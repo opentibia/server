@@ -317,7 +317,6 @@
 		std::string TProt70::makeMap(position topleft, position botright) {
 			int xswap=1, yswap=1;
 			position dif=botright-topleft;
-			position tmppos;
 			/*if(topleft.x > botright.x)
 				swap(topleft.x, botright.x);
 			if(topleft.y > botright.y)
@@ -572,7 +571,7 @@ void TProt70::sendPlayerMove(Action* action){
 	buf[1]=(char)((buf.size()-2)/256)%256;
 
 	FILE* dump=fopen("dump","w+");
-	for(int i=0; i< buf.length(); i++)
+	for(unsigned int i=0; i< buf.length(); i++)
 	fputc(buf[i],dump);
 	fclose(dump);
 

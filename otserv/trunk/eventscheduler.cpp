@@ -21,6 +21,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.9  2003/08/25 21:28:12  tliffrag
+// Fixed all warnings.
+//
 // Revision 1.8  2003/08/25 21:05:51  tliffrag
 // Fixed bugs preventing otserv from running on windows.
 //
@@ -64,7 +67,7 @@ EventScheduler::EventScheduler() {
 void EventScheduler::newsocket(Socket _sock, unary_functor<Socket,void> *_cb) {
     FD_SET(_sock, &active_fd_set);
     fdcb[_sock] = _cb;
-    printf("new socket to listen: %d   %d\n", _sock, _cb);
+    printf("new socket to listen: %d   %d\n", _sock,(int) _cb);
 }
 
 //////////////////////////////////////////////////

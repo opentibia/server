@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.6  2003/08/25 21:28:12  tliffrag
+// Fixed all warnings.
+//
 // Revision 1.5  2003/05/19 16:48:37  tliffrag
 // Loggingin, talking, walking around, logging out working
 //
@@ -124,6 +127,7 @@ int Map::requestAction(Creature* c, Action* a){
 		//says should be ok most of the time
 		distributeAction(a->pos1, a);
 	}
+	return true;
 }
 
 int Map::distributeAction(position pos, Action* a){
@@ -151,6 +155,7 @@ int Map::distributeAction(position pos, Action* a){
 	for(i=victims.begin(); i!=victims.end();++i)
 		(*i)->sendAction(a);
 	delete a;
+	return true;
 }
 
 
