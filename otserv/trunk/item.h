@@ -57,11 +57,13 @@ class Item : public Thing
 
 	 unsigned short count; // number of stacked items
         unsigned getID() const;    // ID as in ItemType
-		bool isBlocking() const;
+		
+    bool isBlocking() const;
 		bool isStackable() const;
 		bool isAlwaysOnTop() const;
 		bool isGroundTile() const;
-		bool isAlwaysOnBottom() const;
+		bool isNotMoveable() const;
+
 		int use(){std::cout << "use " << id << std::endl; return 0;};
 		int use(Item*){std::cout << "use with item ptr " << id << std::endl; return 0;};
 		int use(Creature*){std::cout << "use with creature ptr " << id << std::endl; return 0;};

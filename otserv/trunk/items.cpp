@@ -33,7 +33,7 @@ ItemType::ItemType()
 	iscontainer     = false;
 	stackable       = false;
 	useable	        = false;
-	alwaysOnBottom  = false;
+	notMoveable     = false;
 	alwaysOnTop     = false;
 	groundtile      = false;
 	blocking        = false; // people can walk on it
@@ -151,11 +151,8 @@ int Items::loadFromDat(std::string file)
 					break;
 				
 				case 0x0C:
-					//is alwaysOnBottom
-					//the concept of always on bottom is wron
-					//this only means, that this item has a heigth
-					//TLIFF
-					//iType->alwaysOnBottom=true;
+          // cant be moved
+          iType->notMoveable=true;
 					break;
 	
 				case 0x0F:

@@ -120,8 +120,8 @@ bool Item::isAlwaysOnTop() const {
 	return items[id].alwaysOnTop;
 }
 
-bool Item::isAlwaysOnBottom() const {
-	return items[id].alwaysOnBottom;
+bool Item::isNotMoveable() const {
+	return items[id].notMoveable;
 }
 
 bool Item::isGroundTile() const {

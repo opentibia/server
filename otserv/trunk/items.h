@@ -41,7 +41,7 @@ public:
 	bool iscontainer;
 	bool stackable;
 	bool useable;
-	bool alwaysOnBottom;
+	bool notMoveable;
 	bool alwaysOnTop;
 	bool groundtile; 
 	bool blocking;   // people can walk on it
