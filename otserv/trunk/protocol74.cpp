@@ -750,9 +750,9 @@ void Protocol74::parseUseItem(NetworkMessage &msg)
   	                newcontainer = (Item*)t->getThingByStackPos(un);
   	}
     */
-  	 
+        Container *parentcontainer = NULL;
 		if(x == 0xFFFF) {
-		Container *parentcontainer = NULL;
+		
 
 		if(0x40 & y) {
 			unsigned char containerid = y & 0x0F;
@@ -785,7 +785,12 @@ void Protocol74::parseUseItem(NetworkMessage &msg)
 
 			msg.AddU16(newcontainer->getID());
 			msg.AddString(newcontainer->getName());
-			msg.AddU16(newcontainer->getContainerMaxItemCount());
+			msg.AddByte(newcontainer->getContainerMaxItemCount());
+			if(parentcontainer)
+			/* TODO: implement up arrow */
+			msg.AddByte(0x01); // container up ID (can go up) 
+			else
+			msg.AddByte(0x00);
 			msg.AddByte(newcontainer->getContainerItemCount());
 
       Container::iterator cit;
