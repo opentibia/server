@@ -494,6 +494,12 @@ void TProt70::parseTurnWest(Action* action, std::string msg){
 void TProt70::parseSetOutfit(Action* action, std::string msg){}
 
 void TProt70::parseLogout(Action* action, std::string msg){
+    // if this is a player then save the player's data
+    if( creature->isPlayer() )
+    {
+        // save the character before we logout
+        this->player->save();
+    }
 	//we ask the map to remove us
 	map->removeCreature(pos);
 	//we ask the eventscheduler to disconnect us
