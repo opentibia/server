@@ -129,12 +129,13 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name){
 						int sl_id = atoi((const char*)xmlGetProp(slot, (const xmlChar *)"slotid"));
 						Item* myitem = new Item();
 						myitem->unserialize(slot->children);
-						player->items[sl_id]= Item::CreateItem(myitem->getID(), myitem->getItemCountOrSubtype());
+						//player->items[sl_id] = Item::CreateItem(myitem->getID(), myitem->getItemCountOrSubtype());
+						player->addItem(Item::CreateItem(myitem->getID(), myitem->getItemCountOrSubtype()), sl_id);
 						delete myitem;
 						myitem = NULL;
 
 						//Should be loaded from xml later on...
-						Container* defaultbackpack = dynamic_cast<Container*>(player->items[sl_id]);
+						Container* defaultbackpack = dynamic_cast<Container*>(player->getItem(sl_id));
 						if(defaultbackpack) {
 
 							Container *backpack = dynamic_cast<Container*>(Item::CreateItem(1988));
