@@ -55,6 +55,7 @@ class TSchedulerTask : public SchedulerTask {
 
 					 virtual result_type operator()(const argument_type& arg) {
 								_f(arg);
+                return 0;
 					 }
 
 		  protected:

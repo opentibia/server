@@ -23,6 +23,8 @@
 
 #include <string>
 
+using namespace std;
+
 #include "otsystem.h"
 
 #include <stdio.h>
@@ -678,8 +680,8 @@ void Map::thingMoveInternal(Player *player,
 		      }
 
           CreatureVector::iterator cit;
-          for (int x = std::min(oldPos.x, (int)to_x) - 9; x <= std::max(oldPos.x, (int)to_x) + 9; x++)
-            for (int y = std::min(oldPos.y, (int)to_y) - 7; y <= std::max(oldPos.y, (int)to_y) + 7; y++)
+          for (int x = min(oldPos.x, (int)to_x) - 9; x <= max(oldPos.x, (int)to_x) + 9; x++)
+            for (int y = min(oldPos.y, (int)to_y) - 7; y <= max(oldPos.y, (int)to_y) + 7; y++)
             {
               Tile *tile = getTile(x, y, 7);
               if (tile)
@@ -827,8 +829,8 @@ void Map::creatureMakeDistDamage(Creature *creature, Creature *attackedCreature)
 
     NetworkMessage msg;
 
-    for (int x = std::min(creature->pos.x, attackedCreature->pos.x) - 9; x <= std::max(creature->pos.x, attackedCreature->pos.x) + 9; x++)
-      for (int y = std::min(creature->pos.y, attackedCreature->pos.y) - 7; y <= std::max(creature->pos.y, attackedCreature->pos.y) + 7; y++)
+    for (int x = min(creature->pos.x, attackedCreature->pos.x) - 9; x <= max(creature->pos.x, attackedCreature->pos.x) + 9; x++)
+      for (int y = min(creature->pos.y, attackedCreature->pos.y) - 7; y <= max(creature->pos.y, attackedCreature->pos.y) + 7; y++)
       {
         Tile *tile = getTile(x, y, 7);
         if (tile)

@@ -3,6 +3,8 @@
 #include <iostream>
 #include <sstream>
 
+using namespace std;
+
 #include "otsystem.h"
 
 #include "networkmessage.h"
@@ -66,7 +68,7 @@ bool NetworkMessage::WriteToSocket(SOCKET socket)
   int sendBytes = 0;
   do
   {
-    int b = send(socket, (char*)m_MsgBuf+sendBytes, std::min(m_MsgSize-sendBytes+2, 1000), 0);
+    int b = send(socket, (char*)m_MsgBuf+sendBytes, min(m_MsgSize-sendBytes+2, 1000), 0);
 
     if (b <= 0)
       return false;

@@ -6,6 +6,7 @@
 
 #if defined WIN32 || defined __WINDOWS__
 
+#include <windows.h>
 #include <process.h>
 #include <sys/timeb.h>
 
@@ -20,15 +21,40 @@
 #define OTSYS_THREAD_LOCK(a)        EnterCriticalSection(&a);
 #define OTSYS_THREAD_UNLOCK(a)      LeaveCriticalSection(&a);
 
+#define OTSYS_THREAD_TIMEOUT			  WAIT_TIMEOUT
+#define OTSYS_THREAD_SIGNALVARINIT(a) a = CreateEvent(NULL, FALSE, FALSE, NULL)
+#define OTSYS_THREAD_SIGNAL_SEND(a)   SetEvent(a);
 
-#define OTSYS_SLEEP(a) Sleep(a);
-
+typedef HANDLE OTSYS_THREAD_SIGNALVAR;
 
 inline __int64 OTSYS_TIME()
 {
   _timeb t;
   _ftime(&t);
   return ((__int64)t.millitm) + ((__int64)t.time) * 1000;
+}
+
+inline int OTSYS_THREAD_WAITSIGNAL(OTSYS_THREAD_SIGNALVAR& signal, OTSYS_THREAD_LOCKVAR& lock)
+{
+  LeaveCriticalSection(&lock);
+  WaitForSingleObject(signal, INFINITE);
+  EnterCriticalSection(&lock);
+
+  return -0x4711;
+}
+
+
+inline int OTSYS_THREAD_WAITSIGNAL_TIMED(OTSYS_THREAD_SIGNALVAR& signal, OTSYS_THREAD_LOCKVAR& lock, __int64 cycle)
+{
+  DWORD tout = (DWORD)(cycle - OTSYS_TIME());
+  if (tout < 0)
+    tout = 0;
+
+  LeaveCriticalSection(&lock);
+  int ret = WaitForSingleObject(signal, tout);
+  EnterCriticalSection(&lock);
+
+  return ret;
 }
 
 typedef int socklen_t;

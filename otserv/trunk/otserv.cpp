@@ -92,8 +92,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 
     Account account;
     char accstring[16];
-    //itoa(accnumber, accstring, 10);
-	 snprintf(accstring, 10, "%i", accnumber);
+	  sprintf(accstring, "%i", accnumber);
 
     if (account.openAccount(accstring, password))
     {

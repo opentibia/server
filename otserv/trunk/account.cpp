@@ -23,8 +23,8 @@ Account::~Account()
 
 bool Account::openAccount(const std::string &account, const std::string &givenpassword)
 {
-		  std::string filename = "data/accounts/" + account + ".xml";
-  transform(filename.begin(), filename.end(), filename.begin(), tolower);
+	std::string filename = "data/accounts/" + account + ".xml";
+  std::transform(filename.begin(), filename.end(), filename.begin(), tolower);
 
   xmlDocPtr doc = xmlParseFile(filename.c_str());
 
@@ -87,7 +87,7 @@ bool Account::openAccount(const std::string &account, const std::string &givenpa
 bool Account::openPlayer(const std::string &name, const std::string &givenpassword, Player &player)
 {
 	std::string filename="data/players/"+name+".xml";
-	transform (filename.begin(),filename.end(), filename.begin(), tolower);
+  std::transform (filename.begin(),filename.end(), filename.begin(), tolower);
 
 	xmlDocPtr doc;
 	doc = xmlParseFile(filename.c_str());

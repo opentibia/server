@@ -6,6 +6,7 @@
 
 #include "creature.h"
 
+using namespace std;
 
 static unsigned int idcount = 0x4711;
 
@@ -36,7 +37,7 @@ Creature::Creature(const char *name)
 
 void Creature::drainHealth(int damage)
 {
-  lastDamage = std::min(health, damage);
+  lastDamage = min(health, damage);
 
   health -= lastDamage;
 }
