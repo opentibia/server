@@ -49,7 +49,7 @@ Account IOAccountSQL::loadAccount(unsigned long accno){
 
 		mysqlpp::Row row = *res.begin();
 		acc.accnumber = row.lookup_by_name("accno");
-		acc.password = row.lookup_by_name("password");
+		acc.password = std::string(row.lookup_by_name("password"));
 		std::cout << "pass " << acc.password << "      acc " << acc.accnumber << std::endl;
 		acc.accType = row.lookup_by_name("type");
 		acc.premDays = row.lookup_by_name("premDays");
@@ -60,7 +60,7 @@ Account IOAccountSQL::loadAccount(unsigned long accno){
 		res = query.store();
 		mysqlpp::Result::iterator i;
 		for(i = res.begin(); i != res.end(); i++){
-			std::string ss = (*i)[0];
+			std::string ss = std::string((*i)[0]);
 			acc.charList.push_back(ss.c_str());
 		}
 					

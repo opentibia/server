@@ -28,7 +28,14 @@
 
 #include <iostream>
 #include <iomanip>
+
+// cross compatibility vc++ and gcc
+#ifdef __GNUC__
+#include <ext/hash_map>
+#else
 #include <hash_map>
+#endif
+
 #include <mysql++.h>
 #include <boost/tokenizer.hpp>
 
@@ -65,9 +72,9 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 	std::cout << "found " << res.size() << " chars" << std::endl;
 
 	//FIXME: why doesnt this work?
-/*	if(res.size() != 1())
+	if(res.size() != 1)
 		return false;
-*/
+
 	mysqlpp::Row row = *(res.begin());
 
 	int accno = row.lookup_by_name("account");
@@ -111,7 +118,7 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 	boost::char_separator<char> sep(";");
 
 	//SPAWN
-	std::string pos = row.lookup_by_name("pos");
+	std::string pos = std::string(row.lookup_by_name("pos"));
 	std::cout << pos << std::endl;
 	tokenizer tokens(pos, sep);
 
@@ -126,7 +133,7 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 	std::cout << "sql loading: " << player->pos << std::endl;
 
 	//MASTERSPAWN
-	std::string masterpos = row.lookup_by_name("masterpos");
+	std::string masterpos = std::string(row.lookup_by_name("masterpos"));
 	tokenizer mastertokens(masterpos, sep);
 
 	tokenizer::iterator mspawnit = mastertokens.begin();
@@ -171,7 +178,12 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 		return false;
 	}
 
+    // cross compatibility vc++ and gcc
+    #ifdef __GNUC__
+	__gnu_cxx::hash_map<int,std::pair<Item*,int> > itemmap;
+	#else
 	std::hash_map<int,std::pair<Item*,int> > itemmap;
+	#endif
 	try{
 		for(mysqlpp::Result::iterator i = res.begin(); i != res.end(); i++){
 			mysqlpp::Row r = *i;
@@ -187,7 +199,12 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 	catch(std::exception er){
 		std::cout << "damn crap" << std::endl;
 	}
+	// cross compatibility vc++ and gcc
+    #ifdef __GNUC__
+	__gnu_cxx::hash_map<int,std::pair<Item*,int> >::iterator it;
+	#else
 	std::hash_map<int,std::pair<Item*,int> >::iterator it;
+	#endif
 	for(it=itemmap.begin(); it != itemmap.end(); it++){
 		if(int p=(*it).second.second)
 			if(Container* c = dynamic_cast<Container*>(itemmap[p].first))
