@@ -504,7 +504,8 @@ void TProt70::parseLogout(Action* action, std::string msg){
 	es.deletesocket(psocket);
 	close(psocket);
 	//we remove ourself
-	delete creature;
+	// FIXME when does the creature get deleted? this produced segfaults.
+	//delete creature;
 //	delete this;
 }
 
