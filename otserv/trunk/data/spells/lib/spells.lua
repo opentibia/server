@@ -1,16 +1,18 @@
-function MagicDamageObject(ianimationEffect, idamageEffect, ianimationColor, ioffensive, iphysical, iminDmg, imaxDmg)
+function MagicDamageObject(iattackType, ianimationEffect, ihitEffect, idamageEffect, ianimationColor, ioffensive, idrawblood, iminDmg, imaxDmg)
   local self = {
+  attackType = iattackType,
   animationEffect = ianimationEffect,
+  hitEffect = ihitEffect,
   damageEffect = idamageEffect,
   animationColor = ianimationColor,
   offensive = ioffensive,
-  physical = iphysical,
+  drawblood = idrawblood,
   minDmg = iminDmg,
   maxDmg = imaxDmg}
 
   function self:ordered()
     --print('ordered()')
-    return {self.animationEffect, self.damageEffect, self.animationColor, self.offensive, self.physical, self.minDmg, self.maxDmg}
+    return {self.attackType, self.animationEffect, self.hitEffect, self.damageEffect, self.animationColor, self.offensive, self.drawblood, self.minDmg, self.maxDmg}
   end
   
 return self
@@ -56,14 +58,17 @@ NM_ANI_POWERBOLT = 13
 -- only for internal use, dont send to client
 NM_ANI_NONE = 0
 
-GREEN	= 19
-RED = 180
-DARK_BLUE =	2
+GREEN	    = 19
+RED       = 180
+DARK_BLUE = 2
 
--- for use with spells that causes certain conditions (burning/poisoned/energized)
-MAGIC_CONDITIONFIRE = 1
-MAGIC_CONDITIONPOISON = 2
-MAGIC_CONDITIONENERGY = 3
-
+ATTACK_NONE      = 0
+ATTACK_ENERGY    = 1
+ATTACK_BURST     = 2
+ATTACK_FIRE      = 3
+ATTACK_PHYSICAL  = 4
+ATTACK_POISON    = 5
+ATTACK_PARALYZE  = 6
+ATTACK_DRUNKNESS = 7
 
 outfits = {["Orc Warlord"] = 2, ["War Wolf"] = 3, ["Orc Ridder"] = 4, ["Orc"] = 5, ["Orc Shaman"] =6, ["Orc Warrior"] = 7, ["Orc Berserker"] = 8, ["Necromancer"] = 9, ["Black Sheep"] = 13, ["Sheep"] = 14, ["Trol"] = 15, ["Bear"] = 16, ["Beholder"] = 17, ["Ghoul"] = 18, ["Slime"] = 19, ["Rat"]= 21, ["Cyclops"] = 22, ["Minotaur Mage"] = 23, ["Minotaur Archer"] = 24, ["Minotaur"] = 25, ["Rotworm"] = 26, ["Wolf"] = 27, ["Snake"] = 28, ["Minotaur Guard"] =29, ["Spider"] = 30, ["Deer"] = 31, ["Dog"] = 32, ["Skeleton"] = 33, ["Dragon"] = 34, ["Poison Spider"] = 36, ["Demon Skeleton"] = 37, ["Giant Spider"] = 38, ["Dragon Lord"] = 39, ["Fire Devil"] = 40, ["Lion"] = 41, ["Polar Bear"] = 42, ["Scorpion"] = 43, ["Wasp"]= 44, ["Bug"] = 45, ["Ghost"] = 48, ["Fire Elemental"] = 49, ["Orc Spearman"] = 50, ["Djinn"] =51, ["Winter Wolf"] = 52, ["Frost Troll"]=53, ["Witch"] = 54, ["Behemot"] =55, ["Cave Rat"] = 56, ["Monk"] = 57, ["Priestess"] = 58, ["Orc Leader"] = 59, ["Pig"] = 60, ["Goblin"] = 61, ["Elf"] = 62, ["Elf Arcanist"] = 63,  ["Elf Scout"] = 64, ["Mummy"] = 65, ["Dwarf Geomancer"] = 66, ["Stone Golem"] = 67, ["Vampire"] = 68,  ["Dwarf"] = 69, ["Dwarf Guard"] = 70, ["Dwarf Soldier"] = 71, ["Rabbit"] = 74, ["Swamp Troll"] = 76}
