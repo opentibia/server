@@ -296,7 +296,7 @@ void TProt70::setMap(position newpos, Map& newmap) throw(texception) {
 	buf[1]=(char)((buf.size()-2)/256)%256;
 	// and send to client...
 	TNetwork::SendData(psocket,buf);
-	//sendInventory(); // TODO readd inventory which currently segfaults
+	sendInventory();
 } // void TProt70::setMap(position newpos) throw(texception)
 
 std::string TProt70::makeMap(position topleft, position botright) {

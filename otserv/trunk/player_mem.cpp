@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.18  2004/11/14 17:42:11  shivoc
+// readd inventory
+//
 // Revision 1.17  2004/11/14 09:16:54  shivoc
 // some fixes to at least reenable login without segfaulting the server (including some merges from haktivex' server
 //
@@ -368,7 +371,7 @@ int player_mem::loadXml(){
 			while(slot){
 				int sl_id=atoi((const char*)xmlGetProp(slot, (const xmlChar *) "slotid"));
 				Item* myitem=new Item();
-				//myitem->unserialize(slot->children);
+				myitem->unserialize(slot->children);
 				items[sl_id]=myitem;
 				slot=slot->next;
 			}

@@ -2,7 +2,7 @@ AUTOMAKE_OPTIONS = foreign
 
 noinst_PROGRAMS = otserv
 
-CXXFLAGS = $(XML_CPPFLAGS) $(OTSERV_FLAGS) $(LUA50_CFLAGS) -D__DEBUG__
+CXXFLAGS = $(XML_CPPFLAGS) $(OTSERV_FLAGS) $(LUA50_CFLAGS) -D__DEBUG__ -g
 LIBS = $(XML_LIBS) $(LUA50_LIBS)
 
 otserv_SOURCES = action.h creature.h definitions.h eventscheduler.cpp \
