@@ -620,6 +620,9 @@ void Map::thingMoveInternal(Player *player,
       {
         // TODO... "not Posible"
       }
+      else if (toTile->isBlocking())
+      {
+      }
       else
       {
         int oldstackpos = fromTile->getThingStackPos(thing);

@@ -34,18 +34,21 @@ int Tile::getStackPosItem(){
 }
 
 
-bool Tile::isBlocking(){
-	bool blocking=false;
-/*	Tile::iterator i;
-	//if any of the items on this tile is blocking,
-	//the whole tile blocks
-	for(i = this->begin(); i != this->end(); i++){
-		if((*i)->isBlocking())
-			blocking=true;
-	}
-	if(creature) //creatures also block a tile
-		blocking=true;*/
-	return blocking;
+bool Tile::isBlocking()
+{
+  if (creatures.size() != 0)
+    return true;
+
+  ItemVector::iterator iit;
+  for (iit = topItems.begin(); iit != topItems.end(); iit++)
+    if ((*iit)->isBlocking())
+      return true;
+
+  for (iit = downItems.begin(); iit != downItems.end(); iit++)
+    if ((*iit)->isBlocking())
+      return true;
+
+  return false;
 }
 
 int Tile::removeItem(int stack, int type, int count){
