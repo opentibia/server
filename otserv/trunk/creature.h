@@ -47,13 +47,26 @@ enum subfight_t {
   DIST_POWERBOLT = NM_ANI_POWERBOLT
 };
 
+enum slots_t {
+	SLOT_WHEREEVER=0,
+	SLOT_HEAD=1,
+	SLOT_NECKLACE=2,
+	SLOT_BACKPACK=3,
+	SLOT_ARMOR=4,
+	SLOT_RIGHT=5,
+	SLOT_LEFT=6,
+	SLOT_LEGS=7,
+	SLOT_FEET=8,
+	SLOT_RING=9,
+	SLOT_AMMO=10,
+	SLOT_DEPOT=11
+};
+
 enum fight_t {
 	FIGHT_MELEE,
 	FIGHT_DIST,
 	FIGHT_MAGICDIST
 };
-
-enum slots_t;
 
 // Macros
 #define CREATURE_SET_OUTFIT(c, type, head, body, legs, feet) c->looktype = type; \
