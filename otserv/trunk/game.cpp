@@ -714,6 +714,7 @@ void Game::thingMoveInternal(Creature *player,
 				//change level begin          
 				Tile* downTile = getTile(to_x, to_y, to_z+1);
 				//diagonal begin
+				if(downTile){
 				if(downTile->floorChange(NORTH) && downTile->floorChange(EAST)){
 					teleport(playerMoving, Position(playerMoving->pos.x-2, playerMoving->pos.y+2, playerMoving->pos.z+1));                           
 				}
@@ -738,7 +739,8 @@ void Game::thingMoveInternal(Creature *player,
 				}
 				else if(downTile->floorChange(WEST)){
 					teleport(playerMoving, Position(playerMoving->pos.x+2, playerMoving->pos.y, playerMoving->pos.z+1));                           
-				}                                                
+				}    
+            }                                            
 				//change level end   
 				else player->sendCancelWalk("Sorry, not possible...");
 					
@@ -794,6 +796,7 @@ void Game::thingMoveInternal(Creature *player,
 				//change level begin
 				if(playerMoving && !(toTile->ground.noFloorChange())){          
 					Tile* downTile = getTile(to_x, to_y, to_z+1);
+					if(downTile){
 					//diagonal begin
 					if(downTile->floorChange(NORTH) && downTile->floorChange(EAST)){
 						teleport(playerMoving, Position(playerMoving->pos.x-1, playerMoving->pos.y+1, playerMoving->pos.z+1));                           
@@ -820,6 +823,7 @@ void Game::thingMoveInternal(Creature *player,
 					else if(downTile->floorChange(WEST)){
 						teleport(playerMoving, Position(playerMoving->pos.x+1, playerMoving->pos.y, playerMoving->pos.z+1));                           
 					}
+                }
 				}
 				//diagonal begin
 				else if(playerMoving && toTile->floorChange(NORTH) && toTile->floorChange(EAST)){
@@ -1081,10 +1085,12 @@ void Game::teleport(Creature *creature, Position newPos) {
             
     std::vector<Creature*> list;
     getSpectators(Range(oldPos, true), list);
+    printf("1\n");
     for(size_t i = 0; i < list.size(); ++i)
       list[i]->onTileUpdated(oldPos);
     list.clear();
     getSpectators(Range(creature->pos, true), list);
+    printf("2\n");
     for(size_t i = 0; i < list.size(); ++i)
       list[i]->onTeleport(creature, &oldPos, osp);
   } 

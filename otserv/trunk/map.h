@@ -150,7 +150,7 @@ public:
 
 	Range(Position centerpos, int minRangeX, int maxRangeX, int minRangeY, int maxRangeY)
 	{
-		Range(centerpos, true);
+		setRange(centerpos, true);
 
 		minRange.x = -minRangeX;
 		minRange.y = -minRangeY;
@@ -178,8 +178,8 @@ private:
 		minRange.x = -8;
 		minRange.y = -6;
 
-		maxRange.x = 9;
-		maxRange.y = 7;
+		maxRange.x = 8;
+		maxRange.y = 6;
 		
 		zstep = 1;
 

@@ -365,13 +365,19 @@ bool Map::removeCreature(Creature* c)
 
 void Map::getSpectators(const Range& range, std::vector<Creature*>& list)
 {
-/*
+
 #ifdef __DEBUG__
 	std::cout << "Viewer position at x: " << range.centerpos.x
 		<< ", y: " << range.centerpos.y
 		<< ", z: " << range.centerpos.z << std::endl;
+	std::cout << "Min Range x: " << range.minRange.x
+		<< ", y: " << range.minRange.y
+		<< ", z: " << range.minRange.z << std::endl;
+    std::cout << "Max Range x: " << range.maxRange.x
+		<< ", y: " << range.maxRange.y
+		<< ", z: " << range.maxRange.z << std::endl;    	
 #endif
-*/
+
 
 	int offsetz;
 	CreatureVector::iterator cit;
@@ -389,11 +395,11 @@ void Map::getSpectators(const Range& range, std::vector<Creature*>& list)
 				if (tile)
 				{
 					for (cit = tile->creatures.begin(); cit != tile->creatures.end(); ++cit) {
-/*
+
 #ifdef __DEBUG__
-						std::cout << "Found " << (*cit)->getName() << " at x: " << (*cit)->pos.x << ", y: " << (*cit)->pos.y << ", z: " << (*cit)->pos.z << ", offset: " << offset << std::endl;
+						std::cout << "Found " << (*cit)->getName() << " at x: " << (*cit)->pos.x << ", y: " << (*cit)->pos.y << ", z: " << (*cit)->pos.z << ", offset: " << offsetz << std::endl;
 #endif
-*/
+
 						list.push_back((*cit));
 					}
 				}

@@ -281,11 +281,11 @@ void Protocol74::GetMapDescription(unsigned short x, unsigned short y, unsigned 
   int skip = -1;
   int startz, endz, offset, zstep, cc = 0;
   if (z > 7) {
-		startz = std::min(z + 2, MAP_LAYER - 1);
-		endz = std::max(z - 2, 6 /*(8 - 2)*/);
-    //startz = z - 2;   
-		//endz = std::max(MAP_LAYER - 1, z + 2);
-		zstep = -1;
+		//startz = std::min(z + 2, MAP_LAYER - 1);
+		//endz = std::max(z - 2, 6 /*(8 - 2)*/);
+        startz = z - 2;   
+		endz = std::min(MAP_LAYER - 1, z + 2);
+		zstep = 1;
   }
 	else {
 		startz = 7;
@@ -1353,12 +1353,12 @@ void Protocol74::sendContainerUpdated(Item *item, unsigned char from_id, unsigne
 	msg.WriteToSocket(s);
 }
 
-void Protocol74::sendThingMove(const Creature *creature, const Thing *thing, const Position *oldPos, unsigned char oldStackPos)
+void Protocol74::sendThingMove(const Creature *creature, const Thing *thing, const Position *oldPos, unsigned char oldStackPos, bool tele)
 {
   NetworkMessage msg;
 
 	const Creature* c = dynamic_cast<const Creature*>(thing);
-  if (c && (CanSee(oldPos->x, oldPos->y, oldPos->z)) && (CanSee(thing->pos.x, thing->pos.y, thing->pos.z)))
+  if (!tele && c && (CanSee(oldPos->x, oldPos->y, oldPos->z)) && (CanSee(thing->pos.x, thing->pos.y, thing->pos.z)))
   {
     msg.AddByte(0x6D);
     msg.AddPosition(*oldPos);
@@ -1374,7 +1374,7 @@ void Protocol74::sendThingMove(const Creature *creature, const Thing *thing, con
       msg.AddByte(oldStackPos);
     }
 
-    if (CanSee(thing->pos.x, thing->pos.y, thing->pos.z))
+    if (!(tele && thing == this->player) && CanSee(thing->pos.x, thing->pos.y, thing->pos.z))
     {
       msg.AddByte(0x6A);
       msg.AddPosition(thing->pos);
@@ -1390,6 +1390,12 @@ void Protocol74::sendThingMove(const Creature *creature, const Thing *thing, con
   }
 	
   if (thing == this->player) {
+    if(tele){
+             msg.AddByte(0x64); 
+             msg.AddPosition(player->pos); 
+             GetMapDescription(player->pos.x-8, player->pos.y-6, player->pos.z, 18, 14, msg); 
+             }  
+    else{               
     if (oldPos->y > thing->pos.y) { // north, for old x
       msg.AddByte(0x65);
       GetMapDescription(oldPos->x - 8, thing->pos.y - 6, thing->pos.z, 18, 1, msg);
@@ -1404,37 +1410,11 @@ void Protocol74::sendThingMove(const Creature *creature, const Thing *thing, con
       msg.AddByte(0x68);
       GetMapDescription(thing->pos.x - 8, thing->pos.y - 6, thing->pos.z, 1, 14, msg);
     }
+    }
   }
 
   msg.WriteToSocket(s);
 }
-
-void Protocol74::sendTeleport(const Creature *creature, const Position *oldPos, unsigned char oldStackPos) { 
-  NetworkMessage msg; 
-  if (creature == this->player) {
-    if (CanSee(oldPos->x, oldPos->y, oldPos->z)) { 
-      msg.AddByte(0x6C); 
-      msg.AddPosition(*oldPos); 
-      msg.AddByte(oldStackPos); 
-    } 
-    // new pos
-    msg.AddByte(0x64); 
-    msg.AddPosition(player->pos); 
-    GetMapDescription(player->pos.x-8, player->pos.y-6, player->pos.z, 18, 14, msg); 
-
-    msg.WriteToSocket(s); 
-  } else if (CanSee( creature->pos.x, creature->pos.y, creature->pos.z)){
-      bool known;
-      unsigned long removedKnown;
-      checkCreatureAsKnown(creature->getID(), known, removedKnown);
-
-      msg.AddByte(0x6A);
-      msg.AddPosition(creature->pos);
-      msg.AddCreature(creature, known, removedKnown);
-
-      msg.WriteToSocket(s);
-    } 
-} 
 
 
 void Protocol74::sendCreatureAppear(const Creature *creature)

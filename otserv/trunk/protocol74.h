@@ -121,7 +121,7 @@ private:
 
   virtual void sendNetworkMessage(NetworkMessage *msg);
   virtual void sendIcons(int icons);
-  virtual void sendThingMove(const Creature *creature, const Thing *thing, const Position *oldPos, unsigned char oldstackpos);
+  virtual void sendThingMove(const Creature *creature, const Thing *thing, const Position *oldPos, unsigned char oldstackpos, bool tele = false);
   virtual void sendCreatureAppear(const Creature *creature);
   virtual void sendCreatureDisappear(const Creature *creature, unsigned char stackPos);
   virtual void sendCreatureTurn(const Creature *creature, unsigned char stackpos);
@@ -136,8 +136,6 @@ private:
 	virtual void sendContainerUpdated(Item *item, unsigned char from_id, unsigned char to_id, unsigned char from_slot, unsigned char to_slot, bool remove);
 
   virtual bool CanSee(int x, int y, int z) const;
-  
-  virtual void sendTeleport(const Creature *creature, const Position *oldPos, unsigned char oldStackPos);
 
 	void sendContainer(unsigned char index, Container *container);
 

@@ -49,7 +49,7 @@ public:
 
   virtual void sendNetworkMessage(NetworkMessage *msg) = 0;
 
-  virtual void sendThingMove(const Creature *creature, const Thing *thing, const Position *oldPos, unsigned char oldStackPos) = 0;
+  virtual void sendThingMove(const Creature *creature, const Thing *thing, const Position *oldPos, unsigned char oldStackPos, bool tele = false) = 0;
   virtual void sendCreatureAppear(const Creature *creature) = 0;
   virtual void sendCreatureDisappear(const Creature *creature, unsigned char stackPos) = 0;
   virtual void sendCreatureTurn(const Creature *creature, unsigned char stackPos) = 0;
@@ -67,7 +67,6 @@ public:
   virtual void sendChannel(unsigned short channelId) = 0;
   virtual void sendToChannel(const Creature * creature, unsigned char type, const std::string &text, unsigned short channelId) = 0;
   virtual void sendOpenPriv(std::string &receiver) =0;
-  virtual void sendTeleport(const Creature *creature, const Position *oldPos, unsigned char oldStackPos) = 0;
 
 
 protected:
