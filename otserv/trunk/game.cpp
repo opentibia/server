@@ -57,6 +57,193 @@ extern Spells spells;
 extern std::map<long, Creature*> channel;
 extern std::vector< std::pair<unsigned long, unsigned long> > bannedIPs;
 
+GameState::GameState(Game *game, const Range &range) :
+	mapstate(game->map)
+{
+	this->game = game;
+	game->getSpectators(range, spectatorlist);
+}
+
+void GameState::onAttack(Creature *creature, const Position& pos, const MagicEffectClass* me)
+{
+	Tile *tile = game->map->getTile(pos.x, pos.y, pos.z);
+
+	if(!tile)
+		return;
+
+	CreatureVector::iterator cit;
+	Player *player = dynamic_cast<Player*>(creature);
+	Creature *targetCreature = NULL;
+	Player *targetPlayer = NULL;
+	for(cit = tile->creatures.begin(); cit != tile->creatures.end(); ++cit) {
+		targetCreature = (*cit);
+		targetPlayer = dynamic_cast<Player*>(targetCreature);
+
+		int damage = me->getDamage(targetCreature, creature);
+		int manaDamage = 0;
+
+		if (damage > 0) {
+			if(player && player->access == 0) {
+				if(targetPlayer && targetPlayer != player)
+					player->pzLocked = true;
+			}
+
+			if(targetCreature->access == 0 && targetPlayer) {
+				targetPlayer->inFightTicks = (long)g_config.getGlobalNumber("pzlocked", 0);
+				targetPlayer->sendIcons();
+			}
+		}
+		
+		if(damage != 0) {
+			game->creatureApplyDamage(targetCreature, damage, damage, manaDamage);
+		}
+
+		addCreatureState(tile, targetCreature, damage, manaDamage, me->drawblood);
+	}
+
+	//Solid ground items/Magic items (fire/poison/energy)
+	MagicEffectItem *newmagicItem = me->getMagicItem(creature, tile->isPz(), tile->isBlocking());
+
+	if(newmagicItem) {
+
+		MagicEffectItem *magicItem = tile->getFieldItem();
+
+		if(magicItem) {
+			//Replace existing magic field
+			magicItem->transform(newmagicItem);
+			
+			//mapstate.removeThing(targettile, magicItem);
+			//mapstate.addThing(targettile, magicItem);
+			mapstate.refreshThing(tile, magicItem);
+		}
+		else {
+			magicItem = new MagicEffectItem(*newmagicItem);
+			magicItem->pos = pos; //taIt->first;
+
+			mapstate.addThing(tile, magicItem);
+
+			game->addEvent(makeTask(newmagicItem->getDecayTime(), std::bind2nd(std::mem_fun(&Game::decayItem), magicItem)));
+		}
+	}
+
+	//Clean up
+	for(CreatureStateVec::const_iterator csIt = creaturestates[tile].begin(); csIt != creaturestates[tile].end(); ++csIt) {
+		onAttackedCreature(tile, csIt->first, csIt->second.damage, csIt->second.drawblood);
+	}
+
+	if(player && player->access == 0) {
+		//Add exhaustion
+		if(me->causeExhaustion(true) /*!areaTargetVec.empty())*/)
+			player->exhaustedTicks = (long)g_config.getGlobalNumber("exhausted", 0);
+		
+		//Fight symbol
+		if(me->offensive /*&& !areaTargetVec.empty()*/)
+			player->inFightTicks = (long)g_config.getGlobalNumber("pzlocked", 0);
+	}
+}
+
+void GameState::onAttack(Creature *creature, const Position& pos, Creature* attackedCreature)
+{
+	int damage = creature->getWeaponDamage();
+	int manaDamage = 0;
+
+	if (creature->access != 0)
+		damage += 1337;
+
+	if (damage < -50 || attackedCreature->access != 0)
+		damage = 0;
+
+	game->creatureApplyDamage(attackedCreature, damage, damage, manaDamage);
+
+	Tile *tile = game->map->getTile(pos.x, pos.y, pos.z);
+
+	addCreatureState(tile, attackedCreature, damage, manaDamage, true);
+	onAttackedCreature(tile, attackedCreature, damage,  true);
+}
+
+void GameState::addCreatureState(Tile* tile, Creature *creature, int damage, int manaDamage, bool drawblood)
+{
+	CreatureState cs;
+	cs.damage = damage;
+	cs.manaDamage = manaDamage;
+	cs.drawblood = drawblood;
+
+	creaturestates[tile].push_back( make_pair(creature, cs) );
+}
+
+void GameState::onAttackedCreature(Tile* tile, Creature *creature, int damage, bool drawblood)
+{
+	//Remove player?
+	if(creature->health <= 0) {
+		
+		//Remove character
+		unsigned char stackpos = tile->getCreatureStackPos(creature);
+		mapstate.removeThing(tile, creature);
+		removeCreature(creature, stackpos);
+					
+		if(creature) {
+			creature->experience += (int)(creature->experience * 0.1);
+		}
+
+		Player *player = dynamic_cast<Player*>(creature);
+		if(player) {
+			NetworkMessage msg;
+			msg.AddPlayerStats(player);           
+			player->sendNetworkMessage(&msg);
+		}
+			    
+		//Add body
+		Item *corpseitem = Item::CreateItem(creature->lookcorpse);
+		corpseitem->pos = creature->pos;
+
+		mapstate.addThing(tile, corpseitem);
+
+		//Start decaying
+		unsigned short decayTime = Item::items[corpseitem->getID()].decayTime;
+		game->addEvent(makeTask(decayTime*1000, std::bind2nd(std::mem_fun(&Game::decayItem), corpseitem)));
+	}
+
+	//Add blood?
+	if(drawblood && damage > 0) {
+
+		bool hadSplash = (tile->splash != NULL);
+
+		if (!tile->splash) {
+			Item *item = Item::CreateItem(2019, 2);
+			item->pos = creature->pos;
+			tile->splash = item;
+		}
+
+		if(hadSplash)
+			mapstate.refreshThing(tile, tile->splash);
+		else
+			mapstate.addThing(tile, tile->splash);
+
+		//Start decaying
+		unsigned short decayTime = Item::items[tile->splash->getID()].decayTime;
+		tile->decaySplashAfter = OTSYS_TIME() + decayTime*1000;
+		game->addEvent(makeTask(decayTime*1000, std::bind2nd(std::mem_fun(&Game::decaySplash), tile->splash)));
+	}
+}
+
+void GameState::removeCreature(Creature *creature, unsigned char stackPos)
+{
+	game->playersOnline.erase(game->playersOnline.find(creature->getID()));
+
+	//distribute the change to all non-players that a character has been removed
+	for(int i = 0; i < spectatorlist.size(); ++i) {
+		Player *player = dynamic_cast<Player*>(spectatorlist[i]);
+		if(!player) {
+			spectatorlist[i]->onCreatureDisappear(creature, stackPos);
+		}
+	}
+}
+
+void GameState::getChanges(Player *spectator, NetworkMessage &msg)
+{
+	mapstate.getMapChanges(spectator, msg);
+}
+
 Game::Game()
 {
 	this->map = NULL;
@@ -677,8 +864,8 @@ void Game::thingMoveInternal(Creature *player,
                     unsigned char stackPos,
                     unsigned short to_x, unsigned short to_y, unsigned char to_z)
 {
-	Thing *thing = getTile(from_x, from_y, from_z)->getThingByStackPos(stackPos);
   Tile *fromTile = getTile(from_x, from_y, from_z);
+	Thing *thing = fromTile->getThingByStackPos(stackPos);
 	Tile *toTile   = getTile(to_x, to_y, to_z);
 
 #ifdef __DEBUG__
@@ -704,12 +891,6 @@ void Game::thingMoveInternal(Creature *player,
 
 		if(fromTile)
 		{
-			if(!onPrepareMoveThing(player, thing, Position(from_x, from_y, from_z), Position(to_x, to_y, to_z)))
-				return;
-
-			if(creature && !onPrepareMoveCreature(player, creature, fromTile, toTile))
-				return;
-
 			if(!toTile && player == creature){
 				//change level begin          
 				Tile* downTile = getTile(to_x, to_y, to_z+1);
@@ -746,6 +927,12 @@ void Game::thingMoveInternal(Creature *player,
 					
 					return;
 			}
+
+			if(!onPrepareMoveThing(player, thing, Position(from_x, from_y, from_z), Position(to_x, to_y, to_z)))
+				return;
+
+			if(creature && !onPrepareMoveCreature(player, creature, fromTile, toTile))
+				return;
 
 			if(!onPrepareMoveThing(player, thing, fromTile, toTile))
 				return;
@@ -858,11 +1045,14 @@ void Game::thingMoveInternal(Creature *player,
 
 					if(fieldItem) {
 						fieldItem->getDamage(creature);
-						const MagicEffectTargetMagicDamageClass *magicTargetDmg = fieldItem->getMagicDamageEffect();
+						const MagicEffectTargetCreatureCondition *magicTargetCondition = fieldItem->getCondition();
 						
-						if(magicTargetDmg) {
-							Creature* c = getCreatureByID(magicTargetDmg->getOwnerID());
-							creatureMakeMagic(c, thing->pos, magicTargetDmg);
+						if(magicTargetCondition && ((magicTargetCondition->attackType == ATTACK_FIRE) || 
+								(magicTargetCondition->attackType == ATTACK_POISON) ||
+								(magicTargetCondition->attackType == ATTACK_ENERGY))) {
+
+							Creature* c = getCreatureByID(magicTargetCondition->getOwnerID());
+							creatureMakeMagic(c, thing->pos, magicTargetCondition);
 						}
 					}
 				}
@@ -950,30 +1140,27 @@ void Game::creatureSay(Creature *creature, unsigned char type, const std::string
 					delete npc;
 					break;
 				}
+
 				// Set the NPC pos
-				if(creature->direction == NORTH)
-				{
+				if(creature->direction == NORTH) {
 					npc->pos.x = creature->pos.x;
 					npc->pos.y = creature->pos.y - 1;
 					npc->pos.z = creature->pos.z;
 				}
 				// South
-				if(creature->direction == SOUTH)
-				{
+				if(creature->direction == SOUTH) {
 					npc->pos.x = creature->pos.x;
 					npc->pos.y = creature->pos.y + 1;
 					npc->pos.z = creature->pos.z;
 				}
 				// East
-				if(creature->direction == EAST)
-				{
+				if(creature->direction == EAST) {
 					npc->pos.x = creature->pos.x + 1;
 					npc->pos.y = creature->pos.y;
 					npc->pos.z = creature->pos.z;
 				}
 				// West
-				if(creature->direction == WEST)
-				{
+				if(creature->direction == WEST) {
 					npc->pos.x = creature->pos.x - 1;
 					npc->pos.y = creature->pos.y;
 					npc->pos.z = creature->pos.z;
@@ -981,6 +1168,48 @@ void Game::creatureSay(Creature *creature, unsigned char type, const std::string
 				// Place the npc
 				placeCreature(npc);
 			} break; // case 's':
+
+			// Summon?
+			case 'm':
+			{
+				// Create a non-const copy of the command
+				std::string cmd = text;
+				// Erase the first 2 bytes
+				cmd.erase(0,3);
+				// The string contains the name of the NPC we want.
+				Monster *monster = new Monster(cmd.c_str(), (Game *)this);
+				if(!monster->isLoaded()){
+					delete monster;
+					break;
+				}
+
+				// Set the NPC pos
+				if(creature->direction == NORTH) {
+					monster->pos.x = creature->pos.x;
+					monster->pos.y = creature->pos.y - 1;
+					monster->pos.z = creature->pos.z;
+				}
+				// South
+				if(creature->direction == SOUTH) {
+					monster->pos.x = creature->pos.x;
+					monster->pos.y = creature->pos.y + 1;
+					monster->pos.z = creature->pos.z;
+				}
+				// East
+				if(creature->direction == EAST) {
+					monster->pos.x = creature->pos.x + 1;
+					monster->pos.y = creature->pos.y;
+					monster->pos.z = creature->pos.z;
+				}
+				// West
+				if(creature->direction == WEST) {
+					monster->pos.x = creature->pos.x - 1;
+					monster->pos.y = creature->pos.y;
+					monster->pos.z = creature->pos.z;
+				}
+				// Place the npc
+				placeCreature(monster);
+			} break; // case 'm':
 
 			// IP ban
 			case 'b':
@@ -1147,11 +1376,6 @@ void Game::creatureYell(Creature *creature, std::string &text)
 		std::transform(text.begin(), text.end(), text.begin(), upchar);
 
 		std::vector<Creature*> list;
-		/*
-		map->getSpectators(Range(creature->pos.x - 18, creature->pos.x + 18,
-												creature->pos.y - 14, creature->pos.y + 14,
-												max(creature->pos.z - 3, 0), min(creature->pos.z + 3, MAP_LAYER - 1)), list);
-		*/
 		map->getSpectators(Range(creature->pos, 18, 18, 14, 14), list);
 
 		for(unsigned int i = 0; i < list.size(); ++i)
@@ -1209,15 +1433,10 @@ void Game::creatureToChannel(Creature *creature, unsigned char type, const std::
 /** \todo Someone _PLEASE_ clean up this mess */
 bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, const MagicEffectClass* me)
 {
-OTSYS_THREAD_LOCK(gameLock)     	
-/*
-	const MagicEffectTargetGroundClass* magicGround = dynamic_cast<const MagicEffectTargetGroundClass*>(me);
-	const MagicEffectGroundAreaClass* magicGroundEx = dynamic_cast<const MagicEffectGroundAreaClass*>(me);
-*/
-
+	OTSYS_THREAD_LOCK(gameLock)     	
+	
 #ifdef __DEBUG__
 	cout << "creatureMakeMagic: " << (creature ? creature->getName() : "No name") << ", x: " << centerpos.x << ", y: " << centerpos.y << ", z: " << centerpos.z << std::endl;
-
 #endif
 
 	Position frompos;
@@ -1225,18 +1444,11 @@ OTSYS_THREAD_LOCK(gameLock)
 	if(creature) {
 		frompos = creature->pos;
 
-		if(!creatureOnPrepareMagicAttack(creature, centerpos, me)){
-            OTSYS_THREAD_UNLOCK(gameLock)                                        
-			return false;
-			
-        }
-	
-		/*
-		if(magicGround && !creatureOnPrepareMagicCreateSolidObject(creature, centerpos, magicGround)) {
-            OTSYS_THREAD_UNLOCK(gameLock)           
+		if(!creatureOnPrepareMagicAttack(creature, centerpos, me))
+		{
+      OTSYS_THREAD_UNLOCK(gameLock)
 			return false;
 		}
-		*/
 	}
 	else {
 		frompos = centerpos;
@@ -1245,14 +1457,14 @@ OTSYS_THREAD_LOCK(gameLock)
 	MagicAreaVec tmpMagicAreaVec;
 	me->getArea(centerpos, tmpMagicAreaVec);
 	
-	AreaTargetVec areaTargetVec;
+	std::vector<Position> poslist;
 
 	Position topLeft(0xFFFF, 0xFFFF, frompos.z), bottomRight(0, 0, frompos.z);
 
 	//Filter out the tiles we actually can work on
 	for(MagicAreaVec::iterator maIt = tmpMagicAreaVec.begin(); maIt != tmpMagicAreaVec.end(); ++maIt) {
 		Tile *t = map->getTile(maIt->x, maIt->y, maIt->z);
-		if(t && (!creature || (creature->access != 0 || !t->isPz()) ) ) {
+		if(t && (!creature || (creature->access != 0 || !me->offensive || !t->isPz()) ) ) {
 			if(/*t->isBlocking() &&*/ map->canThrowItemTo(frompos, (*maIt), false, true)) {
 				
 				if(maIt->x < topLeft.x)
@@ -1267,185 +1479,47 @@ OTSYS_THREAD_LOCK(gameLock)
 				if(maIt->y > bottomRight.y)
 					bottomRight.y = maIt->y;
 
-				areaTargetVec.push_back(make_pair(*maIt, TargetDataVec()));
+				poslist.push_back(*maIt);
 			}
 		}
 	}
 	
-	std::vector<Creature*> spectatorlist;
-	/*
-	getSpectators(Range(min(frompos.x, centerpos.x) - 14, max(frompos.x, centerpos.x) + 14,
-											min(frompos.y, centerpos.y) - 11, max(frompos.y, centerpos.y) + 11,
-											frompos.z), spectatorlist);
-	*/
-
-//=======
-	//getSpectators(Range(frompos, centerpos), spectatorlist);
 	topLeft.z = frompos.z;
 	bottomRight.z = frompos.z;
+
 	if(topLeft.x == 0xFFFF || topLeft.y == 0xFFFF || bottomRight.x == 0 || bottomRight.y == 0){
-	OTSYS_THREAD_UNLOCK(gameLock)
+		OTSYS_THREAD_UNLOCK(gameLock)
     return false;
-    }
-//>>>>>>> 1.21
+	}
+
 #ifdef __DEBUG__	
 	printf("top left %d %d %d\n", topLeft.x, topLeft.y, topLeft.z);
 	printf("bottom right %d %d %d\n", bottomRight.x, bottomRight.y, bottomRight.z);
 #endif
 
-	getSpectators(Range(topLeft, bottomRight), spectatorlist);
-	Player* player = dynamic_cast<Player*>(creature);
-
-	//We do all changes against a MapState to keep track of the changes,
+	//We do all changes against a GameState to keep track of the changes,
 	//need some more work to work for all situations...
-	MapState mapstate(map);
+	GameState gamestate(this, Range(topLeft, bottomRight));
 
 	Tile *targettile = getTile(centerpos.x, centerpos.y, centerpos.z);
-	//bool hasTarget = false;
+	bool bSuccess = false;
 	bool hasTarget = !targettile->creatures.empty();
+	bool isBlocking = targettile->isBlocking();
 
-	if(targettile && me->canCast(targettile->isBlocking(), hasTarget)) {
-		Creature *target = NULL;
-		Player* targetPlayer = NULL;
+	if(targettile && me->canCast(targettile->isBlocking(), !targettile->creatures.empty())) {
+		bSuccess = true;
+
 		//Apply the permanent effect to the map
-		for(AreaTargetVec::iterator taIt = areaTargetVec.begin(); taIt != areaTargetVec.end(); ++taIt) {
-			targettile = getTile(taIt->first.x,  taIt->first.y, taIt->first.z);
-
-			if(!targettile)
-				continue;
-
-			CreatureVector::iterator cit;
-			for(cit = targettile->creatures.begin(); cit != targettile->creatures.end(); ++cit) {
-				target = (*cit);
-				targetPlayer = dynamic_cast<Player*>(target);
-
-				int damage = me->getDamage(target, creature);
-				int manaDamage = 0;
-
-				if (damage > 0) {
-					if(player && player->access == 0) {
-						if(targetPlayer && targetPlayer != player)
-							player->pzLocked = true;
-					}
-
-					if(target->access == 0 && targetPlayer) {
-						targetPlayer->inFightTicks = (long)g_config.getGlobalNumber("pzlocked", 0);
-						targetPlayer->sendIcons();
-					}
-				}
-				
-				if(damage != 0) {
-					creatureApplyDamage(target, damage, damage, manaDamage);
-				}
-				
-				targetdata td = {damage, manaDamage, me->physical};
-				taIt->second.push_back(make_pair(target, td));
-			}
-
-			//Solid ground items/Magic items (fire/poison/energy)
-			MagicEffectItem *newmagicItem = me->getMagicItem(creature, targettile->isPz(), targettile->isBlocking());
-
-			if(newmagicItem) {
-
-				MagicEffectItem *magicItem = targettile->getFieldItem();
-
-				if(magicItem) {
-					//Replace existing magic field
-					magicItem->transform(newmagicItem);
-					
-					//mapstate.removeThing(targettile, magicItem);
-					//mapstate.addThing(targettile, magicItem);
-					mapstate.refreshThing(targettile, magicItem);
-				}
-				else {
-					magicItem = new MagicEffectItem(*newmagicItem);
-					magicItem->pos = taIt->first;
-
-					mapstate.addThing(targettile, magicItem);
-
-					addEvent(makeTask(newmagicItem->getDecayTime(), std::bind2nd(std::mem_fun(&Game::decayItem), magicItem)));
-				}
-			}
+		std::vector<Position>::const_iterator tlIt;
+		for(tlIt = poslist.begin(); tlIt != poslist.end(); ++tlIt) {
+			gamestate.onAttack(creature, Position(*tlIt), me);
 		}
-		
-		//Do target related map changes
-		targettile = NULL;
-		/*Creature **/target = NULL;
-		for(AreaTargetVec::const_iterator taIt = areaTargetVec.begin(); taIt != areaTargetVec.end(); ++taIt) {
-			for(TargetDataVec::const_iterator tdIt = taIt->second.begin(); tdIt != taIt->second.end(); ++tdIt) {
-				target = tdIt->first;
-				targettile = getTile(target->pos.x, target->pos.y, target->pos.z);
-
-				//Remove player?
-				if(target->health <= 0) {
-
-					//Remove character
-					mapstate.removeThing(targettile, target);
-
-					playersOnline.erase(playersOnline.find(target->getID()));
-								
-					if(creature) {
-						creature->experience += (int)(target->experience * 0.1);
-					}
-
-					if(player){
-
-						NetworkMessage msg;
-						msg.AddPlayerStats(player);           
-						player->sendNetworkMessage(&msg);
-					}
-		            
-					//Add body
-					Item *corpseitem = Item::CreateItem(target->lookcorpse);
-					corpseitem->pos = target->pos;
-
-					mapstate.addThing(targettile, corpseitem);
-
-					//Start decaying
-					unsigned short decayTime = Item::items[corpseitem->getID()].decayTime;
-					addEvent(makeTask(decayTime*1000, std::bind2nd(std::mem_fun(&Game::decayItem), corpseitem)));
-				}
-
-				//Add blood?
-				if(tdIt->second.physical && tdIt->second.damage > 0) {
-
-					bool hadSplash = (targettile->splash != NULL);
-
-					if (!targettile->splash)
-					{
-						Item *item = Item::CreateItem(2019, 2);
-						item->pos = target->pos;
-						targettile->splash = item;
-					}
-
-					if(hadSplash)
-						mapstate.refreshThing(targettile, targettile->splash);
-					else
-						mapstate.addThing(targettile, targettile->splash);
-
-					//Start decaying
-					unsigned short decayTime = Item::items[targettile->splash->getID()].decayTime;
-					targettile->decaySplashAfter = OTSYS_TIME() + decayTime*1000;
-					addEvent(makeTask(decayTime*1000, std::bind2nd(std::mem_fun(&Game::decaySplash), targettile->splash)));
-				}
-			}
-		}
-
-		if(player && player->access == 0) {
-			//Add exhaustion
-			if(me->causeExhaustion(!areaTargetVec.empty()))
-				player->exhaustedTicks = (long)g_config.getGlobalNumber("exhausted", 0);
-			
-			//Fight symbol
-			if(me->offensive && !areaTargetVec.empty())
-				player->inFightTicks = (long)g_config.getGlobalNumber("pzlocked", 0);
-		}
-	
-		hasTarget = areaTargetVec.hasTarget();
 	}
 
-	NetworkMessage msg;
 	//Create a network message for each spectator
+	NetworkMessage msg;
+
+	std::vector<Creature*> spectatorlist = gamestate.getSpectators();
 	for(size_t i = 0; i < spectatorlist.size(); ++i) {
 		Player* spectator = dynamic_cast<Player*>(spectatorlist[i]);
 		
@@ -1454,67 +1528,72 @@ OTSYS_THREAD_LOCK(gameLock)
 
 		msg.Reset();
 
-		mapstate.getMapChanges(spectator, msg);
-		me->getDistanceShoot(spectator, creature, centerpos, hasTarget, msg);
-		
-		for(AreaTargetVec::const_iterator taIt = areaTargetVec.begin(); taIt != areaTargetVec.end(); ++taIt) {
-			Tile *targettile = getTile(taIt->first.x,  taIt->first.y, taIt->first.z);
+		if(bSuccess) {
+			gamestate.getChanges(spectator, msg);
+			me->getDistanceShoot(spectator, creature, centerpos, hasTarget, msg);
 
-			if(!taIt->second.hasTarget()) { //no targets
-				me->getMagicEffect(spectator, creature, taIt->first, false, 0, targettile->isPz(), false /*mapstate.getStoredProperties(targettile).isBlocking*/, msg);
-			}
-			else {
-				for(TargetDataVec::const_iterator tdIt = taIt->second.begin(); tdIt != taIt->second.end(); ++tdIt) {
-					Creature *target = tdIt->first;
-					Tile *targettile = getTile(target->pos.x, target->pos.y, target->pos.z);
-					int damage = tdIt->second.damage;
-					int manaDamage = tdIt->second.manaDamage;
-					hasTarget = (target->access == 0);
+			std::vector<Position>::const_iterator tlIt;
+			for(tlIt = poslist.begin(); tlIt != poslist.end(); ++tlIt) {
+				Position pos = *tlIt;
+				Tile *tile = getTile(pos.x, pos.y, pos.z);			
+				const CreatureStateVec& creatureStateVec = gamestate.getCreatureStateList(tile);
+					
+				if(creatureStateVec.empty()) { //no targets
+					me->getMagicEffect(spectator, creature, NULL, pos, 0, targettile->isPz(), isBlocking, msg);
+				}
+				else {
+					for(CreatureStateVec::const_iterator csIt = creatureStateVec.begin(); csIt != creatureStateVec.end(); ++csIt) {
+						Creature *target = csIt->first;
+						int damage = csIt->second.damage;
+						int manaDamage = csIt->second.manaDamage;
 
-					if(hasTarget)
-						me->getMagicEffect(spectator, creature, target->pos, true, damage, targettile->isPz(), false /*mapstate.getStoredProperties(targettile).isBlocking*/, msg);
+						me->getMagicEffect(spectator, creature, target, target->pos, damage, tile->isPz(), false, msg);
 
-					//could be death due to a magic damage with no owner (fire/poison/energy)
-					if(creature && target->health <= 0) {
-						if(spectator->CanSee(creature->pos.x, creature->pos.y, creature->pos.z)) {
-							std::stringstream exp;
-							exp << (int)(target->experience * 0.1);
-							msg.AddAnimatedText(creature->pos, 983, exp.str());
-						}
-					}
-
-					if(spectator->CanSee(target->pos.x, target->pos.y, target->pos.z))
-					{
-						if(damage != 0) {
-							std::stringstream dmg;
-							dmg << std::abs(damage);
-							msg.AddAnimatedText(target->pos, me->animationColor, dmg.str());
+						//could be death due to a magic damage with no owner (fire/poison/energy)
+						if(creature && target->health <= 0) {
+							if(spectator->CanSee(creature->pos.x, creature->pos.y, creature->pos.z)) {
+								std::stringstream exp;
+								exp << (int)(target->experience * 0.1);
+								msg.AddAnimatedText(creature->pos, 983, exp.str());
+							}
 						}
 
-						if(manaDamage > 0){
-							msg.AddMagicEffect(target->pos, NM_ME_LOOSE_ENERGY);
-							std::stringstream manaDmg;
-							manaDmg << std::abs(manaDamage);
-							msg.AddAnimatedText(target->pos, 2, manaDmg.str());
-						}
+						if(spectator->CanSee(target->pos.x, target->pos.y, target->pos.z))
+						{
+							if(damage != 0) {
+								std::stringstream dmg;
+								dmg << std::abs(damage);
+								msg.AddAnimatedText(target->pos, me->animationColor, dmg.str());
+							}
 
-						if (target->health > 0)
-							msg.AddCreatureHealth(target);
+							if(manaDamage > 0){
+								msg.AddMagicEffect(target->pos, NM_ME_LOOSE_ENERGY);
+								std::stringstream manaDmg;
+								manaDmg << std::abs(manaDamage);
+								msg.AddAnimatedText(target->pos, 2, manaDmg.str());
+							}
 
-						if (spectator == target){
-							CreateManaDamageUpdate(target, creature, manaDamage, msg);
-							CreateDamageUpdate(target, creature, damage, msg);
+							if (target->health > 0)
+								msg.AddCreatureHealth(target);
+
+							if (spectator == target){
+								CreateManaDamageUpdate(target, creature, manaDamage, msg);
+								CreateDamageUpdate(target, creature, damage, msg);
+							}
 						}
 					}
 				}
-
 			}
+		}
+		else {
+			me->FailedToCast(spectator, creature, isBlocking, hasTarget, msg);
 		}
 
 		spectator->sendNetworkMessage(&msg);
 	}
+
 	OTSYS_THREAD_UNLOCK(gameLock)
-	return true;
+	return bSuccess;
 }
 
 void Game::creatureApplyDamage(Creature *creature, int damage, int &outDamage, int &outManaDamage)
@@ -1627,7 +1706,7 @@ bool Game::creatureOnPrepareAttack(Creature *creature, Position pos)
 
 bool Game::creatureOnPrepareMagicAttack(Creature *creature, Position pos, const MagicEffectClass* me)
 {
-	if(creatureOnPrepareAttack(creature, pos)) {
+	if(!me->offensive || me->isIndirect() || creatureOnPrepareAttack(creature, pos)) {
 		/*
 			if(creature->access == 0) {
 				if(!((std::abs(creature->pos.x-centerpos.x) <= 8) && (std::abs(creature->pos.y-centerpos.y) <= 6) &&
@@ -1666,37 +1745,6 @@ bool Game::creatureOnPrepareMagicAttack(Creature *creature, Position pos, const 
 	return false;
 }
 
-/*
-bool Game::creatureOnPrepareMagicCreateSolidObject(Creature *creature, const Position& pos, const MagicEffectTargetGroundClass* magicGround)
-{
-	Tile *targettile = getTile(pos.x, pos.y, pos.z);
-
-	if(!targettile)
-		return false;
-
-	if(magicGround->getMagicItem()->isBlocking() && (targettile->isBlocking() || !targettile->creatures.empty())) {
-		
-		Player* player = dynamic_cast<Player*>(creature);
-		if(player) {
-			if(!targettile->creatures.empty()) {
-				player->sendCancel("There is not enough room.");
-
-				NetworkMessage msg;
-				msg.AddMagicEffect(player->pos, NM_ME_PUFF);
-				player->sendNetworkMessage(&msg);
-			}
-			else {
-				player->sendCancel("You cannot throw there.");
-			}
-		}
-
-		return false;
-	}
-
-	return true;
-}
-*/
-
 void Game::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fight_t damagetype)
 {
 	if(!creatureOnPrepareAttack(creature, attackedCreature->pos))
@@ -1707,10 +1755,8 @@ void Game::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fi
 	Player* player = dynamic_cast<Player*>(creature);
 	Player* attackedPlayer = dynamic_cast<Player*>(attackedCreature);
 
-	//Tile* tile = getTile(creature->pos.x, creature->pos.y, creature->pos.z);
 	Tile* targettile = getTile(attackedCreature->pos.x, attackedCreature->pos.y, attackedCreature->pos.z);
 
-	NetworkMessage msg;
 	//can the attacker reach the attacked?
 	bool inReach = false;
 
@@ -1727,191 +1773,116 @@ void Game::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fi
 				(creature->pos.z == attackedCreature->pos.z))
 					inReach = true;
 		break;
+		/*
 		case FIGHT_MAGICDIST:
 			if((std::abs(creature->pos.x-attackedCreature->pos.x) <= 8) &&
 				(std::abs(creature->pos.y-attackedCreature->pos.y) <= 5) &&
 				(creature->pos.z == attackedCreature->pos.z))
 					inReach = true;	
 			break;
+		*/
 	}	
-					
+
 	if (player && player->access == 0) {
-	    player->inFightTicks = (long)g_config.getGlobalNumber("pzlocked", 0);
-	    player->sendIcons();
-	    if(attackedPlayer)
- 	         player->pzLocked = true;	    
+		player->inFightTicks = (long)g_config.getGlobalNumber("pzlocked", 0);
+		player->sendIcons();
+		
+		if(attackedPlayer)
+			player->pzLocked = true;	    
 	}
+
 	if(attackedPlayer && attackedPlayer->access ==0){
 	 attackedPlayer->inFightTicks = (long)g_config.getGlobalNumber("pzlocked", 0);
 	 attackedPlayer->sendIcons();
   }
-    if(attackedCreature->access != 0){
-        if(player)
-        player->sendCancelAttacking();
-        OTSYS_THREAD_UNLOCK(gameLock)
-        return;
-         }
+	
+	if(attackedCreature->access != 0){
+		if(player)
+			player->sendCancelAttacking();
+
+      OTSYS_THREAD_UNLOCK(gameLock)
+      return;
+	}
+
 	if(!inReach){
-        OTSYS_THREAD_UNLOCK(gameLock)                  
+		OTSYS_THREAD_UNLOCK(gameLock)                  
 		return;
-    }
-	int damage = creature->getWeaponDamage();
-	int manaDamage = 0;
+	}
 
-	if (creature->access != 0)
-		damage += 1337;
+	//We do all changes against a GameState to keep track of the changes,
+	//need some more work to work for all situations...
+	GameState gamestate(this, Range(creature->pos, attackedCreature->pos));
 
-	if (damage < -50 || attackedCreature->access != 0)
-		damage = 0;
-	if (attackedCreature->manaShieldTicks <1000 && damage > 0)
-		attackedCreature->drainHealth(damage);
-	else if (attackedCreature->manaShieldTicks >= 1000 && damage < attackedCreature->mana){
-         manaDamage = damage;
-         damage = 0;
-         attackedCreature->drainMana(manaDamage);
-         }
-    else if(attackedCreature->manaShieldTicks >= 1000 && damage > attackedCreature->mana){
-         manaDamage = attackedCreature->mana;
-         damage -= manaDamage;
-         attackedCreature->drainHealth(damage);
-         attackedCreature->drainMana(manaDamage);
-         }
-	else
-		attackedCreature->health += min(-damage, attackedCreature->healthmax - attackedCreature->health);
+	gamestate.onAttack(creature, attackedCreature->pos, attackedCreature);
 
-	std::vector<Creature*> list;
-	/*
-	getSpectators(Range(min(creature->pos.x, attackedCreature->pos.x) - 9,
-										  max(creature->pos.x, attackedCreature->pos.x) + 9,
-											min(creature->pos.y, attackedCreature->pos.y) - 7,
-											max(creature->pos.y, attackedCreature->pos.y) + 7, creature->pos.z), list);
-	*/
-	getSpectators(Range(creature->pos, attackedCreature->pos), list);
+	const CreatureStateVec& creatureStateVec = gamestate.getCreatureStateList(targettile);
+	const CreatureState& creatureState = creatureStateVec[0].second;
 
-	for(unsigned int i = 0; i < list.size(); ++i)
+	if(player && (creatureState.damage > 0 || creatureState.manaDamage > 0)) {
+		player->addSkillTry(1);
+	}
+	else if(player)
+		player->addSkillTry(1);
+
+	NetworkMessage msg;
+
+	std::vector<Creature*> spectatorlist = gamestate.getSpectators();
+	for(unsigned int i = 0; i < spectatorlist.size(); ++i)
 	{
-		Player* p = dynamic_cast<Player*>(list[i]);
+		Player* spectator = dynamic_cast<Player*>(spectatorlist[i]);
+		if(!spectator)
+			continue;
 
-		if (p) {
-			msg.Reset();
-			if(damagetype == FIGHT_DIST)
-				msg.AddDistanceShoot(creature->pos, attackedCreature->pos, NM_ANI_POWERBOLT);
-			if(damagetype == FIGHT_MAGICDIST)
-				msg.AddDistanceShoot(creature->pos, attackedCreature->pos, NM_ANI_ENERGY);
+		msg.Reset();
 
-			if (attackedCreature->manaShieldTicks < 1000 && (damage == 0) && (p->CanSee(attackedCreature->pos.x, attackedCreature->pos.y, attackedCreature->pos.z))) {
-				msg.AddMagicEffect(attackedCreature->pos, NM_ME_PUFF);
-			}
-			else if (attackedCreature->manaShieldTicks < 1000 && (damage < 0) && (p->CanSee(attackedCreature->pos.x, attackedCreature->pos.y, attackedCreature->pos.z)))
-			{
-				msg.AddMagicEffect(attackedCreature->pos, NM_ME_BLOCKHIT);
-			}
-			else
-			{
-				if (p->CanSee(attackedCreature->pos.x, attackedCreature->pos.y, attackedCreature->pos.z))
-				{
-					std::stringstream dmg, manaDmg;
-					dmg << std::abs(damage);
-					manaDmg << std::abs(manaDamage);
-					
-					if(damage > 0){
-					msg.AddAnimatedText(attackedCreature->pos, 0xB4, dmg.str());
-					msg.AddMagicEffect(attackedCreature->pos, NM_ME_DRAW_BLOOD);
-													}
-					if(manaDamage >0){
-													msg.AddMagicEffect(attackedCreature->pos, NM_ME_LOOSE_ENERGY);
-													msg.AddAnimatedText(attackedCreature->pos, 2, manaDmg.str());
-													}
+		gamestate.getChanges(spectator, msg);
 
-					if (attackedCreature->health <= 0)
-					{
-                        std::stringstream exp;
-                        exp << (int)(attackedCreature->experience * 0.1);
-						//todo see above
-                        msg.AddAnimatedText(creature->pos, (uint8_t)983, exp.str());                         
-						// remove character
-						msg.AddByte(0x6c);
-						msg.AddPosition(attackedCreature->pos);
-						msg.AddByte(targettile->getThingStackPos(attackedCreature));
-						msg.AddByte(0x6a);
-						msg.AddPosition(attackedCreature->pos);
-						Item item = Item(attackedCreature->lookcorpse);
-						msg.AddItem(&item);
-					}
-					else
-					{
-						msg.AddCreatureHealth(attackedCreature);
-					}
-					if(damage > 0){				
-					// fresh blood, first remove od
-					if (targettile->splash)
-					{
-						msg.AddByte(0x6c);
-						msg.AddPosition(attackedCreature->pos);
-						msg.AddByte(1);
-						targettile->splash->setID(2019);
-					}
-					msg.AddByte(0x6a);
-					msg.AddPosition(attackedCreature->pos);
-					Item item = Item(2019, 2);
-					msg.AddItem(&item);
-					}
-				}
-			}
-
-			if (p == attackedCreature){
-				CreateManaDamageUpdate(p, creature, manaDamage, msg);
-				CreateDamageUpdate(p, creature, damage, msg);
-			}
-	
-			p->sendNetworkMessage(&msg);
+		if(damagetype != FIGHT_MELEE)
+			msg.AddDistanceShoot(creature->pos, attackedCreature->pos, creature->getSubFightType());
+		
+		if (attackedCreature->manaShieldTicks < 1000 && (creatureState.damage == 0) &&
+			(spectator->CanSee(attackedCreature->pos.x, attackedCreature->pos.y, attackedCreature->pos.z))) {
+			msg.AddMagicEffect(attackedCreature->pos, NM_ME_PUFF);
 		}
-	}
-	
-	if(damage > 0){
-		if (!targettile->splash)
+		else if (attackedCreature->manaShieldTicks < 1000 && (creatureState.damage < 0) &&
+			(spectator->CanSee(attackedCreature->pos.x, attackedCreature->pos.y, attackedCreature->pos.z))) {
+			msg.AddMagicEffect(attackedCreature->pos, NM_ME_BLOCKHIT);
+		}
+		else if (spectator->CanSee(attackedCreature->pos.x, attackedCreature->pos.y, attackedCreature->pos.z))
 		{
-			Item *item = new Item(2019, 2);
-			item->pos = attackedCreature->pos;
-			targettile->splash = item;
-		}
-        
-		unsigned short decayTime = Item::items[2019].decayTime;
-		targettile->decaySplashAfter = OTSYS_TIME() + decayTime*1000;
-		addEvent(makeTask(decayTime*1000, std::bind2nd(std::mem_fun(&Game::decaySplash), targettile->splash)));
-	}
-   if(player && (damage > 0 || manaDamage >0)){
-        player->addSkillTry(1);
-        }
-   else if(player)
-   player->addSkillTry(1);
-   
-   
-	if (attackedCreature->health <= 0) {
-		targettile->removeThing(attackedCreature);
-		playersOnline.erase(playersOnline.find(attackedCreature->getID()));
-		NetworkMessage msg;
-        creature->experience += (int)(attackedCreature->experience * 0.1);
-        if(player){
-             msg.AddPlayerStats(player);           
-			 player->sendNetworkMessage(&msg);
-            }
-    Item *item = new Item(attackedCreature->lookcorpse);
-    item->pos = attackedCreature->pos;
-		targettile->addThing(item);
+			std::stringstream dmg, manaDmg;
+			dmg << std::abs(creatureState.damage);
+			manaDmg << std::abs(creatureState.manaDamage);
+			
+			if(creatureState.damage > 0) {
+				msg.AddAnimatedText(attackedCreature->pos, 0xB4, dmg.str());
+				msg.AddMagicEffect(attackedCreature->pos, NM_ME_DRAW_BLOOD);
+			}
 
-		unsigned short decayTime = Item::items[item->getID()].decayTime;
-    addEvent(makeTask(decayTime*1000, std::bind2nd(std::mem_fun(&Game::decayItem), item)));
+			if(creatureState.manaDamage >0) {
+				msg.AddMagicEffect(attackedCreature->pos, NM_ME_LOOSE_ENERGY);
+				msg.AddAnimatedText(attackedCreature->pos, 2, manaDmg.str());
+			}
+
+			if (attackedCreature->health > 0)
+				msg.AddCreatureHealth(attackedCreature);
+
+			if (spectator == attackedCreature) {
+				CreateManaDamageUpdate(attackedCreature, creature, creatureState.manaDamage, msg);
+				CreateDamageUpdate(attackedCreature, creature, creatureState.damage, msg);
+			}
+		}
+
+
+		spectator->sendNetworkMessage(&msg);
 	}
+
 	OTSYS_THREAD_UNLOCK(gameLock)
 }
-
 
 std::list<Position> Game::getPathTo(Position start, Position to, bool creaturesBlock){
 	return map->getPathTo(start, to, creaturesBlock);
 }
-
-
 
 void Game::checkPlayer(unsigned long id)
 {
@@ -1928,7 +1899,7 @@ void Game::checkPlayer(unsigned long id)
 		 addEvent(makeTask(1000, std::bind2nd(std::mem_fun(&Game::checkPlayer), id)));
 		 decTick = 1000;
 
-		 player->mana += min(10, player->manamax - player->mana);
+		 player->mana += min(5, player->manamax - player->mana);
 		 NetworkMessage msg;
 		 unsigned int requiredExp = player->getExpForLv(player->level+1);
 		 
@@ -2003,87 +1974,28 @@ void Game::checkPlayer(unsigned long id)
 		 }
 	 }
 
-	 if(creature->curburningTicks > 0) {
-		 MagicDamageVec *dl = creature->getMagicDamageVec(magicFire);
-		 
-		 if(dl && dl->size() > 0) {
-			 creature->curburningTicks -= decTick;
+		Conditions& conditions = creature->getConditions();
+		for(Conditions::iterator condIt = conditions.begin(); condIt != conditions.end(); ++condIt) {
+			if(condIt->first == ATTACK_FIRE || condIt->first == ATTACK_ENERGY || condIt->first == ATTACK_POISON) {
+				ConditionVec &condVec = condIt->second;
 
-			 if(creature->curburningTicks <= 0) {
-				 creature->curburningTicks = 0;
+				if(condVec.empty())
+					continue;
 
-				 damageInfo& di = dl->at(0);
-				 Creature* c = getCreatureByID(di.second.getOwnerID());
-				 creatureMakeMagic(c, creature->pos, &di.second);
-				 
-				 di.first.second--; //damageCount
-				 if(di.first.second <= 0)
-					 dl->erase(dl->begin());
+				CreatureCondition& condition = condVec[0];
 
-				 if(dl->size() > 0)
-					creature->curburningTicks = (*dl)[0].first.first;
+				if(condition.onTick(decTick)) {
+					const MagicEffectTargetCreatureCondition* magicTargetCondition =  condition.getCondition();
+					Creature* c = getCreatureByID(magicTargetCondition->getOwnerID());
+					creatureMakeMagic(c, creature->pos, magicTargetCondition);
+
+					if(condition.getCount() <= 0) {
+						condVec.erase(condVec.begin());
+					}
 				}
-		 }
-		 else
-			 creature->curburningTicks = 0;
-	 }
-	 else
-	 creature->burningTicks = 0;
-	 
-	 if(creature->curenergizedTicks > 0) {
-		 MagicDamageVec *dl = creature->getMagicDamageVec(magicEnergy);
-	 
-		 if(dl && dl->size() > 0) {
-			 creature->curenergizedTicks -= decTick;
-
-			 if(creature->curenergizedTicks <= 0) {
-				 creature->curenergizedTicks = 0;
-
-				 damageInfo& di = dl->at(0);
-				 Creature* c = getCreatureByID(di.second.getOwnerID());
-				 creatureMakeMagic(c, creature->pos, &di.second);
-				 
-				 di.first.second--; //damageCount
-				 if(di.first.second <= 0)
-					 dl->erase(dl->begin());
-
-				 if(dl->size() > 0)
-					creature->curenergizedTicks = (*dl)[0].first.first;
-				}
-		 }
-		 else
-			 creature->curenergizedTicks = 0;
-	 }
-	 else
-	 creature->energizedTicks = 0;
-	 
-	 if(creature->curpoisonedTicks > 0) {
-		 MagicDamageVec *dl = creature->getMagicDamageVec(magicPoison);
-		 
-		 if(dl && dl->size() > 0) {
-			 creature->curpoisonedTicks -= decTick;
-
-			 if(creature->curpoisonedTicks <= 0) {
-				 creature->curpoisonedTicks = 0;
-
-				 damageInfo& di = dl->at(0);
-				 Creature* c = getCreatureByID(di.second.getOwnerID());
-				 creatureMakeMagic(c, creature->pos, &di.second);
-				 
-				 di.first.second--; //damageCount
-				 if(di.first.second <= 0)
-					 dl->erase(dl->begin());
-
-				 if(dl->size() > 0)
-					creature->curpoisonedTicks = (*dl)[0].first.first;
-				}
-		 }
-		 else
-			 creature->curpoisonedTicks = 0;
-	 }
-	 else
-	 creature->poisonedTicks = 0;
-  }
+			}
+		}
+	}
 	
 	OTSYS_THREAD_UNLOCK(gameLock)
 }
@@ -2139,6 +2051,19 @@ void Game::changeSpeed(unsigned long id, unsigned short speed)
 	OTSYS_THREAD_UNLOCK(gameLock)
 }
 
+/*
+void Game::checkMonsterAttacking(unsigned long id)
+{
+	OTSYS_THREAD_LOCK(gameLock)
+
+	Monster *monster = dynamic_cast<Monster*>(getCreatureByID(id));
+	if (monster != NULL && monster->health > 0) {
+		monster->onAttack();
+	}
+
+	OTSYS_THREAD_UNLOCK(gameLock)
+}
+*/
 
 void Game::checkPlayerAttacking(unsigned long id)
 {
@@ -2147,29 +2072,35 @@ void Game::checkPlayerAttacking(unsigned long id)
 	Creature *creature = getCreatureByID(id);
 	if (creature != NULL && creature->health > 0)
 	{
-		addEvent(makeTask(2000, std::bind2nd(std::mem_fun(&Game::checkPlayerAttacking), id)));
+		Monster *monster = dynamic_cast<Monster*>(creature);
+		if (monster) {
+			monster->onAttack();
+		}
+		else {
+			addEvent(makeTask(2000, std::bind2nd(std::mem_fun(&Game::checkPlayerAttacking), id)));
 
-		if (creature->attackedCreature != 0)
-		{
-			Creature *attackedCreature = getCreatureByID(creature->attackedCreature);
-			if (attackedCreature)
+			if (creature->attackedCreature != 0)
 			{
-				Tile* fromtile = getTile(creature->pos.x, creature->pos.y, creature->pos.z);
-				if (!attackedCreature->isAttackable() == 0 && fromtile->isPz() && creature->access == 0)
+				Creature *attackedCreature = getCreatureByID(creature->attackedCreature);
+				if (attackedCreature)
 				{
-					Player* player = dynamic_cast<Player*>(creature);
-					if (player) {
-						NetworkMessage msg;
-						msg.AddTextMessage(MSG_SMALLINFO, "You may not attack a person in a protection zone.");
-						player->sendNetworkMessage(&msg);
-						player->sendCancelAttacking();
-					}
-				}
-				else
-				{
-					if (attackedCreature != NULL && attackedCreature->health > 0)
+					Tile* fromtile = getTile(creature->pos.x, creature->pos.y, creature->pos.z);
+					if (!attackedCreature->isAttackable() == 0 && fromtile->isPz() && creature->access == 0)
 					{
-						this->creatureMakeDamage(creature, attackedCreature, creature->getFightType());
+						Player* player = dynamic_cast<Player*>(creature);
+						if (player) {
+							NetworkMessage msg;
+							msg.AddTextMessage(MSG_SMALLINFO, "You may not attack a person in a protection zone.");
+							player->sendNetworkMessage(&msg);
+							player->sendCancelAttacking();
+						}
+					}
+					else
+					{
+						if (attackedCreature != NULL && attackedCreature->health > 0)
+						{
+							this->creatureMakeDamage(creature, attackedCreature, creature->getFightType());
+						}
 					}
 				}
 			}
@@ -2322,7 +2253,10 @@ bool Game::creatureSaySpell(Creature *creature, const std::string &text)
 	else {
 		temp = text;
 		var = std::string(""); 
-	}  
+	}
+
+	std::transform(temp.begin(), temp.end(), temp.begin(), tolower);	
+
 	if(creature->access != 0 || !player){
 		std::map<std::string, Spell*>::iterator sit = spells.getAllSpells()->find(temp);
 		if( sit != spells.getAllSpells()->end() ) {

@@ -46,42 +46,6 @@ class Game;
 
 #define MAP_LAYER     16
 
-struct targetdata {
-	int damage;
-	int manaDamage;
-	bool physical;
-};
-
-typedef std::pair<Creature*, struct targetdata> targetitem;
-class TargetDataVec : public std::vector<targetitem>
-{
-public:
-	bool hasTarget(bool includeAll = false) const {
-		for(TargetDataVec::const_iterator tdIt = begin(); tdIt != end(); ++tdIt) {
-			if(includeAll || tdIt->first->access == 0)
-				return true;
-		}
-
-		return false;
-	}
-};
-
-typedef std::pair<Position, TargetDataVec> targetAreaItem;
-class AreaTargetVec : public std::vector<targetAreaItem>
-{
-public:
-	bool hasTarget(bool includeAll = false) const {
-		for(AreaTargetVec::const_iterator taIt = begin(); taIt != end(); ++taIt) {
-			if(taIt->second.hasTarget(includeAll))
-				return true;
-		}
-
-		return false;
-	}
-private:
-
-};
-
 class TilePreChangeData {
 public:
 	Position pos;
@@ -113,7 +77,6 @@ public:
 	void refreshThing(Tile *t, Thing *thing);
 
 	void getMapChanges(Player *spectator, NetworkMessage &msg);
-	//const TilePreChangeData& getStoredProperties(Tile *t);
 
 protected:
 	Map* map;
@@ -126,7 +89,6 @@ protected:
 	
 	TileChangeDataVecMap changesItemMap;
 	TileExDataMap preChangeItemMap;
-	//TilePreChangeData dummyData;
 };
 
 class Range {
@@ -139,13 +101,22 @@ public:
 	//Creates a union of 2 positions
 	Range(const Position& pos1, const Position& pos2)
 	{
+		/*
+		Range r1(pos1, true);
+		Range r2(pos2, true);
+		*/
+
+		//*
 		Position topleft(std::min(pos1.x, pos2.x), std::min(pos1.y, pos2.y), pos1.z);
 		Position bottomright(std::max(pos1.x, pos2.x), std::max(pos1.y, pos2.y), pos1.z);
 
 		setRange(topleft, true);
 
-		maxRange.x += (bottomright.x - topleft.x);
-		maxRange.y += (bottomright.y - topleft.y);
+		minRange.x = -9;
+		minRange.y = -7;
+		maxRange.x = std::max(topleft.x + 9, bottomright.x + 9) - topleft.x; //(bottomright.x - topleft.x);
+		maxRange.y = std::max(topleft.y + 7, bottomright.y + 7) - topleft.y; //(bottomright.y - topleft.y);
+		//*/
 	}
 
 	Range(Position centerpos, int minRangeX, int maxRangeX, int minRangeY, int maxRangeY)
@@ -178,8 +149,8 @@ private:
 		minRange.x = -8;
 		minRange.y = -6;
 
-		maxRange.x = 8;
-		maxRange.y = 6;
+		maxRange.x = 9; //maxRange.x = 8;
+		maxRange.y = 7; //maxRange.y = 6;
 		
 		zstep = 1;
 

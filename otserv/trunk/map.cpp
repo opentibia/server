@@ -63,13 +63,7 @@ extern std::map<long, Creature*> channel;
 MapState::MapState(Map* imap)
 : map(imap)
 {
-	/*
-	dummyData.isBlocking = false;
-	dummyData.pos.x = 0;
-	dummyData.pos.y = 0;
-	dummyData.pos.z = 0;
-	dummyData.thingCount = 0;
-	*/
+	//
 }
 
 
@@ -158,14 +152,7 @@ void MapState::getMapChanges(Player *spectator, NetworkMessage &msg)
 
 	TileExDataMap::const_iterator preChangeItemMapIt;
 	for(preChangeItemMapIt = preChangeItemMap.begin(); preChangeItemMapIt != preChangeItemMap.end(); ++preChangeItemMapIt) {
-		
-		/*
-		if(std::find(tileUpdatedVec.begin(), tileUpdatedVec.end(), preChangeItemMap->first) != tileUpdatedVec.end()) {
-			//Tile has already been updated
-			continue;
-		}
-		*/
-
+	
 		if(!spectator->CanSee(preChangeItemMapIt->second.pos.x, preChangeItemMapIt->second.pos.y, preChangeItemMapIt->second.pos.z))
 			continue;
 
@@ -236,11 +223,6 @@ void MapState::addTile(Tile *t, Position& tilepos)
 		pd.pos = tilepos;
 		pd.thingCount = t->getThingCount();
 		pd.isBlocking = t->isBlocking();
-		
-		/*
-		preChangeItemMap[t].pos = tilepos;
-		preChangeItemMap[t].thingCount = t->getThingCount();
-		*/
 	}
 }
 

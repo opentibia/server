@@ -31,6 +31,7 @@
 #include "item.h"
 #include "container.h"
 #include "creature.h"
+#include "monster.h"
 #include "player.h"
 #include "magic.h"
 #include "otsystem.h"
@@ -43,11 +44,54 @@
 class Creature;   // see creature.h
 class Player;
 
-
-
 #define MAP_WIDTH    512
 #define MAP_HEIGHT   512
 #define MAP_LAYER     16
+
+/** State of a creature at a given time
+  * Keeps track of all the changes to be able to send to the client
+	*/
+
+class CreatureState {
+public:
+	CreatureState() {};
+	~CreatureState() {};
+
+	int damage;
+	int manaDamage;
+	bool drawblood;
+};
+
+typedef std::vector< std::pair<Creature*, CreatureState> > CreatureStateVec;
+typedef std::map<Tile*, CreatureStateVec> CreatureStates;
+
+/** State of the game at a given time
+  * Keeps track of all the changes to be able to send to the client
+	*/
+
+class Game;
+
+class GameState {
+public:
+	GameState(Game *game, const Range &range);
+	~GameState() {};
+
+	void onAttack(Creature *creature, const Position& pos, const MagicEffectClass* me);
+	void onAttack(Creature *creature, const Position& pos, Creature* attackedCreature);
+	void getChanges(Player *spectator, NetworkMessage &msg);
+	const CreatureStateVec& getCreatureStateList(Tile *tile) {return creaturestates[tile];};
+	const std::vector<Creature*>& getSpectators() {return spectatorlist;}
+
+protected:
+	void addCreatureState(Tile* tile, Creature* creature, int damage, int manaDamage, bool drawblood);
+	void onAttackedCreature(Tile* tile, Creature *creature, int damage, bool drawblood);
+	void removeCreature(Creature *creature, unsigned char stackPos);
+	Game *game;
+
+	std::vector<Creature*> spectatorlist;
+	MapState mapstate;
+	CreatureStates creaturestates;
+};
 
 /**
   * Main Game class.
@@ -223,6 +267,7 @@ class Game {
 			void*    data;
 		};
 
+		//void checkMonsterAttacking(unsigned long id);
 		void checkPlayerAttacking(unsigned long id);
 		void checkPlayer(unsigned long id);
 		void decayItem(Item* item);
@@ -233,6 +278,9 @@ class Game {
 		uint32_t max_players;
 
 		Map* map;
+
+		friend class Monster;
+		friend class GameState;
 };
 
 
