@@ -82,6 +82,12 @@ public:
 
   virtual void drainHealth(int);
 
+  void    setAttackedCreature(unsigned long id);
+  unsigned long attackedCreature;
+
+  virtual fight_t getFightType() { return FIGHT_MELEE; };
+  virtual bool isAttackable() { return true; };
+
 
 
 

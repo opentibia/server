@@ -71,9 +71,6 @@ public:
   void speak(const std::string &text){};
 
   std::string getName(){return name;};
-  
-  void    setAttackedCreature(unsigned long id);
-  unsigned long attackedCreature;
 
   fight_t getFightType(){return fighttype;};
 

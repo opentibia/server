@@ -35,6 +35,8 @@ Creature::Creature(const char *name) : access(0)
   lastDamage = 0;
 
   speed      = 220;
+
+  attackedCreature = 0;
 }
 
 
@@ -44,5 +46,13 @@ void Creature::drainHealth(int damage)
 
   health -= lastDamage;
 }
+
+
+void Creature::setAttackedCreature(unsigned long id)
+{
+  attackedCreature = id;
+}
+
+
 
 

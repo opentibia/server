@@ -104,13 +104,12 @@ public:
   void    usePlayer() { useCount++; };
   void    releasePlayer() { useCount--; if (useCount == 0) delete this; };
 
-  void    setAttackedCreature(unsigned long id);
-  unsigned long attackedCreature;
-	
-  fight_t getFightType();
+  virtual fight_t getFightType();
 
   bool CanSee(int x, int y);
   void sendNetworkMessage(NetworkMessage *msg);
+
+  virtual bool isAttackable() { return (access == 0); };
 
 protected:
   int useCount;

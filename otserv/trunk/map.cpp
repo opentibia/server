@@ -1035,31 +1035,37 @@ void Map::checkPlayerAttacking(unsigned long id)
 {
   OTSYS_THREAD_LOCK(mapLock)
 
-    Player *player = (Player*)getCreatureByID(id);
+  Creature *creature = getCreatureByID(id);
 
-
-  if (player != NULL && player->health > 0)
+  if (creature != NULL && creature->health > 0)
   {
     addEvent(makeTask(2000, std::bind2nd(std::mem_fun(&Map::checkPlayerAttacking), id)));
 
-	if (player->attackedCreature != 0)
+	  if (creature->attackedCreature != 0)
     {
-      Creature *attackedCreature = (Player*)getCreatureByID(player->attackedCreature);
-
-	  Tile* fromtile = getTile(player->pos.x, player->pos.y, player->pos.z);
-      if (player->access == 0 && fromtile->isPz()) {
-	      NetworkMessage msg;
-	      msg.AddTextMessage(MSG_STATUS, "You may not attack a person in a protection zone.");
-	      player->sendNetworkMessage(&msg);
-      } else {
-
-      if (attackedCreature != NULL && attackedCreature->health > 0)
+      Creature *attackedCreature = getCreatureByID(creature->attackedCreature);
+      if (attackedCreature)
       {
-		  this->creatureMakeDamage(player, attackedCreature, player->getFightType());
+	      Tile* fromtile = getTile(creature->pos.x, creature->pos.y, creature->pos.z);
+        if (!attackedCreature->isAttackable() == 0 && fromtile->isPz())
+        {
+          if (creature->isPlayer())
+          {
+            Player* player = (Player*)creature;
+	          NetworkMessage msg;
+            msg.AddTextMessage(MSG_STATUS, "You may not attack a person in a protection zone.");
+            player->sendNetworkMessage(&msg);
+          }
+        }
+        else
+        {
+          if (attackedCreature != NULL && attackedCreature->health > 0)
+          {
+	          this->creatureMakeDamage(creature, attackedCreature, creature->getFightType());
+          }
+        }
       }
-    }
-
-	}
+	  }
   }
 
   OTSYS_THREAD_UNLOCK(mapLock)
@@ -1182,6 +1188,9 @@ void Map::makeCastSpell(Player *player, int mana, int mindamage, int maxdamage, 
 			Tile* tile = getTile(x, y, player->pos.z);
 			if (tile) {
 				for (cit = tile->creatures.begin(); cit != tile->creatures.end(); cit++) {
+          if (!(*cit)->isPlayer())
+            continue;
+
 					Player *spectator = (Player*)*cit;
 
 					NetworkMessage msg;

@@ -65,8 +65,6 @@ Player::Player(const char *name, Protocol *p) : Creature(name)
 	for(int i = 0; i < 11; i++)
 		items[i] = NULL;
 
-  attackedCreature = 0;
-
   useCount = 0;
 } 
 
@@ -110,12 +108,6 @@ int Player::addItem(Item* item, int pos){
   }
 	client->sendInventory();
 	return true;
-}
-
-
-void Player::setAttackedCreature(unsigned long id)
-{
-  attackedCreature = id;
 }
 
 
