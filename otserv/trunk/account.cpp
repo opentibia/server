@@ -150,6 +150,12 @@ bool Account::openPlayer(const std::string &name, const std::string &givenpasswo
         player.pos.y=atoi((const char*)xmlGetProp(p, (const xmlChar *) "y"));
         player.pos.z=atoi((const char*)xmlGetProp(p, (const xmlChar *) "z"));
       }
+      else if(str=="temple")
+      {
+        player.masterPos.x=atoi((const char*)xmlGetProp(p, (const xmlChar *) "x"));
+        player.masterPos.y=atoi((const char*)xmlGetProp(p, (const xmlChar *) "y"));
+        player.masterPos.z=atoi((const char*)xmlGetProp(p, (const xmlChar *) "z"));
+      }
       else if(str=="skills")
       {
         tmp=p->children;

@@ -395,13 +395,27 @@ bool Map::placeCreature(Creature* c)
 	addEvent(makeTask(1000, std::bind2nd(std::mem_fun(&Map::checkPlayer), c->id)));
 	addEvent(makeTask(2000, std::bind2nd(std::mem_fun(&Map::checkPlayerAttacking), c->id)));
 
-  while (!c->canMovedTo(getTile(c->pos.x, c->pos.y, c->pos.z)))
-  {
-    // crap we need to find another spot
-	  std::cout << "search pos" << std::endl;
-    c->pos.x++;
-  }
-
+  if (!c->canMovedTo(getTile(c->pos.x, c->pos.y, c->pos.z)))
+  {   
+      int x = -1, y = -1;
+      bool found =false;
+      for(int cx =c->pos.x-1; cx <= c->pos.x+1 && !found; cx++){
+                    for(int cy = c->pos.y-1; cy <= c->pos.y+1 && !found; cy++){
+                                        if (c->canMovedTo(getTile(cx, cy, c->pos.z))){
+                                            c->pos.x = cx;
+                                            c->pos.y = cy;
+                                            found = true;
+                                        }
+                                        // crap we need to find another spot
+                                        std::cout << "search pos x:" <<cx <<" y: "<< cy << std::endl;
+                                    }
+                                }
+      if(!found){
+          c->pos.x = c->masterPos.x;
+          c->pos.y = c->masterPos.y;
+          c->pos.z = c->masterPos.z;
+      }    
+    }
 	Tile* tile=getTile(c->pos.x, c->pos.y, c->pos.z);
 	if(!tile){
 		this->setTile(c->pos.x, c->pos.y, c->pos.z, 0);

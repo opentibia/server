@@ -101,6 +101,8 @@ public:
   long exhaustedTicks;
   bool pzLocked;
   long inFightTicks;
+  
+  Position masterPos;
 
   int health, healthmax;
 
