@@ -228,7 +228,7 @@ private:
 			}
 		}
 		else {
-			minRange.z = -centerpos.z;
+			minRange.z = centerpos.z;
 			maxRange.z = centerpos.z;
 		}
 	}
