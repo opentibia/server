@@ -56,12 +56,12 @@ public:
                                       }
                         return &(vocationSpells.at(voc));
                         } 
-  std::vector<Spell*>* getAllSpells(){
+  std::map<std::string, Spell*>* getAllSpells(){
                         return &allSpells;
                         }
 protected:
 
-  std::vector<Spell*> allSpells;
+  std::map<std::string, Spell*> allSpells;
   std::vector<std::map<std::string, Spell*> > vocationSpells;
   bool loaded;
   int maxVoc;

@@ -97,7 +97,7 @@ bool Spells::loadFromXml()
                                                                      }
                                                    tmp = tmp->next;
                                                    }
-                                             allSpells.push_back(spell);           
+                                             allSpells[words] = spell;           
                                              }
 				             
 			                 }
@@ -109,9 +109,10 @@ bool Spells::loadFromXml()
                     return this->loaded;
 }
 Spells::~Spells(){
-                 while(!allSpells.empty()){
-                                           delete allSpells.back();
-                                           allSpells.pop_back();
+                  std::map<std::string, Spell*>::iterator it;
+                  for(it = allSpells.begin(); it != allSpells.end(); it++){
+                                           delete it->second;;
+                                           allSpells.erase(it);
                                            }
                  }
 

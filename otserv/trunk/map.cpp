@@ -1711,15 +1711,11 @@ bool Map::creatureSaySpell(Creature *creature, const std::string &text)
     temp = text;
     var = std::string(""); 
     }
-    std::cout << creature << " - " << std::endl;
-    if(creature->access != 0 ){
-                        std::vector<Spell*>::iterator sit;
-                        for (sit = spells.getAllSpells()->begin(); sit != spells.getAllSpells()->end(); sit++){
-                            if(strcmp(temp.c_str(), ((*sit)->getWords()).c_str()) == 0){                                                    
-                                                    (*sit)->getSpellScript()->castSpell(creature, var);
-                                                    ret = true;
-                                                    break;
-                                                    }
+    if(creature->access != 0 || !player){
+                        std::map<std::string, Spell*>::iterator sit = spells.getAllSpells()->find(temp);
+                            if( sit != spells.getAllSpells()->end() ) {
+                                sit->second->getSpellScript()->castSpell(creature, var);
+                                ret = true;
                             }
     } 
     else if(player){
