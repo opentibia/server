@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.9  2003/10/19 21:32:19  tliffrag
+// Reworked the Tile class; stackable items now working
+//
 // Revision 1.8  2002/08/01 14:11:28  shivoc
 // added initial support for 6.9x clients
 //
@@ -188,7 +191,7 @@ namespace Protokoll {
             for (unsigned short j=topleft.y; j<=botright.y; j++) {
                 std::cout << ".";
                 tile=map->tile(i,j,topleft.z);
-                for (Item::iterator it=tile->begin(); it != tile->end(); it++) {
+                for (Tile::iterator it=tile->begin(); it != tile->end(); it++) {
                     std::cout << "-";
                     buf+=(char)(*it)->getID()%256;
                     buf+=(char)((*it)->getID()/256)%256;

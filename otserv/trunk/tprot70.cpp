@@ -109,9 +109,7 @@ void TProt70::clread(const Socket& sock) throw() {
     std::cerr << "read" << std::endl;
     exit(-1);
   } else if (nbytes == 0) { // eof (means logout)
-    std::cerr << "logout" << std::endl;
-    es.deletesocket(sock);
-    close(sock);
+	parseLogout(NULL, "");
   } else {  // lesen erfolgreich
     buffer[nbytes] = 0;
 #ifdef __DEBUG__
@@ -120,8 +118,7 @@ void TProt70::clread(const Socket& sock) throw() {
     //TODO message bearbeiten
     std::string s= std::string(buffer, nbytes);;
     parsePacket(s);
-    printf("%s\n", buffer);
-  }
+   }
 }
 
 void TProt70::parsePacket(std::string msg){
@@ -167,6 +164,9 @@ void TProt70::parsePacket(std::string msg){
   case 0x78: //throw item
     parseThrow(action, msg);
     break;
+ case 0x8C: //throw item
+    parseLookAt(action, msg);
+    break;
   case 0x96: //say something
     parseSay(action, msg);
     break;
@@ -189,8 +189,6 @@ void TProt70::parsePacket(std::string msg){
 			sendPlayerSorry(TMAP_ERROR_TILE_OCCUPIED);
 		break;
 	}
-    if(map->requestAction(creature,action)==-1)
-		sendPlayerSorry();
   }
 }
 
@@ -343,74 +341,46 @@ void TProt70::parsePacket(std::string msg){
 		} // void TProt70::setMap(position newpos) throw(texception)
 
 std::string TProt70::makeMap(position topleft, position botright) {
-  int xswap=1, yswap=1;
-  position dif=botright-topleft;
-  /*if(topleft.x > botright.x)
-    swap(topleft.x, botright.x);
-    if(topleft.y > botright.y)
-    swap(topleft.y, botright.y);*/
-  if(dif.x<0)
-    xswap=-1;
-  if(dif.y<0)
-    yswap=-1;
-  std::string buf;
-  Tile* tile;
-  /*FILE* dmp=fopen("map","r");
-    int a;
-    while((a=fgetc(dmp))!=EOF)
-    buf+=(char)a;
-    fclose(dmp);
-  */
-#ifdef __DEBUG__
-  std::cout << "   Yswap: " << yswap << "   Xswap: " << xswap << std::endl;
-#endif
-#ifdef __DEBUG__
-  std::cout << "   Topleft: " << topleft.x << "   botright: " << botright.x << std::endl;
-#endif
-  // buf+=makeMap(player->pos-position(-8,7,7),player->pos-position(9,7,7));
-#ifdef __DEBUG__
-  std::cout << topleft.y << "\t" << botright.y <<std::endl;
-#endif
-  // we just add the tilecode for every tile...
-  std::string rowbuf, colbuf, tmpbuf;
-  
-  for (unsigned short i=topleft.x; i*xswap<=botright.x*xswap; i+=xswap) {
-#ifdef __DEBUG__
-    std::cout << "," <<std::endl;
-#endif
-    
-    for (unsigned short j=topleft.y; j*yswap<=botright.y*yswap; j+=yswap) {
-#ifdef __DEBUG__
-      std::cout << ".";
-#endif
-      tile=map->tile(i,j,topleft.z);
-      ADD2BYTE(buf,(*(tile->begin()))->getID());
-      Item::iterator start=tile->end();
-      start--;
-      for (Item::iterator it=start; it !=tile->begin() ; --it) {
-#ifdef __DEBUG__
-	std::cout << "-";
-#endif
-		buf+=makeItem(*it);
-/*		ADD2BYTE(buf, (*it)->getID());
-		if((*it)->isStackable()){
-			buf+=(unsigned char)((*it)->count);
-			std::cout << "Item id " << (*it)->getID() << " is stackable" <<std::endl;
-		}*/
-	  }
-      
-      if(tile->getCreature()!=NULL)
-	buf += makeCreature(tile->getCreature());
-      buf+=(char)0x00; // no special thing
-      buf += (char)0xFF; // tile end
-    } //for (unsigned short j=topleft.y; j<=botright.y; j++)
-  }//for (unsigned short i=topleft.x; i<=botright.x; i++)
-  
-  
-  return buf;
-  
-  
-  
+	int xswap=1, yswap=1;
+	position dif=botright-topleft;
+	if(dif.x<0)
+		xswap=-1;
+	if(dif.y<0)
+		yswap=-1;
+	std::string buf;
+	Tile* tile;
+
+	std::string rowbuf, colbuf, tmpbuf;
+
+	for (unsigned short i=topleft.x; i*xswap<=botright.x*xswap; i+=xswap) {
+	#ifdef __DEBUG__
+		std::cout << "," <<std::endl;
+	#endif
+
+		for (unsigned short j=topleft.y; j*yswap<=botright.y*yswap; j+=yswap) {
+	#ifdef __DEBUG__
+		std::cout << ".";
+	#endif
+		tile=map->tile(i,j,topleft.z);
+		ADD2BYTE(buf,(*(tile->begin()))->getID());
+		Tile::iterator start=tile->end();
+		start--;
+		for (Tile::iterator it=start; it !=tile->begin() ; --it) {
+	#ifdef __DEBUG__
+		std::cout << "-";
+	#endif
+			buf+=makeItem(*it);
+		}
+		if(tile->getCreature()!=NULL){
+			std::cout << "creature" << std::endl;
+			buf += makeCreature(tile->getCreature());
+		}
+		buf+=(char)0x00; // no special thing
+		buf+=(char)0xFF; // tile end
+
+		} //for (unsigned short j=topleft.y; j<=botright.y; j++)
+	}//for (unsigned short i=topleft.x; i<=botright.x; i++)
+	return buf;
 } // std::string TProt70::makeMap(const position& topleft, const position& botright)
 
 bool TProt70::knowsPlayer(long id){
@@ -582,13 +552,14 @@ void TProt70::parseSetOutfit(Action* action, std::string msg){}
 
 void TProt70::parseLogout(Action* action, std::string msg){
     // if this is a player then save the player's data
+	std::cout << "Logging out" << std::endl;
     if( creature->isPlayer() )
     {
         // save the character before we logout
         this->player->save();
     }
 	//we ask the map to remove us
-	map->removeCreature(pos);
+	map->removeCreature(player->pos);
 	//we ask the eventscheduler to disconnect us
 	es.deletesocket(psocket);
 	//we remove ourself
@@ -600,7 +571,7 @@ void TProt70::parseThrow(Action* action, std::string msg){
 	action->pos1.x=(unsigned char)msg[2]*256+(unsigned char)msg[1];
 	action->pos1.y=(unsigned char)msg[4]*256+(unsigned char)msg[3];
 	action->pos1.z=(unsigned char)msg[5];
-
+	action->stack=(unsigned char)msg[8];
 	action->pos2.x=(unsigned char)msg[10]*256+(unsigned char)msg[9];
 	action->pos2.y=(unsigned char)msg[12]*256+(unsigned char)msg[11];
 	action->pos2.z=(unsigned char)msg[13];
@@ -609,6 +580,16 @@ void TProt70::parseThrow(Action* action, std::string msg){
 	action->count=msg[14];
 
 	printf("From %i %i to %i %i", action->pos1.x, action->pos1.y, action->pos2.x, action->pos2.y);
+	action->creature=this->creature;
+}
+
+void TProt70::parseLookAt(Action* action, std::string msg){
+	//TODO add stackpos
+	action->type=ACTION_LOOK_AT;
+	action->pos1.x=(unsigned char)msg[2]*256+(unsigned char)msg[1];
+	action->pos1.y=(unsigned char)msg[4]*256+(unsigned char)msg[3];
+	action->pos1.z=(unsigned char)msg[5];
+
 	action->creature=this->creature;
 }
 
@@ -762,6 +743,9 @@ void TProt70::sendAction(Action* action){
 	if(action->type==ACTION_ITEM_DISAPPEAR){
 		sendPlayerItemDisappear(action);
 	}
+	if(action->type==ACTION_ITEM_CHANGE){
+		sendPlayerItemChange(action);
+	}
 	if(action->type==ACTION_GROUND_CHANGE){
 		sendPlayerChangeGround(action);
 	}
@@ -769,6 +753,10 @@ void TProt70::sendAction(Action* action){
 		//this should not occur
 		//throws are sent as 1 create and 1 delete
 	}
+	if(action->type==ACTION_LOOK_AT){
+		this->sendPlayerLookAt(action->buffer);
+	}
+	//TODO free a;
 }
 
 void TProt70::sendPlayerMove(Action* action){
@@ -897,7 +885,7 @@ void TProt70::sendPlayerItemAppear(Action* action){
 	ADD2BYTE(buf, action->pos1.y);
 	buf+=(char)action->pos1.z;
 	ADD2BYTE(buf, action->id);
-	if(action->count)
+	if(action->count!=0)
 	buf+=(unsigned char)action->count;
 	std::cout << "Count:" << action->count << std::endl;
 	buf[0]=(char)(buf.size()-2)%256;
@@ -957,6 +945,16 @@ void TProt70::sendPlayerSorry(std::string msg){
 	TNetwork::SendData(psocket,buf);
 }
 
+void TProt70::sendPlayerLookAt(std::string msg){
+	std::string buf = "  ";
+	buf+=(char)0xB4;
+	buf+=(char)0x13;
+	ADD2BYTE(buf, msg.size());
+	buf+=msg;
+	buf[0]=(char)(buf.size()-2)%256;
+	buf[1]=(char)((buf.size()-2)/256)%256;
+	TNetwork::SendData(psocket,buf);
+}
 
 void TProt70::sendPlayerChangeGround(Action* action){
 	std::string buf = "  ";
@@ -971,6 +969,17 @@ void TProt70::sendPlayerChangeGround(Action* action){
 	TNetwork::SendData(psocket,buf);
 }
 
+void TProt70::sendPlayerItemChange(Action* action){
+	std::string buf = "  ";
+	buf+=(char)(0x6B);
+	ADDPOS(buf, action->pos1);
+	buf+=(char)(0x01);//stack?
+	ADD2BYTE(buf,action->id);
+	ADD1BYTE(buf,action->count);
+	buf[0]=(char)(buf.size()-2)%256;
+	buf[1]=(char)((buf.size()-2)/256)%256;
+	TNetwork::SendData(psocket,buf);
+}
 
 void TProt70::sendPlayerTurn(Action* action){
 	std::string buf = "  ";

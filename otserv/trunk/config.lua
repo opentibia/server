@@ -13,7 +13,7 @@ loginmsg = "Welcome to OTServ. For help visit tibia.de/forum"
 
 -- port
 -- the port otserv listens on
-port = "7171"
+port = "7172"
 
 -- motd
 -- The messagebox you sometimes get before you choose characters

@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.10  2003/10/19 21:32:19  tliffrag
+// Reworked the Tile class; stackable items now working
+//
 // Revision 1.9  2003/10/17 22:25:02  tliffrag
 // Addes SorryNotPossible; added configfile; basic lua support
 //
@@ -76,7 +79,7 @@ public:
 	bool useable;
 	bool alwaysOnBottom;
 	bool alwaysOnTop;
-    bool groundtile; // is this necessary?
+    bool groundtile; 
     bool blocking; // people can walk on it
     bool pickupable; // people can pick it up
 	//what freak has chosen this const static unsigned short?

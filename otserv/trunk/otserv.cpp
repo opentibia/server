@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.12  2003/10/19 21:32:19  tliffrag
+// Reworked the Tile class; stackable items now working
+//
 // Revision 1.11  2003/10/17 22:25:02  tliffrag
 // Addes SorryNotPossible; added configfile; basic lua support
 //
@@ -54,6 +57,7 @@ int ipFromDotted(char*);
 int g_serverip;
 LuaScript g_config("config.lua");
 EventScheduler es;
+Items Item::items;
 Map::Map map;
 
 int main(int argc, char *argv[]) {

@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.11  2003/10/19 21:32:19  tliffrag
+// Reworked the Tile class; stackable items now working
+//
 // Revision 1.10  2003/10/17 22:25:02  tliffrag
 // Addes SorryNotPossible; added configfile; basic lua support
 //
@@ -58,6 +61,7 @@
 #include "action.h"
 #include "item.h"
 #include "creature.h"
+#include <vector>
 
 enum tmapEnum{
 	TMAP_SUCCESS,
@@ -72,7 +76,7 @@ enum tmapEnum{
 // it is a list of Items.
 class Creature; //see creature.h
 
-class Tile : public std::list<Item *> {
+class Tile : public std::vector<Item *> {
  public:
   Creature* creature;
  public:
@@ -83,8 +87,15 @@ class Tile : public std::list<Item *> {
   Tile(){
    creature = NULL;
   }
+  std::vector<Item *>::iterator getItToPos(int pos);
+  void push_front(Item* i);
+  Item* pop_front();
+  int addItem(Item*);
   int getStackPosPlayer();
   int getStackPosItem();
+  int removeItem(int stack, int type, int count);
+  int removeItemByStack(int stack);
+  Item* getItemByStack(int stack);
   bool isBlocking();
   std::string getDescription();
 };
@@ -117,6 +128,7 @@ class Map {
 
 		int saveMap();
 		int removeItem(position pos);
+		int removeItem(Action* a);
         Tile *tile(unsigned short _x, unsigned short _y, unsigned char _z);
 		std::list <Creature*> PlayerList;
         ~Map();

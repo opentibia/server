@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.6  2003/10/19 21:32:19  tliffrag
+// Reworked the Tile class; stackable items now working
+//
 // Revision 1.5  2003/10/17 22:25:02  tliffrag
 // Addes SorryNotPossible; added configfile; basic lua support
 //
@@ -50,7 +53,7 @@ ItemType::ItemType() {
 	useable=false;
 	alwaysOnBottom=false;
 	alwaysOnTop=false;
-    groundtile=false; // is this necessary?
+    groundtile=false;
     blocking=false; // people can walk on it
     pickupable=false; // people can pick it up
 }
@@ -68,10 +71,6 @@ ItemType::~ItemType() {
 Items::Items() {
     // add a few items
 	loadFromDat("tibia.dat");
-/*    unsigned short id;
-    id = ItemType::WATER; items[id] = ItemType(id, 0x0E00, "water");
-    id = ItemType::GRASS; items[id] = ItemType(id, 0x0A00, "grass");
-*/
 }
 
 int Items::loadFromDat(std::string file){
@@ -100,6 +99,9 @@ int Items::loadFromDat(std::string file){
 
 		std::string header=readDatEntryHeader(f);
 		readDatEntry(f);
+		//TODO include this in the loop:
+		if((unsigned char)(*(header.begin()))==0x00)
+			iType->groundtile=true;
 		for(std::string::iterator i=header.begin(); i != header.end(); i++){
 			unsigned char header_byte=(*i);
 			switch(header_byte){

@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.2  2003/10/19 21:32:19  tliffrag
+// Reworked the Tile class; stackable items now working
+//
 // Revision 1.1  2003/10/17 22:25:02  tliffrag
 // Addes SorryNotPossible; added configfile; basic lua support
 //
@@ -33,8 +36,6 @@ LuaScript::LuaScript(std::string file){
 	l=lua_open();
 	if(lua_dofile(l, file.c_str()))	  
 	  std::cout << "Error loading " << file << std::endl;
-	else
-	  std::cout << "Loaded " << file << std::endl;
 }
 
 LuaScript::~LuaScript(){

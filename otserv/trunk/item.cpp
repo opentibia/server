@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.5  2003/10/19 21:32:19  tliffrag
+// Reworked the Tile class; stackable items now working
+//
 // Revision 1.4  2003/10/17 22:25:02  tliffrag
 // Addes SorryNotPossible; added configfile; basic lua support
 //
@@ -33,8 +36,9 @@
 
 // include header file
 #include "item.h"
+#include <iostream>
+#include <sstream>
 
-Items Item::items;
 //////////////////////////////////////////////////
 // returns the ID of this item's ItemType
 unsigned Item::getID() {
@@ -102,6 +106,26 @@ bool Item::isStackable() {
 
 bool Item::isAlwaysOnTop() {
 	return items.items[id]->alwaysOnTop;
+}
+
+bool Item::isAlwaysOnBottom() {
+	return items.items[id]->alwaysOnBottom;
+}
+
+bool Item::isGroundTile() {
+	return items.items[id]->groundtile;
+	//return true;
+}
+
+std::string Item::getDescription() {
+	std::stringstream s;
+	std::string str;
+	s << "This is an item of type #" << id <<".   ";
+	if(count)
+		s << count << " pieces.";
+	str = s.str();
+	return str;
+	//return true;
 }
 
 //////////////////////////////////////////////////

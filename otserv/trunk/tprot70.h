@@ -22,6 +22,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.8  2003/10/19 21:32:19  tliffrag
+// Reworked the Tile class; stackable items now working
+//
 // Revision 1.7  2003/10/17 22:25:02  tliffrag
 // Addes SorryNotPossible; added configfile; basic lua support
 //
@@ -106,6 +109,7 @@
 			void parseTurnWest(Action* action, std::string msg);
 			void parseSetOutfit(Action* action, std::string msg);
 			void parseSay(Action* action, std::string msg);
+			void parseLookAt(Action* action, std::string msg);
 			void parseAttack(Action* action, std::string msg);
 			void parseLogout(Action* action, std::string msg);
 			void parseThrow(Action* action, std::string msg);
@@ -116,11 +120,13 @@
 			void sendPlayerMoveIn(Action* action);
 			void sendPlayerTurn(Action* action);
 			void sendPlayerItemAppear(Action* action);
+			void sendPlayerItemChange(Action* action);
 			void sendPlayerItemDisappear(Action* action);
 
 			void sendPlayerSorry();
 			void sendPlayerSorry(tmapEnum);
 			void sendPlayerSorry(std::string);
+			void sendPlayerLookAt(std::string);
 
 			bool knowsPlayer(long id);
 			void addKnownPlayer(long id);

@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.15  2003/10/19 21:32:19  tliffrag
+// Reworked the Tile class; stackable items now working
+//
 // Revision 1.14  2003/10/17 22:25:02  tliffrag
 // Addes SorryNotPossible; added configfile; basic lua support
 //
@@ -71,13 +74,35 @@
 #include "npc.h"
 #include <stdio.h>
 
+
+//TODO move all the tile stuff to tile.cpp
 int Tile::getStackPosItem(){
-return 0;
+	int pos=1;
+	if(size()<=1)
+		return 0;
+	if(creature && size()>=2)
+		pos++;
+	Tile::iterator it=end();
+	it--;
+	if(size()>=3 && (*it)->isAlwaysOnTop())
+		pos++;
+	std::cout << "stackpos of top item is "<< pos << std::endl;
+	return pos;
+}
+
+void Tile::push_front(Item* i){
+	this->insert(this->begin(), i);
+}
+
+Item* Tile::pop_front(){
+	Item* a= this->operator[](0);
+	erase(this->begin());
+	return a;
 }
 
 bool Tile::isBlocking(){
 	bool blocking=false;
-	std::list<Item *>::iterator i;
+	Tile::iterator i;
 	//if any of the items on this tile is blocking,
 	//the whole tile blocks
 	for(i = this->begin(); i != this->end(); i++){
@@ -89,9 +114,134 @@ bool Tile::isBlocking(){
 	return blocking;
 }
 
+int Tile::removeItem(int stack, int type, int count){
+	//returns how much items are left
+	//TODO
+	Item* item=getItemByStack(stack);
+std::cout << std::endl << "Stackpos was " << stack << std::endl;
+	std::cout << std::endl << "Got an item with id " << item->getID() << std::endl;
+	int itemsleft = item->count-count;
+	if(itemsleft<=0){
+		itemsleft=0;
+		removeItemByStack(stack);
+	}
+	item->count=itemsleft;
+	return itemsleft;
+}
+
+int Tile::addItem(Item* item){
+	std::cout << item->getDescription() << std::endl;
+	if(size()==0){
+		push_back(item);
+		return true;
+	}
+
+	if(item->isGroundTile()){
+		if(size()==0)
+			push_back(item);
+		else
+			(*this)[0]=item;
+	return true;
+	}
+	else if(item->isAlwaysOnTop()){
+		Tile::iterator it=end();
+		it--;
+		if((*it)->isAlwaysOnTop())
+			(*it)=item;
+		else
+			push_back(item);
+		return true;
+	}
+	else if(!item->isAlwaysOnBottom()){//normal item
+		Tile::iterator it=begin();
+		while(it != end() && !(*it)->isAlwaysOnTop())
+			it++;
+		insert(it,item);
+	}
+	else{
+		Tile::iterator it=begin();
+		while(it != end() && ((*it)->isAlwaysOnBottom() || (*it)->isGroundTile()) )
+			it++;
+		insert(it,item);
+		return true;
+	}
+	return true;
+}
+
+std::vector<Item*>::iterator Tile::getItToPos(int pos){
+	Tile::iterator it;
+	int i=0;
+	for(it=begin(); i <pos; ++it)i++;
+	return it;
+}
+
+Item* Tile::getItemByStack(int stack){
+	if(stack==0)
+		return(*getItToPos(0));
+	//if theres a creature on this tile...
+	if((*(getItToPos(size()-1)))->isAlwaysOnTop()){
+		if(stack==1)
+			return *(getItToPos(size()-1));
+		else{
+			if(this->creature)
+				if(stack==2)
+					return NULL;
+				else
+					return *(getItToPos(size()-(stack-1)));
+			else
+				return *(getItToPos(size()-stack));
+		}
+	}
+	else{
+		if(this->creature)
+			if(stack==1){
+				return NULL;
+			}
+			else{
+				return *(getItToPos(size()-(stack-1)));
+			}
+		else{
+			return *(getItToPos(size()-stack));
+		}
+	}
+	return NULL;
+}
+
+int Tile::removeItemByStack(int stack){
+	if(stack==0)
+		erase(getItToPos(0));
+	//if theres a creature on this tile...
+	else if((*(getItToPos(size()-1)))->isAlwaysOnTop()){
+		if(stack==1)
+			erase ((getItToPos(size()-1)));
+		else{
+			if(this->creature)
+				if(stack==2)
+					return 0;
+				else
+					erase((getItToPos(size()-(stack-1))));
+			else
+				erase( (getItToPos(size()-stack)));
+		}
+	}
+	else{
+		if(this->creature)
+			if(stack==1){
+				return 0;
+			}
+			else{
+				erase((getItToPos(size()-(stack-1))));
+			}
+		else{
+			erase( (getItToPos(size()-stack)));
+		}
+	}
+	return 0;
+}
+
 int Tile::getStackPosPlayer(){
 	bool top=false;
-	std::list<Item *>::iterator i;
+	Tile::iterator i;
 	//if any of the items on this tile is blocking,
 	//the whole tile blocks
 	for(i = this->begin(); i != this->end(); i++){
@@ -106,8 +256,14 @@ int Tile::getStackPosPlayer(){
 
 std::string Tile::getDescription(){
 	std::string ret;
-
-	ret="You dont know why, but you cant see anything!";
+	std::cout << "Items: "<< size() << std::endl;
+	for(unsigned int i=0; i < size(); i++)
+		std::cout << "ID: "<< (*this)[i]->getID() << std::endl;
+	Tile::iterator it;
+	it=end();
+	it--;
+	ret=(*it)->getDescription();
+	//ret="You dont know why, but you cant see anything!";
 	return ret;
 }
 
@@ -148,7 +304,8 @@ Map::Map() {
 				if(id==0x00FF)
 					break;
 				now.x=x+MINX;now.y=y+MINY;now.z=topleft.z;
-				tiles[x][y]->push_back(new Item(id));
+				tiles[x][y]->addItem(new Item(id));
+				//tiles[x][y]->push_back(new Item(id));
 			}
 		}
 	}
@@ -191,7 +348,7 @@ int Map::saveMap(){
 	for(int y=0; y < MAXY-MINY; y++){
 		for(int x=0; x < MAXX-MINX; x++){
 			Tile* tile=tiles[x][y];
-			for (Item::iterator it=tile->begin(); it != tile->end(); it++) {
+			for (Tile::iterator it=tile->begin(); it != tile->end(); it++) {
 				fputc((int)( (*it)->getID()/256), dump);
 				fputc((int)( (*it)->getID()%256), dump);
 			}
@@ -232,8 +389,11 @@ position Map::placeCreature(position pos, Creature* c){
 }
 
 int Map::removeCreature(position pos){
-  if(tiles[pos.x-MINX][pos.y-MINY]->creature)
-    tiles[pos.x-MINX][pos.y-MINY]->creature=NULL;
+	std::cout << "removing creature "<< std::endl;
+	if(tiles[pos.x-MINX][pos.y-MINY]->creature)
+		tiles[pos.x-MINX][pos.y-MINY]->creature=NULL;
+	else
+		std::cout <<"ERROR NO CREATURE" <<std::endl;
   //now distribute the action
   Action* a= new Action;
   a->type=ACTION_LOGOUT;
@@ -279,22 +439,35 @@ int Map::requestAction(Creature* c, Action* a){
 	}
 	if(a->type==ACTION_THROW){
 	//FIXME we should really check, if the player can throw
+		Action a_summon, a_remove;
 		Tile* tile=tiles[a->pos1.x-MINX][a->pos1.y-MINX];
-		Item::iterator it=tile->end(); it--;
-		if(a->pos2.x!=0xFFFF && a->pos1.x!=0xFFFF)
-		//if start is on ground and end is on ground
-		summonItem(a->pos2, (*it)->getID());
-		if(a->pos2.x!=0xFFFF && a->pos1.x==0xFFFF)
-		;//if end is on ground and start is in equipement
-		if(a->pos1.x!=0xFFFF)
-		//if start is on ground
-		;//removeItem(a->pos1);
-		else{
-		//if start is in equipement
-			//take the item away
-		}
+		Tile::iterator it=tile->end(); it--;
+		a_summon.type=ACTION_ITEM_APPEAR;
+		a_summon.pos1=a->pos2;
+		a_summon.id=(*it)->getID();
+		a_remove.type=ACTION_ITEM_DISAPPEAR;
+		a_remove.pos1=a->pos1;
+		a_remove.id=a->id;
+		a_remove.count=a->count;
+		a_remove.stack=a->stack;
+		if((*it)->isStackable())
+			a_summon.count=a->count;
+		else
+			a_summon.count=0;
+
+		if(a->pos1.x!=0xFFFF)//start is on map
+			removeItem(&a_remove);
+		if(a->pos2.x!=0xFFFF)//destination is on map
+			summonItem(&a_summon);
 		std::cout << "i should move " << a->count << " items" << std::endl;
 	}
+	if(a->type==ACTION_LOOK_AT){
+
+		Tile* tile=tiles[a->pos1.x-MINX][a->pos1.y-MINX];
+		a->buffer=tile->getDescription();
+		a->creature->sendAction(a);
+	}
+	delete a;
 	return true;
 }
 
@@ -322,7 +495,6 @@ int Map::distributeAction(position pos, Action* a){
 	std::list<Creature*>::iterator i;
 	for(i=victims.begin(); i!=victims.end();++i)
 		(*i)->sendAction(a);
-	delete a;
 	return true;
 }
 
@@ -336,23 +508,61 @@ int Map::summonItem(Action* a){
 	std::cout << "Summoning item with id " << a->id << std::endl;
 	#endif
 	item->count=a->count;
-	tiles[a->pos1.x-MINX][a->pos1.y-MINY]->push_back(item);
-	Action* b= new Action;
-	b->type=ACTION_ITEM_APPEAR;
-	b->pos1=a->pos1;
-	b->id=a->id;
-	b->count=a->count;
-	distributeAction(a->pos1, b);
+	Tile* tile = tiles[a->pos1.x-MINX][a->pos1.y-MINY];
+	if((unsigned int)a->id != tile->getItemByStack(tile->getStackPosItem())->getID() ||
+		!item->isStackable()){
+		std::cout << "appear id: " << tile->getItemByStack(tile->getStackPosItem())->getID()<< std::endl;
+		//if an item of this type isnt already there or this type isnt stackable
+		tile->addItem(item);
+		Action b;
+		b.type=ACTION_ITEM_APPEAR;
+		b.pos1=a->pos1;
+		b.id=a->id;
+		b.count=a->count;
+		distributeAction(a->pos1, &b);
+	}
+	else {
+		std::cout << "merge" << std::endl;
+		//we might possibly merge the top item and the stuff we want to add
+		Item* onTile = tile->getItemByStack(tile->getStackPosItem());
+		onTile->count+=item->count;
+		int tmpnum=0;
+		if(onTile->count>100){
+			tmpnum= onTile->count-100;
+			onTile->count=100;
+		}
+		Action b;
+		b.type=ACTION_ITEM_CHANGE;
+		b.pos1=a->pos1;
+		b.id=a->id;
+		b.count=onTile->count;
+
+		distributeAction(a->pos1, &b);
+
+		if(tmpnum>0){
+			std::cout << "creating extra item" << std::endl;
+			item->count=tmpnum;
+			tile->addItem(item);
+			Action c;
+			c.type=ACTION_ITEM_APPEAR;
+			c.pos1=a->pos1;
+			c.id=a->id;
+			c.count=item->count;
+			distributeAction(a->pos1, &c);
+			//not all fit into the already existing item, create a new one
+		}
+	}
 	return true;
 }
 
 int Map::summonItem(position pos, int id){
+	std::cout << "Deprecated summonItem" << std::cout;
 	if(!id)
 		return false;
 	#ifdef __DEBUG__
 	std::cout << "Summoning item with id " << id << std::endl;
 	#endif
-	tiles[pos.x-MINX][pos.y-MINY]->push_back(new Item(id));
+	tiles[pos.x-MINX][pos.y-MINY]->addItem(new Item(id));
 	Action* a= new Action;
 	a->type=ACTION_ITEM_APPEAR;
 	a->pos1=pos;
@@ -367,8 +577,7 @@ int Map::changeGround(position pos, int id){
 #ifdef __DEBUG__
   std::cout << "Summoning item with id " << id << std::endl;
 #endif
-  tiles[pos.x-MINX][pos.y-MINY]->pop_front();
-  tiles[pos.x-MINX][pos.y-MINY]->push_front(new Item(id));
+  tiles[pos.x-MINX][pos.y-MINY]->addItem(new Item(id));
   Action* a= new Action;
   a->type=ACTION_GROUND_CHANGE;
   a->pos1=pos;
@@ -378,6 +587,7 @@ int Map::changeGround(position pos, int id){
 }
 
 int Map::removeItem(position pos){
+	std::cout << "Deprecated removeItem" << std::cout;
 	Tile* tile=tiles[pos.x-MINX][pos.y-MINY];
 	if(tile->size()<=1)
 		return false;
@@ -390,5 +600,22 @@ int Map::removeItem(position pos){
 	  a->stack=1;
 	a->pos1=pos;
 	distributeAction(pos, a);
+	return true;
+}
+
+int Map::removeItem(Action* a){
+	int newcount;
+	Tile* tile=tiles[a->pos1.x-MINX][a->pos1.y-MINY];
+	std::cout << "COUNT: " << a->count << std::endl;
+	newcount=tile->removeItem(a->stack, a->type, a->count);
+	std::cout << "COUNT: " << newcount << std::endl;
+	if(newcount==0)
+		distributeAction(a->pos1,a);
+	else{
+		std::cout << "distributing change" << std::endl;
+		a->type=ACTION_ITEM_CHANGE;
+		a->count=newcount;
+		distributeAction(a->pos1,a);
+	}
 	return true;
 }

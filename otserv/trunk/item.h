@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.5  2003/10/19 21:32:19  tliffrag
+// Reworked the Tile class; stackable items now working
+//
 // Revision 1.4  2003/10/17 22:25:02  tliffrag
 // Addes SorryNotPossible; added configfile; basic lua support
 //
@@ -35,6 +38,7 @@
 #define __OTSERV_ITEM_H
 
 #include <list>
+#include <vector>
 
 #include "texcept.h"
 #include "items.h"
@@ -57,6 +61,7 @@ class Item {
 		bool isBlocking();
 		bool isStackable();
 		bool isAlwaysOnTop();
+		bool isGroundTile();
 		bool isAlwaysOnBottom();
 		std::string getDescription();
 
