@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.20  2003/11/03 22:48:14  tliffrag
+// Changing look, walking by mouse working
+//
 // Revision 1.19  2003/11/03 12:16:01  tliffrag
 // started walking by mouse
 //
@@ -589,6 +592,9 @@ int Map::requestAction(Creature* c, Action* a){
 
 		Tile* tile=tiles[a->pos1.x-MINX][a->pos1.y-MINX];
 		a->buffer=tile->getDescription();
+		a->creature->sendAction(a);
+	}
+	else if(a->type==ACTION_REQUEST_APPEARANCE){
 		a->creature->sendAction(a);
 	}
 	delete a;

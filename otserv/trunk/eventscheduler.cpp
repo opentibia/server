@@ -21,6 +21,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.13  2003/11/03 22:48:14  tliffrag
+// Changing look, walking by mouse working
+//
 // Revision 1.12  2003/11/03 12:16:00  tliffrag
 // started walking by mouse
 //
@@ -99,7 +102,7 @@ int EventScheduler::addCreatureTick(long c, int ms){
 	stick* t=new stick;
 	t->type=TICK_CREATURE;
 	t->cid=c;
-	tickList.insert(pair<double, stick*>(((double)ms/1000+getNow()), t));
+	tickList.insert(pair<double, stick*>((((double)ms/(double)1000)+getNow()), t));
 	return true;
 }
 
@@ -111,7 +114,6 @@ void EventScheduler::loop() {
     struct timeval tv = {0, 50000};
     for (;;) {
         if (tv.tv_sec == 0 && tv.tv_usec == 0) {
-			//cout << "time event" << endl;
 			//finally another 50k microsecs have passed and we tick
 			double now=getNow();
 			std::multimap<double, stick*, cmpdouble>::iterator  i = tickList.begin();

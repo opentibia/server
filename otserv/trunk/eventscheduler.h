@@ -21,6 +21,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.13  2003/11/03 22:48:14  tliffrag
+// Changing look, walking by mouse working
+//
 // Revision 1.12  2003/11/03 12:16:00  tliffrag
 // started walking by mouse
 //
@@ -110,7 +113,7 @@ class EventScheduler {
 	double getNow(){
 		timeb nowTime;
 		ftime(&nowTime);
-		return (double)nowTime.time+(double)nowTime.time/1000;
+		return (double)nowTime.time+(double)(((double)nowTime.millitm)/(double)(1000));
 	}
 };
 

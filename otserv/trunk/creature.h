@@ -29,6 +29,17 @@
 #include <iostream>
 #include "tmap.h"
 
+enum playerLooks{
+	PLAYER_MALE_1=0x80,
+	PLAYER_MALE_2=0x81,
+	PLAYER_MALE_3=0x82,
+	PLAYER_MALE_4=0x83,
+	PLAYER_FEMALE_1=0x88,
+	PLAYER_FEMALE_2=0x89,
+	PLAYER_FEMALE_3=0x8A,
+	PLAYER_FEMALE_4=0x8B,
+};
+
 // include Map headers
 
 
@@ -55,6 +66,8 @@ class Creature {
 		virtual int tick(double time)=0;
 
 		virtual int addAction(Action*)=0;
+
+		virtual int clearActionQueue()=0;
 
 		virtual int addItem(Item* item, int pos){return 0;};
 

@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.14  2003/11/03 22:48:14  tliffrag
+// Changing look, walking by mouse working
+//
 // Revision 1.13  2003/11/03 12:16:01  tliffrag
 // started walking by mouse
 //
@@ -111,13 +114,17 @@ namespace Creatures {
 	}
 
 	int Player::tick(double time){
-		std::cout << "q: " <<actionQueue.size() << std::endl;
 		if(actionQueue.size()>0){
+			(*(actionQueue.begin()))->pos1=player.pos;
 			client->doAction(*(actionQueue.begin()));
 			actionQueue.erase(actionQueue.begin());
 		}
-		es.addCreatureTick(player.pnum, 1000);
+		es.addCreatureTick(player.pnum, 450);
 		return 0;
+	}
+
+	int Player::clearActionQueue(){
+		actionQueue.clear();
 	}
 
     void Player::setMap(position pos,Map& map) throw(texception) {

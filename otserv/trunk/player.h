@@ -20,6 +20,9 @@
 	// $Id$
 	//////////////////////////////////////////////////////////////////////
 	// $Log$
+	// Revision 1.11  2003/11/03 22:48:14  tliffrag
+	// Changing look, walking by mouse working
+	//
 	// Revision 1.10  2003/11/03 12:16:01  tliffrag
 	// started walking by mouse
 	//
@@ -64,6 +67,8 @@
 		virtual ~Player();
 
 		bool isPlayer();
+
+		int clearActionQueue();
 
 		std::list<Action*> actionQueue;
 		int addAction(Action* a){ actionQueue.push_back(a); return 0;};

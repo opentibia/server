@@ -177,7 +177,10 @@ void TProt70::parsePacket(std::string msg){
   case 0xA1: //attack
     parseAttack(action, msg);
     break;
-  case 0xDB: //set outfit TODO
+  case 0xD2: //request Outfit
+    parseRequestOutfit(action, msg);
+    break;
+  case 0xD3: //set outfit
     parseSetOutfit(action, msg);
     break;
   }
@@ -411,11 +414,11 @@ if(c && c->isPlayer())
 		ADD2BYTE(buf, p.name.length());
 		buf+=p.name;
 	}
-	buf += (char)0x64;//SEPERATOR
+	buf += (char)0x64;//FIXME health
 
 	buf += (char)0x01; //FACING
 
-	buf += (char)0x88;//FIX
+	buf += (char)0x88;//looktype
 
 	buf += (char)p.lookhead;
 	buf += (char)p.lookbody;
@@ -518,7 +521,15 @@ void TProt70::parseTurnWest(Action* action, std::string msg){
 	player->lookdir=3;
 }
 
-void TProt70::parseSetOutfit(Action* action, std::string msg){}
+void TProt70::parseRequestOutfit(Action* action, std::string msg){
+	action->type=ACTION_REQUEST_APPEARANCE;
+	action->pos1=player->pos;
+	action->creature=creature;
+}
+
+void TProt70::parseSetOutfit(Action* action, std::string msg){
+
+}
 
 void TProt70::parseLogout(Action* action, std::string msg){
     // if this is a player then save the player's data
@@ -570,10 +581,12 @@ void TProt70::parseLookAt(Action* action, std::string msg){
 
 void TProt70::parseMoveByMouse(Action* action, std::string msg){
 	Action* a;
+	creature->clearActionQueue();
 	for(int i=0; i < msg[1]; i++){
 		a=new Action;
 		a->type=ACTION_MOVE;
 		a->direction=msg[i+2];
+		a->creature=creature;
 		creature->addAction(a);
 	}
 }
@@ -741,6 +754,9 @@ void TProt70::sendAction(Action* action){
 	if(action->type==ACTION_LOOK_AT){
 		this->sendPlayerLookAt(action->buffer);
 	}
+	if(action->type==ACTION_REQUEST_APPEARANCE){
+		sendPlayerAppearance(action);
+	}
 	//TODO free a;
 }
 
@@ -795,6 +811,7 @@ void TProt70::sendPlayerMove(Action* action){
 		ADD2BYTE(buf, action->pos2.y);
 		buf+=(char)action->pos2.z;
 		if(action->pos1==player->pos){
+			std::cout << "We are the player that moved" << std::endl;
 			//if we are the player that moved
 			//we need to add a new map
 			buf+=(char)(0x65+action->direction);
@@ -936,6 +953,22 @@ void TProt70::sendPlayerLookAt(std::string msg){
 	buf+=(char)0x13;
 	ADD2BYTE(buf, msg.size());
 	buf+=msg;
+	buf[0]=(char)(buf.size()-2)%256;
+	buf[1]=(char)((buf.size()-2)/256)%256;
+	TNetwork::SendData(psocket,buf);
+}
+
+void TProt70::sendPlayerAppearance(Action* action){
+	std::string buf = "  ";
+	buf+=(char)0xC8;
+
+	buf += (char)PLAYER_FEMALE_1;//FIX
+	buf += (char)player->lookhead;
+	buf += (char)player->lookbody;
+	buf += (char)player->looklegs;
+	buf += (char)player->lookfeet;
+	buf += (char)player->sex?PLAYER_MALE_1:PLAYER_FEMALE_1;
+	buf += (char)player->sex?PLAYER_MALE_4:PLAYER_FEMALE_4;
 	buf[0]=(char)(buf.size()-2)%256;
 	buf[1]=(char)((buf.size()-2)/256)%256;
 	TNetwork::SendData(psocket,buf);

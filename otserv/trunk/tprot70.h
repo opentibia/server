@@ -22,6 +22,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.12  2003/11/03 22:48:14  tliffrag
+// Changing look, walking by mouse working
+//
 // Revision 1.11  2003/11/03 12:16:01  tliffrag
 // started walking by mouse
 //
@@ -119,6 +122,7 @@
 			void parseTurnEast(Action* action, std::string msg);
 			void parseTurnSouth(Action* action, std::string msg);
 			void parseTurnWest(Action* action, std::string msg);
+			void parseRequestOutfit(Action* action, std::string msg);
 			void parseSetOutfit(Action* action, std::string msg);
 			void parseSay(Action* action, std::string msg);
 			void parseLookAt(Action* action, std::string msg);
@@ -134,6 +138,7 @@
 			void sendPlayerItemAppear(Action* action);
 			void sendPlayerItemChange(Action* action);
 			void sendPlayerItemDisappear(Action* action);
+			void sendPlayerAppearance(Action* action);
 
 			void sendPlayerSorry();
 			void sendPlayerSorry(tmapEnum);
