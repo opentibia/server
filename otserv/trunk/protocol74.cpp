@@ -278,9 +278,11 @@ void Protocol74::GetMapDescription(unsigned short x, unsigned short y, unsigned 
   int skip = -1;
   int startz, endz, offset, zstep, cc = 0;
   if (z > 7) {
-    startz = z - 2;   
-		endz = std::max(MAP_LAYER - 1, z + 2);
-		zstep = 1;
+		startz = std::min(z + 2, MAP_LAYER - 1);
+		endz = std::max(z - 2, 0);
+    //startz = z - 2;   
+		//endz = std::max(MAP_LAYER - 1, z + 2);
+		zstep = -1;
   }
 	else {
 		startz = 7;
@@ -290,9 +292,10 @@ void Protocol74::GetMapDescription(unsigned short x, unsigned short y, unsigned 
 	}
 
 	for(int nz = startz; nz != endz + zstep; nz += zstep) {
+		offset = z - nz;
+
 		for (int nx = 0; nx < width; nx++)
 			for (int ny = 0; ny < height; ny++) {
-				offset = z - nz;
 				tile = game->getTile(x + nx + offset, y + ny + offset, nz);
 				if (tile) {
 					if (skip >= 0) {
@@ -307,8 +310,9 @@ void Protocol74::GetMapDescription(unsigned short x, unsigned short y, unsigned 
 
 				}
 				else {
-                    if(skip == -1) 
-                         skip = 0;
+					//if(skip == -1) 
+					//	skip = 0;
+
 					skip++;
 					if (skip == 0xFF) {
 						msg.AddByte(0xFF);
@@ -788,13 +792,14 @@ void Protocol74::parseUseItem(NetworkMessage &msg)
 
 			msg.AddU16(newcontainer->getID());
 			msg.AddString(newcontainer->getName());
-			msg.AddByte(newcontainer->getContainerMaxItemCount());
+			msg.AddByte(newcontainer->capacity());
 			if(parentcontainer)
 			/* TODO: implement up arrow */
 			msg.AddByte(0x01); // container up ID (can go up) 
 			else
-			msg.AddByte(0x00);
-			msg.AddByte(newcontainer->getContainerItemCount());
+				msg.AddByte(0x00);
+
+			msg.AddByte(newcontainer->size());
 
       Container::iterator cit;
 			for (cit = newcontainer->getItems(); cit != newcontainer->getEnd(); cit++) {
@@ -847,7 +852,54 @@ void Protocol74::parseThrow(NetworkMessage &msg)
   unsigned short to_y       = msg.GetU16(); 
   unsigned char  to_z       = msg.GetByte();
 
-	game->thingMove(player, from_x, from_y, from_z, from_stack, to_x, to_y, to_z);
+	bool isInventory = false;
+
+	//container/inventory to container/inventory
+	if(from_x == 0xFFFF && to_x == 0xFFFF) {
+		unsigned char from_cid = from_y & 0x0F;
+		unsigned char to_cid;
+
+		if(to_y & 0x40) {
+			to_cid = static_cast<unsigned char>(to_y & 0x0F);
+		}
+		else {
+			isInventory = true;
+			to_cid = static_cast<unsigned char>(to_y);
+		}
+		
+		game->thingMove(player, from_cid, from_z, to_cid, to_z, isInventory);
+	}
+	//container/inventory to ground
+	else if(from_x == 0xFFFF && to_x != 0xFFFF) {
+		unsigned char from_cid;
+
+		if(0x40 & from_y) {
+			from_cid = static_cast<unsigned char>(from_y & 0x0F);
+		}
+		else {
+			isInventory = true;
+			from_cid = static_cast<unsigned char>(from_y);
+		}
+
+		game->thingMove(player, from_cid, from_z, Position(to_x, to_y, to_z), isInventory);
+	}
+	//ground to container/inventory
+	else if(from_x != 0xFFFF && to_x == 0xFFFF) {
+		unsigned char to_cid;
+
+		if(0x40 & to_y) {
+			to_cid = static_cast<unsigned char>(to_y & 0x0F);
+		}
+		else {
+			isInventory = true;
+			to_cid = static_cast<unsigned char>(to_y);
+		}
+
+		game->thingMove(player, Position(from_x, from_y, from_z), from_stack, to_cid, to_z, isInventory);
+	}
+	//ground to ground
+	else
+		game->thingMove(player, from_x, from_y, from_z, from_stack, to_x, to_y, to_z);
 }
 
 

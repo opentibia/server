@@ -31,6 +31,16 @@
 #include "container.h"
 #include <string>
 
+/*
+enum MoveParam {
+ MOVE_FROM_INVENTORY = 1,
+ MOVE_TO_INVENTORY = 2, 
+ MOVE_FROM_CONTAINER =  4, 
+ MOVE_TO_CONTAINER = 8, 
+ MOVE_FROM_GROUND = 16, 
+ MOVE_TO_GROUND = 32
+ };
+ */
 
 class NetworkMessage;
 

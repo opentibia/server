@@ -134,7 +134,7 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name){
 
 						//Should be loaded from xml later on...
 						Container* defaultbackpack = dynamic_cast<Container*>(player->items[sl_id]);
-						if(defaultbackpack /*player.items[sl_id] && player.items[sl_id]->isContainer()*/) {
+						if(defaultbackpack) {
 
 							Container *backpack = dynamic_cast<Container*>(Item::CreateItem(1988));
 							if(!backpack)
