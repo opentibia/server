@@ -64,7 +64,7 @@ bool IOMapXML::loadMap(Map* map, std::string identifier){
 				
 				if (tmpitem->isGroundTile())
 				{
-					map->setTile(xorig+x, yorig+y, 7, tmpitem->getID());
+					map->setTile(x, y, 7, tmpitem->getID());
 					delete tmpitem;
 					
 					if (pz && (strcmp(pz, "1") == 0)) {
@@ -74,7 +74,7 @@ bool IOMapXML::loadMap(Map* map, std::string identifier){
 				}
 				else
 				{
-					Tile *t = map->getTile(xorig+x, yorig+y, 7);
+					Tile *t = map->getTile(x, y, 7);
 					if (t)
 					{
 						Item* myitem = Item::CreateItem(tmpitem->getID());
