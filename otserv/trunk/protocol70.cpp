@@ -369,8 +369,24 @@ void Protocol70::parseRequestOutfit(NetworkMessage &msg)
   msg.AddByte(player->lookbody);
   msg.AddByte(player->looklegs);
   msg.AddByte(player->lookfeet);
-  msg.AddByte(player->sex?PLAYER_MALE_1:PLAYER_FEMALE_1);
-  msg.AddByte(player->sex?PLAYER_MALE_4:PLAYER_FEMALE_4);
+  switch (player->sex) {
+	  case 0:
+		  msg.AddByte(PLAYER_FEMALE_1);
+		  msg.AddByte(PLAYER_FEMALE_4);
+		  break;
+	  case 1:
+		  msg.AddByte(PLAYER_MALE_1);
+		  msg.AddByte(PLAYER_MALE_4);
+		  break;
+	  case 2:
+		  msg.AddByte(160);
+		  msg.AddByte(160);
+		  break;
+	  default:
+		  msg.AddByte(PLAYER_MALE_1);
+		  msg.AddByte(PLAYER_MALE_4);
+  }
+
 
   msg.WriteToSocket(s);
 }
@@ -398,6 +414,9 @@ void Protocol70::parseSetOutfit(NetworkMessage &msg)
 	player->looklegs=msg.GetByte();
 	player->lookfeet=msg.GetByte();
 
+	if (player->sex > 1) {
+		std::cout << "set outfit to: " << (int)(player->lookhead) << " / " << (int)player->lookbody << " / " << (int)player->looklegs << " / " <<  (int)player->lookfeet << std::endl;
+	}
 	map->creatureChangeOutfit(player);
 }
 

@@ -17,7 +17,7 @@ Creature::Creature(const char *name) : access(0)
 
   id         = idcount;
 
-  direction  = NORTH;
+  direction  = SOUTH;
 
   this->name = name;
 
