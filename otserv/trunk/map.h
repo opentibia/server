@@ -88,6 +88,8 @@ class Map {
 
     Creature* getCreatureByID(unsigned long id);
 
+	std::list<Position> getPathTo(Position start, Position to);
+
     OTSYS_THREAD_LOCKVAR mapLock;
   protected:
     // use this internal function to move things around to avoid the need of

@@ -24,6 +24,8 @@
 #include <string>
 #include <sstream>
 
+#include <hash_map>
+
 using namespace std;
 
 #include "otsystem.h"
@@ -1012,6 +1014,11 @@ void Map::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fig
 }
 
 
+std::list<Position> Map::getPathTo(Position start, Position to){
+	std::list<Position> path;
+	
+	return path;
+}
 
 
 
