@@ -32,7 +32,9 @@ using namespace std;
 
 #include "protocol.h"
 #include "player.h"
+#include "luascript.h"
 
+extern LuaScript g_config;
 
 Player::Player(const char *name, Protocol *p) : Creature(name)
 {
@@ -43,13 +45,11 @@ Player::Player(const char *name, Protocol *p) : Creature(name)
 	inFightTicks = 0;
 	looktype   = PLAYER_MALE_1;
 	voc        = 0;
-
   cap        = 300;
-
   mana       = 0;
   manamax    = 0;
   manaspent  = 0;
-
+  this->name= name;
   food       = 0;
 
   level      = 1;
@@ -83,6 +83,27 @@ Player::~Player()
   delete client;
 }
 
+std::string Player::getDescription(bool self){
+    std::stringstream s;
+	std::string str;
+    if(self){
+    s << "You see yourself."; 
+    if(voc > 0)
+    s << " You are " << g_config.getGlobalStringField("vocations", voc) << ".";
+    }
+    else {	
+	s << "You see " << name << " (Level " << level <<").";
+	if(voc > 0){
+	if(sex != 0)
+    s << " He";
+    else
+    s << " She";
+    s << " is "<< g_config.getGlobalStringField("vocations", voc) << ".";
+    }
+    }
+	str = s.str();
+	return str;
+            }
 
 Item* Player::getItem(int pos)
 {

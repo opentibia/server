@@ -105,6 +105,7 @@ protected:
   virtual void onCreatureChangeOutfit(const Creature* creature);
   virtual void onThink();
   virtual void setAttackedCreature(unsigned long id);
+  virtual std::string getDescription(bool self = false);
   std::string name;
   std::string scriptname;
   NpcScript* script;

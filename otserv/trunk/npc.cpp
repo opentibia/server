@@ -24,6 +24,7 @@
 #include <algorithm>
 #include <functional>
 #include <string>
+#include <sstream>
 #include <fstream>
 
 #include <libxml/xmlmemory.h>
@@ -116,6 +117,14 @@ Npc::~Npc()
 	delete this->script;
 }
 
+std::string Npc::getDescription(bool self){
+    std::stringstream s;
+	std::string str;	
+	s << "You see " << name << ".";
+	str = s.str();
+	return str;
+            }
+            
 void Npc::onThingMove(const Player *player, const Thing *thing, const Position *oldPos, unsigned char oldstackpos){
 	//not yet implemented
 }

@@ -943,6 +943,19 @@ void Protocol70::parseLookAt(NetworkMessage &msg){
   Position middle;
   newmsg.AddTextMessage(MSG_INFO, ss.str().c_str());
 #else
+  if(ItemNum == 99) //creature
+  {
+         Tile* tile = map->getTile(LookPos.x, LookPos.y, LookPos.z);
+         Creature* creature = tile->creatures.back();
+         if(creature){
+         if(player == creature)
+         newmsg.AddTextMessage(MSG_INFO, creature->getDescription(true).c_str());
+         else
+         newmsg.AddTextMessage(MSG_INFO, creature->getDescription().c_str());
+         }
+             
+  }
+  else           
   newmsg.AddTextMessage(MSG_INFO, Item(ItemNum).getDescription().c_str());
 #endif
   

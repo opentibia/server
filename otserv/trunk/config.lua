@@ -60,3 +60,6 @@ pzlocked = 5*60*1000
 
 -- allow multiple logins of the same char
 allowclones = 0
+
+-- vocation names
+vocations = {"a sorcerer", "a druid", "a paladin", "a knight"}

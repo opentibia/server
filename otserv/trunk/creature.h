@@ -74,7 +74,7 @@ public:
 
   unsigned long getID() const { return id; }
   int getExpForLv(int lv) { 
-      return (int)((50/3 * pow((double)lv ,3)) - (100 * pow((double)lv, 2)) + (850/3 * lv) - 200);
+      return (int)(((50.0/3.0) * pow((double)lv ,3)) - (100 * pow((double)lv, 2)) + ((850.0/3.0) * lv) - 200);
       }
   Direction getDirection() const { return direction; }
   void setDirection(Direction dir) { direction = dir; }
@@ -83,7 +83,7 @@ public:
 
   virtual void drainHealth(int);
   virtual void drainMana(int);
-
+  virtual std::string getDescription(bool self = false);
   virtual void setAttackedCreature(unsigned long id);
 
   virtual int getWeaponDamage() const {

@@ -124,6 +124,7 @@ protected:
   virtual void onCreatureSay(const Creature *creature, unsigned char type, const std::string &text);
   virtual void onCreatureChangeOutfit(const Creature* creature);
   virtual void onThink();
+  virtual std::string getDescription(bool self = false);
 	virtual void onTileUpdated(const Position *Pos);
 	virtual void onContainerUpdated(Item *item, unsigned char from_id, unsigned char to_id, unsigned char from_slot, unsigned char to_slot, bool remove);
 	Protocol *client;

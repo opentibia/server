@@ -5067,7 +5067,7 @@ if test `eval echo '${'$as_ac_Header'}'` = yes; then
   cat >>confdefs.h <<_ACEOF
 #define `echo "HAVE_$ac_header" | $as_tr_cpp` 1
 _ACEOF
- BOOST_LIBS=-lboost_bind
+ BOOST_LIBS=-lboost_thread
 else
   { { echo "$as_me:$LINENO: error: \"boost headers are missing.\"" >&5
 echo "$as_me: error: \"boost headers are missing.\"" >&2;}

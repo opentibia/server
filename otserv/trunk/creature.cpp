@@ -3,6 +3,7 @@
 #include "definitions.h"
 
 #include <string>
+#include <sstream>
 
 #include "creature.h"
 #include "tile.h"
@@ -72,3 +73,11 @@ bool Creature::canMovedTo(Tile *tile)
 
   return Thing::canMovedTo(tile);
 }
+
+std::string Creature::getDescription(bool self){
+    std::stringstream s;
+	std::string str;	
+	s << "You see a " << name << ".";
+	str = s.str();
+	return str;
+            }
