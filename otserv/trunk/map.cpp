@@ -107,8 +107,10 @@ bool MapState::removeThingInternal(Tile *t, Thing *thing, bool onlyRegister)
 	std::vector<tilechangedata>& vec = changesItemMap[t];
 
 	int stackpos = t->getThingStackPos(thing);
+	Position oldPos = thing->pos;
 	if(onlyRegister || t->removeThing(thing)) {
 		tilechangedata tc;
+		tc.pos = oldPos;
 		tc.thing = thing;
 		tc.remove = true;
 		tc.stackpos = stackpos;
@@ -129,12 +131,14 @@ void MapState::addThingInternal(Tile *t, Thing *thing, bool onlyRegister)
 
 	std::vector<tilechangedata>& vec = changesItemMap[t];
 
+	Position oldPos = thing->pos;
 	if(!onlyRegister && thing != t->splash)
 		t->addThing(thing);
 
 	int stackpos = t->getThingStackPos(thing);
 
 	tilechangedata tc;
+	tc.pos = oldPos;
 	tc.thing = thing;
 	tc.remove = false;
 	tc.stackpos = stackpos;
@@ -195,13 +199,13 @@ void MapState::getMapChanges(Player *spectator, NetworkMessage &msg)
 		TileChangeDataVec::const_iterator thIt;
 		for(thIt = changesItemMapIt->second.begin(); thIt != changesItemMapIt->second.end(); ++thIt) {
 			
-			if(!spectator->CanSee(thIt->thing->pos.x,  thIt->thing->pos.y))
+			if(!spectator->CanSee(thIt->/*thing->*/pos.x,  thIt->/*thing->*/pos.y))
 				continue;
 
 			if(thIt->remove) {
 				if(thIt->stackpos < 10) {
 					msg.AddByte(0x6c);
-					msg.AddPosition(thIt->thing->pos);
+					msg.AddPosition(thIt/*->thing*/->pos);
 					msg.AddByte(thIt->stackpos);
 				}
 				else {
@@ -217,7 +221,7 @@ void MapState::getMapChanges(Player *spectator, NetworkMessage &msg)
 
 				if(item) {
 					msg.AddByte(0x6a);
-					msg.AddPosition(item->pos);
+					msg.AddPosition(thIt->pos /*item->pos*/);
 					msg.AddItem(item);
 				}
 			}

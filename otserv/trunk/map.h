@@ -90,6 +90,7 @@ public:
 };
 
 struct tilechangedata {
+	Position pos;
 	Thing *thing;
 	int stackpos;
 	bool remove;

@@ -605,13 +605,21 @@ void Game::thingMoveInternal(Creature *player,
 			if(onPrepareMoveThing(player, item, fromPos, p->pos) &&
 				 onPrepareMoveThing(player, item, NULL, toContainer))
 			{
+				item->pos = fromPos;
+				MapState mapstate(map);
 
-				if(fromTile->removeThing(item)) {
+				if(mapstate.removeThing(fromTile, item) /*fromTile->removeThing(item)*/) {
 					Position itempos = item->pos;
 					toContainer->addItem(item);
+					
+					/*
+					NetworkMessage msg;
+					mapstate.getMapChanges(p, msg);
+					p->sendNetworkMessage(&msg);
+					*/
+					
+					creatureBroadcastTileUpdated(fromPos);
 
-					creatureBroadcastTileUpdated(itempos);
-						
 					for(unsigned int cid = 0; cid < p->getContainerCount(); ++cid) {
 						if(p->getContainer(cid) == toContainer) {
 							player->onContainerUpdated(item, 0xFF, cid, 0xFF, 0, false);

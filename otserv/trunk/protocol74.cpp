@@ -279,7 +279,7 @@ void Protocol74::GetMapDescription(unsigned short x, unsigned short y, unsigned 
   int startz, endz, offset, zstep, cc = 0;
   if (z > 7) {
 		startz = std::min(z + 2, MAP_LAYER - 1);
-		endz = std::max(z - 2, 5 /*(7 - 2)*/);
+		endz = std::max(z - 2, 6 /*(8 - 2)*/);
     //startz = z - 2;   
 		//endz = std::max(MAP_LAYER - 1, z + 2);
 		zstep = -1;
@@ -853,6 +853,7 @@ void Protocol74::parseThrow(NetworkMessage &msg)
   unsigned short to_x       = msg.GetU16();
   unsigned short to_y       = msg.GetU16(); 
   unsigned char  to_z       = msg.GetByte();
+	unsigned char count       = msg.GetByte();
 
 	bool isInventory = false;
 
@@ -1267,8 +1268,10 @@ void Protocol74::sendContainerUpdated(Item *item, unsigned char from_id, unsigne
 
 		//add item
 		msg.AddByte(0x70);
-		msg.AddByte(to_id);
-		msg.AddU16(item->getID());
+		msg.AddItem(item);
+
+		//msg.AddByte(to_id);
+		//msg.AddU16(item->getID());
 	}
 	else if(remove) {
 		//remove item
@@ -1278,10 +1281,15 @@ void Protocol74::sendContainerUpdated(Item *item, unsigned char from_id, unsigne
 	}
 	else
 	{
+		msg.AddByte(0x70);
+		msg.AddByte(to_id);
+		msg.AddItem(item);
+		/*
 		//add item
 		msg.AddByte(0x70);
 		msg.AddByte(to_id);
 		msg.AddU16(item->getID());
+		*/
 	}
 
 	msg.WriteToSocket(s);
