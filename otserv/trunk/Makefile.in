@@ -7,13 +7,21 @@ DEFINES= -D@target_sys@ @DEBUG@
 EXEEXT = @EXEEXT@
 OBJEXT = @OBJEXT@
 
-OBJS = item.$(OBJEXT) network.$(OBJEXT) player.$(OBJEXT) player_mem.$(OBJEXT) \
-protokoll.$(OBJEXT) tprot.$(OBJEXT)
+#OBJS = item.$(OBJEXT) network.$(OBJEXT) player.$(OBJEXT) player_mem.$(OBJEXT) \
+#protokoll.$(OBJEXT) tprot.$(OBJEXT)
 
-all: $(OBJS)
+OBJS = otserv.o eventscheduler.o serversocket.o
 
-.cpp.$(OBJEXT):
+all: otserv
+
+#.cpp.$(OBJEXT):
+#	$(CXX) -c $(DEFINES) $(CXXFLAGS) $<
+
+%.o: %.cc
 	$(CXX) -c $(DEFINES) $(CXXFLAGS) $<
+
+otserv: $(OBJS)
+	$(CXX) -g -o $@ $^
 
 clean:
 	rm -f $(OBJS)

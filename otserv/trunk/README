@@ -1,0 +1,2 @@
+This compiles to otserv.
+otserv currently accepts a number of telnet connections and prints out everything you type into the telnet connections.

@@ -1,0 +1,7 @@
+near future:
+(Acrimon) I will implement keyboard events for the shell later.
+(Acrimon) I will make both ServerSocket and EventScheduler a LOT better.
+(Acrimon) error handling should be made better.
+(Acrimon) add Windows code (but I cannot test that).
+if you want to change anything now, best change ServerSocket::clientread::operator() only.
+Comment out cout's and printf's if they are too many.
