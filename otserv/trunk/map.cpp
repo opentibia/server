@@ -1894,7 +1894,7 @@ void Map::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fig
 		targettile->decaySplashAfter = OTSYS_TIME() + decayTime*1000;
 		addEvent(makeTask(decayTime*1000, std::bind2nd(std::mem_fun(&Map::decaySplash), targettile->splash)));
 	}
-   if(player && damage > 0 || manaDamage >0){
+   if(player && (damage > 0 || manaDamage >0)){
         player->addSkillTry(2);
         }
    else if(player)
@@ -2052,7 +2052,8 @@ void Map::checkPlayer(unsigned long id)
           player->health = player->health+5;
           player->manamax = player->manamax+5;
           player->mana = player->mana+5;
-
+          player->setNormalSpeed();
+          player->sendChangeSpeed(player);
           std::stringstream lvMsg;
           lvMsg << "You advanced from level " << lastLv << " to level " << player->level << ".";
           msg.AddTextMessage(MSG_ADVANCE, lvMsg.str().c_str());
