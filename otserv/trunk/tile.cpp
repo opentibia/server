@@ -277,3 +277,13 @@ void Tile::addThing(Thing *thing)
     }
   }
 }
+
+bool Tile::isPz()
+{
+  return pz;
+}
+
+void Tile::setPz()
+{
+  pz = true;
+}

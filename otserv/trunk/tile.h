@@ -23,6 +23,7 @@ public:
 
   Tile()
   {
+    pz = false;
   }
 
   Item           ground;
@@ -51,8 +52,13 @@ public:
   Item* getItemByStack(int stack);
   
   bool isBlocking();
+
+  bool isPz();
+  void setPz();
   
   std::string getDescription();
+protected:
+  bool pz;
 };
 
 
