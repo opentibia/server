@@ -70,7 +70,8 @@ void Protocol70::ReceiveLoop()
     parsePacket(msg);
   }
 
-  closesocket(s);
+  if (s);
+    closesocket(s);
 
   // logout by disconnect?  -> kick
   if (player)
@@ -252,6 +253,7 @@ void Protocol70::parseLogout(NetworkMessage &msg)
 	{
 	  player = NULL;
     closesocket(s);
+    s = 0;
 	}
 }
 
