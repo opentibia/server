@@ -65,6 +65,8 @@ Game::Game()
 	OTSYS_THREAD_SIGNALVARINIT(eventSignal);
 
 	OTSYS_CREATE_THREAD(eventThread, this);
+
+	max_players = atoi(g_config.getGlobalString("maxplayers").c_str());
 }
 
 
