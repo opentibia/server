@@ -1409,8 +1409,7 @@ bool Map::creatureMakeMagic(Creature *creature, const MagicEffectClass* me)
 	}
 	
 	//Remove player from tile, add bodies/blood to the map
-	std::map<Tile*, int> tileBodyCountMap; //optimization to safe bandwidth
-
+	std::map<Tile*, int> tileBodyCountMap; //optimization to save bandwidth
 	for(tv = targetvec.begin(); tv != targetvec.end(); tv++) {
 		Creature* target = tv->first;
 		Player* targetPlayer = dynamic_cast<Player*>(target);
@@ -1443,9 +1442,9 @@ bool Map::creatureMakeMagic(Creature *creature, const MagicEffectClass* me)
 			NetworkMessage msg;
 			creature->experience += (int)(target->experience * 0.1);
 			if(player){
-             msg.AddPlayerStats(player);           
-			 player->sendNetworkMessage(&msg);
-            }
+        msg.AddPlayerStats(player);
+			  player->sendNetworkMessage(&msg);
+      }
 			Item *item = new Item(target->lookcorpse);
 			/*
 			if(item->isContainer() && targetPlayer) {
@@ -1477,7 +1476,7 @@ bool Map::creatureMakeMagic(Creature *creature, const MagicEffectClass* me)
 		tileBloodVec.clear();
 		tileUpdatedVec.clear();
 
-		if(me->animationEffect > 0 && (spectator->CanSee(player->pos.x, player->pos.y) || spectator->CanSee(me->centerpos.x, me->centerpos.y)))
+		if((!magicRune || targetvec.size() > 0) && me->animationEffect > 0 && (spectator->CanSee(player->pos.x, player->pos.y) || spectator->CanSee(me->centerpos.x, me->centerpos.y)))
 			msg.AddDistanceShoot(creature->pos, me->centerpos, me->animationEffect);
 
 		for(tl = tilelist.begin(); tl != tilelist.end(); tl++) {
@@ -1550,9 +1549,10 @@ bool Map::creatureMakeMagic(Creature *creature, const MagicEffectClass* me)
 
 				if (target->health <= 0)
 				{            
-                    std::stringstream exp;
-                    exp << (int)(target->experience * 0.1);
-                    msg.AddAnimatedText(creature->pos, 983, exp.str());               
+          std::stringstream exp;
+          exp << (int)(target->experience * 0.1);
+          msg.AddAnimatedText(creature->pos, 983, exp.str());               
+
 					if(std::find(tileUpdatedVec.begin(), tileUpdatedVec.end(), targettile) == tileUpdatedVec.end()) {
 #if __DEBUG__
 						std::cout << "remove character " << "targetstackpos: "<< (int) targetstackpos << std::endl;
