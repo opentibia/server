@@ -1,24 +1,27 @@
 <?xml version="1.0"?>
 
 <spells maxVoc="4">
-<spell name="Ultimate Healing" words="exura vita" maglv="8" mana="100" var="0" enabled="1">
+<spell name="Ultimate Healing" words="exura vita" maglv="8" mana="100" enabled="1">
 <vocation id="1" />
 <vocation id="2" />
 <vocation id="3" />
 </spell>
-<spell name="Ultimate Explosion" words="exevo gran mas vis" maglv="40" mana="800" var="0" enabled="1">
+<spell name="Ultimate Explosion" words="exevo gran mas vis" maglv="40" mana="800" enabled="1">
 <vocation id="1" />
 </spell>
-<spell name="Energy Wave" words="exevo mort hur" maglv="20" mana="250" var="0" enabled="1">
+<spell name="Energy Wave" words="exevo mort hur" maglv="20" mana="250" enabled="1">
 <vocation id="1" />
 </spell>
-<spell name="Creature Illusion" words="utevo res ina" maglv="10" mana="100" var="0" enabled="1">
+<spell name="Creature Illusion" words="utevo res ina" maglv="10" mana="100" enabled="1">
 <vocation id="1" />
 <vocation id="2" />
 </spell>
-<spell name="Mana Shield" words="utamo vita" maglv="4" mana="50" var="0" enabled="1">
+<spell name="Mana Shield" words="utamo vita" maglv="4" mana="50" enabled="1">
 <vocation id="1" />
 <vocation id="2" />
 <vocation id="3" />
+</spell>
+<spell name="Heal Friend" words="exura sio" maglv="7" mana="70" enabled="1">
+<vocation id="2" />
 </spell>
 </spells>

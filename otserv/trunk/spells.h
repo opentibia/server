@@ -25,6 +25,7 @@
 
 #include "map.h"
 #include "luascript.h"
+#include "player.h"
 
 extern "C"
 {
@@ -35,7 +36,7 @@ extern "C"
 
 
 //////////////////////////////////////////////////////////////////////
-// Defines an NPC...
+// Defines a Spell...
 class Spell;
 class SpellScript;
 
@@ -70,7 +71,7 @@ protected:
 class Spell
 {
 public:
-  Spell(std::string name, std::string words, bool var, int magLv, int mana, Map* map);
+  Spell(std::string name, std::string words, int magLv, int mana, Map* map);
   virtual ~Spell();
 
 	Map* map;
@@ -85,7 +86,6 @@ int getMagLv(){
 protected:
 
   std::string name, words;
-  bool var;
   int magLv, mana;
   bool loaded;
   SpellScript* script;
@@ -99,6 +99,7 @@ public:
   bool isLoaded(){return loaded;}
   static Spell* SpellScript::getSpell(lua_State *L);
   static int SpellScript::luaActionDoSpell(lua_State *L);
+  static int luaActionGetPos(lua_State *L);
   static int SpellScript::luaActionChangeOutfit(lua_State *L);
   static int SpellScript::luaActionManaShield(lua_State *L);
 protected:

@@ -1199,8 +1199,8 @@ void Map::creatureMakeMagic(Creature *creature, const EffectInfo &ei)
 									}
 
 									if (spectator == target){
+                                        CreateManaDamageUpdate(target, creature, manaDamage, msg);
 										CreateDamageUpdate(target, creature, damage, msg);
-										CreateManaDamageUpdate(target, creature, manaDamage, msg);
                                     }
 							}
 						}
@@ -1440,8 +1440,8 @@ void Map::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fig
 						}
 					
 						if (p == attackedCreature){
+                            CreateManaDamageUpdate(p, creature, manaDamage, msg);
 							CreateDamageUpdate(p, creature, damage, msg);
-							CreateManaDamageUpdate(p, creature, manaDamage, msg);
                         }
 
 						p->sendNetworkMessage(&msg);
@@ -1797,7 +1797,7 @@ void Map::CreateManaDamageUpdate(Creature* creature, Creature* attackCreature, i
 			msg.AddPlayerStats(player);
 			if (damage > 0) {
 				std::stringstream dmgmesg;
-				dmgmesg << "You lose " << damage << " mana due to an attack by ";	
+				dmgmesg << "You lose " << damage << " mana blocking an attack by ";	
 				dmgmesg << attackCreature->getName();
 				msg.AddTextMessage(MSG_EVENT, dmgmesg.str().c_str());
 			}

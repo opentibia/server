@@ -40,7 +40,7 @@ Spells::Spells(Map* imap): map(imap){
 bool Spells::loadFromXml()
 {
                     std::string name, words;
-                    bool var, enabled;
+                    bool enabled;
                     int vocId, maglv, mana;
                     this->loaded = false;
                     xmlDocPtr doc = xmlParseFile(std::string("data/spells/spells.xml").c_str());
@@ -82,10 +82,7 @@ bool Spells::loadFromXml()
 		                                     if ((const char*)xmlGetProp(p, (const xmlChar *)"mana")) {
 			                                    mana = atoi((const char*)xmlGetProp(p, (const xmlChar *)"mana"));
 		                                     }
-		                                     if ((const char*)xmlGetProp(p, (const xmlChar *)"var")) {
-			                                    var = (bool)atoi((const char*)xmlGetProp(p, (const xmlChar *)"var"));
-		                                     }
-		                                     Spell* spell = new Spell(name, words, var, maglv, mana, map);
+		                                     Spell* spell = new Spell(name, words, maglv, mana, map);
 				                             tmp=p->children;
 				                             while (tmp){
                                                    if (strcmp((const char*)tmp->name, "vocation") == 0){
@@ -117,7 +114,7 @@ Spells::~Spells(){
                                            }
                  }
 
-Spell::Spell(std::string iname, std::string iwords, bool ivar, int imagLv, int imana, Map* imap) : name(iname), words(iwords), var(ivar), magLv(imagLv), mana(imana), map(imap){
+Spell::Spell(std::string iname, std::string iwords, int imagLv, int imana, Map* imap) : name(iname), words(iwords), magLv(imagLv), mana(imana), map(imap){
                         //now try to load the script
 	                this->script = new SpellScript(std::string("data/spells/")+(this->words)+std::string(".lua"), this);
 	                if(!this->script->isLoaded())
@@ -155,6 +152,7 @@ int SpellScript::registerFunctions(){
 	lua_register(luaState, "doMagic", SpellScript::luaActionDoSpell);
 	lua_register(luaState, "changeOutfit", SpellScript::luaActionChangeOutfit);
 	lua_register(luaState, "manaShield", SpellScript::luaActionManaShield);
+	lua_register(luaState, "getPosition", SpellScript::luaActionGetPos);
 	return true;
 }
 
@@ -271,7 +269,7 @@ int SpellScript::luaActionDoSpell(lua_State *L){
    Position pos = Position(cx, cy, cz);
    ei.centerpos = pos;
    spell->map->creatureCastSpell(creature, ei);
-	return 1;
+   return 0;
 }
 int SpellScript::luaActionChangeOutfit(lua_State *L){
     int looktype = (int)lua_tonumber(L, -1);
@@ -287,6 +285,7 @@ int SpellScript::luaActionChangeOutfit(lua_State *L){
 	spell->map->creatureChangeOutfit(creature);
 	
     spell->map->changeOutfitAfter(creature->getID(), creature->lookmaster, time);
+    return 0;
 }
 
 int SpellScript::luaActionManaShield(lua_State *L){
@@ -297,4 +296,42 @@ int SpellScript::luaActionManaShield(lua_State *L){
 	Creature* creature = spell->map->getCreatureByID((unsigned long)lua_tonumber(L, -1));
 	lua_pop(L,1);
 	creature->manaShieldTicks = time;
+	return 0;
+}
+
+int SpellScript::luaActionGetPos(lua_State *L){
+	const char* s = lua_tostring(L, -1);
+	lua_pop(L,1);
+	Spell* spell = getSpell(L);
+	Creature* c = spell->map->getCreatureByName(s);
+	Player* p = dynamic_cast<Player*>(c);
+	if(!c || !p){
+      lua_newtable(L);
+      lua_pushstring(L, "x");
+      lua_pushnil(L);
+      lua_settable(L, -3);
+      
+      lua_pushstring(L, "y");
+      lua_pushnil(L);
+      lua_settable(L, -3);
+      
+      lua_pushstring(L, "z");
+      lua_pushnil(L);
+      lua_settable(L, -3);
+	}
+	else{
+         lua_newtable(L);
+      lua_pushstring(L, "x");
+      lua_pushnumber(L, c->pos.x);
+      lua_settable(L, -3);
+      
+      lua_pushstring(L, "y");
+      lua_pushnumber(L, c->pos.y);
+      lua_settable(L, -3);
+      
+      lua_pushstring(L, "z");
+      lua_pushnumber(L, c->pos.z);
+      lua_settable(L, -3);
+	}
+	return 1;
 }
