@@ -4,7 +4,7 @@ noinst_PROGRAMS = otserv
 
 
 AM_CXXFLAGS = $(XML_CPPFLAGS) $(OTSERV_FLAGS) $(LUA50_CFLAGS) -D_THREAD_SAFE -D_REENTRANT
-otserv_LDADD = $(XML_LIBS) $(LUA50_LIBS)
+otserv_LDADD = $(XML_LIBS) $(LUA50_LIBS) -ldl
 otserv_SOURCES = creature.cpp creature.h definitions.h item.cpp item.h \
 					  items.cpp items.h luascript.cpp luascript.h map.cpp \
 					  map.h networkmessage.cpp networkmessage.h npc.cpp \

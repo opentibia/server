@@ -104,8 +104,6 @@ public:
   void    usePlayer() { useCount++; };
   void    releasePlayer() { useCount--; if (useCount == 0) delete this; };
 
-  void    setAttackedCreature(unsigned long id){};
-	
   fight_t getFightType();
 
   bool CanSee(int x, int y);

@@ -27,7 +27,7 @@
 
 enum WeaponType 
 {
-  NONE, SWORD, CLUB, AXE, BOW, XBOW, MAGICSTAFF
+  NONE, SWORD, CLUB, AXE, DIST, MAGIC, AMO, SHIELD
 };
 
 class ItemType {
@@ -40,6 +40,7 @@ public:
   unsigned short maxItems;   // maximum size if this is a container
 	unsigned short weight;     // weight of the item, e.g. throwing distance depends on it
 	std::string    name;		   // the name of the item
+	std::string description;	// additional description... as in "The blade is a magic flame." for fireswords
   WeaponType     weaponType;
   int            attack;
   int            defence;

@@ -58,12 +58,9 @@ class Item : public Thing
 	 unsigned short count; // number of stacked items
         unsigned getID() const;    // ID as in ItemType
 		
-    bool isBow() const;
-    bool isXBow() const;
-    bool isSword() const;
-    bool isClub() const;
-    bool isAxe() const;
-    bool isMagicStaff() const;
+    bool isWeapon() const;
+	 WeaponType getWeaponType() const;
+
 
     bool isBlocking() const;
 		bool isStackable() const;

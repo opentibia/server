@@ -117,11 +117,16 @@ fight_t Player::getFightType()
   {
     if (items[slot])
     {
-      if ((items[slot]->isXBow()) || (items[slot]->isBow()))
-        return FIGHT_DIST;
-
-      if (items[slot]->isMagicStaff())
-        return FIGHT_MAGICDIST;
+			if ((items[slot]->isWeapon())) {
+				switch (items[slot]->getWeaponType()) {
+					case DIST:
+						return FIGHT_DIST;
+					case MAGIC:
+						return FIGHT_MAGICDIST;
+					default:
+						return FIGHT_MELEE;
+				}
+			}
     }
   }
   return FIGHT_MELEE;

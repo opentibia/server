@@ -128,36 +128,14 @@ bool Item::isGroundTile() const {
 	return items[id].groundtile;
 }
 
-bool Item::isBow() const
+bool Item::isWeapon() const
 {
-  return (items[id].weaponType == BOW);
+  return (items[id].weaponType != NONE && items[id].weaponType != SHIELD && items[id].weaponType != AMO);
 }
 
-bool Item::isXBow() const
-{
-  return (items[id].weaponType == XBOW);
+WeaponType Item::getWeaponType() const {
+		  return items[id].weaponType;
 }
-
-bool Item::isSword() const
-{
-  return (items[id].weaponType == SWORD);
-}
-
-bool Item::isClub() const
-{
-  return (items[id].weaponType == CLUB);
-}
-
-bool Item::isAxe() const
-{
-  return (items[id].weaponType == AXE);
-}
-
-bool Item::isMagicStaff() const
-{
-  return (items[id].weaponType == MAGICSTAFF);
-}
-
 
 std::string Item::getDescription() {
 	std::stringstream s;

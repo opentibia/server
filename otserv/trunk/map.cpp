@@ -444,7 +444,6 @@ bool Map::placeCreature(Creature* c)
       {
         for (cit = tile->creatures.begin(); cit != tile->creatures.end(); cit++)
         {
-			std::cout << "On creature appear" << std::endl;
           (*cit)->onCreatureAppear(c);
         }
       }
@@ -999,7 +998,6 @@ void Map::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fig
 	if (attackedCreature->health <= 0) {
 		targettile->removeThing(attackedCreature);
 		playersOnline.erase(playersOnline.find(attackedCreature->getID()));
-		std::cout << "Adding corpse" << attackedCreature->lookcorpse <<std::endl;
 		targettile->addThing(new Item(attackedCreature->lookcorpse));
 	}
 }

@@ -143,7 +143,6 @@ void Npc::doAttack(int id){
 }
 
 void Npc::doMove(int direction){
-	std::cout << "Direction " << direction << std::endl;
 	switch(direction){
 		case 0:
 			this->map->thingMove(this, this,this->pos.x, this->pos.y+1, this->pos.z);
@@ -266,7 +265,6 @@ int NpcScript::luaActionMove(lua_State* L){
 	int dir=lua_tonumber(L, -1);
 	lua_pop(L,1);
 	Npc* mynpc=getNpc(L);
-	std::cout << "NpcScript::luaActionMove "<<mynpc << std::endl;
 	if(mynpc)
 		mynpc->doMove(dir);
 	return 0;

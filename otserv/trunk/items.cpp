@@ -215,83 +215,126 @@ int Items::loadXMLInfos(std::string file)
 	xmlDocPtr doc;
 	doc = xmlParseFile(file.c_str());
 
-  if (doc)
-  {
-    xmlNodePtr root, p;
-	  root = xmlDocGetRootElement(doc);
+	if (doc) {
+		xmlNodePtr root, p;
+		root = xmlDocGetRootElement(doc);
 
-	  if (xmlStrcmp(root->name, (const xmlChar*)"items")) {
-		  xmlFreeDoc(doc);
-		  return -1;
-	  }
+		if (xmlStrcmp(root->name, (const xmlChar*)"items")) {
+			xmlFreeDoc(doc);
+			return -1;
+		}
 
-    p = root->children;
-	  while (p)
-    {
-	    const char* str = (char*)p->name;
-	    if (strcmp(str, "item") == 0)
-      {
-        int id = atoi((const char*)xmlGetProp(p, (xmlChar*)"id"));
+		p = root->children;
+		while (p) {
+			std::string elem = (char*)p->name;
+			if (elem == "item" && xmlGetProp(p, (xmlChar*)"id")) {
+				// get the id...
+				int id = atoi((const char*)xmlGetProp(p, (xmlChar*)"id"));
 
-        ItemMap::iterator it = items.find(id);
-        if ((it != items.end()) && (it->second != NULL))
-        {
-	        ItemType *itemtype = it->second;
+				// now let's find the item and load it's definition...
+				ItemMap::iterator it = items.find(id);
+				if ((it != items.end()) && (it->second != NULL)) {
+					ItemType *itemtype = it->second;
 
-          const char* name = (const char*)xmlGetProp(p, (xmlChar*)"name");
-          if (name != NULL)
-            itemtype->name = name;
+					// set general properties...
+					try {
+						std::string name = (char*)xmlGetProp(p, (xmlChar*)"name");
+						itemtype->name = name;
+					} catch (std::exception& e) {
+						// ignore the missing name tag
+						std::cout << "missing name tag for item: " << id << std::endl;
+					}
+					try {
+						std::string weight = (char*)xmlGetProp(p, (xmlChar*)"weight");
+						itemtype->weight = atoi(weight.c_str());
+					} catch (std::exception& e) {
+						// ignore the missing weight tag
+						std::cout << "missing weight tag for item: " << id << std::endl;
+					}
 
-          const char* maxitems = (const char*)xmlGetProp(p, (xmlChar*)"maxitems");
-          if (maxitems != NULL)
-            itemtype->maxItems = atoi(maxitems);
+					// and optional properties
+					try {
+						std::string description = (char*)xmlGetProp(p, (xmlChar*)"descr");
+						itemtype->description = description;
+					} catch (std::exception) {
+						// don't care... it's optional.
+					}
 
-          const char* weight = (const char*)xmlGetProp(p, (xmlChar*)"weight");
-          if (weight != NULL)
-            itemtype->weight = atoi(weight);
+					// now set special properties...
+					try {
+						// first we check the type...
+						std::string type((char*)xmlGetProp(p, (xmlChar*)"type"));
+						if (type == "container") {
+							// we have a container...
+							// TODO set that we got a container
+							try {
+								std::string maxitems = (char*)xmlGetProp(p, (xmlChar*)"maxitems");
+								itemtype->maxItems = atoi(maxitems.c_str());
+							} catch (std::exception) {
+								std::cout << "item " << id << " is a container but lacks a maxitems definition." << std::endl;
+							}
+						} else if (type == "weapon") {
+							// we have a weapon...
 
-          const char* weaponType = (const char*)xmlGetProp(p, (xmlChar*)"weapontype");
-          if (weaponType != NULL)
-          {
-            if (!xmlStrcmp((const xmlChar*)weaponType, (const xmlChar*)"sword"))
-              itemtype->weaponType = SWORD;
-            else if (!xmlStrcmp((const xmlChar*)weaponType, (const xmlChar*)"club"))
-              itemtype->weaponType = CLUB;
-            else if (!xmlStrcmp((const xmlChar*)weaponType, (const xmlChar*)"axe"))
-              itemtype->weaponType = AXE;
-            else if (!xmlStrcmp((const xmlChar*)weaponType, (const xmlChar*)"bow"))
-              itemtype->weaponType = BOW;
-            else if (!xmlStrcmp((const xmlChar*)weaponType, (const xmlChar*)"crossbow"))
-              itemtype->weaponType = XBOW;
-            else if (!xmlStrcmp((const xmlChar*)weaponType, (const xmlChar*)"magicstaff"))
-              itemtype->weaponType = MAGICSTAFF;
-            else
-              itemtype->weaponType = NONE;
-          }
+							try {
+								// find out which type of weapon we have...
+								std::string skill = (char*)xmlGetProp(p, (xmlChar*)"skill");
+								if (skill == "sword") {
+									itemtype->weaponType = SWORD;
+								} else if (skill == "club") {
+									itemtype->weaponType = CLUB;
+								} else if (skill == "axe") {
+									itemtype->weaponType = AXE;
+								} else if (skill == "distance") {
+									itemtype->weaponType = DIST;
+								} else if (skill == "magic") {
+									itemtype->weaponType = MAGIC;
+								} else if (skill == "shield") {
+										  itemtype->weaponType = SHIELD;
+								}
+							} catch (std::exception) {
+								std::cout << "missing skill tag for weapon" << std::endl;
+							}
 
-          const char* attack = (const char*)xmlGetProp(p, (xmlChar*)"attack");
-          if (attack != NULL)
-            itemtype->attack = atoi(attack);
+							// set general props for weapons...
+							try {
+								std::string attack((const char*)xmlGetProp(p, (xmlChar*)"attack"));
+								itemtype->attack = atoi(attack.c_str());
+							} catch (std::exception) {
+								std::cout << "missing attack tag for weapon: " << id << std::endl;
+							}
 
-          const char* defence = (const char*)xmlGetProp(p, (xmlChar*)"defence");
-          if (defence != NULL)
-            itemtype->defence = atoi(defence);
-        }
-        else
-        {
-          std::cout << "error: wrong item id " << id;
-	  xmlFreeDoc(doc);
-          return -1;
-        }
-		  }
-	    p = p->next;
-	  }
+							try {
+								std::string defence((const char*)xmlGetProp(p, (xmlChar*)"defence"));
+								itemtype->defence = atoi(defence.c_str());
+							} catch (std::exception) {
+								std::cout << "missing defence tag for weapon: " << id << std::endl;
+							}
 
-	  xmlFreeDoc(doc);
+						} else if (type == "amunition") {
+							// we got some amo
+							itemtype->weaponType = AMO;
+						} else if (type == "armor") {
+							// armor...
+						}
+					} catch (std::exception& e) {
+						// if any string is NULL it throws a std::exception indicating this
+						// just ignore it
+						// we may want to indicate the real error message here?
+					}
+				} else {
+						  std::cout << "invalid item " << id << std::endl;
+				}
 
-    return 0;
-  }
-  return -1;
+			}
+			p = p->next;
+		}
+
+		xmlFreeDoc(doc);
+
+		return 0;
+	}
+	return -1;
 }
 
 const ItemType& Items::operator[](int id)

@@ -566,7 +566,6 @@ void Protocol70::parseSay(NetworkMessage &msg)
 void Protocol70::parseAttack(NetworkMessage &msg)
 {
   unsigned long playerid = msg.GetU32();
-  std::cout << "attacking " << playerid << std::endl;
   player->setAttackedCreature(playerid);
 }
 
@@ -821,8 +820,8 @@ void Protocol70::sendCreatureAppear(const Creature *creature)
 
   if ((creature != player) && CanSee(creature->pos.x, creature->pos.y))
   {
-    msg.AddByte(0xD3);
-    msg.AddU32(creature->getID());
+    //msg.AddByte(0xD3);
+    //msg.AddU32(creature->getID());
 
     msg.AddByte(0x6A);
     msg.AddPosition(creature->pos);
@@ -831,10 +830,10 @@ void Protocol70::sendCreatureAppear(const Creature *creature)
     // login bubble
     msg.AddMagicEffect(creature->pos, 0x0A);
 
-    msg.AddByte(0x8D);
-    msg.AddU32(creature->getID());
-    msg.AddByte(0x00); // 00
-    msg.AddByte(0xD7);
+    //msg.AddByte(0x8D);
+    //msg.AddU32(creature->getID());
+    //msg.AddByte(0xFF); // 00
+    //msg.AddByte(0xFF);
 
     msg.WriteToSocket(s);
   }
@@ -865,10 +864,10 @@ void Protocol70::sendCreatureAppear(const Creature *creature)
     msg.AddByte(0x82);
     msg.AddByte(0x6F); //LIGHT LEVEL
     msg.AddByte(0xd7);//ight?
-    msg.AddByte(0x8d);//8d
-    msg.AddU32(player->getID());
-    msg.AddByte(0x00);//00
-    msg.AddByte(0xd7);//d7
+    //msg.AddByte(0x8d);//8d
+    //msg.AddU32(player->getID());
+    //msg.AddByte(0x00);//00
+    //msg.AddByte(0xd7);//d7
 
     msg.AddPlayerSkills(player);
 
