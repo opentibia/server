@@ -90,16 +90,7 @@ Player::Player(const char *name, Protocol *p) : Creature(name)
   HPGain[1]   = 5;
   HPGain[2]   = 5;
   HPGain[3]   = 10;
-  HPGain[4]   = 15;
-  
-  
-  
-  ManaMultiplier[0] = 0; //for Magic level advances
-  ManaMultiplier[1] = 1.1;
-  ManaMultiplier[2] = 1.1;
-  ManaMultiplier[3] = 1.4;
-  ManaMultiplier[4] = 3;
-  
+  HPGain[4]   = 15;  
 } 
 
 
@@ -290,6 +281,20 @@ if (skills[skill][SKILL_TRIES] >= getReqSkilltries (skill, (skills[skill][SKILL_
 
 
 }
+
+
+
+
+unsigned int Player::getReqMana(int maglevel, int voc) {
+  //ATTANTION: MAKE SURE THAT CHARS HAVE REASONABLE MAGIC LEVELS. ESPECIALY KNIGHTS!!!!!!!!!!!
+
+  float ManaMultiplier[5] = { 0, 1.1, 1.1, 1.4, 3 };
+  
+  return (unsigned int) ( 400 * pow(ManaMultiplier[voc], maglevel-1) );       //will calculate required mana for a magic level
+}
+
+
+
 
 Item* Player::getContainer(unsigned char containerid)
 {
@@ -483,8 +488,14 @@ void Player::savePlayer(std::string &name)
             level -= 1;
             healthmax -= HPGain[voc];
             health -= HPGain[voc];
-            manamax -= ManaGain[voc];
-            mana -= ManaGain[voc];
+            
+            if ((manamax - ManaGain[voc]) <= 0)        //This could be avoided with a proper use of unsigend int
+                 manamax = 0;
+            else manamax = manamax - ManaGain[voc];
+            if ((mana - ManaGain[voc]) <= 0)
+                 mana = 0;
+            else mana = mana - ManaGain[voc];
+            
             cap -= CapGain[voc];            
             }
        }
