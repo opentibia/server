@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.10  2003/10/21 17:55:07  tliffrag
+// Added items on player
+//
 // Revision 1.9  2003/09/08 13:28:41  tliffrag
 // Item summoning and maploading/saving now working.
 //
@@ -59,6 +62,10 @@ void swap(T &x, T &y)
   x = y;
   y = temp;
 }
+
+//numbers are fixed to match with
+//the slot numbers in the protocoll
+
 
 extern int hexint(const char *src);
 

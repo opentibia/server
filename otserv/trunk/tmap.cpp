@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.16  2003/10/21 17:55:07  tliffrag
+// Added items on player
+//
 // Revision 1.15  2003/10/19 21:32:19  tliffrag
 // Reworked the Tile class; stackable items now working
 //
@@ -118,7 +121,8 @@ int Tile::removeItem(int stack, int type, int count){
 	//returns how much items are left
 	//TODO
 	Item* item=getItemByStack(stack);
-std::cout << std::endl << "Stackpos was " << stack << std::endl;
+	std::cout << "REMOVE ITEM" << std::endl;
+	std::cout << std::endl << "Stackpos was " << stack << std::endl;
 	std::cout << std::endl << "Got an item with id " << item->getID() << std::endl;
 	int itemsleft = item->count-count;
 	if(itemsleft<=0){
@@ -438,28 +442,67 @@ int Map::requestAction(Creature* c, Action* a){
 		distributeAction(a->pos1, a);
 	}
 	if(a->type==ACTION_THROW){
-	//FIXME we should really check, if the player can throw
-		Action a_summon, a_remove;
+	//TODO make stackbles work correctly for equip
+	//TODO we should really check, if the player can throw
+	/* throwing works like this:
+	we check where the item comes from and if the number of items is available
+	there then we calculate the number that can be added to the target. if
+	they are stackable and it makes them become more then 100, we add another
+	pile. if we are on an inventore slot, 100 is the max and the rest has to stay
+	where we started the move.
+	we
+	*/
+	//First, we get the source item
+	Item* itemMoved;
+	if(a->pos1.x==0xFFFF){
+		itemMoved=a->creature->getItem(a->pos1.y);
+		a->creature->addItem(NULL, a->pos1.y);
+	}
+	else{
 		Tile* tile=tiles[a->pos1.x-MINX][a->pos1.y-MINX];
-		Tile::iterator it=tile->end(); it--;
-		a_summon.type=ACTION_ITEM_APPEAR;
-		a_summon.pos1=a->pos2;
-		a_summon.id=(*it)->getID();
-		a_remove.type=ACTION_ITEM_DISAPPEAR;
-		a_remove.pos1=a->pos1;
-		a_remove.id=a->id;
-		a_remove.count=a->count;
-		a_remove.stack=a->stack;
-		if((*it)->isStackable())
-			a_summon.count=a->count;
-		else
-			a_summon.count=0;
+		itemMoved = tile->getItemByStack(a->stack);
+		//now, we remove the item from the source
+		Action remove;
+		remove.type=ACTION_ITEM_DISAPPEAR;
+		remove.pos1=a->pos1;
+		remove.stack=a->stack;
+		remove.count=a->count;
+		remove.id=a->id;
+		removeItem(&remove);
+	}
 
-		if(a->pos1.x!=0xFFFF)//start is on map
-			removeItem(&a_remove);
-		if(a->pos2.x!=0xFFFF)//destination is on map
-			summonItem(&a_summon);
-		std::cout << "i should move " << a->count << " items" << std::endl;
+	if(!itemMoved){
+		//something went wrong, we got no item
+		return false;
+	}
+
+	//we got the item;
+	if(a->pos2.x==0xFFFF){
+		//we have to spawn this on a playerslot
+		//DAMN!! ;)
+		if(a->creature->getItem(a->pos2.y)){
+			//TODO make this work, when already occupied by some other item
+			//theres something on it...
+		}
+		else{
+			a->creature->addItem(itemMoved, a->pos2.y);
+		}
+	}
+	else{ //target is on a maptile
+		//TODO
+		//check if there are enough items to move
+		//TODO
+		//check if we can put the item there
+		//TODO
+		//move only the pointer: faster and necessary
+		//for things that are more the and id and a count
+		Action createItem;
+		createItem.type=ACTION_ITEM_APPEAR;
+		createItem.pos1=a->pos2;
+		createItem.id=itemMoved->getID();
+		createItem.count=a->count;
+		summonItem(&createItem);
+	}
 	}
 	if(a->type==ACTION_LOOK_AT){
 
@@ -505,7 +548,6 @@ int Map::summonItem(Action* a){
 	if(!a->id)
 		return false;
 	#ifdef __DEBUG__
-	std::cout << "Summoning item with id " << a->id << std::endl;
 	#endif
 	item->count=a->count;
 	Tile* tile = tiles[a->pos1.x-MINX][a->pos1.y-MINY];
@@ -518,6 +560,7 @@ int Map::summonItem(Action* a){
 		b.type=ACTION_ITEM_APPEAR;
 		b.pos1=a->pos1;
 		b.id=a->id;
+		if(item->isStackable())
 		b.count=a->count;
 		distributeAction(a->pos1, &b);
 	}
@@ -562,11 +605,14 @@ int Map::summonItem(position pos, int id){
 	#ifdef __DEBUG__
 	std::cout << "Summoning item with id " << id << std::endl;
 	#endif
-	tiles[pos.x-MINX][pos.y-MINY]->addItem(new Item(id));
+	Item* i=new Item(id);
+	tiles[pos.x-MINX][pos.y-MINY]->addItem(i);
 	Action* a= new Action;
 	a->type=ACTION_ITEM_APPEAR;
 	a->pos1=pos;
 	a->id=id;
+	if(!i->isStackable())
+		a->count=0;
 	distributeAction(pos, a);
 	return true;
 }
@@ -577,11 +623,14 @@ int Map::changeGround(position pos, int id){
 #ifdef __DEBUG__
   std::cout << "Summoning item with id " << id << std::endl;
 #endif
-  tiles[pos.x-MINX][pos.y-MINY]->addItem(new Item(id));
+	Item* i=new Item(id);
+  tiles[pos.x-MINX][pos.y-MINY]->addItem(i);
   Action* a= new Action;
   a->type=ACTION_GROUND_CHANGE;
   a->pos1=pos;
   a->id=id;
+	if(!i->isStackable())
+		a->count=0;
   distributeAction(pos, a);
   return true;
 }
@@ -591,6 +640,7 @@ int Map::removeItem(position pos){
 	Tile* tile=tiles[pos.x-MINX][pos.y-MINY];
 	if(tile->size()<=1)
 		return false;
+	//FIXME Do this by stack
 	tile->pop_back();
 	Action* a= new Action;
 	a->type=ACTION_ITEM_DISAPPEAR;

@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.9  2003/10/21 17:55:07  tliffrag
+// Added items on player
+//
 // Revision 1.8  2003/09/18 12:35:22  tliffrag
 // added item dragNdrop
 //
@@ -64,6 +67,7 @@
             void setdata(player_mem&);
 			void setCreature(Creature* c);
 			virtual void sendAction(Action* a){}
+			virtual int sendInventory(){return 0;}
 
             // get the name...
             virtual const std::string getName() const throw() =0;

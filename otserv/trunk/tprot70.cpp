@@ -192,153 +192,111 @@ void TProt70::parsePacket(std::string msg){
   }
 }
 
-			void TProt70::setMap(position newpos, Map& newmap) throw(texception) {
-			//this happens when the player logs in
-				// first we save the new map position...
-				pos = newpos;
-				map = &newmap;
+void TProt70::setMap(position newpos, Map& newmap) throw(texception) {
+	//this happens when the player logs in
+	// first we save the new map position...
+	pos = newpos;
+	map = &newmap;
+	// now we generate he data to send the player for the map
+	std::string buf="  "; // first two bytes are packet length
+	// packet id, 01 = login? or new map?
+	buf += (char)0x0A;
+	// now get the playernumber
 
-			// now we generate he data to send the player for the map
+	//ADD4BYTE(buf,365137);
 
-			std::string buf="  "; // first two bytes are packet length
-
-				// packet id, 01 = login? or new map?
-			buf += (char)0x0A;
-
-					// now get the playernumber
-
-	//		ADD4BYTE(buf,365137);
-
-			buf += (char)(player->pnum%256);
-			buf += (char)(player->pnum/256)%256;
-			buf += (char)(player->pnum/(256*256))%256;
-			buf += (char)(player->pnum/(256*256*256))%256;
+	buf += (char)(player->pnum%256);
+	buf += (char)(player->pnum/256)%256;
+	buf += (char)(player->pnum/(256*256))%256;
+	buf += (char)(player->pnum/(256*256*256))%256;
 
 
-			buf += (char)0x32;
-			buf += (char)0x00;
-			buf += (char)0x64;
+	buf += (char)0x32;
+	buf += (char)0x00;
+	buf += (char)0x64;
 
 			// map position
 
-			buf += (char)(pos.x%256);
-			buf += (char)(pos.x/256)%256;
-			buf += (char)(pos.y%256);
-			buf += (char)(pos.y/256)%256;
-			buf += (char)pos.z;
+	buf += (char)(pos.x%256);
+	buf += (char)(pos.x/256)%256;
+	buf += (char)(pos.y%256);
+	buf += (char)(pos.y/256)%256;
+	buf += (char)pos.z;
 
 
-			#ifdef __DEBUG__
-			 std::cout << "x: " << pos.x << " y: " << pos.y <<std::endl;
-			 #endif
-			std::string buf2 = makeMap(position(pos.x-8,pos.y-6,pos.z),position(pos.x+9,pos.y+7,pos.z));
+	#ifdef __DEBUG__
+	std::cout << "x: " << pos.x << " y: " << pos.y <<std::endl;
+	#endif
+	std::string buf2 = makeMap(position(pos.x-8,pos.y-6,pos.z),position(pos.x+9,pos.y+7,pos.z));
 
-			buf2.resize(buf2.length()-2);
-			buf += buf2;
-			buf += (char)0xFF;buf += (char)0xFF;buf += (char)0xFF;buf += (char)0xFF;
-			buf += (char)0xFF;buf += (char)0xFF;buf += (char)0xFF;buf += (char)0xFF;
-			buf += (char)0xFF;buf += (char)0xFF;buf += (char)0xFF;buf += (char)0xFF;
+	buf2.resize(buf2.length()-2);
+	buf += buf2;
+	buf += (char)0xFF;buf += (char)0xFF;buf += (char)0xFF;buf += (char)0xFF;
+	buf += (char)0xFF;buf += (char)0xFF;buf += (char)0xFF;buf += (char)0xFF;
+	buf += (char)0xFF;buf += (char)0xFF;buf += (char)0xFF;buf += (char)0xFF;
 
-			buf += (char)0xE4; // TODO Light level
+	buf += (char)0xE4; // TODO Light level
+	buf += (char)0xFF;
 
-			buf += (char)0xFF;
-
-			buf += 0x83;
-			buf += (char)(pos.x%256);
-			buf += (char)(pos.x/256)%256;
-			buf += (char)(pos.y%256);
-			buf += (char)(pos.y/256)%256;
-			buf += (char)pos.z;
-
-
-			buf+= (char)0x0A; //ITEMS
-
-			//4 bytes:
-			//0x78 0xXX position
-			//2 bytes what
-
-			buf+= (char)0x78;//backpack slot
-			buf+= (char)0x03;
-			buf+= (char)0x82;//backpack
-			buf+= (char)0x05;
-
-			buf+= (char)0x78; //armor slot
-			buf+= (char)0x04;
-			buf+= (char)0x59; //jacket
-			buf+= (char)0x07;
-
-			buf+= (char)0x78; //left hand
-			buf+= (char)0x05;
-			buf+= (char)0x89; //club
-			buf+= (char)0x06;
-
-			buf+= (char)0x78; //right hand
-			buf+= (char)0x06;
-			buf+= (char)0xB2; //torch
-			buf+= (char)0x05;
+	//LOGIN BUBBLE
+	buf += 0x83;
+	buf += (char)(pos.x%256);
+	buf += (char)(pos.x/256)%256;
+	buf += (char)(pos.y%256);
+	buf += (char)(pos.y/256)%256;
+	buf += (char)pos.z;
+	buf+= (char)0x0A;
+	//LOGIN BUBBLE END
 
 
-			buf+= (char)0xA0; //STATS
+	buf+= (char)0xA0; //STATS
 
-			ADD2BYTE(buf,this->player->health);//hitpoints
-			ADD2BYTE(buf,this->player->health_max);//hitpoints
-			ADD2BYTE(buf,this->player->cap);//cap
-			ADD4BYTE(buf,this->player->experience); //experience
-			buf+=(char)this->player->level;//level
-			ADD2BYTE(buf,this->player->mana);//mana
-			ADD2BYTE(buf,this->player->mana_max);//mana
-			buf+=(char)this->player->mag_level;//maglevel
-			buf+= (char)0x82;
-
-
-			buf+= (char)0xFF; //LIGHT LEVEL
-
-			//map window?
-			//light effect? login bubble?
-
-			buf+= (char)0xd7;//ight?
-			buf+= (char)0x8d;//8d
-			buf+= (char)0x51;//???
-			buf+= (char)0x92;//92
-			buf+= (char)0x05;//05
-			buf+= (char)0x00;//00
-			buf+= (char)0x00;//00
-			buf+= (char)0xd7;//d7
+	ADD2BYTE(buf,this->player->health);//hitpoints
+	ADD2BYTE(buf,this->player->health_max);//hitpoints
+	ADD2BYTE(buf,this->player->cap);//cap
+	ADD4BYTE(buf,this->player->experience); //experience
+	buf+=(char)this->player->level;//level
+	ADD2BYTE(buf,this->player->mana);//mana
+	ADD2BYTE(buf,this->player->mana_max);//mana
+	buf+=(char)this->player->mag_level;//maglevel
+	buf+= (char)0x82;
 
 
-			buf+= (char)0xA1; //skills follow
-			buf+= (char)this->player->skills[ SKILL_FIST ][ SKILL_LEVEL ]; //fist
-			buf+= (char)this->player->skills[ SKILL_CLUB ][ SKILL_LEVEL ]; //club
-			buf+= (char)this->player->skills[ SKILL_SWORD ][ SKILL_LEVEL ]; //sword
-			buf+= (char)this->player->skills[ SKILL_AXE ][ SKILL_LEVEL ]; //axe
-			buf+= (char)this->player->skills[ SKILL_DIST ][ SKILL_LEVEL ]; //dist
-			buf+= (char)this->player->skills[ SKILL_SHIELD ][ SKILL_LEVEL ]; //shield
-			buf+= (char)this->player->skills[ SKILL_FISH ][ SKILL_LEVEL ]; //fishing
+	buf+= (char)0xFF; //LIGHT LEVEL
 
-			buf+= (char)0xB4;
-			buf+= (char)0x11;
-
-			//TODO richtiger motd support
-			std::string welcomemsg=g_config.getGlobalString("loginmsg");
-			ADD2BYTE(buf,welcomemsg.length());
-			buf+= welcomemsg;
-
-			// now we correct the first two bytes which corespond to the length
-			// of the packet
+	//map window?
+	//light effect? login bubble?
+	buf+= (char)0xd7;//ight?
+	buf+= (char)0x8d;//8d
+	buf+= (char)0x51;//???
+	buf+= (char)0x92;//92
+	buf+= (char)0x05;//05
+	buf+= (char)0x00;//00
+	buf+= (char)0x00;//00
+	buf+= (char)0xd7;//d7
 
 
-			buf[0]=(char)(buf.size()-2)%256;
-			buf[1]=(char)((buf.size()-2)/256)%256;
-
-		/*	FILE* dump=fopen("dump","w+");
-			for(int i=0; i< buf.length(); i++)
-			fputc(buf[i],dump);
-			fclose(dump);
-*/
-			// and send to client...
-			TNetwork::SendData(psocket,buf);
-
-		} // void TProt70::setMap(position newpos) throw(texception)
+	buf+= (char)0xA1; //skills follow
+	buf+= (char)this->player->skills[ SKILL_FIST ][ SKILL_LEVEL ]; //fist
+	buf+= (char)this->player->skills[ SKILL_CLUB ][ SKILL_LEVEL ]; //club
+	buf+= (char)this->player->skills[ SKILL_SWORD ][ SKILL_LEVEL ]; //sword
+	buf+= (char)this->player->skills[ SKILL_AXE ][ SKILL_LEVEL ]; //axe
+	buf+= (char)this->player->skills[ SKILL_DIST ][ SKILL_LEVEL ]; //dist
+	buf+= (char)this->player->skills[ SKILL_SHIELD ][ SKILL_LEVEL ]; //shield
+	buf+= (char)this->player->skills[ SKILL_FISH ][ SKILL_LEVEL ]; //fishing
+	buf+= (char)0xB4;
+	buf+= (char)0x11;
+	std::string welcomemsg=g_config.getGlobalString("loginmsg");
+	ADD2BYTE(buf,welcomemsg.length());
+	buf+= welcomemsg;
+	// now we correct the first two bytes which corespond to the length
+	// of the packet
+	buf[0]=(char)(buf.size()-2)%256;
+	buf[1]=(char)((buf.size()-2)/256)%256;
+	// and send to client...
+	TNetwork::SendData(psocket,buf);
+	sendInventory();
+} // void TProt70::setMap(position newpos) throw(texception)
 
 std::string TProt70::makeMap(position topleft, position botright) {
 	int xswap=1, yswap=1;
@@ -401,8 +359,10 @@ void TProt70::addKnownPlayer(long id){
 std::string TProt70::makeItem(Item* c){
 	std::string tmp;
 	ADD2BYTE(tmp, c->getID());
-	if(c->isStackable())
+	if(c->isStackable()){
 		ADD1BYTE(tmp, c->getItemCount());
+		std::cout << "IS STACKABLE" << std::endl;
+	}
 	return tmp;
 }
 
@@ -572,15 +532,19 @@ void TProt70::parseThrow(Action* action, std::string msg){
 	action->pos1.y=(unsigned char)msg[4]*256+(unsigned char)msg[3];
 	action->pos1.z=(unsigned char)msg[5];
 	action->stack=(unsigned char)msg[8];
+	//FIXME this sucks
+	//make something like GETPOS
 	action->pos2.x=(unsigned char)msg[10]*256+(unsigned char)msg[9];
 	action->pos2.y=(unsigned char)msg[12]*256+(unsigned char)msg[11];
 	action->pos2.z=(unsigned char)msg[13];
 
-	if(msg.size()==15)
-	action->count=msg[14];
-
+	if(msg.size()==15&&action->pos1.x!=0xFFFF)
+		action->count=msg[14];
+	std::cout << "count is " << action->count << std::endl;
 	printf("From %i %i to %i %i", action->pos1.x, action->pos1.y, action->pos2.x, action->pos2.y);
 	action->creature=this->creature;
+	//just in case something happend to our inventory, update it
+	sendInventory();
 }
 
 void TProt70::parseLookAt(Action* action, std::string msg){
@@ -654,7 +618,7 @@ void TProt70::parseSay(Action* action, std::string msg){
 #endif
 		  id=atoi(tmpstr.c_str());
 		  count=atoi(tmpstr2.c_str());
-		  
+
 		  a->type=ACTION_CREATE_ITEM;
 		  a->id=id;
 		  a->pos1=mypos;
@@ -663,7 +627,7 @@ void TProt70::parseSay(Action* action, std::string msg){
 		    sendPlayerSorry("You need to specify a count when you summon this item!");
 		  delete a;
 		  break;
-		  
+
 		  
 	      
 		case 'g':
@@ -982,6 +946,7 @@ void TProt70::sendPlayerItemChange(Action* action){
 }
 
 void TProt70::sendPlayerTurn(Action* action){
+	sendInventory();
 	std::string buf = "  ";
 	buf+=(char)(0x6B);
 	ADDPOS(buf, action->pos1);
@@ -993,4 +958,26 @@ void TProt70::sendPlayerTurn(Action* action){
 	buf[0]=(char)(buf.size()-2)%256;
 	buf[1]=(char)((buf.size()-2)/256)%256;
 	TNetwork::SendData(psocket,buf);
+}
+
+int TProt70::sendInventory(){
+	std::string buf = "  ";
+
+	for(int i=1; i < 11; i++){
+		if(creature->getItem(i)!=NULL){
+			buf+= (char)0x78;//backpack slot
+			buf+= (char)(i);
+			buf+=makeItem(creature->getItem(i));
+		}
+		else{
+			buf+= (char)0x79;//backpack slot
+			buf+= (char)(i);
+		}
+	}
+
+
+	buf[0]=(char)(buf.size()-2)%256;
+	buf[1]=(char)((buf.size()-2)/256)%256;
+	TNetwork::SendData(psocket,buf);
+	return true;
 }

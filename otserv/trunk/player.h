@@ -20,6 +20,9 @@
 	// $Id$
 	//////////////////////////////////////////////////////////////////////
 	// $Log$
+	// Revision 1.9  2003/10/21 17:55:07  tliffrag
+	// Added items on player
+	//
 	// Revision 1.8  2003/09/25 21:17:52  timmit
 	// Adding PlayerList in TMap and getID().  Not workigng!
 	//
@@ -62,6 +65,11 @@
         unsigned long getID();		
 
 		void sendAction(Action*);
+
+		int addItem(Item* item, int pos);
+		int sendInventory();
+
+		Item* getItem(int pos);
 
 		unary_functor<Socket,void>* cb() {
 			return &client->cread;

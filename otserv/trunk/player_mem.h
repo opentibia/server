@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.12  2003/10/21 17:55:07  tliffrag
+// Added items on player
+//
 // Revision 1.11  2003/10/17 22:25:02  tliffrag
 // Addes SorryNotPossible; added configfile; basic lua support
 //
@@ -66,6 +69,8 @@ enum skillsid_t {
     SKILL_TRIES
 };
 
+
+
 class player_mem : public ::Memory {
  public:
   void load();
@@ -76,8 +81,8 @@ class player_mem : public ::Memory {
 	    int lookdir;
 	    position pos;
 	    //items
-	    Item slot_head, slot_necklace, slot_armor, slot_legs, slot_backpack;
-	    Item slot_left, slot_right, slot_ring, slot_ammo, slot_feet;
+	    Item* items[11]; //equipement of the player
+
 	    
 	    // health, health max.
 	    int health, health_max;

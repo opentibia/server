@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.13  2003/10/21 17:55:07  tliffrag
+// Added items on player
+//
 // Revision 1.12  2003/10/17 22:25:02  tliffrag
 // Addes SorryNotPossible; added configfile; basic lua support
 //
@@ -56,6 +59,31 @@ player_mem::player_mem(){
 	color_shoes=rand()%256;
 	lookdir=1;
 
+	//set item pointers to NULL
+	for(int i=0; i < 10; i++)
+		items[i]=NULL;
+
+	//give the player some default stuff
+	Item* item;
+
+
+	item= new Item(0x582);
+	items[SLOT_BACKPACK]=item;
+	/*
+	items[SLOT_BACKPACK]=item;
+	item= new Item(0x759);
+	addItem(item, SLOT_ARMOR);
+
+items[SLOT_BACKPACK]=item;
+	item= new Item(0x689);
+	addItem(item, SLOT_RIGHT);
+
+	items[SLOT_BACKPACK]=item;
+	item= new Item(0x5B2);
+	addItem(item, SLOT_LEFT);
+
+*/
+
 	// default values
 	// these will be changed when the character file is loaded, if one exists
 	// TODO: make these the default values for a level 1 character
@@ -75,7 +103,7 @@ player_mem::player_mem(){
         skills[ i ][ SKILL_LEVEL ] = 10;
         skills[ i ][ SKILL_TRIES ] = 0;
         std::cout<<"skills["<<i<<"] = "<<skills[i][SKILL_TRIES]<<std::endl;
-    }	
+    }
 
 }
     // player's name must be set before calling load()

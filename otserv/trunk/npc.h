@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.2  2003/10/21 17:55:07  tliffrag
+// Added items on player
+//
 // Revision 1.1  2003/10/17 22:25:02  tliffrag
 // Addes SorryNotPossible; added configfile; basic lua support
 //
@@ -50,7 +53,9 @@ class NPC : public Creature {
   virtual ~NPC();
   
   bool isPlayer();
-  
+
+	int addItem(Item* item, slots_t pos);
+
   void sendAction(Action*);
   
   std::string getName(){

@@ -41,6 +41,8 @@ struct Action {
   //that will have to work for now
 	Action(){
 		type=ACTION_NONE;
+		count=0;
+		stack=0;
 	}
 
   //unsigned short count;  // count of the items the action is performed on...

@@ -22,6 +22,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.9  2003/10/21 17:55:07  tliffrag
+// Added items on player
+//
 // Revision 1.8  2003/10/19 21:32:19  tliffrag
 // Reworked the Tile class; stackable items now working
 //
@@ -127,6 +130,8 @@
 			void sendPlayerSorry(tmapEnum);
 			void sendPlayerSorry(std::string);
 			void sendPlayerLookAt(std::string);
+
+			int sendInventory();
 
 			bool knowsPlayer(long id);
 			void addKnownPlayer(long id);

@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.6  2003/10/21 17:55:07  tliffrag
+// Added items on player
+//
 // Revision 1.5  2003/10/19 21:32:19  tliffrag
 // Reworked the Tile class; stackable items now working
 //
@@ -120,9 +123,6 @@ bool Item::isGroundTile() {
 std::string Item::getDescription() {
 	std::stringstream s;
 	std::string str;
-	s << "This is an item of type #" << id <<".   ";
-	if(count)
-		s << count << " pieces.";
 	str = s.str();
 	return str;
 	//return true;

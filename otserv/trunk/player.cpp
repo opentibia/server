@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.12  2003/10/21 17:55:07  tliffrag
+// Added items on player
+//
 // Revision 1.11  2003/09/25 21:17:52  timmit
 // Adding PlayerList in TMap and getID().  Not workigng!
 //
@@ -80,10 +83,28 @@ namespace Creatures {
     return player.pnum;
   }  
 
-  void Player::sendAction(Action* action){
-  	
-	client->sendAction(action);
-  }
+	void Player::sendAction(Action* action){
+		client->sendAction(action);
+	}
+
+	Item* Player::getItem(int pos){
+		if(pos>0 && pos <11)
+			return player.items[pos];
+		return NULL;
+	}
+
+	int Player::sendInventory(){
+		client->sendInventory();
+		return true;
+	}
+
+	int Player::addItem(Item* item, int pos){
+		std::cout << "Should add item at " << pos <<std::endl;
+		if(pos>0 && pos <11)
+			player.items[pos]=item;
+		client->sendInventory();
+		return true;
+	}
 
     void Player::setMap(position pos,Map& map) throw(texception) {
 	  pos=map.placeCreature(pos,this);

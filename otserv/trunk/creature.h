@@ -24,6 +24,7 @@
 // include definitions
 #include "pos.h"
 #include "action.h"
+#include "item.h"
 #include "definitions.h"
 
 // include Map headers
@@ -45,7 +46,12 @@ class Creature {
 		
 		virtual unsigned long getID(){return 0;}
 		
-		virtual void sendAction(Action*){}
+		virtual void sendAction(Action*){};
+		virtual int sendInventory(){return 0;};
+
+		virtual int addItem(Item* item, int pos){return 0;};
+
+		virtual Item* getItem(int pos){return NULL;}
         // get the next Action of the creature
         //			virtual action* GetNextAction()=0;
 
