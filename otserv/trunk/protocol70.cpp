@@ -70,7 +70,7 @@ void Protocol70::ReceiveLoop()
     parsePacket(msg);
   }
 
-  if (s);
+  if (s)
     closesocket(s);
 
   // logout by disconnect?  -> kick
@@ -647,33 +647,6 @@ void Protocol70::sendPlayerChangeAppearance(Action* action){
 */
 
 
-void Protocol70::sendPlayerSorry(){
-	sendPlayerSorry("Sorry. Not possible");
-}
-
-void Protocol70::sendPlayerSorry(tmapEnum){
-/*	std::string msg = "Sorry. Not possible";
-		std::string buf = "  ";
-	buf+=(char)0xB4;
-	buf+=(char)0x14;
-	ADD2BYTE(buf, msg.size());
-	buf+=msg;
-	buf[0]=(char)(buf.size()-2)%256;
-	buf[1]=(char)((buf.size()-2)/256)%256;*/
-	//SendData(psocket,buf);
-}
-
-void Protocol70::sendPlayerSorry(std::string msg){
-	/*std::string buf = "  ";
-	buf+=(char)0xB4;
-	buf+=(char)0x14;
-	ADD2BYTE(buf, msg.size());
-	buf+=msg;
-	buf[0]=(char)(buf.size()-2)%256;
-	buf[1]=(char)((buf.size()-2)/256)%256;*/
-//	SendData(psocket,buf);
-}
-
 void Protocol70::sendPlayerLookAt(std::string msg){
 /*	std::string buf = "  ";
 	buf+=(char)0xB4;
@@ -943,3 +916,18 @@ void Protocol70::sendCreatureSay(const Creature *creature, unsigned char type, c
 }
 
 
+void Protocol70::sendCancel(const char *msg)
+{
+  NetworkMessage netmsg;
+  netmsg.AddTextMessage(MSG_SMALLINFO, msg);
+  netmsg.WriteToSocket(s);
+}
+
+
+void Protocol70::sendCancelWalk(const char *msg)
+{
+  NetworkMessage netmsg;
+  netmsg.AddTextMessage(MSG_SMALLINFO, msg);
+  netmsg.AddByte(0xB5);
+  netmsg.WriteToSocket(s);
+}

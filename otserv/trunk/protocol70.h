@@ -89,9 +89,6 @@ private:
 	void sendPlayerChangeAppearance(Action* action);
 */
 
-	void sendPlayerSorry();
-	void sendPlayerSorry(tmapEnum);
-	void sendPlayerSorry(std::string);
 	void sendPlayerLookAt(std::string);
 
 
@@ -99,13 +96,15 @@ private:
 //	void sendPlayerChangeGround(Action* action);
 
   virtual void sendNetworkMessage(NetworkMessage *msg);
-
   
   virtual void sendThingMove(const Creature *creature, const Thing *thing, const Position *oldPos, unsigned char oldstackpos);
   virtual void sendCreatureAppear(const Creature *creature);
   virtual void sendCreatureDisappear(const Creature *creature, unsigned char stackPos);
   virtual void sendCreatureTurn(const Creature *creature, unsigned char stackpos);
   virtual void sendCreatureSay(const Creature *creature, unsigned char type, const std::string &text);
+
+  virtual void sendCancel(const char *msg);
+  virtual void sendCancelWalk(const char *msg);
 
   void sendSetOutfit(const Creature* creature);
 	virtual void sendTileUpdated(const Position *Pos);

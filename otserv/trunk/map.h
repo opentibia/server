@@ -37,15 +37,6 @@
 #include "networkmessage.h"
 
 
-enum tmapEnum{
-  TMAP_SUCCESS,
-  TMAP_ERROR,
-  TMAP_ERROR_NO_COUNT,
-  TMAP_ERROR_TILE_OCCUPIED,
-};
-
-
-
 class Creature;   // see creature.h
 class Player;
 

@@ -56,6 +56,9 @@ public:
   virtual void sendSetOutfit(const Creature* creature) = 0;
 	virtual void sendTileUpdated(const Position *Pos) = 0;
 
+  virtual void sendCancel(const char *msg) = 0;
+  virtual void sendCancelWalk(const char *msg) = 0;
+
 protected:
   Map    *map;
   Player *player;

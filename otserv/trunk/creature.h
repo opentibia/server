@@ -112,6 +112,8 @@ public:
   // level
   int level;
 
+  virtual void sendCancel(const char *msg) { };
+  virtual void sendCancelWalk(const char *msg) { };
 
 private:
 	virtual void onThink(){};

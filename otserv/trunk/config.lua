@@ -13,7 +13,7 @@ loginmsg = "Welcome to OTServ. For help visit tibia.de/forum"
 
 -- port
 -- the port otserv listens on
-port = "7172"
+port = "7171"
 
 -- ip
 -- the ip the server should redirect too

@@ -142,8 +142,17 @@ bool Player::CanSee(int x, int y)
 void Player::sendNetworkMessage(NetworkMessage *msg)
 {
   client->sendNetworkMessage(msg);
-};
+}
 
+void Player::sendCancel(const char *msg)
+{
+  client->sendCancel(msg);
+}
+
+void Player::sendCancelWalk(const char *msg)
+{
+  client->sendCancelWalk(msg);
+}
 
 void Player::onThingMove(const Creature *creature, const Thing *thing, const Position *oldPos, unsigned char oldstackpos)
 {
@@ -187,5 +196,6 @@ void Player::onTileUpdated(const Position *Pos)
 {
   client->sendTileUpdated(Pos);
 }
+
 
 

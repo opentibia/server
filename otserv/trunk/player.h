@@ -102,6 +102,9 @@ public:
   bool CanSee(int x, int y);
   void sendNetworkMessage(NetworkMessage *msg);
 
+  virtual void sendCancel(const char *msg);
+  virtual void sendCancelWalk(const char *msg);
+
   virtual bool isAttackable() { return (access == 0); };
 
 protected:

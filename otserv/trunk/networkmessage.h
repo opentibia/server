@@ -32,10 +32,12 @@
 #define NM_ME_MORT_AREA          17
 #define NM_ME_SOUND              18
 
+
 enum MessageClasses {
-		  MSG_INFO   = 0x13,
-		  MSG_EVENT  = 0x11,
-		  MSG_STATUS = 0x12
+      MSG_SMALLINFO = 0x14,
+		  MSG_INFO      = 0x13,
+		  MSG_EVENT     = 0x11,
+		  MSG_STATUS    = 0x12
 };
 
 class Creature;

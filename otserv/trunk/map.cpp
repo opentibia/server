@@ -685,7 +685,10 @@ void Map::thingMoveInternal(Creature *player,
   if (thing)
   {
     if (player->access == 0 && thing->isPlayer() && ((Player*)thing)->access != 0)
+    {
+      player->sendCancel("Better dont touch him...");
       return;
+    }
 
     Position oldPos;
     oldPos.x = from_x;
@@ -701,17 +704,22 @@ void Map::thingMoveInternal(Creature *player,
 
     if ((fromTile != NULL) && (toTile != NULL))
     {
-      if ((abs(oldPos.x - to_x) > thing->ThrowRange) ||
-          (abs(oldPos.y - to_y) > thing->ThrowRange))
+      if ((abs(from_x - player->pos.x) > 1) ||
+          (abs(from_y - player->pos.y) > 1))
       {
-        // TODO... "not Posible"
+        player->sendCancel("To far away...");
       }
-      else if (!thing->CanMovedTo(toTile))
+      else if ((abs(oldPos.x - to_x) > thing->ThrowRange) ||
+               (abs(oldPos.y - to_y) > thing->ThrowRange))
       {
-        // TODO... "not Posible"
+        player->sendCancel("Not there...");
       }
-      else if (toTile->isBlocking())
+      else if ((!thing->CanMovedTo(toTile)) || (toTile->isBlocking()))
       {
+        if (player == thing)
+          player->sendCancelWalk("Sorry, not possible...");
+        else
+          player->sendCancel("Sorry, not possible...");
       }
       else
       {
