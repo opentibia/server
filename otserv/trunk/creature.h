@@ -99,6 +99,7 @@ public:
   int lookhead, lookbody, looklegs, lookfeet, looktype, lookcorpse;
   int mana, manamax, manaspent;
   bool exhausted;
+  __int64 pzLockedTicks;
 
   int speed;
 

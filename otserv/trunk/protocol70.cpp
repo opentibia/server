@@ -284,6 +284,10 @@ void Protocol70::checkCreatureAsKnown(unsigned long id, bool &known, unsigned lo
 // Parse methods
 void Protocol70::parseLogout(NetworkMessage &msg)
 {
+    if(player->pzLockedTicks>=1000) {
+         sendCancel("You may not logout during or immediately after a fight!");
+         return;
+     }    
 	// we ask the map to remove us
 	if (map->removeCreature(player))
 	{

@@ -17,7 +17,7 @@ Creature::Creature(const char *name) : access(0)
 
   id         = idcount;
 
-  direction  = SOUTH;
+  direction  = NORTH;
 
   this->name = name;
 
@@ -33,7 +33,7 @@ Creature::Creature(const char *name) : access(0)
   healthmax  = 1000;//150;
 
   lastDamage = 0;
-
+  pzLockedTicks = 0;
   speed      = 220;
 
   attackedCreature = 0;

@@ -675,6 +675,15 @@ void Map::thingMoveInternal(Creature *player,
         else
           player->sendCancel("Sorry, not possible...");
       }
+      else if (toTile->isPz() && creature && creature->pzLockedTicks) {
+          if (player == thing && player->pzLockedTicks >= 1000)
+            player->sendCancelWalk("You can't enter a protection zone after attacking another creature.");
+          else if (creature->pzLockedTicks >= 1000)
+            player->sendCancel("Sorry, not possible...");
+      }
+      else if (fromTile->isPz() && creature && player != thing) {
+            player->sendCancel("Sorry, not possible...");
+      } 
       else
       {
         int oldstackpos = fromTile->getThingStackPos(thing);
@@ -786,8 +795,8 @@ default:break;
 else {
     CreatureVector::iterator cit;
 
-  for (int x = creature->pos.x - 9; x <= creature->pos.x + 9; x++)
-    for (int y = creature->pos.y - 7; y <= creature->pos.y + 7; y++)
+  for (int x = creature->pos.x - 8; x <= creature->pos.x + 8; x++)
+    for (int y = creature->pos.y - 6; y <= creature->pos.y + 6; y++)
     {
       Tile *tile = getTile(x, y, 7);
       if (tile)
@@ -829,8 +838,8 @@ void Map::creatureWhisper(Creature *creature, const std::string &text)
   OTSYS_THREAD_LOCK(mapLock)
 
       CreatureVector::iterator cit;
-  for (int x = creature->pos.x - 9; x <= creature->pos.x + 9; x++)
-    for (int y = creature->pos.y - 7; y <= creature->pos.y + 7; y++)
+  for (int x = creature->pos.x - 8; x <= creature->pos.x + 8; x++)
+    for (int y = creature->pos.y - 6; y <= creature->pos.y + 6; y++)
     {
       Tile *tile = getTile(x, y, 7);
       if (tile)
@@ -924,19 +933,21 @@ void Map::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fig
 					inReach = true;
 		break;
 		case FIGHT_DIST:
-			if((std::abs(creature->pos.x-attackedCreature->pos.x) <= 8) &&
-				(std::abs(creature->pos.y-attackedCreature->pos.y) <= 6) &&
+			if((std::abs(creature->pos.x-attackedCreature->pos.x) <= 7) &&
+				(std::abs(creature->pos.y-attackedCreature->pos.y) <= 5) &&
 				(creature->pos.z == attackedCreature->pos.z))
 					inReach = true;
 		break;
 		case FIGHT_MAGICDIST:
-			if((std::abs(creature->pos.x-attackedCreature->pos.x) <= 8) &&
-				(std::abs(creature->pos.y-attackedCreature->pos.y) <= 6) &&
+			if((std::abs(creature->pos.x-attackedCreature->pos.x) <= 7) &&
+				(std::abs(creature->pos.y-attackedCreature->pos.y) <= 5) &&
 				(creature->pos.z == attackedCreature->pos.z))
 					inReach = true;	
 		break;
 	}
-	
+	if (creature->access == 0) {
+	    creature->pzLockedTicks = +120000;	    
+	}    
 	if(!inReach)
 		return;
 	
@@ -1009,6 +1020,9 @@ void Map::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fig
 		targettile->removeThing(attackedCreature);
 		playersOnline.erase(playersOnline.find(attackedCreature->getID()));
 		targettile->addThing(new Item(attackedCreature->lookcorpse));
+		if (creature->access == 0) {
+	      creature->pzLockedTicks = +120000;	      
+  	      }
 	}
 }
 
@@ -1135,9 +1149,10 @@ void Map::checkPlayer(unsigned long id)
 		 
 		 msg.AddPlayerStats(player);
 		 player->sendNetworkMessage(&msg);
+		 if(player->pzLockedTicks >= 1000)
+             player->pzLockedTicks -= 1000;
 	 }
   }
-
   OTSYS_THREAD_UNLOCK(mapLock)
 }
 
@@ -1294,6 +1309,10 @@ void Map::makeCastSpell(Creature *creature, int mana, int mindamage, int maxdama
 		pos.x -= 18;
 		pos.y += 1;
 	}
+	
+	if (creature->access == 0 && !damagelist.empty()) {
+	    creature->pzLockedTicks += 120000;
+	}
 
 	//spectators
 	for(int y =  creature->pos.y - 12; y < creature->pos.y + 12; y++) {
@@ -1303,14 +1322,17 @@ void Map::makeCastSpell(Creature *creature, int mana, int mindamage, int maxdama
 			if (tile) {
 				for (cit = tile->creatures.begin(); cit != tile->creatures.end(); cit++) {
 					Player* spectator = dynamic_cast<Player*>(*cit);
-          if (!spectator)
-            continue;
+                    if (!spectator)
+                                continue;
 
 					NetworkMessage msg;
 
 					for(int a = 0; a < areaPos.size(); a++) {
-						if(spectator->CanSee(areaPos[a].x, areaPos[a].y))
+						if(spectator->CanSee(areaPos[a].x, areaPos[a].y)) {
+						    Tile* tilearea = getTile(areaPos[a].x, areaPos[a].y, areaPos[a].z);
+						    if(!tilearea->isPz() || creature->access !=0 || (mindamage <=0 && maxdamage<=0))
 							msg.AddMagicEffect(areaPos[a], typeArea);
+							}				
 					}
 
 					for (int i = 0; i < damagelist.size(); i++) {
@@ -1325,10 +1347,9 @@ void Map::makeCastSpell(Creature *creature, int mana, int mindamage, int maxdama
 
 							if(vtile->isPz() && creature->access == 0) {
 								//msg.AddTextMessage(MSG_STATUS, "You may not attack a person in a protection zone.");
-								msg.AddMagicEffect(victim->pos, NM_ME_PUFF);
+								//msg.AddMagicEffect(victim->pos, NM_ME_PUFF);
 							}
-						else
-							if(damage > 0) {
+							else if(damage > 0) {
 								msg.AddMagicEffect(victim->pos, typeDamage);
 
 								std::stringstream dmg;
@@ -1380,6 +1401,9 @@ void Map::makeCastSpell(Creature *creature, int mana, int mindamage, int maxdama
 			tile->removeThing(victim);
 			playersOnline.erase(playersOnline.find(victim->getID()));
 			tile->addThing(new Item(victim->lookcorpse));
+			if (creature->access == 0) {
+	          creature->pzLockedTicks += 120000;
+	          }
 		}
 	}
 }
