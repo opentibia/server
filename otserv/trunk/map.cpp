@@ -2349,9 +2349,9 @@ void Map::CreateDamageUpdate(Creature* creature, Creature* attackCreature, int d
                     
                     lostSkilltries = (int) (sumSkilltries * 0.1);           //player loses 10% of his skill tries
 
-                    cout << player->getName() << "died an lost " << lostSkilltries << " skill tries for skill " << i << "\n";
-                    cout << "skill tries before death: " <<  player->skills[i][SKILL_TRIES] << "\n";
-                    cout << "skill level before death: " <<  player->skills[i][SKILL_LEVEL] << "\n";
+                    //cout << player->getName() << "died an lost " << lostSkilltries << " skill tries for skill " << i << "\n";
+                    //cout << "skill tries before death: " <<  player->skills[i][SKILL_TRIES] << "\n";
+                    //cout << "skill level before death: " <<  player->skills[i][SKILL_LEVEL] << "\n";
 
                     if (player->skills[i][SKILL_TRIES] >= lostSkilltries) { //player does not lose a skill level
                        player->skills[i][SKILL_TRIES] -= lostSkilltries;
@@ -2367,8 +2367,8 @@ void Map::CreateDamageUpdate(Creature* creature, Creature* attackCreature, int d
                        }
                     }
                     
-                    cout << "skill tries after death: " <<  player->skills[i][SKILL_TRIES] << "\n";
-                    cout << "skill level after death: " <<  player->skills[i][SKILL_LEVEL] << "\n";
+                    //cout << "skill tries after death: " <<  player->skills[i][SKILL_TRIES] << "\n";
+                    //cout << "skill level after death: " <<  player->skills[i][SKILL_LEVEL] << "\n";
                 }               
                 //End Skill loss
                 
