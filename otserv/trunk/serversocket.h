@@ -28,9 +28,11 @@ private:
     void operator() (const int &z);
   } newconnection;
 public:
+  #if 0
   struct clientread : public unary_functor<int,void> {
     void operator() (const int &z);
   } clientread;
+#endif
 private:
   int serversocket;
   int make_socket(int socket_type, u_short port);

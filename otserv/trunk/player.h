@@ -40,6 +40,10 @@ namespace Creatures {
 			// virtual destructor to be overloaded...
 			virtual ~Player();
 
+			unary_functor<int ,void>* cb() {
+				return &client->cread;
+			}
+
 		private:
 			// pointer to the protokoll...
 			Protokoll::ProtokollP client;

@@ -1,5 +1,10 @@
 #include "tprot.h"
 #include "network.h"
+#include "eventscheduler.h"
+
+#include <unistd.h> // read
+
+extern EventScheduler es;
 
 namespace Protokoll {
 	TProt::TProt(const SOCKET& sock, const string& in) throw(texception) {
@@ -57,7 +62,7 @@ namespace Protokoll {
 
 	} // TProt::TProt(SOCKET sock, string in) throw(texception) 	
 
-	TProt::~TProt() {
+	TProt::~TProt() throw() {
 		TNetwork::ShutdownClient(psocket);
 	} // TProt::~TProt() 
 
@@ -69,9 +74,29 @@ namespace Protokoll {
 		return passwd;
 	}
 
-/*	void TProt::setMap(mapposition newpos) throw(texception) {
-		// first we save the new map position...
-		our_pos = newpos;
+	void TProt::clread(const SOCKET& sock) throw() {
+		  static const int MAXMSG = 4096;
+		  char buffer[MAXMSG];
+
+		  int nbytes = read(sock, buffer, MAXMSG);
+		  if (nbytes < 0) { // error
+			  cerr << "read" << endl;
+			  exit(-1);
+		  } else if (nbytes == 0) { // eof (means logout)
+			  cerr << "logout" << endl;
+			  es.deletesocket(sock);
+			  close(sock);
+		  } else {  // lesen erfolgreich
+			  buffer[nbytes] = 0;
+			  cout << "read" << endl;
+//			  printf("%s\n", buffer);
+		  }
+	}
+
+	/*	void TProt::setMap(mapposition newpos) throw(texception) {
+	// first we save the new map position...
+	our_pos = newpos;
 	} // void TProt::setMap(mapposition, Map&) throw(texception)
-*/
+	 */
+
 }

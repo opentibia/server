@@ -29,6 +29,18 @@ namespace Protokoll {
 	class Protokoll {
 		public:
 
+			Protokoll() throw();
+			
+			// our callback interface
+			struct clientread : public unary_functor<int ,void> {
+				Protokoll& base;
+				clientread(Protokoll& prot) : base(prot) { };
+				void operator() (const SOCKET &sock) {
+					base.clread(sock);
+				}
+			};
+
+
 			// get the name...
 			virtual const std::string getName() const throw() =0;
 
@@ -36,10 +48,15 @@ namespace Protokoll {
 			virtual const std::string getPassword() const throw() =0;
 
 			// virtual destructor
-			virtual ~Protokoll() throw() =0;
+			virtual ~Protokoll() throw() {};
+
+			// callback if data arives on our socket
+			clientread cread;
+
+			virtual void clread(const SOCKET &sock) = 0;
 
 			// set the map and update the client screen
-//			virtual void setMap(Map::mapposition) throw(texception) =0;
+			//			virtual void setMap(Map::mapposition) throw(texception) =0;
 
 
 		protected:

@@ -4,8 +4,8 @@ namespace Creatures {
 Player::Player(const SOCKET& sock) : client(sock) {
 
 	// we get name and password from the client...
-	name = client->getName();
-	password = client->getPassword();
+	cout << (name = client->getName()) << endl;
+	cout << (password = client->getPassword()) << endl;
 
 	// now we should check both... (TODO)
 

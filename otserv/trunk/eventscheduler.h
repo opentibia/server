@@ -35,7 +35,7 @@ class EventScheduler {
   fd_set active_fd_set, read_fd_set;
 public:
   EventScheduler();
-  void newsocket(signed int sock, unary_functor<int,void> *);
+  void newsocket(signed int sock, unary_functor<SOCKET,void> *);
   void deletesocket(signed int sock);
   void loop();
 };

@@ -37,8 +37,10 @@ namespace Protokoll {
 			const std::string getName() const throw();
 			const std::string getPassword() const throw();
 
+			void clread(const SOCKET& sock) throw();
+
 			// our destructor to clean up the mess we made...
-			~TProt();
+			~TProt() throw();
 
 		private:
 

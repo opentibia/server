@@ -18,6 +18,16 @@
 #ifndef __definitions_h
 #define __definitions_h
 
+#include <functional>
+
+// functor that enables me to use functors with same types but different algorithms
+template<class A, class R> struct unary_functor : public unary_function<A,R> {
+  virtual R operator() (const A &) = 0;
+};
+
+
+
+
 // constants...
 // width and length of the map...
 const unsigned TC_MSIZEX = 1000;
