@@ -87,7 +87,7 @@ public:
   // write functions for complex types
   void AddPosition(const Position &pos);
   void AddItem(const Item *item);
-  void AddCreature(const Creature *creature, bool known, bool login);
+  void AddCreature(const Creature *creature, bool known, unsigned int remove);
 
 
   // write functions for complete message blocks

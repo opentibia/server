@@ -51,7 +51,7 @@ private:
   SOCKET s;
 
   std::list<unsigned long> knownPlayers;
-  bool setCreatureAsKnown(unsigned long id);
+  void checkCreatureAsKnown(unsigned long id, bool &known, unsigned long &removedKnown);
 
 	// we have all the parse methods
   void parsePacket(NetworkMessage &msg);

@@ -234,7 +234,7 @@ void NetworkMessage::AddDistanceShoot(const Position &from, const Position &to, 
 }
 
 
-void NetworkMessage::AddCreature(const Creature *creature, bool known, bool login)
+void NetworkMessage::AddCreature(const Creature *creature, bool known, unsigned int remove)
 {
   if (known)
   {
@@ -245,11 +245,8 @@ void NetworkMessage::AddCreature(const Creature *creature, bool known, bool logi
   else
   {
     AddByte(0x61);
-
     AddByte(0x00);
-	 AddU32(0);
-    //AddU32(login ? creature->getID() : 0); leads to strange invisibility problems...
-	 // though on the real server this is not always 0 (only for players always 0?)
+	  AddU32(remove);
     AddU32(creature->getID());
     AddString(creature->getName());
   }

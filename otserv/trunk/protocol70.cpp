@@ -205,7 +205,10 @@ void Protocol70::GetMapDescription(unsigned short x, unsigned short y, unsigned 
         CreatureVector::iterator itc;
 		    for (itc = tile->creatures.begin(); ((itc !=tile->creatures.end()) && (count < 10)); itc++)
         {
-  			  msg.AddCreature(*itc, setCreatureAsKnown((*itc)->getID()), false);
+          bool known;
+          unsigned long removedKnown;
+          checkCreatureAsKnown((*itc)->getID(), known, removedKnown);
+  			  msg.AddCreature(*itc, known, removedKnown);
           count++;
         }
 
@@ -226,30 +229,57 @@ void Protocol70::GetMapDescription(unsigned short x, unsigned short y, unsigned 
 }
 
 
-
-bool Protocol70::setCreatureAsKnown(unsigned long id)
+void Protocol70::checkCreatureAsKnown(unsigned long id, bool &known, unsigned long &removedKnown)
 {
-std::list<unsigned long>::iterator i;
-for(i = knownPlayers.begin(); i != knownPlayers.end(); ++i)
-{
-	if((*i) == id)
-	{
-		knownPlayers.erase(i);
+  // loop through the known player and check if the given player is in
+  std::list<unsigned long>::iterator i;
+  for(i = knownPlayers.begin(); i != knownPlayers.end(); ++i)
+  {
+	  if((*i) == id)
+	  {
+      // know... make the creature even more known...
+		  knownPlayers.erase(i);
+		  knownPlayers.push_back(id);
 
-		knownPlayers.push_back(id);
+		  known = true;
+      return;
+	  }
+  }
 
-		return true;
-	}
+  // ok, he is unknown...
+  known = false;
+
+  // ... but not in future
+  knownPlayers.push_back(id);
+
+  // to many known players?
+  if(knownPlayers.size() > 64)
+  {
+    // lets try to remove one from the end of the list
+    for (int n = 0; n < 64; n++)
+    {
+      removedKnown = knownPlayers.front();
+
+      Creature *c = map->getCreatureByID(removedKnown);
+      if ((!c) || (!CanSee(c->pos.x, c->pos.y)))
+        break;
+
+      // this creature we can't remove, still in sight, so back to the end
+      knownPlayers.pop_front();
+      knownPlayers.push_back(removedKnown);
+    }
+
+    // hopefully we found someone to remove :S, we got only 64 tries
+    // if not... lets kick some players with debug errors :)
+	  knownPlayers.pop_front();
+  }
+  else
+  {
+    // we can cache without problems :)
+    removedKnown = 0;
+  }
 }
 
-if(knownPlayers.size() >= 35)
-	knownPlayers.pop_front();
-
-	knownPlayers.push_back(id);
-
-	return false;
-
-}
 
 // Parse methods
 void Protocol70::parseLogout(NetworkMessage &msg)
@@ -753,7 +783,12 @@ void Protocol70::sendThingMove(const Creature *player, const Thing *thing, const
       msg.AddByte(0x6A);
       msg.AddPosition(thing->pos);
       if (thing->isCreature())
-        msg.AddCreature((Creature*)thing, setCreatureAsKnown(((Creature*)thing)->getID()), false);
+      {
+        bool known;
+        unsigned long removedKnown;
+        checkCreatureAsKnown(((Creature*)thing)->getID(), known, removedKnown);
+  			msg.AddCreature((Creature*)thing, known, removedKnown);
+      }
       else
         msg.AddItem((Item*)thing);
     }
@@ -802,12 +837,16 @@ void Protocol70::sendCreatureAppear(const Creature *creature)
 
   if ((creature != player) && CanSee(creature->pos.x, creature->pos.y))
   {
-    //msg.AddByte(0xD3);
-    //msg.AddU32(creature->getID());
+   // msg.AddByte(0xD3);
+   // msg.AddU32(creature->getID());
+
+    bool known;
+    unsigned long removedKnown;
+    checkCreatureAsKnown(creature->getID(), known, removedKnown);
 
     msg.AddByte(0x6A);
     msg.AddPosition(creature->pos);
-    msg.AddCreature(creature, setCreatureAsKnown(creature->getID()), true);
+  	msg.AddCreature(creature, known, removedKnown);
 
     // login bubble
     msg.AddMagicEffect(creature->pos, 0x0A);
