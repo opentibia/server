@@ -51,6 +51,10 @@ function onCreatureSay(cid, type, msg)
 		target = cid
 		selfSay('Ok, I will.')
 	end
+	if string.find(msg, '(%a*)position(%a*)') then
+		x, y, z = creatureGetPosition(cid)
+		selfSay(x .." "..y)
+	end
 	if string.find(msg, '(%a*)stop(%a*)') then
 		selfGotoIdle()
 		selfSay('Ok, I will wait here.')

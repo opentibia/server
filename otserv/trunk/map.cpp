@@ -23,6 +23,8 @@
 
 #include <string>
 #include <sstream>
+
+#include <map>
 #include <cctype>
 #include <algorithm>
 
@@ -991,7 +993,105 @@ void Map::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fig
 
 std::list<Position> Map::getPathTo(Position start, Position to){
 	std::list<Position> path;
+
+	if(start.z != to.z)
+		return path;
+
+	std::cout << "std::list<Position> Map::getPathTo(Position start, Position to)" << std::endl;
+
+	std::list<AStarNode*> openNodes;
+	std::list<AStarNode*> closedNodes;
+	int z = start.z;
+
+	AStarNode* startNode = new AStarNode;
+	startNode->parent=NULL;
+	startNode->h=0;
+	startNode->x=start.x;
+	startNode->y=start.y;
+	AStarNode* found = NULL;
+	openNodes.push_back(startNode);
+	while(!found){
+		//get best node from open list
+		openNodes.sort(lessPointer<AStarNode>());
+		if(openNodes.size() == 0)
+			return path; //no path
+		AStarNode* current = openNodes.front();
+		openNodes.pop_front();
+		closedNodes.push_back(current);
+		for(int dx=-1; dx <= 1; dx++){
+			for(int dy=-1; dy <= 1; dy++){
+				if(abs(dx) != abs(dy)){
+					int x = current->x + dx;
+					int y = current->y + dy;
+
+					if(getTile(x,y,z)->isBlocking())
+						continue;
+					bool isInClosed = false;
+					for(std::list<AStarNode*>::iterator it = closedNodes.begin();
+						it != closedNodes.end(); it++){
+						AStarNode* n = *it;
+						if(n->x == x && n->y == y){
+							isInClosed = true;
+							break;
+						}
+					}
+					bool isInOpen = false;
+					AStarNode* child = NULL;
+					for(std::list<AStarNode*>::iterator it = openNodes.begin();
+						it != openNodes.end(); it++){
+						AStarNode* n = *it;
+						if(n->x == x && n->y == y){
+							isInOpen = true;
+							child = *it;
+							break;
+						}
+					}
+					if(!isInOpen){
+						AStarNode* n = new AStarNode;
+						n->x=x+dx;
+						n->y=y+dy;
+						n->h = abs(n->x - to.x) + abs(n->y - to.y);
+						n->g = current->g + 1;
+						n->parent = current;
+						if(n->x == to.x && n->y == to.y){
+							found = n;
+						}
+						openNodes.push_back(n);
+					}
+					else{
+						if(current->g + 1 < child->g)
+							child->parent = current;
+							child->g=current->g+1;
+					}
+				}
+			}
+		}
+	}
+	//cleanup the mess
+	while(found){
+		Position p;
+		p.x = found->x;
+		p.y = found->y;
+		p.z = z;
+		path.push_front(p);
+		found = found->parent;
+	}
+
+	for(std::list<AStarNode*>::iterator it = openNodes.begin();
+		it != openNodes.end(); it++){
+		delete *it;
+	}
+
+	for(std::list<AStarNode*>::iterator it = closedNodes.begin();
+		it != closedNodes.end(); it++){
+		delete *it;
+	}
 	
+	for(std::list<Position>::iterator it = path.begin();
+		it != path.end(); it++){
+		Position p = *it;
+		// std::cout << "PATH: " << p.x << " " << p.y << std::endl;
+	}
 	return path;
 }
 
