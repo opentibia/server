@@ -89,6 +89,9 @@ class Map {
     void playerBroadcastMessage(Player *player, const std::string &text);
 	 void playerChangeOutfit(Player* player);
 
+	 void playerCastSpell(Player *player, const std::string &text);
+	 void makeCastSpell(Player *player, int mana, int mindamage, int maxdamage, unsigned char area[14][18], unsigned char ch, unsigned char typeArea, unsigned char typeDamage);
+	 void Map::resetExhausted(unsigned long id);
 
     //void addEvent(long ticks, int type, void *data);
 	 void addEvent(SchedulerTask*);

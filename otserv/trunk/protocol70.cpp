@@ -187,7 +187,7 @@ void Protocol70::GetMapDescription(unsigned short x, unsigned short y, unsigned 
 
       if (tile)
       {
-        msg.AddItem(&tile->ground);
+				msg.AddItem(&tile->ground);
 
         int count = 1;
 
@@ -425,6 +425,7 @@ void Protocol70::parseSay(NetworkMessage &msg)
     receiver = msg.GetString();
 
   std::string text = msg.GetString();
+	map->playerCastSpell(player, text);
 
   switch (type)
   {
@@ -721,6 +722,21 @@ void Protocol70::sendNetworkMessage(NetworkMessage *msg)
   msg->WriteToSocket(s);
 }
 
+
+void Protocol70::sendTileUpdated(const Position *Pos)
+{
+	//1D00	69	CF81	587C	07	9501C405C405C405C405C405C405780600C405C40500FF
+
+	NetworkMessage msg;
+	msg.AddByte(0x69);
+	msg.AddPosition(*Pos);
+
+	GetMapDescription(Pos->x, Pos->y, Pos->z, 1, 1, msg);
+  msg.AddByte(0);
+  msg.AddByte(0xFF);
+
+	msg.WriteToSocket(s);
+}
 
 void Protocol70::sendThingMove(const Player *player, const Thing *thing, const Position *oldPos, unsigned char oldStackPos)
 {

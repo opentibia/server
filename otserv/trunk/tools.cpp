@@ -20,7 +20,22 @@
 
 
 #include <stdio.h>
+#include <stdlib.h>
 
+
+//////////////////////////////////////////////////
+// get a random value between lowest_number and highest_number
+int random_range(int lowest_number, int highest_number)
+{
+	if(lowest_number > highest_number){
+		int nTmp = highest_number;
+		highest_number = lowest_number;
+		lowest_number = nTmp;
+    }
+
+    int range = highest_number - lowest_number + 1;
+    return lowest_number + int(range * rand()/(RAND_MAX + 1.0));
+}
 
 //////////////////////////////////////////////////
 // dump a part of the memory to stderr.

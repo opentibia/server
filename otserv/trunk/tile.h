@@ -35,6 +35,7 @@ public:
 
   int getCreatureStackPos(Creature *c);
   int getThingStackPos(Thing *thing);
+	int getThingCount();
 
   Thing* getThingByStackPos(int pos);
 

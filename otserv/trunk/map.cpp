@@ -27,7 +27,6 @@
 using namespace std;
 
 #include "otsystem.h"
-
 #include <stdio.h>
 
 #include "items.h"
@@ -35,6 +34,7 @@ using namespace std;
 #include "tile.h"
 
 #include "player.h"
+#include "tools.h"
 
 #include "networkmessage.h"
 
@@ -651,7 +651,7 @@ void Map::thingMoveInternal(Player *player,
     unsigned char stackPos,
     unsigned short to_x, unsigned short to_y, unsigned char to_z)
 {
-  Thing *thing = getTile(from_x, from_y, from_z)->getThingByStackPos(stackPos);
+	Thing *thing = getTile(from_x, from_y, from_z)->getThingByStackPos(stackPos);
 
   if (thing)
   {
@@ -686,7 +686,7 @@ void Map::thingMoveInternal(Player *player,
 
         if (fromTile->removeThing(thing))
         {
-          toTile->addThing(thing);
+					toTile->addThing(thing);
 
           thing->pos.x = to_x;
           thing->pos.y = to_y;
@@ -716,8 +716,30 @@ void Map::thingMoveInternal(Player *player,
                   (*cit)->onThingMove(player, thing, &oldPos, oldstackpos);
                 }
               }
-            }
-        }
+						}
+
+						if(fromTile->getThingCount() > 8) {
+							//We need to pop up this item
+							Thing *newthing = fromTile->getThingByStackPos(9);
+							NetworkMessage msg;
+
+							if(newthing != NULL) {
+								CreatureVector::iterator cit;
+								for (int x = newthing->pos.x - 9; x <= newthing->pos.x + 9; x++)
+									for (int y = newthing->pos.y - 7; y <= newthing->pos.y + 7; y++)
+									{
+										Tile *tile = getTile(x, y, 7);
+										if (tile)
+										{
+											for (cit = tile->creatures.begin(); cit != tile->creatures.end(); cit++)
+											{
+												(*cit)->onTileUpdated(&oldPos);
+											}
+										}
+									}
+							}
+						}
+				}
       }
     }
   }
@@ -1095,12 +1117,17 @@ void Map::checkPlayer(unsigned long id)
 {
   OTSYS_THREAD_LOCK(mapLock)
 
-    Creature *creature = getCreatureByID(id);
+  Player *player = (Player*) getCreatureByID(id);
 
-  if (creature != NULL)
+  if (player != NULL)
   {
+	 addEvent(makeTask(1000, std::bind2nd(std::mem_fun(&Map::checkPlayer), id)));
 
-    addEvent(makeTask(1000, std::bind2nd(std::mem_fun(&Map::checkPlayer), id)));
+	 player->mana += min(10, player->manamax - player->mana);
+	 NetworkMessage msg;
+	 
+	 msg.AddPlayerStats(player);
+	 player->sendNetworkMessage(&msg);
   }
 
   OTSYS_THREAD_UNLOCK(mapLock)
@@ -1152,5 +1179,358 @@ void Map::CreateDamageUpdate(Player* player, Creature* attackCreature, int damag
   msg.AddTextMessage(MSG_EVENT, dmgmesg.str().c_str());
   if (player->health <= 0)
     msg.AddTextMessage(MSG_EVENT, "Own3d!");
+}
+
+
+void Map::resetExhausted(unsigned long id)
+{
+  OTSYS_THREAD_LOCK(mapLock)
+
+	Player *player = (Player*)getCreatureByID(id);
+
+  if (player != NULL)
+  {
+		player->exhausted = false;
+  }
+
+	OTSYS_THREAD_UNLOCK(mapLock)
+}
+
+void Map::makeCastSpell(Player *player, int mana, int mindamage, int maxdamage, unsigned char area[14][18], unsigned char ch, unsigned char typeArea, unsigned char typeDamage)
+{
+	NetworkMessage msg;
+	if(player->mana < mana || player->exhausted) {
+			msg.AddMagicEffect(player->pos, NM_ME_PUFF);
+			player->sendNetworkMessage(&msg);
+			return;
+	}
+
+	player->exhausted = true;
+	player->mana -= mana;
+	addEvent(makeTask(1200, std::bind2nd(std::mem_fun(&Map::resetExhausted), player->id)));
+
+	CreatureVector::iterator cit;
+
+	std::vector< std::pair<unsigned long, unsigned long> > spectatorlist;
+  std::pair<unsigned long, unsigned long> spectator;
+	
+	Position pos = player->pos;
+	pos.x -= 8;
+	pos.y -= 6;
+
+	for(int y = 0; y < 14; y++) {
+		for(int x = 0; x < 18; x++) {
+				Tile* tile = getTile(pos.x, pos.y, pos.z);
+				if (tile) {
+					if(tile->creatures.empty())
+					{
+						if(area[y][x] == ch)
+							msg.AddMagicEffect(pos, typeArea);
+					}
+					else 
+					for (cit = tile->creatures.begin(); cit != tile->creatures.end(); cit++) {
+						Player *p = (Player*)(*cit);
+
+						spectator.first  = p->getID();
+						spectator.second = 0;
+
+						if(area[y][x] == ch) {
+							if(p->access == 0) {
+								int damage = random_range(mindamage, maxdamage);
+
+								if(damage > p->health)
+									damage = p->health;
+
+								spectator.second = damage;
+
+								if(damage > 0) {
+									p->drainHealth(damage);
+									msg.AddMagicEffect(p->pos, typeDamage);
+
+									std::stringstream dmg;
+									dmg << damage;
+									msg.AddAnimatedText(p->pos, 0xB4, dmg.str());
+								
+
+								if (p->health <= 0)
+								{
+									// remove character
+									msg.AddByte(0x6c);
+									msg.AddPosition(p->pos);
+									msg.AddByte(tile->getThingStackPos(p));
+									msg.AddByte(0x6a);
+									msg.AddPosition(p->pos);
+									Item* item = new Item(2278);
+									msg.AddItem(item);
+									delete item;
+								}
+								else
+									msg.AddCreatureHealth(p);
+								}
+							}
+						else
+							msg.AddMagicEffect(p->pos, NM_ME_PUFF);
+
+						}
+						
+						spectatorlist.push_back(spectator);
+					}
+				}
+
+			pos.x += 1;
+		}
+		
+		pos.x -= 18;
+		pos.y += 1;
+		}
+
+	for (int i = 0; i < spectatorlist.size(); i++) {
+		Player* p = (Player*) getCreatureByID(spectatorlist[i].first);
+		Tile *tile = getTile(p->pos.x, p->pos.y, 7);
+
+		if(p->CanSee(player->pos.x, player->pos.y)) {
+			if (p != player && spectatorlist[i].second > 0) {
+				NetworkMessage newmsg;
+				
+				CreateDamageUpdate(p, player, spectatorlist[i].second, newmsg);
+				newmsg.AddPlayerStats(p);
+
+				p->sendNetworkMessage(&newmsg);
+			}
+
+			p->sendNetworkMessage(&msg);
+		}
+
+		if (p->health <= 0) {
+			tile->removeThing(p);
+			playersOnline.erase(playersOnline.find(p->getID()));
+			tile->addThing(new Item(2278));
+		}
+	}
+
+}
+
+void Map::playerCastSpell(Player *player, const std::string &text)
+{
+  OTSYS_THREAD_LOCK(mapLock)
+
+	if(strcmp(text.c_str(), "exura vita") == 0) {
+			NetworkMessage msg;
+			if(player->mana < 100 || player->exhausted) {
+					msg.AddMagicEffect(player->pos, NM_ME_PUFF);
+					player->sendNetworkMessage(&msg);
+			}
+			else {
+				player->exhausted = true;
+				player->mana -= 100;
+				addEvent(makeTask(1200, std::bind2nd(std::mem_fun(&Map::resetExhausted), player->id)));
+				
+				int base = player->level * 2 + player->maglevel * 3;
+				int min = (base * 2) / 2;
+				int max = ((base * 2.8)) / 2;
+				int newhealth = player->health + random_range(min, max); //player->health + 1+(int)(500.0*rand()/(RAND_MAX+1.0));
+				if(newhealth > player->healthmax)
+					newhealth = player->healthmax;
+
+				player->health = newhealth;
+				
+				msg.AddCreatureHealth(player);
+				msg.AddMagicEffect(player->pos, NM_ME_MAGIC_ENERGIE);
+
+				CreatureVector::iterator cit;
+				for (int x = player->pos.x - 9; x <= player->pos.x + 9; x++) {
+					for (int y = player->pos.y - 7; y <= player->pos.y + 7; y++) {
+
+						Tile *tile = getTile(x, y, 7);
+						if (tile)
+						{
+							for (cit = tile->creatures.begin(); cit != tile->creatures.end(); cit++)
+							{
+								if ((*cit)->isPlayer())
+								{
+									Player *p = (Player*)(*cit);
+									if(p->CanSee(player->pos.x, player->pos.y)) {
+										p->sendNetworkMessage(&msg);
+									}
+								}
+							}
+						}
+					}
+				}		
+			}
+	}
+	else if(strcmp(text.c_str(), "exevo gran mas vis") == 0) {
+
+			static unsigned char area[14][18] = {
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0},
+				{0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0},
+				{0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0},
+				{0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0},
+				{0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+			};
+
+		int base = player->level * 2 + player->maglevel * 3;
+		int min = ((base * 2.3) - 30) / 2;
+		int max = ((base * 3.0)) / 2;
+		makeCastSpell(player, 800, min, max, area, 1, NM_ME_EXPLOSION_AREA, NM_ME_EXPLOSION_DAMAGE);
+	}
+	else if(strcmp(text.c_str(), "exori vis") == 0) {
+
+			static unsigned char area[14][18] = {
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 2, 0, 3, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+			};
+
+		unsigned char ch = 0xFF;
+
+		switch(player->direction) {
+			case NORTH: ch = 1; break;
+			case WEST: ch = 2; break;
+			case EAST: ch = 3; break;
+			case SOUTH: ch = 4; break;
+		};
+
+		int base = player->level * 2 + player->maglevel * 3;
+		int min = (base * 1.1) / 2;
+		int max = (base * 1.0) / 2;
+		makeCastSpell(player, 20, min, max, area, ch, NM_ME_ENERGY_AREA, NM_ME_ENERGY_DAMAGE);
+	}
+	else if(strcmp(text.c_str(), "exori mort") == 0) {
+
+			static unsigned char area[14][18] = {
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 2, 0, 3, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+			};
+
+		unsigned char ch = 0xFF;
+
+		switch(player->direction) {
+			case NORTH: ch = 1; break;
+			case WEST: ch = 2; break;
+			case EAST: ch = 3; break;
+			case SOUTH: ch = 4; break;
+		};
+
+		int base = player->level * 2 + player->maglevel * 3;
+		int min = (base * 1.1) / 2;
+		int max = (base * 1.0) / 2;
+		makeCastSpell(player, 20, min, max, area, ch, NM_ME_MORT_AREA, NM_ME_MORT_AREA);
+	}
+	else if(strcmp(text.c_str(), "exori") == 0) {
+			static unsigned char area[14][18] = {
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+			};
+
+		int base = player->level * 2 + player->maglevel * 3;
+		int min = (base * 2.0) / 2;
+		int max = (base * 2.5) / 2;
+		makeCastSpell(player, 250, min, max, area, 1, 	NM_ME_HIT_AREA, NM_ME_HIT_AREA);
+	}
+	else if(strcmp(text.c_str(), "exevo mort hur") == 0) {
+			static unsigned char area[14][18] = {
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 2, 2, 2, 0, 0, 1, 0, 0, 3, 3, 3, 0, 0, 0},
+				{0, 0, 0, 2, 2, 2, 2, 2, 0, 3, 3, 3, 3, 3, 0, 0, 0},
+				{0, 0, 0, 2, 2, 2, 0, 0, 4, 0, 0, 3, 3, 3, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+			};
+
+		unsigned char ch = 0xFF;
+
+		switch(player->direction) {
+			case NORTH: ch = 1; break;
+			case WEST: ch = 2; break;
+			case EAST: ch = 3; break;
+			case SOUTH: ch = 4; break;
+		};
+
+		int base = player->level * 2 + player->maglevel * 3;
+		int min = (base * 2.0) / 2;
+		int max = (base * 2.5) / 2;
+		makeCastSpell(player, 250, min, max, area, ch, NM_ME_ENERGY_AREA, NM_ME_ENERGY_DAMAGE);
+	}
+	else if(strcmp(text.c_str(), "exevo vis lux") == 0) {
+			static unsigned char area[14][18] = {
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 2, 2, 2, 2, 0, 3, 3, 3, 3, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+			};
+
+		unsigned char ch = 0xFF;
+
+		switch(player->direction) {
+			case NORTH: ch = 1; break;
+			case WEST: ch = 2; break;
+			case EAST: ch = 3; break;
+			case SOUTH: ch = 4; break;
+		};
+
+		int base = player->level * 2 + player->maglevel * 3;
+		int min = (base * 1.2) / 2;
+		int max = (base * 2.0) / 2;
+		makeCastSpell(player, 100, min, max, area, ch, NM_ME_ENERGY_AREA, NM_ME_ENERGY_DAMAGE);
+	}
+
+	OTSYS_THREAD_UNLOCK(mapLock)
 }
 

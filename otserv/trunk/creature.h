@@ -100,6 +100,7 @@ private:
   virtual void onCreatureSay(const Creature *creature, unsigned char type, const std::string &text) { };
 
   virtual void onCreatureChangeOutfit(const Creature* creature) { };
+	virtual void onTileUpdated(const Position *Pos) { };
 
   friend class Map;
 

@@ -12,19 +12,19 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="Debug"
+			OutputDirectory="C:\otserv\"
 			IntermediateDirectory="Debug"
 			ConfigurationType="1"
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="/MT /D &quot;_X86_&quot; /c 
+				AdditionalOptions="/D &quot;_X86_&quot; /c 
 "
 				Optimization="0"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
+				RuntimeLibrary="1"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="TRUE"
@@ -33,7 +33,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="libxml2.lib liblua+crt.lib liblualib+crt.lib wsock32.lib /NODEFAULTLIB:libcmt.lib"
+				AdditionalOptions="libxml2.lib lualib.lib wsock32.lib /NODEFAULTLIB:libcmt.lib"
 				OutputFile="$(OutDir)/otserv.exe"
 				LinkIncremental="2"
 				GenerateDebugInformation="TRUE"
@@ -63,15 +63,15 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="Release"
+			OutputDirectory="C:\otserv\"
 			IntermediateDirectory="Release"
 			ConfigurationType="1"
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
-				RuntimeLibrary="4"
-				UsePrecompiledHeader="3"
+				RuntimeLibrary="0"
+				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="TRUE"
 				DebugInformationFormat="3"/>
@@ -79,6 +79,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalOptions="libxml2.lib lualib.lib wsock32.lib"
 				OutputFile="$(OutDir)/otserv.exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="TRUE"
@@ -224,6 +225,9 @@
 			</File>
 			<File
 				RelativePath="..\tile.h">
+			</File>
+			<File
+				RelativePath="..\tools.h">
 			</File>
 		</Filter>
 		<Filter

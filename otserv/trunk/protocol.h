@@ -54,6 +54,7 @@ public:
   virtual void sendCreatureTurn(const Creature *creature, unsigned char stackPos) = 0;
   virtual void sendCreatureSay(const Creature *creature, unsigned char type, const std::string &text) = 0;
   virtual void sendSetOutfit(const Creature* creature) = 0;
+	virtual void sendTileUpdated(const Position *Pos) = 0;
 
 protected:
   Map    *map;

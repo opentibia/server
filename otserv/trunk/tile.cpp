@@ -194,6 +194,11 @@ Thing* Tile::getThingByStackPos(int pos)
   return NULL;
 }
 
+int Tile::getThingCount()
+{
+	return 1 + topItems.size() + 	creatures.size() + downItems.size();
+}
+
 std::string Tile::getDescription(){
 /*	std::string ret;
 	std::cout << "Items: "<< size() << std::endl;

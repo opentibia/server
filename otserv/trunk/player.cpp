@@ -36,6 +36,7 @@ Player::Player(const char *name, Protocol *p) : Creature(name)
 {
   client     = p;
 
+	exhausted  = false;
 	looktype   = PLAYER_MALE_1;
 	voc        = 0;
 
@@ -50,7 +51,7 @@ Player::Player(const char *name, Protocol *p) : Creature(name)
   level      = 1;
   experience = 180;
 
-  maglevel   = 1;
+  maglevel   = 60;
 
   access     = 0;
 
@@ -179,3 +180,10 @@ void Player::onCreatureSay(const Creature *creature, unsigned char type, const s
 void Player::onCreatureChangeOutfit(const Creature* creature) {
 		  client->sendSetOutfit(creature);
 }
+
+void Player::onTileUpdated(const Position *Pos)
+{
+  client->sendTileUpdated(Pos);
+}
+
+

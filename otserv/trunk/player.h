@@ -85,6 +85,8 @@ public:
 
 	std::string getName(){return name;};
 
+	bool exhausted;
+
   int sex, voc;
   int cap;
 
@@ -110,7 +112,7 @@ public:
 
   void    setAttackedCreature(unsigned long id);
   unsigned long attackedCreature;
-
+	
   fight_t getFightType();
 
   bool CanSee(int x, int y);
@@ -125,6 +127,7 @@ protected:
   virtual void onCreatureTurn(const Creature *creature, unsigned char stackpos);
   virtual void onCreatureSay(const Creature *creature, unsigned char type, const std::string &text);
   virtual void onCreatureChangeOutfit(const Creature* creature);
+	virtual void onTileUpdated(const Position *Pos);
 
 	Protocol *client;
 

@@ -108,6 +108,7 @@ private:
   virtual void sendCreatureSay(const Creature *creature, unsigned char type, const std::string &text);
 
   void sendSetOutfit(const Creature* creature);
+	virtual void sendTileUpdated(const Position *Pos);
 
   virtual bool CanSee(int x, int y);
 
