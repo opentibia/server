@@ -485,7 +485,7 @@ void Protocol70::parseSay(NetworkMessage &msg)
 
   std::string text = msg.GetString();
 
-	map->playerCastSpell(player, text);
+	map->creatureCastSpell(player, text);
 
   switch (type)
   {
@@ -776,12 +776,13 @@ void Protocol70::sendTileUpdated(const Position *Pos)
   }
 }
 
-void Protocol70::sendThingMove(const Creature *player, const Thing *thing, const Position *oldPos, unsigned char oldStackPos)
+void Protocol70::sendThingMove(const Creature *creature, const Thing *thing, const Position *oldPos, unsigned char oldStackPos)
 
 {
   NetworkMessage msg;
 
-  if ((thing->isCreature()) && (CanSee(oldPos->x, oldPos->y)) && (CanSee(thing->pos.x, thing->pos.y)))
+	const Creature* c = dynamic_cast<const Creature*>(thing);
+  if (c && (CanSee(oldPos->x, oldPos->y)) && (CanSee(thing->pos.x, thing->pos.y)))
   {
     msg.AddByte(0x6D);
     msg.AddPosition(*oldPos);
@@ -801,8 +802,7 @@ void Protocol70::sendThingMove(const Creature *player, const Thing *thing, const
     {
       msg.AddByte(0x6A);
       msg.AddPosition(thing->pos);
-      if (thing->isCreature())
-      {
+      if (c) {
         bool known;
         unsigned long removedKnown;
         checkCreatureAsKnown(((Creature*)thing)->getID(), known, removedKnown);

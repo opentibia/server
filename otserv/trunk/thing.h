@@ -20,9 +20,6 @@ public:
 
   bool CanMovedTo(Tile *tile);
 
-  virtual bool isCreature() const { return false; };
-  virtual bool isPlayer() const { return false; };
-
   int ThrowRange;
 
   Position pos;

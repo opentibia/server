@@ -215,8 +215,8 @@ std::string Tile::getDescription(){
 
 bool Tile::removeThing(Thing *thing)
 {
-  if (thing->isCreature())
-  {
+	Creature* creature = dynamic_cast<Creature*>(thing);
+	if (creature) {
     CreatureVector::iterator it;
     for (it = creatures.begin(); it != creatures.end(); it++)
       if (*it == thing)
@@ -254,11 +254,10 @@ bool Tile::removeThing(Thing *thing)
 }
 
 
-void Tile::addThing(Thing *thing)
-{
-  if (thing->isCreature())
-  {
-    creatures.insert(creatures.begin(), (Creature*)thing);
+void Tile::addThing(Thing *thing) {
+	Creature* creature = dynamic_cast<Creature*>(thing);
+	if (creature) {
+    creatures.insert(creatures.begin(), creature);
   }
   else
   {

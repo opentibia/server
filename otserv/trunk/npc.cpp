@@ -148,7 +148,7 @@ void Npc::onThink(){
 
 
 void Npc::doSay(std::string msg){
-	map->playerCastSpell(this, msg);
+	map->creatureCastSpell(this, msg);
 	this->map->creatureSay(this, 1, msg);
 }
 
@@ -217,7 +217,7 @@ int NpcScript::registerFunctions(){
 
 Npc* NpcScript::getNpc(lua_State *L){
 	lua_getglobal(L, "addressOfNpc");
-	int val = lua_tonumber(L, -1);
+	int val = (int)lua_tonumber(L, -1);
 	lua_pop(L,1);
 
 	Npc* mynpc = (Npc*) val;
@@ -228,7 +228,7 @@ Npc* NpcScript::getNpc(lua_State *L){
 }
 
 int NpcScript::luaCreatureGetName(lua_State *L){
-	int id = lua_tonumber(L, -1);
+	int id = (int)lua_tonumber(L, -1);
 	lua_pop(L,1);
 	Npc* mynpc = getNpc(L);
 	lua_pushstring(L, mynpc->map->getCreatureByID(id)->getName().c_str());
@@ -236,7 +236,7 @@ int NpcScript::luaCreatureGetName(lua_State *L){
 }
 
 int NpcScript::luaCreatureGetPos(lua_State *L){
-	int id = lua_tonumber(L, -1);
+	int id = (int)lua_tonumber(L, -1);
 	lua_pop(L,1);
 	Npc* mynpc = getNpc(L);
 	Creature* c = mynpc->map->getCreatureByID(id);
@@ -277,7 +277,7 @@ int NpcScript::luaActionSay(lua_State* L){
 }
 
 int NpcScript::luaActionMove(lua_State* L){
-	int dir=lua_tonumber(L, -1);
+	int dir=(int)lua_tonumber(L, -1);
 	lua_pop(L,1);
 	Npc* mynpc=getNpc(L);
 	if(mynpc)
@@ -286,7 +286,7 @@ int NpcScript::luaActionMove(lua_State* L){
 }
 
 int NpcScript::luaActionAttackCreature(lua_State *L){
-	int id=lua_tonumber(L, -1);
+	int id=(int)lua_tonumber(L, -1);
 	lua_pop(L,1);
 	Npc* mynpc=getNpc(L);
 	if(mynpc)
