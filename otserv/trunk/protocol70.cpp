@@ -477,7 +477,7 @@ void Protocol70::sendIcons(int icons){
 void Protocol70::parseSetOutfit(NetworkMessage &msg)
 {
     int temp = msg.GetByte();
-    if((temp >= 136 && temp <= 139) || (temp >= 128 && temp <= 131)){ 
+    if ( (player->sex == 0 && temp >= 136 && temp <= 139) || (player->sex == 1 && temp >= 128 && temp <= 131)){ 
 	player->looktype= temp;
 	player->lookmaster = player->looktype;
 	player->lookhead=msg.GetByte();

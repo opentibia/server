@@ -1198,7 +1198,8 @@ void Map::creatureMakeMagic(Creature *creature, const EffectInfo &ei)
 
 										msg.AddByte(0x6a);
 										msg.AddPosition(target->pos);
-										msg.AddItem(&Item(1437, 2));
+										Item item = Item(1437, 2);
+										msg.AddItem(&item);
 									}
 
 									if (spectator == target){
@@ -1445,7 +1446,8 @@ void Map::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fig
                 }
                 msg.AddByte(0x6a);
                 msg.AddPosition(attackedCreature->pos);
-                msg.AddItem(&Item(1437, 2));
+                Item item = Item(1437, 2);
+                msg.AddItem(&item);
                 }
 							}
 						}
