@@ -44,7 +44,7 @@ private:
   int atoport(char *service, char *proto);
   struct in_addr *atoaddr(char *address);
 public:
-  ServerSocket();
+  //ServerSocket();
   ServerSocket(Socket _sock = 7171, int _maxconnections = 100);
   ~ServerSocket();
 };

@@ -128,6 +128,7 @@ ServerSocket::ServerSocket(Socket _sock = 7171, int _maxconnections = 100) : new
   serversocket = make_socket(SOCK_STREAM, _sock);
   es.newsocket(serversocket, &newconnection);
 }
+#if 0
 // odd! doesnt the above constructor suffice?
 ServerSocket::ServerSocket() : newconnection(*this) {
   maxconnections = 100;
@@ -135,7 +136,7 @@ ServerSocket::ServerSocket() : newconnection(*this) {
   serversocket = make_socket(SOCK_STREAM, 7171);
   es.newsocket(serversocket, &newconnection);
 }
-
+#endif
 //////////////////////////////////////////////////
 // free the socket for use by other programs.
 ServerSocket::~ServerSocket() {
@@ -155,9 +156,7 @@ void ServerSocket::newconnection::operator()(const Socket &_sock) {
   }
   // if too many connections, send a message over cs and close it
   ss.connections++;
-#if 0
   fprintf(stderr, "ip= %s, p= %hd.\n", inet_ntoa(clientname.sin_addr), ntohs(clientname.sin_port));
-#endif
 
   Creatures::Player *bla = new Creatures::Player(cs);
   es.newsocket(cs, bla->cb());

@@ -21,6 +21,6 @@
 extern EventScheduler es;
 
 main() {
-  ServerSocket ss();
+  ServerSocket ss;
   es.loop();
 }
