@@ -149,7 +149,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
       Account account;
       if (account.openPlayer(name, password, *player))
       {
-		if(gmap.getCreatureByName(name.c_str()) != NULL){
+		  if(gmap.getCreatureByName(name.c_str()) != NULL && ! g_config.getGlobalNumber("allowclones", 0)){
 					std::cout << "reject player..." << std::endl;
 				    msg.Reset();
 				    msg.AddByte(0x14);
