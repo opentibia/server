@@ -21,6 +21,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.19  2003/11/05 23:28:24  tliffrag
+// Addex XML for players, outfits working
+//
 // Revision 1.18  2003/11/03 12:16:01  tliffrag
 // started walking by mouse
 //
@@ -132,52 +135,8 @@ namespace TNetwork {
         return NULL;
     }
 
-#if 0
-    void write_to_host(int _filedes, unsigned char _message[MAXMSG]) {
-        int nbytes;
 
-        if (_filedes!=1) nbytes=write(_filedes, _message, MAXMSG); // schreiben
-        fprintf(stderr, "%s an %i\n", _message, _filedes);
-        if (nbytes<=0) perror("write");        // fehler
-    }
-#endif
 
-#if 0
-    //////////////////////////////////////////////////
-    // creates the socket that can accept connections.
-    Socket ServerSocket::make_socket(int _socket_type, u_short _port) {
-        // creating socket
-        struct protoent *protox = (struct protoent *) getprotobyname("tcp");
-        Socket sock = socket(AF_INET, _socket_type, protox->p_proto);
-        if (sock < 0) {
-            perror("socket");
-            exit(EXIT_FAILURE);
-        }
-
-        // Internet address information
-        struct sockaddr_in address;
-        memset((char *) &address, 0, sizeof (address));
-        address.sin_family = AF_INET;
-        address.sin_port   = htons(_port);
-        address.sin_addr.s_addr = htonl(INADDR_ANY);
-
-        // set O_NONBLOCK flag!
-        int reuse_addr = 1;
-        setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &reuse_addr, sizeof (reuse_addr));
-
-        if (bind(sock, (struct sockaddr *) &address, sizeof (address)) < 0) {
-            perror("bind");
-            CloseSocket(sock);
-            exit(EXIT_FAILURE);
-        }
-        if (listen(sock, 10) < 0) { // maximum 10 pending connections
-            perror("listen");
-            CloseSocket(sock);
-            exit(EXIT_FAILURE);
-        }
-        return sock;
-    }
-#endif
 
     //////////////////////////////////////////////////
     // This class listens on a port to create connections.

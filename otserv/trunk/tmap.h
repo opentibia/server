@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.15  2003/11/05 23:28:24  tliffrag
+// Addex XML for players, outfits working
+//
 // Revision 1.14  2003/11/03 12:16:01  tliffrag
 // started walking by mouse
 //
@@ -71,8 +74,8 @@
 #include "item.h"
 #include "creature.h"
 #include <vector>
-#include <libxml/xmlmemory.h>
-#include <libxml/parser.h>
+#include <libxml2/libxml/xmlmemory.h>
+#include <libxml2/libxml/parser.h>
 
 #define GETTILEBYPOS(pos) (tiles[pos.x-MINX][pos.y-MINY])
 

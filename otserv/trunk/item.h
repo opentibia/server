@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.7  2003/11/05 23:28:23  tliffrag
+// Addex XML for players, outfits working
+//
 // Revision 1.6  2003/11/01 15:58:52  tliffrag
 // Added XML for players and map
 //
@@ -40,12 +43,18 @@
 #ifndef __OTSERV_ITEM_H
 #define __OTSERV_ITEM_H
 
+#include <iostream>
 #include <list>
 #include <vector>
-#include <libxml/xmlmemory.h>
-#include <libxml/parser.h>
+#include <libxml2/libxml/xmlmemory.h>
+#include <libxml2/libxml/parser.h>
 #include "texcept.h"
 #include "items.h"
+
+
+#ifndef __creature_h
+class Creature;
+#endif
 
 class Item {
     private:
@@ -67,6 +76,9 @@ class Item {
 		bool isAlwaysOnTop();
 		bool isGroundTile();
 		bool isAlwaysOnBottom();
+		int use(){std::cout << "use " << id << std::endl; return 0;};
+		int use(Item*){std::cout << "use with item ptr " << id << std::endl; return 0;};
+		int use(Creature*){std::cout << "use with creature ptr " << id << std::endl; return 0;};
 		std::string getDescription();
 		int unserialize(xmlNodePtr p);
 		xmlNodePtr serialize();
@@ -80,7 +92,7 @@ class Item {
 
         ~Item();
 
-        // definition for iterator over backpack items
+        // definition for iterator over backpack itemsfclose(f);
         typedef std::list<Item *>::const_iterator iterator;
         iterator getItems();     // begin();
         iterator getEnd();       // iterator beyond the last element

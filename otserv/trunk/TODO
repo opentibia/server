@@ -1,8 +1,9 @@
-fix 1265/1263: counter
+make sure, no message a client sends may crash the server
+make sure, no message a client sends may crash a client
+fix 1265/1263: counter doesnt work to walk through
 multiplayer: twice when out of screen and back
 add more methods to creature
-make a system, that messages an be queued up a buffer before sending
-implement a better callback system in event handler
+make a system, so that messages can be queued up a buffer before sending
 impelemtnt lua support
 telnet protocoll
 opening items

@@ -106,16 +106,10 @@ void TProt70::clread(const Socket& sock) throw() {
 #endif
   
   if (nbytes < 0) { // error
-    std::cerr << "read" << std::endl;
-    exit(-1);
   } else if (nbytes == 0) { // eof (means logout)
 	parseLogout(NULL, "");
   } else {  // lesen erfolgreich
     buffer[nbytes] = 0;
-#ifdef __DEBUG__
-    std::cout << "read" << std::endl;
-#endif
-    //TODO message bearbeiten
     std::string s= std::string(buffer, nbytes);;
     parsePacket(s);
    }
@@ -123,18 +117,13 @@ void TProt70::clread(const Socket& sock) throw() {
 
 void TProt70::parsePacket(std::string msg){
   msg.erase(0,2);
-				//i just hope CIP was intelligent enough to make the 3. byte unique
-				//i guess they were not
   Action* action= new Action;
   action->pos1=player->pos;
   action->creature=this->creature;
-#ifdef __DEBUG__
-  std::cout << "byte is " << (int)msg[0]<<std::endl;
-#endif
-  
+
   
   switch( msg[0] ){
-  case 0x14: //logout TODO remove player for others
+  case 0x14: //logout
     parseLogout(action, msg);
     break;
   case 0x65: //move north
@@ -163,6 +152,9 @@ void TProt70::parsePacket(std::string msg){
     break;
   case 0x78: //throw item
     parseThrow(action, msg);
+    break;
+ case 0x82: //throw item
+    parseUseItem(action, msg);
     break;
  case 0x8C: //throw item
     parseLookAt(action, msg);
@@ -195,13 +187,14 @@ void TProt70::parsePacket(std::string msg){
 }
 
 int TProt70::doAction(Action* action){
-  if(action->type!=ACTION_NONE){
-  	switch(map->requestAction(creature,action)){
-		case TMAP_ERROR_TILE_OCCUPIED:
-			sendPlayerSorry(TMAP_ERROR_TILE_OCCUPIED);
-		break;
+	if(action->type!=ACTION_NONE){
+		switch(map->requestAction(creature,action)){
+			case TMAP_ERROR_TILE_OCCUPIED:
+				sendPlayerSorry(TMAP_ERROR_TILE_OCCUPIED);
+			break;
+		}
 	}
-  }
+	return 0;
 }
 
 void TProt70::setMap(position newpos, Map& newmap) throw(texception) {
@@ -341,7 +334,7 @@ std::string TProt70::makeMap(position topleft, position botright) {
 			buf+=makeItem(*it);
 		}
 		if(tile->getCreature()!=NULL){
-			std::cout << "creature" << std::endl;
+
 			buf += makeCreature(tile->getCreature());
 		}
 		buf+=(char)0x00; // no special thing
@@ -384,14 +377,12 @@ std::string TProt70::makeCreature(Creature* c){
 std::string buf="";
 
 //TODO unify this so that !isPlayer is no longer needed
-if(c && c->isPlayer())
-	{
+if(c){
 	bool knows=true;
-	player_mem p=((Player*)c)->player;
 	//PLAYER??
-		if(!this->knowsPlayer(p.pnum)){
-				addKnownPlayer(p.pnum);
-			knows=false;
+	if(!this->knowsPlayer(c->getID())){
+			addKnownPlayer(c->getID());
+		knows=false;
 	}
 	if(knows){
 	buf += (char)0x62;
@@ -406,67 +397,25 @@ if(c && c->isPlayer())
 
 	buf += (char)0x00; //seperator?
 }
-	buf += (char)(p.pnum%256);
-	buf += (char)(p.pnum/256)%256;
-	buf += (char)(p.pnum/(256*256))%256;
-	buf += (char)(p.pnum/(256*256*256))%256;
+	ADD4BYTE(buf,c->getID());
 	if(!knows){
-		ADD2BYTE(buf, p.name.length());
-		buf+=p.name;
+		std::string tmpname=c->getName();
+		ADD2BYTE(buf, tmpname.length());
+		buf+=tmpname;
 	}
 	buf += (char)0x64;//FIXME health
 
 	buf += (char)0x01; //FACING
 
-	buf += (char)0x88;//looktype
+	buf+=c->getLook();
 
-	buf += (char)p.lookhead;
-	buf += (char)p.lookbody;
-	buf += (char)p.looklegs;
-	buf += (char)p.lookfeet;
 	buf += (char)0x00; //NOTHING? light
 	buf += (char)0xD7; //NOTHING? speed
 
-	buf += (char)0xDC;//NOTHING?
+	buf += (char)0xDC;//speed
 	buf += (char)0x00;
 	}
 
-else{
-	buf += (char)0x61;
-	buf += (char)0x00;
-	buf += (char)0x00;
-	buf += (char)0x00;
-	buf += (char)0x00;
-
-	buf += (char)0x00; //seperator?
-
-	buf += (char)10;
-	buf += (char)10;
-	buf += (char)10;
-	buf += (char)10;
-
-	std::string name="Ruediger";
-	ADD2BYTE(buf, name.length());
-	buf+=name;
-	buf += (char)0x64;//SEPERATOR
-
-	buf += (char)0x01; //FACING
-
-	buf += (char)0x88;//FIX
-
-	buf += (char)217;
-	buf += (char)123;
-	buf += (char)45;
-	buf += (char)1;
-	buf += (char)0x00; //NOTHING?
-
-	buf += (char)0xD7; //NOTHING?
-	buf += (char)0xDC;//NOTHING?
-
-
-	buf += (char)0x00;
-	//FIXME implement creatures
-}
 return buf;
 }
 
@@ -527,25 +476,39 @@ void TProt70::parseRequestOutfit(Action* action, std::string msg){
 	action->creature=creature;
 }
 
-void TProt70::parseSetOutfit(Action* action, std::string msg){
+void TProt70::parseUseItem(Action* action, std::string msg){
+	action->type=ACTION_ITEM_USE;
+	action->pos1.x=(unsigned char)msg[2]*256+(unsigned char)msg[1];
+	action->pos1.y=(unsigned char)msg[4]*256+(unsigned char)msg[3];
+	action->pos1.z=(unsigned char)msg[5];
+	action->stack=(unsigned char)msg[8];
+	action->creature=creature;
 
+}
+
+void TProt70::parseSetOutfit(Action* action, std::string msg){
+	//TODO check for sex SCNR ;)
+	action->type = ACTION_CHANGE_APPEARANCE;
+	action->creature=creature;
+	player->looktype=msg[1];
+	player->lookhead=msg[2];
+	player->lookbody=msg[3];
+	player->looklegs=msg[4];
+	player->lookfeet=msg[5];
 }
 
 void TProt70::parseLogout(Action* action, std::string msg){
     // if this is a player then save the player's data
 	std::cout << "Logging out" << std::endl;
-    if( creature->isPlayer() )
-    {
         // save the character before we logout
-        this->player->save();
-    }
 	//we ask the map to remove us
 	map->removeCreature(player->pos);
 	//we ask the eventscheduler to disconnect us
 	es.deletesocket(psocket);
 	close(psocket);
 	//we remove ourself
-	delete this;
+	delete creature;
+//	delete this;
 }
 
 void TProt70::parseThrow(Action* action, std::string msg){
@@ -707,13 +670,12 @@ void TProt70::parseAttack(Action* action, std::string msg){
 void TProt70::sendAction(Action* action){
 	std::string buf = "  ";
 	#ifdef __DEBUG__
-	std::cout << "I got an action" << std::endl;
 	#endif
 	if(action->type==ACTION_SAY){
 		buf+=(char)0xAA;
 		ADD2BYTE(buf,action->playername.length());
 		buf+=action->playername;
-		buf+=(char)action->stack;
+		buf+=(char)0x01;
 		ADD2BYTE(buf, action->pos1.x);
 		ADD2BYTE(buf, action->pos1.y);
 		buf+=(char)action->pos1.z;
@@ -756,6 +718,9 @@ void TProt70::sendAction(Action* action){
 	}
 	if(action->type==ACTION_REQUEST_APPEARANCE){
 		sendPlayerAppearance(action);
+	}
+	if(action->type==ACTION_CHANGE_APPEARANCE){
+		sendPlayerChangeAppearance(action);
 	}
 	//TODO free a;
 }
@@ -811,7 +776,6 @@ void TProt70::sendPlayerMove(Action* action){
 		ADD2BYTE(buf, action->pos2.y);
 		buf+=(char)action->pos2.z;
 		if(action->pos1==player->pos){
-			std::cout << "We are the player that moved" << std::endl;
 			//if we are the player that moved
 			//we need to add a new map
 			buf+=(char)(0x65+action->direction);
@@ -919,6 +883,16 @@ void TProt70::sendPlayerLogout(Action* action){
 	TNetwork::SendData(psocket,buf);
 }
 
+void TProt70::sendPlayerChangeAppearance(Action* action){
+	std::string buf = "  ";
+	buf+=(char)0x8E;
+	ADD4BYTE(buf, action->creature->getID());
+	buf+=action->creature->getLook();
+	buf[0]=(char)(buf.size()-2)%256;
+	buf[1]=(char)((buf.size()-2)/256)%256;
+	TNetwork::SendData(psocket,buf);
+}
+
 
 void TProt70::sendPlayerSorry(){
 	sendPlayerSorry("Sorry. Not possible");
@@ -962,7 +936,7 @@ void TProt70::sendPlayerAppearance(Action* action){
 	std::string buf = "  ";
 	buf+=(char)0xC8;
 
-	buf += (char)PLAYER_FEMALE_1;//FIX
+	buf += (char)player->looktype;//FIX
 	buf += (char)player->lookhead;
 	buf += (char)player->lookbody;
 	buf += (char)player->looklegs;
@@ -1001,15 +975,16 @@ void TProt70::sendPlayerItemChange(Action* action){
 }
 
 void TProt70::sendPlayerTurn(Action* action){
-	sendInventory();
 	std::string buf = "  ";
 	buf+=(char)(0x6B);
 	ADDPOS(buf, action->pos1);
 	buf+=(char)action->stack;//stack?
+	//buf+=makeCreature(action->creature);
 	buf+=(char)(0x63);
 	buf+=(char)(0x00);
-	ADD4BYTE(buf,action->creature->id);
+	ADD4BYTE(buf,action->creature->getID());
 	buf+=(char)(action->direction);
+
 	buf[0]=(char)(buf.size()-2)%256;
 	buf[1]=(char)((buf.size()-2)/256)%256;
 	TNetwork::SendData(psocket,buf);
@@ -1022,7 +997,7 @@ int TProt70::sendInventory(){
 		if(creature->getItem(i)!=NULL){
 			buf+= (char)0x78;
 			buf+= (char)(i);
-			std::cout << "Adding item on pos " << i << std::endl;
+//			std::cout << "Adding item on pos " << i << std::endl;
 			buf+=makeItem(creature->getItem(i));
 		}
 		else{

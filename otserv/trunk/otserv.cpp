@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.14  2003/11/05 23:28:23  tliffrag
+// Addex XML for players, outfits working
+//
 // Revision 1.13  2003/11/03 12:16:01  tliffrag
 // started walking by mouse
 //
@@ -49,6 +52,7 @@
 //
 //////////////////////////////////////////////////////////////////////
 #include <string>
+#include <iostream>
 #include "serversocket.h"
 #include <stdlib.h>
 #include <time.h>
@@ -72,6 +76,7 @@ int main(int argc, char *argv[]) {
 	g_serverip=ipFromDotted(ip);;
 	srand(time(NULL));
     TNetwork::ServerSocket ss;
+	std::cout << "Otserv running..." << std::endl;
     es.loop();
 }
 
@@ -89,7 +94,7 @@ int ipFromDotted(char* _ip){
     ip.erase(0,1);
     num+=atoi(t.c_str()) << i*8;
   }
-  printf("\n%i\n", num);
+  //printf("\n%i\n", num);
   return num;
 }
 

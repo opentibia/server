@@ -22,6 +22,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.13  2003/11/05 23:28:24  tliffrag
+// Addex XML for players, outfits working
+//
 // Revision 1.12  2003/11/03 22:48:14  tliffrag
 // Changing look, walking by mouse working
 //
@@ -129,6 +132,7 @@
 			void parseAttack(Action* action, std::string msg);
 			void parseLogout(Action* action, std::string msg);
 			void parseThrow(Action* action, std::string msg);
+			void parseUseItem(Action* action, std::string msg);
 
 			void sendPlayerMove(Action* action);
 			void sendPlayerLogin(Action* action);
@@ -139,6 +143,7 @@
 			void sendPlayerItemChange(Action* action);
 			void sendPlayerItemDisappear(Action* action);
 			void sendPlayerAppearance(Action* action);
+			void sendPlayerChangeAppearance(Action* action);
 
 			void sendPlayerSorry();
 			void sendPlayerSorry(tmapEnum);

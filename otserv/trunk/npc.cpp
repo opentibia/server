@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.3  2003/11/05 23:28:23  tliffrag
+// Addex XML for players, outfits working
+//
 // Revision 1.2  2003/10/21 17:55:07  tliffrag
 // Added items on player
 //
@@ -50,7 +53,6 @@ namespace Creatures {
   }
 
   void NPC::sendAction(Action* action){
-    std::cout << "Got an action" << std::endl;
     /*switch(action->type){
     case ACTION_SAY:
 

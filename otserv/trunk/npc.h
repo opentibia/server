@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.3  2003/11/05 23:28:23  tliffrag
+// Addex XML for players, outfits working
+//
 // Revision 1.2  2003/10/21 17:55:07  tliffrag
 // Added items on player
 //
@@ -57,7 +60,22 @@ class NPC : public Creature {
 	int addItem(Item* item, slots_t pos);
 
   void sendAction(Action*);
-  
+  int tick(double){return 0;}
+
+	int addAction(Action*){return true;};
+
+	int clearActionQueue(){return true;};
+
+	std::string getLook(){
+		std::string tmp;
+		tmp+=(char)0x80;
+		tmp+=(char)0x00;
+		tmp+=(char)0x00;
+		tmp+=(char)0x00;
+		tmp+=(char)0x00;
+		return tmp;
+	}
+
   std::string getName(){
     return name;
   }

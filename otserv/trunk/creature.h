@@ -26,7 +26,6 @@
 #include "action.h"
 #include "item.h"
 #include "definitions.h"
-#include <iostream>
 #include "tmap.h"
 
 enum playerLooks{
@@ -57,7 +56,7 @@ class Creature {
 
 		virtual bool isPlayer(){return false;}
 
-		virtual unsigned long getID()=0;
+		virtual unsigned long getID(){return id;}
 
 		virtual void sendAction(Action*){}
 
@@ -68,6 +67,9 @@ class Creature {
 		virtual int addAction(Action*)=0;
 
 		virtual int clearActionQueue()=0;
+
+		virtual std::string getLook()=0;
+		virtual std::string getName()=0;
 
 		virtual int addItem(Item* item, int pos){return 0;};
 

@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.16  2003/11/05 23:28:24  tliffrag
+// Addex XML for players, outfits working
+//
 // Revision 1.15  2003/11/03 12:16:01  tliffrag
 // started walking by mouse
 //
@@ -56,6 +59,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <string>
+#include <algorithm>
 #include "player_mem.h"
 
 player_mem::~player_mem(){
@@ -67,9 +71,11 @@ player_mem::player_mem(){
 	lookbody=rand()%256;
 	looklegs=rand()%256;
 	lookfeet=rand()%256;
+	looktype=0x88;
 	pnum=rand();
 	lookdir=1;
 	sex=0;
+	voc=0;
 
 	//set item pointers to NULL
 	for(int i=0; i < 11; i++)
@@ -81,20 +87,18 @@ player_mem::player_mem(){
 
 	item= new Item(0x582);
 	items[SLOT_BACKPACK]=item;
-	/*
-	items[SLOT_BACKPACK]=item;
+
 	item= new Item(0x759);
-	addItem(item, SLOT_ARMOR);
+	items[SLOT_ARMOR]=item;
 
-items[SLOT_BACKPACK]=item;
 	item= new Item(0x689);
-	addItem(item, SLOT_RIGHT);
+	items[SLOT_RIGHT]=item;
 
-	items[SLOT_BACKPACK]=item;
+
 	item= new Item(0x5B2);
-	addItem(item, SLOT_LEFT);
+	items[SLOT_LEFT]=item;;
 
-*/
+
 
 	// default values
 	// these will be changed when the character file is loaded, if one exists
@@ -113,153 +117,16 @@ items[SLOT_BACKPACK]=item;
     {
         skills[ i ][ SKILL_LEVEL ] = 10;
         skills[ i ][ SKILL_TRIES ] = 0;
-        std::cout<<"skills["<<i<<"] = "<<skills[i][SKILL_TRIES]<<std::endl;
     }
-
 }
     // player's name must be set before calling load()
-    void player_mem::load() {std::cout << "loading player " << name << "...\n";
- /*       std::cout << "player name is " << name << std::endl;
-        std::string charstr = name + ".chr";
-        
-        // FIXME: this doesn't work, how do you change directory?
-        // must create the directory if it doesn't exist
-        //char * filepath = "\\players";
-        //chdir( filepath );
-
-        // FIXME/TODO: Use a pointer to a function since load() and save() are so similar
-        //        char mode = 'l';
-        //        if( mode == 'l' )
-        //          readWrite = (void *)readVal;
-        //        else
-        //          readWrite = writeVal;
-
-        // open up the character file
-        FILE* charfile = fopen( charstr.c_str(), "r+t" );
-        if( charfile != NULL )
-        {std::cout<<"opened character file for reading..."<<std::endl;
-			// FIXME: don't need to pass these names (2nd param), i will fix soon!
-			health = readVal( charfile );
-			health_max = readVal( charfile );
-			mana = readVal( charfile );
-			mana_max = readVal( charfile );
-			food_level = readVal( charfile );
-			cap = readVal( charfile );
-			cap_max = readVal( charfile );
-			level = readVal( charfile );
-			experience = readVal( charfile );
-			mag_level = readVal( charfile );
-			mana_spent = readVal( charfile );
-			
-			skills[ SKILL_FIST ][ SKILL_LEVEL ] = readVal( charfile );
-			skills[ SKILL_FIST ][ SKILL_TRIES ] = readVal( charfile );
-			skills[ SKILL_CLUB ][ SKILL_LEVEL ] = readVal( charfile );
-			skills[ SKILL_CLUB ][ SKILL_TRIES ] = readVal( charfile );
-			skills[ SKILL_SWORD ][ SKILL_LEVEL ] = readVal( charfile );
-			skills[ SKILL_SWORD ][ SKILL_TRIES ] = readVal( charfile );
-			skills[ SKILL_AXE ][ SKILL_LEVEL ] = readVal( charfile );
-			skills[ SKILL_AXE ][ SKILL_TRIES ] = readVal( charfile );
-			skills[ SKILL_DIST ][ SKILL_LEVEL ] = readVal( charfile );
-			skills[ SKILL_DIST ][ SKILL_TRIES ] = readVal( charfile );
-			skills[ SKILL_SHIELD ][ SKILL_LEVEL ] = readVal( charfile );
-			skills[ SKILL_SHIELD ][ SKILL_TRIES ] = readVal( charfile );
-			skills[ SKILL_FISH ][ SKILL_LEVEL ] = readVal( charfile );
-			skills[ SKILL_FISH ][ SKILL_TRIES ] = readVal( charfile );
+    void player_mem::load() {
 
 
-            readVal( charfile, "health", (unsigned long)health );
-            readVal( charfile, "health_max", (unsigned long)health_max );
-            readVal( charfile, "mana", (unsigned long)mana );
-            readVal( charfile, "mana_max", (unsigned long)mana_max );
-            readVal( charfile, "food_level", (unsigned long)food_level );
-            readVal( charfile, "cap", (unsigned long)cap );
-            readVal( charfile, "cap_max", (unsigned long)cap_max );
-            readVal( charfile, "level", (unsigned long)level );
-            readVal( charfile, "experience", (unsigned long)experience );
-            readVal( charfile, "mag_level", (unsigned long)mag_level );
-            readVal( charfile, "mana_spent", (unsigned long)mana_spent );
-
-            readVal( charfile, "skill_fist", skills[ SKILL_FIST ][ SKILL_LEVEL ] );
-            readVal( charfile, "skill_fist_tries", skills[ SKILL_FIST ][ SKILL_TRIES ] );
-            
-            readVal( charfile, "skill_club", skills[ SKILL_CLUB ][ SKILL_LEVEL ] );
-            readVal( charfile, "skill_club_tries", skills[ SKILL_CLUB ][ SKILL_TRIES ] );
-
-            readVal( charfile, "skill_sword", skills[ SKILL_SWORD ][ SKILL_LEVEL ] );
-            readVal( charfile, "skill_sword_tries", skills[ SKILL_SWORD ][ SKILL_TRIES ] );
-
-            readVal( charfile, "skill_axe", skills[ SKILL_AXE ][ SKILL_LEVEL ] );
-            readVal( charfile, "skill_axe_tries", skills[ SKILL_AXE ][ SKILL_TRIES ] );
-
-            readVal( charfile, "skill_dist", skills[ SKILL_DIST ][ SKILL_LEVEL ] );
-            readVal( charfile, "skill_dist_tries", skills[ SKILL_DIST ][ SKILL_TRIES ] );
-
-            readVal( charfile, "skill_shield", skills[ SKILL_SHIELD ][ SKILL_LEVEL ] );
-            readVal( charfile, "skill_shield_tries", skills[ SKILL_SHIELD ][ SKILL_TRIES ] );
-
-            readVal( charfile, "skill_fish", skills[ SKILL_FISH ][ SKILL_LEVEL ] );
-            readVal( charfile, "skill_fish_tries", skills[ SKILL_FISH ][ SKILL_TRIES ] );
-
-            
-            // close the file
-            fclose( charfile );
-        }
-        else
-        {
-            std::cout << "ERROR: No character file exists for that character!\n";
-        }
-		*/
     } // player_mem::load()
 
     void player_mem::save() {
-/*        std::cout << "player name is " << name << std::endl;
-        std::string charstr = name + ".chr";
 
-        // open up the character file
-        FILE* charfile = fopen( charstr.c_str(), "wt" );
-        //if( fopen( charstr.c_str(), "wt" ) != NULL )
-        if( charfile != NULL )
-        {std::cout<<"opened the character file for writing"<<std::endl;
-            writeVal( charfile, "health", health );
-            writeVal( charfile, "health_max", health_max );
-            writeVal( charfile, "mana", mana );
-            writeVal( charfile, "mana_max", mana_max );
-            writeVal( charfile, "food_level", food_level );
-            writeVal( charfile, "cap", cap );
-            writeVal( charfile, "cap_max", cap_max );
-            writeVal( charfile, "level", level );
-            writeVal( charfile, "experience", experience );
-            writeVal( charfile, "mag_level", mag_level );
-            writeVal( charfile, "mana_spent", mana_spent );
-
-            writeVal( charfile, "skill_fist", skills[ SKILL_FIST ][ SKILL_LEVEL ] );
-            writeVal( charfile, "skill_fist_tries", skills[ SKILL_FIST ][ SKILL_TRIES ] );
-            
-            writeVal( charfile, "skill_club", skills[ SKILL_CLUB ][ SKILL_LEVEL ] );
-            writeVal( charfile, "skill_club_tries", skills[ SKILL_CLUB ][ SKILL_TRIES ] );
-
-            writeVal( charfile, "skill_sword", skills[ SKILL_SWORD ][ SKILL_LEVEL ] );
-            writeVal( charfile, "skill_sword_tries", skills[ SKILL_SWORD ][ SKILL_TRIES ] );
-
-            writeVal( charfile, "skill_axe", skills[ SKILL_AXE ][ SKILL_LEVEL ] );
-            writeVal( charfile, "skill_axe_tries", skills[ SKILL_AXE ][ SKILL_TRIES ] );
-
-            writeVal( charfile, "skill_dist", skills[ SKILL_DIST ][ SKILL_LEVEL ] );
-            writeVal( charfile, "skill_dist_tries", skills[ SKILL_DIST ][ SKILL_TRIES ] );
-
-            writeVal( charfile, "skill_shield", skills[ SKILL_SHIELD ][ SKILL_LEVEL ] );
-            writeVal( charfile, "skill_shield_tries", skills[ SKILL_SHIELD ][ SKILL_TRIES ] );
-
-            writeVal( charfile, "skill_fish", skills[ SKILL_FISH ][ SKILL_LEVEL ] );
-            writeVal( charfile, "skill_fish_tries", skills[ SKILL_FISH ][ SKILL_TRIES ] );
-
-            // close the file
-            fclose( charfile );
-        }
-        else
-        {
-            std::cout << "ERROR: Could not create character save file!\n";
-        }*/
     } // player_mem::save()
         
     unsigned long player_mem::readVal( FILE* charfile )//, std::string name, unsigned long &value )
@@ -294,7 +161,7 @@ int player_mem::unserialize(xmlNodePtr p){
 
 xmlNodePtr player_mem::serialize(){
 	std::stringstream s;
-	xmlNodePtr ret,p;
+	xmlNodePtr ret,p, tmp, slot;
 	ret=xmlNewNode(NULL,(const xmlChar*)"player");
 
 	xmlSetProp(ret, (const xmlChar*)"name", (const xmlChar*)name.c_str());
@@ -370,26 +237,153 @@ xmlNodePtr player_mem::serialize(){
 	s << lookfeet;
 	xmlSetProp(p, (const xmlChar*)"feet", (const xmlChar*)s.str().c_str());
 
-	//skills
-	//Spells
-	//Inventory
+	p=xmlNewChild(ret, NULL, (const xmlChar*)"skills", NULL);
+
+	for(int i=0; i< 7; i++){
+		tmp=xmlNewChild(p, NULL, (const xmlChar*)"skill", NULL);
+		s.str(""); //empty the stringstream
+		s << i;
+		xmlSetProp(tmp, (const xmlChar*)"skillid", (const xmlChar*)s.str().c_str());
+		s.str(""); //empty the stringstream
+		s << skills[ i ][ SKILL_LEVEL ];
+		xmlSetProp(tmp, (const xmlChar*)"level", (const xmlChar*)s.str().c_str());
+		s.str(""); //empty the stringstream
+		s << skills[ i ][ SKILL_TRIES ];
+		xmlSetProp(tmp, (const xmlChar*)"tries", (const xmlChar*)s.str().c_str());
+	}
+
+	p=xmlNewChild(ret, NULL, (const xmlChar*)"inventory", NULL);
+
+	for(int i=0; i< 11; i++){
+		if(items[i]){
+			slot=xmlNewChild(p, NULL, (const xmlChar*)"slot", NULL);
+			s.str(""); //empty the stringstream
+			s << i;
+			xmlSetProp(slot, (const xmlChar*)"slotid", (const xmlChar*)s.str().c_str());
+			xmlAddChild(slot,items[i]->serialize());
+		}
+	}
+
+
+	//TODO: add known spells once there are known spells...
+
 
 	return ret;
 }
 
+/*
+	xmlDocPtr doc;
+	xmlNodePtr root, tile, item;
+	int width, height;
+
+
+	doc=xmlParseFile("map.xml");
+	root=xmlDocGetRootElement(doc);
+	if(xmlStrcmp(root->name,(const xmlChar*) "map")){
+		std::cout << "FATAL: couldnt load map. exiting" << std::endl;
+		exit(1);
+	}
+	width=atoi((const char*)xmlGetProp(root, (const xmlChar *) "width"));
+	height=atoi((const char*)xmlGetProp(root, (const xmlChar *) "height"));
+	tile=root->children;
+	for(int y=0; y < height; y++){
+		for(int x=0; x < width; x++){
+			item=tile->children;
+			tiles[x][y] = new Tile;
+			while(item != NULL){
+				Item* myitem=new Item();
+				myitem->unserialize(item);
+				tiles[x][y]->addItem(myitem);
+				item=item->next;
+			}
+			tile=tile->next;
+
+		}
+	}
+	xmlFreeDoc(doc);
+	return 0;
+
+*/
+
 int player_mem::loadXml(){
+	FILE* f;
+	std::string filename="data/players/"+name+".xml";
+	transform (filename.begin(),filename.end(), filename.begin(), tolower);
+	if(!(f=fopen(filename.c_str(),"r")))
+		return 0; // no xml for this guy
+	fclose(f);
+	xmlDocPtr doc;
+	xmlNodePtr root, tmp, p, slot;
+	doc=xmlParseFile(filename.c_str());
+	root=xmlDocGetRootElement(doc);
+	root=xmlDocGetRootElement(doc);
+	if(xmlStrcmp(root->name,(const xmlChar*) "player")){
+		std::cout << "Strange. Player-Savefile was no savefile for " << name << std::endl;
+	}
+	p=root->children;
+	//perhaps verify name
+	passwd=(const char*)xmlGetProp(root, (const xmlChar *) "pass");
+	sex=atoi((const char*)xmlGetProp(root, (const xmlChar *) "sex"));
+	lookdir=atoi((const char*)xmlGetProp(root, (const xmlChar *) "lookdir"));
+	experience=atoi((const char*)xmlGetProp(root, (const xmlChar *) "exp"));
+	voc=atoi((const char*)xmlGetProp(root, (const xmlChar *) "voc"));
+	while(p){
+		std::string str=(char*)p->name;
+		if(str=="mana"){
+			mana=atoi((const char*)xmlGetProp(p, (const xmlChar *) "now"));
+			manamax=atoi((const char*)xmlGetProp(p, (const xmlChar *) "max"));
+			manaspent=atoi((const char*)xmlGetProp(p, (const xmlChar *) "spent"));
+		}
+		else if(str=="health"){
+			health=atoi((const char*)xmlGetProp(p, (const xmlChar *) "now"));
+			healthmax=atoi((const char*)xmlGetProp(p, (const xmlChar *) "max"));
+			food=atoi((const char*)xmlGetProp(p, (const xmlChar *) "food"));
+		}
+		else if(str=="look"){
+			looktype=atoi((const char*)xmlGetProp(p, (const xmlChar *) "type"));
+			lookhead=atoi((const char*)xmlGetProp(p, (const xmlChar *) "head"));
+			lookbody=atoi((const char*)xmlGetProp(p, (const xmlChar *) "body"));
+			looklegs=atoi((const char*)xmlGetProp(p, (const xmlChar *) "legs"));
+			lookfeet=atoi((const char*)xmlGetProp(p, (const xmlChar *) "feet"));
+		}
+		else if(str=="skills"){
+			tmp=p->children;
+			while(tmp){
+				int s_id, s_lvl, s_tries;
+				s_id=atoi((const char*)xmlGetProp(tmp, (const xmlChar *) "skillid"));
+				s_lvl=atoi((const char*)xmlGetProp(tmp, (const xmlChar *) "level"));
+				s_tries=atoi((const char*)xmlGetProp(tmp, (const xmlChar *) "tries"));
+				skills[s_id][SKILL_LEVEL]=s_lvl;
+				skills[s_id][SKILL_TRIES]=s_tries;
+				tmp=tmp->next;
+			}
+		}
+		else if(str=="inventory"){
+			slot=p->children;
+			while(slot){
+				int sl_id=atoi((const char*)xmlGetProp(slot, (const xmlChar *) "slotid"));
+				Item* myitem=new Item();
+				myitem->unserialize(slot->children);
+				items[sl_id]=myitem;
+				slot=slot->next;
+			}
+		}
+		p=p->next;
+	}
+	std::cout << "loaded " << filename << std::endl;
+	xmlFreeDoc(doc);
 	return true;
 }
 
 int player_mem::saveXml(){
-		//save the map in the new format
+	std::string filename="data/players/"+name+".xml";
+	transform (filename.begin(),filename.end(), filename.begin(), tolower);
 	std::stringstream s;
 	xmlDocPtr doc;
 	doc = xmlNewDoc((const xmlChar*)"1.0");
 	doc->children = serialize();
 	xmlKeepBlanksDefault(0);
-	xmlSaveFile("player.xml", doc);
+	xmlSaveFile(filename.c_str(), doc);
 	xmlFreeDoc(doc);
-	return true;
 	return true;
 }

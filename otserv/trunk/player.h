@@ -20,6 +20,9 @@
 	// $Id$
 	//////////////////////////////////////////////////////////////////////
 	// $Log$
+	// Revision 1.12  2003/11/05 23:28:23  tliffrag
+	// Addex XML for players, outfits working
+	//
 	// Revision 1.11  2003/11/03 22:48:14  tliffrag
 	// Changing look, walking by mouse working
 	//
@@ -73,7 +76,7 @@
 		std::list<Action*> actionQueue;
 		int addAction(Action* a){ actionQueue.push_back(a); return 0;};
 
-        unsigned long getID();		
+        unsigned long getID();
 
 		void sendAction(Action*);
 
@@ -82,6 +85,9 @@
 
 		Item* getItem(int pos);
 
+		std::string getLook();
+		std::string getName(){return name;};
+
 		unary_functor<Socket,void>* cb() {
 			return &client->cread;
 		}
@@ -89,9 +95,6 @@
 		int tick(double time);
 		void setMap(position,Map&) throw(texception);
 
-					std::string getName(){
-					return name;
-					}
 	//	private:
 		// pointer to the protokoll...
 		ProtokollP client;

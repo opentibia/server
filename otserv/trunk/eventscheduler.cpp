@@ -21,6 +21,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.14  2003/11/05 23:28:23  tliffrag
+// Addex XML for players, outfits working
+//
 // Revision 1.13  2003/11/03 22:48:14  tliffrag
 // Changing look, walking by mouse working
 //
@@ -81,7 +84,7 @@ EventScheduler::EventScheduler() {
 void EventScheduler::newsocket(Socket _sock, unary_functor<Socket,void> *_cb) {
     FD_SET(_sock, &active_fd_set);
     fdcb[_sock] = _cb;
-    printf("new socket to listen: %d   %d\n", _sock,(int) _cb);
+//    printf("new socket to listen: %d   %d\n", _sock,(int) _cb);
 }
 
 //////////////////////////////////////////////////

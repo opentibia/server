@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.21  2003/11/05 23:28:24  tliffrag
+// Addex XML for players, outfits working
+//
 // Revision 1.20  2003/11/03 22:48:14  tliffrag
 // Changing look, walking by mouse working
 //
@@ -287,9 +290,14 @@ int Map::tick(double time){
 	return true;
 }
 Map::Map() {
-	loadMapXml("map.xml");
-	tick(0);
-/*	//this code is ugly but works
+	FILE* f;
+	if((f=fopen("data/world/map.xml","r"))){
+	fclose(f);
+		loadMapXml("map.xml");
+		tick(0);
+		return;
+	}
+	//this code is ugly but works
 	//TODO improve this code to support things like
 	//a quadtree to speed up everything
 	#ifdef __DEBUG__
@@ -331,7 +339,8 @@ Map::Map() {
 		}
 	}
 	fclose(dump);
-//	tiles[32864-MINX][32863-MINY]->creature=new NPC("ruediger");*/
+	tick(0);
+	tiles[32864-MINX][32863-MINY]->creature=new NPC("ruediger");
 }
 
 Map::Map(char *filename) {
@@ -364,7 +373,9 @@ int Map::saveMapXml(){
 		for(int x=0; x < MAXX-MINX; x++){
 			p=xmlNewChild(doc->children, NULL, (const xmlChar*)"tile", NULL);
 			Tile* tile=tiles[x][y];
-			for (Tile::iterator it=tile->begin(); it != tile->end(); it++)
+			xmlAddChild(p,(*(tile->begin()))->serialize());
+			Tile::iterator it=tile->end(); it--;
+			for (; it != tile->begin(); it--)
 				xmlAddChild(p,(*it)->serialize());
 		}
 	}
@@ -455,7 +466,6 @@ Creature* Map::getPlayerByID( unsigned long id ){
 }
 
 position Map::placeCreature(position pos, Creature* c){
-	std::cout << "cid " << c << std::endl;
 	//add creature to the online list
 	playersOnline[c->getID()]=c;
   if( tiles[pos.x-MINX][pos.y-MINY]->isBlocking()){
@@ -596,6 +606,13 @@ int Map::requestAction(Creature* c, Action* a){
 	}
 	else if(a->type==ACTION_REQUEST_APPEARANCE){
 		a->creature->sendAction(a);
+	}
+	else if(a->type==ACTION_CHANGE_APPEARANCE){
+		distributeAction(a->pos1,a);
+	}
+	else if(a->type==ACTION_ITEM_USE){
+		GETTILEBYPOS(a->pos1)->getItemByStack(a->stack)->use();
+		distributeAction(a->pos1,a);
 	}
 	delete a;
 	return true;

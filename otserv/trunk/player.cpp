@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.15  2003/11/05 23:28:23  tliffrag
+// Addex XML for players, outfits working
+//
 // Revision 1.14  2003/11/03 22:48:14  tliffrag
 // Changing look, walking by mouse working
 //
@@ -47,6 +50,7 @@
 //
 //////////////////////////////////////////////////////////////////////
 
+#include <iostream>
 #include "player.h"
 #include <stdlib.h>
 #include <iostream>
@@ -58,16 +62,18 @@ namespace Creatures {
    Player::Player(const Socket& sock) : client(sock) {
 
         // we get name and password from the client...
+
         std::cout << (player.name = client->getName()) << std::endl;
         std::cout << (player.passwd = client->getPassword()) << std::endl;
 
+		name=player.name;
         // now we should check both... (TODO)
 
         // if everything was checked we should load the player... (TODO)
         // add the player to the player list
-        
-        player.load();
-        
+
+        player.loadXml();
+
         // for now we just fill in some stuff directly
 
         // and pass that infos to the protocoll
@@ -123,8 +129,20 @@ namespace Creatures {
 		return 0;
 	}
 
+	std::string Player::getLook(){
+		std::string buf;
+		//buf+=(unsigned char)player.looktype;
+		buf+=(char)player.looktype;
+		buf+=(char)player.lookhead;
+		buf+=(char)player.lookbody;
+		buf+=(char)player.looklegs;
+		buf+=(char)player.lookfeet;
+		return buf;
+	}
+
 	int Player::clearActionQueue(){
 		actionQueue.clear();
+		return true;
 	}
 
     void Player::setMap(position pos,Map& map) throw(texception) {

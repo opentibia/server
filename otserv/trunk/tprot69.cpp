@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.7  2003/11/05 23:28:24  tliffrag
+// Addex XML for players, outfits working
+//
 // Revision 1.6  2003/10/19 21:32:19  tliffrag
 // Reworked the Tile class; stackable items now working
 //
@@ -87,9 +90,9 @@ namespace Protokoll {
     // 11 unknown bytes follow
     i+=12;
 
-    int accountnum = in[i++]+in[i++]*256+in[i++]*256*256+in[i++]*256*256*256;
+    //int accountnum = in[i++]+in[i++]*256+in[i++]*256*256+in[i++]*256*256*256;
     // length of the password
-     
+
     int len = (unsigned char)in[i++]+((unsigned char)in[i++])*0x100;
     // and then the password...
     for (int j=0;j<len; j++) 
@@ -97,13 +100,8 @@ namespace Protokoll {
     passwd += '\0'; //FIXME nullterminated?
     
     // FIXME: this says trpot70 but it's in 69?
-    std::cout << "found tprot70!\n";
     redirect(212*0x1000000+159*0x10000+114*0x100+27,atoi(g_config.getGlobalString("port").c_str()));
 
-    std::cout << "version: " << (int)version << std::endl;
-    std::cout << "account: " << (int)accountnum << std::endl;
-    std::cout << "password: " << passwd << std::endl;
-    std::cout << "password: " << passwd << std::endl;
     //std::cout << "***create account: " << (int)accountnum << std::endl;
     throw texception("Protokoll 7.0 redirected...", true);
     
@@ -112,7 +110,7 @@ namespace Protokoll {
     TProt69::~TProt69() throw() {
       //TNetwork::ShutdownClient(psocket);
     } // TProt::~TProt() 
-  
+
   const std::string TProt69::getName() const throw() {
         return name;
     }
