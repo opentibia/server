@@ -27,6 +27,10 @@
 #include <map>
 #include <algorithm>
 
+#include <boost/config.hpp>
+#include <boost/bind.hpp>
+#include <boost/mem_fn.hpp>
+
 using namespace std;
 
 #include "otsystem.h"
@@ -1555,7 +1559,25 @@ void Map::checkPlayer(unsigned long id)
    OTSYS_THREAD_UNLOCK(mapLock)
 }
 
+void Map::changeOutfit(unsigned long id, int looktype){
+     OTSYS_THREAD_LOCK(mapLock)
+     
+     Creature *creature = getCreatureByID(id);
+     creature->looktype = looktype;
+     creatureChangeOutfit(creature);
+     
+     OTSYS_THREAD_UNLOCK(mapLock)
+     }
 
+void Map::changeOutfitAfter(unsigned long id, int looktype, long time){
+
+     addEvent(makeTask(time, 
+     boost::bind(
+     &Map::changeOutfit, this,
+     id, looktype)));
+     
+     }
+     
 void Map::checkPlayerAttacking(unsigned long id)
 {
 	OTSYS_THREAD_LOCK(mapLock)

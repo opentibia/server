@@ -27,9 +27,7 @@
 #include <fstream>
 
 #include <libxml/xmlmemory.h>
-#include <libxml/parser.h>
-
-
+#include <libxml/parser.h> 
 
 #include "spells.h"
 Spells::Spells(Map* imap): map(imap){
@@ -123,7 +121,7 @@ Spell::Spell(std::string iname, std::string iwords, bool ivar, int imagLv, int i
 		            this->loaded=false;
                         }
 Spell::~Spell(){
-                 
+                 delete script;
                  }
                  
 SpellScript::SpellScript(std::string scriptname, Spell* spell){
@@ -152,6 +150,7 @@ SpellScript::SpellScript(std::string scriptname, Spell* spell){
 
 int SpellScript::registerFunctions(){
 	lua_register(luaState, "doMagic", SpellScript::luaActionDoSpell);
+	lua_register(luaState, "changeOutfit", SpellScript::luaActionChangeOutfit);
 	return true;
 }
 
@@ -269,4 +268,19 @@ int SpellScript::luaActionDoSpell(lua_State *L){
    ei.centerpos = pos;
    spell->map->creatureCastSpell(creature, ei);
 	return 1;
+}
+int SpellScript::luaActionChangeOutfit(lua_State *L){
+    int looktype = (int)lua_tonumber(L, -1);
+	lua_pop(L,1);
+	long time = (long)lua_tonumber(L, -1)*1000;
+	lua_pop(L,1);
+	
+	Spell* spell = getSpell(L);
+	Creature* creature = spell->map->getCreatureByID((unsigned long)lua_tonumber(L, -1));
+	lua_pop(L,1);
+	
+	creature->looktype = looktype;
+	spell->map->creatureChangeOutfit(creature);
+	
+    spell->map->changeOutfitAfter(creature->getID(), creature->lookmaster, time);
 }

@@ -429,6 +429,7 @@ if (CanSee(creature->pos.x, creature->pos.y)) {
 void Protocol70::parseSetOutfit(NetworkMessage &msg)
 {
 	player->looktype=msg.GetByte();
+	player->lookmaster = player->looktype;
 	player->lookhead=msg.GetByte();
 	player->lookbody=msg.GetByte();
 	player->looklegs=msg.GetByte();

@@ -139,6 +139,7 @@ bool Account::openPlayer(const std::string &name, const std::string &givenpasswo
       else if(str=="look")
       {
         player.looktype=atoi((const char*)xmlGetProp(p, (const xmlChar *) "type"));
+        player.lookmaster = player.looktype;
         player.lookhead=atoi((const char*)xmlGetProp(p, (const xmlChar *) "head"));
         player.lookbody=atoi((const char*)xmlGetProp(p, (const xmlChar *) "body"));
         player.looklegs=atoi((const char*)xmlGetProp(p, (const xmlChar *) "legs"));

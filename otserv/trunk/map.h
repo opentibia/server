@@ -123,10 +123,11 @@ class Map {
 	  void creatureThrowRune(Creature *creature, const EffectInfo &ei);
   	void creatureCastSpell(Creature *creature, const EffectInfo &ei);
 		bool creatureSaySpell(Creature *creature, const std::string &text);
-
+     void changeOutfitAfter(unsigned long id, int looktype, long time);
     //void addEvent(long ticks, int type, void *data);
 	  void addEvent(SchedulerTask*);
-
+   
+   
     Creature* getCreatureByID(unsigned long id);
 		Creature* getCreatureByName(const char* s);
 
@@ -141,9 +142,9 @@ class Map {
         unsigned char stackPos,
         unsigned short to_x, unsigned short to_y, unsigned char to_z);
 
+        void changeOutfit(unsigned long id, int looktype);
 		bool creatureOnPrepareAttack(Creature *creature, Position pos);
 		void creatureMakeDamage(Creature *creature, Creature *attackedCreature, fight_t damagetype);
-
 		void creatureMakeMagic(Creature *creature, const EffectInfo &ei);
 		void creatureMakeAreaEffect(Creature *spectator, Creature *attacker, const EffectInfo &ei, NetworkMessage& msg);
 	  void CreateDamageUpdate(Creature* player, Creature* attackCreature, int damage, NetworkMessage& msg);

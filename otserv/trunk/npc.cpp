@@ -80,6 +80,7 @@ Npc::Npc(const char *name, Map* map) : Creature(name)
 			}
 			if (strcmp(str, "look") == 0){
 				this->looktype = atoi((const char*)xmlGetProp(p, (const xmlChar *)"type"));
+				this->lookmaster = this->looktype;
 				this->lookhead = atoi((const char*)xmlGetProp(p, (const xmlChar *)"head"));
 				this->lookbody = atoi((const char*)xmlGetProp(p, (const xmlChar *)"body"));
 				this->looklegs = atoi((const char*)xmlGetProp(p, (const xmlChar *)"legs"));

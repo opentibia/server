@@ -23,7 +23,6 @@
 #define __spells_h_
 
 
-#include "creature.h"
 #include "map.h"
 #include "luascript.h"
 
@@ -100,9 +99,10 @@ public:
   bool isLoaded(){return loaded;}
   static Spell* SpellScript::getSpell(lua_State *L);
   static int SpellScript::luaActionDoSpell(lua_State *L);
+  static int SpellScript::luaActionChangeOutfit(lua_State *L);
 protected:
     int registerFunctions();
 	Spell* spell;
 	bool loaded;      
 };
-#endif // __npc_h_
+#endif // __spells_h_

@@ -6,11 +6,14 @@
 <vocation id="2" />
 <vocation id="3" />
 </spell>
-<spell name="Ultimate Explosion" words="exevo gran mas vis" maglv="50" mana="800" var="0" enabled="1">
-<vocation id="0" />
+<spell name="Ultimate Explosion" words="exevo gran mas vis" maglv="40" mana="800" var="0" enabled="1">
 <vocation id="1" />
-<vocation id="4" />
 </spell>
 <spell name="Energy Wave" words="exevo mort hur" maglv="20" mana="250" var="0" enabled="1">
+<vocation id="1" />
+</spell>
+<spell name="Creature Illusion" words="utevo res ina" maglv="10" mana="100" var="0" enabled="1">
+<vocation id="1" />
+<vocation id="2" />
 </spell>
 </spells>

@@ -1,11 +1,4 @@
--- sven, the bewitched bunny
--- it's a sample script, i dont know lua well enough to
--- make some fancy code
--- the good thing is, that this scripts can easily be developed
--- seperately from the main programm
--- perhaps we should write some docu
 
--- the id of the creature we are attacking, following, etc.
 area = {
 			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},

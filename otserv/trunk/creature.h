@@ -97,7 +97,7 @@ public:
   virtual Direction getDirection(){return direction;}
 
 
-  int lookhead, lookbody, looklegs, lookfeet, looktype, lookcorpse;
+  int lookhead, lookbody, looklegs, lookfeet, looktype, lookcorpse, lookmaster;
   int mana, manamax, manaspent;
   long exhaustedTicks;
   bool pzLocked;

@@ -26,6 +26,7 @@ Creature::Creature(const char *name) : access(0)
 	lookbody   = 0;
 	looklegs   = 0;
 	lookfeet   = 0;
+	lookmaster = 0;
 	looktype   = PLAYER_MALE_1;
 	pzLocked = false;
 	inFightTicks = 0;
