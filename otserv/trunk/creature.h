@@ -64,7 +64,9 @@ public:
   virtual const string& getName() const {return name; };
 
   unsigned long getID() const { return id; }
+
   Direction getDirection() const { return direction; }
+  void setDirection(Direction dir) { direction = dir; }
 
 
   virtual void drainHealth(int);

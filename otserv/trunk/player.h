@@ -51,10 +51,12 @@ class NetworkMessage;
 class Player : public Creature
 {
 public:
-	Player(const char *name, int sex, Protocol* p);
+	Player(const char *name, Protocol* p);
 	virtual ~Player();
 
   virtual bool isPlayer() const { return true; };
+
+  void speak(const string &text);
 
 	int addItem(Item* item, int pos);
 	int sendInventory();
@@ -67,7 +69,10 @@ public:
   int sex, voc;
   int cap;
 
-  int mana, manamax;
+  int mana, manamax, manaspent;
+
+  int food;
+
 
   // level
   int level;
@@ -77,7 +82,6 @@ public:
   int maglevel;
 
   int skills[7][2];
-
 
   void    usePlayer() { useCount++; };
   void    releasePlayer() { useCount++; if (useCount == 0) delete this; };

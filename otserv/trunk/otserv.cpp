@@ -37,6 +37,7 @@ using namespace std;
 #include "map.h"
 
 #include "luascript.h"
+#include "account.h"
 
 #ifndef WIN32
 #include <fcntl.h>
@@ -54,7 +55,8 @@ Map gmap;
 
 #include "networkmessage.h"
 
-static int i = 0;
+
+
 OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 {
   srand((unsigned)time(NULL));
@@ -71,10 +73,9 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
   {
     msg.SkipBytes(15);
 
-    unsigned int account  = msg.GetU32();
-    string password       = msg.GetString();
+    unsigned int accnumber = msg.GetU32();
+    string password        = msg.GetString();
 
-    msg.Reset();
 
     int serverip = serverIPs[0].first;
 
@@ -91,25 +92,36 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
         }
     }
 
-    msg.AddByte(0x14);
-    msg.AddString("1\nWelcome to OpenTibia.");
+    msg.Reset();
 
-    msg.AddByte(0x64);
-    msg.AddByte(0x02);
+    Account account;
+    char accstring[16];
+    itoa(accnumber, accstring, 10);
 
-    msg.AddString("Hurz (m)");
-    msg.AddString("OpenTibia");
+    if (account.openAccount(accstring, password))
+    {
+      msg.AddByte(0x14);
+      msg.AddString("1\nWelcome to OpenTibia.");
 
-    msg.AddU32(serverip);
-    msg.AddU16(7171);
+      msg.AddByte(0x64);
+      msg.AddByte(account.charList.size());
 
-    msg.AddString("Hurz (w)");
-    msg.AddString("OpenTibia");
+      list<string>::iterator it;
+      for (it = account.charList.begin(); it != account.charList.end(); it++)
+      {
+        msg.AddString((*it));
+        msg.AddString("OpenTibia");
+        msg.AddU32(serverip);
+        msg.AddU16(7171);
+      }
 
-    msg.AddU32(serverip);
-    msg.AddU16(7171);
-
-    msg.AddU16(1337);
+      msg.AddU16(account.premDays);
+    }
+    else
+    {
+      msg.AddByte(0x0A);
+      msg.AddString("Please enter a valid account number and password.");
+    }
 
     msg.WriteToSocket(s);
 
@@ -118,28 +130,30 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
   // gameworld connection tibia 7.1
   else if (protId == 0x020A)
   {
-    i++;
+    unsigned char  clientos = msg.GetByte();
+    unsigned short version  = msg.GetU16();
+    unsigned char  unknown  = msg.GetByte();
 
-    char name[128];
-    sprintf(name, "Hurz %i", i);
+    string name     = msg.GetString();
+    string password = msg.GetString();
+
 
     Protocol70 *protocol = new Protocol70(s);
 
-	 // we use the name to set the sex of the char...
-	 msg.SkipBytes(4);
-	 std::string choosenname = msg.GetString();
-
-	 Player *player;
-
-	 if (choosenname == "Hurz (m)") player = new Player(name, 1, protocol);
-	 else player = new Player(name, 0, protocol);
-
+    Player *player;
+    player = new Player(name.c_str(), protocol);
     player->usePlayer();
-    
+
     protocol->setPlayer(player);
 
-    protocol->ConnectPlayer();
-    protocol->ReceiveLoop();
+    Account account;
+    if (account.openPlayer(name, password, *player))
+    {
+      protocol->ConnectPlayer();
+      protocol->ReceiveLoop();
+    }
+
+    player->releasePlayer();
 
     closesocket(s);
   }
@@ -160,7 +174,7 @@ void ErrorMessage(const char* message)
 
 int main(int argc, char *argv[])
 {
-  std::cout << ":: OTServ Version 0.3.0" << std::endl;
+  std::cout << ":: OTServ Development-Version 0.3.0" << std::endl;
   std::cout << ":: ====================" << std::endl;
   std::cout << "::" << std::endl;
 

@@ -21,11 +21,11 @@ Creature::Creature(const char *name)
 
   this->name = name;
 
-  lookhead   = rand() % 133;
-	lookbody   = rand() % 133;
-	looklegs   = rand() % 133;
-	lookfeet   = rand() % 133;
-	looktype   = 0x83;
+  lookhead   = 0;
+	lookbody   = 0;
+	looklegs   = 0;
+	lookfeet   = 0;
+	looktype   = PLAYER_MALE_1;
 
   health     = 1000;//150;
   healthmax  = 1000;//150;

@@ -33,24 +33,25 @@ using namespace std;
 
 
 
-Player::Player(const char *name, int _sex, Protocol *p) : Creature(name)
+Player::Player(const char *name, Protocol *p) : Creature(name)
 {
   client     = p;
 
-	sex        = _sex;
-	looktype = sex?PLAYER_MALE_1:PLAYER_FEMALE_1;
-
+	looktype   = PLAYER_MALE_1;
 	voc        = 0;
 
   cap        = 300;
 
-  mana       = 250;
-  manamax    = 250;
+  mana       = 0;
+  manamax    = 0;
+  manaspent  = 0;
+
+  food       = 0;
 
   level      = 1;
-  experience = 3000;
+  experience = 180;
 
-  maglevel   = 50;
+  maglevel   = 1;
 
   access     = 0;
 
@@ -77,6 +78,11 @@ Item* Player::getItem(int pos)
 //		if(pos>0 && pos <11)
 //			return player.items[pos];
 		return NULL;
+}
+
+
+void Player::speak(const string &text)
+{
 }
 
 
