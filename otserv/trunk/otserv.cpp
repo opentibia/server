@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.8  2003/05/19 16:48:37  tliffrag
+// Loggingin, talking, walking around, logging out working
+//
 // Revision 1.7  2002/05/29 16:07:38  shivoc
 // implemented non-creature display for login
 //
@@ -33,12 +36,43 @@
 
 #include "eventscheduler.h"
 #include "serversocket.h"
+#include <stdlib.h>
+#include <time.h>
 #include "tmap.h"
+#include <string>
 
+int ipFromDotted(char*);
+int g_serverip;
 EventScheduler es;
 Map::Map map;
 
-int main() {
+int main(int argc, char *argv[]) {
+	char* ip;
+	if(argc>1)
+		ip=argv[1];
+	else
+		ip="10.0.0.13";
+	g_serverip=ipFromDotted(ip);;
+	srand(time(NULL));
     TNetwork::ServerSocket ss;
     es.loop();
 }
+
+int ipFromDotted(char* _ip){
+  std::string ip=_ip;
+  std::string t;
+  int num=0;
+
+  for(int i=0; i<4;i++){
+    t="";
+    while((ip[0]!='.')^(ip.length()==0)){
+      t+=ip[0];
+      ip.erase(0,1);
+    }
+    ip.erase(0,1);
+    num+=atoi(t.c_str()) << i*8;
+  }
+  printf("\n%i\n", num);
+  return num;
+}
+

@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.9  2003/05/19 16:48:37  tliffrag
+// Loggingin, talking, walking around, logging out working
+//
 // Revision 1.8  2002/08/01 14:11:28  shivoc
 // added initial support for 6.9x clients
 //
@@ -40,7 +43,7 @@
 #include <unistd.h> // read
 #include <iostream>
 
-namespace Protokoll {
+
 
 extern EventScheduler es;
 
@@ -169,4 +172,4 @@ extern EventScheduler es;
         TNetwork::SendData(psocket, temp);
     } // void redirect(int ip, int port)
 
-} // namespace Protokoll
+

@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.11  2003/05/19 16:48:37  tliffrag
+// Loggingin, talking, walking around, logging out working
+//
 // Revision 1.10  2002/08/01 14:11:28  shivoc
 // added initial support for 6.9x clients
 //
@@ -43,6 +46,9 @@
 #include "network.h"
 
 // include system dependent headers...
+#ifdef __MINGW__
+#include <winsock.h>
+#endif
 #ifdef __LINUX__
 #  include <fcntl.h> // fcntl
 #  include <sys/socket.h> // listen bind socket
@@ -52,10 +58,11 @@
 #  include <unistd.h> // fcntl select
 #  include <sys/time.h> // select timeval
 
+#endif
 #  include <cstdlib> // memory management...
 #  include <cstring> // memset
 #include <iostream>
-#endif
+
 
 
 //////////////////////////////////////////////////
@@ -156,7 +163,7 @@ void TNetwork::SendData(const Socket& playersocket, const std::string& data) thr
 
     while (total < data.length())
     {
-
+		std::cout << std::endl << "___----___" << std::endl;
         sent=send(playersocket, data.c_str()+total, bytesleft, 0);
 
         if (sent ==-1 || sent == 0) break;
@@ -225,7 +232,7 @@ Socket TNetwork::AcceptPlayer(const Socket& listen) throw(texception) {
     socklen_t fromlen;
 #endif
 
-#ifdef __WINDOWS__  
+#if defined __WINDOWS__ || defined __MINGW__ 
     int fromlen;
 #endif
 

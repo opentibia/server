@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////
+/*//////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
 // File loads and saves binary files.
@@ -22,6 +22,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.4  2003/05/19 16:48:37  tliffrag
+// Loggingin, talking, walking around, logging out working
+//
 // Revision 1.3  2002/05/28 13:55:56  shivoc
 // some minor changes
 //
@@ -33,7 +36,8 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#include <fstream.h>
+#include <fstream>
+#include <iostream>
 
 class File {
     private:
@@ -45,7 +49,7 @@ class File {
         File(const File& _file);
         File& operator=(const File& _file);
         File(char *filename);
-        File(istream I);
+        File(ifstream I);
         ~File();
         long getsize() { return size; }
         // void save();   // not yet written
@@ -64,3 +68,4 @@ class TextFile : public File {
     char *extractnextname();   // some complicated function
     int getmarks();
 };
+*/

@@ -16,23 +16,14 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-//////////////////////////////////////////////////////////////////////
-// $Id$
-//////////////////////////////////////////////////////////////////////
-// $Log$
-// Revision 1.3  2002/05/29 16:07:38  shivoc
-// implemented non-creature display for login
-//
-// Revision 1.2  2002/05/28 13:55:56  shivoc
-// some minor changes
-//
-//
-//////////////////////////////////////////////////////////////////////
+
 
 #ifndef __creature_h
 #define __creature_h
 
 // include definitions
+#include "pos.h"
+#include "action.h"
 #include "definitions.h"
 
 // include Map headers
@@ -41,6 +32,8 @@
 //////////////////////////////////////////////////////////////////////
 // Defines the Base class for all creatures and base functions which 
 // every creature has
+class Map;
+
 class Creature {
 
     public:
@@ -48,6 +41,9 @@ class Creature {
         // set creature on map position...
         virtual void setMap(position, Map&) throw(texception)=0;
 
+		virtual bool isPlayer(){return false;}
+
+		virtual void sendAction(Action*){}
         // get the next Action of the creature
         //			virtual action* GetNextAction()=0;
 

@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.8  2003/05/19 16:48:37  tliffrag
+// Loggingin, talking, walking around, logging out working
+//
 // Revision 1.7  2002/05/28 13:55:56  shivoc
 // some minor changes
 //
@@ -36,7 +39,7 @@ template<class A, class R> struct unary_functor : public std::unary_function<A,R
     virtual R operator() (const A &) = 0;
 };
 
-#ifdef __WINDOWS__
+#if defined __WINDOWS__ || defined __MINGW__ 
 #include <winsock.h>
 typedef SOCKET Socket;
 typedef int socklen_t;
@@ -44,4 +47,13 @@ typedef int socklen_t;
 typedef signed int Socket;
 #endif
 
+template <class T>
+void swap(T &x, T &y)
+{
+  T temp;
+ 
+  temp = x;
+  x = y;
+  y = temp;
+}
 #endif // __definitions_h

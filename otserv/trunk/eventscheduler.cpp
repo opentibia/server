@@ -21,6 +21,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.7  2003/05/19 16:48:37  tliffrag
+// Loggingin, talking, walking around, logging out working
+//
 // Revision 1.6  2002/05/28 13:55:56  shivoc
 // some minor changes
 //
@@ -65,6 +68,7 @@ void EventScheduler::newsocket(Socket _sock, unary_functor<Socket,void> *_cb) {
 // The socket should not be listened to anymore.
 void EventScheduler::deletesocket(Socket _sock) {
     FD_CLR(_sock, &active_fd_set);
+	close(_sock);
     fdcb.erase(_sock);
 }
 

@@ -21,6 +21,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.10  2003/05/19 16:48:37  tliffrag
+// Loggingin, talking, walking around, logging out working
+//
 // Revision 1.9  2002/08/01 14:11:28  shivoc
 // added initial support for 6.9x clients
 //
@@ -38,8 +41,17 @@
 //
 //////////////////////////////////////////////////////////////////////
 
+#if __GNUC__ < 3
+#include <hash_map>
+#else
 #include <ext/hash_map>
+#if (__GNUC__ > 3) || (__GNUC__ == 3 && __GNUC_MINOR__ >= 1)
 using namespace __gnu_cxx;
+#endif
+#if (__GNUC__ == 3 && __GNUC_MINOR__ < 1)
+using std::hash_map;
+#endif
+#endif
 
 #include "definitions.h"
 #include "network.h"

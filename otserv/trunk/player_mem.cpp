@@ -20,17 +20,25 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.4  2003/05/19 16:48:37  tliffrag
+// Loggingin, talking, walking around, logging out working
+//
 // Revision 1.3  2002/05/28 13:55:56  shivoc
 // some minor changes
 //
 //
 //////////////////////////////////////////////////////////////////////
-
+#include <stdlib.h>
 #include "player_mem.h"
 
-namespace Creatures {
+player_mem::player_mem(){
+	color_hair=rand()%256;
+	color_shirt=rand()%256;
+	color_legs=rand()%256;
+	color_shoes=rand()%256;
+}
 
     void player_mem::save() {
     } // player_mem::save()
 
-} // namespace Creatures
+

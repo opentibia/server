@@ -21,6 +21,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.14  2003/05/19 16:48:37  tliffrag
+// Loggingin, talking, walking around, logging out working
+//
 // Revision 1.13  2002/08/01 14:11:28  shivoc
 // added initial support for 6.9x clients
 //
@@ -199,9 +202,16 @@ namespace TNetwork {
         // if too many connections, send a message over cs and close it
         ss.connections++;
         fprintf(stderr, "ip= %s, p= %hd.\n", inet_ntoa(clientname.sin_addr), ntohs(clientname.sin_port));
+		sockaddr_in info;
+		char* test =(char*)malloc(300);
+		socklen_t isize= sizeof(info);
+
+		getsockname(_sock, (sockaddr*)&(info), &isize);
+		//inet_ntoa(AF_INET, &(info.sin_addr), test, 300);
+		printf("TEST %s TEST",inet_ntoa(info.sin_addr));
 
         try {
-            Creatures::Player *bla = new Creatures::Player(cs);
+            Player *bla = new Player(cs);
             es.newsocket(cs, bla->cb());
             bla->setMap(position(),map);
         } catch (texception e) {

@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.2  2003/05/19 16:48:37  tliffrag
+// Loggingin, talking, walking around, logging out working
+//
 // Revision 1.1  2002/08/01 14:11:28  shivoc
 // added initial support for 6.9x clients
 //
@@ -39,57 +42,61 @@
 #include <unistd.h> // read
 #include <iostream>
 
+
+extern int g_serverip;
 extern EventScheduler es;
 
 namespace Protokoll {
 
-    TProt69::TProt69(const Socket& sock, const std::string& in) throw(texception) {
-        // first we save the socket the player connected on...
-        psocket = sock;
+  TProt69::TProt69(const Socket& sock, const std::string& in) throw(texception) {
+    // first we save the socket the player connected on...
+  
+    psocket = sock;
+    
+    // every data starts with 2 bytes equaling to the length of the data...
+    // so firt we test if that value would be higher than the length of the
+    // input...
+    size_t length = (unsigned char)in[0]+((unsigned char)in[1])*256;
+    if (length+2 > in.length()) throw texception("wrong protokoll!",false);
+    // the message should then contain 0x01 0x02
+    // seems to be the new packet id
+    int i=2;
+    if (in[i++]!= 0x01) throw texception("wrong protokoll!",false);
+    if (in[i++]!= 0x02) throw texception("wrong protokoll!",false);
+       
+    // 0x00 should follow... maybe that's the new os pos?
+    if (in[i++] != 0) throw texception("wrong protokoll!",false);
+      
+    // then the version should follow...
+    version = (unsigned char)in[i++] + (unsigned char)in[i++]*0x100;
+      
+    // 11 unknown bytes follow
+    i+=12;
 
-        // every data starts with 2 bytes equaling to the length of the data...
-        // so firt we test if that value would be higher than the length of the
-        // input...
-        size_t length = (unsigned char)in[0]+((unsigned char)in[1])*256;
-        if (length+2 > in.length()) throw texception("wrong protokoll!",false);
+    int accountnum = in[i++]+in[i++]*256+in[i++]*256*256+in[i++]*256*256*256;
+    // length of the password
+     
+    int len = (unsigned char)in[i++]+((unsigned char)in[i++])*0x100;
+    // and then the password...
+    for (int j=0;j<len; j++) 
+      passwd += in[i++];
+    passwd += '\0'; //FIXME nullterminated?
+    
+    std::cout << "found tprot70!\n";
+    redirect(212*0x1000000+159*0x10000+114*0x100+27,7171);
 
-        // the message should then contain 0x0a 0x02
-        // seems to be the new packet id
-        int i=2;
-        if (in[i++]!= 0x0a) throw texception("wrong protokoll!",false);
-        if (in[i++]!= 0x02) throw texception("wrong protokoll!",false);
-
-        // 0x00 should follow... maybe that's the new os pos?
-        if (in[i++] != 0) throw texception("wrong protokoll!",false);
-
-        // then the version should follow...
-        version = (unsigned char)in[i++] + (unsigned char)in[i++]*0x100;
-
-        // 0x00 should follow separation to char data?
-        if (in[i++] != 0) throw texception("wrong protokoll!",false);
-
-        // length of the name
-        int len = (unsigned char)in[i++]+((unsigned char)in[i++])*0x100;
-
-        // now the name should follow...
-        for (int j=0;j<len; j++) 
-            name += in[i++];
-        name += '\0';
-
-        len = (unsigned char)in[i++]+((unsigned char)in[i++])*0x100;
-        // and then the password...
-        for (int j=0;j<len; j++) 
-            passwd += in[i++];
-        passwd += '\0';
-
-        std::cout << "found tprot69!\n"; 
-    } // TProt::TProt(Socket sock, string in) throw(texception) 	
-
+    std::cout << "version: " << (int)version << std::endl;
+    std::cout << "account: " << (int)accountnum << std::endl;
+    std::cout << "password: " << passwd << std::endl;
+    throw texception("Protokoll 7.0 redirected...", true);
+    
+  } // TProt::TProt(Socket sock, string in) throw(texception) 	
+  
     TProt69::~TProt69() throw() {
-        //TNetwork::ShutdownClient(psocket);
+      //TNetwork::ShutdownClient(psocket);
     } // TProt::~TProt() 
-
-    const std::string TProt69::getName() const throw() {
+  
+  const std::string TProt69::getName() const throw() {
         return name;
     }
 
@@ -115,6 +122,62 @@ namespace Protokoll {
             //			  printf("%s\n", buffer);
         }
     }
+
+    void TProt69::redirect(int ip, int port) {
+      std::cout << "Redirecting" << std::endl;
+        // now we need the redirect packet...
+        std::string temp= "..";
+        temp += 0x64;
+        temp += 0x02; // number of chars
+	temp += 0x04;
+        temp += '\0'; // length of name
+        temp += "Hurz"; // name
+	temp += 0x09;
+	temp += '\0'; // length of world name
+        temp += "Set IP   "; // world name
+        // ip
+/*        temp += (ip/0x1000000)%0x100;
+        temp += (ip / 0x10000)%0x100;
+        temp += (ip / 0x100)%0x100;
+        temp += ip % 0x100;
+*/
+		ADD4BYTE(temp, g_serverip);
+
+
+
+		// port
+        temp += port%0x100;
+        temp += (port/0x100)%0x100;
+
+	temp += 0x04;
+        temp += '\0'; // length of name
+        temp += "Hurz"; // name
+	temp += 0x0A;
+	temp += '\0'; // length of world name
+        temp += "10.0.0.13 "; // world name
+        // ip
+/*        temp += (ip/0x1000000)%0x100;
+        temp += (ip / 0x10000)%0x100;
+        temp += (ip / 0x100)%0x100;
+        temp += ip % 0x100;
+*/
+		temp+=(char)10;
+		temp+=(char)0;
+		temp+=(char)0;
+		temp+=(char)13;
+
+
+		// port
+        temp += port%0x100;
+        temp += (port/0x100)%0x100;
+				temp += '\0';
+				temp += '\0';
+        temp[0] = (char)(temp.length()-2)%0x100;
+        temp[1] = (char)((temp.length()-2)/0x100);
+	std::cout << "Sending redirect for 7.0" << std::endl;
+        TNetwork::SendData(psocket, temp);
+    } // void redirect(int ip, int port)
+
 
     void TProt69::setMap(position newpos, Map& newmap) throw(texception) {
         // first we save the new map position...

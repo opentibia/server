@@ -22,6 +22,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.7  2003/05/19 16:48:37  tliffrag
+// Loggingin, talking, walking around, logging out working
+//
 // Revision 1.6  2002/05/29 16:07:38  shivoc
 // implemented non-creature display for login
 //
@@ -35,10 +38,11 @@
 #define tprot_h
 
 #include "protokoll.h"
+#include "creature.h"
 #include "texcept.h"
 #include <string>
 
-namespace Protokoll {
+
     class TProt : public Protokoll {
 
         public:
@@ -66,6 +70,8 @@ namespace Protokoll {
             std::string makeMap(const position topleft, 
                     const position botright);
 
+	    std::string makeCreature(Creature*);
+
             // the socket the player is on...
             Socket psocket;
             // the os of the client...
@@ -80,6 +86,6 @@ namespace Protokoll {
 
     }; // class TProt : public Protokoll  
 
-}
+
 
 #endif

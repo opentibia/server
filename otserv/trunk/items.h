@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.6  2003/05/19 16:48:37  tliffrag
+// Loggingin, talking, walking around, logging out working
+//
 // Revision 1.5  2002/08/01 14:11:28  shivoc
 // added initial support for 6.9x clients
 //
@@ -42,6 +45,7 @@
 
 #include <ext/hash_map>
 using namespace __gnu_cxx;
+
 #include <string>
 
 class ItemType {
@@ -61,8 +65,8 @@ class ItemType {
     bool pickupable : 1; // people can pick it up
     // other bools
     public:
-    const static unsigned short WATER = 10;
-    const static unsigned short GRASS = 0x66;
+    const static unsigned short WATER = 486;
+    const static unsigned short GRASS = 694;
 
     bool isContainer(); // return if this item is a Container
 
@@ -80,7 +84,7 @@ class Items {
             return 1;
         }
     };
-    typedef hash_map<unsigned short, ItemType, hash<unsigned short>, eqItemType> ItemHash;
+    typedef hash_map<unsigned short, ItemType> ItemHash;
     ItemHash items;
     public:
     Items();
@@ -88,3 +92,12 @@ class Items {
 };
 
 #endif
+
+
+
+
+
+
+
+
+

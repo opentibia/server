@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.5  2003/05/19 16:48:37  tliffrag
+// Loggingin, talking, walking around, logging out working
+//
 // Revision 1.4  2002/05/28 13:55:57  shivoc
 // some minor changes
 //
@@ -36,6 +39,7 @@
 
 #include "items.h"
 #include "tmap.h"
+#include "player.h"
 #include <iostream>
 
 Map::Map() {
@@ -43,15 +47,15 @@ Map::Map() {
     // yes I could have done that better ...
     for (unsigned short y = MINY; y < MAXY; y++)
         for (unsigned short x = MINX; x < MAXX; x++) {
-            tiles[y-MINY][x-MINX] = new Tile;
-            tiles[y-MINY][x-MINX]->push_back(new Item(ItemType::WATER));
+            tiles[x-MINX][y-MINY] = new Tile;
+            tiles[x-MINX][y-MINY]->push_back(new Item(ItemType::WATER));
         }
     std::cout << "region watered." << std::endl;
-    for (unsigned short y = MINY + 20; y <= MAXY - 20; y++)
-        for (unsigned short x = MINX + 20; x <= MAXX - 20; x++) {
-            delete tiles[y-MINY][x-MINX]->back();
-            tiles[y-MINY][x-MINX]->pop_back();
-            tiles[y-MINY][x-MINX]->push_back(new Item(ItemType::GRASS));
+    for (unsigned short x = MINX + 20; x <= MAXX - 20; x++)
+        for (unsigned short y = MINY + 20; y <= MAXY - 20; y++) {
+            delete tiles[x-MINX][y-MINY]->back();
+            tiles[x-MINX][y-MINY]->pop_back();
+            tiles[x-MINX][y-MINY]->push_back(new Item(ItemType::GRASS));
         }
     std::cout << "created land." << std::endl;
 }
@@ -61,9 +65,92 @@ Map::Map(char *filename) {
 }
 
 Tile *Map::tile(unsigned short _x, unsigned short _y, unsigned char _z) {
-    return tiles[_y - MINY][_x - MINX];
+    return tiles[_x - MINX][_y - MINY];
 }
 
 Map::~Map() {
 
 }
+
+position Map::placeCreature(position pos, Creature* c){
+  if( tiles[pos.x-MINX][pos.y-MINY]->creature){
+  	//crap we need to find another spot
+	pos.x++;
+	return placeCreature(pos, c);
+  }
+  tiles[pos.x-MINX][pos.y-MINY]->creature=c;
+  //we placed the creature, now tell everbody who saw it about the login
+  Action* a = new Action;
+  a->type=ACTION_LOGIN;
+  a->pos1=pos;
+  a->creature=c;
+  distributeAction(pos, a);
+  return pos;
+}
+
+int Map::removeCreature(position pos, Creature* c){
+	if(tiles[pos.x-MINX][pos.y-MINY]->creature==c)
+		tiles[pos.x-MINX][pos.y-MINY]->creature=0;
+	//now distribute the action
+	Action* a= new Action;
+	a->type=ACTION_LOGOUT;
+	a->pos1=pos;
+	distributeAction(pos, a);
+	delete a;
+	return true;
+}
+
+int Map::requestAction(Creature* c, Action* a){
+	if(a->type==ACTION_MOVE){
+		a->pos2=a->pos1;
+		if(a->direction%2){
+			int x=a->direction-2;
+			a->pos2.x-=x;
+		}
+		else{
+			int y=a->direction-1;
+			a->pos2.y+=y;
+		}
+		//we got the new action, now distribute it
+		//FIXME THIS IS A BUG!!!
+			std::cout << "Going to distribute an action" << std::endl;
+		//we move the pointer
+		tiles[a->pos2.x-MINX][a->pos2.y-MINY]->creature=tiles[a->pos1.x-MINX][a->pos1.y-MINY]->creature;
+		tiles[a->pos1.x-MINX][a->pos1.y-MINY]->creature=NULL;
+		a->creature=c;
+		distributeAction(a->pos1, a);
+	}
+	if(a->type==ACTION_SAY){
+		//says should be ok most of the time
+		distributeAction(a->pos1, a);
+	}
+}
+
+int Map::distributeAction(position pos, Action* a){
+	//finds out how saw a certain action and tells him about it
+	//the region in which we can be seen is
+	// -9/-7 to 9/7
+	std::list<Creature*> victims;
+	for(int x=-7; x <=7; x++){
+		for(int y=-6; y <=6; y++){
+			if(tiles[a->pos1.x+x-MINX][a->pos1.y+y-MINY]->creature){
+				victims.push_back(tiles[a->pos1.x+x-MINX][a->pos1.y+y-MINY]->creature);
+			}
+		}
+	}
+	for(int x=-7; x <=7; x++){
+		for(int y=-6; y <=6; y++){
+			if(tiles[a->pos2.x+x-MINX][a->pos2.y+y-MINY]->creature){
+				victims.push_back(tiles[a->pos2.x+x-MINX][a->pos2.y+y-MINY]->creature);
+			}
+		}
+	}
+	victims.sort();
+	victims.unique();
+	std::list<Creature*>::iterator i;
+	for(i=victims.begin(); i!=victims.end();++i)
+		(*i)->sendAction(a);
+	delete a;
+}
+
+

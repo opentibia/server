@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.10  2003/05/19 16:48:37  tliffrag
+// Loggingin, talking, walking around, logging out working
+//
 // Revision 1.9  2002/08/01 14:11:28  shivoc
 // added initial support for 6.9x clients
 //
@@ -36,80 +39,67 @@
 #include "tprot.h"	// client <= 6.4 and 6.5+ clients after redirect
 #include "tprot65.h" // v6.5+ clients
 #include "tprot69.h" // 6.9+ clients
+#include "tprot70.h" // 7.0+ clients
 #include "network.h"
 #include <iostream>
 
-namespace Protokoll {
+  Protokoll::Protokoll() throw() : cread(*this) { };
+  
+  void Protokoll::setdata(player_mem& pm) {
+    player=&pm;
+  }
 
-    Protokoll::Protokoll() throw() : cread(*this) { };
+void Protokoll::setCreature(Creature* c){
+	creature=c;
+}
 
-    void Protokoll::setdata(Creatures::player_mem& pm) {
-        player=&pm;
+  ProtokollP::ProtokollP(const Socket& psocket) throw(texception) {
+    
+    // we try to read from our socket...
+    std::string buf=TNetwork::ReceiveData(psocket);
+
+     
+    // now we need to find out the protokoll...
+    try {
+      // if the protokoll is the tibia protokoll for 6.9+ clients 
+      // there will be no
+      // exception, else there will be one and we need to check the next
+      // protokoll...
+      
+      prot = new TProt69(psocket, buf);
+      return;
+    }
+    catch (texception e) {
+      // so it's not the tibia protokoll...
+      if (e.isCritical()) {
+	throw texception(e.toString(),false);;
+      } // if (e.isCritical()) 
     }
 
-    ProtokollP::ProtokollP(const Socket& psocket) throw(texception) {
 
-        // we try to read from our socket...
-        std::string buf=TNetwork::ReceiveData(psocket);
-
-#if 0
-        FILE* log = fopen("client","w");
-        fwrite(buf.c_str(), buf.length(), 1, log);
-        fclose(log);
-        std::cout << "wrote logfile client" << std::endl;
-#endif
-
-        // now we need to find out the protokoll...
-        try {
-            // if it's the tibia protokoll 6.5+ the client get's redirected
-            // back to the server for the second login step...
-            // and an exception get's thrown...
-            prot = new TProt65(psocket, buf);
-        }
-        catch (texception e) {
-            // if it's critical it's the 6.5+ protokoll...
-            if (e.isCritical()) {
-                throw texception(e.toString(),false);
-            } // if (e.isCritical()) 
-        }
-
-        try {
-            // if the protokoll is the tibia protokoll there will be no
-            // exception, else there will be one and we need to check the next
-            // protokoll...
-            prot = new TProt(psocket, buf);
-            return;
-        }
-        catch (texception e) {
-            // so it's not the tibia protokoll...
-            if (e.isCritical()) {
-                throw;
-            } // if (e.isCritical()) 
-        }
-
-        try {
-            // if the protokoll is the tibia protokoll for 6.9+ clients 
-            // there will be no
-            // exception, else there will be one and we need to check the next
-            // protokoll...
-            prot = new TProt69(psocket, buf);
-            return;
-        }
-        catch (texception e) {
-            // so it's not the tibia protokoll...
-            if (e.isCritical()) {
-                throw;
-            } // if (e.isCritical()) 
-        }
-
-        // other protokolls insert here...
-
-        // since it's none of the protokolls above we throw an exception...
-        throw texception("no protokoll found!", false);
+    try {
+      // if the protokoll is the tibia protokoll for 7.0+ clients 
+      // there will be no
+      // exception, else there will be one and we need to check the next
+      // protokoll...
+      prot = new TProt70(psocket, buf);
+      return;
     }
-
-    ProtokollP::~ProtokollP() throw() {
-        delete prot;
+    catch (texception e) {
+      // so it's not the tibia protokoll...
+      std::cout <<e.toString()<<"AAAAAAAAAA"<< std::endl;
+      if (e.isCritical()) {
+ 	std::cout << e.toString() << std::endl;
+	throw texception(e.toString(),false);
+      } // if (e.isCritical()) 
     }
-
-} // namespace Protokoll 
+    
+    // other protokolls insert here...
+    
+    // since it's none of the protokolls above we throw an exception...
+    throw texception("no protokoll found!", false);
+  }
+  
+  ProtokollP::~ProtokollP() throw() {
+    delete prot;
+  }

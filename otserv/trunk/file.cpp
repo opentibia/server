@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////
+/*//////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
 // File loads and saves binary files.
@@ -21,6 +21,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.5  2003/05/19 16:48:37  tliffrag
+// Loggingin, talking, walking around, logging out working
+//
 // Revision 1.4  2002/08/01 14:11:28  shivoc
 // added initial support for 6.9x clients
 //
@@ -35,7 +38,8 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#include <iostream.h>
+#include <iostream>
+#include <fstream>
 #include "file.h"
 #include "tools.h"
 
@@ -265,3 +269,4 @@ char *TextFile::extractnextname() {
 int TextFile::getmarks() {
     return marks;
 }
+*/

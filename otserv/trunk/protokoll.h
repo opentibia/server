@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.7  2003/05/19 16:48:37  tliffrag
+// Loggingin, talking, walking around, logging out working
+//
 // Revision 1.6  2002/05/29 16:07:38  shivoc
 // implemented non-creature display for login
 //
@@ -35,12 +38,11 @@
 #include "definitions.h"
 #include "tmap.h"
 #include "texcept.h"
+#include "creature.h"
 #include "player_mem.h"
 #include <string>
 
-namespace Protokoll {
-
-    // virtual base class to represent different protokolls...
+   // virtual base class to represent different protokolls...
     class Protokoll {
         public:
 
@@ -56,7 +58,9 @@ namespace Protokoll {
             };
 
             // set the playerdata to use
-            void setdata(Creatures::player_mem&);
+            void setdata(player_mem&);
+			void setCreature(Creature* c);
+			virtual void sendAction(Action* a){}
 
             // get the name...
             virtual const std::string getName() const throw() =0;
@@ -77,7 +81,8 @@ namespace Protokoll {
 
 
         protected:
-            Creatures::player_mem* player;
+            player_mem* player;
+			Creature* creature;
     };
 
     // class to choose the protokoll which acts like a pointer to the correct
@@ -99,6 +104,6 @@ namespace Protokoll {
             Protokoll* prot;
     };
 
-}
+
 
 #endif

@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.5  2003/05/19 16:48:37  tliffrag
+// Loggingin, talking, walking around, logging out working
+//
 // Revision 1.4  2002/05/29 16:07:38  shivoc
 // implemented non-creature display for login
 //
@@ -33,20 +36,20 @@
 #define __OTSERV_PLAYER_MEM_H
 
 #include "memory.h"
+#include "pos.h"
 #include <string>
 
-namespace Creatures {
-
-
-    class player_mem : public ::Memory {
+   class player_mem : public ::Memory {
         public:
             void save();
-
+			player_mem();
             std::string name, passwd;
+			int color_hair, color_shirt, color_legs, color_shoes;
+			position pos;
+
             unsigned int pnum;
 
     }; // class player_mem : public Memory
 
-} // namespace Creatures
 
 #endif

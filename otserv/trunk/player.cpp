@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.7  2003/05/19 16:48:37  tliffrag
+// Loggingin, talking, walking around, logging out working
+//
 // Revision 1.6  2002/05/29 16:07:38  shivoc
 // implemented non-creature display for login
 //
@@ -30,10 +33,11 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "player.h"
+#include <stdlib.h>
 #include <iostream>
 
 namespace Creatures {
-    Player::Player(const Socket& sock) : client(sock) {
+   Player::Player(const Socket& sock) : client(sock) {
 
         // we get name and password from the client...
         std::cout << (player.name = client->getName()) << std::endl;
@@ -43,18 +47,31 @@ namespace Creatures {
 
         // if everything was checked we should load the player... (TODO)
         // for now we just fill in some stuff directly
-        player.pnum = 1;
+        player.pnum =rand(); //TODO right playernumbers
 
         // and pass that infos to the protocoll
         client->setdata(player);
+		client->setCreature(this);
 
     } // Player::Player(Socket sock) 
 
     Player::~Player() {
     } // Player::~Player() 
 
+  bool Player::isPlayer(){
+    return true;
+  }
+
+  void Player::sendAction(Action* action){
+  	
+	client->sendAction(action);
+  }
+
     void Player::setMap(position pos,Map& map) throw(texception) {
-        client->setMap(pos, map);
+	  pos=map.placeCreature(pos,this);
+	  player.pos=pos;
+	  client->setMap(pos, map);
     } // void setMap(position) throw(texception)
 
 } // namespace Creature 
+
