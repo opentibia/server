@@ -28,7 +28,7 @@ Container::Container(const unsigned short _type) : Item(_type)
 
 Container::~Container()
 {
-	for(Container::iterator cit = lcontained.begin(); cit != lcontained.end(); cit++)
+	for(ContainerList::iterator cit = lcontained.begin(); cit != lcontained.end(); cit++)
 	{
     delete (*cit);
   }
@@ -63,7 +63,7 @@ bool Container::addItem(Item *newitem) {
 
 bool Container::removeItem(Item* item)
 {
-	for (std::list<Item*>::iterator cit = lcontained.begin(); cit != lcontained.end(); cit++) {
+	for (ContainerList::iterator cit = lcontained.begin(); cit != lcontained.end(); cit++) {
 		if((*cit) == item) {
 			lcontained.erase(cit);
 			actualitems--;
@@ -79,7 +79,7 @@ void Container::isHolding(const Item* item, bool& found) const
 	if(found || item == NULL)
 		return;
 
-	for (std::list<Item*>::const_iterator cit = lcontained.begin(); cit != lcontained.end(); cit++) {
+	for (ContainerList::const_iterator cit = lcontained.begin(); cit != lcontained.end(); cit++) {
 		Container *container = dynamic_cast<Container*>(*cit);
 		if(container) {
 
@@ -96,7 +96,7 @@ void Container::isHolding(const Item* item, bool& found) const
 void Container::moveItem(unsigned char from_slot, unsigned char to_slot)
 {
 	int n = 0;
-	for (std::list<Item*>::iterator cit = lcontained.begin(); cit != lcontained.end(); cit++) {
+	for (ContainerList::iterator cit = lcontained.begin(); cit != lcontained.end(); cit++) {
 		if(n == from_slot) {
 			Item *item = (*cit);
 			lcontained.erase(cit);
@@ -110,7 +110,7 @@ void Container::moveItem(unsigned char from_slot, unsigned char to_slot)
 Item* Container::getItem(unsigned long slot_num)
 {
 	size_t n = 0;			
-	for (Container::iterator cit = getItems(); cit != getEnd(); cit++) {
+	for (ContainerList::const_iterator cit = getItems(); cit != getEnd(); cit++) {
 		if(n == slot_num)
 			return *cit;
 		else
@@ -120,10 +120,10 @@ Item* Container::getItem(unsigned long slot_num)
 	return NULL;
 }
 
-unsigned char Container::getSlotNumberByItem(Item* item) const
+unsigned char Container::getSlotNumberByItem(const Item* item) const
 {
 	unsigned char n = 0;			
-	for (Container::iterator cit = getItems(); cit != getEnd(); cit++) {
+	for (ContainerList::const_iterator cit = getItems(); cit != getEnd(); cit++) {
 		if(*cit == item)
 			return n;
 		else
@@ -133,11 +133,11 @@ unsigned char Container::getSlotNumberByItem(Item* item) const
 	return 0xFF;
 }
 
-Container::iterator Container::getItems() const {
+ContainerList::const_iterator Container::getItems() const {
 	return lcontained.begin();
 }
 
-Container::iterator Container::getEnd() const {
+ContainerList::const_iterator Container::getEnd() const {
 	return lcontained.end();
 }
 

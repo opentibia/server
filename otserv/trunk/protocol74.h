@@ -96,8 +96,10 @@ private:
 	void parseUseItemEx(NetworkMessage &msg);
 	void parseUseItem(NetworkMessage &msg);
 	void parseCloseContainer(NetworkMessage &msg);
+	void parseUpArrowContainer(NetworkMessage &msg);
 
-/*	void sendPlayerItemAppear(Action* action);
+/*
+	void sendPlayerItemAppear(Action* action);
 	void sendPlayerItemChange(Action* action);
 	void sendPlayerItemDisappear(Action* action);
 	void sendPlayerAppearance(Action* action);
@@ -105,16 +107,17 @@ private:
 */
 
 	void sendPlayerLookAt(std::string);
-// channel tabs
-void parseGetChannels(NetworkMessage &msg);
-void parseOpenChannel(NetworkMessage &msg);
-void parseOpenPriv(NetworkMessage &msg);
-void parseCloseChannel(NetworkMessage &msg);
-virtual void sendChannels();
-virtual void sendChannel(unsigned short channelId);
-virtual void sendOpenPriv(std::string &receiver);
-virtual void sendToChannel(const Creature * creature, unsigned char type, const std::string &text, unsigned short channelId);
-//	void sendPlayerChangeGround(Action* action);
+
+	// channel tabs
+	void parseGetChannels(NetworkMessage &msg);
+	void parseOpenChannel(NetworkMessage &msg);
+	void parseOpenPriv(NetworkMessage &msg);
+	void parseCloseChannel(NetworkMessage &msg);
+	virtual void sendChannels();
+	virtual void sendChannel(unsigned short channelId);
+	virtual void sendOpenPriv(std::string &receiver);
+	virtual void sendToChannel(const Creature * creature, unsigned char type, const std::string &text, unsigned short channelId);
+	//void sendPlayerChangeGround(Action* action);
 
   virtual void sendNetworkMessage(NetworkMessage *msg);
   virtual void sendIcons(int icons);
@@ -136,6 +139,9 @@ virtual void sendToChannel(const Creature * creature, unsigned char type, const 
   
   virtual void sendTeleport(const Creature *creature, const Position *oldPos, unsigned char oldStackPos);
 
+	void sendContainer(unsigned char index, Container *container);
+
+	// translate a tile to clientreadable format
   void GetTileDescription(const Tile* tile, NetworkMessage &msg);
 
 	// translate a map area to clientreadable format

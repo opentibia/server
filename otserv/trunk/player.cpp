@@ -104,7 +104,8 @@ Player::~Player()
   delete client;
 }
 
-std::string Player::getDescription(bool self){
+std::string Player::getDescription(bool self) const
+{
 	std::stringstream s;
 	std::string str;
 	

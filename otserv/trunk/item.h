@@ -75,8 +75,8 @@ class Item : public Thing
 		int use(){std::cout << "use " << id << std::endl; return 0;};
 		int use(Item*){std::cout << "use with item ptr " << id << std::endl; return 0;};
 		int use(Creature*){std::cout << "use with creature ptr " << id << std::endl; return 0;};
-		std::string getDescription();
-		std::string getName();
+		std::string getDescription() const;
+		std::string getName() const ;
 		int unserialize(xmlNodePtr p);
 		xmlNodePtr serialize();
 

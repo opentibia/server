@@ -23,15 +23,17 @@
 
 #include "item.h"
 
+typedef std::list<Item *> ContainerList;
+
 class Container : public Item
 {
 	private:
 		unsigned short maxitems; //number of max items in container  
 		unsigned short actualitems; // number of items in container
-		std::list<Item *> lcontained;
+		ContainerList lcontained;
 
 	public:
-		typedef std::list<Item *>::const_iterator iterator;
+		//typedef std::list<Item *>::const_iterator const_iterator;
 
 		Container(const unsigned short _type);
 		virtual ~Container();
@@ -39,13 +41,13 @@ class Container : public Item
 		int size() const {return actualitems;};
 		int capacity() const {return maxitems;};
 
-		iterator getItems() const;     // begin();
-		iterator getEnd() const;       // iterator beyond the last element
+		ContainerList::const_iterator getItems() const;     // begin();
+		ContainerList::const_iterator getEnd() const;       // iterator beyond the last element
 		bool addItem(Item* newitem);     // add an item to the container
 		bool removeItem(Item* item); //remove an item from the container
 		void moveItem(unsigned char from_slot, unsigned char to_slot);
 		Item* getItem(unsigned long slot_num);
-		unsigned char getSlotNumberByItem(Item* item) const;
+		unsigned char getSlotNumberByItem(const Item* item) const;
 		void isHolding(const Item* item, bool& found) const; //search all containers for the item recursively
 		//Item& operator<<(Item*); // put items into the container
 };

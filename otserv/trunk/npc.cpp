@@ -117,7 +117,8 @@ Npc::~Npc()
 	delete this->script;
 }
 
-std::string Npc::getDescription(bool self){
+std::string Npc::getDescription(bool self) const
+{
     std::stringstream s;
 	std::string str;	
 	s << "You see " << name << ".";

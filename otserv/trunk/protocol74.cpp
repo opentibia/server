@@ -150,6 +150,9 @@ void Protocol74::parsePacket(NetworkMessage &msg)
      case 0x87: // close container
       parseCloseContainer(msg);
       break;
+		 case 0x88: //"up-arrow" - container
+			 parseUpArrowContainer(msg);
+			 break;
      case 0x8C: // throw item
       parseLookAt(msg);
       break;
@@ -698,6 +701,48 @@ void Protocol74::parseUseItemEx(NetworkMessage &msg)
 	}
 }
 
+void Protocol74::sendContainer(unsigned char index, Container *container)
+{
+	if(!container)
+		return;
+
+	const Container *parentcontainer = NULL;
+
+	for(unsigned int cid = 0; cid < player->getContainerCount(); ++cid) {
+		Container *c = player->getContainer(cid);
+		if(c && c->getSlotNumberByItem(container) < 0xFF) {
+			parentcontainer = container;
+		}
+	}
+
+	NetworkMessage msg;
+
+	player->addContainer(index, container);
+
+	msg.AddByte(0x6E);
+	msg.AddByte(index);
+
+	msg.AddU16(container->getID());
+	msg.AddString(container->getName());
+	msg.AddByte(container->capacity());
+	if(parentcontainer)
+		/* TODO: implement up arrow */
+		msg.AddByte(0x01); // container up ID (can go up) 
+	else
+		msg.AddByte(0x00);
+
+	msg.AddByte(container->size());
+
+  ContainerList::const_iterator cit;
+	for (cit = container->getItems(); cit != container->getEnd(); ++cit) {
+		msg.AddU16((*cit)->getID());
+		if((*cit)->getItemCountOrSubtype() > 1)
+			msg.AddByte((*cit)->getItemCountOrSubtype());
+	}
+
+	msg.WriteToSocket(s);
+}
+
 void Protocol74::parseUseItem(NetworkMessage &msg)
 {
 	//open main backpack
@@ -772,7 +817,7 @@ void Protocol74::parseUseItem(NetworkMessage &msg)
 			}
 
 			int n = 0;
-			for (Container::iterator cit = parentcontainer->getItems(); cit != parentcontainer->getEnd(); cit++) {
+			for (ContainerList::const_iterator cit = parentcontainer->getItems(); cit != parentcontainer->getEnd(); cit++) {
 				if(n == z) {
 					newcontainer = dynamic_cast<Container*>(*cit);
 					break;
@@ -787,8 +832,9 @@ void Protocol74::parseUseItem(NetworkMessage &msg)
 		}
 
 		if(newcontainer) {
-			player->addContainer(stack, newcontainer);
-
+			//player->addContainer(stack, newcontainer);
+			sendContainer(stack, newcontainer);
+			/*
 			msg.AddByte(0x6E);
 			msg.AddByte(stack);
 
@@ -796,7 +842,7 @@ void Protocol74::parseUseItem(NetworkMessage &msg)
 			msg.AddString(newcontainer->getName());
 			msg.AddByte(newcontainer->capacity());
 			if(parentcontainer)
-			/* TODO: implement up arrow */
+
 			msg.AddByte(0x01); // container up ID (can go up) 
 			else
 				msg.AddByte(0x00);
@@ -811,6 +857,7 @@ void Protocol74::parseUseItem(NetworkMessage &msg)
 			}
 	
 			msg.WriteToSocket(s);
+		*/
 		}
 	}
 }
@@ -826,6 +873,30 @@ void Protocol74::parseCloseContainer(NetworkMessage &msg)
 	msg.AddByte(containerid);
 
 	msg.WriteToSocket(s);
+}
+
+void Protocol74::parseUpArrowContainer(NetworkMessage &msg)
+{
+	unsigned char containerid = msg.GetByte();
+
+	Container *container = player->getContainer(containerid);
+	if(!container)
+		return;
+
+	Container *parentcontainer = NULL;
+
+	for(unsigned int cid = 0; cid < player->getContainerCount(); ++cid) {
+		Container *c = player->getContainer(cid);
+		if(c && c->getSlotNumberByItem(container) < 0xFF) {
+			parentcontainer = c;
+			break;
+		}
+	}
+
+	if(parentcontainer) {
+		//player->addContainer(containerid, parentcontainer); 
+		sendContainer(containerid, parentcontainer);
+	}
 }
 
 
@@ -1268,6 +1339,7 @@ void Protocol74::sendContainerUpdated(Item *item, unsigned char from_id, unsigne
 
 		//add item
 		msg.AddByte(0x70);
+		msg.AddByte(to_id);
 		msg.AddItem(item);
 
 		//msg.AddByte(to_id);

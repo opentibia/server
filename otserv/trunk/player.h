@@ -147,7 +147,7 @@ protected:
   virtual void onCreatureChangeOutfit(const Creature* creature);
   virtual void onTeleport(const Creature *creature, const Position *oldPos, unsigned char oldstackpos); 
   virtual void onThink();
-  virtual std::string getDescription(bool self = false);
+  virtual std::string getDescription(bool self = false) const;
 	virtual void onTileUpdated(const Position *Pos);
 	virtual void onContainerUpdated(Item *item, unsigned char from_id, unsigned char to_id, unsigned char from_slot, unsigned char to_slot, bool remove);
 	Protocol *client;

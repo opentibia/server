@@ -168,7 +168,8 @@ WeaponType Item::getWeaponType() const {
 		  return items[id].weaponType;
 }
 
-std::string Item::getDescription() {
+std::string Item::getDescription() const
+{
 	std::stringstream s;
 	std::string str;
   if (items[id].name.length())
@@ -185,7 +186,7 @@ std::string Item::getDescription() {
 	return str;
 }
 
-std::string Item::getName()
+std::string Item::getName() const
 {
 	return items[id].name;
 }

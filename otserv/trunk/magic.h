@@ -260,7 +260,7 @@ public:
 	virtual int getDamage(Creature *target, const Creature *attacker = NULL) const;
 
 	virtual void getMagicEffect(const Player* spectator, const Creature* attacker, const Position& pos,
-		bool hasTarget, int damage, bool isPz, NetworkMessage &msg) const
+		bool hasTarget, int damage, bool isPz, bool isBlocking, NetworkMessage &msg) const
 	{
 		MagicEffectClass::getMagicEffect(spectator, attacker, pos, hasTarget, damage, isPz, isBlocking, msg);
 	}
