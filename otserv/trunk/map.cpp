@@ -334,14 +334,15 @@ int Map::loadMapXml(const char *filename){
   int xorig=((MAP_WIDTH)-width)/2;
   int yorig=((MAP_HEIGHT)-height)/2;
   tile=root->children;
+  int numpz = 0;
   for(int y=0; y < height; y++){
     for(int x=0; x < width; x++){
 	    if (!tile) {
 		    std::cout << "no tile for " << x << " / " << y << std::endl;
 		    exit(1);
 	    }
-      item=tile->children;
       const char* pz = (const char*)xmlGetProp(tile, (const xmlChar *) "pz");
+      item=tile->children;
 
       while(item != NULL)
       {
@@ -353,8 +354,10 @@ int Map::loadMapXml(const char *filename){
           setTile(xorig+x, yorig+y, 7, myitem->getID());
           delete myitem;
 
-          if (pz && (strcmp(pz, "1") == 0))
+          if (pz && (strcmp(pz, "1") == 0)) {
+		  numpz++;
             getTile(xorig+x, yorig+y, 7)->setPz();
+	  }
         }
         else
         {
@@ -375,6 +378,7 @@ int Map::loadMapXml(const char *filename){
     }
   }
   xmlFreeDoc(doc);
+  std::cout << std::endl << "Got " << numpz << " PZ tiles." << std::endl;
   return 0;
 }
 
@@ -934,7 +938,6 @@ void Map::creatureMakeMeleeDamage(Creature *creature, Creature *attackedCreature
       (std::abs(creature->pos.y-attackedCreature->pos.y) <= 1) &&
       (creature->pos.z == attackedCreature->pos.z))
   {
-    Tile* targettile = getTile(attackedCreature->pos.x, attackedCreature->pos.y, attackedCreature->pos.z);
 
     int damage = 1+(int)(80.0*rand()/(RAND_MAX+1.0));
     if (creature->access != 0)
@@ -950,6 +953,7 @@ void Map::creatureMakeMeleeDamage(Creature *creature, Creature *attackedCreature
 
     NetworkMessage msg;
 
+    Tile* targettile = getTile(attackedCreature->pos.x, attackedCreature->pos.y, attackedCreature->pos.z);
 
 
     for (int x = min(creature->pos.x, attackedCreature->pos.x) - 9; x <= max(creature->pos.x, attackedCreature->pos.x) + 9; x++)
@@ -1213,28 +1217,37 @@ void Map::checkPlayerAttacking(unsigned long id)
 
     Player *player = (Player*)getCreatureByID(id);
 
+
   if (player != NULL && player->health > 0)
   {
     if (player->attackedCreature != 0)
     {
       Creature *attackedCreature = (Player*)getCreatureByID(player->attackedCreature);
 
-      if (attackedCreature != NULL && attackedCreature->health > 0)
-      {
-        switch (player->getFightType())
-        {
-          case FIGHT_MELEE:
-            creatureMakeMeleeDamage(player, attackedCreature);
-            break;
+      Tile* fromtile = getTile(player->pos.x, player->pos.y, player->pos.z);
+      if (player->access == 0 && fromtile->isPz()) {
+	      NetworkMessage msg;
+	      msg.AddTextMessage(MSG_STATUS, "You may not attack a person in a protection zone.");
+	      player->sendNetworkMessage(&msg);
+      } else {
 
-          case FIGHT_DIST:
-            creatureMakeDistDamage(player, attackedCreature);
-            break;
+	      if (attackedCreature != NULL && attackedCreature->health > 0)
+	      {
+		      switch (player->getFightType())
+		      {
+			      case FIGHT_MELEE:
+				      creatureMakeMeleeDamage(player, attackedCreature);
+				      break;
 
-          case FIGHT_MAGICDIST:
-            creatureMakeMagicDistDamage(player, attackedCreature);
-            break;
-        }
+			      case FIGHT_DIST:
+				      creatureMakeDistDamage(player, attackedCreature);
+				      break;
+
+			      case FIGHT_MAGICDIST:
+				      creatureMakeMagicDistDamage(player, attackedCreature);
+				      break;
+		      }
+	      }
       }
     }
 
@@ -1274,6 +1287,12 @@ void Map::resetExhausted(unsigned long id)
 void Map::makeCastSpell(Player *player, int mana, int mindamage, int maxdamage, unsigned char area[14][18], unsigned char ch, unsigned char typeArea, unsigned char typeDamage)
 {
 	NetworkMessage msg;
+	Tile* fromtile = getTile(player->pos.x, player->pos.y, player->pos.z);
+	if (player->access == 0 && fromtile->isPz()) {
+		msg.AddTextMessage(MSG_STATUS, "You may not attack a person in a protection zone.");
+		player->sendNetworkMessage(&msg);
+		return;
+	}
 	if(player->access == 0 && (player->mana < mana || player->exhausted)) {
 			msg.AddMagicEffect(player->pos, NM_ME_PUFF);
 			msg.AddTextMessage(MSG_EVENT, "You are exhausted.");
@@ -1311,7 +1330,7 @@ void Map::makeCastSpell(Player *player, int mana, int mindamage, int maxdamage, 
 					if(area[y][x] == ch) {
 						damagedcreature.first  = (*cit)->getID();
 
-						if((!tile->isPz() || player->access != 0)) {
+						if((!tile->isPz() && (*cit)->access == 0)) {
 							int damage = random_range(mindamage, maxdamage);
 
 							if (damage > 0) {
@@ -1371,7 +1390,7 @@ void Map::makeCastSpell(Player *player, int mana, int mindamage, int maxdamage, 
 							int damage = damagelist[i].second;
 
 							if(vtile->isPz() && player->access == 0) {
-								msg.AddTextMessage(MSG_STATUS, "You may not attack a person in a protection zone.");
+								//msg.AddTextMessage(MSG_STATUS, "You may not attack a person in a protection zone.");
 								msg.AddMagicEffect(victim->pos, NM_ME_PUFF);
 							}
 						else
