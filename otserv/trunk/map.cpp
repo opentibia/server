@@ -880,26 +880,26 @@ void Map::creatureMakeDistDamage(Creature *creature, Creature *attackedCreature)
 						dmg << damage;
                   msg.AddAnimatedText(attackedCreature->pos, 0xB4, dmg.str());
                   msg.AddMagicEffect(attackedCreature->pos, NM_ME_DRAW_BLOOD);
-                    //if (attackedCreature->health <= 0)
-                    //{
-                    //  // remove character
-                    //  msg.AddByte(0x6c);
-                    //  msg.AddPosition(attackedCreature->pos);
-                    //  msg.AddByte(targettile->getThingStackPos(attackedCreature));
-						  //msg.AddByte(0x6a);
-						  //msg.AddPosition(attackedCreature->pos);
-						  //Item* item = new Item(1437);
-						  //msg.AddItem(item);
-						  //delete item;
-                    //}
-                    //else
+                    if (attackedCreature->health <= 0)
+                    {
+                      // remove character
+                      msg.AddByte(0x6c);
+                      msg.AddPosition(attackedCreature->pos);
+                      msg.AddByte(targettile->getThingStackPos(attackedCreature));
+		      msg.AddByte(0x6a);
+		      msg.AddPosition(attackedCreature->pos);
+		      Item* item = new Item(2278);
+		      msg.AddItem(item);
+		      delete item;
+                    }
+                    else
 							 msg.AddCreatureHealth(attackedCreature);
 
                 }
 
                 // own damage, update infos
-                //if (p == attackedCreature)
-                //  CreateDamageUpdate(p, creature, damage, msg);
+                if (p == attackedCreature)
+                  CreateDamageUpdate(p, creature, damage, msg);
               }
 
               p->sendNetworkMessage(&msg);

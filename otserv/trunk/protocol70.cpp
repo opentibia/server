@@ -329,6 +329,7 @@ void Protocol70::parseRequestOutfit(NetworkMessage &msg)
 
 
 void Protocol70::sendSetOutfit(const Creature* creature) {
+if (CanSee(creature->pos.x, creature->pos.y)) {
 	NetworkMessage newmsg;
 	newmsg.AddByte(0x8E);
 	newmsg.AddU32(creature->getID());
@@ -338,6 +339,7 @@ void Protocol70::sendSetOutfit(const Creature* creature) {
 	newmsg.AddByte(creature->looklegs);
 	newmsg.AddByte(creature->lookfeet);
 	newmsg.WriteToSocket(s);
+}
 }
 
 void Protocol70::parseSetOutfit(NetworkMessage &msg)

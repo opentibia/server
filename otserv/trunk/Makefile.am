@@ -3,7 +3,7 @@ AUTOMAKE_OPTIONS = foreign
 noinst_PROGRAMS = otserv
 
 
-AM_CXXFLAGS = $(XML_CPPFLAGS) $(OTSERV_FLAGS) $(LUA50_CFLAGS)
+AM_CXXFLAGS = $(XML_CPPFLAGS) $(OTSERV_FLAGS) $(LUA50_CFLAGS) -D_THREAD_SAFE -D_REENTRANT
 otserv_LDADD = $(XML_LIBS) $(LUA50_LIBS)
 otserv_SOURCES = creature.cpp creature.h definitions.h item.cpp item.h \
 					  items.cpp items.h luascript.cpp luascript.h map.cpp \
