@@ -239,10 +239,10 @@ void Protocol70::parseLogout(NetworkMessage &msg)
 {
 	// we ask the map to remove us
 	if (map->removeCreature(player))
-  {
+	{
 	  player = NULL;
 	  closesocket(s);
-  }
+	}
 }
 
 void Protocol70::parseMoveByMouse(NetworkMessage &msg)

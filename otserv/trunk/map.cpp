@@ -426,10 +426,12 @@ bool Map::removeCreature(Creature* c)
   OTSYS_THREAD_LOCK(mapLock)
 
 	//removeCreature from the online list
-  playersOnline.erase(playersOnline.find(c->getID()));
+			 
+    std::map<long, Creature*>::iterator pit = playersOnline.find(c->getID());
+  if (pit != playersOnline.end()) {
+			 playersOnline.erase(pit);
 
   
-  std::cout << playersOnline.size() << " players online." << std::endl;
 #ifdef __DEBUG__
 	std::cout << "removing creature "<< std::endl;
 #endif
@@ -450,6 +452,10 @@ bool Map::removeCreature(Creature* c)
 											  }
 									}
 						 }
+
+  }
+
+  std::cout << playersOnline.size() << " players online." << std::endl;
 
   if (c->isPlayer())
     ((Player*)c)->releasePlayer();
@@ -886,11 +892,11 @@ void Map::creatureMakeDistDamage(Creature *creature, Creature *attackedCreature)
                       msg.AddByte(0x6c);
                       msg.AddPosition(attackedCreature->pos);
                       msg.AddByte(targettile->getThingStackPos(attackedCreature));
-		      msg.AddByte(0x6a);
-		      msg.AddPosition(attackedCreature->pos);
-		      Item* item = new Item(2278);
-		      msg.AddItem(item);
-		      delete item;
+							 msg.AddByte(0x6a);
+							 msg.AddPosition(attackedCreature->pos);
+							 Item* item = new Item(2278);
+							 msg.AddItem(item);
+							 delete item;
                     }
                     else
 							 msg.AddCreatureHealth(attackedCreature);
@@ -908,10 +914,11 @@ void Map::creatureMakeDistDamage(Creature *creature, Creature *attackedCreature)
         }
       }
 
-	 //if (attackedCreature->health <= 0) {
-	 //  		targettile->removeThing(attackedCreature);
-	 //  		targettile->addThing(new Item(2278));
-	 //}
+	 if (attackedCreature->health <= 0) {
+	   		targettile->removeThing(attackedCreature);
+				playersOnline.erase(playersOnline.find(attackedCreature->getID()));
+	   		targettile->addThing(new Item(2278));
+	 }
   }
 }
 
