@@ -1221,8 +1221,8 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 		for(TargetAreaVec::const_iterator taIt = areaVec.begin(); taIt != areaVec.end(); ++taIt) {
 			Tile *targettile = getTile(taIt->first.x,  taIt->first.y, taIt->first.z);
 			
-			//if(!taIt->second)
-			me->getMagicEffect(spectator, creature, taIt->first, taIt->second, 0, targettile->isPz() , msg);
+			if(!taIt->second /*hasTarget*/)
+				me->getMagicEffect(spectator, creature, taIt->first, false, 0, targettile->isPz() , msg);
 		}
 
 		for(TargetDataVec::const_iterator tdIt = targetVec.begin(); tdIt != targetVec.end(); ++tdIt) {
@@ -1232,10 +1232,18 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 			int damage = tdIt->second.damage;
 			int manaDamage = tdIt->second.manaDamage;
 
+			me->getMagicEffect(spectator, creature, target->pos, true, damage, targettile->isPz() , msg);
+
+			if(creature && target->health <= 0) { //could be death due to a magic damage with no owner (fire/poison/energy)
+				if(spectator->CanSee(creature->pos.x, creature->pos.y)) {
+					std::stringstream exp;
+					exp << (int)(target->experience * 0.1);
+					msg.AddAnimatedText(creature->pos, 983, exp.str());
+				}
+			}
+
 			if(spectator->CanSee(target->pos.x, target->pos.y))
 			{
-				//me->getMagicEffect(creature, target->pos, true, damage, targettile->isPz() , msg);
-
 				if(damage != 0) {
 					std::stringstream dmg;
 					dmg << std::abs(damage);
@@ -1249,17 +1257,8 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 					msg.AddAnimatedText(target->pos, 2, manaDmg.str());
 				}
 
-				if (target->health <= 0)
-				{            
-					if(creature) { //could be death due to a magic damage with no owner (fire/poison/energy)
-						std::stringstream exp;
-						exp << (int)(target->experience * 0.1);
-						msg.AddAnimatedText(creature->pos, 983, exp.str());
-					}
-				}
-				else {
+				if (target->health > 0)
 					msg.AddCreatureHealth(target);
-				}
 
 				if (spectator == target){
 					CreateManaDamageUpdate(target, creature, manaDamage, msg);
