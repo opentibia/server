@@ -47,6 +47,23 @@ bool Tile::isBlocking() const
 
   return false;
 }
+bool Tile::floorChange(){
+  ItemVector::iterator iit;
+  if(!(ground.noFloorChange() == true))
+    return true;
+  for (iit = topItems.begin(); iit != topItems.end(); ++iit){  
+         if ((*iit)->floorChangeNorth() || (*iit)->floorChangeSouth() || (*iit)->floorChangeEast() || (*iit)->floorChangeWest())
+         return true;      
+      }
+
+  for (iit = downItems.begin(); iit != downItems.end(); ++iit){ 
+         if ((*iit)->floorChangeNorth() || (*iit)->floorChangeSouth() || (*iit)->floorChangeEast() || (*iit)->floorChangeWest())
+         return true;
+      }
+
+
+  return false;
+     }
 bool Tile::floorChange(Direction direction)
 {
   

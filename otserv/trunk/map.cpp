@@ -511,7 +511,7 @@ std::list<Position> Map::getPathTo(Position start, Position to, bool creaturesBl
 						continue;
 					*/
 
-					if((!(t = getTile(x,y,z))) || t->isBlocking() || (t->creatures.size() /*&& x != to.x && y != to.y*/))
+					if((!(t = getTile(x,y,z))) || t->isBlocking() || (t->creatures.size() /*&& x != to.x && y != to.y*/)|| t->floorChange() )
 						continue;
 					bool isInClosed = false;
 					for(std::list<AStarNode*>::iterator it = closedNodes.begin();

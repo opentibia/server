@@ -54,6 +54,7 @@ public:
   bool isPz() const;
   void setPz();
   
+  bool floorChange();
   bool floorChange(Direction direction);
   
   std::string getDescription() const;
