@@ -1310,16 +1310,16 @@ void Map::makeCastSpell(Player *player, int mana, int mindamage, int maxdamage, 
 							}
 							else
 								msg.AddCreatureHealth(victim);
-						}
 
-						if(victim == spectator && damagelist[i].second > 0) {
-							CreateDamageUpdate(spectator, player, damagelist[i].second, msg);
-							msg.AddPlayerStats(victim);
+							if(victim == spectator && damagelist[i].second > 0) {
+								CreateDamageUpdate(spectator, player, damagelist[i].second, msg);
+								msg.AddPlayerStats(victim);
 
-							spectator->sendNetworkMessage(&msg);
+								spectator->sendNetworkMessage(&msg);
+							}
+							else
+								msg.AddPlayerStats(spectator);
 						}
-						else
-							msg.AddPlayerStats(spectator);
 					}
 
 					spectator->sendNetworkMessage(&msg);
