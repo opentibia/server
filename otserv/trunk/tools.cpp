@@ -33,7 +33,7 @@ int random_range(int lowest_number, int highest_number)
 		lowest_number = nTmp;
     }
 
-    int range = highest_number - lowest_number + 1;
+    double range = highest_number - lowest_number + 1;
     return lowest_number + int(range * rand()/(RAND_MAX + 1.0));
 }
 
