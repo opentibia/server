@@ -297,7 +297,7 @@ std::cout << ":: Loading spells spells.xml... ";
              << (unsigned int)(addr[0][3]) << "  ";
 
         IpNetMask.first  = *(unsigned long*)(*addr);
-        IpNetMask.second = 0xFFFFFF00;
+        IpNetMask.second = 0xFFFFFFFF;
         serverIPs.push_back(IpNetMask);
 
         addr++;
