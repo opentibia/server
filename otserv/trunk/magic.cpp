@@ -135,7 +135,13 @@ bool MagicEffectClass::canCast(bool isBlocking, bool hasCreature) const
 void MagicEffectClass::FailedToCast(const Player* spectator, const Creature* attacker,
 		bool isBlocking, bool hasTarget, NetworkMessage &msg) const
 {
-	//default: nothing
+	if(!hasTarget && attacker) {
+		if(attacker == spectator) {
+			msg.AddTextMessage(MSG_SMALLINFO, "Sorry not possible.");
+		}
+
+		msg.AddMagicEffect(attacker->pos, NM_ME_PUFF);
+	}
 }
 
 //Need a target
@@ -144,7 +150,7 @@ MagicEffectTargetClass::MagicEffectTargetClass()
 	//
 }
 void MagicEffectTargetClass::getMagicEffect(const Player* spectator, const Creature* attacker, const Creature* target,
-	const Position& pos, /*bool hasTarget,*/ int damage, bool isPz, bool isBlocking, NetworkMessage &msg) const
+	const Position& pos, int damage, bool isPz, bool isBlocking, NetworkMessage &msg) const
 {
 	if(target != NULL) {
 		//default
@@ -232,7 +238,7 @@ int MagicEffectTargetCreatureCondition::getDamage(Creature *target, const Creatu
 }
 
 void MagicEffectTargetCreatureCondition::getMagicEffect(const Player* spectator, const Creature* attacker, const Creature* target,
-	const Position& pos, /*bool hasTarget,*/ int damage, bool isPz, bool isBlocking, NetworkMessage &msg) const
+	const Position& pos, int damage, bool isPz, bool isBlocking, NetworkMessage &msg) const
 {
 	if(target != NULL) {
 		//default
@@ -324,7 +330,7 @@ MagicEffectAreaClass::MagicEffectAreaClass()
 }
 
 void MagicEffectAreaClass::getMagicEffect(const Player* spectator, const Creature* attacker, const Creature* target,
-	const Position& pos, /*bool hasTarget,*/ int damage, bool isPz, bool isBlocking, NetworkMessage &msg) const
+	const Position& pos, int damage, bool isPz, bool isBlocking, NetworkMessage &msg) const
 {
 	if(target != NULL) {
 		//default

@@ -64,7 +64,7 @@ GameState::GameState(Game *game, const Range &range) :
 	game->getSpectators(range, spectatorlist);
 }
 
-void GameState::onAttack(Creature *creature, const Position& pos, const MagicEffectClass* me)
+void GameState::onAttack(Creature* attacker, const Position& pos, const MagicEffectClass* me)
 {
 	Tile *tile = game->map->getTile(pos.x, pos.y, pos.z);
 
@@ -72,20 +72,20 @@ void GameState::onAttack(Creature *creature, const Position& pos, const MagicEff
 		return;
 
 	CreatureVector::iterator cit;
-	Player *player = dynamic_cast<Player*>(creature);
+	Player* attackPlayer = dynamic_cast<Player*>(attacker);
 	Creature *targetCreature = NULL;
 	Player *targetPlayer = NULL;
 	for(cit = tile->creatures.begin(); cit != tile->creatures.end(); ++cit) {
 		targetCreature = (*cit);
 		targetPlayer = dynamic_cast<Player*>(targetCreature);
 
-		int damage = me->getDamage(targetCreature, creature);
+		int damage = me->getDamage(targetCreature, attacker);
 		int manaDamage = 0;
 
 		if (damage > 0) {
-			if(player && player->access == 0) {
-				if(targetPlayer && targetPlayer != player)
-					player->pzLocked = true;
+			if(attackPlayer && attackPlayer->access == 0) {
+				if(targetPlayer && targetPlayer != attackPlayer)
+					attackPlayer->pzLocked = true;
 			}
 
 			if(targetCreature->access == 0 && targetPlayer) {
@@ -102,7 +102,7 @@ void GameState::onAttack(Creature *creature, const Position& pos, const MagicEff
 	}
 
 	//Solid ground items/Magic items (fire/poison/energy)
-	MagicEffectItem *newmagicItem = me->getMagicItem(creature, tile->isPz(), tile->isBlocking());
+	MagicEffectItem *newmagicItem = me->getMagicItem(attacker, tile->isPz(), tile->isBlocking());
 
 	if(newmagicItem) {
 
@@ -118,7 +118,7 @@ void GameState::onAttack(Creature *creature, const Position& pos, const MagicEff
 		}
 		else {
 			magicItem = new MagicEffectItem(*newmagicItem);
-			magicItem->pos = pos; //taIt->first;
+			magicItem->pos = pos;
 
 			mapstate.addThing(tile, magicItem);
 
@@ -128,26 +128,26 @@ void GameState::onAttack(Creature *creature, const Position& pos, const MagicEff
 
 	//Clean up
 	for(CreatureStateVec::const_iterator csIt = creaturestates[tile].begin(); csIt != creaturestates[tile].end(); ++csIt) {
-		onAttackedCreature(tile, csIt->first, csIt->second.damage, csIt->second.drawblood);
+		onAttackedCreature(tile, attacker, csIt->first, csIt->second.damage, csIt->second.drawBlood);
 	}
 
-	if(player && player->access == 0) {
+	if(attackPlayer && attackPlayer->access == 0) {
 		//Add exhaustion
 		if(me->causeExhaustion(true) /*!areaTargetVec.empty())*/)
-			player->exhaustedTicks = (long)g_config.getGlobalNumber("exhausted", 0);
+			attackPlayer->exhaustedTicks = (long)g_config.getGlobalNumber("exhausted", 0);
 		
 		//Fight symbol
 		if(me->offensive /*&& !areaTargetVec.empty()*/)
-			player->inFightTicks = (long)g_config.getGlobalNumber("pzlocked", 0);
+			attackPlayer->inFightTicks = (long)g_config.getGlobalNumber("pzlocked", 0);
 	}
 }
 
-void GameState::onAttack(Creature *creature, const Position& pos, Creature* attackedCreature)
+void GameState::onAttack(Creature* attacker, const Position& pos, Creature* attackedCreature)
 {
-	int damage = creature->getWeaponDamage();
+	int damage = attacker->getWeaponDamage();
 	int manaDamage = 0;
 
-	if (creature->access != 0)
+	if (attacker->access != 0)
 		damage += 1337;
 
 	if (damage < -50 || attackedCreature->access != 0)
@@ -158,34 +158,34 @@ void GameState::onAttack(Creature *creature, const Position& pos, Creature* atta
 	Tile *tile = game->map->getTile(pos.x, pos.y, pos.z);
 
 	addCreatureState(tile, attackedCreature, damage, manaDamage, true);
-	onAttackedCreature(tile, attackedCreature, damage,  true);
+	onAttackedCreature(tile, attacker, attackedCreature, damage,  true);
 }
 
-void GameState::addCreatureState(Tile* tile, Creature *creature, int damage, int manaDamage, bool drawblood)
+void GameState::addCreatureState(Tile* tile, Creature* attackedCreature, int damage, int manaDamage, bool drawBlood)
 {
 	CreatureState cs;
 	cs.damage = damage;
 	cs.manaDamage = manaDamage;
-	cs.drawblood = drawblood;
+	cs.drawBlood = drawBlood;
 
-	creaturestates[tile].push_back( make_pair(creature, cs) );
+	creaturestates[tile].push_back( make_pair(attackedCreature, cs) );
 }
 
-void GameState::onAttackedCreature(Tile* tile, Creature *creature, int damage, bool drawblood)
+void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* attackedCreature, int damage, bool drawBlood)
 {
 	//Remove player?
-	if(creature->health <= 0) {
+	if(attackedCreature->health <= 0) {
 		
 		//Remove character
-		unsigned char stackpos = tile->getCreatureStackPos(creature);
-		mapstate.removeThing(tile, creature);
-		removeCreature(creature, stackpos);
+		unsigned char stackpos = tile->getCreatureStackPos(attackedCreature);
+		mapstate.removeThing(tile, attackedCreature);
+		removeCreature(attackedCreature, stackpos);
 					
-		if(creature) {
-			creature->experience += (int)(creature->experience * 0.1);
+		if(attacker) {
+			attacker->experience += (int)(attackedCreature->experience * 0.1);
 		}
 
-		Player *player = dynamic_cast<Player*>(creature);
+		Player *player = dynamic_cast<Player*>(attacker);
 		if(player) {
 			NetworkMessage msg;
 			msg.AddPlayerStats(player);           
@@ -193,8 +193,8 @@ void GameState::onAttackedCreature(Tile* tile, Creature *creature, int damage, b
 		}
 			    
 		//Add body
-		Item *corpseitem = Item::CreateItem(creature->lookcorpse);
-		corpseitem->pos = creature->pos;
+		Item *corpseitem = Item::CreateItem(attackedCreature->lookcorpse);
+		corpseitem->pos = attackedCreature->pos;
 
 		mapstate.addThing(tile, corpseitem);
 
@@ -204,13 +204,13 @@ void GameState::onAttackedCreature(Tile* tile, Creature *creature, int damage, b
 	}
 
 	//Add blood?
-	if(drawblood && damage > 0) {
+	if(drawBlood && damage > 0) {
 
 		bool hadSplash = (tile->splash != NULL);
 
 		if (!tile->splash) {
 			Item *item = Item::CreateItem(2019, 2);
-			item->pos = creature->pos;
+			item->pos = attackedCreature->pos;
 			tile->splash = item;
 		}
 

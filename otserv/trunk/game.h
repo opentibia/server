@@ -59,7 +59,7 @@ public:
 
 	int damage;
 	int manaDamage;
-	bool drawblood;
+	bool drawBlood;
 };
 
 typedef std::vector< std::pair<Creature*, CreatureState> > CreatureStateVec;
@@ -76,16 +76,16 @@ public:
 	GameState(Game *game, const Range &range);
 	~GameState() {};
 
-	void onAttack(Creature *creature, const Position& pos, const MagicEffectClass* me);
-	void onAttack(Creature *creature, const Position& pos, Creature* attackedCreature);
-	void getChanges(Player *spectator, NetworkMessage &msg);
-	const CreatureStateVec& getCreatureStateList(Tile *tile) {return creaturestates[tile];};
+	void onAttack(Creature* attacker, const Position& pos, const MagicEffectClass* me);
+	void onAttack(Creature* attacker, const Position& pos, Creature* attackedCreature);
+	void getChanges(Player* spectator, NetworkMessage &msg);
+	const CreatureStateVec& getCreatureStateList(Tile* tile) {return creaturestates[tile];};
 	const std::vector<Creature*>& getSpectators() {return spectatorlist;}
 
 protected:
-	void addCreatureState(Tile* tile, Creature* creature, int damage, int manaDamage, bool drawblood);
-	void onAttackedCreature(Tile* tile, Creature *creature, int damage, bool drawblood);
-	void removeCreature(Creature *creature, unsigned char stackPos);
+	void addCreatureState(Tile* tile, Creature* attackedCreature, int damage, int manaDamage, bool drawBlood);
+	void onAttackedCreature(Tile* tile, Creature* attacker, Creature* attackedCreature, int damage, bool drawBlood);
+	void removeCreature(Creature* creature, unsigned char stackPos);
 	Game *game;
 
 	std::vector<Creature*> spectatorlist;
