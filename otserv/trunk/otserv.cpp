@@ -211,10 +211,10 @@ int main(int argc, char *argv[])
 	}
 	std::cout << "[done]" << std::endl;
 
-  std::cout << ":: reading data\\items\\items.xml ... ";
-	if (Item::items.loadXMLInfos("data\\items\\items.xml"))
+  std::cout << ":: reading data/items/items.xml ... ";
+	if (Item::items.loadXMLInfos("data/items/items.xml"))
   {
-    ErrorMessage("Could not load data\\items\\items.xml ...!");
+    ErrorMessage("Could not load data/items/items.xml ...!");
     return -1;
 	}
 	std::cout << "[done]" << std::endl;
