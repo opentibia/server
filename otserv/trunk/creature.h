@@ -27,6 +27,7 @@
 #include "position.h"
 #include "networkmessage.h"
 #include "magic.h"
+#include <vector>
 
 enum subfight_t {
 	DIST_NONE = 0,
@@ -96,10 +97,6 @@ public:
 
 		return false;
 	}
-
-	//void AddCondition(attacktype_t type, ConditionVec condVec) {
-		//
-	//}
 };
 
 //////////////////////////////////////////////////////////////////////
@@ -159,9 +156,6 @@ public:
   
   long inFightTicks, exhaustedTicks;
 	long manaShieldTicks, hasteTicks, paralyzeTicks;
-
-	//long burningTicks, energizedTicks, poisonedTicks;
-	//long curburningTicks, curenergizedTicks, curpoisonedTicks;
 	int immunities;
 
   unsigned long experience;
@@ -180,32 +174,45 @@ public:
   virtual int getStepDuration(int underground) { return (1000*120*100)/(getSpeed()*underground); };
   void setNormalSpeed()
   {
-  if(access!=0){
-           speed = 900;     
-           return;    
-           } 
-  speed = 220 + (2* (level - 1)); 
+		if(access!=0){
+			speed = 900;     
+			return;    
+		}
+		
+		speed = 220 + (2* (level - 1)); 
   }
-  int getNormalSpeed()
+  
+	int getNormalSpeed()
   {
-      if(access!=0){     
-           return 900;    
-           }
-  return 220 + (2* (level - 1)); 
+		if(access!=0){     
+			return 900;    
+		}
+		return 220 + (2* (level - 1)); 
   }
-  int access; //access level
-  // magic level
-  int maglevel;
-  // level
-  int level;
+
+  int access;		//access level
+  int maglevel;	// magic level
+  int level;		// level
   int speed;
+
   virtual bool canMovedTo(const Tile *tile) const;
 
   virtual void sendCancel(const char *msg) { };
   virtual void sendCancelWalk(const char *msg) { };
 
+	virtual void addDamage(Creature* attacker, int damage);
+	virtual int getGainedExperience(Creature* attacker);
+	virtual std::vector<long> getInflicatedDamageCreatureList();
 protected:
 	Conditions conditions;
+	typedef std::vector< std::pair<uint64_t, long> > DamageList;
+	typedef std::map<long, DamageList > TotalDamageList;
+	TotalDamageList totaldamagelist;
+
+	virtual int getLostExperience();
+	virtual int getInflicatedDamage(Creature* attacker);
+	virtual int getTotalInflictedDamage();
+	virtual int getInflicatedDamage(unsigned long id);
 
 private:
 	virtual void onThink(){};

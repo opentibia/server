@@ -173,17 +173,57 @@ void GameState::addCreatureState(Tile* tile, Creature* attackedCreature, int dam
 
 void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* attackedCreature, int damage, bool drawBlood)
 {
+	attackedCreature->addDamage(attacker, damage);
+
 	//Remove player?
 	if(attackedCreature->health <= 0) {
 		
 		//Remove character
 		unsigned char stackpos = tile->getCreatureStackPos(attackedCreature);
 		mapstate.removeThing(tile, attackedCreature);
-		removeCreature(attackedCreature, stackpos);
-					
-		if(attacker) {
-			attacker->experience += (int)(attackedCreature->experience * 0.1);
+		removeCreature(attackedCreature, stackpos);			
+		
+		//Get all creatures that will gain xp from this kill..
+		std::vector<long> creaturelist;
+		creaturelist = attackedCreature->getInflicatedDamageCreatureList();
+
+		CreatureState* attackedCreatureState = NULL;
+		CreatureStateVec& creatureStateVec = creaturestates[tile];
+		for(CreatureStateVec::iterator csIt = creatureStateVec.begin(); csIt != creatureStateVec.end(); ++csIt) {
+			if(csIt->first == attackedCreature) {
+				attackedCreatureState = &csIt->second;
+				//csIt->second.attackerlist.push_back(gainexpCreature);
+			}
 		}
+
+		if(attackedCreatureState) { //should never be NULL..
+			//Add experience
+			for(std::vector<long>::const_iterator iit = creaturelist.begin(); iit != creaturelist.end(); ++iit) {
+				Creature* gainexpCreature = game->getCreatureByID(*iit);
+				if(gainexpCreature) {
+					gainexpCreature->experience += attackedCreature->getGainedExperience(gainexpCreature);
+
+					//Need to add this creature and all that can see it to spectators, unless they already added
+					std::vector<Creature*> creaturelist;
+					game->getSpectators(Range(gainexpCreature->pos, true), creaturelist);
+
+					for(std::vector<Creature*>::const_iterator cit = creaturelist.begin(); cit != creaturelist.end(); ++cit) {
+						if(std::find(spectatorlist.begin(), spectatorlist.end(), *cit) == spectatorlist.end()) {
+							spectatorlist.push_back(*cit);
+						}
+					}
+
+					//Add creature to attackerlist
+					attackedCreatureState->attackerlist.push_back(gainexpCreature);
+				}
+			}
+		}
+
+		/*
+		if(attacker) {
+			attacker->experience += attackedCreature->getGainedExperience(attacker); //(int)(attackedCreature->experience * 0.1);
+		}
+		*/
 
 		Player *player = dynamic_cast<Player*>(attacker);
 		if(player) {
@@ -1428,6 +1468,13 @@ void Game::creatureToChannel(Creature *creature, unsigned char type, const std::
 	OTSYS_THREAD_UNLOCK(gameLock)
 }
 
+/*
+void creatureMakeMagic::creatureAddDamageAnimation(Player* spectator, const CreatureState& creatureState, NetworkMessage& msg)
+{
+	//
+}
+*/
+
 /** \todo Someone _PLEASE_ clean up this mess */
 bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, const MagicEffectClass* me)
 {
@@ -1542,32 +1589,46 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 				else {
 					for(CreatureStateVec::const_iterator csIt = creatureStateVec.begin(); csIt != creatureStateVec.end(); ++csIt) {
 						Creature *target = csIt->first;
-						int damage = csIt->second.damage;
-						int manaDamage = csIt->second.manaDamage;
+						const CreatureState& creatureState = csIt->second;
 
-						me->getMagicEffect(spectator, creature, target, target->pos, damage, tile->isPz(), false, msg);
+						me->getMagicEffect(spectator, creature, target, target->pos, creatureState.damage, tile->isPz(), false, msg);
 
 						//could be death due to a magic damage with no owner (fire/poison/energy)
 						if(creature && target->health <= 0) {
+
+							for(std::vector<Creature*>::const_iterator cit = creatureState.attackerlist.begin(); cit != creatureState.attackerlist.end(); ++cit) {
+								Creature* gainexpCreature = *cit;
+								
+								if(spectator->CanSee(gainexpCreature->pos.x, gainexpCreature->pos.y, gainexpCreature->pos.z)) {
+									std::stringstream exp;
+									exp << target->getGainedExperience(gainexpCreature);
+									msg.AddAnimatedText(gainexpCreature->pos, 983, exp.str());
+									msg.AddPlayerStats(spectator);
+								}
+							}
+
+							/*
 							if(spectator->CanSee(creature->pos.x, creature->pos.y, creature->pos.z)) {
 								std::stringstream exp;
-								exp << (int)(target->experience * 0.1);
+								//exp << (int)(target->experience * 0.1);
+								exp << target->getGainedExperience(creature);
 								msg.AddAnimatedText(creature->pos, 983, exp.str());
 							}
+							*/
 						}
 
 						if(spectator->CanSee(target->pos.x, target->pos.y, target->pos.z))
 						{
-							if(damage != 0) {
+							if(creatureState.damage != 0) {
 								std::stringstream dmg;
-								dmg << std::abs(damage);
+								dmg << std::abs(creatureState.damage);
 								msg.AddAnimatedText(target->pos, me->animationColor, dmg.str());
 							}
 
-							if(manaDamage > 0){
+							if(creatureState.manaDamage > 0){
 								msg.AddMagicEffect(target->pos, NM_ME_LOOSE_ENERGY);
 								std::stringstream manaDmg;
-								manaDmg << std::abs(manaDamage);
+								manaDmg << std::abs(creatureState.manaDamage);
 								msg.AddAnimatedText(target->pos, 2, manaDmg.str());
 							}
 
@@ -1575,8 +1636,8 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 								msg.AddCreatureHealth(target);
 
 							if (spectator == target){
-								CreateManaDamageUpdate(target, creature, manaDamage, msg);
-								CreateDamageUpdate(target, creature, damage, msg);
+								CreateManaDamageUpdate(target, creature, creatureState.manaDamage, msg);
+								CreateDamageUpdate(target, creature, creatureState.damage, msg);
 							}
 						}
 					}
@@ -1849,31 +1910,54 @@ void Game::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fi
 			(spectator->CanSee(attackedCreature->pos.x, attackedCreature->pos.y, attackedCreature->pos.z))) {
 			msg.AddMagicEffect(attackedCreature->pos, NM_ME_BLOCKHIT);
 		}
-		else if (spectator->CanSee(attackedCreature->pos.x, attackedCreature->pos.y, attackedCreature->pos.z))
-		{
-			std::stringstream dmg, manaDmg;
-			dmg << std::abs(creatureState.damage);
-			manaDmg << std::abs(creatureState.manaDamage);
-			
-			if(creatureState.damage > 0) {
-				msg.AddAnimatedText(attackedCreature->pos, 0xB4, dmg.str());
-				msg.AddMagicEffect(attackedCreature->pos, NM_ME_DRAW_BLOOD);
+		else {
+			for(std::vector<Creature*>::const_iterator cit = creatureState.attackerlist.begin(); cit != creatureState.attackerlist.end(); ++cit) {
+				Creature* gainexpCreature = *cit;
+
+				if(spectator->CanSee(gainexpCreature->pos.x, gainexpCreature->pos.y, gainexpCreature->pos.z)) {
+					std::stringstream exp;
+					exp << attackedCreature->getGainedExperience(gainexpCreature);
+					msg.AddAnimatedText(gainexpCreature->pos, 983, exp.str());
+					msg.AddPlayerStats(spectator);
+				}
 			}
 
-			if(creatureState.manaDamage >0) {
-				msg.AddMagicEffect(attackedCreature->pos, NM_ME_LOOSE_ENERGY);
-				msg.AddAnimatedText(attackedCreature->pos, 2, manaDmg.str());
+			/*
+			if(attackedCreature->health <= 0) {
+				if(spectator->CanSee(creature->pos.x, creature->pos.y, creature->pos.z)) {
+					std::stringstream exp;
+					exp << attackedCreature->getGainedExperience(creature);
+					msg.AddAnimatedText(creature->pos, 983, exp.str());
+				}
 			}
+			*/
 
-			if (attackedCreature->health > 0)
-				msg.AddCreatureHealth(attackedCreature);
+			if (spectator->CanSee(attackedCreature->pos.x, attackedCreature->pos.y, attackedCreature->pos.z))
+			{
+				if(creatureState.damage > 0) {
+					std::stringstream dmg;
+					dmg << std::abs(creatureState.damage);
 
-			if (spectator == attackedCreature) {
-				CreateManaDamageUpdate(attackedCreature, creature, creatureState.manaDamage, msg);
-				CreateDamageUpdate(attackedCreature, creature, creatureState.damage, msg);
+					msg.AddAnimatedText(attackedCreature->pos, 0xB4, dmg.str());
+					msg.AddMagicEffect(attackedCreature->pos, NM_ME_DRAW_BLOOD);
+				}
+
+				if(creatureState.manaDamage >0) {
+					std::stringstream manaDmg;
+					manaDmg << std::abs(creatureState.manaDamage);
+					msg.AddMagicEffect(attackedCreature->pos, NM_ME_LOOSE_ENERGY);
+					msg.AddAnimatedText(attackedCreature->pos, 2, manaDmg.str());
+				}
+
+				if (attackedCreature->health > 0)
+					msg.AddCreatureHealth(attackedCreature);
+
+				if (spectator == attackedCreature) {
+					CreateManaDamageUpdate(attackedCreature, creature, creatureState.manaDamage, msg);
+					CreateDamageUpdate(attackedCreature, creature, creatureState.damage, msg);
+				}
 			}
 		}
-
 
 		spectator->sendNetworkMessage(&msg);
 	}

@@ -583,7 +583,7 @@ void Player::savePlayer(std::string &name)
 		pos.z = masterPos.z;
 
 		//int expLoss = (int)(experience*0.1f);
-		experience -= (int)(experience*0.1f);        //0.1f is also used in die().. maybe we make a little function for exp-loss?
+		experience -= getLostExperience(); //(int)(experience*0.1f);        //0.1f is also used in die().. maybe we make a little function for exp-loss?
 
 		//Player died?
 

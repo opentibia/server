@@ -57,27 +57,26 @@ Monster::Monster(const char *name, Game* game) :
 		if ((const char*)xmlGetProp(root, (const xmlChar *)"name")) {
 			monstername = (const char*)xmlGetProp(root, (const xmlChar *)"name");
 		}
+
+		if ((const char*)xmlGetProp(root, (const xmlChar *)"experience")) {
+			this->experience = atoi((const char*)xmlGetProp(root, (const xmlChar *)"experience"));
+		}
+
 		/*
 		if ((const char*)xmlGetProp(root, (const xmlChar *)"access")) {
 			access = atoi((const char*)xmlGetProp(root, (const xmlChar *)"access"));
 		}
 		*/
+
 		if ((const char*)xmlGetProp(root, (const xmlChar *)"level")) {
 			level = atoi((const char*)xmlGetProp(root, (const xmlChar *)"level"));
 			setNormalSpeed();
-			//std::cout << level << std::endl;
-			//std::cout << maglevel << std::endl;
-
 			maglevel = atoi((const char*)xmlGetProp(root, (const xmlChar *)"maglevel"));
 		}
 
 		while (p)
 		{
 			const char* str = (char*)p->name;
-
-			if (strcmp(str, "experience") == 0) {
-				this->experience = atoi((const char*)xmlGetProp(p, (const xmlChar *)"experience"));
-			}
 			
 			if (strcmp(str, "health") == 0) {
 				this->health = atoi((const char*)xmlGetProp(p, (const xmlChar *)"now"));
@@ -159,13 +158,6 @@ Monster::Monster(const char *name, Game* game) :
 							}
 						}
 						else if(strcmp(attacktype.c_str(), "rune") == 0) {
-							/*
-							unsigned short id = atoi((const char*)xmlGetProp(tmp, (const xmlChar *)"id"));
-							if(spells.getAllRuneSpells()->find(id) != spells.getAllRuneSpells()->end())
-							{
-								runeSpells.push_back(id);
-							}
-							*/
 							std::string spellname = (const char*)xmlGetProp(tmp, (const xmlChar *)"name");
 							std::transform(spellname.begin(), spellname.end(), spellname.begin(), tolower);
 							

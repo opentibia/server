@@ -60,8 +60,10 @@ public:
 	int damage;
 	int manaDamage;
 	bool drawBlood;
+	std::vector<Creature*> attackerlist;
 };
 
+//typedef map::map<Creature*, CreatureState> CreatureStateMap;
 typedef std::vector< std::pair<Creature*, CreatureState> > CreatureStateVec;
 typedef std::map<Tile*, CreatureStateVec> CreatureStates;
 
@@ -188,8 +190,6 @@ class Game {
     void creatureToChannel(Creature *creature, unsigned char type, const std::string &text, unsigned short channelId);
 		void creatureChangeOutfit(Creature *creature);
 
-		//bool creatureThrowRune(Creature *creature, const MagicEffectClass& me);
-		//void creatureCastSpell(Creature *creature, const MagicEffectClass& me);
 		bool creatureThrowRune(Creature *creature, const Position& centerpos, const MagicEffectClass& me);
 		bool creatureCastSpell(Creature *creature, const Position& centerpos, const MagicEffectClass& me);
 		bool creatureSaySpell(Creature *creature, const std::string &text);
@@ -242,7 +242,6 @@ class Game {
 
 		bool creatureMakeMagic(Creature *creature, const Position& centerpos, const MagicEffectClass* me);
 		bool creatureOnPrepareMagicAttack(Creature *creature, Position pos, const MagicEffectClass* me);
-		//bool creatureOnPrepareMagicCreateSolidObject(Creature *creature, const Position& pos, const MagicEffectTargetGroundClass* magicGround);
 	
 	/**
 		* Change the players hitpoints
@@ -254,6 +253,8 @@ class Game {
 		void getSpectators(const Range& range, std::vector<Creature*>& list);
 		void creatureApplyMagicEffect(Creature *target, const MagicEffectClass& me, NetworkMessage& msg);
 		void CreateManaDamageUpdate(Creature* player, Creature* attackCreature, int damage, NetworkMessage& msg);
+
+		//void creatureAddDamageAnimation(Player* spectator, const CreatureState& creatureState, NetworkMessage& msg);
 
 		OTSYS_THREAD_LOCKVAR eventLock;
 		OTSYS_THREAD_SIGNALVAR eventSignal;

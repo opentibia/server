@@ -100,71 +100,82 @@ void Creature::addCondition(const CreatureCondition& condition, bool refresh)
 	condVec.push_back(condition);
 }
 
-//void Creature::addMagicDamage(const MagicDamageContainer& dmgContainer, bool skipfirst /*= true*/)
-/*
+void Creature::addDamage(Creature* attacker, int damage)
 {
-	if(dmgContainer.getMagicType() == magicNone || dmgContainer.empty())
+	if(damage <= 0)
 		return;
 
-	MagicDamageType mt = dmgContainer.getMagicType();
-	MagicDamageMap[mt] = dmgContainer;
-	ConditionVec& vec = MagicDamageMap[mt];
-	
-	//has already been handled
-	if(skipfirst && vec.size() > 0) {
-		CreatureCondition& di = vec[0];
-		di.first.second--;
+	unsigned long id = 0;
+	if(attacker) {
+		id = attacker->getID();
+	}
 
-		if(di.first.second <=0) {
-			vec.erase(vec.begin());
+	totaldamagelist[id].push_back(make_pair(OTSYS_TIME(), damage));
+}
+
+int Creature::getLostExperience() {
+	return (int)std::floor(((double)experience * 0.1));
+}
+
+int Creature::getInflicatedDamage(unsigned long id)
+{
+	int ret = 0;
+	std::map<long, DamageList >::const_iterator tdIt = totaldamagelist.find(id);
+	if(tdIt != totaldamagelist.end()) {
+		for(DamageList::const_iterator dlIt = tdIt->second.begin(); dlIt != tdIt->second.end(); ++dlIt) {
+			ret += dlIt->second;
 		}
 	}
 
-	long ticks = 0;
-	long curticks = 0;
-
-	for(ConditionVec::iterator mdi = vec.begin(); mdi != vec.end(); ++mdi) {
-		if(vec.begin() == mdi)
-			curticks = mdi->first.first;
-
-		ticks += mdi->first.first * mdi->first.second;
-	}
-	
-	//inFightTicks += ticks;
-
-	switch(mt) {
-	case magicFire:
-		burningTicks = ticks;
-		curburningTicks = curticks;
-		break;
-		
-	case magicEnergy:
-		energizedTicks = ticks;
-		curenergizedTicks = curticks;
-		break;
-
-	case magicPoison:
-		poisonedTicks = ticks;
-		curpoisonedTicks = curticks;
-		break;
-	case magicNone:
-		// nothing to do
-		break;
-	}
+	return ret;
 }
-*/
 
-/*
-ConditionVec* Creature::getConditionVec(MagicDamageType md)
+int Creature::getInflicatedDamage(Creature* attacker)
 {
-	if(MagicDamageMap.find(md) != MagicDamageMap.end()) {
-		return &MagicDamageMap[md];
+	unsigned long id = 0;
+	if(attacker) {
+		id = attacker->getID();
 	}
 
-	return NULL;
+	return getInflicatedDamage(id);
 }
-*/
 
+int Creature::getTotalInflictedDamage()
+{
+	int ret = 0;
+	std::map<long, DamageList >::const_iterator tdIt;
+	for(tdIt = totaldamagelist.begin(); tdIt != totaldamagelist.end(); ++tdIt) {
+		ret += getInflicatedDamage(tdIt->first);
+	}
+
+	return ret;
+}
+
+int Creature::getGainedExperience(Creature* attacker)
+{
+	int totaldamage = getTotalInflictedDamage();
+	int attackerdamage = getInflicatedDamage(attacker);
+	int lostexperience = getLostExperience();
+	int gainexperience = 0;
+	
+	if(attackerdamage > 0 && totaldamage > 0) {
+		gainexperience = (int)std::floor(((double)attackerdamage / totaldamage) * lostexperience);
+	}
+
+	return gainexperience;
+}
+
+std::vector<long> Creature::getInflicatedDamageCreatureList()
+{
+	std::vector<long> list;
+
+	std::map<long, DamageList >::const_iterator tdIt;
+	for(tdIt = totaldamagelist.begin(); tdIt != totaldamagelist.end(); ++tdIt) {
+		list.push_back(tdIt->first);
+	}
+
+	return list;
+}
 
 bool Creature::canMovedTo(const Tile *tile) const
 {

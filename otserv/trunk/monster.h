@@ -67,6 +67,8 @@ protected:
 	void OnCreatureEnter(const Creature *creature);
 	void OnCreatureLeave(const Creature *creature);
 
+	virtual int getLostExperience() {return experience;};
+
 	virtual void onThingMove(const Creature *creature, const Thing *thing, const Position *oldPos, unsigned char oldstackpos);
   virtual void onCreatureAppear(const Creature *creature);
   virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos);
