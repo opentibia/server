@@ -81,8 +81,11 @@ typedef int socklen_t;
 
 inline void OTSYS_CREATE_THREAD(void *(*a)(void*), void *b)
 {
+  pthread_attr_t attr;
   pthread_t id;
-  pthread_create(&id, NULL, a, b);
+  pthread_attr_init(&attr);
+  pthread_attr_setdetachstate(&attr,PTHREAD_CREATE_DETACHED);
+  pthread_create(&id, &attr, a, b);
 }
 
 typedef pthread_mutex_t OTSYS_THREAD_LOCKVAR;
