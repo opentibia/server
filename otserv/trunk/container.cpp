@@ -48,6 +48,7 @@ bool Container::addItem(Item *newitem) {
 	if(lcontained.size() < maxitems) {
 		newitem->pos.x = 0xFFFF;
 
+		//FIXME: is this correct? i dont get what it does. tliff
 		Container* container = dynamic_cast<Container*>(newitem); 
 		if(container) {
 			container->setParent(this);

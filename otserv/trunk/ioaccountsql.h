@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// Base class for the Account Loader/Saver
+// Account Loader/Saver implemented through XML
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,22 +18,24 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#include "ioplayer.h"
-#include "ioplayerxml.h"
 
-IOPlayer* IOPlayer::_instance = NULL;
+#ifndef __IOACCOUNTSQL_H
+#define __IOACCOUNTSQL_H
 
-IOPlayer* IOPlayer::instance(){
-	if(!_instance){
-		_instance = (IOPlayer*)new IOPlayerXML;
-	}
-	return _instance;
-}
+#include <string>
 
-bool IOPlayer::loadPlayer(Player* player, std::string name){
-	return false;
-}
 
-bool IOPlayer::savePlayer(Player* player){
-	return false;
-}
+#include "ioaccount.h"
+
+/** Player-Loaders implemented with SQL */
+class IOAccountSQL : protected IOAccount {
+  public:
+	/** Get a textual description of what source is used
+	  * \returns Name of the source*/
+	virtual char* getSourceDescription(){return "SQL";};
+	virtual Account loadAccount(unsigned long accno);
+	IOAccountSQL(){};
+	virtual ~IOAccountSQL(){};
+};
+
+#endif

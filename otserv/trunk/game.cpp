@@ -45,6 +45,7 @@ using namespace std;
 
 #include "npc.h"
 #include "spells.h"
+#include "ioplayer.h"
 
 #include "luascript.h"
 #include <ctype.h>
@@ -270,7 +271,7 @@ void GameState::removeCreature(Creature *creature, unsigned char stackPos)
 	game->playersOnline.erase(game->playersOnline.find(creature->getID()));
 
 	//distribute the change to all non-players that a character has been removed
-	for(int i = 0; i < spectatorlist.size(); ++i) {
+	for(unsigned int i = 0; i < spectatorlist.size(); ++i) {
 		Player *player = dynamic_cast<Player*>(spectatorlist[i]);
 		if(!player) {
 			spectatorlist[i]->onCreatureDisappear(creature, stackPos);
@@ -487,7 +488,7 @@ bool Game::removeCreature(Creature* c)
 
 	if (player){
 		std::string charName = c->getName();
-		player->savePlayer(charName);                    
+		IOPlayer::instance()->savePlayer(player);
 		player->releasePlayer();
 	}
 

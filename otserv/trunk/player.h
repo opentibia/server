@@ -40,22 +40,23 @@ enum slots_t {
 	SLOT_LEGS=7,
 	SLOT_FEET=8,
 	SLOT_RING=9,
-	SLOT_AMMO=10
+	SLOT_AMMO=10,
+	SLOT_DEPOT=11
 };
 
 enum skills_t {
-    SKILL_FIST,
-    SKILL_CLUB,
-    SKILL_SWORD,
-    SKILL_AXE,
-    SKILL_DIST,
-    SKILL_SHIELD,
-    SKILL_FISH
+    SKILL_FIST=0,
+    SKILL_CLUB=1,
+    SKILL_SWORD=2,
+    SKILL_AXE=3,
+    SKILL_DIST=4,
+    SKILL_SHIELD=5,
+    SKILL_FISH=6
 };
 
 enum skillsid_t {
-    SKILL_LEVEL,
-    SKILL_TRIES
+    SKILL_LEVEL=0,
+    SKILL_TRIES=1
 };
 
 class NetworkMessage;
@@ -112,7 +113,7 @@ public:
 	typedef std::pair<unsigned char, Container*> containerItem;
 	typedef std::vector<containerItem> containerLayout;
 	containerLayout vcontainers;
-
+  void preSave();
   void    usePlayer() { useCount++; };
   void    releasePlayer() { useCount--; if (useCount == 0) delete this; };
 	unsigned long getIP() const;
@@ -126,7 +127,6 @@ public:
   void sendNetworkMessage(NetworkMessage *msg);
   void sendCancelAttacking();
   void sendChangeSpeed(Creature* creature);
-  void savePlayer(std::string &name);
   void sendToChannel(Creature *creature, unsigned char type, const std::string &text, unsigned short channelId);
   void die();      //player loses exp/skills/maglevel on death
 

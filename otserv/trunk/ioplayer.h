@@ -33,7 +33,17 @@ class IOPlayer {
 	/** Get a textual description of what source is used
 	  * \returns Name of the source*/
 	virtual char* getSourceDescription(){return "NULL";};
+	/** Load a player
+	  * \returns Wheter the player was successfully loaded
+	  * \param player Player structure to load to
+	  * \param name Name of the player
+	  */
 	virtual bool loadPlayer(Player* player, std::string name);
+	/** Save a player
+	  * \returns Wheter the player was successfully saved
+	  * \param player the player to save
+	  */
+	virtual bool savePlayer(Player* player);
   protected:
 	IOPlayer(){};
 	virtual ~IOPlayer(){};

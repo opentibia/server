@@ -38,6 +38,11 @@ class IOPlayerXML : protected IOPlayer{
 	  * \returns Name of the source*/
 	virtual char* getSourceDescription(){return "XML Player";};
 	virtual bool loadPlayer(Player* player, std::string name);
+	/** Save a player
+	  * \returns Wheter the player was successfully saved
+	  * \param player the player to save
+	  */
+	bool savePlayer(Player* player);
 	IOPlayerXML(){};
 	virtual ~IOPlayerXML(){};
 };

@@ -113,6 +113,7 @@ public:
 
   virtual const std::string& getName() const {return name; };
 
+  void setID(int id){this->id=id;}
   unsigned long getID() const { return id; }
   unsigned long getExpForLv(const int& lv) const { 
 		return (int)((50*lv*lv*lv)/3 - 100 * lv * lv + (850*lv) / 3 - 200);
@@ -205,16 +206,18 @@ public:
 	virtual void addInflictedDamage(Creature* attacker, int damage);
 	virtual int getGainedExperience(Creature* attacker);
 	virtual std::vector<long> getInflicatedDamageCreatureList();
+	virtual int getLostExperience();
+	virtual int getInflicatedDamage(Creature* attacker);
+	virtual int getTotalInflictedDamage();
+	virtual int getInflicatedDamage(unsigned long id);
+
 protected:
 	Conditions conditions;
 	typedef std::vector< std::pair<uint64_t, long> > DamageList;
 	typedef std::map<long, DamageList > TotalDamageList;
 	TotalDamageList totaldamagelist;
 
-	virtual int getLostExperience();
-	virtual int getInflicatedDamage(Creature* attacker);
-	virtual int getTotalInflictedDamage();
-	virtual int getInflicatedDamage(unsigned long id);
+
 
 protected:
 	virtual int onThink(int& newThinkTicks){newThinkTicks = 300; return 300;};

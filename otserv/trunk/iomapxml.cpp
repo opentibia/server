@@ -28,6 +28,7 @@ bool IOMapXML::loadMap(Map* map, std::string identifier){
 	int width, height;
 
 	xmlLineNumbersDefault(1);
+	std::cout << "loaded map " << identifier << std::endl;
 	doc=xmlParseFile(identifier.c_str());
 	if (!doc) {
 		std::cout << "FATAL: couldnt load map. exiting" << std::endl;
@@ -42,9 +43,10 @@ bool IOMapXML::loadMap(Map* map, std::string identifier){
 
 	width=atoi((const char*)xmlGetProp(root, (const xmlChar *) "width"));
 	height=atoi((const char*)xmlGetProp(root, (const xmlChar *) "height"));
+	std::cout << width << "  " << height << std::endl;
 
 	tile=root->children;
-	
+
 	int px,py,pz;
   char* tmp;
   Tile *t;
@@ -59,6 +61,7 @@ bool IOMapXML::loadMap(Map* map, std::string identifier){
       px = atoi(tmp);
       tmp = (char*)xmlGetProp(tile, (const xmlChar *) "y");
       py = atoi(tmp);
+
       tmp = (char*)xmlGetProp(tile, (const xmlChar *) "z");
       pz = atoi(tmp);
       

@@ -32,7 +32,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="libxml2.lib lualibD.lib luaD.lib wsock32.lib /NODEFAULTLIB:libcmtd.lib"
+				AdditionalOptions="libxml2.lib liblua.lib liblualib.lib wsock32.lib /NODEFAULTLIB:libcmtd.lib  mysql++.lib mysqlclient.lib zlib.lib"
 				OutputFile="$(OutDir)/otserv.exe"
 				LinkIncremental="2"
 				GenerateDebugInformation="TRUE"
@@ -133,6 +133,9 @@
 				RelativePath="..\ioaccount.cpp">
 			</File>
 			<File
+				RelativePath="..\ioaccountsql.cpp">
+			</File>
+			<File
 				RelativePath="..\ioaccountxml.cpp">
 			</File>
 			<File
@@ -163,6 +166,9 @@
 				RelativePath="..\map.cpp">
 			</File>
 			<File
+				RelativePath="..\monster.cpp">
+			</File>
+			<File
 				RelativePath="..\networkmessage.cpp">
 			</File>
 			<File
@@ -181,7 +187,7 @@
 				RelativePath="..\protocol.cpp">
 			</File>
 			<File
-				RelativePath="..\protocol70.cpp">
+				RelativePath="..\protocol74.cpp">
 			</File>
 			<File
 				RelativePath="..\spells.cpp">
@@ -222,6 +228,9 @@
 				RelativePath="..\ioaccount.h">
 			</File>
 			<File
+				RelativePath="..\ioaccountsql.h">
+			</File>
+			<File
 				RelativePath="..\ioaccountxml.h">
 			</File>
 			<File
@@ -255,6 +264,9 @@
 				RelativePath="..\map.h">
 			</File>
 			<File
+				RelativePath="..\monster.h">
+			</File>
+			<File
 				RelativePath="..\networkmessage.h">
 			</File>
 			<File
@@ -273,7 +285,7 @@
 				RelativePath="..\protocol.h">
 			</File>
 			<File
-				RelativePath="..\protocol70.h">
+				RelativePath="..\protocol74.h">
 			</File>
 			<File
 				RelativePath=".\resource.h">

@@ -340,12 +340,14 @@ Position Map::placeCreature(Creature* c){
 			pos.y = c->masterPos.y;
 			pos.z = c->masterPos.z;
 		}    
+
 	}
 	Tile* tile=getTile(pos.x, pos.y, pos.z);
 	if (!tile){
          pos = Position();
          tile=getTile(pos.x, pos.y, pos.z);
-               }
+    }
+	std::cout << "POS: " << c->pos << std::endl;
 	tile->addThing(c);
 	c->pos = pos;
 

@@ -17,9 +17,6 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
-
-#ifdef __BUILD_WITH_SQL
-
 #ifndef __IOPLAYERSQL_H
 #define __IOPLAYERSQL_H
 
@@ -35,10 +32,15 @@ class IOPlayerSQL : protected IOPlayer{
 	  * \returns Name of the source*/
 	char* getSourceDescription(){return "SQL";};
 	bool loadPlayer(Player* player, std::string name);
+		/** Save a player
+	  * \returns Wheter the player was successfully saved
+	  * \param player the player to save
+	  */
+	 bool savePlayer(Player* player);
 	IOPlayerSQL(){};
 	~IOPlayerSQL(){};
+  protected:
+	std::string getItems(Item* i, int &startid, int startslot, int player, int parentid);
 };
-
-#endif
 
 #endif
