@@ -162,7 +162,7 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 		mysqlpp::Row r = *i;
 		int skillid=r.lookup_by_name("id");
 		player->skills[skillid][SKILL_LEVEL]=r.lookup_by_name("skill");
-		player->skills[skillid][SKILL_LEVEL]=r.lookup_by_name("tries");
+		player->skills[skillid][SKILL_TRIES]=r.lookup_by_name("tries");
 	}
 
 	//load the items
@@ -229,7 +229,7 @@ bool IOPlayerSQL::savePlayer(Player* player){
 	//Start the transaction
 	mysqlpp::Query query = con.query();
 	query << "BEGIN;";
-	query.store();
+	query.execute();
 
 	//First, an UPDATE query to write the player itself
 
@@ -258,15 +258,15 @@ bool IOPlayerSQL::savePlayer(Player* player){
 	query << "`food` = " << player->food << ", ";
 	query << "`sex` = " << player->sex << " ";
 	query << " WHERE `id` = "<< player->getID() <<" LIMIT 1";
-std::cout << query.preview() << std::endl;
-	query.store();
+	std::cout << query.preview() << std::endl;
+	query.execute();
 
 
 	//then we write the individual skills
 	query.reset();
 	query << "DELETE FROM skills WHERE player="<< player->getID();
 	std::cout << query.preview() << std::endl;
-	query.store();
+	query.execute();
 
 	query.reset();
 	query << "INSERT INTO `skills` ( `player` , `id`, `skill` , `tries` ) VALUES";
@@ -276,13 +276,13 @@ std::cout << query.preview() << std::endl;
 			query<<",";
 	}
 	std::cout << query.preview() << std::endl;
-	query.store();
+	query.execute();
 
 	//now item saving
 	query.reset();
 	query << "DELETE FROM items WHERE player="<< player->getID();
-std::cout << query.preview() << std::endl;
-	query.store();
+	std::cout << query.preview() << std::endl;
+	query.execute();
 	query.reset();
 	std::string itemsstring;
 	query << "INSERT INTO `items` (`player` , `slot` , `sid` , `pid` , `type` , `number` ) VALUES"; 
@@ -295,14 +295,14 @@ std::cout << query.preview() << std::endl;
 		itemsstring.erase(itemsstring.length()-1);
 		query << itemsstring;
 		std::cout << query.preview() << std::endl;
-		query.store();
+		query.execute();
 	}
 
 	//End the transaction
 	query.reset();
 	query << "COMMIT;";
 	std::cout << query.preview() << std::endl;
-	query.store();
+	query.execute();
 
 	return true;
 
