@@ -1,8 +1,7 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// The EventScheduler manages events and calls callbacks when an
-// event happened.
+// Various functions.
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -21,29 +20,58 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
-// Revision 1.5  2002/04/05 18:56:11  acrimon
+// Revision 1.1  2002/04/05 18:56:11  acrimon
 // Adding a file class.
 //
 //////////////////////////////////////////////////////////////////////
 
-#include <hash_map>
-#include "definitions.h"
+#include <stdio.h>
+//#include <pthread.h>
 
-struct eqfd {
-  bool operator() (Socket s1, Socket s2) const {
-    return s1 == s2;
+void hexdump(unsigned char *data, int len) {
+  int i;
+  for (; len > 0; data += 16, len -= 16) {
+    for (i = 0; i < 16 && i < len; i++)
+      fprintf(stderr, "%02x ", data[i]);
+    for (; i < 16; i++)
+      fprintf(stderr, "   ");
+    fprintf(stderr, " ");
+    for (i = 0; i < 16 && i < len; i++)
+      fprintf(stderr, "%c", (data[i] & 0x70) < 32 ? '·' : data[i]);
+    fprintf(stderr, "\n");
   }
-};
+}
 
-typedef hash_map<Socket, unary_functor<Socket,void> *, hash<Socket>, eqfd> fdcbhash;
+#if 0
+pthread_t *detach(void *(*fn)(void *), void *arg) {
+  pthread_t *thread = new pthread_t();
+  if (pthread_create(thread, NULL, fn, arg))
+    perror("pthread");
+  return thread;
+}
+#endif
 
-// EventListener ?
-class EventScheduler {
-  fdcbhash fdcb;
-  fd_set active_fd_set, read_fd_set;
-public:
-  EventScheduler();
-  void newsocket(Socket sock, unary_functor<Socket,void> *);
-  void deletesocket(Socket sock);
-  void loop();
-};
+char upchar(char c) {
+  if (c >= 'a' && c <= 'z')
+    return c - 'a' + 'A';
+  else if (c == 'ä')
+    return 'Ä';
+  else if (c == 'ö')
+    return 'Ö';
+  else if (c == 'ü')
+    return 'Ü';
+  else
+    return c;
+}
+
+void upper(char *upstr, char *str) {
+  for (; *str; str++, upstr++)
+    *upstr = upchar(*str);
+  *upstr = '\0';
+}
+
+void upper(char *upstr, char *str, int n) {
+  for (; *str && n; str++, upstr++, n--)
+    *upstr = upchar(*str);
+  if (n) *upstr = '\0';
+}

@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// The EventScheduler manages events and calls callbacks when an
-// event happened.
+// File loads and saves binary files.
+// TextFile treats them as text files.
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -21,29 +21,37 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
-// Revision 1.5  2002/04/05 18:56:11  acrimon
+// Revision 1.1  2002/04/05 18:56:11  acrimon
 // Adding a file class.
 //
 //////////////////////////////////////////////////////////////////////
 
-#include <hash_map>
-#include "definitions.h"
+#include <fstream.h>
 
-struct eqfd {
-  bool operator() (Socket s1, Socket s2) const {
-    return s1 == s2;
-  }
+class File {
+private:
+  bool error;
+public:
+  char *data;
+  long size;
+  File();
+  File(const File& _file);
+  File& operator=(const File& _file);
+  File(char *filename);
+  File(istream I);
+  ~File();
 };
 
-typedef hash_map<Socket, unary_functor<Socket,void> *, hash<Socket>, eqfd> fdcbhash;
-
-// EventListener ?
-class EventScheduler {
-  fdcbhash fdcb;
-  fd_set active_fd_set, read_fd_set;
+class TextFile : public File {
+  char *curpos;
+  int marks;
 public:
-  EventScheduler();
-  void newsocket(Socket sock, unary_functor<Socket,void> *);
-  void deletesocket(Socket sock);
-  void loop();
+  TextFile();
+  TextFile(const TextFile& _file);
+  TextFile& operator=(const TextFile& _file);
+  TextFile(char *filename);
+  //TextFile(istream I);
+  int splitlines(char ** &A, char delim = '\n');
+  char *extractnextname();
+  int getmarks();
 };

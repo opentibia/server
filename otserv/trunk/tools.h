@@ -1,8 +1,7 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// The EventScheduler manages events and calls callbacks when an
-// event happened.
+// Various functions.
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -21,29 +20,20 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
-// Revision 1.5  2002/04/05 18:56:11  acrimon
+// Revision 1.1  2002/04/05 18:56:11  acrimon
 // Adding a file class.
 //
 //////////////////////////////////////////////////////////////////////
 
-#include <hash_map>
-#include "definitions.h"
+#ifndef __TIBIALOG_TOOLS_H_
+#define __TIBIALOG_TOOLS_H_
 
-struct eqfd {
-  bool operator() (Socket s1, Socket s2) const {
-    return s1 == s2;
-  }
-};
+#include <pthread.h>
 
-typedef hash_map<Socket, unary_functor<Socket,void> *, hash<Socket>, eqfd> fdcbhash;
+extern void hexdump(unsigned char *data, int len);
+//extern pthread_t *detach(void *(*fn)(void *), void *arg);
+extern char upchar(char c);
+extern void upper(char *upstr, char *str);
+extern void upper(char *upstr, char *str, int n);
 
-// EventListener ?
-class EventScheduler {
-  fdcbhash fdcb;
-  fd_set active_fd_set, read_fd_set;
-public:
-  EventScheduler();
-  void newsocket(Socket sock, unary_functor<Socket,void> *);
-  void deletesocket(Socket sock);
-  void loop();
-};
+#endif

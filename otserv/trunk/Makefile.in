@@ -8,7 +8,7 @@ EXEEXT = @EXEEXT@
 OBJEXT = @OBJEXT@
 
 SRC = item.cpp network.cpp player.cpp player_mem.cpp \
-protokoll.cpp tprot.cpp \
+protokoll.cpp tprot.cpp file.cpp tools.cpp \
 otserv.cpp eventscheduler.cpp serversocket.cpp
 
 ADDFILES = config.log config.status configure Makefile Makefile.bak
