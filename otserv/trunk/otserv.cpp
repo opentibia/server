@@ -109,7 +109,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
         msg.AddString((*it));
         msg.AddString("OpenTibia");
         msg.AddU32(serverip);
-        msg.AddU16(7171);
+        msg.AddU16(atoi(g_config.getGlobalString("port").c_str()));
       }
 
       msg.AddU16(account.premDays);
@@ -179,7 +179,7 @@ void ErrorMessage(const char* message)
 
 int main(int argc, char *argv[])
 {
-  std::cout << ":: OTServ Development-Version 0.3.0" << std::endl;
+  std::cout << ":: OTServ Development-Version 0.3.0 - Preview" << std::endl;
   std::cout << ":: ====================" << std::endl;
   std::cout << "::" << std::endl;
 
@@ -306,7 +306,7 @@ int main(int argc, char *argv[])
   memset(&local_adress, 0, sizeof(sockaddr_in)); // zero the struct 
 
   local_adress.sin_family      = AF_INET;
-  local_adress.sin_port        = htons(7171);
+  local_adress.sin_port        = htons(atoi(g_config.getGlobalString("port").c_str()));
   local_adress.sin_addr.s_addr = htonl(INADDR_ANY);
  
   // first we create a new socket
