@@ -66,21 +66,25 @@ int MagicEffectClass::getDamage(Creature *target, const Creature *attacker /*= N
 	return 0;
 }
 
-void MagicEffectClass::getMagicEffect(const Creature* c, const Position& pos, bool hasTarget, int damage, bool isPz, NetworkMessage &msg) const
+void MagicEffectClass::getMagicEffect(const Player* spectator, const Creature* attacker, const Position& pos, bool hasTarget, int damage, bool isPz, NetworkMessage &msg) const
 {
 	if(hasTarget) {
-		if(physical && damage > 0)
-			msg.AddMagicEffect(pos, NM_ME_DRAW_BLOOD);
+		if(spectator->CanSee(pos.x, pos.y)) {
+			if(physical && damage > 0)
+				msg.AddMagicEffect(pos, NM_ME_DRAW_BLOOD);
 
-		if(damageEffect != 0xFF)
-			msg.AddMagicEffect(pos, damageEffect);
+			if(damageEffect != 0xFF)
+				msg.AddMagicEffect(pos, damageEffect);
+		}
 	}
 }
 
-void MagicEffectClass::getDistanceShoot(const Creature* c, const Position& to, bool hasTarget, NetworkMessage &msg) const
+void MagicEffectClass::getDistanceShoot(const Player* spectator, const Creature* attacker, const Position& to, bool hasTarget, NetworkMessage &msg) const
 {
 	if(animationEffect > 0) {
-		msg.AddDistanceShoot(c->pos, to, animationEffect);
+		if(spectator->CanSee(attacker->pos.x, attacker->pos.y) || spectator->CanSee(to.x, to.y)) {
+			msg.AddDistanceShoot(attacker->pos, to, animationEffect);
+		}
 	}
 }
 
@@ -102,20 +106,25 @@ MagicEffectTargetClass::MagicEffectTargetClass()
 	//
 }
 
-void MagicEffectTargetClass::getMagicEffect(const Creature* c, const Position& pos, bool hasTarget, int damage, bool isPz, NetworkMessage &msg) const
+void MagicEffectTargetClass::getMagicEffect(const Player* spectator, const Creature* attacker, const Position& pos, bool hasTarget, int damage, bool isPz, NetworkMessage &msg) const
 {
 	if(hasTarget) {
 		//default
-		MagicEffectClass::getMagicEffect(c, pos, hasTarget, damage, isPz, msg);
+		MagicEffectClass::getMagicEffect(spectator, attacker, pos, hasTarget, damage, isPz, msg);
 	}
-	else
-		msg.AddMagicEffect(c->pos, NM_ME_PUFF);
+	else {
+		if(spectator->CanSee(attacker->pos.x, attacker->pos.y)) {
+			msg.AddMagicEffect(attacker->pos, NM_ME_PUFF);
+		}
+	}
 }
 
-void MagicEffectTargetClass::getDistanceShoot(const Creature* c, const Position& to, bool hasTarget, NetworkMessage &msg) const
+void MagicEffectTargetClass::getDistanceShoot(const Player* spectator, const Creature* attacker, const Position& to, bool hasTarget, NetworkMessage &msg) const
 {
 	if(animationEffect > 0 && hasTarget) {
-		msg.AddDistanceShoot(c->pos, to, animationEffect);
+		if(spectator->CanSee(attacker->pos.x, attacker->pos.y) || spectator->CanSee(to.x, to.y)) {
+			msg.AddDistanceShoot(attacker->pos, to, animationEffect);
+		}
 	}
 }
 
@@ -190,10 +199,12 @@ MagicEffectTargetGroundClass::~MagicEffectTargetGroundClass()
 	}
 }
 
-void MagicEffectTargetGroundClass::getDistanceShoot(const Creature* c, const Position& to, bool hasTarget, NetworkMessage &msg) const
+void MagicEffectTargetGroundClass::getDistanceShoot(const Player* spectator, const Creature* attacker, const Position& to, bool hasTarget, NetworkMessage &msg) const
 {
 	if(animationEffect > 0) {
-		msg.AddDistanceShoot(c->pos, to, animationEffect);
+		if(spectator->CanSee(attacker->pos.x, attacker->pos.y) || spectator->CanSee(to.x, to.y)) {
+			msg.AddDistanceShoot(attacker->pos, to, animationEffect);
+		}
 	}
 }
 
@@ -204,15 +215,17 @@ MagicEffectAreaClass::MagicEffectAreaClass()
 	//memset(area, 0, sizeof(area));
 }
 
-void MagicEffectAreaClass::getMagicEffect(const Creature* c, const Position& pos, bool hasTarget, int damage, bool isPz, NetworkMessage &msg) const
+void MagicEffectAreaClass::getMagicEffect(const Player* spectator, const Creature* attacker, const Position& pos, bool hasTarget, int damage, bool isPz, NetworkMessage &msg) const
 {
 	if(hasTarget) {
 		//default
-		MagicEffectClass::getMagicEffect(c, pos, hasTarget, damage, isPz, msg);
+		MagicEffectClass::getMagicEffect(spectator, attacker, pos, hasTarget, damage, isPz, msg);
 	}
 	else {
-		if(areaEffect != 0xFF && (c->access != 0 || !isPz)) {
-			msg.AddMagicEffect(pos, areaEffect);
+		if(areaEffect != 0xFF && (attacker->access != 0 || !isPz)) {
+			if(spectator->CanSee(pos.x, pos.y)) {
+				msg.AddMagicEffect(pos, areaEffect);
+			}
 		}
 	}
 }

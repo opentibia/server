@@ -198,16 +198,16 @@ void Player::sendIcons()
 		icons |= ICON_HASTE;
 	}
 	if(burningTicks >= 1000){
-		icons |= ICON_BURN;
+		icons |= ICON_BURN | ICON_SWORDS;
 	}
 	if(energizedTicks >= 1000){
-		icons |= ICON_ENERGY;
+		icons |= ICON_ENERGY | ICON_SWORDS;
 	}
 	if(poisonedTicks >= 1000){
-		icons |= ICON_POISON;
+		icons |= ICON_POISON | ICON_SWORDS;
 	}
 	if(speed < getNormalSpeed() /*paralyzeTicks >= 1000*/) {
-		icons |= ICON_PARALYZE;
+		icons |= ICON_PARALYZE | ICON_SWORDS;
 	}
 
 	client->sendIcons(icons);             

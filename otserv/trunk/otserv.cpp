@@ -99,7 +99,6 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
     if (protId == 0x0201)
     {
       msg.SkipBytes(15);
-			//bool isClientBanished = false;
       unsigned int accnumber = msg.GetU32();
 	    std::string  password  = msg.GetString();
 

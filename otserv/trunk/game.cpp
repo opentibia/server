@@ -1216,13 +1216,13 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 
 		mapstate.getMapChanges(spectator, msg);
 
-		me->getDistanceShoot(creature, centerpos, targetVec.size() > 0, msg);
+		me->getDistanceShoot(spectator, creature, centerpos, targetVec.size() > 0, msg);
 
 		for(TargetAreaVec::const_iterator taIt = areaVec.begin(); taIt != areaVec.end(); ++taIt) {
 			Tile *targettile = getTile(taIt->first.x,  taIt->first.y, taIt->first.z);
 			
-			if(!taIt->second)
-				me->getMagicEffect(creature, taIt->first, false, 0, targettile->isPz() , msg);
+			//if(!taIt->second)
+			me->getMagicEffect(spectator, creature, taIt->first, taIt->second, 0, targettile->isPz() , msg);
 		}
 
 		for(TargetDataVec::const_iterator tdIt = targetVec.begin(); tdIt != targetVec.end(); ++tdIt) {
@@ -1234,7 +1234,7 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 
 			if(spectator->CanSee(target->pos.x, target->pos.y))
 			{
-				me->getMagicEffect(creature, target->pos, true, damage, targettile->isPz() , msg);
+				//me->getMagicEffect(creature, target->pos, true, damage, targettile->isPz() , msg);
 
 				if(damage != 0) {
 					std::stringstream dmg;
@@ -1253,7 +1253,7 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 				{            
 					if(creature) { //could be death due to a magic damage with no owner (fire/poison/energy)
 						std::stringstream exp;
-						exp << (int)(target->experience * 0.01);
+						exp << (int)(target->experience * 0.1);
 						msg.AddAnimatedText(creature->pos, 983, exp.str());
 					}
 				}

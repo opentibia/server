@@ -109,7 +109,7 @@ void Creature::addMagicDamage(const MagicDamageContainer& dmgContainer, bool ski
 		ticks += mdi->first.first * mdi->first.second;
 	}
 	
-	inFightTicks += ticks;
+	//inFightTicks += ticks;
 
 	switch(mt) {
 	case magicFire:
