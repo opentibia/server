@@ -319,10 +319,13 @@ int main(int argc, char *argv[])
 #ifndef WIN32
     int yes=1;
     // lose the pesky "Address already in use" error message
-    if (setsockopt(listen_socket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof (int)) == -1)  {
-        throw texception("network.cpp: setsockopt failed!", true);
+    if (setsockopt(listen_socket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof (int)) == -1)
+    {
+      ErrorMessage("Unable to set socket options!");
+      return -1;
     }
 #endif
+
   // bind socket on port
   if (bind(listen_socket, (struct sockaddr*)&local_adress, sizeof(struct sockaddr_in)) < 0)
   {
@@ -344,10 +347,7 @@ int main(int argc, char *argv[])
   } // if (listen(*listen_socket, 10) == -1)
 
 
-
   std::cout << "[done]" << std::endl << ":: OpenTibia Server Running..." << std::endl;
-
-
 
   while (true)
   {

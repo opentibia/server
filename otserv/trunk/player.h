@@ -83,6 +83,7 @@ public:
   int food;
 
   virtual int getWeaponDamage() const;
+  virtual unsigned short getSpeed() const;
 
   // experience
   unsigned long experience;

@@ -276,7 +276,7 @@ void NetworkMessage::AddCreature(const Creature *creature, bool known, unsigned 
   AddByte(0x00); //
   AddByte(0xDC); // 
 
-  AddU16(creature->speed);
+  AddU16(creature->getSpeed());
 }
 
 

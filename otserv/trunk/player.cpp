@@ -126,10 +126,19 @@ int Player::getWeaponDamage() const
 	return 1+(int)(damagemax*rand()/(RAND_MAX+1.0));
 }
 
+
+unsigned short Player::getSpeed() const
+{
+  if (access > 0)
+    return 600;
+
+  return 220 + level*3;
+};
+
+
 void Player::speak(const std::string &text)
 {
 }
-
 
 int Player::sendInventory(){
 	client->sendInventory();

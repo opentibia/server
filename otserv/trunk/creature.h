@@ -101,11 +101,11 @@ public:
   bool exhausted;
   __int64 pzLockedTicks;
 
-  int speed;
-
   int health, healthmax;
 
   int lastDamage;
+
+  virtual unsigned short getSpeed() const { return 220; };
 
   int access; //access level
   // magic level

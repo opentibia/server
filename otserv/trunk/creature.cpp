@@ -35,7 +35,6 @@ Creature::Creature(const char *name) : access(0)
 
   lastDamage = 0;
   pzLockedTicks = 0;
-  speed      = 220;
 
   attackedCreature = 0;
 }
