@@ -22,7 +22,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
 bool fileExists(char* filename)
 {
 	FILE *f = fopen(filename, "rb");

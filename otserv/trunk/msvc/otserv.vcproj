@@ -19,7 +19,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;_CONSOLE;__BUILD_WITH_SQL"
+				PreprocessorDefinitions="WIN32;_CONSOLE;"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -32,7 +32,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="libxml2.lib liblua.lib liblualib.lib wsock32.lib /NODEFAULTLIB:libcmtd.lib mysql++.lib libmysql.lib"
+				AdditionalOptions="libxml2.lib lualibD.lib luaD.lib wsock32.lib /NODEFAULTLIB:libcmtd.lib"
 				OutputFile="$(OutDir)/otserv.exe"
 				LinkIncremental="2"
 				GenerateDebugInformation="TRUE"
@@ -71,6 +71,7 @@
 				AdditionalOptions="/D &quot;_X86_&quot; /c "
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="0"
+				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="TRUE"
@@ -79,7 +80,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="libxml2.lib liblua.lib liblualib.lib wsock32.lib /NODEFAULTLIB:libcmt.lib"
+				AdditionalOptions="libxml2.lib lualib.lib lua.lib wsock32.lib"
 				OutputFile="$(OutDir)/otserv.exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="TRUE"
@@ -118,6 +119,9 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
 				RelativePath="..\account.cpp">
+			</File>
+			<File
+				RelativePath="..\container.cpp">
 			</File>
 			<File
 				RelativePath="..\creature.cpp">
@@ -201,6 +205,9 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
 				RelativePath="..\account.h">
+			</File>
+			<File
+				RelativePath="..\container.h">
 			</File>
 			<File
 				RelativePath="..\creature.h">

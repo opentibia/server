@@ -6,7 +6,8 @@
 
 #include "definitions.h"
 #include "item.h"
-
+#include "container.h"
+#include "magic.h"
 
 class Creature;
 
@@ -39,14 +40,16 @@ public:
 
   bool removeThing(Thing *thing);
   void addThing(Thing *thing);
+	MagicEffectItem* getFieldItem();
 
   int getCreatureStackPos(Creature *c);
-  int getThingStackPos(Thing *thing);
+  int getThingStackPos(const Thing *thing);
 	int getThingCount();
 
   Thing* getThingByStackPos(int pos);
 
-  bool isBlocking();
+  bool isBlockingProjectile();
+	bool isBlocking();
 
   bool isPz();
   void setPz();

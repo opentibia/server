@@ -11,9 +11,24 @@
 #include "tile.h"
 
 #include "creature.h"
-#include "item.h"
+
+bool Tile::isBlockingProjectile()
+{
+	if(ground.isBlockingProjectile() == true)
+    return true;
+  
+  ItemVector::iterator iit;
+  for (iit = topItems.begin(); iit != topItems.end(); iit++)
+    if ((*iit)->isBlockingProjectile())
+      return true;
+
+  for (iit = downItems.begin(); iit != downItems.end(); iit++)
+    if ((*iit)->isBlockingProjectile())
+      return true;
 
 
+  return false;
+}
 
 bool Tile::isBlocking()
 {
@@ -46,7 +61,7 @@ int Tile::getCreatureStackPos(Creature *c)
   return 255;
 }
 
-int Tile::getThingStackPos(Thing *thing)
+int Tile::getThingStackPos(const Thing *thing)
 {
   int n = 0;
 
@@ -179,6 +194,18 @@ bool Tile::removeThing(Thing *thing)
   return false;
 }
 
+MagicEffectItem* Tile::getFieldItem()
+{
+  MagicEffectItem* fieldItem = NULL;
+  for (ItemVector::const_iterator iit = downItems.begin(); iit != downItems.end(); iit++)
+  {
+		fieldItem = dynamic_cast<MagicEffectItem*>(*iit);
+		if (fieldItem)
+      return fieldItem;
+  }
+
+	return fieldItem;
+}
 
 void Tile::addThing(Thing *thing) {
 	Creature* creature = dynamic_cast<Creature*>(thing);

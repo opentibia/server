@@ -21,10 +21,18 @@
 // include header file
 
 #include "definitions.h"
-#include "item.h"
+#include "container.h"
+
 #include <iostream>
 #include <sstream>
 
+Item* Item::CreateItem(const unsigned short _type, unsigned char _count /*= 0*/)
+{
+	if(items[_type].iscontainer)
+		return new Container(_type);
+	else
+		return new Item(_type, _count);
+}
 
 //////////////////////////////////////////////////
 // returns the ID of this item's ItemType
@@ -49,8 +57,6 @@ Item::Item(const unsigned short _type) {
     id = _type;
     count = 0;
 		chargecount = 0;
-		maxitems = 20;
-		actualitems = 0;
 
     throwRange = 6;
 }
@@ -72,19 +78,11 @@ Item::Item() {
     id = 0;
     count = 0;
 		chargecount = 0;
-		maxitems = 20;
-		actualitems = 0;
-
+		
     throwRange = 6;
 }
 
 Item::~Item() {
-	for(Item::iterator cit = lcontained.begin(); cit != lcontained.end(); cit++)
-	{
-    delete (*cit);
-  }
-    
-	lcontained.clear();
 }
 
 int Item::unserialize(xmlNodePtr p){
@@ -109,104 +107,8 @@ xmlNodePtr Item::serialize(){
 	return ret;
 }
 
-//////////////////////////////////////////////////
-// add an item to (this) container if possible
-void Item::addItem(Item *newitem) {
-    //first check if we are a container, there is an item to be added and if we can add more items...
-    //if (!iscontainer) throw TE_NoContainer();
-    if (newitem == NULL)
-      return;
-    //if (maxitems <=actualitems) throw TE_ContainerFull();
-
-    // seems we should add the item...
-    // new items just get placed in front of the items we already have...
-		if(lcontained.size() < maxitems) {
-			lcontained.push_front(newitem);
-
-			// increase the itemcount
-			actualitems++;
-		}
-}
-
-void Item::removeItem(Item* item)
-{
-	for (std::list<Item*>::iterator cit = lcontained.begin(); cit != lcontained.end(); cit++) {
-		if((*cit) == item) {
-			lcontained.erase(cit);
-			actualitems--;
-			break;
-		}
-	}
-}
-
-void Item::isContainerHolding(Item* item, bool& found)
-{
-	if(found || item == NULL)
-		return;
-
-	for (std::list<Item*>::iterator cit = lcontained.begin(); cit != lcontained.end(); cit++) {
-		if((*cit)->isContainer()) {
-
-			if((*cit) == item) {
-				found = true;
-				break;
-			}
-			else
-				return (*cit)->isContainerHolding(item, found);
-		}
-	}
-}
-
-void Item::moveItem(unsigned char from_slot, unsigned char to_slot)
-{
-	int n = 0;
-	for (std::list<Item*>::iterator cit = lcontained.begin(); cit != lcontained.end(); cit++) {
-		if(n == from_slot) {
-			Item *item = (*cit);
-			lcontained.erase(cit);
-			lcontained.push_front(item);
-			break;
-		}
-		n++;
-	}
-}
-
-Item* Item::getItem(unsigned long slot_num)
-{
-	int n = 0;			
-	for (Item::iterator cit = getItems(); cit != getEnd(); cit++) {
-		if(n == slot_num)
-			return *cit;
-		else
-			n++;
-	}
-
-	return NULL;
-}
-
-unsigned char Item::getSlotNumberByItem(Item* item)
-{
-	unsigned char n = 0;			
-	for (Item::iterator cit = getItems(); cit != getEnd(); cit++) {
-		if(*cit == item)
-			return n;
-		else
-			n++;
-	}
-
-	return 0xFF;
-}
-
-//////////////////////////////////////////////////
-// returns iterator to itemlist
-Item::iterator Item::getItems() {
-    return lcontained.begin();
-}
-
-//////////////////////////////////////////////////
-// return iterator to one beyond the last item
-Item::iterator Item::getEnd() {
-    return lcontained.end();
+bool Item::isBlockingProjectile() const {
+	return items[id].blockingProjectile;
 }
 
 bool Item::isBlocking() const {
@@ -231,10 +133,6 @@ bool Item::isNotMoveable() const {
 
 bool Item::isGroundTile() const {
 	return items[id].groundtile;
-}
-
-bool Item::isContainer() const {
-	return items[id].iscontainer;
 }
 
 bool Item::isWeapon() const
@@ -269,11 +167,4 @@ std::string Item::getDescription() {
 std::string Item::getName()
 {
 	return items[id].name;
-}
-
-//////////////////////////////////////////////////
-// add item into the container
-Item& Item::operator<<(Item* toAdd) {
-    addItem(toAdd);
-    return *this;
 }

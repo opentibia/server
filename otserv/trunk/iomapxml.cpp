@@ -59,13 +59,13 @@ bool IOMapXML::loadMap(Map* map, std::string identifier){
 		while(p)
 		{
 			if(xmlStrcmp(p->name,(const xmlChar*) "item")==0){
-				Item* myitem=new Item();
-				myitem->unserialize(p);
-
-				if (myitem->isGroundTile())
+				Item* tmpitem=new Item();
+				tmpitem->unserialize(p);
+				
+				if (tmpitem->isGroundTile())
 				{
-					map->setTile(x, y, 7, myitem->getID());
-					delete myitem;
+					map->setTile(xorig+x, yorig+y, 7, tmpitem->getID());
+					delete tmpitem;
 					
 					if (pz && (strcmp(pz, "1") == 0)) {
 						numpz++;
@@ -74,9 +74,12 @@ bool IOMapXML::loadMap(Map* map, std::string identifier){
 				}
 				else
 				{
-					Tile *t = map->getTile(x, y, 7);
+					Tile *t = map->getTile(xorig+x, yorig+y, 7);
 					if (t)
 					{
+						Item* myitem = Item::CreateItem(tmpitem->getID());
+						delete tmpitem;
+
 						if (myitem->isAlwaysOnTop())
 							t->topItems.push_back(myitem);
 						else

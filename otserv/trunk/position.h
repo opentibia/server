@@ -43,7 +43,8 @@ public:
 		return (x==p.x && y== p.x && z==p.z);
 	}*/
 
-    // for now we just initialise the position to a startpoint
+  // for now we just initialise the position to a startpoint
+  //Position() : x(247), y(218), z(7) { };
   Position() : x(31), y(31), z(7) { };
 
     Position(int _x, int _y, int _z)

@@ -28,6 +28,7 @@
 #include "creature.h"
 #include "texcept.h"
 #include "item.h"
+#include "container.h"
 #include <string>
 
 
@@ -121,7 +122,7 @@ virtual void sendToChannel(const Creature * creature, unsigned char type, const 
 	virtual void sendTileUpdated(const Position *Pos);
 	virtual void sendContainerUpdated(Item *item, unsigned char from_id, unsigned char to_id, unsigned char from_slot, unsigned char to_slot, bool remove);
 
-  virtual bool CanSee(int x, int y);
+  virtual bool CanSee(int x, int y) const;
 
   // translate a map area to clientreadable format
   void GetMapDescription(unsigned short x, unsigned short y, unsigned char z,

@@ -63,6 +63,7 @@ public:
 	bool groundtile; 
 	bool blocking;   // people can walk on it
 	bool pickupable; // people can pick it up
+	bool blockingProjectile;
 };
 
 

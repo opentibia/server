@@ -48,5 +48,4 @@ public:
 
 };
 
-
 #endif  // #ifndef __ACCOUNT_H__

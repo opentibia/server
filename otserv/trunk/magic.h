@@ -22,71 +22,358 @@
 #define __MAGIC_H__
 
 #include "position.h"
+#include "item.h"
 
-class BaseMagicEffect
-{
-public:
-	BaseMagicEffect();
-  virtual ~BaseMagicEffect() {};
+#include "networkmessage.h"
+#include "tools.h"
 
-	Position centerpos;
-	unsigned char damageEffect;
-	unsigned char animationcolor;
-	unsigned char animationEffect;
+/*
+MagicEffectClass
+|
+|	
+|----->	MagicEffectTargetClass : public MagicEffectClass
+|       |
+|       |-----> MagicEffectTargetEx : public MagicEffectTargetClass //ie. soul fire
+|       |
+|       |-----> MagicEffectTargetMagicDamageClass : public MagicEffectTarget //burning, energized etc.
+|       |
+|       |-----> MagicEffectTargetGroundClass //m-wall, wild growth
+|								(Holds a MagicEffectItem*)
+|       
+|-----> MagicEffectAreaClass : public MagicEffectClass //gfb
+|       |
+|       |-----> MagicEffectAreaExClass : public MagicEffectAreaClass //ie. poison storm
+|       |
+|	      |-----> MagicEffectGroundAreaClass : public MagicEffectArea //fire bomb
+|                 (Holds a MagicEffectItem*)
+|
+|----->	MagicEffectItem : public Item, public MagicEffectClass
+*/
+//------------------------------------------------------------------------------
+
+enum MagicDamageType {
+	magicNone,
+	magicFire,
+	magicPoison,
+	magicEnergy
 };
 
-class MagicEffectClass : public BaseMagicEffect
-{
+typedef std::vector<Position> MagicAreaVec;
+
+class MagicEffectTargetMagicDamageClass;
+
+//<delayTicks, damageCount>
+typedef std::pair<long, long> damageTimeCount;
+
+//<<delayTicks, damageCount>, MagicEffectTargetMagicDamageClass>
+typedef std::pair<damageTimeCount, MagicEffectTargetMagicDamageClass> damageInfo;
+typedef std::vector<damageInfo> MagicDamageVec;
+
+//<duration, MagicDamageVectorClass>
+typedef std::pair<long, MagicDamageVec> transformInfo;
+
+//<type, <duration, <<delayTicks, damageCount>, MagicEffectTargetMagicDamageClass>> >
+typedef std::map<unsigned short, transformInfo> damageMapClass;
+
+class MagicEffectClass {
 public:
 	MagicEffectClass();
+	virtual ~MagicEffectClass() {};
+	
+	virtual bool causeExhaustion(bool hasTarget) const;
+	virtual int getDamage(Creature *target, const Creature *attacker = NULL) const;
+	virtual void getMagicEffect(const Creature* c, const Position& pos, bool hasTarget, int damage, bool isPz, NetworkMessage &msg) const;
+	virtual void getDistanceShoot(const Creature* c, const Position& to, bool hasTarget, NetworkMessage &msg) const;
+	virtual void getArea(const Position& rcenterpos, MagicAreaVec& list) const;
+	//virtual void alterTile(MapState *mapstate, Tile *t);
+
 	int minDamage;
 	int maxDamage;
 	bool offensive;
 	bool physical; //causes blood splashes
+	long manaCost;
+
+	unsigned char animationColor;
+	unsigned char animationEffect;
+	unsigned char damageEffect;
 };
 
-/*
-class MagicSpellConditionClass : public MagicEffectClass
+//Need a target. Example sudden death
+class MagicEffectTargetClass : public MagicEffectClass {
+public:
+	MagicEffectTargetClass();
+	virtual ~MagicEffectTargetClass() {};
+
+	virtual bool causeExhaustion(bool hasTarget) const
+	{
+		return MagicEffectClass::causeExhaustion(hasTarget);
+	}
+
+	virtual int getDamage(Creature *target, const Creature *attacker = NULL) const
+	{
+		return MagicEffectClass::getDamage(target, attacker);
+	}
+	
+	virtual void getMagicEffect(const Creature* c, const Position& pos, bool hasTarget, int damage, bool isPz, NetworkMessage &msg) const;
+	virtual void getDistanceShoot(const Creature* c, const Position& to, bool hasTarget, NetworkMessage &msg) const;
+	virtual void getArea(const Position& rcenterpos, MagicAreaVec& list) const
+	{
+		MagicEffectClass::getArea(rcenterpos, list);
+	}
+};
+
+//Holds the magic damage (burning/energized/poisoned)
+class MagicDamageContainer : public MagicDamageVec {
+public:
+	MagicDamageContainer(MagicDamageType md);
+	MagicDamageContainer(MagicDamageType md, MagicDamageVec list);
+	virtual ~MagicDamageContainer() {};
+
+	MagicDamageType getMagicType() const {return this->magictype;}
+
+protected:
+	MagicDamageType magictype;
+};
+
+//Needs target, holds a damage list. Example: Soul fire.
+class MagicEffectTargetEx : public MagicEffectTargetClass
 {
 public:
-	MagicSpellConditionClass(cond_t cond);
-	MagicSpellConditionClass(const MagicSpellClass *rhs);
-	MagicSpellConditionClass& operator = (const MagicSpellClass* rhs);
+	MagicEffectTargetEx(MagicDamageType md, const MagicDamageVec& dmglist);
+	virtual ~MagicEffectTargetEx() {};
 
-	cond_t condition;
-	unsigned long condTimeDefaultInSeconds;
-	unsigned long condTimeElapsedInSeconds;
-	unsigned long condCount;
+	virtual bool causeExhaustion(bool hasTarget) const
+	{
+		return MagicEffectTargetClass::causeExhaustion(hasTarget);	
+	}
+
+	virtual int getDamage(Creature *target, const Creature *attacker = NULL) const;
+
+	virtual void getMagicEffect(const Creature* c, const Position& pos, bool hasTarget, int damage, bool isPz, NetworkMessage &msg) const
+	{
+		MagicEffectTargetClass::getMagicEffect(c, pos, hasTarget, damage, isPz, msg);
+	}
+
+	virtual void getDistanceShoot(const Creature* c, const Position& to, bool hasTarget, NetworkMessage &msg) const
+	{
+		MagicEffectTargetClass::getDistanceShoot(c, to, hasTarget, msg);
+	}
+
+	virtual void getArea(const Position& rcenterpos, MagicAreaVec& list) const
+	{
+		MagicEffectTargetClass::getArea(rcenterpos, list);
+	}
+	
+protected:
+		MagicDamageContainer dmgContainer;
 };
-*/
 
-class MagicEffectRuneClass : public MagicEffectClass
+//Is created indirectly, need a target and make magic damage (burning/poisoned/energized)
+class MagicEffectTargetMagicDamageClass : public MagicEffectTargetClass
 {
 public:
-	MagicEffectRuneClass();
+	MagicEffectTargetMagicDamageClass(const unsigned long creatureid);
+	virtual ~MagicEffectTargetMagicDamageClass() {};
+
+	virtual bool causeExhaustion(bool hasTarget) const
+	{
+		return false;
+	}
+
+	virtual int getDamage(Creature *target, const Creature *attacker = NULL) const;
+
+	virtual void getMagicEffect(const Creature* c, const Position& pos, bool hasTarget, int damage, bool isPz, NetworkMessage &msg) const
+	{
+		MagicEffectTargetClass::getMagicEffect(c, pos, hasTarget, damage, isPz, msg);
+	}
+
+	virtual void getDistanceShoot(const Creature* c, const Position& to, bool hasTarget, NetworkMessage &msg) const
+	{
+		//this class shouldn't have any distance shoots, just return.
+	}
+
+	virtual void getArea(const Position& rcenterpos, MagicAreaVec& list) const
+	{
+		MagicEffectTargetClass::getArea(rcenterpos, list);
+	}
+
+	const unsigned long getOwnerID() const {return ownerid;}
+
+protected:
+	unsigned long ownerid;
 };
 
-class MagicEffectAreaClass : public MagicEffectClass
+//magic field (Fire/Energy/Poison) and solid objects (Magic-wall/Wild growth)
+class MagicEffectItem : public Item, public MagicEffectClass
 {
+public:
+	MagicEffectItem(const damageMapClass& dmgmap);
+	MagicEffectItem(MagicDamageType md, const damageMapClass& dmgmap);
+
+	const MagicEffectTargetMagicDamageClass* getMagicDamageEffect() const;
+
+	virtual bool causeExhaustion(bool hasTarget) const
+	{
+		return false;
+	}
+
+	virtual int getDamage(Creature *target, const Creature *attacker = NULL) const;
+
+	virtual void getMagicEffect(const Creature* c, const Position& pos, bool hasTarget, int damage, bool isPz, NetworkMessage &msg) const
+	{
+		MagicEffectClass::getMagicEffect(c, pos, hasTarget, damage, isPz, msg);
+	}
+
+	virtual void getDistanceShoot(const Creature* c, const Position& to, bool hasTarget, NetworkMessage &msg) const
+	{
+		MagicEffectClass::getDistanceShoot(c, to, hasTarget, msg);
+	}
+
+	virtual void getArea(const Position& rcenterpos, MagicAreaVec& list) const
+	{
+		MagicEffectClass::getArea(rcenterpos, list);
+	}
+
+	bool transform();
+	bool transform(const MagicEffectItem &rhs);
+	long getDecayTime();
+protected:
+	void buildDamageList();
+	damageMapClass dmgMap;
+	MagicDamageContainer dmgContainer;
+};
+
+//Create a solid object. Example: Magic wall, Wild growth
+class MagicEffectTargetGroundClass : public MagicEffectTargetClass {
+public:
+	MagicEffectTargetGroundClass(MagicEffectItem* fieldItem);
+	virtual ~MagicEffectTargetGroundClass();
+
+	virtual bool causeExhaustion(bool hasTarget) const
+	{
+		return true;
+	}
+
+	virtual int getDamage(Creature *target, const Creature *attacker = NULL) const
+	{
+		return 0;
+	}
+
+	virtual void getMagicEffect(const Creature* c, const Position& pos, bool hasTarget, int damage, bool isPz, NetworkMessage &msg) const
+	{
+		//Nothing
+	}
+
+	virtual void getDistanceShoot(const Creature* c, const Position& to, bool hasTarget, NetworkMessage &msg) const;
+
+	virtual void getArea(const Position& rcenterpos, MagicAreaVec& list) const
+	{
+		MagicEffectTargetClass::getArea(rcenterpos, list);
+	}
+
+	MagicEffectItem* getFieldItem() const {return fieldItem;}
+
+protected:
+	MagicEffectItem* fieldItem;
+};
+
+//Don't need a target. Example: GFB
+class MagicEffectAreaClass : public MagicEffectClass {
 public:
 	MagicEffectAreaClass();
+	virtual ~MagicEffectAreaClass() {};
+
+	virtual bool causeExhaustion(bool hasTarget) const
+	{
+		return true;
+	}
+
+	virtual int getDamage(Creature *target, const Creature *attacker = NULL) const
+	{
+		return MagicEffectClass::getDamage(target, attacker);
+	}
+
+	virtual void getMagicEffect(const Creature* c, const Position& pos, bool hasTarget, int damage, bool isPz, NetworkMessage &msg) const;
+
+	virtual void getDistanceShoot(const Creature* c, const Position& to, bool hasTarget, NetworkMessage &msg) const
+	{
+		MagicEffectClass::getDistanceShoot(c, to, hasTarget, msg);
+	}
+
+	virtual void getArea(const Position& rcenterpos, MagicAreaVec& list) const;
+
 	unsigned char direction;
 	unsigned char areaEffect;
-	unsigned char area[14][18];
+	
+	std::vector< std::vector<unsigned char> > areaVec;
+	//unsigned char area[14][18];
 };
 
-class MagicEffectInstantSpellClass : public MagicEffectAreaClass
+//Dont need target. Example: Poison storm
+class MagicEffectAreaExClass : public MagicEffectAreaClass
 {
 public:
-	MagicEffectInstantSpellClass();
-	int manaCost;
+	MagicEffectAreaExClass(MagicDamageType md, const MagicDamageVec& dmglist);
+	virtual ~MagicEffectAreaExClass() {};
+
+	virtual bool causeExhaustion(bool hasTarget) const
+	{
+		return MagicEffectAreaClass::causeExhaustion(hasTarget);
+	}
+
+	virtual int getDamage(Creature *target, const Creature *attacker = NULL) const;
+
+	virtual void getMagicEffect(const Creature* c, const Position& pos, bool hasTarget, int damage, bool isPz, NetworkMessage &msg) const
+	{
+		MagicEffectAreaClass::getMagicEffect(c, pos, hasTarget, damage, isPz, msg);
+	}
+
+	virtual void getDistanceShoot(const Creature* c, const Position& to, bool hasTarget, NetworkMessage &msg) const
+	{
+		MagicEffectAreaClass::getDistanceShoot(c, to, hasTarget, msg);
+	}
+
+	virtual void getArea(const Position& rcenterpos, MagicAreaVec& list) const
+	{
+		MagicEffectAreaClass::getArea(rcenterpos, list);
+	}
+
+protected:
+	MagicDamageContainer dmgContainer;
 };
 
-class MagicEffectGroundClass : public MagicEffectAreaClass
+//Don't need a target. Example: Fire bomb
+class MagicEffectGroundAreaClass : public MagicEffectAreaClass
 {
 public:
-	MagicEffectGroundClass();
-	unsigned short groundID;
-};
+	MagicEffectGroundAreaClass(MagicEffectItem* fieldItem);
+	virtual ~MagicEffectGroundAreaClass();
 
+	virtual bool causeExhaustion(bool hasTarget) const
+	{
+		return MagicEffectAreaClass::causeExhaustion(hasTarget);
+	}
+
+	virtual int getDamage(Creature *target, const Creature *attacker = NULL) const;
+
+	virtual void getMagicEffect(const Creature* c, const Position& pos, bool hasTarget, int damage, bool isPz, NetworkMessage &msg) const
+	{
+		MagicEffectAreaClass::getMagicEffect(c, pos, hasTarget, damage, isPz, msg);
+	}
+
+	virtual void getDistanceShoot(const Creature* c, const Position& to, bool hasTarget, NetworkMessage &msg) const
+	{
+		MagicEffectAreaClass::getDistanceShoot(c, to, hasTarget, msg);
+	}
+
+	virtual void getArea(const Position& rcenterpos, MagicAreaVec& list) const
+	{
+		MagicEffectAreaClass::getArea(rcenterpos, list);
+	}
+
+	MagicEffectItem* getFieldItem() const {return fieldItem;}
+protected:
+	MagicEffectItem* fieldItem;
+};
 #endif //__MAGIC_H__
+

@@ -10,6 +10,7 @@ using namespace std;
 #include "networkmessage.h"
 
 #include "item.h"
+#include "container.h"
 #include "creature.h"
 #include "player.h"
 
@@ -248,7 +249,7 @@ void NetworkMessage::AddTextMessage(MessageClasses mclass, const char* message)
 }
 
 
-void NetworkMessage::AddAnimatedText(Position &pos, unsigned char color, std::string text)
+void NetworkMessage::AddAnimatedText(const Position &pos, unsigned char color, std::string text)
 {
   AddByte(0x84); 
   AddPosition(pos);
@@ -309,7 +310,7 @@ void NetworkMessage::AddCreature(const Creature *creature, bool known, unsigned 
 }
 
 
-void NetworkMessage::AddPlayerStats(Player *player)
+void NetworkMessage::AddPlayerStats(const Player *player)
 {
   AddByte(0xA0);
   AddU16(player->health);
@@ -322,7 +323,7 @@ void NetworkMessage::AddPlayerStats(Player *player)
   AddByte(player->maglevel);
 }
 
-void NetworkMessage::AddPlayerSkills(Player *player)
+void NetworkMessage::AddPlayerSkills(const Player *player)
 {
 	AddByte(0xA1);
 
@@ -336,7 +337,7 @@ void NetworkMessage::AddPlayerSkills(Player *player)
 }
 
 
-void NetworkMessage::AddPlayerInventoryItem(Player *player, int item)
+void NetworkMessage::AddPlayerInventoryItem(const Player *player, int item)
 {
   if (player->items[item] == NULL)
   {
@@ -364,7 +365,7 @@ void NetworkMessage::AddCreatureSpeak(const Creature *creature, unsigned char ty
   AddString(text);
 }
 
-void NetworkMessage::AddCreatureHealth(Creature *creature)
+void NetworkMessage::AddCreatureHealth(const Creature *creature)
 {
   AddByte(0x8C);
   AddU32(creature->getID());

@@ -41,6 +41,17 @@ Protocol::~Protocol()
 {
 }
 
+unsigned long Protocol::getIP() const
+{
+	sockaddr_in sain;
+	socklen_t salen = sizeof(sockaddr_in);
+	if (getpeername(s, (sockaddr*)&sain, &salen) == 0)
+	{
+		return sain.sin_addr.S_un.S_addr;
+	}
+	
+	return 0;
+}
 
 void Protocol::setPlayer(Player* p)
 {

@@ -50,6 +50,7 @@
 
 
 std::vector< std::pair<unsigned long, unsigned long> > serverIPs;
+std::vector< std::pair<unsigned long, unsigned long> > bannedIPs;
 
 LuaScript g_config;
 
@@ -59,7 +60,29 @@ Spells spells(&g_game);
 
 #include "networkmessage.h"
 
+bool isclientBanished(SOCKET s)
+{
+	sockaddr_in sain;
+  socklen_t salen = sizeof(sockaddr_in);
 
+	if (getpeername(s, (sockaddr*)&sain, &salen) == 0)
+	{
+		unsigned long clientip = *(unsigned long*)&sain.sin_addr;
+
+		for (int i = 0; i < bannedIPs.size(); ++i) {
+      if ((bannedIPs[i].first & bannedIPs[i].second) == (clientip & bannedIPs[i].second))
+				return true;
+		}
+
+		/*for(banned
+		if(std::find(bannedIPs.begin(), bannedIPs.end(), clientip) != bannedIPs.end()) {
+			return true;
+		}
+		*/
+	}
+
+	return false;
+}
 
 OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 {
@@ -76,7 +99,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
     if (protId == 0x0201)
     {
       msg.SkipBytes(15);
-
+			bool isClientBanished = false;
       unsigned int accnumber = msg.GetU32();
 	    std::string  password  = msg.GetString();
 
@@ -92,43 +115,51 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
           {
             serverip = serverIPs[i].first;
             break;
-          }
+					}
       }
 
       msg.Reset();
-
-      
-		Account account=IOAccount::instance()->loadAccount(accnumber);
-		if (account.accnumber == accnumber) // seems to be a successful load
-      {
-        msg.AddByte(0x14);
-	std::stringstream motd;
-	motd << g_config.getGlobalString("motdnum");
-	motd << "\n";
-	motd << g_config.getGlobalString("motd");
-        msg.AddString(motd.str());
-
-        msg.AddByte(0x64);
-        msg.AddByte((uint8_t)account.charList.size());
-
-		    std::list<std::string>::iterator it;
-        for (it = account.charList.begin(); it != account.charList.end(); it++)
-        {
-          msg.AddString((*it));
-          msg.AddString("OpenTibia");
-          msg.AddU32(serverip);
-          msg.AddU16(atoi(g_config.getGlobalString("port").c_str()));
-        }
-
-        msg.AddU16(account.premDays);
-      }
-      else
-      {
+			
+			if(isclientBanished(s)) {
         msg.AddByte(0x0A);
-        msg.AddString("Please enter a valid account number and password.");
-      }
+        msg.AddString("Your IP is banished!");
+			}
+			else {
+				char accstring[16];
+				sprintf(accstring, "%i", accnumber);
 
-      msg.WriteToSocket(s);
+				Account account = IOAccount::instance()->loadAccount(accnumber);
+				if (account.accnumber == accnumber) // seems to be a successful load
+				{
+					msg.AddByte(0x14);
+					std::stringstream motd;
+					motd << g_config.getGlobalString("motdnum");
+					motd << "\n";
+					motd << g_config.getGlobalString("motd");
+					msg.AddString(motd.str());
+
+					msg.AddByte(0x64);
+					msg.AddByte((uint8_t)account.charList.size());
+
+					std::list<std::string>::iterator it;
+					for (it = account.charList.begin(); it != account.charList.end(); it++)
+					{
+						msg.AddString((*it));
+						msg.AddString("OpenTibia");
+						msg.AddU32(serverip);
+						msg.AddU16(atoi(g_config.getGlobalString("port").c_str()));
+					}
+
+					msg.AddU16(account.premDays);
+				}
+				else
+				{
+					msg.AddByte(0x0A);
+					msg.AddString("Please enter a valid account number and password.");
+				}
+			}
+
+			msg.WriteToSocket(s);
     }
     // gameworld connection tibia 7.1
     else if (protId == 0x020A)
@@ -140,37 +171,45 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
       std::string name     = msg.GetString();
       std::string password = msg.GetString();
 
-	  Protocol70 *protocol = new Protocol70(s);
+			if(isclientBanished(s)) {
+				msg.Reset();
+				msg.AddByte(0x14);
+				msg.AddString("Your IP is banished!");
+				msg.WriteToSocket(s);
+			}
+			else {
+				Protocol70 *protocol = new Protocol70(s);
 
-      Player *player;
-      player = new Player(name.c_str(), protocol);
-      player->usePlayer();
-	  IOPlayer::instance()->loadPlayer(player, name);
+				Player *player;
+				player = new Player(name.c_str(), protocol);
+				player->usePlayer();
+				IOPlayer::instance()->loadPlayer(player, name);
 
-      protocol->setPlayer(player);
+				protocol->setPlayer(player);
 
-      if (player->password == password)
-      {
-		  if(g_game.getCreatureByName(name.c_str()) != NULL && ! g_config.getGlobalNumber("allowclones", 0)){
-					std::cout << "reject player..." << std::endl;
-				    msg.Reset();
-				    msg.AddByte(0x14);
-				    msg.AddString("You are already logged in.");
-				    msg.WriteToSocket(s);		
-		} else if (!protocol->ConnectPlayer())  {
-				    std::cout << "reject player..." << std::endl;
-				    msg.Reset();
-				    msg.AddByte(0x14);
-				    msg.AddString("Too many Players online.");
-				    msg.WriteToSocket(s);
-		} else {	
-			Status* stat = Status::instance();
-			stat->addPlayer();
-					s = 0;            // protocol/player will close socket
-				    protocol->ReceiveLoop();
-					stat->removePlayer();
-		}
-      }
+				if (player->password == password)
+				{
+					if(g_game.getCreatureByName(name.c_str()) != NULL && ! g_config.getGlobalNumber("allowclones", 0)){
+						std::cout << "reject player..." << std::endl;
+							msg.Reset();
+							msg.AddByte(0x14);
+							msg.AddString("You are already logged in.");
+							msg.WriteToSocket(s);		
+					} else if (!protocol->ConnectPlayer())  {
+							std::cout << "reject player..." << std::endl;
+							msg.Reset();
+							msg.AddByte(0x14);
+							msg.AddString("Too many Players online.");
+							msg.WriteToSocket(s);
+					} else {	
+						Status* stat = Status::instance();
+						stat->addPlayer();
+						s = 0;            // protocol/player will close socket
+						protocol->ReceiveLoop();
+						stat->removePlayer();
+					}
+				}
+			}
     }
 	else if(protId == 0xFFFF){
 		if(msg.GetRaw() == "info"){

@@ -39,10 +39,11 @@ extern LuaScript g_config;
 Player::Player(const char *name, Protocol *p) : Creature(name)
 {
   client     = p;
-
+	/*
 	exhaustedTicks  = 0;
 	pzLocked = false;
 	inFightTicks = 0;
+	*/
 	looktype   = PLAYER_MALE_1;
 	voc        = 0;
   cap        = 300;
@@ -104,26 +105,30 @@ Player::~Player()
 }
 
 std::string Player::getDescription(bool self){
-    std::stringstream s;
+	std::stringstream s;
 	std::string str;
-    if(self){
-    s << "You see yourself."; 
-    if(voc > 0)
-    s << " You are " << g_config.getGlobalStringField("vocations", voc) << ".";
-    }
-    else {	
-	s << "You see " << name << " (Level " << level <<").";
-	if(voc > 0){
-	if(sex != 0)
-    s << " He";
-    else
-    s << " She";
-    s << " is "<< g_config.getGlobalStringField("vocations", voc) << ".";
-    }
-    }
+	
+	if(self){
+		s << "You see yourself."; 
+		if(voc > 0)
+			s << " You are " << g_config.getGlobalStringField("vocations", voc) << ".";
+	}
+	else {	
+		s << "You see " << name << " (Level " << level <<").";
+	
+		if(voc > 0){
+			if(sex != 0)
+				s << " He";
+			else
+				s << " She";
+
+				s << " is "<< g_config.getGlobalStringField("vocations", voc) << ".";
+		}
+	}
+	
 	str = s.str();
 	return str;
-            }
+}
 
 Item* Player::getItem(int pos)
 {
@@ -177,17 +182,30 @@ void Player::speak(const std::string &text)
 
 void Player::sendIcons()
 {
-     int icons = 0;
-     if(inFightTicks >= 6000 || inFightTicks ==4000 || inFightTicks == 2000){
-                     icons |= ICON_SWORDS;
-                     }
-     if(manaShieldTicks >= 1000){
-                     icons |= ICON_MANASHIELD;
-                     }
-     if(speed != getNormalSpeed()){
-                     icons |= ICON_HASTE;
-                     }                   
-     client->sendIcons(icons);             
+	int icons = 0;
+	if(inFightTicks >= 6000 || inFightTicks ==4000 || inFightTicks == 2000){
+		icons |= ICON_SWORDS;
+	}
+	if(manaShieldTicks >= 1000){
+		icons |= ICON_MANASHIELD;
+	}
+	if(speed > getNormalSpeed()){
+		icons |= ICON_HASTE;
+	}
+	if(burningTicks >= 1000){
+		icons |= ICON_BURN;
+	}
+	if(energizedTicks >= 1000){
+		icons |= ICON_ENERGY;
+	}
+	if(poisonedTicks >= 1000){
+		icons |= ICON_POISON;
+	}
+	if(speed < getNormalSpeed() /*paralyzeTicks >= 1000*/) {
+		icons |= ICON_PARALYZE;
+	}
+
+	client->sendIcons(icons);             
 }
 
 int Player::sendInventory(){
@@ -228,53 +246,46 @@ unsigned int Player::getReqSkilltries (int skill, int level, int voc) {
 
 void Player::addSkillTry(int skilltry)
 {
-int skill;
-
-
-
-std::string skillname;
-for (int slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++)
-    if (items[slot])
-    {
-     if (items[slot]->isWeapon())
-     {
-      switch (items[slot]->getWeaponType())
-            {
-            case SWORD: skill = 2; skillname = "sword fighting"; break;
-            case CLUB: skill = 1; skillname = "club fighting"; break;
-            case AXE: skill = 3; skillname = "axe fighting"; break;
-            case DIST: skill = 4; skillname = "distance fighting"; break;
-            case SHIELD: skill = 5; skillname = "shielding"; break;
-            default: skill = 0; skillname = "fist fighting"; break;
-            }
-      }
-    }
-
-skills[skill][SKILL_TRIES] += skilltry;
-
-//for skill level advances
-//int reqTries = (int) ( SkillBases[skill] * pow((float) VocMultipliers[skill][voc], (float) ( skills[skill][SKILL_LEVEL] - 10) ) );
-
-//for debug
-//cout << Creature::getName() << ", voc: " << voc << ", training: " << skillname << "(" << skill << "). Tries: " << skills[skill][SKILL_TRIES] << "(" << getReqSkilltries (skill, (skills[skill][SKILL_LEVEL] + 1), voc) << ")\n";
-//cout << "Current skill: " << skills[skill][SKILL_LEVEL] << " Skillbase: " << getSkillBase(skill) << ", SkillMultiplier: " << getSkillMultiplier(voc, skill) << "\n";
-
-
-//Need skill up?
-if ((unsigned)skills[skill][SKILL_TRIES] >= getReqSkilltries (skill, (skills[skill][SKILL_LEVEL] + 1), voc))
-{
-   skills[skill][SKILL_LEVEL]++;
-   skills[skill][SKILL_TRIES] = 0;
-
-   NetworkMessage msg;
-   std::stringstream advMsg;
-   advMsg << "You advanced in " << skillname << ".";
-   msg.AddTextMessage(MSG_ADVANCE, advMsg.str().c_str());
-   msg.AddPlayerSkills(this);
-   sendNetworkMessage(&msg);
-}
-
-
+	int skill;
+	std::string skillname;
+	for (int slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++) {
+		if (items[slot]) {
+			if (items[slot]->isWeapon()) {
+				switch (items[slot]->getWeaponType()) {
+					case SWORD: skill = 2; skillname = "sword fighting"; break;
+					case CLUB: skill = 1; skillname = "club fighting"; break;
+					case AXE: skill = 3; skillname = "axe fighting"; break;
+					case DIST: skill = 4; skillname = "distance fighting"; break;
+          case SHIELD: skill = 5; skillname = "shielding"; break;
+					default: skill = 0; skillname = "fist fighting"; break;
+			 }
+			 
+			 skills[skill][SKILL_TRIES] += skilltry;
+			 
+			 //for skill level advances
+			 //int reqTries = (int) ( SkillBases[skill] * pow((float) VocMultipliers[skill][voc], (float) ( skills[skill][SKILL_LEVEL] - 10) ) );
+			 
+#if __DEBUG__
+			 //for debug
+			 cout << Creature::getName() << ", has the vocation: " << voc << " and is training his " << skillname << "(" << skill << "). Tries: " << skills[skill][SKILL_TRIES] << "(" << getReqSkilltries (skill, (skills[skill][SKILL_LEVEL] + 1), voc) << ")\n";
+			 cout << "Current skill: " << skills[skill][SKILL_LEVEL] << " Skillbase: " << getSkillBase(skill) << ", SkillMultiplier: " << getSkillMultiplier(voc, skill) << "\n";
+#endif
+			 
+			 //Need skill up?
+			 if (skills[skill][SKILL_TRIES] >= getReqSkilltries (skill, (skills[skill][SKILL_LEVEL] + 1), voc)) {
+				 skills[skill][SKILL_LEVEL]++;
+				 skills[skill][SKILL_TRIES] = 0;
+				 
+				 NetworkMessage msg;
+				 std::stringstream advMsg;
+				 advMsg << "You advanced in " << skillname << ".";
+				 msg.AddTextMessage(MSG_ADVANCE, advMsg.str().c_str());
+				 msg.AddPlayerSkills(this);
+				 sendNetworkMessage(&msg);
+			 }
+			}
+		}
+	}
 }
 
 
@@ -288,10 +299,7 @@ unsigned int Player::getReqMana(int maglevel, int voc) {
   return (unsigned int) ( 400 * pow(ManaMultiplier[voc], maglevel-1) );       //will calculate required mana for a magic level
 }
 
-
-
-
-Item* Player::getContainer(unsigned char containerid)
+Container* Player::getContainer(unsigned char containerid)
 {
   for(containerLayout::iterator cl = vcontainers.begin(); cl != vcontainers.end(); ++cl)
   {
@@ -302,7 +310,7 @@ Item* Player::getContainer(unsigned char containerid)
 	return NULL;
 }
 
-unsigned char Player::getContainerID(Item* container)
+unsigned char Player::getContainerID(Container* container)
 {
   for(containerLayout::iterator cl = vcontainers.begin(); cl != vcontainers.end(); ++cl)
   {
@@ -313,7 +321,7 @@ unsigned char Player::getContainerID(Item* container)
 	return 0xFF;
 }
 
-void Player::addContainer(unsigned char containerid, Item *container)
+void Player::addContainer(unsigned char containerid, Container *container)
 {
 #ifdef __DEBUG__
 	cout << Creature::getName() << ", addContainer: " << (int)containerid << std::endl;
@@ -373,7 +381,7 @@ fight_t Player::getFightType()
 }
 
 
-bool Player::CanSee(int x, int y)
+bool Player::CanSee(int x, int y) const
 {
   return client->CanSee(x, y);
 }
@@ -456,6 +464,10 @@ void Player::onContainerUpdated(Item *item, unsigned char from_id, unsigned char
 	client->sendContainerUpdated(item, from_id, to_id, from_slot, to_slot, remove);
 }
 
+unsigned long Player::getIP() const
+{
+	return client->getIP();
+}
 
 void Player::die() {
         NetworkMessage msg;
@@ -539,15 +551,17 @@ void Player::savePlayer(std::string &name)
 	root = doc->children;
 	
 	if (health <= 0)
-	   {
-       health = healthmax;
-       pos.x = masterPos.x;
-       pos.y = masterPos.y;
-       pos.z = masterPos.z;
-       //int expLoss = (int)(experience*0.1f);
-       experience -= (int)(experience*0.1f);        //0.1f is also used in die().. maybe we make a little function for exp-loss?
-       
-       //Player died?
+	{
+		health = healthmax;
+		pos.x = masterPos.x;
+		pos.y = masterPos.y;
+		pos.z = masterPos.z;
+
+		//int expLoss = (int)(experience*0.1f);
+		experience -= (int)(experience*0.1f);        //0.1f is also used in die().. maybe we make a little function for exp-loss?
+
+		//Player died?
+
 	   int reqExp =  getExpForLv(level);
 	   if (experience < (unsigned )reqExp)
 		    {                     
@@ -564,7 +578,7 @@ void Player::savePlayer(std::string &name)
             
             cap -= CapGain[voc];            
             }
-       }
+		 }
        
 	sb << name;  	           xmlSetProp(root, (const xmlChar*) "name", (const xmlChar*)sb.str().c_str());     sb.str("");
 	sb << accountNumber;       xmlSetProp(root, (const xmlChar*) "account", (const xmlChar*)sb.str().c_str());	sb.str("");

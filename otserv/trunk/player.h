@@ -23,6 +23,7 @@
 
 
 #include "creature.h"
+#include "container.h"
 #include <vector>
 #include <algorithm>
 
@@ -72,9 +73,9 @@ public:
 
 	int addItem(Item* item, int pos);
 	unsigned int getContainerCount() {return (uint32_t)vcontainers.size();}; //returns the current number of containers open
-	Item* getContainer(unsigned char containerid);
-	unsigned char getContainerID(Item* container);
-	void addContainer(unsigned char containerid, Item *container);
+	Container* getContainer(unsigned char containerid);
+	unsigned char getContainerID(Container* container);
+	void addContainer(unsigned char containerid, Container *container);
 	void closeContainer(unsigned char containerid);
 	int sendInventory();
 
@@ -84,7 +85,6 @@ public:
 	
   int sex, voc;
   int cap;
-  bool poisoned, burning, energy, drunk, paralised;
   int food;
   bool cancelMove;
   virtual int getWeaponDamage() const;
@@ -109,16 +109,19 @@ public:
 
   //items
   Item* items[11]; //equipement of the player
-	typedef std::pair<unsigned char, Item*> containerItem;
+	typedef std::pair<unsigned char, Container*> containerItem;
 	typedef std::vector<containerItem> containerLayout;
 	containerLayout vcontainers;
 
   void    usePlayer() { useCount++; };
   void    releasePlayer() { useCount--; if (useCount == 0) delete this; };
+	unsigned long getIP() const;
+	//void kickPlayer(bool banIP = false);
+	//const SOCKET getSocket() const;
 
   fight_t getFightType();
   void sendIcons();
-  bool CanSee(int x, int y);
+  bool CanSee(int x, int y) const;
   void addSkillTry(int skilltry);
   void sendNetworkMessage(NetworkMessage *msg);
   void sendCancelAttacking();

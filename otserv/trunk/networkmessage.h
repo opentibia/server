@@ -59,7 +59,7 @@ enum Icons {
  ICON_ENERGY =  4, 
  ICON_DRUNK = 8, 
  ICON_MANASHIELD = 16, 
- ICON_PARALIZE = 32, 
+ ICON_PARALYZE = 32, 
  ICON_HASTE = 64, 
  ICON_SWORDS = 128
  };
@@ -116,17 +116,17 @@ public:
 
   // write functions for complete message blocks
   void AddTextMessage(MessageClasses mclass, const char* message);
-  void AddAnimatedText(Position &pos, unsigned char color, std::string text);
+  void AddAnimatedText(const Position &pos, unsigned char color, std::string text);
 
   void AddMagicEffect(const Position &pos, unsigned char type);
   void AddDistanceShoot(const Position &from, const Position &to, unsigned char type);
   
   void AddCreatureSpeak(const Creature *creature, unsigned char type, std::string text, unsigned short channelId);
-  void AddCreatureHealth(Creature *creature);
+  void AddCreatureHealth(const Creature *creature);
   
-  void AddPlayerInventoryItem(Player *player, int item);
-  void AddPlayerSkills(Player *player);
-  void AddPlayerStats(Player *player);
+  void AddPlayerInventoryItem(const Player *player, int item);
+  void AddPlayerSkills(const Player *player);
+  void AddPlayerStats(const Player *player);
 
   int getMessageLength(){
       return m_MsgSize;

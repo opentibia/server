@@ -59,6 +59,170 @@ using namespace std;
 extern LuaScript g_config;
 extern Spells spells;
 extern std::map<long, Creature*> channel;
+
+MapState::MapState(Map* imap)
+: map(imap)
+{
+}
+
+
+bool MapState::isTileStored(const Tile *t) const
+{
+	bool ret = false;
+
+	TileExDataMap::const_iterator preChangeItemMapIt;
+	for(preChangeItemMapIt = preChangeItemMap.begin(); preChangeItemMapIt != preChangeItemMap.end(); ++preChangeItemMapIt) {
+		if(preChangeItemMapIt->first == t) {
+			ret = true;
+		}
+	}
+
+	return ret;
+}
+
+void MapState::addThing(Tile *t, Thing *thing)
+{
+	addThingInternal(t, thing, false);
+}
+
+bool MapState::removeThing(Tile *t, Thing *thing)
+{
+	return removeThingInternal(t, thing, false);
+}
+
+bool MapState::removeThingInternal(Tile *t, Thing *thing, bool onlyRegister)
+{
+	//First change to this tile?
+	if(!isTileStored(t)) {
+		addTile(t, thing->pos);
+	}
+
+	std::vector<tilechangedata>& vec = changesItemMap[t];
+
+	int stackpos = t->getThingStackPos(thing);
+	if(onlyRegister || t->removeThing(thing)) {
+		tilechangedata tc;
+		tc.thing = thing;
+		tc.remove = true;
+		tc.stackpos = stackpos;
+
+		vec.push_back(tc);
+		return true;
+	}
+
+	return false;
+}
+
+void MapState::addThingInternal(Tile *t, Thing *thing, bool onlyRegister)
+{
+	//First change to this tile?
+	if(!isTileStored(t)) {
+		addTile(t, thing->pos);
+	}
+
+	std::vector<tilechangedata>& vec = changesItemMap[t];
+
+	if(thing != t->splash)
+		t->addThing(thing);
+
+	int stackpos = t->getThingStackPos(thing);
+
+	tilechangedata tc;
+	tc.thing = thing;
+	tc.remove = false;
+	tc.stackpos = stackpos;
+	vec.push_back(tc);
+}
+
+//Basically "fake" remove/add an item to register the change to the client
+void MapState::refreshThing(Tile *t, Thing *thing)
+{
+	removeThingInternal(t, thing, true);
+	addThingInternal(t, thing, true);
+}
+
+void MapState::getMapChanges(Player *spectator, NetworkMessage &msg)
+{
+	std::vector<Tile*> tileUpdatedVec; //keep track of tiles that already been updated
+
+	TileExDataMap::const_iterator preChangeItemMapIt;
+	for(preChangeItemMapIt = preChangeItemMap.begin(); preChangeItemMapIt != preChangeItemMap.end(); ++preChangeItemMapIt) {
+		
+		/*
+		if(std::find(tileUpdatedVec.begin(), tileUpdatedVec.end(), preChangeItemMap->first) != tileUpdatedVec.end()) {
+			//Tile has already been updated
+			continue;
+		}
+		*/
+
+		if(!spectator->CanSee(preChangeItemMapIt->second.pos.x,  preChangeItemMapIt->second.pos.y))
+			continue;
+
+		Tile *targettile = map->getTile(preChangeItemMapIt->second.pos.x,  preChangeItemMapIt->second.pos.y, preChangeItemMapIt->second.pos.z);
+
+		if(!targettile)
+			continue;
+
+		//if(preChangeItemMapIt->second.thingCount > 9 && tileThingCountMap[targettile] > 0) {
+		if(preChangeItemMapIt->second.thingCount > 9 && changesItemMap[targettile].size() > 0) {
+			if(std::find(tileUpdatedVec.begin(), tileUpdatedVec.end(), targettile) == tileUpdatedVec.end()) {
+				tileUpdatedVec.push_back(targettile);
+				((Creature*)spectator)->onTileUpdated(&preChangeItemMapIt->second.pos);
+			}
+
+			#if __DEBUG__
+			std::cout << "pop-up item" << std::endl;
+			#endif
+		}
+	}
+
+	//Add/remove items
+	TileChangeDataVecMap::const_iterator changesItemMapIt;
+	for(changesItemMapIt = changesItemMap.begin(); changesItemMapIt != changesItemMap.end(); ++changesItemMapIt) {
+		
+		if(std::find(tileUpdatedVec.begin(), tileUpdatedVec.end(), changesItemMapIt->first) != tileUpdatedVec.end()) {
+			//Tile has already been updated
+			continue;
+		}
+
+		TileChangeDataVec::const_iterator thIt;
+		for(thIt = changesItemMapIt->second.begin(); thIt != changesItemMapIt->second.end(); ++thIt) {
+			
+			if(thIt->remove) {
+				if(thIt->stackpos < 10) {
+					msg.AddByte(0x6c);
+					msg.AddPosition(thIt->thing->pos);
+					msg.AddByte(thIt->stackpos);
+				}
+				else {
+					//This will cause some problem, we remove an item (example: a player gets removed due to death) from the map, but the client cant see it
+					//(above the 9 limit), real tibia has the same problem so I don't think there is a way to fix this.
+					//Problem: The client won't be informed that the player has been killed
+					//and will show the player as alive (0 hp).
+					//Solution: re-log.
+				}
+			}
+			else {
+				Item *item = dynamic_cast<Item*>(thIt->thing);
+
+				if(item) {
+					msg.AddByte(0x6a);
+					msg.AddPosition(item->pos);
+					msg.AddItem(item);
+				}
+			}
+		}
+	}
+}
+
+void MapState::addTile(Tile *t, Position& tilepos)
+{
+	if(t) {
+		preChangeItemMap[t].pos = tilepos;
+		preChangeItemMap[t].thingCount = t->getThingCount();
+	}
+}
+
 Map::Map()
 {
 /*	//first we fill the map with
@@ -171,12 +335,12 @@ bool Map::removeCreature(Creature* c)
 void Map::getSpectators(const Range& range, std::vector<Creature*>& list)
 {
 	CreatureVector::iterator cit;
-	//for (int z = range.startz; z <= range.endz; z++) {
+	for (int z = range.startz; z <= range.endz; z++) {
 		for (int x = range.startx; x <= range.endx; x++)
 		{
 			for (int y = range.starty; y <= range.endy; y++)
 			{
-				Tile *tile = getTile(x, y, range.endz);
+				Tile *tile = getTile(x, y, z);
 				if (tile)
 				{
 					for (cit = tile->creatures.begin(); cit != tile->creatures.end(); cit++) {					
@@ -185,9 +349,50 @@ void Map::getSpectators(const Range& range, std::vector<Creature*>& list)
 				}
 			}
 		}
-	//}
+	}
 }
 
+bool Map::canThrowItemTo(Position from, Position to, bool creaturesBlock /* = true*/, bool isProjectile /*= false*/)
+{
+	if(from.x > to.x) {
+		swap(from.x, to.x);
+		swap(from.y, to.y);
+	}
+
+	bool steep = std::abs(to.y - from.y) > abs(to.x - from.x);
+
+	if(steep) {
+		swap(from.x, from.y);
+		swap(to.x, to.y);
+	}
+	
+	int deltax = abs(to.x - from.x);
+	int deltay = abs(to.y - from.y);
+	int error = 0;
+	int deltaerr = deltay;
+	int y = from.y;
+	Tile *t = NULL;
+	int xstep = ((from.x < to.x) ? 1 : -1);
+	int ystep = ((from.y < to.y) ? 1 : -1);
+
+	for(int x = from.x; x != to.x; x += xstep) {
+		//cout << "x: " << (steep ? y : x) << ", y: " << (steep ? x : y) << std::endl;
+		t = getTile((steep ? y : x), (steep ? x : y), from.z);
+
+		if(t && (isProjectile ? t->isBlockingProjectile() : t->isBlocking()) || (creaturesBlock ? !t->creatures.empty() : false)) {
+			return false;
+		}
+
+		error += deltaerr;
+
+		if(2 * error >= deltax) {
+			y += ystep;
+			error -= deltax;
+		}
+	}
+
+	return true;
+}
 
 
 std::list<Position> Map::getPathTo(Position start, Position to, bool creaturesBlock){

@@ -127,37 +127,63 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name){
 						int sl_id = atoi((const char*)xmlGetProp(slot, (const xmlChar *)"slotid"));
 						Item* myitem = new Item();
 						myitem->unserialize(slot->children);
-						player->items[sl_id]=myitem;
+						player->items[sl_id]= Item::CreateItem(myitem->getID(), myitem->getItemCountOrSubtype());
+						delete myitem;
+						myitem = NULL;
 
 						//Should be loaded from xml later on...
-						if(player->items[sl_id] && player->items[sl_id]->isContainer()) {
+						Container* defaultbackpack = dynamic_cast<Container*>(player->items[sl_id]);
+						if(defaultbackpack /*player.items[sl_id] && player.items[sl_id]->isContainer()*/) {
 
-							Item *backpack = new Item(1411);
-							player->items[sl_id]->addItem(backpack);
-							backpack->addItem(new Item(1663, 99));
-							backpack->addItem(new Item(1663, 99));
-							backpack->addItem(new Item(1663, 99));
-							backpack->addItem(new Item(1663, 99));
+							Container *backpack = dynamic_cast<Container*>(Item::CreateItem(1411));
+							if(!backpack)
+								continue;
 
-							backpack = new Item(1411);
-							player->items[sl_id]->addItem(backpack);
+							defaultbackpack->addItem(backpack);
+							for(int i = 0; i < 20; ++i) {
+								backpack->addItem(Item::CreateItem(1663, 99));
+							}
+
+							backpack = dynamic_cast<Container*>(Item::CreateItem(1411));
+							if(!backpack)
+								continue;
+							defaultbackpack->addItem(backpack);
 							
-							backpack->addItem(new Item(1623, 99));
-							backpack->addItem(new Item(1623, 99));
-							backpack->addItem(new Item(1623, 99));
-							backpack->addItem(new Item(1623, 99));
+							for(int i = 0; i < 20; ++i) {
+								backpack->addItem(Item::CreateItem(1623, 99));
+							}
 
-							backpack = new Item(1411);
-							player->items[sl_id]->addItem(backpack);
+							backpack = dynamic_cast<Container*>(Item::CreateItem(1411));
+							if(!backpack)
+								continue;
+							defaultbackpack->addItem(backpack);
 							
-							backpack->addItem(new Item(1618, 99));
-							backpack->addItem(new Item(1618, 99));
-							backpack->addItem(new Item(1618, 99));
-							backpack->addItem(new Item(1618, 99));
+							for(int i = 0; i < 20; ++i) {
+								backpack->addItem(Item::CreateItem(1618, 99));
+							}
 
-							player->items[sl_id]->addItem(new Item(1655, 5));
-							player->items[sl_id]->addItem(new Item(1643, 5));
-							player->items[sl_id]->addItem(new Item(1654, 5));
+							backpack = dynamic_cast<Container*>(Item::CreateItem(1411));
+							if(!backpack)
+								continue;
+							defaultbackpack->addItem(backpack);
+
+							for(int i = 0; i < 20; ++i) {
+								backpack->addItem(Item::CreateItem(1655, 3));
+							}
+
+							backpack = dynamic_cast<Container*>(Item::CreateItem(1411));
+							if(!backpack)
+								continue;
+							defaultbackpack->addItem(backpack);
+
+							for(int i = 0; i < 20; ++i) {
+								backpack->addItem(Item::CreateItem(1643, 3));
+							}
+
+							defaultbackpack->addItem(Item::CreateItem(1654, 2));
+							defaultbackpack->addItem(Item::CreateItem(1658, 50));
+							defaultbackpack->addItem(Item::CreateItem(1614, 5));
+							//defaultbackpack->addItem(Item::CreateItem(1628, 5));
 						}
 					}
 				slot=slot->next;

@@ -42,9 +42,10 @@ public:
 	virtual int sendInventory(){return 0;}
 
   void setPlayer(Player* p);
+	unsigned long getIP() const;
+	//SOCKET getSocket() const {return s;}
 
-
-  virtual bool CanSee(int x, int y) = 0;
+  virtual bool CanSee(int x, int y) const = 0;
 
   virtual void sendNetworkMessage(NetworkMessage *msg) = 0;
 

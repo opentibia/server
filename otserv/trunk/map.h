@@ -34,6 +34,8 @@
 #include "scheduler.h"
 #include "networkmessage.h"
 
+#include "tools.h"
+
 class Creature;   // see creature.h
 class Player;
 class Game;
@@ -46,6 +48,61 @@ class Game;
 
 
 class Tile;
+
+struct targetdata {
+	int damage;
+	int manaDamage;
+	bool physical;
+};
+
+class TilePreChangeData {
+public:
+	Position pos;
+	unsigned char thingCount;
+};
+
+struct tilechangedata {
+	Thing *thing;
+	int stackpos;
+	bool remove;
+};
+
+typedef std::pair<Position, bool> targetAreaItem;
+typedef std::vector< targetAreaItem > TargetAreaVec;
+
+typedef std::pair<Creature*, struct targetdata> targetitem;
+typedef std::vector< targetitem > TargetDataVec;
+
+typedef std::vector<TilePreChangeData> TileExDataVec;
+typedef std::vector<struct tilechangedata> TileChangeDataVec;
+
+typedef std::map<Tile*, TilePreChangeData > TileExDataMap;
+typedef std::map<Tile*, TileChangeDataVec > TileChangeDataVecMap;
+
+
+class Map;
+
+class MapState {
+public:
+	MapState(Map* imap);
+	void addThing(Tile *t, Thing *thing);
+	bool removeThing(Tile *t, Thing *thing);
+	void refreshThing(Tile *t, Thing *thing);
+
+	void getMapChanges(Player *spectator, NetworkMessage &msg);
+	
+protected:
+	Map* map;
+
+	void addThingInternal(Tile *t, Thing *thing, bool onlyRegister);
+	bool removeThingInternal(Tile *t, Thing *thing, bool onlyRegister);
+
+	void addTile(Tile *t, Position& tilepos);
+	bool isTileStored(const Tile *t) const;
+	
+	TileChangeDataVecMap changesItemMap;
+	TileExDataMap preChangeItemMap;
+};
 
 class Range {
 public:
@@ -71,7 +128,7 @@ public:
 		if(multilevel)
 			this->startz = 0;
 		else
-			this->startz = startz;
+			this->startz = z;
 		this->endz = z;
 		this->multilevel = multilevel;
 	}
@@ -94,19 +151,6 @@ public:
 	int startz;
 	int endz;
 	bool multilevel;
-};
-
-struct targetdata {
-	int damage;
-	int manaDamage;
-	unsigned char stackpos;
-	bool hadSplash;
-};
-
-struct tiletargetdata {
-	Position pos;
-	int targetCount;
-	unsigned char thingCount;
 };
 
 /**
@@ -173,6 +217,16 @@ class Map {
     bool removeCreature(Creature* c);
 
 	/**
+	 * Checks if you can throw an object to that position
+	 *	\param from from Source point
+	 *	\param to Destination point
+	 *	\param creaturesBlock Wether a Creature is an obstacle or not
+	 *	\param isProjectile Takes into consideration for windows/door-ways.
+	 *	\returns The result if you can throw there or not
+	 */
+		bool canThrowItemTo(Position from, Position to, bool creaturesBlock /* = true*/, bool isProjectile = false);
+
+	/**
 	  * Get the path to a specific position on the map.
 	  * \param start The start position of the path
 	  * \param to The destination position
@@ -187,14 +241,14 @@ class Map {
     /**
 	  * Get the Creatures within a specific Range */
 	void getSpectators(const Range& range, std::vector<Creature*>& list);
-	void getAreaTiles(Position pos, const unsigned char area[14][18], unsigned char dir, std::list<tiletargetdata>& list);
 
-    typedef std::map<unsigned long, Tile*> TileMap;
+  typedef std::map<unsigned long, Tile*> TileMap;
 
 	TileMap tileMaps[64][64][MAP_LAYER];
 
     void Map::setTile(unsigned short _x, unsigned short _y, unsigned char _z, unsigned short groundId);
 	
+	friend class MapState;
 	friend class Game;
 	//FIXME friend for derived classes?
 	friend class IOMapXML;

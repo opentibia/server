@@ -29,6 +29,7 @@
 
 #include "position.h"
 #include "item.h"
+#include "container.h"
 #include "creature.h"
 #include "magic.h"
 #include "otsystem.h"
@@ -124,9 +125,12 @@ class Game {
     void creatureToChannel(Creature *creature, unsigned char type, const std::string &text, unsigned short channelId);
 	void creatureChangeOutfit(Creature *creature);
 
-	bool creatureThrowRune(Creature *creature, const MagicEffectClass& me);
-  	void creatureCastSpell(Creature *creature, const MagicEffectClass& me);
+	//bool creatureThrowRune(Creature *creature, const MagicEffectClass& me);
+  //void creatureCastSpell(Creature *creature, const MagicEffectClass& me);
+	bool creatureThrowRune(Creature *creature, const Position& centerpos, const MagicEffectClass& me);
+	bool creatureCastSpell(Creature *creature, const Position& centerpos, const MagicEffectClass& me);
 	bool creatureSaySpell(Creature *creature, const std::string &text);
+	bool creatureUseItem(Creature *creature, const Position& pos, Item* item);
     void changeOutfitAfter(unsigned long id, int looktype, long time);
     void changeSpeed(unsigned long id, unsigned short speed);
     void addEvent(long ticks, int type, void *data);
@@ -137,7 +141,6 @@ class Game {
 	Creature* getCreatureByName(const char* s);
 
 	std::list<Position> getPathTo(Position start, Position to, bool creaturesBlock=true);
-	bool canThrowItemTo(Position from, Position to, bool creaturesBlock=true);
 
 	/** Lockvar for Game. */
     OTSYS_THREAD_LOCKVAR gameLock;
@@ -152,12 +155,24 @@ class Game {
     void changeOutfit(unsigned long id, int looktype);
 	bool creatureOnPrepareAttack(Creature *creature, Position pos);
 	void creatureMakeDamage(Creature *creature, Creature *attackedCreature, fight_t damagetype);
-    void creatureBroadcastTileUpdated(const Position& pos);
-	bool creatureMakeMagic(Creature *creature, const MagicEffectClass* me);
+  void creatureBroadcastTileUpdated(const Position& pos);
+
+	bool creatureMakeMagic(Creature *creature, const Position& centerpos, const MagicEffectClass* me);
+	bool creatureOnPrepareMagicAttack(Creature *creature, Position pos, const MagicEffectClass* me);
+	bool creatureOnPrepareMagicCreateSolidObject(Creature *creature, const Position& pos, const MagicEffectTargetGroundClass* magicGround);
+	
+	/**
+	* Change the players hitpoints
+	* Return: the mana damage and the actual hitpoint loss
+	*/
+	void creatureApplyDamage(Creature *creature, int damage, int &outDamage, int &outManaDamage);
+
+	//bool creatureMakeMagicSolidObject(const MagicEffectTargetGroundClass* magicGround
+	//creatureMakeFieldItem(const Position& pos, );
 
 	void CreateDamageUpdate(Creature* player, Creature* attackCreature, int damage, NetworkMessage& msg);
 	void getSpectators(const Range& range, std::vector<Creature*>& list);
-	void getAreaTiles(Position pos, const unsigned char area[14][18], unsigned char dir, std::list<tiletargetdata>& list);
+	//void getAreaTiles(Position pos, const unsigned char area[14][18], unsigned char dir, std::list<tiletargetdata>& list);
 	void creatureApplyMagicEffect(Creature *target, const MagicEffectClass& me, NetworkMessage& msg);
 	void CreateManaDamageUpdate(Creature* player, Creature* attackCreature, int damage, NetworkMessage& msg);
 

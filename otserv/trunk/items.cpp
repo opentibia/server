@@ -38,6 +38,7 @@ ItemType::ItemType()
 	groundtile      = false;
 	blocking        = false; // people can walk on it
 	pickupable      = false; // people can pick it up
+	blockingProjectile = false;
 	
 	speed		= 0;
 	id         =  100;
@@ -188,7 +189,8 @@ int Items::loadFromDat(std::string file)
         case 0x09: //can contain fluids
             break;
         case 0x0D: // blocks missiles (walls, magic wall etc)
-            break;
+					iType->blockingProjectile = true;
+          break;
         case 0x0E: // blocks monster movement (flowers, parcels etc)
             break;
         case 0x11: // can see what is under (ladder holes, stairs holes etc)

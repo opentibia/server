@@ -26,6 +26,8 @@
 #include "thing.h"
 #include "position.h"
 
+#include "magic.h"
+
 enum fight_t {
 	FIGHT_MELEE,
 	FIGHT_DIST,
@@ -58,7 +60,6 @@ class Item;
 class Thing;
 class Player;
 
-
 //////////////////////////////////////////////////////////////////////
 // Defines the Base class for all creatures and base functions which 
 // every creature has
@@ -73,10 +74,10 @@ public:
   virtual const std::string& getName() const {return name; };
 
   unsigned long getID() const { return id; }
-  int getExpForLv(int lv) { 
+  int getExpForLv(const int& lv) const { 
 		return (int)((50*lv*lv*lv)/3 - 100 * lv * lv + (850*lv) / 3 - 200);
-      //return (int)(((50.0/3.0) * pow((double)lv ,3)) - (100 * pow((double)lv, 2)) + ((850.0/3.0) * lv) - 200);
-      }
+    //return (int)(((50.0/3.0) * pow((double)lv ,3)) - (100 * pow((double)lv, 2)) + ((850.0/3.0) * lv) - 200);
+	}
   Direction getDirection() const { return direction; }
   void setDirection(Direction dir) { direction = dir; }
 
@@ -100,12 +101,16 @@ public:
   virtual int addItem(Item* item, int pos){return 0;};
   virtual Item* getItem(int pos){return NULL;}
   virtual Direction getDirection(){return direction;}
-
+	void addMagicDamage(const MagicDamageContainer& dmgContainer, bool skipfirst = true);
+	MagicDamageVec* getMagicDamageVec(MagicDamageType md);
 
   int lookhead, lookbody, looklegs, lookfeet, looktype, lookcorpse, lookmaster;
   int mana, manamax, manaspent;
   bool pzLocked;
-  long inFightTicks, exhaustedTicks, manaShieldTicks, hasteTicks;
+  //bool poisoned, burning, energized, drunk, paralyzed;
+  long inFightTicks, exhaustedTicks, manaShieldTicks, hasteTicks, paralyzeTicks;
+	long burningTicks, energizedTicks, poisonedTicks;
+	long curburningTicks, curenergizedTicks, curpoisonedTicks;
   unsigned long experience;
   Position masterPos;
 
@@ -158,7 +163,11 @@ private:
 	virtual void onTileUpdated(const Position *Pos) { };
 	virtual void onContainerUpdated(Item *item, unsigned char from_id, unsigned char to_id, unsigned char from_slot, unsigned char to_slot, bool remove) {};
 
+	std::map<MagicDamageType, MagicDamageVec> MagicDamageMap;
+
   friend class Game;
+  friend class Map;
+	friend class MapState;
 
   Direction direction;
 
