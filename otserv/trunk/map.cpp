@@ -1273,12 +1273,8 @@ void Map::makeCastSpell(Player *player, int mana, int mindamage, int maxdamage, 
 					NetworkMessage msg;
 
 					for(int a = 0; a < areaPos.size(); a++) {
-						Position npos = areaPos[a];
-						int nx = npos.x;
-						int ny = npos.y;
-						
-						if(spectator->CanSee(nx, ny))
-							msg.AddMagicEffect(npos, typeArea);
+						if(spectator->CanSee(areaPos[a].x, areaPos[a].y))
+							msg.AddMagicEffect(areaPos[a], typeArea);
 					}
 
 					for (int i = 0; i < damagelist.size(); i++) {
@@ -1317,12 +1313,10 @@ void Map::makeCastSpell(Player *player, int mana, int mindamage, int maxdamage, 
 						}
 
 						if(victim == spectator && damagelist[i].second > 0) {
-							NetworkMessage newmsg;
-			
-							CreateDamageUpdate(spectator, player, damagelist[i].second, newmsg);
-							newmsg.AddPlayerStats(victim);
+							CreateDamageUpdate(spectator, player, damagelist[i].second, msg);
+							msg.AddPlayerStats(victim);
 
-							spectator->sendNetworkMessage(&newmsg);
+							spectator->sendNetworkMessage(&msg);
 						}
 						else
 							msg.AddPlayerStats(spectator);
