@@ -1199,20 +1199,22 @@ void Map::resetExhausted(unsigned long id)
 void Map::makeCastSpell(Player *player, int mana, int mindamage, int maxdamage, unsigned char area[14][18], unsigned char ch, unsigned char typeArea, unsigned char typeDamage)
 {
 	NetworkMessage msg;
-	if(player->mana < mana || player->exhausted) {
+	if(player->mana < mana | player->exhausted) {
 			msg.AddMagicEffect(player->pos, NM_ME_PUFF);
 			player->sendNetworkMessage(&msg);
 			return;
-	}
+	} 
 
-	player->exhausted = true;
+	player->exhausted =true;
 	player->mana -= mana;
 	addEvent(makeTask(1200, std::bind2nd(std::mem_fun(&Map::resetExhausted), player->id)));
 
-	CreatureVector::iterator cit;
+	std::vector< std::pair<unsigned long, unsigned long> > damagelist;
+	damagelist.clear();
 
-	std::vector< std::pair<unsigned long, unsigned long> > spectatorlist;
-  std::pair<unsigned long, unsigned long> spectator;
+  std::pair<unsigned long, unsigned long> damagedcreature;
+	std::vector<Position> areaPos;
+	CreatureVector::iterator cit;
 	
 	Position pos = player->pos;
 	pos.x -= 8;
@@ -1220,94 +1222,129 @@ void Map::makeCastSpell(Player *player, int mana, int mindamage, int maxdamage, 
 
 	for(int y = 0; y < 14; y++) {
 		for(int x = 0; x < 18; x++) {
-				Tile* tile = getTile(pos.x, pos.y, pos.z);
-				if (tile) {
-					if(tile->creatures.empty())
-					{
-						if(area[y][x] == ch)
-							msg.AddMagicEffect(pos, typeArea);
-					}
-					else 
-					for (cit = tile->creatures.begin(); cit != tile->creatures.end(); cit++) {
-						Player *p = (Player*)(*cit);
+			Tile* tile = getTile(pos.x, pos.y, pos.z);
+			if (tile) {
+				if(tile->creatures.empty())
+				{
+					if(area[y][x] == ch)
+						areaPos.push_back(pos);
+				}
+				else 
+				for (cit = tile->creatures.begin(); cit != tile->creatures.end(); cit++) {
+					
+					if(area[y][x] == ch) {
+						damagedcreature.first  = (*cit)->getID();
 
-						spectator.first  = p->getID();
-						spectator.second = 0;
+						if((*cit)->access == 0) {
+							int damage = random_range(mindamage, maxdamage);
 
-						if(area[y][x] == ch) {
-							if(p->access == 0) {
-								int damage = random_range(mindamage, maxdamage);
+							if(damage > (*cit)->health)
+								damage = (*cit)->health;
 
-								if(damage > p->health)
-									damage = p->health;
-
-								spectator.second = damage;
-
-								if(damage > 0) {
-									p->drainHealth(damage);
-									msg.AddMagicEffect(p->pos, typeDamage);
-
-									std::stringstream dmg;
-									dmg << damage;
-									msg.AddAnimatedText(p->pos, 0xB4, dmg.str());
-								
-
-								if (p->health <= 0)
-								{
-									// remove character
-									msg.AddByte(0x6c);
-									msg.AddPosition(p->pos);
-									msg.AddByte(tile->getThingStackPos(p));
-									msg.AddByte(0x6a);
-									msg.AddPosition(p->pos);
-									Item* item = new Item(2278);
-									msg.AddItem(item);
-									delete item;
-								}
-								else
-									msg.AddCreatureHealth(p);
-								}
-							}
-						else
-							msg.AddMagicEffect(p->pos, NM_ME_PUFF);
-
+							(*cit)->drainHealth(damage);
+							damagedcreature.second = damage;
 						}
-						
-						spectatorlist.push_back(spectator);
+						else
+							damagedcreature.second = 0;
+
+						damagelist.push_back(damagedcreature);
 					}
 				}
+			}
 
 			pos.x += 1;
 		}
 		
 		pos.x -= 18;
 		pos.y += 1;
-		}
+	}
 
-	for (int i = 0; i < spectatorlist.size(); i++) {
-		Player* p = (Player*) getCreatureByID(spectatorlist[i].first);
-		Tile *tile = getTile(p->pos.x, p->pos.y, 7);
+	//spectators
+	for(int y =  player->pos.y - 14; y < player->pos.y + 14; y++) {
+		for(int x = player->pos.x - 18; x < player->pos.x + 18; x++) {
+			
+			Tile* tile = getTile(x, y, player->pos.z);
+			if (tile) {
+				for (cit = tile->creatures.begin(); cit != tile->creatures.end(); cit++) {
+					Player *spectator = (Player*)*cit;
+					if(spectator == NULL)
+						return ;
 
-		if(p->CanSee(player->pos.x, player->pos.y)) {
-			if (p != player && spectatorlist[i].second > 0) {
-				NetworkMessage newmsg;
-				
-				CreateDamageUpdate(p, player, spectatorlist[i].second, newmsg);
-				newmsg.AddPlayerStats(p);
+					NetworkMessage msg;
 
-				p->sendNetworkMessage(&newmsg);
+					for(int a = 0; a < areaPos.size(); a++) {
+						Position npos = areaPos[a];
+						int nx = npos.x;
+						int ny = npos.y;
+						
+						if(spectator->CanSee(nx, ny))
+							msg.AddMagicEffect(npos, typeArea);
+					}
+
+					for (int i = 0; i < damagelist.size(); i++) {
+
+						//build effects for spectator
+						Player* victim = (Player*) getCreatureByID(damagelist[i].first);
+
+						if(spectator->CanSee(victim->pos.x, victim->pos.y)) {
+
+							int damage = damagelist[i].second;
+
+							if(damage > 0) {
+								msg.AddMagicEffect(victim->pos, typeDamage);
+
+								std::stringstream dmg;
+								dmg << damage;
+								msg.AddAnimatedText(victim->pos, 0xB4, dmg.str());
+							}
+							else
+								msg.AddMagicEffect(victim->pos, NM_ME_PUFF);
+
+							if (victim->health <= 0)
+							{
+								// remove character
+								msg.AddByte(0x6c);
+								msg.AddPosition(victim->pos);
+								msg.AddByte(getTile(victim->pos.x, victim->pos.y, victim->pos.z)->getThingStackPos(victim));
+								msg.AddByte(0x6a);
+								msg.AddPosition(victim->pos);
+								Item* item = new Item(2278);
+								msg.AddItem(item);
+								delete item;
+							}
+							else
+								msg.AddCreatureHealth(victim);
+						}
+
+						if(victim == spectator && damagelist[i].second > 0) {
+							NetworkMessage newmsg;
+			
+							CreateDamageUpdate(spectator, player, damagelist[i].second, newmsg);
+							newmsg.AddPlayerStats(victim);
+
+							spectator->sendNetworkMessage(&newmsg);
+						}
+						else
+							msg.AddPlayerStats(spectator);
+					}
+
+					spectator->sendNetworkMessage(&msg);
+					msg.Reset();
+				}
 			}
-
-			p->sendNetworkMessage(&msg);
-		}
-
-		if (p->health <= 0) {
-			tile->removeThing(p);
-			playersOnline.erase(playersOnline.find(p->getID()));
-			tile->addThing(new Item(2278));
 		}
 	}
 
+	for (int i = 0; i < damagelist.size(); i++) {
+		Player* victim = (Player*) getCreatureByID(damagelist[i].first);
+		Tile *tile = getTile(victim->pos.x, victim->pos.y, 7);
+
+		if (victim->health <= 0) {
+			tile->removeThing(victim);
+			playersOnline.erase(playersOnline.find(victim->getID()));
+			tile->addThing(new Item(2278));
+		}
+	}
 }
 
 void Map::playerCastSpell(Player *player, const std::string &text)
@@ -1325,9 +1362,9 @@ void Map::playerCastSpell(Player *player, const std::string &text)
 				player->mana -= 100;
 				addEvent(makeTask(1200, std::bind2nd(std::mem_fun(&Map::resetExhausted), player->id)));
 				
-				int base = player->level * 2 + player->maglevel * 3;
-				int min = (base * 2) / 2;
-				int max = ((base * 2.8)) / 2;
+				int base = (int)player->level * 2 + player->maglevel * 3;
+				int min = (int)(base * 2) / 2;
+				int max = (int)((base * 2.8)) / 2;
 				int newhealth = player->health + random_range(min, max); //player->health + 1+(int)(500.0*rand()/(RAND_MAX+1.0));
 				if(newhealth > player->healthmax)
 					newhealth = player->healthmax;
@@ -1377,9 +1414,9 @@ void Map::playerCastSpell(Player *player, const std::string &text)
 				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 			};
 
-		int base = player->level * 2 + player->maglevel * 3;
-		int min = ((base * 2.3) - 30) / 2;
-		int max = ((base * 3.0)) / 2;
+		int base = (int)player->level * 2 + player->maglevel * 3;
+		int min = (int)((base * 2.3) - 30) / 2;
+		int max = (int)((base * 3.0)) / 2;
 		makeCastSpell(player, 800, min, max, area, 1, NM_ME_EXPLOSION_AREA, NM_ME_EXPLOSION_DAMAGE);
 	}
 	else if(strcmp(text.c_str(), "exori vis") == 0) {
@@ -1409,9 +1446,9 @@ void Map::playerCastSpell(Player *player, const std::string &text)
 			case SOUTH: ch = 4; break;
 		};
 
-		int base = player->level * 2 + player->maglevel * 3;
-		int min = (base * 1.1) / 2;
-		int max = (base * 1.0) / 2;
+		int base = (int)player->level * 2 + player->maglevel * 3;
+		int min = (int)(base * 1.1) / 2;
+		int max = (int)(base * 1.0) / 2;
 		makeCastSpell(player, 20, min, max, area, ch, NM_ME_ENERGY_AREA, NM_ME_ENERGY_DAMAGE);
 	}
 	else if(strcmp(text.c_str(), "exori mort") == 0) {
@@ -1441,9 +1478,9 @@ void Map::playerCastSpell(Player *player, const std::string &text)
 			case SOUTH: ch = 4; break;
 		};
 
-		int base = player->level * 2 + player->maglevel * 3;
-		int min = (base * 1.1) / 2;
-		int max = (base * 1.0) / 2;
+		int base = (int)player->level * 2 + player->maglevel * 3;
+		int min = (int)(base * 1.1) / 2;
+		int max = (int)(base * 1.0) / 2;
 		makeCastSpell(player, 20, min, max, area, ch, NM_ME_MORT_AREA, NM_ME_MORT_AREA);
 	}
 	else if(strcmp(text.c_str(), "exori") == 0) {
@@ -1463,9 +1500,9 @@ void Map::playerCastSpell(Player *player, const std::string &text)
 				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 			};
 
-		int base = player->level * 2 + player->maglevel * 3;
-		int min = (base * 2.0) / 2;
-		int max = (base * 2.5) / 2;
+		int base = (int)player->level * 2 + player->maglevel * 3;
+		int min = (int)(base * 2.0) / 2;
+		int max = (int)(base * 2.5) / 2;
 		makeCastSpell(player, 250, min, max, area, 1, 	NM_ME_HIT_AREA, NM_ME_HIT_AREA);
 	}
 	else if(strcmp(text.c_str(), "exevo mort hur") == 0) {
@@ -1494,9 +1531,9 @@ void Map::playerCastSpell(Player *player, const std::string &text)
 			case SOUTH: ch = 4; break;
 		};
 
-		int base = player->level * 2 + player->maglevel * 3;
-		int min = (base * 2.0) / 2;
-		int max = (base * 2.5) / 2;
+		int base = (int)player->level * 2 + player->maglevel * 3;
+		int min = (int)(base * 2.0) / 2;
+		int max = (int)(base * 2.5) / 2;
 		makeCastSpell(player, 250, min, max, area, ch, NM_ME_ENERGY_AREA, NM_ME_ENERGY_DAMAGE);
 	}
 	else if(strcmp(text.c_str(), "exevo vis lux") == 0) {
@@ -1525,9 +1562,9 @@ void Map::playerCastSpell(Player *player, const std::string &text)
 			case SOUTH: ch = 4; break;
 		};
 
-		int base = player->level * 2 + player->maglevel * 3;
-		int min = (base * 1.2) / 2;
-		int max = (base * 2.0) / 2;
+		int base = (int)player->level * 2 + player->maglevel * 3;
+		int min = (int)(base * 1.2) / 2;
+		int max = (int)(base * 2.0) / 2;
 		makeCastSpell(player, 100, min, max, area, ch, NM_ME_ENERGY_AREA, NM_ME_ENERGY_DAMAGE);
 	}
 

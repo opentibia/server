@@ -425,6 +425,7 @@ void Protocol70::parseSay(NetworkMessage &msg)
     receiver = msg.GetString();
 
   std::string text = msg.GetString();
+
 	map->playerCastSpell(player, text);
 
   switch (type)
