@@ -20,6 +20,9 @@
 	// $Id$
 	//////////////////////////////////////////////////////////////////////
 	// $Log$
+	// Revision 1.8  2003/09/25 21:17:52  timmit
+	// Adding PlayerList in TMap and getID().  Not workigng!
+	//
 	// Revision 1.7  2003/05/19 16:48:37  tliffrag
 	// Loggingin, talking, walking around, logging out working
 	//
@@ -55,6 +58,8 @@
 		virtual ~Player();
 
 		bool isPlayer();
+		
+        unsigned long getID();		
 
 		void sendAction(Action*);
 

@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.13  2003/09/25 21:17:52  timmit
+// Adding PlayerList in TMap and getID().  Not workigng!
+//
 // Revision 1.12  2003/09/23 20:00:51  tliffrag
 // added !g command
 //
@@ -154,6 +157,17 @@ int Map::saveMap(){
 	}
 	fclose(dump);
 	return true;
+}
+
+Creature* Map::getPlayerByID( unsigned long id ){
+  std::list<Creature*>::iterator i;
+  for( i = PlayerList.begin(); i != PlayerList.end(); i++ )
+  {
+    if( (*i)->getID() == id )
+    {
+      return *i;
+    }
+  }
 }
 
 position Map::placeCreature(position pos, Creature* c){

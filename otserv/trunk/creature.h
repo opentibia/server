@@ -42,7 +42,9 @@ class Creature {
         virtual void setMap(position, Map&) throw(texception)=0;
 
 		virtual bool isPlayer(){return false;}
-
+		
+		virtual unsigned long getID(){}
+		
 		virtual void sendAction(Action*){}
         // get the next Action of the creature
         //			virtual action* GetNextAction()=0;

@@ -20,8 +20,8 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
-// Revision 1.9  2003/09/25 18:24:37  timmit
-// Updated the 0x0A packet to send the client the actual player information.  Log on, then log off to create a .chr file.  You can edit the .chr file (within some limits) and the next time you log on the client will show the changes.
+// Revision 1.10  2003/09/25 21:17:52  timmit
+// Adding PlayerList in TMap and getID().  Not workigng!
 //
 // Revision 1.8  2003/09/24 20:47:05  timmit
 // Player loading/saving added.  Both load() and save() in player_mem work.  Saves player's character to the appropriate *.chr file when the player logs out but does NOT load() the player's file when they log in.  Once accounts are added then the call to load() will be added.
@@ -96,7 +96,7 @@ enum skillsid_t {
 			// [ skill ][ SKILL_TRIES ] is how many tries on that skill ( to determine when the skill advances )
 			int skills[ 7 ][ 2 ];
 			
-            unsigned int pnum;
+            unsigned long pnum;
             
           unsigned long readVal( FILE* charfile );//, std::string name, unsigned long &value );
           void writeVal( FILE* charfile, std::string name, unsigned long value );

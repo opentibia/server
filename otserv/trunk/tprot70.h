@@ -22,6 +22,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.6  2003/09/25 21:17:52  timmit
+// Adding PlayerList in TMap and getID().  Not workigng!
+//
 // Revision 1.5  2003/09/23 20:00:51  tliffrag
 // added !g command
 //
@@ -97,6 +100,7 @@
 			void parseTurnWest(Action* action, std::string msg);
 			void parseSetOutfit(Action* action, std::string msg);
 			void parseSay(Action* action, std::string msg);
+			void parseAttack(Action* action, std::string msg);
 			void parseLogout(Action* action, std::string msg);
 			void parseThrow(Action* action, std::string msg);
 

@@ -167,6 +167,9 @@ void TProt70::parsePacket(std::string msg){
   case 0x96: //say something
     parseSay(action, msg);
     break;
+  case 0xA1: //attack
+    parseAttack(action, msg);
+    break;
   case 0xDB: //set outfit TODO
     parseSetOutfit(action, msg);
     break;
@@ -614,6 +617,9 @@ void TProt70::parseSay(Action* action, std::string msg){
 	msg.erase(0,4);
 	action->buffer=msg;
 	action->pos1=player->pos;
+}
+
+void TProt70::parseAttack(Action* action, std::string msg){
 }
 
 void TProt70::sendAction(Action* action){

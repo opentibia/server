@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.9  2003/09/25 21:17:52  timmit
+// Adding PlayerList in TMap and getID().  Not workigng!
+//
 // Revision 1.8  2003/09/23 20:00:51  tliffrag
 // added !g command
 //
@@ -52,7 +55,6 @@
 #include "action.h"
 #include "item.h"
 #include "creature.h"
-
 
 //////////////////////////////////////////////////
 // a Tile represents a single field on the map.
@@ -90,13 +92,15 @@ class Map {
         Map();
         Map(char *filename);
 		position placeCreature(position pos, Creature* c);
+		Creature* getPlayerByID( unsigned long id );
 		int removeCreature(position pos);
 		int requestAction(Creature* c, Action* a);
 		int summonItem(position pos, int id);
 		int changeGround(position pos, int id);
 		int saveMap();
-	int removeItem(position pos);
+		int removeItem(position pos);
         Tile *tile(unsigned short _x, unsigned short _y, unsigned char _z);
+		std::list <Creature*> PlayerList;
         ~Map();
 };
 

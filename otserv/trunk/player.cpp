@@ -20,8 +20,8 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
-// Revision 1.10  2003/09/25 18:24:37  timmit
-// Updated the 0x0A packet to send the client the actual player information.  Log on, then log off to create a .chr file.  You can edit the .chr file (within some limits) and the next time you log on the client will show the changes.
+// Revision 1.11  2003/09/25 21:17:52  timmit
+// Adding PlayerList in TMap and getID().  Not workigng!
 //
 // Revision 1.8  2003/09/08 13:28:41  tliffrag
 // Item summoning and maploading/saving now working.
@@ -58,11 +58,14 @@ namespace Creatures {
         
         // for now we just fill in some stuff directly
 		id=rand();
-        player.pnum =id; //TODO right playernumbers
+        player.pnum = id; //TODO right playernumbers
 
         // and pass that infos to the protocoll
         client->setdata(player);
 		client->setCreature(this);
+		
+		// add the player to the PlayerList
+		//PlayerList.push_back(this);
 
     } // Player::Player(Socket sock) 
 
@@ -72,6 +75,10 @@ namespace Creatures {
   bool Player::isPlayer(){
     return true;
   }
+  
+  unsigned long Player::getID(){
+    return player.pnum;
+  }  
 
   void Player::sendAction(Action* action){
   	

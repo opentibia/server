@@ -20,8 +20,8 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
-// Revision 1.10  2003/09/25 18:24:37  timmit
-// Updated the 0x0A packet to send the client the actual player information.  Log on, then log off to create a .chr file.  You can edit the .chr file (within some limits) and the next time you log on the client will show the changes.
+// Revision 1.11  2003/09/25 21:17:52  timmit
+// Adding PlayerList in TMap and getID().  Not workigng!
 //
 // Revision 1.8  2003/09/24 20:59:28  tliffrag
 // replaced itoa with sprintf
@@ -217,7 +217,7 @@ player_mem::player_mem(){
             std::cout << "ERROR: Could not create character save file!\n";
         }
     } // player_mem::save()
-    
+        
     unsigned long player_mem::readVal( FILE* charfile )//, std::string name, unsigned long &value )
     {
         char buffer[ 32 ];
