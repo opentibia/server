@@ -1311,7 +1311,7 @@ void Map::makeCastSpell(Player *player, int mana, int mindamage, int maxdamage, 
 					if(area[y][x] == ch) {
 						damagedcreature.first  = (*cit)->getID();
 
-						if((*cit)->access == 0) {
+						if((!tile->isPz() || player->access != 0)) {
 							int damage = random_range(mindamage, maxdamage);
 
 							if (damage > 0) {
@@ -1346,15 +1346,13 @@ void Map::makeCastSpell(Player *player, int mana, int mindamage, int maxdamage, 
 	}
 
 	//spectators
-	for(int y =  player->pos.y - 14; y < player->pos.y + 14; y++) {
-		for(int x = player->pos.x - 18; x < player->pos.x + 18; x++) {
+	for(int y =  player->pos.y - 12; y < player->pos.y + 12; y++) {
+		for(int x = player->pos.x - 15; x < player->pos.x + 15; x++) {
 			
 			Tile* tile = getTile(x, y, player->pos.z);
 			if (tile) {
 				for (cit = tile->creatures.begin(); cit != tile->creatures.end(); cit++) {
 					Player *spectator = (Player*)*cit;
-					if(spectator == NULL)
-						return ;
 
 					NetworkMessage msg;
 
@@ -1366,12 +1364,18 @@ void Map::makeCastSpell(Player *player, int mana, int mindamage, int maxdamage, 
 					for (int i = 0; i < damagelist.size(); i++) {
 
 						//build effects for spectator
-						Player* victim = (Player*) getCreatureByID(damagelist[i].first);
+						Player *victim = (Player*) getCreatureByID(damagelist[i].first);
+						Tile *vtile = getTile(victim->pos.x, victim->pos.y, victim->pos.z);
 
 						if(spectator->CanSee(victim->pos.x, victim->pos.y)) {
 
 							int damage = damagelist[i].second;
 
+							if(vtile->isPz() && player->access == 0) {
+								msg.AddTextMessage(MSG_STATUS, "You may not attack a person in a protection zone.");
+								msg.AddMagicEffect(victim->pos, NM_ME_PUFF);
+							}
+						else
 							if(damage > 0) {
 								msg.AddMagicEffect(victim->pos, typeDamage);
 
@@ -1399,7 +1403,7 @@ void Map::makeCastSpell(Player *player, int mana, int mindamage, int maxdamage, 
 								CreateDamageUpdate(spectator, player, damagelist[i].second, msg);
 								msg.AddPlayerStats(victim);
 
-								spectator->sendNetworkMessage(&msg);
+								//spectator->sendNetworkMessage(&msg);
 							}
 							else
 								msg.AddPlayerStats(spectator);
@@ -1415,7 +1419,7 @@ void Map::makeCastSpell(Player *player, int mana, int mindamage, int maxdamage, 
 
 	for (int i = 0; i < damagelist.size(); i++) {
 		Player* victim = (Player*) getCreatureByID(damagelist[i].first);
-		Tile *tile = getTile(victim->pos.x, victim->pos.y, 7);
+		Tile *tile = getTile(victim->pos.x, victim->pos.y, victim->pos.z);
 
 		if (victim->health <= 0) {
 			tile->removeThing(victim);
