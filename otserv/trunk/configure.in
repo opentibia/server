@@ -1,16 +1,24 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_INIT(opentserv, 0.2, opentserv@youdie.de)
-AC_CONFIG_SRCDIR([creature.h])
+AC_INIT
+
+AC_PREREQ(2.50)
 AC_CONFIG_AUX_DIR(config)
-AC_CANONICAL_SYSTEM
-dnl AC_CONFIG_HEADER([config.h])
+
+AC_CONFIG_SRCDIR([creature.h])
+
+AC_CONFIG_HEADER(config.h)
+
+AC_CANONICAL_HOST
+AC_CANONICAL_TARGET
+
+AM_INIT_AUTOMAKE(otserv, 0.2)
 
 # check if we want debuging
-AC_SUBST(DEBUG)
 AC_ARG_WITH(debug,   --with-debug      enable debuging, DEBUG=-DDEBUG)
+AC_SUBST(DEBUG)
 
 # Checks for programs.
-AC_PROG_CXX
+AC_PROG_CXX([g++-3.2 g++-3 g++-3.1 g++-3.0 g++3 g++])
 AC_LANG_CPLUSPLUS
 AC_EXEEXT
 AC_OBJEXT
@@ -20,8 +28,9 @@ AC_PROG_INSTALL
 # Checks for libraries.
 
 # check if we use mingw or unix...
+#LDFLAGS=$LDFLAGS" -lwsock32 ";;
 case "$host" in
-*mingw* | *win*) target_sys=__WINDOWS__; LDFLAGS=$LDFLAGS" -lwsock32 ";;
+*mingw* | *win*) target_sys=__WINDOWS__;;
 *) target_sys=__LINUX__;;
 esac
 AC_SUBST(target_sys)
@@ -37,6 +46,8 @@ AC_HEADER_TIME
 
 # Checks for library functions.
 AC_CHECK_FUNCS([gethostbyname inet_ntoa memset select socket strtol])
+
+CXXFLAGS="-Wall ${CXXFLAGS} -D${target_sys} ${DEBUG}"
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
