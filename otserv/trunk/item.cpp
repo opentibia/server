@@ -34,7 +34,7 @@ unsigned Item::getID() const {
 
 //////////////////////////////////////////////////
 // return how many items are stacked or 0 if non stackable
-unsigned short Item::getItemCount() const {
+unsigned char Item::getItemCount() const {
     return count;
 }
 
@@ -43,7 +43,7 @@ Item::Item(const unsigned short _type) {
     id = _type;
     count = 0;
 
-    ThrowRange = 6;
+    throwRange = 6;
 }
 
 
@@ -51,7 +51,7 @@ Item::Item() {
     id = 0;
     count = 0;
 
-    ThrowRange = 6;
+    throwRange = 6;
 }
 
 Item::~Item() {

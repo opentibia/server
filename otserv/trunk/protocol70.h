@@ -112,7 +112,7 @@ private:
   virtual bool CanSee(int x, int y);
 
   // translate a map area to clientreadable format
-  void GetMapDescription(unsigned short x, unsigned short y, unsigned short z,
+  void GetMapDescription(unsigned short x, unsigned short y, unsigned char z,
                          unsigned short width, unsigned short height,
                          NetworkMessage &msg);
 

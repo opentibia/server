@@ -375,7 +375,7 @@ bool Map::placeCreature(Creature* c)
 	addEvent(makeTask(1000, std::bind2nd(std::mem_fun(&Map::checkPlayer), c->id)));
 	addEvent(makeTask(2000, std::bind2nd(std::mem_fun(&Map::checkPlayerAttacking), c->id)));
 
-  while (getTile(c->pos.x, c->pos.y, c->pos.z)->isBlocking())
+  while (!c->canMovedTo(getTile(c->pos.x, c->pos.y, c->pos.z)))
   {
     // crap we need to find another spot
     c->pos.x++;
@@ -663,12 +663,12 @@ void Map::thingMoveInternal(Creature *player,
       {
         player->sendCancel("To far away...");
       }
-      else if ((abs(oldPos.x - to_x) > thing->ThrowRange) ||
-               (abs(oldPos.y - to_y) > thing->ThrowRange))
+      else if ((abs(oldPos.x - to_x) > thing->throwRange) ||
+               (abs(oldPos.y - to_y) > thing->throwRange))
       {
         player->sendCancel("Not there...");
       }
-      else if ((!thing->CanMovedTo(toTile)) || (toTile->isBlocking()))
+      else if (!thing->canMovedTo(toTile))
       {
         if (player == thing)
           player->sendCancelWalk("Sorry, not possible...");
@@ -1098,7 +1098,8 @@ std::list<Position> Map::getPathTo(Position start, Position to){
 					int x = current->x + dx;
 					int y = current->y + dy;
 
-					if(getTile(x,y,z)->isBlocking())
+          Tile *t;
+          if((!(t = getTile(x,y,z))) || t->isBlocking() || t->creatures.size())
 						continue;
 					bool isInClosed = false;
 					for(std::list<AStarNode*>::iterator it = closedNodes.begin();

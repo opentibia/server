@@ -113,6 +113,8 @@ public:
   // level
   int level;
 
+  virtual bool canMovedTo(Tile *tile);
+
   virtual void sendCancel(const char *msg) { };
   virtual void sendCancelWalk(const char *msg) { };
 

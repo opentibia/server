@@ -55,8 +55,8 @@ class Item : public Thing
 
 		static Items items;
 
-	 unsigned short count; // number of stacked items
-        unsigned getID() const;    // ID as in ItemType
+	 unsigned char count; // number of stacked items
+   unsigned getID() const;    // ID as in ItemType
 		
     bool isWeapon() const;
 	 WeaponType getWeaponType() const;
@@ -76,7 +76,7 @@ class Item : public Thing
 		xmlNodePtr serialize();
 
         // get the number of items
-        unsigned short getItemCount() const;
+        unsigned char getItemCount() const;
 
         // Constructor for items
         Item(const unsigned short _type);

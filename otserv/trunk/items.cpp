@@ -124,7 +124,13 @@ int Items::loadFromDat(std::string file)
     			iType->groundtile = true;
 		   		fseek(f, 2, SEEK_CUR);
 		   		break;
-  
+
+        case 0x01:
+        case 0x02:
+          // hmmm whats the diff :S
+          iType->alwaysOnTop=true;
+          break;
+
 				case 0x03:
 					//is a container
 					iType->iscontainer=true;
@@ -146,8 +152,8 @@ int Items::loadFromDat(std::string file)
 					break;
 				
 				case 0x0C:
-					//is on top
-					iType->alwaysOnTop=true;
+					//is on moveable
+          iType->notMoveable=true;
 					break;
 	
 				case 0x0F:
@@ -157,11 +163,9 @@ int Items::loadFromDat(std::string file)
 
 				case 0x10:
 					//makes light (skip 4 bytes)
-		   			fseek(f, 4, SEEK_CUR);
+		   		fseek(f, 4, SEEK_CUR);
 					break;
 
-				case 0x01:
-        case 0x02:
         case 0x06:
         case 0x09:
         case 0x0A:

@@ -1,11 +1,11 @@
 
 #include "thing.h"
-
+#include "tile.h"
 
 
 Thing::Thing()
 {
-  ThrowRange = 1;
+  throwRange = 1;
 }
 
 
@@ -14,9 +14,9 @@ Thing::~Thing()
 }
 
 
-bool Thing::CanMovedTo(Tile *tile)
+bool Thing::canMovedTo(Tile *tile)
 {
-  return true;
+  return !tile->isBlocking();
 }
 
 

@@ -18,9 +18,9 @@ public:
   Thing();
   virtual ~Thing();
 
-  bool CanMovedTo(Tile *tile);
+  virtual bool canMovedTo(Tile *tile);
 
-  int ThrowRange;
+  int throwRange;
 
   Position pos;
 

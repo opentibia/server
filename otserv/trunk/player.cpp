@@ -32,6 +32,7 @@ using namespace std;
 #include "protocol.h"
 #include "player.h"
 
+
 Player::Player(const char *name, Protocol *p) : Creature(name)
 {
   client     = p;
@@ -86,14 +87,18 @@ Item* Player::getItem(int pos)
 	return NULL;
 }
 
-int Player::getWeaponDamage() const {
+int Player::getWeaponDamage() const
+{
 	double damagemax = 0;
-	  for (int slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++)
-		  if (items[slot]) {
-			if ((items[slot]->isWeapon())) {
+  for (int slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++)
+	  if (items[slot])
+    {
+			if ((items[slot]->isWeapon()))
+      {
 				// check which kind of skill we use...
 				// and calculate the damage dealt
-				switch (items[slot]->getWeaponType()) {
+				switch (items[slot]->getWeaponType())
+        {
 					case SWORD:
 						damagemax = 3*skills[2][SKILL_LEVEL] + 2*Item::items[items[slot]->getID()].attack;
 						break;
@@ -109,17 +114,16 @@ int Player::getWeaponDamage() const {
 					case MAGIC:
 						damagemax = level*10+maglevel*30;
 						break;
-			}
+			  }
 		  }
+    }
 
-	  // no weapon found -> fist fighting
-	  if (damagemax == 0)
-		  damagemax = 2*skills[3][SKILL_LEVEL] + Item::items[items[slot]->getID()].attack;
+	// no weapon found -> fist fighting
+	if (damagemax == 0)
+		damagemax = 2*skills[3][SKILL_LEVEL] + Item::items[items[slot]->getID()].attack;
 
-	  // return it
-	  return 1+(int)(damagemax*rand()/(RAND_MAX+1.0));
-}
-		  
+	// return it
+	return 1+(int)(damagemax*rand()/(RAND_MAX+1.0));
 }
 
 void Player::speak(const std::string &text)
@@ -231,6 +235,5 @@ void Player::onTileUpdated(const Position *Pos)
 {
   client->sendTileUpdated(Pos);
 }
-
 
 

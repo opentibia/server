@@ -30,9 +30,6 @@ int Tile::getStackPosItem(){
 
 bool Tile::isBlocking()
 {
-  if (creatures.size() != 0)
-    return true;
-
   ItemVector::iterator iit;
   for (iit = topItems.begin(); iit != topItems.end(); iit++)
     if ((*iit)->isBlocking())

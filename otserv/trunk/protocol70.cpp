@@ -178,9 +178,9 @@ void Protocol70::parsePacket(NetworkMessage &msg)
 }*/
 
 
-void Protocol70::GetMapDescription(unsigned short x, unsigned short y, unsigned short z,
-                                unsigned short width, unsigned short height,
-                                NetworkMessage &msg)
+void Protocol70::GetMapDescription(unsigned short x, unsigned short y, unsigned char z,
+                                   unsigned short width, unsigned short height,
+                                   NetworkMessage &msg)
 {
 	Tile* tile;
 
@@ -494,11 +494,8 @@ void Protocol70::parseSay(NetworkMessage &msg)
   switch (type)
   {
     case 0x01:
-      map->creatureSay(player, type, text);  
-      break;
-      
     case 0x02:
-      map->creatureWhisper(player, text);
+      map->creatureSay(player, type, text);
       break;
 
     case 0x03:
@@ -908,6 +905,7 @@ void Protocol70::sendCreatureAppear(const Creature *creature)
     msg.AddByte(0x82);
     msg.AddByte(0x6F); //LIGHT LEVEL
     msg.AddByte(0xd7);//ight?
+
     //msg.AddByte(0x8d);//8d
     //msg.AddU32(player->getID());
     //msg.AddByte(0x00);//00

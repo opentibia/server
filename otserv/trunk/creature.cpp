@@ -5,6 +5,7 @@
 #include <string>
 
 #include "creature.h"
+#include "tile.h"
 
 using namespace std;
 
@@ -53,6 +54,10 @@ void Creature::setAttackedCreature(unsigned long id)
   attackedCreature = id;
 }
 
+bool Creature::canMovedTo(Tile *tile)
+{
+  if (tile->creatures.size())
+    return false;
 
-
-
+  return Thing::canMovedTo(tile);
+}
