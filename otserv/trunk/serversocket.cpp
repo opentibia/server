@@ -35,18 +35,18 @@ extern EventScheduler es;
 // Take a service name, and a service type, and return a port number.  If the
 // service name is not found, it tries it as a decimal number.  The number
 // returned is byte ordered for the network.
-int ServerSocket::atoport(char *service, char *proto) {
+int ServerSocket::atoport(char *_service, char *_proto) {
   int port;
   long int lport;
   struct servent *serv;
   char *errpos;
 
   // First try to read it from /etc/services
-  serv = getservbyname(service, proto);
+  serv = getservbyname(_service, _proto);
   if (serv != NULL)
     port = serv->s_port;
   else { // Not in services, maybe a number?
-    lport = strtol(service, &errpos, 0);
+    lport = strtol(_service, &errpos, 0);
     if ((errpos[0] != 0) || (lport < 1) || (lport > 65535))
       return -1; // Invalid port address
     port = htons(lport);
@@ -57,16 +57,16 @@ int ServerSocket::atoport(char *service, char *proto) {
 //////////////////////////////////////////////////
 // Converts ascii text to in_addr struct.  NULL is returned if the address
 // can not be found.
-struct in_addr *ServerSocket::atoaddr(char *address) {
+struct in_addr *ServerSocket::atoaddr(char *_address) {
   struct hostent *host;
   static struct in_addr saddr;
 
   // First try it as aaa.bbb.ccc.ddd.
-  saddr.s_addr = inet_addr(address);
+  saddr.s_addr = inet_addr(_address);
   if (saddr.s_addr != -1) {
     return &saddr;
   }
-  host = gethostbyname(address);
+  host = gethostbyname(_address);
   if (host != NULL) {
     return (struct in_addr *) *host->h_addr_list;
   }
@@ -74,21 +74,21 @@ struct in_addr *ServerSocket::atoaddr(char *address) {
 }
 
 #if 0
-void write_to_host(int filedes, unsigned char MESSAGE[MAXMSG]) {
+void write_to_host(int _filedes, unsigned char _message[MAXMSG]) {
   int nbytes;
   
-  if (filedes!=1) nbytes=write(filedes,MESSAGE,MAXMSG); /* schreiben */
-  fprintf(stderr,"%s an %i\n",MESSAGE,filedes);
+  if (_filedes!=1) nbytes=write(_filedes, _message, MAXMSG); // schreiben
+  fprintf(stderr, "%s an %i\n", _message, _filedes);
   if (nbytes<=0) perror("write");        /* fehler */
 }
 #endif
 
 //////////////////////////////////////////////////
 // creates the socket that can accept connections.
-int ServerSocket::make_socket(int socket_type, u_short port) {
+Socket ServerSocket::make_socket(int _socket_type, u_short _port) {
   // creating socket
   struct protoent *protox = (struct protoent *) getprotobyname("tcp");
-  int sock = socket(AF_INET, socket_type, protox->p_proto);
+  Socket sock = socket(AF_INET, _socket_type, protox->p_proto);
   if (sock < 0) {
     perror("socket");
     exit(EXIT_FAILURE);
@@ -98,7 +98,7 @@ int ServerSocket::make_socket(int socket_type, u_short port) {
   struct sockaddr_in address;
   memset((char *) &address, 0, sizeof (address));
   address.sin_family = AF_INET;
-  address.sin_port   = htons(port);
+  address.sin_port   = htons(_port);
   address.sin_addr.s_addr = htonl(INADDR_ANY);
 
   // set O_NONBLOCK flag!
@@ -122,7 +122,16 @@ int ServerSocket::make_socket(int socket_type, u_short port) {
 
 //////////////////////////////////////////////////
 // This class listens on a port to create connections.
+ServerSocket::ServerSocket(Socket _sock = 7171, int _maxconnections = 100) : newconnection(*this) {
+  maxconnections = _maxconnections;
+  connections = 0;
+  serversocket = make_socket(SOCK_STREAM, _sock);
+  es.newsocket(serversocket, &newconnection);
+}
+// odd! doesnt the above constructor suffice?
 ServerSocket::ServerSocket() : newconnection(*this) {
+  maxconnections = 100;
+  connections = 0;
   serversocket = make_socket(SOCK_STREAM, 7171);
   es.newsocket(serversocket, &newconnection);
 }
@@ -136,43 +145,45 @@ ServerSocket::~ServerSocket() {
 
 //////////////////////////////////////////////////
 // a new connection is pending. Accept it.
-void ServerSocket::newconnection::operator()(const signed int &sock) {
+void ServerSocket::newconnection::operator()(const Socket &_sock) {
   struct sockaddr_in clientname;
   socklen_t size = sizeof (clientname);
-  int cs = accept(sock, (struct sockaddr *) &clientname, &size);
+  Socket cs = accept(_sock, (struct sockaddr *) &clientname, &size);
   if (cs < 0) {
     perror("accept");
     return;
   }
-  
+  // if too many connections, send a message over cs and close it
+  ss.connections++;
 #if 0
   fprintf(stderr, "ip= %s, p= %hd.\n", inet_ntoa(clientname.sin_addr), ntohs(clientname.sin_port));
 #endif
-  
+
   Creatures::Player *bla = new Creatures::Player(cs);
   es.newsocket(cs, bla->cb());
   // read_from_client(cs, active_fd_set, 1);
 }
 
+#if 0
 //////////////////////////////////////////////////
 // Incoming data from a connection socket. Read it.
 // should that be here?
-#if 0
-void Protokoll::Protokoll::clientread::operator()(const signed int &sock) {
+void ServerSocket::clientread::operator()(const Socket &_sock) {
   static const int MAXMSG = 4096;
   char buffer[MAXMSG];
 
-  int nbytes = read(sock, buffer, MAXMSG);
+  int nbytes = read(_sock, buffer, MAXMSG);
   if (nbytes < 0) { // error
     perror("read");
     exit(-1);
   } else if (nbytes == 0) { // eof
     printf("eof!\n");
-    es.deletesocket(sock);
-    close(sock);
+    es.deletesocket(_sock);
+    close(_sock);
+    ss.connections--;
   } else {  // lesen erfolgreich
     buffer[nbytes] = 0;
-    printf("%s\n", buffer);
+    cout << buffer << endl;
   }
 }
 #endif

@@ -21,24 +21,30 @@
 #include "definitions.h"
 
 class ServerSocket {
+  Socket serversocket;
+public: // this is public only for the functors; it should be private
+  int connections;
+  int maxconnections;
 private:
-  struct newconnection : public unary_functor<int,void> {
+  struct newconnection : public unary_functor<Socket,void> {
     ServerSocket &ss;
     newconnection(ServerSocket &_ss) : ss(_ss) { }
-    void operator() (const int &z);
+    void operator() (const Socket &z);
   } newconnection;
+#if 0
 public:
-  #if 0
-  struct clientread : public unary_functor<int,void> {
-    void operator() (const int &z);
+  struct clientread : public unary_functor<Socket,void> {
+    ServerSocket &ss;
+    clientread(ServerSocket &_ss) : ss(_ss) { }
+    void operator() (const Socket &z);
   } clientread;
 #endif
 private:
-  int serversocket;
-  int make_socket(int socket_type, u_short port);
+  Socket make_socket(int socket_type, u_short port);
   int atoport(char *service, char *proto);
   struct in_addr *atoaddr(char *address);
 public:
   ServerSocket();
+  ServerSocket(Socket _sock = 7171, int _maxconnections = 100);
   ~ServerSocket();
 };

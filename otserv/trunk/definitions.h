@@ -25,6 +25,12 @@ template<class A, class R> struct unary_functor : public unary_function<A,R> {
   virtual R operator() (const A &) = 0;
 };
 
+#ifdef WINDOWS
+typedef SOCKET Socket;
+#else
+typedef signed int Socket;
+#endif
+
 
 
 
@@ -41,13 +47,5 @@ const unsigned TC_MINY = 1000;
 // and we define our maximum X/Y...
 const unsigned TC_MAXX = TC_MINX+TC_MSIZEX;
 const unsigned TC_MAXY = TC_MINY+TC_MSIZEY;
-
-#ifdef __LINUX__
-typedef int Socket;
-#endif
-
-#ifdef __WINDOWS__
-typedef SOCKET Socket;
-#endif
 
 #endif // __definitions_h

@@ -22,12 +22,12 @@
 #include "definitions.h"
 
 struct eqfd {
-  bool operator() (signed int s1, signed int s2) const {
+  bool operator() (Socket s1, Socket s2) const {
     return s1 == s2;
   }
 };
 
-typedef hash_map<signed int, unary_functor<int,void> *, hash<signed int>, eqfd> fdcbhash;
+typedef hash_map<Socket, unary_functor<Socket,void> *, hash<Socket>, eqfd> fdcbhash;
 
 // EventListener ?
 class EventScheduler {
@@ -35,7 +35,7 @@ class EventScheduler {
   fd_set active_fd_set, read_fd_set;
 public:
   EventScheduler();
-  void newsocket(signed int sock, unary_functor<Socket,void> *);
-  void deletesocket(signed int sock);
+  void newsocket(Socket sock, unary_functor<Socket,void> *);
+  void deletesocket(Socket sock);
   void loop();
 };
