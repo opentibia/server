@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.8  2004/11/18 20:32:15  shivoc
+// fix libxml2 include paths
+//
 // Revision 1.7  2003/11/05 23:28:23  tliffrag
 // Addex XML for players, outfits working
 //
@@ -46,8 +49,8 @@
 #include <iostream>
 #include <list>
 #include <vector>
-#include <libxml2/libxml/xmlmemory.h>
-#include <libxml2/libxml/parser.h>
+#include <libxml/xmlmemory.h>
+#include <libxml/parser.h>
 #include "texcept.h"
 #include "items.h"
 

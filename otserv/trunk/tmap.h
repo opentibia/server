@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.17  2004/11/18 20:32:15  shivoc
+// fix libxml2 include paths
+//
 // Revision 1.16  2003/11/06 17:16:47  tliffrag
 // 0.2.7 release
 //
@@ -77,8 +80,8 @@
 #include "item.h"
 #include "creature.h"
 #include <vector>
-#include <libxml2/libxml/xmlmemory.h>
-#include <libxml2/libxml/parser.h>
+#include <libxml/xmlmemory.h>
+#include <libxml/parser.h>
 
 #define GETTILEBYPOS(pos) (tiles[pos.x-MINX][pos.y-MINY])
 

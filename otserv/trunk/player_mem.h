@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.16  2004/11/18 20:32:15  shivoc
+// fix libxml2 include paths
+//
 // Revision 1.15  2004/11/14 09:16:54  shivoc
 // some fixes to at least reenable login without segfaulting the server (including some merges from haktivex' server
 //
@@ -65,8 +68,8 @@
 #include <string>
 #include <sstream>
 
-#include <libxml2/libxml/xmlmemory.h>
-#include <libxml2/libxml/parser.h>
+#include <libxml/xmlmemory.h>
+#include <libxml/parser.h>
 
 
 enum skills_t {
