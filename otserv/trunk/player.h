@@ -120,6 +120,8 @@ public:
 	//const SOCKET getSocket() const;
 
   fight_t getFightType();
+	subfight_t getSubFightType();
+
   void sendIcons();
   bool CanSee(int x, int y, int z) const;
   void addSkillTry(int skilltry);

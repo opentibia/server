@@ -198,16 +198,16 @@ void Player::sendIcons()
 	if(speed > getNormalSpeed()){
 		icons |= ICON_HASTE;
 	}
-	if(burningTicks >= 1000){
+	if(conditions.hasCondition(ATTACK_FIRE) /*burningTicks >= 1000*/){
 		icons |= ICON_BURN | ICON_SWORDS;
 	}
-	if(energizedTicks >= 1000){
+	if(conditions.hasCondition(ATTACK_ENERGY) /*energizedTicks >= 1000*/){
 		icons |= ICON_ENERGY | ICON_SWORDS;
 	}
-	if(poisonedTicks >= 1000){
+	if(conditions.hasCondition(ATTACK_POISON)/*poisonedTicks >= 1000*/){
 		icons |= ICON_POISON | ICON_SWORDS;
 	}
-	if(speed < getNormalSpeed() /*paralyzeTicks >= 1000*/) {
+	if(conditions.hasCondition(ATTACK_PARALYZE) /*speed < getNormalSpeed()*/ /*paralyzeTicks >= 1000*/) {
 		icons |= ICON_PARALYZE | ICON_SWORDS;
 	}
 
@@ -388,6 +388,15 @@ fight_t Player::getFightType()
   return FIGHT_MELEE;
 }
 
+subfight_t Player::getSubFightType()
+{
+	fight_t type = getFightType();
+	if(type == FIGHT_DIST) {
+		return DIST_POWERBOLT;
+	}
+
+	return DIST_NONE;
+}
 
 bool Player::CanSee(int x, int y, int z) const
 {

@@ -28,11 +28,40 @@
 
 #include "magic.h"
 
+enum attacktype_t {
+	ATTACK_NONE = 0,
+	ATTACK_ENERGY = 1,
+	ATTACK_BURST = 2,
+	ATTACK_FIRE = 8,
+	ATTACK_PHYSICAL = 16,
+	ATTACK_POISON = 32,
+	ATTACK_PARALYZE = 64,
+	ATTACK_DRUNKNESS = 128
+};
+
+enum subfight_t {
+	DIST_NONE = 0,
+	DIST_BOLT = NM_ANI_BOLT,
+  DIST_ARROW = NM_ANI_ARROW, 
+  DIST_FIRE = NM_ANI_FIRE,
+  DIST_ENERGY = NM_ANI_ENERGY,
+  DIST_POISONARROW = NM_ANI_POISONARROW,
+  DIST_BURSTARROW = NM_ANI_BURSTARROW,
+  DIST_THROWINGSTAR = NM_ANI_THROWINGSTAR,
+  DIST_THROWINGKNIFE = NM_ANI_THROWINGKNIFE,
+  DIST_SMALLSTONE = NM_ANI_SMALLSTONE,
+  DIST_SUDDENDEATH = NM_ANI_SUDDENDEATH,
+  DIST_LARGEROCK = NM_ANI_LARGEROCK,
+  DIST_SNOWBALL = NM_ANI_SNOWBALL,
+  DIST_POWERBOLT = NM_ANI_POWERBOLT
+};
+
 enum fight_t {
 	FIGHT_MELEE,
 	FIGHT_DIST,
 	FIGHT_MAGICDIST
 };
+
 // Macros
 #define CREATURE_SET_OUTFIT(c, type, head, body, legs, feet) c->looktype = type; \
 c->lookhead = head; \
@@ -66,6 +95,24 @@ class Item;
 class Thing;
 class Player;
 
+class Conditions : public std::map<attacktype_t, ConditionVec>
+{
+public:
+	bool hasCondition(attacktype_t type)
+	{
+		Conditions::iterator condIt = this->find(type);
+		if(condIt != this->end() && !condIt->second.empty()) {
+			return true;
+		}
+
+		return false;
+	}
+
+	//void AddCondition(attacktype_t type, ConditionVec condVec) {
+		//
+	//}
+};
+
 //////////////////////////////////////////////////////////////////////
 // Defines the Base class for all creatures and base functions which 
 // every creature has
@@ -82,13 +129,20 @@ public:
   unsigned long getID() const { return id; }
   unsigned long getExpForLv(const int& lv) const { 
 		return (int)((50*lv*lv*lv)/3 - 100 * lv * lv + (850*lv) / 3 - 200);
-    //return (int)(((50.0/3.0) * pow((double)lv ,3)) - (100 * pow((double)lv, 2)) + ((850.0/3.0) * lv) - 200);
 	}
   Direction getDirection() const { return direction; }
   void setDirection(Direction dir) { direction = dir; }
 
   virtual fight_t getFightType(){return FIGHT_MELEE;};
-
+	virtual subfight_t getSubFightType() {return DIST_NONE;}
+	virtual int getImmunities() const
+	{
+		if(access != 0) 
+			return  ATTACK_ENERGY | ATTACK_BURST | ATTACK_FIRE |
+			ATTACK_PHYSICAL | ATTACK_POISON | ATTACK_PARALYZE | ATTACK_DRUNKNESS;
+		else
+			return immunities;
+	};
   virtual void drainHealth(int);
   virtual void drainMana(int);
   virtual void die(){};
@@ -107,16 +161,20 @@ public:
   virtual int addItem(Item* item, int pos){return 0;};
   virtual Item* getItem(int pos){return NULL;}
   virtual Direction getDirection(){return direction;}
-	void addMagicDamage(const MagicDamageContainer& dmgContainer, bool skipfirst = true);
-	MagicDamageVec* getMagicDamageVec(MagicDamageType md);
+	void addCondition(const CreatureCondition& condition, bool refresh);
+	Conditions& getConditions() {return conditions;};
 
   int lookhead, lookbody, looklegs, lookfeet, looktype, lookcorpse, lookmaster;
   int mana, manamax, manaspent;
   bool pzLocked;
-  //bool poisoned, burning, energized, drunk, paralyzed;
-  long inFightTicks, exhaustedTicks, manaShieldTicks, hasteTicks, paralyzeTicks;
-	long burningTicks, energizedTicks, poisonedTicks;
-	long curburningTicks, curenergizedTicks, curpoisonedTicks;
+  
+  long inFightTicks, exhaustedTicks;
+	long manaShieldTicks, hasteTicks, paralyzeTicks;
+
+	//long burningTicks, energizedTicks, poisonedTicks;
+	//long curburningTicks, curenergizedTicks, curpoisonedTicks;
+	int immunities;
+
   unsigned long experience;
   Position masterPos;
 
@@ -124,7 +182,7 @@ public:
 
   uint64_t lastmove;
 
-  int lastDamage;
+  //int lastDamage;
 
   unsigned short getSpeed() const {            
            return speed; 
@@ -157,6 +215,9 @@ public:
   virtual void sendCancel(const char *msg) { };
   virtual void sendCancelWalk(const char *msg) { };
 
+protected:
+	Conditions conditions;
+
 private:
 	virtual void onThink(){};
   virtual void onThingMove(const Creature *player, const Thing *thing, const Position *oldPos, unsigned char oldstackpos) { };
@@ -170,11 +231,10 @@ private:
 	virtual void onContainerUpdated(Item *item, unsigned char from_id, unsigned char to_id, unsigned char from_slot, unsigned char to_slot, bool remove) {};
   virtual void onTeleport(const Creature *creature, const Position *oldPos, unsigned char oldstackpos) { };
 
-	std::map<MagicDamageType, MagicDamageVec> MagicDamageMap;
-
   friend class Game;
   friend class Map;
 	friend class MapState;
+	friend class GameState;
 
   Direction direction;
 

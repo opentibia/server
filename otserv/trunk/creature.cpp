@@ -38,7 +38,7 @@ Creature::Creature(const char *name) : access(0)
   experience = 100000;
   lastmove=0;
 
-  lastDamage = 0;
+  //lastDamage = 0;
 
 	inFightTicks = 0;
 	inFightTicks = 0;
@@ -48,13 +48,19 @@ Creature::Creature(const char *name) : access(0)
 	exhaustedTicks  = 0;
 	pzLocked = false;
 	
+	/*
 	burningTicks = 0;
 	energizedTicks = 0;
 	poisonedTicks = 0;
+	*/
 
+	immunities = 0;
+
+	/*
 	curburningTicks = 0;
 	curenergizedTicks = 0;
 	curpoisonedTicks = 0;
+	*/
 
   attackedCreature = 0;
   speed = 220;
@@ -63,16 +69,16 @@ Creature::Creature(const char *name) : access(0)
 
 void Creature::drainHealth(int damage)
 {
-  lastDamage = min(health, damage);
+  //lastDamage = min(health, damage);
 
-  health -= lastDamage;
+  health -= min(health, damage);
 }
 
 void Creature::drainMana(int damage)
 {
-  lastDamage = min(mana, damage);
+  //lastDamage = min(mana, damage);
 
-  mana -= lastDamage;
+  mana -= min(mana, damage);
 }
 
 void Creature::setAttackedCreature(unsigned long id)
@@ -80,18 +86,33 @@ void Creature::setAttackedCreature(unsigned long id)
   attackedCreature = id;
 }
 
-void Creature::addMagicDamage(const MagicDamageContainer& dmgContainer, bool skipfirst /*= true*/)
+void Creature::addCondition(const CreatureCondition& condition, bool refresh)
+{
+	if(condition.getCondition()->attackType == ATTACK_NONE)
+		return;
+
+	ConditionVec &condVec = conditions[condition.getCondition()->attackType];
+	
+	if(refresh) {
+		condVec.clear();
+	}
+
+	condVec.push_back(condition);
+}
+
+//void Creature::addMagicDamage(const MagicDamageContainer& dmgContainer, bool skipfirst /*= true*/)
+/*
 {
 	if(dmgContainer.getMagicType() == magicNone || dmgContainer.empty())
 		return;
 
 	MagicDamageType mt = dmgContainer.getMagicType();
 	MagicDamageMap[mt] = dmgContainer;
-	MagicDamageVec& vec = MagicDamageMap[mt];
+	ConditionVec& vec = MagicDamageMap[mt];
 	
 	//has already been handled
 	if(skipfirst && vec.size() > 0) {
-		damageInfo& di = vec[0];
+		CreatureCondition& di = vec[0];
 		di.first.second--;
 
 		if(di.first.second <=0) {
@@ -102,7 +123,7 @@ void Creature::addMagicDamage(const MagicDamageContainer& dmgContainer, bool ski
 	long ticks = 0;
 	long curticks = 0;
 
-	for(MagicDamageVec::iterator mdi = vec.begin(); mdi != vec.end(); ++mdi) {
+	for(ConditionVec::iterator mdi = vec.begin(); mdi != vec.end(); ++mdi) {
 		if(vec.begin() == mdi)
 			curticks = mdi->first.first;
 
@@ -131,8 +152,10 @@ void Creature::addMagicDamage(const MagicDamageContainer& dmgContainer, bool ski
 		break;
 	}
 }
+*/
 
-MagicDamageVec* Creature::getMagicDamageVec(MagicDamageType md)
+/*
+ConditionVec* Creature::getConditionVec(MagicDamageType md)
 {
 	if(MagicDamageMap.find(md) != MagicDamageMap.end()) {
 		return &MagicDamageMap[md];
@@ -140,6 +163,7 @@ MagicDamageVec* Creature::getMagicDamageVec(MagicDamageType md)
 
 	return NULL;
 }
+*/
 
 
 bool Creature::canMovedTo(const Tile *tile) const
@@ -153,10 +177,11 @@ bool Creature::canMovedTo(const Tile *tile) const
   else return false;
 }
 
-std::string Creature::getDescription(bool self) const {
-    std::stringstream s;
+std::string Creature::getDescription(bool self) const
+{
+  std::stringstream s;
 	std::string str;	
 	s << "You see a " << name << ".";
 	str = s.str();
 	return str;
-            }
+}
