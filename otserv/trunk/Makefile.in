@@ -61,7 +61,8 @@ am_otserv_OBJECTS = creature.$(OBJEXT) item.$(OBJEXT) items.$(OBJEXT) \
 	npc.$(OBJEXT) otserv.$(OBJEXT) player.$(OBJEXT) \
 	protocol.$(OBJEXT) protocol70.$(OBJEXT) thing.$(OBJEXT) \
 	tile.$(OBJEXT) tools.$(OBJEXT) position.$(OBJEXT) \
-	account.$(OBJEXT) status.$(OBJEXT) spells.$(OBJEXT)
+	account.$(OBJEXT) status.$(OBJEXT) spells.$(OBJEXT) \
+	magic.$(OBJEXT)
 otserv_OBJECTS = $(am_otserv_OBJECTS)
 am__DEPENDENCIES_1 =
 otserv_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
@@ -200,7 +201,8 @@ otserv_SOURCES = creature.cpp creature.h definitions.h item.cpp item.h \
 					  position.h protocol.cpp protocol.h protocol70.cpp \
 					  protocol70.h texcept.h thing.cpp thing.h tile.cpp \
 					  tile.h tools.cpp position.cpp scheduler.h account.h \
-					  account.cpp status.cpp status.h spells.cpp spells.h
+					  account.cpp status.cpp status.h spells.cpp spells.h \
+					  magic.h magic.cpp	
 
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
@@ -275,6 +277,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/item.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/items.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/luascript.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/magic.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/map.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/networkmessage.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/npc.Po@am__quote@

@@ -12,4 +12,5 @@ otserv_SOURCES = creature.cpp creature.h definitions.h item.cpp item.h \
 					  position.h protocol.cpp protocol.h protocol70.cpp \
 					  protocol70.h texcept.h thing.cpp thing.h tile.cpp \
 					  tile.h tools.cpp position.cpp scheduler.h account.h \
-					  account.cpp status.cpp status.h spells.cpp spells.h
+					  account.cpp status.cpp status.h spells.cpp spells.h \
+					  magic.h magic.cpp	
