@@ -761,7 +761,6 @@ void Protocol70::parseUseItemEx(NetworkMessage &msg)
 				decreaseCharge = map->creatureThrowRune(player, spellGround);
 			}
 
-			/*
 			if(decreaseCharge) {
 				 runeitem->setItemCharge(((int)runeitem->getItemCharge()) - 1 < 0 ? 0 : runeitem->getItemCharge() - 1);
 
@@ -770,7 +769,6 @@ void Protocol70::parseUseItemEx(NetworkMessage &msg)
 					sendContainerUpdated(runeitem, containerid, 0xFF, from_z, 0xFF, true);
 				}	
             }	
-			*/
 		}
 	}
 }

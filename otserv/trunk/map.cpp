@@ -1685,6 +1685,7 @@ bool Map::creatureThrowRune(Creature *creature, const MagicEffectClass& me) {
 
 bool Map::creatureOnPrepareAttack(Creature *creature, Position pos)
 {
+    if(creature){ 
 	Player* player = dynamic_cast<Player*>(creature);
 
 	Tile* tile = (Tile*)getTile(creature->pos.x, creature->pos.y, creature->pos.z);
@@ -1714,6 +1715,8 @@ bool Map::creatureOnPrepareAttack(Creature *creature, Position pos)
 	}
 
 	return true;
+    }
+    return false;
 }
 
 void Map::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fight_t damagetype)
