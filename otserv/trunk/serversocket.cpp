@@ -21,6 +21,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.7  2002/04/06 09:04:30  shivoc
+// moved make_socket and added win support
+//
 // Revision 1.6  2002/04/06 08:09:12  shivoc
 // moved serversocket to TNetwork Namespace and minor changes to regain win compatibility (unfinished)
 //
@@ -100,6 +103,7 @@ namespace TNetwork {
 	}
 #endif
 
+#if 0
 	//////////////////////////////////////////////////
 	// creates the socket that can accept connections.
 	Socket ServerSocket::make_socket(int _socket_type, u_short _port) {
@@ -134,13 +138,14 @@ namespace TNetwork {
 		}
 		return sock;
 	}
+#endif
 
 	//////////////////////////////////////////////////
 	// This class listens on a port to create connections.
-	ServerSocket::ServerSocket(Socket _sock = 7171, int _maxconnections = 100) : newconnection(*this) {
+	ServerSocket::ServerSocket(int _port = 7171, int _maxconnections = 100) : newconnection(*this) {
 		maxconnections = _maxconnections;
 		connections = 0;
-		serversocket = make_socket(SOCK_STREAM, _sock);
+		serversocket = make_socket(SOCK_STREAM, _port);
 		es.newsocket(serversocket, &newconnection);
 	}
 

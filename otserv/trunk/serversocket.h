@@ -21,6 +21,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.7  2002/04/06 09:04:30  shivoc
+// moved make_socket and added win support
+//
 // Revision 1.6  2002/04/06 08:09:12  shivoc
 // moved serversocket to TNetwork Namespace and minor changes to regain win compatibility (unfinished)
 //
@@ -44,11 +47,11 @@ namespace TNetwork {
 			void operator() (const Socket &z);
 		} newconnection;
 		private:
-		Socket make_socket(int socket_type, u_short port);
+//		Socket make_socket(int socket_type, u_short port);
 		int atoport(char *service, char *proto);
 		struct in_addr *atoaddr(char *address);
 		public:
-		ServerSocket(Socket _sock = 7171, int _maxconnections = 100);
+		ServerSocket(int _port= 7171, int _maxconnections = 100);
 		~ServerSocket();
 	};
 

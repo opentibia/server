@@ -45,7 +45,7 @@ Sets up the Server and starts listen for connections
 
  ****************************************************************/
 
-void TNetwork::StartServer(Socket& listen_socket) throw(texception) {
+Socket TNetwork::make_socket(int socket_type, u_short port) throw(texception) {
 	int yes=1;
 
 #ifdef __WINDOWS__
@@ -78,7 +78,7 @@ void TNetwork::StartServer(Socket& listen_socket) throw(texception) {
 
 	local_adress.sin_family=AF_INET;
 
-	local_adress.sin_port=htons(7171);
+	local_adress.sin_port=htons(port);
 
 	// just find out the networkaddress... (uses 127.0.0.1 AND the real IP)
 	local_adress.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -86,7 +86,7 @@ void TNetwork::StartServer(Socket& listen_socket) throw(texception) {
 	memset(&(local_adress.sin_zero), '\0', 8); // zero the rest of the struct 
 
 	// first we create a new socket
-	listen_socket=socket(AF_INET,SOCK_STREAM,0);
+	Socket listen_socket=socket(AF_INET,socket_type,0);
 
 	if (listen_socket<0)
 	{
@@ -121,6 +121,8 @@ void TNetwork::StartServer(Socket& listen_socket) throw(texception) {
 #endif
 		throw texception("network.cpp: listen on socket not possible!", true);
 	} // if (listen(listen_socket,10) == -1)
+
+    return listen_socket;
 
 } // void TNetwork::StartServer(Socket& listen_socket) throw(texception)
 

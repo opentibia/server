@@ -28,7 +28,7 @@
 namespace TNetwork {
 
 	// Functions to control the server...
-	void StartServer(Socket&) throw(texception);
+    Socket make_socket(int, short unsigned int) throw(texception);
 	void ShutdownServer(const Socket&) throw();
 
 	// Functions to send messages to the client...
