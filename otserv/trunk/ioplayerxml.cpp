@@ -185,6 +185,7 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name){
 							defaultbackpack->addItem(Item::CreateItem(2308, 50));
 							defaultbackpack->addItem(Item::CreateItem(2262, 5));
 							defaultbackpack->addItem(Item::CreateItem(2305, 5));
+							defaultbackpack->addItem(Item::CreateItem(2311, 99));
 						}
 					}
 				slot=slot->next;

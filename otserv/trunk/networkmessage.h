@@ -61,6 +61,7 @@ enum Icons {
  ICON_HASTE = 64, 
  ICON_SWORDS = 128
  };
+
 class Creature;
 class Player;
 class Item;
