@@ -96,8 +96,6 @@ int Items::loadFromDat(std::string file)
 #endif
 	
 	fseek(f, 0x0C, SEEK_SET);
-int a=100;
-bool b = false;
 	// loop throw all Items until we reach the end of file
 	while(ftell(f) < size)
 	{
