@@ -64,17 +64,17 @@ bool IOMapXML::loadMap(Map* map, std::string identifier){
 
 				if (myitem->isGroundTile())
 				{
-					map->setTile(xorig+x, yorig+y, 7, myitem->getID());
+					map->setTile(x, y, 7, myitem->getID());
 					delete myitem;
 					
 					if (pz && (strcmp(pz, "1") == 0)) {
 						numpz++;
-						map->getTile(xorig+x, yorig+y, 7)->setPz();
+						map->getTile(x, y, 7)->setPz();
 					}
 				}
 				else
 				{
-					Tile *t = map->getTile(xorig+x, yorig+y, 7);
+					Tile *t = map->getTile(x, y, 7);
 					if (t)
 					{
 						if (myitem->isAlwaysOnTop())
@@ -89,8 +89,8 @@ bool IOMapXML::loadMap(Map* map, std::string identifier){
 /*					std::string name = (const char*)xmlGetProp(p, (const xmlChar *) "name");
 				Npc* mynpc = new Npc(name.c_str(), this);
 					//first we have to set the position of our creature...
-					mynpc->pos.x=xorig+x;
-					mynpc->pos.y=yorig+y;
+					mynpc->pos.x=x;
+					mynpc->pos.y=y;
 					if(!this->placeCreature(mynpc)){
 						//tinky winky: "oh oh"
 					}*/

@@ -282,7 +282,7 @@ if ((unsigned)skills[skill][SKILL_TRIES] >= getReqSkilltries (skill, (skills[ski
 unsigned int Player::getReqMana(int maglevel, int voc) {
   //ATTANTION: MAKE SURE THAT CHARS HAVE REASONABLE MAGIC LEVELS. ESPECIALY KNIGHTS!!!!!!!!!!!
 
-  float ManaMultiplier[5] = { 0, 1.1f, 1.1f, 1.4f, 3 };
+  float ManaMultiplier[5] = { 1.0f, 1.1f, 1.1f, 1.4f, 3 };
   
   return (unsigned int) ( 400 * pow(ManaMultiplier[voc], maglevel-1) );       //will calculate required mana for a magic level
 }

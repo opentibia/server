@@ -61,7 +61,7 @@ extern Spells spells;
 extern std::map<long, Creature*> channel;
 Map::Map()
 {
-	//first we fill the map with
+/*	//first we fill the map with
   for(int y = 0; y < MAP_HEIGHT; y++)
   {
     for(int x = 0; x < MAP_WIDTH; x++)
@@ -69,7 +69,7 @@ Map::Map()
       //				setTile(x,y,7,102);
     }
   }
-
+*/
 
   OTSYS_THREAD_LOCKVARINIT(mapLock);
 }
@@ -145,10 +145,16 @@ Position Map::placeCreature(Creature* c){
 		}    
 	}
 	Tile* tile=getTile(pos.x, pos.y, pos.z);
+	if (!tile){
+         pos = Position();
+         tile=getTile(pos.x, pos.y, pos.z);
+               }
 	tile->addThing(c);
 	c->pos = pos;
 
 	return pos;
+         
+
 }
 
 bool Map::removeCreature(Creature* c)

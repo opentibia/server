@@ -44,7 +44,7 @@ public:
 	}*/
 
     // for now we just initialise the position to a startpoint
-  Position() : x(223), y(223), z(7) { };
+  Position() : x(31), y(31), z(7) { };
 
     Position(int _x, int _y, int _z)
         : x(_x), y(_y), z(_z) {};

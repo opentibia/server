@@ -68,10 +68,13 @@ void Creature::setAttackedCreature(unsigned long id)
 
 bool Creature::canMovedTo(Tile *tile)
 {
+  if(tile){   
   if (tile->creatures.size())
     return false;
 
   return Thing::canMovedTo(tile);
+  }
+  else return false;
 }
 
 std::string Creature::getDescription(bool self){
