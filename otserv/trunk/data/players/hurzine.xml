@@ -4,6 +4,7 @@
 	<mana now="800" max="800" spent="0"/>
 	<health now="800" max="800" food="0"/>
 	<look type="136" head="25" body="35" legs="45" feet="55"/>
+	<spawn x="223" y="223" z="7"/> 
 	<skills>
 		<skill skillid="0" level="10" tries="0"/>
 		<skill skillid="1" level="10" tries="0"/>

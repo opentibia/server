@@ -835,14 +835,14 @@ void Map::creatureYell(Creature *creature, std::string &text)
   OTSYS_THREAD_LOCK(mapLock)
 
 		Player* player = dynamic_cast<Player*>(creature);
-  if(player && player->access == 0 && player->exhausted) {
+  if(player && player->access == 0 && player->exhaustedTicks >=1000) {
+      player->exhaustedTicks +=2000;
       NetworkMessage msg;
       msg.AddTextMessage(MSG_SMALLINFO, "You are exhausted.");
       player->sendNetworkMessage(&msg);
   }
   else {
-      creature->exhausted = true;
-      addEvent(makeTask(1200, std::bind2nd(std::mem_fun(&Map::resetExhausted), creature->id)));
+      creature->exhaustedTicks = 2000;
       CreatureVector::iterator cit;
       std::transform(text.begin(), text.end(), text.begin(), upchar);
 
@@ -972,7 +972,8 @@ void Map::creatureMakeMagic(Creature *creature, const EffectInfo &ei)
 	Player* player = dynamic_cast<Player*>(creature);
 	if(player) {
 		if(player->access == 0) {
-			if(player->exhausted) {
+			if(player->exhaustedTicks >=1000) {
+			    player->exhaustedTicks +=1000;
 				NetworkMessage msg;
 				msg.AddMagicEffect(player->pos, NM_ME_PUFF);
 				msg.AddTextMessage(MSG_SMALLINFO, "You are exhausted.");
@@ -999,8 +1000,7 @@ void Map::creatureMakeMagic(Creature *creature, const EffectInfo &ei)
 		if(ei.offensive)
 			player->pzLocked = true;
 
-		creature->exhausted = true;
-		addEvent(makeTask(1000, std::bind2nd(std::mem_fun(&Map::resetExhausted), creature->id)));
+		creature->exhaustedTicks = 2000;
 	}
 
 	if (ei.offensive && player && player->access == 0) {
@@ -1507,6 +1507,9 @@ void Map::checkPlayer(unsigned long id)
       if(player->inFightTicks < 1000)
 				player->pzLocked = false; 
      }
+     if(player->exhaustedTicks >=1000){
+         player->exhaustedTicks -=1000;
+     }    
 	 }
 	 else{
 		 addEvent(makeTask(300, std::bind2nd(std::mem_fun(&Map::checkPlayer), id)));
@@ -1654,20 +1657,6 @@ void Map::CreateDamageUpdate(Creature* creature, Creature* attackCreature, int d
 			}
 			if (player->health <= 0)
 				msg.AddTextMessage(MSG_EVENT, "Own3d!");
-}
-
-
-void Map::resetExhausted(unsigned long id)
-{
-  OTSYS_THREAD_LOCK(mapLock)
-	Player *player = (Player*)getCreatureByID(id);
-
-  if (player != NULL)
-  {
-		player->exhausted = false;
-  }
-
-	 OTSYS_THREAD_UNLOCK(mapLock)
 }
 
 void Map::creatureSaySpell(Creature *creature, const std::string &text)

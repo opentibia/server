@@ -148,7 +148,6 @@ class Map {
 		void creatureMakeAreaEffect(Creature *spectator, Creature *attacker, const EffectInfo &ei, NetworkMessage& msg);
 	  void CreateDamageUpdate(Creature* player, Creature* attackCreature, int damage, NetworkMessage& msg);
 	  //void getSpectators(const Position& pos, std::vector<Player*>& list);
-	  void resetExhausted(unsigned long id);
 
     OTSYS_THREAD_LOCKVAR eventLock;
 	  OTSYS_THREAD_SIGNALVAR eventSignal;

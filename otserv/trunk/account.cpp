@@ -144,6 +144,12 @@ bool Account::openPlayer(const std::string &name, const std::string &givenpasswo
         player.looklegs=atoi((const char*)xmlGetProp(p, (const xmlChar *) "legs"));
         player.lookfeet=atoi((const char*)xmlGetProp(p, (const xmlChar *) "feet"));
       }
+      else if(str=="spawn")
+      {
+        player.pos.x=atoi((const char*)xmlGetProp(p, (const xmlChar *) "x"));
+        player.pos.y=atoi((const char*)xmlGetProp(p, (const xmlChar *) "y"));
+        player.pos.z=atoi((const char*)xmlGetProp(p, (const xmlChar *) "z"));
+      }
       else if(str=="skills")
       {
         tmp=p->children;
