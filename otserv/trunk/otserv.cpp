@@ -155,10 +155,13 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 				    msg.AddByte(0x14);
 				    msg.AddString("Too many Players online.");
 				    msg.WriteToSocket(s);
-        } else {
-            s = 0;            // protocol/player will close socket
+        } else {	
+			Status* stat = Status::instance();
+			stat->addPlayer();
+					s = 0;            // protocol/player will close socket
 				    protocol->ReceiveLoop();
-		    }
+					stat->removePlayer();
+		}
       }
     }
 	else if(protId == 0xFFFF){

@@ -92,8 +92,8 @@ std::string Status::getStatusString(){
 	p=xmlNewNode(NULL,(const xmlChar*)"map");
 	xmlSetProp(p, (const xmlChar*) "name", (const xmlChar*)this->mapname.c_str());
 	xmlSetProp(p, (const xmlChar*) "author", (const xmlChar*)this->mapauthor.c_str());
-	xmlSetProp(p, (const xmlChar*) "width", (const xmlChar*)"128");
-	xmlSetProp(p, (const xmlChar*) "height", (const xmlChar*)"128");
+	xmlSetProp(p, (const xmlChar*) "width", (const xmlChar*)"");
+	xmlSetProp(p, (const xmlChar*) "height", (const xmlChar*)"");
 	xmlAddChild(root, p);
 
 	xmlNewTextChild(root, NULL, (const xmlChar*)"motd", (const xmlChar*)g_config.getGlobalString("motd", "").c_str());
