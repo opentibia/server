@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.11  2003/09/23 16:41:19  tliffrag
+// Fixed several map bugs
+//
 // Revision 1.10  2003/09/18 12:35:22  tliffrag
 // added item dragNdrop
 //
@@ -90,12 +93,12 @@ Map::Map() {
 
 	for(int y=0; y < ysize; y++){
 		for(int x=0; x < xsize; x++){
+		  tiles[x][y] = new Tile;
 			while(true){
 				int id=fgetc(dump)*256;id+=fgetc(dump);
 				if(id==0x00FF)
 					break;
 				now.x=x+MINX;now.y=y+MINY;now.z=topleft.z;
-				tiles[x][y] = new Tile;
 				tiles[x][y]->push_back(new Item(id));
 			}
 		}
@@ -166,16 +169,16 @@ position Map::placeCreature(position pos, Creature* c){
   return pos;
 }
 
-int Map::removeCreature(position pos, Creature* c){
-	if(tiles[pos.x-MINX][pos.y-MINY]->creature==c)
-		tiles[pos.x-MINX][pos.y-MINY]->creature=0;
-	//now distribute the action
-	Action* a= new Action;
-	a->type=ACTION_LOGOUT;
-	a->pos1=pos;
-	distributeAction(pos, a);
-	delete a;
-	return true;
+int Map::removeCreature(position pos){
+  if(tiles[pos.x-MINX][pos.y-MINY]->creature)
+    tiles[pos.x-MINX][pos.y-MINY]->creature=NULL;
+  //now distribute the action
+  Action* a= new Action;
+  a->type=ACTION_LOGOUT;
+  a->pos1=pos;
+  distributeAction(pos, a);
+  delete a;
+  return true;
 }
 
 int Map::requestAction(Creature* c, Action* a){
@@ -278,7 +281,10 @@ int Map::removeItem(position pos){
 	tile->pop_back();
 	Action* a= new Action;
 	a->type=ACTION_ITEM_DISAPPEAR;
-	a->stack=1;
+	if(tile->creature)
+	  a->stack=2;
+	else
+	  a->stack=1;
 	a->pos1=pos;
 	distributeAction(pos, a);
 	return true;

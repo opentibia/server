@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.7  2003/09/23 16:41:19  tliffrag
+// Fixed several map bugs
+//
 // Revision 1.6  2003/09/17 16:35:08  tliffrag
 // added !d command and fixed lag on windows
 //
@@ -84,7 +87,7 @@ class Map {
         Map();
         Map(char *filename);
 		position placeCreature(position pos, Creature* c);
-		int removeCreature(position pos, Creature* c);
+		int removeCreature(position pos);
 		int requestAction(Creature* c, Action* a);
 		int summonItem(position pos, int id);
 		int saveMap();
