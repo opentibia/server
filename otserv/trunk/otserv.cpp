@@ -138,7 +138,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
       std::string name     = msg.GetString();
       std::string password = msg.GetString();
 
-      Protocol70 *protocol = new Protocol70(s);
+	  Protocol70 *protocol = new Protocol70(s);
 
       Player *player;
       player = new Player(name.c_str(), protocol);
@@ -149,18 +149,18 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
       Account account;
       if (account.openPlayer(name, password, *player))
       {
-        if (!protocol->ConnectPlayer())  {
-				    std::cout << "reject player..." << std::endl;
-				    msg.Reset();
-				    msg.AddByte(0x14);
-				    msg.AddString("Too many Players online.");
-				    msg.WriteToSocket(s);
-		} else if(gmap.getCreatureByName(name.c_str()) != NULL){
+		if(gmap.getCreatureByName(name.c_str()) != NULL){
 					std::cout << "reject player..." << std::endl;
 				    msg.Reset();
 				    msg.AddByte(0x14);
 				    msg.AddString("You are already logged in.");
 				    msg.WriteToSocket(s);		
+		} else if (!protocol->ConnectPlayer())  {
+				    std::cout << "reject player..." << std::endl;
+				    msg.Reset();
+				    msg.AddByte(0x14);
+				    msg.AddString("Too many Players online.");
+				    msg.WriteToSocket(s);
 		} else {	
 			Status* stat = Status::instance();
 			stat->addPlayer();
