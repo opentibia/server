@@ -1129,8 +1129,11 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 
 				playersOnline.erase(playersOnline.find(target->getID()));
 							
+				if(creature) {
+					creature->experience += (int)(target->experience * 0.1);
+				}
+
 				if(player){
-					player->experience += (int)(target->experience * 0.1);
 
 					NetworkMessage msg;
 					msg.AddPlayerStats(player);           
