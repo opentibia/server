@@ -57,7 +57,7 @@ Player::Player(const char *name, Protocol *p) : Creature(name)
   maglevel   = 20;
 
   access     = 0;
-
+  cancelMove = false;
   for(int i = 0; i < 7; i++)
   {
     skills[i][SKILL_LEVEL] = 1;

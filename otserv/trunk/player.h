@@ -86,7 +86,7 @@ public:
   int cap;
   bool poisoned, burning, energy, drunk, paralised;
   int food;
-
+  bool cancelMove;
   virtual int getWeaponDamage() const;
 
   // experience

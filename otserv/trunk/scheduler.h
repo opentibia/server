@@ -81,31 +81,34 @@ class lessSchedTask : public std::binary_function<SchedulerTask*, SchedulerTask*
 		  }
 };
 
-template<class Functor, class Arg>
+template<class Functor, class Functor2,  class Arg>
 class TCallList : public SchedulerTask {
 		  public:
-					 TCallList(Functor f, std::list<Arg>& call_list, __int64 interval) : _f(f), _list(call_list), _interval(interval) {
+					 TCallList(Functor f, Functor2 f2, std::list<Arg>& call_list, __int64 interval) : _f(f), _f2(f2), _list(call_list), _interval(interval) {
 					 }
 
 					 result_type operator()(const argument_type& arg) {
+                              if(!_f2(arg)){   
 								result_type ret = _f(arg, _list.front());
 								_list.pop_front();
 								if (!_list.empty()) {
-										  SchedulerTask* newtask = new TCallList<Functor, Arg>(_f, _list, _interval);
+										  SchedulerTask* newtask = new TCallList<Functor, Functor2, Arg>(_f, _f2, _list, _interval);
 										  newtask->setTicks(_interval);
 										  arg->addEvent(newtask);
 								}
 								return ret;
+                          }	
 					 }
 		  protected:
 					 Functor _f;
+					 Functor2 _f2;
 					 std::list<Arg> _list;
 					 __int64 _interval;
 };
 
-template<class Functor, class Arg>
-SchedulerTask* makeTask(__int64 ticks, Functor f, std::list<Arg>& call_list, __int64 interval) {
-		  TCallList<Functor, Arg> *t = new TCallList<Functor, Arg>(f, call_list, interval);
+template<class Functor, class Functor2, class Arg>
+SchedulerTask* makeTask(__int64 ticks, Functor f, std::list<Arg>& call_list, __int64 interval, Functor2 f2) {
+		  TCallList<Functor, Functor2, Arg> *t = new TCallList<Functor, Functor2, Arg>(f, f2, call_list, interval);
 		  t->setTicks(ticks);
 		  return t;
 }

@@ -41,7 +41,11 @@ class MovePlayer : public std::binary_function<Map*, Direction, int> {
 									OTSYS_THREAD_UNLOCK(map->mapLock)
 										return -1;
 								}
-
+                                if(player->cancelMove){                                             
+                                OTSYS_THREAD_UNLOCK(map->mapLock)                       
+                                return 0;
+                                }
+                                
 								Position pos = player->pos;
 								switch (dir) {
 										  case NORTH:
@@ -72,4 +76,32 @@ class MovePlayer : public std::binary_function<Map*, Direction, int> {
 
 };
 
+class StopMovePlayer : public std::unary_function<Map*, bool> {
+		  public:
+					 StopMovePlayer(unsigned long playerid) : _pid(playerid) { }
+
+					 virtual result_type operator()(const argument_type& map) const {
+									// get the player we want to move...
+									Creature* creature = map->getCreatureByID(_pid);
+
+								Player* player = dynamic_cast<Player*>(creature);
+								if (!player) { // player is not available anymore it seems...
+										return false;
+								}
+                                else{
+                                     if(player->cancelMove){
+                                     player->cancelMove = false;
+                                     player->sendCancelWalk("");
+                                     return true;
+                                                            }
+                                     else
+                                     return false;
+                                     }
+                     return false;
+					 }
+
+		  protected:
+					 unsigned long _pid;
+
+};
 #endif

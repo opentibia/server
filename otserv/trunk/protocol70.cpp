@@ -323,10 +323,9 @@ void Protocol70::parseLogout(NetworkMessage &msg)
 
 void Protocol70::parseCancelMove(NetworkMessage &msg)
 {
-NetworkMessage netmsg;
-  netmsg.AddByte(0xB5);
-  netmsg.WriteToSocket(s);
+player->cancelMove = true;
 }
+
 void Protocol70::parseDebug(NetworkMessage &msg)
 {
   int dataLength = msg.getMessageLength()-3;
@@ -352,7 +351,13 @@ void Protocol70::parseMoveByMouse(NetworkMessage &msg)
   }
   // then we schedule the movement...
   // the interval seems to depend on the speed of the char?
-  map->addEvent(makeTask(0, MovePlayer(player->getID()), path, 400));
+  if(player->cancelMove) {
+                              player->cancelMove = false;
+                              sendCancelWalk("");                 
+                         }
+  else{     
+  map->addEvent(makeTask(0, MovePlayer(player->getID()), path, 400, StopMovePlayer(player->getID())));
+ }
 }
 
 
