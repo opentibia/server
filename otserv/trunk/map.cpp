@@ -934,6 +934,15 @@ void Map::playerBroadcastMessage(Player *player, const std::string &text)
 
 void Map::creatureMakeMeleeDamage(Creature *creature, Creature *attackedCreature)
 {
+	Tile* targettile = getTile(attackedCreature->pos.x, attackedCreature->pos.y, attackedCreature->pos.z);
+	if (creature->access == 0 && targettile->isPz()) {
+		if (creature->isPlayer()) {
+		NetworkMessage msg;
+		msg.AddTextMessage(MSG_STATUS, "You may not attack a person in a protection zone.");
+		((Player*)creature)->sendNetworkMessage(&msg);
+		}
+		return;
+	}
   if ((std::abs(creature->pos.x-attackedCreature->pos.x) <= 1) &&
       (std::abs(creature->pos.y-attackedCreature->pos.y) <= 1) &&
       (creature->pos.z == attackedCreature->pos.z))
@@ -952,9 +961,6 @@ void Map::creatureMakeMeleeDamage(Creature *creature, Creature *attackedCreature
     CreatureVector::iterator cit;
 
     NetworkMessage msg;
-
-    Tile* targettile = getTile(attackedCreature->pos.x, attackedCreature->pos.y, attackedCreature->pos.z);
-
 
     for (int x = min(creature->pos.x, attackedCreature->pos.x) - 9; x <= max(creature->pos.x, attackedCreature->pos.x) + 9; x++)
       for (int y = min(creature->pos.y, attackedCreature->pos.y) - 7; y <= max(creature->pos.y, attackedCreature->pos.y) + 7; y++)
@@ -1023,6 +1029,16 @@ void Map::creatureMakeMeleeDamage(Creature *creature, Creature *attackedCreature
 
 void Map::creatureMakeDistDamage(Creature *creature, Creature *attackedCreature)
 {
+	Tile* targettile = getTile(attackedCreature->pos.x, attackedCreature->pos.y, attackedCreature->pos.z);
+	if (creature->access == 0 && targettile->isPz()) {
+		if (creature->isPlayer()) {
+		NetworkMessage msg;
+		msg.AddTextMessage(MSG_STATUS, "You may not attack a person in a protection zone.");
+		((Player*)creature)->sendNetworkMessage(&msg);
+		}
+		return;
+	}
+
   if ((std::abs(creature->pos.x-attackedCreature->pos.x) <= 8) &&
       (std::abs(creature->pos.y-attackedCreature->pos.y) <= 6) &&
       (creature->pos.z == attackedCreature->pos.z))
@@ -1040,8 +1056,6 @@ void Map::creatureMakeDistDamage(Creature *creature, Creature *attackedCreature)
     CreatureVector::iterator cit;
 
     NetworkMessage msg;
-
-    Tile* targettile = getTile(attackedCreature->pos.x, attackedCreature->pos.y, attackedCreature->pos.z);
 
     for (int x = min(creature->pos.x, attackedCreature->pos.x) - 9; x <= max(creature->pos.x, attackedCreature->pos.x) + 9; x++)
       for (int y = min(creature->pos.y, attackedCreature->pos.y) - 7; y <= max(creature->pos.y, attackedCreature->pos.y) + 7; y++)
@@ -1112,6 +1126,15 @@ void Map::creatureMakeDistDamage(Creature *creature, Creature *attackedCreature)
 
 void Map::creatureMakeMagicDistDamage(Creature *creature, Creature *attackedCreature)
 {
+	Tile* targettile = getTile(attackedCreature->pos.x, attackedCreature->pos.y, attackedCreature->pos.z);
+	if (creature->access == 0 && targettile->isPz()) {
+		if (creature->isPlayer()) {
+		NetworkMessage msg;
+		msg.AddTextMessage(MSG_STATUS, "You may not attack a person in a protection zone.");
+		((Player*)creature)->sendNetworkMessage(&msg);
+		}
+		return;
+	}
   if ((std::abs(creature->pos.x-attackedCreature->pos.x) <= 8) &&
       (std::abs(creature->pos.y-attackedCreature->pos.y) <= 6) &&
       (creature->pos.z == attackedCreature->pos.z))
@@ -1129,8 +1152,6 @@ void Map::creatureMakeMagicDistDamage(Creature *creature, Creature *attackedCrea
     CreatureVector::iterator cit;
 
     NetworkMessage msg;
-
-    Tile* targettile = getTile(attackedCreature->pos.x, attackedCreature->pos.y, attackedCreature->pos.z);
 
     for (int x = min(creature->pos.x, attackedCreature->pos.x) - 9; x <= max(creature->pos.x, attackedCreature->pos.x) + 9; x++)
       for (int y = min(creature->pos.y, attackedCreature->pos.y) - 7; y <= max(creature->pos.y, attackedCreature->pos.y) + 7; y++)
@@ -1288,7 +1309,7 @@ void Map::makeCastSpell(Player *player, int mana, int mindamage, int maxdamage, 
 {
 	NetworkMessage msg;
 	Tile* fromtile = getTile(player->pos.x, player->pos.y, player->pos.z);
-	if (player->access == 0 && fromtile->isPz()) {
+	if (player->access == 0 && fromtile->isPz() && maxdamage > 0) {
 		msg.AddTextMessage(MSG_STATUS, "You may not attack a person in a protection zone.");
 		player->sendNetworkMessage(&msg);
 		return;
