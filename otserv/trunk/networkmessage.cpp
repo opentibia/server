@@ -366,7 +366,7 @@ void NetworkMessage::AddCreatureSpeak(const Creature *creature, unsigned char ty
   AddByte(0xAA);
   AddString(creature->getName());
   AddByte(type);
-  if (type <= 3 || type == 16)
+  if (type <= 3 || type == 16 || type == SPEAK_MONSTER)
     AddPosition(creature->pos);
   if(type == 5)
     AddU16(channelId);

@@ -192,7 +192,6 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 		for(CreatureStateVec::iterator csIt = creatureStateVec.begin(); csIt != creatureStateVec.end(); ++csIt) {
 			if(csIt->first == attackedCreature) {
 				attackedCreatureState = &csIt->second;
-				//csIt->second.attackerlist.push_back(gainexpCreature);
 			}
 		}
 
@@ -244,7 +243,7 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 	}
 
 	//Add blood?
-	if(drawBlood && damage > 0) {
+	if((drawBlood || attackedCreature->health <= 0) && damage > 0) {
 
 		bool hadSplash = (tile->splash != NULL);
 
@@ -1425,7 +1424,6 @@ void Game::creatureYell(Creature *creature, std::string &text)
 	OTSYS_THREAD_UNLOCK(gameLock)
 }
 
-
 void Game::creatureSpeakTo(Creature *creature, const std::string &receiver, const std::string &text)
 {
 	OTSYS_THREAD_LOCK(gameLock) 
@@ -1435,6 +1433,19 @@ void Game::creatureSpeakTo(Creature *creature, const std::string &receiver, cons
 	OTSYS_THREAD_UNLOCK(gameLock)
 }
 
+void Game::creatureMonsterYell(Monster* monster, const std::string& text) 
+{
+	OTSYS_THREAD_LOCK(gameLock)
+
+	std::vector<Creature*> list;
+	map->getSpectators(Range(monster->pos, 18, 18, 14, 14), list);
+
+	for(unsigned int i = 0; i < list.size(); ++i) {
+		list[i]->onCreatureSay(monster, SPEAK_MONSTER, text);
+	}
+
+  OTSYS_THREAD_UNLOCK(gameLock)
+}
 
 void Game::creatureBroadcastMessage(Creature *creature, const std::string &text)
 {

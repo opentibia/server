@@ -18,6 +18,7 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
+#include <vector>
 #include <string>
 #include <sstream>
 
@@ -31,13 +32,10 @@ Monster::Monster(const char *name, Game* game) :
 {
 	loaded = false;
 	this->game = game;
-	minWeapondamage = 0;
-	maxWeapondamage = 0;
+	curPhysicalAttack = NULL;
+
 	targetDistance = 1;
 	runawayHealth = 0;
-
-	//fight_t = FIGHT_NONE;
-	disttype = DIST_NONE;
 
 	std::string filename = "data/monster/" + std::string(name) + ".xml";
 	std::transform(filename.begin(), filename.end(), filename.begin(), tolower);
@@ -62,12 +60,6 @@ Monster::Monster(const char *name, Game* game) :
 			this->experience = atoi((const char*)xmlGetProp(root, (const xmlChar *)"experience"));
 		}
 
-		/*
-		if ((const char*)xmlGetProp(root, (const xmlChar *)"access")) {
-			access = atoi((const char*)xmlGetProp(root, (const xmlChar *)"access"));
-		}
-		*/
-
 		if ((const char*)xmlGetProp(root, (const xmlChar *)"level")) {
 			level = atoi((const char*)xmlGetProp(root, (const xmlChar *)"level"));
 			setNormalSpeed();
@@ -83,7 +75,7 @@ Monster::Monster(const char *name, Game* game) :
 				this->healthmax = atoi((const char*)xmlGetProp(p, (const xmlChar *)"max"));
 			}
 			if (strcmp(str, "combat") == 0) {
-				this->targetDistance = atoi((const char*)xmlGetProp(p, (const xmlChar *)"targetdistance"));
+				this->targetDistance = std::max(1, atoi((const char*)xmlGetProp(p, (const xmlChar *)"targetdistance")));
 				//this->runawayHealth = atoi((const char*)xmlGetProp(p, (const xmlChar *)"runawayHealth"));
 			}
 			else if (strcmp(str, "look") == 0) {
@@ -111,50 +103,73 @@ Monster::Monster(const char *name, Game* game) :
 				{
 					if (strcmp((const char*)tmp->name, "attack") == 0)
 					{
+						int cycleTicks = -1;
+						int probability = -1;
+						int exhaustionTicks = -1;
+
+						if((const char*)xmlGetProp(tmp, (const xmlChar *)"exhaustion"))
+							exhaustionTicks = atoi((const char*)xmlGetProp(tmp, (const xmlChar *)"exhaustion"));
+
+						if((const char*)xmlGetProp(tmp, (const xmlChar *)"cycleticks"))
+							cycleTicks = atoi((const char*)xmlGetProp(tmp, (const xmlChar *)"cycleticks"));
+
+						if((const char*)xmlGetProp(tmp, (const xmlChar *)"probability"))
+							probability = atoi((const char*)xmlGetProp(tmp, (const xmlChar *)"probability"));
+
+						TimeProbabilityClass timeprobsystem(cycleTicks, probability, exhaustionTicks);
+
 						std::string attacktype = (const char*)xmlGetProp(tmp, (const xmlChar *)"type");
 
 						if(strcmp(attacktype.c_str(), "melee") == 0)
 						{
-							this->fighttype = FIGHT_MELEE;
+							PhysicalAttackClass* physicalattack = new PhysicalAttackClass();
+							
+							physicalattack->fighttype = FIGHT_MELEE;
 							if(xmlGetProp(tmp, (const xmlChar *)"mindamage")) 
-								this->minWeapondamage = atoi((const char*)xmlGetProp(tmp, (const xmlChar *)"mindamage"));
+								physicalattack->minWeapondamage = atoi((const char*)xmlGetProp(tmp, (const xmlChar *)"mindamage"));
 							
 							if(xmlGetProp(tmp, (const xmlChar *)"maxdamage"))
-								this->maxWeapondamage = atoi((const char*)xmlGetProp(tmp, (const xmlChar *)"maxdamage"));
+								physicalattack->maxWeapondamage = atoi((const char*)xmlGetProp(tmp, (const xmlChar *)"maxdamage"));
+
+							physicalAttacks[physicalattack] = TimeProbabilityClass(cycleTicks, probability, exhaustionTicks);
 						}
 						else if(strcmp(attacktype.c_str(), "distance") == 0)
 						{
-							this->fighttype = FIGHT_DIST;
+							PhysicalAttackClass* physicalattack = new PhysicalAttackClass();
+
+							physicalattack->fighttype = FIGHT_DIST;
 							std::string subattacktype = (const char*)xmlGetProp(tmp, (const xmlChar *)"name");
 
 							if(strcmp(subattacktype.c_str(), "bolt") == 0)
-								this->disttype = DIST_BOLT;
+								physicalattack->disttype = DIST_BOLT;
 							else if(strcmp(subattacktype.c_str(), "arrow") == 0)
-								this->disttype = DIST_ARROW;
+								physicalattack->disttype = DIST_ARROW;
 							else if(strcmp(subattacktype.c_str(), "throwingstar") == 0)
-								this->disttype = DIST_THROWINGSTAR;
+								physicalattack->disttype = DIST_THROWINGSTAR;
 							else if(strcmp(subattacktype.c_str(), "throwingknife") == 0)
-								this->disttype = DIST_THROWINGKNIFE;
+								physicalattack->disttype = DIST_THROWINGKNIFE;
 							else if(strcmp(subattacktype.c_str(), "smallstone") == 0)
-								this->disttype = DIST_SMALLSTONE;
+								physicalattack->disttype = DIST_SMALLSTONE;
 							else if(strcmp(subattacktype.c_str(), "largerock") == 0)
-								this->disttype = DIST_LARGEROCK;
+								physicalattack->disttype = DIST_LARGEROCK;
 							else if(strcmp(subattacktype.c_str(), "snowball") == 0)
-								this->disttype = DIST_SNOWBALL;
+								physicalattack->disttype = DIST_SNOWBALL;
 							else if(strcmp(subattacktype.c_str(), "powerbolt") == 0)
-								this->disttype = DIST_POWERBOLT;
+								physicalattack->disttype = DIST_POWERBOLT;
 
 							if(xmlGetProp(tmp, (const xmlChar *)"mindamage"))
-								this->minWeapondamage = atoi((const char*)xmlGetProp(tmp, (const xmlChar *)"mindamage"));
+								physicalattack->minWeapondamage = atoi((const char*)xmlGetProp(tmp, (const xmlChar *)"mindamage"));
 							if(xmlGetProp(tmp, (const xmlChar *)"maxdamage"))
-								this->maxWeapondamage = atoi((const char*)xmlGetProp(tmp, (const xmlChar *)"maxdamage"));
+								physicalattack->maxWeapondamage = atoi((const char*)xmlGetProp(tmp, (const xmlChar *)"maxdamage"));
+					
+							physicalAttacks[physicalattack] = TimeProbabilityClass(cycleTicks, probability, exhaustionTicks);
 						}
 						else if(strcmp(attacktype.c_str(), "instant") == 0) {
 							std::string spellname = (const char*)xmlGetProp(tmp, (const xmlChar *)"name");
-							
+
 							if(spells.getAllSpells()->find(spellname) != spells.getAllSpells()->end())
 							{
-								instantSpells.push_back(spellname);
+								instantSpells[spellname].push_back(timeprobsystem);
 							}
 						}
 						else if(strcmp(attacktype.c_str(), "rune") == 0) {
@@ -164,14 +179,14 @@ Monster::Monster(const char *name, Game* game) :
 							std::map<unsigned short, Spell*>::const_iterator rsIt;
 							for(rsIt = spells.getAllRuneSpells()->begin(); rsIt != spells.getAllRuneSpells()->end(); ++rsIt) {
 								if(strcmp(rsIt->second->getName().c_str(), spellname.c_str()) == 0) {
-									runeSpells.push_back(rsIt->first);
+									runeSpells[rsIt->first].push_back(timeprobsystem);
 									break;
 								}
 							}
 						}
 					}
 
-					tmp=tmp->next;
+					tmp = tmp->next;
 				}
 			}
 			else if (strcmp(str, "defenses") == 0)
@@ -198,7 +213,41 @@ Monster::Monster(const char *name, Game* game) :
 							immunities |= ATTACK_DRUNKNESS;
 					}
 
-					tmp=tmp->next;
+					tmp = tmp->next;
+				}
+			}
+			else if (strcmp(str, "voices") == 0)
+			{
+				tmp=p->children;
+				while(tmp)
+				{
+					if (strcmp((const char*)tmp->name, "voice") == 0) {
+						int cycleTicks, probability, exhaustionTicks;
+
+						if((const char*)xmlGetProp(tmp, (const xmlChar *)"exhaustion"))
+							exhaustionTicks = atoi((const char*)xmlGetProp(tmp, (const xmlChar *)"exhaustion"));
+						else
+							exhaustionTicks = 0;
+
+						if((const char*)xmlGetProp(tmp, (const xmlChar *)"cycleticks"))
+							cycleTicks = atoi((const char*)xmlGetProp(tmp, (const xmlChar *)"cycleticks"));
+						else
+							cycleTicks = 30000;
+
+						if((const char*)xmlGetProp(tmp, (const xmlChar *)"probability"))
+							probability = atoi((const char*)xmlGetProp(tmp, (const xmlChar *)"probability"));
+						else
+							probability = 30;
+						
+						std::string sentence = (const char*)xmlGetProp(tmp, (const xmlChar *)"sentence");
+
+						if(sentence.length() > 0) {
+							yellingSentences.push_back(make_pair(sentence, TimeProbabilityClass(cycleTicks, probability, exhaustionTicks)));
+							//sentenceVec.push_back(sentence);
+						}
+					}
+
+					tmp = tmp->next;
 				}
 			}
 
@@ -218,17 +267,35 @@ Monster::Monster(const char *name, Game* game) :
 
 Monster::~Monster()
 {
-	//
+	for(std::map<PhysicalAttackClass*, TimeProbabilityClass>::iterator it = physicalAttacks.begin(); it != physicalAttacks.end(); ++it) {
+		delete it->first;
+	}
+	
+	physicalAttacks.clear();
 }
 
 void Monster::onThink()
 {
+	bool yelled = false;
+	for(YellingSentences::iterator ysIt = yellingSentences.begin(); ysIt != yellingSentences.end(); ++ysIt) {
+		if(ysIt->second.onTick(200) && !yelled) {
+			yelled = true;
+			game->creatureMonsterYell(this, ysIt->first);
+		}
+	}
+
+	/*
+	if(random_range(20, 100) > 80) {
+		int index = random_range(0, (int)sentenceVec.size() - 1);
+		game->creatureMonsterYell(this, sentenceVec[index]);
+	}
+	*/
+
 	if(attackedCreature != 0) {
 		int ground = game->getTile(this->pos.x, this->pos.y, this->pos.z)->ground.getID();
 
 		long long delay = ((long long)this->lastmove +
-			(long long)this->getStepDuration(Item::items[ground].speed)) -
-			((long long)OTSYS_TIME());
+			(long long)this->getStepDuration(Item::items[ground].speed)) - ((long long)OTSYS_TIME());
 
 		if(delay > 0){
 /*
@@ -236,7 +303,6 @@ void Monster::onThink()
 			std::cout << "Delaying "<< this->getName() << " --- " << delay << std::endl;		
 #endif
 */
-			
 			return;
 		}
 
@@ -281,17 +347,17 @@ void Monster::calcMovePosition()
 					if(!game->map->canThrowItemTo(tmppos, targetPos, false, true))
 						continue;
 					
-					if((this->pos.x != x && this->pos.y != y)) {
+					//if((this->pos.x != x && this->pos.y != y)) {
+					if(!(this->pos.x == x && this->pos.y == y)) {
 						Tile *t = NULL;
 						if((!(t = game->map->getTile(x, y, pos.z))) || t->isBlocking() || t->isPz() || t->creatures.size())
 							continue;
 					}
 				
-/*
 #ifdef __DEBUG__
 					std::cout << "CalcMovePosition()" << ", x: " << x << ", y: " << y  << std::endl;
 #endif
-*/
+
 					minwalkdist =walkdist;
 					prevdist = dist;
 					moveToPos.x = x;
@@ -364,7 +430,9 @@ void Monster::onThingMove(const Creature *creature, const Thing *thing, const Po
 
 void Monster::onCreatureAppear(const Creature *creature)
 {
-	OnCreatureEnter(creature);
+	if(isInRange(creature->pos)) {
+		OnCreatureEnter(creature);
+	}
 }
 
 void Monster::onCreatureDisappear(const Creature *creature, unsigned char stackPos)
@@ -438,16 +506,93 @@ std::string Monster::getDescription() const
 
 int Monster::getWeaponDamage() const
 {
-	return random_range(0, maxWeapondamage);
+	if(curPhysicalAttack != NULL)
+		return random_range(curPhysicalAttack->minWeapondamage, curPhysicalAttack->maxWeapondamage);
+	else
+		return 0;
+}
+
+bool Monster::doAttacks(Player* attackedPlayer)
+{
+	bool ret = false;
+	if(exhaustedTicks <= 0) {
+		for(RuneAttackSpells::iterator raIt = runeSpells.begin(); raIt != runeSpells.end(); ++raIt) {
+			for(TimeProbabilityClassVec::iterator asIt = raIt->second.begin(); asIt != raIt->second.end(); ++asIt) {
+				TimeProbabilityClass& timeprobsystem = *asIt;
+				if(timeprobsystem.onTick(500)) {
+
+					std::map<unsigned short, Spell*>::iterator rit = spells.getAllRuneSpells()->find(raIt->first);
+					if( rit != spells.getAllRuneSpells()->end() ) {
+						bool success = rit->second->getSpellScript()->castSpell(this, attackedPlayer->pos, "");
+
+						if(success) {
+							ret = true;
+							exhaustedTicks = timeprobsystem.getExhaustion();
+							if(exhaustedTicks > 0)
+								return true;
+						}
+					}
+				}
+			}
+		}
+
+		for(InstantAttackSpells::iterator iaIt = instantSpells.begin(); iaIt != instantSpells.end(); ++iaIt) {
+			for(TimeProbabilityClassVec::iterator asIt = iaIt->second.begin(); asIt != iaIt->second.end(); ++asIt) {
+				TimeProbabilityClass& timeprobsystem = *asIt;
+				if(timeprobsystem.onTick(500)) {
+
+					std::map<std::string, Spell*>::iterator rit = spells.getAllSpells()->find(iaIt->first);
+					if( rit != spells.getAllSpells()->end() ) {
+						bool success = rit->second->getSpellScript()->castSpell(this, this->pos, "");
+
+						if(success) {
+							ret = true;
+							exhaustedTicks = timeprobsystem.getExhaustion();
+							if(exhaustedTicks > 0)
+								return true;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	bool trymelee = getCurrentDistanceToTarget() <= 1;
+	bool hasmelee = false;
+	for(PhysicalAttacks::iterator paIt = physicalAttacks.begin(); paIt != physicalAttacks.end(); ++paIt) {
+		if(trymelee && paIt->first->fighttype == FIGHT_MELEE) {
+			hasmelee = true;
+			break;
+		}
+	}
+	
+	for(PhysicalAttacks::iterator paIt = physicalAttacks.begin(); paIt != physicalAttacks.end(); ++paIt) {
+		TimeProbabilityClass& timeprobsystem = paIt->second;
+		if(timeprobsystem.onTick(500)) {
+			if(!hasmelee || (hasmelee && paIt->first->fighttype == FIGHT_MELEE)) {
+				curPhysicalAttack = paIt->first;
+				game->creatureMakeDamage(this, attackedPlayer, getFightType());
+			}
+		}
+	}
+
+	return ret;
 }
 
 void Monster::onAttack()
 {
 	if (attackedCreature != 0) {
 		game->addEvent(makeTask(500, std::bind2nd(std::mem_fun(&Game::checkPlayerAttacking), getID())));
+
+		exhaustedTicks -= 500;
 		
-		if(random_range(0, 100) >= 25)
+		/*
+		if(exhaustedTicks > 0)
 			return;
+		*/
+
+		if(exhaustedTicks < 0)
+			exhaustedTicks = 0;
 
 		Player *attackedPlayer = dynamic_cast<Player*>(game->getCreatureByID(this->attackedCreature));
 		if (attackedPlayer) {
@@ -457,29 +602,7 @@ void Monster::onAttack()
 			}
 			else {
 				if (attackedPlayer != NULL && attackedPlayer->health > 0) {
-					
-					if(runeSpells.size() > 0 &&  random_range(0, 100) >= 50) {
-						//Runes
-						unsigned short id = random_range(0, (int)runeSpells.size() - 1);
-
-						std::map<unsigned short, Spell*>::iterator rit = spells.getAllRuneSpells()->find(runeSpells[id]);
-						if( rit != spells.getAllRuneSpells()->end() ) {
-							bool success = rit->second->getSpellScript()->castSpell(this, attackedPlayer->pos, "");
-							//ret = success;
-						}
-					}
-					else if(instantSpells.size() > 0 && random_range(0, 100) >= 50) {
-						//Instant
-						unsigned short id = random_range(0, (int)instantSpells.size() - 1);
-						std::map<std::string, Spell*>::iterator sit = spells.getAllSpells()->find(instantSpells[id]);
-						if( sit != spells.getAllSpells()->end() ) {
-							bool success = sit->second->getSpellScript()->castSpell(this, this->pos, "");
-						}
-					}
-					else if(random_range(0, 100) >= 50)
-					{
-						game->creatureMakeDamage(this, attackedPlayer, this->getFightType());
-					}
+					doAttacks(attackedPlayer);
 				}
 			}
 		}
@@ -499,7 +622,36 @@ void Monster::doMoveTo(const Position &target)
 		if(moveToPos == this->pos) {
 			int dx = targetPos.x - this->pos.x;
 			int dy = targetPos.y - this->pos.y;
+			int targetdist = getCurrentDistanceToTarget();
+			
+			Direction newdir = this->getDirection();
 
+			//SE
+			if( dx < 0 && dy < 0)
+				newdir = WEST;
+			//SW
+			else if(dx > 0 && dy < 0)
+				newdir = EAST;
+			//NW
+			else if(dx > 0 && dy > 0)
+				newdir = EAST;
+			//NE
+			else if(dx < 0 && dy > 0)
+				newdir = WEST;
+			//S
+			else if(dx == 0 && dy < 0)
+				newdir = NORTH;
+			//W
+			else if(dx > 0 && dy == 0)
+				newdir = EAST;
+			//N
+			else if(dx == 0 && dy > 0)
+				newdir = SOUTH;
+			//E
+			else if(dx < 0 && dy == 0)
+				newdir = WEST;
+
+			/*
 			Direction newdir = this->getDirection();
 			if(dx > 0 && dx >= std::max(std::abs(dx), std::abs(dy)))
 				newdir = EAST;
@@ -509,9 +661,10 @@ void Monster::doMoveTo(const Position &target)
 				newdir = SOUTH;
 			else if(dy < 0 && std::abs(dy) >= std::max(std::abs(dx), std::abs(dy)))
 				newdir = NORTH;
+			*/
 		
 			if(newdir != this->getDirection()) {
-				game->creatureTurn(this, EAST);
+				game->creatureTurn(this, newdir);
 			}
 		}
 

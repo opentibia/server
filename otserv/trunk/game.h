@@ -188,6 +188,7 @@ class Game {
     void creatureSpeakTo(Creature *creature, const std::string &receiver, const std::string &text);
     void creatureBroadcastMessage(Creature *creature, const std::string &text);
     void creatureToChannel(Creature *creature, unsigned char type, const std::string &text, unsigned short channelId);
+		void creatureMonsterYell(Monster* monster, const std::string& text);
 		void creatureChangeOutfit(Creature *creature);
 
 		bool creatureThrowRune(Creature *creature, const Position& centerpos, const MagicEffectClass& me);

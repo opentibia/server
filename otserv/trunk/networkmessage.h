@@ -45,12 +45,17 @@
 #define NM_ANI_SNOWBALL          12
 #define NM_ANI_POWERBOLT         13
 
+enum SpeakClasses {
+	SPEAK_MONSTER = 0x11
+};
+
 enum MessageClasses {
       MSG_SMALLINFO = 0x17,
 		  MSG_INFO      = 0x16,
 		  MSG_EVENT     = 0x14,
 		  MSG_ADVANCE   = 0x13,
 };
+
 enum Icons {
  ICON_POISON = 1,
  ICON_BURN = 2, 

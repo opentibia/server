@@ -84,6 +84,7 @@ class Item;
 
 class Thing;
 class Player;
+class Monster;
 
 class Conditions : public std::map<attacktype_t, ConditionVec>
 {

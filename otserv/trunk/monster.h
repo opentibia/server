@@ -27,6 +27,85 @@
 #include "game.h"
 #include "tile.h"
 
+class TimeProbabilityClass {
+public:
+	TimeProbabilityClass()
+	{
+		setDefault();
+	}
+
+	TimeProbabilityClass(int _cycleTicks, int _probability, int _exhaustionticks)
+	{
+		setDefault();
+		init(_cycleTicks, _probability, _exhaustionticks);
+	};
+
+	~TimeProbabilityClass() {};
+
+	bool onTick(int ticks)
+	{
+		ticksleft -= ticks;
+		
+		if(ticksleft <= 0) {
+			ticksleft = cycleTicks;
+			bool ret = (random_range(probability, 100) >= probability);
+			return ret;
+		}
+
+		return false;
+	}
+	
+	void init(int _cycleTicks, int _probability, int _exhaustionticks)
+	{
+		if(_cycleTicks >= 0) {
+			this->ticksleft = _cycleTicks;
+			this->cycleTicks = _cycleTicks;
+		}
+
+		_probability = std::max(_probability, 0);
+
+		if(_probability >= 0)
+			probability = std::min(100, probability);
+
+		if(_exhaustionticks >= 0)
+			exhaustionTicks = _exhaustionticks;
+	}
+
+	int getExhaustion() const {return exhaustionTicks;}
+
+private:
+	void setDefault()
+	{
+		cycleTicks = 5000;
+		ticksleft = cycleTicks;
+		probability = 50;
+		exhaustionTicks = 0;
+	}
+
+	int ticksleft;
+	int cycleTicks;
+	int probability;
+	int exhaustionTicks;
+};
+
+class PhysicalAttackClass {
+public:
+	PhysicalAttackClass()
+	{
+		//fighttype = FIGHT_NONE;
+		disttype = DIST_NONE;
+		minWeapondamage = 0;
+		maxWeapondamage = 1;
+	};
+
+	~PhysicalAttackClass() {};
+
+	fight_t fighttype;
+	subfight_t disttype;
+
+	int minWeapondamage;
+	int maxWeapondamage;
+};
 
 class Monster : public Creature
 {
@@ -45,23 +124,34 @@ private:
 
 protected:
 	Game* game;
+	PhysicalAttackClass	*curPhysicalAttack;
 
-	fight_t fighttype;
 	int targetDistance;
-	subfight_t disttype;
-	int minWeapondamage;
-	int maxWeapondamage;
 	int runawayHealth;
 
-	std::vector<std::string> instantSpells;
-	std::vector<unsigned short> runeSpells;
+	bool doAttacks(Player* attackedPlayer);
+
+	typedef std::vector<TimeProbabilityClass> TimeProbabilityClassVec;
+
+	typedef std::map<std::string, TimeProbabilityClassVec> InstantAttackSpells;
+	InstantAttackSpells instantSpells;
+	
+	typedef std::map<unsigned short, TimeProbabilityClassVec> RuneAttackSpells;
+	RuneAttackSpells runeSpells;
+
+	typedef std::map<PhysicalAttackClass*, TimeProbabilityClass> PhysicalAttacks;
+	PhysicalAttacks physicalAttacks;
+
+	typedef std::vector<std::pair<std::string, TimeProbabilityClass> > YellingSentences;
+	YellingSentences yellingSentences;
 	
 	Position targetPos;
 	Position moveToPos;
 	void doMoveTo(const Position &target);
 
-	virtual fight_t getFightType(){return fighttype;};
-	virtual subfight_t getSubFightType() {return disttype;}
+	virtual fight_t getFightType() {return curPhysicalAttack->fighttype; /*curPhysicalAttack != NULL ? curPhysicalAttack->fighttype : FIGHT_MELEE);*/};
+	virtual subfight_t getSubFightType()
+	{return curPhysicalAttack->disttype; /*return (curPhysicalAttack != NULL ? curPhysicalAttack->disttype : DIST_NONE);*/}
 	virtual int getWeaponDamage() const;
 
 	void OnCreatureEnter(const Creature *creature);
