@@ -46,9 +46,11 @@ inline int OTSYS_THREAD_WAITSIGNAL(OTSYS_THREAD_SIGNALVAR& signal, OTSYS_THREAD_
 
 inline int OTSYS_THREAD_WAITSIGNAL_TIMED(OTSYS_THREAD_SIGNALVAR& signal, OTSYS_THREAD_LOCKVAR& lock, __int64 cycle)
 {
-  DWORD tout = (DWORD)(cycle - OTSYS_TIME());
-  if (tout < 0)
-    tout = 0;
+  __int64 tout64 = (cycle - OTSYS_TIME());
+  
+  DWORD tout = 0;
+  if (tout64 > 0)
+    tout = (DWORD)(tout64);
 
   LeaveCriticalSection(&lock);
   int ret = WaitForSingleObject(signal, tout);
