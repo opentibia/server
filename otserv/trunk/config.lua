@@ -48,15 +48,3 @@ motdnum="1"
 
 -- max number of players allowed
 maxplayers = "10000"
-
--- exhausted time in ms (1000 = 1sec)
-exhausted = 2*1000
-
--- how many ms to add if the player is already exhausted and tries to cast a spell (1000 = 1sec)
-exhaustedadd = 2*1000
-
--- how long does the player has to stay out of fight to get pz unlocked in ms (1000 = 1sec)
-pzlocked = 5*60*1000
-
--- allow multiple logins of the same char
-allowclones = 0
