@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<kdevelop>
+ <general>
+  <author>root</author>
+  <email>root@linux</email>
+  <version>$VERSION$</version>
+  <projectmanagement>KDevCustomProject</projectmanagement>
+  <primarylanguage>C++</primarylanguage>
+  <ignoreparts>
+   <part>KDevFileView</part>
+  </ignoreparts>
+ </general>
+ <kdevcustomproject>
+  <run>
+   <mainprogram>src/otserv</mainprogram>
+  </run>
+ </kdevcustomproject>
+ <kdevdebugger>
+  <general>
+   <dbgshell></dbgshell>
+  </general>
+ </kdevdebugger>
+  <kdevfilecreate>
+    <filetypes/>
+    <useglobaltypes>
+      <type ext="ui" />
+      <type ext="cpp" />
+      <type ext="h" />
+    </useglobaltypes>
+  </kdevfilecreate>
+</kdevelop>
