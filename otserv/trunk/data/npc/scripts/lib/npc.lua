@@ -1,6 +1,9 @@
 
 -- get the distance to a creature
 function getDistanceToCreature(id)
+	if id == 0 or id == nil then
+		selfGotoIdle()
+	end
 	cx, cy, cz = creatureGetPosition(id)
 	if cx == nil then
 		return nil
@@ -32,6 +35,9 @@ end
 
 -- do one step to reach creature
 function moveToCreature(id)
+	if id == 0 or id == nil then
+		selfGotoIdle()
+	end
 	tx,ty,tz=creatureGetPosition(id)
 	if tx == nil then
 		selfGotoIdle()
