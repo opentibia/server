@@ -78,22 +78,39 @@ bool NetworkMessage::WriteToSocket(SOCKET socket)
   m_MsgBuf[0] = (unsigned char)(m_MsgSize);
   m_MsgBuf[1] = (unsigned char)(m_MsgSize >> 8);
   
+	bool ret = true;
   int sendBytes = 0;
+	int flags;
+
+#if defined WIN32 || defined __WINDOWS__
+	// Set the socket I/O mode; iMode = 0 for blocking; iMode != 0 for non-blocking
+  unsigned long mode = 1;
+  ioctlsocket(socket, FIONBIO, &mode);
+
+	flags = 0;
+#else
+	flags = MSG_DONTWAIT;
+#endif
+
   do
   {
-#if defined WIN32 || defined __WINDOWS__
-#define MSG_DONTWAIT 0
-#endif
-    int b = send(socket, (char*)m_MsgBuf+sendBytes, min(m_MsgSize-sendBytes+2, 1000), MSG_DONTWAIT);
+    int b = send(socket, (char*)m_MsgBuf+sendBytes, min(m_MsgSize-sendBytes+2, 1000), flags);
 
-	if (b <= 0)
-      return false;
+		if (b <= 0) {
+			ret = false;
+			break;
+		}
 
     sendBytes += b;
   }
   while (sendBytes < m_MsgSize+2);
 
-  return true;
+#if defined WIN32 || defined __WINDOWS__
+  mode = 0;
+  ioctlsocket(socket, FIONBIO, &mode);
+#endif
+
+  return ret;
 }
 
 
