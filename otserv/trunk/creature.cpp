@@ -30,7 +30,7 @@ Creature::Creature(const char *name) : access(0)
 	looktype   = PLAYER_MALE_1;
 	pzLocked = false;
 	inFightTicks = 0;
-
+    manaShieldTicks = 0;
 	lookcorpse = 2276;
 
   health     = 1000;//150;
@@ -50,7 +50,12 @@ void Creature::drainHealth(int damage)
 
   health -= lastDamage;
 }
+void Creature::drainMana(int damage)
+{
+  lastDamage = min(mana, damage);
 
+  mana -= lastDamage;
+}
 
 void Creature::setAttackedCreature(unsigned long id)
 {

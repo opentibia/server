@@ -29,7 +29,6 @@
 
 #include <boost/config.hpp>
 #include <boost/bind.hpp>
-#include <boost/mem_fn.hpp>
 
 using namespace std;
 
@@ -403,8 +402,8 @@ bool Map::placeCreature(Creature* c)
   if (!c->canMovedTo(getTile(c->pos.x, c->pos.y, c->pos.z)))
   {   
       bool found =false;
-      for(int cx =c->pos.x-3; cx <= c->pos.x+3 && !found; cx++){
-                    for(int cy = c->pos.y-3; cy <= c->pos.y+3 && !found; cy++){
+      for(int cx =c->pos.x-1; cx <= c->pos.x+1 && !found; cx++){
+                    for(int cy = c->pos.y-1; cy <= c->pos.y+1 && !found; cy++){
                         std::cout << "search pos x:" <<cx <<" y: "<< cy << std::endl;                
 						if (c->canMovedTo(getTile(cx, cy, c->pos.z))){
                                             c->pos.x = cx;
@@ -1050,8 +1049,8 @@ void Map::creatureMakeMagic(Creature *creature, const EffectInfo &ei)
 	    player->inFightTicks = (long)g_config.getGlobalNumber("pzlocked", 0);
 	}
 
-	std::vector< std::pair<unsigned long, signed long> > targetlist;
-  std::pair<unsigned long, signed long> targetitem;
+	std::vector< std::pair<unsigned long, signed long [2]> > targetlist;
+  std::pair<unsigned long, signed long [2]> targetitem;
 	CreatureVector::iterator cit;
 	
 	Position pos = ei.centerpos;
@@ -1070,7 +1069,7 @@ void Map::creatureMakeMagic(Creature *creature, const EffectInfo &ei)
 
 						if((creature->access != 0 && target->access == 0) || !ei.offensive || (target->access == 0 && !tile->isPz() && (ei.needtarget || creature != target))) {
 							int damage = random_range(ei.minDamage, ei.maxDamage);
-							
+							int manaDamage = 0;
 							if(!ei.offensive)
 								damage = -damage;
 
@@ -1080,23 +1079,50 @@ void Map::creatureMakeMagic(Creature *creature, const EffectInfo &ei)
 							if (damage > 0) {
 								if(ei.offensive && target->access ==0)
 									target->inFightTicks = (long)g_config.getGlobalNumber("pzlocked", 0);
-
-								if(damage > target->health)
+									
+								if (target->manaShieldTicks >= 1000 && (damage < target->mana) ){
+                                   manaDamage = damage;
+                                   damage = 0;
+                                }
+                                else if (target->manaShieldTicks >= 1000 && (damage > target->mana) ){
+                                   manaDamage = target->mana;
+                                   damage -= manaDamage;
+                                   }
+								else if((target->manaShieldTicks < 1000) && (damage > target->health))
 									damage = target->health;
-
-								targetitem.second = damage;
+								else if (target->manaShieldTicks >= 1000 && (damage > (target->health + target->mana))){
+								    damage = target->health;
+                                    manaDamage = target->mana;
+                                    }
+                                
+                                signed long temp[2] = { damage , manaDamage };
+                                memcpy(&targetitem.second, temp, sizeof(temp));
+								//targetitem.second = temp;
+								if(target->manaShieldTicks < 1000)
 								target->drainHealth(damage);
+								else if(manaDamage >0){
+								target->drainHealth(damage);
+								target->drainMana(manaDamage);
+                                }
+								else
+								target->drainMana(damage);
 							} else {
 								int newhealth = target->health - damage;
 								if(newhealth > target->healthmax)
 									newhealth = target->healthmax;
-
-								targetitem.second = target->health - newhealth;
+									
+                                signed long temp[2] = { target->health - newhealth , 0 };
+                                memcpy(&targetitem.second, temp, sizeof(temp));
+                                
+								//targetitem.second = {target->health - newhealth, 0};
 								target->health = newhealth;
 							}
 						}
-						else
-							targetitem.second = 0;
+						else{
+							signed long temp[2] = { 0 , 0 };
+                            memcpy(&targetitem.second, temp, sizeof(temp));
+                            //targetitem.second = {0, 0};
+                        }
 
 						targetlist.push_back(targetitem);
 					}
@@ -1132,7 +1158,8 @@ void Map::creatureMakeMagic(Creature *creature, const EffectInfo &ei)
 						Tile *targettile = getTile(target->pos.x, target->pos.y, target->pos.z);
 
 						if(target->access == 0) {
-							int damage = targetlist[i].second;
+							int damage = targetlist[i].second[0];
+							int manaDamage = targetlist[i].second[1];
 
 							if(ei.animationEffect > 0 && spectator->CanSee(ei.centerpos.x, ei.centerpos.y))
 								msg.AddDistanceShoot(creature->pos, ei.centerpos, ei.animationEffect);
@@ -1145,7 +1172,15 @@ void Map::creatureMakeMagic(Creature *creature, const EffectInfo &ei)
 										std::stringstream dmg;
 										dmg << std::abs(damage);
 										msg.AddAnimatedText(target->pos, ei.animationcolor, dmg.str());
+										
+										
 									}
+									if(manaDamage > 0){
+                                                  msg.AddMagicEffect(target->pos, NM_ME_LOOSE_ENERGY);
+                                                  std::stringstream manaDmg;
+                                                  manaDmg << std::abs(manaDamage);
+                                                  msg.AddAnimatedText(target->pos, 2, manaDmg.str());
+                                                      }
 
 									if(damage > 0)
 									{
@@ -1163,8 +1198,10 @@ void Map::creatureMakeMagic(Creature *creature, const EffectInfo &ei)
 										msg.AddItem(&Item(1437, 2));
 									}
 
-									if (spectator == target)
+									if (spectator == target){
 										CreateDamageUpdate(target, creature, damage, msg);
+										CreateManaDamageUpdate(target, creature, manaDamage, msg);
+                                    }
 							}
 						}
 						else if (spectator->CanSee(target->pos.x, target->pos.y))
@@ -1182,7 +1219,7 @@ void Map::creatureMakeMagic(Creature *creature, const EffectInfo &ei)
 		Creature* target = getCreatureByID(targetlist[i].first);
 		Tile *targettile = getTile(target->pos.x, target->pos.y, target->pos.z);
 
-		if(targetlist[i].second > 0) {
+		if(targetlist[i].second[0] > 0) {
 			if (!targettile->splash)
 			{
 				Item *item = new Item(1437, 2);
@@ -1305,14 +1342,26 @@ void Map::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fig
 		return;
 	
 	int damage = creature->getWeaponDamage();
+	int manaDamage = 0;
 
 	if (creature->access != 0)
 		damage += 1337;
 
 	if (damage < -50 || attackedCreature->access != 0)
 		damage = 0;
-	if (damage > 0)
+	if (attackedCreature->manaShieldTicks <1000 && damage > 0)
 		attackedCreature->drainHealth(damage);
+	else if (attackedCreature->manaShieldTicks >= 1000 && damage < attackedCreature->mana){
+         manaDamage = damage;
+         damage = 0;
+         attackedCreature->drainMana(manaDamage);
+         }
+    else if(attackedCreature->manaShieldTicks >= 1000 && damage > attackedCreature->mana){
+         manaDamage = attackedCreature->mana;
+         damage -= manaDamage;
+         attackedCreature->drainHealth(damage);
+         attackedCreature->drainMana(manaDamage);
+         }
 	else
 		attackedCreature->health += min(-damage, attackedCreature->healthmax - attackedCreature->health);
 
@@ -1335,10 +1384,10 @@ void Map::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fig
 						if(damagetype == FIGHT_MAGICDIST)
 							msg.AddDistanceShoot(creature->pos, attackedCreature->pos, NM_ANI_ENERGY);
 
-						if ((damage == 0) && (p->CanSee(attackedCreature->pos.x, attackedCreature->pos.y))) {
+						if (attackedCreature->manaShieldTicks < 1000 && (damage == 0) && (p->CanSee(attackedCreature->pos.x, attackedCreature->pos.y))) {
 							msg.AddMagicEffect(attackedCreature->pos, NM_ME_PUFF);
 						}
-						else if ((damage < 0) && (p->CanSee(attackedCreature->pos.x, attackedCreature->pos.y)))
+						else if (attackedCreature->manaShieldTicks < 1000 && (damage < 0) && (p->CanSee(attackedCreature->pos.x, attackedCreature->pos.y)))
 						{
 							msg.AddMagicEffect(attackedCreature->pos, NM_ME_BLOCKHIT);
 						}
@@ -1346,10 +1395,18 @@ void Map::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fig
 						{
 							if (p->CanSee(attackedCreature->pos.x, attackedCreature->pos.y))
 							{
-								std::stringstream dmg;
+								std::stringstream dmg, manaDmg;
 								dmg << std::abs(damage);
+								manaDmg << std::abs(manaDamage);
+								
+								if(damage > 0){
 								msg.AddAnimatedText(attackedCreature->pos, 0xB4, dmg.str());
 								msg.AddMagicEffect(attackedCreature->pos, NM_ME_DRAW_BLOOD);
+                                }
+								if(manaDamage >0){
+                                msg.AddMagicEffect(attackedCreature->pos, NM_ME_LOOSE_ENERGY);
+                                msg.AddAnimatedText(attackedCreature->pos, 2, manaDmg.str());
+                                }
 
 								if (attackedCreature->health <= 0)
 								{
@@ -1366,7 +1423,7 @@ void Map::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fig
                 {
 									msg.AddCreatureHealth(attackedCreature);
                 }
-								
+				if(damage > 0){				
 								// fresh blood, first remove od
                 if (targettile->splash)
                 {
@@ -1378,11 +1435,14 @@ void Map::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fig
                 msg.AddByte(0x6a);
                 msg.AddPosition(attackedCreature->pos);
                 msg.AddItem(&Item(1437, 2));
+                }
 							}
 						}
 					
-						if (p == attackedCreature)
+						if (p == attackedCreature){
 							CreateDamageUpdate(p, creature, damage, msg);
+							CreateManaDamageUpdate(p, creature, manaDamage, msg);
+                        }
 
 						p->sendNetworkMessage(&msg);
 					}
@@ -1545,15 +1605,21 @@ void Map::checkPlayer(unsigned long id)
 
 		 if(player->inFightTicks >= 1000) {
 			player->inFightTicks -= 1000;
-      if(player->inFightTicks < 1000)
+            if(player->inFightTicks < 1000)
 				player->pzLocked = false; 
-     }
-     if(player->exhaustedTicks >=1000){
-         player->exhaustedTicks -=1000;
-     }    
+          }
+          if(player->exhaustedTicks >=1000){
+            player->exhaustedTicks -=1000;
+            } 
+          if(player->manaShieldTicks >=1000){
+            player->manaShieldTicks -=1000;
+            }   
 	 }
 	 else{
 		 addEvent(makeTask(300, std::bind2nd(std::mem_fun(&Map::checkPlayer), id)));
+		 if(creature->manaShieldTicks >=1000){
+         creature->manaShieldTicks -=300;
+         }  
 	 }
   }
    OTSYS_THREAD_UNLOCK(mapLock)
@@ -1563,8 +1629,10 @@ void Map::changeOutfit(unsigned long id, int looktype){
      OTSYS_THREAD_LOCK(mapLock)
      
      Creature *creature = getCreatureByID(id);
+     if(creature){
      creature->looktype = looktype;
      creatureChangeOutfit(creature);
+     }
      
      OTSYS_THREAD_UNLOCK(mapLock)
      }
@@ -1577,7 +1645,7 @@ void Map::changeOutfitAfter(unsigned long id, int looktype, long time){
      id, looktype)));
      
      }
-     
+
 void Map::checkPlayerAttacking(unsigned long id)
 {
 	OTSYS_THREAD_LOCK(mapLock)
@@ -1710,12 +1778,29 @@ void Map::CreateDamageUpdate(Creature* creature, Creature* attackCreature, int d
 			msg.AddPlayerStats(player);
 			if (damage > 0) {
 				std::stringstream dmgmesg;
+				if(damage == 1)
+				dmgmesg << "You lose 1 hitpoint due to an attack by ";
+				else
 				dmgmesg << "You lose " << damage << " hitpoints due to an attack by ";
+				
 				dmgmesg << attackCreature->getName();
 				msg.AddTextMessage(MSG_EVENT, dmgmesg.str().c_str());
 			}
 			if (player->health <= 0)
 				msg.AddTextMessage(MSG_EVENT, "Own3d!");
+}
+void Map::CreateManaDamageUpdate(Creature* creature, Creature* attackCreature, int damage, NetworkMessage& msg)
+{
+			Player* player = dynamic_cast<Player*>(creature);
+			if(!player)
+				return;
+			msg.AddPlayerStats(player);
+			if (damage > 0) {
+				std::stringstream dmgmesg;
+				dmgmesg << "You lose " << damage << " mana due to an attack by ";	
+				dmgmesg << attackCreature->getName();
+				msg.AddTextMessage(MSG_EVENT, dmgmesg.str().c_str());
+			}
 }
 
 bool Map::creatureSaySpell(Creature *creature, const std::string &text)

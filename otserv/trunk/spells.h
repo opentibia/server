@@ -100,6 +100,7 @@ public:
   static Spell* SpellScript::getSpell(lua_State *L);
   static int SpellScript::luaActionDoSpell(lua_State *L);
   static int SpellScript::luaActionChangeOutfit(lua_State *L);
+  static int SpellScript::luaActionManaShield(lua_State *L);
 protected:
     int registerFunctions();
 	Spell* spell;

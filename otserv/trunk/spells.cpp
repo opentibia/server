@@ -29,6 +29,9 @@
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h> 
 
+#include <boost/config.hpp>
+#include <boost/bind.hpp>
+
 #include "spells.h"
 Spells::Spells(Map* imap): map(imap){
                    
@@ -151,6 +154,7 @@ SpellScript::SpellScript(std::string scriptname, Spell* spell){
 int SpellScript::registerFunctions(){
 	lua_register(luaState, "doMagic", SpellScript::luaActionDoSpell);
 	lua_register(luaState, "changeOutfit", SpellScript::luaActionChangeOutfit);
+	lua_register(luaState, "manaShield", SpellScript::luaActionManaShield);
 	return true;
 }
 
@@ -283,4 +287,14 @@ int SpellScript::luaActionChangeOutfit(lua_State *L){
 	spell->map->creatureChangeOutfit(creature);
 	
     spell->map->changeOutfitAfter(creature->getID(), creature->lookmaster, time);
+}
+
+int SpellScript::luaActionManaShield(lua_State *L){
+	long time = (long)lua_tonumber(L, -1)*1000;
+	lua_pop(L,1);
+	
+	Spell* spell = getSpell(L);
+	Creature* creature = spell->map->getCreatureByID((unsigned long)lua_tonumber(L, -1));
+	lua_pop(L,1);
+	creature->manaShieldTicks = time;
 }

@@ -148,6 +148,7 @@ class Map {
 		void creatureMakeMagic(Creature *creature, const EffectInfo &ei);
 		void creatureMakeAreaEffect(Creature *spectator, Creature *attacker, const EffectInfo &ei, NetworkMessage& msg);
 	  void CreateDamageUpdate(Creature* player, Creature* attackCreature, int damage, NetworkMessage& msg);
+	  void CreateManaDamageUpdate(Creature* player, Creature* attackCreature, int damage, NetworkMessage& msg);
 	  //void getSpectators(const Position& pos, std::vector<Player*>& list);
 
     OTSYS_THREAD_LOCKVAR eventLock;

@@ -80,6 +80,7 @@ public:
   virtual fight_t getFightType(){return FIGHT_MELEE;};
 
   virtual void drainHealth(int);
+  virtual void drainMana(int);
 
   void    setAttackedCreature(unsigned long id);
 
@@ -99,9 +100,8 @@ public:
 
   int lookhead, lookbody, looklegs, lookfeet, looktype, lookcorpse, lookmaster;
   int mana, manamax, manaspent;
-  long exhaustedTicks;
   bool pzLocked;
-  long inFightTicks;
+  long inFightTicks, exhaustedTicks, manaShieldTicks;
   
   Position masterPos;
 

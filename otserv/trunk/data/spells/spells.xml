@@ -16,4 +16,9 @@
 <vocation id="1" />
 <vocation id="2" />
 </spell>
+<spell name="Mana Shield" words="utamo vita" maglv="4" mana="50" var="0" enabled="1">
+<vocation id="1" />
+<vocation id="2" />
+<vocation id="3" />
+</spell>
 </spells>
