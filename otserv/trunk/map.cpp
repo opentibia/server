@@ -1679,8 +1679,7 @@ void Map::changeSpeed(unsigned long id, unsigned short speed){
                 player->sendChangeSpeed(creature);
                 player->sendIcons();
                 }
-     }
-     CreatureVector::iterator cit;
+      CreatureVector::iterator cit;
 
   for (int x = creature->pos.x - 8; x <= creature->pos.x + 8; x++)
     for (int y = creature->pos.y - 6; y <= creature->pos.y + 6; y++)
@@ -1695,7 +1694,9 @@ void Map::changeSpeed(unsigned long id, unsigned short speed){
           p->sendChangeSpeed(creature);
         }
       }
-    }
+    }          
+     }
+     
      
 }
 
