@@ -13,19 +13,6 @@
 #include "creature.h"
 #include "item.h"
 
-int Tile::getStackPosItem(){
-	int pos=1;
-/*	if(size()<=1)
-		return 0;
-	if(creature && size()>=2)
-		pos++;
-	Tile::iterator it=end();
-	it--;
-	if(size()>=3 && (*it)->isAlwaysOnTop())
-		pos++;
-	std::cout << "stackpos of top item is "<< pos << std::endl; */
-	return pos;
-}
 
 
 bool Tile::isBlocking()
@@ -43,95 +30,13 @@ bool Tile::isBlocking()
   return false;
 }
 
-int Tile::removeItem(int stack, int type, int count){
-	//returns how much items are left
-	//TODO
-	Item* item=getItemByStack(stack);
-	int itemsleft = item->count-count;
-	if(itemsleft<=0){
-		itemsleft=0;
-		removeItemByStack(stack);
-	}
-	item->count=itemsleft;
-	return itemsleft;
-}
-
-
-Item* Tile::getItemByStack(int stack){
-/*	if(stack==0)
-		return(*getItToPos(0));
-	//if theres a creature on this tile...
-	if((*(getItToPos(size()-1)))->isAlwaysOnTop()){
-		if(stack==1)
-			return *(getItToPos(size()-1));
-		else{
-			if(this->creature)
-				if(stack==2)
-					return NULL;
-				else
-					return *(getItToPos(size()-(stack-1)));
-			else
-				return *(getItToPos(size()-stack));
-		}
-	}
-	else{
-		if(this->creature)
-			if(stack==1){
-				return NULL;
-			}
-			else{
-				return *(getItToPos(size()-(stack-1)));
-			}
-		else{
-			return *(getItToPos(size()-stack));
-		}
-	}
-	return NULL;
-  */
-  return NULL;
-}
-
-int Tile::removeItemByStack(int stack){
-/*	if(stack==0)
-		erase(getItToPos(0));
-	//if theres a creature on this tile...
-	else if((*(getItToPos(size()-1)))->isAlwaysOnTop()){
-		if(stack==1)
-			erase ((getItToPos(size()-1)));
-		else{
-			if(this->creature)
-				if(stack==2)
-					return 0;
-				else
-					erase((getItToPos(size()-(stack-1))));
-			else
-				erase( (getItToPos(size()-stack)));
-		}
-	}
-	else{
-		if(this->creature)
-			if(stack==1){
-				return 0;
-			}
-			else{
-				erase((getItToPos(size()-(stack-1))));
-			}
-		else{
-			erase( (getItToPos(size()-stack)));
-		}
-	}
-	return 0;*/
-
-  return 0;
-}
-
 int Tile::getCreatureStackPos(Creature *c)
 {
   CreatureVector::iterator it;
   for (it = creatures.begin(); it != creatures.end(); it++)
   {
     if ((*it) == c)
-      return (int) ((it - creatures.begin()) + 1 + topItems.size());
+      return (int) ((it - creatures.begin()) + 1 + topItems.size()) + (splash ? 1 : 0);
   }
 
   /* todo error */
@@ -142,6 +47,13 @@ int Tile::getThingStackPos(Thing *thing)
 {
   int n = 0;
 
+  if (splash)
+  {
+    if (thing == splash)
+      return 1;
+    n++;
+  }
+  
   ItemVector::iterator iit;
   for (iit = topItems.begin(); iit != topItems.end(); iit++)
   {
@@ -176,6 +88,14 @@ Thing* Tile::getThingByStackPos(int pos)
 
   pos--;
 
+  if (splash)
+  {
+    if (pos == 0)
+      return splash;
+
+    pos--;
+  }
+
   if (pos < topItems.size())
     return topItems[pos];
 
@@ -194,7 +114,7 @@ Thing* Tile::getThingByStackPos(int pos)
 
 int Tile::getThingCount()
 {
-	return 1 + topItems.size() + 	creatures.size() + downItems.size();
+  return 1 + (splash ? 1 : 0) + topItems.size() +	creatures.size() + downItems.size();
 }
 
 std::string Tile::getDescription(){
@@ -222,6 +142,11 @@ bool Tile::removeThing(Thing *thing)
         creatures.erase(it);
         return true;
       }
+  }
+  else if (thing == splash)
+  {
+    splash = NULL;
+    return true;
   }
   else
   {

@@ -23,13 +23,18 @@ public:
 
   Tile()
   {
-    pz = false;
+    pz               = false;
+    splash           = NULL;
+    decaySplashAfter = 0;
   }
 
   Item           ground;
+  Item*          splash;
   ItemVector     topItems;
   CreatureVector creatures;
   ItemVector     downItems;
+
+  __int64        decaySplashAfter;
 
   bool removeThing(Thing *thing);
   void addThing(Thing *thing);
@@ -40,17 +45,6 @@ public:
 
   Thing* getThingByStackPos(int pos);
 
-
-
-
-  int getStackPosItem();
-  
-  int removeItem(int stack, int type, int count);
-  
-  int removeItemByStack(int stack);
-  
-  Item* getItemByStack(int stack);
-  
   bool isBlocking();
 
   bool isPz();

@@ -31,6 +31,7 @@ ItemType::ItemType()
 {
 	iscontainer     = false;
 	stackable       = false;
+  multitype       = false;
 	useable	        = false;
 	notMoveable     = false;
 	alwaysOnTop     = false;
@@ -44,6 +45,9 @@ ItemType::ItemType()
   weaponType = NONE;
   attack     =    0;
   defence    =    0;
+
+  decayTo    =    0;
+  decayTime  =   60;
 }
 
 ItemType::~ItemType()
@@ -145,7 +149,12 @@ int Items::loadFromDat(std::string file)
 					//is useable
 					iType->useable=true;
 					break;
-				
+
+				case 0x0A:
+					//is multitype
+          iType->multitype=true;
+					break;
+
 				case 0x0B:
 					//is blocking
 					iType->blocking=true;
@@ -168,7 +177,6 @@ int Items::loadFromDat(std::string file)
 
         case 0x06:
         case 0x09:
-        case 0x0A:
         case 0x0D:
         case 0x0E:
         case 0x11:
@@ -258,6 +266,14 @@ int Items::loadXMLInfos(std::string file)
           char* description = (char*)xmlGetProp(p, (xmlChar*)"descr");
           if (description)
 						itemtype->description = description;
+
+          char* decayTo = (char*)xmlGetProp(p, (xmlChar*)"decayto");
+          if (decayTo)
+						itemtype->decayTo = atoi(decayTo);
+
+          char* decayTime = (char*)xmlGetProp(p, (xmlChar*)"decaytime");
+          if (decayTime)
+						itemtype->decayTime = atoi(decayTime);
 
 					// now set special properties...
 					// first we check the type...

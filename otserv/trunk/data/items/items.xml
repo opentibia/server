@@ -183,4 +183,17 @@
 <item id="1546" name="Wooden Wand" type="weapon" skill="magic" attack="0" defence="0" weight="26.5" />
 <item id="1554" name="Yellow Spell Wand" type="weapon" skill="magic" attack="0" defence="0" weight="23" />
 <item id="1804" name="Power Bolt" type="amunition" amutype="bolt" shottype="13" attack="0" defence="0" weight="23" />
+
+<item id="2276" name="dead human" weight="1200" decayto="2277" decaytime="30" />
+<item id="2277" name="dead human" weight="1200" decayto="2278" decaytime="30" />
+<item id="2278" name="dead human" weight="1200" decayto="2279" decaytime="30" />
+<item id="2279" name="dead human" weight="1200" decayto="2280" decaytime="30" />
+<item id="2280" name="dead human" weight="1200" decayto="2281" decaytime="30" />
+<item id="2281" name="human skeleton" weight="900" decayto="2282" decaytime="30" />
+<item id="2282" name="human skeleton" weight="600" />
+
+<item id="1437" name="blood" weight="900" decayto="1438" decaytime="45" />
+<item id="1438" name="blood" weight="900" decayto="1439" decaytime="45" />
+<item id="1439" name="blood" weight="600" />
+
 </items>

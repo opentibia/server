@@ -45,9 +45,14 @@ public:
   int            attack;
   int            defence;
 
+  unsigned short decayTo;
+  unsigned short decayTime;
+
+
 	// other bools
 	bool iscontainer;
 	bool stackable;
+  bool multitype;
 	bool useable;
 	bool notMoveable;
 	bool alwaysOnTop;

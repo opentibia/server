@@ -195,6 +195,12 @@ void Protocol70::GetMapDescription(unsigned short x, unsigned short y, unsigned 
 
         int count = 1;
 
+        if (tile->splash)
+        {
+          msg.AddItem(tile->splash);
+          count++;
+        }
+
         ItemVector::iterator it;
 		    for (it = tile->topItems.begin(); ((it !=tile->topItems.end()) && (count < 10)); it++)
         {

@@ -886,6 +886,7 @@ void Map::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fig
 								dmg << damage;
 								msg.AddAnimatedText(attackedCreature->pos, 0xB4, dmg.str());
 								msg.AddMagicEffect(attackedCreature->pos, NM_ME_DRAW_BLOOD);
+
 								if (attackedCreature->health <= 0)
 								{
 									// remove character
@@ -898,7 +899,21 @@ void Map::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fig
 									msg.AddItem(&item);
 								}
 								else
+                {
 									msg.AddCreatureHealth(attackedCreature);
+                }
+
+                // fresh blood, first remove od
+                if (targettile->splash)
+                {
+									msg.AddByte(0x6c);
+									msg.AddPosition(attackedCreature->pos);
+									msg.AddByte(1);
+                  targettile->splash->setID(1437);
+                }
+                msg.AddByte(0x6a);
+                msg.AddPosition(attackedCreature->pos);
+                msg.AddItem(&Item(1437, 2));
 							}
 						}
 					
@@ -911,13 +926,31 @@ void Map::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fig
 			}
 		}
 	}
+
+  if (!targettile->splash)
+  {
+    Item *item = new Item(1437, 2);
+    item->pos = attackedCreature->pos;
+	  targettile->splash = item;
+  }
+  unsigned short decayTime = Item::items[1437].decayTime;
+  targettile->decaySplashAfter = OTSYS_TIME() + decayTime*1000;
+  addEvent(makeTask(decayTime*1000, std::bind2nd(std::mem_fun(&Map::decaySplash), targettile->splash)));
+
 	if (attackedCreature->health <= 0) {
 		targettile->removeThing(attackedCreature);
 		playersOnline.erase(playersOnline.find(attackedCreature->getID()));
-		targettile->addThing(new Item(attackedCreature->lookcorpse));
-		if (creature->access == 0) {
-	      creature->pzLockedTicks = +120000;	      
-  	      }
+
+    Item *item = new Item(attackedCreature->lookcorpse);
+    item->pos = attackedCreature->pos;
+		targettile->addThing(item);
+    unsigned short decayTime = Item::items[item->getID()].decayTime;
+    addEvent(makeTask(decayTime*1000, std::bind2nd(std::mem_fun(&Map::decayItem), item)));
+
+		if (creature->access == 0)
+    {
+	    creature->pzLockedTicks = +120000;
+  	}
 	}
 }
 
@@ -1088,6 +1121,88 @@ void Map::checkPlayerAttacking(unsigned long id)
         }
       }
 	  }
+  }
+
+  OTSYS_THREAD_UNLOCK(mapLock)
+}
+
+
+void Map::decayItem(Item* item)
+{
+  OTSYS_THREAD_LOCK(mapLock)
+
+  Tile *t = getTile(item->pos.x, item->pos.y, item->pos.z);
+  unsigned short decayTo   = Item::items[item->getID()].decayTo;
+  unsigned short decayTime = Item::items[item->getID()].decayTime;
+
+  if (decayTo == 0)
+  {
+    t->removeThing(item);
+  }
+  else
+  {
+    item->setID(decayTo);
+    addEvent(makeTask(decayTime*1000, std::bind2nd(std::mem_fun(&Map::decayItem), item)));
+  }
+
+	CreatureVector::iterator cit;
+	for (int x = item->pos.x - 9; x <= item->pos.x + 9; x++)
+		for (int y = item->pos.y - 7; y <= item->pos.y + 7; y++)
+		{
+			Tile *tile = getTile(x, y, 7);
+			if (tile)
+			{
+				for (cit = tile->creatures.begin(); cit != tile->creatures.end(); cit++)
+				{
+					(*cit)->onTileUpdated(&item->pos);
+				}
+			}
+		}
+
+  if (decayTo == 0)
+    delete item;
+
+  OTSYS_THREAD_UNLOCK(mapLock)
+}
+
+
+void Map::decaySplash(Item* item)
+{
+  OTSYS_THREAD_LOCK(mapLock)
+
+  Tile *t = getTile(item->pos.x, item->pos.y, item->pos.z);
+
+  if ((t) && (t->decaySplashAfter <= OTSYS_TIME()))
+  {
+    unsigned short decayTo   = Item::items[item->getID()].decayTo;
+    unsigned short decayTime = Item::items[item->getID()].decayTime;
+
+    if (decayTo == 0)
+    {
+      t->splash = NULL;
+    }
+    else
+    {
+      item->setID(decayTo);
+      addEvent(makeTask(decayTime*1000, std::bind2nd(std::mem_fun(&Map::decaySplash), item)));
+    }
+
+	  CreatureVector::iterator cit;
+	  for (int x = item->pos.x - 9; x <= item->pos.x + 9; x++)
+		  for (int y = item->pos.y - 7; y <= item->pos.y + 7; y++)
+		  {
+			  Tile *tile = getTile(x, y, 7);
+			  if (tile)
+			  {
+				  for (cit = tile->creatures.begin(); cit != tile->creatures.end(); cit++)
+				  {
+					  (*cit)->onTileUpdated(&item->pos);
+				  }
+			  }
+		  }
+
+    if (decayTo == 0)
+      delete item;
   }
 
   OTSYS_THREAD_UNLOCK(mapLock)
@@ -1273,6 +1388,18 @@ void Map::makeCastSpell(Creature *creature, int mana, int mindamage, int maxdama
 							else
 								msg.AddCreatureHealth(victim);
 
+              // fresh blood, first remove od
+              if (vtile->splash)
+              {
+								msg.AddByte(0x6c);
+								msg.AddPosition(victim->pos);
+								msg.AddByte(1);
+                vtile->splash->setID(1437);
+              }
+              msg.AddByte(0x6a);
+              msg.AddPosition(victim->pos);
+              msg.AddItem(&Item(1437, 2));
+
 							if(victim == spectator && damagelist[i].second > 0) {
 								CreateDamageUpdate(spectator, creature, damagelist[i].second, msg);
 								msg.AddPlayerStats(victim);
@@ -1295,13 +1422,29 @@ void Map::makeCastSpell(Creature *creature, int mana, int mindamage, int maxdama
 		Player* victim = (Player*) getCreatureByID(damagelist[i].first);
 		Tile *tile = getTile(victim->pos.x, victim->pos.y, victim->pos.z);
 
+    if (!tile->splash)
+    {
+      Item *item = new Item(1437, 2);
+      item->pos = victim->pos;
+	    tile->splash = item;
+    }
+    unsigned short decayTime = Item::items[1437].decayTime;
+    tile->decaySplashAfter = OTSYS_TIME() + decayTime*1000;
+    addEvent(makeTask(decayTime*1000, std::bind2nd(std::mem_fun(&Map::decaySplash), tile->splash)));
+
 		if (victim->health <= 0) {
 			tile->removeThing(victim);
 			playersOnline.erase(playersOnline.find(victim->getID()));
-			tile->addThing(new Item(victim->lookcorpse));
+
+      Item *item = new Item(victim->lookcorpse);
+      item->pos = victim->pos;
+		  tile->addThing(item);
+      unsigned short decayTime = Item::items[item->getID()].decayTime;
+      addEvent(makeTask(decayTime*1000, std::bind2nd(std::mem_fun(&Map::decayItem), item)));
+
 			if (creature->access == 0) {
-	          creature->pzLockedTicks += 120000;
-	          }
+	      creature->pzLockedTicks += 120000;
+	    }
 		}
 	}
 }

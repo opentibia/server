@@ -43,6 +43,7 @@ class Item : public Thing
 {
     private:
         unsigned id;  // the same id as in ItemType
+	      unsigned char count; // number of stacked items
 
     private: // the following, I will have to rethink:
         // could be union:
@@ -55,8 +56,8 @@ class Item : public Thing
 
 		static Items items;
 
-	 unsigned char count; // number of stacked items
-   unsigned getID() const;    // ID as in ItemType
+   unsigned short getID() const;    // ID as in ItemType
+   void setID(unsigned short newid);
 		
     bool isWeapon() const;
 	 WeaponType getWeaponType() const;
@@ -64,6 +65,7 @@ class Item : public Thing
 
     bool isBlocking() const;
 		bool isStackable() const;
+    bool isMultiType() const;
 		bool isAlwaysOnTop() const;
 		bool isGroundTile() const;
 		bool isNotMoveable() const;
@@ -76,10 +78,11 @@ class Item : public Thing
 		xmlNodePtr serialize();
 
         // get the number of items
-        unsigned char getItemCount() const;
+        unsigned char getItemCountOrSubtype() const;
 
         // Constructor for items
         Item(const unsigned short _type);
+        Item(const unsigned short _type, unsigned char _count);
 		Item();
 
         ~Item();
@@ -92,20 +95,5 @@ class Item : public Thing
         Item& operator<<(Item*); // put items into the container
 };
 
-// now we declare exceptions we throw...
-class TE_Nocontainer : public texception {
-    public:
-        TE_Nocontainer() : texception("Item is not a container!", false) {}
-};
-
-class TE_BadItem : public texception {
-    public:
-        TE_BadItem() : texception("Item is invalid!", false) {}
-};
-
-class TE_ContainerFull : public texception {
-    public:
-        TE_ContainerFull() : texception("container is full!", false) {}
-};
 
 #endif

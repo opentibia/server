@@ -28,13 +28,19 @@
 
 //////////////////////////////////////////////////
 // returns the ID of this item's ItemType
-unsigned Item::getID() const {
+unsigned short Item::getID() const {
     return id;
 }
 
 //////////////////////////////////////////////////
+// sets the ID of this item's ItemType
+void Item::setID(unsigned short newid) {
+    id = newid;
+}
+
+//////////////////////////////////////////////////
 // return how many items are stacked or 0 if non stackable
-unsigned char Item::getItemCount() const {
+unsigned char Item::getItemCountOrSubtype() const {
     return count;
 }
 
@@ -46,6 +52,12 @@ Item::Item(const unsigned short _type) {
     throwRange = 6;
 }
 
+Item::Item(const unsigned short _type, unsigned char _count) {
+    id = _type;
+    count = _count;
+
+    throwRange = 6;
+}
 
 Item::Item() {
     id = 0;
@@ -85,7 +97,8 @@ xmlNodePtr Item::serialize(){
 void Item::addItem(Item *newitem) {
     //first check if we are a container, there is an item to be added and if we can add more items...
     //if (!iscontainer) throw TE_NoContainer();
-    if (newitem == NULL) throw TE_BadItem();
+    if (newitem == NULL)
+      return;
     //if (maxitems <=actualitems) throw TE_ContainerFull();
 
     // seems we should add the item...
@@ -114,6 +127,10 @@ bool Item::isBlocking() const {
 
 bool Item::isStackable() const {
 	return items[id].stackable;
+}
+
+bool Item::isMultiType() const {
+	return items[id].multitype;
 }
 
 bool Item::isAlwaysOnTop() const {

@@ -204,10 +204,8 @@ void NetworkMessage::AddItem(const Item *item)
 {
   AddU16(item->getID());
 
-  if (item->isStackable())
-    AddByte((unsigned char)item->getItemCount());
-
-  /* TODO multitype items */
+  if (item->isStackable() || item->isMultiType())
+    AddByte(item->getItemCountOrSubtype());
 }
 
 /******************************************************************************/

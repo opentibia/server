@@ -136,6 +136,8 @@ class Map {
 
     void checkPlayerAttacking(unsigned long id);
     void checkPlayer(unsigned long id);
+    void decayItem(Item* item);
+    void decaySplash(Item* item);
 
 	 std::priority_queue<SchedulerTask*, std::vector<SchedulerTask*>, lessSchedTask > eventList;
     //list<MapEvent> *eventLists[12000];
