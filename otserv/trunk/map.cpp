@@ -1186,25 +1186,26 @@ void Map::getAreaTiles(Position pos, const unsigned char area[14][18], unsigned 
 {
 	tiletargetdata tt;
 
-	pos.x -= 8;
-	pos.y -= 6;
+	Position tpos = pos;
+	tpos.x -= 8;
+	tpos.y -= 6;
 
 	for(int y = 0; y < 14; y++) {
 		for(int x = 0; x < 18; x++) {
 			if(area[y][x] == dir) {
-				Tile *t = getTile(pos.x, pos.y, pos.z);
-				if(t) {
-					tt.pos = pos;
+				Tile *t = getTile(tpos.x, tpos.y, tpos.z);
+				if(t && !t->isBlocking() && canThrowItemTo(pos, tpos, false)) {
+					tt.pos = tpos;
 					tt.targetCount = t->creatures.size();
 					tt.thingCount = t->getThingCount();
 					list.push_back(tt);
 				}
 			}
-			pos.x += 1;
+			tpos.x += 1;
 		}
 		
-		pos.x -= 18;
-		pos.y += 1;
+		tpos.x -= 18;
+		tpos.y += 1;
 	}
 }
 
@@ -1396,14 +1397,14 @@ bool Map::creatureMakeMagic(Creature *creature, const MagicEffectClass* me)
 		}
 
 		if(magicGround) {
-			if(!targettile->isBlocking()) {
-				Item* item = new Item(magicGround->groundID);
-				item->pos = tl->pos;
-				targettile->addThing(item);
+			//if(!targettile->isBlocking()) {
+			Item* item = new Item(magicGround->groundID);
+			item->pos = tl->pos;
+			targettile->addThing(item);
 
-				unsigned short decayTime = Item::items[magicGround->groundID].decayTime;
-				addEvent(makeTask(decayTime * 1000, std::bind2nd(std::mem_fun(&Map::decayItem), item)));
-			}
+			unsigned short decayTime = Item::items[magicGround->groundID].decayTime;
+			addEvent(makeTask(decayTime * 1000, std::bind2nd(std::mem_fun(&Map::decayItem), item)));
+			//}
 		}
 	}
 	
@@ -1476,6 +1477,9 @@ bool Map::creatureMakeMagic(Creature *creature, const MagicEffectClass* me)
 		tileBloodVec.clear();
 		tileUpdatedVec.clear();
 
+		if(me->animationEffect > 0 && (spectator->CanSee(player->pos.x, player->pos.y) || spectator->CanSee(me->centerpos.x, me->centerpos.y)))
+			msg.AddDistanceShoot(creature->pos, me->centerpos, me->animationEffect);
+
 		for(tl = tilelist.begin(); tl != tilelist.end(); tl++) {
 			Tile *targettile = getTile(tl->pos.x,  tl->pos.y, tl->pos.z);
 
@@ -1484,34 +1488,25 @@ bool Map::creatureMakeMagic(Creature *creature, const MagicEffectClass* me)
 
 			if(tl->thingCount > 9 && tileBodyCountMap[targettile] > 0) {
 				if(std::find(tileUpdatedVec.begin(), tileUpdatedVec.end(), targettile) == tileUpdatedVec.end()) {
-					spectatorlist[i]->onTileUpdated(&tl->pos);
 					tileUpdatedVec.push_back(targettile);
+					spectatorlist[i]->onTileUpdated(&tl->pos);
 				}
 
 #if __DEBUG__
 				std::cout << "pop-up item" << std::endl;
 #endif
 			}
-			
-			if(magicGround) {
-				if(me->animationEffect > 0 && (spectator->CanSee(player->pos.x, player->pos.y) || spectator->CanSee(me->centerpos.x, me->centerpos.y))) {
-					msg.AddDistanceShoot(player->pos, me->centerpos, me->animationEffect); 
-				}
-				
+
+			if(magicGround && spectator->CanSee(tl->pos.x, tl->pos.y)) {
 				if(std::find(tileUpdatedVec.begin(), tileUpdatedVec.end(), targettile) == tileUpdatedVec.end()) {
 
 					msg.AddByte(0x6a);
 					msg.AddPosition(tl->pos);
 					Item item = Item(magicGround->groundID);
 					msg.AddItem(&item);
-
-					/*if(spectator->CanSee(tl->pos.x, tl->pos.y))
-						spectatorlist[i]->onTileUpdated(&tl->pos);*/
-
 				}
 
 				if(magicGround->maxDamage == 0) {
-					spectator->sendNetworkMessage(&msg);
 					continue;
 				}
 			}
@@ -1532,9 +1527,6 @@ bool Map::creatureMakeMagic(Creature *creature, const MagicEffectClass* me)
 			int manaDamage = tv->second.manaDamage;
 			unsigned char targetstackpos = tv->second.stackpos;
 			bool hadSplash = tv->second.hadSplash;
-
-			if(me->animationEffect > 0 && spectator->CanSee(me->centerpos.x, me->centerpos.y))
-				msg.AddDistanceShoot(creature->pos, me->centerpos, me->animationEffect);
 
 			if(spectator->CanSee(target->pos.x, target->pos.y))
 			{
