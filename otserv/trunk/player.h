@@ -23,7 +23,8 @@
 
 
 #include "creature.h"
-
+#include <vector>
+#include <algorithm>
 
 class Protocol;
 
@@ -70,7 +71,7 @@ public:
   void speak(const std::string &text);
 
 	int addItem(Item* item, int pos);
-	unsigned int getContainerCount() {return vcontainers.size();}; //returns the current number of containers open
+	unsigned int getContainerCount() {return (uint32_t)vcontainers.size();}; //returns the current number of containers open
 	Item* getContainer(unsigned char containerid);
 	unsigned char getContainerID(Item* container);
 	void addContainer(unsigned char containerid, Item *container);
@@ -90,6 +91,8 @@ public:
   char fightMode, followMode;
   int accountNumber;
   
+  std::string password;
+
   int skills[7][2];
   
   //reminder: 0 = None, 1 = Sorcerer, 2 = Druid, 3 = Paladin, 4 = Knight
@@ -142,8 +145,8 @@ protected:
 	virtual void onContainerUpdated(Item *item, unsigned char from_id, unsigned char to_id, unsigned char from_slot, unsigned char to_slot, bool remove);
 	Protocol *client;
 
-	// we need our name and password...
-	std::string name, password;
+	// we need our name
+	std::string name;
 };
 
 

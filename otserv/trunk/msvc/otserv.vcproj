@@ -19,7 +19,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;_CONSOLE"
+				PreprocessorDefinitions="WIN32;_CONSOLE;__BUILD_WITH_SQL"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -32,7 +32,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="libxml2.lib liblua.lib liblualib.lib wsock32.lib /NODEFAULTLIB:libcmtd.lib"
+				AdditionalOptions="libxml2.lib liblua.lib liblualib.lib wsock32.lib /NODEFAULTLIB:libcmtd.lib mysql++.lib libmysql.lib"
 				OutputFile="$(OutDir)/otserv.exe"
 				LinkIncremental="2"
 				GenerateDebugInformation="TRUE"
@@ -123,6 +123,27 @@
 				RelativePath="..\creature.cpp">
 			</File>
 			<File
+				RelativePath="..\game.cpp">
+			</File>
+			<File
+				RelativePath="..\ioaccount.cpp">
+			</File>
+			<File
+				RelativePath="..\ioaccountxml.cpp">
+			</File>
+			<File
+				RelativePath="..\iomapxml.cpp">
+			</File>
+			<File
+				RelativePath="..\ioplayer.cpp">
+			</File>
+			<File
+				RelativePath="..\ioplayersql.cpp">
+			</File>
+			<File
+				RelativePath="..\ioplayerxml.cpp">
+			</File>
+			<File
 				RelativePath="..\item.cpp">
 			</File>
 			<File
@@ -130,6 +151,9 @@
 			</File>
 			<File
 				RelativePath="..\luascript.cpp">
+			</File>
+			<File
+				RelativePath="..\magic.cpp">
 			</File>
 			<File
 				RelativePath="..\map.cpp">
@@ -154,6 +178,9 @@
 			</File>
 			<File
 				RelativePath="..\protocol70.cpp">
+			</File>
+			<File
+				RelativePath="..\spells.cpp">
 			</File>
 			<File
 				RelativePath="..\status.cpp">
@@ -182,6 +209,30 @@
 				RelativePath="..\definitions.h">
 			</File>
 			<File
+				RelativePath="..\game.h">
+			</File>
+			<File
+				RelativePath="..\ioaccount.h">
+			</File>
+			<File
+				RelativePath="..\ioaccountxml.h">
+			</File>
+			<File
+				RelativePath="..\iomap.h">
+			</File>
+			<File
+				RelativePath="..\iomapxml.h">
+			</File>
+			<File
+				RelativePath="..\ioplayer.h">
+			</File>
+			<File
+				RelativePath="..\ioplayersql.h">
+			</File>
+			<File
+				RelativePath="..\ioplayerxml.h">
+			</File>
+			<File
 				RelativePath="..\item.h">
 			</File>
 			<File
@@ -189,6 +240,9 @@
 			</File>
 			<File
 				RelativePath="..\luascript.h">
+			</File>
+			<File
+				RelativePath="..\magic.h">
 			</File>
 			<File
 				RelativePath="..\map.h">
@@ -219,6 +273,9 @@
 			</File>
 			<File
 				RelativePath="..\scheduler.h">
+			</File>
+			<File
+				RelativePath="..\spells.h">
 			</File>
 			<File
 				RelativePath="..\status.h">

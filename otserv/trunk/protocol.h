@@ -24,7 +24,7 @@
 
 
 #include "definitions.h"
-#include "map.h"
+#include "game.h"
 #include "texcept.h"
 
 #include <string>
@@ -68,7 +68,7 @@ public:
   virtual void sendOpenPriv(std::string &receiver) =0;
 
 protected:
-  Map    *map;
+  Game   *game;
   Player *player;
   SOCKET s;
 };

@@ -57,7 +57,7 @@ Protocol70::~Protocol70()
 
 bool Protocol70::ConnectPlayer()
 {
-  return map->placeCreature(player);
+  return game->placeCreature(player);
 }
 
 
@@ -76,7 +76,7 @@ void Protocol70::ReceiveLoop()
   // logout by disconnect?  -> kick
   if (player)
   {
-			 map->removeCreature(player);
+			 game->removeCreature(player);
   }
 }
 
@@ -217,7 +217,7 @@ void Protocol70::GetMapDescription(unsigned short x, unsigned short y, unsigned 
   for (int nx = 0; nx < width; nx++)
     for (int ny = 0; ny < height; ny++)
     {
-      tile = map->getTile(x + nx, y + ny, (unsigned char)z);
+      tile = game->getTile(x + nx, y + ny, (unsigned char)z);
 
       if (tile)
       {
@@ -296,7 +296,7 @@ void Protocol70::checkCreatureAsKnown(unsigned long id, bool &known, unsigned lo
     {
       removedKnown = knownPlayers.front();
 
-      Creature *c = map->getCreatureByID(removedKnown);
+      Creature *c = game->getCreatureByID(removedKnown);
       if ((!c) || (!CanSee(c->pos.x, c->pos.y)))
         break;
 
@@ -324,8 +324,8 @@ void Protocol70::parseLogout(NetworkMessage &msg)
          sendCancel("You may not logout during or immediately after a fight!");
          return;
      }    
-	// we ask the map to remove us
-	if (map->removeCreature(player))
+	// we ask the game to remove us
+	if (game->removeCreature(player))
 	{
 		player = NULL;
 		closesocket(s);
@@ -357,7 +357,7 @@ void Protocol70::parseCloseChannel(NetworkMessage &msg){
 void Protocol70::parseOpenPriv(NetworkMessage &msg){
      std::string receiver; 
      receiver = msg.GetString();
-     Creature* c = map->getCreatureByName(receiver.c_str());
+     Creature* c = game->getCreatureByName(receiver.c_str());
      Player* player = dynamic_cast<Player*>(c);
      if(player) 
      sendOpenPriv(receiver);
@@ -411,7 +411,7 @@ void Protocol70::parseMoveByMouse(NetworkMessage &msg)
                               sendCancelWalk("");                 
                          }
   else{     
-  map->addEvent(makeTask(0, MovePlayer(player->getID()), path, 400, StopMovePlayer(player->getID())));
+  game->addEvent(makeTask(0, MovePlayer(player->getID()), path, 400, StopMovePlayer(player->getID())));
  }
 }
 
@@ -419,7 +419,7 @@ void Protocol70::parseMoveByMouse(NetworkMessage &msg)
 void Protocol70::parseMoveNorth(NetworkMessage &msg)
 {
 	this->sleepTillMove();
-  map->thingMove(player, player,
+  game->thingMove(player, player,
                  player->pos.x, player->pos.y-1, player->pos.z);
 }
 
@@ -427,7 +427,7 @@ void Protocol70::parseMoveNorth(NetworkMessage &msg)
 void Protocol70::parseMoveEast(NetworkMessage &msg)
 {
 	this->sleepTillMove();
-  map->thingMove(player, player,
+  game->thingMove(player, player,
                  player->pos.x+1, player->pos.y, player->pos.z);
 }
 
@@ -435,7 +435,7 @@ void Protocol70::parseMoveEast(NetworkMessage &msg)
 void Protocol70::parseMoveSouth(NetworkMessage &msg)
 {
 	this->sleepTillMove();
-  map->thingMove(player, player,
+  game->thingMove(player, player,
                  player->pos.x, player->pos.y+1, player->pos.z);
 }
 
@@ -443,20 +443,20 @@ void Protocol70::parseMoveSouth(NetworkMessage &msg)
 void Protocol70::parseMoveWest(NetworkMessage &msg)
 {
 	this->sleepTillMove();
-  map->thingMove(player, player,
+  game->thingMove(player, player,
                  player->pos.x-1, player->pos.y, player->pos.z);
 }
 
 
 void Protocol70::parseTurnNorth(NetworkMessage &msg)
 {
-	map->creatureTurn(player, NORTH);
+	game->creatureTurn(player, NORTH);
 }
 
 
 void Protocol70::parseTurnEast(NetworkMessage &msg)
 {
-  map->creatureTurn(player, EAST);
+  game->creatureTurn(player, EAST);
   NetworkMessage newmsg;
   newmsg.WriteToSocket(s);
 }
@@ -464,13 +464,13 @@ void Protocol70::parseTurnEast(NetworkMessage &msg)
 
 void Protocol70::parseTurnSouth(NetworkMessage &msg)
 {
-  map->creatureTurn(player, SOUTH);
+  game->creatureTurn(player, SOUTH);
 }
 
 
 void Protocol70::parseTurnWest(NetworkMessage &msg)
 {
-  map->creatureTurn(player, WEST);
+  game->creatureTurn(player, WEST);
   
 }
 
@@ -578,7 +578,7 @@ void Protocol70::parseSetOutfit(NetworkMessage &msg)
 	if (player->sex > 1) {
 		std::cout << "set outfit to: " << (int)(player->lookhead) << " / " << (int)player->lookbody << " / " << (int)player->looklegs << " / " <<  (int)player->lookfeet << std::endl;
 	}
-	map->creatureChangeOutfit(player);
+	game->creatureChangeOutfit(player);
     }
 }
 
@@ -623,7 +623,7 @@ void Protocol70::parseUseItemEx(NetworkMessage &msg)
 				runeSpell.centerpos = pos;
 				runeSpell.minDamage = (int)(((player->level + player->maglevel) * 3) * 1.0);
 				runeSpell.maxDamage = (int)(((player->level + player->maglevel) * 3) * 1.2);
-				decreaseCharge = map->creatureThrowRune(player, runeSpell); 
+				decreaseCharge = game->creatureThrowRune(player, runeSpell); 
 			}
 		else
 			if(item == 1654) {
@@ -655,7 +655,7 @@ void Protocol70::parseUseItemEx(NetworkMessage &msg)
 				fieldRune.direction = 1;
 				fieldRune.minDamage = (int)(((player->level + player->maglevel) * 3) * 0.34) / 2;
 				fieldRune.maxDamage = (int)(((player->level + player->maglevel) * 3) * 0.40) / 2;
-				decreaseCharge = map->creatureThrowRune(player, fieldRune); 
+				decreaseCharge = game->creatureThrowRune(player, fieldRune); 
 			}
 		else
 			if(item == 1663) {
@@ -687,7 +687,7 @@ void Protocol70::parseUseItemEx(NetworkMessage &msg)
 				runeAreaSpell.direction = 1;
 				runeAreaSpell.minDamage = (int)(((player->level + player->maglevel) * 3) * 0.1) / 2;
 				runeAreaSpell.maxDamage = (int)(((player->level + player->maglevel) * 3) * 0.9) / 2;
-				decreaseCharge = decreaseCharge = map->creatureThrowRune(player, runeAreaSpell); 
+				decreaseCharge = decreaseCharge = game->creatureThrowRune(player, runeAreaSpell); 
 			}
 		else
 			if(item == 0x0652) {
@@ -700,7 +700,7 @@ void Protocol70::parseUseItemEx(NetworkMessage &msg)
 				runeSpell.centerpos = pos;
 				runeSpell.minDamage = (int)(((player->level + player->maglevel) * 3) * 1.1) / 2;
 				runeSpell.maxDamage = (int)(((player->level + player->maglevel) * 3) * 1.3) / 2;
-				decreaseCharge = map->creatureThrowRune(player, runeSpell); 
+				decreaseCharge = game->creatureThrowRune(player, runeSpell); 
 			}
 			else if(item == 1643) {
 				static unsigned char area[14][18] = {
@@ -726,7 +726,7 @@ void Protocol70::parseUseItemEx(NetworkMessage &msg)
 				memcpy(&spellGround.area, area, sizeof(area));
 				spellGround.direction = 1;
 				spellGround.groundID = 1190;
-				decreaseCharge = map->creatureThrowRune(player, spellGround); 
+				decreaseCharge = game->creatureThrowRune(player, spellGround); 
 			}
 			else if(item == 1655) {
 				static unsigned char area[14][18] = {
@@ -758,7 +758,7 @@ void Protocol70::parseUseItemEx(NetworkMessage &msg)
 				spellGround.minDamage = 20; //Item::items[spellGround.groundID].damage;
 				spellGround.maxDamage = 20; //Item::items[spellGround.groundID].damage;
 
-				decreaseCharge = map->creatureThrowRune(player, spellGround);
+				decreaseCharge = game->creatureThrowRune(player, spellGround);
 			}
 
 			if(decreaseCharge) {
@@ -922,7 +922,7 @@ void Protocol70::parseThrow(NetworkMessage &msg)
   unsigned short to_y       = msg.GetU16(); 
   unsigned char  to_z       = msg.GetByte();
 
-	map->thingMove(player, from_x, from_y, from_z, from_stack, to_x, to_y, to_z);
+	game->thingMove(player, from_x, from_y, from_z, from_stack, to_x, to_y, to_z);
 }
 
 
@@ -945,7 +945,7 @@ void Protocol70::parseLookAt(NetworkMessage &msg){
 #else
   if(ItemNum == 99) //creature
   {
-         Tile* tile = map->getTile(LookPos.x, LookPos.y, LookPos.z);
+         Tile* tile = game->getTile(LookPos.x, LookPos.y, LookPos.z);
          Creature* creature = tile->creatures.back();
          if(creature){
          if(player == creature)
@@ -976,29 +976,29 @@ void Protocol70::parseSay(NetworkMessage &msg)
     channelId = msg.GetU16();
   std::string text = msg.GetString();
 
-	map->creatureSaySpell(player, text);
+	game->creatureSaySpell(player, text);
 
   switch (type)
   {
     case 0x01:
-      map->creatureSay(player, type, text);
+      game->creatureSay(player, type, text);
       break;
     case 0x02:
-      map->creatureWhisper(player, text);
+      game->creatureWhisper(player, text);
       break;
 
     case 0x03:
-      map->creatureYell(player, text);
+      game->creatureYell(player, text);
       break;
 
     case 0x04:
-      map->creatureSpeakTo(player, receiver, text);
+      game->creatureSpeakTo(player, receiver, text);
       break;
     case 0x05:
-      map->creatureToChannel(player, type, text, channelId);
+      game->creatureToChannel(player, type, text, channelId);
       break;
     case 0x09:
-      map->creatureBroadcastMessage(player, text);
+      game->creatureBroadcastMessage(player, text);
       break;
   }
 

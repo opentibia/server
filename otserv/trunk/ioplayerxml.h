@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// protocoll chooser
+// Base class for the Player Loader/Saver
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -19,49 +19,27 @@
 //////////////////////////////////////////////////////////////////////
 
 
-#include "definitions.h"
-#include "tile.h"
-#include "otsystem.h"
+#ifndef __IOPLAYERXML_H
+#define __IOPLAYERXML_H
 
 #include <string>
 
-#include "protocol.h"
+#include "ioplayer.h"
+#include "player.h"
 
-class Player;
-
-extern Game g_game;
-
-
-Protocol::Protocol()
-{
-}
+#include <libxml/xmlmemory.h>
+#include <libxml/parser.h>
 
 
-Protocol::~Protocol()
-{
-}
+/** Baseclass for all Player-Loaders */
+class IOPlayerXML : protected IOPlayer{
+  public:
+	/** Get a textual description of what source is used
+	  * \returns Name of the source*/
+	char* getSourceDescription(){return "XML";};
+	bool loadPlayer(Player* player, std::string name);
+	IOPlayerXML(){};
+	~IOPlayerXML(){};
+};
 
-
-void Protocol::setPlayer(Player* p)
-{
-	player = p;
-  game    = &g_game;
-}
-
-void Protocol::sleepTillMove(){
-	int ground =	game->getTile(	player->pos.x,
-									player->pos.y,
-									player->pos.z)->ground.getID();
-	long long delay = ((long long)player->lastmove + (long long)player->getStepDuration(Item::items[ground].speed)) -
-				((long long)OTSYS_TIME());
-
-	if(delay > 0){
-             
-        #if __DEBUG__     
-		std::cout << "Delaying "<< player->getName() << " --- " << delay << std::endl;		
-		#endif
-		
-		OTSYS_SLEEP((uint32_t)delay);
-	}
-	player->lastmove = OTSYS_TIME();
-}
+#endif

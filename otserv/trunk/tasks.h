@@ -25,24 +25,24 @@
 
 #include "scheduler.h"
 #include "position.h"
-#include "map.h"
+#include "game.h"
 
-class MovePlayer : public std::binary_function<Map*, Direction, int> {
+class MovePlayer : public std::binary_function<Game*, Direction, int> {
 		  public:
 					 MovePlayer(unsigned long playerid) : _pid(playerid) { }
 
-					 virtual result_type operator()(const first_argument_type& map, const second_argument_type& dir) const {
-								OTSYS_THREAD_LOCK(map->mapLock)
+					 virtual result_type operator()(const first_argument_type& game, const second_argument_type& dir) const {
+								OTSYS_THREAD_LOCK(game->gameLock)
 									// get the player we want to move...
-									Creature* creature = map->getCreatureByID(_pid);
+									Creature* creature = game->getCreatureByID(_pid);
 
 								Player* player = dynamic_cast<Player*>(creature);
 								if (!player) { // player is not available anymore it seems...
-									OTSYS_THREAD_UNLOCK(map->mapLock)
+									OTSYS_THREAD_UNLOCK(game->gameLock)
 										return -1;
 								}
                                 if(player->cancelMove){                                             
-                                OTSYS_THREAD_UNLOCK(map->mapLock)                       
+                                OTSYS_THREAD_UNLOCK(game->gameLock)                       
                                 return 0;
                                 }
                                 
@@ -65,8 +65,8 @@ class MovePlayer : public std::binary_function<Map*, Direction, int> {
 #ifdef __DEBUG__
 								std::cout << "move to: " << dir << std::endl;
 #endif
-								map->thingMove(player, player, pos.x, pos.y, pos.z);
-								OTSYS_THREAD_UNLOCK(map->mapLock)
+								game->thingMove(player, player, pos.x, pos.y, pos.z);
+								OTSYS_THREAD_UNLOCK(game->gameLock)
 
                 return 0;
 					 }
@@ -76,13 +76,13 @@ class MovePlayer : public std::binary_function<Map*, Direction, int> {
 
 };
 
-class StopMovePlayer : public std::unary_function<Map*, bool> {
+class StopMovePlayer : public std::unary_function<Game*, bool> {
 		  public:
 					 StopMovePlayer(unsigned long playerid) : _pid(playerid) { }
 
-					 virtual result_type operator()(const argument_type& map) const {
+					 virtual result_type operator()(const argument_type& game) const {
 									// get the player we want to move...
-									Creature* creature = map->getCreatureByID(_pid);
+									Creature* creature = game->getCreatureByID(_pid);
 
 								Player* player = dynamic_cast<Player*>(creature);
 								if (!player) { // player is not available anymore it seems...

@@ -84,6 +84,7 @@ public:
 
   virtual void drainHealth(int);
   virtual void drainMana(int);
+  virtual void die(){};
   virtual std::string getDescription(bool self = false);
   virtual void setAttackedCreature(unsigned long id);
 
@@ -157,7 +158,7 @@ private:
 	virtual void onTileUpdated(const Position *Pos) { };
 	virtual void onContainerUpdated(Item *item, unsigned char from_id, unsigned char to_id, unsigned char from_slot, unsigned char to_slot, bool remove) {};
 
-  friend class Map;
+  friend class Game;
 
   Direction direction;
 

@@ -35,7 +35,7 @@
 #include "npc.h"
 
 
-Npc::Npc(const char *name, Map* map) : Creature(name)
+Npc::Npc(const char *name, Game* game) : Creature(name)
 {
 	this->loaded = false;
 	std::string filename = "data/npc/" + std::string(name) + ".xml";
@@ -108,7 +108,7 @@ Npc::Npc(const char *name, Map* map) : Creature(name)
 	this->script = new NpcScript(this->scriptname, this);
 	if(!this->script->isLoaded())
 		this->loaded=false;
-	this->map=map;
+	this->game=game;
 }
 
 
@@ -164,8 +164,8 @@ void Npc::onThink(){
 
 
 void Npc::doSay(std::string msg){
-	if(!map->creatureSaySpell(this, msg))
-		this->map->creatureSay(this, 1, msg);
+	if(!game->creatureSaySpell(this, msg))
+		this->game->creatureSay(this, 1, msg);
 }
 
 void Npc::doAttack(int id){
@@ -175,23 +175,23 @@ void Npc::doAttack(int id){
 void Npc::doMove(int direction){
 	switch(direction){
 		case 0:
-			this->map->thingMove(this, this,this->pos.x, this->pos.y+1, this->pos.z);
+			this->game->thingMove(this, this,this->pos.x, this->pos.y+1, this->pos.z);
 		break;
 		case 1:
-			this->map->thingMove(this, this,this->pos.x+1, this->pos.y, this->pos.z);
+			this->game->thingMove(this, this,this->pos.x+1, this->pos.y, this->pos.z);
 		break;
 		case 2:
-			this->map->thingMove(this, this,this->pos.x, this->pos.y-1, this->pos.z);
+			this->game->thingMove(this, this,this->pos.x, this->pos.y-1, this->pos.z);
 		break;
 		case 3:
-			this->map->thingMove(this, this,this->pos.x-1, this->pos.y, this->pos.z);
+			this->game->thingMove(this, this,this->pos.x-1, this->pos.y, this->pos.z);
 		break;
 	}
 }
 
 void Npc::doMoveTo(Position target){
 	if(route.size() == 0 || route.back() != target || route.front() != this->pos){
-		route = this->map->getPathTo(this->pos, target);
+		route = this->game->getPathTo(this->pos, target);
 	}
 	if(route.size()==0){
 		//still no route, means there is none
@@ -202,7 +202,7 @@ void Npc::doMoveTo(Position target){
 	route.pop_front();
 	int dx = nextStep.x - this->pos.x;
 	int dy = nextStep.y - this->pos.y;
-	this->map->thingMove(this, this,this->pos.x + dx, this->pos.y + dy, this->pos.z);
+	this->game->thingMove(this, this,this->pos.x + dx, this->pos.y + dy, this->pos.z);
 }
 
 NpcScript::NpcScript(std::string scriptname, Npc* npc){
@@ -292,7 +292,7 @@ int NpcScript::luaCreatureGetName2(lua_State *L){
 	const char* s = lua_tostring(L, -1);
 	lua_pop(L,1);
 	Npc* mynpc = getNpc(L);
-	Creature *c = mynpc->map->getCreatureByName(s);
+	Creature *c = mynpc->game->getCreatureByName(s);
 	
 	if(c && c->access == 0) {
 		lua_pushnumber(L, c->getID());
@@ -307,7 +307,7 @@ int NpcScript::luaCreatureGetName(lua_State *L){
 	int id = (int)lua_tonumber(L, -1);
 	lua_pop(L,1);
 	Npc* mynpc = getNpc(L);
-	lua_pushstring(L, mynpc->map->getCreatureByID(id)->getName().c_str());
+	lua_pushstring(L, mynpc->game->getCreatureByID(id)->getName().c_str());
 	return 1;
 }
 
@@ -315,7 +315,7 @@ int NpcScript::luaCreatureGetPos(lua_State *L){
 	int id = (int)lua_tonumber(L, -1);
 	lua_pop(L,1);
 	Npc* mynpc = getNpc(L);
-	Creature* c = mynpc->map->getCreatureByID(id);
+	Creature* c = mynpc->game->getCreatureByID(id);
 	
 	if(!c){
 		lua_pushnil(L);
@@ -340,7 +340,7 @@ int NpcScript::luaSelfGetPos(lua_State *L){
 }
 
 int NpcScript::luaActionSay(lua_State* L){
-	int len = lua_strlen(L, -1);
+	int len = (uint32_t)lua_strlen(L, -1);
 	std::string msg(lua_tostring(L, -1), len);
 	lua_pop(L,1);
 	//now, we got the message, we now have to find out

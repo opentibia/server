@@ -1,3 +1,24 @@
+//////////////////////////////////////////////////////////////////////
+// OpenTibia - an opensource roleplaying game
+//////////////////////////////////////////////////////////////////////
+// Account class
+//////////////////////////////////////////////////////////////////////
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software Foundation,
+// Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+//////////////////////////////////////////////////////////////////////
+
+
 #ifndef __ACCOUNT_H__
 #define __ACCOUNT_H__
 
@@ -10,14 +31,13 @@ class Player;
 
 class Account
 {
+	//superflous
+	friend class IOAccount;
 public:
   Account();
   ~Account();
 
-
-  bool openAccount(const std::string &account, const std::string &givenpassword);
-  bool openPlayer(const std::string &name, const std::string &givenpassword, Player &player);
-
+  int accnumber;
   int accType;     // ?
   int premDays;    // Premium days
 
@@ -26,10 +46,6 @@ public:
 
   std::list<std::string> charList;
 
-
-
-protected:
-  bool parseAccountFile(std::string filename);
 };
 
 

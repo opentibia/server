@@ -24,7 +24,7 @@
 
 
 #include "creature.h"
-#include "map.h"
+#include "game.h"
 #include "luascript.h"
 
 extern "C"
@@ -69,7 +69,7 @@ protected:
 class Npc : public Creature
 {
 public:
-  Npc(const char *name, Map* map);
+  Npc(const char *name, Game* game);
   virtual ~Npc();
 
   virtual bool isPlayer() const { return false; };
@@ -88,7 +88,7 @@ public:
 
   fight_t fighttype;
 
-	Map* map;
+	Game* game;
 
   void doSay(std::string msg);
   void doMove(int dir);

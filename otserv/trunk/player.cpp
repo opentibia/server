@@ -214,13 +214,13 @@ int Player::addItem(Item* item, int pos){
 unsigned int Player::getReqSkilltries (int skill, int level, int voc) {
     unsigned short int SkillBases[7] = { 50, 50, 50, 50, 30, 100, 20 };       // follows the order of enum skills_t
     float SkillMultipliers[7][5] = {
-                                   {1.5, 1.5, 1.5, 1.2, 1.1},     // Fist
-                                   {2, 2, 1.8, 1.2, 1.1},         // Club
-                                   {2, 2, 1.8, 1.2, 1.1},         // Sword
-                                   {2, 2, 1.8, 1.2, 1.1},         // Axe
-                                   {2, 2, 1.8, 1.4, 1.1},         // Distance
-                                   {1.5, 1.5, 1.5, 1.1, 1.1},     // Shielding
-                                   {1.1, 1.1, 1.1, 1.1, 1.1}      // Fishing
+                                   {1.5f, 1.5f, 1.5f, 1.2f, 1.1f},     // Fist
+                                   {2.0f, 2.0f, 1.8f, 1.2f, 1.1f},         // Club
+                                   {2.0f, 2.0f, 1.8f, 1.2f, 1.1f},         // Sword
+                                   {2.0f, 2.0f, 1.8f, 1.2f, 1.1f},         // Axe
+                                   {2.0f, 2.0f, 1.8f, 1.4f, 1.1f},         // Distance
+                                   {1.5f, 1.5f, 1.5f, 1.1f, 1.1f},     // Shielding
+                                   {1.1f, 1.1f, 1.1f, 1.1f, 1.1f}      // Fishing
                                    };
                                    
     return (int) ( SkillBases[skill] * pow((float) SkillMultipliers[skill][voc], (float) ( level - 11) ) );
@@ -260,7 +260,7 @@ skills[skill][SKILL_TRIES] += skilltry;
 
 
 //Need skill up?
-if (skills[skill][SKILL_TRIES] >= getReqSkilltries (skill, (skills[skill][SKILL_LEVEL] + 1), voc))
+if ((unsigned)skills[skill][SKILL_TRIES] >= getReqSkilltries (skill, (skills[skill][SKILL_LEVEL] + 1), voc))
 {
    skills[skill][SKILL_LEVEL]++;
    skills[skill][SKILL_TRIES] = 0;
@@ -282,7 +282,7 @@ if (skills[skill][SKILL_TRIES] >= getReqSkilltries (skill, (skills[skill][SKILL_
 unsigned int Player::getReqMana(int maglevel, int voc) {
   //ATTANTION: MAKE SURE THAT CHARS HAVE REASONABLE MAGIC LEVELS. ESPECIALY KNIGHTS!!!!!!!!!!!
 
-  float ManaMultiplier[5] = { 0, 1.1, 1.1, 1.4, 3 };
+  float ManaMultiplier[5] = { 0, 1.1f, 1.1f, 1.4f, 3 };
   
   return (unsigned int) ( 400 * pow(ManaMultiplier[voc], maglevel-1) );       //will calculate required mana for a magic level
 }
@@ -477,7 +477,7 @@ void Player::savePlayer(std::string &name)
        
        //Player died?
 	   int reqExp =  getExpForLv(level);
-	   if (experience < reqExp)
+	   if (experience < (unsigned )reqExp)
 		    {                     
             level -= 1;
             healthmax -= HPGain[voc];

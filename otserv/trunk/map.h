@@ -24,8 +24,6 @@
 
 
 #include <queue>
-#include <libxml/xmlmemory.h>
-#include <libxml/parser.h>
 
 #include "position.h"
 #include "item.h"
@@ -36,14 +34,14 @@
 #include "scheduler.h"
 #include "networkmessage.h"
 
-
 class Creature;   // see creature.h
 class Player;
-
+class Game;
 
 
 #define MAP_WIDTH    512
 #define MAP_HEIGHT   512
+
 #define MAP_LAYER     16
 
 
@@ -111,12 +109,20 @@ struct tiletargetdata {
 	unsigned char thingCount;
 };
 
+/**
+  * A Node inside the A*-Algorithm
+  */
 struct AStarNode{
+	/** Current position */
 	int x,y;
+	/** Parent of this node. Null if this is the rootnode */
 	AStarNode* parent;
+	/** Heuristics variable */
 	float f, g, h;
+	/** Operator to sort so we can find the best node */
 	bool operator<(const AStarNode &node){return this->h < node.h;}
 };
+
 
 template<class T> class lessPointer : public std::binary_function<T*, T*, bool> {
 		  public:
@@ -125,105 +131,74 @@ template<class T> class lessPointer : public std::binary_function<T*, T*, bool> 
 		  }
 };
 
+/**
+  * Map class.
+  * Holds all the actual map-data
+  */
 class Map {
   public:
     Map();
     ~Map();
-		
-    bool LoadMap(std::string filename);
 
+	/** Lock the map */
+	void lock(){OTSYS_THREAD_LOCK(mapLock);};
+
+	/** Unlock the map */
+	void unlock(){OTSYS_THREAD_UNLOCK(mapLock);};
+
+	/**
+	  * Load a map.
+	  * \param filename Mapfile to load
+	  * \returns Bool if load was successful.
+	  */
+    bool loadMap(std::string filename);
+
+	/**
+	  * Get a single tile.
+	  * \returns A pointer to that tile.
+	  */
     Tile* getTile(unsigned short _x, unsigned short _y, unsigned char _z);
 
-    std::map<long, Creature*> playersOnline;
-
-    bool placeCreature(Creature* c);
+	/**
+	  * Place a creature on the map
+	  * \param c Creature pointer to the creature to place
+	  * \returns The postition the Creature was actually added at
+	  */
+    Position placeCreature(Creature* c);
+	
+	/**
+	  * Remove a creature from the map.
+	  * \param c Creature pointer to the creature to remove
+	  */
     bool removeCreature(Creature* c);
 
-    void thingMove(Creature *player, Thing *thing,
-        unsigned short to_x, unsigned short to_y, unsigned char to_z);
-
-    void thingMove(Creature *player,
-        unsigned short from_x, unsigned short from_y, unsigned char from_z,
-        unsigned char stackPos,
-        unsigned short to_x, unsigned short to_y, unsigned char to_z);
-
-		void creatureTurn(Creature *creature, Direction dir);
-
-    void creatureSay(Creature *creature, unsigned char type, const std::string &text);
-    void creatureWhisper(Creature *creature, const std::string &text);
-    void creatureYell(Creature *creature, std::string &text);
-    void creatureSpeakTo(Creature *creature, const std::string &receiver, const std::string &text);
-    void creatureBroadcastMessage(Creature *creature, const std::string &text);
-    void creatureToChannel(Creature *creature, unsigned char type, const std::string &text, unsigned short channelId);
-	  void creatureChangeOutfit(Creature *creature);
-
-	  bool creatureThrowRune(Creature *creature, const MagicEffectClass& me);
-  	void creatureCastSpell(Creature *creature, const MagicEffectClass& me);
-		bool creatureSaySpell(Creature *creature, const std::string &text);
-     void changeOutfitAfter(unsigned long id, int looktype, long time);
-     void changeSpeed(unsigned long id, unsigned short speed);
-    //void addEvent(long ticks, int type, void *data);
-	  void addEvent(SchedulerTask*);
-   
-   
-    Creature* getCreatureByID(unsigned long id);
-		Creature* getCreatureByName(const char* s);
-
+	/**
+	  * Get the path to a specific position on the map.
+	  * \param start The start position of the path
+	  * \param to The destination position
+	  * \param creaturesBlock Wether a Creature is an obstacle or not
+	  * \returns A list of all positions you have to traverse to reacg the destination
+	  */
 	std::list<Position> getPathTo(Position start, Position to, bool creaturesBlock=true);
-	bool canThrowItemTo(Position from, Position to, bool creaturesBlock=true);
-	//bool canThrowItemTo(int x0, int y0, int x1, int y1, int floor);
 
-    OTSYS_THREAD_LOCKVAR mapLock;
+	/** The Map-Lock */
+	OTSYS_THREAD_LOCKVAR mapLock;
   protected:
-    // use this internal function to move things around to avoid the need of
-    // recursive locks
-		//bool OnPrepareMoveInternal(const Thing *thing);
-    void thingMoveInternal(Creature *player,
-        unsigned short from_x, unsigned short from_y, unsigned char from_z,
-        unsigned char stackPos,
-        unsigned short to_x, unsigned short to_y, unsigned char to_z);
-
-    void changeOutfit(unsigned long id, int looktype);
-		bool creatureOnPrepareAttack(Creature *creature, Position pos);
-		void creatureMakeDamage(Creature *creature, Creature *attackedCreature, fight_t damagetype);
-    void creatureBroadcastTileUpdated(const Position& pos);
-		bool creatureMakeMagic(Creature *creature, const MagicEffectClass* me);
-
-		void CreateDamageUpdate(Creature* player, Creature* attackCreature, int damage, NetworkMessage& msg);
-	  void getSpectators(const Range& range, std::vector<Creature*>& list);
-	  void getAreaTiles(Position pos, const unsigned char area[14][18], unsigned char dir, std::list<tiletargetdata>& list);
-		void creatureApplyMagicEffect(Creature *target, const MagicEffectClass& me, NetworkMessage& msg);
-	  void CreateManaDamageUpdate(Creature* player, Creature* attackCreature, int damage, NetworkMessage& msg);
-
-    OTSYS_THREAD_LOCKVAR eventLock;
-	  OTSYS_THREAD_SIGNALVAR eventSignal;
-
-    static OTSYS_THREAD_RETURN eventThread(void *p);
-
-    struct MapEvent
-    {
-      __int64  tick;
-      int      type;
-      void*    data;
-    };
-
-    void checkPlayerAttacking(unsigned long id);
-    void checkPlayer(unsigned long id);
-    void decayItem(Item* item);
-    void decaySplash(Item* item);
-
-	 std::priority_queue<SchedulerTask*, std::vector<SchedulerTask*>, lessSchedTask > eventList;
-    //list<MapEvent> *eventLists[12000];
-
-    int loadMapXml(const char *filename);
-
+    /**
+	  * Get the Creatures within a specific Range */
+	void getSpectators(const Range& range, std::vector<Creature*>& list);
+	void getAreaTiles(Position pos, const unsigned char area[14][18], unsigned char dir, std::list<tiletargetdata>& list);
 
     typedef std::map<unsigned long, Tile*> TileMap;
-    TileMap tileMaps[64][64][MAP_LAYER];
+
+	TileMap tileMaps[64][64][MAP_LAYER];
 
     void Map::setTile(unsigned short _x, unsigned short _y, unsigned char _z, unsigned short groundId);
-
-	 uint32_t max_players;
+	
+	friend class Game;
+	//FIXME friend for derived classes?
+	friend class IOMapXML;
+	friend class IOMap;
 };
 
 #endif

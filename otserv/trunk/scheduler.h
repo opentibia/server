@@ -25,9 +25,9 @@
 #include <functional>
 #include "otsystem.h"
 
-class Map;
+class Game;
 
-class SchedulerTask : public std::unary_function<Map*, int> {
+class SchedulerTask : public std::unary_function<Game*, int> {
 		  public:
 					 inline __int64 getCycle() const {
 								return _cycle;

@@ -23,7 +23,7 @@
 #define __spells_h_
 
 
-#include "map.h"
+#include "game.h"
 #include "luascript.h"
 #include "player.h"
 
@@ -43,11 +43,11 @@ class SpellScript;
 class Spells
 {
 public:
-  Spells(Map* map);
+  Spells(Game* game);
   bool loadFromXml();
   virtual ~Spells();
 
-	Map* map;
+	Game* game;
 
   bool isLoaded(){return loaded;}
   std::map<std::string, Spell*>* getVocSpells(int voc){
@@ -71,10 +71,10 @@ protected:
 class Spell
 {
 public:
-  Spell(std::string name, std::string words, int magLv, int mana, Map* map);
+  Spell(std::string name, std::string words, int magLv, int mana, Game* game);
   virtual ~Spell();
 
-	Map* map;
+	Game* game;
 
   bool isLoaded(){return loaded;}
 SpellScript* getSpellScript(){return script;};

@@ -63,3 +63,11 @@ allowclones = 0
 
 -- vocation names
 vocations = {"a sorcerer", "a druid", "a paladin", "a knight"}
+
+
+--- SQL part (probaly buggy)
+sql_host = "localhost"
+sql_user = "root"
+sql_pass = ""
+sql_db   = "otserv"
+----------------------------

@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// protocoll chooser
+// Base class for the Account Loader/Saver
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,50 +18,18 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
+#include "ioplayer.h"
+#include "ioplayerxml.h"
 
-#include "definitions.h"
-#include "tile.h"
-#include "otsystem.h"
+IOPlayer* IOPlayer::_instance = NULL;
 
-#include <string>
-
-#include "protocol.h"
-
-class Player;
-
-extern Game g_game;
-
-
-Protocol::Protocol()
-{
-}
-
-
-Protocol::~Protocol()
-{
-}
-
-
-void Protocol::setPlayer(Player* p)
-{
-	player = p;
-  game    = &g_game;
-}
-
-void Protocol::sleepTillMove(){
-	int ground =	game->getTile(	player->pos.x,
-									player->pos.y,
-									player->pos.z)->ground.getID();
-	long long delay = ((long long)player->lastmove + (long long)player->getStepDuration(Item::items[ground].speed)) -
-				((long long)OTSYS_TIME());
-
-	if(delay > 0){
-             
-        #if __DEBUG__     
-		std::cout << "Delaying "<< player->getName() << " --- " << delay << std::endl;		
-		#endif
-		
-		OTSYS_SLEEP((uint32_t)delay);
+IOPlayer* IOPlayer::instance(){
+	if(!_instance){
+		_instance = (IOPlayer*)new IOPlayerXML;
 	}
-	player->lastmove = OTSYS_TIME();
+	return _instance;
+}
+
+bool IOPlayer::loadPlayer(Player* player, std::string name){
+	return false;
 }

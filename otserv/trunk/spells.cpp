@@ -34,7 +34,7 @@
 
 #include "spells.h"
 
-Spells::Spells(Map* imap): map(imap){
+Spells::Spells(Game* igame): game(igame){
                    
                    }
 
@@ -83,7 +83,7 @@ bool Spells::loadFromXml()
 		                                     if ((const char*)xmlGetProp(p, (const xmlChar *)"mana")) {
 			                                    mana = atoi((const char*)xmlGetProp(p, (const xmlChar *)"mana"));
 		                                     }
-		                                     Spell* spell = new Spell(name, words, maglv, mana, map);
+		                                     Spell* spell = new Spell(name, words, maglv, mana, game);
 				                             tmp=p->children;
 				                             while (tmp){
                                                    if (strcmp((const char*)tmp->name, "vocation") == 0){
@@ -116,7 +116,7 @@ Spells::~Spells(){
 									}
                  }
 
-Spell::Spell(std::string iname, std::string iwords, int imagLv, int imana, Map* imap) : name(iname), words(iwords), magLv(imagLv), mana(imana), map(imap){
+Spell::Spell(std::string iname, std::string iwords, int imagLv, int imana, Game* igame) : name(iname), words(iwords), magLv(imagLv), mana(imana), game(igame){
                         //now try to load the script
 	                this->script = new SpellScript(std::string("data/spells/")+(this->words)+std::string(".lua"), this);
 	                if(!this->script->isLoaded())
@@ -257,7 +257,7 @@ int SpellScript::luaActionDoSpell(lua_State *L){
    Spell* spell = getSpell(L);
    magicInstant.manaCost = spell->getMana();
    
-   Creature* creature = spell->map->getCreatureByID((unsigned long)lua_tonumber(L, -1));
+   Creature* creature = spell->game->getCreatureByID((unsigned long)lua_tonumber(L, -1));
    lua_pop(L,1);
    
    if(needDirection){
@@ -274,7 +274,7 @@ int SpellScript::luaActionDoSpell(lua_State *L){
    Position pos = Position(cx, cy, cz);
 
 	 magicInstant.centerpos = pos;
-   spell->map->creatureCastSpell(creature, magicInstant);
+   spell->game->creatureCastSpell(creature, magicInstant);
    return 0;
 }
 int SpellScript::luaActionChangeOutfit(lua_State *L){
@@ -284,13 +284,13 @@ int SpellScript::luaActionChangeOutfit(lua_State *L){
 	lua_pop(L,1);
 	
 	Spell* spell = getSpell(L);
-	Creature* creature = spell->map->getCreatureByID((unsigned long)lua_tonumber(L, -1));
+	Creature* creature = spell->game->getCreatureByID((unsigned long)lua_tonumber(L, -1));
 	lua_pop(L,1);
 	
 	creature->looktype = looktype;
-	spell->map->creatureChangeOutfit(creature);
+	spell->game->creatureChangeOutfit(creature);
 	
-  spell->map->changeOutfitAfter(creature->getID(), creature->lookmaster, time);
+  spell->game->changeOutfitAfter(creature->getID(), creature->lookmaster, time);
   return 0;
 }
 
@@ -299,7 +299,7 @@ int SpellScript::luaActionManaShield(lua_State *L){
 	lua_pop(L,1);
 	
 	Spell* spell = getSpell(L);
-	Creature* creature = spell->map->getCreatureByID((unsigned long)lua_tonumber(L, -1));
+	Creature* creature = spell->game->getCreatureByID((unsigned long)lua_tonumber(L, -1));
 	lua_pop(L,1);
 	creature->manaShieldTicks = time;
 	
@@ -317,13 +317,13 @@ int SpellScript::luaActionChangeSpeed(lua_State *L){
 	lua_pop(L,1);
 	
 	Spell* spell = getSpell(L);
-	Creature* creature = spell->map->getCreatureByID((unsigned long)lua_tonumber(L, -1));
+	Creature* creature = spell->game->getCreatureByID((unsigned long)lua_tonumber(L, -1));
 	lua_pop(L,1);
 	
-	spell->map->addEvent(makeTask(time, boost::bind(&Map::changeSpeed, spell->map,creature->getID(), creature->getNormalSpeed()) ) );
+	spell->game->addEvent(makeTask(time, boost::bind(&Game::changeSpeed, spell->game,creature->getID(), creature->getNormalSpeed()) ) );
 	Player* p = dynamic_cast<Player*>(creature);
 	if(p){
-         spell->map->changeSpeed(creature->getID(), creature->getNormalSpeed()+speed); 
+         spell->game->changeSpeed(creature->getID(), creature->getNormalSpeed()+speed); 
 	     p->sendIcons();
       }
     creature->hasteTicks = time;  
@@ -332,7 +332,7 @@ int SpellScript::luaActionChangeSpeed(lua_State *L){
 
 int SpellScript::luaActionGetSpeed(lua_State *L){
 	Spell* spell = getSpell(L);
-	Creature* creature = spell->map->getCreatureByID((unsigned long)lua_tonumber(L, -1));
+	Creature* creature = spell->game->getCreatureByID((unsigned long)lua_tonumber(L, -1));
 	lua_pop(L,1);
 	
 	lua_pushnumber(L, creature->getNormalSpeed());
@@ -343,7 +343,7 @@ int SpellScript::luaActionGetPos(lua_State *L){
 	const char* s = lua_tostring(L, -1);
 	lua_pop(L,1);
 	Spell* spell = getSpell(L);
-	Creature* c = spell->map->getCreatureByName(s);
+	Creature* c = spell->game->getCreatureByName(s);
 	Player* p = dynamic_cast<Player*>(c);
 	if(!c || !p){
       lua_newtable(L);

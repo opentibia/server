@@ -31,7 +31,10 @@
 
 #include <stdlib.h>
 #include <time.h>
-#include "map.h"
+#include "game.h"
+
+#include "ioaccount.h"
+#include "ioplayer.h"
 
 #include "status.h"
 #include "spells.h"
@@ -51,8 +54,8 @@ std::vector< std::pair<unsigned long, unsigned long> > serverIPs;
 LuaScript g_config;
 
 Items Item::items;
-Map gmap;
-Spells spells(&gmap);
+Game g_game;
+Spells spells(&g_game);
 
 #include "networkmessage.h"
 
@@ -84,7 +87,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
       if (getpeername(s, (sockaddr*)&sain, &salen) == 0)
       {
         unsigned long clientip = *(unsigned long*)&sain.sin_addr;
-        for (int i = 0; i < serverIPs.size(); i++)
+        for (unsigned int i = 0; i < serverIPs.size(); i++)
           if ((serverIPs[i].first & serverIPs[i].second) == (clientip & serverIPs[i].second))
           {
             serverip = serverIPs[i].first;
@@ -94,11 +97,9 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 
       msg.Reset();
 
-      Account account;
-      char accstring[16];
-	    sprintf(accstring, "%i", accnumber);
-
-      if (account.openAccount(accstring, password))
+      
+		Account account=IOAccount::instance()->loadAccount(accnumber);
+		if (account.accnumber == accnumber) // seems to be a successful load
       {
         msg.AddByte(0x14);
 	std::stringstream motd;
@@ -108,7 +109,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
         msg.AddString(motd.str());
 
         msg.AddByte(0x64);
-        msg.AddByte(account.charList.size());
+        msg.AddByte((uint8_t)account.charList.size());
 
 		    std::list<std::string>::iterator it;
         for (it = account.charList.begin(); it != account.charList.end(); it++)
@@ -144,13 +145,13 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
       Player *player;
       player = new Player(name.c_str(), protocol);
       player->usePlayer();
+	  IOPlayer::instance()->loadPlayer(player, name);
 
       protocol->setPlayer(player);
 
-      Account account;
-      if (account.openPlayer(name, password, *player))
+      if (player->password == password)
       {
-		  if(gmap.getCreatureByName(name.c_str()) != NULL && ! g_config.getGlobalNumber("allowclones", 0)){
+		  if(g_game.getCreatureByName(name.c_str()) != NULL && ! g_config.getGlobalNumber("allowclones", 0)){
 					std::cout << "reject player..." << std::endl;
 				    msg.Reset();
 				    msg.AddByte(0x14);
@@ -175,7 +176,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 		if(msg.GetRaw() == "info"){
 			Status* status =Status::instance();
 			std::string str = status->getStatusString();
-			send(s, str.c_str(), str.size(), 0); 
+			send(s, str.c_str(), (int)str.size(), 0); 
 		}
 	}
   }
@@ -248,7 +249,7 @@ std::cout << ":: Loading spells spells.xml... ";
 
 
   // load map file
-  gmap.LoadMap(g_config.getGlobalString("mapfile"));
+  g_game.loadMap(g_config.getGlobalString("mapfile"));
 
 
   // Call to WSA Startup on Windows Systems...
