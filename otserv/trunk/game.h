@@ -31,6 +31,7 @@
 #include "item.h"
 #include "container.h"
 #include "creature.h"
+#include "player.h"
 #include "magic.h"
 #include "otsystem.h"
 #include "map.h"
@@ -55,7 +56,7 @@ class Player;
 
 class Game {
   public:
-    Game();
+		Game();
     ~Game();
 	
 	/**
@@ -74,7 +75,7 @@ class Game {
 	  * Set a Tile to a specific ground id
 	  * \param groundId ID of the ground to set
 	  */
-	void setTile(unsigned short _x, unsigned short _y, unsigned char _z, unsigned short groundId);
+		void setTile(unsigned short _x, unsigned short _y, unsigned char _z, unsigned short groundId);
 
 	/** List holding the creatures in the game
 	  * \todo This also contains NPCs, should change the name and rework max_players to work with this */
@@ -92,22 +93,40 @@ class Game {
 	  * Removes the Creature from playersOnline and from the map
 	  * \param c Creature to remove
 	  */
-	bool removeCreature(Creature* c);
+		bool removeCreature(Creature* c);
 
     void thingMove(Creature *player, Thing *thing,
         unsigned short to_x, unsigned short to_y, unsigned char to_z);
+	
+		//container/inventory to container/inventory
+		void thingMove(Creature *player,
+				unsigned char from_cid, unsigned char from_slotid,
+				unsigned char to_cid, unsigned char to_slotid,
+				bool isInventory);
 
+		//container/inventory to ground
+		void thingMove(Creature *player,
+				unsigned char from_cid, unsigned char from_slotid, const Position& toPos,
+				bool isInventory);
+
+		//ground to container/inventory
+		void thingMove(Creature *player,
+				const Position& fromPos, unsigned char stackPos,
+				unsigned char to_cid, unsigned char to_slotid,
+				bool isInventory);
+		
+		//ground to ground
     void thingMove(Creature *player,
         unsigned short from_x, unsigned short from_y, unsigned char from_z,
         unsigned char stackPos,
         unsigned short to_x, unsigned short to_y, unsigned char to_z);
-	
+
 	/**
 	  * Creature wants to turn.
 	  * \param creature Creature pointer
 	  * \param dir Direction to turn to
 	  */
-	void creatureTurn(Creature *creature, Direction dir);
+		void creatureTurn(Creature *creature, Direction dir);
 
 	/**
 	  * Creature wants to say something.
@@ -116,90 +135,104 @@ class Game {
 	  * \todo document types
 	  * \param text The text to say
 	  */
-	void creatureSay(Creature *creature, unsigned char type, const std::string &text);
+		void creatureSay(Creature *creature, unsigned char type, const std::string &text);
 
     void creatureWhisper(Creature *creature, const std::string &text);
     void creatureYell(Creature *creature, std::string &text);
     void creatureSpeakTo(Creature *creature, const std::string &receiver, const std::string &text);
     void creatureBroadcastMessage(Creature *creature, const std::string &text);
     void creatureToChannel(Creature *creature, unsigned char type, const std::string &text, unsigned short channelId);
-	void creatureChangeOutfit(Creature *creature);
+		void creatureChangeOutfit(Creature *creature);
 
-	//bool creatureThrowRune(Creature *creature, const MagicEffectClass& me);
-  //void creatureCastSpell(Creature *creature, const MagicEffectClass& me);
-	bool creatureThrowRune(Creature *creature, const Position& centerpos, const MagicEffectClass& me);
-	bool creatureCastSpell(Creature *creature, const Position& centerpos, const MagicEffectClass& me);
-	bool creatureSaySpell(Creature *creature, const std::string &text);
-	bool creatureUseItem(Creature *creature, const Position& pos, Item* item);
+		//bool creatureThrowRune(Creature *creature, const MagicEffectClass& me);
+		//void creatureCastSpell(Creature *creature, const MagicEffectClass& me);
+		bool creatureThrowRune(Creature *creature, const Position& centerpos, const MagicEffectClass& me);
+		bool creatureCastSpell(Creature *creature, const Position& centerpos, const MagicEffectClass& me);
+		bool creatureSaySpell(Creature *creature, const std::string &text);
+		bool creatureUseItem(Creature *creature, const Position& pos, Item* item);
     void changeOutfitAfter(unsigned long id, int looktype, long time);
     void changeSpeed(unsigned long id, unsigned short speed);
     void addEvent(long ticks, int type, void *data);
-	void addEvent(SchedulerTask*);
+		void addEvent(SchedulerTask*);
    
    
     Creature* getCreatureByID(unsigned long id);
-	Creature* getCreatureByName(const char* s);
+		Creature* getCreatureByName(const char* s);
 
-	std::list<Position> getPathTo(Position start, Position to, bool creaturesBlock=true);
+		std::list<Position> getPathTo(Position start, Position to, bool creaturesBlock=true);
 
-	/** Lockvar for Game. */
+		/** Lockvar for Game. */
     OTSYS_THREAD_LOCKVAR gameLock;
+
   protected:
-    // use this internal function to move things around to avoid the need of
+		bool onPrepareMoveThing(Creature *player, const Thing* thing, const Position& fromPos, const Position& toPos);
+		bool onPrepareMoveThing(Creature *player, const Thing* thing, const Tile *fromTile, const Tile *toTile);
+		bool onPrepareMoveThing(Creature *player, const Item* item, const Container *fromContainer, const Container *toContainer);
+		bool onPrepareMoveCreature(Creature *player, const Creature* creatureMoving, const Tile *fromTile, const Tile *toTile);
+
+		void thingMoveInternal(Creature *player,
+				unsigned char from_cid, unsigned char from_slotid,
+				unsigned char to_cid, unsigned char to_slotid, bool isInventory);
+
+		void thingMoveInternal(Creature *player,
+				unsigned char from_cid, unsigned char from_slotid, const Position& toPos,
+				bool isInventory);
+
+		void thingMoveInternal(Creature *player,
+				const Position& fromPos, unsigned char stackPos,
+				unsigned char to_cid, unsigned char to_slotid,
+				bool isInventory);
+
+		// use this internal function to move things around to avoid the need of
     // recursive locks
     void thingMoveInternal(Creature *player,
         unsigned short from_x, unsigned short from_y, unsigned char from_z,
         unsigned char stackPos,
         unsigned short to_x, unsigned short to_y, unsigned char to_z);
 
-    void changeOutfit(unsigned long id, int looktype);
-	bool creatureOnPrepareAttack(Creature *creature, Position pos);
-	void creatureMakeDamage(Creature *creature, Creature *attackedCreature, fight_t damagetype);
-    void creatureBroadcastTileUpdated(const Position& pos);
-    void teleport(Creature *creature, Position newPos);
+		void changeOutfit(unsigned long id, int looktype);
+		bool creatureOnPrepareAttack(Creature *creature, Position pos);
+		void creatureMakeDamage(Creature *creature, Creature *attackedCreature, fight_t damagetype);
+		void creatureBroadcastTileUpdated(const Position& pos);
+		void teleport(Creature *creature, Position newPos);
 
-	bool creatureMakeMagic(Creature *creature, const Position& centerpos, const MagicEffectClass* me);
-	bool creatureOnPrepareMagicAttack(Creature *creature, Position pos, const MagicEffectClass* me);
-	bool creatureOnPrepareMagicCreateSolidObject(Creature *creature, const Position& pos, const MagicEffectTargetGroundClass* magicGround);
+		bool creatureMakeMagic(Creature *creature, const Position& centerpos, const MagicEffectClass* me);
+		bool creatureOnPrepareMagicAttack(Creature *creature, Position pos, const MagicEffectClass* me);
+		//bool creatureOnPrepareMagicCreateSolidObject(Creature *creature, const Position& pos, const MagicEffectTargetGroundClass* magicGround);
 	
 	/**
-	* Change the players hitpoints
-	* Return: the mana damage and the actual hitpoint loss
-	*/
-	void creatureApplyDamage(Creature *creature, int damage, int &outDamage, int &outManaDamage);
+		* Change the players hitpoints
+		* Return: the mana damage and the actual hitpoint loss
+		*/
+		void creatureApplyDamage(Creature *creature, int damage, int &outDamage, int &outManaDamage);
 
-	//bool creatureMakeMagicSolidObject(const MagicEffectTargetGroundClass* magicGround
-	//creatureMakeFieldItem(const Position& pos, );
+		void CreateDamageUpdate(Creature* player, Creature* attackCreature, int damage, NetworkMessage& msg);
+		void getSpectators(const Range& range, std::vector<Creature*>& list);
+		void creatureApplyMagicEffect(Creature *target, const MagicEffectClass& me, NetworkMessage& msg);
+		void CreateManaDamageUpdate(Creature* player, Creature* attackCreature, int damage, NetworkMessage& msg);
 
-	void CreateDamageUpdate(Creature* player, Creature* attackCreature, int damage, NetworkMessage& msg);
-	void getSpectators(const Range& range, std::vector<Creature*>& list);
-	//void getAreaTiles(Position pos, const unsigned char area[14][18], unsigned char dir, std::list<tiletargetdata>& list);
-	void creatureApplyMagicEffect(Creature *target, const MagicEffectClass& me, NetworkMessage& msg);
-	void CreateManaDamageUpdate(Creature* player, Creature* attackCreature, int damage, NetworkMessage& msg);
+		OTSYS_THREAD_LOCKVAR eventLock;
+		OTSYS_THREAD_SIGNALVAR eventSignal;
 
-    OTSYS_THREAD_LOCKVAR eventLock;
-	OTSYS_THREAD_SIGNALVAR eventSignal;
+		static OTSYS_THREAD_RETURN eventThread(void *p);
 
-    static OTSYS_THREAD_RETURN eventThread(void *p);
+		struct GameEvent
+		{
+			__int64  tick;
+			int      type;
+			void*    data;
+		};
 
-    struct GameEvent
-    {
-      __int64  tick;
-      int      type;
-      void*    data;
-    };
+		void checkPlayerAttacking(unsigned long id);
+		void checkPlayer(unsigned long id);
+		void decayItem(Item* item);
+		void decaySplash(Item* item);
 
-    void checkPlayerAttacking(unsigned long id);
-    void checkPlayer(unsigned long id);
-    void decayItem(Item* item);
-    void decaySplash(Item* item);
+		std::priority_queue<SchedulerTask*, std::vector<SchedulerTask*>, lessSchedTask > eventList;
 
-	std::priority_queue<SchedulerTask*, std::vector<SchedulerTask*>, lessSchedTask > eventList;
+		uint32_t max_players;
 
-	uint32_t max_players;
-
-	Map* map;
-
+		Map* map;
 };
 
 

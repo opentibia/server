@@ -63,6 +63,13 @@ extern std::map<long, Creature*> channel;
 MapState::MapState(Map* imap)
 : map(imap)
 {
+	/*
+	dummyData.isBlocking = false;
+	dummyData.pos.x = 0;
+	dummyData.pos.y = 0;
+	dummyData.pos.z = 0;
+	dummyData.thingCount = 0;
+	*/
 }
 
 
@@ -221,10 +228,27 @@ void MapState::getMapChanges(Player *spectator, NetworkMessage &msg)
 void MapState::addTile(Tile *t, Position& tilepos)
 {
 	if(t) {
+		TilePreChangeData &pd = preChangeItemMap[t];
+		pd.pos = tilepos;
+		pd.thingCount = t->getThingCount();
+		pd.isBlocking = t->isBlocking();
+		
+		/*
 		preChangeItemMap[t].pos = tilepos;
 		preChangeItemMap[t].thingCount = t->getThingCount();
+		*/
 	}
 }
+
+/*
+const TilePreChangeData& MapState::getStoredProperties(Tile *t)
+{
+	if(isTileStored(t)) {
+		return preChangeItemMap[t];
+	}
+	else return dummyData;
+}
+*/
 
 Map::Map()
 {
@@ -292,7 +316,7 @@ void Map::setTile(unsigned short _x, unsigned short _y, unsigned char _z, unsign
 
 Position Map::placeCreature(Creature* c){
 	Position pos = c->pos;
-	/*if (!c->canMovedTo(getTile(pos.x, pos.y, pos.z)))
+	if (!c->canMovedTo(getTile(pos.x, pos.y, pos.z)))
 	{   
 		bool found =false;
 		for(int cx =pos.x-1; cx <= pos.x+1 && !found; cx++){
@@ -310,7 +334,7 @@ Position Map::placeCreature(Creature* c){
 			pos.y = c->masterPos.y;
 			pos.z = c->masterPos.z;
 		}    
-	}*/
+	}
 	Tile* tile=getTile(pos.x, pos.y, pos.z);
 	if (!tile){
          pos = Position();
@@ -337,17 +361,29 @@ bool Map::removeCreature(Creature* c)
 
 void Map::getSpectators(const Range& range, std::vector<Creature*>& list)
 {
+/*
 #ifdef __DEBUG__
 	std::cout << "Viewer position at x: " << range.centerpos.x
 		<< ", y: " << range.centerpos.y
 		<< ", z: " << range.centerpos.z << std::endl;
 #endif
+*/
 
 	int offset;
 	CreatureVector::iterator cit;
 	Tile *tile;
 
+	//for(int nz = range.minRange.z; nz != range.maxRange.z + range.zstep; nz += range.zstep) {
 	for(int nz = range.minRange.z; nz != range.maxRange.z + range.zstep; nz += range.zstep) {
+		//centerpos.z = 9
+		//9 - (9 - (-2)) = -2
+		//9 - (9 - (-1)) = -1
+		//9 - (9 - (0)) = 0
+		//9 - (9 - 1) = 1
+
+		//centerpos.z = 7
+		//7 - (7 - 7) = 7
+		//offset = range.centerpos.z - (range.centerpos.z - nz);
 		offset = range.centerpos.z - nz;
 		//negative offset means that the player is on a lower floor than ourself
 
@@ -359,9 +395,11 @@ void Map::getSpectators(const Range& range, std::vector<Creature*>& list)
 				if (tile)
 				{
 					for (cit = tile->creatures.begin(); cit != tile->creatures.end(); ++cit) {
+/*
 #ifdef __DEBUG__
 						std::cout << "Found " << (*cit)->getName() << " at x: " << (*cit)->pos.x << ", y: " << (*cit)->pos.y << ", z: " << (*cit)->pos.z << ", offset: " << offset << std::endl;
 #endif
+*/
 						list.push_back((*cit));
 					}
 				}
@@ -397,9 +435,21 @@ bool Map::canThrowItemTo(Position from, Position to, bool creaturesBlock /* = tr
 		//cout << "x: " << (steep ? y : x) << ", y: " << (steep ? x : y) << std::endl;
 		t = getTile((steep ? y : x), (steep ? x : y), from.z);
 
-		if(t && (isProjectile ? t->isBlockingProjectile() : t->isBlocking()) || (creaturesBlock ? !t->creatures.empty() : false)) {
+		if(t) {
+			if(isProjectile && t->isBlockingProjectile())
+				return false;
+			else if(creaturesBlock && !t->creatures.empty())
+				return false;
+			else if((from.x != x && from.y != y) && t->isBlocking())
+				return false;
+		}
+
+		/*
+		if(t && (isProjectile ? t->isBlockingProjectile() : t->isBlocking()) ||
+			      (creaturesBlock ? !t->creatures.empty() : false)) {
 			return false;
 		}
+		*/
 
 		error += deltaerr;
 

@@ -85,6 +85,7 @@ private:
 class TilePreChangeData {
 public:
 	Position pos;
+	bool isBlocking;
 	unsigned char thingCount;
 };
 
@@ -111,7 +112,8 @@ public:
 	void refreshThing(Tile *t, Thing *thing);
 
 	void getMapChanges(Player *spectator, NetworkMessage &msg);
-	
+	//const TilePreChangeData& getStoredProperties(Tile *t);
+
 protected:
 	Map* map;
 
@@ -123,6 +125,7 @@ protected:
 	
 	TileChangeDataVecMap changesItemMap;
 	TileExDataMap preChangeItemMap;
+	//TilePreChangeData dummyData;
 };
 
 class Range {
@@ -216,10 +219,14 @@ private:
 		zstep = 1;
 
 		if(multilevel) {
-			if(isUnderground()) { //underground
+			if(isUnderground()) {
 				//8->15
-				minRange.z = -2;
-				maxRange.z = 2;
+				//minRange.z = -2;
+				//maxRange.z = 2;
+				minRange.z = std::min(centerpos.z + 2, MAP_LAYER - 1);
+				maxRange.z = std::max(centerpos.z - 2, 0);
+
+				zstep = -1;
 			} else {
 				minRange.z = 7;
 				maxRange.z = 0;
@@ -315,6 +322,8 @@ class Map {
 	  * \returns A list of all positions you have to traverse to reacg the destination
 	  */
 	std::list<Position> getPathTo(Position start, Position to, bool creaturesBlock=true);
+
+	//bool removeItem(Tile t, Item);
 
 	/** The Map-Lock */
 	OTSYS_THREAD_LOCKVAR mapLock;

@@ -44,7 +44,7 @@ MagicEffectClass
 |       |
 |       |-----> MagicEffectAreaExClass : public MagicEffectAreaClass //ie. poison storm
 |       |
-|	      |-----> MagicEffectGroundAreaClass : public MagicEffectArea //fire bomb
+|	      |-----> MagicEffectAreaGroundClass : public MagicEffectArea //fire bomb
 |                 (Holds a MagicEffectItem*)
 |
 |----->	MagicEffectItem : public Item, public MagicEffectClass
@@ -58,6 +58,8 @@ enum MagicDamageType {
 	magicEnergy
 };
 
+class MagicEffectItem;
+
 typedef std::vector<Position> MagicAreaVec;
 
 //<delayTicks, damageCount>
@@ -70,10 +72,13 @@ public:
 	
 	virtual bool causeExhaustion(bool hasTarget) const;
 	virtual int getDamage(Creature *target, const Creature *attacker = NULL) const;
-	virtual void getMagicEffect(const Player* spectator, const Creature* c, const Position& pos, bool hasTarget, int damage, bool isPz, NetworkMessage &msg) const;
-	virtual void getDistanceShoot(const Player* spectator, const Creature* c, const Position& to, bool hasTarget, NetworkMessage &msg) const;
+	virtual void getMagicEffect(const Player* spectator, const Creature* c, const Position& pos,
+		bool hasTarget, int damage, bool isPz, bool isBlocking, NetworkMessage &msg) const;
+	virtual void getDistanceShoot(const Player* spectator, const Creature* c, const Position& to,
+		bool hasTarget, NetworkMessage &msg) const;
 	virtual void getArea(const Position& rcenterpos, MagicAreaVec& list) const;
-	//virtual void alterTile(MapState *mapstate, Tile *t);
+	virtual MagicEffectItem* getMagicItem(const Creature* attacker, bool isPz, bool isBlocking) const;
+	virtual bool canCast(bool isBlocking, bool hasCreature) const;
 
 	int minDamage;
 	int maxDamage;
@@ -102,11 +107,23 @@ public:
 		return MagicEffectClass::getDamage(target, attacker);
 	}
 	
-	virtual void getMagicEffect(const Player* spectator, const Creature* attacker, const Position& pos, bool hasTarget, int damage, bool isPz, NetworkMessage &msg) const;
-	virtual void getDistanceShoot(const Player* spectator, const Creature* attacker, const Position& to, bool hasTarget, NetworkMessage &msg) const;
+	virtual void getMagicEffect(const Player* spectator, const Creature* attacker, const Position& pos,
+		bool hasTarget, int damage, bool isPz, bool isBlocking, NetworkMessage &msg) const;
+	virtual void getDistanceShoot(const Player* spectator, const Creature* attacker, const Position& to,
+		bool hasTarget, NetworkMessage &msg) const;
 	virtual void getArea(const Position& rcenterpos, MagicAreaVec& list) const
 	{
 		MagicEffectClass::getArea(rcenterpos, list);
+	}
+
+	virtual MagicEffectItem* getMagicItem(const Creature* attacker, bool isPz, bool isBlocking) const
+	{
+		return MagicEffectClass::getMagicItem(attacker, isPz, isBlocking);
+	}
+
+	virtual bool canCast(bool isBlocking, bool hasCreature) const
+	{
+		return MagicEffectClass::canCast(isBlocking, hasCreature);
 	}
 };
 
@@ -124,12 +141,14 @@ public:
 
 	virtual int getDamage(Creature *target, const Creature *attacker = NULL) const;
 
-	virtual void getMagicEffect(const Player* spectator, const Creature* attacker, const Position& pos, bool hasTarget, int damage, bool isPz, NetworkMessage &msg) const
+	virtual void getMagicEffect(const Player* spectator, const Creature* attacker, const Position& pos,
+		bool hasTarget, int damage, bool isPz, bool isBlocking, NetworkMessage &msg) const
 	{
-		MagicEffectTargetClass::getMagicEffect(spectator, attacker, pos, hasTarget, damage, isPz, msg);
+		MagicEffectTargetClass::getMagicEffect(spectator, attacker, pos, hasTarget, damage, isPz, isBlocking, msg);
 	}
 
-	virtual void getDistanceShoot(const Creature* c, const Position& to, bool hasTarget, NetworkMessage &msg) const
+	virtual void getDistanceShoot(const Creature* c, const Position& to,
+		bool hasTarget, NetworkMessage &msg) const
 	{
 		//this class shouldn't have any distance shoots, just return.
 	}
@@ -137,6 +156,16 @@ public:
 	virtual void getArea(const Position& rcenterpos, MagicAreaVec& list) const
 	{
 		MagicEffectTargetClass::getArea(rcenterpos, list);
+	}
+
+	virtual MagicEffectItem* getMagicItem(const Creature* attacker, bool isPz, bool isBlocking) const
+	{
+		return MagicEffectTargetClass::getMagicItem(attacker, isPz, isBlocking);
+	}
+
+	virtual bool canCast(bool isBlocking, bool hasCreature) const
+	{
+		return MagicEffectTargetClass::canCast(isBlocking, hasCreature);
 	}
 
 	const unsigned long getOwnerID() const {return ownerid;}
@@ -170,11 +199,11 @@ protected:
 };
 
 //Needs target, holds a damage list. Example: Soul fire.
-class MagicEffectTargetEx : public MagicEffectTargetClass
+class MagicEffectTargetExClass : public MagicEffectTargetClass
 {
 public:
-	MagicEffectTargetEx(MagicDamageType md, const MagicDamageVec& dmglist);
-	virtual ~MagicEffectTargetEx() {};
+	MagicEffectTargetExClass(MagicDamageType md, const MagicDamageVec& dmglist);
+	virtual ~MagicEffectTargetExClass() {};
 
 	virtual bool causeExhaustion(bool hasTarget) const
 	{
@@ -183,12 +212,14 @@ public:
 
 	virtual int getDamage(Creature *target, const Creature *attacker = NULL) const;
 
-	virtual void getMagicEffect(const Player* spectator, const Creature* attacker, const Position& pos, bool hasTarget, int damage, bool isPz, NetworkMessage &msg) const
+	virtual void getMagicEffect(const Player* spectator, const Creature* attacker, const Position& pos,
+		bool hasTarget, int damage, bool isPz, bool isBlocking, NetworkMessage &msg) const
 	{
-		MagicEffectTargetClass::getMagicEffect(spectator, attacker, pos, hasTarget, damage, isPz, msg);
+		MagicEffectTargetClass::getMagicEffect(spectator, attacker, pos, hasTarget, damage, isPz, isBlocking, msg);
 	}
 
-	virtual void getDistanceShoot(const Player* spectator, const Creature* attacker, const Position& to, bool hasTarget, NetworkMessage &msg) const
+	virtual void getDistanceShoot(const Player* spectator, const Creature* attacker, const Position& to,
+		bool hasTarget, NetworkMessage &msg) const
 	{
 		MagicEffectTargetClass::getDistanceShoot(spectator, attacker, to, hasTarget, msg);
 	}
@@ -198,6 +229,16 @@ public:
 		MagicEffectTargetClass::getArea(rcenterpos, list);
 	}
 	
+	virtual MagicEffectItem* getMagicItem(const Creature* attacker, bool isPz, bool isBlocking) const
+	{
+		return MagicEffectTargetClass::getMagicItem(attacker, isPz, isBlocking);
+	}
+
+	virtual bool canCast(bool isBlocking, bool hasCreature) const
+	{
+		return MagicEffectTargetClass::canCast(isBlocking, hasCreature);
+	}
+
 protected:
 		MagicDamageContainer dmgContainer;
 };
@@ -218,12 +259,14 @@ public:
 
 	virtual int getDamage(Creature *target, const Creature *attacker = NULL) const;
 
-	virtual void getMagicEffect(const Player* spectator, const Creature* attacker, const Position& pos, bool hasTarget, int damage, bool isPz, NetworkMessage &msg) const
+	virtual void getMagicEffect(const Player* spectator, const Creature* attacker, const Position& pos,
+		bool hasTarget, int damage, bool isPz, NetworkMessage &msg) const
 	{
-		MagicEffectClass::getMagicEffect(spectator, attacker, pos, hasTarget, damage, isPz, msg);
+		MagicEffectClass::getMagicEffect(spectator, attacker, pos, hasTarget, damage, isPz, isBlocking, msg);
 	}
 
-	virtual void getDistanceShoot(const Player* spectator, const Creature* attacker, const Position& to, bool hasTarget, NetworkMessage &msg) const
+	virtual void getDistanceShoot(const Player* spectator, const Creature* attacker, const Position& to,
+		bool hasTarget, NetworkMessage &msg) const
 	{
 		MagicEffectClass::getDistanceShoot(spectator, attacker, to, hasTarget, msg);
 	}
@@ -233,8 +276,18 @@ public:
 		MagicEffectClass::getArea(rcenterpos, list);
 	}
 
+	virtual MagicEffectItem* getMagicItem(const Creature* attacker, bool isPz, bool isBlocking) const
+	{
+		return MagicEffectClass::getMagicItem(attacker, isPz, isBlocking);
+	}
+
+	virtual bool canCast(bool isBlocking, bool hasCreature) const
+	{
+		return MagicEffectClass::canCast(isBlocking, hasCreature);
+	}
+
 	bool transform();
-	bool transform(const MagicEffectItem &rhs);
+	bool transform(const MagicEffectItem *rhs);
 	long getDecayTime();
 protected:
 	void buildDamageList();
@@ -258,22 +311,21 @@ public:
 		return 0;
 	}
 
-	virtual void getMagicEffect(const Player* spectator, const Creature* attacker, const Position& pos, bool hasTarget, int damage, bool isPz, NetworkMessage &msg) const
-	{
-		//Nothing
-	}
-
-	virtual void getDistanceShoot(const Player* spectator, const Creature* attacker, const Position& to, bool hasTarget, NetworkMessage &msg) const;
+	virtual void getMagicEffect(const Player* spectator, const Creature* attacker, const Position& pos,
+		bool hasTarget, int damage, bool isPz, bool isBlocking, NetworkMessage &msg) const;
+	virtual void getDistanceShoot(const Player* spectator, const Creature* attacker, const Position& to,
+		bool hasTarget, NetworkMessage &msg) const;
 
 	virtual void getArea(const Position& rcenterpos, MagicAreaVec& list) const
 	{
 		MagicEffectTargetClass::getArea(rcenterpos, list);
 	}
 
-	MagicEffectItem* getFieldItem() const {return fieldItem;}
+	virtual MagicEffectItem* getMagicItem(const Creature* attacker, bool isPz, bool isBlocking) const;
+	virtual bool canCast(bool isBlocking, bool hasCreature) const;
 
 protected:
-	MagicEffectItem* fieldItem;
+	MagicEffectItem* magicItem;
 };
 
 //Don't need a target. Example: GFB
@@ -292,14 +344,26 @@ public:
 		return MagicEffectClass::getDamage(target, attacker);
 	}
 
-	virtual void getMagicEffect(const Player* spectator, const Creature* attacker, const Position& pos, bool hasTarget, int damage, bool isPz, NetworkMessage &msg) const;
+	virtual void getMagicEffect(const Player* spectator, const Creature* attacker, const Position& pos,
+		bool hasTarget, int damage, bool isPz, bool isBlocking, NetworkMessage &msg) const;
 
-	virtual void getDistanceShoot(const Player* spectator, const Creature* attacker, const Position& to, bool hasTarget, NetworkMessage &msg) const
+	virtual void getDistanceShoot(const Player* spectator, const Creature* attacker, const Position& to,
+		bool hasTarget, NetworkMessage &msg) const
 	{
 		MagicEffectClass::getDistanceShoot(spectator, attacker, to, hasTarget, msg);
 	}
 
 	virtual void getArea(const Position& rcenterpos, MagicAreaVec& list) const;
+
+	virtual MagicEffectItem* getMagicItem(const Creature* attacker, bool isPz, bool isBlocking) const
+	{
+		return MagicEffectClass::getMagicItem(attacker, isPz, isBlocking);
+	}
+
+	virtual bool canCast(bool isBlocking, bool hasCreature) const
+	{
+		return MagicEffectClass::canCast(isBlocking, hasCreature);
+	}
 
 	unsigned char direction;
 	unsigned char areaEffect;
@@ -322,12 +386,14 @@ public:
 
 	virtual int getDamage(Creature *target, const Creature *attacker = NULL) const;
 
-	virtual void getMagicEffect(const Player* spectator, const Creature* attacker, const Position& pos, bool hasTarget, int damage, bool isPz, NetworkMessage &msg) const
+	virtual void getMagicEffect(const Player* spectator, const Creature* attacker, const Position& pos,
+		bool hasTarget, int damage, bool isPz, bool isBlocking, NetworkMessage &msg) const
 	{
-		MagicEffectAreaClass::getMagicEffect(spectator, attacker, pos, hasTarget, damage, isPz, msg);
+		MagicEffectAreaClass::getMagicEffect(spectator, attacker, pos, hasTarget, damage, isPz, isBlocking, msg);
 	}
 
-	virtual void getDistanceShoot(const Player* spectator, const Creature* attacker, const Position& to, bool hasTarget, NetworkMessage &msg) const
+	virtual void getDistanceShoot(const Player* spectator, const Creature* attacker, const Position& to,
+		bool hasTarget, NetworkMessage &msg) const
 	{
 		MagicEffectAreaClass::getDistanceShoot(spectator, attacker, to, hasTarget, msg);
 	}
@@ -337,16 +403,26 @@ public:
 		MagicEffectAreaClass::getArea(rcenterpos, list);
 	}
 
+	virtual MagicEffectItem* getMagicItem(const Creature* attacker, bool isPz, bool isBlocking) const
+	{
+		return MagicEffectAreaClass::getMagicItem(attacker, isPz, isBlocking);
+	}
+
+	virtual bool canCast(bool isBlocking, bool hasCreature) const
+	{
+		return MagicEffectAreaClass::canCast(isBlocking, hasCreature);
+	}
+
 protected:
 	MagicDamageContainer dmgContainer;
 };
 
 //Don't need a target. Example: Fire bomb
-class MagicEffectGroundAreaClass : public MagicEffectAreaClass
+class MagicEffectAreaGroundClass : public MagicEffectAreaClass
 {
 public:
-	MagicEffectGroundAreaClass(MagicEffectItem* fieldItem);
-	virtual ~MagicEffectGroundAreaClass();
+	MagicEffectAreaGroundClass(MagicEffectItem* fieldItem);
+	virtual ~MagicEffectAreaGroundClass();
 
 	virtual bool causeExhaustion(bool hasTarget) const
 	{
@@ -355,12 +431,14 @@ public:
 
 	virtual int getDamage(Creature *target, const Creature *attacker = NULL) const;
 
-	virtual void getMagicEffect(const Player* spectator, const Creature* attacker, const Position& pos, bool hasTarget, int damage, bool isPz, NetworkMessage &msg) const
+	virtual void getMagicEffect(const Player* spectator, const Creature* attacker,
+		const Position& pos, bool hasTarget, int damage, bool isPz, bool isBlocking, NetworkMessage &msg) const
 	{
-		MagicEffectAreaClass::getMagicEffect(spectator, attacker, pos, hasTarget, damage, isPz, msg);
+		MagicEffectAreaClass::getMagicEffect(spectator, attacker, pos, hasTarget, damage, isPz, isBlocking, msg);
 	}
 
-	virtual void getDistanceShoot(const Player* spectator, const Creature* attacker, const Position& to, bool hasTarget, NetworkMessage &msg) const
+	virtual void getDistanceShoot(const Player* spectator, const Creature* attacker,
+		const Position& to, bool hasTarget, NetworkMessage &msg) const
 	{
 		MagicEffectAreaClass::getDistanceShoot(spectator, attacker, to, hasTarget, msg);
 	}
@@ -370,9 +448,15 @@ public:
 		MagicEffectAreaClass::getArea(rcenterpos, list);
 	}
 
-	MagicEffectItem* getFieldItem() const {return fieldItem;}
+	virtual MagicEffectItem* getMagicItem(const Creature* attacker, bool isPz, bool isBlocking) const;
+	
+	virtual bool canCast(bool isBlocking, bool hasCreature) const
+	{
+		return MagicEffectAreaClass::canCast(isBlocking, hasCreature);
+	}
+
 protected:
-	MagicEffectItem* fieldItem;
+	MagicEffectItem* magicItem;
 };
 #endif //__MAGIC_H__
 

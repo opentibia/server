@@ -51,13 +51,24 @@ bool IOMapXML::loadMap(Map* map, std::string identifier){
 
   while (tile) { 
       tmp = (char*)xmlGetProp(tile, (const xmlChar *) "x");
+			if(!tmp) {
+				tile=tile->next;
+				continue;
+			}
+
       px = atoi(tmp);
       tmp = (char*)xmlGetProp(tile, (const xmlChar *) "y");
       py = atoi(tmp);
       tmp = (char*)xmlGetProp(tile, (const xmlChar *) "z");
       pz = atoi(tmp);
       
-      tmp = (char*)xmlGetProp(tile, (const xmlChar *) "ground");
+			tmp = (char*)xmlGetProp(tile, (const xmlChar *) "ground");
+#ifdef __DEBUG__
+			if(tmp == NULL) {
+				std::cout << "No ground tile! x: " << px << ", y: " << py << "z: " << pz << std::endl;
+			}
+#endif
+
       map->setTile(px,py,pz,atoi(tmp));
       t = map->getTile(px,py,pz);
       

@@ -416,7 +416,7 @@ int SpellScript::luaActionDoTargetExSpell(lua_State *L)
 	MagicDamageType md = (MagicDamageType)(int)lua_tonumber(L, -1);
 	lua_pop(L,1);
 
-	MagicEffectTargetEx magicTargetEx(md, dmgvec);
+	MagicEffectTargetExClass magicTargetEx(md, dmgvec);
 
 	internalGetMagicEffect(L, magicTargetEx);
 
@@ -565,7 +565,7 @@ int SpellScript::luaActionDoAreaGroundSpell(lua_State *L)
 	lua_pop(L,1);
 
 	MagicEffectItem* fieldItem = new MagicEffectItem(md, dmgMap);
-	MagicEffectGroundAreaClass magicGroundEx(fieldItem);
+	MagicEffectAreaGroundClass magicGroundEx(fieldItem);
 
 	internalGetMagicEffect(L, magicGroundEx);
 
