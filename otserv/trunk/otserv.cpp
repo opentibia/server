@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.10  2003/09/17 16:35:08  tliffrag
+// added !d command and fixed lag on windows
+//
 // Revision 1.9  2003/09/08 13:28:41  tliffrag
 // Item summoning and maploading/saving now working.
 //
@@ -36,13 +39,12 @@
 // Added some very basic map support
 //
 //////////////////////////////////////////////////////////////////////
-
+#include <string>
 #include "eventscheduler.h"
 #include "serversocket.h"
 #include <stdlib.h>
 #include <time.h>
 #include "tmap.h"
-#include <string>
 
 int ipFromDotted(char*);
 int g_serverip;
@@ -54,7 +56,7 @@ int main(int argc, char *argv[]) {
 	if(argc>1)
 		ip=argv[1];
 	else
-		ip="10.0.0.13";
+		ip="127.0.0.1";
 	g_serverip=ipFromDotted(ip);;
 	srand(time(NULL));
     TNetwork::ServerSocket ss;

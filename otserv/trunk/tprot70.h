@@ -22,8 +22,8 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
-// Revision 1.3  2003/09/08 13:28:41  tliffrag
-// Item summoning and maploading/saving now working.
+// Revision 1.4  2003/09/17 16:35:08  tliffrag
+// added !d command and fixed lag on windows
 //
 // Revision 1.2  2003/08/26 21:09:53  tliffrag
 // fixed maphandling
@@ -95,6 +95,7 @@
 			void parseSetOutfit(Action* action, std::string msg);
 			void parseSay(Action* action, std::string msg);
 			void parseLogout(Action* action, std::string msg);
+			void parseThrow(Action* action, std::string msg);
 
 			void sendPlayerMove(Action* action);
 			void sendPlayerLogin(Action* action);
@@ -102,7 +103,7 @@
 			void sendPlayerMoveIn(Action* action);
 			void sendPlayerTurn(Action* action);
 			void sendPlayerItemAppear(Action* action);
-
+			void sendPlayerItemDisappear(Action* action);
 
             // translate a map area to clientreadable format
             // uses the map the client is on

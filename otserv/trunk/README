@@ -1,2 +1,75 @@
-This compiles to otserv.
-otserv currently accepts a number of telnet connections and prints out everything you type into the telnet connections.
+otserv 0.2.3
+---------------
+What is this?
+	otserv is a programm that acts like a tibia server.
+	You can connect to it, walk around, talk, create items.
+
+How does it work?
+	Just start otserv.exe. Then, you need Tibia 7.1. 7.11
+	doesnt work as you cant specify a server to connect to.
+	Set the server IP in the client to 127.0.0.1
+	Then connect like to the normal tibia server.
+	Leave account number and password blank.
+	Never ever enter your real acc# and/or password when
+	not connecting to the CIP servers.
+	Then you are logged in.
+
+What's New?
+	- Map no longer saves on crash
+	- !d command to remove items
+  	- !s command to save the map
+	- lag should be gone
+	- a nice new installer
+
+How do I use this new stuff?
+	- Map no longer saves on crash
+	  The map is no longer saved automatically, see the !s
+	  command for details.
+
+	- !d command to remove items
+	  Turn so you are facing the item you want to delete,
+	  then say !d and the topmost item on that tile will
+ 	  be deleted. If you want to delete a lower item, you
+	  have to use !d multiple times.
+
+  	- !s command to save the map
+	  The server no longer saves automatically so use !s
+	  regularly to save your work.
+
+	- lag should be gone
+	  Just enjoy.
+
+	- a nice new installer
+	  If you read this, you already found out how to use it.
+
+How to use the old stuff?
+	Create items by saying !i <itemid>
+	Delete items by saying !d
+	Save the map by saying !s
+	Shutdown the server by saying !q
+
+Problems?
+	If you should ever have problems, that your client
+	crashes when you login, you have to delete the map
+	(otserv.map) and replace it with otserv_default.map.
+
+Credits?
+	Shi'Voc - Coding of initial otserv
+	Acrimon - Coding of initial otserv
+	Tliff - Coding, some kind of project leader
+	Zybak - Map-Editor coding
+	Torvik - Item list
+	Privateer - Documentation on the protocoll
+	Reebow - special support	
+	Yorick - Board freak ;)
+	Nibbles and MMN-o - Decoration on IRC ;)
+	The people that helped to name the items
+
+
+Help?
+	We always need help. Post on the otserv board at
+	www.tibia.de/forum if you want to help.
+	Proposals are also always welcome.
+
+Anything else?
+	No.

@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.9  2003/09/17 16:35:08  tliffrag
+// added !d command and fixed lag on windows
+//
 // Revision 1.8  2003/09/08 13:28:41  tliffrag
 // Item summoning and maploading/saving now working.
 //
@@ -46,20 +49,25 @@
 //
 //////////////////////////////////////////////////////////////////////
 
+#include <iostream>
 #include "items.h"
 #include "tmap.h"
 #include "player.h"
 #include <stdio.h>
-#include <iostream>
+
 
 Map::Map() {
 	//this code is ugly but works
 	//TODO improve this code to support things like
 	//a quadtree to speed up everything
+	#ifdef __DEBUG__
 	std::cout << "Loading map" << std::endl;
+	#endif
 	FILE* dump=fopen("otserv.map", "rb");
 	if(!dump){
+		 #ifdef __DEBUG__
 		 std::cout << "Fatal error: Mapfile not found" << std::endl;
+		 #endif
 		exit(1);
 	}
 	position topleft, bottomright, now;
@@ -101,8 +109,14 @@ Tile *Map::tile(unsigned short _x, unsigned short _y, unsigned char _z) {
 }
 
 Map::~Map() {
+
+}
+
+int Map::saveMap(){
 	//save the map
+	#ifdef __DEBUG__
 	std::cout << "Saving the map" << std::endl;
+	#endif
 	FILE* dump=fopen("otserv.map", "wb+");
 	//first dump position of top left corner, then bottom right corner
 	//then the raw map-dumpa
@@ -130,6 +144,7 @@ Map::~Map() {
 		}
 	}
 	fclose(dump);
+	return true;
 }
 
 position Map::placeCreature(position pos, Creature* c){
@@ -177,7 +192,9 @@ int Map::requestAction(Creature* c, Action* a){
 		}
 		//we got the new action, now distribute it
 		//FIXME THIS IS A BUG!!!
+			#ifdef __DEBUG__
 			std::cout << "Going to distribute an action" << std::endl;
+			#endif
 		//we move the pointer
 		tiles[a->pos2.x-MINX][a->pos2.y-MINY]->creature=tiles[a->pos1.x-MINX][a->pos1.y-MINY]->creature;
 		tiles[a->pos1.x-MINX][a->pos1.y-MINY]->creature=NULL;
@@ -222,12 +239,27 @@ int Map::distributeAction(position pos, Action* a){
 int Map::summonItem(position pos, int id){
 	if(!id)
 		return false;
+	#ifdef __DEBUG__
 	std::cout << "Summoning item with id " << id << std::endl;
+	#endif
 	tiles[pos.x-MINX][pos.y-MINY]->push_back(new Item(id));
 	Action* a= new Action;
 	a->type=ACTION_ITEM_APPEAR;
 	a->pos1=pos;
 	a->id=id;
+	distributeAction(pos, a);
+	return true;
+}
+
+int Map::removeItem(position pos){
+	Tile* tile=tiles[pos.x-MINX][pos.y-MINY];
+	if(tile->size()<=1)
+		return false;
+	tile->pop_back();
+	Action* a= new Action;
+	a->type=ACTION_ITEM_DISAPPEAR;
+	a->stack=1;
+	a->pos1=pos;
 	distributeAction(pos, a);
 	return true;
 }

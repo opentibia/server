@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.3  2003/09/17 16:35:08  tliffrag
+// added !d command and fixed lag on windows
+//
 // Revision 1.2  2003/05/19 16:48:37  tliffrag
 // Loggingin, talking, walking around, logging out working
 //
@@ -128,24 +131,15 @@ namespace Protokoll {
         // now we need the redirect packet...
         std::string temp= "..";
         temp += 0x64;
-        temp += 0x02; // number of chars
+        temp += 0x03; // number of chars
 	temp += 0x04;
         temp += '\0'; // length of name
         temp += "Hurz"; // name
 	temp += 0x09;
 	temp += '\0'; // length of world name
         temp += "Set IP   "; // world name
-        // ip
-/*        temp += (ip/0x1000000)%0x100;
-        temp += (ip / 0x10000)%0x100;
-        temp += (ip / 0x100)%0x100;
-        temp += ip % 0x100;
-*/
-		ADD4BYTE(temp, g_serverip);
-
-
-
-		// port
+	ADD4BYTE(temp, g_serverip);
+	// port
         temp += port%0x100;
         temp += (port/0x100)%0x100;
 
@@ -155,21 +149,30 @@ namespace Protokoll {
 	temp += 0x0A;
 	temp += '\0'; // length of world name
         temp += "10.0.0.13 "; // world name
-        // ip
-/*        temp += (ip/0x1000000)%0x100;
-        temp += (ip / 0x10000)%0x100;
-        temp += (ip / 0x100)%0x100;
-        temp += ip % 0x100;
-*/
 		temp+=(char)10;
 		temp+=(char)0;
 		temp+=(char)0;
 		temp+=(char)13;
 
-
-		// port
+	// port
         temp += port%0x100;
         temp += (port/0x100)%0x100;
+
+	temp += 0x04;
+        temp += '\0'; // length of name
+        temp += "Hurz"; // name
+	temp += 0x0A;
+	temp += '\0'; // length of world name
+        temp += "127.0.0.1 "; // world name
+		temp+=(char)127;
+		temp+=(char)0;
+		temp+=(char)0;
+		temp+=(char)1;
+
+	// port
+        temp += port%0x100;
+        temp += (port/0x100)%0x100;
+
 				temp += '\0';
 				temp += '\0';
         temp[0] = (char)(temp.length()-2)%0x100;

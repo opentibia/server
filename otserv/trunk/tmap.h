@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.6  2003/09/17 16:35:08  tliffrag
+// added !d command and fixed lag on windows
+//
 // Revision 1.5  2003/09/08 13:28:41  tliffrag
 // Item summoning and maploading/saving now working.
 //
@@ -84,6 +87,8 @@ class Map {
 		int removeCreature(position pos, Creature* c);
 		int requestAction(Creature* c, Action* a);
 		int summonItem(position pos, int id);
+		int saveMap();
+	int removeItem(position pos);
         Tile *tile(unsigned short _x, unsigned short _y, unsigned char _z);
         ~Map();
 };

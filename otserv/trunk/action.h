@@ -14,6 +14,8 @@ ACTION_SAY,
 ACTION_WALK_IN,
 ACTION_LOGIN,
 ACTION_ITEM_APPEAR,
+ACTION_THROW,
+ACTION_ITEM_DISAPPEAR,
 };
 
 class Creature;
@@ -25,6 +27,7 @@ struct Action {
   int direction; // north/east/south/west
   position pos1;  // first argument of the action (like attacked person...)
   position pos2;  // second argument (like place an item is used on...)
+  int stack;	//postition on the stack of a tile
   std::string playername; //player who said something
   std::string buffer;          // buffer if the char wants to say something etc.
   int id; // an id

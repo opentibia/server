@@ -21,6 +21,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.10  2003/09/17 16:35:08  tliffrag
+// added !d command and fixed lag on windows
+//
 // Revision 1.9  2003/08/25 21:28:12  tliffrag
 // Fixed all warnings.
 //
@@ -95,7 +98,7 @@ void EventScheduler::loop() {
             perror("select");
             exit(-1);
         }
-       // std::cout << "loop " << std::endl;
+       //#ifdef__DEBUG__ std::cout << "loop " << std::endl; #endif
         if(sel)
         for (Socket i = 0; sel && i < FD_SETSIZE; i++) {
             #ifdef __WINDOWS__
@@ -106,7 +109,9 @@ void EventScheduler::loop() {
 	      Socket i_= i;
             #endif
                 sel--;
-                std::cout << "socket event on socket " << i_ << std::endl;
+                #ifdef __DEBUG__
+		std::cout << "socket event on socket " << i_ << std::endl;
+		#endif
                 (*fdcb[i_])(i_);  // call the callback
             }
         }

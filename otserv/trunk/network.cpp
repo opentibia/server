@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.12  2003/09/17 16:35:08  tliffrag
+// added !d command and fixed lag on windows
+//
 // Revision 1.11  2003/05/19 16:48:37  tliffrag
 // Loggingin, talking, walking around, logging out working
 //
@@ -163,7 +166,9 @@ void TNetwork::SendData(const Socket& playersocket, const std::string& data) thr
 
     while (total < data.length())
     {
+		#ifdef __DEBUG__
 		std::cout << std::endl << "___----___" << std::endl;
+		#endif
         sent=send(playersocket, data.c_str()+total, bytesleft, 0);
 
         if (sent ==-1 || sent == 0) break;
@@ -171,7 +176,9 @@ void TNetwork::SendData(const Socket& playersocket, const std::string& data) thr
         bytesleft-=sent;
     }  // while (total < length)
 
+    #ifdef __DEBUG__
     std::cout << "sent: " << total << " bytes to: " << playersocket << std::endl;
+    #endif
 
 } // void TNetwork::SendData(const Socket& playersocket, const string& data) throw() 
 

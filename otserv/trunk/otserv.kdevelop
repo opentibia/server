@@ -13,6 +13,7 @@
   <kdevcustomproject>
     <run>
       <mainprogram>src/otserv</mainprogram>
+      <directoryradio>executable</directoryradio>
     </run>
   </kdevcustomproject>
   <kdevdebugger>
@@ -28,4 +29,30 @@
       <type ext="h" />
     </useglobaltypes>
   </kdevfilecreate>
+  <kdevcvs>
+    <cvsoptions>-f</cvsoptions>
+    <commitoptions></commitoptions>
+    <addoptions></addoptions>
+    <logoptions></logoptions>
+    <updateoptions>-dP</updateoptions>
+    <removeoptions>-f</removeoptions>
+    <revertoptions>-C -d -P</revertoptions>
+    <diffoptions>-u3 -p</diffoptions>
+    <rshoptions></rshoptions>
+  </kdevcvs>
+  <kdevcppsupport>
+    <references/>
+    <codecompletion>
+      <includeGlobalFunctions>true</includeGlobalFunctions>
+      <includeTypes>true</includeTypes>
+      <includeEnums>true</includeEnums>
+      <includeTypedefs>false</includeTypedefs>
+      <automaticCodeCompletion>true</automaticCodeCompletion>
+      <automaticArgumentsHint>true</automaticArgumentsHint>
+      <automaticHeaderCompletion>true</automaticHeaderCompletion>
+      <codeCompletionDelay>250</codeCompletionDelay>
+      <argumentsHintDelay>400</argumentsHintDelay>
+      <headerCompletionDelay>250</headerCompletionDelay>
+    </codecompletion>
+  </kdevcppsupport>
 </kdevelop>

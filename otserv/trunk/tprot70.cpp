@@ -111,7 +111,9 @@
 					close(sock);
 				} else {  // lesen erfolgreich
 					buffer[nbytes] = 0;
+					#ifdef __DEBUG__
 					std::cout << "read" << std::endl;
+					#endif
 					//TODO message bearbeiten
 					std::string s= std::string(buffer, nbytes);;
 					parsePacket(s);
@@ -126,11 +128,13 @@
 				Action* action= new Action;
 				action->pos1=player->pos;
 				action->creature=this->creature;
+				#ifdef __DEBUG__
 				std::cout << "byte is " << (int)msg[0]<<std::endl;
+				#endif
 
 
 				switch( msg[0] ){
-					case 0x14: //logout TODO
+					case 0x14: //logout TODO remove player for others
 					parseLogout(action, msg);
 					break;
 					case 0x65: //move north
@@ -145,17 +149,20 @@
 					case 0x68: //move west
 					parseMoveWest(action, msg);
 					break;
-					case 0x6F: //turn north TODO
+					case 0x6F: //turn north
 					parseTurnNorth(action, msg);
 					break;
-					case 0x70: //turn east TODO
+					case 0x70: //turn east
 					parseTurnEast(action, msg);
 					break;
-					case 0x71: //turn south TODO
+					case 0x71: //turn south
 					parseTurnSouth(action, msg);
 					break;
-					case 0x72: //turn west TODO
+					case 0x72: //turn west
 					parseTurnWest(action, msg);
+					break;
+					case 0x78: //throw item
+					parseThrow(action, msg);
 					break;
 					case 0x96: //say something
 					parseSay(action, msg);
@@ -206,7 +213,9 @@
 			buf += (char)pos.z;
 
 
-			std::cout << "x: " << pos.x << " y: " << pos.y <<std::endl;
+			#ifdef __DEBUG__
+			 std::cout << "x: " << pos.x << " y: " << pos.y <<std::endl;
+			 #endif
 			std::string buf2 = makeMap(position(pos.x-8,pos.y-6,pos.z),position(pos.x+9,pos.y+7,pos.z));
 
 			buf2.resize(buf2.length()-2);
@@ -295,7 +304,7 @@
 			buf+= (char)0x11;
 
 			//TODO richtiger motd support
-			std::string welcomemsg="Welcome to the OTServ-County. Come to where the segfaults are.";
+			std::string welcomemsg="Welcome to the otserv. For help check http://tibia.de/forum";
 			ADD2BYTE(buf,welcomemsg.length());
 			buf+= welcomemsg;
 
@@ -335,20 +344,34 @@
 			buf+=(char)a;
 			fclose(dmp);
 */
-	std::cout << "   Yswap: " << yswap << "   Xswap: " << xswap << std::endl;
-	std::cout << "   Topleft: " << topleft.x << "   botright: " << botright.x << std::endl;
+	#ifdef __DEBUG__
+	 std::cout << "   Yswap: " << yswap << "   Xswap: " << xswap << std::endl;
+	 #endif
+	#ifdef __DEBUG__
+	 std::cout << "   Topleft: " << topleft.x << "   botright: " << botright.x << std::endl;
+	  #endif
 // buf+=makeMap(player->pos-position(-8,7,7),player->pos-position(9,7,7));
+			#ifdef __DEBUG__
 			std::cout << topleft.y << "\t" << botright.y <<std::endl;
+			 #endif
 			// we just add the tilecode for every tile...
 			std::string rowbuf, colbuf, tmpbuf;
 
 			for (unsigned short i=topleft.x; i*xswap<=botright.x*xswap; i+=xswap) {
+				#ifdef __DEBUG
+				#ifdef __DEBUG__
 				std::cout << "," <<std::endl;
+				#endif
+				#endif
 				for (unsigned short j=topleft.y; j*yswap<=botright.y*yswap; j+=yswap) {
+				#ifdef __DEBUG
 					std::cout << ".";
+				#endif
 					tile=map->tile(i,j,topleft.z);
 					for (Item::iterator it=tile->begin(); it != tile->end(); it++) {
+					#ifdef __DEBUG
 						std::cout << "-";
+					#endif
 						ADD2BYTE(buf, (*it)->getID());
 					}
 					if(tile->getCreature()!=NULL)
@@ -473,15 +496,50 @@ void TProt70::parseLogout(Action* action, std::string msg){
 	delete this;
 }
 
+void TProt70::parseThrow(Action* action, std::string msg){
+	action->type=ACTION_THROW;
+	action->pos1.x=abs(msg[2]*256+msg[1]);
+	action->pos1.y=abs(msg[4]*256+msg[3]);
+	action->pos1.z=abs(msg[5]);
+
+	action->pos2.x=abs(msg[10]*256+msg[9]);
+	action->pos2.y=abs(msg[12]*256+msg[11]);
+	action->pos2.z=abs(msg[13]);
+
+	printf("From %i %i to %i %i", action->pos1.x, action->pos1.y, action->pos2.x, action->pos2.y);
+}
+
 void TProt70::parseSay(Action* action, std::string msg){
 	//we should check if this was a command
 	if(msg[4]=='!'){
 		action->type=ACTION_NONE;
+		position mypos=player->pos;
 		switch(msg[5]){
 			case 'q':
 				exit(0);
+			break;
+			case 's':
+				map->saveMap();
+			break;
+			case 'd':
+
+				switch(player->lookdir){
+					case 0:
+						mypos.y-=1;
+						break;
+					case 1:
+						mypos.x+=1;
+						break;
+					case 2:
+						mypos.y+=1;
+						break;
+					case 3:
+						mypos.x-=1;
+						break;
+				}
+				map->removeItem(mypos);
+				break;
 			case 'i':
-				position mypos=player->pos;
 				switch(player->lookdir){
 					case 0:
 						mypos.y-=1;
@@ -498,11 +556,16 @@ void TProt70::parseSay(Action* action, std::string msg){
 				}
 				std::string tmpstr;
 				tmpstr=msg.substr(7,msg.length()-7);
+				#ifdef __DEBUG__
 				std::cout << tmpstr << std::endl;
+				#endif
 				int id=atoi(tmpstr.c_str());
+					#ifdef __DEBUG__
 					std::cout << id << std::endl;
+					#endif
 				map->summonItem(mypos,  id);
-				break;
+			break;
+
 		}
 		return;
 	}
@@ -515,7 +578,9 @@ void TProt70::parseSay(Action* action, std::string msg){
 
 void TProt70::sendAction(Action* action){
 	std::string buf = "  ";
+	#ifdef __DEBUG__
 	std::cout << "I got an action" << std::endl;
+	#endif
 	if(action->type==ACTION_SAY){
 		buf+=(char)0xAA;
 		ADD2BYTE(buf,action->playername.length());
@@ -545,21 +610,34 @@ void TProt70::sendAction(Action* action){
 	if(action->type==ACTION_ITEM_APPEAR){
 		sendPlayerItemAppear(action);
 	}
+	if(action->type==ACTION_ITEM_DISAPPEAR){
+		sendPlayerItemDisappear(action);
+	}
 }
 
 void TProt70::sendPlayerMove(Action* action){
 	std::string buf = "  ";
 	position distancenow=action->pos2 - player->pos;
 	position distancewas=action->pos1 - player->pos;
+	#ifdef __DEBUG__
 	std::cout << "distancewas.x: " << distancewas.x <<std::endl;
+	#endif
+	#ifdef __DEBUG__
 	std::cout << "distancewas.y: " << distancewas.y <<std::endl;
+	#endif
 
+	#ifdef __DEBUG__
 	std::cout << "distancenow.x: " << distancenow.x <<std::endl;
+	#endif
+	#ifdef __DEBUG__
 	std::cout << "distancenow.y: " << distancenow.y <<std::endl;
+	#endif
 
 
 	if((distancewas.x<=9&&distancenow.x >= 10)||(distancewas.y<=7&&distancenow.y>=8)||(distancewas.x>=-8&&distancenow.x <= -9)||(distancewas.y>=-6&&distancenow.y<=-7)){
-	std::cout << "PLAYER MOVED OUT" << std::endl;
+	#ifdef __DEBUG__
+	 std::cout << "PLAYER MOVED OUT" << std::endl;
+	#endif
 		buf += (char)0x6C;
 		ADD2BYTE(buf, action->pos1.x);
 		ADD2BYTE(buf, action->pos1.y);
@@ -567,7 +645,9 @@ void TProt70::sendPlayerMove(Action* action){
 		buf += (char)0x01;
 	}
 	else if((distancewas.x>=10&&distancenow.x<=9)||(distancewas.y>=8&&distancenow.y<=7)||(distancewas.x<=-10&&distancenow.x>=-9)||(distancewas.y<=-7&&distancenow.y>=-6) ){
-	std::cout << "PLAYER MOVED IN" << std::endl;
+	#ifdef __DEBUG__
+	 std::cout << "PLAYER MOVED IN" << std::endl;
+	#endif
 		buf += (char)0x6A;
 		ADD2BYTE(buf, action->pos2.x);
 		ADD2BYTE(buf, action->pos2.y);
@@ -589,19 +669,27 @@ void TProt70::sendPlayerMove(Action* action){
 			buf+=(char)(0x65+action->direction);
 
 			if(action->direction==2){
-				std::cout << "Move to the south" << std::endl;
+				#ifdef __DEBUG__
+				 std::cout << "Move to the south" << std::endl;
+				 #endif
 				buf+=makeMap(player->pos-position(8,-8,7),player->pos-position(-9,-8,7));
 			}
 			if(action->direction==3){
-				std::cout << "Move to the west" << std::endl;
+				#ifdef __DEBUG__
+				 std::cout << "Move to the west" << std::endl;
+				 #endif
 				buf+=makeMap(player->pos-position(9,6,7),player->pos-position(9,-7,7));
 			}
 			if(action->direction==0){
-				std::cout << "Move to the north" << std::endl;
+				#ifdef __DEBUG__
+				 std::cout << "Move to the north" << std::endl;
+				  #endif
 				buf+=makeMap(player->pos-position(8,7,7),player->pos-position(-9,7,7));
 			}
 			if(action->direction==1){
-				std::cout << "Move to the east" << std::endl;
+				#ifdef __DEBUG__
+				 std::cout << "Move to the east" << std::endl;
+				  #endif
 				buf+=makeMap(player->pos-position(-10,6,7),player->pos-position(-10,-7,7));
 			}
 
@@ -655,6 +743,17 @@ void TProt70::sendPlayerItemAppear(Action* action){
 	TNetwork::SendData(psocket,buf);
 }
 
+void TProt70::sendPlayerItemDisappear(Action* action){
+	std::string buf = "  ";
+	buf+=(char)0x6C;
+	ADD2BYTE(buf, action->pos1.x);
+	ADD2BYTE(buf, action->pos1.y);
+	buf+=(char)action->pos1.z;
+	buf+=(char)1;
+	buf[0]=(char)(buf.size()-2)%256;
+	buf[1]=(char)((buf.size()-2)/256)%256;
+	TNetwork::SendData(psocket,buf);
+}
 
 void TProt70::sendPlayerLogout(Action* action){
 	std::string buf = "  ";
@@ -681,4 +780,3 @@ void TProt70::sendPlayerTurn(Action* action){
 	buf[1]=(char)((buf.size()-2)/256)%256;
 	TNetwork::SendData(psocket,buf);
 }
-
