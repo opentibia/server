@@ -20,8 +20,8 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
-// Revision 1.9  2003/09/25 17:46:59  timmit
-// Player loading/saving added.  Both load() and save() in player_mem work.  Saves player's character to the appropriate *.chr file when the player logs out but does NOT load() the player's file when they log in.  Once accounts are added then the call to load() will be added.
+// Revision 1.10  2003/09/25 18:24:37  timmit
+// Updated the 0x0A packet to send the client the actual player information.  Log on, then log off to create a .chr file.  You can edit the .chr file (within some limits) and the next time you log on the client will show the changes.
 //
 // Revision 1.8  2003/09/24 20:59:28  tliffrag
 // replaced itoa with sprintf
@@ -56,8 +56,8 @@ player_mem::player_mem(){
 	// default values
 	// these will be changed when the character file is loaded, if one exists
 	// TODO: make these the default values for a level 1 character
-    health = 150;
-    health_max = 150;
+    health = 50;//150;
+    health_max = 50;//150;
     mana = 0;
     mana_max = 0;
     food_level = 0;
@@ -84,30 +84,57 @@ player_mem::player_mem(){
         //char * filepath = "\\players";
         //chdir( filepath );
 
-// FIXME/TODO: Use a pointer to a function since load() and save() are so similar
-//        char mode = 'l';
-//        if( mode == 'l' )
-//          readWrite = (void *)readVal;
-//        else
-//          readWrite = writeVal;
+        // FIXME/TODO: Use a pointer to a function since load() and save() are so similar
+        //        char mode = 'l';
+        //        if( mode == 'l' )
+        //          readWrite = (void *)readVal;
+        //        else
+        //          readWrite = writeVal;
 
         // open up the character file
         FILE* charfile = fopen( charstr.c_str(), "r+t" );
-        //if( fopen( charstr.c_str(), "wt" ) != NULL )
         if( charfile != NULL )
         {std::cout<<"opened character file for reading..."<<std::endl;
-			// don't need to pass these names (2nd param), i will fix soon!
-            readVal( charfile, "health", health );
-            readVal( charfile, "health_max", health_max );
-            readVal( charfile, "mana", mana );
-            readVal( charfile, "mana_max", mana_max );
-            readVal( charfile, "food_level", food_level );
-            readVal( charfile, "cap", cap );
-            readVal( charfile, "cap_max", cap_max );
-            readVal( charfile, "level", level );
-            readVal( charfile, "experience", experience );
-            readVal( charfile, "mag_level", mag_level );
-            readVal( charfile, "mana_spent", mana_spent );
+			// FIXME: don't need to pass these names (2nd param), i will fix soon!
+			health = readVal( charfile );
+			health_max = readVal( charfile );
+			mana = readVal( charfile );
+			mana_max = readVal( charfile );
+			food_level = readVal( charfile );
+			cap = readVal( charfile );
+			cap_max = readVal( charfile );
+			level = readVal( charfile );
+			experience = readVal( charfile );
+			mag_level = readVal( charfile );
+			mana_spent = readVal( charfile );
+			
+			skills[ SKILL_FIST ][ SKILL_LEVEL ] = readVal( charfile );
+			skills[ SKILL_FIST ][ SKILL_TRIES ] = readVal( charfile );
+			skills[ SKILL_CLUB ][ SKILL_LEVEL ] = readVal( charfile );
+			skills[ SKILL_CLUB ][ SKILL_TRIES ] = readVal( charfile );
+			skills[ SKILL_SWORD ][ SKILL_LEVEL ] = readVal( charfile );
+			skills[ SKILL_SWORD ][ SKILL_TRIES ] = readVal( charfile );
+			skills[ SKILL_AXE ][ SKILL_LEVEL ] = readVal( charfile );
+			skills[ SKILL_AXE ][ SKILL_TRIES ] = readVal( charfile );
+			skills[ SKILL_DIST ][ SKILL_LEVEL ] = readVal( charfile );
+			skills[ SKILL_DIST ][ SKILL_TRIES ] = readVal( charfile );
+			skills[ SKILL_SHIELD ][ SKILL_LEVEL ] = readVal( charfile );
+			skills[ SKILL_SHIELD ][ SKILL_TRIES ] = readVal( charfile );
+			skills[ SKILL_FISH ][ SKILL_LEVEL ] = readVal( charfile );
+			skills[ SKILL_FISH ][ SKILL_TRIES ] = readVal( charfile );
+
+/*			
+            readVal( charfile, "health", (unsigned long)health );
+            readVal( charfile, "health_max", (unsigned long)health_max );
+            readVal( charfile, "mana", (unsigned long)mana );
+            readVal( charfile, "mana_max", (unsigned long)mana_max );
+            readVal( charfile, "food_level", (unsigned long)food_level );
+            readVal( charfile, "cap", (unsigned long)cap );
+            readVal( charfile, "cap_max", (unsigned long)cap_max );
+            readVal( charfile, "level", (unsigned long)level );
+            readVal( charfile, "experience", (unsigned long)experience );
+            readVal( charfile, "mag_level", (unsigned long)mag_level );
+            readVal( charfile, "mana_spent", (unsigned long)mana_spent );
             
             readVal( charfile, "skill_fist", skills[ SKILL_FIST ][ SKILL_LEVEL ] );
             readVal( charfile, "skill_fist_tries", skills[ SKILL_FIST ][ SKILL_TRIES ] );
@@ -129,6 +156,7 @@ player_mem::player_mem(){
 
             readVal( charfile, "skill_fish", skills[ SKILL_FISH ][ SKILL_LEVEL ] );
             readVal( charfile, "skill_fish_tries", skills[ SKILL_FISH ][ SKILL_TRIES ] );
+*/            
             
             // close the file
             fclose( charfile );
@@ -190,7 +218,7 @@ player_mem::player_mem(){
         }
     } // player_mem::save()
     
-    unsigned long player_mem::readVal( FILE* charfile, std::string name, unsigned long value )
+    unsigned long player_mem::readVal( FILE* charfile )//, std::string name, unsigned long &value )
     {
         char buffer[ 32 ];
         std::string charstr;
@@ -198,7 +226,9 @@ player_mem::player_mem(){
         charstr = fgets( buffer, 32, charfile );
         int strpos = charstr.find( "=", 0 ) + 1;
         charstr = charstr.substr( strpos, charstr.length() - strpos );
-        value = atoi( charstr.c_str() );
+//        unsigned long value = atoi( charstr.c_str() );
+        
+        return atoi( charstr.c_str() );
     } // player_mem::readVal( FILE* charfile, std::string name, unsigned long &value )
     
     void player_mem::writeVal( FILE* charfile, std::string name, unsigned long value )

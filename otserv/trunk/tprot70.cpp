@@ -268,19 +268,11 @@ void TProt70::parsePacket(std::string msg){
 			ADD2BYTE(buf,this->player->health);//hitpoints
 			ADD2BYTE(buf,this->player->health_max);//hitpoints
 			ADD2BYTE(buf,this->player->cap);//cap
-			ADD4BYTE(buf,3000); //experience
-			buf+=(char)0x0F;//level
-			ADD2BYTE(buf,0);//mana
-			ADD2BYTE(buf,0);//mana
-			buf+=(char)0x0F;//maglevel
-//			ADD2BYTE(buf,150);//hitpoints
-//			ADD2BYTE(buf,150);//hitpoints
-//			ADD2BYTE(buf,300);//cap
-//			ADD4BYTE(buf,3000); //experience
-//			buf+=(char)0x0F;//level
-//			ADD2BYTE(buf,0);//mana
-//			ADD2BYTE(buf,0);//mana
-//			buf+=(char)0x0F;//maglevel
+			ADD4BYTE(buf,this->player->experience); //experience
+			buf+=(char)this->player->level;//level
+			ADD2BYTE(buf,this->player->mana);//mana
+			ADD2BYTE(buf,this->player->mana_max);//mana
+			buf+=(char)this->player->mag_level;//maglevel
 			buf+= (char)0x82;
 
 
@@ -300,13 +292,13 @@ void TProt70::parsePacket(std::string msg){
 
 
 			buf+= (char)0xA1; //skills follow
-			buf+= (char)0x0A; //fist
-			buf+= (char)0x0A; //club
-			buf+= (char)0x0A; //sword
-			buf+= (char)0x0A; //axe
-			buf+= (char)0x0A; //dist
-			buf+= (char)0x0A; //shield
-			buf+= (char)0x0A; //fishing
+			buf+= (char)this->player->skills[ SKILL_FIST ][ SKILL_LEVEL ]; //fist
+			buf+= (char)this->player->skills[ SKILL_CLUB ][ SKILL_LEVEL ]; //club
+			buf+= (char)this->player->skills[ SKILL_SWORD ][ SKILL_LEVEL ]; //sword
+			buf+= (char)this->player->skills[ SKILL_AXE ][ SKILL_LEVEL ]; //axe
+			buf+= (char)this->player->skills[ SKILL_DIST ][ SKILL_LEVEL ]; //dist
+			buf+= (char)this->player->skills[ SKILL_SHIELD ][ SKILL_LEVEL ]; //shield
+			buf+= (char)this->player->skills[ SKILL_FISH ][ SKILL_LEVEL ]; //fishing
 
 			buf+= (char)0xB4;
 			buf+= (char)0x11;
