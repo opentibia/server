@@ -61,13 +61,23 @@ Map::Map()
 		}
 	}
 
-  /* todo: out of the constructor :/ */
+  
+  OTSYS_THREAD_LOCKVARINIT(mapLock);
+  OTSYS_THREAD_LOCKVARINIT(eventLock);
+  
+  OTSYS_CREATE_THREAD(eventThread, this);
+}
+
+bool Map::LoadMap(std::string filename) {
 
 	FILE* f;
-	f=fopen("data/world/map.xml","r");
+	std::cout << ":: Loading Map from " << filename << " ... ";
+	f=fopen(filename.c_str(),"r");
 	if(f){
-	fclose(f);
-		loadMapXml("data/world/map.xml");
+			  fclose(f);
+			  loadMapXml(filename.c_str());
+			  std::cout << "[done]" << std::endl;
+			  return true;
 	}
 	else{
 		//this code is ugly but works
@@ -79,7 +89,7 @@ Map::Map()
 		FILE* dump=fopen("otserv.map", "rb");
 		if(!dump){
 			#ifdef __DEBUG__
-			std::cout << "Loading old format mapfile" << std::endl;
+			std::cout << "Loading old format mapfile failed" << std::endl;
 			#endif
 			exit(1);
 		}
@@ -114,19 +124,14 @@ Map::Map()
 		}
 		fclose(dump);
 	}
-  
-  OTSYS_THREAD_LOCKVARINIT(mapLock);
-  OTSYS_THREAD_LOCKVARINIT(eventLock);
-  
+
   Npc *npc = new Npc("Ruediger");
   npc->pos.x = 220;
   npc->pos.y = 220;
 
   placeCreature(npc);
 
-  OTSYS_CREATE_THREAD(eventThread, this);
 }
-
 
 Map::~Map()
 {
@@ -235,7 +240,6 @@ int Map::loadMapXml(const char *filename){
 	height=atoi((const char*)xmlGetProp(root, (const xmlChar *) "height"));
 	int xorig=((MAP_WIDTH)-width)/2;
 	int yorig=((MAP_HEIGHT)-height)/2;
-	std::cout << xorig << "   " << yorig << std::endl;
 	tile=root->children;
 	for(int y=0; y < height; y++){
 		for(int x=0; x < width; x++){
@@ -251,7 +255,6 @@ int Map::loadMapXml(const char *filename){
 
 		}
 	}
-	std::cout << "Loaded XML-Map" << std::endl;
 	xmlFreeDoc(doc);
 	return 0;
 }
@@ -315,7 +318,9 @@ bool Map::removeCreature(Creature* c)
 	//removeCreature from the online list
   playersOnline.erase(playersOnline.find(c->getID()));
 
+#ifdef __DEBUG__
 	std::cout << "removing creature "<< std::endl;
+#endif
 
   int stackpos = tiles[c->pos.x][c->pos.y]->getCreatureStackPos(c);
   tiles[c->pos.x][c->pos.y]->removeThing(c);

@@ -23,6 +23,7 @@
 
 #include <string>
 #include <iostream>
+#include <sstream>
 
 using namespace std;
 
@@ -123,7 +124,7 @@ void Protocol70::parsePacket(NetworkMessage &msg)
 //      parseUseItem(&action, msg);
       break;
      case 0x8C: // throw item
-//      parseLookAt(&action, msg);
+      parseLookAt(msg);
       break;
     case 0x96:  // say something
       parseSay(msg);
@@ -236,7 +237,7 @@ void Protocol70::parseMoveByMouse(NetworkMessage &msg)
 {
   // cancel for now
   msg.Reset();
-  msg.AddTextMessage(0x14, "Sorry, not possible.");
+  msg.AddTextMessage(MSG_STATUS, "Sorry, not possible.");
   msg.AddByte(0xB5);
   msg.WriteToSocket(s);
 }
@@ -366,18 +367,23 @@ void Protocol70::parseThrow(Action* action, NetworkMessage &msg){
 }
 */
 
-/*
-void Protocol70::parseLookAt(Action* action, NetworkMessage &msg){
-	//TODO add stackpos
-	action->type=ACTION_LOOK_AT;
-	action->pos1.x=(unsigned char)msg[2]*256+(unsigned char)msg[1];
-	action->pos1.y=(unsigned char)msg[4]*256+(unsigned char)msg[3];
-	action->pos1.z=(unsigned char)msg[5];
+void Protocol70::parseLookAt(NetworkMessage &msg){
+  Position LookPos = msg.GetPosition();
+  uint16_t ItemNum = msg.GetU16();
 
-	action->creature=this->creature;
+#ifdef __DEBUG__
+  std::cout << "look at: " << LookPos << std::endl;
+  std::cout << "itemnum: " << ItemNum << std::endl;
+#endif
+
+  NetworkMessage newmsg;
+  std::stringstream ss;
+  ss << "You look at " << LookPos << " and see Item # " << ItemNum << ".";
+  Position middle;
+  newmsg.AddTextMessage(MSG_INFO, ss.str().c_str());
   
+  sendNetworkMessage(&newmsg);
 }
-*/
 
 
 
@@ -824,7 +830,7 @@ void Protocol70::sendCreatureAppear(const Creature *creature)
     msg.AddPlayerInventoryItem(player, 10);
 
 
-    msg.AddTextMessage(0x11, g_config.getGlobalString("loginmsg", "Welcome.").c_str());
+    msg.AddTextMessage(MSG_EVENT, g_config.getGlobalString("loginmsg", "Welcome.").c_str());
 
 	  msg.WriteToSocket(s);
   }

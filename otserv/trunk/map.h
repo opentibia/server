@@ -38,10 +38,10 @@
 
 
 enum tmapEnum{
-	TMAP_SUCCESS,
-	TMAP_ERROR,
-	TMAP_ERROR_NO_COUNT,
-	TMAP_ERROR_TILE_OCCUPIED,
+  TMAP_SUCCESS,
+  TMAP_ERROR,
+  TMAP_ERROR_NO_COUNT,
+  TMAP_ERROR_TILE_OCCUPIED,
 };
 
 
@@ -61,68 +61,68 @@ class Player;
 class Tile;
 
 class Map {
-    // should use an Space Partitioning Tree.
-    // I am using a very simple array now though.
-    public:
+  // should use an Space Partitioning Tree.
+  // I am using a very simple array now though.
+  public:
 
     Tile* tiles[MAP_WIDTH][MAP_HEIGHT];
 
-    public:
-        Map();
-        Map(char *filename);
-        ~Map();
+  public:
+    Map();
+    ~Map();
 
-
-
-		int loadMapXml(const char *filename);
+    bool LoadMap(std::string filename);
 
     Tile *tile(unsigned short _x, unsigned short _y, unsigned char _z);
 
     std::map<long, Creature*> playersOnline;
 
 
-  bool placeCreature(Creature* c);
-  bool removeCreature(Creature* c);
+    bool placeCreature(Creature* c);
+    bool removeCreature(Creature* c);
 
-  void thingMove(Player *player, Thing *thing,
-                 unsigned short to_x, unsigned short to_y, unsigned char to_z);
+    void thingMove(Player *player, Thing *thing,
+        unsigned short to_x, unsigned short to_y, unsigned char to_z);
 
-  void thingMove(Player *player,
-                 unsigned short from_x, unsigned short from_y, unsigned char from_z,
-                 unsigned char stackPos,
-                 unsigned short to_x, unsigned short to_y, unsigned char to_z);
+    void thingMove(Player *player,
+        unsigned short from_x, unsigned short from_y, unsigned char from_z,
+        unsigned char stackPos,
+        unsigned short to_x, unsigned short to_y, unsigned char to_z);
 
-  void creatureTurn(Creature *creature, Direction dir);
+    void creatureTurn(Creature *creature, Direction dir);
 
-  void playerSay(Player *player, unsigned char type, const string &text);
-  void playerYell(Player *player, const string &text);
-  void playerSpeakTo(Player *player, const string &receiver, const string &text);
-  void playerBroadcastMessage(Player *player, const string &text);
+    void playerSay(Player *player, unsigned char type, const string &text);
+    void playerYell(Player *player, const string &text);
+    void playerSpeakTo(Player *player, const string &receiver, const string &text);
+    void playerBroadcastMessage(Player *player, const string &text);
 
-  
-  void addEvent(long ticks, int type, void *data);
 
-protected:
-  void creatureMakeDistDamage(Creature *creature, Creature *attackedCreature);
+    void addEvent(long ticks, int type, void *data);
 
-  Creature* getCreatureByID(unsigned long id);
+  protected:
+    void creatureMakeDistDamage(Creature *creature, Creature *attackedCreature);
 
-  OTSYS_THREAD_LOCKVAR mapLock;
-  OTSYS_THREAD_LOCKVAR eventLock;
-  
-  static OTSYS_THREAD_RETURN eventThread(void *p);
+    Creature* getCreatureByID(unsigned long id);
 
-  struct MapEvent
-  {
-    __int64  tick;
-    int      type;
-    void*    data;
-  };
+    OTSYS_THREAD_LOCKVAR mapLock;
+    OTSYS_THREAD_LOCKVAR eventLock;
 
-  void checkPlayerAttacking(unsigned long id);
-  void checkPlayer(unsigned long id);
+    static OTSYS_THREAD_RETURN eventThread(void *p);
 
-  list<MapEvent> *eventLists[12000];
+    struct MapEvent
+    {
+      __int64  tick;
+      int      type;
+      void*    data;
+    };
+
+    void checkPlayerAttacking(unsigned long id);
+    void checkPlayer(unsigned long id);
+
+    list<MapEvent> *eventLists[12000];
+
+    int loadMapXml(const char *filename);
+
 };
 
 #endif

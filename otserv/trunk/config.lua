@@ -5,7 +5,7 @@
 
 -- mapfile
 -- sets what map to load
-mapfile = "otserv.map"
+mapfile = "data/world/map.xml"
 
 -- loginmsg
 -- the message the player gets when he logs in
@@ -17,7 +17,7 @@ port = "7172"
 
 -- ip
 -- the ip the server should redirect too
-ip = "127.0.0.1"
+ip = "192.168.23.1"
 
 -- motd
 -- The messagebox you sometimes get before you choose characters

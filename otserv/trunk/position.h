@@ -4,7 +4,8 @@
 // represents a map position
 // for now just a 3d point
 #include <stdlib.h>
-#include <math.h>
+#include <cmath>
+#include <iostream>
 
 enum slots_t {
 	SLOT_WHEREEVER=0,
@@ -55,5 +56,7 @@ public:
         : x(_x), y(_y), z(_z) {};
 
 };
+
+std::ostream& operator<<(std::ostream&, const Position&);
 
 #endif

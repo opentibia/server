@@ -113,6 +113,14 @@ string NetworkMessage::GetString()
   return string(v, stringlen);
 }
 
+Position NetworkMessage::GetPosition() {
+  Position pos;
+  pos.x = GetU16();
+  pos.y = GetU16();
+  pos.z = GetByte();
+  return pos;
+}
+
 
 void NetworkMessage::SkipBytes(int count)
 {
@@ -187,10 +195,10 @@ void NetworkMessage::AddItem(const Item *item)
 
 /******************************************************************************/
 
-void NetworkMessage::AddTextMessage(unsigned char type, const char* message)
+void NetworkMessage::AddTextMessage(MessageClasses mclass, const char* message)
 {
   AddByte(0xB4);
-  AddByte(type);
+  AddByte(mclass);
   AddString(message);
 }
 

@@ -40,6 +40,7 @@ using namespace std;
 
 #ifndef WIN32
 #include <fcntl.h>
+#include <arpa/inet.h>
 #endif
 
 
@@ -52,35 +53,6 @@ Map gmap;
 
 
 #include "networkmessage.h"
-
-
-
-
-int ipFromDotted(const char* _ip)
-{
-	string ip=_ip;
-	string t;
-	int num=0;
-
-	for(int i=0; i<4;i++)
-  {
-    t="";
-    while ((ip[0]!='.') && (ip.length() != 0))
-    {
-		  t += ip[0];
-		  ip.erase(0,1);
-    }
-    ip.erase(0,1);
-    num+=atoi(t.c_str()) << i*8;
-	}
-
-	return num;
-}
-
-
-
-
-
 
 static int i = 0;
 OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
@@ -174,7 +146,21 @@ void ErrorMessage(const char* message)
 
 int main(int argc, char *argv[])
 {
-  cout << "OTServ Version 0.3.0" << endl << endl;
+  std::cout << ":: OTServ Version 0.3.0" << std::endl;
+  std::cout << ":: ====================" << std::endl;
+  std::cout << "::" << std::endl;
+
+  // read global config
+  std::cout << ":: Loading lua script config.lua... ";
+  if (!g_config.OpenFile("config.lua"))
+  {
+    ErrorMessage("Unable to load config.lua!");
+    return -1;
+  }
+  cout << "[done]" << endl;
+
+  // load map file
+  gmap.LoadMap(g_config.getGlobalString("mapfile"));
 
 
   // Call to WSA Startup on Windows Systems...
@@ -198,31 +184,21 @@ int main(int argc, char *argv[])
 #endif
 
 
-  // read global config
-  cout << "reading config.lua ...       ";
-  if (!g_config.OpenFile("config.lua"))
-  {
-    ErrorMessage("Unable to load config.lua!");
-    return -1;
-  }
-  cout << "[done]" << endl;
-
-
   pair<unsigned long, unsigned long> IpNetMask;
-  IpNetMask.first  = ipFromDotted("127.0.0.1");
+  IpNetMask.first  = inet_addr("127.0.0.1");
   IpNetMask.second = 0xFFFFFFFF;
   serverIPs.push_back(IpNetMask);
 
   char szHostName[128];
   if (gethostname(szHostName, 128) == 0)
   {
-    cout << endl << "running on host " << szHostName << endl;
+    cout << "::" << endl << ":: Running on host " << szHostName << endl;
 
     hostent *he = gethostbyname(szHostName);
 
     if (he)
     {
-      cout << "local ip address(es):  ";
+      cout << ":: Local IP address(es):  ";
       unsigned char** addr = (unsigned char**)he->h_addr_list;
 
       while (addr[0] != NULL)
@@ -243,7 +219,7 @@ int main(int argc, char *argv[])
     }
   }
   
-  cout << "global ip address:     ";
+  cout << ":: Global IP address:     ";
 	string ip;
 
 	if(argc > 1)
@@ -251,16 +227,16 @@ int main(int argc, char *argv[])
 	else
 		ip = g_config.getGlobalString("ip", "127.0.0.1");
 
-	std::cout << ip << endl << endl;
+	std::cout << ip << endl << "::" << endl;
 
-  IpNetMask.first  = ipFromDotted(ip.c_str());
+  IpNetMask.first  = inet_addr(ip.c_str());
   IpNetMask.second = 0;
   serverIPs.push_back(IpNetMask);
 
 
 
   
-  std::cout << "starting server socket" << std::endl;
+  std::cout << ":: Starting Server... ";
 
 
   // start the server listen...
@@ -315,7 +291,7 @@ int main(int argc, char *argv[])
 
 
 
-  std::cout << endl << "OTServ running..." << std::endl;
+  std::cout << "[done]" << endl << ":: OpenTibia Server Running..." << std::endl;
 
 
 

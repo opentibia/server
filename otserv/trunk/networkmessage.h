@@ -32,6 +32,11 @@
 #define NM_ME_MORT_AREA          17
 #define NM_ME_SOUND              18
 
+enum MessageClasses {
+		  MSG_INFO   = 0x13,
+		  MSG_EVENT  = 0x11,
+		  MSG_STATUS = 0x12
+};
 
 class Creature;
 class Player;
@@ -61,6 +66,7 @@ public:
   unsigned short GetU16();
   unsigned int   GetU32();
   std::string    GetString();
+  Position       GetPosition();
 
 
   // skips count unknown/unused bytes in an incoming message
@@ -83,7 +89,7 @@ public:
 
 
   // write functions for complete message blocks
-  void AddTextMessage(unsigned char type, const char* message);
+  void AddTextMessage(MessageClasses mclass, const char* message);
   void AddAnimatedText(Position &pos, unsigned char color, std::string text);
 
   void AddMagicEffect(const Position &pos, unsigned char type);

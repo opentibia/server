@@ -85,7 +85,7 @@ noinst_PROGRAMS = otserv
 
 AM_CXXFLAGS = $(XML_CPPFLAGS) $(OTSERV_FLAGS) $(LUA50_CFLAGS)
 otserv_LDADD = $(XML_LIBS) $(LUA50_LIBS)
-otserv_SOURCES = creature.cpp creature.h definitions.h item.cpp item.h 					  items.cpp items.h luascript.cpp luascript.h map.cpp 					  map.h networkmessage.cpp networkmessage.h npc.cpp 					  npc.h otserv.cpp otsystem.h player.cpp player.h 					  position.h protocol.cpp protocol.h protocol70.cpp 					  protocol70.h texcept.h thing.cpp thing.h tile.cpp 					  tile.h tools.cpp
+otserv_SOURCES = creature.cpp creature.h definitions.h item.cpp item.h 					  items.cpp items.h luascript.cpp luascript.h map.cpp 					  map.h networkmessage.cpp networkmessage.h npc.cpp 					  npc.h otserv.cpp otsystem.h player.cpp player.h 					  position.h protocol.cpp protocol.h protocol70.cpp 					  protocol70.h texcept.h thing.cpp thing.h tile.cpp 					  tile.h tools.cpp position.cpp
 
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
@@ -102,7 +102,8 @@ LIBS = @LIBS@
 otserv_OBJECTS =  creature.$(OBJEXT) item.$(OBJEXT) items.$(OBJEXT) \
 luascript.$(OBJEXT) map.$(OBJEXT) networkmessage.$(OBJEXT) \
 npc.$(OBJEXT) otserv.$(OBJEXT) player.$(OBJEXT) protocol.$(OBJEXT) \
-protocol70.$(OBJEXT) thing.$(OBJEXT) tile.$(OBJEXT) tools.$(OBJEXT)
+protocol70.$(OBJEXT) thing.$(OBJEXT) tile.$(OBJEXT) tools.$(OBJEXT) \
+position.$(OBJEXT)
 otserv_DEPENDENCIES = 
 otserv_LDFLAGS = 
 CXXFLAGS = @CXXFLAGS@
@@ -123,8 +124,8 @@ TAR = tar
 GZIP_ENV = --best
 DEP_FILES =  .deps/creature.P .deps/item.P .deps/items.P \
 .deps/luascript.P .deps/map.P .deps/networkmessage.P .deps/npc.P \
-.deps/otserv.P .deps/player.P .deps/protocol.P .deps/protocol70.P \
-.deps/thing.P .deps/tile.P .deps/tools.P
+.deps/otserv.P .deps/player.P .deps/position.P .deps/protocol.P \
+.deps/protocol70.P .deps/thing.P .deps/tile.P .deps/tools.P
 SOURCES = $(otserv_SOURCES)
 OBJECTS = $(otserv_OBJECTS)
 

@@ -11,4 +11,4 @@ otserv_SOURCES = creature.cpp creature.h definitions.h item.cpp item.h \
 					  npc.h otserv.cpp otsystem.h player.cpp player.h \
 					  position.h protocol.cpp protocol.h protocol70.cpp \
 					  protocol70.h texcept.h thing.cpp thing.h tile.cpp \
-					  tile.h tools.cpp
+					  tile.h tools.cpp position.cpp
