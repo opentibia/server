@@ -59,10 +59,12 @@ public:
 
   virtual void sendCancel(const char *msg) = 0;
   virtual void sendCancelWalk(const char *msg) = 0;
+  virtual void sleepTillMove();
 
 protected:
   Map    *map;
   Player *player;
+  SOCKET s;
 };
 
 

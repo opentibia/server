@@ -20,6 +20,8 @@
 
 
 #include "definitions.h"
+#include "tile.h"
+#include "otsystem.h"
 
 #include <string>
 
@@ -44,4 +46,17 @@ void Protocol::setPlayer(Player* p)
 {
 	player = p;
   map    = &gmap;
+}
+
+void Protocol::sleepTillMove(){
+	int ground =	map->getTile(	player->pos.x,
+									player->pos.y,
+									player->pos.z)->ground.getID();
+	long long delay = ((long long)player->lastmove + (long long)player->getStepDuration(Item::items[ground].speed)) -
+				((long long)OTSYS_TIME());
+
+	if(delay > 0){
+		OTSYS_SLEEP((uint32_t)delay);
+	}
+	player->lastmove = OTSYS_TIME();
 }

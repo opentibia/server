@@ -106,9 +106,13 @@ public:
 
   int health, healthmax;
 
+  uint64_t lastmove;
+
   int lastDamage;
 
   virtual unsigned short getSpeed() const { return 220; };
+
+  virtual int getStepDuration(int underground) { return (1000*120*100)/(getSpeed()*underground); };
 
   int access; //access level
   // magic level

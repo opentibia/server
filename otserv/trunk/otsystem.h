@@ -48,6 +48,10 @@ inline int OTSYS_THREAD_WAITSIGNAL(OTSYS_THREAD_SIGNALVAR& signal, OTSYS_THREAD_
   return -0x4711;
 }
 
+inline void OTSYS_SLEEP(uint32_t t){
+	Sleep(t);
+}
+
 
 inline int OTSYS_THREAD_WAITSIGNAL_TIMED(OTSYS_THREAD_SIGNALVAR& signal, OTSYS_THREAD_LOCKVAR& lock, __int64 cycle)
 {

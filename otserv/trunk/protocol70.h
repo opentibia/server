@@ -48,7 +48,6 @@ public:
 
 private:
   // the socket the player is on...
-  SOCKET s;
 
   std::list<unsigned long> knownPlayers;
   void checkCreatureAsKnown(unsigned long id, bool &known, unsigned long &removedKnown);

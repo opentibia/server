@@ -48,11 +48,13 @@ public:
   unsigned short decayTo;
   unsigned short decayTime;
 
+  uint8_t speed;
+
 
 	// other bools
 	bool iscontainer;
 	bool stackable;
-  bool multitype;
+	bool multitype;
 	bool useable;
 	bool notMoveable;
 	bool alwaysOnTop;

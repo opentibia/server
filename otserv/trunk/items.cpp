@@ -39,6 +39,7 @@ ItemType::ItemType()
 	blocking        = false; // people can walk on it
 	pickupable      = false; // people can pick it up
 	
+	speed		= 0;
 	id         =  100;
 	maxItems   =    8;  // maximum size if this is a container
 	weight     =   50;  // weight of the item, e.g. throwing distance depends on it
@@ -126,7 +127,8 @@ int Items::loadFromDat(std::string file)
 	   		case 0x00:
 		   		//is groundtile	   				
     			iType->groundtile = true;
-    			if((int)fgetc(f)==0) {
+    			iType->speed=(int)fgetc(f);
+				if(iType->speed==0) {
                   iType->blocking=true;
                   }    
     			fgetc(f);

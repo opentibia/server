@@ -325,6 +325,7 @@ void Protocol70::parseMoveByMouse(NetworkMessage &msg)
 
 void Protocol70::parseMoveNorth(NetworkMessage &msg)
 {
+	this->sleepTillMove();
   map->thingMove(player, player,
                  player->pos.x, player->pos.y-1, player->pos.z);
 }
@@ -332,6 +333,7 @@ void Protocol70::parseMoveNorth(NetworkMessage &msg)
 
 void Protocol70::parseMoveEast(NetworkMessage &msg)
 {
+	this->sleepTillMove();
   map->thingMove(player, player,
                  player->pos.x+1, player->pos.y, player->pos.z);
 }
@@ -339,6 +341,7 @@ void Protocol70::parseMoveEast(NetworkMessage &msg)
 
 void Protocol70::parseMoveSouth(NetworkMessage &msg)
 {
+	this->sleepTillMove();
   map->thingMove(player, player,
                  player->pos.x, player->pos.y+1, player->pos.z);
 }
@@ -346,6 +349,7 @@ void Protocol70::parseMoveSouth(NetworkMessage &msg)
 
 void Protocol70::parseMoveWest(NetworkMessage &msg)
 {
+	this->sleepTillMove();
   map->thingMove(player, player,
                  player->pos.x-1, player->pos.y, player->pos.z);
 }

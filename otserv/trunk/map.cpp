@@ -401,13 +401,14 @@ bool Map::placeCreature(Creature* c)
       bool found =false;
       for(int cx =c->pos.x-3; cx <= c->pos.x+3 && !found; cx++){
                     for(int cy = c->pos.y-3; cy <= c->pos.y+3 && !found; cy++){
-                                        if (c->canMovedTo(getTile(cx, cy, c->pos.z))){
+                        std::cout << "search pos x:" <<cx <<" y: "<< cy << std::endl;                
+						if (c->canMovedTo(getTile(cx, cy, c->pos.z))){
                                             c->pos.x = cx;
                                             c->pos.y = cy;
                                             found = true;
                                         }
                                         // crap we need to find another spot
-                                        std::cout << "search pos x:" <<cx <<" y: "<< cy << std::endl;
+                                        
                                     }
                                 }
       if(!found){
