@@ -112,7 +112,7 @@ int Player::getWeaponDamage() const
 						damagemax = 4*skills[SKILL_DIST][SKILL_LEVEL];
 						break;
 					case MAGIC:
-						damagemax = level*10+maglevel*30;
+						damagemax = (level*2+maglevel*3) * 1.25;
 						break;
 			  }
 		  }

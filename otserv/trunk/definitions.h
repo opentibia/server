@@ -32,6 +32,12 @@ typedef unsigned char uint8_t;
 
 #pragma warning(disable:4786) // msvc too long debug names in stl
 #include <winsock.h>
+
+#else
+
+#include <stdint.h>
+typedef int64_t __int64;
+
 #endif
 
 

@@ -4,6 +4,8 @@
 #define __OTTHREAD_H__
 
 
+#include "definitions.h"
+
 #if defined WIN32 || defined __WINDOWS__
 
 #include <windows.h>
@@ -111,8 +113,6 @@ inline void OTSYS_SLEEP(int t)
   tv.tv_nsec = t % 1000;
   nanosleep(&tv, NULL);
 }
-
-typedef uint64_t __int64;
 
 inline __int64 OTSYS_TIME()
 {

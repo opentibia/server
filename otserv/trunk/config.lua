@@ -22,7 +22,8 @@ ip = "127.0.0.1"
 -- motd
 -- The messagebox you sometimes get before you choose characters
 -- not working yet
-motd = "we dont need a motd rightnow"
+motd = "Welcome to OpenTibia Pre-Release"
+motdnum="1"
 
 -- max number of players allowed
 maxplayers = "10000"

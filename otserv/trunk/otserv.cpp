@@ -23,6 +23,7 @@
 
 #include <string>
 #include <iostream>
+#include <sstream>
 
 #include "otsystem.h"
 
@@ -97,7 +98,11 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
       if (account.openAccount(accstring, password))
       {
         msg.AddByte(0x14);
-        msg.AddString("1\nWelcome to OpenTibia.");
+	std::stringstream motd;
+	motd << g_config.getGlobalString("motdnum");
+	motd << "\n";
+	motd << g_config.getGlobalString("motd");
+        msg.AddString(motd.str());
 
         msg.AddByte(0x64);
         msg.AddByte(account.charList.size());

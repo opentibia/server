@@ -4,6 +4,7 @@
 #define __TILE_H__
 
 
+#include "definitions.h"
 #include "item.h"
 
 

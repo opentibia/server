@@ -378,6 +378,7 @@ bool Map::placeCreature(Creature* c)
   while (!c->canMovedTo(getTile(c->pos.x, c->pos.y, c->pos.z)))
   {
     // crap we need to find another spot
+	  std::cout << "search pos" << std::endl;
     c->pos.x++;
   }
 
@@ -1170,6 +1171,7 @@ void Map::decaySplash(Item* item)
 {
   OTSYS_THREAD_LOCK(mapLock)
 
+  if (!item) return;
   Tile *t = getTile(item->pos.x, item->pos.y, item->pos.z);
 
   if ((t) && (t->decaySplashAfter <= OTSYS_TIME()))
@@ -1184,6 +1186,7 @@ void Map::decaySplash(Item* item)
     else
     {
       item->setID(decayTo);
+      t->decaySplashAfter = OTSYS_TIME() + decayTime*1000;
       addEvent(makeTask(decayTime*1000, std::bind2nd(std::mem_fun(&Map::decaySplash), item)));
     }
 
@@ -1464,7 +1467,7 @@ void Map::creatureCastSpell(Creature *creature, const std::string &text) {
 				if (creature->access == 0) creature->mana -= 100;
 				addEvent(makeTask(1200, std::bind2nd(std::mem_fun(&Map::resetExhausted), creature->id)));
 				
-				int base = (int)creature->level * 2 + creature->maglevel * 3;
+				int base = (int)creature->level * 10 + creature->maglevel * 15;
 				int min = (int)(base * 2) / 2;
 				int max = (int)((base * 2.8)) / 2;
 				int newhealth = creature->health + random_range(min, max); //creature->health + 1+(int)(500.0*rand()/(RAND_MAX+1.0));
