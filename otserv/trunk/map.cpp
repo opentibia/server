@@ -2075,9 +2075,10 @@ void Map::checkPlayer(unsigned long id)
 
 
          //Magic Level Advance
-         unsigned long int reqMana = (unsigned long int) ( 400 * pow(player->ManaMultiplier[player->voc], player->maglevel) );       //will calculate mana for _NEXT_ magic level
+         unsigned int reqMana = player->getReqMana(player->maglevel+1, player->voc);
+         //ATTANTION: MAKE SURE THAT CHARACTERS HAVE REASONABLE MAGIC LEVELS. ESPECIALY KNIGHTS!!!!!!!!!!!
 
-         if (reqMana % 20 < 10)
+         if (reqMana % 20 < 10)                                  //CIP must have been bored when they invented this odd rounding
               reqMana = reqMana - (reqMana % 20);
          else reqMana = reqMana - (reqMana % 20) + 20;
 
@@ -2089,6 +2090,8 @@ void Map::checkPlayer(unsigned long id)
             std::stringstream MaglvMsg;
             MaglvMsg << "You advanced from magic level " << (player->maglevel - 1) << " to magic level " << player->maglevel << ".";
             msg.AddTextMessage(MSG_ADVANCE, MaglvMsg.str().c_str());
+            
+            msg.AddPlayerStats(player);
             player->sendNetworkMessage(&msg);
          }
          //End Magic Level Advance
@@ -2307,21 +2310,37 @@ void Map::CreateDamageUpdate(Creature* creature, Creature* attackCreature, int d
 			if (player->health <= 0){
                 msg.AddTextMessage(MSG_ADVANCE, "You are dead.");             
 				msg.AddTextMessage(MSG_EVENT, "Own3d!");
+				
+				
+                // Magic Level downgrade
+                unsigned int sumMana = 0;
+                unsigned int lostMana = 0;
+                for (int i = 1; i <= player->maglevel; i++) {              //sum up all the mana
+                    sumMana += player->getReqMana(i, player->voc);
+                }
                 
+                sumMana += player->manaspent;
+                
+                lostMana = (int) (sumMana * 0.1);   //player loses 10% of all spent mana when he dies
+                
+                if (player->manaspent >= lostMana) { //player does not lose a magic level
+                   player->manaspent -= lostMana;
+                } else {                             //player DOES lose a magic level
+                   lostMana -= player->manaspent;
+                   player->manaspent = (int) ( player->getReqMana(player->maglevel, player->voc) - lostMana );
+                   player->maglevel--;
+                }
+                //End Magic Level downgrade
+                
+                
+                
+                //Level Downgrade
                 int reqExp =  player->getExpForLv(player->level);
                 if(player->experience < reqExp)
                 {
                 std::stringstream lvMsg;
                 lvMsg << "You were downgraded from level " << player->level << " to level " << player->level-1 << ".";
                 msg.AddTextMessage(MSG_ADVANCE, lvMsg.str().c_str());
-                
-                
-                /* Magic Level downgrade
-                for (int i = 0, i <= player->level, i++) {
-                    //
-                }
-                
-                End Magic Level downgrade*/
                 }
             }
 }

@@ -97,12 +97,13 @@ public:
   unsigned short ManaGain[5];
   unsigned short HPGain[5];
   
-  float ManaMultiplier[5];            //for Maglevel advances
-  
   //for skill advances
   float getSkillMultiplier(int voc_c, int skill_c);
   unsigned int getSkillBase (int skill_c);
   unsigned int getReqSkilltries (int skill, int level, int voc);
+  
+  //for magic level advances
+  unsigned int getReqMana(int maglevel, int voc); 
   
 
   //items
