@@ -67,7 +67,7 @@ std::string Status::getStatusString(){
 	p=xmlNewNode(NULL,(const xmlChar*)"serverinfo");
 	uint64_t running = (OTSYS_TIME() - this->start)/1000;
 	ss << running;
-	xmlSetProp(p, (const xmlChar*) "uptime", (const xmlChar*)running.str().c_str());
+	xmlSetProp(p, (const xmlChar*) "uptime", (const xmlChar*)ss.str().c_str());
 	ss.str("");
 	xmlSetProp(p, (const xmlChar*) "ip", (const xmlChar*)g_config.getGlobalString("ip", "").c_str());
 	xmlSetProp(p, (const xmlChar*) "servername", (const xmlChar*)g_config.getGlobalString("servername", "").c_str());
