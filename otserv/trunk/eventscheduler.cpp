@@ -21,6 +21,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.3  2002/04/05 19:44:07  shivoc
+// added protokoll 6.5 inital support
+//
 // Revision 1.2  2002/04/05 18:19:28  acrimon
 // test commit
 //
@@ -62,7 +65,7 @@ void EventScheduler::loop() {
   struct timeval tv = {1, 0};
   for (;;) {
     if (tv.tv_sec == 0 && tv.tv_usec == 0) {
-      cout << "time event" << endl;
+//      cout << "time event" << endl;
       tv.tv_sec = 1;
     }
     read_fd_set = active_fd_set;
@@ -71,7 +74,7 @@ void EventScheduler::loop() {
       perror("select");
       exit(-1);
     }
-    cout << "loop ";
+//    cout << "loop ";
     for (Socket i = 0; sel && i < FD_SETSIZE; i++) {
       if (FD_ISSET(i, &read_fd_set) > 0) { // if there was input:
 	sel--;

@@ -1,5 +1,6 @@
 #include "protokoll.h"
-#include "tprot.h"
+#include "tprot.h"	// client <= 6.4 and 6.5+ clients after redirect
+#include "tprot65.h" // v6.5+ clients
 #include "network.h"
 
 namespace Protokoll {
@@ -7,14 +8,28 @@ namespace Protokoll {
 	Protokoll::Protokoll() throw() : cread(*this) { };
 
 	ProtokollP::ProtokollP(const Socket& psocket) throw(texception) {
-		// first we check the socket...
-//		Socket psocket = TNetwork::AcceptPlayer(sock);
 
-		// then we try to read it...
+		// we try to read from our socket...
 		string buf=TNetwork::ReceiveData(psocket,false);
 
-
 		// now we need to find out the protokoll...
+		try {
+			// if it's the tibia protokoll 6.5+ the client get's redirected
+			// back to the server for the second login step...
+			// and an exception get's thrown...
+			prot = new TProt65(psocket, buf);
+				cout << "WRONG" << endl;
+				TNetwork::ShutdownClient(psocket);
+				throw texception("TProt 6.5",false);
+		}
+		catch (texception e) {
+			// if it's critical it's the 6.5+ protokoll...
+			if (e.isCritical()) {
+				TNetwork::ShutdownClient(psocket);
+				throw texception(e.toString(),false);
+			} // if (e.isCritical()) 
+		}
+
 		try {
 			// if the protokoll is the tibia protokoll there will be no
 			// exception, else there will be one and we need to check the next

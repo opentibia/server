@@ -21,6 +21,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.5  2002/04/05 19:44:07  shivoc
+// added protokoll 6.5 inital support
+//
 // Revision 1.4  2002/04/05 18:56:11  acrimon
 // Adding a file class.
 //
@@ -36,6 +39,7 @@
 #include "eventscheduler.h"
 
 #include "player.h"
+#include "texcept.h"
 
 extern EventScheduler es;
 
@@ -110,10 +114,8 @@ Socket ServerSocket::make_socket(int _socket_type, u_short _port) {
   address.sin_addr.s_addr = htonl(INADDR_ANY);
 
   // set O_NONBLOCK flag!
-#if 0
   int reuse_addr = 1;
   setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &reuse_addr, sizeof (reuse_addr));
-#endif
 
   if (bind(sock, (struct sockaddr *) &address, sizeof (address)) < 0) {
     perror("bind");
@@ -158,8 +160,17 @@ void ServerSocket::newconnection::operator()(const Socket &_sock) {
   ss.connections++;
   fprintf(stderr, "ip= %s, p= %hd.\n", inet_ntoa(clientname.sin_addr), ntohs(clientname.sin_port));
 
+  try {
   Creatures::Player *bla = new Creatures::Player(cs);
   es.newsocket(cs, bla->cb());
+  }
+  catch (texception e) {
+  	if (e.isCritical()) {
+		//something went wrong!
+		cerr << "ERROR!" << endl;
+		exit(1);
+	} // if (e.isCritical())
+  } // catch (texception e)
   // read_from_client(cs, active_fd_set, 1);
 }
 
