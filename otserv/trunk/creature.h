@@ -166,7 +166,7 @@ private:
   virtual void onCreatureSay(const Creature *creature, unsigned char type, const std::string &text) { };
 
   virtual void onCreatureChangeOutfit(const Creature* creature) { };
-	virtual void onTileUpdated(const Position *Pos) { };
+	virtual void onTileUpdated(const Position &pos) { };
 	virtual void onContainerUpdated(Item *item, unsigned char from_id, unsigned char to_id, unsigned char from_slot, unsigned char to_slot, bool remove) {};
   virtual void onTeleport(const Creature *creature, const Position *oldPos, unsigned char oldstackpos) { };
 

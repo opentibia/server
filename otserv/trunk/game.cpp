@@ -339,7 +339,13 @@ void Game::thingMove(Creature *player,
 
 bool Game::onPrepareMoveThing(Creature *player, const Thing* thing, const Position& fromPos, const Position& toPos)
 {
+	/*
 	if( (abs(fromPos.x - toPos.x) > 1) || (abs(fromPos.y - toPos.y) > 1) ) {
+		player->sendCancel("To far away...");
+		return false;
+	}
+	*/
+	if( (abs(player->pos.x - fromPos.x) > 1) || (abs(player->pos.y - fromPos.y) > 1) ) {
 		player->sendCancel("To far away...");
 		return false;
 	}
@@ -394,7 +400,7 @@ bool Game::onPrepareMoveThing(Creature *player, const Item* item, const Containe
 		player->sendCancel("Sorry, not possible.");
 		return false;
 	}
-	else if(toContainer->size() + 1 >= toContainer->capacity()) {
+	else if(toContainer->size() + 1 > toContainer->capacity()) {
 		player->sendCancel("Sorry, not enough room.");
 		return false;
 	}
@@ -522,6 +528,7 @@ void Game::thingMoveInternal(Creature *player,
 				return;
 			
 			Item *item = dynamic_cast<Item*>(fromContainer->getItem(from_slotid));
+			/*TODO: if item is a container we need to resend the container to update it (up-arrow)*/
 
 			if(onPrepareMoveThing(p, item, (item->pos.x == 0xFFFF ? player->pos : item->pos), toPos)) {
 				item->pos = toPos;
@@ -581,6 +588,8 @@ void Game::thingMoveInternal(Creature *player,
 		Container *toContainer = NULL;
 
 		Item *item = dynamic_cast<Item*>(fromTile->getThingByStackPos(stackPos));
+		/*TODO: if item is a container we need to resend the container to update it (up-arrow)*/
+
 		if(!item)
 			return;
 
@@ -881,7 +890,7 @@ void Game::creatureBroadcastTileUpdated(const Position& pos)
 
 	for(unsigned int i = 0; i < list.size(); ++i)
 	{
-		list[i]->onTileUpdated(&pos);
+		list[i]->onTileUpdated(pos);
 	}
 }
 
@@ -1071,7 +1080,7 @@ void Game::teleport(Creature *creature, Position newPos) {
     std::vector<Creature*> list;
     getSpectators(Range(oldPos, true), list);
     for(size_t i = 0; i < list.size(); ++i)
-      list[i]->onTileUpdated(&oldPos);
+      list[i]->onTileUpdated(oldPos);
     list.clear();
     getSpectators(Range(creature->pos, true), list);
     for(size_t i = 0; i < list.size(); ++i)
@@ -1459,14 +1468,14 @@ OTSYS_THREAD_LOCK(gameLock)
 
 					//could be death due to a magic damage with no owner (fire/poison/energy)
 					if(creature && target->health <= 0) {
-						if(spectator->CanSee(creature->pos.x, creature->pos.y)) {
+						if(spectator->CanSee(creature->pos.x, creature->pos.y, creature->pos.z)) {
 							std::stringstream exp;
 							exp << (int)(target->experience * 0.1);
 							msg.AddAnimatedText(creature->pos, 983, exp.str());
 						}
 					}
 
-					if(spectator->CanSee(target->pos.x, target->pos.y))
+					if(spectator->CanSee(target->pos.x, target->pos.y, target->pos.z))
 					{
 						if(damage != 0) {
 							std::stringstream dmg;
@@ -1782,16 +1791,16 @@ void Game::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fi
 			if(damagetype == FIGHT_MAGICDIST)
 				msg.AddDistanceShoot(creature->pos, attackedCreature->pos, NM_ANI_ENERGY);
 
-			if (attackedCreature->manaShieldTicks < 1000 && (damage == 0) && (p->CanSee(attackedCreature->pos.x, attackedCreature->pos.y))) {
+			if (attackedCreature->manaShieldTicks < 1000 && (damage == 0) && (p->CanSee(attackedCreature->pos.x, attackedCreature->pos.y, attackedCreature->pos.z))) {
 				msg.AddMagicEffect(attackedCreature->pos, NM_ME_PUFF);
 			}
-			else if (attackedCreature->manaShieldTicks < 1000 && (damage < 0) && (p->CanSee(attackedCreature->pos.x, attackedCreature->pos.y)))
+			else if (attackedCreature->manaShieldTicks < 1000 && (damage < 0) && (p->CanSee(attackedCreature->pos.x, attackedCreature->pos.y, attackedCreature->pos.z)))
 			{
 				msg.AddMagicEffect(attackedCreature->pos, NM_ME_BLOCKHIT);
 			}
 			else
 			{
-				if (p->CanSee(attackedCreature->pos.x, attackedCreature->pos.y))
+				if (p->CanSee(attackedCreature->pos.x, attackedCreature->pos.y, attackedCreature->pos.z))
 				{
 					std::stringstream dmg, manaDmg;
 					dmg << std::abs(damage);

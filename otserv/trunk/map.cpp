@@ -166,7 +166,7 @@ void MapState::getMapChanges(Player *spectator, NetworkMessage &msg)
 		}
 		*/
 
-		if(!spectator->CanSee(preChangeItemMapIt->second.pos.x,  preChangeItemMapIt->second.pos.y))
+		if(!spectator->CanSee(preChangeItemMapIt->second.pos.x, preChangeItemMapIt->second.pos.y, preChangeItemMapIt->second.pos.z))
 			continue;
 
 		Tile *targettile = map->getTile(preChangeItemMapIt->second.pos.x,  preChangeItemMapIt->second.pos.y, preChangeItemMapIt->second.pos.z);
@@ -178,7 +178,7 @@ void MapState::getMapChanges(Player *spectator, NetworkMessage &msg)
 		if(preChangeItemMapIt->second.thingCount > 9 && changesItemMap[targettile].size() > 0) {
 			if(std::find(tileUpdatedVec.begin(), tileUpdatedVec.end(), targettile) == tileUpdatedVec.end()) {
 				tileUpdatedVec.push_back(targettile);
-				((Creature*)spectator)->onTileUpdated(&preChangeItemMapIt->second.pos);
+				((Creature*)spectator)->onTileUpdated(preChangeItemMapIt->second.pos);
 			}
 
 			#if __DEBUG__
@@ -199,7 +199,7 @@ void MapState::getMapChanges(Player *spectator, NetworkMessage &msg)
 		TileChangeDataVec::const_iterator thIt;
 		for(thIt = changesItemMapIt->second.begin(); thIt != changesItemMapIt->second.end(); ++thIt) {
 			
-			if(!spectator->CanSee(thIt->/*thing->*/pos.x,  thIt->/*thing->*/pos.y))
+			if(!spectator->CanSee(thIt->/*thing->*/pos.x,  thIt->/*thing->*/pos.y, thIt->pos.z))
 				continue;
 
 			if(thIt->remove) {
@@ -373,27 +373,17 @@ void Map::getSpectators(const Range& range, std::vector<Creature*>& list)
 #endif
 */
 
-	int offset;
+	int offsetz;
 	CreatureVector::iterator cit;
 	Tile *tile;
 
-	//for(int nz = range.minRange.z; nz != range.maxRange.z + range.zstep; nz += range.zstep) {
 	for(int nz = range.minRange.z; nz != range.maxRange.z + range.zstep; nz += range.zstep) {
-		//centerpos.z = 9
-		//9 - (9 - (-2)) = -2
-		//9 - (9 - (-1)) = -1
-		//9 - (9 - (0)) = 0
-		//9 - (9 - 1) = 1
-
-		//centerpos.z = 7
-		//7 - (7 - 7) = 7
-		//offset = range.centerpos.z - (range.centerpos.z - nz);
-		offset = range.centerpos.z - nz;
+		offsetz = range.centerpos.z - nz;
 		//negative offset means that the player is on a lower floor than ourself
 
-		for (int nx = range.minRange.x + offset; nx <= range.maxRange.x + offset; ++nx)
+		for (int nx = range.minRange.x + offsetz; nx <= range.maxRange.x + offsetz; ++nx)
 		{
-			for (int ny = range.minRange.y + offset; ny <= range.maxRange.y + offset; ++ny)
+			for (int ny = range.minRange.y + offsetz; ny <= range.maxRange.y + offsetz; ++ny)
 			{
 				tile = getTile(nx + range.centerpos.x, ny + range.centerpos.y, nz);
 				if (tile)

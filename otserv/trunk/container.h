@@ -28,18 +28,19 @@ typedef std::list<Item *> ContainerList;
 class Container : public Item
 {
 	private:
+		Container *parent;
 		unsigned short maxitems; //number of max items in container  
 		unsigned short actualitems; // number of items in container
 		ContainerList lcontained;
 
 	public:
-		//typedef std::list<Item *>::const_iterator const_iterator;
-
 		Container(const unsigned short _type);
 		virtual ~Container();
 
 		int size() const {return actualitems;};
 		int capacity() const {return maxitems;};
+		void setParent(Container* container) {parent = container;};
+		Container *getParent()  {return parent;}
 
 		ContainerList::const_iterator getItems() const;     // begin();
 		ContainerList::const_iterator getEnd() const;       // iterator beyond the last element

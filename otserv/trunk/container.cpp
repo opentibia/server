@@ -24,11 +24,12 @@ Container::Container(const unsigned short _type) : Item(_type)
 {
 	maxitems = 20;
 	actualitems = 0;
+	parent = 0;
 }
 
 Container::~Container()
 {
-	for(ContainerList::iterator cit = lcontained.begin(); cit != lcontained.end(); cit++)
+	for(ContainerList::iterator cit = lcontained.begin(); cit != lcontained.end(); ++cit)
 	{
     delete (*cit);
   }
@@ -46,15 +47,16 @@ bool Container::addItem(Item *newitem) {
 	// new items just get placed in front of the items we already have...
 	if(lcontained.size() < maxitems) {
 		newitem->pos.x = 0xFFFF;
-		/*
-		newitem->pos.y = 0xFFFF;
-		newitem->pos.z = 0xFFFF;
-		*/
+
+		Container* container = dynamic_cast<Container*>(newitem); 
+		if(container) {
+			container->setParent(this);
+		}
 
 		lcontained.push_front(newitem);
 
 		// increase the itemcount
-		actualitems++;
+		++actualitems;
 		return true;
 	}
 
@@ -65,8 +67,14 @@ bool Container::removeItem(Item* item)
 {
 	for (ContainerList::iterator cit = lcontained.begin(); cit != lcontained.end(); cit++) {
 		if((*cit) == item) {
+
+			Container* container = dynamic_cast<Container*>(*cit); 
+			if(container) {
+				container->setParent(NULL);
+			}
+
 			lcontained.erase(cit);
-			actualitems--;
+			--actualitems;
 			return true;
 		}
 	}
@@ -79,7 +87,7 @@ void Container::isHolding(const Item* item, bool& found) const
 	if(found || item == NULL)
 		return;
 
-	for (ContainerList::const_iterator cit = lcontained.begin(); cit != lcontained.end(); cit++) {
+	for (ContainerList::const_iterator cit = lcontained.begin(); cit != lcontained.end(); ++cit) {
 		Container *container = dynamic_cast<Container*>(*cit);
 		if(container) {
 
@@ -96,25 +104,25 @@ void Container::isHolding(const Item* item, bool& found) const
 void Container::moveItem(unsigned char from_slot, unsigned char to_slot)
 {
 	int n = 0;
-	for (ContainerList::iterator cit = lcontained.begin(); cit != lcontained.end(); cit++) {
+	for (ContainerList::iterator cit = lcontained.begin(); cit != lcontained.end(); ++cit) {
 		if(n == from_slot) {
 			Item *item = (*cit);
 			lcontained.erase(cit);
 			lcontained.push_front(item);
 			break;
 		}
-		n++;
+		++n;
 	}
 }
 
 Item* Container::getItem(unsigned long slot_num)
 {
 	size_t n = 0;			
-	for (ContainerList::const_iterator cit = getItems(); cit != getEnd(); cit++) {
+	for (ContainerList::const_iterator cit = getItems(); cit != getEnd(); ++cit) {
 		if(n == slot_num)
 			return *cit;
 		else
-			n++;
+			++n;
 	}
 
 	return NULL;
@@ -123,11 +131,11 @@ Item* Container::getItem(unsigned long slot_num)
 unsigned char Container::getSlotNumberByItem(const Item* item) const
 {
 	unsigned char n = 0;			
-	for (ContainerList::const_iterator cit = getItems(); cit != getEnd(); cit++) {
+	for (ContainerList::const_iterator cit = getItems(); cit != getEnd(); ++cit) {
 		if(*cit == item)
 			return n;
 		else
-			n++;
+			++n;
 	}
 
 	return 0xFF;

@@ -70,7 +70,7 @@ void MagicEffectClass::getMagicEffect(const Player* spectator, const Creature* a
 			bool hasTarget, int damage, bool isPz, bool isBlocking, NetworkMessage &msg) const
 {
 	if(!isBlocking && hasTarget) {
-		if(spectator->CanSee(pos.x, pos.y)) {
+		if(spectator->CanSee(pos.x, pos.y, pos.z)) {
 			if(physical && damage > 0)
 				msg.AddMagicEffect(pos, NM_ME_DRAW_BLOOD);
 
@@ -84,7 +84,7 @@ void MagicEffectClass::getDistanceShoot(const Player* spectator, const Creature*
 			bool hasTarget, NetworkMessage &msg) const
 {
 	if(animationEffect > 0) {
-		if(spectator->CanSee(attacker->pos.x, attacker->pos.y) || spectator->CanSee(to.x, to.y)) {
+		if(spectator->CanSee(attacker->pos.x, attacker->pos.y, attacker->pos.z) || spectator->CanSee(to.x, to.y, to.z)) {
 			msg.AddDistanceShoot(attacker->pos, to, animationEffect);
 		}
 	}
@@ -120,7 +120,7 @@ void MagicEffectTargetClass::getMagicEffect(const Player* spectator, const Creat
 	}
 	else {
 		if(attacker) {
-			if(spectator->CanSee(attacker->pos.x, attacker->pos.y)) {
+			if(spectator->CanSee(attacker->pos.x, attacker->pos.y, attacker->pos.z)) {
 				msg.AddMagicEffect(attacker->pos, NM_ME_PUFF);
 			}
 		}
@@ -131,7 +131,7 @@ void MagicEffectTargetClass::getDistanceShoot(const Player* spectator, const Cre
 			bool hasTarget, NetworkMessage &msg) const
 {
 	if(animationEffect > 0 && hasTarget) {
-		if(spectator->CanSee(attacker->pos.x, attacker->pos.y) || spectator->CanSee(to.x, to.y)) {
+		if(spectator->CanSee(attacker->pos.x, attacker->pos.y, attacker->pos.z) || spectator->CanSee(to.x, to.y, to.z)) {
 			msg.AddDistanceShoot(attacker->pos, to, animationEffect);
 		}
 	}
@@ -251,7 +251,7 @@ void MagicEffectTargetGroundClass::getDistanceShoot(const Player* spectator, con
 			bool hasTarget, NetworkMessage &msg) const
 {
 	if(hasTarget && animationEffect > 0) {
-		if(spectator->CanSee(attacker->pos.x, attacker->pos.y) || spectator->CanSee(to.x, to.y)) {
+		if(spectator->CanSee(attacker->pos.x, attacker->pos.y, attacker->pos.z) || spectator->CanSee(to.x, to.y, to.z)) {
 			msg.AddDistanceShoot(attacker->pos, to, animationEffect);
 		}
 	}
@@ -273,7 +273,7 @@ void MagicEffectAreaClass::getMagicEffect(const Player* spectator, const Creatur
 	}
 	else {
 		if(!isBlocking && areaEffect != 0xFF && (attacker->access != 0 || !isPz)) {
-			if(spectator->CanSee(pos.x, pos.y)) {
+			if(spectator->CanSee(pos.x, pos.y, pos.z)) {
 				msg.AddMagicEffect(pos, areaEffect);
 			}
 		}

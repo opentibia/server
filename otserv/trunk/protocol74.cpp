@@ -373,7 +373,7 @@ void Protocol74::checkCreatureAsKnown(unsigned long id, bool &known, unsigned lo
       removedKnown = knownPlayers.front();
 
       Creature *c = game->getCreatureByID(removedKnown);
-      if ((!c) || (!CanSee(c->pos.x, c->pos.y)))
+      if ((!c) || (!CanSee(c->pos.x, c->pos.y, c->pos.z)))
         break;
 
       // this creature we can't remove, still in sight, so back to the end
@@ -585,7 +585,7 @@ void Protocol74::parseRequestOutfit(NetworkMessage &msg)
 
 
 void Protocol74::sendSetOutfit(const Creature* creature) {
-if (CanSee(creature->pos.x, creature->pos.y)) {
+if (CanSee(creature->pos.x, creature->pos.y, creature->pos.z)) {
 	NetworkMessage newmsg;
 	newmsg.AddByte(0x8E);
 	newmsg.AddU32(creature->getID());
@@ -706,6 +706,7 @@ void Protocol74::sendContainer(unsigned char index, Container *container)
 	if(!container)
 		return;
 
+	/*
 	const Container *parentcontainer = NULL;
 
 	for(unsigned int cid = 0; cid < player->getContainerCount(); ++cid) {
@@ -714,6 +715,7 @@ void Protocol74::sendContainer(unsigned char index, Container *container)
 			parentcontainer = container;
 		}
 	}
+	*/
 
 	NetworkMessage msg;
 
@@ -725,7 +727,7 @@ void Protocol74::sendContainer(unsigned char index, Container *container)
 	msg.AddU16(container->getID());
 	msg.AddString(container->getName());
 	msg.AddByte(container->capacity());
-	if(parentcontainer)
+	if(container->getParent() != NULL)
 		/* TODO: implement up arrow */
 		msg.AddByte(0x01); // container up ID (can go up) 
 	else
@@ -883,6 +885,7 @@ void Protocol74::parseUpArrowContainer(NetworkMessage &msg)
 	if(!container)
 		return;
 
+	/*
 	Container *parentcontainer = NULL;
 
 	for(unsigned int cid = 0; cid < player->getContainerCount(); ++cid) {
@@ -892,9 +895,9 @@ void Protocol74::parseUpArrowContainer(NetworkMessage &msg)
 			break;
 		}
 	}
-
+	*/
+	Container *parentcontainer = container->getParent();
 	if(parentcontainer) {
-		//player->addContainer(containerid, parentcontainer); 
 		sendContainer(containerid, parentcontainer);
 	}
 }
@@ -1284,13 +1287,42 @@ void Protocol74::sendPlayerItemChange(Action* action){
 */
 
 
-bool Protocol74::CanSee(int x, int y) const
+bool Protocol74::CanSee(int x, int y, int z) const
 {
-  if ((x >= player->pos.x - 8) && (x <= player->pos.x + 9) &&
+	Range rangePlayer(player->pos, true);
+#ifdef __DEBUG__
+	if(z < 0 || z >= MAP_LAYER) {
+		std::cout << "WARNING! Protocol74::CanSee() Z-value is out of range!" << std::endl;
+	}
+#endif
+
+	/*underground 8->15*/
+	if(rangePlayer.centerpos.z > 7 && z < 6 /*8 - 2*/) {
+		return false;
+	}
+	/*ground level and above 7->0*/
+	else if(rangePlayer.centerpos.z <= 7 && z > 7){
+		return false;
+	}
+
+	//negative offset means that the action taken place is on a lower floor than ourself
+	int offsetz = rangePlayer.centerpos.z - z;
+
+	if ((x >= rangePlayer.centerpos.x + rangePlayer.minRange.x + offsetz) &&
+		  (x <= rangePlayer.centerpos.x + rangePlayer.maxRange.x + offsetz) &&
+      (y >= rangePlayer.centerpos.y + rangePlayer.minRange.y + offsetz) &&
+			(y <= rangePlayer.centerpos.y + rangePlayer.maxRange.y + offsetz))
+    return true;
+
+  return false;
+	
+	/*
+	if ((x >= player->pos.x - 8) && (x <= player->pos.x + 9) &&
       (y >= player->pos.y - 6) && (y <= player->pos.y + 7))
     return true;
 
   return false;
+	*/
 }
 
 
@@ -1301,16 +1333,16 @@ void Protocol74::sendNetworkMessage(NetworkMessage *msg)
 
 
 
-void Protocol74::sendTileUpdated(const Position *Pos)
+void Protocol74::sendTileUpdated(const Position &pos)
 {
 	//1D00	69	CF81	587C	07	9501C405C405C405C405C405C405780600C405C40500FF
-  if (CanSee(Pos->x, Pos->y))
+  if (CanSee(pos.x, pos.y, pos.z))
   {
 	  NetworkMessage msg;
 	  msg.AddByte(0x69);
-	  msg.AddPosition(*Pos);
+	  msg.AddPosition(pos);
 
-		Tile* tile = game->getTile(Pos->x, Pos->y, Pos->z);
+		Tile* tile = game->getTile(pos.x, pos.y, pos.z);
 		if(tile) {
 			GetTileDescription(tile, msg);
 			msg.AddByte(0);
@@ -1372,7 +1404,7 @@ void Protocol74::sendThingMove(const Creature *creature, const Thing *thing, con
   NetworkMessage msg;
 
 	const Creature* c = dynamic_cast<const Creature*>(thing);
-  if (c && (CanSee(oldPos->x, oldPos->y)) && (CanSee(thing->pos.x, thing->pos.y)))
+  if (c && (CanSee(oldPos->x, oldPos->y, oldPos->z)) && (CanSee(thing->pos.x, thing->pos.y, thing->pos.z)))
   {
     msg.AddByte(0x6D);
     msg.AddPosition(*oldPos);
@@ -1381,14 +1413,14 @@ void Protocol74::sendThingMove(const Creature *creature, const Thing *thing, con
   }
   else
   {
-    if (CanSee(oldPos->x, oldPos->y))
+    if (CanSee(oldPos->x, oldPos->y, oldPos->z))
     {
       msg.AddByte(0x6C);
       msg.AddPosition(*oldPos);
       msg.AddByte(oldStackPos);
     }
 
-    if (CanSee(thing->pos.x, thing->pos.y))
+    if (CanSee(thing->pos.x, thing->pos.y, thing->pos.z))
     {
       msg.AddByte(0x6A);
       msg.AddPosition(thing->pos);
@@ -1426,7 +1458,7 @@ void Protocol74::sendThingMove(const Creature *creature, const Thing *thing, con
 void Protocol74::sendTeleport(const Creature *creature, const Position *oldPos, unsigned char oldStackPos) { 
   NetworkMessage msg; 
   if (creature == this->player) {
-    if (CanSee(oldPos->x, oldPos->y)) { 
+    if (CanSee(oldPos->x, oldPos->y, oldPos->z)) { 
       msg.AddByte(0x6C); 
       msg.AddPosition(*oldPos); 
       msg.AddByte(oldStackPos); 
@@ -1437,7 +1469,7 @@ void Protocol74::sendTeleport(const Creature *creature, const Position *oldPos, 
     GetMapDescription(player->pos.x-8, player->pos.y-6, player->pos.z, 18, 14, msg); 
 
     msg.WriteToSocket(s); 
-  } else if (CanSee( creature->pos.x, creature->pos.y )){
+  } else if (CanSee( creature->pos.x, creature->pos.y, creature->pos.z)){
       bool known;
       unsigned long removedKnown;
       checkCreatureAsKnown(creature->getID(), known, removedKnown);
@@ -1455,7 +1487,7 @@ void Protocol74::sendCreatureAppear(const Creature *creature)
 {
   NetworkMessage msg;
 
-  if ((creature != player) && CanSee(creature->pos.x, creature->pos.y))
+  if ((creature != player) && CanSee(creature->pos.x, creature->pos.y, creature->pos.z))
   {
    // msg.AddByte(0xD3);
    // msg.AddU32(creature->getID());
@@ -1527,7 +1559,7 @@ void Protocol74::sendCreatureAppear(const Creature *creature)
 
 void Protocol74::sendCreatureDisappear(const Creature *creature, unsigned char stackPos)
 {
-  if ((creature != player) && CanSee(creature->pos.x, creature->pos.y))
+  if ((creature != player) && CanSee(creature->pos.x, creature->pos.y, creature->pos.z))
   {
     NetworkMessage msg;
 
@@ -1544,7 +1576,7 @@ void Protocol74::sendCreatureDisappear(const Creature *creature, unsigned char s
 
 void Protocol74::sendCreatureTurn(const Creature *creature, unsigned char stackPos)
 {
-  if (CanSee(creature->pos.x, creature->pos.y))
+  if (CanSee(creature->pos.x, creature->pos.y, creature->pos.z))
   {
     NetworkMessage msg;
 

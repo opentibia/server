@@ -45,7 +45,7 @@ public:
 	unsigned long getIP() const;
 	//SOCKET getSocket() const {return s;}
 
-  virtual bool CanSee(int x, int y) const = 0;
+  virtual bool CanSee(int x, int y, int z) const = 0;
 
   virtual void sendNetworkMessage(NetworkMessage *msg) = 0;
 
@@ -55,7 +55,7 @@ public:
   virtual void sendCreatureTurn(const Creature *creature, unsigned char stackPos) = 0;
   virtual void sendCreatureSay(const Creature *creature, unsigned char type, const std::string &text) = 0;
   virtual void sendSetOutfit(const Creature* creature) = 0;
-	virtual void sendTileUpdated(const Position *Pos) = 0;
+	virtual void sendTileUpdated(const Position &pos) = 0;
 	virtual void sendContainerUpdated(Item *item, unsigned char from_id, unsigned char to_id, unsigned char from_slot, unsigned char to_slot, bool remove) = 0;
   virtual void sendIcons(int icons) = 0;
   virtual void sendCancel(const char *msg) = 0;

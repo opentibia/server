@@ -121,7 +121,7 @@ public:
 
   fight_t getFightType();
   void sendIcons();
-  bool CanSee(int x, int y) const;
+  bool CanSee(int x, int y, int z) const;
   void addSkillTry(int skilltry);
   void sendNetworkMessage(NetworkMessage *msg);
   void sendCancelAttacking();
@@ -148,7 +148,7 @@ protected:
   virtual void onTeleport(const Creature *creature, const Position *oldPos, unsigned char oldstackpos); 
   virtual void onThink();
   virtual std::string getDescription(bool self = false) const;
-	virtual void onTileUpdated(const Position *Pos);
+	virtual void onTileUpdated(const Position &pos);
 	virtual void onContainerUpdated(Item *item, unsigned char from_id, unsigned char to_id, unsigned char from_slot, unsigned char to_slot, bool remove);
 	Protocol *client;
 

@@ -159,35 +159,6 @@ public:
 		maxRange.y = maxRangeY;
 	}
 
-	/*
-	Range(int startx, int endx, int starty, int endy, int z, bool multilevel = false)
-	{
-		this->startx = startx;
-		this->endx = endx;
-		this->starty = starty;
-		this->endy = endy;
-		this->viewerz = z;
-		zstep = 1;
-
-		if(multilevel) {
-			if(z > 7) { //underground
-				//8->15
-				startz = z - 2;
-				endz = std::max(MAP_LAYER - 1, z + 2);
-			} else {
-				startz = 7;
-				endz = 0;
-
-				zstep = -1;
-			}
-		}
-		else {
-			startz = z;
-			endz = z;
-		}
-	}
-	*/
-
 	Position centerpos;
 	Position minRange;
 	Position maxRange;
@@ -204,13 +175,6 @@ private:
 	{
 		centerpos = pos;
 		
-		/*
-		minRange.x = -9;
-		minRange.y = -7;
-
-		maxRange.x = 9;
-		maxRange.y = 7;
-		*/
 		minRange.x = -8;
 		minRange.y = -6;
 
@@ -222,10 +186,8 @@ private:
 		if(multilevel) {
 			if(isUnderground()) {
 				//8->15
-				//minRange.z = -2;
-				//maxRange.z = 2;
 				minRange.z = std::min(centerpos.z + 2, MAP_LAYER - 1);
-				maxRange.z = std::max(centerpos.z - 2, 8/*0*/);
+				maxRange.z = std::max(centerpos.z - 2, 8);
 
 				zstep = -1;
 			} else {

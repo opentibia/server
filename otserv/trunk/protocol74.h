@@ -132,10 +132,10 @@ private:
   virtual void sendChangeSpeed(const Creature* creature);
   virtual void sendCancelAttacking();
   void sendSetOutfit(const Creature* creature);
-	virtual void sendTileUpdated(const Position *Pos);
+	virtual void sendTileUpdated(const Position &Pos);
 	virtual void sendContainerUpdated(Item *item, unsigned char from_id, unsigned char to_id, unsigned char from_slot, unsigned char to_slot, bool remove);
 
-  virtual bool CanSee(int x, int y) const;
+  virtual bool CanSee(int x, int y, int z) const;
   
   virtual void sendTeleport(const Creature *creature, const Position *oldPos, unsigned char oldStackPos);
 

@@ -389,9 +389,9 @@ fight_t Player::getFightType()
 }
 
 
-bool Player::CanSee(int x, int y) const
+bool Player::CanSee(int x, int y, int z) const
 {
-  return client->CanSee(x, y);
+  return client->CanSee(x, y, z);
 }
 
 
@@ -461,9 +461,9 @@ void Player::onCreatureChangeOutfit(const Creature* creature) {
 
 void Player::onThink(){}
 
-void Player::onTileUpdated(const Position *Pos)
+void Player::onTileUpdated(const Position &pos)
 {
-  client->sendTileUpdated(Pos);
+  client->sendTileUpdated(pos);
 }
 
 void Player::onContainerUpdated(Item *item, unsigned char from_id, unsigned char to_id,
