@@ -177,12 +177,12 @@ void Npc::doMove(int direction){
 void Npc::doMoveTo(Position target){
 	if(route.size() == 0 || route.back() != target || route.front() != this->pos){
 		route = this->map->getPathTo(this->pos, target);
-		route.pop_front();
 	}
 	if(route.size()==0){
 		//still no route, means there is none
 		return;
 	}
+	else route.pop_front();
 	Position nextStep=route.front();
 	route.pop_front();
 	int dx = nextStep.x - this->pos.x;
