@@ -213,68 +213,99 @@ void Protocol74::parsePacket(NetworkMessage &msg)
 }*/
 
 
+void Protocol74::GetTileDescription(const Tile* tile, NetworkMessage &msg)
+{
+	if (tile)
+	{
+		msg.AddItem(&tile->ground);
+
+		int count = 1;
+
+		if (tile->splash)
+		{
+			msg.AddItem(tile->splash);
+			count++;
+		}
+
+		ItemVector::const_iterator it;
+		for (it = tile->topItems.begin(); ((it !=tile->topItems.end()) && (count < 10)); ++it)
+		{
+  		msg.AddItem(*it);
+			count++;
+		}
+
+		CreatureVector::const_iterator itc;
+		for (itc = tile->creatures.begin(); ((itc !=tile->creatures.end()) && (count < 10)); ++itc)
+		{
+			bool known;
+			unsigned long removedKnown;
+			checkCreatureAsKnown((*itc)->getID(), known, removedKnown);
+  		msg.AddCreature(*itc, known, removedKnown);
+			count++;
+		}
+
+
+		for (it = tile->downItems.begin(); ((it !=tile->downItems.end()) && (count < 10)); ++it)
+		{
+  		msg.AddItem(*it);
+			count++;
+		}
+	}
+}
+
 void Protocol74::GetMapDescription(unsigned short x, unsigned short y, unsigned char z,
                                    unsigned short width, unsigned short height,
                                    NetworkMessage &msg)
 {
-	Tile* tile;	
-  int skip = -2;
-  int startz, endz, offset, cc=0;
+  Tile* tile;
+  int skip = -1;
+  int startz, endz, offset, zstep, cc = 0;
   if (z > 7) {
-    startz = z-2;   
-    z + 2 > 15 ? endz = 15 + 1 : endz = z + 2 + 1;
-  } else { startz = 7; endz = 0 - 1; } 
-  for (int nz = startz; nz != endz; z > 7 ? nz++ : nz-- )
-  for (int nx = 0; nx < width; nx++)
-    for (int ny = 0; ny < height; ny++) {
-      offset = z - nz;
-      int tx = ((int)x) + nx + offset;
-      int ty = ((int)y) + ny + offset;
-      tile = game->getTile(tx, ty, (unsigned char)nz);
-      if (tile) {  
-        if (skip >= 0) {
-          msg.AddByte(skip);
-          msg.AddByte(0xFF);
-          cc +=skip;
-        }   
-        skip = 0;
-        // ground, splash, topitems, creatures, downitems   
-        msg.AddItem(&tile->ground);
-        int count = 1;
-        if (tile->splash) { msg.AddItem(tile->splash); count++; }
-        ItemVector::iterator it;
-        for (it = tile->topItems.begin(); ((it !=tile->topItems.end()) && (count < 10)); it++) {
-          msg.AddItem(*it);  count++;
-        }
-        CreatureVector::iterator itc;
-        for (itc = tile->creatures.begin(); ((itc !=tile->creatures.end()) && (count < 10)); itc++) {
-          bool known;
-          unsigned long removedKnown;
-          checkCreatureAsKnown((*itc)->getID(), known, removedKnown);
-          msg.AddCreature(*itc, known, removedKnown);
-          count++;
-        }
-        for (it = tile->downItems.begin(); ((it !=tile->downItems.end()) && (count < 10)); it++) {
-          msg.AddItem(*it); count++;
-        }
-      } else {
-        if(skip == -1) { 
-        skip = 0;
-        }  
-        skip++;
-        if (skip == 255) {
-          msg.AddByte(255);
-          msg.AddByte(0xFF); 
-          cc += skip;
-          skip = -1; 
-        } 
-      }
-    }
+    startz = z - 2;   
+		endz = std::max(MAP_LAYER - 1, z + 2);
+		zstep = 1;
+  }
+	else {
+		startz = 7;
+		endz = 0;
+
+		zstep = -1;
+	}
+
+	for(int nz = startz; nz != endz + zstep; nz += zstep) {
+		for (int nx = 0; nx < width; nx++)
+			for (int ny = 0; ny < height; ny++) {
+				offset = z - nz;
+				tile = game->getTile(x + nx + offset, y + ny + offset, nz);
+				if (tile) {
+					if (skip >= 0) {
+						msg.AddByte(skip);
+						msg.AddByte(0xFF);
+						cc +=skip;
+					}   
+					skip = 0;
+
+					GetTileDescription(tile, msg);
+
+				}
+				else {
+					skip++;
+					if (skip == 0xFF) {
+						msg.AddByte(0xFF);
+						msg.AddByte(0xFF);
+						cc += skip;
+						skip = -1;
+					}
+				}
+			}
+	}
+
   if (skip >= 0) {
     msg.AddByte(skip);
     msg.AddByte(0xFF);
-    cc += skip;
-  }
+		cc += skip;
+	}
+
   #ifdef __DEBUG__
   printf("tiles in total: %d \n", cc);
   #endif
@@ -1122,39 +1153,26 @@ void Protocol74::sendNetworkMessage(NetworkMessage *msg)
 void Protocol74::sendTileUpdated(const Position *Pos)
 {
 	//1D00	69	CF81	587C	07	9501C405C405C405C405C405C405780600C405C40500FF
-  if (CanSee(Pos->x, Pos->y)) {
-    NetworkMessage msg;
-    msg.AddByte(0x69);
-    msg.AddPosition(*Pos);
-    
-    Tile *tile = game->getTile( Pos->x, Pos->y, Pos->z );
-    if (tile) {
-      msg.AddItem(&tile->ground);
-      int count = 1;
-      if (tile->splash) { msg.AddItem(tile->splash); count++; }
-      ItemVector::iterator it;
-      for (it = tile->topItems.begin(); ((it !=tile->topItems.end()) && (count < 10)); it++) {
-        msg.AddItem(*it);  count++;
-      }
-      CreatureVector::iterator itc;
-      for (itc = tile->creatures.begin(); ((itc !=tile->creatures.end()) && (count < 10)); itc++) {
-        bool known;
-        unsigned long removedKnown;
-        checkCreatureAsKnown((*itc)->getID(), known, removedKnown);
-        msg.AddCreature(*itc, known, removedKnown);
-        count++;
-      }
-      for (it = tile->downItems.begin(); ((it !=tile->downItems.end()) && (count < 10)); it++) {
-        msg.AddItem(*it); count++;
-      }
-      msg.AddByte(0);
-      msg.AddByte(0xFF);
-    } else {
-      msg.AddByte(1);
-      msg.AddByte(0xFF);
-    } 
-//  GetMapDescription(Pos->x, Pos->y, Pos->z, 1, 1, msg);
-    msg.WriteToSocket(s);
+  if (CanSee(Pos->x, Pos->y))
+  {
+	  NetworkMessage msg;
+	  msg.AddByte(0x69);
+	  msg.AddPosition(*Pos);
+
+		Tile* tile = game->getTile(Pos->x, Pos->y, Pos->z);
+		if(tile) {
+			GetTileDescription(tile, msg);
+			msg.AddByte(0);
+			msg.AddByte(0xFF);
+		}
+		else {
+			msg.AddByte(0x01);
+			msg.AddByte(0xFF);
+		}
+
+		//GetMapDescription(Pos->x, Pos->y, Pos->z, 1, 1, msg);
+
+	  msg.WriteToSocket(s);
   }
 }
 

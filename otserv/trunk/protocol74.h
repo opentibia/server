@@ -126,7 +126,9 @@ virtual void sendToChannel(const Creature * creature, unsigned char type, const 
   
   virtual void sendTeleport(const Creature *creature, const Position *oldPos, unsigned char oldStackPos);
 
-  // translate a map area to clientreadable format
+  void GetTileDescription(const Tile* tile, NetworkMessage &msg);
+
+	// translate a map area to clientreadable format
   void GetMapDescription(unsigned short x, unsigned short y, unsigned char z,
                          unsigned short width, unsigned short height,
                          NetworkMessage &msg);

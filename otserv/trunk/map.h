@@ -127,51 +127,111 @@ protected:
 
 class Range {
 public:
+	
 	Range(Position centerpos, bool multilevel = false) {
-		this->startx = centerpos.x - 9;
-		this->endx = centerpos.x + 9;
-		this->starty = centerpos.y - 7;
-		this->endy = centerpos.y + 7;
-		if(multilevel)
-			this->startz = 0;
-		else
-			this->startz = centerpos.z;
-		this->endz = centerpos.z;
-		this->multilevel = multilevel;
+		setRange(centerpos, multilevel);
+	}
+	
+	//Creates a union of 2 positions
+	Range(const Position& pos1, const Position& pos2)
+	{
+		Position topleft(std::min(pos1.x, pos2.x), std::min(pos1.y, pos2.y), pos1.z);
+		Position bottomright(std::max(pos1.x, pos2.x), std::max(pos1.y, pos2.y), pos1.z);
+
+		setRange(topleft, true);
+
+		maxRange.x += (bottomright.x - topleft.x);
+		maxRange.y += (bottomright.y - topleft.y);
 	}
 
+	Range(Position centerpos, int minRangeX, int maxRangeX, int minRangeY, int maxRangeY)
+	{
+		Range(centerpos, true);
+
+		minRange.x = -minRangeX;
+		minRange.y = -minRangeY;
+
+		maxRange.x = maxRangeX;
+		maxRange.y = maxRangeY;
+	}
+
+	/*
 	Range(int startx, int endx, int starty, int endy, int z, bool multilevel = false)
 	{
 		this->startx = startx;
 		this->endx = endx;
 		this->starty = starty;
 		this->endy = endy;
-		if(multilevel)
-			this->startz = 0;
-		else
-			this->startz = z;
-		this->endz = z;
-		this->multilevel = multilevel;
-	}
+		this->viewerz = z;
+		zstep = 1;
 
-	Range(int startx, int endx, int starty, int endy, int startz, int endz)
-	{
-		this->startx = startx;
-		this->endx = endx;
-		this->starty = starty;
-		this->endy = endy;
-		this->startz = startz;
-		this->endz = endz;
-		this->multilevel = multilevel;
-	}
+		if(multilevel) {
+			if(z > 7) { //underground
+				//8->15
+				startz = z - 2;
+				endz = std::max(MAP_LAYER - 1, z + 2);
+			} else {
+				startz = 7;
+				endz = 0;
 
-	int startx;
-	int endx;
-	int starty;
-	int endy;
-	int startz;
-	int endz;
+				zstep = -1;
+			}
+		}
+		else {
+			startz = z;
+			endz = z;
+		}
+	}
+	*/
+
+	Position centerpos;
+	Position minRange;
+	Position maxRange;
+
+	int zstep;	
 	bool multilevel;
+
+private:
+	bool isUnderground() const {
+		return (centerpos.z > 7);
+	}
+
+	void setRange(Position pos, bool multilevel = false)
+	{
+		centerpos = pos;
+		
+		/*
+		minRange.x = -9;
+		minRange.y = -7;
+
+		maxRange.x = 9;
+		maxRange.y = 7;
+		*/
+		minRange.x = -8;
+		minRange.y = -6;
+
+		maxRange.x = 9;
+		maxRange.y = 7;
+		
+		zstep = 1;
+
+		if(multilevel) {
+			if(isUnderground()) { //underground
+				//8->15
+				minRange.z = -2;
+				maxRange.z = 2;
+			} else {
+				minRange.z = 7;
+				maxRange.z = 0;
+
+				zstep = -1;
+			}
+		}
+		else {
+			minRange.z = -centerpos.z;
+			maxRange.z = centerpos.z;
+		}
+	}
 };
 
 /**

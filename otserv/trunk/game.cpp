@@ -460,13 +460,14 @@ void Game::thingMoveInternal(Creature *player,
     oldPos.y = from_y;
     oldPos.z = from_z;
 
-    if(!toTile && player == creature){
-         player->sendCancelWalk("Sorry, not possible...");
-         return;
-         }   
-    else if ((fromTile != NULL || fromContainer) && (toTile != NULL || toContainer))
-    {
-      if (fromTile && ((abs(from_x - player->pos.x) > 1) ||
+    if ((fromTile != NULL || fromContainer) /*&& (toTile != NULL || toContainer)*/)
+		{
+			if(!toTile && player == creature){
+					player->sendCancelWalk("Sorry, not possible...");
+					return;
+			}
+
+			if (fromTile && ((abs(from_x - player->pos.x) > 1) ||
           (abs(from_y - player->pos.y) > 1)))
       {
         player->sendCancel("To far away...");
@@ -480,7 +481,7 @@ void Game::thingMoveInternal(Creature *player,
 															(toContainer ? player->pos : Position(to_x, to_y, to_z)), false)) {
 				player->sendCancel("You cannot throw there.");
 			}
-			else if (toTile && !thing->canMovedTo(toTile))
+			else if (!toTile || (toTile && !thing->canMovedTo(toTile)))
       {
         if (player == thing)
           player->sendCancelWalk("Sorry, not possible...");
@@ -689,9 +690,12 @@ void Game::thingMoveInternal(Creature *player,
 					}
 
 					std::vector<Creature*> list;
+					/*
 					getSpectators(Range(min(oldPos.x, (int)to_x) - 9, max(oldPos.x, (int)to_x) + 9,
 														  min(oldPos.y, (int)to_y) - 7, max(oldPos.y, (int)to_y) + 7, oldPos.z, true), list);
-
+					*/
+					getSpectators(Range(oldPos, Position(to_x, to_y, to_z)), list);
+					
 					for(unsigned int i = 0; i < list.size(); ++i)
 					{
 						list[i]->onThingMove(player, thing, &oldPos, oldstackpos);
@@ -989,9 +993,12 @@ void Game::creatureYell(Creature *creature, std::string &text)
 		std::transform(text.begin(), text.end(), text.begin(), upchar);
 
 		std::vector<Creature*> list;
+		/*
 		map->getSpectators(Range(creature->pos.x - 18, creature->pos.x + 18,
 												creature->pos.y - 14, creature->pos.y + 14,
 												max(creature->pos.z - 3, 0), min(creature->pos.z + 3, MAP_LAYER - 1)), list);
+		*/
+		map->getSpectators(Range(creature->pos, 18, 18, 14, 14), list);
 
 		for(unsigned int i = 0; i < list.size(); ++i)
 		{
@@ -1072,32 +1079,50 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 		frompos = centerpos;
 	}
 
-	std::vector<Creature*> spectatorlist;
-	getSpectators(Range(min(frompos.x, centerpos.x) - 14, max(frompos.x, centerpos.x) + 14,
-											min(frompos.y, centerpos.y) - 11, max(frompos.y, centerpos.y) + 11,
-											frompos.z), spectatorlist);
-
-	//We do all changes against a MapState to keep track of the changes,
-	//need some more work to work for all situations...
-	MapState mapstate(map);
-
 	MagicAreaVec tmpMagicAreaVec;
 	me->getArea(centerpos, tmpMagicAreaVec);
 	
 	AreaTargetVec areaTargetVec;
 
 	Player* player = dynamic_cast<Player*>(creature);
+	Position topLeft(0xFFFF, 0xFFFF, 0xFFFF), bottomRight(0xFFFF, 0xFFFF, 0xFFFF);
 
 	//Filter out the tiles we actually can work on
 	for(MagicAreaVec::iterator maIt = tmpMagicAreaVec.begin(); maIt != tmpMagicAreaVec.end(); ++maIt) {
 		Tile *t = map->getTile(maIt->x, maIt->y, maIt->z);
 		if(t && (!creature || (creature->access != 0 || !t->isPz()) ) ) {
 			if(!t->isBlocking() && map->canThrowItemTo(frompos, (*maIt), false, true)) {
+				
+				if(maIt->x < topLeft.x)
+					topLeft.x = maIt->x;
+
+				if(maIt->y < topLeft.y)
+					topLeft.y = maIt->y;
+
+				if(maIt->x > bottomRight.x)
+					bottomRight.x = maIt->x;
+
+				if(maIt->y > bottomRight.y)
+					bottomRight.y = maIt->y;
+
 				areaTargetVec.push_back(make_pair(*maIt, TargetDataVec()));
 			}
 		}
 	}
 	
+	std::vector<Creature*> spectatorlist;
+	/*
+	getSpectators(Range(min(frompos.x, centerpos.x) - 14, max(frompos.x, centerpos.x) + 14,
+											min(frompos.y, centerpos.y) - 11, max(frompos.y, centerpos.y) + 11,
+											frompos.z), spectatorlist);
+	*/
+	//getSpectators(Range(frompos, centerpos), spectatorlist);
+	getSpectators(Range(topLeft, bottomRight), spectatorlist);
+
+	//We do all changes against a MapState to keep track of the changes,
+	//need some more work to work for all situations...
+	MapState mapstate(map);
+
 	//Apply the permanent effect to the map
 	for(AreaTargetVec::iterator taIt = areaTargetVec.begin(); taIt != areaTargetVec.end(); ++taIt) {
 		Tile *targettile = getTile(taIt->first.x,  taIt->first.y, taIt->first.z);
@@ -1563,10 +1588,13 @@ void Game::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fi
 		attackedCreature->health += min(-damage, attackedCreature->healthmax - attackedCreature->health);
 
 	std::vector<Creature*> list;
+	/*
 	getSpectators(Range(min(creature->pos.x, attackedCreature->pos.x) - 9,
 										  max(creature->pos.x, attackedCreature->pos.x) + 9,
 											min(creature->pos.y, attackedCreature->pos.y) - 7,
 											max(creature->pos.y, attackedCreature->pos.y) + 7, creature->pos.z), list);
+	*/
+	getSpectators(Range(creature->pos, attackedCreature->pos), list);
 
 	for(unsigned int i = 0; i < list.size(); ++i)
 	{

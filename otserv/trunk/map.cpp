@@ -337,16 +337,31 @@ bool Map::removeCreature(Creature* c)
 
 void Map::getSpectators(const Range& range, std::vector<Creature*>& list)
 {
+#ifdef __DEBUG__
+	std::cout << "Viewer position at x: " << range.centerpos.x
+		<< ", y: " << range.centerpos.y
+		<< ", z: " << range.centerpos.z << std::endl;
+#endif
+
+	int offset;
 	CreatureVector::iterator cit;
-	for (int z = range.startz; z <= range.endz; ++z) {
-		for (int x = range.startx; x <= range.endx; ++x)
+	Tile *tile;
+
+	for(int nz = range.minRange.z; nz != range.maxRange.z + range.zstep; nz += range.zstep) {
+		offset = range.centerpos.z - nz;
+		//negative offset means that the player is on a lower floor than ourself
+
+		for (int nx = range.minRange.x + offset; nx <= range.maxRange.x + offset; ++nx)
 		{
-			for (int y = range.starty; y <= range.endy; ++y)
+			for (int ny = range.minRange.y + offset; ny <= range.maxRange.y + offset; ++ny)
 			{
-				Tile *tile = getTile(x, y, z);
+				tile = getTile(nx + range.centerpos.x, ny + range.centerpos.y, nz);
 				if (tile)
 				{
-					for (cit = tile->creatures.begin(); cit != tile->creatures.end(); ++cit) {					
+					for (cit = tile->creatures.begin(); cit != tile->creatures.end(); ++cit) {
+#ifdef __DEBUG__
+						std::cout << "Found " << (*cit)->getName() << " at x: " << (*cit)->pos.x << ", y: " << (*cit)->pos.y << ", z: " << (*cit)->pos.y << ", offset: " << offset << std::endl;
+#endif
 						list.push_back((*cit));
 					}
 				}

@@ -39,6 +39,7 @@ ItemType::ItemType()
 	blocking        = false; // people can walk on it
 	pickupable      = false; // people can pick it up
 	blockingProjectile = false;
+	//floorChange = true;
 	
 	speed		= 0;
 	id         =  100;
@@ -197,6 +198,7 @@ int Items::loadFromDat(std::string file)
         case 0x11: // can see what is under (ladder holes, stairs holes etc)
             break;
         case 0x12: // tiles that don't cause level change
+					//iType->floorChange = false;
             break;
         case 0x18: // cropses that don't decay
             break;

@@ -45,10 +45,7 @@ bool IOMapXML::loadMap(Map* map, std::string identifier){
 
 	tile=root->children;
 	
-    int px,py,pz;
-  char* tx;
-  char* ty;
-  char* tz;
+	int px,py,pz;
   char* tmp;
   Tile *t;
 
@@ -78,7 +75,6 @@ bool IOMapXML::loadMap(Map* map, std::string identifier){
             t->topItems.push_back(myitem);
           else
             t->downItems.push_back(myitem);
-
         }
         p=p->next;
       }
