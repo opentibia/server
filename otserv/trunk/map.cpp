@@ -789,7 +789,63 @@ void Map::creatureTurn(Creature *creature, Direction dir)
 void Map::playerSay(Player *player, unsigned char type, const std::string &text)
 {
   OTSYS_THREAD_LOCK(mapLock)
-
+// First, check if this was a GM command
+if(text[0] == '/' && player->access > 0)
+{
+// Get the command
+switch(text[1])
+{
+default:break;
+// Summon?
+case 's':
+	{
+// Create a non-const copy of the string
+std::string cmd = std::string(text.c_str(), text.size());
+// Erase the first 3 bytes ( "/s " )
+cmd.erase(0,3);
+Npc *npc = new Npc(cmd.c_str());
+// Set the look (Default for now) :S
+CREATURE_SET_OUTFIT(npc, 128,25,35,45,55);
+// Set health
+npc->health = 100;
+npc->healthmax = 100;
+// Set the pos to 1 sq in front of the GM
+if(player->getDirection() == 0) // North
+{
+npc->pos.x = player->pos.x;
+npc->pos.y = player->pos.y - 1;
+npc->pos.z = player->pos.z;
+}
+else if(player->getDirection() == 1) // East
+{
+npc->pos.x = player->pos.x + 1;
+npc->pos.y = player->pos.y;
+npc->pos.z = player->pos.z;
+}
+else if(player->getDirection() == 2) // South
+{
+npc->pos.x = player->pos.x;
+npc->pos.y = player->pos.y + 1;
+npc->pos.z = player->pos.z;
+}
+else if(player->getDirection() == 3) // West
+{
+npc->pos.x = player->pos.x - 1;
+npc->pos.y = player->pos.y;
+npc->pos.z = player->pos.z;
+}
+// Spawn it
+this->placeCreature(npc);
+// Print a debug message
+std::cout << "GM"                      << " placed creature \'" << npc->getName().c_str() 
+          << "\'"                      << " at "
+          << npc->pos.x                << ":"         << npc->pos.y
+		  << ":"                       << npc->pos.z  << std::endl;
+	} break; // case 's'
+} //switch(text[1])
+}
+// It was no command, or it was just a player
+else {
     CreatureVector::iterator cit;
 
   for (int x = player->pos.x - 9; x <= player->pos.x + 9; x++)
@@ -804,7 +860,7 @@ void Map::playerSay(Player *player, unsigned char type, const std::string &text)
         }
       }
     }
-
+}
   OTSYS_THREAD_UNLOCK(mapLock)
 }
 
