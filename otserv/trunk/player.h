@@ -68,8 +68,6 @@ public:
 	Player(const char *name, Protocol* p);
 	virtual ~Player();
 
-  virtual bool isPlayer() const { return true; };
-
   void speak(const std::string &text);
 
 	int addItem(Item* item, int pos);

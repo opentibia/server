@@ -70,8 +70,6 @@ public:
   Creature(const char *name);
   virtual ~Creature() {};
 
-  virtual bool isCreature() const { return true; };
-
   virtual const std::string& getName() const {return name; };
 
   unsigned long getID() const { return id; }
