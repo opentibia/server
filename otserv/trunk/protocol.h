@@ -49,14 +49,38 @@ public:
 
   virtual void sendNetworkMessage(NetworkMessage *msg) = 0;
 
-  virtual void sendThingMove(const Creature *creature, const Thing *thing, const Position *oldPos, unsigned char oldStackPos, bool tele = false) = 0;
+  //container to container
+	virtual void sendThingMove(const Creature *creature, const Container *fromContainer, Container *toContainer,
+		const Item* item, unsigned char from_slotid, unsigned char to_slotid, unsigned char oldcount, unsigned char count) = 0;
+
+	//container to ground
+	virtual void sendThingMove(const Creature *creature, const Container *fromContainer, const Position *newPos,
+		const Item* item, unsigned char from_slotid, unsigned char oldcount, unsigned char count) = 0;
+
+	//inventory to ground
+	virtual void sendThingMove(const Creature *creature, slots_t fromSlot, const Position *newPos,
+		const Item* item, unsigned char oldcount, unsigned char count) = 0;
+
+	//ground to container
+	virtual void sendThingMove(const Creature *creature, const Position *oldPos, const Container *toContainer,
+		const Item* item, unsigned char stackpos, unsigned char to_slotid, unsigned char oldcount, unsigned char count) = 0;
+
+	//ground to inventory
+	virtual void sendThingMove(const Creature *creature, const Position *oldPos, slots_t toSlot,
+		const Item* item, unsigned char stackpos, unsigned char oldcount, unsigned char count) = 0;
+
+	//ground to ground
+	virtual void sendThingMove(const Creature *creature, const Thing *thing,
+		const Position *oldPos, unsigned char oldStackPos, unsigned char oldcount,
+		unsigned char count, bool tele = false) = 0;
+
   virtual void sendCreatureAppear(const Creature *creature) = 0;
   virtual void sendCreatureDisappear(const Creature *creature, unsigned char stackPos) = 0;
   virtual void sendCreatureTurn(const Creature *creature, unsigned char stackPos) = 0;
   virtual void sendCreatureSay(const Creature *creature, unsigned char type, const std::string &text) = 0;
   virtual void sendSetOutfit(const Creature* creature) = 0;
 	virtual void sendTileUpdated(const Position &pos) = 0;
-	virtual void sendContainerUpdated(Item *item, unsigned char from_id, unsigned char to_id, unsigned char from_slot, unsigned char to_slot, bool remove) = 0;
+	//virtual void sendContainerUpdated(Item *item, unsigned char from_id, unsigned char to_id, unsigned char from_slot, unsigned char to_slot, bool remove) = 0;
   virtual void sendIcons(int icons) = 0;
   virtual void sendCancel(const char *msg) = 0;
   virtual void sendCancelWalk(const char *msg) = 0;

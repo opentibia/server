@@ -116,12 +116,37 @@ private:
 	virtual void sendChannels();
 	virtual void sendChannel(unsigned short channelId);
 	virtual void sendOpenPriv(std::string &receiver);
-	virtual void sendToChannel(const Creature * creature, unsigned char type, const std::string &text, unsigned short channelId);
+	virtual void sendToChannel(const Creature *creature, unsigned char type, const std::string &text, unsigned short channelId);
 	//void sendPlayerChangeGround(Action* action);
 
   virtual void sendNetworkMessage(NetworkMessage *msg);
   virtual void sendIcons(int icons);
-  virtual void sendThingMove(const Creature *creature, const Thing *thing, const Position *oldPos, unsigned char oldstackpos, bool tele = false);
+
+	//container to container
+	virtual void sendThingMove(const Creature *creature, const Container *fromContainer, Container *toContainer,
+		const Item* item, unsigned char from_slotid, unsigned char to_slotid, unsigned char oldcount, unsigned char count);
+
+	//container to ground
+	virtual void sendThingMove(const Creature *creature, const Container *fromContainer, const Position *newPos,
+		const Item* item, unsigned char from_slotid, unsigned char oldcount, unsigned char count);
+
+	//inventory to ground
+	virtual void sendThingMove(const Creature *creature, slots_t fromSlot, const Position *newPos,
+		const Item* item, unsigned char oldcount, unsigned char count);
+
+	//ground to container
+	virtual void sendThingMove(const Creature *creature, const Position *oldPos, const Container *toContainer,
+		const Item* item, unsigned char stackpos, unsigned char to_slotid, unsigned char oldcount, unsigned char count);
+
+	//ground to inventory
+	virtual void sendThingMove(const Creature *creature, const Position *oldPos, slots_t toSlot,
+		const Item* item, unsigned char stackpos, unsigned char oldcount, unsigned char count);
+
+	//ground to ground
+  virtual void sendThingMove(const Creature *creature, const Thing *thing,
+		const Position *oldPos, unsigned char oldstackpos, unsigned char oldcount,
+		unsigned char count, bool tele = false);
+
   virtual void sendCreatureAppear(const Creature *creature);
   virtual void sendCreatureDisappear(const Creature *creature, unsigned char stackPos);
   virtual void sendCreatureTurn(const Creature *creature, unsigned char stackpos);
@@ -133,11 +158,13 @@ private:
   virtual void sendCancelAttacking();
   void sendSetOutfit(const Creature* creature);
 	virtual void sendTileUpdated(const Position &Pos);
-	virtual void sendContainerUpdated(Item *item, unsigned char from_id, unsigned char to_id, unsigned char from_slot, unsigned char to_slot, bool remove);
+	//virtual void sendContainerUpdated(Item *item, unsigned char from_id, unsigned char to_id, unsigned char from_slot, unsigned char to_slot, bool remove);
 
   virtual bool CanSee(int x, int y, int z) const;
 
+	void GetTileUpdated(const Position &pos, NetworkMessage &msg);
 	void sendContainer(unsigned char index, Container *container);
+	void sendCloseContainer(unsigned char containerid);
 
 	// translate a tile to clientreadable format
   void GetTileDescription(const Tile* tile, NetworkMessage &msg);

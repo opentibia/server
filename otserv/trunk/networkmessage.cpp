@@ -365,7 +365,7 @@ void NetworkMessage::AddPlayerSkills(const Player *player)
 
 void NetworkMessage::AddPlayerInventoryItem(const Player *player, int item)
 {
-  if (player->items[item] == NULL)
+  if (player->getItem(item) == NULL)
   {
     AddByte(0x79);
     AddByte(item);
@@ -374,7 +374,7 @@ void NetworkMessage::AddPlayerInventoryItem(const Player *player, int item)
   {
     AddByte(0x78);
     AddByte(item);
-    AddItem(player->items[item]);
+    AddItem(player->getItem(item));
   }
 }
 

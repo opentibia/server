@@ -104,18 +104,10 @@ bool MapState::removeThingInternal(Tile *t, Thing *thing, bool onlyRegister)
 	Position oldPos = thing->pos;
 	if(onlyRegister || t->removeThing(thing)) {
 		tilechangedata tc;
-		tc.pos = oldPos;
+		tc.oldPos = oldPos;
+		tc.thing = thing;
 
-		/*
-		Item* item = dynamic_cast<Item*>(thing);
-		tc.item.id = item->getID();
-		tc.item.stackable = item->isStackable();
-		tc.item.multitype = item->isMultiType();
-		tc.item.ItemCountOrSubtype = item->getItemCountOrSubtype();
-		*/
-
-		//tc.thing = thing;
-		tc.remove = true;
+		tc.type = CHANGE_REMOVE;
 		tc.stackpos = stackpos;
 
 		vec.push_back(tc);
@@ -141,16 +133,10 @@ void MapState::addThingInternal(Tile *t, Thing *thing, bool onlyRegister)
 	int stackpos = t->getThingStackPos(thing);
 
 	tilechangedata tc;
-	tc.pos = oldPos;
+	tc.oldPos = oldPos;
+	tc.thing = thing;
 
-	Item* item = dynamic_cast<Item*>(thing);
-	tc.item.id = item->getID();
-	tc.item.stackable = item->isStackable();
-	tc.item.multitype = item->isMultiType();
-	tc.item.ItemCountOrSubtype = item->getItemCountOrSubtype();
-
-	//tc.thing = thing;
-	tc.remove = false;
+	tc.type = CHANGE_ADD;
 	tc.stackpos = stackpos;
 	vec.push_back(tc);
 }
@@ -160,6 +146,90 @@ void MapState::refreshThing(Tile *t, Thing *thing)
 {
 	removeThingInternal(t, thing, true);
 	addThingInternal(t, thing, true);
+}
+
+void MapState::replaceThing(Tile *t, Thing *oldThing, Thing *newThing)
+{
+	//First change to this tile?
+	if(!isTileStored(t)) {
+		addTile(t, oldThing->pos);
+	}
+
+	Position oldPos = oldThing->pos;
+	int stackpos = t->getThingStackPos(oldThing);
+
+	removeThingInternal(t, oldThing, false);
+	
+	std::vector<tilechangedata>& vec = changesItemMap[t];
+
+	if(t->insertThing(newThing, stackpos)) {
+		tilechangedata tc;
+		tc.oldPos = oldPos;
+		tc.thing = newThing;
+
+		tc.type = CHANGE_ADD;
+		tc.stackpos = stackpos;
+		vec.push_back(tc);
+	}
+
+	/*
+	//First change to this tile?
+	if(!isTileStored(t)) {
+		addTile(t, oldThing->pos);
+	}
+
+	std::vector<tilechangedata>& vec = changesItemMap[t];
+
+	Position oldPos = oldThing->pos;
+	int stackpos = t->getThingStackPos(oldThing);
+
+	if(t->insertThing(newThing, stackpos)) {
+		tilechangedata tc;
+		tc.oldPos = oldPos;
+		tc.thing = newThing;
+
+		tc.type = CHANGE_TRANSFORM;
+		tc.stackpos = stackpos;
+		vec.push_back(tc);
+	}
+	*/
+}
+
+void MapState::onRemoveThing(Player *spectator, Thing* thing, NetworkMessage &msg)
+{
+	Container *container = dynamic_cast<Container *>(thing);
+	if(container) {
+		unsigned char cid = spectator->getContainerID(container);
+
+		if(cid != 0xFF) {
+			std::vector<unsigned char> containerlist;
+
+			for(cid = 0; cid < spectator->getContainerCount(); ++cid) {
+				Container *tmpcontainer = spectator->getContainer(cid);
+
+				if(tmpcontainer == container) {
+					containerlist.push_back(cid);
+				}
+				else {
+					//Check if its a child container.
+					while(tmpcontainer != NULL) {
+						tmpcontainer = tmpcontainer->getParent();
+						if(tmpcontainer == container) {
+							containerlist.push_back(cid);
+							break;
+						}
+					}
+				}
+			}
+
+			for(std::vector<unsigned char>::iterator it = containerlist.begin(); it != containerlist.end(); ++it) {
+				spectator->closeContainer(*it);
+
+				msg.AddByte(0x6F);
+				msg.AddByte(*it);
+			}
+		}
+	}
 }
 
 void MapState::getMapChanges(Player *spectator, NetworkMessage &msg)
@@ -177,38 +247,46 @@ void MapState::getMapChanges(Player *spectator, NetworkMessage &msg)
 		if(!targettile)
 			continue;
 
-		//if(preChangeItemMapIt->second.thingCount > 9 && tileThingCountMap[targettile] > 0) {
 		if(preChangeItemMapIt->second.thingCount > 9 && changesItemMap[targettile].size() > 0) {
 			if(std::find(tileUpdatedVec.begin(), tileUpdatedVec.end(), targettile) == tileUpdatedVec.end()) {
 				tileUpdatedVec.push_back(targettile);
 				((Creature*)spectator)->onTileUpdated(preChangeItemMapIt->second.pos);
 			}
 
-			#if __DEBUG__
+#if __DEBUG__
 			std::cout << "pop-up item" << std::endl;
-			#endif
+#endif
 		}
 	}
 
 	//Add/remove items
 	TileChangeDataVecMap::const_iterator changesItemMapIt;
+	TileChangeDataVec::const_iterator thIt;
+
 	for(changesItemMapIt = changesItemMap.begin(); changesItemMapIt != changesItemMap.end(); ++changesItemMapIt) {
 		
 		if(std::find(tileUpdatedVec.begin(), tileUpdatedVec.end(), changesItemMapIt->first) != tileUpdatedVec.end()) {
-			//Tile has already been updated
+
+			for(thIt = changesItemMapIt->second.begin(); thIt != changesItemMapIt->second.end(); ++thIt) {
+				//Auto-closing containers
+				if(thIt->type == CHANGE_REMOVE) {
+					onRemoveThing(spectator, thIt->thing, msg);
+				}
+			}
+
+			//Tile has already been updated,
 			continue;
 		}
 
-		TileChangeDataVec::const_iterator thIt;
 		for(thIt = changesItemMapIt->second.begin(); thIt != changesItemMapIt->second.end(); ++thIt) {
 			
-			if(!spectator->CanSee(thIt->/*thing->*/pos.x,  thIt->/*thing->*/pos.y, thIt->pos.z))
+			if(!spectator->CanSee(thIt->oldPos.x,  thIt->oldPos.y, thIt->oldPos.z))
 				continue;
 
-			if(thIt->remove) {
+			if(thIt->type == CHANGE_REMOVE) {
 				if(thIt->stackpos < 10) {
 					msg.AddByte(0x6c);
-					msg.AddPosition(thIt/*->thing*/->pos);
+					msg.AddPosition(thIt->oldPos);
 					msg.AddByte(thIt->stackpos);
 				}
 				else {
@@ -218,20 +296,40 @@ void MapState::getMapChanges(Player *spectator, NetworkMessage &msg)
 					//and will show the player as alive (0 hp).
 					//Solution: re-log.
 				}
-			}
-			else {
-				//Item *item = dynamic_cast<Item*>(thIt->thing);
-				//if(item) {
-				msg.AddByte(0x6a);
-				msg.AddPosition(thIt->pos /*item->pos*/);
 
-				//AddItem()
-				msg.AddU16(thIt->item.id);
+				//Auto-closing containers
+				onRemoveThing(spectator, thIt->thing, msg);
 
-				if (thIt->item.stackable || thIt->item.multitype)
-					msg.AddByte(thIt->item.ItemCountOrSubtype);
+				/*
+				Container *container = dynamic_cast<Container *>(thIt->thing);
+				if(container) {
+					unsigned char cid = spectator->getContainerID(container);
+
+					if(cid != 0xFF) {
+						spectator->closeContainer(cid);
+						msg.AddByte(0x6F);
+						msg.AddByte(cid);
+					}
 				}
-			//}
+				*/
+			}
+			/*else if(thIt->type == CHANGE_TRANSFORM) {
+				Item *item = dynamic_cast<Item*>(thIt->thing);
+				if(item) {
+					msg.AddByte(0x6B);
+					msg.AddPosition(thIt->oldPos);
+					msg.AddByte(thIt->stackpos);
+					msg.AddItem(item);
+				}
+			}*/
+			else if(thIt->type == CHANGE_ADD) {
+				Item *item = dynamic_cast<Item*>(thIt->thing);
+				if(item) {
+					msg.AddByte(0x6a);
+					msg.AddPosition(thIt->oldPos);
+					msg.AddItem(item);
+				}
+			}
 		}
 	}
 }

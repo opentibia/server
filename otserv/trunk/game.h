@@ -142,30 +142,30 @@ class Game {
 		bool removeCreature(Creature* c);
 
     void thingMove(Creature *player, Thing *thing,
-        unsigned short to_x, unsigned short to_y, unsigned char to_z);
+        unsigned short to_x, unsigned short to_y, unsigned char to_z, unsigned char count);
 	
 		//container/inventory to container/inventory
 		void thingMove(Creature *player,
-				unsigned char from_cid, unsigned char from_slotid,
-				unsigned char to_cid, unsigned char to_slotid,
-				bool isInventory);
+				unsigned char from_cid, unsigned char from_slotid, bool fromInventory,
+				unsigned char to_cid, unsigned char to_slotid, bool toInventory,
+				unsigned char count);
 
 		//container/inventory to ground
 		void thingMove(Creature *player,
-				unsigned char from_cid, unsigned char from_slotid, const Position& toPos,
-				bool isInventory);
+				unsigned char from_cid, unsigned char from_slotid, bool fromInventory,
+				const Position& toPos, unsigned char count);
 
 		//ground to container/inventory
 		void thingMove(Creature *player,
 				const Position& fromPos, unsigned char stackPos,
 				unsigned char to_cid, unsigned char to_slotid,
-				bool isInventory);
+				bool isInventory, unsigned char count);
 		
 		//ground to ground
     void thingMove(Creature *player,
         unsigned short from_x, unsigned short from_y, unsigned char from_z,
         unsigned char stackPos,
-        unsigned short to_x, unsigned short to_y, unsigned char to_z);
+        unsigned short to_x, unsigned short to_y, unsigned char to_z, unsigned char count);
 
 	/**
 	  * Creature wants to turn.
@@ -214,26 +214,32 @@ class Game {
 		bool onPrepareMoveThing(Creature *player, const Thing* thing, const Tile *fromTile, const Tile *toTile);
 		bool onPrepareMoveThing(Creature *player, const Item* item, const Container *fromContainer, const Container *toContainer);
 		bool onPrepareMoveCreature(Creature *player, const Creature* creatureMoving, const Tile *fromTile, const Tile *toTile);
+		bool onPrepareMoveThing(Player *player, const Tile *fromTile, const Item *item, slots_t toSlot);
+		bool onPrepareMoveThing(Player *player, slots_t fromSlot, slots_t toSlot);
 
+		//container/inventory to container/inventory
 		void thingMoveInternal(Creature *player,
-				unsigned char from_cid, unsigned char from_slotid,
-				unsigned char to_cid, unsigned char to_slotid, bool isInventory);
+				unsigned char from_cid, unsigned char from_slotid, bool fromInventory,
+				unsigned char to_cid, unsigned char to_slotid, bool toInventory,
+				unsigned char count);
 
+		//container/inventory to ground
 		void thingMoveInternal(Creature *player,
-				unsigned char from_cid, unsigned char from_slotid, const Position& toPos,
-				bool isInventory);
+				unsigned char from_cid, unsigned char from_slotid, bool fromInventory,
+				const Position& toPos, unsigned char count);
 
+		//ground to container/inventory
 		void thingMoveInternal(Creature *player,
 				const Position& fromPos, unsigned char stackPos,
 				unsigned char to_cid, unsigned char to_slotid,
-				bool isInventory);
+				bool toInventory, unsigned char count);
 
 		// use this internal function to move things around to avoid the need of
     // recursive locks
     void thingMoveInternal(Creature *player,
         unsigned short from_x, unsigned short from_y, unsigned char from_z,
         unsigned char stackPos,
-        unsigned short to_x, unsigned short to_y, unsigned char to_z);
+        unsigned short to_x, unsigned short to_y, unsigned char to_z, unsigned char count);
 
 		void changeOutfit(unsigned long id, int looktype);
 		bool creatureOnPrepareAttack(Creature *creature, Position pos);
@@ -272,7 +278,8 @@ class Game {
 		//void checkMonsterAttacking(unsigned long id);
 		void checkPlayerAttacking(unsigned long id);
 		void checkPlayer(unsigned long id);
-		void decayItem(Item* item);
+		void decayItem(Item *item);
+		//void decayItem(Position& pos, unsigned short id, unsigned char stackpos);
 		void decaySplash(Item* item);
 
 		std::priority_queue<SchedulerTask*, std::vector<SchedulerTask*>, lessSchedTask > eventList;

@@ -53,19 +53,17 @@ public:
 	unsigned char thingCount;
 };
 
-struct itemstruct {
-	unsigned short id;
-	unsigned char ItemCountOrSubtype;
-	bool stackable;
-	bool multitype;
+enum itemchange_t {
+  CHANGE_REMOVE,
+	CHANGE_ADD,
+	CHANGE_TRANSFORM
 };
 
 struct tilechangedata {
-	Position pos;
-	//Thing *thing;
-	itemstruct item;
+	Position oldPos;
+	Thing *thing;
 	int stackpos;
-	bool remove;
+	itemchange_t type;
 };
 
 typedef std::vector<TilePreChangeData> TileExDataVec;
@@ -83,12 +81,14 @@ public:
 	void addThing(Tile *t, Thing *thing);
 	bool removeThing(Tile *t, Thing *thing);
 	void refreshThing(Tile *t, Thing *thing);
+	void replaceThing(Tile *t, Thing *oldThing, Thing *newThing);
 
 	void getMapChanges(Player *spectator, NetworkMessage &msg);
 
 protected:
 	Map* map;
-
+	void onRemoveThing(Player *spectator, Thing* thing, NetworkMessage &msg);
+	//void getItemChange(Player *spectator, NetworkMessage &msg);
 	void addThingInternal(Tile *t, Thing *thing, bool onlyRegister);
 	bool removeThingInternal(Tile *t, Thing *thing, bool onlyRegister);
 

@@ -73,14 +73,14 @@ public:
   void speak(const std::string &text);
 
 	int addItem(Item* item, int pos);
-	unsigned int getContainerCount() {return (uint32_t)vcontainers.size();}; //returns the current number of containers open
+	unsigned char getContainerCount() {return (unsigned char)vcontainers.size();}; //returns the current number of containers open
 	Container* getContainer(unsigned char containerid);
-	unsigned char getContainerID(Container* container);
+	unsigned char getContainerID(const Container* container) const;
 	void addContainer(unsigned char containerid, Container *container);
 	void closeContainer(unsigned char containerid);
 	int sendInventory();
 
-	Item* getItem(int pos);
+	Item* getItem(int pos) const;
 
 	std::string getName(){return name;};
 	
@@ -94,6 +94,7 @@ public:
   
   std::string password;
 
+  Item* items[11]; //equipement of the player
   unsigned int skills[7][2];
   
   //reminder: 0 = None, 1 = Sorcerer, 2 = Druid, 3 = Paladin, 4 = Knight
@@ -107,9 +108,7 @@ public:
   //for magic level advances
   unsigned int getReqMana(int maglevel, int voc); 
   
-
   //items
-  Item* items[11]; //equipement of the player
 	typedef std::pair<unsigned char, Container*> containerItem;
 	typedef std::vector<containerItem> containerLayout;
 	containerLayout vcontainers;
@@ -129,18 +128,17 @@ public:
   void sendChangeSpeed(Creature* creature);
   void sendToChannel(Creature *creature, unsigned char type, const std::string &text, unsigned short channelId);
   void die();      //player loses exp/skills/maglevel on death
-
   
   virtual void sendCancel(const char *msg);
   virtual void sendCancelWalk(const char *msg);
   virtual void setAttackedCreature(unsigned long id);
   virtual bool isAttackable() const { return (access == 0); };
   virtual bool isPushable() const { return (access == 0); };
+	virtual void dropLoot(Container *corpse);
 
 protected:
   int useCount;
 
-  virtual void onThingMove(const Creature *creature, const Thing *thing, const Position *oldPos, unsigned char oldstackpos);
   virtual void onCreatureAppear(const Creature *creature);
   virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos);
   virtual void onCreatureTurn(const Creature *creature, unsigned char stackpos);
@@ -150,7 +148,32 @@ protected:
   virtual int onThink(int& newThinkTicks);
   virtual std::string getDescription(bool self = false) const;
 	virtual void onTileUpdated(const Position &pos);
-	virtual void onContainerUpdated(Item *item, unsigned char from_id, unsigned char to_id, unsigned char from_slot, unsigned char to_slot, bool remove);
+	//virtual void onContainerUpdated(Item *item, unsigned char from_id, unsigned char to_id, unsigned char from_slot, unsigned char to_slot, bool remove);
+
+	//container to container
+	virtual void onThingMove(const Creature *creature, const Container *fromContainer, Container *toContainer,
+		const Item* item, unsigned char from_slotid, unsigned char to_slotid, unsigned char oldcount, unsigned char count);
+
+	//container to ground
+	virtual void onThingMove(const Creature *creature, const Container *fromContainer, const Position *newPos,
+		const Item* item, unsigned char from_slotid, unsigned char oldcount, unsigned char count);
+
+	//inventory to ground
+	virtual void onThingMove(const Creature *creature, slots_t fromSlot, const Position *newPos,
+		const Item* item, unsigned char oldcount, unsigned char count);
+
+	//ground to container
+	virtual void onThingMove(const Creature *creature, const Position *oldPos, const Container *toContainer,
+		const Item* item, unsigned char stackpos, unsigned char to_slotid, unsigned char oldcount, unsigned char count);
+
+	//ground to inventory
+	virtual void onThingMove(const Creature *creature, const Position *oldPos, slots_t toSlot,
+		const Item* item, unsigned char stackpos, unsigned char oldcount, unsigned char count);
+
+  //ground to ground
+	virtual void onThingMove(const Creature *creature, const Thing *thing, const Position *oldPos,
+		unsigned char oldstackpos, unsigned char oldcount, unsigned char count);
+
 	Protocol *client;
 
 	// we need our name

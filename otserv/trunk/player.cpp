@@ -131,7 +131,7 @@ std::string Player::getDescription(bool self) const
 	return str;
 }
 
-Item* Player::getItem(int pos)
+Item* Player::getItem(int pos) const
 {
 	if(pos>0 && pos <11)
 		return items[pos];
@@ -220,17 +220,23 @@ int Player::sendInventory(){
 }
 
 
-int Player::addItem(Item* item, int pos){
+int Player::addItem(Item* item, int pos) {
 #ifdef __DEBUG__
 	std::cout << "Should add item at " << pos <<std::endl;
 #endif
 
-	if(pos>0 && pos <11)
+	if(pos > 0 && pos < 11)
   {
-    if (items[pos])
+		if (items[pos]) {
       delete items[pos];
-		items[pos]=item;
+		}
+
+		items[pos] = item;
+		if(items[pos]) {
+			items[pos]->pos.x = 0xFFFF;
+		}
   }
+
 	client->sendInventory();
 	return true;
 }
@@ -316,9 +322,9 @@ Container* Player::getContainer(unsigned char containerid)
 	return NULL;
 }
 
-unsigned char Player::getContainerID(Container* container)
+unsigned char Player::getContainerID(const Container* container) const
 {
-  for(containerLayout::iterator cl = vcontainers.begin(); cl != vcontainers.end(); ++cl)
+  for(containerLayout::const_iterator cl = vcontainers.begin(); cl != vcontainers.end(); ++cl)
   {
 	  if(cl->second == container)
 			return cl->first;
@@ -364,6 +370,21 @@ void Player::closeContainer(unsigned char containerid)
 #ifdef __DEBUG__
 	cout << Creature::getName() << ", closeContainer: " << (int)containerid << std::endl;
 #endif
+}
+
+void Player::dropLoot(Container *corpse)
+{
+	for (int slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++)
+  {
+    Item *item = items[slot];
+		if (item) {
+			Container *container = dynamic_cast<Container*>(item);
+			if(container || random_range(1, 100) <= 10) {
+				corpse->addItem(item);
+				items[slot] = NULL;
+			}
+		}
+	}
 }
 
 fight_t Player::getFightType()
@@ -432,9 +453,46 @@ void Player::sendCancelWalk(const char *msg)
   client->sendCancelWalk(msg);
 }
 
-void Player::onThingMove(const Creature *creature, const Thing *thing, const Position *oldPos, unsigned char oldstackpos)
+void Player::onThingMove(const Creature *creature, const Thing *thing, const Position *oldPos,
+	unsigned char oldstackpos, unsigned char oldcount, unsigned char count)
 {
-  client->sendThingMove(creature, thing, oldPos, oldstackpos);
+  client->sendThingMove(creature, thing, oldPos, oldstackpos, oldcount, count);
+}
+
+ //container to container
+void Player::onThingMove(const Creature *creature, const Container *fromContainer, Container *toContainer,
+		const Item* item, unsigned char from_slotid, unsigned char to_slotid,
+		unsigned char oldcount, unsigned char count)
+{
+	client->sendThingMove(creature, fromContainer, toContainer, item, from_slotid, to_slotid, oldcount, count);
+}
+
+//container to ground
+void Player::onThingMove(const Creature *creature, const Container *fromContainer, const Position *newPos,
+	const Item* item, unsigned char from_slotid, unsigned char oldcount, unsigned char count)
+{
+	client->sendThingMove(creature, fromContainer, newPos, item, from_slotid, oldcount, count);
+}
+
+//inventory to ground
+void Player::onThingMove(const Creature *creature, slots_t fromSlot, const Position *newPos,
+	const Item* item, unsigned char oldcount, unsigned char count)
+{
+	client->sendThingMove(creature, fromSlot, newPos, item, oldcount, count);
+}
+
+//ground to container
+void Player::onThingMove(const Creature *creature, const Position *oldPos, const Container *toContainer,
+	const Item* item, unsigned char stackpos, unsigned char to_slotid, unsigned char oldcount, unsigned char count)
+{
+	client->sendThingMove(creature, oldPos, toContainer, item, stackpos, to_slotid, oldcount, count);
+}
+
+//ground to inventory
+void Player::onThingMove(const Creature *creature, const Position *oldPos, slots_t toSlot,
+	const Item* item, unsigned char stackpos, unsigned char oldcount, unsigned char count)
+{
+	client->sendThingMove(creature, oldPos, toSlot, item, stackpos, oldcount, count);
 }
 
 void Player::setAttackedCreature(unsigned long id){
@@ -479,14 +537,16 @@ void Player::onTileUpdated(const Position &pos)
   client->sendTileUpdated(pos);
 }
 
+/*
 void Player::onContainerUpdated(Item *item, unsigned char from_id, unsigned char to_id,
 																unsigned char from_slot, unsigned char to_slot, bool remove)
 {
 	client->sendContainerUpdated(item, from_id, to_id, from_slot, to_slot, remove);
 }
+*/
 
 void Player::onTeleport(const Creature *creature, const Position *oldPos, unsigned char oldstackpos) { 
-  client->sendThingMove(creature, creature,oldPos, oldstackpos, true); 
+  client->sendThingMove(creature, creature,oldPos, oldstackpos, true, 1, 1); 
 }
 
 unsigned long Player::getIP() const
@@ -554,7 +614,7 @@ void Player::die() {
 		//End Skill loss
         
 		//Level Downgrade
-		if ((unsigned long)(experience - (unsigned)(experience*0.1f)) < getExpForLv(level))         //0.1f is also used in die().. maybe we make a little function for exp-loss?
+		if ((unsigned long)(experience - getLostExperience()) < getExpForLv(level))         //0.1f is also used in die().. maybe we make a little function for exp-loss?
 		{
             if(level>1){          
 			std::stringstream lvMsg;

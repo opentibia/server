@@ -123,6 +123,7 @@ void GameState::onAttack(Creature* attacker, const Position& pos, const MagicEff
 
 			mapstate.addThing(tile, magicItem);
 
+			//game->addEvent(makeTask(newmagicItem->getDecayTime(), boost::bind(&Game::decayItem, this->game, magicItem->pos, magicItem->getID(), tile->getThingStackPos(magicItem)) ) );
 			game->addEvent(makeTask(newmagicItem->getDecayTime(), std::bind2nd(std::mem_fun(&Game::decayItem), magicItem)));
 		}
 	}
@@ -193,6 +194,7 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 		for(CreatureStateVec::iterator csIt = creatureStateVec.begin(); csIt != creatureStateVec.end(); ++csIt) {
 			if(csIt->first == attackedCreature) {
 				attackedCreatureState = &csIt->second;
+				break;
 			}
 		}
 
@@ -236,10 +238,17 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 		Item *corpseitem = Item::CreateItem(attackedCreature->lookcorpse);
 		corpseitem->pos = attackedCreature->pos;
 
+		//Add eventual loot
+		Container *lootcontainer = dynamic_cast<Container*>(corpseitem);
+		if(lootcontainer) {
+			attackedCreature->dropLoot(lootcontainer);
+		}
+
 		mapstate.addThing(tile, corpseitem);
 
 		//Start decaying
 		unsigned short decayTime = Item::items[corpseitem->getID()].decayTime;
+		//game->addEvent(makeTask(decayTime*1000, boost::bind(&Game::decayItem, this->game, corpseitem->pos, corpseitem->getID(), tile->getThingStackPos(corpseitem)) ) );
 		game->addEvent(makeTask(decayTime*1000, std::bind2nd(std::mem_fun(&Game::decayItem), corpseitem)));
 	}
 
@@ -278,6 +287,25 @@ void GameState::removeCreature(Creature *creature, unsigned char stackPos)
 		}
 	}
 }
+
+/*
+void GameState::removeItem(const Position& pos, Item* item)
+{
+	if(tile->getThingCount() > 8) {
+#ifdef __DEBUG__
+		cout << "removeItem() Pop-up item from below..." << std::endl;
+#endif
+		//We need to pop up this item
+		Thing *newthing = fromTile->getThingByStackPos(9);
+
+		if(newthing != NULL) {
+			creatureBroadcastTileUpdated(newthing->pos);
+		}
+	}
+
+	//delete item;
+}
+*/
 
 void GameState::getChanges(Player *spectator, NetworkMessage &msg)
 {
@@ -498,7 +526,7 @@ bool Game::removeCreature(Creature* c)
 }
 
 void Game::thingMove(Creature *player, Thing *thing,
-                    unsigned short to_x, unsigned short to_y, unsigned char to_z)
+	unsigned short to_x, unsigned short to_y, unsigned char to_z, unsigned char count)
 {
 	OTSYS_THREAD_LOCK(gameLock)
 	Tile *fromTile = map->getTile(thing->pos.x, thing->pos.y, thing->pos.z);
@@ -506,65 +534,64 @@ void Game::thingMove(Creature *player, Thing *thing,
 	if (fromTile)
 	{
 		int oldstackpos = fromTile->getThingStackPos(thing);
-		thingMoveInternal(player, thing->pos.x, thing->pos.y, thing->pos.z, oldstackpos, to_x, to_y, to_z);
+		thingMoveInternal(player, thing->pos.x, thing->pos.y, thing->pos.z, oldstackpos, to_x, to_y, to_z, count);
 	}
 
 	OTSYS_THREAD_UNLOCK(gameLock)
 }
 
 
-void Game::thingMove(Creature *player,
-                    unsigned short from_x, unsigned short from_y, unsigned char from_z,
-                    unsigned char stackPos,
-                    unsigned short to_x, unsigned short to_y, unsigned char to_z)
+void Game::thingMove(Creature *player, unsigned short from_x, unsigned short from_y, unsigned char from_z,
+	unsigned char stackPos, unsigned short to_x, unsigned short to_y, unsigned char to_z, unsigned char count)
 {
 	OTSYS_THREAD_LOCK(gameLock)
   
-	thingMoveInternal(player, from_x, from_y, from_z, stackPos, to_x, to_y, to_z);
+	thingMoveInternal(player, from_x, from_y, from_z, stackPos, to_x, to_y, to_z, count);
   
 	OTSYS_THREAD_UNLOCK(gameLock)
 }
 
 //container/inventory to container/inventory
 void Game::thingMove(Creature *player,
-										unsigned char from_cid, unsigned char from_slotid,
-										unsigned char to_cid, unsigned char to_slotid,
-										bool isInventory)
+	unsigned char from_cid, unsigned char from_slotid, bool fromInventory,
+	unsigned char to_cid, unsigned char to_slotid, bool toInventory,
+	unsigned char count)
 {
 	OTSYS_THREAD_LOCK(gameLock)
 		
-	thingMoveInternal(player, from_cid, from_slotid, to_cid, to_slotid, isInventory);
+	thingMoveInternal(player, from_cid, from_slotid, fromInventory,
+		to_cid, to_slotid, toInventory, count);
 		
 	OTSYS_THREAD_UNLOCK(gameLock)
 }
 
 //container/inventory to ground
 void Game::thingMove(Creature *player,
-										unsigned char from_cid, unsigned char from_slotid, const Position& toPos,
-										bool isInventory)
+	unsigned char from_cid, unsigned char from_slotid, bool fromInventory,
+	const Position& toPos, unsigned char count)
 {
 	OTSYS_THREAD_LOCK(gameLock)
 		
-	thingMoveInternal(player, from_cid, from_slotid, toPos, isInventory);
+	thingMoveInternal(player, from_cid, from_slotid, fromInventory, toPos, count);
 		
 	OTSYS_THREAD_UNLOCK(gameLock)
 }
 
 //ground to container/inventory
 void Game::thingMove(Creature *player,
-                    const Position& fromPos,
-										unsigned char stackPos,
-										unsigned char to_cid, unsigned char to_slotid,
-										bool isInventory)
+	const Position& fromPos, unsigned char stackPos,
+	unsigned char to_cid, unsigned char to_slotid, bool toInventory,
+	unsigned char count)
 {
 	OTSYS_THREAD_LOCK(gameLock)
 		
-	thingMoveInternal(player, fromPos, stackPos, to_cid, to_slotid, isInventory);
+	thingMoveInternal(player, fromPos, stackPos, to_cid, to_slotid, toInventory, count);
 		
 	OTSYS_THREAD_UNLOCK(gameLock)
 }
 
-bool Game::onPrepareMoveThing(Creature *player, const Thing* thing, const Position& fromPos, const Position& toPos)
+bool Game::onPrepareMoveThing(Creature *player, const Thing* thing,
+	const Position& fromPos, const Position& toPos)
 {
 	/*
 	if( (abs(fromPos.x - toPos.x) > 1) || (abs(fromPos.y - toPos.y) > 1) ) {
@@ -622,7 +649,8 @@ bool Game::onPrepareMoveThing(Creature *player, const Thing* thing, const Tile *
 	return thing->canMovedTo(toTile);
 }
 
-bool Game::onPrepareMoveThing(Creature *player, const Item* item, const Container *fromContainer, const Container *toContainer)
+bool Game::onPrepareMoveThing(Creature *player, const Item* item, const Container *fromContainer,
+	const Container *toContainer)
 {
 	if(!item->isPickupable()) {
 		player->sendCancel("Sorry, not possible.");
@@ -646,7 +674,8 @@ bool Game::onPrepareMoveThing(Creature *player, const Item* item, const Containe
 	return true;
 }
 
-bool Game::onPrepareMoveCreature(Creature *player, const Creature* creatureMoving, const Tile *fromTile, const Tile *toTile)
+bool Game::onPrepareMoveCreature(Creature *player, const Creature* creatureMoving,
+	const Tile *fromTile, const Tile *toTile)
 {
 	const Player* playerMoving = dynamic_cast<const Player*>(creatureMoving);
 
@@ -675,28 +704,32 @@ bool Game::onPrepareMoveCreature(Creature *player, const Creature* creatureMovin
 	return true;
 }
 
-/*
-void Game:onCreatureUpdateContainer(Player *player, const Container *container, Item *item, bool remove)
+bool Game::onPrepareMoveThing(Player *player, const Tile *fromTile, const Item *item, slots_t toSlot)
 {
-	Item* container = NULL;
-	for(unsigned int cid = 0; cid < p->getContainerCount(); ++cid) {
-		container = p->getContainer(cid);
-		if(container && container == fromContainer) {
-			player->onContainerUpdated(item, cid, (toContainer == fromContainer ? cid : 0xFF), from_slotid, 0, true);
-		}
+	if(!item->isPickupable())
+		return false;
 
-		if(container && container == toContainer && toContainer != fromContainer) {
-			player->onContainerUpdated(item, 0xFF, cid, from_slotid, 0, false);
-		}
-	}
+	return true;
 }
-*/
 
-//Container to container
+bool Game::onPrepareMoveThing(Player *player, slots_t fromSlot, slots_t toSlot)
+{
+	if(player->getItem(fromSlot) == NULL)
+		return false;
+
+	if(player->getItem(toSlot) != NULL) {
+		player->sendCancel("Sorry, not enough room.");
+		return false;
+	}
+
+	return true;
+}
+
+//container/inventory to container/inventory
 void Game::thingMoveInternal(Creature *player,
-                    unsigned char from_cid, unsigned char from_slotid,
-                    unsigned char to_cid, unsigned char to_slotid,
-										bool isInventory)
+	unsigned char from_cid, unsigned char from_slotid, bool fromInventory,
+	unsigned char to_cid, unsigned char to_slotid, bool toInventory,
+	unsigned char count)
 {
 	Player *p = dynamic_cast<Player*>(player);
 	if(p) {
@@ -706,7 +739,7 @@ void Game::thingMoveInternal(Creature *player,
 
 		Container *toContainer = NULL;
 
-		if(!isInventory) {
+		if(!toInventory) {
 			toContainer = p->getContainer(to_cid);
 
 			if(!toContainer)
@@ -718,38 +751,79 @@ void Game::thingMoveInternal(Creature *player,
 			}
 		}
 		else {
-			toContainer = dynamic_cast<Container *>(p->items[to_cid]);
+			toContainer = dynamic_cast<Container *>(p->getItem(to_cid));
 		}
 
-		if(!(fromContainer && toContainer) || from_slotid >= fromContainer->size())
-			return;
+		//Container to container
+		if((fromContainer && toContainer)) {
+			if(from_slotid >= fromContainer->size())
+				return;
 
-		Item* item = fromContainer->getItem(from_slotid);
-		if(!item)
-			return;
-		
-		if(onPrepareMoveThing(p, item, fromContainer, toContainer)) {
-			//move around an item in a container
-			if(fromContainer == toContainer) {
-				fromContainer->moveItem(from_slotid, 0);
+			Item* item = fromContainer->getItem(from_slotid);
+			if(!item)
+				return;
+			
+			Item *toSlotItem = toContainer->getItem(to_slotid);
+			if(onPrepareMoveThing(p, item, fromContainer, toContainer)) {
+				int oldcount = item->getItemCountOrSubtype();
+				//move around an item in a container
+				if(fromContainer == toContainer) {
+					if(item->isStackable() && count < item->getItemCountOrSubtype()) {
+						item->setItemCountOrSubtype(item->getItemCountOrSubtype() - count);
+						fromContainer->addItem(Item::CreateItem(item->getID(), count));
+					}
+					else
+						fromContainer->moveItem(from_slotid, 0);
+				}
+				//move around an item between different containers
+				else {
+					/*if(item->isStackable() && toSlotItem && toSlotItem->getID() == item->getID()) {
+						int toSlotOldCount = toSlotItem->getItemCountOrSubtype(); //99
+						toSlotItem->setItemCountOrSubtype(std::min(100, toSlotOldCount + count));
+						
+					}*/
+					if(item->isStackable() && count < item->getItemCountOrSubtype()) {
+						item->setItemCountOrSubtype(item->getItemCountOrSubtype() - count);
+						toContainer->addItem(Item::CreateItem(item->getID(), count));
+					}
+					else if(fromContainer->removeItem(item)) {
+						toContainer->addItem(item);
+					}
+				}
+
+				if(fromContainer && fromContainer->pos.x != 0xFFFF || toContainer && toContainer->pos.x != 0xFFFF) {
+					std::vector<Creature*> list;
+					getSpectators(Range(player->pos, false), list);
+
+					for(int i = 0; i < list.size(); ++i) {
+						list[i]->onThingMove(player, fromContainer, toContainer, item, from_slotid, to_slotid, oldcount, count);
+					}
+				}
+				else
+					player->onThingMove(player, fromContainer, toContainer, item, from_slotid, to_slotid, oldcount, count);
 			}
-			//move around an item between different containers
-			else {
-				if(fromContainer->removeItem(item)) {
-					toContainer->addItem(item);
+		}
+		else {
+			//Inventory to inventory
+			if(fromInventory && toInventory) {
+				if(onPrepareMoveThing(p, (slots_t)from_cid, (slots_t)to_cid)) {
+					/*
+					Item *fromSlot = p->getItem(from_cid);
+					Item *toSlot = p->getItem(to_cid);
+					
+					p->items[fromSlot] = NULL;
+					p->items[toSlot] = item;
+					player->onThingMove();
+					*/
 				}
 			}
-
-			Item* container = NULL;
-			for(unsigned int cid = 0; cid < p->getContainerCount(); ++cid) {
-				container  = p->getContainer(cid);
-				if(container && container == fromContainer) {
-					player->onContainerUpdated(item, cid, (toContainer == fromContainer ? cid : 0xFF), from_slotid, 0, true);
-				}
-
-				if(container && container == toContainer && toContainer != fromContainer) {
-					player->onContainerUpdated(item, 0xFF, cid, from_slotid, 0, false);
-				}
+			//Inventory to container
+			else if(fromInventory && !toInventory) {
+				//
+			}
+			//Container to inventory
+			else if(!fromContainer && toInventory) {
+				//
 			}
 		}
 	}
@@ -757,8 +831,8 @@ void Game::thingMoveInternal(Creature *player,
 
 //container/inventory to ground
 void Game::thingMoveInternal(Creature *player,
-                    unsigned char from_cid, unsigned char from_slotid, const Position& toPos,
-										bool isInventory)
+	unsigned char from_cid, unsigned char from_slotid, bool fromInventory,
+	const Position& toPos, unsigned char count)
 {
 	Player* p = dynamic_cast<Player*>(player);
 	if(p) {
@@ -767,52 +841,51 @@ void Game::thingMoveInternal(Creature *player,
 		if(!toTile)
 			return;
 
-		if(!isInventory) {
+		if(!fromInventory) {
 			fromContainer = p->getContainer(from_cid);
 			if(!fromContainer)
 				return;
 			
 			Item *item = dynamic_cast<Item*>(fromContainer->getItem(from_slotid));
-			/*TODO: if item is a container we need to resend the container to update it (up-arrow)*/
 
 			if(onPrepareMoveThing(p, item, (item->pos.x == 0xFFFF ? player->pos : item->pos), toPos)) {
 				item->pos = toPos;
+				int oldcount = item->getItemCountOrSubtype();
 
 				//Do action...
 				if(fromContainer->removeItem(item)) {
 					toTile->addThing(item);
 
-					creatureBroadcastTileUpdated(item->pos);
+					//if(fromContainer && fromContainer->pos.x != 0xFFFF) {
+						std::vector<Creature*> list;
+						getSpectators(Range(toPos, false), list);
 
-					for(unsigned int cid = 0; cid < p->getContainerCount(); ++cid) {
-						if(p->getContainer(cid) == fromContainer) {
-							player->onContainerUpdated(item, cid, 0xFF, from_slotid /*slot*/, 0xFF, true);
+						for(int i = 0; i < list.size(); ++i) {
+							list[i]->onThingMove(player, fromContainer, &toPos, item, from_slotid, oldcount, count);
 						}
-					}
+					//}
+					//else
+					//player->onThingMove(player, fromContainer, &toPos, item, from_slotid);
 				}
 			}
 		}
 		else {
-			Item *item = p->items[from_cid];
+			Item *item = p->getItem(from_cid);
 			if(!item)
 				return;
 			
 			if(onPrepareMoveThing(p, item, player->pos, toPos)) {
+				int oldcount = item->getItemCountOrSubtype();
 				item->pos = toPos;
 
 				p->items[from_cid] = NULL;
 				toTile->addThing(item);
 
-				NetworkMessage msg;
-
-				msg.AddByte(0x6a);
-				msg.AddPosition(item->pos);
-				msg.AddItem(item);
-
-				//creatureBroadcastTileUpdated(item->pos);
-
-				msg.AddPlayerInventoryItem(p, from_cid);
-				p->sendNetworkMessage(&msg);
+				std::vector<Creature*> list;
+				getSpectators(Range(player->pos, false), list);
+				for(int i = 0; i < list.size(); ++i) {
+					list[i]->onThingMove(player, (slots_t)from_cid, &toPos, item, oldcount, count);
+				}
 			}
 		}
 	}
@@ -820,9 +893,9 @@ void Game::thingMoveInternal(Creature *player,
 
 //ground to container/inventory
 void Game::thingMoveInternal(Creature *player,
-                    const Position& fromPos, unsigned char stackPos,
-										unsigned char to_cid, unsigned char to_slotid,
-										bool isInventory)
+	const Position& fromPos, unsigned char stackPos,
+	unsigned char to_cid, unsigned char to_slotid, bool toInventory,
+	unsigned char count)
 {
 	Player* p = dynamic_cast<Player*>(player);
 	if(p) {
@@ -833,16 +906,15 @@ void Game::thingMoveInternal(Creature *player,
 		Container *toContainer = NULL;
 
 		Item *item = dynamic_cast<Item*>(fromTile->getThingByStackPos(stackPos));
-		/*TODO: if item is a container we need to resend the container to update it (up-arrow)*/
 
 		if(!item)
 			return;
 
-		if(isInventory) {
-			Item *toSlot = p->items[to_cid];
+		if(toInventory) {
+			Item *toSlot = p->getItem(to_cid);
 			toContainer = dynamic_cast<Container*>(toSlot);
 		}
-		else /*if(!isInventory)*/ {
+		else /*if(!toInventory)*/ {
 			toContainer = p->getContainer(to_cid);
 			if(!toContainer)
 				return;
@@ -860,66 +932,52 @@ void Game::thingMoveInternal(Creature *player,
 				 onPrepareMoveThing(player, item, NULL, toContainer))
 			{
 				item->pos = fromPos;
-				MapState mapstate(map);
 
-				if(mapstate.removeThing(fromTile, item) /*fromTile->removeThing(item)*/) {
+				int stackpos = fromTile->getThingStackPos(item);
+				int oldcount = item->getItemCountOrSubtype();
+				if(fromTile->removeThing(item)) {
 					Position itempos = item->pos;
 					toContainer->addItem(item);
 					
-					/*
-					NetworkMessage msg;
-					mapstate.getMapChanges(p, msg);
-					p->sendNetworkMessage(&msg);
-					*/
-					
-					creatureBroadcastTileUpdated(fromPos);
-
-					for(unsigned int cid = 0; cid < p->getContainerCount(); ++cid) {
-						if(p->getContainer(cid) == toContainer) {
-							player->onContainerUpdated(item, 0xFF, cid, 0xFF, 0, false);
-						}
+					std::vector<Creature*> list;
+					getSpectators(Range(fromPos, false), list);
+					for(int i = 0; i < list.size(); ++i) {
+						list[i]->onThingMove(player, &fromPos, toContainer, item, stackpos, to_slotid, oldcount, count);
 					}
-
-					/*
-					const Container container = dynamic_cast<const Container*>(item);
-
-					if(container) {
-						Player* p;
-						Container* c;
-						NetworkMessage msg;
-						std::vector<Creature*> list;
-						getSpectators(Range(container->pos, 2, 2, 2, 2), list);
-
-						for(int i = 0; i < list.size(); ++i) {
-							p = dynamic_cast<Player*>(list[i]);
-							if(p) {
-								for(int cid = 0; cid < p->getContainerCount(); ++cid) {
-									c = p->getContainer(cid);
-
-									if(c && c == toContainer && player != p) {
-										//Close container
-										msg.AddByte(0x6F);
-										msg.AddByte(cid);
-									}
-								}
-							}	
-						}
-					}
-					*/
 				}
 			}
 		}
 		//Put on equipment from ground
-		else if(isInventory) {
-			//
+		else if(toInventory) {
+			if(onPrepareMoveThing(p, fromTile, item, (slots_t)to_cid)) {
+				int stackpos = fromTile->getThingStackPos(item);
+				if(fromTile->removeThing(item)) {
+					Item *oldItem = p->getItem(to_cid);
+					p->items[to_cid] = NULL;
+					p->addItem(item, to_cid);
+
+					if(oldItem) {
+						fromTile->addThing(oldItem);
+						oldItem->pos = fromPos;
+					}
+
+					std::vector<Creature*> list;
+					getSpectators(Range(fromPos, false), list);
+					for(int i = 0; i < list.size(); ++i) {
+						list[i]->onThingMove(player, &fromPos, (slots_t)to_cid, item, stackpos, 1, 1);
+
+						if(oldItem) {
+							list[i]->onThingMove(player, (slots_t)to_cid, &fromPos, oldItem, oldItem->getItemCountOrSubtype(), count);
+						}
+					}
+				}
+			}
 		}
 	}
 }
 
-void Game::thingMoveInternal(Creature *player,
-                    unsigned short from_x, unsigned short from_y, unsigned char from_z,
-                    unsigned char stackPos,
-                    unsigned short to_x, unsigned short to_y, unsigned char to_z)
+void Game::thingMoveInternal(Creature *player, unsigned short from_x, unsigned short from_y, unsigned char from_z,
+	unsigned char stackPos, unsigned short to_x, unsigned short to_y, unsigned char to_z, unsigned char count)
 {
   Tile *fromTile = getTile(from_x, from_y, from_z);
 	Thing *thing = fromTile->getThingByStackPos(stackPos);
@@ -1034,7 +1092,7 @@ void Game::thingMoveInternal(Creature *player,
 				
 				for(unsigned int i = 0; i < list.size(); ++i)
 				{
-					list[i]->onThingMove(player, thing, &oldPos, oldstackpos);
+					list[i]->onThingMove(player, thing, &oldPos, oldstackpos, 1, 1);
 				}
 
 				//change level begin
@@ -2236,47 +2294,94 @@ void Game::checkPlayerAttacking(unsigned long id)
 	OTSYS_THREAD_UNLOCK(gameLock)
 }
 
-void Game::decayItem(Item* item)
+//void Game::decayItem(Position& pos, unsigned short id, unsigned char stackpos)
+void Game::decayItem(Item *item)
 {
 	OTSYS_THREAD_LOCK(gameLock)
+	//Tile *tile = getTile(pos.x, pos.y, pos.z);
 
-	if(item) {
-		Tile *t = getTile(item->pos.x, item->pos.y, item->pos.z);
-		MagicEffectItem* magicItem = dynamic_cast<MagicEffectItem*>(item);
+	//if(tile) {
+		//Item *item = dynamic_cast<Item*>(tile->getThingByStackPos(stackpos));
 
-		if(magicItem) {
-			Position pos = magicItem->pos;
-			if(magicItem->transform()) {
-				addEvent(makeTask(magicItem->getDecayTime(), std::bind2nd(std::mem_fun(&Game::decayItem), magicItem)));
+		if(item  /*&& item->getID() == id*/) {
+			Tile *tile = getTile(item->pos.x, item->pos.y, item->pos.z);
+			MagicEffectItem* magicItem = dynamic_cast<MagicEffectItem*>(item);
+
+			if(magicItem) {
+				Position pos = magicItem->pos;
+				if(magicItem->transform()) {
+					//addEvent(makeTask(magicItem->getDecayTime(), boost::bind(&Game::decayItem, this, magicItem->pos, magicItem->getID(), tile->getThingStackPos(magicItem)) ) );
+					addEvent(makeTask(magicItem->getDecayTime(), std::bind2nd(std::mem_fun(&Game::decayItem), magicItem)));
+				}
+				else {
+					tile->removeThing(magicItem);
+					delete magicItem;
+				}
+
+				creatureBroadcastTileUpdated(pos);
 			}
 			else {
-				t->removeThing(magicItem);
-				delete magicItem;
-			}
+				Item* newitem = item->tranform();
 
-			creatureBroadcastTileUpdated(pos);
-		}
-		else {
-			unsigned short decayTo   = Item::items[item->getID()].decayTo;
-			unsigned short decayTime = Item::items[item->getID()].decayTime;
+				//unsigned short decayTo   = Item::items[item->getID()].decayTo;
+				//unsigned short decayTime = Item::items[item->getID()].decayTime;
 
-			if (decayTo == 0)
-			{
-				t->removeThing(item);
-			}
-			else
-			{
-				item->setID(decayTo);
-				addEvent(makeTask(decayTime*1000, std::bind2nd(std::mem_fun(&Game::decayItem), item)));
-			}
+				Position oldPos = item->pos;
+				MapState mapstate(this->map);
 
-			creatureBroadcastTileUpdated(item->pos);
+				if (newitem == NULL /*decayTo == 0*/) {
+					mapstate.removeThing(tile, item);
+					//t->removeThing(item);
+				}
+				else {
+					mapstate.replaceThing(tile, item, newitem);
 
-			if (decayTo == 0)
+					//item->setID(decayTo);
+					//unsigned short decayTime = Item::items[item->getID()].decayTime;
+					unsigned short decayTime = Item::items[newitem->getID()].decayTime;					
+					//addEvent(makeTask(decayTime*1000, boost::bind(&Game::decayItem, this, newitem->pos, newitem->getID(), tile->getThingStackPos(newitem)) ) );
+					addEvent(makeTask(decayTime*1000, std::bind2nd(std::mem_fun(&Game::decayItem), newitem)));
+					//mapstate.refreshThing(tile, item);
+				}
+				
+				std::vector<Creature*> list;
+				getSpectators(Range(oldPos, true), list);
+
+				NetworkMessage msg;
+				for(unsigned int i = 0; i < list.size(); ++i) {
+					Player *spectator = dynamic_cast<Player*>(list[i]);
+					if(!spectator)
+						continue;
+
+					msg.Reset();
+					mapstate.getMapChanges(spectator, msg);
+					spectator->sendNetworkMessage(&msg);
+				}
+
 				delete item;
+
+				/*
+				if (decayTo == 0) {
+					delete item;
+				}
+				*/
+
+				/*
+				creatureBroadcastTileUpdated(item->pos);
+
+				if (decayTo == 0) {
+					Container *container = dynamic_cast<Container*>(item);
+					if(container) {
+						this->
+					}
+
+					delete item;
+				}
+				*/
+			}
 		}
-	}
-  
+	//} 
+
 	OTSYS_THREAD_UNLOCK(gameLock)
 }
 

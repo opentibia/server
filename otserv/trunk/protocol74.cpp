@@ -197,16 +197,16 @@ void Protocol74::parsePacket(NetworkMessage &msg)
       // update position   
       break; 
     case 0x6a:
-      this->game->thingMove(player, player, (player->pos.x+1), (player->pos.y-1), player->pos.z);   
+      this->game->thingMove(player, player, (player->pos.x+1), (player->pos.y-1), player->pos.z, 1);   
       break;
     case 0x6b:
-      this->game->thingMove(player, player, (player->pos.x+1), (player->pos.y+1), player->pos.z);   
+      this->game->thingMove(player, player, (player->pos.x+1), (player->pos.y+1), player->pos.z, 1);   
       break;
     case 0x6c:
-      this->game->thingMove(player, player, (player->pos.x-1), (player->pos.y+1), player->pos.z);   
+      this->game->thingMove(player, player, (player->pos.x-1), (player->pos.y+1), player->pos.z, 1);   
       break;
     case 0x6d:
-      this->game->thingMove(player, player, (player->pos.x-1), (player->pos.y-1), player->pos.z);   
+      this->game->thingMove(player, player, (player->pos.x-1), (player->pos.y-1), player->pos.z, 1);   
       break;                
     default:
          printf("unknown packet header: %x \n", recvbyte);
@@ -499,7 +499,7 @@ void Protocol74::parseMoveNorth(NetworkMessage &msg)
 {
 	this->sleepTillMove();
   game->thingMove(player, player,
-                 player->pos.x, player->pos.y-1, player->pos.z);
+                 player->pos.x, player->pos.y-1, player->pos.z, 1);
 }
 
 
@@ -507,7 +507,7 @@ void Protocol74::parseMoveEast(NetworkMessage &msg)
 {
 	this->sleepTillMove();
   game->thingMove(player, player,
-                 player->pos.x+1, player->pos.y, player->pos.z);
+                 player->pos.x+1, player->pos.y, player->pos.z, 1);
 }
 
 
@@ -515,7 +515,7 @@ void Protocol74::parseMoveSouth(NetworkMessage &msg)
 {
 	this->sleepTillMove();
   game->thingMove(player, player,
-                 player->pos.x, player->pos.y+1, player->pos.z);
+                 player->pos.x, player->pos.y+1, player->pos.z, 1);
 }
 
 
@@ -523,7 +523,7 @@ void Protocol74::parseMoveWest(NetworkMessage &msg)
 {
 	this->sleepTillMove();
   game->thingMove(player, player,
-                 player->pos.x-1, player->pos.y, player->pos.z);
+                 player->pos.x-1, player->pos.y, player->pos.z, 1);
 }
 
 
@@ -732,9 +732,7 @@ void Protocol74::sendContainer(unsigned char index, Container *container)
 
   ContainerList::const_iterator cit;
 	for (cit = container->getItems(); cit != container->getEnd(); ++cit) {
-		msg.AddU16((*cit)->getID());
-		if((*cit)->getItemCountOrSubtype() > 1)
-			msg.AddByte((*cit)->getItemCountOrSubtype());
+		msg.AddItem(*cit);
 	}
 
 	msg.WriteToSocket(s);
@@ -790,42 +788,40 @@ void Protocol74::parseUseItem(NetworkMessage &msg)
 	{
 		msg.Reset();
 		Container *newcontainer = NULL;
-		/*
+		Container *parentcontainer = NULL;
+
   	if(x != 0xFFFF) {
-  	        if(abs(player->pos.x - x) > 1 || abs(player->pos.y - y) > 1)
-  	                return;
-
-  	        Tile *t = map->getTile(x, y, z);
-
-  	        if(t)
-  	                newcontainer = (Item*)t->getThingByStackPos(un);
-  	}
-    */
-        Container *parentcontainer = NULL;
-		if(x == 0xFFFF) {
-		
-
-		if(0x40 & y) {
-			unsigned char containerid = y & 0x0F;
-			 parentcontainer = player->getContainer(containerid);
-
-			if(!parentcontainer) {
+			if(std::abs(player->pos.x - x) > 1 || std::abs(player->pos.y - y) > 1)
 				return;
-			}
 
-			int n = 0;
-			for (ContainerList::const_iterator cit = parentcontainer->getItems(); cit != parentcontainer->getEnd(); cit++) {
-				if(n == z) {
-					newcontainer = dynamic_cast<Container*>(*cit);
-					break;
-				}
-				else
-					n++;
+			Tile *t = game->getTile(x, y, z);
+
+			if(t) {
+				newcontainer = dynamic_cast<Container*>(t->getThingByStackPos(un));
 			}
 		}
-		else
-			
-			newcontainer = dynamic_cast<Container *>(player->items[y]);
+		else if(x == 0xFFFF) {		
+			if(0x40 & y) {
+				unsigned char containerid = y & 0x0F;
+				parentcontainer = player->getContainer(containerid);
+
+				if(!parentcontainer) {
+					return;
+				}
+
+				int n = 0;
+				for (ContainerList::const_iterator cit = parentcontainer->getItems(); cit != parentcontainer->getEnd(); cit++) {
+					if(n == z) {
+						newcontainer = dynamic_cast<Container*>(*cit);
+						break;
+					}
+					else
+						n++;
+				}
+			}
+			else
+				
+				newcontainer = dynamic_cast<Container *>(player->getItem(y));
 		}
 
 		if(newcontainer) {
@@ -881,30 +877,40 @@ void Protocol74::parseThrow(NetworkMessage &msg)
   unsigned short from_x     = msg.GetU16();
   unsigned short from_y     = msg.GetU16(); 
   unsigned char  from_z     = msg.GetByte();
-  /* unsigned char  duno1 = */ msg.GetByte(); // item type 2 bytes
-  /* unsigned char  duno2 = */ msg.GetByte();
+  ///* unsigned char  duno1 = */ msg.GetByte(); // item type 2 bytes
+  ///* unsigned char  duno2 = */ msg.GetByte();
+	unsigned short itemid = msg.GetU16();
   unsigned char  from_stack = msg.GetByte();
   unsigned short to_x       = msg.GetU16();
   unsigned short to_y       = msg.GetU16(); 
   unsigned char  to_z       = msg.GetByte();
 	unsigned char count       = msg.GetByte();
 
-	bool isInventory = false;
+	bool toInventory = false;
+	bool fromInventory = false;
 
 	//container/inventory to container/inventory
 	if(from_x == 0xFFFF && to_x == 0xFFFF) {
-		unsigned char from_cid = from_y & 0x0F;
+		unsigned char from_cid;
 		unsigned char to_cid;
+
+		if(from_y & 0x40) {
+			from_cid = from_y & 0x0F;
+		}
+		else {
+			fromInventory = true;
+			from_cid = static_cast<unsigned char>(from_y);
+		}
 
 		if(to_y & 0x40) {
 			to_cid = static_cast<unsigned char>(to_y & 0x0F);
 		}
 		else {
-			isInventory = true;
+			toInventory = true;
 			to_cid = static_cast<unsigned char>(to_y);
 		}
 		
-		game->thingMove(player, from_cid, from_z, to_cid, to_z, isInventory);
+		game->thingMove(player, from_cid, from_z, fromInventory, to_cid, to_z, toInventory, count);
 	}
 	//container/inventory to ground
 	else if(from_x == 0xFFFF && to_x != 0xFFFF) {
@@ -914,11 +920,11 @@ void Protocol74::parseThrow(NetworkMessage &msg)
 			from_cid = static_cast<unsigned char>(from_y & 0x0F);
 		}
 		else {
-			isInventory = true;
+			fromInventory = true;
 			from_cid = static_cast<unsigned char>(from_y);
 		}
 
-		game->thingMove(player, from_cid, from_z, Position(to_x, to_y, to_z), isInventory);
+		game->thingMove(player, from_cid, from_z, fromInventory, Position(to_x, to_y, to_z), count);
 	}
 	//ground to container/inventory
 	else if(from_x != 0xFFFF && to_x == 0xFFFF) {
@@ -928,15 +934,25 @@ void Protocol74::parseThrow(NetworkMessage &msg)
 			to_cid = static_cast<unsigned char>(to_y & 0x0F);
 		}
 		else {
-			isInventory = true;
+			toInventory = true;
 			to_cid = static_cast<unsigned char>(to_y);
+
+			if(to_cid > 11) {
+				return;
+			}
+
+			if(to_cid == 0) {
+				//Special condition, player drops an item to the "capacity window" when the inventory is minimized,
+				//we should add this item to the most appropriate slot/container
+				return;
+			}
 		}
 
-		game->thingMove(player, Position(from_x, from_y, from_z), from_stack, to_cid, to_z, isInventory);
+		game->thingMove(player, Position(from_x, from_y, from_z), from_stack, to_cid, to_z, toInventory, count);
 	}
 	//ground to ground
 	else
-		game->thingMove(player, from_x, from_y, from_z, from_stack, to_x, to_y, to_z);
+		game->thingMove(player, from_x, from_y, from_z, from_stack, to_x, to_y, to_z, count);
 }
 
 
@@ -1249,7 +1265,6 @@ void Protocol74::sendPlayerItemChange(Action* action){
 
 bool Protocol74::CanSee(int x, int y, int z) const
 {
-	//Range rangePlayer(player->pos, true);
 #ifdef __DEBUG__
 	if(z < 0 || z >= MAP_LAYER) {
 		std::cout << "WARNING! Protocol74::CanSee() Z-value is out of range!" << std::endl;
@@ -1273,16 +1288,6 @@ bool Protocol74::CanSee(int x, int y, int z) const
     return true;
 
   return false;
-
-	/*
-	if ((x >= rangePlayer.centerpos.x + rangePlayer.minRange.x + offsetz) &&
-		  (x <= rangePlayer.centerpos.x + rangePlayer.maxRange.x + offsetz) &&
-      (y >= rangePlayer.centerpos.y + rangePlayer.minRange.y + offsetz) &&
-			(y <= rangePlayer.centerpos.y + rangePlayer.maxRange.y + offsetz))
-    return true;
-
-  return false;
-	*/
 }
 
 
@@ -1293,12 +1298,11 @@ void Protocol74::sendNetworkMessage(NetworkMessage *msg)
 
 
 
-void Protocol74::sendTileUpdated(const Position &pos)
+void Protocol74::GetTileUpdated(const Position &pos, NetworkMessage &msg)
 {
 	//1D00	69	CF81	587C	07	9501C405C405C405C405C405C405780600C405C40500FF
   if (CanSee(pos.x, pos.y, pos.z))
   {
-	  NetworkMessage msg;
 	  msg.AddByte(0x69);
 	  msg.AddPosition(pos);
 
@@ -1314,11 +1318,18 @@ void Protocol74::sendTileUpdated(const Position &pos)
 		}
 
 		//GetMapDescription(Pos->x, Pos->y, Pos->z, 1, 1, msg);
-
-	  msg.WriteToSocket(s);
   }
 }
 
+void Protocol74::sendTileUpdated(const Position &pos)
+{
+  NetworkMessage msg;
+	
+	GetTileUpdated(pos, msg);
+  msg.WriteToSocket(s);
+}
+
+/*
 void Protocol74::sendContainerUpdated(Item *item, unsigned char from_id, unsigned char to_id,
 																			unsigned char from_slot, unsigned char to_slot, bool remove)
 {
@@ -1333,9 +1344,6 @@ void Protocol74::sendContainerUpdated(Item *item, unsigned char from_id, unsigne
 		msg.AddByte(0x70);
 		msg.AddByte(to_id);
 		msg.AddItem(item);
-
-		//msg.AddByte(to_id);
-		//msg.AddU16(item->getID());
 	}
 	else if(remove) {
 		//remove item
@@ -1348,18 +1356,318 @@ void Protocol74::sendContainerUpdated(Item *item, unsigned char from_id, unsigne
 		msg.AddByte(0x70);
 		msg.AddByte(to_id);
 		msg.AddItem(item);
-		/*
-		//add item
-		msg.AddByte(0x70);
-		msg.AddByte(to_id);
-		msg.AddU16(item->getID());
-		*/
+	}
+
+	msg.WriteToSocket(s);
+}
+*/
+
+//container to container
+void Protocol74::sendThingMove(const Creature *creature,
+	const Container *fromContainer, Container *toContainer, const Item* item,
+	unsigned char from_slotid, unsigned char to_slotid, unsigned char oldcount, unsigned char count)
+{
+	NetworkMessage msg;
+
+	Item *container = NULL;
+	for(unsigned char cid = 0; cid < player->getContainerCount(); ++cid) {
+		container  = player->getContainer(cid);
+		if(container && container == fromContainer) {
+			if(toContainer == fromContainer) {
+				Item *toSlotItem = toContainer->getItem(to_slotid);
+				if(item->isStackable() && item->getItemCountOrSubtype() != oldcount) {
+					//add item
+					msg.AddByte(0x70);
+					msg.AddByte(cid /*to_id*/);
+					msg.AddU16(item->getID());
+					msg.AddByte(count);
+
+					//update count
+					msg.AddByte(0x71);
+					msg.AddByte(cid /*to_id*/);
+					msg.AddByte(from_slotid + 1);
+					msg.AddItem(item);
+				}
+				else /*Move all*/ {
+					
+					//remove item			
+					msg.AddByte(0x72);
+					msg.AddByte(cid /*from_id*/);
+					msg.AddByte(from_slotid);
+
+					//add item
+					msg.AddByte(0x70);
+					msg.AddByte(cid /*to_id*/);
+					msg.AddItem(item);
+				}
+			}
+			else {
+				if(item->isStackable() && item->getItemCountOrSubtype() != oldcount) {
+					//update count
+					msg.AddByte(0x71);
+					msg.AddByte(cid);
+					msg.AddByte(from_slotid);
+					msg.AddItem(item);
+				}
+				else {
+					//remove item
+					msg.AddByte(0x72);
+					msg.AddByte(cid);
+					msg.AddByte(from_slotid);
+				}
+			}
+		}
+
+		if(container && container == toContainer && toContainer != fromContainer) {
+			if(item->isStackable() && item->getItemCountOrSubtype() != oldcount) {
+				//add item
+				msg.AddByte(0x70);
+				msg.AddByte(cid /*to_id*/);
+				msg.AddU16(item->getID());
+				msg.AddByte(count);
+			}
+			else {
+				//add item
+				msg.AddByte(0x70);
+				msg.AddByte(cid /*to_id*/);
+				msg.AddItem(item);
+			}
+		}
 	}
 
 	msg.WriteToSocket(s);
 }
 
-void Protocol74::sendThingMove(const Creature *creature, const Thing *thing, const Position *oldPos, unsigned char oldStackPos, bool tele)
+//container to ground
+void Protocol74::sendThingMove(const Creature *creature, const Container *fromContainer,
+	const Position *newPos, const Item* item, unsigned char from_slotid, unsigned char oldcount, unsigned char count)
+{
+	NetworkMessage msg;
+
+	//Update up-arrow
+	if((fromContainer->pos.x == 0xFFFF && creature == player) &&
+		(std::abs(player->pos.x - newPos->x) <= 1 && std::abs(player->pos.y - newPos->y) <= 1)) {
+			//
+	}
+	//Auto-close container's
+	else if(std::abs(player->pos.x - newPos->x) <= 1 || std::abs(player->pos.y - newPos->y) <= 1) {
+		const Container *container = dynamic_cast<const Container*>(item);
+		if(container) {
+			unsigned char cid = player->getContainerID(container);
+			if(cid != 0xFF) {
+
+				std::vector<unsigned char> containerlist;
+
+				for(cid = 0; cid < player->getContainerCount(); ++cid) {
+					Container *tmpcontainer = player->getContainer(cid);
+
+					if(tmpcontainer == container) {
+						containerlist.push_back(cid);
+					}
+					else {
+						//Check if its a child container.
+						while(tmpcontainer != NULL) {
+							tmpcontainer = tmpcontainer->getParent();
+							if(tmpcontainer == container) {
+								containerlist.push_back(cid);
+								break;
+							}
+						}
+					}
+				}
+
+				for(std::vector<unsigned char>::iterator it = containerlist.begin(); it != containerlist.end(); ++it) {
+					player->closeContainer(*it);
+
+					msg.AddByte(0x6F);
+					msg.AddByte(*it);
+				}
+			}
+		}
+	}
+
+	if(CanSee(item->pos.x, item->pos.y, item->pos.z)) {
+		msg.AddByte(0x6A);
+		msg.AddPosition(item->pos);
+		msg.AddItem(item);
+	}
+
+	for(unsigned char cid = 0; cid < player->getContainerCount(); ++cid) {
+		if(player->getContainer(cid) == fromContainer) {
+			//remove item
+			msg.AddByte(0x72);
+			msg.AddByte(cid);
+			msg.AddByte(from_slotid);
+		}
+	}
+
+	msg.WriteToSocket(s);
+}
+
+//inventory to ground
+void Protocol74::sendThingMove(const Creature *creature, slots_t fromSlot,
+	const Position *newPos, const Item* item, unsigned char oldcount, unsigned char count)
+{
+	NetworkMessage msg;
+
+	//Update up-arrow (if container)
+	if(creature == player) {
+		if(std::abs(player->pos.x - newPos->x) <= 1 && std::abs(player->pos.y - newPos->y) <= 1) {
+			//
+		}
+		//Auto-close container's
+		else {
+			const Container *container = dynamic_cast<const Container*>(item);
+			if(container) {
+				unsigned char cid = player->getContainerID(container);
+				if(cid != 0xFF) {
+
+					std::vector<unsigned char> containerlist;
+
+					for(cid = 0; cid < player->getContainerCount(); ++cid) {
+						Container *tmpcontainer = player->getContainer(cid);
+
+						if(tmpcontainer == container) {
+							containerlist.push_back(cid);
+						}
+						else {
+							//Check if its a child container.
+							while(tmpcontainer != NULL) {
+								tmpcontainer = tmpcontainer->getParent();
+								if(tmpcontainer == container) {
+									containerlist.push_back(cid);
+									break;
+								}
+							}
+						}
+					}
+
+					for(std::vector<unsigned char>::iterator it = containerlist.begin(); it != containerlist.end(); ++it) {
+						player->closeContainer(*it);
+
+						msg.AddByte(0x6F);
+						msg.AddByte(*it);
+					}
+				}
+			}
+		}
+	}
+
+	if(CanSee(item->pos.x, item->pos.y, item->pos.z)) {
+		msg.AddByte(0x6A);
+		msg.AddPosition(item->pos);
+		msg.AddItem(item);
+	}
+	
+	if(creature == player) {
+		msg.AddPlayerInventoryItem(player, fromSlot);
+	}
+
+	msg.WriteToSocket(s);
+}
+
+//ground to container
+void Protocol74::sendThingMove(const Creature *creature, const Position *oldPos, const Container *toContainer,
+	const Item* item, unsigned char stackpos, unsigned char to_slotid, unsigned char oldcount, unsigned char count)
+{
+	NetworkMessage msg;
+
+	//Update up-arrow
+	if((toContainer->pos.x == 0xFFFF && creature == player))
+	{
+	}
+	//Auto-close container's
+	else if((toContainer->pos.x == 0xFFFF) || (std::abs(player->pos.x - toContainer->pos.x) > 1 ||
+																						 std::abs(player->pos.y - toContainer->pos.y) > 1)) {
+		const Container *container = dynamic_cast<const Container*>(item);
+		if(container) {
+			unsigned char cid = player->getContainerID(container);
+			if(cid != 0xFF) {
+
+				std::vector<unsigned char> containerlist;
+
+				for(cid = 0; cid < player->getContainerCount(); ++cid) {
+					Container *tmpcontainer = player->getContainer(cid);
+
+					if(tmpcontainer == container) {
+						containerlist.push_back(cid);
+					}
+					else {
+						//Check if its a child container.
+						while(tmpcontainer != NULL) {
+							tmpcontainer = tmpcontainer->getParent();
+							if(tmpcontainer == container) {
+								containerlist.push_back(cid);
+								break;
+							}
+						}
+					}
+				}
+
+				for(std::vector<unsigned char>::iterator it = containerlist.begin(); it != containerlist.end(); ++it) {
+					player->closeContainer(*it);
+
+					msg.AddByte(0x6F);
+					msg.AddByte(*it);
+				}
+			}
+		}
+	}
+	//
+
+	if(CanSee(oldPos->x, oldPos->y, oldPos->z)) {
+		msg.AddByte(0x6C);
+		msg.AddPosition(*oldPos);
+		msg.AddByte(stackpos);
+	}
+
+	Tile *fromTile = game->getTile(oldPos->x, oldPos->y, oldPos->z);
+	if(fromTile && fromTile->getThingCount() > 8) {
+#ifdef __DEBUG__
+		std::cout << "Pop-up item from below..." << std::endl;
+#endif
+		//We need to pop up this item
+		Thing *newthing = fromTile->getThingByStackPos(9);
+
+		if(newthing != NULL) {
+			GetTileUpdated(*oldPos, msg);
+		}
+	}
+
+	for(unsigned char cid = 0; cid < player->getContainerCount(); ++cid) {
+		if(player->getContainer(cid) == toContainer) {
+			//add item
+			msg.AddByte(0x70);
+			msg.AddByte(cid /*to_id*/);
+			msg.AddItem(item);
+		}
+	}
+
+	msg.WriteToSocket(s);
+}
+
+//ground to inventory
+void Protocol74::sendThingMove(const Creature *creature, const Position *oldPos, slots_t toSlot,
+	const Item* item, unsigned char stackpos, unsigned char oldcount, unsigned char count)
+{
+	NetworkMessage msg;
+	if(creature == player) {
+		msg.AddPlayerInventoryItem(player, toSlot);
+		//
+	}
+
+	if(CanSee(oldPos->x, oldPos->y, oldPos->z)) {
+		msg.AddByte(0x6C);
+		msg.AddPosition(*oldPos);
+		msg.AddByte(stackpos);
+	}
+
+	msg.WriteToSocket(s);
+}
+
+//ground to ground
+void Protocol74::sendThingMove(const Creature *creature, const Thing *thing,
+	const Position *oldPos, unsigned char oldStackPos, unsigned char oldcount, unsigned char count, bool tele)
 {
 	NetworkMessage msg;
 
@@ -1390,8 +1698,46 @@ void Protocol74::sendThingMove(const Creature *creature, const Thing *thing, con
         checkCreatureAsKnown(((Creature*)thing)->getID(), known, removedKnown);
   			msg.AddCreature((Creature*)thing, known, removedKnown);
       }
-      else
+			else {
         msg.AddItem((Item*)thing);
+
+				//Auto-close container's
+				if(std::abs(player->pos.x - thing->pos.x) > 1 || std::abs(player->pos.y - thing->pos.y) > 1) {
+					const Container *container = dynamic_cast<const Container*>(thing);
+					if(container) {
+						unsigned char cid = player->getContainerID(container);
+						if(cid != 0xFF) {
+
+							std::vector<unsigned char> containerlist;
+
+							for(cid = 0; cid < player->getContainerCount(); ++cid) {
+								Container *tmpcontainer = player->getContainer(cid);
+
+								if(tmpcontainer == container) {
+									containerlist.push_back(cid);
+								}
+								else {
+									//Check if its a child container.
+									while(tmpcontainer != NULL) {
+										tmpcontainer = tmpcontainer->getParent();
+										if(tmpcontainer == container) {
+											containerlist.push_back(cid);
+											break;
+										}
+									}
+								}
+							}
+
+							for(std::vector<unsigned char>::iterator it = containerlist.begin(); it != containerlist.end(); ++it) {
+								player->closeContainer(*it);
+
+								msg.AddByte(0x6F);
+								msg.AddByte(*it);
+							}
+						}
+					}
+				}
+			}
     }
   }
 	
@@ -1402,24 +1748,73 @@ void Protocol74::sendThingMove(const Creature *creature, const Thing *thing, con
              GetMapDescription(player->pos.x-8, player->pos.y-6, player->pos.z, 18, 14, msg); 
              }  
     else{               
-    if (oldPos->y > thing->pos.y) { // north, for old x
-      msg.AddByte(0x65);
-      GetMapDescription(oldPos->x - 8, thing->pos.y - 6, thing->pos.z, 18, 1, msg);
-    } else if (oldPos->y < thing->pos.y) { // south, for old x
-      msg.AddByte(0x67);
-      GetMapDescription(oldPos->x - 8, thing->pos.y + 7, thing->pos.z, 18, 1, msg);
-    }
-    if (oldPos->x < thing->pos.x) { // east, [with new y]
-      msg.AddByte(0x66);
-      GetMapDescription(thing->pos.x + 9, thing->pos.y - 6, thing->pos.z, 1, 14, msg);
-    } else if (oldPos->x > thing->pos.x) { // west, [with new y]
-      msg.AddByte(0x68);
-      GetMapDescription(thing->pos.x - 8, thing->pos.y - 6, thing->pos.z, 1, 14, msg);
-    }
-    }
+			if (oldPos->y > thing->pos.y) { // north, for old x
+				msg.AddByte(0x65);
+				GetMapDescription(oldPos->x - 8, thing->pos.y - 6, thing->pos.z, 18, 1, msg);
+			} else if (oldPos->y < thing->pos.y) { // south, for old x
+				msg.AddByte(0x67);
+				GetMapDescription(oldPos->x - 8, thing->pos.y + 7, thing->pos.z, 18, 1, msg);
+			}
+			if (oldPos->x < thing->pos.x) { // east, [with new y]
+				msg.AddByte(0x66);
+				GetMapDescription(thing->pos.x + 9, thing->pos.y - 6, thing->pos.z, 1, 14, msg);
+			} else if (oldPos->x > thing->pos.x) { // west, [with new y]
+				msg.AddByte(0x68);
+				GetMapDescription(thing->pos.x - 8, thing->pos.y - 6, thing->pos.z, 1, 14, msg);
+			}
+		}
+
+		//Auto-close container's
+		for(unsigned int cid = 0; cid < player->getContainerCount(); ++cid) {
+			Container *container  = player->getContainer(cid);
+			if(container && container->pos.x != 0xFFFF) {
+				if(std::abs(player->pos.x - container->pos.x) > 1 || std::abs(player->pos.y - container->pos.y) > 1) {
+					std::vector<unsigned char> containerlist;
+
+					for(cid = 0; cid < player->getContainerCount(); ++cid) {
+						Container *tmpcontainer = player->getContainer(cid);
+
+						if(tmpcontainer == container) {
+							containerlist.push_back(cid);
+						}
+						else {
+							//Check if its a child container.
+							while(tmpcontainer != NULL) {
+								tmpcontainer = tmpcontainer->getParent();
+								if(tmpcontainer == container) {
+									containerlist.push_back(cid);
+									break;
+								}
+							}
+						}
+					}
+
+					for(std::vector<unsigned char>::iterator it = containerlist.begin(); it != containerlist.end(); ++it) {
+						player->closeContainer(*it);
+
+						msg.AddByte(0x6F);
+						msg.AddByte(*it);
+					}
+				}
+			}
+		}
   }
 
-  msg.WriteToSocket(s);
+	Tile *fromTile = game->getTile(oldPos->x, oldPos->y, oldPos->z);
+	if(fromTile && fromTile->getThingCount() > 8) {
+#ifdef __DEBUG__
+		std::cout << "Pop-up item from below..." << std::endl;
+#endif
+		//We need to pop up this item
+		Thing *newthing = fromTile->getThingByStackPos(9);
+
+		if(newthing != NULL) {
+			GetTileUpdated(*oldPos, msg);
+			//creatureBroadcastTileUpdated(newthing->pos /*&oldPos*/);
+		}
+	}
+
+	msg.WriteToSocket(s);
 }
 
 
@@ -1513,6 +1908,22 @@ void Protocol74::sendCreatureDisappear(const Creature *creature, unsigned char s
   }
 }
 
+/*
+void Protocol74::sendItemChange(const Creature *creature, unsigned char stackPos, const Item* item)
+{
+  if (CanSee(creature->pos.x, creature->pos.y, creature->pos.z))
+	{
+    NetworkMessage msg;
+
+    msg.AddByte(0x6B);
+    msg.AddPosition(creature->pos);
+    msg.AddByte(stackPos);
+		msg.AddItem(item);
+
+		msg.WriteToSocket(s);
+	}
+}
+*/
 
 void Protocol74::sendCreatureTurn(const Creature *creature, unsigned char stackPos)
 {
