@@ -18,6 +18,6 @@
 class Memory {
 
 	public:
-		virtual void save();
+		virtual void save()=0;
 
 }; // class Memory

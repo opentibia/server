@@ -18,6 +18,8 @@
 #include "player_mem.h"
 
 namespace Creatures {
+
 	void player_mem::save() {
 	} // player_mem::save()
+
 } // namespace Creatures
