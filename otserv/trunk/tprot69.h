@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.3  2004/11/19 22:28:07  shivoc
+// fix segfault when using items in inventory and pushing creatures
+//
 // Revision 1.2  2003/05/19 16:48:37  tliffrag
 // Loggingin, talking, walking around, logging out working
 //
@@ -35,11 +38,6 @@
 #include "protokoll.h"
 #include "texcept.h"
 #include <string>
-
-#define ADD4BYTE(stream, val) (stream) += (char)((val)%256); \
-(stream) += (char)(((val)/256)%256); \
-(stream) += (char)(((val)/(256*256))%256); \
-(stream) += (char)(((val)/(256*256*256))%256);
 
     class TProt69 : public Protokoll {
 

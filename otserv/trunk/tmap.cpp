@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.24  2004/11/19 22:28:07  shivoc
+// fix segfault when using items in inventory and pushing creatures
+//
 // Revision 1.23  2004/11/14 09:16:54  shivoc
 // some fixes to at least reenable login without segfaulting the server (including some merges from haktivex' server
 //
@@ -638,8 +641,10 @@ int Map::requestAction(Creature* c, Action* a){
 		distributeAction(a->pos1,a);
 	}
 	else if(a->type==ACTION_ITEM_USE){
-		GETTILEBYPOS(a->pos1)->getItemByStack(a->stack)->use();
-		distributeAction(a->pos1,a);
+			  if (a->pos1.x != 0xFFFF) { // inventory position?
+						 GETTILEBYPOS(a->pos1)->getItemByStack(a->stack)->use();
+						 distributeAction(a->pos1,a);
+			  }
 	}
 	delete a;
 	return true;
@@ -788,6 +793,8 @@ int Map::removeItem(Action* a){
 	int newcount;
 	Tile* tile=tiles[a->pos1.x-MINX][a->pos1.y-MINY];
 	std::cout << "COUNT: " << a->count << std::endl;
+	if (tile->getItemByStack(a->stack) == NULL)
+			  return false;
 	newcount=tile->removeItem(a->stack, a->type, a->count);
 	std::cout << "COUNT: " << newcount << std::endl;
 	if(newcount==0)

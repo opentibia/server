@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.15  2004/11/19 22:28:07  shivoc
+// fix segfault when using items in inventory and pushing creatures
+//
 // Revision 1.14  2004/11/19 21:39:26  shivoc
 // fix a bug in converting from ascii to binary representation
 //
@@ -271,10 +274,5 @@ Socket TNetwork::AcceptPlayer(const Socket& listen) throw(texception) {
 } // Socket TNetwork::AcceptPlayer(const Socket& listen) throw(texception) 
 
 uint32_t TNetwork::convip(const char* ip) {
-		  std::cout << "getting ip from: " << ip << std::endl;
-
-		  uint32_t t = inet_addr(ip);
-		  for (int i = 0; i < 4; ++i)
-					 std::cout << std::hex << (uint16_t)(((char*)&t)[i]) << std::endl;
 		  return inet_addr(ip);
 }
