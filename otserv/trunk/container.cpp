@@ -45,6 +45,12 @@ bool Container::addItem(Item *newitem) {
 	// seems we should add the item...
 	// new items just get placed in front of the items we already have...
 	if(lcontained.size() < maxitems) {
+		newitem->pos.x = 0xFFFF;
+		/*
+		newitem->pos.y = 0xFFFF;
+		newitem->pos.z = 0xFFFF;
+		*/
+
 		lcontained.push_front(newitem);
 
 		// increase the itemcount
@@ -68,12 +74,12 @@ bool Container::removeItem(Item* item)
 	return false;
 }
 
-void Container::isContainerHolding(Item* item, bool& found)
+void Container::isHolding(const Item* item, bool& found) const
 {
 	if(found || item == NULL)
 		return;
 
-	for (std::list<Item*>::iterator cit = lcontained.begin(); cit != lcontained.end(); cit++) {
+	for (std::list<Item*>::const_iterator cit = lcontained.begin(); cit != lcontained.end(); cit++) {
 		Container *container = dynamic_cast<Container*>(*cit);
 		if(container) {
 
@@ -82,7 +88,7 @@ void Container::isContainerHolding(Item* item, bool& found)
 				break;
 			}
 			else
-				return container->isContainerHolding(item, found);
+				return container->isHolding(item, found);
 		}
 	}
 }
@@ -114,7 +120,7 @@ Item* Container::getItem(unsigned long slot_num)
 	return NULL;
 }
 
-unsigned char Container::getSlotNumberByItem(Item* item)
+unsigned char Container::getSlotNumberByItem(Item* item) const
 {
 	unsigned char n = 0;			
 	for (Container::iterator cit = getItems(); cit != getEnd(); cit++) {
@@ -127,24 +133,11 @@ unsigned char Container::getSlotNumberByItem(Item* item)
 	return 0xFF;
 }
 
-//////////////////////////////////////////////////
-// returns iterator to itemlist
-Container::iterator Container::getItems() {
+Container::iterator Container::getItems() const {
 	return lcontained.begin();
 }
 
-//////////////////////////////////////////////////
-// return iterator to one beyond the last item
-Container::iterator Container::getEnd() {
+Container::iterator Container::getEnd() const {
 	return lcontained.end();
 }
-
-/*
-//////////////////////////////////////////////////
-// add item into the container
-Item& Item::operator<<(Item* toAdd) {
-    addItem(toAdd);
-    return *this;
-}
-*/
 

@@ -31,21 +31,22 @@ class Container : public Item
 		std::list<Item *> lcontained;
 
 	public:
-		Container(const unsigned short _type);
-		virtual ~Container();
 		typedef std::list<Item *>::const_iterator iterator;
 
-		int getContainerItemCount() {return actualitems;};
-		int getContainerMaxItemCount() {return maxitems;};
+		Container(const unsigned short _type);
+		virtual ~Container();
 
-		iterator getItems();     // begin();
-		iterator getEnd();       // iterator beyond the last element
+		int size() const {return actualitems;};
+		int capacity() const {return maxitems;};
+
+		iterator getItems() const;     // begin();
+		iterator getEnd() const;       // iterator beyond the last element
 		bool addItem(Item* newitem);     // add an item to the container
 		bool removeItem(Item* item); //remove an item from the container
 		void moveItem(unsigned char from_slot, unsigned char to_slot);
 		Item* getItem(unsigned long slot_num);
-		unsigned char getSlotNumberByItem(Item* item);
-		void isContainerHolding(Item* item, bool& found); //search all containers for the item recursively
+		unsigned char getSlotNumberByItem(Item* item) const;
+		void isHolding(const Item* item, bool& found) const; //search all containers for the item recursively
 		//Item& operator<<(Item*); // put items into the container
 };
 
