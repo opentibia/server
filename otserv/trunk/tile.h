@@ -40,6 +40,7 @@ public:
 
   bool removeThing(Thing *thing);
   void addThing(Thing *thing);
+	bool insertThing(Thing *thing, int stackpos);
 	MagicEffectItem* getFieldItem();
 
   int getCreatureStackPos(Creature *c) const;

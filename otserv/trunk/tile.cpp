@@ -211,6 +211,61 @@ std::string Tile::getDescription() const
 	return ret;
 }
 
+bool Tile::insertThing(Thing *thing, int stackpos)
+{
+	Item *item = (Item*)thing;
+	int pos = stackpos;
+
+	if (pos == 0) {
+    //ground = item;
+		return false;
+	}
+
+  pos--;
+
+  if(splash)
+  {
+		if (pos == 0) {
+      //splash = item;
+			return false;
+		}
+
+    pos--;
+  }
+
+	if ((unsigned) pos < topItems.size()) {
+		
+    ItemVector::iterator it = topItems.begin();
+		while(pos > 0)
+			++it;
+		topItems.insert(it, item);
+		return true;
+	}
+
+  pos -= (uint32_t)topItems.size();
+
+	if ((unsigned) pos < creatures.size()) {
+		//creatures.insert(creatures[pos], item);
+		return false;
+	}
+
+  pos -= (uint32_t)creatures.size();
+
+	if ((unsigned) pos < downItems.size()) {
+    ItemVector::iterator it = downItems.begin();
+		while(pos > 0)
+			++it;
+		downItems.insert(it, item);
+		return true;
+	}
+	else {
+		//Add it to the end.
+		downItems.insert(downItems.end(), item);
+		return true;
+	}
+
+  return false;
+}
 
 bool Tile::removeThing(Thing *thing)
 {
