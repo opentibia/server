@@ -1072,10 +1072,11 @@ void Map::checkPlayer(unsigned long id)
   if (creature != NULL)
   {
 	 creature->onThink();
-	 addEvent(makeTask(1000, std::bind2nd(std::mem_fun(&Map::checkPlayer), id)));
 
 	 Player* player = dynamic_cast<Player*>(creature);
 	 if(player){
+		 addEvent(makeTask(1000, std::bind2nd(std::mem_fun(&Map::checkPlayer), id)));
+
 		 player->mana += min(10, player->manamax - player->mana);
 		 NetworkMessage msg;
 		 
@@ -1083,6 +1084,9 @@ void Map::checkPlayer(unsigned long id)
 		 player->sendNetworkMessage(&msg);
 		 if(player->pzLockedTicks >= 1000)
              player->pzLockedTicks -= 1000;
+	 }
+	 else{
+		 addEvent(makeTask(300, std::bind2nd(std::mem_fun(&Map::checkPlayer), id)));
 	 }
   }
   OTSYS_THREAD_UNLOCK(mapLock)

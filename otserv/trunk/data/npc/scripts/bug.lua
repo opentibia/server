@@ -17,7 +17,8 @@ end
 
 
 function onCreatureAppear(creature)
-
+	attacking = true
+	target = creature
 end
 
 

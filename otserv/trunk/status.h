@@ -21,18 +21,29 @@
 #ifndef __OTSERV_STATUS_H
 #define __OTSERV_STATUS_H
 
+#include <string>
 #include "definitions.h"
 
 
 class Status{
   public:
-	Status* instance();
+	void addPlayer();
+	void removePlayer();
+	static Status* instance();
+	std::string getStatusString();
+	int playersonline, playersmax, playerspeak;
+	std::string ownername, owneremail;
+	std::string motd;
+	std::string mapname, mapauthor;
+	int mapsizex, mapsizey;
+	std::string servername, location, url;
+	std::string version;
+
   private:
 	Status();
 	static Status* _Status;
 
 	// the stats of our server
-	int players, playersmax;
 };
 
 #endif

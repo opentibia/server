@@ -15,6 +15,27 @@ loginmsg = "Welcome to OTServ. For help visit tibia.de/forum"
 -- the port otserv listens on
 port = "7171"
 
+
+-- servername
+-- name of our server
+servername = "otserv.org"
+
+-- ownername
+-- name of the owner of our server
+ownername = "Tliff"
+
+-- owneremail
+-- email of the owner of our server
+owneremail = "otserv@tibia.de"
+
+-- url
+-- the url for more server info
+url = "http://otserv.org"
+
+-- location
+-- the location of the server
+location = "Germany"
+
 -- ip
 -- the ip the server should redirect too
 ip = "127.0.0.1"

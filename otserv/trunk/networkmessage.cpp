@@ -130,6 +130,16 @@ std::string NetworkMessage::GetString()
   return std::string(v, stringlen);
 }
 
+std::string NetworkMessage::GetRaw(){
+  int stringlen = m_MsgSize- m_ReadPos;
+  if (stringlen >= (16384 - m_ReadPos))
+	  return std::string();
+
+  char* v = (char*)(m_MsgBuf+m_ReadPos);
+  m_ReadPos += stringlen;
+  return std::string(v, stringlen);
+}
+
 Position NetworkMessage::GetPosition() {
   Position pos;
   pos.x = GetU16();

@@ -68,6 +68,7 @@ public:
   unsigned short GetU16();
   unsigned int   GetU32();
   std::string    GetString();
+  std::string	 GetRaw();
   Position       GetPosition();
 
 

@@ -33,6 +33,8 @@
 #include <time.h>
 #include "map.h"
 
+#include "status.h"
+
 #include "luascript.h"
 #include "account.h"
 
@@ -60,7 +62,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
   srand((unsigned)time(NULL));
 
   SOCKET s = *(SOCKET*)dat;
-  
+    
   NetworkMessage msg;
   if (msg.ReadFromSocket(s))
   {
@@ -159,6 +161,13 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 		    }
       }
     }
+	else if(protId == 0xFFFF){
+		if(msg.GetRaw() == "info"){
+			Status* status =Status::instance();
+			std::string str = status->getStatusString();
+			send(s, str.c_str(), str.size(), 0); 
+		}
+	}
   }
 
   if (s)
