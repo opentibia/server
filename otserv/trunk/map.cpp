@@ -855,13 +855,13 @@ void Map::creatureYell(Creature *creature, std::string &text)
 
 		Player* player = dynamic_cast<Player*>(creature);
   if(player && player->access == 0 && player->exhaustedTicks >=1000) {
-      player->exhaustedTicks +=2000;
+      player->exhaustedTicks += (long)g_config.getGlobalNumber("exhaustedadd", 0);
       NetworkMessage msg;
       msg.AddTextMessage(MSG_SMALLINFO, "You are exhausted.");
       player->sendNetworkMessage(&msg);
   }
   else {
-      creature->exhaustedTicks = 2000;
+      creature->exhaustedTicks = (long)g_config.getGlobalNumber("exhausted", 0);
       CreatureVector::iterator cit;
       std::transform(text.begin(), text.end(), text.begin(), upchar);
 
@@ -991,11 +991,12 @@ void Map::creatureMakeMagic(Creature *creature, const EffectInfo &ei)
 	Player* player = dynamic_cast<Player*>(creature);
 	if(player) {
 		if(player->access == 0) {
-			if(player->exhaustedTicks > 0/*=1000*/) {
+			if(player->exhaustedTicks >= 1000) {
 				NetworkMessage msg;
 				msg.AddMagicEffect(player->pos, NM_ME_PUFF);
 				msg.AddTextMessage(MSG_SMALLINFO, "You are exhausted.");
 				player->sendNetworkMessage(&msg);
+				player->exhaustedTicks += (long)g_config.getGlobalNumber("exhaustedadd", 0);
 				return;
 			}
 			else if(player->mana < ei.manaCost) {
@@ -1018,11 +1019,11 @@ void Map::creatureMakeMagic(Creature *creature, const EffectInfo &ei)
 		if(ei.offensive)
 			player->pzLocked = true;
 
-		creature->exhaustedTicks = 1000;
+		creature->exhaustedTicks = (long)g_config.getGlobalNumber("exhausted", 0);
 	}
 
 	if (ei.offensive && player && player->access == 0) {
-	    player->inFightTicks = 5 * 10 * 1000;
+	    player->inFightTicks = (long)g_config.getGlobalNumber("pzlocked", 0);
 	}
 
 	std::vector< std::pair<unsigned long, signed long> > targetlist;
@@ -1054,7 +1055,7 @@ void Map::creatureMakeMagic(Creature *creature, const EffectInfo &ei)
 
 							if (damage > 0) {
 								if(ei.offensive && target->access ==0)
-									target->inFightTicks = 5 * 10 * 1000;
+									target->inFightTicks = (long)g_config.getGlobalNumber("pzlocked", 0);
 
 								if(damage > target->health)
 									damage = target->health;
@@ -1269,12 +1270,12 @@ void Map::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fig
 	}
 
 	if (player && player->access == 0) {
-	    player->inFightTicks = 5 * 60 * 1000;
+	    player->inFightTicks = (long)g_config.getGlobalNumber("pzlocked", 0);
 	    if(attackedPlayer)
  	         player->pzLocked = true;	    
 	}
 	if(attackedPlayer && attackedPlayer->access ==0)
-	 attackedPlayer->inFightTicks = 5 * 60 * 1000;
+	 attackedPlayer->inFightTicks = (long)g_config.getGlobalNumber("pzlocked", 0);
 
 	if(!inReach)
 		return;
