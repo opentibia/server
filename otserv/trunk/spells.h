@@ -97,6 +97,7 @@ public:
 
 	bool isLoaded(){return loaded;}
 	SpellScript* getSpellScript(){return script;};
+	std::string getName() const {return name;};
 	int getMana(){return mana;};
 	int getMagLv(){
   return magLv;};
@@ -153,8 +154,8 @@ protected:
 	static void internalGetArea(lua_State *L, MagicEffectAreaClass &magicArea);
 	static void internalGetPosition(lua_State *L, Position& pos);
 	static void internalGetMagicEffect(lua_State *L, MagicEffectClass &me);
-	static void internalLoadDamageVec(lua_State *L, MagicDamageVec& dmgvec);
-	static void internalLoadTransformVec(lua_State *L, damageMapClass& dmgMap);
+	static void internalLoadDamageVec(lua_State *L, ConditionVec& condvec);
+	static void internalLoadTransformVec(lua_State *L, TransformMap& transformMap);
 	int registerFunctions();
 	Spell* spell;
 	bool loaded;      

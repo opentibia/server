@@ -72,7 +72,7 @@ public:
   Npc(const char *name, Game* game);
   virtual ~Npc();
 
-  virtual bool isPlayer() const { return false; };
+  //virtual bool isPlayer() const { return false; };
 
   void speak(const std::string &text){};
 

@@ -44,7 +44,11 @@ bool Spells::loadFromXml()
   bool enabled = false;
   int vocId, maglv = 0, mana = 0, id = 0, charges = 0;
   this->loaded = false;
-  xmlDocPtr doc = xmlParseFile(std::string("data/spells/spells.xml").c_str());
+
+	std::string filename = "data/spells/spells.xml";
+	std::transform(filename.begin(), filename.end(), filename.begin(), tolower);
+  xmlDocPtr doc = xmlParseFile(filename.c_str());
+
   if (doc){
 		this->loaded=true;
 		xmlNodePtr root, p, tmp;
@@ -78,6 +82,7 @@ bool Spells::loadFromXml()
 				if (enabled){
 					if ((const char*)xmlGetProp(p, (const xmlChar *)"name")) {
 						name = (const char*)xmlGetProp(p, (const xmlChar *)"name");
+						std::transform(name.begin(), name.end(), name.begin(), tolower);
 					}
 					if ((const char*)xmlGetProp(p, (const xmlChar *)"words")) {
 						words = (const char*)xmlGetProp(p, (const xmlChar *)"words");
@@ -116,6 +121,7 @@ bool Spells::loadFromXml()
 				if (enabled){
 					if ((const char*)xmlGetProp(p, (const xmlChar *)"name")) {
 						name = (const char*)xmlGetProp(p, (const xmlChar *)"name");
+						std::transform(name.begin(), name.end(), name.begin(), tolower);
 					}
 
 					if ((const char*)xmlGetProp(p, (const xmlChar *)"id")) {
@@ -240,7 +246,6 @@ int SpellScript::registerFunctions(){
 	lua_register(luaState, "doAreaExMagic", SpellScript::luaActionDoAreaExSpell);
 	lua_register(luaState, "doAreaGroundMagic", SpellScript::luaActionDoAreaGroundSpell);
 
-	//lua_register(luaState, "doMagic", SpellScript::luaActionDoSpell);
 	lua_register(luaState, "changeOutfit", SpellScript::luaActionChangeOutfit);
 	lua_register(luaState, "manaShield", SpellScript::luaActionManaShield);
 	lua_register(luaState, "getPosition", SpellScript::luaActionGetPos);
@@ -286,8 +291,6 @@ Spell* SpellScript::getSpell(lua_State *L){
 
 void SpellScript::internalGetArea(lua_State *L, MagicEffectAreaClass &magicArea)
 {
-	//unsigned char area[14][18]={};
-	
 	std::vector<unsigned char> col;
 
 	int i=0, j = 0;
@@ -297,10 +300,7 @@ void SpellScript::internalGetArea(lua_State *L, MagicEffectAreaClass &magicArea)
 		lua_pushnil(L);
 		col.clear();
     while (lua_next(L, -2) != 0) {
-			//if(i< rows /*14*/ && j < cols /*18*/){
-				//area[i][j] = (unsigned char)lua_tonumber(L, -1);
-				col.push_back((unsigned char)lua_tonumber(L, -1));
-			//}
+			col.push_back((unsigned char)lua_tonumber(L, -1));
 			
 			lua_pop(L, 1);  /* removes `value'; keeps `key' for next iteration */
 			j++;
@@ -317,8 +317,6 @@ void SpellScript::internalGetArea(lua_State *L, MagicEffectAreaClass &magicArea)
 
 	magicArea.areaEffect = (char)lua_tonumber(L, -1);
 	lua_pop(L,1);
-
-	//memcpy(&magicArea.area, area, sizeof(area));	
 }
 
 void SpellScript::internalGetPosition(lua_State *L, Position& pos)
@@ -343,23 +341,38 @@ void SpellScript::internalGetPosition(lua_State *L, Position& pos)
 
 void SpellScript::internalGetMagicEffect(lua_State *L, MagicEffectClass& me)
 {
-	/*
-  lua_pushnil(L);
-  while (lua_next(L, 2) != 0) {
-    printf("%s - %s\n", lua_typename(L, lua_type(L, -2)), lua_typename(L, lua_type(L, -1)));
-    lua_pop(L, 1);
-  }
-
-	lua_pushnil(L); //start of table
-	*/
-
 	lua_pushnil(L);
 
+	lua_next(L, -2);
+	int attackType = lua_tonumber(L, -1);
+	lua_pop(L, 1);
+
+	switch(attackType) {
+		case 0: me.attackType = ATTACK_NONE; break;
+		case 1: me.attackType = ATTACK_ENERGY; break;
+		case 2: me.attackType = ATTACK_BURST; break;
+		case 3: me.attackType = ATTACK_FIRE; break;
+		case 4: me.attackType = ATTACK_PHYSICAL; break;
+		case 5: me.attackType = ATTACK_POISON; break;
+		case 6: me.attackType = ATTACK_PARALYZE; break;
+		case 7: me.attackType = ATTACK_DRUNKNESS; break;
+
+		default:
+#ifdef __DEBUG__
+			std::cerr << "WARNING: internalGetMagicEffect(), attackType out of range!" << std::endl;
+#endif
+			break;
+	}
+	
 	lua_next(L, -2);
 	me.animationEffect = (char)lua_tonumber(L, -1);
 	lua_pop(L, 1);
 
 	lua_next(L, -2);
+	me.hitEffect = (char)lua_tonumber(L, -1);
+	lua_pop(L, 1);
+
+ 	lua_next(L, -2);
 	me.damageEffect = (char)lua_tonumber(L, -1);
 	lua_pop(L, 1);
 
@@ -372,7 +385,7 @@ void SpellScript::internalGetMagicEffect(lua_State *L, MagicEffectClass& me)
 	lua_pop(L, 1);
 
 	lua_next(L, -2);
-	me.physical = lua_toboolean(L, -1);
+	me.drawblood = lua_toboolean(L, -1);
 	lua_pop(L, 1);
 
 	lua_next(L, -2);
@@ -410,13 +423,10 @@ int SpellScript::luaActionDoTargetSpell(lua_State *L)
 
 int SpellScript::luaActionDoTargetExSpell(lua_State *L)
 {
-	MagicDamageVec dmgvec;
-	internalLoadDamageVec(L, dmgvec);
+	ConditionVec condvec;
+	internalLoadDamageVec(L, condvec);
 
-	MagicDamageType md = (MagicDamageType)(int)lua_tonumber(L, -1);
-	lua_pop(L,1);
-
-	MagicEffectTargetExClass magicTargetEx(md, dmgvec);
+	MagicEffectTargetExClass magicTargetEx(/*md,*/ condvec);
 
 	internalGetMagicEffect(L, magicTargetEx);
 
@@ -436,10 +446,10 @@ int SpellScript::luaActionDoTargetExSpell(lua_State *L)
 
 int SpellScript::luaActionDoTargetGroundSpell(lua_State *L)
 {
-	damageMapClass dmgMap;
-	internalLoadTransformVec(L, dmgMap);
+	TransformMap transformMap;
+	internalLoadTransformVec(L, transformMap);
 	
-	MagicEffectItem* fieldItem = new MagicEffectItem(magicNone, dmgMap);
+	MagicEffectItem* fieldItem = new MagicEffectItem(transformMap);
 	MagicEffectTargetGroundClass magicGround(fieldItem);
 
 	magicGround.offensive = lua_toboolean(L, -1);
@@ -503,19 +513,16 @@ int SpellScript::luaActionDoAreaSpell(lua_State *L)
 
 int SpellScript::luaActionDoAreaExSpell(lua_State *L)
 {
-	MagicDamageVec dmgvec;
+	ConditionVec condvec;
 
 	int count = (int)lua_tonumber(L, -1);
 	lua_pop(L,1);
 
 	for(int n = 0; n < count; ++n) {
-		internalLoadDamageVec(L, dmgvec);
+		internalLoadDamageVec(L, condvec);
 	}
 
-	MagicDamageType md = (MagicDamageType)(int)lua_tonumber(L, -1);
-	lua_pop(L,1);
-
-	MagicEffectAreaExClass magicAreaEx(md, dmgvec);
+	MagicEffectAreaExClass magicAreaEx(/*md,*/ condvec);
 
 	internalGetMagicEffect(L, magicAreaEx);
     
@@ -558,13 +565,10 @@ int SpellScript::luaActionDoAreaExSpell(lua_State *L)
 
 int SpellScript::luaActionDoAreaGroundSpell(lua_State *L)
 {
-	damageMapClass dmgMap;
-	internalLoadTransformVec(L, dmgMap);
-	
-	MagicDamageType md = (MagicDamageType)(int)lua_tonumber(L, -1);
-	lua_pop(L,1);
+	TransformMap transformMap;
+	internalLoadTransformVec(L, transformMap);
 
-	MagicEffectItem* fieldItem = new MagicEffectItem(md, dmgMap);
+	MagicEffectItem* fieldItem = new MagicEffectItem(/*md,*/ transformMap);
 	MagicEffectAreaGroundClass magicGroundEx(fieldItem);
 
 	internalGetMagicEffect(L, magicGroundEx);
@@ -600,97 +604,6 @@ int SpellScript::luaActionDoAreaGroundSpell(lua_State *L)
 	return 1;
 }
 
-/*
-int SpellScript::luaActionDoSpell(lua_State *L){
-
-	MagicEffectAreaClass magicInstant;
-    
-  needDirection = (bool)lua_toboolean(L, -1);
-	lua_pop(L,1);
-
-	magicInstant.maxDamage = (int)lua_tonumber(L, -1);
-	lua_pop(L,1);
-	
-	magicInstant.minDamage = (int)lua_tonumber(L, -1);
-	lua_pop(L,1);
-    
-  magicInstant.physical = (bool)lua_toboolean(L, -1);
-	lua_pop(L,1);
-
-	magicInstant.offensive = (bool)lua_toboolean(L, -1);
-	lua_pop(L,1);
-	
-	magicInstant.animationColor = (char)lua_tonumber(L, -1);
-	lua_pop(L,1);
-
-	magicInstant.areaEffect = (char)lua_tonumber(L, -1);
-	lua_pop(L,1);
-	
-	magicInstant.damageEffect = (char)lua_tonumber(L, -1);
-	lua_pop(L,1);	
-
-	lua_pushstring(L, "z");
-	lua_gettable(L, -2);
-  cz = (int)lua_tonumber(L, -1);
-  lua_pop(L, 1);
-    
-  lua_pushstring(L, "y");
-  lua_gettable(L, -2);
-  cy = (int)lua_tonumber(L, -1);
-  lua_pop(L, 1);
-    
-  lua_pushstring(L, "x");
-  lua_gettable(L, -2);
-  cx = (int)lua_tonumber(L, -1);
-  lua_pop(L, 1);
-    
-  lua_pop(L, 1); //table
-
-	unsigned char area[14][18]={};
-	int i=0, j = 0;
-	lua_pushnil(L);
-  while (lua_next(L, -2) != 0) {
-		lua_pushnil(L);
-		while (lua_next(L, -2) != 0) {
-			if(i<14 && j <18){
-				area [i][j] = (unsigned char)lua_tonumber(L, -1);
-			}
-			
-			lua_pop(L, 1);
-			j++;
-		}
-    j=0;
-    lua_pop(L, 1);
-    i++;
-	}
-
-	lua_pop(L, 1);
-	memcpy(&magicInstant.area, area, sizeof(area));	
-
-	Spell* spell = getSpell(L);
-  magicInstant.manaCost = spell->getMana();
-   
-  Creature* creature = spell->game->getCreatureByID((unsigned long)lua_tonumber(L, -1));
-  lua_pop(L,1);
-	 
-	if(needDirection){
-		switch(creature->getDirection()) {
-			case NORTH: magicInstant.direction = 1; break;
-			case WEST: magicInstant.direction = 2; break;
-			case EAST: magicInstant.direction = 3; break;
-			case SOUTH: magicInstant.direction = 4; break;
-		 };
-	}
-	else {
-		magicInstant.direction = 1;
-	}
-
-	bool isSuccess = spell->game->creatureCastSpell(creature, centerpos, magicInstant);
-	lua_pushboolean(L, isSuccess);
-	return 1;
-}
-*/
-
 int SpellScript::luaActionChangeOutfit(lua_State *L){
     int looktype = (int)lua_tonumber(L, -1);
 	lua_pop(L,1);
@@ -708,37 +621,35 @@ int SpellScript::luaActionChangeOutfit(lua_State *L){
 	return 0;
 }
 
-void SpellScript::internalLoadDamageVec(lua_State *L, MagicDamageVec& dmgvec)
+void SpellScript::internalLoadDamageVec(lua_State *L, ConditionVec& condvec)
 {
-	damageTimeCount dt;
-
 	//cid
 	unsigned long cid = (int)lua_tonumber(L, 1);
 
-	MagicEffectTargetMagicDamageClass tmd(cid);
+	MagicEffectTargetCreatureCondition magicTargetCondition(cid);
 	
-	internalGetMagicEffect(L, tmd);
+	internalGetMagicEffect(L, magicTargetCondition);
 
-	//damageTimeCount
-	dt.second = (int)lua_tonumber(L, -1); //damageCount
+	//conditionTimeCount
+	long condCount = (int)lua_tonumber(L, -1); //conditionCount
 	lua_pop(L, 1);
 
-	dt.first = (int)lua_tonumber(L, -1); //delayTicks
+	long ticks = (int)lua_tonumber(L, -1); //delayTicks
 	lua_pop(L, 1);
 
-	dmgvec.insert(dmgvec.begin(), damageInfo(dt, tmd));
+	condvec.insert(condvec.begin(), CreatureCondition(ticks, condCount, magicTargetCondition));
 }
 
-void SpellScript::internalLoadTransformVec(lua_State *L, damageMapClass& dmgMap)
+void SpellScript::internalLoadTransformVec(lua_State *L, TransformMap& transformMap)
 {
-	transformInfo ti;
-	MagicDamageVec dmgvec;
+	TransformItem ti;
+	ConditionVec condvec;
 
 	int stateCount = (int)lua_tonumber(L, -1);
 	lua_pop(L,1);
 
 	for(int s = 0; s < stateCount; ++s) {
-		dmgvec.clear();
+		condvec.clear();
 
 		int id = (int)lua_tonumber(L, -1);
 		lua_pop(L,1);
@@ -750,11 +661,11 @@ void SpellScript::internalLoadTransformVec(lua_State *L, damageMapClass& dmgMap)
 		lua_pop(L,1);
 
 		for(int n = 0; n < count; ++n) {
-			internalLoadDamageVec(L, dmgvec);
+			internalLoadDamageVec(L, condvec);
 		}
 		
-		ti.second = dmgvec;
-		dmgMap[id] = ti;
+		ti.second = condvec;
+		transformMap[id] = ti;
 	}
 }
 

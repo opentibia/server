@@ -12,8 +12,16 @@ enum Direction { NORTH = 0, EAST = 1, SOUTH = 2, WEST = 3 };
 
 class Position {
 public:
-  int x,y,z;
 
+  // for now we just initialise the position to a startpoint
+  //Position() : x(247), y(218), z(7) { };
+  Position() : x(31), y(31), z(7) { };
+	~Position() {};
+
+	Position(int _x, int _y, int _z)
+	: x(_x), y(_y), z(_z) {};
+
+	int x,y,z;
 
 	bool operator==(const Position p)  const {
 		if(p.x==x && p.y==y && p.z ==z)
@@ -38,17 +46,12 @@ public:
 		y=abs(y);
 		z=abs(z);
 	}
-/*
+	
+	/*
 	bool operator==(const position p){
 		return (x==p.x && y== p.x && z==p.z);
-	}*/
-
-  // for now we just initialise the position to a startpoint
-  //Position() : x(247), y(218), z(7) { };
-  Position() : x(31), y(31), z(7) { };
-
-    Position(int _x, int _y, int _z)
-        : x(_x), y(_y), z(_z) {};
+	}
+	*/
 
 };
 
