@@ -173,7 +173,7 @@ void GameState::addCreatureState(Tile* tile, Creature* attackedCreature, int dam
 
 void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* attackedCreature, int damage, bool drawBlood)
 {
-	attackedCreature->addDamage(attacker, damage);
+	attackedCreature->addInflictedDamage(attacker, damage);
 
 	//Remove player?
 	if(attackedCreature->health <= 0) {

@@ -200,7 +200,7 @@ public:
   virtual void sendCancel(const char *msg) { };
   virtual void sendCancelWalk(const char *msg) { };
 
-	virtual void addDamage(Creature* attacker, int damage);
+	virtual void addInflictedDamage(Creature* attacker, int damage);
 	virtual int getGainedExperience(Creature* attacker);
 	virtual std::vector<long> getInflicatedDamageCreatureList();
 protected:

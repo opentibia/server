@@ -100,7 +100,7 @@ void Creature::addCondition(const CreatureCondition& condition, bool refresh)
 	condVec.push_back(condition);
 }
 
-void Creature::addDamage(Creature* attacker, int damage)
+void Creature::addInflictedDamage(Creature* attacker, int damage)
 {
 	if(damage <= 0)
 		return;
