@@ -1040,7 +1040,9 @@ void Map::checkPlayerAttacking(unsigned long id)
 
   if (player != NULL && player->health > 0)
   {
-    if (player->attackedCreature != 0)
+    addEvent(makeTask(2000, std::bind2nd(std::mem_fun(&Map::checkPlayerAttacking), id)));
+
+	if (player->attackedCreature != 0)
     {
       Creature *attackedCreature = (Player*)getCreatureByID(player->attackedCreature);
 
@@ -1057,7 +1059,6 @@ void Map::checkPlayerAttacking(unsigned long id)
       }
     }
 
-    addEvent(makeTask(2000, std::bind2nd(std::mem_fun(&Map::checkPlayerAttacking), id)));
 	}
   }
 
