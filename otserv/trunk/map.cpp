@@ -25,7 +25,6 @@
 #include <sstream>
 
 #include <map>
-#include <cctype>
 #include <algorithm>
 
 using namespace std;
@@ -828,6 +827,27 @@ void Map::creatureChangeOutfit(Creature *creature)
   OTSYS_THREAD_UNLOCK(mapLock)
 }
 
+void Map::creatureWhisper(Creature *creature, const std::string &text)
+{
+  OTSYS_THREAD_LOCK(mapLock)
+
+      CreatureVector::iterator cit;
+  for (int x = creature->pos.x - 9; x <= creature->pos.x + 9; x++)
+    for (int y = creature->pos.y - 7; y <= creature->pos.y + 7; y++)
+    {
+      Tile *tile = getTile(x, y, 7);
+      if (tile)
+      {
+        for (cit = tile->creatures.begin(); cit != tile->creatures.end(); cit++)
+        {
+            if(abs(creature->pos.x - x) >1 || abs(creature->pos.y - y) >1)
+                      (*cit)->onCreatureSay(creature, 2, std::string("pspsps"));
+            else (*cit)->onCreatureSay(creature, 2, text);
+        }
+      }
+    }    
+  OTSYS_THREAD_UNLOCK(mapLock)
+}
 
 void Map::creatureYell(Creature *creature, std::string &text)
 {
@@ -870,7 +890,14 @@ void Map::creatureSpeakTo(Creature *creature, const std::string &receiver, const
 void Map::creatureBroadcastMessage(Creature *creature, const std::string &text)
 {
   OTSYS_THREAD_LOCK(mapLock)
-    OTSYS_THREAD_UNLOCK(mapLock)
+  if(creature->access != 0) {
+    std::map<long, Creature*>::iterator cit;
+    for (cit = playersOnline.begin(); cit != playersOnline.end(); cit++)
+            {
+                  cit->second->onCreatureSay(creature, 9, text);
+            }
+  }  
+  OTSYS_THREAD_UNLOCK(mapLock)
 }
 
 void Map::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fight_t damagetype){

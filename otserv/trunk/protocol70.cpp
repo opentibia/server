@@ -441,8 +441,11 @@ void Protocol70::parseSay(NetworkMessage &msg)
   switch (type)
   {
     case 0x01:
+      map->creatureSay(player, type, text);  
+      break;
+      
     case 0x02:
-      map->creatureSay(player, type, text);
+      map->creatureWhisper(player, text);
       break;
 
     case 0x03:
