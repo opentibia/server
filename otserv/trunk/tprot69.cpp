@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.9  2004/11/19 22:08:47  shivoc
+// fix redirect for some ips
+//
 // Revision 1.8  2004/11/14 09:16:54  shivoc
 // some fixes to at least reenable login without segfaulting the server (including some merges from haktivex' server
 //
@@ -153,8 +156,10 @@ namespace Protokoll {
 	temp += 0x09;
 	temp += '\0'; // length of world name
         temp += "Set IP   "; // world name
-	ADD4BYTE(temp, g_serverip);
-	// port
+		  for (int i = 0; i < 4; ++i)
+					 temp += ((char*)&g_serverip)[i];
+					 
+		  // port
         temp += port%0x100;
         temp += (port/0x100)%0x100;
 
