@@ -56,7 +56,7 @@ public:
   virtual void sendSetOutfit(const Creature* creature) = 0;
 	virtual void sendTileUpdated(const Position *Pos) = 0;
 	virtual void sendContainerUpdated(Item *item, unsigned char from_id, unsigned char to_id, unsigned char from_slot, unsigned char to_slot, bool remove) = 0;
-
+  virtual void sendIcons(int icons) = 0;
   virtual void sendCancel(const char *msg) = 0;
   virtual void sendCancelWalk(const char *msg) = 0;
   virtual void sleepTillMove();

@@ -1047,6 +1047,7 @@ void Map::creatureMakeMagic(Creature *creature, const EffectInfo &ei)
 
 	if (ei.offensive && player && player->access == 0) {
 	    player->inFightTicks = (long)g_config.getGlobalNumber("pzlocked", 0);
+	    player->sendIcons();
 	}
 
 	std::vector< std::pair<unsigned long, signed long [2]> > targetlist;
@@ -1063,7 +1064,7 @@ void Map::creatureMakeMagic(Creature *creature, const EffectInfo &ei)
 			if (tile) {
 				for (cit = tile->creatures.begin(); cit != tile->creatures.end(); cit++) {
 					Creature* target = (*cit);
-
+                    Player* targetPlayer = dynamic_cast<Player*>(target);
 					if(ei.area[y][x] == ei.direction) {
 						targetitem.first = target->getID();
 
@@ -1077,8 +1078,10 @@ void Map::creatureMakeMagic(Creature *creature, const EffectInfo &ei)
 								damage += (ei.offensive ? 1337 : -1337);
 
 							if (damage > 0) {
-								if(ei.offensive && target->access ==0)
-									target->inFightTicks = (long)g_config.getGlobalNumber("pzlocked", 0);
+								if(targetPlayer && ei.offensive && target->access ==0){
+									targetPlayer->inFightTicks = (long)g_config.getGlobalNumber("pzlocked", 0);
+									targetPlayer->sendIcons();
+                                }
 									
 								if (target->manaShieldTicks >= 1000 && (damage < target->mana) ){
                                    manaDamage = damage;
@@ -1332,11 +1335,14 @@ void Map::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fig
 
 	if (player && player->access == 0) {
 	    player->inFightTicks = (long)g_config.getGlobalNumber("pzlocked", 0);
+	    player->sendIcons();
 	    if(attackedPlayer)
  	         player->pzLocked = true;	    
 	}
-	if(attackedPlayer && attackedPlayer->access ==0)
+	if(attackedPlayer && attackedPlayer->access ==0){
 	 attackedPlayer->inFightTicks = (long)g_config.getGlobalNumber("pzlocked", 0);
+	 attackedPlayer->sendIcons();
+  }
 
 	if(!inReach)
 		return;
@@ -1606,13 +1612,16 @@ void Map::checkPlayer(unsigned long id)
 		 if(player->inFightTicks >= 1000) {
 			player->inFightTicks -= 1000;
             if(player->inFightTicks < 1000)
-				player->pzLocked = false; 
+				player->pzLocked = false;
+                player->sendIcons(); 
           }
           if(player->exhaustedTicks >=1000){
             player->exhaustedTicks -=1000;
             } 
           if(player->manaShieldTicks >=1000){
             player->manaShieldTicks -=1000;
+            if(player->manaShieldTicks  < 1000)
+            player->sendIcons();
             }   
 	 }
 	 else{

@@ -142,6 +142,18 @@ void Player::speak(const std::string &text)
 {
 }
 
+void Player::sendIcons()
+{
+     int icons = 0;
+     if(inFightTicks >= 6000 || inFightTicks ==4000 || inFightTicks == 2000){
+                     icons |= ICON_SWORDS;
+                     }
+     if(manaShieldTicks >= 1000){
+                     icons |= ICON_MANASHIELD;
+                     }   
+     client->sendIcons(icons);             
+}
+
 int Player::sendInventory(){
 	client->sendInventory();
 	return true;

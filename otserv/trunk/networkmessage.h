@@ -52,7 +52,16 @@ enum MessageClasses {
 		  MSG_EVENT     = 0x11,
 		  MSG_STATUS    = 0x12
 };
-
+enum Icons {
+ ICON_POISON = 1,
+ ICON_BURN = 2, 
+ ICON_ENERGY =  4, 
+ ICON_DRUNK = 8, 
+ ICON_MANASHIELD = 16, 
+ ICON_PARALIZE = 32, 
+ ICON_HASTE = 64, 
+ ICON_SWORDS = 128
+ };
 class Creature;
 class Player;
 class Item;

@@ -43,7 +43,6 @@
 
 extern LuaScript g_config;
 
-
 Protocol70::Protocol70(SOCKET s)
 {
   this->s = s;
@@ -164,9 +163,11 @@ void Protocol70::parsePacket(NetworkMessage &msg)
       parseCancelMove(msg);
       break;
     case 0xA0: // ?? (during character loggin into world) has 2 bytes data
+      printf("packet header %x \n", recvbyte);
       parseDebug(msg);
       break;
-    case 0x69: // ?? control meesage (no data)
+    case 0x69: // ?? client quit without logout 
+      printf("packet header %x \n", recvbyte);
       parseDebug(msg);
       break;    
     default:
@@ -397,6 +398,8 @@ void Protocol70::parseTurnNorth(NetworkMessage &msg)
 void Protocol70::parseTurnEast(NetworkMessage &msg)
 {
   map->creatureTurn(player, EAST);
+  NetworkMessage newmsg;
+  newmsg.WriteToSocket(s);
 }
 
 
@@ -409,6 +412,7 @@ void Protocol70::parseTurnSouth(NetworkMessage &msg)
 void Protocol70::parseTurnWest(NetworkMessage &msg)
 {
   map->creatureTurn(player, WEST);
+  
 }
 
 
@@ -458,6 +462,13 @@ if (CanSee(creature->pos.x, creature->pos.y)) {
 	newmsg.WriteToSocket(s);
 }
 }
+
+void Protocol70::sendIcons(int icons){
+     NetworkMessage newmsg;
+	 newmsg.AddByte(0xA2);
+	 newmsg.AddByte(icons);
+	 newmsg.WriteToSocket(s);
+     }
 
 void Protocol70::parseSetOutfit(NetworkMessage &msg)
 {
@@ -1324,7 +1335,7 @@ void Protocol70::sendCreatureSay(const Creature *creature, unsigned char type, c
   NetworkMessage msg;
 
   msg.AddCreatureSpeak(creature, type, text);
-
+  
   msg.WriteToSocket(s);
 }
 

@@ -100,7 +100,7 @@ private:
 //	void sendPlayerChangeGround(Action* action);
 
   virtual void sendNetworkMessage(NetworkMessage *msg);
-  
+  virtual void sendIcons(int icons);
   virtual void sendThingMove(const Creature *creature, const Thing *thing, const Position *oldPos, unsigned char oldstackpos);
   virtual void sendCreatureAppear(const Creature *creature);
   virtual void sendCreatureDisappear(const Creature *creature, unsigned char stackPos);

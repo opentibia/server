@@ -296,6 +296,10 @@ int SpellScript::luaActionManaShield(lua_State *L){
 	Creature* creature = spell->map->getCreatureByID((unsigned long)lua_tonumber(L, -1));
 	lua_pop(L,1);
 	creature->manaShieldTicks = time;
+	
+	Player* p = dynamic_cast<Player*>(creature);
+	if(p)
+	     p->sendIcons();
 	return 0;
 }
 

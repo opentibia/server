@@ -84,7 +84,7 @@ public:
 	
   int sex, voc;
   int cap;
-
+  bool poisoned, burning, energy, drunk, paralised;
   int food;
 
   virtual int getWeaponDamage() const;
@@ -105,7 +105,7 @@ public:
   void    releasePlayer() { useCount--; if (useCount == 0) delete this; };
 
   fight_t getFightType();
-
+  void sendIcons();
   bool CanSee(int x, int y);
   void sendNetworkMessage(NetworkMessage *msg);
 
