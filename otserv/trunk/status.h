@@ -22,6 +22,7 @@
 #define __OTSERV_STATUS_H
 
 #include <string>
+#include "otsystem.h"
 #include "definitions.h"
 
 
@@ -38,6 +39,8 @@ class Status{
 	int mapsizex, mapsizey;
 	std::string servername, location, url;
 	std::string version;
+	uint64_t start;
+
 
   private:
 	Status();

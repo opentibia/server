@@ -37,6 +37,7 @@ Status* Status::instance(){
 Status::Status(){
 	this->playersonline=0;
 	this->playersmax=0;
+	this->start=OTSYS_TIME();
 }
 
 void Status::addPlayer(){
@@ -64,7 +65,10 @@ std::string Status::getStatusString(){
 	
 	
 	p=xmlNewNode(NULL,(const xmlChar*)"serverinfo");
-	xmlSetProp(p, (const xmlChar*) "uptime", (const xmlChar*)"uptime");///////////////////////
+	uint64_t running = (OTSYS_TIME() - this->start)/1000;
+	ss << running;
+	xmlSetProp(p, (const xmlChar*) "uptime", (const xmlChar*)running.str().c_str());
+	ss.str("");
 	xmlSetProp(p, (const xmlChar*) "ip", (const xmlChar*)g_config.getGlobalString("ip", "").c_str());
 	xmlSetProp(p, (const xmlChar*) "servername", (const xmlChar*)g_config.getGlobalString("servername", "").c_str());
 	xmlSetProp(p, (const xmlChar*) "port", (const xmlChar*)g_config.getGlobalString("port", "").c_str());
