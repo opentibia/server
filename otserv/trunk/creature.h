@@ -97,6 +97,8 @@ public:
 
 
   int lookhead, lookbody, looklegs, lookfeet, looktype, lookcorpse;
+  int mana, manamax, manaspent;
+  bool exhausted;
 
   int speed;
 
@@ -105,6 +107,10 @@ public:
   int lastDamage;
 
   int access; //access level
+  // magic level
+  int maglevel;
+  // level
+  int level;
 
 
 private:

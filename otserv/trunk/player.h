@@ -79,22 +79,15 @@ public:
 
 	std::string getName(){return name;};
 
-	bool exhausted;
-
   int sex, voc;
   int cap;
 
-  int mana, manamax, manaspent;
 
   int food;
 
 
-  // level
-  int level;
   // experience
   unsigned long experience;
-  // magic level
-  int maglevel;
 
   int skills[7][2];
 

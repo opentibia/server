@@ -85,7 +85,7 @@ void Protocol70::parsePacket(NetworkMessage &msg)
 {
   uint8_t recvbyte = msg.GetByte();
 
-  if (player->health <= 0) {
+  if (s && player->health <= 0) {
 	 if (recvbyte == 0x14)
 		parseLogout(msg);
 	     return;
@@ -226,24 +226,30 @@ void Protocol70::GetMapDescription(unsigned short x, unsigned short y, unsigned 
 }
 
 
+
 bool Protocol70::setCreatureAsKnown(unsigned long id)
 {
-	std::list<unsigned long>::iterator i;
-	for(i = knownPlayers.begin(); i != knownPlayers.end(); ++i)
-  {
-		if((*i) == id)
-			return true;
+std::list<unsigned long>::iterator i;
+for(i = knownPlayers.begin(); i != knownPlayers.end(); ++i)
+{
+	if((*i) == id)
+	{
+		knownPlayers.erase(i);
+
+		knownPlayers.push_back(id);
+
+		return true;
 	}
-
-  if(knownPlayers.size() >= 35)
-		knownPlayers.pop_front();
-
-  knownPlayers.push_back(id);
-
-	return false;
 }
 
+if(knownPlayers.size() >= 35)
+	knownPlayers.pop_front();
 
+	knownPlayers.push_back(id);
+
+	return false;
+
+}
 
 // Parse methods
 void Protocol70::parseLogout(NetworkMessage &msg)
@@ -251,9 +257,9 @@ void Protocol70::parseLogout(NetworkMessage &msg)
 	// we ask the map to remove us
 	if (map->removeCreature(player))
 	{
-	  player = NULL;
-    closesocket(s);
-    s = 0;
+		player = NULL;
+		closesocket(s);
+		s = 0;
 	}
 }
 

@@ -50,6 +50,15 @@ Npc::Npc(const char *name, Map* map) : Creature(name)
 		p = root->children;
 
 		this->scriptname = (const char*)xmlGetProp(root, (const xmlChar *)"script");
+		if ((const char*)xmlGetProp(root, (const xmlChar *)"access")) {
+			access = atoi((const char*)xmlGetProp(root, (const xmlChar *)"access"));
+		}
+		if ((const char*)xmlGetProp(root, (const xmlChar *)"level")) {
+			level = atoi((const char*)xmlGetProp(root, (const xmlChar *)"level"));
+			std::cout << level << std::endl;
+			maglevel = atoi((const char*)xmlGetProp(root, (const xmlChar *)"maglevel"));
+			std::cout << maglevel << std::endl;
+		}
 
 		while (p)
 		{
@@ -135,6 +144,7 @@ void Npc::onThink(){
 
 
 void Npc::doSay(std::string msg){
+	map->playerCastSpell(this, msg);
 	this->map->creatureSay(this, 1, msg);
 }
 

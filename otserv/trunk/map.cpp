@@ -1101,19 +1101,23 @@ void Map::resetExhausted(unsigned long id)
 	OTSYS_THREAD_UNLOCK(mapLock)
 }
 
-void Map::makeCastSpell(Player *player, int mana, int mindamage, int maxdamage, unsigned char area[14][18], unsigned char ch, unsigned char typeArea, unsigned char typeDamage)
+void Map::makeCastSpell(Creature *player, int mana, int mindamage, int maxdamage, unsigned char area[14][18], unsigned char ch, unsigned char typeArea, unsigned char typeDamage)
 {
 	NetworkMessage msg;
 	Tile* fromtile = getTile(player->pos.x, player->pos.y, player->pos.z);
 	if (player->access == 0 && fromtile->isPz() && maxdamage > 0) {
-		msg.AddTextMessage(MSG_STATUS, "You may not attack a person in a protection zone.");
-		player->sendNetworkMessage(&msg);
+		if (player->isPlayer()) {
+			msg.AddTextMessage(MSG_STATUS, "You may not attack a person in a protection zone.");
+			((Player*)player)->sendNetworkMessage(&msg);
+		}
 		return;
 	}
 	if(player->access == 0 && (player->mana < mana || player->exhausted)) {
+		if (player->isPlayer()) {
 			msg.AddMagicEffect(player->pos, NM_ME_PUFF);
 			msg.AddTextMessage(MSG_EVENT, "You are exhausted.");
-			player->sendNetworkMessage(&msg);
+			((Player*)player)->sendNetworkMessage(&msg);
+		}
 			return;
 	} 
 
@@ -1147,7 +1151,7 @@ void Map::makeCastSpell(Player *player, int mana, int mindamage, int maxdamage, 
 					if(area[y][x] == ch) {
 						damagedcreature.first  = (*cit)->getID();
 
-						if((!tile->isPz() && (*cit)->access == 0)) {
+						if(((!tile->isPz() || maxdamage < 0) || player->access != 0) && (*cit)->access == 0) {
 							int damage = random_range(mindamage, maxdamage);
 
 							if (damage > 0) {
@@ -1271,16 +1275,16 @@ void Map::makeCastSpell(Player *player, int mana, int mindamage, int maxdamage, 
 	}
 }
 
-void Map::playerCastSpell(Player *player, const std::string &text)
+void Map::playerCastSpell(Creature *player, const std::string &text)
 {
   OTSYS_THREAD_LOCK(mapLock)
 
 	if(strcmp(text.c_str(), "exura vita") == 0) {
 			NetworkMessage msg;
-			if(player->access == 0 && (player->mana < 100 || player->exhausted)) {
+			if(player->isPlayer() && player->access == 0 && (player->mana < 100 || player->exhausted)) {
 					msg.AddMagicEffect(player->pos, NM_ME_PUFF);
 					msg.AddTextMessage(MSG_EVENT, "You are exhausted.");
-					player->sendNetworkMessage(&msg);
+					((Player*)player)->sendNetworkMessage(&msg);
 			}
 			else {
 				player->exhausted = true;

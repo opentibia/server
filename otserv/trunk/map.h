@@ -88,8 +88,8 @@ class Map {
     void creatureBroadcastMessage(Creature *creature, const std::string &text);
 	 void creatureChangeOutfit(Creature *creature);
 
-	 void playerCastSpell(Player *player, const std::string &text);
-	 void makeCastSpell(Player *player, int mana, int mindamage, int maxdamage, unsigned char area[14][18], unsigned char ch, unsigned char typeArea, unsigned char typeDamage);
+	 void playerCastSpell(Creature *player, const std::string &text);
+	 void makeCastSpell(Creature *player, int mana, int mindamage, int maxdamage, unsigned char area[14][18], unsigned char ch, unsigned char typeArea, unsigned char typeDamage);
 	 void resetExhausted(unsigned long id);
 
     //void addEvent(long ticks, int type, void *data);
