@@ -142,9 +142,26 @@ int Items::loadFromDat(std::string file)
                          }
             if(iType->id == 1390|| iType->id ==1400){
                          iType->floorChangeWest = true;
+                         }
+                         
+            //diagonal             
+            if(iType->id == 1559){
+                         iType->floorChangeSouth = true;
+                         iType->floorChangeWest = true;
+                         }
+            if(iType->id == 1557){
+                         iType->floorChangeSouth = true;
+                         iType->floorChangeEast = true;
+                         }
+            if(iType->id == 1553){
+                         iType->floorChangeNorth = true;
+                         iType->floorChangeWest = true;
+                         }
+            if(iType->id == 1555){
+                         iType->floorChangeNorth = true;
+                         iType->floorChangeEast = true;
                          }                                       
-            if(iType->id == 459) //we set 459 as a neutral invisible tile
-                         iType->noFloorChange = true;
+                                     
 			switch (optbyte)
 			{
 	   		case 0x00:
