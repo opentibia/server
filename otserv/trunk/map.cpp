@@ -52,12 +52,10 @@ Map::Map()
   {
 		for(int x = 0; x < MAP_WIDTH; x++)
     {
-      tiles[x][y] = new Tile();
-
-		  if(abs(x)<10 || abs(x)<10 || abs(y)<10 || abs(y)<10)
+/*		  if(abs(x)<10 || abs(x)<10 || abs(y)<10 || abs(y)<10)
 			  tiles[x][y]->ground = 605;
 		  else
-  			tiles[x][y]->ground = 102;
+  			tiles[x][y]->ground = 102;*/
 		}
 	}
 
@@ -67,6 +65,12 @@ Map::Map()
   
   OTSYS_CREATE_THREAD(eventThread, this);
 }
+
+
+Map::~Map()
+{
+}
+
 
 bool Map::LoadMap(std::string filename) {
 
@@ -112,12 +116,25 @@ bool Map::LoadMap(std::string filename) {
 
 		for(int y=0; y < ysize; y++){
 			for(int x=0; x < xsize; x++){
-				while(true){
+				while(true)
+        {
 					int id=fgetc(dump)*256;id+=fgetc(dump);
 					if(id==0x00FF)
 						break;
 					//now.x=x+MINX;now.y=y+MINY;now.z=topleft.z;
-					tiles[xorig][yorig]->addThing(new Item(id));
+
+          Item *item = new Item(id);
+          if (item->isGroundTile())
+          {
+            setTile(xorig+x, yorig+y, 7, id);
+            delete item;
+          }
+          else
+          {
+            Tile *t = getTile(xorig+x, yorig+y, 7);
+            if (t)
+					    t->addThing(item);
+          }
 					//tiles[x][y]->push_back(new Item(id));
 				}
 			}
@@ -131,11 +148,9 @@ bool Map::LoadMap(std::string filename) {
 
   placeCreature(npc);
 
+  return true;
 }
 
-Map::~Map()
-{
-}
 
 
 /*****************************************************************************/
@@ -219,9 +234,43 @@ void Map::addEvent(long ticks, int type, void *data)
 /*****************************************************************************/
 
 
-Tile *Map::tile(unsigned short _x, unsigned short _y, unsigned char _z) {
-    return tiles[_x][_y];
+
+Tile* Map::getTile(unsigned short _x, unsigned short _y, unsigned char _z)
+{
+  if (_z < MAP_LAYER)
+  {
+    // _x & 0x3F  is like _x % 64
+    TileMap *tm = &tileMaps[_x & 1][_y & 1][_z];
+
+    // search in the stl map for the requested tile
+    TileMap::iterator it = tm->find((_x << 16) | _y);
+
+    // ... found
+    if (it != tm->end())
+      return it->second;
+  }
+
+  // or not
+  return NULL;
 }
+
+
+void Map::setTile(unsigned short _x, unsigned short _y, unsigned char _z, unsigned short groundId)
+{
+  Tile *tile = getTile(_x, _y, _z);
+
+  if (tile != NULL)
+  {
+    tile->ground = groundId;
+  }
+  else
+  {
+    tile = new Tile();
+    tile->ground = groundId;
+    tileMaps[_x & 1][_y & 1][_z][(_x << 16) | _y] = tile;
+  }  
+}
+
 
 
 int Map::loadMapXml(const char *filename){
@@ -245,10 +294,23 @@ int Map::loadMapXml(const char *filename){
 		for(int x=0; x < width; x++){
 			item=tile->children;
 
-			while(item != NULL){
+			while(item != NULL)
+      {
 				Item* myitem=new Item();
 				myitem->unserialize(item);
-				tiles[x+xorig][y+yorig]->addThing(myitem);
+
+        if (myitem->isGroundTile())
+        {
+          setTile(xorig+x, yorig+y, 7, myitem->getID());
+          delete myitem;
+        }
+        else
+        {
+          Tile *t = getTile(xorig+x, yorig+y, 7);
+          if (t)
+					  t->addThing(myitem);
+        }
+
 				item=item->next;
 			}
 			tile=tile->next;
@@ -290,21 +352,27 @@ bool Map::placeCreature(Creature* c)
     ((Player*)c)->usePlayer();
   }
 
-  while (tiles[c->pos.x][c->pos.y]->isBlocking())
+  while (getTile(c->pos.x, c->pos.y, c->pos.z)->isBlocking())
   {
-  	//crap we need to find another spot
+  	// crap we need to find another spot
 	  c->pos.x++;
   }
 
-  tiles[c->pos.x][c->pos.y]->addThing(c);
+  getTile(c->pos.x, c->pos.y, c->pos.z)->addThing(c);
 
   CreatureVector::iterator cit;
-  for (int x =c->pos.x - 9; x <= c->pos.x + 9; x++)
+  for (int x = c->pos.x - 9; x <= c->pos.x + 9; x++)
     for (int y = c->pos.y - 7; y <= c->pos.y + 7; y++)
-      for (cit = tiles[x][y]->creatures.begin(); cit != tiles[x][y]->creatures.end(); cit++)
+    {
+      Tile *tile = getTile(x, y, 7);
+      if (tile)
       {
-        (*cit)->onCreatureAppear(c);
+        for (cit = tile->creatures.begin(); cit != tile->creatures.end(); cit++)
+        {
+          (*cit)->onCreatureAppear(c);
+        }
       }
+    }
 
   OTSYS_THREAD_UNLOCK(mapLock)
 
@@ -322,16 +390,22 @@ bool Map::removeCreature(Creature* c)
 	std::cout << "removing creature "<< std::endl;
 #endif
 
-  int stackpos = tiles[c->pos.x][c->pos.y]->getCreatureStackPos(c);
-  tiles[c->pos.x][c->pos.y]->removeThing(c);
+  int stackpos = getTile(c->pos.x, c->pos.y, c->pos.z)->getCreatureStackPos(c);
+  getTile(c->pos.x, c->pos.y, c->pos.z)->removeThing(c);
 
   CreatureVector::iterator cit;
-  for (int x =c->pos.x - 9; x <= c->pos.x + 9; x++)
+  for (int x = c->pos.x - 9; x <= c->pos.x + 9; x++)
     for (int y = c->pos.y - 7; y <= c->pos.y + 7; y++)
-      for (cit = tiles[x][y]->creatures.begin(); cit != tiles[x][y]->creatures.end(); cit++)
+    {
+      Tile *tile = getTile(x, y, 7);
+      if (tile)
       {
-        (*cit)->onCreatureDisappear(c, stackpos);
+        for (cit = tile->creatures.begin(); cit != tile->creatures.end(); cit++)
+        {
+          (*cit)->onCreatureDisappear(c, stackpos);
+        }
       }
+    }
 
   if (c->isPlayer())
     ((Player*)c)->releasePlayer();
@@ -491,55 +565,13 @@ void Map::thingMove(Player *player, Thing *thing,
 {
   OTSYS_THREAD_LOCK(mapLock)
 
-  //if ((abs(player->pos.x - from_x) > 1) || (abs(player->pos - from_y) > 1))
-//    return;
+  Tile *fromTile = getTile(thing->pos.x, thing->pos.y, thing->pos.z);
 
-  Position oldPos = thing->pos;
-
-  Tile *fromTile = tiles[oldPos.x][oldPos.y];  // TODO: null for outside -> func
-  Tile *toTile   = tiles[to_x  ][to_y  ];
-
-  if ((fromTile != NULL) && (toTile != NULL))
+  if (fromTile)
   {
-    if ((abs(oldPos.x - to_x) > thing->ThrowRange) ||
-        (abs(oldPos.y - to_y) > thing->ThrowRange))
-    {
-      // TODO... "not Posible"
-    }
-    else if (!thing->CanMovedTo(toTile))
-    {
-      // TODO... "not Posible"
-    }
-    else
-    {
-      int oldstackpos = fromTile->getThingStackPos(thing);
+    int oldstackpos = fromTile->getThingStackPos(thing);
 
-      if (!fromTile->removeThing(thing))
-        return;  // TODO... "not Posible" ; hmm not there
-
-      toTile->addThing(thing);
-
-      thing->pos.x = to_x;
-      thing->pos.y = to_y;
-      thing->pos.z = to_z;
-    
-      CreatureVector::iterator cit;
-      for (int x = min(oldPos.x, (int)to_x) - 9; x <= max(oldPos.x, (int)to_x) + 9; x++)
-        for (int y = min(oldPos.y, (int)to_y) - 7; y <= max(oldPos.y, (int)to_y) + 7; y++)
-          for (cit = tiles[x][y]->creatures.begin(); cit != tiles[x][y]->creatures.end(); cit++)
-          {
-            (*cit)->onThingMove(player, thing, &oldPos, oldstackpos);
-          }
-		if (thing->isPlayer()) {
-				  // we need to update the direction the player is facing to...
-				  // otherwise we are facing some problems in turning into the
-				  // direction we were facing before the movement
-				  if (to_x > oldPos.x) ((Player*)thing)->direction = EAST;
-				  if (to_x < oldPos.x) ((Player*)thing)->direction = WEST;
-				  if (to_y < oldPos.y) ((Player*)thing)->direction = NORTH;
-				  if (to_y > oldPos.y) ((Player*)thing)->direction = SOUTH;
-		}
-    }
+    thingMoveInternal(player, thing->pos.x, thing->pos.y, thing->pos.z, oldstackpos, to_x, to_y, to_z);
   }
 
   OTSYS_THREAD_UNLOCK(mapLock)
@@ -553,9 +585,84 @@ void Map::thingMove(Player *player,
 {
   OTSYS_THREAD_LOCK(mapLock)
 
+  thingMoveInternal(player, from_x, from_y, from_z, stackPos, to_x, to_y, to_z);
 
   OTSYS_THREAD_UNLOCK(mapLock)
 }
+
+
+
+void Map::thingMoveInternal(Player *player,
+                    unsigned short from_x, unsigned short from_y, unsigned char from_z,
+                    unsigned char stackPos,
+                    unsigned short to_x, unsigned short to_y, unsigned char to_z)
+{
+  Thing *thing = getTile(from_x, from_y, from_z)->getThingByStackPos(stackPos);
+
+  if (thing)
+  {
+    Position oldPos;
+    oldPos.x = from_x;
+    oldPos.y = from_y;
+    oldPos.z = from_z;
+
+    Tile *fromTile = getTile(from_x, from_y, from_z);
+    Tile *toTile   = getTile(to_x, to_y, to_z);
+
+    if ((fromTile != NULL) && (toTile != NULL))
+    {
+      if ((abs(oldPos.x - to_x) > thing->ThrowRange) ||
+          (abs(oldPos.y - to_y) > thing->ThrowRange))
+      {
+        // TODO... "not Posible"
+      }
+      else if (!thing->CanMovedTo(toTile))
+      {
+        // TODO... "not Posible"
+      }
+      else
+      {
+        int oldstackpos = fromTile->getThingStackPos(thing);
+
+        if (fromTile->removeThing(thing))
+        {
+          toTile->addThing(thing);
+
+          thing->pos.x = to_x;
+          thing->pos.y = to_y;
+          thing->pos.z = to_z;
+    
+		      if (thing->isPlayer())
+          {
+            // we need to update the direction the player is facing to...
+            // otherwise we are facing some problems in turning into the
+            // direction we were facing before the movement
+            // check y first cuz after a diagonal move we lock to east or west
+            if (to_y < oldPos.y) ((Player*)thing)->direction = NORTH;
+            if (to_y > oldPos.y) ((Player*)thing)->direction = SOUTH;
+            if (to_x > oldPos.x) ((Player*)thing)->direction = EAST;
+            if (to_x < oldPos.x) ((Player*)thing)->direction = WEST;
+		      }
+
+          CreatureVector::iterator cit;
+          for (int x = min(oldPos.x, (int)to_x) - 9; x <= max(oldPos.x, (int)to_x) + 9; x++)
+            for (int y = min(oldPos.y, (int)to_y) - 7; y <= max(oldPos.y, (int)to_y) + 7; y++)
+            {
+              Tile *tile = getTile(x, y, 7);
+              if (tile)
+              {
+                for (cit = tile->creatures.begin(); cit != tile->creatures.end(); cit++)
+                {
+                  (*cit)->onThingMove(player, thing, &oldPos, oldstackpos);
+                }
+              }
+            }
+        }
+      }
+    }
+  }
+}
+
 
 
 void Map::creatureTurn(Creature *creature, Direction dir)
@@ -566,15 +673,21 @@ void Map::creatureTurn(Creature *creature, Direction dir)
   {
     creature->direction = dir;
 
-    int stackpos = 1; /* todo */
+    int stackpos = getTile(creature->pos.x, creature->pos.y, creature->pos.z)->getThingStackPos(creature);
 
     CreatureVector::iterator cit;
     for (int x = creature->pos.x - 9; x <= creature->pos.x + 9; x++)
       for (int y = creature->pos.y - 7; y <= creature->pos.y + 7; y++)
-        for (cit = tiles[x][y]->creatures.begin(); cit != tiles[x][y]->creatures.end(); cit++)
+      {
+        Tile *tile = getTile(x, y, 7);
+        if (tile)
         {
-          (*cit)->onCreatureTurn(creature, stackpos);
+          for (cit = tile->creatures.begin(); cit != tile->creatures.end(); cit++)
+          {
+            (*cit)->onCreatureTurn(creature, stackpos);
+          }
         }
+      }
   }
 
   OTSYS_THREAD_UNLOCK(mapLock)
@@ -587,31 +700,44 @@ void Map::playerSay(Player *player, unsigned char type, const string &text)
 
   CreatureVector::iterator cit;
 
-  for (int x = player->pos.x - 7; x <= player->pos.x + 7; x++)
-    for (int y = player->pos.y - 5; y <= player->pos.y + 5; y++)
-      for (cit = tiles[x][y]->creatures.begin(); cit != tiles[x][y]->creatures.end(); cit++)
+  for (int x = player->pos.x - 9; x <= player->pos.x + 9; x++)
+    for (int y = player->pos.y - 7; y <= player->pos.y + 7; y++)
+    {
+      Tile *tile = getTile(x, y, 7);
+      if (tile)
       {
-        (*cit)->onCreatureSay(player, type, text);
+        for (cit = tile->creatures.begin(); cit != tile->creatures.end(); cit++)
+        {
+          (*cit)->onCreatureSay(player, type, text);
+        }
       }
+    }
 
   OTSYS_THREAD_UNLOCK(mapLock)
 }
+
 
 void Map::playerChangeOutfit(Player *player)
 {
   OTSYS_THREAD_LOCK(mapLock)
 
   CreatureVector::iterator cit;
-
-  for (int x = player->pos.x - 7; x <= player->pos.x + 7; x++)
-    for (int y = player->pos.y - 5; y <= player->pos.y + 5; y++)
-      for (cit = tiles[x][y]->creatures.begin(); cit != tiles[x][y]->creatures.end(); cit++)
+  for (int x = player->pos.x - 9; x <= player->pos.x + 9; x++)
+    for (int y = player->pos.y - 7; y <= player->pos.y + 7; y++)
+    {
+      Tile *tile = getTile(x, y, 7);
+      if (tile)
       {
-        (*cit)->onCreatureChangeOutfit(player);
+        for (cit = tile->creatures.begin(); cit != tile->creatures.end(); cit++)
+        {
+          (*cit)->onCreatureChangeOutfit(player);
+        }
       }
+    }
 
   OTSYS_THREAD_UNLOCK(mapLock)
 }
+
 
 void Map::playerYell(Player *player, const string &text)
 {
@@ -621,10 +747,16 @@ void Map::playerYell(Player *player, const string &text)
 
   for (int x = player->pos.x - 18; x <= player->pos.x + 18; x++)
     for (int y = player->pos.y - 14; y <= player->pos.y + 14; y++)
-      for (cit = tiles[x][y]->creatures.begin(); cit != tiles[x][y]->creatures.end(); cit++)
+    {
+      Tile *tile = getTile(x, y, 7);
+      if (tile)
       {
-        (*cit)->onCreatureSay(player, 3, text);
+        for (cit = tile->creatures.begin(); cit != tile->creatures.end(); cit++)
+        {
+          (*cit)->onCreatureSay(player, 3, text);
+        }
       }
+    }
 
   OTSYS_THREAD_UNLOCK(mapLock)
 }
@@ -664,41 +796,47 @@ void Map::creatureMakeDistDamage(Creature *creature, Creature *attackedCreature)
 
     for (int x = min(creature->pos.x, attackedCreature->pos.x) - 9; x <= max(creature->pos.x, attackedCreature->pos.x) + 9; x++)
       for (int y = min(creature->pos.y, attackedCreature->pos.y) - 7; y <= max(creature->pos.y, attackedCreature->pos.y) + 7; y++)
-        for (cit = tiles[x][y]->creatures.begin(); cit != tiles[x][y]->creatures.end(); cit++)
+      {
+        Tile *tile = getTile(x, y, 7);
+        if (tile)
         {
-          if ((*cit)->isPlayer())
+          for (cit = tile->creatures.begin(); cit != tile->creatures.end(); cit++)
           {
-            Player *p = (Player*)(*cit);
-
-            msg.Reset();
-
-            msg.AddDistanceShoot(creature->pos, attackedCreature->pos, 13);
-
-            if ((damage == 0) && (p->CanSee(attackedCreature->pos.x, attackedCreature->pos.y)))
+            if ((*cit)->isPlayer())
             {
-              msg.AddMagicEffect(attackedCreature->pos, NM_ME_PUFF);
-            }
-            else if ((damage < 0) && (p->CanSee(attackedCreature->pos.x, attackedCreature->pos.y)))
-            {
-              msg.AddMagicEffect(attackedCreature->pos, NM_ME_BLOCKHIT);
-            }
-            else
-            {
-              if (p->CanSee(attackedCreature->pos.x, attackedCreature->pos.y))
+              Player *p = (Player*)(*cit);
+
+              msg.Reset();
+
+              msg.AddDistanceShoot(creature->pos, attackedCreature->pos, 13);
+
+              if ((damage == 0) && (p->CanSee(attackedCreature->pos.x, attackedCreature->pos.y)))
               {
-                msg.AddAnimatedText(attackedCreature->pos, 0xB4, "1337");
-                msg.AddMagicEffect(attackedCreature->pos, NM_ME_DRAW_BLOOD);
-                msg.AddCreatureHealth(attackedCreature);
+                msg.AddMagicEffect(attackedCreature->pos, NM_ME_PUFF);
+              }
+              else if ((damage < 0) && (p->CanSee(attackedCreature->pos.x, attackedCreature->pos.y)))
+              {
+                msg.AddMagicEffect(attackedCreature->pos, NM_ME_BLOCKHIT);
+              }
+              else
+              {
+                if (p->CanSee(attackedCreature->pos.x, attackedCreature->pos.y))
+                {
+                  msg.AddAnimatedText(attackedCreature->pos, 0xB4, "1337");
+                  msg.AddMagicEffect(attackedCreature->pos, NM_ME_DRAW_BLOOD);
+                  msg.AddCreatureHealth(attackedCreature);
+                }
+
+                // own damage, update infos
+                //if (p == attackedCreature)
+                  //CreateDamageUpdate(p, creature, ref netMessage);
               }
 
-              // own damage, update infos
-              //if (p == attackedCreature)
-                //CreateDamageUpdate(p, creature, ref netMessage);
+              p->sendNetworkMessage(&msg);
             }
-
-            p->sendNetworkMessage(&msg);
           }
         }
+      }
   }
 }
 

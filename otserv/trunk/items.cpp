@@ -52,13 +52,7 @@ ItemType::~ItemType()
 
 Items::Items()
 {
-	// add a few items
-	if (loadFromDat("tibia.dat")) {
-			  std::cout << "could not load tibia.dat!" << std::endl;
-			  exit(1);
-	}
 }
-
 
 Items::~Items()
 {

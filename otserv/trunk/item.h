@@ -50,9 +50,11 @@ class Item : public Thing
         unsigned short actualitems; // number of items in container
         // list of items if this is a container
         std::list<Item *> lcontained;
-		static Items items;
 
     public:
+
+		static Items items;
+
 	 unsigned short count; // number of stacked items
         unsigned getID() const;    // ID as in ItemType
 		bool isBlocking() const;

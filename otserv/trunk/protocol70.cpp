@@ -118,7 +118,7 @@ void Protocol70::parsePacket(NetworkMessage &msg)
       break;
 
     case 0x78: // throw item
-//      parseThrow(&action, msg);
+      parseThrow(msg);
       break;
      case 0x82: // throw item
 //      parseUseItem(&action, msg);
@@ -171,28 +171,30 @@ void Protocol70::GetMapDescription(unsigned short x, unsigned short y, unsigned 
   for (int nx = 0; nx < width; nx++)
     for (int ny = 0; ny < height; ny++)
     {
-      tile = map->tile(x + nx, y + ny, z);
+      tile = map->getTile(x + nx, y + ny, z);
 
-      msg.AddItem(&tile->ground);
-
-      ItemVector::iterator it;
-		  for (it = tile->topItems.begin(); it !=tile->topItems.end(); it++)
+      if (tile)
       {
-  			msg.AddItem(*it);
+        msg.AddItem(&tile->ground);
+
+        ItemVector::iterator it;
+		    for (it = tile->topItems.begin(); it !=tile->topItems.end(); it++)
+        {
+  			  msg.AddItem(*it);
+        }
+
+        CreatureVector::iterator itc;
+		    for (itc = tile->creatures.begin(); itc !=tile->creatures.end(); itc++)
+        {
+  			  msg.AddCreature(*itc, setCreatureAsKnown((*itc)->getID()), false);
+        }
+
+
+		    for (it = tile->downItems.begin(); it !=tile->downItems.end(); it++)
+        {
+  			  msg.AddItem(*it);
+        }
       }
-
-      CreatureVector::iterator itc;
-		  for (itc = tile->creatures.begin(); itc !=tile->creatures.end(); itc++)
-      {
-  			msg.AddCreature(*itc, setCreatureAsKnown((*itc)->getID()), false);
-      }
-
-
-		  for (it = tile->downItems.begin(); it !=tile->downItems.end(); it++)
-      {
-  			msg.AddItem(*it);
-      }
-
        // tile end
       if ((nx != width-1) || (ny != height-1))
       {
@@ -348,33 +350,26 @@ void Protocol70::parseSetOutfit(NetworkMessage &msg)
 */
 
 
-/*
-void Protocol70::parseThrow(Action* action, NetworkMessage &msg){
-	action->type=ACTION_THROW;
-	action->pos1.x=(unsigned char)msg[2]*256+(unsigned char)msg[1];
-	action->pos1.y=(unsigned char)msg[4]*256+(unsigned char)msg[3];
-	action->pos1.z=(unsigned char)msg[5];
-	action->stack=(unsigned char)msg[8];
-	//FIXME this sucks
-	//make something like GETPOS
-	action->pos2.x=(unsigned char)msg[10]*256+(unsigned char)msg[9];
-	action->pos2.y=(unsigned char)msg[12]*256+(unsigned char)msg[11];
-	action->pos2.z=(unsigned char)msg[13];
 
-	if(msg.size()==15&&action->pos1.x!=0xFFFF)
-		action->count=msg[14];
-	std::cout << "count is " << action->count << std::endl;
-	printf("From %i %i to %i %i", action->pos1.x, action->pos1.y, action->pos2.x, action->pos2.y);
-	action->creature=this->creature;
-	//just in case something happend to our inventory, update it
-	sendInventory();
-  
+void Protocol70::parseThrow(NetworkMessage &msg)
+{
+  unsigned short from_x     = msg.GetU16();
+  unsigned short from_y     = msg.GetU16(); 
+  unsigned char  from_z     = msg.GetByte();
+  unsigned char  duno1 = msg.GetByte();
+  unsigned char  duno2 = msg.GetByte();
+  unsigned char  from_stack = msg.GetByte();
+  unsigned short to_x       = msg.GetU16();
+  unsigned short to_y       = msg.GetU16(); 
+  unsigned char  to_z       = msg.GetByte();
+
+  map->thingMove(player, from_x, from_y, from_z, from_stack, to_x, to_y, to_z);
 }
-*/
+
 
 void Protocol70::parseLookAt(NetworkMessage &msg){
   Position LookPos = msg.GetPosition();
-  uint16_t ItemNum = msg.GetU16();
+  unsigned short ItemNum = msg.GetU16();
 
 #ifdef __DEBUG__
   std::cout << "look at: " << LookPos << std::endl;
@@ -383,7 +378,7 @@ void Protocol70::parseLookAt(NetworkMessage &msg){
 
   NetworkMessage newmsg;
   std::stringstream ss;
-  ss << "You look at " << LookPos << " and see Item # " << ItemNum << ".";
+  ss << "You " << /*look at " << LookPos << " and todo: implement that operator*/ " see Item # " << ItemNum << ".";
   Position middle;
   newmsg.AddTextMessage(MSG_INFO, ss.str().c_str());
   
@@ -770,7 +765,7 @@ void Protocol70::sendCreatureAppear(const Creature *creature)
 {
   NetworkMessage msg;
 
-  if (creature != player)
+  if ((creature != player) && CanSee(creature->pos.x, creature->pos.y))
   {
     msg.AddByte(0xD3);
     msg.AddU32(creature->getID());
@@ -844,7 +839,7 @@ void Protocol70::sendCreatureAppear(const Creature *creature)
 
 void Protocol70::sendCreatureDisappear(const Creature *creature, unsigned char stackPos)
 {
-  if (creature != player)
+  if ((creature != player) && CanSee(creature->pos.x, creature->pos.y))
   {
     NetworkMessage msg;
 
@@ -861,18 +856,21 @@ void Protocol70::sendCreatureDisappear(const Creature *creature, unsigned char s
 
 void Protocol70::sendCreatureTurn(const Creature *creature, unsigned char stackPos)
 {
-  NetworkMessage msg;
+  if (CanSee(creature->pos.x, creature->pos.y))
+  {
+    NetworkMessage msg;
 
-  msg.AddByte(0x6B);
-  msg.AddPosition(creature->pos);
-  msg.AddByte(stackPos); 
+    msg.AddByte(0x6B);
+    msg.AddPosition(creature->pos);
+    msg.AddByte(stackPos); 
 
-  msg.AddByte(0x63);
-  msg.AddByte(0x00);
-  msg.AddU32(creature->getID());
-  msg.AddByte(creature->getDirection());
+    msg.AddByte(0x63);
+    msg.AddByte(0x00);
+    msg.AddU32(creature->getID());
+    msg.AddByte(creature->getDirection());
 
-  msg.WriteToSocket(s);
+    msg.WriteToSocket(s);
+  }
 }
 
 

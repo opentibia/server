@@ -34,9 +34,6 @@
 #include "otsystem.h"
 
 
-#define GETTILEBYPOS(pos) (tiles[pos.x][pos.y])
-
-
 enum tmapEnum{
   TMAP_SUCCESS,
   TMAP_ERROR,
@@ -45,35 +42,27 @@ enum tmapEnum{
 };
 
 
-//////////////////////////////////////////////////
-// a Tile represents a single field on the map.
-// it is a list of Items
 
-class Creature; //see creature.h
-
-
-
+class Creature;   // see creature.h
 class Player;
 
-#define MAP_WIDTH  512
-#define MAP_HEIGHT 512
+
+
+#define MAP_WIDTH    512
+#define MAP_HEIGHT   512
+#define MAP_LAYER     16
+
 
 class Tile;
 
 class Map {
-  // should use an Space Partitioning Tree.
-  // I am using a very simple array now though.
-  public:
-
-    Tile* tiles[MAP_WIDTH][MAP_HEIGHT];
-
   public:
     Map();
     ~Map();
 
     bool LoadMap(std::string filename);
 
-    Tile *tile(unsigned short _x, unsigned short _y, unsigned char _z);
+    Tile* getTile(unsigned short _x, unsigned short _y, unsigned char _z);
 
     std::map<long, Creature*> playersOnline;
 
@@ -95,12 +84,19 @@ class Map {
     void playerYell(Player *player, const string &text);
     void playerSpeakTo(Player *player, const string &receiver, const string &text);
     void playerBroadcastMessage(Player *player, const string &text);
-	 void playerChangeOutfit(Player* player);
+	  void playerChangeOutfit(Player* player);
 
 
     void addEvent(long ticks, int type, void *data);
 
   protected:
+    // use this internal function to move things around to avoid the need of
+    // recursive locks
+    void thingMoveInternal(Player *player,
+        unsigned short from_x, unsigned short from_y, unsigned char from_z,
+        unsigned char stackPos,
+        unsigned short to_x, unsigned short to_y, unsigned char to_z);
+
     void creatureMakeDistDamage(Creature *creature, Creature *attackedCreature);
 
     Creature* getCreatureByID(unsigned long id);
@@ -123,6 +119,12 @@ class Map {
     list<MapEvent> *eventLists[12000];
 
     int loadMapXml(const char *filename);
+
+
+    typedef map<unsigned long, Tile*> TileMap;
+    TileMap tileMaps[64][64][MAP_LAYER];
+
+    void Map::setTile(unsigned short _x, unsigned short _y, unsigned char _z, unsigned short groundId);
 
 };
 

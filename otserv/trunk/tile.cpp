@@ -1,3 +1,7 @@
+//////////////////////////////////////////////////
+// a Tile represents a single field on the map.
+// it is a list of Items
+
 
 #include "definitions.h"
 
@@ -14,7 +18,7 @@ using namespace std;
 
 
 
-//TODO move all the tile stuff to tile.cpp
+
 int Tile::getStackPosItem(){
 	int pos=1;
 /*	if(size()<=1)
@@ -168,6 +172,29 @@ int Tile::getThingStackPos(Thing *thing)
 
   /* todo error */
   return 255;
+}
+
+Thing* Tile::getThingByStackPos(int pos)
+{
+  if (pos == 0)
+    return &ground;
+
+  pos--;
+
+  if (pos < topItems.size())
+    return topItems[pos];
+
+  pos -= topItems.size();
+
+  if (pos < creatures.size())
+    return creatures[pos];
+
+  pos -= creatures.size();
+
+  if (pos < downItems.size())
+    return downItems[pos];
+
+  return NULL;
 }
 
 std::string Tile::getDescription(){

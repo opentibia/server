@@ -42,12 +42,16 @@ unsigned short Item::getItemCount() const {
 Item::Item(const unsigned short _type) {
     id = _type;
     count = 0;
+
+    ThrowRange = 6;
 }
 
 
 Item::Item() {
     id = 0;
     count = 0;
+
+    ThrowRange = 6;
 }
 
 Item::~Item() {

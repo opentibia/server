@@ -173,6 +173,17 @@ int main(int argc, char *argv[])
   }
   cout << "[done]" << endl;
 
+
+  // load item data
+  std::cout << ":: reading tibia.dat ...            ";
+	if (Item::items.loadFromDat("tibia.dat"))
+  {
+    ErrorMessage("Could not load tibia.dat!");
+    return -1;
+	}
+  cout << "[done]" << endl;
+
+
   // load map file
   gmap.LoadMap(g_config.getGlobalString("mapfile"));
 
