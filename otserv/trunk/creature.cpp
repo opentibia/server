@@ -4,8 +4,6 @@
 
 #include <string>
 
-using namespace std;
-
 #include "creature.h"
 
 
@@ -38,7 +36,7 @@ Creature::Creature(const char *name)
 
 void Creature::drainHealth(int damage)
 {
-  lastDamage = min(health, damage);
+  lastDamage = std::min(health, damage);
 
   health -= lastDamage;
 }

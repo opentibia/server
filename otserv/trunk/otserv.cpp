@@ -24,13 +24,9 @@
 #include <string>
 #include <iostream>
 
-using namespace std;
-
-
 #include "otsystem.h"
 
 #include "protocol70.h"
-
 
 #include <stdlib.h>
 #include <time.h>
@@ -45,7 +41,7 @@ using namespace std;
 #endif
 
 
-vector< pair<unsigned long, unsigned long> > serverIPs;
+std::vector< std::pair<unsigned long, unsigned long> > serverIPs;
 
 LuaScript g_config;
 
@@ -74,7 +70,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
     msg.SkipBytes(15);
 
     unsigned int accnumber = msg.GetU32();
-    string password        = msg.GetString();
+	 std::string password        = msg.GetString();
 
 
     int serverip = serverIPs[0].first;
@@ -96,7 +92,8 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 
     Account account;
     char accstring[16];
-    itoa(accnumber, accstring, 10);
+    //itoa(accnumber, accstring, 10);
+	 snprintf(accstring, 10, "%i", accnumber);
 
     if (account.openAccount(accstring, password))
     {
@@ -106,7 +103,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
       msg.AddByte(0x64);
       msg.AddByte(account.charList.size());
 
-      list<string>::iterator it;
+		std::list<std::string>::iterator it;
       for (it = account.charList.begin(); it != account.charList.end(); it++)
       {
         msg.AddString((*it));
@@ -134,8 +131,8 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
     unsigned short version  = msg.GetU16();
     unsigned char  unknown  = msg.GetByte();
 
-    string name     = msg.GetString();
-    string password = msg.GetString();
+	 std::string name     = msg.GetString();
+	 std::string password = msg.GetString();
 
 
     Protocol70 *protocol = new Protocol70(s);
@@ -164,10 +161,10 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 
 void ErrorMessage(const char* message)
 {
-  cout << endl << endl << "Error: " << message;
+  std::cout << std::endl << std::endl << "Error: " << message;
 
-  string s;
-  cin >> s;
+  std::string s;
+  std::cin >> s;
 }
 
 
@@ -185,7 +182,7 @@ int main(int argc, char *argv[])
     ErrorMessage("Unable to load config.lua!");
     return -1;
   }
-  cout << "[done]" << endl;
+  std::cout << "[done]" << std::endl;
 
 
   // load item data
@@ -195,7 +192,7 @@ int main(int argc, char *argv[])
     ErrorMessage("Could not load tibia.dat!");
     return -1;
 	}
-  cout << "[done]" << endl;
+	std::cout << "[done]" << std::endl;
 
 
   // load map file
@@ -223,7 +220,7 @@ int main(int argc, char *argv[])
 #endif
 
 
-  pair<unsigned long, unsigned long> IpNetMask;
+  std::pair<unsigned long, unsigned long> IpNetMask;
   IpNetMask.first  = inet_addr("127.0.0.1");
   IpNetMask.second = 0xFFFFFFFF;
   serverIPs.push_back(IpNetMask);
@@ -231,18 +228,18 @@ int main(int argc, char *argv[])
   char szHostName[128];
   if (gethostname(szHostName, 128) == 0)
   {
-    cout << "::" << endl << ":: Running on host " << szHostName << endl;
+	 std::cout << "::" << std::endl << ":: Running on host " << szHostName << std::endl;
 
     hostent *he = gethostbyname(szHostName);
 
     if (he)
     {
-      cout << ":: Local IP address(es):  ";
+		std::cout << ":: Local IP address(es):  ";
       unsigned char** addr = (unsigned char**)he->h_addr_list;
 
       while (addr[0] != NULL)
       {
-        cout << (unsigned int)(addr[0][0]) << "."
+		  std::cout << (unsigned int)(addr[0][0]) << "."
              << (unsigned int)(addr[0][1]) << "."
              << (unsigned int)(addr[0][2]) << "."
              << (unsigned int)(addr[0][3]) << "  ";
@@ -254,19 +251,19 @@ int main(int argc, char *argv[])
         addr++;
       }
 
-      cout << endl;
+		std::cout << std::endl;
     }
   }
   
-  cout << ":: Global IP address:     ";
-	string ip;
+  std::cout << ":: Global IP address:     ";
+  std::string ip;
 
 	if(argc > 1)
 		ip = argv[1];
 	else
 		ip = g_config.getGlobalString("ip", "127.0.0.1");
 
-	std::cout << ip << endl << "::" << endl;
+	std::cout << ip << std::endl << "::" << std::endl;
 
   IpNetMask.first  = inet_addr(ip.c_str());
   IpNetMask.second = 0;
@@ -327,7 +324,7 @@ int main(int argc, char *argv[])
 
 
 
-  std::cout << "[done]" << endl << ":: OpenTibia Server Running..." << std::endl;
+  std::cout << "[done]" << std::endl << ":: OpenTibia Server Running..." << std::endl;
 
 
 

@@ -28,11 +28,7 @@ extern "C"
 #include <string>
 #include <iostream>
 
-using namespace std;
-
 #include "luascript.h"
-
-
 
 LuaScript::LuaScript()
 {
@@ -58,7 +54,7 @@ int LuaScript::OpenFile(const char *filename)
 }
 
 
-string LuaScript::getGlobalString(string var, const string &defString)
+std::string LuaScript::getGlobalString(std::string var, const std::string &defString)
 {
 	lua_getglobal(luaState, var.c_str());
 
@@ -66,14 +62,14 @@ string LuaScript::getGlobalString(string var, const string &defString)
   	  return defString;
 
 	int len = lua_strlen(luaState, -1);
-	string ret(lua_tostring(luaState, -1), len);
+	std::string ret(lua_tostring(luaState, -1), len);
 	lua_pop(luaState,1);
 
 	return ret;
 }
 
 
-int LuaScript::setGlobalString(string var, string val)
+int LuaScript::setGlobalString(std::string var, std::string val)
 {
 	return false;
 }

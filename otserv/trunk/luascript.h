@@ -35,10 +35,10 @@ public:
   int OpenFile(const char* file);
 
   // get a global string
-  string getGlobalString(string var, const string &defString = "");
+  std::string getGlobalString(std::string var, const std::string &defString = "");
 
   // set a var to a val
-	int setGlobalString(string var, string val);
+	int setGlobalString(std::string var, std::string val);
 
 private:
 	std::string luaFile;   // the file we represent

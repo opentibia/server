@@ -24,14 +24,10 @@
 #include <string>
 #include <iostream>
 
-using namespace std;
-
 #include <stdlib.h>
 
 #include "protocol.h"
 #include "player.h"
-
-
 
 Player::Player(const char *name, Protocol *p) : Creature(name)
 {
@@ -81,7 +77,7 @@ Item* Player::getItem(int pos)
 }
 
 
-void Player::speak(const string &text)
+void Player::speak(const std::string &text)
 {
 }
 
@@ -143,7 +139,7 @@ void Player::onCreatureTurn(const Creature *creature, unsigned char stackPos)
 }
 
 
-void Player::onCreatureSay(const Creature *creature, unsigned char type, const string &text)
+void Player::onCreatureSay(const Creature *creature, unsigned char type, const std::string &text)
 {
   client->sendCreatureSay(creature, type, text);
 }

@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 
 <player name="Hurzine" account="111111" sex="0" lookdir="0" exp="1111" voc="0" level="0" access="0" cap="300">
-	<mana now="800" max="800" spent="0"/>
-	<health now="800" max="800" food="0"/>
+	<mana now="600" max="800" spent="0"/>
+	<health now="600" max="800" food="0"/>
 	<look type="136" head="25" body="35" legs="45" feet="55"/>
 	<skills>
 		<skill skillid="0" level="10" tries="0"/>

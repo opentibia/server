@@ -23,10 +23,7 @@
 
 #include <string>
 
-using namespace std;
-
 #include "protocol.h"
-
 
 class Player;
 

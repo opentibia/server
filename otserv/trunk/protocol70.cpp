@@ -25,9 +25,6 @@
 #include <iostream>
 #include <sstream>
 
-using namespace std;
-
-
 #include "protocol70.h"
 
 #include "tile.h"
@@ -39,6 +36,8 @@ using namespace std;
 #include <stdio.h>
 
 #include "luascript.h"
+
+#include "tasks.h"
 
 extern LuaScript g_config;
 
@@ -237,11 +236,15 @@ void Protocol70::parseLogout(NetworkMessage &msg)
 
 void Protocol70::parseMoveByMouse(NetworkMessage &msg)
 {
-  // cancel for now
-  msg.Reset();
-  msg.AddTextMessage(MSG_STATUS, "Sorry, not possible.");
-  msg.AddByte(0xB5);
-  msg.WriteToSocket(s);
+  // first we get all directions...
+  std::list<Direction> path;
+  size_t numdirs = msg.GetByte();
+  for (size_t i = 0; i < numdirs; ++i) {
+          path.push_back((Direction)msg.GetByte());
+  }
+  // then we schedule the movement...
+  // the interval seems to depend on the speed of the char?
+  map->addEvent(makeTask(0, MovePlayer(player->getID()), path, 400));
 }
 
 
@@ -391,11 +394,11 @@ void Protocol70::parseSay(NetworkMessage &msg)
 {
   unsigned char type = msg.GetByte();
   
-  string receiver;
+  std::string receiver;
   if (type == 4)
     receiver = msg.GetString();
 
-  string text = msg.GetString();
+  std::string text = msg.GetString();
 
   switch (type)
   {
@@ -745,14 +748,14 @@ void Protocol70::sendThingMove(const Player *player, const Thing *thing, const P
     {
       msg.AddByte(0x66);
       GetMapDescription(thing->pos.x + 9, thing->pos.y - 6, thing->pos.z, 1, 14, msg);
-      msg.AddByte(0x7E);
+      msg.AddByte(0x62);
       msg.AddByte(0xFF);
     }
     else if (oldPos->x > thing->pos.x)   // west, [with new y]
     {
       msg.AddByte(0x68);
       GetMapDescription(thing->pos.x - 8, thing->pos.y - 6, thing->pos.z, 1, 14, msg);
-      msg.AddByte(0x7E);
+      msg.AddByte(0x62);
       msg.AddByte(0xFF);
     }
   }
@@ -874,7 +877,7 @@ void Protocol70::sendCreatureTurn(const Creature *creature, unsigned char stackP
 }
 
 
-void Protocol70::sendCreatureSay(const Creature *creature, unsigned char type, const string &text)
+void Protocol70::sendCreatureSay(const Creature *creature, unsigned char type, const std::string &text)
 {
   NetworkMessage msg;
 

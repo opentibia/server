@@ -1,19 +1,15 @@
-
+#include <algorithm>
+#include <functional>
+#include <iostream>
 
 #include "definitions.h"
-
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 
-#include <algorithm>
-#include <iostream>
-
 #include "item.h"
 #include "account.h"
 #include "player.h"
-
-
 
 Account::Account()
 {
@@ -25,12 +21,12 @@ Account::~Account()
 }
 
 
-bool Account::openAccount(const string &account, const string &givenpassword)
+bool Account::openAccount(const std::string &account, const std::string &givenpassword)
 {
-  string filename = "data/accounts/" + account + ".xml";
+		  std::string filename = "data/accounts/" + account + ".xml";
   transform(filename.begin(), filename.end(), filename.begin(), tolower);
 
-    xmlDocPtr doc = xmlParseFile(filename.c_str());
+  xmlDocPtr doc = xmlParseFile(filename.c_str());
 
   if (doc)
   {
@@ -88,7 +84,7 @@ bool Account::openAccount(const string &account, const string &givenpassword)
 }
 
 
-bool Account::openPlayer(const string &name, const string &givenpassword, Player &player)
+bool Account::openPlayer(const std::string &name, const std::string &givenpassword, Player &player)
 {
 	std::string filename="data/players/"+name+".xml";
 	transform (filename.begin(),filename.end(), filename.begin(), tolower);

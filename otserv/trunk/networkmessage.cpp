@@ -2,7 +2,6 @@
 #include <string>
 #include <iostream>
 #include <sstream>
-using namespace std;
 
 #include "otsystem.h"
 
@@ -67,7 +66,7 @@ bool NetworkMessage::WriteToSocket(SOCKET socket)
   int sendBytes = 0;
   do
   {
-    int b = send(socket, (char*)m_MsgBuf+sendBytes, min(m_MsgSize-sendBytes+2, 1000), 0);
+    int b = send(socket, (char*)m_MsgBuf+sendBytes, std::min(m_MsgSize-sendBytes+2, 1000), 0);
 
     if (b <= 0)
       return false;
@@ -105,12 +104,12 @@ unsigned int NetworkMessage::GetU32()
 }
 
 
-string NetworkMessage::GetString()
+std::string NetworkMessage::GetString()
 {
   int stringlen = GetU16();
   char* v = (char*)(m_MsgBuf+m_ReadPos);
   m_ReadPos += stringlen;
-  return string(v, stringlen);
+  return std::string(v, stringlen);
 }
 
 Position NetworkMessage::GetPosition() {
@@ -156,7 +155,7 @@ void NetworkMessage::AddU32(unsigned int value)
 }
 
 
-void NetworkMessage::AddString(const string &value)
+void NetworkMessage::AddString(const std::string &value)
 {
   AddString(value.c_str());
 }
@@ -234,7 +233,6 @@ void NetworkMessage::AddCreature(const Creature *creature, bool known, bool logi
 {
   if (known)
   {
-			 std::cout << "creature already known??" << std::endl;
     AddByte(0x62);
     AddByte(0x00);
     AddU32(creature->getID());

@@ -24,10 +24,6 @@
 
 #include <iostream>
 
-using namespace std;
-
-
-
 ItemType::ItemType()
 {
 	iscontainer     = false;

@@ -8,16 +8,10 @@
 #include <string>
 #include <iostream>
 
-using namespace std;
-
-
 #include "tile.h"
 
 #include "creature.h"
 #include "item.h"
-
-
-
 
 int Tile::getStackPosItem(){
 	int pos=1;

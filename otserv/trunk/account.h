@@ -1,15 +1,9 @@
-
-
-
 #ifndef __ACCOUNT_H__
 #define __ACCOUNT_H__
 
 
 #include <list>
 #include <string>
-
-using namespace std;
-
 
 class Player;
 
@@ -21,21 +15,21 @@ public:
   ~Account();
 
 
-  bool openAccount(const string &account, const string &givenpassword);
-  bool openPlayer(const string &name, const string &givenpassword, Player &player);
+  bool openAccount(const std::string &account, const std::string &givenpassword);
+  bool openPlayer(const std::string &name, const std::string &givenpassword, Player &player);
 
   int accType;     // ?
   int premDays;    // Premium days
 
-  string name;
-  string password;
+  std::string name;
+  std::string password;
 
-  list<std::string> charList;
+  std::list<std::string> charList;
 
 
 
 protected:
-  bool parseAccountFile(string filename);
+  bool parseAccountFile(std::string filename);
 };
 
 

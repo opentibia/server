@@ -23,7 +23,7 @@
 #define __OTSERV_MAP_H
 
 
-#include <vector>
+#include <queue>
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 
@@ -32,6 +32,8 @@
 #include "creature.h"
 
 #include "otsystem.h"
+
+#include "scheduler.h"
 
 
 enum tmapEnum{
@@ -80,14 +82,17 @@ class Map {
 
     void creatureTurn(Creature *creature, Direction dir);
 
-    void playerSay(Player *player, unsigned char type, const string &text);
-    void playerYell(Player *player, const string &text);
-    void playerSpeakTo(Player *player, const string &receiver, const string &text);
-    void playerBroadcastMessage(Player *player, const string &text);
+    void playerSay(Player *player, unsigned char type, const std::string &text);
+    void playerYell(Player *player, const std::string &text);
+    void playerSpeakTo(Player *player, const std::string &receiver, const std::string &text);
+    void playerBroadcastMessage(Player *player, const std::string &text);
 	  void playerChangeOutfit(Player* player);
 
 
-    void addEvent(long ticks, int type, void *data);
+    //void addEvent(long ticks, int type, void *data);
+	 void addEvent(SchedulerTask*);
+
+    Creature* getCreatureByID(unsigned long id);
 
   protected:
     // use this internal function to move things around to avoid the need of
@@ -99,10 +104,10 @@ class Map {
 
     void creatureMakeDistDamage(Creature *creature, Creature *attackedCreature);
 
-    Creature* getCreatureByID(unsigned long id);
 
     OTSYS_THREAD_LOCKVAR mapLock;
     OTSYS_THREAD_LOCKVAR eventLock;
+	 OTSYS_THREAD_SIGNALVAR eventSignal;
 
     static OTSYS_THREAD_RETURN eventThread(void *p);
 
@@ -116,12 +121,13 @@ class Map {
     void checkPlayerAttacking(unsigned long id);
     void checkPlayer(unsigned long id);
 
-    list<MapEvent> *eventLists[12000];
+	 std::priority_queue<SchedulerTask*, std::vector<SchedulerTask*>, lessSchedTask > eventList;
+    //list<MapEvent> *eventLists[12000];
 
     int loadMapXml(const char *filename);
 
 
-    typedef map<unsigned long, Tile*> TileMap;
+    typedef std::map<unsigned long, Tile*> TileMap;
     TileMap tileMaps[64][64][MAP_LAYER];
 
     void Map::setTile(unsigned short _x, unsigned short _y, unsigned char _z, unsigned short groundId);

@@ -105,7 +105,7 @@ private:
   virtual void sendCreatureAppear(const Creature *creature);
   virtual void sendCreatureDisappear(const Creature *creature, unsigned char stackPos);
   virtual void sendCreatureTurn(const Creature *creature, unsigned char stackpos);
-  virtual void sendCreatureSay(const Creature *creature, unsigned char type, const string &text);
+  virtual void sendCreatureSay(const Creature *creature, unsigned char type, const std::string &text);
 
   void sendSetOutfit(const Creature* creature);
 

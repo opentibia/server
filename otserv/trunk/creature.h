@@ -61,7 +61,7 @@ public:
 
   virtual bool isCreature() const { return true; };
 
-  virtual const string& getName() const {return name; };
+  virtual const std::string& getName() const {return name; };
 
   unsigned long getID() const { return id; }
 
@@ -95,7 +95,7 @@ private:
   virtual void onCreatureAppear(const Creature *creature) { };
   virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos) { };
   virtual void onCreatureTurn(const Creature *creature, unsigned char stackPos) { };
-  virtual void onCreatureSay(const Creature *creature, unsigned char type, const string &text) { };
+  virtual void onCreatureSay(const Creature *creature, unsigned char type, const std::string &text) { };
 
   virtual void onCreatureChangeOutfit(const Creature* creature) { };
 
@@ -104,7 +104,7 @@ private:
   Direction direction;
 
   unsigned long id;
-  string        name;
+  std::string        name;
 };
 
 

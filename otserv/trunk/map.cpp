@@ -23,10 +23,7 @@
 
 #include <string>
 
-using namespace std;
-
 #include "otsystem.h"
-
 
 #include <stdio.h>
 
@@ -62,6 +59,7 @@ Map::Map()
   
   OTSYS_THREAD_LOCKVARINIT(mapLock);
   OTSYS_THREAD_LOCKVARINIT(eventLock);
+  OTSYS_THREAD_SIGNALVARINIT(eventSignal);
   
   OTSYS_CREATE_THREAD(eventThread, this);
 }
@@ -160,12 +158,45 @@ OTSYS_THREAD_RETURN Map::eventThread(void *p)
 {
   Map* _this = (Map*)p;
 
-  memset(_this->eventLists, 0, sizeof(_this->eventLists));
-
-  __int64 eventTick = OTSYS_TIME() / 10;
-
+  // basically what we do is, look at the first scheduled item,
+  // and then sleep until it's due (or if there is none, sleep until we get an event)
+  // of course this means we need to get a notification if there are new events added
   while (true)
   {
+#ifdef __DEBUG__EVENTSCHEDULER__
+			 std::cout << "schedulercycle start..." << std::endl;
+#endif
+
+			 SchedulerTask* task = NULL;
+
+			 // check if there are events waiting...
+			 OTSYS_THREAD_LOCK(_this->eventLock)
+						
+						int ret;
+			 if (_this->eventList.size() == 0) {
+						// unlock mutex and wait for signal
+						ret = OTSYS_THREAD_WAITSIGNAL(_this->eventSignal, _this->eventLock);
+			 } else {
+						// unlock mutex and wait for signal or timeout
+						ret = OTSYS_THREAD_WAITSIGNAL_TIMED(_this->eventSignal, _this->eventLock, _this->eventList.top()->getCycle());
+			 }
+			 // the mutex is locked again now...
+			 if (ret == OTSYS_THREAD_TIMEOUT) {
+						// ok we had a timeout, so there has to be an event we have to execute...
+#ifdef __DEBUG__EVENTSCHEDULER__
+						std::cout << "event found at " << OTSYS_TIME() << " which is to be scheduled at: " << _this->eventList.top()->getCycle() << std::endl;
+#endif
+						task = _this->eventList.top();
+						_this->eventList.pop();
+			 }
+
+			 OTSYS_THREAD_UNLOCK(_this->eventLock);
+			 if (task)
+						(*task)(_this);
+  }
+
+/*
+
     if (eventTick < OTSYS_TIME() / 10)
     {
       list<MapEvent> *eventList = NULL;
@@ -179,7 +210,7 @@ OTSYS_THREAD_RETURN Map::eventThread(void *p)
 
       if (eventList != NULL)
       {
-        list<MapEvent>::iterator it;
+		  std::list<MapEvent>::iterator it;
         for (it = eventList->begin(); it != eventList->end(); it++)
         {
           if ((*it).tick == eventTick)
@@ -197,7 +228,7 @@ OTSYS_THREAD_RETURN Map::eventThread(void *p)
           }
           else
           {
-            /* todo reschedule */
+            // todo reschedule 
           }
         }
 
@@ -210,26 +241,23 @@ OTSYS_THREAD_RETURN Map::eventThread(void *p)
     {
       OTSYS_SLEEP(1);  // nothing to-do :)
     }
-  }
+*/
 }
 
-void Map::addEvent(long ticks, int type, void *data)
-{
-  MapEvent e;
-  e.tick = OTSYS_TIME() / 10 + ticks;
-  e.type = type;
-  e.data = data;
-
+void Map::addEvent(SchedulerTask* event) {
+  bool do_signal = false;
   OTSYS_THREAD_LOCK(eventLock)
 
-  if (eventLists[e.tick % 12000] == NULL)
-    eventLists[e.tick % 12000] = new list<MapEvent>;
-
-  eventLists[e.tick % 12000]->push_back(e);
+  eventList.push(event);
+  if (eventList.empty() || *event < *eventList.top())
+			 do_signal = true;
 
   OTSYS_THREAD_UNLOCK(eventLock)
-}
 
+  if (do_signal)
+			 OTSYS_THREAD_SIGNAL_SEND(eventSignal);
+
+}
 
 /*****************************************************************************/
 
@@ -346,8 +374,10 @@ bool Map::placeCreature(Creature* c)
   {
 	  playersOnline[c->getID()] = c;
 
-    addEvent(100, EVENT_CHECKPLAYER, (void*)c->id);
-    addEvent(200, EVENT_CHECKPLAYERATTACKING, (void*)c->id);
+    //addEvent(100, EVENT_CHECKPLAYER, (void*)c->id);
+    //addEvent(200, EVENT_CHECKPLAYERATTACKING, (void*)c->id);
+	 addEvent(makeTask(1000, std::bind2nd(std::mem_fun(&Map::checkPlayer), c->id)));
+	 addEvent(makeTask(2000, std::bind2nd(std::mem_fun(&Map::checkPlayerAttacking), c->id)));
 
     ((Player*)c)->usePlayer();
   }
@@ -648,8 +678,8 @@ void Map::thingMoveInternal(Player *player,
 		      }
 
           CreatureVector::iterator cit;
-          for (int x = min(oldPos.x, (int)to_x) - 9; x <= max(oldPos.x, (int)to_x) + 9; x++)
-            for (int y = min(oldPos.y, (int)to_y) - 7; y <= max(oldPos.y, (int)to_y) + 7; y++)
+          for (int x = std::min(oldPos.x, (int)to_x) - 9; x <= std::max(oldPos.x, (int)to_x) + 9; x++)
+            for (int y = std::min(oldPos.y, (int)to_y) - 7; y <= std::max(oldPos.y, (int)to_y) + 7; y++)
             {
               Tile *tile = getTile(x, y, 7);
               if (tile)
@@ -697,7 +727,7 @@ void Map::creatureTurn(Creature *creature, Direction dir)
 }
 
 
-void Map::playerSay(Player *player, unsigned char type, const string &text)
+void Map::playerSay(Player *player, unsigned char type, const std::string &text)
 {
   OTSYS_THREAD_LOCK(mapLock)
 
@@ -742,7 +772,7 @@ void Map::playerChangeOutfit(Player *player)
 }
 
 
-void Map::playerYell(Player *player, const string &text)
+void Map::playerYell(Player *player, const std::string &text)
 {
   OTSYS_THREAD_LOCK(mapLock)
 
@@ -765,14 +795,14 @@ void Map::playerYell(Player *player, const string &text)
 }
 
 
-void Map::playerSpeakTo(Player *player, const string &receiver, const string &text)
+void Map::playerSpeakTo(Player *player, const std::string &receiver, const std::string &text)
 {
   OTSYS_THREAD_LOCK(mapLock)
   OTSYS_THREAD_UNLOCK(mapLock)
 }
 
 
-void Map::playerBroadcastMessage(Player *player, const string &text)
+void Map::playerBroadcastMessage(Player *player, const std::string &text)
 {
   OTSYS_THREAD_LOCK(mapLock)
   OTSYS_THREAD_UNLOCK(mapLock)
@@ -797,8 +827,8 @@ void Map::creatureMakeDistDamage(Creature *creature, Creature *attackedCreature)
 
     NetworkMessage msg;
 
-    for (int x = min(creature->pos.x, attackedCreature->pos.x) - 9; x <= max(creature->pos.x, attackedCreature->pos.x) + 9; x++)
-      for (int y = min(creature->pos.y, attackedCreature->pos.y) - 7; y <= max(creature->pos.y, attackedCreature->pos.y) + 7; y++)
+    for (int x = std::min(creature->pos.x, attackedCreature->pos.x) - 9; x <= std::max(creature->pos.x, attackedCreature->pos.x) + 9; x++)
+      for (int y = std::min(creature->pos.y, attackedCreature->pos.y) - 7; y <= std::max(creature->pos.y, attackedCreature->pos.y) + 7; y++)
       {
         Tile *tile = getTile(x, y, 7);
         if (tile)
@@ -853,7 +883,8 @@ void Map::checkPlayer(unsigned long id)
   if (creature != NULL)
   {
     
-    addEvent(100, EVENT_CHECKPLAYER, (void*)id);   
+	 addEvent(makeTask(1000, std::bind2nd(std::mem_fun(&Map::checkPlayer), id)));
+    //addEvent(100, EVENT_CHECKPLAYER, (void*)id);   
   }
 
   OTSYS_THREAD_UNLOCK(mapLock)
@@ -876,7 +907,8 @@ void Map::checkPlayerAttacking(unsigned long id)
         creatureMakeDistDamage(player, attackedCreature);
     }
 
-    addEvent(200, EVENT_CHECKPLAYERATTACKING, (void*)id);
+	 addEvent(makeTask(2000, std::bind2nd(std::mem_fun(&Map::checkPlayerAttacking), id)));
+    //addEvent(200, EVENT_CHECKPLAYERATTACKING, (void*)id);
   }
 
   OTSYS_THREAD_UNLOCK(mapLock)

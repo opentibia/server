@@ -56,7 +56,7 @@ public:
 
   virtual bool isPlayer() const { return true; };
 
-  void speak(const string &text);
+  void speak(const std::string &text);
 
 	int addItem(Item* item, int pos);
 	int sendInventory();
@@ -100,7 +100,7 @@ protected:
   virtual void onCreatureAppear(const Creature *creature);
   virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos);
   virtual void onCreatureTurn(const Creature *creature, unsigned char stackpos);
-  virtual void onCreatureSay(const Creature *creature, unsigned char type, const string &text);
+  virtual void onCreatureSay(const Creature *creature, unsigned char type, const std::string &text);
   virtual void onCreatureChangeOutfit(const Creature* creature);
 
 	Protocol *client;
