@@ -52,8 +52,9 @@ namespace Protokoll {
 			unsigned char version;
 			// name and passwd
 			std::string name, passwd;
-			// the position on the map...
-//			Map::mapposition our_pos;
+
+            // redirect the client...
+            void redirect(int ip, int port);
 
 	}; // class TProt : public Protokoll  
 

@@ -9,6 +9,10 @@ extern EventScheduler es;
 
 namespace Protokoll {
 	TProt65::TProt65(const Socket& sock, const string& in) throw(texception) {
+
+        // save socket
+        psocket = sock;
+
 		// every data starts with 2 bytes equaling to the length of the data...
 		// so firt we test if that value would be higher than the length of the
 		// input...
@@ -58,22 +62,8 @@ namespace Protokoll {
 		cout << "6.5 client accountnumber: " << pnum << " pwd: " << passwd 
 			<< endl;
 
-		// now we need the redirect packet...
-		std::string temp= "..";
-		temp += 0x64;
-		temp += 0x01; // number of chars
-		temp += 0x05; temp += '\0'; // length of name
-		temp += "Hurz"; temp += '\0'; // name
-		temp += 0x0A; temp += '\0'; // length of world name
-		temp += "OpenWorld"; temp += '\0'; // world name
-		temp += 0x7f; temp += '\0'; temp += '\0'; temp += 0x01; // ip
-		temp += 0x03;
-		temp += 0x1c;
-
-		temp[0] = (char)temp.length()%256;
-		temp[1] = (char)(temp.length()/256);
-
-		TNetwork::SendData(sock, temp);
+        // redirect to 127.0.0.1
+        redirect(127*0x1000000+1,7171);
 
 		throw texception("Protokoll 6.5+ redirected...", true);
 
@@ -114,5 +104,30 @@ namespace Protokoll {
 	our_pos = newpos;
 	} // void TProt::setMap(mapposition, Map&) throw(texception)
 	 */
+
+   void TProt65::redirect(int ip, int port) {
+		// now we need the redirect packet...
+		std::string temp= "..";
+		temp += 0x64;
+		temp += 0x01; // number of chars
+		temp += 0x05; temp += '\0'; // length of name
+		temp += "Hurz"; temp += '\0'; // name
+		temp += 0x0A; temp += '\0'; // length of world name
+		temp += "OpenWorld"; temp += '\0'; // world name
+        // ip
+        temp += (ip/0x1000000)%0x100;
+        temp += (ip / 0x10000)%0x100;
+        temp += (ip / 0x100)%0x100;
+        temp += ip % 0x100;
+        // port
+        temp += port%0x100;
+        temp += (port/0x100)%0x100;
+
+		temp[0] = (char)temp.length()%0x100;
+		temp[1] = (char)(temp.length()/0x100);
+
+		TNetwork::SendData(psocket, temp);
+   } // void redirect(int ip, int port)
+
 
 }
