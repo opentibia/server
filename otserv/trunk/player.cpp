@@ -100,16 +100,16 @@ int Player::getWeaponDamage() const
 				switch (items[slot]->getWeaponType())
         {
 					case SWORD:
-						damagemax = 3*skills[2][SKILL_LEVEL] + 2*Item::items[items[slot]->getID()].attack;
+						damagemax = 3*skills[SKILL_SWORD][SKILL_LEVEL] + 2*Item::items[items[slot]->getID()].attack;
 						break;
 					case CLUB:
-						damagemax = 3*skills[1][SKILL_LEVEL] + 2*Item::items[items[slot]->getID()].attack;
+						damagemax = 3*skills[SKILL_CLUB][SKILL_LEVEL] + 2*Item::items[items[slot]->getID()].attack;
 						break;
 					case AXE:
-						damagemax = 3*skills[3][SKILL_LEVEL] + 2*Item::items[items[slot]->getID()].attack;
+						damagemax = 3*skills[SKILL_AXE][SKILL_LEVEL] + 2*Item::items[items[slot]->getID()].attack;
 						break;
 					case DIST:
-						damagemax = 4*skills[4][SKILL_LEVEL];
+						damagemax = 4*skills[SKILL_DIST][SKILL_LEVEL];
 						break;
 					case MAGIC:
 						damagemax = level*10+maglevel*30;
@@ -120,7 +120,7 @@ int Player::getWeaponDamage() const
 
 	// no weapon found -> fist fighting
 	if (damagemax == 0)
-		damagemax = 2*skills[3][SKILL_LEVEL] + Item::items[items[slot]->getID()].attack;
+		damagemax = 2*skills[SKILL_FIST][SKILL_LEVEL] + 5;
 
 	// return it
 	return 1+(int)(damagemax*rand()/(RAND_MAX+1.0));
@@ -157,13 +157,12 @@ fight_t Player::getFightType()
     if (items[slot])
     {
 			if ((items[slot]->isWeapon())) {
-				switch (items[slot]->getWeaponType()) {
+				switch (items[slot]->getWeaponType())
+        {
 					case DIST:
 						return FIGHT_DIST;
 					case MAGIC:
 						return FIGHT_MAGICDIST;
-					default:
-						return FIGHT_MELEE;
 				}
 			}
     }
