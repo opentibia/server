@@ -88,7 +88,7 @@ public:
   int food;
   bool cancelMove;
   virtual int getWeaponDamage() const;
-
+  char fightMode, followMode;
   // experience
   unsigned long experience;
 
@@ -109,6 +109,7 @@ public:
   void sendNetworkMessage(NetworkMessage *msg);
   void sendCancelAttacking();
   void sendChangeSpeed(Creature* creature);
+  void sendToChannel(Creature *creature, unsigned char type, const std::string &text, unsigned short channelId);
   virtual void sendCancel(const char *msg);
   virtual void sendCancelWalk(const char *msg);
 

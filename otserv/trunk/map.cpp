@@ -55,6 +55,7 @@ using namespace std;
 
 extern LuaScript g_config;
 extern Spells spells;
+extern std::map<long, Creature*> channel;
 Map::Map()
 {
 	//first we fill the map with
@@ -1131,6 +1132,9 @@ void Map::creatureYell(Creature *creature, std::string &text)
 void Map::creatureSpeakTo(Creature *creature, const std::string &receiver, const std::string &text)
 {
   OTSYS_THREAD_LOCK(mapLock) 
+  Creature* c = getCreatureByName(receiver.c_str());
+  if(c)
+  c->onCreatureSay(creature, 4, text);
   OTSYS_THREAD_UNLOCK(mapLock)
 }
 
@@ -1146,6 +1150,22 @@ void Map::creatureBroadcastMessage(Creature *creature, const std::string &text)
   for (cit = playersOnline.begin(); cit != playersOnline.end(); cit++)
   {
 		cit->second->onCreatureSay(creature, 9, text);
+	}
+
+	OTSYS_THREAD_UNLOCK(mapLock)
+}
+
+void Map::creatureToChannel(Creature *creature, unsigned char type, const std::string &text, unsigned short channelId)
+{
+
+  OTSYS_THREAD_LOCK(mapLock)
+
+	std::map<long, Creature*>::iterator cit;
+  for (cit = channel.begin(); cit != channel.end(); cit++)
+  {
+        Player* player = dynamic_cast<Player*>(cit->second);
+        if(player)
+		player->sendToChannel(creature, type, text, channelId);
 	}
 
 	OTSYS_THREAD_UNLOCK(mapLock)
@@ -1547,7 +1567,8 @@ bool Map::creatureMakeMagic(Creature *creature, const MagicEffectClass* me)
 
 							msg.AddByte(0x6a);
 							msg.AddPosition(target->pos);
-							msg.AddItem(&Item(1437, 2));
+							Item item = Item(1437, 2);
+							msg.AddItem(&item);
 						}
 					}
 				}
@@ -2193,8 +2214,10 @@ void Map::CreateDamageUpdate(Creature* creature, Creature* attackCreature, int d
 
 				msg.AddTextMessage(MSG_EVENT, dmgmesg.str().c_str());
 			}
-			if (player->health <= 0)
+			if (player->health <= 0){
+                msg.AddTextMessage(MSG_ADVANCE, "You are dead.");             
 				msg.AddTextMessage(MSG_EVENT, "Own3d!");
+            }
 }
 
 void Map::CreateManaDamageUpdate(Creature* creature, Creature* attackCreature, int damage, NetworkMessage& msg)

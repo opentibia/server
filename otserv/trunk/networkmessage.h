@@ -50,7 +50,8 @@ enum MessageClasses {
       MSG_SMALLINFO = 0x14,
 		  MSG_INFO      = 0x13,
 		  MSG_EVENT     = 0x11,
-		  MSG_STATUS    = 0x12
+		  MSG_STATUS    = 0x12,
+		  MSG_ADVANCE   = 0x10,
 };
 enum Icons {
  ICON_POISON = 1,
@@ -120,7 +121,7 @@ public:
   void AddMagicEffect(const Position &pos, unsigned char type);
   void AddDistanceShoot(const Position &from, const Position &to, unsigned char type);
   
-  void AddCreatureSpeak(const Creature *creature, unsigned char type, std::string text);
+  void AddCreatureSpeak(const Creature *creature, unsigned char type, std::string text, unsigned short channelId);
   void AddCreatureHealth(Creature *creature);
   
   void AddPlayerInventoryItem(Player *player, int item);

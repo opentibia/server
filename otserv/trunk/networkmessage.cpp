@@ -352,16 +352,17 @@ void NetworkMessage::AddPlayerInventoryItem(Player *player, int item)
 }
 
 
-void NetworkMessage::AddCreatureSpeak(const Creature *creature, unsigned char type, std::string text)
+void NetworkMessage::AddCreatureSpeak(const Creature *creature, unsigned char type, std::string text, unsigned short channelId)
 {
   AddByte(0xAA);
   AddString(creature->getName());
   AddByte(type);
   if (type <= 3)
     AddPosition(creature->pos);
+  if(type == 5)
+    AddU16(channelId);
   AddString(text);
 }
-
 
 void NetworkMessage::AddCreatureHealth(Creature *creature)
 {

@@ -58,6 +58,7 @@ Player::Player(const char *name, Protocol *p) : Creature(name)
 
   access     = 0;
   cancelMove = false;
+  fightMode = followMode = 0;
   for(int i = 0; i < 7; i++)
   {
     skills[i][SKILL_LEVEL] = 1;
@@ -267,6 +268,10 @@ void Player::sendCancel(const char *msg)
 }
 void Player::sendChangeSpeed(Creature* creature){
      client->sendChangeSpeed(creature);
+     }
+
+void Player::sendToChannel(Creature *creature, unsigned char type, const std::string &text, unsigned short channelId){
+     client->sendToChannel(creature, type, text, channelId);
      }
 
 void Player::sendCancelAttacking()

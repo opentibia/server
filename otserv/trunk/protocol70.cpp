@@ -42,6 +42,7 @@
 #include "tasks.h"
 
 extern LuaScript g_config;
+std::map<long, Creature*> channel;
 
 Protocol70::Protocol70(SOCKET s)
 {
@@ -159,12 +160,23 @@ void Protocol70::parsePacket(NetworkMessage &msg)
     case 0xD3: // set outfit
       parseSetOutfit(msg);
       break;
+    case 0x97: // request Channels
+      parseGetChannels(msg);
+      break;
+    case 0x98: // open Channel
+      parseOpenChannel(msg);
+      break; 
+    case 0x99: // close Channel
+      //parseCloseChannel(msg);
+      break;
+    case 0x9A: // open priv
+      parseOpenPriv(msg);
+      break;       
     case 0xBE: // cancel move
       parseCancelMove(msg);
       break;
-    case 0xA0: // ?? (during character loggin into world) has 2 bytes data
-      printf("not handled packet header %x \n", recvbyte);
-      parseDebug(msg);
+    case 0xA0: // set attack and follow mode
+      parseModes(msg);
       break;
     case 0x69: // client quit without logout 
       break;    
@@ -321,9 +333,52 @@ void Protocol70::parseLogout(NetworkMessage &msg)
 	}
 }
 
+void Protocol70::parseGetChannels(NetworkMessage &msg){
+     sendChannels();
+}
+
+void Protocol70::parseOpenChannel(NetworkMessage &msg){
+     unsigned short channelId = msg.GetU16();
+     sendChannel(channelId);
+     std::map<long, Creature*>::iterator sit = channel.find(player->getID());
+     if( sit == channel.end() ) {
+          channel[player->getID()] = player;
+         }
+}
+
+void Protocol70::parseCloseChannel(NetworkMessage &msg){
+     unsigned short channelId = msg.GetU16();
+     std::map<long, Creature*>::iterator sit = channel.find(player->getID());
+     if( sit != channel.end() ) {
+          channel.erase(sit);
+         }
+}
+
+void Protocol70::parseOpenPriv(NetworkMessage &msg){
+     std::string receiver; 
+     receiver = msg.GetString();
+     Creature* c = map->getCreatureByName(receiver.c_str());
+     Player* player = dynamic_cast<Player*>(c);
+     if(player) 
+     sendOpenPriv(receiver);
+     }
+
+void Protocol70::sendOpenPriv(std::string &receiver){
+     NetworkMessage newmsg; 
+     newmsg.AddByte(0xAD); 
+     newmsg.AddString(receiver); 
+     newmsg.WriteToSocket(s);
+}     
+
 void Protocol70::parseCancelMove(NetworkMessage &msg)
 {
 player->cancelMove = true;
+}
+
+void Protocol70::parseModes(NetworkMessage &msg)
+{
+player->fightMode = msg.GetByte();
+player->followMode = msg.GetByte();
 }
 
 void Protocol70::parseDebug(NetworkMessage &msg)
@@ -467,6 +522,41 @@ if (CanSee(creature->pos.x, creature->pos.y)) {
 }
 }
 
+void Protocol70::sendChannels(){
+     NetworkMessage newmsg;
+	 newmsg.AddByte(0xAB);
+	 
+	 newmsg.AddByte(3); //how many
+	 
+	 newmsg.AddByte(0xFF); //priv chan
+	 newmsg.AddByte(0xFF); //priv chan
+	 newmsg.AddString("Private Chat Channel");
+	 
+	 newmsg.AddByte(0x00); //clan chan
+	 newmsg.AddByte(0x00); //clan chan
+	 newmsg.AddString("Clan Channel");
+	 
+	 newmsg.AddByte(0x04);
+	 newmsg.AddByte(0x00);
+	 newmsg.AddString("Game-Chat");
+	 newmsg.WriteToSocket(s);
+	 
+}
+
+void Protocol70::sendChannel(unsigned short channelId){
+     NetworkMessage newmsg;
+     if(channelId == 4){
+	 newmsg.AddByte(0xAC);
+	 
+	 newmsg.AddU16(channelId);
+	 
+	 newmsg.AddString("Game-Chat");
+	 
+	 newmsg.WriteToSocket(s);
+     }
+	 
+}
+
 void Protocol70::sendIcons(int icons){
      NetworkMessage newmsg;
 	 newmsg.AddByte(0xA2);
@@ -512,18 +602,16 @@ void Protocol70::parseUseItemEx(NetworkMessage &msg)
 	pos.z = to_z;
 
 	if(from_x == 0xFFFF) {
-		bool decreaseCharge = false;
-
+        bool decreaseCharge = false;      
 		if(from_y & 0x40) {
-			unsigned char containerid = from_y & 0x0F;
-			Item* container = player->getContainer(containerid);
-			if(!container)
-				return;
-
-			Item* runeitem = container->getItem(from_z);
-			if(!runeitem)
-				return;
-
+			 unsigned char containerid = from_y & 0x0F;
+  	                         Item* container = player->getContainer(containerid);
+  	                         if(!container)
+  	                                 return;
+  	 
+  	                         Item* runeitem = container->getItem(from_z);
+  	                         if(!runeitem)
+  	                                 return;
 			//This should be loaded from somewhere later (lua? or xml perhaps)
 			if(item == 1623) {
 				MagicEffectRuneClass runeSpell;
@@ -611,32 +699,6 @@ void Protocol70::parseUseItemEx(NetworkMessage &msg)
 				decreaseCharge = map->creatureThrowRune(player, runeSpell); 
 			}
 		else
-			if(item == 1643) {
-				static unsigned char area[14][18] = {
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
-
-				MagicEffectGroundClass spellGround;
-				spellGround.animationEffect = NM_ANI_ENERGY;
-				spellGround.offensive = true;
-				spellGround.centerpos = pos;
-				memcpy(&spellGround.area, area, sizeof(area));
-				spellGround.direction = 1;
-				spellGround.groundID = 1190;
-				decreaseCharge = map->creatureThrowRune(player, spellGround); 
-			}
-		else
 			if(item == 1655) {
 				static unsigned char area[14][18] = {
 				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -670,13 +732,13 @@ void Protocol70::parseUseItemEx(NetworkMessage &msg)
 			}
 
 			if(decreaseCharge) {
-				runeitem->setItemCharge(max(0, runeitem->getItemCharge() - 1));
+				runeitem->setItemCharge(std::max(0, runeitem->getItemCharge() - 1));
 
 				if(runeitem->getItemCharge() == 0) {
 					container->removeItem(runeitem);
 					sendContainerUpdated(runeitem, containerid, 0xFF, from_z, 0xFF, true);
-				}
-			}
+				}	
+            }	
 		}
 	}
 }
@@ -728,47 +790,46 @@ void Protocol70::parseUseItem(NetworkMessage &msg)
 #endif
 
 	if(Item(item).isContainer())
-	{
+  	         {
 		msg.Reset();
-
 		Item *newcontainer = NULL;
 		/*
-		if(x != 0xFFFF) {
-			if(abs(player->pos.x - x) > 1 || abs(player->pos.y - y) > 1)
+  	                 if(x != 0xFFFF) {
+  	                         if(abs(player->pos.x - x) > 1 || abs(player->pos.y - y) > 1)
+  	                                 return;
+  	 
+  	                         Tile *t = map->getTile(x, y, z);
+  	 
+  	                         if(t)
+  	                                 newcontainer = (Item*)t->getThingByStackPos(un);
+  	                 }
+  	                 */
+  	 
+  	                 if(x == 0xFFFF) {
+  	                         Item *parentcontainer = NULL;
+
+		if(0x40 & y) {
+			unsigned char containerid = y & 0x0F;
+			 parentcontainer = player->getContainer(containerid);
+
+			if(parentcontainer == NULL || !parentcontainer->isContainer()) {
 				return;
-
-			Tile *t = map->getTile(x, y, z);
-			
-			if(t)
-				newcontainer = (Item*)t->getThingByStackPos(un);
-		}
-		*/
-
-		if(x == 0xFFFF) {
-			Item *parentcontainer = NULL;
-
-			if(0x40 & y) {
-				unsigned char containerid = y & 0x0F;
-				parentcontainer = player->getContainer(containerid);
-
-				if(parentcontainer == NULL || !parentcontainer->isContainer()) {
-					return;
-				}
-
-				int n = 0;
-				for (Item::iterator cit = parentcontainer->getItems(); cit != parentcontainer->getEnd(); cit++) {
-					if(n == z) {
-						newcontainer = (*cit);
-						break;
-					}
-					else
-						n++;
-				}
 			}
-			else
-				newcontainer = (Item*)player->items[y];
-		}
 
+
+			int n = 0;
+			for (Item::iterator cit = parentcontainer->getItems(); cit != parentcontainer->getEnd(); cit++) {
+				if(n == z) {
+					newcontainer = (*cit);
+					break;
+				}
+				else
+					n++;
+			}
+		}
+		else
+			newcontainer = (Item*)player->items[y];
+      }
 		if(newcontainer && newcontainer->isContainer()) {
 			player->addContainer(stack, newcontainer);
 
@@ -780,7 +841,7 @@ void Protocol70::parseUseItem(NetworkMessage &msg)
 			msg.AddU16(newcontainer->getContainerMaxItemCount());
 			msg.AddByte(newcontainer->getContainerItemCount());
 
-			Item::iterator cit;
+      Item::iterator cit;
 			for (cit = newcontainer->getItems(); cit != newcontainer->getEnd(); cit++) {
 				msg.AddU16((*cit)->getID());
 				if((*cit)->getItemCountOrSubtype() > 1)
@@ -865,9 +926,11 @@ void Protocol70::parseSay(NetworkMessage &msg)
   unsigned char type = msg.GetByte();
   
   std::string receiver;
+  unsigned short channelId;
   if (type == 4)
     receiver = msg.GetString();
-
+  if (type == 5)
+    channelId = msg.GetU16();
   std::string text = msg.GetString();
 
 	map->creatureSaySpell(player, text);
@@ -888,7 +951,9 @@ void Protocol70::parseSay(NetworkMessage &msg)
     case 0x04:
       map->creatureSpeakTo(player, receiver, text);
       break;
-
+    case 0x05:
+      map->creatureToChannel(player, type, text, channelId);
+      break;
     case 0x09:
       map->creatureBroadcastMessage(player, text);
       break;
@@ -1387,11 +1452,18 @@ void Protocol70::sendCreatureSay(const Creature *creature, unsigned char type, c
 {
   NetworkMessage msg;
 
-  msg.AddCreatureSpeak(creature, type, text);
+  msg.AddCreatureSpeak(creature, type, text, 0);
   
   msg.WriteToSocket(s);
 }
 
+void Protocol70::sendToChannel(const Creature * creature, unsigned char type, const std::string &text, unsigned short channelId){
+     NetworkMessage msg;
+
+  msg.AddCreatureSpeak(creature, type, text, channelId);
+  
+  msg.WriteToSocket(s);
+     }
 
 void Protocol70::sendCancel(const char *msg)
 {

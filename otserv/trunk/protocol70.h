@@ -31,7 +31,6 @@
 #include <string>
 
 
-
 class NetworkMessage;
 
 class Protocol70 : public Protocol
@@ -58,6 +57,7 @@ private:
   void parseLogout(NetworkMessage &msg);
   
   void parseCancelMove(NetworkMessage &msg);
+  void parseModes(NetworkMessage &msg);
   void parseDebug(NetworkMessage &msg);
   
   void parseMoveByMouse(NetworkMessage &msg);
@@ -94,9 +94,15 @@ private:
 */
 
 	void sendPlayerLookAt(std::string);
-
-
-
+// channel tabs
+void parseGetChannels(NetworkMessage &msg);
+void parseOpenChannel(NetworkMessage &msg);
+void parseOpenPriv(NetworkMessage &msg);
+void parseCloseChannel(NetworkMessage &msg);
+virtual void sendChannels();
+virtual void sendChannel(unsigned short channelId);
+virtual void sendOpenPriv(std::string &receiver);
+virtual void sendToChannel(const Creature * creature, unsigned char type, const std::string &text, unsigned short channelId);
 //	void sendPlayerChangeGround(Action* action);
 
   virtual void sendNetworkMessage(NetworkMessage *msg);
