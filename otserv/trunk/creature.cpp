@@ -153,7 +153,7 @@ bool Creature::canMovedTo(const Tile *tile) const
   else return false;
 }
 
-std::string Creature::getDescription(bool self){
+std::string Creature::getDescription(bool self) const {
     std::stringstream s;
 	std::string str;	
 	s << "You see a " << name << ".";

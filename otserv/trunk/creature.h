@@ -92,7 +92,7 @@ public:
   virtual void drainHealth(int);
   virtual void drainMana(int);
   virtual void die(){};
-  virtual std::string getDescription(bool self = false);
+  virtual std::string getDescription(bool self = false) const;
   virtual void setAttackedCreature(unsigned long id);
 
   virtual int getWeaponDamage() const {
