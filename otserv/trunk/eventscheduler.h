@@ -21,6 +21,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.11  2003/11/01 15:52:43  tliffrag
+// Improved eventscheduler
+//
 // Revision 1.10  2003/05/19 16:48:37  tliffrag
 // Loggingin, talking, walking around, logging out working
 //
@@ -41,6 +44,10 @@
 //
 //////////////////////////////////////////////////////////////////////
 
+#ifndef __OTSERV_EVENTSCHEDULER_H
+#define __OTSERV_EVENTSCHEDULER_H
+#include <map>
+#include <sys/timeb.h>
 #if __GNUC__ < 3
 #include <hash_map>
 #else
@@ -53,6 +60,7 @@ using std::hash_map;
 #endif
 #endif
 
+#include "tmap.h"
 #include "definitions.h"
 #include "network.h"
 
@@ -62,15 +70,43 @@ struct eqfd {
     }
 };
 
+struct cmpdouble {
+  bool operator()(double s1, double s2) const {
+    return s1 < s2;
+  }
+};
+
+enum tickTypes{
+	TICK_MAP,
+	TICK_CREATURE
+};
+
+struct stick {
+	int type;
+	int cid;
+};
+
 typedef hash_map<Socket, unary_functor<Socket,void> *, hash<Socket>, eqfd> fdcbhash;
 
 // EventListener ?
 class EventScheduler {
-    fdcbhash fdcb;
-    fd_set active_fd_set, read_fd_set;
-    public:
+	fdcbhash fdcb;
+	fd_set active_fd_set, read_fd_set;
+
+	std::multimap<double, stick*, cmpdouble> tickList;
+
+	public:
     EventScheduler();
     void newsocket(Socket sock, unary_functor<Socket,void> *);
-    void deletesocket(Socket sock);
+	void deletesocket(Socket sock);
     void loop();
+	int addMapTick(int ms);
+	int addCreatureTick(long c, int ms);
+	double getNow(){
+		timeb nowTime;
+		ftime(&nowTime);
+		return (double)nowTime.time+(double)nowTime.time/1000;
+	}
 };
+
+#endif

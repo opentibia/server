@@ -418,6 +418,7 @@ if(c && c->isPlayer())
 
 	buf += (char)0x00;
 	}
+
 else{
 	buf += (char)0x61;
 	buf += (char)0x00;

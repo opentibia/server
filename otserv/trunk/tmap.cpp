@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.17  2003/11/01 15:52:43  tliffrag
+// Improved eventscheduler
+//
 // Revision 1.16  2003/10/21 17:55:07  tliffrag
 // Added items on player
 //
@@ -365,18 +368,20 @@ int Map::saveMap(){
 }
 
 Creature* Map::getPlayerByID( unsigned long id ){
-  std::list<Creature*>::iterator i;
-  for( i = PlayerList.begin(); i != PlayerList.end(); i++ )
+  std::map<long, Creature*>::iterator i;
+  for( i = playersOnline.begin(); i != playersOnline.end(); i++ )
   {
-    if( (*i)->getID() == id )
+    if( (i->second)->getID() == id )
     {
-      return *i;
+      return i->second;
     }
   }
   return NULL; //just in case the player doesnt exist
 }
 
 position Map::placeCreature(position pos, Creature* c){
+	//add creature to the online list
+	playersOnline[c->getID()]=c;
   if( tiles[pos.x-MINX][pos.y-MINY]->isBlocking()){
   	//crap we need to find another spot
 	pos.x++;
@@ -393,6 +398,8 @@ position Map::placeCreature(position pos, Creature* c){
 }
 
 int Map::removeCreature(position pos){
+	//removeCreature from the online list
+	playersOnline.erase(playersOnline.find(tiles[pos.x-MINX][pos.y-MINY]->creature->getID()));
 	std::cout << "removing creature "<< std::endl;
 	if(tiles[pos.x-MINX][pos.y-MINY]->creature)
 		tiles[pos.x-MINX][pos.y-MINY]->creature=NULL;

@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.12  2003/11/01 15:52:43  tliffrag
+// Improved eventscheduler
+//
 // Revision 1.11  2003/10/19 21:32:19  tliffrag
 // Reworked the Tile class; stackable items now working
 //
@@ -62,6 +65,7 @@
 #include "item.h"
 #include "creature.h"
 #include <vector>
+#include <map>
 
 enum tmapEnum{
 	TMAP_SUCCESS,
@@ -117,6 +121,7 @@ class Map {
     public:
         Map();
         Map(char *filename);
+		int tick(double time){std::cout << "Map tick" << std::endl;};
 		position placeCreature(position pos, Creature* c);
 		Creature* getPlayerByID( unsigned long id );
 		int removeCreature(position pos);
@@ -130,7 +135,7 @@ class Map {
 		int removeItem(position pos);
 		int removeItem(Action* a);
         Tile *tile(unsigned short _x, unsigned short _y, unsigned char _z);
-		std::list <Creature*> PlayerList;
+		std::map<long, Creature*> playersOnline;
         ~Map();
 };
 

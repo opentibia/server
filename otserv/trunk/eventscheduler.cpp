@@ -21,6 +21,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.11  2003/11/01 15:52:43  tliffrag
+// Improved eventscheduler
+//
 // Revision 1.10  2003/09/17 16:35:08  tliffrag
 // added !d command and fixed lag on windows
 //
@@ -56,9 +59,11 @@
 #include <stdio.h>
 #include <iostream>
 
+
 #include "eventscheduler.h"
 
 extern EventScheduler es;
+extern Map map;
 
 EventScheduler::EventScheduler() {
     FD_ZERO(&active_fd_set);
@@ -81,16 +86,48 @@ void EventScheduler::deletesocket(Socket _sock) {
     fdcb.erase(_sock);
 }
 
+int EventScheduler::addMapTick(int ms){
+	stick* t=new stick;
+	t->type=TICK_MAP;
+	tickList.insert(pair<double, stick*>(((double)ms/1000+getNow()), t));
+	return true;
+}
+int EventScheduler::addCreatureTick(long c, int ms){
+	stick* t=new stick;
+	t->type=TICK_MAP;
+	t->cid=c;
+	tickList.insert(pair<double, stick*>(((double)ms/1000+getNow()), t));
+	return true;
+}
+
 //////////////////////////////////////////////////
 // main loop, listening to events and calling callbacks.
 // It does not return.
 // Todo: optionally returning when no socket is listened to anymore.
 void EventScheduler::loop() {
-    struct timeval tv = {1, 0};
+    struct timeval tv = {0, 50000};
     for (;;) {
         if (tv.tv_sec == 0 && tv.tv_usec == 0) {
-            //      cout << "time event" << endl;
-            tv.tv_sec = 1;
+	//cout << "time event" << endl;
+	//finally another 50k microsecs have passed and we tick
+	double now=getNow();
+	std::multimap<double, stick*, cmpdouble>::iterator i=tickList.lower_bound(now);
+	if(i==tickList.begin() || tickList.size()==0);
+	else{
+	i--;
+		while(i!= tickList.begin()){
+			stick* t=i->second;
+			switch(t->type){
+				case TICK_MAP:
+					map.tick(now);
+					break;
+				case TICK_CREATURE:
+					map.getPlayerByID(t->cid)->tick(now);
+					break;
+			}
+		}
+	}
+	    tv.tv_sec = 0; tv.tv_usec=50000;
         }
         read_fd_set = active_fd_set;
         int sel = select(FD_SETSIZE, &read_fd_set, NULL, NULL, &tv);

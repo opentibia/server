@@ -26,7 +26,10 @@
 #include "action.h"
 #include "item.h"
 #include "definitions.h"
+#include <iostream>
 
+class EventScheduler;
+extern EventScheduler es;
 // include Map headers
 #include "tmap.h"
 
@@ -40,45 +43,22 @@ class Creature {
     public:
 
         // set creature on map position...
-        virtual void setMap(position, Map&) throw(texception)=0;
+		virtual void setMap(position, Map&) throw(texception)=0;
 
 		virtual bool isPlayer(){return false;}
 		
 		virtual unsigned long getID(){return 0;}
 		
-		virtual void sendAction(Action*){};
+		virtual void sendAction(Action*){}
+
 		virtual int sendInventory(){return 0;};
+
+		virtual int tick(double time){std::cout << "Creature tick" << std::endl; return 0;}
 
 		virtual int addItem(Item* item, int pos){return 0;};
 
 		virtual Item* getItem(int pos){return NULL;}
-        // get the next Action of the creature
-        //			virtual action* GetNextAction()=0;
 
-        // Do the action
-        //			virtual int DoAction(action*, Map*, Creature*)=0;
-
-        // get information about the Creature
-        // the information which is displayed if you click with both buttons on a creature in tibia
-        //			virtual infotyp* GetInfo()=0;
-
-        //			virtual pos GetPosition()=0;
-
-        // returns 0 if the creature is not valid anymore or 1 if it is valid
-        //			virtual int isValid()=0;
-
-        // if changes on the map occured near the creature 
-        // (like person moved, item moved...)
-        // this method will get called
-        //			virtual void UpdateMap(int, action*, unsigned long, char*, Creature*, Map*)=0;
-
-        // update a single tile on the map
-        //			virtual void UpdateTile(pos, unsigned)=0;
-
-        // Show the creature...
-        //			virtual void ShowCreature(int*, char**)=0;
-
-        // virtual destructor to be overloaded...
         virtual ~Creature() {};
 		int id;
 
