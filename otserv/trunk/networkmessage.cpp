@@ -41,11 +41,23 @@ bool NetworkMessage::ReadFromSocket(SOCKET socket)
 {
   // just read the size to avoid reading 2 messages at once
   m_MsgSize = recv(socket, (char*)m_MsgBuf, 2, 0);
-
+	
   // for now we expect 2 bytes at once, it should not be splitted
   int datasize = m_MsgBuf[0] | m_MsgBuf[1] >> 8;
   if ((m_MsgSize != 2) || (datasize > NETWORKMESSAGE_MAXSIZE-2))
   {
+		int errnum;
+#if defined WIN32 || defined __WINDOWS__
+		errnum = ::WSAGetLastError();
+#else
+	errnum = errno;
+#endif
+
+		if(errnum == EWOULDBLOCK) {
+			m_MsgSize = 0;
+			return true;
+		}
+
     Reset();
     return false;
   }

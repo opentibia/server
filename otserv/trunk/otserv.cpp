@@ -73,12 +73,6 @@ bool isclientBanished(SOCKET s)
       if ((bannedIPs[i].first & bannedIPs[i].second) == (clientip & bannedIPs[i].second))
 				return true;
 		}
-
-		/*for(banned
-		if(std::find(bannedIPs.begin(), bannedIPs.end(), clientip) != bannedIPs.end()) {
-			return true;
-		}
-		*/
 	}
 
 	return false;
