@@ -320,7 +320,7 @@ int SpellScript::luaActionChangeSpeed(lua_State *L){
 	Creature* creature = spell->map->getCreatureByID((unsigned long)lua_tonumber(L, -1));
 	lua_pop(L,1);
 	
-	spell->map->addEvent(makeTask(time, boost::bind(&Map::changeSpeed, spell->map,creature->getID(), creature->speed) ) );
+	spell->map->addEvent(makeTask(time, boost::bind(&Map::changeSpeed, spell->map,creature->getID(), creature->getNormalSpeed()) ) );
 	Player* p = dynamic_cast<Player*>(creature);
 	if(p){
          spell->map->changeSpeed(creature->getID(), creature->getNormalSpeed()+speed); 

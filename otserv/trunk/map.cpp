@@ -2122,7 +2122,7 @@ void Map::changeSpeed(unsigned long id, unsigned short speed)
 {
 	Creature *creature = getCreatureByID(id);
 	if(creature){
-		if(creature->hasteTicks >= 1000 && creature->speed == speed){
+		if(creature->hasteTicks >= 1000 || creature->speed == speed){
 			return;
 		}
 	
