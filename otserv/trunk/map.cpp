@@ -329,12 +329,14 @@ int Map::loadMapXml(const char *filename){
   }
   width=atoi((const char*)xmlGetProp(root, (const xmlChar *) "width"));
   height=atoi((const char*)xmlGetProp(root, (const xmlChar *) "height"));
+
   int xorig=((MAP_WIDTH)-width)/2;
   int yorig=((MAP_HEIGHT)-height)/2;
   tile=root->children;
   for(int y=0; y < height; y++){
     for(int x=0; x < width; x++){
       item=tile->children;
+      const char* pz = (const char*)xmlGetProp(tile, (const xmlChar *) "pz");
 
       while(item != NULL)
       {
@@ -345,12 +347,20 @@ int Map::loadMapXml(const char *filename){
         {
           setTile(xorig+x, yorig+y, 7, myitem->getID());
           delete myitem;
+
+          if (pz && (strcmp(pz, "1") == 0))
+            getTile(xorig+x, yorig+y, 7)->setPz();
         }
         else
         {
           Tile *t = getTile(xorig+x, yorig+y, 7);
           if (t)
-            t->addThing(myitem);
+          {
+            if (myitem->isAlwaysOnTop())
+              t->topItems.push_back(myitem);
+            else
+              t->downItems.push_back(myitem);
+          }
         }
 
         item=item->next;
@@ -863,6 +873,8 @@ void Map::creatureMakeMeleeDamage(Creature *creature, Creature *attackedCreature
       (std::abs(creature->pos.y-attackedCreature->pos.y) <= 1) &&
       (creature->pos.z == attackedCreature->pos.z))
   {
+    Tile* targettile = getTile(attackedCreature->pos.x, attackedCreature->pos.y, attackedCreature->pos.z);
+
     int damage = 1+(int)(80.0*rand()/(RAND_MAX+1.0));
     if (creature->access != 0)
       damage += 1337;
@@ -877,7 +889,7 @@ void Map::creatureMakeMeleeDamage(Creature *creature, Creature *attackedCreature
 
     NetworkMessage msg;
 
-    Tile* targettile = getTile(attackedCreature->pos.x, attackedCreature->pos.y, attackedCreature->pos.z);
+
 
     for (int x = min(creature->pos.x, attackedCreature->pos.x) - 9; x <= max(creature->pos.x, attackedCreature->pos.x) + 9; x++)
       for (int y = min(creature->pos.y, attackedCreature->pos.y) - 7; y <= max(creature->pos.y, attackedCreature->pos.y) + 7; y++)
