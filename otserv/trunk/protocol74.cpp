@@ -303,9 +303,12 @@ void Protocol74::GetMapDescription(unsigned short x, unsigned short y, unsigned 
 					skip = 0;
 
 					GetTileDescription(tile, msg);
+					cc++;
 
 				}
 				else {
+                    if(skip == -1) 
+                         skip = 0;
 					skip++;
 					if (skip == 0xFF) {
 						msg.AddByte(0xFF);
