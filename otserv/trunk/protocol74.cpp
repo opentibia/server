@@ -70,7 +70,7 @@ void Protocol74::ReceiveLoop()
 {
   NetworkMessage msg;
 
-  while (msg.ReadFromSocket(s))
+	while (msg.ReadFromSocket(s))
   {
     parsePacket(msg);
   }
@@ -88,6 +88,9 @@ void Protocol74::ReceiveLoop()
 
 void Protocol74::parsePacket(NetworkMessage &msg)
 {
+	if(msg.getMessageLength() <= 0)
+		return;
+
   uint8_t recvbyte = msg.GetByte();
 
   if (s && player->health <= 0) {

@@ -252,14 +252,17 @@ class Map {
 	 */
 		bool canThrowItemTo(Position from, Position to, bool creaturesBlock /* = true*/, bool isProjectile = false);
 
+		bool isPathValid(Creature *creature, const std::list<Position>& path);
+
 	/**
 	  * Get the path to a specific position on the map.
+	  * \param creature The creature that wants a route
 	  * \param start The start position of the path
 	  * \param to The destination position
 	  * \param creaturesBlock Wether a Creature is an obstacle or not
 	  * \returns A list of all positions you have to traverse to reacg the destination
 	  */
-	std::list<Position> getPathTo(Position start, Position to, bool creaturesBlock=true);
+	std::list<Position> getPathTo(Creature* creature, Position start, Position to, bool creaturesBlock=true);
 
 	//bool removeItem(Tile t, Item);
 

@@ -448,13 +448,6 @@ bool Map::canThrowItemTo(Position from, Position to, bool creaturesBlock /* = tr
 				return false;
 		}
 
-		/*
-		if(t && (isProjectile ? t->isBlockingProjectile() : t->isBlocking()) ||
-			      (creaturesBlock ? !t->creatures.empty() : false)) {
-			return false;
-		}
-		*/
-
 		error += deltaerr;
 
 		if(2 * error >= deltax) {
@@ -466,8 +459,20 @@ bool Map::canThrowItemTo(Position from, Position to, bool creaturesBlock /* = tr
 	return true;
 }
 
+bool Map::isPathValid(Creature *creature, const std::list<Position>& path)
+{
+	std::list<Position>::const_iterator iit;
+	for(iit = path.begin(); iit != path.end(); ++iit) {
 
-std::list<Position> Map::getPathTo(Position start, Position to, bool creaturesBlock){
+		Tile *t = getTile(iit->x, iit->y, iit->z);		
+		if(!t || t->isBlocking() || (!t->creatures.empty() && (t->getCreature() != creature || t->creatures.size() > 1)))
+			return false;
+	}
+
+	return true;
+}
+
+std::list<Position> Map::getPathTo(Creature *creature, Position start, Position to, bool creaturesBlock){
 	std::list<Position> path;
 /*	if(start.z != to.z)
 		return path;
@@ -498,9 +503,10 @@ std::list<Position> Map::getPathTo(Position start, Position to, bool creaturesBl
 					int x = current->x + dx;
 					int y = current->y + dy;
 
-					Tile *t;
-					if((!(t = getTile(x,y,z))) || t->isBlocking() || (t->creatures.size() /*&& x != to.x && y != to.y*/))
-						continue;
+					Tile *t = getTile(x, y, z);
+					//if(!t || t->isBlocking() || (t->creatures.size() && t->getCreature() != creature))
+					if(!t || t->isBlocking() || (!t->creatures.empty() && (t->getCreature() != creature || t->creatures.size() > 1)))
+					continue;
 
 					bool isInClosed = false;
 					for(std::list<AStarNode*>::iterator it = closedNodes.begin();

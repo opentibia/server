@@ -1994,8 +1994,8 @@ void Game::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fi
 	OTSYS_THREAD_UNLOCK(gameLock)
 }
 
-std::list<Position> Game::getPathTo(Position start, Position to, bool creaturesBlock){
-	return map->getPathTo(start, to, creaturesBlock);
+std::list<Position> Game::getPathTo(Creature *creature, Position start, Position to, bool creaturesBlock){
+	return map->getPathTo(creature, start, to, creaturesBlock);
 }
 
 void Game::checkPlayer(unsigned long id)

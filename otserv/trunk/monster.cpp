@@ -652,53 +652,54 @@ void Monster::onAttack()
 	}
 }
 
-void Monster::doMoveTo(const Position &target)
+void Monster::doMoveTo(const Position& destpos)
 {
-	if(route.size() == 0 || route.back() != target || route.front() != this->pos){
-		route = this->game->getPathTo(this->pos, target);
-	}
-
-	if(route.size()==0){
-		//still no route, means there is none, or reached destination
-
-		//Update look direction
-		if(moveToPos == this->pos) {
-			int dx = targetPos.x - this->pos.x;
-			int dy = targetPos.y - this->pos.y;
-			int targetdist = getCurrentDistanceToTarget();
-			
-			Direction newdir = this->getDirection();
-
-			//SE
-			if( dx < 0 && dy < 0)
-				newdir = WEST;
-			//SW
-			else if(dx > 0 && dy < 0)
-				newdir = EAST;
-			//NW
-			else if(dx > 0 && dy > 0)
-				newdir = EAST;
-			//NE
-			else if(dx < 0 && dy > 0)
-				newdir = WEST;
-			//S
-			else if(dx == 0 && dy < 0)
-				newdir = NORTH;
-			//W
-			else if(dx > 0 && dy == 0)
-				newdir = EAST;
-			//N
-			else if(dx == 0 && dy > 0)
-				newdir = SOUTH;
-			//E
-			else if(dx < 0 && dy == 0)
-				newdir = WEST;
+	//Update look direction
+	if(destpos == this->pos) {
+		int dx = targetPos.x - this->pos.x;
+		int dy = targetPos.y - this->pos.y;
 		
-			if(newdir != this->getDirection()) {
-				game->creatureTurn(this, newdir);
-			}
+		Direction newdir = this->getDirection();
+
+		//SE
+		if( dx < 0 && dy < 0)
+			newdir = WEST;
+		//SW
+		else if(dx > 0 && dy < 0)
+			newdir = EAST;
+		//NW
+		else if(dx > 0 && dy > 0)
+			newdir = EAST;
+		//NE
+		else if(dx < 0 && dy > 0)
+			newdir = WEST;
+		//S
+		else if(dx == 0 && dy < 0)
+			newdir = NORTH;
+		//W
+		else if(dx > 0 && dy == 0)
+			newdir = EAST;
+		//N
+		else if(dx == 0 && dy > 0)
+			newdir = SOUTH;
+		//E
+		else if(dx < 0 && dy == 0)
+			newdir = WEST;
+	
+		if(newdir != this->getDirection()) {
+			game->creatureTurn(this, newdir);
 		}
 
+		return;
+	}
+
+	//if(route.size() == 0 || route.back() != destpos || route.front() != this->pos){
+	if(route.size() == 0 || route.back() != destpos || !game->map->isPathValid(this, route)){
+		route = this->game->getPathTo(this, this->pos, destpos);
+	}
+
+	if(route.size() == 0){
+		//still no route
 		return;
 	}
 	else
@@ -706,7 +707,7 @@ void Monster::doMoveTo(const Position &target)
 
 	Position nextStep = route.front();
 
-	route.pop_front();
+	//route.pop_front();
 	
 	int dx = nextStep.x - this->pos.x;
 	int dy = nextStep.y - this->pos.y;

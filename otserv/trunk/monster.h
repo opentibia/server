@@ -123,7 +123,7 @@ private:
 	int oldThinkTicks;
 	Position targetPos;
 	Position moveToPos;
-	void doMoveTo(const Position &target);
+	void doMoveTo(const Position& destpos);
 
 	int getCurrentDistanceToTarget();
 	void calcMovePosition();

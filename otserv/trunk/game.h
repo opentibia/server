@@ -204,7 +204,7 @@ class Game {
     Creature* getCreatureByID(unsigned long id);
 		Creature* getCreatureByName(const char* s);
 
-		std::list<Position> getPathTo(Position start, Position to, bool creaturesBlock=true);
+		std::list<Position> getPathTo(Creature *creature, Position start, Position to, bool creaturesBlock=true);
 
 		/** Lockvar for Game. */
     OTSYS_THREAD_LOCKVAR gameLock;

@@ -193,7 +193,7 @@ void Npc::doMove(int direction){
 
 void Npc::doMoveTo(Position target){
 	if(route.size() == 0 || route.back() != target || route.front() != this->pos){
-		route = this->game->getPathTo(this->pos, target);
+		route = this->game->getPathTo(this, this->pos, target);
 	}
 	if(route.size()==0){
 		//still no route, means there is none
