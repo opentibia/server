@@ -79,13 +79,13 @@ public:
   Direction getDirection() const { return direction; }
   void setDirection(Direction dir) { direction = dir; }
 
+  virtual fight_t getFightType(){return FIGHT_MELEE;};
 
   virtual void drainHealth(int);
 
   void    setAttackedCreature(unsigned long id);
   unsigned long attackedCreature;
 
-  virtual fight_t getFightType() { return FIGHT_MELEE; };
   virtual bool isAttackable() { return true; };
 
 
@@ -94,8 +94,6 @@ public:
 		virtual int sendInventory(){return 0;};
 		virtual int addItem(Item* item, int pos){return 0;};
 		virtual Item* getItem(int pos){return NULL;}
-
-
 
 
   int lookhead, lookbody, looklegs, lookfeet, looktype, lookcorpse;

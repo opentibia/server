@@ -138,17 +138,21 @@ void Npc::doSay(std::string msg){
 	this->map->creatureSay(this, 1, msg);
 }
 
+void Npc::doAttack(int id){
+	attackedCreature = id;
+}
+
 void Npc::doMove(int direction){
-	return;
+	std::cout << "Direction " << direction << std::endl;
 	switch(direction){
 		case 0:
-			this->map->thingMove(this, this,this->pos.x, this->pos.y-1, this->pos.z);
+			this->map->thingMove(this, this,this->pos.x, this->pos.y+1, this->pos.z);
 		break;
 		case 1:
 			this->map->thingMove(this, this,this->pos.x+1, this->pos.y, this->pos.z);
 		break;
 		case 2:
-			this->map->thingMove(this, this,this->pos.x, this->pos.y+1, this->pos.z);
+			this->map->thingMove(this, this,this->pos.x, this->pos.y-1, this->pos.z);
 		break;
 		case 3:
 			this->map->thingMove(this, this,this->pos.x-1, this->pos.y, this->pos.z);
@@ -188,6 +192,8 @@ void NpcScript::onCreatureSay(int cid, unsigned char type, const std::string &te
 int NpcScript::registerFunctions(){
 	lua_register(luaState, "selfSay", NpcScript::luaActionSay);
 	lua_register(luaState, "selfMove", NpcScript::luaActionMove);
+	lua_register(luaState, "selfGetPosition", NpcScript::luaSelfGetPos);
+	lua_register(luaState, "selfAttackCreature", NpcScript::luaActionAttackCreature);
 	lua_register(luaState, "creatureGetName", NpcScript::luaCreatureGetName);
 	lua_register(luaState, "creatureGetPosition", NpcScript::luaCreatureGetPos);
 	lua_register(luaState, "selfGetPosition", NpcScript::luaSelfGetPos);
@@ -260,7 +266,17 @@ int NpcScript::luaActionMove(lua_State* L){
 	int dir=lua_tonumber(L, -1);
 	lua_pop(L,1);
 	Npc* mynpc=getNpc(L);
+	std::cout << "NpcScript::luaActionMove "<<mynpc << std::endl;
 	if(mynpc)
 		mynpc->doMove(dir);
+	return 0;
+}
+
+int NpcScript::luaActionAttackCreature(lua_State *L){
+	int id=lua_tonumber(L, -1);
+	lua_pop(L,1);
+	Npc* mynpc=getNpc(L);
+	if(mynpc)
+		mynpc->doAttack(id);
 	return 0;
 }

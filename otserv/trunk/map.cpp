@@ -1038,7 +1038,6 @@ void Map::checkPlayerAttacking(unsigned long id)
   OTSYS_THREAD_LOCK(mapLock)
 
   Creature *creature = getCreatureByID(id);
-
   if (creature != NULL && creature->health > 0)
   {
     addEvent(makeTask(2000, std::bind2nd(std::mem_fun(&Map::checkPlayerAttacking), id)));

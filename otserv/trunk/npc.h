@@ -53,6 +53,7 @@ public:
 	static int luaActionSay(lua_State *L);
 	static int luaActionMove(lua_State *L);
 	static int luaCreatureGetName(lua_State *L);
+	static int luaActionAttackCreature(lua_State *L);
 	static int luaCreatureGetPos(lua_State *L);
 	static int luaSelfGetPos(lua_State *L);
 protected:
@@ -72,6 +73,9 @@ public:
 
   std::string getName(){return name;};
 
+  void    setAttackedCreature(unsigned long id);
+
+
   fight_t getFightType(){return fighttype;};
 
   int mana, manamax;
@@ -86,6 +90,7 @@ public:
 
   void doSay(std::string msg);
   void doMove(int dir);
+  void doAttack(int id);
 
 protected:
   virtual void onThingMove(const Player *player, const Thing *thing, const Position *oldPos, unsigned char oldstackpos);
