@@ -349,7 +349,8 @@ bool Game::onPrepareMoveThing(Creature *player, const Thing* thing, const Positi
 		player->sendCancel("To far away...");
 		return false;
 	}
-	else if( (abs(fromPos.x - toPos.x) > thing->throwRange) || (abs(fromPos.y - toPos.y) > thing->throwRange) ) {
+	else if( (abs(fromPos.x - toPos.x) > thing->throwRange) || (abs(fromPos.y - toPos.y) > thing->throwRange)
+		|| (fromPos.z != toPos.z) /*TODO: Make it possible to throw items to different floors*/ ) {
 		player->sendCancel("To far away...");
 		return false;
 	}
@@ -863,8 +864,9 @@ void Game::thingMoveInternal(Creature *player,
 				}
 
 				if(fromTile->getThingCount() > 8) {
+#ifdef __DEBUG__
 					cout << "Pop-up item from below..." << std::endl;
-
+#endif
 					//We need to pop up this item
 					Thing *newthing = fromTile->getThingByStackPos(9);
 
