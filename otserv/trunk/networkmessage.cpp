@@ -42,15 +42,28 @@ void NetworkMessage::Reset()
 
 bool NetworkMessage::ReadFromSocket(SOCKET socket)
 {
-  m_MsgSize = recv(socket, (char*)m_MsgBuf, NETWORKMESSAGE_MAXSIZE, 0);
+  // just read the size to avoid reading 2 messages at once
+  m_MsgSize = recv(socket, (char*)m_MsgBuf, 2, 0);
 
-  // we got something unexpected
+  // for now we expect 2 bytes at once, it should not be splitted
+  int datasize = m_MsgBuf[0] | m_MsgBuf[1] >> 8;
+  if ((m_MsgSize != 2) || (datasize > NETWORKMESSAGE_MAXSIZE-2))
+  {
+    Reset();
+    return false;
+  }
+
+  // read the real data
+  m_MsgSize += recv(socket, (char*)m_MsgBuf+2, datasize, 0);
+
+  // we got something unexpected/incomplete
   if ((m_MsgSize <= 2) || ((m_MsgBuf[0] | m_MsgBuf[1] >> 8) != m_MsgSize-2))
   {
     Reset();
     return false;
   }
 
+  // ok, ...reading starts after the size
   m_ReadPos = 2;
 
   return true;
