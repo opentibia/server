@@ -21,6 +21,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.8  2003/08/25 21:05:51  tliffrag
+// Fixed bugs preventing otserv from running on windows.
+//
 // Revision 1.7  2003/05/19 16:48:37  tliffrag
 // Loggingin, talking, walking around, logging out working
 //
@@ -89,12 +92,19 @@ void EventScheduler::loop() {
             perror("select");
             exit(-1);
         }
-        //    cout << "loop ";
+       // std::cout << "loop " << std::endl;
+        if(sel)
         for (Socket i = 0; sel && i < FD_SETSIZE; i++) {
-            if (FD_ISSET(i, &read_fd_set) > 0) { // if there was input:
+            #ifdef __WINDOWS__
+            if (FD_ISSET(active_fd_set.fd_array[i], &read_fd_set)) { // if there was input:
+            Socket i_= active_fd_set.fd_array[i];
+            #else
+            if (FD_ISSET(i, &read_fd_set)) { // if there was input:
+	      Socket i_= i;
+            #endif
                 sel--;
-                std::cout << "socket event " << i << std::endl;
-                (*fdcb[i])(i);  // call the callback
+                std::cout << "socket event on socket " << i_ << std::endl;
+                (*fdcb[i_])(i_);  // call the callback
             }
         }
     }

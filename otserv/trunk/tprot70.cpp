@@ -96,8 +96,12 @@
 			void TProt70::clread(const Socket& sock) throw() {
 				static const int MAXMSG = 4096;
 				char buffer[MAXMSG];
-
+#ifdef __WINDOWS__
+				int nbytes = recv(sock, buffer, MAXMSG,0);
+#else
 				int nbytes = read(sock, buffer, MAXMSG);
+#endif
+			       
 				if (nbytes < 0) { // error
 					std::cerr << "read" << std::endl;
 					exit(-1);
