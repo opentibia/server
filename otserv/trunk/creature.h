@@ -26,6 +26,13 @@
 #include "thing.h"
 #include "position.h"
 
+// Macros
+#define CREATURE_SET_OUTFIT(c, type, head, body, legs, feet) c->looktype = type; \
+c->lookhead = head; \
+c->lookbody = body; \
+c->looklegs = legs; \
+c->lookfeet = feet;
+
 
 enum playerLooks
 {
