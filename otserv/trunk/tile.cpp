@@ -91,8 +91,8 @@ Thing* Tile::getThingByStackPos(int pos)
   if (splash)
   {
     if (pos == 0)
-      return splash;
-
+      //return splash;
+      return NULL;
     pos--;
   }
 
