@@ -499,7 +499,7 @@ void Map::thingMoveInternal(Creature *player,
       player->sendCancel("Better dont touch him...");
       return;
     }
-
+    Player* playerMoving = dynamic_cast<Player*>(creature);
     Position oldPos;
     oldPos.x = from_x;
     oldPos.y = from_y;
@@ -531,13 +531,13 @@ void Map::thingMoveInternal(Creature *player,
         else
           player->sendCancel("Sorry, not possible...");
       }
-      else if (toTile->isPz() && creature && creature->pzLockedTicks) {
-          if (player == thing && player->pzLockedTicks >= 1000)
+      else if (playerMoving && toTile->isPz() && playerMoving->pzLocked) {
+          if (player == thing && player->pzLocked)
             player->sendCancelWalk("You can't enter a protection zone after attacking another creature.");
-          else if (creature->pzLockedTicks >= 1000)
+          else if (playerMoving->pzLocked)
             player->sendCancel("Sorry, not possible...");
       }
-      else if (fromTile->isPz() && creature && player != thing) {
+      else if (playerMoving && fromTile->isPz() && player != thing) {
             player->sendCancel("Sorry, not possible...");
       } 
       else
@@ -809,6 +809,7 @@ void Map::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fig
 	Tile* targettile = getTile(attackedCreature->pos.x, attackedCreature->pos.y, attackedCreature->pos.z);
 
 	Player* player = dynamic_cast<Player*>(creature);
+	Player* attackedPlayer = dynamic_cast<Player*>(attackedCreature);
 	if (creature->access == 0 && targettile->isPz()) {
 		if (player) {
 			NetworkMessage msg;
@@ -841,9 +842,13 @@ void Map::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fig
 					inReach = true;	
 		break;
 	}
-	if (creature->access == 0) {
-	    creature->pzLockedTicks = +2000;	    
-	}    
+	if (player && player->access == 0) {
+	    player->inFightTicks = 5 * 60 * 1000;
+	    if(attackedPlayer)
+ 	         player->pzLocked = true;	    
+	}
+	if(attackedPlayer && attackedPlayer->access ==0)
+	 attackedPlayer->inFightTicks = 5 * 60 * 1000;
 	if(!inReach)
 		return;
 	
@@ -947,11 +952,6 @@ void Map::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fig
 		targettile->addThing(item);
     unsigned short decayTime = Item::items[item->getID()].decayTime;
     addEvent(makeTask(decayTime*1000, std::bind2nd(std::mem_fun(&Map::decayItem), item)));
-
-		if (creature->access == 0)
-    {
-	    creature->pzLockedTicks = +120000;
-  	}
 	}
 }
 
@@ -1082,8 +1082,11 @@ void Map::checkPlayer(unsigned long id)
 		 
 		 msg.AddPlayerStats(player);
 		 player->sendNetworkMessage(&msg);
-		 if(player->pzLockedTicks >= 1000)
-             player->pzLockedTicks -= 1000;
+		 if(player->inFightTicks >= 1000) {
+             player->inFightTicks -= 1000;
+             if(player->inFightTicks < 1000)
+                          player->pzLocked = false; 
+         }    
 	 }
 	 else{
 		 addEvent(makeTask(300, std::bind2nd(std::mem_fun(&Map::checkPlayer), id)));
@@ -1251,6 +1254,7 @@ void Map::makeCastSpell(Creature *creature, int mana, int mindamage, int maxdama
 	NetworkMessage msg;
 	Tile* fromtile = getTile(creature->pos.x, creature->pos.y, creature->pos.z);
 	Player* player = dynamic_cast<Player*>(creature);
+	bool playerDamaged = false;
 	if (creature->access == 0 && fromtile->isPz() && maxdamage > 0) {
 		if (player) {
 			msg.AddTextMessage(MSG_STATUS, "You may not attack a person in a protection zone.");
@@ -1299,7 +1303,13 @@ void Map::makeCastSpell(Creature *creature, int mana, int mindamage, int maxdama
 
 						if(((!tile->isPz() || maxdamage < 0) || creature->access != 0) && (*cit)->access == 0 || maxdamage < 0) {
 							int damage = random_range(mindamage, maxdamage);
-
+							Player* damagedPlayer = dynamic_cast<Player*>(*cit);
+							if(damagedPlayer && damagedPlayer->access == 0) {
+                                playerDamaged=true;
+                                damagedPlayer->inFightTicks = 5 * 60 * 1000;
+                                
+                            }
+                            if(player) player->inFightTicks = 5 * 60 * 1000;    
 							if (damage > 0) {
 								if(damage > (*cit)->health)
 									damage = (*cit)->health;
@@ -1330,8 +1340,8 @@ void Map::makeCastSpell(Creature *creature, int mana, int mindamage, int maxdama
 		pos.y += 1;
 	}
 	
-	if (creature->access == 0 && !damagelist.empty()) {
-	    creature->pzLockedTicks += 2000;
+	if (player->access == 0 && playerDamaged) {
+	    player->pzLocked = true;
 	}
 
 	//spectators
@@ -1448,10 +1458,6 @@ void Map::makeCastSpell(Creature *creature, int mana, int mindamage, int maxdama
 		  tile->addThing(item);
       unsigned short decayTime = Item::items[item->getID()].decayTime;
       addEvent(makeTask(decayTime*1000, std::bind2nd(std::mem_fun(&Map::decayItem), item)));
-
-			if (creature->access == 0) {
-	      creature->pzLockedTicks += 120000;
-	    }
 		}
 	}
 }

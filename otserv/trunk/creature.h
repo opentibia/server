@@ -99,7 +99,8 @@ public:
   int lookhead, lookbody, looklegs, lookfeet, looktype, lookcorpse;
   int mana, manamax, manaspent;
   bool exhausted;
-  long pzLockedTicks;
+  bool pzLocked;
+  long inFightTicks;
 
   int health, healthmax;
 

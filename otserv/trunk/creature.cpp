@@ -34,7 +34,6 @@ Creature::Creature(const char *name) : access(0)
   healthmax  = 1000;//150;
 
   lastDamage = 0;
-  pzLockedTicks = 0;
 
   attackedCreature = 0;
 }

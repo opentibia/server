@@ -38,6 +38,8 @@ Player::Player(const char *name, Protocol *p) : Creature(name)
   client     = p;
 
 	exhausted  = false;
+	pzLocked = false;
+	inFightTicks = 0;
 	looktype   = PLAYER_MALE_1;
 	voc        = 0;
 

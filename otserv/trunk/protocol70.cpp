@@ -290,7 +290,7 @@ void Protocol70::checkCreatureAsKnown(unsigned long id, bool &known, unsigned lo
 // Parse methods
 void Protocol70::parseLogout(NetworkMessage &msg)
 {
-    if(player->pzLockedTicks>=1000 && player-> health >0) {
+    if(player->inFightTicks >=1000 && player-> health >0) {
          sendCancel("You may not logout during or immediately after a fight!");
          return;
      }    
