@@ -183,9 +183,9 @@ receives Data from the player
 
  ****************************************************************/
 
-string TNetwork::ReceiveData(const Socket& playersocket, const bool& check=true) throw(texception) { 
+string TNetwork::ReceiveData(const Socket& playersocket) throw(texception) { 
 	// maximum length to read
-	const size_t max_read = 256;
+	const size_t max_read = 4096;
 
 	// number of received bytes...
 	int numrecv;
@@ -194,32 +194,6 @@ string TNetwork::ReceiveData(const Socket& playersocket, const bool& check=true)
 	char data[max_read];
 
 	// initialise the buffer to read
-
-	// do we need to check if there is data?
-	if (check) {
-		fd_set player;
-		fd_set errsock;
-		timeval notime;
-
-		notime.tv_usec=0;
-		notime.tv_sec=0;
-
-		FD_ZERO(&player);
-		FD_ZERO(&errsock);
-
-		FD_SET(playersocket, &player);
-		FD_SET(playersocket, &errsock);
-
-		if (select(playersocket+1, &player, NULL, &errsock, &notime) > 0)
-		{
-			// is the error flag set?
-			if (!FD_ISSET(playersocket, &player)) throw texception(true);
-
-		} // if (select... > 0)
-		// no data was available...
-		else throw texception(false);
-
-	} // if (check)  
 
 	string readbuf="";
 
@@ -237,14 +211,10 @@ string TNetwork::ReceiveData(const Socket& playersocket, const bool& check=true)
 } // string TNetwork::ReceiveData(const Socket& playersocket, const bool& check=true) throw(texception)  
 
 
-/****************************************************************
-Method: void ShutdownClient(const Socket&)
-------------------------------------------
-
-shuts down the client socket...
-
- ****************************************************************/
-void TNetwork::ShutdownClient(const Socket& playersocket) throw() {
+////////////////////////////////////////
+// shuts down the client socket...
+////////////////////////////////////////
+void TNetwork::CloseSocket(const Socket& playersocket) throw() {
 
 #ifdef __LINUX__
 	close(playersocket);
@@ -254,8 +224,7 @@ void TNetwork::ShutdownClient(const Socket& playersocket) throw() {
 	closesocket(playersocket);
 #endif
 
-} // void TNetwork::ShutdownClient(const Socket& playersocket) throw() 
-
+} // void TNetwork::CloseSocket(const Socket& playersocket) throw()
 
 /****************************************************************
 Method: Socket AcceptPlayer(const Socket&)

@@ -39,10 +39,10 @@ namespace TNetwork {
 	// receive Data from the Client (length, data)
 	// if there is data (like after accepting the socket) and the check for new
 	// data should be omitted, check should be set to false
-	std::string ReceiveData(const Socket&, const bool& check=true) throw(texception);
+	std::string ReceiveData(const Socket&) throw(texception);
 
 	// shutdown a client connection...
-	void ShutdownClient(const Socket&) throw();
+	void CloseSocket(const Socket&) throw();
 
 	// accept a connection from a player and return the socket...
 	Socket AcceptPlayer(const Socket&) throw(texception);

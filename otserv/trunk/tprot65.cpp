@@ -53,7 +53,6 @@ namespace Protokoll {
 			passwd += in[i++];
 		} // for (int j=0; j<passlen; j++)
 			
-		cout << passwd  << " " << passwd.length() << endl;
 
 		// seems we have a client v6.5+
 		cout << "6.5 client accountnumber: " << pnum << " pwd: " << passwd 
@@ -69,7 +68,7 @@ namespace Protokoll {
 		temp += "OpenWorld"; temp += '\0'; // world name
 		temp += 0x7f; temp += '\0'; temp += '\0'; temp += 0x01; // ip
 		temp += 0x03;
-		temp[-1]=0x1c;
+		temp += 0x1c;
 
 		temp[0] = (char)temp.length()%256;
 		temp[1] = (char)(temp.length()/256);
@@ -81,7 +80,6 @@ namespace Protokoll {
 	} // TProt65::TProt65(Socket sock, string in) throw(texception) 	
 
 	TProt65::~TProt65() throw() {
-		TNetwork::ShutdownClient(psocket);
 	} // TProt65::~TProt65() 
 
 	const std::string TProt65::getName() const throw() {

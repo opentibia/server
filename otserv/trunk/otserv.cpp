@@ -21,6 +21,6 @@
 extern EventScheduler es;
 
 main() {
-  ServerSocket ss;
+  TNetwork::ServerSocket ss;
   es.loop();
 }
