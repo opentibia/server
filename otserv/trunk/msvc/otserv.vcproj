@@ -239,6 +239,9 @@
 			Name="scripts"
 			Filter="">
 			<File
+				RelativePath="..\data\npc\scripts\bug.lua">
+			</File>
+			<File
 				RelativePath="..\data\npc\scripts\lib\npc.lua">
 			</File>
 			<File

@@ -50,6 +50,10 @@ Npc::Npc(const char *name, Map* map) : Creature(name)
 		p = root->children;
 
 		this->scriptname = (const char*)xmlGetProp(root, (const xmlChar *)"script");
+
+		if ((const char*)xmlGetProp(root, (const xmlChar *)"name")) {
+			this->name = (const char*)xmlGetProp(root, (const xmlChar *)"name");
+		}
 		if ((const char*)xmlGetProp(root, (const xmlChar *)"access")) {
 			access = atoi((const char*)xmlGetProp(root, (const xmlChar *)"access"));
 		}

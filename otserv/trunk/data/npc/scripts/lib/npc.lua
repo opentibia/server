@@ -34,9 +34,14 @@ end
 function moveToCreature(id)
 	tx,ty,tz=creatureGetPosition(id)
 	if tx == nil then
-		following = false
-		target = 0
-		return
+		selfGotoIdle()
 	end
 	moveToPosition(tx, ty, tz)
+end
+
+function selfGotoIdle()
+		following = false
+		attacking = false
+		selfAttackCreature(0)
+		target = 0
 end

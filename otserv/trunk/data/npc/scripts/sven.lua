@@ -42,26 +42,17 @@ function onCreatureSay(cid, type, msg)
 		selfSay('Hello, ' .. creatureGetName(cid) .. '!')
 	end
 	if string.find(msg, '(%a*)follow(%a*)') then
---		if following == true and target ~= cid then
---			-- already following someone else
---		end
---		if following == true and target == cid then
---			-- already following this player
---		end
 		following = true
 		target = cid
-		selfSay('Ok, I will follow you.')
+		selfSay('Ok!')
 	end
 	if string.find(msg, '(%a*)attack(%a*)') then
 		attacking = true
 		target = cid
-		selfSay('Ok, I will attack you.')
+		selfSay('Ok, I will.')
 	end
 	if string.find(msg, '(%a*)stop(%a*)') then
-		following = false
-		attacking = false
-		selfAttackCreature(0)
-		target = 0
+		selfGotoIdle()
 		selfSay('Ok, I will wait here.')
 	end
 end
@@ -79,7 +70,12 @@ function onThink()
 		moveToCreature(target)
 	end
 	if attacking == true then
-		if getDistanceToCreature(target) <= 1 then
+		dist = getDistanceToCreature(target)
+		if dist == nil then
+			selfGotoIdle()
+			return
+		end
+		if dist <= 1 then
 			selfAttackCreature(target)
 		else
 			moveToCreature(target)
