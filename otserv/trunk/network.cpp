@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.10  2002/08/01 14:11:28  shivoc
+// added initial support for 6.9x clients
+//
 // Revision 1.9  2002/05/29 16:07:38  shivoc
 // implemented non-creature display for login
 //
@@ -51,6 +54,7 @@
 
 #  include <cstdlib> // memory management...
 #  include <cstring> // memset
+#include <iostream>
 #endif
 
 

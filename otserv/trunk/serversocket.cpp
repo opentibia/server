@@ -21,6 +21,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.13  2002/08/01 14:11:28  shivoc
+// added initial support for 6.9x clients
+//
 // Revision 1.12  2002/05/29 16:07:38  shivoc
 // implemented non-creature display for login
 //
@@ -163,7 +166,7 @@ namespace TNetwork {
 
     //////////////////////////////////////////////////
     // This class listens on a port to create connections.
-    ServerSocket::ServerSocket(int _port = 7171, int _maxconnections = 100) : newconnection(*this) {
+    ServerSocket::ServerSocket(int _port, int _maxconnections ) : newconnection(*this) {
         maxconnections = _maxconnections;
         connections = 0;
         serversocket = make_socket(SOCK_STREAM, _port);

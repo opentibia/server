@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// implementation of tibia v6.4 protocoll
+// implementation of tibia v6.9+ protocoll
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -20,7 +20,7 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
-// Revision 1.8  2002/08/01 14:11:28  shivoc
+// Revision 1.1  2002/08/01 14:11:28  shivoc
 // added initial support for 6.9x clients
 //
 // Revision 1.7  2002/05/29 16:07:38  shivoc
@@ -32,7 +32,7 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#include "tprot.h"
+#include "tprot69.h"
 #include "network.h"
 #include "eventscheduler.h"
 
@@ -43,7 +43,7 @@ extern EventScheduler es;
 
 namespace Protokoll {
 
-    TProt::TProt(const Socket& sock, const std::string& in) throw(texception) {
+    TProt69::TProt69(const Socket& sock, const std::string& in) throw(texception) {
         // first we save the socket the player connected on...
         psocket = sock;
 
@@ -53,66 +53,51 @@ namespace Protokoll {
         size_t length = (unsigned char)in[0]+((unsigned char)in[1])*256;
         if (length+2 > in.length()) throw texception("wrong protokoll!",false);
 
-        // the message should the contain 0x00 0x00
+        // the message should then contain 0x0a 0x02
+        // seems to be the new packet id
         int i=2;
-        if (in[i++]!= 0) throw texception("wrong protokoll!",false);
-        if (in[i++]!= 0) throw texception("wrong protokoll!",false);
+        if (in[i++]!= 0x0a) throw texception("wrong protokoll!",false);
+        if (in[i++]!= 0x02) throw texception("wrong protokoll!",false);
 
-        // next we encounter the selection of journey onward/new game...
-        // since new game is only in very old clients and journey onward is in
-        // both new and old client versions set...
-        // we don't support new game in this version...
-        // new players should be generated in another way...
-        if (in[i++] != 0x01 || length != 67 || in.length() != 69) 
-            throw texception("wrong protokoll!", false);
-
-        // so everything looks still ok...
-        // next we have the client os...
-        // 0x00 -> linux, 0x01 -> windows
-        clientos = in[i++];
-        if (clientos != 0x00 && clientos != 0x01) 
-            throw texception("wrong protokoll!",false);
-
-        // 0x00 should follow
+        // 0x00 should follow... maybe that's the new os pos?
         if (in[i++] != 0) throw texception("wrong protokoll!",false);
 
         // then the version should follow...
-        version = (unsigned char)in[i++];
+        version = (unsigned char)in[i++] + (unsigned char)in[i++]*0x100;
 
-        // and an unknown byte (0x02?)
-        if (in[i++] != 0x02) throw texception("wrong protokoll!",false);
+        // 0x00 should follow separation to char data?
+        if (in[i++] != 0) throw texception("wrong protokoll!",false);
+
+        // length of the name
+        int len = (unsigned char)in[i++]+((unsigned char)in[i++])*0x100;
 
         // now the name should follow...
-        for (;in[i]!='\0' && i < 39; i++)
-            name += in[i];
+        for (int j=0;j<len; j++) 
+            name += in[i++];
+        name += '\0';
 
-        if (in[i] != '\0' || name == "") 
-            throw texception("wrong protokoll!",false);
-
+        len = (unsigned char)in[i++]+((unsigned char)in[i++])*0x100;
         // and then the password...
-        for (i=39; in[i]!='\0' && i < 69; i++)
-            passwd += in[i];
+        for (int j=0;j<len; j++) 
+            passwd += in[i++];
+        passwd += '\0';
 
-        if (in[i] != '\0') 
-            throw texception("wrong protokoll!",false);
-
-            std::cout << "found tprot64!\n"; 
-
+        std::cout << "found tprot69!\n"; 
     } // TProt::TProt(Socket sock, string in) throw(texception) 	
 
-    TProt::~TProt() throw() {
+    TProt69::~TProt69() throw() {
         //TNetwork::ShutdownClient(psocket);
     } // TProt::~TProt() 
 
-    const std::string TProt::getName() const throw() {
+    const std::string TProt69::getName() const throw() {
         return name;
     }
 
-    const std::string TProt::getPassword() const throw() {
+    const std::string TProt69::getPassword() const throw() {
         return passwd;
     }
 
-    void TProt::clread(const Socket& sock) throw() {
+    void TProt69::clread(const Socket& sock) throw() {
         static const int MAXMSG = 4096;
         char buffer[MAXMSG];
 
@@ -131,7 +116,7 @@ namespace Protokoll {
         }
     }
 
-    void TProt::setMap(position newpos, Map& newmap) throw(texception) {
+    void TProt69::setMap(position newpos, Map& newmap) throw(texception) {
         // first we save the new map position...
         pos = newpos;
         map = &newmap;
@@ -139,9 +124,8 @@ namespace Protokoll {
         // now we generate he data to send the player for the map
         std::string buf="  "; // first two bytes are packet length
 
-        // packet id, 01 = login? or new map?
-        buf += (char)0x01;
-        buf += (char)0x00;
+        // packet id, 0a = login? or new map?
+        buf += (char)0x0A;
 
         // now get the playernumber
         buf += (char)(player->pnum%256);
@@ -151,6 +135,9 @@ namespace Protokoll {
         
         buf += (char)0x0A;
         buf += (char)0x00;
+
+        // 0x64 unknown
+        buf += 0x64;
 
         // map position
         buf += (char)(pos.x%256);
@@ -166,18 +153,40 @@ namespace Protokoll {
         std::cout << buf2.size() << "\t";
         std::cout << buf.size() << "\t";
         buf += buf2;
+        for (int j=0; j<10; j++) buf += (char)0xFF;
+        buf += (char)0xe4;
+        buf += (char)0xff;
+        buf += 0x83;
+
+        buf += (char)(pos.x%256);
+        buf += (char)(pos.x/256)%256;
+        buf += (char)(pos.y%256);
+        buf += (char)(pos.y/256)%256;
+        buf += (char)pos.z;
+
+        buf += (char)0x0a;
+        buf += (char)0xa0;
+        buf += (char)0xdb;
+        buf += (char)0x01;
+        buf += (char)0xdb;
+        buf += (char)0x01;
+        buf += (char)0x1a;
+        buf += (char)0x04;
+        buf += (char)0x94;
+        buf += (char)0x00;
+
         std::cout << buf.size() <<std::endl;
         // now we correct the first two bytes which corespond to the length
         // of the packet
-        buf[0]=(char)buf.size()%256;
-        buf[1]=(char)(buf.size()/256)%256;
+        buf[0]=(char)(buf.size()-2)%256;
+        buf[1]=(char)((buf.size()-2)/256)%256;
 
         // and send to client...
         TNetwork::SendData(psocket,buf);
 
     } // void TProt::setMap(position newpos) throw(texception)
 
-    std::string TProt::makeMap(const position topleft, const position botright) {
+    std::string TProt69::makeMap(const position topleft, const position botright) {
         std::string buf;
         Tile* tile;
 
@@ -193,8 +202,9 @@ namespace Protokoll {
                     buf+=(char)(*it)->getID()%256;
                     buf+=(char)((*it)->getID()/256)%256;
                 }
-                if (i!=botright.x || j != botright.y) buf += (char)0xFF; // tile end
-                else buf += (char)0xFE;
+                if (i!=botright.x || j != botright.y) buf += (char)0x00; // tile end
+                else buf += (char)0xff; // map end
+                buf += (char)0xFF;
             } // for (int j=topleft.y; i<=botright.y; i++) 
         }
 

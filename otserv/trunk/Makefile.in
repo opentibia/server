@@ -12,7 +12,7 @@ items.cpp tmap.cpp \
 file.cpp tools.cpp \
 protokoll.cpp tprot.cpp tprot65.cpp \
 network.cpp otserv.cpp serversocket.cpp \
-eventscheduler.cpp
+eventscheduler.cpp tprot69.cpp
 
 ADDFILES = config.log config.status configure Makefile Makefile.bak
 

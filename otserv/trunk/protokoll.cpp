@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.9  2002/08/01 14:11:28  shivoc
+// added initial support for 6.9x clients
+//
 // Revision 1.8  2002/05/29 16:07:38  shivoc
 // implemented non-creature display for login
 //
@@ -32,7 +35,9 @@
 #include "protokoll.h"
 #include "tprot.h"	// client <= 6.4 and 6.5+ clients after redirect
 #include "tprot65.h" // v6.5+ clients
+#include "tprot69.h" // 6.9+ clients
 #include "network.h"
+#include <iostream>
 
 namespace Protokoll {
 
@@ -46,6 +51,13 @@ namespace Protokoll {
 
         // we try to read from our socket...
         std::string buf=TNetwork::ReceiveData(psocket);
+
+#if 0
+        FILE* log = fopen("client","w");
+        fwrite(buf.c_str(), buf.length(), 1, log);
+        fclose(log);
+        std::cout << "wrote logfile client" << std::endl;
+#endif
 
         // now we need to find out the protokoll...
         try {
@@ -66,6 +78,21 @@ namespace Protokoll {
             // exception, else there will be one and we need to check the next
             // protokoll...
             prot = new TProt(psocket, buf);
+            return;
+        }
+        catch (texception e) {
+            // so it's not the tibia protokoll...
+            if (e.isCritical()) {
+                throw;
+            } // if (e.isCritical()) 
+        }
+
+        try {
+            // if the protokoll is the tibia protokoll for 6.9+ clients 
+            // there will be no
+            // exception, else there will be one and we need to check the next
+            // protokoll...
+            prot = new TProt69(psocket, buf);
             return;
         }
         catch (texception e) {

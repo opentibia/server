@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// implemetation of redirect for 6.5+ clients
+// The protocoll for the second part of clients version 6.9+
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -20,36 +20,30 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
-// Revision 1.6  2002/08/01 14:11:28  shivoc
+// Revision 1.1  2002/08/01 14:11:28  shivoc
 // added initial support for 6.9x clients
-//
-// Revision 1.5  2002/05/29 16:07:38  shivoc
-// implemented non-creature display for login
-//
-// Revision 1.4  2002/05/28 13:55:57  shivoc
-// some minor changes
 //
 //
 //////////////////////////////////////////////////////////////////////
 
-#ifndef tprot65_h
-#define tprot65_h
+#ifndef tprot69_h
+#define tprot69_h
 
 #include "protokoll.h"
 #include "texcept.h"
 #include <string>
 
 namespace Protokoll {
-    class TProt65 : public Protokoll {
+    class TProt69 : public Protokoll {
 
         public:
 
             // our constructor get's the socket of the client and the initial
             // message the client sent
-            TProt65(const Socket&, const std::string&) throw(texception);
+            TProt69(const Socket&, const std::string&) throw(texception);
 
             // set the map and update the client screen
-            void setMap(position, Map&) throw(texception) {}
+            void setMap(position, Map&) throw(texception);
 
             // virtual methods form out base class...
             const std::string getName() const throw();
@@ -58,21 +52,26 @@ namespace Protokoll {
             void clread(const Socket& sock) throw();
 
             // our destructor to clean up the mess we made...
-            ~TProt65() throw();
+            ~TProt69() throw();
 
         private:
+
+            // translate a map area to clientreadable format
+            // uses the map the client is on
+            std::string makeMap(const position topleft, 
+                    const position botright);
 
             // the socket the player is on...
             Socket psocket;
             // the os of the client...
             unsigned char clientos;
             // version of the client
-            unsigned int version;
+            unsigned char version;
             // name and passwd
             std::string name, passwd;
-
-            // redirect the client...
-            void redirect(int ip, int port);
+            // the position on the map...
+            position pos;
+            Map* map;
 
     }; // class TProt : public Protokoll  
 

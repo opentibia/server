@@ -21,6 +21,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.4  2002/08/01 14:11:28  shivoc
+// added initial support for 6.9x clients
+//
 // Revision 1.3  2002/05/28 13:55:56  shivoc
 // some minor changes
 //
@@ -141,7 +144,7 @@ TextFile& TextFile::operator=(const TextFile& _file) {
 // (memory for _A will automatically be allocated)
 // Return: the number of read lines
 // Parameter: use _delim as line separator
-int TextFile::splitlines(char ** &_A, char _delim = '\n') {
+int TextFile::splitlines(char ** &_A, char _delim) {
     int lines = 1;
     int i = 0;
     for (; i < getsize(); i++) {   // Zeilen zählen

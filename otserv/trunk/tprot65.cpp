@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.8  2002/08/01 14:11:28  shivoc
+// added initial support for 6.9x clients
+//
 // Revision 1.7  2002/05/29 16:07:38  shivoc
 // implemented non-creature display for login
 //
@@ -65,8 +68,8 @@ extern EventScheduler es;
             throw texception("wrong protokoll!",false);
         }
 #endif
-        i++;
-        if (in[i++]!= 0x02) {
+        version = (unsigned char)in[i++] + 0x100 * (unsigned char)in[i++];
+        if (version < 641) {
             std::cout << "clientversion error? (2)" << std::endl;
             throw texception("wrong protokoll!",false);
         }
@@ -96,8 +99,9 @@ extern EventScheduler es;
             << std::endl;
 
         // redirect to 127.0.0.1
-        redirect(127*0x1000000+1,7171);
+        redirect(127*0x1000000+0*0x10000+0*0x100+1,7171);
 
+        std::cout << "version: " << version << std::endl;
         throw texception("Protokoll 6.5+ redirected...", true);
 
     } // TProt65::TProt65(Socket sock, string in) throw(texception) 	
@@ -139,10 +143,16 @@ extern EventScheduler es;
         std::string temp= "..";
         temp += 0x64;
         temp += 0x01; // number of chars
-        temp += 0x05; temp += '\0'; // length of name
-        temp += "Hurz"; temp += '\0'; // name
-        temp += 0x0A; temp += '\0'; // length of world name
-        temp += "OpenWorld"; temp += '\0'; // world name
+        if (version < 690) temp += 0x05;
+        else temp += 0x04; 
+        temp += '\0'; // length of name
+        temp += "Hurz"; // name
+        if (version < 690) temp += '\0';
+        if (version < 690) temp += 0x0A;
+        else temp += 0x09; 
+        temp += '\0'; // length of world name
+        temp += "OpenWorld"; // world name
+        if (version < 690) temp += '\0'; // name
         // ip
         temp += (ip/0x1000000)%0x100;
         temp += (ip / 0x10000)%0x100;
@@ -152,7 +162,8 @@ extern EventScheduler es;
         temp += port%0x100;
         temp += (port/0x100)%0x100;
 
-        temp[0] = (char)temp.length()%0x100;
+        if (version >= 690) temp[0] = (char)temp.length()%0x100-2;
+        else temp[0] = (char)temp.length()%0x100;
         temp[1] = (char)(temp.length()/0x100);
 
         TNetwork::SendData(psocket, temp);

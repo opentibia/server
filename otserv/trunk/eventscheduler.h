@@ -21,6 +21,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.9  2002/08/01 14:11:28  shivoc
+// added initial support for 6.9x clients
+//
 // Revision 1.8  2002/05/28 13:55:56  shivoc
 // some minor changes
 //
@@ -35,7 +38,8 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#include <hash_map>
+#include <ext/hash_map>
+using namespace __gnu_cxx;
 
 #include "definitions.h"
 #include "network.h"
@@ -46,7 +50,7 @@ struct eqfd {
     }
 };
 
-typedef std::hash_map<Socket, unary_functor<Socket,void> *, std::hash<Socket>, eqfd> fdcbhash;
+typedef hash_map<Socket, unary_functor<Socket,void> *, hash<Socket>, eqfd> fdcbhash;
 
 // EventListener ?
 class EventScheduler {
