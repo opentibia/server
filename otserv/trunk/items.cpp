@@ -103,7 +103,6 @@ int Items::loadFromDat(std::string file)
 #endif
 		// read the options until we find a 0xff
 		int optbyte;
-		int opt2;
 		while (((optbyte = fgetc(f)) >= 0) &&   // no error
 				   (optbyte != 0xFF))			    // end of options
 		{
@@ -120,19 +119,12 @@ int Items::loadFromDat(std::string file)
 #endif
 			switch (optbyte)
 			{
-	   			case 0x00:
-		   			//is groundtile	   				
-					iType->groundtile = true;
-		   			fseek(f, 2, SEEK_CUR);
-		   			break;
+	   		case 0x00:
+		   		//is groundtile	   				
+    			iType->groundtile = true;
+		   		fseek(f, 2, SEEK_CUR);
+		   		break;
   
-				case 0x02:
-					//is on top
-					iType->alwaysOnTop=true;
-					// ignore next byte
-					fseek(f,1,SEEK_CUR);
-					break;
-
 				case 0x03:
 					//is a container
 					iType->iscontainer=true;
@@ -154,8 +146,8 @@ int Items::loadFromDat(std::string file)
 					break;
 				
 				case 0x0C:
-          // cant be moved
-          iType->notMoveable=true;
+					//is on top
+					iType->alwaysOnTop=true;
 					break;
 	
 				case 0x0F:
@@ -167,18 +159,20 @@ int Items::loadFromDat(std::string file)
 					//makes light (skip 4 bytes)
 		   			fseek(f, 4, SEEK_CUR);
 					break;
-				case 0x14: // dunno
-				case 0x12:
-				case 0x11:
-				case 0x0e:
+
 				case 0x01:
-				case 0x06:
-				case 0x18:
-				case 0x19:
-				case 0x09: // item can contain fluids (needs a 3rd byte stating
-							  // which fluid on 7.3... perhaps the same here?
-				case 0x0A: // item has a color (colored bp) in 7.3
-					break;
+        case 0x02:
+        case 0x06:
+        case 0x09:
+        case 0x0A:
+        case 0x0D:
+        case 0x0E:
+        case 0x11:
+        case 0x12:
+        case 0x18:
+        case 0x19:
+				case 0x14: // up?
+          break;
 
 				case 0x07:
 				case 0x08:
@@ -188,14 +182,6 @@ int Items::loadFromDat(std::string file)
 					// unknown, but skip 2 bytes to follow the "ordered option" idea
 		   			fseek(f, 2, SEEK_CUR);
 		   			break;
-				case 0x0D: // anyone has an idea what this means??
-						// get the next byte...
-						opt2 = fgetc(f);
-						if (opt2 >= 0x16)
-								  fseek(f, 2, SEEK_CUR);
-						if (opt2 == 0x10)
-								  fseek(f, 4, SEEK_CUR);
-						break;
 				default:
 						std::cout << "unknown byte: " << (unsigned short)optbyte << std::endl;
 			}
