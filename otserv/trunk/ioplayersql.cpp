@@ -60,8 +60,9 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 	try{
 		mysqlpp::Query query = con.query();
 		query << "SELECT * FROM players WHERE name ='" << name << "'";
+#ifdef __DEBUG__
 		std::cout << query.preview() << std::endl;
-		
+#endif		
 		res = query.store();
 	}
 	catch(mysqlpp::BadQuery e){
@@ -148,8 +149,9 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 	try{
 		mysqlpp::Query query = con.query();
 		query << "SELECT * FROM skills WHERE player ='" << player->getID() << "'";
+#ifdef __DEBUG__
 		std::cout << query.preview() << std::endl;
-		
+#endif		
 		res = query.store();
 	}
 	catch(mysqlpp::BadQuery e){
@@ -169,8 +171,9 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 	try{
 		mysqlpp::Query query = con.query();
 		query << "SELECT * FROM items WHERE player ='" << player->getID() << "'";
+#ifdef __DEBUG__
 		std::cout << query.preview() << std::endl;
-		
+#endif
 		res = query.store();
 	}
 	catch(mysqlpp::BadQuery e){
@@ -258,14 +261,18 @@ bool IOPlayerSQL::savePlayer(Player* player){
 	query << "`food` = " << player->food << ", ";
 	query << "`sex` = " << player->sex << " ";
 	query << " WHERE `id` = "<< player->getID() <<" LIMIT 1";
+#ifdef __DEBUG__
 	std::cout << query.preview() << std::endl;
+#endif
 	query.execute();
 
 
 	//then we write the individual skills
 	query.reset();
 	query << "DELETE FROM skills WHERE player="<< player->getID();
+#ifdef __DEBUG__
 	std::cout << query.preview() << std::endl;
+#endif
 	query.execute();
 
 	query.reset();
@@ -275,13 +282,17 @@ bool IOPlayerSQL::savePlayer(Player* player){
 		if(i!=6)
 			query<<",";
 	}
+#ifdef __DEBUG__
 	std::cout << query.preview() << std::endl;
+#endif
 	query.execute();
 
 	//now item saving
 	query.reset();
 	query << "DELETE FROM items WHERE player="<< player->getID();
+#ifdef __DEBUG__
 	std::cout << query.preview() << std::endl;
+#endif
 	query.execute();
 	query.reset();
 	std::string itemsstring;
@@ -294,14 +305,18 @@ bool IOPlayerSQL::savePlayer(Player* player){
 	if(itemsstring.length()){
 		itemsstring.erase(itemsstring.length()-1);
 		query << itemsstring;
+#ifdef __DEBUG__
 		std::cout << query.preview() << std::endl;
+#endif
 		query.execute();
 	}
 
 	//End the transaction
 	query.reset();
 	query << "COMMIT;";
+#ifdef __DEBUG__
 	std::cout << query.preview() << std::endl;
+#endif
 	query.execute();
 
 	return true;
