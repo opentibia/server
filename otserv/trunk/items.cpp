@@ -127,7 +127,6 @@ int Items::loadFromDat(std::string file)
 		   		//is groundtile	   				
     			iType->groundtile = true;
     			if((int)fgetc(f)==0) {
-                  std::cout << iType->id << " - " << ""<< std::endl;;
                   iType->blocking=true;
                   }    
     			fgetc(f);
