@@ -71,6 +71,35 @@ Player::Player(const char *name, Protocol *p) : Creature(name)
 		items[i] = NULL;
 
   useCount = 0;
+  
+  
+  CapGain[0]  = 10;     //for level advances
+  CapGain[1]  = 10;     //e.g. Sorcerers will get 10 Cap with each level up
+  CapGain[2]  = 10;     
+  CapGain[3]  = 20;
+  CapGain[4]  = 25;
+  
+  ManaGain[0] = 5;      //for level advances
+  ManaGain[1] = 30;
+  ManaGain[2] = 30;
+  ManaGain[3] = 15;
+  ManaGain[4] = 5;
+  
+  
+  HPGain[0]   = 5;      //for level advances
+  HPGain[1]   = 5;
+  HPGain[2]   = 5;
+  HPGain[3]   = 10;
+  HPGain[4]   = 15;
+  
+  
+  
+  ManaMultiplier[0] = 0; //for Magic level advances
+  ManaMultiplier[1] = 1.1;
+  ManaMultiplier[2] = 1.1;
+  ManaMultiplier[3] = 1.4;
+  ManaMultiplier[4] = 3;
+  
 } 
 
 
@@ -191,9 +220,35 @@ int Player::addItem(Item* item, int pos){
 	return true;
 }
 
+float Player::getSkillMultiplier(int voc_c, int skill_c) {
+      float SkillMultipliers[7][5] = {
+                             {1.5, 1.5, 1.5, 1.2, 1.1},     // Fist   //for level advances
+                             {2, 2, 1.8, 1.2, 1.1},         // Club
+                             {2, 2, 1.8, 1.2, 1.1},         // Sword
+                             {2, 2, 1.8, 1.2, 1.1},         // Axe
+                             {2, 2, 1.8, 1.4, 1.1},         // Distance
+                             {1.5, 1.5, 1.5, 1.1, 1.1},     // Shielding
+                             {1.1, 1.1, 1.1, 1.1, 1.1}      // Fishing
+      };
+      
+      return SkillMultipliers[skill_c][voc_c];
+}
+
+unsigned int Player::getSkillBase (int skill_c) {
+    unsigned short int SkillBases[7] = { 50, 50, 50, 50, 30, 100, 20 };       // follows the order of enum skills_t, for level advances
+    return SkillBases[skill_c];
+}
+
+unsigned int Player::getReqSkilltries (int skill, int level, int voc) {
+    return (int) ( getSkillBase(skill) * pow((float) getSkillMultiplier(skill, voc), (float) ( level - 9) ) );
+}
+
 void Player::addSkillTry(int skilltry)
 {
 int skill;
+
+
+
 std::string skillname;
 for (int slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++)
     if (items[slot])
@@ -213,21 +268,16 @@ for (int slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++)
 
 skills[skill][SKILL_TRIES] += skilltry;
 
-int oldSkill = skills[skill][SKILL_LEVEL];
-int tries = skills[skill][SKILL_TRIES];
+//for skill level advances
+//int reqTries = (int) ( SkillBases[skill] * pow((float) VocMultipliers[skill][voc], (float) ( skills[skill][SKILL_LEVEL] - 10) ) );
 
-int checkSkill = oldSkill+1;
-int reqTries = 50;
-for(int i = 10;i<=checkSkill;i++){
-        if(i == 11)
-        reqTries = 50;
-        else
-        reqTries = (int)(reqTries*1.1);
-}
+//for debug
+//cout << Creature::getName() << ", has the vocation: " << voc << " and is training his " << skillname << "\n";
+
 //Need skill up?
-if (tries >= reqTries)
+if (skills[skill][SKILL_TRIES] >= getReqSkilltries (skill, (skills[skill][SKILL_LEVEL] + 1), voc))
 {
-   skills[skill][SKILL_LEVEL] = checkSkill;
+   skills[skill][SKILL_LEVEL]++;
    skills[skill][SKILL_TRIES] = 0;
 
    NetworkMessage msg;
@@ -426,14 +476,16 @@ void Player::savePlayer(std::string &name)
        int expLoss = (int)(experience*0.05);
        experience -= expLoss;
        
+       //Player died?
 	   int reqExp =  getExpForLv(level);
 	   if (experience < reqExp)
 		    {                     
             level -= 1;
-            healthmax -= 5;
-            health -= 5;
-            manamax -= 5;
-            mana -= 5;            
+            healthmax -= HPGain[voc];
+            health -= HPGain[voc];
+            manamax -= ManaGain[voc];
+            mana -= ManaGain[voc];
+            cap -= CapGain[voc];            
             }
        }
        
@@ -472,9 +524,9 @@ void Player::savePlayer(std::string &name)
 	xmlAddChild(root, pn);
 	
 	pn = xmlNewNode(NULL,(const xmlChar*)"mana");
-	sb << mana;     xmlSetProp(pn, (const xmlChar*) "now", (const xmlChar*)sb.str().c_str());        sb.str("");
-	sb << manamax;  xmlSetProp(pn, (const xmlChar*) "max", (const xmlChar*)sb.str().c_str());        sb.str("");
-    	               xmlSetProp(pn, (const xmlChar*) "spent", (const xmlChar*)"0");
+	sb << mana;      xmlSetProp(pn, (const xmlChar*) "now", (const xmlChar*)sb.str().c_str());        sb.str("");
+	sb << manamax;   xmlSetProp(pn, (const xmlChar*) "max", (const xmlChar*)sb.str().c_str());        sb.str("");
+    sb << manaspent; xmlSetProp(pn, (const xmlChar*) "spent", (const xmlChar*)sb.str().c_str());      sb.str("");
 	xmlAddChild(root, pn);
     	               
 	pn = xmlNewNode(NULL,(const xmlChar*)"look");

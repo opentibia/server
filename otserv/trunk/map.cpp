@@ -1253,6 +1253,12 @@ bool Map::creatureMakeMagic(Creature *creature, const MagicEffectClass* me)
 				}
 				else
 					player->mana -= magicInstant->manaCost;
+					
+					//for debug only:
+					//cout << player->getName() << " casted a spell that costed " << magicInstant->manaCost << " mana.\n";
+					
+					//for magic level advances
+					player->manaspent += magicInstant->manaCost;
 			}
 		}
 	}
@@ -1899,7 +1905,7 @@ void Map::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fig
 		addEvent(makeTask(decayTime*1000, std::bind2nd(std::mem_fun(&Map::decaySplash), targettile->splash)));
 	}
    if(player && (damage > 0 || manaDamage >0)){
-        player->addSkillTry(2);
+        player->addSkillTry(1);
         }
    else if(player)
    player->addSkillTry(1);
@@ -2052,10 +2058,11 @@ void Map::checkPlayer(unsigned long id)
           int lastLv = player->level;
 
           player->level += 1;
-          player->healthmax = player->healthmax+5;
-          player->health = player->health+5;
-          player->manamax = player->manamax+5;
-          player->mana = player->mana+5;
+          player->healthmax = player->healthmax+player->HPGain[player->voc];
+          player->health = player->health+player->HPGain[player->voc];
+          player->manamax = player->manamax+player->ManaGain[player->voc];
+          player->mana = player->mana+player->ManaGain[player->voc];
+          player->cap = player->cap+player->CapGain[player->voc];
           player->setNormalSpeed();
           changeSpeed(player->getID(), player->getSpeed());
           std::stringstream lvMsg;
@@ -2065,6 +2072,27 @@ void Map::checkPlayer(unsigned long id)
 		 
 		 msg.AddPlayerStats(player);
 		 player->sendNetworkMessage(&msg);
+
+
+         //Magic Level Advance
+         unsigned long int reqMana = (unsigned long int) ( 400 * pow(player->ManaMultiplier[player->voc], player->maglevel) );       //will calculate mana for _NEXT_ magic level
+
+         if (reqMana % 20 < 10)
+              reqMana = reqMana - (reqMana % 20);
+         else reqMana = reqMana - (reqMana % 20) + 20;
+
+
+         if (player->manaspent >= reqMana) {
+            player->manaspent -= reqMana;
+            player->maglevel++;
+            
+            std::stringstream MaglvMsg;
+            MaglvMsg << "You advanced from magic level " << (player->maglevel - 1) << " to magic level " << player->maglevel << ".";
+            msg.AddTextMessage(MSG_ADVANCE, MaglvMsg.str().c_str());
+            player->sendNetworkMessage(&msg);
+         }
+         //End Magic Level Advance
+
 
 		 if(player->inFightTicks >= 1000) {
 			player->inFightTicks -= 1000;
@@ -2286,6 +2314,14 @@ void Map::CreateDamageUpdate(Creature* creature, Creature* attackCreature, int d
                 std::stringstream lvMsg;
                 lvMsg << "You were downgraded from level " << player->level << " to level " << player->level-1 << ".";
                 msg.AddTextMessage(MSG_ADVANCE, lvMsg.str().c_str());
+                
+                
+                /* Magic Level downgrade
+                for (int i = 0, i <= player->level, i++) {
+                    //
+                }
+                
+                End Magic Level downgrade*/
                 }
             }
 }

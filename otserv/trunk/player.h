@@ -27,7 +27,6 @@
 
 class Protocol;
 
-
 enum slots_t {
 	SLOT_WHEREEVER=0,
 	SLOT_HEAD=1,
@@ -92,6 +91,19 @@ public:
   int accountNumber;
   
   int skills[7][2];
+  
+  //reminder: 0 = None, 1 = Sorcerer, 2 = Druid, 3 = Paladin, 4 = Knight
+  unsigned short CapGain[5];          //for level advances
+  unsigned short ManaGain[5];
+  unsigned short HPGain[5];
+  
+  float ManaMultiplier[5];            //for Maglevel advances
+  
+  //for skill advances
+  float getSkillMultiplier(int voc_c, int skill_c);
+  unsigned int getSkillBase (int skill_c);
+  unsigned int getReqSkilltries (int skill, int level, int voc);
+  
 
   //items
   Item* items[11]; //equipement of the player
