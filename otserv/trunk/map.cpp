@@ -927,7 +927,7 @@ void Map::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fig
 			}
 		}
 	}
-
+if(damage>0){
   if (!targettile->splash)
   {
     Item *item = new Item(1437, 2);
@@ -937,7 +937,7 @@ void Map::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fig
   unsigned short decayTime = Item::items[1437].decayTime;
   targettile->decaySplashAfter = OTSYS_TIME() + decayTime*1000;
   addEvent(makeTask(decayTime*1000, std::bind2nd(std::mem_fun(&Map::decaySplash), targettile->splash)));
-
+}
 	if (attackedCreature->health <= 0) {
 		targettile->removeThing(attackedCreature);
 		playersOnline.erase(playersOnline.find(attackedCreature->getID()));
