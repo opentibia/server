@@ -639,7 +639,7 @@ void Map::thingMoveInternal(Creature *player,
 
   if (thing)
   {
-    if (player->access == 0 && thing->isPlayer() && ((Player*)thing)->access != 0)
+    if (player->access == 0 && thing->isCreature() && ((Creature*)thing)->access != 0)
     {
       player->sendCancel("Better dont touch him...");
       return;
@@ -873,6 +873,20 @@ void Map::creatureBroadcastMessage(Creature *creature, const std::string &text)
 
 void Map::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fight_t damagetype){
 
+	Tile* targettile = getTile(attackedCreature->pos.x, attackedCreature->pos.y, attackedCreature->pos.z);
+
+        if (creature->access == 0 && targettile->isPz())
+        {
+          if (creature->isPlayer())
+          {
+            Player* player = (Player*)creature;
+	          NetworkMessage msg;
+            msg.AddTextMessage(MSG_STATUS, "You may not attack a person in a protection zone.");
+            player->sendNetworkMessage(&msg);
+          }
+	  return;
+        }
+
 	NetworkMessage msg;
 	//can the attacker reach the attacked?
 	bool inReach = false;
@@ -909,7 +923,6 @@ void Map::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fig
 	if (damage > 0)
 		attackedCreature->drainHealth(damage);
 	CreatureVector::iterator cit;
-	Tile* targettile = getTile(attackedCreature->pos.x, attackedCreature->pos.y, attackedCreature->pos.z);
 	for (int x = min(creature->pos.x, attackedCreature->pos.x) - 9; x <= max(creature->pos.x, attackedCreature->pos.x) + 9; x++)
 	{	
 		for (int y = min(creature->pos.y, attackedCreature->pos.y) - 7; y <= max(creature->pos.y, attackedCreature->pos.y) + 7; y++)
@@ -1024,7 +1037,7 @@ void Map::checkPlayerAttacking(unsigned long id)
       if (attackedCreature)
       {
 	      Tile* fromtile = getTile(creature->pos.x, creature->pos.y, creature->pos.z);
-        if (!attackedCreature->isAttackable() == 0 && fromtile->isPz())
+        if (!attackedCreature->isAttackable() == 0 && fromtile->isPz() && creature->access == 0)
         {
           if (creature->isPlayer())
           {
@@ -1129,7 +1142,7 @@ void Map::makeCastSpell(Creature *player, int mana, int mindamage, int maxdamage
 					if(area[y][x] == ch) {
 						damagedcreature.first  = (*cit)->getID();
 
-						if(((!tile->isPz() || maxdamage < 0) || player->access != 0) && (*cit)->access == 0) {
+						if(((!tile->isPz() || maxdamage < 0) || player->access != 0) && (*cit)->access == 0 || maxdamage < 0) {
 							int damage = random_range(mindamage, maxdamage);
 
 							if (damage > 0) {
