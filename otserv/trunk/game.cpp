@@ -327,8 +327,7 @@ void Game::thingMoveInternal(Creature *player,
 
 		fromContainer = p->getContainer(from_id);
 
-		if(!(fromContainer && toContainer) /*|| !(fromContainer->isContainer() && toContainer->isContainer())*/ || 
-			from_z >= fromContainer->getContainerItemCount())
+		if(!(fromContainer && toContainer) || from_z >= fromContainer->getContainerItemCount())
 			return;
 
 		Item* item = fromContainer->getItem(from_z);
@@ -1129,12 +1128,14 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 				mapstate.removeThing(targettile, target);
 
 				playersOnline.erase(playersOnline.find(target->getID()));
-							NetworkMessage msg;
-							creature->experience += (int)(target->experience * 0.1);
-							if(player){
-												msg.AddPlayerStats(player);           
-									player->sendNetworkMessage(&msg);
-							}
+							
+				if(player){
+					player->experience += (int)(target->experience * 0.1);
+
+					NetworkMessage msg;
+					msg.AddPlayerStats(player);           
+					player->sendNetworkMessage(&msg);
+				}
 	            
 				//Add body
 				Item *corpseitem = Item::CreateItem(target->lookcorpse);
