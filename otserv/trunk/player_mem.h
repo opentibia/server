@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.15  2004/11/14 09:16:54  shivoc
+// some fixes to at least reenable login without segfaulting the server (including some merges from haktivex' server
+//
 // Revision 1.14  2003/11/05 23:28:24  tliffrag
 // Addex XML for players, outfits working
 //
@@ -91,6 +94,7 @@ class player_mem : public ::Memory {
         std::string name, passwd;
 	    int lookhead, lookbody, looklegs, lookfeet, looktype;
 	    int lookdir;
+		 int access;
 		int sex, voc;
 	    position pos;
 	    //items

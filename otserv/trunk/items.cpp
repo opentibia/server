@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.8  2004/11/14 09:16:53  shivoc
+// some fixes to at least reenable login without segfaulting the server (including some merges from haktivex' server
+//
 // Revision 1.7  2003/11/01 15:58:52  tliffrag
 // Added XML for players and map
 //
@@ -72,8 +75,15 @@ ItemType::~ItemType() {
 }
 
 Items::Items() {
-    // add a few items
-	loadFromDat("tibia.dat");
+		  std::cout << "Loading items... ";
+		  // add a few items
+		  int a;
+		  if (loadFromDat("Tibia.dat") != 0) {
+					 std::cout << "failed!" << std::endl;
+					 std::cout << "make sure you have a valid Tibia.dat from tibia 7.1" << std::endl;
+					 exit(1);
+		  }
+		  std::cout << a << " done." << std::endl;
 }
 
 int Items::loadFromDat(std::string file){
@@ -156,7 +166,7 @@ int Items::loadFromDat(std::string file){
 		items[id]=iType;
 
 	}
-	return true;
+	return 0;
 }
 
 std::string Items::readDatEntryHeader(FILE* f){

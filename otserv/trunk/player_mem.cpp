@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.17  2004/11/14 09:16:54  shivoc
+// some fixes to at least reenable login without segfaulting the server (including some merges from haktivex' server
+//
 // Revision 1.16  2003/11/05 23:28:24  tliffrag
 // Addex XML for players, outfits working
 //
@@ -326,7 +329,9 @@ int player_mem::loadXml(){
 	sex=atoi((const char*)xmlGetProp(root, (const xmlChar *) "sex"));
 	lookdir=atoi((const char*)xmlGetProp(root, (const xmlChar *) "lookdir"));
 	experience=atoi((const char*)xmlGetProp(root, (const xmlChar *) "exp"));
+	level=atoi((const char*)xmlGetProp(root, (const xmlChar *) "level"));
 	voc=atoi((const char*)xmlGetProp(root, (const xmlChar *) "voc"));
+	access=atoi((const char*)xmlGetProp(root, (const xmlChar *) "access"));
 	while(p){
 		std::string str=(char*)p->name;
 		if(str=="mana"){
@@ -363,7 +368,7 @@ int player_mem::loadXml(){
 			while(slot){
 				int sl_id=atoi((const char*)xmlGetProp(slot, (const xmlChar *) "slotid"));
 				Item* myitem=new Item();
-				myitem->unserialize(slot->children);
+				//myitem->unserialize(slot->children);
 				items[sl_id]=myitem;
 				slot=slot->next;
 			}
@@ -372,6 +377,15 @@ int player_mem::loadXml(){
 	}
 	std::cout << "loaded " << filename << std::endl;
 	xmlFreeDoc(doc);
+
+	if(access==3)
+	{
+			  lookhead=75;
+			  lookbody=75;
+			  looklegs=75;
+			  lookfeet=75;
+	}
+
 	return true;
 }
 

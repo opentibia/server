@@ -21,6 +21,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.15  2004/11/14 09:16:53  shivoc
+// some fixes to at least reenable login without segfaulting the server (including some merges from haktivex' server
+//
 // Revision 1.14  2003/11/05 23:28:23  tliffrag
 // Addex XML for players, outfits working
 //
@@ -75,8 +78,10 @@ extern EventScheduler es;
 extern Map map;
 
 EventScheduler::EventScheduler() {
-    FD_ZERO(&active_fd_set);
-    FD_ZERO(&read_fd_set);
+		  std::cout << "Initializing Eventscheduler...";
+		  FD_ZERO(&active_fd_set);
+		  FD_ZERO(&read_fd_set);
+		  std::cout << " done." << std::endl;
 }
 
 //////////////////////////////////////////////////

@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.16  2004/11/14 09:16:54  shivoc
+// some fixes to at least reenable login without segfaulting the server (including some merges from haktivex' server
+//
 // Revision 1.15  2003/11/05 23:28:23  tliffrag
 // Addex XML for players, outfits working
 //
@@ -63,25 +66,24 @@ namespace Creatures {
 
         // we get name and password from the client...
 
-        std::cout << (player.name = client->getName()) << std::endl;
-        std::cout << (player.passwd = client->getPassword()) << std::endl;
+        player.name = client->getName();
+        player.passwd = client->getPassword();
 
-		name=player.name;
+		  name=player.name;
         // now we should check both... (TODO)
 
         // if everything was checked we should load the player... (TODO)
-        // add the player to the player list
 
+		  std::cout << "try to load player from xml" << std::endl;
         player.loadXml();
-
-        // for now we just fill in some stuff directly
+		  std::cout << "done." << std::endl;
 
         // and pass that infos to the protocoll
         client->setdata(player);
-		client->setCreature(this);
-		tick(0);
-		// add the player to the PlayerList
-		//PlayerList.push_back(this);
+		  client->setCreature(this);
+		  tick(0);
+		  // add the player to the PlayerList
+		  //PlayerList.push_back(this);
 
     } // Player::Player(Socket sock)
 

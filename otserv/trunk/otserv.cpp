@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.15  2004/11/14 09:16:54  shivoc
+// some fixes to at least reenable login without segfaulting the server (including some merges from haktivex' server
+//
 // Revision 1.14  2003/11/05 23:28:23  tliffrag
 // Addex XML for players, outfits working
 //
@@ -60,7 +63,7 @@
 #include "eventscheduler.h"
 #include "luascript.h"
 
-int ipFromDotted(char*);
+int ipFromDotted(const char*);
 int g_serverip;
 LuaScript g_config("config.lua");
 EventScheduler es;
@@ -68,52 +71,54 @@ Items Item::items;
 Map::Map map;
 
 int main(int argc, char *argv[]) {
-	char* ip;
+	const char* ip;
 	if(argc>1)
 		ip=argv[1];
 	else
-		ip="127.0.0.1";
+		ip=g_config.getGlobalString("ip").c_str();
+	std::cout << "getting ip from " << ip << std::endl;
 	g_serverip=ipFromDotted(ip);;
 	srand(time(NULL));
-    TNetwork::ServerSocket ss;
+	std::cout << "starting server socket" << std::endl;
+	TNetwork::ServerSocket ss;
 	std::cout << "Otserv running..." << std::endl;
-    es.loop();
+	es.loop();
 }
 
-int ipFromDotted(char* _ip){
-  std::string ip=_ip;
-  std::string t;
-  int num=0;
+int ipFromDotted(const char* _ip){
+		  std::string ip=_ip;
+		  std::string t;
+		  int num=0;
 
-  for(int i=0; i<4;i++){
-    t="";
-    while((ip[0]!='.')^(ip.length()==0)){
-      t+=ip[0];
-      ip.erase(0,1);
-    }
-    ip.erase(0,1);
-    num+=atoi(t.c_str()) << i*8;
-  }
-  //printf("\n%i\n", num);
-  return num;
+		  for(int i=0; i<4;i++){
+					 t="";
+					 while((ip[0]!='.')^(ip.length()==0)){
+								t+=ip[0];
+								ip.erase(0,1);
+					 }
+					 ip.erase(0,1);
+					 num+=atoi(t.c_str()) << i*8;
+		  }
+		  //printf("\n%i\n", num);
+		  return num;
 }
 
 int hexint(const char *src)
 {
- unsigned int y; /* unsigned for correct wrapping. */
- int h;
+		  unsigned int y; /* unsigned for correct wrapping. */
+		  int h;
 
- /* high part. */
- if ((y = src[0] - '0') <= '9'-'0') h = y;
- else if ((y = src[0] - 'a') <= 'f'-'a') h = y+10;
- else if ((y = src[0] - 'A') <= 'F'-'A') h = y+10;
- else return -1;
- h <<= 4;
+		  /* high part. */
+		  if ((y = src[0] - '0') <= '9'-'0') h = y;
+		  else if ((y = src[0] - 'a') <= 'f'-'a') h = y+10;
+		  else if ((y = src[0] - 'A') <= 'F'-'A') h = y+10;
+		  else return -1;
+		  h <<= 4;
 
- /* low part. */
- if ((y = src[1] - '0') <= '9'-'0') return h | y;
- if ((y = src[1] - 'a') <= 'f'-'a') return h | (y+10);
- if ((y = src[1] - 'A') <= 'F'-'A') return h | (y+10);
- return -1;
+		  /* low part. */
+		  if ((y = src[1] - '0') <= '9'-'0') return h | y;
+		  if ((y = src[1] - 'a') <= 'f'-'a') return h | (y+10);
+		  if ((y = src[1] - 'A') <= 'F'-'A') return h | (y+10);
+		  return -1;
 }
 

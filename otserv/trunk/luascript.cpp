@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.3  2004/11/14 09:16:54  shivoc
+// some fixes to at least reenable login without segfaulting the server (including some merges from haktivex' server
+//
 // Revision 1.2  2003/10/19 21:32:19  tliffrag
 // Reworked the Tile class; stackable items now working
 //
@@ -33,9 +36,12 @@
 
 
 LuaScript::LuaScript(std::string file){
+		  std::cout << "loading lua script: " << file << "... ";
 	l=lua_open();
-	if(lua_dofile(l, file.c_str()))	  
-	  std::cout << "Error loading " << file << std::endl;
+	if(lua_dofile(l, file.c_str()))
+			  std::cout << "failed." << std::endl;
+	else
+			  std::cout << "done." << std::endl;
 }
 
 LuaScript::~LuaScript(){

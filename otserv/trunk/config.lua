@@ -15,6 +15,10 @@ loginmsg = "Welcome to OTServ. For help visit tibia.de/forum"
 -- the port otserv listens on
 port = "7172"
 
+-- ip
+-- the ip the server should redirect too
+ip = "192.168.23.1"
+
 -- motd
 -- The messagebox you sometimes get before you choose characters
 -- not working yet

@@ -240,7 +240,7 @@ void TProt70::setMap(position newpos, Map& newmap) throw(texception) {
 	buf += (char)0xFF;buf += (char)0xFF;buf += (char)0xFF;buf += (char)0xFF;
 	buf += (char)0xFF;buf += (char)0xFF;buf += (char)0xFF;buf += (char)0xFF;
 
-	buf += (char)0xE4; // TODO Light level
+	buf += (char)0xE9; // TODO Light level
 	buf += (char)0xFF;
 
 	//LOGIN BUBBLE
@@ -267,17 +267,14 @@ void TProt70::setMap(position newpos, Map& newmap) throw(texception) {
 	buf+= (char)0x82;
 
 
-	buf+= (char)0xFF; //LIGHT LEVEL
+	buf+= (char)0xF0; //LIGHT LEVEL
 
 
 	buf+= (char)0xd7;//ight?
-	buf+= (char)0x8d;//8d
-	buf+= (char)0x51;//???
-	buf+= (char)0x92;//92
-	buf+= (char)0x05;//05
-	buf+= (char)0x00;//00
-	buf+= (char)0x00;//00
-	buf+= (char)0xd7;//d7
+	buf+= (char)0x8d;//8d?
+	ADD4BYTE(buf,creature->getID());
+	buf+= (char)0x01;//?
+	buf+= (char)0xd7;//d7?
 
 
 	buf+= (char)0xA1; //skills follow
@@ -299,7 +296,7 @@ void TProt70::setMap(position newpos, Map& newmap) throw(texception) {
 	buf[1]=(char)((buf.size()-2)/256)%256;
 	// and send to client...
 	TNetwork::SendData(psocket,buf);
-	sendInventory();
+	//sendInventory(); // TODO readd inventory which currently segfaults
 } // void TProt70::setMap(position newpos) throw(texception)
 
 std::string TProt70::makeMap(position topleft, position botright) {

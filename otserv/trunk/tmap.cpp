@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.23  2004/11/14 09:16:54  shivoc
+// some fixes to at least reenable login without segfaulting the server (including some merges from haktivex' server
+//
 // Revision 1.22  2003/11/06 17:16:47  tliffrag
 // 0.2.7 release
 //
@@ -293,6 +296,7 @@ int Map::tick(double time){
 	return true;
 }
 Map::Map() {
+		  std::cout << "loading map...";
 	//first we fill the map with
 	for(int y=MINY; y< MAXY; y++){
 		for(int x=MINX; x < MAXX; x++){
@@ -357,6 +361,7 @@ Map::Map() {
 		fclose(dump);
 	}
 	tiles[32864-MINX][32863-MINY]->creature=new NPC("ruediger");
+	std::cout << "done." << std::endl;
 }
 
 Map::Map(char *filename) {

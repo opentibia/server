@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.8  2004/11/14 09:16:54  shivoc
+// some fixes to at least reenable login without segfaulting the server (including some merges from haktivex' server
+//
 // Revision 1.7  2003/11/05 23:28:24  tliffrag
 // Addex XML for players, outfits working
 //
@@ -99,7 +102,7 @@ namespace Protokoll {
       passwd += in[i++];
     passwd += '\0'; //FIXME nullterminated?
     
-    // FIXME: this says trpot70 but it's in 69?
+    // FIXME: this says tprot70 but it's in 69?
     redirect(212*0x1000000+159*0x10000+114*0x100+27,atoi(g_config.getGlobalString("port").c_str()));
 
     //std::cout << "***create account: " << (int)accountnum << std::endl;
