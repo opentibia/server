@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.10  2003/09/18 12:35:22  tliffrag
+// added item dragNdrop
+//
 // Revision 1.9  2003/09/17 16:35:08  tliffrag
 // added !d command and fixed lag on windows
 //
@@ -204,6 +207,23 @@ int Map::requestAction(Creature* c, Action* a){
 	if(a->type==ACTION_SAY){
 		//says should be ok most of the time
 		distributeAction(a->pos1, a);
+	}
+	if(a->type==ACTION_THROW){
+	//FIXME we should really check, if the player can throw
+		Tile* tile=tiles[a->pos1.x-MINX][a->pos1.y-MINX];
+		Item::iterator it=tile->end(); it--;
+		if(a->pos2.x!=0xFFFF && a->pos1.x!=0xFFFF)
+		//if start is on ground and end is on ground
+		summonItem(a->pos2, (*it)->getID());
+		if(a->pos2.x!=0xFFFF && a->pos1.x==0xFFFF)
+		;//if end is on ground and start is in equipement
+		if(a->pos1.x!=0xFFFF)
+		//if start is on ground
+		removeItem(a->pos1);
+		else{
+		//if start is in equipement
+			//take the item away
+		}
 	}
 	return true;
 }

@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.8  2003/09/18 12:35:22  tliffrag
+// added item dragNdrop
+//
 // Revision 1.7  2003/05/19 16:48:37  tliffrag
 // Loggingin, talking, walking around, logging out working
 //
@@ -82,7 +85,7 @@
 
         protected:
             player_mem* player;
-			Creature* creature;
+            Creature* creature;
     };
 
     // class to choose the protokoll which acts like a pointer to the correct

@@ -1,5 +1,4 @@
 stone 				1043
-gayhooker 			1432
 golden mug 			1442
 plate 				1443
 flute 				1470
@@ -307,7 +306,6 @@ dead swamp troll 		2209
 dead swamp troll (2 stage) 	2210
 dead human (2 stage) 		2213
 dead human (3 stage) 		2214
-fucked human 			2217
 dead troll (2stage) 		2224
 dead troll (3 stage) 		2225
 dead rat (2 stage) 		2228

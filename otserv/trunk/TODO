@@ -12,3 +12,20 @@ opening items
 using items
 looking at
 changing look
+getplayerbypid
+getplayerbyname
+getplayersnearposition
+restructure the creature/player hierachie
+implement an action queue for the player
+implement an npc queue
+3rd dimension
+send 2 commands in 1 packet where possible
+
+
+
+
+
+
+
+
+

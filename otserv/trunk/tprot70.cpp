@@ -498,15 +498,16 @@ void TProt70::parseLogout(Action* action, std::string msg){
 
 void TProt70::parseThrow(Action* action, std::string msg){
 	action->type=ACTION_THROW;
-	action->pos1.x=abs(msg[2]*256+msg[1]);
-	action->pos1.y=abs(msg[4]*256+msg[3]);
-	action->pos1.z=abs(msg[5]);
+	action->pos1.x=(unsigned char)msg[2]*256+(unsigned char)msg[1];
+	action->pos1.y=(unsigned char)msg[4]*256+(unsigned char)msg[3];
+	action->pos1.z=(unsigned char)msg[5];
 
-	action->pos2.x=abs(msg[10]*256+msg[9]);
-	action->pos2.y=abs(msg[12]*256+msg[11]);
-	action->pos2.z=abs(msg[13]);
+	action->pos2.x=(unsigned char)msg[10]*256+(unsigned char)msg[9];
+	action->pos2.y=(unsigned char)msg[12]*256+(unsigned char)msg[11];
+	action->pos2.z=(unsigned char)msg[13];
 
 	printf("From %i %i to %i %i", action->pos1.x, action->pos1.y, action->pos2.x, action->pos2.y);
+	action->creature=this->creature;
 }
 
 void TProt70::parseSay(Action* action, std::string msg){
@@ -613,9 +614,14 @@ void TProt70::sendAction(Action* action){
 	if(action->type==ACTION_ITEM_DISAPPEAR){
 		sendPlayerItemDisappear(action);
 	}
+	if(action->type==ACTION_THROW){
+		//this should not occur
+		//throws are sent as 1 create and 1 delete
+	}
 }
 
 void TProt70::sendPlayerMove(Action* action){
+	//TODO rename this, it also handles items
 	std::string buf = "  ";
 	position distancenow=action->pos2 - player->pos;
 	position distancewas=action->pos1 - player->pos;
@@ -653,6 +659,7 @@ void TProt70::sendPlayerMove(Action* action){
 		ADD2BYTE(buf, action->pos2.y);
 		buf+=(char)action->pos2.z;
 		buf+=makeCreature(action->creature);
+
 	}
 	else{ //just a normal walk
 		buf += (char)0x6D;
@@ -697,6 +704,7 @@ void TProt70::sendPlayerMove(Action* action){
 			buf[buf.length()-2]=0x7E;
 		}
 	}
+
 	buf[0]=(char)(buf.size()-2)%256;
 	buf[1]=(char)((buf.size()-2)/256)%256;
 
