@@ -3,6 +3,12 @@
 /* Define to 1 if you have the <arpa/inet.h> header file. */
 #undef HAVE_ARPA_INET_H
 
+/* Define to 1 if you have the <boost/bind.hpp> header file. */
+#undef HAVE_BOOST_BIND_HPP
+
+/* Define to 1 if you have the <boost/config.hpp> header file. */
+#undef HAVE_BOOST_CONFIG_HPP
+
 /* Define to 1 if you have the <errno.h> header file. */
 #undef HAVE_ERRNO_H
 
