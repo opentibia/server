@@ -2,7 +2,8 @@
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
 // File loads and saves binary files.
-// TextFile treats them as text files.
+// Using a constructor, you can read a file into memory.
+// Assigning files to each other, you get a second copy.
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -21,6 +22,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.2  2002/04/05 20:02:23  acrimon
+// *** empty log message ***
+//
 // Revision 1.1  2002/04/05 18:56:11  acrimon
 // Adding a file class.
 //
@@ -31,15 +35,17 @@
 class File {
 private:
   bool error;
+  long size;    // the size of the data
 public:
-  char *data;
-  long size;
+  char *data;   // user accessable data
   File();
   File(const File& _file);
   File& operator=(const File& _file);
   File(char *filename);
   File(istream I);
   ~File();
+  long getsize() { return size; }
+  // void save();   // not yet written
 };
 
 class TextFile : public File {
@@ -52,6 +58,6 @@ public:
   TextFile(char *filename);
   //TextFile(istream I);
   int splitlines(char ** &A, char delim = '\n');
-  char *extractnextname();
+  char *extractnextname();   // some complicated function
   int getmarks();
 };

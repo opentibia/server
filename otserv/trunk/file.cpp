@@ -21,6 +21,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.2  2002/04/05 20:02:23  acrimon
+// *** empty log message ***
+//
 // Revision 1.1  2002/04/05 18:56:11  acrimon
 // Adding a file class.
 //
@@ -54,55 +57,55 @@ File& File::operator=(const File& _file) {
   return *this;
 }
 
-File::File(char *filename) {
-    ifstream I(filename);
-    if (!I.good()) {
-        cerr <<"Datei " <<filename <<" kann nicht gelesen werden\n";
-        error = true;
-	size = 0;
-    }
-    I.seekg(-1, ios::end);
-    size = I.tellg();
-    if (!size) {
-      data = NULL;
-      size = 0;
-      error = false;
-      return;
-    }
-    data = new char[size + 1];
-    data[size] = '\0';
-    I.seekg(0, ios::beg);
-    I.read(data, size);
-    if (!I.good()) {
-        cerr << "Fehler beim Lesen von Datei " << filename << endl;
-        error = true;
-    }
-    I.close();
+File::File(char *_filename) {
+  ifstream I(_filename);
+  if (!I.good()) {
+    cerr << "Datei " << _filename << " cannot be read." << endl;
+    error = true;
+    size = 0;
+  }
+  I.seekg(-1, ios::end);
+  size = I.tellg();
+  if (!size) {
+    data = NULL;
+    size = 0;
     error = false;
+    return;
+  }
+  data = new char[size + 1];
+  data[size] = '\0';
+  I.seekg(0, ios::beg);
+  I.read(data, size);
+  if (!I.good()) {
+    cerr << "Error reading file " << _filename << endl;
+    error = true;
+  }
+  I.close();
+  error = false;
 }
 
 // Ich weiß noch nicht ob das für cin funktioniert.
-File::File(istream I) {
-    if (!I.good()) {
-        cerr <<"Eingabedatei kann nicht gelesen werden\n";
-        error = true;
-	size = 0;
-    }
-    I.seekg(-1, ios::end);
-    size = I.tellg();
-    if (!size) {
-        cerr << "Eingabedatei ist leer.\n";
-        error = true;
-    }
-    data = new char[size + 1];
-    data[size] = '\0';
-    I.seekg(0, ios::beg);
-    I.read(data, size);
-    if (!I.good()) {
-        cerr << "Fehler beim Lesen der Eingabedatei." << endl;
-        error = true;
-    }
-    error = false;
+File::File(istream _I) {
+  if (!_I.good()) {
+    cerr <<"Eingabedatei kann nicht gelesen werden\n";
+    error = true;
+    size = 0;
+  }
+  _I.seekg(-1, ios::end);
+  size = _I.tellg();
+  if (!size) {
+    cerr << "Eingabedatei ist leer.\n";
+    error = true;
+  }
+  data = new char[size + 1];
+  data[size] = '\0';
+  _I.seekg(0, ios::beg);
+  _I.read(data, size);
+  if (!_I.good()) {
+    cerr << "Fehler beim Lesen der Eingabedatei." << endl;
+    error = true;
+  }
+  error = false;
 }
 
 File::~File() {
@@ -113,7 +116,7 @@ TextFile::TextFile() : File() {
   curpos = data;
 }
 
-TextFile::TextFile(char *filename) : File(filename) {
+TextFile::TextFile(char *_filename) : File(_filename) {
   curpos = data;
 }
 
@@ -130,26 +133,27 @@ TextFile& TextFile::operator=(const TextFile& _file) {
   return *this;
 }
 
-// Aufsplitten der Datei zeilenweise in Array A
-// (Speicher für A wird in der Funktion belegt)
-// Rückgabewert: Anzahl der gelesenen Zeilen
-// Wenn delim angegeben wird, dann wird er statt '\n' als Zeilentrenner genommen
-int TextFile::splitlines(char ** &A, char delim = '\n') {
-    int lines = 1;
-    int i = 0;
-    for (; i < size; i++) {   // Zeilen zählen
-        if (data[i] == delim)
-            data[i] = 0;
-        if (data[i] == 0)
-            lines++;
-    }
-    A = new char *[lines];
-    A[0] = data;
-    i = 0;
-    for (int c = 1; c < lines; A[c++] = data + i) // und eintragen
-        while (data[i++])
-            ;
-    return lines;
+//////////////////////////////////////////////////
+// Splitting up the file into strings into array _A
+// (memory for _A will automatically be allocated)
+// Return: the number of read lines
+// Parameter: use _delim as line separator
+int TextFile::splitlines(char ** &_A, char _delim = '\n') {
+  int lines = 1;
+  int i = 0;
+  for (; i < getsize(); i++) {   // Zeilen zählen
+    if (data[i] == _delim)
+      data[i] = 0;
+    if (data[i] == 0)
+      lines++;
+  }
+  _A = new char *[lines];
+  _A[0] = data;
+  i = 0;
+  for (int c = 1; c < lines; _A[c++] = data + i) // und eintragen
+    while (data[i++])
+      ;
+  return lines;
 }
 
 char *TextFile::extractnextname() {

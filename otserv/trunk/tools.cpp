@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.2  2002/04/05 20:02:23  acrimon
+// *** empty log message ***
+//
 // Revision 1.1  2002/04/05 18:56:11  acrimon
 // Adding a file class.
 //
@@ -28,29 +31,40 @@
 #include <stdio.h>
 //#include <pthread.h>
 
-void hexdump(unsigned char *data, int len) {
+//////////////////////////////////////////////////
+// dump a part of the memory to stderr.
+void hexdump(unsigned char *_data, int _len) {
   int i;
-  for (; len > 0; data += 16, len -= 16) {
-    for (i = 0; i < 16 && i < len; i++)
-      fprintf(stderr, "%02x ", data[i]);
+  for (; _len > 0; _data += 16, _len -= 16) {
+    for (i = 0; i < 16 && i < _len; i++)
+      fprintf(stderr, "%02x ", _data[i]);
     for (; i < 16; i++)
       fprintf(stderr, "   ");
     fprintf(stderr, " ");
-    for (i = 0; i < 16 && i < len; i++)
-      fprintf(stderr, "%c", (data[i] & 0x70) < 32 ? '·' : data[i]);
+    for (i = 0; i < 16 && i < _len; i++)
+      fprintf(stderr, "%c", (_data[i] & 0x70) < 32 ? '·' : _data[i]);
     fprintf(stderr, "\n");
   }
 }
 
 #if 0
-pthread_t *detach(void *(*fn)(void *), void *arg) {
+//////////////////////////////////////////////////
+// Enable asynchronous function calls.
+// This function does not wait for return of the called function;
+// instead, this function returns immediately.
+// The called function must be of type void *fn(void *).
+// You can use the pointer to the function for anything you want to.
+// Return: a thread handle.
+pthread_t *detach(void *(*_fn)(void *), void *_arg) {
   pthread_t *thread = new pthread_t();
-  if (pthread_create(thread, NULL, fn, arg))
+  if (pthread_create(thread, NULL, _fn, _arg))
     perror("pthread");
   return thread;
 }
 #endif
 
+//////////////////////////////////////////////////
+// Upcase a char.
 char upchar(char c) {
   if (c >= 'a' && c <= 'z')
     return c - 'a' + 'A';
@@ -64,12 +78,16 @@ char upchar(char c) {
     return c;
 }
 
+//////////////////////////////////////////////////
+// Upcase a 0-terminated string.
 void upper(char *upstr, char *str) {
   for (; *str; str++, upstr++)
     *upstr = upchar(*str);
   *upstr = '\0';
 }
 
+//////////////////////////////////////////////////
+// Upcase a 0-terminated string, but at most n chars.
 void upper(char *upstr, char *str, int n) {
   for (; *str && n; str++, upstr++, n--)
     *upstr = upchar(*str);

@@ -32,7 +32,7 @@ namespace Protokoll {
 			Protokoll() throw();
 			
 			// our callback interface
-			struct clientread : public unary_functor<int ,void> {
+			struct clientread : public unary_functor<Socket,void> {
 				Protokoll& base;
 				clientread(Protokoll& prot) : base(prot) { };
 				void operator() (const Socket &sock) {
