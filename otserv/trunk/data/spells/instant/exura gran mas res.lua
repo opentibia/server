@@ -38,8 +38,11 @@ centerpos = {x=creaturePos.x, y=creaturePos.y, z=creaturePos.z}
 n = tonumber(var)   -- try to convert it to a number
 
 	if n ~= nil then
-		MassHealingObject.minDmg = var+0
-		MassHealingObject.maxDmg = var+0
+                -- bugged
+		-- MassHealingObject.minDmg = var+0
+		-- MassHealingObject.maxDmg = var+0
+		MassHealingObject.minDmg = 0
+		MassHealingObject.maxDmg = 0
 
 	else
 		MassHealingObject.minDmg = ((level+maglv)*3) * 1.0
