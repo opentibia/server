@@ -1042,7 +1042,7 @@ void Protocol70::parseUseItem(NetworkMessage &msg)
 	unsigned short y = msg.GetU16();
 	unsigned char z = msg.GetByte();
 	unsigned short item = msg.GetU16();
-	/*unsigned char un = */msg.GetByte();
+	unsigned char un = msg.GetByte();
 	unsigned char stack = msg.GetByte();
 
 #ifdef __DEBUG__

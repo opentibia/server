@@ -1774,6 +1774,8 @@ void Game::checkPlayer(unsigned long id)
 		 else
 			 creature->curburningTicks = 0;
 	 }
+	 else
+	 creature->burningTicks = 0;
 	 
 	 if(creature->curenergizedTicks > 0) {
 		 MagicDamageVec *dl = creature->getMagicDamageVec(magicEnergy);
@@ -1799,6 +1801,8 @@ void Game::checkPlayer(unsigned long id)
 		 else
 			 creature->curenergizedTicks = 0;
 	 }
+	 else
+	 creature->energizedTicks = 0;
 	 
 	 if(creature->curpoisonedTicks > 0) {
 		 MagicDamageVec *dl = creature->getMagicDamageVec(magicPoison);
@@ -1824,6 +1828,8 @@ void Game::checkPlayer(unsigned long id)
 		 else
 			 creature->curpoisonedTicks = 0;
 	 }
+	 else
+	 creature->poisonedTicks = 0;
   }
 	
 	OTSYS_THREAD_UNLOCK(gameLock)

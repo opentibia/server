@@ -538,9 +538,13 @@ void Player::die() {
 		//Level Downgrade
 		if ((unsigned long)(experience - (unsigned)(experience*0.1f)) < getExpForLv(level))         //0.1f is also used in die().. maybe we make a little function for exp-loss?
 		{
+            if(level>1){          
 			std::stringstream lvMsg;
 			lvMsg << "You were downgraded from level " << level << " to level " << level-1 << ".";
 			msg.AddTextMessage(MSG_ADVANCE, lvMsg.str().c_str());
+            }
+            if(experience <0)
+            experience =0;
 		}
 		
 		sendNetworkMessage(&msg);
@@ -571,7 +575,8 @@ void Player::savePlayer(std::string &name)
 
 	   int reqExp =  getExpForLv(level);
 	   if (experience < (unsigned )reqExp)
-		    {                     
+		    {
+            if(level > 1)                               
             level -= 1;
             healthmax -= HPGain[voc];
             health -= HPGain[voc];
