@@ -42,7 +42,8 @@ class NpcScript : protected LuaScript{
 public:
 	NpcScript(std::string name, Npc* npc);
 	virtual ~NpcScript(){}
-//	virtual void onThingMove(const Player *player, const Thing *thing, const Position *oldPos, unsigned char oldstackpos);
+//	virtual void onThingMove(const Player *player, const Thing *thing, const Position *oldPos,
+//	unsigned char oldstackpos, unsigned char oldcount, unsigned char count);
 	virtual void onCreatureAppear(unsigned long cid);
 	virtual void onCreatureDisappear(int cid);
 //	virtual void onCreatureTurn(const Creature *creature, unsigned char stackpos);
@@ -97,7 +98,8 @@ public:
   bool isLoaded(){return loaded;}
 
 protected:
-  virtual void onThingMove(const Player *player, const Thing *thing, const Position *oldPos, unsigned char oldstackpos);
+  virtual void onThingMove(const Player *player, const Thing *thing, const Position *oldPos,
+		unsigned char oldstackpos, unsigned char oldcount, unsigned char count);
   virtual void onCreatureAppear(const Creature *creature);
   virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos);
   virtual void onCreatureTurn(const Creature *creature, unsigned char stackpos);

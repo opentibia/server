@@ -126,7 +126,8 @@ std::string Npc::getDescription(bool self) const
 	return str;
             }
             
-void Npc::onThingMove(const Player *player, const Thing *thing, const Position *oldPos, unsigned char oldstackpos){
+void Npc::onThingMove(const Player *player, const Thing *thing, const Position *oldPos,
+	unsigned char oldstackpos, unsigned char oldcount, unsigned char count){
 	//not yet implemented
 }
 
@@ -177,16 +178,16 @@ void Npc::doAttack(int id){
 void Npc::doMove(int direction){
 	switch(direction){
 		case 0:
-			this->game->thingMove(this, this,this->pos.x, this->pos.y+1, this->pos.z);
+			this->game->thingMove(this, this,this->pos.x, this->pos.y+1, this->pos.z, 1);
 		break;
 		case 1:
-			this->game->thingMove(this, this,this->pos.x+1, this->pos.y, this->pos.z);
+			this->game->thingMove(this, this,this->pos.x+1, this->pos.y, this->pos.z, 1);
 		break;
 		case 2:
-			this->game->thingMove(this, this,this->pos.x, this->pos.y-1, this->pos.z);
+			this->game->thingMove(this, this,this->pos.x, this->pos.y-1, this->pos.z, 1);
 		break;
 		case 3:
-			this->game->thingMove(this, this,this->pos.x-1, this->pos.y, this->pos.z);
+			this->game->thingMove(this, this,this->pos.x-1, this->pos.y, this->pos.z, 1);
 		break;
 	}
 }
@@ -204,7 +205,7 @@ void Npc::doMoveTo(Position target){
 	route.pop_front();
 	int dx = nextStep.x - this->pos.x;
 	int dy = nextStep.y - this->pos.y;
-	this->game->thingMove(this, this,this->pos.x + dx, this->pos.y + dy, this->pos.z);
+	this->game->thingMove(this, this,this->pos.x + dx, this->pos.y + dy, this->pos.z, 1);
 }
 
 NpcScript::NpcScript(std::string scriptname, Npc* npc){

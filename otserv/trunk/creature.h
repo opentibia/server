@@ -26,6 +26,7 @@
 #include "thing.h"
 #include "position.h"
 #include "networkmessage.h"
+#include "container.h"
 #include "magic.h"
 #include <vector>
 
@@ -51,6 +52,8 @@ enum fight_t {
 	FIGHT_DIST,
 	FIGHT_MAGICDIST
 };
+
+enum slots_t;
 
 // Macros
 #define CREATURE_SET_OUTFIT(c, type, head, body, legs, feet) c->looktype = type; \
@@ -145,6 +148,7 @@ public:
 
   virtual bool isAttackable() const { return true; };
 	virtual bool isPushable() const {return true;}
+	virtual void dropLoot(Container *corpse) {return;};
 
   virtual int sendInventory(){return 0;};
   virtual int addItem(Item* item, int pos){return 0;};
@@ -221,7 +225,9 @@ protected:
 
 protected:
 	virtual int onThink(int& newThinkTicks){newThinkTicks = 300; return 300;};
-  virtual void onThingMove(const Creature *player, const Thing *thing, const Position *oldPos, unsigned char oldstackpos) { };
+  virtual void onThingMove(const Creature *player, const Thing *thing, const Position *oldPos,
+		unsigned char oldstackpos, unsigned char oldcount, unsigned char count) { };
+
   virtual void onCreatureAppear(const Creature *creature) { };
   virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos) { };
   virtual void onCreatureTurn(const Creature *creature, unsigned char stackPos) { };
@@ -229,8 +235,29 @@ protected:
 
   virtual void onCreatureChangeOutfit(const Creature* creature) { };
 	virtual void onTileUpdated(const Position &pos) { };
-	virtual void onContainerUpdated(Item *item, unsigned char from_id, unsigned char to_id, unsigned char from_slot, unsigned char to_slot, bool remove) {};
+
+	//virtual void onContainerUpdated(Item *item, unsigned char from_id, unsigned char to_id, unsigned char from_slot, unsigned char to_slot, bool remove) {};
   virtual void onTeleport(const Creature *creature, const Position *oldPos, unsigned char oldstackpos) { };
+
+	//container to container
+	virtual void onThingMove(const Creature *creature, const Container *fromContainer, Container *toContainer,
+		const Item* item, unsigned char from_slotid, unsigned char to_slotid, unsigned char oldcount, unsigned char count) {};
+
+	//container to ground
+	virtual void onThingMove(const Creature *creature, const Container *fromContainer, const Position *newPos,
+		const Item* item, unsigned char from_slotid, unsigned char oldcount, unsigned char count) {};
+
+	//inventory to ground
+	virtual void onThingMove(const Creature *creature, slots_t fromSlot, const Position *newPos,
+		const Item* item, unsigned char oldcount, unsigned char count) {};
+	
+	//ground to container
+	virtual void onThingMove(const Creature *creature, const Position *oldPos, const Container *toContainer,
+		const Item* item, unsigned char stackpos, unsigned char to_slotid, unsigned char oldcount, unsigned char count) {};
+	
+	//ground to inventory
+	virtual void onThingMove(const Creature *creature, const Position *oldPos, slots_t toSlot,
+		const Item* item, unsigned char stackpos, unsigned char oldcount, unsigned char count) {};
 
   friend class Game;
   friend class Map;

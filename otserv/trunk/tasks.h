@@ -65,7 +65,7 @@ class MovePlayer : public std::binary_function<Game*, Direction, int> {
 #ifdef __DEBUG__
 								std::cout << "move to: " << dir << std::endl;
 #endif
-								game->thingMove(player, player, pos.x, pos.y, pos.z);
+								game->thingMove(player, player, pos.x, pos.y, pos.z, 1);
 								OTSYS_THREAD_UNLOCK(game->gameLock)
 
                 return 0;
