@@ -395,7 +395,7 @@ void Monster::calcMovePosition()
 #endif
 */
 
-					minwalkdist =walkdist;
+					minwalkdist = walkdist;
 					prevdist = dist;
 					moveToPos.x = x;
 					moveToPos.y = y;

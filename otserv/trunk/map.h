@@ -99,6 +99,7 @@ public:
 	}
 	
 	//Creates a union of 2 positions
+	//Should only be used when a player makes a move.
 	Range(const Position& pos1, const Position& pos2)
 	{
 		Position topleft(std::min(pos1.x, pos2.x), std::min(pos1.y, pos2.y), pos1.z);

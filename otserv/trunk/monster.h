@@ -152,9 +152,9 @@ protected:
 	typedef std::vector<std::pair<std::string, TimeProbabilityClass> > YellingSentences;
 	YellingSentences yellingSentences;
 
-	virtual fight_t getFightType() {return curPhysicalAttack->fighttype; /*curPhysicalAttack != NULL ? curPhysicalAttack->fighttype : FIGHT_MELEE);*/};
+	virtual fight_t getFightType() {return curPhysicalAttack->fighttype;};
 	virtual subfight_t getSubFightType()
-	{return curPhysicalAttack->disttype; /*return (curPhysicalAttack != NULL ? curPhysicalAttack->disttype : DIST_NONE);*/}
+	{return curPhysicalAttack->disttype;}
 	virtual int getWeaponDamage() const;
 
 	void OnCreatureEnter(const Creature *creature);
