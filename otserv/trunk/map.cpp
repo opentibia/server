@@ -385,8 +385,6 @@ bool Map::placeCreature(Creature* c)
   {
 	  playersOnline[c->getID()] = c;
 
-    //addEvent(100, EVENT_CHECKPLAYER, (void*)c->id);
-    //addEvent(200, EVENT_CHECKPLAYERATTACKING, (void*)c->id);
 	 addEvent(makeTask(1000, std::bind2nd(std::mem_fun(&Map::checkPlayer), c->id)));
 	 addEvent(makeTask(2000, std::bind2nd(std::mem_fun(&Map::checkPlayerAttacking), c->id)));
 
@@ -933,7 +931,6 @@ void Map::checkPlayer(unsigned long id)
   {
     
 	 addEvent(makeTask(1000, std::bind2nd(std::mem_fun(&Map::checkPlayer), id)));
-    //addEvent(100, EVENT_CHECKPLAYER, (void*)id);   
   }
 
   OTSYS_THREAD_UNLOCK(mapLock)
@@ -957,7 +954,6 @@ void Map::checkPlayerAttacking(unsigned long id)
     }
 
 	 addEvent(makeTask(2000, std::bind2nd(std::mem_fun(&Map::checkPlayerAttacking), id)));
-    //addEvent(200, EVENT_CHECKPLAYERATTACKING, (void*)id);
   }
 
   OTSYS_THREAD_UNLOCK(mapLock)

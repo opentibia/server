@@ -36,12 +36,14 @@ class MovePlayer : public std::binary_function<Map*, Direction, int> {
 								// get the player we want to move...
 								Creature* creature = map->getCreatureByID(_pid);
 
-// when runtime info then everywhere
+								// when runtime info then everywhere
 //              Player* player = dynamic_cast<Player*>(creature);*/
 //                if (!player) // player is not available anymore it seems...
 //										  return -1;
-                if (!creature || !creature->isPlayer())
+                if (!creature || !creature->isPlayer()) {
+								OTSYS_THREAD_UNLOCK(map->mapLock)
                   return -1;
+					 }
 
                 Player *player = (Player*)creature;
 

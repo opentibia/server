@@ -83,7 +83,7 @@ public:
   int skills[7][2];
 
   void    usePlayer() { useCount++; };
-  void    releasePlayer() { useCount++; if (useCount == 0) delete this; };
+  void    releasePlayer() { useCount--; if (useCount == 0) delete this; };
 
   void    setAttackedCreature(unsigned long id);
 
@@ -93,7 +93,7 @@ public:
   void sendNetworkMessage(NetworkMessage *msg);
 
 protected:
-  bool    useCount;
+  int useCount;
 
   virtual void onThingMove(const Player *player, const Thing *thing, const Position *oldPos, unsigned char oldstackpos);
   virtual void onCreatureAppear(const Creature *creature);
