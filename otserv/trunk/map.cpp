@@ -23,8 +23,8 @@
 
 #include <string>
 #include <sstream>
-
-#include <hash_map>
+#include <cctype>
+#include <algorithm>
 
 using namespace std;
 
@@ -874,12 +874,20 @@ void Map::creatureChangeOutfit(Creature *creature)
 }
 
 
-void Map::creatureYell(Creature *creature, const std::string &text)
+void Map::creatureYell(Creature *creature, std::string &text)
 {
   OTSYS_THREAD_LOCK(mapLock)
-
-    CreatureVector::iterator cit;
-
+  
+  if(creature->isPlayer() && creature->access == 0 && creature->exhausted) {
+      NetworkMessage msg;
+      msg.AddTextMessage(MSG_EVENT, "You are exhausted.");
+      ((Player*)creature)->sendNetworkMessage(&msg);
+  }
+  else {
+      creature->exhausted = true;
+      addEvent(makeTask(1200, std::bind2nd(std::mem_fun(&Map::resetExhausted), creature->id)));
+      CreatureVector::iterator cit;
+      std::transform(text.begin(), text.end(), text.begin(), upchar);
   for (int x = creature->pos.x - 18; x <= creature->pos.x + 18; x++)
     for (int y = creature->pos.y - 14; y <= creature->pos.y + 14; y++)
     {
@@ -892,7 +900,7 @@ void Map::creatureYell(Creature *creature, const std::string &text)
         }
       }
     }
-
+  }    
   OTSYS_THREAD_UNLOCK(mapLock)
 }
 

@@ -74,7 +74,7 @@ class Map {
     void creatureTurn(Creature *creature, Direction dir);
 
     void creatureSay(Creature *creature, unsigned char type, const std::string &text);
-    void creatureYell(Creature *creature, const std::string &text);
+    void creatureYell(Creature *creature, std::string &text);
     void creatureSpeakTo(Creature *creature, const std::string &receiver, const std::string &text);
     void creatureBroadcastMessage(Creature *creature, const std::string &text);
 	 void creatureChangeOutfit(Creature *creature);
