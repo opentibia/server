@@ -22,6 +22,7 @@
 #include "definitions.h"
 
 #include <string>
+#include <sstream>
 #include <iostream>
 #include <algorithm>
 
@@ -169,6 +170,57 @@ int Player::addItem(Item* item, int pos){
 	return true;
 }
 
+void Player::addSkillTry(int skilltry)
+{
+int skill;
+std::string skillname;
+for (int slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++)
+    if (items[slot])
+    {
+     if (items[slot]->isWeapon())
+     {
+      switch (items[slot]->getWeaponType())
+            {
+            case SWORD: skill = 2; skillname = "sword fighting"; break;
+            case CLUB: skill = 1; skillname = "club fighting"; break;
+            case AXE: skill = 3; skillname = "axe fighting"; break;
+            case DIST: skill = 4; skillname = "distance fighting"; break;
+            default: skill = 0; skillname = "fist fighting"; break;
+            }
+      }
+    }
+
+skills[skill][SKILL_TRIES] += skilltry;
+
+int oldSkill = skills[skill][SKILL_LEVEL];
+int tries = skills[skill][SKILL_TRIES];
+
+int checkSkill = oldSkill+1;
+int reqTries = 50;
+for(int i = 10;i<=checkSkill;i++){
+        if(i == 11)
+        reqTries = 50;
+        else
+        reqTries = (int)(reqTries*1.1);
+}
+//Need skill up?
+printf("%d -- %d\n", tries, reqTries);
+if (tries >= reqTries)
+{
+   skills[skill][SKILL_LEVEL] = checkSkill;
+   skills[skill][SKILL_TRIES] = 0;
+
+   NetworkMessage msg;
+   std::stringstream advMsg;
+   advMsg << "You advanced in " << skillname << ".";
+   msg.AddTextMessage(MSG_ADVANCE, advMsg.str().c_str());
+   msg.AddPlayerSkills(this);
+   sendNetworkMessage(&msg);
+}
+
+
+}
+
 Item* Player::getContainer(unsigned char containerid)
 {
   for(containerLayout::iterator cl = vcontainers.begin(); cl != vcontainers.end(); ++cl)
@@ -290,6 +342,9 @@ void Player::onThingMove(const Creature *creature, const Thing *thing, const Pos
   client->sendThingMove(creature, thing, oldPos, oldstackpos);
 }
 
+void Player::setAttackedCreature(unsigned long id){
+     attackedCreature = id;
+        }
 
 void Player::onCreatureAppear(const Creature *creature)
 {

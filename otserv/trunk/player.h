@@ -89,8 +89,6 @@ public:
   bool cancelMove;
   virtual int getWeaponDamage() const;
   char fightMode, followMode;
-  // experience
-  unsigned long experience;
 
   int skills[7][2];
 
@@ -106,13 +104,14 @@ public:
   fight_t getFightType();
   void sendIcons();
   bool CanSee(int x, int y);
+  void addSkillTry(int skilltry);
   void sendNetworkMessage(NetworkMessage *msg);
   void sendCancelAttacking();
   void sendChangeSpeed(Creature* creature);
   void sendToChannel(Creature *creature, unsigned char type, const std::string &text, unsigned short channelId);
   virtual void sendCancel(const char *msg);
   virtual void sendCancelWalk(const char *msg);
-
+  virtual void setAttackedCreature(unsigned long id);
   virtual bool isAttackable() { return (access == 0); };
 
 protected:

@@ -36,7 +36,7 @@ Creature::Creature(const char *name) : access(0)
 
   health     = 1000;//150;
   healthmax  = 1000;//150;
-
+  experience = 100000;
   lastmove=0;
 
   lastDamage = 0;

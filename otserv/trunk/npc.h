@@ -78,9 +78,6 @@ public:
 
   std::string getName(){return name;};
 
-  void    setAttackedCreature(unsigned long id);
-
-
   fight_t getFightType(){return fighttype;};
 
   int mana, manamax;
@@ -107,7 +104,7 @@ protected:
   virtual void onCreatureSay(const Creature *creature, unsigned char type, const std::string &text);
   virtual void onCreatureChangeOutfit(const Creature* creature);
   virtual void onThink();
-
+  virtual void setAttackedCreature(unsigned long id);
   std::string name;
   std::string scriptname;
   NpcScript* script;

@@ -154,7 +154,7 @@ class Map {
     void creatureYell(Creature *creature, std::string &text);
     void creatureSpeakTo(Creature *creature, const std::string &receiver, const std::string &text);
     void creatureBroadcastMessage(Creature *creature, const std::string &text);
-		void creatureToChannel(Creature *creature, unsigned char type, const std::string &text, unsigned short channelId);
+    void creatureToChannel(Creature *creature, unsigned char type, const std::string &text, unsigned short channelId);
 	  void creatureChangeOutfit(Creature *creature);
 
 	  bool creatureThrowRune(Creature *creature, const MagicEffectClass& me);

@@ -73,7 +73,9 @@ public:
   virtual const std::string& getName() const {return name; };
 
   unsigned long getID() const { return id; }
-
+  int getExpForLv(int lv) { 
+      return (int)((50/3 * pow((double)lv ,3)) - (100 * pow((double)lv, 2)) + (850/3 * lv) - 200);
+      }
   Direction getDirection() const { return direction; }
   void setDirection(Direction dir) { direction = dir; }
 
@@ -82,7 +84,7 @@ public:
   virtual void drainHealth(int);
   virtual void drainMana(int);
 
-  void    setAttackedCreature(unsigned long id);
+  virtual void setAttackedCreature(unsigned long id);
 
   virtual int getWeaponDamage() const {
 	return 1+(int)(10.0*rand()/(RAND_MAX+1.0));
@@ -102,7 +104,7 @@ public:
   int mana, manamax, manaspent;
   bool pzLocked;
   long inFightTicks, exhaustedTicks, manaShieldTicks, hasteTicks;
-  
+  unsigned long experience;
   Position masterPos;
 
   int health, healthmax;
