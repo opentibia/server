@@ -131,10 +131,10 @@ int Player::getWeaponDamage() const
 
 unsigned short Player::getSpeed() const
 {
-  if (access > 0)
-    return 600;
-
-  return 220 + level*3;
+	if (access > 0)
+		return 600;
+	
+	return 220 + level*3;
 };
 
 
