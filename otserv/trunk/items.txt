@@ -1,0 +1,328 @@
+stone 				1043
+gayhooker 			1432
+golden mug 			1442
+plate 				1443
+flute 				1470
+lyre 				1471
+banjo 				1472
+lute 				1472
+drum 				1473
+panpipes 			1474
+fan pipe 			1474
+simple fanfare 			1475
+fanfare 			1476
+fotball 			1492
+football 			1492
+teddybear 			1495
+teddy bear 			1495
+rope 				1497
+wedding ring 			1498
+crystal ring 			1501
+crystal necklace 		1502
+crown 				1505
+wolf tooth chain 		1506
+ammy 				1510
+ruby necklace 			1510
+violet gem 			1522
+yellow gem 			1523
+big emerald 			1524
+mightring 			1530
+stealthring 			1531
+powerring 			1532
+power ring 			1532
+energyring 			1533
+lifering 			1534
+timering 			1535
+silver amulet 			1536
+platinum amulet 		1537
+strange symbol 			1539
+spellbook 			1540
+spell book 			1540
+mind stone 			1543
+red spellwand 			1556
+mysterious fetish 		1559
+boots of haste 			1560
+amulet of life 			1561
+stone skin amulet 		1562
+stoneskinamulet 		1562
+elven amulet 			1563
+garlic necklace 		1564
+protection amulet 		1565
+shielding amulet 		1565
+dragon necklace 		1566
+swordring 			1572
+sword ring 			1572
+axering 			1573
+axe ring 			1573
+clubring 			1574
+club ring 			1574
+dwarfen ring 			1578
+dwarfenring 			1578
+ring of healing 		1579
+banana skin 			1582
+dirty fur 			1583
+old twig 			1584
+some wood 			1585
+piece of iron 			1588
+pieces of iron 			1588
+iron piece 			1588
+fishbone 			1589
+fish bone 			1589
+rotten meat 			1590
+bone 				1593
+big bone 			1594
+broken brown glas 		1595
+broken brown glass 		1595
+broken green glas 		1596
+broken green glass 		1596
+broken sword 			1597
+mouldy cheese 			1598
+moldy cheese 			1598
+torn book 			1599
+dirty cape 			1600
+worn leather boots 		1601
+burnt scroll 			1602
+fish remains 			1603
+wood rubbish 			1605
+mouldy rubbish 			1606
+rubbish 			1606
+leaves 				1607
+green leaves 			1607
+troll green 			1608
+twigs 				1608
+burnt down firewood 		1609
+firewood 			1609
+animate dead 			1666
+sword 				1667
+two-handed sword 		1668
+two handed sword 		1668
+battle axe 			1669
+dagger 				1670
+hand axe 			1671
+halberd 			1672
+halbert 			1672
+club 				1673
+spikesword 			1674
+spike sword 			1674
+rapier 				1675
+sabre 				1676
+axe 				1677
+double axe 			1678
+spear 				1680
+magic longsword 		1681
+giant sword 			1684
+morning star 			1685
+carlin sword 			1686
+carlinsword 			1686
+ice rapier 			1687
+longsword 			1688
+throwing star 			1690
+magic sword 			1691
+staff 				1692
+silver dagger 			1693
+sickle 				1696
+bright sword 			1698
+warlord sword 			1699
+throwing knife 			1701
+poison dagger 			1702
+katana 				1703
+broad sword 			1704
+dragon lance 			1705
+crowbar 			1707
+golden sickle 			1709
+machete 			1711
+thunder hammer 			1712
+iron hammer 			1713
+clerical mace 			1714
+silver mace 			1715
+obsidian lance 			1716
+naginata 			1717
+guardian halberd 		1718
+barbarian axe 			1720
+knight axe 			1721
+fire axe 			1723
+pelle 				1723
+crossbow 			1728
+bow 				1729
+steel helmet 			1730
+iron helmet 			1732
+brass helmet 			1733
+leather helmet 			1734
+devil helmet 			1735
+plate armor 			1736
+chain armor 			1737
+brass armor 			1738
+golden armor 			1739
+leather armor 			1740
+studded legs 			1741
+golden helmet 			1744
+magic plate armor 		1745
+enchanted plate armor 		1745
+viking helmet 			1746
+winged helmet 			1747
+warrior helmet 			1748
+knight armor 			1749
+knight legs 			1750
+brass legs 			1751
+strange helmet 			1752
+legion helmet 			1753
+chain helmet 			1753
+soldier helmet 			1754
+studded helmet 			1755
+scale armor 			1756
+studded armor 			1757
+doublet 			1758
+noble armor 			1759
+crown armor 			1760
+crown legs 			1761
+dark armor 			1762
+dark helmet 			1763
+crown helmet 			1764
+dragon scale legs 		1765
+dragon scale mail 		1765
+demon helmet 			1766
+demon armor 			1767
+demon legs 			1768
+horned helmet 			1769
+knights helmet 			1770
+royal helmet 			1771
+steel shield 			1772
+plate shield 			1773
+brass shield 			1774
+wooden shield 			1775
+battle shield 			1776
+mastermind shield 		1777
+shield of the mastermind 	1777
+guardians shield 		1778
+guardian shield 		1778
+dragon shield 			1779
+forgotten shield 		1780
+unholy shield 			1780
+beholder shield 		1781
+crown shield 			1782
+demon shield 			1783
+dark shield 			1784
+great shield 			1785
+blessed shield 			1786
+viking shield 			1787
+ornamented shield 		1787
+dwarven shield 			1788
+studded shield 			1789
+rose shield 			1790
+tower shield 			1791
+angel shield 			1792
+black shield 			1792
+copper shield 			1793
+hooligan shield 		1794
+beach shield 			1795
+ancient shield 			1795
+gyffin shield 			1796
+griffin shield 			1796
+vampire shield 			1797
+castle shield 			1798
+mirror 				1817
+pan 				1820
+fork 				1821
+spoon 				1822
+knife 				1823
+wooden spoon 			1824
+cleaver 			1825
+oven spatula 			1826
+rolling pin 			1827
+trap 				1828
+letter 				1839
+label 				1841
+white gamestone 		1857
+white pawn 			1858
+white castle 			1859
+white knight 			1860
+white bishop 			1861
+white queen 			1862
+white king 			1863
+black pawn 			1864
+black castle 			1865
+black knight 			1866
+black bishop 			1867
+black queen 			1868
+tic-tac-toe o 			1871
+sandals 			1873
+leather boots 			1874
+steel boots 			1875
+golden boots 			1876
+plate legs 			1877
+chain legs 			1878
+leather legs 			1879
+jacket 				1880
+coat 				1881
+green tunic 			1882
+cape 				1884
+blue robe 			1886
+dress 				1889
+scarf 				1890
+wizard\'s hat 			1891
+magican hat 			1891
+mystic turban 			1892
+grapes 				1906
+melon 				1907
+moonflowers 			1959
+red rose 			1963
+dragon hammer 			1964
+blue rose 			1964
+yellow rose 			1965
+sunflower 			1972
+red water lily 			1977
+orange star 			1978
+dead skeleton 			2021
+dead troll 			2023
+dead rat 			2027
+dead snake 			2029
+dead deer 			2049
+dead ghoul 			2067
+dead minotaur 			2090
+dead fire devil 		2099
+dead scorpion 			2109
+dead wasp 			2112
+dead bug 			2115
+dead sheep 			2118
+vbxcv 				2135
+golden legs 			2136
+dead demon skeleton 		2136
+slain skeleton 			2136
+dead frost troll 		2143
+b 				2143
+dead pig 			2150
+r 				2150
+dead orc 			2152
+dead goblin 			2157
+dead elf 			2161
+rune 				2163
+dead mummy 			2163
+demon 				2164
+hatchet 			2171
+dead rabbit 			2176
+dead rabbit (rotten) 		2178
+dead ghost (2 stage) 		2191
+dead rabbit (2 stage) 		2207
+dead swamp troll 		2209
+dead swamp troll (2 stage) 	2210
+dead human (2 stage) 		2213
+dead human (3 stage) 		2214
+fucked human 			2217
+dead troll (2stage) 		2224
+dead troll (3 stage) 		2225
+dead rat (2 stage) 		2228
+dead spider 			2236
+dead wolf 			2242
+dead dog 			2255
+dead human 			2281
+
+
+
+
+
+
+
+
+
+
+
