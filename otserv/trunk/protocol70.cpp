@@ -242,7 +242,6 @@ bool Protocol70::setCreatureAsKnown(unsigned long id)
 
 
 // Parse methods
-
 void Protocol70::parseLogout(NetworkMessage &msg)
 {
 	// we ask the map to remove us
@@ -727,16 +726,18 @@ void Protocol70::sendNetworkMessage(NetworkMessage *msg)
 void Protocol70::sendTileUpdated(const Position *Pos)
 {
 	//1D00	69	CF81	587C	07	9501C405C405C405C405C405C405780600C405C40500FF
+  if (CanSee(Pos->x, Pos->y))
+  {
+	  NetworkMessage msg;
+	  msg.AddByte(0x69);
+	  msg.AddPosition(*Pos);
 
-	NetworkMessage msg;
-	msg.AddByte(0x69);
-	msg.AddPosition(*Pos);
+	  GetMapDescription(Pos->x, Pos->y, Pos->z, 1, 1, msg);
+    msg.AddByte(0);
+    msg.AddByte(0xFF);
 
-	GetMapDescription(Pos->x, Pos->y, Pos->z, 1, 1, msg);
-  msg.AddByte(0);
-  msg.AddByte(0xFF);
-
-	msg.WriteToSocket(s);
+	  msg.WriteToSocket(s);
+  }
 }
 
 void Protocol70::sendThingMove(const Player *player, const Thing *thing, const Position *oldPos, unsigned char oldStackPos)
