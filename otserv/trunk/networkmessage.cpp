@@ -81,9 +81,12 @@ bool NetworkMessage::WriteToSocket(SOCKET socket)
   int sendBytes = 0;
   do
   {
-    int b = send(socket, (char*)m_MsgBuf+sendBytes, min(m_MsgSize-sendBytes+2, 1000), 0);
+#if defined WIN32 || defined __WINDOWS__
+#define MSG_DONTWAIT 0
+#endif
+    int b = send(socket, (char*)m_MsgBuf+sendBytes, min(m_MsgSize-sendBytes+2, 1000), MSG_DONTWAIT);
 
-    if (b <= 0)
+	if (b <= 0)
       return false;
 
     sendBytes += b;
