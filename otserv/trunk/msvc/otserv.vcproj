@@ -235,6 +235,16 @@
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}">
 		</Filter>
+		<Filter
+			Name="scripts"
+			Filter="">
+			<File
+				RelativePath="..\data\npc\scripts\lib\npc.lua">
+			</File>
+			<File
+				RelativePath="..\data\npc\scripts\sven.lua">
+			</File>
+		</Filter>
 	</Files>
 	<Globals>
 	</Globals>

@@ -176,6 +176,7 @@ NpcScript::NpcScript(std::string scriptname, Npc* npc){
 	luaopen_math(luaState);
 	luaopen_string(luaState);
 	luaopen_io(luaState);
+	lua_dofile(luaState, "data/npc/scripts/lib/npc.lua");
 	lua_dofile(luaState, scriptname.c_str());
 	this->npc=npc;
 	this->setGlobalNumber("addressOfNpc", (int) npc);
