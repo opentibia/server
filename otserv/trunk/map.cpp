@@ -987,7 +987,8 @@ void Map::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fig
 									msg.AddByte(targettile->getThingStackPos(attackedCreature));
 									msg.AddByte(0x6a);
 									msg.AddPosition(attackedCreature->pos);
-									msg.AddItem(&Item(attackedCreature->lookcorpse));
+									Item item = Item(attackedCreature->lookcorpse);
+									msg.AddItem(&item);
 								}
 								else
 									msg.AddCreatureHealth(attackedCreature);
@@ -1246,9 +1247,8 @@ void Map::makeCastSpell(Creature *player, int mana, int mindamage, int maxdamage
 								msg.AddByte(getTile(victim->pos.x, victim->pos.y, victim->pos.z)->getThingStackPos(victim));
 								msg.AddByte(0x6a);
 								msg.AddPosition(victim->pos);
-								Item* item = new Item(2278);
-								msg.AddItem(item);
-								delete item;
+								Item item = Item(victim->lookcorpse);
+								msg.AddItem(&item);
 							}
 							else
 								msg.AddCreatureHealth(victim);
@@ -1278,7 +1278,7 @@ void Map::makeCastSpell(Creature *player, int mana, int mindamage, int maxdamage
 		if (victim->health <= 0) {
 			tile->removeThing(victim);
 			playersOnline.erase(playersOnline.find(victim->getID()));
-			tile->addThing(new Item(2278));
+			tile->addThing(new Item(victim->lookcorpse));
 		}
 	}
 }
