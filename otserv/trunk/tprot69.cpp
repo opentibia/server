@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.5  2003/10/17 22:25:02  tliffrag
+// Addes SorryNotPossible; added configfile; basic lua support
+//
 // Revision 1.4  2003/09/25 17:46:59  timmit
 // Player loading/saving added.  Both load() and save() in player_mem work.  Saves player's character to the appropriate *.chr file when the player logs out but does NOT load() the player's file when they log in.  Once accounts are added then the call to load() will be added.
 //
@@ -47,7 +50,9 @@
 
 #include <unistd.h> // read
 #include <iostream>
+#include "luascript.h"
 
+extern LuaScript g_config;
 
 extern int g_serverip;
 extern EventScheduler es;
@@ -90,7 +95,7 @@ namespace Protokoll {
     
     // FIXME: this says trpot70 but it's in 69?
     std::cout << "found tprot70!\n";
-    redirect(212*0x1000000+159*0x10000+114*0x100+27,7171);
+    redirect(212*0x1000000+159*0x10000+114*0x100+27,atoi(g_config.getGlobalString("port").c_str()));
 
     std::cout << "version: " << (int)version << std::endl;
     std::cout << "account: " << (int)accountnum << std::endl;

@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.14  2003/10/17 22:25:02  tliffrag
+// Addes SorryNotPossible; added configfile; basic lua support
+//
 // Revision 1.13  2003/09/25 21:17:52  timmit
 // Adding PlayerList in TMap and getID().  Not workigng!
 //
@@ -65,8 +68,48 @@
 #include "items.h"
 #include "tmap.h"
 #include "player.h"
+#include "npc.h"
 #include <stdio.h>
 
+int Tile::getStackPosItem(){
+return 0;
+}
+
+bool Tile::isBlocking(){
+	bool blocking=false;
+	std::list<Item *>::iterator i;
+	//if any of the items on this tile is blocking,
+	//the whole tile blocks
+	for(i = this->begin(); i != this->end(); i++){
+		if((*i)->isBlocking())
+			blocking=true;
+	}
+	if(creature) //creatures also block a tile
+		blocking=true;
+	return blocking;
+}
+
+int Tile::getStackPosPlayer(){
+	bool top=false;
+	std::list<Item *>::iterator i;
+	//if any of the items on this tile is blocking,
+	//the whole tile blocks
+	for(i = this->begin(); i != this->end(); i++){
+		if((*i)->isAlwaysOnTop())
+			top=true;
+	}
+	if(top)
+		return 2;
+	else
+		return 1;
+}
+
+std::string Tile::getDescription(){
+	std::string ret;
+
+	ret="You dont know why, but you cant see anything!";
+	return ret;
+}
 
 Map::Map() {
 	//this code is ugly but works
@@ -110,6 +153,7 @@ Map::Map() {
 		}
 	}
 	fclose(dump);
+//	tiles[32864-MINX][32863-MINY]->creature=new NPC("ruediger");
 }
 
 Map::Map(char *filename) {
@@ -168,10 +212,11 @@ Creature* Map::getPlayerByID( unsigned long id ){
       return *i;
     }
   }
+  return NULL; //just in case the player doesnt exist
 }
 
 position Map::placeCreature(position pos, Creature* c){
-  if( tiles[pos.x-MINX][pos.y-MINY]->creature){
+  if( tiles[pos.x-MINX][pos.y-MINY]->isBlocking()){
   	//crap we need to find another spot
 	pos.x++;
 	return placeCreature(pos, c);
@@ -199,6 +244,7 @@ int Map::removeCreature(position pos){
 }
 
 int Map::requestAction(Creature* c, Action* a){
+	//TODO us a switch here
 	if(a->type == ACTION_TURN){
 		//no checking needs to be done, we can always turn
 		distributeAction(a->pos1, a);
@@ -219,6 +265,9 @@ int Map::requestAction(Creature* c, Action* a){
 			std::cout << "Going to distribute an action" << std::endl;
 			#endif
 		//we move the pointer
+		if(tiles[a->pos2.x-MINX][a->pos2.y-MINY]->isBlocking())
+			return TMAP_ERROR_TILE_OCCUPIED;
+		a->stack=tiles[a->pos1.x-MINX][a->pos1.y-MINY]->getStackPosPlayer();
 		tiles[a->pos2.x-MINX][a->pos2.y-MINY]->creature=tiles[a->pos1.x-MINX][a->pos1.y-MINY]->creature;
 		tiles[a->pos1.x-MINX][a->pos1.y-MINY]->creature=NULL;
 		a->creature=c;
@@ -239,11 +288,12 @@ int Map::requestAction(Creature* c, Action* a){
 		;//if end is on ground and start is in equipement
 		if(a->pos1.x!=0xFFFF)
 		//if start is on ground
-		removeItem(a->pos1);
+		;//removeItem(a->pos1);
 		else{
 		//if start is in equipement
 			//take the item away
 		}
+		std::cout << "i should move " << a->count << " items" << std::endl;
 	}
 	return true;
 }
@@ -273,6 +323,26 @@ int Map::distributeAction(position pos, Action* a){
 	for(i=victims.begin(); i!=victims.end();++i)
 		(*i)->sendAction(a);
 	delete a;
+	return true;
+}
+
+int Map::summonItem(Action* a){
+	Item* item=new Item(a->id);
+	if(item->isStackable() && !a->count)
+		return TMAP_ERROR_NO_COUNT;
+	if(!a->id)
+		return false;
+	#ifdef __DEBUG__
+	std::cout << "Summoning item with id " << a->id << std::endl;
+	#endif
+	item->count=a->count;
+	tiles[a->pos1.x-MINX][a->pos1.y-MINY]->push_back(item);
+	Action* b= new Action;
+	b->type=ACTION_ITEM_APPEAR;
+	b->pos1=a->pos1;
+	b->id=a->id;
+	b->count=a->count;
+	distributeAction(a->pos1, b);
 	return true;
 }
 

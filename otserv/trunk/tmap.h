@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.10  2003/10/17 22:25:02  tliffrag
+// Addes SorryNotPossible; added configfile; basic lua support
+//
 // Revision 1.9  2003/09/25 21:17:52  timmit
 // Adding PlayerList in TMap and getID().  Not workigng!
 //
@@ -56,10 +59,19 @@
 #include "item.h"
 #include "creature.h"
 
+enum tmapEnum{
+	TMAP_SUCCESS,
+	TMAP_ERROR,
+	TMAP_ERROR_NO_COUNT,
+	TMAP_ERROR_TILE_OCCUPIED,
+};
+
+
 //////////////////////////////////////////////////
 // a Tile represents a single field on the map.
 // it is a list of Items.
 class Creature; //see creature.h
+
 class Tile : public std::list<Item *> {
  public:
   Creature* creature;
@@ -71,7 +83,10 @@ class Tile : public std::list<Item *> {
   Tile(){
    creature = NULL;
   }
-
+  int getStackPosPlayer();
+  int getStackPosItem();
+  bool isBlocking();
+  std::string getDescription();
 };
 
 
@@ -95,8 +110,11 @@ class Map {
 		Creature* getPlayerByID( unsigned long id );
 		int removeCreature(position pos);
 		int requestAction(Creature* c, Action* a);
-		int summonItem(position pos, int id);
+
+		int summonItem(Action* a);
+		int summonItem(position pos,int id );
 		int changeGround(position pos, int id);
+
 		int saveMap();
 		int removeItem(position pos);
         Tile *tile(unsigned short _x, unsigned short _y, unsigned char _z);

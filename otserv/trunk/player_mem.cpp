@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.12  2003/10/17 22:25:02  tliffrag
+// Addes SorryNotPossible; added configfile; basic lua support
+//
 // Revision 1.11  2003/09/25 21:17:52  timmit
 // Adding PlayerList in TMap and getID().  Not workigng!
 //
@@ -52,7 +55,7 @@ player_mem::player_mem(){
 	color_legs=rand()%256;
 	color_shoes=rand()%256;
 	lookdir=1;
-	
+
 	// default values
 	// these will be changed when the character file is loaded, if one exists
 	// TODO: make these the default values for a level 1 character
@@ -73,6 +76,7 @@ player_mem::player_mem(){
         skills[ i ][ SKILL_TRIES ] = 0;
         std::cout<<"skills["<<i<<"] = "<<skills[i][SKILL_TRIES]<<std::endl;
     }	
+
 }
     // player's name must be set before calling load()
     void player_mem::load() {std::cout << "loading player " << name << "...\n";
@@ -233,7 +237,7 @@ player_mem::player_mem(){
     
     void player_mem::writeVal( FILE* charfile, std::string name, unsigned long value )
     {
-        char buffer[ 32 ];
+       
         std::string charstr;
         char tmp[ 32 ];
 

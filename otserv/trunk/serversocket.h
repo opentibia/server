@@ -21,6 +21,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.10  2003/10/17 22:25:02  tliffrag
+// Addes SorryNotPossible; added configfile; basic lua support
+//
 // Revision 1.9  2002/05/28 13:55:57  shivoc
 // some minor changes
 //
@@ -39,6 +42,9 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "definitions.h"
+#include "luascript.h"
+
+extern LuaScript g_config;
 
 namespace TNetwork {
     class ServerSocket {
@@ -57,7 +63,7 @@ namespace TNetwork {
         int atoport(char *service, char *proto);
         struct in_addr *atoaddr(char *address);
         public:
-        ServerSocket(int _port= 7171, int _maxconnections = 100);
+        ServerSocket(int _port= atoi(g_config.getGlobalString("port").c_str()), int _maxconnections = 100);
         ~ServerSocket();
     };
 

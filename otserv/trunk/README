@@ -1,5 +1,5 @@
-otserv 0.2.5a
----------------
+otserv CVS
+=======
 What is this?
 	otserv is a programm that acts like a tibia server.
 	You can connect to it, walk around, talk, create items.
@@ -16,7 +16,7 @@ How does it work?
 
 What's New?
 	- lost of bugfixes
-	- !g command
+
 
 How do I use this new stuff?
 	- lost of bugfixes
@@ -25,9 +25,7 @@ How do I use this new stuff?
 	    crash anymore
 	  Items dont change places on the stack
 	  You can push items under yourself
-	- !g command
-	  use !g to create groundtiles, dont use !i for ground
-	  it will crash the client!
+
 
 How to use the old stuff?
 	Create items by saying !i <itemid>
@@ -47,6 +45,7 @@ Credits?
 	Shi'Voc - Coding of initial otserv
 	Acrimon - Coding of initial otserv
 	Tliff - Coding, some kind of project leader
+	TiMMit
 	Zybak - Map-Editor coding
 	Torvik - Item list
 	Privateer - Documentation on the protocoll

@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.4  2003/10/17 22:25:02  tliffrag
+// Addes SorryNotPossible; added configfile; basic lua support
+//
 // Revision 1.3  2002/05/28 13:55:56  shivoc
 // some minor changes
 //
@@ -42,19 +45,27 @@ class Item {
 
     private: // the following, I will have to rethink:
         // could be union:
-        unsigned short itemcount; // number of stacked items
+
         unsigned short actualitems; // number of items in container
         // list of items if this is a container
         std::list<Item *> lcontained;
+		static Items items;
 
     public:
+	 unsigned short count; // number of stacked items
         unsigned getID();    // ID as in ItemType
+		bool isBlocking();
+		bool isStackable();
+		bool isAlwaysOnTop();
+		bool isAlwaysOnBottom();
+		std::string getDescription();
 
         // get the number of items or 0 if non stackable
         unsigned short getItemCount();
 
         // Constructor for items
         Item(const unsigned short _type);
+		Item();
 
         ~Item();
 

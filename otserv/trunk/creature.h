@@ -43,7 +43,7 @@ class Creature {
 
 		virtual bool isPlayer(){return false;}
 		
-		virtual unsigned long getID(){}
+		virtual unsigned long getID(){return 0;}
 		
 		virtual void sendAction(Action*){}
         // get the next Action of the creature

@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.11  2003/10/17 22:25:02  tliffrag
+// Addes SorryNotPossible; added configfile; basic lua support
+//
 // Revision 1.10  2003/09/17 16:35:08  tliffrag
 // added !d command and fixed lag on windows
 //
@@ -45,9 +48,11 @@
 #include <stdlib.h>
 #include <time.h>
 #include "tmap.h"
+#include "luascript.h"
 
 int ipFromDotted(char*);
 int g_serverip;
+LuaScript g_config("config.lua");
 EventScheduler es;
 Map::Map map;
 

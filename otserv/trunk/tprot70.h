@@ -22,6 +22,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.7  2003/10/17 22:25:02  tliffrag
+// Addes SorryNotPossible; added configfile; basic lua support
+//
 // Revision 1.6  2003/09/25 21:17:52  timmit
 // Adding PlayerList in TMap and getID().  Not workigng!
 //
@@ -53,6 +56,7 @@
 #include "creature.h"
 #include "texcept.h"
 #include "action.h"
+#include "item.h"
 #include <string>
 
 #define ADD4BYTE(stream, val) (stream) += (char)((val)%256); \
@@ -62,6 +66,8 @@
 
 #define ADD2BYTE(stream, val) (stream) += (char)((val)%256); \
 (stream) += (char)(((val)/256)%256);
+
+#define ADD1BYTE(stream, val) (stream) += (char)((val)%256);
 
 #define ADDPOS(stream,pos) (stream)+=(char)((pos.x)%256); \
 (stream)+=(char)((pos.x)/256);(stream)+=(char)((pos.y)%256);\
@@ -111,6 +117,15 @@
 			void sendPlayerTurn(Action* action);
 			void sendPlayerItemAppear(Action* action);
 			void sendPlayerItemDisappear(Action* action);
+
+			void sendPlayerSorry();
+			void sendPlayerSorry(tmapEnum);
+			void sendPlayerSorry(std::string);
+
+			bool knowsPlayer(long id);
+			void addKnownPlayer(long id);
+            // translate a map area to clientreadable format
+
 			void sendPlayerChangeGround(Action* action);
             // translate a map area to clientreada format
             // uses the map the client is on
@@ -120,6 +135,7 @@
 			void TProt70::parsePacket(std::string);
 
 			std::string makeCreature(Creature*);
+			std::string makeItem(Item*);
             // the socket the player is on...
             Socket psocket;
             // the os of the client...
@@ -131,6 +147,7 @@
             // the position on the map...
             position pos;
             Map* map;
+			std::list<long> knownPlayers;
 
 
     }; // class TProt70 : public Protokoll  

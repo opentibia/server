@@ -13,6 +13,7 @@ ACTION_SETOUTFIT,
 ACTION_SAY,
 ACTION_WALK_IN,
 ACTION_LOGIN,
+ACTION_CREATE_ITEM,
 ACTION_ITEM_APPEAR,
 ACTION_THROW,
 ACTION_ITEM_DISAPPEAR,
@@ -32,7 +33,8 @@ struct Action {
   std::string playername; //player who said something
   std::string buffer;          // buffer if the char wants to say something etc.
   int id; // an id
-Creature* creature;
+  int count;
+  Creature* creature;
 
   //that will have to work for now
 	Action(){

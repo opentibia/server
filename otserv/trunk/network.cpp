@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.13  2003/10/17 22:25:02  tliffrag
+// Addes SorryNotPossible; added configfile; basic lua support
+//
 // Revision 1.12  2003/09/17 16:35:08  tliffrag
 // added !d command and fixed lag on windows
 //
@@ -71,8 +74,6 @@
 //////////////////////////////////////////////////
 // Sets up the Server and starts listen for connections
 Socket TNetwork::make_socket(int _socket_type, u_short _port) throw(texception) {
-    int yes=1;
-
 #ifdef __WINDOWS__
     // Call to WSA Startup...
 
@@ -110,6 +111,7 @@ Socket TNetwork::make_socket(int _socket_type, u_short _port) throw(texception) 
         throw texception("network.cpp: The socket could not be created!", true);
     } // if (listen_socket == -1)
 #ifdef __LINUX__
+    int yes;
     if (fcntl(listen_socket, F_SETFL, O_NONBLOCK) < 0) {  // set O_NONBLOCK flag
         throw texception("network.cpp: could not set O_NONBLOCK!", true);
     }

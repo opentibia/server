@@ -21,6 +21,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.16  2003/10/17 22:25:02  tliffrag
+// Addes SorryNotPossible; added configfile; basic lua support
+//
 // Revision 1.15  2003/08/25 21:28:12  tliffrag
 // Fixed all warnings.
 //
@@ -204,7 +207,7 @@ namespace TNetwork {
 #endif
         // if too many connections, send a message over cs and close it
         ss.connections++;
-        fprintf(stderr, "ip= %s, p= %hd.\n", inet_ntoa(clientname.sin_addr), ntohs(clientname.sin_port));
+        fprintf(stdout, "ip= %s, p= %hd.\n", inet_ntoa(clientname.sin_addr), ntohs(clientname.sin_port));
 		sockaddr_in info;
 		socklen_t isize= sizeof(info);
 

@@ -30,6 +30,9 @@
 #include <unistd.h> // read
 #include <stdio.h>
 #include <iostream>
+#include "luascript.h"
+
+extern LuaScript g_config;
 
 extern EventScheduler es;
 extern int g_serverip;
@@ -167,6 +170,11 @@ void TProt70::parsePacket(std::string msg){
   case 0x96: //say something
     parseSay(action, msg);
     break;
+  case 0x64: //TODO client moving with steps
+    std::cout << "player tried to move by mouse"<< std::endl;
+    sendPlayerSorry("Moving by mouse not possible yet. Use the cursors keys!");
+    return;
+    break;
   case 0xA1: //attack
     parseAttack(action, msg);
     break;
@@ -176,9 +184,15 @@ void TProt70::parsePacket(std::string msg){
   }
 				//so we got the action, now we ask the map to execut it
   if(action->type!=ACTION_NONE){
-    map->requestAction(creature,action);
+  	switch(map->requestAction(creature,action)){
+		case TMAP_ERROR_TILE_OCCUPIED:
+			sendPlayerSorry(TMAP_ERROR_TILE_OCCUPIED);
+		break;
+	}
+    if(map->requestAction(creature,action)==-1)
+		sendPlayerSorry();
   }
-			}
+}
 
 			void TProt70::setMap(position newpos, Map& newmap) throw(texception) {
 			//this happens when the player logs in
@@ -307,7 +321,7 @@ void TProt70::parsePacket(std::string msg){
 			buf+= (char)0x11;
 
 			//TODO richtiger motd support
-			std::string welcomemsg="Welcome to the otserv. For help check http://tibia.de/forum";
+			std::string welcomemsg=g_config.getGlobalString("loginmsg");
 			ADD2BYTE(buf,welcomemsg.length());
 			buf+= welcomemsg;
 
@@ -377,8 +391,13 @@ std::string TProt70::makeMap(position topleft, position botright) {
 #ifdef __DEBUG__
 	std::cout << "-";
 #endif
-	ADD2BYTE(buf, (*it)->getID());
-      }
+		buf+=makeItem(*it);
+/*		ADD2BYTE(buf, (*it)->getID());
+		if((*it)->isStackable()){
+			buf+=(unsigned char)((*it)->count);
+			std::cout << "Item id " << (*it)->getID() << " is stackable" <<std::endl;
+		}*/
+	  }
       
       if(tile->getCreature()!=NULL)
 	buf += makeCreature(tile->getCreature());
@@ -394,53 +413,118 @@ std::string TProt70::makeMap(position topleft, position botright) {
   
 } // std::string TProt70::makeMap(const position& topleft, const position& botright)
 
+bool TProt70::knowsPlayer(long id){
+	std::list<long>::iterator i;
+	for(i=knownPlayers.begin();i!=knownPlayers.end();++i){
+		if((*i)==id)
+			return true;
+	}
+	return false;
+}
+
+void TProt70::addKnownPlayer(long id){
+	if(knownPlayers.size()>=64)
+		knownPlayers.pop_front();
+	knownPlayers.push_back(id);
+}
+
+std::string TProt70::makeItem(Item* c){
+	std::string tmp;
+	ADD2BYTE(tmp, c->getID());
+	if(c->isStackable())
+		ADD1BYTE(tmp, c->getItemCount());
+	return tmp;
+}
+
 std::string TProt70::makeCreature(Creature* c){
-  std::string buf="";
-  
-  
-  if(c && c->isPlayer())
-    {
-     
-      player_mem p=((Player*)c)->player;
-      //PLAYER??
-      
-      buf += (char)0x61;
-      buf += (char)0x00;
-      buf += (char)0x00;
-      buf += (char)0x00;
-      buf += (char)0x00;
-      
-      buf += (char)0x00; //seperator?
-     
-      buf += (char)(p.pnum%256);
-      buf += (char)(p.pnum/256)%256;
-      buf += (char)(p.pnum/(256*256))%256;
-      buf += (char)(p.pnum/(256*256*256))%256;
-      
-      ADD2BYTE(buf, p.name.length());
-      buf+=p.name;
-      buf += (char)0x64;//SEPERATOR
-     
-      buf += (char)0x01; //FACING
-      
-      buf += (char)0x88;//FIX
-     
-      buf += (char)p.color_hair;
-      buf += (char)p.color_shirt;
-      buf += (char)p.color_legs;
-      buf += (char)p.color_shoes;
-      buf += (char)0x00; //NOTHING?
-     
-      buf += (char)0xD7; //NOTHING?
-      buf += (char)0xDC;//NOTHING?
-    
-      
-      buf += (char)0x00;
-    }
-  else{
-    //FIXME implement creatures
-  }
-  return buf;
+	//FIXME this i a bad thing
+std::string buf="";
+
+
+if(c && c->isPlayer())
+	{
+	bool knows=true;
+	player_mem p=((Player*)c)->player;
+	//PLAYER??
+		if(!this->knowsPlayer(p.pnum)){
+			std::cout << "Dont know this player" << std::endl;
+			addKnownPlayer(p.pnum);
+			knows=false;
+	}
+	if(knows)
+	buf += (char)0x62;
+	else{
+	buf += (char)0x61;
+	buf += (char)0x00;
+	buf += (char)0x00;
+	buf += (char)0x00;
+	buf += (char)0x00;
+
+	buf += (char)0x00; //seperator?
+}
+	buf += (char)(p.pnum%256);
+	buf += (char)(p.pnum/256)%256;
+	buf += (char)(p.pnum/(256*256))%256;
+	buf += (char)(p.pnum/(256*256*256))%256;
+	if(!knows){
+		ADD2BYTE(buf, p.name.length());
+		buf+=p.name;
+	}
+	buf += (char)0x64;//SEPERATOR
+
+	buf += (char)0x01; //FACING
+
+	buf += (char)0x88;//FIX
+
+	buf += (char)p.color_hair;
+	buf += (char)p.color_shirt;
+	buf += (char)p.color_legs;
+	buf += (char)p.color_shoes;
+	buf += (char)0x00; //NOTHING?
+
+	buf += (char)0xD7; //NOTHING?
+	buf += (char)0xDC;//NOTHING?
+
+
+	buf += (char)0x00;
+	}
+else{
+	buf += (char)0x61;
+	buf += (char)0x00;
+	buf += (char)0x00;
+	buf += (char)0x00;
+	buf += (char)0x00;
+
+	buf += (char)0x00; //seperator?
+
+	buf += (char)10;
+	buf += (char)10;
+	buf += (char)10;
+	buf += (char)10;
+
+	std::string name="Ruediger";
+	ADD2BYTE(buf, name.length());
+	buf+=name;
+	buf += (char)0x64;//SEPERATOR
+
+	buf += (char)0x01; //FACING
+
+	buf += (char)0x88;//FIX
+
+	buf += (char)217;
+	buf += (char)123;
+	buf += (char)45;
+	buf += (char)1;
+	buf += (char)0x00; //NOTHING?
+
+	buf += (char)0xD7; //NOTHING?
+	buf += (char)0xDC;//NOTHING?
+
+
+	buf += (char)0x00;
+	//FIXME implement creatures
+}
+return buf;
 }
 
 //Parse methods
@@ -521,6 +605,9 @@ void TProt70::parseThrow(Action* action, std::string msg){
 	action->pos2.y=(unsigned char)msg[12]*256+(unsigned char)msg[11];
 	action->pos2.z=(unsigned char)msg[13];
 
+	if(msg.size()==15)
+	action->count=msg[14];
+
 	printf("From %i %i to %i %i", action->pos1.x, action->pos1.y, action->pos2.x, action->pos2.y);
 	action->creature=this->creature;
 }
@@ -530,32 +617,35 @@ void TProt70::parseSay(Action* action, std::string msg){
 	if(msg[4]=='!'){
 		action->type=ACTION_NONE;
 		position mypos=player->pos;
-		int id; std::string tmpstr;
+		int id;
+		std::string tmpstr, tmpstr2;
+		int count;
+		unsigned int space;
+		Action* a = new Action;
 		switch(msg[5]){
-			case 'q':
-				exit(0);
-			break;
-			case 's':
-				map->saveMap();
-			break;
-			case 'd':
-
-			  switch(player->lookdir){
-			  case 0:
-			    mypos.y-=1;
-			    break;
-			  case 1:
-			    mypos.x+=1;
-			    break;
-			  case 2:
-			    mypos.y+=1;
-			    break;
-			  case 3:
-			    mypos.x-=1;
-			    break;
-			  }
-			  map->removeItem(mypos);
-			  break;
+		case 'q':
+		  exit(0);
+		  break;
+		case 's':
+		  map->saveMap();
+		  break;
+		case 'd':
+		  switch(player->lookdir){
+		  case 0:
+		    mypos.y-=1;
+		    break;
+		  case 1:
+		    mypos.x+=1;
+		    break;
+		  case 2:
+		    mypos.y+=1;
+		    break;
+		  case 3:
+		    mypos.x-=1;
+		    break;
+		  }
+		  map->removeItem(mypos);
+		  break;
 		case 'i':
 		  switch(player->lookdir){
 		  case 0:
@@ -571,17 +661,30 @@ void TProt70::parseSay(Action* action, std::string msg){
 		    mypos.x-=1;
 		    break;
 		  }
-		 
+
 		  tmpstr=msg.substr(7,msg.length()-7);
+		  space=tmpstr.find(" ", 0);
+		  if(space==tmpstr.npos)
+		    tmpstr2="0";
+		  else
+		    tmpstr2=tmpstr.substr(space,tmpstr.length()-space);
 #ifdef __DEBUG__
 		  std::cout << tmpstr << std::endl;
 #endif
 		  id=atoi(tmpstr.c_str());
-#ifdef __DEBUG__
-		  std::cout << id << std::endl;
-#endif
-		  map->summonItem(mypos,  id);
+		  count=atoi(tmpstr2.c_str());
+		  
+		  a->type=ACTION_CREATE_ITEM;
+		  a->id=id;
+		  a->pos1=mypos;
+		  a->count=count;
+		  if(map->summonItem(a)==TMAP_ERROR_NO_COUNT)
+		    sendPlayerSorry("You need to specify a count when you summon this item!");
+		  delete a;
 		  break;
+		  
+		  
+	      
 		case 'g':
 		  switch(player->lookdir){
 		  case 0:
@@ -696,7 +799,7 @@ void TProt70::sendPlayerMove(Action* action){
 		ADD2BYTE(buf, action->pos1.x);
 		ADD2BYTE(buf, action->pos1.y);
 		buf+=(char)action->pos1.z;
-		buf += (char)0x01;
+		buf += (char)action->stack;
 	}
 	else if((distancewas.x>=10&&distancenow.x<=9)||(distancewas.y>=8&&distancenow.y<=7)||(distancewas.x<=-10&&distancenow.x>=-9)||(distancewas.y<=-7&&distancenow.y>=-6) ){
 	#ifdef __DEBUG__
@@ -714,7 +817,7 @@ void TProt70::sendPlayerMove(Action* action){
 		ADD2BYTE(buf, action->pos1.x);
 		ADD2BYTE(buf, action->pos1.y);
 		buf+=(char)action->pos1.z;
-		buf += (char)0x01;
+		buf += (char)action->stack;
 		ADD2BYTE(buf, action->pos2.x);
 		ADD2BYTE(buf, action->pos2.y);
 		buf+=(char)action->pos2.z;
@@ -794,6 +897,9 @@ void TProt70::sendPlayerItemAppear(Action* action){
 	ADD2BYTE(buf, action->pos1.y);
 	buf+=(char)action->pos1.z;
 	ADD2BYTE(buf, action->id);
+	if(action->count)
+	buf+=(unsigned char)action->count;
+	std::cout << "Count:" << action->count << std::endl;
 	buf[0]=(char)(buf.size()-2)%256;
 	buf[1]=(char)((buf.size()-2)/256)%256;
 	TNetwork::SendData(psocket,buf);
@@ -823,6 +929,35 @@ void TProt70::sendPlayerLogout(Action* action){
 	TNetwork::SendData(psocket,buf);
 }
 
+
+void TProt70::sendPlayerSorry(){
+	sendPlayerSorry("Sorry. Not possible");
+}
+
+void TProt70::sendPlayerSorry(tmapEnum){
+	std::string msg = "Sorry. Not possible";
+		std::string buf = "  ";
+	buf+=(char)0xB4;
+	buf+=(char)0x14;
+	ADD2BYTE(buf, msg.size());
+	buf+=msg;
+	buf[0]=(char)(buf.size()-2)%256;
+	buf[1]=(char)((buf.size()-2)/256)%256;
+	TNetwork::SendData(psocket,buf);
+}
+
+void TProt70::sendPlayerSorry(std::string msg){
+	std::string buf = "  ";
+	buf+=(char)0xB4;
+	buf+=(char)0x14;
+	ADD2BYTE(buf, msg.size());
+	buf+=msg;
+	buf[0]=(char)(buf.size()-2)%256;
+	buf[1]=(char)((buf.size()-2)/256)%256;
+	TNetwork::SendData(psocket,buf);
+}
+
+
 void TProt70::sendPlayerChangeGround(Action* action){
 	std::string buf = "  ";
 	buf+=(char)0x6B;
@@ -835,6 +970,7 @@ void TProt70::sendPlayerChangeGround(Action* action){
 	buf[1]=(char)((buf.size()-2)/256)%256;
 	TNetwork::SendData(psocket,buf);
 }
+
 
 void TProt70::sendPlayerTurn(Action* action){
 	std::string buf = "  ";

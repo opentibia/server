@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.9  2003/10/17 22:25:02  tliffrag
+// Addes SorryNotPossible; added configfile; basic lua support
+//
 // Revision 1.8  2003/09/08 13:28:41  tliffrag
 // Item summoning and maploading/saving now working.
 //
@@ -49,13 +52,14 @@
 #ifndef __OTSERV_ITEMS_H
 #define __OTSERV_ITEMS_H
 
-#include <ext/hash_map>
+#include <map>
 using namespace __gnu_cxx;
 
 #include <string>
 
 class ItemType {
-    unsigned short id;
+public:
+	unsigned short id;
     unsigned short maxitems; // maximum size if this is a container
     unsigned short tibiaid; // the ID in the Tibia protocol
     unsigned short weight; // weight of the item, e.g. throwing distance depends on it
@@ -64,13 +68,17 @@ class ItemType {
     // other vars:
     // what items can be used on what other items? pointer to function, think on implementation
 
-    bool iscontainer : 1;
-    bool stackable : 1;
-    bool groundtile : 1; // is this necessary?
-    bool walkable : 1; // people can walk on it
-    bool pickupable : 1; // people can pick it up
+
     // other bools
-    public:
+
+	bool iscontainer;
+    bool stackable;
+	bool useable;
+	bool alwaysOnBottom;
+	bool alwaysOnTop;
+    bool groundtile; // is this necessary?
+    bool blocking; // people can walk on it
+    bool pickupable; // people can pick it up
 	//what freak has chosen this const static unsigned short?
     //const static unsigned short WATER = 486;
     const static unsigned short WATER = 0x01DB;
@@ -87,15 +95,14 @@ class ItemType {
 };
 
 class Items {
-    struct eqItemType {
-        bool operator() (unsigned short it1, unsigned short it2) const {
-            // ...
-            return 1;
-        }
-    };
-    typedef hash_map<unsigned short, ItemType> ItemHash;
-    ItemHash items;
     public:
+	typedef std::map<unsigned short, ItemType*> ItemHash;
+    ItemHash items;
+
+	std::string readDatEntryHeader(FILE* f);
+	void Items::readDatEntry(FILE* f);
+
+	int loadFromDat(std::string);
     Items();
     ~Items();
 };

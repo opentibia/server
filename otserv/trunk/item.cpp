@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.4  2003/10/17 22:25:02  tliffrag
+// Addes SorryNotPossible; added configfile; basic lua support
+//
 // Revision 1.3  2002/05/28 13:55:56  shivoc
 // some minor changes
 //
@@ -31,7 +34,7 @@
 // include header file
 #include "item.h"
 
-
+Items Item::items;
 //////////////////////////////////////////////////
 // returns the ID of this item's ItemType
 unsigned Item::getID() {
@@ -41,15 +44,20 @@ unsigned Item::getID() {
 //////////////////////////////////////////////////
 // return how many items are stacked or 0 if non stackable
 unsigned short Item::getItemCount() {
-    return itemcount;
+    return count;
 }
 
 
 Item::Item(const unsigned short _type) {
     id = _type;
-    itemcount = 0;
+    count = 0;
 }
 
+
+Item::Item() {
+    id = 0;
+    count = 0;
+}
 
 Item::~Item() {
     lcontained.clear();
@@ -82,6 +90,18 @@ Item::iterator Item::getItems() {
 // return iterator to one beyond the last item
 Item::iterator Item::getEnd() {
     return lcontained.end();
+}
+
+bool Item::isBlocking() {
+	return items.items[id]->blocking;
+}
+
+bool Item::isStackable() {
+	return items.items[id]->stackable;
+}
+
+bool Item::isAlwaysOnTop() {
+	return items.items[id]->alwaysOnTop;
 }
 
 //////////////////////////////////////////////////

@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.11  2003/10/17 22:25:02  tliffrag
+// Addes SorryNotPossible; added configfile; basic lua support
+//
 // Revision 1.10  2003/09/25 21:17:52  timmit
 // Adding PlayerList in TMap and getID().  Not workigng!
 //
@@ -46,6 +49,7 @@
 
 #include "memory.h"
 #include "pos.h"
+#include "item.h"
 #include <string>
 
 enum skills_t {
@@ -62,45 +66,49 @@ enum skillsid_t {
     SKILL_TRIES
 };
 
-   class player_mem : public ::Memory {
-        public:
-            void load();
-            void save();
-			player_mem();
+class player_mem : public ::Memory {
+ public:
+  void load();
+  void save();
+  player_mem();
             std::string name, passwd;
-			int color_hair, color_shirt, color_legs, color_shoes;
-			int lookdir;
-			position pos;
-			
-			// health, health max.
-			int health, health_max;
-			// mana, mana max.
-			int mana, mana_max;
-			// food level
-			int food_level;
-			// inventory
-			// TODO: how do you want to store the inventory?
-			// use a list of Item?
-			// capacity ( based off what is in inventory ), capacity max.
-			int cap, cap_max;
-			// level
-			int level;
+	    int color_hair, color_shirt, color_legs, color_shoes;
+	    int lookdir;
+	    position pos;
+	    //items
+	    Item slot_head, slot_necklace, slot_armor, slot_legs, slot_backpack;
+	    Item slot_left, slot_right, slot_ring, slot_ammo, slot_feet;
+	    
+	    // health, health max.
+	    int health, health_max;
+	    // mana, mana max.
+	    int mana, mana_max;
+	    // food level
+	    int food_level;
+	    // inventory
+	    // TODO: how do you want to store the inventory?
+	    // use a list of Item?
+	    // capacity ( based off what is in inventory ), capacity max.
+	    int cap, cap_max;
+	    // level
+	    int level;
             // experience
             unsigned long experience;
-			// magic level
-			int mag_level;
+	    // magic level
+	    int mag_level;
             //mana spent ( to know when the character will advance in magic level )
-			unsigned long mana_spent;
-			// skills, # of tries on each skill ( to know when the character will advance )
-			// 2 sub-elements.  [ skill ][ SKILL_LEVEL ] is the current level of that skill
-			// [ skill ][ SKILL_TRIES ] is how many tries on that skill ( to determine when the skill advances )
-			int skills[ 7 ][ 2 ];
-			
+	    unsigned long mana_spent;
+	    // skills, # of tries on each skill ( to know when the character will advance )
+	    // 2 sub-elements.  [ skill ][ SKILL_LEVEL ] is the current level of that skill
+	    // [ skill ][ SKILL_TRIES ] is how many tries on that skill ( to determine when the skill advances )
+	    int skills[ 7 ][ 2 ];
+	    
             unsigned long pnum;
             
-          unsigned long readVal( FILE* charfile );//, std::string name, unsigned long &value );
-          void writeVal( FILE* charfile, std::string name, unsigned long value );
-    }; // class player_mem : public Memory
+	    unsigned long readVal( FILE* charfile );//, std::string name, unsigned long &value );
+	    void writeVal( FILE* charfile, std::string name, unsigned long value );
+        
+		      }; // class player_mem : public Memory
 
 
 #endif
