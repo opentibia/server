@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.9  2003/09/08 13:28:41  tliffrag
+// Item summoning and maploading/saving now working.
+//
 // Revision 1.8  2003/05/19 16:48:37  tliffrag
 // Loggingin, talking, walking around, logging out working
 //
@@ -56,4 +59,7 @@ void swap(T &x, T &y)
   x = y;
   y = temp;
 }
+
+extern int hexint(const char *src);
+
 #endif // __definitions_h

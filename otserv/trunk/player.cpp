@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.8  2003/09/08 13:28:41  tliffrag
+// Item summoning and maploading/saving now working.
+//
 // Revision 1.7  2003/05/19 16:48:37  tliffrag
 // Loggingin, talking, walking around, logging out working
 //
@@ -47,7 +50,8 @@ namespace Creatures {
 
         // if everything was checked we should load the player... (TODO)
         // for now we just fill in some stuff directly
-        player.pnum =rand(); //TODO right playernumbers
+		id=rand();
+        player.pnum =id; //TODO right playernumbers
 
         // and pass that infos to the protocoll
         client->setdata(player);

@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.6  2003/09/08 13:28:41  tliffrag
+// Item summoning and maploading/saving now working.
+//
 // Revision 1.5  2003/05/19 16:48:37  tliffrag
 // Loggingin, talking, walking around, logging out working
 //
@@ -45,6 +48,7 @@
 			player_mem();
             std::string name, passwd;
 			int color_hair, color_shirt, color_legs, color_shoes;
+			int lookdir;
 			position pos;
 
             unsigned int pnum;

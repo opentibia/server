@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.4  2003/09/08 13:28:41  tliffrag
+// Item summoning and maploading/saving now working.
+//
 // Revision 1.3  2002/05/28 13:55:56  shivoc
 // some minor changes
 //
@@ -52,9 +55,10 @@ ItemType::~ItemType() {
 
 Items::Items() {
     // add a few items
-    unsigned short id;
+/*    unsigned short id;
     id = ItemType::WATER; items[id] = ItemType(id, 0x0E00, "water");
     id = ItemType::GRASS; items[id] = ItemType(id, 0x0A00, "grass");
+*/
 }
 
 Items::~Items() {

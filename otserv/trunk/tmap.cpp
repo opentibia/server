@@ -5,7 +5,7 @@
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
-// as published by the Free Software Foundation; either version 2
+// as published by the Free Software Foundumpion; either version 2
 // of the License, or (at your option) any later version.
 // 
 // This program is distributed in the hope that it will be useful,
@@ -14,12 +14,15 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software Foundation,
+// along with this program; if not, write to the Free Software Foundumpion,
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.8  2003/09/08 13:28:41  tliffrag
+// Item summoning and maploading/saving now working.
+//
 // Revision 1.7  2003/08/26 21:09:53  tliffrag
 // fixed maphandling
 //
@@ -46,26 +49,47 @@
 #include "items.h"
 #include "tmap.h"
 #include "player.h"
+#include <stdio.h>
 #include <iostream>
 
 Map::Map() {
-    // generating some standard map.
-    // yes I could have done that better ...
-    for (unsigned short y = MINY; y < MAXY; y++)
-        for (unsigned short x = MINX; x < MAXX; x++) {
-            tiles[x-MINX][y-MINY] = new Tile;
-            tiles[x-MINX][y-MINY]->push_back(new Item(ItemType::WATER));
-        }
-    std::cout << "region watered." << std::endl;
-    for (unsigned short x = MINX + 20; x <= MAXX - 20; x++)
-        for (unsigned short y = MINY + 20; y <= MAXY - 20; y++) {
-            delete tiles[x-MINX][y-MINY]->back();
-            tiles[x-MINX][y-MINY]->pop_back();
-            tiles[x-MINX][y-MINY]->push_back(new Item(ItemType::STREET));
-        }
-    std::cout << "created land." << std::endl;
-	tiles[32864-MINX+20][32864-MINY]->push_back(new Item(ItemType::THING));
-	tiles[32864-MINX+2][32864-MINY]->push_back(new Item(ItemType::THING));
+	//this code is ugly but works
+	//TODO improve this code to support things like
+	//a quadtree to speed up everything
+	std::cout << "Loading map" << std::endl;
+	FILE* dump=fopen("otserv.map", "rb");
+	if(!dump){
+		 std::cout << "Fatal error: Mapfile not found" << std::endl;
+		exit(1);
+	}
+	position topleft, bottomright, now;
+
+
+	topleft.x=fgetc(dump)*256;	topleft.x+=fgetc(dump);
+	topleft.y=fgetc(dump)*256;	topleft.y+=fgetc(dump);
+	topleft.z=fgetc(dump);
+
+	bottomright.x=fgetc(dump)*256;	bottomright.x+=fgetc(dump);
+	bottomright.y=fgetc(dump)*256;	bottomright.y+=fgetc(dump);
+	bottomright.z=fgetc(dump);
+
+	int xsize= bottomright.x-topleft.x;
+	int ysize= bottomright.y-topleft.y;
+	//TODO really place this map patch where it belongs
+
+	for(int y=0; y < ysize; y++){
+		for(int x=0; x < xsize; x++){
+			while(true){
+				int id=fgetc(dump)*256;id+=fgetc(dump);
+				if(id==0x00FF)
+					break;
+				now.x=x+MINX;now.y=y+MINY;now.z=topleft.z;
+				tiles[x][y] = new Tile;
+				tiles[x][y]->push_back(new Item(id));
+			}
+		}
+	}
+	fclose(dump);
 }
 
 Map::Map(char *filename) {
@@ -77,7 +101,35 @@ Tile *Map::tile(unsigned short _x, unsigned short _y, unsigned char _z) {
 }
 
 Map::~Map() {
+	//save the map
+	std::cout << "Saving the map" << std::endl;
+	FILE* dump=fopen("otserv.map", "wb+");
+	//first dump position of top left corner, then bottom right corner
+	//then the raw map-dumpa
+	fputc((int)(MINX/256), dump);
+	fputc((int)(MINX%256), dump);
+	fputc((int)(MINY/256), dump);
+	fputc((int)(MINY%256), dump);
+	fputc( (int) 7, dump);
 
+	fputc((int)(MAXX/256), dump);
+	fputc((int)(MAXX%256), dump);
+	fputc( (int)(MAXY/256), dump);
+	fputc((int)(MAXY%256), dump);
+	fputc((int) 7, dump);
+
+	for(int y=0; y < MAXY-MINY; y++){
+		for(int x=0; x < MAXX-MINX; x++){
+			Tile* tile=tiles[x][y];
+			for (Item::iterator it=tile->begin(); it != tile->end(); it++) {
+				fputc((int)( (*it)->getID()/256), dump);
+				fputc((int)( (*it)->getID()%256), dump);
+			}
+			fputc(0x00, dump);
+			fputc(0xFF, dump); // tile end
+		}
+	}
+	fclose(dump);
 }
 
 position Map::placeCreature(position pos, Creature* c){
@@ -167,4 +219,15 @@ int Map::distributeAction(position pos, Action* a){
 	return true;
 }
 
-
+int Map::summonItem(position pos, int id){
+	if(!id)
+		return false;
+	std::cout << "Summoning item with id " << id << std::endl;
+	tiles[pos.x-MINX][pos.y-MINY]->push_back(new Item(id));
+	Action* a= new Action;
+	a->type=ACTION_ITEM_APPEAR;
+	a->pos1=pos;
+	a->id=id;
+	distributeAction(pos, a);
+	return true;
+}

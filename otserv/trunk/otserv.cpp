@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.9  2003/09/08 13:28:41  tliffrag
+// Item summoning and maploading/saving now working.
+//
 // Revision 1.8  2003/05/19 16:48:37  tliffrag
 // Loggingin, talking, walking around, logging out working
 //
@@ -74,5 +77,24 @@ int ipFromDotted(char* _ip){
   }
   printf("\n%i\n", num);
   return num;
+}
+
+int hexint(const char *src)
+{
+ unsigned int y; /* unsigned for correct wrapping. */
+ int h;
+
+ /* high part. */
+ if ((y = src[0] - '0') <= '9'-'0') h = y;
+ else if ((y = src[0] - 'a') <= 'f'-'a') h = y+10;
+ else if ((y = src[0] - 'A') <= 'F'-'A') h = y+10;
+ else return -1;
+ h <<= 4;
+
+ /* low part. */
+ if ((y = src[1] - '0') <= '9'-'0') return h | y;
+ if ((y = src[1] - 'a') <= 'f'-'a') return h | (y+10);
+ if ((y = src[1] - 'A') <= 'F'-'A') return h | (y+10);
+ return -1;
 }
 

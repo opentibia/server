@@ -13,6 +13,7 @@ ACTION_SETOUTFIT,
 ACTION_SAY,
 ACTION_WALK_IN,
 ACTION_LOGIN,
+ACTION_ITEM_APPEAR,
 };
 
 class Creature;
@@ -26,6 +27,7 @@ struct Action {
   position pos2;  // second argument (like place an item is used on...)
   std::string playername; //player who said something
   std::string buffer;          // buffer if the char wants to say something etc.
+  int id; // an id
 Creature* creature;
 
   //that will have to work for now

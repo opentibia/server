@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.5  2003/09/08 13:28:41  tliffrag
+// Item summoning and maploading/saving now working.
+//
 // Revision 1.4  2003/05/19 16:48:37  tliffrag
 // Loggingin, talking, walking around, logging out working
 //
@@ -65,10 +68,10 @@ class Map {
     // should use an Space Partitioning Tree.
     // I am using a very simple array now though.
     public:
-        static const unsigned short MINX = 32768;
-        static const unsigned short MINY = 32768;
-        static const unsigned short MAXX = 33024;
-        static const unsigned short MAXY = 33024;
+        static const unsigned short MINX = 32832;
+        static const unsigned short MINY = 32832;
+        static const unsigned short MAXX = 32960;
+        static const unsigned short MAXY = 32960;
 
     private:
 		int distributeAction(position pos, Action* a);
@@ -80,6 +83,7 @@ class Map {
 		position placeCreature(position pos, Creature* c);
 		int removeCreature(position pos, Creature* c);
 		int requestAction(Creature* c, Action* a);
+		int summonItem(position pos, int id);
         Tile *tile(unsigned short _x, unsigned short _y, unsigned char _z);
         ~Map();
 };

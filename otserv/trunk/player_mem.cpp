@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.5  2003/09/08 13:28:41  tliffrag
+// Item summoning and maploading/saving now working.
+//
 // Revision 1.4  2003/05/19 16:48:37  tliffrag
 // Loggingin, talking, walking around, logging out working
 //
@@ -36,6 +39,7 @@ player_mem::player_mem(){
 	color_shirt=rand()%256;
 	color_legs=rand()%256;
 	color_shoes=rand()%256;
+	lookdir=1;
 }
 
     void player_mem::save() {

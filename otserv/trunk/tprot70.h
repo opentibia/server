@@ -22,6 +22,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.3  2003/09/08 13:28:41  tliffrag
+// Item summoning and maploading/saving now working.
+//
 // Revision 1.2  2003/08/26 21:09:53  tliffrag
 // fixed maphandling
 //
@@ -54,7 +57,9 @@
 #define ADD2BYTE(stream, val) (stream) += (char)((val)%256); \
 (stream) += (char)(((val)/256)%256);
 
-
+#define ADDPOS(stream,pos) (stream)+=(char)((pos.x)%256); \
+(stream)+=(char)((pos.x)/256);(stream)+=(char)((pos.y)%256);\
+(stream)+=(char)((pos.y)/256);(stream)+=(char)((pos.z));\
 
     class TProt70 : public Protokoll {
 
@@ -96,7 +101,7 @@
 			void sendPlayerLogout(Action* action);
 			void sendPlayerMoveIn(Action* action);
 			void sendPlayerTurn(Action* action);
-
+			void sendPlayerItemAppear(Action* action);
 
 
             // translate a map area to clientreadable format

@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.8  2003/09/08 13:28:41  tliffrag
+// Item summoning and maploading/saving now working.
+//
 // Revision 1.7  2003/08/26 21:09:53  tliffrag
 // fixed maphandling
 //
@@ -69,8 +72,8 @@ class ItemType {
     // other bools
     public:
 	//what freak has chosen this const static unsigned short?
-    const static unsigned short WATER = 486;
-    const static unsigned short GRASS = 694;
+    //const static unsigned short WATER = 486;
+    const static unsigned short WATER = 0x01DB;
 	const static unsigned short STREET = 0x02B6;
 	const static unsigned short THING = 0x0759;
 

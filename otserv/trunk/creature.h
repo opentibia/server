@@ -72,6 +72,7 @@ class Creature {
 
         // virtual destructor to be overloaded...
         virtual ~Creature() {};
+		int id;
 
 };
 

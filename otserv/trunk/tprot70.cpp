@@ -125,6 +125,7 @@
 				//i guess they were not
 				Action* action= new Action;
 				action->pos1=player->pos;
+				action->creature=this->creature;
 				std::cout << "byte is " << (int)msg[0]<<std::endl;
 
 
@@ -404,13 +405,10 @@
 
 				buf += (char)0x00;
 			}
-
 			else{
+				//FIXME implement creatures
 			}
-
-
-
-			return buf;
+		return buf;
 		}
 
 //Parse methods
@@ -419,41 +417,49 @@
 void TProt70::parseMoveNorth(Action* action, std::string msg){
 	action->type=ACTION_MOVE;
 	action->direction=0;
+	player->lookdir=0;
 }
 
 void TProt70::parseMoveEast(Action* action, std::string msg){
 	action->type=ACTION_MOVE;
 	action->direction=1;
+	player->lookdir=1;
 }
 
 void TProt70::parseMoveSouth(Action* action, std::string msg){
 	action->type=ACTION_MOVE;
 	action->direction=2;
+	player->lookdir=2;
 }
 
 void TProt70::parseMoveWest(Action* action, std::string msg){
 	action->type=ACTION_MOVE;
 	action->direction=3;
+	player->lookdir=3;
 }
 
 void TProt70::parseTurnNorth(Action* action, std::string msg){
 	action->type=ACTION_TURN;
 	action->direction=0;
+	player->lookdir=0;
 }
 
 void TProt70::parseTurnEast(Action* action, std::string msg){
 	action->type=ACTION_TURN;
 	action->direction=1;
+	player->lookdir=1;
 }
 
 void TProt70::parseTurnSouth(Action* action, std::string msg){
 	action->type=ACTION_TURN;
 	action->direction=2;
+	player->lookdir=2;
 }
 
 void TProt70::parseTurnWest(Action* action, std::string msg){
 	action->type=ACTION_TURN;
 	action->direction=3;
+	player->lookdir=3;
 }
 
 void TProt70::parseSetOutfit(Action* action, std::string msg){}
@@ -468,6 +474,38 @@ void TProt70::parseLogout(Action* action, std::string msg){
 }
 
 void TProt70::parseSay(Action* action, std::string msg){
+	//we should check if this was a command
+	if(msg[4]=='!'){
+		action->type=ACTION_NONE;
+		switch(msg[5]){
+			case 'q':
+				exit(0);
+			case 'i':
+				position mypos=player->pos;
+				switch(player->lookdir){
+					case 0:
+						mypos.y-=1;
+						break;
+					case 1:
+						mypos.x+=1;
+						break;
+					case 2:
+						mypos.y+=1;
+						break;
+					case 3:
+						mypos.x-=1;
+						break;
+				}
+				std::string tmpstr;
+				tmpstr=msg.substr(7,msg.length()-7);
+				std::cout << tmpstr << std::endl;
+				int id=atoi(tmpstr.c_str());
+					std::cout << id << std::endl;
+				map->summonItem(mypos,  id);
+				break;
+		}
+		return;
+	}
 	action->type=ACTION_SAY;
 	action->playername=player->name;
 	msg.erase(0,4);
@@ -503,6 +541,9 @@ void TProt70::sendAction(Action* action){
 	}
 	if(action->type==ACTION_LOGOUT){
 		sendPlayerLogout(action);
+	}
+	if(action->type==ACTION_ITEM_APPEAR){
+		sendPlayerItemAppear(action);
 	}
 }
 
@@ -602,6 +643,18 @@ void TProt70::sendPlayerLogin(Action* action){
 	buf[1]=(char)((buf.size()-2)/256)%256;
 	TNetwork::SendData(psocket,buf);
 }
+void TProt70::sendPlayerItemAppear(Action* action){
+	std::string buf = "  ";
+	buf+=(char)0x6A;
+	ADD2BYTE(buf, action->pos1.x);
+	ADD2BYTE(buf, action->pos1.y);
+	buf+=(char)action->pos1.z;
+	ADD2BYTE(buf, action->id);
+	buf[0]=(char)(buf.size()-2)%256;
+	buf[1]=(char)((buf.size()-2)/256)%256;
+	TNetwork::SendData(psocket,buf);
+}
+
 
 void TProt70::sendPlayerLogout(Action* action){
 	std::string buf = "  ";
@@ -617,7 +670,13 @@ void TProt70::sendPlayerLogout(Action* action){
 
 void TProt70::sendPlayerTurn(Action* action){
 	std::string buf = "  ";
-	buf+=(char)(0x6F+action->direction);
+	buf+=(char)(0x6B);
+	ADDPOS(buf, action->pos1);
+	buf+=(char)(0x01);//stack?
+	buf+=(char)(0x63);
+	buf+=(char)(0x00);
+	ADD4BYTE(buf,action->creature->id);
+	buf+=(char)(action->direction);
 	buf[0]=(char)(buf.size()-2)%256;
 	buf[1]=(char)((buf.size()-2)/256)%256;
 	TNetwork::SendData(psocket,buf);
