@@ -20,12 +20,13 @@ areaEffect = NM_ME_ENERGY_AREA
 animationColor = RED
 offensive = true
 needDirection = true
+physical = true
 
 function onCast(cid, creaturePos, level, maglv, var)
 centerpos = {x=creaturePos.x, y=creaturePos.y, z=creaturePos.z}
 		minDmg = level+maglv
 		maxDmg = level+maglv
-doMagic(cid, area, centerpos, damageEffect, areaEffect, animationColor, offensive, minDmg, maxDmg, needDirection)
+doMagic(cid, area, centerpos, damageEffect, areaEffect, animationColor, offensive, physical, minDmg, maxDmg, needDirection)
 end
 
 

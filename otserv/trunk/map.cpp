@@ -1135,9 +1135,9 @@ void Map::creatureSpeakTo(Creature *creature, const std::string &receiver, const
   Creature* c = getCreatureByName(receiver.c_str());
   if(c)
   c->onCreatureSay(creature, 4, text);
-  OTSYS_THREAD_UNLOCK(mapLock)
-}
 
+	OTSYS_THREAD_UNLOCK(mapLock)
+}
 
 void Map::creatureBroadcastMessage(Creature *creature, const std::string &text)
 {
@@ -1384,6 +1384,7 @@ bool Map::creatureMakeMagic(Creature *creature, const MagicEffectClass* me)
 			targetvec.push_back(ti);
 		}
 
+
 		if(magicGround) {
 			if(!targettile->isBlocking()) {
 				Item* item = new Item(magicGround->groundID);
@@ -1404,7 +1405,7 @@ bool Map::creatureMakeMagic(Creature *creature, const MagicEffectClass* me)
 		Player* targetPlayer = dynamic_cast<Player*>(target);
 		Tile *targettile = getTile(target->pos.x, target->pos.y, target->pos.z);
 
-		if(/*magicRune &&*/ tv->second.damage > 0) {
+		if(me->physical && tv->second.damage > 0) {
 			if (!targettile->splash)
 			{
 				Item *item = new Item(1437, 2);
@@ -1466,19 +1467,6 @@ bool Map::creatureMakeMagic(Creature *creature, const MagicEffectClass* me)
 			if(!targettile)
 				continue;
 
-			if(magicGround) {
-				if(me->animationEffect > 0 && (spectator->CanSee(player->pos.x, player->pos.y) || spectator->CanSee(me->centerpos.x, me->centerpos.y))) {
-					msg.AddDistanceShoot(player->pos, me->centerpos, me->animationEffect); 
-					spectator->sendNetworkMessage(&msg);
-				}
-				
-				if(spectator->CanSee(tl->pos.x, tl->pos.y))
-					spectatorlist[i]->onTileUpdated(&tl->pos);
-
-				if(magicGround->maxDamage == 0)
-					continue;
-			}
-
 			if(tl->thingCount > 9 && tileBodyCountMap[targettile] > 0) {
 				if(std::find(tileUpdatedVec.begin(), tileUpdatedVec.end(), targettile) == tileUpdatedVec.end()) {
 					spectatorlist[i]->onTileUpdated(&tl->pos);
@@ -1488,6 +1476,29 @@ bool Map::creatureMakeMagic(Creature *creature, const MagicEffectClass* me)
 #if __DEBUG__
 				std::cout << "pop-up item" << std::endl;
 #endif
+			}
+
+			if(magicGround) {
+				if(me->animationEffect > 0 && (spectator->CanSee(player->pos.x, player->pos.y) || spectator->CanSee(me->centerpos.x, me->centerpos.y))) {
+					msg.AddDistanceShoot(player->pos, me->centerpos, me->animationEffect); 
+				}
+				
+				if(std::find(tileUpdatedVec.begin(), tileUpdatedVec.end(), targettile) == tileUpdatedVec.end()) {
+
+					msg.AddByte(0x6a);
+					msg.AddPosition(tl->pos);
+					Item item = Item(magicGround->groundID);
+					msg.AddItem(&item);
+
+					/*if(spectator->CanSee(tl->pos.x, tl->pos.y))
+						spectatorlist[i]->onTileUpdated(&tl->pos);*/
+
+				}
+
+				if(magicGround->maxDamage == 0) {
+					spectator->sendNetworkMessage(&msg);
+					continue;
+				}
 			}
 
 			if(tl->targetCount == 0 && spectator->CanSee(tl->pos.x, tl->pos.y)) {
@@ -1513,6 +1524,9 @@ bool Map::creatureMakeMagic(Creature *creature, const MagicEffectClass* me)
 
 			if(spectator->CanSee(target->pos.x, target->pos.y))
 			{
+				if(me->physical && damage > 0)
+					msg.AddMagicEffect(target->pos, NM_ME_DRAW_BLOOD);
+
 				msg.AddMagicEffect(target->pos, me->damageEffect);
 
 				if(damage != 0) {
@@ -1539,6 +1553,8 @@ bool Map::creatureMakeMagic(Creature *creature, const MagicEffectClass* me)
 							msg.AddByte(0x6c);
 							msg.AddPosition(target->pos);
 							msg.AddByte(targetstackpos);
+
+							//add corpse
 							msg.AddByte(0x6a);
 							msg.AddPosition(target->pos);
 							Item item = Item(target->lookcorpse);
@@ -1550,7 +1566,7 @@ bool Map::creatureMakeMagic(Creature *creature, const MagicEffectClass* me)
 					msg.AddCreatureHealth(target);
         }
 
-				if(/*magicRune &&*/ damage > 0)
+				if(me->physical && damage > 0)
 				{
 					if(std::find(tileUpdatedVec.begin(), tileUpdatedVec.end(), targettile) == tileUpdatedVec.end()) {
 						if(std::find(tileBloodVec.begin(), tileBloodVec.end(), targettile) == tileBloodVec.end()) {

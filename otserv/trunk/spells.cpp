@@ -192,27 +192,30 @@ Spell* SpellScript::getSpell(lua_State *L){
 int SpellScript::luaActionDoSpell(lua_State *L){
 		int cx,cy,cz;
     bool needDirection;
-		MagicEffectInstantSpellClass instantSpell;
+		MagicEffectInstantSpellClass magicInstant;
     
-    needDirection = (bool)lua_toboolean(L, -1);
-	lua_pop(L,1);
-    
-    instantSpell.maxDamage = (int)lua_tonumber(L, -1);
-	lua_pop(L,1);
-	
-	instantSpell.minDamage = (int)lua_tonumber(L, -1);
+  needDirection = (bool)lua_toboolean(L, -1);
 	lua_pop(L,1);
     
-	instantSpell.offensive = lua_toboolean(L, -1);
+	magicInstant.maxDamage = (int)lua_tonumber(L, -1);
 	lua_pop(L,1);
 	
-	instantSpell.animationcolor = (char)lua_tonumber(L, -1);
+	magicInstant.minDamage = (int)lua_tonumber(L, -1);
+	lua_pop(L,1);
+    
+  magicInstant.physical = lua_toboolean(L, -1);
+	lua_pop(L,1);
+
+	magicInstant.offensive = lua_toboolean(L, -1);
 	lua_pop(L,1);
 	
-	instantSpell.areaEffect = (char)lua_tonumber(L, -1);
+	magicInstant.animationcolor = (char)lua_tonumber(L, -1);
+	lua_pop(L,1);
+
+	magicInstant.areaEffect = (char)lua_tonumber(L, -1);
 	lua_pop(L,1);
 	
-	instantSpell.damageEffect = (char)lua_tonumber(L, -1);
+	magicInstant.damageEffect = (char)lua_tonumber(L, -1);
 	lua_pop(L,1);
 	
 	lua_pushstring(L, "z");
@@ -250,28 +253,28 @@ int SpellScript::luaActionDoSpell(lua_State *L){
          i++;
        }
        lua_pop(L, 1);
-   memcpy(&instantSpell.area, area, sizeof(area));	
+   memcpy(&magicInstant.area, area, sizeof(area));	
    Spell* spell = getSpell(L);
-   instantSpell.manaCost = spell->getMana();
+   magicInstant.manaCost = spell->getMana();
    
    Creature* creature = spell->map->getCreatureByID((unsigned long)lua_tonumber(L, -1));
    lua_pop(L,1);
    
    if(needDirection){
                     switch(creature->getDirection()) {
-			                                    case NORTH: instantSpell.direction = 1; break;
-			                                    case WEST: instantSpell.direction = 2; break;
-			                                    case EAST: instantSpell.direction = 3; break;
-			                                    case SOUTH: instantSpell.direction = 4; break;
+			                                    case NORTH: magicInstant.direction = 1; break;
+			                                    case WEST: magicInstant.direction = 2; break;
+			                                    case EAST: magicInstant.direction = 3; break;
+			                                    case SOUTH: magicInstant.direction = 4; break;
 		                                     };
                     }
    else {
-        instantSpell.direction = 1;
+        magicInstant.direction = 1;
         }
    Position pos = Position(cx, cy, cz);
 
-	 instantSpell.centerpos = pos;
-   spell->map->creatureCastSpell(creature, instantSpell);
+	 magicInstant.centerpos = pos;
+   spell->map->creatureCastSpell(creature, magicInstant);
    return 0;
 }
 int SpellScript::luaActionChangeOutfit(lua_State *L){

@@ -37,6 +37,7 @@ MagicEffectClass::MagicEffectClass()
 	minDamage = 0;
 	maxDamage = 0;
 	offensive = false;
+	physical = false;
 }
 
 MagicEffectRuneClass::MagicEffectRuneClass()

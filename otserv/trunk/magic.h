@@ -42,6 +42,7 @@ public:
 	int minDamage;
 	int maxDamage;
 	bool offensive;
+	bool physical; //causes blood splashes
 };
 
 /*

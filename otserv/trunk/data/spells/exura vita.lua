@@ -19,6 +19,7 @@ damageEffect = NM_ME_MAGIC_ENERGIE
 animationColor = GREEN
 offensive = false
 needDirection = false
+physical = false
 
 function onCast(cid, creaturePos, level, maglv, var)
 centerpos = {x=creaturePos.x, y=creaturePos.y, z=creaturePos.z}
@@ -30,7 +31,7 @@ n = tonumber(var)   -- try to convert it to a number
 		minDmg = level+maglv
 		maxDmg = level+maglv
 	end
-doMagic(cid, area, centerpos, damageEffect, areaEffect, animationColor, offensive, minDmg, maxDmg, needDirection)
+doMagic(cid, area, centerpos, damageEffect, areaEffect, animationColor, offensive, physical, minDmg, maxDmg, needDirection)
 end
 
 

@@ -192,6 +192,14 @@
 <item id="2281" name="human skeleton" weight="900" decayto="2282" decaytime="30" />
 <item id="2282" name="human skeleton" weight="600" />
 
+<item id="1190" name="magic wall" weight="0" decayto="0" decaytime="20" />
+<item id="1191" name="magic wall" weight="0" decayto="0" decaytime="20" />
+
+<item id="1185" name="fire" weight="0" decayto="1186" decaytime="200" damage="20" />
+<item id="1186" name="fire" weight="0" decayto="1187" decaytime="200" damage="10" />
+<item id="1187" name="fire" weight="0" decayto="0" decaytime="80" />
+<item id="1184" name="energy" weight="0" decayto="0" decaytime="30" damage="30" />
+
 <item id="1437" name="blood" weight="900" decayto="1438" decaytime="45" />
 <item id="1438" name="blood" weight="900" decayto="1439" decaytime="45" />
 <item id="1439" name="blood" weight="600" />
