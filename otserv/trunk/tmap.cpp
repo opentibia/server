@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.2  2002/04/08 14:12:49  shivoc
+// fixed a segfault because of out of bounds access to tiles array
+//
 // Revision 1.1  2002/04/08 13:53:59  acrimon
 // Added some very basic map support
 //
@@ -31,8 +34,8 @@
 Map::Map() {
     // generating some standard map.
     // yes I could have done that better ...
-    for (unsigned short y = MINY; y <= MAXY; y++)
-	for (unsigned short x = MINX; x <= MAXX; x++) {
+    for (unsigned short y = MINY; y < MAXY; y++)
+	for (unsigned short x = MINX; x < MAXX; x++) {
 	    tiles[y-MINY][x-MINX] = new Tile;
 	    tiles[y-MINY][x-MINX]->push_back(new Item(ItemType::WATER));
 	}
