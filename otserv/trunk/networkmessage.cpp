@@ -48,6 +48,7 @@ bool NetworkMessage::ReadFromSocket(SOCKET socket)
   if ((m_MsgSize <= 2) || ((m_MsgBuf[0] | m_MsgBuf[1] >> 8) != m_MsgSize-2))
   {
     Reset();
+    closesocket(socket);
     return false;
   }
 
