@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.8  2003/09/23 20:00:51  tliffrag
+// added !g command
+//
 // Revision 1.7  2003/09/23 16:41:19  tliffrag
 // Fixed several map bugs
 //
@@ -90,6 +93,7 @@ class Map {
 		int removeCreature(position pos);
 		int requestAction(Creature* c, Action* a);
 		int summonItem(position pos, int id);
+		int changeGround(position pos, int id);
 		int saveMap();
 	int removeItem(position pos);
         Tile *tile(unsigned short _x, unsigned short _y, unsigned char _z);

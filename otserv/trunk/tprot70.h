@@ -22,6 +22,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.5  2003/09/23 20:00:51  tliffrag
+// added !g command
+//
 // Revision 1.4  2003/09/17 16:35:08  tliffrag
 // added !d command and fixed lag on windows
 //
@@ -104,8 +107,8 @@
 			void sendPlayerTurn(Action* action);
 			void sendPlayerItemAppear(Action* action);
 			void sendPlayerItemDisappear(Action* action);
-
-            // translate a map area to clientreadable format
+			void sendPlayerChangeGround(Action* action);
+            // translate a map area to clientreada format
             // uses the map the client is on
  //           std::string makeMap(const position topleft,
   //                  bool reverse);

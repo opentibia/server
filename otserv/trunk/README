@@ -1,4 +1,4 @@
-otserv 0.2.4
+otserv 0.2.5a
 ---------------
 What is this?
 	otserv is a programm that acts like a tibia server.
@@ -15,14 +15,19 @@ How does it work?
 	Then you are logged in.
 
 What's New?
-	- item drag n drop
+	- lost of bugfixes
+	- !g command
 
 How do I use this new stuff?
-	- item drag n drop
-	  just like in real tibia you can now drag and drop items
-	  on the map. dont try to drag items to or from your
-	  equipement as it will crash. you cant move wall or ground
-	  tiles either.
+	- lost of bugfixes
+	  Mapsaving works without problems:
+ 	    deleting after save'n'load works and it doesnt
+	    crash anymore
+	  Items dont change places on the stack
+	  You can push items under yourself
+	- !g command
+	  use !g to create groundtiles, dont use !i for ground
+	  it will crash the client!
 
 How to use the old stuff?
 	Create items by saying !i <itemid>

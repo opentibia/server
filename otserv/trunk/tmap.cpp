@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.12  2003/09/23 20:00:51  tliffrag
+// added !g command
+//
 // Revision 1.11  2003/09/23 16:41:19  tliffrag
 // Fixed several map bugs
 //
@@ -272,6 +275,22 @@ int Map::summonItem(position pos, int id){
 	a->id=id;
 	distributeAction(pos, a);
 	return true;
+}
+
+int Map::changeGround(position pos, int id){
+  if(!id)
+    return false;
+#ifdef __DEBUG__
+  std::cout << "Summoning item with id " << id << std::endl;
+#endif
+  tiles[pos.x-MINX][pos.y-MINY]->pop_front();
+  tiles[pos.x-MINX][pos.y-MINY]->push_front(new Item(id));
+  Action* a= new Action;
+  a->type=ACTION_GROUND_CHANGE;
+  a->pos1=pos;
+  a->id=id;
+  distributeAction(pos, a);
+  return true;
 }
 
 int Map::removeItem(position pos){

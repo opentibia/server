@@ -521,6 +521,7 @@ void TProt70::parseSay(Action* action, std::string msg){
 	if(msg[4]=='!'){
 		action->type=ACTION_NONE;
 		position mypos=player->pos;
+		int id; std::string tmpstr;
 		switch(msg[5]){
 			case 'q':
 				exit(0);
@@ -530,48 +531,74 @@ void TProt70::parseSay(Action* action, std::string msg){
 			break;
 			case 'd':
 
-				switch(player->lookdir){
-					case 0:
-						mypos.y-=1;
-						break;
-					case 1:
-						mypos.x+=1;
-						break;
-					case 2:
-						mypos.y+=1;
-						break;
-					case 3:
-						mypos.x-=1;
-						break;
-				}
-				map->removeItem(mypos);
-				break;
-			case 'i':
-				switch(player->lookdir){
-					case 0:
-						mypos.y-=1;
-						break;
-					case 1:
-						mypos.x+=1;
-						break;
-					case 2:
-						mypos.y+=1;
-						break;
-					case 3:
-						mypos.x-=1;
-						break;
-				}
-				std::string tmpstr;
-				tmpstr=msg.substr(7,msg.length()-7);
-				#ifdef __DEBUG__
-				std::cout << tmpstr << std::endl;
-				#endif
-				int id=atoi(tmpstr.c_str());
-					#ifdef __DEBUG__
-					std::cout << id << std::endl;
-					#endif
-				map->summonItem(mypos,  id);
-			break;
+			  switch(player->lookdir){
+			  case 0:
+			    mypos.y-=1;
+			    break;
+			  case 1:
+			    mypos.x+=1;
+			    break;
+			  case 2:
+			    mypos.y+=1;
+			    break;
+			  case 3:
+			    mypos.x-=1;
+			    break;
+			  }
+			  map->removeItem(mypos);
+			  break;
+		case 'i':
+		  switch(player->lookdir){
+		  case 0:
+		    mypos.y-=1;
+		    break;
+		  case 1:
+		    mypos.x+=1;
+		    break;
+		  case 2:
+		    mypos.y+=1;
+		    break;
+		  case 3:
+		    mypos.x-=1;
+		    break;
+		  }
+		 
+		  tmpstr=msg.substr(7,msg.length()-7);
+#ifdef __DEBUG__
+		  std::cout << tmpstr << std::endl;
+#endif
+		  id=atoi(tmpstr.c_str());
+#ifdef __DEBUG__
+		  std::cout << id << std::endl;
+#endif
+		  map->summonItem(mypos,  id);
+		  break;
+		case 'g':
+		  switch(player->lookdir){
+		  case 0:
+		    mypos.y-=1;
+		    break;
+		  case 1:
+		    mypos.x+=1;
+		    break;
+		  case 2:
+		    mypos.y+=1;
+		    break;
+		  case 3:
+		    mypos.x-=1;
+		    break;
+		  }
+
+		  tmpstr=msg.substr(7,msg.length()-7);
+#ifdef __DEBUG__
+		  std::cout << tmpstr << std::endl;
+#endif
+		  id=atoi(tmpstr.c_str());
+#ifdef __DEBUG__
+		  std::cout << id << std::endl;
+#endif
+		  map->changeGround(mypos,  id);
+		  break;
 
 		}
 		return;
@@ -619,6 +646,9 @@ void TProt70::sendAction(Action* action){
 	}
 	if(action->type==ACTION_ITEM_DISAPPEAR){
 		sendPlayerItemDisappear(action);
+	}
+	if(action->type==ACTION_GROUND_CHANGE){
+		sendPlayerChangeGround(action);
 	}
 	if(action->type==ACTION_THROW){
 		//this should not occur
@@ -776,6 +806,19 @@ void TProt70::sendPlayerLogout(Action* action){
 	ADD2BYTE(buf, action->pos1.y);
 	buf+=(char)action->pos1.z;
 	buf+=(char)0x01;
+	buf[0]=(char)(buf.size()-2)%256;
+	buf[1]=(char)((buf.size()-2)/256)%256;
+	TNetwork::SendData(psocket,buf);
+}
+
+void TProt70::sendPlayerChangeGround(Action* action){
+	std::string buf = "  ";
+	buf+=(char)0x6B;
+	ADD2BYTE(buf, action->pos1.x);
+	ADD2BYTE(buf, action->pos1.y);
+	buf+=(char)action->pos1.z;
+	buf+=(char)0x00;
+	ADD2BYTE(buf,action->id);
 	buf[0]=(char)(buf.size()-2)%256;
 	buf[1]=(char)((buf.size()-2)/256)%256;
 	TNetwork::SendData(psocket,buf);
