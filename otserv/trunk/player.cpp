@@ -310,9 +310,9 @@ void Player::onTileUpdated(const Position *Pos)
 }
 
 void Player::onContainerUpdated(Item *item, unsigned char from_id, unsigned char to_id,
-																unsigned char from_slot, unsigned char to_slot, bool sameview)
+																unsigned char from_slot, unsigned char to_slot, bool remove)
 {
-	client->sendContainerUpdated(item, from_id, to_id, from_slot, to_slot, sameview);
+	client->sendContainerUpdated(item, from_id, to_id, from_slot, to_slot, remove);
 }
 
 

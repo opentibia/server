@@ -1062,7 +1062,7 @@ void Protocol70::sendContainerUpdated(Item *item, unsigned char from_id, unsigne
 																			unsigned char from_slot, unsigned char to_slot, bool remove)
 {
 	NetworkMessage msg;
-	if(from_id == to_id /*moveItemSameContainer*/) {
+	if(from_id == to_id) {
 		//remove item
 		msg.AddByte(0x72);
 		msg.AddByte(from_id);
@@ -1088,20 +1088,6 @@ void Protocol70::sendContainerUpdated(Item *item, unsigned char from_id, unsigne
 	}
 
 	msg.WriteToSocket(s);
-
-	/*
-	if(sameview) {
-		//remove item
-		msg.AddByte(0x72);
-		msg.AddByte(to_id);
-		msg.AddByte(from_slot);
-		
-		//add item
-		msg.AddByte(0x70);
-		msg.AddByte(from_id);
-		msg.AddU16(item->getID());
-	}
-	*/
 }
 
 void Protocol70::sendThingMove(const Creature *creature, const Thing *thing, const Position *oldPos, unsigned char oldStackPos)

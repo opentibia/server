@@ -125,7 +125,7 @@ protected:
   virtual void onCreatureChangeOutfit(const Creature* creature);
   virtual void onThink();
 	virtual void onTileUpdated(const Position *Pos);
-	virtual void onContainerUpdated(Item *item, unsigned char from_id, unsigned char to_id, unsigned char from_slot, unsigned char to_slot, bool sameview);
+	virtual void onContainerUpdated(Item *item, unsigned char from_id, unsigned char to_id, unsigned char from_slot, unsigned char to_slot, bool remove);
 	Protocol *client;
 
 	// we need our name and password...
