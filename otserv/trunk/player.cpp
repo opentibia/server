@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.13  2003/11/03 12:16:01  tliffrag
+// started walking by mouse
+//
 // Revision 1.12  2003/10/21 17:55:07  tliffrag
 // Added items on player
 //
@@ -45,6 +48,9 @@
 #include <stdlib.h>
 #include <iostream>
 
+#include "eventscheduler.h"
+extern EventScheduler es;
+
 namespace Creatures {
    Player::Player(const Socket& sock) : client(sock) {
 
@@ -60,20 +66,18 @@ namespace Creatures {
         player.load();
         
         // for now we just fill in some stuff directly
-		id=rand();
-        player.pnum = id; //TODO right playernumbers
 
         // and pass that infos to the protocoll
         client->setdata(player);
 		client->setCreature(this);
-		
+		tick(0);
 		// add the player to the PlayerList
 		//PlayerList.push_back(this);
 
-    } // Player::Player(Socket sock) 
+    } // Player::Player(Socket sock)
 
     Player::~Player() {
-    } // Player::~Player() 
+    } // Player::~Player()
 
   bool Player::isPlayer(){
     return true;
@@ -104,6 +108,16 @@ namespace Creatures {
 			player.items[pos]=item;
 		client->sendInventory();
 		return true;
+	}
+
+	int Player::tick(double time){
+		std::cout << "q: " <<actionQueue.size() << std::endl;
+		if(actionQueue.size()>0){
+			client->doAction(*(actionQueue.begin()));
+			actionQueue.erase(actionQueue.begin());
+		}
+		es.addCreatureTick(player.pnum, 1000);
+		return 0;
 	}
 
     void Player::setMap(position pos,Map& map) throw(texception) {

@@ -21,6 +21,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.18  2003/11/03 12:16:01  tliffrag
+// started walking by mouse
+//
 // Revision 1.17  2003/11/01 15:58:52  tliffrag
 // Added XML for players and map
 //
@@ -78,11 +81,11 @@
 #include <iostream>
 
 #include "serversocket.h"
-#include "eventscheduler.h"
+
 
 #include "player.h"
 #include "texcept.h"
-
+#include "eventscheduler.h"
 extern EventScheduler es;
 extern Map::Map map;
 

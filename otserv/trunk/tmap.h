@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.14  2003/11/03 12:16:01  tliffrag
+// started walking by mouse
+//
 // Revision 1.13  2003/11/01 15:58:52  tliffrag
 // Added XML for players and map
 //
@@ -128,7 +131,7 @@ class Map {
     public:
         Map();
         Map(char *filename);
-		int tick(double time){std::cout << "Map tick" << std::endl; return true;};
+		int tick(double time);
 		position placeCreature(position pos, Creature* c);
 		Creature* getPlayerByID( unsigned long id );
 		int removeCreature(position pos);

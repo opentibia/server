@@ -21,6 +21,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.12  2003/11/03 12:16:00  tliffrag
+// started walking by mouse
+//
 // Revision 1.11  2003/11/01 15:52:43  tliffrag
 // Improved eventscheduler
 //
@@ -94,7 +97,7 @@ int EventScheduler::addMapTick(int ms){
 }
 int EventScheduler::addCreatureTick(long c, int ms){
 	stick* t=new stick;
-	t->type=TICK_MAP;
+	t->type=TICK_CREATURE;
 	t->cid=c;
 	tickList.insert(pair<double, stick*>(((double)ms/1000+getNow()), t));
 	return true;
@@ -108,25 +111,28 @@ void EventScheduler::loop() {
     struct timeval tv = {0, 50000};
     for (;;) {
         if (tv.tv_sec == 0 && tv.tv_usec == 0) {
-	//cout << "time event" << endl;
-	//finally another 50k microsecs have passed and we tick
-	double now=getNow();
-	std::multimap<double, stick*, cmpdouble>::iterator i=tickList.lower_bound(now);
-	if(i==tickList.begin() || tickList.size()==0);
-	else{
-	i--;
-		while(i!= tickList.begin()){
-			stick* t=i->second;
-			switch(t->type){
-				case TICK_MAP:
-					map.tick(now);
-					break;
-				case TICK_CREATURE:
-					map.getPlayerByID(t->cid)->tick(now);
-					break;
+			//cout << "time event" << endl;
+			//finally another 50k microsecs have passed and we tick
+			double now=getNow();
+			std::multimap<double, stick*, cmpdouble>::iterator  i = tickList.begin();
+			if(tickList.size()!=0){
+				while(i->first <now && i != tickList.end()){
+						stick* t= i->second;
+						switch(t->type){
+							case TICK_MAP:
+								map.tick(now);
+								break;
+							case TICK_CREATURE:
+								Creature* c=map.getPlayerByID(t->cid);
+								if(c)
+									c->tick(now);
+								break;
+						}
+						delete t;
+					tickList.erase(i);
+					i++;
+				}
 			}
-		}
-	}
 	    tv.tv_sec = 0; tv.tv_usec=50000;
         }
         read_fd_set = active_fd_set;

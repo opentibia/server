@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.13  2003/11/03 12:16:01  tliffrag
+// started walking by mouse
+//
 // Revision 1.12  2003/10/19 21:32:19  tliffrag
 // Reworked the Tile class; stackable items now working
 //
@@ -46,11 +49,11 @@
 //
 //////////////////////////////////////////////////////////////////////
 #include <string>
-#include "eventscheduler.h"
 #include "serversocket.h"
 #include <stdlib.h>
 #include <time.h>
 #include "tmap.h"
+#include "eventscheduler.h"
 #include "luascript.h"
 
 int ipFromDotted(char*);

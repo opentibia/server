@@ -21,6 +21,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.12  2003/11/03 12:16:00  tliffrag
+// started walking by mouse
+//
 // Revision 1.11  2003/11/01 15:52:43  tliffrag
 // Improved eventscheduler
 //
@@ -60,7 +63,9 @@ using std::hash_map;
 #endif
 #endif
 
+#include "creature.h"
 #include "tmap.h"
+
 #include "definitions.h"
 #include "network.h"
 

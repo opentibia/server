@@ -22,6 +22,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.11  2003/11/03 12:16:01  tliffrag
+// started walking by mouse
+//
 // Revision 1.10  2003/11/01 15:58:52  tliffrag
 // Added XML for players and map
 //
@@ -103,8 +106,11 @@
             // our destructor to clean up the mess we made...
             ~TProt70() throw();
 
+			int doAction(Action*);
+
         private:
 			//First, we have all the parse methods
+			void parseMoveByMouse(Action* action, std::string msg);
 			void parseMoveNorth(Action* action, std::string msg);
 			void parseMoveEast(Action* action, std::string msg);
 			void parseMoveSouth(Action* action, std::string msg);

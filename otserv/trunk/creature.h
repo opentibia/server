@@ -27,11 +27,10 @@
 #include "item.h"
 #include "definitions.h"
 #include <iostream>
-
-class EventScheduler;
-extern EventScheduler es;
-// include Map headers
 #include "tmap.h"
+
+// include Map headers
+
 
 //////////////////////////////////////////////////////////////////////
 // Defines the Base class for all creatures and base functions which 
@@ -46,14 +45,16 @@ class Creature {
 		virtual void setMap(position, Map&) throw(texception)=0;
 
 		virtual bool isPlayer(){return false;}
-		
-		virtual unsigned long getID(){return 0;}
-		
+
+		virtual unsigned long getID()=0;
+
 		virtual void sendAction(Action*){}
 
 		virtual int sendInventory(){return 0;};
 
-		virtual int tick(double time){std::cout << "Creature tick" << std::endl; return 0;}
+		virtual int tick(double time)=0;
+
+		virtual int addAction(Action*)=0;
 
 		virtual int addItem(Item* item, int pos){return 0;};
 

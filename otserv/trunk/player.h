@@ -20,6 +20,9 @@
 	// $Id$
 	//////////////////////////////////////////////////////////////////////
 	// $Log$
+	// Revision 1.10  2003/11/03 12:16:01  tliffrag
+	// started walking by mouse
+	//
 	// Revision 1.9  2003/10/21 17:55:07  tliffrag
 	// Added items on player
 	//
@@ -61,7 +64,10 @@
 		virtual ~Player();
 
 		bool isPlayer();
-		
+
+		std::list<Action*> actionQueue;
+		int addAction(Action* a){ actionQueue.push_back(a); return 0;};
+
         unsigned long getID();		
 
 		void sendAction(Action*);
@@ -75,6 +81,7 @@
 			return &client->cread;
 		}
 
+		int tick(double time);
 		void setMap(position,Map&) throw(texception);
 
 					std::string getName(){

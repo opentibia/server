@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.10  2003/11/03 12:16:01  tliffrag
+// started walking by mouse
+//
 // Revision 1.9  2003/10/21 17:55:07  tliffrag
 // Added items on player
 //
@@ -68,6 +71,7 @@
 			void setCreature(Creature* c);
 			virtual void sendAction(Action* a){}
 			virtual int sendInventory(){return 0;}
+			virtual int doAction(Action*){return 0;};
 
             // get the name...
             virtual const std::string getName() const throw() =0;

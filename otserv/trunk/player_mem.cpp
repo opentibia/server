@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.15  2003/11/03 12:16:01  tliffrag
+// started walking by mouse
+//
 // Revision 1.14  2003/11/01 15:58:52  tliffrag
 // Added XML for players and map
 //
@@ -64,6 +67,7 @@ player_mem::player_mem(){
 	lookbody=rand()%256;
 	looklegs=rand()%256;
 	lookfeet=rand()%256;
+	pnum=rand();
 	lookdir=1;
 	sex=0;
 

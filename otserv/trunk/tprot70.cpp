@@ -171,8 +171,7 @@ void TProt70::parsePacket(std::string msg){
     parseSay(action, msg);
     break;
   case 0x64: //TODO client moving with steps
-    std::cout << "player tried to move by mouse"<< std::endl;
-    sendPlayerSorry("Moving by mouse not possible yet. Use the cursors keys!");
+	parseMoveByMouse(action, msg);
     return;
     break;
   case 0xA1: //attack
@@ -183,6 +182,16 @@ void TProt70::parsePacket(std::string msg){
     break;
   }
 				//so we got the action, now we ask the map to execut it
+  if(action->type!=ACTION_NONE){
+  	switch(map->requestAction(creature,action)){
+		case TMAP_ERROR_TILE_OCCUPIED:
+			sendPlayerSorry(TMAP_ERROR_TILE_OCCUPIED);
+		break;
+	}
+  }
+}
+
+int TProt70::doAction(Action* action){
   if(action->type!=ACTION_NONE){
   	switch(map->requestAction(creature,action)){
 		case TMAP_ERROR_TILE_OCCUPIED:
@@ -557,6 +566,16 @@ void TProt70::parseLookAt(Action* action, std::string msg){
 	action->pos1.z=(unsigned char)msg[5];
 
 	action->creature=this->creature;
+}
+
+void TProt70::parseMoveByMouse(Action* action, std::string msg){
+	Action* a;
+	for(int i=0; i < msg[1]; i++){
+		a=new Action;
+		a->type=ACTION_MOVE;
+		a->direction=msg[i+2];
+		creature->addAction(a);
+	}
 }
 
 void TProt70::parseSay(Action* action, std::string msg){

@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.19  2003/11/03 12:16:01  tliffrag
+// started walking by mouse
+//
 // Revision 1.18  2003/11/01 15:58:52  tliffrag
 // Added XML for players and map
 //
@@ -79,11 +82,13 @@
 #include <iostream>
 #include "items.h"
 #include "tmap.h"
-#include "player.h"
 #include "npc.h"
 #include <stdio.h>
 #include <string>
 #include <sstream>
+
+#include "eventscheduler.h"
+extern EventScheduler es;
 
 //TODO move all the tile stuff to tile.cpp
 int Tile::getStackPosItem(){
@@ -273,8 +278,14 @@ std::string Tile::getDescription(){
 	return ret;
 }
 
+
+int Map::tick(double time){
+	es.addMapTick(1000);
+	return true;
+}
 Map::Map() {
 	loadMapXml("map.xml");
+	tick(0);
 /*	//this code is ugly but works
 	//TODO improve this code to support things like
 	//a quadtree to speed up everything
@@ -434,13 +445,14 @@ Creature* Map::getPlayerByID( unsigned long id ){
   {
     if( (i->second)->getID() == id )
     {
-      return i->second;
+		return i->second;
     }
   }
   return NULL; //just in case the player doesnt exist
 }
 
 position Map::placeCreature(position pos, Creature* c){
+	std::cout << "cid " << c << std::endl;
 	//add creature to the online list
 	playersOnline[c->getID()]=c;
   if( tiles[pos.x-MINX][pos.y-MINY]->isBlocking()){
