@@ -16,19 +16,19 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+//////////////////////////////////////////////////////////////////////
 
 
 #ifndef __creature_h
 #define __creature_h
 
-// include definitions
-#include "pos.h"
-#include "action.h"
-#include "item.h"
-#include "definitions.h"
-#include "tmap.h"
 
-enum playerLooks{
+#include "thing.h"
+#include "position.h"
+
+
+enum playerLooks
+{
 	PLAYER_MALE_1=0x80,
 	PLAYER_MALE_2=0x81,
 	PLAYER_MALE_3=0x82,
@@ -39,49 +39,70 @@ enum playerLooks{
 	PLAYER_FEMALE_4=0x8B,
 };
 
-// include Map headers
+
+class Map;
+
+class Item;
+
+class Thing;
+class Player;
 
 
 //////////////////////////////////////////////////////////////////////
 // Defines the Base class for all creatures and base functions which 
 // every creature has
-class Map;
 
-class Creature {
 
-    public:
+class Creature : public Thing
+{
+public:
+  Creature(const char *name);
+  virtual ~Creature() {};
 
-        // set creature on map position...
-		virtual void setMap(position, Map&) throw(texception)=0;
+  virtual bool isCreature() const { return true; };
 
-		virtual position getPosition() = 0;
+  virtual const string& getName() const {return name; };
 
-		virtual bool isPlayer(){return false;}
+  unsigned long getID() const { return id; }
+  Direction getDirection() const { return direction; }
 
-		virtual unsigned long getID(){return id;}
 
-		virtual void sendAction(Action*){}
+  virtual void drainHealth(int);
+
+
+
 
 		virtual int sendInventory(){return 0;};
-
-		virtual int tick(double time)=0;
-
-		virtual int addAction(Action*)=0;
-
-		virtual int clearActionQueue()=0;
-
-		virtual std::string getLook()=0;
-		virtual std::string getName()=0;
-
 		virtual int addItem(Item* item, int pos){return 0;};
-
 		virtual Item* getItem(int pos){return NULL;}
 
-        virtual ~Creature() {};
-		int id;
 
-		virtual void drainHealth(int){return;};
-		virtual int getHealth(){return 100;};
+
+
+  int lookhead, lookbody, looklegs, lookfeet, looktype;
+
+  int speed;
+
+  int health, healthmax;
+
+  int lastDamage;
+
+
+private:
+  virtual void onThingMove(const Player *player, const Thing *thing, const Position *oldPos, unsigned char oldstackpos) { };
+  virtual void onCreatureAppear(const Creature *creature) { };
+  virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos) { };
+  virtual void onCreatureTurn(const Creature *creature, unsigned char stackPos) { };
+  virtual void onCreatureSay(const Creature *creature, unsigned char type, const string &text) { };
+
+
+  friend class Map;
+
+  Direction direction;
+
+  unsigned long id;
+  string        name;
 };
+
 
 #endif // __creature_h

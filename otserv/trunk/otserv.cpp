@@ -17,97 +17,317 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
-// $Id$
-//////////////////////////////////////////////////////////////////////
-// $Log$
-// Revision 1.17  2004/11/20 14:56:28  shivoc
-// started adding haktivex battlesystem; fixed some bugs; changed serveroutput
-//
-// Revision 1.16  2004/11/19 21:39:26  shivoc
-// fix a bug in converting from ascii to binary representation
-//
-// Revision 1.15  2004/11/14 09:16:54  shivoc
-// some fixes to at least reenable login without segfaulting the server (including some merges from haktivex' server
-//
-// Revision 1.14  2003/11/05 23:28:23  tliffrag
-// Addex XML for players, outfits working
-//
-// Revision 1.13  2003/11/03 12:16:01  tliffrag
-// started walking by mouse
-//
-// Revision 1.12  2003/10/19 21:32:19  tliffrag
-// Reworked the Tile class; stackable items now working
-//
-// Revision 1.11  2003/10/17 22:25:02  tliffrag
-// Addes SorryNotPossible; added configfile; basic lua support
-//
-// Revision 1.10  2003/09/17 16:35:08  tliffrag
-// added !d command and fixed lag on windows
-//
-// Revision 1.9  2003/09/08 13:28:41  tliffrag
-// Item summoning and maploading/saving now working.
-//
-// Revision 1.8  2003/05/19 16:48:37  tliffrag
-// Loggingin, talking, walking around, logging out working
-//
-// Revision 1.7  2002/05/29 16:07:38  shivoc
-// implemented non-creature display for login
-//
-// Revision 1.6  2002/05/28 13:55:56  shivoc
-// some minor changes
-//
-// Revision 1.5  2002/04/08 13:53:59  acrimon
-// Added some very basic map support
-//
-//////////////////////////////////////////////////////////////////////
+
+
+#include "definitions.h"
+
 #include <string>
 #include <iostream>
-#include "serversocket.h"
+
+using namespace std;
+
+
+#include "otsystem.h"
+
+#include "protocol70.h"
+
+
 #include <stdlib.h>
 #include <time.h>
-#include "tmap.h"
-#include "eventscheduler.h"
+#include "map.h"
+
 #include "luascript.h"
-#include "network.h"
 
-int g_serverip;
-LuaScript g_config("config.lua");
-EventScheduler es;
-Items Item::items;
-Map::Map map;
-
-int main(int argc, char *argv[]) {
-	const char* ip;
-	if(argc>1)
-		ip=argv[1];
-	else
-		ip=g_config.getGlobalString("ip").c_str();
-#ifdef __DEBUG__
-	std::cout << "getting ip from " << ip << std::endl;
+#ifndef WIN32
+#include <fcntl.h>
 #endif
-	g_serverip=TNetwork::convip(ip);;
-	srand(time(NULL));
-	TNetwork::ServerSocket ss;
-	std::cout << ":: OpenTibia Server Ready." << std::endl;
-	es.loop();
-}
 
-int hexint(const char *src)
+
+vector< pair<unsigned long, unsigned long> > serverIPs;
+
+LuaScript g_config;
+
+Items Item::items;
+Map gmap;
+
+
+#include "networkmessage.h"
+
+
+
+
+int ipFromDotted(const char* _ip)
 {
-		  unsigned int y; /* unsigned for correct wrapping. */
-		  int h;
+	string ip=_ip;
+	string t;
+	int num=0;
 
-		  /* high part. */
-		  if ((y = src[0] - '0') <= '9'-'0') h = y;
-		  else if ((y = src[0] - 'a') <= 'f'-'a') h = y+10;
-		  else if ((y = src[0] - 'A') <= 'F'-'A') h = y+10;
-		  else return -1;
-		  h <<= 4;
+	for(int i=0; i<4;i++)
+  {
+    t="";
+    while ((ip[0]!='.') && (ip.length() != 0))
+    {
+		  t += ip[0];
+		  ip.erase(0,1);
+    }
+    ip.erase(0,1);
+    num+=atoi(t.c_str()) << i*8;
+	}
 
-		  /* low part. */
-		  if ((y = src[1] - '0') <= '9'-'0') return h | y;
-		  if ((y = src[1] - 'a') <= 'f'-'a') return h | (y+10);
-		  if ((y = src[1] - 'A') <= 'F'-'A') return h | (y+10);
-		  return -1;
+	return num;
 }
 
+
+
+
+
+
+static int i = 0;
+OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
+{
+  srand((unsigned)time(NULL));
+
+  SOCKET s = *(SOCKET*)dat;
+  
+  NetworkMessage msg;
+  msg.ReadFromSocket(s);
+
+  unsigned short protId = msg.GetU16();
+
+  // login server connection
+  if (protId == 0x0201)
+  {
+    msg.SkipBytes(15);
+
+    unsigned int account  = msg.GetU32();
+    string password       = msg.GetString();
+
+    msg.Reset();
+
+    int serverip = serverIPs[0].first;
+
+    sockaddr_in sain;
+    socklen_t salen = sizeof(sockaddr_in);
+    if (getpeername(s, (sockaddr*)&sain, &salen) == 0)
+    {
+      unsigned long clientip = *(unsigned long*)&sain.sin_addr;
+      for (int i = 0; i < serverIPs.size(); i++)
+        if ((serverIPs[i].first & serverIPs[i].second) == (clientip & serverIPs[i].second))
+        {
+          serverip = serverIPs[i].first;
+          break;
+        }
+    }
+
+    msg.AddByte(0x14);
+    msg.AddString("1\nWelcome to OpenTibia.");
+
+    msg.AddByte(0x64);
+    msg.AddByte(0x01);
+
+    msg.AddString("Hurz");
+    msg.AddString("OpenTibia");
+
+    msg.AddU32(serverip);
+    msg.AddU16(7171);
+
+    msg.AddU16(1337);
+
+    msg.WriteToSocket(s);
+
+    closesocket(s);
+  }
+  // gameworld connection tibia 7.1
+  else if (protId == 0x020A)
+  {
+    i++;
+
+    char name[128];
+    sprintf(name, "Hurz %i", i);
+
+    Protocol70 *protocol = new Protocol70(s);
+    Player     *player = new Player(name, protocol);
+
+    player->usePlayer();
+    
+    protocol->setPlayer(player);
+
+    protocol->ConnectPlayer();
+    protocol->ReceiveLoop();
+
+    closesocket(s);
+  }
+}
+
+
+
+
+void ErrorMessage(const char* message)
+{
+  cout << endl << endl << "Error: " << message;
+
+  string s;
+  cin >> s;
+}
+
+
+
+int main(int argc, char *argv[])
+{
+  cout << "OTServ Version 0.3.0" << endl << endl;
+
+
+  // Call to WSA Startup on Windows Systems...
+#ifdef WIN32
+  WORD wVersionRequested; 
+  WSADATA wsaData; 
+  wVersionRequested = MAKEWORD( 1, 1 );
+
+  if (WSAStartup(wVersionRequested, &wsaData) != 0)
+  {
+    ErrorMessage("Winsock startup failed!!");
+    return -1;
+  } 
+  
+  if ((LOBYTE(wsaData.wVersion) != 1) || (HIBYTE(wsaData.wVersion) != 1)) 
+  { 
+    WSACleanup( ); 
+    ErrorMessage("No Winsock 1.1 found!");
+    return -1;
+  } 
+#endif
+
+
+  // read global config
+  cout << "reading config.lua ...       ";
+  if (!g_config.OpenFile("config.lua"))
+  {
+    ErrorMessage("Unable to load config.lua!");
+    return -1;
+  }
+  cout << "[done]" << endl;
+
+
+  pair<unsigned long, unsigned long> IpNetMask;
+  IpNetMask.first  = ipFromDotted("127.0.0.1");
+  IpNetMask.second = 0xFFFFFFFF;
+  serverIPs.push_back(IpNetMask);
+
+  char szHostName[128];
+  if (gethostname(szHostName, 128) == 0)
+  {
+    cout << endl << "running on host " << szHostName << endl;
+
+    hostent *he = gethostbyname(szHostName);
+
+    if (he)
+    {
+      cout << "local ip address(es):  ";
+      unsigned char** addr = (unsigned char**)he->h_addr_list;
+
+      while (addr[0] != NULL)
+      {
+        cout << (unsigned int)(addr[0][0]) << "."
+             << (unsigned int)(addr[0][1]) << "."
+             << (unsigned int)(addr[0][2]) << "."
+             << (unsigned int)(addr[0][3]) << "  ";
+
+        IpNetMask.first  = *(unsigned long*)(*addr);
+        IpNetMask.second = 0xFFFFFF00;
+        serverIPs.push_back(IpNetMask);
+
+        addr++;
+      }
+
+      cout << endl;
+    }
+  }
+  
+  cout << "global ip address:     ";
+	string ip;
+
+	if(argc > 1)
+		ip = argv[1];
+	else
+		ip = g_config.getGlobalString("ip", "127.0.0.1");
+
+	std::cout << ip << endl << endl;
+
+  IpNetMask.first  = ipFromDotted(ip.c_str());
+  IpNetMask.second = 0;
+  serverIPs.push_back(IpNetMask);
+
+
+
+  
+  std::cout << "starting server socket" << std::endl;
+
+
+  // start the server listen...
+  sockaddr_in local_adress;
+  memset(&local_adress, 0, sizeof(sockaddr_in)); // zero the struct 
+
+  local_adress.sin_family      = AF_INET;
+  local_adress.sin_port        = htons(7171);
+  local_adress.sin_addr.s_addr = htonl(INADDR_ANY);
+ 
+  // first we create a new socket
+  SOCKET listen_socket = socket(AF_INET, SOCK_STREAM, 0);
+  
+  if (listen_socket <= 0)
+  {
+#ifdef WIN32
+    WSACleanup();   
+#endif
+    ErrorMessage("Unable to create server socket (1)!");
+    return -1;
+  } // if (listen_socket <= 0)
+
+#ifndef WIN32
+    int yes;
+    if (fcntl(listen_socket, F_SETFL, O_NONBLOCK) < 0) {  // set O_NONBLOCK flag
+        throw texception("network.cpp: could not set O_NONBLOCK!", true);
+    }
+    // lose the pesky "Address already in use" error message
+    if (setsockopt(listen_socket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof (int)) == -1)  {
+        throw texception("network.cpp: setsockopt failed!", true);
+    }
+#endif
+  // bind socket on port
+  if (bind(listen_socket, (struct sockaddr*)&local_adress, sizeof(struct sockaddr_in)) < 0)
+  {
+#ifdef WIN32
+    WSACleanup();    
+#endif
+    ErrorMessage("Unable to create server socket (2)!");
+    return -1;
+  } // if (bind(...))
+  
+  // now we start listen on the new socket
+  if (listen(listen_socket, 10) == -1)
+  {
+#ifdef WIN32
+    WSACleanup();
+#endif
+    ErrorMessage("Listen on server socket not possible!");
+    return -1;
+  } // if (listen(*listen_socket, 10) == -1)
+
+
+
+  std::cout << endl << "OTServ running..." << std::endl;
+
+
+
+  while (true)
+  {
+    SOCKET s = accept(listen_socket, NULL, NULL); // accept a new connection
+
+    if (s > 0)
+    {
+      OTSYS_CREATE_THREAD(ConnectionHandler, (void*)&s);
+    }
+  }
+
+	return 0;
+}

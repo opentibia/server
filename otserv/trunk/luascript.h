@@ -17,34 +17,33 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
-// $Id$
-//////////////////////////////////////////////////////////////////////
-// $Log$
-// Revision 1.1  2003/10/17 22:25:02  tliffrag
-// Addes SorryNotPossible; added configfile; basic lua support
-//
-//////////////////////////////////////////////////////////////////////
 
-#ifndef __luascript_h_
-#define __luascript_h_
 
-extern "C"{
-#include <lua.h>
-#include <lauxlib.h>
-}
+#ifndef __LUASCRIPT_H__
+#define __LUASCRIPT_H__
 
-#include <string>
 
-class LuaScript {
-private:
-	std::string file; // the file we represent
-	lua_State* l; // our lua state
+extern "C" struct lua_State;
+
+
+class LuaScript
+{
 public:
-	LuaScript(std::string file);
+	LuaScript();
 	~LuaScript();
-	std::string getGlobalString(std::string var); //get a global string
-	int setGlobalString(std::string var, std::string val); //set a var to a val
+
+  int OpenFile(const char* file);
+
+  // get a global string
+  string getGlobalString(string var, const string &defString = "");
+
+  // set a var to a val
+	int setGlobalString(string var, string val);
+
+private:
+	std::string luaFile;   // the file we represent
+	lua_State*  luaState;  // our lua state
 };
 
 
-#endif
+#endif  // #ifndef __LUASCRIPT_H__

@@ -17,80 +17,30 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
-// $Id$
-//////////////////////////////////////////////////////////////////////
-// $Log$
-// Revision 1.4  2004/11/20 14:56:28  shivoc
-// started adding haktivex battlesystem; fixed some bugs; changed serveroutput
-//
-// Revision 1.3  2003/11/05 23:28:23  tliffrag
-// Addex XML for players, outfits working
-//
-// Revision 1.2  2003/10/21 17:55:07  tliffrag
-// Added items on player
-//
-// Revision 1.1  2003/10/17 22:25:02  tliffrag
-// Addes SorryNotPossible; added configfile; basic lua support
-//
-//////////////////////////////////////////////////////////////////////
+
 
 #ifndef __npc_h_
 #define __npc_h_
 
-#include "definitions.h"
+
 #include "creature.h"
-#include "protokoll.h"
-extern "C"{
+
+extern "C"
+{
 #include <lua.h>
 #include <lauxlib.h>
 }
-#include <string>
+
 
 //////////////////////////////////////////////////////////////////////
 // Defines an NPC...
-class NPC : public Creature {
+
+class Npc : public Creature
+{
+public:
+  Npc(const char *name);
+  virtual ~Npc();
   
- public:
-  
-  // our constructor
-  NPC(const std::string script);
-  
-  // virtual destructor to be overloaded...
-  virtual ~NPC();
-  
-  bool isPlayer();
-
-  virtual position getPosition();
-
-	int addItem(Item* item, slots_t pos);
-
-  void sendAction(Action*);
-  int tick(double){return 0;}
-
-	int addAction(Action*){return true;};
-
-	int clearActionQueue(){return true;};
-
-	std::string getLook(){
-		std::string tmp;
-		tmp+=(char)0x80;
-		tmp+=(char)0x00;
-		tmp+=(char)0x00;
-		tmp+=(char)0x00;
-		tmp+=(char)0x00;
-		return tmp;
-	}
-
-  std::string getName(){
-    return name;
-  }
-  void setMap(position,Map&) throw(texception);
-  
-  // we need our name and password...
-  std::string name;
-  lua_State* lua;
-  position pos;
-
 };
 
 

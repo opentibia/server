@@ -27,14 +27,6 @@ AC_PROG_INSTALL
 
 # Checks for libraries.
 
-# check if we use mingw or unix...
-#LDFLAGS=$LDFLAGS" -lwsock32 ";;
-case "$host" in
-*mingw* | *win*) target_sys=__WINDOWS__;;
-*) target_sys=__LINUX__;;
-esac
-AC_SUBST(target_sys)
-
 # Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS([arpa/inet.h errno.h fcntl.h netdb.h netinet/in.h stdlib.h string.h strings.h sys/socket.h sys/time.h unistd.h])
@@ -54,9 +46,6 @@ AM_PATH_XML2(2.6.5, , AC_MSG_ERROR([you need libxml2 >= 2.6.5 to compile otserv!
 PKG_CHECK_MODULES(LUA50, lualib50 >= 5.0.0, , AC_MSG_ERROR([you need lua and lualib >= 5.0 to compile otserv!]))
 AC_SUBST(LUA50_CFLAGS)
 AC_SUBST(LUA50_LIBS)
-
-OTSERV_FLAGS="-Wall -D${target_sys} ${DEBUG}"
-AC_SUBST(OTSERV_FLAGS)
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT

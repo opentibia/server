@@ -17,148 +17,126 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
-// $Id$
-//////////////////////////////////////////////////////////////////////
-// $Log$
-// Revision 1.17  2004/11/20 14:56:28  shivoc
-// started adding haktivex battlesystem; fixed some bugs; changed serveroutput
-//
-// Revision 1.16  2004/11/14 09:16:54  shivoc
-// some fixes to at least reenable login without segfaulting the server (including some merges from haktivex' server
-//
-// Revision 1.15  2003/11/05 23:28:23  tliffrag
-// Addex XML for players, outfits working
-//
-// Revision 1.14  2003/11/03 22:48:14  tliffrag
-// Changing look, walking by mouse working
-//
-// Revision 1.13  2003/11/03 12:16:01  tliffrag
-// started walking by mouse
-//
-// Revision 1.12  2003/10/21 17:55:07  tliffrag
-// Added items on player
-//
-// Revision 1.11  2003/09/25 21:17:52  timmit
-// Adding PlayerList in TMap and getID().  Not workigng!
-//
-// Revision 1.8  2003/09/08 13:28:41  tliffrag
-// Item summoning and maploading/saving now working.
-//
-// Revision 1.7  2003/05/19 16:48:37  tliffrag
-// Loggingin, talking, walking around, logging out working
-//
-// Revision 1.6  2002/05/29 16:07:38  shivoc
-// implemented non-creature display for login
-//
-// Revision 1.5  2002/05/28 13:55:56  shivoc
-// some minor changes
-//
-//
-//////////////////////////////////////////////////////////////////////
 
+
+#include "definitions.h"
+
+#include <string>
 #include <iostream>
-#include "player.h"
+
+using namespace std;
+
 #include <stdlib.h>
-#include <iostream>
 
-#include "eventscheduler.h"
-extern EventScheduler es;
+#include "protocol.h"
+#include "player.h"
 
-namespace Creatures {
-   Player::Player(const Socket& sock) : client(sock) {
 
-        // we get name and password from the client...
 
-        player.name = client->getName();
-        player.passwd = client->getPassword();
+Player::Player(const char *name, Protocol *p) : Creature(name)
+{
+  client     = p;
 
-		  name=player.name;
-        // now we should check both... (TODO)
+	sex        = 0;
+	voc        = 0;
 
-        // if everything was checked we should load the player... (TODO)
+  cap        = 300;
 
-		  std::cout << "try to load player from xml" << std::endl;
-        player.loadXml();
-		  std::cout << "done." << std::endl;
+  mana       = 250;
+  manamax    = 250;
 
-        // and pass that infos to the protocoll
-        client->setdata(player);
-		  client->setCreature(this);
-		  tick(0);
-		  // add the player to the PlayerList
-		  //PlayerList.push_back(this);
+  level      = 1;
+  experience = 3000;
 
-    } // Player::Player(Socket sock)
+  maglevel   = 50;
 
-    Player::~Player() {
-    } // Player::~Player()
+  access     = 0;
 
-  bool Player::isPlayer(){
-    return true;
+  for(int i = 0; i < 7; i++)
+  {
+    skills[i][SKILL_LEVEL] = 1;
+    skills[i][SKILL_TRIES] = 0;
   }
-  
-  unsigned long Player::getID(){
-    return player.pnum;
-  }  
 
-	void Player::sendAction(Action* action){
-		client->sendAction(action);
-	}
+  attackedCreature = 0;
 
-	Item* Player::getItem(int pos){
-		if(pos>0 && pos <11)
-			return player.items[pos];
+  useCount = 0;
+} 
+
+
+Player::~Player()
+{
+  delete client;
+}
+
+
+Item* Player::getItem(int pos)
+{
+//		if(pos>0 && pos <11)
+//			return player.items[pos];
 		return NULL;
-	}
+}
 
-	int Player::sendInventory(){
-		client->sendInventory();
-		return true;
-	}
 
-	int Player::addItem(Item* item, int pos){
-		std::cout << "Should add item at " << pos <<std::endl;
-		if(pos>0 && pos <11)
-			player.items[pos]=item;
-		client->sendInventory();
-		return true;
-	}
+int Player::sendInventory(){
+	client->sendInventory();
+	return true;
+}
 
-	int Player::tick(double time){
-		if(actionQueue.size()>0){
-			(*(actionQueue.begin()))->pos1=player.pos;
-			client->doAction(*(actionQueue.begin()));
-			actionQueue.erase(actionQueue.begin());
-		}
-		es.addCreatureTick(player.pnum, 450);
-		return 0;
-	}
 
-	std::string Player::getLook(){
-		std::string buf;
-		//buf+=(unsigned char)player.looktype;
-		buf+=(char)player.looktype;
-		buf+=(char)player.lookhead;
-		buf+=(char)player.lookbody;
-		buf+=(char)player.looklegs;
-		buf+=(char)player.lookfeet;
-		return buf;
-	}
+int Player::addItem(Item* item, int pos){
+//		std::cout << "Should add item at " << pos <<std::endl;
+//		if(pos>0 && pos <11)
+//			player.items[pos]=item;
+//		client->sendInventory();
+	return true;
+}
 
-	int Player::clearActionQueue(){
-		actionQueue.clear();
-		return true;
-	}
 
-    void Player::setMap(position pos,Map& map) throw(texception) {
-	  pos=map.placeCreature(pos,this);
-	  player.pos=pos;
-	  client->setMap(pos, map);
-    } // void setMap(position) throw(texception)
+void Player::setAttackedCreature(unsigned long id)
+{
+  attackedCreature = id;
+}
 
-	 position Player::getPosition() {
-				return player.pos;
-	 }
 
-} // namespace Creature 
+bool Player::CanSee(int x, int y)
+{
+  return client->CanSee(x, y);
+}
+
+
+void Player::sendNetworkMessage(NetworkMessage *msg)
+{
+  client->sendNetworkMessage(msg);
+};
+
+
+void Player::onThingMove(const Player *player, const Thing *thing, const Position *oldPos, unsigned char oldstackpos)
+{
+  client->sendThingMove(player, thing, oldPos, oldstackpos);
+}
+
+
+void Player::onCreatureAppear(const Creature *creature)
+{
+  client->sendCreatureAppear(creature);
+}
+
+
+void Player::onCreatureDisappear(const Creature *creature, unsigned char stackPos)
+{
+  client->sendCreatureDisappear(creature, stackPos);
+}
+
+
+void Player::onCreatureTurn(const Creature *creature, unsigned char stackPos)
+{
+  client->sendCreatureTurn(creature, stackPos);
+}
+
+
+void Player::onCreatureSay(const Creature *creature, unsigned char type, const string &text)
+{
+  client->sendCreatureSay(creature, type, text);
+}
 

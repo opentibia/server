@@ -17,52 +17,63 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
-// $Id$
-//////////////////////////////////////////////////////////////////////
-// $Log$
-// Revision 1.4  2004/11/20 14:56:27  shivoc
-// started adding haktivex battlesystem; fixed some bugs; changed serveroutput
-//
-// Revision 1.3  2004/11/14 09:16:54  shivoc
-// some fixes to at least reenable login without segfaulting the server (including some merges from haktivex' server
-//
-// Revision 1.2  2003/10/19 21:32:19  tliffrag
-// Reworked the Tile class; stackable items now working
-//
-// Revision 1.1  2003/10/17 22:25:02  tliffrag
-// Addes SorryNotPossible; added configfile; basic lua support
-//
-//////////////////////////////////////////////////////////////////////
 
-#include "luascript.h"
+
+extern "C"
+{
+#include <lua.h>
+#include <lauxlib.h>
+}
+
+#include <string>
 #include <iostream>
 
+using namespace std;
 
-LuaScript::LuaScript(std::string file){
-		  std::cout << ":: Loading lua script " << file << "... ";
-	l=lua_open();
-	if(lua_dofile(l, file.c_str()))
-			  std::cout << "failed." << std::endl;
-	else
-			  std::cout << "done." << std::endl;
+#include "luascript.h"
+
+
+
+LuaScript::LuaScript()
+{
+  luaState = NULL;
 }
 
-LuaScript::~LuaScript(){
-	lua_close(l);
+
+LuaScript::~LuaScript()
+{
+  if (luaState)
+	  lua_close(luaState);
 }
 
-std::string LuaScript::getGlobalString(std::string var){
-	lua_getglobal(l, var.c_str());
-	if(!lua_isstring(l, -1)){
-	  std::cout << "code " << lua_type(l, -1) <<std::endl; 
-	  return "no string";
-	}
-	int len = lua_strlen(l, -1);
-	std::string ret(lua_tostring(l,-1), len);
-	lua_pop(l,1);
+
+int LuaScript::OpenFile(const char *filename)
+{
+	luaState = lua_open();
+
+	if (lua_dofile(luaState, filename))
+		return false;
+
+  return true;
+}
+
+
+string LuaScript::getGlobalString(string var, const string &defString)
+{
+	lua_getglobal(luaState, var.c_str());
+
+  if(!lua_isstring(luaState, -1))
+  	  return defString;
+
+	int len = lua_strlen(luaState, -1);
+	string ret(lua_tostring(luaState, -1), len);
+	lua_pop(luaState,1);
+
 	return ret;
 }
 
-int LuaScript::setGlobalString(std::string var, std::string val){
-	return true;
+
+int LuaScript::setGlobalString(string var, string val)
+{
+	return false;
 }

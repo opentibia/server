@@ -17,185 +17,207 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
-// $Id$
-//////////////////////////////////////////////////////////////////////
-// $Log$
-// Revision 1.9  2004/11/20 14:56:27  shivoc
-// started adding haktivex battlesystem; fixed some bugs; changed serveroutput
-//
-// Revision 1.8  2004/11/14 09:16:53  shivoc
-// some fixes to at least reenable login without segfaulting the server (including some merges from haktivex' server
-//
-// Revision 1.7  2003/11/01 15:58:52  tliffrag
-// Added XML for players and map
-//
-// Revision 1.6  2003/10/19 21:32:19  tliffrag
-// Reworked the Tile class; stackable items now working
-//
-// Revision 1.5  2003/10/17 22:25:02  tliffrag
-// Addes SorryNotPossible; added configfile; basic lua support
-//
-// Revision 1.4  2003/09/08 13:28:41  tliffrag
-// Item summoning and maploading/saving now working.
-//
-// Revision 1.3  2002/05/28 13:55:56  shivoc
-// some minor changes
-//
-// Revision 1.2  2002/04/08 15:57:03  shivoc
-// made some changes to be more ansi compliant
-//
-// Revision 1.1  2002/04/08 13:53:59  acrimon
-// Added some very basic map support
-//
-//////////////////////////////////////////////////////////////////////
 
+
+#include "definitions.h"
 #include "items.h"
+
 #include <iostream>
 
-bool ItemType::isContainer() {
-    return iscontainer;
+using namespace std;
+
+
+
+ItemType::ItemType()
+{
+	iscontainer     = false;
+	stackable       = false;
+	useable	        = false;
+	alwaysOnBottom  = false;
+	alwaysOnTop     = false;
+	groundtile      = false;
+	blocking        = false; // people can walk on it
+	pickupable      = false; // people can pick it up
+	
+	id       = 100;
+	tibiaid  = 100;  // the ID in the Tibia protocol
+	maxitems =   8;  // maximum size if this is a container
+	weight   =  50;  // weight of the item, e.g. throwing distance depends on it
 }
 
-ItemType::ItemType() {
-	iscontainer=false;
-    stackable=false;
-	useable=false;
-	alwaysOnBottom=false;
-	alwaysOnTop=false;
-    groundtile=false;
-    blocking=false; // people can walk on it
-    pickupable=false; // people can pick it up
+ItemType::~ItemType()
+{
 }
 
-ItemType::ItemType(unsigned short _id, unsigned short _tibiaid, std::string _name) {
-    id = _id;
-    tibiaid = _tibiaid;
-    name = _name;
+
+Items::Items()
+{
+	// add a few items
+	if (loadFromDat("tibia.dat")) {
+			  std::cout << "could not load tibia.dat!" << std::endl;
+			  exit(1);
+	}
 }
 
-ItemType::~ItemType() {
 
+Items::~Items()
+{
+	for (ItemMap::iterator it = items.begin(); it != items.end(); it++)
+		delete it->second;
 }
 
-Items::Items() {
-		  std::string filename = "Tibia.dat";
-		  std::cout << ":: Loading Items from " << filename << "... ";
-		  // add a few items
-		  if (loadFromDat(filename.c_str()) != 0) {
-					 std::cerr << "failed!" << std::endl;
-					 std::cerr << "make sure you have a valid " << filename << " from tibia 7.1" << std::endl;
-					 exit(1);
-		  }
-		  std::cout << "done." << std::endl;
-}
 
-int Items::loadFromDat(std::string file){
-	int id=100; // tibia.dat start with id 100
+int Items::loadFromDat(std::string file)
+{
+	int id = 100;  // tibia.dat start with id 100
+	
 	#ifdef __DEBUG__
 	std::cout << "Reading item data from tibia.dat" << std::endl;
 	#endif
+	
 	FILE* f=fopen(file.c_str(), "rb");
+	
 	if(!f){
 	#ifdef __DEBUG__
 	std::cout << "FAILED!" << std::endl;
 	#endif
 		return -1;
 	}
+	
 	fseek(f,0,SEEK_END);
 	long size=ftell(f);
+	
 	#ifdef __DEBUG__
 	std::cout << "tibia.dat size is " << size << std::endl;
 	#endif
-	fseek(f,20,SEEK_SET);
-	readDatEntry(f); //skip the first buggy entry TODO: find out what that is
-	while(ftell(f)< size){
-		id++;
-		ItemType* iType= new ItemType;
-		iType->id=id;iType->tibiaid=id;
 
-		std::string header=readDatEntryHeader(f);
-		readDatEntry(f);
-		//TODO include this in the loop:
-		if((unsigned char)(*(header.begin()))==0x00)
-			iType->groundtile=true;
-		for(std::string::iterator i=header.begin(); i != header.end(); i++){
-			unsigned char header_byte=(*i);
-			switch(header_byte){
-				case 0x0F:
-				//can be equipped
-				iType->pickupable=true;
-				break;
-				case 0x0B:
-				//is blocking
-				iType->blocking=true;
-				break;
-				case 0x04:
-				//is stackable
-				iType->stackable=true;
-				break;
-				case 0x05:
-				//is useable
-				iType->useable=true;
-				break;
-				case 0x0C:
-				//is alwaysOnBottom
-				//the concept of always on bottom is wron
-				//this only means, that this item has a heigth
-				//TLIFF
-				//iType->alwaysOnBottom=true;
-				break;
+#ifdef __DEBUG__
+	bool warningwrongoptordershown = false;
+#endif
+	
+	fseek(f, 0x0C, SEEK_SET);
+
+	// loop throw all Items until we reach the end of file
+	while(ftell(f) < size)
+	{
+		ItemType* iType= new ItemType();
+		iType->id	  = id;
+		iType->tibiaid = id;
+
+#ifdef __DEBUG__
+		int lastoptbyte = 0;
+#endif
+		// read the options until we find a 0xff
+		int optbyte;
+		while (((optbyte = fgetc(f)) >= 0) &&   // no error
+				   (optbyte != 0xFF))			    // end of options
+		{
+#ifdef __DEBUG__
+			if (optbyte < lastoptbyte)
+			{
+			 	if (!warningwrongoptordershown)
+				{
+					std::cout << "WARNING! Unexpected option order in file tibia.dat." << std::endl;
+					warningwrongoptordershown = true;
+				}
+			}
+			lastoptbyte = optbyte;
+#endif
+			switch (optbyte)
+			{
+	   			case 0x00:
+		   			//is groundtile	   				
+					iType->groundtile = true;
+		   			fseek(f, 2, SEEK_CUR);
+		   			break;
+  
 				case 0x02:
-				//is on top
-				i++;
-				iType->alwaysOnTop=true;
-				break;
-				case 0x03:
-				//is a container
-				iType->iscontainer=true;
-				break;
-				case 0x10:
-				//makes light (5 bytes)
-				for(int j=0; j<4;j++)
-					i++;
-				break;
-				case 0x1A:
-				//unknown
-				for(int j=0; j<2;j++)
-					i++;
-				break;
+					//is on top
+					iType->alwaysOnTop=true;
+					break;
 
+				case 0x03:
+					//is a container
+					iType->iscontainer=true;
+					break;	   			
+
+				case 0x04:
+					//is stackable
+					iType->stackable=true;
+					break;
+
+				case 0x05:
+					//is useable
+					iType->useable=true;
+					break;
+				
+				case 0x0B:
+					//is blocking
+					iType->blocking=true;
+					break;
+				
+				case 0x0C:
+					//is alwaysOnBottom
+					//the concept of always on bottom is wron
+					//this only means, that this item has a heigth
+					//TLIFF
+					//iType->alwaysOnBottom=true;
+					break;
+	
+				case 0x0F:
+					//can be equipped
+					iType->pickupable=true;
+					break;
+
+				case 0x10:
+					//makes light (skip 4 bytes)
+		   			fseek(f, 4, SEEK_CUR);
+					break;
+
+				case 0x07:
+				case 0x08:
+				case 0x13:
+				case 0x16:
+				case 0x1A:
+					// unknown, but skip 2 bytes to follow the "ordered option" idea
+		   			fseek(f, 2, SEEK_CUR);
+		   			break;
 			}
 		}
-		items[id]=iType;
+		
+		// now skip the size and sprite data		
+ 		int width  = fgetc(f);
+ 		int height = fgetc(f);
+ 		if ((width > 1) || (height > 1))
+ 		   int skip = fgetc(f);
+ 		   
+		int blendframes = fgetc(f);
+		int xdiv        = fgetc(f);
+		int ydiv        = fgetc(f);
+		int animcount   = fgetc(f);
 
-	}
+	  	fseek(f, width*height*blendframes*xdiv*ydiv*animcount*2, SEEK_CUR);
+
+	  	// store the found item	  	
+		items[id] = iType;
+ 		id++;
+   	}
+   	
+   	fclose(f);
 	return 0;
 }
 
-std::string Items::readDatEntryHeader(FILE* f){
-	std::string header;
-	int tmpbyte;
-	while((tmpbyte=fgetc(f))!=EOF){
-		if(tmpbyte==0xFF)
-			return header;
-		header+=(unsigned char)tmpbyte;
-	}
-	return "";
-}
 
-void Items::readDatEntry(FILE* f){
-	//read over the pic-data contained in the dat
-	int count=1;
-	int tmpbyte;
-	for(int i=0; i < 6; i++){
-		tmpbyte=fgetc(f);
-		if(tmpbyte>2 && i ==2) //some strange case where blend is very high
-			tmpbyte=fgetc(f);
-		count*=tmpbyte;
-	}
-	fseek(f,count*2, SEEK_CUR);
-}
-Items::~Items() {
-    items.clear();
-}
+const ItemType& Items::operator[](int id)
+{
+	ItemMap::iterator it = items.find(id);
+	if ((it != items.end()) && (it->second != NULL))
+	  return *it->second;
+
+	#ifdef __DEBUG__
+	std::cout << "WARNING! unknown itemtypeid " << id << ". using defaults." << std::endl;
+	#endif
+	   
+	return dummyItemType;
+}	
 

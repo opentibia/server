@@ -17,22 +17,10 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
-// $Id$
-//////////////////////////////////////////////////////////////////////
-// $Log$
-// Revision 1.3  2002/05/28 13:55:57  shivoc
-// some minor changes
-//
-// Revision 1.2  2002/04/05 20:02:23  acrimon
-// *** empty log message ***
-//
-// Revision 1.1  2002/04/05 18:56:11  acrimon
-// Adding a file class.
-//
-//////////////////////////////////////////////////////////////////////
+
 
 #include <stdio.h>
-//#include <pthread.h>
+
 
 //////////////////////////////////////////////////
 // dump a part of the memory to stderr.
@@ -88,6 +76,7 @@ void upper(char *upstr, char *str) {
         *upstr = upchar(*str);
     *upstr = '\0';
 }
+
 
 //////////////////////////////////////////////////
 // Upcase a 0-terminated string, but at most n chars.
