@@ -1164,7 +1164,13 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 			mapstate.removeThing(targettile, target);
 
 			playersOnline.erase(playersOnline.find(target->getID()));
-
+            NetworkMessage msg;
+            creature->experience += (int)(target->experience * 0.1);
+            if(player){
+                       msg.AddPlayerStats(player);           
+			           player->sendNetworkMessage(&msg);
+            }
+            
 			//Add body
 			Item *corpseitem = Item::CreateItem(target->lookcorpse);
 			corpseitem->pos = target->pos;
