@@ -1,4 +1,4 @@
-otserv CVS
+otserv 0.2.7
 =======
 What is this?
 	otserv is a programm that acts like a tibia server.
@@ -15,16 +15,29 @@ How does it work?
 	Then you are logged in.
 
 What's New?
-	- lost of bugfixes
+	- many small fixes
+	- you may change your outfit
+	- player saving nows uses XML
+	  and saves equipement
+	- map saving now uses XML
+	- you can walk using your mouse
 
 
 How do I use this new stuff?
-	- lost of bugfixes
-	  Mapsaving works without problems:
- 	    deleting after save'n'load works and it doesnt
-	    crash anymore
-	  Items dont change places on the stack
-	  You can push items under yourself
+	Most stuff doesnt have to be explained. Expect perhaps the XML
+	stuff wich isnt really important if you arent a programmer.
+	What is important to mention is, that the way map-saves are made
+	and loaded has changed a bit.
+	The map is no longer called otserv.map but is now in data/world
+	and is called map.xml It is generated when you use the save command
+	the first time.
+	If you want to load a map in the old format, you have to make sure,
+	that map.xml *doesnt exist*.
+	The order in which otserv will read the map is:
+	1. map.xml
+	2. then otserv.map
+	3. generate empty map
+
 
 
 How to use the old stuff?
@@ -45,12 +58,13 @@ Credits?
 	Shi'Voc - Coding of initial otserv
 	Acrimon - Coding of initial otserv
 	Tliff - Coding, some kind of project leader
-	TiMMit
-	Zybak - Map-Editor coding
-	Torvik - Item list
+	TiMMit - Coding
+	Reebow - special support, protocoll
+	Matkus - Front end coding
 	Privateer - Documentation on the protocoll
-	Reebow - special support	
-	Yorick - Board freak ;)
+	Torvik - Item list
+	Yorick - Board mod
+	Decar - Fansiter
 	Nibbles and MMN-o - Decoration on IRC ;)
 	The people that helped to name the items
 

@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.22  2003/11/06 17:16:47  tliffrag
+// 0.2.7 release
+//
 // Revision 1.21  2003/11/05 23:28:24  tliffrag
 // Addex XML for players, outfits working
 //
@@ -290,56 +293,69 @@ int Map::tick(double time){
 	return true;
 }
 Map::Map() {
-	FILE* f;
-	if((f=fopen("data/world/map.xml","r"))){
-	fclose(f);
-		loadMapXml("map.xml");
-		tick(0);
-		return;
-	}
-	//this code is ugly but works
-	//TODO improve this code to support things like
-	//a quadtree to speed up everything
-	#ifdef __DEBUG__
-	std::cout << "Loading map" << std::endl;
-	#endif
-	FILE* dump=fopen("otserv.map", "rb");
-	if(!dump){
-		 #ifdef __DEBUG__
-		 std::cout << "Fatal error: Mapfile not found" << std::endl;
-		 #endif
-		exit(1);
-	}
-	position topleft, bottomright, now;
-
-
-	topleft.x=fgetc(dump)*256;	topleft.x+=fgetc(dump);
-	topleft.y=fgetc(dump)*256;	topleft.y+=fgetc(dump);
-	topleft.z=fgetc(dump);
-
-	bottomright.x=fgetc(dump)*256;	bottomright.x+=fgetc(dump);
-	bottomright.y=fgetc(dump)*256;	bottomright.y+=fgetc(dump);
-	bottomright.z=fgetc(dump);
-
-	int xsize= bottomright.x-topleft.x;
-	int ysize= bottomright.y-topleft.y;
-	//TODO really place this map patch where it belongs
-
-	for(int y=0; y < ysize; y++){
-		for(int x=0; x < xsize; x++){
-		  tiles[x][y] = new Tile;
-			while(true){
-				int id=fgetc(dump)*256;id+=fgetc(dump);
-				if(id==0x00FF)
-					break;
-				now.x=x+MINX;now.y=y+MINY;now.z=topleft.z;
-				tiles[x][y]->addItem(new Item(id));
-				//tiles[x][y]->push_back(new Item(id));
-			}
+	//first we fill the map with
+	for(int y=MINY; y< MAXY; y++){
+		for(int x=MINX; x < MAXX; x++){
+		tiles[x-MINX][y-MINY] = new Tile;
+		if(abs(x-MINX)<10 || abs(x-MAXX)<10 ||
+		   abs(y-MINY)<10 || abs(y-MAXY)<10)
+			tiles[x-MINX][y-MINY]->addItem(new Item(605));
+		else
+			tiles[x-MINX][y-MINY]->addItem(new Item(102));
 		}
 	}
-	fclose(dump);
-	tick(0);
+
+	FILE* f;
+	f=fopen("data/world/map.xml","r");
+	if(f){
+	fclose(f);
+		loadMapXml("data/world/map.xml");
+	}
+	else{
+		//this code is ugly but works
+		//TODO improve this code to support things like
+		//a quadtree to speed up everything
+		#ifdef __DEBUG__
+		std::cout << "Loading map" << std::endl;
+		#endif
+		FILE* dump=fopen("otserv.map", "rb");
+		if(!dump){
+			#ifdef __DEBUG__
+			std::cout << "Loading old format mapfile" << std::endl;
+			#endif
+			exit(1);
+		}
+		position topleft, bottomright, now;
+
+
+		topleft.x=fgetc(dump)*256;	topleft.x+=fgetc(dump);
+		topleft.y=fgetc(dump)*256;	topleft.y+=fgetc(dump);
+		topleft.z=fgetc(dump);
+
+		bottomright.x=fgetc(dump)*256;	bottomright.x+=fgetc(dump);
+		bottomright.y=fgetc(dump)*256;	bottomright.y+=fgetc(dump);
+		bottomright.z=fgetc(dump);
+
+		int xsize= bottomright.x-topleft.x;
+		int ysize= bottomright.y-topleft.y;
+		int xorig=((MAXX-MINX)-xsize)/2;
+		int yorig=((MAXY-MINY)-ysize)/2;
+		//TODO really place this map patch where it belongs
+
+		for(int y=0; y < ysize; y++){
+			for(int x=0; x < xsize; x++){
+				while(true){
+					int id=fgetc(dump)*256;id+=fgetc(dump);
+					if(id==0x00FF)
+						break;
+					//now.x=x+MINX;now.y=y+MINY;now.z=topleft.z;
+					tiles[xorig][yorig]->addItem(new Item(id));
+					//tiles[x][y]->push_back(new Item(id));
+				}
+			}
+		}
+		fclose(dump);
+	}
 	tiles[32864-MINX][32863-MINY]->creature=new NPC("ruediger");
 }
 
@@ -391,7 +407,7 @@ int Map::loadMapXml(std::string map){
 	int width, height;
 
 
-	doc=xmlParseFile("map.xml");
+	doc=xmlParseFile(map.c_str());
 	root=xmlDocGetRootElement(doc);
 	if(xmlStrcmp(root->name,(const xmlChar*) "map")){
 		std::cout << "FATAL: couldnt load map. exiting" << std::endl;
@@ -399,21 +415,25 @@ int Map::loadMapXml(std::string map){
 	}
 	width=atoi((const char*)xmlGetProp(root, (const xmlChar *) "width"));
 	height=atoi((const char*)xmlGetProp(root, (const xmlChar *) "height"));
+	int xorig=((MAXX-MINX)-width)/2;
+	int yorig=((MAXY-MINY)-height)/2;
+	std::cout << xorig << "   " << yorig << std::endl;
 	tile=root->children;
 	for(int y=0; y < height; y++){
 		for(int x=0; x < width; x++){
 			item=tile->children;
-			tiles[x][y] = new Tile;
+
 			while(item != NULL){
 				Item* myitem=new Item();
 				myitem->unserialize(item);
-				tiles[x][y]->addItem(myitem);
+				tiles[x+xorig][y+yorig]->addItem(myitem);
 				item=item->next;
 			}
 			tile=tile->next;
 
 		}
 	}
+	std::cout << "Loaded XML-Map" << std::endl;
 	xmlFreeDoc(doc);
 	return 0;
 }
@@ -466,6 +486,8 @@ Creature* Map::getPlayerByID( unsigned long id ){
 }
 
 position Map::placeCreature(position pos, Creature* c){
+//	pos.x+=192;
+//	pos.y+=192;
 	//add creature to the online list
 	playersOnline[c->getID()]=c;
   if( tiles[pos.x-MINX][pos.y-MINY]->isBlocking()){

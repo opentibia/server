@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.16  2003/11/06 17:16:47  tliffrag
+// 0.2.7 release
+//
 // Revision 1.15  2003/11/05 23:28:24  tliffrag
 // Addex XML for players, outfits working
 //
@@ -122,10 +125,10 @@ class Map {
     // should use an Space Partitioning Tree.
     // I am using a very simple array now though.
     public:
-        static const unsigned short MINX = 32832;
-        static const unsigned short MINY = 32832;
-        static const unsigned short MAXX = 32960;
-        static const unsigned short MAXY = 32960;
+        static const unsigned short MINX = 32640;
+        static const unsigned short MINY = 32640;
+        static const unsigned short MAXX = 33152;
+        static const unsigned short MAXY = 33152;
 
     private:
 		int distributeAction(position pos, Action* a);
