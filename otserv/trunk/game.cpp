@@ -1102,14 +1102,14 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 			int manaDamage = 0;
 
 			if (damage > 0) {
-				if(targetPlayer && me->offensive && target->access == 0) {
-					if(player) {
-						if(targetPlayer != player)
-							player->pzLocked = true;
+				if(player) {
+					if(targetPlayer && targetPlayer != player)
+						player->pzLocked = true;
 
-						player->inFightTicks = (long)g_config.getGlobalNumber("pzlocked", 0); //me->getInFightTicks();
-					}
+					//player->inFightTicks = (long)g_config.getGlobalNumber("pzlocked", 0); //me->getInFightTicks();
+				}
 
+				if(target->access == 0 && targetPlayer) {
 					targetPlayer->inFightTicks = (long)g_config.getGlobalNumber("pzlocked", 0);
 					targetPlayer->sendIcons();
 				}
@@ -1201,8 +1201,11 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 	}
 
 
-	if(me->causeExhaustion(targetVec.size() > 0))
+	if(me->causeExhaustion(!targetVec.empty()))
 		creature->exhaustedTicks = (long)g_config.getGlobalNumber("exhausted", 0);
+	
+	if(me->offensive && player && (!targetVec.empty() || !areaVec.empty()))
+		player->inFightTicks = (long)g_config.getGlobalNumber("pzlocked", 0);
 
 	NetworkMessage msg;
 	//Create a network message for each spectator
@@ -1217,11 +1220,13 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 		mapstate.getMapChanges(spectator, msg);
 
 		me->getDistanceShoot(spectator, creature, centerpos, targetVec.size() > 0, msg);
-
+		
+		bool hasTarget = false;
 		for(TargetAreaVec::const_iterator taIt = areaVec.begin(); taIt != areaVec.end(); ++taIt) {
 			Tile *targettile = getTile(taIt->first.x,  taIt->first.y, taIt->first.z);
 			
-			if(!taIt->second /*hasTarget*/)
+			hasTarget = taIt->second;
+			if(!hasTarget)
 				me->getMagicEffect(spectator, creature, taIt->first, false, 0, targettile->isPz() , msg);
 		}
 
@@ -1231,8 +1236,10 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 			Tile *targettile = getTile(target->pos.x, target->pos.y, target->pos.z);
 			int damage = tdIt->second.damage;
 			int manaDamage = tdIt->second.manaDamage;
+			hasTarget = (target->access == 0);
 
-			me->getMagicEffect(spectator, creature, target->pos, true, damage, targettile->isPz() , msg);
+			if(hasTarget)
+				me->getMagicEffect(spectator, creature, target->pos, true, damage, targettile->isPz() , msg);
 
 			if(creature && target->health <= 0) { //could be death due to a magic damage with no owner (fire/poison/energy)
 				if(spectator->CanSee(creature->pos.x, creature->pos.y)) {

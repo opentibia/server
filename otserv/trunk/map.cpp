@@ -122,7 +122,7 @@ void MapState::addThingInternal(Tile *t, Thing *thing, bool onlyRegister)
 
 	std::vector<tilechangedata>& vec = changesItemMap[t];
 
-	if(thing != t->splash)
+	if(!onlyRegister && thing != t->splash)
 		t->addThing(thing);
 
 	int stackpos = t->getThingStackPos(thing);
@@ -188,6 +188,9 @@ void MapState::getMapChanges(Player *spectator, NetworkMessage &msg)
 		TileChangeDataVec::const_iterator thIt;
 		for(thIt = changesItemMapIt->second.begin(); thIt != changesItemMapIt->second.end(); ++thIt) {
 			
+			if(!spectator->CanSee(thIt->thing->pos.x,  thIt->thing->pos.y))
+				continue;
+
 			if(thIt->remove) {
 				if(thIt->stackpos < 10) {
 					msg.AddByte(0x6c);
