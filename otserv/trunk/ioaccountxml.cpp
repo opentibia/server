@@ -23,7 +23,7 @@
 #include <functional>
 #include <sstream>
 
-Account IOAccountXML::loadAccount(int accno){
+Account IOAccountXML::loadAccount(unsigned long accno){
 	Account acc;
 
 	std::stringstream accsstr;

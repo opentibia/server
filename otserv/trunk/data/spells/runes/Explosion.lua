@@ -21,5 +21,5 @@ centerpos = {x=creaturePos.x, y=creaturePos.y, z=creaturePos.z}
 ExplosionObject.minDmg = (level * 2 + maglv *3) * 0.35
 ExplosionObject.maxDmg = (level * 2 + maglv *3) * 0.65
 
-return doAreaMagic(cid, centerpos, needDirection, areaEffect, area, 3, 3, ExplosionObject:ordered())
+return doAreaMagic(cid, centerpos, needDirection, areaEffect, area, ExplosionObject:ordered())
 end

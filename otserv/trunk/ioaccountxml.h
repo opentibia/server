@@ -34,10 +34,10 @@ class IOAccountXML : protected IOAccount {
   public:
 	/** Get a textual description of what source is used
 	  * \returns Name of the source*/
-	char* getSourceDescription(){return "XML";};
-	Account loadAccount(int accno);
+	virtual char* getSourceDescription(){return "XML";};
+	virtual Account loadAccount(unsigned long accno);
 	IOAccountXML(){};
-	~IOAccountXML(){};
+	virtual ~IOAccountXML(){};
 };
 
 #endif

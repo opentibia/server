@@ -272,8 +272,8 @@ void Player::addSkillTry(int skilltry)
 			 
 #if __DEBUG__
 			 //for debug
-			 cout << Creature::getName() << ", has the vocation: " << voc << " and is training his " << skillname << "(" << skill << "). Tries: " << skills[skill][SKILL_TRIES] << "(" << getReqSkilltries (skill, (skills[skill][SKILL_LEVEL] + 1), voc) << ")\n";
-			 cout << "Current skill: " << skills[skill][SKILL_LEVEL] << " Skillbase: " << getSkillBase(skill) << ", SkillMultiplier: " << getSkillMultiplier(voc, skill) << "\n";
+			 cout << Creature::getName() << ", has the vocation: " << voc << " and is training his " << skillname << "(" << skill << "). Tries: " << skills[skill][SKILL_TRIES] << "(" << getReqSkilltries (skill, (skills[skill][SKILL_LEVEL] + 1), voc) << ")" << std::endl;
+			 cout << "Current skill: " << skills[skill][SKILL_LEVEL] << std::endl;
 #endif
 			 
 			 //Need skill up?
