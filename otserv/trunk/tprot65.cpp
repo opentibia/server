@@ -59,6 +59,23 @@ namespace Protokoll {
 		cout << "6.5 client accountnumber: " << pnum << " pwd: " << passwd 
 			<< endl;
 
+		// now we need the redirect packet...
+		std::string temp= "..";
+		temp += 0x64;
+		temp += 0x01; // number of chars
+		temp += 0x05; temp += '\0'; // length of name
+		temp += "Hurz"; temp += '\0'; // name
+		temp += 0x0A; temp += '\0'; // length of world name
+		temp += "OpenWorld"; temp += '\0'; // world name
+		temp += 0x7f; temp += '\0'; temp += '\0'; temp += 0x01; // ip
+		temp += 0x03;
+		temp[-1]=0x1c;
+
+		temp[0] = (char)temp.length()%256;
+		temp[1] = (char)(temp.length()/256);
+
+		TNetwork::SendData(sock, temp);
+
 		throw texception("Protokoll 6.5+ redirected...", true);
 
 	} // TProt65::TProt65(Socket sock, string in) throw(texception) 	
