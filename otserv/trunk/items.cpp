@@ -234,9 +234,9 @@ int Items::loadXMLInfos(std::string file)
     xmlNodePtr root, p;
 	  root = xmlDocGetRootElement(doc);
 
-	  if (xmlStrcmp(root->name, (const xmlChar*)"items"))
-    {
-  	  return -1;
+	  if (xmlStrcmp(root->name, (const xmlChar*)"items")) {
+		  xmlFreeDoc(doc);
+		  return -1;
 	  }
 
     p = root->children;
@@ -294,11 +294,14 @@ int Items::loadXMLInfos(std::string file)
         else
         {
           std::cout << "error: wrong item id " << id;
+	  xmlFreeDoc(doc);
           return -1;
         }
 		  }
 	    p = p->next;
 	  }
+
+	  xmlFreeDoc(doc);
 
     return 0;
   }

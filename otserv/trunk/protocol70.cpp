@@ -230,7 +230,7 @@ bool Protocol70::setCreatureAsKnown(unsigned long id)
 			return true;
 	}
 
-  if(knownPlayers.size() >= 64)
+  if(knownPlayers.size() >= 35)
 		knownPlayers.pop_front();
 
   knownPlayers.push_back(id);
