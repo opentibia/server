@@ -7,7 +7,7 @@
 #include "definitions.h"
 
 
-#define NETWORKMESSAGE_MAXSIZE 2048
+#define NETWORKMESSAGE_MAXSIZE 16384
 
 
 #define NM_ME_DRAW_BLOOD          0

@@ -38,6 +38,7 @@
 #ifndef WIN32
 #include <fcntl.h>
 #include <arpa/inet.h>
+#include <signal.h>
 #endif
 
 
@@ -145,11 +146,19 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
     Account account;
     if (account.openPlayer(name, password, *player))
     {
-      protocol->ConnectPlayer();
-      protocol->ReceiveLoop();
-    }
+      if (!protocol->ConnectPlayer())  {
+				  std::cout << "reject player..." << std::endl;
+				  msg.Reset();
+				  msg.AddByte(0x14);
+				  msg.AddString("Too many Players online.");
 
-    player->releasePlayer();
+				  msg.WriteToSocket(s);
+				  closesocket(s);
+
+		} else {
+				  protocol->ReceiveLoop();
+		}
+    }
 
     closesocket(s);
   }
@@ -174,6 +183,10 @@ int main(int argc, char *argv[])
   std::cout << ":: ====================" << std::endl;
   std::cout << "::" << std::endl;
 
+  // ignore sigpipe...
+  struct sigaction sigh;
+  sigh.sa_handler = SIG_IGN;
+  sigaction(SIGPIPE, &sigh, NULL);
   // read global config
   std::cout << ":: Loading lua script config.lua... ";
   if (!g_config.OpenFile("config.lua"))
@@ -295,7 +308,7 @@ int main(int argc, char *argv[])
   } // if (listen_socket <= 0)
 
 #ifndef WIN32
-    int yes;
+    int yes=1;
     // lose the pesky "Address already in use" error message
     if (setsockopt(listen_socket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof (int)) == -1)  {
         throw texception("network.cpp: setsockopt failed!", true);

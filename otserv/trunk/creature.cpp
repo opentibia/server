@@ -11,7 +11,7 @@ using namespace std;
 static unsigned int idcount = 0x4711;
 
 
-Creature::Creature(const char *name)
+Creature::Creature(const char *name) : access(0)
 {
   idcount++;
 

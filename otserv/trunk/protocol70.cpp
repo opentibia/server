@@ -53,9 +53,9 @@ Protocol70::~Protocol70()
 }
 
 
-void Protocol70::ConnectPlayer()
+bool Protocol70::ConnectPlayer()
 {
-  map->placeCreature(player);
+  return map->placeCreature(player);
 }
 
 
@@ -63,18 +63,28 @@ void Protocol70::ReceiveLoop()
 {
   NetworkMessage msg;
 
-  while (msg.ReadFromSocket(s))
-  {
+  while (msg.ReadFromSocket(s)) {
     parsePacket(msg);
   }
 
-  // TODO: logout -> kick
+  // logout by disconnect?  -> kick
+  if (player) {
+			 map->removeCreature(player);
+  }
 }
 
 
 void Protocol70::parsePacket(NetworkMessage &msg)
 {
-  switch(msg.GetByte())
+  uint8_t recvbyte = msg.GetByte();
+
+  if (player->health <= 0) {
+	 if (recvbyte == 0x14)
+		parseLogout(msg);
+	     return;
+  }
+
+  switch(recvbyte)
   {
     case 0x14: // logout
       parseLogout(msg);
@@ -230,6 +240,7 @@ void Protocol70::parseLogout(NetworkMessage &msg)
 	// we ask the map to remove us
 	if (map->removeCreature(player))
   {
+	  player = NULL;
 	  closesocket(s);
   }
 }
@@ -359,7 +370,7 @@ void Protocol70::parseThrow(NetworkMessage &msg)
   unsigned short from_x     = msg.GetU16();
   unsigned short from_y     = msg.GetU16(); 
   unsigned char  from_z     = msg.GetByte();
-  unsigned char  duno1 = msg.GetByte();
+  unsigned char  duno1 = msg.GetByte(); // item type 2 bytes
   unsigned char  duno2 = msg.GetByte();
   unsigned char  from_stack = msg.GetByte();
   unsigned short to_x       = msg.GetU16();
@@ -381,7 +392,7 @@ void Protocol70::parseLookAt(NetworkMessage &msg){
 
   NetworkMessage newmsg;
   std::stringstream ss;
-  ss << "You " << /*look at " << LookPos << " and todo: implement that operator*/ " see Item # " << ItemNum << ".";
+  ss << "You look at " << LookPos << " and see Item # " << ItemNum << ".";
   Position middle;
   newmsg.AddTextMessage(MSG_INFO, ss.str().c_str());
   
@@ -787,7 +798,7 @@ void Protocol70::sendCreatureAppear(const Creature *creature)
 
     msg.WriteToSocket(s);
   }
-  else
+  else if (creature == player)
   {
 	  msg.AddByte(0x0A);
     msg.AddU32(player->getID());

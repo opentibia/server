@@ -42,7 +42,7 @@ public:
   Protocol70(SOCKET s);
   virtual ~Protocol70();
 
-  void ConnectPlayer();
+  bool ConnectPlayer();
   void ReceiveLoop();
 
 

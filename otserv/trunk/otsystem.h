@@ -84,7 +84,12 @@ inline void OTSYS_CREATE_THREAD(void *(*a)(void*), void *b)
 
 typedef pthread_mutex_t OTSYS_THREAD_LOCKVAR;
 
-#define OTSYS_THREAD_LOCKVARINIT(a)   pthread_mutex_init(&a, NULL);
+inline void OTSYS_THREAD_LOCKVARINIT(OTSYS_THREAD_LOCKVAR& l) {
+		  pthread_mutexattr_t attr;
+		  pthread_mutexattr_init(&attr);
+		  pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE_NP);
+		  pthread_mutex_init(&l, &attr);
+}
 #define OTSYS_THREAD_LOCK(a)          pthread_mutex_lock(&a);
 #define OTSYS_THREAD_UNLOCK(a)        pthread_mutex_unlock(&a);
 #define OTSYS_THREAD_TIMEOUT			  ETIMEDOUT
@@ -112,7 +117,6 @@ inline __int64 OTSYS_TIME()
 
 #define OTSYS_THREAD_WAITSIGNAL(a,b) pthread_cond_wait(&a, &b)
 
-#include <iostream>
 inline int OTSYS_THREAD_WAITSIGNAL_TIMED(OTSYS_THREAD_SIGNALVAR& signal, OTSYS_THREAD_LOCKVAR& lock, __int64 cycle) {
 		  timespec tv;
 		  tv.tv_sec = (__int64)(cycle / 1000);

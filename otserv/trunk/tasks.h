@@ -32,6 +32,7 @@ class MovePlayer : public std::binary_function<Map*, Direction, int> {
 					 MovePlayer(unsigned long playerid) : _pid(playerid) { }
 
 					 virtual result_type operator()(const first_argument_type& map, const second_argument_type& dir) const {
+								OTSYS_THREAD_LOCK(map->mapLock)
 								// get the player we want to move...
 								Creature* creature = map->getCreatureByID(_pid);
 
@@ -39,7 +40,7 @@ class MovePlayer : public std::binary_function<Map*, Direction, int> {
 //              Player* player = dynamic_cast<Player*>(creature);*/
 //                if (!player) // player is not available anymore it seems...
 //										  return -1;
-                if (!creature->isPlayer())
+                if (!creature || !creature->isPlayer())
                   return -1;
 
                 Player *player = (Player*)creature;
@@ -64,6 +65,7 @@ class MovePlayer : public std::binary_function<Map*, Direction, int> {
 								std::cout << "move to: " << dir << std::endl;
 #endif
 								map->thingMove(player, player, pos.x, pos.y, pos.z);
+								OTSYS_THREAD_UNLOCK(map->mapLock)
 
                 return 0;
 					 }

@@ -65,7 +65,6 @@ public:
 
 	std::string getName(){return name;};
 
-  int access; //access level
   int sex, voc;
   int cap;
 

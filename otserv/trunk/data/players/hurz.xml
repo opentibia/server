@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<player name="Hurz" account="111111" sex="1" lookdir="0" exp="1111" voc="0" level="0" access="0" cap="300">
+<player name="Hurz" account="111111" sex="1" lookdir="0" exp="1111" voc="0" level="0" access="1" cap="300">
 	<mana now="800" max="800" spent="0"/>
 	<health now="800" max="800" food="0"/>
 	<look type="128" head="20" body="30" legs="40" feet="50"/>

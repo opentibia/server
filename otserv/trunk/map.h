@@ -34,6 +34,7 @@
 #include "otsystem.h"
 
 #include "scheduler.h"
+#include "networkmessage.h"
 
 
 enum tmapEnum{
@@ -86,7 +87,7 @@ class Map {
     void playerYell(Player *player, const std::string &text);
     void playerSpeakTo(Player *player, const std::string &receiver, const std::string &text);
     void playerBroadcastMessage(Player *player, const std::string &text);
-	  void playerChangeOutfit(Player* player);
+	 void playerChangeOutfit(Player* player);
 
 
     //void addEvent(long ticks, int type, void *data);
@@ -94,6 +95,7 @@ class Map {
 
     Creature* getCreatureByID(unsigned long id);
 
+    OTSYS_THREAD_LOCKVAR mapLock;
   protected:
     // use this internal function to move things around to avoid the need of
     // recursive locks
@@ -104,8 +106,9 @@ class Map {
 
     void creatureMakeDistDamage(Creature *creature, Creature *attackedCreature);
 
+	 void CreateDamageUpdate(Player* player, Creature* attackCreature, int damage, NetworkMessage& msg);
 
-    OTSYS_THREAD_LOCKVAR mapLock;
+
     OTSYS_THREAD_LOCKVAR eventLock;
 	 OTSYS_THREAD_SIGNALVAR eventSignal;
 
@@ -132,6 +135,7 @@ class Map {
 
     void Map::setTile(unsigned short _x, unsigned short _y, unsigned char _z, unsigned short groundId);
 
+	 uint32_t max_players;
 };
 
 #endif

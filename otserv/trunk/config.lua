@@ -23,3 +23,6 @@ ip = "127.0.0.1"
 -- The messagebox you sometimes get before you choose characters
 -- not working yet
 motd = "we dont need a motd rightnow"
+
+-- max number of players allowed
+maxplayers = "10000"

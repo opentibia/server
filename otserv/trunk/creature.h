@@ -89,6 +89,8 @@ public:
 
   int lastDamage;
 
+  int access; //access level
+
 
 private:
   virtual void onThingMove(const Player *player, const Thing *thing, const Position *oldPos, unsigned char oldstackpos) { };

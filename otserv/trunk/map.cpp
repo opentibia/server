@@ -22,6 +22,7 @@
 #include "definitions.h"
 
 #include <string>
+#include <sstream>
 
 using namespace std;
 
@@ -39,10 +40,12 @@ using namespace std;
 
 #include "npc.h"
 
+#include "luascript.h"
 
 #define EVENT_CHECKPLAYER          123
 #define EVENT_CHECKPLAYERATTACKING 124
 
+extern LuaScript g_config;
 
 Map::Map()
 {
@@ -51,10 +54,7 @@ Map::Map()
   {
 		for(int x = 0; x < MAP_WIDTH; x++)
     {
-/*		  if(abs(x)<10 || abs(x)<10 || abs(y)<10 || abs(y)<10)
-			  tiles[x][y]->ground = 605;
-		  else
-  			tiles[x][y]->ground = 102;*/
+				setTile(x,y,7,102);
 		}
 	}
 
@@ -73,6 +73,10 @@ Map::~Map()
 
 
 bool Map::LoadMap(std::string filename) {
+
+  // get maximum number of players allowed...
+  max_players = atoi(g_config.getGlobalString("maxplayers").c_str());
+  std::cout << ":: Player Limit: " << max_players << std::endl;
 
 	FILE* f;
 	std::cout << ":: Loading Map from " << filename << " ... ";
@@ -193,8 +197,10 @@ OTSYS_THREAD_RETURN Map::eventThread(void *p)
 			 }
 
 			 OTSYS_THREAD_UNLOCK(_this->eventLock);
-			 if (task)
+			 if (task) {
 						(*task)(_this);
+						delete task;
+			 }
   }
 
 /*
@@ -369,6 +375,9 @@ Creature* Map::getCreatureByID(unsigned long id)
 
 bool Map::placeCreature(Creature* c)
 {
+  if (c->access == 0 && playersOnline.size() >= max_players)
+			 return false;
+
   OTSYS_THREAD_LOCK(mapLock)
 
 	// add player to the online list
@@ -382,13 +391,14 @@ bool Map::placeCreature(Creature* c)
 	 addEvent(makeTask(2000, std::bind2nd(std::mem_fun(&Map::checkPlayerAttacking), c->id)));
 
     ((Player*)c)->usePlayer();
+	 std::cout << playersOnline.size() << " players online." << std::endl;
   }
 
-  while (getTile(c->pos.x, c->pos.y, c->pos.z)->isBlocking())
-  {
-  	// crap we need to find another spot
-	  c->pos.x++;
-  }
+  //while (getTile(c->pos.x, c->pos.y, c->pos.z)->isBlocking())
+  //{
+  //	// crap we need to find another spot
+  //   c->pos.x++;
+  //}
 
   getTile(c->pos.x, c->pos.y, c->pos.z)->addThing(c);
 
@@ -418,26 +428,28 @@ bool Map::removeCreature(Creature* c)
 	//removeCreature from the online list
   playersOnline.erase(playersOnline.find(c->getID()));
 
+  
+  std::cout << playersOnline.size() << " players online." << std::endl;
 #ifdef __DEBUG__
 	std::cout << "removing creature "<< std::endl;
 #endif
 
-  int stackpos = getTile(c->pos.x, c->pos.y, c->pos.z)->getCreatureStackPos(c);
-  getTile(c->pos.x, c->pos.y, c->pos.z)->removeThing(c);
+			  int stackpos = getTile(c->pos.x, c->pos.y, c->pos.z)->getCreatureStackPos(c);
+			  getTile(c->pos.x, c->pos.y, c->pos.z)->removeThing(c);
 
-  CreatureVector::iterator cit;
-  for (int x = c->pos.x - 9; x <= c->pos.x + 9; x++)
-    for (int y = c->pos.y - 7; y <= c->pos.y + 7; y++)
-    {
-      Tile *tile = getTile(x, y, 7);
-      if (tile)
-      {
-        for (cit = tile->creatures.begin(); cit != tile->creatures.end(); cit++)
-        {
-          (*cit)->onCreatureDisappear(c, stackpos);
-        }
-      }
-    }
+			  CreatureVector::iterator cit;
+			  for (int x = c->pos.x - 9; x <= c->pos.x + 9; x++)
+						 for (int y = c->pos.y - 7; y <= c->pos.y + 7; y++)
+						 {
+									Tile *tile = getTile(x, y, 7);
+									if (tile)
+									{
+											  for (cit = tile->creatures.begin(); cit != tile->creatures.end(); cit++)
+											  {
+														 (*cit)->onCreatureDisappear(c, stackpos);
+											  }
+									}
+						 }
 
   if (c->isPlayer())
     ((Player*)c)->releasePlayer();
@@ -633,6 +645,9 @@ void Map::thingMoveInternal(Player *player,
 
   if (thing)
   {
+    if (player->access == 0 && thing->isPlayer() && ((Player*)thing)->access != 0)
+				return;
+				
     Position oldPos;
     oldPos.x = from_x;
     oldPos.y = from_y;
@@ -817,9 +832,11 @@ void Map::creatureMakeDistDamage(Creature *creature, Creature *attackedCreature)
   //    (Math.Abs(creature.Position.y-attackedCreature.Position.y) <= 6) &&
     //  (creature.Position.z == attackedCreature.Position.z))
   {
-    int damage = rand() % 300 - 100; //attackedCreature.CalculateDistDamage(creature);
+	 int damage = 1+(int)(10.0*rand()/(RAND_MAX+1.0));
+	 if (creature->access != 0)
+				damage += 1337;
 
-    if (damage < -50)
+    if (damage < -50 || attackedCreature->access != 0)
       damage = 0;
 
     if (damage > 0)
@@ -828,6 +845,8 @@ void Map::creatureMakeDistDamage(Creature *creature, Creature *attackedCreature)
     CreatureVector::iterator cit;
 
     NetworkMessage msg;
+
+	 Tile* targettile = getTile(attackedCreature->pos.x, attackedCreature->pos.y, attackedCreature->pos.z);
 
     for (int x = min(creature->pos.x, attackedCreature->pos.x) - 9; x <= max(creature->pos.x, attackedCreature->pos.x) + 9; x++)
       for (int y = min(creature->pos.y, attackedCreature->pos.y) - 7; y <= max(creature->pos.y, attackedCreature->pos.y) + 7; y++)
@@ -857,14 +876,30 @@ void Map::creatureMakeDistDamage(Creature *creature, Creature *attackedCreature)
               {
                 if (p->CanSee(attackedCreature->pos.x, attackedCreature->pos.y))
                 {
-                  msg.AddAnimatedText(attackedCreature->pos, 0xB4, "1337");
+						std::stringstream dmg;
+						dmg << damage;
+                  msg.AddAnimatedText(attackedCreature->pos, 0xB4, dmg.str());
                   msg.AddMagicEffect(attackedCreature->pos, NM_ME_DRAW_BLOOD);
-                  msg.AddCreatureHealth(attackedCreature);
+                    //if (attackedCreature->health <= 0)
+                    //{
+                    //  // remove character
+                    //  msg.AddByte(0x6c);
+                    //  msg.AddPosition(attackedCreature->pos);
+                    //  msg.AddByte(targettile->getThingStackPos(attackedCreature));
+						  //msg.AddByte(0x6a);
+						  //msg.AddPosition(attackedCreature->pos);
+						  //Item* item = new Item(1437);
+						  //msg.AddItem(item);
+						  //delete item;
+                    //}
+                    //else
+							 msg.AddCreatureHealth(attackedCreature);
+
                 }
 
                 // own damage, update infos
                 //if (p == attackedCreature)
-                  //CreateDamageUpdate(p, creature, ref netMessage);
+                //  CreateDamageUpdate(p, creature, damage, msg);
               }
 
               p->sendNetworkMessage(&msg);
@@ -872,6 +907,11 @@ void Map::creatureMakeDistDamage(Creature *creature, Creature *attackedCreature)
           }
         }
       }
+
+	 //if (attackedCreature->health <= 0) {
+	 //  		targettile->removeThing(attackedCreature);
+	 //  		targettile->addThing(new Item(2278));
+	 //}
   }
 }
 
@@ -899,13 +939,13 @@ void Map::checkPlayerAttacking(unsigned long id)
 
   Player *player = (Player*)getCreatureByID(id);
 
-  if (player != NULL)
+  if (player != NULL && player->health > 0)
   {
     if (player->attackedCreature != 0)
     {
       Creature *attackedCreature = (Player*)getCreatureByID(player->attackedCreature);
 
-      if (attackedCreature != NULL)
+      if (attackedCreature != NULL && attackedCreature->health > 0)
         creatureMakeDistDamage(player, attackedCreature);
     }
 
@@ -916,4 +956,13 @@ void Map::checkPlayerAttacking(unsigned long id)
   OTSYS_THREAD_UNLOCK(mapLock)
 }
 
+void Map::CreateDamageUpdate(Player* player, Creature* attackCreature, int damage, NetworkMessage& msg) {
+		  msg.AddPlayerStats(player);
+		  std::stringstream dmgmesg;
+		  dmgmesg << "You lose " << damage << " hitpoints due to an attack by ";
+		  dmgmesg << attackCreature->getName();
+		  msg.AddTextMessage(MSG_EVENT, dmgmesg.str().c_str());
+		  if (player->health <= 0)
+					 msg.AddTextMessage(MSG_EVENT, "Own3d!");
+}
 
