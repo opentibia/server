@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.14  2003/11/01 15:58:52  tliffrag
+// Added XML for players and map
+//
 // Revision 1.13  2003/10/21 17:55:07  tliffrag
 // Added items on player
 //
@@ -52,15 +55,20 @@
 #include <string>
 #include "player_mem.h"
 
+player_mem::~player_mem(){
+	saveXml();
+}
+
 player_mem::player_mem(){
-	color_hair=rand()%256;
-	color_shirt=rand()%256;
-	color_legs=rand()%256;
-	color_shoes=rand()%256;
+	lookhead=rand()%256;
+	lookbody=rand()%256;
+	looklegs=rand()%256;
+	lookfeet=rand()%256;
 	lookdir=1;
+	sex=0;
 
 	//set item pointers to NULL
-	for(int i=0; i < 10; i++)
+	for(int i=0; i < 11; i++)
 		items[i]=NULL;
 
 	//give the player some default stuff
@@ -88,16 +96,15 @@ items[SLOT_BACKPACK]=item;
 	// these will be changed when the character file is loaded, if one exists
 	// TODO: make these the default values for a level 1 character
     health = 50;//150;
-    health_max = 50;//150;
+    healthmax = 50;//150;
     mana = 0;
-    mana_max = 0;
-    food_level = 0;
+    manamax = 0;
+    food = 0;
     cap = 300;
-    cap_max = 300;
     level = 15;
     experience = 3000;
-    mag_level = 0;
-    mana_spent = 0;
+    maglevel = 0;
+    manaspent = 0;
     for(int i=0;i<7;i++)
     {
         skills[ i ][ SKILL_LEVEL ] = 10;
@@ -108,7 +115,7 @@ items[SLOT_BACKPACK]=item;
 }
     // player's name must be set before calling load()
     void player_mem::load() {std::cout << "loading player " << name << "...\n";
-        std::cout << "player name is " << name << std::endl;
+ /*       std::cout << "player name is " << name << std::endl;
         std::string charstr = name + ".chr";
         
         // FIXME: this doesn't work, how do you change directory?
@@ -155,7 +162,7 @@ items[SLOT_BACKPACK]=item;
 			skills[ SKILL_FISH ][ SKILL_LEVEL ] = readVal( charfile );
 			skills[ SKILL_FISH ][ SKILL_TRIES ] = readVal( charfile );
 
-/*			
+
             readVal( charfile, "health", (unsigned long)health );
             readVal( charfile, "health_max", (unsigned long)health_max );
             readVal( charfile, "mana", (unsigned long)mana );
@@ -167,7 +174,7 @@ items[SLOT_BACKPACK]=item;
             readVal( charfile, "experience", (unsigned long)experience );
             readVal( charfile, "mag_level", (unsigned long)mag_level );
             readVal( charfile, "mana_spent", (unsigned long)mana_spent );
-            
+
             readVal( charfile, "skill_fist", skills[ SKILL_FIST ][ SKILL_LEVEL ] );
             readVal( charfile, "skill_fist_tries", skills[ SKILL_FIST ][ SKILL_TRIES ] );
             
@@ -188,7 +195,7 @@ items[SLOT_BACKPACK]=item;
 
             readVal( charfile, "skill_fish", skills[ SKILL_FISH ][ SKILL_LEVEL ] );
             readVal( charfile, "skill_fish_tries", skills[ SKILL_FISH ][ SKILL_TRIES ] );
-*/            
+
             
             // close the file
             fclose( charfile );
@@ -197,10 +204,11 @@ items[SLOT_BACKPACK]=item;
         {
             std::cout << "ERROR: No character file exists for that character!\n";
         }
+		*/
     } // player_mem::load()
 
     void player_mem::save() {
-        std::cout << "player name is " << name << std::endl;
+/*        std::cout << "player name is " << name << std::endl;
         std::string charstr = name + ".chr";
 
         // open up the character file
@@ -219,7 +227,7 @@ items[SLOT_BACKPACK]=item;
             writeVal( charfile, "experience", experience );
             writeVal( charfile, "mag_level", mag_level );
             writeVal( charfile, "mana_spent", mana_spent );
-            
+
             writeVal( charfile, "skill_fist", skills[ SKILL_FIST ][ SKILL_LEVEL ] );
             writeVal( charfile, "skill_fist_tries", skills[ SKILL_FIST ][ SKILL_TRIES ] );
             
@@ -240,14 +248,14 @@ items[SLOT_BACKPACK]=item;
 
             writeVal( charfile, "skill_fish", skills[ SKILL_FISH ][ SKILL_LEVEL ] );
             writeVal( charfile, "skill_fish_tries", skills[ SKILL_FISH ][ SKILL_TRIES ] );
-            
+
             // close the file
             fclose( charfile );
         }
         else
         {
             std::cout << "ERROR: Could not create character save file!\n";
-        }
+        }*/
     } // player_mem::save()
         
     unsigned long player_mem::readVal( FILE* charfile )//, std::string name, unsigned long &value )
@@ -275,3 +283,109 @@ items[SLOT_BACKPACK]=item;
         charstr += "\n";
         fputs( charstr.c_str(), charfile );
     } // player_mem::writeVal( FILE* charfile, std::string name, unsigned long value )
+
+int player_mem::unserialize(xmlNodePtr p){
+	return true;
+}
+
+xmlNodePtr player_mem::serialize(){
+	std::stringstream s;
+	xmlNodePtr ret,p;
+	ret=xmlNewNode(NULL,(const xmlChar*)"player");
+
+	xmlSetProp(ret, (const xmlChar*)"name", (const xmlChar*)name.c_str());
+	xmlSetProp(ret, (const xmlChar*)"pass", (const xmlChar*)passwd.c_str());
+
+	s.str(""); //empty the stringstream
+	s << sex;
+	xmlSetProp(ret, (const xmlChar*)"sex", (const xmlChar*)s.str().c_str());
+
+	s.str(""); //empty the stringstream
+	s << lookdir;
+	xmlSetProp(ret, (const xmlChar*)"lookdir", (const xmlChar*)s.str().c_str());
+
+	s.str(""); //empty the stringstream
+	s << experience;
+	xmlSetProp(ret, (const xmlChar*)"exp", (const xmlChar*)s.str().c_str());
+
+	s.str(""); //empty the stringstream
+	s << voc;
+	xmlSetProp(ret, (const xmlChar*)"voc", (const xmlChar*)s.str().c_str());
+
+	s.str(""); //empty the stringstream
+	s << cap;
+	xmlSetProp(ret, (const xmlChar*)"cap", (const xmlChar*)s.str().c_str());
+
+	p=xmlNewChild(ret, NULL, (const xmlChar*)"mana", NULL);
+
+	s.str(""); //empty the stringstream
+	s << mana;
+	xmlSetProp(p, (const xmlChar*)"now", (const xmlChar*)s.str().c_str());
+
+	s.str(""); //empty the stringstream
+	s << manamax;
+	xmlSetProp(p, (const xmlChar*)"max", (const xmlChar*)s.str().c_str());
+
+	s.str(""); //empty the stringstream
+	s << manaspent;
+	xmlSetProp(p, (const xmlChar*)"spent", (const xmlChar*)s.str().c_str());
+
+	p=xmlNewChild(ret, NULL, (const xmlChar*)"health", NULL);
+
+	s.str(""); //empty the stringstream
+	s << health;
+	xmlSetProp(p, (const xmlChar*)"now", (const xmlChar*)s.str().c_str());
+
+	s.str(""); //empty the stringstream
+	s << healthmax;
+	xmlSetProp(p, (const xmlChar*)"max", (const xmlChar*)s.str().c_str());
+
+	s.str(""); //empty the stringstream
+	s << food;
+	xmlSetProp(p, (const xmlChar*)"food", (const xmlChar*)s.str().c_str());
+
+	p=xmlNewChild(ret, NULL, (const xmlChar*)"look", NULL);
+
+	s.str(""); //empty the stringstream
+	s << looktype;
+	xmlSetProp(p, (const xmlChar*)"type", (const xmlChar*)s.str().c_str());
+
+	s.str(""); //empty the stringstream
+	s << lookhead;
+	xmlSetProp(p, (const xmlChar*)"head", (const xmlChar*)s.str().c_str());
+
+	s.str(""); //empty the stringstream
+	s << lookbody;
+	xmlSetProp(p, (const xmlChar*)"body", (const xmlChar*)s.str().c_str());
+
+	s.str(""); //empty the stringstream
+	s << looklegs;
+	xmlSetProp(p, (const xmlChar*)"legs", (const xmlChar*)s.str().c_str());
+
+	s.str(""); //empty the stringstream
+	s << lookfeet;
+	xmlSetProp(p, (const xmlChar*)"feet", (const xmlChar*)s.str().c_str());
+
+	//skills
+	//Spells
+	//Inventory
+
+	return ret;
+}
+
+int player_mem::loadXml(){
+	return true;
+}
+
+int player_mem::saveXml(){
+		//save the map in the new format
+	std::stringstream s;
+	xmlDocPtr doc;
+	doc = xmlNewDoc((const xmlChar*)"1.0");
+	doc->children = serialize();
+	xmlKeepBlanksDefault(0);
+	xmlSaveFile("player.xml", doc);
+	xmlFreeDoc(doc);
+	return true;
+	return true;
+}

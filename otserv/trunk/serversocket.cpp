@@ -21,6 +21,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.17  2003/11/01 15:58:52  tliffrag
+// Added XML for players and map
+//
 // Revision 1.16  2003/10/17 22:25:02  tliffrag
 // Addes SorryNotPossible; added configfile; basic lua support
 //
@@ -213,7 +216,6 @@ namespace TNetwork {
 
 		getsockname(_sock, (sockaddr*)&(info), &isize);
 		//inet_ntoa(AF_INET, &(info.sin_addr), test, 300);
-		printf("TEST %s TEST",inet_ntoa(info.sin_addr));
 
         try {
             Player *bla = new Player(cs);

@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.7  2003/11/01 15:58:52  tliffrag
+// Added XML for players and map
+//
 // Revision 1.6  2003/10/21 17:55:07  tliffrag
 // Added items on player
 //
@@ -41,6 +44,7 @@
 #include "item.h"
 #include <iostream>
 #include <sstream>
+
 
 //////////////////////////////////////////////////
 // returns the ID of this item's ItemType
@@ -70,6 +74,27 @@ Item::~Item() {
     lcontained.clear();
 }
 
+int Item::unserialize(xmlNodePtr p){
+	id=atoi((const char*)xmlGetProp(p, (const xmlChar *) "id"));
+	const char* tmp=(const char*)xmlGetProp(p, (const xmlChar *) "count");
+	if(tmp)
+		count=atoi(tmp);
+	return 0;
+}
+xmlNodePtr Item::serialize(){
+	std::stringstream s;
+	xmlNodePtr ret;
+	ret=xmlNewNode(NULL,(const xmlChar*)"item");
+	s.str(""); //empty the stringstream
+	s << getID();
+	xmlSetProp(ret, (const xmlChar*)"id", (const xmlChar*)s.str().c_str());
+	if(isStackable()){
+		s.str(""); //empty the stringstream
+		s <<count;
+		xmlSetProp(ret, (const xmlChar*)"count", (const xmlChar*)s.str().c_str());
+	}
+	return ret;
+}
 
 //////////////////////////////////////////////////
 // add an item to (this) container if possible
@@ -117,15 +142,16 @@ bool Item::isAlwaysOnBottom() {
 
 bool Item::isGroundTile() {
 	return items.items[id]->groundtile;
-	//return true;
 }
 
 std::string Item::getDescription() {
 	std::stringstream s;
 	std::string str;
+	s<<"You see an item of type " << id<<".";
+	if(isStackable())
+		s<<"These are "<< count << " pieces.";
 	str = s.str();
 	return str;
-	//return true;
 }
 
 //////////////////////////////////////////////////

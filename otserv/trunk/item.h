@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.6  2003/11/01 15:58:52  tliffrag
+// Added XML for players and map
+//
 // Revision 1.5  2003/10/19 21:32:19  tliffrag
 // Reworked the Tile class; stackable items now working
 //
@@ -39,7 +42,8 @@
 
 #include <list>
 #include <vector>
-
+#include <libxml/xmlmemory.h>
+#include <libxml/parser.h>
 #include "texcept.h"
 #include "items.h"
 
@@ -64,6 +68,8 @@ class Item {
 		bool isGroundTile();
 		bool isAlwaysOnBottom();
 		std::string getDescription();
+		int unserialize(xmlNodePtr p);
+		xmlNodePtr serialize();
 
         // get the number of items or 0 if non stackable
         unsigned short getItemCount();

@@ -22,6 +22,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.10  2003/11/01 15:58:52  tliffrag
+// Added XML for players and map
+//
 // Revision 1.9  2003/10/21 17:55:07  tliffrag
 // Added items on player
 //
@@ -140,8 +143,6 @@
 			void sendPlayerChangeGround(Action* action);
             // translate a map area to clientreada format
             // uses the map the client is on
- //           std::string makeMap(const position topleft,
-  //                  bool reverse);
 
 			void TProt70::parsePacket(std::string);
 

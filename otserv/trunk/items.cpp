@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.7  2003/11/01 15:58:52  tliffrag
+// Added XML for players and map
+//
 // Revision 1.6  2003/10/19 21:32:19  tliffrag
 // Reworked the Tile class; stackable items now working
 //
@@ -123,7 +126,10 @@ int Items::loadFromDat(std::string file){
 				break;
 				case 0x0C:
 				//is alwaysOnBottom
-				iType->alwaysOnBottom=true;
+				//the concept of always on bottom is wron
+				//this only means, that this item has a heigth
+				//TLIFF
+				//iType->alwaysOnBottom=true;
 				break;
 				case 0x02:
 				//is on top

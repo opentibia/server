@@ -252,20 +252,19 @@ void TProt70::setMap(position newpos, Map& newmap) throw(texception) {
 	buf+= (char)0xA0; //STATS
 
 	ADD2BYTE(buf,this->player->health);//hitpoints
-	ADD2BYTE(buf,this->player->health_max);//hitpoints
+	ADD2BYTE(buf,this->player->healthmax);//hitpoints
 	ADD2BYTE(buf,this->player->cap);//cap
 	ADD4BYTE(buf,this->player->experience); //experience
 	buf+=(char)this->player->level;//level
 	ADD2BYTE(buf,this->player->mana);//mana
-	ADD2BYTE(buf,this->player->mana_max);//mana
-	buf+=(char)this->player->mag_level;//maglevel
+	ADD2BYTE(buf,this->player->manamax);//mana
+	buf+=(char)this->player->maglevel;//maglevel
 	buf+= (char)0x82;
 
 
 	buf+= (char)0xFF; //LIGHT LEVEL
 
-	//map window?
-	//light effect? login bubble?
+
 	buf+= (char)0xd7;//ight?
 	buf+= (char)0x8d;//8d
 	buf+= (char)0x51;//???
@@ -357,6 +356,8 @@ void TProt70::addKnownPlayer(long id){
 }
 
 std::string TProt70::makeItem(Item* c){
+	if(!c)
+		return "";
 	std::string tmp;
 	ADD2BYTE(tmp, c->getID());
 	if(c->isStackable()){
@@ -370,19 +371,20 @@ std::string TProt70::makeCreature(Creature* c){
 	//FIXME this i a bad thing
 std::string buf="";
 
-
+//TODO unify this so that !isPlayer is no longer needed
 if(c && c->isPlayer())
 	{
 	bool knows=true;
 	player_mem p=((Player*)c)->player;
 	//PLAYER??
 		if(!this->knowsPlayer(p.pnum)){
-			std::cout << "Dont know this player" << std::endl;
-			addKnownPlayer(p.pnum);
+				addKnownPlayer(p.pnum);
 			knows=false;
 	}
-	if(knows)
+	if(knows){
 	buf += (char)0x62;
+	buf += (char)0x00;
+	}
 	else{
 	buf += (char)0x61;
 	buf += (char)0x00;
@@ -406,16 +408,14 @@ if(c && c->isPlayer())
 
 	buf += (char)0x88;//FIX
 
-	buf += (char)p.color_hair;
-	buf += (char)p.color_shirt;
-	buf += (char)p.color_legs;
-	buf += (char)p.color_shoes;
-	buf += (char)0x00; //NOTHING?
+	buf += (char)p.lookhead;
+	buf += (char)p.lookbody;
+	buf += (char)p.looklegs;
+	buf += (char)p.lookfeet;
+	buf += (char)0x00; //NOTHING? light
+	buf += (char)0xD7; //NOTHING? speed
 
-	buf += (char)0xD7; //NOTHING?
 	buf += (char)0xDC;//NOTHING?
-
-
 	buf += (char)0x00;
 	}
 
@@ -523,6 +523,7 @@ void TProt70::parseLogout(Action* action, std::string msg){
 	map->removeCreature(player->pos);
 	//we ask the eventscheduler to disconnect us
 	es.deletesocket(psocket);
+	close(psocket);
 	//we remove ourself
 	delete this;
 }
@@ -573,7 +574,7 @@ void TProt70::parseSay(Action* action, std::string msg){
 		  exit(0);
 		  break;
 		case 's':
-		  map->saveMap();
+		  map->saveMapXml();
 		  break;
 		case 'd':
 		  switch(player->lookdir){
@@ -680,7 +681,7 @@ void TProt70::sendAction(Action* action){
 		buf+=(char)0xAA;
 		ADD2BYTE(buf,action->playername.length());
 		buf+=action->playername;
-		buf+=(char)0x01;
+		buf+=(char)action->stack;
 		ADD2BYTE(buf, action->pos1.x);
 		ADD2BYTE(buf, action->pos1.y);
 		buf+=(char)action->pos1.z;
@@ -876,7 +877,7 @@ void TProt70::sendPlayerLogout(Action* action){
 	ADD2BYTE(buf, action->pos1.x);
 	ADD2BYTE(buf, action->pos1.y);
 	buf+=(char)action->pos1.z;
-	buf+=(char)0x01;
+	buf+=(char)action->stack;
 	buf[0]=(char)(buf.size()-2)%256;
 	buf[1]=(char)((buf.size()-2)/256)%256;
 	TNetwork::SendData(psocket,buf);
@@ -927,6 +928,7 @@ void TProt70::sendPlayerChangeGround(Action* action){
 	ADD2BYTE(buf, action->pos1.x);
 	ADD2BYTE(buf, action->pos1.y);
 	buf+=(char)action->pos1.z;
+	//this is a stackpos but is fixed as ground is always 0x00
 	buf+=(char)0x00;
 	ADD2BYTE(buf,action->id);
 	buf[0]=(char)(buf.size()-2)%256;
@@ -938,7 +940,7 @@ void TProt70::sendPlayerItemChange(Action* action){
 	std::string buf = "  ";
 	buf+=(char)(0x6B);
 	ADDPOS(buf, action->pos1);
-	buf+=(char)(0x01);//stack?
+	buf+=(char)action->stack;//stack?
 	ADD2BYTE(buf,action->id);
 	ADD1BYTE(buf,action->count);
 	buf[0]=(char)(buf.size()-2)%256;
@@ -951,7 +953,7 @@ void TProt70::sendPlayerTurn(Action* action){
 	std::string buf = "  ";
 	buf+=(char)(0x6B);
 	ADDPOS(buf, action->pos1);
-	buf+=(char)(0x01);//stack?
+	buf+=(char)action->stack;//stack?
 	buf+=(char)(0x63);
 	buf+=(char)(0x00);
 	ADD4BYTE(buf,action->creature->id);
@@ -966,12 +968,13 @@ int TProt70::sendInventory(){
 
 	for(int i=1; i < 11; i++){
 		if(creature->getItem(i)!=NULL){
-			buf+= (char)0x78;//backpack slot
+			buf+= (char)0x78;
 			buf+= (char)(i);
+			std::cout << "Adding item on pos " << i << std::endl;
 			buf+=makeItem(creature->getItem(i));
 		}
 		else{
-			buf+= (char)0x79;//backpack slot
+			buf+= (char)0x79;
 			buf+= (char)(i);
 		}
 	}

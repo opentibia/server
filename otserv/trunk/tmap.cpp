@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.18  2003/11/01 15:58:52  tliffrag
+// Added XML for players and map
+//
 // Revision 1.17  2003/11/01 15:52:43  tliffrag
 // Improved eventscheduler
 //
@@ -79,7 +82,8 @@
 #include "player.h"
 #include "npc.h"
 #include <stdio.h>
-
+#include <string>
+#include <sstream>
 
 //TODO move all the tile stuff to tile.cpp
 int Tile::getStackPosItem(){
@@ -124,9 +128,6 @@ int Tile::removeItem(int stack, int type, int count){
 	//returns how much items are left
 	//TODO
 	Item* item=getItemByStack(stack);
-	std::cout << "REMOVE ITEM" << std::endl;
-	std::cout << std::endl << "Stackpos was " << stack << std::endl;
-	std::cout << std::endl << "Got an item with id " << item->getID() << std::endl;
 	int itemsleft = item->count-count;
 	if(itemsleft<=0){
 		itemsleft=0;
@@ -137,12 +138,10 @@ int Tile::removeItem(int stack, int type, int count){
 }
 
 int Tile::addItem(Item* item){
-	std::cout << item->getDescription() << std::endl;
 	if(size()==0){
 		push_back(item);
 		return true;
 	}
-
 	if(item->isGroundTile()){
 		if(size()==0)
 			push_back(item);
@@ -159,15 +158,15 @@ int Tile::addItem(Item* item){
 			push_back(item);
 		return true;
 	}
-	else if(!item->isAlwaysOnBottom()){//normal item
+/*	else if(!item->isAlwaysOnBottom()){//normal item
 		Tile::iterator it=begin();
 		while(it != end() && !(*it)->isAlwaysOnTop())
 			it++;
 		insert(it,item);
-	}
+	}*/
 	else{
 		Tile::iterator it=begin();
-		while(it != end() && ((*it)->isAlwaysOnBottom() || (*it)->isGroundTile()) )
+		while(it != end() && (*it)->isGroundTile() )
 			it++;
 		insert(it,item);
 		return true;
@@ -275,7 +274,8 @@ std::string Tile::getDescription(){
 }
 
 Map::Map() {
-	//this code is ugly but works
+	loadMapXml("map.xml");
+/*	//this code is ugly but works
 	//TODO improve this code to support things like
 	//a quadtree to speed up everything
 	#ifdef __DEBUG__
@@ -317,7 +317,7 @@ Map::Map() {
 		}
 	}
 	fclose(dump);
-//	tiles[32864-MINX][32863-MINY]->creature=new NPC("ruediger");
+//	tiles[32864-MINX][32863-MINY]->creature=new NPC("ruediger");*/
 }
 
 Map::Map(char *filename) {
@@ -329,7 +329,68 @@ Tile *Map::tile(unsigned short _x, unsigned short _y, unsigned char _z) {
 }
 
 Map::~Map() {
+	saveMapXml();
+}
 
+int Map::saveMapXml(){
+	//save the map in the new format
+	std::stringstream s;
+	xmlDocPtr doc;
+	xmlNodePtr p, root;
+	std::cout << "Saving the map in XML format" << std::endl;
+	doc = xmlNewDoc((const xmlChar*)"1.0");
+	doc->children = xmlNewDocNode(doc, NULL, (const xmlChar*)"map", NULL);
+	root=doc->children;
+	s <<MAXY-MINY;
+	xmlSetProp(doc->children, (const xmlChar*)"height", (const xmlChar*)s.str().c_str());
+	s.str(""); //empty the stringstream
+	s <<MAXX-MINX;
+    xmlSetProp(doc->children, (const xmlChar*)"width", (const xmlChar*)s.str().c_str());
+	for(int y=0; y < MAXY-MINY; y++){
+		for(int x=0; x < MAXX-MINX; x++){
+			p=xmlNewChild(doc->children, NULL, (const xmlChar*)"tile", NULL);
+			Tile* tile=tiles[x][y];
+			for (Tile::iterator it=tile->begin(); it != tile->end(); it++)
+				xmlAddChild(p,(*it)->serialize());
+		}
+	}
+	xmlKeepBlanksDefault(1);
+	xmlSaveFile("map.xml", doc);
+	xmlFreeDoc(doc);
+	return true;
+}
+
+int Map::loadMapXml(std::string map){
+	xmlDocPtr doc;
+	xmlNodePtr root, tile, item;
+	int width, height;
+
+
+	doc=xmlParseFile("map.xml");
+	root=xmlDocGetRootElement(doc);
+	if(xmlStrcmp(root->name,(const xmlChar*) "map")){
+		std::cout << "FATAL: couldnt load map. exiting" << std::endl;
+		exit(1);
+	}
+	width=atoi((const char*)xmlGetProp(root, (const xmlChar *) "width"));
+	height=atoi((const char*)xmlGetProp(root, (const xmlChar *) "height"));
+	tile=root->children;
+	for(int y=0; y < height; y++){
+		for(int x=0; x < width; x++){
+			item=tile->children;
+			tiles[x][y] = new Tile;
+			while(item != NULL){
+				Item* myitem=new Item();
+				myitem->unserialize(item);
+				tiles[x][y]->addItem(myitem);
+				item=item->next;
+			}
+			tile=tile->next;
+
+		}
+	}
+	xmlFreeDoc(doc);
+	return 0;
 }
 
 int Map::saveMap(){
@@ -418,6 +479,7 @@ int Map::requestAction(Creature* c, Action* a){
 	//TODO us a switch here
 	if(a->type == ACTION_TURN){
 		//no checking needs to be done, we can always turn
+		a->stack=GETTILEBYPOS(a->pos1)->getStackPosPlayer();
 		distributeAction(a->pos1, a);
 	}
 	if(a->type==ACTION_MOVE){

@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.13  2003/11/01 15:58:52  tliffrag
+// Added XML for players and map
+//
 // Revision 1.12  2003/10/21 17:55:07  tliffrag
 // Added items on player
 //
@@ -54,6 +57,11 @@
 #include "pos.h"
 #include "item.h"
 #include <string>
+#include <sstream>
+
+#include <libxml/xmlmemory.h>
+#include <libxml/parser.h>
+
 
 enum skills_t {
     SKILL_FIST,
@@ -76,40 +84,44 @@ class player_mem : public ::Memory {
   void load();
   void save();
   player_mem();
-            std::string name, passwd;
-	    int color_hair, color_shirt, color_legs, color_shoes;
+  ~player_mem();
+        std::string name, passwd;
+	    int lookhead, lookbody, looklegs, lookfeet, looktype;
 	    int lookdir;
+		int sex, voc;
 	    position pos;
 	    //items
 	    Item* items[11]; //equipement of the player
 
-	    
+
 	    // health, health max.
-	    int health, health_max;
+	    int health, healthmax, food;
 	    // mana, mana max.
-	    int mana, mana_max;
-	    // food level
-	    int food_level;
+	    int mana, manamax, manaspent;
 	    // inventory
 	    // TODO: how do you want to store the inventory?
 	    // use a list of Item?
 	    // capacity ( based off what is in inventory ), capacity max.
-	    int cap, cap_max;
+	    int cap;
 	    // level
 	    int level;
             // experience
             unsigned long experience;
 	    // magic level
-	    int mag_level;
+	    int maglevel;
             //mana spent ( to know when the character will advance in magic level )
-	    unsigned long mana_spent;
 	    // skills, # of tries on each skill ( to know when the character will advance )
 	    // 2 sub-elements.  [ skill ][ SKILL_LEVEL ] is the current level of that skill
 	    // [ skill ][ SKILL_TRIES ] is how many tries on that skill ( to determine when the skill advances )
 	    int skills[ 7 ][ 2 ];
 	    
-            unsigned long pnum;
-            
+		unsigned long pnum;
+		int unserialize(xmlNodePtr p);
+		xmlNodePtr serialize();
+
+		int loadXml();
+		int saveXml();
+
 	    unsigned long readVal( FILE* charfile );//, std::string name, unsigned long &value );
 	    void writeVal( FILE* charfile, std::string name, unsigned long value );
         

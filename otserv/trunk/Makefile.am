@@ -2,7 +2,7 @@ AUTOMAKE_OPTIONS = foreign
 
 noinst_PROGRAMS = otserv
 
-LIBS = -llua -llualib
+LIBS = -llua -llualib -lxml2
 otserv_SOURCES = action.h creature.h definitions.h eventscheduler.cpp \
 eventscheduler.h file.cpp file.h item.cpp item.h items.cpp items.h memory.h \
 network.cpp network.h otserv.cpp player.cpp player.h player_mem.cpp \

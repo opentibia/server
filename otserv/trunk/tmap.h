@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.13  2003/11/01 15:58:52  tliffrag
+// Added XML for players and map
+//
 // Revision 1.12  2003/11/01 15:52:43  tliffrag
 // Improved eventscheduler
 //
@@ -65,7 +68,11 @@
 #include "item.h"
 #include "creature.h"
 #include <vector>
-#include <map>
+#include <libxml/xmlmemory.h>
+#include <libxml/parser.h>
+
+#define GETTILEBYPOS(pos) (tiles[pos.x-MINX][pos.y-MINY])
+
 
 enum tmapEnum{
 	TMAP_SUCCESS,
@@ -121,7 +128,7 @@ class Map {
     public:
         Map();
         Map(char *filename);
-		int tick(double time){std::cout << "Map tick" << std::endl;};
+		int tick(double time){std::cout << "Map tick" << std::endl; return true;};
 		position placeCreature(position pos, Creature* c);
 		Creature* getPlayerByID( unsigned long id );
 		int removeCreature(position pos);
@@ -132,6 +139,8 @@ class Map {
 		int changeGround(position pos, int id);
 
 		int saveMap();
+		int saveMapXml();
+		int loadMapXml(std::string name);
 		int removeItem(position pos);
 		int removeItem(Action* a);
         Tile *tile(unsigned short _x, unsigned short _y, unsigned char _z);

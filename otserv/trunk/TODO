@@ -1,25 +1,17 @@
-near future:
-tibia.dat: restrict items thatdont work
+fix 1265/1263: counter
 multiplayer: twice when out of screen and back
-come tho where the segfaults are
-add config file parser
+add more methods to creature
+make a system, that messages an be queued up a buffer before sending
+implement a better callback system in event handler
 impelemtnt lua support
-char saving
 telnet protocoll
-walking on minimap
-item dragNdrop
 opening items
 using items
-looking at
 changing look
 getplayerbypid
 getplayerbyname
 getplayersnearposition
-restructure the creature/player hierachie
-implement an action queue for the player
-implement an npc queue
 3rd dimension
-send 2 commands in 1 packet where possible
 
 
 
