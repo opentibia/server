@@ -22,6 +22,13 @@
 #ifndef __LUASCRIPT_H__
 #define __LUASCRIPT_H__
 
+#include <string>
+extern "C"
+{
+#include <lua.h>
+#include <lauxlib.h>
+#include <lualib.h>
+}
 
 extern "C" struct lua_State;
 
@@ -36,11 +43,13 @@ public:
 
   // get a global string
   std::string getGlobalString(std::string var, const std::string &defString = "");
+  int getGlobalNumber(std::string var, const int defNum = 0);
 
   // set a var to a val
-	int setGlobalString(std::string var, std::string val);
+  int setGlobalString(std::string var, std::string val);
+  int setGlobalNumber(std::string var, int val);
 
-private:
+protected:
 	std::string luaFile;   // the file we represent
 	lua_State*  luaState;  // our lua state
 };

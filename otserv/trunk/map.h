@@ -69,29 +69,28 @@ class Map {
 
     std::map<long, Creature*> playersOnline;
 
-
     bool placeCreature(Creature* c);
     bool removeCreature(Creature* c);
 
-    void thingMove(Player *player, Thing *thing,
+    void thingMove(Creature *player, Thing *thing,
         unsigned short to_x, unsigned short to_y, unsigned char to_z);
 
-    void thingMove(Player *player,
+    void thingMove(Creature *player,
         unsigned short from_x, unsigned short from_y, unsigned char from_z,
         unsigned char stackPos,
         unsigned short to_x, unsigned short to_y, unsigned char to_z);
 
     void creatureTurn(Creature *creature, Direction dir);
 
-    void playerSay(Player *player, unsigned char type, const std::string &text);
-    void playerYell(Player *player, const std::string &text);
-    void playerSpeakTo(Player *player, const std::string &receiver, const std::string &text);
-    void playerBroadcastMessage(Player *player, const std::string &text);
-	 void playerChangeOutfit(Player* player);
+    void creatureSay(Creature *creature, unsigned char type, const std::string &text);
+    void creatureYell(Creature *creature, const std::string &text);
+    void creatureSpeakTo(Creature *creature, const std::string &receiver, const std::string &text);
+    void creatureBroadcastMessage(Creature *creature, const std::string &text);
+	 void creatureChangeOutfit(Creature *creature);
 
 	 void playerCastSpell(Player *player, const std::string &text);
 	 void makeCastSpell(Player *player, int mana, int mindamage, int maxdamage, unsigned char area[14][18], unsigned char ch, unsigned char typeArea, unsigned char typeDamage);
-	 void Map::resetExhausted(unsigned long id);
+	 void resetExhausted(unsigned long id);
 
     //void addEvent(long ticks, int type, void *data);
 	 void addEvent(SchedulerTask*);
@@ -102,16 +101,17 @@ class Map {
   protected:
     // use this internal function to move things around to avoid the need of
     // recursive locks
-    void thingMoveInternal(Player *player,
+    void thingMoveInternal(Creature *player,
         unsigned short from_x, unsigned short from_y, unsigned char from_z,
         unsigned char stackPos,
         unsigned short to_x, unsigned short to_y, unsigned char to_z);
 
+	void creatureMakeDamage(Creature *creature, Creature *attackedCreature, fight_t damagetype);
     void creatureMakeMeleeDamage(Creature *creature, Creature *attackedCreature);
     void creatureMakeDistDamage(Creature *creature, Creature *attackedCreature);
     void creatureMakeMagicDistDamage(Creature *creature, Creature *attackedCreature);
 
-	 void CreateDamageUpdate(Player* player, Creature* attackCreature, int damage, NetworkMessage& msg);
+	 void CreateDamageUpdate(Creature* player, Creature* attackCreature, int damage, NetworkMessage& msg);
 
 
     OTSYS_THREAD_LOCKVAR eventLock;

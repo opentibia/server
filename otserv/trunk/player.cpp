@@ -148,9 +148,10 @@ void Player::sendNetworkMessage(NetworkMessage *msg)
 };
 
 
-void Player::onThingMove(const Player *player, const Thing *thing, const Position *oldPos, unsigned char oldstackpos)
+void Player::onThingMove(const Creature *creature, const Thing *thing, const Position *oldPos, unsigned char oldstackpos)
 {
-  client->sendThingMove(player, thing, oldPos, oldstackpos);
+	std::cout << "On thing move" << std::endl;
+  client->sendThingMove(creature, thing, oldPos, oldstackpos);
 }
 
 
@@ -180,6 +181,8 @@ void Player::onCreatureSay(const Creature *creature, unsigned char type, const s
 void Player::onCreatureChangeOutfit(const Creature* creature) {
 		  client->sendSetOutfit(creature);
 }
+
+void Player::onThink(){}
 
 void Player::onTileUpdated(const Position *Pos)
 {

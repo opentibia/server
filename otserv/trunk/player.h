@@ -57,12 +57,6 @@ enum skillsid_t {
     SKILL_TRIES
 };
 
-enum fight_t {
-	FIGHT_MELEE,
-	FIGHT_DIST,
-  FIGHT_MAGICDIST
-};
-
 class NetworkMessage;
 
 //////////////////////////////////////////////////////////////////////
@@ -121,14 +115,14 @@ public:
 protected:
   int useCount;
 
-  virtual void onThingMove(const Player *player, const Thing *thing, const Position *oldPos, unsigned char oldstackpos);
+  virtual void onThingMove(const Creature *creature, const Thing *thing, const Position *oldPos, unsigned char oldstackpos);
   virtual void onCreatureAppear(const Creature *creature);
   virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos);
   virtual void onCreatureTurn(const Creature *creature, unsigned char stackpos);
   virtual void onCreatureSay(const Creature *creature, unsigned char type, const std::string &text);
   virtual void onCreatureChangeOutfit(const Creature* creature);
+  virtual void onThink();
 	virtual void onTileUpdated(const Position *Pos);
-
 	Protocol *client;
 
 	// we need our name and password...

@@ -357,7 +357,7 @@ void Protocol70::parseSetOutfit(NetworkMessage &msg)
 	player->looklegs=msg.GetByte();
 	player->lookfeet=msg.GetByte();
 
-	map->playerChangeOutfit(player);
+	map->creatureChangeOutfit(player);
 }
 
 
@@ -431,19 +431,19 @@ void Protocol70::parseSay(NetworkMessage &msg)
   {
     case 0x01:
     case 0x02:
-      map->playerSay(player, type, text);
+      map->creatureSay(player, type, text);
       break;
 
     case 0x03:
-      map->playerYell(player, text);
+      map->creatureYell(player, text);
       break;
 
     case 0x04:
-      map->playerSpeakTo(player, receiver, text);
+      map->creatureSpeakTo(player, receiver, text);
       break;
 
     case 0x09:
-      map->playerBroadcastMessage(player, text);
+      map->creatureBroadcastMessage(player, text);
       break;
   }
 
@@ -561,7 +561,7 @@ void Protocol70::parseSay(NetworkMessage &msg)
 void Protocol70::parseAttack(NetworkMessage &msg)
 {
   unsigned long playerid = msg.GetU32();
-
+  std::cout << "attacking " << playerid << std::endl;
   player->setAttackedCreature(playerid);
 }
 
@@ -723,6 +723,7 @@ void Protocol70::sendNetworkMessage(NetworkMessage *msg)
 }
 
 
+
 void Protocol70::sendTileUpdated(const Position *Pos)
 {
 	//1D00	69	CF81	587C	07	9501C405C405C405C405C405C405780600C405C40500FF
@@ -740,7 +741,8 @@ void Protocol70::sendTileUpdated(const Position *Pos)
   }
 }
 
-void Protocol70::sendThingMove(const Player *player, const Thing *thing, const Position *oldPos, unsigned char oldStackPos)
+void Protocol70::sendThingMove(const Creature *player, const Thing *thing, const Position *oldPos, unsigned char oldStackPos)
+
 {
   NetworkMessage msg;
 

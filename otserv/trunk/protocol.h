@@ -48,7 +48,7 @@ public:
 
   virtual void sendNetworkMessage(NetworkMessage *msg) = 0;
 
-  virtual void sendThingMove(const Player *player, const Thing *thing, const Position *oldPos, unsigned char oldStackPos) = 0;
+  virtual void sendThingMove(const Creature *creature, const Thing *thing, const Position *oldPos, unsigned char oldStackPos) = 0;
   virtual void sendCreatureAppear(const Creature *creature) = 0;
   virtual void sendCreatureDisappear(const Creature *creature, unsigned char stackPos) = 0;
   virtual void sendCreatureTurn(const Creature *creature, unsigned char stackPos) = 0;

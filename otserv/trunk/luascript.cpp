@@ -19,12 +19,6 @@
 //////////////////////////////////////////////////////////////////////
 
 
-extern "C"
-{
-#include <lua.h>
-#include <lauxlib.h>
-}
-
 #include <string>
 #include <iostream>
 
@@ -68,8 +62,27 @@ std::string LuaScript::getGlobalString(std::string var, const std::string &defSt
 	return ret;
 }
 
+int LuaScript::getGlobalNumber(std::string var, const int defNum)
+{
+	lua_getglobal(luaState, var.c_str());
+
+  if(!lua_isnumber(luaState, -1))
+  	  return defNum;
+
+	int val = lua_tonumber(luaState, -1);
+	lua_pop(luaState,1);
+
+	return val;
+}
+
 
 int LuaScript::setGlobalString(std::string var, std::string val)
 {
 	return false;
+}
+
+int LuaScript::setGlobalNumber(std::string var, int val){
+	lua_pushnumber(luaState, val);
+	lua_setglobal(luaState, var.c_str());
+	return true;
 }

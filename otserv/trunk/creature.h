@@ -26,13 +26,17 @@
 #include "thing.h"
 #include "position.h"
 
+enum fight_t {
+	FIGHT_MELEE,
+	FIGHT_DIST,
+	FIGHT_MAGICDIST
+};
 // Macros
 #define CREATURE_SET_OUTFIT(c, type, head, body, legs, feet) c->looktype = type; \
 c->lookhead = head; \
 c->lookbody = body; \
 c->looklegs = legs; \
 c->lookfeet = feet;
-
 
 enum playerLooks
 {
@@ -88,7 +92,7 @@ public:
 
 
 
-  int lookhead, lookbody, looklegs, lookfeet, looktype;
+  int lookhead, lookbody, looklegs, lookfeet, looktype, lookcorpse;
 
   int speed;
 
@@ -100,7 +104,8 @@ public:
 
 
 private:
-  virtual void onThingMove(const Player *player, const Thing *thing, const Position *oldPos, unsigned char oldstackpos) { };
+	virtual void onThink(){};
+  virtual void onThingMove(const Creature *player, const Thing *thing, const Position *oldPos, unsigned char oldstackpos) { };
   virtual void onCreatureAppear(const Creature *creature) { };
   virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos) { };
   virtual void onCreatureTurn(const Creature *creature, unsigned char stackPos) { };
