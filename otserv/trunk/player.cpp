@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.17  2004/11/20 14:56:28  shivoc
+// started adding haktivex battlesystem; fixed some bugs; changed serveroutput
+//
 // Revision 1.16  2004/11/14 09:16:54  shivoc
 // some fixes to at least reenable login without segfaulting the server (including some merges from haktivex' server
 //
@@ -152,6 +155,10 @@ namespace Creatures {
 	  player.pos=pos;
 	  client->setMap(pos, map);
     } // void setMap(position) throw(texception)
+
+	 position Player::getPosition() {
+				return player.pos;
+	 }
 
 } // namespace Creature 
 

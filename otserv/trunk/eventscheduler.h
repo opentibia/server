@@ -21,6 +21,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.14  2004/11/20 14:56:27  shivoc
+// started adding haktivex battlesystem; fixed some bugs; changed serveroutput
+//
 // Revision 1.13  2003/11/03 22:48:14  tliffrag
 // Changing look, walking by mouse working
 //
@@ -110,7 +113,7 @@ class EventScheduler {
     void loop();
 	int addMapTick(int ms);
 	int addCreatureTick(long c, int ms);
-	double getNow(){
+	static double getNow(){
 		timeb nowTime;
 		ftime(&nowTime);
 		return (double)nowTime.time+(double)(((double)nowTime.millitm)/(double)(1000));

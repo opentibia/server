@@ -21,6 +21,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.16  2004/11/20 14:56:27  shivoc
+// started adding haktivex battlesystem; fixed some bugs; changed serveroutput
+//
 // Revision 1.15  2004/11/14 09:16:53  shivoc
 // some fixes to at least reenable login without segfaulting the server (including some merges from haktivex' server
 //
@@ -78,10 +81,10 @@ extern EventScheduler es;
 extern Map map;
 
 EventScheduler::EventScheduler() {
-		  std::cout << "Initializing Eventscheduler...";
+		  std::cout << ":: Initializing Eventscheduler... ";
 		  FD_ZERO(&active_fd_set);
 		  FD_ZERO(&read_fd_set);
-		  std::cout << " done." << std::endl;
+		  std::cout << "done." << std::endl;
 }
 
 //////////////////////////////////////////////////

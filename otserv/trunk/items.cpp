@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.9  2004/11/20 14:56:27  shivoc
+// started adding haktivex battlesystem; fixed some bugs; changed serveroutput
+//
 // Revision 1.8  2004/11/14 09:16:53  shivoc
 // some fixes to at least reenable login without segfaulting the server (including some merges from haktivex' server
 //
@@ -75,15 +78,15 @@ ItemType::~ItemType() {
 }
 
 Items::Items() {
-		  std::cout << "Loading items... ";
+		  std::string filename = "Tibia.dat";
+		  std::cout << ":: Loading Items from " << filename << "... ";
 		  // add a few items
-		  int a;
-		  if (loadFromDat("Tibia.dat") != 0) {
-					 std::cout << "failed!" << std::endl;
-					 std::cout << "make sure you have a valid Tibia.dat from tibia 7.1" << std::endl;
+		  if (loadFromDat(filename.c_str()) != 0) {
+					 std::cerr << "failed!" << std::endl;
+					 std::cerr << "make sure you have a valid " << filename << " from tibia 7.1" << std::endl;
 					 exit(1);
 		  }
-		  std::cout << a << " done." << std::endl;
+		  std::cout << "done." << std::endl;
 }
 
 int Items::loadFromDat(std::string file){

@@ -201,6 +201,7 @@ void TProt70::setMap(position newpos, Map& newmap) throw(texception) {
 	//this happens when the player logs in
 	// first we save the new map position...
 	pos = newpos;
+	player->pos = newpos;
 	map = &newmap;
 	// now we generate he data to send the player for the map
 	std::string buf="  "; // first two bytes are packet length
@@ -663,12 +664,21 @@ void TProt70::parseSay(Action* action, std::string msg){
 }
 
 void TProt70::parseAttack(Action* action, std::string msg){
+		  // 4 bytes player number
+		  uint32_t playernumber = 0;
+		  for (int i = 0; i < 4; ++i) {
+					 playernumber *= 256;
+					 playernumber += (uint8_t)msg[4-i];
+		  }
+		  std::cout << "attack player: " << playernumber << std::endl;
+		  action->type = ACTION_DOATTACK;
+		  action->creature = creature;
+		  action->playername=player->name;
+		  action->attackCreature = playernumber;
 }
 
 void TProt70::sendAction(Action* action){
 	std::string buf = "  ";
-	#ifdef __DEBUG__
-	#endif
 	if(action->type==ACTION_SAY){
 		buf+=(char)0xAA;
 		ADD2BYTE(buf,action->playername.length());
@@ -720,6 +730,46 @@ void TProt70::sendAction(Action* action){
 	if(action->type==ACTION_CHANGE_APPEARANCE){
 		sendPlayerChangeAppearance(action);
 	}
+	if(action->type==ACTION_ANIMATION){
+			  buf += 0x83;
+			  buf += (char)(action->pos1.x%256);
+			  buf += (char)(action->pos1.x/256)%256;
+			  buf += (char)(action->pos1.y%256);
+			  buf += (char)(action->pos1.y/256)%256;
+			  buf += (char)action->pos1.z;
+			  buf+= (char)action->id;
+
+			  buf[0]=(char)(buf.size()-2)%256;
+			  buf[1]=(char)((buf.size()-2)/256)%256;
+			  TNetwork::SendData(psocket, buf);
+	}
+	if(action->type==ACTION_HPUPDATE){
+std::cout << "send hpupdate" << std::endl;
+			  std::string blah;
+			  std::string buf= "  "; //buffer
+			  buf+=(char)0x8C; //type
+			  ADD4BYTE(buf, action->creature->getID()); //unique id on the client
+			  buf += (int)action->id; //add the health
+			  buf[0]=(char)(buf.size()-2)%256; //length
+			  buf[1]=(char)((buf.size()-2)/256)%256; //second length
+			  TNetwork::SendData(psocket, buf);
+
+			  if(action->creature==creature)
+			  {
+						 sendInventory();
+
+						 if(action->id<=0)
+						 {
+									//    We need to tell everyone to delete us, and stuff.
+									//    Tell the server to delete us.
+									map->removeCreature(player->pos);
+									close(psocket);
+						 }
+			  }
+	}
+
+
+
 	//TODO free a;
 }
 
@@ -783,28 +833,31 @@ void TProt70::sendPlayerMove(Action* action){
 				 std::cout << "Move to the south" << std::endl;
 				 #endif
 				buf+=makeMap(player->pos-position(8,-8,7),player->pos-position(-9,-8,7));
+				buf[buf.length()-2]=0x7E;
 			}
 			if(action->direction==3){
 				#ifdef __DEBUG__
 				 std::cout << "Move to the west" << std::endl;
 				 #endif
 				buf+=makeMap(player->pos-position(9,6,7),player->pos-position(9,-7,7));
+				buf[buf.length()-2]=0x62;
 			}
 			if(action->direction==0){
 				#ifdef __DEBUG__
 				 std::cout << "Move to the north" << std::endl;
 				  #endif
 				buf+=makeMap(player->pos-position(8,7,7),player->pos-position(-9,7,7));
+				buf[buf.length()-2]=0x7E;
 			}
 			if(action->direction==1){
 				#ifdef __DEBUG__
 				 std::cout << "Move to the east" << std::endl;
 				  #endif
 				buf+=makeMap(player->pos-position(-10,6,7),player->pos-position(-10,-7,7));
+				buf[buf.length()-2]=0x62;
 			}
 
 			player->pos=action->pos2;
-			buf[buf.length()-2]=0x7E;
 		}
 	}
 
@@ -870,6 +923,7 @@ void TProt70::sendPlayerItemDisappear(Action* action){
 }
 
 void TProt70::sendPlayerLogout(Action* action){
+		  std::cout << "sending logout" << std::endl;
 	std::string buf = "  ";
 	buf+=(char)0x6C;
 	ADD2BYTE(buf, action->pos1.x);

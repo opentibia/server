@@ -21,6 +21,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.20  2004/11/20 14:56:28  shivoc
+// started adding haktivex battlesystem; fixed some bugs; changed serveroutput
+//
 // Revision 1.19  2003/11/05 23:28:24  tliffrag
 // Addex XML for players, outfits working
 //
@@ -143,6 +146,9 @@ namespace TNetwork {
     ServerSocket::ServerSocket(int _port, int _maxconnections ) : newconnection(*this) {
         maxconnections = _maxconnections;
         connections = 0;
+		  if (_port == -1)
+					 _port = atoi(g_config.getGlobalString("port").c_str());
+
         serversocket = make_socket(SOCK_STREAM, _port);
         es.newsocket(serversocket, &newconnection);
     }

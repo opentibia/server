@@ -54,6 +54,8 @@ class Creature {
         // set creature on map position...
 		virtual void setMap(position, Map&) throw(texception)=0;
 
+		virtual position getPosition() = 0;
+
 		virtual bool isPlayer(){return false;}
 
 		virtual unsigned long getID(){return id;}
@@ -78,6 +80,8 @@ class Creature {
         virtual ~Creature() {};
 		int id;
 
+		virtual void drainHealth(int){return;};
+		virtual int getHealth(){return 100;};
 };
 
 #endif // __creature_h

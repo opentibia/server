@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.4  2004/11/20 14:56:28  shivoc
+// started adding haktivex battlesystem; fixed some bugs; changed serveroutput
+//
 // Revision 1.3  2003/11/05 23:28:23  tliffrag
 // Addex XML for players, outfits working
 //
@@ -61,7 +64,11 @@ namespace Creatures {
 		break;
     }*/
   }
-  void NPC::setMap(position, Map&) throw(texception) {}
+  void NPC::setMap(position p, Map&) throw(texception) { pos = p; }
+
+  position NPC::getPosition() {
+			 return pos;
+  }
 
 } // namespace Creature 
 

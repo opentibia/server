@@ -20,6 +20,9 @@
 	// $Id$
 	//////////////////////////////////////////////////////////////////////
 	// $Log$
+	// Revision 1.13  2004/11/20 14:56:28  shivoc
+	// started adding haktivex battlesystem; fixed some bugs; changed serveroutput
+	//
 	// Revision 1.12  2003/11/05 23:28:23  tliffrag
 	// Addex XML for players, outfits working
 	//
@@ -76,7 +79,9 @@
 		std::list<Action*> actionQueue;
 		int addAction(Action* a){ actionQueue.push_back(a); return 0;};
 
-        unsigned long getID();
+		unsigned long getID();
+
+		virtual position getPosition();
 
 		void sendAction(Action*);
 

@@ -21,6 +21,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.11  2004/11/20 14:56:28  shivoc
+// started adding haktivex battlesystem; fixed some bugs; changed serveroutput
+//
 // Revision 1.10  2003/10/17 22:25:02  tliffrag
 // Addes SorryNotPossible; added configfile; basic lua support
 //
@@ -63,7 +66,7 @@ namespace TNetwork {
         int atoport(char *service, char *proto);
         struct in_addr *atoaddr(char *address);
         public:
-        ServerSocket(int _port= atoi(g_config.getGlobalString("port").c_str()), int _maxconnections = 100);
+        ServerSocket(int _port = -1, int _maxconnections = 100);
         ~ServerSocket();
     };
 

@@ -17,7 +17,7 @@ port = "7172"
 
 -- ip
 -- the ip the server should redirect too
-ip = "192.168.23.13"
+ip = "127.0.0.1"
 
 -- motd
 -- The messagebox you sometimes get before you choose characters

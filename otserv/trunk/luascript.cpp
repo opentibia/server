@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.4  2004/11/20 14:56:27  shivoc
+// started adding haktivex battlesystem; fixed some bugs; changed serveroutput
+//
 // Revision 1.3  2004/11/14 09:16:54  shivoc
 // some fixes to at least reenable login without segfaulting the server (including some merges from haktivex' server
 //
@@ -36,7 +39,7 @@
 
 
 LuaScript::LuaScript(std::string file){
-		  std::cout << "loading lua script: " << file << "... ";
+		  std::cout << ":: Loading lua script " << file << "... ";
 	l=lua_open();
 	if(lua_dofile(l, file.c_str()))
 			  std::cout << "failed." << std::endl;

@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.25  2004/11/20 14:56:28  shivoc
+// started adding haktivex battlesystem; fixed some bugs; changed serveroutput
+//
 // Revision 1.24  2004/11/19 22:28:07  shivoc
 // fix segfault when using items in inventory and pushing creatures
 //
@@ -103,6 +106,8 @@
 #include <sstream>
 
 #include "eventscheduler.h"
+#include "battleSystem.h"
+
 extern EventScheduler es;
 
 //TODO move all the tile stuff to tile.cpp
@@ -299,7 +304,7 @@ int Map::tick(double time){
 	return true;
 }
 Map::Map() {
-		  std::cout << "loading map...";
+		  std::cout << ":: Loading map... ";
 	//first we fill the map with
 	for(int y=MINY; y< MAXY; y++){
 		for(int x=MINX; x < MAXX; x++){
@@ -322,9 +327,6 @@ Map::Map() {
 		//this code is ugly but works
 		//TODO improve this code to support things like
 		//a quadtree to speed up everything
-		#ifdef __DEBUG__
-		std::cout << "Loading map" << std::endl;
-		#endif
 		FILE* dump=fopen("otserv.map", "rb");
 		if(!dump){
 			#ifdef __DEBUG__
@@ -363,7 +365,8 @@ Map::Map() {
 		}
 		fclose(dump);
 	}
-	tiles[32864-MINX][32863-MINY]->creature=new NPC("ruediger");
+	placeCreature(position(32864, 32863, 0), new NPC("ruediger"));
+	//tiles[32864-MINX][32863-MINY]->creature=new NPC("ruediger");
 	std::cout << "done." << std::endl;
 }
 
@@ -418,14 +421,13 @@ int Map::loadMapXml(std::string map){
 	doc=xmlParseFile(map.c_str());
 	root=xmlDocGetRootElement(doc);
 	if(xmlStrcmp(root->name,(const xmlChar*) "map")){
-		std::cout << "FATAL: couldnt load map. exiting" << std::endl;
+		std::cerr << "FATAL: couldnt load map. exiting" << std::endl;
 		exit(1);
 	}
 	width=atoi((const char*)xmlGetProp(root, (const xmlChar *) "width"));
 	height=atoi((const char*)xmlGetProp(root, (const xmlChar *) "height"));
 	int xorig=((MAXX-MINX)-width)/2;
 	int yorig=((MAXY-MINY)-height)/2;
-	std::cout << xorig << "   " << yorig << std::endl;
 	tile=root->children;
 	for(int y=0; y < height; y++){
 		for(int x=0; x < width; x++){
@@ -441,7 +443,6 @@ int Map::loadMapXml(std::string map){
 
 		}
 	}
-	std::cout << "Loaded XML-Map" << std::endl;
 	xmlFreeDoc(doc);
 	return 0;
 }
@@ -531,123 +532,143 @@ int Map::removeCreature(position pos){
 }
 
 int Map::requestAction(Creature* c, Action* a){
-	//TODO us a switch here
-	if(a->type == ACTION_TURN){
-		//no checking needs to be done, we can always turn
-		a->stack=GETTILEBYPOS(a->pos1)->getStackPosPlayer();
-		distributeAction(a->pos1, a);
-	}
-	if(a->type==ACTION_MOVE){
-		a->pos2=a->pos1;
-		if(a->direction%2){
-			int x=a->direction-2;
-			a->pos2.x-=x;
-		}
-		else{
-			int y=a->direction-1;
-			a->pos2.y+=y;
-		}
-		//we got the new action, now distribute it
-		//FIXME THIS IS A BUG!!!
-			#ifdef __DEBUG__
-			std::cout << "Going to distribute an action" << std::endl;
-			#endif
-		//we move the pointer
-		if(tiles[a->pos2.x-MINX][a->pos2.y-MINY]->isBlocking())
-			return TMAP_ERROR_TILE_OCCUPIED;
-		a->stack=tiles[a->pos1.x-MINX][a->pos1.y-MINY]->getStackPosPlayer();
-		tiles[a->pos2.x-MINX][a->pos2.y-MINY]->creature=tiles[a->pos1.x-MINX][a->pos1.y-MINY]->creature;
-		tiles[a->pos1.x-MINX][a->pos1.y-MINY]->creature=NULL;
-		a->creature=c;
-		distributeAction(a->pos1, a);
-	}
-	if(a->type==ACTION_SAY){
-		//says should be ok most of the time
-		distributeAction(a->pos1, a);
-	}
-	if(a->type==ACTION_THROW){
-	//TODO make stackbles work correctly for equip
-	//TODO we should really check, if the player can throw
-	/* throwing works like this:
-	we check where the item comes from and if the number of items is available
-	there then we calculate the number that can be added to the target. if
-	they are stackable and it makes them become more then 100, we add another
-	pile. if we are on an inventore slot, 100 is the max and the rest has to stay
-	where we started the move.
-	we
-	*/
-	//First, we get the source item
-	Item* itemMoved;
-	if(a->pos1.x==0xFFFF){
-		itemMoved=a->creature->getItem(a->pos1.y);
-		a->creature->addItem(NULL, a->pos1.y);
-	}
-	else{
-		Tile* tile=tiles[a->pos1.x-MINX][a->pos1.y-MINX];
-		itemMoved = tile->getItemByStack(a->stack);
-		//now, we remove the item from the source
-		Action remove;
-		remove.type=ACTION_ITEM_DISAPPEAR;
-		remove.pos1=a->pos1;
-		remove.stack=a->stack;
-		remove.count=a->count;
-		remove.id=a->id;
-		removeItem(&remove);
-	}
+		  Tile* tile;
+		  switch (a->type) {
+					 case ACTION_TURN:
+								//no checking needs to be done, we can always turn
+								a->stack=GETTILEBYPOS(a->pos1)->getStackPosPlayer();
+								distributeAction(a->pos1, a);
+								break;
+					 case ACTION_MOVE:
+								a->pos2=a->pos1;
+								if(a->direction%2){
+										  int x=a->direction-2;
+										  a->pos2.x-=x;
+								}
+								else{
+										  int y=a->direction-1;
+										  a->pos2.y+=y;
+								}
+								//we got the new action, now distribute it
+								//FIXME THIS IS A BUG!!!
+#ifdef __DEBUG__
+								std::cout << "Going to distribute an action" << std::endl;
+#endif
+								//we move the pointer
+								if(tiles[a->pos2.x-MINX][a->pos2.y-MINY]->isBlocking())
+										  return TMAP_ERROR_TILE_OCCUPIED;
+								a->stack=tiles[a->pos1.x-MINX][a->pos1.y-MINY]->getStackPosPlayer();
+								tiles[a->pos2.x-MINX][a->pos2.y-MINY]->creature=tiles[a->pos1.x-MINX][a->pos1.y-MINY]->creature;
+								tiles[a->pos1.x-MINX][a->pos1.y-MINY]->creature=NULL;
+								a->creature=c;
+								distributeAction(a->pos1, a);
+								break;
+					 case ACTION_SAY:
+								//says should be ok most of the time
+								distributeAction(a->pos1, a);
+					 case ACTION_THROW:	
+								//TODO make stackbles work correctly for equip
+								//TODO we should really check, if the player can throw
+								/* throwing works like this:
+									we check where the item comes from and if the number of items is available
+									there then we calculate the number that can be added to the target. if
+									they are stackable and it makes them become more then 100, we add another
+									pile. if we are on an inventore slot, 100 is the max and the rest has to stay
+									where we started the move.
+									we
+									*/
+								//First, we get the source item
+								Item* itemMoved;
+								if(a->pos1.x==0xFFFF){
+										  itemMoved=a->creature->getItem(a->pos1.y);
+										  a->creature->addItem(NULL, a->pos1.y);
+								}
+								else{
+										  tile=tiles[a->pos1.x-MINX][a->pos1.y-MINX];
+										  itemMoved = tile->getItemByStack(a->stack);
+										  //now, we remove the item from the source
+										  Action remove;
+										  remove.type=ACTION_ITEM_DISAPPEAR;
+										  remove.pos1=a->pos1;
+										  remove.stack=a->stack;
+										  remove.count=a->count;
+										  remove.id=a->id;
+										  removeItem(&remove);
+								}
 
-	if(!itemMoved){
-		//something went wrong, we got no item
-		return false;
-	}
+								if(!itemMoved){
+										  //something went wrong, we got no item
+										  return false;
+								}
 
-	//we got the item;
-	if(a->pos2.x==0xFFFF){
-		//we have to spawn this on a playerslot
-		//DAMN!! ;)
-		if(a->creature->getItem(a->pos2.y)){
-			//TODO make this work, when already occupied by some other item
-			//theres something on it...
-		}
-		else{
-			a->creature->addItem(itemMoved, a->pos2.y);
-		}
-	}
-	else{ //target is on a maptile
-		//TODO
-		//check if there are enough items to move
-		//TODO
-		//check if we can put the item there
-		//TODO
-		//move only the pointer: faster and necessary
-		//for things that are more the and id and a count
-		Action createItem;
-		createItem.type=ACTION_ITEM_APPEAR;
-		createItem.pos1=a->pos2;
-		createItem.id=itemMoved->getID();
-		createItem.count=a->count;
-		summonItem(&createItem);
-	}
-	}
-	if(a->type==ACTION_LOOK_AT){
-
-		Tile* tile=tiles[a->pos1.x-MINX][a->pos1.y-MINX];
-		a->buffer=tile->getDescription();
-		a->creature->sendAction(a);
-	}
-	else if(a->type==ACTION_REQUEST_APPEARANCE){
-		a->creature->sendAction(a);
-	}
-	else if(a->type==ACTION_CHANGE_APPEARANCE){
-		distributeAction(a->pos1,a);
-	}
-	else if(a->type==ACTION_ITEM_USE){
-			  if (a->pos1.x != 0xFFFF) { // inventory position?
-						 GETTILEBYPOS(a->pos1)->getItemByStack(a->stack)->use();
-						 distributeAction(a->pos1,a);
-			  }
-	}
-	delete a;
-	return true;
+								//we got the item;
+								if(a->pos2.x==0xFFFF){
+										  //we have to spawn this on a playerslot
+										  //DAMN!! ;)
+										  if(a->creature->getItem(a->pos2.y)){
+													 //TODO make this work, when already occupied by some other item
+													 //theres something on it...
+										  }
+										  else{
+													 a->creature->addItem(itemMoved, a->pos2.y);
+										  }
+								}
+								else{ //target is on a maptile
+										  //TODO
+										  //check if there are enough items to move
+										  //TODO
+										  //check if we can put the item there
+										  //TODO
+										  //move only the pointer: faster and necessary
+										  //for things that are more the and id and a count
+										  Action createItem;
+										  createItem.type=ACTION_ITEM_APPEAR;
+										  createItem.pos1=a->pos2;
+										  createItem.id=itemMoved->getID();
+										  createItem.count=a->count;
+										  summonItem(&createItem);
+								}
+								break;
+					 case ACTION_LOOK_AT:
+								if (a->pos1.x != 0xFFFF) { // not for inventory for now
+								tile=tiles[a->pos1.x-MINX][a->pos1.y-MINX];
+								a->buffer=tile->getDescription();
+								a->creature->sendAction(a);
+								}
+								break;
+					 case ACTION_REQUEST_APPEARANCE:
+								a->creature->sendAction(a);
+								break;
+					 case ACTION_CHANGE_APPEARANCE:
+								distributeAction(a->pos1,a);
+								break;
+					 case ACTION_ITEM_USE:
+								if (a->pos1.x != 0xFFFF) {
+								GETTILEBYPOS(a->pos1)->getItemByStack(a->stack)->use();
+								distributeAction(a->pos1,a);
+								}
+								break;
+					 case ACTION_DOATTACK:
+								// we should do a real attack
+								// check if the time is right for next attack
+								if (EventScheduler::getNow() > a->receiveTime + 2.5) {
+										  std::cout << "attack creature: " << a->attackCreature << std::endl;
+										  Creature* c = getPlayerByID(a->attackCreature);
+										  if (c) {
+										  battle_Attack(1, 100, c->getPosition() , c, *this);
+										  std::cout << "ATTACK!" << std::endl;
+										  }
+										  else return true;
+										  a->receiveTime += 2.5;
+								}
+								// queue up for next attack
+								a->creature->addAction(a);
+								return true;
+					 default:
+								std::cout << "unknown action : " << a->type << std::endl;
+		  }
+		  delete a;
+		  return true;
 }
 
 int Map::distributeAction(position pos, Action* a){
@@ -807,3 +828,21 @@ int Map::removeItem(Action* a){
 	}
 	return true;
 }
+
+void Map::drainHP(position pos, int damage) {
+		  std::cout << "drain hp..." << std::endl;
+		  Action* action= new Action;
+		  action->type=ACTION_HPUPDATE;
+
+		  if (tiles[pos.x-MINX][pos.y-MINY]->creature==NULL) { //theres no one on the tile
+					 return;
+		  } else {
+					 std::cout << "do action" << std::endl;
+					 action->creature=tiles[pos.x-MINX][pos.y-MINY]->creature;
+					 tiles[pos.x-MINX][pos.y-MINY]->creature->drainHealth(damage);
+					 action->id=tiles[pos.x-MINX][pos.y-MINY]->creature->getHealth();
+					 action->count=damage;
+					 distributeAction(pos, action);
+		  }
+}
+

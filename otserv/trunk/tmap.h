@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.18  2004/11/20 14:56:29  shivoc
+// started adding haktivex battlesystem; fixed some bugs; changed serveroutput
+//
 // Revision 1.17  2004/11/18 20:32:15  shivoc
 // fix libxml2 include paths
 //
@@ -133,13 +136,13 @@ class Map {
         static const unsigned short MAXX = 33152;
         static const unsigned short MAXY = 33152;
 
-    private:
 		int distributeAction(position pos, Action* a);
+    private:
         Tile *tiles[MAXX - MINX][MAXY - MINY];
 
     public:
-        Map();
-        Map(char *filename);
+		  Map();
+		  Map(char *filename);
 		int tick(double time);
 		position placeCreature(position pos, Creature* c);
 		Creature* getPlayerByID( unsigned long id );
@@ -155,9 +158,12 @@ class Map {
 		int loadMapXml(std::string name);
 		int removeItem(position pos);
 		int removeItem(Action* a);
-        Tile *tile(unsigned short _x, unsigned short _y, unsigned char _z);
+		Tile *tile(unsigned short _x, unsigned short _y, unsigned char _z);
 		std::map<long, Creature*> playersOnline;
-        ~Map();
+		~Map();
+
+		void drainHP(position, int);
+
 };
 
 #endif

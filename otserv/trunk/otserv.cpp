@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.17  2004/11/20 14:56:28  shivoc
+// started adding haktivex battlesystem; fixed some bugs; changed serveroutput
+//
 // Revision 1.16  2004/11/19 21:39:26  shivoc
 // fix a bug in converting from ascii to binary representation
 //
@@ -79,31 +82,14 @@ int main(int argc, char *argv[]) {
 		ip=argv[1];
 	else
 		ip=g_config.getGlobalString("ip").c_str();
+#ifdef __DEBUG__
 	std::cout << "getting ip from " << ip << std::endl;
+#endif
 	g_serverip=TNetwork::convip(ip);;
 	srand(time(NULL));
-	std::cout << "starting server socket" << std::endl;
 	TNetwork::ServerSocket ss;
-	std::cout << "Otserv running..." << std::endl;
+	std::cout << ":: OpenTibia Server Ready." << std::endl;
 	es.loop();
-}
-
-int ipFromDotted(const char* _ip){
-		  std::string ip=_ip;
-		  std::string t;
-		  int num=0;
-
-		  for(int i=0; i<4;i++){
-					 t="";
-					 while((ip[0]!='.')^(ip.length()==0)){
-								t+=ip[0];
-								ip.erase(0,1);
-					 }
-					 ip.erase(0,1);
-					 num+=atoi(t.c_str()) << i*8;
-		  }
-		  //printf("\n%i\n", num);
-		  return num;
 }
 
 int hexint(const char *src)

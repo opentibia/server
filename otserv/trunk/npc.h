@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.4  2004/11/20 14:56:28  shivoc
+// started adding haktivex battlesystem; fixed some bugs; changed serveroutput
+//
 // Revision 1.3  2003/11/05 23:28:23  tliffrag
 // Addex XML for players, outfits working
 //
@@ -57,6 +60,8 @@ class NPC : public Creature {
   
   bool isPlayer();
 
+  virtual position getPosition();
+
 	int addItem(Item* item, slots_t pos);
 
   void sendAction(Action*);
@@ -84,6 +89,7 @@ class NPC : public Creature {
   // we need our name and password...
   std::string name;
   lua_State* lua;
+  position pos;
 
 };
 
