@@ -106,7 +106,11 @@ protected:
   virtual int onThink(int& newThinkTicks);
   virtual void setAttackedCreature(unsigned long id);
   virtual std::string getDescription(bool self = false) const;
-  std::string name;
+
+	virtual bool isAttackable() const { return false; };
+  virtual bool isPushable() const { return true; };
+
+	std::string name;
   std::string scriptname;
   NpcScript* script;
   std::list<Position> route;

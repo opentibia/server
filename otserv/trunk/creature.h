@@ -142,7 +142,8 @@ public:
 
   unsigned long attackedCreature;
 
-  virtual bool isAttackable() { return true; };
+  virtual bool isAttackable() const { return true; };
+	virtual bool isPushable() const {return true;}
 
   virtual int sendInventory(){return 0;};
   virtual int addItem(Item* item, int pos){return 0;};

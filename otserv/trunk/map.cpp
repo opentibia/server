@@ -402,7 +402,6 @@ void Map::getSpectators(const Range& range, std::vector<Creature*>& list)
 						std::cout << "Found " << (*cit)->getName() << " at x: " << (*cit)->pos.x << ", y: " << (*cit)->pos.y << ", z: " << (*cit)->pos.z << ", offset: " << offsetz << std::endl;
 #endif
 */
-
 						list.push_back((*cit));
 					}
 				}
@@ -473,8 +472,6 @@ std::list<Position> Map::getPathTo(Position start, Position to, bool creaturesBl
 /*	if(start.z != to.z)
 		return path;
 */
-	//Tile* starttile = getTile(start.x, start.y, start.z);
-	//Tile* totile = getTile(to.x, to.y, to.z);
 
 	std::list<AStarNode*> openNodes;
 	std::list<AStarNode*> closedNodes;
@@ -501,18 +498,10 @@ std::list<Position> Map::getPathTo(Position start, Position to, bool creaturesBl
 					int x = current->x + dx;
 					int y = current->y + dy;
 
-					Tile *t = getTile(x,y,z);
-					if(!t)
+					Tile *t;
+					if((!(t = getTile(x,y,z))) || t->isBlocking() || (t->creatures.size() /*&& x != to.x && y != to.y*/))
 						continue;
 
-					/*
-					bool isBlockCreature = ((starttile && (starttile == t)) || (totile && (totile == t))) && (t->creatures.size() == 1);
-					if(t->isBlocking() || (t->creatures.size() && !isBlockCreature))
-						continue;
-					*/
-
-					if((!(t = getTile(x,y,z))) || t->isBlocking() || (t->creatures.size() /*&& x != to.x && y != to.y*/)|| t->floorChange() )
-						continue;
 					bool isInClosed = false;
 					for(std::list<AStarNode*>::iterator it = closedNodes.begin();
 						it != closedNodes.end(); it++){

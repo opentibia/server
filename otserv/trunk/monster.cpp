@@ -37,6 +37,7 @@ Monster::Monster(const char *name, Game* game) :
 
 	targetDistance = 1;
 	runawayHealth = 0;
+	pushable = true;
 
 	std::string filename = "data/monster/" + std::string(name) + ".xml";
 	std::transform(filename.begin(), filename.end(), filename.begin(), tolower);
@@ -59,6 +60,10 @@ Monster::Monster(const char *name, Game* game) :
 
 		if ((const char*)xmlGetProp(root, (const xmlChar *)"experience")) {
 			this->experience = atoi((const char*)xmlGetProp(root, (const xmlChar *)"experience"));
+		}
+
+		if ((const char*)xmlGetProp(root, (const xmlChar *)"pushable")) {
+			this->pushable = (bool)atoi((const char*)xmlGetProp(root, (const xmlChar *)"pushable"));
 		}
 
 		if ((const char*)xmlGetProp(root, (const xmlChar *)"level")) {

@@ -1358,7 +1358,7 @@ void Protocol74::sendContainerUpdated(Item *item, unsigned char from_id, unsigne
 
 void Protocol74::sendThingMove(const Creature *creature, const Thing *thing, const Position *oldPos, unsigned char oldStackPos, bool tele)
 {
-  NetworkMessage msg;
+	NetworkMessage msg;
 
 	const Creature* c = dynamic_cast<const Creature*>(thing);
   if (!tele && c && (CanSee(oldPos->x, oldPos->y, oldPos->z)) && (CanSee(thing->pos.x, thing->pos.y, thing->pos.z)))

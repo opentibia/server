@@ -648,12 +648,13 @@ bool Game::onPrepareMoveThing(Creature *player, const Item* item, const Containe
 bool Game::onPrepareMoveCreature(Creature *player, const Creature* creatureMoving, const Tile *fromTile, const Tile *toTile)
 {
 	const Player* playerMoving = dynamic_cast<const Player*>(creatureMoving);
-	if (player->access == 0 && creatureMoving && creatureMoving->access != 0) {
-    player->sendCancel("Better dont touch him...");
+
+	if (player->access == 0 && player != creatureMoving && !creatureMoving->isPushable()) {
+    player->sendCancel("Sorry, not possible.");
     return false;
   }
 	if(!toTile && player == creatureMoving){
-    player->sendCancelWalk("Sorry, not possible...");
+    player->sendCancelWalk("Sorry, not possible.");
 	}
   else if (playerMoving && toTile->isPz() && playerMoving->pzLocked) {
 		if (player == creatureMoving/*thing*/ && player->pzLocked) {

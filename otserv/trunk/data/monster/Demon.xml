@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<monster name="Demon" level="50" maglevel="60" experience="6000">
+<monster name="Demon" level="50" maglevel="60" experience="6000" pushable="0">
 	<health now="8200" max="8200"/>
 	<look type="35" head="20" body="30" legs="40" feet="50" corpse="2916"/>
 	<combat targetdistance="1" runonhealth="0"/>

@@ -135,6 +135,7 @@ protected:
 
 	int targetDistance;
 	int runawayHealth;
+	bool pushable;
 
 	bool doAttacks(Player* attackedPlayer);
 
@@ -153,8 +154,7 @@ protected:
 	YellingSentences yellingSentences;
 
 	virtual fight_t getFightType() {return curPhysicalAttack->fighttype;};
-	virtual subfight_t getSubFightType()
-	{return curPhysicalAttack->disttype;}
+	virtual subfight_t getSubFightType()  {return curPhysicalAttack->disttype;}
 	virtual int getWeaponDamage() const;
 
 	void OnCreatureEnter(const Creature *creature);
@@ -167,7 +167,10 @@ protected:
   virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos);
   virtual void onTeleport(const Creature *creature, const Position *oldPos, unsigned char oldstackpos);
 
-  //virtual void onCreatureTurn(const Creature *creature, unsigned char stackpos);
+	virtual bool isAttackable() const { return true; };
+  virtual bool isPushable() const { return pushable; };
+
+	//virtual void onCreatureTurn(const Creature *creature, unsigned char stackpos);
   //virtual void onCreatureSay(const Creature *creature, unsigned char type, const std::string &text);
   //virtual void onCreatureChangeOutfit(const Creature* creature);
 	virtual int onThink(int& newThinkTicks);

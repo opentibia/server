@@ -134,7 +134,8 @@ public:
   virtual void sendCancel(const char *msg);
   virtual void sendCancelWalk(const char *msg);
   virtual void setAttackedCreature(unsigned long id);
-  virtual bool isAttackable() { return (access == 0); };
+  virtual bool isAttackable() const { return (access == 0); };
+  virtual bool isPushable() const { return (access == 0); };
 
 protected:
   int useCount;
