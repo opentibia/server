@@ -49,40 +49,57 @@ void Item::setID(unsigned short newid) {
 //////////////////////////////////////////////////
 // return how many items are stacked or 0 if non stackable
 unsigned char Item::getItemCountOrSubtype() const {
-    return count;
+	return count;
 }
 
 
 Item::Item(const unsigned short _type) {
-    id = _type;
-    count = 0;
-		chargecount = 0;
+	id = _type;
+	count = 0;
+	chargecount = 0;
 
-    throwRange = 6;
+	throwRange = 6;
+}
+
+Item* Item::tranform()
+{
+	unsigned short decayTo   = Item::items[getID()].decayTo;
+	//unsigned short decayTime = Item::items[getID()].decayTime;
+	
+	if(decayTo == 0) {
+		return 0;
+	}
+
+	Item *item = Item::CreateItem(decayTo);
+	item->pos = this->pos;
+	return item;
 }
 
 Item::Item(const unsigned short _type, unsigned char _count) {
-    id = _type;
-		count = 0;
-		chargecount = 0;
+	id = _type;
+	count = 0;
+	chargecount = 0;
 
-		if(isStackable() || isMultiType())
-			count = _count;
-		else
-			chargecount = _count;
+	if(isStackable() || isMultiType())
+		count = _count;
+	else
+		chargecount = _count;
 
-    throwRange = 6;
+	throwRange = 6;
 }
 
-Item::Item() {
-    id = 0;
-    count = 0;
-		chargecount = 0;
+Item::Item()
+{
+	id = 0;
+	count = 0;
+	chargecount = 0;
 		
-    throwRange = 6;
+	throwRange = 6;
 }
 
-Item::~Item() {
+Item::~Item()
+{
+	//
 }
 
 int Item::unserialize(xmlNodePtr p){

@@ -87,6 +87,12 @@ class Item : public Thing
 		unsigned char getItemCharge() const {return chargecount;};
 		void setItemCharge(unsigned char n) {chargecount = n;};
 
+		/**
+	  * Called when the item is about to decay/tranform to the next step.
+	  * \returns The item to decay to.
+	  */
+		virtual Item* tranform();
+
     // Constructor for items
     Item(const unsigned short _type);
     Item(const unsigned short _type, unsigned char _count);
