@@ -26,9 +26,9 @@
 
 
 #if defined __WINDOWS__ || defined WIN32
-typedef int uint32_t;
-typedef short uint16_t;
-typedef char uint8_t;
+typedef unsigned int uint32_t;
+typedef unsigned short uint16_t;
+typedef unsigned char uint8_t;
 
 #pragma warning(disable:4786) // msvc too long debug names in stl
 #include <winsock.h>
