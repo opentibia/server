@@ -569,11 +569,20 @@ void Map::thingMoveInternal(Creature *player,
 		return;
 	}
 
+#ifdef __DEBUG__
+				std::cout << "moving: "
+				<< "from_x: "<< (int)from_x << ", from_y: "<< (int)from_y << ", from_z: "<< (int)from_z
+				<< ", stackpos: "<< (int)stackPos
+				<< ", to_x: "<< (int)to_x << ", to_y: "<< (int)to_y << ", to_z: "<< (int)to_z
+				<< std::endl;
+#endif
+
 	Thing *thing = getTile(from_x, from_y, from_z)->getThingByStackPos(stackPos);
 
   if (thing)
   {
 		Creature* creature = dynamic_cast<Creature*>(thing);
+		Item* item = dynamic_cast<Item*>(thing); //testing
     if (player->access == 0 && creature && creature->access != 0) {
       player->sendCancel("Better dont touch him...");
       return;
@@ -583,10 +592,6 @@ void Map::thingMoveInternal(Creature *player,
     oldPos.x = from_x;
     oldPos.y = from_y;
     oldPos.z = from_z;
-
-#ifdef __DEBUG__
-	  std::cout << "moving" << std::endl;
-#endif
 
     Tile *fromTile = getTile(from_x, from_y, from_z);
     Tile *toTile   = getTile(to_x, to_y, to_z);
@@ -619,6 +624,18 @@ void Map::thingMoveInternal(Creature *player,
       else if (playerMoving && fromTile->isPz() && player != thing) {
             player->sendCancel("Sorry, not possible...");
       } 
+			else if (fromTile->splash == thing && fromTile->splash->isNotMoveable()) {
+				player->sendCancel("You cannot move this object.");
+#ifdef __DEBUG__
+				cout << player->Creature::getName() << " is trying to move a splash item!" << std::endl;
+#endif
+			}
+			else if (item && item->isNotMoveable()) {
+				player->sendCancel("You cannot move this object.");
+#ifdef __DEBUG__
+				cout << player->Creature::getName() << " is trying to move an unmoveable item!" << std::endl;
+#endif
+			}
       else
       {
         int oldstackpos = fromTile->getThingStackPos(thing);
@@ -657,6 +674,8 @@ void Map::thingMoveInternal(Creature *player,
 						}
 
 						if(fromTile->getThingCount() > 8) {
+							cout << "Pop-up item from below..." << std::endl;
+
 							//We need to pop up this item
 							Thing *newthing = fromTile->getThingByStackPos(9);
 
@@ -677,7 +696,7 @@ void Map::thingMoveInternal(Creature *player,
 							}
 						}
 				}
-	  }
+			}
     }
   }
 }
@@ -972,8 +991,7 @@ void Map::creatureMakeMagic(Creature *creature, const EffectInfo &ei)
 	Player* player = dynamic_cast<Player*>(creature);
 	if(player) {
 		if(player->access == 0) {
-			if(player->exhaustedTicks >=1000) {
-			    player->exhaustedTicks +=1000;
+			if(player->exhaustedTicks > 0/*=1000*/) {
 				NetworkMessage msg;
 				msg.AddMagicEffect(player->pos, NM_ME_PUFF);
 				msg.AddTextMessage(MSG_SMALLINFO, "You are exhausted.");
@@ -1000,7 +1018,7 @@ void Map::creatureMakeMagic(Creature *creature, const EffectInfo &ei)
 		if(ei.offensive)
 			player->pzLocked = true;
 
-		creature->exhaustedTicks = 2000;
+		creature->exhaustedTicks = 1000;
 	}
 
 	if (ei.offensive && player && player->access == 0) {
@@ -1228,7 +1246,6 @@ void Map::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fig
 	NetworkMessage msg;
 	//can the attacker reach the attacked?
 	bool inReach = false;
-	int damage = 1+(int)(10.0*rand()/(RAND_MAX+1.0));
 
 	switch(damagetype){
 		case FIGHT_MELEE:
@@ -1262,8 +1279,7 @@ void Map::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fig
 	if(!inReach)
 		return;
 	
-	if(damage == 0)
-		damage = creature->getWeaponDamage();
+	int damage = creature->getWeaponDamage();
 
 	if (creature->access != 0)
 		damage += 1337;
@@ -1325,7 +1341,7 @@ void Map::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fig
                 {
 									msg.AddCreatureHealth(attackedCreature);
                 }
-
+								
 								// fresh blood, first remove od
                 if (targettile->splash)
                 {
@@ -1349,7 +1365,7 @@ void Map::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fig
 			}
 		}
 	}
-
+	
 	if(damage > 0){
 		if (!targettile->splash)
 		{
@@ -1696,7 +1712,7 @@ void Map::creatureSaySpell(Creature *creature, const std::string &text)
 		
 		creatureMakeMagic(creature, ei);
 	}
-	else if(strcmp(text.c_str(), "exevo gran mas vis") == 0) {
+	/*else if(strcmp(text.c_str(), "exevo gran mas vis") == 0) {
 
 			static unsigned char area[14][18] = {
 				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -1730,7 +1746,7 @@ void Map::creatureSaySpell(Creature *creature, const std::string &text)
 		ei.maxDamage = (int)(((creature->level + creature->maglevel) * 3) * 2.0) / 2;
 		
 		creatureMakeMagic(creature, ei);
-	}
+	}*/
 	else if(strcmp(text.c_str(), "exura gran mas res") == 0) {
 
 		static unsigned char area[14][18] = {
