@@ -123,7 +123,7 @@ private:
 	int oldThinkTicks;
 	Position targetPos;
 	Position moveToPos;
-	void doMoveTo(const Position& destpos);
+	void doMoveTo(const Position& destpos, bool isRouteValid);
 
 	int getCurrentDistanceToTarget();
 	void calcMovePosition();
@@ -153,6 +153,8 @@ protected:
 	typedef std::vector<std::pair<std::string, TimeProbabilityClass> > YellingSentences;
 	YellingSentences yellingSentences;
 
+	std::vector<Item *> lootItems;
+
 	virtual fight_t getFightType() {return curPhysicalAttack->fighttype;};
 	virtual subfight_t getSubFightType()  {return curPhysicalAttack->disttype;}
 	virtual int getWeaponDamage() const;
@@ -161,8 +163,11 @@ protected:
 	void OnCreatureLeave(const Creature *creature);
 
 	virtual int getLostExperience() {return experience;};
+	virtual void dropLoot(Container *corpse);
 
-	virtual void onThingMove(const Creature *creature, const Thing *thing, const Position *oldPos, unsigned char oldstackpos);
+	virtual void onThingMove(const Creature *creature, const Thing *thing, const Position *oldPos,
+		unsigned char oldstackpos, unsigned char oldcount, unsigned char count);
+
   virtual void onCreatureAppear(const Creature *creature);
   virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos);
   virtual void onTeleport(const Creature *creature, const Position *oldPos, unsigned char oldstackpos);

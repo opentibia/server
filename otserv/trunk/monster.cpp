@@ -339,8 +339,13 @@ int Monster::onThink(int& newThinkTicks)
 
 		this->lastmove = OTSYS_TIME();
 
-		//doMoveTo(targetPos);
-		doMoveTo(moveToPos);
+		bool isRouteValid = true;
+		if(!game->map->isPathValid(this, route)) {
+			calcMovePosition();
+			isRouteValid = false;
+		}
+
+		doMoveTo(moveToPos, isRouteValid);
 
 		newThinkTicks = stepDuration;
 		int ret = oldThinkTicks;
@@ -445,7 +450,8 @@ bool Monster::isInRange(const Position &p)
 		(p.z == this->pos.z));
 }
 
-void Monster::onThingMove(const Creature *creature, const Thing *thing, const Position *oldPos, unsigned char oldstackpos)
+void Monster::onThingMove(const Creature *creature, const Thing *thing,
+	const Position *oldPos, unsigned char oldstackpos, unsigned char oldcount, unsigned char count)
 {
 	const Creature* moveCreature = dynamic_cast<const Creature *>(thing);
 	
@@ -560,9 +566,34 @@ int Monster::getWeaponDamage() const
 		return 0;
 }
 
+void Monster::dropLoot(Container *corpse)
+{
+	corpse->addItem(Item::CreateItem(2392));
+}
+
 bool Monster::doAttacks(Player* attackedPlayer)
 {
 	bool ret = false;
+
+	bool trymelee = getCurrentDistanceToTarget() <= 1;
+	bool hasmelee = false;
+	for(PhysicalAttacks::iterator paIt = physicalAttacks.begin(); paIt != physicalAttacks.end(); ++paIt) {
+		if(trymelee && paIt->first->fighttype == FIGHT_MELEE) {
+			hasmelee = true;
+			break;
+		}
+	}
+	
+	for(PhysicalAttacks::iterator paIt = physicalAttacks.begin(); paIt != physicalAttacks.end(); ++paIt) {
+		TimeProbabilityClass& timeprobsystem = paIt->second;
+		if(timeprobsystem.onTick(500)) {
+			if(!hasmelee || (hasmelee && paIt->first->fighttype == FIGHT_MELEE)) {
+				curPhysicalAttack = paIt->first;
+				game->creatureMakeDamage(this, attackedPlayer, getFightType());
+			}
+		}
+	}
+
 	if(exhaustedTicks <= 0) {
 		for(RuneAttackSpells::iterator raIt = runeSpells.begin(); raIt != runeSpells.end(); ++raIt) {
 			for(TimeProbabilityClassVec::iterator asIt = raIt->second.begin(); asIt != raIt->second.end(); ++asIt) {
@@ -605,25 +636,6 @@ bool Monster::doAttacks(Player* attackedPlayer)
 		}
 	}
 
-	bool trymelee = getCurrentDistanceToTarget() <= 1;
-	bool hasmelee = false;
-	for(PhysicalAttacks::iterator paIt = physicalAttacks.begin(); paIt != physicalAttacks.end(); ++paIt) {
-		if(trymelee && paIt->first->fighttype == FIGHT_MELEE) {
-			hasmelee = true;
-			break;
-		}
-	}
-	
-	for(PhysicalAttacks::iterator paIt = physicalAttacks.begin(); paIt != physicalAttacks.end(); ++paIt) {
-		TimeProbabilityClass& timeprobsystem = paIt->second;
-		if(timeprobsystem.onTick(500)) {
-			if(!hasmelee || (hasmelee && paIt->first->fighttype == FIGHT_MELEE)) {
-				curPhysicalAttack = paIt->first;
-				game->creatureMakeDamage(this, attackedPlayer, getFightType());
-			}
-		}
-	}
-
 	return ret;
 }
 
@@ -652,7 +664,7 @@ void Monster::onAttack()
 	}
 }
 
-void Monster::doMoveTo(const Position& destpos)
+void Monster::doMoveTo(const Position& destpos, bool isRouteValid)
 {
 	//Update look direction
 	if(destpos == this->pos) {
@@ -694,7 +706,7 @@ void Monster::doMoveTo(const Position& destpos)
 	}
 
 	//if(route.size() == 0 || route.back() != destpos || route.front() != this->pos){
-	if(route.size() == 0 || route.back() != destpos || !game->map->isPathValid(this, route)){
+	if(route.size() == 0 || route.back() != destpos || !isRouteValid /*!game->map->isPathValid(this, route)*/){
 		route = this->game->getPathTo(this, this->pos, destpos);
 	}
 
@@ -712,5 +724,5 @@ void Monster::doMoveTo(const Position& destpos)
 	int dx = nextStep.x - this->pos.x;
 	int dy = nextStep.y - this->pos.y;
 
-	this->game->thingMove(this, this,this->pos.x + dx, this->pos.y + dy, this->pos.z);
+	this->game->thingMove(this, this,this->pos.x + dx, this->pos.y + dy, this->pos.z, 1);
 }
