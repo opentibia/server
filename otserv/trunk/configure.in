@@ -47,7 +47,16 @@ AC_HEADER_TIME
 # Checks for library functions.
 AC_CHECK_FUNCS([gethostbyname inet_ntoa memset select socket strtol])
 
-CXXFLAGS="-Wall ${CXXFLAGS} -D${target_sys} ${DEBUG}"
+# check for libxml2
+AM_PATH_XML2(2.6.5, , AC_MSG_ERROR([you need libxml2 >= 2.6.5 to compile otserv!]))
+
+# check for lua
+PKG_CHECK_MODULES(LUA50, lualib50 >= 5.0.0, , AC_MSG_ERROR([you need lua and lualib >= 5.0 to compile otserv!]))
+AC_SUBST(LUA50_CFLAGS)
+AC_SUBST(LUA50_LIBS)
+
+OTSERV_FLAGS="-Wall -D${target_sys} ${DEBUG}"
+AC_SUBST(OTSERV_FLAGS)
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
