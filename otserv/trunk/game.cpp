@@ -1913,23 +1913,39 @@ void Game::decayItem(Item* item)
 
 	if(item) {
 		Tile *t = getTile(item->pos.x, item->pos.y, item->pos.z);
-		unsigned short decayTo   = Item::items[item->getID()].decayTo;
-		unsigned short decayTime = Item::items[item->getID()].decayTime;
+		MagicEffectItem* magicItem = dynamic_cast<MagicEffectItem*>(item);
 
-		if (decayTo == 0)
-		{
-			t->removeThing(item);
+		if(magicItem) {
+			Position pos = magicItem->pos;
+			if(magicItem->transform()) {
+				addEvent(makeTask(magicItem->getDecayTime(), std::bind2nd(std::mem_fun(&Game::decayItem), magicItem)));
+			}
+			else {
+				t->removeThing(magicItem);
+				delete magicItem;
+			}
+
+			creatureBroadcastTileUpdated(pos);
 		}
-		else
-		{
-			item->setID(decayTo);
-			addEvent(makeTask(decayTime*1000, std::bind2nd(std::mem_fun(&Game::decayItem), item)));
+		else {
+			unsigned short decayTo   = Item::items[item->getID()].decayTo;
+			unsigned short decayTime = Item::items[item->getID()].decayTime;
+
+			if (decayTo == 0)
+			{
+				t->removeThing(item);
+			}
+			else
+			{
+				item->setID(decayTo);
+				addEvent(makeTask(decayTime*1000, std::bind2nd(std::mem_fun(&Game::decayItem), item)));
+			}
+
+			creatureBroadcastTileUpdated(item->pos);
+
+			if (decayTo == 0)
+				delete item;
 		}
-
-		creatureBroadcastTileUpdated(item->pos);
-
-		if (decayTo == 0)
-			delete item;
 	}
   
 	OTSYS_THREAD_UNLOCK(gameLock)

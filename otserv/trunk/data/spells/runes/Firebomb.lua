@@ -24,7 +24,7 @@ function onCast(cid, creaturePos, level, maglv, var)
 centerpos = {x=creaturePos.x, y=creaturePos.y, z=creaturePos.z}
 return doAreaGroundMagic(cid, centerpos, needDirection, areaEffect, area, FireBombObject:ordered(), magicType,
 0, 1, SubFireBombObject1:ordered(),
-5000, 1, SubFireBombObject1:ordered(),
+5000, 1, SubFireBombObject2:ordered(),
 2, 60000, 1185,
 5000, 6, SubFireBombObject2:ordered(),
 1, 60000, 1186,

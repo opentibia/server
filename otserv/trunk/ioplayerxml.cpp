@@ -60,6 +60,7 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name){
 		player->setDirection((Direction)atoi((const char*)xmlGetProp(root, (const xmlChar *) "lookdir")));
 		player->experience=atoi((const char*)xmlGetProp(root, (const xmlChar *) "exp"));
 		player->level=atoi((const char*)xmlGetProp(root, (const xmlChar *) "level"));
+
 		player->maglevel=atoi((const char*)xmlGetProp(root, (const xmlChar *) "maglevel"));
 		player->voc=atoi((const char*)xmlGetProp(root, (const xmlChar *) "voc"));
 		player->access=atoi((const char*)xmlGetProp(root, (const xmlChar *) "access"));

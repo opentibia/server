@@ -82,7 +82,7 @@ void Creature::setAttackedCreature(unsigned long id)
 
 void Creature::addMagicDamage(const MagicDamageContainer& dmgContainer, bool skipfirst /*= true*/)
 {
-	if(dmgContainer.getMagicType() == magicNone)
+	if(dmgContainer.getMagicType() == magicNone || dmgContainer.empty())
 		return;
 
 	MagicDamageType mt = dmgContainer.getMagicType();

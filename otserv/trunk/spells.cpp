@@ -738,6 +738,8 @@ void SpellScript::internalLoadTransformVec(lua_State *L, damageMapClass& dmgMap)
 	lua_pop(L,1);
 
 	for(int s = 0; s < stateCount; ++s) {
+		dmgvec.clear();
+
 		int id = (int)lua_tonumber(L, -1);
 		lua_pop(L,1);
 		
