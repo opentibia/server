@@ -113,6 +113,7 @@ void MagicEffectTargetClass::getMagicEffect(const Player* spectator, const Creat
 		MagicEffectClass::getMagicEffect(spectator, attacker, pos, hasTarget, damage, isPz, msg);
 	}
 	else {
+        if(spectator && attacker) 
 		if(spectator->CanSee(attacker->pos.x, attacker->pos.y)) {
 			msg.AddMagicEffect(attacker->pos, NM_ME_PUFF);
 		}
