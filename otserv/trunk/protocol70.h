@@ -80,7 +80,9 @@ private:
 	void parseAttack(NetworkMessage &msg);
 
 	void parseThrow(NetworkMessage &msg);
-//	void parseUseItem(Action* action, NetworkMessage &msg);
+	void parseUseItemEx(NetworkMessage &msg);
+	void parseUseItem(NetworkMessage &msg);
+	void parseCloseContainer(NetworkMessage &msg);
 
 /*	void sendPlayerItemAppear(Action* action);
 	void sendPlayerItemChange(Action* action);
@@ -108,6 +110,7 @@ private:
 
   void sendSetOutfit(const Creature* creature);
 	virtual void sendTileUpdated(const Position *Pos);
+	virtual void sendContainerUpdated(Item *item, unsigned char from_id, unsigned char to_id, unsigned char from_slot, unsigned char to_slot, bool sameview);
 
   virtual bool CanSee(int x, int y);
 

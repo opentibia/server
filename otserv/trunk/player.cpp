@@ -131,10 +131,10 @@ int Player::getWeaponDamage() const
 
 unsigned short Player::getSpeed() const
 {
-	if (access > 0)
-		return 600;
-	
-	return 220 + level*3;
+  if (access > 0)
+    return 900;
+
+  return 220 + level*3;
 };
 
 
@@ -149,7 +149,10 @@ int Player::sendInventory(){
 
 
 int Player::addItem(Item* item, int pos){
+#ifdef __DEBUG__
 	std::cout << "Should add item at " << pos <<std::endl;
+#endif
+
 	if(pos>0 && pos <11)
   {
     if (items[pos])
@@ -160,6 +163,66 @@ int Player::addItem(Item* item, int pos){
 	return true;
 }
 
+Item* Player::getContainer(unsigned char containerid)
+{
+  for(containerLayout::iterator cl = vcontainers.begin(); cl != vcontainers.end(); ++cl)
+  {
+	  if(cl->first == containerid)
+			return cl->second;
+	}
+
+	return NULL;
+}
+
+unsigned char Player::getContainerID(Item* container)
+{
+  for(containerLayout::iterator cl = vcontainers.begin(); cl != vcontainers.end(); ++cl)
+  {
+	  if(cl->second == container)
+			return cl->first;
+	}
+
+	return 0xFF;
+}
+
+void Player::addContainer(unsigned char containerid, Item *container)
+{
+#ifdef __DEBUG__
+	cout << Creature::getName() << ", addContainer: " << (int)containerid << std::endl;
+#endif
+	if(containerid > 0xF)
+		return;
+
+	for(containerLayout::iterator cl = vcontainers.begin(); cl != vcontainers.end(); ++cl) {
+		if(cl->first == containerid) {
+			cl->second = container;
+			return;
+		}
+	}
+	
+	//id doesnt exist, create it
+	containerItem vItem;
+	vItem.first = containerid;
+	vItem.second = container;
+
+	vcontainers.push_back(vItem);
+}
+
+void Player::closeContainer(unsigned char containerid)
+{
+  for(containerLayout::iterator cl = vcontainers.begin(); cl != vcontainers.end(); ++cl)
+  {
+	  if(cl->first == containerid)
+	  {
+		  vcontainers.erase(cl);
+			break;
+		}
+	}
+
+#ifdef __DEBUG__
+	cout << Creature::getName() << ", closeContainer: " << (int)containerid << std::endl;
+#endif
+}
 
 fight_t Player::getFightType()
 {
@@ -244,6 +307,12 @@ void Player::onThink(){}
 void Player::onTileUpdated(const Position *Pos)
 {
   client->sendTileUpdated(Pos);
+}
+
+void Player::onContainerUpdated(Item *item, unsigned char from_id, unsigned char to_id,
+																unsigned char from_slot, unsigned char to_slot, bool sameview)
+{
+	client->sendContainerUpdated(item, from_id, to_id, from_slot, to_slot, sameview);
 }
 
 

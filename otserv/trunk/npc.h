@@ -54,6 +54,7 @@ public:
 	static int luaActionMove(lua_State *L);
 	static int luaActionMoveTo(lua_State *L);
 	static int luaCreatureGetName(lua_State *L);
+	static int luaCreatureGetName2(lua_State *L);
 	static int luaActionAttackCreature(lua_State *L);
 	static int luaCreatureGetPos(lua_State *L);
 	static int luaSelfGetPos(lua_State *L);

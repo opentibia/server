@@ -270,6 +270,7 @@ void NetworkMessage::AddCreature(const Creature *creature, bool known, unsigned 
   {
     AddByte(0x61);
     AddByte(0x00);
+		//AddU32(0);
 	  AddU32(remove);
     AddU32(creature->getID());
     AddString(creature->getName());

@@ -48,6 +48,8 @@ unsigned char Item::getItemCountOrSubtype() const {
 Item::Item(const unsigned short _type) {
     id = _type;
     count = 0;
+		maxitems = 20;
+		actualitems = 0;
 
     throwRange = 6;
 }
@@ -62,12 +64,19 @@ Item::Item(const unsigned short _type, unsigned char _count) {
 Item::Item() {
     id = 0;
     count = 0;
+		maxitems = 20;
+		actualitems = 0;
 
     throwRange = 6;
 }
 
 Item::~Item() {
-    lcontained.clear();
+	for(Item::iterator cit = lcontained.begin(); cit != lcontained.end(); cit++)
+	{
+    delete (*cit);
+  }
+    
+	lcontained.clear();
 }
 
 int Item::unserialize(xmlNodePtr p){
@@ -103,10 +112,68 @@ void Item::addItem(Item *newitem) {
 
     // seems we should add the item...
     // new items just get placed in front of the items we already have...
-    lcontained.push_front(newitem);
+		if(lcontained.size() < maxitems) {
+			lcontained.push_front(newitem);
 
-    // increase the itemcount
-    actualitems++;
+			// increase the itemcount
+			actualitems++;
+		}
+}
+
+void Item::removeItem(Item* item)
+{
+	for (std::list<Item*>::iterator cit = lcontained.begin(); cit != lcontained.end(); cit++) {
+		if((*cit) == item) {
+			lcontained.erase(cit);
+			actualitems--;
+			break;
+		}
+	}
+}
+
+void Item::isContainerHolding(Item* item, bool& found)
+{
+	if(found || item == NULL)
+		return;
+
+	for (std::list<Item*>::iterator cit = lcontained.begin(); cit != lcontained.end(); cit++) {
+		if((*cit)->isContainer()) {
+
+			if((*cit) == item) {
+				found = true;
+				break;
+			}
+			else
+				return (*cit)->isContainerHolding(item, found);
+		}
+	}
+}
+
+void Item::moveItem(unsigned char from_slot, unsigned char to_slot)
+{
+	int n = 0;
+	for (std::list<Item*>::iterator cit = lcontained.begin(); cit != lcontained.end(); cit++) {
+		if(n == from_slot) {
+			Item *item = (*cit);
+			lcontained.erase(cit);
+			lcontained.push_front(item);
+			break;
+		}
+		n++;
+	}
+}
+
+Item* Item::getItem(unsigned long slot_num)
+{
+	int n = 0;			
+	for (Item::iterator cit = getItems(); cit != getEnd(); cit++) {
+		if(n == slot_num)
+			return *cit;
+		else
+			n++;
+	}
+
+	return NULL;
 }
 
 //////////////////////////////////////////////////
@@ -145,6 +212,10 @@ bool Item::isGroundTile() const {
 	return items[id].groundtile;
 }
 
+bool Item::isContainer() const {
+	return items[id].iscontainer;
+}
+
 bool Item::isWeapon() const
 {
   return (items[id].weaponType != NONE && items[id].weaponType != SHIELD && items[id].weaponType != AMO);
@@ -169,6 +240,11 @@ std::string Item::getDescription() {
 
 	str = s.str();
 	return str;
+}
+
+std::string Item::getName()
+{
+	return items[id].name;
 }
 
 //////////////////////////////////////////////////

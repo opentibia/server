@@ -23,6 +23,16 @@
 #include <stdlib.h>
 
 
+bool fileExists(char* filename)
+{
+	FILE *f = fopen(filename, "rb");
+	bool exists = (f != NULL);
+	if (f != NULL)
+		fclose(f);
+
+	return exists;
+}
+
 //////////////////////////////////////////////////
 // get a random value between lowest_number and highest_number
 int random_range(int lowest_number, int highest_number)

@@ -53,7 +53,7 @@ extern LuaScript g_config;
 
 Map::Map()
 {
-  //first we fill the map with
+	//first we fill the map with
   for(int y = 0; y < MAP_HEIGHT; y++)
   {
     for(int x = 0; x < MAP_WIDTH; x++)
@@ -277,6 +277,7 @@ int Map::loadMapXml(const char *filename){
     std::cout << "FATAL: couldnt load map. exiting" << std::endl;
     exit(1);
   }
+
 	width=atoi((const char*)xmlGetProp(root, (const xmlChar *) "width"));
 	height=atoi((const char*)xmlGetProp(root, (const xmlChar *) "height"));
 
@@ -337,7 +338,9 @@ int Map::loadMapXml(const char *filename){
 			tile=tile->next;
 		}
 	}
-	xmlFreeDoc(doc);
+	
+  xmlFreeDoc(doc);
+
 	return 0;
 }
 
@@ -356,6 +359,23 @@ Creature* Map::getCreatureByID(unsigned long id)
   return NULL; //just in case the player doesnt exist
 }
 
+Creature* Map::getCreatureByName(const char* s)
+{
+  std::map<long, Creature*>::iterator i;
+	std::string txt1 = s;
+	std::transform(txt1.begin(), txt1.end(), txt1.begin(), upchar);
+
+  for( i = playersOnline.begin(); i != playersOnline.end(); i++ )
+	{
+		std::string txt2 = (i->second)->getName();
+		std::transform(txt2.begin(), txt2.end(), txt2.begin(), upchar);
+		if(txt1 == txt2)
+    {
+      return i->second;
+    }
+  }
+  return NULL; //just in case the player doesnt exist
+}
 
 bool Map::placeCreature(Creature* c)
 {
@@ -475,18 +495,80 @@ void Map::thingMove(Creature *player,
                     unsigned short to_x, unsigned short to_y, unsigned char to_z)
 {
   OTSYS_THREAD_LOCK(mapLock)
-    thingMoveInternal(player, from_x, from_y, from_z, stackPos, to_x, to_y, to_z);
-
-   OTSYS_THREAD_UNLOCK(mapLock)
+  
+	thingMoveInternal(player, from_x, from_y, from_z, stackPos, to_x, to_y, to_z);
+  
+	OTSYS_THREAD_UNLOCK(mapLock)
 }
-
-
 
 void Map::thingMoveInternal(Creature *player,
                     unsigned short from_x, unsigned short from_y, unsigned char from_z,
                     unsigned char stackPos,
                     unsigned short to_x, unsigned short to_y, unsigned char to_z)
 {
+	if(from_x == 0xFFFF && to_x == 0xFFFF) {
+		Player* p = dynamic_cast<Player*>(player);
+		if(!p)
+			return;
+
+		unsigned char from_id = from_y & 0x0F;
+		unsigned char to_id = to_y & 0x0F;
+
+		Item* from_container = p->getContainer(from_id);
+		Item* to_container = p->getContainer(to_id);
+
+		if(!(from_container && to_container) || !(from_container->isContainer() && to_container->isContainer()) || 
+			from_z >= from_container->getContainerItemCount())
+			return;
+
+		Item* item = from_container->getItem(from_z);
+		Item *to_slot_item = to_container->getItem(to_z);
+
+		if(!item)
+			return;
+
+		if(to_slot_item && to_slot_item->isContainer()) {
+			to_container = to_slot_item;
+		}
+
+		bool isItemHolding = false;
+		item->isContainerHolding(to_container, isItemHolding);
+		if(isItemHolding || to_container == item || from_container == item || item == to_slot_item) {
+      player->sendCancel("This is impossible.");
+			return ;
+		}
+
+		//move around an item in a container
+		if(from_container == to_container) {
+			from_container->moveItem(from_z, to_z);
+		}
+		//move around an item between different containers
+		else {
+			from_container->removeItem(item);
+			to_container->addItem(item);
+		}
+		
+		Item* container = NULL;
+		for(int i = 0; i < p->getContainerCount(); i++) {
+			container  = p->getContainer(i);
+			if(container && container == from_container) {
+				player->onContainerUpdated(item, i, (to_container == from_container ? i : 0xFF), from_z, to_z, true);
+			}
+
+			if(container && container == to_container && to_container != from_container) {
+				player->onContainerUpdated(item, 0xFF, i, from_z, to_z, false);
+			}
+		}
+
+		return;
+	}
+	else if(from_x == 0xFFFF && to_x != 0xFFFF) {
+		return;
+	}
+	else if(from_x != 0xFFFF && to_x == 0xFFFF) {
+		return;
+	}
+
 	Thing *thing = getTile(from_x, from_y, from_z)->getThingByStackPos(stackPos);
 
   if (thing)
@@ -521,7 +603,7 @@ void Map::thingMoveInternal(Creature *player,
       {
         player->sendCancel("Not there...");
       }
-      else if (!thing->canMovedTo(toTile))
+			else if (!thing->canMovedTo(toTile) || (player == thing && toTile->ground.getID () == 475))
       {
         if (player == thing)
           player->sendCancelWalk("Sorry, not possible...");
@@ -577,14 +659,13 @@ void Map::thingMoveInternal(Creature *player,
 						if(fromTile->getThingCount() > 8) {
 							//We need to pop up this item
 							Thing *newthing = fromTile->getThingByStackPos(9);
-							NetworkMessage msg;
 
 							if(newthing != NULL) {
 								CreatureVector::iterator cit;
 								for (int x = newthing->pos.x - 9; x <= newthing->pos.x + 9; x++)
 									for (int y = newthing->pos.y - 7; y <= newthing->pos.y + 7; y++)
 									{
-										Tile *tile = getTile(x, y, 7);
+										Tile *tile = getTile(x, y, newthing->pos.z);
 										if (tile)
 										{
 											for (cit = tile->creatures.begin(); cit != tile->creatures.end(); cit++)
@@ -635,57 +716,59 @@ void Map::creatureTurn(Creature *creature, Direction dir)
 void Map::creatureSay(Creature *creature, unsigned char type, const std::string &text)
 {
   OTSYS_THREAD_LOCK(mapLock)
-// First, check if this was a GM command
-if(text[0] == '/' && creature->access > 0)
-{
-// Get the command
-switch(text[1])
-{
-default:break;
-// Summon?
-case 's':
+	// First, check if this was a GM command
+	if(text[0] == '/' && creature->access > 0)
 	{
-// Create a non-const copy of the command
-std::string cmd = text;
-// Erase the first 2 bytes
-cmd.erase(0,3);
-// The string contains the name of the NPC we want.
-Npc *npc = new Npc(cmd.c_str(), (Map *)this);
-// Set the NPC pos
-if(creature->direction == NORTH)
-{
-npc->pos.x = creature->pos.x;
-npc->pos.y = creature->pos.y - 1;
-npc->pos.z = creature->pos.z;
-}
-// South
-if(creature->direction == SOUTH)
-{
-npc->pos.x = creature->pos.x;
-npc->pos.y = creature->pos.y + 1;
-npc->pos.z = creature->pos.z;
-}
-// East
-if(creature->direction == EAST)
-{
-npc->pos.x = creature->pos.x + 1;
-npc->pos.y = creature->pos.y;
-npc->pos.z = creature->pos.z;
-}
-// West
-if(creature->direction == WEST)
-{
-npc->pos.x = creature->pos.x - 1;
-npc->pos.y = creature->pos.y;
-npc->pos.z = creature->pos.z;
-}
-// Place the npc
-placeCreature(npc);
-	} break; // case 's':
-} //switch(text[1])
-}
-// It was no command, or it was just a player
-else {
+		// Get the command
+		switch(text[1])
+		{
+			default:break;
+			// Summon?
+			case 's':
+			{
+				// Create a non-const copy of the command
+				std::string cmd = text;
+				// Erase the first 2 bytes
+				cmd.erase(0,3);
+				// The string contains the name of the NPC we want.
+				Npc *npc = new Npc(cmd.c_str(), (Map *)this);
+
+				// Set the NPC pos
+				if(creature->direction == NORTH)
+				{
+					npc->pos.x = creature->pos.x;
+					npc->pos.y = creature->pos.y - 1;
+					npc->pos.z = creature->pos.z;
+				}
+				// South
+				if(creature->direction == SOUTH)
+				{
+					npc->pos.x = creature->pos.x;
+					npc->pos.y = creature->pos.y + 1;
+					npc->pos.z = creature->pos.z;
+				}
+				// East
+				if(creature->direction == EAST)
+				{
+					npc->pos.x = creature->pos.x + 1;
+					npc->pos.y = creature->pos.y;
+					npc->pos.z = creature->pos.z;
+				}
+				// West
+				if(creature->direction == WEST)
+				{
+					npc->pos.x = creature->pos.x - 1;
+					npc->pos.y = creature->pos.y;
+					npc->pos.z = creature->pos.z;
+				}
+				// Place the npc
+				placeCreature(npc);
+			} break; // case 's':
+		}
+	}
+
+	// It was no command, or it was just a player
+	else {
     CreatureVector::iterator cit;
 
   for (int x = creature->pos.x - 8; x <= creature->pos.x + 8; x++)
@@ -700,7 +783,8 @@ else {
         }
       }
     }
-}
+	}
+
 	OTSYS_THREAD_UNLOCK(mapLock)
 }
 
@@ -753,7 +837,7 @@ void Map::creatureYell(Creature *creature, std::string &text)
 		Player* player = dynamic_cast<Player*>(creature);
   if(player && player->access == 0 && player->exhausted) {
       NetworkMessage msg;
-      msg.AddTextMessage(MSG_EVENT, "You are exhausted.");
+      msg.AddTextMessage(MSG_SMALLINFO, "You are exhausted.");
       player->sendNetworkMessage(&msg);
   }
   else {
@@ -761,18 +845,19 @@ void Map::creatureYell(Creature *creature, std::string &text)
       addEvent(makeTask(1200, std::bind2nd(std::mem_fun(&Map::resetExhausted), creature->id)));
       CreatureVector::iterator cit;
       std::transform(text.begin(), text.end(), text.begin(), upchar);
-  for (int x = creature->pos.x - 18; x <= creature->pos.x + 18; x++)
-    for (int y = creature->pos.y - 14; y <= creature->pos.y + 14; y++)
-    {
-      Tile *tile = getTile(x, y, 7);
-      if (tile)
-      {
-        for (cit = tile->creatures.begin(); cit != tile->creatures.end(); cit++)
-        {
-          (*cit)->onCreatureSay(creature, 3, text);
-        }
-      }
-    }
+
+			for (int x = creature->pos.x - 18; x <= creature->pos.x + 18; x++)
+				for (int y = creature->pos.y - 14; y <= creature->pos.y + 14; y++)
+				{
+					Tile *tile = getTile(x, y, 7);
+					if (tile)
+					{
+						for (cit = tile->creatures.begin(); cit != tile->creatures.end(); cit++)
+						{
+							(*cit)->onCreatureSay(creature, 3, text);
+						}
+					}
+				}
   }    
    OTSYS_THREAD_UNLOCK(mapLock)
 }
@@ -791,32 +876,360 @@ void Map::creatureBroadcastMessage(Creature *creature, const std::string &text)
 	  return;
 
   OTSYS_THREAD_LOCK(mapLock)
-	  std::map<long, Creature*>::iterator cit;
-    for (cit = playersOnline.begin(); cit != playersOnline.end(); cit++)
-            {
-                  cit->second->onCreatureSay(creature, 9, text);
-            }
-OTSYS_THREAD_UNLOCK(mapLock)
+
+	std::map<long, Creature*>::iterator cit;
+  for (cit = playersOnline.begin(); cit != playersOnline.end(); cit++)
+  {
+		cit->second->onCreatureSay(creature, 9, text);
+	}
+
+	OTSYS_THREAD_UNLOCK(mapLock)
 }
 
-void Map::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fight_t damagetype){
+void Map::creatureMakeAreaEffect(Creature *spectator, Creature *attacker, const EffectInfo &ei, NetworkMessage& msg)
+{
+	CreatureVector::iterator cit;
 
-	Tile* targettile = getTile(attackedCreature->pos.x, attackedCreature->pos.y, attackedCreature->pos.z);
+	Player* pattacker = dynamic_cast<Player*>(attacker);
+	Player* pspectator = dynamic_cast<Player*>(spectator);
+	Position pos = ei.centerpos;
+	bool distshootadded = false;
+
+	pos.x -= 8;
+	pos.y -= 6;
+
+	for(int y = 0; y < 14; y++) {
+		for(int x = 0; x < 18; x++) {
+			Tile* tile = getTile(pos.x, pos.y, pos.z);
+
+			if (tile && pspectator && pspectator->CanSee(pos.x, pos.y)) {
+				if(tile->creatures.empty())
+				{
+					if(ei.area[y][x] == ei.direction) {
+						if(ei.needtarget) {
+							msg.AddMagicEffect(attacker->pos, NM_ME_PUFF);
+							return;
+						}
+					else
+						if((!tile->isPz() || !ei.offensive || attacker->access != 0) && ei.areaEffect > 0) {
+							if(!distshootadded && !ei.needtarget) {
+								msg.AddDistanceShoot(attacker->pos, ei.centerpos, ei.animationEffect);
+								distshootadded = true;
+		
+							}
+
+							msg.AddMagicEffect(pos, ei.areaEffect);
+						}
+					}
+				}
+				else 
+				for (cit = tile->creatures.begin(); cit != tile->creatures.end(); cit++) {
+					Creature* target = (*cit);
+					Tile *targettile = getTile(target->pos.x, target->pos.y, target->pos.z);
+
+					if((!tile->isPz() || !ei.offensive || attacker->access != 0) && ei.area[y][x] == ei.direction)
+					{
+						if(target == attacker && ei.offensive && !ei.needtarget) {
+							msg.AddMagicEffect(target->pos, ei.areaEffect);
+						}
+						else {
+
+							if (target->health <= 0)
+							{
+								// remove character
+								msg.AddByte(0x6c);
+								msg.AddPosition(target->pos);
+								msg.AddByte(targettile->getThingStackPos(target));
+								msg.AddByte(0x6a);
+								msg.AddPosition(target->pos);
+								Item item = Item(target->lookcorpse);
+								msg.AddItem(&item);
+							}
+							else
+								msg.AddCreatureHealth(target);
+						}
+					}
+				}
+			}
+
+			pos.x += 1;
+		}
+		
+		pos.x -= 18;
+		pos.y += 1;
+	}
+}
+
+void Map::creatureMakeMagic(Creature *creature, const EffectInfo &ei)
+{
+	if(ei.offensive && !creatureOnPrepareAttack(creature, ei.centerpos))
+		return;
+
+	if(!((std::abs(creature->pos.x-ei.centerpos.x) <= 8) && (std::abs(creature->pos.y-ei.centerpos.y) <= 6) &&
+		(creature->pos.z == ei.centerpos.z)))
+		return;
 
 	Player* player = dynamic_cast<Player*>(creature);
-	Player* attackedPlayer = dynamic_cast<Player*>(attackedCreature);
-	if (creature->access == 0 && targettile->isPz()) {
-		if (player) {
-			NetworkMessage msg;
-			msg.AddTextMessage(MSG_STATUS, "You may not attack a person in a protection zone.");
-			player->sendNetworkMessage(&msg);
+	if(player) {
+		if(player->access == 0) {
+			if(player->exhausted) {
+				NetworkMessage msg;
+				msg.AddMagicEffect(player->pos, NM_ME_PUFF);
+				msg.AddTextMessage(MSG_SMALLINFO, "You are exhausted.");
+				player->sendNetworkMessage(&msg);
+				return;
+			}
+			else if(player->mana < ei.manaCost) {
+				NetworkMessage msg;
+				msg.AddMagicEffect(player->pos, NM_ME_PUFF);
+				msg.AddTextMessage(MSG_SMALLINFO, "You do not have enough mana.");
+				player->sendNetworkMessage(&msg);
+				return;
+			}
+			else
+				player->mana -= ei.manaCost;
 		}
-		return;
+	} 
+	
+#ifdef __DEBUG__
+	cout << "creatureMakeMagic: " << creature->getName() << "x: " << ei.centerpos.x << ", y: " << ei.centerpos.y << ", z: " << ei.centerpos.z << std::endl;
+#endif
+
+	if(player->access == 0 && (!ei.needtarget || getTile(ei.centerpos.x, ei.centerpos.y, ei.centerpos.z)->creatures.size() > 0)) {
+		if(ei.offensive)
+			player->pzLocked = true;
+
+		creature->exhausted = true;
+		addEvent(makeTask(1000, std::bind2nd(std::mem_fun(&Map::resetExhausted), creature->id)));
 	}
+
+	if (ei.offensive && player && player->access == 0) {
+	    player->inFightTicks = 5 * 10 * 1000;
+	}
+
+	std::vector< std::pair<unsigned long, signed long> > targetlist;
+  std::pair<unsigned long, signed long> targetitem;
+	CreatureVector::iterator cit;
+	
+	Position pos = ei.centerpos;
+	pos.x -= 8;
+	pos.y -= 6;
+
+	for(int y = 0; y < 14; y++) {
+		for(int x = 0; x < 18; x++) {
+			Tile* tile = getTile(pos.x, pos.y, pos.z);
+			if (tile) {
+				for (cit = tile->creatures.begin(); cit != tile->creatures.end(); cit++) {
+					Creature* target = (*cit);
+
+					if(ei.area[y][x] == ei.direction) {
+						targetitem.first = target->getID();
+
+						if((creature->access != 0 && target->access == 0) || !ei.offensive || (target->access == 0 && !tile->isPz() && (ei.needtarget || creature != target))) {
+							int damage = random_range(ei.minDamage, ei.maxDamage);
+							
+							if(!ei.offensive)
+								damage = -damage;
+
+							if(creature->access != 0)
+								damage += (ei.offensive ? 1337 : -1337);
+
+							if (damage > 0) {
+								if(ei.offensive && target->access ==0)
+									target->inFightTicks = 5 * 10 * 1000;
+
+								if(damage > target->health)
+									damage = target->health;
+
+								targetitem.second = damage;
+								target->drainHealth(damage);
+							} else {
+								int newhealth = target->health - damage;
+								if(newhealth > target->healthmax)
+									newhealth = target->healthmax;
+
+								targetitem.second = target->health - newhealth;
+								target->health = newhealth;
+							}
+						}
+						else
+							targetitem.second = 0;
+
+						targetlist.push_back(targetitem);
+					}
+				}
+			}
+
+			pos.x += 1;
+		}
+		
+		pos.x -= 18;
+		pos.y += 1;
+	}
+
+	NetworkMessage msg;
+
+	//spectators
+	for(int y = min(creature->pos.y, ei.centerpos.y) - 12; y < max(creature->pos.y, ei.centerpos.y) + 12; y++) {
+		for(int x = min(creature->pos.x, ei.centerpos.x) - 15; x < max(creature->pos.x, ei.centerpos.x) + 15; x++) {
+			
+			Tile* tile = getTile(x, y, creature->pos.z);
+			if (tile) {
+				for (cit = tile->creatures.begin(); cit != tile->creatures.end(); cit++) {
+					Player* spectator = dynamic_cast<Player*>(*cit);
+          if (!spectator)
+						continue;
+
+					creatureMakeAreaEffect(spectator, creature, ei, msg);
+
+					//Add info taken from the targetlist
+					Creature* target = NULL; 
+					for (int i = 0; i < targetlist.size(); i++) {
+						target = getCreatureByID(targetlist[i].first);
+						Tile *targettile = getTile(target->pos.x, target->pos.y, target->pos.z);
+
+						if(target->access == 0) {
+							int damage = targetlist[i].second;
+
+							if(ei.animationEffect > 0 && spectator->CanSee(ei.centerpos.x, ei.centerpos.y))
+								msg.AddDistanceShoot(creature->pos, ei.centerpos, ei.animationEffect);
+
+								if(spectator->CanSee(target->pos.x, target->pos.y))
+								{
+									msg.AddMagicEffect(target->pos, ei.damageEffect);
+
+									if(damage != 0) {
+										std::stringstream dmg;
+										dmg << std::abs(damage);
+										msg.AddAnimatedText(target->pos, ei.animationcolor, dmg.str());
+									}
+
+									if(damage > 0)
+									{
+										// fresh blood, first remove od
+										if (targettile->splash)
+										{
+											msg.AddByte(0x6c);
+											msg.AddPosition(target->pos);
+											msg.AddByte(1);
+											targettile->splash->setID(1437);
+										}
+
+										msg.AddByte(0x6a);
+										msg.AddPosition(target->pos);
+										msg.AddItem(&Item(1437, 2));
+									}
+
+									if (spectator == target)
+										CreateDamageUpdate(target, creature, damage, msg);
+							}
+						}
+						else if (spectator->CanSee(target->pos.x, target->pos.y))
+							msg.AddMagicEffect(target->pos, NM_ME_PUFF);
+					}
+					
+					spectator->sendNetworkMessage(&msg);
+					msg.Reset();
+				}
+			}
+		}
+	}
+
+	for (int i = 0; i < targetlist.size(); i++) {
+		Creature* target = getCreatureByID(targetlist[i].first);
+		Tile *targettile = getTile(target->pos.x, target->pos.y, target->pos.z);
+
+		if(targetlist[i].second > 0) {
+			if (!targettile->splash)
+			{
+				Item *item = new Item(1437, 2);
+				item->pos = target->pos;
+				targettile->splash = item;
+			}
+			
+			unsigned short decayTime = Item::items[1437].decayTime;
+			targettile->decaySplashAfter = OTSYS_TIME() + decayTime*1000;
+			addEvent(makeTask(decayTime*1000, std::bind2nd(std::mem_fun(&Map::decaySplash), targettile->splash)));
+		}
+
+		if (target->health <= 0) {
+			targettile->removeThing(target);
+			playersOnline.erase(playersOnline.find(target->getID()));
+
+			Item *item = new Item(target->lookcorpse);
+			item->pos = target->pos;
+			targettile->addThing(item);
+
+			unsigned short decayTime = Item::items[item->getID()].decayTime;
+			addEvent(makeTask(decayTime*1000, std::bind2nd(std::mem_fun(&Map::decayItem), item)));
+		}
+	}
+}
+
+
+void Map::creatureCastSpell(Creature *creature, const EffectInfo &ei) {
+  OTSYS_THREAD_LOCK(mapLock)
+
+	creatureMakeMagic(creature, ei);
+
+	OTSYS_THREAD_UNLOCK(mapLock)
+}
+
+void Map::creatureThrowRune(Creature *creature, const EffectInfo &ei) {
+  OTSYS_THREAD_LOCK(mapLock)
+
+	creatureMakeMagic(creature, ei);
+
+	OTSYS_THREAD_UNLOCK(mapLock)
+}
+
+bool Map::creatureOnPrepareAttack(Creature *creature, Position pos)
+{
+	Player* player = dynamic_cast<Player*>(creature);
+
+	Tile* tile = (Tile*)getTile(creature->pos.x, creature->pos.y, creature->pos.z);
+	Tile* targettile = getTile(pos.x, pos.y, pos.z);
+
+	if(creature->access == 0) {
+		if(tile && tile->isPz()) {
+			if(player) {
+				NetworkMessage msg;
+				msg.AddTextMessage(MSG_SMALLINFO, "You may not attack a person while your in a protection zone.");
+				player->sendNetworkMessage(&msg);
+			}
+
+			return false;
+		}
+	else if(targettile && targettile->isPz()) {
+			if(player) {
+				NetworkMessage msg;
+				msg.AddTextMessage(MSG_SMALLINFO, "You may not attack a person in a protection zone.");
+				player->sendNetworkMessage(&msg);
+			}
+
+			return false;
+		}
+	}
+
+	return true;
+}
+
+void Map::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fight_t damagetype)
+{
+	if(!creatureOnPrepareAttack(creature, attackedCreature->pos))
+		return;
+	
+	Player* player = dynamic_cast<Player*>(creature);
+	Player* attackedPlayer = dynamic_cast<Player*>(attackedCreature);
+
+	Tile* tile = getTile(creature->pos.x, creature->pos.y, creature->pos.z);
+	Tile* targettile = getTile(attackedCreature->pos.x, attackedCreature->pos.y, attackedCreature->pos.z);
 
 	NetworkMessage msg;
 	//can the attacker reach the attacked?
 	bool inReach = false;
+	int damage = 1+(int)(10.0*rand()/(RAND_MAX+1.0));
+
 	switch(damagetype){
 		case FIGHT_MELEE:
 			if((std::abs(creature->pos.x-attackedCreature->pos.x) <= 1) &&
@@ -835,8 +1248,9 @@ void Map::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fig
 				(std::abs(creature->pos.y-attackedCreature->pos.y) <= 5) &&
 				(creature->pos.z == attackedCreature->pos.z))
 					inReach = true;	
-		break;
+			break;
 	}
+
 	if (player && player->access == 0) {
 	    player->inFightTicks = 5 * 60 * 1000;
 	    if(attackedPlayer)
@@ -844,18 +1258,25 @@ void Map::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fig
 	}
 	if(attackedPlayer && attackedPlayer->access ==0)
 	 attackedPlayer->inFightTicks = 5 * 60 * 1000;
+
 	if(!inReach)
 		return;
 	
-	int damage = creature->getWeaponDamage();
-	//int damage = 1+(int)(10.0*rand()/(RAND_MAX+1.0));
+	if(damage == 0)
+		damage = creature->getWeaponDamage();
+
 	if (creature->access != 0)
 		damage += 1337;
+
 	if (damage < -50 || attackedCreature->access != 0)
 		damage = 0;
 	if (damage > 0)
 		attackedCreature->drainHealth(damage);
+	else
+		attackedCreature->health += min(-damage, attackedCreature->healthmax - attackedCreature->health);
+
 	CreatureVector::iterator cit;
+
 	for (int x = min(creature->pos.x, attackedCreature->pos.x) - 9; x <= max(creature->pos.x, attackedCreature->pos.x) + 9; x++)
 	{	
 		for (int y = min(creature->pos.y, attackedCreature->pos.y) - 7; y <= max(creature->pos.y, attackedCreature->pos.y) + 7; y++)
@@ -869,9 +1290,10 @@ void Map::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fig
 					if (p) {
 						msg.Reset();
 						if(damagetype == FIGHT_DIST)
-							msg.AddDistanceShoot(creature->pos, attackedCreature->pos, 13);
+							msg.AddDistanceShoot(creature->pos, attackedCreature->pos, NM_ANI_POWERBOLT);
 						if(damagetype == FIGHT_MAGICDIST)
-							msg.AddDistanceShoot(creature->pos, attackedCreature->pos, 4);
+							msg.AddDistanceShoot(creature->pos, attackedCreature->pos, NM_ANI_ENERGY);
+
 						if ((damage == 0) && (p->CanSee(attackedCreature->pos.x, attackedCreature->pos.y))) {
 							msg.AddMagicEffect(attackedCreature->pos, NM_ME_PUFF);
 						}
@@ -884,7 +1306,7 @@ void Map::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fig
 							if (p->CanSee(attackedCreature->pos.x, attackedCreature->pos.y))
 							{
 								std::stringstream dmg;
-								dmg << damage;
+								dmg << std::abs(damage);
 								msg.AddAnimatedText(attackedCreature->pos, 0xB4, dmg.str());
 								msg.AddMagicEffect(attackedCreature->pos, NM_ME_DRAW_BLOOD);
 
@@ -904,7 +1326,7 @@ void Map::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fig
 									msg.AddCreatureHealth(attackedCreature);
                 }
 
-                // fresh blood, first remove od
+								// fresh blood, first remove od
                 if (targettile->splash)
                 {
 									msg.AddByte(0x6c);
@@ -919,25 +1341,28 @@ void Map::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fig
 						}
 					
 						if (p == attackedCreature)
-						CreateDamageUpdate(p, creature, damage, msg);
+							CreateDamageUpdate(p, creature, damage, msg);
+
 						p->sendNetworkMessage(&msg);
 					}
-		
 				}
 			}
 		}
 	}
-if(damage>0){
-  if (!targettile->splash)
-  {
-    Item *item = new Item(1437, 2);
-    item->pos = attackedCreature->pos;
-	  targettile->splash = item;
-  }
-  unsigned short decayTime = Item::items[1437].decayTime;
-  targettile->decaySplashAfter = OTSYS_TIME() + decayTime*1000;
-  addEvent(makeTask(decayTime*1000, std::bind2nd(std::mem_fun(&Map::decaySplash), targettile->splash)));
-}
+
+	if(damage > 0){
+		if (!targettile->splash)
+		{
+			Item *item = new Item(1437, 2);
+			item->pos = attackedCreature->pos;
+			targettile->splash = item;
+		}
+
+		unsigned short decayTime = Item::items[1437].decayTime;
+		targettile->decaySplashAfter = OTSYS_TIME() + decayTime*1000;
+		addEvent(makeTask(decayTime*1000, std::bind2nd(std::mem_fun(&Map::decaySplash), targettile->splash)));
+	}
+
 	if (attackedCreature->health <= 0) {
 		targettile->removeThing(attackedCreature);
 		playersOnline.erase(playersOnline.find(attackedCreature->getID()));
@@ -945,7 +1370,8 @@ if(damage>0){
     Item *item = new Item(attackedCreature->lookcorpse);
     item->pos = attackedCreature->pos;
 		targettile->addThing(item);
-    unsigned short decayTime = Item::items[item->getID()].decayTime;
+
+		unsigned short decayTime = Item::items[item->getID()].decayTime;
     addEvent(makeTask(decayTime*1000, std::bind2nd(std::mem_fun(&Map::decayItem), item)));
 	}
 }
@@ -1049,8 +1475,7 @@ std::list<Position> Map::getPathTo(Position start, Position to, bool creaturesBl
 		delete *it;
 	}
 	
-	for(std::list<Position>::iterator it = path.begin();
-		it != path.end(); it++){
+	for(std::list<Position>::iterator it = path.begin(); it != path.end(); it++){
 		Position p = *it;
 	}
 	return path;
@@ -1076,11 +1501,12 @@ void Map::checkPlayer(unsigned long id)
 		 
 		 msg.AddPlayerStats(player);
 		 player->sendNetworkMessage(&msg);
+
 		 if(player->inFightTicks >= 1000) {
-             player->inFightTicks -= 1000;
-             if(player->inFightTicks < 1000)
-                          player->pzLocked = false; 
-         }    
+			player->inFightTicks -= 1000;
+      if(player->inFightTicks < 1000)
+				player->pzLocked = false; 
+     }
 	 }
 	 else{
 		 addEvent(makeTask(300, std::bind2nd(std::mem_fun(&Map::checkPlayer), id)));
@@ -1123,7 +1549,7 @@ void Map::checkPlayerAttacking(unsigned long id)
         }
       }
 	  }
-  }
+	}
 
    OTSYS_THREAD_UNLOCK(mapLock)
 }
@@ -1172,48 +1598,50 @@ void Map::decaySplash(Item* item)
 {
   OTSYS_THREAD_LOCK(mapLock)
 
-  if (!item) return;
-  Tile *t = getTile(item->pos.x, item->pos.y, item->pos.z);
+	if (item) {
+		Tile *t = getTile(item->pos.x, item->pos.y, item->pos.z);
 
-  if ((t) && (t->decaySplashAfter <= OTSYS_TIME()))
-  {
-    unsigned short decayTo   = Item::items[item->getID()].decayTo;
-    unsigned short decayTime = Item::items[item->getID()].decayTime;
+		if ((t) && (t->decaySplashAfter <= OTSYS_TIME()))
+		{
+			unsigned short decayTo   = Item::items[item->getID()].decayTo;
+			unsigned short decayTime = Item::items[item->getID()].decayTime;
 
-    if (decayTo == 0)
-    {
-      t->splash = NULL;
-    }
-    else
-    {
-      item->setID(decayTo);
-      t->decaySplashAfter = OTSYS_TIME() + decayTime*1000;
-      addEvent(makeTask(decayTime*1000, std::bind2nd(std::mem_fun(&Map::decaySplash), item)));
-    }
+			if (decayTo == 0)
+			{
+				t->splash = NULL;
+			}
+			else
+			{
+				item->setID(decayTo);
+				t->decaySplashAfter = OTSYS_TIME() + decayTime*1000;
+				addEvent(makeTask(decayTime*1000, std::bind2nd(std::mem_fun(&Map::decaySplash), item)));
+			}
 
-	  CreatureVector::iterator cit;
-	  for (int x = item->pos.x - 9; x <= item->pos.x + 9; x++)
-		  for (int y = item->pos.y - 7; y <= item->pos.y + 7; y++)
-		  {
-			  Tile *tile = getTile(x, y, 7);
-			  if (tile)
-			  {
-				  for (cit = tile->creatures.begin(); cit != tile->creatures.end(); cit++)
-				  {
-					  (*cit)->onTileUpdated(&item->pos);
-				  }
-			  }
-		  }
+			CreatureVector::iterator cit;
+			for (int x = item->pos.x - 9; x <= item->pos.x + 9; x++)
+				for (int y = item->pos.y - 7; y <= item->pos.y + 7; y++)
+				{
+					Tile *tile = getTile(x, y, 7);
+					if (tile)
+					{
+						for (cit = tile->creatures.begin(); cit != tile->creatures.end(); cit++)
+						{
+							(*cit)->onTileUpdated(&item->pos);
+						}
+					}
+				}
 
-    if (decayTo == 0)
-      delete item;
-  }
-
-   OTSYS_THREAD_UNLOCK(mapLock)
+			if (decayTo == 0)
+				delete item;
+		}
+	}
+  
+	OTSYS_THREAD_UNLOCK(mapLock)
 }
 
 
-void Map::CreateDamageUpdate(Creature* creature, Creature* attackCreature, int damage, NetworkMessage& msg) {
+void Map::CreateDamageUpdate(Creature* creature, Creature* attackCreature, int damage, NetworkMessage& msg)
+{
 			Player* player = dynamic_cast<Player*>(creature);
 			if(!player)
 				return;
@@ -1242,266 +1670,42 @@ void Map::resetExhausted(unsigned long id)
 	 OTSYS_THREAD_UNLOCK(mapLock)
 }
 
-void Map::makeCastSpell(Creature *creature, int mana, int mindamage, int maxdamage, unsigned char area[14][18], unsigned char ch, unsigned char typeArea, unsigned char typeDamage)
+void Map::creatureSaySpell(Creature *creature, const std::string &text)
 {
-	NetworkMessage msg;
-	Tile* fromtile = getTile(creature->pos.x, creature->pos.y, creature->pos.z);
-	Player* player = dynamic_cast<Player*>(creature);
-	bool playerDamaged = false;
-	if (creature->access == 0 && fromtile->isPz() && maxdamage > 0) {
-		if (player) {
-			msg.AddTextMessage(MSG_STATUS, "You may not attack a person in a protection zone.");
-			player->sendNetworkMessage(&msg);
-		}
-		return;
-	}
-	if(creature->access == 0 && (creature->mana < mana || creature->exhausted)) {
-		if (player) {
-			msg.AddMagicEffect(player->pos, NM_ME_PUFF);
-			msg.AddTextMessage(MSG_EVENT, "You are exhausted.");
-			player->sendNetworkMessage(&msg);
-		}
-			return;
-	} 
-
-	creature->exhausted =true;
-	if (creature->access == 0) creature->mana -= mana;
-	addEvent(makeTask(1200, std::bind2nd(std::mem_fun(&Map::resetExhausted), creature->id)));
-
-	std::vector< std::pair<unsigned long, unsigned long> > damagelist;
-	damagelist.clear();
-
-  std::pair<unsigned long, unsigned long> damagedcreature;
-	std::vector<Position> areaPos;
-	CreatureVector::iterator cit;
-	
-	Position pos = creature->pos;
-	pos.x -= 8;
-	pos.y -= 6;
-
-	for(int y = 0; y < 14; y++) {
-		for(int x = 0; x < 18; x++) {
-			Tile* tile = getTile(pos.x, pos.y, pos.z);
-			if (tile) {
-				if(tile->creatures.empty() || (tile->isPz() && creature->access == 0))
-				{
-					if(area[y][x] == ch)
-						areaPos.push_back(pos);
-				}
-				else 
-				for (cit = tile->creatures.begin(); cit != tile->creatures.end(); cit++) {
-					
-					if(area[y][x] == ch) {
-						damagedcreature.first  = (*cit)->getID();
-
-						if(((!tile->isPz() || maxdamage < 0) || creature->access != 0) && (*cit)->access == 0 || maxdamage < 0) {
-							int damage = random_range(mindamage, maxdamage);
-							Player* damagedPlayer = dynamic_cast<Player*>(*cit);
-							if(damagedPlayer && damagedPlayer->access == 0) {
-                                playerDamaged=true;
-                                damagedPlayer->inFightTicks = 5 * 60 * 1000;
-                                
-                            }
-                            if(player) player->inFightTicks = 5 * 60 * 1000;    
-							if (damage > 0) {
-								if(damage > (*cit)->health)
-									damage = (*cit)->health;
-
-								(*cit)->drainHealth(damage);
-								damagedcreature.second = damage;
-							} else {
-								int newhealth = (*cit)->health - damage;
-								if(newhealth > (*cit)->healthmax)
-									newhealth = (*cit)->healthmax;
-
-								damagedcreature.second = (*cit)->health - newhealth;
-								(*cit)->health = newhealth;
-							}
-						}
-						else
-							damagedcreature.second = 0;
-
-						damagelist.push_back(damagedcreature);
-					}
-				}
-			}
-
-			pos.x += 1;
-		}
-		
-		pos.x -= 18;
-		pos.y += 1;
-	}
-	
-	if (player->access == 0 && playerDamaged) {
-	    player->pzLocked = true;
-	}
-
-	//spectators
-	for(int y =  creature->pos.y - 12; y < creature->pos.y + 12; y++) {
-		for(int x = creature->pos.x - 15; x < creature->pos.x + 15; x++) {
-			
-			Tile* tile = getTile(x, y, creature->pos.z);
-			if (tile) {
-				for (cit = tile->creatures.begin(); cit != tile->creatures.end(); cit++) {
-					Player* spectator = dynamic_cast<Player*>(*cit);
-                    if (!spectator)
-                                continue;
-
-					NetworkMessage msg;
-
-					for(int a = 0; a < areaPos.size(); a++) {
-						if(spectator->CanSee(areaPos[a].x, areaPos[a].y)) {
-						    Tile* tilearea = getTile(areaPos[a].x, areaPos[a].y, areaPos[a].z);
-						    if(!tilearea->isPz() || creature->access !=0 || (mindamage <=0 && maxdamage<=0))
-							msg.AddMagicEffect(areaPos[a], typeArea);
-							}				
-					}
-
-					for (int i = 0; i < damagelist.size(); i++) {
-
-						//build effects for spectator
-						Player *victim = (Player*) getCreatureByID(damagelist[i].first);
-						Tile *vtile = getTile(victim->pos.x, victim->pos.y, victim->pos.z);
-
-						if(spectator->CanSee(victim->pos.x, victim->pos.y)) {
-
-							int damage = damagelist[i].second;
-
-							if(vtile->isPz() && creature->access == 0) {
-								//msg.AddTextMessage(MSG_STATUS, "You may not attack a person in a protection zone.");
-								//msg.AddMagicEffect(victim->pos, NM_ME_PUFF);
-							}
-							else if(damage > 0) {
-								msg.AddMagicEffect(victim->pos, typeDamage);
-
-								std::stringstream dmg;
-								dmg << damage;
-								msg.AddAnimatedText(victim->pos, 0xB4, dmg.str());
-							} else if (damage < 0) {
-								std::stringstream dmg;
-								dmg << -damage;
-								msg.AddAnimatedText(victim->pos, MSG_INFO, dmg.str());
-							} else msg.AddMagicEffect(victim->pos, NM_ME_PUFF);
-
-							if (victim->health <= 0)
-							{
-								// remove character
-								msg.AddByte(0x6c);
-								msg.AddPosition(victim->pos);
-								msg.AddByte(getTile(victim->pos.x, victim->pos.y, victim->pos.z)->getThingStackPos(victim));
-								msg.AddByte(0x6a);
-								msg.AddPosition(victim->pos);
-								Item item = Item(victim->lookcorpse);
-								msg.AddItem(&item);
-							}
-							else
-								msg.AddCreatureHealth(victim);
-
-              // fresh blood, first remove od
-              if (vtile->splash)
-              {
-								msg.AddByte(0x6c);
-								msg.AddPosition(victim->pos);
-								msg.AddByte(1);
-                vtile->splash->setID(1437);
-              }
-              msg.AddByte(0x6a);
-              msg.AddPosition(victim->pos);
-              msg.AddItem(&Item(1437, 2));
-
-							if(victim == spectator && damagelist[i].second > 0) {
-								CreateDamageUpdate(spectator, creature, damagelist[i].second, msg);
-								msg.AddPlayerStats(victim);
-
-								//spectator->sendNetworkMessage(&msg);
-							}
-							else
-								msg.AddPlayerStats(spectator);
-						}
-					}
-
-					spectator->sendNetworkMessage(&msg);
-					msg.Reset();
-				}
-			}
-		}
-	}
-
-	for (int i = 0; i < damagelist.size(); i++) {
-		Player* victim = (Player*) getCreatureByID(damagelist[i].first);
-		Tile *tile = getTile(victim->pos.x, victim->pos.y, victim->pos.z);
-
-    if (!tile->splash)
-    {
-      Item *item = new Item(1437, 2);
-      item->pos = victim->pos;
-	    tile->splash = item;
-    }
-    unsigned short decayTime = Item::items[1437].decayTime;
-    tile->decaySplashAfter = OTSYS_TIME() + decayTime*1000;
-    addEvent(makeTask(decayTime*1000, std::bind2nd(std::mem_fun(&Map::decaySplash), tile->splash)));
-
-		if (victim->health <= 0) {
-			tile->removeThing(victim);
-			playersOnline.erase(playersOnline.find(victim->getID()));
-
-      Item *item = new Item(victim->lookcorpse);
-      item->pos = victim->pos;
-		  tile->addThing(item);
-      unsigned short decayTime = Item::items[item->getID()].decayTime;
-      addEvent(makeTask(decayTime*1000, std::bind2nd(std::mem_fun(&Map::decayItem), item)));
-		}
-	}
-}
-
-void Map::creatureCastSpell(Creature *creature, const std::string &text) {
   OTSYS_THREAD_LOCK(mapLock)
-
+	//This should be loaded from somewhere later (lua? or xml perhaps)
 	if(strcmp(text.c_str(), "exura vita") == 0) {
-			NetworkMessage msg;
-			Player* player = dynamic_cast<Player*>(creature);
-			if(player && creature->access == 0 && (creature->mana < 100 || creature->exhausted)) {
-					msg.AddMagicEffect(player->pos, NM_ME_PUFF);
-					msg.AddTextMessage(MSG_EVENT, "You are exhausted.");
-					player->sendNetworkMessage(&msg);
-			} else {
-				creature->exhausted = true;
-				if (creature->access == 0) creature->mana -= 100;
-				addEvent(makeTask(1200, std::bind2nd(std::mem_fun(&Map::resetExhausted), creature->id)));
-				
-				int base = (int)creature->level * 10 + creature->maglevel * 15;
-				int min = (int)(base * 2) / 2;
-				int max = (int)((base * 2.8)) / 2;
-				int newhealth = creature->health + random_range(min, max); //creature->health + 1+(int)(500.0*rand()/(RAND_MAX+1.0));
-				if(newhealth > creature->healthmax)
-					newhealth = creature->healthmax;
+		static unsigned char area[14][18] = {
+			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+		};
 
-				creature->health = newhealth;
-				
-				msg.AddCreatureHealth(creature);
-				msg.AddMagicEffect(creature->pos, NM_ME_MAGIC_ENERGIE);
-
-				CreatureVector::iterator cit;
-				for (int x = creature->pos.x - 9; x <= creature->pos.x + 9; x++) {
-					for (int y = creature->pos.y - 7; y <= creature->pos.y + 7; y++) {
-
-						Tile *tile = getTile(x, y, 7);
-						if (tile)
-						{
-							for (cit = tile->creatures.begin(); cit != tile->creatures.end(); cit++)
-							{
-								Player* p = dynamic_cast<Player*>(*cit);
-								if (p) {
-									if(p->CanSee(creature->pos.x, creature->pos.y)) {
-										p->sendNetworkMessage(&msg);
-									}
-								}
-							}
-						}
-					}
-				}		
-			}
+		EffectInfo ei;
+		ei.animationEffect = 0;
+		ei.damageEffect = NM_ME_MAGIC_ENERGIE;
+		ei.areaEffect = 0;
+		ei.animationcolor = MSG_INFO; 
+		ei.offensive = false;
+		ei.needtarget = true;
+		ei.centerpos = creature->pos;
+		memcpy(&ei.area, area, sizeof(area));
+		ei.direction = 1;
+		ei.manaCost = 100;
+		ei.minDamage = (int)(((creature->level + creature->maglevel) * 3) * 1.0);
+		ei.maxDamage = (int)(((creature->level + creature->maglevel) * 3) * 1.2);
+		
+		creatureMakeMagic(creature, ei);
 	}
 	else if(strcmp(text.c_str(), "exevo gran mas vis") == 0) {
 
@@ -1521,100 +1725,141 @@ void Map::creatureCastSpell(Creature *creature, const std::string &text) {
 				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 			};
 
-		int base = (int)creature->level * 2 + creature->maglevel * 3;
-		int min = (int)((base * 2.3) - 30) / 2;
-		int max = (int)((base * 3.0)) / 2;
-		makeCastSpell(creature, 800, min, max, area, 1, NM_ME_EXPLOSION_AREA, NM_ME_EXPLOSION_DAMAGE);
+
+		EffectInfo ei;
+		ei.animationEffect = 0;
+		ei.damageEffect = NM_ME_EXPLOSION_DAMAGE;
+		ei.areaEffect = NM_ME_EXPLOSION_AREA;
+		ei.animationcolor = 0xB4; 
+		ei.offensive = true;
+		ei.needtarget = false;
+		ei.centerpos = creature->pos;
+		memcpy(&ei.area, area, sizeof(area));
+		ei.direction = 1;
+		ei.manaCost = 800;
+		ei.minDamage = (int)(((creature->level + creature->maglevel) * 3) * 1.4) / 2;
+		ei.maxDamage = (int)(((creature->level + creature->maglevel) * 3) * 2.0) / 2;
+		
+		creatureMakeMagic(creature, ei);
 	}
 	else if(strcmp(text.c_str(), "exura gran mas res") == 0) {
 
-			static unsigned char area[14][18] = {
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0},
-				{0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0},
-				{0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0},
-				{0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0},
-				{0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-			};
+		static unsigned char area[14][18] = {
+			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0},
+			{0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0},
+			{0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0},
+			{0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0},
+			{0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+		};
 
-		int base = (int)creature->level * 2 + creature->maglevel * 3;
-		int min = (int)((base * 2.3) - 30);
-		int max = (int)((base * 3.0));
-		makeCastSpell(creature, 400, -min, -max, area, 1, NM_ME_MAGIC_ENERGIE, NM_ME_MAGIC_ENERGIE);
+		EffectInfo ei;
+		ei.animationEffect = 0;
+		ei.damageEffect = NM_ME_MAGIC_ENERGIE;
+		ei.areaEffect = NM_ME_MAGIC_ENERGIE;
+		ei.animationcolor = MSG_INFO; 
+		ei.offensive = false;
+		ei.needtarget = false;
+		ei.centerpos = creature->pos;
+		memcpy(&ei.area, area, sizeof(area));
+		ei.direction = 1;
+		ei.manaCost = 400;
+		ei.minDamage = (int)(((creature->level + creature->maglevel) * 3) * 1.0);
+		ei.maxDamage = (int)(((creature->level + creature->maglevel) * 3) * 1.2);
+		
+		creatureMakeMagic(creature, ei);
 	}
 	else if(strcmp(text.c_str(), "exori vis") == 0) {
 
-			static unsigned char area[14][18] = {
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 2, 0, 3, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-			};
-
-		unsigned char ch = 0xFF;
-
-		switch(creature->direction) {
-			case NORTH: ch = 1; break;
-			case WEST: ch = 2; break;
-			case EAST: ch = 3; break;
-			case SOUTH: ch = 4; break;
+		static unsigned char area[14][18] = {
+			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 0, 2, 0, 3, 0, 0, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 		};
 
-		int base = (int)creature->level * 2 + creature->maglevel * 3;
-		int min = (int)(base * 1.1) / 2;
-		int max = (int)(base * 1.0) / 2;
-		makeCastSpell(creature, 20, min, max, area, ch, NM_ME_ENERGY_AREA, NM_ME_ENERGY_DAMAGE);
+
+		EffectInfo ei;
+		ei.animationEffect = 0;
+		ei.damageEffect = NM_ME_ENERGY_DAMAGE;
+		ei.areaEffect = NM_ME_ENERGY_AREA;
+		ei.animationcolor = 0xB4; 
+		ei.offensive = true;
+		ei.needtarget = false;
+		ei.centerpos = creature->pos;
+		memcpy(&ei.area, area, sizeof(area));
+		switch(creature->direction) {
+			case NORTH: ei.direction = 1; break;
+			case WEST: ei.direction = 2; break;
+			case EAST: ei.direction = 3; break;
+			case SOUTH: ei.direction = 4; break;
+		};
+
+		ei.manaCost = 20;
+		ei.minDamage = (int)(((creature->level + creature->maglevel) * 3) * 0.3) / 2;
+		ei.maxDamage = (int)(((creature->level + creature->maglevel) * 3) * 0.4) / 2;
+		
+		creatureMakeMagic(creature, ei);
 	}
 	else if(strcmp(text.c_str(), "exori mort") == 0) {
 
-			static unsigned char area[14][18] = {
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 2, 0, 3, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-			};
-
-		unsigned char ch = 0xFF;
-
-		switch(creature->direction) {
-			case NORTH: ch = 1; break;
-			case WEST: ch = 2; break;
-			case EAST: ch = 3; break;
-			case SOUTH: ch = 4; break;
+		static unsigned char area[14][18] = {
+			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 0, 2, 0, 3, 0, 0, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 		};
 
-		int base = (int)creature->level * 2 + creature->maglevel * 3;
-		int min = (int)(base * 1.1) / 2;
-		int max = (int)(base * 1.0) / 2;
-		makeCastSpell(creature, 20, min, max, area, ch, NM_ME_MORT_AREA, NM_ME_MORT_AREA);
+
+		EffectInfo ei;
+		ei.animationEffect = 0;
+		ei.damageEffect = NM_ME_MORT_AREA;
+		ei.areaEffect = NM_ME_MORT_AREA;
+		ei.animationcolor = 0xB4; 
+		ei.offensive = true;
+		ei.needtarget = false;
+		ei.centerpos = creature->pos;
+		memcpy(&ei.area, area, sizeof(area));
+		switch(creature->direction) {
+			case NORTH: ei.direction = 1; break;
+			case WEST: ei.direction = 2; break;
+			case EAST: ei.direction = 3; break;
+			case SOUTH: ei.direction = 4; break;
+		};
+
+		ei.manaCost = 20;
+		ei.minDamage = (int)(((creature->level + creature->maglevel) * 3) * 0.3) / 2;
+		ei.maxDamage = (int)(((creature->level + creature->maglevel) * 3) * 0.4) / 2;
+		
+		creatureMakeMagic(creature, ei);
 	}
 	else if(strcmp(text.c_str(), "exori") == 0) {
-			static unsigned char area[14][18] = {
+		static unsigned char area[14][18] = {
 				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -1630,13 +1875,24 @@ void Map::creatureCastSpell(Creature *creature, const std::string &text) {
 				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 			};
 
-		int base = (int)creature->level * 2 + creature->maglevel * 3;
-		int min = (int)(base * 2.0) / 2;
-		int max = (int)(base * 2.5) / 2;
-		makeCastSpell(creature, 250, min, max, area, 1, 	NM_ME_HIT_AREA, NM_ME_HIT_AREA);
+		EffectInfo ei;
+		ei.animationEffect = 0;
+		ei.damageEffect = NM_ME_HIT_AREA;
+		ei.areaEffect = NM_ME_HIT_AREA;
+		ei.animationcolor = 0xB4; 
+		ei.offensive = true;
+		ei.needtarget = false;
+		ei.centerpos = creature->pos;
+		memcpy(&ei.area, area, sizeof(area));
+		ei.direction = 1;
+		ei.manaCost = 250;
+		ei.minDamage = (int)(((creature->level + creature->maglevel) * 3) * 0.7) / 2;
+		ei.maxDamage = (int)(((creature->level + creature->maglevel) * 3) * 1.1) / 2;
+		
+		creatureMakeMagic(creature, ei);
 	}
 	else if(strcmp(text.c_str(), "exevo mort hur") == 0) {
-			static unsigned char area[14][18] = {
+		static unsigned char area[14][18] = {
 				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 				{0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0},
 				{0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0},
@@ -1652,22 +1908,31 @@ void Map::creatureCastSpell(Creature *creature, const std::string &text) {
 				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 			};
 
-		unsigned char ch = 0xFF;
 
+		EffectInfo ei;
+		ei.animationEffect = 0;
+		ei.damageEffect = NM_ME_ENERGY_DAMAGE;
+		ei.areaEffect = NM_ME_ENERGY_AREA;
+		ei.animationcolor = 0xB4; 
+		ei.offensive = true;
+		ei.needtarget = false;
+		ei.centerpos = creature->pos;
+		memcpy(&ei.area, area, sizeof(area));
 		switch(creature->direction) {
-			case NORTH: ch = 1; break;
-			case WEST: ch = 2; break;
-			case EAST: ch = 3; break;
-			case SOUTH: ch = 4; break;
+			case NORTH: ei.direction = 1; break;
+			case WEST: ei.direction = 2; break;
+			case EAST: ei.direction = 3; break;
+			case SOUTH: ei.direction = 4; break;
 		};
 
-		int base = (int)creature->level * 2 + creature->maglevel * 3;
-		int min = (int)(base * 2.0) / 2;
-		int max = (int)(base * 2.5) / 2;
-		makeCastSpell(creature, 250, min, max, area, ch, NM_ME_ENERGY_AREA, NM_ME_ENERGY_DAMAGE);
+		ei.manaCost = 250;
+		ei.minDamage = (int)(((creature->level + creature->maglevel) * 3) * 0.7) / 2;
+		ei.maxDamage = (int)(((creature->level + creature->maglevel) * 3) * 1.3) / 2;
+		
+		creatureMakeMagic(creature, ei);
 	}
 	else if(strcmp(text.c_str(), "exevo vis lux") == 0) {
-			static unsigned char area[14][18] = {
+		static unsigned char area[14][18] = {
 				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 				{0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -1683,19 +1948,28 @@ void Map::creatureCastSpell(Creature *creature, const std::string &text) {
 				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 			};
 
-		unsigned char ch = 0xFF;
-
+		
+		EffectInfo ei;
+		ei.animationEffect = 0;
+		ei.damageEffect = NM_ME_ENERGY_DAMAGE;
+		ei.areaEffect = NM_ME_ENERGY_AREA;
+		ei.animationcolor = 0xB4; 
+		ei.offensive = true;
+		ei.needtarget = false;
+		ei.centerpos = creature->pos;
+		memcpy(&ei.area, area, sizeof(area));
 		switch(creature->direction) {
-			case NORTH: ch = 1; break;
-			case WEST: ch = 2; break;
-			case EAST: ch = 3; break;
-			case SOUTH: ch = 4; break;
+			case NORTH: ei.direction = 1; break;
+			case WEST: ei.direction = 2; break;
+			case EAST: ei.direction = 3; break;
+			case SOUTH: ei.direction = 4; break;
 		};
 
-		int base = (int)creature->level * 2 + creature->maglevel * 3;
-		int min = (int)(base * 1.2) / 2;
-		int max = (int)(base * 2.0) / 2;
-		makeCastSpell(creature, 100, min, max, area, ch, NM_ME_ENERGY_AREA, NM_ME_ENERGY_DAMAGE);
+		ei.manaCost = 100;
+		ei.minDamage = (int)(((creature->level + creature->maglevel) * 3) * 0.8) / 2;
+		ei.maxDamage = (int)(((creature->level + creature->maglevel) * 3) * 1.4) / 2;
+		
+		creatureMakeMagic(creature, ei);
 	}
 
 	OTSYS_THREAD_UNLOCK(mapLock)

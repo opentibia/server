@@ -49,6 +49,30 @@ class Player;
 
 class Tile;
 
+//struct effectInfo {
+class EffectInfo
+{
+public:
+	//Position GetViewState(Player *spectator);
+	//createMagicEffect(Player *spectator
+	//CanSee(Player *spectator);
+//private:
+	Position centerpos;
+	unsigned char areaEffect;
+	unsigned char damageEffect;
+	unsigned char animationEffect;
+	unsigned char area[14][18];
+	unsigned char direction;
+	unsigned char animationcolor;
+	int manaCost;
+	int minDamage;
+	int maxDamage;
+	int minManaDrain;
+	int maxManaDrain;
+	bool offensive;
+	bool needtarget;
+};
+
 struct AStarNode{
 	int x,y;
 	AStarNode* parent;
@@ -67,7 +91,7 @@ class Map {
   public:
     Map();
     ~Map();
-
+		
     bool LoadMap(std::string filename);
 
     Tile* getTile(unsigned short _x, unsigned short _y, unsigned char _z);
@@ -92,16 +116,19 @@ class Map {
     void creatureYell(Creature *creature, std::string &text);
     void creatureSpeakTo(Creature *creature, const std::string &receiver, const std::string &text);
     void creatureBroadcastMessage(Creature *creature, const std::string &text);
-	 void creatureChangeOutfit(Creature *creature);
+	  void creatureChangeOutfit(Creature *creature);
 
-	 void creatureCastSpell(Creature *creature, const std::string &text);
-	 void makeCastSpell(Creature *creature, int mana, int mindamage, int maxdamage, unsigned char area[14][18], unsigned char ch, unsigned char typeArea, unsigned char typeDamage);
-	 void resetExhausted(unsigned long id);
-
+	  //void playerCastSpell(Creature *creature, const std::string &text);
+		//void makeCastSpell(Creature *creature, int mana, int mindamage, int maxdamage, unsigned char area[14][18], unsigned char ch, unsigned char typeArea, unsigned char typeDamage);
+	  void creatureThrowRune(Creature *creature, const EffectInfo &ei);
+  	void creatureCastSpell(Creature *creature, const EffectInfo &ei);
+		void creatureSaySpell(Creature *creature, const std::string &text);
+ 
     //void addEvent(long ticks, int type, void *data);
-	 void addEvent(SchedulerTask*);
+	  void addEvent(SchedulerTask*);
 
     Creature* getCreatureByID(unsigned long id);
+		Creature* getCreatureByName(const char* s);
 
 	std::list<Position> getPathTo(Position start, Position to, bool creaturesBlock=true);
 
@@ -114,16 +141,20 @@ class Map {
         unsigned char stackPos,
         unsigned short to_x, unsigned short to_y, unsigned char to_z);
 
-	void creatureMakeDamage(Creature *creature, Creature *attackedCreature, fight_t damagetype);
-    void creatureMakeMeleeDamage(Creature *creature, Creature *attackedCreature);
+		bool creatureOnPrepareAttack(Creature *creature, Position pos);
+		void creatureMakeDamage(Creature *creature, Creature *attackedCreature, fight_t damagetype);
+		void creatureMakeMeleeDamage(Creature *creature, Creature *attackedCreature);
     void creatureMakeDistDamage(Creature *creature, Creature *attackedCreature);
     void creatureMakeMagicDistDamage(Creature *creature, Creature *attackedCreature);
 
-	 void CreateDamageUpdate(Creature* player, Creature* attackCreature, int damage, NetworkMessage& msg);
-
+		void creatureMakeMagic(Creature *creature, const EffectInfo &ei);
+		void creatureMakeAreaEffect(Creature *spectator, Creature *attacker, const EffectInfo &ei, NetworkMessage& msg);
+	  void CreateDamageUpdate(Creature* player, Creature* attackCreature, int damage, NetworkMessage& msg);
+	  //void getSpectators(const Position& pos, std::vector<Player*>& list);
+	  void resetExhausted(unsigned long id);
 
     OTSYS_THREAD_LOCKVAR eventLock;
-	 OTSYS_THREAD_SIGNALVAR eventSignal;
+	  OTSYS_THREAD_SIGNALVAR eventSignal;
 
     static OTSYS_THREAD_RETURN eventThread(void *p);
 

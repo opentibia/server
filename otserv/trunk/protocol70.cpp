@@ -136,8 +136,14 @@ void Protocol70::parsePacket(NetworkMessage &msg)
     case 0x78: // throw item
       parseThrow(msg);
       break;
-     case 0x82: // throw item
-//      parseUseItem(&action, msg);
+     case 0x82: // use item
+      parseUseItem(msg);
+      break;
+     case 0x83: // use item
+      parseUseItemEx(msg);
+      break;
+     case 0x87: // close container
+      parseCloseContainer(msg);
       break;
      case 0x8C: // throw item
       parseLookAt(msg);
@@ -237,7 +243,7 @@ void Protocol70::GetMapDescription(unsigned short x, unsigned short y, unsigned 
 
 void Protocol70::checkCreatureAsKnown(unsigned long id, bool &known, unsigned long &removedKnown)
 {
-  // loop through the known player and check if the given player is in
+	// loop through the known player and check if the given player is in
   std::list<unsigned long>::iterator i;
   for(i = knownPlayers.begin(); i != knownPlayers.end(); ++i)
   {
@@ -254,11 +260,11 @@ void Protocol70::checkCreatureAsKnown(unsigned long id, bool &known, unsigned lo
 
   // ok, he is unknown...
   known = false;
-
+	
   // ... but not in future
   knownPlayers.push_back(id);
 
-  // to many known players?
+	// to many known players?
   if(knownPlayers.size() > 64)
   {
     // lets try to remove one from the end of the list
@@ -431,6 +437,273 @@ void Protocol70::parseSetOutfit(NetworkMessage &msg)
 }
 
 
+void Protocol70::parseUseItemEx(NetworkMessage &msg)
+{
+	unsigned short from_x = msg.GetU16();
+	unsigned short from_y = msg.GetU16();
+	unsigned char from_z = msg.GetByte();
+	unsigned short item = msg.GetU16();
+	unsigned char newpos = msg.GetByte();
+	unsigned short to_x = msg.GetU16();
+	unsigned short to_y = msg.GetU16();
+	unsigned char to_z = msg.GetByte();
+	unsigned short tile_id = msg.GetU16();
+	unsigned char count = msg.GetByte();
+
+	Position pos;
+	pos.x = to_x;
+	pos.y = to_y;
+	pos.z = to_z;
+
+	if(from_x == 0xFFFF) {
+		if(from_y & 0x40) {
+			unsigned char bpid = from_y & 0x0F;
+			//This should be loaded from somewhere later (lua? or xml perhaps)
+			if(item == 1623) {
+				static unsigned char area[14][18] = {
+					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					{0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+				};
+
+				EffectInfo ei;
+				ei.animationEffect = 0;
+				ei.damageEffect = NM_ME_MAGIC_ENERGIE;
+				ei.areaEffect = 0;
+				ei.animationcolor = MSG_INFO; 
+				ei.offensive = false;
+				ei.needtarget = true;
+				ei.centerpos = pos;
+				memcpy(&ei.area, area, sizeof(area));
+				ei.direction = 1;
+				ei.manaCost = 0;
+				ei.minDamage = (int)(((player->level + player->maglevel) * 3) * 1.0);
+				ei.maxDamage = (int)(((player->level + player->maglevel) * 3) * 1.2);
+				map->creatureThrowRune(player, ei); 
+			}
+		else
+			if(item == 1654) {
+				static unsigned char area[14][18] = {
+					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					{0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0},
+					{0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0},
+					{0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0},
+					{0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0},
+					{0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0},
+					{0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0},
+					{0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0},
+					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+				};
+
+				EffectInfo ei;
+				ei.animationEffect = NM_ANI_FIRE;
+				ei.damageEffect = NM_ME_FIRE_AREA;
+				ei.areaEffect = NM_ME_FIRE_AREA;
+				ei.animationcolor = 0xB4;
+				ei.offensive = true;
+				ei.needtarget = false;
+				ei.centerpos = pos;
+				memcpy(&ei.area, area, sizeof(area));
+				ei.direction = 1;
+				ei.minDamage = (int)(((player->level + player->maglevel) * 3) * 0.34) / 2;
+				ei.maxDamage = (int)(((player->level + player->maglevel) * 3) * 0.40) / 2;
+				map->creatureThrowRune(player, ei); 
+			}
+		else
+			if(item == 1663) {
+				static unsigned char area[14][18] = {
+					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					{0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+					{0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0},
+					{0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+				};
+
+				EffectInfo ei;
+				ei.animationEffect = NM_ANI_FIRE;
+				ei.damageEffect = NM_ME_EXPLOSION_DAMAGE;
+				ei.areaEffect = NM_ME_EXPLOSION_AREA;
+				ei.animationcolor = 0xB4;
+				ei.offensive = true;
+				ei.needtarget = false;
+				ei.centerpos = pos;
+				memcpy(&ei.area, area, sizeof(area));
+				ei.direction = 1;
+				ei.manaCost = 0;
+				ei.minDamage = (int)(((player->level + player->maglevel) * 3) * 0.1) / 2;
+				ei.maxDamage = (int)(((player->level + player->maglevel) * 3) * 0.9) / 2;
+				map->creatureThrowRune(player, ei); 
+			}
+		else
+			if(item == 0x0652) {
+				static unsigned char area[14][18] = {
+					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					{0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+				};
+
+				EffectInfo ei;
+				ei.animationEffect = NM_ANI_SUDDENDEATH;
+				ei.damageEffect = NM_ME_MORT_AREA;
+				ei.areaEffect = 0;
+				ei.animationcolor = 0xB4; 
+				ei.offensive = true;
+				ei.needtarget = true;
+				ei.centerpos = pos;
+				memcpy(&ei.area, area, sizeof(area));
+				ei.direction = 1;
+				ei.manaCost = 0;
+				ei.minDamage = (int)(((player->level + player->maglevel) * 3) * 1.1) / 2;
+				ei.maxDamage = (int)(((player->level + player->maglevel) * 3) * 1.3) / 2;
+				map->creatureThrowRune(player, ei); 
+			}
+		}
+	}
+}
+
+void Protocol70::parseUseItem(NetworkMessage &msg)
+{
+	//open main backpack
+	//FFFF	0300	00	5506	00	00
+	//sent:
+	//n		bpid	len	backpack						max		cur	
+	//00	5506	08	006261636B7061636B	1400	09	5406540654063B08C206DE0661DE066431080C4E08
+
+	//open bag 0, new window
+	//FFFF	4000	00	5406	00	01
+	//sent:
+	//n		bpid	len	backpack						max		cur	
+	//01	5406	03	00626167						0801	00
+	
+	//open bag 1, new window
+	//FFFF	4000	01	5406	01	02
+	//sent:
+	//n		bpid	len	backpack						max		cur	
+	//02	5406	03	00626167						0801	00
+
+	//close bag 0
+	//8701
+	//sent:
+
+	//open bag 0, new window
+	//FFFF	4000	00	5406	00	01
+	//sent:
+	//n		bpid	len	backpack						max		cur	
+	//01	5406	03	00626167						0801	00
+
+	//open bag 2, new window
+	//FFFF	4000	02	5406	02	03
+	//sent:
+	//n		bpid	len	backpack						max		cur	
+	//03	5406	03	00626167						0801	00
+	unsigned short x = msg.GetU16();
+	unsigned short y = msg.GetU16();
+	unsigned char z = msg.GetByte();
+	unsigned short item = msg.GetU16();
+	unsigned char un = msg.GetByte();
+	unsigned char stack = msg.GetByte();
+	
+#ifdef __DEBUG__
+	std::cout << "parseUseItem: " << "x: " << x << ", y: " << (int)y <<  ", z: " << (int)z << ", item: " << (int)item << ", un: " << (int)un << ", stack: " << (int)stack << std::endl;
+#endif
+
+	if(x == 0xFFFF && Item(item).isContainer()) {
+		msg.Reset();
+		Item *newcontainer = NULL;
+		Item *container = NULL;
+
+		if(0x40 & y) {
+			unsigned char containerid = y & 0x0F;
+			container = player->getContainer(containerid);
+
+			if(container == NULL) {
+				return;
+			}
+
+			newcontainer = container;
+
+			int n = 0;
+			for (Item::iterator cit = container->getItems(); cit != container->getEnd(); cit++) {
+				if(n == z) {
+					newcontainer = (*cit);
+					break;
+				}
+				else
+					n++;
+			}
+		}
+		else
+			newcontainer = (Item*)player->items[y];
+
+		if(newcontainer && newcontainer->isContainer()) {
+			player->addContainer(stack, newcontainer);
+
+			msg.AddByte(0x6E);
+			msg.AddByte(stack);
+
+			msg.AddU16(newcontainer->getID());
+			msg.AddString(newcontainer->getName());
+			msg.AddU16(newcontainer->getContainerMaxItemCount());
+			msg.AddByte(newcontainer->getContainerItemCount());
+
+      Item::iterator cit;
+			for (cit = newcontainer->getItems(); cit != newcontainer->getEnd(); cit++) {
+				msg.AddU16((*cit)->getID());
+				if((*cit)->getItemCountOrSubtype() > 1)
+					msg.AddByte((*cit)->getItemCountOrSubtype());
+			}
+	
+			msg.WriteToSocket(s);
+		}
+	}
+}
+
+void Protocol70::parseCloseContainer(NetworkMessage &msg)
+{
+	unsigned char containerid = msg.GetByte();
+	player->closeContainer(containerid);
+
+	msg.Reset();
+
+	msg.AddByte(0x6F);
+	msg.AddByte(containerid);
+
+	msg.WriteToSocket(s);
+}
+
+
 /*void Protocol70::parseUseItem(Action* action, NetworkMessage &msg){
 	action->type=ACTION_ITEM_USE;
 	action->pos1.x=(unsigned char)msg[2]*256+(unsigned char)msg[1];
@@ -456,7 +729,7 @@ void Protocol70::parseThrow(NetworkMessage &msg)
   unsigned short to_y       = msg.GetU16(); 
   unsigned char  to_z       = msg.GetByte();
 
-  map->thingMove(player, from_x, from_y, from_z, from_stack, to_x, to_y, to_z);
+	map->thingMove(player, from_x, from_y, from_z, from_stack, to_x, to_y, to_z);
 }
 
 
@@ -473,7 +746,7 @@ void Protocol70::parseLookAt(NetworkMessage &msg){
   std::stringstream ss;
 
 #ifdef __DEBUG__
-  ss << "You look at " << LookPos << " and see Item # " << ItemNum << ".";
+	ss << "You look at " << LookPos << " and see Item # " << ItemNum << ".";
   Position middle;
   newmsg.AddTextMessage(MSG_INFO, ss.str().c_str());
 #else
@@ -495,7 +768,7 @@ void Protocol70::parseSay(NetworkMessage &msg)
 
   std::string text = msg.GetString();
 
-	map->creatureCastSpell(player, text);
+	map->creatureSaySpell(player, text);
 
   switch (type)
   {
@@ -783,6 +1056,52 @@ void Protocol70::sendTileUpdated(const Position *Pos)
   }
 }
 
+void Protocol70::sendContainerUpdated(Item *item, unsigned char from_id, unsigned char to_id,
+																			unsigned char from_slot, unsigned char to_slot, bool remove)
+{
+	NetworkMessage msg;
+	if(from_id == to_id /*moveItemSameContainer*/) {
+		//remove item
+		msg.AddByte(0x72);
+		msg.AddByte(from_id);
+		msg.AddByte(from_slot);
+
+		//add item
+		msg.AddByte(0x70);
+		msg.AddByte(to_id);
+		msg.AddU16(item->getID());
+	}
+	else if(remove) {
+		//remove item
+		msg.AddByte(0x72);
+		msg.AddByte(from_id);
+		msg.AddByte(from_slot);
+	}
+	else
+	{
+		//add item
+		msg.AddByte(0x70);
+		msg.AddByte(to_id);
+		msg.AddU16(item->getID());
+	}
+
+	msg.WriteToSocket(s);
+
+	/*
+	if(sameview) {
+		//remove item
+		msg.AddByte(0x72);
+		msg.AddByte(to_id);
+		msg.AddByte(from_slot);
+		
+		//add item
+		msg.AddByte(0x70);
+		msg.AddByte(from_id);
+		msg.AddU16(item->getID());
+	}
+	*/
+}
+
 void Protocol70::sendThingMove(const Creature *creature, const Thing *thing, const Position *oldPos, unsigned char oldStackPos)
 
 {
@@ -819,10 +1138,10 @@ void Protocol70::sendThingMove(const Creature *creature, const Thing *thing, con
         msg.AddItem((Item*)thing);
     }
   }
-
+	
   if (thing == this->player)
   {
-    if (oldPos->y > thing->pos.y)        // north, for old x
+		if (oldPos->y > thing->pos.y)        // north, for old x
     {
       msg.AddByte(0x65);
       GetMapDescription(oldPos->x - 8, thing->pos.y - 6, thing->pos.z, 18, 1, msg);

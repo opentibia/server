@@ -32,6 +32,19 @@
 #define NM_ME_MORT_AREA          17
 #define NM_ME_SOUND              18
 
+#define NM_ANI_BOLT              1
+#define NM_ANI_ARROW             2
+#define NM_ANI_FIRE              3
+#define NM_ANI_ENERGY            4
+#define NM_ANI_POISONARROW       5
+#define NM_ANI_BURSTARROW        6
+#define NM_ANI_THROWINGSTAR      7
+#define NM_ANI_THROWINGKNIFE     8
+#define NM_ANI_SMALLSTONE        9
+#define NM_ANI_SUDDENDEATH       10
+#define NM_ANI_LARGEROCK         11
+#define NM_ANI_SNOWBALL          12
+#define NM_ANI_POWERBOLT         13
 
 enum MessageClasses {
       MSG_SMALLINFO = 0x14,

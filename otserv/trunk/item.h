@@ -48,7 +48,8 @@ class Item : public Thing
     private: // the following, I will have to rethink:
         // could be union:
 
-        unsigned short actualitems; // number of items in container
+			unsigned short maxitems; //number of max items in container  
+			unsigned short actualitems; // number of items in container
         // list of items if this is a container
         std::list<Item *> lcontained;
 
@@ -69,11 +70,13 @@ class Item : public Thing
 		bool isAlwaysOnTop() const;
 		bool isGroundTile() const;
 		bool isNotMoveable() const;
+		bool isContainer() const;
 
 		int use(){std::cout << "use " << id << std::endl; return 0;};
 		int use(Item*){std::cout << "use with item ptr " << id << std::endl; return 0;};
 		int use(Creature*){std::cout << "use with creature ptr " << id << std::endl; return 0;};
 		std::string getDescription();
+		std::string getName();
 		int unserialize(xmlNodePtr p);
 		xmlNodePtr serialize();
 
@@ -88,10 +91,16 @@ class Item : public Thing
         ~Item();
 
         // definition for iterator over backpack itemsfclose(f);
+				int getContainerItemCount() {return actualitems;};
+				int getContainerMaxItemCount() {return maxitems;};
         typedef std::list<Item *>::const_iterator iterator;
         iterator getItems();     // begin();
         iterator getEnd();       // iterator beyond the last element
-        void addItem(Item*);     // add an item to the container
+        void addItem(Item* newitem);     // add an item to the container
+				void removeItem(Item* item); //remove an item from the container
+				void moveItem(unsigned char from_slot, unsigned char to_slot);
+				Item* getItem(unsigned long slot_num);
+				void isContainerHolding(Item* item, bool& found); //search all containers for the item recursively
         Item& operator<<(Item*); // put items into the container
 };
 

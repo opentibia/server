@@ -55,6 +55,7 @@ public:
   virtual void sendCreatureSay(const Creature *creature, unsigned char type, const std::string &text) = 0;
   virtual void sendSetOutfit(const Creature* creature) = 0;
 	virtual void sendTileUpdated(const Position *Pos) = 0;
+	virtual void sendContainerUpdated(Item *item, unsigned char from_id, unsigned char to_id, unsigned char from_slot, unsigned char to_slot, bool sameview) = 0;
 
   virtual void sendCancel(const char *msg) = 0;
   virtual void sendCancelWalk(const char *msg) = 0;

@@ -143,7 +143,7 @@ void Npc::onThink(){
 
 
 void Npc::doSay(std::string msg){
-	map->creatureCastSpell(this, msg);
+	map->creatureSaySpell(this, msg);
 	this->map->creatureSay(this, 1, msg);
 }
 
@@ -238,6 +238,7 @@ int NpcScript::registerFunctions(){
 	lua_register(luaState, "selfGetPosition", NpcScript::luaSelfGetPos);
 	lua_register(luaState, "selfAttackCreature", NpcScript::luaActionAttackCreature);
 	lua_register(luaState, "creatureGetName", NpcScript::luaCreatureGetName);
+	lua_register(luaState, "creatureGetName2", NpcScript::luaCreatureGetName2);
 	lua_register(luaState, "creatureGetPosition", NpcScript::luaCreatureGetPos);
 	lua_register(luaState, "selfGetPosition", NpcScript::luaSelfGetPos);
 	
@@ -254,6 +255,21 @@ Npc* NpcScript::getNpc(lua_State *L){
 		return 0;
 	}
 	return mynpc;
+}
+
+int NpcScript::luaCreatureGetName2(lua_State *L){
+	const char* s = lua_tostring(L, -1);
+	lua_pop(L,1);
+	Npc* mynpc = getNpc(L);
+	Creature *c = mynpc->map->getCreatureByName(s);
+	
+	if(c && c->access == 0) {
+		lua_pushnumber(L, c->getID());
+	}
+	else
+		lua_pushnumber(L, 0);
+
+	return 1;
 }
 
 int NpcScript::luaCreatureGetName(lua_State *L){

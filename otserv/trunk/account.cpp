@@ -172,6 +172,33 @@ bool Account::openPlayer(const std::string &name, const std::string &givenpasswo
             Item* myitem = new Item();
             myitem->unserialize(slot->children);
             player.items[sl_id]=myitem;
+
+						//Should be loaded from xml later on...
+						if(player.items[sl_id] && player.items[sl_id]->isContainer()) {
+
+							Item *backpack = new Item(1411);
+							player.items[sl_id]->addItem(backpack);
+							backpack->addItem(new Item(1663));
+							backpack->addItem(new Item(1663));
+							backpack->addItem(new Item(1663));
+							backpack->addItem(new Item(1663));
+
+							backpack = new Item(1411);
+							player.items[sl_id]->addItem(backpack);
+							
+							backpack->addItem(new Item(1623));
+							backpack->addItem(new Item(1623));
+							backpack->addItem(new Item(1623));
+							backpack->addItem(new Item(1623));
+
+							backpack = new Item(1411);
+							player.items[sl_id]->addItem(backpack);
+							
+							backpack->addItem(new Item(1618));
+							backpack->addItem(new Item(1618));
+							backpack->addItem(new Item(1618));
+							backpack->addItem(new Item(1618));
+						}
           }
           slot=slot->next;
         }

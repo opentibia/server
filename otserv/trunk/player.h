@@ -71,12 +71,17 @@ public:
   void speak(const std::string &text);
 
 	int addItem(Item* item, int pos);
+	unsigned int getContainerCount() {return vcontainers.size();}; //returns the current number of containers open
+	Item* getContainer(unsigned char containerid);
+	unsigned char getContainerID(Item* container);
+	void addContainer(unsigned char containerid, Item *container);
+	void closeContainer(unsigned char containerid);
 	int sendInventory();
 
 	Item* getItem(int pos);
 
 	std::string getName(){return name;};
-
+	
   int sex, voc;
   int cap;
 
@@ -92,6 +97,9 @@ public:
 
   //items
   Item* items[11]; //equipement of the player
+	typedef std::pair<unsigned char, Item*> containerItem;
+	typedef std::vector<containerItem> containerLayout;
+	containerLayout vcontainers;
 
   void    usePlayer() { useCount++; };
   void    releasePlayer() { useCount--; if (useCount == 0) delete this; };
@@ -117,6 +125,7 @@ protected:
   virtual void onCreatureChangeOutfit(const Creature* creature);
   virtual void onThink();
 	virtual void onTileUpdated(const Position *Pos);
+	virtual void onContainerUpdated(Item *item, unsigned char from_id, unsigned char to_id, unsigned char from_slot, unsigned char to_slot, bool sameview);
 	Protocol *client;
 
 	// we need our name and password...

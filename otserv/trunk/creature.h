@@ -129,6 +129,7 @@ private:
 
   virtual void onCreatureChangeOutfit(const Creature* creature) { };
 	virtual void onTileUpdated(const Position *Pos) { };
+	virtual void onContainerUpdated(Item *item, unsigned char from_id, unsigned char to_id, unsigned char from_slot, unsigned char to_slot, bool sameview) {};
 
   friend class Map;
 
