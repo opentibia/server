@@ -65,7 +65,7 @@ public:
 		_probability = std::max(_probability, 0);
 
 		if(_probability >= 0)
-			probability = std::min(100, probability);
+			probability = std::min(100, _probability);
 
 		if(_exhaustionticks >= 0)
 			exhaustionTicks = _exhaustionticks;
