@@ -51,7 +51,7 @@ class NetworkMessage;
 class Player : public Creature
 {
 public:
-	Player(const char *name, Protocol* p);
+	Player(const char *name, int sex, Protocol* p);
 	virtual ~Player();
 
   virtual bool isPlayer() const { return true; };
@@ -97,6 +97,7 @@ protected:
   virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos);
   virtual void onCreatureTurn(const Creature *creature, unsigned char stackpos);
   virtual void onCreatureSay(const Creature *creature, unsigned char type, const string &text);
+  virtual void onCreatureChangeOutfit(const Creature* creature);
 
 	Protocol *client;
 

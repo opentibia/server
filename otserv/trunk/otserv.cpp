@@ -95,9 +95,15 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
     msg.AddString("1\nWelcome to OpenTibia.");
 
     msg.AddByte(0x64);
-    msg.AddByte(0x01);
+    msg.AddByte(0x02);
 
-    msg.AddString("Hurz");
+    msg.AddString("Hurz (m)");
+    msg.AddString("OpenTibia");
+
+    msg.AddU32(serverip);
+    msg.AddU16(7171);
+
+    msg.AddString("Hurz (w)");
     msg.AddString("OpenTibia");
 
     msg.AddU32(serverip);
@@ -118,7 +124,15 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
     sprintf(name, "Hurz %i", i);
 
     Protocol70 *protocol = new Protocol70(s);
-    Player     *player = new Player(name, protocol);
+
+	 // we use the name to set the sex of the char...
+	 msg.SkipBytes(4);
+	 std::string choosenname = msg.GetString();
+
+	 Player *player;
+
+	 if (choosenname == "Hurz (m)") player = new Player(name, 1, protocol);
+	 else player = new Player(name, 0, protocol);
 
     player->usePlayer();
     

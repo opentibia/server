@@ -107,6 +107,8 @@ private:
   virtual void sendCreatureTurn(const Creature *creature, unsigned char stackpos);
   virtual void sendCreatureSay(const Creature *creature, unsigned char type, const string &text);
 
+  void sendSetOutfit(const Creature* creature);
+
   virtual bool CanSee(int x, int y);
 
   // translate a map area to clientreadable format

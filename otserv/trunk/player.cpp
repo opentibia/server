@@ -33,11 +33,13 @@ using namespace std;
 
 
 
-Player::Player(const char *name, Protocol *p) : Creature(name)
+Player::Player(const char *name, int _sex, Protocol *p) : Creature(name)
 {
   client     = p;
 
-	sex        = 0;
+	sex        = _sex;
+	looktype = sex?PLAYER_MALE_1:PLAYER_FEMALE_1;
+
 	voc        = 0;
 
   cap        = 300;
@@ -140,3 +142,6 @@ void Player::onCreatureSay(const Creature *creature, unsigned char type, const s
   client->sendCreatureSay(creature, type, text);
 }
 
+void Player::onCreatureChangeOutfit(const Creature* creature) {
+		  client->sendSetOutfit(creature);
+}

@@ -25,7 +25,7 @@ Creature::Creature(const char *name)
 	lookbody   = rand() % 133;
 	looklegs   = rand() % 133;
 	lookfeet   = rand() % 133;
-	looktype   = 0x88;
+	looktype   = 0x83;
 
   health     = 1000;//150;
   healthmax  = 1000;//150;

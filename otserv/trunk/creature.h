@@ -95,6 +95,7 @@ private:
   virtual void onCreatureTurn(const Creature *creature, unsigned char stackPos) { };
   virtual void onCreatureSay(const Creature *creature, unsigned char type, const string &text) { };
 
+  virtual void onCreatureChangeOutfit(const Creature* creature) { };
 
   friend class Map;
 

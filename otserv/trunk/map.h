@@ -95,6 +95,7 @@ class Map {
     void playerYell(Player *player, const string &text);
     void playerSpeakTo(Player *player, const string &receiver, const string &text);
     void playerBroadcastMessage(Player *player, const string &text);
+	 void playerChangeOutfit(Player* player);
 
 
     void addEvent(long ticks, int type, void *data);

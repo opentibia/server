@@ -305,29 +305,34 @@ void Protocol70::parseRequestOutfit(NetworkMessage &msg)
   msg.AddByte(player->lookbody);
   msg.AddByte(player->looklegs);
   msg.AddByte(player->lookfeet);
-  msg.AddByte(0x80);
-  msg.AddByte(0x83);
+  msg.AddByte(player->sex?PLAYER_MALE_1:PLAYER_FEMALE_1);
+  msg.AddByte(player->sex?PLAYER_MALE_4:PLAYER_FEMALE_4);
 
   msg.WriteToSocket(s);
 }
 
 
+void Protocol70::sendSetOutfit(const Creature* creature) {
+	NetworkMessage newmsg;
+	newmsg.AddByte(0x8E);
+	newmsg.AddU32(creature->getID());
+	newmsg.AddByte(creature->looktype);
+	newmsg.AddByte(creature->lookhead);
+	newmsg.AddByte(creature->lookbody);
+	newmsg.AddByte(creature->looklegs);
+	newmsg.AddByte(creature->lookfeet);
+	newmsg.WriteToSocket(s);
+}
+
 void Protocol70::parseSetOutfit(NetworkMessage &msg)
 {
-/*	action->type = ACTION_CHANGE_APPEARANCE;
+	player->looktype=msg.GetByte();
+	player->lookhead=msg.GetByte();
+	player->lookbody=msg.GetByte();
+	player->looklegs=msg.GetByte();
+	player->lookfeet=msg.GetByte();
 
-        byte charType = netMessage.GetByte();
-
-      if (((charType >= CHARTYP_MALE_MIN) && (charType <= CHARTYP_MALE_MAX)) ||
-          ((charType >= CHARTYP_FEMALE_MIN) && (charType <= CHARTYP_FEMALE_MAX)))
-        m_CharType  = charType;
-
-	action->creature=creature;
-	player->looktype=msg[1];
-	player->lookhead=msg[2];
-	player->lookbody=msg[3];
-	player->looklegs=msg[4];
-	player->lookfeet=msg[5];*/
+	map->playerChangeOutfit(player);
 }
 
 

@@ -588,6 +588,21 @@ void Map::playerSay(Player *player, unsigned char type, const string &text)
   OTSYS_THREAD_UNLOCK(mapLock)
 }
 
+void Map::playerChangeOutfit(Player *player)
+{
+  OTSYS_THREAD_LOCK(mapLock)
+
+  CreatureVector::iterator cit;
+
+  for (int x = player->pos.x - 7; x <= player->pos.x + 7; x++)
+    for (int y = player->pos.y - 5; y <= player->pos.y + 5; y++)
+      for (cit = tiles[x][y]->creatures.begin(); cit != tiles[x][y]->creatures.end(); cit++)
+      {
+        (*cit)->onCreatureChangeOutfit(player);
+      }
+
+  OTSYS_THREAD_UNLOCK(mapLock)
+}
 
 void Map::playerYell(Player *player, const string &text)
 {
