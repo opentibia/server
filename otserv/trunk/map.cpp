@@ -789,6 +789,46 @@ if(text[0] == '/' && creature->access > 0)
 switch(text[1])
 {
 default:break;
+// Summon?
+case 's':
+	{
+// Create a non-const copy of the command
+std::string cmd = text;
+// Erase the first 2 bytes
+cmd.erase(0,3);
+// The string contains the name of the NPC we want.
+Npc *npc = new Npc(cmd.c_str(), (Map *)this);
+// Set the NPC pos
+if(creature->direction == NORTH)
+{
+npc->pos.x = creature->pos.x;
+npc->pos.y = creature->pos.y - 1;
+npc->pos.z = creature->pos.z;
+}
+// South
+if(creature->direction == SOUTH)
+{
+npc->pos.x = creature->pos.x;
+npc->pos.y = creature->pos.y + 1;
+npc->pos.z = creature->pos.z;
+}
+// East
+if(creature->direction == EAST)
+{
+npc->pos.x = creature->pos.x + 1;
+npc->pos.y = creature->pos.y;
+npc->pos.z = creature->pos.z;
+}
+// West
+if(creature->direction == WEST)
+{
+npc->pos.x = creature->pos.x - 1;
+npc->pos.y = creature->pos.y;
+npc->pos.z = creature->pos.z;
+}
+// Place the npc
+placeCreature(npc);
+	} break; // case 's':
 } //switch(text[1])
 }
 // It was no command, or it was just a player
