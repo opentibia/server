@@ -16,7 +16,7 @@ area = {
 }
 
 damageEffect = NM_ME_EXPLOSION_DAMAGE
-areaEffect = NM_ME_POISEN_RINGS
+areaEffect = NM_ME_EXPLOSION_AREA
 animationColor = RED
 offensive = true
 needDirection = false

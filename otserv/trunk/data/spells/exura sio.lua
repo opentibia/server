@@ -16,7 +16,6 @@ area = {
 }
 
 damageEffect = NM_ME_MAGIC_ENERGIE
-areaEffect = 0
 animationColor = GREEN
 offensive = false
 needDirection = false
