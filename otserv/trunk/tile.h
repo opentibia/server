@@ -42,21 +42,22 @@ public:
   void addThing(Thing *thing);
 	MagicEffectItem* getFieldItem();
 
-  int getCreatureStackPos(Creature *c);
-  int getThingStackPos(const Thing *thing);
-	int getThingCount();
+  int getCreatureStackPos(Creature *c) const;
+  int getThingStackPos(const Thing *thing) const;
+	int getThingCount() const;
 
   Thing* getThingByStackPos(int pos);
 
-  bool isBlockingProjectile();
-	bool isBlocking();
+  bool isBlockingProjectile() const;
+	bool isBlocking() const;
 
-  bool isPz();
+  bool isPz() const;
   void setPz();
   
   bool floorChange(Direction direction);
   
-  std::string getDescription();
+  std::string getDescription() const;
+
 protected:
   bool pz;
 };

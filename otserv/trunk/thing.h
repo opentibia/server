@@ -18,7 +18,7 @@ public:
   Thing();
   virtual ~Thing();
 
-  virtual bool canMovedTo(Tile *tile);
+  virtual bool canMovedTo(const Tile *tile) const;
 
   int throwRange;
 

@@ -12,12 +12,12 @@
 
 #include "creature.h"
 
-bool Tile::isBlockingProjectile()
+bool Tile::isBlockingProjectile() const
 {
 	if(ground.isBlockingProjectile() == true)
     return true;
   
-  ItemVector::iterator iit;
+  ItemVector::const_iterator iit;
   for (iit = topItems.begin(); iit != topItems.end(); ++iit)
     if ((*iit)->isBlockingProjectile())
       return true;
@@ -30,12 +30,12 @@ bool Tile::isBlockingProjectile()
   return false;
 }
 
-bool Tile::isBlocking()
+bool Tile::isBlocking() const
 {
   if(ground.isBlocking() == true)
     return true;
   
-  ItemVector::iterator iit;
+	ItemVector::const_iterator iit;
   for (iit = topItems.begin(); iit != topItems.end(); ++iit)
     if ((*iit)->isBlocking())
       return true;
@@ -93,9 +93,9 @@ bool Tile::floorChange(Direction direction)
   return false;
 }
 
-int Tile::getCreatureStackPos(Creature *c)
+int Tile::getCreatureStackPos(Creature *c) const
 {
-  CreatureVector::iterator it;
+  CreatureVector::const_iterator it;
   for (it = creatures.begin(); it != creatures.end(); ++it)
   {
     if ((*it) == c)
@@ -106,7 +106,7 @@ int Tile::getCreatureStackPos(Creature *c)
   return 255;
 }
 
-int Tile::getThingStackPos(const Thing *thing)
+int Tile::getThingStackPos(const Thing *thing) const
 {
   int n = 0;
 
@@ -117,7 +117,7 @@ int Tile::getThingStackPos(const Thing *thing)
     n++;
   }
   
-  ItemVector::iterator iit;
+  ItemVector::const_iterator iit;
   for (iit = topItems.begin(); iit != topItems.end(); ++iit)
   {
     n++;
@@ -125,7 +125,7 @@ int Tile::getThingStackPos(const Thing *thing)
       return n;
   }
 
-  CreatureVector::iterator cit;
+  CreatureVector::const_iterator cit;
   for (cit = creatures.begin(); cit != creatures.end(); ++cit)
   {
     n++;
@@ -175,12 +175,13 @@ Thing* Tile::getThingByStackPos(int pos)
   return NULL;
 }
 
-int Tile::getThingCount()
+int Tile::getThingCount() const
 {
   return (uint32_t) 1 + (splash ? 1 : 0) + topItems.size() +	creatures.size() + downItems.size();
 }
 
-std::string Tile::getDescription(){
+std::string Tile::getDescription() const
+{
 /*	std::string ret;
 	std::cout << "Items: "<< size() << std::endl;
 	for(unsigned int i=0; i < size(); i++)
@@ -275,7 +276,7 @@ void Tile::addThing(Thing *thing) {
   }
 }
 
-bool Tile::isPz()
+bool Tile::isPz() const
 {
   return pz;
 }

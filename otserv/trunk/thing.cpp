@@ -14,7 +14,7 @@ Thing::~Thing()
 }
 
 
-bool Thing::canMovedTo(Tile *tile)
+bool Thing::canMovedTo(const Tile *tile) const
 {
   return !tile->isBlocking();
 }
