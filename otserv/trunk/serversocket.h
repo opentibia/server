@@ -21,6 +21,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.8  2002/04/07 09:52:33  acrimon
+// minor changes
+//
 // Revision 1.7  2002/04/06 09:04:30  shivoc
 // moved make_socket and added win support
 //
@@ -35,24 +38,24 @@
 #include "definitions.h"
 
 namespace TNetwork {
-	class ServerSocket {
-		Socket serversocket;
-		public: // this is public only for the functors; it should be private
-		int connections;
-		int maxconnections;
-		private:
-		struct newconnection : public unary_functor<Socket,void> {
-			ServerSocket &ss;
-			newconnection(ServerSocket &_ss) : ss(_ss) { }
-			void operator() (const Socket &z);
-		} newconnection;
-		private:
-//		Socket make_socket(int socket_type, u_short port);
-		int atoport(char *service, char *proto);
-		struct in_addr *atoaddr(char *address);
-		public:
-		ServerSocket(int _port= 7171, int _maxconnections = 100);
-		~ServerSocket();
-	};
+    class ServerSocket {
+	Socket serversocket;
+    public: // this is public only for the functors; it should be private
+	int connections;
+	int maxconnections;
+    private:
+	struct newconnection : public unary_functor<Socket,void> {
+	    ServerSocket &ss;
+	    newconnection(ServerSocket &_ss) : ss(_ss) { }
+	    void operator() (const Socket &z);
+	} newconnection;
+    private:
+//        Socket make_socket(int socket_type, u_short port);
+	int atoport(char *service, char *proto);
+	struct in_addr *atoaddr(char *address);
+    public:
+	ServerSocket(int _port= 7171, int _maxconnections = 100);
+	~ServerSocket();
+    };
 
 } // namespace TNetwork
