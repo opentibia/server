@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.8  2002/05/28 13:55:56  shivoc
+// some minor changes
+//
 // Revision 1.7  2002/04/24 18:25:39  shivoc
 // some changes for win compatibility
 //
@@ -52,27 +55,27 @@
 // Sets up the Server and starts listen for connections
 Socket TNetwork::make_socket(int _socket_type, u_short _port) throw(texception) {
     int yes=1;
-    
+
 #ifdef __WINDOWS__
     // Call to WSA Startup...
-    
+
     WORD wVersionRequested; 
     WSADATA wsaData; 
     int err; 
     wVersionRequested = MAKEWORD(1, 1); 
-    
+
     err = WSAStartup(wVersionRequested, &wsaData); 
     if (err != 0) {
-	throw texception("network.cpp: No Winsock.dll found!", true);
+        throw texception("network.cpp: No Winsock.dll found!", true);
     } 
-    
+
     if (LOBYTE(wsaData.wVersion) != 1 || HIBYTE(wsaData.wVersion) != 1) { 
-	WSACleanup(); 
-	throw texception("network.cpp: No Winsock 1.1 found!", true);
+        WSACleanup(); 
+        throw texception("network.cpp: No Winsock 1.1 found!", true);
     } 
     // WSA Startup complete...
 #endif
-    
+
     sockaddr_in local_adress;
     local_adress.sin_family = AF_INET;
     local_adress.sin_port = htons(_port);
@@ -83,11 +86,11 @@ Socket TNetwork::make_socket(int _socket_type, u_short _port) throw(texception) 
     // first we create a new socket
     Socket listen_socket=socket(AF_INET, _socket_type, 0);
     if (listen_socket < 0) {
-	// the socket could not be created!
+        // the socket could not be created!
 #ifdef __WINDOWS__
-	WSACleanup();
+        WSACleanup();
 #endif	    
-	throw texception("network.cpp: The socket could not be created!", true);
+        throw texception("network.cpp: The socket could not be created!", true);
     } // if (listen_socket == -1)
 #ifdef __LINUX__
     if (fcntl(listen_socket, F_SETFL, O_NONBLOCK) < 0) {  // set O_NONBLOCK flag
@@ -95,25 +98,25 @@ Socket TNetwork::make_socket(int _socket_type, u_short _port) throw(texception) 
     }
     // lose the pesky "Address already in use" error message
     if (setsockopt(listen_socket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof (int)) == -1)  {
-	throw texception("network.cpp: setsockopt failed!", true);
+        throw texception("network.cpp: setsockopt failed!", true);
     } 
 #endif
 
     if (bind(listen_socket, (struct sockaddr *) &local_adress, sizeof (struct sockaddr)) < 0) {
-	// bind error
+        // bind error
 #ifdef __WINDOWS__      
-	WSACleanup();
+        WSACleanup();
 #endif      
-	throw texception("network.cpp: bind error!", true);
+        throw texception("network.cpp: bind error!", true);
     } // if (bind(...))
 
     // now we listen on the new socket
     if (listen(listen_socket, 10) == -1) {
-	// error while listening on socket
+        // error while listening on socket
 #ifdef __WINDOWS__      
-	WSACleanup();
+        WSACleanup();
 #endif
-	throw texception("network.cpp: listen on socket not possible!", true);
+        throw texception("network.cpp: listen on socket not possible!", true);
     } // if (listen(listen_socket,10) == -1)
 
     return listen_socket;
@@ -121,145 +124,120 @@ Socket TNetwork::make_socket(int _socket_type, u_short _port) throw(texception) 
 
 
 
-/****************************************************************
-Method: void ShutdownServer(const Socket&)
----------------------------------
-
-Shutdown the Server...
-only shuts down the connection
-
- ****************************************************************/
-
+//////////////////////////////////////////////////////////////////////
+// Shutdown the Server...
+// only shuts down the connection
 void TNetwork::ShutdownServer(const Socket& listen_socket) throw() {
 #ifdef __LINUX__
-	close(listen_socket);
+    close(listen_socket);
 #endif // __LINUX__
 
 #ifdef __WINDOWS__
-	closesocket(listen_socket);
-	WSACleanup();
+    closesocket(listen_socket);
+    WSACleanup();
 #endif
 
 } // void TNetwork::ShutdownServer(const Socket& listen_socket) throw()
 
 
-/****************************************************************
-Method: void SendData(const Socket&, const string&)
-------------------------------------------
-
-sends Data to the player
-
- ****************************************************************/
-
+//////////////////////////////////////////////////////////////////////
+// sends Data to the player
 void TNetwork::SendData(const Socket& playersocket, const std::string& data) throw() {
-	size_t total=0;  // bytes we sended total...
-	int bytesleft=data.length();  // bytes we need to send...
-	int sent;  // bytes send sent...
+    size_t total=0;  // bytes we sended total...
+    int bytesleft=data.length();  // bytes we need to send...
+    int sent;  // bytes send sent...
 
-	while (total < data.length())
-	{
+    while (total < data.length())
+    {
 
-		sent=send(playersocket, data.c_str()+total, bytesleft, 0);
+        sent=send(playersocket, data.c_str()+total, bytesleft, 0);
 
-		if (sent ==-1 || sent == 0) break;
-		total+=sent;
-		bytesleft-=sent;
-	}  // while (total < length)
+        if (sent ==-1 || sent == 0) break;
+        total+=sent;
+        bytesleft-=sent;
+    }  // while (total < length)
 
 } // void TNetwork::SendData(const Socket& playersocket, const string& data) throw() 
 
 
 
-/****************************************************************
-Method: string ReceiveData(const Socket&, const bool&)
-------------------------------------------
-
-receives Data from the player
-
- ****************************************************************/
-
+//////////////////////////////////////////////////////////////////////
+// receives Data from the player
 std::string TNetwork::ReceiveData(const Socket& playersocket) throw(texception) { 
-	// maximum length to read
-	const size_t max_read = 4096;
+    // maximum length to read
+    const size_t max_read = 4096;
 
-	// number of received bytes...
-	int numrecv;
+    // number of received bytes...
+    int numrecv;
 
-	// our receive buffer
-	char data[max_read];
+    // our receive buffer
+    char data[max_read];
 
-	// initialise the buffer to read
+    // initialise the buffer to read
 
-	std::string readbuf="";
+    std::string readbuf="";
 
-	// read the whole incoming data into the buffer...
-	while ((numrecv=recv(playersocket,data,max_read,0))==256) {
-		readbuf += std::string(data,numrecv);
-	} // while (numrecv=recv(playersocket,256,0)) 
-	if (numrecv > 0) readbuf += std::string(data,numrecv);
+    // read the whole incoming data into the buffer...
+    while ((numrecv=recv(playersocket,data,max_read,0))==256) {
+        readbuf += std::string(data,numrecv);
+    } // while (numrecv=recv(playersocket,256,0)) 
+    if (numrecv > 0) readbuf += std::string(data,numrecv);
 
-	// error while reading...
-	if (numrecv == -1) throw texception(true);
+    // error while reading...
+    if (numrecv == -1) throw texception(true);
 
-	return readbuf;
+    return readbuf;
 
 } // string TNetwork::ReceiveData(const Socket& playersocket, const bool& check=true) throw(texception)  
 
 
-////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
 // shuts down the client socket...
-////////////////////////////////////////
 void TNetwork::CloseSocket(const Socket& playersocket) throw() {
 
 #ifdef __LINUX__
-	close(playersocket);
+    close(playersocket);
 #endif
 
 #ifdef __WINDOWS__
-	closesocket(playersocket);
+    closesocket(playersocket);
 #endif
 
 } // void TNetwork::CloseSocket(const Socket& playersocket) throw()
 
-/****************************************************************
-Method: Socket AcceptPlayer(const Socket&)
-------------------------------------------
-
-trys to accept a connecting player if possible...
-
- ****************************************************************/
-
+//////////////////////////////////////////////////////////////////////
+// trys to accept a connecting player if possible...
 Socket TNetwork::AcceptPlayer(const Socket& listen) throw(texception) {
 
-	struct timeval notime;
-	struct sockaddr from;
+    struct timeval notime;
+    struct sockaddr from;
 
 #ifdef __LINUX__
-	socklen_t fromlen;
+    socklen_t fromlen;
 #endif
 
 #ifdef __WINDOWS__  
-	int fromlen;
+    int fromlen;
 #endif
 
-	fd_set player;
+    fd_set player;
 
-	fromlen=sizeof(sockaddr);
+    fromlen=sizeof(sockaddr);
 
-	notime.tv_usec=0;
-	notime.tv_sec=0;
+    notime.tv_usec=0;
+    notime.tv_sec=0;
 
-	FD_ZERO(&player);
-	FD_SET(listen,&player);
+    FD_ZERO(&player);
+    FD_SET(listen,&player);
 
-	Socket psocket;
+    Socket psocket;
 
-	if (select(listen+1,&player,NULL,NULL,(struct timeval*)&notime) > 0)
-	{
-		psocket=accept(listen, &from, &fromlen);
-	}
-	else throw texception("no player", false);
+    if (select(listen+1,&player,NULL,NULL,(struct timeval*)&notime) > 0)
+    {
+        psocket=accept(listen, &from, &fromlen);
+    }
+    else throw texception("no player", false);
 
-	return psocket;
+    return psocket;
 
 } // Socket TNetwork::AcceptPlayer(const Socket& listen) throw(texception) 

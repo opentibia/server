@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.6  2002/05/28 13:55:56  shivoc
+// some minor changes
+//
 // Revision 1.5  2002/04/08 13:53:59  acrimon
 // Added some very basic map support
 //
@@ -31,8 +34,8 @@
 
 EventScheduler es;
 
-main() {
-    Map map;
+int main() {
+    Map::Map map;
     TNetwork::ServerSocket ss;
     es.loop();
 }

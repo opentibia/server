@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.4  2002/05/28 13:55:57  shivoc
+// some minor changes
+//
 // Revision 1.3  2002/04/08 15:57:03  shivoc
 // made some changes to be more ansi compliant
 //
@@ -39,16 +42,17 @@ Map::Map() {
     // generating some standard map.
     // yes I could have done that better ...
     for (unsigned short y = MINY; y < MAXY; y++)
-	for (unsigned short x = MINX; x < MAXX; x++) {
-	    tiles[y-MINY][x-MINX] = new Tile;
-	    tiles[y-MINY][x-MINX]->push_back(new Item(ItemType::WATER));
-	}
+        for (unsigned short x = MINX; x < MAXX; x++) {
+            tiles[y-MINY][x-MINX] = new Tile;
+            tiles[y-MINY][x-MINX]->push_back(new Item(ItemType::WATER));
+        }
     std::cout << "region watered." << std::endl;
     for (unsigned short y = MINY + 20; y <= MAXY - 20; y++)
-	for (unsigned short x = MINX + 20; x <= MAXX - 20; x++) {
-	    tiles[y-MINY][x-MINX]->clear(); // creates memory leak
-	    tiles[y-MINY][x-MINX]->push_back(new Item(ItemType::GRASS));
-	}
+        for (unsigned short x = MINX + 20; x <= MAXX - 20; x++) {
+            delete tiles[y-MINY][x-MINX]->back();
+            tiles[y-MINY][x-MINX]->pop_back();
+            tiles[y-MINY][x-MINX]->push_back(new Item(ItemType::GRASS));
+        }
     std::cout << "created land." << std::endl;
 }
 

@@ -22,6 +22,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.3  2002/05/28 13:55:56  shivoc
+// some minor changes
+//
 // Revision 1.2  2002/04/05 20:02:23  acrimon
 // *** empty log message ***
 //
@@ -33,31 +36,31 @@
 #include <fstream.h>
 
 class File {
-private:
-  bool error;
-  long size;    // the size of the data
-public:
-  char *data;   // user accessable data
-  File();
-  File(const File& _file);
-  File& operator=(const File& _file);
-  File(char *filename);
-  File(istream I);
-  ~File();
-  long getsize() { return size; }
-  // void save();   // not yet written
+    private:
+        bool error;
+        long size;    // the size of the data
+    public:
+        char *data;   // user accessable data
+        File();
+        File(const File& _file);
+        File& operator=(const File& _file);
+        File(char *filename);
+        File(istream I);
+        ~File();
+        long getsize() { return size; }
+        // void save();   // not yet written
 };
 
 class TextFile : public File {
-  char *curpos;
-  int marks;
-public:
-  TextFile();
-  TextFile(const TextFile& _file);
-  TextFile& operator=(const TextFile& _file);
-  TextFile(char *filename);
-  //TextFile(istream I);
-  int splitlines(char ** &A, char delim = '\n');
-  char *extractnextname();   // some complicated function
-  int getmarks();
+    char *curpos;
+    int marks;
+    public:
+    TextFile();
+    TextFile(const TextFile& _file);
+    TextFile& operator=(const TextFile& _file);
+    TextFile(char *filename);
+    //TextFile(istream I);
+    int splitlines(char ** &A, char delim = '\n');
+    char *extractnextname();   // some complicated function
+    int getmarks();
 };

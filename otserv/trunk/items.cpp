@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.3  2002/05/28 13:55:56  shivoc
+// some minor changes
+//
 // Revision 1.2  2002/04/08 15:57:03  shivoc
 // made some changes to be more ansi compliant
 //
@@ -33,7 +36,7 @@
 bool ItemType::isContainer() {
     return iscontainer;
 }
-    
+
 ItemType::ItemType() {
 }
 

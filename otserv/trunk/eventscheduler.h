@@ -21,6 +21,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.8  2002/05/28 13:55:56  shivoc
+// some minor changes
+//
 // Revision 1.7  2002/04/24 18:25:39  shivoc
 // some changes for win compatibility
 //
@@ -38,20 +41,20 @@
 #include "network.h"
 
 struct eqfd {
-  bool operator() (Socket s1, Socket s2) const {
-    return s1 == s2;
-  }
+    bool operator() (Socket s1, Socket s2) const {
+        return s1 == s2;
+    }
 };
 
 typedef std::hash_map<Socket, unary_functor<Socket,void> *, std::hash<Socket>, eqfd> fdcbhash;
 
 // EventListener ?
 class EventScheduler {
-  fdcbhash fdcb;
-  fd_set active_fd_set, read_fd_set;
-public:
-  EventScheduler();
-  void newsocket(Socket sock, unary_functor<Socket,void> *);
-  void deletesocket(Socket sock);
-  void loop();
+    fdcbhash fdcb;
+    fd_set active_fd_set, read_fd_set;
+    public:
+    EventScheduler();
+    void newsocket(Socket sock, unary_functor<Socket,void> *);
+    void deletesocket(Socket sock);
+    void loop();
 };

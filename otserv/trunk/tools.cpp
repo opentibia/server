@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.3  2002/05/28 13:55:57  shivoc
+// some minor changes
+//
 // Revision 1.2  2002/04/05 20:02:23  acrimon
 // *** empty log message ***
 //
@@ -34,17 +37,17 @@
 //////////////////////////////////////////////////
 // dump a part of the memory to stderr.
 void hexdump(unsigned char *_data, int _len) {
-  int i;
-  for (; _len > 0; _data += 16, _len -= 16) {
-    for (i = 0; i < 16 && i < _len; i++)
-      fprintf(stderr, "%02x ", _data[i]);
-    for (; i < 16; i++)
-      fprintf(stderr, "   ");
-    fprintf(stderr, " ");
-    for (i = 0; i < 16 && i < _len; i++)
-      fprintf(stderr, "%c", (_data[i] & 0x70) < 32 ? '·' : _data[i]);
-    fprintf(stderr, "\n");
-  }
+    int i;
+    for (; _len > 0; _data += 16, _len -= 16) {
+        for (i = 0; i < 16 && i < _len; i++)
+            fprintf(stderr, "%02x ", _data[i]);
+        for (; i < 16; i++)
+            fprintf(stderr, "   ");
+        fprintf(stderr, " ");
+        for (i = 0; i < 16 && i < _len; i++)
+            fprintf(stderr, "%c", (_data[i] & 0x70) < 32 ? '·' : _data[i]);
+        fprintf(stderr, "\n");
+    }
 }
 
 #if 0
@@ -56,40 +59,40 @@ void hexdump(unsigned char *_data, int _len) {
 // You can use the pointer to the function for anything you want to.
 // Return: a thread handle.
 pthread_t *detach(void *(*_fn)(void *), void *_arg) {
-  pthread_t *thread = new pthread_t();
-  if (pthread_create(thread, NULL, _fn, _arg))
-    perror("pthread");
-  return thread;
+    pthread_t *thread = new pthread_t();
+    if (pthread_create(thread, NULL, _fn, _arg))
+        perror("pthread");
+    return thread;
 }
 #endif
 
 //////////////////////////////////////////////////
 // Upcase a char.
 char upchar(char c) {
-  if (c >= 'a' && c <= 'z')
-    return c - 'a' + 'A';
-  else if (c == 'ä')
-    return 'Ä';
-  else if (c == 'ö')
-    return 'Ö';
-  else if (c == 'ü')
-    return 'Ü';
-  else
-    return c;
+    if (c >= 'a' && c <= 'z')
+        return c - 'a' + 'A';
+    else if (c == 'ä')
+        return 'Ä';
+    else if (c == 'ö')
+        return 'Ö';
+    else if (c == 'ü')
+        return 'Ü';
+    else
+        return c;
 }
 
 //////////////////////////////////////////////////
 // Upcase a 0-terminated string.
 void upper(char *upstr, char *str) {
-  for (; *str; str++, upstr++)
-    *upstr = upchar(*str);
-  *upstr = '\0';
+    for (; *str; str++, upstr++)
+        *upstr = upchar(*str);
+    *upstr = '\0';
 }
 
 //////////////////////////////////////////////////
 // Upcase a 0-terminated string, but at most n chars.
 void upper(char *upstr, char *str, int n) {
-  for (; *str && n; str++, upstr++, n--)
-    *upstr = upchar(*str);
-  if (n) *upstr = '\0';
+    for (; *str && n; str++, upstr++, n--)
+        *upstr = upchar(*str);
+    if (n) *upstr = '\0';
 }

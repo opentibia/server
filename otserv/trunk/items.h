@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.3  2002/05/28 13:55:56  shivoc
+// some minor changes
+//
 // Revision 1.2  2002/04/08 15:57:03  shivoc
 // made some changes to be more ansi compliant
 //
@@ -40,22 +43,22 @@ class ItemType {
     unsigned short tibiaid; // the ID in the Tibia protocol
     unsigned short weight; // weight of the item, e.g. throwing distance depends on it
     std::string name; // the name of the item
-    
+
     // other vars:
     // what items can be used on what other items? pointer to function, think on implementation
-    
+
     bool iscontainer : 1;
     bool stackable : 1;
     bool groundtile : 1; // is this necessary?
     bool walkable : 1; // people can walk on it
     bool pickupable : 1; // people can pick it up
     // other bools
-public:
+    public:
     const static unsigned short WATER = 0x0000;
     const static unsigned short GRASS = 0x0001;
 
     bool isContainer(); // return if this item is a Container
-    
+
     // maybe it should be enough if itemtypes van be defined with constructors only.
     ItemType();
     // some simple constructor:
@@ -65,13 +68,14 @@ public:
 
 class Items {
     struct eqItemType {
-	bool operator() (unsigned short it1, unsigned short it2) const {
-	    // ...
-	}
+        bool operator() (unsigned short it1, unsigned short it2) const {
+            // ...
+            return 1;
+        }
     };
     typedef std::hash_map<unsigned short, ItemType, std::hash<unsigned short>, eqItemType> ItemHash;
     ItemHash items;
-public:
+    public:
     Items();
     ~Items();
 };

@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.3  2002/05/28 13:55:56  shivoc
+// some minor changes
+//
 // Revision 1.2  2002/04/08 13:53:59  acrimon
 // Added some very basic map support
 //
@@ -34,49 +37,49 @@
 #include "items.h"
 
 class Item {
-private:
-    unsigned id;  // the same id as in ItemType
+    private:
+        unsigned id;  // the same id as in ItemType
 
-private: // the following, I will have to rethink:
-    // could be union:
-    unsigned short itemcount; // number of stacked items
-    unsigned short actualitems; // number of items in container
-    // list of items if this is a container
-    std::list<Item *> lcontained;
-    
-public:
-    unsigned getID();    // ID as in ItemType
-    
-    // get the number of items or 0 if non stackable
-    unsigned short getItemCount();
-    
-    // Constructor for items
-    Item(const unsigned short _type);
-    
-    ~Item();
-    
-    // definition for iterator over backpack items
-    typedef std::list<Item *>::const_iterator iterator;
-    iterator getItems();     // begin();
-    iterator getEnd();       // iterator beyond the last element
-    void addItem(Item*);     // add an item to the container
-    Item& operator<<(Item*); // put items into the container
+    private: // the following, I will have to rethink:
+        // could be union:
+        unsigned short itemcount; // number of stacked items
+        unsigned short actualitems; // number of items in container
+        // list of items if this is a container
+        std::list<Item *> lcontained;
+
+    public:
+        unsigned getID();    // ID as in ItemType
+
+        // get the number of items or 0 if non stackable
+        unsigned short getItemCount();
+
+        // Constructor for items
+        Item(const unsigned short _type);
+
+        ~Item();
+
+        // definition for iterator over backpack items
+        typedef std::list<Item *>::const_iterator iterator;
+        iterator getItems();     // begin();
+        iterator getEnd();       // iterator beyond the last element
+        void addItem(Item*);     // add an item to the container
+        Item& operator<<(Item*); // put items into the container
 };
 
 // now we declare exceptions we throw...
 class TE_Nocontainer : public texception {
-public:
-    TE_Nocontainer() : texception("Item is not a container!", false) {}
+    public:
+        TE_Nocontainer() : texception("Item is not a container!", false) {}
 };
-    
+
 class TE_BadItem : public texception {
-public:
-    TE_BadItem() : texception("Item is invalid!", false) {}
+    public:
+        TE_BadItem() : texception("Item is invalid!", false) {}
 };
 
 class TE_ContainerFull : public texception {
-public:
-    TE_ContainerFull() : texception("container is full!", false) {}
+    public:
+        TE_ContainerFull() : texception("container is full!", false) {}
 };
 
 #endif

@@ -21,6 +21,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.3  2002/05/28 13:55:56  shivoc
+// some minor changes
+//
 // Revision 1.2  2002/04/05 20:02:23  acrimon
 // *** empty log message ***
 //
@@ -34,103 +37,103 @@
 #include "tools.h"
 
 File::File() {
-  error = false;
-  data = NULL;
-  size = 0;
+    error = false;
+    data = NULL;
+    size = 0;
 }
 
 File::File(const File& _file) {
-  data = NULL;
-  *this = _file;
+    data = NULL;
+    *this = _file;
 }
 
 File& File::operator=(const File& _file) {
-  error = _file.error;
-  size = _file.size;
-  if (data) delete data;
-  if (_file.data) {
-    data = new char[size + 1];
-    for (int i = size; i >= 0; i--)
-      data[i] = _file.data[i];
-  } else
-    data = NULL;
-  return *this;
+    error = _file.error;
+    size = _file.size;
+    if (data) delete data;
+    if (_file.data) {
+        data = new char[size + 1];
+        for (int i = size; i >= 0; i--)
+            data[i] = _file.data[i];
+    } else
+        data = NULL;
+    return *this;
 }
 
 File::File(char *_filename) {
-  ifstream I(_filename);
-  if (!I.good()) {
-    cerr << "Datei " << _filename << " cannot be read." << endl;
-    error = true;
-    size = 0;
-  }
-  I.seekg(-1, ios::end);
-  size = I.tellg();
-  if (!size) {
-    data = NULL;
-    size = 0;
+    ifstream I(_filename);
+    if (!I.good()) {
+        cerr << "Datei " << _filename << " cannot be read." << endl;
+        error = true;
+        size = 0;
+    }
+    I.seekg(-1, ios::end);
+    size = I.tellg();
+    if (!size) {
+        data = NULL;
+        size = 0;
+        error = false;
+        return;
+    }
+    data = new char[size + 1];
+    data[size] = '\0';
+    I.seekg(0, ios::beg);
+    I.read(data, size);
+    if (!I.good()) {
+        cerr << "Error reading file " << _filename << endl;
+        error = true;
+    }
+    I.close();
     error = false;
-    return;
-  }
-  data = new char[size + 1];
-  data[size] = '\0';
-  I.seekg(0, ios::beg);
-  I.read(data, size);
-  if (!I.good()) {
-    cerr << "Error reading file " << _filename << endl;
-    error = true;
-  }
-  I.close();
-  error = false;
 }
 
 // Ich weiß noch nicht ob das für cin funktioniert.
 File::File(istream _I) {
-  if (!_I.good()) {
-    cerr <<"Eingabedatei kann nicht gelesen werden\n";
-    error = true;
-    size = 0;
-  }
-  _I.seekg(-1, ios::end);
-  size = _I.tellg();
-  if (!size) {
-    cerr << "Eingabedatei ist leer.\n";
-    error = true;
-  }
-  data = new char[size + 1];
-  data[size] = '\0';
-  _I.seekg(0, ios::beg);
-  _I.read(data, size);
-  if (!_I.good()) {
-    cerr << "Fehler beim Lesen der Eingabedatei." << endl;
-    error = true;
-  }
-  error = false;
+    if (!_I.good()) {
+        cerr <<"Eingabedatei kann nicht gelesen werden\n";
+        error = true;
+        size = 0;
+    }
+    _I.seekg(-1, ios::end);
+    size = _I.tellg();
+    if (!size) {
+        cerr << "Eingabedatei ist leer.\n";
+        error = true;
+    }
+    data = new char[size + 1];
+    data[size] = '\0';
+    _I.seekg(0, ios::beg);
+    _I.read(data, size);
+    if (!_I.good()) {
+        cerr << "Fehler beim Lesen der Eingabedatei." << endl;
+        error = true;
+    }
+    error = false;
 }
 
 File::~File() {
-  if (data) delete data;
+    if (data) delete data;
 }
 
 TextFile::TextFile() : File() {
-  curpos = data;
+    curpos = data;
 }
 
 TextFile::TextFile(char *_filename) : File(_filename) {
-  curpos = data;
+    curpos = data;
 }
 
 TextFile::TextFile(const TextFile& _file) {
-  data = NULL;
-  *this = _file;
+    data = NULL;
+    *this = _file;
 }
 
 TextFile& TextFile::operator=(const TextFile& _file) {
-  char *oldcurpos = _file.curpos;
-  long relpos = _file.curpos - _file.data;
-  *((File *) this) = *((File *) &_file);
-  curpos = oldcurpos ? (data + relpos) : NULL;
-  return *this;
+    char *oldcurpos = _file.curpos;
+    long relpos = _file.curpos - _file.data;
+    *((File *) this) = *((File *) &_file);
+    curpos = oldcurpos ? (data + relpos) : NULL;
+    return *this;
 }
 
 //////////////////////////////////////////////////
@@ -139,124 +142,123 @@ TextFile& TextFile::operator=(const TextFile& _file) {
 // Return: the number of read lines
 // Parameter: use _delim as line separator
 int TextFile::splitlines(char ** &_A, char _delim = '\n') {
-  int lines = 1;
-  int i = 0;
-  for (; i < getsize(); i++) {   // Zeilen zählen
-    if (data[i] == _delim)
-      data[i] = 0;
-    if (data[i] == 0)
-      lines++;
-  }
-  _A = new char *[lines];
-  _A[0] = data;
-  i = 0;
-  for (int c = 1; c < lines; _A[c++] = data + i) // und eintragen
-    while (data[i++])
-      ;
-  return lines;
+    int lines = 1;
+    int i = 0;
+    for (; i < getsize(); i++) {   // Zeilen zählen
+        if (data[i] == _delim)
+            data[i] = 0;
+        if (data[i] == 0)
+            lines++;
+    }
+    _A = new char *[lines];
+    _A[0] = data;
+    i = 0;
+    for (int c = 1; c < lines; _A[c++] = data + i) // und eintragen
+        while (data[i++])
+            ;
+    return lines;
 }
 
 char *TextFile::extractnextname() {
-  char *namebeg = curpos;
-  bool inname = true;
-  char *lastempty = NULL;
-  bool seperator = false;
-  int paren = 0;
-  marks = 0;
-  if (*curpos == '\0') {
-    curpos = data;
-    return NULL;
-  }
-  for (;;) {
-    if (upchar(*curpos) >= 'A' && upchar(*curpos) <= 'Z' ||
-	upchar(*curpos) == 'Ä' || upchar(*curpos) == 'Ö' || upchar(*curpos) == 'Ü' ||
-	*curpos == 'ß' ||
-	*curpos == '\'' || *curpos == '.') {
-      curpos++;
-    } else if (*curpos == ' ' || *curpos == '-') {
-      if (lastempty + 1 == curpos) {
-	lastempty[0] = '\0';
-	curpos++;
-	break;
-      } else {
-	lastempty = curpos;
-	curpos++;
-      }
-    } else if (*curpos == '=' || *curpos == '<' || *curpos == '\n') {
-      seperator = true;
-      if (lastempty + 1 == curpos)
-	lastempty[0] = '\0';
-      else
-	curpos[0] = '\0';
-      curpos++;
-      break;
-    } else if (*curpos == '?') {
-      curpos[0] = '\0';
-      marks++;
-      curpos++;
-      break;
-    } else if (*curpos == ':' || *curpos == ',') {
-      curpos[0] = '\0';
-      curpos++;
-      break;
-    } else if (*curpos == '(') {
-      paren++;
-      if (lastempty + 1 == curpos)
-	lastempty[0] = '\0';
-      else
-	curpos[0] = '\0';
-      curpos++;
-      break;
-    } else if (*curpos == '\0') {
-      return namebeg;
-    } else {
-      cout << "char " << *curpos << " occured inname" << endl;
-      curpos++;
+    char *namebeg = curpos;
+    char *lastempty = NULL;
+    bool seperator = false;
+    int paren = 0;
+    marks = 0;
+    if (*curpos == '\0') {
+        curpos = data;
+        return NULL;
     }
-  }
-  if (!seperator) for (;;) {
-    while (paren) {
-      if (*curpos == '(')
-	paren++;
-      else if (*curpos == ')')
-	paren--;
-      curpos++;
+    for (;;) {
+        if (upchar(*curpos) >= 'A' && upchar(*curpos) <= 'Z' ||
+                upchar(*curpos) == 'Ä' || upchar(*curpos) == 'Ö' || upchar(*curpos) == 'Ü' ||
+                *curpos == 'ß' ||
+                *curpos == '\'' || *curpos == '.') {
+            curpos++;
+        } else if (*curpos == ' ' || *curpos == '-') {
+            if (lastempty + 1 == curpos) {
+                lastempty[0] = '\0';
+                curpos++;
+                break;
+            } else {
+                lastempty = curpos;
+                curpos++;
+            }
+        } else if (*curpos == '=' || *curpos == '<' || *curpos == '\n') {
+            seperator = true;
+            if (lastempty + 1 == curpos)
+                lastempty[0] = '\0';
+            else
+                curpos[0] = '\0';
+            curpos++;
+            break;
+        } else if (*curpos == '?') {
+            curpos[0] = '\0';
+            marks++;
+            curpos++;
+            break;
+        } else if (*curpos == ':' || *curpos == ',') {
+            curpos[0] = '\0';
+            curpos++;
+            break;
+        } else if (*curpos == '(') {
+            paren++;
+            if (lastempty + 1 == curpos)
+                lastempty[0] = '\0';
+            else
+                curpos[0] = '\0';
+            curpos++;
+            break;
+        } else if (*curpos == '\0') {
+            return namebeg;
+        } else {
+            cout << "char " << *curpos << " occured inname" << endl;
+            curpos++;
+        }
     }
-    if (*curpos == '=' || *curpos == '<' || *curpos == '\n') {
-      curpos++;
-      break;
-    } else if (*curpos == '(') {
-      paren++;
-    } else if (*curpos == '\0') {
-      return namebeg;
-    } else if (*curpos == '?') {
-      marks++;
+    if (!seperator) for (;;) {
+        while (paren) {
+            if (*curpos == '(')
+                paren++;
+            else if (*curpos == ')')
+                paren--;
+            curpos++;
+        }
+        if (*curpos == '=' || *curpos == '<' || *curpos == '\n') {
+            curpos++;
+            break;
+        } else if (*curpos == '(') {
+            paren++;
+        } else if (*curpos == '\0') {
+            return namebeg;
+        } else if (*curpos == '?') {
+            marks++;
+        }
+        curpos++;
     }
-    curpos++;
-  }
-  for (;;) {
-    while (paren) {
-      if (*curpos == '(')
-	paren++;
-      else if (*curpos == ')')
-	paren--;
-      curpos++;
+    for (;;) {
+        while (paren) {
+            if (*curpos == '(')
+                paren++;
+            else if (*curpos == ')')
+                paren--;
+            curpos++;
+        }
+        if (*curpos == '(') {
+            paren++;
+            curpos++;
+        } else if (*curpos == '\0') {
+            return namebeg;
+        } else if (upchar(*curpos) >= 'A' && upchar(*curpos) <= 'Z' ||
+                upchar(*curpos) == 'Ä' || upchar(*curpos) == 'Ö' || upchar(*curpos) == 'Ü') {
+            return namebeg;
+        } else
+            curpos++;
     }
-    if (*curpos == '(') {
-      paren++;
-      curpos++;
-    } else if (*curpos == '\0') {
-      return namebeg;
-    } else if (upchar(*curpos) >= 'A' && upchar(*curpos) <= 'Z' ||
-	       upchar(*curpos) == 'Ä' || upchar(*curpos) == 'Ö' || upchar(*curpos) == 'Ü') {
-      return namebeg;
-    } else
-      curpos++;
-  }
-  
-  return namebeg;
+
+    return namebeg;
 }
 
 int TextFile::getmarks() {
-  return marks;
+    return marks;
 }

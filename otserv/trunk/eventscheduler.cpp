@@ -21,6 +21,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.6  2002/05/28 13:55:56  shivoc
+// some minor changes
+//
 // Revision 1.5  2002/04/08 15:57:03  shivoc
 // made some changes to be more ansi compliant
 //
@@ -46,23 +49,23 @@
 extern EventScheduler es;
 
 EventScheduler::EventScheduler() {
-  FD_ZERO(&active_fd_set);
-  FD_ZERO(&read_fd_set);
+    FD_ZERO(&active_fd_set);
+    FD_ZERO(&read_fd_set);
 }
 
 //////////////////////////////////////////////////
 // If an open socket should be listened to, call this.
 void EventScheduler::newsocket(Socket _sock, unary_functor<Socket,void> *_cb) {
-  FD_SET(_sock, &active_fd_set);
-  fdcb[_sock] = _cb;
-  printf("new socket to listen: %d   %d\n", _sock, _cb);
+    FD_SET(_sock, &active_fd_set);
+    fdcb[_sock] = _cb;
+    printf("new socket to listen: %d   %d\n", _sock, _cb);
 }
 
 //////////////////////////////////////////////////
 // The socket should not be listened to anymore.
 void EventScheduler::deletesocket(Socket _sock) {
-  FD_CLR(_sock, &active_fd_set);
-  fdcb.erase(_sock);
+    FD_CLR(_sock, &active_fd_set);
+    fdcb.erase(_sock);
 }
 
 //////////////////////////////////////////////////
@@ -70,25 +73,25 @@ void EventScheduler::deletesocket(Socket _sock) {
 // It does not return.
 // Todo: optionally returning when no socket is listened to anymore.
 void EventScheduler::loop() {
-  struct timeval tv = {1, 0};
-  for (;;) {
-    if (tv.tv_sec == 0 && tv.tv_usec == 0) {
-//      cout << "time event" << endl;
-      tv.tv_sec = 1;
+    struct timeval tv = {1, 0};
+    for (;;) {
+        if (tv.tv_sec == 0 && tv.tv_usec == 0) {
+            //      cout << "time event" << endl;
+            tv.tv_sec = 1;
+        }
+        read_fd_set = active_fd_set;
+        int sel = select(FD_SETSIZE, &read_fd_set, NULL, NULL, &tv);
+        if (sel < 0) {
+            perror("select");
+            exit(-1);
+        }
+        //    cout << "loop ";
+        for (Socket i = 0; sel && i < FD_SETSIZE; i++) {
+            if (FD_ISSET(i, &read_fd_set) > 0) { // if there was input:
+                sel--;
+                std::cout << "socket event " << i << std::endl;
+                (*fdcb[i])(i);  // call the callback
+            }
+        }
     }
-    read_fd_set = active_fd_set;
-    int sel = select(FD_SETSIZE, &read_fd_set, NULL, NULL, &tv);
-    if (sel < 0) {
-      perror("select");
-      exit(-1);
-    }
-//    cout << "loop ";
-    for (Socket i = 0; sel && i < FD_SETSIZE; i++) {
-      if (FD_ISSET(i, &read_fd_set) > 0) { // if there was input:
-	sel--;
-	std::cout << "socket event " << i << std::endl;
-	(*fdcb[i])(i);  // call the callback
-      }
-    }
-  }
 }

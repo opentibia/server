@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.3  2002/05/28 13:55:56  shivoc
+// some minor changes
+//
 // Revision 1.2  2002/04/08 13:53:59  acrimon
 // Added some very basic map support
 //
@@ -60,11 +63,11 @@ void Item::addItem(Item *newitem) {
     //if (!iscontainer) throw TE_NoContainer();
     if (newitem == NULL) throw TE_BadItem();
     //if (maxitems <=actualitems) throw TE_ContainerFull();
-    
+
     // seems we should add the item...
     // new items just get placed in front of the items we already have...
     lcontained.push_front(newitem);
-    
+
     // increase the itemcount
     actualitems++;
 }
@@ -72,18 +75,18 @@ void Item::addItem(Item *newitem) {
 //////////////////////////////////////////////////
 // returns iterator to itemlist
 Item::iterator Item::getItems() {
-	return lcontained.begin();
+    return lcontained.begin();
 }
 
 //////////////////////////////////////////////////
 // return iterator to one beyond the last item
 Item::iterator Item::getEnd() {
-	return lcontained.end();
+    return lcontained.end();
 }
 
 //////////////////////////////////////////////////
 // add item into the container
 Item& Item::operator<<(Item* toAdd) {
-	addItem(toAdd);
-	return *this;
+    addItem(toAdd);
+    return *this;
 }
