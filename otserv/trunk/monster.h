@@ -48,7 +48,7 @@ public:
 		
 		if(ticksleft <= 0) {
 			ticksleft = cycleTicks;
-			bool ret = (random_range(probability, 100) >= probability);
+			bool ret = (random_range(1, 100) <= probability);
 			return ret;
 		}
 
