@@ -35,7 +35,7 @@ namespace Creatures {
 		public:
 
 			// our constructor
-			Player(const SOCKET&);
+			Player(const Socket&);
 
 			// virtual destructor to be overloaded...
 			virtual ~Player();

@@ -28,7 +28,7 @@ namespace Protokoll {
 
 			// our constructor get's the socket of the client and the initial
 			// message the client sent
-			TProt(const SOCKET&, const string&) throw(texception);
+			TProt(const Socket&, const string&) throw(texception);
 
 			// set the map and update the client screen
 //			void setMap(Map::mapposition) throw(texception);
@@ -37,7 +37,7 @@ namespace Protokoll {
 			const std::string getName() const throw();
 			const std::string getPassword() const throw();
 
-			void clread(const SOCKET& sock) throw();
+			void clread(const Socket& sock) throw();
 
 			// our destructor to clean up the mess we made...
 			~TProt() throw();
@@ -45,7 +45,7 @@ namespace Protokoll {
 		private:
 
 			// the socket the player is on...
-			SOCKET psocket;
+			Socket psocket;
 			// the os of the client...
 			unsigned char clientos;
 			// version of the client

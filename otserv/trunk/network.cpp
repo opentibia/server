@@ -38,14 +38,14 @@
 #endif
 
 /****************************************************************
-Method: void StartServer(SOCKET&)
+Method: void StartServer(Socket&)
 ------------------------------
 
 Sets up the Server and starts listen for connections
 
  ****************************************************************/
 
-void TNetwork::StartServer(SOCKET& listen_socket) throw(texception) {
+void TNetwork::StartServer(Socket& listen_socket) throw(texception) {
 	int yes=1;
 
 #ifdef __WINDOWS__
@@ -122,12 +122,12 @@ void TNetwork::StartServer(SOCKET& listen_socket) throw(texception) {
 		throw texception("network.cpp: listen on socket not possible!", true);
 	} // if (listen(listen_socket,10) == -1)
 
-} // void TNetwork::StartServer(SOCKET& listen_socket) throw(texception)
+} // void TNetwork::StartServer(Socket& listen_socket) throw(texception)
 
 
 
 /****************************************************************
-Method: void ShutdownServer(const SOCKET&)
+Method: void ShutdownServer(const Socket&)
 ---------------------------------
 
 Shutdown the Server...
@@ -135,7 +135,7 @@ only shuts down the connection
 
  ****************************************************************/
 
-void TNetwork::ShutdownServer(const SOCKET& listen_socket) throw() {
+void TNetwork::ShutdownServer(const Socket& listen_socket) throw() {
 #ifdef __LINUX__
 	close(listen_socket);
 #endif // __LINUX__
@@ -145,18 +145,18 @@ void TNetwork::ShutdownServer(const SOCKET& listen_socket) throw() {
 	WSACleanup();
 #endif
 
-} // void TNetwork::ShutdownServer(const SOCKET& listen_socket) throw()
+} // void TNetwork::ShutdownServer(const Socket& listen_socket) throw()
 
 
 /****************************************************************
-Method: void SendData(const SOCKET&, const string&)
+Method: void SendData(const Socket&, const string&)
 ------------------------------------------
 
 sends Data to the player
 
  ****************************************************************/
 
-void TNetwork::SendData(const SOCKET& playersocket, const string& data) throw() {
+void TNetwork::SendData(const Socket& playersocket, const string& data) throw() {
 	size_t total=0;  // bytes we sended total...
 	int bytesleft=data.length();  // bytes we need to send...
 	int sent;  // bytes send sent...
@@ -171,19 +171,19 @@ void TNetwork::SendData(const SOCKET& playersocket, const string& data) throw() 
 		bytesleft-=sent;
 	}  // while (total < length)
 
-} // void TNetwork::SendData(const SOCKET& playersocket, const string& data) throw() 
+} // void TNetwork::SendData(const Socket& playersocket, const string& data) throw() 
 
 
 
 /****************************************************************
-Method: string ReceiveData(const SOCKET&, const bool&)
+Method: string ReceiveData(const Socket&, const bool&)
 ------------------------------------------
 
 receives Data from the player
 
  ****************************************************************/
 
-string TNetwork::ReceiveData(const SOCKET& playersocket, const bool& check=true) throw(texception) { 
+string TNetwork::ReceiveData(const Socket& playersocket, const bool& check=true) throw(texception) { 
 	// maximum length to read
 	const size_t max_read = 256;
 
@@ -234,17 +234,17 @@ string TNetwork::ReceiveData(const SOCKET& playersocket, const bool& check=true)
 
 	return readbuf;
 
-} // string TNetwork::ReceiveData(const SOCKET& playersocket, const bool& check=true) throw(texception)  
+} // string TNetwork::ReceiveData(const Socket& playersocket, const bool& check=true) throw(texception)  
 
 
 /****************************************************************
-Method: void ShutdownClient(const SOCKET&)
+Method: void ShutdownClient(const Socket&)
 ------------------------------------------
 
 shuts down the client socket...
 
  ****************************************************************/
-void TNetwork::ShutdownClient(const SOCKET& playersocket) throw() {
+void TNetwork::ShutdownClient(const Socket& playersocket) throw() {
 
 #ifdef __LINUX__
 	close(playersocket);
@@ -254,18 +254,18 @@ void TNetwork::ShutdownClient(const SOCKET& playersocket) throw() {
 	closesocket(playersocket);
 #endif
 
-} // void TNetwork::ShutdownClient(const SOCKET& playersocket) throw() 
+} // void TNetwork::ShutdownClient(const Socket& playersocket) throw() 
 
 
 /****************************************************************
-Method: SOCKET AcceptPlayer(const SOCKET&)
+Method: Socket AcceptPlayer(const Socket&)
 ------------------------------------------
 
 trys to accept a connecting player if possible...
 
  ****************************************************************/
 
-SOCKET TNetwork::AcceptPlayer(const SOCKET& listen) throw(texception) {
+Socket TNetwork::AcceptPlayer(const Socket& listen) throw(texception) {
 
 	struct timeval notime;
 	struct sockaddr from;
@@ -288,7 +288,7 @@ SOCKET TNetwork::AcceptPlayer(const SOCKET& listen) throw(texception) {
 	FD_ZERO(&player);
 	FD_SET(listen,&player);
 
-	SOCKET psocket;
+	Socket psocket;
 
 	if (select(listen+1,&player,NULL,NULL,(struct timeval*)&notime) > 0)
 	{
@@ -298,4 +298,4 @@ SOCKET TNetwork::AcceptPlayer(const SOCKET& listen) throw(texception) {
 
 	return psocket;
 
-} // SOCKET TNetwork::AcceptPlayer(const SOCKET& listen) throw(texception) 
+} // Socket TNetwork::AcceptPlayer(const Socket& listen) throw(texception) 

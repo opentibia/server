@@ -1,7 +1,7 @@
 #include "player.h"
 
 namespace Creatures {
-Player::Player(const SOCKET& sock) : client(sock) {
+Player::Player(const Socket& sock) : client(sock) {
 
 	// we get name and password from the client...
 	cout << (name = client->getName()) << endl;
@@ -11,7 +11,7 @@ Player::Player(const SOCKET& sock) : client(sock) {
 
 	// if everything was checked we should load the player... (TODO)
 	
-} // Player::Player(SOCKET sock) 
+} // Player::Player(Socket sock) 
 
 Player::~Player() {
 } // Player::~Player() 

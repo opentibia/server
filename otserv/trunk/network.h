@@ -28,24 +28,24 @@
 namespace TNetwork {
 
 	// Functions to control the server...
-	void StartServer(SOCKET&) throw(texception);
-	void ShutdownServer(const SOCKET&) throw();
+	void StartServer(Socket&) throw(texception);
+	void ShutdownServer(const Socket&) throw();
 
 	// Functions to send messages to the client...
 
 	// send Data to the client (length, data)
-	void SendData(const SOCKET&, const std::string&) throw();
+	void SendData(const Socket&, const std::string&) throw();
 
 	// receive Data from the Client (length, data)
 	// if there is data (like after accepting the socket) and the check for new
 	// data should be omitted, check should be set to false
-	std::string ReceiveData(const SOCKET&, const bool& check=true) throw(texception);
+	std::string ReceiveData(const Socket&, const bool& check=true) throw(texception);
 
 	// shutdown a client connection...
-	void ShutdownClient(const SOCKET&) throw();
+	void ShutdownClient(const Socket&) throw();
 
 	// accept a connection from a player and return the socket...
-	SOCKET AcceptPlayer(const SOCKET&) throw(texception);
+	Socket AcceptPlayer(const Socket&) throw(texception);
 
 } // Namespace TNetwork 
 

@@ -7,7 +7,7 @@
 extern EventScheduler es;
 
 namespace Protokoll {
-	TProt::TProt(const SOCKET& sock, const string& in) throw(texception) {
+	TProt::TProt(const Socket& sock, const string& in) throw(texception) {
 		// first we save the socket the player connected on...
 		psocket = sock;
 
@@ -60,7 +60,7 @@ namespace Protokoll {
 		if (in[i] != '\0') 
 		throw texception("wrong protokoll!",false);
 
-	} // TProt::TProt(SOCKET sock, string in) throw(texception) 	
+	} // TProt::TProt(Socket sock, string in) throw(texception) 	
 
 	TProt::~TProt() throw() {
 		TNetwork::ShutdownClient(psocket);
@@ -74,7 +74,7 @@ namespace Protokoll {
 		return passwd;
 	}
 
-	void TProt::clread(const SOCKET& sock) throw() {
+	void TProt::clread(const Socket& sock) throw() {
 		  static const int MAXMSG = 4096;
 		  char buffer[MAXMSG];
 

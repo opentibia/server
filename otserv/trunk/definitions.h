@@ -43,7 +43,11 @@ const unsigned TC_MAXX = TC_MINX+TC_MSIZEX;
 const unsigned TC_MAXY = TC_MINY+TC_MSIZEY;
 
 #ifdef __LINUX__
-typedef int SOCKET;
+typedef int Socket;
+#endif
+
+#ifdef __WINDOWS__
+typedef SOCKET Socket;
 #endif
 
 #endif // __definitions_h

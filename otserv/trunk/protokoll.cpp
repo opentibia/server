@@ -6,9 +6,9 @@ namespace Protokoll {
 
 	Protokoll::Protokoll() throw() : cread(*this) { };
 
-	ProtokollP::ProtokollP(const SOCKET& psocket) throw(texception) {
+	ProtokollP::ProtokollP(const Socket& psocket) throw(texception) {
 		// first we check the socket...
-//		SOCKET psocket = TNetwork::AcceptPlayer(sock);
+//		Socket psocket = TNetwork::AcceptPlayer(sock);
 
 		// then we try to read it...
 		string buf=TNetwork::ReceiveData(psocket,false);

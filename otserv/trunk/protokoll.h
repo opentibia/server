@@ -35,7 +35,7 @@ namespace Protokoll {
 			struct clientread : public unary_functor<int ,void> {
 				Protokoll& base;
 				clientread(Protokoll& prot) : base(prot) { };
-				void operator() (const SOCKET &sock) {
+				void operator() (const Socket &sock) {
 					base.clread(sock);
 				}
 			};
@@ -53,7 +53,7 @@ namespace Protokoll {
 			// callback if data arives on our socket
 			clientread cread;
 
-			virtual void clread(const SOCKET &sock) = 0;
+			virtual void clread(const Socket &sock) = 0;
 
 			// set the map and update the client screen
 			//			virtual void setMap(Map::mapposition) throw(texception) =0;
@@ -67,7 +67,7 @@ namespace Protokoll {
 	class ProtokollP {
 		public:
 			// the constructor which choses the socket...
-			ProtokollP(const SOCKET&) throw(texception);
+			ProtokollP(const Socket&) throw(texception);
 
 			// resemble pointer usage...
 			Protokoll* operator->() const throw() {
