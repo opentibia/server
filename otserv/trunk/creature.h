@@ -94,6 +94,7 @@ public:
   virtual int sendInventory(){return 0;};
   virtual int addItem(Item* item, int pos){return 0;};
   virtual Item* getItem(int pos){return NULL;}
+  virtual Direction getDirection(){return direction;}
 
 
   int lookhead, lookbody, looklegs, lookfeet, looktype, lookcorpse;

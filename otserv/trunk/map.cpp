@@ -42,6 +42,7 @@ using namespace std;
 #include "networkmessage.h"
 
 #include "npc.h"
+#include "spells.h"
 
 #include "luascript.h"
 #include <ctype.h>
@@ -50,7 +51,7 @@ using namespace std;
 #define EVENT_CHECKPLAYERATTACKING 124
 
 extern LuaScript g_config;
-
+extern Spells spells;
 Map::Map()
 {
 	//first we fill the map with
@@ -1207,7 +1208,7 @@ void Map::creatureMakeMagic(Creature *creature, const EffectInfo &ei)
 
 void Map::creatureCastSpell(Creature *creature, const EffectInfo &ei) {
   OTSYS_THREAD_LOCK(mapLock)
-
+  
 	creatureMakeMagic(creature, ei);
 
 	OTSYS_THREAD_UNLOCK(mapLock)
@@ -1699,313 +1700,40 @@ bool Map::creatureSaySpell(Creature *creature, const std::string &text)
 {
   OTSYS_THREAD_LOCK(mapLock)
 	bool ret = false;
-
-	//This should be loaded from somewhere later (lua? or xml perhaps)
-	if(strcmp(text.c_str(), "exura vita") == 0) {
-		static unsigned char area[14][18] = {
-			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-		};
-
-		EffectInfo ei;
-		ei.animationEffect = 0;
-		ei.damageEffect = NM_ME_MAGIC_ENERGIE;
-		ei.areaEffect = 0;
-		ei.animationcolor = MSG_INFO; 
-		ei.offensive = false;
-		ei.needtarget = true;
-		ei.centerpos = creature->pos;
-		memcpy(&ei.area, area, sizeof(area));
-		ei.direction = 1;
-		ei.manaCost = 100;
-		ei.minDamage = (int)(((creature->level + creature->maglevel) * 3) * 1.0);
-		ei.maxDamage = (int)(((creature->level + creature->maglevel) * 3) * 1.2);
-		
-		creatureMakeMagic(creature, ei);
-		ret = true;
-	}
-	else if(strcmp(text.c_str(), "exevo gran mas vis") == 0) {
-
-			static unsigned char area[14][18] = {
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0},
-				{0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0},
-				{0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0},
-				{0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0},
-				{0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-			};
-
-
-		EffectInfo ei;
-		ei.animationEffect = 0;
-		ei.damageEffect = NM_ME_EXPLOSION_DAMAGE;
-		ei.areaEffect = NM_ME_EXPLOSION_AREA;
-		ei.animationcolor = 0xB4; 
-		ei.offensive = true;
-		ei.needtarget = false;
-		ei.centerpos = creature->pos;
-		memcpy(&ei.area, area, sizeof(area));
-		ei.direction = 1;
-		ei.manaCost = 800;
-		ei.minDamage = (int)(((creature->level + creature->maglevel) * 3) * 1.4) / 2;
-		ei.maxDamage = (int)(((creature->level + creature->maglevel) * 3) * 2.0) / 2;
-		
-		creatureMakeMagic(creature, ei);
-		ret = true;
-	}
-	else if(strcmp(text.c_str(), "exura gran mas res") == 0) {
-
-		static unsigned char area[14][18] = {
-			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0},
-			{0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0},
-			{0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0},
-			{0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0},
-			{0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-		};
-
-		EffectInfo ei;
-		ei.animationEffect = 0;
-		ei.damageEffect = NM_ME_MAGIC_ENERGIE;
-		ei.areaEffect = NM_ME_MAGIC_ENERGIE;
-		ei.animationcolor = MSG_INFO; 
-		ei.offensive = false;
-		ei.needtarget = false;
-		ei.centerpos = creature->pos;
-		memcpy(&ei.area, area, sizeof(area));
-		ei.direction = 1;
-		ei.manaCost = 400;
-		ei.minDamage = (int)(((creature->level + creature->maglevel) * 3) * 1.0);
-		ei.maxDamage = (int)(((creature->level + creature->maglevel) * 3) * 1.2);
-		
-		creatureMakeMagic(creature, ei);
-		ret = true;
-	}
-	else if(strcmp(text.c_str(), "exori vis") == 0) {
-
-		static unsigned char area[14][18] = {
-			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 0, 2, 0, 3, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-		};
-
-
-		EffectInfo ei;
-		ei.animationEffect = 0;
-		ei.damageEffect = NM_ME_ENERGY_DAMAGE;
-		ei.areaEffect = NM_ME_ENERGY_AREA;
-		ei.animationcolor = 0xB4; 
-		ei.offensive = true;
-		ei.needtarget = false;
-		ei.centerpos = creature->pos;
-		memcpy(&ei.area, area, sizeof(area));
-		switch(creature->direction) {
-			case NORTH: ei.direction = 1; break;
-			case WEST: ei.direction = 2; break;
-			case EAST: ei.direction = 3; break;
-			case SOUTH: ei.direction = 4; break;
-		};
-
-		ei.manaCost = 20;
-		ei.minDamage = (int)(((creature->level + creature->maglevel) * 3) * 0.3) / 2;
-		ei.maxDamage = (int)(((creature->level + creature->maglevel) * 3) * 0.4) / 2;
-		
-		creatureMakeMagic(creature, ei);
-		ret = true;
-	}
-	else if(strcmp(text.c_str(), "exori mort") == 0) {
-
-		static unsigned char area[14][18] = {
-			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 0, 2, 0, 3, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-		};
-
-
-		EffectInfo ei;
-		ei.animationEffect = 0;
-		ei.damageEffect = NM_ME_MORT_AREA;
-		ei.areaEffect = NM_ME_MORT_AREA;
-		ei.animationcolor = 0xB4; 
-		ei.offensive = true;
-		ei.needtarget = false;
-		ei.centerpos = creature->pos;
-		memcpy(&ei.area, area, sizeof(area));
-		switch(creature->direction) {
-			case NORTH: ei.direction = 1; break;
-			case WEST: ei.direction = 2; break;
-			case EAST: ei.direction = 3; break;
-			case SOUTH: ei.direction = 4; break;
-		};
-
-		ei.manaCost = 20;
-		ei.minDamage = (int)(((creature->level + creature->maglevel) * 3) * 0.3) / 2;
-		ei.maxDamage = (int)(((creature->level + creature->maglevel) * 3) * 0.4) / 2;
-		
-		creatureMakeMagic(creature, ei);
-		ret = true;
-	}
-	else if(strcmp(text.c_str(), "exori") == 0) {
-		static unsigned char area[14][18] = {
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-			};
-
-		EffectInfo ei;
-		ei.animationEffect = 0;
-		ei.damageEffect = NM_ME_HIT_AREA;
-		ei.areaEffect = NM_ME_HIT_AREA;
-		ei.animationcolor = 0xB4; 
-		ei.offensive = true;
-		ei.needtarget = false;
-		ei.centerpos = creature->pos;
-		memcpy(&ei.area, area, sizeof(area));
-		ei.direction = 1;
-		ei.manaCost = 250;
-		ei.minDamage = (int)(((creature->level + creature->maglevel) * 3) * 0.7) / 2;
-		ei.maxDamage = (int)(((creature->level + creature->maglevel) * 3) * 1.1) / 2;
-		
-		creatureMakeMagic(creature, ei);
-		ret = true;
-	}
-	else if(strcmp(text.c_str(), "exevo mort hur") == 0) {
-		static unsigned char area[14][18] = {
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 2, 2, 2, 0, 0, 1, 0, 0, 3, 3, 3, 0, 0, 0},
-				{0, 0, 0, 2, 2, 2, 2, 2, 0, 3, 3, 3, 3, 3, 0, 0, 0},
-				{0, 0, 0, 2, 2, 2, 0, 0, 4, 0, 0, 3, 3, 3, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-			};
-
-
-		EffectInfo ei;
-		ei.animationEffect = 0;
-		ei.damageEffect = NM_ME_ENERGY_DAMAGE;
-		ei.areaEffect = NM_ME_ENERGY_AREA;
-		ei.animationcolor = 0xB4; 
-		ei.offensive = true;
-		ei.needtarget = false;
-		ei.centerpos = creature->pos;
-		memcpy(&ei.area, area, sizeof(area));
-		switch(creature->direction) {
-			case NORTH: ei.direction = 1; break;
-			case WEST: ei.direction = 2; break;
-			case EAST: ei.direction = 3; break;
-			case SOUTH: ei.direction = 4; break;
-		};
-
-		ei.manaCost = 250;
-		ei.minDamage = (int)(((creature->level + creature->maglevel) * 3) * 0.7) / 2;
-		ei.maxDamage = (int)(((creature->level + creature->maglevel) * 3) * 1.3) / 2;
-		
-		creatureMakeMagic(creature, ei);
-		ret = true;
-	}
-	else if(strcmp(text.c_str(), "exevo vis lux") == 0) {
-		static unsigned char area[14][18] = {
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 2, 2, 2, 2, 0, 3, 3, 3, 3, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-			};
-
-		
-		EffectInfo ei;
-		ei.animationEffect = 0;
-		ei.damageEffect = NM_ME_ENERGY_DAMAGE;
-		ei.areaEffect = NM_ME_ENERGY_AREA;
-		ei.animationcolor = 0xB4; 
-		ei.offensive = true;
-		ei.needtarget = false;
-		ei.centerpos = creature->pos;
-		memcpy(&ei.area, area, sizeof(area));
-		switch(creature->direction) {
-			case NORTH: ei.direction = 1; break;
-			case WEST: ei.direction = 2; break;
-			case EAST: ei.direction = 3; break;
-			case SOUTH: ei.direction = 4; break;
-		};
-
-		ei.manaCost = 100;
-		ei.minDamage = (int)(((creature->level + creature->maglevel) * 3) * 0.8) / 2;
-		ei.maxDamage = (int)(((creature->level + creature->maglevel) * 3) * 1.4) / 2;
-		
-		creatureMakeMagic(creature, ei);
-		ret = true;
-	}
+	Player* player = dynamic_cast<Player*>(creature);
+	std::string temp, var;
+    unsigned int loc = text.find( "\"", 0 );
+    if( loc != string::npos && loc >= 0){
+      temp = std::string(text, 0, loc-1);
+      var = std::string(text, (loc+1), text.size()-loc-1);
+      }
+    else {
+    temp = text;
+    var = std::string(""); 
+    }
+    std::cout << creature << " - " << std::endl;
+    if(creature->access != 0 ){
+                        std::vector<Spell*>::iterator sit;
+                        for (sit = spells.getAllSpells()->begin(); sit != spells.getAllSpells()->end(); sit++){
+                            if(strcmp(temp.c_str(), ((*sit)->getWords()).c_str()) == 0){                                                    
+                                                    (*sit)->getSpellScript()->castSpell(creature, var);
+                                                    ret = true;
+                                                    break;
+                                                    }
+                            }
+    } 
+    else if(player){
+         std::map<std::string, Spell*>* tmp = spells.getVocSpells(player->voc);
+         if(tmp){
+                 std::map<std::string, Spell*>::iterator sit = tmp->find(temp);
+                 if( sit != tmp->end() ) {
+                     if(player->maglevel >= sit->second->getMagLv()){
+                     sit->second->getSpellScript()->castSpell(creature, var);
+                     ret = true;
+                     }
+                     }
+                 }
+         }
 
 
 	OTSYS_THREAD_UNLOCK(mapLock)

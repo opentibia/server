@@ -123,7 +123,7 @@ class Map {
 	  void creatureThrowRune(Creature *creature, const EffectInfo &ei);
   	void creatureCastSpell(Creature *creature, const EffectInfo &ei);
 		bool creatureSaySpell(Creature *creature, const std::string &text);
- 
+
     //void addEvent(long ticks, int type, void *data);
 	  void addEvent(SchedulerTask*);
 

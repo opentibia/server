@@ -34,6 +34,7 @@
 #include "map.h"
 
 #include "status.h"
+#include "spells.h"
 
 #include "luascript.h"
 #include "account.h"
@@ -51,7 +52,7 @@ LuaScript g_config;
 
 Items Item::items;
 Map gmap;
-
+Spells spells(&gmap);
 
 #include "networkmessage.h"
 
@@ -219,6 +220,13 @@ int main(int argc, char *argv[])
   }
   std::cout << "[done]" << std::endl;
 
+std::cout << ":: Loading spells spells.xml... ";
+  if (!spells.loadFromXml())
+  {
+    ErrorMessage("Unable to load spells.xml!");
+    return -1;
+  }
+  std::cout << "[done]" << std::endl;
 
   // load item data
   std::cout << ":: reading tibia.dat ...            ";

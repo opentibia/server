@@ -86,3 +86,18 @@ int LuaScript::setGlobalNumber(std::string var, int val){
 	lua_setglobal(luaState, var.c_str());
 	return true;
 }
+
+int LuaScript::getField (const char *key) {
+      int result;
+      lua_pushstring(luaState, key);
+      lua_gettable(luaState, -2);  /* get table[key] */
+      result = (int)lua_tonumber(luaState, -1);
+      lua_pop(luaState, 1);  /* remove number and key*/
+      return result;
+}
+
+void LuaScript::setField (const char *index, int val) {
+      lua_pushstring(luaState, index);
+      lua_pushnumber(luaState, (double)val);
+      lua_settable(luaState, -3);
+    }

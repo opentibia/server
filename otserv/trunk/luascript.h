@@ -40,7 +40,8 @@ public:
 	~LuaScript();
 
   int OpenFile(const char* file);
-
+  int getField (const char *key);
+  void LuaScript::setField (const char *index, int value);
   // get a global string
   std::string getGlobalString(std::string var, const std::string &defString = "");
   int getGlobalNumber(std::string var, const int defNum = 0);
