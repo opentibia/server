@@ -65,8 +65,6 @@ Game::Game()
 	OTSYS_THREAD_SIGNALVARINIT(eventSignal);
 
 	OTSYS_CREATE_THREAD(eventThread, this);
-
-	max_players = atoi(g_config.getGlobalString("maxplayers").c_str());
 }
 
 
@@ -78,6 +76,7 @@ Game::~Game()
 bool Game::loadMap(std::string filename) {
 	if(!map)
 		map = new Map;
+	max_players = atoi(g_config.getGlobalString("maxplayers").c_str());	
 	return map->loadMap(filename);
 }
 
