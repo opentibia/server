@@ -96,7 +96,8 @@ int Items::loadFromDat(std::string file)
 #endif
 	
 	fseek(f, 0x0C, SEEK_SET);
-
+int a=100;
+bool b = false;
 	// loop throw all Items until we reach the end of file
 	while(ftell(f) < size)
 	{
@@ -131,12 +132,11 @@ int Items::loadFromDat(std::string file)
 				if(iType->speed==0) {
                   iType->blocking=true;
                   }    
-    			fgetc(f);
+                  fgetc(f);
 		   		break;
 
-        case 0x01:
-        case 0x02:
-          // hmmm whats the diff :S
+        case 0x01: // all OnTop
+        case 0x02: // can walk trough (open doors, arces, bug pen fence ??)
           iType->alwaysOnTop=true;
           break;
 
@@ -156,8 +156,8 @@ int Items::loadFromDat(std::string file)
 					break;
 
 				case 0x0A:
-					//is multitype
-          iType->multitype=true;
+					//is multitype !!! wrong definition (only water splash on floor)
+                    iType->multitype=true;
 					break;
 
 				case 0x0B:
@@ -167,7 +167,7 @@ int Items::loadFromDat(std::string file)
 				
 				case 0x0C:
 					//is on moveable
-          iType->notMoveable=true;
+                    iType->notMoveable=true;
 					break;
 	
 				case 0x0F:
@@ -177,28 +177,51 @@ int Items::loadFromDat(std::string file)
 
 				case 0x10:
 					//makes light (skip 4 bytes)
-		   		fseek(f, 4, SEEK_CUR);
+                    fgetc(f); //number of tiles around
+                    fgetc(f); // always 0
+                    fgetc(f); // 215 items, 208 fe non existant items other values
+                    fgetc(f); // always 0
 					break;
 
-        case 0x06:
-        case 0x09:
-        case 0x0D:
-        case 0x0E:
-        case 0x11:
-        case 0x12:
-        case 0x18:
-        case 0x19:
-				case 0x14: // up?
-          break;
+        case 0x06: // ladder up (id 1124)   why a group for just 1 item ???  
+            break;
+        case 0x09: //can contain fluids
+            break;
+        case 0x0D: // blocks missiles (walls, magic wall etc)
+            break;
+        case 0x0E: // blocks monster movement (flowers, parcels etc)
+            break;
+        case 0x11: // can see what is under (ladder holes, stairs holes etc)
+            break;
+        case 0x12: // tiles that don't cause level change
+            break;
+        case 0x18: // cropses that don't decay
+            break;
+        case 0x19: // monster has animation even when iddle (rot, wasp, slime, fe)
+            break;
+        case 0x14: // player color templates
+            break;
 
-				case 0x07:
-				case 0x08:
-				case 0x13:
-				case 0x16:
-				case 0x1A:
-					// unknown, but skip 2 bytes to follow the "ordered option" idea
-		   			fseek(f, 2, SEEK_CUR);
-		   			break;
+				case 0x07: // writtable objects
+                    fgetc(f); //max characters that can be written in it (0 unlimited)
+                    fgetc(f); //max number of  newlines ? 0, 2, 4, 7
+				    break;
+				case 0x08: // writtable objects that can't be edited 
+                    fgetc(f); //always 0 max characters that can be written in it (0 unlimited) 
+                    fgetc(f); //always 4 max number of  newlines ? 
+				    break;
+				case 0x13: // mostly blocking items, but also items that can pile up in level (boxes, chairs etc)
+                    fgetc(f); //always 8
+                    fgetc(f); //always 0
+                    break;
+				case 0x16: // ground, blocking items and mayby some more
+                    fgetc(f); //12, 186, 210, 129 and other.. 
+                    fgetc(f); //always 0
+				    break;
+				case 0x1A: 
+                    fgetc(f); //action that can be performed (doors-> open, hole->open, book->read) not all included ex. wall torches
+                    fgetc(f); //always 4
+				    break;
 				default:
 						std::cout << "unknown byte: " << (unsigned short)optbyte << std::endl;
 			}
