@@ -25,8 +25,10 @@ template<class A, class R> struct unary_functor : public std::unary_function<A,R
   virtual R operator() (const A &) = 0;
 };
 
-#ifdef WINDOWS
+#ifdef __WINDOWS__
+#include <winsock.h>
 typedef SOCKET Socket;
+typedef int socklen_t;
 #else
 typedef signed int Socket;
 #endif

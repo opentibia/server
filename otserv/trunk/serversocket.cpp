@@ -21,6 +21,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.10  2002/04/24 18:25:40  shivoc
+// some changes for win compatibility
+//
 // Revision 1.9  2002/04/08 15:57:03  shivoc
 // made some changes to be more ansi compliant
 //
@@ -41,9 +44,12 @@
 //
 //////////////////////////////////////////////////////////////////////
 
+#ifdef __LINUX__
 #include <sys/socket.h>
 #include <netdb.h>
 #include <arpa/inet.h>
+#endif
+
 #include <stdio.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -55,7 +61,6 @@
 
 #include "player.h"
 #include "texcept.h"
-#include "network.h"
 
 extern EventScheduler es;
 

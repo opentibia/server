@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.7  2002/04/24 18:25:39  shivoc
+// some changes for win compatibility
+//
 // Revision 1.6  2002/04/08 15:57:03  shivoc
 // made some changes to be more ansi compliant
 //
@@ -31,9 +34,7 @@
 #include "network.h"
 
 // include system dependent headers...
-#ifdef __WINDOWS__
-#  include <winsock.h>
-#else
+#ifdef __LINUX__
 #  include <fcntl.h> // fcntl
 #  include <sys/socket.h> // listen bind socket
 #  include <sys/types.h> // bind socket inet_addr select

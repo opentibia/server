@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.2  2002/04/24 18:25:40  shivoc
+// some changes for win compatibility
+//
 // Revision 1.1  2002/04/05 18:56:11  acrimon
 // Adding a file class.
 //
@@ -28,7 +31,9 @@
 #ifndef __TIBIALOG_TOOLS_H_
 #define __TIBIALOG_TOOLS_H_
 
+#if 0
 #include <pthread.h>
+#endif
 
 extern void hexdump(unsigned char *data, int len);
 //extern pthread_t *detach(void *(*fn)(void *), void *arg);

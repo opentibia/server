@@ -21,6 +21,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.7  2002/04/24 18:25:39  shivoc
+// some changes for win compatibility
+//
 // Revision 1.6  2002/04/08 15:57:03  shivoc
 // made some changes to be more ansi compliant
 //
@@ -30,7 +33,9 @@
 //////////////////////////////////////////////////////////////////////
 
 #include <hash_map>
+
 #include "definitions.h"
+#include "network.h"
 
 struct eqfd {
   bool operator() (Socket s1, Socket s2) const {

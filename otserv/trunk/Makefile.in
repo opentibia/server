@@ -24,7 +24,7 @@ all: otserv
 	$(CXX) -c $(DEFINES) $(CXXFLAGS) $<
 
 otserv: $(OBJS)
-	$(CXX) $(DEFINES) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
+	$(CXX) $(DEFINES) $(CXXFLAGS) -o $@$(EXEEXT) $^ $(LDFLAGS)
 
 depend:
 	makedepend -- $(CFLAGS) $(DEFINES) -I/usr/include/g++-3/ -- $(SRC)
