@@ -946,7 +946,7 @@ void Map::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fig
 		break;
 	}
 	if (creature->access == 0) {
-	    creature->pzLockedTicks = +120000;	    
+	    creature->pzLockedTicks = +2000;	    
 	}    
 	if(!inReach)
 		return;
@@ -1266,7 +1266,7 @@ void Map::makeCastSpell(Creature *creature, int mana, int mindamage, int maxdama
 		for(int x = 0; x < 18; x++) {
 			Tile* tile = getTile(pos.x, pos.y, pos.z);
 			if (tile) {
-				if(tile->creatures.empty())
+				if(tile->creatures.empty() || (tile->isPz() && creature->access == 0))
 				{
 					if(area[y][x] == ch)
 						areaPos.push_back(pos);
@@ -1311,7 +1311,7 @@ void Map::makeCastSpell(Creature *creature, int mana, int mindamage, int maxdama
 	}
 	
 	if (creature->access == 0 && !damagelist.empty()) {
-	    creature->pzLockedTicks += 120000;
+	    creature->pzLockedTicks += 2000;
 	}
 
 	//spectators
