@@ -470,9 +470,13 @@ bool Map::removeCreature(Creature* c)
 
   std::cout << playersOnline.size() << " players online." << std::endl;
 
-	Player* player = dynamic_cast<Player*>(c);
-  if (player)
+  Player* player = dynamic_cast<Player*>(c);
+
+  if (player){
+    std::string charName = c->getName();
+    player->savePlayer(charName);                    
     player->releasePlayer();
+  }
 
    OTSYS_THREAD_UNLOCK(mapLock)
 
@@ -2053,7 +2057,7 @@ void Map::checkPlayer(unsigned long id)
           player->manamax = player->manamax+5;
           player->mana = player->mana+5;
           player->setNormalSpeed();
-          player->sendChangeSpeed(player);
+          changeSpeed(player->getID(), player->getSpeed());
           std::stringstream lvMsg;
           lvMsg << "You advanced from level " << lastLv << " to level " << player->level << ".";
           msg.AddTextMessage(MSG_ADVANCE, lvMsg.str().c_str());
@@ -2275,6 +2279,14 @@ void Map::CreateDamageUpdate(Creature* creature, Creature* attackCreature, int d
 			if (player->health <= 0){
                 msg.AddTextMessage(MSG_ADVANCE, "You are dead.");             
 				msg.AddTextMessage(MSG_EVENT, "Own3d!");
+                
+                int reqExp =  player->getExpForLv(player->level);
+                if(player->experience < reqExp)
+                {
+                std::stringstream lvMsg;
+                lvMsg << "You were downgraded from level " << player->level << " to level " << player->level-1 << ".";
+                msg.AddTextMessage(MSG_ADVANCE, lvMsg.str().c_str());
+                }
             }
 }
 

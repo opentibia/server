@@ -406,4 +406,129 @@ void Player::onContainerUpdated(Item *item, unsigned char from_id, unsigned char
 	client->sendContainerUpdated(item, from_id, to_id, from_slot, to_slot, remove);
 }
 
+void Player::savePlayer(std::string &name)
+{  
+    std::string filename = "data/players/"+name+".xml";
+    std::stringstream sb;
+    
+    xmlDocPtr doc;
+	xmlNodePtr nn, sn, pn, root;
+	doc = xmlNewDoc((const xmlChar*)"1.0");
+	doc->children = xmlNewDocNode(doc, NULL, (const xmlChar*)"player", NULL);
+	root = doc->children;
+	
+	if (health <= 0)
+	   {
+       health = healthmax;
+       pos.x = masterPos.x;
+       pos.y = masterPos.y;
+       pos.z = masterPos.z;
+       int expLoss = (int)(experience*0.05);
+       experience -= expLoss;
+       
+	   int reqExp =  getExpForLv(level);
+	   if (experience < reqExp)
+		    {                     
+            level -= 1;
+            healthmax -= 5;
+            health -= 5;
+            manamax -= 5;
+            mana -= 5;            
+            }
+       }
+       
+	sb << name;  	           xmlSetProp(root, (const xmlChar*) "name", (const xmlChar*)sb.str().c_str());     sb.str("");
+	sb << accountNumber;       xmlSetProp(root, (const xmlChar*) "account", (const xmlChar*)sb.str().c_str());	sb.str("");
+	sb << sex;                 xmlSetProp(root, (const xmlChar*) "sex", (const xmlChar*)sb.str().c_str());     	sb.str("");	
+	sb << getDirection();
+    if (sb.str() == "North"){sb.str(""); sb << "0";}
+	if (sb.str() == "East") {sb.str(""); sb << "1";}
+	if (sb.str() == "South"){sb.str(""); sb << "2";}
+	if (sb.str() == "West") {sb.str(""); sb << "3";}
+	xmlSetProp(root, (const xmlChar*) "lookdir", (const xmlChar*)sb.str().c_str());                             sb.str("");
+	sb << experience;         xmlSetProp(root, (const xmlChar*) "exp", (const xmlChar*)sb.str().c_str());       sb.str("");	
+	sb << voc;                xmlSetProp(root, (const xmlChar*) "voc", (const xmlChar*)sb.str().c_str());       sb.str("");
+	sb << level;              xmlSetProp(root, (const xmlChar*) "level", (const xmlChar*)sb.str().c_str());     sb.str("");	
+	sb << access;             xmlSetProp(root, (const xmlChar*) "access", (const xmlChar*)sb.str().c_str());	sb.str("");	
+	sb << cap;    	          xmlSetProp(root, (const xmlChar*) "cap", (const xmlChar*)sb.str().c_str());       sb.str("");
+	sb << maglevel;	          xmlSetProp(root, (const xmlChar*) "maglevel", (const xmlChar*)sb.str().c_str());  sb.str("");
 
+	pn = xmlNewNode(NULL,(const xmlChar*)"spawn");
+	sb << pos.x;    xmlSetProp(pn, (const xmlChar*) "x", (const xmlChar*)sb.str().c_str());        sb.str("");
+	sb << pos.y;  	xmlSetProp(pn, (const xmlChar*) "y", (const xmlChar*)sb.str().c_str());        sb.str("");
+	sb << pos.z; 	xmlSetProp(pn, (const xmlChar*) "z", (const xmlChar*)sb.str().c_str());	       sb.str("");
+	xmlAddChild(root, pn);
+	
+	pn = xmlNewNode(NULL,(const xmlChar*)"temple");
+	sb << masterPos.x;  xmlSetProp(pn, (const xmlChar*) "x", (const xmlChar*)sb.str().c_str());        sb.str("");
+	sb << masterPos.y;  xmlSetProp(pn, (const xmlChar*) "y", (const xmlChar*)sb.str().c_str());        sb.str("");
+	sb << masterPos.z; 	xmlSetProp(pn, (const xmlChar*) "z", (const xmlChar*)sb.str().c_str());	       sb.str("");
+	xmlAddChild(root, pn);
+	
+	pn = xmlNewNode(NULL,(const xmlChar*)"health");
+	sb << health;     xmlSetProp(pn, (const xmlChar*) "now", (const xmlChar*)sb.str().c_str());        sb.str("");
+	sb << healthmax;  xmlSetProp(pn, (const xmlChar*) "max", (const xmlChar*)sb.str().c_str());        sb.str("");
+	                     xmlSetProp(pn, (const xmlChar*) "food", (const xmlChar*)"0");	   
+	xmlAddChild(root, pn);
+	
+	pn = xmlNewNode(NULL,(const xmlChar*)"mana");
+	sb << mana;     xmlSetProp(pn, (const xmlChar*) "now", (const xmlChar*)sb.str().c_str());        sb.str("");
+	sb << manamax;  xmlSetProp(pn, (const xmlChar*) "max", (const xmlChar*)sb.str().c_str());        sb.str("");
+    	               xmlSetProp(pn, (const xmlChar*) "spent", (const xmlChar*)"0");
+	xmlAddChild(root, pn);
+    	               
+	pn = xmlNewNode(NULL,(const xmlChar*)"look");
+    sb << lookmaster;       xmlSetProp(pn, (const xmlChar*) "type", (const xmlChar*)sb.str().c_str());        sb.str("");
+	sb << lookhead;         xmlSetProp(pn, (const xmlChar*) "head", (const xmlChar*)sb.str().c_str());        sb.str("");
+	sb << lookbody;         xmlSetProp(pn, (const xmlChar*) "body", (const xmlChar*)sb.str().c_str());        sb.str("");
+	sb << looklegs;         xmlSetProp(pn, (const xmlChar*) "legs", (const xmlChar*)sb.str().c_str());        sb.str("");
+	sb << lookfeet;         xmlSetProp(pn, (const xmlChar*) "feet", (const xmlChar*)sb.str().c_str());        sb.str("");
+	xmlAddChild(root, pn);
+    	               
+    	      
+	sn = xmlNewNode(NULL,(const xmlChar*)"skills");
+	for (int i = 0; i <= 6; i++)
+	  {
+	  pn = xmlNewNode(NULL,(const xmlChar*)"skill");
+	  sb << i;                          xmlSetProp(pn, (const xmlChar*) "skillid", (const xmlChar*)sb.str().c_str());      sb.str("");
+	  sb << skills[i][SKILL_LEVEL];     xmlSetProp(pn, (const xmlChar*) "level", (const xmlChar*)sb.str().c_str());        sb.str("");
+	  sb << skills[i][SKILL_TRIES];     xmlSetProp(pn, (const xmlChar*) "tries", (const xmlChar*)sb.str().c_str());        sb.str("");
+	  xmlAddChild(sn, pn);
+      }
+   xmlAddChild(root, sn);
+	
+	sn = xmlNewNode(NULL,(const xmlChar*)"inventory");
+	for (int i = 1; i <= 10; i++)
+	  {
+   	  if (items[i])
+          {
+    	  pn = xmlNewNode(NULL,(const xmlChar*)"slot");
+    	  sb << i;                             
+          xmlSetProp(pn, (const xmlChar*) "slotid", (const xmlChar*)sb.str().c_str());            
+          sb.str("");
+          
+      	  nn = xmlNewNode(NULL,(const xmlChar*)"item");
+          sb << items[i]->getID();
+          xmlSetProp(nn, (const xmlChar*) "id", (const xmlChar*)sb.str().c_str());            
+          sb.str("");
+          
+	      xmlAddChild(pn, nn);
+	      xmlAddChild(sn, pn);
+          }
+      }
+   xmlAddChild(root, sn);
+	
+	//Save the character
+    if (xmlSaveFile(filename.c_str(), doc))
+       {
+       #ifdef __DEBUG__
+       std::cout << "\tSaved character succefully!\n";
+       #endif
+       xmlFreeDoc(doc);
+       }
+    else
+       {
+       std::cout << "\tCouldn't save character =(\n";
+       xmlFreeDoc(doc);
+       }
+}

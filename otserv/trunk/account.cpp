@@ -112,7 +112,7 @@ bool Account::openPlayer(const std::string &name, const std::string &givenpasswo
       xmlFreeDoc(doc);
       return false;
     }
-
+    player.accountNumber = atoi((const char*)xmlGetProp(root, (const xmlChar *) "account"));
     player.sex=atoi((const char*)xmlGetProp(root, (const xmlChar *) "sex"));
     player.setDirection((Direction)atoi((const char*)xmlGetProp(root, (const xmlChar *) "lookdir")));
     player.experience=atoi((const char*)xmlGetProp(root, (const xmlChar *) "exp"));
