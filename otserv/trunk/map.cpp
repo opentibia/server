@@ -584,11 +584,13 @@ void Map::thingMoveInternal(Creature *player,
 	}
 
 #ifdef __DEBUG__
-//				std::cout << "moving: "
-//				<< "from_x: "<< (int)from_x << ", from_y: "<< (int)from_y << ", from_z: "<< (int)from_z
-//				<< ", stackpos: "<< (int)stackPos
-//				<< ", to_x: "<< (int)to_x << ", to_y: "<< (int)to_y << ", to_z: "<< (int)to_z
-//				<< std::endl;
+				std::cout << "moving"
+				/*
+				<< ": from_x: "<< (int)from_x << ", from_y: "<< (int)from_y << ", from_z: "<< (int)from_z
+				<< ", stackpos: "<< (int)stackPos
+				<< ", to_x: "<< (int)to_x << ", to_y: "<< (int)to_y << ", to_z: "<< (int)to_z
+				*/
+				<< std::endl;
 #endif
 
 	Thing *thing = getTile(from_x, from_y, from_z)->getThingByStackPos(stackPos);
@@ -1026,10 +1028,10 @@ void Map::creatureMakeMagic(Creature *creature, const EffectInfo &ei)
 	} 
 	
 #ifdef __DEBUG__
-	cout << "creatureMakeMagic: " << creature->getName() << "x: " << ei.centerpos.x << ", y: " << ei.centerpos.y << ", z: " << ei.centerpos.z << std::endl;
+	cout << "creatureMakeMagic: " << creature->getName() << ", x: " << ei.centerpos.x << ", y: " << ei.centerpos.y << ", z: " << ei.centerpos.z << std::endl;
 #endif
 
-	if(player->access == 0 && (!ei.needtarget || getTile(ei.centerpos.x, ei.centerpos.y, ei.centerpos.z)->creatures.size() > 0)) {
+	if(player && player->access == 0 && (!ei.needtarget || getTile(ei.centerpos.x, ei.centerpos.y, ei.centerpos.z)->creatures.size() > 0)) {
 		if(ei.offensive)
 			player->pzLocked = true;
 
@@ -1690,9 +1692,11 @@ void Map::CreateDamageUpdate(Creature* creature, Creature* attackCreature, int d
 				msg.AddTextMessage(MSG_EVENT, "Own3d!");
 }
 
-void Map::creatureSaySpell(Creature *creature, const std::string &text)
+bool Map::creatureSaySpell(Creature *creature, const std::string &text)
 {
   OTSYS_THREAD_LOCK(mapLock)
+	bool ret = false;
+
 	//This should be loaded from somewhere later (lua? or xml perhaps)
 	if(strcmp(text.c_str(), "exura vita") == 0) {
 		static unsigned char area[14][18] = {
@@ -1726,6 +1730,7 @@ void Map::creatureSaySpell(Creature *creature, const std::string &text)
 		ei.maxDamage = (int)(((creature->level + creature->maglevel) * 3) * 1.2);
 		
 		creatureMakeMagic(creature, ei);
+		ret = true;
 	}
 	/*else if(strcmp(text.c_str(), "exevo gran mas vis") == 0) {
 
@@ -1761,6 +1766,7 @@ void Map::creatureSaySpell(Creature *creature, const std::string &text)
 		ei.maxDamage = (int)(((creature->level + creature->maglevel) * 3) * 2.0) / 2;
 		
 		creatureMakeMagic(creature, ei);
+		ret = true;
 	}*/
 	else if(strcmp(text.c_str(), "exura gran mas res") == 0) {
 
@@ -1795,6 +1801,7 @@ void Map::creatureSaySpell(Creature *creature, const std::string &text)
 		ei.maxDamage = (int)(((creature->level + creature->maglevel) * 3) * 1.2);
 		
 		creatureMakeMagic(creature, ei);
+		ret = true;
 	}
 	else if(strcmp(text.c_str(), "exori vis") == 0) {
 
@@ -1836,6 +1843,7 @@ void Map::creatureSaySpell(Creature *creature, const std::string &text)
 		ei.maxDamage = (int)(((creature->level + creature->maglevel) * 3) * 0.4) / 2;
 		
 		creatureMakeMagic(creature, ei);
+		ret = true;
 	}
 	else if(strcmp(text.c_str(), "exori mort") == 0) {
 
@@ -1877,6 +1885,7 @@ void Map::creatureSaySpell(Creature *creature, const std::string &text)
 		ei.maxDamage = (int)(((creature->level + creature->maglevel) * 3) * 0.4) / 2;
 		
 		creatureMakeMagic(creature, ei);
+		ret = true;
 	}
 	else if(strcmp(text.c_str(), "exori") == 0) {
 		static unsigned char area[14][18] = {
@@ -1910,6 +1919,7 @@ void Map::creatureSaySpell(Creature *creature, const std::string &text)
 		ei.maxDamage = (int)(((creature->level + creature->maglevel) * 3) * 1.1) / 2;
 		
 		creatureMakeMagic(creature, ei);
+		ret = true;
 	}
 	else if(strcmp(text.c_str(), "exevo mort hur") == 0) {
 		static unsigned char area[14][18] = {
@@ -1950,6 +1960,7 @@ void Map::creatureSaySpell(Creature *creature, const std::string &text)
 		ei.maxDamage = (int)(((creature->level + creature->maglevel) * 3) * 1.3) / 2;
 		
 		creatureMakeMagic(creature, ei);
+		ret = true;
 	}
 	else if(strcmp(text.c_str(), "exevo vis lux") == 0) {
 		static unsigned char area[14][18] = {
@@ -1990,7 +2001,10 @@ void Map::creatureSaySpell(Creature *creature, const std::string &text)
 		ei.maxDamage = (int)(((creature->level + creature->maglevel) * 3) * 1.4) / 2;
 		
 		creatureMakeMagic(creature, ei);
+		ret = true;
 	}
 
+
 	OTSYS_THREAD_UNLOCK(mapLock)
+	return ret;
 }

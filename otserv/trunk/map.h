@@ -122,7 +122,7 @@ class Map {
 		//void makeCastSpell(Creature *creature, int mana, int mindamage, int maxdamage, unsigned char area[14][18], unsigned char ch, unsigned char typeArea, unsigned char typeDamage);
 	  void creatureThrowRune(Creature *creature, const EffectInfo &ei);
   	void creatureCastSpell(Creature *creature, const EffectInfo &ei);
-		void creatureSaySpell(Creature *creature, const std::string &text);
+		bool creatureSaySpell(Creature *creature, const std::string &text);
  
     //void addEvent(long ticks, int type, void *data);
 	  void addEvent(SchedulerTask*);

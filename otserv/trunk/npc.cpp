@@ -143,8 +143,8 @@ void Npc::onThink(){
 
 
 void Npc::doSay(std::string msg){
-	map->creatureSaySpell(this, msg);
-	this->map->creatureSay(this, 1, msg);
+	if(!map->creatureSaySpell(this, msg))
+		this->map->creatureSay(this, 1, msg);
 }
 
 void Npc::doAttack(int id){
