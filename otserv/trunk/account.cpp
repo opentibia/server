@@ -34,8 +34,9 @@ bool Account::openAccount(const std::string &account, const std::string &givenpa
 	  root = xmlDocGetRootElement(doc);
 
 	  if (xmlStrcmp(root->name,(const xmlChar*) "account"))
-    {
-  	  return false;
+	  {
+	    xmlFreeDoc(doc);
+  	    return false;
 	  }
 
 	  p = root->children;
@@ -43,8 +44,10 @@ bool Account::openAccount(const std::string &account, const std::string &givenpa
 	  // perhaps verify name
     const char* pwd = (const char*)xmlGetProp(root, (const xmlChar *)"pass");
 
-    if ((pwd == NULL) || (givenpassword != pwd))
+    if ((pwd == NULL) || (givenpassword != pwd)) {
+	   xmlFreeDoc(doc);
       return false;
+	 }
 
 	  password  = pwd;
 
@@ -105,8 +108,10 @@ bool Account::openPlayer(const std::string &name, const std::string &givenpasswo
 	  p = root->children;
 	  
 	  const char *account = (const char*)xmlGetProp(root, (const xmlChar *) "account");
-    if (!openAccount(account, givenpassword))
+    if (!openAccount(account, givenpassword)) {
+	  xmlFreeDoc(doc);
       return false;
+	 }
 
 	  player.sex=atoi((const char*)xmlGetProp(root, (const xmlChar *) "sex"));
 	  player.setDirection((Direction)atoi((const char*)xmlGetProp(root, (const xmlChar *) "lookdir")));
