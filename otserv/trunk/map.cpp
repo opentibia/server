@@ -106,11 +106,13 @@ bool MapState::removeThingInternal(Tile *t, Thing *thing, bool onlyRegister)
 		tilechangedata tc;
 		tc.pos = oldPos;
 
+		/*
 		Item* item = dynamic_cast<Item*>(thing);
 		tc.item.id = item->getID();
 		tc.item.stackable = item->isStackable();
 		tc.item.multitype = item->isMultiType();
 		tc.item.ItemCountOrSubtype = item->getItemCountOrSubtype();
+		*/
 
 		//tc.thing = thing;
 		tc.remove = true;

@@ -1272,6 +1272,7 @@ void Game::creatureSay(Creature *creature, unsigned char type, const std::string
 				Creature *c = getCreatureByName(text.substr(3).c_str());
 				if(c) {
 					MagicEffectClass me;
+
 					me.animationColor = 0xB4;
 					me.damageEffect = NM_ME_MAGIC_BLOOD;
 					me.maxDamage = c->health + c->mana;
