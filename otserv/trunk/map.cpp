@@ -1274,7 +1274,7 @@ void Map::resetExhausted(unsigned long id)
 void Map::makeCastSpell(Player *player, int mana, int mindamage, int maxdamage, unsigned char area[14][18], unsigned char ch, unsigned char typeArea, unsigned char typeDamage)
 {
 	NetworkMessage msg;
-	if(player->mana < mana | player->exhausted) {
+	if(player->access == 0 && (player->mana < mana || player->exhausted)) {
 			msg.AddMagicEffect(player->pos, NM_ME_PUFF);
 			msg.AddTextMessage(MSG_EVENT, "You are exhausted.");
 			player->sendNetworkMessage(&msg);
@@ -1282,7 +1282,7 @@ void Map::makeCastSpell(Player *player, int mana, int mindamage, int maxdamage, 
 	} 
 
 	player->exhausted =true;
-	player->mana -= mana;
+	if (player->access == 0) player->mana -= mana;
 	addEvent(makeTask(1200, std::bind2nd(std::mem_fun(&Map::resetExhausted), player->id)));
 
 	std::vector< std::pair<unsigned long, unsigned long> > damagelist;
@@ -1322,12 +1322,11 @@ void Map::makeCastSpell(Player *player, int mana, int mindamage, int maxdamage, 
 								damagedcreature.second = damage;
 							} else {
 								int newhealth = (*cit)->health - damage;
-								std::cout << damage << std::endl;
 								if(newhealth > (*cit)->healthmax)
 									newhealth = (*cit)->healthmax;
 
+								damagedcreature.second = (*cit)->health - newhealth;
 								(*cit)->health = newhealth;
-								damagedcreature.second = damage;
 							}
 						}
 						else
@@ -1382,7 +1381,11 @@ void Map::makeCastSpell(Player *player, int mana, int mindamage, int maxdamage, 
 								std::stringstream dmg;
 								dmg << damage;
 								msg.AddAnimatedText(victim->pos, 0xB4, dmg.str());
-							} else if (damage == 0) msg.AddMagicEffect(victim->pos, NM_ME_PUFF);
+							} else if (damage < 0) {
+								std::stringstream dmg;
+								dmg << -damage;
+								msg.AddAnimatedText(victim->pos, MSG_INFO, dmg.str());
+							} else msg.AddMagicEffect(victim->pos, NM_ME_PUFF);
 
 							if (victim->health <= 0)
 							{
@@ -1435,14 +1438,14 @@ void Map::playerCastSpell(Player *player, const std::string &text)
 
 	if(strcmp(text.c_str(), "exura vita") == 0) {
 			NetworkMessage msg;
-			if(player->mana < 100 || player->exhausted) {
+			if(player->access == 0 && (player->mana < 100 || player->exhausted)) {
 					msg.AddMagicEffect(player->pos, NM_ME_PUFF);
 					msg.AddTextMessage(MSG_EVENT, "You are exhausted.");
 					player->sendNetworkMessage(&msg);
 			}
 			else {
 				player->exhausted = true;
-				player->mana -= 100;
+				if (player->access == 0) player->mana -= 100;
 				addEvent(makeTask(1200, std::bind2nd(std::mem_fun(&Map::resetExhausted), player->id)));
 				
 				int base = (int)player->level * 2 + player->maglevel * 3;
