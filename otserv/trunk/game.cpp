@@ -2303,8 +2303,11 @@ void Game::decayItem(Item *item)
 	//if(tile) {
 		//Item *item = dynamic_cast<Item*>(tile->getThingByStackPos(stackpos));
 
-		if(item  /*&& item->getID() == id*/) {
+		/*todo: Decaying item could be in a  container carried by a player,
+			should all items have a pointer to their parent (like containers)?*/
+		if(item && item->pos.x != 0xFFFF) {
 			Tile *tile = getTile(item->pos.x, item->pos.y, item->pos.z);
+
 			MagicEffectItem* magicItem = dynamic_cast<MagicEffectItem*>(item);
 
 			if(magicItem) {
