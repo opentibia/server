@@ -347,7 +347,7 @@ bool Map::removeCreature(Creature* c)
 
 void Map::getSpectators(const Range& range, std::vector<Creature*>& list)
 {
-
+/*
 #ifdef __DEBUG__
 	std::cout << "Viewer position at x: " << range.centerpos.x
 		<< ", y: " << range.centerpos.y
@@ -359,7 +359,7 @@ void Map::getSpectators(const Range& range, std::vector<Creature*>& list)
 		<< ", y: " << range.maxRange.y
 		<< ", z: " << range.maxRange.z << std::endl;    	
 #endif
-
+*/
 
 	int offsetz;
 	CreatureVector::iterator cit;
@@ -377,10 +377,11 @@ void Map::getSpectators(const Range& range, std::vector<Creature*>& list)
 				if (tile)
 				{
 					for (cit = tile->creatures.begin(); cit != tile->creatures.end(); ++cit) {
-
+/*
 #ifdef __DEBUG__
 						std::cout << "Found " << (*cit)->getName() << " at x: " << (*cit)->pos.x << ", y: " << (*cit)->pos.y << ", z: " << (*cit)->pos.z << ", offset: " << offsetz << std::endl;
 #endif
+*/
 
 						list.push_back((*cit));
 					}
@@ -476,7 +477,7 @@ std::list<Position> Map::getPathTo(Position start, Position to, bool creaturesBl
 					int y = current->y + dy;
 
 					Tile *t;
-					if((!(t = getTile(x,y,z))) || t->isBlocking() || (t->creatures.size() && x != to.x && y != to.y))
+					if((!(t = getTile(x,y,z))) || t->isBlocking() || (t->creatures.size() /*&& x != to.x && y != to.y*/))
 						continue;
 					bool isInClosed = false;
 					for(std::list<AStarNode*>::iterator it = closedNodes.begin();
