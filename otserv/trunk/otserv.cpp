@@ -120,7 +120,6 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
       }
 
       msg.WriteToSocket(s);
-      closesocket(s);
     }
     // gameworld connection tibia 7.1
     else if (protId == 0x020A)
@@ -148,16 +147,17 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 				    msg.Reset();
 				    msg.AddByte(0x14);
 				    msg.AddString("Too many Players online.");
-
 				    msg.WriteToSocket(s);
-            closesocket(s);
         } else {
+            s = 0;            // protocol/player will close socket
 				    protocol->ReceiveLoop();
-            // protocol/player will close socket
 		    }
       }
     }
   }
+
+  if (s)
+    closesocket(s);
 }
 
 
