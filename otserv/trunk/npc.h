@@ -58,9 +58,12 @@ public:
 	static int luaActionAttackCreature(lua_State *L);
 	static int luaCreatureGetPos(lua_State *L);
 	static int luaSelfGetPos(lua_State *L);
+
+  bool isLoaded(){return loaded;}
 protected:
 	int registerFunctions();
 	Npc* npc;
+	bool loaded;
 };
 
 class Npc : public Creature
@@ -94,6 +97,7 @@ public:
   void doMove(int dir);
   void doMoveTo(Position pos);
   void doAttack(int id);
+  bool isLoaded(){return loaded;}
 
 protected:
   virtual void onThingMove(const Player *player, const Thing *thing, const Position *oldPos, unsigned char oldstackpos);
@@ -108,6 +112,7 @@ protected:
   std::string scriptname;
   NpcScript* script;
   std::list<Position> route;
+	bool loaded;
 };
 
 

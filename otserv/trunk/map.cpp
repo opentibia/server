@@ -767,7 +767,10 @@ void Map::creatureSay(Creature *creature, unsigned char type, const std::string 
 				cmd.erase(0,3);
 				// The string contains the name of the NPC we want.
 				Npc *npc = new Npc(cmd.c_str(), (Map *)this);
-
+				if(!npc->isLoaded()){
+					delete npc;
+					break;
+				}
 				// Set the NPC pos
 				if(creature->direction == NORTH)
 				{

@@ -24,6 +24,7 @@
 #include <algorithm>
 #include <functional>
 #include <string>
+#include <fstream>
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
@@ -35,10 +36,12 @@
 
 Npc::Npc(const char *name, Map* map) : Creature(name)
 {
+	this->loaded = false;
 	std::string filename = "data/npc/" + std::string(name) + ".xml";
 	std::transform(filename.begin(), filename.end(), filename.begin(), tolower);
 	xmlDocPtr doc = xmlParseFile(filename.c_str());
 	if (doc){
+		this->loaded=true;
 		xmlNodePtr root, p;
 		root = xmlDocGetRootElement(doc);
 
@@ -100,12 +103,15 @@ Npc::Npc(const char *name, Map* map) : Creature(name)
 	}
 	//now try to load the script
 	this->script = new NpcScript(this->scriptname, this);
+	if(!this->script->isLoaded())
+		this->loaded=false;
 	this->map=map;
 }
 
 
 Npc::~Npc()
 {
+	delete this->script;
 }
 
 void Npc::onThingMove(const Player *player, const Thing *thing, const Position *oldPos, unsigned char oldstackpos){
@@ -185,14 +191,24 @@ void Npc::doMoveTo(Position target){
 }
 
 NpcScript::NpcScript(std::string scriptname, Npc* npc){
+	this->loaded = false;
+	if(scriptname == "")
+		return;
 	luaState = lua_open();
 	luaopen_loadlib(luaState);
 	luaopen_base(luaState);
 	luaopen_math(luaState);
 	luaopen_string(luaState);
 	luaopen_io(luaState);
-	lua_dofile(luaState, "data/npc/scripts/lib/npc.lua");
+    lua_dofile(luaState, "data/npc/scripts/lib/npc.lua");
+	
+	FILE* in=fopen(scriptname.c_str(), "r");
+	if(!in)
+		return;
+	else
+		fclose(in);
 	lua_dofile(luaState, scriptname.c_str());
+	this->loaded=true;
 	this->npc=npc;
 	this->setGlobalNumber("addressOfNpc", (int) npc);
 	this->registerFunctions();
