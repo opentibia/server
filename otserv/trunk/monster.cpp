@@ -31,8 +31,10 @@ Monster::Monster(const char *name, Game* game) :
 {
 	loaded = false;
 	this->game = game;
-	this->minWeapondamage = 0;
-	this->maxWeapondamage = 0;
+	minWeapondamage = 0;
+	maxWeapondamage = 0;
+	targetDistance = 1;
+	runawayHealth = 0;
 
 	//fight_t = FIGHT_NONE;
 	disttype = DIST_NONE;
@@ -64,8 +66,9 @@ Monster::Monster(const char *name, Game* game) :
 			level = atoi((const char*)xmlGetProp(root, (const xmlChar *)"level"));
 			setNormalSpeed();
 			//std::cout << level << std::endl;
+			//std::cout << maglevel << std::endl;
+
 			maglevel = atoi((const char*)xmlGetProp(root, (const xmlChar *)"maglevel"));
-			std::cout << maglevel << std::endl;
 		}
 
 		while (p)
@@ -80,8 +83,11 @@ Monster::Monster(const char *name, Game* game) :
 				this->health = atoi((const char*)xmlGetProp(p, (const xmlChar *)"now"));
 				this->healthmax = atoi((const char*)xmlGetProp(p, (const xmlChar *)"max"));
 			}
-
-			if (strcmp(str, "look") == 0) {
+			if (strcmp(str, "combat") == 0) {
+				this->targetDistance = atoi((const char*)xmlGetProp(p, (const xmlChar *)"targetdistance"));
+				//this->runawayHealth = atoi((const char*)xmlGetProp(p, (const xmlChar *)"runawayHealth"));
+			}
+			else if (strcmp(str, "look") == 0) {
 				this->looktype = atoi((const char*)xmlGetProp(p, (const xmlChar *)"type"));
 				this->lookmaster = this->looktype;
 				if ((const char*)xmlGetProp(p, (const xmlChar *)"head"))
@@ -233,23 +239,110 @@ void Monster::onThink()
 			((long long)OTSYS_TIME());
 
 		if(delay > 0){
+/*
 #if __DEBUG__     
 			std::cout << "Delaying "<< this->getName() << " --- " << delay << std::endl;		
 #endif
+*/
 			
 			return;
 		}
 
 		this->lastmove = OTSYS_TIME();
 
-		doMoveTo(targetPos);
+		//doMoveTo(targetPos);
+		doMoveTo(moveToPos);
 	}
 }
 
-bool Monster::isInRange(const Position &pos)
+int Monster::getCurrentDistanceToTarget()
 {
-	return ((std::abs(pos.x - this->pos.x) <= 8) && (std::abs(pos.y - this->pos.y) <= 6) &&
-		(pos.z == this->pos.z));
+	return std::max(std::abs(pos.x - targetPos.x), std::abs(pos.y - targetPos.y));
+}
+
+void Monster::calcMovePosition()
+{
+	int currentdist = getCurrentDistanceToTarget();
+	if(currentdist == targetDistance && game->map->canThrowItemTo(this->pos, targetPos, false, true))
+		return;
+
+	if(targetDistance > 1) {
+
+		int prevdist = 0;
+		int minwalkdist = 0;
+		int d = targetDistance;
+
+		for (int y = targetPos.y - d; y <= targetPos.y + d; ++y)
+		{
+			for (int x = targetPos.x - d; x <= targetPos.x + d; ++x)
+			{
+				if((targetPos.x == x && targetPos.y == y))
+					continue;
+
+				int dist = std::max(std::abs(targetPos.x - x), std::abs(targetPos.y - y));
+				Position tmppos(x, y, pos.z);
+				int walkdist = std::max(std::abs(pos.x - x), std::abs(pos.y - y));
+
+				if(dist <= targetDistance &&
+					((dist > prevdist || (dist == prevdist && walkdist > 0 && walkdist < minwalkdist)))) {
+
+					if(!game->map->canThrowItemTo(tmppos, targetPos, false, true))
+						continue;
+					
+					if((this->pos.x != x && this->pos.y != y)) {
+						Tile *t = NULL;
+						if((!(t = game->map->getTile(x, y, pos.z))) || t->isBlocking() || t->isPz() || t->creatures.size())
+							continue;
+					}
+				
+/*
+#ifdef __DEBUG__
+					std::cout << "CalcMovePosition()" << ", x: " << x << ", y: " << y  << std::endl;
+#endif
+*/
+					minwalkdist =walkdist;
+					prevdist = dist;
+					moveToPos.x = x;
+					moveToPos.y = y;
+					moveToPos.z = pos.z;
+				}
+			}
+		}
+	}
+	//Close combat
+	else if(currentdist > targetDistance) {
+		//Close combat
+		int prevdist = 0;
+		for(int y = targetPos.y - 1; y <= targetPos.y + 1; ++y) {
+			for(int x = targetPos.x - 1; x <= targetPos.x + 1; ++x) {
+				if((targetPos.x == x && targetPos.y == y))
+					continue;
+
+				int dist = std::max(std::abs(pos.x - x), std::abs(pos.y - y));
+
+				if(dist < prevdist || (prevdist == 0)) {
+					Tile *t;
+					if((!(t = game->map->getTile(x, y, pos.z))) || t->isBlocking() || t->isPz() || t->creatures.size())
+						continue;
+					
+					prevdist = dist;
+					moveToPos.x = x;
+					moveToPos.y = y;
+					moveToPos.z = pos.z;
+				}
+			}
+		}
+
+		if(prevdist == 0) {
+			moveToPos = targetPos;
+		}
+	}
+}
+
+bool Monster::isInRange(const Position &p)
+{
+	return ((std::abs(p.x - this->pos.x) <= 8) && (std::abs(p.y - this->pos.y) <= 6) &&
+		(p.z == this->pos.z));
 }
 
 void Monster::onThingMove(const Creature *creature, const Thing *thing, const Position *oldPos, unsigned char oldstackpos)
@@ -269,11 +362,11 @@ void Monster::onThingMove(const Creature *creature, const Thing *thing, const Po
 		else if(!isInRange(moveCreature->pos) && isInRange(*oldPos)) {
 			OnCreatureLeave(creature);
 		}
-		/*
-		else if(attackedCreature == creature->getID()) {
-			targetPos = creature->pos;
+
+		if(attackedCreature != 0 && moveCreature != this /*|| (targetDistance > 1 && getCurrentDistanceToTarget() != targetDistance) )*/ ) {
+			//Update move position
+			calcMovePosition();
 		}
-		*/
 	}
 }
 
@@ -301,11 +394,11 @@ void Monster::onTeleport(const Creature *creature, const Position *oldPos, unsig
 	else if(isInRange(*oldPos) && !isInRange(creature->pos)) {
 		OnCreatureLeave(creature);
 	}
-	/*
-	else if(attackedCreature == creature->getID()) {
-		targetPos = creature->pos;
+
+	if(attackedCreature != 0) {
+		//Update move position
+		calcMovePosition();
 	}
-	*/
 }
 
 void Monster::OnCreatureEnter(const Creature *creature)
@@ -315,6 +408,9 @@ void Monster::OnCreatureEnter(const Creature *creature)
 		if(player && player->access == 0) {
 			attackedCreature = player->getID();
 			targetPos = player->pos;
+
+			//Update move position
+			calcMovePosition();
 
 			game->addEvent(makeTask(500, std::bind2nd(std::mem_fun(&Game::checkPlayerAttacking), getID())));
 		}
@@ -405,7 +501,28 @@ void Monster::doMoveTo(const Position &target)
 	}
 
 	if(route.size()==0){
-		//still no route, means there is none
+		//still no route, means there is none, or reached destination
+
+		//Update look direction
+		if(moveToPos == this->pos) {
+			int dx = targetPos.x - this->pos.x;
+			int dy = targetPos.y - this->pos.y;
+
+			Direction newdir = this->getDirection();
+			if(dx > 0 && dx >= std::max(std::abs(dx), std::abs(dy)))
+				newdir = EAST;
+			else if(dx < 0 && std::abs(dx) >= std::max(std::abs(dx), std::abs(dy)))
+				newdir = WEST;
+			else if(dy > 0 && dy >= std::max(std::abs(dx), std::abs(dy)))
+				newdir = SOUTH;
+			else if(dy < 0 && std::abs(dy) >= std::max(std::abs(dx), std::abs(dy)))
+				newdir = NORTH;
+		
+			if(newdir != this->getDirection()) {
+				game->creatureTurn(this, EAST);
+			}
+		}
+
 		return;
 	}
 	else

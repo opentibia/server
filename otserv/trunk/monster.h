@@ -38,6 +38,8 @@ public:
 	bool isLoaded() const {return loaded;}
 
 private:
+	int getCurrentDistanceToTarget();
+	void calcMovePosition();
 	bool isInRange(const Position &pos);
 	std::list<Position> route;
 
@@ -45,14 +47,17 @@ protected:
 	Game* game;
 
 	fight_t fighttype;
+	int targetDistance;
 	subfight_t disttype;
 	int minWeapondamage;
 	int maxWeapondamage;
+	int runawayHealth;
 
 	std::vector<std::string> instantSpells;
 	std::vector<unsigned short> runeSpells;
 	
 	Position targetPos;
+	Position moveToPos;
 	void doMoveTo(const Position &target);
 
 	virtual fight_t getFightType(){return fighttype;};
