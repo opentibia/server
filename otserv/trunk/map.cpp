@@ -530,6 +530,15 @@ void Map::thingMove(Player *player, Thing *thing,
           {
             (*cit)->onThingMove(player, thing, &oldPos, oldstackpos);
           }
+		if (thing->isPlayer()) {
+				  // we need to update the direction the player is facing to...
+				  // otherwise we are facing some problems in turning into the
+				  // direction we were facing before the movement
+				  if (to_x > oldPos.x) ((Player*)thing)->direction = EAST;
+				  if (to_x < oldPos.x) ((Player*)thing)->direction = WEST;
+				  if (to_y < oldPos.y) ((Player*)thing)->direction = NORTH;
+				  if (to_y > oldPos.y) ((Player*)thing)->direction = SOUTH;
+		}
     }
   }
 
