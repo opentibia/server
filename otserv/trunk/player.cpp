@@ -215,10 +215,10 @@ unsigned int Player::getReqSkilltries (int skill, int level, int voc) {
     unsigned short int SkillBases[7] = { 50, 50, 50, 50, 30, 100, 20 };       // follows the order of enum skills_t
     float SkillMultipliers[7][5] = {
                                    {1.5f, 1.5f, 1.5f, 1.2f, 1.1f},     // Fist
-                                   {2.0f, 2.0f, 1.8f, 1.2f, 1.1f},         // Club
-                                   {2.0f, 2.0f, 1.8f, 1.2f, 1.1f},         // Sword
-                                   {2.0f, 2.0f, 1.8f, 1.2f, 1.1f},         // Axe
-                                   {2.0f, 2.0f, 1.8f, 1.4f, 1.1f},         // Distance
+                                   {2.0f, 2.0f, 1.8f, 1.2f, 1.1f},     // Club
+                                   {2.0f, 2.0f, 1.8f, 1.2f, 1.1f},     // Sword
+                                   {2.0f, 2.0f, 1.8f, 1.2f, 1.1f},     // Axe
+                                   {2.0f, 2.0f, 1.8f, 1.4f, 1.1f},     // Distance
                                    {1.5f, 1.5f, 1.5f, 1.1f, 1.1f},     // Shielding
                                    {1.1f, 1.1f, 1.1f, 1.1f, 1.1f}      // Fishing
                                    };
@@ -244,6 +244,7 @@ for (int slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++)
             case CLUB: skill = 1; skillname = "club fighting"; break;
             case AXE: skill = 3; skillname = "axe fighting"; break;
             case DIST: skill = 4; skillname = "distance fighting"; break;
+            case SHIELD: skill = 5; skillname = "shielding"; break;
             default: skill = 0; skillname = "fist fighting"; break;
             }
       }
@@ -455,6 +456,77 @@ void Player::onContainerUpdated(Item *item, unsigned char from_id, unsigned char
 	client->sendContainerUpdated(item, from_id, to_id, from_slot, to_slot, remove);
 }
 
+
+void Player::die() {
+        NetworkMessage msg;
+        
+		msg.AddTextMessage(MSG_ADVANCE, "You are dead.");
+		msg.AddTextMessage(MSG_EVENT, "Own3d!");
+		
+		//Magic Level downgrade
+		unsigned int sumMana = 0;
+		unsigned int lostMana = 0;
+		for (int i = 1; i <= maglevel; i++) {              //sum up all the mana
+			sumMana += getReqMana(i, voc);
+		}
+                
+		sumMana += manaspent;
+                
+		lostMana = (int) (sumMana * 0.1);   //player loses 10% of all spent mana when he dies
+                
+		if ((unsigned) manaspent >= lostMana) { //player does not lose a magic level
+		manaspent -= lostMana;
+		} 
+		else {                             //player DOES lose a magic level
+			lostMana -= manaspent;
+			manaspent = (int) ( getReqMana(maglevel, voc) - lostMana );
+			maglevel--;
+		}
+		//End Magic Level downgrade
+                
+		//Skill loss
+		unsigned int lostSkilltries;
+		unsigned int sumSkilltries;
+		for (int i = 0; i <= 6; i++) {  //for each skill
+			lostSkilltries = 0;         //reset to 0
+			sumSkilltries = 0;
+                    
+			for (int c = 11; c <= skills[i][SKILL_LEVEL]; c++) {    //sum up all required tries for all skill levels
+				sumSkilltries += getReqSkilltries(i, c, voc);
+			}
+                    
+			sumSkilltries += skills[i][SKILL_TRIES];
+                    
+			lostSkilltries = (int) (sumSkilltries * 0.1);           //player loses 10% of his skill tries
+
+			if ((unsigned)skills[i][SKILL_TRIES] >= lostSkilltries) { //player does not lose a skill level
+				skills[i][SKILL_TRIES] -= lostSkilltries;
+			}
+			else {                                                //player DOES lose a skill level
+				if (skills[i][SKILL_LEVEL] > 10 ) {          //skills should not be < 10
+					lostSkilltries -= skills[i][SKILL_TRIES];
+					skills[i][SKILL_TRIES] = (int) ( getReqSkilltries(i, skills[i][SKILL_LEVEL], voc) - lostSkilltries );
+					skills[i][SKILL_LEVEL]--;
+				}
+				else {
+					skills[i][SKILL_LEVEL] = 10;
+					skills[i][SKILL_TRIES] = 0;
+				}
+			}
+		}               
+		//End Skill loss
+        
+		//Level Downgrade
+		if ((experience - (int)(experience*0.1f)) < getExpForLv(level))         //0.1f is also used in die().. maybe we make a little function for exp-loss?
+		{
+			std::stringstream lvMsg;
+			lvMsg << "You were downgraded from level " << level << " to level " << level-1 << ".";
+			msg.AddTextMessage(MSG_ADVANCE, lvMsg.str().c_str());
+		}
+		
+		sendNetworkMessage(&msg);
+}
+
 void Player::savePlayer(std::string &name)
 {  
     std::string filename = "data/players/"+name+".xml";
@@ -472,8 +544,8 @@ void Player::savePlayer(std::string &name)
        pos.x = masterPos.x;
        pos.y = masterPos.y;
        pos.z = masterPos.z;
-       int expLoss = (int)(experience*0.05);
-       experience -= expLoss;
+       //int expLoss = (int)(experience*0.1f);
+       experience -= (int)(experience*0.1f);        //0.1f is also used in die().. maybe we make a little function for exp-loss?
        
        //Player died?
 	   int reqExp =  getExpForLv(level);

@@ -63,8 +63,7 @@ class Item : public Thing
 		
     bool isWeapon() const;
 	 WeaponType getWeaponType() const;
-
-
+    
     bool isBlocking() const;
 		bool isStackable() const;
     bool isMultiType() const;

@@ -125,6 +125,9 @@ public:
   void sendChangeSpeed(Creature* creature);
   void savePlayer(std::string &name);
   void sendToChannel(Creature *creature, unsigned char type, const std::string &text, unsigned short channelId);
+  void die();      //player loses exp/skills/maglevel on death
+
+  
   virtual void sendCancel(const char *msg);
   virtual void sendCancelWalk(const char *msg);
   virtual void setAttackedCreature(unsigned long id);

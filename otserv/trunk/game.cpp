@@ -1944,73 +1944,7 @@ void Game::CreateDamageUpdate(Creature* creature, Creature* attackCreature, int 
 		msg.AddTextMessage(MSG_EVENT, dmgmesg.str().c_str());
 	}
 	if (player->health <= 0){
-		msg.AddTextMessage(MSG_ADVANCE, "You are dead.");             
-		msg.AddTextMessage(MSG_EVENT, "Own3d!");
-		
-		//Magic Level downgrade
-		unsigned int sumMana = 0;
-		unsigned int lostMana = 0;
-		for (int i = 1; i <= player->maglevel; i++) {              //sum up all the mana
-			sumMana += player->getReqMana(i, player->voc);
-		}
-                
-		sumMana += player->manaspent;
-                
-		lostMana = (int) (sumMana * 0.1);   //player loses 10% of all spent mana when he dies
-                
-		if ((unsigned) player->manaspent >= lostMana) { //player does not lose a magic level
-		player->manaspent -= lostMana;
-		} 
-		else {                             //player DOES lose a magic level
-			lostMana -= player->manaspent;
-			player->manaspent = (int) ( player->getReqMana(player->maglevel, player->voc) - lostMana );
-			player->maglevel--;
-		}
-		//End Magic Level downgrade
-                
-		//Skill loss
-		unsigned int lostSkilltries;
-		unsigned int sumSkilltries;
-		for (int i = 0; i <= 6; i++) {  //for each skill
-			lostSkilltries = 0;         //reset to 0
-			sumSkilltries = 0;
-                    
-			for (int c = 11; c <= player->skills[i][SKILL_LEVEL]; c++) {    //sum up all required tries for all skill levels
-				sumSkilltries += player->getReqSkilltries(i, c, player->voc);
-			}
-                    
-			sumSkilltries += player->skills[i][SKILL_TRIES];
-                    
-			lostSkilltries = (int) (sumSkilltries * 0.1);           //player loses 10% of his skill tries
-
-			if ((unsigned)player->skills[i][SKILL_TRIES] >= lostSkilltries) { //player does not lose a skill level
-				player->skills[i][SKILL_TRIES] -= lostSkilltries;
-			}
-			else {                                                //player DOES lose a skill level
-				if (player->skills[i][SKILL_LEVEL] > 10 ) {          //skills should not be < 10
-					lostSkilltries -= player->skills[i][SKILL_TRIES];
-					player->skills[i][SKILL_TRIES] = (int) ( player->getReqSkilltries(i, player->skills[i][SKILL_LEVEL], player->voc) - lostSkilltries );
-					player->skills[i][SKILL_LEVEL]--;
-				}
-				else {
-					player->skills[i][SKILL_LEVEL] = 10;
-					player->skills[i][SKILL_TRIES] = 0;
-				}
-			}
-                    
-                    //cout << "skill tries after death: " <<  player->skills[i][SKILL_TRIES] << "\n";
-                    //cout << "skill level after death: " <<  player->skills[i][SKILL_LEVEL] << "\n";
-		}               
-		//End Skill loss
-                
-		//Level Downgrade
-		int reqExp =  player->getExpForLv(player->level);
-		if(player->experience < (unsigned)reqExp)
-		{
-			std::stringstream lvMsg;
-			lvMsg << "You were downgraded from level " << player->level << " to level " << player->level-1 << ".";
-			msg.AddTextMessage(MSG_ADVANCE, lvMsg.str().c_str());
-		}
+       player->die();        //handles exp/skills/maglevel loss
 	}
 }
 
