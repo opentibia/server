@@ -505,7 +505,7 @@ std::list<Position> Map::getPathTo(Creature *creature, Position start, Position 
 
 					Tile *t = getTile(x, y, z);
 					//if(!t || t->isBlocking() || (t->creatures.size() && t->getCreature() != creature))
-					if(!t || t->isBlocking() || (!t->creatures.empty() && (t->getCreature() != creature || t->creatures.size() > 1)))
+					if(!t || t->isBlocking() || (!t->creatures.empty() && (t->getCreature() != creature || t->creatures.size() > 1)) || t->floorChange())
 					continue;
 
 					bool isInClosed = false;
