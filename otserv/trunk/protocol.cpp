@@ -56,6 +56,7 @@ void Protocol::sleepTillMove(){
 				((long long)OTSYS_TIME());
 
 	if(delay > 0){
+		std::cout << "Delaying "<< player->getName() << " --- " << delay << std::endl;
 		OTSYS_SLEEP((uint32_t)delay);
 	}
 	player->lastmove = OTSYS_TIME();
