@@ -234,6 +234,7 @@ void NetworkMessage::AddCreature(const Creature *creature, bool known, bool logi
 {
   if (known)
   {
+			 std::cout << "creature already known??" << std::endl;
     AddByte(0x62);
     AddByte(0x00);
     AddU32(creature->getID());
@@ -241,9 +242,11 @@ void NetworkMessage::AddCreature(const Creature *creature, bool known, bool logi
   else
   {
     AddByte(0x61);
-    AddByte(0x00);
 
-    AddU32(login ? creature->getID() : 0);
+    AddByte(0x00);
+	 AddU32(0);
+    //AddU32(login ? creature->getID() : 0); leads to strange invisibility problems...
+	 // though on the real server this is not always 0 (only for players always 0?)
     AddU32(creature->getID());
     AddString(creature->getName());
   }
