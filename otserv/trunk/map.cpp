@@ -1024,8 +1024,6 @@ std::list<Position> Map::getPathTo(Position start, Position to){
 	if(start.z != to.z)
 		return path;
 
-	std::cout << "std::list<Position> Map::getPathTo(Position start, Position to)" << std::endl;
-
 	std::list<AStarNode*> openNodes;
 	std::list<AStarNode*> closedNodes;
 	int z = start.z;
