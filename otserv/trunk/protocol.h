@@ -59,6 +59,7 @@ public:
   virtual void sendIcons(int icons) = 0;
   virtual void sendCancel(const char *msg) = 0;
   virtual void sendCancelWalk(const char *msg) = 0;
+  virtual void sendChangeSpeed(int speed) = 0;
   virtual void sleepTillMove();
 
 protected:

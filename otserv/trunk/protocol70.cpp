@@ -159,19 +159,18 @@ void Protocol70::parsePacket(NetworkMessage &msg)
     case 0xD3: // set outfit
       parseSetOutfit(msg);
       break;
-    case 0xBE: // cancel move by mouse
+    case 0xBE: // cancel move
       parseCancelMove(msg);
       break;
     case 0xA0: // ?? (during character loggin into world) has 2 bytes data
-      printf("packet header %x \n", recvbyte);
+      printf("not handled packet header %x \n", recvbyte);
       parseDebug(msg);
       break;
-    case 0x69: // ?? client quit without logout 
-      printf("packet header %x \n", recvbyte);
-      parseDebug(msg);
+    case 0x69: // client quit without logout 
       break;    
     default:
          printf("unknown packet header: %x \n", recvbyte);
+         parseDebug(msg);
          break;  
   }
 				//so we got the action, now we ask the map to execut it
@@ -472,7 +471,9 @@ void Protocol70::sendIcons(int icons){
 
 void Protocol70::parseSetOutfit(NetworkMessage &msg)
 {
-	player->looktype=msg.GetByte();
+    int temp = msg.GetByte();
+    if((temp >= 136 && temp <= 139) || (temp >= 128 && temp <= 131)){ 
+	player->looktype= temp;
 	player->lookmaster = player->looktype;
 	player->lookhead=msg.GetByte();
 	player->lookbody=msg.GetByte();
@@ -483,6 +484,7 @@ void Protocol70::parseSetOutfit(NetworkMessage &msg)
 		std::cout << "set outfit to: " << (int)(player->lookhead) << " / " << (int)player->lookbody << " / " << (int)player->looklegs << " / " <<  (int)player->lookfeet << std::endl;
 	}
 	map->creatureChangeOutfit(player);
+    }
 }
 
 
@@ -1347,6 +1349,20 @@ void Protocol70::sendCancel(const char *msg)
   netmsg.WriteToSocket(s);
 }
 
+void Protocol70::sendChangeSpeed(int speed)
+{
+  NetworkMessage netmsg;
+  netmsg.AddByte(0x8F);
+  
+  netmsg.AddByte(0x18);
+  netmsg.AddByte(0x38);
+  netmsg.AddByte(0x00);
+  netmsg.AddByte(0x00);
+  
+  netmsg.AddU16(speed);
+  
+  netmsg.WriteToSocket(s);
+}
 
 void Protocol70::sendCancelWalk(const char *msg)
 {

@@ -109,7 +109,7 @@ private:
 
   virtual void sendCancel(const char *msg);
   virtual void sendCancelWalk(const char *msg);
-
+  virtual void sendChangeSpeed(int speed);
   void sendSetOutfit(const Creature* creature);
 	virtual void sendTileUpdated(const Position *Pos);
 	virtual void sendContainerUpdated(Item *item, unsigned char from_id, unsigned char to_id, unsigned char from_slot, unsigned char to_slot, bool remove);
