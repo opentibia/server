@@ -1,0 +1,32 @@
+dnl Process this file with autoconf to produce a configure script.
+AC_INIT(opentserv, 0.2, opentserv@youdie.de)
+AC_CONFIG_SRCDIR([creature.h])
+AC_CONFIG_AUX_DIR(config)
+AC_CANONICAL_SYSTEM
+
+# check if we want debuging
+AC_SUBST(DEBUG)
+AC_ARG_WITH(debug,   --with-debug      enable debuging, DEBUG=-DDEBUG)
+
+# Checks for programs.
+AC_PROG_CXX
+AC_LANG_CPLUSPLUS
+AC_EXEEXT
+AC_OBJEXT
+
+# Checks for libraries.
+
+# check if we use mingw or unix...
+case "$host" in
+*mingw* | *win*) target_sys=__WINDOWS__; LDFLAGS=$LDFLAGS" -lwsock32 ";;
+*) target_sys=__LINUX__;;
+esac
+AC_SUBST(target_sys)
+
+# Checks for header files.
+
+# Checks for typedefs, structures, and compiler characteristics.
+
+# Checks for library functions.
+
+AC_OUTPUT(Makefile)

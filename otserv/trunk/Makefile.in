@@ -1,0 +1,19 @@
+srcdir = @srcdir@
+VPATH = @srcdir@
+CXX = @CXX@
+CXXFLAGS = @CXXFLAGS@
+LDFLAGS = @LDFLAGS@
+DEFINES= -D@target_sys@ @DEBUG@
+EXEEXT = @EXEEXT@
+OBJEXT = @OBJEXT@
+
+OBJS = item.$(OBJEXT) network.$(OBJEXT) player.$(OBJEXT) player_mem.$(OBJEXT) \
+protokoll.$(OBJEXT) tprot.$(OBJEXT)
+
+all: $(OBJS)
+
+.cpp.$(OBJEXT):
+	$(CXX) -c $(DEFINES) $(CXXFLAGS) $<
+
+clean:
+	rm -f $(OBJS)
