@@ -142,7 +142,7 @@ private:
 		
 		minRange.x = -8;
 		minRange.y = -6;
-        //just the visible ones
+    //just the visible ones
 		maxRange.x = 8; //maxRange.x = 9;
 		maxRange.y = 6; //maxRange.y = 7;
 		

@@ -673,6 +673,22 @@ bool Game::onPrepareMoveCreature(Creature *player, const Creature* creatureMovin
 	return true;
 }
 
+/*
+void Game:onCreatureUpdateContainer(Player *player, const Container *container, Item *item, bool remove)
+{
+	Item* container = NULL;
+	for(unsigned int cid = 0; cid < p->getContainerCount(); ++cid) {
+		container = p->getContainer(cid);
+		if(container && container == fromContainer) {
+			player->onContainerUpdated(item, cid, (toContainer == fromContainer ? cid : 0xFF), from_slotid, 0, true);
+		}
+
+		if(container && container == toContainer && toContainer != fromContainer) {
+			player->onContainerUpdated(item, 0xFF, cid, from_slotid, 0, false);
+		}
+	}
+}
+*/
 
 //Container to container
 void Game::thingMoveInternal(Creature *player,

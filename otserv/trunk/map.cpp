@@ -419,8 +419,10 @@ bool Map::canThrowItemTo(Position from, Position to, bool creaturesBlock /* = tr
 		t = getTile((steep ? y : x), (steep ? x : y), from.z);
 
 		if(t) {
-			if(isProjectile && t->isBlockingProjectile())
-				return false;
+			if(isProjectile) {
+				if(t->isBlockingProjectile())
+					return false;
+			}
 			else if(creaturesBlock && !t->creatures.empty())
 				return false;
 			else if((from.x != x && from.y != y) && t->isBlocking())
