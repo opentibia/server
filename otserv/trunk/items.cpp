@@ -49,6 +49,8 @@ ItemType::ItemType()
 
   decayTo    =    0;
   decayTime  =   60;
+
+	damage = 0;
 }
 
 ItemType::~ItemType()
@@ -300,6 +302,10 @@ int Items::loadXMLInfos(std::string file)
           char* decayTime = (char*)xmlGetProp(p, (xmlChar*)"decaytime");
           if (decayTime)
 						itemtype->decayTime = atoi(decayTime);
+		
+					char* damage = (char*)xmlGetProp(p, (xmlChar*)"damage");
+					if(damage)
+						itemtype->damage = atoi(damage);
 
 					// now set special properties...
 					// first we check the type...

@@ -33,6 +33,7 @@
 #include <boost/bind.hpp>
 
 #include "spells.h"
+
 Spells::Spells(Map* imap): map(imap){
                    
                    }
@@ -107,11 +108,12 @@ bool Spells::loadFromXml()
                     return this->loaded;
 }
 Spells::~Spells(){
-                  std::map<std::string, Spell*>::iterator it;
-                  for(it = allSpells.begin(); it != allSpells.end(); it++){
-                                           delete it->second;;
-                                           allSpells.erase(it);
-                                           }
+                  std::map<std::string, Spell*>::iterator it = allSpells.begin();
+									while(it != allSpells.end()) {
+										delete it->second;
+										allSpells.erase(it);
+										it = allSpells.begin();
+									}
                  }
 
 Spell::Spell(std::string iname, std::string iwords, int imagLv, int imana, Map* imap) : name(iname), words(iwords), magLv(imagLv), mana(imana), map(imap){
@@ -188,31 +190,29 @@ Spell* SpellScript::getSpell(lua_State *L){
 }
 
 int SpellScript::luaActionDoSpell(lua_State *L){
-    int cx,cy,cz;
+		int cx,cy,cz;
     bool needDirection;
-    EffectInfo ei;
-    ei.animationEffect = 0;
-    ei.needtarget = false;
+		MagicEffectInstantSpellClass instantSpell;
     
     needDirection = (bool)lua_toboolean(L, -1);
 	lua_pop(L,1);
     
-    ei.maxDamage = (int)lua_tonumber(L, -1);
+    instantSpell.maxDamage = (int)lua_tonumber(L, -1);
 	lua_pop(L,1);
 	
-	ei.minDamage = (int)lua_tonumber(L, -1);
+	instantSpell.minDamage = (int)lua_tonumber(L, -1);
 	lua_pop(L,1);
     
-	ei.offensive = lua_toboolean(L, -1);
+	instantSpell.offensive = lua_toboolean(L, -1);
 	lua_pop(L,1);
 	
-	ei.animationcolor = (char)lua_tonumber(L, -1);
+	instantSpell.animationcolor = (char)lua_tonumber(L, -1);
 	lua_pop(L,1);
 	
-	ei.areaEffect = (char)lua_tonumber(L, -1);
+	instantSpell.areaEffect = (char)lua_tonumber(L, -1);
 	lua_pop(L,1);
 	
-	ei.damageEffect = (char)lua_tonumber(L, -1);
+	instantSpell.damageEffect = (char)lua_tonumber(L, -1);
 	lua_pop(L,1);
 	
 	lua_pushstring(L, "z");
@@ -250,27 +250,28 @@ int SpellScript::luaActionDoSpell(lua_State *L){
          i++;
        }
        lua_pop(L, 1);
-   memcpy(&ei.area, area, sizeof(area));	
+   memcpy(&instantSpell.area, area, sizeof(area));	
    Spell* spell = getSpell(L);
-   ei.manaCost = spell->getMana();
+   instantSpell.manaCost = spell->getMana();
    
    Creature* creature = spell->map->getCreatureByID((unsigned long)lua_tonumber(L, -1));
    lua_pop(L,1);
    
    if(needDirection){
                     switch(creature->getDirection()) {
-			                                    case NORTH: ei.direction = 1; break;
-			                                    case WEST: ei.direction = 2; break;
-			                                    case EAST: ei.direction = 3; break;
-			                                    case SOUTH: ei.direction = 4; break;
+			                                    case NORTH: instantSpell.direction = 1; break;
+			                                    case WEST: instantSpell.direction = 2; break;
+			                                    case EAST: instantSpell.direction = 3; break;
+			                                    case SOUTH: instantSpell.direction = 4; break;
 		                                     };
                     }
    else {
-        ei.direction = 1;
+        instantSpell.direction = 1;
         }
    Position pos = Position(cx, cy, cz);
-   ei.centerpos = pos;
-   spell->map->creatureCastSpell(creature, ei);
+
+	 instantSpell.centerpos = pos;
+   spell->map->creatureCastSpell(creature, instantSpell);
    return 0;
 }
 int SpellScript::luaActionChangeOutfit(lua_State *L){
@@ -286,8 +287,8 @@ int SpellScript::luaActionChangeOutfit(lua_State *L){
 	creature->looktype = looktype;
 	spell->map->creatureChangeOutfit(creature);
 	
-    spell->map->changeOutfitAfter(creature->getID(), creature->lookmaster, time);
-    return 0;
+  spell->map->changeOutfitAfter(creature->getID(), creature->lookmaster, time);
+  return 0;
 }
 
 int SpellScript::luaActionManaShield(lua_State *L){

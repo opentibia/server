@@ -44,6 +44,7 @@ class Item : public Thing
     private:
         unsigned id;  // the same id as in ItemType
 	      unsigned char count; // number of stacked items
+				unsigned char chargecount; //number of charges on the item
 
     private: // the following, I will have to rethink:
         // could be union:
@@ -82,6 +83,10 @@ class Item : public Thing
 
         // get the number of items
         unsigned char getItemCountOrSubtype() const;
+				void setItemCountOrSubtype(unsigned char n) {count = n;};
+
+				unsigned char getItemCharge() const {return chargecount;};
+				void setItemCharge(unsigned char n) {chargecount = n;};
 
         // Constructor for items
         Item(const unsigned short _type);
@@ -100,6 +105,7 @@ class Item : public Thing
 				void removeItem(Item* item); //remove an item from the container
 				void moveItem(unsigned char from_slot, unsigned char to_slot);
 				Item* getItem(unsigned long slot_num);
+				unsigned char getSlotNumberByItem(Item* item);
 				void isContainerHolding(Item* item, bool& found); //search all containers for the item recursively
         Item& operator<<(Item*); // put items into the container
 };

@@ -48,6 +48,7 @@ unsigned char Item::getItemCountOrSubtype() const {
 Item::Item(const unsigned short _type) {
     id = _type;
     count = 0;
+		chargecount = 0;
 		maxitems = 20;
 		actualitems = 0;
 
@@ -56,7 +57,13 @@ Item::Item(const unsigned short _type) {
 
 Item::Item(const unsigned short _type, unsigned char _count) {
     id = _type;
-    count = _count;
+		count = 0;
+		chargecount = 0;
+
+		if(isStackable() || isMultiType())
+			count = _count;
+		else
+			chargecount = _count;
 
     throwRange = 6;
 }
@@ -64,6 +71,7 @@ Item::Item(const unsigned short _type, unsigned char _count) {
 Item::Item() {
     id = 0;
     count = 0;
+		chargecount = 0;
 		maxitems = 20;
 		actualitems = 0;
 
@@ -174,6 +182,19 @@ Item* Item::getItem(unsigned long slot_num)
 	}
 
 	return NULL;
+}
+
+unsigned char Item::getSlotNumberByItem(Item* item)
+{
+	unsigned char n = 0;			
+	for (Item::iterator cit = getItems(); cit != getEnd(); cit++) {
+		if(*cit == item)
+			return n;
+		else
+			n++;
+	}
+
+	return 0xFF;
 }
 
 //////////////////////////////////////////////////

@@ -30,7 +30,7 @@
 #include "position.h"
 #include "item.h"
 #include "creature.h"
-
+#include "magic.h"
 #include "otsystem.h"
 
 #include "scheduler.h"
@@ -49,28 +49,66 @@ class Player;
 
 class Tile;
 
-//struct effectInfo {
-class EffectInfo
-{
+class Range {
 public:
-	//Position GetViewState(Player *spectator);
-	//createMagicEffect(Player *spectator
-	//CanSee(Player *spectator);
-//private:
-	Position centerpos;
-	unsigned char areaEffect;
-	unsigned char damageEffect;
-	unsigned char animationEffect;
-	unsigned char area[14][18];
-	unsigned char direction;
-	unsigned char animationcolor;
-	int manaCost;
-	int minDamage;
-	int maxDamage;
-	int minManaDrain;
-	int maxManaDrain;
-	bool offensive;
-	bool needtarget;
+	Range(Position centerpos, bool multilevel = false) {
+		this->startx = centerpos.x - 9;
+		this->endx = centerpos.x + 9;
+		this->starty = centerpos.y - 7;
+		this->endy = centerpos.y + 7;
+		if(multilevel)
+			this->startz = 0;
+		else
+			this->startz = centerpos.z;
+		this->endz = centerpos.z;
+		this->multilevel = multilevel;
+	}
+
+	Range(int startx, int endx, int starty, int endy, int z, bool multilevel = false)
+	{
+		this->startx = startx;
+		this->endx = endx;
+		this->starty = starty;
+		this->endy = endy;
+		if(multilevel)
+			this->startz = 0;
+		else
+			this->startz = startz;
+		this->endz = z;
+		this->multilevel = multilevel;
+	}
+
+	Range(int startx, int endx, int starty, int endy, int startz, int endz)
+	{
+		this->startx = startx;
+		this->endx = endx;
+		this->starty = starty;
+		this->endy = endy;
+		this->startz = startz;
+		this->endz = endz;
+		this->multilevel = multilevel;
+	}
+
+	int startx;
+	int endx;
+	int starty;
+	int endy;
+	int startz;
+	int endz;
+	bool multilevel;
+};
+
+struct targetdata {
+	int damage;
+	int manaDamage;
+	unsigned char stackpos;
+	bool hadSplash;
+};
+
+struct tiletargetdata {
+	Position pos;
+	int targetCount;
+	unsigned char thingCount;
 };
 
 struct AStarNode{
@@ -109,7 +147,7 @@ class Map {
         unsigned char stackPos,
         unsigned short to_x, unsigned short to_y, unsigned char to_z);
 
-    void creatureTurn(Creature *creature, Direction dir);
+		void creatureTurn(Creature *creature, Direction dir);
 
     void creatureSay(Creature *creature, unsigned char type, const std::string &text);
     void creatureWhisper(Creature *creature, const std::string &text);
@@ -118,10 +156,8 @@ class Map {
     void creatureBroadcastMessage(Creature *creature, const std::string &text);
 	  void creatureChangeOutfit(Creature *creature);
 
-	  //void playerCastSpell(Creature *creature, const std::string &text);
-		//void makeCastSpell(Creature *creature, int mana, int mindamage, int maxdamage, unsigned char area[14][18], unsigned char ch, unsigned char typeArea, unsigned char typeDamage);
-	  void creatureThrowRune(Creature *creature, const EffectInfo &ei);
-  	void creatureCastSpell(Creature *creature, const EffectInfo &ei);
+	  bool creatureThrowRune(Creature *creature, const MagicEffectClass& me);
+  	void creatureCastSpell(Creature *creature, const MagicEffectClass& me);
 		bool creatureSaySpell(Creature *creature, const std::string &text);
      void changeOutfitAfter(unsigned long id, int looktype, long time);
      void changeSpeed(unsigned long id, unsigned short speed);
@@ -133,24 +169,30 @@ class Map {
 		Creature* getCreatureByName(const char* s);
 
 	std::list<Position> getPathTo(Position start, Position to, bool creaturesBlock=true);
+	bool canThrowItemTo(Position from, Position to, bool creaturesBlock=true);
+	//bool canThrowItemTo(int x0, int y0, int x1, int y1, int floor);
 
     OTSYS_THREAD_LOCKVAR mapLock;
   protected:
     // use this internal function to move things around to avoid the need of
     // recursive locks
+		//bool OnPrepareMoveInternal(const Thing *thing);
     void thingMoveInternal(Creature *player,
         unsigned short from_x, unsigned short from_y, unsigned char from_z,
         unsigned char stackPos,
         unsigned short to_x, unsigned short to_y, unsigned char to_z);
 
-        void changeOutfit(unsigned long id, int looktype);
+    void changeOutfit(unsigned long id, int looktype);
 		bool creatureOnPrepareAttack(Creature *creature, Position pos);
 		void creatureMakeDamage(Creature *creature, Creature *attackedCreature, fight_t damagetype);
-		void creatureMakeMagic(Creature *creature, const EffectInfo &ei);
-		void creatureMakeAreaEffect(Creature *spectator, Creature *attacker, const EffectInfo &ei, NetworkMessage& msg);
-	  void CreateDamageUpdate(Creature* player, Creature* attackCreature, int damage, NetworkMessage& msg);
+    void creatureBroadcastTileUpdated(const Position& pos);
+		bool creatureMakeMagic(Creature *creature, const MagicEffectClass* me);
+
+		void CreateDamageUpdate(Creature* player, Creature* attackCreature, int damage, NetworkMessage& msg);
+	  void getSpectators(const Range& range, std::vector<Creature*>& list);
+	  void getAreaTiles(Position pos, const unsigned char area[14][18], unsigned char dir, std::list<tiletargetdata>& list);
+		void creatureApplyMagicEffect(Creature *target, const MagicEffectClass& me, NetworkMessage& msg);
 	  void CreateManaDamageUpdate(Creature* player, Creature* attackCreature, int damage, NetworkMessage& msg);
-	  //void getSpectators(const Position& pos, std::vector<Player*>& list);
 
     OTSYS_THREAD_LOCKVAR eventLock;
 	  OTSYS_THREAD_SIGNALVAR eventSignal;

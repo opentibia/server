@@ -512,40 +512,29 @@ void Protocol70::parseUseItemEx(NetworkMessage &msg)
 	pos.z = to_z;
 
 	if(from_x == 0xFFFF) {
+		bool decreaseCharge = false;
+
 		if(from_y & 0x40) {
-			unsigned char bpid = from_y & 0x0F;
+			unsigned char containerid = from_y & 0x0F;
+			Item* container = player->getContainer(containerid);
+			if(!container)
+				return;
+
+			Item* runeitem = container->getItem(from_z);
+			if(!runeitem)
+				return;
+
 			//This should be loaded from somewhere later (lua? or xml perhaps)
 			if(item == 1623) {
-				static unsigned char area[14][18] = {
-					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-					{0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-				};
-
-				EffectInfo ei;
-				ei.animationEffect = 0;
-				ei.damageEffect = NM_ME_MAGIC_ENERGIE;
-				ei.areaEffect = 0;
-				ei.animationcolor = MSG_INFO; 
-				ei.offensive = false;
-				ei.needtarget = true;
-				ei.centerpos = pos;
-				memcpy(&ei.area, area, sizeof(area));
-				ei.direction = 1;
-				ei.manaCost = 0;
-				ei.minDamage = (int)(((player->level + player->maglevel) * 3) * 1.0);
-				ei.maxDamage = (int)(((player->level + player->maglevel) * 3) * 1.2);
-				map->creatureThrowRune(player, ei); 
+				MagicEffectRuneClass runeSpell;
+				runeSpell.animationEffect = 0;
+				runeSpell.damageEffect = NM_ME_MAGIC_ENERGIE;
+				runeSpell.animationcolor = MSG_INFO; 
+				runeSpell.offensive = false;
+				runeSpell.centerpos = pos;
+				runeSpell.minDamage = (int)(((player->level + player->maglevel) * 3) * 1.0);
+				runeSpell.maxDamage = (int)(((player->level + player->maglevel) * 3) * 1.2);
+				decreaseCharge = map->creatureThrowRune(player, runeSpell); 
 			}
 		else
 			if(item == 1654) {
@@ -565,19 +554,18 @@ void Protocol70::parseUseItemEx(NetworkMessage &msg)
 					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 				};
 
-				EffectInfo ei;
-				ei.animationEffect = NM_ANI_FIRE;
-				ei.damageEffect = NM_ME_FIRE_AREA;
-				ei.areaEffect = NM_ME_FIRE_AREA;
-				ei.animationcolor = 0xB4;
-				ei.offensive = true;
-				ei.needtarget = false;
-				ei.centerpos = pos;
-				memcpy(&ei.area, area, sizeof(area));
-				ei.direction = 1;
-				ei.minDamage = (int)(((player->level + player->maglevel) * 3) * 0.34) / 2;
-				ei.maxDamage = (int)(((player->level + player->maglevel) * 3) * 0.40) / 2;
-				map->creatureThrowRune(player, ei); 
+				MagicEffectAreaClass fieldRune;
+				fieldRune.animationEffect = NM_ANI_FIRE;
+				fieldRune.damageEffect = NM_ME_FIRE_AREA;
+				fieldRune.areaEffect = NM_ME_FIRE_AREA;
+				fieldRune.animationcolor = 0xB4;
+				fieldRune.offensive = true;
+				fieldRune.centerpos = pos;
+				memcpy(&fieldRune.area, area, sizeof(area));
+				fieldRune.direction = 1;
+				fieldRune.minDamage = (int)(((player->level + player->maglevel) * 3) * 0.34) / 2;
+				fieldRune.maxDamage = (int)(((player->level + player->maglevel) * 3) * 0.40) / 2;
+				decreaseCharge = map->creatureThrowRune(player, fieldRune); 
 			}
 		else
 			if(item == 1663) {
@@ -597,53 +585,97 @@ void Protocol70::parseUseItemEx(NetworkMessage &msg)
 					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 				};
 
-				EffectInfo ei;
-				ei.animationEffect = NM_ANI_FIRE;
-				ei.damageEffect = NM_ME_EXPLOSION_DAMAGE;
-				ei.areaEffect = NM_ME_EXPLOSION_AREA;
-				ei.animationcolor = 0xB4;
-				ei.offensive = true;
-				ei.needtarget = false;
-				ei.centerpos = pos;
-				memcpy(&ei.area, area, sizeof(area));
-				ei.direction = 1;
-				ei.manaCost = 0;
-				ei.minDamage = (int)(((player->level + player->maglevel) * 3) * 0.1) / 2;
-				ei.maxDamage = (int)(((player->level + player->maglevel) * 3) * 0.9) / 2;
-				map->creatureThrowRune(player, ei); 
+				MagicEffectAreaClass runeAreaSpell;
+				runeAreaSpell.animationEffect = NM_ANI_FIRE;
+				runeAreaSpell.damageEffect = NM_ME_EXPLOSION_DAMAGE;
+				runeAreaSpell.areaEffect = NM_ME_EXPLOSION_AREA;
+				runeAreaSpell.animationcolor = 0xB4;
+				runeAreaSpell.offensive = true;
+				runeAreaSpell.centerpos = pos;
+				memcpy(&runeAreaSpell.area, area, sizeof(area));
+				runeAreaSpell.direction = 1;
+				runeAreaSpell.minDamage = (int)(((player->level + player->maglevel) * 3) * 0.1) / 2;
+				runeAreaSpell.maxDamage = (int)(((player->level + player->maglevel) * 3) * 0.9) / 2;
+				decreaseCharge = decreaseCharge = map->creatureThrowRune(player, runeAreaSpell); 
 			}
 		else
 			if(item == 0x0652) {
+				MagicEffectRuneClass runeSpell;
+				runeSpell.animationEffect = NM_ANI_SUDDENDEATH;
+				runeSpell.damageEffect = NM_ME_MORT_AREA;
+				runeSpell.animationcolor = 0xB4; 
+				runeSpell.offensive = true;
+				runeSpell.centerpos = pos;
+				runeSpell.minDamage = (int)(((player->level + player->maglevel) * 3) * 1.1) / 2;
+				runeSpell.maxDamage = (int)(((player->level + player->maglevel) * 3) * 1.3) / 2;
+				decreaseCharge = map->creatureThrowRune(player, runeSpell); 
+			}
+		else
+			if(item == 1643) {
 				static unsigned char area[14][18] = {
-					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-					{0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-					{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-				};
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
 
-				EffectInfo ei;
-				ei.animationEffect = NM_ANI_SUDDENDEATH;
-				ei.damageEffect = NM_ME_MORT_AREA;
-				ei.areaEffect = 0;
-				ei.animationcolor = 0xB4; 
-				ei.offensive = true;
-				ei.needtarget = true;
-				ei.centerpos = pos;
-				memcpy(&ei.area, area, sizeof(area));
-				ei.direction = 1;
-				ei.manaCost = 0;
-				ei.minDamage = (int)(((player->level + player->maglevel) * 3) * 1.1) / 2;
-				ei.maxDamage = (int)(((player->level + player->maglevel) * 3) * 1.3) / 2;
-				map->creatureThrowRune(player, ei); 
+				MagicEffectGroundClass spellGround;
+				spellGround.animationEffect = NM_ANI_ENERGY;
+				spellGround.offensive = true;
+				spellGround.centerpos = pos;
+				memcpy(&spellGround.area, area, sizeof(area));
+				spellGround.direction = 1;
+				spellGround.groundID = 1190;
+				decreaseCharge = map->creatureThrowRune(player, spellGround); 
+			}
+		else
+			if(item == 1655) {
+				static unsigned char area[14][18] = {
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
+
+				MagicEffectGroundClass spellGround;
+				spellGround.animationEffect = NM_ANI_FIRE;
+				spellGround.animationcolor = 0xB4;
+				spellGround.damageEffect = NM_ME_HITBY_FIRE;
+				spellGround.areaEffect = NM_ME_FIRE_AREA;
+				spellGround.offensive = true;
+				spellGround.centerpos = pos;
+				memcpy(&spellGround.area, area, sizeof(area));
+				spellGround.direction = 1;
+				spellGround.groundID = 1185;
+				spellGround.minDamage = 20; //Item::items[spellGround.groundID].damage;
+				spellGround.maxDamage = 20; //Item::items[spellGround.groundID].damage;
+
+				decreaseCharge = map->creatureThrowRune(player, spellGround);
+			}
+
+			if(decreaseCharge) {
+				runeitem->setItemCharge(max(0, runeitem->getItemCharge() - 1));
+
+				if(runeitem->getItemCharge() == 0) {
+					container->removeItem(runeitem);
+					sendContainerUpdated(runeitem, containerid, 0xFF, from_z, 0xFF, true);
+				}
 			}
 		}
 	}
@@ -695,33 +727,47 @@ void Protocol70::parseUseItem(NetworkMessage &msg)
 	std::cout << "parseUseItem: " << "x: " << x << ", y: " << (int)y <<  ", z: " << (int)z << ", item: " << (int)item << ", un: " << (int)un << ", stack: " << (int)stack << std::endl;
 #endif
 
-	if(x == 0xFFFF && Item(item).isContainer()) {
+	if(Item(item).isContainer())
+	{
 		msg.Reset();
+
 		Item *newcontainer = NULL;
-		Item *container = NULL;
-
-		if(0x40 & y) {
-			unsigned char containerid = y & 0x0F;
-			container = player->getContainer(containerid);
-
-			if(container == NULL) {
+		/*
+		if(x != 0xFFFF) {
+			if(abs(player->pos.x - x) > 1 || abs(player->pos.y - y) > 1)
 				return;
-			}
 
-			newcontainer = container;
-
-			int n = 0;
-			for (Item::iterator cit = container->getItems(); cit != container->getEnd(); cit++) {
-				if(n == z) {
-					newcontainer = (*cit);
-					break;
-				}
-				else
-					n++;
-			}
+			Tile *t = map->getTile(x, y, z);
+			
+			if(t)
+				newcontainer = (Item*)t->getThingByStackPos(un);
 		}
-		else
-			newcontainer = (Item*)player->items[y];
+		*/
+
+		if(x == 0xFFFF) {
+			Item *parentcontainer = NULL;
+
+			if(0x40 & y) {
+				unsigned char containerid = y & 0x0F;
+				parentcontainer = player->getContainer(containerid);
+
+				if(parentcontainer == NULL || !parentcontainer->isContainer()) {
+					return;
+				}
+
+				int n = 0;
+				for (Item::iterator cit = parentcontainer->getItems(); cit != parentcontainer->getEnd(); cit++) {
+					if(n == z) {
+						newcontainer = (*cit);
+						break;
+					}
+					else
+						n++;
+				}
+			}
+			else
+				newcontainer = (Item*)player->items[y];
+		}
 
 		if(newcontainer && newcontainer->isContainer()) {
 			player->addContainer(stack, newcontainer);
@@ -734,7 +780,7 @@ void Protocol70::parseUseItem(NetworkMessage &msg)
 			msg.AddU16(newcontainer->getContainerMaxItemCount());
 			msg.AddByte(newcontainer->getContainerItemCount());
 
-      Item::iterator cit;
+			Item::iterator cit;
 			for (cit = newcontainer->getItems(); cit != newcontainer->getEnd(); cit++) {
 				msg.AddU16((*cit)->getID());
 				if((*cit)->getItemCountOrSubtype() > 1)

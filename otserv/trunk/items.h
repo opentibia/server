@@ -48,7 +48,9 @@ public:
   unsigned short decayTo;
   unsigned short decayTime;
 
-  uint8_t speed;
+	unsigned short damage;
+
+	uint8_t speed;
 
 
 	// other bools

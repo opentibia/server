@@ -191,26 +191,31 @@ bool Account::openPlayer(const std::string &name, const std::string &givenpasswo
 
 							Item *backpack = new Item(1411);
 							player.items[sl_id]->addItem(backpack);
-							backpack->addItem(new Item(1663));
-							backpack->addItem(new Item(1663));
-							backpack->addItem(new Item(1663));
-							backpack->addItem(new Item(1663));
+							backpack->addItem(new Item(1663, 99));
+							backpack->addItem(new Item(1663, 99));
+							backpack->addItem(new Item(1663, 99));
+							backpack->addItem(new Item(1663, 99));
 
 							backpack = new Item(1411);
 							player.items[sl_id]->addItem(backpack);
 							
-							backpack->addItem(new Item(1623));
-							backpack->addItem(new Item(1623));
-							backpack->addItem(new Item(1623));
-							backpack->addItem(new Item(1623));
+							backpack->addItem(new Item(1623, 99));
+							backpack->addItem(new Item(1623, 99));
+							backpack->addItem(new Item(1623, 99));
+							backpack->addItem(new Item(1623, 99));
 
 							backpack = new Item(1411);
 							player.items[sl_id]->addItem(backpack);
 							
-							backpack->addItem(new Item(1618));
-							backpack->addItem(new Item(1618));
-							backpack->addItem(new Item(1618));
-							backpack->addItem(new Item(1618));
+							backpack->addItem(new Item(1618, 99));
+							backpack->addItem(new Item(1618, 99));
+							backpack->addItem(new Item(1618, 99));
+							backpack->addItem(new Item(1618, 99));
+
+							//player.items[sl_id]->addItem(new Item(1629, 99));
+							player.items[sl_id]->addItem(new Item(1655, 99));
+							player.items[sl_id]->addItem(new Item(1643, 99));
+							player.items[sl_id]->addItem(new Item(1654, 99));
 						}
           }
           slot=slot->next;
