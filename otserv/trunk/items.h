@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.7  2003/08/26 21:09:53  tliffrag
+// fixed maphandling
+//
 // Revision 1.6  2003/05/19 16:48:37  tliffrag
 // Loggingin, talking, walking around, logging out working
 //
@@ -65,8 +68,11 @@ class ItemType {
     bool pickupable : 1; // people can pick it up
     // other bools
     public:
+	//what freak has chosen this const static unsigned short?
     const static unsigned short WATER = 486;
     const static unsigned short GRASS = 694;
+	const static unsigned short STREET = 0x02B6;
+	const static unsigned short THING = 0x0759;
 
     bool isContainer(); // return if this item is a Container
 

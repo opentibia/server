@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.7  2003/08/26 21:09:53  tliffrag
+// fixed maphandling
+//
 // Revision 1.6  2003/08/25 21:28:12  tliffrag
 // Fixed all warnings.
 //
@@ -58,9 +61,11 @@ Map::Map() {
         for (unsigned short y = MINY + 20; y <= MAXY - 20; y++) {
             delete tiles[x-MINX][y-MINY]->back();
             tiles[x-MINX][y-MINY]->pop_back();
-            tiles[x-MINX][y-MINY]->push_back(new Item(ItemType::GRASS));
+            tiles[x-MINX][y-MINY]->push_back(new Item(ItemType::STREET));
         }
     std::cout << "created land." << std::endl;
+	tiles[32864-MINX+20][32864-MINY]->push_back(new Item(ItemType::THING));
+	tiles[32864-MINX+2][32864-MINY]->push_back(new Item(ItemType::THING));
 }
 
 Map::Map(char *filename) {
@@ -104,6 +109,10 @@ int Map::removeCreature(position pos, Creature* c){
 }
 
 int Map::requestAction(Creature* c, Action* a){
+	if(a->type == ACTION_TURN){
+		//no checking needs to be done, we can always turn
+		distributeAction(a->pos1, a);
+	}
 	if(a->type==ACTION_MOVE){
 		a->pos2=a->pos1;
 		if(a->direction%2){

@@ -170,6 +170,7 @@
 			}
 
 			void TProt70::setMap(position newpos, Map& newmap) throw(texception) {
+			//this happens when the player logs in
 				// first we save the new map position...
 				pos = newpos;
 				map = &newmap;
@@ -347,13 +348,11 @@
 					tile=map->tile(i,j,topleft.z);
 					for (Item::iterator it=tile->begin(); it != tile->end(); it++) {
 						std::cout << "-";
-						//ADD2BYTE(buf, (*it)->getID());
-						buf+=(char)0xB6;
-						buf+=(char)0x02;
-						 if(tile->getCreature()!=NULL)
-						  buf += makeCreature(tile->getCreature());
-						buf+=(char)0x00; // no special thing
+						ADD2BYTE(buf, (*it)->getID());
 					}
+					if(tile->getCreature()!=NULL)
+					buf += makeCreature(tile->getCreature());
+					buf+=(char)0x00; // no special thing
 					buf += (char)0xFF; // tile end
 				} //for (unsigned short j=topleft.y; j<=botright.y; j++)
 			}//for (unsigned short i=topleft.x; i<=botright.x; i++)
@@ -493,7 +492,9 @@ void TProt70::sendAction(Action* action){
 		buf[1]=(char)((buf.size()-2)/256)%256;
 		TNetwork::SendData(psocket,buf);
 	}
-
+	if(action->type==ACTION_TURN){
+		sendPlayerTurn(action);
+	}
 	if(action->type==ACTION_MOVE){
 		sendPlayerMove(action);
 	}
@@ -609,6 +610,14 @@ void TProt70::sendPlayerLogout(Action* action){
 	ADD2BYTE(buf, action->pos1.y);
 	buf+=(char)action->pos1.z;
 	buf+=(char)0x01;
+	buf[0]=(char)(buf.size()-2)%256;
+	buf[1]=(char)((buf.size()-2)/256)%256;
+	TNetwork::SendData(psocket,buf);
+}
+
+void TProt70::sendPlayerTurn(Action* action){
+	std::string buf = "  ";
+	buf+=(char)(0x6F+action->direction);
 	buf[0]=(char)(buf.size()-2)%256;
 	buf[1]=(char)((buf.size()-2)/256)%256;
 	TNetwork::SendData(psocket,buf);

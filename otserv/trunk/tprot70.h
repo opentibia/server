@@ -22,6 +22,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.2  2003/08/26 21:09:53  tliffrag
+// fixed maphandling
+//
 // Revision 1.1  2003/05/19 16:51:20  tliffrag
 // Forgot some files, blame it on cvs add
 //
@@ -92,6 +95,7 @@
 			void sendPlayerLogin(Action* action);
 			void sendPlayerLogout(Action* action);
 			void sendPlayerMoveIn(Action* action);
+			void sendPlayerTurn(Action* action);
 
 
 
