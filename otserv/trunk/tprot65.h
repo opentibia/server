@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.5  2002/05/29 16:07:38  shivoc
+// implemented non-creature display for login
+//
 // Revision 1.4  2002/05/28 13:55:57  shivoc
 // some minor changes
 //
@@ -43,7 +46,7 @@ namespace Protokoll {
             TProt65(const Socket&, const std::string&) throw(texception);
 
             // set the map and update the client screen
-            void setMap(position) throw(texception);
+            void setMap(position, Map&) throw(texception) {}
 
             // virtual methods form out base class...
             const std::string getName() const throw();

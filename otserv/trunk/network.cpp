@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.9  2002/05/29 16:07:38  shivoc
+// implemented non-creature display for login
+//
 // Revision 1.8  2002/05/28 13:55:56  shivoc
 // some minor changes
 //
@@ -156,6 +159,8 @@ void TNetwork::SendData(const Socket& playersocket, const std::string& data) thr
         total+=sent;
         bytesleft-=sent;
     }  // while (total < length)
+
+    std::cout << "sent: " << total << " bytes to: " << playersocket << std::endl;
 
 } // void TNetwork::SendData(const Socket& playersocket, const string& data) throw() 
 

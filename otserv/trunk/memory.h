@@ -20,15 +20,24 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.4  2002/05/29 16:07:38  shivoc
+// implemented non-creature display for login
+//
 // Revision 1.3  2002/05/28 13:55:56  shivoc
 // some minor changes
 //
 //
 //////////////////////////////////////////////////////////////////////
 
+#ifndef __OTSERV_MEMORY_H
+#define __OTSERV_MEMORY_H
+
 class Memory {
 
     public:
         virtual void save()=0;
+        virtual ~Memory() { };
 
 }; // class Memory
+
+#endif

@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.7  2002/05/29 16:07:38  shivoc
+// implemented non-creature display for login
+//
 // Revision 1.6  2002/05/28 13:55:57  shivoc
 // some minor changes
 //
@@ -123,9 +126,77 @@ namespace Protokoll {
         }
     }
 
-    void TProt::setMap(position newpos) throw(texception) {
+    void TProt::setMap(position newpos, Map& newmap) throw(texception) {
         // first we save the new map position...
-        our_pos = newpos;
+        pos = newpos;
+        map = &newmap;
+
+        // now we generate he data to send the player for the map
+        std::string buf="  "; // first two bytes are packet length
+
+        // packet id, 01 = login? or new map?
+        buf += (char)0x01;
+        buf += (char)0x00;
+
+        // now get the playernumber
+        buf += (char)(player->pnum%256);
+        buf += (char)(player->pnum/256)%256;
+        buf += (char)(player->pnum/(256*256))%256;
+        buf += (char)(player->pnum/(256*256*256))%256;
+        
+        buf += (char)0x0A;
+        buf += (char)0x00;
+
+        // map position
+        buf += (char)(pos.x%256);
+        buf += (char)(pos.x/256)%256;
+        buf += (char)(pos.y%256);
+        buf += (char)(pos.y/256)%256;
+        buf += (char)pos.z;
+
+        // now the actual map code follows...
+        cout << "x: " << pos.x << " y: " << pos.y << endl;
+        std::string buf2 = makeMap(position(pos.x-8,pos.y-6,pos.z),position(pos.x+9,pos.y+7,pos.z));
+
+        cout << buf2.size() << "\t";
+        cout << buf.size() << "\t";
+        buf += buf2;
+        cout << buf.size() << endl;
+        // now we correct the first two bytes which corespond to the length
+        // of the packet
+        buf[0]=(char)buf.size()%256;
+        buf[1]=(char)(buf.size()/256)%256;
+
+        // and send to client...
+        TNetwork::SendData(psocket,buf);
+
     } // void TProt::setMap(position newpos) throw(texception)
+
+    std::string TProt::makeMap(const position topleft, const position botright) {
+        std::string buf;
+        Tile* tile;
+
+        cout << topleft.y << "\t" << botright.y << endl;
+        // we just add the tilecode for every tile...
+        for (unsigned short i=topleft.x; i<=botright.x; i++) {
+            cout << "," << endl;
+            for (unsigned short j=topleft.y; j<=botright.y; j++) {
+                cout << ".";
+                tile=map->tile(i,j,topleft.z);
+                for (Item::iterator it=tile->begin(); it != tile->end(); it++) {
+                    cout << "-";
+                    buf+=(char)(*it)->getID()%256;
+                    buf+=(char)((*it)->getID()/256)%256;
+                }
+                if (i!=botright.x || j != botright.y) buf += (char)0xFF; // tile end
+                else buf += (char)0xFE;
+            } // for (int j=topleft.y; i<=botright.y; i++) 
+        }
+
+        cout << buf.size() << endl;
+        return buf;
+
+    } // std::string TProt::makeMap(const position& topleft, const position& botright)
+
 
 } // namespace Protokoll

@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.7  2002/05/29 16:07:38  shivoc
+// implemented non-creature display for login
+//
 // Revision 1.6  2002/05/28 13:55:57  shivoc
 // some minor changes
 //
@@ -130,9 +133,6 @@ extern EventScheduler es;
         }
 #endif
     }
-
-    void TProt65::setMap(position newpos) throw(texception) {
-    } // void TProt::setMap(mapposition, Map&) throw(texception)
 
     void TProt65::redirect(int ip, int port) {
         // now we need the redirect packet...

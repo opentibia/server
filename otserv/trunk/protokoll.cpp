@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.8  2002/05/29 16:07:38  shivoc
+// implemented non-creature display for login
+//
 // Revision 1.7  2002/05/28 13:55:56  shivoc
 // some minor changes
 //
@@ -34,6 +37,10 @@
 namespace Protokoll {
 
     Protokoll::Protokoll() throw() : cread(*this) { };
+
+    void Protokoll::setdata(Creatures::player_mem& pm) {
+        player=&pm;
+    }
 
     ProtokollP::ProtokollP(const Socket& psocket) throw(texception) {
 

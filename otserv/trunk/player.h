@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.6  2002/05/29 16:07:38  shivoc
+// implemented non-creature display for login
+//
 // Revision 1.5  2002/05/28 13:55:56  shivoc
 // some minor changes
 //
@@ -32,6 +35,7 @@
 #include "definitions.h"
 #include "creature.h"
 #include "protokoll.h"
+#include "player_mem.h"
 
 #include <string>
 
@@ -52,9 +56,14 @@ namespace Creatures {
                 return &client->cread;
             }
 
+            void setMap(position,Map&) throw(texception);
+
         private:
             // pointer to the protokoll...
             Protokoll::ProtokollP client;
+
+            // the data of our player
+            player_mem player;
 
             // we need our name and password...
             std::string name, password;

@@ -22,6 +22,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.6  2002/05/29 16:07:38  shivoc
+// implemented non-creature display for login
+//
 // Revision 1.5  2002/05/28 13:55:57  shivoc
 // some minor changes
 //
@@ -45,7 +48,7 @@ namespace Protokoll {
             TProt(const Socket&, const std::string&) throw(texception);
 
             // set the map and update the client screen
-            void setMap(position) throw(texception);
+            void setMap(position, Map&) throw(texception);
 
             // virtual methods form out base class...
             const std::string getName() const throw();
@@ -58,6 +61,11 @@ namespace Protokoll {
 
         private:
 
+            // translate a map area to clientreadable format
+            // uses the map the client is on
+            std::string makeMap(const position topleft, 
+                    const position botright);
+
             // the socket the player is on...
             Socket psocket;
             // the os of the client...
@@ -67,7 +75,8 @@ namespace Protokoll {
             // name and passwd
             std::string name, passwd;
             // the position on the map...
-            position our_pos;
+            position pos;
+            Map* map;
 
     }; // class TProt : public Protokoll  
 

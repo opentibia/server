@@ -21,6 +21,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.12  2002/05/29 16:07:38  shivoc
+// implemented non-creature display for login
+//
 // Revision 1.11  2002/05/28 13:55:56  shivoc
 // some minor changes
 //
@@ -66,6 +69,7 @@
 #include "texcept.h"
 
 extern EventScheduler es;
+extern Map::Map map;
 
 namespace TNetwork {
     //////////////////////////////////////////////////
@@ -196,6 +200,7 @@ namespace TNetwork {
         try {
             Creatures::Player *bla = new Creatures::Player(cs);
             es.newsocket(cs, bla->cb());
+            bla->setMap(position(),map);
         } catch (texception e) {
             // no protokoll found... -> close socket and forget him
             CloseSocket(cs);

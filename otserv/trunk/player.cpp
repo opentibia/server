@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.6  2002/05/29 16:07:38  shivoc
+// implemented non-creature display for login
+//
 // Revision 1.5  2002/05/28 13:55:56  shivoc
 // some minor changes
 //
@@ -33,16 +36,25 @@ namespace Creatures {
     Player::Player(const Socket& sock) : client(sock) {
 
         // we get name and password from the client...
-        std::cout << (name = client->getName()) << std::endl;
-        std::cout << (password = client->getPassword()) << std::endl;
+        std::cout << (player.name = client->getName()) << std::endl;
+        std::cout << (player.passwd = client->getPassword()) << std::endl;
 
         // now we should check both... (TODO)
 
         // if everything was checked we should load the player... (TODO)
+        // for now we just fill in some stuff directly
+        player.pnum = 1;
+
+        // and pass that infos to the protocoll
+        client->setdata(player);
 
     } // Player::Player(Socket sock) 
 
     Player::~Player() {
     } // Player::~Player() 
+
+    void Player::setMap(position pos,Map& map) throw(texception) {
+        client->setMap(pos, map);
+    } // void setMap(position) throw(texception)
 
 } // namespace Creature 

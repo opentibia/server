@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.7  2002/05/29 16:07:38  shivoc
+// implemented non-creature display for login
+//
 // Revision 1.6  2002/05/28 13:55:56  shivoc
 // some minor changes
 //
@@ -33,9 +36,9 @@
 #include "tmap.h"
 
 EventScheduler es;
+Map::Map map;
 
 int main() {
-    Map::Map map;
     TNetwork::ServerSocket ss;
     es.loop();
 }

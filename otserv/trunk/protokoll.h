@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.6  2002/05/29 16:07:38  shivoc
+// implemented non-creature display for login
+//
 // Revision 1.5  2002/05/28 13:55:56  shivoc
 // some minor changes
 //
@@ -32,6 +35,7 @@
 #include "definitions.h"
 #include "tmap.h"
 #include "texcept.h"
+#include "player_mem.h"
 #include <string>
 
 namespace Protokoll {
@@ -51,6 +55,8 @@ namespace Protokoll {
                 }
             };
 
+            // set the playerdata to use
+            void setdata(Creatures::player_mem&);
 
             // get the name...
             virtual const std::string getName() const throw() =0;
@@ -67,10 +73,11 @@ namespace Protokoll {
             virtual void clread(const Socket &sock) = 0;
 
             // set the map and update the client screen
-            void setMap(position) throw(texception);
+            virtual void setMap(position, Map&) throw(texception)=0;
 
 
         protected:
+            Creatures::player_mem* player;
     };
 
     // class to choose the protokoll which acts like a pointer to the correct

@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// 
+// class which takes care of all data which must get saved in the player
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -20,13 +20,20 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.4  2002/05/29 16:07:38  shivoc
+// implemented non-creature display for login
+//
 // Revision 1.3  2002/05/28 13:55:56  shivoc
 // some minor changes
 //
 //
 //////////////////////////////////////////////////////////////////////
 
+#ifndef __OTSERV_PLAYER_MEM_H
+#define __OTSERV_PLAYER_MEM_H
+
 #include "memory.h"
+#include <string>
 
 namespace Creatures {
 
@@ -35,5 +42,11 @@ namespace Creatures {
         public:
             void save();
 
+            std::string name, passwd;
+            unsigned int pnum;
+
     }; // class player_mem : public Memory
+
 } // namespace Creatures
+
+#endif
