@@ -1735,7 +1735,7 @@ bool Map::creatureSaySpell(Creature *creature, const std::string &text)
 		creatureMakeMagic(creature, ei);
 		ret = true;
 	}
-	/*else if(strcmp(text.c_str(), "exevo gran mas vis") == 0) {
+	else if(strcmp(text.c_str(), "exevo gran mas vis") == 0) {
 
 			static unsigned char area[14][18] = {
 				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -1770,7 +1770,7 @@ bool Map::creatureSaySpell(Creature *creature, const std::string &text)
 		
 		creatureMakeMagic(creature, ei);
 		ret = true;
-	}*/
+	}
 	else if(strcmp(text.c_str(), "exura gran mas res") == 0) {
 
 		static unsigned char area[14][18] = {
