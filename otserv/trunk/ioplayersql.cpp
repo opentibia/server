@@ -193,7 +193,7 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 			std::pair<Item*, int> myPair(myItem, r.lookup_by_name("pid"));
 			itemmap[r.lookup_by_name("sid")] = myPair;
 			if(int slotid = r.lookup_by_name("slot"))
-				player->items[slotid] = myItem;
+				player->addItem(myItem, slotid);
 		}
 	}
 	catch(std::exception er){
