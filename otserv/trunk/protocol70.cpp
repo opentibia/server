@@ -1349,17 +1349,20 @@ void Protocol70::sendCancel(const char *msg)
   netmsg.WriteToSocket(s);
 }
 
-void Protocol70::sendChangeSpeed(int speed)
+void Protocol70::sendCancelAttacking()
+{
+  NetworkMessage netmsg;
+  netmsg.AddByte(0xa3);
+  netmsg.WriteToSocket(s);
+}
+
+void Protocol70::sendChangeSpeed(const Creature *creature)
 {
   NetworkMessage netmsg;
   netmsg.AddByte(0x8F);
   
-  netmsg.AddByte(0x18);
-  netmsg.AddByte(0x38);
-  netmsg.AddByte(0x00);
-  netmsg.AddByte(0x00);
-  
-  netmsg.AddU16(speed);
+  netmsg.AddU32(creature->getID());
+  netmsg.AddU16(creature->getSpeed());
   
   netmsg.WriteToSocket(s);
 }

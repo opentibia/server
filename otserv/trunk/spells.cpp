@@ -153,6 +153,8 @@ int SpellScript::registerFunctions(){
 	lua_register(luaState, "changeOutfit", SpellScript::luaActionChangeOutfit);
 	lua_register(luaState, "manaShield", SpellScript::luaActionManaShield);
 	lua_register(luaState, "getPosition", SpellScript::luaActionGetPos);
+	lua_register(luaState, "getSpeed", SpellScript::luaActionGetSpeed);
+	lua_register(luaState, "changeSpeed", SpellScript::luaActionChangeSpeed);
 	return true;
 }
 
@@ -301,6 +303,36 @@ int SpellScript::luaActionManaShield(lua_State *L){
 	if(p)
 	     p->sendIcons();
 	return 0;
+}
+
+int SpellScript::luaActionChangeSpeed(lua_State *L){
+	long time = (long)lua_tonumber(L, -1)*1000;
+	lua_pop(L,1);
+	
+	int speed = (int)lua_tonumber(L, -1);
+	lua_pop(L,1);
+	
+	Spell* spell = getSpell(L);
+	Creature* creature = spell->map->getCreatureByID((unsigned long)lua_tonumber(L, -1));
+	lua_pop(L,1);
+	
+	spell->map->addEvent(makeTask(time, boost::bind(&Map::changeSpeed, spell->map,creature->getID(), creature->speed) ) );
+	Player* p = dynamic_cast<Player*>(creature);
+	if(p){
+         spell->map->changeSpeed(creature->getID(), creature->getNormalSpeed()+speed); 
+	     p->sendIcons();
+      }
+    creature->hasteTicks = time;  
+	return 0;
+}
+
+int SpellScript::luaActionGetSpeed(lua_State *L){
+	Spell* spell = getSpell(L);
+	Creature* creature = spell->map->getCreatureByID((unsigned long)lua_tonumber(L, -1));
+	lua_pop(L,1);
+	
+	lua_pushnumber(L, creature->getNormalSpeed());
+	return 1;
 }
 
 int SpellScript::luaActionGetPos(lua_State *L){

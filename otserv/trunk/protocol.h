@@ -59,7 +59,8 @@ public:
   virtual void sendIcons(int icons) = 0;
   virtual void sendCancel(const char *msg) = 0;
   virtual void sendCancelWalk(const char *msg) = 0;
-  virtual void sendChangeSpeed(int speed) = 0;
+  virtual void sendChangeSpeed(const Creature* creature) = 0;
+  virtual void sendCancelAttacking() = 0;
   virtual void sleepTillMove();
 
 protected:

@@ -62,6 +62,7 @@ Npc::Npc(const char *name, Map* map) : Creature(name)
 		}
 		if ((const char*)xmlGetProp(root, (const xmlChar *)"level")) {
 			level = atoi((const char*)xmlGetProp(root, (const xmlChar *)"level"));
+			setNormalSpeed();
 			std::cout << level << std::endl;
 			maglevel = atoi((const char*)xmlGetProp(root, (const xmlChar *)"maglevel"));
 			std::cout << maglevel << std::endl;

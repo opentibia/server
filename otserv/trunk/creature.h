@@ -101,7 +101,7 @@ public:
   int lookhead, lookbody, looklegs, lookfeet, looktype, lookcorpse, lookmaster;
   int mana, manamax, manaspent;
   bool pzLocked;
-  long inFightTicks, exhaustedTicks, manaShieldTicks;
+  long inFightTicks, exhaustedTicks, manaShieldTicks, hasteTicks;
   
   Position masterPos;
 
@@ -111,16 +111,32 @@ public:
 
   int lastDamage;
 
-  virtual unsigned short getSpeed() const { return 220; };
+  unsigned short getSpeed() const {            
+           return speed; 
+           };
 
   virtual int getStepDuration(int underground) { return (1000*120*100)/(getSpeed()*underground); };
-
+  void setNormalSpeed()
+  {
+  if(access!=0){
+           speed = 900;     
+           return;    
+           } 
+  speed = 220 + (2* (level - 1)); 
+  }
+  int getNormalSpeed()
+  {
+      if(access!=0){     
+           return 900;    
+           }
+  return 220 + (2* (level - 1)); 
+  }
   int access; //access level
   // magic level
   int maglevel;
   // level
   int level;
-
+  int speed;
   virtual bool canMovedTo(Tile *tile);
 
   virtual void sendCancel(const char *msg) { };

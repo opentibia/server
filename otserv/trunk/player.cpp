@@ -128,16 +128,6 @@ int Player::getWeaponDamage() const
 	return 1+(int)(damagemax*rand()/(RAND_MAX+1.0));
 }
 
-
-unsigned short Player::getSpeed() const
-{
-  if (access > 0)
-    return 900;
-
-  return 220 + 2*(level-1);
-};
-
-
 void Player::speak(const std::string &text)
 {
 }
@@ -150,7 +140,10 @@ void Player::sendIcons()
                      }
      if(manaShieldTicks >= 1000){
                      icons |= ICON_MANASHIELD;
-                     }   
+                     }
+     if(speed != getNormalSpeed()){
+                     icons |= ICON_HASTE;
+                     }                   
      client->sendIcons(icons);             
 }
 
@@ -271,6 +264,15 @@ void Player::sendNetworkMessage(NetworkMessage *msg)
 void Player::sendCancel(const char *msg)
 {
   client->sendCancel(msg);
+}
+void Player::sendChangeSpeed(Creature* creature){
+     client->sendChangeSpeed(creature);
+     }
+
+void Player::sendCancelAttacking()
+{
+  attackedCreature = 0;   
+  client->sendCancelAttacking();
 }
 
 void Player::sendCancelWalk(const char *msg)

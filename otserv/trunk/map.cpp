@@ -1279,6 +1279,7 @@ bool Map::creatureOnPrepareAttack(Creature *creature, Position pos)
 				NetworkMessage msg;
 				msg.AddTextMessage(MSG_SMALLINFO, "You may not attack a person while your in a protection zone.");
 				player->sendNetworkMessage(&msg);
+				player->sendCancelAttacking();
 			}
 
 			return false;
@@ -1288,6 +1289,7 @@ bool Map::creatureOnPrepareAttack(Creature *creature, Position pos)
 				NetworkMessage msg;
 				msg.AddTextMessage(MSG_SMALLINFO, "You may not attack a person in a protection zone.");
 				player->sendNetworkMessage(&msg);
+				player->sendCancelAttacking();
 			}
 
 			return false;
@@ -1344,8 +1346,11 @@ void Map::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fig
 	 attackedPlayer->sendIcons();
   }
 
-	if(!inReach)
+	if(!inReach || attackedCreature->access != 0){
+        if(player)
+        player->sendCancelAttacking();         
 		return;
+    }
 	
 	int damage = creature->getWeaponDamage();
 	int manaDamage = 0;
@@ -1622,13 +1627,19 @@ void Map::checkPlayer(unsigned long id)
             player->manaShieldTicks -=1000;
             if(player->manaShieldTicks  < 1000)
             player->sendIcons();
-            }   
+            }
+            if(player->hasteTicks >=1000){
+            player->hasteTicks -=1000;
+            }    
 	 }
 	 else{
 		 addEvent(makeTask(300, std::bind2nd(std::mem_fun(&Map::checkPlayer), id)));
 		 if(creature->manaShieldTicks >=1000){
          creature->manaShieldTicks -=300;
-         }  
+         }
+         if(creature->hasteTicks >=1000){
+            creature->hasteTicks -=300;
+            }  
 	 }
   }
    OTSYS_THREAD_UNLOCK(mapLock)
@@ -1654,6 +1665,38 @@ void Map::changeOutfitAfter(unsigned long id, int looktype, long time){
      id, looktype)));
      
      }
+void Map::changeSpeed(unsigned long id, unsigned short speed){
+     Creature *creature = getCreatureByID(id);
+     if(creature){
+                  if(creature->hasteTicks >= 1000 && creature->speed == speed){
+                  return;
+                  }
+     creature->speed = speed;
+     Player* player = dynamic_cast<Player*>(creature);
+     if(player){
+                player->sendChangeSpeed(creature);
+                player->sendIcons();
+                }
+     }
+     CreatureVector::iterator cit;
+
+  for (int x = creature->pos.x - 8; x <= creature->pos.x + 8; x++)
+    for (int y = creature->pos.y - 6; y <= creature->pos.y + 6; y++)
+    {
+      Tile *tile = getTile(x, y, 7);
+      if (tile)
+      {
+        for (cit = tile->creatures.begin(); cit != tile->creatures.end(); cit++)
+        {
+          Player* p = dynamic_cast<Player*>(*cit);
+          if(p)
+          p->sendChangeSpeed(creature);
+        }
+      }
+    }
+     
+}
+
 
 void Map::checkPlayerAttacking(unsigned long id)
 {
@@ -1677,6 +1720,7 @@ void Map::checkPlayerAttacking(unsigned long id)
 	          NetworkMessage msg;
             msg.AddTextMessage(MSG_STATUS, "You may not attack a person in a protection zone.");
             player->sendNetworkMessage(&msg);
+            player->sendCancelAttacking();
           }
         }
         else

@@ -24,4 +24,9 @@
 <spell name="Heal Friend" words="exura sio" maglv="7" mana="70" enabled="1">
 <vocation id="2" />
 </spell>
+<spell name="Haste" words="utani hur" maglv="4" mana="60" enabled="1">
+<vocation id="1" />
+<vocation id="2" />
+<vocation id="3" />
+</spell>
 </spells>

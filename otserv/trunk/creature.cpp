@@ -31,6 +31,7 @@ Creature::Creature(const char *name) : access(0)
 	pzLocked = false;
 	inFightTicks = 0;
     manaShieldTicks = 0;
+    hasteTicks = 0;
 	lookcorpse = 2276;
 
   health     = 1000;//150;
@@ -41,6 +42,7 @@ Creature::Creature(const char *name) : access(0)
   lastDamage = 0;
 
   attackedCreature = 0;
+  speed = 220;
 }
 
 
@@ -50,6 +52,7 @@ void Creature::drainHealth(int damage)
 
   health -= lastDamage;
 }
+
 void Creature::drainMana(int damage)
 {
   lastDamage = min(mana, damage);

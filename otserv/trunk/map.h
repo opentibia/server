@@ -124,6 +124,7 @@ class Map {
   	void creatureCastSpell(Creature *creature, const EffectInfo &ei);
 		bool creatureSaySpell(Creature *creature, const std::string &text);
      void changeOutfitAfter(unsigned long id, int looktype, long time);
+     void changeSpeed(unsigned long id, unsigned short speed);
     //void addEvent(long ticks, int type, void *data);
 	  void addEvent(SchedulerTask*);
    

@@ -120,7 +120,7 @@ bool Account::openPlayer(const std::string &name, const std::string &givenpasswo
     player.maglevel=atoi((const char*)xmlGetProp(root, (const xmlChar *) "maglevel"));
     player.voc=atoi((const char*)xmlGetProp(root, (const xmlChar *) "voc"));
     player.access=atoi((const char*)xmlGetProp(root, (const xmlChar *) "access"));
-
+    player.setNormalSpeed();
     while (p)
     {
       std::string str=(char*)p->name;

@@ -88,7 +88,6 @@ public:
   int food;
 
   virtual int getWeaponDamage() const;
-  virtual unsigned short getSpeed() const;
 
   // experience
   unsigned long experience;
@@ -108,7 +107,8 @@ public:
   void sendIcons();
   bool CanSee(int x, int y);
   void sendNetworkMessage(NetworkMessage *msg);
-
+  void sendCancelAttacking();
+  void sendChangeSpeed(Creature* creature);
   virtual void sendCancel(const char *msg);
   virtual void sendCancelWalk(const char *msg);
 
