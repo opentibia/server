@@ -265,14 +265,22 @@ void TProt70::parsePacket(std::string msg){
 
 			buf+= (char)0xA0; //STATS
 
-			ADD2BYTE(buf,150);//hitpoints
-			ADD2BYTE(buf,150);//hitpoints
-			ADD2BYTE(buf,300);//cap
+			ADD2BYTE(buf,this->player->health);//hitpoints
+			ADD2BYTE(buf,this->player->health_max);//hitpoints
+			ADD2BYTE(buf,this->player->cap);//cap
 			ADD4BYTE(buf,3000); //experience
 			buf+=(char)0x0F;//level
 			ADD2BYTE(buf,0);//mana
 			ADD2BYTE(buf,0);//mana
 			buf+=(char)0x0F;//maglevel
+//			ADD2BYTE(buf,150);//hitpoints
+//			ADD2BYTE(buf,150);//hitpoints
+//			ADD2BYTE(buf,300);//cap
+//			ADD4BYTE(buf,3000); //experience
+//			buf+=(char)0x0F;//level
+//			ADD2BYTE(buf,0);//mana
+//			ADD2BYTE(buf,0);//mana
+//			buf+=(char)0x0F;//maglevel
 			buf+= (char)0x82;
 
 

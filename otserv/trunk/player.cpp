@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.9  2003/09/25 17:46:59  timmit
+// Player loading/saving added.  Both load() and save() in player_mem work.  Saves player's character to the appropriate *.chr file when the player logs out but does NOT load() the player's file when they log in.  Once accounts are added then the call to load() will be added.
+//
 // Revision 1.8  2003/09/08 13:28:41  tliffrag
 // Item summoning and maploading/saving now working.
 //
@@ -49,6 +52,13 @@ namespace Creatures {
         // now we should check both... (TODO)
 
         // if everything was checked we should load the player... (TODO)
+        // add the player to the player list
+        
+        // if( fexists() ) then player->load()
+        std::string charstr = player.name + ".chr";
+        FILE* charfile;
+        player.load();
+        
         // for now we just fill in some stuff directly
 		id=rand();
         player.pnum =id; //TODO right playernumbers

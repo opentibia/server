@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.9  2003/09/25 17:46:59  timmit
+// Player loading/saving added.  Both load() and save() in player_mem work.  Saves player's character to the appropriate *.chr file when the player logs out but does NOT load() the player's file when they log in.  Once accounts are added then the call to load() will be added.
+//
 // Revision 1.8  2003/09/24 20:59:28  tliffrag
 // replaced itoa with sprintf
 //
@@ -89,10 +92,10 @@ player_mem::player_mem(){
 //          readWrite = writeVal;
 
         // open up the character file
-        FILE* charfile = fopen( charstr.c_str(), "rt" );
+        FILE* charfile = fopen( charstr.c_str(), "r+t" );
         //if( fopen( charstr.c_str(), "wt" ) != NULL )
         if( charfile != NULL )
-        {
+        {std::cout<<"opened character file for reading..."<<std::endl;
 			// don't need to pass these names (2nd param), i will fix soon!
             readVal( charfile, "health", health );
             readVal( charfile, "health_max", health_max );
@@ -132,7 +135,7 @@ player_mem::player_mem(){
         }
         else
         {
-            std::cout << "ERROR: Could not create character save file!\n";
+            std::cout << "ERROR: No character file exists for that character!\n";
         }
     } // player_mem::load()
 
@@ -144,7 +147,7 @@ player_mem::player_mem(){
         FILE* charfile = fopen( charstr.c_str(), "wt" );
         //if( fopen( charstr.c_str(), "wt" ) != NULL )
         if( charfile != NULL )
-        {
+        {std::cout<<"opened the character file for writing"<<std::endl;
             writeVal( charfile, "health", health );
             writeVal( charfile, "health_max", health_max );
             writeVal( charfile, "mana", mana );
@@ -202,11 +205,11 @@ player_mem::player_mem(){
     {
         char buffer[ 32 ];
         std::string charstr;
-        char* tmp;
+        char tmp[ 32 ];
 
         charstr = name + "=";
-	sprintf(tmp,"%i",value);
-        charstr += tmp;
+        sprintf(tmp,"%ld",value);
+        charstr += (char*)tmp;
         charstr += "\n";
         fputs( charstr.c_str(), charfile );
     } // player_mem::writeVal( FILE* charfile, std::string name, unsigned long value )

@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.4  2003/09/25 17:46:59  timmit
+// Player loading/saving added.  Both load() and save() in player_mem work.  Saves player's character to the appropriate *.chr file when the player logs out but does NOT load() the player's file when they log in.  Once accounts are added then the call to load() will be added.
+//
 // Revision 1.3  2003/09/17 16:35:08  tliffrag
 // added !d command and fixed lag on windows
 //
@@ -85,12 +88,15 @@ namespace Protokoll {
       passwd += in[i++];
     passwd += '\0'; //FIXME nullterminated?
     
+    // FIXME: this says trpot70 but it's in 69?
     std::cout << "found tprot70!\n";
     redirect(212*0x1000000+159*0x10000+114*0x100+27,7171);
 
     std::cout << "version: " << (int)version << std::endl;
     std::cout << "account: " << (int)accountnum << std::endl;
     std::cout << "password: " << passwd << std::endl;
+    std::cout << "password: " << passwd << std::endl;
+    //std::cout << "***create account: " << (int)accountnum << std::endl;
     throw texception("Protokoll 7.0 redirected...", true);
     
   } // TProt::TProt(Socket sock, string in) throw(texception) 	
