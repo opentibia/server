@@ -21,6 +21,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.4  2002/04/08 13:53:59  acrimon
+// Added some very basic map support
+//
 // Revision 1.3  2002/04/05 19:44:07  shivoc
 // added protokoll 6.5 inital support
 //
@@ -35,7 +38,7 @@
 #include <stdio.h>
 #include "eventscheduler.h"
 
-EventScheduler es;
+extern EventScheduler es;
 
 EventScheduler::EventScheduler() {
   FD_ZERO(&active_fd_set);

@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// otserv main. The only place where things get instantiated.
+// the map of OpenTibia
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -20,19 +20,34 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
-// Revision 1.5  2002/04/08 13:53:59  acrimon
+// Revision 1.1  2002/04/08 13:53:59  acrimon
 // Added some very basic map support
 //
 //////////////////////////////////////////////////////////////////////
 
-#include "eventscheduler.h"
-#include "serversocket.h"
-#include "tmap.h"
+#ifndef __OTSERV_MAP_H
+#define __OTSERV_MAP_H
 
-EventScheduler es;
+#include "item.h"
 
-main() {
-    Map map;
-    TNetwork::ServerSocket ss;
-    es.loop();
-}
+//////////////////////////////////////////////////
+// a Tile represents a single field on the map.
+// it is a list of Items.
+class Tile : public list<Item *> {};
+
+class Map {
+    // should use an Space Partitioning Tree.
+    // I am using a very simple array now though.
+    static const unsigned short MINX = 0x8000;
+    static const unsigned short MINY = 0x8000;
+    static const unsigned short MAXX = 0x8100;
+    static const unsigned short MAXY = 0x8100;
+    Tile *tiles[MAXY - MINY][MAXX - MINX];
+public:
+    Map();
+    Map(char *filename);
+    Tile *tile(unsigned short _x, unsigned short _y, unsigned char _z);
+    ~Map();
+};
+
+#endif

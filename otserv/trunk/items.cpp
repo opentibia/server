@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// otserv main. The only place where things get instantiated.
+// The database of items.
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -20,19 +20,38 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
-// Revision 1.5  2002/04/08 13:53:59  acrimon
+// Revision 1.1  2002/04/08 13:53:59  acrimon
 // Added some very basic map support
 //
 //////////////////////////////////////////////////////////////////////
 
-#include "eventscheduler.h"
-#include "serversocket.h"
-#include "tmap.h"
+#include "items.h"
 
-EventScheduler es;
-
-main() {
-    Map map;
-    TNetwork::ServerSocket ss;
-    es.loop();
+bool ItemType::isContainer() {
+    return iscontainer;
 }
+    
+ItemType::ItemType() {
+}
+
+ItemType::ItemType(unsigned short _id, unsigned short _tibiaid, string _name) {
+    id = _id;
+    tibiaid = _tibiaid;
+    name = _name;
+}
+
+ItemType::~ItemType() {
+
+}
+
+Items::Items() {
+    // add a few items
+    unsigned short id;
+    id = ItemType::WATER; items[id] = ItemType(id, 0x0E00, "water");
+    id = ItemType::GRASS; items[id] = ItemType(id, 0x0A00, "grass");
+}
+
+Items::~Items() {
+    items.clear();
+}
+

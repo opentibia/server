@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// otserv main. The only place where things get instantiated.
+// the map of OpenTibia
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -20,19 +20,39 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
-// Revision 1.5  2002/04/08 13:53:59  acrimon
+// Revision 1.1  2002/04/08 13:53:59  acrimon
 // Added some very basic map support
 //
 //////////////////////////////////////////////////////////////////////
 
-#include "eventscheduler.h"
-#include "serversocket.h"
+#include "items.h"
 #include "tmap.h"
 
-EventScheduler es;
+Map::Map() {
+    // generating some standard map.
+    // yes I could have done that better ...
+    for (unsigned short y = MINY; y <= MAXY; y++)
+	for (unsigned short x = MINX; x <= MAXX; x++) {
+	    tiles[y-MINY][x-MINX] = new Tile;
+	    tiles[y-MINY][x-MINX]->push_back(new Item(ItemType::WATER));
+	}
+    cout << "region watered." << endl;
+    for (unsigned short y = MINY + 20; y <= MAXY - 20; y++)
+	for (unsigned short x = MINX + 20; x <= MAXX - 20; x++) {
+	    tiles[y-MINY][x-MINX]->clear(); // creates memory leak
+	    tiles[y-MINY][x-MINX]->push_back(new Item(ItemType::GRASS));
+	}
+    cout << "created land." << endl;
+}
 
-main() {
-    Map map;
-    TNetwork::ServerSocket ss;
-    es.loop();
+Map::Map(char *filename) {
+    // load the map from a file
+}
+
+Tile *Map::tile(unsigned short _x, unsigned short _y, unsigned char _z) {
+    return tiles[_y - MINY][_x - MINX];
+}
+
+Map::~Map() {
+
 }

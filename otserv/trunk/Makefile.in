@@ -7,10 +7,12 @@ DEFINES= -D@target_sys@ @DEBUG@
 EXEEXT = @EXEEXT@
 OBJEXT = @OBJEXT@
 
-SRC = item.cpp network.cpp player.cpp player_mem.cpp \
-protokoll.cpp tprot.cpp tprot65.cpp \
+SRC = item.cpp player.cpp player_mem.cpp \
+items.cpp tmap.cpp \
 file.cpp tools.cpp \
-otserv.cpp eventscheduler.cpp serversocket.cpp
+protokoll.cpp tprot.cpp tprot65.cpp \
+network.cpp otserv.cpp serversocket.cpp \
+eventscheduler.cpp
 
 ADDFILES = config.log config.status configure Makefile Makefile.bak
 

@@ -1,103 +1,82 @@
-/* OpenTibia - an opensource roleplaying game
+//////////////////////////////////////////////////////////////////////
+// OpenTibia - an opensource roleplaying game
+//////////////////////////////////////////////////////////////////////
+// Item represents an existing item.
+//////////////////////////////////////////////////////////////////////
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software Foundation,
+// Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+//////////////////////////////////////////////////////////////////////
+// $Id$
+//////////////////////////////////////////////////////////////////////
+// $Log$
+// Revision 1.2  2002/04/08 13:53:59  acrimon
+// Added some very basic map support
+//
+//////////////////////////////////////////////////////////////////////
 
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+#ifndef __OTSERV_ITEM_H
+#define __OTSERV_ITEM_H
 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- */
-
-#ifndef __item_h
-#define __item_h
-
-#include <list> // stdlibrary list
+#include <list>
 
 #include "texcept.h"
+#include "items.h"
 
-/****************************************************************
-  Defines the Itemclass
- ****************************************************************/
+class Item {
+private:
+    unsigned id;  // the same id as in ItemType
 
-namespace Items {
-	class Item {
+private: // the following, I will have to rethink:
+    // could be union:
+    unsigned short itemcount; // number of stacked items
+    unsigned short actualitems; // number of items in container
+    // list of items if this is a container
+    std::list<Item *> lcontained;
+    
+public:
+    unsigned getID();    // ID as in ItemType
+    
+    // get the number of items or 0 if non stackable
+    unsigned short getItemCount();
+    
+    // Constructor for items
+    Item(const unsigned short _type);
+    
+    ~Item();
+    
+    // definition for iterator over backpack items
+    typedef std::list<Item *>::const_iterator iterator;
+    iterator getItems();     // begin();
+    iterator getEnd();       // iterator beyond the last element
+    void addItem(Item*);     // add an item to the container
+    Item& operator<<(Item*); // put items into the container
+};
 
-		private:
-			unsigned itemnumber;
-			unsigned short itemcount;
+// now we declare exceptions we throw...
+class TE_Nocontainer : public texception {
+public:
+    TE_Nocontainer() : texception("Item is not a container!", false) {}
+};
+    
+class TE_BadItem : public texception {
+public:
+    TE_BadItem() : texception("Item is invalid!", false) {}
+};
 
-			// list of items if this is a container
-			std::list<Item*> lcontained;
-
-			// is this item a container?
-			int iscontainer;
-			// how many items can be stored maximum?
-			int maxitems;
-			// and how many do we have already?
-			int actualitems;
-
-		public:
-			// definition for iterator over backpack items
-			typedef std::list<Item*>::const_iterator iterator;
-
-			// return the number of the item
-			unsigned  GetItemNumber();
-
-			// get the number of items or 0 if non stackable
-			unsigned short  GetItemCount();
-
-			// return if this item is a Container
-			int  isContainer();
-
-			// Konstructor for items, needs the itemnumber
-			Item(unsigned,unsigned short);
-
-			// Konstructor for containers, the 3rd is the max number of items to store
-			Item(unsigned,unsigned short, int);
-
-			// Destructor
-			~Item();
-
-			// add an item to the container
-			void addItem(Item*);
-
-			// return item iterator
-			iterator  getItems();
-
-			// return iterator to one beyond the last element
-			iterator  getEnd();
-
-			// put items into the container
-			Item& operator<<(Item*);
-
-	}; // class Item
-
-	// now we declare exceptions we throw...
-	class nocontainer : public texception {
-		public:
-			nocontainer() : texception("Item is not a container!", false) {
-			} // nocontainer() : texception("Item is not a container!", false) 	
-	}; // class nocontainer : public texception 	
-
-	class bad_item : public texception {
-		public:
-			bad_item() : texception("Item is invalid!", false) {
-			} // bad_item() : texception("Item is not a container!", false) 	
-	}; // class bad_item : public texception 
-
-	class container_full : public texception {
-		public:
-			container_full() : texception("container is full!", false) {
-			} // container_full() : texception("container is full!", false) 
-	}; // class container_full : public texception 
-
-} // namespace Items
+class TE_ContainerFull : public texception {
+public:
+    TE_ContainerFull() : texception("container is full!", false) {}
+};
 
 #endif
