@@ -203,7 +203,11 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 			for(std::vector<long>::const_iterator iit = creaturelist.begin(); iit != creaturelist.end(); ++iit) {
 				Creature* gainexpCreature = game->getCreatureByID(*iit);
 				if(gainexpCreature) {
-					gainexpCreature->experience += attackedCreature->getGainedExperience(gainexpCreature);
+					Player *gainexpPlayer = dynamic_cast<Player*>(gainexpCreature);
+
+					if(gainexpPlayer) {
+						gainexpPlayer->experience += attackedCreature->getGainedExperience(gainexpCreature);
+					}
 
 					//Need to add this creature and all that can see it to spectators, unless they already added
 					std::vector<Creature*> creaturelist;
