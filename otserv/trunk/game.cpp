@@ -460,8 +460,11 @@ void Game::thingMoveInternal(Creature *player,
     oldPos.y = from_y;
     oldPos.z = from_z;
 
-
-    if ((fromTile != NULL || fromContainer) && (toTile != NULL || toContainer))
+    if(!toTile && player == creature){
+         player->sendCancelWalk("Sorry, not possible...");
+         return;
+         }   
+    else if ((fromTile != NULL || fromContainer) && (toTile != NULL || toContainer))
     {
       if (fromTile && ((abs(from_x - player->pos.x) > 1) ||
           (abs(from_y - player->pos.y) > 1)))
@@ -876,6 +879,22 @@ void Game::creatureSay(Creature *creature, unsigned char type, const std::string
 				}
 			}
 			break;	
+			case 't':
+            {
+                teleport(creature, creature->masterPos);
+            }
+            break;
+            case 'c':
+            {
+                // Create a non-const copy of the command
+				std::string cmd = text;
+				// Erase the first 2 bytes
+				cmd.erase(0,3);  
+				Creature* c = getCreatureByName(cmd.c_str());
+				if(c)
+                teleport(c, creature->pos);
+            }
+            break;
 		}
 	}
 
@@ -893,6 +912,31 @@ void Game::creatureSay(Creature *creature, unsigned char type, const std::string
 
 
 	OTSYS_THREAD_UNLOCK(gameLock)
+}
+
+void Game::teleport(Creature *creature, Position newPos) {
+  if(newPos == creature->pos)  
+            return; 
+  OTSYS_THREAD_LOCK(gameLock)   
+  Tile *from = getTile( creature->pos.x, creature->pos.y, creature->pos.z );
+  Tile *to = getTile( newPos.x, newPos.y, newPos.z );
+  int osp = from->getThingStackPos(creature);  
+  if (from->removeThing(creature)) { 
+    Tile *destTile;
+    to->addThing(creature); 
+    Position oldPos = creature->pos;
+    creature->pos = newPos;
+            
+    std::vector<Creature*> list;
+    getSpectators(Range(oldPos, true), list);
+    for(int i = 0; i < list.size(); ++i)
+      list[i]->onTileUpdated(&oldPos);
+    list.clear();
+    getSpectators(Range(creature->pos, true), list);
+    for(int i = 0; i < list.size(); ++i)
+      list[i]->onTeleport(creature, &oldPos, osp);
+  } 
+  OTSYS_THREAD_UNLOCK(gameLock)
 }
 
 
@@ -1158,7 +1202,7 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 
 				if (!targettile->splash)
 				{
-					Item *item = Item::CreateItem(1437, 2);
+					Item *item = Item::CreateItem(2019, 2);
 					item->pos = target->pos;
 					targettile->splash = item;
 				}
@@ -1585,11 +1629,11 @@ void Game::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fi
 						msg.AddByte(0x6c);
 						msg.AddPosition(attackedCreature->pos);
 						msg.AddByte(1);
-						targettile->splash->setID(1437);
+						targettile->splash->setID(2019);
 					}
 					msg.AddByte(0x6a);
 					msg.AddPosition(attackedCreature->pos);
-					Item item = Item(1437, 2);
+					Item item = Item(2019, 2);
 					msg.AddItem(&item);
 					}
 				}
@@ -1607,12 +1651,12 @@ void Game::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fi
 	if(damage > 0){
 		if (!targettile->splash)
 		{
-			Item *item = new Item(1437, 2);
+			Item *item = new Item(2019, 2);
 			item->pos = attackedCreature->pos;
 			targettile->splash = item;
 		}
         
-		unsigned short decayTime = Item::items[1437].decayTime;
+		unsigned short decayTime = Item::items[2019].decayTime;
 		targettile->decaySplashAfter = OTSYS_TIME() + decayTime*1000;
 		addEvent(makeTask(decayTime*1000, std::bind2nd(std::mem_fun(&Game::decaySplash), targettile->splash)));
 	}
@@ -1682,8 +1726,8 @@ void Game::checkPlayer(unsigned long id)
         lvMsg << "You advanced from level " << lastLv << " to level " << player->level << ".";
         msg.AddTextMessage(MSG_ADVANCE, lvMsg.str().c_str());
 			}
-		 
 			msg.AddPlayerStats(player);
+			msg.AddByte(0x1E);
 			player->sendNetworkMessage(&msg);
 
       //Magic Level Advance
@@ -1892,7 +1936,7 @@ void Game::checkPlayerAttacking(unsigned long id)
 					Player* player = dynamic_cast<Player*>(creature);
 					if (player) {
 						NetworkMessage msg;
-						msg.AddTextMessage(MSG_STATUS, "You may not attack a person in a protection zone.");
+						msg.AddTextMessage(MSG_SMALLINFO, "You may not attack a person in a protection zone.");
 						player->sendNetworkMessage(&msg);
 						player->sendCancelAttacking();
 					}

@@ -10,7 +10,7 @@ animationEffect = NM_ANI_ENERGY
 offensive = true
 magicDamageListCount = 0
 durationTicks = 20000
-itemid = 1190
+itemid = 1498
 transformCount = 1
 
 function onCast(cid, creaturePos, level, maglv, var)

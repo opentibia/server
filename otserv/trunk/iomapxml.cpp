@@ -43,68 +43,48 @@ bool IOMapXML::loadMap(Map* map, std::string identifier){
 	width=atoi((const char*)xmlGetProp(root, (const xmlChar *) "width"));
 	height=atoi((const char*)xmlGetProp(root, (const xmlChar *) "height"));
 
-    int xorig=((MAP_WIDTH)-width)/2;
-    int yorig=((MAP_HEIGHT)-height)/2;
 	tile=root->children;
-	int numpz = 0;
-	for(int y=0; y < height; y++){
-		for(int x=0; x < width; x++){
-			if (!tile) {
-			std::cout << "no tile for " << x << " / " << y << std::endl;
-		    exit(1);
-	    }
-		const char* pz = (const char*)xmlGetProp(tile, (const xmlChar *) "pz");
-		p=tile->children;
 	
-		while(p)
-		{
-			if(xmlStrcmp(p->name,(const xmlChar*) "item")==0){
-				Item* tmpitem=new Item();
-				tmpitem->unserialize(p);
-				
-				if (tmpitem->isGroundTile())
-				{
-					map->setTile(x, y, 7, tmpitem->getID());
-					delete tmpitem;
-					
-					if (pz && (strcmp(pz, "1") == 0)) {
-						numpz++;
-						map->getTile(x, y, 7)->setPz();
-					}
-				}
-				else
-				{
-					Tile *t = map->getTile(x, y, 7);
-					if (t)
-					{
-						Item* myitem = Item::CreateItem(tmpitem->getID());
-						delete tmpitem;
+    int px,py,pz;
+  char* tx;
+  char* ty;
+  char* tz;
+  char* tmp;
+  Tile *t;
 
-						if (myitem->isAlwaysOnTop())
-							t->topItems.push_back(myitem);
-						else
-							t->downItems.push_back(myitem);
-						}
-					}
+  while (tile) { 
+      tmp = (char*)xmlGetProp(tile, (const xmlChar *) "x");
+      px = atoi(tmp);
+      tmp = (char*)xmlGetProp(tile, (const xmlChar *) "y");
+      py = atoi(tmp);
+      tmp = (char*)xmlGetProp(tile, (const xmlChar *) "z");
+      pz = atoi(tmp);
+      
+      tmp = (char*)xmlGetProp(tile, (const xmlChar *) "ground");
+      map->setTile(px,py,pz,atoi(tmp));
+      t = map->getTile(px,py,pz);
+      
+      tmp = (char*)xmlGetProp(tile, (const xmlChar *) "pz");
+      if (tmp && (strcmp(tmp, "1") == 0)) t->setPz();
+       
+      p = tile->children;
+      while(p) {
+               
+        if(xmlStrcmp(p->name,(const xmlChar*) "item")==0){
+                                    
+          Item* myitem=new Item();
+          myitem->unserialize(p);
+          if (myitem->isAlwaysOnTop())
+            t->topItems.push_back(myitem);
+          else
+            t->downItems.push_back(myitem);
 
-				}
-				if(xmlStrcmp(p->name,(const xmlChar*) "npc")==0){
-/*					std::string name = (const char*)xmlGetProp(p, (const xmlChar *) "name");
-				Npc* mynpc = new Npc(name.c_str(), this);
-					//first we have to set the position of our creature...
-					mynpc->pos.x=x;
-					mynpc->pos.y=y;
-					if(!this->placeCreature(mynpc)){
-						//tinky winky: "oh oh"
-					}*/
-				}
-				p=p->next;
-			}
-			tile=tile->next;
-		}
-	}
-	
-	xmlFreeDoc(doc);
+        }
+        p=p->next;
+      }
+      tile=tile->next;
+    }
+  xmlFreeDoc(doc);
 	
 	return true;
 }

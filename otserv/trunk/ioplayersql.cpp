@@ -146,32 +146,32 @@ std::string filename="data/players/"+name+".xml";
 						//Should be loaded from xml later on...
 						if(player->items[sl_id] && player->items[sl_id]->isContainer()) {
 
-							Item *backpack = new Item(1411);
+							Item *backpack = new Item(1988);
 							player->items[sl_id]->addItem(backpack);
 							backpack->addItem(new Item(1663, 99));
 							backpack->addItem(new Item(1663, 99));
 							backpack->addItem(new Item(1663, 99));
 							backpack->addItem(new Item(1663, 99));
 
-							backpack = new Item(1411);
-							player->items[sl_id]->addItem(backpack);
-							
-							backpack->addItem(new Item(1623, 99));
-							backpack->addItem(new Item(1623, 99));
-							backpack->addItem(new Item(1623, 99));
-							backpack->addItem(new Item(1623, 99));
-
-							backpack = new Item(1411);
+							backpack = new Item(1988);
 							player->items[sl_id]->addItem(backpack);
 							
-							backpack->addItem(new Item(1618, 99));
-							backpack->addItem(new Item(1618, 99));
-							backpack->addItem(new Item(1618, 99));
-							backpack->addItem(new Item(1618, 99));
+							backpack->addItem(new Item(2273, 99));
+							backpack->addItem(new Item(2273, 99));
+							backpack->addItem(new Item(2273, 99));
+							backpack->addItem(new Item(2273, 99));
 
-							player->items[sl_id]->addItem(new Item(1655, 5));
+							backpack = new Item(1988);
+							player->items[sl_id]->addItem(backpack);
+							
+							backpack->addItem(new Item(2268, 99));
+							backpack->addItem(new Item(2268, 99));
+							backpack->addItem(new Item(2268, 99));
+							backpack->addItem(new Item(2268, 99));
+
+							player->items[sl_id]->addItem(new Item(2302, 5));
 							player->items[sl_id]->addItem(new Item(1643, 5));
-							player->items[sl_id]->addItem(new Item(1654, 5));
+							player->items[sl_id]->addItem(new Item(2304, 5));
 						}
 					}
 				slot=slot->next;

@@ -36,10 +36,10 @@ class IOPlayerXML : protected IOPlayer{
   public:
 	/** Get a textual description of what source is used
 	  * \returns Name of the source*/
-	char* getSourceDescription(){return "XML";};
-	bool loadPlayer(Player* player, std::string name);
+	virtual char* getSourceDescription(){return "XML Player";};
+	virtual bool loadPlayer(Player* player, std::string name);
 	IOPlayerXML(){};
-	~IOPlayerXML(){};
+	virtual ~IOPlayerXML(){};
 };
 
 #endif

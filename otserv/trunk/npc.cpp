@@ -165,7 +165,7 @@ void Npc::onThink(){
 
 void Npc::doSay(std::string msg){
 	if(!game->creatureSaySpell(this, msg))
-		this->game->creatureSay(this, 1, msg);
+		this->game->creatureSay(this, 16, msg);
 }
 
 void Npc::doAttack(int id){

@@ -471,6 +471,10 @@ void Player::onContainerUpdated(Item *item, unsigned char from_id, unsigned char
 	client->sendContainerUpdated(item, from_id, to_id, from_slot, to_slot, remove);
 }
 
+void Player::onTeleport(const Creature *creature, const Position *oldPos, unsigned char oldstackpos) { 
+  client->sendTeleport(creature, oldPos, oldstackpos); 
+}
+
 unsigned long Player::getIP() const
 {
 	return client->getIP();

@@ -46,11 +46,10 @@
 #define NM_ANI_POWERBOLT         13
 
 enum MessageClasses {
-      MSG_SMALLINFO = 0x14,
-		  MSG_INFO      = 0x13,
-		  MSG_EVENT     = 0x11,
-		  MSG_STATUS    = 0x12,
-		  MSG_ADVANCE   = 0x10,
+      MSG_SMALLINFO = 0x17,
+		  MSG_INFO      = 0x16,
+		  MSG_EVENT     = 0x14,
+		  MSG_ADVANCE   = 0x13,
 };
 enum Icons {
  ICON_POISON = 1,

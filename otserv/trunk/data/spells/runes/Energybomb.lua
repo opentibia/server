@@ -25,6 +25,6 @@ centerpos = {x=creaturePos.x, y=creaturePos.y, z=creaturePos.z}
 return doAreaGroundMagic(cid, centerpos, needDirection, areaEffect, area, EnergyBombObject:ordered(), magicType,
 0, 1, SubEnergyBombObject1:ordered(),
 5000, 1, SubEnergyBombObject2:ordered(),
-2, 105000, 1184, 1)
+2, 105000, 1495, 1)
 
 end

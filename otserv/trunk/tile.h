@@ -4,11 +4,11 @@
 #define __TILE_H__
 
 
-#include "definitions.h"
 #include "item.h"
 #include "container.h"
 #include "magic.h"
 
+#include "definitions.h"
 class Creature;
 
 

@@ -303,6 +303,9 @@ void NetworkMessage::AddCreature(const Creature *creature, bool known, unsigned 
   AddByte(0xDC); // 
 
   AddU16(creature->getSpeed());
+  
+  AddByte(0x00); //
+  AddByte(0x00); //
 }
 
 
@@ -314,9 +317,11 @@ void NetworkMessage::AddPlayerStats(const Player *player)
   AddU16(player->cap);
   AddU32(player->experience);
   AddByte(player->level);
+  AddByte(0x07); //new
   AddU16(player->mana);
   AddU16(player->manamax);
   AddByte(player->maglevel);
+  AddByte(0x20); //new
 }
 
 void NetworkMessage::AddPlayerSkills(const Player *player)
@@ -324,12 +329,19 @@ void NetworkMessage::AddPlayerSkills(const Player *player)
 	AddByte(0xA1);
 
   AddByte(player->skills[SKILL_FIST  ][SKILL_LEVEL]);
+  AddByte(0x32);
   AddByte(player->skills[SKILL_CLUB  ][SKILL_LEVEL]);
+  AddByte(0x32);
   AddByte(player->skills[SKILL_SWORD ][SKILL_LEVEL]);
+  AddByte(0x32);
   AddByte(player->skills[SKILL_AXE   ][SKILL_LEVEL]);
+  AddByte(0x32);
   AddByte(player->skills[SKILL_DIST  ][SKILL_LEVEL]);
+  AddByte(0x32);
   AddByte(player->skills[SKILL_SHIELD][SKILL_LEVEL]);
+  AddByte(0x32);
   AddByte(player->skills[SKILL_FISH  ][SKILL_LEVEL]);
+  AddByte(0x32);
 }
 
 
@@ -354,7 +366,7 @@ void NetworkMessage::AddCreatureSpeak(const Creature *creature, unsigned char ty
   AddByte(0xAA);
   AddString(creature->getName());
   AddByte(type);
-  if (type <= 3)
+  if (type <= 3 || type == 16)
     AddPosition(creature->pos);
   if(type == 5)
     AddU16(channelId);

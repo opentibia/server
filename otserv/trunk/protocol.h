@@ -67,6 +67,8 @@ public:
   virtual void sendChannel(unsigned short channelId) = 0;
   virtual void sendToChannel(const Creature * creature, unsigned char type, const std::string &text, unsigned short channelId) = 0;
   virtual void sendOpenPriv(std::string &receiver) =0;
+  virtual void sendTeleport(const Creature *creature, const Position *oldPos, unsigned char oldStackPos) = 0;
+
 
 protected:
   Game   *game;

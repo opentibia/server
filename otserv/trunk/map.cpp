@@ -292,7 +292,7 @@ void Map::setTile(unsigned short _x, unsigned short _y, unsigned char _z, unsign
 
 Position Map::placeCreature(Creature* c){
 	Position pos = c->pos;
-	if (!c->canMovedTo(getTile(pos.x, pos.y, pos.z)))
+	/*if (!c->canMovedTo(getTile(pos.x, pos.y, pos.z)))
 	{   
 		bool found =false;
 		for(int cx =pos.x-1; cx <= pos.x+1 && !found; cx++){
@@ -310,7 +310,7 @@ Position Map::placeCreature(Creature* c){
 			pos.y = c->masterPos.y;
 			pos.z = c->masterPos.z;
 		}    
-	}
+	}*/
 	Tile* tile=getTile(pos.x, pos.y, pos.z);
 	if (!tile){
          pos = Position();

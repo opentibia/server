@@ -28,12 +28,12 @@
 </spell>
 <spell name="Poison storm" words="exevo gran mas pox" maglv="20" mana="200" enabled="1"><vocation id="1" /><vocation id="2" />
 </spell>
-<rune name="Sudden death" id="1618" charges="1" maglv="18" mana="0" enabled="1"></rune>
-<rune name="Ultimate healing" id="1623" charges="1" maglv="4" mana="0" enabled="1"></rune>
-<rune name="Great fireball" id="1654" charges="2" maglv="4" mana="0" enabled="1"></rune>
-<rune name="Explosion" id="1663" charges="2" maglv="7" mana="0" enabled="1"></rune>
-<rune name="Firebomb" id="1655" charges="2" maglv="10" mana="0" enabled="1"></rune>
-<rune name="Energybomb" id="1614" charges="5" maglv="10" mana="0" enabled="1"></rune>
-<rune name="Magic wall" id="1643" charges="5" maglv="10" mana="0" enabled="1"></rune>
-<rune name="Soul fire" id="1658" charges="5" maglv="10" mana="0" enabled="1"></rune>
+<rune name="Sudden death" id="2268" charges="1" maglv="18" mana="0" enabled="1"></rune>
+<rune name="Ultimate healing" id="2273" charges="1" maglv="4" mana="0" enabled="1"></rune>
+<rune name="Great fireball" id="2304" charges="2" maglv="4" mana="0" enabled="1"></rune>
+<rune name="Explosion" id="2313" charges="2" maglv="7" mana="0" enabled="1"></rune>
+<rune name="Firebomb" id="2305" charges="2" maglv="10" mana="0" enabled="1"></rune>
+<rune name="Energybomb" id="2262" charges="5" maglv="10" mana="0" enabled="1"></rune>
+<rune name="Magic wall" id="2293" charges="5" maglv="10" mana="0" enabled="1"></rune>
+<rune name="Soul fire" id="2308" charges="5" maglv="10" mana="0" enabled="1"></rune>
 </spells>

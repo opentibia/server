@@ -110,6 +110,7 @@ int Items::loadFromDat(std::string file)
 #endif
 		// read the options until we find a 0xff
 		int optbyte;
+		
 		while (((optbyte = fgetc(f)) >= 0) &&   // no error
 				   (optbyte != 0xFF))			    // end of options
 		{
@@ -199,8 +200,8 @@ int Items::loadFromDat(std::string file)
             break;
         case 0x18: // cropses that don't decay
             break;
-        case 0x19: // monster has animation even when iddle (rot, wasp, slime, fe)
-            break;
+        /*case 0x19: //(removed in 7.4) monster has animation even when iddle (rot, wasp, slime, fe)
+            break;*/
         case 0x14: // player color templates
             break;
 
@@ -221,9 +222,22 @@ int Items::loadFromDat(std::string file)
                     fgetc(f); //always 0
 				    break;
 				case 0x1A: 
-                    fgetc(f); //action that can be performed (doors-> open, hole->open, book->read) not all included ex. wall torches
-                    fgetc(f); //always 4
+                    //7.4 (change no data ?? ) action that can be performed (doors-> open, hole->open, book->read) not all included ex. wall torches
 				    break;
+				//new from 7.4    
+				case 0x1D:  // line spot ...
+                    fgetc(f);
+                    fgetc(f);                  
+                    break;         
+				case 0x1B:  // ?? ...                 
+                    break;
+                case 0x19:  // ?? ...                 
+                    break;    
+                case 0x17:  // ?? ...                 
+                    break;
+                case 0x1C:  // ?? ...                 
+                    break;        
+                        
 				default:
 						std::cout << "unknown byte: " << (unsigned short)optbyte << std::endl;
 			}

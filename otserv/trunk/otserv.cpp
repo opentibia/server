@@ -27,7 +27,7 @@
 
 #include "otsystem.h"
 
-#include "protocol70.h"
+#include "protocol74.h"
 
 #include <stdlib.h>
 #include <time.h>
@@ -160,24 +160,29 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 
 			msg.WriteToSocket(s);
     }
-    // gameworld connection tibia 7.1
+    // gameworld connection tibia 7.4
     else if (protId == 0x020A)
     {
-      /* unsigned char  clientos = */msg.GetByte();
-      /* unsigned short version  = */msg.GetU16();
-      /* unsigned char  unknown  = */msg.GetByte();
-
+      unsigned char  clientos = msg.GetByte();
+      unsigned short version  = msg.GetU16();
+      unsigned char  unknown = msg.GetByte();
+      msg.GetU32();
       std::string name     = msg.GetString();
       std::string password = msg.GetString();
-
-			if(isclientBanished(s)) {
+            if(version != 740){
+                msg.Reset();
+				msg.AddByte(0x14);
+				msg.AddString("Only clients with protocol 7.4 allowed!");
+				msg.WriteToSocket(s);
+            }      
+			else if(isclientBanished(s)) {
 				msg.Reset();
 				msg.AddByte(0x14);
 				msg.AddString("Your IP is banished!");
 				msg.WriteToSocket(s);
 			}
 			else {
-				Protocol70 *protocol = new Protocol70(s);
+				Protocol74 *protocol = new Protocol74(s);
 
 				Player *player;
 				player = new Player(name.c_str(), protocol);
@@ -217,6 +222,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 			send(s, str.c_str(), (int)str.size(), 0); 
 		}
 	}
+	
   }
 
   if (s)

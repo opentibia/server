@@ -145,6 +145,7 @@ protected:
   virtual void onCreatureTurn(const Creature *creature, unsigned char stackpos);
   virtual void onCreatureSay(const Creature *creature, unsigned char type, const std::string &text);
   virtual void onCreatureChangeOutfit(const Creature* creature);
+  virtual void onTeleport(const Creature *creature, const Position *oldPos, unsigned char oldstackpos); 
   virtual void onThink();
   virtual std::string getDescription(bool self = false);
 	virtual void onTileUpdated(const Position *Pos);

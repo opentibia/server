@@ -136,55 +136,55 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name){
 						Container* defaultbackpack = dynamic_cast<Container*>(player->items[sl_id]);
 						if(defaultbackpack /*player.items[sl_id] && player.items[sl_id]->isContainer()*/) {
 
-							Container *backpack = dynamic_cast<Container*>(Item::CreateItem(1411));
+							Container *backpack = dynamic_cast<Container*>(Item::CreateItem(1988));
 							if(!backpack)
 								continue;
 
 							defaultbackpack->addItem(backpack);
 							for(int i = 0; i < 20; ++i) {
-								backpack->addItem(Item::CreateItem(1663, 99));
+								backpack->addItem(Item::CreateItem(2313, 99));
 							}
 
-							backpack = dynamic_cast<Container*>(Item::CreateItem(1411));
-							if(!backpack)
-								continue;
-							defaultbackpack->addItem(backpack);
-							
-							for(int i = 0; i < 20; ++i) {
-								backpack->addItem(Item::CreateItem(1623, 99));
-							}
-
-							backpack = dynamic_cast<Container*>(Item::CreateItem(1411));
+							backpack = dynamic_cast<Container*>(Item::CreateItem(1988));
 							if(!backpack)
 								continue;
 							defaultbackpack->addItem(backpack);
 							
 							for(int i = 0; i < 20; ++i) {
-								backpack->addItem(Item::CreateItem(1618, 99));
+								backpack->addItem(Item::CreateItem(2273, 99));
 							}
 
-							backpack = dynamic_cast<Container*>(Item::CreateItem(1411));
+							backpack = dynamic_cast<Container*>(Item::CreateItem(1988));
+							if(!backpack)
+								continue;
+							defaultbackpack->addItem(backpack);
+							
+							for(int i = 0; i < 20; ++i) {
+								backpack->addItem(Item::CreateItem(2268, 99));
+							}
+
+							backpack = dynamic_cast<Container*>(Item::CreateItem(1988));
 							if(!backpack)
 								continue;
 							defaultbackpack->addItem(backpack);
 
 							for(int i = 0; i < 20; ++i) {
-								backpack->addItem(Item::CreateItem(1655, 3));
+								backpack->addItem(Item::CreateItem(2304, 3));
 							}
 
-							backpack = dynamic_cast<Container*>(Item::CreateItem(1411));
+							backpack = dynamic_cast<Container*>(Item::CreateItem(1988));
 							if(!backpack)
 								continue;
 							defaultbackpack->addItem(backpack);
 
 							for(int i = 0; i < 20; ++i) {
-								backpack->addItem(Item::CreateItem(1643, 3));
+								backpack->addItem(Item::CreateItem(2293, 3));
 							}
 
-							defaultbackpack->addItem(Item::CreateItem(1654, 2));
-							defaultbackpack->addItem(Item::CreateItem(1658, 50));
-							defaultbackpack->addItem(Item::CreateItem(1614, 5));
-							//defaultbackpack->addItem(Item::CreateItem(1628, 5));
+							defaultbackpack->addItem(Item::CreateItem(2304, 2));
+							defaultbackpack->addItem(Item::CreateItem(2308, 50));
+							defaultbackpack->addItem(Item::CreateItem(2262, 5));
+							defaultbackpack->addItem(Item::CreateItem(2305, 5));
 						}
 					}
 				slot=slot->next;

@@ -31,7 +31,7 @@ Creature::Creature(const char *name) : access(0)
 	looktype   = PLAYER_MALE_1;
 	pzLocked = false;
 
-	lookcorpse = 2276;
+	lookcorpse = 3128;
 
   health     = 1000;//150;
   healthmax  = 1000;//150;
