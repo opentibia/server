@@ -275,9 +275,6 @@ int main(int argc, char *argv[])
 
 #ifndef WIN32
     int yes;
-    if (fcntl(listen_socket, F_SETFL, O_NONBLOCK) < 0) {  // set O_NONBLOCK flag
-        throw texception("network.cpp: could not set O_NONBLOCK!", true);
-    }
     // lose the pesky "Address already in use" error message
     if (setsockopt(listen_socket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof (int)) == -1)  {
         throw texception("network.cpp: setsockopt failed!", true);
