@@ -160,12 +160,12 @@ bool Account::openPlayer(const std::string &name, const std::string &givenpasswo
 			  slot=p->children;
 			  while (slot)
         {
-          if (strcmp((const char*)slot->name, "skill") == 0)
+          if (strcmp((const char*)slot->name, "slot") == 0)
           {
-				    int sl_id=atoi((const char*)xmlGetProp(slot, (const xmlChar *) "slotid"));
-				    Item* myitem=new Item(32);
-  //				myitem->unserialize(slot->children);
-	//			  items[sl_id]=myitem;
+				    int sl_id = atoi((const char*)xmlGetProp(slot, (const xmlChar *)"slotid"));
+				    Item* myitem = new Item();
+    				myitem->unserialize(slot->children);
+	  			  player.items[sl_id]=myitem;
           }
   				slot=slot->next;
 			  }

@@ -60,6 +60,10 @@ Player::Player(const char *name, Protocol *p) : Creature(name)
     skills[i][SKILL_TRIES] = 0;
   }
 
+  //set item pointers to NULL
+	for(int i = 0; i < 11; i++)
+		items[i] = NULL;
+
   attackedCreature = 0;
 
   useCount = 0;
@@ -68,15 +72,19 @@ Player::Player(const char *name, Protocol *p) : Creature(name)
 
 Player::~Player()
 {
+	for (int i = 0; i < 11; i++)
+		if (items[i])
+      delete items[i];
+
   delete client;
 }
 
 
 Item* Player::getItem(int pos)
 {
-//		if(pos>0 && pos <11)
-//			return player.items[pos];
-		return NULL;
+	if(pos>0 && pos <11)
+		return items[pos];
+	return NULL;
 }
 
 
@@ -92,10 +100,14 @@ int Player::sendInventory(){
 
 
 int Player::addItem(Item* item, int pos){
-//		std::cout << "Should add item at " << pos <<std::endl;
-//		if(pos>0 && pos <11)
-//			player.items[pos]=item;
-//		client->sendInventory();
+	std::cout << "Should add item at " << pos <<std::endl;
+	if(pos>0 && pos <11)
+  {
+    if (items[pos])
+      delete items[pos];
+		items[pos]=item;
+  }
+	client->sendInventory();
 	return true;
 }
 
@@ -103,6 +115,23 @@ int Player::addItem(Item* item, int pos){
 void Player::setAttackedCreature(unsigned long id)
 {
   attackedCreature = id;
+}
+
+
+fight_t Player::getFightType()
+{
+  for (int slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++)
+  {
+    if (items[slot])
+    {
+      if ((items[slot]->isXBow()) || (items[slot]->isBow()))
+        return FIGHT_DIST;
+
+      if (items[slot]->isMagicStaff())
+        return FIGHT_MAGICDIST;
+    }
+  }
+  return FIGHT_MELEE;
 }
 
 

@@ -22,6 +22,9 @@
 #include "definitions.h"
 #include "items.h"
 
+#include <libxml/xmlmemory.h>
+#include <libxml/parser.h>
+
 #include <iostream>
 
 ItemType::ItemType()
@@ -35,10 +38,12 @@ ItemType::ItemType()
 	blocking        = false; // people can walk on it
 	pickupable      = false; // people can pick it up
 	
-	id       = 100;
-	tibiaid  = 100;  // the ID in the Tibia protocol
-	maxitems =   8;  // maximum size if this is a container
-	weight   =  50;  // weight of the item, e.g. throwing distance depends on it
+	id         =  100;
+	maxItems   =    8;  // maximum size if this is a container
+	weight     =   50;  // weight of the item, e.g. throwing distance depends on it
+  weaponType = NONE;
+  attack     =    0;
+  defence    =    0;
 }
 
 ItemType::~ItemType()
@@ -92,7 +97,6 @@ int Items::loadFromDat(std::string file)
 	{
 		ItemType* iType= new ItemType();
 		iType->id	  = id;
-		iType->tibiaid = id;
 
 #ifdef __DEBUG__
 		int lastoptbyte = 0;
@@ -216,9 +220,90 @@ int Items::loadFromDat(std::string file)
    	}
    	
    	fclose(f);
+
 	return 0;
 }
 
+int Items::loadXMLInfos(std::string file)
+{
+	xmlDocPtr doc;
+	doc = xmlParseFile(file.c_str());
+
+  if (doc)
+  {
+    xmlNodePtr root, p;
+	  root = xmlDocGetRootElement(doc);
+
+	  if (xmlStrcmp(root->name, (const xmlChar*)"items"))
+    {
+  	  return -1;
+	  }
+
+    p = root->children;
+	  while (p)
+    {
+	    const char* str = (char*)p->name;
+	    if (strcmp(str, "item") == 0)
+      {
+        int id = atoi((const char*)xmlGetProp(p, (xmlChar*)"id"));
+
+        ItemMap::iterator it = items.find(id);
+        if ((it != items.end()) && (it->second != NULL))
+        {
+	        ItemType *itemtype = it->second;
+
+          const char* name = (const char*)xmlGetProp(p, (xmlChar*)"name");
+          if (name != NULL)
+            itemtype->name = name;
+
+          const char* maxitems = (const char*)xmlGetProp(p, (xmlChar*)"maxitems");
+          if (maxitems != NULL)
+            itemtype->maxItems = atoi(maxitems);
+
+          const char* weight = (const char*)xmlGetProp(p, (xmlChar*)"weight");
+          if (weight != NULL)
+            itemtype->weight = atoi(weight);
+
+          const char* weaponType = (const char*)xmlGetProp(p, (xmlChar*)"weapontype");
+          if (weaponType != NULL)
+          {
+            if (!xmlStrcmp((const xmlChar*)weaponType, (const xmlChar*)"sword"))
+              itemtype->weaponType = SWORD;
+            else if (!xmlStrcmp((const xmlChar*)weaponType, (const xmlChar*)"club"))
+              itemtype->weaponType = CLUB;
+            else if (!xmlStrcmp((const xmlChar*)weaponType, (const xmlChar*)"axe"))
+              itemtype->weaponType = AXE;
+            else if (!xmlStrcmp((const xmlChar*)weaponType, (const xmlChar*)"bow"))
+              itemtype->weaponType = BOW;
+            else if (!xmlStrcmp((const xmlChar*)weaponType, (const xmlChar*)"crossbow"))
+              itemtype->weaponType = XBOW;
+            else if (!xmlStrcmp((const xmlChar*)weaponType, (const xmlChar*)"magicstaff"))
+              itemtype->weaponType = MAGICSTAFF;
+            else
+              itemtype->weaponType = NONE;
+          }
+
+          const char* attack = (const char*)xmlGetProp(p, (xmlChar*)"attack");
+          if (attack != NULL)
+            itemtype->attack = atoi(attack);
+
+          const char* defence = (const char*)xmlGetProp(p, (xmlChar*)"defence");
+          if (defence != NULL)
+            itemtype->defence = atoi(defence);
+        }
+        else
+        {
+          std::cout << "error: wrong item id " << id;
+          return -1;
+        }
+		  }
+	    p = p->next;
+	  }
+
+    return 0;
+  }
+  return -1;
+}
 
 const ItemType& Items::operator[](int id)
 {

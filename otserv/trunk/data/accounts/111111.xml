@@ -2,6 +2,7 @@
 <account pass="tibia" type="1" premDays="15">
 	<characters>
 		<character name="Hurz" />
+		<character name="Hurzel" />
 		<character name="Hurzine" />
 	</characters>
 </account>

@@ -104,7 +104,9 @@ class Map {
         unsigned char stackPos,
         unsigned short to_x, unsigned short to_y, unsigned char to_z);
 
+    void creatureMakeMeleeDamage(Creature *creature, Creature *attackedCreature);
     void creatureMakeDistDamage(Creature *creature, Creature *attackedCreature);
+    void creatureMakeMagicDistDamage(Creature *creature, Creature *attackedCreature);
 
 	 void CreateDamageUpdate(Player* player, Creature* attackCreature, int damage, NetworkMessage& msg);
 

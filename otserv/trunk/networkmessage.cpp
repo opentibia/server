@@ -189,7 +189,7 @@ void NetworkMessage::AddItem(const Item *item)
   AddU16(item->getID());
 
   if (item->isStackable())
-    AddU16(item->getItemCount());
+    AddByte(item->getItemCount());
 
   /* TODO multitype items */
 }
@@ -296,21 +296,17 @@ void NetworkMessage::AddPlayerSkills(Player *player)
 
 void NetworkMessage::AddPlayerInventoryItem(Player *player, int item)
 {
-
-  AddByte(0x79);
-  AddByte(item);
-
-/*  if (item
-  buf+= (char)0x78;
-			buf+= (char)(i);
-//			std::cout << "Adding item on pos " << i << std::endl;
-			buf+=makeItem(creature->getItem(i));
-		}
-		else{
-			buf+= (char)0x79;
-			buf+= (char)(i);
-		}
-	}*/
+  if (player->items[item] == NULL)
+  {
+    AddByte(0x79);
+    AddByte(item);
+  }
+  else
+  {
+    AddByte(0x78);
+    AddByte(item);
+    AddItem(player->items[item]);
+  }
 }
 
 

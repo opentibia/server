@@ -28,6 +28,20 @@
 class Protocol;
 
 
+enum slots_t {
+	SLOT_WHEREEVER=0,
+	SLOT_HEAD=1,
+	SLOT_NECKLACE=2,
+	SLOT_BACKPACK=3,
+	SLOT_ARMOR=4,
+	SLOT_RIGHT=5,
+	SLOT_LEFT=6,
+	SLOT_LEGS=7,
+	SLOT_FEET=8,
+	SLOT_RING=9,
+	SLOT_AMMO=10
+};
+
 enum skills_t {
     SKILL_FIST,
     SKILL_CLUB,
@@ -41,6 +55,12 @@ enum skills_t {
 enum skillsid_t {
     SKILL_LEVEL,
     SKILL_TRIES
+};
+
+enum fight_t {
+	FIGHT_MELEE,
+	FIGHT_DIST,
+  FIGHT_MAGICDIST
 };
 
 class NetworkMessage;
@@ -82,12 +102,16 @@ public:
 
   int skills[7][2];
 
+  //items
+  Item* items[11]; //equipement of the player
+
   void    usePlayer() { useCount++; };
   void    releasePlayer() { useCount--; if (useCount == 0) delete this; };
 
   void    setAttackedCreature(unsigned long id);
-
   unsigned long attackedCreature;
+
+  fight_t getFightType();
 
   bool CanSee(int x, int y);
   void sendNetworkMessage(NetworkMessage *msg);

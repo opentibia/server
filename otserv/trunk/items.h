@@ -25,6 +25,10 @@
 #include <map>
 #include <string>
 
+enum WeaponType 
+{
+  NONE, SWORD, CLUB, AXE, BOW, XBOW, MAGICSTAFF
+};
 
 class ItemType {
 public:
@@ -32,10 +36,13 @@ public:
 	~ItemType();
 
 	unsigned short id;
-	unsigned short maxitems; // maximum size if this is a container
-	unsigned short tibiaid;  // the ID in the Tibia protocol
-	unsigned short weight;   // weight of the item, e.g. throwing distance depends on it
-	std::string name;		     // the name of the item
+
+  unsigned short maxItems;   // maximum size if this is a container
+	unsigned short weight;     // weight of the item, e.g. throwing distance depends on it
+	std::string    name;		   // the name of the item
+  WeaponType     weaponType;
+  int            attack;
+  int            defence;
 
 	// other bools
 	bool iscontainer;
@@ -55,13 +62,14 @@ public:
 	~Items();
 	
 	int loadFromDat(std::string);
+  int loadXMLInfos(std::string);
 	
 	const ItemType& operator[](int id);
 		 
 protected:
 	typedef std::map<unsigned short, ItemType*> ItemMap;
 	ItemMap items;
-	
+
 	ItemType dummyItemType; // use this for invalid ids
 };
 

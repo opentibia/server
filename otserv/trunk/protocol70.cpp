@@ -27,6 +27,8 @@
 
 #include "protocol70.h"
 
+#include "items.h"
+
 #include "tile.h"
 #include "creature.h"
 #include "player.h"
@@ -394,9 +396,14 @@ void Protocol70::parseLookAt(NetworkMessage &msg){
 
   NetworkMessage newmsg;
   std::stringstream ss;
+
+#ifdef __DEBUG__
   ss << "You look at " << LookPos << " and see Item # " << ItemNum << ".";
   Position middle;
   newmsg.AddTextMessage(MSG_INFO, ss.str().c_str());
+#else
+  newmsg.AddTextMessage(MSG_INFO, Item(ItemNum).getDescription().c_str());
+#endif
   
   sendNetworkMessage(&newmsg);
 }

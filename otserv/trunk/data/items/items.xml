@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+
+<items>
+	<item id="1411" name="backpack" maxitems="20" weight="120" />
+
+	<item id="1683" name="firesword" weapontype="sword" attack="35" defence="20" weight="20" />
+
+	<item id="1724" name="magic staff" weapontype="magicstaff" attack="35" defence="20" />
+	<item id="1725" name="dragon hammer" weapontype="club" attack="35" defence="20" />
+
+	<item id="1728" name="crossbow" weapontype="crossbow" />
+	<item id="1729" name="bow" weapontype="bow" />
+</items>
+
+

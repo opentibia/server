@@ -7,19 +7,6 @@
 #include <cmath>
 #include <iostream>
 
-enum slots_t {
-	SLOT_WHEREEVER=0,
-	SLOT_HEAD=1,
-	SLOT_NECKLACE=2,
-	SLOT_BACKPACK=3,
-	SLOT_ARMOR=4,
-	SLOT_RIGHT=5,
-	SLOT_LEFT=6,
-	SLOT_LEGS=7,
-	SLOT_FEET=8,
-	SLOT_RING=9,
-	SLOT_AMMO=10
-};
 
 enum Direction { NORTH = 0, EAST = 1, SOUTH = 2, WEST = 3 };
 
