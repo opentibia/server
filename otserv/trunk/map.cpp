@@ -399,8 +399,8 @@ bool Map::placeCreature(Creature* c)
   {   
       int x = -1, y = -1;
       bool found =false;
-      for(int cx =c->pos.x-1; cx <= c->pos.x+1 && !found; cx++){
-                    for(int cy = c->pos.y-1; cy <= c->pos.y+1 && !found; cy++){
+      for(int cx =c->pos.x-3; cx <= c->pos.x+3 && !found; cx++){
+                    for(int cy = c->pos.y-3; cy <= c->pos.y+3 && !found; cy++){
                                         if (c->canMovedTo(getTile(cx, cy, c->pos.z))){
                                             c->pos.x = cx;
                                             c->pos.y = cy;
