@@ -18,8 +18,7 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="/D &quot;_X86_&quot; /c 
-"
+				AdditionalOptions="/D &quot;_X86_&quot; /c "
 				Optimization="0"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;__DEBUG_NPC__;__DEBUG__"
 				MinimalRebuild="TRUE"

@@ -96,17 +96,17 @@ Thing* Tile::getThingByStackPos(int pos)
     pos--;
   }
 
-  if (pos < topItems.size())
+  if ((unsigned) pos < topItems.size())
     return topItems[pos];
 
-  pos -= topItems.size();
+  pos -= (uint32_t)topItems.size();
 
-  if (pos < creatures.size())
+  if ((unsigned) pos < creatures.size())
     return creatures[pos];
 
-  pos -= creatures.size();
+  pos -= (uint32_t)creatures.size();
 
-  if (pos < downItems.size())
+  if ((unsigned) pos < downItems.size())
     return downItems[pos];
 
   return NULL;
@@ -114,7 +114,7 @@ Thing* Tile::getThingByStackPos(int pos)
 
 int Tile::getThingCount()
 {
-  return 1 + (splash ? 1 : 0) + topItems.size() +	creatures.size() + downItems.size();
+  return (uint32_t) 1 + (splash ? 1 : 0) + topItems.size() +	creatures.size() + downItems.size();
 }
 
 std::string Tile::getDescription(){

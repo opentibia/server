@@ -390,7 +390,7 @@ bool Map::placeCreature(Creature* c)
 	if (player) {
 		player->usePlayer();
 	}
-	std::cout << playersOnline.size() << " players online." << std::endl;
+	std::cout << (uint32_t)playersOnline.size() << " players online." << std::endl;
 
 	addEvent(makeTask(1000, std::bind2nd(std::mem_fun(&Map::checkPlayer), c->id)));
 	addEvent(makeTask(2000, std::bind2nd(std::mem_fun(&Map::checkPlayerAttacking), c->id)));

@@ -143,9 +143,6 @@ class Map {
 
 		bool creatureOnPrepareAttack(Creature *creature, Position pos);
 		void creatureMakeDamage(Creature *creature, Creature *attackedCreature, fight_t damagetype);
-		void creatureMakeMeleeDamage(Creature *creature, Creature *attackedCreature);
-    void creatureMakeDistDamage(Creature *creature, Creature *attackedCreature);
-    void creatureMakeMagicDistDamage(Creature *creature, Creature *attackedCreature);
 
 		void creatureMakeMagic(Creature *creature, const EffectInfo &ei);
 		void creatureMakeAreaEffect(Creature *spectator, Creature *attacker, const EffectInfo &ei, NetworkMessage& msg);

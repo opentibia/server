@@ -55,7 +55,7 @@ std::string LuaScript::getGlobalString(std::string var, const std::string &defSt
   if(!lua_isstring(luaState, -1))
   	  return defString;
 
-	int len = lua_strlen(luaState, -1);
+	int len = (int)lua_strlen(luaState, -1);
 	std::string ret(lua_tostring(luaState, -1), len);
 	lua_pop(luaState,1);
 
@@ -69,7 +69,7 @@ int LuaScript::getGlobalNumber(std::string var, const int defNum)
   if(!lua_isnumber(luaState, -1))
   	  return defNum;
 
-	int val = lua_tonumber(luaState, -1);
+	int val = (int)lua_tonumber(luaState, -1);
 	lua_pop(luaState,1);
 
 	return val;
