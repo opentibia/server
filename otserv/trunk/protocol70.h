@@ -56,7 +56,10 @@ private:
   void parsePacket(NetworkMessage &msg);
 
   void parseLogout(NetworkMessage &msg);
-
+  
+  void parseCancelMove(NetworkMessage &msg);
+  void parseDebug(NetworkMessage &msg);
+  
   void parseMoveByMouse(NetworkMessage &msg);
 
 	void parseMoveNorth(NetworkMessage &msg);

@@ -160,6 +160,18 @@ void Protocol70::parsePacket(NetworkMessage &msg)
     case 0xD3: // set outfit
       parseSetOutfit(msg);
       break;
+    case 0xBE: // cancel move by mouse
+      parseCancelMove(msg);
+      break;
+    case 0xA0: // ?? (during character loggin into world) has 2 bytes data
+      parseDebug(msg);
+      break;
+    case 0x69: // ?? control meesage (no data)
+      parseDebug(msg);
+      break;    
+    default:
+         printf("unknown packet header: %x \n", recvbyte);
+         break;  
   }
 				//so we got the action, now we ask the map to execut it
 /*  if(action.type!=ACTION_NONE){
@@ -307,6 +319,27 @@ void Protocol70::parseLogout(NetworkMessage &msg)
 		closesocket(s);
 		s = 0;
 	}
+}
+
+void Protocol70::parseCancelMove(NetworkMessage &msg)
+{
+NetworkMessage netmsg;
+  netmsg.AddByte(0xB5);
+  netmsg.WriteToSocket(s);
+}
+void Protocol70::parseDebug(NetworkMessage &msg)
+{
+  int dataLength = msg.getMessageLength()-3;
+  if(dataLength!=0){
+  printf("data: ");
+  size_t data = msg.GetByte();
+  while( dataLength > 0){
+  printf("%d ", data);
+  if(--dataLength >0)
+                  data = msg.GetByte();
+  }
+  printf("\n");
+  }
 }
 
 void Protocol70::parseMoveByMouse(NetworkMessage &msg)

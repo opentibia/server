@@ -118,6 +118,9 @@ public:
   void AddPlayerSkills(Player *player);
   void AddPlayerStats(Player *player);
 
+  int getMessageLength(){
+      return m_MsgSize;
+      }
 
 protected:
   int m_MsgSize;

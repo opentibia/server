@@ -1007,9 +1007,9 @@ void Map::creatureMakeMagic(Creature *creature, const EffectInfo &ei)
 	if(ei.offensive && !creatureOnPrepareAttack(creature, ei.centerpos))
 		return;
 
-	if(!((std::abs(creature->pos.x-ei.centerpos.x) <= 8) && (std::abs(creature->pos.y-ei.centerpos.y) <= 6) &&
+	/*if(!((std::abs(creature->pos.x-ei.centerpos.x) <= 8) && (std::abs(creature->pos.y-ei.centerpos.y) <= 6) &&
 		(creature->pos.z == ei.centerpos.z)))
-		return;
+		return;*/
 
 	Player* player = dynamic_cast<Player*>(creature);
 	if(player) {
