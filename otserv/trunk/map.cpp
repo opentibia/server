@@ -360,7 +360,7 @@ void Map::getSpectators(const Range& range, std::vector<Creature*>& list)
 				{
 					for (cit = tile->creatures.begin(); cit != tile->creatures.end(); ++cit) {
 #ifdef __DEBUG__
-						std::cout << "Found " << (*cit)->getName() << " at x: " << (*cit)->pos.x << ", y: " << (*cit)->pos.y << ", z: " << (*cit)->pos.y << ", offset: " << offset << std::endl;
+						std::cout << "Found " << (*cit)->getName() << " at x: " << (*cit)->pos.x << ", y: " << (*cit)->pos.y << ", z: " << (*cit)->pos.z << ", offset: " << offset << std::endl;
 #endif
 						list.push_back((*cit));
 					}

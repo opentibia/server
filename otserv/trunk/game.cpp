@@ -1085,7 +1085,7 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 	AreaTargetVec areaTargetVec;
 
 	Player* player = dynamic_cast<Player*>(creature);
-	Position topLeft(0xFFFF, 0xFFFF, 0xFFFF), bottomRight(0xFFFF, 0xFFFF, 0xFFFF);
+	Position topLeft(0xFFFF, 0xFFFF, 0xFFFF), bottomRight(0x0, 0x0, 0x0);
 
 	//Filter out the tiles we actually can work on
 	for(MagicAreaVec::iterator maIt = tmpMagicAreaVec.begin(); maIt != tmpMagicAreaVec.end(); ++maIt) {
@@ -1117,12 +1117,19 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 											frompos.z), spectatorlist);
 	*/
 	//getSpectators(Range(frompos, centerpos), spectatorlist);
+	topLeft.z = frompos.z;
+	bottomRight.z = frompos.z;
+	if(topLeft.x == 0xFFFF || topLeft.y == 0xFFFF || bottomRight.x == 0 || bottomRight.y == 0)
+	return false;
+#ifdef __DEBUG__	
+	printf("top left %d %d %d\n", topLeft.x, topLeft.y, topLeft.z);
+	printf("bottom right %d %d %d\n", bottomRight.x, bottomRight.y, bottomRight.z);
+#endif
 	getSpectators(Range(topLeft, bottomRight), spectatorlist);
 
 	//We do all changes against a MapState to keep track of the changes,
 	//need some more work to work for all situations...
 	MapState mapstate(map);
-
 	//Apply the permanent effect to the map
 	for(AreaTargetVec::iterator taIt = areaTargetVec.begin(); taIt != areaTargetVec.end(); ++taIt) {
 		Tile *targettile = getTile(taIt->first.x,  taIt->first.y, taIt->first.z);
@@ -1183,7 +1190,6 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 			}
 		}
 	}
-	
 	//Do target related map changes
 	for(AreaTargetVec::const_iterator taIt = areaTargetVec.begin(); taIt != areaTargetVec.end(); ++taIt) {
 		for(TargetDataVec::const_iterator tdIt = taIt->second.begin(); tdIt != taIt->second.end(); ++tdIt) {
@@ -1244,7 +1250,6 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 			}
 		}
 	}
-
 	if(player && player->access == 0) {
 		//Add exhaustion
 		if(me->causeExhaustion(!areaTargetVec.empty()))
@@ -1326,7 +1331,6 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 
 		spectator->sendNetworkMessage(&msg);
 	}
-
 	return true;
 }
 
@@ -2126,8 +2130,7 @@ bool Game::creatureSaySpell(Creature *creature, const std::string &text)
 	else {
 		temp = text;
 		var = std::string(""); 
-	}
-  
+	}  
 	if(creature->access != 0 || !player){
 		std::map<std::string, Spell*>::iterator sit = spells.getAllSpells()->find(temp);
 		if( sit != spells.getAllSpells()->end() ) {

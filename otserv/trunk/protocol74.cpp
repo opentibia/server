@@ -189,7 +189,19 @@ void Protocol74::parsePacket(NetworkMessage &msg)
       break;  
     case 0xC9: // change position
       // update position   
-      break;      
+      break; 
+    case 0x6a:
+      this->game->thingMove(player, player, (player->pos.x-1), (player->pos.y+1), player->pos.z);   
+      break;
+    case 0x6b:
+      this->game->thingMove(player, player, (player->pos.x+1), (player->pos.y+1), player->pos.z);   
+      break;
+    case 0x6c:
+      this->game->thingMove(player, player, (player->pos.x+1), (player->pos.y-1), player->pos.z);   
+      break;
+    case 0x6d:
+      this->game->thingMove(player, player, (player->pos.x-1), (player->pos.y-1), player->pos.z);   
+      break;                
     default:
          printf("unknown packet header: %x \n", recvbyte);
          parseDebug(msg);

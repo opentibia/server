@@ -27,7 +27,9 @@ IOAccount* IOAccount::instance(){
 	if(!_instance){
 		_instance = (IOAccount*)new IOAccountXML;
 	}
+	#ifdef __DEBUG__
 	printf("%s \n", _instance->getSourceDescription());
+	#endif
 	return _instance;
 }
 
