@@ -211,27 +211,19 @@ int Player::addItem(Item* item, int pos){
 	return true;
 }
 
-float Player::getSkillMultiplier(int voc_c, int skill_c) {
-      float SkillMultipliers[7][5] = {
-                             {1.5, 1.5, 1.5, 1.2, 1.1},     // Fist   //for level advances
-                             {2, 2, 1.8, 1.2, 1.1},         // Club
-                             {2, 2, 1.8, 1.2, 1.1},         // Sword
-                             {2, 2, 1.8, 1.2, 1.1},         // Axe
-                             {2, 2, 1.8, 1.4, 1.1},         // Distance
-                             {1.5, 1.5, 1.5, 1.1, 1.1},     // Shielding
-                             {1.1, 1.1, 1.1, 1.1, 1.1}      // Fishing
-      };
-      
-      return SkillMultipliers[skill_c][voc_c];
-}
-
-unsigned int Player::getSkillBase (int skill_c) {
-    unsigned short int SkillBases[7] = { 50, 50, 50, 50, 30, 100, 20 };       // follows the order of enum skills_t, for level advances
-    return SkillBases[skill_c];
-}
-
 unsigned int Player::getReqSkilltries (int skill, int level, int voc) {
-    return (int) ( getSkillBase(skill) * pow((float) getSkillMultiplier(voc, skill), (float) ( level - 9) ) );
+    unsigned short int SkillBases[7] = { 50, 50, 50, 50, 30, 100, 20 };       // follows the order of enum skills_t
+    float SkillMultipliers[7][5] = {
+                                   {1.5, 1.5, 1.5, 1.2, 1.1},     // Fist
+                                   {2, 2, 1.8, 1.2, 1.1},         // Club
+                                   {2, 2, 1.8, 1.2, 1.1},         // Sword
+                                   {2, 2, 1.8, 1.2, 1.1},         // Axe
+                                   {2, 2, 1.8, 1.4, 1.1},         // Distance
+                                   {1.5, 1.5, 1.5, 1.1, 1.1},     // Shielding
+                                   {1.1, 1.1, 1.1, 1.1, 1.1}      // Fishing
+                                   };
+                                   
+    return (int) ( SkillBases[skill] * pow((float) SkillMultipliers[skill][voc], (float) ( level - 11) ) );
 }
 
 void Player::addSkillTry(int skilltry)
@@ -263,8 +255,8 @@ skills[skill][SKILL_TRIES] += skilltry;
 //int reqTries = (int) ( SkillBases[skill] * pow((float) VocMultipliers[skill][voc], (float) ( skills[skill][SKILL_LEVEL] - 10) ) );
 
 //for debug
-cout << Creature::getName() << ", has the vocation: " << voc << " and is training his " << skillname << "(" << skill << "). Tries: " << skills[skill][SKILL_TRIES] << "(" << getReqSkilltries (skill, (skills[skill][SKILL_LEVEL] + 1), voc) << ")\n";
-cout << "Current skill: " << skills[skill][SKILL_LEVEL] << " Skillbase: " << getSkillBase(skill) << ", SkillMultiplier: " << getSkillMultiplier(voc, skill) << "\n";
+//cout << Creature::getName() << ", voc: " << voc << ", training: " << skillname << "(" << skill << "). Tries: " << skills[skill][SKILL_TRIES] << "(" << getReqSkilltries (skill, (skills[skill][SKILL_LEVEL] + 1), voc) << ")\n";
+//cout << "Current skill: " << skills[skill][SKILL_LEVEL] << " Skillbase: " << getSkillBase(skill) << ", SkillMultiplier: " << getSkillMultiplier(voc, skill) << "\n";
 
 
 //Need skill up?

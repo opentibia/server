@@ -98,8 +98,6 @@ public:
   unsigned short HPGain[5];
   
   //for skill advances
-  float getSkillMultiplier(int voc_c, int skill_c);
-  unsigned int getSkillBase (int skill_c);
   unsigned int getReqSkilltries (int skill, int level, int voc);
   
   //for magic level advances

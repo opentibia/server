@@ -2312,7 +2312,7 @@ void Map::CreateDamageUpdate(Creature* creature, Creature* attackCreature, int d
 				msg.AddTextMessage(MSG_EVENT, "Own3d!");
 				
 				
-                // Magic Level downgrade
+                //Magic Level downgrade
                 unsigned int sumMana = 0;
                 unsigned int lostMana = 0;
                 for (int i = 1; i <= player->maglevel; i++) {              //sum up all the mana
@@ -2331,6 +2331,46 @@ void Map::CreateDamageUpdate(Creature* creature, Creature* attackCreature, int d
                    player->maglevel--;
                 }
                 //End Magic Level downgrade
+                
+                
+                
+                //Skill loss
+                unsigned int lostSkilltries;
+                unsigned int sumSkilltries;
+                for (int i = 0; i <= 6; i++) {  //for each skill
+                    lostSkilltries = 0;         //reset to 0
+                    sumSkilltries = 0;
+                    
+                    for (int c = 11; c <= player->skills[i][SKILL_LEVEL]; c++) {    //sum up all required tries for all skill levels
+                        sumSkilltries += player->getReqSkilltries(i, c, player->voc);
+                    }
+                    
+                    sumSkilltries += player->skills[i][SKILL_TRIES];
+                    
+                    lostSkilltries = (int) (sumSkilltries * 0.1);           //player loses 10% of his skill tries
+
+                    cout << player->getName() << "died an lost " << lostSkilltries << " skill tries for skill " << i << "\n";
+                    cout << "skill tries before death: " <<  player->skills[i][SKILL_TRIES] << "\n";
+                    cout << "skill level before death: " <<  player->skills[i][SKILL_LEVEL] << "\n";
+
+                    if (player->skills[i][SKILL_TRIES] >= lostSkilltries) { //player does not lose a skill level
+                       player->skills[i][SKILL_TRIES] -= lostSkilltries;
+                       
+                    } else {                                                //player DOES lose a skill level
+                       if (player->skills[i][SKILL_LEVEL] > 10 ) {          //skills should not be < 10
+                          lostSkilltries -= player->skills[i][SKILL_TRIES];
+                          player->skills[i][SKILL_TRIES] = (int) ( player->getReqSkilltries(i, player->skills[i][SKILL_LEVEL], player->voc) - lostSkilltries );
+                          player->skills[i][SKILL_LEVEL]--;
+                       } else {
+                              player->skills[i][SKILL_LEVEL] = 10;
+                              player->skills[i][SKILL_TRIES] = 0;
+                       }
+                    }
+                    
+                    cout << "skill tries after death: " <<  player->skills[i][SKILL_TRIES] << "\n";
+                    cout << "skill level after death: " <<  player->skills[i][SKILL_LEVEL] << "\n";
+                }               
+                //End Skill loss
                 
                 
                 
