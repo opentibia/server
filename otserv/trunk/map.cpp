@@ -362,7 +362,7 @@ bool Map::placeCreature(Creature* c)
   if (c->access == 0 && playersOnline.size() >= max_players)
     return false;
 
-	std::cout << "locking 1";OTSYS_THREAD_LOCK(mapLock) std::cout <<"pid:" << getpid() << "locked 1"  << std::endl;
+	OTSYS_THREAD_LOCK(mapLock)
 
 	// add player to the online list
 	playersOnline[c->getID()] = c;
@@ -403,15 +403,14 @@ bool Map::placeCreature(Creature* c)
       }
     }
 
-   std::cout<< "pid:" << getpid() << "unlocking 1" << std::endl; OTSYS_THREAD_UNLOCK(mapLock)
+	OTSYS_THREAD_UNLOCK(mapLock)
 
     return true;
 }
 
 bool Map::removeCreature(Creature* c)
 {
-  std::cout << "locking 2";OTSYS_THREAD_LOCK(mapLock) std::cout <<"pid:" << getpid() << "locked 2"  << std::endl;
-
+  OTSYS_THREAD_LOCK(mapLock)
     //removeCreature from the online list
 
     std::map<long, Creature*>::iterator pit = playersOnline.find(c->getID());
@@ -448,7 +447,7 @@ bool Map::removeCreature(Creature* c)
   if (player)
     player->releasePlayer();
 
-   std::cout<< "pid:" << getpid() << "unlocking 2" << std::endl; OTSYS_THREAD_UNLOCK(mapLock)
+   OTSYS_THREAD_UNLOCK(mapLock)
 
     return true;
 }
@@ -456,8 +455,7 @@ bool Map::removeCreature(Creature* c)
 void Map::thingMove(Creature *player, Thing *thing,
                     unsigned short to_x, unsigned short to_y, unsigned char to_z)
 {
-  std::cout << "locking 3";OTSYS_THREAD_LOCK(mapLock) std::cout <<"pid:" << getpid() << "locked 3"  << std::endl;
-
+  OTSYS_THREAD_LOCK(mapLock)
   Tile *fromTile = getTile(thing->pos.x, thing->pos.y, thing->pos.z);
 
   if (fromTile)
@@ -467,7 +465,7 @@ void Map::thingMove(Creature *player, Thing *thing,
     thingMoveInternal(player, thing->pos.x, thing->pos.y, thing->pos.z, oldstackpos, to_x, to_y, to_z);
   }
 
-   std::cout<< "pid:" << getpid() << "unlocking 3" << std::endl; OTSYS_THREAD_UNLOCK(mapLock)
+   OTSYS_THREAD_UNLOCK(mapLock)
 }
 
 
@@ -476,11 +474,10 @@ void Map::thingMove(Creature *player,
                     unsigned char stackPos,
                     unsigned short to_x, unsigned short to_y, unsigned char to_z)
 {
-  std::cout << "locking 4";OTSYS_THREAD_LOCK(mapLock) std::cout <<"pid:" << getpid() << "locked 4"  << std::endl;
-
+  OTSYS_THREAD_LOCK(mapLock)
     thingMoveInternal(player, from_x, from_y, from_z, stackPos, to_x, to_y, to_z);
 
-   std::cout<< "pid:" << getpid() << "unlocking 4" << std::endl; OTSYS_THREAD_UNLOCK(mapLock)
+   OTSYS_THREAD_UNLOCK(mapLock)
 }
 
 
@@ -608,7 +605,7 @@ void Map::thingMoveInternal(Creature *player,
 
 void Map::creatureTurn(Creature *creature, Direction dir)
 {
-  std::cout << "locking 5";OTSYS_THREAD_LOCK(mapLock) std::cout <<"pid:" << getpid() << "locked 5"  << std::endl;
+	OTSYS_THREAD_LOCK(mapLock)
 
     if (creature->direction != dir)
     {
@@ -631,13 +628,13 @@ void Map::creatureTurn(Creature *creature, Direction dir)
         }
     }
 
-   std::cout<< "pid:" << getpid() << "unlocking 5" << std::endl; OTSYS_THREAD_UNLOCK(mapLock)
+   OTSYS_THREAD_UNLOCK(mapLock)
 }
 
 
 void Map::creatureSay(Creature *creature, unsigned char type, const std::string &text)
 {
-  std::cout << "6";OTSYS_THREAD_LOCK(mapLock) std::cout <<"pid:" << getpid() << "locked 6"  << std::endl;
+  OTSYS_THREAD_LOCK(mapLock)
 // First, check if this was a GM command
 if(text[0] == '/' && creature->access > 0)
 {
@@ -704,14 +701,13 @@ else {
       }
     }
 }
-   std::cout<< "pid:" << getpid() << "unlocking 6" << std::endl; OTSYS_THREAD_UNLOCK(mapLock)
+	OTSYS_THREAD_UNLOCK(mapLock)
 }
 
 
 void Map::creatureChangeOutfit(Creature *creature)
 {
-  std::cout << "locking 7";OTSYS_THREAD_LOCK(mapLock) std::cout <<"pid:" << getpid() << "locked 7"  << std::endl;
-
+  OTSYS_THREAD_LOCK(mapLock)
   CreatureVector::iterator cit;
   for (int x = creature->pos.x - 9; x <= creature->pos.x + 9; x++)
     for (int y = creature->pos.y - 7; y <= creature->pos.y + 7; y++)
@@ -726,13 +722,12 @@ void Map::creatureChangeOutfit(Creature *creature)
       }
     }
 
-   std::cout<< "pid:" << getpid() << "unlocking 7" << std::endl; OTSYS_THREAD_UNLOCK(mapLock)
+   OTSYS_THREAD_UNLOCK(mapLock)
 }
 
 void Map::creatureWhisper(Creature *creature, const std::string &text)
 {
-  std::cout << "locking 8";OTSYS_THREAD_LOCK(mapLock) std::cout <<"pid:" << getpid() << "locked 8"  << std::endl;
-
+  OTSYS_THREAD_LOCK(mapLock)
       CreatureVector::iterator cit;
   for (int x = creature->pos.x - 8; x <= creature->pos.x + 8; x++)
     for (int y = creature->pos.y - 6; y <= creature->pos.y + 6; y++)
@@ -748,13 +743,13 @@ void Map::creatureWhisper(Creature *creature, const std::string &text)
         }
       }
     }    
-   std::cout<< "pid:" << getpid() << "unlocking 8" << std::endl; OTSYS_THREAD_UNLOCK(mapLock)
+  OTSYS_THREAD_UNLOCK(mapLock)
 }
 
 void Map::creatureYell(Creature *creature, std::string &text)
 {
-  std::cout << "locking 9";OTSYS_THREAD_LOCK(mapLock) std::cout <<"pid:" << getpid() << "locked 9"  << std::endl;
-  
+  OTSYS_THREAD_LOCK(mapLock)
+
 		Player* player = dynamic_cast<Player*>(creature);
   if(player && player->access == 0 && player->exhausted) {
       NetworkMessage msg;
@@ -779,14 +774,14 @@ void Map::creatureYell(Creature *creature, std::string &text)
       }
     }
   }    
-   std::cout<< "pid:" << getpid() << "unlocking 9" << std::endl; OTSYS_THREAD_UNLOCK(mapLock)
+   OTSYS_THREAD_UNLOCK(mapLock)
 }
 
 
 void Map::creatureSpeakTo(Creature *creature, const std::string &receiver, const std::string &text)
 {
-  std::cout << "locking 10";OTSYS_THREAD_LOCK(mapLock) std::cout <<"pid:" << getpid() << "locked 10"  << std::endl;
-     std::cout<< "pid:" << getpid() << "unlocking 10" << std::endl; OTSYS_THREAD_UNLOCK(mapLock)
+  OTSYS_THREAD_LOCK(mapLock) 
+ OTSYS_THREAD_UNLOCK(mapLock)
 }
 
 
@@ -795,13 +790,13 @@ void Map::creatureBroadcastMessage(Creature *creature, const std::string &text)
   if(creature->access == 0) 
 	  return;
 
-  std::cout << "locking 11";OTSYS_THREAD_LOCK(mapLock) std::cout <<"pid:" << getpid() << "locked 11"  << std::endl;
-    std::map<long, Creature*>::iterator cit;
+  OTSYS_THREAD_LOCK(mapLock)
+	  std::map<long, Creature*>::iterator cit;
     for (cit = playersOnline.begin(); cit != playersOnline.end(); cit++)
             {
                   cit->second->onCreatureSay(creature, 9, text);
             }
-   std::cout<< "pid:" << getpid() << "unlocking 11" << std::endl; OTSYS_THREAD_UNLOCK(mapLock)
+OTSYS_THREAD_UNLOCK(mapLock)
 }
 
 void Map::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fight_t damagetype){
@@ -1065,8 +1060,7 @@ std::list<Position> Map::getPathTo(Position start, Position to, bool creaturesBl
 
 void Map::checkPlayer(unsigned long id)
 {
-  std::cout << "locking 12";OTSYS_THREAD_LOCK(mapLock) std::cout <<"pid:" << getpid() << "locked 12"  << std::endl;
-
+  OTSYS_THREAD_LOCK(mapLock)
   Creature *creature = getCreatureByID(id);
 
   if (creature != NULL)
@@ -1092,13 +1086,13 @@ void Map::checkPlayer(unsigned long id)
 		 addEvent(makeTask(300, std::bind2nd(std::mem_fun(&Map::checkPlayer), id)));
 	 }
   }
-   std::cout<< "pid:" << getpid() << "unlocking 12" << std::endl; OTSYS_THREAD_UNLOCK(mapLock)
+   OTSYS_THREAD_UNLOCK(mapLock)
 }
 
 
 void Map::checkPlayerAttacking(unsigned long id)
 {
-  std::cout << "locking 13";OTSYS_THREAD_LOCK(mapLock) std::cout <<"pid:" << getpid() << "locked 13"  << std::endl;
+	OTSYS_THREAD_LOCK(mapLock)
 
   Creature *creature = getCreatureByID(id);
   if (creature != NULL && creature->health > 0)
@@ -1131,13 +1125,13 @@ void Map::checkPlayerAttacking(unsigned long id)
 	  }
   }
 
-   std::cout<< "pid:" << getpid() << "unlocking 13" << std::endl; OTSYS_THREAD_UNLOCK(mapLock)
+   OTSYS_THREAD_UNLOCK(mapLock)
 }
 
 
 void Map::decayItem(Item* item)
 {
-  std::cout << "locking 14";OTSYS_THREAD_LOCK(mapLock) std::cout <<"pid:" << getpid() << "locked 14"  << std::endl;
+  OTSYS_THREAD_LOCK(mapLock)
 
   Tile *t = getTile(item->pos.x, item->pos.y, item->pos.z);
   unsigned short decayTo   = Item::items[item->getID()].decayTo;
@@ -1170,13 +1164,13 @@ void Map::decayItem(Item* item)
   if (decayTo == 0)
     delete item;
 
-   std::cout<< "pid:" << getpid() << "unlocking 14" << std::endl; OTSYS_THREAD_UNLOCK(mapLock)
+   OTSYS_THREAD_UNLOCK(mapLock)
 }
 
 
 void Map::decaySplash(Item* item)
 {
-  std::cout << "locking 15";OTSYS_THREAD_LOCK(mapLock) std::cout <<"pid:" << getpid() << "locked 15"  << std::endl;
+  OTSYS_THREAD_LOCK(mapLock)
 
   if (!item) return;
   Tile *t = getTile(item->pos.x, item->pos.y, item->pos.z);
@@ -1215,7 +1209,7 @@ void Map::decaySplash(Item* item)
       delete item;
   }
 
-   std::cout<< "pid:" << getpid() << "unlocking 15" << std::endl; OTSYS_THREAD_UNLOCK(mapLock)
+   OTSYS_THREAD_UNLOCK(mapLock)
 }
 
 
@@ -1237,8 +1231,7 @@ void Map::CreateDamageUpdate(Creature* creature, Creature* attackCreature, int d
 
 void Map::resetExhausted(unsigned long id)
 {
-  std::cout << "locking 16";OTSYS_THREAD_LOCK(mapLock) std::cout <<"pid:" << getpid() << "locked 16"  << std::endl;
-
+  OTSYS_THREAD_LOCK(mapLock)
 	Player *player = (Player*)getCreatureByID(id);
 
   if (player != NULL)
@@ -1246,7 +1239,7 @@ void Map::resetExhausted(unsigned long id)
 		player->exhausted = false;
   }
 
-	 std::cout<< "pid:" << getpid() << "unlocking 16" << std::endl; OTSYS_THREAD_UNLOCK(mapLock)
+	 OTSYS_THREAD_UNLOCK(mapLock)
 }
 
 void Map::makeCastSpell(Creature *creature, int mana, int mindamage, int maxdamage, unsigned char area[14][18], unsigned char ch, unsigned char typeArea, unsigned char typeDamage)
@@ -1463,7 +1456,7 @@ void Map::makeCastSpell(Creature *creature, int mana, int mindamage, int maxdama
 }
 
 void Map::creatureCastSpell(Creature *creature, const std::string &text) {
-  std::cout << "locking 17";OTSYS_THREAD_LOCK(mapLock) std::cout <<"pid:" << getpid() << "locked 17"  << std::endl;
+  OTSYS_THREAD_LOCK(mapLock)
 
 	if(strcmp(text.c_str(), "exura vita") == 0) {
 			NetworkMessage msg;
@@ -1705,5 +1698,5 @@ void Map::creatureCastSpell(Creature *creature, const std::string &text) {
 		makeCastSpell(creature, 100, min, max, area, ch, NM_ME_ENERGY_AREA, NM_ME_ENERGY_DAMAGE);
 	}
 
-	 std::cout<< "pid:" << getpid() << "unlocking 17" << std::endl; OTSYS_THREAD_UNLOCK(mapLock)
+	OTSYS_THREAD_UNLOCK(mapLock)
 }
