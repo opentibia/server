@@ -134,7 +134,7 @@ unsigned short Player::getSpeed() const
   if (access > 0)
     return 900;
 
-  return 220 + level*3;
+  return 220 + 2*(level-1);
 };
 
 
