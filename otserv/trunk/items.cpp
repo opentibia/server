@@ -39,7 +39,11 @@ ItemType::ItemType()
 	blocking        = false; // people can walk on it
 	pickupable      = false; // people can pick it up
 	blockingProjectile = false;
-	//floorChange = true;
+	noFloorChange = false;
+	floorChangeNorth = false;
+	floorChangeSouth = false;
+	floorChangeEast = false;
+	floorChangeWest = false;
 	
 	speed		= 0;
 	id         =  100;
@@ -126,6 +130,21 @@ int Items::loadFromDat(std::string file)
 			}
 			lastoptbyte = optbyte;
 #endif
+            //TODO: some other way of finding levelchange items
+            if(iType->id == 1396 || iType->id ==1385 || iType->id ==1394 || iType->id ==1404){
+                         iType->floorChangeNorth = true;
+                         }
+            if(iType->id == 1392|| iType->id ==1402){
+                         iType->floorChangeSouth = true;
+                         }
+            if(iType->id == 1388|| iType->id ==1398){
+                         iType->floorChangeEast = true;
+                         }
+            if(iType->id == 1390|| iType->id ==1400){
+                         iType->floorChangeWest = true;
+                         }                                       
+            if(iType->id == 459) //we set 459 as a neutral invisible tile
+                         iType->noFloorChange = true;
 			switch (optbyte)
 			{
 	   		case 0x00:
@@ -186,7 +205,7 @@ int Items::loadFromDat(std::string file)
                     fgetc(f); // always 0
 					break;
 
-        case 0x06: // ladder up (id 1124)   why a group for just 1 item ???  
+        case 0x06: // ladder up (id 1386)   why a group for just 1 item ???   
             break;
         case 0x09: //can contain fluids
             break;
@@ -197,8 +216,8 @@ int Items::loadFromDat(std::string file)
             break;
         case 0x11: // can see what is under (ladder holes, stairs holes etc)
             break;
-        case 0x12: // tiles that don't cause level change
-					//iType->floorChange = false;
+        case 0x12: // ground tiles that don't cause level change
+					iType->noFloorChange = true;
             break;
         case 0x18: // cropses that don't decay
             break;
@@ -219,23 +238,27 @@ int Items::loadFromDat(std::string file)
                     fgetc(f); //always 8
                     fgetc(f); //always 0
                     break;
-				case 0x16: // ground, blocking items and mayby some more
-                    fgetc(f); //12, 186, 210, 129 and other.. 
+				case 0x16: // ground, blocking items and mayby some more 
+				unsigned char a;
+                    a = fgetc(f); //12, 186, 210, 129 and other.. 
                     fgetc(f); //always 0
+                    //if(a == 210)
+                    //printf("%d - %d %d\n", iType->id, a);
+                    //iType->floorChange = true;
 				    break;
 				case 0x1A: 
                     //7.4 (change no data ?? ) action that can be performed (doors-> open, hole->open, book->read) not all included ex. wall torches
 				    break;
 				//new from 7.4    
 				case 0x1D:  // line spot ...
-                    fgetc(f);
-                    fgetc(f);                  
+                    fgetc(f); // 86 -> openable holes, 77-> can be used to go down, 76 can be used to go up, 82 -> stairs up, 79 switch,    
+                    fgetc(f); // always 4                  
                     break;         
-				case 0x1B:  // ?? ...                 
+				case 0x1B:  // walls 2 types of them same material (total 4 pairs)                  
                     break;
-                case 0x19:  // ?? ...                 
+                case 0x19:  // wall items                 
                     break;    
-                case 0x17:  // ?? ...                 
+                case 0x17:  // seems like decorables with 4 states of turning (exception first 4 are unique statues)                 
                     break;
                 case 0x1C:  // ?? ...                 
                     break;        
@@ -264,7 +287,7 @@ int Items::loadFromDat(std::string file)
    	}
    	
    	fclose(f);
-
+    
 	return 0;
 }
 

@@ -1298,7 +1298,6 @@ void Protocol74::sendTeleport(const Creature *creature, const Position *oldPos, 
     msg.AddByte(0x64); 
     msg.AddPosition(player->pos); 
     GetMapDescription(player->pos.x-8, player->pos.y-6, player->pos.z, 18, 14, msg); 
-    msg.AddMagicEffect(creature->pos, 0x0A); 
 
     msg.WriteToSocket(s); 
   } else if (CanSee( creature->pos.x, creature->pos.y )){
@@ -1310,8 +1309,6 @@ void Protocol74::sendTeleport(const Creature *creature, const Position *oldPos, 
       msg.AddPosition(creature->pos);
       msg.AddCreature(creature, known, removedKnown);
 
-      // login bubble
-      msg.AddMagicEffect(creature->pos, 0x0A);
       msg.WriteToSocket(s);
     } 
 } 

@@ -700,7 +700,37 @@ void Game::thingMoveInternal(Creature *player,
 					{
 						list[i]->onThingMove(player, thing, &oldPos, oldstackpos);
 					}
-					
+					//change level begin
+					if(playerMoving && !(toTile->ground.noFloorChange())){
+                         printf("1\n");           
+                         Tile* downTile = getTile(to_x, to_y, to_z+1);
+                         if(downTile->floorChange(NORTH)){
+                            teleport(playerMoving, Position(playerMoving->pos.x, playerMoving->pos.y+1, playerMoving->pos.z+1));                           
+                                                       }
+                         else if(downTile->floorChange(SOUTH)){
+                            teleport(playerMoving, Position(playerMoving->pos.x, playerMoving->pos.y-1, playerMoving->pos.z+1));                           
+                                                       }
+                         else if(downTile->floorChange(EAST)){
+                            teleport(playerMoving, Position(playerMoving->pos.x-1, playerMoving->pos.y, playerMoving->pos.z+1));                           
+                                                       }
+                         else if(downTile->floorChange(WEST)){
+                            teleport(playerMoving, Position(playerMoving->pos.x+1, playerMoving->pos.y, playerMoving->pos.z+1));                           
+                                                       }                                                                                                                 
+                                                }
+					else if(playerMoving && toTile->floorChange(NORTH)){
+                            teleport(playerMoving, Position(playerMoving->pos.x, playerMoving->pos.y-1, playerMoving->pos.z-1));                           
+                                                       }
+                    else if(playerMoving && toTile->floorChange(SOUTH)){
+                            teleport(playerMoving, Position(playerMoving->pos.x, playerMoving->pos.y+1, playerMoving->pos.z-1));                           
+                                                       }
+                    else if(playerMoving && toTile->floorChange(EAST)){
+                            teleport(playerMoving, Position(playerMoving->pos.x+1, playerMoving->pos.y, playerMoving->pos.z-1));                           
+                                                       }
+                    else if(playerMoving && toTile->floorChange(WEST)){
+                            teleport(playerMoving, Position(playerMoving->pos.x-1, playerMoving->pos.y, playerMoving->pos.z-1));                           
+                                                       }                                                                                                                 
+                                                
+					//change level end
 					if(creature) {
 						const MagicEffectItem* fieldItem = toTile->getFieldItem();
 
@@ -1054,7 +1084,8 @@ void Game::creatureToChannel(Creature *creature, unsigned char type, const std::
 
 /** \todo Someone _PLEASE_ clean up this mess */
 bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, const MagicEffectClass* me)
-{	
+{
+OTSYS_THREAD_LOCK(gameLock)     	
 	const MagicEffectTargetGroundClass* magicGround = dynamic_cast<const MagicEffectTargetGroundClass*>(me);
 	const MagicEffectGroundAreaClass* magicGroundEx = dynamic_cast<const MagicEffectGroundAreaClass*>(me);
 
@@ -1068,10 +1099,14 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 	if(creature) {
 		frompos = creature->pos;
 
-		if(!creatureOnPrepareMagicAttack(creature, centerpos, me))
+		if(!creatureOnPrepareMagicAttack(creature, centerpos, me)){
+            OTSYS_THREAD_UNLOCK(gameLock)                                        
 			return false;
+			
+        }
 	
 		if(magicGround && !creatureOnPrepareMagicCreateSolidObject(creature, centerpos, magicGround)) {
+            OTSYS_THREAD_UNLOCK(gameLock)           
 			return false;
 		}
 	}
@@ -1119,8 +1154,10 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 	//getSpectators(Range(frompos, centerpos), spectatorlist);
 	topLeft.z = frompos.z;
 	bottomRight.z = frompos.z;
-	if(topLeft.x == 0xFFFF || topLeft.y == 0xFFFF || bottomRight.x == 0 || bottomRight.y == 0)
-	return false;
+	if(topLeft.x == 0xFFFF || topLeft.y == 0xFFFF || bottomRight.x == 0 || bottomRight.y == 0){
+	OTSYS_THREAD_UNLOCK(gameLock)
+    return false;
+    }
 #ifdef __DEBUG__	
 	printf("top left %d %d %d\n", topLeft.x, topLeft.y, topLeft.z);
 	printf("bottom right %d %d %d\n", bottomRight.x, bottomRight.y, bottomRight.z);
@@ -1331,6 +1368,7 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 
 		spectator->sendNetworkMessage(&msg);
 	}
+	OTSYS_THREAD_UNLOCK(gameLock)
 	return true;
 }
 
@@ -1517,6 +1555,8 @@ void Game::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fi
 {
 	if(!creatureOnPrepareAttack(creature, attackedCreature->pos))
 		return;
+		
+	OTSYS_THREAD_LOCK(gameLock)
 	
 	Player* player = dynamic_cast<Player*>(creature);
 	Player* attackedPlayer = dynamic_cast<Player*>(attackedCreature);
@@ -1562,9 +1602,11 @@ void Game::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fi
     if(attackedCreature->access != 0){
         if(player)
         player->sendCancelAttacking();
+        OTSYS_THREAD_UNLOCK(gameLock)
         return;
          }
-	if(!inReach){         
+	if(!inReach){
+        OTSYS_THREAD_UNLOCK(gameLock)                  
 		return;
     }
 	int damage = creature->getWeaponDamage();
@@ -1715,6 +1757,7 @@ void Game::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fi
 		unsigned short decayTime = Item::items[item->getID()].decayTime;
     addEvent(makeTask(decayTime*1000, std::bind2nd(std::mem_fun(&Game::decayItem), item)));
 	}
+	OTSYS_THREAD_UNLOCK(gameLock)
 }
 
 
@@ -1922,9 +1965,11 @@ void Game::changeOutfitAfter(unsigned long id, int looktype, long time){
 
 void Game::changeSpeed(unsigned long id, unsigned short speed)
 {
+    OTSYS_THREAD_LOCK(gameLock) 
 	Creature *creature = getCreatureByID(id);
 	if(creature){
 		if(creature->hasteTicks >= 1000 || creature->speed == speed){
+            OTSYS_THREAD_UNLOCK(gameLock)                    
 			return;
 		}
 	
@@ -1945,6 +1990,7 @@ void Game::changeSpeed(unsigned long id, unsigned short speed)
 				p->sendChangeSpeed(creature);
 		}
 	}
+	OTSYS_THREAD_UNLOCK(gameLock)
 }
 
 

@@ -135,6 +135,23 @@ bool Item::isGroundTile() const {
 	return items[id].groundtile;
 }
 
+bool Item::noFloorChange() const {
+	return items[id].noFloorChange;
+}
+
+bool Item::floorChangeNorth() const {
+	return items[id].floorChangeNorth;
+}
+bool Item::floorChangeSouth() const {
+	return items[id].floorChangeSouth;
+}
+bool Item::floorChangeEast() const {
+	return items[id].floorChangeEast;
+}
+bool Item::floorChangeWest() const {
+	return items[id].floorChangeWest;
+}
+
 bool Item::isWeapon() const
 { 
   //now also returns true on SHIELDS!!! Check back with getWeponType!

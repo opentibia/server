@@ -64,7 +64,11 @@ public:
 	bool blocking;   // people can walk on it
 	bool pickupable; // people can pick it up
 	bool blockingProjectile;
-	//bool floorChange;
+	bool noFloorChange;
+	bool floorChangeNorth;
+	bool floorChangeSouth;
+	bool floorChangeEast;
+	bool floorChangeWest;
 };
 
 

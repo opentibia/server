@@ -367,7 +367,7 @@ void Map::getSpectators(const Range& range, std::vector<Creature*>& list)
 				}
 			}
 		}
-	}
+	}	
 }
 
 bool Map::canThrowItemTo(Position from, Position to, bool creaturesBlock /* = true*/, bool isProjectile /*= false*/)

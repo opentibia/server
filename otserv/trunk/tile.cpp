@@ -47,6 +47,51 @@ bool Tile::isBlocking()
 
   return false;
 }
+bool Tile::floorChange(Direction direction)
+{
+  
+  ItemVector::iterator iit;
+  for (iit = topItems.begin(); iit != topItems.end(); ++iit){
+    if(direction == NORTH){  
+         if ((*iit)->floorChangeNorth())
+         return true;
+      }
+    else if(direction == SOUTH){
+         if ((*iit)->floorChangeSouth())
+         return true;
+         }
+    else if(direction == EAST){
+         if ((*iit)->floorChangeEast())
+         return true;
+         }
+    else if(direction == WEST){
+         if ((*iit)->floorChangeWest())
+         return true;
+         }           
+      }
+
+  for (iit = downItems.begin(); iit != downItems.end(); ++iit){
+    if(direction == NORTH){  
+         if ((*iit)->floorChangeNorth())
+         return true;
+      }
+    else if(direction == SOUTH){
+         if ((*iit)->floorChangeSouth())
+         return true;
+         }
+    else if(direction == EAST){
+         if ((*iit)->floorChangeEast())
+         return true;
+         }
+    else if(direction == WEST){
+         if ((*iit)->floorChangeWest())
+         return true;
+         } 
+      }
+
+
+  return false;
+}
 
 int Tile::getCreatureStackPos(Creature *c)
 {
