@@ -1314,12 +1314,10 @@ void Game::teleport(Creature *creature, Position newPos) {
             
     std::vector<Creature*> list;
     getSpectators(Range(oldPos, true), list);
-    printf("1\n");
     for(size_t i = 0; i < list.size(); ++i)
       list[i]->onTileUpdated(oldPos);
     list.clear();
     getSpectators(Range(creature->pos, true), list);
-    printf("2\n");
     for(size_t i = 0; i < list.size(); ++i)
       list[i]->onTeleport(creature, &oldPos, osp);
   } 
@@ -2255,7 +2253,7 @@ bool Game::creatureSaySpell(Creature *creature, const std::string &text)
 		var = std::string(""); 
 	}
 
-	std::transform(temp.begin(), temp.end(), temp.begin(), tolower);	
+	std::transform(temp.begin(), temp.end(), temp.begin(), (int(*)(int))tolower);	
 
 	if(creature->access != 0 || !player){
 		std::map<std::string, Spell*>::iterator sit = spells.getAllSpells()->find(temp);

@@ -25,19 +25,8 @@
 
 #include "thing.h"
 #include "position.h"
-
+#include "networkmessage.h"
 #include "magic.h"
-
-enum attacktype_t {
-	ATTACK_NONE = 0,
-	ATTACK_ENERGY = 1,
-	ATTACK_BURST = 2,
-	ATTACK_FIRE = 8,
-	ATTACK_PHYSICAL = 16,
-	ATTACK_POISON = 32,
-	ATTACK_PARALYZE = 64,
-	ATTACK_DRUNKNESS = 128
-};
 
 enum subfight_t {
 	DIST_NONE = 0,

@@ -216,8 +216,6 @@ Monster::Monster(const char *name, Game* game) :
 		xmlFreeDoc(doc);
 	}
 
-
-	Creature::Creature(name);
 }
 
 Monster::~Monster()

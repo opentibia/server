@@ -344,7 +344,7 @@ void SpellScript::internalGetMagicEffect(lua_State *L, MagicEffectClass& me)
 	lua_pushnil(L);
 
 	lua_next(L, -2);
-	int attackType = lua_tonumber(L, -1);
+	int attackType = (int)lua_tonumber(L, -1);
 	lua_pop(L, 1);
 
 	switch(attackType) {

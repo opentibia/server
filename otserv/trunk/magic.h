@@ -27,7 +27,16 @@
 #include "networkmessage.h"
 #include "tools.h"
 
-enum attacktype_t;
+enum attacktype_t {
+	ATTACK_NONE = 0,
+	ATTACK_ENERGY = 1,
+	ATTACK_BURST = 2,
+	ATTACK_FIRE = 8,
+	ATTACK_PHYSICAL = 16,
+	ATTACK_POISON = 32,
+	ATTACK_PARALYZE = 64,
+	ATTACK_DRUNKNESS = 128
+};
 
 /*
 MagicEffectClass
@@ -311,5 +320,6 @@ public:
 protected:
 	MagicEffectItem* magicItem;
 };
+#include "creature.h"
 #endif //__MAGIC_H__
 
