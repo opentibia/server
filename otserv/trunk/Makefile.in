@@ -63,9 +63,6 @@ CC = @CC@
 CXX = @CXX@
 DEBUG = @DEBUG@
 EXEEXT = @EXEEXT@
-HAVE_LIB = @HAVE_LIB@
-LIB = @LIB@
-LTLIB = @LTLIB@
 LUA50_CFLAGS = @LUA50_CFLAGS@
 LUA50_LIBS = @LUA50_LIBS@
 MAKEINFO = @MAKEINFO@
@@ -74,8 +71,6 @@ PACKAGE = @PACKAGE@
 PKG_CONFIG = @PKG_CONFIG@
 VERSION = @VERSION@
 XML2_CONFIG = @XML2_CONFIG@
-XML_CFLAGS = @XML_CFLAGS@
-XML_CONFIG = @XML_CONFIG@
 XML_CPPFLAGS = @XML_CPPFLAGS@
 XML_LIBS = @XML_LIBS@
 
@@ -85,7 +80,7 @@ noinst_PROGRAMS = otserv
 
 AM_CXXFLAGS = $(XML_CPPFLAGS) $(OTSERV_FLAGS) $(LUA50_CFLAGS) -D_THREAD_SAFE -D_REENTRANT
 otserv_LDADD = $(XML_LIBS) $(LUA50_LIBS) -ldl
-otserv_SOURCES = creature.cpp creature.h definitions.h item.cpp item.h 					  items.cpp items.h luascript.cpp luascript.h map.cpp 					  map.h networkmessage.cpp networkmessage.h npc.cpp 					  npc.h otserv.cpp otsystem.h player.cpp player.h 					  position.h protocol.cpp protocol.h protocol70.cpp 					  protocol70.h texcept.h thing.cpp thing.h tile.cpp 					  tile.h tools.cpp position.cpp scheduler.h account.h 					  account.cpp
+otserv_SOURCES = creature.cpp creature.h definitions.h item.cpp item.h 					  items.cpp items.h luascript.cpp luascript.h map.cpp 					  map.h networkmessage.cpp networkmessage.h npc.cpp 					  npc.h otserv.cpp otsystem.h player.cpp player.h 					  position.h protocol.cpp protocol.h protocol70.cpp 					  protocol70.h texcept.h thing.cpp thing.h tile.cpp 					  tile.h tools.cpp position.cpp scheduler.h account.h 					  account.cpp status.cpp
 
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
@@ -103,7 +98,7 @@ otserv_OBJECTS =  creature.$(OBJEXT) item.$(OBJEXT) items.$(OBJEXT) \
 luascript.$(OBJEXT) map.$(OBJEXT) networkmessage.$(OBJEXT) \
 npc.$(OBJEXT) otserv.$(OBJEXT) player.$(OBJEXT) protocol.$(OBJEXT) \
 protocol70.$(OBJEXT) thing.$(OBJEXT) tile.$(OBJEXT) tools.$(OBJEXT) \
-position.$(OBJEXT) account.$(OBJEXT)
+position.$(OBJEXT) account.$(OBJEXT) status.$(OBJEXT)
 otserv_DEPENDENCIES = 
 otserv_LDFLAGS = 
 CXXFLAGS = @CXXFLAGS@
@@ -125,7 +120,8 @@ GZIP_ENV = --best
 DEP_FILES =  .deps/account.P .deps/creature.P .deps/item.P .deps/items.P \
 .deps/luascript.P .deps/map.P .deps/networkmessage.P .deps/npc.P \
 .deps/otserv.P .deps/player.P .deps/position.P .deps/protocol.P \
-.deps/protocol70.P .deps/thing.P .deps/tile.P .deps/tools.P
+.deps/protocol70.P .deps/status.P .deps/thing.P .deps/tile.P \
+.deps/tools.P
 SOURCES = $(otserv_SOURCES)
 OBJECTS = $(otserv_OBJECTS)
 

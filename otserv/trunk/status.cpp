@@ -41,7 +41,8 @@ Status::Status(){
 
 void Status::addPlayer(){
 	this->playersonline++;
-	this->playersmax=max(this->playersmax, this->playersonline);
+	if(playersmax < playersonline)
+	  playersmax=playersonline;
 }
 void Status::removePlayer(){
 	this->playersonline--;
