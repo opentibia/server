@@ -135,6 +135,10 @@ bool Item::isGroundTile() const {
 	return items[id].groundtile;
 }
 
+bool Item::isPickupable() const {
+	return items[id].pickupable;
+}
+
 bool Item::noFloorChange() const {
 	return items[id].noFloorChange;
 }

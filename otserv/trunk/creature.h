@@ -152,7 +152,7 @@ public:
   // level
   int level;
   int speed;
-  virtual bool canMovedTo(Tile *tile);
+  virtual bool canMovedTo(const Tile *tile) const;
 
   virtual void sendCancel(const char *msg) { };
   virtual void sendCancelWalk(const char *msg) { };

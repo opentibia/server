@@ -142,7 +142,7 @@ MagicDamageVec* Creature::getMagicDamageVec(MagicDamageType md)
 }
 
 
-bool Creature::canMovedTo(Tile *tile)
+bool Creature::canMovedTo(const Tile *tile) const
 {
   if(tile){   
   if (tile->creatures.size())

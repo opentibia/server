@@ -47,7 +47,7 @@ class Item : public Thing
 				unsigned char chargecount; //number of charges on the item
 
     public:
-		static Item* CreateItem(const unsigned short _type, unsigned char _count = 0); //Factory member to create item of right type based on id
+		static Item* CreateItem(const unsigned short _type, unsigned char _count = 0); //Factory member to create item of right type based on type
 		static Items items;
 
    unsigned short getID() const;    // ID as in ItemType
@@ -64,6 +64,7 @@ class Item : public Thing
 		bool isAlwaysOnTop() const;
 		bool isGroundTile() const;
 		bool isNotMoveable() const;
+		bool isPickupable() const;
 		//bool isContainer() const;
 		bool noFloorChange() const;
 		bool floorChangeNorth() const;
