@@ -184,9 +184,14 @@ int main(int argc, char *argv[])
   std::cout << "::" << std::endl;
 
   // ignore sigpipe...
+#if defined __WINDOWS__ || defined WIN32
+	//nothing yet
+#else
   struct sigaction sigh;
   sigh.sa_handler = SIG_IGN;
   sigaction(SIGPIPE, &sigh, NULL);
+#endif
+
   // read global config
   std::cout << ":: Loading lua script config.lua... ";
   if (!g_config.OpenFile("config.lua"))

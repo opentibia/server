@@ -133,7 +133,7 @@ int Tile::getCreatureStackPos(Creature *c)
   for (it = creatures.begin(); it != creatures.end(); it++)
   {
     if ((*it) == c)
-      return (it - creatures.begin()) + 1 + topItems.size();
+      return (int) ((it - creatures.begin()) + 1 + topItems.size());
   }
 
   /* todo error */

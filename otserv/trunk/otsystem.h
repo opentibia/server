@@ -7,7 +7,10 @@
 #if defined WIN32 || defined __WINDOWS__
 
 #include <windows.h>
-#include <process.h>
+#include <process.h>    /* _beginthread, _endthread */
+#include <stddef.h>
+#include <stdlib.h>
+#include <conio.h>
 #include <sys/timeb.h>
 
 #define OTSYS_THREAD_RETURN  void
