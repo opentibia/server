@@ -53,9 +53,17 @@ public:
 	unsigned char thingCount;
 };
 
+struct itemstruct {
+	unsigned short id;
+	unsigned char ItemCountOrSubtype;
+	bool stackable;
+	bool multitype;
+};
+
 struct tilechangedata {
 	Position pos;
-	Thing *thing;
+	//Thing *thing;
+	itemstruct item;
 	int stackpos;
 	bool remove;
 };
@@ -140,11 +148,13 @@ private:
 	{
 		centerpos = pos;
 		
-		minRange.x = -8;
-		minRange.y = -6;
+		//This is the maximum view that the viewer AND the viewers that is seeing the viewer :o
+		minRange.x = -9; //minRange.x = -8;
+		minRange.y = -7; //minRange.y = -6;
+		
     //just the visible ones
-		maxRange.x = 8; //maxRange.x = 9;
-		maxRange.y = 6; //maxRange.y = 7;
+		maxRange.x = 9; //maxRange.x = 8;
+		maxRange.y = 7; //maxRange.y = 6;
 		
 		zstep = 1;
 

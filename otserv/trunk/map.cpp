@@ -105,7 +105,14 @@ bool MapState::removeThingInternal(Tile *t, Thing *thing, bool onlyRegister)
 	if(onlyRegister || t->removeThing(thing)) {
 		tilechangedata tc;
 		tc.pos = oldPos;
-		tc.thing = thing;
+
+		Item* item = dynamic_cast<Item*>(thing);
+		tc.item.id = item->getID();
+		tc.item.stackable = item->isStackable();
+		tc.item.multitype = item->isMultiType();
+		tc.item.ItemCountOrSubtype = item->getItemCountOrSubtype();
+
+		//tc.thing = thing;
 		tc.remove = true;
 		tc.stackpos = stackpos;
 
@@ -133,7 +140,14 @@ void MapState::addThingInternal(Tile *t, Thing *thing, bool onlyRegister)
 
 	tilechangedata tc;
 	tc.pos = oldPos;
-	tc.thing = thing;
+
+	Item* item = dynamic_cast<Item*>(thing);
+	tc.item.id = item->getID();
+	tc.item.stackable = item->isStackable();
+	tc.item.multitype = item->isMultiType();
+	tc.item.ItemCountOrSubtype = item->getItemCountOrSubtype();
+
+	//tc.thing = thing;
 	tc.remove = false;
 	tc.stackpos = stackpos;
 	vec.push_back(tc);
@@ -204,14 +218,18 @@ void MapState::getMapChanges(Player *spectator, NetworkMessage &msg)
 				}
 			}
 			else {
-				Item *item = dynamic_cast<Item*>(thIt->thing);
+				//Item *item = dynamic_cast<Item*>(thIt->thing);
+				//if(item) {
+				msg.AddByte(0x6a);
+				msg.AddPosition(thIt->pos /*item->pos*/);
 
-				if(item) {
-					msg.AddByte(0x6a);
-					msg.AddPosition(thIt->pos /*item->pos*/);
-					msg.AddItem(item);
+				//AddItem()
+				msg.AddU16(thIt->item.id);
+
+				if (thIt->item.stackable || thIt->item.multitype)
+					msg.AddByte(thIt->item.ItemCountOrSubtype);
 				}
-			}
+			//}
 		}
 	}
 }

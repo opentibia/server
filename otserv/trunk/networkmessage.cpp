@@ -247,6 +247,12 @@ void NetworkMessage::AddTextMessage(MessageClasses mclass, const char* message)
 
 void NetworkMessage::AddAnimatedText(const Position &pos, unsigned char color, std::string text)
 {
+#ifdef __DEBUG__
+	if(text.length() == 0) {
+		std::cout << "Warning: 0-Length string in AddAnimatedText()" << std::endl;
+	}
+#endif
+
   AddByte(0x84); 
   AddPosition(pos);
   AddByte(color);

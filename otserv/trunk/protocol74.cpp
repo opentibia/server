@@ -690,12 +690,15 @@ void Protocol74::parseUseItemEx(NetworkMessage &msg)
 				return;
 
 			if(game->creatureUseItem(player, pos, runeitem)) {
+				//Disabled for now, need to send containerupdated to all views of the container
+				/*
 				runeitem->setItemCharge(std::max((int)runeitem->getItemCharge() - 1, 0) );
 
 				if(runeitem->getItemCharge() == 0) {
 					container->removeItem(runeitem);
 					sendContainerUpdated(runeitem, containerid, 0xFF, from_z, 0xFF, true);
 				}
+				*/
 			}
 		}
 	}
@@ -1243,7 +1246,7 @@ void Protocol74::sendPlayerItemChange(Action* action){
 
 bool Protocol74::CanSee(int x, int y, int z) const
 {
-	Range rangePlayer(player->pos, true);
+	//Range rangePlayer(player->pos, true);
 #ifdef __DEBUG__
 	if(z < 0 || z >= MAP_LAYER) {
 		std::cout << "WARNING! Protocol74::CanSee() Z-value is out of range!" << std::endl;
@@ -1251,28 +1254,28 @@ bool Protocol74::CanSee(int x, int y, int z) const
 #endif
 
 	/*underground 8->15*/
-	if(rangePlayer.centerpos.z > 7 && z < 6 /*8 - 2*/) {
+	if(player->pos.z > 7 && z < 6 /*8 - 2*/) {
 		return false;
 	}
 	/*ground level and above 7->0*/
-	else if(rangePlayer.centerpos.z <= 7 && z > 7){
+	else if(player->pos.z <= 7 && z > 7){
 		return false;
 	}
 
 	//negative offset means that the action taken place is on a lower floor than ourself
-	int offsetz = rangePlayer.centerpos.z - z;
+	int offsetz = player->pos.z - z;
 
+	if ((x >= player->pos.x - 8 + offsetz) && (x <= player->pos.x + 9 + offsetz) &&
+      (y >= player->pos.y - 6 + offsetz) && (y <= player->pos.y + 7 + offsetz))
+    return true;
+
+  return false;
+
+	/*
 	if ((x >= rangePlayer.centerpos.x + rangePlayer.minRange.x + offsetz) &&
 		  (x <= rangePlayer.centerpos.x + rangePlayer.maxRange.x + offsetz) &&
       (y >= rangePlayer.centerpos.y + rangePlayer.minRange.y + offsetz) &&
 			(y <= rangePlayer.centerpos.y + rangePlayer.maxRange.y + offsetz))
-    return true;
-
-  return false;
-	
-	/*
-	if ((x >= player->pos.x - 8) && (x <= player->pos.x + 9) &&
-      (y >= player->pos.y - 6) && (y <= player->pos.y + 7))
     return true;
 
   return false;

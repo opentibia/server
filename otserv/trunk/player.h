@@ -116,8 +116,6 @@ public:
   void    usePlayer() { useCount++; };
   void    releasePlayer() { useCount--; if (useCount == 0) delete this; };
 	unsigned long getIP() const;
-	//void kickPlayer(bool banIP = false);
-	//const SOCKET getSocket() const;
 
   fight_t getFightType();
 	subfight_t getSubFightType();
