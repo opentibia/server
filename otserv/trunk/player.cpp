@@ -231,7 +231,7 @@ unsigned int Player::getSkillBase (int skill_c) {
 }
 
 unsigned int Player::getReqSkilltries (int skill, int level, int voc) {
-    return (int) ( getSkillBase(skill) * pow((float) getSkillMultiplier(skill, voc), (float) ( level - 9) ) );
+    return (int) ( getSkillBase(skill) * pow((float) getSkillMultiplier(voc, skill), (float) ( level - 9) ) );
 }
 
 void Player::addSkillTry(int skilltry)
@@ -263,7 +263,9 @@ skills[skill][SKILL_TRIES] += skilltry;
 //int reqTries = (int) ( SkillBases[skill] * pow((float) VocMultipliers[skill][voc], (float) ( skills[skill][SKILL_LEVEL] - 10) ) );
 
 //for debug
-//cout << Creature::getName() << ", has the vocation: " << voc << " and is training his " << skillname << "\n";
+cout << Creature::getName() << ", has the vocation: " << voc << " and is training his " << skillname << "(" << skill << "). Tries: " << skills[skill][SKILL_TRIES] << "(" << getReqSkilltries (skill, (skills[skill][SKILL_LEVEL] + 1), voc) << ")\n";
+cout << "Current skill: " << skills[skill][SKILL_LEVEL] << " Skillbase: " << getSkillBase(skill) << ", SkillMultiplier: " << getSkillMultiplier(voc, skill) << "\n";
+
 
 //Need skill up?
 if (skills[skill][SKILL_TRIES] >= getReqSkilltries (skill, (skills[skill][SKILL_LEVEL] + 1), voc))
