@@ -155,7 +155,13 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 				    msg.AddByte(0x14);
 				    msg.AddString("Too many Players online.");
 				    msg.WriteToSocket(s);
-        } else {	
+		} else if(gmap.getCreatureByName(name.c_str()) != NULL){
+					std::cout << "reject player..." << std::endl;
+				    msg.Reset();
+				    msg.AddByte(0x14);
+				    msg.AddString("You are already logged in.");
+				    msg.WriteToSocket(s);		
+		} else {	
 			Status* stat = Status::instance();
 			stat->addPlayer();
 					s = 0;            // protocol/player will close socket

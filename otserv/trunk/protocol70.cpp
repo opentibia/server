@@ -1091,7 +1091,6 @@ void Protocol70::sendContainerUpdated(Item *item, unsigned char from_id, unsigne
 }
 
 void Protocol70::sendThingMove(const Creature *creature, const Thing *thing, const Position *oldPos, unsigned char oldStackPos)
-
 {
   NetworkMessage msg;
 

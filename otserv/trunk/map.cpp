@@ -570,11 +570,11 @@ void Map::thingMoveInternal(Creature *player,
 	}
 
 #ifdef __DEBUG__
-				std::cout << "moving: "
-				<< "from_x: "<< (int)from_x << ", from_y: "<< (int)from_y << ", from_z: "<< (int)from_z
-				<< ", stackpos: "<< (int)stackPos
-				<< ", to_x: "<< (int)to_x << ", to_y: "<< (int)to_y << ", to_z: "<< (int)to_z
-				<< std::endl;
+//				std::cout << "moving: "
+//				<< "from_x: "<< (int)from_x << ", from_y: "<< (int)from_y << ", from_z: "<< (int)from_z
+//				<< ", stackpos: "<< (int)stackPos
+//				<< ", to_x: "<< (int)to_x << ", to_y: "<< (int)to_y << ", to_z: "<< (int)to_z
+//				<< std::endl;
 #endif
 
 	Thing *thing = getTile(from_x, from_y, from_z)->getThingByStackPos(stackPos);
