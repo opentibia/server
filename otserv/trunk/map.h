@@ -224,7 +224,7 @@ private:
 				//minRange.z = -2;
 				//maxRange.z = 2;
 				minRange.z = std::min(centerpos.z + 2, MAP_LAYER - 1);
-				maxRange.z = std::max(centerpos.z - 2, 0);
+				maxRange.z = std::max(centerpos.z - 2, 8/*0*/);
 
 				zstep = -1;
 			} else {

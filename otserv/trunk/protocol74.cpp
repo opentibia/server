@@ -279,7 +279,7 @@ void Protocol74::GetMapDescription(unsigned short x, unsigned short y, unsigned 
   int startz, endz, offset, zstep, cc = 0;
   if (z > 7) {
 		startz = std::min(z + 2, MAP_LAYER - 1);
-		endz = std::max(z - 2, 0);
+		endz = std::max(z - 2, 5 /*(7 - 2)*/);
     //startz = z - 2;   
 		//endz = std::max(MAP_LAYER - 1, z + 2);
 		zstep = -1;
@@ -310,8 +310,10 @@ void Protocol74::GetMapDescription(unsigned short x, unsigned short y, unsigned 
 
 				}
 				else {
-					//if(skip == -1) 
-					//	skip = 0;
+					/*
+					if(skip == -1) 
+						skip = 0;
+					*/
 
 					skip++;
 					if (skip == 0xFF) {

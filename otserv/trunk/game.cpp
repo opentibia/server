@@ -526,7 +526,6 @@ void Game::thingMoveInternal(Creature *player,
 			if(onPrepareMoveThing(p, item, (item->pos.x == 0xFFFF ? player->pos : item->pos), toPos)) {
 				item->pos = toPos;
 
-				//thingMoveFromContainerToGround(p, item, fromContainer, toTile);
 				//Do action...
 				if(fromContainer->removeItem(item)) {
 					toTile->addThing(item);
