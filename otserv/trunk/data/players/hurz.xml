@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<player name="Hurz" account="111111" sex="1" lookdir="0" exp="1111" voc="0" level="0" access="1" cap="300">
+<player name="Hurz" account="111111" sex="1" lookdir="0" exp="1111" voc="0" level="0" access="0" cap="300">
 	<mana now="800" max="800" spent="0"/>
 	<health now="800" max="800" food="0"/>
 	<look type="128" head="20" body="30" legs="40" feet="50"/>
@@ -14,9 +14,14 @@
 		<skill skillid="6" level="10" tries="0"/>
        </skills>
        <inventory>
-	       <slot slotid="3"><item id="1410"/></slot>
-	       <slot slotid="4"><item id="1881"/></slot>
-	       <slot slotid="5"><item id="1673"/></slot>
-	       <slot slotid="6"><item id="1458"/></slot>
+	       <slot slotid="1"><item id="1771"/></slot>
+	       <slot slotid="2"><item id="1537"/></slot>
+	       <slot slotid="3"><item id="1411"/></slot>
+	       <slot slotid="4"><item id="1745"/></slot>
+	       <slot slotid="5"><item id="1797"/></slot>
+	       <slot slotid="6"><item id="1683"/></slot>
+	       <slot slotid="7"><item id="1743"/></slot>
+	       <slot slotid="8"><item id="1874"/></slot>
+	       <slot slotid="10"><item id="1459"/></slot>
 	</inventory>
 </player>
