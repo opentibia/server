@@ -698,12 +698,14 @@ void Game::thingMoveInternal(Creature *player,
 					if(creature) {
 						const MagicEffectItem* fieldItem = toTile->getFieldItem();
 
-						if(fieldItem) {	
+						if(fieldItem) {
 							fieldItem->getDamage(creature);
 							const MagicEffectTargetMagicDamageClass *magicTargetDmg = fieldItem->getMagicDamageEffect();
 							
-							if(magicTargetDmg)
-								creatureMakeMagic(creature, thing->pos, magicTargetDmg);
+							if(magicTargetDmg) {
+								Creature* c = getCreatureByID(magicTargetDmg->getOwnerID());
+								creatureMakeMagic(c, thing->pos, magicTargetDmg);
+							}
 						}
 					}
 
@@ -1003,13 +1005,6 @@ void Game::creatureToChannel(Creature *creature, unsigned char type, const std::
 /** \todo Someone _PLEASE_ clean up this mess */
 bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, const MagicEffectClass* me)
 {	
-	/*
-	const MagicEffectTargetClass* magicTarget = dynamic_cast<const MagicEffectTargetClass*>(me);
-	const MagicEffectTargetEx* magicTargetEx = dynamic_cast<const MagicEffectTargetEx*>(me);
-	const MagicEffectTargetMagicDamageClass* magicTargetDmg = dynamic_cast<const MagicEffectTargetMagicDamageClass*>(me);
-	const MagicEffectAreaClass* magicArea = dynamic_cast<const MagicEffectAreaClass*>(me);
-	*/
-
 	const MagicEffectTargetGroundClass* magicGround = dynamic_cast<const MagicEffectTargetGroundClass*>(me);
 	const MagicEffectGroundAreaClass* magicGroundEx = dynamic_cast<const MagicEffectGroundAreaClass*>(me);
 
@@ -1018,42 +1013,26 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 
 #endif
 
+	Position frompos;
+
 	if(creature) {
+		frompos = creature->pos;
+
 		if(!creatureOnPrepareMagicAttack(creature, centerpos, me))
 			return false;
 	
 		if(magicGround && !creatureOnPrepareMagicCreateSolidObject(creature, centerpos, magicGround)) {
 			return false;
 		}
-		
-		/*
-		if(player && player->access == 0 && (magicArea || getTile(centerpos.x, centerpos.y, centerpos.z)->creatures.size() > 0)) {
-			if(me->offensive && creature->pos != centerpos)
-				player->pzLocked = true;
-
-			creature->exhaustedTicks = (long)g_config.getGlobalNumber("exhausted", 0);
-		}
-		
-		if (creature->pos != centerpos && me->offensive && player && player->access == 0) {
-			int defaultinFightTicks = (long)g_config.getGlobalNumber("pzlocked", 0);
-				player->inFightTicks = max(player->inFightTicks, defaultinFightTicks);
-				player->sendIcons();
-			}
-		*/
-	}
-
-	Position p;
-	if(creature) {
-		p = creature->pos;
 	}
 	else {
-		p = centerpos;
+		frompos = centerpos;
 	}
 
 	std::vector<Creature*> spectatorlist;
-	getSpectators(Range(min(p.x, centerpos.x) - 14, max(p.x, centerpos.x) + 14,
-											min(p.y, centerpos.y) - 11, max(p.y, centerpos.y) + 11,
-											p.z), spectatorlist);
+	getSpectators(Range(min(frompos.x, centerpos.x) - 14, max(frompos.x, centerpos.x) + 14,
+											min(frompos.y, centerpos.y) - 11, max(frompos.y, centerpos.y) + 11,
+											frompos.z), spectatorlist);
 
 	//We do all changes against a MapState to keep track of the changes,
 	//need some more work to work for all situations...
@@ -1062,39 +1041,29 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 	MagicAreaVec tmpMagicAreaVec;
 	me->getArea(centerpos, tmpMagicAreaVec);
 	
-	TargetAreaVec areaVec;
-	TargetDataVec targetVec;
+	AreaTargetVec areaTargetVec;
 
 	Player* player = dynamic_cast<Player*>(creature);
 
 	//Filter out the tiles we actually can work on
-	for(MagicAreaVec::const_iterator maIt = tmpMagicAreaVec.begin(); maIt != tmpMagicAreaVec.end(); ++maIt) {
+	for(MagicAreaVec::iterator maIt = tmpMagicAreaVec.begin(); maIt != tmpMagicAreaVec.end(); ++maIt) {
 		Tile *t = map->getTile(maIt->x, maIt->y, maIt->z);
 		if(t && (!creature || (creature->access != 0 || !t->isPz()) ) ) {
-			if(!t->isBlocking() && map->canThrowItemTo(p, (*maIt), false, true)) {
-				bool hasTarget = false;
-
-				for(CreatureVector::iterator cit = t->creatures.begin(); cit != t->creatures.end(); cit++) {
-					if((*cit)->access == 0) {
-						hasTarget = true;
-						break;
-					}
-				}
-
-				areaVec.push_back(targetAreaItem(*maIt, hasTarget));
+			if(!t->isBlocking() && map->canThrowItemTo(frompos, (*maIt), false, true)) {
+				areaTargetVec.push_back(make_pair(*maIt, TargetDataVec()));
 			}
 		}
 	}
 	
 	//Apply the permanent effect to the map
-	for(TargetAreaVec::const_iterator taIt = areaVec.begin(); taIt != areaVec.end(); ++taIt) {
+	for(AreaTargetVec::iterator taIt = areaTargetVec.begin(); taIt != areaTargetVec.end(); ++taIt) {
 		Tile *targettile = getTile(taIt->first.x,  taIt->first.y, taIt->first.z);
 
 		if(!targettile)
 			continue;
 
 		CreatureVector::iterator cit;
-		for(cit = targettile->creatures.begin(); cit != targettile->creatures.end(); cit++) {
+		for(cit = targettile->creatures.begin(); cit != targettile->creatures.end(); ++cit) {
 			Creature* target = (*cit);
 			Player* targetPlayer = dynamic_cast<Player*>(target);
 
@@ -1102,11 +1071,9 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 			int manaDamage = 0;
 
 			if (damage > 0) {
-				if(player) {
+				if(player && player->access == 0) {
 					if(targetPlayer && targetPlayer != player)
 						player->pzLocked = true;
-
-					//player->inFightTicks = (long)g_config.getGlobalNumber("pzlocked", 0); //me->getInFightTicks();
 				}
 
 				if(target->access == 0 && targetPlayer) {
@@ -1119,12 +1086,8 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 				creatureApplyDamage(target, damage, damage, manaDamage);
 			}
 			
-			targetdata td;
-			td.damage = damage;
-			td.manaDamage = manaDamage;
-			td.physical = me->physical;
-
-			targetVec.push_back(targetitem(target, td));
+			targetdata td = {damage, manaDamage, me->physical};
+			taIt->second.push_back(make_pair(target, td));
 		}
 
 		//Solid ground objects
@@ -1152,66 +1115,74 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 			}
 		}
 	}
+	
+	//Do target related map changes
+	for(AreaTargetVec::const_iterator taIt = areaTargetVec.begin(); taIt != areaTargetVec.end(); ++taIt) {
+		for(TargetDataVec::const_iterator tdIt = taIt->second.begin(); tdIt != taIt->second.end(); ++tdIt) {
+			Creature *target = tdIt->first;
+			Tile *targettile = getTile(target->pos.x, target->pos.y, target->pos.z);
 
-	for(TargetDataVec::const_iterator tdIt = targetVec.begin(); tdIt != targetVec.end(); ++tdIt) {
-		Creature *target = tdIt->first;
-		Tile *targettile = getTile(target->pos.x, target->pos.y, target->pos.z);
+			//Remove player?
+			if(target->health <= 0) {
 
-		//Remove player?
-		if(target->health <= 0) {
+				//Remove character
+				mapstate.removeThing(targettile, target);
 
-			//Remove character
-			mapstate.removeThing(targettile, target);
+				playersOnline.erase(playersOnline.find(target->getID()));
+							NetworkMessage msg;
+							creature->experience += (int)(target->experience * 0.1);
+							if(player){
+												msg.AddPlayerStats(player);           
+									player->sendNetworkMessage(&msg);
+							}
+	            
+				//Add body
+				Item *corpseitem = Item::CreateItem(target->lookcorpse);
+				corpseitem->pos = target->pos;
 
-			playersOnline.erase(playersOnline.find(target->getID()));
-            NetworkMessage msg;
-            creature->experience += (int)(target->experience * 0.1);
-            if(player){
-                       msg.AddPlayerStats(player);           
-			           player->sendNetworkMessage(&msg);
-            }
-            
-			//Add body
-			Item *corpseitem = Item::CreateItem(target->lookcorpse);
-			corpseitem->pos = target->pos;
+				mapstate.addThing(targettile, corpseitem);
 
-			mapstate.addThing(targettile, corpseitem);
-
-			//Start decaying
-			unsigned short decayTime = Item::items[corpseitem->getID()].decayTime;
-			addEvent(makeTask(decayTime*1000, std::bind2nd(std::mem_fun(&Game::decayItem), corpseitem)));
-		}
-
-		//Add blood?
-		if(tdIt->second.physical && tdIt->second.damage > 0) {
-
-			bool hadSplash = (targettile->splash != NULL);
-
-			if (!targettile->splash)
-			{
-				Item *item = Item::CreateItem(1437, 2);
-				item->pos = target->pos;
-				targettile->splash = item;
+				//Start decaying
+				unsigned short decayTime = Item::items[corpseitem->getID()].decayTime;
+				addEvent(makeTask(decayTime*1000, std::bind2nd(std::mem_fun(&Game::decayItem), corpseitem)));
 			}
 
-			if(hadSplash)
-				mapstate.refreshThing(targettile, targettile->splash);
-			else
-				mapstate.addThing(targettile, targettile->splash);
+			//Add blood?
+			if(tdIt->second.physical && tdIt->second.damage > 0) {
 
-			//Start decaying
-			unsigned short decayTime = Item::items[targettile->splash->getID()].decayTime;
-			targettile->decaySplashAfter = OTSYS_TIME() + decayTime*1000;
-			addEvent(makeTask(decayTime*1000, std::bind2nd(std::mem_fun(&Game::decaySplash), targettile->splash)));
+				bool hadSplash = (targettile->splash != NULL);
+
+				if (!targettile->splash)
+				{
+					Item *item = Item::CreateItem(1437, 2);
+					item->pos = target->pos;
+					targettile->splash = item;
+				}
+
+				if(hadSplash)
+					mapstate.refreshThing(targettile, targettile->splash);
+				else
+					mapstate.addThing(targettile, targettile->splash);
+
+				//Start decaying
+				unsigned short decayTime = Item::items[targettile->splash->getID()].decayTime;
+				targettile->decaySplashAfter = OTSYS_TIME() + decayTime*1000;
+				addEvent(makeTask(decayTime*1000, std::bind2nd(std::mem_fun(&Game::decaySplash), targettile->splash)));
+			}
 		}
 	}
 
+	if(player && player->access == 0) {
+		//Add exhaustion
+		if(me->causeExhaustion(!areaTargetVec.empty()))
+			player->exhaustedTicks = (long)g_config.getGlobalNumber("exhausted", 0);
+		
+		//Fight symbol
+		if(me->offensive && !areaTargetVec.empty())
+			player->inFightTicks = (long)g_config.getGlobalNumber("pzlocked", 0);
+	}
 
-	if(me->causeExhaustion(!targetVec.empty()))
-		creature->exhaustedTicks = (long)g_config.getGlobalNumber("exhausted", 0);
-	
-	if(me->offensive && player && (!targetVec.empty() || !areaVec.empty()))
-		player->inFightTicks = (long)g_config.getGlobalNumber("pzlocked", 0);
+	bool hasTarget = areaTargetVec.hasTarget();
 
 	NetworkMessage msg;
 	//Create a network message for each spectator
@@ -1224,59 +1195,59 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 		msg.Reset();
 
 		mapstate.getMapChanges(spectator, msg);
-
-		me->getDistanceShoot(spectator, creature, centerpos, targetVec.size() > 0, msg);
+		me->getDistanceShoot(spectator, creature, centerpos, hasTarget, msg);
 		
-		bool hasTarget = false;
-		for(TargetAreaVec::const_iterator taIt = areaVec.begin(); taIt != areaVec.end(); ++taIt) {
+		for(AreaTargetVec::const_iterator taIt = areaTargetVec.begin(); taIt != areaTargetVec.end(); ++taIt) {
 			Tile *targettile = getTile(taIt->first.x,  taIt->first.y, taIt->first.z);
 			
-			hasTarget = taIt->second;
-			if(!hasTarget)
+			if(!taIt->second.hasTarget()) { //no targets
 				me->getMagicEffect(spectator, creature, taIt->first, false, 0, targettile->isPz() , msg);
-		}
-
-		for(TargetDataVec::const_iterator tdIt = targetVec.begin(); tdIt != targetVec.end(); ++tdIt) {
-
-			Creature *target = tdIt->first;
-			Tile *targettile = getTile(target->pos.x, target->pos.y, target->pos.z);
-			int damage = tdIt->second.damage;
-			int manaDamage = tdIt->second.manaDamage;
-			hasTarget = (target->access == 0);
-
-			if(hasTarget)
-				me->getMagicEffect(spectator, creature, target->pos, true, damage, targettile->isPz() , msg);
-
-			if(creature && target->health <= 0) { //could be death due to a magic damage with no owner (fire/poison/energy)
-				if(spectator->CanSee(creature->pos.x, creature->pos.y)) {
-					std::stringstream exp;
-					exp << (int)(target->experience * 0.1);
-					msg.AddAnimatedText(creature->pos, 983, exp.str());
-				}
 			}
+			else {
+				for(TargetDataVec::const_iterator tdIt = taIt->second.begin(); tdIt != taIt->second.end(); ++tdIt) {
+					Creature *target = tdIt->first;
+					Tile *targettile = getTile(target->pos.x, target->pos.y, target->pos.z);
+					int damage = tdIt->second.damage;
+					int manaDamage = tdIt->second.manaDamage;
+					hasTarget = (target->access == 0);
 
-			if(spectator->CanSee(target->pos.x, target->pos.y))
-			{
-				if(damage != 0) {
-					std::stringstream dmg;
-					dmg << std::abs(damage);
-					msg.AddAnimatedText(target->pos, me->animationColor, dmg.str());
+					if(hasTarget)
+						me->getMagicEffect(spectator, creature, target->pos, true, damage, targettile->isPz() , msg);
+
+					//could be death due to a magic damage with no owner (fire/poison/energy)
+					if(creature && target->health <= 0) {
+						if(spectator->CanSee(creature->pos.x, creature->pos.y)) {
+							std::stringstream exp;
+							exp << (int)(target->experience * 0.1);
+							msg.AddAnimatedText(creature->pos, 983, exp.str());
+						}
+					}
+
+					if(spectator->CanSee(target->pos.x, target->pos.y))
+					{
+						if(damage != 0) {
+							std::stringstream dmg;
+							dmg << std::abs(damage);
+							msg.AddAnimatedText(target->pos, me->animationColor, dmg.str());
+						}
+
+						if(manaDamage > 0){
+							msg.AddMagicEffect(target->pos, NM_ME_LOOSE_ENERGY);
+							std::stringstream manaDmg;
+							manaDmg << std::abs(manaDamage);
+							msg.AddAnimatedText(target->pos, 2, manaDmg.str());
+						}
+
+						if (target->health > 0)
+							msg.AddCreatureHealth(target);
+
+						if (spectator == target){
+							CreateManaDamageUpdate(target, creature, manaDamage, msg);
+							CreateDamageUpdate(target, creature, damage, msg);
+						}
+					}
 				}
 
-				if(manaDamage > 0){
-					msg.AddMagicEffect(target->pos, NM_ME_LOOSE_ENERGY);
-					std::stringstream manaDmg;
-					manaDmg << std::abs(manaDamage);
-					msg.AddAnimatedText(target->pos, 2, manaDmg.str());
-				}
-
-				if (target->health > 0)
-					msg.AddCreatureHealth(target);
-
-				if (spectator == target){
-					CreateManaDamageUpdate(target, creature, manaDamage, msg);
-					CreateDamageUpdate(target, creature, damage, msg);
-				}
 			}
 		}
 

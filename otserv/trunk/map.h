@@ -46,13 +46,40 @@ class Game;
 
 #define MAP_LAYER     16
 
-
-class Tile;
-
 struct targetdata {
 	int damage;
 	int manaDamage;
 	bool physical;
+};
+
+typedef std::pair<Creature*, struct targetdata> targetitem;
+class TargetDataVec : public std::vector<targetitem>
+{
+public:
+	bool hasTarget(bool includeAll = false) const {
+		for(TargetDataVec::const_iterator tdIt = begin(); tdIt != end(); ++tdIt) {
+			if(includeAll || tdIt->first->access == 0)
+				return true;
+		}
+
+		return false;
+	}
+};
+
+typedef std::pair<Position, TargetDataVec> targetAreaItem;
+class AreaTargetVec : public std::vector<targetAreaItem>
+{
+public:
+	bool hasTarget(bool includeAll = false) const {
+		for(AreaTargetVec::const_iterator taIt = begin(); taIt != end(); ++taIt) {
+			if(taIt->second.hasTarget(includeAll))
+				return true;
+		}
+
+		return false;
+	}
+private:
+
 };
 
 class TilePreChangeData {
@@ -67,19 +94,13 @@ struct tilechangedata {
 	bool remove;
 };
 
-typedef std::pair<Position, bool> targetAreaItem;
-typedef std::vector< targetAreaItem > TargetAreaVec;
-
-typedef std::pair<Creature*, struct targetdata> targetitem;
-typedef std::vector< targetitem > TargetDataVec;
-
 typedef std::vector<TilePreChangeData> TileExDataVec;
 typedef std::vector<struct tilechangedata> TileChangeDataVec;
 
 typedef std::map<Tile*, TilePreChangeData > TileExDataMap;
 typedef std::map<Tile*, TileChangeDataVec > TileChangeDataVecMap;
 
-
+class Tile;
 class Map;
 
 class MapState {

@@ -338,15 +338,15 @@ bool Map::removeCreature(Creature* c)
 void Map::getSpectators(const Range& range, std::vector<Creature*>& list)
 {
 	CreatureVector::iterator cit;
-	for (int z = range.startz; z <= range.endz; z++) {
-		for (int x = range.startx; x <= range.endx; x++)
+	for (int z = range.startz; z <= range.endz; ++z) {
+		for (int x = range.startx; x <= range.endx; ++x)
 		{
-			for (int y = range.starty; y <= range.endy; y++)
+			for (int y = range.starty; y <= range.endy; ++y)
 			{
 				Tile *tile = getTile(x, y, z);
 				if (tile)
 				{
-					for (cit = tile->creatures.begin(); cit != tile->creatures.end(); cit++) {					
+					for (cit = tile->creatures.begin(); cit != tile->creatures.end(); ++cit) {					
 						list.push_back((*cit));
 					}
 				}

@@ -232,14 +232,14 @@ void Protocol70::GetMapDescription(unsigned short x, unsigned short y, unsigned 
         }
 
         ItemVector::iterator it;
-		    for (it = tile->topItems.begin(); ((it !=tile->topItems.end()) && (count < 10)); it++)
+		    for (it = tile->topItems.begin(); ((it !=tile->topItems.end()) && (count < 10)); ++it)
         {
   			  msg.AddItem(*it);
           count++;
         }
 
         CreatureVector::iterator itc;
-		    for (itc = tile->creatures.begin(); ((itc !=tile->creatures.end()) && (count < 10)); itc++)
+		    for (itc = tile->creatures.begin(); ((itc !=tile->creatures.end()) && (count < 10)); ++itc)
         {
           bool known;
           unsigned long removedKnown;
@@ -249,7 +249,7 @@ void Protocol70::GetMapDescription(unsigned short x, unsigned short y, unsigned 
         }
 
 
-		    for (it = tile->downItems.begin(); ((it !=tile->downItems.end()) && (count < 10)); it++)
+		    for (it = tile->downItems.begin(); ((it !=tile->downItems.end()) && (count < 10)); ++it)
         {
   			  msg.AddItem(*it);
           count++;

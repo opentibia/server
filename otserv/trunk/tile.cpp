@@ -18,11 +18,11 @@ bool Tile::isBlockingProjectile()
     return true;
   
   ItemVector::iterator iit;
-  for (iit = topItems.begin(); iit != topItems.end(); iit++)
+  for (iit = topItems.begin(); iit != topItems.end(); ++iit)
     if ((*iit)->isBlockingProjectile())
       return true;
 
-  for (iit = downItems.begin(); iit != downItems.end(); iit++)
+  for (iit = downItems.begin(); iit != downItems.end(); ++iit)
     if ((*iit)->isBlockingProjectile())
       return true;
 
@@ -36,11 +36,11 @@ bool Tile::isBlocking()
     return true;
   
   ItemVector::iterator iit;
-  for (iit = topItems.begin(); iit != topItems.end(); iit++)
+  for (iit = topItems.begin(); iit != topItems.end(); ++iit)
     if ((*iit)->isBlocking())
       return true;
 
-  for (iit = downItems.begin(); iit != downItems.end(); iit++)
+  for (iit = downItems.begin(); iit != downItems.end(); ++iit)
     if ((*iit)->isBlocking())
       return true;
 
@@ -51,7 +51,7 @@ bool Tile::isBlocking()
 int Tile::getCreatureStackPos(Creature *c)
 {
   CreatureVector::iterator it;
-  for (it = creatures.begin(); it != creatures.end(); it++)
+  for (it = creatures.begin(); it != creatures.end(); ++it)
   {
     if ((*it) == c)
       return (int) ((it - creatures.begin()) + 1 + topItems.size()) + (splash ? 1 : 0);
@@ -73,7 +73,7 @@ int Tile::getThingStackPos(const Thing *thing)
   }
   
   ItemVector::iterator iit;
-  for (iit = topItems.begin(); iit != topItems.end(); iit++)
+  for (iit = topItems.begin(); iit != topItems.end(); ++iit)
   {
     n++;
     if ((*iit) == thing)
@@ -81,14 +81,14 @@ int Tile::getThingStackPos(const Thing *thing)
   }
 
   CreatureVector::iterator cit;
-  for (cit = creatures.begin(); cit != creatures.end(); cit++)
+  for (cit = creatures.begin(); cit != creatures.end(); ++cit)
   {
     n++;
     if ((*cit) == thing)
       return n;
   }
 
-  for (iit = downItems.begin(); iit != downItems.end(); iit++)
+  for (iit = downItems.begin(); iit != downItems.end(); ++iit)
   {
     n++;
     if ((*iit) == thing)
@@ -154,7 +154,7 @@ bool Tile::removeThing(Thing *thing)
 	Creature* creature = dynamic_cast<Creature*>(thing);
 	if (creature) {
     CreatureVector::iterator it;
-    for (it = creatures.begin(); it != creatures.end(); it++)
+    for (it = creatures.begin(); it != creatures.end(); ++it)
       if (*it == thing)
       {
         creatures.erase(it);
@@ -173,7 +173,7 @@ bool Tile::removeThing(Thing *thing)
 
     if (item->isAlwaysOnTop())
     {
-      for (it = topItems.begin(); it != topItems.end(); it++)
+      for (it = topItems.begin(); it != topItems.end(); ++it)
         if (*it == item)
         {
           topItems.erase(it);
@@ -182,7 +182,7 @@ bool Tile::removeThing(Thing *thing)
     }
     else
     {
-      for (it = downItems.begin(); it != downItems.end(); it++)
+      for (it = downItems.begin(); it != downItems.end(); ++it)
         if (*it == item)
         {
           downItems.erase(it);
@@ -197,7 +197,7 @@ bool Tile::removeThing(Thing *thing)
 MagicEffectItem* Tile::getFieldItem()
 {
   MagicEffectItem* fieldItem = NULL;
-  for (ItemVector::const_iterator iit = downItems.begin(); iit != downItems.end(); iit++)
+  for (ItemVector::const_iterator iit = downItems.begin(); iit != downItems.end(); ++iit)
   {
 		fieldItem = dynamic_cast<MagicEffectItem*>(*iit);
 		if (fieldItem)
