@@ -3,11 +3,12 @@
 #include "eventscheduler.h"
 
 #include <unistd.h> // read
+#include <iostream>
 
 extern EventScheduler es;
 
 namespace Protokoll {
-  TProt::TProt(const Socket& sock, const string& in) throw(texception) {
+  TProt::TProt(const Socket& sock, const std::string& in) throw(texception) {
     // first we save the socket the player connected on...
     psocket = sock;
     
@@ -80,15 +81,15 @@ namespace Protokoll {
     
     int nbytes = read(sock, buffer, MAXMSG);
     if (nbytes < 0) { // error
-      cerr << "read" << endl;
+      std::cerr << "read" << std::endl;
       exit(-1);
     } else if (nbytes == 0) { // eof (means logout)
-      cerr << "logout" << endl;
+      std::cerr << "logout" << std::endl;
       es.deletesocket(sock);
       close(sock);
     } else {  // lesen erfolgreich
       buffer[nbytes] = 0;
-      cout << "read" << endl;
+      std::cout << "read" << std::endl;
       //			  printf("%s\n", buffer);
     }
   }

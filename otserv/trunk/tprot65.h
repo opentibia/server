@@ -28,7 +28,7 @@ namespace Protokoll {
 
 			// our constructor get's the socket of the client and the initial
 			// message the client sent
-			TProt65(const Socket&, const string&) throw(texception);
+			TProt65(const Socket&, const std::string&) throw(texception);
 
 			// set the map and update the client screen
 //			void setMap(Map::mapposition) throw(texception);

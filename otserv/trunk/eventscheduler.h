@@ -21,6 +21,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.6  2002/04/08 15:57:03  shivoc
+// made some changes to be more ansi compliant
+//
 // Revision 1.5  2002/04/05 18:56:11  acrimon
 // Adding a file class.
 //
@@ -35,7 +38,7 @@ struct eqfd {
   }
 };
 
-typedef hash_map<Socket, unary_functor<Socket,void> *, hash<Socket>, eqfd> fdcbhash;
+typedef std::hash_map<Socket, unary_functor<Socket,void> *, std::hash<Socket>, eqfd> fdcbhash;
 
 // EventListener ?
 class EventScheduler {

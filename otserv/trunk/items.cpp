@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.2  2002/04/08 15:57:03  shivoc
+// made some changes to be more ansi compliant
+//
 // Revision 1.1  2002/04/08 13:53:59  acrimon
 // Added some very basic map support
 //
@@ -34,7 +37,7 @@ bool ItemType::isContainer() {
 ItemType::ItemType() {
 }
 
-ItemType::ItemType(unsigned short _id, unsigned short _tibiaid, string _name) {
+ItemType::ItemType(unsigned short _id, unsigned short _tibiaid, std::string _name) {
     id = _id;
     tibiaid = _tibiaid;
     name = _name;

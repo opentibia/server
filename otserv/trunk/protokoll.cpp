@@ -10,7 +10,7 @@ namespace Protokoll {
 	ProtokollP::ProtokollP(const Socket& psocket) throw(texception) {
 
 		// we try to read from our socket...
-		string buf=TNetwork::ReceiveData(psocket);
+		std::string buf=TNetwork::ReceiveData(psocket);
 
 		// now we need to find out the protokoll...
 		try {

@@ -21,6 +21,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.5  2002/04/08 15:57:03  shivoc
+// made some changes to be more ansi compliant
+//
 // Revision 1.4  2002/04/08 13:53:59  acrimon
 // Added some very basic map support
 //
@@ -36,6 +39,8 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <iostream>
+
 #include "eventscheduler.h"
 
 extern EventScheduler es;
@@ -81,7 +86,7 @@ void EventScheduler::loop() {
     for (Socket i = 0; sel && i < FD_SETSIZE; i++) {
       if (FD_ISSET(i, &read_fd_set) > 0) { // if there was input:
 	sel--;
-	cout << "socket event " << i << endl;
+	std::cout << "socket event " << i << std::endl;
 	(*fdcb[i])(i);  // call the callback
       }
     }

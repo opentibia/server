@@ -21,6 +21,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.9  2002/04/08 15:57:03  shivoc
+// made some changes to be more ansi compliant
+//
 // Revision 1.8  2002/04/07 09:52:33  acrimon
 // minor changes
 //
@@ -44,6 +47,8 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <fcntl.h>
+
+#include <iostream>
 
 #include "serversocket.h"
 #include "eventscheduler.h"
@@ -188,7 +193,7 @@ namespace TNetwork {
 	    CloseSocket(cs);
 	    if (e.isCritical()) {
 		//something went wrong!
-		cerr << "ERROR!" << endl;
+		std::cerr << "ERROR!" << std::endl;
 		exit(1);
 	    } // if (e.isCritical())
 	} // catch (texception e)

@@ -1,11 +1,12 @@
 #include "player.h"
+#include <iostream>
 
 namespace Creatures {
 Player::Player(const Socket& sock) : client(sock) {
 
 	// we get name and password from the client...
-	cout << (name = client->getName()) << endl;
-	cout << (password = client->getPassword()) << endl;
+	std::cout << (name = client->getName()) << std::endl;
+	std::cout << (password = client->getPassword()) << std::endl;
 
 	// now we should check both... (TODO)
 

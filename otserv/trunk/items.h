@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.2  2002/04/08 15:57:03  shivoc
+// made some changes to be more ansi compliant
+//
 // Revision 1.1  2002/04/08 13:53:59  acrimon
 // Added some very basic map support
 //
@@ -36,7 +39,7 @@ class ItemType {
     unsigned short maxitems; // maximum size if this is a container
     unsigned short tibiaid; // the ID in the Tibia protocol
     unsigned short weight; // weight of the item, e.g. throwing distance depends on it
-    string name; // the name of the item
+    std::string name; // the name of the item
     
     // other vars:
     // what items can be used on what other items? pointer to function, think on implementation
@@ -56,7 +59,7 @@ public:
     // maybe it should be enough if itemtypes van be defined with constructors only.
     ItemType();
     // some simple constructor:
-    ItemType(unsigned short _id, unsigned short _tibiaid, string _name);
+    ItemType(unsigned short _id, unsigned short _tibiaid, std::string _name);
     ~ItemType();
 };
 
@@ -66,7 +69,7 @@ class Items {
 	    // ...
 	}
     };
-    typedef hash_map<unsigned short, ItemType, hash<unsigned short>, eqItemType> ItemHash;
+    typedef std::hash_map<unsigned short, ItemType, std::hash<unsigned short>, eqItemType> ItemHash;
     ItemHash items;
 public:
     Items();

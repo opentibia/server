@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.2  2002/04/08 15:57:03  shivoc
+// made some changes to be more ansi compliant
+//
 // Revision 1.1  2002/04/08 13:53:59  acrimon
 // Added some very basic map support
 //
@@ -33,7 +36,7 @@
 //////////////////////////////////////////////////
 // a Tile represents a single field on the map.
 // it is a list of Items.
-class Tile : public list<Item *> {};
+class Tile : public std::list<Item *> {};
 
 class Map {
     // should use an Space Partitioning Tree.

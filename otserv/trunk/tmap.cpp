@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.3  2002/04/08 15:57:03  shivoc
+// made some changes to be more ansi compliant
+//
 // Revision 1.2  2002/04/08 14:12:49  shivoc
 // fixed a segfault because of out of bounds access to tiles array
 //
@@ -30,6 +33,7 @@
 
 #include "items.h"
 #include "tmap.h"
+#include <iostream>
 
 Map::Map() {
     // generating some standard map.
@@ -39,13 +43,13 @@ Map::Map() {
 	    tiles[y-MINY][x-MINX] = new Tile;
 	    tiles[y-MINY][x-MINX]->push_back(new Item(ItemType::WATER));
 	}
-    cout << "region watered." << endl;
+    std::cout << "region watered." << std::endl;
     for (unsigned short y = MINY + 20; y <= MAXY - 20; y++)
 	for (unsigned short x = MINX + 20; x <= MAXX - 20; x++) {
 	    tiles[y-MINY][x-MINX]->clear(); // creates memory leak
 	    tiles[y-MINY][x-MINX]->push_back(new Item(ItemType::GRASS));
 	}
-    cout << "created land." << endl;
+    std::cout << "created land." << std::endl;
 }
 
 Map::Map(char *filename) {

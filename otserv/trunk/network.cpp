@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.6  2002/04/08 15:57:03  shivoc
+// made some changes to be more ansi compliant
+//
 // Revision 1.5  2002/04/07 09:52:33  acrimon
 // minor changes
 //
@@ -147,7 +150,7 @@ sends Data to the player
 
  ****************************************************************/
 
-void TNetwork::SendData(const Socket& playersocket, const string& data) throw() {
+void TNetwork::SendData(const Socket& playersocket, const std::string& data) throw() {
 	size_t total=0;  // bytes we sended total...
 	int bytesleft=data.length();  // bytes we need to send...
 	int sent;  // bytes send sent...
@@ -174,7 +177,7 @@ receives Data from the player
 
  ****************************************************************/
 
-string TNetwork::ReceiveData(const Socket& playersocket) throw(texception) { 
+std::string TNetwork::ReceiveData(const Socket& playersocket) throw(texception) { 
 	// maximum length to read
 	const size_t max_read = 4096;
 
@@ -186,13 +189,13 @@ string TNetwork::ReceiveData(const Socket& playersocket) throw(texception) {
 
 	// initialise the buffer to read
 
-	string readbuf="";
+	std::string readbuf="";
 
 	// read the whole incoming data into the buffer...
 	while ((numrecv=recv(playersocket,data,max_read,0))==256) {
-		readbuf += string(data,numrecv);
+		readbuf += std::string(data,numrecv);
 	} // while (numrecv=recv(playersocket,256,0)) 
-	if (numrecv > 0) readbuf += string(data,numrecv);
+	if (numrecv > 0) readbuf += std::string(data,numrecv);
 
 	// error while reading...
 	if (numrecv == -1) throw texception(true);

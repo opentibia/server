@@ -4,11 +4,12 @@
 #include <cmath>
 
 #include <unistd.h> // read
+#include <iostream>
 
 extern EventScheduler es;
 
 namespace Protokoll {
-	TProt65::TProt65(const Socket& sock, const string& in) throw(texception) {
+	TProt65::TProt65(const Socket& sock, const std::string& in) throw(texception) {
 
         // save socket
         psocket = sock;
@@ -34,7 +35,7 @@ namespace Protokoll {
 		#endif
 		i++;
 		if (in[i++]!= 0x02) {
-			cout << "clientversion error? (2)" << endl;
+			std::cout << "clientversion error? (2)" << std::endl;
 			throw texception("wrong protokoll!",false);
 		}
 		
@@ -59,8 +60,8 @@ namespace Protokoll {
 			
 
 		// seems we have a client v6.5+
-		cout << "6.5 client accountnumber: " << pnum << " pwd: " << passwd 
-			<< endl;
+		std::cout << "6.5 client accountnumber: " << pnum << " pwd: " << passwd 
+			<< std::endl;
 
         // redirect to 127.0.0.1
         redirect(127*0x1000000+1,7171);
@@ -81,6 +82,7 @@ namespace Protokoll {
 	}
 
 	void TProt65::clread(const Socket& sock) throw() {
+	#if 0
 		  static const int MAXMSG = 4096;
 		  char buffer[MAXMSG];
 
@@ -97,6 +99,7 @@ namespace Protokoll {
 			  cout << "read" << endl;
 //			  printf("%s\n", buffer);
 		  }
+	#endif
 	}
 
 	/*	void TProt::setMap(mapposition newpos) throw(texception) {
