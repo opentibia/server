@@ -206,10 +206,12 @@ void NpcScript::onThink(){
 
 
 void NpcScript::onCreatureAppear(int cid){
-	lua_pushstring(luaState, "onCreatureAppear");
-	lua_gettable(luaState, LUA_GLOBALSINDEX);
-	lua_pushnumber(luaState, cid);
-	lua_call(luaState, 1,0);
+	if(npc->getID() != cid){
+		lua_pushstring(luaState, "onCreatureAppear");
+		lua_gettable(luaState, LUA_GLOBALSINDEX);
+		lua_pushnumber(luaState, cid);
+		lua_call(luaState, 1,0);
+	}
 }
 
 void NpcScript::onCreatureDisappear(int cid){
