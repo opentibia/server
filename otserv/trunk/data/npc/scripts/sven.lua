@@ -72,6 +72,7 @@ function onThink()
 	--but perhaps we want to do an action?
 	if following == true then
 		moveToCreature(target)
+		return
 	end
 	if attacking == true then
 		dist = getDistanceToCreature(target)

@@ -35,8 +35,9 @@ function moveToCreature(id)
 	tx,ty,tz=creatureGetPosition(id)
 	if tx == nil then
 		selfGotoIdle()
-	end
-	moveToPosition(tx, ty, tz)
+	else
+	   moveToPosition(tx, ty, tz)
+   end
 end
 
 function selfGotoIdle()
