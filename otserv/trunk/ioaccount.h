@@ -33,10 +33,11 @@ class IOAccount {
 	/** Get a textual description of what source is used
 	  * \returns Name of the source*/
 	virtual char* getSourceDescription(){return "NULL";};
-	virtual Account loadAccount(int accno);
+	virtual Account loadAccount(unsigned long accno);
+
   protected:
 	IOAccount(){};
-	~IOAccount(){};
+	virtual ~IOAccount(){};
 	static IOAccount* _instance;
 };
 

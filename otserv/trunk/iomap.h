@@ -33,7 +33,7 @@
 class IOMap {
   public:
 	IOMap(){};
-	~IOMap(){};
+	virtual ~IOMap(){};
 	virtual char* getSourceDescription()=0;
 	/** Get a textual description of what source is used
 	  * \returns Name of the source*/

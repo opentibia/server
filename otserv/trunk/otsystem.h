@@ -79,6 +79,7 @@ typedef int socklen_t;
 #include <sys/timeb.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <arpa/inet.h>
 #include <netdb.h>
 #include <stdint.h>
 

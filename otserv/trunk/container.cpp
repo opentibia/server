@@ -103,7 +103,7 @@ void Container::moveItem(unsigned char from_slot, unsigned char to_slot)
 
 Item* Container::getItem(unsigned long slot_num)
 {
-	int n = 0;			
+	size_t n = 0;			
 	for (Container::iterator cit = getItems(); cit != getEnd(); cit++) {
 		if(n == slot_num)
 			return *cit;

@@ -74,7 +74,7 @@ public:
   virtual const std::string& getName() const {return name; };
 
   unsigned long getID() const { return id; }
-  int getExpForLv(const int& lv) const { 
+  unsigned long getExpForLv(const int& lv) const { 
 		return (int)((50*lv*lv*lv)/3 - 100 * lv * lv + (850*lv) / 3 - 200);
     //return (int)(((50.0/3.0) * pow((double)lv ,3)) - (100 * pow((double)lv, 2)) + ((850.0/3.0) * lv) - 200);
 	}

@@ -44,6 +44,8 @@ class SchedulerTask : public std::unary_function<Game*, int> {
 					 virtual void setTicks(const __int64 ticks) {
 								_cycle = OTSYS_TIME() + ticks;;
 					 }
+
+					 virtual ~SchedulerTask() { };
 		  protected:
 					 __int64 _cycle;
 };
@@ -98,6 +100,7 @@ class TCallList : public SchedulerTask {
 								}
 								return ret;
                           }	
+										return result_type();
 					 }
 		  protected:
 					 Functor _f;

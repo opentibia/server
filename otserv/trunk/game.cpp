@@ -1206,7 +1206,7 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 
 	NetworkMessage msg;
 	//Create a network message for each spectator
-	for(int i = 0; i < spectatorlist.size(); ++i) {
+	for(size_t i = 0; i < spectatorlist.size(); ++i) {
 		Player* spectator = dynamic_cast<Player*>(spectatorlist[i]);
 		
 		if(!spectator)
@@ -1460,7 +1460,7 @@ void Game::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fi
 	Player* player = dynamic_cast<Player*>(creature);
 	Player* attackedPlayer = dynamic_cast<Player*>(attackedCreature);
 
-	Tile* tile = getTile(creature->pos.x, creature->pos.y, creature->pos.z);
+	//Tile* tile = getTile(creature->pos.x, creature->pos.y, creature->pos.z);
 	Tile* targettile = getTile(attackedCreature->pos.x, attackedCreature->pos.y, attackedCreature->pos.z);
 
 	NetworkMessage msg;

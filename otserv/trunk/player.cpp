@@ -164,6 +164,11 @@ int Player::getWeaponDamage() const
 					case MAGIC:
 						damagemax = (level*2+maglevel*3) * 1.25;
 						break;
+					case AMO:
+					case NONE:
+					case SHIELD:
+						// nothing to do
+						break;
 			  }
 		  }
     }
@@ -373,6 +378,8 @@ fight_t Player::getFightType()
 						return FIGHT_DIST;
 					case MAGIC:
 						return FIGHT_MAGICDIST;
+					default:
+						break;
 				}
 			}
     }
@@ -503,7 +510,7 @@ void Player::die() {
 			lostSkilltries = 0;         //reset to 0
 			sumSkilltries = 0;
                     
-			for (int c = 11; c <= skills[i][SKILL_LEVEL]; c++) {    //sum up all required tries for all skill levels
+			for (unsigned c = 11; c <= skills[i][SKILL_LEVEL]; c++) {    //sum up all required tries for all skill levels
 				sumSkilltries += getReqSkilltries(i, c, voc);
 			}
                     
@@ -529,7 +536,7 @@ void Player::die() {
 		//End Skill loss
         
 		//Level Downgrade
-		if ((experience - (int)(experience*0.1f)) < getExpForLv(level))         //0.1f is also used in die().. maybe we make a little function for exp-loss?
+		if ((unsigned long)(experience - (unsigned)(experience*0.1f)) < getExpForLv(level))         //0.1f is also used in die().. maybe we make a little function for exp-loss?
 		{
 			std::stringstream lvMsg;
 			lvMsg << "You were downgraded from level " << level << " to level " << level-1 << ".";

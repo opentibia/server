@@ -36,7 +36,7 @@ class IOPlayer {
 	virtual bool loadPlayer(Player* player, std::string name);
   protected:
 	IOPlayer(){};
-	~IOPlayer(){};
+	virtual ~IOPlayer(){};
 	static IOPlayer* _instance;
 };
 

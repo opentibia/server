@@ -43,7 +43,7 @@ public:
 	NpcScript(std::string name, Npc* npc);
 	virtual ~NpcScript(){}
 //	virtual void onThingMove(const Player *player, const Thing *thing, const Position *oldPos, unsigned char oldstackpos);
-	virtual void onCreatureAppear(int cid);
+	virtual void onCreatureAppear(unsigned long cid);
 	virtual void onCreatureDisappear(int cid);
 //	virtual void onCreatureTurn(const Creature *creature, unsigned char stackpos);
 	virtual void onCreatureSay(int cid, unsigned char type, const std::string &text);

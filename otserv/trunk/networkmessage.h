@@ -5,10 +5,9 @@
 
 
 #include "definitions.h"
-
+#include "otsystem.h"
 
 #define NETWORKMESSAGE_MAXSIZE 16384
-
 
 #define NM_ME_DRAW_BLOOD          0
 #define NM_ME_LOOSE_ENERGY        1

@@ -30,7 +30,7 @@ IOAccount* IOAccount::instance(){
 	return _instance;
 }
 
-Account IOAccount::loadAccount(int accno){
+Account IOAccount::loadAccount(unsigned long accno){
 	Account acc;
 	return acc;
 }

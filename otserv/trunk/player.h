@@ -93,7 +93,7 @@ public:
   
   std::string password;
 
-  int skills[7][2];
+  unsigned int skills[7][2];
   
   //reminder: 0 = None, 1 = Sorcerer, 2 = Druid, 3 = Paladin, 4 = Knight
   unsigned short CapGain[5];          //for level advances

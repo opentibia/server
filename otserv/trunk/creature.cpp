@@ -126,6 +126,9 @@ void Creature::addMagicDamage(const MagicDamageContainer& dmgContainer, bool ski
 		poisonedTicks = ticks;
 		curpoisonedTicks = curticks;
 		break;
+	case magicNone:
+		// nothing to do
+		break;
 	}
 }
 

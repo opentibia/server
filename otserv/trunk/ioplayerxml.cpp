@@ -50,7 +50,7 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name){
 		Account a = IOAccount::instance()->loadAccount(atoi(account));
 		
 		player->password = a.password;
-		if (a.accnumber == 0 || a.accnumber != atoi(account)) {
+		if (a.accnumber == 0 || a.accnumber != (unsigned long)atoi(account)) {
 		  xmlFreeDoc(doc);
 		  return false;
 		}

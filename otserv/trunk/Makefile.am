@@ -3,14 +3,15 @@ AUTOMAKE_OPTIONS = foreign
 noinst_PROGRAMS = otserv
 
 
-AM_CXXFLAGS = $(XML_CPPFLAGS) $(OTSERV_FLAGS) $(LUA50_CFLAGS) -D_THREAD_SAFE -D_REENTRANT
+AM_CXXFLAGS = $(XML_CPPFLAGS) $(OTSERV_FLAGS) $(LUA50_CFLAGS) -D_THREAD_SAFE -D_REENTRANT -Wall -Werror
 otserv_LDADD = $(XML_LIBS) $(LUA50_LIBS) $(BOOST_LIBS) -ldl
-otserv_SOURCES = creature.cpp creature.h definitions.h item.cpp item.h \
-					  items.cpp items.h luascript.cpp luascript.h map.cpp \
-					  map.h networkmessage.cpp networkmessage.h npc.cpp \
-					  npc.h otserv.cpp otsystem.h player.cpp player.h \
-					  position.h protocol.cpp protocol.h protocol70.cpp \
-					  protocol70.h texcept.h thing.cpp thing.h tile.cpp \
-					  tile.h tools.cpp position.cpp scheduler.h account.h \
-					  account.cpp status.cpp status.h spells.cpp spells.h \
-					  magic.h magic.cpp	
+otserv_SOURCES = account.cpp container.cpp creature.cpp game.cpp ioaccount.cpp \
+					  ioaccountxml.cpp iomapxml.cpp ioplayer.cpp ioplayersql.cpp ioplayerxml.cpp \
+					  item.cpp items.cpp luascript.cpp magic.cpp map.cpp networkmessage.cpp npc.cpp \
+					  otserv.cpp player.cpp position.cpp protocol.cpp protocol70.cpp spells.cpp \
+					  status.cpp thing.cpp tile.cpp tools.cpp account.h bootstrap.sh config.h \
+					  container.h creature.h definitions.h game.h ioaccount.h ioaccountxml.h \
+					  iomap.h iomapxml.h ioplayer.h ioplayersql.h ioplayerxml.h item.h items.h \
+					  luascript.h magic.h map.h networkmessage.h npc.h otsystem.h player.h \
+					  position.h protocol.h protocol70.h scheduler.h spells.h stamp-h status.h \
+					  tasks.h texcept.h thing.h tile.h tools.h

@@ -233,7 +233,7 @@ int Items::loadFromDat(std::string file)
  		int width  = fgetc(f);
  		int height = fgetc(f);
  		if ((width > 1) || (height > 1))
- 		   int skip = fgetc(f);
+ 		   fgetc(f);
  		   
 		int blendframes = fgetc(f);
 		int xdiv        = fgetc(f);

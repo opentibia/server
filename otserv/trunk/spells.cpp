@@ -41,8 +41,8 @@ Spells::Spells(Game* igame): game(igame){
 bool Spells::loadFromXml()
 {
 	std::string name, words;
-  bool enabled;
-  int vocId, maglv, mana, id, charges;
+  bool enabled = false;
+  int vocId, maglv = 0, mana = 0, id = 0, charges = 0;
   this->loaded = false;
   xmlDocPtr doc = xmlParseFile(std::string("data/spells/spells.xml").c_str());
   if (doc){
@@ -173,7 +173,7 @@ Spells::~Spells(){
 }
 
 Spell::Spell(std::string iname, int imagLv, int imana, Game* igame)
-: name(iname), magLv(imagLv), mana(imana), game(igame)
+:  game(igame), name(iname),magLv(imagLv) , mana(imana)
 {
 	this->loaded=false;
 	this->script = NULL;

@@ -37,7 +37,7 @@ public:
   Account();
   ~Account();
 
-  int accnumber;
+  unsigned long accnumber;
   int accType;     // ?
   int premDays;    // Premium days
 

@@ -69,7 +69,7 @@ bool isclientBanished(SOCKET s)
 	{
 		unsigned long clientip = *(unsigned long*)&sain.sin_addr;
 
-		for (int i = 0; i < bannedIPs.size(); ++i) {
+		for (size_t i = 0; i < bannedIPs.size(); ++i) {
       if ((bannedIPs[i].first & bannedIPs[i].second) == (clientip & bannedIPs[i].second))
 				return true;
 		}
@@ -99,7 +99,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
     if (protId == 0x0201)
     {
       msg.SkipBytes(15);
-			bool isClientBanished = false;
+			//bool isClientBanished = false;
       unsigned int accnumber = msg.GetU32();
 	    std::string  password  = msg.GetString();
 
@@ -164,9 +164,9 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
     // gameworld connection tibia 7.1
     else if (protId == 0x020A)
     {
-      unsigned char  clientos = msg.GetByte();
-      unsigned short version  = msg.GetU16();
-      unsigned char  unknown  = msg.GetByte();
+      /* unsigned char  clientos = */msg.GetByte();
+      /* unsigned short version  = */msg.GetU16();
+      /* unsigned char  unknown  = */msg.GetByte();
 
       std::string name     = msg.GetString();
       std::string password = msg.GetString();
@@ -222,6 +222,11 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 
   if (s)
     closesocket(s);
+
+#if defined WIN32 || defined WINDOWS
+#else
+  return 0;
+#endif
 }
 
 

@@ -236,7 +236,7 @@ void NpcScript::onThink(){
 }
 
 
-void NpcScript::onCreatureAppear(int cid){
+void NpcScript::onCreatureAppear(unsigned long cid){
 	if(npc->getID() != cid){
 		lua_pushstring(luaState, "onCreatureAppear");
 		lua_gettable(luaState, LUA_GLOBALSINDEX);

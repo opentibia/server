@@ -56,7 +56,7 @@ int MagicEffectClass::getDamage(Creature *target, const Creature *attacker /*= N
 			const Player* p = dynamic_cast<const Player*>(target);
 
 			if(p) {
-				damage = floor(damage / 2.0);
+				damage = (int)floor(damage / 2.0);
 			}
 		}
 

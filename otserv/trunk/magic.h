@@ -60,20 +60,8 @@ enum MagicDamageType {
 
 typedef std::vector<Position> MagicAreaVec;
 
-class MagicEffectTargetMagicDamageClass;
-
 //<delayTicks, damageCount>
 typedef std::pair<long, long> damageTimeCount;
-
-//<<delayTicks, damageCount>, MagicEffectTargetMagicDamageClass>
-typedef std::pair<damageTimeCount, MagicEffectTargetMagicDamageClass> damageInfo;
-typedef std::vector<damageInfo> MagicDamageVec;
-
-//<duration, MagicDamageVectorClass>
-typedef std::pair<long, MagicDamageVec> transformInfo;
-
-//<type, <duration, <<delayTicks, damageCount>, MagicEffectTargetMagicDamageClass>> >
-typedef std::map<unsigned short, transformInfo> damageMapClass;
 
 class MagicEffectClass {
 public:
@@ -122,6 +110,52 @@ public:
 	}
 };
 
+//Is created indirectly, need a target and make magic damage (burning/poisoned/energized)
+class MagicEffectTargetMagicDamageClass : public MagicEffectTargetClass
+{
+public:
+	MagicEffectTargetMagicDamageClass(const unsigned long creatureid);
+	virtual ~MagicEffectTargetMagicDamageClass() {};
+
+	virtual bool causeExhaustion(bool hasTarget) const
+	{
+		return false;
+	}
+
+	virtual int getDamage(Creature *target, const Creature *attacker = NULL) const;
+
+	virtual void getMagicEffect(const Creature* c, const Position& pos, bool hasTarget, int damage, bool isPz, NetworkMessage &msg) const
+	{
+		MagicEffectTargetClass::getMagicEffect(c, pos, hasTarget, damage, isPz, msg);
+	}
+
+	virtual void getDistanceShoot(const Creature* c, const Position& to, bool hasTarget, NetworkMessage &msg) const
+	{
+		//this class shouldn't have any distance shoots, just return.
+	}
+
+	virtual void getArea(const Position& rcenterpos, MagicAreaVec& list) const
+	{
+		MagicEffectTargetClass::getArea(rcenterpos, list);
+	}
+
+	const unsigned long getOwnerID() const {return ownerid;}
+
+protected:
+	unsigned long ownerid;
+};
+
+
+//<<delayTicks, damageCount>, MagicEffectTargetMagicDamageClass>
+typedef std::pair<damageTimeCount, MagicEffectTargetMagicDamageClass> damageInfo;
+typedef std::vector<damageInfo> MagicDamageVec;
+
+//<duration, MagicDamageVectorClass>
+typedef std::pair<long, MagicDamageVec> transformInfo;
+
+//<type, <duration, <<delayTicks, damageCount>, MagicEffectTargetMagicDamageClass>> >
+typedef std::map<unsigned short, transformInfo> damageMapClass;
+
 //Holds the magic damage (burning/energized/poisoned)
 class MagicDamageContainer : public MagicDamageVec {
 public:
@@ -166,41 +200,6 @@ public:
 	
 protected:
 		MagicDamageContainer dmgContainer;
-};
-
-//Is created indirectly, need a target and make magic damage (burning/poisoned/energized)
-class MagicEffectTargetMagicDamageClass : public MagicEffectTargetClass
-{
-public:
-	MagicEffectTargetMagicDamageClass(const unsigned long creatureid);
-	virtual ~MagicEffectTargetMagicDamageClass() {};
-
-	virtual bool causeExhaustion(bool hasTarget) const
-	{
-		return false;
-	}
-
-	virtual int getDamage(Creature *target, const Creature *attacker = NULL) const;
-
-	virtual void getMagicEffect(const Creature* c, const Position& pos, bool hasTarget, int damage, bool isPz, NetworkMessage &msg) const
-	{
-		MagicEffectTargetClass::getMagicEffect(c, pos, hasTarget, damage, isPz, msg);
-	}
-
-	virtual void getDistanceShoot(const Creature* c, const Position& to, bool hasTarget, NetworkMessage &msg) const
-	{
-		//this class shouldn't have any distance shoots, just return.
-	}
-
-	virtual void getArea(const Position& rcenterpos, MagicAreaVec& list) const
-	{
-		MagicEffectTargetClass::getArea(rcenterpos, list);
-	}
-
-	const unsigned long getOwnerID() const {return ownerid;}
-
-protected:
-	unsigned long ownerid;
 };
 
 //magic field (Fire/Energy/Poison) and solid objects (Magic-wall/Wild growth)

@@ -347,7 +347,7 @@ void Protocol70::parseOpenChannel(NetworkMessage &msg){
 }
 
 void Protocol70::parseCloseChannel(NetworkMessage &msg){
-     unsigned short channelId = msg.GetU16();
+     /* unsigned short channelId = */msg.GetU16();
      std::map<long, Creature*>::iterator sit = channel.find(player->getID());
      if( sit != channel.end() ) {
           channel.erase(sit);
@@ -588,13 +588,13 @@ void Protocol70::parseUseItemEx(NetworkMessage &msg)
 	unsigned short from_x = msg.GetU16();
 	unsigned short from_y = msg.GetU16();
 	unsigned char from_z = msg.GetByte();
-	unsigned short item = msg.GetU16();
-	unsigned char newpos = msg.GetByte();
+	/*unsigned short item = */msg.GetU16();
+	/*unsigned char newpos = */msg.GetByte();
 	unsigned short to_x = msg.GetU16();
 	unsigned short to_y = msg.GetU16();
 	unsigned char to_z = msg.GetByte();
-	unsigned short tile_id = msg.GetU16();
-	unsigned char count = msg.GetByte();
+	/*unsigned short tile_id = */msg.GetU16();
+	/*unsigned char count = */msg.GetByte();
 
 	Position pos;
 	pos.x = to_x;
@@ -614,7 +614,7 @@ void Protocol70::parseUseItemEx(NetworkMessage &msg)
 				return;
 
 			if(game->creatureUseItem(player, pos, runeitem)) {
-				runeitem->setItemCharge(max((int)runeitem->getItemCharge() - 1, 0) );
+				runeitem->setItemCharge(std::max((int)runeitem->getItemCharge() - 1, 0) );
 
 				if(runeitem->getItemCharge() == 0) {
 					container->removeItem(runeitem);
@@ -1042,7 +1042,7 @@ void Protocol70::parseUseItem(NetworkMessage &msg)
 	unsigned short y = msg.GetU16();
 	unsigned char z = msg.GetByte();
 	unsigned short item = msg.GetU16();
-	unsigned char un = msg.GetByte();
+	/*unsigned char un = */msg.GetByte();
 	unsigned char stack = msg.GetByte();
 
 #ifdef __DEBUG__
@@ -1146,8 +1146,8 @@ void Protocol70::parseThrow(NetworkMessage &msg)
   unsigned short from_x     = msg.GetU16();
   unsigned short from_y     = msg.GetU16(); 
   unsigned char  from_z     = msg.GetByte();
-  unsigned char  duno1 = msg.GetByte(); // item type 2 bytes
-  unsigned char  duno2 = msg.GetByte();
+  /* unsigned char  duno1 = */ msg.GetByte(); // item type 2 bytes
+  /* unsigned char  duno2 = */ msg.GetByte();
   unsigned char  from_stack = msg.GetByte();
   unsigned short to_x       = msg.GetU16();
   unsigned short to_y       = msg.GetU16(); 
@@ -1199,7 +1199,7 @@ void Protocol70::parseSay(NetworkMessage &msg)
   unsigned char type = msg.GetByte();
   
   std::string receiver;
-  unsigned short channelId;
+  unsigned short channelId = 0;
   if (type == 4)
     receiver = msg.GetString();
   if (type == 5)

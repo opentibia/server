@@ -324,7 +324,7 @@ Position Map::placeCreature(Creature* c){
 bool Map::removeCreature(Creature* c)
 {
 	OTSYS_THREAD_LOCK(mapLock)
-	int stackpos = getTile(c->pos.x, c->pos.y, c->pos.z)->getCreatureStackPos(c);
+	/* int stackpos = */ getTile(c->pos.x, c->pos.y, c->pos.z)->getCreatureStackPos(c);
 	getTile(c->pos.x, c->pos.y, c->pos.z)->removeThing(c);
 
 	OTSYS_THREAD_UNLOCK(mapLock)
