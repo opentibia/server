@@ -51,7 +51,7 @@ Player::Player(const char *name, Protocol *p) : Creature(name)
   level      = 1;
   experience = 180;
 
-  maglevel   = 60;
+  maglevel   = 20;
 
   access     = 0;
 

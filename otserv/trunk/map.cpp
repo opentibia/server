@@ -316,6 +316,7 @@ int Map::loadMapXml(const char *filename){
   int width, height;
 
 
+  xmlLineNumbersDefault(1);
   doc=xmlParseFile(filename);
   if (!doc) {
     std::cout << "FATAL: couldnt load map. exiting" << std::endl;
@@ -335,6 +336,10 @@ int Map::loadMapXml(const char *filename){
   tile=root->children;
   for(int y=0; y < height; y++){
     for(int x=0; x < width; x++){
+	    if (!tile) {
+		    std::cout << "no tile for " << x << " / " << y << std::endl;
+		    exit(1);
+	    }
       item=tile->children;
       const char* pz = (const char*)xmlGetProp(tile, (const xmlChar *) "pz");
 
@@ -1107,7 +1112,7 @@ void Map::creatureMakeMagicDistDamage(Creature *creature, Creature *attackedCrea
       (std::abs(creature->pos.y-attackedCreature->pos.y) <= 6) &&
       (creature->pos.z == attackedCreature->pos.z))
   {
-    int damage = 1+(int)(300.0*rand()/(RAND_MAX+1.0));
+    int damage = 1+(int)(200.0*rand()/(RAND_MAX+1.0));
     if (creature->access != 0)
       damage += 1337;
 
@@ -1241,10 +1246,12 @@ void Map::checkPlayerAttacking(unsigned long id)
 
 void Map::CreateDamageUpdate(Player* player, Creature* attackCreature, int damage, NetworkMessage& msg) {
   msg.AddPlayerStats(player);
-  std::stringstream dmgmesg;
-  dmgmesg << "You lose " << damage << " hitpoints due to an attack by ";
-  dmgmesg << attackCreature->getName();
-  msg.AddTextMessage(MSG_EVENT, dmgmesg.str().c_str());
+  if (damage > 0) {
+	  std::stringstream dmgmesg;
+	  dmgmesg << "You lose " << damage << " hitpoints due to an attack by ";
+	  dmgmesg << attackCreature->getName();
+	  msg.AddTextMessage(MSG_EVENT, dmgmesg.str().c_str());
+  }
   if (player->health <= 0)
     msg.AddTextMessage(MSG_EVENT, "Own3d!");
 }
@@ -1269,6 +1276,7 @@ void Map::makeCastSpell(Player *player, int mana, int mindamage, int maxdamage, 
 	NetworkMessage msg;
 	if(player->mana < mana | player->exhausted) {
 			msg.AddMagicEffect(player->pos, NM_ME_PUFF);
+			msg.AddTextMessage(MSG_EVENT, "You are exhausted.");
 			player->sendNetworkMessage(&msg);
 			return;
 	} 
@@ -1306,11 +1314,21 @@ void Map::makeCastSpell(Player *player, int mana, int mindamage, int maxdamage, 
 						if((*cit)->access == 0) {
 							int damage = random_range(mindamage, maxdamage);
 
-							if(damage > (*cit)->health)
-								damage = (*cit)->health;
+							if (damage > 0) {
+								if(damage > (*cit)->health)
+									damage = (*cit)->health;
 
-							(*cit)->drainHealth(damage);
-							damagedcreature.second = damage;
+								(*cit)->drainHealth(damage);
+								damagedcreature.second = damage;
+							} else {
+								int newhealth = (*cit)->health - damage;
+								std::cout << damage << std::endl;
+								if(newhealth > (*cit)->healthmax)
+									newhealth = (*cit)->healthmax;
+
+								(*cit)->health = newhealth;
+								damagedcreature.second = damage;
+							}
 						}
 						else
 							damagedcreature.second = 0;
@@ -1360,9 +1378,7 @@ void Map::makeCastSpell(Player *player, int mana, int mindamage, int maxdamage, 
 								std::stringstream dmg;
 								dmg << damage;
 								msg.AddAnimatedText(victim->pos, 0xB4, dmg.str());
-							}
-							else
-								msg.AddMagicEffect(victim->pos, NM_ME_PUFF);
+							} else if (damage == 0) msg.AddMagicEffect(victim->pos, NM_ME_PUFF);
 
 							if (victim->health <= 0)
 							{
@@ -1417,6 +1433,7 @@ void Map::playerCastSpell(Player *player, const std::string &text)
 			NetworkMessage msg;
 			if(player->mana < 100 || player->exhausted) {
 					msg.AddMagicEffect(player->pos, NM_ME_PUFF);
+					msg.AddTextMessage(MSG_EVENT, "You are exhausted.");
 					player->sendNetworkMessage(&msg);
 			}
 			else {
@@ -1480,6 +1497,29 @@ void Map::playerCastSpell(Player *player, const std::string &text)
 		int min = (int)((base * 2.3) - 30) / 2;
 		int max = (int)((base * 3.0)) / 2;
 		makeCastSpell(player, 800, min, max, area, 1, NM_ME_EXPLOSION_AREA, NM_ME_EXPLOSION_DAMAGE);
+	}
+	else if(strcmp(text.c_str(), "exura gran mas res") == 0) {
+
+			static unsigned char area[14][18] = {
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0},
+				{0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0},
+				{0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0},
+				{0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0},
+				{0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
+				{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+			};
+
+		int base = (int)player->level * 2 + player->maglevel * 3;
+		int min = (int)((base * 2.3) - 30);
+		int max = (int)((base * 3.0));
+		makeCastSpell(player, 400, -min, -max, area, 1, NM_ME_MAGIC_ENERGIE, NM_ME_MAGIC_ENERGIE);
 	}
 	else if(strcmp(text.c_str(), "exori vis") == 0) {
 
@@ -1632,4 +1672,3 @@ void Map::playerCastSpell(Player *player, const std::string &text)
 
 	OTSYS_THREAD_UNLOCK(mapLock)
 }
-
