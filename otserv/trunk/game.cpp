@@ -1413,6 +1413,7 @@ bool Game::creatureOnPrepareMagicAttack(Creature *creature, Position pos, const 
 				}
 				else
 					player->mana -= me->manaCost;
+					player->manaspent += me->manaCost;
 			}
 		}
 
