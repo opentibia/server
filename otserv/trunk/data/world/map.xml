@@ -1,23 +1,17 @@
 <?xml version="1.0"?>
 <map height="128" width="128">
-<tile x="1" y="1" z="5" ground="695"></tile>
-
-<tile x="1" y="1" z="6" ground="695"></tile>
-<tile x="1" y="2" z="6" ground="695"></tile>
-<tile x="2" y="1" z="6" ground="695"></tile>
-
-<tile x="2" y="2" z="7" ground="695"></tile>
-<tile x="2" y="1" z="7" ground="695"></tile>
-<tile x="1" y="2" z="7" ground="695"></tile>
-<tile x="2" y="3" z="7" ground="695"></tile>
-<tile x="3" y="2" z="7" ground="695"></tile>
-<tile x="3" y="3" z="7" ground="695"></tile>
+<tile x="20" y="20" z="7" ground="695"></tile>
+<tile x="21" y="21" z="7" ground="695"></tile>
+<tile x="22" y="21" z="7" ground="695"></tile>
+<tile x="21" y="22" z="7" ground="695"></tile>
+<tile x="22" y="23" z="7" ground="695"></tile>
+<tile x="23" y="22" z="7" ground="695"></tile>
+<tile x="23" y="23" z="7" ground="695"></tile>
 
 
-<tile x="2" y="2" z="8" ground="695"></tile>
-<tile x="2" y="3" z="8" ground="695"></tile>
-<tile x="3" y="2" z="8" ground="695"></tile>
-<tile x="3" y="3" z="8" ground="695"></tile>
-<tile x="3" y="4" z="8" ground="695"></tile>
-<tile x="4" y="3" z="8" ground="695"></tile>
+<tile x="23" y="23" z="6" ground="695"></tile>
+<tile x="23" y="22" z="6" ground="695"></tile>
+<tile x="22" y="23" z="6" ground="695"></tile>
+<tile x="24" y="23" z="6" ground="695"></tile>
+<tile x="23" y="24" z="6" ground="695"></tile>
 </map>

@@ -32,6 +32,7 @@
 #include "tile.h"
 #include "creature.h"
 #include "player.h"
+#include "status.h"
 
 #include "networkmessage.h"
 
@@ -57,7 +58,11 @@ Protocol74::~Protocol74()
 
 bool Protocol74::ConnectPlayer()
 {
-  return game->placeCreature(player);
+  Status* stat = Status::instance();
+  if(stat->playersonline >= g_config.getGlobalNumber("maxplayers") && player->access == 0)
+    return false;
+  else                    
+    return game->placeCreature(player);
 }
 
 

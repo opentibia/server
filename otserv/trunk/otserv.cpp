@@ -202,8 +202,9 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 					} else if (!protocol->ConnectPlayer())  {
 							std::cout << "reject player..." << std::endl;
 							msg.Reset();
-							msg.AddByte(0x14);
+							msg.AddByte(0x16);
 							msg.AddString("Too many Players online.");
+							msg.AddByte(45);
 							msg.WriteToSocket(s);
 					} else {	
 						Status* stat = Status::instance();
