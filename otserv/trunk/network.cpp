@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.14  2004/11/19 21:39:26  shivoc
+// fix a bug in converting from ascii to binary representation
+//
 // Revision 1.13  2003/10/17 22:25:02  tliffrag
 // Addes SorryNotPossible; added configfile; basic lua support
 //
@@ -266,3 +269,12 @@ Socket TNetwork::AcceptPlayer(const Socket& listen) throw(texception) {
     return psocket;
 
 } // Socket TNetwork::AcceptPlayer(const Socket& listen) throw(texception) 
+
+uint32_t TNetwork::convip(const char* ip) {
+		  std::cout << "getting ip from: " << ip << std::endl;
+
+		  uint32_t t = inet_addr(ip);
+		  for (int i = 0; i < 4; ++i)
+					 std::cout << std::hex << (uint16_t)(((char*)&t)[i]) << std::endl;
+		  return inet_addr(ip);
+}

@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.7  2004/11/19 21:39:26  shivoc
+// fix a bug in converting from ascii to binary representation
+//
 // Revision 1.6  2002/05/28 13:55:56  shivoc
 // some minor changes
 //
@@ -56,6 +59,10 @@ namespace TNetwork {
 
     // accept a connection from a player and return the socket...
     Socket AcceptPlayer(const Socket&) throw(texception);
+
+	 // convert ip address in char* to uint32_t
+	 uint32_t convip(const char* ip);
+
 } // Namespace TNetwork 
 
 #endif // __network_h

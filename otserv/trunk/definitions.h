@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.11  2004/11/19 21:39:26  shivoc
+// fix a bug in converting from ascii to binary representation
+//
 // Revision 1.10  2003/10/21 17:55:07  tliffrag
 // Added items on player
 //
@@ -39,6 +42,7 @@
 #define __definitions_h
 
 #include <functional>
+#include <stdint.h>
 
 // functor that enables me to use functors with same types but different algorithms
 template<class A, class R> struct unary_functor : public std::unary_function<A,R> {

@@ -20,6 +20,9 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
+// Revision 1.16  2004/11/19 21:39:26  shivoc
+// fix a bug in converting from ascii to binary representation
+//
 // Revision 1.15  2004/11/14 09:16:54  shivoc
 // some fixes to at least reenable login without segfaulting the server (including some merges from haktivex' server
 //
@@ -62,8 +65,8 @@
 #include "tmap.h"
 #include "eventscheduler.h"
 #include "luascript.h"
+#include "network.h"
 
-int ipFromDotted(const char*);
 int g_serverip;
 LuaScript g_config("config.lua");
 EventScheduler es;
@@ -77,7 +80,7 @@ int main(int argc, char *argv[]) {
 	else
 		ip=g_config.getGlobalString("ip").c_str();
 	std::cout << "getting ip from " << ip << std::endl;
-	g_serverip=ipFromDotted(ip);;
+	g_serverip=TNetwork::convip(ip);;
 	srand(time(NULL));
 	std::cout << "starting server socket" << std::endl;
 	TNetwork::ServerSocket ss;
