@@ -20,8 +20,8 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
-// Revision 1.7  2003/09/24 20:10:13  timmit
-// *** empty log message ***
+// Revision 1.8  2003/09/24 20:47:05  timmit
+// Player loading/saving added.  Both load() and save() in player_mem work.  Saves player's character to the appropriate *.chr file when the player logs out but does NOT load() the player's file when they log in.  Once accounts are added then the call to load() will be added.
 //
 // Revision 1.6  2003/09/08 13:28:41  tliffrag
 // Item summoning and maploading/saving now working.
@@ -94,7 +94,9 @@ enum skillsid_t {
 			int skills[ 7 ][ 2 ];
 			
             unsigned int pnum;
-
+            
+          unsigned long readVal( FILE* charfile, std::string name, unsigned long value );
+          void writeVal( FILE* charfile, std::string name, unsigned long value );
     }; // class player_mem : public Memory
 
 

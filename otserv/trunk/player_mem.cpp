@@ -20,7 +20,7 @@
 // $Id$
 //////////////////////////////////////////////////////////////////////
 // $Log$
-// Revision 1.6  2003/09/24 20:33:09  timmit
+// Revision 1.7  2003/09/24 20:47:05  timmit
 // Player loading/saving added.  Both load() and save() in player_mem work.  Saves player's character to the appropriate *.chr file when the player logs out but does NOT load() the player's file when they log in.  Once accounts are added then the call to load() will be added.
 //
 // Revision 1.5  2003/09/08 13:28:41  tliffrag
@@ -35,6 +35,10 @@
 //
 //////////////////////////////////////////////////////////////////////
 #include <stdlib.h>
+#include <iostream>
+#include <stdio.h>
+#include <string>
+#include <direct.h>
 #include "player_mem.h"
 
 player_mem::player_mem(){
