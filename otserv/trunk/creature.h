@@ -74,7 +74,8 @@ public:
 
   unsigned long getID() const { return id; }
   int getExpForLv(int lv) { 
-      return (int)(((50.0/3.0) * pow((double)lv ,3)) - (100 * pow((double)lv, 2)) + ((850.0/3.0) * lv) - 200);
+		return (int)((50*lv*lv*lv)/3 - 100 * lv * lv + (850*lv) / 3 - 200);
+      //return (int)(((50.0/3.0) * pow((double)lv ,3)) - (100 * pow((double)lv, 2)) + ((850.0/3.0) * lv) - 200);
       }
   Direction getDirection() const { return direction; }
   void setDirection(Direction dir) { direction = dir; }
