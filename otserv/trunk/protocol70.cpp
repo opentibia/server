@@ -188,22 +188,27 @@ void Protocol70::GetMapDescription(unsigned short x, unsigned short y, unsigned 
       {
         msg.AddItem(&tile->ground);
 
+        int count = 1;
+
         ItemVector::iterator it;
-		    for (it = tile->topItems.begin(); it !=tile->topItems.end(); it++)
+		    for (it = tile->topItems.begin(); ((it !=tile->topItems.end()) && (count < 10)); it++)
         {
   			  msg.AddItem(*it);
+          count++;
         }
 
         CreatureVector::iterator itc;
-		    for (itc = tile->creatures.begin(); itc !=tile->creatures.end(); itc++)
+		    for (itc = tile->creatures.begin(); ((itc !=tile->creatures.end()) && (count < 10)); itc++)
         {
   			  msg.AddCreature(*itc, setCreatureAsKnown((*itc)->getID()), false);
+          count++;
         }
 
 
-		    for (it = tile->downItems.begin(); it !=tile->downItems.end(); it++)
+		    for (it = tile->downItems.begin(); ((it !=tile->downItems.end()) && (count < 10)); it++)
         {
   			  msg.AddItem(*it);
+          count++;
         }
       }
        // tile end
