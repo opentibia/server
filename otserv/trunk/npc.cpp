@@ -108,25 +108,20 @@ Npc::~Npc()
 {
 }
 
-// The following things should be turned over to lua scripts which will allow more
-// complex reactions of NPCs to player actions
 void Npc::onThingMove(const Player *player, const Thing *thing, const Position *oldPos, unsigned char oldstackpos){
+	//not yet implemented
 }
 
 void Npc::onCreatureAppear(const Creature *creature){
-	//if we arent attacking anybody AND the creature coming in range is enemy, attack it
-
-	//else ignore
+	this->script->onCreatureAppear(creature->getID());
 }
 
 void Npc::onCreatureDisappear(const Creature *creature, unsigned char stackPos){
-	//if we were attacking the creature, find a new enemy
-
-	//else ignore
+	this->script->onCreatureDisappear(creature->getID());
 }
 
 void Npc::onCreatureTurn(const Creature *creature, unsigned char stackpos){
-	//we dont care about turning, we are an evil bad monster!
+	//not implemented yet, do we need it?
 }
 
 void Npc::onCreatureSay(const Creature *creature, unsigned char type, const std::string &text){
@@ -173,6 +168,22 @@ void Npc::doMove(int direction){
 	}
 }
 
+void Npc::doMoveTo(Position target){
+	if(route.size() == 0 || route.back() != target || route.front() != this->pos){
+		route = this->map->getPathTo(this->pos, target);
+		route.pop_front();
+	}
+	if(route.size()==0){
+		//still no route, means there is none
+		return;
+	}
+	Position nextStep=route.front();
+	route.pop_front();
+	int dx = nextStep.x - this->pos.x;
+	int dy = nextStep.y - this->pos.y;
+	this->map->thingMove(this, this,this->pos.x + dx, this->pos.y + dy, this->pos.z);
+}
+
 NpcScript::NpcScript(std::string scriptname, Npc* npc){
 	luaState = lua_open();
 	luaopen_loadlib(luaState);
@@ -193,6 +204,21 @@ void NpcScript::onThink(){
 	lua_call(luaState, 0,0);
 }
 
+
+void NpcScript::onCreatureAppear(int cid){
+	lua_pushstring(luaState, "onCreatureAppear");
+	lua_gettable(luaState, LUA_GLOBALSINDEX);
+	lua_pushnumber(luaState, cid);
+	lua_call(luaState, 1,0);
+}
+
+void NpcScript::onCreatureDisappear(int cid){
+	lua_pushstring(luaState, "onCreatureDisappear");
+	lua_gettable(luaState, LUA_GLOBALSINDEX);
+	lua_pushnumber(luaState, cid);
+	lua_call(luaState, 1,0);
+}
+
 void NpcScript::onCreatureSay(int cid, unsigned char type, const std::string &text){
 	//now we need to call the function
 	lua_pushstring(luaState, "onCreatureSay");
@@ -206,6 +232,7 @@ void NpcScript::onCreatureSay(int cid, unsigned char type, const std::string &te
 int NpcScript::registerFunctions(){
 	lua_register(luaState, "selfSay", NpcScript::luaActionSay);
 	lua_register(luaState, "selfMove", NpcScript::luaActionMove);
+	lua_register(luaState, "selfMoveTo", NpcScript::luaActionMoveTo);
 	lua_register(luaState, "selfGetPosition", NpcScript::luaSelfGetPos);
 	lua_register(luaState, "selfAttackCreature", NpcScript::luaActionAttackCreature);
 	lua_register(luaState, "creatureGetName", NpcScript::luaCreatureGetName);
@@ -284,6 +311,22 @@ int NpcScript::luaActionMove(lua_State* L){
 		mynpc->doMove(dir);
 	return 0;
 }
+
+int NpcScript::luaActionMoveTo(lua_State* L){
+	Position target;
+	target.z=(int)lua_tonumber(L, -1);
+	lua_pop(L,1);
+	target.y=(int)lua_tonumber(L, -1);
+	lua_pop(L,1);
+	target.x=(int)lua_tonumber(L, -1);
+	lua_pop(L,1);
+	Npc* mynpc=getNpc(L);
+	if(mynpc)
+		mynpc->doMoveTo(target);
+	return 0;
+}
+
+
 
 int NpcScript::luaActionAttackCreature(lua_State *L){
 	int id=(int)lua_tonumber(L, -1);

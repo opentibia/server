@@ -181,7 +181,7 @@ void NetworkMessage::AddString(const std::string &value)
 
 void NetworkMessage::AddString(const char* value)
 {
-  unsigned short stringlen = strlen(value);
+  unsigned short stringlen = (unsigned short) strlen(value);
   AddU16(stringlen);
   strcpy((char*)m_MsgBuf + m_ReadPos, value);
   m_ReadPos += stringlen;
@@ -205,7 +205,7 @@ void NetworkMessage::AddItem(const Item *item)
   AddU16(item->getID());
 
   if (item->isStackable())
-    AddByte(item->getItemCount());
+    AddByte((unsigned char)item->getItemCount());
 
   /* TODO multitype items */
 }

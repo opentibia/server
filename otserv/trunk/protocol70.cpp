@@ -187,7 +187,7 @@ void Protocol70::GetMapDescription(unsigned short x, unsigned short y, unsigned 
   for (int nx = 0; nx < width; nx++)
     for (int ny = 0; ny < height; ny++)
     {
-      tile = map->getTile(x + nx, y + ny, z);
+      tile = map->getTile(x + nx, y + ny, (unsigned char)z);
 
       if (tile)
       {

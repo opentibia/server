@@ -39,6 +39,7 @@ bool Tile::isBlocking()
     if ((*iit)->isBlocking())
       return true;
 
+
   return false;
 }
 

@@ -452,151 +452,6 @@ bool Map::removeCreature(Creature* c)
     return true;
 }
 
-/*int Map::requestAction(Creature* c, Action* a)
-  {
-
-  if(a->type==ACTION_LOOK_AT){
-
-  a->buffer=tiles[a->pos1.x][a->pos1.y]->getDescription();
-  a->creature->sendAction(a);
-  }
-  else if(a->type==ACTION_REQUEST_APPEARANCE){
-  a->creature->sendAction(a);
-  }
-  else if(a->type==ACTION_CHANGE_APPEARANCE){
-  distributeAction(a->pos1,a);
-  }
-  else if(a->type==ACTION_ITEM_USE){
-  GETTILEBYPOS(a->pos1)->getItemByStack(a->stack)->use();
-  distributeAction(a->pos1,a);
-  }
-
-  return true;
-  }
-  */
-
-/*int Map::summonItem(Action* a)
-  {
-  Item* item=new Item(a->id);
-  if(item->isStackable() && !a->count)
-  return TMAP_ERROR_NO_COUNT;
-  if(!a->id)
-  return false;
-#ifdef __DEBUG__
-#endif
-item->count=a->count;
-Tile* tile = tiles[a->pos1.x][a->pos1.y];
-if((unsigned int)a->id != tile->getItemByStack(tile->getStackPosItem())->getID() ||
-!item->isStackable()){
-std::cout << "appear id: " << tile->getItemByStack(tile->getStackPosItem())->getID()<< std::endl;
-//if an item of this type isnt already there or this type isnt stackable
-tile->addItem(item);
-Action b;
-b.type=ACTION_ITEM_APPEAR;
-b.pos1=a->pos1;
-b.id=a->id;
-if(item->isStackable())
-b.count=a->count;
-distributeAction(a->pos1, &b);
-}
-else {
-std::cout << "merge" << std::endl;
-//we might possibly merge the top item and the stuff we want to add
-Item* onTile = tile->getItemByStack(tile->getStackPosItem());
-onTile->count+=item->count;
-int tmpnum=0;
-if(onTile->count>100){
-tmpnum= onTile->count-100;
-onTile->count=100;
-}
-Action b;
-b.type=ACTION_ITEM_CHANGE;
-b.pos1=a->pos1;
-b.id=a->id;
-b.count=onTile->count;
-
-distributeAction(a->pos1, &b);
-
-if(tmpnum>0){
-std::cout << "creating extra item" << std::endl;
-item->count=tmpnum;
-tile->addItem(item);
-Action c;
-c.type=ACTION_ITEM_APPEAR;
-c.pos1=a->pos1;
-c.id=a->id;
-c.count=item->count;
-distributeAction(a->pos1, &c);
-//not all fit into the already existing item, create a new one
-}
-}
-return true;
-}
-*/
-
-/*
-   int Map::summonItem(Position pos, int id)
-   {
-
-   std::cout << "Deprecated summonItem" << std::cout;
-   if(!id)
-   return false;
-#ifdef __DEBUG__
-std::cout << "Summoning item with id " << id << std::endl;
-#endif
-Item* i=new Item(id);
-tiles[pos.x][pos.y]->addItem(i);
-Action* a= new Action;
-a->type=ACTION_ITEM_APPEAR;
-a->pos1=pos;
-a->id=id;
-if(!i->isStackable())
-a->count=0;
-distributeAction(pos, a);
-return true;
-
-}
-
-*/
-
-/*
-   int Map::changeGround(Position pos, int id){
-   if(!id)
-   return false;
-#ifdef __DEBUG__
-std::cout << "Summoning item with id " << id << std::endl;
-#endif
-Item* i=new Item(id);
-tiles[pos.x][pos.y]->addItem(i);
-Action* a= new Action;
-a->type=ACTION_GROUND_CHANGE;
-a->pos1=pos;
-a->id=id;
-if(!i->isStackable())
-a->count=0;
-distributeAction(pos, a);
-return true;
-}
-
-int Map::removeItem(Action* a){
-int newcount;
-Tile* tile=tiles[a->pos1.x][a->pos1.y];
-std::cout << "COUNT: " << a->count << std::endl;
-newcount=tile->removeItem(a->stack, a->type, a->count);
-std::cout << "COUNT: " << newcount << std::endl;
-if(newcount==0)
-distributeAction(a->pos1,a);
-else{
-std::cout << "distributing change" << std::endl;
-a->type=ACTION_ITEM_CHANGE;
-a->count=newcount;
-distributeAction(a->pos1,a);
-}
-return true;
-}
-
-*/
-
 void Map::thingMove(Creature *player, Thing *thing,
                     unsigned short to_x, unsigned short to_y, unsigned char to_z)
 {
@@ -1067,12 +922,11 @@ void Map::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fig
 }
 
 
-std::list<Position> Map::getPathTo(Position start, Position to){
+std::list<Position> Map::getPathTo(Position start, Position to, bool creaturesBlock){
 	std::list<Position> path;
-
-	if(start.z != to.z)
+/*	if(start.z != to.z)
 		return path;
-
+*/
 	std::list<AStarNode*> openNodes;
 	std::list<AStarNode*> closedNodes;
 	int z = start.z;
@@ -1084,7 +938,7 @@ std::list<Position> Map::getPathTo(Position start, Position to){
 	startNode->y=start.y;
 	AStarNode* found = NULL;
 	openNodes.push_back(startNode);
-	while(!found){
+	while(!found && closedNodes.size() < 100){
 		//get best node from open list
 		openNodes.sort(lessPointer<AStarNode>());
 		if(openNodes.size() == 0)
@@ -1098,8 +952,8 @@ std::list<Position> Map::getPathTo(Position start, Position to){
 					int x = current->x + dx;
 					int y = current->y + dy;
 
-          Tile *t;
-          if((!(t = getTile(x,y,z))) || t->isBlocking() || t->creatures.size())
+					Tile *t;
+					if((!(t = getTile(x,y,z))) || t->isBlocking() || (t->creatures.size() && x != to.x && y != to.y))
 						continue;
 					bool isInClosed = false;
 					for(std::list<AStarNode*>::iterator it = closedNodes.begin();
@@ -1110,6 +964,9 @@ std::list<Position> Map::getPathTo(Position start, Position to){
 							break;
 						}
 					}
+					if(isInClosed)
+						continue;
+
 					bool isInOpen = false;
 					AStarNode* child = NULL;
 					for(std::list<AStarNode*>::iterator it = openNodes.begin();
@@ -1121,23 +978,24 @@ std::list<Position> Map::getPathTo(Position start, Position to){
 							break;
 						}
 					}
+
 					if(!isInOpen){
 						AStarNode* n = new AStarNode;
-						n->x=x+dx;
-						n->y=y+dy;
+						n->x=x;
+						n->y=y;
 						n->h = abs(n->x - to.x) + abs(n->y - to.y);
 						n->g = current->g + 1;
 						n->parent = current;
 						if(n->x == to.x && n->y == to.y){
 							found = n;
 						}
-						openNodes.push_back(n);
+						openNodes.push_front(n);
 					}
-					else{
+/*					else{
 						if(current->g + 1 < child->g)
 							child->parent = current;
 							child->g=current->g+1;
-					}
+					}*/
 				}
 			}
 		}
@@ -1165,7 +1023,6 @@ std::list<Position> Map::getPathTo(Position start, Position to){
 	for(std::list<Position>::iterator it = path.begin();
 		it != path.end(); it++){
 		Position p = *it;
-		// std::cout << "PATH: " << p.x << " " << p.y << std::endl;
 	}
 	return path;
 }

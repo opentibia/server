@@ -14,23 +14,7 @@ end
 
 -- do one step to reach position
 function moveToPosition(x,y,z)
-	sx, sy, sz = selfGetPosition()
-	dx=sx-x
-	dy=sy-y
-	dz=sz-z
-	if math.abs(dx) > math.abs(dy) then
-		if dx < 0 then
-			selfMove(1)
-		else
-			selfMove(3)
-		end
-	else
-		if dy < 0 then
-			selfMove(0)	
-		else
-			selfMove(2)
-		end
-	end
+	selfMoveTo(x, y, z)
 end
 
 -- do one step to reach creature

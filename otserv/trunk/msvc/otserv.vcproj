@@ -25,6 +25,7 @@
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
+				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="TRUE"
@@ -156,6 +157,9 @@
 				RelativePath="..\protocol70.cpp">
 			</File>
 			<File
+				RelativePath="..\status.cpp">
+			</File>
+			<File
 				RelativePath="..\thing.cpp">
 			</File>
 			<File
@@ -213,6 +217,9 @@
 			</File>
 			<File
 				RelativePath="..\scheduler.h">
+			</File>
+			<File
+				RelativePath="..\status.h">
 			</File>
 			<File
 				RelativePath="..\tasks.h">

@@ -21,7 +21,7 @@ function onCreatureAppear(creature)
 end
 
 
-function onCreatureDisappear(id, stackpos)
+function onCreatureDisappear(id)
 	if id == target then
 		target = 0
 		attacking = false
@@ -31,7 +31,7 @@ function onCreatureDisappear(id, stackpos)
 end
 
 
-function onCreatureTurn(creature, stackpos)
+function onCreatureTurn(creature)
 
 end
 

@@ -22,6 +22,13 @@ public:
 			return false;
 	}
 
+	bool operator!=(const Position p)  const {
+		if(p.x==x && p.y==y && p.z ==z)
+			return false;
+		else
+			return true;
+	}
+
 	Position operator-(const Position p1){
 		return Position(x-p1.x, y-p1.y,z-p1.z);
 	}

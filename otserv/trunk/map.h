@@ -103,7 +103,7 @@ class Map {
 
     Creature* getCreatureByID(unsigned long id);
 
-	std::list<Position> getPathTo(Position start, Position to);
+	std::list<Position> getPathTo(Position start, Position to, bool creaturesBlock=true);
 
     OTSYS_THREAD_LOCKVAR mapLock;
   protected:

@@ -43,8 +43,8 @@ public:
 	NpcScript(std::string name, Npc* npc);
 	virtual ~NpcScript(){}
 //	virtual void onThingMove(const Player *player, const Thing *thing, const Position *oldPos, unsigned char oldstackpos);
-//	virtual void onCreatureAppear(const Creature *creature);
-//	virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos);
+	virtual void onCreatureAppear(int cid);
+	virtual void onCreatureDisappear(int cid);
 //	virtual void onCreatureTurn(const Creature *creature, unsigned char stackpos);
 	virtual void onCreatureSay(int cid, unsigned char type, const std::string &text);
 	virtual void onThink();
@@ -52,6 +52,7 @@ public:
 	static Npc* getNpc(lua_State *L);
 	static int luaActionSay(lua_State *L);
 	static int luaActionMove(lua_State *L);
+	static int luaActionMoveTo(lua_State *L);
 	static int luaCreatureGetName(lua_State *L);
 	static int luaActionAttackCreature(lua_State *L);
 	static int luaCreatureGetPos(lua_State *L);
@@ -90,6 +91,7 @@ public:
 
   void doSay(std::string msg);
   void doMove(int dir);
+  void doMoveTo(Position pos);
   void doAttack(int id);
 
 protected:
@@ -104,6 +106,7 @@ protected:
   std::string name;
   std::string scriptname;
   NpcScript* script;
+  std::list<Position> route;
 };
 
 
