@@ -84,16 +84,18 @@ public:
   virtual void drainHealth(int);
 
   void    setAttackedCreature(unsigned long id);
+
+  virtual int getWeaponDamage() const {
+	return 1+(int)(10.0*rand()/(RAND_MAX+1.0));
+  }
+
   unsigned long attackedCreature;
 
   virtual bool isAttackable() { return true; };
 
-
-
-
-		virtual int sendInventory(){return 0;};
-		virtual int addItem(Item* item, int pos){return 0;};
-		virtual Item* getItem(int pos){return NULL;}
+  virtual int sendInventory(){return 0;};
+  virtual int addItem(Item* item, int pos){return 0;};
+  virtual Item* getItem(int pos){return NULL;}
 
 
   int lookhead, lookbody, looklegs, lookfeet, looktype, lookcorpse;

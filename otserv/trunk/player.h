@@ -82,9 +82,9 @@ public:
   int sex, voc;
   int cap;
 
-
   int food;
 
+  virtual int getWeaponDamage() const;
 
   // experience
   unsigned long experience;

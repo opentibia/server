@@ -200,53 +200,6 @@ OTSYS_THREAD_RETURN Map::eventThread(void *p)
     }
   }
 
-  /*
-
-     if (eventTick < OTSYS_TIME() / 10)
-     {
-     list<MapEvent> *eventList = NULL;
-
-     OTSYS_THREAD_LOCK(_this->eventLock)
-     {
-     eventList = _this->eventLists[eventTick % 12000];
-     _this->eventLists[eventTick % 12000] = NULL;
-     }
-     OTSYS_THREAD_UNLOCK(_this->eventLock)
-
-     if (eventList != NULL)
-     {
-     std::list<MapEvent>::iterator it;
-     for (it = eventList->begin(); it != eventList->end(); it++)
-     {
-     if ((*it).tick == eventTick)
-     {
-     switch ((*it).type)
-     {
-     case EVENT_CHECKPLAYER:
-     _this->checkPlayer((unsigned long)(*it).data);
-     break;
-
-     case EVENT_CHECKPLAYERATTACKING:
-     _this->checkPlayerAttacking((unsigned long)(*it).data);
-     break;
-     }
-     }
-     else
-     {
-  // todo reschedule 
-  }
-  }
-
-  delete eventList;
-  }
-
-  eventTick++;
-  }
-  else
-  {
-  OTSYS_SLEEP(1);  // nothing to-do :)
-  }
-  */
 }
 
 void Map::addEvent(SchedulerTask* event) {
@@ -947,7 +900,8 @@ void Map::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fig
 	if(!inReach)
 		return;
 	
-	int damage = 1+(int)(10.0*rand()/(RAND_MAX+1.0));
+	int damage = creature->getWeaponDamage();
+	//int damage = 1+(int)(10.0*rand()/(RAND_MAX+1.0));
 	if (creature->access != 0)
 		damage += 1337;
 	if (damage < -50 || attackedCreature->access != 0)
@@ -1380,7 +1334,7 @@ void Map::playerCastSpell(Creature *player, const std::string &text)
 				{0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0},
 				{0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0},
 				{0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0},
-				{0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0},
+				{0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0},
 				{0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0},
 				{0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0},
 				{0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0},

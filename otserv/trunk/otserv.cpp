@@ -128,8 +128,8 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
       unsigned short version  = msg.GetU16();
       unsigned char  unknown  = msg.GetByte();
 
-	    std::string name     = msg.GetString();
-	    std::string password = msg.GetString();
+      std::string name     = msg.GetString();
+      std::string password = msg.GetString();
 
       Protocol70 *protocol = new Protocol70(s);
 

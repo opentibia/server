@@ -86,6 +86,41 @@ Item* Player::getItem(int pos)
 	return NULL;
 }
 
+int Player::getWeaponDamage() const {
+	double damagemax = 0;
+	  for (int slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++)
+		  if (items[slot]) {
+			if ((items[slot]->isWeapon())) {
+				// check which kind of skill we use...
+				// and calculate the damage dealt
+				switch (items[slot]->getWeaponType()) {
+					case SWORD:
+						damagemax = 3*skills[2][SKILL_LEVEL] + 2*Item::items[items[slot]->getID()].attack;
+						break;
+					case CLUB:
+						damagemax = 3*skills[1][SKILL_LEVEL] + 2*Item::items[items[slot]->getID()].attack;
+						break;
+					case AXE:
+						damagemax = 3*skills[3][SKILL_LEVEL] + 2*Item::items[items[slot]->getID()].attack;
+						break;
+					case DIST:
+						damagemax = 4*skills[4][SKILL_LEVEL];
+						break;
+					case MAGIC:
+						damagemax = level*10+maglevel*30;
+						break;
+			}
+		  }
+
+	  // no weapon found -> fist fighting
+	  if (damagemax == 0)
+		  damagemax = 2*skills[3][SKILL_LEVEL] + Item::items[items[slot]->getID()].attack;
+
+	  // return it
+	  return 1+(int)(damagemax*rand()/(RAND_MAX+1.0));
+}
+		  
+}
 
 void Player::speak(const std::string &text)
 {

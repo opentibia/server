@@ -260,7 +260,7 @@ int Items::loadXMLInfos(std::string file)
 					char* type = (char*)xmlGetProp(p, (xmlChar*)"type");
 				  if (type)
           {
-            if (!stricmp(type, "container"))
+            if (!strcmp(type, "container"))
             {
 							// we have a container...
 							// TODO set that we got a container
@@ -271,24 +271,24 @@ int Items::loadXMLInfos(std::string file)
 								std::cout << "item " << id << " is a container but lacks a maxitems definition." << std::endl;
 
 						}
-            else if (!stricmp(type, "weapon"))
+            else if (!strcmp(type, "weapon"))
             {
 							// we have a weapon...
 							// find out which type of weapon we have...
               char *skill = (char*)xmlGetProp(p, (xmlChar*)"skill");
               if (skill)
               {
-						    if (!stricmp(skill, "sword"))
+						    if (!strcmp(skill, "sword"))
 								  itemtype->weaponType = SWORD;
-							  else if (!stricmp(skill, "club"))
+							  else if (!strcmp(skill, "club"))
 							    itemtype->weaponType = CLUB;
-							  else if (!stricmp(skill, "axe"))
+							  else if (!strcmp(skill, "axe"))
 								  itemtype->weaponType = AXE;
-							  else if (!stricmp(skill, "distance"))
+							  else if (!strcmp(skill, "distance"))
 								  itemtype->weaponType = DIST;
-							  else if (!stricmp(skill, "magic"))
+							  else if (!strcmp(skill, "magic"))
 								  itemtype->weaponType = MAGIC;
-							  else if (!stricmp(skill, "shielding"))
+							  else if (!strcmp(skill, "shielding"))
 								  itemtype->weaponType = SHIELD;
                 else
                   std::cout << "wrong skill tag for weapon" << std::endl;
@@ -309,12 +309,12 @@ int Items::loadXMLInfos(std::string file)
 								std::cout << "missing defence tag for weapon: " << id << std::endl;
 
 						}
-            else if (!stricmp(type, "amunition"))
+            else if (!strcmp(type, "amunition"))
             {
 							// we got some amo
 							itemtype->weaponType = AMO;
 						}
-            else if (!stricmp(type, "armor"))
+            else if (!strcmp(type, "armor"))
             {
 							// armor...
 						}

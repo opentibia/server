@@ -109,6 +109,9 @@ unsigned int NetworkMessage::GetU32()
 std::string NetworkMessage::GetString()
 {
   int stringlen = GetU16();
+  if (stringlen >= (16384 - m_ReadPos))
+	  return std::string();
+
   char* v = (char*)(m_MsgBuf+m_ReadPos);
   m_ReadPos += stringlen;
   return std::string(v, stringlen);
