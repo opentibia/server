@@ -204,7 +204,6 @@ for(int i = 10;i<=checkSkill;i++){
         reqTries = (int)(reqTries*1.1);
 }
 //Need skill up?
-printf("%d -- %d\n", tries, reqTries);
 if (tries >= reqTries)
 {
    skills[skill][SKILL_LEVEL] = checkSkill;
