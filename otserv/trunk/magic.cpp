@@ -20,21 +20,29 @@
 
 #include "definitions.h"
 #include "creature.h"
-#include "magic.h"
-
+#include "monster.h"
 #include "player.h"
+
+#include "magic.h"
 
 
 MagicEffectClass::MagicEffectClass()
 {
 	animationColor = 0;
 	animationEffect = 0;
+	hitEffect = 0xFF;
 	damageEffect = 0xFF;
 	minDamage = 0;
 	maxDamage = 0;
 	offensive = false;
-	physical = false;
+	drawblood = false;
 	manaCost = 0;
+	attackType = ATTACK_NONE;
+}
+ 
+bool MagicEffectClass::isIndirect() const
+{
+	return false;
 }
 
 bool MagicEffectClass::causeExhaustion(bool hasTarget) const
@@ -44,6 +52,9 @@ bool MagicEffectClass::causeExhaustion(bool hasTarget) const
 
 int MagicEffectClass::getDamage(Creature *target, const Creature *attacker /*= NULL*/) const
 {
+	if((attackType != ATTACK_NONE) && (target->getImmunities() & attackType) == attackType)
+		return 0;
+
 	if((!offensive || (target != attacker)) && target->access == 0) {
 		int damage = (int)random_range(minDamage, maxDamage);
 
@@ -53,9 +64,15 @@ int MagicEffectClass::getDamage(Creature *target, const Creature *attacker /*= N
 			if(attacker && attacker->access != 0)
 				return damage;
 
-			const Player* p = dynamic_cast<const Player*>(target);
+			const Monster *monster = dynamic_cast<const Monster*>(attacker);
+			if(monster) {
+				//no reductation of damage if attack came from a monster
+				return damage;
+			}
 
-			if(p) {
+			const Player *targetPlayer = dynamic_cast<const Player*>(target);
+
+			if(targetPlayer) {
 				damage = (int)floor(damage / 2.0);
 			}
 		}
@@ -66,16 +83,26 @@ int MagicEffectClass::getDamage(Creature *target, const Creature *attacker /*= N
 	return 0;
 }
 
-void MagicEffectClass::getMagicEffect(const Player* spectator, const Creature* attacker, const Position& pos,
-			bool hasTarget, int damage, bool isPz, bool isBlocking, NetworkMessage &msg) const
+void MagicEffectClass::getMagicEffect(const Player* spectator, const Creature* attacker, const Creature* target,
+	const Position& pos, /*bool hasTarget,*/ int damage, bool isPz, bool isBlocking, NetworkMessage &msg) const
 {
-	if(!isBlocking && hasTarget) {
+	if(!isBlocking && target != NULL /*hasTarget*/) {
 		if(spectator->CanSee(pos.x, pos.y, pos.z)) {
-			if(physical && damage > 0)
-				msg.AddMagicEffect(pos, NM_ME_DRAW_BLOOD);
+			if(target->access == 0) {
+				if(damageEffect != 0xFF) {
+					if(offensive && (target->getImmunities() & attackType) == attackType) {
+						msg.AddMagicEffect(pos, NM_ME_BLOCKHIT);
+					}
+					else {
+						msg.AddMagicEffect(pos, damageEffect);
+					}
+				}
 
-			if(damageEffect != 0xFF)
-				msg.AddMagicEffect(pos, damageEffect);
+				if(hitEffect != 0xFF)
+					msg.AddMagicEffect(pos, hitEffect);
+			}
+			else
+				msg.AddMagicEffect(pos, NM_ME_PUFF);
 		}
 	}
 }
@@ -105,18 +132,23 @@ bool MagicEffectClass::canCast(bool isBlocking, bool hasCreature) const
 	return !isBlocking;
 }
 
+void MagicEffectClass::FailedToCast(const Player* spectator, const Creature* attacker,
+		bool isBlocking, bool hasTarget, NetworkMessage &msg) const
+{
+	//default: nothing
+}
+
 //Need a target
 MagicEffectTargetClass::MagicEffectTargetClass()
 {
 	//
 }
-
-void MagicEffectTargetClass::getMagicEffect(const Player* spectator, const Creature* attacker, const Position& pos,
-			bool hasTarget, int damage, bool isPz, bool isBlocking, NetworkMessage &msg) const
+void MagicEffectTargetClass::getMagicEffect(const Player* spectator, const Creature* attacker, const Creature* target,
+	const Position& pos, /*bool hasTarget,*/ int damage, bool isPz, bool isBlocking, NetworkMessage &msg) const
 {
-	if(hasTarget) {
+	if(target != NULL) {
 		//default
-		MagicEffectClass::getMagicEffect(spectator, attacker, pos, hasTarget, damage, isPz, isBlocking, msg);
+		MagicEffectClass::getMagicEffect(spectator, attacker, target, pos, /*hasTarget,*/ damage, isPz, isBlocking, msg);
 	}
 	else {
 		if(attacker) {
@@ -137,29 +169,32 @@ void MagicEffectTargetClass::getDistanceShoot(const Player* spectator, const Cre
 	}
 }
 
-MagicDamageContainer::MagicDamageContainer(enum MagicDamageType md) 
-: magictype(md)
-{
-
-}
-
-MagicDamageContainer::MagicDamageContainer(MagicDamageType md, MagicDamageVec list)
-: magictype(md)
-{
-	this->assign(list.begin(), list.end());
-}
-
-
-MagicEffectTargetExClass::MagicEffectTargetExClass(MagicDamageType md, const MagicDamageVec& dmglist)
-: dmgContainer(md, dmglist)
+MagicEffectTargetExClass::MagicEffectTargetExClass(const ConditionVec& dmglist) :
+condition(dmglist)
 {
 
 }
 
 int MagicEffectTargetExClass::getDamage(Creature *target, const Creature *attacker /*= NULL*/) const
 {
+	if((attackType != ATTACK_NONE) && (target->getImmunities() & attackType) == attackType)
+		return 0;
+
 	if((!offensive || (target != attacker)) && target->access == 0) {
-		target->addMagicDamage(dmgContainer, true);
+		
+		//target->addMagicDamage(dmgContainer, true);
+
+		bool refresh = true;
+		for(ConditionVec::const_iterator condIt = condition.begin(); condIt != condition.end(); ++condIt) {
+			if(condIt == condition.begin()) //skip first
+				continue;
+			
+			if((condIt->getCondition()->attackType != ATTACK_NONE) &&
+				(target->getImmunities() & condIt->getCondition()->attackType) != condIt->getCondition()->attackType) {
+				target->addCondition(*condIt, refresh);
+				refresh = false; //only set refresh flag on first "new event"
+			}
+		}
 
 		int damage = (int)random_range(minDamage, maxDamage);
 
@@ -173,14 +208,17 @@ int MagicEffectTargetExClass::getDamage(Creature *target, const Creature *attack
 }
 
 //Burning/poisoned/energized
-MagicEffectTargetMagicDamageClass::MagicEffectTargetMagicDamageClass(const unsigned long creatureid)
+MagicEffectTargetCreatureCondition::MagicEffectTargetCreatureCondition(const unsigned long creatureid)
 : ownerid(creatureid)
 {
 	//
 }
 
-int MagicEffectTargetMagicDamageClass::getDamage(Creature *target, const Creature *attacker /*= NULL*/) const
+int MagicEffectTargetCreatureCondition::getDamage(Creature *target, const Creature *attacker /*= NULL*/) const
 {
+	if((attackType != ATTACK_NONE) && (target->getImmunities() & attackType) == attackType)
+		return 0;
+
 	if(target->access == 0) {
 		int damage = (int)random_range(minDamage, maxDamage);
 
@@ -191,6 +229,22 @@ int MagicEffectTargetMagicDamageClass::getDamage(Creature *target, const Creatur
 	}
 
 	return 0;
+}
+
+void MagicEffectTargetCreatureCondition::getMagicEffect(const Player* spectator, const Creature* attacker, const Creature* target,
+	const Position& pos, /*bool hasTarget,*/ int damage, bool isPz, bool isBlocking, NetworkMessage &msg) const
+{
+	if(target != NULL) {
+		//default
+		MagicEffectClass::getMagicEffect(spectator, attacker, target, pos, /*hasTarget,*/ damage, isPz, isBlocking, msg);
+	}
+	else {
+		if(spectator->CanSee(pos.x, pos.y, pos.z)) {
+			msg.AddMagicEffect(pos, NM_ME_PUFF);
+		}
+	}
+
+	//MagicEffectTargetClass::getMagicEffect(spectator, attacker, pos, hasTarget, damage, isPz, isBlocking, msg);
 }
 
 
@@ -228,8 +282,8 @@ bool MagicEffectTargetGroundClass::canCast(bool isBlocking, bool hasCreature) co
 	return true;
 }
 
-void MagicEffectTargetGroundClass::getMagicEffect(const Player* spectator, const Creature* attacker, const Position& pos,
-			bool hasTarget, int damage, bool isPz, bool isBlocking, NetworkMessage &msg) const
+void MagicEffectTargetGroundClass::FailedToCast(const Player* spectator, const Creature* attacker,
+		bool isBlocking, bool hasTarget, NetworkMessage &msg) const
 {
 	const Player* player = dynamic_cast<const Player*>(attacker);
 
@@ -247,10 +301,16 @@ void MagicEffectTargetGroundClass::getMagicEffect(const Player* spectator, const
 	}
 }
 
+void MagicEffectTargetGroundClass::getMagicEffect(const Player* spectator, const Creature* attacker, const Creature* target,
+		const Position& pos, int damage, bool isPz, bool isBlocking, NetworkMessage &msg) const
+{
+	//Default: nothing
+}
+
 void MagicEffectTargetGroundClass::getDistanceShoot(const Player* spectator, const Creature* attacker, const Position& to,
 			bool hasTarget, NetworkMessage &msg) const
 {
-	if(hasTarget && animationEffect > 0) {
+	if(!hasTarget && animationEffect > 0) {
 		if(spectator->CanSee(attacker->pos.x, attacker->pos.y, attacker->pos.z) || spectator->CanSee(to.x, to.y, to.z)) {
 			msg.AddDistanceShoot(attacker->pos, to, animationEffect);
 		}
@@ -261,15 +321,14 @@ MagicEffectAreaClass::MagicEffectAreaClass()
 {
 	direction = 0;
 	areaEffect = 0xFF;
-	//memset(area, 0, sizeof(area));
 }
 
-void MagicEffectAreaClass::getMagicEffect(const Player* spectator, const Creature* attacker, const Position& pos,
-			bool hasTarget, int damage, bool isPz, bool isBlocking, NetworkMessage &msg) const
+void MagicEffectAreaClass::getMagicEffect(const Player* spectator, const Creature* attacker, const Creature* target,
+	const Position& pos, /*bool hasTarget,*/ int damage, bool isPz, bool isBlocking, NetworkMessage &msg) const
 {
-	if(hasTarget) {
+	if(target != NULL) {
 		//default
-		MagicEffectClass::getMagicEffect(spectator, attacker, pos, hasTarget, damage, isPz, isBlocking, msg);
+		MagicEffectClass::getMagicEffect(spectator, attacker, target, pos, /*hasTarget,*/ damage, isPz, isBlocking, msg);
 	}
 	else {
 		if(!isBlocking && areaEffect != 0xFF && (attacker->access != 0 || !isPz)) {
@@ -307,16 +366,32 @@ void MagicEffectAreaClass::getArea(const Position& rcenterpos, MagicAreaVec& lis
 	}
 }
 
-MagicEffectAreaExClass::MagicEffectAreaExClass(MagicDamageType md, const MagicDamageVec& dmglist)
-: dmgContainer(md, dmglist)
+MagicEffectAreaExClass::MagicEffectAreaExClass(const ConditionVec& dmglist) :
+condition(dmglist)
 {
-
+	//
 }
 
 int MagicEffectAreaExClass::getDamage(Creature *target, const Creature *attacker /*= NULL*/) const
 {
+	if((attackType != ATTACK_NONE) && (target->getImmunities() & attackType) == attackType)
+		return 0;
+
 	if(target->access == 0) {
-		target->addMagicDamage(dmgContainer, true);
+		//target->addMagicDamage(dmgContainer, true);
+
+		bool refresh = true;
+		for(ConditionVec::const_iterator condIt = condition.begin(); condIt != condition.end(); ++condIt) {
+			if(condIt == condition.begin()) //skip first
+				continue;
+
+			if((condIt->getCondition()->attackType != ATTACK_NONE) &&
+				(target->getImmunities() & condIt->getCondition()->attackType) != condIt->getCondition()->attackType) {
+				target->addCondition(*condIt, refresh);
+				refresh = false; //only set refresh flag on first "new event"
+			}
+		}
+
 		int damage = (int)random_range(minDamage, maxDamage);
 
 		if(!offensive)
@@ -343,22 +418,15 @@ MagicEffectAreaGroundClass::~MagicEffectAreaGroundClass()
 
 int MagicEffectAreaGroundClass::getDamage(Creature *target, const Creature *attacker /*= NULL*/) const
 {
+	if((attackType != ATTACK_NONE) && (target->getImmunities() & attackType) == attackType)
+		return 0;
+
 	if(target->access == 0) {
 		if(magicItem) {
 			return magicItem->getDamage(target, attacker);
 		}
 		else
 			return 0;
-
-		/*
-		c->addMagicDamage(dmgContainer, true);
-		int damage = (int)random_range(minDamage, maxDamage);
-
-		if(!offensive)
-			damage = -damage;
-
-		return damage;
-		*/
 	}
 
 	return 0;
@@ -374,49 +442,33 @@ MagicEffectItem* MagicEffectAreaGroundClass::getMagicItem(const Creature* attack
 }
 
 //Constructor for solid objects.
-MagicEffectItem::MagicEffectItem(const damageMapClass& dmgmap)
-: dmgContainer(magicNone)
+MagicEffectItem::MagicEffectItem(const TransformMap& transformMap)
 {
-	this->dmgMap = dmgmap;
+	this->transformMap = transformMap;
 
 	unsigned short type = 0;
-	damageMapClass::iterator dm = dmgMap.begin();
-	if(dm != dmgMap.end()) {
+	TransformMap::const_iterator dm = transformMap.begin();
+	if(dm != transformMap.end()) {
 		type = dm->first;
 	}
 
 	setID(type);
-}
-
-//Fire/Poison/Energy fields.
-MagicEffectItem::MagicEffectItem(MagicDamageType md, const damageMapClass& dmgmap)
-: dmgContainer(md)
-{
-	this->dmgMap = dmgmap;
-
-	unsigned short type = 0;
-	damageMapClass::iterator dm = dmgMap.begin();
-	if(dm != dmgMap.end()) {
-		type = dm->first;
-	}
-
-	setID(type);
-	buildDamageList();
+	buildCondition();
 }
 
 bool MagicEffectItem::transform(const MagicEffectItem *rhs)
 {
-	this->dmgMap = rhs->dmgMap;
+	this->transformMap = rhs->transformMap;
 	setID(rhs->getID());
 
-	buildDamageList();
+	buildCondition();
 	return true;
 }
 
 long MagicEffectItem::getDecayTime()
 {
-	damageMapClass::iterator dm = dmgMap.find(getID());
-	if(dm != dmgMap.end()) {
+	TransformMap::iterator dm = transformMap.find(getID());
+	if(dm != transformMap.end()) {
 		return dm->second.first;
 	}
 	
@@ -425,15 +477,15 @@ long MagicEffectItem::getDecayTime()
 
 bool MagicEffectItem::transform()
 {
-	damageMapClass::iterator dm = dmgMap.find(getID());
-	if(dm != dmgMap.end()) {
+	TransformMap::iterator dm = transformMap.find(getID());
+	if(dm != transformMap.end()) {
 
 		//get next id to transform to
 		dm++;
 
-		if(dm != dmgMap.end()) {
+		if(dm != transformMap.end()) {
 			setID(dm->first);
-			buildDamageList();
+			buildCondition();
 			return true;
 		}
 	}
@@ -441,16 +493,16 @@ bool MagicEffectItem::transform()
 	return false;
 }
 
-void MagicEffectItem::buildDamageList()
+void MagicEffectItem::buildCondition()
 {
-	dmgContainer.clear();
+	condition.clear();
 
-	damageMapClass::iterator dm = dmgMap.find(getID());
-	if(dm != dmgMap.end()) {
-		while(dm != dmgMap.end()) {
-			for(MagicDamageVec::iterator di = dm->second.second.begin(); di != dm->second.second.end(); di++) {
+	TransformMap::iterator dm = transformMap.find(getID());
+	if(dm != transformMap.end()) {
+		while(dm != transformMap.end()) {
+			for(ConditionVec::iterator di = dm->second.second.begin(); di != dm->second.second.end(); di++) {
 
-				dmgContainer.push_back(*di);
+				condition.push_back(*di);
 			}
 
 			dm++;
@@ -460,12 +512,30 @@ void MagicEffectItem::buildDamageList()
 
 int MagicEffectItem::getDamage(Creature *target, const Creature *attacker /*= NULL*/) const
 {
+	/* ALWAYS ATTACK_NONE
+	if((attackType != ATTACK_NONE) && (target->getImmunities() & attackType) == attackType)
+		return 0;
+	*/
+
 	if(target->access == 0) {
-		target->addMagicDamage(dmgContainer, true);
-		const MagicEffectTargetMagicDamageClass *magicTargetDmg = getMagicDamageEffect();
+		//target->addMagicDamage(dmgContainer, true);
+
+		bool refresh = true;
+		for(ConditionVec::const_iterator condIt = condition.begin(); condIt != condition.end(); ++condIt) {
+			if(condIt == condition.begin()) //skip first
+				continue;
+
+			if((condIt->getCondition()->attackType != ATTACK_NONE) &&
+				(target->getImmunities() & condIt->getCondition()->attackType) != condIt->getCondition()->attackType) {
+				target->addCondition(*condIt, refresh);
+				refresh = false; //only set refresh flag on first "new event"
+			}
+		}
+
+		const MagicEffectTargetCreatureCondition *magicTargetCondition = getCondition();
 		
-		if(magicTargetDmg)
-			return magicTargetDmg->getDamage(target, attacker);
+		if(magicTargetCondition)
+			return magicTargetCondition->getDamage(target, attacker);
 		else
 			return 0;
 	}
@@ -473,10 +543,10 @@ int MagicEffectItem::getDamage(Creature *target, const Creature *attacker /*= NU
 	return 0;
 }
 
-const MagicEffectTargetMagicDamageClass* MagicEffectItem::getMagicDamageEffect() const
+const MagicEffectTargetCreatureCondition* MagicEffectItem::getCondition() const
 {
-	if(dmgContainer.size() > 0) {
-		return &dmgContainer[0].second;
+	if(condition.size() > 0) {
+		return condition[0].getCondition();
 	}
 
 	return NULL;
