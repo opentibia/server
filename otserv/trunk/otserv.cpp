@@ -61,109 +61,104 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
   SOCKET s = *(SOCKET*)dat;
   
   NetworkMessage msg;
-  msg.ReadFromSocket(s);
-
-  unsigned short protId = msg.GetU16();
-
-  // login server connection
-  if (protId == 0x0201)
+  if (msg.ReadFromSocket(s))
   {
-    msg.SkipBytes(15);
+    unsigned short protId = msg.GetU16();
 
-    unsigned int accnumber = msg.GetU32();
-	 std::string password        = msg.GetString();
-
-
-    int serverip = serverIPs[0].first;
-
-    sockaddr_in sain;
-    socklen_t salen = sizeof(sockaddr_in);
-    if (getpeername(s, (sockaddr*)&sain, &salen) == 0)
+    // login server connection
+    if (protId == 0x0201)
     {
-      unsigned long clientip = *(unsigned long*)&sain.sin_addr;
-      for (int i = 0; i < serverIPs.size(); i++)
-        if ((serverIPs[i].first & serverIPs[i].second) == (clientip & serverIPs[i].second))
-        {
-          serverip = serverIPs[i].first;
-          break;
-        }
-    }
+      msg.SkipBytes(15);
 
-    msg.Reset();
+      unsigned int accnumber = msg.GetU32();
+	    std::string  password  = msg.GetString();
 
-    Account account;
-    char accstring[16];
-	  sprintf(accstring, "%i", accnumber);
+      int serverip = serverIPs[0].first;
 
-    if (account.openAccount(accstring, password))
-    {
-      msg.AddByte(0x14);
-      msg.AddString("1\nWelcome to OpenTibia.");
-
-      msg.AddByte(0x64);
-      msg.AddByte(account.charList.size());
-
-		std::list<std::string>::iterator it;
-      for (it = account.charList.begin(); it != account.charList.end(); it++)
+      sockaddr_in sain;
+      socklen_t salen = sizeof(sockaddr_in);
+      if (getpeername(s, (sockaddr*)&sain, &salen) == 0)
       {
-        msg.AddString((*it));
-        msg.AddString("OpenTibia");
-        msg.AddU32(serverip);
-        msg.AddU16(atoi(g_config.getGlobalString("port").c_str()));
+        unsigned long clientip = *(unsigned long*)&sain.sin_addr;
+        for (int i = 0; i < serverIPs.size(); i++)
+          if ((serverIPs[i].first & serverIPs[i].second) == (clientip & serverIPs[i].second))
+          {
+            serverip = serverIPs[i].first;
+            break;
+          }
       }
 
-      msg.AddU16(account.premDays);
+      msg.Reset();
+
+      Account account;
+      char accstring[16];
+	    sprintf(accstring, "%i", accnumber);
+
+      if (account.openAccount(accstring, password))
+      {
+        msg.AddByte(0x14);
+        msg.AddString("1\nWelcome to OpenTibia.");
+
+        msg.AddByte(0x64);
+        msg.AddByte(account.charList.size());
+
+		    std::list<std::string>::iterator it;
+        for (it = account.charList.begin(); it != account.charList.end(); it++)
+        {
+          msg.AddString((*it));
+          msg.AddString("OpenTibia");
+          msg.AddU32(serverip);
+          msg.AddU16(atoi(g_config.getGlobalString("port").c_str()));
+        }
+
+        msg.AddU16(account.premDays);
+      }
+      else
+      {
+        msg.AddByte(0x0A);
+        msg.AddString("Please enter a valid account number and password.");
+      }
+
+      msg.WriteToSocket(s);
+      closesocket(s);
     }
-    else
+    // gameworld connection tibia 7.1
+    else if (protId == 0x020A)
     {
-      msg.AddByte(0x0A);
-      msg.AddString("Please enter a valid account number and password.");
+      unsigned char  clientos = msg.GetByte();
+      unsigned short version  = msg.GetU16();
+      unsigned char  unknown  = msg.GetByte();
+
+	    std::string name     = msg.GetString();
+	    std::string password = msg.GetString();
+
+      Protocol70 *protocol = new Protocol70(s);
+
+      Player *player;
+      player = new Player(name.c_str(), protocol);
+      player->usePlayer();
+
+      protocol->setPlayer(player);
+
+      Account account;
+      if (account.openPlayer(name, password, *player))
+      {
+        if (!protocol->ConnectPlayer())  {
+				    std::cout << "reject player..." << std::endl;
+				    msg.Reset();
+				    msg.AddByte(0x14);
+				    msg.AddString("Too many Players online.");
+
+				    msg.WriteToSocket(s);
+            closesocket(s);
+        } else {
+				    protocol->ReceiveLoop();
+            // protocol/player will close socket
+		    }
+      }
     }
-
-    msg.WriteToSocket(s);
-
-    closesocket(s);
-  }
-  // gameworld connection tibia 7.1
-  else if (protId == 0x020A)
-  {
-    unsigned char  clientos = msg.GetByte();
-    unsigned short version  = msg.GetU16();
-    unsigned char  unknown  = msg.GetByte();
-
-	 std::string name     = msg.GetString();
-	 std::string password = msg.GetString();
-
-
-    Protocol70 *protocol = new Protocol70(s);
-
-    Player *player;
-    player = new Player(name.c_str(), protocol);
-    player->usePlayer();
-
-    protocol->setPlayer(player);
-
-    Account account;
-    if (account.openPlayer(name, password, *player))
-    {
-      if (!protocol->ConnectPlayer())  {
-				  std::cout << "reject player..." << std::endl;
-				  msg.Reset();
-				  msg.AddByte(0x14);
-				  msg.AddString("Too many Players online.");
-
-				  msg.WriteToSocket(s);
-				  closesocket(s);
-
-		} else {
-				  protocol->ReceiveLoop();
-		}
-    }
-
-    closesocket(s);
   }
 }
-
 
 
 

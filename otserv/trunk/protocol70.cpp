@@ -52,7 +52,6 @@ Protocol70::Protocol70(SOCKET s)
 
 Protocol70::~Protocol70()
 {
-	closesocket(s);
 }
 
 
@@ -66,12 +65,16 @@ void Protocol70::ReceiveLoop()
 {
   NetworkMessage msg;
 
-  while (msg.ReadFromSocket(s)) {
+  while (msg.ReadFromSocket(s))
+  {
     parsePacket(msg);
   }
 
+  closesocket(s);
+
   // logout by disconnect?  -> kick
-  if (player) {
+  if (player)
+  {
 			 map->removeCreature(player);
   }
 }
@@ -248,8 +251,8 @@ void Protocol70::parseLogout(NetworkMessage &msg)
 	if (map->removeCreature(player))
 	{
 	  player = NULL;
+    closesocket(s);
 	}
-	closesocket(s);
 }
 
 void Protocol70::parseMoveByMouse(NetworkMessage &msg)

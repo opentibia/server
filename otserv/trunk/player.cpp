@@ -142,7 +142,9 @@ void Player::sendNetworkMessage(NetworkMessage *msg)
 
 void Player::onThingMove(const Creature *creature, const Thing *thing, const Position *oldPos, unsigned char oldstackpos)
 {
+#ifdef __DEBUG__
 	std::cout << "On thing move" << std::endl;
+#endif
   client->sendThingMove(creature, thing, oldPos, oldstackpos);
 }
 

@@ -649,7 +649,7 @@ void Map::thingMove(Creature *player, Thing *thing,
 {
   OTSYS_THREAD_LOCK(mapLock)
 
-    Tile *fromTile = getTile(thing->pos.x, thing->pos.y, thing->pos.z);
+  Tile *fromTile = getTile(thing->pos.x, thing->pos.y, thing->pos.z);
 
   if (fromTile)
   {
@@ -693,7 +693,9 @@ void Map::thingMoveInternal(Creature *player,
     oldPos.y = from_y;
     oldPos.z = from_z;
 
-	std::cout << "moving" << std::endl;
+#ifdef __DEBUG__
+	  std::cout << "moving" << std::endl;
+#endif
 
     Tile *fromTile = getTile(from_x, from_y, from_z);
     Tile *toTile   = getTile(to_x, to_y, to_z);
