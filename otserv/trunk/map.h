@@ -101,12 +101,6 @@ public:
 	//Creates a union of 2 positions
 	Range(const Position& pos1, const Position& pos2)
 	{
-		/*
-		Range r1(pos1, true);
-		Range r2(pos2, true);
-		*/
-
-		//*
 		Position topleft(std::min(pos1.x, pos2.x), std::min(pos1.y, pos2.y), pos1.z);
 		Position bottomright(std::max(pos1.x, pos2.x), std::max(pos1.y, pos2.y), pos1.z);
 
@@ -116,7 +110,6 @@ public:
 		minRange.y = -7;
 		maxRange.x = std::max(topleft.x + 9, bottomright.x + 9) - topleft.x; //(bottomright.x - topleft.x);
 		maxRange.y = std::max(topleft.y + 7, bottomright.y + 7) - topleft.y; //(bottomright.y - topleft.y);
-		//*/
 	}
 
 	Range(Position centerpos, int minRangeX, int maxRangeX, int minRangeY, int maxRangeY)

@@ -117,13 +117,20 @@ public:
 	bool isLoaded() const {return loaded;}
 
 private:
+	Game* game;
+	std::list<Position> route;
+
+	int oldThinkTicks;
+	Position targetPos;
+	Position moveToPos;
+	void doMoveTo(const Position &target);
+
 	int getCurrentDistanceToTarget();
 	void calcMovePosition();
 	bool isInRange(const Position &pos);
-	std::list<Position> route;
+	Creature* findTarget();
 
 protected:
-	Game* game;
 	PhysicalAttackClass	*curPhysicalAttack;
 
 	int targetDistance;
@@ -144,10 +151,6 @@ protected:
 
 	typedef std::vector<std::pair<std::string, TimeProbabilityClass> > YellingSentences;
 	YellingSentences yellingSentences;
-	
-	Position targetPos;
-	Position moveToPos;
-	void doMoveTo(const Position &target);
 
 	virtual fight_t getFightType() {return curPhysicalAttack->fighttype; /*curPhysicalAttack != NULL ? curPhysicalAttack->fighttype : FIGHT_MELEE);*/};
 	virtual subfight_t getSubFightType()
@@ -167,7 +170,7 @@ protected:
   //virtual void onCreatureTurn(const Creature *creature, unsigned char stackpos);
   //virtual void onCreatureSay(const Creature *creature, unsigned char type, const std::string &text);
   //virtual void onCreatureChangeOutfit(const Creature* creature);
-	virtual void onThink();
+	virtual int onThink(int& newThinkTicks);
   virtual void setAttackedCreature(unsigned long id);
   virtual std::string getDescription() const;
   std::string monstername;

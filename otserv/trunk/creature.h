@@ -215,8 +215,8 @@ protected:
 	virtual int getTotalInflictedDamage();
 	virtual int getInflicatedDamage(unsigned long id);
 
-private:
-	virtual void onThink(){};
+protected:
+	virtual int onThink(int& newThinkTicks){newThinkTicks = 300; return 300;};
   virtual void onThingMove(const Creature *player, const Thing *thing, const Position *oldPos, unsigned char oldstackpos) { };
   virtual void onCreatureAppear(const Creature *creature) { };
   virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos) { };

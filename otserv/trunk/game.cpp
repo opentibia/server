@@ -597,9 +597,9 @@ bool Game::onPrepareMoveThing(Creature *player, const Thing* thing, const Tile *
 	}*/
 	if (!toTile || (toTile && !thing->canMovedTo(toTile)))
   {
-    //if (player == item)
-    //  player->sendCancelWalk("Sorry, not possible...");
-    //else
+    if (player == thing)
+      player->sendCancelWalk("Sorry, not possible...");
+    else
       player->sendCancel("Sorry, not possible...");
 			return false;
   }
@@ -1985,19 +1985,22 @@ void Game::checkPlayer(unsigned long id)
   OTSYS_THREAD_LOCK(gameLock)
   Creature *creature = getCreatureByID(id);
 
-  if (creature != NULL)
+	if (creature != NULL)
   {
-	 creature->onThink();
-	 int decTick = 0;
+		int thinkTicks = 0;
+		int oldThinkTicks = creature->onThink(thinkTicks);
 
-	 Player* player = dynamic_cast<Player*>(creature);
-	 if(player){
-		 addEvent(makeTask(1000, std::bind2nd(std::mem_fun(&Game::checkPlayer), id)));
-		 decTick = 1000;
+		if(thinkTicks > 0) {
+			addEvent(makeTask(thinkTicks, std::bind2nd(std::mem_fun(&Game::checkPlayer), id)));
+		}
 
-		 player->mana += min(5, player->manamax - player->mana);
-		 NetworkMessage msg;
-		 unsigned int requiredExp = player->getExpForLv(player->level+1);
+		Player* player = dynamic_cast<Player*>(creature);
+		if(player){
+			//addEvent(makeTask(1000, std::bind2nd(std::mem_fun(&Game::checkPlayer), id)));
+
+			player->mana += min(5, player->manamax - player->mana);
+			NetworkMessage msg;
+			unsigned int requiredExp = player->getExpForLv(player->level+1);
 		 
 		  if (player->experience >= requiredExp) {
         int lastLv = player->level;
@@ -2014,17 +2017,19 @@ void Game::checkPlayer(unsigned long id)
         lvMsg << "You advanced from level " << lastLv << " to level " << player->level << ".";
         msg.AddTextMessage(MSG_ADVANCE, lvMsg.str().c_str());
 			}
+
 			msg.AddPlayerStats(player);
 			msg.AddByte(0x1E);
 			player->sendNetworkMessage(&msg);
-
+			
       //Magic Level Advance
       int reqMana = player->getReqMana(player->maglevel+1, player->voc);
       //ATTANTION: MAKE SURE THAT CHARACTERS HAVE REASONABLE MAGIC LEVELS. ESPECIALY KNIGHTS!!!!!!!!!!!
-
-      if (reqMana % 20 < 10)                                  //CIP must have been bored when they invented this odd rounding
-          reqMana = reqMana - (reqMana % 20);
-      else reqMana = reqMana - (reqMana % 20) + 20;
+			
+      if (reqMana % 20 < 10)			//CIP must have been bored when they invented this odd rounding
+				reqMana = reqMana - (reqMana % 20);
+      else
+				reqMana = reqMana - (reqMana % 20) + 20;
 
 			if (player->access == 0 && player->manaspent >= reqMana) {
         player->manaspent -= reqMana;
@@ -2039,36 +2044,42 @@ void Game::checkPlayer(unsigned long id)
       }
       //End Magic Level Advance
 
-		 if(player->inFightTicks >= 1000) {
-			player->inFightTicks -= 1000;
-            if(player->inFightTicks < 1000)
-				player->pzLocked = false;
-                player->sendIcons(); 
-          }
-          if(player->exhaustedTicks >=1000){
-            player->exhaustedTicks -=1000;
-            } 
-          if(player->manaShieldTicks >=1000){
-            player->manaShieldTicks -=1000;
-            if(player->manaShieldTicks  < 1000)
-            player->sendIcons();
-            }
-            if(player->hasteTicks >=1000){
-            player->hasteTicks -=1000;
-            }    
-	 }
-	 else{
- 		 decTick = 300;
-
-		 addEvent(makeTask(300, std::bind2nd(std::mem_fun(&Game::checkPlayer), id)));
-		 if(creature->manaShieldTicks >=1000){
-         creature->manaShieldTicks -=300;
-		 }
+			if(player->inFightTicks >= 1000) {
+				player->inFightTicks -= thinkTicks; /*1000;*/
+				
+				if(player->inFightTicks < 1000)
+					player->pzLocked = false;
+					player->sendIcons(); 
+			}
 			
-		 if(creature->hasteTicks >=1000){
-			 creature->hasteTicks -=300;
-		 }
-	 }
+			if(player->exhaustedTicks >=1000){
+				player->exhaustedTicks -= thinkTicks; /*1000;*/
+			}
+			
+			if(player->manaShieldTicks >=1000){
+				player->manaShieldTicks -= thinkTicks; /*1000;*/
+				
+				if(player->manaShieldTicks  < 1000)
+					player->sendIcons();
+			}
+			
+			if(player->hasteTicks >=1000){
+				player->hasteTicks -= thinkTicks; /*1000*/;
+			}
+		}
+		else {
+ 			/*
+			addEvent(makeTask(300, std::bind2nd(std::mem_fun(&Game::checkPlayer), id)));
+			*/
+
+			if(creature->manaShieldTicks >=1000){
+					creature->manaShieldTicks -= thinkTicks; /*300*/;
+			}
+				
+			if(creature->hasteTicks >=1000){
+				creature->hasteTicks -= thinkTicks; /*300*/;
+			}
+		}
 
 		Conditions& conditions = creature->getConditions();
 		for(Conditions::iterator condIt = conditions.begin(); condIt != conditions.end(); ++condIt) {
@@ -2080,7 +2091,7 @@ void Game::checkPlayer(unsigned long id)
 
 				CreatureCondition& condition = condVec[0];
 
-				if(condition.onTick(decTick)) {
+				if(condition.onTick(oldThinkTicks /*decTick*/)) {
 					const MagicEffectTargetCreatureCondition* magicTargetCondition =  condition.getCondition();
 					Creature* c = getCreatureByID(magicTargetCondition->getOwnerID());
 					creatureMakeMagic(c, creature->pos, magicTargetCondition);

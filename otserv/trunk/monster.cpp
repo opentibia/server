@@ -30,6 +30,7 @@ extern Spells spells;
 Monster::Monster(const char *name, Game* game) : 
  Creature(name)
 {
+	oldThinkTicks = 0;
 	loaded = false;
 	this->game = game;
 	curPhysicalAttack = NULL;
@@ -274,43 +275,78 @@ Monster::~Monster()
 	physicalAttacks.clear();
 }
 
-void Monster::onThink()
+Creature* Monster::findTarget()
+{
+	if(attackedCreature == 0) {
+		std::vector<Creature*> tmplist;
+		game->getSpectators(Range(this->pos, false), tmplist);
+		
+		std::vector<Creature*> playerlist;
+		for(std::vector<Creature*>::const_iterator cit = tmplist.begin(); cit != tmplist.end(); ++cit) {
+			const Player* player = dynamic_cast<const Player*>(*cit);
+
+			if(player && player->access == 0) {
+				playerlist.push_back(*cit);
+			}
+		}
+
+		if(playerlist.empty())
+			return NULL;
+
+		size_t index = random_range(0, playerlist.size() - 1);
+		return tmplist[index];
+	}
+
+	return NULL;
+}
+
+int Monster::onThink(int& newThinkTicks)
 {
 	bool yelled = false;
 	for(YellingSentences::iterator ysIt = yellingSentences.begin(); ysIt != yellingSentences.end(); ++ysIt) {
-		if(ysIt->second.onTick(200) && !yelled) {
+		if(ysIt->second.onTick(oldThinkTicks) && !yelled) {
 			yelled = true;
 			game->creatureMonsterYell(this, ysIt->first);
 		}
 	}
 
-	/*
-	if(random_range(20, 100) > 80) {
-		int index = random_range(0, (int)sentenceVec.size() - 1);
-		game->creatureMonsterYell(this, sentenceVec[index]);
-	}
-	*/
-
 	if(attackedCreature != 0) {
 		int ground = game->getTile(this->pos.x, this->pos.y, this->pos.z)->ground.getID();
+		int stepDuration = this->getStepDuration(Item::items[ground].speed);
 
-		long long delay = ((long long)this->lastmove +
-			(long long)this->getStepDuration(Item::items[ground].speed)) - ((long long)OTSYS_TIME());
+		long long delay = ((long long)this->lastmove + (long long)stepDuration) - ((long long)OTSYS_TIME());
 
-		if(delay > 0){
-/*
+		//long long delay = ((long long)this->lastmove +
+		//	(long long)this->getStepDuration(Item::items[ground].speed)) - ((long long)OTSYS_TIME());
+
+		if(delay > 0) {
+///*
 #if __DEBUG__     
 			std::cout << "Delaying "<< this->getName() << " --- " << delay << std::endl;		
 #endif
-*/
-			return;
+//*/
+			newThinkTicks = (int)delay;
+			int ret = oldThinkTicks;
+			oldThinkTicks = newThinkTicks;
+			return ret;
+			//return (int)delay;
 		}
 
 		this->lastmove = OTSYS_TIME();
 
 		//doMoveTo(targetPos);
 		doMoveTo(moveToPos);
+
+		newThinkTicks = stepDuration;
+		int ret = oldThinkTicks;
+		oldThinkTicks = newThinkTicks;
+		return ret;
+		//return stepDuration;
 	}
+
+	newThinkTicks = 0;
+	return oldThinkTicks;
+	//return 0;
 }
 
 int Monster::getCurrentDistanceToTarget()
@@ -353,10 +389,11 @@ void Monster::calcMovePosition()
 						if((!(t = game->map->getTile(x, y, pos.z))) || t->isBlocking() || t->isPz() || t->creatures.size())
 							continue;
 					}
-				
+/*				
 #ifdef __DEBUG__
 					std::cout << "CalcMovePosition()" << ", x: " << x << ", y: " << y  << std::endl;
 #endif
+*/
 
 					minwalkdist =walkdist;
 					prevdist = dist;
@@ -368,7 +405,7 @@ void Monster::calcMovePosition()
 		}
 	}
 	//Close combat
-	else if(currentdist > targetDistance) {
+	else if(currentdist > targetDistance || currentdist == 0) {
 		//Close combat
 		int prevdist = 0;
 		for(int y = targetPos.y - 1; y <= targetPos.y + 1; ++y) {
@@ -472,6 +509,7 @@ void Monster::OnCreatureEnter(const Creature *creature)
 			//Update move position
 			calcMovePosition();
 
+			game->addEvent(makeTask(500, std::bind2nd(std::mem_fun(&Game::checkPlayer), getID())));
 			game->addEvent(makeTask(500, std::bind2nd(std::mem_fun(&Game::checkPlayerAttacking), getID())));
 		}
 	}
@@ -485,6 +523,11 @@ void Monster::OnCreatureLeave(const Creature *creature)
 		targetPos.x = 0;
 		targetPos.y = 0;
 		targetPos.z = 0;
+
+		Creature* creature = NULL;
+		if((creature = findTarget())) {
+			OnCreatureEnter(creature);
+		}
 	}
 }
 
@@ -585,11 +628,6 @@ void Monster::onAttack()
 		game->addEvent(makeTask(500, std::bind2nd(std::mem_fun(&Game::checkPlayerAttacking), getID())));
 
 		exhaustedTicks -= 500;
-		
-		/*
-		if(exhaustedTicks > 0)
-			return;
-		*/
 
 		if(exhaustedTicks < 0)
 			exhaustedTicks = 0;
@@ -650,18 +688,6 @@ void Monster::doMoveTo(const Position &target)
 			//E
 			else if(dx < 0 && dy == 0)
 				newdir = WEST;
-
-			/*
-			Direction newdir = this->getDirection();
-			if(dx > 0 && dx >= std::max(std::abs(dx), std::abs(dy)))
-				newdir = EAST;
-			else if(dx < 0 && std::abs(dx) >= std::max(std::abs(dx), std::abs(dy)))
-				newdir = WEST;
-			else if(dy > 0 && dy >= std::max(std::abs(dx), std::abs(dy)))
-				newdir = SOUTH;
-			else if(dy < 0 && std::abs(dy) >= std::max(std::abs(dx), std::abs(dy)))
-				newdir = NORTH;
-			*/
 		
 			if(newdir != this->getDirection()) {
 				game->creatureTurn(this, newdir);
@@ -679,5 +705,6 @@ void Monster::doMoveTo(const Position &target)
 	
 	int dx = nextStep.x - this->pos.x;
 	int dy = nextStep.y - this->pos.y;
+
 	this->game->thingMove(this, this,this->pos.x + dx, this->pos.y + dy, this->pos.z);
 }

@@ -159,8 +159,9 @@ void Npc::onCreatureChangeOutfit(const Creature* creature){
 	//we dont care about filthy player changing his ugly clothes
 }
 
-void Npc::onThink(){
+int Npc::onThink(int& newThinkTicks){
 	this->script->onThink();
+	return Creature::onThink(newThinkTicks);
 }
 
 

@@ -103,7 +103,7 @@ protected:
   virtual void onCreatureTurn(const Creature *creature, unsigned char stackpos);
   virtual void onCreatureSay(const Creature *creature, unsigned char type, const std::string &text);
   virtual void onCreatureChangeOutfit(const Creature* creature);
-  virtual void onThink();
+  virtual int onThink(int& newThinkTicks);
   virtual void setAttackedCreature(unsigned long id);
   virtual std::string getDescription(bool self = false) const;
   std::string name;

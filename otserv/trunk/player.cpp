@@ -468,7 +468,11 @@ void Player::onCreatureChangeOutfit(const Creature* creature) {
 		  client->sendSetOutfit(creature);
 }
 
-void Player::onThink(){}
+int Player::onThink(int& newThinkTicks)
+{
+	newThinkTicks = 1000;
+	return 1000;
+}
 
 void Player::onTileUpdated(const Position &pos)
 {
