@@ -126,7 +126,11 @@ int Items::loadFromDat(std::string file)
 	   		case 0x00:
 		   		//is groundtile	   				
     			iType->groundtile = true;
-		   		fseek(f, 2, SEEK_CUR);
+    			if((int)fgetc(f)==0) {
+                  std::cout << iType->id << " - " << ""<< std::endl;;
+                  iType->blocking=true;
+                  }    
+    			fgetc(f);
 		   		break;
 
         case 0x01:

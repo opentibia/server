@@ -17,6 +17,9 @@
 
 bool Tile::isBlocking()
 {
+  if(ground.isBlocking() == true)
+    return true;
+  
   ItemVector::iterator iit;
   for (iit = topItems.begin(); iit != topItems.end(); iit++)
     if ((*iit)->isBlocking())
