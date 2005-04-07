@@ -1007,10 +1007,19 @@ void Game::thingMoveInternal(Creature *player, unsigned short from_x, unsigned s
     oldPos.x = from_x;
     oldPos.y = from_y;
     oldPos.z = from_z;
-
+    if(creature){
+          // we need to update the direction the player is facing to...
+          // otherwise we are facing some problems in turning into the
+          // direction we were facing before the movement
+          // check y first cuz after a diagonal move we lock to east or west
+          if (to_y < oldPos.y) ((Player*)thing)->direction = NORTH;
+          if (to_y > oldPos.y) ((Player*)thing)->direction = SOUTH;
+          if (to_x > oldPos.x) ((Player*)thing)->direction = EAST;
+          if (to_x < oldPos.x) ((Player*)thing)->direction = WEST;
+    }
 		if(fromTile)
 		{
-			if(!toTile && player == creature){
+			if(!toTile && player == creature){      
 				//change level begin          
 				Tile* downTile = getTile(to_x, to_y, to_z+1);
 				//diagonal begin
@@ -1039,8 +1048,9 @@ void Game::thingMoveInternal(Creature *player, unsigned short from_x, unsigned s
 				}
 				else if(downTile->floorChange(WEST)){
 					teleport(playerMoving, Position(playerMoving->pos.x+2, playerMoving->pos.y, playerMoving->pos.z+1));                           
-				}    
-            }                                            
+				}
+                else player->sendCancelWalk("Sorry, not possible...");  
+                }                                            
 				//change level end   
 				else player->sendCancelWalk("Sorry, not possible...");
 					
@@ -1066,14 +1076,6 @@ void Game::thingMoveInternal(Creature *player, unsigned short from_x, unsigned s
         thing->pos.z = to_z;
 				
 				if (creature) {
-          // we need to update the direction the player is facing to...
-          // otherwise we are facing some problems in turning into the
-          // direction we were facing before the movement
-          // check y first cuz after a diagonal move we lock to east or west
-          if (to_y < oldPos.y) ((Player*)thing)->direction = NORTH;
-          if (to_y > oldPos.y) ((Player*)thing)->direction = SOUTH;
-          if (to_x > oldPos.x) ((Player*)thing)->direction = EAST;
-          if (to_x < oldPos.x) ((Player*)thing)->direction = WEST;
 
 					Player* playerMoving = dynamic_cast<Player*>(creature);
 					if(playerMoving && creature->attackedCreature != 0){
