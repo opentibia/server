@@ -708,10 +708,16 @@ bool Game::onPrepareMoveCreature(Creature *player, const Creature* creatureMovin
 	return true;
 }
 
-bool Game::onPrepareMoveThing(Player *player, const Tile *fromTile, const Item *item, slots_t toSlot)
+bool Game::onPrepareMoveThing(Player *player, const Position& fromPos, const Item *item, slots_t toSlot)
 {
-	if(!item->isPickupable())
+	if( (abs(player->pos.x - fromPos.x) > 1) || (abs(player->pos.y - fromPos.y) > 1) ) {
+		player->sendCancel("To far away...");
 		return false;
+	}
+	else if(!item->isPickupable()) {
+		player->sendCancel("You cannot move this object.");
+		return false;
+	}
 
 	return true;
 }
@@ -953,7 +959,7 @@ void Game::thingMoveInternal(Creature *player,
 		}
 		//Put on equipment from ground
 		else if(toInventory) {
-			if(onPrepareMoveThing(p, fromTile, item, (slots_t)to_cid)) {
+			if(onPrepareMoveThing(p, fromPos, item, (slots_t)to_cid)) {
 				int stackpos = fromTile->getThingStackPos(item);
 				if(fromTile->removeThing(item)) {
 					Item *oldItem = p->getItem(to_cid);
