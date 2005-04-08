@@ -871,7 +871,7 @@ void Game::thingMoveInternal(Creature *player,
 					toTile->addThing(item);
 
 					std::vector<Creature*> list;
-					getSpectators(Range(fromPos, false), list);
+					getSpectators(Range(fromPos, true), list);
 
 					for(int i = 0; i < list.size(); ++i) {
 						list[i]->onThingMove(player, fromContainer, &toPos, item, from_slotid, oldcount, count);
@@ -892,7 +892,7 @@ void Game::thingMoveInternal(Creature *player,
 				toTile->addThing(item);
 
 				std::vector<Creature*> list;
-				getSpectators(Range(player->pos, false), list);
+				getSpectators(Range(player->pos, true), list);
 				for(int i = 0; i < list.size(); ++i) {
 					list[i]->onThingMove(player, (slots_t)from_cid, &toPos, item, oldcount, count);
 				}
@@ -950,7 +950,7 @@ void Game::thingMoveInternal(Creature *player,
 					toContainer->addItem(item);
 					
 					std::vector<Creature*> list;
-					getSpectators(Range(fromPos, false), list);
+					getSpectators(Range(fromPos, true), list);
 					for(int i = 0; i < list.size(); ++i) {
 						list[i]->onThingMove(player, &fromPos, toContainer, item, stackpos, to_slotid, oldcount, count);
 					}
@@ -972,7 +972,7 @@ void Game::thingMoveInternal(Creature *player,
 					}
 
 					std::vector<Creature*> list;
-					getSpectators(Range(fromPos, false), list);
+					getSpectators(Range(fromPos, true), list);
 					for(int i = 0; i < list.size(); ++i) {
 						list[i]->onThingMove(player, &fromPos, (slots_t)to_cid, item, stackpos, 1, 1);
 
@@ -1433,6 +1433,11 @@ void Game::teleport(Creature *creature, Position newPos) {
   OTSYS_THREAD_LOCK(gameLock)   
   Tile *from = getTile( creature->pos.x, creature->pos.y, creature->pos.z );
   Tile *to = getTile( newPos.x, newPos.y, newPos.z );
+	if(!to) {
+	  OTSYS_THREAD_UNLOCK(gameLock)
+		return;
+	}
+
   int osp = from->getThingStackPos(creature);  
   if (from->removeThing(creature)) { 
     //Tile *destTile;
