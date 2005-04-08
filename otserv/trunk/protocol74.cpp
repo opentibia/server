@@ -1773,24 +1773,24 @@ void Protocol74::sendThingMove(const Creature *creature, const Thing *thing,
 		}
 
 		//Auto-close container's
+		std::vector<unsigned char> containerlist;
 		for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
 			Container *container  = cit->second;
 			if(container && container->pos.x != 0xFFFF) {
 				if(std::abs(player->pos.x - container->pos.x) > 1 || std::abs(player->pos.y - container->pos.y) > 1) {
-					std::vector<unsigned char> containerlist;
 
-					for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
-						Container *tmpcontainer = cit->second;
+					for(containerLayout::const_iterator childcit = player->getContainers(); childcit != player->getEndContainer(); ++childcit) {
+						Container *tmpcontainer = childcit->second;
 
 						if(tmpcontainer == container) {
-							containerlist.push_back(cit->first);
+							containerlist.push_back(childcit->first);
 						}
 						else {
 							//Check if its a child container.
 							while(tmpcontainer != NULL) {
 								tmpcontainer = tmpcontainer->getParent();
 								if(tmpcontainer == container) {
-									containerlist.push_back(cit->first);
+									containerlist.push_back(childcit->first);
 									break;
 								}
 							}
@@ -1798,15 +1798,17 @@ void Protocol74::sendThingMove(const Creature *creature, const Thing *thing,
 					}
 
 					for(std::vector<unsigned char>::iterator it = containerlist.begin(); it != containerlist.end(); ++it) {
-						player->closeContainer(*it);
-
 						msg.AddByte(0x6F);
 						msg.AddByte(*it);
 					}
 				}
 			}
 		}
-  }
+
+		for(std::vector<unsigned char>::iterator it = containerlist.begin(); it != containerlist.end(); ++it) {
+			player->closeContainer(*it);
+		}
+  }	
 
 	Tile *fromTile = game->getTile(oldPos->x, oldPos->y, oldPos->z);
 	if(fromTile && fromTile->getThingCount() > 8) {

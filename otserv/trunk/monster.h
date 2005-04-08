@@ -62,8 +62,6 @@ public:
 			this->cycleTicks = _cycleTicks;
 		}
 
-		_probability = std::max(_probability, 0);
-
 		if(_probability >= 0)
 			probability = std::min(100, _probability);
 
@@ -76,9 +74,9 @@ public:
 private:
 	void setDefault()
 	{
-		cycleTicks = 5000;
+		cycleTicks = 2000;
 		ticksleft = cycleTicks;
-		probability = 50;
+		probability = 80;
 		exhaustionTicks = 0;
 	}
 
@@ -119,13 +117,14 @@ public:
 private:
 	Game* game;
 	std::list<Position> route;
-
+	bool isfleeing;
 	int oldThinkTicks;
 	Position targetPos;
 	Position moveToPos;
 	void doMoveTo(const Position& destpos, bool isRouteValid);
 
 	int getCurrentDistanceToTarget();
+	int getTargetDistance();
 	void calcMovePosition();
 	bool isInRange(const Position &pos);
 	Creature* findTarget();

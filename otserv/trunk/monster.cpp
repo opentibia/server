@@ -32,6 +32,7 @@ Monster::Monster(const char *name, Game* game) :
 {
 	oldThinkTicks = 0;
 	loaded = false;
+	isfleeing = false;
 	this->game = game;
 	curPhysicalAttack = NULL;
 
@@ -82,7 +83,7 @@ Monster::Monster(const char *name, Game* game) :
 			}
 			if (strcmp(str, "combat") == 0) {
 				this->targetDistance = std::max(1, atoi((const char*)xmlGetProp(p, (const xmlChar *)"targetdistance")));
-				//this->runawayHealth = atoi((const char*)xmlGetProp(p, (const xmlChar *)"runawayHealth"));
+				this->runawayHealth = atoi((const char*)xmlGetProp(p, (const xmlChar *)"runonhealth"));
 			}
 			else if (strcmp(str, "look") == 0) {
 				this->looktype = atoi((const char*)xmlGetProp(p, (const xmlChar *)"type"));
@@ -345,6 +346,19 @@ int Monster::onThink(int& newThinkTicks)
 			isRouteValid = false;
 		}
 
+		if(runawayHealth > 0) {
+			if(this->health <= runawayHealth) {
+				if(!isfleeing) {
+					isfleeing = true;
+					calcMovePosition();
+				}
+			}
+			else if(isfleeing) {
+				isfleeing = false;
+				calcMovePosition();
+			}
+		}
+
 		doMoveTo(moveToPos, isRouteValid);
 
 		newThinkTicks = stepDuration;
@@ -359,6 +373,15 @@ int Monster::onThink(int& newThinkTicks)
 	//return 0;
 }
 
+int Monster::getTargetDistance()
+{
+	if(isfleeing) {
+		return 8;
+	}
+
+	return targetDistance;
+}
+
 int Monster::getCurrentDistanceToTarget()
 {
 	return std::max(std::abs(pos.x - targetPos.x), std::abs(pos.y - targetPos.y));
@@ -367,14 +390,16 @@ int Monster::getCurrentDistanceToTarget()
 void Monster::calcMovePosition()
 {
 	int currentdist = getCurrentDistanceToTarget();
-	if(currentdist == targetDistance && game->map->canThrowItemTo(this->pos, targetPos, false, true))
+	if((currentdist == getTargetDistance() && game->map->canThrowItemTo(this->pos, targetPos, false, true))
+		|| (isfleeing && currentdist >= getTargetDistance()))
 		return;
 
-	if(targetDistance > 1) {
+	int distance = getTargetDistance();
+	if(distance > 1) {
 
 		int prevdist = 0;
 		int minwalkdist = 0;
-		int d = targetDistance;
+		int d = distance;
 
 		for (int y = targetPos.y - d; y <= targetPos.y + d; ++y)
 		{
@@ -387,7 +412,7 @@ void Monster::calcMovePosition()
 				Position tmppos(x, y, pos.z);
 				int walkdist = std::max(std::abs(pos.x - x), std::abs(pos.y - y));
 
-				if(dist <= targetDistance &&
+				if(dist <= distance &&
 					((dist > prevdist || (dist == prevdist && walkdist > 0 && walkdist < minwalkdist)))) {
 
 					if(!game->map->canThrowItemTo(tmppos, targetPos, false, true))
@@ -415,7 +440,7 @@ void Monster::calcMovePosition()
 		}
 	}
 	//Close combat
-	else if(currentdist > targetDistance || currentdist == 0) {
+	else if(currentdist > distance || currentdist == 0) {
 		//Close combat
 		int prevdist = 0;
 		for(int y = targetPos.y - 1; y <= targetPos.y + 1; ++y) {
@@ -446,7 +471,7 @@ void Monster::calcMovePosition()
 
 bool Monster::isInRange(const Position &p)
 {
-	return ((std::abs(p.x - this->pos.x) <= 8) && (std::abs(p.y - this->pos.y) <= 6) &&
+	return ((std::abs(p.x - this->pos.x) <= 9) && (std::abs(p.y - this->pos.y) <= 7) &&
 		(p.z == this->pos.z));
 }
 
@@ -469,7 +494,7 @@ void Monster::onThingMove(const Creature *creature, const Thing *thing,
 			OnCreatureLeave(creature);
 		}
 
-		if(attackedCreature != 0 && moveCreature != this /*|| (targetDistance > 1 && getCurrentDistanceToTarget() != targetDistance) )*/ ) {
+		if(attackedCreature != 0 && moveCreature != this) {
 			//Update move position
 			calcMovePosition();
 		}
