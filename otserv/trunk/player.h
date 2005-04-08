@@ -46,6 +46,9 @@ enum skillsid_t {
 
 class NetworkMessage;
 
+typedef std::pair<unsigned char, Container*> containerItem;
+typedef std::vector<containerItem> containerLayout;
+
 //////////////////////////////////////////////////////////////////////
 // Defines a player...
 
@@ -58,7 +61,10 @@ public:
   void speak(const std::string &text);
 
 	int addItem(Item* item, int pos);
-	unsigned char getContainerCount() {return (unsigned char)vcontainers.size();}; //returns the current number of containers open
+
+	containerLayout::const_iterator getContainers() const { return vcontainers.begin();}
+	containerLayout::const_iterator getEndContainer() const { return vcontainers.end();}
+
 	Container* getContainer(unsigned char containerid);
 	unsigned char getContainerID(const Container* container) const;
 	void addContainer(unsigned char containerid, Container *container);
@@ -94,8 +100,6 @@ public:
   unsigned int getReqMana(int maglevel, int voc); 
   
   //items
-	typedef std::pair<unsigned char, Container*> containerItem;
-	typedef std::vector<containerItem> containerLayout;
 	containerLayout vcontainers;
   void preSave();
   void    usePlayer() { useCount++; };

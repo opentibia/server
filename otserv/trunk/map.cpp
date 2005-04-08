@@ -204,8 +204,8 @@ void MapState::onRemoveThing(Player *spectator, Thing* thing, NetworkMessage &ms
 		if(cid != 0xFF) {
 			std::vector<unsigned char> containerlist;
 
-			for(cid = 0; cid < spectator->getContainerCount(); ++cid) {
-				Container *tmpcontainer = spectator->getContainer(cid);
+			for(containerLayout::const_iterator cit = spectator->getContainers(); cit != spectator->getEndContainer(); ++cit) {
+				Container *tmpcontainer = cit->second;
 
 				if(tmpcontainer == container) {
 					containerlist.push_back(cid);

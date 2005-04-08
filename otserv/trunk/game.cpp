@@ -253,7 +253,7 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 		//Start decaying
 		unsigned short decayTime = Item::items[corpseitem->getID()].decayTime;
 		//game->addEvent(makeTask(decayTime*1000, boost::bind(&Game::decayItem, this->game, corpseitem->pos, corpseitem->getID(), tile->getThingStackPos(corpseitem)) ) );
-		game->addEvent(makeTask(decayTime*1000, std::bind2nd(std::mem_fun(&Game::decayItem), corpseitem)));
+		//game->addEvent(makeTask(decayTime*1000, std::bind2nd(std::mem_fun(&Game::decayItem), corpseitem)));
 	}
 
 	//Add blood?
@@ -850,9 +850,13 @@ void Game::thingMoveInternal(Creature *player,
 			if(!fromContainer)
 				return;
 			
+			Position fromPos = (fromContainer->pos.x == 0xFFFF ? player->pos : fromContainer->pos);
 			Item *item = dynamic_cast<Item*>(fromContainer->getItem(from_slotid));
 
-			if(onPrepareMoveThing(p, item, (item->pos.x == 0xFFFF ? player->pos : item->pos), toPos)) {
+			if(!item)
+				return;
+
+			if(onPrepareMoveThing(p, item, fromPos, toPos)) {
 				item->pos = toPos;
 				int oldcount = item->getItemCountOrSubtype();
 
@@ -860,16 +864,12 @@ void Game::thingMoveInternal(Creature *player,
 				if(fromContainer->removeItem(item)) {
 					toTile->addThing(item);
 
-					//if(fromContainer && fromContainer->pos.x != 0xFFFF) {
-						std::vector<Creature*> list;
-						getSpectators(Range(toPos, false), list);
+					std::vector<Creature*> list;
+					getSpectators(Range(fromPos, false), list);
 
-						for(int i = 0; i < list.size(); ++i) {
-							list[i]->onThingMove(player, fromContainer, &toPos, item, from_slotid, oldcount, count);
-						}
-					//}
-					//else
-					//player->onThingMove(player, fromContainer, &toPos, item, from_slotid);
+					for(int i = 0; i < list.size(); ++i) {
+						list[i]->onThingMove(player, fromContainer, &toPos, item, from_slotid, oldcount, count);
+					}
 				}
 			}
 		}
