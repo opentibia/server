@@ -43,6 +43,7 @@
 #define NM_ANI_SUDDENDEATH       10
 #define NM_ANI_LARGEROCK         11
 #define NM_ANI_SNOWBALL          12
+#define NM_ANI_SPEAR         13
 #define NM_ANI_POWERBOLT         13
 
 enum SpeakClasses {

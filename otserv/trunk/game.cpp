@@ -1940,14 +1940,16 @@ void Game::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fi
 						inReach = true;
 				}
 		break;
-		/*
 		case FIGHT_MAGICDIST:
 			if((std::abs(creature->pos.x-attackedCreature->pos.x) <= 8) &&
 				(std::abs(creature->pos.y-attackedCreature->pos.y) <= 5) &&
-				(creature->pos.z == attackedCreature->pos.z))
-					inReach = true;	
-			break;
-		*/
+				(creature->pos.z == attackedCreature->pos.z)) {
+
+					if(map->canThrowItemTo(creature->pos, attackedCreature->pos, false, true))
+						inReach = true;
+				}	
+		break;
+		
 	}	
 
 	if (player && player->access == 0) {

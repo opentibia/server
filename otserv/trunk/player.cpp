@@ -268,7 +268,7 @@ void Player::addSkillTry(int skilltry)
 					case CLUB: skill = 1; skillname = "club fighting"; break;
 					case AXE: skill = 3; skillname = "axe fighting"; break;
 					case DIST: skill = 4; skillname = "distance fighting"; break;
-          case SHIELD: skill = 5; skillname = "shielding"; break;
+                    case SHIELD: skill = 5; skillname = "shielding"; break;
 					default: skill = 0; skillname = "fist fighting"; break;
 			 }
 			 
@@ -415,7 +415,9 @@ subfight_t Player::getSubFightType()
 	if(type == FIGHT_DIST) {
 		return DIST_POWERBOLT;
 	}
-
+    if(type == FIGHT_MAGICDIST) {
+		return DIST_ENERGY;
+	}
 	return DIST_NONE;
 }
 
