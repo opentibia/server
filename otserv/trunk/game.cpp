@@ -253,7 +253,7 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 		//Start decaying
 		unsigned short decayTime = Item::items[corpseitem->getID()].decayTime;
 		//game->addEvent(makeTask(decayTime*1000, boost::bind(&Game::decayItem, this->game, corpseitem->pos, corpseitem->getID(), tile->getThingStackPos(corpseitem)) ) );
-		//game->addEvent(makeTask(decayTime*1000, std::bind2nd(std::mem_fun(&Game::decayItem), corpseitem)));
+		game->addEvent(makeTask(decayTime*1000, std::bind2nd(std::mem_fun(&Game::decayItem), corpseitem)));
 	}
 
 	//Add blood?
