@@ -344,7 +344,7 @@ int Items::loadXMLInfos(std::string file)
 
           char* weight = (char*)xmlGetProp(p, (xmlChar*)"weight");
           if (weight)
-						itemtype->weight = atoi(weight);
+						itemtype->weight = atof(weight);
           else
             std::cout << "missing weight tag for item: " << id << std::endl;
 

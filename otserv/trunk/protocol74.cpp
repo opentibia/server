@@ -973,19 +973,43 @@ void Protocol74::parseLookAt(NetworkMessage &msg){
 	ss << "You look at " << LookPos << " and see Item # " << ItemNum << ".";
   newmsg.AddTextMessage(MSG_INFO, ss.str().c_str());
 #else
-	if(ItemNum == 99 && LookPos.x != 0xFFFFF) //creature
-  {
+	Item *item = NULL;
+	Creature *creature = NULL;
+
+	if(LookPos.x != 0xFFFF) {
 		Tile* tile = game->getTile(LookPos.x, LookPos.y, LookPos.z);
-		Creature* creature = dynamic_cast<Creature*>(tile->getThingByStackPos(stackpos)); //tile->creatures.back();
+		item = dynamic_cast<Item*>(tile->getThingByStackPos(stackpos));
+		creature = dynamic_cast<Creature*>(tile->getThingByStackPos(stackpos));
+	}
+	else {
+		//from container/inventory
+		if(LookPos.y & 0x40) {
+			unsigned char from_cid = LookPos.y & 0x0F;
+			unsigned char slot = LookPos.z;
+
+			Container *parentcontainer = player->getContainer(from_cid);
+			if(!parentcontainer)
+				return;
+
+			item = parentcontainer->getItem(slot);
+		}
+		else {
+			unsigned char from_cid = static_cast<unsigned char>(LookPos.y);
+			item = player->getItem(from_cid);
+		}
+	}
+
+	if(item) {
+		newmsg.AddTextMessage(MSG_INFO, item->getDescription().c_str());
+	}
+	else if(creature) { //if(item->getID() == 99) {  //creature
 		if(creature){
 			if(player == creature)
 				newmsg.AddTextMessage(MSG_INFO, creature->getDescription(true).c_str());
 		else
 			newmsg.AddTextMessage(MSG_INFO, creature->getDescription().c_str());
 		}
-  }
-  else
-		newmsg.AddTextMessage(MSG_INFO, Item(ItemNum).getDescription().c_str());
+	}
 #endif
   
   sendNetworkMessage(&newmsg);

@@ -25,6 +25,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <iomanip>
 
 Item* Item::CreateItem(const unsigned short _type, unsigned char _count /*= 0*/)
 {
@@ -189,15 +190,18 @@ std::string Item::getDescription() const
 {
 	std::stringstream s;
 	std::string str;
-  if (items[id].name.length())
-    s << "You see a " << items[id].name << ".";
+	if (items[id].name.length()) {
+		if(isStackable() && count > 1) {
+			s<<"You see "<< (int)count << " " << items[id].name << "s" << "." << std::endl;
+			s << "They weight " << std::fixed << std::setprecision(1) << ((double) count * items[id].weight) << " oz.";
+		}
+		else {
+			s << "You see a " << items[id].name << "." << std::endl;
+			s << "It weighs " << std::fixed << std::setprecision(1) << items[id].weight << " oz.";
+		}
+	}
   else
 	  s<<"You see an item of type " << id <<".";
-
-	if(isStackable())
-		s<<"These are "<< count << " pieces.";
-
-  s << "\nIt weights " << items[id].weight/10 << " oz.";
 
 	str = s.str();
 	return str;
