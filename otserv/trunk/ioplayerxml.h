@@ -45,6 +45,9 @@ class IOPlayerXML : protected IOPlayer{
 	bool savePlayer(Player* player);
 	IOPlayerXML(){};
 	virtual ~IOPlayerXML(){};
+  private:
+	  bool LoadContainer(xmlNodePtr item,Container* container);
+  	  bool SaveContainer(xmlNodePtr item,Container* container);
 };
 
 #endif

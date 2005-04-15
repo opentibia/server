@@ -135,10 +135,10 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name){
 						myitem = NULL;
 
 						//Should be loaded from xml later on...
-						Container* defaultbackpack = dynamic_cast<Container*>(player->getItem(sl_id));
-						if(defaultbackpack) {
-
-							Container *backpack = dynamic_cast<Container*>(Item::CreateItem(1988));
+						Container* default_container = dynamic_cast<Container*>(player->getItem(sl_id));
+						if(default_container) {
+							LoadContainer(slot->children,default_container);							
+							/*Container *backpack = dynamic_cast<Container*>(Item::CreateItem(1988));
 							if(!backpack)
 								continue;
 
@@ -187,7 +187,7 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name){
 							defaultbackpack->addItem(Item::CreateItem(2308, 50));
 							defaultbackpack->addItem(Item::CreateItem(2262, 5));
 							defaultbackpack->addItem(Item::CreateItem(2305, 5));
-							defaultbackpack->addItem(Item::CreateItem(2311, 99));
+							defaultbackpack->addItem(Item::CreateItem(2311, 99));*/
 						}
 					}
 				slot=slot->next;
@@ -202,6 +202,61 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name){
 	}
 	return false;
 }
+
+bool IOPlayerXML::LoadContainer(xmlNodePtr nodeitem,Container* ccontainer)
+{
+	xmlNodePtr tmp,p;
+	unsigned short s_id;
+	unsigned char s_count;
+	Item *new_item;
+	if(nodeitem==NULL){
+		return false;
+	}
+	tmp=nodeitem->children;
+	if(tmp==NULL){
+		return false;
+	}
+                  
+	if (strcmp((const char*)tmp->name, "inside") == 0){
+		//load items
+		p=tmp->children;
+		while(p){
+			s_id = atoi((const char*)xmlGetProp(p, (const xmlChar *) "id"));
+			s_count = atoi((const char*)xmlGetProp(p, (const xmlChar *) "count"));
+			new_item = Item::CreateItem(s_id, s_count);
+			ccontainer->addItem(new_item);
+			Container* in_container = dynamic_cast<Container*>(new_item);
+			if(in_container){
+				LoadContainer(p,in_container);
+			}
+			p=p->next;
+		}
+	}
+	else{
+		return false;
+	}
+}
+
+bool IOPlayerXML::SaveContainer(xmlNodePtr nodeitem,Container* ccontainer)
+{
+	xmlNodePtr pn,nn;
+	std::stringstream sb;
+	if(ccontainer->size() != 0){
+		pn = xmlNewNode(NULL,(const xmlChar*)"inside");
+		for(int i=ccontainer->size()-1;i>=0;i--){
+			Item * citem = ccontainer->getItem(i);
+			nn = citem->serialize();
+			Container* in_container = dynamic_cast<Container*>(citem);
+			if(in_container){
+				SaveContainer(nn,in_container);
+			}
+			xmlAddChild(pn, nn);
+		}
+		xmlAddChild(nodeitem, pn);
+	}
+	return true;
+}
+
 
 bool IOPlayerXML::savePlayer(Player* player){
 	std::string filename = "data/players/"+player->getName()+".xml";
@@ -289,6 +344,10 @@ bool IOPlayerXML::savePlayer(Player* player){
           sb << player->items[i]->getID();
           xmlSetProp(nn, (const xmlChar*) "id", (const xmlChar*)sb.str().c_str());            
           sb.str("");
+          Container* is_container = dynamic_cast<Container*>(player->items[i]);
+          if(is_container){
+               SaveContainer(nn,is_container);
+          }
           
 	      xmlAddChild(pn, nn);
 	      xmlAddChild(sn, pn);

@@ -82,9 +82,11 @@ bool IOMapXML::loadMap(Map* map, std::string identifier){
       while(p) {
                
         if(xmlStrcmp(p->name,(const xmlChar*) "item")==0){
-                                    
-          Item* myitem=new Item();
-          myitem->unserialize(p);
+          Item* myitem;         
+          Item* myloaditem=new Item();
+          myloaditem->unserialize(p);
+          myitem = Item::CreateItem(myloaditem->getID(), myloaditem->getItemCountOrSubtype());
+          delete myloaditem;
           if (myitem->isAlwaysOnTop())
             t->topItems.push_back(myitem);
           else

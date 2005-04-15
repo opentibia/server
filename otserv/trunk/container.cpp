@@ -22,7 +22,7 @@
 
 Container::Container(const unsigned short _type) : Item(_type)
 {
-	maxitems = 20;
+	maxitems = items[this->getID()].maxItems;
 	actualitems = 0;
 	parent = 0;
 }
