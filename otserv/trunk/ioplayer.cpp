@@ -19,14 +19,24 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "ioplayer.h"
-#include "ioplayerxml.h"
+
+#ifdef USE_SQL
+	#include "ioplayersql.h"
+#else
+	#include "ioplayerxml.h"
+#endif
 
 IOPlayer* IOPlayer::_instance = NULL;
 
 IOPlayer* IOPlayer::instance(){
 	if(!_instance){
-		_instance = (IOPlayer*)new IOPlayerXML;
+#ifdef USE_SQL
+ _instance = (IOPlayer*)new IOPlayerSQL;
+#else
+	_instance = (IOPlayer*)new IOPlayerXML;
+#endif
 	}
+
 	return _instance;
 }
 

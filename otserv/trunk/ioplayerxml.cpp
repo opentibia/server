@@ -222,7 +222,12 @@ bool IOPlayerXML::LoadContainer(xmlNodePtr nodeitem,Container* ccontainer)
 		p=tmp->children;
 		while(p){
 			s_id = atoi((const char*)xmlGetProp(p, (const xmlChar *) "id"));
-			s_count = atoi((const char*)xmlGetProp(p, (const xmlChar *) "count"));
+			s_count = 0;
+			
+			if((const char*)xmlGetProp(p, (const xmlChar *) "count")) {
+				s_count = atoi((const char*)xmlGetProp(p, (const xmlChar *) "count"));
+			}
+
 			new_item = Item::CreateItem(s_id, s_count);
 			ccontainer->addItem(new_item);
 			Container* in_container = dynamic_cast<Container*>(new_item);

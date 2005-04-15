@@ -119,7 +119,7 @@ xmlNodePtr Item::serialize(){
 	xmlSetProp(ret, (const xmlChar*)"id", (const xmlChar*)s.str().c_str());
 	if(isStackable()){
 		s.str(""); //empty the stringstream
-		s <<count;
+		s << (int)count;
 		xmlSetProp(ret, (const xmlChar*)"count", (const xmlChar*)s.str().c_str());
 	}
 	return ret;

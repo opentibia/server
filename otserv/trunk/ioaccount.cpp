@@ -19,14 +19,22 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "ioaccount.h"
-#include "ioaccountxml.h"
 
+#ifdef USE_SQL
+#include "ioaccountsql.h"
+#else
+#include "ioaccountxml.h"
+#endif
 
 IOAccount* IOAccount::_instance = NULL;
 
 IOAccount* IOAccount::instance(){
 	if(!_instance){
-		_instance = (IOAccount*)new IOAccountXML;
+#ifdef USE_SQL
+	instance = (IOAccount*)new IOAccountSQL;
+#else
+	_instance = (IOAccount*)new IOAccountXML;
+#endif
 	}
 	#ifdef __DEBUG__
 	printf("%s \n", _instance->getSourceDescription());
