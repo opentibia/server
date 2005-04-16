@@ -681,7 +681,7 @@ void Protocol74::parseUseItemEx(NetworkMessage &msg)
 	pos.z = to_z;
 
 	if(from_x == 0xFFFF) {
-		if(from_y & 0x40) {
+		if(from_y & 0x40) { // use item from container
 			unsigned char containerid = from_y & 0x0F;
 			Container* container = player->getContainer(containerid);
 			
@@ -703,6 +703,35 @@ void Protocol74::parseUseItemEx(NetworkMessage &msg)
 				}
 				*/
 			}
+		}
+		else // use item from inventory
+		{
+			Item* runeitem = player->getItem(from_y);
+			if(!runeitem)
+				return;
+			
+			if(game->creatureUseItem(player, pos, runeitem)) {
+				//Need to be added code for no infinity charges
+			}
+		}
+	}
+	else // use item from ground
+	{
+		int dist_x = from_x - player->pos.x;
+		int dist_y = from_y - player->pos.y;
+		if(dist_x > 1 || dist_x < -1 || dist_y > 1 || dist_y < -1 || (from_z != player->pos.z))
+			return;
+			
+		Tile *t = game->getTile(from_x, from_y, from_z);
+		if(!t)
+			return;
+		
+		Item *runeitem = (Item*)t->getThingByStackPos(1);
+		if(!runeitem)
+			return;
+		
+		if(game->creatureUseItem(player, pos, runeitem)) {
+			//Need to be added code for no infinity charges
 		}
 	}
 }
