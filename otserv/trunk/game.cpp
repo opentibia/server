@@ -2078,14 +2078,14 @@ std::list<Position> Game::getPathTo(Creature *creature, Position start, Position
 
 void Game::checkPlayer(unsigned long id)
 {
-  OTSYS_THREAD_LOCK(gameLock)
-  Creature *creature = getCreatureByID(id);
+	OTSYS_THREAD_LOCK(gameLock)
+	Creature *creature = getCreatureByID(id);
 
 	if (creature != NULL)
-  {
+	{
 		int thinkTicks = 0;
 		int oldThinkTicks = creature->onThink(thinkTicks);
-
+		
 		if(thinkTicks > 0) {
 			addEvent(makeTask(thinkTicks, std::bind2nd(std::mem_fun(&Game::checkPlayer), id)));
 		}
@@ -2093,52 +2093,56 @@ void Game::checkPlayer(unsigned long id)
 		Player* player = dynamic_cast<Player*>(creature);
 		if(player){
 			//addEvent(makeTask(1000, std::bind2nd(std::mem_fun(&Game::checkPlayer), id)));
-
-			player->mana += min(5, player->manamax - player->mana);
+			
+			Tile *tile = getTile(player->pos.x, player->pos.y, player->pos.z);
+			if(!tile->isPz())
+				player->mana += min(5, player->manamax - player->mana);
+			
 			NetworkMessage msg;
-			unsigned int requiredExp = player->getExpForLv(player->level+1);
-		 
-		  if (player->experience >= requiredExp) {
-        int lastLv = player->level;
-
-        player->level += 1;
-        player->healthmax = player->healthmax+player->HPGain[player->voc];
-        player->health = player->health+player->HPGain[player->voc];
-        player->manamax = player->manamax+player->ManaGain[player->voc];
-        player->mana = player->mana+player->ManaGain[player->voc];
-        player->cap = player->cap+player->CapGain[player->voc];
-        player->setNormalSpeed();
-        changeSpeed(player->getID(), player->getSpeed());
-        std::stringstream lvMsg;
-        lvMsg << "You advanced from level " << lastLv << " to level " << player->level << ".";
-        msg.AddTextMessage(MSG_ADVANCE, lvMsg.str().c_str());
+			
+			int lastLv = player->level;
+			
+			while (player->experience >= player->getExpForLv(player->level+1)) {
+				player->level++;
+				player->healthmax += player->HPGain[player->voc];
+				player->health += player->HPGain[player->voc];
+				player->manamax += player->ManaGain[player->voc];
+				player->mana += player->ManaGain[player->voc];
+				player->cap += player->CapGain[player->voc];
 			}
-
+			if(lastLv != player->level)
+			{
+				player->setNormalSpeed();
+				changeSpeed(player->getID(), player->getSpeed());
+				std::stringstream lvMsg;
+				lvMsg << "You advanced from level " << lastLv << " to level " << player->level << ".";
+				msg.AddTextMessage(MSG_ADVANCE, lvMsg.str().c_str());
+			}
+			
 			msg.AddPlayerStats(player);
 			msg.AddByte(0x1E);
 			player->sendNetworkMessage(&msg);
 			
-      //Magic Level Advance
-      int reqMana = player->getReqMana(player->maglevel+1, player->voc);
-      //ATTANTION: MAKE SURE THAT CHARACTERS HAVE REASONABLE MAGIC LEVELS. ESPECIALY KNIGHTS!!!!!!!!!!!
+			//Magic Level Advance
+			int reqMana = player->getReqMana(player->maglevel+1, player->voc);
+			//ATTANTION: MAKE SURE THAT CHARACTERS HAVE REASONABLE MAGIC LEVELS. ESPECIALY KNIGHTS!!!!!!!!!!!
 			
-      if (reqMana % 20 < 10)			//CIP must have been bored when they invented this odd rounding
+			if (reqMana % 20 < 10) //CIP must have been bored when they invented this odd rounding
 				reqMana = reqMana - (reqMana % 20);
-      else
+			else
 				reqMana = reqMana - (reqMana % 20) + 20;
-
+			
 			if (player->access == 0 && player->manaspent >= reqMana) {
-        player->manaspent -= reqMana;
-        player->maglevel++;
-        
-        std::stringstream MaglvMsg;
-        MaglvMsg << "You advanced from magic level " << (player->maglevel - 1) << " to magic level " << player->maglevel << ".";
-        msg.AddTextMessage(MSG_ADVANCE, MaglvMsg.str().c_str());
-        
-        msg.AddPlayerStats(player);
-        player->sendNetworkMessage(&msg);
-      }
-      //End Magic Level Advance
+				player->manaspent -= reqMana;
+				player->maglevel++;
+				std::stringstream MaglvMsg;
+				MaglvMsg << "You advanced from magic level " << (player->maglevel - 1) << " to magic level " << player->maglevel << ".";
+				msg.AddTextMessage(MSG_ADVANCE, MaglvMsg.str().c_str());
+				
+				msg.AddPlayerStats(player);
+				player->sendNetworkMessage(&msg);
+			}
+			//End Magic Level Advance
 
 			if(player->inFightTicks >= 1000) {
 				player->inFightTicks -= thinkTicks; /*1000;*/
