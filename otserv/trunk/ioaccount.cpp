@@ -31,7 +31,7 @@ IOAccount* IOAccount::_instance = NULL;
 IOAccount* IOAccount::instance(){
 	if(!_instance){
 #ifdef USE_SQL
-	instance = (IOAccount*)new IOAccountSQL;
+	_instance = (IOAccount*)new IOAccountSQL;
 #else
 	_instance = (IOAccount*)new IOAccountXML;
 #endif
