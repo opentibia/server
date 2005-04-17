@@ -557,77 +557,82 @@ unsigned long Player::getIP() const
 }
 
 void Player::die() {
-        NetworkMessage msg;
+	NetworkMessage msg;
         
-		msg.AddTextMessage(MSG_ADVANCE, "You are dead.");
-		msg.AddTextMessage(MSG_EVENT, "Own3d!");
+	msg.AddTextMessage(MSG_ADVANCE, "You are dead.");
+	msg.AddTextMessage(MSG_EVENT, "Own3d!");
 		
-		//Magic Level downgrade
-		unsigned int sumMana = 0;
-		unsigned int lostMana = 0;
-		for (int i = 1; i <= maglevel; i++) {              //sum up all the mana
-			sumMana += getReqMana(i, voc);
-		}
+	//Magic Level downgrade
+	unsigned int sumMana = 0;
+	unsigned int lostMana = 0;
+	for (int i = 1; i <= maglevel; i++) {              //sum up all the mana
+		sumMana += getReqMana(i, voc);
+	}
                 
-		sumMana += manaspent;
+	sumMana += manaspent;
                 
-		lostMana = (int) (sumMana * 0.1);   //player loses 10% of all spent mana when he dies
+	lostMana = (int) (sumMana * 0.1);   //player loses 10% of all spent mana when he dies
                 
-		if ((unsigned) manaspent >= lostMana) { //player does not lose a magic level
+	if ((unsigned) manaspent >= lostMana) { //player does not lose a magic level
 		manaspent -= lostMana;
-		} 
-		else {                             //player DOES lose a magic level
-			lostMana -= manaspent;
-			manaspent = (int) ( getReqMana(maglevel, voc) - lostMana );
-			maglevel--;
-		}
-		//End Magic Level downgrade
+	} 
+	else {                             //player DOES lose a magic level
+		lostMana -= manaspent;
+		manaspent = (int) ( getReqMana(maglevel, voc) - lostMana );
+		maglevel--;
+	}
+	//End Magic Level downgrade
                 
-		//Skill loss
-		unsigned int lostSkilltries;
-		unsigned int sumSkilltries;
-		for (int i = 0; i <= 6; i++) {  //for each skill
-			lostSkilltries = 0;         //reset to 0
-			sumSkilltries = 0;
+	//Skill loss
+	unsigned int lostSkilltries;
+	unsigned int sumSkilltries;
+	for (int i = 0; i <= 6; i++) {  //for each skill
+		lostSkilltries = 0;         //reset to 0
+		sumSkilltries = 0;
                     
-			for (unsigned c = 11; c <= skills[i][SKILL_LEVEL]; c++) {    //sum up all required tries for all skill levels
-				sumSkilltries += getReqSkilltries(i, c, voc);
-			}
-                    
-			sumSkilltries += skills[i][SKILL_TRIES];
-                    
-			lostSkilltries = (int) (sumSkilltries * 0.1);           //player loses 10% of his skill tries
-
-			if ((unsigned)skills[i][SKILL_TRIES] >= lostSkilltries) { //player does not lose a skill level
-				skills[i][SKILL_TRIES] -= lostSkilltries;
-			}
-			else {                                                //player DOES lose a skill level
-				if (skills[i][SKILL_LEVEL] > 10 ) {          //skills should not be < 10
-					lostSkilltries -= skills[i][SKILL_TRIES];
-					skills[i][SKILL_TRIES] = (int) ( getReqSkilltries(i, skills[i][SKILL_LEVEL], voc) - lostSkilltries );
-					skills[i][SKILL_LEVEL]--;
-				}
-				else {
-					skills[i][SKILL_LEVEL] = 10;
-					skills[i][SKILL_TRIES] = 0;
-				}
-			}
-		}               
-		//End Skill loss
-        
-		//Level Downgrade
-		if ((unsigned long)(experience - getLostExperience()) < getExpForLv(level))         //0.1f is also used in die().. maybe we make a little function for exp-loss?
-		{
-            if(level>1){          
-			std::stringstream lvMsg;
-			lvMsg << "You were downgraded from level " << level << " to level " << level-1 << ".";
-			msg.AddTextMessage(MSG_ADVANCE, lvMsg.str().c_str());
-            }
-            if(experience <0)
-            experience =0;
+		for (unsigned c = 11; c <= skills[i][SKILL_LEVEL]; c++) { //sum up all required tries for all skill levels
+			sumSkilltries += getReqSkilltries(i, c, voc);
 		}
+                    
+		sumSkilltries += skills[i][SKILL_TRIES];
+                    
+		lostSkilltries = (int) (sumSkilltries * 0.1);           //player loses 10% of his skill tries
+
+		if ((unsigned)skills[i][SKILL_TRIES] >= lostSkilltries) { //player does not lose a skill level
+			skills[i][SKILL_TRIES] -= lostSkilltries;
+		}
+		else {                                                //player DOES lose a skill level
+			if (skills[i][SKILL_LEVEL] > 10 ) {          //skills should not be < 10
+				lostSkilltries -= skills[i][SKILL_TRIES];
+				skills[i][SKILL_TRIES] = (int) ( getReqSkilltries(i, skills[i][SKILL_LEVEL], voc) - lostSkilltries );
+				skills[i][SKILL_LEVEL]--;
+			}
+			else {
+				skills[i][SKILL_LEVEL] = 10;
+				skills[i][SKILL_TRIES] = 0;
+			}
+		}
+	}               
+	//End Skill loss
+        
+	//Level Downgrade
+	int newLevel = level;
+	while((unsigned long)(experience - getLostExperience()) < getExpForLv(newLevel)) //0.1f is also used in die().. maybe we make a little function for exp-loss?
+	{
+		if(newLevel > 1)
+			newLevel--;
+		else
+			break;
+	}
+	
+	if(newLevel != level)
+	{
+		std::stringstream lvMsg;
+		lvMsg << "You were downgraded from level " << level << " to level " << newLevel << ".";
+		msg.AddTextMessage(MSG_ADVANCE, lvMsg.str().c_str());
 		
-		sendNetworkMessage(&msg);
+	}
+	sendNetworkMessage(&msg);
 }
 
 void Player::preSave()
@@ -641,25 +646,30 @@ void Player::preSave()
 
 		//int expLoss = (int)(experience*0.1f);
 		experience -= getLostExperience(); //(int)(experience*0.1f);        //0.1f is also used in die().. maybe we make a little function for exp-loss?
-
-		//Player died?
-
-	   int reqExp =  getExpForLv(level);
-	   if (experience < (unsigned )reqExp)
-		    {
-            if(level > 1)                               
-            level -= 1;
-            healthmax -= HPGain[voc];
-            health -= HPGain[voc];
-            
-            if ((manamax - ManaGain[voc]) <= 0)        //This could be avoided with a proper use of unsigend int
-                 manamax = 0;
-            else manamax = manamax - ManaGain[voc];
-            if ((mana - ManaGain[voc]) <= 0)
-                 mana = 0;
-            else mana = mana - ManaGain[voc];
-            
-            cap -= CapGain[voc];            
-            }
-		 }
+		
+		int newLevel = level;
+		while(experience < getExpForLv(level))
+		{
+			if(level > 1)                               
+				level--;
+			else
+				break;
+			
+			/* This checks (but not the downgrade sentences) aren't really necesary cause if the
+			player has a "normal" hp,mana,etc when he gets level 1 he will not lose more
+			hp,mana,etc... but here they are :P */
+			if ((healthmax -= HPGain[voc]) < 0) //This could be avoided with a proper use of unsigend int
+				healthmax = 0;
+			
+			health = healthmax;
+			
+			if ((manamax -= ManaGain[voc]) < 0) //This could be avoided with a proper use of unsigend int
+				manamax = 0;
+			
+			mana = manamax;
+			
+			if ((cap -= CapGain[voc]) < 0) //This could be avoided with a proper use of unsigend int
+				cap = 0;         
+		}
+	}
 }
