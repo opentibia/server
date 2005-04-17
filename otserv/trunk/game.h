@@ -199,6 +199,7 @@ class Game {
     void changeSpeed(unsigned long id, unsigned short speed);
     void addEvent(long ticks, int type, void *data);
 		void addEvent(SchedulerTask*);
+		void creatureBroadcastTileUpdated(const Position& pos);
    
    
     Creature* getCreatureByID(unsigned long id);
@@ -244,7 +245,6 @@ class Game {
 		void changeOutfit(unsigned long id, int looktype);
 		bool creatureOnPrepareAttack(Creature *creature, Position pos);
 		void creatureMakeDamage(Creature *creature, Creature *attackedCreature, fight_t damagetype);
-		void creatureBroadcastTileUpdated(const Position& pos);
 		void teleport(Creature *creature, Position newPos);
 
 		bool creatureMakeMagic(Creature *creature, const Position& centerpos, const MagicEffectClass* me);

@@ -310,7 +310,7 @@ bool IOPlayerSQL::savePlayer(Player* player){
 #endif
 		query.execute();
 	}
-
+	
 	//End the transaction
 	query.reset();
 	query << "COMMIT;";
@@ -326,7 +326,7 @@ bool IOPlayerSQL::savePlayer(Player* player){
 std::string IOPlayerSQL::getItems(Item* i, int &startid, int slot, int player,int parentid){
 	int id = ++startid;
 	std::stringstream ss;
-	ss << "(" << player <<"," << slot << ","<< id <<","<< parentid <<"," << i->getID()<<","<< "0" <<"),";
+	ss << "(" << player <<"," << slot << ","<< id <<","<< parentid <<"," << i->getID()<<","<< (int)i->getItemCharge() <<"),";
 	std::cout << "i";
 	if(Container* c = dynamic_cast<Container*>(i)){
 		std::cout << "c";	

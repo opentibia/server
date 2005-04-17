@@ -711,7 +711,14 @@ void Protocol74::parseUseItemEx(NetworkMessage &msg)
 				return;
 			
 			if(game->creatureUseItem(player, pos, runeitem)) {
-				//Need to be added code for no infinity charges
+				runeitem->setItemCharge(std::max((int)runeitem->getItemCharge() - 1, 0) );
+				
+				if(runeitem->getItemCharge() == 0) {
+					player->items[from_y] = NULL;
+					NetworkMessage netmsgs;
+					netmsgs.AddPlayerInventoryItem(player, from_y);
+					player->sendNetworkMessage(&netmsgs);
+				}
 			}
 		}
 	}
@@ -731,7 +738,12 @@ void Protocol74::parseUseItemEx(NetworkMessage &msg)
 			return;
 		
 		if(game->creatureUseItem(player, pos, runeitem)) {
-			//Need to be added code for no infinity charges
+			runeitem->setItemCharge(std::max((int)runeitem->getItemCharge() - 1, 0) );
+			
+			if(runeitem->getItemCharge() == 0) {
+				t->removeThing(runeitem);
+				game->creatureBroadcastTileUpdated(Position(from_x, from_y, from_z));
+			}
 		}
 	}
 }

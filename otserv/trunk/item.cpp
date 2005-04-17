@@ -200,9 +200,14 @@ std::string Item::getDescription() const
 			s << "It weighs " << std::fixed << std::setprecision(1) << items[id].weight << " oz.";
 		}
 	}
-  else
-	  s<<"You see an item of type " << id <<".";
-
+	else
+		s<<"You see an item of type " << id <<".";
+	
+	if(this->getItemCharge() > 0)
+	{
+		s << std::endl << "It has " << (int)this->getItemCharge() << " charges left.";
+	}
+	
 	str = s.str();
 	return str;
 }
