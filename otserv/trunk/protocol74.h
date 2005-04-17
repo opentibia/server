@@ -155,6 +155,8 @@ private:
 		const Position *oldPos, unsigned char oldstackpos, unsigned char oldcount,
 		unsigned char count, bool tele = false);
 
+	void autoCloseContainers(const Container *container, NetworkMessage &msg);
+
   virtual void sendCreatureAppear(const Creature *creature);
   virtual void sendCreatureDisappear(const Creature *creature, unsigned char stackPos);
   virtual void sendCreatureTurn(const Creature *creature, unsigned char stackpos);

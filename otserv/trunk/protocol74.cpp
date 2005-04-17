@@ -1431,9 +1431,22 @@ void Protocol74::sendThingMove(const Creature *creature,
 {
 	NetworkMessage msg;
 
+	if(fromContainer && fromContainer->pos.x != 0xFFFF && toContainer->pos.x != 0xFFFF) {
+		//Auto-close container's
+		if(std::abs(player->pos.x - toContainer->pos.x) > 1 || std::abs(player->pos.y - toContainer->pos.y) > 1) {
+			const Container *container = dynamic_cast<const Container*>(item);
+			if(container) {
+				unsigned char cid = player->getContainerID(container);
+				if(cid != 0xFF) {
+					autoCloseContainers(container, msg);
+				}
+			}
+		}
+	}
+
 	Item *container = NULL;
 	for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
-		container  = cit->second; //player->getContainer(cid);
+		container  = cit->second;
 		unsigned char cid = cit->first;
 
 		if(container && container == fromContainer) {
@@ -1548,38 +1561,12 @@ void Protocol74::sendThingMove(const Creature *creature, const Container *fromCo
 			//
 	}
 	//Auto-close container's
-	else if(std::abs(player->pos.x - newPos->x) <= 1 || std::abs(player->pos.y - newPos->y) <= 1) {
+	else if(std::abs(player->pos.x - newPos->x) > 1 || std::abs(player->pos.y - newPos->y) > 1) {
 		const Container *container = dynamic_cast<const Container*>(item);
 		if(container) {
 			unsigned char cid = player->getContainerID(container);
 			if(cid != 0xFF) {
-
-				std::vector<unsigned char> containerlist;
-
-				for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
-					Container *tmpcontainer = cit->second;
-
-					if(tmpcontainer == container) {
-						containerlist.push_back(cid);
-					}
-					else {
-						//Check if its a child container.
-						while(tmpcontainer != NULL) {
-							tmpcontainer = tmpcontainer->getParent();
-							if(tmpcontainer == container) {
-								containerlist.push_back(cid);
-								break;
-							}
-						}
-					}
-				}
-
-				for(std::vector<unsigned char>::iterator it = containerlist.begin(); it != containerlist.end(); ++it) {
-					player->closeContainer(*it);
-
-					msg.AddByte(0x6F);
-					msg.AddByte(*it);
-				}
+				autoCloseContainers(container, msg);
 			}
 		}
 	}
@@ -1621,33 +1608,7 @@ void Protocol74::sendThingMove(const Creature *creature, slots_t fromSlot,
 			if(container) {
 				unsigned char cid = player->getContainerID(container);
 				if(cid != 0xFF) {
-
-					std::vector<unsigned char> containerlist;
-
-					for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
-						Container *tmpcontainer = cit->second;
-
-						if(tmpcontainer == container) {
-							containerlist.push_back(cid);
-						}
-						else {
-							//Check if its a child container.
-							while(tmpcontainer != NULL) {
-								tmpcontainer = tmpcontainer->getParent();
-								if(tmpcontainer == container) {
-									containerlist.push_back(cid);
-									break;
-								}
-							}
-						}
-					}
-
-					for(std::vector<unsigned char>::iterator it = containerlist.begin(); it != containerlist.end(); ++it) {
-						player->closeContainer(*it);
-
-						msg.AddByte(0x6F);
-						msg.AddByte(*it);
-					}
+					autoCloseContainers(container, msg);
 				}
 			}
 		}
@@ -1683,33 +1644,7 @@ void Protocol74::sendThingMove(const Creature *creature, const Position *oldPos,
 		if(container) {
 			unsigned char cid = player->getContainerID(container);
 			if(cid != 0xFF) {
-
-				std::vector<unsigned char> containerlist;
-
-				for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
-					Container *tmpcontainer = cit->second;
-
-					if(tmpcontainer == container) {
-						containerlist.push_back(cid);
-					}
-					else {
-						//Check if its a child container.
-						while(tmpcontainer != NULL) {
-							tmpcontainer = tmpcontainer->getParent();
-							if(tmpcontainer == container) {
-								containerlist.push_back(cid);
-								break;
-							}
-						}
-					}
-				}
-
-				for(std::vector<unsigned char>::iterator it = containerlist.begin(); it != containerlist.end(); ++it) {
-					player->closeContainer(*it);
-
-					msg.AddByte(0x6F);
-					msg.AddByte(*it);
-				}
+				autoCloseContainers(container, msg);
 			}
 		}
 	}
@@ -1758,6 +1693,16 @@ void Protocol74::sendThingMove(const Creature *creature, const Position *oldPos,
 	if(creature == player) {
 		msg.AddPlayerInventoryItem(player, toSlot);
 		//
+	}
+	else {
+		const Container *container = dynamic_cast<const Container*>(item);
+		//Auto-closing containers
+		if(container) {
+			unsigned char cid = player->getContainerID(container);
+			if(cid != 0xFF) {
+				autoCloseContainers(container, msg);
+			}
+		}
 	}
 
 	if(CanSee(oldPos->x, oldPos->y, oldPos->z)) {
@@ -1811,33 +1756,7 @@ void Protocol74::sendThingMove(const Creature *creature, const Thing *thing,
 					if(container) {
 						unsigned char cid = player->getContainerID(container);
 						if(cid != 0xFF) {
-
-							std::vector<unsigned char> containerlist;
-
-							for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
-								Container *tmpcontainer = cit->second;
-
-								if(tmpcontainer == container) {
-									containerlist.push_back(cit->first /*cid*/);
-								}
-								else {
-									//Check if its a child container.
-									while(tmpcontainer != NULL) {
-										tmpcontainer = tmpcontainer->getParent();
-										if(tmpcontainer == container) {
-											containerlist.push_back(cit->first /*cid*/);
-											break;
-										}
-									}
-								}
-							}
-
-							for(std::vector<unsigned char>::iterator it = containerlist.begin(); it != containerlist.end(); ++it) {
-								player->closeContainer(*it);
-
-								msg.AddByte(0x6F);
-								msg.AddByte(*it);
-							}
+							autoCloseContainers(container, msg);
 						}
 					}
 				}
@@ -1869,40 +1788,20 @@ void Protocol74::sendThingMove(const Creature *creature, const Thing *thing,
 		}
 
 		//Auto-close container's
-		std::vector<unsigned char> containerlist;
+		std::vector<Container *> containers;
 		for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
-			Container *container  = cit->second;
+			Container *container = cit->second;
+			
+			//Only add those we need to close
 			if(container && container->pos.x != 0xFFFF) {
 				if(std::abs(player->pos.x - container->pos.x) > 1 || std::abs(player->pos.y - container->pos.y) > 1) {
-
-					for(containerLayout::const_iterator childcit = player->getContainers(); childcit != player->getEndContainer(); ++childcit) {
-						Container *tmpcontainer = childcit->second;
-
-						if(tmpcontainer == container) {
-							containerlist.push_back(childcit->first);
-						}
-						else {
-							//Check if its a child container.
-							while(tmpcontainer != NULL) {
-								tmpcontainer = tmpcontainer->getParent();
-								if(tmpcontainer == container) {
-									containerlist.push_back(childcit->first);
-									break;
-								}
-							}
-						}
-					}
-
-					for(std::vector<unsigned char>::iterator it = containerlist.begin(); it != containerlist.end(); ++it) {
-						msg.AddByte(0x6F);
-						msg.AddByte(*it);
-					}
+					containers.push_back(cit->second);
 				}
 			}
 		}
 
-		for(std::vector<unsigned char>::iterator it = containerlist.begin(); it != containerlist.end(); ++it) {
-			player->closeContainer(*it);
+		for(std::vector<Container *>::const_iterator it = containers.begin(); it != containers.end(); ++it) {
+			autoCloseContainers(*it, msg);
 		}
   }	
 
@@ -1923,6 +1822,29 @@ void Protocol74::sendThingMove(const Creature *creature, const Thing *thing,
 	msg.WriteToSocket(s);
 }
 
+
+//close container and its child containers
+void Protocol74::autoCloseContainers(const Container *container, NetworkMessage &msg)
+{
+	std::vector<unsigned char> containerlist;
+	for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
+		Container *tmpcontainer = cit->second;
+		while(tmpcontainer != NULL) {							
+			if(tmpcontainer == container) {
+				containerlist.push_back(cit->first);
+				break;
+			}
+
+			tmpcontainer = tmpcontainer->getParent();
+		}
+	}
+
+	for(std::vector<unsigned char>::iterator it = containerlist.begin(); it != containerlist.end(); ++it) {
+		player->closeContainer(*it);
+		msg.AddByte(0x6F);
+		msg.AddByte(*it);
+	}						
+}
 
 void Protocol74::sendCreatureAppear(const Creature *creature)
 {
