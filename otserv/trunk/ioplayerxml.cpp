@@ -236,10 +236,11 @@ bool IOPlayerXML::LoadContainer(xmlNodePtr nodeitem,Container* ccontainer)
 			}
 			p=p->next;
 		}
+
+		return true;
 	}
-	else{
-		return false;
-	}
+
+	return false;
 }
 
 bool IOPlayerXML::SaveContainer(xmlNodePtr nodeitem,Container* ccontainer)

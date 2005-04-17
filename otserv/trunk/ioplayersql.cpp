@@ -170,7 +170,7 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 	//load the items
 	try{
 		mysqlpp::Query query = con.query();
-		query << "SELECT * FROM items WHERE player ='" << player->getID() << "'";
+		query << "SELECT * FROM items WHERE player ='" << player->getID() << "'" << " ORDER BY sid ASC";
 #ifdef __DEBUG__
 		std::cout << query.preview() << std::endl;
 #endif
@@ -208,10 +208,16 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 	#else
 	std::hash_map<int,std::pair<Item*,int> >::iterator it;
 	#endif
-	for(it=itemmap.begin(); it != itemmap.end(); it++){
-		if(int p=(*it).second.second)
-			if(Container* c = dynamic_cast<Container*>(itemmap[p].first))
+	for(int i = (int)itemmap.size(); i > 0; --i) {
+		it = itemmap.find(i);
+		if(it == itemmap.end())
+			continue;
+
+		if(int p=(*it).second.second) {
+			if(Container* c = dynamic_cast<Container*>(itemmap[p].first)) {
 				c->addItem((*it).second.first);
+			}
+		}
 	}
 	return true;
 	
@@ -324,15 +330,16 @@ bool IOPlayerSQL::savePlayer(Player* player){
 }
 
 std::string IOPlayerSQL::getItems(Item* i, int &startid, int slot, int player,int parentid){
-	int id = ++startid;
+	++startid;
 	std::stringstream ss;
-	ss << "(" << player <<"," << slot << ","<< id <<","<< parentid <<"," << i->getID()<<","<< (int)i->getItemCharge() <<"),";
+	ss << "(" << player <<"," << slot << ","<< startid <<","<< parentid <<"," << i->getID()<<","<< (int)i->getItemCountOrSubtype() <<"),";
 	std::cout << "i";
 	if(Container* c = dynamic_cast<Container*>(i)){
 		std::cout << "c";	
+		int pid = startid;
 		for(ContainerList::const_iterator it = c->getItems(); it != c->getEnd(); it++){
 			std::cout << "s";
-			ss << getItems(*it, id, 0, player, id);
+			ss << getItems(*it, startid, 0, player, pid);
 			std::cout << "r";
 		}
 	}
