@@ -866,7 +866,6 @@ void Protocol74::parseUseItem(NetworkMessage &msg)
 		}
 
 		if(newcontainer) {
-			//player->addContainer(stack, newcontainer);
 			sendContainer(stack, newcontainer);
 		}
 	}
@@ -1043,13 +1042,11 @@ void Protocol74::parseLookAt(NetworkMessage &msg){
 	if(item) {
 		newmsg.AddTextMessage(MSG_INFO, item->getDescription().c_str());
 	}
-	else if(creature) { //if(item->getID() == 99) {  //creature
-		if(creature){
-			if(player == creature)
-				newmsg.AddTextMessage(MSG_INFO, creature->getDescription(true).c_str());
-		else
-			newmsg.AddTextMessage(MSG_INFO, creature->getDescription().c_str());
-		}
+	else if(creature) {
+		if(player == creature)
+			newmsg.AddTextMessage(MSG_INFO, creature->getDescription(true).c_str());
+	else
+		newmsg.AddTextMessage(MSG_INFO, creature->getDescription().c_str());
 	}
 #endif
   
@@ -1429,7 +1426,7 @@ void Protocol74::sendContainerUpdated(Item *item, unsigned char from_id, unsigne
 
 //container to container
 void Protocol74::sendThingMove(const Creature *creature,
-	const Container *fromContainer, Container *toContainer, const Item* item,
+	const Container *fromContainer, const Container *toContainer, const Item* item,
 	unsigned char from_slotid, unsigned char to_slotid, unsigned char oldcount, unsigned char count)
 {
 	NetworkMessage msg;
@@ -1441,7 +1438,7 @@ void Protocol74::sendThingMove(const Creature *creature,
 
 		if(container && container == fromContainer) {
 			if(toContainer == fromContainer) {
-				Item *toSlotItem = toContainer->getItem(to_slotid);
+				//Item *toSlotItem = toContainer->getItem(to_slotid);
 				if(item->isStackable() && item->getItemCountOrSubtype() != oldcount) {
 					//add item
 					msg.AddByte(0x70);
@@ -1500,6 +1497,40 @@ void Protocol74::sendThingMove(const Creature *creature,
 				msg.AddItem(item);
 			}
 		}
+	}
+
+	msg.WriteToSocket(s);
+}
+
+//inventory to container
+void Protocol74::sendThingMove(const Creature *creature, slots_t fromSlot, const Container *toContainer,
+	const Item* item, unsigned char oldcount, unsigned char count)
+{
+	NetworkMessage msg;
+	//Update up-arrow
+	//
+
+	if(creature == player) {
+		sendThingMove(creature, (Container*)NULL, toContainer, item, 0, 0, count, count);
+
+		msg.AddPlayerInventoryItem(player, fromSlot);
+	}
+
+	msg.WriteToSocket(s);
+}
+
+//container to inventory
+void Protocol74::sendThingMove(const Creature *creature, const Container *fromContainer, slots_t toSlot,
+	const Item* item, unsigned char from_slotid, unsigned char oldcount, unsigned char count)
+{
+	NetworkMessage msg;
+	//Update up-arrow
+	//
+
+	if(creature == player) {
+		sendThingMove(creature, fromContainer, (Container*)NULL, item, from_slotid, 0, count, count);
+
+		msg.AddPlayerInventoryItem(player, toSlot);
 	}
 
 	msg.WriteToSocket(s);
@@ -1787,14 +1818,14 @@ void Protocol74::sendThingMove(const Creature *creature, const Thing *thing,
 								Container *tmpcontainer = cit->second;
 
 								if(tmpcontainer == container) {
-									containerlist.push_back(cid);
+									containerlist.push_back(cit->first /*cid*/);
 								}
 								else {
 									//Check if its a child container.
 									while(tmpcontainer != NULL) {
 										tmpcontainer = tmpcontainer->getParent();
 										if(tmpcontainer == container) {
-											containerlist.push_back(cid);
+											containerlist.push_back(cit->first /*cid*/);
 											break;
 										}
 									}

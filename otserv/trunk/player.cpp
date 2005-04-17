@@ -462,11 +462,25 @@ void Player::onThingMove(const Creature *creature, const Thing *thing, const Pos
 }
 
  //container to container
-void Player::onThingMove(const Creature *creature, const Container *fromContainer, Container *toContainer,
+void Player::onThingMove(const Creature *creature, const Container *fromContainer, const Container *toContainer,
 		const Item* item, unsigned char from_slotid, unsigned char to_slotid,
 		unsigned char oldcount, unsigned char count)
 {
 	client->sendThingMove(creature, fromContainer, toContainer, item, from_slotid, to_slotid, oldcount, count);
+}
+
+//inventory to container
+void Player::onThingMove(const Creature *creature, slots_t fromSlot, const Container *toContainer,
+		const Item* item, unsigned char oldcount, unsigned char count)
+{
+	client->sendThingMove(creature, fromSlot, toContainer, item, oldcount, count);
+}
+
+//container to inventory
+void Player::onThingMove(const Creature *creature, const Container *fromContainer, slots_t toSlot,
+		const Item* item, unsigned char from_slotid, unsigned char oldcount, unsigned char count)
+{
+	client->sendThingMove(creature, fromContainer, toSlot, item, from_slotid, oldcount, count);
 }
 
 //container to ground

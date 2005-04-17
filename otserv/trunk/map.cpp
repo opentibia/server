@@ -208,14 +208,14 @@ void MapState::onRemoveThing(Player *spectator, Thing* thing, NetworkMessage &ms
 				Container *tmpcontainer = cit->second;
 
 				if(tmpcontainer == container) {
-					containerlist.push_back(cid);
+					containerlist.push_back(cit->first);
 				}
 				else {
 					//Check if its a child container.
 					while(tmpcontainer != NULL) {
 						tmpcontainer = tmpcontainer->getParent();
 						if(tmpcontainer == container) {
-							containerlist.push_back(cid);
+							containerlist.push_back(cit->first);
 							break;
 						}
 					}

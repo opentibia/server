@@ -140,8 +140,16 @@ protected:
 	//virtual void onContainerUpdated(Item *item, unsigned char from_id, unsigned char to_id, unsigned char from_slot, unsigned char to_slot, bool remove);
 
 	//container to container
-	virtual void onThingMove(const Creature *creature, const Container *fromContainer, Container *toContainer,
+	virtual void onThingMove(const Creature *creature, const Container *fromContainer, const Container *toContainer,
 		const Item* item, unsigned char from_slotid, unsigned char to_slotid, unsigned char oldcount, unsigned char count);
+
+	//inventory to container
+	virtual void onThingMove(const Creature *creature, slots_t fromSlot, const Container *toContainer,
+		const Item* item, unsigned char oldcount, unsigned char count);
+
+	//container to inventory
+	virtual void onThingMove(const Creature *creature, const Container *fromContainer, slots_t toSlot,
+		const Item* item, unsigned char from_slotid, unsigned char oldcount, unsigned char count);
 
 	//container to ground
 	virtual void onThingMove(const Creature *creature, const Container *fromContainer, const Position *newPos,

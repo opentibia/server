@@ -743,21 +743,24 @@ void Game::thingMoveInternal(Creature *player,
 {
 	Player *p = dynamic_cast<Player*>(player);
 	if(p) {
-		Container *fromContainer = p->getContainer(from_cid);
-		if(!fromContainer)
-			return;
-
+		Container *fromContainer = NULL;
 		Container *toContainer = NULL;
+
+		if(!fromInventory) {
+			fromContainer = p->getContainer(from_cid);
+		}
+		else {
+			fromContainer = dynamic_cast<Container *>(p->getItem(from_cid));
+		}
 
 		if(!toInventory) {
 			toContainer = p->getContainer(to_cid);
 
-			if(!toContainer)
-				return;
-
-			Container *toSlotContainer = dynamic_cast<Container*>(toContainer->getItem(to_slotid));
-			if(toSlotContainer) {
-				toContainer = toSlotContainer;
+			if(toContainer) {
+				Container *toSlotContainer = dynamic_cast<Container*>(toContainer->getItem(to_slotid));
+				if(toSlotContainer) {
+					toContainer = toSlotContainer;
+				}
 			}
 		}
 		else {
@@ -814,8 +817,37 @@ void Game::thingMoveInternal(Creature *player,
 			}
 		}
 		else {
-			//Inventory to inventory
-			if(fromInventory && toInventory) {
+			//container to inventory
+			if(fromContainer && toInventory) {
+				Item* item = fromContainer->getItem(from_slotid);
+				if(!item)
+					return;
+
+				/*
+				if(onPrepareMoveThing(p, fromContainer, (slots_t)to_cid)) {
+					if(fromContainer->removeItem(item)) {
+						p->items[to_cid] = item;
+
+						player->onThingMove(player, fromContainer, (slots_t)to_cid, item, from_slotid, count, count);
+					}
+				}
+				*/
+			}
+			//inventory to container
+			else if(fromInventory && toContainer) {
+				/*
+				if(onPrepareMoveThing(p, (slots_t)from_cid, toContainer)) {
+					Item *fromSlot = p->getItem(from_cid);
+					p->items[from_cid] = NULL;
+
+					toContainer->addItem(fromSlot);
+
+					player->onThingMove(player, (slots_t)from_cid, toContainer, fromSlot, count, count);
+				}
+				*/
+			}
+			//inventory to inventory
+			else if(fromInventory && toInventory) {
 				if(onPrepareMoveThing(p, (slots_t)from_cid, (slots_t)to_cid)) {
 					/*
 					Item *fromSlot = p->getItem(from_cid);
@@ -826,14 +858,6 @@ void Game::thingMoveInternal(Creature *player,
 					player->onThingMove();
 					*/
 				}
-			}
-			//Inventory to container
-			else if(fromInventory && !toInventory) {
-				//
-			}
-			//Container to inventory
-			else if(!fromContainer && toInventory) {
-				//
 			}
 		}
 	}

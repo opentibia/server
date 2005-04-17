@@ -50,7 +50,13 @@ void Item::setID(unsigned short newid) {
 //////////////////////////////////////////////////
 // return how many items are stacked or 0 if non stackable
 unsigned char Item::getItemCountOrSubtype() const {
-	return count;
+	if(isStackable() || isMultiType()) {
+		return count;
+	}
+	else if(chargecount != 0)
+		return chargecount;
+	else
+		return 0;
 }
 
 

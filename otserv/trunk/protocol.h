@@ -50,8 +50,16 @@ public:
   virtual void sendNetworkMessage(NetworkMessage *msg) = 0;
 
   //container to container
-	virtual void sendThingMove(const Creature *creature, const Container *fromContainer, Container *toContainer,
+	virtual void sendThingMove(const Creature *creature, const Container *fromContainer, const Container *toContainer,
 		const Item* item, unsigned char from_slotid, unsigned char to_slotid, unsigned char oldcount, unsigned char count) = 0;
+
+	//inventory to container
+	virtual void sendThingMove(const Creature *creature, slots_t fromSlot, const Container *toContainer,
+		const Item* item, unsigned char oldcount, unsigned char count) = 0;
+
+	//container to inventory
+	virtual void sendThingMove(const Creature *creature, const Container *fromContainer, slots_t toSlot,
+		const Item* item, unsigned char from_slotid, unsigned char oldcount, unsigned char count) = 0;
 
 	//container to ground
 	virtual void sendThingMove(const Creature *creature, const Container *fromContainer, const Position *newPos,
