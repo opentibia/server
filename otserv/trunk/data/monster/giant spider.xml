@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<monster name="Giant Spider" level="90" maglevel="60" experience="900">
+	<health now="1000" max="1000"/>
+	<look type="38" corpse="2857"/>
+	<combat targetdistance="1" runonhealth="0"/>
+<attacks>
+	<attack type="melee" maxdamage="500"/>
+	<attack type="distance" name="throwingstar" mindamage="10" maxdamage="200"/> 
+</attacks>
+
+<defenses>
+	<defense immunity="fire"/>
+	<defense immunity="poison"/>
+	<defense immunity="paralyze"/>
+	<defense immunity="drunk"/>
+</defenses>
+
+<loot>
+	<lootitem id="1729"/>
+</loot>
+</monster>
