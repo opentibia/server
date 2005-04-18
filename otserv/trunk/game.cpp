@@ -1432,6 +1432,35 @@ void Game::creatureSay(Creature *creature, unsigned char type, const std::string
                 teleport(c, creature->pos);
             }
             break;
+		  case 'i': // Create new items in the ground ;)
+            {
+			std::string cmd = text;
+			cmd.erase(0,3);
+			std::string::size_type pos = cmd.find(0x20, 0);
+			if(pos == std::string::npos)
+				break;
+			
+			int type = atoi(cmd.substr(0, pos).c_str());
+			cmd.erase(0, pos+1);
+			int count = atoi(cmd.c_str());
+			
+			Item *newItem = Item::CreateItem(type, count);
+			if(!newItem)
+				break;
+			
+			Tile *t = getTile(creature->pos.x, creature->pos.y, creature->pos.z);
+			if(!t)
+			{
+				delete newItem;
+				break;
+			}
+			
+			t->addThing(newItem);
+			
+			Game::creatureBroadcastTileUpdated(Position(creature->pos.x, creature->pos.y, creature->pos.z));
+			
+            }
+            break;
 		}
 	}
 
