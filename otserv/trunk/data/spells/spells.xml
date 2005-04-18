@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <spells maxVoc="4">
-<spell name="Ultimate Healing" words="exura vita" maglv="8" mana="100" enabled="1">
+<spell name="Ultimate Healing" words="exura vita" maglv="8" mana="80" enabled="1">
 <vocation id="0" /><vocation id="1" /><vocation id="2" /><vocation id="3" />
 </spell>
 <spell name="Light Healing" words="exura" maglv="8" mana="20" enabled="1">
@@ -14,7 +14,7 @@
 </spell>
 <spell name="Energy Wave" words="exevo mort hur" maglv="20" mana="250" enabled="1"><vocation id="0" /><vocation id="1" />
 </spell>
-<spell name="Mass Healing" words="exura gran mas res" maglv="20" mana="100" enabled="1"><vocation id="1" />
+<spell name="Mass Healing" words="exura gran mas res" maglv="20" mana="100" enabled="1"><vocation id="2" />
 </spell>
 <spell name="Creature Illusion" words="utevo res ina" maglv="10" mana="100" enabled="1"><vocation id="0" /><vocation id="1" /><vocation id="2" />
 </spell>
