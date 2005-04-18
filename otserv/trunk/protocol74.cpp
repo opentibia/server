@@ -697,6 +697,8 @@ void Protocol74::parseUseItemEx(NetworkMessage &msg)
 				
 				if(runeitem->getItemCharge() == 0) {
 					container->removeItem(runeitem);
+					delete runeitem;
+					
 					NetworkMessage msg;
 					for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
 						if(cit->second == container) {
@@ -722,6 +724,7 @@ void Protocol74::parseUseItemEx(NetworkMessage &msg)
 				
 				if(runeitem->getItemCharge() == 0) {
 					player->items[from_y] = NULL;
+					delete runeitem;
 					NetworkMessage netmsgs;
 					netmsgs.AddPlayerInventoryItem(player, from_y);
 					player->sendNetworkMessage(&netmsgs);
@@ -749,6 +752,7 @@ void Protocol74::parseUseItemEx(NetworkMessage &msg)
 			
 			if(runeitem->getItemCharge() == 0) {
 				t->removeThing(runeitem);
+				delete runeitem;
 				game->creatureBroadcastTileUpdated(Position(from_x, from_y, from_z));
 			}
 		}
