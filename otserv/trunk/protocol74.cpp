@@ -693,15 +693,22 @@ void Protocol74::parseUseItemEx(NetworkMessage &msg)
 				return;
 
 			if(game->creatureUseItem(player, pos, runeitem)) {
-				//Disabled for now, need to send containerupdated to all views of the container
-				/*
 				runeitem->setItemCharge(std::max((int)runeitem->getItemCharge() - 1, 0) );
-
+				
 				if(runeitem->getItemCharge() == 0) {
 					container->removeItem(runeitem);
-					sendContainerUpdated(runeitem, containerid, 0xFF, from_z, 0xFF, true);
+					NetworkMessage msg;
+					for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
+						if(cit->second == container) {
+							//remove item
+							msg.AddByte(0x72);
+							msg.AddByte(cit->first);
+							msg.AddByte(from_z);
+						}
+					}
+					msg.WriteToSocket(s);
+					//sendContainerUpdated(runeitem, containerid, 0xFF, from_z, 0xFF, true);
 				}
-				*/
 			}
 		}
 		else // use item from inventory
