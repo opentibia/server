@@ -2571,9 +2571,18 @@ bool Game::creatureUseItem(Creature *creature, const Position& pos, Item* item)
 
 	//Runes
 	std::map<unsigned short, Spell*>::iterator sit = spells.getAllRuneSpells()->find(item->getID());
-	if( sit != spells.getAllRuneSpells()->end() ) {
-		bool success = sit->second->getSpellScript()->castSpell(creature, pos, var);
-		ret = success;
+	if(sit != spells.getAllRuneSpells()->end()) {
+		if(sit->second->getMagLv() <= creature->maglevel)
+		{
+			bool success = sit->second->getSpellScript()->castSpell(creature, pos, var);
+			ret = success;
+		}
+		else
+		{
+			Player *p = dynamic_cast<Player *>(creature);
+			if(p)
+				p->sendCancel("You don't have the required magic level to use that rune.");
+		}
 	}
 
 	OTSYS_THREAD_UNLOCK(gameLock)
