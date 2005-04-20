@@ -29,7 +29,7 @@
 #include "container.h"
 #include "magic.h"
 #include <vector>
-
+/* moved to items.h
 enum subfight_t {
 	DIST_NONE = 0,
 	DIST_BOLT = NM_ANI_BOLT,
@@ -47,7 +47,7 @@ enum subfight_t {
   DIST_POWERBOLT = NM_ANI_POWERBOLT,
   DIST_SPEAR = NM_ANI_SPEAR
 };
-
+*/
 enum slots_t {
 	SLOT_WHEREEVER=0,
 	SLOT_HEAD=1,
@@ -140,6 +140,7 @@ public:
 
   virtual fight_t getFightType(){return FIGHT_MELEE;};
 	virtual subfight_t getSubFightType() {return DIST_NONE;}
+	virtual void RemoveDistItem(){return;}
 	virtual int getImmunities() const
 	{
 		if(access != 0) 
