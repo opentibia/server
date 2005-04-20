@@ -55,7 +55,9 @@ class Item : public Thing
 		
     bool isWeapon() const;
 		WeaponType getWeaponType() const;
-
+		amu_t	getAmuType() const;
+		subfight_t getSubfightType() const;
+		
 		bool isBlockingProjectile() const;
 	  bool isBlocking() const;
 

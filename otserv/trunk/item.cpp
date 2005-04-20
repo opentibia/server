@@ -197,7 +197,15 @@ bool Item::isWeapon() const
 
 
 WeaponType Item::getWeaponType() const {
-		  return items[id].weaponType;
+	  return items[id].weaponType;
+}
+
+amu_t Item::getAmuType() const{
+	 return items[id].amuType;
+}
+
+subfight_t Item::getSubfightType() const {
+	return items[id].shootType;
 }
 
 std::string Item::getDescription() const
