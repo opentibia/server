@@ -2,7 +2,7 @@
 
 <items>
 <item id="1988" name="backpack" type="container" maxitems="20" weight="120" descr="asd"/>
-<item id="2433" name="magic staff" type="weapon" skill="magic" attack="35" defence="20" shottype="4" weight="20" />
+<item id="2433" name="magic staff" type="weapon" skill="magic" attack="35" defence="20" shottype="energy" weight="20" />
 <item id="2434" name="dragon hammer" type="weapon" skill="club" attack="35" defence="20" weight="20" />
 <item id="2455" name="crossbow" type="weapon" skill="distance" amutype="bolt" weight="20" />
 <item id="2456" name="bow" type="weapon" skill="distance" amutype="arrow" weight="20" />
@@ -17,7 +17,9 @@
 <item id="2130" name="Golden Amulet" type="armor" position="amulet" attack="0" defence="0" weight="999" arm="0"/>
 <item id="2123" name="Ring of the Skies" type="armor" position="ring" weight="0.9" />
 <item id="2453" name="Sprite Wand" type="weapon" skill="magic" attack="50" defence="50" weight="28" />
-<item id="2547" name="Power Bolt" type="amunition" amutype="bolt" shottype="13" attack="0" defence="0" weight="23" />
+<item id="2547" name="Power Bolt" type="amunition" amutype="bolt" shottype="power-bolt" attack="0" defence="0" weight="23" />
+<item id="2111" name="Snowball" type="weapon" skill="distance" shottype="snowball" attack="0" defence="0" weight="0.8"/>
+
 
 <item id="3128" name="dead human" weight="1200" decayto="3129" decaytime="30" />
 <item id="3129" name="dead human" weight="1200" decayto="3130" decaytime="30" />
@@ -34,6 +36,7 @@
 <item id="2273" name="adura vita" type="rune" maglevel="8" weight="0.1" />
 <item id="2268" name="adori vita vis" type="rune" maglevel="15" weight="0.1" />
 
-<item id="2148" name="gold" weight="0.1" />
+<item id="2148" name="gold coin" weight="0.1" />
+
 
 </items>
