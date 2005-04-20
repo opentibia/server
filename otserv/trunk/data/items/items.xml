@@ -31,4 +31,9 @@
 <item id="2020" name="blood" weight="900" decayto="2021" decaytime="45" />
 <item id="2021" name="blood" weight="600" />
 
+<item id="2273" name="adura vita" type="rune" maglevel="8" weight="0.1" />
+<item id="2268" name="adori vita vis" type="rune" maglevel="15" weight="0.1" />
+
+<item id="2148" name="gold" weight="0.1" />
+
 </items>
