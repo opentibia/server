@@ -130,7 +130,8 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name){
 						Item* myitem = new Item();
 						myitem->unserialize(slot->children);
 						//player->items[sl_id] = Item::CreateItem(myitem->getID(), myitem->getItemCountOrSubtype());
-						player->addItem(Item::CreateItem(myitem->getID(), myitem->getItemCountOrSubtype()), sl_id);
+						//player->addItem(Item::CreateItem(myitem->getID(), myitem->getItemCountOrSubtype()), sl_id);
+						player->addItem(Item::CreateItem(myitem->getID(), myitem->getItemCharge()), sl_id);
 						delete myitem;
 						myitem = NULL;
 
@@ -256,6 +257,12 @@ bool IOPlayerXML::SaveContainer(xmlNodePtr nodeitem,Container* ccontainer)
 			if(in_container){
 				SaveContainer(nn,in_container);
 			}
+			else if((int)citem->getItemCharge())
+			{
+				sb << (int)citem->getItemCharge();
+				xmlSetProp(nn, (const xmlChar*) "count", (const xmlChar*)sb.str().c_str());
+				sb.str("");
+			}
 			xmlAddChild(pn, nn);
 		}
 		xmlAddChild(nodeitem, pn);
@@ -266,6 +273,7 @@ bool IOPlayerXML::SaveContainer(xmlNodePtr nodeitem,Container* ccontainer)
 
 bool IOPlayerXML::savePlayer(Player* player){
 	std::string filename = "data/players/"+player->getName()+".xml";
+	std::transform (filename.begin(),filename.end(), filename.begin(), tolower);
     std::stringstream sb;
     
     xmlDocPtr doc;
@@ -350,6 +358,12 @@ bool IOPlayerXML::savePlayer(Player* player){
           sb << player->items[i]->getID();
           xmlSetProp(nn, (const xmlChar*) "id", (const xmlChar*)sb.str().c_str());            
           sb.str("");
+		if((int)player->items[i]->getItemCharge())
+		{
+			sb << (int)player->items[i]->getItemCharge();
+			xmlSetProp(nn, (const xmlChar*) "count", (const xmlChar*)sb.str().c_str());
+			sb.str("");
+		}
           Container* is_container = dynamic_cast<Container*>(player->items[i]);
           if(is_container){
                SaveContainer(nn,is_container);

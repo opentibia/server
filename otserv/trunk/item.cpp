@@ -113,7 +113,7 @@ int Item::unserialize(xmlNodePtr p){
 	id=atoi((const char*)xmlGetProp(p, (const xmlChar *) "id"));
 	const char* tmp=(const char*)xmlGetProp(p, (const xmlChar *) "count");
 	if(tmp)
-		count=atoi(tmp);
+		chargecount=atoi(tmp);
 	return 0;
 }
 xmlNodePtr Item::serialize(){
