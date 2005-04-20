@@ -1454,7 +1454,7 @@ void Game::creatureSay(Creature *creature, unsigned char type, const std::string
 				delete newItem;
 				break;
 			}
-			
+			newItem->pos = creature->pos;
 			t->addThing(newItem);
 			
 			Game::creatureBroadcastTileUpdated(Position(creature->pos.x, creature->pos.y, creature->pos.z));
@@ -2059,8 +2059,10 @@ void Game::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fi
 
 		gamestate.getChanges(spectator, msg);
 
-		if(damagetype != FIGHT_MELEE)
+		if(damagetype != FIGHT_MELEE){
 			msg.AddDistanceShoot(creature->pos, attackedCreature->pos, creature->getSubFightType());
+			creature->RemoveDistItem();
+		}
 		
 		if (attackedCreature->manaShieldTicks < 1000 && (creatureState.damage == 0) &&
 			(spectator->CanSee(attackedCreature->pos.x, attackedCreature->pos.y, attackedCreature->pos.z))) {
