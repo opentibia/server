@@ -24,11 +24,52 @@
 
 #include <map>
 #include <string>
+#include "networkmessage.h"
 
 enum WeaponType 
 {
   NONE, SWORD, CLUB, AXE, DIST, MAGIC, AMO, SHIELD
 };
+
+enum amu_t{
+	AMU_NONE,
+	AMU_BOLT,
+	AMU_ARROW
+};
+
+//unfortunately this have to be here
+enum subfight_t {
+	DIST_NONE = 0,
+	DIST_BOLT = NM_ANI_BOLT,
+  DIST_ARROW = NM_ANI_ARROW, 
+  DIST_FIRE = NM_ANI_FIRE,
+  DIST_ENERGY = NM_ANI_ENERGY,
+  DIST_POISONARROW = NM_ANI_POISONARROW,
+  DIST_BURSTARROW = NM_ANI_BURSTARROW,
+  DIST_THROWINGSTAR = NM_ANI_THROWINGSTAR,
+  DIST_THROWINGKNIFE = NM_ANI_THROWINGKNIFE,
+  DIST_SMALLSTONE = NM_ANI_SMALLSTONE,
+  DIST_SUDDENDEATH = NM_ANI_SUDDENDEATH,
+  DIST_LARGEROCK = NM_ANI_LARGEROCK,
+  DIST_SNOWBALL = NM_ANI_SNOWBALL,
+  DIST_POWERBOLT = NM_ANI_POWERBOLT,
+  DIST_SPEAR = NM_ANI_SPEAR
+};
+
+
+#define SLOTP_WHEREEVER 0xFFFFFFFF
+#define SLOTP_HEAD 1
+#define	SLOTP_NECKLACE 2
+#define	SLOTP_BACKPACK 4
+#define	SLOTP_ARMOR 8
+#define	SLOTP_RIGHT 16
+#define	SLOTP_LEFT 32
+#define	SLOTP_LEGS 64
+#define	SLOTP_FEET 128
+#define	SLOTP_RING 256
+#define	SLOTP_AMMO 512
+#define	SLOTP_DEPOT 1024
+
 
 class ItemType {
 public:
@@ -42,9 +83,12 @@ public:
 	std::string    name;			 // the name of the item
 	std::string description;	 // additional description... as in "The blade is a magic flame." for fireswords
   WeaponType     weaponType;
+  amu_t			amuType;
+  subfight_t	shootType;
   int            attack;
   int            defence;
-
+  int 			 armor;
+	unsigned long 		slot_position;
   unsigned short decayTo;
   unsigned short decayTime;
 

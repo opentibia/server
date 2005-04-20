@@ -52,6 +52,9 @@ ItemType::ItemType()
 	maxItems   =    8;  // maximum size if this is a container
 	weight     =   50;  // weight of the item, e.g. throwing distance depends on it
   weaponType = NONE;
+  slot_position = SLOTP_WHEREEVER;
+  amuType = AMU_NONE;
+  shootType = DIST_NONE;
   attack     =    0;
   defence    =    0;
 
@@ -333,82 +336,146 @@ int Items::loadXMLInfos(std::string file)
 
 				// now let's find the item and load it's definition...
 				ItemMap::iterator it = items.find(id);
-				if ((it != items.end()) && (it->second != NULL))
-        {
+				if ((it != items.end()) && (it->second != NULL)){
 					ItemType *itemtype = it->second;
 
 					// set general properties...
 					char* name = (char*)xmlGetProp(p, (xmlChar*)"name");
-          if (name)
+          			if (name)
 						itemtype->name = name;
-          else
-            std::cout << "missing name tag for item: " << id << std::endl;
+          			else
+            			std::cout << "missing name tag for item: " << id << std::endl;
 
-          char* weight = (char*)xmlGetProp(p, (xmlChar*)"weight");
-          if (weight)
+          			char* weight = (char*)xmlGetProp(p, (xmlChar*)"weight");
+          			if (weight)
 						itemtype->weight = atof(weight);
-          else
-            std::cout << "missing weight tag for item: " << id << std::endl;
+          			else
+            			std::cout << "missing weight tag for item: " << id << std::endl;
 
 					// and optional properties
-          char* description = (char*)xmlGetProp(p, (xmlChar*)"descr");
-          if (description)
+          			char* description = (char*)xmlGetProp(p, (xmlChar*)"descr");
+          			if (description)
 						itemtype->description = description;
 
-          char* decayTo = (char*)xmlGetProp(p, (xmlChar*)"decayto");
-          if (decayTo)
+          			char* decayTo = (char*)xmlGetProp(p, (xmlChar*)"decayto");
+          			if (decayTo)
 						itemtype->decayTo = atoi(decayTo);
 
-          char* decayTime = (char*)xmlGetProp(p, (xmlChar*)"decaytime");
-          if (decayTime)
+          			char* decayTime = (char*)xmlGetProp(p, (xmlChar*)"decaytime");
+          			if (decayTime)
 						itemtype->decayTime = atoi(decayTime);
 		
 					char* damage = (char*)xmlGetProp(p, (xmlChar*)"damage");
 					if(damage)
 						itemtype->damage = atoi(damage);
-
+					
+					char *position = (char*)xmlGetProp(p, (xmlChar*)"position");
+					if(position){
+						if (!strcmp(position, "helmet") || !strcmp(position, "head"))
+						  	itemtype->slot_position = SLOTP_HEAD;
+					 	else if (!strcmp(position, "amulet"))
+					 		itemtype->slot_position = SLOTP_NECKLACE;
+					 	else if (!strcmp(position, "body"))
+					 		itemtype->slot_position = SLOTP_ARMOR;
+					 	else if (!strcmp(position, "legs"))
+					 		itemtype->slot_position = SLOTP_LEGS;
+					 	else if (!strcmp(position, "boots"))
+					 		itemtype->slot_position = SLOTP_FEET;
+					 	else if (!strcmp(position, "ring"))
+					 		itemtype->slot_position = SLOTP_RING;
+					 	else if (!strcmp(position, "backpack"))
+					 		itemtype->slot_position = SLOTP_BACKPACK; 
+					 	else if (!strcmp(position, "weapon"))
+					 		itemtype->slot_position = SLOTP_RIGHT | SLOTP_LEFT;
+					 	else if (!strcmp(position, "hand"))
+					 		itemtype->slot_position = SLOTP_RIGHT | SLOTP_LEFT | SLOTP_AMMO;
+           				else
+	       					std::cout << "wrong position tag for item: " << id << std::endl;
+					}						
+					
 					// now set special properties...
 					// first we check the type...
 					char* type = (char*)xmlGetProp(p, (xmlChar*)"type");
-				  if (type)
-          {
-            if (!strcmp(type, "container"))
-            {
+				  	if (type){
+            			if (!strcmp(type, "container")){
 							// we have a container...
 							// TODO set that we got a container
-              char* maxitems = (char*)xmlGetProp(p, (xmlChar*)"maxitems");
+              				char* maxitems = (char*)xmlGetProp(p, (xmlChar*)"maxitems");
 							if (maxitems)
-                itemtype->maxItems = atoi(maxitems);
-              else
+                				itemtype->maxItems = atoi(maxitems);
+              				else
 								std::cout << "item " << id << " is a container but lacks a maxitems definition." << std::endl;
 
-						}
-            else if (!strcmp(type, "weapon"))
-            {
+						}//container
+            			else if (!strcmp(type, "weapon")){
 							// we have a weapon...
 							// find out which type of weapon we have...
-              char *skill = (char*)xmlGetProp(p, (xmlChar*)"skill");
-              if (skill)
-              {
-						    if (!strcmp(skill, "sword"))
-								  itemtype->weaponType = SWORD;
-							  else if (!strcmp(skill, "club"))
-							    itemtype->weaponType = CLUB;
-							  else if (!strcmp(skill, "axe"))
-								  itemtype->weaponType = AXE;
-							  else if (!strcmp(skill, "distance"))
-								  itemtype->weaponType = DIST;
-							  else if (!strcmp(skill, "magic"))
-								  itemtype->weaponType = MAGIC;
-							  else if (!strcmp(skill, "shielding"))
-								  itemtype->weaponType = SHIELD;
-								else
-								  std::cout << "wrong skill tag for weapon" << std::endl;
-							}
-							else
+              				char *skill = (char*)xmlGetProp(p, (xmlChar*)"skill");
+              				if (skill){
+						    	if (!strcmp(skill, "sword"))
+								  	itemtype->weaponType = SWORD;
+							  	else if (!strcmp(skill, "club"))
+							    	itemtype->weaponType = CLUB;
+							  	else if (!strcmp(skill, "axe"))
+									itemtype->weaponType = AXE;
+							  	else if (!strcmp(skill, "distance")){
+									itemtype->weaponType = DIST;
+									char *amutype = (char*)xmlGetProp(p, (xmlChar*)"amutype");
+              						if (amutype){
+						    			if (!strcmp(amutype, "bolt"))
+								  			itemtype->amuType = AMU_BOLT;
+							  			else if (!strcmp(amutype, "arrow"))
+							    			itemtype->amuType = AMU_ARROW;
+                						else
+                  							std::cout << "wrong amutype tag" << std::endl;
+									}
+									else{ //no ammunition, check shoottype
+										char *sshoottype = (char*)xmlGetProp(p, (xmlChar*)"shottype");
+              							if (sshoottype){
+							    			if (!strcmp(sshoottype, "throwing-star"))
+							    				itemtype->shootType = DIST_THROWINGSTAR;
+							    			else if (!strcmp(sshoottype, "throwing-knife"))
+							    				itemtype->shootType = DIST_THROWINGKNIFE;
+							    			else if (!strcmp(sshoottype, "small-stone"))
+							    				itemtype->shootType = DIST_SMALLSTONE;
+							    			else if (!strcmp(sshoottype, "sudden-death"))
+							    				itemtype->shootType = DIST_SUDDENDEATH;
+							    			else if (!strcmp(sshoottype, "large-rock"))
+							    				itemtype->shootType = DIST_LARGEROCK;
+							    			else if (!strcmp(sshoottype, "snowball"))
+							    				itemtype->shootType = DIST_SNOWBALL;
+							    			else if (!strcmp(sshoottype, "spear"))
+							    				itemtype->shootType = DIST_SPEAR;
+                							else
+                  								std::cout << "wrong shootype tag" << std::endl;
+										}
+										else
+											std::cout << "missing shoottype type for distante-item: " << id << std::endl;
+									}																
+								}
+								else if (!strcmp(skill, "magic")){
+									itemtype->weaponType = MAGIC;
+									char *sshoottype = (char*)xmlGetProp(p, (xmlChar*)"shottype");
+              						if (sshoottype){
+										if (!strcmp(sshoottype, "fire"))
+							    			itemtype->shootType = DIST_FIRE;
+							    		else if (!strcmp(sshoottype, "energy"))
+							    			itemtype->shootType = DIST_ENERGY;
+							    		else
+							    			std::cout << "wrong shootype tag" << std::endl;
+									}									
+									
+								}
+							  	else if (!strcmp(skill, "shielding"))
+									itemtype->weaponType = SHIELD;
+                				else
+                  					std::cout << "wrong skill tag for weapon" << std::endl;
+              				}
+              				else
 								std::cout << "missing skill tag for weapon" << std::endl;
 							
 							char* attack = (char*)xmlGetProp(p, (xmlChar*)"attack");
+
 							if (attack)
 								itemtype->attack = atoi(attack);
 							else
@@ -424,26 +491,57 @@ int Items::loadXMLInfos(std::string file)
 						else if (!strcmp(type, "amunition"))
 						{
 							// we got some amo
-							itemtype->weaponType = AMO;
-						}
-						else if (!strcmp(type, "armor"))
-						{
-							// armor...
-						}
+							itemtype->weaponType = AMO;							
+							char *amutype = (char*)xmlGetProp(p, (xmlChar*)"amutype");
+              				if (amutype){
+						    	if (!strcmp(amutype, "bolt"))
+								  	itemtype->amuType = AMU_BOLT;
+							  	else if (!strcmp(amutype, "arrow"))
+							    	itemtype->amuType = AMU_ARROW;
+                				else
+                  					std::cout << "wrong amutype tag for item: " << id << std::endl;
+							}
+							else
+								std::cout << "missing amutype for item: " << id << std::endl;
+								
+    						char *sshoottype = (char*)xmlGetProp(p, (xmlChar*)"shottype");
+              				if (sshoottype){
+						    	if (!strcmp(sshoottype, "bolt"))
+								  	itemtype->shootType = DIST_BOLT;
+							  	else if (!strcmp(sshoottype, "arrow"))
+							    	itemtype->shootType = DIST_ARROW;
+							    else if (!strcmp(sshoottype, "poison-arrow"))
+							    	itemtype->shootType = DIST_POISONARROW;
+							    else if (!strcmp(sshoottype, "burst-arrow"))
+							    	itemtype->shootType = DIST_BURSTARROW;
+							    else if (!strcmp(sshoottype, "power-bolt"))
+							    	itemtype->shootType = DIST_POWERBOLT;
+                				else
+                  					std::cout << "wrong shootype tag for item: " << id << std::endl;                  					
+              				}
+              				else
+								std::cout << "missing shoottype for item: " << id <<  std::endl;
+						}//ammunition
+            			else if (!strcmp(type, "armor")){
+							char* sarmor = (char*)xmlGetProp(p, (xmlChar*)"arm");
+		            		if (sarmor)
+								itemtype->armor = atoi(sarmor);
+              				else
+								std::cout << "missing arm tag for armor: " << id << std::endl;
+						}//armor
 						else if (!strcmp(type, "rune"))
 						{
 							// runes..
 							char* runemaglv = (char*)xmlGetProp(p, (xmlChar*)"maglevel");
 							if(runemaglv)
 								itemtype->runeMagLevel = atoi(runemaglv);
-						}
-						
-					}
-				} else {
-						  std::cout << "invalid item " << id << std::endl;
-				}
-
-			}
+						}//rune
+					}//type
+				} 
+				else {
+					std::cout << "invalid item " << id << std::endl;
+				}//type
+			}//item - id						
 			p = p->next;
 		}
 
