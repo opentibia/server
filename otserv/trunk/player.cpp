@@ -148,6 +148,7 @@ int Player::getWeaponDamage() const
       {
 				// check which kind of skill we use...
 				// and calculate the damage dealt
+				Item *distitem;
 				switch (items[slot]->getWeaponType())
         {
 					case SWORD:
@@ -160,7 +161,9 @@ int Player::getWeaponDamage() const
 						damagemax = 3*skills[SKILL_AXE][SKILL_LEVEL] + 2*Item::items[items[slot]->getID()].attack;
 						break;
 					case DIST:
-						damagemax = 4*skills[SKILL_DIST][SKILL_LEVEL];
+						distitem = 	GetDistWeapon();
+						if(distitem)
+							damagemax = 3*skills[SKILL_DIST][SKILL_LEVEL]+ 2*Item::items[distitem->getID()].attack;
 						break;
 					case MAGIC:
 						damagemax = (level*2+maglevel*3) * 1.25;
@@ -393,33 +396,115 @@ fight_t Player::getFightType()
   {
     if (items[slot])
     {
-			if ((items[slot]->isWeapon())) {
-				switch (items[slot]->getWeaponType())
-        {
-					case DIST:
-						return FIGHT_DIST;
-					case MAGIC:
-						return FIGHT_MAGICDIST;
-					default:
-						break;
+		if ((items[slot]->isWeapon())) {
+			Item *DistItem;
+			switch (items[slot]->getWeaponType()){
+			case DIST:
+				DistItem = GetDistWeapon();
+				if(DistItem){
+					return FIGHT_DIST;
 				}
+				else{
+					return FIGHT_MELEE;
+				}
+				break;
+			case MAGIC:
+				return FIGHT_MAGICDIST;
+			default:
+				break;
 			}
+		}
     }
   }
   return FIGHT_MELEE;
+}
+
+void Player::RemoveDistItem(){
+	Item *DistItem = GetDistWeapon();
+	unsigned char sl_id;
+	if(DistItem){
+		if(DistItem->isStackable() == false)
+			return;
+		//remove one dist item
+		unsigned char n = DistItem->getItemCountOrSubtype();
+		if(DistItem == items[SLOT_RIGHT]){
+			sl_id = SLOT_RIGHT;
+		}
+		else if(DistItem == items[SLOT_LEFT]){
+			sl_id = SLOT_LEFT;
+		}
+		else if(DistItem == items[SLOT_AMMO]){
+			sl_id = SLOT_AMMO;
+		}
+		if(n > 1){
+			DistItem->setItemCountOrSubtype(n-1);
+		}
+		else{
+			//remove the item			
+			items[sl_id] = NULL;
+			delete DistItem;
+		}		
+		//update inventory
+		NetworkMessage msg;			
+		msg.AddPlayerInventoryItem(this,sl_id);
+		sendNetworkMessage(&msg);
+	}
+	return;
 }
 
 subfight_t Player::getSubFightType()
 {
 	fight_t type = getFightType();
 	if(type == FIGHT_DIST) {
-		return DIST_POWERBOLT;
+		Item *DistItem = GetDistWeapon();
+		if(DistItem){
+			return DistItem->getSubfightType();
+		}
 	}
     if(type == FIGHT_MAGICDIST) {
-		return DIST_ENERGY;
+		Item *DistItem = GetDistWeapon();
+		if(DistItem){
+			return DistItem->getSubfightType();
+		}	
 	}
 	return DIST_NONE;
 }
+
+Item * Player::GetDistWeapon() const{
+	for (int slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++){
+	    if (items[slot]){
+			if ((items[slot]->isWeapon())) {
+				switch (items[slot]->getWeaponType()){
+				case DIST:
+					//find ammunition
+					if(items[slot]->getAmuType() == AMU_NONE){
+						return items[slot];
+					}
+					if(items[SLOT_AMMO]){
+						//compare ammo types
+						if(items[SLOT_AMMO]->getWeaponType() == AMO && 
+							items[slot]->getAmuType() == items[SLOT_AMMO]->getAmuType()){
+								return items[SLOT_AMMO];
+						}
+						else{
+							return NULL;
+						}
+						
+					}
+					else{
+						return NULL;
+					}
+				case MAGIC:
+					return items[slot];
+				default:
+					break;
+				}//switch
+			}//isweapon
+    	}//item[slot]
+  	}//for
+  	return NULL;
+}
+
 
 bool Player::CanSee(int x, int y, int z) const
 {

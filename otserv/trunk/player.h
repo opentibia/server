@@ -72,7 +72,8 @@ public:
 	int sendInventory();
 
 	Item* getItem(int pos) const;
-
+	Item* GetDistWeapon() const;
+	
 	std::string getName(){return name;};
 	
   int sex, voc;
@@ -106,6 +107,7 @@ public:
   void    releasePlayer() { useCount--; if (useCount == 0) delete this; };
 	unsigned long getIP() const;
 
+	void RemoveDistItem();
   fight_t getFightType();
 	subfight_t getSubFightType();
 
