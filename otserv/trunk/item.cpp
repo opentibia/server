@@ -210,17 +210,29 @@ std::string Item::getDescription() const
 			s << "They weight " << std::fixed << std::setprecision(1) << ((double) count * items[id].weight) << " oz.";
 		}
 		else {
-			s << "You see a " << items[id].name << "." << std::endl;
+			if(items[id].runeMagLevel != -1)
+			{
+				s << "You see a spell rune for level " << items[id].runeMagLevel << "." << std::endl;
+				s << "It's an \"" << items[id].name << "\" spell (";
+				if(getItemCharge())
+					s << (int)getItemCharge();
+				else
+					s << "1";
+				s << "x)." << std::endl;
+			}
+			else
+			{
+				s << "You see a " << items[id].name << "." << std::endl;
+			}
 			s << "It weighs " << std::fixed << std::setprecision(1) << items[id].weight << " oz.";
+			if(items[id].description != "")
+			{
+				s << std::endl << items[id].description;
+			}
 		}
 	}
 	else
 		s<<"You see an item of type " << id <<".";
-	
-	if(this->getItemCharge() > 0)
-	{
-		s << std::endl << "It has " << (int)this->getItemCharge() << " charges left.";
-	}
 	
 	str = s.str();
 	return str;

@@ -60,7 +60,8 @@ public:
 	bool useable;
 	bool notMoveable;
 	bool alwaysOnTop;
-	bool groundtile; 
+	bool groundtile;
+	int  runeMagLevel;
 	bool blocking;   // people can walk on it
 	bool pickupable; // people can pick it up
 	bool blockingProjectile;

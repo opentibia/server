@@ -45,6 +45,8 @@ ItemType::ItemType()
 	floorChangeEast = false;
 	floorChangeWest = false;
 	
+	runeMagLevel    = -1;
+	
 	speed		= 0;
 	id         =  100;
 	maxItems   =    8;  // maximum size if this is a container
@@ -400,34 +402,42 @@ int Items::loadXMLInfos(std::string file)
 								  itemtype->weaponType = MAGIC;
 							  else if (!strcmp(skill, "shielding"))
 								  itemtype->weaponType = SHIELD;
-                else
-                  std::cout << "wrong skill tag for weapon" << std::endl;
-              }
-              else
+								else
+								  std::cout << "wrong skill tag for weapon" << std::endl;
+							}
+							else
 								std::cout << "missing skill tag for weapon" << std::endl;
-
+							
 							char* attack = (char*)xmlGetProp(p, (xmlChar*)"attack");
-              if (attack)
+							if (attack)
 								itemtype->attack = atoi(attack);
-              else
+							else
 								std::cout << "missing attack tag for weapon: " << id << std::endl;
-
+							
 							char* defence = (char*)xmlGetProp(p, (xmlChar*)"defence");
 							if (defence)
-                itemtype->defence = atoi(defence);
-              else
+							itemtype->defence = atoi(defence);
+							else
 								std::cout << "missing defence tag for weapon: " << id << std::endl;
-
+						
 						}
-            else if (!strcmp(type, "amunition"))
-            {
+						else if (!strcmp(type, "amunition"))
+						{
 							// we got some amo
 							itemtype->weaponType = AMO;
 						}
-            else if (!strcmp(type, "armor"))
-            {
+						else if (!strcmp(type, "armor"))
+						{
 							// armor...
 						}
+						else if (!strcmp(type, "rune"))
+						{
+							// runes..
+							char* runemaglv = (char*)xmlGetProp(p, (xmlChar*)"maglevel");
+							if(runemaglv)
+								itemtype->runeMagLevel = atoi(runemaglv);
+						}
+						
 					}
 				} else {
 						  std::cout << "invalid item " << id << std::endl;
