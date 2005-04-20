@@ -2046,6 +2046,9 @@ void Game::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fi
 	else if(player)
 		player->addSkillTry(1);
 
+	if(damagetype != FIGHT_MELEE)
+		creature->RemoveDistItem();
+	
 	NetworkMessage msg;
 
 	std::vector<Creature*> spectatorlist = gamestate.getSpectators();
@@ -2061,7 +2064,6 @@ void Game::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fi
 
 		if(damagetype != FIGHT_MELEE){
 			msg.AddDistanceShoot(creature->pos, attackedCreature->pos, creature->getSubFightType());
-			creature->RemoveDistItem();
 		}
 		
 		if (attackedCreature->manaShieldTicks < 1000 && (creatureState.damage == 0) &&
