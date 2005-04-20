@@ -112,8 +112,11 @@ Item::~Item()
 int Item::unserialize(xmlNodePtr p){
 	id=atoi((const char*)xmlGetProp(p, (const xmlChar *) "id"));
 	const char* tmp=(const char*)xmlGetProp(p, (const xmlChar *) "count");
-	if(tmp)
+	if(tmp && isStackable())
+		count=atoi(tmp);
+	else if(tmp)
 		chargecount=atoi(tmp);
+	
 	return 0;
 }
 xmlNodePtr Item::serialize(){
@@ -126,6 +129,11 @@ xmlNodePtr Item::serialize(){
 	if(isStackable()){
 		s.str(""); //empty the stringstream
 		s << (int)count;
+		xmlSetProp(ret, (const xmlChar*)"count", (const xmlChar*)s.str().c_str());
+	}
+	else if(getItemCharge() > 0){
+		s.str(""); //empty the stringstream
+		s << (int)getItemCharge();
 		xmlSetProp(ret, (const xmlChar*)"count", (const xmlChar*)s.str().c_str());
 	}
 	return ret;

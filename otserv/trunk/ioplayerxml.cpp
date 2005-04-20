@@ -130,8 +130,7 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name){
 						Item* myitem = new Item();
 						myitem->unserialize(slot->children);
 						//player->items[sl_id] = Item::CreateItem(myitem->getID(), myitem->getItemCountOrSubtype());
-						//player->addItem(Item::CreateItem(myitem->getID(), myitem->getItemCountOrSubtype()), sl_id);
-						player->addItem(Item::CreateItem(myitem->getID(), myitem->getItemCharge()), sl_id);
+						player->addItem(Item::CreateItem(myitem->getID(), myitem->getItemCountOrSubtype()), sl_id);
 						delete myitem;
 						myitem = NULL;
 
@@ -222,15 +221,23 @@ bool IOPlayerXML::LoadContainer(xmlNodePtr nodeitem,Container* ccontainer)
 		//load items
 		p=tmp->children;
 		while(p){
+			/*
 			s_id = atoi((const char*)xmlGetProp(p, (const xmlChar *) "id"));
 			s_count = 0;
 			
 			if((const char*)xmlGetProp(p, (const xmlChar *) "count")) {
 				s_count = atoi((const char*)xmlGetProp(p, (const xmlChar *) "count"));
 			}
-
-			new_item = Item::CreateItem(s_id, s_count);
+			*/
+			Item* myitem = new Item();
+			myitem->unserialize(p);
+			
+			Item *new_item = Item::CreateItem(myitem->getID(), myitem->getItemCountOrSubtype());
+			delete myitem;
+			myitem = NULL;
+			
 			ccontainer->addItem(new_item);
+			
 			Container* in_container = dynamic_cast<Container*>(new_item);
 			if(in_container){
 				LoadContainer(p,in_container);
@@ -256,12 +263,6 @@ bool IOPlayerXML::SaveContainer(xmlNodePtr nodeitem,Container* ccontainer)
 			Container* in_container = dynamic_cast<Container*>(citem);
 			if(in_container){
 				SaveContainer(nn,in_container);
-			}
-			else if((int)citem->getItemCharge())
-			{
-				sb << (int)citem->getItemCharge();
-				xmlSetProp(nn, (const xmlChar*) "count", (const xmlChar*)sb.str().c_str());
-				sb.str("");
 			}
 			xmlAddChild(pn, nn);
 		}
@@ -354,16 +355,7 @@ bool IOPlayerXML::savePlayer(Player* player){
           xmlSetProp(pn, (const xmlChar*) "slotid", (const xmlChar*)sb.str().c_str());            
           sb.str("");
           
-      	  nn = xmlNewNode(NULL,(const xmlChar*)"item");
-          sb << player->items[i]->getID();
-          xmlSetProp(nn, (const xmlChar*) "id", (const xmlChar*)sb.str().c_str());            
-          sb.str("");
-		if((int)player->items[i]->getItemCharge())
-		{
-			sb << (int)player->items[i]->getItemCharge();
-			xmlSetProp(nn, (const xmlChar*) "count", (const xmlChar*)sb.str().c_str());
-			sb.str("");
-		}
+		nn = player->items[i]->serialize();
           Container* is_container = dynamic_cast<Container*>(player->items[i]);
           if(is_container){
                SaveContainer(nn,is_container);
