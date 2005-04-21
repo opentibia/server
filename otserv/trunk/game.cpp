@@ -1521,6 +1521,35 @@ void Game::creatureSay(Creature *creature, unsigned char type, const std::string
 			
             }
             break;
+		  case 'q': // Testing command to see your money and to substract too.
+            {
+			std::string cmd = text;
+			cmd.erase(0,3);
+			
+			Player *p = dynamic_cast<Player *>(creature);
+			if(!p)
+				break;
+			
+			int count = atoi(cmd.c_str());
+			unsigned long money = p->getMoney();
+			if(!count)
+			{
+				std::stringstream info;
+				info << "You have " << money << " of money.";
+				p->sendCancel(info.str().c_str());
+				break;
+			}
+			else if(count > money)
+			{
+				std::stringstream info;
+				info << "You have " << money << " of money and is not suficient.";
+				p->sendCancel(info.str().c_str());
+				break;
+			}
+			
+			p->substractMoney(count);
+            }
+            break;
 		}
 	}
 

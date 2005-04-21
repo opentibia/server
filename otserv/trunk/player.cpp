@@ -217,6 +217,170 @@ int Player::getDefense() const
 	return defense;
 }
 
+unsigned long Player::getMoney()
+{
+	unsigned long money=0;
+	
+	for(int i=SLOT_HEAD; i <= SLOT_AMMO; i++)
+	{
+		Container* new_container = dynamic_cast<Container*>(items[i]);
+		if(new_container)
+		{
+			money += getMoneyContainer(new_container);
+		}
+		else if(items[i])
+		{
+			switch(items[i]->getID())
+			{
+			case 2148:
+				//gold coins
+				money += items[i]->getItemCountOrSubtype();
+				break;
+			}
+		}
+	}
+	
+	return money;
+}
+
+unsigned long Player::getMoneyContainer(Container *container)
+{
+	unsigned long money=0;
+	
+	for(int i=0; i<container->size();i++)
+	{
+		Item *item = container->getItem(i);
+		
+		Container* new_container = dynamic_cast<Container*>(item);
+		if(new_container)
+		{
+			money += getMoneyContainer(new_container);
+		}
+		else if(item)
+		{
+			switch(item->getID())
+			{
+			case 2148:
+				//gold coins
+				money += item->getItemCountOrSubtype();
+				break;
+			}
+		}
+	}
+	
+	return money;
+}
+
+bool Player::substractMoney(unsigned long money)
+{
+	int temp;
+	
+	for(int i=SLOT_HEAD; i <= SLOT_AMMO; i++)
+	{
+		Container* new_container = dynamic_cast<Container*>(items[i]);
+		if(new_container && money)
+		{
+			substractMoneyContainer(new_container, &money);
+		}
+		else if(items[i] && money)
+		{
+			switch(items[i]->getID())
+			{
+			case 2148:
+				//gold coins
+				temp = items[i]->getItemCountOrSubtype();
+				if(money >= temp)
+				{
+					money -= temp;
+					delete items[i];
+					items[i] = NULL;
+					
+				}
+				else
+				{
+					items[i]->setItemCountOrSubtype(temp - money);
+					money = 0;
+				}
+				NetworkMessage msg;
+				msg.AddPlayerInventoryItem(this,i);
+				sendNetworkMessage(&msg);
+				break;
+			}
+		}
+	}
+	
+	if(money == 0)
+		return true;
+	else
+		return false;
+}
+
+bool Player::substractMoneyContainer(Container *container, unsigned long *money)
+{
+	int temp;
+	
+	for(int i=0; i<container->size();i++)
+	{
+		Item *item = container->getItem(i);
+		
+		Container* new_container = dynamic_cast<Container*>(item);
+		if(new_container && *money)
+		{
+			substractMoneyContainer(new_container, money);
+		}
+		else if(item && *money)
+		{
+			switch(item->getID())
+			{
+			case 2148:
+				//gold coins
+				temp = item->getItemCountOrSubtype();
+				
+				NetworkMessage msg;
+				for(containerLayout::const_iterator cit = getContainers(); cit != getEndContainer(); ++cit) {
+					if(cit->second == container) {
+						//remove item
+						msg.AddByte(0x72);
+						msg.AddByte(cit->first);
+						msg.AddByte(i);
+					}
+				}
+				
+				if(*money >= temp)
+				{
+					*money -= temp;
+					container->removeItem(item);
+					delete item;
+				}
+				else
+				{
+					item->setItemCountOrSubtype(temp - *money);
+					*money = 0;
+					
+					for(containerLayout::const_iterator cit = getContainers(); cit != getEndContainer(); ++cit) {
+						if(cit->second == container) {
+							//add item
+							msg.AddByte(0x70);
+							msg.AddByte(cit->first);
+							msg.AddU16(item->getID());
+							msg.AddByte(item->getItemCountOrSubtype());
+						}
+					}
+				}
+				
+				sendNetworkMessage(&msg);
+				break;
+			}
+		}
+	}
+	
+	if(*money == 0)
+		return true;
+	else
+		return false;
+}
+
+
 void Player::speak(const std::string &text)
 {
 }
