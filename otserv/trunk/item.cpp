@@ -208,6 +208,22 @@ subfight_t Item::getSubfightType() const {
 	return items[id].shootType;
 }
 
+int Item::getAttack() const {
+	  return items[id].attack;
+}
+
+int Item::getArmor() const {
+	  return items[id].armor;
+}
+
+int Item::getDefense() const {
+	  return items[id].defence;
+}
+
+int Item::getSlotPosition() const {
+	return items[id].slot_position;
+}
+
 std::string Item::getDescription() const
 {
 	std::stringstream s;
@@ -228,12 +244,20 @@ std::string Item::getDescription() const
 					s << "1";
 				s << "x)." << std::endl;
 			}
+			else if(isWeapon())
+			{
+				s << "You see a " << items[id].name << " (Atk:" << (int)getAttack() << " Def:" << (int)getDefense() << ")." << std::endl;
+			}
+			else if(getArmor())
+			{
+				s << "You see a " << items[id].name << " (Armor:"<< (int)getArmor() << ")." << std::endl;
+			}
 			else
 			{
 				s << "You see a " << items[id].name << "." << std::endl;
 			}
 			s << "It weighs " << std::fixed << std::setprecision(1) << items[id].weight << " oz.";
-			if(items[id].description != "")
+			if(items[id].description.length())
 			{
 				s << std::endl << items[id].description;
 			}

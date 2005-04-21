@@ -57,6 +57,10 @@ class Item : public Thing
 		WeaponType getWeaponType() const;
 		amu_t	getAmuType() const;
 		subfight_t getSubfightType() const;
+		int getAttack() const;
+		int getArmor() const;
+		int getDefense() const;
+		int getSlotPosition() const;
 		
 		bool isBlockingProjectile() const;
 	  bool isBlocking() const;

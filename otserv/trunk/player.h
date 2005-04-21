@@ -81,6 +81,8 @@ public:
   int food;
   bool cancelMove;
   virtual int getWeaponDamage() const;
+  virtual int getArmor() const;
+  virtual int getDefense() const;
   char fightMode, followMode;
   int accountNumber;
   

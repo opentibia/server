@@ -185,6 +185,38 @@ int Player::getWeaponDamage() const
 	return 1+(int)(damagemax*rand()/(RAND_MAX+1.0));
 }
 
+int Player::getArmor() const
+{
+	int armor=0;
+	
+	if(items[SLOT_HEAD])
+		armor += items[SLOT_HEAD]->getArmor();
+	if(items[SLOT_NECKLACE])
+		armor += items[SLOT_NECKLACE]->getArmor();
+	if(items[SLOT_ARMOR])
+		armor += items[SLOT_ARMOR]->getArmor();
+	if(items[SLOT_LEGS])
+		armor += items[SLOT_LEGS]->getArmor();
+	if(items[SLOT_FEET])
+		armor += items[SLOT_FEET]->getArmor();
+	if(items[SLOT_RING])
+		armor += items[SLOT_RING]->getArmor();
+	
+	return armor;
+}
+
+int Player::getDefense() const
+{
+	int defense=0;
+	
+	if(items[SLOT_LEFT])
+		defense += items[SLOT_LEFT]->getDefense();
+	if(items[SLOT_RIGHT])
+		defense += items[SLOT_RIGHT]->getDefense();
+	
+	return defense;
+}
+
 void Player::speak(const std::string &text)
 {
 }

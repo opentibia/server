@@ -52,7 +52,7 @@ ItemType::ItemType()
 	maxItems   =    8;  // maximum size if this is a container
 	weight     =   50;  // weight of the item, e.g. throwing distance depends on it
   weaponType = NONE;
-  slot_position = SLOTP_WHEREEVER;
+  slot_position = SLOTP_RIGHT | SLOTP_LEFT | SLOTP_AMMO;
   amuType = AMU_NONE;
   shootType = DIST_NONE;
   attack     =    0;
@@ -391,7 +391,9 @@ int Items::loadXMLInfos(std::string file)
 					 		itemtype->slot_position = SLOTP_RIGHT | SLOTP_LEFT | SLOTP_AMMO;
            				else
 	       					std::cout << "wrong position tag for item: " << id << std::endl;
-					}						
+						
+						itemtype->slot_position |= SLOTP_LEFT | SLOTP_RIGHT | SLOTP_AMMO;
+					}
 					
 					// now set special properties...
 					// first we check the type...
@@ -400,6 +402,7 @@ int Items::loadXMLInfos(std::string file)
             			if (!strcmp(type, "container")){
 							// we have a container...
 							// TODO set that we got a container
+						itemtype->slot_position = SLOTP_BACKPACK | SLOTP_LEFT | SLOTP_RIGHT | SLOTP_AMMO;
               				char* maxitems = (char*)xmlGetProp(p, (xmlChar*)"maxitems");
 							if (maxitems)
                 				itemtype->maxItems = atoi(maxitems);

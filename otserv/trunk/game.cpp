@@ -146,7 +146,20 @@ void GameState::onAttack(Creature* attacker, const Position& pos, const MagicEff
 
 void GameState::onAttack(Creature* attacker, const Position& pos, Creature* attackedCreature)
 {
+	//TODO: Decent formulas and such...
 	int damage = attacker->getWeaponDamage();
+	int armor = attackedCreature->getArmor();
+	int defense = attackedCreature->getDefense();
+	
+	int probability = rand()%100;
+	
+	if(probability < defense)
+		damage = 0;
+	else
+	{
+		damage -= (int)(damage*armor/100);
+	}
+	
 	int manaDamage = 0;
 
 	if (attacker->access != 0)
@@ -718,7 +731,54 @@ bool Game::onPrepareMoveThing(Player *player, const Position& fromPos, const Ite
 		player->sendCancel("You cannot move this object.");
 		return false;
 	}
-
+	else
+	{
+		switch(toSlot)
+		{
+		case SLOT_HEAD:
+			if(item->getSlotPosition() & SLOTP_HEAD)
+				return true;
+			break;
+		case SLOT_NECKLACE:
+			if(item->getSlotPosition() & SLOTP_NECKLACE)
+				return true;
+			break;
+		case SLOT_BACKPACK:
+			if(item->getSlotPosition() & SLOTP_BACKPACK)
+				return true;
+			break;
+		case SLOT_ARMOR:
+			if(item->getSlotPosition() & SLOTP_ARMOR)
+				return true;
+			break;
+		case SLOT_RIGHT:
+			if(item->getSlotPosition() & SLOTP_RIGHT)
+				return true;
+			break;
+		case SLOT_LEFT:
+			if(item->getSlotPosition() & SLOTP_LEFT)
+				return true;
+			break;
+		case SLOT_LEGS:
+			if(item->getSlotPosition() & SLOTP_LEGS)
+				return true;
+			break;
+		case SLOT_FEET:
+			if(item->getSlotPosition() & SLOTP_FEET)
+				return true;
+			break;
+		case SLOT_RING:
+			if(item->getSlotPosition() & SLOTP_RING)
+				return true;
+			break;
+		case SLOT_AMMO:
+			if(item->getSlotPosition() & SLOTP_AMMO)
+				return true;
+			break;
+		}
+		player->sendCancel("You cannot put that object in that place.");
+		return false;
+	}
 	return true;
 }
 
@@ -1457,7 +1517,7 @@ void Game::creatureSay(Creature *creature, unsigned char type, const std::string
 			newItem->pos = creature->pos;
 			t->addThing(newItem);
 			
-			Game::creatureBroadcastTileUpdated(Position(creature->pos.x, creature->pos.y, creature->pos.z));
+			Game::creatureBroadcastTileUpdated(creature->pos);
 			
             }
             break;

@@ -158,6 +158,12 @@ public:
   virtual int getWeaponDamage() const {
 	return 1+(int)(10.0*rand()/(RAND_MAX+1.0));
   }
+  virtual int getArmor() const {
+  	return 0;
+  }
+  virtual int getDefense() const {
+  	return 0;
+  }
 
   unsigned long attackedCreature;
 
