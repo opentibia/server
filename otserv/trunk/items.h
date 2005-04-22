@@ -69,6 +69,7 @@ enum subfight_t {
 #define	SLOTP_RING 256
 #define	SLOTP_AMMO 512
 #define	SLOTP_DEPOT 1024
+#define	SLOTP_TWO_HAND 2048
 
 
 class ItemType {

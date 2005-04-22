@@ -383,10 +383,12 @@ int Items::loadXMLInfos(std::string file)
 					 		itemtype->slot_position = SLOTP_FEET;
 					 	else if (!strcmp(position, "ring"))
 					 		itemtype->slot_position = SLOTP_RING;
-					 	else if (!strcmp(position, "backpack"))
-					 		itemtype->slot_position = SLOTP_BACKPACK; 
+					 	else if (!strcmp(position, "backpack"))					 	
+					 		itemtype->slot_position = SLOTP_BACKPACK | SLOTP_LEFT | SLOTP_RIGHT | SLOTP_AMMO;
 					 	else if (!strcmp(position, "weapon"))
 					 		itemtype->slot_position = SLOTP_RIGHT | SLOTP_LEFT;
+					 	else if (!strcmp(position, "twohand"))
+					 		itemtype->slot_position = SLOTP_RIGHT | SLOTP_LEFT | SLOTP_TWO_HAND;
 					 	else if (!strcmp(position, "hand"))
 					 		itemtype->slot_position = SLOTP_RIGHT | SLOTP_LEFT | SLOTP_AMMO;
            				else
@@ -401,8 +403,7 @@ int Items::loadXMLInfos(std::string file)
 				  	if (type){
             			if (!strcmp(type, "container")){
 							// we have a container...
-							// TODO set that we got a container
-						itemtype->slot_position = SLOTP_BACKPACK | SLOTP_LEFT | SLOTP_RIGHT | SLOTP_AMMO;
+							// TODO set that we got a container						
               				char* maxitems = (char*)xmlGetProp(p, (xmlChar*)"maxitems");
 							if (maxitems)
                 				itemtype->maxItems = atoi(maxitems);
@@ -538,6 +539,8 @@ int Items::loadXMLInfos(std::string file)
 							char* runemaglv = (char*)xmlGetProp(p, (xmlChar*)"maglevel");
 							if(runemaglv)
 								itemtype->runeMagLevel = atoi(runemaglv);
+							else
+	       						std::cout << "missing maglevel for rune: " << id << std::endl;
 						}//rune
 					}//type
 				} 
