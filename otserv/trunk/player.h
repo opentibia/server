@@ -41,7 +41,8 @@ enum skills_t {
 
 enum skillsid_t {
     SKILL_LEVEL=0,
-    SKILL_TRIES=1
+    SKILL_TRIES=1,
+    SKILL_PERCENT=2
 };
 
 class NetworkMessage;
@@ -93,7 +94,7 @@ public:
   std::string password;
 
   Item* items[11]; //equipement of the player
-  unsigned int skills[7][2];
+  unsigned int skills[7][3];
   
   //reminder: 0 = None, 1 = Sorcerer, 2 = Druid, 3 = Paladin, 4 = Knight
   unsigned short CapGain[5];          //for level advances
@@ -180,7 +181,12 @@ protected:
 		unsigned char oldstackpos, unsigned char oldcount, unsigned char count);
 
 	Protocol *client;
-
+	struct SkillCache{
+		unsigned int tries;
+		int level;
+		int voc;
+	};
+	SkillCache SkillAdvanceCache[7][2];
 	// we need our name
 	std::string name;
 };

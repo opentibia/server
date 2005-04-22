@@ -65,6 +65,12 @@ Player::Player(const char *name, Protocol *p) : Creature(name)
   {
     skills[i][SKILL_LEVEL] = 1;
     skills[i][SKILL_TRIES] = 0;
+	skills[i][SKILL_PERCENT] = 0;
+	for(int j=0;j<2;j++){
+		SkillAdvanceCache[i][j].level = 0;
+		SkillAdvanceCache[i][j].voc = 0;
+		SkillAdvanceCache[i][j].tries = 0;
+	}
   }
 
   //set item pointers to NULL
@@ -99,8 +105,7 @@ Player::~Player()
 {
 	for (int i = 0; i < 11; i++)
 		if (items[i])
-      delete items[i];
-
+      delete items[i];	
   delete client;
 }
 
@@ -141,16 +146,14 @@ Item* Player::getItem(int pos) const
 int Player::getWeaponDamage() const
 {
 	double damagemax = 0;
+	//TODO:what happens with 2 weapons?
   for (int slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++)
-	  if (items[slot])
-    {
-			if ((items[slot]->isWeapon()))
-      {
+	  if (items[slot]){
+			if ((items[slot]->isWeapon())){
 				// check which kind of skill we use...
 				// and calculate the damage dealt
 				Item *distitem;
-				switch (items[slot]->getWeaponType())
-        {
+				switch (items[slot]->getWeaponType()){
 					case SWORD:
 						damagemax = 3*skills[SKILL_SWORD][SKILL_LEVEL] + 2*Item::items[items[slot]->getID()].attack;
 						break;
@@ -162,8 +165,23 @@ int Player::getWeaponDamage() const
 						break;
 					case DIST:
 						distitem = 	GetDistWeapon();
-						if(distitem)
+						if(distitem){
 							damagemax = 3*skills[SKILL_DIST][SKILL_LEVEL]+ 2*Item::items[distitem->getID()].attack;
+							//hit or miss
+							int hitchance;
+							if(distitem->getWeaponType() == AMO){//projectile
+								hitchance = 90;
+							}
+							else{//thrown weapons
+								hitchance = 50;
+							}
+							if(rand()%100 < hitchance){ //hit
+								return 1+(int)(damagemax*rand()/(RAND_MAX+1.0));
+							}
+							else{	//miss
+								return 0;
+							}
+						}						
 						break;
 					case MAGIC:
 						damagemax = (level*2+maglevel*3) * 1.25;
@@ -175,6 +193,8 @@ int Player::getWeaponDamage() const
 						break;
 			  }
 		  }
+		  if(damagemax != 0)
+		  	break;
     }
 
 	// no weapon found -> fist fighting
@@ -609,6 +629,15 @@ int Player::addItem(Item* item, int pos) {
 }
 
 unsigned int Player::getReqSkilltries (int skill, int level, int voc) {
+	//first find on cache
+	for(int i=0;i<2;i++){
+		if(SkillAdvanceCache[skill][i].level == level && SkillAdvanceCache[skill][i].voc == voc){
+#ifdef __DEBUG__
+	std::cout << "Skill cache hit: " << this->name << " " << skill << " " << level << " " << voc <<std::endl;
+#endif
+			return SkillAdvanceCache[skill][i].tries;
+		}
+	}
     unsigned short int SkillBases[7] = { 50, 50, 50, 50, 30, 100, 20 };       // follows the order of enum skills_t
     float SkillMultipliers[7][5] = {
                                    {1.5f, 1.5f, 1.5f, 1.2f, 1.1f},     // Fist
@@ -618,15 +647,31 @@ unsigned int Player::getReqSkilltries (int skill, int level, int voc) {
                                    {2.0f, 2.0f, 1.8f, 1.4f, 1.1f},     // Distance
                                    {1.5f, 1.5f, 1.5f, 1.1f, 1.1f},     // Shielding
                                    {1.1f, 1.1f, 1.1f, 1.1f, 1.1f}      // Fishing
-                                   };
-                                   
-    return (int) ( SkillBases[skill] * pow((float) SkillMultipliers[skill][voc], (float) ( level - 11) ) );
+	                           };
+#ifdef __DEBUG__
+	std::cout << "Skill cache miss: " << this->name << " "<< skill << " " << level << " " << voc <<std::endl;
+#endif
+	//update cache
+	//remove minor level
+	int j;
+	if(SkillAdvanceCache[skill][0].level > SkillAdvanceCache[skill][1].level){
+		j = 1;
+	}
+	else{
+		j = 0;
+	}	
+	SkillAdvanceCache[skill][j].level = level;
+	SkillAdvanceCache[skill][j].voc = voc;
+	SkillAdvanceCache[skill][j].tries = (int) ( SkillBases[skill] * pow((float) SkillMultipliers[skill][voc], (float) ( level - 11) ) );
+	                                   
+    return SkillAdvanceCache[skill][j].tries;
 }
 
 void Player::addSkillTry(int skilltry)
 {
 	int skill;
 	std::string skillname;
+	//TODO:what happens with 2 weapons?
 	for (int slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++) {
 		if (items[slot]) {
 			if (items[slot]->isWeapon()) {
@@ -636,9 +681,10 @@ void Player::addSkillTry(int skilltry)
 					case AXE: skill = 3; skillname = "axe fighting"; break;
 					case DIST: skill = 4; skillname = "distance fighting"; break;
                     case SHIELD: skill = 5; skillname = "shielding"; break;
+                    case MAGIC: return;	break;//TODO: should add skill try?
 					default: skill = 0; skillname = "fist fighting"; break;
 			 }
-			 
+		
 			 skills[skill][SKILL_TRIES] += skilltry;
 			 
 			 //for skill level advances
@@ -648,13 +694,12 @@ void Player::addSkillTry(int skilltry)
 			 //for debug
 			 cout << Creature::getName() << ", has the vocation: " << voc << " and is training his " << skillname << "(" << skill << "). Tries: " << skills[skill][SKILL_TRIES] << "(" << getReqSkilltries (skill, (skills[skill][SKILL_LEVEL] + 1), voc) << ")" << std::endl;
 			 cout << "Current skill: " << skills[skill][SKILL_LEVEL] << std::endl;
-#endif
-			 
+#endif			 
 			 //Need skill up?
 			 if (skills[skill][SKILL_TRIES] >= getReqSkilltries (skill, (skills[skill][SKILL_LEVEL] + 1), voc)) {
 				 skills[skill][SKILL_LEVEL]++;
 				 skills[skill][SKILL_TRIES] = 0;
-				 
+				 skills[skill][SKILL_PERCENT] = 0;
 				 NetworkMessage msg;
 				 std::stringstream advMsg;
 				 advMsg << "You advanced in " << skillname << ".";
@@ -662,7 +707,18 @@ void Player::addSkillTry(int skilltry)
 				 msg.AddPlayerSkills(this);
 				 sendNetworkMessage(&msg);
 			 }
-			}
+			 else{
+				 //update percent
+				 int new_percent = (unsigned int)(100*(skills[skill][SKILL_TRIES])/(1.*getReqSkilltries (skill, (skills[skill][SKILL_LEVEL]+1), voc)));
+				 
+				 if(skills[skill][SKILL_PERCENT] != new_percent){
+						skills[skill][SKILL_PERCENT] = new_percent;
+						NetworkMessage msg;
+						msg.AddPlayerSkills(this);
+				 		sendNetworkMessage(&msg);
+				 }
+			 }
+		   }
 		}
 	}
 }
@@ -741,17 +797,20 @@ void Player::closeContainer(unsigned char containerid)
 
 void Player::dropLoot(Container *corpse)
 {
-	for (int slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++)
-  {
-    Item *item = items[slot];
-		if (item) {
-			Container *container = dynamic_cast<Container*>(item);
-			if(container || random_range(1, 100) <= 10) {
-				corpse->addItem(item);
-				items[slot] = NULL;
-			}
+	for (int slot = 0; slot < 11; slot++)
+	{
+		Item *item = items[slot];
+		if (item && random_range(1, 100) <= 10) {
+			corpse->addItem(item);
+			items[slot] = NULL;			
 		}
 	}
+	//drop backpack if any
+	if(items[SLOT_BACKPACK]){
+		corpse->addItem(items[SLOT_BACKPACK]);
+		items[SLOT_BACKPACK] = NULL;
+	}
+	
 }
 
 fight_t Player::getFightType()
