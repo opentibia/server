@@ -4,22 +4,22 @@
 <items>
 
 <!--container-->
-<item id="1988" name="backpack" type="container" maxitems="20" weight="18" />
-<item id="1998" name="backpack" type="container" maxitems="20" weight="18" />
-<item id="1999" name="backpack" type="container" maxitems="20" weight="18" />
-<item id="2000" name="backpack" type="container" maxitems="20" weight="18" />
-<item id="2001" name="backpack" type="container" maxitems="20" weight="18" />
-<item id="2002" name="backpack" type="container" maxitems="20" weight="18" />
-<item id="2003" name="backpack" type="container" maxitems="20" weight="18" />
-<item id="2004" name="backpack" type="container" maxitems="20" weight="18" />
-<item id="1987" name="bag" type="container" maxitems="8" weight="8" />
-<item id="1991" name="bag" type="container" maxitems="8" weight="8" />
-<item id="1992" name="bag" type="container" maxitems="8" weight="8" />
-<item id="1993" name="bag" type="container" maxitems="8" weight="8" />
-<item id="1994" name="bag" type="container" maxitems="8" weight="8" />
-<item id="1995" name="bag" type="container" maxitems="8" weight="8" />
-<item id="1996" name="bag" type="container" maxitems="8" weight="8" />
-<item id="1997" name="bag" type="container" maxitems="8" weight="8" />
+<item id="1988" name="backpack" type="container" position="backpack" maxitems="20" weight="18" />
+<item id="1998" name="backpack" type="container" position="backpack" maxitems="20" weight="18" />
+<item id="1999" name="backpack" type="container" position="backpack" maxitems="20" weight="18" />
+<item id="2000" name="backpack" type="container" position="backpack" maxitems="20" weight="18" />
+<item id="2001" name="backpack" type="container" position="backpack" maxitems="20" weight="18" />
+<item id="2002" name="backpack" type="container" position="backpack" maxitems="20" weight="18" />
+<item id="2003" name="backpack" type="container" position="backpack" maxitems="20" weight="18" />
+<item id="2004" name="backpack" type="container" position="backpack" maxitems="20" weight="18" />
+<item id="1987" name="bag" type="container" position="backpack" maxitems="8" weight="8" />
+<item id="1991" name="bag" type="container" position="backpack" maxitems="8" weight="8" />
+<item id="1992" name="bag" type="container" position="backpack" maxitems="8" weight="8" />
+<item id="1993" name="bag" type="container" position="backpack" maxitems="8" weight="8" />
+<item id="1994" name="bag" type="container" position="backpack" maxitems="8" weight="8" />
+<item id="1995" name="bag" type="container" position="backpack" maxitems="8" weight="8" />
+<item id="1996" name="bag" type="container" position="backpack" maxitems="8" weight="8" />
+<item id="1997" name="bag" type="container" position="backpack" maxitems="8" weight="8" />
 <item id="1740" name="Chest" type="container" maxitems="15" weight="120" />
 <!--END container-->
 
@@ -1675,19 +1675,22 @@
 
 
 <!--Ammunition-->
-<item id="2547" name="Power Bolt" type="amunition" amutype="bolt" shottype="power-bolt" attack="0" defence="0" weight="0.9" />
 <item id="2543" name="Bolt" type="amunition" amutype="bolt" shottype="bolt" attack="0" defence="0" weight="0.8" />
+<item id="2547" name="Power Bolt" type="amunition" amutype="bolt" shottype="power-bolt" attack="0" defence="0" weight="0.9" />
 <item id="2544" name="Arrow" type="amunition" amutype="arrow" shottype="arrow" attack="0" defence="0" weight="0.7" />
-<item id="2111" name="Snowball" type="weapon" skill="distance" shottype="snowball" attack="0" defence="0" weight="0.8"/>
+<item id="2545" name="Poison arrow" type="amunition" amutype="arrow" shottype="poison-arrow" attack="0" defence="0" weight="0.8" arm="0"/>
+<item id="2546" name="Burst arrow" type="amunition" position="hand" amutype="arrow" shottype="burst-arrow" attack="0" defence="0" weight="0.9" arm="0"/>
+<!--END Ammunition-->
 
 <!--distand-->
-<item id="2455" name="crossbow" type="weapon" skill="distance" amutype="bolt" weight="20" />
-<item id="2456" name="bow" type="weapon" skill="distance" amutype="arrow" weight="20" />
-<item id="2389" name="Spear" type="weapon" position="weapon" skill="distance" attack="30" defence="0" weight="20"/>
-<item id="2410" name="Throwing Knife" type="weapon" position="weapon" skill="distance" attack="30" defence="0" weight="2.1"/>
-<item id="2399" name="Throwing Star" type="weapon" position="weapon" skill="distance" attack="25" defence="0" weight="1"/>
-<item id="3424" name="Small Stone" type="weapon" position="weapon" skill="distance" attack="20" defence="0" weight="3.6"/>
-<!--END Ammunition-->
+<item id="2456" name="bow" type="weapon" position="twohand" skill="distance" amutype="arrow" attack="0" defence="0" weight="31"/>
+<item id="2455" name="crossbow" type="weapon" position="twohand" skill="distance" amutype="bolt" attack="0" defence="0" weight="40" />
+<item id="3424" name="Small Stone" type="weapon" position="weapon" skill="distance" shottype="small-stone" attack="20" defence="0" weight="3.6"/>
+<item id="2111" name="Snowball" type="weapon" position="weapon" skill="distance" shottype="snowball" attack="0" defence="0" weight="0.8"/>
+<item id="2389" name="Spear" type="weapon" position="weapon" skill="distance" shottype="spear" attack="30" defence="0" weight="20"/>
+<item id="2410" name="Throwing Knife" type="weapon" position="weapon" skill="distance" shottype="throwing-knife" attack="30" defence="0" weight="2.1"/>
+<item id="2399" name="Throwing Star" type="weapon" position="weapon" skill="distance" shottype="throwing-star" attack="25" defence="0" weight="1"/>
+<!--END distand-->
 
 <!-- DECAYTO CORPSE -->
 <item id="3128" name="dead human" weight="1200" decayto="3129" decaytime="240" />
