@@ -57,7 +57,7 @@ ItemType::ItemType()
   shootType = DIST_NONE;
   attack     =    0;
   defence    =    0;
-
+  armor      =    0;
   decayTo    =    0;
   decayTime  =   60;
 

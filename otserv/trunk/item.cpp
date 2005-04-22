@@ -250,13 +250,16 @@ std::string Item::getDescription() const
 			}
 			else if(getArmor())
 			{
-				s << "You see a " << items[id].name << " (Armor:"<< (int)getArmor() << ")." << std::endl;
+				s << "You see a " << items[id].name << " (Arm:"<< (int)getArmor() << ")." << std::endl;
 			}
 			else
 			{
 				s << "You see a " << items[id].name << "." << std::endl;
 			}
-			s << "It weighs " << std::fixed << std::setprecision(1) << items[id].weight << " oz.";
+			
+			if(items[id].weight > 0)
+				s << "It weighs " << std::fixed << std::setprecision(1) << items[id].weight << " oz.";
+			
 			if(items[id].description.length())
 			{
 				s << std::endl << items[id].description;
