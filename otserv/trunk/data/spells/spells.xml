@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <spells maxVoc="4">
-<spell name="Ultimate Healing" words="exura vita" maglv="8" mana="80" enabled="1">
+<spell name="Ultimate Healing" words="exura vita" maglv="8" mana="100" enabled="1">
 <vocation id="0" /><vocation id="1" /><vocation id="2" /><vocation id="3" />
 </spell>
 <spell name="Light Healing" words="exura" maglv="8" mana="20" enabled="1">
@@ -14,7 +14,7 @@
 </spell>
 <spell name="Energy Wave" words="exevo mort hur" maglv="20" mana="250" enabled="1"><vocation id="0" /><vocation id="1" />
 </spell>
-<spell name="Mass Healing" words="exura gran mas res" maglv="20" mana="100" enabled="1"><vocation id="2" />
+<spell name="Mass Healing" words="exura gran mas res" maglv="20" mana="100" enabled="1"><vocation id="1" />
 </spell>
 <spell name="Creature Illusion" words="utevo res ina" maglv="10" mana="100" enabled="1"><vocation id="0" /><vocation id="1" /><vocation id="2" />
 </spell>
@@ -29,6 +29,8 @@
 <spell name="Strong Haste" words="utani gran hur" maglv="17" mana="100" enabled="1"><vocation id="1" /><vocation id="2" />
 </spell>
 <spell name="Poison storm" words="exevo gran mas pox" maglv="20" mana="200" enabled="1"><vocation id="1" /><vocation id="2" />
+</spell>
+<spell name="Ultimate healing rune" words="adura vita" maglv="11" mana="100" enabled="1"><vocation id="2" />
 </spell>
 <rune name="Sudden death" id="2268" charges="1" maglv="18" mana="0" enabled="1"></rune>
 <rune name="Ultimate healing" id="2273" charges="1" maglv="4" mana="0" enabled="1"></rune>
