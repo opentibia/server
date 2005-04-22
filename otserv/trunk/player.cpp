@@ -799,17 +799,19 @@ void Player::dropLoot(Container *corpse)
 {
 	for (int slot = 0; slot < 11; slot++)
 	{
-		Item *item = items[slot];
-		if (item && random_range(1, 100) <= 10) {
+		Item *item = items[slot];		
+		if (item && ((dynamic_cast<Container*>(item)) || random_range(1, 100) <= 10)) {
 			corpse->addItem(item);
 			items[slot] = NULL;			
 		}
 	}
+	/*
 	//drop backpack if any
 	if(items[SLOT_BACKPACK]){
 		corpse->addItem(items[SLOT_BACKPACK]);
 		items[SLOT_BACKPACK] = NULL;
 	}
+	*/
 	
 }
 

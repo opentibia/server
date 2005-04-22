@@ -1803,6 +1803,10 @@ void Protocol74::sendThingMove(const Creature *creature, const Thing *thing,
 		for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
 			Container *container = cit->second;
 			
+			while(container->getParent()) {
+				container = container->getParent();
+			}
+
 			//Only add those we need to close
 			if(container && container->pos.x != 0xFFFF) {
 				if(std::abs(player->pos.x - container->pos.x) > 1 || std::abs(player->pos.y - container->pos.y) > 1) {
