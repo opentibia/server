@@ -167,13 +167,18 @@ void GameState::onAttack(Creature* attacker, const Position& pos, Creature* atta
 
 	if (damage < -50 || attackedCreature->access != 0)
 		damage = 0;
-
-	game->creatureApplyDamage(attackedCreature, damage, damage, manaDamage);
-
+		
 	Tile *tile = game->map->getTile(pos.x, pos.y, pos.z);
-
-	addCreatureState(tile, attackedCreature, damage, manaDamage, true);
-	onAttackedCreature(tile, attacker, attackedCreature, damage,  true);
+	bool blood;
+	if(damage != 0){
+		game->creatureApplyDamage(attackedCreature, damage, damage, manaDamage);
+		blood = true;
+	}
+	else{//no draw blood
+		blood = false;
+	}
+	addCreatureState(tile, attackedCreature, damage, manaDamage, blood);
+	onAttackedCreature(tile, attacker, attackedCreature, damage,  true);		
 }
 
 void GameState::addCreatureState(Tile* tile, Creature* attackedCreature, int damage, int manaDamage, bool drawBlood)
@@ -732,7 +737,7 @@ bool Game::onPrepareMoveThing(Player *player, const Position& fromPos, const Ite
 		return false;
 	}
 	else
-	{
+	{		
 		switch(toSlot)
 		{
 		case SLOT_HEAD:
@@ -752,12 +757,46 @@ bool Game::onPrepareMoveThing(Player *player, const Position& fromPos, const Ite
 				return true;
 			break;
 		case SLOT_RIGHT:
-			if(item->getSlotPosition() & SLOTP_RIGHT)
-				return true;
+			if(item->getSlotPosition() & SLOTP_RIGHT){
+				if(item->getSlotPosition() & SLOTP_TWO_HAND){
+					if(player->items[SLOT_LEFT] != NULL){
+						player->sendCancel("Two handed item .");
+						return false;
+					}
+					return true	;				
+				}
+				else{
+					if(player->items[SLOT_LEFT]){
+						if(player->items[SLOT_LEFT]->getSlotPosition() & SLOTP_TWO_HAND){
+							player->sendCancel("Two handed item .");
+							return false;
+						}
+						return true;
+					}
+					return true;
+				}
+			}
 			break;
 		case SLOT_LEFT:
-			if(item->getSlotPosition() & SLOTP_LEFT)
-				return true;
+			if(item->getSlotPosition() & SLOTP_LEFT){
+				if(item->getSlotPosition() & SLOTP_TWO_HAND){
+					if(player->items[SLOT_RIGHT] != NULL){
+						player->sendCancel("Two handed item .");
+						return false;
+					}
+					return true	;				
+				}
+				else{
+					if(player->items[SLOT_RIGHT]){
+						if(player->items[SLOT_RIGHT]->getSlotPosition() & SLOTP_TWO_HAND){
+							player->sendCancel("Two handed item .");
+							return false;
+						}
+						return true;
+					}
+					return true;
+				}
+			}
 			break;
 		case SLOT_LEGS:
 			if(item->getSlotPosition() & SLOTP_LEGS)
