@@ -150,12 +150,14 @@ public:
   static int luaActionManaShield(lua_State *L);
   static int luaActionChangeSpeed(lua_State *L);
   static int luaActionGetSpeed(lua_State *L);
+  static int SpellScript::luaActionMakeRune(lua_State *L);
 protected:
 	static void internalGetArea(lua_State *L, MagicEffectAreaClass &magicArea);
 	static void internalGetPosition(lua_State *L, Position& pos);
 	static void internalGetMagicEffect(lua_State *L, MagicEffectClass &me);
 	static void internalLoadDamageVec(lua_State *L, ConditionVec& condvec);
 	static void internalLoadTransformVec(lua_State *L, TransformMap& transformMap);
+	static int  internalMakeRune(Player *p,unsigned short sl_id,Spell *S,unsigned short id, unsigned char charges);
 	int registerFunctions();
 	Spell* spell;
 	bool loaded;      

@@ -34,6 +34,8 @@
 
 #include "spells.h"
 
+#define ID_BLANK_RUNE 2260
+
 Spells::Spells(Game* igame): game(igame){
                    
                    }
@@ -251,6 +253,7 @@ int SpellScript::registerFunctions(){
 	lua_register(luaState, "getPosition", SpellScript::luaActionGetPos);
 	lua_register(luaState, "getSpeed", SpellScript::luaActionGetSpeed);
 	lua_register(luaState, "changeSpeed", SpellScript::luaActionChangeSpeed);
+	lua_register(luaState, "makeRune", SpellScript::luaActionMakeRune);
 	return true;
 }
 
@@ -749,4 +752,93 @@ int SpellScript::luaActionGetPos(lua_State *L){
       lua_settable(L, -3);
 	}
 	return 1;
+}
+
+int SpellScript::luaActionMakeRune(lua_State *L){
+	unsigned char charges = (unsigned char)lua_tonumber(L, -1);
+	lua_pop(L,1);
+	
+	unsigned short type = (unsigned short)lua_tonumber(L, -1);
+	lua_pop(L,1);
+	
+	Spell* spell = getSpell(L);
+	Creature* creature = spell->game->getCreatureByID((unsigned long)lua_tonumber(L, -1));
+	lua_pop(L,1);
+		
+	Player* player = dynamic_cast<Player*>(creature);
+	if(player){
+		MagicEffectTargetClass magicTarget;
+		/*  succesfull make rune
+			attackType = ATTACK_NONE
+			animationEffect = NM_ANI_NONE
+			hitEffect = NM_ME_NONE
+			damageEffect = NM_ME_MAGIC_ENERGIE
+			animationColor = GREEN
+			offensive = false
+			drawblood = false
+		*/
+
+		magicTarget.offensive = false;
+		magicTarget.drawblood = false;
+		magicTarget.animationEffect = 0;
+		magicTarget.attackType = ATTACK_NONE;		
+		magicTarget.hitEffect = 255; //NM_ME_NONE
+		magicTarget.animationColor = 19; //GREEN
+
+		//try to create rune 1
+		int a = internalMakeRune(player,SLOT_RIGHT,spell,type,charges);
+		if(a == 1) //spend mana
+			player->mana -= spell->getMana();
+		//try to create rune 2
+		int b = internalMakeRune(player,SLOT_LEFT,spell,type,charges);
+
+		if(a == -1 && b == -1){ //not enough mana
+			magicTarget.damageEffect = 2; //NM_ME_PUFF		
+			magicTarget.manaCost = player->mana*5; //force not enough mana
+		}
+		else if( a == 0 && b == 0){ //not create any rune
+			magicTarget.damageEffect = 2; //NM_ME_PUFF		
+			magicTarget.manaCost = 0;
+		}
+		else{
+			magicTarget.damageEffect = 12; //NM_ME_MAGIC_ENERGIE = 12
+			if(b==1){
+				magicTarget.manaCost = spell->getMana();
+			}
+			else{	//only create 1 rune
+				magicTarget.manaCost = 0; 
+			}
+		}
+		bool isSuccess = spell->game->creatureThrowRune(player, player->pos, magicTarget);
+
+		lua_pushnumber(L, 1);
+		return 1;
+	}
+	lua_pushnumber(L, 0);
+	return 1;
+}
+
+//create new runes and delete blank ones
+int SpellScript::internalMakeRune(Player *p,unsigned short sl_id,Spell *S,unsigned short id, unsigned char charges){
+	//check mana
+	if(p->mana < S->getMana())
+		return -1;
+	Item *item = p->getItem(sl_id);
+	if(item){
+		if(item->getID() == ID_BLANK_RUNE){			
+			p->addItem(Item::CreateItem(id, charges ),sl_id);
+			//todo working client->sendInventory(); on player.cpp
+			NetworkMessage msg;			
+			msg.AddPlayerInventoryItem(p,sl_id);
+			p->sendNetworkMessage(&msg);
+			return 1;			
+		}
+		else{
+			return 0;
+		}
+	}
+	else{
+		return 0;
+	}
+	return 0;
 }
