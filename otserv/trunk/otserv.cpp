@@ -207,6 +207,8 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 						protocol->ReceiveLoop();
 						stat->removePlayer();
 					}
+					//free memory
+					player->releasePlayer();
 				}
 			}
     }
