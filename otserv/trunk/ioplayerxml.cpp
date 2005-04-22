@@ -115,6 +115,7 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name){
 						s_tries=atoi((const char*)xmlGetProp(tmp, (const xmlChar *) "tries"));
 						player->skills[s_id][SKILL_LEVEL]=s_lvl;
 						player->skills[s_id][SKILL_TRIES]=s_tries;
+						player->skills[s_id][SKILL_PERCENT] = (unsigned int)(100*(player->skills[s_id][SKILL_TRIES])/(1.*player->getReqSkilltries (s_id, (player->skills[s_id][SKILL_LEVEL]+1), player->voc)));
 					}
 					tmp=tmp->next;
 				}
@@ -126,7 +127,7 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name){
 				{
 					if (strcmp((const char*)slot->name, "slot") == 0)
 					{
-						int sl_id = atoi((const char*)xmlGetProp(slot, (const xmlChar *)"slotid"));
+						int sl_id = atoi((const char*)xmlGetProp(slot, (const xmlChar *)"slotid"));					
 						Item* myitem = new Item();
 						myitem->unserialize(slot->children);
 						//player->items[sl_id] = Item::CreateItem(myitem->getID(), myitem->getItemCountOrSubtype());

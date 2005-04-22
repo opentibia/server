@@ -347,19 +347,19 @@ void NetworkMessage::AddPlayerSkills(const Player *player)
 	AddByte(0xA1);
 
   AddByte(player->skills[SKILL_FIST  ][SKILL_LEVEL]);
-  AddByte(0x32);
+  AddByte(player->skills[SKILL_FIST  ][SKILL_PERCENT]);
   AddByte(player->skills[SKILL_CLUB  ][SKILL_LEVEL]);
-  AddByte(0x32);
+  AddByte(player->skills[SKILL_CLUB  ][SKILL_PERCENT]);
   AddByte(player->skills[SKILL_SWORD ][SKILL_LEVEL]);
-  AddByte(0x32);
+  AddByte(player->skills[SKILL_SWORD  ][SKILL_PERCENT]);
   AddByte(player->skills[SKILL_AXE   ][SKILL_LEVEL]);
-  AddByte(0x32);
+  AddByte(player->skills[SKILL_AXE  ][SKILL_PERCENT]);
   AddByte(player->skills[SKILL_DIST  ][SKILL_LEVEL]);
-  AddByte(0x32);
+  AddByte(player->skills[SKILL_DIST  ][SKILL_PERCENT]);
   AddByte(player->skills[SKILL_SHIELD][SKILL_LEVEL]);
-  AddByte(0x32);
+  AddByte(player->skills[SKILL_SHIELD  ][SKILL_PERCENT]);
   AddByte(player->skills[SKILL_FISH  ][SKILL_LEVEL]);
-  AddByte(0x32);
+  AddByte(player->skills[SKILL_FISH  ][SKILL_PERCENT]);
 }
 
 
