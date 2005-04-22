@@ -1,0 +1,2083 @@
+<?xml version="1.0"?>
+<!--// by Atolon \\-->
+
+<items>
+
+<!--container-->
+<item id="1988" name="backpack" type="container" maxitems="20" weight="18" />
+<item id="1998" name="backpack" type="container" maxitems="20" weight="18" />
+<item id="1999" name="backpack" type="container" maxitems="20" weight="18" />
+<item id="2000" name="backpack" type="container" maxitems="20" weight="18" />
+<item id="2001" name="backpack" type="container" maxitems="20" weight="18" />
+<item id="2002" name="backpack" type="container" maxitems="20" weight="18" />
+<item id="2003" name="backpack" type="container" maxitems="20" weight="18" />
+<item id="2004" name="backpack" type="container" maxitems="20" weight="18" />
+<item id="1987" name="bag" type="container" maxitems="8" weight="8" />
+<item id="1991" name="bag" type="container" maxitems="8" weight="8" />
+<item id="1992" name="bag" type="container" maxitems="8" weight="8" />
+<item id="1993" name="bag" type="container" maxitems="8" weight="8" />
+<item id="1994" name="bag" type="container" maxitems="8" weight="8" />
+<item id="1995" name="bag" type="container" maxitems="8" weight="8" />
+<item id="1996" name="bag" type="container" maxitems="8" weight="8" />
+<item id="1997" name="bag" type="container" maxitems="8" weight="8" />
+<item id="1740" name="Chest" type="container" maxitems="15" weight="120" />
+<!--END container-->
+
+<!--Tools-->
+
+<item id="2608" name="Altar" weight="" />
+<item id="2609" name="Altar" weight="" />
+<item id="2606" name="Altar" weight="" />
+<item id="2607" name="Altar" weight="" />
+<item id="2555" name="Anvil" weight="500" />
+<item id="2561" name="Baking Tray" type="item" weight="12" />
+<item id="2324" name="Broom" type="item" weight="11" />
+<item id="2557" name="Carpenter Hammer" type="item" weight="" />
+<item id="2568" name="Cleaver" type="item" weight="6.6" />
+<item id="1481" name="Coal Basin" weight="" />
+<item id="1482" name="Coal Basin" weight="" />
+<item id="1483" name="Coal Basin" weight="" />
+<item id="1484" name="Coal Basin" weight="" />
+<item id="1485" name="Coal Basin" weight="" />
+<item id="2110" name="Doll" type="item" weight="6.5" />
+<item id="2580" name="Fishing Rod" type="item" weight="8.5" />
+<item id="2109" name="Football" type="item" weight="" />
+<item id="2564" name="Fork" type="item" weight="1" />
+<item id="2552" name="Hacket" type="item" weight="28" />
+<item id="2600" name="Inkwell" type="item" weight="2" />
+<item id="2566" name="Knife" type="item" weight="1" />
+<item id="2560" name="Mirror" type="item" weight="9.5" />
+<item id="2569" name="Oven Spatula" type="item" weight="14" />
+<item id="2563" name="Pan" type="item" weight="18" />
+<item id="2553" name="Pick" type="item" weight="45" />
+<item id="2548" name="Pitch Fork" type="item" weight="25" />
+<item id="2035" name="Plate" type="item" weight="1.5" />
+<item id="2549" name="Rake" type="item" weight="15" />
+<item id="2570" name="Rolling Pin" type="item" weight="5" />
+<item id="2120" name="Rope" type="item" weight="18" />
+<item id="2612" name="Sacrifical Stone" type="item" weight="" />
+<item id="2613" name="Sacrifical Stone" type="item" weight="" />
+<item id="2610" name="Sacrifical Stone" type="item" weight="" />
+<item id="2611" name="Sacrifical Stone" type="item" weight="" />
+<item id="2558" name="Saw" type="item" weight="" />
+<item id="2550" name="Scythe" type="item" weight="30" />
+<item id="2554" name="Shovel" type="item" weight="35" />
+<item id="2559" name="Small Axe" type="item" weight="20" />
+<item id="2062" name="Small Oil Lamp" type="item" weight="" />
+<item id="2063" name="Small Oil Lamp" type="item" weight="" />
+<item id="2565" name="Spoon" type="item" weight="" />
+<item id="2112" name="Teddy Bear" type="item" weight="5.9" />
+<item id="2578" name="Trap (closed)" type="item" weight="21" />
+<item id="2579" name="Trap (open)" type="item" weight="21" />
+<item id="2036" name="Watch" type="item" weight="0.5" />
+<item id="2108" name="Wooden Doll" type="item" weight="8.6" />
+<item id="2556" name="Wooden Hammer" type="item" weight="6" />
+<item id="2567" name="Wooden Spoon" type="item" weight="1" />
+<!--END Tools-->
+
+<!--Food-->
+<item id="2674" name="Apple" type="food" weight="1.5" />
+<item id="2676" name="Banana" type="food" weight="1.8" />
+<item id="2669" name="Big Fish" type="food" weight="1.2" />
+<item id="2677" name="Blueberry" type="food" weight="0.2" />
+<item id="2689" name="Bread" type="food" weight="5" />
+<item id="2691" name="Brown Bread" type="food" weight="4" />
+<item id="2688" name="Candy Cane" type="food" weight="0.5" />
+<item id="2684" name="Carrot" type="food" weight="2" />
+<item id="2696" name="Cheese" type="food" weight="4" />
+<item id="2679" name="Cherry" type="food" weight="0.2" />
+<item id="2678" name="Coconut" type="food" weight="4.8" />
+<item id="2687" name="Cookie" type="food" weight="0.1" />
+<item id="2686" name="Corncob" type="food" weight="3.5" />
+<item id="2792" name="Dark Mushroom" type="food" weight="0.1" />
+<item id="2693" name="Dough" type="food" weight="5" />
+<item id="2672" name="Dragon Ham" type="food" weight="30" />
+<item id="2695" name="Egg" type="food" weight="0.3" />
+<item id="2667" name="Fish" type="food" weight="5.2" />
+<item id="2692" name="Flour" type="food" weight="5" />
+<item id="2681" name="Grape" type="food" weight="2.5" />
+<item id="2671" name="Ham" type="food" weight="20" />
+<item id="2666" name="Meat" type="food" weight="13" />
+<item id="2682" name="Melon" type="food" weight="9.5" />
+<item id="2790" name="Mushroom" type="food" weight="0.3" />
+<item id="2791" name="Mushroom" type="food" weight="0.3" />
+<item id="2793" name="Mushroom" type="food" weight="0.1" />
+<item id="2794" name="Mushroom" type="food" weight="0.1" />
+<item id="2795" name="Mushroom" type="food" weight="0.1" />
+<item id="2789" name="Brown Mushroom" type="food" weight="0.2" />
+<item id="2796" name="GreenMushroom" type="food" weight="0.1" />
+<item id="2788" name="Red Mushroom" type="food" weight="0.5" />
+<item id="2787" name="White Mushroom" type="food" weight="0.4" />
+<item id="2675" name="Orange" type="food" weight="1.1" />
+<item id="2673" name="Pears" type="food" weight="1.4" />
+<item id="2883" name="Pumpkin" type="food" weight="" />
+<item id="2690" name="Roll" type="food" weight="0.8" />
+<item id="2668" name="Salmon" type="food" weight="3.2" />
+<item id="2670" name="Shrimp" type="food" weight="" />
+<item id="2680" name="Strawberry" type="food" weight="0.2" />
+<item id="2685" name="Tomato" type="food" weight="1" />
+<item id="2694" name="Wheat" type="food" weight="12.5" />
+<!--END Food-->
+
+<!--Valuables-->
+<item id="2148" name="Gold coin" weight="0.1" />
+<item id="2155" name="Big Emerald" type="item" weight="" />
+<item id="2156" name="Big Ruby" type="item" weight="0.3" />
+<item id="2144" name="Black Pearl" type="item" weight="0.2" />
+<item id="2158" name="Blue Gem" type="item" weight="" />
+<item id="2122" name="Brooches" type="item" weight="" />
+<item id="2128" name="Crown" type="item" weight="" />
+<item id="2160" name="Crystal Coin" type="item" weight="" />
+<item id="2157" name="Gold Nugget" type="item" weight="" />
+<item id="2152" name="Platinum Coin" type="item" weight="0.1" />
+<item id="2159" name="Scarab Coin" type="item" weight="" />
+<item id="2134" name="Silver Brooch" type="item" weight="1.1" />
+<item id="2150" name="Small Amethyst" type="item" weight="0.1" />
+<item id="2145" name="Small Diamond" type="item" weight="0.1" />
+<item id="2149" name="Small Emerald" type="item" weight="0.1" />
+<item id="2147" name="Small Ruby" type="item" weight="0.1" />
+<item id="2146" name="Small Sapphire" type="item" weight="0.1" />
+<item id="2153" name="Violet Gem" type="item" weight="0.3" />
+<item id="2143" name="White Pearl" type="item" weight="0.2" />
+<item id="2154" name="Yellow Gem" type="item" weight="0.3" />
+<!--END Valuables-->
+
+<!--Instruments-->
+<item id="2367" name="Drum" weight="32" />
+<item id="2076" name="Fanfare" weight="23" />
+<item id="2070" name="Flute" weight="2" />
+<item id="2084" name="Harp" weight="95" />
+<item id="2085" name="Harp" weight="95" />
+<item id="2072" name="Lute" weight="34" />
+<item id="2071" name="Lyre" weight="12.5" />
+<item id="2074" name="Panpipes" weight="" />
+<item id="2080" name="Piano" weight="200" />
+<item id="2081" name="Piano" weight="200" />
+<item id="2082" name="Piano" weight="200" />
+<item id="2083" name="Piano" weight="200" />
+<item id="2078" name="Post horn" weight="15" />
+<item id="2075" name="Simple Fanfare" weight="22" />
+<!--END Instruments-->
+
+<!--Paperwork-->
+
+<item id="1947" name="Blank Paper" type="item" weight="" />
+<item id="1984" name="Blue Tome" type="item" weight="19" />
+<item id="1971" name="Book" type="item" weight="13" />
+<item id="1972" name="Book" type="item" weight="13" />
+<item id="1973" name="Book" type="item" weight="13" />
+<item id="1974" name="Book" type="item" weight="13" />
+<item id="1975" name="Book" type="item" weight="13" />
+<item id="1976" name="Book" type="item" weight="13" />
+<item id="1977" name="Book" type="item" weight="13" />
+<item id="1978" name="Book" type="item" weight="" />
+<item id="1979" name="Book" type="item" weight="" />
+<item id="1980" name="Book" type="item" weight="" />
+<item id="1981" name="Book" type="item" weight="" />
+<item id="2217" name="Book" type="item" weight="" />
+<item id="1961" name="Book" type="item" weight="" />
+<item id="2347" name="Cookbook" type="item" weight="15" />
+<item id="1968" name="Document" type="item" weight="1.5" />
+<item id="1983" name="Green Tome" type="item" weight="19" />
+<item id="1985" name="Grey Tome" type="item" weight="19" />
+<item id="1956" name="Map" type="item" weight="8.3" />
+<item id="1957" name="Map" type="item" weight="7.9" />
+<item id="1954" name="Paper" type="item" weight="1" />
+<item id="1948" name="Parchment" type="item" weight="2" />
+<item id="1953" name="Parchment" type="item" weight="2" />
+<item id="1982" name="Purpel Tome" type="item" weight="19" />
+<item id="1986" name="Red Tome" type="item" weight="19" />
+<item id="1949" name="Scroll" type="item" weight="0.5" />
+<item id="2345" name="Spy Report" type="item" weight="" />
+<item id="1969" name="Written Parchment" type="item" weight="2" />
+<!--END Paperwork-->
+
+<!--Constructions-->
+
+<item id="1662" name="Bank" weight="" />
+<item id="1663" name="Bank" weight="" />
+<item id="1664" name="Bank, Lengthwise" weight="" />
+<item id="1665" name="Bank, Lengthwise" weight="" />
+<item id="1374" name="Big Fontain" weight="" />
+<item id="1375" name="Big Fontain" weight="" />
+<item id="1376" name="Big Fontain" weight="" />
+<item id="1377" name="Big Fontain" weight="" />
+<item id="1415" name="Buried Coffin" weight="" />
+<item id="1416" name="Buried Coffin" weight="" />
+<item id="1771" name="Cask" weight="" />
+<item id="1368" name="Draw Well" weight="" />
+<item id="1369" name="Draw Well" weight="" />
+<item id="1360" name="Fountain" weight="" />
+<item id="1361" name="Fountain" weight="" />
+<item id="1362" name="Fountain" weight="" />
+<item id="1363" name="Fountain" weight="" />
+<item id="1364" name="Fountain" weight="" />
+<item id="1365" name="Fountain" weight="" />
+<item id="1366" name="Fountain" weight="" />
+<item id="1367" name="Fountain" weight="" />
+<item id="1406" name="Grave" weight="" />
+<item id="1407" name="Gravestone" weight="" />
+<item id="1408" name="Gravestone" weight="" />
+<item id="1409" name="Gravestone" weight="" />
+<item id="1379" name="Mill" weight="" />
+<item id="1380" name="Mill" weight="" />
+<item id="1381" name="Mill" weight="" />
+<item id="1382" name="Mill" weight="" />
+<item id="1383" name="Mill" weight="" />
+<item id="1384" name="Mill" weight="" />
+<item id="1417" name="Sarcophagus" weight="" />
+<item id="1418" name="Sarcophagus" weight="" />
+<item id="1419" name="Sarcophagus" weight="" />
+<item id="1420" name="Sarcophagus" weight="" />
+<item id="1378" name="Small Basin" weight="" />
+<item id="1410" name="Stone Coffin" weight="" />
+<item id="1411" name="Stone Coffin" weight="" />
+<item id="1412" name="Stone Coffin" weight="" />
+<item id="1413" name="Stone Coffin" weight="" />
+<item id="1414" name="Stone Coffin" weight="" />
+<item id="1742" name="Wooden Coffin" weight="" />
+<item id="1743" name="Wooden Coffin" weight="" />
+<item id="1744" name="Wooden Coffin" weight="" />
+<item id="1745" name="Wooden Coffin" weight="" />
+<!--END Constructions-->
+
+<!--Flags-->
+<item id="1819" name="Banner" weight="" />
+<item id="1820" name="Banner" weight="" />
+<item id="1821" name="Banner" weight="" />
+<item id="1822" name="Banner" weight="" />
+<item id="1823" name="Banner" weight="" />
+<item id="1823" name="Banner" weight="" />
+<item id="1436" name="Castle Flag" weight="" />
+<item id="1435" name="Dragon Flag" weight="" />
+<item id="1437" name="Tibian Flag" weight="" />
+<!--END Flags-->
+
+<!--Game Pieces-->
+<item id="2635" name="Black Bishop" type="item" weight="0.5" />
+<item id="2633" name="Black Castle" type="item" weight="0.5" />
+<item id="2624" name="Black Gamestone" type="item" weight="0.5" />
+<item id="2637" name="Black King" type="item" weight="0.5" />
+<item id="2634" name="Black Knight" type="item" weight="0.5" />
+<item id="2632" name="Black Pawn" type="item" weight="0.5" />
+<item id="2636" name="Black Queen" type="item" weight="0.5" />
+<item id="2639" name="Tic-Tac-Toe O" type="item" weight="0.5" />
+<item id="2638" name="Tic-Tac-Toe X" type="item" weight="0.5" />
+<item id="2629" name="White Bishop" type="item" weight="0.5" />
+<item id="2627" name="White Castle" type="item" weight="0.5" />
+<item id="2625" name="White Gamestone" type="item" weight="0.5" />
+<item id="2631" name="White King" type="item" weight="0.5" />
+<item id="2628" name="White Knight" type="item" weight="0.5" />
+<item id="2626" name="White Pawn" type="item" weight="0.5" />
+<item id="2630" name="White Queen" type="item" weight="0.5" />
+<!--END Game Pieces-->
+
+<!--Keys-->
+<item id="2092" name="Bone Key" type="item" weight="1" />
+<item id="2090" name="Crystal key" type="item" weight="1" />
+<item id="2091" name="Golden Key" type="item" weight="1" />
+<item id="2089" name="Orange key" type="item" weight="" />
+<item id="2086" name="Purple key" type="item" weight="" />
+<item id="2088" name="Silver Key" type="item" weight="1" />
+<item id="2087" name="Wooden key" type="item" weight="1" />
+<!--END Keys-->
+
+<!--Light-->
+<item id="2353" name="Burning Heart" weight="" />
+<item id="1421" name="Campfire" weight="" />
+<item id="1422" name="Campfire" weight="" />
+<item id="1423" name="Campfire" weight="" />
+<item id="1424" name="Campfire" weight="" />
+<item id="1425" name="Campfire" weight="" />
+<item id="1426" name="Campfire" weight="" />
+<item id="1427" name="Campfire" weight="1" />
+<item id="1428" name="Campfire" weight="1" />
+<item id="2041" name="Candelabrum" type="item" weight="50" />
+<item id="2042" name="Candelabrum" type="item" weight="50" />
+<item id="2043" name="Candelabrum" type="item" weight="50" />
+<item id="2047" name="Candle" type="item" weight="3" />
+<item id="2048" name="Candle" weight="3" />
+<item id="2049" name="Candle" type="item" weight="3" />
+<item id="1481" name="Coal Bassin" weight="228" />
+<item id="1482" name="Coal Bassin" weight="228" />
+<item id="1483" name="Coal Bassin" weight="228" />
+<item id="1484" name="Coal Bassin" weight="228" />
+<item id="1485" name="Coal Bassin" weight="228" />
+<item id="2044" name="Lamp" weight="30" />
+<item id="2045" name="Lamp" weight="30" />
+<item id="2046" name="Lamp" weight="30" />
+<item id="1506" name="Purpel Field" weight="" />
+<item id="1479" name="Streetlamp" weight="" />
+<item id="1480" name="Streetlamp" weight="" />
+<item id="2064" name="Table Lamp" type="item" weight="" />
+<item id="2065" name="Table Lamp" type="item" weight="" />
+<item id="2050" name="Torch" type="item" weight="5" />
+<item id="2051" name="Torch" type="item" weight="5" />
+<item id="2052" name="Torch" type="item" weight="5" />
+<item id="2053" name="Torch" type="item" weight="5" />
+<item id="2054" name="Torch" type="item" weight="5" />
+<item id="2055" name="Torch" type="item" weight="5" />
+<item id="2056" name="Torch" type="item" weight="5" />
+<item id="2037" name="Wall Lamp" weight="" />
+<item id="2038" name="Wall Lamp" weight="" />
+<item id="2039" name="Wall Lamp" weight="" />
+<item id="2040" name="Wall Lamp" weight="" />
+<item id="2066" name="Wall Lamp" weight="" />
+<item id="2067" name="Wall Lamp" weight="" />
+<item id="2068" name="Wall Lamp" weight="" />
+<item id="2069" name="Wall Lamp" weight="" />
+<item id="2058" name="Wall Torch" weight="" />
+<item id="2059" name="Wall Torch" weight="" />
+<item id="2060" name="Wall Torch" weight="" />
+<item id="2061" name="Wall Torch" weight="" />
+<!--END Light-->
+
+<!--Post-->
+<item id="2589" name="Locker" type="container" maxitems="30" weight="" descr="asd" />
+<item id="2590" name="Locker" type="container" maxitems="30" weight="" descr="asd" />
+<item id="2591" name="Locker" type="container" maxitems="30" weight="" descr="asd" />
+<item id="2592" name="Locker" type="container" maxitems="30" weight="" descr="asd" />
+<item id="2594" name="Depot Chest" type="container" maxitems="30" weight="" descr="asd" />
+<item id="2599" name="Label" weight="0.1" />
+<item id="2597" name="Letter" weight="0.3" />
+<item id="2598" name="Stamped Letter" weight="0.3" />
+<item id="2334" name="Mailbox" weight="" />
+<item id="2595" name="Parcel" type="container" maxitems="10" weight="18" descr="asd" />
+<item id="2596" name="Stamped Parcel" type="container" maxitems="10" weight="18" descr="asd" />
+<!--END Post-->
+
+<!--Rubbish-->
+<item id="2219" name="Banana Skin" weight="0.3" />
+<item id="2231" name="Big Bone" weight="19" />
+<item id="2230" name="Bone" weight="9.5" />
+<item id="2010" name="Broken Bottle" weight="" />
+<item id="2232" name="Broken Brown Glas" weight="" />
+<item id="2233" name="Broken Green Glas" weight="" />
+<item id="2350" name="Broken Hilt" weight="" />
+<item id="2228" name="Broken Pottery" weight="" />
+<item id="2234" name="Broken Sword" weight="35" />
+<item id="2246" name="Burnt Down Firewood" weight="4.2" />
+<item id="2239" name="Burnt Scroll" weight="" />
+<item id="2237" name="Dirty Cape" weight="" />
+<item id="2220" name="Dirty Fur" weight="" />
+<item id="2226" name="Fish Bone" weight="" />
+<item id="2240" name="Fish Remains" weight="" />
+<item id="2244" name="Leaves" weight="0.8" />
+<item id="2235" name="Moldy Cheese" weight="" />
+<item id="2221" name="Old Twig" weight="" />
+<item id="2225" name="Pieces of Iron" weight="" />
+<item id="2227" name="Rotten Meat" weight="" />
+<item id="2243" name="Rubbish" weight="" />
+<item id="2242" name="Rubbish" weight="" />
+<item id="2224" name="Rubbish" weight="" />
+<item id="2241" name="Rubbish" weight="" />
+<item id="2223" name="Rubbish" weight="" />
+<item id="2229" name="Skull" weight="21.8" />
+<item id="2248" name="Skull" weight="" />
+<item id="2247" name="Skull" weight="" />
+<item id="2222" name="Some Wood" weight="0.4" />
+<item id="2236" name="Torn Book" weight="" />
+
+<!--Signs-->
+
+<item id="1429" name="Sign" weight=""/>
+<item id="1439" name="Sign" weight=""/>
+<item id="1431" name="Sign" weight=""/>
+<item id="1432" name="Sign" weight=""/>
+<item id="1433" name="Sign" weight=""/>
+<item id="1434" name="Sign" weight=""/>
+<item id="1438" name="Street sign" weight=""/>
+<item id="1439" name="Street sign" weight=""/>
+
+<!--Statues-->
+
+<item id="1467" name="cobra statue" weight=""/>
+<item id="1468" name="cobra statue" weight=""/>
+<item id="1470" name="cobra statue" weight=""/>
+<item id="1471" name="cobra statue" weight=""/>
+<item id="1449" name="dwarven statue" weight=""/>
+<item id="1447" name="Goblin" weight=""/>
+<item id="1463" name="Goblin" weight=""/>
+<item id="1464" name="Goblin" weight=""/>
+<item id="1465" name="Goblin" weight=""/>
+<item id="1444" name="Hero" weight=""/>
+<item id="1446" name="Minotaur" weight=""/>
+<item id="1460" name="Minotaur" weight=""/>
+<item id="1461" name="Minotaur" weight=""/>
+<item id="1462" name="Minotaur" weight=""/>
+<item id="1445" name="Monument" weight=""/>
+<item id="1466" name="pedestal" weight=""/>
+<item id="1469" name="pedestal" weight=""/>
+<item id="1451" name="sandstone statue" weight=""/>
+<item id="1442" name="Statue" weight=""/>
+<item id="1476" name="Statue" weight=""/>
+<item id="1477" name="Statue" weight=""/>
+<item id="1478" name="Statue" weight=""/>
+<item id="1472" name="cobra statue" weight=""/>
+<item id="1473" name="cobra statue" weight=""/>
+<item id="1474" name="cobra statue" weight=""/>
+<item id="1475" name="cobra statue" weight=""/>
+<item id="1450" name="watchdog statue" weight=""/>
+
+<!--Dead Trees-->
+
+<item id="2717" name="Dead Tree" weight=""/>
+<item id="2718" name="Dead Tree" weight=""/>
+<item id="2719" name="Dead Tree" weight=""/>
+<item id="2720" name="Dead Tree" weight=""/>
+<item id="2713" name="Dead Tree" weight=""/>
+<item id="2714" name="Dead Tree" weight=""/>
+<item id="2715" name="Dead Tree" weight=""/>
+<item id="2716" name="Dead Tree" weight=""/>
+<item id="2709" name="Dead Tree" weight=""/>
+<item id="2710" name="Dead Tree" weight=""/>
+<item id="2697" name="Dead Tree" weight=""/>
+
+<!--Flowers-->
+
+<item id="2745" name="Blue Rose" weight="0.8"/>
+<item id="2107" name="exotic flower" weight=""/>
+<item id="2102" name="Flower Bowl" weight="11"/>
+<item id="2760" name="Goat Grass" weight="0.8"/>
+<item id="2100" name="God Flowers" weight="11"/>
+<item id="2747" name="Grave Flower" weight="0.6"/>
+<item id="2743" name="Heaven Blossom" weight=""/>
+<item id="2103" name="Honey Flower" weight="10"/>
+<item id="2101" name="indoor Plant" weight="23"/>
+<item id="2748" name="Love Flower" weight=""/>
+<item id="2741" name="Moonflower" weight=""/>
+<item id="2740" name="Moonflowers" weight=""/>
+<item id="2759" name="Orange Star" weight="0.7"/>
+<item id="2761" name="orchid" weight=""/>
+<item id="2749" name="pink royal Blossom" weight=""/>
+<item id="2104" name="Potted Flower" weight="23"/>
+<item id="2744" name="Red Rose" weight="0.8"/>
+<item id="2751" name="red royal Blossom" weight=""/>
+<item id="2758" name="red water Lily" weight=""/>
+<item id="2763" name="rose bush" weight=""/>
+<item id="2764" name="rose bush" weight=""/>
+<item id="2766" name="rose bush" weight=""/>
+<item id="2765" name="rose bush" weight=""/>
+<item id="2753" name="Sunflower" weight=""/>
+<item id="2752" name="Sunflowers" weight=""/>
+<item id="2754" name="Tulip" weight="0.5"/>
+<item id="2757" name="Water Lilies" weight=""/>
+<item id="2755" name="Water Lily" weight=""/>
+<item id="2742" name="white Flower" weight=""/>
+<item id="2746" name="Yellow Rose" weight="0.8"/>
+<item id="2750" name="yellow royal Blossom" weight=""/>
+<item id="2756" name="yellow water Lily" weight=""/>
+
+<!--Herbs-->
+
+<item id="2798" name="Blood Herb" weight="1.2"/>
+<item id="2801" name="Fern" weight="0.3"/>
+<item id="2803" name="Powder Herb" weight="0.5"/>
+<item id="2804" name="Shadow Herb" weight="1"/>
+<item id="2802" name="Sling Herb" weight="0.9"/>
+<item id="2800" name="Star Herb" weight="0.3"/>
+<item id="2799" name="Stone Herb" weight="0.2"/>
+<item id="2805" name="Troll Green" weight="1"/>
+
+<!--Stones-->
+
+<item id="1354" name="blue Shrine Stone" weight=""/>
+<item id="389" name="lava hole, with lava" weight=""/>
+<item id="388" name="lava hole, without lava" weight=""/>
+<item id="1353" name="mossy Stone" weight=""/>
+<item id="391" name="stalagmite" weight=""/>
+<item id="386" name="stalagmite" weight=""/>
+<item id="387" name="stalagmite" weight=""/>
+<item id="390" name="stalagmite" weight=""/>
+<item id="1359" name="stein" weight=""/>
+<item id="1285" name="Stone" weight=""/>
+<item id="1286" name="Stone" weight=""/>
+<item id="1287" name="Stone" weight=""/>
+<item id="1288" name="Stone" weight=""/>
+<item id="1289" name="Stone" weight=""/>
+<item id="1290" name="Stone" weight=""/>
+<item id="1291" name="Stone" weight=""/>
+<item id="1292" name="Stone" weight=""/>
+<item id="1293" name="Stone" weight=""/>
+<item id="1294" name="Stone" weight=""/>
+<item id="1295" name="Stone" weight=""/>
+<item id="1296" name="Stone" weight=""/>
+<item id="1297" name="Stone" weight=""/>
+<item id="1298" name="Stone" weight=""/>
+<item id="1299" name="Stone" weight=""/>
+<item id="1300" name="Stone" weight=""/>
+<item id="1301" name="Stone" weight=""/>
+<item id="1302" name="Stone" weight=""/>
+<item id="1303" name="Stone" weight=""/>
+<item id="1304" name="Stone" weight=""/>
+<item id="1305" name="Stone" weight=""/>
+<item id="1306" name="Stone" weight=""/>
+<item id="1307" name="Stone" weight=""/>
+<item id="1308" name="Stone" weight=""/>
+<item id="1309" name="Stone" weight=""/>
+<item id="1310" name="Stone" weight=""/>
+<item id="1311" name="Stone" weight=""/>
+<item id="1312" name="Stone" weight=""/>
+<item id="1313" name="Stone" weight=""/>
+<item id="1314" name="Stone" weight=""/>
+<item id="1315" name="Stone" weight=""/>
+<item id="1316" name="Stone" weight=""/>
+<item id="1317" name="Stone" weight=""/>
+<item id="1319" name="Stone" weight=""/>
+<item id="1320" name="Stone" weight=""/>
+<item id="1321" name="Stone" weight=""/>
+<item id="1322" name="Stone" weight=""/>
+<item id="1323" name="Stone" weight=""/>
+<item id="1324" name="Stone" weight=""/>
+<item id="1325" name="Stone" weight=""/>
+<item id="1326" name="Stone" weight=""/>
+<item id="1327" name="Stone" weight=""/>
+<item id="1328" name="Stone" weight=""/>
+<item id="1329" name="Stone" weight=""/>
+<item id="1330" name="Stone" weight=""/>
+<item id="1331" name="Stone" weight=""/>
+<item id="1332" name="Stone" weight=""/>
+<item id="1333" name="Stone" weight=""/>
+<item id="1334" name="Stone" weight=""/>
+<item id="1335" name="Stone" weight=""/>
+<item id="1336" name="Stone" weight=""/>
+<item id="1337" name="Stone" weight=""/>
+<item id="1338" name="Stone" weight=""/>
+<item id="1339" name="Stone" weight=""/>
+<item id="1340" name="Stone" weight=""/>
+<item id="1341" name="Stone" weight=""/>
+<item id="1342" name="Stone" weight=""/>
+<item id="1343" name="Stone" weight=""/>
+<item id="1344" name="Stone" weight=""/>
+<item id="1345" name="Stone" weight=""/>
+<item id="1346" name="Stone" weight=""/>
+<item id="1347" name="Stone" weight=""/>
+<item id="1348" name="Stone" weight=""/>
+<item id="1349" name="Stone" weight=""/>
+<item id="1350" name="Stone" weight=""/>
+<item id="1351" name="Stone" weight=""/>
+<item id="1352" name="Stone" weight=""/>
+<item id="1354" name="Stone" weight=""/>
+<item id="1355" name="Stone" weight=""/>
+<item id="1356" name="Stone" weight=""/>
+<item id="1357" name="Stone" weight=""/>
+<item id="1359" name="Stone" weight=""/>
+
+<!--Swamp Plants-->
+
+<item id="2782" name="Agave" weight=""/>
+<item id="2770" name="Brough" weight=""/>
+<item id="2769" name="Bush" weight=""/>
+<item id="2784" name="dry Bush" weight=""/>
+<item id="2781" name="Jungle Gras" weight=""/>
+<item id="2782" name="Jungle Gras" weight=""/>
+<item id="2771" name="Swamp Plant" weight=""/>
+<item id="2772" name="Swamp Plant" weight=""/>
+<item id="2773" name="Swamp Plant" weight=""/>
+<item id="2774" name="Swamp Plant" weight=""/>
+<item id="2775" name="Swamp Plant" weight=""/>
+<item id="2776" name="Swamp Plant" weight=""/>
+<item id="2777" name="Swamp Plant" weight=""/>
+<item id="2778" name="Swamp Plant" weight=""/>
+<item id="2779" name="Swamp Plant" weight=""/>
+<item id="2780" name="Swamp Plant" weight=""/>
+
+<!--Trees-->
+
+<item id="2707" name="Beech" weight=""/>
+<item id="2785" name="blueberry bush" weight=""/>
+<item id="2786" name="blueberry bush" weight=""/>
+<item id="2767" name="Bush" weight=""/>
+<item id="2727" name="cactus" weight=""/>
+<item id="2728" name="cactus" weight=""/>
+<item id="2729" name="cactus" weight=""/>
+<item id="2730" name="cactus" weight=""/>
+<item id="2731" name="cactus" weight=""/>
+<item id="2732" name="cactus" weight=""/>
+<item id="2733" name="cactus" weight=""/>
+<item id="2734" name="cactus" weight=""/>
+<item id="2735" name="cactus" weight=""/>
+<item id="2736" name="cactus" weight=""/>
+<item id="2726" name="Coconut Palm" weight=""/>
+<item id="2711" name="Dwarf Tree" weight=""/>
+<item id="2700" name="Firetree" weight=""/>
+<item id="2722" name="old Tree" weight=""/>
+<item id="2725" name="Palm" weight=""/>
+<item id="2705" name="Pear" weight=""/>
+<item id="2712" name="Pine" weight=""/>
+<item id="2703" name="Plum Tree" weight=""/>
+<item id="2708" name="Poplar" weight=""/>
+<item id="2704" name="red Maple" weight=""/>
+<item id="2768" name="small Firetree" weight=""/>
+<item id="2701" name="Sycamore" weight=""/>
+<item id="2702" name="Willow" weight=""/>
+<item id="2706" name="yellow Maple" weight=""/>
+
+<!--Decoration-->
+
+<item id="2094" name="bird cage" type="item" weight="" />
+<item id="2095" name="bird cage" type="item" weight="" />
+<item id="2105" name="Christmas tree" type="item" weight="" />
+<item id="1873" name="cuckoo clock" type="item" weight="" />
+<item id="1874" name="cuckoo clock" type="item" weight="" />
+<item id="1875" name="cuckoo clock" type="item" weight="" />
+<item id="1876" name="cuckoo clock" type="item" weight="" />
+<item id="1877" name="cuckoo clock" type="item" weight="" />
+<item id="2375" name="gemmed lamp" type="item" weight="" />
+<item id="2098" name="globe" type="item" weight="" />
+<item id="2096" name="halloween pumpkin" type="item" weight="" />
+<item id="2097" name="halloween pumpkin" type="item" weight="" />
+<item id="1685" name="Heart Pillow" type="item" weight="5"/>
+<item id="1728" name="pendulum clock" weight="" />
+<item id="1729" name="pendulum clock" weight="" />
+<item id="1730" name="pendulum clock" weight="" />
+<item id="1731" name="pendulum clock" weight="" />
+<item id="2114" name="piggy bank" weight="" />
+<item id="2115" name="damage piggy bank" weight="" />
+<item id="2116" name="rocking horse" weight="" />
+<item id="2117" name="rocking horse" weight="" />
+<item id="2118" name="rocking horse" weight="" />
+<item id="2119" name="rocking horse" weight="" />
+<item id="2113" name="Shipmodel" weight="" />
+<item id="2346" name="tear of daraman" weight="0.3" />
+<item id="2581" name="telescope" weight="" />
+<item id="2582" name="telescope" weight="" />
+<item id="2583" name="telescope" weight="" />
+<item id="2584" name="telescope" weight="" />
+<item id="2093" name="water-pipe" weight="" />
+
+<!--Furniture-->
+
+<item id="1760" name="Bed" type="item" weight="" />
+<item id="1761" name="Bed" type="item" weight="" />
+<item id="1763" name="Bed" type="item" weight="" />
+<item id="1765" name="Bed" type="item" weight="" />
+<item id="1778" name="big Cask" type="item" weight="" />
+<item id="1779" name="big Cask" type="item" weight="" />
+<item id="1780" name="big Cask" type="item" weight="" />
+<item id="1781" name="big Cask" type="item" weight="" />
+<item id="1782" name="big Cask" type="item" weight="" />
+<item id="1783" name="big Cask" type="item" weight="" />
+<item id="1784" name="big Cask" type="item" weight="" />
+<item id="1785" name="big Cask" type="item" weight="" />
+<item id="1602" name="big Table" type="item" weight="" />
+<item id="1603" name="big Table" type="item" weight="" />
+<item id="1604" name="big Table" type="item" weight="" />
+<item id="1605" name="big Table" type="item" weight="" />
+<item id="1606" name="big Table" type="item" weight="" />
+<item id="1607" name="big Table" type="item" weight="" />
+<item id="1608" name="big Table" type="item" weight="" />
+<item id="1609" name="big Table" type="item" weight="" />
+<item id="1610" name="big Table" type="item" weight="" />
+<item id="1611" name="big Table" type="item" weight="" />
+<item id="1612" name="big Table" type="item" weight="" />
+<item id="1613" name="big Table" type="item" weight="" />
+<item id="1810" name="Blackboard" type="item" weight="" />
+<item id="1811" name="Blackboard" type="item" weight="" />
+<item id="1815" name="Blackboard" type="item" weight="" />
+<item id="1818" name="Blackboard" type="item" weight="" />
+<item id="1718" name="Bookcase" type="container" maxitems="6" weight="" />
+<item id="1719" name="Bookcase" type="container" maxitems="6" weight="" />
+<item id="1720" name="Bookcase" type="container" maxitems="6" weight="" />
+<item id="1721" name="Bookcase" type="container" maxitems="6" weight="" />
+<item id="1722" name="Bookcase" type="container" maxitems="6" weight="" />
+<item id="1723" name="Bookcase" type="container" maxitems="6" weight="" />
+<item id="1756" name="Cot" type="item" weight="" />
+<item id="1757" name="Cot" type="item" weight="" />
+<item id="1758" name="Cot" type="item" weight="" />
+<item id="1759" name="Cot" type="item" weight="" />
+<item id="1714" name="Drawer" type="container" maxitems="" weight="300" />
+<item id="1715" name="Drawer" type="container" maxitems="" weight="300" />
+<item id="1716" name="Drawer" type="container" maxitems="" weight="300" />
+<item id="1717" name="Drawer" type="container" maxitems="" weight="300" />
+<item id="1724" name="Drawer" type="item" weight="" />
+<item id="1725" name="Drawer" type="item" weight="" />
+<item id="1726" name="Drawer" type="item" weight="" />
+<item id="1727" name="Drawer" type="item" weight="" />
+<item id="1777" name="Dustbin" type="item" weight="" />
+<item id="1670" name="green cushioned chair" type="item" weight="" />
+<item id="1671" name="green cushioned chair" type="item" weight="" />
+<item id="1672" name="green cushioned chair" type="item" weight="" />
+<item id="1673" name="green cushioned chair" type="item" weight="" />
+<item id="1732" name="locker" type="item" weight="" />
+<item id="1733" name="locker" type="item" weight="" />
+<item id="1734" name="locker" type="item" weight="" />
+<item id="1735" name="locker" type="item" weight="" />
+<item id="1803" name="oriental carpet" type="item" weight="" />
+<item id="1804" name="oriental carpet" type="item" weight="" />
+<item id="1805" name="oriental carpet" type="item" weight="" />
+<item id="1806" name="oriental carpet" type="item" weight="" />
+<item id="1807" name="oriental carpet" type="item" weight="" />
+<item id="1809" name="oriental carpet" type="item" weight="" />
+<item id="1786" name="Oven" type="item" weight="" />
+<item id="1787" name="Oven" type="item" weight="" />
+<item id="1788" name="Oven" type="item" weight="" />
+<item id="1789" name="Oven" type="item" weight="" />
+<item id="1790" name="Oven" type="item" weight="" />
+<item id="1791" name="Oven" type="item" weight="" />
+<item id="1792" name="Oven" type="item" weight="" />
+<item id="1793" name="Oven" type="item" weight="" />
+<item id="1173" name="paravent" type="item" weight="" />
+<item id="1794" name="Red Carpet" type="item" weight="" />
+<item id="1795" name="Red Carpet" type="item" weight="" />
+<item id="1796" name="Red Carpet" type="item" weight="" />
+<item id="1797" name="Red Carpet" type="item" weight="" />
+<item id="1798" name="Red Carpet" type="item" weight="" />
+<item id="1799" name="Red Carpet" type="item" weight="" />
+<item id="1800" name="Red Carpet" type="item" weight="" />
+<item id="1801" name="Red Carpet" type="item" weight="" />
+<item id="1802" name="Red Carpet" type="item" weight="" />
+<item id="1666" name="Red cushioned chair" type="item" weight="" />
+<item id="1667" name="Red cushioned chair" type="item" weight="" />
+<item id="1668" name="Red cushioned chair" type="item" weight="" />
+<item id="1669" name="Red cushioned chair" type="item" weight="" />
+<item id="1674" name="Rocking chair" type="item" weight="" />
+<item id="1675" name="Rocking chair" type="item" weight="" />
+<item id="1676" name="Rocking chair" type="item" weight="" />
+<item id="1677" name="Rocking chair" type="item" weight="" />
+<item id="1616" name="small round table" type="item" weight="" />
+<item id="1619" name="small Table" type="item" weight="100" />
+<item id="1694" name="Sofa" type="item" weight="80"/>
+<item id="1695" name="Sofa" type="item" weight="80"/>
+<item id="1696" name="Sofa" type="item" weight="80"/>
+<item id="1697" name="Sofa" type="item" weight="80"/>
+<item id="1698" name="Sofa" type="item" weight="80"/>
+<item id="1699" name="Sofa" type="item" weight="80"/>
+<item id="1700" name="Sofa" type="item" weight="80"/>
+<item id="1701" name="Sofa" type="item" weight="80"/>
+<item id="1702" name="Sofa" type="item" weight="80"/>
+<item id="1703" name="Sofa" type="item" weight="80"/>
+<item id="1704" name="Sofa" type="item" weight="80"/>
+<item id="1705" name="Sofa" type="item" weight="80"/>
+<item id="1706" name="Sofa" type="item" weight="80"/>
+<item id="1707" name="Sofa" type="item" weight="80"/>
+<item id="1708" name="Sofa" type="item" weight="80"/>
+<item id="1709" name="Sofa" type="item" weight="80"/>
+<item id="1658" name="Sofa chair" type="item" weight="" />
+<item id="1659" name="Sofa chair" type="item" weight="" />
+<item id="1660" name="Sofa chair" type="item" weight="" />
+<item id="1661" name="Sofa chair" type="item" weight="" />
+<item id="1614" name="Square table" weight="" />
+<item id="1615" name="Square table" weight="" />
+<item id="459" name="strange carving" weight="" />
+<item id="1945" name="Switch" weight="" />
+<item id="1946" name="Switch" weight="" />
+<item id="1654" name="Thron" weight="" />
+<item id="1655" name="Thron" weight="" />
+<item id="1656" name="Thron" weight="" />
+<item id="1657" name="Thron" weight="" />
+<item id="1646" name="Thron" weight="" />
+<item id="1647" name="Thron" weight="" />
+<item id="1648" name="Thron" weight="" />
+<item id="1649" name="Thron" weight="" />
+<item id="1710" name="Wardrobe" weight="" />
+<item id="1711" name="Wardrobe" weight="" />
+<item id="1712" name="Wardrobe" weight="" />
+<item id="1713" name="Wardrobe" weight="" />
+<item id="1650" name="wooden chairs" weight="150" />
+<item id="1651" name="wooden chairs" weight="150" />
+<item id="1652" name="wooden chairs" weight="150" />
+<item id="1653" name="wooden chairs" weight="150" />
+<item id="1736" name="looking glass" weight="" />
+<item id="1737" name="looking glass" weight="" />
+<item id="1843" name="Wall Mirror" weight="" />
+<item id="1844" name="Wall Mirror" weight="" />
+<item id="1845" name="Wall Mirror" weight="" />
+<item id="1846" name="Wall Mirror" weight="" />
+<item id="1847" name="Wall Mirror" weight="" />
+<item id="1848" name="Wall Mirror" weight="" />
+<item id="1849" name="Wall Mirror" weight="" />
+<item id="1850" name="Wall Mirror" weight="" />
+<item id="1851" name="Wall Mirror" weight="" />
+<item id="1809" name="Painting" weight="" />
+<item id="1814" name="Painting" weight="" />
+<item id="1829" name="Painting" weight="" />
+<item id="1830" name="Painting" weight="" />
+<item id="1825" name="Picture" weight="" />
+<item id="1826" name="Picture" weight="" />
+<item id="1827" name="Picture" weight="" />
+<item id="1828" name="Picture" weight="" />
+<item id="1832" name="Picture" weight="" />
+<item id="1836" name="Picture" weight="" />
+<item id="1831" name="Picture" weight="" />
+<item id="1835" name="Picture" weight="" />
+<item id="1833" name="Picture" weight="" />
+<item id="1834" name="Picture" weight="" />
+<item id="1837" name="Picture" weight="" />
+<item id="1838" name="Picture" weight="" />
+<item id="1852" name="Picture" weight="" />
+<item id="1853" name="Picture" weight="" />
+<item id="1854" name="Picture" weight="" />
+<item id="1812" name="Tapestry" weight="" />
+<item id="1813" name="Tapestry" weight="" />
+<item id="1855" name="Purple tapestry" weight="10" />
+<item id="1856" name="Purple tapestry" weight="10" />
+<item id="1857" name="Purple tapestry" weight="10" />
+<item id="1858" name="Green tapestry" weight="10" />
+<item id="1859" name="Green tapestry" weight="10" />
+<item id="1860" name="Green tapestry" weight="10" />
+<item id="1861" name="Yellow tapestry" weight="10" />
+<item id="1862" name="Yellow tapestry" weight="10" />
+<item id="1863" name="Yellow tapestry" weight="10" />
+<item id="1864" name="Orange tapestry" weight="10" />
+<item id="1865" name="Orange tapestry" weight="10" />
+<item id="1866" name="Orange tapestry" weight="10" />
+<item id="1867" name="Red tapestry" weight="10" />
+<item id="1868" name="Red tapestry" weight="10" />
+<item id="1869" name="Red tapestry" weight="10" />
+<item id="1870" name="Blue tapestry" weight="10" />
+<item id="1871" name="Blue tapestry" weight="10" />
+<item id="1872" name="Blue tapestry" weight="10" />
+<item id="1873" name="Blue tapestry" weight="10" />
+
+<!--Pillows-->
+
+<item id="1678" name="Purple Pillow" type="item" weight="5"/>
+<item id="1679" name="Green Pillow" type="item" weight="5"/>
+<item id="1680" name="Red Pillow" type="item" weight="5"/>
+<item id="1681" name="Blue Pillow" type="item" weight="5"/>
+<item id="1682" name="Orange Pillow" type="item" weight="5"/>
+<item id="1683" name="Turqoise Pillow" type="item" weight="5"/>
+<item id="1684" name="White Pillow" type="item" weight="5"/>
+<item id="1686" name="Blue Round Pillow" type="item" weight="5"/>
+<item id="1687" name="Red Round Pillow" type="item" weight="5"/>
+<item id="1688" name="Green Round Pillow" type="item" weight="5"/>
+<item id="1689" name="Yellow Round Pillow" type="item" weight="5"/>
+<item id="1690" name="Blue Round Pillow" type="item" weight="5"/>
+<item id="1691" name="Red Round Pillow" type="item" weight="5"/>
+<item id="1692" name="Purple Round Pillow" type="item" weight="5"/>
+<item id="1693" name="Turqoise Round Pillow" type="item" weight="5"/>
+
+<!--Trophys-->
+
+<item id="1882" name="Demon trophy" weight="" />
+<item id="1883" name="Demon trophy" weight="" />
+<item id="1884" name="Wolf trophy" weight="" />
+<item id="1885" name="Wolf trophy" weight="" />
+<item id="1886" name="Orc trophy" weight="" />
+<item id="1887" name="Orc trophy" weight="" />
+<item id="1888" name="Behemnot trophy" weight="" />
+<item id="1889" name="Behemnot trophy" weight="" />
+<item id="1890" name="Deer trophy" weight="" />
+<item id="1891" name="Deer trophy" weight="" />
+<item id="1892" name="Cyclops trophy" weight="" />
+<item id="1893" name="Cyclops trophy" weight="" />
+<item id="1894" name="Dragon trophy" weight="" />
+<item id="1895" name="Dragon trophy" weight="" />
+<item id="1898" name="Minotaur trophy" weight="" />
+<item id="1899" name="Minotaur trophy" weight="" />
+
+<!--Dirt Tiles-->
+
+<item id="351" name="dirt" weight="" />
+<item id="352" name="dirt" weight="" />
+<item id="353" name="dirt" weight="" />
+<item id="354" name="dirt" weight="" />
+<item id="355" name="dirt" weight="" />
+<item id="356" name="dirt wall" weight="" />
+<item id="357" name="dirt wall" weight="" />
+<item id="358" name="dirt wall" weight="" />
+<item id="359" name="dirt wall" weight="" />
+<item id="360" name="dirt wall" weight="" />
+<item id="361" name="dirt wall" weight="" />
+<item id="362" name="dirt wall" weight="" />
+<item id="363" name="dirt wall" weight="" />
+<item id="364" name="dirt wall" weight="" />
+<item id="365" name="dirt wall" weight="" />
+<item id="366" name="dirt wall" weight="" />
+<item id="367" name="dirt wall" weight="" />
+<item id="371" name="dirt wall" weight="" />
+<item id="372" name="dirt wall" weight="" />
+<item id="373" name="dirt wall" weight="" />
+<item id="374" name="dirt wall" weight="" />
+<item id="375" name="dirt wall" weight="" />
+<item id="376" name="dirt wall" weight="" />
+<item id="377" name="dirt wall" weight="" />
+<item id="378" name="dirt wall" weight="" />
+<item id="379" name="dirt wall" weight="" />
+<item id="380" name="dirt wall" weight="" />
+<item id="381" name="dirt wall" weight="" />
+<item id="382" name="dirt wall" weight="" />
+<item id="383" name="pile of stones" weight="" />
+<item id="384" name="a hole" weight="" />
+<item id="385" name="pile of stones" weight="" />
+<item id="393" name="grass" weight="" />
+<item id="394" name="grass" weight="" />
+<item id="395" name="grass" weight="" />
+<item id="396" name="grass" weight="" />
+<item id="397" name="grass" weight="" />
+<item id="398" name="grass" weight="" />
+<item id="399" name="grass" weight="" />
+<item id="400" name="grass" weight="" />
+<item id="401" name="grass" weight="" />
+<item id="402" name="grass" weight="" />
+<item id="403" name="grass" weight="" />
+<item id="404" name="grass" weight="" />
+<item id="405" name="wooden floor" weight="" />
+<item id="406" name="white marble floor" weight="" />
+<item id="407" name="black marble floor" weight="" />
+<item id="408" name="trapdoor" weight="" />
+<item id="410" name="trapdoor" weight="" />
+<item id="411" name="stair" weight="" />
+<item id="412" name="a tile" weight="" />
+<item id="413" name="a tile" weight="" />
+<item id="414" name="a tile" weight="" />
+<item id="415" name="a tile" weight="" />
+<item id="416" name="a tile" weight="" />
+<item id="417" name="a tile" weight="" />
+<item id="418" name="a tile" weight="" />
+<item id="419" name="a tile" weight="" />
+<item id="420" name="a tile" weight="" />
+<item id="421" name="a tile" weight="" />
+<item id="422" name="a tile" weight="" />
+<item id="423" name="stair" weight="" />
+<item id="424" name="a tile" weight="" />
+<item id="425" name="a tile" weight="" />
+<item id="426" name="a tile" weight="" />
+<item id="427" name="trapdoor" weight="" />
+<item id="428" name="ladder" weight="" />
+<item id="429" name="trapdoor" weight="" />
+<item id="431" name="stone floor" weight="" />
+<item id="448" name="wooden floor" weight="" />
+<item id="449" name="wooden floor" weight="" />
+<item id="450" name="wooden floor" weight="" />
+<item id="451" name="wooden floor" weight="" />
+<item id="452" name="wooden floor" weight="" />
+<item id="453" name="wooden floor" weight="" />
+<item id="454" name="wooden floor" weight="" />
+<item id="455" name="wooden floor" weight="" />
+<item id="456" name="wooden floor" weight="" />
+<item id="481" name="sand" weight="" />
+<item id="482" name="sand" weight="" />
+<item id="483" name="ice" weight="" />
+<item id="484" name="ice" weight="" />
+<item id="485" name="ice" weight="" />
+<item id="486" name="sand" weight="" />
+<item id="487" name="sand" weight="" />
+<item id="489" name="sand" weight="" />
+<item id="490" name="water" weight="" />
+<item id="491" name="water" weight="" />
+<item id="492" name="water" weight="" />
+<item id="493" name="water" weight="" />
+<item id="494" name="water" weight="" />
+<item id="495" name="water" weight="" />
+<item id="496" name="water" weight="" />
+<item id="497" name="water" weight="" />
+<item id="498" name="water" weight="" />
+<item id="499" name="water" weight="" />
+<item id="500" name="water" weight="" />
+<item id="501" name="water" weight="" />
+<item id="502" name="water" weight="" />
+<item id="503" name="water" weight="" />
+<item id="504" name="water" weight="" />
+<item id="505" name="water" weight="" />
+<item id="506" name="water" weight="" />
+<item id="507" name="water" weight="" />
+<item id="508" name="water" weight="" />
+<item id="509" name="water" weight="" />
+<item id="510" name="water" weight="" />
+<item id="511" name="water" weight="" />
+<item id="512" name="water" weight="" />
+<item id="513" name="water" weight="" />
+<item id="514" name="water" weight="" />
+<item id="515" name="water" weight="" />
+<item id="516" name="water" weight="" />
+<item id="517" name="water" weight="" />
+<item id="518" name="lava" weight="" />
+<item id="519" name="lava" weight="" />
+<item id="520" name="lava" weight="" />
+<item id="521" name="lava" weight="" />
+<item id="522" name="lava" weight="" />
+<item id="523" name="lava" weight="" />
+<item id="524" name="lava" weight="" />
+<item id="525" name="lava" weight="" />
+<item id="526" name="lava" weight="" />
+<item id="527" name="lava" weight="" />
+<item id="528" name="lava" weight="" />
+<item id="529" name="lava" weight="" />
+<item id="530" name="swamp" weight="" />
+<item id="531" name="swamp" weight="" />
+<item id="532" name="swamp" weight="" />
+<item id="533" name="swamp" weight="" />
+<item id="534" name="swamp" weight="" />
+<item id="535" name="swamp" weight="" />
+<item id="536" name="swamp" weight="" />
+<item id="537" name="swamp" weight="" />
+<item id="538" name="swamp" weight="" />
+<item id="539" name="swamp" weight="" />
+<item id="540" name="swamp" weight="" />
+<item id="541" name="swamp" weight="" />
+<item id="542" name="lava" weight="" />
+<item id="543" name="lava" weight="" />
+<item id="544" name="lava" weight="" />
+<item id="545" name="lava" weight="" />
+<item id="546" name="lava" weight="" />
+<item id="547" name="lava" weight="" />
+<item id="548" name="lava" weight="" />
+<item id="549" name="lava" weight="" />
+<item id="550" name="lava" weight="" />
+<item id="551" name="lava" weight="" />
+<item id="552" name="lava" weight="" />
+<item id="553" name="lava" weight="" />
+<item id="554" name="lava" weight="" />
+<item id="555" name="lava" weight="" />
+<item id="556" name="lava" weight="" />
+<item id="557" name="lava" weight="" />
+<item id="558" name="lava" weight="" />
+<item id="559" name="lava" weight="" />
+<item id="560" name="lava" weight="" />
+<item id="561" name="lava" weight="" />
+<item id="562" name="lava" weight="" />
+<item id="563" name="lava" weight="" />
+<item id="564" name="lava" weight="" />
+<item id="565" name="lava" weight="" />
+<item id="566" name="water" weight="" />
+<item id="567" name="water" weight="" />
+<item id="568" name="water" weight="" />
+<item id="569" name="water" weight="" />
+<item id="570" name="water" weight="" />
+<item id="571" name="water" weight="" />
+<item id="572" name="water" weight="" />
+<item id="573" name="water" weight="" />
+<item id="574" name="water" weight="" />
+<item id="575" name="water" weight="" />
+<item id="576" name="water" weight="" />
+<item id="577" name="water" weight="" />
+<item id="578" name="water" weight="" />
+<item id="579" name="water" weight="" />
+<item id="580" name="water" weight="" />
+<item id="581" name="water" weight="" />
+<item id="582" name="water" weight="" />
+<item id="583" name="water" weight="" />
+<item id="584" name="water" weight="" />
+<item id="585" name="water" weight="" />
+<item id="586" name="water" weight="" />
+<item id="587" name="water" weight="" />
+<item id="588" name="water" weight="" />
+<item id="589" name="water" weight="" />
+<item id="590" name="water" weight="" />
+<item id="591" name="water" weight="" />
+<item id="592" name="water" weight="" />
+<item id="593" name="water" weight="" />
+<item id="594" name="water" weight="" />
+<item id="595" name="water" weight="" />
+<item id="596" name="water" weight="" />
+<item id="597" name="water" weight="" />
+<item id="598" name="lava" weight="" />
+<item id="599" name="lava" weight="" />
+<item id="600" name="lava" weight="" />
+<item id="601" name="lava" weight="" />
+<item id="602" name="swamp" weight="" />
+<item id="603" name="swamp" weight="" />
+<item id="604" name="swamp" weight="" />
+<item id="605" name="swamp" weight="" />
+<item id="606" name="water" weight="" />
+<item id="607" name="water" weight="" />
+<item id="608" name="water" weight="" />
+<item id="609" name="water" weight="" />
+<item id="610" name="water" weight="" />
+<item id="611" name="water" weight="" />
+<item id="612" name="water" weight="" />
+<item id="613" name="water" weight="" />
+<item id="614" name="water" weight="" />
+<item id="615" name="water" weight="" />
+<item id="616" name="water" weight="" />
+<item id="617" name="water" weight="" />
+<item id="618" name="water" weight="" />
+<item id="619" name="water" weight="" />
+<item id="620" name="water" weight="" />
+<item id="621" name="water" weight="" />
+<item id="622" name="water" weight="" />
+<item id="623" name="water" weight="" />
+<item id="624" name="water" weight="" />
+<item id="625" name="water" weight="" />
+<item id="626" name="water" weight="" />
+<item id="627" name="water" weight="" />
+<item id="628" name="water" weight="" />
+<item id="629" name="water" weight="" />
+<item id="630" name="water" weight="" />
+<item id="631" name="water" weight="" />
+<item id="632" name="water" weight="" />
+<item id="633" name="water" weight="" />
+<item id="634" name="water" weight="" />
+<item id="635" name="water" weight="" />
+<item id="636" name="water" weight="" />
+<item id="637" name="water" weight="" />
+<item id="638" name="swamp" weight="" />
+<item id="639" name="swamp" weight="" />
+<item id="640" name="swamp" weight="" />
+<item id="641" name="swamp" weight="" />
+<item id="642" name="swamp" weight="" />
+<item id="643" name="swamp" weight="" />
+<item id="644" name="swamp" weight="" />
+<item id="645" name="swamp" weight="" />
+<item id="646" name="swamp" weight="" />
+<item id="647" name="swamp" weight="" />
+<item id="648" name="swamp" weight="" />
+<item id="649" name="swamp" weight="" />
+<item id="650" name="swamp" weight="" />
+<item id="651" name="swamp" weight="" />
+<item id="652" name="swamp" weight="" />
+<item id="653" name="swamp" weight="" />
+<item id="654" name="swamp" weight="" />
+<item id="655" name="swamp" weight="" />
+<item id="656" name="swamp" weight="" />
+<item id="657" name="swamp" weight="" />
+<item id="658" name="water" weight="" />
+<item id="659" name="water" weight="" />
+<item id="660" name="water" weight="" />
+<item id="661" name="water" weight="" />
+<item id="662" name="water" weight="" />
+<item id="663" name="water" weight="" />
+<item id="664" name="water" weight="" />
+<item id="665" name="water" weight="" />
+<item id="666" name="water" weight="" />
+<item id="667" name="water" weight="" />
+<item id="668" name="water" weight="" />
+<item id="669" name="water" weight="" />
+<item id="670" name="snow" weight="" />
+<item id="671" name="ice" weight="" />
+<item id="672" name="grass" weight="" />
+<item id="673" name="grass" weight="" />
+<item id="674" name="grass" weight="" />
+<item id="675" name="grass" weight="" />
+<item id="676" name="grass" weight="" />
+<item id="677" name="grass" weight="" />
+<item id="678" name="grass" weight="" />
+<item id="679" name="grass" weight="" />
+<item id="680" name="grass" weight="" />
+<item id="681" name="grass" weight="" />
+<item id="682" name="grass" weight="" />
+<item id="683" name="grass" weight="" />
+<item id="684" name="ice" weight="" />
+<item id="685" name="ice" weight="" />
+<item id="686" name="ice" weight="" />
+<item id="687" name="ice" weight="" />
+<item id="688" name="ice" weight="" />
+<item id="689" name="ice" weight="" />
+<item id="690" name="ice" weight="" />
+<item id="691" name="ice" weight="" />
+<item id="692" name="ice" weight="" />
+<item id="693" name="ice" weight="" />
+<item id="694" name="ice" weight="" />
+<item id="695" name="ice" weight="" />
+<item id="696" name="ice" weight="" />
+<item id="697" name="ice" weight="" />
+<item id="698" name="ice" weight="" />
+<item id="699" name="ice" weight="" />
+<item id="700" name="ice" weight="" />
+<item id="701" name="ice" weight="" />
+<item id="702" name="ice" weight="" />
+<item id="703" name="ice" weight="" />
+<item id="704" name="ice" weight="" />
+<item id="705" name="ice" weight="" />
+<item id="706" name="ice" weight="" />
+<item id="707" name="ice" weight="" />
+<item id="708" name="tar" weight="" />
+<item id="709" name="tar" weight="" />
+<item id="710" name="tar" weight="" />
+<item id="711" name="tar" weight="" />
+<item id="712" name="tar" weight="" />
+<item id="713" name="tar" weight="" />
+<item id="714" name="tar" weight="" />
+<item id="715" name="tar" weight="" />
+<item id="716" name="tar" weight="" />
+<item id="717" name="tar" weight="" />
+<item id="718" name="tar" weight="" />
+<item id="719" name="tar" weight="" />
+<item id="720" name="tar" weight="" />
+<item id="721" name="tar" weight="" />
+<item id="722" name="tar" weight="" />
+<item id="723" name="tar" weight="" />
+<item id="724" name="stone road" weight="" />
+<item id="725" name="stone road" weight="" />
+<item id="726" name="stone road" weight="" />
+<item id="727" name="stone road" weight="" />
+<item id="728" name="stone road" weight="" />
+<item id="729" name="stone road" weight="" />
+<item id="730" name="stone road" weight="" />
+<item id="731" name="stone road" weight="" />
+<item id="732" name="stone road" weight="" />
+<item id="733" name="stone road" weight="" />
+<item id="734" name="stone road" weight="" />
+<item id="735" name="stone road" weight="" />
+<item id="736" name="stone road" weight="" />
+<item id="737" name="stone road" weight="" />
+<item id="738" name="stone road" weight="" />
+<item id="739" name="stone road" weight="" />
+<item id="740" name="stone road" weight="" />
+<item id="741" name="stone road" weight="" />
+<item id="742" name="stone road" weight="" />
+<item id="743" name="stone road" weight="" />
+<item id="744" name="stone road" weight="" />
+<item id="745" name="stone road" weight="" />
+<item id="746" name="stone road" weight="" />
+<item id="747" name="stone road" weight="" />
+<item id="748" name="stone road" weight="" />
+<item id="749" name="stone road" weight="" />
+<item id="750" name="stone road" weight="" />
+<item id="751" name="stone road" weight="" />
+<item id="752" name="stone road" weight="" />
+<item id="753" name="stone road" weight="" />
+<item id="754" name="stone road" weight="" />
+<item id="755" name="stone road" weight="" />
+<item id="756" name="stone road" weight="" />
+<item id="757" name="stone road" weight="" />
+<item id="758" name="stone road" weight="" />
+<item id="759" name="stone road" weight="" />
+<item id="760" name="stone road" weight="" />
+<item id="761" name="stone road" weight="" />
+<item id="762" name="stone road" weight="" />
+<item id="763" name="stone road" weight="" />
+<item id="764" name="stone road" weight="" />
+<item id="765" name="stone road" weight="" />
+<item id="766" name="stone road" weight="" />
+<item id="767" name="stone road" weight="" />
+<item id="768" name="stone road" weight="" />
+<item id="769" name="stone road" weight="" />
+<item id="770" name="stone road" weight="" />
+<item id="771" name="stone road" weight="" />
+<item id="772" name="stone road" weight="" />
+<item id="773" name="stone road" weight="" />
+<item id="774" name="stone road" weight="" />
+<item id="775" name="stone road" weight="" />
+<item id="776" name="stone road" weight="" />
+<item id="777" name="sand stone" weight="" />
+<item id="778" name="sand stone" weight="" />
+<item id="779" name="sand stone" weight="" />
+<item id="780" name="sand stone" weight="" />
+<item id="781" name="sand stone" weight="" />
+<item id="782" name="sand stone" weight="" />
+<item id="783" name="sand stone" weight="" />
+<item id="784" name="sand stone" weight="" />
+<item id="785" name="sand stone" weight="" />
+<item id="786" name="sand stone" weight="" />
+<item id="787" name="sand stone" weight="" />
+<item id="788" name="sand stone" weight="" />
+<item id="789" name="sand stone" weight="" />
+<item id="790" name="sand stone" weight="" />
+<item id="791" name="grass" weight="" />
+<item id="792" name="grass" weight="" />
+<item id="793" name="grass" weight="" />
+<item id="794" name="grass" weight="" />
+<item id="795" name="grass" weight="" />
+<item id="796" name="grass" weight="" />
+<item id="797" name="grass" weight="" />
+<item id="798" name="grass" weight="" />
+<item id="799" name="grass" weight="" />
+<item id="800" name="grass" weight="" />
+
+<!--Tile Names-->
+
+<item id="102" name="grass" weight="" />
+<item id="103" name="dirt" weight="" />
+<item id="105" name="gravel" weight="" />
+<item id="109" name="flowers" weight="" />
+<item id="110" name="grass" weight="" />
+<item id="111" name="grass" weight="" />
+<item id="112" name="grass" weight="" />
+<item id="113" name="grass" weight="" />
+<item id="114" name="grass" weight="" />
+<item id="115" name="grass" weight="" />
+<item id="116" name="grass" weight="" />
+<item id="117" name="grass" weight="" />
+<item id="118" name="grass" weight="" />
+<item id="119" name="grass" weight="" />
+<item id="120" name="grass" weight="" />
+<item id="121" name="grass" weight="" />
+<item id="122" name="grass" weight="" />
+<item id="123" name="grass" weight="" />
+<item id="124" name="grass" weight="" />
+<item id="125" name="grass" weight="" />
+<item id="127" name="grass" weight="" />
+<item id="128" name="grass" weight="" />
+<item id="129" name="grass" weight="" />
+<item id="131" name="grass" weight="" />
+<item id="132" name="grass" weight="" />
+<item id="133" name="grass" weight="" />
+<item id="182" name="grass" weight="" />
+<item id="183" name="grass" weight="" />
+<item id="184" name="grass" weight="" />
+<item id="185" name="grass" weight="" />
+<item id="186" name="grass" weight="" />
+<item id="187" name="grass" weight="" />
+<item id="188" name="grass" weight="" />
+<item id="189" name="grass" weight="" />
+<item id="190" name="grass" weight="" />
+<item id="191" name="grass" weight="" />
+<item id="192" name="grass" weight="" />
+<item id="193" name="grass" weight="" />
+<item id="194" name="grass" weight="" />
+<item id="195" name="grass" weight="" />
+<item id="196" name="grass" weight="" />
+<item id="197" name="grass" weight="" />
+<item id="198" name="grass" weight="" />
+<item id="199" name="grass" weight="" />
+<item id="200" name="grass" weight="" />
+<item id="201" name="grass" weight="" />
+<item id="202" name="grass" weight="" />
+<item id="203" name="grass" weight="" />
+<item id="204" name="grass" weight="" />
+<item id="205" name="grass" weight="" />
+<item id="206" name="grass" weight="" />
+<item id="219" name="grass" weight="" />
+<item id="220" name="grass" weight="" />
+<item id="221" name="grass" weight="" />
+<item id="222" name="grass" weight="" />
+<item id="223" name="grass" weight="" />
+<item id="224" name="grass" weight="" />
+<item id="225" name="grass" weight="" />
+<item id="226" name="grass" weight="" />
+<item id="227" name="grass" weight="" />
+<item id="228" name="grass" weight="" />
+<item id="229" name="grass" weight="" />
+<item id="230" name="grass" weight="" />
+<item id="232" name="grass" weight="" />
+<item id="233" name="grass" weight="" />
+<item id="234" name="grass" weight="" />
+<item id="235" name="grass" weight="" />
+<item id="236" name="grass" weight="" />
+<item id="237" name="grass" weight="" />
+<item id="238" name="grass" weight="" />
+<item id="239" name="grass" weight="" />
+<item id="240" name="grass" weight="" />
+<item id="241" name="grass" weight="" />
+<item id="242" name="grass" weight="" />
+<item id="243" name="grass" weight="" />
+<item id="268" name="grass" weight="" />
+<item id="269" name="grass" weight="" />
+<item id="270" name="grass" weight="" />
+<item id="271" name="grass" weight="" />
+<item id="272" name="grass" weight="" />
+<item id="273" name="grass" weight="" />
+<item id="274" name="grass" weight="" />
+<item id="275" name="grass" weight="" />
+<item id="276" name="grass" weight="" />
+<item id="277" name="grass" weight="" />
+<item id="278" name="grass" weight="" />
+<item id="279" name="grass" weight="" />
+<item id="280" name="grass" weight="" />
+<item id="281" name="grass" weight="" />
+<item id="282" name="grass" weight="" />
+<item id="283" name="grass" weight="" />
+<item id="284" name="grass" weight="" />
+<item id="285" name="grass" weight="" />
+<item id="286" name="grass" weight="" />
+<item id="287" name="grass" weight="" />
+<item id="288" name="grass" weight="" />
+<item id="289" name="grass" weight="" />
+<item id="290" name="grass" weight="" />
+<item id="291" name="grass" weight="" />
+<item id="292" name="grass" weight="" />
+<item id="293" name="grass" weight="" />
+<item id="294" name="grass" weight="" />
+<item id="295" name="grass" weight="" />
+<item id="296" name="grass" weight="" />
+<item id="297" name="grass" weight="" />
+<item id="298" name="grass" weight="" />
+<item id="299" name="grass" weight="" />
+<item id="300" name="grass" weight="" />
+<item id="301" name="grass" weight="" />
+<item id="302" name="grass" weight="" />
+<item id="303" name="grass" weight="" />
+<item id="304" name="grass" weight="" />
+<item id="305" name="grass" weight="" />
+<item id="306" name="grass" weight="" />
+<item id="307" name="grass" weight="" />
+<item id="308" name="grass" weight="" />
+<item id="309" name="grass" weight="" />
+<item id="310" name="grass" weight="" />
+<item id="311" name="grass" weight="" />
+<item id="312" name="grass" weight="" />
+<item id="313" name="grass" weight="" />
+<item id="314" name="grass" weight="" />
+<item id="315" name="grass" weight="" />
+<item id="316" name="grass" weight="" />
+<item id="317" name="grass" weight="" />
+<item id="318" name="grass" weight="" />
+<item id="327" name="grass" weight="" />
+<item id="328" name="grass" weight="" />
+<item id="329" name="grass" weight="" />
+<item id="330" name="grass" weight="" />
+<item id="331" name="grass" weight="" />
+<item id="332" name="grass" weight="" />
+<item id="333" name="grass" weight="" />
+<item id="334" name="grass" weight="" />
+
+<!--Magic Walls-->
+<item id="2721" name="Wild Growth" weight="" />
+<!--END Magic Walls-->
+
+<!--Ring-->
+<item id="2123" name="Ring of the Skies" type="armor" position="ring" weight="0.9" />
+<item id="2208" name="Axering" type="armor" weight="0.9" />
+<item id="2209" name="Clubring" type="armor" position="ring" weight="0.9" />
+<item id="2124" name="Crystal Ring" type="armor" position="ring" weight="0.9" />
+<item id="2213" name="Dwarfenring" type="armor" position="ring" weight="1.1" />
+<item id="2127" name="Emerald Bangle" type="armor" position="ring" weight="1.7" />
+<item id="2167" name="Energyring" type="armor" position="ring" weight="0.8" />
+<item id="2179" name="Gold Ring" type="armor" position="ring" weight="1" />
+<item id="2168" name="Lifering" type="armor" position="ring" weight="0.8" />
+<item id="2164" name="Mightring" type="armor" position="ring" weight="1" />
+<item id="2166" name="Powerring" type="armor" position="ring" weight="0.8" />
+<item id="2214" name="Ring of Healing" type="armor" position="ring" weight="0.8" />
+<item id="2357" name="Ring of the Skies" type="armor" position="ring" weight="0.9" />
+<item id="2165" name="Stealthring" type="armor" position="ring" weight="1" />
+<item id="2207" name="Swordring" type="armor" position="ring" weight="0.9" />
+<item id="2169" name="Timering" type="armor" position="ring" weight="0.9" />
+<item id="2121" name="Wedding Ring" type="armor" position="ring" weight="0.4" />
+<!--END Ring-->
+
+<!--Helmets-->
+<item id="2496" name="Horned Helmet" type="armor" position="helmet" attack="0" defence="0" weight="51" arm="11"/>
+
+<item id="2460" name="Brass Helmet" type="armor" position="head" attack="0" defence="0" weight="27" arm="3"/>
+<item id="2458" name="Chain Helmet" type="armor" position="head" attack="0" defence="0" weight="42" arm="2"/>
+<item id="2491" name="Crown Helmet" type="armor" position="head" attack="0" defence="0" weight="29.5" arm="7"/>
+<item id="2497" name="Crusader Helmet" type="armor" position="head" attack="0" defence="0" weight="52" arm="8"/>
+<item id="2490" name="Dark Helmet" type="armor" position="head" attack="0" defence="0" weight="46" arm="6"/>
+<item id="2493" name="Demon Helmet" type="armor" position="head" attack="0" defence="0" weight="29.5" arm="10"/>
+<item id="2462" name="Devil's Helmet" type="armor" position="head" attack="0" defence="0" weight="50" arm="7"/>
+<item id="2342" name="Full Helmet of the Ancients" position="head" attack="0" defence="0" type="armor" weight="27.6" arm="11"/>
+<item id="2471" name="Golden Helmet" type="armor" position="head" attack="0" defence="0" weight="32" arm="12"/>
+<item id="2459" name="Iron Helmet" type="armor" position="head" attack="0" defence="0" weight="30" arm="5"/>
+<item id="2461" name="Leather Helmet" type="armor" position="head" attack="0" defence="0" weight="22" arm="1"/>
+<item id="2480" name="Legion Helmet" type="armor" position="head" attack="0" defence="0" weight="31" arm="4"/>
+<item id="2662" name="Magician Hat" type="armor" position="head" attack="0" defence="0" weight="7.5" arm="1"/>
+<item id="2663" name="Mystic Turban" type="armor" position="head" attack="0" defence="0" weight="8.5" arm="1"/>
+<item id="2665" name="Post Officers Hat" type="armor" position="head" attack="0" defence="0" weight="7" arm="1"/>
+<item id="2498" name="Royal Helmet" type="armor" position="head" attack="0" defence="0" weight="48" arm="9"/>
+<item id="2481" name="Soldier Helmet" type="armor" position="head" attack="0" defence="0" weight="32" arm="5"/>
+<item id="2457" name="Steel Helmet" type="armor" position="head" attack="0" defence="0" weight="46" arm="6"/>
+<item id="2479" name="Strange Helmet" type="armor" position="head" attack="0" defence="0" weight="46" arm="6"/>
+<item id="2480" name="Studded Helmet" type="armor" position="head" attack="0" defence="0" weight="24.5" arm="2"/>
+<item id="2473" name="Viking Helmet" type="armor" position="head" attack="0" defence="0" weight="39" arm="4"/>
+<item id="2475" name="Warrior Helmet" type="armor" position="head" attack="0" defence="0" weight="68" arm="8"/>
+<item id="2474" name="Winged Helmet" type="armor" position="head" attack="0" defence="0" weight="" arm=""/>
+
+<!--END Helmets-->
+
+<!--Boots-->
+<item id="2641" name="Traper Boots" type="armor" position="boots" attack="0" defence="0" weight="9" arm="3"/> 
+<item id="2195" name="Boots of haste" type="armor" position="boots" attack="0" defence="0" weight="7.5" arm="0"/>
+<item id="2640" name="Boots of Waterwalking" type="armor" position="boots" attack="0" defence="0" weight="8" arm="0"/>
+<item id="2644" name="Bunny Slippers" type="armor" position="boots" attack="0" defence="0" weight="" arm=""/>
+<item id="2646" name="Golden Boots" type="armor" position="boots" attack="0" defence="0" weight="32" arm="4"/>
+<item id="2643" name="Leather Boots" type="armor" position="boots" attack="0" defence="0" weight="9" arm="1"/>
+<item id="2642" name="Sandals" type="armor" position="boots" attack="0" defence="0" weight="6" arm="0"/>
+<item id="2645" name="Steel Boots" type="armor" position="boots" attack="0" defence="0" weight="29" arm="3"/>
+<!--END Boots-->
+
+<!--ARMOR-->
+<item id="2472" name="Magic Plate Armor" type="armor" position="body" descr="An enchanted gem glows on the plate armor." weight="85" arm="17"/>
+<item id="2659" name="Ball Gown" type="armor" position="body" descr="" weight="2" arm="0"/>
+<item id="2656" name="Blue Robe" type="armor" position="body" descr="" weight="22" arm="11"/>
+<item id="2465" name="Brass Armor" type="armor" position="body" descr="" weight="80" arm="8"/>
+<item id="2654" name="Cape" type="armor" position="body" descr="" weight="32" arm="1"/>
+<item id="2464" name="Chain Armor" type="armor" position="body" descr="" weight="100" arm="6"/>
+<item id="2651" name="Coat" type="armor" position="body" descr="" weight="27" arm="1"/>
+<item id="2487" name="Crown Armor" type="armor" position="body" descr="" weight="99" arm="13"/>
+<item id="2489" name="Dark Armor" type="armor" position="body" descr="" weight="120" arm="10"/>
+<item id="2494" name="Demon Armor" type="armor" position="body" descr="" weight="80" arm="16"/>
+<item id="2485" name="Doublet" type="armor" position="body" descr="" weight="25" arm="2"/>
+<item id="2492" name="Dragon Scale Mail" type="armor" position="body" descr="" weight="114" arm="15"/>
+<item id="2658" name="dress" type="armor" position="body" descr="" weight="" arm=""/>
+<item id="2466" name="Golden Armor" type="armor" position="body" descr="" weight="80" arm="14"/>
+<item id="2652" name="Green Tunic" type="armor" position="body" descr="" weight="9.3" arm="1"/>
+<item id="2650" name="Jacket" type="armor" position="body" descr="" weight="24" arm="1"/>
+<item id="2476" name="Knight's Armor" type="armor" position="body" descr="" weight="120" arm="12"/>
+<item id="2467" name="Leather Armor" type="armor" position="body" descr="" weight="60" arm="4"/>
+<item id="2486" name="Noble Armor" type="armor" position="body" descr="" weight="120" arm="11"/>
+<item id="2463" name="Plate Armor" type="armor" position="body" descr="" weight="120" arm="10"/>
+<item id="2655" name="Red Robe" type="armor" position="body" descr="" weight="26" arm="1"/>
+<item id="2653" name="Red Tunic" type="armor" position="body" descr="" weight="" arm="2"/>
+<item id="2483" name="Scale Armor" type="armor" position="body" descr="" weight="105" arm="9"/>
+<item id="2657" name="Simple Dress" type="armor" position="body" descr="" weight="24" arm="1"/>
+<item id="2484" name="Studded Armor" type="armor" position="body" descr="" weight="71" arm="5"/>
+<!--END ARMOR-->
+
+<!--LEGS-->
+<item id="2507" name="Elven Legs" type="armor" position="legs" weight="48" arm="10"/>
+<item id="2478" name="Brass Legs" type="armor" position="legs" weight="38" arm="5"/>
+<item id="2648" name="Chain Trousers" type="armor" position="legs" weight="35" arm="3"/>
+<item id="2488" name="Crown Legs" type="armor" position="legs" weight="65" arm="8"/>
+<item id="2495" name="Demon Legs" type="armor" position="legs" weight="54" arm="9"/>
+<item id="2469" name="Dragon Scale Legs" type="armor" position="legs" weight="48" arm="10"/>
+<item id="2470" name="Golden Legs" type="armor" position="legs" weight="54" arm="9"/>
+<item id="2477" name="Knight Legs" type="armor" position="legs" weight="70" arm="8"/>
+<item id="2649" name="Leather Trousers" type="armor" position="legs" weight="18" arm="1"/>
+<item id="2647" name="Plate Legs" type="armor" position="legs" weight="50" arm="7"/>
+<item id="2468" name="Studded Legs" type="armor" position="legs" weight="26" arm="2"/>
+<!--END LEGS-->
+
+<!--SHIELDS-->
+
+<item id="2532" name="Ancient Shield" type="armor" position="weapon" skill="shielding" attack="0" defence="27" weight="61" arm="0"/>
+<item id="2513" name="Battle Shield" type="armor" position="weapon" skill="shielding" attack="0" defence="23" weight="62" arm="0"/>
+<item id="2518" name="Beholder Shield" type="armor" position="weapon" skill="shielding" attack="0" defence="28" weight="47" arm="0"/>
+<item id="2529" name="Black Shield" type="armor" position="weapon" skill="shielding" attack="0" defence="18" weight="41.5" arm="0"/>
+<item id="2523" name="Blessed Shield" type="armor" position="weapon" skill="shielding" attack="0" defence="45" weight="68" arm="0"/>
+<item id="2541" name="Bone Shield" type="armor" position="weapon" skill="shielding" attack="0" defence="20" weight="55" arm="0"/>
+<item id="2511" name="Brass Shield" type="armor" position="weapon" skill="shielding" attack="0" defence="16" weight="60" arm="0"/>
+<item id="2535" name="Castle Shield" type="armor" position="weapon" skill="shielding" attack="0" defence="28" weight="49" arm="0"/>
+<item id="2530" name="Copper Shield" type="armor" position="weapon" skill="shielding" attack="0" defence="19" weight="63" arm="0"/>
+<item id="2519" name="Crown Shield" type="armor" position="weapon" skill="shielding" attack="0" defence="32" weight="62" arm="0"/>
+<item id="2521" name="Dark Shield" type="armor" position="weapon" skill="shielding" attack="0" defence="25" weight="52" arm="0"/>
+<item id="2520" name="Demon Shield" type="armor" position="weapon" skill="shielding" attack="0" defence="35" weight="26" arm="0"/>
+<item id="2516" name="Dragon Shield" type="armor" position="weapon" skill="shielding" attack="0" defence="31" weight="60" arm="0"/>
+<item id="2525" name="Dwarfish Shield" type="armor" position="weapon" skill="shielding" attack="0" defence="26" weight="55" arm="0"/>
+<item id="2522" name="Great Shield" type="armor" position="weapon" skill="shielding" attack="0" defence="38" weight="84" arm="0"/>
+<item id="2533" name="Griffin Shield" type="armor" position="weapon" skill="shielding" attack="0" defence="29" weight="50" arm="0"/>
+<item id="2515" name="Guardians Shield" type="armor" position="weapon" skill="shielding" attack="0" defence="30" weight="55" arm="0"/>
+<item id="2536" name="Medusa Shield" type="armor" position="weapon" skill="shielding" attack="0" defence="33" weight="58" arm="0"/>
+<item id="2644" name="Mercenarys Shield" type="armor" position="weapon" skill="shielding" attack="0" defence="24" weight="52" arm="0"/>
+<item id="2524" name="Ornamented Shield" type="armor" position="weapon" skill="shielding" attack="0" defence="22" weight="72" arm="0"/>
+<item id="2539" name="Phoenix shield" type="armor" position="weapon" skill="shielding" attack="0" defence="0" weight="" arm="0"/>
+<item id="2510" name="Plate Shield" type="armor" position="weapon" skill="shielding" attack="0" defence="17" weight="65" arm="0"/>
+<item id="2527" name="Rose Shield" type="armor" position="weapon" skill="shielding" attack="0" defence="27" weight="52" arm="0"/>
+<item id="2540" name="Scarab Shield" type="armor" position="weapon" skill="shielding" attack="0" defence="25" weight="" arm="0"/>
+<item id="2517" name="Shield of Honour" type="armor" position="weapon" skill="shielding" attack="0" defence="33" weight="54" arm="0"/>
+<item id="2514" name="Shield of the Mastermind" type="armor" position="weapon" skill="shielding" attack="0" defence="37" weight="57" arm="0"/>
+<item id="2509" name="Steel Shield" type="armor" position="weapon" skill="shielding" attack="0" defence="21" weight="69" arm="0"/>
+<item id="2526" name="Studded Shield" type="armor" position="weapon" skill="shielding" attack="0" defence="15" weight="59" arm="0"/>
+<item id="2528" name="Tower Shield" type="armor" position="weapon" skill="shielding" attack="0" defence="32" weight="88" arm="0"/>
+<item id="2534" name="Vampire Shield" type="armor" position="weapon" skill="shielding" attack="0" defence="34" weight="36" arm="0"/>
+<item id="2531" name="Viking Shield" type="armor" position="weapon" skill="shielding" attack="0" defence="32" weight="66" arm="0"/>
+<item id="2512" name="Wooden Shield" type="armor" position="weapon" skill="shielding" attack="0" defence="14" weight="40" arm="0"/>
+<!--END SHIELDS-->
+
+<!--SWORD-->
+<item id="2392" name="Fire Sword" type="weapon" skill="sword" attack="35" defence="20" descr="The blade is a magic flame." weight="23"/>
+<item id="2450" name="Bone Sword" type="weapon" position="weapon" skill="sword" attack="14" defence="10" weight="0"/>
+<item id="2407" name="Bright Sword" type="weapon" position="weapon" skill="sword" attack="30" defence="30" weight="29"/>
+<item id="2413" name="Broad Sword" type="weapon" position="weapon" skill="sword" attack="26" defence="23" weight="52.5"/>
+<item id="2395" name="Carlinsword" type="weapon" position="weapon" skill="sword" attack="15" defence="13" weight="40"/>
+<item id="2404" name="Combat Knife" type="weapon" position="weapon" skill="sword" attack="8" defence="6" weight="8.7"/>
+<item id="2379" name="Dagger" type="weapon" position="weapon" skill="sword" attack="8" defence="6" weight="9.5"/>
+<item id="2392" name="Firesword" type="weapon" position="weapon" skill="sword" attack="35" defence="20" weight="23"/>
+<item id="2446" name="Giant Daramanian Sword" type="weapon" position="weapon" skill="sword" attack="" defence="" weight="0"/>
+<item id="2393" name="Giantsword" type="weapon" position="weapon" skill="sword" attack="46" defence="22" weight="180"/>
+<item id="2442" name="Heavy Machete" type="weapon" position="weapon" skill="sword" attack="16" defence="10" weight="18.4"/>
+<item id="2396" name="Ice Rapier" type="weapon" position="weapon" skill="sword" attack="100" defence="1" weight="15"/>
+<item id="2412" name="Katana" type="weapon" position="weapon" skill="sword" attack="16" defence="12" weight="31"/>
+<item id="2403" name="Knife" type="weapon" position="weapon" skill="sword" attack="7" defence="5" weight="4.2"/>
+<item id="2397" name="Longsword" type="weapon" position="weapon" skill="sword" attack="17" defence="14" weight="42"/>
+<item id="2420" name="Machete" type="weapon" position="weapon" skill="sword" attack="12" defence="9" weight="16.5"/>
+<item id="2390" name="Magic Longsword" type="weapon" position="weapon" skill="sword" attack="55" defence="40" weight="43"/>
+<item id="2400" name="Magic Sword" type="weapon" position="weapon" skill="sword" attack="48" defence="35" weight="42"/>
+<item id="2411" name="Poison Dagger" type="weapon" position="weapon" skill="sword" attack="18" defence="8" weight="8.8"/>
+<item id="2384" name="Rapier" type="weapon" position="weapon" skill="sword" attack="10" defence="8" weight="15"/>
+<item id="2385" name="Sabre" type="weapon" position="weapon" skill="sword" attack="12" defence="10" weight="25"/>
+<item id="2419" name="Scimitar" type="weapon" position="weapon" skill="sword" attack="19" defence="13" weight="29"/>
+<item id="2550" name="Scythe" type="weapon" position="weapon" skill="sword" attack="8" defence="3" weight="30"/>
+<item id="2409" name="Serpent Sword" type="weapon" position="weapon" skill="sword" attack="26" defence="15" weight="41"/>
+<item id="2406" name="Short Sword" type="weapon" position="weapon" skill="sword" attack="11" defence="11" weight="35"/>
+<item id="2402" name="Silver Dagger" type="weapon" position="weapon" skill="sword" attack="8" defence="7" weight="10.2"/>
+<item id="2383" name="Spikesword" type="weapon" position="weapon" skill="sword" attack="24" defence="21" weight="50"/>
+<item id="2376" name="Sword" type="weapon" position="weapon" skill="sword" attack="14" defence="12" weight="35"/>
+<item id="2377" name="Two-Handed Sword" type="weapon" position="weapon" skill="sword" attack="30" defence="25" weight="70"/>
+<item id="2408" name="Warlord Sword" type="weapon" position="weapon" skill="sword" attack="53" defence="38" weight="0"/>
+
+<!--END SWORD-->
+
+<!--AXE-->
+<item id="2432" name="Fire Axe" type="weapon" skill="axe" attack="38" defence="16" descr="The blade is a magic flame." weight="40"/>
+<item id="2386" name="Axe" type="weapon" position="weapon" skill="axe" attack="12" defence="6" weight="40" arm="0"/>
+<item id="2429" name="Barbarian Axe" type="weapon" position="weapon" skill="axe" attack="28" defence="18" weight="51" arm="0"/>
+<item id="2378" name="Battle Axe" type="weapon" position="weapon" skill="axe" attack="25" defence="10" weight="50" arm="0"/>
+<item id="2440" name="Daramanian Waraxe" type="weapon" position="weapon" skill="axe" attack="39" defence="15" weight="52.5" arm="0"/>
+<item id="2387" name="Double Axe" type="weapon" position="weapon" skill="axe" attack="35" defence="12" weight="70" arm="0"/>
+<item id="2414" name="Dragon Lance" type="weapon" position="weapon" skill="axe" attack="47" defence="16" weight="67" arm="0"/>
+<item id="2435" name="Dwarfish Axe" type="weapon" position="weapon" skill="axe" attack="21" defence="19" weight="82" arm="0"/>
+<item id="2418" name="Golden Sickle" type="weapon" position="weapon" skill="axe" attack="13" defence="6" weight="19.5" arm="0"/>
+<item id="2415" name="Great Axe" type="weapon" position="weapon" skill="axe" attack="52" defence="22" weight="90" arm="0"/>
+<item id="2427" name="Guardian Halberd" type="weapon" position="weapon" skill="axe" attack="46" defence="15" weight="110" arm="0"/>
+<item id="2381" name="Halberd" type="weapon" position="weapon" skill="axe" attack="358" defence="14" weight="90" arm="0"/>
+<item id="2380" name="Hand Axe" type="weapon" position="weapon" skill="axe" attack="10" defence="5" weight="18" arm="0"/>
+<item id="2388" name="Hatchet" type="weapon" position="weapon" skill="axe" attack="15" defence="8" weight="35" arm="0"/>
+<item id="2430" name="Knight Axe" type="weapon" position="weapon" skill="axe" attack="33" defence="21" weight="59" arm="0"/>
+<item id="2426" name="Naginata" type="weapon" position="weapon" skill="axe" attack="39" defence="19" weight="80" arm="0"/>
+<item id="2425" name="Obsidian Lance" type="weapon" position="weapon" skill="axe" attack="34" defence="10" weight="80" arm="0"/>
+<item id="2428" name="Orcish Axe" type="weapon" position="weapon" skill="axe" attack="23" defence="12" weight="45" arm="0"/>
+<item id="2405" name="Sickle" type="weapon" position="weapon" skill="axe" attack="7" defence="4" weight="10.5" arm="0"/>
+<item id="2431" name="Stonecutter's Axe" type="weapon" position="weapon" skill="axe" attack="50" defence="30" weight="99" arm="0"/>
+<!--END AXE-->
+
+<!--CLUB-->
+
+<item id="2417" name="Battlehammer" type="weapon" position="weapon" skill="club" attack="24" defence="14" weight="68" arm="0"/>
+<item id="2449" name="Bone Club" type="weapon" position="weapon" skill="club" attack="12" defence="8" weight="39" arm="0"/>
+<item id="2423" name="Clerical Mace" type="weapon" position="weapon" skill="club" attack="28" defence="15" weight="58" arm="0"/>
+<item id="2382" name="Club" type="weapon" position="weapon" skill="club" attack="7" defence="7" weight="25" arm="0"/>
+<item id="2416" name="Crowbar" type="weapon" position="weapon" skill="club" attack="6" defence="6" weight="21" arm="0"/>
+<item id="2445" name="Crystal Mace" type="weapon" position="weapon" skill="club" attack="38" defence="16" weight="80" arm="0"/>
+<item id="2439" name="Daramanian Mace" type="weapon" position="weapon" skill="club" attack="21" defence="12" weight="68" arm="0"/>
+<item id="2434" name="Dragon Hammer" type="weapon" position="weapon" skill="club" attack="21" defence="20" weight="97" arm="0"/>
+<item id="2437" name="Golden Mace" type="weapon" position="weapon" skill="club" attack="" defence="" weight="" arm="0"/>
+<item id="2422" name="Iron Hammer" type="weapon" position="weapon" skill="club" attack="18" defence="10" weight="66" arm="0"/>
+<item id="2398" name="Mace" type="weapon" position="weapon" skill="club" attack="16" defence="11" weight="28" arm="0"/>
+<item id="2394" name="Morning Star" type="weapon" position="weapon" skill="club" attack="25" defence="11" weight="54" arm="0"/>
+<item id="2424" name="Silver Mace" type="weapon" position="weapon" skill="club" attack="40" defence="30" weight="67" arm="0"/>
+<item id="2401" name="Staff" type="weapon" position="weapon" skill="club" attack="10" defence="25" weight="38" arm="0"/>
+<item id="2448" name="Studded Club" type="weapon" position="weapon" skill="club" attack="9" defence="8" weight="35" arm="0"/>
+<item id="2421" name="Thunder Hammer" type="weapon" position="weapon" skill="club" attack="49" defence="35" weight="125" arm="0"/>
+<item id="2391" name="War Hammer" type="weapon" position="weapon" skill="club" attack="45" defence="10" weight="85" arm="0"/>
+<item id="2436" name="Skull Staff" type="weapon" skill="club" attack="36" defence="12" descr="The staff longs for death." weight="17"/>
+<item id="2433" name="magic staff" type="weapon" skill="magic" attack="35" defence="20" shottype="energy" weight="20" />
+<item id="2453" name="magic staff" type="weapon" skill="magic" attack="35" defence="20" shottype="energy" weight="20" />
+<item id="2453" name="Sprite Wand" type="weapon" skill="magic" attack="50" defence="50" shottype="energy" weight="28" />
+<!--END CLUB-->
+
+<!--Magical Items-->
+
+<item id="2193" name="Ankh" weight="4.2" />
+<item id="2193" name="Crystal Ball" weight="34" />
+<item id="2361" name="Frozen Starlight" weight="" />
+<item id="2140" name="Holy Scarab" weight="" />
+<item id="2177" name="Life Crystal" weight="2.5" />
+<item id="2178" name="Mind Stone" weight="2.5" />
+<item id="2194" name="Mysterious Fetish" weight="4.9" />
+<item id="2176" name="Orb" weight="8" />
+<item id="2180" name="Orb of Nature" weight="" />
+<item id="2354" name="Ornamented Ankh" weight="" />
+<item id="2360" name="Portable Hole" weight="" />
+<item id="2175" name="Spellbook" weight="58" />
+<item id="2151" name="Talon" weight="0.2" />
+
+<!--END Magical Items-->
+
+<!--Amulets-->
+<item id="2130" name="Golden Amulet" type="armor" position="amulet" attack="0" defence="0" weight="9" arm="0"/>
+<item id="2173" name="Amulet of Loss" type="armor" position="amulet" weight="4.2" />
+<item id="2142" name="Ancient Amulet" type="armor" position="amulet" weight="0" />
+<item id="2196" name="Broken Amulet" type="armor" position="amulet" weight="0" />
+<item id="2172" name="Bronze Amulet" type="armor" position="amulet" weight="5" />
+<item id="2126" name="Bronzen Necklace" type="armor" position="amulet" weight="0" />
+<item id="2125" name="Crystal Necklace" type="armor" position="amulet" weight="4.9" />
+<item id="2201" name="Dragon Necklace" type="armor" position="amulet" weight="6.3" />
+<item id="2198" name="Elven Amulet" type="armor" position="amulet" weight="2.7" />
+<item id="2199" name="Garlic Necklace" type="armor" position="amulet" weight="3.8" />
+<item id="2130" name="Golden Amulet" type="armor" position="amulet" weight="8.3" />
+<item id="2171" name="Platinum Amulet" type="armor" position="amulet" defence="2" weight="6" arm="2"/>
+<item id="2200" name="Protection amulet" type="armor" position="amulet" weight="5.5" />
+<item id="2133" name="Ruby Necklace" type="armor" position="amulet" weight="5.7" />
+<item id="2135" name="Scarab Amulet" type="armor" position="amulet" weight="1.2" />
+<item id="2661" name="Scarf" defence="1" type="armor" position="amulet" weight="2" />
+<item id="2170" name="Silver Amulet" type="armor" position="amulet" weight="5" />
+<item id="2132" name="Silver Necklace" type="armor" position="amulet" weight="0" />
+<item id="2131" name="Star Amulet" type="armor" position="amulet" weight="6.6" />
+<item id="2197" name="Stone Skin Amulet" type="armor" position="amulet" weight="7.6" />
+<item id="2319" name="Strange Symbol" type="armor" position="amulet" weight="2" />
+<item id="2161" name="Strange Talisman" type="armor" position="amulet" weight="2.9" />
+<item id="2129" name="Wolves Teeth Chain" type="armor" position="amulet" weight="3.3" />
+
+<!--END Amulets-->
+
+
+<!--Ammunition-->
+<item id="2547" name="Power Bolt" type="amunition" amutype="bolt" shottype="power-bolt" attack="0" defence="0" weight="0.9" />
+<item id="2543" name="Bolt" type="amunition" amutype="bolt" shottype="bolt" attack="0" defence="0" weight="0.8" />
+<item id="2544" name="Arrow" type="amunition" amutype="arrow" shottype="arrow" attack="0" defence="0" weight="0.7" />
+<item id="2111" name="Snowball" type="weapon" skill="distance" shottype="snowball" attack="0" defence="0" weight="0.8"/>
+
+<!--distand-->
+<item id="2455" name="crossbow" type="weapon" skill="distance" amutype="bolt" weight="20" />
+<item id="2456" name="bow" type="weapon" skill="distance" amutype="arrow" weight="20" />
+<item id="2389" name="Spear" type="weapon" position="weapon" skill="distance" attack="30" defence="0" weight="20"/>
+<item id="2410" name="Throwing Knife" type="weapon" position="weapon" skill="distance" attack="30" defence="0" weight="2.1"/>
+<item id="2399" name="Throwing Star" type="weapon" position="weapon" skill="distance" attack="25" defence="0" weight="1"/>
+<item id="3424" name="Small Stone" type="weapon" position="weapon" skill="distance" attack="20" defence="0" weight="3.6"/>
+<!--END Ammunition-->
+
+<!-- DECAYTO CORPSE -->
+<item id="3128" name="dead human" weight="1200" decayto="3129" decaytime="240" />
+<item id="3129" name="dead human" weight="1200" decayto="3130" decaytime="120" />
+<item id="3130" name="dead human" weight="1200" decayto="3131" decaytime="30" />
+<item id="3131" name="dead human" weight="1200" decayto="3132" decaytime="30" />
+<item id="3132" name="dead human" weight="1200" decayto="3133" decaytime="30" />
+<item id="3133" name="human skeleton" weight="900" decayto="3134" decaytime="30" />
+<item id="3134" name="human skeleton" weight="600" />
+
+<item id="3065" name="dead human" weight="1200" decayto="3066" decaytime="240" />
+<item id="3066" name="dead human" weight="1200" decayto="3064" decaytime="120" />
+<item id="3064" name="human skeleton" weight="600" />
+
+<!--orc-->
+<item id="2820" name="dead orc" weight="100" decayto="2821" decaytime="40" />
+<item id="2821" name="dead orc" weight="100" decayto="2966" decaytime="30" />
+
+<item id="2920" name="dead orc spearmen" weight="100" decayto="2921" decaytime="40" />
+<item id="2921" name="dead orc spearmen" weight="100" decayto="2966" decaytime="30" />
+
+<item id="2864" name="dead orc berserker" weight="1200" decayto="2865" decaytime="40" />
+<item id="2865" name="dead orc berserker" weight="1200" decayto="2966" decaytime="30" />
+
+<item id="2860" name="dead orc shaman" weight="1200" decayto="2861" decaytime="40" />
+<item id="2861" name="dead orc shaman" weight="1200" decayto="2966" decaytime="30" />
+
+<item id="2862" name="dead orc warrior" weight="1200" decayto="2863" decaytime="40" />
+<item id="2863" name="dead orc warrior" weight="1200" decayto="2966" decaytime="30" />
+
+<item id="2967" name="dead orc warlord" weight="1200" decayto="2968" decaytime="40" />
+<item id="2968" name="dead orc warlord" weight="1200" decayto="2966" decaytime="30" />
+
+<item id="2938" name="dead orc leader" weight="1200" decayto="2939" decaytime="40" />
+<item id="2939" name="dead orc leader" weight="1200" decayto="2966" decaytime="30" />
+
+<item id="2972" name="dead orc rider" weight="1200" decayto="2973" decaytime="40" />
+<item id="2973" name="dead orc rider" weight="1200" decayto="2974" decaytime="30" />
+<item id="2974" name="skeleton orc rider" weight="1200" />
+
+<item id="2966" name="skeleton orc" weight="100" />
+<!-- End orc-->
+
+<!--minotaur-->
+<item id="2830" name="dead minotaur" weight="600" decayto="2831" decaytime="40" />
+<item id="2831" name="dead minotaur" weight="600" decayto="2878" decaytime="30" />
+
+<item id="2871" name="dead minotaur archer" weight="600" decayto="2872" decaytime="40" />
+<item id="2872" name="dead minotaur archer" weight="600" decayto="2878" decaytime="30" />
+
+<item id="2876" name="dead minotaur guard" weight="600" decayto="2877" decaytime="40" />
+<item id="2877" name="dead minotaur guard" weight="600" decayto="2878" decaytime="30" />
+
+<item id="2866" name="dead minotaur mage" weight="600" decayto="2867" decaytime="40" />
+<item id="2867" name="dead minotaur mage" weight="600" decayto="2878" decaytime="30" />
+
+<item id="2878" name="skeleton minotaur" weight="600" />
+<!--End minotaur-->
+
+<!--elf-->
+<item id="2945" name="dead elf" weight="1000" decayto="2946" decaytime="40" />
+<item id="2946" name="dead elf" weight="1000" decayto="2947" decaytime="30" />
+
+<item id="2979" name="dead elf arcanist" weight="1000" decayto="2980" decaytime="40" />
+<item id="2980" name="dead elf arcanist" weight="1000" decayto="2947" decaytime="30" />
+
+<item id="2981" name="dead elf scout" weight="1000" decayto="2982" decaytime="40" />
+<item id="2982" name="dead elf scout" weight="1000" decayto="2947" decaytime="30" />
+
+<item id="2947" name="skeleton elf" weight="600" />
+<!--End elf-->
+
+<!--dwarf-->
+<item id="2983" name="dead dwarf guard" weight="600" decayto="2984" decaytime="40" />
+<item id="2984" name="dead dwarf guard" weight="600" decayto="2962" decaytime="30" />
+
+<item id="2960" name="dead dwarf" weight="600" decayto="2961" decaytime="40" />
+<item id="2961" name="dead dwarf" weight="600" decayto="2962" decaytime="30" />
+
+<item id="2985" name="dead dwarf soldier" weight="600" decayto="2986" decaytime="40" />
+<item id="2986" name="dead dwarf soldier" weight="600" decayto="2962" decaytime="30" />
+
+<item id="2987" name="dead dwarf geomancer" weight="600" decayto="2988" decaytime="40" />
+<item id="2988" name="dead dwarf geomancer" weight="600" decayto="2962" decaytime="30" />
+
+<item id="2962" name="skeleton dwarf" weight="600" />
+<!--End dwarf-->
+
+<!--djinns-->
+<item id="3001" name="dead blue djinn" weight="1200" decayto="3002" decaytime="30" />
+<item id="3002" name="dead blue djinn" weight="1200" decayto="2991" decaytime="30" />
+
+<item id="2989" name="dead green djinn" weight="1200" decayto="2990" decaytime="30" />
+<item id="2990" name="dead green djinn" weight="1200" decayto="2991" decaytime="30" />
+
+<item id="2991" name="skeleton djinn" weight="1200" />
+
+<item id="3037" name="dead Efreets" weight="1200" decayto="3038" decaytime="30" />
+<item id="3038" name="dead Efreets" weight="1200" decayto="3039" decaytime="30" />
+<item id="3039" name="skeleton Efreets" weight="1200" />
+
+<item id="3040" name="dead marids" weight="1200" decayto="3041" decaytime="30" />
+<item id="3041" name="dead marids" weight="1200" decayto="3042" decaytime="30" />
+<item id="3042" name="skeleton marids" weight="1200" />
+
+<!--End djinns-->
+
+<!--Troll-->
+<item id="2806" name="dead troll" weight="600" decayto="2810" decaytime="40" />
+<item id="2810" name="dead troll" weight="600" decayto="2811" decaytime="30" />
+<item id="2811" name="skeleton troll" weight="600" />
+
+<item id="2995" name="dead swamp troll" weight="600" decayto="2996" decaytime="40" />
+<item id="2996" name="dead swamp troll" weight="600" decayto="2997" decaytime="30" />
+<item id="2997" name="skeleton swamp troll" weight="600" />
+
+<item id="2928" name="dead frost troll" weight="600" decayto="2929" decaytime="40" />
+<item id="2929" name="dead frost troll" weight="600" decayto="2930" decaytime="30" />
+<item id="2930" name="skeleton frost troll" weight="600" />
+
+<!--End Troll-->
+
+<item id="3007" name="dead cobra" weight="60" decayto="3008" decaytime="40" />
+<item id="3008" name="dead cobra" weight="60" decayto="3009" decaytime="30" />
+<item id="3009" name="skeleton cobra" weight="60" />
+
+<item id="3025" name="dead liche" weight="1000" decayto="3026" decaytime="40" />
+<item id="3026" name="dead liche" weight="1000" decayto="3027" decaytime="30" />
+<item id="3027" name="skeleton liche" weight="1000" />
+
+<item id="3019" name="dead hyaena" weight="80" decayto="3020" decaytime="40" />
+<item id="3020" name="dead hyaena" weight="80" decayto="3021" decaytime="30" />
+<item id="3021" name="skeleton hyaena" weight="80" />
+
+<item id="2998" name="dead banshee" weight="1000" decayto="2999" decaytime="40" />
+<item id="2999" name="dead banshee" weight="1000" decayto="3000" decaytime="30" />
+<item id="3000" name="dead banshee" weight="1000" />
+
+<item id="3069" name="dead cyclop" weight="1200" decayto="3117" decaytime="40" />
+<item id="3117" name="dead cyclop" weight="1200" decayto="3118" decaytime="30" />
+<item id="3118" name="skeleton cyclop" weight="900" />
+
+<item id="3113" name="dead ghoul" weight="600" decayto="3114" decaytime="40" />
+<item id="3114" name="dead ghoul" weight="600" decayto="3115" decaytime="30" />
+<item id="3115" name="dead ghoul" weight="600" />
+
+<item id="2849" name="dead bear" weight="1200" decayto="2850" decaytime="40" />
+<item id="2850" name="dead bear" weight="1200" decayto="2851" decaytime="30" />
+<item id="2851" name="skeleton bear" weight="900" />
+
+<item id="3104" name="dead dragon" weight="1200" decayto="3105" decaytime="40" />
+<item id="3105" name="dead dragon" weight="1200" decayto="3106" decaytime="30" />
+<item id="3106" name="skeleton dragon" weight="900" />
+
+<item id="2881" name="dead dragon lord" weight="1200" decayto="2882" decaytime="40" />
+<item id="2882" name="dead dragon lord" weight="1200" decayto="2883" decaytime="30" />
+<item id="2883" name="skeleton dragon lord" weight="900" />
+
+<item id="2824" name="dead rotworm" weight="100" decayto="2825" decaytime="40" />
+<item id="2825" name="dead rotworm" weight="100" decayto="2964" decaytime="40" />
+<item id="2964" name="dead rotworm" weight="100" />
+
+<item id="2826" name="dead wolf" weight="80" decayto="2827" decaytime="40" />
+<item id="2827" name="dead wolf" weight="80" decayto="2828" decaytime="30" />
+<item id="2828" name="skeleton wolf" weight="80" />
+
+<item id="2924" name="dead winter wolf" weight="80" decayto="2925" decaytime="40" />
+<item id="2925" name="dead winter wolf" weight="80" decayto="2926" decaytime="30" />
+<item id="2926" name="skeleton wolf" weight="80" />
+
+<item id="2916" name="dead Demon" weight="1200" decayto="2917" decaytime="40" />
+<item id="2917" name="dead Demon" weight="1200" decayto="2918" decaytime="30" />
+<item id="2918" name="dead Demon" weight="1200" decayto="2919" decaytime="30" />
+<item id="2919" name="dead Skeleton Demon" weight="1200" />
+
+<item id="2931" name="dead behemoth" weight="1200" decayto="2932" decaytime="40" />
+<item id="2932" name="dead behemoth" weight="1200" decayto="2933" decaytime="30" />
+<item id="2933" name="dead skeleton behemoth" weight="1200" decayto="2934" decaytime="30" />
+<item id="2934" name="dead Skeleton behemoth" weight="1200" />
+
+<item id="2889" name="dead lion" weight="120" decayto="2890" decaytime="40" />
+<item id="2890" name="dead lion" weight="120" decayto="2891" decaytime="30" />
+<item id="2891" name="skeleton lion" weight="120" />
+
+<item id="2817" name="dead snake" weight="50" decayto="2818" decaytime="40" />
+<item id="2818" name="dead snake" weight="50" decayto="2819" decaytime="30" />
+<item id="2819" name="dead snake" weight="50" />
+
+<item id="2813" name="dead rat" weight="20" decayto="2814" decaytime="40" />
+<item id="2814" name="dead rat" weight="20" decayto="2815" decaytime="30" />
+<item id="2815" name="skeleton rat" weight="20" />
+
+<item id="2835" name="dead deer" weight="50" decayto="2836" decaytime="40" />
+<item id="2836" name="dead deer" weight="50" decayto="2837" decaytime="30" />
+<item id="2837" name="skeleton deer" weight="50" />
+
+<item id="2839" name="dead dog" weight="10" decayto="2840" decaytime="40" />
+<item id="2840" name="dead dog" weight="10" decayto="2841" decaytime="30" />
+<item id="2841" name="skeleton dog" weight="10" />
+
+<item id="2843" name="dead skeleton" weight="100" decayto="2975" decaytime="40" />
+<item id="2975" name="dead skeleton" weight="100" decayto="2976" decaytime="30" />
+<item id="2976" name="dead skeleton" weight="100" />
+
+<item id="2809" name="dead demon skeleton" weight="100" decayto="2922" decaytime="40" />
+<item id="2922" name="dead demon skeleton" weight="100" decayto="2923" decaytime="30" />
+<item id="2923" name="dead demon skeleton" weight="100" />
+
+<item id="2857" name="dead giant spider" weight="1200" decayto="2858" decaytime="30" />
+<item id="2858" name="dead giant spider" weight="1200" decayto="2859" decaytime="30" />
+<item id="2859" name="dead giant spider" weight="1200" />
+
+<item id="2886" name="dead fire devil" weight="1000" decayto="2887" decaytime="40" />
+<item id="2887" name="dead fire devil" weight="1000" decayto="2888" decaytime="30" />
+<item id="2888" name="skeleton fire devil" weight="1000" />
+
+<item id="2893" name="dead polar bear" weight="1200" decayto="2894" decaytime="40" />
+<item id="2894" name="dead polar bear" weight="1200" decayto="2895" decaytime="30" />
+<item id="2895" name="skeleton bear" weight="900" />
+
+<item id="2897" name="dead scorpion" weight="10" decayto="2898" decaytime="40" />
+<item id="2898" name="dead scorpion" weight="10" decayto="2965" decaytime="30" />
+<item id="2965" name="dead scorpion" weight="10" />
+
+<item id="2899" name="dead wasp" weight="10" decayto="2900" decaytime="40" />
+<item id="2900" name="dead wasp" weight="10" decayto="2901" decaytime="30" />
+<item id="2901" name="dead wasp" weight="10" />
+
+<item id="2902" name="dead bug" weight="10" decayto="2903" decaytime="40" />
+<item id="2903" name="dead bug" weight="10" decayto="2904" decaytime="30" />
+<item id="2904" name="dead bug" weight="10" />
+
+<item id="2905" name="dead sheep" weight="10" decayto="2906" decaytime="40" />
+<item id="2906" name="dead sheep" weight="10" decayto="2907" decaytime="30" />
+<item id="2914" name="dead black sheep" weight="10" decayto="2915" decaytime="40" />
+<item id="2915" name="dead black sheep" weight="10" decayto="2907" decaytime="30" />
+<item id="2907" name="skeleton sheep" weight="10" />
+
+<item id="2913" name="dead ghost" weight="10" decayto="2977" decaytime="40" />
+<item id="2977" name="dead ghost" weight="10" decayto="2978" decaytime="30" />
+<item id="2978" name="dead ghost" weight="10" />
+2807
+<item id="3068" name="dead spider" weight="10" decayto="2822" decaytime="40" />
+<item id="2822" name="dead spider" weight="10" decayto="2823" decaytime="30" />
+<item id="2823" name="dead spider" weight="10" />
+
+<item id="2848" name="dead poison spider" weight="10" decayto="2885" decaytime="40" />
+<item id="2885" name="dead poison spider" weight="10" decayto="2944" decaytime="40" />
+<item id="2944" name="dead poison spider" weight="10" />
+
+<item id="3043" name="dead badger" weight="10" decayto="3044" decaytime="40" />
+<item id="3044" name="dead badger" weight="10" decayto="3045" decaytime="30" />
+<item id="3045" name="skeleton badger" weight="10" />
+
+<item id="3046" name="dead skunk" weight="10" decayto="3047" decaytime="40" />
+<item id="3047" name="dead skunk" weight="10" decayto="3048" decaytime="30" />
+<item id="3048" name="skeleton skunk" weight="10" />
+
+<item id="2969" name="dead war wolf" weight="1000" decayto="2970" decaytime="40" />
+<item id="2970" name="dead war wolf" weight="1000" decayto="2971" decaytime="30" />
+<item id="2971" name="skeleton war wolf" weight="1000" />
+
+<item id="2908" name="dead beholder" weight="1200" decayto="2909" decaytime="30" />
+<item id="2909" name="dead beholder" weight="1200" decayto="2910" decaytime="30" />
+<item id="2910" name="dead beholder" weight="1200" />
+
+<item id="3052" name="dead elder beholder" weight="1200" decayto="3053" decaytime="30" />
+<item id="3053" name="dead elder beholder" weight="1200" decayto="3054" decaytime="30" />
+<item id="3054" name="dead elder beholder" weight="1200" />
+
+<item id="3049" name="dead little beholder" weight="10" decayto="3050" decaytime="40" />
+<item id="3050" name="dead little beholder" weight="10" decayto="3051" decaytime="30" />
+<item id="3051" name="dead little beholder" weight="10" />
+
+<item id="3055" name="dead yeti" weight="1200" decayto="3056" decaytime="40" />
+<item id="3056" name="dead yeti" weight="1200" decayto="3057" decaytime="30" />
+<item id="3057" name="skeleton yeti" weight="1200" />
+
+<item id="3119" name="dead rabbit" weight="10" decayto="3120" decaytime="40" />
+<item id="3120" name="dead rabbit" weight="10" decayto="3121" decaytime="30" />
+<item id="3121" name="skeleton rabbit" weight="10" />
+
+<item id="3031" name="dead bonebeast" weight="1000" decayto="3032" decaytime="40" />
+<item id="3032" name="dead bonebeast" weight="1000" decayto="3033" decaytime="30" />
+<item id="3033" name="dead bonebeast" weight="1000" />
+
+<item id="3028" name="dead crypt shambler" weight="1000" decayto="3029" decaytime="40" />
+<item id="3029" name="dead crypt shambler" weight="1000" decayto="3030" decaytime="30" />
+<item id="3030" name="skeleton crypt shambler" weight="1000" />
+
+<item id="3034" name="dead slain pharaoh" weight="1000" decayto="3035" decaytime="40" />
+<item id="3035" name="dead slain pharaoh" weight="1000" decayto="3036" decaytime="30" />
+<item id="3036" name="dead slain pharaoh" weight="1000" />
+
+<item id="3016" name="dead slain pharaoh" weight="1000" decayto="3017" decaytime="40" />
+<item id="3017" name="dead slain pharaoh" weight="1000" decayto="3018" decaytime="30" />
+<item id="3018" name="dead slain pharaoh" weight="1000" />
+
+<item id="3010" name="dead larva" weight="10" decayto="3011" decaytime="40" />
+<item id="3011" name="dead larva" weight="10" decayto="3012" decaytime="30" />
+<item id="3012" name="dead larva" weight="10" />
+
+<item id="3013" name="dead scarab" weight="20" decayto="3014" decaytime="40" />
+<item id="3014" name="dead scarab" weight="20" decayto="3015" decaytime="30" />
+<item id="3015" name="dead scarab" weight="20" />
+
+<item id="3004" name="dead ancient scarab" weight="1000" decayto="3005" decaytime="40" />
+<item id="3005" name="dead ancient scarab" weight="1000" decayto="3006" decaytime="30" />
+<item id="3006" name="dead ancient scarab" weight="1000" />
+
+<item id="2998" name="dead banshee" weight="10" decayto="2999" decaytime="40" />
+<item id="2999" name="dead banshee" weight="10" decayto="3000" decaytime="30" />
+<item id="3000" name="dead banshee" weight="10" />
+
+<item id="2952" name="dead stone golem" weight="10" decayto="2953" decaytime="40" />
+<item id="2953" name="dead stone golem" weight="10" decayto="2954" decaytime="30" />
+<item id="2954" name="dead stone golem" weight="10" decayto="2955" decaytime="30" />
+<item id="2955" name="dead stone golem" weight="10" />
+
+<item id="2949" name="dead mummy" weight="10" decayto="2950" decaytime="40" />
+<item id="2950" name="dead mummy" weight="10" decayto="2951" decaytime="30" />
+<item id="2951" name="dead mummy" weight="10" />
+
+<item id="2956" name="dead vampire" weight="1000" decayto="2957" decaytime="40" />
+<item id="2957" name="dead vampire" weight="1000" decayto="2958" decaytime="30" />
+<item id="2958" name="dead vampire" weight="1000" />
+
+<item id="2940" name="dead goblin" weight="40" decayto="2941" decaytime="40" />
+<item id="2941" name="dead goblin" weight="40" decayto="2942" decaytime="30" />
+<item id="2942" name="skeleton goblin" weight="40" />
+
+<item id="2935" name="dead pig" weight="10" decayto="2936" decaytime="40" />
+<item id="2936" name="dead pig" weight="10" decayto="2937" decaytime="30" />
+<item id="2937" name="skeleton pig" weight="10" />
+
+<item id="3022" name="dead gargoyle" weight="1000" decayto="3023" decaytime="40" />
+<item id="3023" name="dead gargoyle" weight="1000" decayto="3024" decaytime="30" />
+<item id="3024" name="dead gargoyle" weight="1000" />
+
+<item id="3004" name="dead ancient scarab" weight="1000" decayto="3005" decaytime="40" />
+<item id="3005" name="dead ancient scarab" weight="1000" decayto="3006" decaytime="30" />
+<item id="3006" name="dead ancient scarab" weight="1000" />
+
+<item id="1740" name="chest" weight="20" />
+
+<!-- END DECAYTO CORPSE -->
+
+<item id="1492" name="fire" weight="0" decayto="1493" decaytime="15" damage="10" />
+<item id="1493" name="fire" weight="0" decayto="1494" decaytime="10" damage="10" />
+<item id="1494" name="fire" weight="0" decayto="0" decaytime="10" />
+
+<item id="1495" name="energy" weight="0" decayto="0" decaytime="20" />
+
+<item id="1190" name="magic wall" weight="0" decayto="0" decaytime="20" />
+<item id="1191" name="magic wall" weight="0" decayto="0" decaytime="20" />
+
+<item id="1184" name="energy" weight="0" decayto="0" decaytime="30" damage="30" />
+
+<item id="2019" name="blood" weight="900" decayto="2020" decaytime="45" />
+<item id="2020" name="blood" weight="900" decayto="2021" decaytime="45" />
+<item id="2021" name="blood" weight="600" />
+
+<!-- RUNES -->
+<item id="2260" name="Blank Rune" type="rune" maglevel="0" weight="0.1" />
+<item id="2261" name="adito grav" type="rune" maglevel="3" weight="0.1" />
+<item id="2262" name="adevo mas vis" type="rune" maglevel="10" weight="0.1" />
+<item id="2266" name="adana pox" type="rune" maglevel="0" weight="0.1" />
+<item id="2267" name="adura gran" type="rune" maglevel="1" weight="0.1" />
+<item id="2268" name="adori vita vis" type="rune" maglevel="15" weight="0.1" />
+<item id="2273" name="adura vita" type="rune" maglevel="8" weight="0.1" />
+<item id="2277" name="adevo grav vis" type="rune" maglevel="3" weight="0.1" />
+<item id="2278" name="adana ani" type="rune" maglevel="18" weight="0.1" />
+<item id="2279" name="adevo mas grav vis" type="rune" maglevel="9" weight="0.1" />
+<item id="2285" name="adevo grav pox" type="rune" maglevel="0" weight="0.1" />
+<item id="2286" name="adevo mas pox" type="rune" maglevel="4" weight="0.1" />
+<item id="2290" name="adeta sio" type="rune" maglevel="5" weight="0.1" />
+<item id="2291" name="adevo ina" type="rune" maglevel="4" weight="0.1" />
+<item id="2292" name="adevo res pox" type="rune" maglevel="4" weight="0.1" />
+<item id="2293" name="adevo grav tera" type="rune" maglevel="9" weight="0.1" />
+<item id="2301" name="adevo grav flam" type="rune" maglevel="1" weight="0.1" />
+<item id="2302" name="adori flam" type="rune" maglevel="2" weight="0.1" />
+<item id="2303" name="adevo mas grav flam" type="rune" maglevel="3" weight="0.1" />
+<item id="2304" name="adori gran flam" type="rune" maglevel="4" weight="0.1" />
+<item id="2305" name="adevo mas flam" type="rune" maglevel="5" weight="0.1" />
+<item id="2308" name="adevo res flam" type="rune" maglevel="7" weight="0.1" />
+<item id="2311" name="adori gran" type="rune" maglevel="1" weight="0.1" />
+<item id="2313" name="adevo mas hur" type="rune" maglevel="6" weight="0.1" />
+<item id="2316" name="adana mort" type="rune" maglevel="4" weight="0.1" />
+<!-- END RUNES -->
+
+
+
+</items>
