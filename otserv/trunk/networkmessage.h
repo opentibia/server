@@ -43,8 +43,9 @@
 #define NM_ANI_SUDDENDEATH       10
 #define NM_ANI_LARGEROCK         11
 #define NM_ANI_SNOWBALL          12
-#define NM_ANI_SPEAR         0
+#define NM_ANI_SPEAR             0
 #define NM_ANI_POWERBOLT         13
+#define NM_ANI_FLYPOISONFIELD    14
 
 enum SpeakClasses {
 	SPEAK_MONSTER = 0x11

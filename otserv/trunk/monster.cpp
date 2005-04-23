@@ -163,6 +163,8 @@ Monster::Monster(const char *name, Game* game) :
 								physicalattack->disttype = DIST_SNOWBALL;
 							else if(strcmp(subattacktype.c_str(), "powerbolt") == 0)
 								physicalattack->disttype = DIST_POWERBOLT;
+							else if(strcmp(subattacktype.c_str(), "poisonfield") == 0);
+                                physicalattack->disttype = DIST_POISONFIELD;
 
 							if(xmlGetProp(tmp, (const xmlChar *)"mindamage"))
 								physicalattack->minWeapondamage = atoi((const char*)xmlGetProp(tmp, (const xmlChar *)"mindamage"));
