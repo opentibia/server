@@ -498,12 +498,10 @@ void Protocol74::parseMoveByMouse(NetworkMessage &msg)
 				continue;
 		};
 
-		//Direction dir = (Direction)msg.GetByte();
 #ifdef __DEBUG__
 		std::cout << "Walk by mouse: Direction: " << dir << std::endl;
 #endif
 		path.push_back(dir);
-		//path.push_back((Direction)msg.GetByte());
   }
   // then we schedule the movement...
   // the interval seems to depend on the speed of the char?

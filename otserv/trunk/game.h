@@ -27,6 +27,7 @@
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 
+//#include "spawn.h"
 #include "position.h"
 #include "item.h"
 #include "container.h"
@@ -261,8 +262,6 @@ class Game {
 		void creatureApplyMagicEffect(Creature *target, const MagicEffectClass& me, NetworkMessage& msg);
 		void CreateManaDamageUpdate(Creature* player, Creature* attackCreature, int damage, NetworkMessage& msg);
 
-		//void creatureAddDamageAnimation(Player* spectator, const CreatureState& creatureState, NetworkMessage& msg);
-
 		OTSYS_THREAD_LOCKVAR eventLock;
 		OTSYS_THREAD_SIGNALVAR eventSignal;
 
@@ -275,13 +274,12 @@ class Game {
 			void*    data;
 		};
 
-		//void checkMonsterAttacking(unsigned long id);
 		void checkPlayerAttacking(unsigned long id);
 		void checkPlayer(unsigned long id);
 		void decayItem(Item *item);
-		//void decayItem(Position& pos, unsigned short id, unsigned char stackpos);
 		void decaySplash(Item* item);
-
+	
+		//void checkSpawns(int n);
 		std::priority_queue<SchedulerTask*, std::vector<SchedulerTask*>, lessSchedTask > eventList;
 
 		uint32_t max_players;
@@ -290,6 +288,8 @@ class Game {
 
 		friend class Monster;
 		friend class GameState;
+		friend class Spawn;
+		friend class SpawnManager;
 };
 
 

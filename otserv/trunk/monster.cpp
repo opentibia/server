@@ -27,8 +27,14 @@
 
 extern Spells spells;
 
+template<class T> typename AutoList<T>::list_type AutoList<T>::list;
+template<class T> typename AutoID<T>::list_type AutoID<T>::list;
+template<class T> unsigned long AutoID<T>::count;
+
 Monster::Monster(const char *name, Game* game) : 
- Creature(name)
+  AutoID<Monster>()
+ ,AutoList<Monster>(id)
+ ,Creature(name, id)
 {
 	oldThinkTicks = 0;
 	loaded = false;

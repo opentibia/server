@@ -207,9 +207,9 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name){
 bool IOPlayerXML::LoadContainer(xmlNodePtr nodeitem,Container* ccontainer)
 {
 	xmlNodePtr tmp,p;
-	unsigned short s_id;
+	/*unsigned short s_id;
 	unsigned char s_count;
-	Item *new_item;
+	Item *new_item;*/
 	if(nodeitem==NULL){
 		return false;
 	}

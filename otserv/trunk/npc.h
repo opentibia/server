@@ -67,22 +67,20 @@ protected:
 	bool loaded;
 };
 
-class Npc : public Creature
+class Npc : protected AutoID<Npc>, public AutoList<Npc>, public Creature
 {
 public:
   Npc(const char *name, Game* game);
   virtual ~Npc();
 
-  //virtual bool isPlayer() const { return false; };
+	static const unsigned long min_id = 10000;
+	static const unsigned long max_id = 65536;
 
   void speak(const std::string &text){};
-
   std::string getName(){return name;};
-
   fight_t getFightType(){return fighttype;};
 
   int mana, manamax;
-
 
 	//damage per hit
   int damage;

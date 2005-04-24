@@ -53,11 +53,16 @@ typedef std::vector<containerItem> containerLayout;
 //////////////////////////////////////////////////////////////////////
 // Defines a player...
 
-class Player : public Creature
+class Player : protected AutoID<Player>, public AutoList<Player>, public Creature
 {
 public:
 	Player(const char *name, Protocol* p);
 	virtual ~Player();
+	void setGUID(unsigned long _guid) {guid = _guid;};
+	unsigned long getGUID() const { return guid;};
+
+	static const unsigned long min_id = 16777216 + 1;
+	static const unsigned long max_id = 4294967295;	
 
   void speak(const std::string &text);
 
@@ -189,6 +194,7 @@ protected:
 	SkillCache SkillAdvanceCache[7][2];
 	// we need our name
 	std::string name;
+	unsigned long guid;
 };
 
 

@@ -34,8 +34,14 @@
 
 #include "npc.h"
 
+template<class T> typename AutoList<T>::list_type AutoList<T>::list;
+template<class T> typename AutoID<T>::list_type AutoID<T>::list;
+template<class T> unsigned long AutoID<T>::count;
 
-Npc::Npc(const char *name, Game* game) : Creature(name)
+Npc::Npc(const char *name, Game* game) :
+  AutoID<Npc>()
+ ,AutoList<Npc>(id)
+ ,Creature(name, id)
 {
 	this->loaded = false;
 	std::string filename = "data/npc/" + std::string(name) + ".xml";

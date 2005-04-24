@@ -484,8 +484,8 @@ bool Game::placeCreature(Creature* c)
 	}
 
 	std::cout << (uint32_t)playersOnline.size() << " players online." << std::endl;
-	addEvent(makeTask(1000, std::bind2nd(std::mem_fun(&Game::checkPlayer), c->id)));
-	addEvent(makeTask(2000, std::bind2nd(std::mem_fun(&Game::checkPlayerAttacking), c->id)));
+	addEvent(makeTask(1000, std::bind2nd(std::mem_fun(&Game::checkPlayer), c->getID())));
+	addEvent(makeTask(2000, std::bind2nd(std::mem_fun(&Game::checkPlayerAttacking), c->getID())));
 	
 	//creature added to the online list, now let the map place it
 
@@ -718,7 +718,7 @@ bool Game::onPrepareMoveCreature(Creature *player, const Creature* creatureMovin
 			return false;
 		}
   }
-  else if (playerMoving && fromTile->isPz() && player != playerMoving /*thing*/) {
+  else if (playerMoving && fromTile->isPz() && player != creatureMoving) {
 		player->sendCancel("Sorry, not possible...");
 		return false;
   }
@@ -2630,6 +2630,14 @@ void Game::decaySplash(Item* item)
 	OTSYS_THREAD_UNLOCK(gameLock)
 }
 
+
+/*
+void Game::checkSpawns(int n)
+{
+	SpawnManager::instance()->checkSpawns(n);
+	this->addEvent(makeTask(5000, std::bind2nd(std::mem_fun(&Game::checkSpawns), 0)));
+}
+*/
 
 /** \todo move the exp/skill/lvl losses to Creature::die(); */
 void Game::CreateDamageUpdate(Creature* creature, Creature* attackCreature, int damage, NetworkMessage& msg)

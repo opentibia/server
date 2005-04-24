@@ -36,7 +36,14 @@ using namespace std;
 
 extern LuaScript g_config;
 
-Player::Player(const char *name, Protocol *p) : Creature(name)
+template<class T> typename AutoList<T>::list_type AutoList<T>::list;
+template<class T> typename AutoID<T>::list_type AutoID<T>::list;
+template<class T> unsigned long AutoID<T>::count;
+
+Player::Player(const char *name, Protocol *p) :
+  AutoID<Player>()
+ ,AutoList<Player>(id)
+ ,Creature(name, id)
 {
   client     = p;
 	/*
@@ -802,7 +809,7 @@ void Player::dropLoot(Container *corpse)
 		Item *item = items[slot];		
 		if (item && ((dynamic_cast<Container*>(item)) || random_range(1, 100) <= 10)) {
 			corpse->addItem(item);
-			items[slot] = NULL;			
+			items[slot] = NULL;
 		}
 	}
 	/*

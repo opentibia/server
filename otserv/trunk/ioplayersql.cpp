@@ -86,7 +86,8 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 		  return false;
 	}
 
-	player->setID(row.lookup_by_name("id"));
+	//player->setID(row.lookup_by_name("id"));
+	player->setGUID(row.lookup_by_name("id"));
 		
 	player->accountNumber = row.lookup_by_name("account");
 	player->sex=row.lookup_by_name("sex");
@@ -148,7 +149,7 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 
 	try{
 		mysqlpp::Query query = con.query();
-		query << "SELECT * FROM skills WHERE player ='" << player->getID() << "'";
+		query << "SELECT * FROM skills WHERE player ='" << player->getGUID() << "'";
 #ifdef __DEBUG__
 		std::cout << query.preview() << std::endl;
 #endif		
@@ -170,7 +171,7 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 	//load the items
 	try{
 		mysqlpp::Query query = con.query();
-		query << "SELECT * FROM items WHERE player ='" << player->getID() << "'" << " ORDER BY sid ASC";
+		query << "SELECT * FROM items WHERE player ='" << player->getGUID() << "'" << " ORDER BY sid ASC";
 #ifdef __DEBUG__
 		std::cout << query.preview() << std::endl;
 #endif
@@ -185,7 +186,7 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
     #ifdef __GNUC__
 	__gnu_cxx::hash_map<int,std::pair<Item*,int> > itemmap;
 	#else
-	std::hash_map<int,std::pair<Item*,int> > itemmap;
+	stdext::hash_map<int,std::pair<Item*,int> > itemmap;
 	#endif
 	try{
 		for(mysqlpp::Result::iterator i = res.begin(); i != res.end(); i++){
@@ -206,7 +207,7 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
     #ifdef __GNUC__
 	__gnu_cxx::hash_map<int,std::pair<Item*,int> >::iterator it;
 	#else
-	std::hash_map<int,std::pair<Item*,int> >::iterator it;
+	stdext::hash_map<int,std::pair<Item*,int> >::iterator it;
 	#endif
 	for(int i = (int)itemmap.size(); i > 0; --i) {
 		it = itemmap.find(i);
@@ -266,7 +267,7 @@ bool IOPlayerSQL::savePlayer(Player* player){
 	query << "`cap` = " << player->cap << ", ";
 	query << "`food` = " << player->food << ", ";
 	query << "`sex` = " << player->sex << " ";
-	query << " WHERE `id` = "<< player->getID() <<" LIMIT 1";
+	query << " WHERE `id` = "<< player->getGUID() <<" LIMIT 1";
 #ifdef __DEBUG__
 	std::cout << query.preview() << std::endl;
 #endif
@@ -275,7 +276,7 @@ bool IOPlayerSQL::savePlayer(Player* player){
 
 	//then we write the individual skills
 	query.reset();
-	query << "DELETE FROM skills WHERE player="<< player->getID();
+	query << "DELETE FROM skills WHERE player="<< player->getGUID();
 #ifdef __DEBUG__
 	std::cout << query.preview() << std::endl;
 #endif
@@ -284,7 +285,7 @@ bool IOPlayerSQL::savePlayer(Player* player){
 	query.reset();
 	query << "INSERT INTO `skills` ( `player` , `id`, `skill` , `tries` ) VALUES";
 	for(int i = 0; i <= 6; i++){
-		query << "("<<player->getID()<<","<<i<<","<<player->skills[i][SKILL_LEVEL]<<","<<player->skills[i][SKILL_TRIES]<<")";
+		query << "("<<player->getGUID()<<","<<i<<","<<player->skills[i][SKILL_LEVEL]<<","<<player->skills[i][SKILL_TRIES]<<")";
 		if(i!=6)
 			query<<",";
 	}
@@ -295,7 +296,7 @@ bool IOPlayerSQL::savePlayer(Player* player){
 
 	//now item saving
 	query.reset();
-	query << "DELETE FROM items WHERE player="<< player->getID();
+	query << "DELETE FROM items WHERE player="<< player->getGUID();
 #ifdef __DEBUG__
 	std::cout << query.preview() << std::endl;
 #endif
@@ -306,7 +307,7 @@ bool IOPlayerSQL::savePlayer(Player* player){
 	int runningID=0;
 	for (int i = 1; i <= 10; i++){
 		if(player->items[i])
-			itemsstring += getItems(player->items[i],runningID,i,player->getID(),0);
+			itemsstring += getItems(player->items[i],runningID,i,player->getGUID(),0);
 	}
 	if(itemsstring.length()){
 		itemsstring.erase(itemsstring.length()-1);

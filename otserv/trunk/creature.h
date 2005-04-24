@@ -29,25 +29,8 @@
 #include "container.h"
 #include "magic.h"
 #include <vector>
-/* moved to items.h
-enum subfight_t {
-	DIST_NONE = 0,
-	DIST_BOLT = NM_ANI_BOLT,
-  DIST_ARROW = NM_ANI_ARROW, 
-  DIST_FIRE = NM_ANI_FIRE,
-  DIST_ENERGY = NM_ANI_ENERGY,
-  DIST_POISONARROW = NM_ANI_POISONARROW,
-  DIST_BURSTARROW = NM_ANI_BURSTARROW,
-  DIST_THROWINGSTAR = NM_ANI_THROWINGSTAR,
-  DIST_THROWINGKNIFE = NM_ANI_THROWINGKNIFE,
-  DIST_SMALLSTONE = NM_ANI_SMALLSTONE,
-  DIST_SUDDENDEATH = NM_ANI_SUDDENDEATH,
-  DIST_LARGEROCK = NM_ANI_LARGEROCK,
-  DIST_SNOWBALL = NM_ANI_SNOWBALL,
-  DIST_POWERBOLT = NM_ANI_POWERBOLT,
-  DIST_SPEAR = NM_ANI_SPEAR
-};
-*/
+#include "templates.h"
+
 enum slots_t {
 	SLOT_WHEREEVER=0,
 	SLOT_HEAD=1,
@@ -117,21 +100,21 @@ public:
 	}
 };
 
+
 //////////////////////////////////////////////////////////////////////
 // Defines the Base class for all creatures and base functions which 
 // every creature has
 
-
-class Creature : public Thing
+class Creature : public AutoList<Creature>, public Thing
 {
 public:
-  Creature(const char *name);
+  Creature(const char *name, unsigned long _id);
   virtual ~Creature() {};
 
   virtual const std::string& getName() const {return name; };
 
-  void setID(int id){this->id=id;}
-  unsigned long getID() const { return id; }
+  //void setID(int id){this->id=id;}
+  unsigned long getID() const { return listid; }
   unsigned long getExpForLv(const int& lv) const { 
 		return (int)((50*lv*lv*lv)/3 - 100 * lv * lv + (850*lv) / 3 - 200);
 	}
@@ -295,8 +278,8 @@ protected:
 
   Direction direction;
 
-  unsigned long id;
-  std::string        name;
+  //unsigned long id;
+  std::string name;
 };
 
 

@@ -105,11 +105,14 @@ public:
 	int maxWeapondamage;
 };
 
-class Monster : public Creature
+class Monster : protected AutoID<Monster>, public AutoList<Monster>, public Creature
 {
 public:
   Monster(const char *name, Game* game);
   virtual ~Monster();
+
+	static const unsigned long min_id = 65536 + 1;
+	static const unsigned long max_id = 16777216;	
 
 	virtual void onAttack();
 	bool isLoaded() const {return loaded;}

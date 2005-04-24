@@ -10,15 +10,13 @@
 
 using namespace std;
 
-static unsigned int idcount = 0x4711;
-
-
-Creature::Creature(const char *name) : access(0)
+Creature::Creature(const char *name, unsigned long _id) :
+ AutoList<Creature>(_id)
+ ,access(0)
 {
-  idcount++;
-
-  id         = idcount;
-
+	//idcount++;
+  //id         = idcount;
+	//access = 0;
   direction  = NORTH;
 
   this->name = name;
@@ -38,8 +36,6 @@ Creature::Creature(const char *name) : access(0)
   experience = 100000;
   lastmove=0;
 
-  //lastDamage = 0;
-
 	inFightTicks = 0;
 	inFightTicks = 0;
   manaShieldTicks = 0;
@@ -47,20 +43,7 @@ Creature::Creature(const char *name) : access(0)
 	paralyzeTicks = 0;
 	exhaustedTicks  = 0;
 	pzLocked = false;
-	
-	/*
-	burningTicks = 0;
-	energizedTicks = 0;
-	poisonedTicks = 0;
-	*/
-
 	immunities = 0;
-
-	/*
-	curburningTicks = 0;
-	curenergizedTicks = 0;
-	curpoisonedTicks = 0;
-	*/
 
   attackedCreature = 0;
   speed = 220;
@@ -167,14 +150,14 @@ int Creature::getGainedExperience(Creature* attacker)
 
 std::vector<long> Creature::getInflicatedDamageCreatureList()
 {
-	std::vector<long> list;
+	std::vector<long> damagelist;
 
 	std::map<long, DamageList >::const_iterator tdIt;
 	for(tdIt = totaldamagelist.begin(); tdIt != totaldamagelist.end(); ++tdIt) {
-		list.push_back(tdIt->first);
+		damagelist.push_back(tdIt->first);
 	}
 
-	return list;
+	return damagelist;
 }
 
 bool Creature::canMovedTo(const Tile *tile) const
