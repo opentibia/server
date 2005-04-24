@@ -48,18 +48,34 @@ class MovePlayer : public std::binary_function<Game*, Direction, int> {
                                 
 								Position pos = player->pos;
 								switch (dir) {
-										  case NORTH:
-													 pos.y--;
-													 break;
-										  case EAST:
-													 pos.x++;
-													 break;
-										  case SOUTH:
-													 pos.y++;
-													 break;
-										  case WEST:
-													 pos.x--;
-													 break;
+									case NORTH:
+												pos.y--;
+												break;
+									case EAST:
+												pos.x++;
+												break;
+									case SOUTH:
+												pos.y++;
+												break;
+									case WEST:
+												pos.x--;
+												break;
+									case NORTHEAST:
+											pos.x++;
+											pos.y--;
+										break;
+									case NORTHWEST:
+											pos.x--;
+											pos.y--;
+										break;
+									case SOUTHWEST:
+											pos.x--;
+											pos.y++;
+										break;
+									case SOUTHEAST:
+											pos.x++;
+											pos.y++;
+										break;
 								}
 
 #ifdef __DEBUG__

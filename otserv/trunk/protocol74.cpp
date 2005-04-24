@@ -481,16 +481,38 @@ void Protocol74::parseMoveByMouse(NetworkMessage &msg)
   std::list<Direction> path;
   size_t numdirs = msg.GetByte();
   for (size_t i = 0; i < numdirs; ++i) {
-          path.push_back((Direction)msg.GetByte());
+		unsigned char rawdir = msg.GetByte();
+		Direction dir = SOUTH;
+
+		switch(rawdir) {
+			case 1: dir = EAST; break;
+			case 2: dir = NORTHEAST; break;
+			case 3: dir = NORTH; break;
+			case 4: dir = NORTHWEST; break;
+			case 5: dir = WEST; break;
+			case 6: dir = SOUTHWEST; break;
+			case 7: dir = SOUTH; break;
+			case 8: dir = SOUTHEAST; break;
+
+			default:
+				continue;
+		};
+
+		//Direction dir = (Direction)msg.GetByte();
+#ifdef __DEBUG__
+		std::cout << "Walk by mouse: Direction: " << dir << std::endl;
+#endif
+		path.push_back(dir);
+		//path.push_back((Direction)msg.GetByte());
   }
   // then we schedule the movement...
   // the interval seems to depend on the speed of the char?
   if(player->cancelMove) {
-                              player->cancelMove = false;
-                              sendCancelWalk("");                 
-                         }
+		player->cancelMove = false;
+		sendCancelWalk("");
+	}
   else{     
-  game->addEvent(makeTask(0, MovePlayer(player->getID()), path, 400, StopMovePlayer(player->getID())));
+		game->addEvent(makeTask(0, MovePlayer(player->getID()), path, 400, StopMovePlayer(player->getID())));
  }
 }
 
@@ -499,7 +521,7 @@ void Protocol74::parseMoveNorth(NetworkMessage &msg)
 {
 	this->sleepTillMove();
   game->thingMove(player, player,
-                 player->pos.x, player->pos.y-1, player->pos.z, 1);
+		player->pos.x, player->pos.y-1, player->pos.z, 1);
 }
 
 
@@ -507,7 +529,7 @@ void Protocol74::parseMoveEast(NetworkMessage &msg)
 {
 	this->sleepTillMove();
   game->thingMove(player, player,
-                 player->pos.x+1, player->pos.y, player->pos.z, 1);
+		player->pos.x+1, player->pos.y, player->pos.z, 1);
 }
 
 
@@ -515,7 +537,7 @@ void Protocol74::parseMoveSouth(NetworkMessage &msg)
 {
 	this->sleepTillMove();
   game->thingMove(player, player,
-                 player->pos.x, player->pos.y+1, player->pos.z, 1);
+		player->pos.x, player->pos.y+1, player->pos.z, 1);
 }
 
 
@@ -523,7 +545,7 @@ void Protocol74::parseMoveWest(NetworkMessage &msg)
 {
 	this->sleepTillMove();
   game->thingMove(player, player,
-                 player->pos.x-1, player->pos.y, player->pos.z, 1);
+		player->pos.x-1, player->pos.y, player->pos.z, 1);
 }
 
 
