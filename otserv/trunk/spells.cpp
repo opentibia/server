@@ -271,7 +271,7 @@ bool SpellScript::castSpell(Creature* creature, const Position& pos, std::string
 	lua_pushnumber(luaState, creature->maglevel);
 	lua_pushstring(luaState, var.c_str());
 
-	lua_call(luaState, 5, 1);
+	lua_pcall(luaState, 5, 1, 0);
 
 	bool ret = (bool)lua_toboolean(luaState, -1);
 	lua_pop(luaState, 1);

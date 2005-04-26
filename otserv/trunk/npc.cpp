@@ -241,7 +241,16 @@ NpcScript::NpcScript(std::string scriptname, Npc* npc){
 void NpcScript::onThink(){
 	lua_pushstring(luaState, "onThink");
 	lua_gettable(luaState, LUA_GLOBALSINDEX);
-	lua_call(luaState, 0,0);
+	if(lua_pcall(luaState, 0, 0, 0)){
+		std::cerr << "Lua error: " << lua_tostring(luaState, -1) << std::endl;
+		lua_pop(luaState,1);
+		std::cerr << "Backtrace: " << std::endl;
+		lua_Debug* d = NULL;
+		int i = 0;
+		while(lua_getstack(luaState, i++, d)){
+			std::cerr << "    " << d->name << " @ " << d->currentline << std::endl;
+		}
+	}
 }
 
 
@@ -250,7 +259,16 @@ void NpcScript::onCreatureAppear(unsigned long cid){
 		lua_pushstring(luaState, "onCreatureAppear");
 		lua_gettable(luaState, LUA_GLOBALSINDEX);
 		lua_pushnumber(luaState, cid);
-		lua_call(luaState, 1,0);
+		if(lua_pcall(luaState, 1, 0, 0)){
+			std::cerr << "Lua error: " << lua_tostring(luaState, -1) << std::endl;
+			lua_pop(luaState,1);
+			std::cerr << "Backtrace: " << std::endl;
+			lua_Debug* d = NULL;
+			int i = 0;
+			while(lua_getstack(luaState, i++, d)){
+				std::cerr << "    " << d->name << " @ " << d->currentline << std::endl;
+			}
+		}
 	}
 }
 
@@ -258,7 +276,16 @@ void NpcScript::onCreatureDisappear(int cid){
 	lua_pushstring(luaState, "onCreatureDisappear");
 	lua_gettable(luaState, LUA_GLOBALSINDEX);
 	lua_pushnumber(luaState, cid);
-	lua_call(luaState, 1,0);
+	if(lua_pcall(luaState, 1, 0, 0)){
+		std::cerr << "Lua error: " << lua_tostring(luaState, -1) << std::endl;
+		lua_pop(luaState,1);
+		std::cerr << "Backtrace: " << std::endl;
+		lua_Debug* d = NULL;
+		int i = 0;
+		while(lua_getstack(luaState, i++, d)){
+			std::cerr << "    " << d->name << " @ " << d->currentline << std::endl;
+		}
+	}
 }
 
 void NpcScript::onCreatureSay(int cid, unsigned char type, const std::string &text){
@@ -268,7 +295,16 @@ void NpcScript::onCreatureSay(int cid, unsigned char type, const std::string &te
 	lua_pushnumber(luaState, cid);
 	lua_pushnumber(luaState, type);
 	lua_pushstring(luaState, text.c_str());
-	lua_call(luaState, 3,0);
+	if(lua_pcall(luaState, 3, 0, 0)){
+		std::cerr << "Lua error: " << lua_tostring(luaState, -1) << std::endl;
+		lua_pop(luaState,1);
+		std::cerr << "Backtrace: " << std::endl;
+		lua_Debug* d = NULL;
+		int i = 0;
+		while(lua_getstack(luaState, i++, d)){
+			std::cerr << "    " << d->name << " @ " << d->currentline << std::endl;
+		}
+	}
 }
 
 int NpcScript::registerFunctions(){
