@@ -56,10 +56,6 @@ protected:
 template<class T> class AutoID {
 public:
 	AutoID() {
-		if(list.empty()) {
-			count = T::min_id;
-		}
-
 		unsigned long newid = count;
 		bool wrapped = false;
 		while (find(list.begin(), list.end(), newid) != list.end()) {
@@ -70,6 +66,15 @@ public:
 
 			newid = count;
 			++count;
+		}
+
+		if(newid == count) {
+			if(count + 1 == T::max_id) {
+				wrapped = true;
+				count = T::min_id;
+			}
+			else
+				++count;
 		}
 
 		id = newid;

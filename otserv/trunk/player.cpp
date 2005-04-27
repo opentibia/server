@@ -38,7 +38,7 @@ extern LuaScript g_config;
 
 template<class T> typename AutoList<T>::list_type AutoList<T>::list;
 template<class T> typename AutoID<T>::list_type AutoID<T>::list;
-template<class T> unsigned long AutoID<T>::count;
+template<class T> unsigned long AutoID<T>::count = T::min_id;
 
 Player::Player(const char *name, Protocol *p) :
   AutoID<Player>()

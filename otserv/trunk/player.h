@@ -61,8 +61,8 @@ public:
 	void setGUID(unsigned long _guid) {guid = _guid;};
 	unsigned long getGUID() const { return guid;};
 
-	static const unsigned long min_id = 16777216 + 1;
-	static const unsigned long max_id = 4294967295;	
+	static const unsigned long min_id = 16777217U;
+	static const unsigned long max_id = 4294967295U;	
 
   void speak(const std::string &text);
 

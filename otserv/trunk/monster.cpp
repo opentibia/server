@@ -29,7 +29,7 @@ extern Spells spells;
 
 template<class T> typename AutoList<T>::list_type AutoList<T>::list;
 template<class T> typename AutoID<T>::list_type AutoID<T>::list;
-template<class T> unsigned long AutoID<T>::count;
+template<class T> unsigned long AutoID<T>::count = T::min_id;
 
 Monster::Monster(const char *name, Game* game) : 
   AutoID<Monster>()
@@ -325,7 +325,12 @@ int Monster::onThink(int& newThinkTicks)
 	}
 
 	if(attackedCreature != 0) {
-		int ground = game->getTile(this->pos.x, this->pos.y, this->pos.z)->ground.getID();
+		int ground = 0;
+		Tile *t =game->getTile(this->pos.x, this->pos.y, this->pos.z);
+		if(t && t->ground) {
+			ground = t->ground->getID();
+		}
+
 		int stepDuration = this->getStepDuration(Item::items[ground].speed);
 
 		long long delay = ((long long)this->lastmove + (long long)stepDuration) - ((long long)OTSYS_TIME());

@@ -111,8 +111,8 @@ public:
   Monster(const char *name, Game* game);
   virtual ~Monster();
 
-	static const unsigned long min_id = 65536 + 1;
-	static const unsigned long max_id = 16777216;	
+	static const unsigned long min_id = 65537U;
+	static const unsigned long max_id = 16777216U;	
 
 	virtual void onAttack();
 	bool isLoaded() const {return loaded;}

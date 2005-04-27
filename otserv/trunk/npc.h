@@ -73,8 +73,8 @@ public:
   Npc(const char *name, Game* game);
   virtual ~Npc();
 
-	static const unsigned long min_id = 10000;
-	static const unsigned long max_id = 65536;
+	static const unsigned long min_id = 10000U;
+	static const unsigned long max_id = 65536U;
 
   void speak(const std::string &text){};
   std::string getName(){return name;};
