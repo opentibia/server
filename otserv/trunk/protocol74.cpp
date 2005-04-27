@@ -240,9 +240,11 @@ void Protocol74::GetTileDescription(const Tile* tile, NetworkMessage &msg)
 {
 	if (tile)
 	{
-		msg.AddItem(&tile->ground);
-
-		int count = 1;
+		int count = 0;
+		if(tile->ground) {
+			msg.AddItem(tile->ground);
+			++count;
+		}
 
 		if (tile->splash)
 		{

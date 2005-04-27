@@ -64,9 +64,12 @@ void Protocol::setPlayer(Player* p)
 }
 
 void Protocol::sleepTillMove(){
-	int ground =	game->getTile(	player->pos.x,
-									player->pos.y,
-									player->pos.z)->ground.getID();
+	int ground =	0;
+	Tile *t = game->getTile(player->pos.x, player->pos.y, player->pos.z);
+	
+	if(t && t->ground) {
+		ground = t->ground->getID();
+	}
 	long long delay = ((long long)player->lastmove + (long long)player->getStepDuration(Item::items[ground].speed)) -
 				((long long)OTSYS_TIME());
 

@@ -408,12 +408,17 @@ void Map::setTile(unsigned short _x, unsigned short _y, unsigned char _z, unsign
 
   if (tile != NULL)
   {
-    tile->ground = groundId;
+		if(tile->ground)
+			delete tile->ground;
+
+		tile->ground = Item::CreateItem(groundId);
   }
   else
   {
     tile = new Tile();
-    tile->ground = groundId;
+		if(groundId != 0 && Item::items[groundId].groundtile) {
+			tile->ground = Item::CreateItem(groundId);
+		}
     tileMaps[_x & 1][_y & 1][_z][(_x << 16) | _y] = tile;
   }  
 }

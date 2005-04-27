@@ -27,10 +27,12 @@ public:
   {
     pz               = false;
     splash           = NULL;
+		ground           = NULL;
     decaySplashAfter = 0;
   }
 
-  Item           ground;
+  //Item           ground;
+  Item*           ground;
   Item*          splash;
   ItemVector     topItems;
   CreatureVector creatures;

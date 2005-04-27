@@ -126,7 +126,7 @@ class Game {
 
 	/** List holding the creatures in the game
 	  * \todo This also contains NPCs, should change the name and rework max_players to work with this */
-    std::map<long, Creature*> playersOnline;
+    std::map<unsigned long, Creature*> playersOnline;
 
 	/**
 	  * Place Creature on the map.

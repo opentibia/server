@@ -14,7 +14,7 @@
 
 bool Tile::isBlockingProjectile() const
 {
-	if(ground.isBlockingProjectile() == true)
+	if(ground && ground->isBlockingProjectile() == true)
     return true;
   
   ItemVector::const_iterator iit;
@@ -32,7 +32,7 @@ bool Tile::isBlockingProjectile() const
 
 bool Tile::isBlocking() const
 {
-  if(ground.isBlocking() == true)
+  if(ground && ground->isBlocking() == true)
     return true;
   
 	ItemVector::const_iterator iit;
@@ -49,7 +49,7 @@ bool Tile::isBlocking() const
 }
 bool Tile::floorChange(){
   ItemVector::iterator iit;
-  if(!(ground.noFloorChange() == true))
+  if(ground && !(ground->noFloorChange() == true))
     return true;
   for (iit = topItems.begin(); iit != topItems.end(); ++iit){  
          if ((*iit)->floorChangeNorth() || (*iit)->floorChangeSouth() || (*iit)->floorChangeEast() || (*iit)->floorChangeWest())
@@ -164,7 +164,7 @@ int Tile::getThingStackPos(const Thing *thing) const
 Thing* Tile::getThingByStackPos(int pos)
 {
   if (pos == 0)
-    return &ground;
+    return ground;
 
   pos--;
 
@@ -335,7 +335,7 @@ void Tile::addThing(Thing *thing) {
     Item *item = (Item*)thing;
     if (item->isGroundTile())
     {
-      ground = *item;
+      ground = item;
     }
     else if (item->isAlwaysOnTop())
     {
