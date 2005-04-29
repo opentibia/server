@@ -34,8 +34,6 @@
 
 #include "spells.h"
 
-#define ID_BLANK_RUNE 2260
-
 Spells::Spells(Game* igame): game(igame){
                    
                    }
@@ -825,9 +823,9 @@ int SpellScript::internalMakeRune(Player *p,unsigned short sl_id,Spell *S,unsign
 		return -1;
 	Item *item = p->getItem(sl_id);
 	if(item){
-		if(item->getID() == ID_BLANK_RUNE){			
-			p->addItem(Item::CreateItem(id, charges ),sl_id);		
-			return 1;			
+		if(item->getID() == ITEM_RUNE_BLANK){
+			p->addItem(Item::CreateItem(id, charges ),sl_id);
+			return 1;
 		}
 		else{
 			return 0;

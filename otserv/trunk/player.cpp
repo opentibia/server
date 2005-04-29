@@ -284,11 +284,11 @@ unsigned long Player::getMoney()
 		{
 			switch(items[i]->getID())
 			{
-			case 2148:
+			case ITEM_COINS_GOLD:
 				//gold coins
 				money += items[i]->getItemCountOrSubtype();
 				break;
-			case 2152:
+			case ITEM_COINS_PLATINUM:
 				//platinum coins
 				money += items[i]->getItemCountOrSubtype() * 100;
 				break;
@@ -316,11 +316,11 @@ unsigned long Player::getMoneyContainer(Container *container)
 		{
 			switch(item->getID())
 			{
-			case 2148:
+			case ITEM_COINS_GOLD:
 				//gold coins
 				money += item->getItemCountOrSubtype();
 				break;
-			case 2152:
+			case ITEM_COINS_PLATINUM:
 				//platinum coins
 				money += item->getItemCountOrSubtype() * 100;
 				break;
@@ -348,7 +348,7 @@ bool Player::substractMoney(unsigned long money)
 		{
 			switch(items[i]->getID())
 			{
-			case 2148:
+			case ITEM_COINS_GOLD:
 				//gold coins
 				goldcoins = items[i]->getItemCountOrSubtype();
 				if(money >= goldcoins)
@@ -365,7 +365,7 @@ bool Player::substractMoney(unsigned long money)
 				}
 				client->sendInventory(i);
 				break;
-			case 2152:
+			case ITEM_COINS_PLATINUM:
 				//platinum coins
 				goldcoins = items[i]->getItemCountOrSubtype() * 100;
 				if(money >= goldcoins)
@@ -385,7 +385,7 @@ bool Player::substractMoney(unsigned long money)
 						items[i]->setItemCountOrSubtype(platcoins);
 						if(goldcoins)
 						{
-							Item *new_item = Item::CreateItem(2148, goldcoins);
+							Item *new_item = Item::CreateItem(ITEM_COINS_GOLD, goldcoins);
 							Container *default_container = dynamic_cast<Container*>(getItem(SLOT_BACKPACK));
 							
 							if(default_container && default_container->addItem(new_item)) // There is space in container
@@ -414,7 +414,7 @@ bool Player::substractMoney(unsigned long money)
 						
 						if(goldcoins)
 						{
-							Item *new_item = Item::CreateItem(2148, goldcoins);
+							Item *new_item = Item::CreateItem(ITEM_COINS_GOLD, goldcoins);
 							items[i] = new_item;
 						}
 					}
@@ -450,7 +450,7 @@ bool Player::substractMoneyContainer(Container *container, unsigned long *money)
 		{
 			switch(item->getID())
 			{
-			case 2148:
+			case ITEM_COINS_GOLD:
 				//gold coins
 				msg.Reset();
 				goldcoins = item->getItemCountOrSubtype();
@@ -490,7 +490,7 @@ bool Player::substractMoneyContainer(Container *container, unsigned long *money)
 				
 				sendNetworkMessage(&msg);
 				break;
-			case 2152:
+			case ITEM_COINS_PLATINUM:
 				//platinum coins
 				msg.Reset();
 				goldcoins = item->getItemCountOrSubtype() * 100;
@@ -535,7 +535,7 @@ bool Player::substractMoneyContainer(Container *container, unsigned long *money)
 						
 						if(goldcoins)
 						{
-							Item *new_item = Item::CreateItem(2148, goldcoins);
+							Item *new_item = Item::CreateItem(ITEM_COINS_GOLD, goldcoins);
 							Container *default_container = dynamic_cast<Container*>(getItem(SLOT_BACKPACK));
 							
 							if(default_container && default_container->addItem(new_item)) // There is space in container
@@ -562,7 +562,7 @@ bool Player::substractMoneyContainer(Container *container, unsigned long *money)
 						if(goldcoins)
 						{
 							delete item;
-							Item *new_item = Item::CreateItem(2148, goldcoins);
+							Item *new_item = Item::CreateItem(ITEM_COINS_GOLD, goldcoins);
 							item = new_item;
 							container->addItem(item);
 							
