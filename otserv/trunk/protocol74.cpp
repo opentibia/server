@@ -47,14 +47,14 @@ std::map<long, Creature*> channel;
 
 Protocol74::Protocol74(SOCKET s)
 {
-  OTSYS_THREAD_LOCKVARINIT(bufferLock)
+  OTSYS_THREAD_LOCKVARINIT(bufferLock);
   this->s = s;
 }
 
 
 Protocol74::~Protocol74()
 {
-	OTSYS_THREAD_LOCKVARRELEASE(bufferLock)
+	OTSYS_THREAD_LOCKVARRELEASE(bufferLock);
 }
 
 
