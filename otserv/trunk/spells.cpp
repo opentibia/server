@@ -826,11 +826,7 @@ int SpellScript::internalMakeRune(Player *p,unsigned short sl_id,Spell *S,unsign
 	Item *item = p->getItem(sl_id);
 	if(item){
 		if(item->getID() == ID_BLANK_RUNE){			
-			p->addItem(Item::CreateItem(id, charges ),sl_id);
-			//todo working client->sendInventory(); on player.cpp
-			NetworkMessage msg;			
-			msg.AddPlayerInventoryItem(p,sl_id);
-			p->sendNetworkMessage(&msg);
+			p->addItem(Item::CreateItem(id, charges ),sl_id);		
 			return 1;			
 		}
 		else{

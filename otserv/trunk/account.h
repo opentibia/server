@@ -26,7 +26,7 @@
 #include <list>
 #include <string>
 
-class Player;
+//class Player;
 
 
 class Account

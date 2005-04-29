@@ -25,7 +25,7 @@
 
 #include "thing.h"
 #include "position.h"
-#include "networkmessage.h"
+//#include "networkmessage.h"
 #include "container.h"
 #include "magic.h"
 #include <vector>
@@ -154,7 +154,7 @@ public:
 	virtual bool isPushable() const {return true;}
 	virtual void dropLoot(Container *corpse) {return;};
 
-  virtual int sendInventory(){return 0;};
+//  virtual int sendInventory(){return 0;};
   virtual int addItem(Item* item, int pos){return 0;};
   virtual Item* getItem(int pos){return NULL;}
   virtual Direction getDirection(){return direction;}
@@ -211,6 +211,7 @@ public:
   virtual void sendCancel(const char *msg) { };
   virtual void sendCancelWalk(const char *msg) { };
 
+
 	virtual void addInflictedDamage(Creature* attacker, int damage);
 	virtual int getGainedExperience(Creature* attacker);
 	virtual std::vector<long> getInflicatedDamageCreatureList();
@@ -234,6 +235,8 @@ protected:
 
   virtual void onCreatureAppear(const Creature *creature) { };
   virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos) { };
+  //virtual void onThingDisappear(const Thing* thing, unsigned char stackPos) = 0;
+  //virtual void onThingAppear(const Thing* thing) = 0;
   virtual void onCreatureTurn(const Creature *creature, unsigned char stackPos) { };
   virtual void onCreatureSay(const Creature *creature, unsigned char type, const std::string &text) { };
 

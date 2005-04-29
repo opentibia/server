@@ -33,6 +33,7 @@ using namespace std;
 #include "protocol.h"
 #include "player.h"
 #include "luascript.h"
+#include "networkmessage.h"
 
 extern LuaScript g_config;
 
@@ -44,8 +45,9 @@ Player::Player(const char *name, Protocol *p) :
   AutoID<Player>()
  ,AutoList<Player>(id)
  ,Creature(name, id)
-{
+{	
   client     = p;
+  client->setPlayer(this);
 	/*
 	exhaustedTicks  = 0;
 	pzLocked = false;
@@ -67,6 +69,9 @@ Player::Player(const char *name, Protocol *p) :
 
   access     = 0;
   cancelMove = false;
+  SendBuffer = false;
+  npings = 0;
+  internal_ping = 0;
   fightMode = followMode = 0;
   for(int i = 0; i < 7; i++)
   {
@@ -79,6 +84,18 @@ Player::Player(const char *name, Protocol *p) :
 		SkillAdvanceCache[i][j].tries = 0;
 	}
   }
+
+	lastSentStats.health = 0;
+	lastSentStats.healthmax = 0;
+	lastSentStats.cap = 0;
+	lastSentStats.experience = 0;
+	lastSentStats.level = 0;
+	lastSentStats.mana = 0;
+	lastSentStats.manamax = 0;
+	lastSentStats.manaspent = 0;
+	lastSentStats.maglevel = 0;
+	level_percent = 0;
+	maglevel_percent = 0;
 
   //set item pointers to NULL
 	for(int i = 0; i < 11; i++)
@@ -338,9 +355,7 @@ bool Player::substractMoney(unsigned long money)
 					items[i]->setItemCountOrSubtype(goldcoins - money);
 					money = 0;
 				}
-				msg.Reset();
-				msg.AddPlayerInventoryItem(this,i);
-				sendNetworkMessage(&msg);
+				client->sendInventory(i);
 				break;
 			case 2152:
 				//platinum coins
@@ -396,9 +411,7 @@ bool Player::substractMoney(unsigned long money)
 						}
 					}
 				}
-				msg.Reset();
-				msg.AddPlayerInventoryItem(this,i);
-				sendNetworkMessage(&msg);
+				client->sendInventory(i);
 				break;
 			}
 		}
@@ -608,8 +621,8 @@ void Player::sendIcons()
 	client->sendIcons(icons);             
 }
 
-int Player::sendInventory(){
-	client->sendInventory();
+int Player::sendInventory(unsigned char sl_id){
+	client->sendInventory(sl_id);
 	return true;
 }
 
@@ -618,7 +631,6 @@ int Player::addItem(Item* item, int pos) {
 #ifdef __DEBUG__
 	std::cout << "Should add item at " << pos <<std::endl;
 #endif
-
 	if(pos > 0 && pos < 11)
   {
 		if (items[pos]) {
@@ -631,7 +643,7 @@ int Player::addItem(Item* item, int pos) {
 		}
   }
 
-	client->sendInventory();
+	client->sendInventory(pos);	
 	return true;
 }
 
@@ -706,13 +718,11 @@ void Player::addSkillTry(int skilltry)
 			 if (skills[skill][SKILL_TRIES] >= getReqSkilltries (skill, (skills[skill][SKILL_LEVEL] + 1), voc)) {
 				 skills[skill][SKILL_LEVEL]++;
 				 skills[skill][SKILL_TRIES] = 0;
-				 skills[skill][SKILL_PERCENT] = 0;
-				 NetworkMessage msg;
+				 skills[skill][SKILL_PERCENT] = 0;				 
 				 std::stringstream advMsg;
 				 advMsg << "You advanced in " << skillname << ".";
-				 msg.AddTextMessage(MSG_ADVANCE, advMsg.str().c_str());
-				 msg.AddPlayerSkills(this);
-				 sendNetworkMessage(&msg);
+				 client->sendTextMessage(MSG_ADVANCE, advMsg.str().c_str());
+				 client->sendSkills();
 			 }
 			 else{
 				 //update percent
@@ -720,9 +730,7 @@ void Player::addSkillTry(int skilltry)
 				 
 				 if(skills[skill][SKILL_PERCENT] != new_percent){
 						skills[skill][SKILL_PERCENT] = new_percent;
-						NetworkMessage msg;
-						msg.AddPlayerSkills(this);
-				 		sendNetworkMessage(&msg);
+						client->sendSkills();
 				 }
 			 }
 		   }
@@ -735,10 +743,14 @@ void Player::addSkillTry(int skilltry)
 
 unsigned int Player::getReqMana(int maglevel, int voc) {
   //ATTANTION: MAKE SURE THAT CHARS HAVE REASONABLE MAGIC LEVELS. ESPECIALY KNIGHTS!!!!!!!!!!!
-
   float ManaMultiplier[5] = { 1.0f, 1.1f, 1.1f, 1.4f, 3 };
-  
-  return (unsigned int) ( 400 * pow(ManaMultiplier[voc], maglevel-1) );       //will calculate required mana for a magic level
+  unsigned int reqMana = (unsigned int) ( 400 * pow(ManaMultiplier[voc], maglevel-1) );       //will calculate required mana for a magic level
+  if (reqMana % 20 < 10) //CIP must have been bored when they invented this odd rounding
+    reqMana = reqMana - (reqMana % 20);
+  else
+    reqMana = reqMana - (reqMana % 20) + 20;
+
+  return reqMana;
 }
 
 Container* Player::getContainer(unsigned char containerid)
@@ -877,9 +889,7 @@ void Player::RemoveDistItem(){
 			delete DistItem;
 		}		
 		//update inventory
-		NetworkMessage msg;			
-		msg.AddPlayerInventoryItem(this,sl_id);
-		sendNetworkMessage(&msg);
+		client->sendInventory(sl_id);
 	}
 	return;
 }
@@ -971,6 +981,89 @@ void Player::sendCancelWalk(const char *msg)
 {
   client->sendCancelWalk(msg);
 }
+void Player::sendStats(){
+	//save current stats 
+	lastSentStats.health = this->health;
+	lastSentStats.healthmax = this->healthmax;
+	lastSentStats.cap = this->cap;
+	lastSentStats.experience = this->experience;
+	lastSentStats.level = this->level;
+	lastSentStats.mana = this->mana;
+	lastSentStats.manamax = this->manamax;
+	lastSentStats.manaspent = this->manaspent;
+	lastSentStats.maglevel = this->maglevel;
+	//update level and maglevel percents
+	if(lastSentStats.experience != this->experience)
+	    level_percent  = (unsigned char)(100*(experience-getExpForLv(level))/(1.*getExpForLv(level+1)-getExpForLv(level)));		
+	if(lastSentStats.manaspent != this->manaspent)
+	    maglevel_percent  = (unsigned char)(100*(manaspent/(1.*getReqMana(maglevel+1,voc))));
+	
+	client->sendStats();
+}
+void Player::sendTextMessage(MessageClasses mclass, const char* message){
+	client->sendTextMessage(mclass,message);
+}
+
+void Player::flushMsg(){
+	client->flushOutputBuffer();
+}
+void Player::sendTextMessage(MessageClasses mclass, const char* message,const Position &pos, unsigned char type){
+	client->sendTextMessage(mclass,message,pos,type);
+}
+void Player::sendPing(){
+	internal_ping++;
+	if(internal_ping >= 5){ //1 ping each 5 seconds
+		internal_ping = 0;
+		npings++;
+		client->sendPing();
+	}
+	if(npings >= 6){
+		if(inFightTicks >=1000 && health >0) {
+			//logout?
+		}
+		else{
+			//logout
+		}
+	}
+}
+
+void Player::receivePing(){
+	if(npings > 0)
+		npings--;
+}
+
+void Player::sendDistanceShoot(const Position &from, const Position &to, unsigned char type){
+	client->sendDistanceShoot(from, to,type);
+}
+
+void Player::sendMagicEffect(const Position &pos, unsigned char type){
+	client->sendMagicEffect(pos,type);
+}
+void Player::sendAnimatedText(const Position &pos, unsigned char color, std::string text){
+	client->sendAnimatedText(pos,color,text);
+}
+
+void Player::sendCreatureHealth(const Creature *creature){
+	client->sendCreatureHealth(creature);
+}
+
+
+bool Player::NeedUpdateStats(){
+	if(lastSentStats.health != this->health ||
+		 lastSentStats.healthmax != this->healthmax ||
+		 lastSentStats.cap != this->cap ||
+		 lastSentStats.experience != this->experience ||
+		 lastSentStats.level != this->level ||
+		 lastSentStats.mana != this->mana ||
+		 lastSentStats.manamax != this->manamax ||
+		 lastSentStats.manaspent != this->manaspent ||
+		 lastSentStats.maglevel != this->maglevel){
+		return true;
+	}
+	else{
+		return false;
+	}
+}
 
 void Player::onThingMove(const Creature *creature, const Thing *thing, const Position *oldPos,
 	unsigned char oldstackpos, unsigned char oldcount, unsigned char count)
@@ -1030,23 +1123,36 @@ void Player::onThingMove(const Creature *creature, const Position *oldPos, slots
 
 void Player::setAttackedCreature(unsigned long id){
      attackedCreature = id;
-        }
+}
 
 void Player::onCreatureAppear(const Creature *creature)
 {
-  client->sendCreatureAppear(creature);
+	const Thing *thing = dynamic_cast< const Thing*>(creature);
+	if(thing)
+  		client->sendThingAppear(thing);
 }
-
-
 void Player::onCreatureDisappear(const Creature *creature, unsigned char stackPos)
 {
-  client->sendCreatureDisappear(creature, stackPos);
+	const Thing *thing = dynamic_cast<const Thing*>(creature);
+	if(thing)
+  		client->sendThingDisappear(thing, stackPos);
 }
 
+void Player::onThingDisappear(const Thing* thing, unsigned char stackPos){
+	client->sendThingDisappear(thing, stackPos);
+}
+
+void Player::onThingAppear(const Thing* thing){
+	client->sendThingAppear(thing);
+}
 
 void Player::onCreatureTurn(const Creature *creature, unsigned char stackPos)
 {
   client->sendCreatureTurn(creature, stackPos);
+}
+
+void Player::onThingRemove(const Thing* thing){
+	client->sendThingRemove(thing);
 }
 
 
@@ -1088,10 +1194,9 @@ unsigned long Player::getIP() const
 }
 
 void Player::die() {
-	NetworkMessage msg;
-        
-	msg.AddTextMessage(MSG_ADVANCE, "You are dead.");
-	msg.AddTextMessage(MSG_EVENT, "Own3d!");
+	
+    client->sendTextMessage(MSG_ADVANCE, "You are dead.");
+    client->sendTextMessage(MSG_EVENT, "Own3d!");
 		
 	//Magic Level downgrade
 	unsigned int sumMana = 0;
@@ -1160,10 +1265,9 @@ void Player::die() {
 	{
 		std::stringstream lvMsg;
 		lvMsg << "You were downgraded from level " << level << " to level " << newLevel << ".";
-		msg.AddTextMessage(MSG_ADVANCE, lvMsg.str().c_str());
+		client->sendTextMessage(MSG_ADVANCE, lvMsg.str().c_str());	
 		
 	}
-	sendNetworkMessage(&msg);
 }
 
 void Player::preSave()

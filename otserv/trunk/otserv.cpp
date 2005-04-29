@@ -26,7 +26,7 @@
 #include <sstream>
 
 #include "otsystem.h"
-
+#include "networkmessage.h"
 #include "protocol74.h"
 
 #include <stdlib.h>
@@ -176,17 +176,14 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 				msg.WriteToSocket(s);
 			}
 			else {
-				Protocol74 *protocol = new Protocol74(s);
-
+				Protocol74 *protocol = new Protocol74(s);				
 				Player *player;
-				player = new Player(name.c_str(), protocol);
-				player->usePlayer();
-				IOPlayer::instance()->loadPlayer(player, name);
-
-				protocol->setPlayer(player);
+				player = new Player(name.c_str(), protocol);				
+				player->usePlayer();				
+				IOPlayer::instance()->loadPlayer(player, name);	
 
 				if (player->password == password)
-				{
+				{					
 					if(g_game.getCreatureByName(name.c_str()) != NULL && ! g_config.getGlobalNumber("allowclones", 0)){
 						std::cout << "reject player..." << std::endl;
 							msg.Reset();
@@ -200,7 +197,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 							msg.AddString("Too many Players online.");
 							msg.AddByte(45);
 							msg.WriteToSocket(s);
-					} else {	
+					} else {
 						Status* stat = Status::instance();
 						stat->addPlayer();
 						s = 0;            // protocol/player will close socket

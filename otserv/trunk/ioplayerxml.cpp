@@ -66,6 +66,8 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name){
 		player->voc=atoi((const char*)xmlGetProp(root, (const xmlChar *) "voc"));
 		player->access=atoi((const char*)xmlGetProp(root, (const xmlChar *) "access"));
 		player->setNormalSpeed();
+		//level percent
+		player->level_percent  = (unsigned char)(100*(player->experience-player->getExpForLv(player->level))/(1.*player->getExpForLv(player->level+1)-player->getExpForLv(player->level)));
 		while (p)
 		{
 			std::string str=(char*)p->name;
@@ -74,6 +76,7 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name){
 				player->mana=atoi((const char*)xmlGetProp(p, (const xmlChar *) "now"));
 				player->manamax=atoi((const char*)xmlGetProp(p, (const xmlChar *) "max"));
 				player->manaspent=atoi((const char*)xmlGetProp(p, (const xmlChar *) "spent"));
+				player->maglevel_percent  = (unsigned char)(100*(player->manaspent/(1.*player->getReqMana(player->maglevel+1, player->voc))));
 			}
 			else if(str=="health")
 			{
@@ -130,65 +133,16 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name){
 						int sl_id = atoi((const char*)xmlGetProp(slot, (const xmlChar *)"slotid"));					
 						Item* myitem = new Item();
 						myitem->unserialize(slot->children);
-						//player->items[sl_id] = Item::CreateItem(myitem->getID(), myitem->getItemCountOrSubtype());
-						player->addItem(Item::CreateItem(myitem->getID(), myitem->getItemCountOrSubtype()), sl_id);
+						player->items[sl_id] = Item::CreateItem(myitem->getID(), myitem->getItemCountOrSubtype());
+						//we dont want to sendinventory before login
+						//player->addItem(Item::CreateItem(myitem->getID(), myitem->getItemCountOrSubtype()), sl_id);
 						delete myitem;
 						myitem = NULL;
 
 						//Should be loaded from xml later on...
 						Container* default_container = dynamic_cast<Container*>(player->getItem(sl_id));
-						if(default_container) {
-							LoadContainer(slot->children,default_container);							
-							/*Container *backpack = dynamic_cast<Container*>(Item::CreateItem(1988));
-							if(!backpack)
-								continue;
-
-							defaultbackpack->addItem(backpack);
-							for(int i = 0; i < 20; ++i) {
-								backpack->addItem(Item::CreateItem(2313, 99));
-							}
-
-							backpack = dynamic_cast<Container*>(Item::CreateItem(1988));
-							if(!backpack)
-								continue;
-							defaultbackpack->addItem(backpack);
-							
-							for(int i = 0; i < 20; ++i) {
-								backpack->addItem(Item::CreateItem(2273, 99));
-							}
-
-							backpack = dynamic_cast<Container*>(Item::CreateItem(1988));
-							if(!backpack)
-								continue;
-							defaultbackpack->addItem(backpack);
-							
-							for(int i = 0; i < 20; ++i) {
-								backpack->addItem(Item::CreateItem(2268, 99));
-							}
-
-							backpack = dynamic_cast<Container*>(Item::CreateItem(1988));
-							if(!backpack)
-								continue;
-							defaultbackpack->addItem(backpack);
-
-							for(int i = 0; i < 20; ++i) {
-								backpack->addItem(Item::CreateItem(2304, 3));
-							}
-
-							backpack = dynamic_cast<Container*>(Item::CreateItem(1988));
-							if(!backpack)
-								continue;
-							defaultbackpack->addItem(backpack);
-
-							for(int i = 0; i < 20; ++i) {
-								backpack->addItem(Item::CreateItem(2293, 3));
-							}
-
-							defaultbackpack->addItem(Item::CreateItem(2304, 2));
-							defaultbackpack->addItem(Item::CreateItem(2308, 50));
-							defaultbackpack->addItem(Item::CreateItem(2262, 5));
-							defaultbackpack->addItem(Item::CreateItem(2305, 5));
-							defaultbackpack->addItem(Item::CreateItem(2311, 99));*/
+						if(default_container){
+							LoadContainer(slot->children,default_container);
 						}
 					}
 				slot=slot->next;

@@ -83,36 +83,41 @@ int MagicEffectClass::getDamage(Creature *target, const Creature *attacker /*= N
 	return 0;
 }
 
-void MagicEffectClass::getMagicEffect(const Player* spectator, const Creature* attacker, const Creature* target,
-	const Position& pos, /*bool hasTarget,*/ int damage, bool isPz, bool isBlocking, NetworkMessage &msg) const
+void MagicEffectClass::getMagicEffect(Player* spectator, const Creature* attacker, const Creature* target,
+	const Position& pos, /*bool hasTarget,*/ int damage, bool isPz, bool isBlocking) const
 {
 	if(!isBlocking && target != NULL /*hasTarget*/) {
 		if(spectator->CanSee(pos.x, pos.y, pos.z)) {
 			if(target->access == 0) {
 				if(damageEffect != 0xFF) {
 					if(offensive && (target->getImmunities() & attackType) == attackType) {
-						msg.AddMagicEffect(pos, NM_ME_BLOCKHIT);
+						spectator->sendMagicEffect(pos, NM_ME_BLOCKHIT);
+						//msg.AddMagicEffect(pos, NM_ME_BLOCKHIT);
 					}
 					else {
-						msg.AddMagicEffect(pos, damageEffect);
+						spectator->sendMagicEffect(pos, damageEffect);
+						//msg.AddMagicEffect(pos, damageEffect);
 					}
 				}
 
 				if(hitEffect != 0xFF)
-					msg.AddMagicEffect(pos, hitEffect);
+					spectator->sendMagicEffect(pos, hitEffect);
+					//msg.AddMagicEffect(pos, hitEffect);
 			}
 			else
-				msg.AddMagicEffect(pos, NM_ME_PUFF);
+				spectator->sendMagicEffect(pos, NM_ME_PUFF);
+				//msg.AddMagicEffect(pos, NM_ME_PUFF);
 		}
 	}
 }
 
-void MagicEffectClass::getDistanceShoot(const Player* spectator, const Creature* attacker, const Position& to,
-			bool hasTarget, NetworkMessage &msg) const
+void MagicEffectClass::getDistanceShoot(Player* spectator, const Creature* attacker, const Position& to,
+			bool hasTarget) const
 {
 	if(animationEffect > 0) {
 		if(spectator->CanSee(attacker->pos.x, attacker->pos.y, attacker->pos.z) || spectator->CanSee(to.x, to.y, to.z)) {
-			msg.AddDistanceShoot(attacker->pos, to, animationEffect);
+			spectator->sendDistanceShoot(attacker->pos, to, animationEffect);
+			//msg.AddDistanceShoot(attacker->pos, to, animationEffect);
 		}
 	}
 }
@@ -132,15 +137,16 @@ bool MagicEffectClass::canCast(bool isBlocking, bool hasCreature) const
 	return !isBlocking;
 }
 
-void MagicEffectClass::FailedToCast(const Player* spectator, const Creature* attacker,
-		bool isBlocking, bool hasTarget, NetworkMessage &msg) const
+void MagicEffectClass::FailedToCast(Player* spectator, const Creature* attacker,
+		bool isBlocking, bool hasTarget) const
 {
 	if(!hasTarget && attacker) {
 		if(attacker == spectator) {
-			msg.AddTextMessage(MSG_SMALLINFO, "Sorry not possible.");
+			spectator->sendTextMessage(MSG_SMALLINFO, "Sorry not possible.");
+			//msg.AddTextMessage(MSG_SMALLINFO, "Sorry not possible.");
 		}
-
-		msg.AddMagicEffect(attacker->pos, NM_ME_PUFF);
+		spectator->sendMagicEffect(attacker->pos, NM_ME_PUFF);
+		//msg.AddMagicEffect(attacker->pos, NM_ME_PUFF);
 	}
 }
 
@@ -149,28 +155,30 @@ MagicEffectTargetClass::MagicEffectTargetClass()
 {
 	//
 }
-void MagicEffectTargetClass::getMagicEffect(const Player* spectator, const Creature* attacker, const Creature* target,
-	const Position& pos, int damage, bool isPz, bool isBlocking, NetworkMessage &msg) const
+void MagicEffectTargetClass::getMagicEffect(Player* spectator, const Creature* attacker, const Creature* target,
+	const Position& pos, int damage, bool isPz, bool isBlocking) const
 {
 	if(target != NULL) {
 		//default
-		MagicEffectClass::getMagicEffect(spectator, attacker, target, pos, /*hasTarget,*/ damage, isPz, isBlocking, msg);
+		MagicEffectClass::getMagicEffect(spectator, attacker, target, pos, /*hasTarget,*/ damage, isPz, isBlocking);
 	}
 	else {
 		if(attacker) {
 			if(spectator->CanSee(attacker->pos.x, attacker->pos.y, attacker->pos.z)) {
-				msg.AddMagicEffect(attacker->pos, NM_ME_PUFF);
+				spectator->sendMagicEffect(attacker->pos, NM_ME_PUFF);
+				//msg.AddMagicEffect(attacker->pos, NM_ME_PUFF);
 			}
 		}
 	}
 }
 
-void MagicEffectTargetClass::getDistanceShoot(const Player* spectator, const Creature* attacker, const Position& to,
-			bool hasTarget, NetworkMessage &msg) const
+void MagicEffectTargetClass::getDistanceShoot(Player* spectator, const Creature* attacker, const Position& to,
+			bool hasTarget) const
 {
 	if(animationEffect > 0 && hasTarget) {
 		if(spectator->CanSee(attacker->pos.x, attacker->pos.y, attacker->pos.z) || spectator->CanSee(to.x, to.y, to.z)) {
-			msg.AddDistanceShoot(attacker->pos, to, animationEffect);
+			spectator->sendDistanceShoot(attacker->pos, to, animationEffect);
+			//msg.AddDistanceShoot(attacker->pos, to, animationEffect);
 		}
 	}
 }
@@ -237,16 +245,17 @@ int MagicEffectTargetCreatureCondition::getDamage(Creature *target, const Creatu
 	return 0;
 }
 
-void MagicEffectTargetCreatureCondition::getMagicEffect(const Player* spectator, const Creature* attacker, const Creature* target,
-	const Position& pos, int damage, bool isPz, bool isBlocking, NetworkMessage &msg) const
+void MagicEffectTargetCreatureCondition::getMagicEffect(Player* spectator, const Creature* attacker, const Creature* target,
+	const Position& pos, int damage, bool isPz, bool isBlocking) const
 {
 	if(target != NULL) {
 		//default
-		MagicEffectClass::getMagicEffect(spectator, attacker, target, pos, /*hasTarget,*/ damage, isPz, isBlocking, msg);
+		MagicEffectClass::getMagicEffect(spectator, attacker, target, pos, /*hasTarget,*/ damage, isPz, isBlocking);
 	}
 	else {
 		if(spectator->CanSee(pos.x, pos.y, pos.z)) {
-			msg.AddMagicEffect(pos, NM_ME_PUFF);
+			spectator->sendMagicEffect(pos, NM_ME_PUFF);
+			//msg.AddMagicEffect(pos, NM_ME_PUFF);
 		}
 	}
 
@@ -288,37 +297,40 @@ bool MagicEffectTargetGroundClass::canCast(bool isBlocking, bool hasCreature) co
 	return true;
 }
 
-void MagicEffectTargetGroundClass::FailedToCast(const Player* spectator, const Creature* attacker,
-		bool isBlocking, bool hasTarget, NetworkMessage &msg) const
+void MagicEffectTargetGroundClass::FailedToCast(Player* spectator, const Creature* attacker,
+		bool isBlocking, bool hasTarget) const
 {
 	const Player* player = dynamic_cast<const Player*>(attacker);
 
 	if(isBlocking || hasTarget) {
 		if(hasTarget) {
 			if(player && player == spectator) {
-				msg.AddTextMessage(MSG_SMALLINFO, "There is not enough room.");
+				spectator->sendTextMessage(MSG_SMALLINFO, "There is not enough room.");
+				//msg.AddTextMessage(MSG_SMALLINFO, "There is not enough room.");
 			}
-
-			msg.AddMagicEffect(player->pos, NM_ME_PUFF);
+			spectator->sendMagicEffect(player->pos, NM_ME_PUFF);
+			//msg.AddMagicEffect(player->pos, NM_ME_PUFF);
 		}
 		else if(player && player == spectator) {
-			msg.AddTextMessage(MSG_SMALLINFO, "You cannot throw there.");
+			spectator->sendTextMessage(MSG_SMALLINFO, "You cannot throw there.");
+			//msg.AddTextMessage(MSG_SMALLINFO, "You cannot throw there.");
 		}
 	}
 }
 
-void MagicEffectTargetGroundClass::getMagicEffect(const Player* spectator, const Creature* attacker, const Creature* target,
-		const Position& pos, int damage, bool isPz, bool isBlocking, NetworkMessage &msg) const
+void MagicEffectTargetGroundClass::getMagicEffect(Player* spectator, const Creature* attacker, const Creature* target,
+		const Position& pos, int damage, bool isPz, bool isBlocking) const
 {
 	//Default: nothing
 }
 
-void MagicEffectTargetGroundClass::getDistanceShoot(const Player* spectator, const Creature* attacker, const Position& to,
-			bool hasTarget, NetworkMessage &msg) const
+void MagicEffectTargetGroundClass::getDistanceShoot(Player* spectator, const Creature* attacker, const Position& to,
+			bool hasTarget) const
 {
 	if(!hasTarget && animationEffect > 0) {
 		if(spectator->CanSee(attacker->pos.x, attacker->pos.y, attacker->pos.z) || spectator->CanSee(to.x, to.y, to.z)) {
-			msg.AddDistanceShoot(attacker->pos, to, animationEffect);
+			spectator->sendDistanceShoot(attacker->pos, to, animationEffect);
+			//msg.AddDistanceShoot(attacker->pos, to, animationEffect);
 		}
 	}
 }
@@ -329,17 +341,18 @@ MagicEffectAreaClass::MagicEffectAreaClass()
 	areaEffect = 0xFF;
 }
 
-void MagicEffectAreaClass::getMagicEffect(const Player* spectator, const Creature* attacker, const Creature* target,
-	const Position& pos, int damage, bool isPz, bool isBlocking, NetworkMessage &msg) const
+void MagicEffectAreaClass::getMagicEffect(Player* spectator, const Creature* attacker, const Creature* target,
+	const Position& pos, int damage, bool isPz, bool isBlocking) const
 {
 	if(target != NULL) {
 		//default
-		MagicEffectClass::getMagicEffect(spectator, attacker, target, pos, /*hasTarget,*/ damage, isPz, isBlocking, msg);
+		MagicEffectClass::getMagicEffect(spectator, attacker, target, pos, /*hasTarget,*/ damage, isPz, isBlocking);
 	}
 	else {
 		if(!isBlocking && areaEffect != 0xFF && (attacker->access != 0 || !isPz)) {
 			if(spectator->CanSee(pos.x, pos.y, pos.z)) {
-				msg.AddMagicEffect(pos, areaEffect);
+				spectator->sendMagicEffect(pos, areaEffect);
+				//msg.AddMagicEffect(pos, areaEffect);
 			}
 		}
 	}

@@ -53,12 +53,12 @@ public:
   virtual ~Protocol74();
 
   bool ConnectPlayer();
-  void ReceiveLoop();
-
+  void ReceiveLoop();  
+  void WriteBuffer(NetworkMessage &add);
 
 private:
   // the socket the player is on...
-
+	NetworkMessage OutputBuffer;
   std::list<unsigned long> knownPlayers;
   void checkCreatureAsKnown(unsigned long id, bool &known, unsigned long &removedKnown);
 
@@ -157,8 +157,17 @@ private:
 
 	void autoCloseContainers(const Container *container, NetworkMessage &msg);
 
-  virtual void sendCreatureAppear(const Creature *creature);
-  virtual void sendCreatureDisappear(const Creature *creature, unsigned char stackPos);
+  //rtual void sendCreatureAppear(const Creature *creature);
+  virtual void sendThingDisappear(const Thing *thing, unsigned char stackPos);
+  virtual void sendThingAppear(const Thing *thing);
+  virtual void sendThingRemove(const Thing *thing);
+  virtual void sendDistanceShoot(const Position &from, const Position &to, unsigned char type);
+  virtual void sendMagicEffect(const Position &pos, unsigned char type);
+  virtual void sendAnimatedText(const Position &pos, unsigned char color, std::string text);
+  virtual void sendCreatureHealth(const Creature *creature);
+  virtual void sendSkills();
+  virtual void sendPing();
+  //virtual void sendCreatureDisappear(const Creature *creature, unsigned char stackPos);
   virtual void sendCreatureTurn(const Creature *creature, unsigned char stackpos);
   virtual void sendCreatureSay(const Creature *creature, unsigned char type, const std::string &text);
 
@@ -169,8 +178,14 @@ private:
   void sendSetOutfit(const Creature* creature);
 	virtual void sendTileUpdated(const Position &Pos);
 	//virtual void sendContainerUpdated(Item *item, unsigned char from_id, unsigned char to_id, unsigned char from_slot, unsigned char to_slot, bool remove);
-
+	virtual void sendInventory(unsigned char sl_id);
+	virtual void sendStats();
+	virtual void sendTextMessage(MessageClasses mclass, const char* message);
+	virtual void sendTextMessage(MessageClasses mclass, const char* message,const Position &pos, unsigned char type);
+	
   virtual bool CanSee(int x, int y, int z) const;
+  void flushOutputBuffer();
+  void WriteMsg(NetworkMessage &msg);
 
 	void GetTileUpdated(const Position &pos, NetworkMessage &msg);
 	void sendContainer(unsigned char index, Container *container);
@@ -183,10 +198,21 @@ private:
   void GetMapDescription(unsigned short x, unsigned short y, unsigned char z,
                          unsigned short width, unsigned short height,
                          NetworkMessage &msg);
-
-
+  virtual void AddTextMessage(NetworkMessage &msg,MessageClasses mclass, const char* message);
+  virtual void AddAnimatedText(NetworkMessage &msg,const Position &pos, unsigned char color, std::string text);
+  virtual void AddMagicEffect(NetworkMessage &msg,const Position &pos, unsigned char type);
+  virtual void AddDistanceShoot(NetworkMessage &msg,const Position &from, const Position &to, unsigned char type);
+  virtual void AddCreature(NetworkMessage &msg,const Creature *creature, bool known, unsigned int remove);
+  virtual void AddPlayerStats(NetworkMessage &msg,const Player *player);
+  virtual void AddPlayerInventoryItem(NetworkMessage &msg,const Player *player, int item);
+  virtual void AddCreatureSpeak(NetworkMessage &msg,const Creature *creature, unsigned char type, std::string text, unsigned short channelId);
+  virtual void AddCreatureHealth(NetworkMessage &msg,const Creature *creature);
+  virtual void AddPlayerSkills(NetworkMessage &msg,const Player *player);
+  virtual void AddRemoveThing(NetworkMessage &msg, const Position &pos,unsigned char stackpos);
+  virtual void AddAppearThing(NetworkMessage &msg, const Position &pos);
+  
+  OTSYS_THREAD_LOCKVAR bufferLock;
+   
 };
-
-
 
 #endif

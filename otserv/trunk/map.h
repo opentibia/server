@@ -29,12 +29,12 @@
 #include "item.h"
 #include "creature.h"
 #include "magic.h"
-#include "otsystem.h"
+//#include "otsystem.h"
 
 #include "scheduler.h"
-#include "networkmessage.h"
-
+//#include "networkmessage.h"
 #include "tools.h"
+#include "tile.h"
 
 class Creature;   // see creature.h
 class Player;
@@ -83,11 +83,11 @@ public:
 	void refreshThing(Tile *t, Thing *thing);
 	void replaceThing(Tile *t, Thing *oldThing, Thing *newThing);
 
-	void getMapChanges(Player *spectator, NetworkMessage &msg);
+	void getMapChanges(Player *spectator);
 
 protected:
 	Map* map;
-	void onRemoveThing(Player *spectator, Thing* thing, NetworkMessage &msg);
+	//void onRemoveThing(Player *spectator, Thing* thing, NetworkMessage &msg);
 	//void getItemChange(Player *spectator, NetworkMessage &msg);
 	void addThingInternal(Tile *t, Thing *thing, bool onlyRegister);
 	bool removeThingInternal(Tile *t, Thing *thing, bool onlyRegister);
@@ -205,11 +205,12 @@ template<class T> class lessPointer : public std::binary_function<T*, T*, bool> 
   * Map class.
   * Holds all the actual map-data
   */
+
 class Map {
   public:
     Map();
     ~Map();
-
+    
 	/** Lock the map */
 	void lock(){OTSYS_THREAD_LOCK(mapLock);};
 
@@ -268,22 +269,21 @@ class Map {
 
 	/** The Map-Lock */
 	OTSYS_THREAD_LOCKVAR mapLock;
-  protected:
+    protected:    
     /**
 	  * Get the Creatures within a specific Range */
 	void getSpectators(const Range& range, std::vector<Creature*>& list);
-
-  typedef std::map<unsigned long, Tile*> TileMap;
-
-	TileMap tileMaps[64][64][MAP_LAYER];
+    
+    typedef std::map<unsigned long, Tile*> TileMap;
+	TileMap tileMaps[32][32][MAP_LAYER];	
 
     void Map::setTile(unsigned short _x, unsigned short _y, unsigned char _z, unsigned short groundId);
-	
+
 	friend class MapState;
 	friend class Game;
 	//FIXME friend for derived classes?
 	friend class IOMapXML;
 	friend class IOMap;
-};
 
+};
 #endif

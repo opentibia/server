@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// implementation of tibia v7.0 protocoll
+// implementation of tibia v7.4 protocoll
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -25,6 +25,7 @@
 #include <iostream>
 #include <sstream>
 
+#include "networkmessage.h"
 #include "protocol74.h"
 
 #include "items.h"
@@ -34,30 +35,31 @@
 #include "player.h"
 #include "status.h"
 
-#include "networkmessage.h"
-
 #include <stdio.h>
 
 #include "luascript.h"
 
 #include "tasks.h"
+#include "otsystem.h"
 
 extern LuaScript g_config;
 std::map<long, Creature*> channel;
 
 Protocol74::Protocol74(SOCKET s)
 {
+  OTSYS_THREAD_LOCKVARINIT(bufferLock)
   this->s = s;
 }
 
 
 Protocol74::~Protocol74()
 {
+	OTSYS_THREAD_LOCKVARRELEASE(bufferLock)
 }
 
 
 bool Protocol74::ConnectPlayer()
-{
+{	
   Status* stat = Status::instance();
   if(stat->playersonline >= g_config.getGlobalNumber("maxplayers") && player->access == 0)
     return false;
@@ -81,7 +83,13 @@ void Protocol74::ReceiveLoop()
   // logout by disconnect?  -> kick
   if (player)
   {
-			 game->removeCreature(player);
+		if(player->inFightTicks >=1000 && player->health >0) {
+			//disconnect?
+			game->removeCreature(player);
+		}
+		else{
+			game->removeCreature(player);
+		}
   }
 }
 
@@ -95,10 +103,10 @@ void Protocol74::parsePacket(NetworkMessage &msg)
 
   if (s && player->health <= 0) {
 	 if (recvbyte == 0x14)
-		parseLogout(msg);
-	     return;
+		parseLogout(msg);		
+	    return;
   }
-
+    
   switch(recvbyte)
   {
     case 0x14: // logout
@@ -192,6 +200,7 @@ void Protocol74::parsePacket(NetworkMessage &msg)
     case 0x69: // client quit without logout 
       break;
     case 0x1E: // keep alive / ping response
+    	player->receivePing();
       break;  
     case 0xC9: // change position
       // update position   
@@ -213,6 +222,7 @@ void Protocol74::parsePacket(NetworkMessage &msg)
          parseDebug(msg);
          break;  
   }
+  game->flushSendBuffers();  
 				//so we got the action, now we ask the map to execut it
 /*  if(action.type!=ACTION_NONE){
   	switch(map->requestAction(player, &action)){
@@ -255,7 +265,7 @@ void Protocol74::GetTileDescription(const Tile* tile, NetworkMessage &msg)
 		ItemVector::const_iterator it;
 		for (it = tile->topItems.begin(); ((it !=tile->topItems.end()) && (count < 10)); ++it)
 		{
-  		msg.AddItem(*it);
+			msg.AddItem(*it);
 			count++;
 		}
 
@@ -265,14 +275,14 @@ void Protocol74::GetTileDescription(const Tile* tile, NetworkMessage &msg)
 			bool known;
 			unsigned long removedKnown;
 			checkCreatureAsKnown((*itc)->getID(), known, removedKnown);
-  		msg.AddCreature(*itc, known, removedKnown);
+			AddCreature(msg,*itc, known, removedKnown);
 			count++;
 		}
 
 
 		for (it = tile->downItems.begin(); ((it !=tile->downItems.end()) && (count < 10)); ++it)
 		{
-  		msg.AddItem(*it);
+			msg.AddItem(*it);
 			count++;
 		}
 	}
@@ -282,16 +292,16 @@ void Protocol74::GetMapDescription(unsigned short x, unsigned short y, unsigned 
                                    unsigned short width, unsigned short height,
                                    NetworkMessage &msg)
 {
-  Tile* tile;
-  int skip = -1;
-  int startz, endz, offset, zstep, cc = 0;
-  if (z > 7) {
+	Tile* tile;
+	int skip = -1;
+	int startz, endz, offset, zstep, cc = 0;
+	if (z > 7) {
 		//startz = std::min(z + 2, MAP_LAYER - 1);
 		//endz = std::max(z - 2, 6 /*(8 - 2)*/);
         startz = z - 2;   
 		endz = std::min(MAP_LAYER - 1, z + 2);
 		zstep = 1;
-  }
+	}
 	else {
 		startz = 7;
 		endz = 0;
@@ -432,7 +442,7 @@ void Protocol74::parseCloseChannel(NetworkMessage &msg){
      std::map<long, Creature*>::iterator sit = channel.find(player->getID());
      if( sit != channel.end() ) {
           channel.erase(sit);
-         }
+     }
 }
 
 void Protocol74::parseOpenPriv(NetworkMessage &msg){
@@ -441,14 +451,14 @@ void Protocol74::parseOpenPriv(NetworkMessage &msg){
      Creature* c = game->getCreatureByName(receiver.c_str());
      Player* player = dynamic_cast<Player*>(c);
      if(player) 
-     sendOpenPriv(receiver);
-     }
+     	sendOpenPriv(receiver);
+}
 
 void Protocol74::sendOpenPriv(std::string &receiver){
      NetworkMessage newmsg; 
      newmsg.AddByte(0xAD); 
-     newmsg.AddString(receiver); 
-     newmsg.WriteToSocket(s);
+     newmsg.AddString(receiver);      
+     WriteBuffer(newmsg);
 }     
 
 void Protocol74::parseCancelMove(NetworkMessage &msg)
@@ -559,7 +569,7 @@ void Protocol74::parseTurnEast(NetworkMessage &msg)
 {
   game->creatureTurn(player, EAST);
   NetworkMessage newmsg;
-  newmsg.WriteToSocket(s);
+  WriteBuffer(newmsg);
 }
 
 
@@ -604,23 +614,47 @@ void Protocol74::parseRequestOutfit(NetworkMessage &msg)
 		  msg.AddByte(PLAYER_MALE_7);
   }
 
-
-  msg.WriteToSocket(s);
+	WriteBuffer(msg);
 }
 
 
 void Protocol74::sendSetOutfit(const Creature* creature) {
-if (CanSee(creature->pos.x, creature->pos.y, creature->pos.z)) {
-	NetworkMessage newmsg;
-	newmsg.AddByte(0x8E);
-	newmsg.AddU32(creature->getID());
-	newmsg.AddByte(creature->looktype);
-	newmsg.AddByte(creature->lookhead);
-	newmsg.AddByte(creature->lookbody);
-	newmsg.AddByte(creature->looklegs);
-	newmsg.AddByte(creature->lookfeet);
-	newmsg.WriteToSocket(s);
+	if (CanSee(creature->pos.x, creature->pos.y, creature->pos.z)) {
+		NetworkMessage newmsg;
+		newmsg.AddByte(0x8E);
+		newmsg.AddU32(creature->getID());
+		newmsg.AddByte(creature->looktype);
+		newmsg.AddByte(creature->lookhead);
+		newmsg.AddByte(creature->lookbody);
+		newmsg.AddByte(creature->looklegs);
+		newmsg.AddByte(creature->lookfeet);
+		WriteBuffer(newmsg);
+	}
 }
+
+void Protocol74::sendInventory(unsigned char sl_id){	
+	NetworkMessage msg;
+	AddPlayerInventoryItem(msg,player,sl_id);
+	WriteBuffer(msg);
+}
+
+void Protocol74::sendStats(){
+	NetworkMessage msg;
+	AddPlayerStats(msg,player);
+	WriteBuffer(msg);
+}
+
+void Protocol74::sendTextMessage(MessageClasses mclass, const char* message){
+	NetworkMessage msg;
+	AddTextMessage(msg,mclass, message);
+	WriteBuffer(msg);
+}
+
+void Protocol74::sendTextMessage(MessageClasses mclass, const char* message,const Position &pos, unsigned char type){
+	NetworkMessage msg;
+	AddMagicEffect(msg,pos,type);
+	AddTextMessage(msg,mclass, message);
+	WriteBuffer(msg);
 }
 
 void Protocol74::sendChannels(){
@@ -640,20 +674,18 @@ void Protocol74::sendChannels(){
 	 newmsg.AddByte(0x04);
 	 newmsg.AddByte(0x00);
 	 newmsg.AddString("Game-Chat");
-	 newmsg.WriteToSocket(s);
-	 
+	 WriteBuffer(newmsg);
 }
 
 void Protocol74::sendChannel(unsigned short channelId){
      NetworkMessage newmsg;
      if(channelId == 4){
-	 newmsg.AddByte(0xAC);
+		newmsg.AddByte(0xAC);
 	 
-	 newmsg.AddU16(channelId);
+		newmsg.AddU16(channelId);
 	 
-	 newmsg.AddString("Game-Chat");
-	 
-	 newmsg.WriteToSocket(s);
+		newmsg.AddString("Game-Chat");
+		WriteBuffer(newmsg);
      }
 	 
 }
@@ -662,8 +694,8 @@ void Protocol74::sendIcons(int icons){
      NetworkMessage newmsg;
 	 newmsg.AddByte(0xA2);
 	 newmsg.AddByte(icons);
-	 newmsg.WriteToSocket(s);
-     }
+	 WriteBuffer(newmsg);
+}
 
 void Protocol74::parseSetOutfit(NetworkMessage &msg)
 {
@@ -730,7 +762,7 @@ void Protocol74::parseUseItemEx(NetworkMessage &msg)
 							msg.AddByte(from_z);
 						}
 					}
-					msg.WriteToSocket(s);
+					WriteBuffer(msg);
 					//sendContainerUpdated(runeitem, containerid, 0xFF, from_z, 0xFF, true);
 				}
 			}
@@ -748,7 +780,7 @@ void Protocol74::parseUseItemEx(NetworkMessage &msg)
 					player->items[from_y] = NULL;
 					delete runeitem;
 					NetworkMessage netmsgs;
-					netmsgs.AddPlayerInventoryItem(player, from_y);
+					AddPlayerInventoryItem(netmsgs,player, from_y);
 					player->sendNetworkMessage(&netmsgs);
 				}
 			}
@@ -808,8 +840,7 @@ void Protocol74::sendContainer(unsigned char index, Container *container)
 	for (cit = container->getItems(); cit != container->getEnd(); ++cit) {
 		msg.AddItem(*cit);
 	}
-
-	msg.WriteToSocket(s);
+	WriteBuffer(msg);
 }
 
 void Protocol74::parseUseItem(NetworkMessage &msg)
@@ -913,8 +944,7 @@ void Protocol74::parseCloseContainer(NetworkMessage &msg)
 
 	msg.AddByte(0x6F);
 	msg.AddByte(containerid);
-
-	msg.WriteToSocket(s);
+	WriteBuffer(msg);
 }
 
 void Protocol74::parseUpArrowContainer(NetworkMessage &msg)
@@ -930,20 +960,6 @@ void Protocol74::parseUpArrowContainer(NetworkMessage &msg)
 		sendContainer(containerid, parentcontainer);
 	}
 }
-
-
-/*void Protocol74::parseUseItem(Action* action, NetworkMessage &msg){
-	action->type=ACTION_ITEM_USE;
-	action->pos1.x=(unsigned char)msg[2]*256+(unsigned char)msg[1];
-	action->pos1.y=(unsigned char)msg[4]*256+(unsigned char)msg[3];
-	action->pos1.z=(unsigned char)msg[5];
-	action->stack=(unsigned char)msg[8];
-	action->creature=creature;
-
-}
-*/
-
-
 
 void Protocol74::parseThrow(NetworkMessage &msg)
 {
@@ -1044,7 +1060,7 @@ void Protocol74::parseLookAt(NetworkMessage &msg){
 
 #ifdef __DEBUG__
 	ss << "You look at " << LookPos << " and see Item # " << ItemNum << ".";
-  newmsg.AddTextMessage(MSG_INFO, ss.str().c_str());
+  AddTextMessage(newmsg,MSG_INFO, ss.str().c_str());
 #else
 	Item *item = NULL;
 	Creature *creature = NULL;
@@ -1073,13 +1089,13 @@ void Protocol74::parseLookAt(NetworkMessage &msg){
 	}
 
 	if(item) {
-		newmsg.AddTextMessage(MSG_INFO, item->getDescription().c_str());
+		AddTextMessage(newmsg,MSG_INFO, item->getDescription().c_str());
 	}
 	else if(creature) {
 		if(player == creature)
-			newmsg.AddTextMessage(MSG_INFO, creature->getDescription(true).c_str());
+			AddTextMessage(newmsg,MSG_INFO, creature->getDescription(true).c_str());
 	else
-		newmsg.AddTextMessage(MSG_INFO, creature->getDescription().c_str());
+		AddTextMessage(newmsg,MSG_INFO, creature->getDescription().c_str());
 	}
 #endif
   
@@ -1125,116 +1141,6 @@ void Protocol74::parseSay(NetworkMessage &msg)
       game->creatureBroadcastMessage(player, text);
       break;
   }
-
-	//we should check if this was a command
-  /*
-	if(msg[4]=='!'){
-		action->type=ACTION_NONE;
-		Position mypos=player->pos;
-		int id;
-		std::string tmpstr, tmpstr2;
-		int count;
-		unsigned int space;
-		Action* a = new Action;
-		switch(msg[5]){
-		case 'q':
-		  exit(0);
-		  break;
-		case 's':
-//		  map->saveMapXml();
-		  break;
-		case 'd':
-		  switch(player->lookdir){
-		  case 0:
-		    mypos.y-=1;
-		    break;
-		  case 1:
-		    mypos.x+=1;
-		    break;
-		  case 2:
-		    mypos.y+=1;
-		    break;
-		  case 3:
-		    mypos.x-=1;
-		    break;
-		  }
-		  map->removeItem(mypos);
-		  break;
-		case 'i':
-		  switch(player->lookdir){
-		  case 0:
-		    mypos.y-=1;
-		    break;
-		  case 1:
-		    mypos.x+=1;
-		    break;
-		  case 2:
-		    mypos.y+=1;
-		    break;
-		  case 3:
-		    mypos.x-=1;
-		    break;
-		  }
-
-		  tmpstr=msg.substr(7,msg.length()-7);
-		  space=tmpstr.find(" ", 0);
-		  if(space==tmpstr.npos)
-		    tmpstr2="0";
-		  else
-		    tmpstr2=tmpstr.substr(space,tmpstr.length()-space);
-#ifdef __DEBUG__
-		  std::cout << tmpstr << std::endl;
-#endif
-		  id=atoi(tmpstr.c_str());
-		  count=atoi(tmpstr2.c_str());
-
-		  a->type=ACTION_CREATE_ITEM;
-		  a->id=id;
-		  a->pos1=mypos;
-		  a->count=count;
-		  if(map->summonItem(a)==TMAP_ERROR_NO_COUNT)
-		    sendPlayerSorry("You need to specify a count when you summon this item!");
-		  delete a;
-		  break;
-
-		  
-	      
-		case 'g':
-		  switch(player->lookdir){
-		  case 0:
-		    mypos.y-=1;
-		    break;
-		  case 1:
-		    mypos.x+=1;
-		    break;
-		  case 2:
-		    mypos.y+=1;
-		    break;
-		  case 3:
-		    mypos.x-=1;
-		    break;
-		  }
-
-		  tmpstr=msg.substr(7,msg.length()-7);
-#ifdef __DEBUG__
-		  std::cout << tmpstr << std::endl;
-#endif
-		  id=atoi(tmpstr.c_str());
-#ifdef __DEBUG__
-		  std::cout << id << std::endl;
-#endif
-		  map->changeGround(mypos,  id);
-		  break;
-
-		}
-		return;
-	}
-	action->type=ACTION_SAY;
-	action->playername=player->name;
-	msg.erase(0,4);
-	action->buffer=msg;
-	action->pos1=player->pos;
-  */
 }
 
 void Protocol74::parseAttack(NetworkMessage &msg)
@@ -1388,7 +1294,7 @@ bool Protocol74::CanSee(int x, int y, int z) const
 
 void Protocol74::sendNetworkMessage(NetworkMessage *msg)
 {
-  msg->WriteToSocket(s);
+	WriteBuffer(*msg);
 }
 
 
@@ -1421,7 +1327,7 @@ void Protocol74::sendTileUpdated(const Position &pos)
   NetworkMessage msg;
 	
 	GetTileUpdated(pos, msg);
-  msg.WriteToSocket(s);
+	WriteBuffer(msg);
 }
 
 /*
@@ -1468,11 +1374,8 @@ void Protocol74::sendThingMove(const Creature *creature,
 		//Auto-close container's
 		if(std::abs(player->pos.x - toContainer->pos.x) > 1 || std::abs(player->pos.y - toContainer->pos.y) > 1) {
 			const Container *container = dynamic_cast<const Container*>(item);
-			if(container) {
-				unsigned char cid = player->getContainerID(container);
-				if(cid != 0xFF) {
-					autoCloseContainers(container, msg);
-				}
+			if(container) {				
+				autoCloseContainers(container, msg);
 			}
 		}
 	}
@@ -1544,8 +1447,7 @@ void Protocol74::sendThingMove(const Creature *creature,
 			}
 		}
 	}
-
-	msg.WriteToSocket(s);
+	WriteBuffer(msg);
 }
 
 //inventory to container
@@ -1559,10 +1461,9 @@ void Protocol74::sendThingMove(const Creature *creature, slots_t fromSlot, const
 	if(creature == player) {
 		sendThingMove(creature, (Container*)NULL, toContainer, item, 0, 0, count, count);
 
-		msg.AddPlayerInventoryItem(player, fromSlot);
+		AddPlayerInventoryItem(msg,player, fromSlot);
 	}
-
-	msg.WriteToSocket(s);
+	WriteBuffer(msg);
 }
 
 //container to inventory
@@ -1576,10 +1477,9 @@ void Protocol74::sendThingMove(const Creature *creature, const Container *fromCo
 	if(creature == player) {
 		sendThingMove(creature, fromContainer, (Container*)NULL, item, from_slotid, 0, count, count);
 
-		msg.AddPlayerInventoryItem(player, toSlot);
+		AddPlayerInventoryItem(msg,player, toSlot);
 	}
-
-	msg.WriteToSocket(s);
+	WriteBuffer(msg);
 }
 
 //container to ground
@@ -1596,17 +1496,13 @@ void Protocol74::sendThingMove(const Creature *creature, const Container *fromCo
 	//Auto-close container's
 	else if(std::abs(player->pos.x - newPos->x) > 1 || std::abs(player->pos.y - newPos->y) > 1) {
 		const Container *container = dynamic_cast<const Container*>(item);
-		if(container) {
-			unsigned char cid = player->getContainerID(container);
-			if(cid != 0xFF) {
-				autoCloseContainers(container, msg);
-			}
+		if(container) {			
+			autoCloseContainers(container, msg);			
 		}
 	}
 
 	if(CanSee(item->pos.x, item->pos.y, item->pos.z)) {
-		msg.AddByte(0x6A);
-		msg.AddPosition(item->pos);
+		AddAppearThing(msg,item->pos);
 		msg.AddItem(item);
 	}
 
@@ -1620,8 +1516,7 @@ void Protocol74::sendThingMove(const Creature *creature, const Container *fromCo
 			msg.AddByte(from_slotid);
 		}
 	}
-
-	msg.WriteToSocket(s);
+	WriteBuffer(msg);
 }
 
 //inventory to ground
@@ -1632,32 +1527,27 @@ void Protocol74::sendThingMove(const Creature *creature, slots_t fromSlot,
 
 	//Update up-arrow (if container)
 	if(creature == player) {
-		if(std::abs(player->pos.x - newPos->x) <= 1 && std::abs(player->pos.y - newPos->y) <= 1) {
+		if(std::abs(player->pos.x - newPos->x) <= 1 && std::abs(player->pos.y - newPos->y) <= 1 && player->pos.z == newPos->z ) {
 			//
 		}
 		//Auto-close container's
 		else {
 			const Container *container = dynamic_cast<const Container*>(item);
-			if(container) {
-				unsigned char cid = player->getContainerID(container);
-				if(cid != 0xFF) {
-					autoCloseContainers(container, msg);
-				}
+			if(container) {								
+				autoCloseContainers(container, msg);				
 			}
 		}
 	}
 
 	if(CanSee(item->pos.x, item->pos.y, item->pos.z)) {
-		msg.AddByte(0x6A);
-		msg.AddPosition(item->pos);
+		AddAppearThing(msg,item->pos);		
 		msg.AddItem(item);
 	}
 	
 	if(creature == player) {
-		msg.AddPlayerInventoryItem(player, fromSlot);
+		AddPlayerInventoryItem(msg,player, fromSlot);
 	}
-
-	msg.WriteToSocket(s);
+	WriteBuffer(msg);
 }
 
 //ground to container
@@ -1674,19 +1564,14 @@ void Protocol74::sendThingMove(const Creature *creature, const Position *oldPos,
 	else if((toContainer->pos.x == 0xFFFF) || (std::abs(player->pos.x - toContainer->pos.x) > 1 ||
 																						 std::abs(player->pos.y - toContainer->pos.y) > 1)) {
 		const Container *container = dynamic_cast<const Container*>(item);
-		if(container) {
-			unsigned char cid = player->getContainerID(container);
-			if(cid != 0xFF) {
-				autoCloseContainers(container, msg);
-			}
+		if(container) {			
+			autoCloseContainers(container, msg);		
 		}
 	}
 	//
 
 	if(CanSee(oldPos->x, oldPos->y, oldPos->z)) {
-		msg.AddByte(0x6C);
-		msg.AddPosition(*oldPos);
-		msg.AddByte(stackpos);
+		AddRemoveThing(msg,*oldPos,stackpos);
 	}
 
 	Tile *fromTile = game->getTile(oldPos->x, oldPos->y, oldPos->z);
@@ -1714,8 +1599,7 @@ void Protocol74::sendThingMove(const Creature *creature, const Position *oldPos,
 			msg.AddItem(item);
 		}
 	}
-
-	msg.WriteToSocket(s);
+	WriteBuffer(msg);
 }
 
 //ground to inventory
@@ -1724,27 +1608,20 @@ void Protocol74::sendThingMove(const Creature *creature, const Position *oldPos,
 {
 	NetworkMessage msg;
 	if(creature == player) {
-		msg.AddPlayerInventoryItem(player, toSlot);
-		//
+		AddPlayerInventoryItem(msg,player, toSlot);		
 	}
 	else {
 		const Container *container = dynamic_cast<const Container*>(item);
 		//Auto-closing containers
-		if(container) {
-			unsigned char cid = player->getContainerID(container);
-			if(cid != 0xFF) {
-				autoCloseContainers(container, msg);
-			}
+		if(container) {			
+			autoCloseContainers(container, msg);						
 		}
 	}
 
 	if(CanSee(oldPos->x, oldPos->y, oldPos->z)) {
-		msg.AddByte(0x6C);
-		msg.AddPosition(*oldPos);
-		msg.AddByte(stackpos);
+		AddRemoveThing(msg,*oldPos,stackpos);		
 	}
-
-	msg.WriteToSocket(s);
+	WriteBuffer(msg);
 }
 
 //ground to ground
@@ -1765,31 +1642,27 @@ void Protocol74::sendThingMove(const Creature *creature, const Thing *thing,
   {
     if (CanSee(oldPos->x, oldPos->y, oldPos->z))
     {
-      msg.AddByte(0x6C);
-      msg.AddPosition(*oldPos);
-      msg.AddByte(oldStackPos);
+		AddRemoveThing(msg,*oldPos,oldStackPos);      
     }
 
     if (!(tele && thing == this->player) && CanSee(thing->pos.x, thing->pos.y, thing->pos.z))
     {
-      msg.AddByte(0x6A);
-      msg.AddPosition(thing->pos);
+		AddAppearThing(msg,thing->pos);      
       if (c) {
         bool known;
         unsigned long removedKnown;
         checkCreatureAsKnown(((Creature*)thing)->getID(), known, removedKnown);
-  			msg.AddCreature((Creature*)thing, known, removedKnown);
+  			AddCreature(msg,(Creature*)thing, known, removedKnown);
       }
 			else {
         msg.AddItem((Item*)thing);
 
 				//Auto-close container's
-				if(std::abs(player->pos.x - thing->pos.x) > 1 || std::abs(player->pos.y - thing->pos.y) > 1) {
-					const Container *container = dynamic_cast<const Container*>(thing);
-					if(container) {
-						unsigned char cid = player->getContainerID(container);
-						if(cid != 0xFF) {
-							autoCloseContainers(container, msg);
+				if(thing->pos.x != 0xFFFF){
+					if(std::abs(player->pos.x - thing->pos.x) > 1 || std::abs(player->pos.y - thing->pos.y) > 1 || player->pos.z != thing->pos.z ) {
+						const Container *container = dynamic_cast<const Container*>(thing);
+						if(container) {						
+							autoCloseContainers(container, msg);						
 						}
 					}
 				}
@@ -1855,8 +1728,7 @@ void Protocol74::sendThingMove(const Creature *creature, const Thing *thing,
 			//creatureBroadcastTileUpdated(newthing->pos /*&oldPos*/);
 		}
 	}
-
-	msg.WriteToSocket(s);
+	WriteBuffer(msg);
 }
 
 
@@ -1882,11 +1754,10 @@ void Protocol74::autoCloseContainers(const Container *container, NetworkMessage 
 		msg.AddByte(*it);
 	}						
 }
-
+/*
 void Protocol74::sendCreatureAppear(const Creature *creature)
 {
   NetworkMessage msg;
-
   if ((creature != player) && CanSee(creature->pos.x, creature->pos.y, creature->pos.z))
   {
    // msg.AddByte(0xD3);
@@ -1896,23 +1767,21 @@ void Protocol74::sendCreatureAppear(const Creature *creature)
     unsigned long removedKnown;
     checkCreatureAsKnown(creature->getID(), known, removedKnown);
 
-    msg.AddByte(0x6A);
-    msg.AddPosition(creature->pos);
-  	msg.AddCreature(creature, known, removedKnown);
+	AddAppearThing(msg,creature->pos);    
+  	AddCreature(msg,creature, known, removedKnown);
 
     // login bubble
-    msg.AddMagicEffect(creature->pos, 0x0A);
+    AddMagicEffect(msg,creature->pos, 0x0A);
 
     //msg.AddByte(0x8D);
     //msg.AddU32(creature->getID());
     //msg.AddByte(0xFF); // 00
     //msg.AddByte(0xFF);
-
-    msg.WriteToSocket(s);
+	WriteBuffer(msg);
   }
   else if (creature == player)
-  {
-	  msg.AddByte(0x0A);
+  {		
+	msg.AddByte(0x0A);
     msg.AddU32(player->getID());
 
     msg.AddByte(0x32);
@@ -1923,9 +1792,9 @@ void Protocol74::sendCreatureAppear(const Creature *creature)
     msg.AddPosition(player->pos);
     GetMapDescription(player->pos.x-8, player->pos.y-6, player->pos.z, 18, 14, msg);
 
-	  msg.AddMagicEffect(player->pos, 0x0A);
+	AddMagicEffect(msg,player->pos, 0x0A);
 
-    msg.AddPlayerStats(player);
+	AddPlayerStats(msg,player);	
 
     msg.AddByte(0x82);
     msg.AddByte(0x6F); //LIGHT LEVEL
@@ -1934,45 +1803,41 @@ void Protocol74::sendCreatureAppear(const Creature *creature)
     /*msg.AddByte(0x8d);//8d
     msg.AddU32(player->getID());
     msg.AddByte(0x03);//00
-    msg.AddByte(0xd7);//d7*/
-
-    msg.AddPlayerSkills(player);
-
-    msg.AddPlayerInventoryItem(player, 1);
-    msg.AddPlayerInventoryItem(player, 2);
-    msg.AddPlayerInventoryItem(player, 3);
-    msg.AddPlayerInventoryItem(player, 4);
-    msg.AddPlayerInventoryItem(player, 5);
-    msg.AddPlayerInventoryItem(player, 6);
-    msg.AddPlayerInventoryItem(player, 7);
-    msg.AddPlayerInventoryItem(player, 8);
-    msg.AddPlayerInventoryItem(player, 9);
-    msg.AddPlayerInventoryItem(player, 10);
-
-
-    msg.AddTextMessage(MSG_EVENT, g_config.getGlobalString("loginmsg", "Welcome.").c_str());
-
-	  msg.WriteToSocket(s);
+    msg.AddByte(0xd7);//d7//
+    
+    AddPlayerSkills(msg,player);
+    
+    AddPlayerInventoryItem(msg,player, 1);
+    AddPlayerInventoryItem(msg,player, 2);
+    AddPlayerInventoryItem(msg,player, 3);
+    AddPlayerInventoryItem(msg,player, 4);
+    AddPlayerInventoryItem(msg,player, 5);
+    AddPlayerInventoryItem(msg,player, 6);
+    AddPlayerInventoryItem(msg,player, 7);
+    AddPlayerInventoryItem(msg,player, 8);
+    AddPlayerInventoryItem(msg,player, 9);
+    AddPlayerInventoryItem(msg,player, 10);
+	
+    AddTextMessage(msg,MSG_EVENT, g_config.getGlobalString("loginmsg", "Welcome.").c_str());
+	WriteBuffer(msg);
+	//force flush
+	flushOutputBuffer();	
   }
 }
-
-
+*/
+/*
 void Protocol74::sendCreatureDisappear(const Creature *creature, unsigned char stackPos)
-{
+{	
   if ((creature != player) && CanSee(creature->pos.x, creature->pos.y, creature->pos.z))
   {
     NetworkMessage msg;
+    AddMagicEffect(msg,creature->pos, NM_ME_PUFF);
 
-    msg.AddMagicEffect(creature->pos, NM_ME_PUFF);
-
-    msg.AddByte(0x6c);
-    msg.AddPosition(creature->pos);
-    msg.AddByte(stackPos);
-
-    msg.WriteToSocket(s);
+	AddRemoveThing(msg,creature->pos,stackpos);
+	WriteBuffer(msg);
   }
 }
-
+*/
 /*
 void Protocol74::sendItemChange(const Creature *creature, unsigned char stackPos, const Item* item)
 {
@@ -2004,8 +1869,7 @@ void Protocol74::sendCreatureTurn(const Creature *creature, unsigned char stackP
     msg.AddByte(0x00);
     msg.AddU32(creature->getID());
     msg.AddByte(creature->getDirection());
-
-    msg.WriteToSocket(s);
+	WriteBuffer(msg);
   }
 }
 
@@ -2013,32 +1877,28 @@ void Protocol74::sendCreatureTurn(const Creature *creature, unsigned char stackP
 void Protocol74::sendCreatureSay(const Creature *creature, unsigned char type, const std::string &text)
 {
   NetworkMessage msg;
-
-  msg.AddCreatureSpeak(creature, type, text, 0);
-  
-  msg.WriteToSocket(s);
+  AddCreatureSpeak(msg,creature, type, text, 0);
+  WriteBuffer(msg);
 }
 
 void Protocol74::sendToChannel(const Creature * creature, unsigned char type, const std::string &text, unsigned short channelId){
-     NetworkMessage msg;
-
-  msg.AddCreatureSpeak(creature, type, text, channelId);
-  
-  msg.WriteToSocket(s);
-     }
+  NetworkMessage msg;
+  AddCreatureSpeak(msg,creature, type, text, channelId);
+  WriteBuffer(msg);
+}
 
 void Protocol74::sendCancel(const char *msg)
 {
   NetworkMessage netmsg;
-  netmsg.AddTextMessage(MSG_SMALLINFO, msg);
-  netmsg.WriteToSocket(s);
+  AddTextMessage(netmsg,MSG_SMALLINFO, msg);
+  WriteBuffer(netmsg);
 }
 
 void Protocol74::sendCancelAttacking()
 {
   NetworkMessage netmsg;
   netmsg.AddByte(0xa3);
-  netmsg.WriteToSocket(s);
+  WriteBuffer(netmsg);
 }
 
 void Protocol74::sendChangeSpeed(const Creature *creature)
@@ -2048,15 +1908,336 @@ void Protocol74::sendChangeSpeed(const Creature *creature)
   
   netmsg.AddU32(creature->getID());
   netmsg.AddU16(creature->getSpeed());
-  
-  netmsg.WriteToSocket(s);
+  WriteBuffer(netmsg);
 }
 
 void Protocol74::sendCancelWalk(const char *msg)
 {
   NetworkMessage netmsg;
-  netmsg.AddTextMessage(MSG_SMALLINFO, msg);
+  AddTextMessage(netmsg,MSG_SMALLINFO, msg);
   netmsg.AddByte(0xB5);
   netmsg.AddByte(player->getDirection()); // direction
-  netmsg.WriteToSocket(s);
+  WriteBuffer(netmsg);
 }
+
+void Protocol74::sendThingDisappear(const Thing *thing, unsigned char stackPos)
+{	
+	const Creature* creature = dynamic_cast<const Creature*>(thing);
+	NetworkMessage msg;
+	if(creature){
+		const Player* remove_player = dynamic_cast<const Player*>(creature);
+		if(remove_player == player)
+			return;
+		if(CanSee(creature->pos.x, creature->pos.y, creature->pos.z)){    	
+    		AddMagicEffect(msg,thing->pos, NM_ME_PUFF);
+		}
+	}
+	AddRemoveThing(msg,thing->pos,stackPos);
+	WriteBuffer(msg);
+}
+
+void Protocol74::sendThingAppear(const Thing *thing){
+	NetworkMessage msg;
+	const Creature* creature = dynamic_cast<const Creature*>(thing);
+	if(creature){
+		const Player* add_player = dynamic_cast<const Player*>(creature);
+		if(add_player == player){
+			msg.AddByte(0x0A);
+    		msg.AddU32(player->getID());
+
+		    msg.AddByte(0x32);
+    		msg.AddByte(0x00);
+
+    		msg.AddByte(0x00);
+    		msg.AddByte(0x64);
+    		msg.AddPosition(player->pos);
+    		GetMapDescription(player->pos.x-8, player->pos.y-6, player->pos.z, 18, 14, msg);
+
+			AddMagicEffect(msg,player->pos, 0x0A);
+
+			AddPlayerStats(msg,player);	
+
+		    msg.AddByte(0x82);
+    		msg.AddByte(0x6F); //LIGHT LEVEL
+    		msg.AddByte(0xd7);//light? (seems constant)
+
+    		/*msg.AddByte(0x8d);//8d
+    		msg.AddU32(player->getID());
+    		msg.AddByte(0x03);//00
+    		msg.AddByte(0xd7);//d7*/
+    
+    		AddPlayerSkills(msg,player);
+    
+    		AddPlayerInventoryItem(msg,player, 1);
+    		AddPlayerInventoryItem(msg,player, 2);
+    		AddPlayerInventoryItem(msg,player, 3);
+    		AddPlayerInventoryItem(msg,player, 4);
+    		AddPlayerInventoryItem(msg,player, 5);
+    		AddPlayerInventoryItem(msg,player, 6);
+    		AddPlayerInventoryItem(msg,player, 7);
+    		AddPlayerInventoryItem(msg,player, 8);
+    		AddPlayerInventoryItem(msg,player, 9);
+    		AddPlayerInventoryItem(msg,player, 10);
+	
+    		AddTextMessage(msg,MSG_EVENT, g_config.getGlobalString("loginmsg", "Welcome.").c_str());
+			WriteBuffer(msg);
+			//force flush
+			flushOutputBuffer();
+			return;
+		}
+		else if(CanSee(creature->pos.x, creature->pos.y, creature->pos.z)){
+			bool known;
+    		unsigned long removedKnown;
+    		checkCreatureAsKnown(creature->getID(), known, removedKnown);
+			AddAppearThing(msg,creature->pos);    
+  			AddCreature(msg,creature, known, removedKnown);
+    		// login bubble
+    		AddMagicEffect(msg,creature->pos, 0x0A);     
+		}
+	}
+	else{
+		const Item *item = dynamic_cast<const Item*>(thing);
+		if(item){
+			AddAppearThing(msg,item->pos);
+			msg.AddItem(item);
+		}
+	}
+    WriteBuffer(msg);
+}
+
+void Protocol74::sendSkills()
+{
+  NetworkMessage msg;
+  AddPlayerSkills(msg,player);
+  WriteBuffer(msg);
+}
+
+void Protocol74::sendPing()
+{
+  NetworkMessage msg;
+  msg.AddByte(0x1E);
+  WriteBuffer(msg);
+}
+
+void Protocol74::sendThingRemove(const Thing *thing){
+	NetworkMessage msg;
+	const Container *container = dynamic_cast<const Container *>(thing);
+	if(container) {
+		//Auto-close container's
+		autoCloseContainers(container, msg);		
+	}
+	WriteBuffer(msg);
+}
+
+void Protocol74::sendDistanceShoot(const Position &from, const Position &to, unsigned char type){
+	NetworkMessage msg;
+	AddDistanceShoot(msg,from, to,type );
+	WriteBuffer(msg);
+}
+void Protocol74::sendMagicEffect(const Position &pos, unsigned char type){
+	NetworkMessage msg;
+	AddMagicEffect(msg,pos,type );
+	WriteBuffer(msg);
+}
+void Protocol74::sendAnimatedText(const Position &pos, unsigned char color, std::string text){
+	NetworkMessage msg;
+	AddAnimatedText(msg,pos,color,text);
+	WriteBuffer(msg);
+}
+void Protocol74::sendCreatureHealth(const Creature *creature){
+	NetworkMessage msg;
+	AddCreatureHealth(msg,creature);
+	WriteBuffer(msg);
+}
+
+
+////////////// before at NetwrokMessage class
+void Protocol74::AddTextMessage(NetworkMessage &msg,MessageClasses mclass, const char* message)
+{
+  msg.AddByte(0xB4);
+  msg.AddByte(mclass);
+  msg.AddString(message);
+}
+
+void Protocol74::AddAnimatedText(NetworkMessage &msg,const Position &pos, unsigned char color, std::string text)
+{
+#ifdef __DEBUG__
+	if(text.length() == 0) {
+		std::cout << "Warning: 0-Length string in AddAnimatedText()" << std::endl;
+	}
+#endif
+
+  msg.AddByte(0x84); 
+  msg.AddPosition(pos);
+  msg.AddByte(color);
+  msg.AddString(text);
+}
+
+
+void Protocol74::AddMagicEffect(NetworkMessage &msg,const Position &pos, unsigned char type)
+{
+  msg.AddByte(0x83);
+  msg.AddPosition(pos);
+  msg.AddByte(type);
+}
+
+
+void Protocol74::AddDistanceShoot(NetworkMessage &msg,const Position &from, const Position &to, unsigned char type)
+{
+  msg.AddByte(0x85); 
+  msg.AddPosition(from);
+  msg.AddPosition(to);
+  msg.AddByte(type);
+}
+
+
+void Protocol74::AddCreature(NetworkMessage &msg,const Creature *creature, bool known, unsigned int remove)
+{
+  if (known)
+  {
+    msg.AddByte(0x62);
+    msg.AddByte(0x00);
+    msg.AddU32(creature->getID());
+  }
+  else
+  {
+    msg.AddByte(0x61);
+    msg.AddByte(0x00);
+		//AddU32(0);
+	msg.AddU32(remove);
+    msg.AddU32(creature->getID());
+    msg.AddString(creature->getName());
+  }
+
+  msg.AddByte(creature->health*100/creature->healthmax);
+  msg.AddByte((unsigned char)creature->getDirection());
+
+  msg.AddByte(creature->looktype);
+  msg.AddByte(creature->lookhead);
+  msg.AddByte(creature->lookbody);
+  msg.AddByte(creature->looklegs);
+  msg.AddByte(creature->lookfeet);
+
+  msg.AddByte(0x00); //
+  msg.AddByte(0xDC); // 
+
+  msg.AddU16(creature->getSpeed());
+  
+  msg.AddByte(0x00); //
+  msg.AddByte(0x00); //
+}
+
+
+void Protocol74::AddPlayerStats(NetworkMessage &msg,const Player *player)
+{
+  msg.AddByte(0xA0);
+  msg.AddU16(player->health);
+  msg.AddU16(player->healthmax);
+  msg.AddU16(player->cap);
+  msg.AddU32(player->experience);
+  msg.AddByte(player->level);
+  msg.AddByte(player->level_percent);
+  msg.AddU16(player->mana);
+  msg.AddU16(player->manamax);
+  msg.AddByte(player->maglevel);
+  msg.AddByte(player->maglevel_percent);
+}
+
+void Protocol74::AddPlayerSkills(NetworkMessage &msg,const Player *player)
+{
+  msg.AddByte(0xA1);
+
+  msg.AddByte(player->skills[SKILL_FIST  ][SKILL_LEVEL]);
+  msg.AddByte(player->skills[SKILL_FIST  ][SKILL_PERCENT]);
+  msg.AddByte(player->skills[SKILL_CLUB  ][SKILL_LEVEL]);
+  msg.AddByte(player->skills[SKILL_CLUB  ][SKILL_PERCENT]);
+  msg.AddByte(player->skills[SKILL_SWORD ][SKILL_LEVEL]);
+  msg.AddByte(player->skills[SKILL_SWORD  ][SKILL_PERCENT]);
+  msg.AddByte(player->skills[SKILL_AXE   ][SKILL_LEVEL]);
+  msg.AddByte(player->skills[SKILL_AXE  ][SKILL_PERCENT]);
+  msg.AddByte(player->skills[SKILL_DIST  ][SKILL_LEVEL]);
+  msg.AddByte(player->skills[SKILL_DIST  ][SKILL_PERCENT]);
+  msg.AddByte(player->skills[SKILL_SHIELD][SKILL_LEVEL]);
+  msg.AddByte(player->skills[SKILL_SHIELD  ][SKILL_PERCENT]);
+  msg.AddByte(player->skills[SKILL_FISH  ][SKILL_LEVEL]);
+  msg.AddByte(player->skills[SKILL_FISH  ][SKILL_PERCENT]);
+}
+
+
+void Protocol74::AddPlayerInventoryItem(NetworkMessage &msg,const Player *player, int item)
+{
+  if (player->getItem(item) == NULL)
+  {
+    msg.AddByte(0x79);
+    msg.AddByte(item);
+  }
+  else
+  {
+    msg.AddByte(0x78);
+    msg.AddByte(item);
+    msg.AddItem(player->getItem(item));
+  }
+}
+
+
+void Protocol74::AddCreatureSpeak(NetworkMessage &msg,const Creature *creature, unsigned char type, std::string text, unsigned short channelId)
+{
+  msg.AddByte(0xAA);
+  msg.AddString(creature->getName());
+  msg.AddByte(type);
+  if (type <= 3 || type == 16 || type == SPEAK_MONSTER)
+    msg.AddPosition(creature->pos);
+  if(type == 5)
+    msg.AddU16(channelId);
+  msg.AddString(text);
+}
+
+void Protocol74::AddCreatureHealth(NetworkMessage &msg,const Creature *creature)
+{
+  msg.AddByte(0x8C);
+  msg.AddU32(creature->getID());
+  msg.AddByte(creature->health*100/creature->healthmax);
+}
+
+void Protocol74::AddRemoveThing(NetworkMessage &msg, const Position &pos,unsigned char stackpos){
+	msg.AddByte(0x6C);
+	msg.AddPosition(pos);
+	msg.AddByte(stackpos);
+}
+
+void Protocol74::AddAppearThing(NetworkMessage &msg, const Position &pos){
+	msg.AddByte(0x6A);
+	msg.AddPosition(pos);
+}
+
+
+//////////////////////////
+
+void Protocol74::flushOutputBuffer(){
+	OTSYS_THREAD_LOCK(bufferLock)
+	//force writetosocket	
+	OutputBuffer.WriteToSocket(s);
+	OutputBuffer.Reset();
+	player->SendBuffer = false;	
+	OTSYS_THREAD_UNLOCK(bufferLock)
+	return;
+}
+
+void Protocol74::WriteBuffer(NetworkMessage &add){		
+	OTSYS_THREAD_LOCK(bufferLock)
+	if(player->SendBuffer == false){
+		game->addPlayerBuffer(player);
+		player->SendBuffer = true;		
+	}	
+	if(OutputBuffer.getMessageLength() + add.getMessageLength() > NETWORKMESSAGE_MAXSIZE){		
+		OTSYS_THREAD_UNLOCK(bufferLock)
+		this->flushOutputBuffer();		
+		OTSYS_THREAD_LOCK(bufferLock)
+		player->SendBuffer = true;
+	}	
+	OutputBuffer.JoinMessages(add);	
+	OTSYS_THREAD_UNLOCK(bufferLock)	
+  	return;
+}
+
+

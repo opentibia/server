@@ -1,3 +1,22 @@
+//////////////////////////////////////////////////////////////////////
+// OpenTibia - an opensource roleplaying game
+//////////////////////////////////////////////////////////////////////
+// 
+//////////////////////////////////////////////////////////////////////
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software Foundation,
+// Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+//////////////////////////////////////////////////////////////////////
 
 
 #ifndef __OTTHREAD_H__
@@ -23,6 +42,7 @@
 #define OTSYS_THREAD_LOCKVAR CRITICAL_SECTION
 
 #define OTSYS_THREAD_LOCKVARINIT(a) InitializeCriticalSection(&a);
+#define OTSYS_THREAD_LOCKVARRELEASE(a) DeleteCriticalSection(&a);
 #define OTSYS_THREAD_LOCK(a)        EnterCriticalSection(&a);
 #define OTSYS_THREAD_UNLOCK(a)      LeaveCriticalSection(&a);
 
@@ -103,6 +123,9 @@ inline void OTSYS_THREAD_LOCKVARINIT(OTSYS_THREAD_LOCKVAR& l) {
 		  pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE_NP);
 		  pthread_mutex_init(&l, &attr);
 }
+
+#define OTSYS_THREAD_LOCKVARRELEASE(a)  //todo: working macro
+
 #define OTSYS_THREAD_LOCK(a)          pthread_mutex_lock(&a);
 #define OTSYS_THREAD_UNLOCK(a)        pthread_mutex_unlock(&a);
 #define OTSYS_THREAD_TIMEOUT			  ETIMEDOUT

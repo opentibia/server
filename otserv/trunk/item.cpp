@@ -64,7 +64,6 @@ Item::Item(const unsigned short _type) {
 	id = _type;
 	count = 0;
 	chargecount = 0;
-
 	throwRange = 6;
 }
 
@@ -91,7 +90,6 @@ Item::Item(const unsigned short _type, unsigned char _count) {
 		count = _count;
 	else
 		chargecount = _count;
-
 	throwRange = 6;
 }
 
@@ -100,7 +98,6 @@ Item::Item()
 	id = 0;
 	count = 0;
 	chargecount = 0;
-		
 	throwRange = 6;
 }
 

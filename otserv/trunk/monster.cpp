@@ -36,6 +36,7 @@ Monster::Monster(const char *name, Game* game) :
  ,AutoList<Monster>(id)
  ,Creature(name, id)
 {
+	//std::cout << "Monster constructor " << (unsigned long)this  <<std::endl;		
 	oldThinkTicks = 0;
 	loaded = false;
 	isfleeing = false;
@@ -265,13 +266,10 @@ Monster::Monster(const char *name, Game* game) :
 					tmp = tmp->next;
 				}
 			}
-
-			/*
-			if (strcmp(str, "loot") == 0) {
-				//TODO implement loot
-			}
-			*/
-				
+			else if (strcmp(str, "loot") == 0) {
+				//lootItems.clear();
+				//LoadLootNode(p->children);
+			}			
 			p = p->next;
 		}
 
@@ -279,13 +277,178 @@ Monster::Monster(const char *name, Game* game) :
 	}
 
 }
+/*
+bool Monster::LoadLootNode(xmlNodePtr tmp){
+	unsigned short s_id;
+	char *sxml;
+	Item *tmpItem;
+	while(tmp){
+		s_id = 0;
+		sxml = (char*)xmlGetProp(tmp, (const xmlChar *) "id");
+		if(sxml){
+			s_id = atoi(sxml);
+		}
+		if(s_id != 0){					
+			if(Item::items[s_id].stackable == false){
+				tmpItem = LoadLootItem(tmp,s_id);
+			}
+			else{
+				tmpItem = LoadLootItemStackable(tmp,s_id);
+			}
+			if(tmpItem){				
+				lootItems.push_back(tmpItem);
+				Container* loot_container = dynamic_cast<Container*>(tmpItem);
+				if(loot_container) {
+					LoadLootContainer(tmp ,loot_container);
+					//removes empty container
+					if(loot_container->size() == 0){
+						lootItems.pop_back();
+						delete tmpItem;
+					}
+				}
+			}//tmpitem
+		}//s_id != 0
+		tmp=tmp->next;
+	}
+	return true;
+}
 
+Item* Monster::LoadLootItemStackable(xmlNodePtr tmp,unsigned short id){	
+	Item *tmpItem;
+	float chance1;
+	float chancemax;
+	unsigned char countmax,n;
+	
+	char *s_count = (char*)xmlGetProp(tmp, (const xmlChar *) "countmax");
+	if(s_count) {
+		countmax = atoi(s_count);
+	}
+	else{
+		std::cout << "missing countmax for loot id = "<< id << std::endl;
+		countmax = 1;
+	}
+	char* s_chance = (char*)xmlGetProp(tmp, (xmlChar*)"chancemax");
+    if (s_chance){
+		chancemax = std::abs(atof(s_chance));
+		if(chancemax > 1.0)
+			chancemax = 0.0;
+	}
+	else{
+		std::cout << "missing chancemax for loot id = "<< id << std::endl;
+		chancemax = 0.0;
+	}
+	s_chance = (char*)xmlGetProp(tmp, (xmlChar*)"chance1");
+    if (s_chance){
+		chance1 = std::abs(atof(s_chance));
+		if(chance1 > 1.0)
+			chance1 = 1.0;
+	}
+	else{
+		std::cout << "missing chance1 for loot id = "<< id << std::endl;
+		chance1 = 1.0;
+	}
+	if(chance1 <= chancemax){
+		std::cout << "Wrong chance for loot id = "<< id << std::endl;
+		return NULL;
+	}
+	
+	float randvalue = GetRandom();
+	
+	if(randvalue < chance1){
+		if(randvalue < chancemax){
+			n = countmax;
+		}
+		else{
+			//if  chancemax < randvalue < chance1
+			//get number of items using a linear relation between
+			// n and chances
+			n = (unsigned char)(countmax*(randvalue-chancemax)/(chance1-chancemax));
+		}		
+		tmpItem = Item::CreateItem(id,n);
+	}
+	else{
+		tmpItem = NULL;
+	}
+	return tmpItem;
+}
+
+Item* Monster::LoadLootItem(xmlNodePtr tmp,unsigned short id){
+	Item *tmpItem;
+	float chance;
+	char* s_chance = (char*)xmlGetProp(tmp, (xmlChar*)"chance");
+    if (s_chance){
+		chance = atof(s_chance);
+		if(chance > 1.0)
+			chance = 1.0;
+	}
+	else{		
+		std::cout << "missing chance for loot id = "<< id << std::endl;
+		chance = 1.0;
+	}
+	if(GetRandom() < chance){
+		tmpItem = Item::CreateItem(id,0);
+	}
+	else{
+		tmpItem = NULL;
+	}
+	return tmpItem;
+}
+*/
+float Monster::GetRandom(){
+	return (float)(rand()/(RAND_MAX+1.0));
+}
+/*
+bool Monster::LoadLootContainer(xmlNodePtr nodeitem,Container* ccontainer){
+	xmlNodePtr tmp,p;
+	unsigned short s_id;	
+	Item *new_item;	
+	if(nodeitem==NULL){
+		return false;
+	}
+	tmp=nodeitem->children;
+	if(tmp==NULL){		
+		return false;
+	}	
+	while(tmp){		
+		if (strcmp((const char*)tmp->name, "inside") == 0){			
+			p=tmp->children;
+			while(p){
+				s_id = atoi((const char*)xmlGetProp(p, (const xmlChar *) "id"));				
+				if(s_id != 0){				
+					if(Item::items[s_id].stackable == false){
+						new_item = LoadLootItem(p,s_id);
+					}
+					else{
+						new_item = LoadLootItemStackable(p,s_id);
+					}						
+					if(new_item){						
+						ccontainer->addItem(new_item);
+						Container* in_container = dynamic_cast<Container*>(new_item);
+						if(in_container){
+							LoadLootContainer(p,in_container);
+							//removes empty container
+							if(in_container->size() == 0){
+								ccontainer->removeItem(new_item);
+								delete new_item;
+							}
+						}
+					}//new_item
+				}//s_id!=0
+				p=p->next;
+			}
+			return true;
+		} // inside
+		tmp = tmp->next;
+	}
+	return false;
+}
+*/
 Monster::~Monster()
 {
 	for(std::map<PhysicalAttackClass*, TimeProbabilityClass>::iterator it = physicalAttacks.begin(); it != physicalAttacks.end(); ++it) {
 		delete it->first;
 	}
-	
+	//std::cout << "Monster destructor " << (unsigned long)this  <<std::endl;
 	physicalAttacks.clear();
 }
 
@@ -606,6 +769,9 @@ int Monster::getWeaponDamage() const
 
 void Monster::dropLoot(Container *corpse)
 {
+	/*for(std::vector<Item*>::iterator cit = lootItems.begin(); cit != lootItems.end(); ++cit) {		
+		corpse->addItem(*cit);
+	}*/
 	corpse->addItem(Item::CreateItem(2392));
 }
 

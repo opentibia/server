@@ -131,6 +131,12 @@ private:
 	void calcMovePosition();
 	bool isInRange(const Position &pos);
 	Creature* findTarget();
+	//bool LoadLootNode(xmlNodePtr);
+	//bool LoadLootContainer(xmlNodePtr,Container*);	
+	//Item* LoadLootItemStackable(xmlNodePtr,unsigned short);
+	//Item* LoadLootItem(xmlNodePtr,unsigned short);
+	float GetRandom();
+
 
 protected:
 	PhysicalAttackClass	*curPhysicalAttack;

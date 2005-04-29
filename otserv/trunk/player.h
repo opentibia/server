@@ -61,8 +61,9 @@ public:
 	void setGUID(unsigned long _guid) {guid = _guid;};
 	unsigned long getGUID() const { return guid;};
 
+
 	static const unsigned long min_id = 16777217U;
-	static const unsigned long max_id = 4294967295U;	
+	static const unsigned long max_id = 4294967295U;
 
   void speak(const std::string &text);
 
@@ -75,7 +76,6 @@ public:
 	unsigned char getContainerID(const Container* container) const;
 	void addContainer(unsigned char containerid, Container *container);
 	void closeContainer(unsigned char containerid);
-	int sendInventory();
 
 	Item* getItem(int pos) const;
 	Item* GetDistWeapon() const;
@@ -85,7 +85,12 @@ public:
   int sex, voc;
   int cap;
   int food;
+  unsigned char level_percent;
+  unsigned char maglevel_percent;
   bool cancelMove;
+  bool SendBuffer;
+  long internal_ping;
+  long npings;
   virtual int getWeaponDamage() const;
   virtual int getArmor() const;
   virtual int getDefense() const;
@@ -123,21 +128,38 @@ public:
   fight_t getFightType();
 	subfight_t getSubFightType();
 
-  void sendIcons();
   bool CanSee(int x, int y, int z) const;
-  void addSkillTry(int skilltry);
+
+  void sendIcons();  
   void sendNetworkMessage(NetworkMessage *msg);
   void sendCancelAttacking();
   void sendChangeSpeed(Creature* creature);
   void sendToChannel(Creature *creature, unsigned char type, const std::string &text, unsigned short channelId);
-  void die();      //player loses exp/skills/maglevel on death
-  
   virtual void sendCancel(const char *msg);
-  virtual void sendCancelWalk(const char *msg);
+  virtual void sendCancelWalk(const char *msg);  
+  int sendInventory(unsigned char sl_id);
+  void sendStats();
+  void sendTextMessage(MessageClasses mclass, const char* message);
+  void sendTextMessage(MessageClasses mclass, const char* message,const Position &pos, unsigned char type);
+  void sendPing();
+  void receivePing();
+  void flushMsg();
+
+  void addSkillTry(int skilltry);
+  void die();      //player loses exp/skills/maglevel on death
+
   virtual void setAttackedCreature(unsigned long id);
   virtual bool isAttackable() const { return (access == 0); };
   virtual bool isPushable() const { return (access == 0); };
 	virtual void dropLoot(Container *corpse);
+	bool NeedUpdateStats();	
+	void onThingDisappear(const Thing* thing, unsigned char stackPos);
+    void onThingAppear(const Thing* thing);  
+    void onThingRemove(const Thing* thing);
+    void sendDistanceShoot(const Position &from, const Position &to, unsigned char type);
+    void sendMagicEffect(const Position &pos, unsigned char type);
+    void sendAnimatedText(const Position &pos, unsigned char color, std::string text);
+    void sendCreatureHealth(const Creature *creature);
 
 protected:
   int useCount;
@@ -186,14 +208,27 @@ protected:
 		unsigned char oldstackpos, unsigned char oldcount, unsigned char count);
 
 	Protocol *client;
+	//cache some data
 	struct SkillCache{
 		unsigned int tries;
 		int level;
 		int voc;
 	};
 	SkillCache SkillAdvanceCache[7][2];
+	struct SentStats{
+		int health;
+		int healthmax;
+		unsigned long experience;
+		int level;
+		int cap;
+		int mana;
+		int manamax;
+		int manaspent;
+		int maglevel;
+	};
+	SentStats lastSentStats;
 	// we need our name
-	std::string name;
+	std::string name;	
 	unsigned long guid;
 };
 

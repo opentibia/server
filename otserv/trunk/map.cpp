@@ -45,7 +45,7 @@ using namespace std;
 #include "player.h"
 #include "tools.h"
 
-#include "networkmessage.h"
+//#include "networkmessage.h"
 
 #include "npc.h"
 #include "spells.h"
@@ -194,7 +194,7 @@ void MapState::replaceThing(Tile *t, Thing *oldThing, Thing *newThing)
 	}
 	*/
 }
-
+/*
 void MapState::onRemoveThing(Player *spectator, Thing* thing, NetworkMessage &msg)
 {
 	Container *container = dynamic_cast<Container *>(thing);
@@ -231,8 +231,8 @@ void MapState::onRemoveThing(Player *spectator, Thing* thing, NetworkMessage &ms
 		}
 	}
 }
-
-void MapState::getMapChanges(Player *spectator, NetworkMessage &msg)
+*/
+void MapState::getMapChanges(Player *spectator)
 {
 	std::vector<Tile*> tileUpdatedVec; //keep track of tiles that already been updated
 
@@ -270,7 +270,7 @@ void MapState::getMapChanges(Player *spectator, NetworkMessage &msg)
 			for(thIt = changesItemMapIt->second.begin(); thIt != changesItemMapIt->second.end(); ++thIt) {
 				//Auto-closing containers
 				if(thIt->type == CHANGE_REMOVE) {
-					onRemoveThing(spectator, thIt->thing, msg);
+					spectator->onThingRemove(thIt->thing);
 				}
 			}
 
@@ -285,9 +285,9 @@ void MapState::getMapChanges(Player *spectator, NetworkMessage &msg)
 
 			if(thIt->type == CHANGE_REMOVE) {
 				if(thIt->stackpos < 10) {
-					msg.AddByte(0x6c);
-					msg.AddPosition(thIt->oldPos);
-					msg.AddByte(thIt->stackpos);
+					Thing dis_thing;
+					dis_thing.pos = thIt->oldPos;					
+					spectator->onThingDisappear(&dis_thing,thIt->stackpos);
 				}
 				else {
 					//This will cause some problem, we remove an item (example: a player gets removed due to death) from the map, but the client cant see it
@@ -296,22 +296,9 @@ void MapState::getMapChanges(Player *spectator, NetworkMessage &msg)
 					//and will show the player as alive (0 hp).
 					//Solution: re-log.
 				}
-
 				//Auto-closing containers
-				onRemoveThing(spectator, thIt->thing, msg);
-
-				/*
-				Container *container = dynamic_cast<Container *>(thIt->thing);
-				if(container) {
-					unsigned char cid = spectator->getContainerID(container);
-
-					if(cid != 0xFF) {
-						spectator->closeContainer(cid);
-						msg.AddByte(0x6F);
-						msg.AddByte(cid);
-					}
-				}
-				*/
+				spectator->onThingRemove(thIt->thing);
+			
 			}
 			/*else if(thIt->type == CHANGE_TRANSFORM) {
 				Item *item = dynamic_cast<Item*>(thIt->thing);
@@ -323,12 +310,20 @@ void MapState::getMapChanges(Player *spectator, NetworkMessage &msg)
 				}
 			}*/
 			else if(thIt->type == CHANGE_ADD) {
-				Item *item = dynamic_cast<Item*>(thIt->thing);
-				if(item) {
-					msg.AddByte(0x6a);
+					Item *item = dynamic_cast<Item*>(thIt->thing);
+					if(item) {
+						Item dis_item;
+						dis_item.setID(item->getID());
+						dis_item.setItemCountOrSubtype(item->getItemCountOrSubtype());
+						dis_item.pos = thIt->oldPos;
+						
+						Thing *pdis_thing = dynamic_cast<Thing*>(&dis_item);
+						spectator->onThingAppear(pdis_thing);
+					}
+				/*	msg.AddByte(0x6a);
 					msg.AddPosition(thIt->oldPos);
 					msg.AddItem(item);
-				}
+				}*/
 			}
 		}
 	}
@@ -387,7 +382,8 @@ Tile* Map::getTile(unsigned short _x, unsigned short _y, unsigned char _z)
   if (_z < MAP_LAYER)
   {
     // _x & 0x3F  is like _x % 64
-    TileMap *tm = &tileMaps[_x & 1][_y & 1][_z];
+	// _x & 0x1F  is like _x % 32
+    TileMap *tm = &tileMaps[_x & 0x1F][_y & 0x1F][_z];
 
     // search in the stl map for the requested tile
     TileMap::iterator it = tm->find((_x << 16) | _y);
@@ -419,7 +415,7 @@ void Map::setTile(unsigned short _x, unsigned short _y, unsigned char _z, unsign
 		if(groundId != 0 && Item::items[groundId].groundtile) {
 			tile->ground = Item::CreateItem(groundId);
 		}
-    tileMaps[_x & 1][_y & 1][_z][(_x << 16) | _y] = tile;
+    tileMaps[_x & 0x1F][_y & 0x1F][_z][(_x << 16) | _y] = tile;
   }  
 }
 

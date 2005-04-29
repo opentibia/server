@@ -24,7 +24,12 @@
 #include "position.h"
 #include "item.h"
 
-#include "networkmessage.h"
+#include "const74.h"
+class Creature;
+class Player;
+class Item;
+class Position;
+
 #include "tools.h"
 
 enum attacktype_t {
@@ -76,11 +81,11 @@ public:
 
 	virtual int getDamage(Creature* target, const Creature* attacker = NULL) const;
 
-	virtual void getMagicEffect(const Player* spectator, const Creature* attacker, const Creature* target,
-		const Position& pos, int damage, bool isPz, bool isBlocking, NetworkMessage &msg) const;
+	virtual void getMagicEffect(Player* spectator, const Creature* attacker, const Creature* target,
+		const Position& pos, int damage, bool isPz, bool isBlocking) const;
 
-	virtual void getDistanceShoot(const Player* spectator, const Creature* c, const Position& to,
-		bool hasTarget, NetworkMessage &msg) const;
+	virtual void getDistanceShoot(Player* spectator, const Creature* c, const Position& to,
+		bool hasTarget) const;
 
 	virtual void getArea(const Position& rcenterpos, MagicAreaVec& list) const;
 
@@ -88,8 +93,8 @@ public:
 
 	virtual bool canCast(bool isBlocking, bool hasCreature) const;
 
-	virtual void FailedToCast(const Player* spectator, const Creature* attacker,
-		bool isBlocking, bool hasTarget, NetworkMessage &msg) const;
+	virtual void FailedToCast(Player* spectator, const Creature* attacker,
+		bool isBlocking, bool hasTarget) const;
 
 	int minDamage;
 	int maxDamage;
@@ -111,11 +116,11 @@ public:
 	MagicEffectTargetClass();
 	virtual ~MagicEffectTargetClass() {};
 
-	virtual void getMagicEffect(const Player* spectator, const Creature* attacker, const Creature* target,
-		const Position& pos, int damage, bool isPz, bool isBlocking, NetworkMessage &msg) const;
+	virtual void getMagicEffect(Player* spectator, const Creature* attacker, const Creature* target,
+		const Position& pos, int damage, bool isPz, bool isBlocking) const;
 	
-	virtual void getDistanceShoot(const Player* spectator, const Creature* attacker, const Position& to,
-		bool hasTarget, NetworkMessage &msg) const;
+	virtual void getDistanceShoot(Player* spectator, const Creature* attacker, const Position& to,
+		bool hasTarget) const;
 
 	virtual bool canCast(bool isBlocking, bool hasCreature) const
 	{
@@ -144,11 +149,11 @@ public:
 
 	virtual int getDamage(Creature *target, const Creature *attacker = NULL) const;
 
-	virtual void getMagicEffect(const Player* spectator, const Creature* attacker, const Creature* target,
-		const Position& pos, int damage, bool isPz, bool isBlocking, NetworkMessage &msg) const;
+	virtual void getMagicEffect(Player* spectator, const Creature* attacker, const Creature* target,
+		const Position& pos, int damage, bool isPz, bool isBlocking) const;
 
 	virtual void getDistanceShoot(const Creature* c, const Position& to,
-		bool hasTarget, NetworkMessage &msg) const
+		bool hasTarget) const
 	{
 		//this class shouldn't have any distance shoots, just return.
 	}
@@ -254,18 +259,18 @@ public:
 		return 0;
 	}
 
-	virtual void getMagicEffect(const Player* spectator, const Creature* attacker, const Creature* target,
-		const Position& pos, int damage, bool isPz, bool isBlocking, NetworkMessage &msg) const;
+	virtual void getMagicEffect(Player* spectator, const Creature* attacker, const Creature* target,
+		const Position& pos, int damage, bool isPz, bool isBlocking) const;
 
-	virtual void getDistanceShoot(const Player* spectator, const Creature* attacker, const Position& to,
-		bool hasTarget, NetworkMessage &msg) const;
+	virtual void getDistanceShoot(Player* spectator, const Creature* attacker, const Position& to,
+		bool hasTarget) const;
 
 	virtual MagicEffectItem* getMagicItem(const Creature* attacker, bool isPz, bool isBlocking) const;
 
 	virtual bool canCast(bool isBlocking, bool hasCreature) const;
 
-	virtual void FailedToCast(const Player* spectator, const Creature* attacker,
-		bool isBlocking, bool hasTarget, NetworkMessage &msg) const;
+	virtual void FailedToCast(Player* spectator, const Creature* attacker,
+		bool isBlocking, bool hasTarget) const;
 
 protected:
 	MagicEffectItem* magicItem;
@@ -282,8 +287,8 @@ public:
 		return true;
 	}
 
-	virtual void getMagicEffect(const Player* spectator, const Creature* attacker, const Creature* target,
-		const Position& pos, int damage, bool isPz, bool isBlocking, NetworkMessage &msg) const;
+	virtual void getMagicEffect(Player* spectator, const Creature* attacker, const Creature* target,
+		const Position& pos, int damage, bool isPz, bool isBlocking) const;
 
 	virtual void getArea(const Position& rcenterpos, MagicAreaVec& list) const;
 

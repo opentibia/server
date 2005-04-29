@@ -24,6 +24,7 @@
 
 
 #include <queue>
+#include <vector>
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 
@@ -35,19 +36,21 @@
 #include "monster.h"
 #include "player.h"
 #include "magic.h"
-#include "otsystem.h"
+//#include "otsystem.h"
 #include "map.h"
-
 #include "scheduler.h"
-#include "networkmessage.h"
+//#include "networkmessage.h"
 
 
 class Creature;   // see creature.h
 class Player;
+class SchedulerTask;
+class lessSchedTask;
 
 #define MAP_WIDTH    512
 #define MAP_HEIGHT   512
 #define MAP_LAYER     16
+
 
 /** State of a creature at a given time
   * Keeps track of all the changes to be able to send to the client
@@ -81,7 +84,7 @@ public:
 
 	void onAttack(Creature* attacker, const Position& pos, const MagicEffectClass* me);
 	void onAttack(Creature* attacker, const Position& pos, Creature* attackedCreature);
-	void getChanges(Player* spectator, NetworkMessage &msg);
+	void getChanges(Player* spectator);
 	const CreatureStateVec& getCreatureStateList(Tile* tile) {return creaturestates[tile];};
 	const std::vector<Creature*>& getSpectators() {return spectatorlist;}
 
@@ -189,27 +192,32 @@ class Game {
     void creatureSpeakTo(Creature *creature, const std::string &receiver, const std::string &text);
     void creatureBroadcastMessage(Creature *creature, const std::string &text);
     void creatureToChannel(Creature *creature, unsigned char type, const std::string &text, unsigned short channelId);
-		void creatureMonsterYell(Monster* monster, const std::string& text);
-		void creatureChangeOutfit(Creature *creature);
+	void creatureMonsterYell(Monster* monster, const std::string& text);
+	void creatureChangeOutfit(Creature *creature);
 
-		bool creatureThrowRune(Creature *creature, const Position& centerpos, const MagicEffectClass& me);
-		bool creatureCastSpell(Creature *creature, const Position& centerpos, const MagicEffectClass& me);
-		bool creatureSaySpell(Creature *creature, const std::string &text);
-		bool creatureUseItem(Creature *creature, const Position& pos, Item* item);
+	bool creatureThrowRune(Creature *creature, const Position& centerpos, const MagicEffectClass& me);
+	bool creatureCastSpell(Creature *creature, const Position& centerpos, const MagicEffectClass& me);
+	bool creatureSaySpell(Creature *creature, const std::string &text);
+	bool creatureUseItem(Creature *creature, const Position& pos, Item* item);
     void changeOutfitAfter(unsigned long id, int looktype, long time);
     void changeSpeed(unsigned long id, unsigned short speed);
     void addEvent(long ticks, int type, void *data);
-		void addEvent(SchedulerTask*);
-		void creatureBroadcastTileUpdated(const Position& pos);
-   
+	void addEvent(SchedulerTask*);
+	void creatureBroadcastTileUpdated(const Position& pos);
+      
+   std::vector<Player*> BufferedPlayers;
+   OTSYS_THREAD_LOCKVAR buffervectorLock;
+   void flushSendBuffers();
+   void addPlayerBuffer(Player* p);
    
     Creature* getCreatureByID(unsigned long id);
-		Creature* getCreatureByName(const char* s);
+	Creature* getCreatureByName(const char* s);
 
-		std::list<Position> getPathTo(Creature *creature, Position start, Position to, bool creaturesBlock=true);
+	std::list<Position> getPathTo(Creature *creature, Position start, Position to, bool creaturesBlock=true);
+	
 
 		/** Lockvar for Game. */
-    OTSYS_THREAD_LOCKVAR gameLock;
+    OTSYS_THREAD_LOCKVAR gameLock;    
 
   protected:
 		bool onPrepareMoveThing(Creature *player, const Thing* thing, const Position& fromPos, const Position& toPos);
@@ -257,10 +265,10 @@ class Game {
 		*/
 		void creatureApplyDamage(Creature *creature, int damage, int &outDamage, int &outManaDamage);
 
-		void CreateDamageUpdate(Creature* player, Creature* attackCreature, int damage, NetworkMessage& msg);
+		void CreateDamageUpdate(Creature* player, Creature* attackCreature, int damage);
 		void getSpectators(const Range& range, std::vector<Creature*>& list);
-		void creatureApplyMagicEffect(Creature *target, const MagicEffectClass& me, NetworkMessage& msg);
-		void CreateManaDamageUpdate(Creature* player, Creature* attackCreature, int damage, NetworkMessage& msg);
+		//void creatureApplyMagicEffect(Creature *target, const MagicEffectClass& me, NetworkMessage& msg);
+		void CreateManaDamageUpdate(Creature* player, Creature* attackCreature, int damage);
 
 		OTSYS_THREAD_LOCKVAR eventLock;
 		OTSYS_THREAD_SIGNALVAR eventSignal;
