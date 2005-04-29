@@ -141,7 +141,7 @@ void Npc::onCreatureAppear(const Creature *creature){
 	this->script->onCreatureAppear(creature->getID());
 }
 
-void Npc::onCreatureDisappear(const Creature *creature, unsigned char stackPos){
+void Npc::onCreatureDisappear(const Creature *creature, unsigned char stackPos, bool tele){
 	this->script->onCreatureDisappear(creature->getID());
 }
 

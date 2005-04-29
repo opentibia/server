@@ -684,7 +684,7 @@ void Monster::onCreatureAppear(const Creature *creature)
 	}
 }
 
-void Monster::onCreatureDisappear(const Creature *creature, unsigned char stackPos)
+void Monster::onCreatureDisappear(const Creature *creature, unsigned char stackPos, bool tele)
 {
 	OnCreatureLeave(creature);
 }

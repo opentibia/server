@@ -7,6 +7,7 @@
 
 #include "creature.h"
 #include "tile.h"
+#include "otsystem.h"
 
 using namespace std;
 
@@ -14,9 +15,6 @@ Creature::Creature(const char *name, unsigned long _id) :
  AutoList<Creature>(_id)
  ,access(0)
 {
-	//idcount++;
-  //id         = idcount;
-	//access = 0;
   direction  = NORTH;
 
   this->name = name;
@@ -52,15 +50,11 @@ Creature::Creature(const char *name, unsigned long _id) :
 
 void Creature::drainHealth(int damage)
 {
-  //lastDamage = min(health, damage);
-
   health -= min(health, damage);
 }
 
 void Creature::drainMana(int damage)
 {
-  //lastDamage = min(mana, damage);
-
   mana -= min(mana, damage);
 }
 

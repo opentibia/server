@@ -158,7 +158,7 @@ private:
 	void autoCloseContainers(const Container *container, NetworkMessage &msg);
 
   //rtual void sendCreatureAppear(const Creature *creature);
-  virtual void sendThingDisappear(const Thing *thing, unsigned char stackPos);
+  virtual void sendThingDisappear(const Thing *thing, unsigned char stackPos, bool tele = false);
   virtual void sendThingAppear(const Thing *thing);
   virtual void sendThingRemove(const Thing *thing);
   virtual void sendDistanceShoot(const Position &from, const Position &to, unsigned char type);
@@ -187,7 +187,6 @@ private:
   void flushOutputBuffer();
   void WriteMsg(NetworkMessage &msg);
 
-	void GetTileUpdated(const Position &pos, NetworkMessage &msg);
 	void sendContainer(unsigned char index, Container *container);
 	void sendCloseContainer(unsigned char containerid);
 
@@ -210,6 +209,7 @@ private:
   virtual void AddPlayerSkills(NetworkMessage &msg,const Player *player);
   virtual void AddRemoveThing(NetworkMessage &msg, const Position &pos,unsigned char stackpos);
   virtual void AddAppearThing(NetworkMessage &msg, const Position &pos);
+	virtual void AddTileUpdated(NetworkMessage &msg, const Position &pos);
   
   OTSYS_THREAD_LOCKVAR bufferLock;
    

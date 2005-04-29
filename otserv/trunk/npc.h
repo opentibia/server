@@ -99,7 +99,7 @@ protected:
   virtual void onThingMove(const Player *player, const Thing *thing, const Position *oldPos,
 		unsigned char oldstackpos, unsigned char oldcount, unsigned char count);
   virtual void onCreatureAppear(const Creature *creature);
-  virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos);
+  virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos, bool tele);
   virtual void onCreatureTurn(const Creature *creature, unsigned char stackpos);
   virtual void onCreatureSay(const Creature *creature, unsigned char type, const std::string &text);
   virtual void onCreatureChangeOutfit(const Creature* creature);

@@ -1283,7 +1283,7 @@ void Game::thingMoveInternal(Creature *player, unsigned short from_x, unsigned s
 						}
 					}
 				}
-
+				/*
 				if(fromTile->getThingCount() > 8) {
 #ifdef __DEBUG__
 					cout << "Pop-up item from below..." << std::endl;
@@ -1292,9 +1292,10 @@ void Game::thingMoveInternal(Creature *player, unsigned short from_x, unsigned s
 					Thing *newthing = fromTile->getThingByStackPos(9);
 
 					if(newthing != NULL) {
-						creatureBroadcastTileUpdated(newthing->pos /*&oldPos*/);
+						creatureBroadcastTileUpdated(newthing->pos);
 					}
 				}
+				*/
 			}
     }
   }
@@ -1598,21 +1599,25 @@ void Game::teleport(Creature *creature, Position newPos) {
 
   int osp = from->getThingStackPos(creature);  
   if (from->removeThing(creature)) { 
-    //Tile *destTile;
     to->addThing(creature); 
     Position oldPos = creature->pos;
-    creature->pos = newPos;
             
     std::vector<Creature*> list;
     getSpectators(Range(oldPos, true), list);
-    for(size_t i = 0; i < list.size(); ++i)
-      list[i]->onTileUpdated(oldPos);
+		for(size_t i = 0; i < list.size(); ++i) {
+			list[i]->onCreatureDisappear(creature, osp, true);
+			//list[i]->onTileUpdated(oldPos);
+		}
+
+		creature->pos = newPos;
+
     list.clear();
     getSpectators(Range(creature->pos, true), list);
     for(size_t i = 0; i < list.size(); ++i)
       list[i]->onTeleport(creature, &oldPos, osp);
-  } 
-  OTSYS_THREAD_UNLOCK(gameLock)
+	}
+  
+	OTSYS_THREAD_UNLOCK(gameLock)
 }
 
 

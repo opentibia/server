@@ -1131,15 +1131,15 @@ void Player::onCreatureAppear(const Creature *creature)
 	if(thing)
   		client->sendThingAppear(thing);
 }
-void Player::onCreatureDisappear(const Creature *creature, unsigned char stackPos)
+void Player::onCreatureDisappear(const Creature *creature, unsigned char stackPos, bool tele /*= false*/)
 {
 	const Thing *thing = dynamic_cast<const Thing*>(creature);
 	if(thing)
-  		client->sendThingDisappear(thing, stackPos);
+  		client->sendThingDisappear(thing, stackPos, tele);
 }
 
 void Player::onThingDisappear(const Thing* thing, unsigned char stackPos){
-	client->sendThingDisappear(thing, stackPos);
+	client->sendThingDisappear(thing, stackPos, false);
 }
 
 void Player::onThingAppear(const Thing* thing){
@@ -1175,14 +1175,6 @@ void Player::onTileUpdated(const Position &pos)
 {
   client->sendTileUpdated(pos);
 }
-
-/*
-void Player::onContainerUpdated(Item *item, unsigned char from_id, unsigned char to_id,
-																unsigned char from_slot, unsigned char to_slot, bool remove)
-{
-	client->sendContainerUpdated(item, from_id, to_id, from_slot, to_slot, remove);
-}
-*/
 
 void Player::onTeleport(const Creature *creature, const Position *oldPos, unsigned char oldstackpos) { 
   client->sendThingMove(creature, creature,oldPos, oldstackpos, true, 1, 1); 

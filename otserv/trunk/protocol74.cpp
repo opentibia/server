@@ -1299,8 +1299,12 @@ void Protocol74::sendNetworkMessage(NetworkMessage *msg)
 
 
 
-void Protocol74::GetTileUpdated(const Position &pos, NetworkMessage &msg)
+void Protocol74::AddTileUpdated(NetworkMessage &msg, const Position &pos)
 {
+#ifdef __DEBUG__
+		std::cout << "Pop-up item from below..." << std::endl;
+#endif
+
 	//1D00	69	CF81	587C	07	9501C405C405C405C405C405C405780600C405C40500FF
   if (CanSee(pos.x, pos.y, pos.z))
   {
@@ -1317,8 +1321,6 @@ void Protocol74::GetTileUpdated(const Position &pos, NetworkMessage &msg)
 			msg.AddByte(0x01);
 			msg.AddByte(0xFF);
 		}
-
-		//GetMapDescription(Pos->x, Pos->y, Pos->z, 1, 1, msg);
   }
 }
 
@@ -1326,42 +1328,9 @@ void Protocol74::sendTileUpdated(const Position &pos)
 {
   NetworkMessage msg;
 	
-	GetTileUpdated(pos, msg);
+	AddTileUpdated(msg, pos);
 	WriteBuffer(msg);
 }
-
-/*
-void Protocol74::sendContainerUpdated(Item *item, unsigned char from_id, unsigned char to_id,
-																			unsigned char from_slot, unsigned char to_slot, bool remove)
-{
-	NetworkMessage msg;
-	if(from_id == to_id) {
-		//remove item
-		msg.AddByte(0x72);
-		msg.AddByte(from_id);
-		msg.AddByte(from_slot);
-
-		//add item
-		msg.AddByte(0x70);
-		msg.AddByte(to_id);
-		msg.AddItem(item);
-	}
-	else if(remove) {
-		//remove item
-		msg.AddByte(0x72);
-		msg.AddByte(from_id);
-		msg.AddByte(from_slot);
-	}
-	else
-	{
-		msg.AddByte(0x70);
-		msg.AddByte(to_id);
-		msg.AddItem(item);
-	}
-
-	msg.WriteToSocket(s);
-}
-*/
 
 //container to container
 void Protocol74::sendThingMove(const Creature *creature,
@@ -1574,6 +1543,7 @@ void Protocol74::sendThingMove(const Creature *creature, const Position *oldPos,
 		AddRemoveThing(msg,*oldPos,stackpos);
 	}
 
+	/*
 	Tile *fromTile = game->getTile(oldPos->x, oldPos->y, oldPos->z);
 	if(fromTile && fromTile->getThingCount() > 8) {
 #ifdef __DEBUG__
@@ -1583,9 +1553,10 @@ void Protocol74::sendThingMove(const Creature *creature, const Position *oldPos,
 		Thing *newthing = fromTile->getThingByStackPos(9);
 
 		if(newthing != NULL) {
-			GetTileUpdated(*oldPos, msg);
+			AddTileUpdated(msg, *oldPos);
 		}
 	}
+	*/
 
 	Container *container = NULL;
 	for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
@@ -1637,7 +1608,17 @@ void Protocol74::sendThingMove(const Creature *creature, const Thing *thing,
     msg.AddPosition(*oldPos);
     msg.AddByte(oldStackPos);
     msg.AddPosition(thing->pos);
-  }
+
+		Tile *fromTile = game->getTile(oldPos->x, oldPos->y, oldPos->z);
+		if(fromTile && fromTile->getThingCount() > 8) {
+			//We need to pop up this item
+			Thing *newthing = fromTile->getThingByStackPos(9);
+
+			if(newthing != NULL) {
+				AddTileUpdated(msg, *oldPos);
+			}
+		}
+	}
   else
   {
     if (CanSee(oldPos->x, oldPos->y, oldPos->z))
@@ -1715,6 +1696,7 @@ void Protocol74::sendThingMove(const Creature *creature, const Thing *thing,
 		}
   }	
 
+	/*
 	Tile *fromTile = game->getTile(oldPos->x, oldPos->y, oldPos->z);
 	if(fromTile && fromTile->getThingCount() > 8) {
 #ifdef __DEBUG__
@@ -1724,10 +1706,11 @@ void Protocol74::sendThingMove(const Creature *creature, const Thing *thing,
 		Thing *newthing = fromTile->getThingByStackPos(9);
 
 		if(newthing != NULL) {
-			GetTileUpdated(*oldPos, msg);
-			//creatureBroadcastTileUpdated(newthing->pos /*&oldPos*/);
+			AddTileUpdated(msg, *oldPos);
 		}
 	}
+	*/
+
 	WriteBuffer(msg);
 }
 
@@ -1920,19 +1903,23 @@ void Protocol74::sendCancelWalk(const char *msg)
   WriteBuffer(netmsg);
 }
 
-void Protocol74::sendThingDisappear(const Thing *thing, unsigned char stackPos)
-{	
-	const Creature* creature = dynamic_cast<const Creature*>(thing);
+void Protocol74::sendThingDisappear(const Thing *thing, unsigned char stackPos, bool tele)
+{
 	NetworkMessage msg;
-	if(creature){
-		const Player* remove_player = dynamic_cast<const Player*>(creature);
-		if(remove_player == player)
-			return;
-		if(CanSee(creature->pos.x, creature->pos.y, creature->pos.z)){    	
-    		AddMagicEffect(msg,thing->pos, NM_ME_PUFF);
+
+	if(!tele) {
+		const Creature* creature = dynamic_cast<const Creature*>(thing);
+		if(creature){
+			const Player* remove_player = dynamic_cast<const Player*>(creature);
+			if(remove_player == player)
+				return;
+			if(CanSee(creature->pos.x, creature->pos.y, creature->pos.z)){    	
+    			AddMagicEffect(msg,thing->pos, NM_ME_PUFF);
+			}
 		}
 	}
-	AddRemoveThing(msg,thing->pos,stackPos);
+
+	AddRemoveThing(msg,thing->pos, stackPos);
 	WriteBuffer(msg);
 }
 
@@ -2200,9 +2187,28 @@ void Protocol74::AddCreatureHealth(NetworkMessage &msg,const Creature *creature)
 }
 
 void Protocol74::AddRemoveThing(NetworkMessage &msg, const Position &pos,unsigned char stackpos){
-	msg.AddByte(0x6C);
-	msg.AddPosition(pos);
-	msg.AddByte(stackpos);
+	if(stackpos < 10) {
+		msg.AddByte(0x6C);
+		msg.AddPosition(pos);
+		msg.AddByte(stackpos);
+	}
+	else {
+		//This will cause some problem, we remove an item (example: a player gets removed due to death) from the map, but the client cant see it
+		//(above the 9 limit), real tibia has the same problem so I don't think there is a way to fix this.
+		//Problem: The client won't be informed that the player has been killed
+		//and will show the player as alive (0 hp).
+		//Solution: re-log.
+	}
+
+	Tile *fromTile = game->getTile(pos.x, pos.y, pos.z);
+	if(fromTile && fromTile->getThingCount() > 8) {
+		//We need to pop up this item
+		Thing *newthing = fromTile->getThingByStackPos(9);
+
+		if(newthing != NULL) {
+			AddTileUpdated(msg, pos);
+		}
+	}
 }
 
 void Protocol74::AddAppearThing(NetworkMessage &msg, const Position &pos){

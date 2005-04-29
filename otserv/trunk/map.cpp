@@ -171,67 +171,8 @@ void MapState::replaceThing(Tile *t, Thing *oldThing, Thing *newThing)
 		tc.stackpos = stackpos;
 		vec.push_back(tc);
 	}
-
-	/*
-	//First change to this tile?
-	if(!isTileStored(t)) {
-		addTile(t, oldThing->pos);
-	}
-
-	std::vector<tilechangedata>& vec = changesItemMap[t];
-
-	Position oldPos = oldThing->pos;
-	int stackpos = t->getThingStackPos(oldThing);
-
-	if(t->insertThing(newThing, stackpos)) {
-		tilechangedata tc;
-		tc.oldPos = oldPos;
-		tc.thing = newThing;
-
-		tc.type = CHANGE_TRANSFORM;
-		tc.stackpos = stackpos;
-		vec.push_back(tc);
-	}
-	*/
 }
-/*
-void MapState::onRemoveThing(Player *spectator, Thing* thing, NetworkMessage &msg)
-{
-	Container *container = dynamic_cast<Container *>(thing);
-	if(container) {
-		unsigned char cid = spectator->getContainerID(container);
 
-		if(cid != 0xFF) {
-			std::vector<unsigned char> containerlist;
-
-			for(containerLayout::const_iterator cit = spectator->getContainers(); cit != spectator->getEndContainer(); ++cit) {
-				Container *tmpcontainer = cit->second;
-
-				if(tmpcontainer == container) {
-					containerlist.push_back(cit->first);
-				}
-				else {
-					//Check if its a child container.
-					while(tmpcontainer != NULL) {
-						tmpcontainer = tmpcontainer->getParent();
-						if(tmpcontainer == container) {
-							containerlist.push_back(cit->first);
-							break;
-						}
-					}
-				}
-			}
-
-			for(std::vector<unsigned char>::iterator it = containerlist.begin(); it != containerlist.end(); ++it) {
-				spectator->closeContainer(*it);
-
-				msg.AddByte(0x6F);
-				msg.AddByte(*it);
-			}
-		}
-	}
-}
-*/
 void MapState::getMapChanges(Player *spectator)
 {
 	std::vector<Tile*> tileUpdatedVec; //keep track of tiles that already been updated
@@ -252,10 +193,6 @@ void MapState::getMapChanges(Player *spectator)
 				tileUpdatedVec.push_back(targettile);
 				((Creature*)spectator)->onTileUpdated(preChangeItemMapIt->second.pos);
 			}
-
-#if __DEBUG__
-			std::cout << "pop-up item" << std::endl;
-#endif
 		}
 	}
 
@@ -338,16 +275,6 @@ void MapState::addTile(Tile *t, Position& tilepos)
 		pd.isBlocking = t->isBlocking();
 	}
 }
-
-/*
-const TilePreChangeData& MapState::getStoredProperties(Tile *t)
-{
-	if(isTileStored(t)) {
-		return preChangeItemMap[t];
-	}
-	else return dummyData;
-}
-*/
 
 Map::Map()
 {

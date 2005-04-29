@@ -177,7 +177,7 @@ protected:
 		unsigned char oldstackpos, unsigned char oldcount, unsigned char count);
 
   virtual void onCreatureAppear(const Creature *creature);
-  virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos);
+  virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos, bool tele);
   virtual void onTeleport(const Creature *creature, const Position *oldPos, unsigned char oldstackpos);
 
 	virtual bool isAttackable() const { return true; };
