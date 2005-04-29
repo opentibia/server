@@ -241,9 +241,14 @@ std::string Item::getDescription() const
 					s << "1";
 				s << "x)." << std::endl;
 			}
-			else if(isWeapon())
+			else if(isWeapon() && (getAttack() || getDefense()))
 			{
-				s << "You see a " << items[id].name << " (Atk:" << (int)getAttack() << " Def:" << (int)getDefense() << ")." << std::endl;
+				if(getAttack() != 0){					
+					s << "You see a " << items[id].name << " (Atk:" << (int)getAttack() << " Def:" << (int)getDefense() << ")." << std::endl;					
+				}
+				else{
+					s << "You see a " << items[id].name << " (Def:" << (int)getDefense() << ")." << std::endl;
+				}				
 			}
 			else if(getArmor())
 			{

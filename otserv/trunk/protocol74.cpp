@@ -1635,19 +1635,16 @@ void Protocol74::sendThingMove(const Creature *creature, const Thing *thing,
         checkCreatureAsKnown(((Creature*)thing)->getID(), known, removedKnown);
   			AddCreature(msg,(Creature*)thing, known, removedKnown);
       }
-			else {
-        msg.AddItem((Item*)thing);
-
-				//Auto-close container's
-				if(thing->pos.x != 0xFFFF){
-					if(std::abs(player->pos.x - thing->pos.x) > 1 || std::abs(player->pos.y - thing->pos.y) > 1 || player->pos.z != thing->pos.z ) {
-						const Container *container = dynamic_cast<const Container*>(thing);
-						if(container) {						
-							autoCloseContainers(container, msg);						
-						}
-					}
-				}
+	  else {
+        	msg.AddItem((Item*)thing);
+			//Auto-close container's				
+			if(std::abs(player->pos.x - thing->pos.x) > 1 || std::abs(player->pos.y - thing->pos.y) > 1 || player->pos.z != thing->pos.z ) {
+				const Container *container = dynamic_cast<const Container*>(thing);
+				if(container) {						
+					autoCloseContainers(container, msg);						
+				}					
 			}
+		}
     }
   }
 	
@@ -1685,7 +1682,7 @@ void Protocol74::sendThingMove(const Creature *creature, const Thing *thing,
 
 			//Only add those we need to close
 			if(container && container->pos.x != 0xFFFF) {
-				if(std::abs(player->pos.x - container->pos.x) > 1 || std::abs(player->pos.y - container->pos.y) > 1) {
+				if(std::abs(player->pos.x - container->pos.x) > 1 || std::abs(player->pos.y - container->pos.y) > 1 || player->pos.z != container->pos.z) {
 					containers.push_back(cit->second);
 				}
 			}

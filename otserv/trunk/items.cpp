@@ -422,6 +422,8 @@ int Items::loadXMLInfos(std::string file)
 							    	itemtype->weaponType = CLUB;
 							  	else if (!strcmp(skill, "axe"))
 									itemtype->weaponType = AXE;
+								else if (!strcmp(skill, "shielding"))
+									itemtype->weaponType = SHIELD;
 							  	else if (!strcmp(skill, "distance")){
 									itemtype->weaponType = DIST;
 									char *amutype = (char*)xmlGetProp(p, (xmlChar*)"amutype");

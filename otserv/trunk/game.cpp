@@ -151,6 +151,10 @@ void GameState::onAttack(Creature* attacker, const Position& pos, Creature* atta
 	int armor = attackedCreature->getArmor();
 	int defense = attackedCreature->getDefense();
 	
+	Player *player = dynamic_cast<Player*>(attackedCreature);
+	if(player)
+		player->addSkillShieldTry(1);
+		
 	int probability = rand()%100;
 	
 	if(probability < defense)
@@ -297,7 +301,9 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 
 void GameState::removeCreature(Creature *creature, unsigned char stackPos)
 {
-	game->playersOnline.erase(game->playersOnline.find(creature->getID()));
+	Player *deadplayer = dynamic_cast<Player*>(creature);
+	if(deadplayer == NULL) //remove from online list if it is not a player
+		game->playersOnline.erase(game->playersOnline.find(creature->getID()));
 
 	//distribute the change to all non-players that a character has been removed
 	for(unsigned int i = 0; i < spectatorlist.size(); ++i) {
@@ -956,7 +962,7 @@ void Game::thingMoveInternal(Creature *player,
 			if(!fromContainer)
 				return;
 			
-			Position fromPos = (fromContainer->pos.x == 0xFFFF ? player->pos : fromContainer->pos);
+			Position fromPos = (fromContainer->pos.x == 0xFFFF ? player->pos : fromContainer->pos);			
 			Item *item = dynamic_cast<Item*>(fromContainer->getItem(from_slotid));
 
 			if(!item)

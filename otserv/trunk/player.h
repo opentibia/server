@@ -146,6 +146,7 @@ public:
   void flushMsg();
 
   void addSkillTry(int skilltry);
+  void addSkillShieldTry(int skilltry);
   void die();      //player loses exp/skills/maglevel on death
 
   virtual void setAttackedCreature(unsigned long id);
@@ -206,6 +207,8 @@ protected:
   //ground to ground
 	virtual void onThingMove(const Creature *creature, const Thing *thing, const Position *oldPos,
 		unsigned char oldstackpos, unsigned char oldcount, unsigned char count);
+
+	void addSkillTryInternal(int skilltry,int skill,std::string &skillname);
 
 	Protocol *client;
 	//cache some data

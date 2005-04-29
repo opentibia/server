@@ -253,10 +253,18 @@ int Player::getDefense() const
 {
 	int defense=0;
 	
-	if(items[SLOT_LEFT])
-		defense += items[SLOT_LEFT]->getDefense();
-	if(items[SLOT_RIGHT])
-		defense += items[SLOT_RIGHT]->getDefense();
+	if(items[SLOT_LEFT]){		
+		if(items[SLOT_LEFT]->getWeaponType() == SHIELD)
+			defense += skills[SKILL_SHIELD][SKILL_LEVEL] + items[SLOT_LEFT]->getDefense();
+		else
+			defense += items[SLOT_LEFT]->getDefense();
+	}
+	if(items[SLOT_RIGHT]){
+		if(items[SLOT_RIGHT]->getWeaponType() == SHIELD)
+			defense += skills[SKILL_SHIELD][SKILL_LEVEL] + items[SLOT_RIGHT]->getDefense();
+		else
+			defense += items[SLOT_RIGHT]->getDefense();		
+	}
 	
 	return defense;
 }
@@ -691,7 +699,7 @@ unsigned int Player::getReqSkilltries (int skill, int level, int voc) {
 
 void Player::addSkillTry(int skilltry)
 {
-	int skill;
+	int skill;	
 	std::string skillname;
 	//TODO:what happens with 2 weapons?
 	for (int slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++) {
@@ -702,46 +710,61 @@ void Player::addSkillTry(int skilltry)
 					case CLUB: skill = 1; skillname = "club fighting"; break;
 					case AXE: skill = 3; skillname = "axe fighting"; break;
 					case DIST: skill = 4; skillname = "distance fighting"; break;
-                    case SHIELD: skill = 5; skillname = "shielding"; break;
+                    case SHIELD: return; break;
                     case MAGIC: return;	break;//TODO: should add skill try?
 					default: skill = 0; skillname = "fist fighting"; break;
-			 }
-		
-			 skills[skill][SKILL_TRIES] += skilltry;
-			 
-			 //for skill level advances
-			 //int reqTries = (int) ( SkillBases[skill] * pow((float) VocMultipliers[skill][voc], (float) ( skills[skill][SKILL_LEVEL] - 10) ) );
-			 
-#if __DEBUG__
-			 //for debug
-			 cout << Creature::getName() << ", has the vocation: " << voc << " and is training his " << skillname << "(" << skill << "). Tries: " << skills[skill][SKILL_TRIES] << "(" << getReqSkilltries (skill, (skills[skill][SKILL_LEVEL] + 1), voc) << ")" << std::endl;
-			 cout << "Current skill: " << skills[skill][SKILL_LEVEL] << std::endl;
-#endif			 
-			 //Need skill up?
-			 if (skills[skill][SKILL_TRIES] >= getReqSkilltries (skill, (skills[skill][SKILL_LEVEL] + 1), voc)) {
-				 skills[skill][SKILL_LEVEL]++;
-				 skills[skill][SKILL_TRIES] = 0;
-				 skills[skill][SKILL_PERCENT] = 0;				 
-				 std::stringstream advMsg;
-				 advMsg << "You advanced in " << skillname << ".";
-				 client->sendTextMessage(MSG_ADVANCE, advMsg.str().c_str());
-				 client->sendSkills();
-			 }
-			 else{
-				 //update percent
-				 int new_percent = (unsigned int)(100*(skills[skill][SKILL_TRIES])/(1.*getReqSkilltries (skill, (skills[skill][SKILL_LEVEL]+1), voc)));
-				 
-				 if(skills[skill][SKILL_PERCENT] != new_percent){
-						skills[skill][SKILL_PERCENT] = new_percent;
-						client->sendSkills();
-				 }
-			 }
-		   }
+			 	}//switch
+			 	addSkillTryInternal(skilltry,skill,skillname);
+			}			
 		}
 	}
 }
 
+void Player::addSkillShieldTry(int skilltry){
+	//look for a shield
+	std::string skillname = "shielding";
+	for (int slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++) {
+		if (items[slot]) {
+			if (items[slot]->isWeapon()) {
+				if (items[slot]->getWeaponType() == SHIELD) {
+					addSkillTryInternal(skilltry,5,skillname);
+					break;
+			 	}			 	
+			}			
+		}
+	}	
+}
 
+void Player::addSkillTryInternal(int skilltry,int skill,std::string &skillname){
+	
+	skills[skill][SKILL_TRIES] += skilltry;			
+	//for skill level advances
+	//int reqTries = (int) ( SkillBases[skill] * pow((float) VocMultipliers[skill][voc], (float) ( skills[skill][SKILL_LEVEL] - 10) ) );			 
+#if __DEBUG__
+	//for debug
+	cout << Creature::getName() << ", has the vocation: " << voc << " and is training his " << skillname << "(" << skill << "). Tries: " << skills[skill][SKILL_TRIES] << "(" << getReqSkilltries (skill, (skills[skill][SKILL_LEVEL] + 1), voc) << ")" << std::endl;
+	cout << "Current skill: " << skills[skill][SKILL_LEVEL] << std::endl;
+#endif			 
+	//Need skill up?
+	if (skills[skill][SKILL_TRIES] >= getReqSkilltries (skill, (skills[skill][SKILL_LEVEL] + 1), voc)) {
+	 	skills[skill][SKILL_LEVEL]++;
+	 	skills[skill][SKILL_TRIES] = 0;
+		skills[skill][SKILL_PERCENT] = 0;				 
+		std::stringstream advMsg;
+		advMsg << "You advanced in " << skillname << ".";
+		client->sendTextMessage(MSG_ADVANCE, advMsg.str().c_str());
+		client->sendSkills();
+	}
+	else{
+	 //update percent
+	 int new_percent = (unsigned int)(100*(skills[skill][SKILL_TRIES])/(1.*getReqSkilltries (skill, (skills[skill][SKILL_LEVEL]+1), voc)));
+				 
+	 	if(skills[skill][SKILL_PERCENT] != new_percent){
+			skills[skill][SKILL_PERCENT] = new_percent;
+			client->sendSkills();
+	 	}
+	}
+}
 
 
 unsigned int Player::getReqMana(int maglevel, int voc) {
@@ -985,6 +1008,11 @@ void Player::sendCancelWalk(const char *msg)
   client->sendCancelWalk(msg);
 }
 void Player::sendStats(){
+	//update level and maglevel percents
+	if(lastSentStats.experience != this->experience)
+	    level_percent  = (unsigned char)(100*(experience-getExpForLv(level))/(1.*getExpForLv(level+1)-getExpForLv(level)));		
+	if(lastSentStats.manaspent != this->manaspent)
+	    maglevel_percent  = (unsigned char)(100*(manaspent/(1.*getReqMana(maglevel+1,voc))));
 	//save current stats 
 	lastSentStats.health = this->health;
 	lastSentStats.healthmax = this->healthmax;
@@ -994,12 +1022,7 @@ void Player::sendStats(){
 	lastSentStats.mana = this->mana;
 	lastSentStats.manamax = this->manamax;
 	lastSentStats.manaspent = this->manaspent;
-	lastSentStats.maglevel = this->maglevel;
-	//update level and maglevel percents
-	if(lastSentStats.experience != this->experience)
-	    level_percent  = (unsigned char)(100*(experience-getExpForLv(level))/(1.*getExpForLv(level+1)-getExpForLv(level)));		
-	if(lastSentStats.manaspent != this->manaspent)
-	    maglevel_percent  = (unsigned char)(100*(manaspent/(1.*getReqMana(maglevel+1,voc))));
+	lastSentStats.maglevel = this->maglevel;	
 	
 	client->sendStats();
 }
