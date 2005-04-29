@@ -133,9 +133,9 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name){
 						int sl_id = atoi((const char*)xmlGetProp(slot, (const xmlChar *)"slotid"));					
 						Item* myitem = new Item();
 						myitem->unserialize(slot->children);
-						player->items[sl_id] = Item::CreateItem(myitem->getID(), myitem->getItemCountOrSubtype());
+						//player->items[sl_id] = Item::CreateItem(myitem->getID(), myitem->getItemCountOrSubtype());
 						//we dont want to sendinventory before login
-						//player->addItem(Item::CreateItem(myitem->getID(), myitem->getItemCountOrSubtype()), sl_id);
+						player->addItem(Item::CreateItem(myitem->getID(), myitem->getItemCountOrSubtype()), sl_id, true);
 						delete myitem;
 						myitem = NULL;
 

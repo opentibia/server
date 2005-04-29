@@ -627,7 +627,7 @@ int Player::sendInventory(unsigned char sl_id){
 }
 
 
-int Player::addItem(Item* item, int pos) {
+int Player::addItem(Item* item, int pos, bool isloading /*= false*/) {
 #ifdef __DEBUG__
 	std::cout << "Should add item at " << pos <<std::endl;
 #endif
@@ -642,8 +642,11 @@ int Player::addItem(Item* item, int pos) {
 			items[pos]->pos.x = 0xFFFF;
 		}
   }
+	
+	if(!isloading) {
+		client->sendInventory(pos);	
+	}
 
-	client->sendInventory(pos);	
 	return true;
 }
 

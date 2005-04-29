@@ -1500,14 +1500,15 @@ void Game::creatureSay(Creature *creature, unsigned char type, const std::string
             break;
             case 'c':
             {
-                // Create a non-const copy of the command
-				std::string cmd = text;
-				// Erase the first 2 bytes
-				cmd.erase(0,3);  
-				Creature* c = getCreatureByName(cmd.c_str());
-				if(c)
-                teleport(c, creature->pos);
-            }
+              // Create a non-const copy of the command
+							std::string cmd = text;
+							// Erase the first 2 bytes
+							cmd.erase(0,3);  
+							Creature* c = getCreatureByName(cmd.c_str());
+							if(c) {
+								teleport(c, creature->pos);
+							}
+						}
             break;
 		  case 'i': // Create new items in the ground ;)
             {

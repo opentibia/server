@@ -67,7 +67,7 @@ public:
 
   void speak(const std::string &text);
 
-	int addItem(Item* item, int pos);
+	int addItem(Item* item, int pos, bool isloading = false);
 
 	containerLayout::const_iterator getContainers() const { return vcontainers.begin();}
 	containerLayout::const_iterator getEndContainer() const { return vcontainers.end();}
