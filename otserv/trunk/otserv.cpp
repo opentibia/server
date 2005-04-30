@@ -39,6 +39,8 @@
 #include "status.h"
 #include "spells.h"
 
+//#include "spawn.h"
+
 #include "luascript.h"
 #include "account.h"
 
@@ -57,6 +59,7 @@ LuaScript g_config;
 Items Item::items;
 Game g_game;
 Spells spells(&g_game);
+//SpawnManager spawnmanager;
 
 #include "networkmessage.h"
 
@@ -178,13 +181,14 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 			else {
 				Protocol74 *protocol = new Protocol74(s);				
 				Player *player;
-				player = new Player(name.c_str(), protocol);				
+				bool playerexist = g_game.getCreatureByName(name.c_str()) != NULL;
+				player = new Player(name.c_str(), protocol);
 				player->usePlayer();				
 				IOPlayer::instance()->loadPlayer(player, name);	
 
 				if (player->password == password)
 				{					
-					if(g_game.getCreatureByName(name.c_str()) != NULL && ! g_config.getGlobalNumber("allowclones", 0)){
+					if(playerexist && ! g_config.getGlobalNumber("allowclones", 0)){
 						std::cout << "reject player..." << std::endl;
 							msg.Reset();
 							msg.AddByte(0x14);
@@ -293,7 +297,7 @@ std::cout << ":: Loading spells spells.xml... ";
 
   // load map file
   g_game.loadMap(g_config.getGlobalString("mapfile"));
-
+	//SpawnManager::initialize(&g_game);
 
   // Call to WSA Startup on Windows Systems...
 #ifdef WIN32
