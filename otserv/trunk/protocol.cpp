@@ -34,11 +34,21 @@ extern Game g_game;
 
 Protocol::Protocol()
 {
+	player = NULL;
+	game = NULL;
+	pendingLogout = false;
 }
 
 
 Protocol::~Protocol()
 {
+	if(s) {
+		closesocket(s);
+		s = 0;
+	}
+
+	player = NULL;
+	game = NULL;
 }
 
 unsigned long Protocol::getIP() const

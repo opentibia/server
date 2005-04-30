@@ -27,9 +27,9 @@
 
 extern Spells spells;
 
-template<class T> typename AutoList<T>::list_type AutoList<T>::list;
-template<class T> typename AutoID<T>::list_type AutoID<T>::list;
-template<class T> unsigned long AutoID<T>::count = T::min_id;
+template<class Monster> typename AutoList<Monster>::list_type AutoList<Monster>::list;
+template<class Monster> typename AutoID<Monster>::list_type AutoID<Monster>::list;
+template<class Monster> unsigned long AutoID<Monster>::count = Monster::min_id;
 
 Monster::Monster(const char *name, Game* game) : 
   AutoID<Monster>()
@@ -597,7 +597,7 @@ void Monster::calcMovePosition()
 					//if((this->pos.x != x && this->pos.y != y)) {
 					if(!(this->pos.x == x && this->pos.y == y)) {
 						Tile *t = NULL;
-						if((!(t = game->map->getTile(x, y, pos.z))) || t->isBlocking() || t->isPz() || t->creatures.size())
+						if((!(t = game->map->getTile(x, y, pos.z))) || t->isBlocking() || t->isPz() || t->creatures.size() || t->floorChange())
 							continue;
 					}
 /*				

@@ -34,9 +34,9 @@
 
 #include "npc.h"
 
-template<class T> typename AutoList<T>::list_type AutoList<T>::list;
-template<class T> typename AutoID<T>::list_type AutoID<T>::list;
-template<class T> unsigned long AutoID<T>::count = T::min_id;
+template<class Npc> typename AutoList<Npc>::list_type AutoList<Npc>::list;
+template<class Npc> typename AutoID<Npc>::list_type AutoID<Npc>::list;
+template<class Npc> unsigned long AutoID<Npc>::count = Npc::min_id;
 
 Npc::Npc(const char *name, Game* game) :
   AutoID<Npc>()

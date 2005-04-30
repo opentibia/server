@@ -37,14 +37,12 @@ class Protocol
 {
 public:
   Protocol();
-  virtual ~Protocol();	
+  virtual ~Protocol();
 
   void setPlayer(Player* p);
 	unsigned long getIP() const;
-	//SOCKET getSocket() const {return s;}
 
   virtual bool CanSee(int x, int y, int z) const = 0;
-
   virtual void sendNetworkMessage(NetworkMessage *msg) = 0;
 
   //container to container
@@ -125,8 +123,10 @@ public:
   virtual void AddRemoveThing(NetworkMessage &msg, const Position &pos,unsigned char stackpos) = 0;
   virtual void AddAppearThing(NetworkMessage &msg, const Position &pos) = 0;
 	virtual void AddTileUpdated(NetworkMessage &msg, const Position &pos) = 0;
+
 protected:
-  Game   *game;
+	bool pendingLogout;
+	Game   *game;
   Player *player;
   SOCKET s;
 };

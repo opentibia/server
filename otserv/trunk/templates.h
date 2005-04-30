@@ -30,7 +30,10 @@
 template<class T> class AutoList
 {
 public:
-	AutoList(unsigned long _id) {listid = _id; list[_id] = dynamic_cast<T*>(this);} 
+	AutoList(unsigned long _id) {
+		listid = _id;
+		list[_id] = (T*)this; //reinterpret_cast<T*>(this);
+	}
 	virtual ~AutoList() { list.erase(listid); }
 
 	// cross compatibility vc++ and gcc

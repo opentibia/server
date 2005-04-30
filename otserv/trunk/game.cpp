@@ -58,8 +58,7 @@ extern Spells spells;
 extern std::map<long, Creature*> channel;
 extern std::vector< std::pair<unsigned long, unsigned long> > bannedIPs;
 
-GameState::GameState(Game *game, const Range &range) :
-	mapstate(game->map)
+GameState::GameState(Game *game, const Range &range)
 {
 	this->game = game;
 	game->getSpectators(range, spectatorlist);
@@ -113,17 +112,34 @@ void GameState::onAttack(Creature* attacker, const Position& pos, const MagicEff
 			//Replace existing magic field
 			magicItem->transform(newmagicItem);
 			
-			//mapstate.removeThing(targettile, magicItem);
-			//mapstate.addThing(targettile, magicItem);
-			mapstate.refreshThing(tile, magicItem);
+			unsigned char stackpos = tile->getThingStackPos(magicItem);
+			Player *spectator = NULL;
+			for(int i = 0; i < spectatorlist.size(); ++i) {
+				spectator = dynamic_cast<Player*>(spectatorlist[i]);
+				if(spectator) {
+					spectator->onThingDisappear(magicItem, stackpos);
+					spectator->onThingAppear(magicItem);
+				}
+			}
+
+			//mapstate.refreshThing(tile, magicItem);
 		}
 		else {
 			magicItem = new MagicEffectItem(*newmagicItem);
 			magicItem->pos = pos;
 
-			mapstate.addThing(tile, magicItem);
+			tile->addThing(magicItem);
 
-			//game->addEvent(makeTask(newmagicItem->getDecayTime(), boost::bind(&Game::decayItem, this->game, magicItem->pos, magicItem->getID(), tile->getThingStackPos(magicItem)) ) );
+			Player *spectator = NULL;
+			for(int i = 0; i < spectatorlist.size(); ++i) {
+				spectator = dynamic_cast<Player*>(spectatorlist[i]);
+				if(spectator) {
+					spectator->onThingAppear(magicItem);
+				}
+			}
+
+			//mapstate.addThing(tile, magicItem);
+
 			game->addEvent(makeTask(newmagicItem->getDecayTime(), std::bind2nd(std::mem_fun(&Game::decayItem), magicItem)));
 		}
 	}
@@ -204,8 +220,22 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 		
 		//Remove character
 		unsigned char stackpos = tile->getCreatureStackPos(attackedCreature);
-		mapstate.removeThing(tile, attackedCreature);
-		removeCreature(attackedCreature, stackpos);			
+
+		//map->removeCreature(attackedCreature);
+		tile->removeThing(attackedCreature);
+
+		for(int i = 0; i < spectatorlist.size(); ++i) {
+			/*
+			spectator = dynamic_cast<Player*>(spectatorlist[i]);
+			if(spectator) {
+				spectator->onThingDisappear(attackedCreature, stackpos);
+			}
+			*/
+			spectatorlist[i]->onCreatureDisappear(attackedCreature, stackpos);
+		}
+		//mapstate.removeThing(tile, attackedCreature);
+
+		//removeCreature(attackedCreature, stackpos);			
 		
 		//Get all creatures that will gain xp from this kill..
 		std::vector<long> creaturelist;
@@ -247,12 +277,6 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 			}
 		}
 
-		/*
-		if(attacker) {
-			attacker->experience += attackedCreature->getGainedExperience(attacker); //(int)(attackedCreature->experience * 0.1);
-		}
-		*/
-
 		Player *player = dynamic_cast<Player*>(attacker);
 		if(player) {			
 			player->sendStats();
@@ -268,7 +292,17 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 			attackedCreature->dropLoot(lootcontainer);
 		}
 
-		mapstate.addThing(tile, corpseitem);
+		tile->addThing(corpseitem);
+
+		Player *spectator = NULL;
+		for(int i = 0; i < spectatorlist.size(); ++i) {
+			spectator = dynamic_cast<Player*>(spectatorlist[i]);
+			if(spectator) {
+				spectator->onThingAppear(corpseitem);
+			}
+		}
+
+		//mapstate.addThing(tile, corpseitem);
 
 		//Start decaying
 		unsigned short decayTime = Item::items[corpseitem->getID()].decayTime;
@@ -287,10 +321,31 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 			tile->splash = item;
 		}
 
-		if(hadSplash)
-			mapstate.refreshThing(tile, tile->splash);
-		else
-			mapstate.addThing(tile, tile->splash);
+		if(hadSplash) {
+			unsigned char stackpos = tile->getThingStackPos(tile->splash);
+
+			Player *spectator = NULL;
+			for(int i = 0; i < spectatorlist.size(); ++i) {
+				spectator = dynamic_cast<Player*>(spectatorlist[i]);
+				if(spectator) {
+					spectator->onThingDisappear(tile->splash, stackpos);
+					spectator->onThingAppear(tile->splash);
+				}
+			}
+
+			//mapstate.refreshThing(tile, tile->splash);
+		}
+		else {
+			Player *spectator = NULL;
+			for(int i = 0; i < spectatorlist.size(); ++i) {
+				spectator = dynamic_cast<Player*>(spectatorlist[i]);
+				if(spectator) {
+					spectator->onThingAppear(tile->splash);
+				}
+			}
+
+			//mapstate.addThing(tile, tile->splash);
+		}
 
 		//Start decaying
 		unsigned short decayTime = Item::items[tile->splash->getID()].decayTime;
@@ -299,11 +354,12 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 	}
 }
 
+/*
 void GameState::removeCreature(Creature *creature, unsigned char stackPos)
 {
-	Player *deadplayer = dynamic_cast<Player*>(creature);
-	if(deadplayer == NULL) //remove from online list if it is not a player
-		game->playersOnline.erase(game->playersOnline.find(creature->getID()));
+	//Player *deadplayer = dynamic_cast<Player*>(creature);
+	//if(deadplayer == NULL) //remove from online list if it is not a player
+	//	game->playersOnline.erase(game->playersOnline.find(creature->getID()));
 
 	//distribute the change to all non-players that a character has been removed
 	for(unsigned int i = 0; i < spectatorlist.size(); ++i) {
@@ -313,10 +369,11 @@ void GameState::removeCreature(Creature *creature, unsigned char stackPos)
 		}
 	}
 }
+*/
 
 void GameState::getChanges(Player *spectator)
 {
-	mapstate.getMapChanges(spectator);
+	//mapstate.getMapChanges(spectator);
 }
 
 Game::Game()
@@ -425,30 +482,39 @@ void Game::setTile(unsigned short _x, unsigned short _y, unsigned char _z, unsig
 
 Creature* Game::getCreatureByID(unsigned long id)
 {
-  std::map<unsigned long, Creature*>::iterator i;
-  for( i = playersOnline.begin(); i != playersOnline.end(); i++ )
+	AutoList<Creature>::listiterator it = AutoList<Creature>::list.find(id);
+	if(it != AutoList<Creature>::list.end()) {
+		return (*it).second;
+	}
+
+	/*
+	std::map<unsigned long, Creature*>::iterator it;
+  for( it = playersOnline.begin(); it != playersOnline.end(); ++it )
   {
-    if((i->second)->getID() == id )
+    if(it->second->getID() == id )
     {
-      return i->second;
+      return it->second;
     }
   }
+	*/
+
   return NULL; //just in case the player doesnt exist
 }
 
 Creature* Game::getCreatureByName(const char* s)
 {
-  std::map<unsigned long, Creature*>::iterator i;
 	std::string txt1 = s;
 	std::transform(txt1.begin(), txt1.end(), txt1.begin(), upchar);
 
-  for( i = playersOnline.begin(); i != playersOnline.end(); i++ )
+	//std::map<unsigned long, Creature*>::iterator it;
+  //for( it = playersOnline.begin(); it != playersOnline.end(); ++it)
+	for (AutoList<Creature>::listiterator it = AutoList<Creature>::list.begin(); it != AutoList<Creature>::list.end(); ++it)
 	{
-		std::string txt2 = (i->second)->getName();
+		std::string txt2 = (*it).second->getName();
 		std::transform(txt2.begin(), txt2.end(), txt2.begin(), upchar);
 		if(txt1 == txt2)
     {
-      return i->second;
+      return it->second;
     }
   }
   return NULL; //just in case the player doesnt exist
@@ -456,20 +522,20 @@ Creature* Game::getCreatureByName(const char* s)
 
 bool Game::placeCreature(Creature* c)
 {
-	if (c->access == 0 && playersOnline.size() >= max_players)
+	if (c->access == 0 && getPlayersOnline() >= max_players)
 		//we cant add the player, server is full	
 		return false;
 
 	OTSYS_THREAD_LOCK(gameLock)
 
 	// add player to the online list
-	playersOnline[c->getID()] = c;
+	//playersOnline[c->getID()] = c;
 	Player* player = dynamic_cast<Player*>(c);
 	if (player) {
 		player->usePlayer();
 	}
 
-	std::cout << (uint32_t)playersOnline.size() << " players online." << std::endl;
+	std::cout << (uint32_t)getPlayersOnline() << " players online." << std::endl;
 	addEvent(makeTask(1000, std::bind2nd(std::mem_fun(&Game::checkPlayer), c->getID())));
 	addEvent(makeTask(2000, std::bind2nd(std::mem_fun(&Game::checkPlayerAttacking), c->getID())));
 	
@@ -494,11 +560,11 @@ bool Game::placeCreature(Creature* c)
 bool Game::removeCreature(Creature* c)
 {
 	OTSYS_THREAD_LOCK(gameLock)
-    //removeCreature from the online list
+	//removeCreature from the online list
 
-    std::map<unsigned long, Creature*>::iterator pit = playersOnline.find(c->getID());
+	/*std::map<unsigned long, Creature*>::iterator pit = playersOnline.find(c->getID());
 	if (pit != playersOnline.end()) {
-		playersOnline.erase(pit);
+		playersOnline.erase(pit);*/
 
 
 #ifdef __DEBUG__
@@ -514,9 +580,9 @@ bool Game::removeCreature(Creature* c)
 		{			
 			list[i]->onCreatureDisappear(c, stackpos);
 		}
-	}
+	//}
 
-	std::cout << (uint32_t)playersOnline.size() << " players online." << std::endl;
+	std::cout << (uint32_t)getPlayersOnline() << " players online." << std::endl;
 
 	Player* player = dynamic_cast<Player*>(c);
 
@@ -525,6 +591,7 @@ bool Game::removeCreature(Creature* c)
 		IOPlayer::instance()->savePlayer(player);
 		player->releasePlayer();
 	}
+
 	OTSYS_THREAD_UNLOCK(gameLock)
 
     return true;
@@ -1609,7 +1676,7 @@ void Game::teleport(Creature *creature, Position newPos) {
     to->addThing(creature); 
     Position oldPos = creature->pos;
             
-    std::vector<Creature*> list;
+		std::vector<Creature*> list;
     getSpectators(Range(oldPos, true), list);
 		for(size_t i = 0; i < list.size(); ++i) {
 			list[i]->onCreatureDisappear(creature, osp, true);
@@ -1716,10 +1783,10 @@ void Game::creatureBroadcastMessage(Creature *creature, const std::string &text)
 
 	OTSYS_THREAD_LOCK(gameLock)
 
-	std::map<unsigned long, Creature*>::iterator cit;
-	for (cit = playersOnline.begin(); cit != playersOnline.end(); cit++)
+	//for (cit = playersOnline.begin(); cit != playersOnline.end(); cit++)
+	for (AutoList<Player>::listiterator it = AutoList<Player>::list.begin(); it != AutoList<Player>::list.end(); ++it)
 	{
-		cit->second->onCreatureSay(creature, 9, text);
+		(*it).second->onCreatureSay(creature, 9, text);
 	}
 
 	OTSYS_THREAD_UNLOCK(gameLock)
@@ -2257,7 +2324,7 @@ void Game::checkPlayer(unsigned long id)
 	OTSYS_THREAD_LOCK(gameLock)
 	Creature *creature = getCreatureByID(id);
 
-	if (creature != NULL)
+	if (creature && creature->health > 0)
 	{
 		int thinkTicks = 0;
 		int oldThinkTicks = creature->onThink(thinkTicks);
@@ -2433,20 +2500,6 @@ void Game::changeSpeed(unsigned long id, unsigned short speed)
 	}
 	OTSYS_THREAD_UNLOCK(gameLock)
 }
-
-/*
-void Game::checkMonsterAttacking(unsigned long id)
-{
-	OTSYS_THREAD_LOCK(gameLock)
-
-	Monster *monster = dynamic_cast<Monster*>(getCreatureByID(id));
-	if (monster != NULL && monster->health > 0) {
-		monster->onAttack();
-	}
-
-	OTSYS_THREAD_UNLOCK(gameLock)
-}
-*/
 
 void Game::checkPlayerAttacking(unsigned long id)
 {
@@ -2736,22 +2789,40 @@ bool Game::creatureUseItem(Creature *creature, const Position& pos, Item* item)
 
 
 void Game::flushSendBuffers(){
+	OTSYS_THREAD_LOCK(gameLock)
 	OTSYS_THREAD_LOCK(buffervectorLock)
+
 	for(std::vector<Player*>::iterator it = BufferedPlayers.begin(); it != BufferedPlayers.end(); ++it) {
-		if(*it)
-			(*it)->flushMsg();
-	}	
+		(*it)->flushMsg();
+		(*it)->releasePlayer();
+/*
+#ifdef __DEBUG__
+		std::cout << "flushSendBuffers() - releasePlayer()" << std::endl;
+#endif
+*/
+		}	
 	BufferedPlayers.clear();
 	OTSYS_THREAD_UNLOCK(buffervectorLock)
+	OTSYS_THREAD_UNLOCK(gameLock)
 	return;
 }
 
 void Game::addPlayerBuffer(Player* p){
+	OTSYS_THREAD_LOCK(gameLock)
 	OTSYS_THREAD_LOCK(buffervectorLock)
 #ifdef __DEBUG__
 	std::cout << "Add player buffer: " << (unsigned long)p << std::endl;
 #endif
+/*
+#ifdef __DEBUG__
+	std::cout << "addPlayerBuffer() - usePlayer()" << std::endl;
+#endif
+*/
+
+	p->usePlayer();
+
 	BufferedPlayers.push_back(p);
 	OTSYS_THREAD_UNLOCK(buffervectorLock)
+	OTSYS_THREAD_UNLOCK(gameLock)
 	return;
 }

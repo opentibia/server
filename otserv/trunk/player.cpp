@@ -37,9 +37,9 @@ using namespace std;
 
 extern LuaScript g_config;
 
-template<class T> typename AutoList<T>::list_type AutoList<T>::list;
-template<class T> typename AutoID<T>::list_type AutoID<T>::list;
-template<class T> unsigned long AutoID<T>::count = T::min_id;
+template<class Player> typename AutoList<Player>::list_type AutoList<Player>::list;
+template<class Player> typename AutoID<Player>::list_type AutoID<Player>::list;
+template<class Player> unsigned long AutoID<Player>::count = Player::min_id;
 
 Player::Player(const char *name, Protocol *p) :
   AutoID<Player>()
@@ -127,9 +127,11 @@ Player::Player(const char *name, Protocol *p) :
 
 Player::~Player()
 {
-	for (int i = 0; i < 11; i++)
+	for (int i = 0; i < 11; i++) {
 		if (items[i])
-      delete items[i];	
+      delete items[i];
+	}
+
   delete client;
 }
 

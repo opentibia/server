@@ -87,8 +87,6 @@ public:
 
 protected:
 	Map* map;
-	//void onRemoveThing(Player *spectator, Thing* thing, NetworkMessage &msg);
-	//void getItemChange(Player *spectator, NetworkMessage &msg);
 	void addThingInternal(Tile *t, Thing *thing, bool onlyRegister);
 	bool removeThingInternal(Tile *t, Thing *thing, bool onlyRegister);
 

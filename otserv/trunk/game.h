@@ -36,10 +36,8 @@
 #include "monster.h"
 #include "player.h"
 #include "magic.h"
-//#include "otsystem.h"
 #include "map.h"
 #include "scheduler.h"
-//#include "networkmessage.h"
 
 
 class Creature;   // see creature.h
@@ -91,11 +89,11 @@ public:
 protected:
 	void addCreatureState(Tile* tile, Creature* attackedCreature, int damage, int manaDamage, bool drawBlood);
 	void onAttackedCreature(Tile* tile, Creature* attacker, Creature* attackedCreature, int damage, bool drawBlood);
-	void removeCreature(Creature* creature, unsigned char stackPos);
+	//void removeCreature(Creature* creature, unsigned char stackPos);
 	Game *game;
 
 	std::vector<Creature*> spectatorlist;
-	MapState mapstate;
+	//MapState mapstate;
 	CreatureStates creaturestates;
 };
 
@@ -129,7 +127,7 @@ class Game {
 
 	/** List holding the creatures in the game
 	  * \todo This also contains NPCs, should change the name and rework max_players to work with this */
-    std::map<unsigned long, Creature*> playersOnline;
+    //std::map<unsigned long, Creature*> playersOnline;
 
 	/**
 	  * Place Creature on the map.
@@ -140,10 +138,12 @@ class Game {
 
 	/**
 	  * Remove Creature from the map.
-	  * Removes the Creature from playersOnline and from the map
+	  * Removes the Creature the map
 	  * \param c Creature to remove
 	  */
 		bool removeCreature(Creature* c);
+
+		uint32_t getPlayersOnline() {return (uint32_t)AutoList<Creature>::list.size();};
 
     void thingMove(Creature *player, Thing *thing,
         unsigned short to_x, unsigned short to_y, unsigned char to_z, unsigned char count);

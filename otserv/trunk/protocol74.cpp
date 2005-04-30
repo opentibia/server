@@ -72,16 +72,18 @@ void Protocol74::ReceiveLoop()
 {
   NetworkMessage msg;
 
-	while (msg.ReadFromSocket(s))
+	while (!pendingLogout && msg.ReadFromSocket(s))
   {
     parsePacket(msg);
   }
 
-  if (s)
-    closesocket(s);
+	if (s) {
+		closesocket(s);
+		s = 0;
+	}
 
   // logout by disconnect?  -> kick
-  if (player)
+  if (!pendingLogout /*player*/)
   {
 		if(player->inFightTicks >=1000 && player->health >0) {
 			//disconnect?
@@ -101,11 +103,13 @@ void Protocol74::parsePacket(NetworkMessage &msg)
 
   uint8_t recvbyte = msg.GetByte();
 
-  if (s && player->health <= 0) {
+  /*
+	if (s && player->health <= 0) {
 	 if (recvbyte == 0x14)
 		parseLogout(msg);		
 	    return;
   }
+	*/
     
   switch(recvbyte)
   {
@@ -416,11 +420,13 @@ void Protocol74::parseLogout(NetworkMessage &msg)
          return;
      }    
 	// we ask the game to remove us
-	if (game->removeCreature(player))
-	{
+	if (game->removeCreature(player)) {
+		pendingLogout = true;
+		/*
 		player = NULL;
 		closesocket(s);
 		s = 0;
+		*/
 	}
 }
 
@@ -1631,7 +1637,7 @@ void Protocol74::sendThingMove(const Creature *creature, const Thing *thing,
 	}
   else
   {
-    if (CanSee(oldPos->x, oldPos->y, oldPos->z))
+    if (!tele && CanSee(oldPos->x, oldPos->y, oldPos->z))
     {
 		AddRemoveThing(msg,*oldPos,oldStackPos);      
     }
@@ -1916,17 +1922,21 @@ void Protocol74::sendThingDisappear(const Thing *thing, unsigned char stackPos, 
 
 	if(!tele) {
 		const Creature* creature = dynamic_cast<const Creature*>(thing);
-		if(creature){
+		if(creature && creature->health > 0){
 			const Player* remove_player = dynamic_cast<const Player*>(creature);
 			if(remove_player == player)
 				return;
+
 			if(CanSee(creature->pos.x, creature->pos.y, creature->pos.z)){    	
     			AddMagicEffect(msg,thing->pos, NM_ME_PUFF);
 			}
 		}
 	}
 
-	AddRemoveThing(msg,thing->pos, stackPos);
+	if(CanSee(thing->pos.x, thing->pos.y, thing->pos.z)) {
+		AddRemoveThing(msg,thing->pos, stackPos);
+	}
+
 	WriteBuffer(msg);
 }
 
@@ -1937,43 +1947,43 @@ void Protocol74::sendThingAppear(const Thing *thing){
 		const Player* add_player = dynamic_cast<const Player*>(creature);
 		if(add_player == player){
 			msg.AddByte(0x0A);
-    		msg.AddU32(player->getID());
+    	msg.AddU32(player->getID());
 
-		    msg.AddByte(0x32);
-    		msg.AddByte(0x00);
+		  msg.AddByte(0x32);
+    	msg.AddByte(0x00);
 
-    		msg.AddByte(0x00);
-    		msg.AddByte(0x64);
-    		msg.AddPosition(player->pos);
-    		GetMapDescription(player->pos.x-8, player->pos.y-6, player->pos.z, 18, 14, msg);
+    	msg.AddByte(0x00);
+    	msg.AddByte(0x64);
+    	msg.AddPosition(player->pos);
+    	GetMapDescription(player->pos.x-8, player->pos.y-6, player->pos.z, 18, 14, msg);
 
 			AddMagicEffect(msg,player->pos, 0x0A);
 
 			AddPlayerStats(msg,player);	
 
-		    msg.AddByte(0x82);
-    		msg.AddByte(0x6F); //LIGHT LEVEL
-    		msg.AddByte(0xd7);//light? (seems constant)
+		  msg.AddByte(0x82);
+    	msg.AddByte(0x6F); //LIGHT LEVEL
+    	msg.AddByte(0xd7);//light? (seems constant)
 
-    		/*msg.AddByte(0x8d);//8d
-    		msg.AddU32(player->getID());
-    		msg.AddByte(0x03);//00
-    		msg.AddByte(0xd7);//d7*/
-    
-    		AddPlayerSkills(msg,player);
-    
-    		AddPlayerInventoryItem(msg,player, 1);
-    		AddPlayerInventoryItem(msg,player, 2);
-    		AddPlayerInventoryItem(msg,player, 3);
-    		AddPlayerInventoryItem(msg,player, 4);
-    		AddPlayerInventoryItem(msg,player, 5);
-    		AddPlayerInventoryItem(msg,player, 6);
-    		AddPlayerInventoryItem(msg,player, 7);
-    		AddPlayerInventoryItem(msg,player, 8);
-    		AddPlayerInventoryItem(msg,player, 9);
-    		AddPlayerInventoryItem(msg,player, 10);
+    	/*msg.AddByte(0x8d);//8d
+    	msg.AddU32(player->getID());
+    	msg.AddByte(0x03);//00
+    	msg.AddByte(0xd7);//d7*/
+  
+    	AddPlayerSkills(msg,player);
+  
+    	AddPlayerInventoryItem(msg,player, 1);
+    	AddPlayerInventoryItem(msg,player, 2);
+    	AddPlayerInventoryItem(msg,player, 3);
+    	AddPlayerInventoryItem(msg,player, 4);
+    	AddPlayerInventoryItem(msg,player, 5);
+    	AddPlayerInventoryItem(msg,player, 6);
+    	AddPlayerInventoryItem(msg,player, 7);
+    	AddPlayerInventoryItem(msg,player, 8);
+    	AddPlayerInventoryItem(msg,player, 9);
+    	AddPlayerInventoryItem(msg,player, 10);
 	
-    		AddTextMessage(msg,MSG_EVENT, g_config.getGlobalString("loginmsg", "Welcome.").c_str());
+   		AddTextMessage(msg,MSG_EVENT, g_config.getGlobalString("loginmsg", "Welcome.").c_str());
 			WriteBuffer(msg);
 			//force flush
 			flushOutputBuffer();
@@ -1989,14 +1999,16 @@ void Protocol74::sendThingAppear(const Thing *thing){
     		AddMagicEffect(msg,creature->pos, 0x0A);     
 		}
 	}
-	else{
+	else if(CanSee(thing->pos.x, thing->pos.y, thing->pos.z))
+	{
 		const Item *item = dynamic_cast<const Item*>(thing);
 		if(item){
 			AddAppearThing(msg,item->pos);
 			msg.AddItem(item);
 		}
 	}
-    WriteBuffer(msg);
+	
+	WriteBuffer(msg);
 }
 
 void Protocol74::sendSkills()
@@ -2195,9 +2207,11 @@ void Protocol74::AddCreatureHealth(NetworkMessage &msg,const Creature *creature)
 
 void Protocol74::AddRemoveThing(NetworkMessage &msg, const Position &pos,unsigned char stackpos){
 	if(stackpos < 10) {
-		msg.AddByte(0x6C);
-		msg.AddPosition(pos);
-		msg.AddByte(stackpos);
+		if(CanSee(pos.x, pos.y, pos.z)) {
+			msg.AddByte(0x6C);
+			msg.AddPosition(pos);
+			msg.AddByte(stackpos);
+		}
 	}
 	else {
 		//This will cause some problem, we remove an item (example: a player gets removed due to death) from the map, but the client cant see it
@@ -2219,8 +2233,10 @@ void Protocol74::AddRemoveThing(NetworkMessage &msg, const Position &pos,unsigne
 }
 
 void Protocol74::AddAppearThing(NetworkMessage &msg, const Position &pos){
-	msg.AddByte(0x6A);
-	msg.AddPosition(pos);
+	if(CanSee(pos.x, pos.y, pos.z)) {
+		msg.AddByte(0x6A);
+		msg.AddPosition(pos);
+	}
 }
 
 
@@ -2240,7 +2256,7 @@ void Protocol74::WriteBuffer(NetworkMessage &add){
 	OTSYS_THREAD_LOCK(bufferLock)
 	if(player->SendBuffer == false){
 		game->addPlayerBuffer(player);
-		player->SendBuffer = true;		
+		player->SendBuffer = true;
 	}	
 	if(OutputBuffer.getMessageLength() + add.getMessageLength() > NETWORKMESSAGE_MAXSIZE){		
 		OTSYS_THREAD_UNLOCK(bufferLock)

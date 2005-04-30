@@ -24,6 +24,7 @@
 
 #include "creature.h"
 #include "container.h"
+
 #include <vector>
 #include <algorithm>
 
@@ -121,8 +122,16 @@ public:
   //items
 	containerLayout vcontainers;
   void preSave();
-  void    usePlayer() { useCount++; };
-  void    releasePlayer() { useCount--; if (useCount == 0) delete this; };
+  void    usePlayer() {
+		useCount++;
+	};
+	
+	void    releasePlayer() {
+		useCount--;
+		if (useCount == 0)
+			delete this;
+	};
+
 	unsigned long getIP() const;
 	Container* getDepot(unsigned long depotId);
 	bool addDepot(Container* depot,unsigned long depotIs);
@@ -160,12 +169,12 @@ public:
 	virtual void dropLoot(Container *corpse);
 	bool NeedUpdateStats();	
 	void onThingDisappear(const Thing* thing, unsigned char stackPos);
-    void onThingAppear(const Thing* thing);  
-    void onThingRemove(const Thing* thing);
-    void sendDistanceShoot(const Position &from, const Position &to, unsigned char type);
-    void sendMagicEffect(const Position &pos, unsigned char type);
-    void sendAnimatedText(const Position &pos, unsigned char color, std::string text);
-    void sendCreatureHealth(const Creature *creature);
+	void onThingAppear(const Thing* thing);  
+	void onThingRemove(const Thing* thing);
+	void sendDistanceShoot(const Position &from, const Position &to, unsigned char type);
+	void sendMagicEffect(const Position &pos, unsigned char type);
+	void sendAnimatedText(const Position &pos, unsigned char color, std::string text);
+	void sendCreatureHealth(const Creature *creature);
 
 protected:
   int useCount;
@@ -179,7 +188,6 @@ protected:
   virtual int onThink(int& newThinkTicks);
   virtual std::string getDescription(bool self = false) const;
 	virtual void onTileUpdated(const Position &pos);
-	//virtual void onContainerUpdated(Item *item, unsigned char from_id, unsigned char to_id, unsigned char from_slot, unsigned char to_slot, bool remove);
 
 	//container to container
 	virtual void onThingMove(const Creature *creature, const Container *fromContainer, const Container *toContainer,
@@ -214,6 +222,9 @@ protected:
 		unsigned char oldstackpos, unsigned char oldcount, unsigned char count);
 
 	void addSkillTryInternal(int skilltry,int skill,std::string &skillname);
+
+  friend class Game;
+  friend class Map;
 
 	Protocol *client;
 	//cache some data
