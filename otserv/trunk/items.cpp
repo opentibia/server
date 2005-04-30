@@ -44,6 +44,8 @@ ItemType::ItemType()
 	floorChangeSouth = false;
 	floorChangeEast = false;
 	floorChangeWest = false;
+
+	isteleport = false;
 	
 	runeMagLevel    = -1;
 	
@@ -544,6 +546,10 @@ int Items::loadXMLInfos(std::string file)
 							else
 	       						std::cout << "missing maglevel for rune: " << id << std::endl;
 						}//rune
+						else if(!strcmp(type, "teleport"))
+						{
+							itemtype->isteleport = true;
+						}
 					}//type
 				} 
 				else {

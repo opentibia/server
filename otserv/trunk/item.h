@@ -83,8 +83,8 @@ class Item : public Thing
 		int use(Creature*){std::cout << "use with creature ptr " << id << std::endl; return 0;};
 		std::string getDescription() const;
 		std::string getName() const ;
-		int unserialize(xmlNodePtr p);
-		xmlNodePtr serialize();
+		virtual int unserialize(xmlNodePtr p);
+		virtual xmlNodePtr serialize();
 
     // get the number of items
     unsigned char getItemCountOrSubtype() const;
@@ -106,5 +106,18 @@ class Item : public Thing
     virtual ~Item();
 };
 
+class Teleport : public Item
+{
+public:
+	Teleport(const unsigned short _type);
+	virtual ~Teleport();
+	
+	void setDestPos(const Position &pos) {destPos = pos;};
+	const Position& getDestPos() {return destPos;};
+private:
+	virtual int unserialize(xmlNodePtr p);
+	virtual xmlNodePtr serialize();
+	Position destPos;
+};
 
 #endif

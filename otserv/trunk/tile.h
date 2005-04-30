@@ -44,6 +44,7 @@ public:
   void addThing(Thing *thing);
 	bool insertThing(Thing *thing, int stackpos);
 	MagicEffectItem* getFieldItem();
+	Teleport* getTeleportItem();
 
   int getCreatureStackPos(Creature *c) const;
   int getThingStackPos(const Thing *thing) const;

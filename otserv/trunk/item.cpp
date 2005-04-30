@@ -31,6 +31,8 @@ Item* Item::CreateItem(const unsigned short _type, unsigned char _count /*= 0*/)
 {
 	if(items[_type].iscontainer)
 		return new Container(_type);
+	else if(items[_type].isteleport)
+		return new Teleport(_type);
 	else
 		return new Item(_type, _count);
 }
@@ -279,3 +281,50 @@ std::string Item::getName() const
 {
 	return items[id].name;
 }
+
+
+Teleport::Teleport(const unsigned short _type) : Item(_type)
+{
+	destPos.x = 0;
+	destPos.y = 0;
+	destPos.z = 0;
+}
+
+Teleport::~Teleport()
+{
+}
+
+int Teleport::unserialize(xmlNodePtr p)
+{
+	Item::unserialize(p);
+
+	destPos.x = atoi((const char*)xmlGetProp(p, (const xmlChar *) "destx"));
+	destPos.y = atoi((const char*)xmlGetProp(p, (const xmlChar *) "desty"));
+	destPos.z = atoi((const char*)xmlGetProp(p, (const xmlChar *) "destz"));
+
+	return 0;
+}
+
+xmlNodePtr Teleport::serialize()
+{
+	xmlNodePtr xmlptr = Item::serialize();
+
+	std::stringstream s;
+
+	s.str(""); //empty the stringstream
+	s << (int) destPos.x;
+	xmlSetProp(xmlptr, (const xmlChar*)"destx", (const xmlChar*)s.str().c_str());
+
+	s.str(""); //empty the stringstream
+	s << (int) destPos.y;
+	xmlSetProp(xmlptr, (const xmlChar*)"desty", (const xmlChar*)s.str().c_str());
+
+	s.str(""); //empty the stringstream
+	s << (int)destPos.z;
+	xmlSetProp(xmlptr, (const xmlChar*)"destz", (const xmlChar*)s.str().c_str());
+
+	return xmlptr;
+}
+
+
+

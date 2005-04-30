@@ -67,6 +67,7 @@ public:
 
 	uint8_t speed;
 
+	bool isteleport;
 
 	// other bools
 	bool iscontainer;

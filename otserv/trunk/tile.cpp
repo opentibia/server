@@ -312,6 +312,19 @@ bool Tile::removeThing(Thing *thing)
   return false;
 }
 
+Teleport* Tile::getTeleportItem()
+{
+  Teleport* teleport = NULL;
+  for (ItemVector::const_iterator iit = topItems.begin(); iit != topItems.end(); ++iit)
+  {
+		teleport = dynamic_cast<Teleport*>(*iit);
+		if (teleport)
+      return teleport;
+  }
+
+	return NULL;
+}
+
 MagicEffectItem* Tile::getFieldItem()
 {
   MagicEffectItem* fieldItem = NULL;
@@ -322,7 +335,7 @@ MagicEffectItem* Tile::getFieldItem()
       return fieldItem;
   }
 
-	return fieldItem;
+	return NULL;
 }
 
 void Tile::addThing(Thing *thing) {

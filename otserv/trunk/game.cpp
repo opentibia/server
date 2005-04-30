@@ -1245,7 +1245,13 @@ void Game::thingMoveInternal(Creature *player, unsigned short from_x, unsigned s
 			if(!onPrepareMoveThing(player, thing, fromTile, toTile))
 				return;
 			
-      int oldstackpos = fromTile->getThingStackPos(thing);
+			Teleport *teleportitem = toTile->getTeleportItem();
+			if(teleportitem) {
+				teleport(creature, teleportitem->getDestPos());
+				return;
+			}
+
+			int oldstackpos = fromTile->getThingStackPos(thing);
       if (fromTile && fromTile->removeThing(thing))
       {
 				toTile->addThing(thing);
@@ -1356,19 +1362,6 @@ void Game::thingMoveInternal(Creature *player, unsigned short from_x, unsigned s
 						}
 					}
 				}
-				/*
-				if(fromTile->getThingCount() > 8) {
-#ifdef __DEBUG__
-					cout << "Pop-up item from below..." << std::endl;
-#endif
-					//We need to pop up this item
-					Thing *newthing = fromTile->getThingByStackPos(9);
-
-					if(newthing != NULL) {
-						creatureBroadcastTileUpdated(newthing->pos);
-					}
-				}
-				*/
 			}
     }
   }
