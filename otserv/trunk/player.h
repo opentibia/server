@@ -49,6 +49,7 @@ class NetworkMessage;
 
 typedef std::pair<unsigned char, Container*> containerItem;
 typedef std::vector<containerItem> containerLayout;
+typedef std::map<unsigned long, Container*> DepotMap;
 
 //////////////////////////////////////////////////////////////////////
 // Defines a player...
@@ -123,6 +124,10 @@ public:
   void    usePlayer() { useCount++; };
   void    releasePlayer() { useCount--; if (useCount == 0) delete this; };
 	unsigned long getIP() const;
+	Container* getDepot(unsigned long depotId);
+	bool addDepot(Container* depot,unsigned long depotIs);
+	//depots	
+	DepotMap depots;
 
 	void RemoveDistItem();
   fight_t getFightType();
@@ -232,7 +237,7 @@ protected:
 	SentStats lastSentStats;
 	// we need our name
 	std::string name;	
-	unsigned long guid;
+	unsigned long guid;	
 };
 
 

@@ -92,6 +92,19 @@ bool IOMapXML::loadMap(Map* map, std::string identifier){
           Item* myloaditem=new Item();
           myloaditem->unserialize(p);
           myitem = Item::CreateItem(myloaditem->getID(), myloaditem->getItemCountOrSubtype());
+          Container *container = dynamic_cast<Container*>(myitem);
+          if(container){				
+				//is depot?				
+				tmp = (char*)xmlGetProp(p, (const xmlChar *) "depot");
+				if(tmp){					
+					int depotnumber = atoi(tmp);
+					container->depot = depotnumber;
+				}      			
+				//loadContainer
+			}
+			myitem->pos.x = px;
+			myitem->pos.y = py;
+			myitem->pos.z = pz;		
           delete myloaditem;
           if (myitem->isAlwaysOnTop())
             t->topItems.push_back(myitem);

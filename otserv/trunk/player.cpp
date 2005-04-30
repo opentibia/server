@@ -979,6 +979,24 @@ bool Player::CanSee(int x, int y, int z) const
   return client->CanSee(x, y, z);
 }
 
+Container* Player::getDepot(unsigned long depotId){	
+	DepotMap::iterator it = depots.find(depotId);
+	if (it != depots.end())
+      return it->second;
+      
+	return NULL;
+}
+
+bool Player::addDepot(Container* depot,unsigned long depotId){	
+	Container *bdep = getDepot(depotId);
+	if(bdep)
+		return false;
+		
+	depot->pos.x = 0xFFFF;
+	
+	depots[depotId] = depot;
+	return true;
+}
 
 void Player::sendNetworkMessage(NetworkMessage *msg)
 {

@@ -37,6 +37,7 @@ class Container : public Item
 		Container(const unsigned short _type);
 		virtual ~Container();
 
+		unsigned long depot;
 		int size() const {return actualitems;};
 		int capacity() const {return maxitems;};
 		void setParent(Container* container) {parent = container;};

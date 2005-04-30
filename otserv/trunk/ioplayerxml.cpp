@@ -139,11 +139,35 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name){
 						delete myitem;
 						myitem = NULL;
 
-						//Should be loaded from xml later on...
 						Container* default_container = dynamic_cast<Container*>(player->getItem(sl_id));
 						if(default_container){
 							LoadContainer(slot->children,default_container);
 						}
+					}
+				slot=slot->next;
+				}
+			}
+			else if(str=="depots")
+			{
+				slot=p->children;
+				while (slot)
+				{
+					if (strcmp((const char*)slot->name, "depot") == 0)
+					{
+						int dp_id = atoi((const char*)xmlGetProp(slot, (const xmlChar *)"depotid"));
+						Item* myitem = new Item();
+						myitem->unserialize(slot->children);						
+						Item* newitem = Item::CreateItem(myitem->getID(), myitem->getItemCountOrSubtype());
+						Container* default_container = dynamic_cast<Container*>(newitem);
+						if(default_container){
+							player->addDepot(default_container , dp_id);
+							LoadContainer(slot->children,default_container);
+						}
+						else{
+							delete newitem;
+						}
+						delete myitem;
+						myitem = NULL;																		
 					}
 				slot=slot->next;
 				}
@@ -320,6 +344,26 @@ bool IOPlayerXML::savePlayer(Player* player){
 	      xmlAddChild(sn, pn);
           }
       }
+   xmlAddChild(root, sn);
+	
+	sn = xmlNewNode(NULL,(const xmlChar*)"depots");
+	
+	for(DepotMap::reverse_iterator it = player->depots.rbegin(); it !=player->depots.rend()  ;++it){
+    	  pn = xmlNewNode(NULL,(const xmlChar*)"depot");
+    	  sb << it->first;                             
+          xmlSetProp(pn, (const xmlChar*) "depotid", (const xmlChar*)sb.str().c_str());
+          sb.str("");
+          
+		nn = (it->second)->serialize();
+          Container* is_container = dynamic_cast<Container*>(it->second);
+          if(is_container){
+               SaveContainer(nn,is_container);
+          }
+          
+	      xmlAddChild(pn, nn);
+	      xmlAddChild(sn, pn);
+		}
+      
    xmlAddChild(root, sn);
 	
 	//Save the character
