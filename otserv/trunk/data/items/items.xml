@@ -21,6 +21,8 @@
 <item id="2111" name="Snowball" type="weapon" skill="distance" shottype="snowball" attack="0" defence="0" weight="0.8"/>
 
 
+<item id="1387" name="blue void" type="teleport" />
+
 <item id="3128" name="dead human" weight="1200" decayto="3129" decaytime="30" />
 <item id="3129" name="dead human" weight="1200" decayto="3130" decaytime="30" />
 <item id="3130" name="dead human" weight="1200" decayto="3131" decaytime="30" />
