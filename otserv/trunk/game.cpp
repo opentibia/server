@@ -586,7 +586,13 @@ bool Game::removeCreature(Creature* c)
 
 	Player* player = dynamic_cast<Player*>(c);
 
-	if (player){
+	if (player)
+	{
+		// REmoving the player from the map of channel users
+		std::map<long, Creature*>::iterator sit = channel.find(player->getID());
+		if( sit != channel.end() )
+			channel.erase(sit);
+		
 		std::string charName = c->getName();
 		IOPlayer::instance()->savePlayer(player);
 		player->releasePlayer();
