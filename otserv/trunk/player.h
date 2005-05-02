@@ -148,7 +148,7 @@ public:
   void sendNetworkMessage(NetworkMessage *msg);
   void sendCancelAttacking();
   void sendChangeSpeed(Creature* creature);
-  void sendToChannel(Creature *creature, unsigned char type, const std::string &text, unsigned short channelId);
+  void sendToChannel(Creature *creature, SpeakClasses type, const std::string &text, unsigned short channelId);
   virtual void sendCancel(const char *msg);
   virtual void sendCancelWalk(const char *msg);  
   int sendInventory(unsigned char sl_id);
@@ -182,7 +182,7 @@ protected:
   virtual void onCreatureAppear(const Creature *creature);
   virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos, bool tele);
   virtual void onCreatureTurn(const Creature *creature, unsigned char stackpos);
-  virtual void onCreatureSay(const Creature *creature, unsigned char type, const std::string &text);
+  virtual void onCreatureSay(const Creature *creature, SpeakClasses type, const std::string &text);
   virtual void onCreatureChangeOutfit(const Creature* creature);
   virtual void onTeleport(const Creature *creature, const Position *oldPos, unsigned char oldstackpos); 
   virtual int onThink(int& newThinkTicks);

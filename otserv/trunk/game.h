@@ -185,13 +185,13 @@ class Game {
 	  * \todo document types
 	  * \param text The text to say
 	  */
-		void creatureSay(Creature *creature, unsigned char type, const std::string &text);
+		void creatureSay(Creature *creature, SpeakClasses type, const std::string &text);
 
     void creatureWhisper(Creature *creature, const std::string &text);
     void creatureYell(Creature *creature, std::string &text);
     void creatureSpeakTo(Creature *creature, const std::string &receiver, const std::string &text);
     void creatureBroadcastMessage(Creature *creature, const std::string &text);
-    void creatureToChannel(Creature *creature, unsigned char type, const std::string &text, unsigned short channelId);
+    void creatureToChannel(Creature *creature, SpeakClasses type, const std::string &text, unsigned short channelId);
 	void creatureMonsterYell(Monster* monster, const std::string& text);
 	void creatureChangeOutfit(Creature *creature);
 
@@ -205,8 +205,7 @@ class Game {
 	void addEvent(SchedulerTask*);
 	void creatureBroadcastTileUpdated(const Position& pos);
       
-   std::vector<Player*> BufferedPlayers;
-   OTSYS_THREAD_LOCKVAR buffervectorLock;
+   std::vector<Player*> BufferedPlayers;   
    void flushSendBuffers();
    void addPlayerBuffer(Player* p);
    
@@ -299,5 +298,40 @@ class Game {
 		friend class Spawn;
 		friend class SpawnManager;
 };
+// moved from scheduler.h
+template<class Functor, class Functor2,  class Arg>
+class TCallList : public SchedulerTask {
+		  public:
+					 TCallList(Functor f, Functor2 f2, std::list<Arg>& call_list, __int64 interval) : _f(f), _f2(f2), _list(call_list), _interval(interval) {
+					 }
+
+					 result_type operator()(const argument_type& arg) {
+                              if(!_f2(arg)){   
+								result_type ret = _f(arg, _list.front());
+								_list.pop_front();
+								if (!_list.empty()) {
+										  SchedulerTask* newtask = new TCallList<Functor, Functor2, Arg>(_f, _f2, _list, _interval);
+										  newtask->setTicks(_interval);
+										  arg->addEvent(newtask);
+								}
+								return ret;
+                          }	
+										return result_type();
+					 }
+		  protected:
+					 Functor _f;
+					 Functor2 _f2;
+					 std::list<Arg> _list;
+					 __int64 _interval;
+};
+
+template<class Functor, class Functor2, class Arg>
+SchedulerTask* makeTask(__int64 ticks, Functor f, std::list<Arg>& call_list, __int64 interval, Functor2 f2) {
+		  TCallList<Functor, Functor2, Arg> *t = new TCallList<Functor, Functor2, Arg>(f, f2, call_list, interval);
+		  t->setTicks(ticks);
+		  return t;
+}
+
+
 
 #endif

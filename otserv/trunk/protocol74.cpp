@@ -162,6 +162,9 @@ void Protocol74::parsePacket(NetworkMessage &msg)
      case 0x83: // use item
       parseUseItemEx(msg);
       break;
+    case 0x85:	//rotate item
+    	//parseRotateItem(msg);
+		break;
      case 0x87: // close container
       parseCloseContainer(msg);
       break;
@@ -419,14 +422,13 @@ void Protocol74::parseLogout(NetworkMessage &msg)
          sendCancel("You may not logout during or immediately after a fight!");
          return;
      }    
+     logout();
+}
+
+void Protocol74::logout(){
 	// we ask the game to remove us
 	if (game->removeCreature(player)) {
-		pendingLogout = true;
-		/*
-		player = NULL;
-		closesocket(s);
-		s = 0;
-		*/
+		pendingLogout = true;		
 	}
 }
 
@@ -1122,7 +1124,7 @@ void Protocol74::parseLookAt(NetworkMessage &msg){
 
 void Protocol74::parseSay(NetworkMessage &msg)
 {
-  unsigned char type = msg.GetByte();
+  SpeakClasses type = (SpeakClasses)msg.GetByte();
   
   std::string receiver;
   unsigned short channelId = 0;
@@ -1136,24 +1138,24 @@ void Protocol74::parseSay(NetworkMessage &msg)
 
   switch (type)
   {
-    case 0x01:
+    case SPEAK_SAY:
       game->creatureSay(player, type, text);
       break;
-    case 0x02:
+    case SPEAK_WHISPER:
       game->creatureWhisper(player, text);
       break;
 
-    case 0x03:
+    case SPEAK_YELL:
       game->creatureYell(player, text);
       break;
 
-    case 0x04:
+    case SPEAK_PRIVATE:
       game->creatureSpeakTo(player, receiver, text);
       break;
-    case 0x05:
+    case SPEAK_CHANNEL_Y:
       game->creatureToChannel(player, type, text, channelId);
       break;
-    case 0x09:
+    case SPEAK_BROADCAST:
       game->creatureBroadcastMessage(player, text);
       break;
   }
@@ -1870,14 +1872,14 @@ void Protocol74::sendCreatureTurn(const Creature *creature, unsigned char stackP
 }
 
 
-void Protocol74::sendCreatureSay(const Creature *creature, unsigned char type, const std::string &text)
+void Protocol74::sendCreatureSay(const Creature *creature, SpeakClasses type, const std::string &text)
 {
   NetworkMessage msg;
   AddCreatureSpeak(msg,creature, type, text, 0);
   WriteBuffer(msg);
 }
 
-void Protocol74::sendToChannel(const Creature * creature, unsigned char type, const std::string &text, unsigned short channelId){
+void Protocol74::sendToChannel(const Creature * creature, SpeakClasses type, const std::string &text, unsigned short channelId){
   NetworkMessage msg;
   AddCreatureSpeak(msg,creature, type, text, channelId);
   WriteBuffer(msg);
@@ -1996,7 +1998,7 @@ void Protocol74::sendThingAppear(const Thing *thing){
 			AddAppearThing(msg,creature->pos);    
   			AddCreature(msg,creature, known, removedKnown);
     		// login bubble
-    		AddMagicEffect(msg,creature->pos, 0x0A);     
+    		AddMagicEffect(msg,creature->pos, NM_ME_ENERGY_AREA);
 		}
 	}
 	else if(CanSee(thing->pos.x, thing->pos.y, thing->pos.z))
@@ -2186,15 +2188,25 @@ void Protocol74::AddPlayerInventoryItem(NetworkMessage &msg,const Player *player
 }
 
 
-void Protocol74::AddCreatureSpeak(NetworkMessage &msg,const Creature *creature, unsigned char type, std::string text, unsigned short channelId)
+void Protocol74::AddCreatureSpeak(NetworkMessage &msg,const Creature *creature, SpeakClasses  type, std::string text, unsigned short channelId)
 {
   msg.AddByte(0xAA);
   msg.AddString(creature->getName());
   msg.AddByte(type);
-  if (type <= 3 || type == 16 || type == SPEAK_MONSTER)
-    msg.AddPosition(creature->pos);
-  if(type == 5)
-    msg.AddU16(channelId);
+  switch(type){
+	case SPEAK_SAY:
+	case SPEAK_WHISPER:
+	case SPEAK_YELL:
+	case SPEAK_MONSTER1:
+	case SPEAK_MONSTER2:
+		msg.AddPosition(creature->pos);
+		break;	
+	case SPEAK_CHANNEL_Y:
+	case SPEAK_CHANNEL_R1:
+	case SPEAK_CHANNEL_R2:
+		msg.AddU16(channelId);
+		break;	
+	}
   msg.AddString(text);
 }
 

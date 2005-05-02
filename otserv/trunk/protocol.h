@@ -90,7 +90,7 @@ public:
   //virtual void sendCreatureDisappear(const Creature *creature, unsigned char stackPos) = 0;
   virtual void sendThingDisappear(const Thing *thing, unsigned char stackPos, bool tele) = 0;
   virtual void sendCreatureTurn(const Creature *creature, unsigned char stackPos) = 0;
-  virtual void sendCreatureSay(const Creature *creature, unsigned char type, const std::string &text) = 0;
+  virtual void sendCreatureSay(const Creature *creature, SpeakClasses type, const std::string &text) = 0;
   virtual void sendSetOutfit(const Creature* creature) = 0;
 	virtual void sendTileUpdated(const Position &pos) = 0;
 	//virtual void sendContainerUpdated(Item *item, unsigned char from_id, unsigned char to_id, unsigned char from_slot, unsigned char to_slot, bool remove) = 0;
@@ -106,9 +106,10 @@ public:
   virtual void sleepTillMove();
   virtual void sendChannels() = 0;
   virtual void sendChannel(unsigned short channelId) = 0;
-  virtual void sendToChannel(const Creature * creature, unsigned char type, const std::string &text, unsigned short channelId) = 0;
+  virtual void sendToChannel(const Creature * creature, SpeakClasses type, const std::string &text, unsigned short channelId) = 0;
   virtual void sendOpenPriv(std::string &receiver) =0;
   virtual void flushOutputBuffer() = 0;
+  virtual void logout() = 0;
 
   virtual void AddTextMessage(NetworkMessage &msg,MessageClasses mclass, const char* message) = 0;
   virtual void AddAnimatedText(NetworkMessage &msg,const Position &pos, unsigned char color, std::string text) = 0;
@@ -117,7 +118,7 @@ public:
   virtual void AddCreature(NetworkMessage &msg,const Creature *creature, bool known, unsigned int remove) = 0;
   virtual void AddPlayerStats(NetworkMessage &msg,const Player *player) = 0;
   virtual void AddPlayerInventoryItem(NetworkMessage &msg,const Player *player, int item) = 0;
-  virtual void AddCreatureSpeak(NetworkMessage &msg,const Creature *creature, unsigned char type, std::string text, unsigned short channelId) = 0;
+  virtual void AddCreatureSpeak(NetworkMessage &msg,const Creature *creature, SpeakClasses type, std::string text, unsigned short channelId) = 0;
   virtual void AddCreatureHealth(NetworkMessage &msg,const Creature *creature) = 0;
   virtual void AddPlayerSkills(NetworkMessage &msg,const Player *player) = 0;
   virtual void AddRemoveThing(NetworkMessage &msg, const Position &pos,unsigned char stackpos) = 0;

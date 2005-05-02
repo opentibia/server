@@ -50,7 +50,6 @@
 #include <signal.h>
 #endif
 
-
 std::vector< std::pair<unsigned long, unsigned long> > serverIPs;
 std::vector< std::pair<unsigned long, unsigned long> > bannedIPs;
 
@@ -60,7 +59,9 @@ Items Item::items;
 Game g_game;
 Spells spells(&g_game);
 //SpawnManager spawnmanager;
-
+#if defined __EXCEPTION_TRACER__
+#include "exception.h"
+#endif
 #include "networkmessage.h"
 
 bool isclientBanished(SOCKET s)
@@ -83,6 +84,11 @@ bool isclientBanished(SOCKET s)
 
 OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 {
+#if defined __EXCEPTION_TRACER__
+	ExceptionHandler playerExceptionHandler;	
+	playerExceptionHandler.InstallHandler();
+#endif
+
   srand((unsigned)time(NULL));
 
   SOCKET s = *(SOCKET*)dat;
@@ -208,9 +214,9 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 						protocol->ReceiveLoop();
 						stat->removePlayer();
 					}
-					//free memory
-					player->releasePlayer();
 				}
+				//free memory
+				player->releasePlayer();
 			}
     }
 	else if(protId == 0xFFFF){
@@ -225,6 +231,10 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 
   if (s)
     closesocket(s);
+#if defined __EXCEPTION_TRACER__
+	playerExceptionHandler.RemoveHandler();
+#endif
+
 
 #if defined WIN32 || defined WINDOWS
 #else
@@ -246,12 +256,16 @@ void ErrorMessage(const char* message)
 
 int main(int argc, char *argv[])
 {
+#if defined __EXCEPTION_TRACER__
+	ExceptionHandler mainExceptionHandler;	
+	mainExceptionHandler.InstallHandler();
+#endif
   std::cout << ":: OTServ Development-Version 0.3.0 - Preview" << std::endl;
   std::cout << ":: ====================" << std::endl;
   std::cout << "::" << std::endl;
 
   // ignore sigpipe...
-#if defined __WINDOWS__ || defined WIN32
+#if defined __WINDOWS__ || defined WIN32	
 	//nothing yet
 #else
   struct sigaction sigh;
@@ -428,6 +442,7 @@ std::cout << ":: Loading spells spells.xml... ";
 
   std::cout << "[done]" << std::endl << ":: OpenTibia Server Running..." << std::endl;
 
+	
   while (true)
   {
     SOCKET s = accept(listen_socket, NULL, NULL); // accept a new connection
@@ -437,6 +452,8 @@ std::cout << ":: Loading spells spells.xml... ";
       OTSYS_CREATE_THREAD(ConnectionHandler, (void*)&s);
     }
   }
-
+#if defined __EXCEPTION_TRACER__	
+	mainExceptionHandler.RemoveHandler();
+#endif
 	return 0;
 }

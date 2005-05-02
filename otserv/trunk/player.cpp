@@ -1013,7 +1013,7 @@ void Player::sendChangeSpeed(Creature* creature){
      client->sendChangeSpeed(creature);
      }
 
-void Player::sendToChannel(Creature *creature, unsigned char type, const std::string &text, unsigned short channelId){
+void Player::sendToChannel(Creature *creature,SpeakClasses type, const std::string &text, unsigned short channelId){
      client->sendToChannel(creature, type, text, channelId);
      }
 
@@ -1068,9 +1068,10 @@ void Player::sendPing(){
 	if(npings >= 6){
 		if(inFightTicks >=1000 && health >0) {
 			//logout?
+			client->logout();
 		}
 		else{
-			//logout
+			client->logout();			
 		}
 	}
 }
@@ -1204,7 +1205,7 @@ void Player::onThingRemove(const Thing* thing){
 }
 
 
-void Player::onCreatureSay(const Creature *creature, unsigned char type, const std::string &text)
+void Player::onCreatureSay(const Creature *creature, SpeakClasses type, const std::string &text)
 {
   client->sendCreatureSay(creature, type, text);
 }

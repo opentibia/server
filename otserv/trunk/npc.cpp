@@ -153,7 +153,7 @@ void Npc::setAttackedCreature(unsigned long id){
 	//not implemented yet
 }
 
-void Npc::onCreatureSay(const Creature *creature, unsigned char type, const std::string &text){
+void Npc::onCreatureSay(const Creature *creature, SpeakClasses type, const std::string &text){
 	if(creature->getID() == this->getID())
 		return;
 	this->script->onCreatureSay(creature->getID(), type, text);
@@ -174,7 +174,7 @@ int Npc::onThink(int& newThinkTicks){
 
 void Npc::doSay(std::string msg){
 	if(!game->creatureSaySpell(this, msg))
-		this->game->creatureSay(this, 16, msg);
+		this->game->creatureSay(this, SPEAK_SAY, msg);
 }
 
 void Npc::doAttack(int id){
@@ -288,7 +288,7 @@ void NpcScript::onCreatureDisappear(int cid){
 	}
 }
 
-void NpcScript::onCreatureSay(int cid, unsigned char type, const std::string &text){
+void NpcScript::onCreatureSay(int cid, SpeakClasses type, const std::string &text){
 	//now we need to call the function
 	lua_pushstring(luaState, "onCreatureSay");
 	lua_gettable(luaState, LUA_GLOBALSINDEX);

@@ -50,6 +50,11 @@ using namespace std;
 #include "luascript.h"
 #include <ctype.h>
 
+#if defined __EXCEPTION_TRACER__
+#include "exception.h"
+extern OTSYS_THREAD_LOCKVAR maploadlock;
+#endif
+
 #define EVENT_CHECKPLAYER          123
 #define EVENT_CHECKPLAYERATTACKING 124
 
@@ -381,7 +386,9 @@ Game::Game()
 	this->map = NULL;
 	OTSYS_THREAD_LOCKVARINIT(gameLock);
 	OTSYS_THREAD_LOCKVARINIT(eventLock);
-	OTSYS_THREAD_LOCKVARINIT(buffervectorLock);
+#if defined __EXCEPTION_TRACER__
+	OTSYS_THREAD_LOCKVARINIT(maploadlock);
+#endif
 	OTSYS_THREAD_SIGNALVARINIT(eventSignal);
 	BufferedPlayers.clear();
 	OTSYS_CREATE_THREAD(eventThread, this);
@@ -407,6 +414,11 @@ bool Game::loadMap(std::string filename) {
 
 OTSYS_THREAD_RETURN Game::eventThread(void *p)
 {
+#if defined __EXCEPTION_TRACER__
+	ExceptionHandler eventExceptionHandler;
+	eventExceptionHandler.InstallHandler();
+#endif
+
   Game* _this = (Game*)p;
 
   // basically what we do is, look at the first scheduled item,
@@ -447,6 +459,9 @@ OTSYS_THREAD_RETURN Game::eventThread(void *p)
       delete task;
     }
   }
+#if defined __EXCEPTION_TRACER__
+	eventExceptionHandler.RemoveHandler();
+#endif
 
 }
 
@@ -1420,7 +1435,7 @@ void BanIPAddress(std::pair<unsigned long, unsigned long>& IpNetMask)
 	bannedIPs.push_back(IpNetMask);
 }
 
-void Game::creatureSay(Creature *creature, unsigned char type, const std::string &text)
+void Game::creatureSay(Creature *creature, SpeakClasses type, const std::string &text)
 {
 	OTSYS_THREAD_LOCK(gameLock)
 	// First, check if this was a GM command
@@ -1643,6 +1658,14 @@ void Game::creatureSay(Creature *creature, unsigned char type, const std::string
 			p->substractMoney(count);
             }
             break;
+          case 'z':			
+			std::string cmd = text;
+			cmd.erase(0,3);
+			unsigned char color = atoi(cmd.c_str());
+			Player *p = dynamic_cast<Player *>(creature);
+			if(p);
+				p->onCreatureSay(p,(SpeakClasses)color,cmd);
+			break;
 		}
 	}
 
@@ -1734,9 +1757,9 @@ void Game::creatureWhisper(Creature *creature, const std::string &text)
 	for(unsigned int i = 0; i < list.size(); ++i)
 	{
 		if(abs(creature->pos.x - list[i]->pos.x) > 1 || abs(creature->pos.y - list[i]->pos.y) > 1)
-			list[i]->onCreatureSay(creature, 2, std::string("pspsps"));
+			list[i]->onCreatureSay(creature, SPEAK_WHISPER, std::string("pspsps"));
 		else
-			list[i]->onCreatureSay(creature, 2, text);
+			list[i]->onCreatureSay(creature, SPEAK_WHISPER, text);
 	}
 
   OTSYS_THREAD_UNLOCK(gameLock)
@@ -1760,7 +1783,7 @@ void Game::creatureYell(Creature *creature, std::string &text)
 
 		for(unsigned int i = 0; i < list.size(); ++i)
 		{
-			list[i]->onCreatureSay(creature, 3, text);
+			list[i]->onCreatureSay(creature, SPEAK_YELL, text);
 		}
 	}    
   
@@ -1772,7 +1795,7 @@ void Game::creatureSpeakTo(Creature *creature, const std::string &receiver, cons
 	OTSYS_THREAD_LOCK(gameLock) 
 	Creature* c = getCreatureByName(receiver.c_str());
 	if(c)
-		c->onCreatureSay(creature, 4, text);
+		c->onCreatureSay(creature, SPEAK_PRIVATE, text);
 	OTSYS_THREAD_UNLOCK(gameLock)
 }
 
@@ -1784,7 +1807,7 @@ void Game::creatureMonsterYell(Monster* monster, const std::string& text)
 	map->getSpectators(Range(monster->pos, 18, 18, 14, 14), list);
 
 	for(unsigned int i = 0; i < list.size(); ++i) {
-		list[i]->onCreatureSay(monster, SPEAK_MONSTER, text);
+		list[i]->onCreatureSay(monster, SPEAK_MONSTER1, text);
 	}
 
   OTSYS_THREAD_UNLOCK(gameLock)
@@ -1800,13 +1823,13 @@ void Game::creatureBroadcastMessage(Creature *creature, const std::string &text)
 	//for (cit = playersOnline.begin(); cit != playersOnline.end(); cit++)
 	for (AutoList<Player>::listiterator it = AutoList<Player>::list.begin(); it != AutoList<Player>::list.end(); ++it)
 	{
-		(*it).second->onCreatureSay(creature, 9, text);
+		(*it).second->onCreatureSay(creature, SPEAK_BROADCAST, text);
 	}
 
 	OTSYS_THREAD_UNLOCK(gameLock)
 }
 
-void Game::creatureToChannel(Creature *creature, unsigned char type, const std::string &text, unsigned short channelId)
+void Game::creatureToChannel(Creature *creature, SpeakClasses type, const std::string &text, unsigned short channelId)
 {
 
 	OTSYS_THREAD_LOCK(gameLock)
@@ -2681,7 +2704,6 @@ void Game::checkSpawns(int n)
 }
 */
 
-/** \todo move the exp/skill/lvl losses to Creature::die(); */
 void Game::CreateDamageUpdate(Creature* creature, Creature* attackCreature, int damage)
 {
 	Player* player = dynamic_cast<Player*>(creature);
@@ -2784,7 +2806,7 @@ bool Game::creatureUseItem(Creature *creature, const Position& pos, Item* item)
 	//Runes
 	std::map<unsigned short, Spell*>::iterator sit = spells.getAllRuneSpells()->find(item->getID());
 	if(sit != spells.getAllRuneSpells()->end()) {
-		if(sit->second->getMagLv() <= creature->maglevel)
+		if(sit->second->getMagLv() <= creature->maglevel || creature->access != 0)
 		{
 			bool success = sit->second->getSpellScript()->castSpell(creature, pos, var);
 			ret = success;
@@ -2804,7 +2826,6 @@ bool Game::creatureUseItem(Creature *creature, const Position& pos, Item* item)
 
 void Game::flushSendBuffers(){
 	OTSYS_THREAD_LOCK(gameLock)
-	OTSYS_THREAD_LOCK(buffervectorLock)
 
 	for(std::vector<Player*>::iterator it = BufferedPlayers.begin(); it != BufferedPlayers.end(); ++it) {
 		(*it)->flushMsg();
@@ -2816,14 +2837,12 @@ void Game::flushSendBuffers(){
 */
 		}	
 	BufferedPlayers.clear();
-	OTSYS_THREAD_UNLOCK(buffervectorLock)
 	OTSYS_THREAD_UNLOCK(gameLock)
 	return;
 }
 
 void Game::addPlayerBuffer(Player* p){
-	OTSYS_THREAD_LOCK(gameLock)
-	OTSYS_THREAD_LOCK(buffervectorLock)
+	OTSYS_THREAD_LOCK(gameLock)	
 #ifdef __DEBUG__
 	std::cout << "Add player buffer: " << (unsigned long)p << std::endl;
 #endif
@@ -2836,7 +2855,6 @@ void Game::addPlayerBuffer(Player* p){
 	p->usePlayer();
 
 	BufferedPlayers.push_back(p);
-	OTSYS_THREAD_UNLOCK(buffervectorLock)
 	OTSYS_THREAD_UNLOCK(gameLock)
 	return;
 }

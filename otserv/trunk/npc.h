@@ -47,7 +47,7 @@ public:
 	virtual void onCreatureAppear(unsigned long cid);
 	virtual void onCreatureDisappear(int cid);
 //	virtual void onCreatureTurn(const Creature *creature, unsigned char stackpos);
-	virtual void onCreatureSay(int cid, unsigned char type, const std::string &text);
+	virtual void onCreatureSay(int cid, SpeakClasses, const std::string &text);
 	virtual void onThink();
 //	virtual void onCreatureChangeOutfit(const Creature* creature);
 	static Npc* getNpc(lua_State *L);
@@ -101,7 +101,7 @@ protected:
   virtual void onCreatureAppear(const Creature *creature);
   virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos, bool tele);
   virtual void onCreatureTurn(const Creature *creature, unsigned char stackpos);
-  virtual void onCreatureSay(const Creature *creature, unsigned char type, const std::string &text);
+  virtual void onCreatureSay(const Creature *creature, SpeakClasses type, const std::string &text);
   virtual void onCreatureChangeOutfit(const Creature* creature);
   virtual int onThink(int& newThinkTicks);
   virtual void setAttackedCreature(unsigned long id);

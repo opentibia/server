@@ -105,7 +105,7 @@ private:
 	virtual void sendChannels();
 	virtual void sendChannel(unsigned short channelId);
 	virtual void sendOpenPriv(std::string &receiver);
-	virtual void sendToChannel(const Creature *creature, unsigned char type, const std::string &text, unsigned short channelId);
+	virtual void sendToChannel(const Creature *creature, SpeakClasses type, const std::string &text, unsigned short channelId);
 	//void sendPlayerChangeGround(Action* action);
 
   virtual void sendNetworkMessage(NetworkMessage *msg);
@@ -158,7 +158,7 @@ private:
   virtual void sendPing();
   //virtual void sendCreatureDisappear(const Creature *creature, unsigned char stackPos);
   virtual void sendCreatureTurn(const Creature *creature, unsigned char stackpos);
-  virtual void sendCreatureSay(const Creature *creature, unsigned char type, const std::string &text);
+  virtual void sendCreatureSay(const Creature *creature, SpeakClasses type, const std::string &text);
 
   virtual void sendCancel(const char *msg);
   virtual void sendCancelWalk(const char *msg);
@@ -173,6 +173,8 @@ private:
 	virtual void sendTextMessage(MessageClasses mclass, const char* message,const Position &pos, unsigned char type);
 	
   virtual bool CanSee(int x, int y, int z) const;
+  virtual void logout();
+  
   void flushOutputBuffer();
   void WriteMsg(NetworkMessage &msg);
 
@@ -193,7 +195,7 @@ private:
   virtual void AddCreature(NetworkMessage &msg,const Creature *creature, bool known, unsigned int remove);
   virtual void AddPlayerStats(NetworkMessage &msg,const Player *player);
   virtual void AddPlayerInventoryItem(NetworkMessage &msg,const Player *player, int item);
-  virtual void AddCreatureSpeak(NetworkMessage &msg,const Creature *creature, unsigned char type, std::string text, unsigned short channelId);
+  virtual void AddCreatureSpeak(NetworkMessage &msg,const Creature *creature, SpeakClasses type, std::string text, unsigned short channelId);
   virtual void AddCreatureHealth(NetworkMessage &msg,const Creature *creature);
   virtual void AddPlayerSkills(NetworkMessage &msg,const Player *player);
   virtual void AddRemoveThing(NetworkMessage &msg, const Position &pos,unsigned char stackpos);
