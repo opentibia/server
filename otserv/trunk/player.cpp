@@ -712,7 +712,7 @@ void Player::addSkillTry(int skilltry)
 					case CLUB: skill = 1; skillname = "club fighting"; break;
 					case AXE: skill = 3; skillname = "axe fighting"; break;
 					case DIST: skill = 4; skillname = "distance fighting"; break;
-                    case SHIELD: return; break;
+                    case SHIELD: continue; break;
                     case MAGIC: return;	break;//TODO: should add skill try?
 					default: skill = 0; skillname = "fist fighting"; break;
 			 	}//switch
@@ -1029,9 +1029,11 @@ void Player::sendCancelWalk(const char *msg)
 }
 void Player::sendStats(){
 	//update level and maglevel percents
-	if(lastSentStats.experience != this->experience)
+	if(lastSentStats.experience != this->experience || 
+			lastSentStats.level != this->level)
 	    level_percent  = (unsigned char)(100*(experience-getExpForLv(level))/(1.*getExpForLv(level+1)-getExpForLv(level)));		
-	if(lastSentStats.manaspent != this->manaspent)
+	if(lastSentStats.manaspent != this->manaspent || 
+			lastSentStats.maglevel != this->maglevel)
 	    maglevel_percent  = (unsigned char)(100*(manaspent/(1.*getReqMana(maglevel+1,voc))));
 	//save current stats 
 	lastSentStats.health = this->health;
@@ -1042,7 +1044,7 @@ void Player::sendStats(){
 	lastSentStats.mana = this->mana;
 	lastSentStats.manamax = this->manamax;
 	lastSentStats.manaspent = this->manaspent;
-	lastSentStats.maglevel = this->maglevel;	
+	lastSentStats.maglevel = this->maglevel;
 	
 	client->sendStats();
 }
@@ -1237,29 +1239,27 @@ void Player::die() {
     client->sendTextMessage(MSG_EVENT, "Own3d!");
 		
 	//Magic Level downgrade
-	unsigned int sumMana = 0;
-	unsigned int lostMana = 0;
+	unsigned long sumMana = 0;
+	long lostMana = 0;
 	for (int i = 1; i <= maglevel; i++) {              //sum up all the mana
 		sumMana += getReqMana(i, voc);
 	}
                 
 	sumMana += manaspent;
                 
-	lostMana = (int) (sumMana * 0.1);   //player loses 10% of all spent mana when he dies
-                
-	if ((unsigned) manaspent >= lostMana) { //player does not lose a magic level
-		manaspent -= lostMana;
-	} 
-	else {                             //player DOES lose a magic level
+	lostMana = (long)(sumMana * 0.1);   //player loses 10% of all spent mana when he dies
+    
+    while(lostMana > manaspent){
 		lostMana -= manaspent;
-		manaspent = (int) ( getReqMana(maglevel, voc) - lostMana );
+		manaspent = getReqMana(maglevel, voc);
 		maglevel--;
 	}
+	manaspent -= lostMana;
 	//End Magic Level downgrade
                 
 	//Skill loss
-	unsigned int lostSkilltries;
-	unsigned int sumSkilltries;
+	long lostSkilltries;
+	unsigned long sumSkilltries;
 	for (int i = 0; i <= 6; i++) {  //for each skill
 		lostSkilltries = 0;         //reset to 0
 		sumSkilltries = 0;
@@ -1270,27 +1270,27 @@ void Player::die() {
                     
 		sumSkilltries += skills[i][SKILL_TRIES];
                     
-		lostSkilltries = (int) (sumSkilltries * 0.1);           //player loses 10% of his skill tries
+		lostSkilltries = (long) (sumSkilltries * 0.1);           //player loses 10% of his skill tries
 
-		if ((unsigned)skills[i][SKILL_TRIES] >= lostSkilltries) { //player does not lose a skill level
-			skills[i][SKILL_TRIES] -= lostSkilltries;
-		}
-		else {                                                //player DOES lose a skill level
-			if (skills[i][SKILL_LEVEL] > 10 ) {          //skills should not be < 10
-				lostSkilltries -= skills[i][SKILL_TRIES];
-				skills[i][SKILL_TRIES] = (int) ( getReqSkilltries(i, skills[i][SKILL_LEVEL], voc) - lostSkilltries );
+		while(lostSkilltries > skills[i][SKILL_TRIES]){
+			lostSkilltries -= skills[i][SKILL_TRIES];
+			skills[i][SKILL_TRIES] = getReqSkilltries(i, skills[i][SKILL_LEVEL], voc);
+			if(skills[i][SKILL_LEVEL] > 10){
 				skills[i][SKILL_LEVEL]--;
 			}
-			else {
+			else{
 				skills[i][SKILL_LEVEL] = 10;
 				skills[i][SKILL_TRIES] = 0;
+				lostSkilltries = 0;
+				break;
 			}
 		}
+		skills[i][SKILL_TRIES] -= lostSkilltries;
 	}               
 	//End Skill loss
         
 	//Level Downgrade
-	int newLevel = level;
+	long newLevel = level;
 	while((unsigned long)(experience - getLostExperience()) < getExpForLv(newLevel)) //0.1f is also used in die().. maybe we make a little function for exp-loss?
 	{
 		if(newLevel > 1)
@@ -1316,11 +1316,9 @@ void Player::preSave()
 		pos.x = masterPos.x;
 		pos.y = masterPos.y;
 		pos.z = masterPos.z;
-
-		//int expLoss = (int)(experience*0.1f);
-		experience -= getLostExperience(); //(int)(experience*0.1f);        //0.1f is also used in die().. maybe we make a little function for exp-loss?
 		
-		int newLevel = level;
+		experience -= getLostExperience(); //(int)(experience*0.1f);        //0.1f is also used in die().. maybe we make a little function for exp-loss?
+				
 		while(experience < getExpForLv(level))
 		{
 			if(level > 1)                               
