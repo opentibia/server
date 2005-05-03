@@ -55,8 +55,10 @@ unsigned char Item::getItemCountOrSubtype() const {
 	if(isStackable() || isMultiType()) {
 		return count;
 	}
+	else if(isFluidContainer())
+		return fluid;
 	else if(chargecount != 0)
-		return chargecount;
+		return chargecount;	
 	else
 		return 0;
 }
@@ -66,6 +68,7 @@ Item::Item(const unsigned short _type) {
 	id = _type;
 	count = 0;
 	chargecount = 0;
+	fluid = 0;
 	throwRange = 6;
 }
 
@@ -80,6 +83,20 @@ Item* Item::tranform()
 
 	Item *item = Item::CreateItem(decayTo);
 	item->pos = this->pos;
+	//move items if they both are containers
+	Container *containerfrom = dynamic_cast<Container*>(this);
+	Container *containerto = dynamic_cast<Container*>(item);
+	if(containerto && containerfrom){
+		std::vector<Item*> itemlist;
+		for (ContainerList::const_iterator cit = containerfrom->getItems(); cit != containerfrom->getEnd(); ++cit) {
+			itemlist.push_back(*cit);							
+		}
+		for(std::vector<Item*>::reverse_iterator it = itemlist.rbegin(); it != itemlist.rend(); ++it){
+			containerfrom->removeItem(*it);
+			containerto->addItem(*it);
+		}						
+	}
+
 	return item;
 }
 
@@ -87,9 +104,12 @@ Item::Item(const unsigned short _type, unsigned char _count) {
 	id = _type;
 	count = 0;
 	chargecount = 0;
+	fluid = 0;
 
 	if(isStackable() || isMultiType())
 		count = _count;
+	else if(isFluidContainer())
+		fluid = _count;
 	else
 		chargecount = _count;
 	throwRange = 6;
@@ -152,6 +172,10 @@ bool Item::isStackable() const {
 
 bool Item::isMultiType() const {
 	return items[id].multitype;
+}
+
+bool Item::isFluidContainer() const {
+	return items[id].fluidcontainer;
 }
 
 bool Item::isAlwaysOnTop() const {

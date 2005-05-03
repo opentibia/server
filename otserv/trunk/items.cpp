@@ -30,6 +30,7 @@
 ItemType::ItemType()
 {
 	iscontainer     = false;
+	fluidcontainer	= false;
 	stackable       = false;
   multitype       = false;
 	useable	        = false;
@@ -232,6 +233,7 @@ int Items::loadFromDat(std::string file)
         case 0x06: // ladder up (id 1386)   why a group for just 1 item ???   
             break;
         case 0x09: //can contain fluids
+        	iType->fluidcontainer = true;
             break;
         case 0x0D: // blocks missiles (walls, magic wall etc)
 					iType->blockingProjectile = true;

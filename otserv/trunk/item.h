@@ -45,6 +45,7 @@ class Item : public Thing
         unsigned id;  // the same id as in ItemType
 	      unsigned char count; // number of stacked items
 				unsigned char chargecount; //number of charges on the item
+		unsigned char fluid;
 
     public:
 		static Item* CreateItem(const unsigned short _type, unsigned char _count = 0); //Factory member to create item of right type based on type
@@ -66,6 +67,7 @@ class Item : public Thing
 	  bool isBlocking() const;
 
 		bool isStackable() const;
+		bool isFluidContainer() const;
     bool isMultiType() const;
 		bool isAlwaysOnTop() const;
 		bool isGroundTile() const;

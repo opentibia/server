@@ -261,7 +261,7 @@ void NetworkMessage::AddItem(const Item *item)
 {
   AddU16(item->getID());
 
-  if (item->isStackable() || item->isMultiType())
+  if (item->isStackable() || item->isMultiType() || item->isFluidContainer())
     AddByte(item->getItemCountOrSubtype());
 }
 

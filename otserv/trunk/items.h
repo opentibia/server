@@ -71,6 +71,7 @@ public:
 
 	// other bools
 	bool iscontainer;
+	bool fluidcontainer;
 	bool stackable;
 	bool multitype;
 	bool useable;
