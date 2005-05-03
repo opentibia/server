@@ -80,7 +80,9 @@ void Protocol::sleepTillMove(){
 	if(t && t->ground) {
 		ground = t->ground->getID();
 	}
-	long long delay = ((long long)player->lastmove + (long long)player->getStepDuration(Item::items[ground].speed)) -
+	long long delay = 0;
+	if(Item::items[ground].speed != 0)
+		delay = ((long long)player->lastmove + (long long)player->getStepDuration(Item::items[ground].speed)) -
 				((long long)OTSYS_TIME());
 
 	if(delay > 0){

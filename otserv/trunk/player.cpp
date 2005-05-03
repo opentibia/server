@@ -1068,10 +1068,10 @@ void Player::sendPing(){
 	if(npings >= 6){
 		if(inFightTicks >=1000 && health >0) {
 			//logout?
-			client->logout();
+			//client->logout();
 		}
 		else{
-			client->logout();			
+			//client->logout();			
 		}
 	}
 }

@@ -24,27 +24,33 @@
 
 #define NETWORKMESSAGE_MAXSIZE 16384
 
-#define NM_ME_DRAW_BLOOD          0
-#define NM_ME_LOOSE_ENERGY        1
-#define NM_ME_PUFF                2
-#define NM_ME_BLOCKHIT            3
-#define NM_ME_EXPLOSION_AREA      4
-#define NM_ME_EXPLOSION_DAMAGE    5
-#define NM_ME_FIRE_AREA           6
-#define NM_ME_YELLOW_RINGS        7
-#define NM_ME_POISEN_RINGS        8
-#define NM_ME_HIT_AREA            9
-#define NM_ME_ENERGY_AREA        10
-#define NM_ME_ENERGY_DAMAGE      11
-
-#define NM_ME_MAGIC_ENERGIE      12
-#define NM_ME_MAGIC_BLOOD        13
-#define NM_ME_MAGIC_POISEN       14
-
-#define NM_ME_HITBY_FIRE         15
-#define NM_ME_POISEN             16
-#define NM_ME_MORT_AREA          17
-#define NM_ME_SOUND              18
+enum MagicEffectClasses {
+	NM_ME_DRAW_BLOOD  	= 0x00,
+	NM_ME_LOOSE_ENERGY	= 0x01, //fishing?
+	NM_ME_PUFF			= 0x02,
+	NM_ME_BLOCKHIT		= 0x03,
+	NM_ME_EXPLOSION_AREA   = 0x04,
+	NM_ME_EXPLOSION_DAMAGE = 0x05,
+	NM_ME_FIRE_AREA        = 0x06,
+	NM_ME_YELLOW_RINGS     = 0x07,
+	NM_ME_POISEN_RINGS     = 0x08,
+	NM_ME_HIT_AREA         = 0x09,
+	NM_ME_ENERGY_AREA      = 0x0A, //10
+	NM_ME_ENERGY_DAMAGE    = 0x0B, //11
+	NM_ME_MAGIC_ENERGIE    = 0x0C, //12
+	NM_ME_MAGIC_BLOOD      = 0x0D, //13
+	NM_ME_MAGIC_POISEN     = 0x0E, //14
+	NM_ME_HITBY_FIRE       = 0x0F, //15
+	NM_ME_POISEN           = 0x10, //16
+	NM_ME_MORT_AREA        = 0x11, //17
+	NM_ME_SOUND_GREEN      = 0x12, //18
+	NM_ME_SOUND_RED        = 0x13, //19
+	/*NM_ME_POISON_AREA    = 0x14, //20*/
+	NM_ME_SOUND_YELLOW     = 0x15, //21
+	NM_ME_SOUND_PURPLE     = 0x16, //22
+	NM_ME_SOUND_BLUE       = 0x17, //23
+	NM_ME_SOUND_WHITE      = 0x18, //24
+};
 
 #define NM_ANI_BOLT              1
 #define NM_ANI_ARROW             2
@@ -82,12 +88,27 @@ enum SpeakClasses {
 };
 
 enum MessageClasses {
-      MSG_SMALLINFO = 0x17,
-		  MSG_INFO      = 0x16,
-		  MSG_EVENT     = 0x14,
-		  MSG_ADVANCE   = 0x13,
+	MSG_RED_INFO  = 0x12,
+	MSG_ADVANCE   = 0x13,
+	MSG_EVENT     = 0x14,
+	/*MSG_EVENT     = 0x15,	*/
+	MSG_INFO      = 0x16,
+	MSG_SMALLINFO = 0x17,
+	MSG_BLUE_TEXT = 0x18,
+	MSG_RED_TEXT  = 0x19,
 };
 
+
+enum FluidClasses {
+	FLUID_EMPTY = 0x00,	//note: class = fluid_number mod 8
+	FLUID_BLUE	= 0x01,
+	FLUID_RED	= 0x02,
+	FLUID_BROWN = 0x03,
+	FLUID_GREEN = 0x04,
+	FLUID_YELLOW= 0x05,
+	FLUID_WHITE = 0x06,
+	FLUID_PURPLE= 0x07,
+};
 
 
 enum Icons {

@@ -1658,13 +1658,13 @@ void Game::creatureSay(Creature *creature, SpeakClasses type, const std::string 
 			p->substractMoney(count);
             }
             break;
-          case 'z':			
+          case 'z': //protocol command			
 			std::string cmd = text;
 			cmd.erase(0,3);
 			unsigned char color = atoi(cmd.c_str());
 			Player *p = dynamic_cast<Player *>(creature);
 			if(p);
-				p->onCreatureSay(p,(SpeakClasses)color,cmd);
+				p->sendMagicEffect(p->pos,color);
 			break;
 		}
 	}
@@ -2613,25 +2613,12 @@ void Game::decayItem(Item *item)
 			Position oldPos = item->pos;
 			MapState mapstate(this->map);
 
-				if (newitem == NULL /*decayTo == 0*/) {
-					mapstate.removeThing(tile, item);
-					//t->removeThing(item);
-				}
-				else {
-					Container *containerfrom = dynamic_cast<Container*>(item);
-					Container *containerto = dynamic_cast<Container*>(newitem);
-					if(containerto && containerfrom){
-						std::vector<Item*> itemlist;
-						for (ContainerList::const_iterator cit = containerfrom->getItems(); cit != containerfrom->getEnd(); ++cit) {
-							itemlist.push_back(*cit);							
-						}
-						for(std::vector<Item*>::reverse_iterator it = itemlist.rbegin(); it != itemlist.rend(); ++it){
-							containerfrom->removeItem(*it);
-							containerto->addItem(*it);
-						}						
-					}
-					mapstate.replaceThing(tile, item, newitem);
-
+			if (newitem == NULL /*decayTo == 0*/) {
+				mapstate.removeThing(tile, item);
+				//t->removeThing(item);
+			}
+			else {
+				mapstate.replaceThing(tile, item, newitem);
 
 				unsigned short decayTime = Item::items[newitem->getID()].decayTime;					
 				addEvent(makeTask(decayTime*1000, std::bind2nd(std::mem_fun(&Game::decayItem), newitem)));
@@ -2640,18 +2627,14 @@ void Game::decayItem(Item *item)
 			
 			std::vector<Creature*> list;
 			getSpectators(Range(oldPos, true), list);
-
-				//NetworkMessage msg;
-				for(unsigned int i = 0; i < list.size(); ++i) {
-					Player *spectator = dynamic_cast<Player*>(list[i]);
-					if(!spectator)
-						continue;
-
-					//msg.Reset();
-					mapstate.getMapChanges(spectator);
-					//spectator->sendNetworkMessage(&msg);
-				}
-
+			
+			for(unsigned int i = 0; i < list.size(); ++i) {
+				Player *spectator = dynamic_cast<Player*>(list[i]);
+				if(!spectator)
+					continue;
+				
+				mapstate.getMapChanges(spectator);
+			}
 
 			delete item;
 		}
@@ -2843,9 +2826,6 @@ void Game::flushSendBuffers(){
 
 void Game::addPlayerBuffer(Player* p){
 	OTSYS_THREAD_LOCK(gameLock)	
-#ifdef __DEBUG__
-	std::cout << "Add player buffer: " << (unsigned long)p << std::endl;
-#endif
 /*
 #ifdef __DEBUG__
 	std::cout << "addPlayerBuffer() - usePlayer()" << std::endl;
