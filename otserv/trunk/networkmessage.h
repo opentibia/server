@@ -76,7 +76,7 @@ public:
   void AddItem(const Item *item);
   void AddCreature(const Creature *creature, bool known, unsigned int remove);
 
-
+/* MOVED TO PROTOCOL
   // write functions for complete message blocks
   void AddTextMessage(MessageClasses mclass, const char* message);
   void AddAnimatedText(const Position &pos, unsigned char color, std::string text);
@@ -90,7 +90,7 @@ public:
   void AddPlayerInventoryItem(const Player *player, int item);
   void AddPlayerSkills(const Player *player);
   void AddPlayerStats(const Player *player);
-
+*/
   int getMessageLength(){
       return m_MsgSize;
       }
