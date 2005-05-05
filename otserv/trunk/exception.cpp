@@ -63,7 +63,7 @@ bool ExceptionHandler::InstallHandler(){
 		return false;
 		/*
 			mov eax,fs:[0]
-			mov eax,[prevSEH]
+			mov [prevSEH],eax
 			mov [chain].prevSEH,eax
 			mov [chain].SEHfunction,_SEHHandler
 			lea eax,[chain]
@@ -104,6 +104,7 @@ EXCEPTION_DISPOSITION
 	unsigned long *esp;
 	unsigned long stack_val;
 	unsigned long *stacklimit;
+	bool file;
 	char buffer[12];
 	_MEMORY_BASIC_INFORMATION mbi;
 
@@ -112,12 +113,14 @@ EXCEPTION_DISPOSITION
 	stacklimit = (unsigned long*)((unsigned long)(mbi.BaseAddress) + mbi.RegionSize);
 	
 	std::ostream *outdriver;
-	
+	std::cout << "Error: generating report file..." <<std::endl;
 	std::ofstream output("report.txt",std::ios_base::app);
 	if(output.fail()){
 		outdriver = &std::cout;
+		file = false;
 	}
 	else{
+		file = true;
 		outdriver = &output;
 	}
 	
@@ -164,7 +167,10 @@ EXCEPTION_DISPOSITION
 		esp++;
 	}
 	*outdriver << "*****************************************************" << std::endl;
-	MessageBox(NULL,"Please send the file report.txt to support service ;). Thanks","Error",MB_OK |MB_ICONERROR);
+	if(file)
+		((std::ofstream*)outdriver)->close();
+	/*MessageBox(NULL,"Please send the file report.txt to support service ;). Thanks","Error",MB_OK |MB_ICONERROR);*/
+	std::cout << "Error report generated. Killing server." <<std::endl;
 	exit(1); //force exit
 	return ExceptionContinueSearch;
 }
