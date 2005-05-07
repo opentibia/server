@@ -63,13 +63,16 @@ public:
 	void setGUID(unsigned long _guid) {guid = _guid;};
 	unsigned long getGUID() const { return guid;};
 
-
 	static const unsigned long min_id = 16777217U;
 	static const unsigned long max_id = 4294967295U;
 
   void speak(const std::string &text);
 
-	int addItem(Item* item, int pos, bool isloading = false);
+	//bool addItem(Item* item);
+	//bool removeItem(unsigned short id,unsigned short count);
+	//bool removeItem(Item* item);
+	//int getItemCount(unsigned short id);
+	int addItemInventory(Item* item, int pos, bool isloading = false);
 
 	containerLayout::const_iterator getContainers() const { return vcontainers.begin();}
 	containerLayout::const_iterator getEndContainer() const { return vcontainers.end();}
@@ -170,6 +173,7 @@ public:
 	bool NeedUpdateStats();	
 	void onThingDisappear(const Thing* thing, unsigned char stackPos);
 	void onThingAppear(const Thing* thing);  
+	void onThingTransform(const Thing* thing,int stackpos);
 	void onThingRemove(const Thing* thing);
 	void sendDistanceShoot(const Position &from, const Position &to, unsigned char type);
 	void sendMagicEffect(const Position &pos, unsigned char type);

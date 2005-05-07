@@ -321,7 +321,7 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 		bool hadSplash = (tile->splash != NULL);
 
 		if (!tile->splash) {
-			Item *item = Item::CreateItem(2019, 2);
+			Item *item = Item::CreateItem(2019, FLUID_BLOOD);
 			item->pos = attackedCreature->pos;
 			tile->splash = item;
 		}
@@ -537,11 +537,13 @@ Creature* Game::getCreatureByName(const char* s)
 
 bool Game::placeCreature(Creature* c)
 {
-	if (c->access == 0 && getPlayersOnline() >= max_players)
-		//we cant add the player, server is full	
-		return false;
-
 	OTSYS_THREAD_LOCK(gameLock)
+	if (c->access == 0 && getPlayersOnline() >= max_players){
+		//we cant add the player, server is full	
+		OTSYS_THREAD_UNLOCK(gameLock)
+		return false;
+	}
+
 
 	// add player to the online list
 	//playersOnline[c->getID()] = c;
@@ -717,9 +719,11 @@ bool Game::onPrepareMoveThing(Creature *player, const Thing* thing, const Tile *
 			player->sendCancelWalk("Sorry, not possible...");
 			return;
 	}*/
-	if ((!toTile) || (toTile && !thing->canMovedTo(toTile))){		
-    	if (player == thing)
-      		player->sendCancelWalk("Sorry, not possible...");
+	if ((!toTile) || (toTile && !thing->canMovedTo(toTile)) || 
+			(item && (item->isBlocking() && toTile->creatures[0])) ){		
+		const Player* player_t = dynamic_cast<const Player*>(thing);
+    	if (player_t && player == player_t)
+      		player->sendCancelWalk("Sorry, not possible...");      	
     	else
       		player->sendCancel("Sorry, not possible...");
 		return false;
@@ -1056,7 +1060,8 @@ void Game::thingMoveInternal(Creature *player,
 			if(!item)
 				return;
 
-			if(onPrepareMoveThing(p, item, fromPos, toPos)) {
+			if(onPrepareMoveThing(p, item, fromPos, toPos) &&
+					onPrepareMoveThing(p,item,NULL,toTile)) {
 				item->pos = toPos;
 				int oldcount = item->getItemCountOrSubtype();
 
@@ -1078,7 +1083,8 @@ void Game::thingMoveInternal(Creature *player,
 			if(!item)
 				return;
 			
-			if(onPrepareMoveThing(p, item, player->pos, toPos)) {
+			if(onPrepareMoveThing(p, item, player->pos, toPos) &&
+					onPrepareMoveThing(p,item,NULL,toTile)) {
 				int oldcount = item->getItemCountOrSubtype();
 				item->pos = toPos;
 
@@ -1158,7 +1164,7 @@ void Game::thingMoveInternal(Creature *player,
 				if(fromTile->removeThing(item)) {
 					Item *oldItem = p->getItem(to_cid);
 					p->items[to_cid] = NULL;
-					p->addItem(item, to_cid);
+					p->addItemInventory(item, to_cid);
 
 					if(oldItem) {
 						fromTile->addThing(oldItem);
@@ -1658,13 +1664,13 @@ void Game::creatureSay(Creature *creature, SpeakClasses type, const std::string 
 			p->substractMoney(count);
             }
             break;
-          case 'z': //protocol command			
+          case 'z': //protocol command
 			std::string cmd = text;
 			cmd.erase(0,3);
-			unsigned char color = atoi(cmd.c_str());
-			Player *p = dynamic_cast<Player *>(creature);
-			if(p);
-				p->sendMagicEffect(p->pos,color);
+			int color = atoi(cmd.c_str());
+			Player *p = dynamic_cast<Player *>(creature);			
+			if(p)		
+				p->sendMagicEffect(p->pos,color);					
 			break;
 		}
 	}
@@ -2636,7 +2642,7 @@ void Game::decayItem(Item *item)
 				mapstate.getMapChanges(spectator);
 			}
 
-			delete item;
+			//delete item;
 		}
 		flushSendBuffers();
 	}

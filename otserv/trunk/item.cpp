@@ -52,10 +52,10 @@ void Item::setID(unsigned short newid) {
 //////////////////////////////////////////////////
 // return how many items are stacked or 0 if non stackable
 unsigned char Item::getItemCountOrSubtype() const {
-	if(isStackable() || isMultiType()) {
+	if(isStackable() ) {
 		return count;
 	}
-	else if(isFluidContainer())
+	else if(isFluidContainer() || isMultiType())
 		return fluid;
 	else if(chargecount != 0)
 		return chargecount;	
@@ -70,6 +70,8 @@ Item::Item(const unsigned short _type) {
 	chargecount = 0;
 	fluid = 0;
 	throwRange = 6;
+	//specialDescription = NULL;
+	//text = NULL;
 }
 
 Item* Item::tranform()
@@ -80,8 +82,8 @@ Item* Item::tranform()
 	if(decayTo == 0) {
 		return 0;
 	}
-
-	Item *item = Item::CreateItem(decayTo);
+	
+	Item *item = Item::CreateItem(decayTo,getItemCountOrSubtype());
 	item->pos = this->pos;
 	//move items if they both are containers
 	Container *containerfrom = dynamic_cast<Container*>(this);
@@ -105,10 +107,12 @@ Item::Item(const unsigned short _type, unsigned char _count) {
 	count = 0;
 	chargecount = 0;
 	fluid = 0;
+	//specialDescription = NULL;
+	//text = NULL;
 
-	if(isStackable() || isMultiType())
+	if(isStackable())
 		count = _count;
-	else if(isFluidContainer())
+	else if(isFluidContainer() || isMultiType() )
 		fluid = _count;
 	else
 		chargecount = _count;
@@ -131,10 +135,12 @@ Item::~Item()
 int Item::unserialize(xmlNodePtr p){
 	id=atoi((const char*)xmlGetProp(p, (const xmlChar *) "id"));
 	const char* tmp=(const char*)xmlGetProp(p, (const xmlChar *) "count");
-	if(tmp && isStackable())
+	if(tmp && (isStackable() || isMultiType()))
 		count=atoi(tmp);
+	else if(tmp && isFluidContainer())
+		fluid=atoi(tmp);
 	else if(tmp)
-		chargecount=atoi(tmp);
+		chargecount=atoi(tmp);	
 	
 	return 0;
 }
@@ -145,16 +151,21 @@ xmlNodePtr Item::serialize(){
 	s.str(""); //empty the stringstream
 	s << getID();
 	xmlSetProp(ret, (const xmlChar*)"id", (const xmlChar*)s.str().c_str());
-	if(isStackable()){
-		s.str(""); //empty the stringstream
+	s.str(""); //empty the stringstream
+	if(isStackable() || isMultiType() ){		
 		s << (int)count;
 		xmlSetProp(ret, (const xmlChar*)"count", (const xmlChar*)s.str().c_str());
 	}
-	else if(getItemCharge() > 0){
-		s.str(""); //empty the stringstream
+	else if(isFluidContainer()){
+		s << (int)fluid;
+		xmlSetProp(ret, (const xmlChar*)"count", (const xmlChar*)s.str().c_str());
+	}
+	else if(getItemCharge() > 0){		
 		s << (int)getItemCharge();
 		xmlSetProp(ret, (const xmlChar*)"count", (const xmlChar*)s.str().c_str());
 	}
+	
+		
 	return ret;
 }
 
@@ -251,11 +262,15 @@ std::string Item::getDescription() const
 {
 	std::stringstream s;
 	std::string str;
+	/*if(specialDescription){
+		s << specialDescription;
+	}
+	else */	
 	if (items[id].name.length()) {
 		if(isStackable() && count > 1) {
 			s<<"You see "<< (int)count << " " << items[id].name << "s" << "." << std::endl;
 			s << "They weight " << std::fixed << std::setprecision(1) << ((double) count * items[id].weight) << " oz.";
-		}
+		}		
 		else {
 			if(items[id].runeMagLevel != -1)
 			{
@@ -279,6 +294,25 @@ std::string Item::getDescription() const
 			else if(getArmor())
 			{
 				s << "You see a " << items[id].name << " (Arm:"<< (int)getArmor() << ")." << std::endl;
+			}
+			else if(isFluidContainer()){
+				s << "You see a " << items[id].name;
+				if(fluid == 0){
+					s << ". It is empty.";
+				}
+				else{
+					s << " of " << items[fluid].name << ".";
+				}
+			}
+			else if(isMultiType()){				
+				s << "You see a " << items[id].name << " of ";
+				if(fluid == 0){
+					s << items[1].name;
+				}
+				else{
+					s << items[fluid].name;
+				}
+				s << ".";								
 			}
 			else
 			{

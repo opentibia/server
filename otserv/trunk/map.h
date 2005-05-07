@@ -62,6 +62,7 @@ enum itemchange_t {
 struct tilechangedata {
 	Position oldPos;
 	Thing *thing;
+	Thing *oldthing;
 	int stackpos;
 	itemchange_t type;
 };
@@ -80,15 +81,15 @@ public:
 	MapState(Map* imap);
 	void addThing(Tile *t, Thing *thing);
 	bool removeThing(Tile *t, Thing *thing);
-	void refreshThing(Tile *t, Thing *thing);
+	//void refreshThing(Tile *t, Thing *thing);
 	void replaceThing(Tile *t, Thing *oldThing, Thing *newThing);
 
 	void getMapChanges(Player *spectator);
 
 protected:
 	Map* map;
-	void addThingInternal(Tile *t, Thing *thing, bool onlyRegister);
-	bool removeThingInternal(Tile *t, Thing *thing, bool onlyRegister);
+	void addThingInternal(Tile *t, Thing *thing, bool Register);
+	bool removeThingInternal(Tile *t, Thing *thing, bool Register);
 
 	void addTile(Tile *t, Position& tilepos);
 	bool isTileStored(const Tile *t) const;

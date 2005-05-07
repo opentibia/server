@@ -79,6 +79,9 @@ class Item : public Thing
 		bool floorChangeSouth() const;
 		bool floorChangeEast() const;
 		bool floorChangeWest() const;
+		//TODO: pointers?
+		//std::string *specialDescription;
+		//std::string *text;	//text written
 
 		int use(){std::cout << "use " << id << std::endl; return 0;};
 		int use(Item*){std::cout << "use with item ptr " << id << std::endl; return 0;};

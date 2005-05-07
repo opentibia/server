@@ -155,7 +155,7 @@ public:
 	virtual void dropLoot(Container *corpse) {return;};
 
 //  virtual int sendInventory(){return 0;};
-  virtual int addItem(Item* item, int pos){return 0;};
+  virtual int addItemInventory(Item* item, int pos){return 0;};
   virtual Item* getItem(int pos){return NULL;}
   virtual Direction getDirection(){return direction;}
 	void addCondition(const CreatureCondition& condition, bool refresh);

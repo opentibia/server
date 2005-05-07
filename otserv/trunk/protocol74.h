@@ -149,6 +149,7 @@ private:
   //rtual void sendCreatureAppear(const Creature *creature);
   virtual void sendThingDisappear(const Thing *thing, unsigned char stackPos, bool tele = false);
   virtual void sendThingAppear(const Thing *thing);
+  virtual void sendThingTransform(const Thing* thing,int stackpos);
   virtual void sendThingRemove(const Thing *thing);
   virtual void sendDistanceShoot(const Position &from, const Position &to, unsigned char type);
   virtual void sendMagicEffect(const Position &pos, unsigned char type);

@@ -71,7 +71,7 @@ bool Protocol74::ConnectPlayer()
 void Protocol74::ReceiveLoop()
 {
   NetworkMessage msg;
-
+  
 	while (!pendingLogout && msg.ReadFromSocket(s))
   {
     parsePacket(msg);
@@ -428,7 +428,7 @@ void Protocol74::parseLogout(NetworkMessage &msg)
 void Protocol74::logout(){
 	// we ask the game to remove us
 	if (game->removeCreature(player)) {
-		pendingLogout = true;		
+		pendingLogout = true;
 	}
 }
 
@@ -805,7 +805,7 @@ void Protocol74::parseUseItemEx(NetworkMessage &msg)
 		if(!t)
 			return;
 		
-		Item *runeitem = (Item*)t->getThingByStackPos(1);
+		Item *runeitem = (Item*)t->getThingByStackPos(1);//TODO: find item at the top of stack
 		if(!runeitem)
 			return;
 		
@@ -1070,7 +1070,7 @@ void Protocol74::parseLookAt(NetworkMessage &msg){
 
 #ifdef __DEBUG__
   std::cout << "look at: " << LookPos << std::endl;
-  std::cout << "itemnum: " << ItemNum << std::endl;
+  std::cout << "itemnum: " << ItemNum << " stackpos: " << (long)stackpos<< std::endl;
 #endif
 
   NetworkMessage newmsg;
@@ -1085,8 +1085,10 @@ void Protocol74::parseLookAt(NetworkMessage &msg){
 
 	if(LookPos.x != 0xFFFF) {
 		Tile* tile = game->getTile(LookPos.x, LookPos.y, LookPos.z);
-		item = dynamic_cast<Item*>(tile->getThingByStackPos(stackpos));
-		creature = dynamic_cast<Creature*>(tile->getThingByStackPos(stackpos));
+		if(tile){
+			item = dynamic_cast<Item*>(tile->getThingByStackPos(stackpos));
+			creature = dynamic_cast<Creature*>(tile->getThingByStackPos(stackpos));
+		}
 	}
 	else {
 		//from container/inventory
@@ -1959,7 +1961,7 @@ void Protocol74::sendThingAppear(const Thing *thing){
     	msg.AddPosition(player->pos);
     	GetMapDescription(player->pos.x-8, player->pos.y-6, player->pos.z, 18, 14, msg);
 
-			AddMagicEffect(msg,player->pos, 0x0A);
+			AddMagicEffect(msg,player->pos, NM_ME_ENERGY_AREA);
 
 			AddPlayerStats(msg,player);	
 
@@ -2003,14 +2005,29 @@ void Protocol74::sendThingAppear(const Thing *thing){
 	}
 	else if(CanSee(thing->pos.x, thing->pos.y, thing->pos.z))
 	{
-		const Item *item = dynamic_cast<const Item*>(thing);
-		if(item){
+		const Item *item = dynamic_cast<const Item*>(thing);		
+		if(item){			
 			AddAppearThing(msg,item->pos);
 			msg.AddItem(item);
 		}
 	}
 	
 	WriteBuffer(msg);
+}
+
+void Protocol74::sendThingTransform(const Thing* thing,int stackpos){
+	const Item *item = dynamic_cast<const Item*>(thing);
+	if(item){
+		NetworkMessage msg;
+		AddTileUpdated(msg,thing->pos);
+		/* //TODO: implement message 0x6B
+		msg.AddByte(0x6B);
+		msg.AddPosition(thing->pos);
+		msg.AddByte(stackpos);	
+		msg.AddItem(item);
+		*/
+		WriteBuffer(msg);
+	}
 }
 
 void Protocol74::sendSkills()
@@ -2245,9 +2262,9 @@ void Protocol74::AddRemoveThing(NetworkMessage &msg, const Position &pos,unsigne
 }
 
 void Protocol74::AddAppearThing(NetworkMessage &msg, const Position &pos){
-	if(CanSee(pos.x, pos.y, pos.z)) {
+	if(CanSee(pos.x, pos.y, pos.z)) {		
 		msg.AddByte(0x6A);
-		msg.AddPosition(pos);
+		msg.AddPosition(pos);	
 	}
 }
 

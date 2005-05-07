@@ -43,11 +43,11 @@ class IOPlayerXML : protected IOPlayer{
 	  * \param player the player to save
 	  */
 	bool savePlayer(Player* player);
-	IOPlayerXML(){};
+	IOPlayerXML();
 	virtual ~IOPlayerXML(){};
   private:
 	  bool LoadContainer(xmlNodePtr item,Container* container);
-  	  bool SaveContainer(xmlNodePtr item,Container* container);
+  	  bool SaveContainer(xmlNodePtr item,Container* container);  	  
 };
 
 #endif

@@ -171,8 +171,8 @@ Thing* Tile::getThingByStackPos(int pos)
   if (splash)
   {
     if (pos == 0)
-      //return splash;
-      return NULL;
+      return splash;
+      //return NULL;
     pos--;
   }
 
@@ -233,11 +233,12 @@ bool Tile::insertThing(Thing *thing, int stackpos)
     pos--;
   }
 
-	if ((unsigned) pos < topItems.size()) {
-		
-    ItemVector::iterator it = topItems.begin();
-		while(pos > 0)
+	if ((unsigned) pos < topItems.size()) {		
+		ItemVector::iterator it = topItems.begin();
+		while(pos > 0){
+			pos--;
 			++it;
+		}
 		topItems.insert(it, item);
 		return true;
 	}
@@ -252,9 +253,11 @@ bool Tile::insertThing(Thing *thing, int stackpos)
   pos -= (uint32_t)creatures.size();
 
 	if ((unsigned) pos < downItems.size()) {
-    ItemVector::iterator it = downItems.begin();
-		while(pos > 0)
+    	ItemVector::iterator it = downItems.begin();
+		while(pos > 0){	
+			pos--;
 			++it;
+		}
 		downItems.insert(it, item);
 		return true;
 	}

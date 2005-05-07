@@ -313,6 +313,12 @@ int Items::loadFromDat(std::string file)
    	}
    	
    	fclose(f);
+    //create extra items for liquids
+    for(int i=0;i < 40;i++){ //8*5 = 40
+    	ItemType* iType= new ItemType();
+		iType->id = i;
+		items[i] = iType;
+	}
     
 	return 0;
 }

@@ -22,6 +22,15 @@
 #include <algorithm>
 #include <functional>
 #include <sstream>
+#include <string.h>
+
+extern xmlMutexPtr xmlmutex;
+
+IOAccountXML::IOAccountXML(){
+	if(xmlmutex == NULL){
+		xmlmutex = xmlNewMutex();
+	}
+}
 
 Account IOAccountXML::loadAccount(unsigned long accno){
 	Account acc;
@@ -30,7 +39,7 @@ Account IOAccountXML::loadAccount(unsigned long accno){
 	accsstr << "data/accounts/" << accno << ".xml";;
 	std::string filename = accsstr.str();
 	std::transform(filename.begin(), filename.end(), filename.begin(), tolower);
-
+	xmlMutexLock(xmlmutex);
 	xmlDocPtr doc = xmlParseFile(filename.c_str());
 
 	if (doc)
@@ -40,7 +49,8 @@ Account IOAccountXML::loadAccount(unsigned long accno){
 
 		if (xmlStrcmp(root->name,(const xmlChar*) "account"))
 		{
-			xmlFreeDoc(doc);
+			xmlFreeDoc(doc);			
+			xmlMutexUnlock(xmlmutex);
 			return acc;
 		}
 
@@ -48,8 +58,8 @@ Account IOAccountXML::loadAccount(unsigned long accno){
 
 		// perhaps verify name
 		const char* pwd = (const char*)xmlGetProp(root, (const xmlChar *)"pass");
-
-		acc.password  = pwd;
+		
+		acc.password  = pwd;		
 
 		acc.accType   = atoi((const char*)xmlGetProp(root, (xmlChar*)"type"));
 		acc.premDays  = atoi((const char*)xmlGetProp(root, (xmlChar*)"premDays"));
@@ -67,19 +77,21 @@ Account IOAccountXML::loadAccount(unsigned long accno){
 				{
 					const char* temp_a = (const char*)xmlGetProp(tmp, (xmlChar*)"name");
 
-					if ((strcmp((const char*)tmp->name, "character") == 0) && (temp_a != NULL))
-						acc.charList.push_back(temp_a);
+					if(temp_a && strcmp((const char*)tmp->name, "character") == 0)
+						acc.charList.push_back(std::string(temp_a));
 
 					tmp = tmp->next;
 				}
 			}
 			p = p->next;
 		}
+		
 		xmlFreeDoc(doc);
 
 		// Organize the char list.
 		acc.charList.sort();
 		acc.accnumber = accno;
-	}
+	}	
+	xmlMutexUnlock(xmlmutex);
 	return acc;
 }

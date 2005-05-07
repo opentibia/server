@@ -81,6 +81,7 @@ public:
   //virtual void sendCreatureAppear(const Creature *creature) = 0;
   virtual void sendThingAppear(const Thing *thing) = 0;
   virtual void sendThingRemove(const Thing *thing) = 0;
+  virtual void sendThingTransform(const Thing* thing,int stackpos) = 0;
   virtual void sendDistanceShoot(const Position &from, const Position &to, unsigned char type) = 0;
   virtual void sendMagicEffect(const Position &pos, unsigned char type) = 0;
   virtual void sendAnimatedText(const Position &pos, unsigned char color, std::string text) = 0;

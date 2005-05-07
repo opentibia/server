@@ -637,7 +637,7 @@ int Player::sendInventory(unsigned char sl_id){
 }
 
 
-int Player::addItem(Item* item, int pos, bool isloading /*= false*/) {
+int Player::addItemInventory(Item* item, int pos, bool isloading /*= false*/) {
 #ifdef __DEBUG__
 	std::cout << "Should add item at " << pos <<std::endl;
 #endif
@@ -1066,6 +1066,7 @@ void Player::sendPing(){
 		client->sendPing();
 	}
 	if(npings >= 6){
+		//std::cout << "logout" << std::endl;
 		if(inFightTicks >=1000 && health >0) {
 			//logout?
 			//client->logout();
@@ -1193,6 +1194,10 @@ void Player::onThingDisappear(const Thing* thing, unsigned char stackPos){
 
 void Player::onThingAppear(const Thing* thing){
 	client->sendThingAppear(thing);
+}
+
+void Player::onThingTransform(const Thing* thing,int stackpos){
+	client->sendThingTransform(thing,stackpos);
 }
 
 void Player::onCreatureTurn(const Creature *creature, unsigned char stackPos)

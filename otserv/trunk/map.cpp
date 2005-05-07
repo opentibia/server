@@ -83,15 +83,15 @@ bool MapState::isTileStored(const Tile *t) const
 
 void MapState::addThing(Tile *t, Thing *thing)
 {
-	addThingInternal(t, thing, false);
+	addThingInternal(t, thing, true);
 }
 
 bool MapState::removeThing(Tile *t, Thing *thing)
 {
-	return removeThingInternal(t, thing, false);
+	return removeThingInternal(t, thing, true);
 }
 
-bool MapState::removeThingInternal(Tile *t, Thing *thing, bool onlyRegister)
+bool MapState::removeThingInternal(Tile *t, Thing *thing, bool Register)
 {
 	//First change to this tile?
 	if(!isTileStored(t)) {
@@ -102,7 +102,7 @@ bool MapState::removeThingInternal(Tile *t, Thing *thing, bool onlyRegister)
 
 	int stackpos = t->getThingStackPos(thing);
 	Position oldPos = thing->pos;
-	if(onlyRegister || t->removeThing(thing)) {
+	if(t->removeThing(thing) && Register) {
 		tilechangedata tc;
 		tc.oldPos = oldPos;
 		tc.thing = thing;
@@ -117,7 +117,7 @@ bool MapState::removeThingInternal(Tile *t, Thing *thing, bool onlyRegister)
 	return false;
 }
 
-void MapState::addThingInternal(Tile *t, Thing *thing, bool onlyRegister)
+void MapState::addThingInternal(Tile *t, Thing *thing, bool Register)
 {
 	//First change to this tile?
 	if(!isTileStored(t)) {
@@ -127,27 +127,28 @@ void MapState::addThingInternal(Tile *t, Thing *thing, bool onlyRegister)
 	std::vector<tilechangedata>& vec = changesItemMap[t];
 
 	Position oldPos = thing->pos;
-	if(!onlyRegister && thing != t->splash)
+	if(thing != t->splash)
 		t->addThing(thing);
 
 	int stackpos = t->getThingStackPos(thing);
+	if(Register) {
+		tilechangedata tc;
+		tc.oldPos = oldPos;
+		tc.thing = thing;
 
-	tilechangedata tc;
-	tc.oldPos = oldPos;
-	tc.thing = thing;
-
-	tc.type = CHANGE_ADD;
-	tc.stackpos = stackpos;
-	vec.push_back(tc);
+		tc.type = CHANGE_ADD;
+		tc.stackpos = stackpos;
+		vec.push_back(tc);
+	}
 }
-
+/*
 //Basically "fake" remove/add an item to register the change to the client
 void MapState::refreshThing(Tile *t, Thing *thing)
 {
 	removeThingInternal(t, thing, true);
 	addThingInternal(t, thing, true);
 }
-
+*/
 void MapState::replaceThing(Tile *t, Thing *oldThing, Thing *newThing)
 {
 	//First change to this tile?
@@ -166,8 +167,8 @@ void MapState::replaceThing(Tile *t, Thing *oldThing, Thing *newThing)
 		tilechangedata tc;
 		tc.oldPos = oldPos;
 		tc.thing = newThing;
-
-		tc.type = CHANGE_ADD;
+		tc.oldthing = oldThing;
+		tc.type = CHANGE_TRANSFORM;
 		tc.stackpos = stackpos;
 		vec.push_back(tc);
 	}
@@ -206,7 +207,7 @@ void MapState::getMapChanges(Player *spectator)
 
 			for(thIt = changesItemMapIt->second.begin(); thIt != changesItemMapIt->second.end(); ++thIt) {
 				//Auto-closing containers
-				if(thIt->type == CHANGE_REMOVE) {
+				if(thIt->type == CHANGE_REMOVE) {					
 					spectator->onThingRemove(thIt->thing);
 				}
 			}
@@ -222,7 +223,7 @@ void MapState::getMapChanges(Player *spectator)
 
 			if(thIt->type == CHANGE_REMOVE) {
 				if(thIt->stackpos < 10) {
-					Thing dis_thing;
+					Thing dis_thing;				
 					dis_thing.pos = thIt->oldPos;					
 					spectator->onThingDisappear(&dis_thing,thIt->stackpos);
 				}
@@ -233,19 +234,24 @@ void MapState::getMapChanges(Player *spectator)
 					//and will show the player as alive (0 hp).
 					//Solution: re-log.
 				}
-				//Auto-closing containers
+				//Auto-closing containers				
 				spectator->onThingRemove(thIt->thing);
 			
 			}
-			/*else if(thIt->type == CHANGE_TRANSFORM) {
+			else if(thIt->type == CHANGE_TRANSFORM) {
 				Item *item = dynamic_cast<Item*>(thIt->thing);
-				if(item) {
+				if(item) {					
+					spectator->onThingTransform(thIt->thing,thIt->stackpos);
+					//auto-close
+					spectator->onThingRemove(thIt->oldthing);
+					/*
 					msg.AddByte(0x6B);
 					msg.AddPosition(thIt->oldPos);
 					msg.AddByte(thIt->stackpos);
 					msg.AddItem(item);
+					*/
 				}
-			}*/
+			}
 			else if(thIt->type == CHANGE_ADD) {
 					Item *item = dynamic_cast<Item*>(thIt->thing);
 					if(item) {
@@ -256,6 +262,7 @@ void MapState::getMapChanges(Player *spectator)
 						
 						Thing *pdis_thing = dynamic_cast<Thing*>(&dis_item);
 						spectator->onThingAppear(pdis_thing);
+						std::cout << "thing appear " << std::endl;
 					}
 				/*	msg.AddByte(0x6a);
 					msg.AddPosition(thIt->oldPos);

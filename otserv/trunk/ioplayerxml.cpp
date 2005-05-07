@@ -18,21 +18,27 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-
-
 #include "ioplayer.h"
 #include "ioplayerxml.h"
 #include "ioaccount.h"
 #include "item.h"
 #include <sstream>
 
+xmlMutexPtr xmlmutex;
+
+IOPlayerXML::IOPlayerXML(){
+	if(xmlmutex == NULL){
+		xmlmutex = xmlNewMutex();
+	}
+}
 
 bool IOPlayerXML::loadPlayer(Player* player, std::string name){
 
 	std::string filename="data/players/"+name+".xml";
 	std::transform (filename.begin(),filename.end(), filename.begin(), tolower);
 
-	xmlDocPtr doc;
+	xmlDocPtr doc;	
+	xmlMutexLock(xmlmutex);
 	doc = xmlParseFile(filename.c_str());
 
 	if (doc)
@@ -52,7 +58,8 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name){
 		
 		player->password = a.password;
 		if (a.accnumber == 0 || a.accnumber != (unsigned long)atoi(account)) {
-		  xmlFreeDoc(doc);
+		  xmlFreeDoc(doc);		  
+		  xmlMutexUnlock(xmlmutex);		  
 		  return false;
 		}
 
@@ -135,7 +142,7 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name){
 						myitem->unserialize(slot->children);
 						//player->items[sl_id] = Item::CreateItem(myitem->getID(), myitem->getItemCountOrSubtype());
 						//we dont want to sendinventory before login
-						player->addItem(Item::CreateItem(myitem->getID(), myitem->getItemCountOrSubtype()), sl_id, true);
+						player->addItemInventory(Item::CreateItem(myitem->getID(), myitem->getItemCountOrSubtype()), sl_id, true);
 						delete myitem;
 						myitem = NULL;
 
@@ -175,10 +182,11 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name){
 			p=p->next;
 		}
 		std::cout << "loaded " << filename << std::endl;
-		xmlFreeDoc(doc);
-
+		xmlFreeDoc(doc);		
+		xmlMutexUnlock(xmlmutex);		
 		return true;
-	}
+	}	
+	xmlMutexUnlock(xmlmutex);	
 	return false;
 }
 
@@ -256,7 +264,8 @@ bool IOPlayerXML::savePlayer(Player* player){
 	std::transform (filename.begin(),filename.end(), filename.begin(), tolower);
     std::stringstream sb;
     
-    xmlDocPtr doc;
+    xmlDocPtr doc;        
+    xmlMutexLock(xmlmutex);    
 	xmlNodePtr nn, sn, pn, root;
 	doc = xmlNewDoc((const xmlChar*)"1.0");
 	doc->children = xmlNewDocNode(doc, NULL, (const xmlChar*)"player", NULL);
@@ -372,13 +381,15 @@ bool IOPlayerXML::savePlayer(Player* player){
        #ifdef __DEBUG__
        std::cout << "\tSaved character succefully!\n";
        #endif
-       xmlFreeDoc(doc);
+       xmlFreeDoc(doc);       
+       xmlMutexUnlock(xmlmutex);       
 	   return true;
        }
     else
        {
        std::cout << "\tCouldn't save character =(\n";
-       xmlFreeDoc(doc);
+       xmlFreeDoc(doc);       
+       xmlMutexUnlock(xmlmutex);       
 	   return false;
        }
 }

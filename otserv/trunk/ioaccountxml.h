@@ -36,7 +36,7 @@ class IOAccountXML : protected IOAccount {
 	  * \returns Name of the source*/
 	virtual char* getSourceDescription(){return "XML";};
 	virtual Account loadAccount(unsigned long accno);
-	IOAccountXML(){};
+	IOAccountXML();
 	virtual ~IOAccountXML(){};
 };
 
