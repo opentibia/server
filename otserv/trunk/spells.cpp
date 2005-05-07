@@ -252,6 +252,7 @@ int SpellScript::registerFunctions(){
 	lua_register(luaState, "getSpeed", SpellScript::luaActionGetSpeed);
 	lua_register(luaState, "changeSpeed", SpellScript::luaActionChangeSpeed);
 	lua_register(luaState, "makeRune", SpellScript::luaActionMakeRune);
+	lua_register(luaState, "makeArrows", SpellScript::luaActionMakeArrows);
 	return true;
 }
 
@@ -824,7 +825,7 @@ int SpellScript::internalMakeRune(Player *p,unsigned short sl_id,Spell *S,unsign
 	Item *item = p->getItem(sl_id);
 	if(item){
 		if(item->getID() == ITEM_RUNE_BLANK){
-			p->addItem(Item::CreateItem(id, charges ),sl_id);
+			p->addItemInventory(Item::CreateItem(id, charges ),sl_id);
 			return 1;
 		}
 		else{
@@ -835,4 +836,66 @@ int SpellScript::internalMakeRune(Player *p,unsigned short sl_id,Spell *S,unsign
 		return 0;
 	}
 	return 0;
+}
+
+int SpellScript::luaActionMakeArrows(lua_State *L){
+	unsigned char count = (unsigned char)lua_tonumber(L, -1);
+	lua_pop(L,1);
+
+	unsigned short id = (unsigned short)lua_tonumber(L, -1);
+	lua_pop(L,1);
+
+	Spell* spell = getSpell(L);
+	Creature* creature = spell->game->getCreatureByID((unsigned long)lua_tonumber(L, -1));
+	lua_pop(L,1);
+ 
+	Player* player = dynamic_cast<Player*>(creature);
+	if(player){
+ 		MagicEffectTargetClass magicTarget;
+ 		/*  succesfull make rune
+  		attackType = ATTACK_NONE
+  		animationEffect = NM_ANI_NONE
+  		hitEffect = NM_ME_NONE
+		damageEffect = NM_ME_MAGIC_ENERGIE
+		animationColor = GREEN		
+		offensive = false		
+		drawblood = false
+ 		*/
+
+		magicTarget.offensive = false;
+ 		magicTarget.drawblood = false;
+ 		magicTarget.animationEffect = 0;
+ 		magicTarget.attackType = ATTACK_NONE;  
+ 		magicTarget.hitEffect = 255; //NM_ME_NONE
+ 		magicTarget.animationColor = 19; //GREEN
+
+		if(player->mana < spell->getMana()){
+			magicTarget.damageEffect = 2; //NM_ME_PUFF  
+  			magicTarget.manaCost = player->mana*5; //force not enough mana
+		}
+		else{			
+			magicTarget.manaCost = spell->getMana();
+			magicTarget.damageEffect = 12; //NM_ME_MAGIC_ENERGIE = 12
+ 			if(!player->getItem(SLOT_RIGHT)){
+  				player->addItemInventory(Item::CreateItem(id, count ),SLOT_RIGHT);
+ 			}
+ 			else if(!player->getItem(SLOT_LEFT)){
+  				player->addItemInventory(Item::CreateItem(id, count ),SLOT_LEFT);
+			}
+			else if(!player->getItem(SLOT_AMMO)){				
+  				player->addItemInventory(Item::CreateItem(id, count ),SLOT_AMMO);
+			}
+			else{
+				magicTarget.damageEffect = 2; //NM_ME_PUFF  
+  				magicTarget.manaCost = 0; //force not enough mana
+			}			
+ 		}
+ 		
+		bool isSuccess = spell->game->creatureThrowRune(player, player->pos, magicTarget);
+		
+ 		lua_pushnumber(L, 1);
+ 		return 1;
+	}
+	lua_pushnumber(L, 0);
+	return 1;
 }
