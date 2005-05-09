@@ -125,12 +125,14 @@ public:
   //items
 	containerLayout vcontainers;
   void preSave();
-  void    usePlayer() {
+    virtual void useThing() {
+		//std::cout << "Player: useThing() " << (int)this << std::endl;
 		useCount++;
 	};
 	
-	void    releasePlayer() {
+	virtual void releaseThing() {
 		useCount--;
+		//std::cout << "Player: releaseThing() " << (int)this << std::endl;
 		if (useCount == 0)
 			delete this;
 	};
