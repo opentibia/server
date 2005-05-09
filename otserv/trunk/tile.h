@@ -19,8 +19,11 @@ typedef std::vector<Creature*> CreatureVector;
 class Tile
 {
 public:
-  Creature* getCreature(){
-    return creatures[0];
+  Creature* getCreature() const{
+		if(creatures.size())
+    		return creatures[0];
+    	else
+    		return NULL;
   }
 
   Tile()

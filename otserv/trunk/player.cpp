@@ -694,8 +694,7 @@ unsigned int Player::getReqSkilltries (int skill, int level, int voc) {
 	}	
 	SkillAdvanceCache[skill][j].level = level;
 	SkillAdvanceCache[skill][j].voc = voc;
-	SkillAdvanceCache[skill][j].tries = (int) ( SkillBases[skill] * pow((float) SkillMultipliers[skill][voc], (float) ( level - 11) ) );
-	                                   
+	SkillAdvanceCache[skill][j].tries = (unsigned int) ( SkillBases[skill] * pow((float) SkillMultipliers[skill][voc], (float) ( level - 11) ) );	
     return SkillAdvanceCache[skill][j].tries;
 }
 
@@ -983,9 +982,9 @@ bool Player::CanSee(int x, int y, int z) const
 
 Container* Player::getDepot(unsigned long depotId){	
 	DepotMap::iterator it = depots.find(depotId);
-	if (it != depots.end())
+	if (it != depots.end()){	
       return it->second;
-      
+	}    
 	return NULL;
 }
 
