@@ -79,9 +79,9 @@ class Item : public Thing
 		bool floorChangeSouth() const;
 		bool floorChangeEast() const;
 		bool floorChangeWest() const;
-		//TODO: pointers?
-		//std::string *specialDescription;
-		//std::string *text;	//text written
+	
+		std::string *specialDescription;
+		std::string *text;	//text written
 
 		int use(){std::cout << "use " << id << std::endl; return 0;};
 		int use(Item*){std::cout << "use with item ptr " << id << std::endl; return 0;};
@@ -99,7 +99,7 @@ class Item : public Thing
 		void setItemCharge(unsigned char n) {chargecount = n;};
 
 		/**
-	  * Called when the item is about to decay/tranform to the next step.
+	  * Called when the item is about to decay/transform to the next step.
 	  * \returns The item to decay to.
 	  */
 		virtual Item* tranform();
@@ -109,6 +109,20 @@ class Item : public Thing
     Item(const unsigned short _type, unsigned char _count);
 		Item();
     virtual ~Item();
+    virtual void useThing() {
+		//std::cout << "Item: useThing() " << (int)this << std::endl;
+		useCount++;
+	};
+	
+	virtual void releaseThing() {
+		useCount--;
+		//std::cout << "Item: releaseThing() " << (int)this << std::endl;
+		//if (useCount == 0)
+		if (useCount <= 0)
+			delete this;
+	};
+private:
+	int useCount;
 };
 
 class Teleport : public Item
@@ -116,10 +130,23 @@ class Teleport : public Item
 public:
 	Teleport(const unsigned short _type);
 	virtual ~Teleport();
+	virtual void useThing() {
+		//std::cout << "Teleport: useThing() " << (int)this << std::endl;
+		useCount++;
+	};
+	
+	virtual void releaseThing() {
+		useCount--;
+		//std::cout << "Teleport: releaseThing() " << (int)this << std::endl;
+		//if (useCount == 0)
+		if (useCount <= 0)
+			delete this;
+	};
 	
 	void setDestPos(const Position &pos) {destPos = pos;};
 	const Position& getDestPos() {return destPos;};
 private:
+	int useCount;
 	virtual int unserialize(xmlNodePtr p);
 	virtual xmlNodePtr serialize();
 	Position destPos;

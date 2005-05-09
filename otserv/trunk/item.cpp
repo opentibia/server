@@ -70,8 +70,9 @@ Item::Item(const unsigned short _type) {
 	chargecount = 0;
 	fluid = 0;
 	throwRange = 6;
-	//specialDescription = NULL;
-	//text = NULL;
+	useCount = 0;
+	specialDescription = NULL;
+	text = NULL;
 }
 
 Item* Item::tranform()
@@ -107,8 +108,9 @@ Item::Item(const unsigned short _type, unsigned char _count) {
 	count = 0;
 	chargecount = 0;
 	fluid = 0;
-	//specialDescription = NULL;
-	//text = NULL;
+	useCount = 0;
+	specialDescription = NULL;
+	text = NULL;
 
 	if(isStackable())
 		count = _count;
@@ -125,16 +127,31 @@ Item::Item()
 	count = 0;
 	chargecount = 0;
 	throwRange = 6;
+	useCount = 0;
+	specialDescription = NULL;
+	text = NULL;
 }
 
 Item::~Item()
 {
-	//
+	if(specialDescription)
+		delete specialDescription;
+	if(text)
+		delete text;
 }
 
 int Item::unserialize(xmlNodePtr p){
 	id=atoi((const char*)xmlGetProp(p, (const xmlChar *) "id"));
-	const char* tmp=(const char*)xmlGetProp(p, (const xmlChar *) "count");
+	
+	const char* tmp=(const char*)xmlGetProp(p, (const xmlChar *) "special_description");
+	if(tmp)
+		specialDescription = new std::string(tmp);
+		
+	tmp=(const char*)xmlGetProp(p, (const xmlChar *) "text");
+	if(tmp)
+		text = new std::string(tmp);
+	
+	tmp=(const char*)xmlGetProp(p, (const xmlChar *) "count");
 	if(tmp && (isStackable() || isMultiType()))
 		count=atoi(tmp);
 	else if(tmp && isFluidContainer())
@@ -144,6 +161,7 @@ int Item::unserialize(xmlNodePtr p){
 	
 	return 0;
 }
+
 xmlNodePtr Item::serialize(){
 	std::stringstream s;
 	xmlNodePtr ret;
@@ -151,6 +169,19 @@ xmlNodePtr Item::serialize(){
 	s.str(""); //empty the stringstream
 	s << getID();
 	xmlSetProp(ret, (const xmlChar*)"id", (const xmlChar*)s.str().c_str());
+	
+	if(specialDescription){
+		s.str(""); //empty the stringstream
+		s << *specialDescription;
+		xmlSetProp(ret, (const xmlChar*)"special_description", (const xmlChar*)s.str().c_str());
+	}
+	
+	if(text){
+		s.str(""); //empty the stringstream
+		s << *text;
+		xmlSetProp(ret, (const xmlChar*)"text", (const xmlChar*)s.str().c_str());
+	}
+	
 	s.str(""); //empty the stringstream
 	if(isStackable() || isMultiType() ){		
 		s << (int)count;
@@ -262,11 +293,12 @@ std::string Item::getDescription() const
 {
 	std::stringstream s;
 	std::string str;
-	/*if(specialDescription){
-		s << specialDescription;
+	if(specialDescription){
+		s << (*specialDescription) << ".";
+		if(items[id].weight > 0)
+				s << "It weighs " << std::fixed << std::setprecision(1) << items[id].weight << " oz.";
 	}
-	else */	
-	if (items[id].name.length()) {
+	else if (items[id].name.length()) {
 		if(isStackable() && count > 1) {
 			s<<"You see "<< (int)count << " " << items[id].name << "s" << "." << std::endl;
 			s << "They weight " << std::fixed << std::setprecision(1) << ((double) count * items[id].weight) << " oz.";
@@ -343,6 +375,7 @@ std::string Item::getName() const
 
 Teleport::Teleport(const unsigned short _type) : Item(_type)
 {
+	useCount = 0;	
 	destPos.x = 0;
 	destPos.y = 0;
 	destPos.z = 0;
