@@ -84,7 +84,7 @@ void Protocol74::ReceiveLoop()
 
   // logout by disconnect?  -> kick
   if (!pendingLogout /*player*/)
-  {
+  {		
 		if(player->inFightTicks >=1000 && player->health >0) {
 			//disconnect?
 			game->removeCreature(player);
@@ -102,14 +102,10 @@ void Protocol74::parsePacket(NetworkMessage &msg)
 		return;
 
   uint8_t recvbyte = msg.GetByte();
-
-  /*
-	if (s && player->health <= 0) {
-	 if (recvbyte == 0x14)
-		parseLogout(msg);		
+  	//a dead player can not performs actions
+	if (player->health <= 0 && recvbyte != 0x14) {
 	    return;
-  }
-	*/
+  	}	
     
   switch(recvbyte)
   {
@@ -429,7 +425,7 @@ void Protocol74::logout(){
 	// we ask the game to remove us
 	if (game->removeCreature(player)) {
 		pendingLogout = true;
-	}
+	}	
 }
 
 void Protocol74::parseGetChannels(NetworkMessage &msg){
@@ -730,12 +726,12 @@ void Protocol74::parseUseItemEx(NetworkMessage &msg)
 	unsigned short from_y = msg.GetU16();
 	unsigned char from_z = msg.GetByte();
 	/*unsigned short item = */msg.GetU16();
-	/*unsigned char newpos = */msg.GetByte();
+	unsigned char from_stackpos = msg.GetByte();
 	unsigned short to_x = msg.GetU16();
 	unsigned short to_y = msg.GetU16();
 	unsigned char to_z = msg.GetByte();
 	/*unsigned short tile_id = */msg.GetU16();
-	/*unsigned char count = */msg.GetByte();
+	/*unsigned char to_stackpos =*/ msg.GetByte();
 
 	Position pos;
 	pos.x = to_x;
@@ -805,7 +801,7 @@ void Protocol74::parseUseItemEx(NetworkMessage &msg)
 		if(!t)
 			return;
 		
-		Item *runeitem = (Item*)t->getThingByStackPos(1);//TODO: find item at the top of stack
+		Item *runeitem = (Item*)t->getThingByStackPos(from_stackpos);
 		if(!runeitem)
 			return;
 		
@@ -890,11 +886,11 @@ void Protocol74::parseUseItem(NetworkMessage &msg)
 	unsigned short y = msg.GetU16();
 	unsigned char z = msg.GetByte();
 	unsigned short item = msg.GetU16();
-	unsigned char un = msg.GetByte();
 	unsigned char stack = msg.GetByte();
+	unsigned char index = msg.GetByte();
 
 #ifdef __DEBUG__
-	std::cout << "parseUseItem: " << "x: " << x << ", y: " << (int)y <<  ", z: " << (int)z << ", item: " << (int)item << ", un: " << (int)un << ", stack: " << (int)stack << std::endl;
+	std::cout << "parseUseItem: " << "x: " << x << ", y: " << (int)y <<  ", z: " << (int)z << ", item: " << (int)item << ", stack: " << (int)stack << ", index: " << (int)index << std::endl;
 #endif
 
 	if(Item::items[item].iscontainer)
@@ -910,7 +906,7 @@ void Protocol74::parseUseItem(NetworkMessage &msg)
 			Tile *t = game->getTile(x, y, z);
 
 			if(t) {
-				newcontainer = dynamic_cast<Container*>(t->getThingByStackPos(un));
+				newcontainer = dynamic_cast<Container*>(t->getThingByStackPos(stack));
 			}
 		}
 		else if(x == 0xFFFF) {		
@@ -938,15 +934,15 @@ void Protocol74::parseUseItem(NetworkMessage &msg)
 		}
 
 		if(newcontainer) {			
-			if(newcontainer->depot == 0){				
-				sendContainer(stack, newcontainer);
+			if(newcontainer->depot == 0){
+				sendContainer(index, newcontainer);
 			}
 			else{				
 				Container *newcontainer2 = player->getDepot(newcontainer->depot);
 				if(newcontainer2){
 					//update depot coordinates					
 					newcontainer2->pos = newcontainer->pos;
-					sendContainer(stack, newcontainer2);
+					sendContainer(index, newcontainer2);
 				}
 			}
 		}
@@ -2019,13 +2015,13 @@ void Protocol74::sendThingTransform(const Thing* thing,int stackpos){
 	const Item *item = dynamic_cast<const Item*>(thing);
 	if(item){
 		NetworkMessage msg;
-		AddTileUpdated(msg,thing->pos);
-		/* //TODO: implement message 0x6B
+		//AddTileUpdated(msg,thing->pos);		
+		
 		msg.AddByte(0x6B);
 		msg.AddPosition(thing->pos);
 		msg.AddByte(stackpos);	
 		msg.AddItem(item);
-		*/
+		
 		WriteBuffer(msg);
 	}
 }
