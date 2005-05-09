@@ -144,6 +144,7 @@ class Game {
 		bool removeCreature(Creature* c);
 
 		uint32_t getPlayersOnline() {return (uint32_t)AutoList<Creature>::list.size();};
+		//uint32_t getPlayersOnline() {return (uint32_t)AutoList<Player>::list.size();};
 
     void thingMove(Creature *player, Thing *thing,
         unsigned short to_x, unsigned short to_y, unsigned char to_z, unsigned char count);
@@ -208,6 +209,9 @@ class Game {
    std::vector<Player*> BufferedPlayers;   
    void flushSendBuffers();
    void addPlayerBuffer(Player* p);
+   
+   std::vector<Thing*> ToReleaseThings;   
+   void FreeThing(Thing* thing);
    
     Creature* getCreatureByID(unsigned long id);
 	Creature* getCreatureByName(const char* s);
@@ -298,6 +302,5 @@ class Game {
 		friend class Spawn;
 		friend class SpawnManager;
 };
-
 
 #endif
