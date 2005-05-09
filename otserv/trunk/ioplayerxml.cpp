@@ -137,17 +137,14 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name){
 				{
 					if (strcmp((const char*)slot->name, "slot") == 0)
 					{
-						int sl_id = atoi((const char*)xmlGetProp(slot, (const xmlChar *)"slotid"));					
-						Item* myitem = new Item();
-						myitem->unserialize(slot->children);
-						//player->items[sl_id] = Item::CreateItem(myitem->getID(), myitem->getItemCountOrSubtype());
+						int sl_id = atoi((const char*)xmlGetProp(slot, (const xmlChar *)"slotid"));
+						unsigned int id = atoi((const char*)xmlGetProp(slot->children, (const xmlChar *) "id"));
+						Item* myitem = Item::CreateItem(id);
+						myitem->unserialize(slot->children);				
 						//we dont want to sendinventory before login
-						player->addItemInventory(Item::CreateItem(myitem->getID(), myitem->getItemCountOrSubtype()), sl_id, true);
-						delete myitem;
-						myitem = NULL;
-
-						Container* default_container = dynamic_cast<Container*>(player->getItem(sl_id));
-						if(default_container){
+						player->addItemInventory(myitem, sl_id, true);						
+						Container* default_container = dynamic_cast<Container*>(myitem);
+						if(default_container){							
 							LoadContainer(slot->children,default_container);
 						}
 					}
@@ -162,19 +159,17 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name){
 					if (strcmp((const char*)slot->name, "depot") == 0)
 					{
 						int dp_id = atoi((const char*)xmlGetProp(slot, (const xmlChar *)"depotid"));
-						Item* myitem = new Item();
-						myitem->unserialize(slot->children);						
-						Item* newitem = Item::CreateItem(myitem->getID(), myitem->getItemCountOrSubtype());
-						Container* default_container = dynamic_cast<Container*>(newitem);
-						if(default_container){
+						unsigned int id = atoi((const char*)xmlGetProp(slot->children, (const xmlChar *) "id"));
+						Item* myitem = Item::CreateItem(id);
+						myitem->unserialize(slot->children);
+						Container* default_container = dynamic_cast<Container*>(myitem);						
+						if(default_container){							
 							player->addDepot(default_container , dp_id);
 							LoadContainer(slot->children,default_container);
 						}
 						else{
-							delete newitem;
-						}
-						delete myitem;
-						myitem = NULL;																		
+							delete myitem;
+						}							
 					}
 				slot=slot->next;
 				}
@@ -207,25 +202,13 @@ bool IOPlayerXML::LoadContainer(xmlNodePtr nodeitem,Container* ccontainer)
 	if (strcmp((const char*)tmp->name, "inside") == 0){
 		//load items
 		p=tmp->children;
-		while(p){
-			/*
-			s_id = atoi((const char*)xmlGetProp(p, (const xmlChar *) "id"));
-			s_count = 0;
+		while(p){			
+			unsigned int id = atoi((const char*)xmlGetProp(p, (const xmlChar *) "id"));
+			Item* myitem = Item::CreateItem(id);
+			myitem->unserialize(p);			
+			ccontainer->addItem(myitem);
 			
-			if((const char*)xmlGetProp(p, (const xmlChar *) "count")) {
-				s_count = atoi((const char*)xmlGetProp(p, (const xmlChar *) "count"));
-			}
-			*/
-			Item* myitem = new Item();
-			myitem->unserialize(p);
-			
-			Item *new_item = Item::CreateItem(myitem->getID(), myitem->getItemCountOrSubtype());
-			delete myitem;
-			myitem = NULL;
-			
-			ccontainer->addItem(new_item);
-			
-			Container* in_container = dynamic_cast<Container*>(new_item);
+			Container* in_container = dynamic_cast<Container*>(myitem);
 			if(in_container){
 				LoadContainer(p,in_container);
 			}

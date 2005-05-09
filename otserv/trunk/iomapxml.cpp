@@ -87,37 +87,33 @@ bool IOMapXML::loadMap(Map* map, std::string identifier){
       p = tile->children;
       while(p) {
                
-        if(xmlStrcmp(p->name,(const xmlChar*) "item")==0){
-          //Item* myitem;  
-					unsigned int id = atoi((const char*)xmlGetProp(p, (const xmlChar *) "id"));
-					Item* myitem = Item::CreateItem(id); //new Item();
-
-          myitem->unserialize(p);
-          //myitem = Item::CreateItem(myloaditem->getID(), myloaditem->getItemCountOrSubtype());
-          Container *container = dynamic_cast<Container*>(myitem);
-          if(container){				
-						//is depot?				
-						tmp = (char*)xmlGetProp(p, (const xmlChar *) "depot");
-						if(tmp){					
-							int depotnumber = atoi(tmp);
-							container->depot = depotnumber;
-						}      			
-						//loadContainer
-					}
-
-					myitem->pos.x = px;
-					myitem->pos.y = py;
-					myitem->pos.z = pz;		
-					//delete myloaditem;
-      
-					if (myitem->isAlwaysOnTop())
-						t->topItems.push_back(myitem);
-					else
-						t->downItems.push_back(myitem);
-				}
-				
-				p=p->next;
+        if(xmlStrcmp(p->name,(const xmlChar*) "item")==0){          
+			unsigned int id = atoi((const char*)xmlGetProp(p, (const xmlChar *) "id"));
+			Item* myitem = Item::CreateItem(id);
+			myitem->unserialize(p);
+			Container *container = dynamic_cast<Container*>(myitem);
+			if(container){
+				//is depot?					
+				tmp = (char*)xmlGetProp(p, (const xmlChar *) "depot");
+				if(tmp){					
+					int depotnumber = atoi(tmp);					
+					container->depot = depotnumber;
+				}      			
+				//loadContainer
 			}
+
+			myitem->pos.x = px;
+			myitem->pos.y = py;
+			myitem->pos.z = pz;		
+			
+      		if (myitem->isAlwaysOnTop())
+				t->topItems.push_back(myitem);
+			else
+				t->downItems.push_back(myitem);
+			}
+				
+			p=p->next;
+		}
       tile=tile->next;
     }
   xmlFreeDoc(doc);
