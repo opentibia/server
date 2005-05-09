@@ -28,6 +28,7 @@ typedef std::list<Item *> ContainerList;
 class Container : public Item
 {
 	private:
+		int useCount;
 		Container *parent;
 		unsigned short maxitems; //number of max items in container  
 		unsigned short actualitems; // number of items in container
@@ -36,6 +37,18 @@ class Container : public Item
 	public:
 		Container(const unsigned short _type);
 		virtual ~Container();
+		virtual void useThing() {
+			//std::cout << "Container: useThing() " << (int)this << std::endl;
+			useCount++;
+		};
+	
+		virtual void releaseThing() {
+			useCount--;
+			//std::cout << "Container: releaseThing() " << (int)this << std::endl;
+			//if (useCount == 0)
+			if (useCount <= 0)
+				delete this;
+		};
 
 		unsigned long depot;
 		int size() const {return actualitems;};

@@ -225,6 +225,19 @@ class MagicEffectItem : public Item, public MagicEffectClass
 public:
 	MagicEffectItem(const TransformMap& transformMap);
 
+	virtual void useThing() {
+		//std::cout << "Magic: useThing() " << (int)this << std::endl;
+		useCount++;
+	};
+	
+	virtual void releaseThing() {
+		//std::cout << "Magic: releaseThing() " << (int)this << std::endl;
+		useCount--;
+		//if (useCount == 0)
+		if (useCount <= 0)
+			delete this;
+	};
+	
 	const MagicEffectTargetCreatureCondition* getCondition() const;
 
 	virtual bool causeExhaustion(bool hasTarget) const
@@ -238,6 +251,7 @@ public:
 	bool transform(const MagicEffectItem *rhs);
 	long getDecayTime();
 protected:
+	int useCount;
 	void buildCondition();
 	TransformMap transformMap;
 	ConditionVec condition;

@@ -37,6 +37,7 @@ Monster::Monster(const char *name, Game* game) :
  ,Creature(name, id)
 {
 	//std::cout << "Monster constructor " << (unsigned long)this  <<std::endl;		
+	useCount = 0;
 	oldThinkTicks = 0;
 	loaded = false;
 	isfleeing = false;
@@ -393,11 +394,11 @@ Item* Monster::LoadLootItem(xmlNodePtr tmp,unsigned short id){
 	}
 	return tmpItem;
 }
-*/
+
 float Monster::GetRandom(){
 	return (float)(rand()/(RAND_MAX+1.0));
 }
-/*
+
 bool Monster::LoadLootContainer(xmlNodePtr nodeitem,Container* ccontainer){
 	xmlNodePtr tmp,p;
 	unsigned short s_id;	

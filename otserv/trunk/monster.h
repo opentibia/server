@@ -110,6 +110,17 @@ class Monster : protected AutoID<Monster>, public AutoList<Monster>, public Crea
 public:
   Monster(const char *name, Game* game);
   virtual ~Monster();
+	virtual void useThing() {
+		//std::cout << "Monster: useThing() " << (int)this << std::endl;
+		useCount++;
+	};
+	
+	virtual void releaseThing() {
+		//std::cout << "Monster: releaseThing() " << (int)this << std::endl;
+		useCount--;
+		if (useCount == 0)
+			delete this;
+	};
 
 	static const unsigned long min_id = 65537U;
 	static const unsigned long max_id = 16777216U;	
@@ -135,10 +146,11 @@ private:
 	//bool LoadLootContainer(xmlNodePtr,Container*);	
 	//Item* LoadLootItemStackable(xmlNodePtr,unsigned short);
 	//Item* LoadLootItem(xmlNodePtr,unsigned short);
-	float GetRandom();
+	//float GetRandom();
 
 
 protected:
+	int useCount;
 	PhysicalAttackClass	*curPhysicalAttack;
 
 	int targetDistance;

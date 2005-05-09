@@ -72,6 +72,17 @@ class Npc : protected AutoID<Npc>, public AutoList<Npc>, public Creature
 public:
   Npc(const char *name, Game* game);
   virtual ~Npc();
+	virtual void useThing() {
+		//std::cout << "Npc: useThing() " << (int)this << std::endl;
+		useCount++;
+	};
+	
+	virtual void releaseThing() {
+		//std::cout << "Npc: releaseThing() " << (int)this << std::endl;
+		useCount--;
+		if (useCount == 0)
+			delete this;
+	};
 
 	static const unsigned long min_id = 10000U;
 	static const unsigned long max_id = 65536U;
@@ -96,6 +107,7 @@ public:
   bool isLoaded(){return loaded;}
 
 protected:
+	int useCount;
   virtual void onThingMove(const Player *player, const Thing *thing, const Position *oldPos,
 		unsigned char oldstackpos, unsigned char oldcount, unsigned char count);
   virtual void onCreatureAppear(const Creature *creature);

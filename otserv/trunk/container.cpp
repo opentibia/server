@@ -26,6 +26,7 @@ Container::Container(const unsigned short _type) : Item(_type)
 	actualitems = 0;
 	parent = 0;
 	depot = 0;
+	useCount = 0;
 }
 
 Container::~Container()

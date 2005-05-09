@@ -464,7 +464,7 @@ MagicEffectItem* MagicEffectAreaGroundClass::getMagicItem(const Creature* attack
 MagicEffectItem::MagicEffectItem(const TransformMap& transformMap)
 {
 	this->transformMap = transformMap;
-
+	useCount = 0;
 	unsigned short type = 0;
 	TransformMap::const_iterator dm = transformMap.begin();
 	if(dm != transformMap.end()) {

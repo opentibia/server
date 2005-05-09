@@ -223,8 +223,8 @@ void MapState::getMapChanges(Player *spectator)
 
 			if(thIt->type == CHANGE_REMOVE) {
 				if(thIt->stackpos < 10) {
-					Thing dis_thing;				
-					dis_thing.pos = thIt->oldPos;					
+					Item dis_thing;				
+					dis_thing.pos = thIt->oldPos;
 					spectator->onThingDisappear(&dis_thing,thIt->stackpos);
 				}
 				else {

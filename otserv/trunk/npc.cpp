@@ -43,6 +43,7 @@ Npc::Npc(const char *name, Game* game) :
  ,AutoList<Npc>(id)
  ,Creature(name, id)
 {
+	useCount = 0;
 	this->loaded = false;
 	std::string filename = "data/npc/" + std::string(name) + ".xml";
 	std::transform(filename.begin(), filename.end(), filename.begin(), tolower);

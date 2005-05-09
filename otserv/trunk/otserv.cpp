@@ -189,7 +189,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 				Player *player;
 				bool playerexist = g_game.getCreatureByName(name.c_str()) != NULL;
 				player = new Player(name.c_str(), protocol);
-				player->usePlayer();				
+				player->useThing();
 				IOPlayer::instance()->loadPlayer(player, name);	
 
 				if (player->password == password)
@@ -216,7 +216,8 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 					}
 				}
 				//free memory
-				player->releasePlayer();
+				g_game.FreeThing(player);
+				//player->releaseThing();
 			}
     }
 	else if(protId == 0xFFFF){
