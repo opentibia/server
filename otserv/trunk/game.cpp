@@ -947,7 +947,7 @@ void Game::thingMoveInternal(Creature *player,
 		}
 
 		//Container to container
-		if((fromContainer && toContainer)) {
+		if(!fromInventory && fromContainer && toContainer) {
 			if(from_slotid >= fromContainer->size())
 				return;
 
@@ -1041,9 +1041,7 @@ void Game::thingMoveInternal(Creature *player,
 					getSpectators(Range(fromPos, toPos), list);
 				}
 
-				if(!list.empty() /*fromContainer && fromContainer->pos.x != 0xFFFF || toContainer && toContainer->pos.x != 0xFFFF*/) {
-					//getSpectators(Range(player->pos, false), list);
-
+				if(!list.empty()) {
 					for(int i = 0; i < list.size(); ++i) {
 						list[i]->onThingMove(player, fromContainer, from_slotid, fromItem, oldFromCount, toContainer, to_slotid, toItem, oldToCount, count);
 					}
@@ -1121,7 +1119,7 @@ void Game::thingMoveInternal(Creature *player,
 				}
 			}
 			//container to inventory
-			else if(fromContainer && toInventory) {
+			else if(!fromInventory && fromContainer && toInventory) {
 				Item* fromItem = fromContainer->getItem(from_slotid);
 				if(!fromItem)
 					return;

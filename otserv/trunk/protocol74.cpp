@@ -1531,10 +1531,10 @@ void Protocol74::sendThingMove(const Creature *creature, slots_t fromSlot, const
 				msg.AddItem(fromItem->getID(), count);
 			}
 		}
-		
-		if(creature == player) {
-			AddPlayerInventoryItem(msg,player, fromSlot);
-		}
+	}
+
+	if(creature == player) {
+		AddPlayerInventoryItem(msg,player, fromSlot);
 	}
 	
 	WriteBuffer(msg);
@@ -1589,10 +1589,10 @@ void Protocol74::sendThingMove(const Creature *creature, const Container *fromCo
 				msg.AddItem(toItem);
 			}
 		}
+	}
 
-		if(creature == player) {
-			AddPlayerInventoryItem(msg,player, toSlot);
-		}
+	if(creature == player) {
+		AddPlayerInventoryItem(msg,player, toSlot);
 	}
 
 	WriteBuffer(msg);
@@ -2462,7 +2462,7 @@ void Protocol74::WriteBuffer(NetworkMessage &add){
 	}	
 	if(OutputBuffer.getMessageLength() + add.getMessageLength() > NETWORKMESSAGE_MAXSIZE){		
 		OTSYS_THREAD_UNLOCK(bufferLock)
-		this->flushOutputBuffer();		
+		this->flushOutputBuffer();
 		OTSYS_THREAD_LOCK(bufferLock)
 		player->SendBuffer = true;
 	}	
