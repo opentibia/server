@@ -250,14 +250,13 @@ protected:
 		const Item* fromItem, int oldFromCount, Container *toContainer, unsigned char to_slotid,
 		const Item *toItem, int oldToCount, int count) {};
 
-	/*
-	virtual void onThingMove(const Creature *creature, const Container *fromContainer, const Item* item, unsigned char from_slotid,
-		const Container *toContainer, const Item* dropitem, unsigned char to_slotid, unsigned char oldcount, unsigned char count) {};
-	*/
-
 	//inventory to container
-	virtual void onThingMove(const Creature *creature, slots_t fromSlot, const Container *toContainer,
-		const Item* item, unsigned char oldcount, unsigned char count) {};
+	virtual void onThingMove(const Creature *creature, slots_t fromSlot, const Item* fromItem,
+		int oldFromCount, const Container *toContainer, unsigned char to_slotid, const Item *toItem, int oldToCount, int count) {};
+
+	//inventory to inventory (100%)
+	virtual void onThingMove(const Creature *creature, slots_t fromSlot, const Item* fromItem,
+		int oldFromCount, slots_t toSlot, const Item* toItem, int oldToCount, int count) {};
 
 	//container to inventory (100%)
 	virtual void onThingMove(const Creature *creature, const Container *fromContainer, unsigned char from_slotid,

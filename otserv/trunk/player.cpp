@@ -636,8 +636,7 @@ int Player::sendInventory(unsigned char sl_id){
 	return true;
 }
 
-
-int Player::addItemInventory(Item* item, int pos, bool isloading /*= false*/) {
+int Player::addItemInventory(Item* item, int pos, bool internal /*= false*/) {
 #ifdef __DEBUG__
 	std::cout << "Should add item at " << pos <<std::endl;
 #endif
@@ -651,11 +650,29 @@ int Player::addItemInventory(Item* item, int pos, bool isloading /*= false*/) {
 		if(items[pos]) {
 			items[pos]->pos.x = 0xFFFF;
 		}
+
+		if(!internal) {
+			client->sendInventory(pos);	
+		}
   }
-	
-	if(!isloading) {
-		client->sendInventory(pos);	
+	else
+		return false;
+
+	return true;
+}
+
+int Player::removeItemInventory(int pos, bool internal /*= false*/)
+{
+	if(pos > 0 && pos < 11) {
+
+		items[pos] = NULL;
+
+		if(!internal) {
+			client->sendInventory(pos);
+		}
 	}
+	else
+		return false;
 
 	return true;
 }
@@ -1121,24 +1138,25 @@ void Player::onThingMove(const Creature *creature, const Thing *thing, const Pos
 }
 
  //container to container
-
-/*
-void Player::onThingMove(const Creature *creature, const Container *fromContainer, const Item* item, unsigned char from_slotid,
-	const Container *toContainer, const Item* dropitem, unsigned char to_slotid, unsigned char oldcount, unsigned char count)
-*/
 void Player::onThingMove(const Creature *creature, const Container *fromContainer, unsigned char from_slotid,
 	const Item* fromItem, int oldFromCount, Container *toContainer, unsigned char to_slotid,
 	const Item *toItem, int oldToCount, int count)
 {
 	client->sendThingMove(creature, fromContainer, from_slotid, fromItem, oldFromCount, toContainer, to_slotid, toItem, oldToCount, count);
-	//client->sendThingMove(creature, fromContainer, item, from_slotid, toContainer, dropitem, to_slotid, oldcount, count);
 }
 
 //inventory to container
-void Player::onThingMove(const Creature *creature, slots_t fromSlot, const Container *toContainer,
-		const Item* item, unsigned char oldcount, unsigned char count)
+void Player::onThingMove(const Creature *creature, slots_t fromSlot, const Item* fromItem,
+	int oldFromCount, const Container *toContainer, unsigned char to_slotid, const Item *toItem, int oldToCount, int count)
 {
-	//client->sendThingMove(creature, fromSlot, toContainer, item, oldcount, count);
+	client->sendThingMove(creature, fromSlot, fromItem, oldFromCount, toContainer, to_slotid, toItem, oldToCount, count);
+}
+
+//inventory to inventory
+void Player::onThingMove(const Creature *creature, slots_t fromSlot, const Item* fromItem,
+	int oldFromCount, slots_t toSlot, const Item* toItem, int oldToCount, int count)
+{
+	client->sendThingMove(creature, fromSlot, fromItem, oldFromCount, toSlot, toItem, oldToCount, count);
 }
 
 //container to inventory

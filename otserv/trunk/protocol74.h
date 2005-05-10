@@ -119,6 +119,10 @@ private:
 	virtual void sendThingMove(const Creature *creature, slots_t fromSlot, const Item* fromItem,
 		int oldFromCount, const Container *toContainer, unsigned char to_slotid, const Item *toItem, int oldToCount, int count);
 
+	//inventory to inventory
+	virtual void sendThingMove(const Creature *creature, slots_t fromSlot, const Item* fromItem,
+		int oldFromCount, slots_t toSlot, const Item* toItem, int oldToCount, int count);
+
 	//container to inventory (100%)
 	virtual void sendThingMove(const Creature *creature, const Container *fromContainer, unsigned char from_slotid,
 		const Item* fromItem, int oldFromCount, slots_t toSlot, const Item *toItem, int oldToCount, int count);

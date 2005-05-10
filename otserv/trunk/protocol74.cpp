@@ -1540,6 +1540,20 @@ void Protocol74::sendThingMove(const Creature *creature, slots_t fromSlot, const
 	WriteBuffer(msg);
 }
 
+//inventory to inventory
+void Protocol74::sendThingMove(const Creature *creature, slots_t fromSlot, const Item* fromItem,
+	int oldFromCount, slots_t toSlot, const Item* toItem, int oldToCount, int count)
+{
+	NetworkMessage msg;
+
+	if(creature == player) {
+		AddPlayerInventoryItem(msg, player, fromSlot);
+		AddPlayerInventoryItem(msg, player, toSlot);
+	}
+
+	WriteBuffer(msg);
+}
+
 //container to inventory (100%)
 void Protocol74::sendThingMove(const Creature *creature, const Container *fromContainer,
 	unsigned char from_slotid, const Item* fromItem, int oldFromCount, slots_t toSlot, const Item *toItem, int oldToCount, int count)

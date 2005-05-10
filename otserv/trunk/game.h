@@ -228,8 +228,8 @@ class Game {
 		bool onPrepareMoveThing(Creature *player, const Item* fromItem, const Container *fromContainer, const Container *toContainer, const Item* toItem);
 		bool onPrepareMoveCreature(Creature *player, const Creature* creatureMoving, const Tile *fromTile, const Tile *toTile);
 		bool onPrepareMoveThing(Player *player, const Position& fromPos, const Item *item, slots_t toSlot);
-		bool onPrepareMoveThing(Player *player, slots_t fromSlot, slots_t toSlot);
-		bool onPrepareMoveThing(Player *player, const Container *fromContainer, slots_t toSlot);
+		bool onPrepareMoveThing(Player *player, slots_t fromSlot, const Item *fromItem, slots_t toSlot, const Item *toItem);
+		bool onPrepareMoveThing(Player *player, const Item *item, slots_t toSlot);
 
 		//container/inventory to container/inventory
 		void thingMoveInternal(Creature *player,

@@ -48,14 +48,14 @@ public:
   //container to container
 	virtual void sendThingMove(const Creature *creature, const Container *fromContainer, unsigned char from_slotid,
 		const Item* fromItem, int oldFromCount, Container *toContainer, unsigned char to_slotid, const Item *toItem, int oldToCount, int count) = 0;
-	/*
-	virtual void sendThingMove(const Creature *creature, const Container *fromContainer, const Item* item, unsigned char from_slotid,
-		const Container *toContainer, const Item* dropitem, unsigned char to_slotid, unsigned char oldcount, unsigned char count) = 0;
-	*/
 
 	//inventory to container
 	virtual void sendThingMove(const Creature *creature, slots_t fromSlot, const Item* fromItem,
 		int oldFromCount, const Container *toContainer, unsigned char to_slotid, const Item *toItem, int oldToCount, int count) = 0;
+
+	//inventory to inventory
+	virtual void sendThingMove(const Creature *creature, slots_t fromSlot, const Item* fromItem,
+		int oldFromCount, slots_t toSlot, const Item* toItem, int oldToCount, int count) = 0;
 
 	//container to inventory
 	virtual void sendThingMove(const Creature *creature, const Container *fromContainer, unsigned char from_slotid,
