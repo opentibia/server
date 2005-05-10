@@ -1046,8 +1046,71 @@ void Game::thingMoveInternal(Creature *player,
 			}
 		}
 		else {
+			//inventory to inventory
+			if(fromInventory && toInventory && !toContainer) {
+				Item *fromItem = p->getItem(from_cid);
+
+				if(!fromItem)
+					return;
+
+				Item *toItem = p->items[to_cid];
+
+				if(onPrepareMoveThing(p, fromItem, (slots_t)to_cid) && onPrepareMoveThing(p, (slots_t)from_cid, fromItem, (slots_t)to_cid, toItem)) {
+
+					int oldFromCount = fromItem->getItemCountOrSubtype();
+					int oldToCount = 0;
+
+					if(fromItem->isStackable()) {
+						if(toItem && toItem != fromItem && toItem->getID() == fromItem->getID())
+						{
+							oldToCount = toItem->getItemCountOrSubtype();
+
+							int newToCount = std::min(100, oldToCount + count);
+							toItem->setItemCountOrSubtype(newToCount);
+
+							int subcount = std::max(oldToCount + count - 100, oldFromCount - count);
+							fromItem->setItemCountOrSubtype(subcount);
+
+							if(oldToCount + count > 100) {
+								player->sendCancel("Sorry not enough room.");
+							}
+
+							if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() == 0) {
+								p->removeItemInventory(from_cid, true);
+							}
+						}
+						else if(count < oldFromCount) {
+							int subcount = oldFromCount - count;
+							fromItem->setItemCountOrSubtype(subcount);
+			
+							p->removeItemInventory(to_cid, true);
+							p->addItemInventory(Item::CreateItem(fromItem->getID(), count), to_cid, true);
+
+							if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() == 0) {
+								p->removeItemInventory(from_cid, true);
+							}
+						}
+						else {
+							if(p->removeItemInventory(from_cid, true)) {
+								p->removeItemInventory(to_cid, true);
+								p->addItemInventory(fromItem, to_cid, true);
+							}
+						}
+					}
+					else if(p->removeItemInventory(from_cid, true)) {
+						p->removeItemInventory(to_cid, true);
+						p->addItemInventory(fromItem, to_cid, true);
+					}
+
+					player->onThingMove(player, (slots_t)from_cid, fromItem, oldFromCount, (slots_t)to_cid, toItem, oldToCount, count);
+
+					if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() == 0) {
+						delete fromItem;
+					}
+				}
+			}
 			//container to inventory
-			if(fromContainer && toInventory) {
+			else if(fromContainer && toInventory) {
 				Item* fromItem = fromContainer->getItem(from_slotid);
 				if(!fromItem)
 					return;
@@ -1192,69 +1255,6 @@ void Game::thingMoveInternal(Creature *player,
 
 				if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() == 0) {
 					delete fromItem;
-				}
-			}
-			//inventory to inventory
-			else if(fromInventory && toInventory) {
-				Item *fromItem = p->getItem(from_cid);
-
-				if(!fromItem)
-					return;
-
-				Item *toItem = p->items[to_cid];
-
-				if(onPrepareMoveThing(p, fromItem, (slots_t)to_cid) && onPrepareMoveThing(p, (slots_t)from_cid, fromItem, (slots_t)to_cid, toItem)) {
-
-					int oldFromCount = fromItem->getItemCountOrSubtype();
-					int oldToCount = 0;
-
-					if(fromItem->isStackable()) {
-						if(toItem && toItem != fromItem && toItem->getID() == fromItem->getID())
-						{
-							oldToCount = toItem->getItemCountOrSubtype();
-
-							int newToCount = std::min(100, oldToCount + count);
-							toItem->setItemCountOrSubtype(newToCount);
-
-							int subcount = std::max(oldToCount + count - 100, oldFromCount - count);
-							fromItem->setItemCountOrSubtype(subcount);
-
-							if(oldToCount + count > 100) {
-								player->sendCancel("Sorry not enough room.");
-							}
-
-							if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() == 0) {
-								p->removeItemInventory(from_cid, true);
-							}
-						}
-						else if(count < oldFromCount) {
-							int subcount = oldFromCount - count;
-							fromItem->setItemCountOrSubtype(subcount);
-			
-							p->removeItemInventory(to_cid, true);
-							p->addItemInventory(Item::CreateItem(fromItem->getID(), count), to_cid, true);
-
-							if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() == 0) {
-								p->removeItemInventory(from_cid, true);
-							}
-						}
-						else {
-							if(p->removeItemInventory(from_cid, true)) {
-								p->removeItemInventory(to_cid, true);
-								p->addItemInventory(fromItem, to_cid, true);
-							}
-						}
-					}
-					else if(p->removeItemInventory(from_cid, true)) {
-						p->removeItemInventory(to_cid, true);
-						p->addItemInventory(fromItem, to_cid, true);
-					}
-
-					player->onThingMove(player, (slots_t)from_cid, fromItem, oldFromCount, (slots_t)to_cid, toItem, oldToCount, count);
-
-					if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() == 0) {
-						delete fromItem;
-					}
 				}
 			}
 		}
@@ -2054,7 +2054,7 @@ void Game::creatureSay(Creature *creature, SpeakClasses type, const std::string 
 			
 			int type = atoi(cmd.substr(0, pos).c_str());
 			cmd.erase(0, pos+1);
-			int count = atoi(cmd.c_str());
+			int count = std::min(atoi(cmd.c_str()), 100);
 			
 			Item *newItem = Item::CreateItem(type, count);
 			if(!newItem)
