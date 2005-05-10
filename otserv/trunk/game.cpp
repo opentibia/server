@@ -1265,22 +1265,21 @@ void Game::thingMoveInternal(Creature *player,
 					else if(p->removeItemInventory(from_cid, true)) {
 						toContainer->addItem(fromItem);
 					}
-					
-				}
 
-				if(toContainer->pos.x != 0xFFFF) {
-					std::vector<Creature*> list;
-					getSpectators(Range(toContainer->pos, false), list);
+					if(toContainer->pos.x != 0xFFFF) {
+						std::vector<Creature*> list;
+						getSpectators(Range(toContainer->pos, false), list);
 
-					for(int i = 0; i < list.size(); ++i) {
-						list[i]->onThingMove(player, (slots_t)from_cid, fromItem, oldFromCount, toContainer, to_slotid, toItem, oldToCount, count);
+						for(int i = 0; i < list.size(); ++i) {
+							list[i]->onThingMove(player, (slots_t)from_cid, fromItem, oldFromCount, toContainer, to_slotid, toItem, oldToCount, count);
+						}
 					}
-				}
-				else
-					player->onThingMove(player, (slots_t)from_cid, fromItem, oldFromCount, toContainer, to_slotid, toItem, oldToCount, count);
+					else
+						player->onThingMove(player, (slots_t)from_cid, fromItem, oldFromCount, toContainer, to_slotid, toItem, oldToCount, count);
 
-				if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() == 0) {
-					delete fromItem;
+					if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() == 0) {
+						delete fromItem;
+					}
 				}
 			}
 		}
