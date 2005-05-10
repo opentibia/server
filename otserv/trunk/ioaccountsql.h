@@ -32,7 +32,7 @@ class IOAccountSQL : protected IOAccount {
   public:
 	/** Get a textual description of what source is used
 	  * \returns Name of the source*/
-	virtual char* getSourceDescription(){return "SQL";};
+	virtual char* getSourceDescription(){return "Account source: SQL";};
 	virtual Account loadAccount(unsigned long accno);
 	IOAccountSQL(){};
 	virtual ~IOAccountSQL(){};

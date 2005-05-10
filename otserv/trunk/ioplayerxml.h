@@ -36,7 +36,7 @@ class IOPlayerXML : protected IOPlayer{
   public:
 	/** Get a textual description of what source is used
 	  * \returns Name of the source*/
-	virtual char* getSourceDescription(){return "XML Player";};
+	virtual char* getSourceDescription(){return "Player source: XML";};
 	virtual bool loadPlayer(Player* player, std::string name);
 	/** Save a player
 	  * \returns Wheter the player was successfully saved

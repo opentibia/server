@@ -41,7 +41,6 @@ Account IOAccountXML::loadAccount(unsigned long accno){
 	std::transform(filename.begin(), filename.end(), filename.begin(), tolower);
 	xmlMutexLock(xmlmutex);
 	xmlDocPtr doc = xmlParseFile(filename.c_str());
-
 	if (doc)
 	{
 		xmlNodePtr root, p, tmp;

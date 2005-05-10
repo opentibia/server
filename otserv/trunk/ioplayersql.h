@@ -30,7 +30,7 @@ class IOPlayerSQL : protected IOPlayer{
   public:
 	/** Get a textual description of what source is used
 	  * \returns Name of the source*/
-	char* getSourceDescription(){return "SQL";};
+	char* getSourceDescription(){return "Player source: SQL";};
 	bool loadPlayer(Player* player, std::string name);
 		/** Save a player
 	  * \returns Wheter the player was successfully saved

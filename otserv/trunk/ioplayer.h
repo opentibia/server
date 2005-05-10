@@ -32,7 +32,7 @@ class IOPlayer {
 	static IOPlayer* instance();
 	/** Get a textual description of what source is used
 	  * \returns Name of the source*/
-	virtual char* getSourceDescription(){return "NULL";};
+	virtual char* getSourceDescription(){return "Player source: NULL";};
 	/** Load a player
 	  * \returns Wheter the player was successfully loaded
 	  * \param player Player structure to load to

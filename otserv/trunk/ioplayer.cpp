@@ -36,7 +36,9 @@ IOPlayer* IOPlayer::instance(){
 	_instance = (IOPlayer*)new IOPlayerXML;
 #endif
 	}
-
+    #ifdef __DEBUG__
+	printf("%s \n", _instance->getSourceDescription());
+	#endif 
 	return _instance;
 }
 
