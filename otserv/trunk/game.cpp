@@ -1124,7 +1124,7 @@ void Game::thingMoveInternal(Creature *player,
 				if(!fromItem)
 					return;
 
-				if(onPrepareMoveThing(p, fromContainer, (slots_t)to_cid) && onPrepareMoveThing(p, fromItem, (slots_t)to_cid)) {
+				if(onPrepareMoveThing(p, fromItem, (slots_t)to_cid)) {
 					Item *toItem = p->items[to_cid];
 					int oldFromCount = fromItem->getItemCountOrSubtype();
 					int oldToCount = 0;
