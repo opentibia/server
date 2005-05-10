@@ -257,6 +257,15 @@ void NetworkMessage::AddPosition(const Position &pos)
 }
 
 
+void NetworkMessage::AddItem(unsigned short id, unsigned char count)
+{
+	AddU16(id);
+
+	const ItemType &it = Item::items[id];
+	if(it.stackable || it.multitype || it.fluidcontainer)
+		AddByte(count);
+}
+
 void NetworkMessage::AddItem(const Item *item)
 {
   AddU16(item->getID());

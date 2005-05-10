@@ -27,6 +27,8 @@
 #include "game.h"
 #include "tile.h"
 
+class Creature;
+
 class TimeProbabilityClass {
 public:
 	TimeProbabilityClass()

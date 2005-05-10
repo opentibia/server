@@ -131,6 +131,19 @@ Item* Container::getItem(unsigned long slot_num)
 	return NULL;
 }
 
+const Item* Container::getItem(unsigned long slot_num) const
+{
+	size_t n = 0;			
+	for (ContainerList::const_iterator cit = getItems(); cit != getEnd(); ++cit) {
+		if(n == slot_num)
+			return *cit;
+		else
+			++n;
+	}
+
+	return NULL;
+}
+
 unsigned char Container::getSlotNumberByItem(const Item* item) const
 {
 	unsigned char n = 0;			

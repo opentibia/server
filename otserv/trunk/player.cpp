@@ -1121,53 +1121,64 @@ void Player::onThingMove(const Creature *creature, const Thing *thing, const Pos
 }
 
  //container to container
-void Player::onThingMove(const Creature *creature, const Container *fromContainer, const Container *toContainer,
-		const Item* item, unsigned char from_slotid, unsigned char to_slotid,
-		unsigned char oldcount, unsigned char count)
+
+/*
+void Player::onThingMove(const Creature *creature, const Container *fromContainer, const Item* item, unsigned char from_slotid,
+	const Container *toContainer, const Item* dropitem, unsigned char to_slotid, unsigned char oldcount, unsigned char count)
+*/
+void Player::onThingMove(const Creature *creature, const Container *fromContainer, unsigned char from_slotid,
+	const Item* fromItem, int oldFromCount, Container *toContainer, unsigned char to_slotid,
+	const Item *toItem, int oldToCount, int count)
 {
-	client->sendThingMove(creature, fromContainer, toContainer, item, from_slotid, to_slotid, oldcount, count);
+	client->sendThingMove(creature, fromContainer, from_slotid, fromItem, oldFromCount, toContainer, to_slotid, toItem, oldToCount, count);
+	//client->sendThingMove(creature, fromContainer, item, from_slotid, toContainer, dropitem, to_slotid, oldcount, count);
 }
 
 //inventory to container
 void Player::onThingMove(const Creature *creature, slots_t fromSlot, const Container *toContainer,
 		const Item* item, unsigned char oldcount, unsigned char count)
 {
-	client->sendThingMove(creature, fromSlot, toContainer, item, oldcount, count);
+	//client->sendThingMove(creature, fromSlot, toContainer, item, oldcount, count);
 }
 
 //container to inventory
-void Player::onThingMove(const Creature *creature, const Container *fromContainer, slots_t toSlot,
-		const Item* item, unsigned char from_slotid, unsigned char oldcount, unsigned char count)
+void Player::onThingMove(const Creature *creature, const Container *fromContainer, unsigned char from_slotid,
+	const Item* fromItem, int oldFromCount, slots_t toSlot, const Item *toItem, int oldToCount, int count)
 {
-	client->sendThingMove(creature, fromContainer, toSlot, item, from_slotid, oldcount, count);
+	client->sendThingMove(creature, fromContainer, from_slotid, fromItem, oldFromCount, toSlot, toItem, oldToCount, count);
 }
 
-//container to ground
-void Player::onThingMove(const Creature *creature, const Container *fromContainer, const Position *newPos,
-	const Item* item, unsigned char from_slotid, unsigned char oldcount, unsigned char count)
+//container to ground (100%)
+void Player::onThingMove(const Creature *creature, const Container *fromContainer, unsigned char from_slotid,
+	const Item* fromItem, int oldFromCount, const Position &toPos, const Item *toItem, int oldToCount, int count)
 {
-	client->sendThingMove(creature, fromContainer, newPos, item, from_slotid, oldcount, count);
+	client->sendThingMove(creature, fromContainer, from_slotid, fromItem, oldFromCount, toPos, toItem, oldToCount, count);
 }
 
 //inventory to ground
-void Player::onThingMove(const Creature *creature, slots_t fromSlot, const Position *newPos,
-	const Item* item, unsigned char oldcount, unsigned char count)
+void Player::onThingMove(const Creature *creature, slots_t fromSlot,
+	const Item* fromItem, int oldFromCount, const Position &toPos, const Item *toItem, int oldToCount, int count)
 {
-	client->sendThingMove(creature, fromSlot, newPos, item, oldcount, count);
+	client->sendThingMove(creature, fromSlot, fromItem, oldFromCount, toPos, toItem, oldToCount, count);
 }
 
 //ground to container
-void Player::onThingMove(const Creature *creature, const Position *oldPos, const Container *toContainer,
-	const Item* item, unsigned char stackpos, unsigned char to_slotid, unsigned char oldcount, unsigned char count)
+/*
+void Player::onThingMove(const Creature *creature, const Position *oldPos, const Item* item, unsigned char stackpos,
+	const Container *toContainer, const Item* dropitem, unsigned char to_slotid, bool concat)
+*/
+void Player::onThingMove(const Creature *creature, const Position &fromPos, int stackpos, const Item* fromItem,
+	int oldFromCount, const Container *toContainer, unsigned char to_slotid, const Item *toItem, int oldToCount, int count)
 {
-	client->sendThingMove(creature, oldPos, toContainer, item, stackpos, to_slotid, oldcount, count);
+	client->sendThingMove(creature, fromPos, stackpos, fromItem, oldFromCount, toContainer, to_slotid, toItem, oldToCount, count);
+	//client->sendThingMove(creature, oldPos, item, stackpos, toContainer, dropitem, to_slotid, concat);
 }
 
 //ground to inventory
-void Player::onThingMove(const Creature *creature, const Position *oldPos, slots_t toSlot,
-	const Item* item, unsigned char stackpos, unsigned char oldcount, unsigned char count)
+void Player::onThingMove(const Creature *creature, const Position &fromPos, int stackpos, const Item* fromItem,
+	int oldFromCount, slots_t toSlot, const Item *toItem, int oldToCount, int count)
 {
-	client->sendThingMove(creature, oldPos, toSlot, item, stackpos, oldcount, count);
+	client->sendThingMove(creature, fromPos, stackpos, fromItem, oldFromCount, toSlot, toItem, oldToCount, count);
 }
 
 void Player::setAttackedCreature(unsigned long id){

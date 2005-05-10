@@ -196,32 +196,37 @@ protected:
 	virtual void onTileUpdated(const Position &pos);
 
 	//container to container
-	virtual void onThingMove(const Creature *creature, const Container *fromContainer, const Container *toContainer,
-		const Item* item, unsigned char from_slotid, unsigned char to_slotid, unsigned char oldcount, unsigned char count);
+	virtual void onThingMove(const Creature *creature, const Container *fromContainer, unsigned char from_slotid,
+		const Item* fromItem, int oldFromCount, Container *toContainer, unsigned char to_slotid,
+		const Item *toItem, int oldToCount, int count);
+	/*
+	virtual void onThingMove(const Creature *creature, const Container *fromContainer, const Item* item, unsigned char from_slotid,
+		const Container *toContainer, const Item* dropitem, unsigned char to_slotid, unsigned char oldcount, unsigned char count);
+	*/
 
 	//inventory to container
 	virtual void onThingMove(const Creature *creature, slots_t fromSlot, const Container *toContainer,
 		const Item* item, unsigned char oldcount, unsigned char count);
 
 	//container to inventory
-	virtual void onThingMove(const Creature *creature, const Container *fromContainer, slots_t toSlot,
-		const Item* item, unsigned char from_slotid, unsigned char oldcount, unsigned char count);
+	virtual void onThingMove(const Creature *creature, const Container *fromContainer, unsigned char from_slotid,
+		const Item* fromItem, int oldFromCount, slots_t toSlot, const Item *toItem, int oldToCount, int count);
 
-	//container to ground
-	virtual void onThingMove(const Creature *creature, const Container *fromContainer, const Position *newPos,
-		const Item* item, unsigned char from_slotid, unsigned char oldcount, unsigned char count);
+	//container to ground (100%)
+	virtual void onThingMove(const Creature *creature, const Container *fromContainer, unsigned char from_slotid,
+		const Item* fromItem, int oldFromCount, const Position &toPos, const Item *toItem, int oldToCount, int count);
 
-	//inventory to ground
-	virtual void onThingMove(const Creature *creature, slots_t fromSlot, const Position *newPos,
-		const Item* item, unsigned char oldcount, unsigned char count);
+	//inventory to ground (100%)
+	virtual void onThingMove(const Creature *creature, slots_t fromSlot,
+		const Item* fromItem, int oldFromCount, const Position &toPos, const Item *toItem, int oldToCount, int count);
 
-	//ground to container
-	virtual void onThingMove(const Creature *creature, const Position *oldPos, const Container *toContainer,
-		const Item* item, unsigned char stackpos, unsigned char to_slotid, unsigned char oldcount, unsigned char count);
+	//ground to container (100%)
+	virtual void onThingMove(const Creature *creature, const Position &fromPos, int stackpos, const Item* fromItem,
+		int oldFromCount, const Container *toContainer, unsigned char to_slotid, const Item *toItem, int oldToCount, int count);
 
-	//ground to inventory
-	virtual void onThingMove(const Creature *creature, const Position *oldPos, slots_t toSlot,
-		const Item* item, unsigned char stackpos, unsigned char oldcount, unsigned char count);
+	//ground to inventory (100%)
+	virtual void onThingMove(const Creature *creature, const Position &fromPos, int stackpos, const Item* fromItem,
+		int oldFromCount, slots_t toSlot, const Item *toItem, int oldToCount, int count);
 
   //ground to ground
 	virtual void onThingMove(const Creature *creature, const Thing *thing, const Position *oldPos,

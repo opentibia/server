@@ -539,8 +539,9 @@ std::list<Position> Map::getPathTo(Creature *creature, Position start, Position 
 					int y = current->y + dy;
 
 					Tile *t = getTile(x, y, z);
-					//if(!t || t->isBlocking() || (t->creatures.size() && t->getCreature() != creature))
-					if(!t || t->isBlocking() || (!t->creatures.empty() && (t->getCreature() != creature || t->creatures.size() > 1)) || t->floorChange())
+					if(!t || t->isBlocking() ||
+						(!t->creatures.empty() && (t->getCreature() != creature || t->creatures.size() > 1)) ||
+							t->floorChange() || t->getTeleportItem())
 					continue;
 
 					bool isInClosed = false;

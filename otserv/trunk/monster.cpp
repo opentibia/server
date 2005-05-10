@@ -598,7 +598,12 @@ void Monster::calcMovePosition()
 					//if((this->pos.x != x && this->pos.y != y)) {
 					if(!(this->pos.x == x && this->pos.y == y)) {
 						Tile *t = NULL;
-						if((!(t = game->map->getTile(x, y, pos.z))) || t->isBlocking() || t->isPz() || t->creatures.size() || t->floorChange())
+						if((!(t = game->map->getTile(x, y, pos.z))) ||
+								t->isBlocking() ||
+								t->isPz() || 
+								t->creatures.size() ||
+								t->floorChange() ||
+								t->getTeleportItem())
 							continue;
 					}
 /*				

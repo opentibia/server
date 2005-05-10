@@ -1348,17 +1348,16 @@ void Protocol74::sendTileUpdated(const Position &pos)
 	WriteBuffer(msg);
 }
 
-//container to container
-void Protocol74::sendThingMove(const Creature *creature,
-	const Container *fromContainer, const Container *toContainer, const Item* item,
-	unsigned char from_slotid, unsigned char to_slotid, unsigned char oldcount, unsigned char count)
+//container to container (100%)
+void Protocol74::sendThingMove(const Creature *creature, const Container *fromContainer, unsigned char from_slotid,
+	const Item* fromItem, int oldFromCount, Container *toContainer, unsigned char to_slotid, const Item *toItem, int oldToCount, int count)
 {
 	NetworkMessage msg;
 
 	if(fromContainer && fromContainer->pos.x != 0xFFFF && toContainer->pos.x != 0xFFFF) {
 		//Auto-close container's
 		if(std::abs(player->pos.x - toContainer->pos.x) > 1 || std::abs(player->pos.y - toContainer->pos.y) > 1) {
-			const Container *container = dynamic_cast<const Container*>(item);
+			const Container *container = dynamic_cast<const Container*>(fromItem);
 			if(container) {				
 				autoCloseContainers(container, msg);
 			}
@@ -1372,40 +1371,76 @@ void Protocol74::sendThingMove(const Creature *creature,
 
 		if(container && container == fromContainer) {
 			if(toContainer == fromContainer) {
-				//Item *toSlotItem = toContainer->getItem(to_slotid);
-				if(item->isStackable() && item->getItemCountOrSubtype() != oldcount) {
-					//add item
-					msg.AddByte(0x70);
-					msg.AddByte(cid /*to_id*/);
-					msg.AddU16(item->getID());
-					msg.AddByte(count);
+				if(fromItem->isStackable()) {
+					if(toItem && fromItem->getID() == toItem->getID() && toItem->getItemCountOrSubtype() != oldToCount) {
+						//update count
+						msg.AddByte(0x71);
+						msg.AddByte(cid);
+						msg.AddByte(to_slotid);
+						msg.AddItem(toItem);
 
-					//update count
-					msg.AddByte(0x71);
-					msg.AddByte(cid /*to_id*/);
-					msg.AddByte(from_slotid + 1);
-					msg.AddItem(item);
+						if(fromItem->getItemCountOrSubtype() > 0 && count < oldFromCount) {
+							//update count
+							msg.AddByte(0x71);
+							msg.AddByte(cid);
+							msg.AddByte(from_slotid);
+							msg.AddItem(fromItem);
+						}
+						else {
+							//remove item
+							msg.AddByte(0x72);
+							msg.AddByte(cid);
+							msg.AddByte(from_slotid);
+						}
+
+						//surplus items
+						if(oldToCount + count > 100) {
+							//add item
+							msg.AddByte(0x70);
+							msg.AddByte(cid);
+							msg.AddItem(fromItem->getID(), oldToCount + count - 100);
+						}
+					}
+					else {
+						if(count < fromItem->getItemCountOrSubtype()) {
+							//update count
+							msg.AddByte(0x71);
+							msg.AddByte(cid);
+							msg.AddByte(from_slotid);
+							msg.AddItem(fromItem);
+						}
+						else {
+							//remove item
+							msg.AddByte(0x72);
+							msg.AddByte(cid);
+							msg.AddByte(from_slotid);
+						}
+
+						//add item
+						msg.AddByte(0x70);
+						msg.AddByte(cid);
+						msg.AddItem(fromItem->getID(), count);
+					}
 				}
-				else /*Move all*/ {
-					
-					//remove item			
+				else {
+					//remove item
 					msg.AddByte(0x72);
-					msg.AddByte(cid /*from_id*/);
+					msg.AddByte(cid);
 					msg.AddByte(from_slotid);
 
 					//add item
 					msg.AddByte(0x70);
-					msg.AddByte(cid /*to_id*/);
-					msg.AddItem(item);
+					msg.AddByte(cid);
+					msg.AddItem(fromItem->getID(), count);
 				}
 			}
 			else {
-				if(item->isStackable() && item->getItemCountOrSubtype() != oldcount) {
+				if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() > 0 && count < oldFromCount) {
 					//update count
 					msg.AddByte(0x71);
 					msg.AddByte(cid);
 					msg.AddByte(from_slotid);
-					msg.AddItem(item);
+					msg.AddItem(fromItem);
 				}
 				else {
 					//remove item
@@ -1417,127 +1452,230 @@ void Protocol74::sendThingMove(const Creature *creature,
 		}
 
 		if(container && container == toContainer && toContainer != fromContainer) {
-			if(item->isStackable() && item->getItemCountOrSubtype() != oldcount) {
-				//add item
-				msg.AddByte(0x70);
-				msg.AddByte(cid /*to_id*/);
-				msg.AddU16(item->getID());
-				msg.AddByte(count);
+			if(fromItem->isStackable()) {
+				if(toItem && fromItem->getID() == toItem->getID() && toItem->getItemCountOrSubtype() != oldToCount) {
+					//update count
+					msg.AddByte(0x71);
+					msg.AddByte(cid);
+					msg.AddByte(to_slotid);
+					msg.AddItem(toItem);
+
+					//surplus items
+					if(oldToCount + count > 100) {
+						//add item
+						msg.AddByte(0x70);
+						msg.AddByte(cid);
+						msg.AddItem(fromItem->getID(), oldToCount + count - 100);
+					}
+				}
+				else {
+					//add item
+					msg.AddByte(0x70);
+					msg.AddByte(cid);
+					msg.AddItem(fromItem->getID(), count);
+				}
 			}
 			else {
 				//add item
 				msg.AddByte(0x70);
-				msg.AddByte(cid /*to_id*/);
-				msg.AddItem(item);
+				msg.AddByte(cid);
+				msg.AddItem(fromItem);
 			}
 		}
 	}
+
 	WriteBuffer(msg);
 }
 
 //inventory to container
-void Protocol74::sendThingMove(const Creature *creature, slots_t fromSlot, const Container *toContainer,
-	const Item* item, unsigned char oldcount, unsigned char count)
+void Protocol74::sendThingMove(const Creature *creature, slots_t fromSlot, const Item* fromItem,
+	int oldFromCount, const Container *toContainer, unsigned char to_slotid, const Item *toItem, int oldToCount, int count)
 {
 	NetworkMessage msg;
 	//Update up-arrow
 	//
 
 	if(creature == player) {
-		sendThingMove(creature, (Container*)NULL, toContainer, item, 0, 0, count, count);
+		Container *container = NULL;
+		for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
+			container = cit->second;
+			if(container == toContainer) {
+				unsigned char cid = cit->first;
+
+				if(fromItem->isStackable()) {
+					if(toItem && fromItem->getID() == toItem->getID() && toItem->getItemCountOrSubtype() != oldToCount) {
+						//update count
+						msg.AddByte(0x71);
+						msg.AddByte(cid);
+						msg.AddByte(to_slotid);
+						msg.AddItem(toItem);
+
+						//surplus items
+						if(oldToCount + count > 100) {
+							//add item
+							msg.AddByte(0x70);
+							msg.AddByte(cid);
+							msg.AddItem(fromItem->getID(), oldToCount + count - 100);
+						}
+					}
+					else {
+						//add item
+						msg.AddByte(0x70);
+						msg.AddByte(cid);
+						msg.AddItem(fromItem->getID(), count);
+					}
+				}
+				else {
+					//add item
+					msg.AddByte(0x70);
+					msg.AddByte(cid);
+					msg.AddItem(fromItem->getID(), count);
+				}
+			}
+		}
 
 		AddPlayerInventoryItem(msg,player, fromSlot);
 	}
+	
 	WriteBuffer(msg);
 }
 
-//container to inventory
-void Protocol74::sendThingMove(const Creature *creature, const Container *fromContainer, slots_t toSlot,
-	const Item* item, unsigned char from_slotid, unsigned char oldcount, unsigned char count)
+//container to inventory (100%)
+void Protocol74::sendThingMove(const Creature *creature, const Container *fromContainer,
+	unsigned char from_slotid, const Item* fromItem, int oldFromCount, slots_t toSlot, const Item *toItem, int oldToCount, int count)
 {
 	NetworkMessage msg;
 	//Update up-arrow
 	//
 
 	if(creature == player) {
-		sendThingMove(creature, fromContainer, (Container*)NULL, item, from_slotid, 0, count, count);
+		Container *container = NULL;
+		for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
+			container = cit->second;
+			if(container == fromContainer) {
+				unsigned char cid = cit->first;
+				
+				if(!fromItem->isStackable() || (oldFromCount == count && oldToCount + count <= 100)) {
+					//remove item
+					msg.AddByte(0x72);
+					msg.AddByte(cid);
+					msg.AddByte(from_slotid);
+				}
+				else {
+					//update count
+					msg.AddByte(0x71);
+					msg.AddByte(cid);
+					msg.AddByte(from_slotid);
+					msg.AddItem(fromItem);
+				}
+
+				if(toItem && toItem->getID() != fromItem->getID()) {
+					//add item
+					msg.AddByte(0x70);
+					msg.AddByte(cid);
+					msg.AddItem(toItem);
+				}
+			}
+		}
 
 		AddPlayerInventoryItem(msg,player, toSlot);
 	}
+
 	WriteBuffer(msg);
 }
 
-//container to ground
-void Protocol74::sendThingMove(const Creature *creature, const Container *fromContainer,
-	const Position *newPos, const Item* item, unsigned char from_slotid, unsigned char oldcount, unsigned char count)
+//container to ground (100%)
+void Protocol74::sendThingMove(const Creature *creature, const Container *fromContainer, unsigned char from_slotid,
+	const Item* fromItem, int oldFromCount, const Position &toPos, const Item *toItem, int oldToCount, int count)
 {
 	NetworkMessage msg;
 
 	//Update up-arrow
 	if((fromContainer->pos.x == 0xFFFF && creature == player) &&
-		(std::abs(player->pos.x - newPos->x) <= 1 && std::abs(player->pos.y - newPos->y) <= 1)) {
+		(std::abs(player->pos.x - toPos.x) <= 1 && std::abs(player->pos.y - toPos.y) <= 1)) {
 			//
 	}
 	//Auto-close container's
-	else if(std::abs(player->pos.x - newPos->x) > 1 || std::abs(player->pos.y - newPos->y) > 1) {
-		const Container *container = dynamic_cast<const Container*>(item);
+	else if(std::abs(player->pos.x - toPos.x) > 1 || std::abs(player->pos.y - toPos.y) > 1) {
+		const Container *container = dynamic_cast<const Container*>(fromItem);
 		if(container) {			
 			autoCloseContainers(container, msg);			
 		}
 	}
 
-	if(CanSee(item->pos.x, item->pos.y, item->pos.z)) {
-		AddAppearThing(msg,item->pos);
-		msg.AddItem(item);
+	if(CanSee(toPos.x, toPos.y, toPos.z)) {
+		if(toItem && toItem->getID() == fromItem->getID() && fromItem->isStackable() && toItem->getItemCountOrSubtype() != oldToCount) {
+			AddTileUpdated(msg, toItem->pos);
+		}
+		else {
+			AddAppearThing(msg, toPos);
+			msg.AddItem(fromItem->getID(), count);
+		}
 	}
-
 	
 	for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
 		unsigned char cid = cit->first;
 		if(cit->second == fromContainer) {
-			//remove item
-			msg.AddByte(0x72);
-			msg.AddByte(cid);
-			msg.AddByte(from_slotid);
+
+			if(!fromItem->isStackable() || fromItem->getItemCountOrSubtype() == 0 || fromItem->getItemCountOrSubtype() == oldFromCount) {
+				//remove item
+				msg.AddByte(0x72);
+				msg.AddByte(cid);
+				msg.AddByte(from_slotid);
+			}
+			else {
+				//update count
+				msg.AddByte(0x71);
+				msg.AddByte(cid);
+				msg.AddByte(from_slotid);
+				msg.AddItem(fromItem);
+			}
 		}
 	}
+
 	WriteBuffer(msg);
 }
 
-//inventory to ground
+//inventory to ground (100%)
 void Protocol74::sendThingMove(const Creature *creature, slots_t fromSlot,
-	const Position *newPos, const Item* item, unsigned char oldcount, unsigned char count)
+	const Item* fromItem, int oldFromCount, const Position &toPos, const Item *toItem, int oldToCount, int count)
 {
 	NetworkMessage msg;
 
 	//Update up-arrow (if container)
 	if(creature == player) {
-		if(std::abs(player->pos.x - newPos->x) <= 1 && std::abs(player->pos.y - newPos->y) <= 1 && player->pos.z == newPos->z ) {
+		if(std::abs(player->pos.x - toPos.x) <= 1 && std::abs(player->pos.y - toPos.y) <= 1 && player->pos.z == toPos.z ) {
 			//
 		}
 		//Auto-close container's
 		else {
-			const Container *container = dynamic_cast<const Container*>(item);
+			const Container *container = dynamic_cast<const Container*>(fromItem);
 			if(container) {								
 				autoCloseContainers(container, msg);				
 			}
 		}
 	}
 
-	if(CanSee(item->pos.x, item->pos.y, item->pos.z)) {
-		AddAppearThing(msg,item->pos);		
-		msg.AddItem(item);
+	if(CanSee(toPos.x, toPos.y, toPos.z)) {
+		if(toItem && toItem->getID() == fromItem->getID() && fromItem->isStackable() && toItem->getItemCountOrSubtype() != oldToCount) {
+			AddTileUpdated(msg, toItem->pos);
+		}
+		else {
+			AddAppearThing(msg, toPos);
+			msg.AddItem(fromItem->getID(), count);
+		}
 	}
 	
 	if(creature == player) {
-		AddPlayerInventoryItem(msg,player, fromSlot);
+		AddPlayerInventoryItem(msg, player, fromSlot);
 	}
+
 	WriteBuffer(msg);
 }
 
-//ground to container
-void Protocol74::sendThingMove(const Creature *creature, const Position *oldPos, const Container *toContainer,
-	const Item* item, unsigned char stackpos, unsigned char to_slotid, unsigned char oldcount, unsigned char count)
+//ground to container (100%)
+void Protocol74::sendThingMove(const Creature *creature, const Position &fromPos, int stackpos, const Item* fromItem,
+	int oldFromCount, const Container *toContainer, unsigned char to_slotid, const Item *toItem, int oldToCount, int count)
 {
 	NetworkMessage msg;
 
@@ -1548,66 +1686,91 @@ void Protocol74::sendThingMove(const Creature *creature, const Position *oldPos,
 	//Auto-close container's
 	else if((toContainer->pos.x == 0xFFFF) || (std::abs(player->pos.x - toContainer->pos.x) > 1 ||
 																						 std::abs(player->pos.y - toContainer->pos.y) > 1)) {
-		const Container *container = dynamic_cast<const Container*>(item);
+		const Container *container = dynamic_cast<const Container*>(fromItem);
 		if(container) {			
 			autoCloseContainers(container, msg);		
 		}
 	}
 	//
 
-	if(CanSee(oldPos->x, oldPos->y, oldPos->z)) {
-		AddRemoveThing(msg,*oldPos,stackpos);
-	}
-
-	/*
-	Tile *fromTile = game->getTile(oldPos->x, oldPos->y, oldPos->z);
-	if(fromTile && fromTile->getThingCount() > 8) {
-#ifdef __DEBUG__
-		std::cout << "Pop-up item from below..." << std::endl;
-#endif
-		//We need to pop up this item
-		Thing *newthing = fromTile->getThingByStackPos(9);
-
-		if(newthing != NULL) {
-			AddTileUpdated(msg, *oldPos);
+	if(CanSee(fromPos.x, fromPos.y, fromPos.z)) {
+		if(!fromItem->isStackable() || (oldFromCount == count && oldToCount + count <= 100)) {
+			AddRemoveThing(msg, fromPos, stackpos);
 		}
+		else
+			AddTileUpdated(msg, fromPos);
 	}
-	*/
 
 	Container *container = NULL;
 	for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
 		container = cit->second;
 		if(container == toContainer) {
 			unsigned char cid = cit->first;
+			
+			if(fromItem->isStackable()) {
+				if(toItem && fromItem->getID() == toItem->getID() && toItem->getItemCountOrSubtype() != oldToCount) {
+					//update count
+					msg.AddByte(0x71);
+					msg.AddByte(cid);
+					msg.AddByte(to_slotid);
+					msg.AddItem(toItem);
 
-			//add item
-			msg.AddByte(0x70);
-			msg.AddByte(cid /*to_id*/);
-			msg.AddItem(item);
+					//surplus items
+					if(oldToCount + count > 100) {
+						//add item
+						msg.AddByte(0x70);
+						msg.AddByte(cid);
+						msg.AddItem(fromItem->getID(), oldToCount + count - 100);
+					}
+				}
+				else {
+					//add item
+					msg.AddByte(0x70);
+					msg.AddByte(cid);
+					msg.AddItem(fromItem->getID(), count);
+				}
+			}
+			else {
+				//add item
+				msg.AddByte(0x70);
+				msg.AddByte(cid);
+				msg.AddItem(fromItem->getID(), count);
+			}
 		}
 	}
+
 	WriteBuffer(msg);
 }
 
-//ground to inventory
-void Protocol74::sendThingMove(const Creature *creature, const Position *oldPos, slots_t toSlot,
-	const Item* item, unsigned char stackpos, unsigned char oldcount, unsigned char count)
+//ground to inventory (100%)
+void Protocol74::sendThingMove(const Creature *creature, const Position &fromPos, int stackpos, const Item* fromItem,
+	int oldFromCount, slots_t toSlot, const Item *toItem, int oldToCount, int count)
 {
 	NetworkMessage msg;
 	if(creature == player) {
-		AddPlayerInventoryItem(msg,player, toSlot);		
+		AddPlayerInventoryItem(msg, player, toSlot);
 	}
 	else {
-		const Container *container = dynamic_cast<const Container*>(item);
+		const Container *container = dynamic_cast<const Container*>(fromItem);
 		//Auto-closing containers
-		if(container) {			
+		if(container) {
 			autoCloseContainers(container, msg);						
 		}
 	}
 
-	if(CanSee(oldPos->x, oldPos->y, oldPos->z)) {
-		AddRemoveThing(msg,*oldPos,stackpos);		
+	if(CanSee(fromPos.x, fromPos.y, fromPos.z)) {
+		if(!fromItem->isStackable() || (oldFromCount == count && oldToCount + count <= 100)) {
+			AddRemoveThing(msg, fromPos, stackpos);
+
+			if(toItem && toItem->isStackable() && toItem->getID() != fromItem->getID()) {
+				AddAppearThing(msg, fromPos);
+				msg.AddItem(toItem);
+			}
+		}
+		else
+			AddTileUpdated(msg, fromPos);
 	}
+
 	WriteBuffer(msg);
 }
 

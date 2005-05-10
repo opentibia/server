@@ -41,6 +41,11 @@ using namespace std;
 
 #include "player.h"
 
+//
+#include "creature.h"
+#include "monster.h"
+//
+
 //#include "networkmessage.h"
 
 #include "npc.h"
@@ -747,19 +752,19 @@ bool Game::onPrepareMoveThing(Creature *player, const Thing* thing, const Tile *
 	return thing->canMovedTo(toTile);
 }
 
-bool Game::onPrepareMoveThing(Creature *player, const Item* item, const Container *fromContainer,
-	const Container *toContainer)
+bool Game::onPrepareMoveThing(Creature *player, const Item* fromItem, const Container *fromContainer,
+	const Container *toContainer, const Item *toItem)
 {	
-	if(!item->isPickupable()) {		
+	if(!fromItem->isPickupable()) {		
 		player->sendCancel("Sorry, not possible.");
 		return false;
 	}
-	else if(toContainer->size() + 1 > toContainer->capacity()) {		
+	else if((!fromItem->isStackable() || !toItem || fromItem->getID() != toItem->getID()) && toContainer->size() + 1 > toContainer->capacity()) {		
 		player->sendCancel("Sorry, not enough room.");
 		return false;
 	}
 
-	const Container *itemContainer = dynamic_cast<const Container*>(item);
+	const Container *itemContainer = dynamic_cast<const Container*>(fromItem);
 	if(itemContainer) {
 		bool isContainerHolding = false;
 		itemContainer->isHolding(toContainer, isContainerHolding);
@@ -910,6 +915,11 @@ bool Game::onPrepareMoveThing(Player *player, slots_t fromSlot, slots_t toSlot)
 	return true;
 }
 
+bool Game::onPrepareMoveThing(Player *player, const Container *fromContainer, slots_t toSlot)
+{
+	return true;
+}
+
 //container/inventory to container/inventory
 void Game::thingMoveInternal(Creature *player,
 	unsigned char from_cid, unsigned char from_slotid, bool fromInventory,
@@ -947,35 +957,81 @@ void Game::thingMoveInternal(Creature *player,
 			if(from_slotid >= fromContainer->size())
 				return;
 
-			Item* item = fromContainer->getItem(from_slotid);
-			if(!item)
+			Item* fromItem = fromContainer->getItem(from_slotid);
+			if(!fromItem)
+				return;
+
+			if(fromItem->isStackable() && count > fromItem->getItemCountOrSubtype())
 				return;
 			
-			Item *toSlotItem = toContainer->getItem(to_slotid);
-			if(onPrepareMoveThing(p, item, fromContainer, toContainer)) {
-				int oldcount = item->getItemCountOrSubtype();
+			Item *toItem = toContainer->getItem(to_slotid);
+
+			if(toItem == fromItem)
+				return;
+
+			if(onPrepareMoveThing(p, fromItem, fromContainer, toContainer, toItem)) {
+				int oldFromCount = fromItem->getItemCountOrSubtype();
+				int oldToCount = 0;
+
 				//move around an item in a container
-				if(fromContainer == toContainer) {
-					if(item->isStackable() && count < item->getItemCountOrSubtype()) {
-						item->setItemCountOrSubtype(item->getItemCountOrSubtype() - count);
-						fromContainer->addItem(Item::CreateItem(item->getID(), count));
+				if(fromItem->isStackable()) {
+					if(toItem && toItem != fromItem && toItem->getID() == fromItem->getID())
+					{
+						oldToCount = toItem->getItemCountOrSubtype();
+
+						int newToCount = std::min(100, oldToCount + count);
+						toItem->setItemCountOrSubtype(newToCount);
+
+						int subcount = std::max(oldToCount + count - 100, oldFromCount - count);
+						fromItem->setItemCountOrSubtype(subcount);
+
+						if(oldToCount + count  > 100) {
+							int surplusCount = oldToCount + count  - 100;
+							if(surplusCount == fromItem->getItemCountOrSubtype()) {
+								if(onPrepareMoveThing(p, fromItem, fromContainer, toContainer, NULL)) {
+									if(fromContainer->removeItem(fromItem)) {
+										toContainer->addItem(fromItem);
+									}
+								}
+								else
+									count -= surplusCount; //re-define the actual amount we move.
+							} else {
+								Item *surplusItem = Item::CreateItem(fromItem->getID(), surplusCount);
+								if(onPrepareMoveThing(p, surplusItem, fromContainer, toContainer, NULL)) {
+									toContainer->addItem(surplusItem);
+								}
+								else {
+									delete surplusItem;
+									count -= surplusCount; //re-define the actual amount we move.
+								}
+							}
+						}
 					}
-					else
-						fromContainer->moveItem(from_slotid, 0);
+					else if(count < oldFromCount) {
+						int subcount = oldFromCount - count;
+						fromItem->setItemCountOrSubtype(subcount);
+		
+						toContainer->addItem(Item::CreateItem(fromItem->getID(), count));
+					}
+					else {
+						if(fromContainer == toContainer) {
+							fromContainer->moveItem(from_slotid, 0);
+						}
+						else if(fromContainer->removeItem(fromItem)) {
+							toContainer->addItem(fromItem);
+						}
+					}
+
+					if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() == 0) {
+						fromContainer->removeItem(fromItem);
+					}
 				}
-				//move around an item between different containers
 				else {
-					/*if(item->isStackable() && toSlotItem && toSlotItem->getID() == item->getID()) {
-						int toSlotOldCount = toSlotItem->getItemCountOrSubtype(); //99
-						toSlotItem->setItemCountOrSubtype(std::min(100, toSlotOldCount + count));
-						
-					}*/
-					if(item->isStackable() && count < item->getItemCountOrSubtype()) {
-						item->setItemCountOrSubtype(item->getItemCountOrSubtype() - count);
-						toContainer->addItem(Item::CreateItem(item->getID(), count));
+					if(fromContainer == toContainer) {
+						fromContainer->moveItem(from_slotid, 0);
 					}
-					else if(fromContainer->removeItem(item)) {
-						toContainer->addItem(item);
+					else if(fromContainer->removeItem(fromItem)) {
+						toContainer->addItem(fromItem);
 					}
 				}
 
@@ -984,29 +1040,79 @@ void Game::thingMoveInternal(Creature *player,
 					getSpectators(Range(player->pos, false), list);
 
 					for(int i = 0; i < list.size(); ++i) {
-						list[i]->onThingMove(player, fromContainer, toContainer, item, from_slotid, to_slotid, oldcount, count);
+						list[i]->onThingMove(player, fromContainer, from_slotid, fromItem, oldFromCount, toContainer, to_slotid, toItem, oldToCount, count);
 					}
 				}
 				else
-					player->onThingMove(player, fromContainer, toContainer, item, from_slotid, to_slotid, oldcount, count);
+					player->onThingMove(player, fromContainer, from_slotid, fromItem, oldFromCount, toContainer, to_slotid, toItem, oldToCount, count);
+
+				if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() == 0) {
+					//fromContainer->removeItem(fromItem);
+					delete fromItem;
+				}
 			}
 		}
 		else {
 			//container to inventory
 			if(fromContainer && toInventory) {
-				Item* item = fromContainer->getItem(from_slotid);
-				if(!item)
+				Item* fromItem = fromContainer->getItem(from_slotid);
+				if(!fromItem)
 					return;
 
-				/*
 				if(onPrepareMoveThing(p, fromContainer, (slots_t)to_cid)) {
-					if(fromContainer->removeItem(item)) {
-						p->items[to_cid] = item;
+					Item *toItem = p->items[to_cid];
+					int oldFromCount = fromItem->getItemCountOrSubtype();
+					int oldToCount = 0;
 
-						player->onThingMove(player, fromContainer, (slots_t)to_cid, item, from_slotid, count, count);
+					if(fromItem->isStackable()) {
+						if(toItem && toItem != fromItem && toItem->getID() == fromItem->getID())
+						{
+							oldToCount = toItem->getItemCountOrSubtype();
+
+							int newToCount = std::min(100, oldToCount + count);
+							toItem->setItemCountOrSubtype(newToCount);
+
+							int subcount = std::max(oldToCount + count - 100, oldFromCount - count);
+							fromItem->setItemCountOrSubtype(subcount);
+
+							if(oldToCount + count > 100) {
+								player->sendCancel("Sorry not enough room.");
+							}
+						}
+						else if(count < oldFromCount) {
+							int subcount = oldFromCount - count;
+							fromItem->setItemCountOrSubtype(subcount);
+			
+							p->items[to_cid] = Item::CreateItem(fromItem->getID(), count);
+
+							if(toItem) {
+								fromContainer->addItem(toItem);
+							}
+						}
+						else {
+							if(fromContainer->removeItem(fromItem)) {
+								p->items[to_cid] = fromItem;
+
+								if(toItem) {
+									fromContainer->addItem(toItem);
+								}
+							}
+						}
+
+						if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() == 0) {
+							fromContainer->removeItem(fromItem);
+						}
 					}
+					else if(fromContainer->removeItem(fromItem)) {
+						p->items[to_cid] = fromItem;
+
+						if(toItem) {
+							fromContainer->addItem(toItem);
+						}
+					}
+
+					player->onThingMove(player, fromContainer, from_slotid, fromItem, oldFromCount, (slots_t)to_cid, toItem, oldToCount, count);
 				}
-				*/
 			}
 			//inventory to container
 			else if(fromInventory && toContainer) {
@@ -1038,7 +1144,7 @@ void Game::thingMoveInternal(Creature *player,
 	}
 }
 
-//container/inventory to ground
+//container/inventory to ground (100%)
 void Game::thingMoveInternal(Creature *player,
 	unsigned char from_cid, unsigned char from_slotid, bool fromInventory,
 	const Position& toPos, unsigned char count)
@@ -1056,46 +1162,144 @@ void Game::thingMoveInternal(Creature *player,
 				return;
 			
 			Position fromPos = (fromContainer->pos.x == 0xFFFF ? player->pos : fromContainer->pos);			
-			Item *item = dynamic_cast<Item*>(fromContainer->getItem(from_slotid));
+			Item *fromItem = dynamic_cast<Item*>(fromContainer->getItem(from_slotid));
 
-			if(!item)
+			if(!fromItem)
 				return;
 
-			if(onPrepareMoveThing(p, item, fromPos, toPos) &&
-					onPrepareMoveThing(p,item,NULL,toTile)) {
-				item->pos = toPos;
-				int oldcount = item->getItemCountOrSubtype();
+			if(onPrepareMoveThing(p, fromItem, fromPos, toPos) && onPrepareMoveThing(p, fromItem, NULL, toTile)) {
+				Item *toItem = dynamic_cast<Item*>(toTile->getThingByStackPos(toTile->getThingCount() - 1));
+				int oldFromCount = fromItem->getItemCountOrSubtype();
+				int oldToCount = 0;
 
 				//Do action...
-				if(fromContainer->removeItem(item)) {
-					toTile->addThing(item);
+				if(fromItem->isStackable()) {
+					if(toItem && toItem->getID() == fromItem->getID())
+					{
+						oldToCount = toItem->getItemCountOrSubtype();
 
-					std::vector<Creature*> list;
-					getSpectators(Range(fromPos, true), list);
+						int newToCount = std::min(100, oldToCount + count);
+						toItem->setItemCountOrSubtype(newToCount);
 
-					for(int i = 0; i < list.size(); ++i) {
-						list[i]->onThingMove(player, fromContainer, &toPos, item, from_slotid, oldcount, count);
+						int subcount = std::max(oldToCount + count - 100, oldFromCount - count);
+						fromItem->setItemCountOrSubtype(subcount);
+
+						if(oldToCount + count > 100) {
+							int surplusCount = oldToCount + count  - 100;
+							if(surplusCount == fromItem->getItemCountOrSubtype()) {
+								if(fromContainer->removeItem(fromItem)) {
+									toTile->addThing(fromItem);
+								}
+							} else {
+								Item *surplusItem = Item::CreateItem(fromItem->getID(), surplusCount);
+								surplusItem->pos = toPos;
+								
+								toTile->addThing(surplusItem);
+							}
+						}
 					}
+					else if(count < oldFromCount) {
+						int subcount = oldFromCount - count;
+						fromItem->setItemCountOrSubtype(subcount);
+
+						Item *moveItem = Item::CreateItem(fromItem->getID(), count);
+						moveItem->pos = toPos;
+						toTile->addThing(moveItem);
+					}
+					else if(fromContainer->removeItem(fromItem)) {
+						fromItem->pos = toPos;
+						toTile->addThing(fromItem);
+					}
+
+					if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() == 0) {
+						fromContainer->removeItem(fromItem);
+					}
+				}
+				else if(fromContainer->removeItem(fromItem)) {
+					fromItem->pos = toPos;
+					toTile->addThing(fromItem);
+				}
+
+				std::vector<Creature*> list;
+				getSpectators(Range(fromPos, true), list);
+
+				for(int i = 0; i < list.size(); ++i) {
+					list[i]->onThingMove(player, fromContainer, from_slotid, fromItem, oldFromCount, toPos, toItem, oldToCount, count);
+				}
+
+				if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() == 0) {
+					delete fromItem;
 				}
 			}
 		}
 		else {
-			Item *item = p->getItem(from_cid);
-			if(!item)
+			Item *fromItem = p->getItem(from_cid);
+			if(!fromItem)
 				return;
 			
-			if(onPrepareMoveThing(p, item, player->pos, toPos) &&
-					onPrepareMoveThing(p,item,NULL,toTile)) {
-				int oldcount = item->getItemCountOrSubtype();
-				item->pos = toPos;
+			if(onPrepareMoveThing(p, fromItem, player->pos, toPos) && onPrepareMoveThing(p, fromItem, NULL, toTile)) {
+				Item *toItem = dynamic_cast<Item*>(toTile->getThingByStackPos(toTile->getThingCount() - 1));
+				int oldFromCount = fromItem->getItemCountOrSubtype();
+				int oldToCount = 0;
 
-				p->items[from_cid] = NULL;
-				toTile->addThing(item);
+				//Do action...
+				if(fromItem->isStackable()) {
+					if(toItem && toItem->getID() == fromItem->getID())
+					{
+						oldToCount = toItem->getItemCountOrSubtype();
+
+						int newToCount = std::min(100, oldToCount + count);
+						toItem->setItemCountOrSubtype(newToCount);
+
+						int subcount = std::max(oldToCount + count - 100, oldFromCount - count);
+						fromItem->setItemCountOrSubtype(subcount);
+
+						if(oldToCount + count > 100) {
+							int surplusCount = oldToCount + count  - 100;
+							if(surplusCount == fromItem->getItemCountOrSubtype()) {
+								if(fromContainer->removeItem(fromItem)) {
+									toTile->addThing(fromItem);
+								}
+							} else {
+								Item *surplusItem = Item::CreateItem(fromItem->getID(), surplusCount);
+								surplusItem->pos = toPos;
+								
+								toTile->addThing(surplusItem);
+							}
+						}
+					}
+					else if(count < oldFromCount) {
+						int subcount = oldFromCount - count;
+						fromItem->setItemCountOrSubtype(subcount);
+
+						Item *moveItem = Item::CreateItem(fromItem->getID(), count);
+						moveItem->pos = toPos;
+						toTile->addThing(moveItem);
+					}
+					else /*if(p->removeItem(item))*/ {
+						p->items[from_cid] = NULL;
+						fromItem->pos = toPos;
+						toTile->addThing(fromItem);
+					}
+
+					if(fromItem->getItemCountOrSubtype() == 0) {
+						p->items[from_cid] = NULL;
+					}
+				}
+				else {
+					fromItem->pos = toPos;
+					p->items[from_cid] = NULL;
+					toTile->addThing(fromItem);
+				}
 
 				std::vector<Creature*> list;
 				getSpectators(Range(player->pos, true), list);
 				for(int i = 0; i < list.size(); ++i) {
-					list[i]->onThingMove(player, (slots_t)from_cid, &toPos, item, oldcount, count);
+					list[i]->onThingMove(player, (slots_t)from_cid, fromItem, oldFromCount, toPos, toItem, oldToCount, count);
+				}
+
+				if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() == 0) {
+					delete fromItem;
 				}
 			}
 		}
@@ -1103,10 +1307,10 @@ void Game::thingMoveInternal(Creature *player,
 }
 
 //ground to container/inventory
-void Game::thingMoveInternal(Creature *player,
-	const Position& fromPos, unsigned char stackPos,
-	unsigned char to_cid, unsigned char to_slotid, bool toInventory,
-	unsigned char count)
+//ground to inventory (100%)
+//ground to container (100%)
+void Game::thingMoveInternal(Creature *player, const Position& fromPos, unsigned char stackPos,
+	unsigned char to_cid, unsigned char to_slotid, bool toInventory, unsigned char count)
 {
 	Player* p = dynamic_cast<Player*>(player);
 	if(p) {
@@ -1116,16 +1320,16 @@ void Game::thingMoveInternal(Creature *player,
 
 		Container *toContainer = NULL;
 
-		Item *item = dynamic_cast<Item*>(fromTile->getThingByStackPos(stackPos));
+		Item *fromItem = dynamic_cast<Item*>(fromTile->getThingByStackPos(stackPos));
 
-		if(!item)
+		if(!fromItem)
 			return;
 
 		if(toInventory) {
 			Item *toSlot = p->getItem(to_cid);
 			toContainer = dynamic_cast<Container*>(toSlot);
 		}
-		else /*if(!toInventory)*/ {
+		else {
 			toContainer = p->getContainer(to_cid);
 			if(!toContainer)
 				return;
@@ -1139,54 +1343,142 @@ void Game::thingMoveInternal(Creature *player,
 		}
 
 		if(toContainer) {
-			if(onPrepareMoveThing(player, item, fromPos, p->pos) &&
-				 onPrepareMoveThing(player, item, NULL, toContainer))
-			{
-				item->pos = fromPos;
+			Item *toItem = toContainer->getItem(to_slotid);
 
-				int stackpos = fromTile->getThingStackPos(item);
-				int oldcount = item->getItemCountOrSubtype();
-				if(fromTile->removeThing(item)) {
-					Position itempos = item->pos;
-					toContainer->addItem(item);
-					
-					std::vector<Creature*> list;
-					getSpectators(Range(fromPos, true), list);
-					for(int i = 0; i < list.size(); ++i) {
-						list[i]->onThingMove(player, &fromPos, toContainer, item, stackpos, to_slotid, oldcount, count);
+			if(onPrepareMoveThing(player, fromItem, fromPos, p->pos) &&
+				 onPrepareMoveThing(player, fromItem, NULL, toContainer, toItem))
+			{
+				int oldFromCount = fromItem->getItemCountOrSubtype();
+				int oldToCount = 0;
+				int stackpos = fromTile->getThingStackPos(fromItem);
+
+				if(fromItem->isStackable()) {
+					if(toItem && toItem->getID() == fromItem->getID()) {
+						oldToCount = toItem->getItemCountOrSubtype();
+
+						int newToCount = std::min(100, oldToCount + count);
+						toItem->setItemCountOrSubtype(newToCount);
+
+						int subcount = std::max(oldToCount + count - 100, oldFromCount - count);
+						fromItem->setItemCountOrSubtype(subcount);
+
+						if(oldToCount + count > 100) {
+							int surplusCount = oldToCount + count  - 100;
+							if(surplusCount == fromItem->getItemCountOrSubtype()) {
+								if(onPrepareMoveThing(player, fromItem, NULL, toContainer, NULL)) {
+									if(fromTile->removeThing(fromItem)) {
+										toContainer->addItem(fromItem);
+									}
+								}
+								else
+									count -= surplusCount; //re-define the actual amount we move.
+							}
+							else {
+								Item *surplusItem = Item::CreateItem(fromItem->getID(), surplusCount);
+
+								if(onPrepareMoveThing(player, surplusItem, NULL, toContainer, NULL)) {
+									toContainer->addItem(surplusItem);
+								}
+								else {
+									delete surplusItem;
+									count -= surplusCount; //re-define the actual amount we move.
+								}
+							}
+
+							/*
+							if(onPrepareMoveThing(player, fromItem, NULL, toContainer, NULL)) {
+								if(fromTile->removeThing(fromItem)) {
+									toContainer->addItem(fromItem);
+								}
+							}
+							else
+								count -= oldToCount + count - 100; //re-define the actual amount we move.
+							*/
+						}
 					}
+					else if(count < oldFromCount) {
+						int subcount = oldFromCount - count;
+						fromItem->setItemCountOrSubtype(subcount);
+
+						toContainer->addItem(Item::CreateItem(fromItem->getID(), count));
+					}
+					else if(fromTile->removeThing(fromItem)) {
+						toContainer->addItem(fromItem);
+					}
+
+					if(fromItem->getItemCountOrSubtype() == 0) {
+						fromTile->removeThing(fromItem);
+					}
+				}
+				else {
+					if(fromTile->removeThing(fromItem)) {
+						toContainer->addItem(fromItem);
+					}
+				}
+					
+				std::vector<Creature*> list;
+				getSpectators(Range(fromPos, true), list);
+				for(int i = 0; i < list.size(); ++i) {
+					list[i]->onThingMove(player, fromPos, stackpos, fromItem, oldFromCount, toContainer, to_slotid, toItem, oldToCount, count);
+				}
+
+				if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() == 0) {
+					delete fromItem;
 				}
 			}
 		}
 		//Put on equipment from ground
 		else if(toInventory) {
-			if(onPrepareMoveThing(p, fromPos, item, (slots_t)to_cid)) {
-				int stackpos = fromTile->getThingStackPos(item);
-				if(fromTile->removeThing(item)) {
-					Item *oldItem = p->getItem(to_cid);
-					p->items[to_cid] = NULL;
-					p->addItemInventory(item, to_cid);
+			if(onPrepareMoveThing(p, fromPos, fromItem, (slots_t)to_cid)) {
+				Item *toItem = p->getItem(to_cid);
+				int oldFromCount = fromItem->getItemCountOrSubtype();
+				int oldToCount = 0;
+				int stackpos = fromTile->getThingStackPos(fromItem);
 
-					if(oldItem) {
-						fromTile->addThing(oldItem);
-						oldItem->pos = fromPos;
+				if(fromItem->isStackable() && toItem && toItem->getID() == fromItem->getID()) {
+					oldToCount = toItem->getItemCountOrSubtype();
+
+					int newToCount = std::min(100, oldToCount + count);
+					toItem->setItemCountOrSubtype(newToCount);
+
+					int subcount = std::max(oldToCount + count - 100, oldFromCount - count);
+					fromItem->setItemCountOrSubtype(subcount);
+
+					if(oldToCount + count > 100) {
+						p->sendCancel("Sorry not enough room.");
 					}
 
-					std::vector<Creature*> list;
-					getSpectators(Range(fromPos, true), list);
-					for(int i = 0; i < list.size(); ++i) {
-						list[i]->onThingMove(player, &fromPos, (slots_t)to_cid, item, stackpos, 1, 1);
+					if(fromItem->getItemCountOrSubtype() == 0) {
+						fromTile->removeThing(fromItem);
+					}
+				}
+				else {
+					if(fromTile->removeThing(fromItem)) {
+						p->items[to_cid] = NULL;
+						p->addItemInventory(fromItem, to_cid);
 
-						if(oldItem) {
-							list[i]->onThingMove(player, (slots_t)to_cid, &fromPos, oldItem, oldItem->getItemCountOrSubtype(), count);
+						if(toItem) {
+							fromTile->addThing(toItem);
+							toItem->pos = fromPos;
 						}
 					}
+				}
+
+				std::vector<Creature*> list;
+				getSpectators(Range(fromPos, true), list);
+				for(int i = 0; i < list.size(); ++i) {
+					list[i]->onThingMove(player, fromPos, stackpos, fromItem, oldFromCount, (slots_t)to_cid, toItem, oldToCount, count);
+				}
+
+				if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() == 0) {
+					delete fromItem;
 				}
 			}
 		}
 	}
 }
 
+//ground to ground
 void Game::thingMoveInternal(Creature *player, unsigned short from_x, unsigned short from_y, unsigned char from_z,
 	unsigned char stackPos, unsigned short to_x, unsigned short to_y, unsigned char to_z, unsigned char count)
 {
@@ -1274,7 +1566,6 @@ void Game::thingMoveInternal(Creature *player, unsigned short from_x, unsigned s
 			
 			if(!onPrepareMoveThing(player, thing, fromTile, toTile))
 				return;
-			
 			
 			Teleport *teleportitem = toTile->getTeleportItem();
 			if(teleportitem) {

@@ -73,7 +73,8 @@ public:
 
   // write functions for complex types
   void AddPosition(const Position &pos);
-  void AddItem(const Item *item);
+	void AddItem(unsigned short id, unsigned char count);
+	void AddItem(const Item *item);
   void AddCreature(const Creature *creature, bool known, unsigned int remove);
 
 /* MOVED TO PROTOCOL

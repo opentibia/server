@@ -62,6 +62,7 @@ class Container : public Item
 		bool removeItem(Item* item); //remove an item from the container
 		void moveItem(unsigned char from_slot, unsigned char to_slot);
 		Item* getItem(unsigned long slot_num);
+		const Item* getItem(unsigned long slot_num) const;
 		unsigned char getSlotNumberByItem(const Item* item) const;
 		void isHolding(const Item* item, bool& found) const; //search all containers for the item recursively
 		//Item& operator<<(Item*); // put items into the container

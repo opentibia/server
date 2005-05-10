@@ -32,12 +32,12 @@
 #include "position.h"
 #include "item.h"
 #include "container.h"
-#include "creature.h"
-#include "monster.h"
-#include "player.h"
+//#include "creature.h"
+//#include "monster.h"
+//#include "player.h"
 #include "magic.h"
 #include "map.h"
-#include "scheduler.h"
+//#include "scheduler.h"
 
 
 class Creature;   // see creature.h
@@ -225,10 +225,11 @@ class Game {
   protected:
 		bool onPrepareMoveThing(Creature *player, const Thing* thing, const Position& fromPos, const Position& toPos);
 		bool onPrepareMoveThing(Creature *player, const Thing* thing, const Tile *fromTile, const Tile *toTile);
-		bool onPrepareMoveThing(Creature *player, const Item* item, const Container *fromContainer, const Container *toContainer);
+		bool onPrepareMoveThing(Creature *player, const Item* fromItem, const Container *fromContainer, const Container *toContainer, const Item* toItem);
 		bool onPrepareMoveCreature(Creature *player, const Creature* creatureMoving, const Tile *fromTile, const Tile *toTile);
 		bool onPrepareMoveThing(Player *player, const Position& fromPos, const Item *item, slots_t toSlot);
 		bool onPrepareMoveThing(Player *player, slots_t fromSlot, slots_t toSlot);
+		bool onPrepareMoveThing(Player *player, const Container *fromContainer, slots_t toSlot);
 
 		//container/inventory to container/inventory
 		void thingMoveInternal(Creature *player,
