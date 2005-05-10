@@ -1776,7 +1776,7 @@ void Protocol74::sendThingMove(const Creature *creature, const Position &fromPos
 		if(!fromItem->isStackable() || (oldFromCount == count && oldToCount + count <= 100)) {
 			AddRemoveThing(msg, fromPos, stackpos);
 
-			if(toItem /*&& toItem->isStackable()*/ && toItem->getID() != fromItem->getID()) {
+			if(toItem && (!toItem->isStackable() || toItem->getID() != fromItem->getID())) {
 				AddAppearThing(msg, fromPos);
 				msg.AddItem(toItem);
 			}

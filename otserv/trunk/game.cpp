@@ -823,7 +823,7 @@ bool Game::onPrepareMoveThing(Player *player, const Position& fromPos, const Ite
 
 bool Game::onPrepareMoveThing(Player *player, slots_t fromSlot, const Item *fromItem, slots_t toSlot, const Item *toItem)
 {
-	if(toItem && toItem->getID() != fromItem->getID()) {
+	if(toItem && (!toItem->isStackable() || toItem->getID() != fromItem->getID())) {
 		player->sendCancel("Sorry, not enough room.");
 		return false;
 	}
