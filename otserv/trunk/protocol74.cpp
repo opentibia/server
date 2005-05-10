@@ -1495,34 +1495,26 @@ void Protocol74::sendThingMove(const Creature *creature, slots_t fromSlot, const
 	//Update up-arrow
 	//
 
-	if(creature == player) {
-		Container *container = NULL;
-		for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
-			container = cit->second;
-			if(container == toContainer) {
-				unsigned char cid = cit->first;
+	Container *container = NULL;
+	for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
+		container = cit->second;
+		if(container == toContainer) {
+			unsigned char cid = cit->first;
 
-				if(fromItem->isStackable()) {
-					if(toItem && fromItem->getID() == toItem->getID() && toItem->getItemCountOrSubtype() != oldToCount) {
-						//update count
-						msg.AddByte(0x71);
-						msg.AddByte(cid);
-						msg.AddByte(to_slotid);
-						msg.AddItem(toItem);
+			if(fromItem->isStackable()) {
+				if(toItem && fromItem->getID() == toItem->getID() && toItem->getItemCountOrSubtype() != oldToCount) {
+					//update count
+					msg.AddByte(0x71);
+					msg.AddByte(cid);
+					msg.AddByte(to_slotid);
+					msg.AddItem(toItem);
 
-						//surplus items
-						if(oldToCount + count > 100) {
-							//add item
-							msg.AddByte(0x70);
-							msg.AddByte(cid);
-							msg.AddItem(fromItem->getID(), oldToCount + count - 100);
-						}
-					}
-					else {
+					//surplus items
+					if(oldToCount + count > 100) {
 						//add item
 						msg.AddByte(0x70);
 						msg.AddByte(cid);
-						msg.AddItem(fromItem->getID(), count);
+						msg.AddItem(fromItem->getID(), oldToCount + count - 100);
 					}
 				}
 				else {
@@ -1532,9 +1524,17 @@ void Protocol74::sendThingMove(const Creature *creature, slots_t fromSlot, const
 					msg.AddItem(fromItem->getID(), count);
 				}
 			}
+			else {
+				//add item
+				msg.AddByte(0x70);
+				msg.AddByte(cid);
+				msg.AddItem(fromItem->getID(), count);
+			}
 		}
-
-		AddPlayerInventoryItem(msg,player, fromSlot);
+		
+		if(creature == player) {
+			AddPlayerInventoryItem(msg,player, fromSlot);
+		}
 	}
 	
 	WriteBuffer(msg);
@@ -1562,37 +1562,37 @@ void Protocol74::sendThingMove(const Creature *creature, const Container *fromCo
 	//Update up-arrow
 	//
 
-	if(creature == player) {
-		Container *container = NULL;
-		for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
-			container = cit->second;
-			if(container == fromContainer) {
-				unsigned char cid = cit->first;
-				
-				if(!fromItem->isStackable() || (oldFromCount == count && oldToCount + count <= 100)) {
-					//remove item
-					msg.AddByte(0x72);
-					msg.AddByte(cid);
-					msg.AddByte(from_slotid);
-				}
-				else {
-					//update count
-					msg.AddByte(0x71);
-					msg.AddByte(cid);
-					msg.AddByte(from_slotid);
-					msg.AddItem(fromItem);
-				}
+	Container *container = NULL;
+	for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
+		container = cit->second;
+		if(container == fromContainer) {
+			unsigned char cid = cit->first;
+			
+			if(!fromItem->isStackable() || (oldFromCount == count && oldToCount + count <= 100)) {
+				//remove item
+				msg.AddByte(0x72);
+				msg.AddByte(cid);
+				msg.AddByte(from_slotid);
+			}
+			else {
+				//update count
+				msg.AddByte(0x71);
+				msg.AddByte(cid);
+				msg.AddByte(from_slotid);
+				msg.AddItem(fromItem);
+			}
 
-				if(toItem && toItem->getID() != fromItem->getID()) {
-					//add item
-					msg.AddByte(0x70);
-					msg.AddByte(cid);
-					msg.AddItem(toItem);
-				}
+			if(toItem && toItem->getID() != fromItem->getID()) {
+				//add item
+				msg.AddByte(0x70);
+				msg.AddByte(cid);
+				msg.AddItem(toItem);
 			}
 		}
 
-		AddPlayerInventoryItem(msg,player, toSlot);
+		if(creature == player) {
+			AddPlayerInventoryItem(msg,player, toSlot);
+		}
 	}
 
 	WriteBuffer(msg);
@@ -1776,7 +1776,7 @@ void Protocol74::sendThingMove(const Creature *creature, const Position &fromPos
 		if(!fromItem->isStackable() || (oldFromCount == count && oldToCount + count <= 100)) {
 			AddRemoveThing(msg, fromPos, stackpos);
 
-			if(toItem && toItem->isStackable() && toItem->getID() != fromItem->getID()) {
+			if(toItem /*&& toItem->isStackable()*/ && toItem->getID() != fromItem->getID()) {
 				AddAppearThing(msg, fromPos);
 				msg.AddItem(toItem);
 			}

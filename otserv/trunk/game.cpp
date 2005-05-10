@@ -1029,9 +1029,20 @@ void Game::thingMoveInternal(Creature *player,
 					}
 				}
 
-				if(fromContainer && fromContainer->pos.x != 0xFFFF || toContainer && toContainer->pos.x != 0xFFFF) {
-					std::vector<Creature*> list;
-					getSpectators(Range(player->pos, false), list);
+				std::vector<Creature*> list;
+
+				Position fromPos = (fromContainer->pos.x == 0xFFFF ? player->pos : fromContainer->pos);
+				Position toPos = (toContainer->pos.x == 0xFFFF ? player->pos : toContainer->pos);
+
+				if(fromPos == toPos) {
+					getSpectators(Range(fromPos, false), list);
+				}
+				else {
+					getSpectators(Range(fromPos, toPos), list);
+				}
+
+				if(!list.empty() /*fromContainer && fromContainer->pos.x != 0xFFFF || toContainer && toContainer->pos.x != 0xFFFF*/) {
+					//getSpectators(Range(player->pos, false), list);
 
 					for(int i = 0; i < list.size(); ++i) {
 						list[i]->onThingMove(player, fromContainer, from_slotid, fromItem, oldFromCount, toContainer, to_slotid, toItem, oldToCount, count);
@@ -1166,7 +1177,6 @@ void Game::thingMoveInternal(Creature *player,
 						}
 					}
 					else if(fromContainer->removeItem(fromItem)) {
-						//p->items[to_cid] = fromItem;
 						p->removeItemInventory(to_cid, true);
 						p->addItemInventory(fromItem, to_cid, true);
 
@@ -1175,7 +1185,16 @@ void Game::thingMoveInternal(Creature *player,
 						}
 					}
 
-					player->onThingMove(player, fromContainer, from_slotid, fromItem, oldFromCount, (slots_t)to_cid, toItem, oldToCount, count);
+					if(fromContainer->pos.x != 0xFFFF) {
+						std::vector<Creature*> list;
+						getSpectators(Range(fromContainer->pos, false), list);
+
+						for(int i = 0; i < list.size(); ++i) {
+							list[i]->onThingMove(player, fromContainer, from_slotid, fromItem, oldFromCount, (slots_t)to_cid, toItem, oldToCount, count);
+						}
+					}
+					else
+						player->onThingMove(player, fromContainer, from_slotid, fromItem, oldFromCount, (slots_t)to_cid, toItem, oldToCount, count);
 
 					if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() == 0) {
 						delete fromItem;
@@ -1251,7 +1270,16 @@ void Game::thingMoveInternal(Creature *player,
 					
 				}
 
-				player->onThingMove(player, (slots_t)from_cid, fromItem, oldFromCount, toContainer, to_slotid, toItem, oldToCount, count);
+				if(toContainer->pos.x != 0xFFFF) {
+					std::vector<Creature*> list;
+					getSpectators(Range(toContainer->pos, false), list);
+
+					for(int i = 0; i < list.size(); ++i) {
+						list[i]->onThingMove(player, (slots_t)from_cid, fromItem, oldFromCount, toContainer, to_slotid, toItem, oldToCount, count);
+					}
+				}
+				else
+					player->onThingMove(player, (slots_t)from_cid, fromItem, oldFromCount, toContainer, to_slotid, toItem, oldToCount, count);
 
 				if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() == 0) {
 					delete fromItem;
@@ -1342,7 +1370,16 @@ void Game::thingMoveInternal(Creature *player,
 				}
 
 				std::vector<Creature*> list;
-				getSpectators(Range(fromPos, true), list);
+				getSpectators(Range(fromPos, false), list);
+
+				std::vector<Creature*> tolist;
+				getSpectators(Range(toPos, true), tolist);
+
+				for(std::vector<Creature*>::const_iterator it = tolist.begin(); it != tolist.end(); ++it) {
+					if(std::find(list.begin(), list.end(), *it) == list.end()) {
+						list.push_back(*it);
+					}
+				}
 
 				for(int i = 0; i < list.size(); ++i) {
 					list[i]->onThingMove(player, fromContainer, from_slotid, fromItem, oldFromCount, toPos, toItem, oldToCount, count);
@@ -1416,7 +1453,17 @@ void Game::thingMoveInternal(Creature *player,
 				}
 
 				std::vector<Creature*> list;
-				getSpectators(Range(player->pos, true), list);
+				getSpectators(Range(player->pos, false), list);
+
+				std::vector<Creature*> tolist;
+				getSpectators(Range(toPos, true), tolist);
+
+				for(std::vector<Creature*>::const_iterator it = tolist.begin(); it != tolist.end(); ++it) {
+					if(std::find(list.begin(), list.end(), *it) == list.end()) {
+						list.push_back(*it);
+					}
+				}
+
 				for(int i = 0; i < list.size(); ++i) {
 					list[i]->onThingMove(player, (slots_t)from_cid, fromItem, oldFromCount, toPos, toItem, oldToCount, count);
 				}
