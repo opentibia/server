@@ -35,6 +35,9 @@
 <spell name="Conjure Arrow" words="exevo con" maglv="2" mana="40" enabled="1">
 <vocation id="3" />
 </spell>
+<spell name="Create Food" words="exevo pan" maglv="0" mana="30" enabled="1">
+<vocation id="0" /><vocation id="1" /><vocation id="2" /><vocation id="3" />
+</spell>
 <rune name="Sudden death" id="2268" charges="1" maglv="18" mana="0" enabled="1"></rune>
 <rune name="Ultimate healing" id="2273" charges="1" maglv="4" mana="0" enabled="1"></rune>
 <rune name="Great fireball" id="2304" charges="2" maglv="4" mana="0" enabled="1"></rune>
