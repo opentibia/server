@@ -152,6 +152,7 @@ public:
   static int luaActionGetSpeed(lua_State *L);
   static int luaActionMakeRune(lua_State *L);
   static int luaActionMakeArrows(lua_State *L);
+  static int luaActionMakeFood(lua_State *L);
 protected:
 	static void internalGetArea(lua_State *L, MagicEffectAreaClass &magicArea);
 	static void internalGetPosition(lua_State *L, Position& pos);

@@ -253,6 +253,7 @@ int SpellScript::registerFunctions(){
 	lua_register(luaState, "changeSpeed", SpellScript::luaActionChangeSpeed);
 	lua_register(luaState, "makeRune", SpellScript::luaActionMakeRune);
 	lua_register(luaState, "makeArrows", SpellScript::luaActionMakeArrows);
+	lua_register(luaState, "makeFood", SpellScript::luaActionMakeFood);
 	return true;
 }
 
@@ -876,25 +877,72 @@ int SpellScript::luaActionMakeArrows(lua_State *L){
 		else{			
 			magicTarget.manaCost = spell->getMana();
 			magicTarget.damageEffect = 12; //NM_ME_MAGIC_ENERGIE = 12
- 			if(!player->getItem(SLOT_RIGHT)){
-  				player->addItemInventory(Item::CreateItem(id, count ),SLOT_RIGHT);
- 			}
- 			else if(!player->getItem(SLOT_LEFT)){
-  				player->addItemInventory(Item::CreateItem(id, count ),SLOT_LEFT);
-			}
-			else if(!player->getItem(SLOT_AMMO)){				
-  				player->addItemInventory(Item::CreateItem(id, count ),SLOT_AMMO);
-			}
-			else{
+			Item* new_item = Item::CreateItem(id,count);
+			if(!player->addItem(new_item)){
+				delete new_item;
 				magicTarget.damageEffect = 2; //NM_ME_PUFF  
-  				magicTarget.manaCost = 0; //force not enough mana
-			}			
+  				magicTarget.manaCost = 0;
+			} 
  		}
  		
 		bool isSuccess = spell->game->creatureThrowRune(player, player->pos, magicTarget);
 		
  		lua_pushnumber(L, 1);
  		return 1;
+	}
+	lua_pushnumber(L, 0);
+	return 1;
+}
+
+int SpellScript::luaActionMakeFood(lua_State *L){
+	unsigned char count = (unsigned char)lua_tonumber(L, -1);
+	lua_pop(L,1);
+	
+	Spell* spell = getSpell(L);
+	Creature* creature = spell->game->getCreatureByID((unsigned long)lua_tonumber(L, -1));
+	lua_pop(L,1);
+	
+	Player* player = dynamic_cast<Player*>(creature);
+	if(player){
+  		MagicEffectTargetClass magicTarget;
+
+		magicTarget.offensive = false;
+		magicTarget.drawblood = false;
+		magicTarget.animationEffect = 0;
+		magicTarget.attackType = ATTACK_NONE;  
+		magicTarget.hitEffect = 255; //NM_ME_NONE
+		magicTarget.animationColor = 19; //GREEN
+
+		if(player->mana < spell->getMana()){
+  			magicTarget.damageEffect = 2; //NM_ME_PUFF  
+    		magicTarget.manaCost = player->mana*5; //force not enough mana
+  		}
+  		else{  
+  			magicTarget.manaCost = spell->getMana();
+  			magicTarget.damageEffect = 12; //NM_ME_MAGIC_ENERGIE = 12    	
+  			int r,foodtype;
+    		r = rand()%7;        
+			if(r == 0) foodtype = ITEM_MEAT;
+			if(r == 1) foodtype = ITEM_HAM;
+			if(r == 2) foodtype = ITEM_GRAPE;
+			if(r == 3) foodtype = ITEM_APPLE;
+			if(r == 4) foodtype = ITEM_BREAD;
+			if(r == 5) foodtype = ITEM_CHEESE;
+			if(r == 6) foodtype = ITEM_ROLL;
+    		if(r == 7) foodtype = ITEM_BREAD;
+  			
+  			Item* new_item = Item::CreateItem(foodtype,count);
+			if(!player->addItem(new_item)){
+				delete new_item;
+				magicTarget.damageEffect = 2; //NM_ME_PUFF  
+  				magicTarget.manaCost = 0;
+			} 
+		}
+  
+		bool isSuccess = spell->game->creatureThrowRune(player, player->pos, magicTarget);
+  
+		lua_pushnumber(L, 1);
+		return 1;
 	}
 	lua_pushnumber(L, 0);
 	return 1;
