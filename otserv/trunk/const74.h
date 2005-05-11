@@ -187,6 +187,7 @@ enum item_t {
 	ITEM_GRAPE			= 2681,
 	ITEM_APPLE			= 2674,
 	ITEM_BREAD			= 2689,
+	ITEM_ROLL			= 2690,
     ITEM_CHEESE			= 2696,
 };
 
