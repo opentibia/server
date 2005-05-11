@@ -70,6 +70,8 @@ public:
 	bool isteleport;
 
 	// other bools
+	bool ismagicfield;
+	int  magicfieldtype;
 	bool iscontainer;
 	bool fluidcontainer;
 	bool stackable;

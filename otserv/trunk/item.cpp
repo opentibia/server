@@ -22,6 +22,7 @@
 
 #include "definitions.h"
 #include "container.h"
+#include "magic.h"
 
 #include <iostream>
 #include <sstream>
@@ -33,6 +34,9 @@ Item* Item::CreateItem(const unsigned short _type, unsigned char _count /*= 0*/)
 		return new Container(_type);
 	else if(items[_type].isteleport)
 		return new Teleport(_type);
+	else if(items[_type].ismagicfield){		
+		return new Item(_type, _count);
+	}
 	else
 		return new Item(_type, _count);
 }
@@ -112,8 +116,17 @@ Item::Item(const unsigned short _type, unsigned char _count) {
 	specialDescription = NULL;
 	text = NULL;
 
-	if(isStackable())
-		count = _count;
+	if(isStackable()){
+		if(_count == 0){
+			count = 1;
+		}
+		else if(_count > 100){
+			count = 100;
+		}
+		else{
+			count = _count;
+		}
+	}
 	else if(isFluidContainer() || isMultiType() )
 		fluid = _count;
 	else
@@ -152,9 +165,9 @@ int Item::unserialize(xmlNodePtr p){
 		text = new std::string(tmp);
 	
 	tmp=(const char*)xmlGetProp(p, (const xmlChar *) "count");
-	if(tmp && (isStackable() || isMultiType()))
+	if(tmp && isStackable() )
 		count=atoi(tmp);
-	else if(tmp && isFluidContainer())
+	else if(tmp && (isFluidContainer() || isMultiType()))
 		fluid=atoi(tmp);
 	else if(tmp)
 		chargecount=atoi(tmp);	
@@ -183,11 +196,11 @@ xmlNodePtr Item::serialize(){
 	}
 	
 	s.str(""); //empty the stringstream
-	if(isStackable() || isMultiType() ){		
+	if(isStackable()){		
 		s << (int)count;
 		xmlSetProp(ret, (const xmlChar*)"count", (const xmlChar*)s.str().c_str());
 	}
-	else if(isFluidContainer()){
+	else if(isFluidContainer() || isMultiType()){
 		s << (int)fluid;
 		xmlSetProp(ret, (const xmlChar*)"count", (const xmlChar*)s.str().c_str());
 	}
@@ -294,7 +307,7 @@ std::string Item::getDescription() const
 	std::stringstream s;
 	std::string str;
 	if(specialDescription){
-		s << (*specialDescription) << ".";
+		s << "You see " << (*specialDescription) << ".";
 		if(items[id].weight > 0)
 				s << "It weighs " << std::fixed << std::setprecision(1) << items[id].weight << " oz.";
 	}
@@ -372,6 +385,14 @@ std::string Item::getName() const
 	return items[id].name;
 }
 
+void Item::setSpecialDescription(std::string desc){
+	specialDescription = new std::string(desc);	
+}
+
+void Item::clearSpecialDescription(){
+	delete specialDescription;
+	specialDescription = NULL;
+}
 
 Teleport::Teleport(const unsigned short _type) : Item(_type)
 {

@@ -30,6 +30,7 @@
 ItemType::ItemType()
 {
 	iscontainer     = false;
+	ismagicfield 	= false;
 	fluidcontainer	= false;
 	stackable       = false;
   multitype       = false;
@@ -49,6 +50,7 @@ ItemType::ItemType()
 	isteleport = false;
 	
 	runeMagLevel    = -1;
+	magicfieldtype = -1;
 	
 	speed		= 0;
 	id         =  100;
@@ -557,6 +559,23 @@ int Items::loadXMLInfos(std::string file)
 						else if(!strcmp(type, "teleport"))
 						{
 							itemtype->isteleport = true;
+						}
+						else if(!strcmp(type, "magicfield"))
+						{
+							itemtype->ismagicfield = true;
+							char* fieldtype = (char*)xmlGetProp(p, (xmlChar*)"fieldtype");
+							if(fieldtype)		
+						    	if (!strcmp(fieldtype, "fire"))
+								  	itemtype->magicfieldtype = MAGIC_FIELD_FIRE;
+							  	else if (!strcmp(fieldtype, "energy"))
+							    	itemtype->magicfieldtype = MAGIC_FIELD_ENERGY;
+							    else if (!strcmp(fieldtype, "poison"))
+							    	itemtype->magicfieldtype = MAGIC_FIELD_POISON_GREEN;
+                				else
+                  					std::cout << "wrong field type tag for item: " << id << std::endl;
+							else
+	       						std::cout << "missing field type for field: " << id << std::endl;
+							
 						}
 					}//type
 				} 
