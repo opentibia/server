@@ -1402,7 +1402,7 @@ void Protocol74::sendThingMove(const Creature *creature, const Container *fromCo
 						}
 					}
 					else {
-						if(count < fromItem->getItemCountOrSubtype()) {
+						if(count != fromItem->getItemCountOrSubtype() /*count < fromItem->getItemCountOrSubtype()*/) {
 							//update count
 							msg.AddByte(0x71);
 							msg.AddByte(cid);

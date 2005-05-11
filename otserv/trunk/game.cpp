@@ -924,45 +924,49 @@ void Game::thingMoveInternal(Creature *player,
 	if(p) {
 		Container *fromContainer = NULL;
 		Container *toContainer = NULL;
+		Item *fromItem = NULL;
+		Item *toItem = NULL;
 
-		if(!fromInventory) {
-			fromContainer = p->getContainer(from_cid);
+		if(fromInventory) {
+			fromItem = p->getItem(from_cid);
+			fromContainer = dynamic_cast<Container *>(fromItem);
 		}
 		else {
-			fromContainer = dynamic_cast<Container *>(p->getItem(from_cid));
+			fromContainer = p->getContainer(from_cid);
+
+			if(fromContainer) {
+				if(from_slotid >= fromContainer->size())
+					return;
+
+				fromItem = fromContainer->getItem(from_slotid);
+			}
 		}
 
-		if(!toInventory) {
+		if(toInventory) {
+			toItem = p->getItem(to_cid);
+			toContainer = dynamic_cast<Container *>(toItem);
+		}
+		else {
 			toContainer = p->getContainer(to_cid);
 
 			if(toContainer) {
-				Container *toSlotContainer = dynamic_cast<Container*>(toContainer->getItem(to_slotid));
+				if(to_slotid >= toContainer->capacity())
+					return;
+
+				toItem = toContainer->getItem(to_slotid);
+				Container *toSlotContainer = dynamic_cast<Container*>(toItem);
 				if(toSlotContainer) {
 					toContainer = toSlotContainer;
+					toItem = NULL;
 				}
 			}
 		}
-		else {
-			toContainer = dynamic_cast<Container *>(p->getItem(to_cid));
-		}
+
+		if(!fromItem || (toItem == fromItem) || (fromItem->isStackable() && count > fromItem->getItemCountOrSubtype()))
+			return;
 
 		//Container to container
 		if(!fromInventory && fromContainer && toContainer) {
-			if(from_slotid >= fromContainer->size())
-				return;
-
-			Item* fromItem = fromContainer->getItem(from_slotid);
-			if(!fromItem)
-				return;
-
-			if(fromItem->isStackable() && count > fromItem->getItemCountOrSubtype())
-				return;
-			
-			Item *toItem = toContainer->getItem(to_slotid);
-
-			if(toItem == fromItem)
-				return;
-
 			if(onPrepareMoveThing(p, fromItem, fromContainer, toContainer, toItem)) {
 				int oldFromCount = fromItem->getItemCountOrSubtype();
 				int oldToCount = 0;
@@ -1057,13 +1061,6 @@ void Game::thingMoveInternal(Creature *player,
 		else {
 			//inventory to inventory
 			if(fromInventory && toInventory && !toContainer) {
-				Item *fromItem = p->getItem(from_cid);
-
-				if(!fromItem)
-					return;
-
-				Item *toItem = p->items[to_cid];
-
 				if(onPrepareMoveThing(p, fromItem, (slots_t)to_cid) && onPrepareMoveThing(p, (slots_t)from_cid, fromItem, (slots_t)to_cid, toItem)) {
 
 					int oldFromCount = fromItem->getItemCountOrSubtype();
@@ -1120,12 +1117,7 @@ void Game::thingMoveInternal(Creature *player,
 			}
 			//container to inventory
 			else if(!fromInventory && fromContainer && toInventory) {
-				Item* fromItem = fromContainer->getItem(from_slotid);
-				if(!fromItem)
-					return;
-
 				if(onPrepareMoveThing(p, fromItem, (slots_t)to_cid)) {
-					Item *toItem = p->items[to_cid];
 					int oldFromCount = fromItem->getItemCountOrSubtype();
 					int oldToCount = 0;
 
@@ -1201,12 +1193,7 @@ void Game::thingMoveInternal(Creature *player,
 			}
 			//inventory to container
 			else if(fromInventory && toContainer) {
-				Item* fromItem = p->getItem(from_cid);
-				if(!fromItem)
-					return;
-
 				int oldFromCount = fromItem->getItemCountOrSubtype();
-				Item *toItem = toContainer->getItem(to_slotid);
 				int oldToCount = 0;
 
 				if(onPrepareMoveThing(player, fromItem, NULL, toContainer, toItem)) {
@@ -1253,8 +1240,7 @@ void Game::thingMoveInternal(Creature *player,
 						}
 						else {
 							if(p->removeItemInventory((slots_t)from_cid, true)) {
-								p->removeItemInventory(to_cid, true);
-								p->addItemInventory(fromItem, to_cid, true);
+								toContainer->addItem(fromItem);
 							}
 						}
 
