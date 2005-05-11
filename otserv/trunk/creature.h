@@ -153,6 +153,7 @@ public:
   virtual bool isAttackable() const { return true; };
 	virtual bool isPushable() const {return true;}
 	virtual void dropLoot(Container *corpse) {return;};
+	virtual int getLookCorpse() {return lookcorpse;};
 
 //  virtual int sendInventory(){return 0;};
   virtual int addItemInventory(Item* item, int pos){return 0;};
@@ -160,7 +161,7 @@ public:
   virtual Direction getDirection(){return direction;}
 	void addCondition(const CreatureCondition& condition, bool refresh);
 	Conditions& getConditions() {return conditions;};
-
+	
   int lookhead, lookbody, looklegs, lookfeet, looktype, lookcorpse, lookmaster;
   int mana, manamax, manaspent;
   bool pzLocked;

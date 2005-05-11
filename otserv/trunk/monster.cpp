@@ -268,8 +268,8 @@ Monster::Monster(const char *name, Game* game) :
 				}
 			}
 			else if (strcmp(str, "loot") == 0) {
-				//lootItems.clear();
-				//LoadLootNode(p->children);
+				lootItems.clear();
+				LoadLootNode(p->children);
 			}			
 			p = p->next;
 		}
@@ -278,7 +278,7 @@ Monster::Monster(const char *name, Game* game) :
 	}
 
 }
-/*
+
 bool Monster::LoadLootNode(xmlNodePtr tmp){
 	unsigned short s_id;
 	char *sxml;
@@ -316,13 +316,15 @@ bool Monster::LoadLootNode(xmlNodePtr tmp){
 
 Item* Monster::LoadLootItemStackable(xmlNodePtr tmp,unsigned short id){	
 	Item *tmpItem;
-	float chance1;
-	float chancemax;
+	unsigned long chance1,chancemax;
 	unsigned char countmax,n;
 	
 	char *s_count = (char*)xmlGetProp(tmp, (const xmlChar *) "countmax");
 	if(s_count) {
 		countmax = atoi(s_count);
+		if(countmax > 100){			
+			countmax = 100;
+		}
 	}
 	else{
 		std::cout << "missing countmax for loot id = "<< id << std::endl;
@@ -330,30 +332,30 @@ Item* Monster::LoadLootItemStackable(xmlNodePtr tmp,unsigned short id){
 	}
 	char* s_chance = (char*)xmlGetProp(tmp, (xmlChar*)"chancemax");
     if (s_chance){
-		chancemax = std::abs(atof(s_chance));
-		if(chancemax > 1.0)
-			chancemax = 0.0;
+		chancemax = atoi(s_chance);
+		if(chancemax > CHANCE_MAX)
+			chancemax = 0;
 	}
 	else{
 		std::cout << "missing chancemax for loot id = "<< id << std::endl;
-		chancemax = 0.0;
+		chancemax = 0;
 	}
 	s_chance = (char*)xmlGetProp(tmp, (xmlChar*)"chance1");
     if (s_chance){
-		chance1 = std::abs(atof(s_chance));
-		if(chance1 > 1.0)
-			chance1 = 1.0;
+		chance1 = atoi(s_chance);
+		if(chance1 > CHANCE_MAX)
+			chance1 = CHANCE_MAX;
 	}
 	else{
 		std::cout << "missing chance1 for loot id = "<< id << std::endl;
-		chance1 = 1.0;
+		chance1 = CHANCE_MAX;
 	}
 	if(chance1 <= chancemax){
 		std::cout << "Wrong chance for loot id = "<< id << std::endl;
 		return NULL;
 	}
 	
-	float randvalue = GetRandom();
+	unsigned long randvalue = GetRandom();
 	
 	if(randvalue < chance1){
 		if(randvalue < chancemax){
@@ -363,7 +365,8 @@ Item* Monster::LoadLootItemStackable(xmlNodePtr tmp,unsigned short id){
 			//if  chancemax < randvalue < chance1
 			//get number of items using a linear relation between
 			// n and chances
-			n = (unsigned char)(countmax*(randvalue-chancemax)/(chance1-chancemax));
+			//n = (unsigned char)(countmax*(randvalue-chancemax)/(chance1-chancemax));
+			n = (unsigned char)(randvalue % countmax + 1);
 		}		
 		tmpItem = Item::CreateItem(id,n);
 	}
@@ -375,19 +378,19 @@ Item* Monster::LoadLootItemStackable(xmlNodePtr tmp,unsigned short id){
 
 Item* Monster::LoadLootItem(xmlNodePtr tmp,unsigned short id){
 	Item *tmpItem;
-	float chance;
+	unsigned long chance;
 	char* s_chance = (char*)xmlGetProp(tmp, (xmlChar*)"chance");
     if (s_chance){
-		chance = atof(s_chance);
-		if(chance > 1.0)
-			chance = 1.0;
+		chance = atoi(s_chance);
+		if(chance > CHANCE_MAX)
+			chance = CHANCE_MAX;
 	}
 	else{		
 		std::cout << "missing chance for loot id = "<< id << std::endl;
-		chance = 1.0;
+		chance = CHANCE_MAX;
 	}
 	if(GetRandom() < chance){
-		tmpItem = Item::CreateItem(id,0);
+		tmpItem = Item::CreateItem(id);
 	}
 	else{
 		tmpItem = NULL;
@@ -395,8 +398,9 @@ Item* Monster::LoadLootItem(xmlNodePtr tmp,unsigned short id){
 	return tmpItem;
 }
 
-float Monster::GetRandom(){
-	return (float)(rand()/(RAND_MAX+1.0));
+unsigned long Monster::GetRandom(){
+	return (unsigned long)((rand()<< 16 | 
+		rand()) % CHANCE_MAX);
 }
 
 bool Monster::LoadLootContainer(xmlNodePtr nodeitem,Container* ccontainer){
@@ -443,7 +447,7 @@ bool Monster::LoadLootContainer(xmlNodePtr nodeitem,Container* ccontainer){
 	}
 	return false;
 }
-*/
+
 Monster::~Monster()
 {
 	for(std::map<PhysicalAttackClass*, TimeProbabilityClass>::iterator it = physicalAttacks.begin(); it != physicalAttacks.end(); ++it) {
@@ -775,10 +779,10 @@ int Monster::getWeaponDamage() const
 
 void Monster::dropLoot(Container *corpse)
 {
-	/*for(std::vector<Item*>::iterator cit = lootItems.begin(); cit != lootItems.end(); ++cit) {		
+	for(std::vector<Item*>::iterator cit = lootItems.begin(); cit != lootItems.end(); ++cit) {		
 		corpse->addItem(*cit);
-	}*/
-	corpse->addItem(Item::CreateItem(2392));
+	}
+	//corpse->addItem(Item::CreateItem(2392));
 }
 
 bool Monster::doAttacks(Player* attackedPlayer)

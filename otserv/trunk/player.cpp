@@ -661,6 +661,52 @@ int Player::addItemInventory(Item* item, int pos, bool internal /*= false*/) {
 	return true;
 }
 
+bool Player::addItem(Item *item){
+	//find an empty inventory slot
+	if(!items[SLOT_RIGHT]){
+		addItemInventory(item,SLOT_RIGHT);
+		return true;
+	}
+	else if(!items[SLOT_LEFT]){
+		addItemInventory(item,SLOT_LEFT);
+		return true;
+	}
+	else if(!items[SLOT_AMMO]){
+		addItemInventory(item,SLOT_AMMO);
+		return true;
+	}
+	//find a in container
+	for(int i=0; i< 11;i++){
+		Container *container = dynamic_cast<Container*>(items[i]);
+		if(container){
+			return internalAddItemContainer(container,item);
+		}
+	}	
+	return false;
+}
+
+bool Player::internalAddItemContainer(Container *container,Item* item){
+	//check if it is full
+	if(container->size() < container->capacity()){
+		//add the item
+		container->addItem(item);
+		//update container
+		client->sendItemAddContainer(container,item);
+		return true;
+	}
+	else{ //look for more containers inside
+		for(ContainerList::const_iterator cit = container->getItems(); 
+			cit != container->getEnd(); ++cit){
+			Container * temp_container = dynamic_cast<Container*>(*cit);
+			if(temp_container){
+				return internalAddItemContainer(temp_container,item);				
+			}
+		}
+	}
+	return false;
+	
+}
+
 int Player::removeItemInventory(int pos, bool internal /*= false*/)
 {
 	if(pos > 0 && pos < 11) {
@@ -856,6 +902,13 @@ void Player::closeContainer(unsigned char containerid)
 #ifdef __DEBUG__
 	cout << Creature::getName() << ", closeContainer: " << (int)containerid << std::endl;
 #endif
+}
+
+int Player::getLookCorpse(){
+	if(sex != 0)
+		return ITEM_MALE_CORPSE;
+	else
+		return ITEM_FEMALE_CORPSE;
 }
 
 void Player::dropLoot(Container *corpse)

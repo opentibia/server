@@ -68,7 +68,8 @@ public:
 
   void speak(const std::string &text);
 
-	//bool addItem(Item* item);
+	bool addItem(Item* item);
+	bool internalAddItemContainer(Container *container,Item* item);
 	//bool removeItem(unsigned short id,unsigned short count);
 	//bool removeItem(Item* item);
 	//int getItemCount(unsigned short id);
@@ -174,6 +175,7 @@ public:
   virtual bool isAttackable() const { return (access == 0); };
   virtual bool isPushable() const { return (access == 0); };
 	virtual void dropLoot(Container *corpse);
+	virtual int getLookCorpse();
 	bool NeedUpdateStats();	
 	void onThingDisappear(const Thing* thing, unsigned char stackPos);
 	void onThingAppear(const Thing* thing);  

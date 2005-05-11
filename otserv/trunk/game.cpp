@@ -285,7 +285,7 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 		}
 			    
 		//Add body
-		Item *corpseitem = Item::CreateItem(attackedCreature->lookcorpse);
+		Item *corpseitem = Item::CreateItem(attackedCreature->getLookCorpse());
 		corpseitem->pos = attackedCreature->pos;
 
 		//Add eventual loot
@@ -293,7 +293,28 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 		if(lootcontainer) {
 			attackedCreature->dropLoot(lootcontainer);
 		}
+		
+		Player *attackedplayer = dynamic_cast<Player*>(attackedCreature);
+		if(attackedplayer){
+			std::stringstream s;
+			s << "a dead human. You recognize " 
+				<< attackedplayer->getName() << "."; 				
+			if(attacker){
+				if(attackedplayer->sex != 0)
+					s << "He";
+				else
+					s << "She";
+				s << " was killed by ";
+				Player *attackerplayer = dynamic_cast<Player*>(attacker);
+				if(attackerplayer)
+					s << attacker->getName();
+				else
+					s << "a " << attacker->getName();
+			}
 				
+			corpseitem->setSpecialDescription(s.str());
+		}
+		
 		tile->addThing(corpseitem);
 
 		Player *spectator = NULL;
@@ -311,10 +332,11 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 		//game->addEvent(makeTask(decayTime*1000, boost::bind(&Game::decayItem, this->game, corpseitem->pos, corpseitem->getID(), tile->getThingStackPos(corpseitem)) ) );
 		game->addEvent(makeTask(decayTime*1000, std::bind2nd(std::mem_fun(&Game::decayItem), corpseitem)));
 		
-		//free if attackedCreature is not a player
-		Player *attackedplayer = dynamic_cast<Player*>(attackedCreature);
+		//free if attackedCreature is not a player		
 		if(attackedplayer == NULL)
 			game->FreeThing(attackedCreature);
+		
+			
 	}
 
 	//Add blood?
@@ -554,8 +576,9 @@ bool Game::placeCreature(Creature* c)
 		player->useThing();
 	}*/
 	c->useThing();
-
-	std::cout << (uint32_t)getPlayersOnline() << " players online." << std::endl;
+	if(dynamic_cast<Player*>(c))
+		std::cout << (uint32_t)getPlayersOnline() << " players online." << std::endl;
+		
 	addEvent(makeTask(1000, std::bind2nd(std::mem_fun(&Game::checkPlayer), c->getID())));
 	addEvent(makeTask(2000, std::bind2nd(std::mem_fun(&Game::checkPlayerAttacking), c->getID())));
 	
@@ -1853,9 +1876,8 @@ void Game::thingMoveInternal(Creature *player, unsigned short from_x, unsigned s
 						
 						if(magicTargetCondition && ((magicTargetCondition->attackType == ATTACK_FIRE) || 
 								(magicTargetCondition->attackType == ATTACK_POISON) ||
-								(magicTargetCondition->attackType == ATTACK_ENERGY))) {
-								
-							Creature* c = getCreatureByID(magicTargetCondition->getOwnerID());
+								(magicTargetCondition->attackType == ATTACK_ENERGY))) {	
+							Creature *c = getCreatureByID(magicTargetCondition->getOwnerID());
 							creatureMakeMagic(c, thing->pos, magicTargetCondition);
 						}
 					}
