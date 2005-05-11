@@ -184,6 +184,7 @@ private:
 
 	void sendContainer(unsigned char index, Container *container);
 	void sendCloseContainer(unsigned char containerid);
+	void sendItemAddContainer(const Container *container, const Item *item);
 
 	// translate a tile to clientreadable format
   void GetTileDescription(const Tile* tile, NetworkMessage &msg);
@@ -204,7 +205,12 @@ private:
   virtual void AddPlayerSkills(NetworkMessage &msg,const Player *player);
   virtual void AddRemoveThing(NetworkMessage &msg, const Position &pos,unsigned char stackpos);
   virtual void AddAppearThing(NetworkMessage &msg, const Position &pos);
-	virtual void AddTileUpdated(NetworkMessage &msg, const Position &pos);
+  virtual void AddTileUpdated(NetworkMessage &msg, const Position &pos);
+  virtual void AddItemContainer(NetworkMessage &msg,unsigned char cid, const Item *item);
+  virtual void AddItemContainer(NetworkMessage &msg,unsigned char cid, const Item *item,unsigned char count);
+  virtual void TransformItemContainer(NetworkMessage &msg,unsigned char cid,unsigned char slot, const Item *item);
+  virtual void RemoveItemContainer(NetworkMessage &msg,unsigned char cid,unsigned char slot);
+	
   
   OTSYS_THREAD_LOCKVAR bufferLock;
    

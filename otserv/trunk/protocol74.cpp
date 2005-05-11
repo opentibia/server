@@ -725,7 +725,7 @@ void Protocol74::parseUseItemEx(NetworkMessage &msg)
 	unsigned short from_x = msg.GetU16();
 	unsigned short from_y = msg.GetU16();
 	unsigned char from_z = msg.GetByte();
-	/*unsigned short item = */msg.GetU16();
+	/*unsigned short itemid =*/ msg.GetU16();
 	unsigned char from_stackpos = msg.GetByte();
 	unsigned short to_x = msg.GetU16();
 	unsigned short to_y = msg.GetU16();
@@ -761,13 +761,10 @@ void Protocol74::parseUseItemEx(NetworkMessage &msg)
 					for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
 						if(cit->second == container) {
 							//remove item
-							msg.AddByte(0x72);
-							msg.AddByte(cit->first);
-							msg.AddByte(from_z);
+							RemoveItemContainer(msg,cit->first,from_z);
 						}
 					}
-					WriteBuffer(msg);
-					//sendContainerUpdated(runeitem, containerid, 0xFF, from_z, 0xFF, true);
+					WriteBuffer(msg);					
 				}
 			}
 		}
@@ -988,7 +985,12 @@ void Protocol74::parseThrow(NetworkMessage &msg)
   unsigned short to_y       = msg.GetU16(); 
   unsigned char  to_z       = msg.GetByte();
 	unsigned char count       = msg.GetByte();
-
+	/*
+	std::cout << "parseThrow: " << "from_x: " << (int)from_x << ", from_y: " << (int)from_y
+	 <<  ", from_z: " << (int)from_z << ", item: " << (int)itemid << ", from_stack: " 
+	 << (int)from_stack << " to_x: " << (int)to_x << ", to_y: " << (int)to_y
+	 <<  ", to_z: " << (int)to_z  
+	 << ", count: " << (int)count << std::endl;*/
 	bool toInventory = false;
 	bool fromInventory = false;
 
@@ -1374,79 +1376,90 @@ void Protocol74::sendThingMove(const Creature *creature, const Container *fromCo
 				if(fromItem->isStackable()) {
 					if(toItem && fromItem->getID() == toItem->getID() && toItem->getItemCountOrSubtype() != oldToCount) {
 						//update count
-						msg.AddByte(0x71);
+						/*msg.AddByte(0x71);
 						msg.AddByte(cid);
 						msg.AddByte(to_slotid);
-						msg.AddItem(toItem);
+						msg.AddItem(toItem);*/
+						TransformItemContainer(msg,cid,to_slotid,toItem);
 
 						if(fromItem->getItemCountOrSubtype() > 0 && count < oldFromCount) {
 							//update count
-							msg.AddByte(0x71);
+							/*msg.AddByte(0x71);
 							msg.AddByte(cid);
 							msg.AddByte(from_slotid);
-							msg.AddItem(fromItem);
+							msg.AddItem(fromItem);*/
+							TransformItemContainer(msg,cid,from_slotid,fromItem);
 						}
 						else {
 							//remove item
-							msg.AddByte(0x72);
+							/*msg.AddByte(0x72);
 							msg.AddByte(cid);
-							msg.AddByte(from_slotid);
+							msg.AddByte(from_slotid);*/
+							RemoveItemContainer(msg,cid,from_slotid);
 						}
 
 						//surplus items
 						if(oldToCount + count > 100) {
-							//add item
-							msg.AddByte(0x70);
+							//add item							
+							/*msg.AddByte(0x70);
 							msg.AddByte(cid);
-							msg.AddItem(fromItem->getID(), oldToCount + count - 100);
+							msg.AddItem(fromItem->getID(), oldToCount + count - 100);*/
+							AddItemContainer(msg,cid,fromItem,oldToCount + count - 100);
 						}
 					}
 					else {
-						if(count != fromItem->getItemCountOrSubtype() /*count < fromItem->getItemCountOrSubtype()*/) {
+						if(count != fromItem->getItemCountOrSubtype()) {
 							//update count
-							msg.AddByte(0x71);
+							/*msg.AddByte(0x71);
 							msg.AddByte(cid);
 							msg.AddByte(from_slotid);
-							msg.AddItem(fromItem);
+							msg.AddItem(fromItem);*/
+							TransformItemContainer(msg,cid,from_slotid,fromItem);
 						}
 						else {
 							//remove item
-							msg.AddByte(0x72);
+							/*msg.AddByte(0x72);
 							msg.AddByte(cid);
-							msg.AddByte(from_slotid);
+							msg.AddByte(from_slotid);*/
+							RemoveItemContainer(msg,cid,from_slotid);
 						}
 
 						//add item
-						msg.AddByte(0x70);
+						/*msg.AddByte(0x70);
 						msg.AddByte(cid);
-						msg.AddItem(fromItem->getID(), count);
+						msg.AddItem(fromItem->getID(), count);*/
+						AddItemContainer(msg,cid,fromItem,count);
 					}
 				}
 				else {
 					//remove item
-					msg.AddByte(0x72);
+					/*msg.AddByte(0x72);
 					msg.AddByte(cid);
-					msg.AddByte(from_slotid);
+					msg.AddByte(from_slotid);*/
+					RemoveItemContainer(msg,cid,from_slotid);
 
 					//add item
-					msg.AddByte(0x70);
+					/*msg.AddByte(0x70);
 					msg.AddByte(cid);
-					msg.AddItem(fromItem->getID(), count);
+					msg.AddItem(fromItem->getID(), count);*/
+					AddItemContainer(msg,cid,fromItem,count);
 				}
 			}
 			else {
 				if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() > 0 && count < oldFromCount) {
 					//update count
-					msg.AddByte(0x71);
+					/*msg.AddByte(0x71);
 					msg.AddByte(cid);
 					msg.AddByte(from_slotid);
-					msg.AddItem(fromItem);
+					msg.AddItem(fromItem);*/
+					TransformItemContainer(msg,cid,from_slotid,fromItem);
 				}
 				else {
 					//remove item
-					msg.AddByte(0x72);
+					/*msg.AddByte(0x72);
 					msg.AddByte(cid);
-					msg.AddByte(from_slotid);
+					msg.AddByte(from_slotid);*/
+					RemoveItemContainer(msg,cid,from_slotid);
 				}
 			}
 		}
@@ -1455,31 +1468,35 @@ void Protocol74::sendThingMove(const Creature *creature, const Container *fromCo
 			if(fromItem->isStackable()) {
 				if(toItem && fromItem->getID() == toItem->getID() && toItem->getItemCountOrSubtype() != oldToCount) {
 					//update count
-					msg.AddByte(0x71);
+					/*msg.AddByte(0x71);
 					msg.AddByte(cid);
 					msg.AddByte(to_slotid);
-					msg.AddItem(toItem);
+					msg.AddItem(toItem);*/
+					TransformItemContainer(msg,cid,to_slotid,toItem);
 
 					//surplus items
 					if(oldToCount + count > 100) {
 						//add item
-						msg.AddByte(0x70);
+						/*msg.AddByte(0x70);
 						msg.AddByte(cid);
-						msg.AddItem(fromItem->getID(), oldToCount + count - 100);
+						msg.AddItem(fromItem->getID(), oldToCount + count - 100);*/
+						AddItemContainer(msg,cid,fromItem,oldToCount + count - 100);
 					}
 				}
 				else {
 					//add item
-					msg.AddByte(0x70);
+					/*msg.AddByte(0x70);
 					msg.AddByte(cid);
-					msg.AddItem(fromItem->getID(), count);
+					msg.AddItem(fromItem->getID(), count);*/
+					AddItemContainer(msg,cid,fromItem,count);
 				}
 			}
 			else {
 				//add item
-				msg.AddByte(0x70);
+				/*msg.AddByte(0x70);
 				msg.AddByte(cid);
-				msg.AddItem(fromItem);
+				msg.AddItem(fromItem);*/
+				AddItemContainer(msg,cid,fromItem);
 			}
 		}
 	}
@@ -1495,6 +1512,7 @@ void Protocol74::sendThingMove(const Creature *creature, slots_t fromSlot, const
 	//Update up-arrow
 	//
 
+
 	Container *container = NULL;
 	for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
 		container = cit->second;
@@ -1504,31 +1522,35 @@ void Protocol74::sendThingMove(const Creature *creature, slots_t fromSlot, const
 			if(fromItem->isStackable()) {
 				if(toItem && fromItem->getID() == toItem->getID() && toItem->getItemCountOrSubtype() != oldToCount) {
 					//update count
-					msg.AddByte(0x71);
+					/*msg.AddByte(0x71);
 					msg.AddByte(cid);
 					msg.AddByte(to_slotid);
-					msg.AddItem(toItem);
+					msg.AddItem(toItem);*/
+					TransformItemContainer(msg,cid,to_slotid,toItem);
 
 					//surplus items
 					if(oldToCount + count > 100) {
 						//add item
-						msg.AddByte(0x70);
+						/*msg.AddByte(0x70);
 						msg.AddByte(cid);
-						msg.AddItem(fromItem->getID(), oldToCount + count - 100);
+						msg.AddItem(fromItem->getID(), oldToCount + count - 100);*/
+						AddItemContainer(msg,cid,fromItem,oldToCount + count - 100);
 					}
 				}
 				else {
 					//add item
-					msg.AddByte(0x70);
+					/*msg.AddByte(0x70);
 					msg.AddByte(cid);
-					msg.AddItem(fromItem->getID(), count);
+					msg.AddItem(fromItem->getID(), count);*/
+					AddItemContainer(msg,cid,fromItem,count);
 				}
 			}
 			else {
 				//add item
-				msg.AddByte(0x70);
+				/*msg.AddByte(0x70);
 				msg.AddByte(cid);
-				msg.AddItem(fromItem->getID(), count);
+				msg.AddItem(fromItem->getID(), count);*/
+				AddItemContainer(msg,cid,fromItem,count);
 			}
 		}
 	}
@@ -1562,6 +1584,7 @@ void Protocol74::sendThingMove(const Creature *creature, const Container *fromCo
 	//Update up-arrow
 	//
 
+
 	Container *container = NULL;
 	for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
 		container = cit->second;
@@ -1570,23 +1593,27 @@ void Protocol74::sendThingMove(const Creature *creature, const Container *fromCo
 			
 			if(!fromItem->isStackable() || (oldFromCount == count && oldToCount + count <= 100)) {
 				//remove item
-				msg.AddByte(0x72);
+				/*msg.AddByte(0x72);
 				msg.AddByte(cid);
-				msg.AddByte(from_slotid);
+				msg.AddByte(from_slotid);*/
+				RemoveItemContainer(msg,cid,from_slotid);
 			}
 			else {
 				//update count
-				msg.AddByte(0x71);
+				/*msg.AddByte(0x71);
 				msg.AddByte(cid);
 				msg.AddByte(from_slotid);
-				msg.AddItem(fromItem);
+				msg.AddItem(fromItem);*/
+				TransformItemContainer(msg,cid,from_slotid,fromItem);
 			}
+
 
 			if(toItem && toItem->getID() != fromItem->getID()) {
 				//add item
-				msg.AddByte(0x70);
+				/*msg.AddByte(0x70);
 				msg.AddByte(cid);
-				msg.AddItem(toItem);
+				msg.AddItem(toItem);*/
+				AddItemContainer(msg,cid,toItem);
 			}
 		}
 	}
@@ -1633,16 +1660,18 @@ void Protocol74::sendThingMove(const Creature *creature, const Container *fromCo
 
 			if(!fromItem->isStackable() || fromItem->getItemCountOrSubtype() == 0 || fromItem->getItemCountOrSubtype() == oldFromCount) {
 				//remove item
-				msg.AddByte(0x72);
+				/*msg.AddByte(0x72);
 				msg.AddByte(cid);
-				msg.AddByte(from_slotid);
+				msg.AddByte(from_slotid);*/
+				RemoveItemContainer(msg,cid,from_slotid);
 			}
 			else {
 				//update count
-				msg.AddByte(0x71);
+				/*msg.AddByte(0x71);
 				msg.AddByte(cid);
 				msg.AddByte(from_slotid);
-				msg.AddItem(fromItem);
+				msg.AddItem(fromItem);*/
+				TransformItemContainer(msg,cid,from_slotid,fromItem);
 			}
 		}
 	}
@@ -1724,31 +1753,35 @@ void Protocol74::sendThingMove(const Creature *creature, const Position &fromPos
 			if(fromItem->isStackable()) {
 				if(toItem && fromItem->getID() == toItem->getID() && toItem->getItemCountOrSubtype() != oldToCount) {
 					//update count
-					msg.AddByte(0x71);
+					/*msg.AddByte(0x71);
 					msg.AddByte(cid);
 					msg.AddByte(to_slotid);
-					msg.AddItem(toItem);
+					msg.AddItem(toItem);*/
+					TransformItemContainer(msg,cid,to_slotid,toItem);
 
 					//surplus items
 					if(oldToCount + count > 100) {
 						//add item
-						msg.AddByte(0x70);
+						/*msg.AddByte(0x70);
 						msg.AddByte(cid);
-						msg.AddItem(fromItem->getID(), oldToCount + count - 100);
+						msg.AddItem(fromItem->getID(), oldToCount + count - 100);*/
+						AddItemContainer(msg,cid,fromItem,oldToCount + count - 100);
 					}
 				}
 				else {
 					//add item
-					msg.AddByte(0x70);
+					/*msg.AddByte(0x70);
 					msg.AddByte(cid);
-					msg.AddItem(fromItem->getID(), count);
+					msg.AddItem(fromItem->getID(), count);*/
+					AddItemContainer(msg,cid,fromItem,count);
 				}
 			}
 			else {
 				//add item
-				msg.AddByte(0x70);
+				/*msg.AddByte(0x70);
 				msg.AddByte(cid);
-				msg.AddItem(fromItem->getID(), count);
+				msg.AddItem(fromItem->getID(), count);*/
+				AddItemContainer(msg,cid,fromItem,count);
 			}
 		}
 	}
@@ -2248,6 +2281,18 @@ void Protocol74::sendCreatureHealth(const Creature *creature){
 	WriteBuffer(msg);
 }
 
+void Protocol74::sendItemAddContainer(const Container *container, const Item *item){
+	NetworkMessage msg;
+	//find cid for the container
+	for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit){
+		Container *tmpcontainer = cit->second;
+		if(container == cit->second){
+			AddItemContainer(msg,cit->first,item);
+			WriteBuffer(msg);
+			break;
+		}
+	}	
+}
 
 ////////////// before at NetwrokMessage class
 void Protocol74::AddTextMessage(NetworkMessage &msg,MessageClasses mclass, const char* message)
@@ -2441,6 +2486,30 @@ void Protocol74::AddAppearThing(NetworkMessage &msg, const Position &pos){
 	}
 }
 
+void Protocol74::AddItemContainer(NetworkMessage &msg,unsigned char cid, const Item *item){
+	msg.AddByte(0x70);
+	msg.AddByte(cid);
+	msg.AddItem(item);
+}
+
+void Protocol74::AddItemContainer(NetworkMessage &msg,unsigned char cid, const Item *item,unsigned char count){
+	msg.AddByte(0x70);
+	msg.AddByte(cid);
+	msg.AddItem(item->getID(), count);
+}
+
+void Protocol74::TransformItemContainer(NetworkMessage &msg,unsigned char cid,unsigned char slot,const  Item *item){
+	msg.AddByte(0x71);
+	msg.AddByte(cid);
+	msg.AddByte(slot);
+	msg.AddItem(item);
+}
+
+void Protocol74::RemoveItemContainer(NetworkMessage &msg,unsigned char cid,unsigned char slot){
+	msg.AddByte(0x72);
+	msg.AddByte(cid);
+	msg.AddByte(slot);
+}
 
 //////////////////////////
 
@@ -2461,9 +2530,9 @@ void Protocol74::WriteBuffer(NetworkMessage &add){
 		player->SendBuffer = true;
 	}	
 	if(OutputBuffer.getMessageLength() + add.getMessageLength() > NETWORKMESSAGE_MAXSIZE){		
-		OTSYS_THREAD_UNLOCK(bufferLock)
+		//OTSYS_THREAD_UNLOCK(bufferLock)
 		this->flushOutputBuffer();
-		OTSYS_THREAD_LOCK(bufferLock)
+		//OTSYS_THREAD_LOCK(bufferLock)
 		player->SendBuffer = true;
 	}	
 	OutputBuffer.JoinMessages(add);	

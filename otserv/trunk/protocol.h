@@ -86,6 +86,7 @@ public:
   virtual void sendThingAppear(const Thing *thing) = 0;
   virtual void sendThingRemove(const Thing *thing) = 0;
   virtual void sendThingTransform(const Thing* thing,int stackpos) = 0;
+  virtual void sendItemAddContainer(const Container *container, const Item *item) = 0;
   virtual void sendDistanceShoot(const Position &from, const Position &to, unsigned char type) = 0;
   virtual void sendMagicEffect(const Position &pos, unsigned char type) = 0;
   virtual void sendAnimatedText(const Position &pos, unsigned char color, std::string text) = 0;
@@ -128,7 +129,11 @@ public:
   virtual void AddPlayerSkills(NetworkMessage &msg,const Player *player) = 0;
   virtual void AddRemoveThing(NetworkMessage &msg, const Position &pos,unsigned char stackpos) = 0;
   virtual void AddAppearThing(NetworkMessage &msg, const Position &pos) = 0;
-	virtual void AddTileUpdated(NetworkMessage &msg, const Position &pos) = 0;
+  virtual void AddTileUpdated(NetworkMessage &msg, const Position &pos) = 0;
+  virtual void AddItemContainer(NetworkMessage &msg,unsigned char cid, const Item *item) = 0;
+  virtual void AddItemContainer(NetworkMessage &msg,unsigned char cid, const Item *item,unsigned char count) = 0;
+  virtual void TransformItemContainer(NetworkMessage &msg,unsigned char cid,unsigned char slot, const Item *item) = 0;
+  virtual void RemoveItemContainer(NetworkMessage &msg,unsigned char cid,unsigned char slot) = 0;
 
 protected:
 	bool pendingLogout;
