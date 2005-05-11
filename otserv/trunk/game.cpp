@@ -759,7 +759,7 @@ bool Game::onPrepareMoveThing(Creature *player, const Item* fromItem, const Cont
 		player->sendCancel("Sorry, not possible.");
 		return false;
 	}
-	else if((!fromItem->isStackable() || !toItem || fromItem->getID() != toItem->getID()) && toContainer->size() + 1 > toContainer->capacity()) {		
+	else if((!fromItem->isStackable() || !toItem || fromItem->getID() != toItem->getID() || toItem->getItemCountOrSubtype() >= 100) && toContainer->size() + 1 > toContainer->capacity()) {		
 		player->sendCancel("Sorry, not enough room.");
 		return false;
 	}
