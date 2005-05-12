@@ -1382,7 +1382,7 @@ void Protocol74::sendThingMove(const Creature *creature, const Container *fromCo
 						msg.AddItem(toItem);*/
 						TransformItemContainer(msg,cid,to_slotid,toItem);
 
-						if(fromItem->getItemCountOrSubtype() > 0 && count < oldFromCount) {
+						if(fromItem->getItemCountOrSubtype() > 0 && count != oldFromCount) {
 							//update count
 							/*msg.AddByte(0x71);
 							msg.AddByte(cid);
@@ -1408,20 +1408,20 @@ void Protocol74::sendThingMove(const Creature *creature, const Container *fromCo
 						}
 					}
 					else {
-						if(count != fromItem->getItemCountOrSubtype()) {
+						if(count == oldFromCount) {
+							//remove item
+							/*msg.AddByte(0x72);
+							msg.AddByte(cid);
+							msg.AddByte(from_slotid);*/
+							RemoveItemContainer(msg,cid,from_slotid);
+						}
+						else {
 							//update count
 							/*msg.AddByte(0x71);
 							msg.AddByte(cid);
 							msg.AddByte(from_slotid);
 							msg.AddItem(fromItem);*/
 							TransformItemContainer(msg,cid,from_slotid,fromItem);
-						}
-						else {
-							//remove item
-							/*msg.AddByte(0x72);
-							msg.AddByte(cid);
-							msg.AddByte(from_slotid);*/
-							RemoveItemContainer(msg,cid,from_slotid);
 						}
 
 						//add item
@@ -1446,7 +1446,7 @@ void Protocol74::sendThingMove(const Creature *creature, const Container *fromCo
 				}
 			}
 			else {
-				if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() > 0 && count < oldFromCount) {
+				if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() > 0 && count != oldFromCount) {
 					//update count
 					/*msg.AddByte(0x71);
 					msg.AddByte(cid);
@@ -1549,8 +1549,8 @@ void Protocol74::sendThingMove(const Creature *creature, slots_t fromSlot, const
 				//add item
 				/*msg.AddByte(0x70);
 				msg.AddByte(cid);
-				msg.AddItem(fromItem->getID(), count);*/
-				AddItemContainer(msg,cid,fromItem,count);
+				msg.AddItem(fromItem);*/
+				AddItemContainer(msg,cid,fromItem);
 			}
 		}
 	}
@@ -1607,7 +1607,6 @@ void Protocol74::sendThingMove(const Creature *creature, const Container *fromCo
 				TransformItemContainer(msg,cid,from_slotid,fromItem);
 			}
 
-
 			if(toItem && toItem->getID() != fromItem->getID()) {
 				//add item
 				/*msg.AddByte(0x70);
@@ -1650,7 +1649,11 @@ void Protocol74::sendThingMove(const Creature *creature, const Container *fromCo
 		}
 		else {
 			AddAppearThing(msg, toPos);
-			msg.AddItem(fromItem->getID(), count);
+			if(fromItem->isStackable()) {
+				msg.AddItem(fromItem->getID(), count);
+			}
+			else
+				msg.AddItem(fromItem);
 		}
 	}
 	
@@ -1658,7 +1661,7 @@ void Protocol74::sendThingMove(const Creature *creature, const Container *fromCo
 		unsigned char cid = cit->first;
 		if(cit->second == fromContainer) {
 
-			if(!fromItem->isStackable() || fromItem->getItemCountOrSubtype() == 0 || fromItem->getItemCountOrSubtype() == oldFromCount) {
+			if(!fromItem->isStackable() || fromItem->getItemCountOrSubtype() == 0 || count == oldFromCount) {
 				//remove item
 				/*msg.AddByte(0x72);
 				msg.AddByte(cid);
@@ -1705,7 +1708,11 @@ void Protocol74::sendThingMove(const Creature *creature, slots_t fromSlot,
 		}
 		else {
 			AddAppearThing(msg, toPos);
-			msg.AddItem(fromItem->getID(), count);
+			if(fromItem->isStackable()) {
+				msg.AddItem(fromItem->getID(), count);
+			}
+			else
+				msg.AddItem(fromItem);
 		}
 	}
 	
@@ -1780,8 +1787,8 @@ void Protocol74::sendThingMove(const Creature *creature, const Position &fromPos
 				//add item
 				/*msg.AddByte(0x70);
 				msg.AddByte(cid);
-				msg.AddItem(fromItem->getID(), count);*/
-				AddItemContainer(msg,cid,fromItem,count);
+				msg.AddItem(fromItem);*/
+				AddItemContainer(msg,cid,fromItem);
 			}
 		}
 	}

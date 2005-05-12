@@ -1003,28 +1003,19 @@ void Game::thingMoveInternal(Creature *player,
 						int newToCount = std::min(100, oldToCount + count);
 						toItem->setItemCountOrSubtype(newToCount);
 
-						int subcount = std::max(oldToCount + count - 100, oldFromCount - count);
+						int subcount = oldFromCount - count;
 						fromItem->setItemCountOrSubtype(subcount);
 
-						if(oldToCount + count  > 100) {
-							int surplusCount = oldToCount + count  - 100;
-							if(surplusCount == fromItem->getItemCountOrSubtype()) {
-								if(onPrepareMoveThing(p, fromItem, fromContainer, toContainer, NULL)) {
-									if(fromContainer->removeItem(fromItem)) {
-										toContainer->addItem(fromItem);
-									}
-								}
-								else
-									count -= surplusCount; //re-define the actual amount we move.
-							} else {
-								Item *surplusItem = Item::CreateItem(fromItem->getID(), surplusCount);
-								if(onPrepareMoveThing(p, surplusItem, fromContainer, toContainer, NULL)) {
-									toContainer->addItem(surplusItem);
-								}
-								else {
-									delete surplusItem;
-									count -= surplusCount; //re-define the actual amount we move.
-								}
+						int surplusCount = oldToCount + count  - 100;
+						if(surplusCount > 0) {
+							Item *surplusItem = Item::CreateItem(fromItem->getID(), surplusCount);
+							if(onPrepareMoveThing(p, surplusItem, fromContainer, toContainer, NULL)) {
+								toContainer->addItem(surplusItem);
+							}
+							else {
+								delete surplusItem;
+								count -= surplusCount; //re-define the actual amount we move.
+								fromItem->setItemCountOrSubtype(fromItem->getItemCountOrSubtype() + surplusCount);
 							}
 						}
 					}
@@ -1097,10 +1088,12 @@ void Game::thingMoveInternal(Creature *player,
 							int newToCount = std::min(100, oldToCount + count);
 							toItem->setItemCountOrSubtype(newToCount);
 
-							int subcount = std::max(oldToCount + count - 100, oldFromCount - count);
+							int subcount = oldFromCount - count;
 							fromItem->setItemCountOrSubtype(subcount);
 
-							if(oldToCount + count > 100) {
+							int surplusCount = oldToCount + count  - 100;
+							if(surplusCount > 0) {
+								fromItem->setItemCountOrSubtype(fromItem->getItemCountOrSubtype() + surplusCount);
 								player->sendCancel("Sorry not enough room.");
 							}
 
@@ -1152,10 +1145,12 @@ void Game::thingMoveInternal(Creature *player,
 							int newToCount = std::min(100, oldToCount + count);
 							toItem->setItemCountOrSubtype(newToCount);
 
-							int subcount = std::max(oldToCount + count - 100, oldFromCount - count);
+							int subcount = oldFromCount - count;
 							fromItem->setItemCountOrSubtype(subcount);
 
-							if(oldToCount + count > 100) {
+							int surplusCount = oldToCount + count  - 100;
+							if(surplusCount > 0) {
+								fromItem->setItemCountOrSubtype(fromItem->getItemCountOrSubtype() + surplusCount);
 								player->sendCancel("Sorry not enough room.");
 							}
 
@@ -1229,29 +1224,20 @@ void Game::thingMoveInternal(Creature *player,
 							int newToCount = std::min(100, oldToCount + count);
 							toItem->setItemCountOrSubtype(newToCount);
 
-							int subcount = std::max(oldToCount + count - 100, oldFromCount - count);
+							int subcount = oldFromCount - count;
 							fromItem->setItemCountOrSubtype(subcount);
 
-							if(oldToCount + count > 100) {
-								int surplusCount = oldToCount + count  - 100;
-								if(surplusCount == fromItem->getItemCountOrSubtype()) {
-									if(onPrepareMoveThing(player, fromItem, NULL, toContainer, NULL)) {
-										p->removeItemInventory(from_cid, true);
-										toContainer->addItem(fromItem);
-									}
-									else
-										count -= surplusCount; //re-define the actual amount we move.
+							int surplusCount = oldToCount + count  - 100;
+							if(surplusCount > 0) {
+								Item *surplusItem = Item::CreateItem(fromItem->getID(), surplusCount);
+
+								if(onPrepareMoveThing(player, surplusItem, NULL, toContainer, NULL)) {
+									toContainer->addItem(surplusItem);
 								}
 								else {
-									Item *surplusItem = Item::CreateItem(fromItem->getID(), surplusCount);
-
-									if(onPrepareMoveThing(player, surplusItem, NULL, toContainer, NULL)) {
-										toContainer->addItem(surplusItem);
-									}
-									else {
-										delete surplusItem;
-										count -= surplusCount; //re-define the actual amount we move.
-									}
+									delete surplusItem;
+									count -= surplusCount; //re-define the actual amount we move.
+									fromItem->setItemCountOrSubtype(fromItem->getItemCountOrSubtype() + surplusCount);
 								}
 							}
 						}
@@ -1314,12 +1300,12 @@ void Game::thingMoveInternal(Creature *player,
 			
 			Position fromPos = (fromContainer->pos.x == 0xFFFF ? player->pos : fromContainer->pos);			
 			Item *fromItem = dynamic_cast<Item*>(fromContainer->getItem(from_slotid));
+			Item *toItem = dynamic_cast<Item*>(toTile->getThingByStackPos(toTile->getThingCount() - 1));
 
-			if(!fromItem)
+			if(!fromItem || (toItem == fromItem) || (fromItem->isStackable() && count > fromItem->getItemCountOrSubtype()))
 				return;
 
 			if(onPrepareMoveThing(p, fromItem, fromPos, toPos) && onPrepareMoveThing(p, fromItem, NULL, toTile)) {
-				Item *toItem = dynamic_cast<Item*>(toTile->getThingByStackPos(toTile->getThingCount() - 1));
 				int oldFromCount = fromItem->getItemCountOrSubtype();
 				int oldToCount = 0;
 
@@ -1332,21 +1318,15 @@ void Game::thingMoveInternal(Creature *player,
 						int newToCount = std::min(100, oldToCount + count);
 						toItem->setItemCountOrSubtype(newToCount);
 
-						int subcount = std::max(oldToCount + count - 100, oldFromCount - count);
+						int subcount = oldFromCount - count;
 						fromItem->setItemCountOrSubtype(subcount);
 
-						if(oldToCount + count > 100) {
-							int surplusCount = oldToCount + count  - 100;
-							if(surplusCount == fromItem->getItemCountOrSubtype()) {
-								if(fromContainer->removeItem(fromItem)) {
-									toTile->addThing(fromItem);
-								}
-							} else {
-								Item *surplusItem = Item::CreateItem(fromItem->getID(), surplusCount);
-								surplusItem->pos = toPos;
-								
-								toTile->addThing(surplusItem);
-							}
+						int surplusCount = oldToCount + count  - 100;
+						if(surplusCount > 0) {
+							Item *surplusItem = Item::CreateItem(fromItem->getID(), surplusCount);
+							surplusItem->pos = toPos;
+							
+							toTile->addThing(surplusItem);
 						}
 
 						if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() == 0) {
@@ -1415,21 +1395,15 @@ void Game::thingMoveInternal(Creature *player,
 						int newToCount = std::min(100, oldToCount + count);
 						toItem->setItemCountOrSubtype(newToCount);
 
-						int subcount = std::max(oldToCount + count - 100, oldFromCount - count);
+						int subcount = oldFromCount - count;
 						fromItem->setItemCountOrSubtype(subcount);
 
-						if(oldToCount + count > 100) {
-							int surplusCount = oldToCount + count  - 100;
-							if(surplusCount == fromItem->getItemCountOrSubtype()) {
-								if(fromContainer->removeItem(fromItem)) {
-									toTile->addThing(fromItem);
-								}
-							} else {
-								Item *surplusItem = Item::CreateItem(fromItem->getID(), surplusCount);
-								surplusItem->pos = toPos;
-								
-								toTile->addThing(surplusItem);
-							}
+						int surplusCount = oldToCount + count  - 100;
+						if(surplusCount > 0) {
+							Item *surplusItem = Item::CreateItem(fromItem->getID(), surplusCount);
+							surplusItem->pos = toPos;
+							
+							toTile->addThing(surplusItem);
 						}
 
 						if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() == 0) {
@@ -1497,30 +1471,33 @@ void Game::thingMoveInternal(Creature *player, const Position& fromPos, unsigned
 		Container *toContainer = NULL;
 
 		Item *fromItem = dynamic_cast<Item*>(fromTile->getThingByStackPos(stackPos));
+		Item *toItem = NULL;
 
 		if(!fromItem)
 			return;
 
 		if(toInventory) {
-			Item *toSlot = p->getItem(to_cid);
-			toContainer = dynamic_cast<Container*>(toSlot);
+			toItem = p->getItem(to_cid);
+			toContainer = dynamic_cast<Container*>(toItem);
 		}
 		else {
 			toContainer = p->getContainer(to_cid);
 			if(!toContainer)
 				return;
 
-			Item *toSlot = toContainer->getItem(to_slotid);
-			Container *toSlotContainer = dynamic_cast<Container*>(toContainer->getItem(to_slotid));
+			toItem = toContainer->getItem(to_slotid);
+			Container *toSlotContainer = dynamic_cast<Container*>(toItem);
 
 			if(toSlotContainer) {
 				toContainer = toSlotContainer;
+				toItem = NULL;
 			}
 		}
 
-		if(toContainer) {
-			Item *toItem = toContainer->getItem(to_slotid);
+		if(!fromItem || (toItem == fromItem) || (fromItem->isStackable() && count > fromItem->getItemCountOrSubtype()))
+			return;
 
+		if(toContainer) {
 			if(onPrepareMoveThing(player, fromItem, fromPos, p->pos) &&
 				 onPrepareMoveThing(player, fromItem, NULL, toContainer, toItem))
 			{
@@ -1535,30 +1512,20 @@ void Game::thingMoveInternal(Creature *player, const Position& fromPos, unsigned
 						int newToCount = std::min(100, oldToCount + count);
 						toItem->setItemCountOrSubtype(newToCount);
 
-						int subcount = std::max(oldToCount + count - 100, oldFromCount - count);
+						int subcount = oldFromCount - count;
 						fromItem->setItemCountOrSubtype(subcount);
 
-						if(oldToCount + count > 100) {
-							int surplusCount = oldToCount + count  - 100;
-							if(surplusCount == fromItem->getItemCountOrSubtype()) {
-								if(onPrepareMoveThing(player, fromItem, NULL, toContainer, NULL)) {
-									if(fromTile->removeThing(fromItem)) {
-										toContainer->addItem(fromItem);
-									}
-								}
-								else
-									count -= surplusCount; //re-define the actual amount we move.
+						int surplusCount = oldToCount + count  - 100;
+						if(surplusCount > 0) {
+							Item *surplusItem = Item::CreateItem(fromItem->getID(), surplusCount);
+
+							if(onPrepareMoveThing(player, surplusItem, NULL, toContainer, NULL)) {
+								toContainer->addItem(surplusItem);
 							}
 							else {
-								Item *surplusItem = Item::CreateItem(fromItem->getID(), surplusCount);
-
-								if(onPrepareMoveThing(player, surplusItem, NULL, toContainer, NULL)) {
-									toContainer->addItem(surplusItem);
-								}
-								else {
-									delete surplusItem;
-									count -= surplusCount; //re-define the actual amount we move.
-								}
+								delete surplusItem;
+								count -= surplusCount; //re-define the actual amount we move.
+								fromItem->setItemCountOrSubtype(fromItem->getItemCountOrSubtype() + surplusCount);
 							}
 						}
 
@@ -1600,7 +1567,6 @@ void Game::thingMoveInternal(Creature *player, const Position& fromPos, unsigned
 		//Put on equipment from ground
 		else if(toInventory) {
 			if(onPrepareMoveThing(p, fromPos, fromItem, (slots_t)to_cid) && onPrepareMoveThing(p, fromItem, (slots_t)to_cid)) {
-				Item *toItem = p->getItem(to_cid);
 				int oldFromCount = fromItem->getItemCountOrSubtype();
 				int oldToCount = 0;
 				int stackpos = fromTile->getThingStackPos(fromItem);
@@ -1612,10 +1578,12 @@ void Game::thingMoveInternal(Creature *player, const Position& fromPos, unsigned
 						int newToCount = std::min(100, oldToCount + count);
 						toItem->setItemCountOrSubtype(newToCount);
 
-						int subcount = std::max(oldToCount + count - 100, oldFromCount - count);
+						int subcount = oldFromCount - count;
 						fromItem->setItemCountOrSubtype(subcount);
 
-						if(oldToCount + count > 100) {
+						int surplusCount = oldToCount + count  - 100;
+						if(surplusCount > 0) {
+							fromItem->setItemCountOrSubtype(fromItem->getItemCountOrSubtype() + surplusCount);
 							p->sendCancel("Sorry not enough room.");
 						}
 
