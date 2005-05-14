@@ -348,12 +348,14 @@ void Map::setTile(unsigned short _x, unsigned short _y, unsigned char _z, unsign
     tile = new Tile();
 		if(groundId != 0 && Item::items[groundId].groundtile) {
 			tile->ground = Item::CreateItem(groundId);
+
+			tile->ground->pos.x = _x;
+			tile->ground->pos.y = _y;
+			tile->ground->pos.z = _z;
 		}
-    tileMaps[_x & 0x1F][_y & 0x1F][_z][(_x << 16) | _y] = tile;
-  }  
-  tile->ground->pos.x = _x;
-  tile->ground->pos.y = _y;
-  tile->ground->pos.z = _z;
+
+		tileMaps[_x & 0x1F][_y & 0x1F][_z][(_x << 16) | _y] = tile;
+  } 
 }
 
 Position Map::placeCreature(Creature* c){
