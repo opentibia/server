@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+
+<actions>
+
+<action itemid="2674" script="food.lua" />
+<action itemid="2676" script="food.lua" />
+<action itemid="2697" script="food.lua" />
+<action itemid="1386" script="teleport.lua" />
+<action itemid="430" script="teleport.lua" />
+<action itemid="2554" script="shovel.lua" />
+
+</actions>
