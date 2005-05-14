@@ -193,6 +193,8 @@ protected:
 
   virtual void onCreatureAppear(const Creature *creature);
   virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos, bool tele);
+  virtual void onThingDisappear(const Thing* thing, unsigned char stackPos);
+  virtual void onThingAppear(const Thing* thing);
   virtual void onTeleport(const Creature *creature, const Position *oldPos, unsigned char oldstackpos);
 
 	virtual bool isAttackable() const { return true; };

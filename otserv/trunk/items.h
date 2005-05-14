@@ -74,6 +74,7 @@ public:
 	int  magicfieldtype;
 	bool iscontainer;
 	bool fluidcontainer;
+	bool iskey;
 	bool stackable;
 	bool multitype;
 	bool useable;

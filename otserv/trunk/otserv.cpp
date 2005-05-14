@@ -38,7 +38,7 @@
 
 #include "status.h"
 #include "spells.h"
-
+#include "actions.h"
 //#include "spawn.h"
 
 #include "luascript.h"
@@ -58,6 +58,7 @@ LuaScript g_config;
 Items Item::items;
 Game g_game;
 Spells spells(&g_game);
+Actions actions(&g_game);
 //SpawnManager spawnmanager;
 #if defined __EXCEPTION_TRACER__
 #include "exception.h"
@@ -283,10 +284,20 @@ int main(int argc, char *argv[])
   }
   std::cout << "[done]" << std::endl;
 
-std::cout << ":: Loading spells spells.xml... ";
+  //load spells data
+  std::cout << ":: Loading spells spells.xml... ";
   if (!spells.loadFromXml())
   {
     ErrorMessage("Unable to load spells.xml!");
+    return -1;
+  }
+  std::cout << "[done]" << std::endl;
+  
+  //load actions data
+  std::cout << ":: Loading actions actions.xml... ";
+  if(!actions.loadFromXml())
+  {
+	ErrorMessage("Unable to load actions.xml!");
     return -1;
   }
   std::cout << "[done]" << std::endl;

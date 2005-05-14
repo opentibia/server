@@ -41,8 +41,9 @@
 
 #include "tasks.h"
 #include "otsystem.h"
-
+#include "actions.h"
 extern LuaScript g_config;
+extern Actions actions;
 std::map<long, Creature*> channel;
 
 Protocol74::Protocol74(SOCKET s)
@@ -722,96 +723,21 @@ void Protocol74::parseSetOutfit(NetworkMessage &msg)
 
 void Protocol74::parseUseItemEx(NetworkMessage &msg)
 {
-	unsigned short from_x = msg.GetU16();
-	unsigned short from_y = msg.GetU16();
-	unsigned char from_z = msg.GetByte();
-	/*unsigned short itemid =*/ msg.GetU16();
+	//unsigned short from_x = msg.GetU16();
+	//unsigned short from_y = msg.GetU16();
+	//unsigned char from_z = msg.GetByte();
+	Position pos_from = msg.GetPosition();
+	unsigned short itemid = msg.GetU16();
 	unsigned char from_stackpos = msg.GetByte();
-	unsigned short to_x = msg.GetU16();
-	unsigned short to_y = msg.GetU16();
-	unsigned char to_z = msg.GetByte();
+	//unsigned short to_x = msg.GetU16();
+	//unsigned short to_y = msg.GetU16();
+	//unsigned char to_z = msg.GetByte();
+	Position pos_to = msg.GetPosition();
 	/*unsigned short tile_id = */msg.GetU16();
-	/*unsigned char to_stackpos =*/ msg.GetByte();
-
-	Position pos;
-	pos.x = to_x;
-	pos.y = to_y;
-	pos.z = to_z;
-
-	if(from_x == 0xFFFF) {
-		if(from_y & 0x40) { // use item from container
-			unsigned char containerid = from_y & 0x0F;
-			Container* container = player->getContainer(containerid);
-			
-			if(!container)
-				return;
-
-			Item* runeitem = container->getItem(from_z);
-			if(!runeitem)
-				return;
-
-			if(game->creatureUseItem(player, pos, runeitem)) {
-				runeitem->setItemCharge(std::max((int)runeitem->getItemCharge() - 1, 0) );
-				
-				if(runeitem->getItemCharge() == 0) {
-					container->removeItem(runeitem);
-					delete runeitem;
-					
-					NetworkMessage msg;
-					for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
-						if(cit->second == container) {
-							//remove item
-							RemoveItemContainer(msg,cit->first,from_z);
-						}
-					}
-					WriteBuffer(msg);					
-				}
-			}
-		}
-		else // use item from inventory
-		{
-			Item* runeitem = player->getItem(from_y);
-			if(!runeitem)
-				return;
-			
-			if(game->creatureUseItem(player, pos, runeitem)) {
-				runeitem->setItemCharge(std::max((int)runeitem->getItemCharge() - 1, 0) );
-				
-				if(runeitem->getItemCharge() == 0) {
-					player->items[from_y] = NULL;
-					delete runeitem;
-					NetworkMessage netmsgs;
-					AddPlayerInventoryItem(netmsgs,player, from_y);
-					player->sendNetworkMessage(&netmsgs);
-				}
-			}
-		}
-	}
-	else // use item from ground
-	{
-		int dist_x = from_x - player->pos.x;
-		int dist_y = from_y - player->pos.y;
-		if(dist_x > 1 || dist_x < -1 || dist_y > 1 || dist_y < -1 || (from_z != player->pos.z))
-			return;
-			
-		Tile *t = game->getTile(from_x, from_y, from_z);
-		if(!t)
-			return;
+	unsigned char to_stackpos = msg.GetByte();
 		
-		Item *runeitem = (Item*)t->getThingByStackPos(from_stackpos);
-		if(!runeitem)
-			return;
-		
-		if(game->creatureUseItem(player, pos, runeitem)) {
-			runeitem->setItemCharge(std::max((int)runeitem->getItemCharge() - 1, 0) );
-			
-			if(runeitem->getItemCharge() == 0) {
-				t->removeThing(runeitem);
-				delete runeitem;
-				game->creatureBroadcastTileUpdated(Position(from_x, from_y, from_z));
-			}
-		}
-	}
+	game->playerUseItemEx(player,pos_from,from_stackpos, pos_to, to_stackpos, itemid);
+	
 }
 
 void Protocol74::sendContainer(unsigned char index, Container *container)
@@ -881,7 +807,7 @@ void Protocol74::parseUseItem(NetworkMessage &msg)
 	//03	5406	03	00626167						0801	00
 	unsigned short x = msg.GetU16();
 	unsigned short y = msg.GetU16();
-	unsigned char z = msg.GetByte();
+	unsigned char z = msg.GetByte();	
 	unsigned short item = msg.GetU16();
 	unsigned char stack = msg.GetByte();
 	unsigned char index = msg.GetByte();
@@ -896,7 +822,7 @@ void Protocol74::parseUseItem(NetworkMessage &msg)
 		Container *newcontainer = NULL;
 		Container *parentcontainer = NULL;
 
-  	if(x != 0xFFFF) {
+		if(x != 0xFFFF) {
 			if(std::abs(player->pos.x - x) > 1 || std::abs(player->pos.y - y) > 1)
 				return;
 
@@ -943,6 +869,10 @@ void Protocol74::parseUseItem(NetworkMessage &msg)
 				}
 			}
 		}
+	}// iscontainer
+	else{
+		Position pos(x,y,z);
+		game->playerUseItem(player, pos, stack, item);
 	}
 }
 
@@ -1325,7 +1255,7 @@ void Protocol74::AddTileUpdated(NetworkMessage &msg, const Position &pos)
 
 	//1D00	69	CF81	587C	07	9501C405C405C405C405C405C405780600C405C40500FF
   if (CanSee(pos.x, pos.y, pos.z))
-  {
+  {		
 	  msg.AddByte(0x69);
 	  msg.AddPosition(pos);
 
@@ -2232,12 +2162,15 @@ void Protocol74::sendThingTransform(const Thing* thing,int stackpos){
 	const Item *item = dynamic_cast<const Item*>(thing);
 	if(item){
 		NetworkMessage msg;
-		//AddTileUpdated(msg,thing->pos);		
-		
-		msg.AddByte(0x6B);
-		msg.AddPosition(thing->pos);
-		msg.AddByte(stackpos);	
-		msg.AddItem(item);
+		if(stackpos != 0){					
+			msg.AddByte(0x6B);
+			msg.AddPosition(thing->pos);
+			msg.AddByte(stackpos);	
+			msg.AddItem(item);
+		}
+		else{
+			AddTileUpdated(msg,thing->pos);
+		}
 		
 		WriteBuffer(msg);
 	}
@@ -2290,16 +2223,31 @@ void Protocol74::sendCreatureHealth(const Creature *creature){
 
 void Protocol74::sendItemAddContainer(const Container *container, const Item *item){
 	NetworkMessage msg;
-	//find cid for the container
-	for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit){
-		Container *tmpcontainer = cit->second;
-		if(container == cit->second){
-			AddItemContainer(msg,cit->first,item);
-			WriteBuffer(msg);
-			break;
-		}
-	}	
+	unsigned char cid = player->getContainerID(container);
+	if(cid != 0xFF){
+		AddItemContainer(msg,cid,item);
+		WriteBuffer(msg);
+	}
 }
+
+void Protocol74::sendItemRemoveContainer(const Container *container, const unsigned char slot){
+	NetworkMessage msg;
+	unsigned char cid = player->getContainerID(container);
+	if(cid != 0xFF){
+		RemoveItemContainer(msg,cid,slot);
+		WriteBuffer(msg);
+	}
+}
+
+void Protocol74::sendItemUpdateContainer(const Container *container, const Item* item,const unsigned char slot){
+	NetworkMessage msg;
+	unsigned char cid = player->getContainerID(container);
+	if(cid != 0xFF){
+		TransformItemContainer(msg,cid,slot,item);
+		WriteBuffer(msg);
+	}
+}
+
 
 ////////////// before at NetwrokMessage class
 void Protocol74::AddTextMessage(NetworkMessage &msg,MessageClasses mclass, const char* message)

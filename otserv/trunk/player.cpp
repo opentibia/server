@@ -1262,15 +1262,12 @@ void Player::onCreatureAppear(const Creature *creature)
 	if(thing)
   		client->sendThingAppear(thing);
 }
+
 void Player::onCreatureDisappear(const Creature *creature, unsigned char stackPos, bool tele /*= false*/)
 {
 	const Thing *thing = dynamic_cast<const Thing*>(creature);
 	if(thing)
   		client->sendThingDisappear(thing, stackPos, tele);
-}
-
-void Player::onThingDisappear(const Thing* thing, unsigned char stackPos){
-	client->sendThingDisappear(thing, stackPos, false);
 }
 
 void Player::onThingAppear(const Thing* thing){
@@ -1281,15 +1278,30 @@ void Player::onThingTransform(const Thing* thing,int stackpos){
 	client->sendThingTransform(thing,stackpos);
 }
 
-void Player::onCreatureTurn(const Creature *creature, unsigned char stackPos)
-{
-  client->sendCreatureTurn(creature, stackPos);
+void Player::onThingDisappear(const Thing* thing, unsigned char stackPos){
+	client->sendThingDisappear(thing, stackPos, false);
 }
-
+//auto-close containers
 void Player::onThingRemove(const Thing* thing){
 	client->sendThingRemove(thing);
 }
 
+void Player::onItemAddContainer(const Container* container,const Item* item){
+	client->sendItemAddContainer(container,item);
+}
+
+void Player::onItemRemoveContainer(const Container* container,const unsigned char slot){
+	client->sendItemRemoveContainer(container,slot);
+}
+
+void Player::onItemUpdateContainer(const Container* container,const Item* item,const unsigned char slot){
+	client->sendItemUpdateContainer(container,item,slot);
+}
+
+void Player::onCreatureTurn(const Creature *creature, unsigned char stackPos)
+{
+  client->sendCreatureTurn(creature, stackPos);
+}
 
 void Player::onCreatureSay(const Creature *creature, SpeakClasses type, const std::string &text)
 {

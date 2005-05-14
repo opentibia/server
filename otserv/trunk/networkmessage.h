@@ -77,25 +77,10 @@ public:
 	void AddItem(const Item *item);
   void AddCreature(const Creature *creature, bool known, unsigned int remove);
 
-/* MOVED TO PROTOCOL
-  // write functions for complete message blocks
-  void AddTextMessage(MessageClasses mclass, const char* message);
-  void AddAnimatedText(const Position &pos, unsigned char color, std::string text);
-
-  void AddMagicEffect(const Position &pos, unsigned char type);
-  void AddDistanceShoot(const Position &from, const Position &to, unsigned char type);
-  
-  void AddCreatureSpeak(const Creature *creature, unsigned char type, std::string text, unsigned short channelId);
-  void AddCreatureHealth(const Creature *creature);
-  
-  void AddPlayerInventoryItem(const Player *player, int item);
-  void AddPlayerSkills(const Player *player);
-  void AddPlayerStats(const Player *player);
-*/
   int getMessageLength(){
       return m_MsgSize;
       }
-	//NetworkMessage operator<<(NetworkMessage &add);
+
 	void JoinMessages(NetworkMessage &add);
 
 	

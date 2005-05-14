@@ -146,6 +146,17 @@ void Npc::onCreatureDisappear(const Creature *creature, unsigned char stackPos, 
 	this->script->onCreatureDisappear(creature->getID());
 }
 
+void Npc::onThingDisappear(const Thing* thing, unsigned char stackPos){
+	const Creature *creature = dynamic_cast<const Creature*>(thing);
+	if(creature)
+		this->script->onCreatureDisappear(creature->getID());
+}
+void Npc::onThingAppear(const Thing* thing){
+	const Creature *creature = dynamic_cast<const Creature*>(thing);
+	if(creature)
+		this->script->onCreatureAppear(creature->getID());
+}
+
 void Npc::onCreatureTurn(const Creature *creature, unsigned char stackpos){
 	//not implemented yet, do we need it?
 }

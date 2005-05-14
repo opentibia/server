@@ -120,9 +120,9 @@ public:
 		maxRange.y = std::max(topleft.y + 7, bottomright.y + 7) - topleft.y; //(bottomright.y - topleft.y);
 	}
 
-	Range(Position centerpos, int minRangeX, int maxRangeX, int minRangeY, int maxRangeY)
+	Range(Position centerpos, int minRangeX, int maxRangeX, int minRangeY, int maxRangeY, bool multilevel = true)
 	{
-		setRange(centerpos, true);
+		setRange(centerpos, multilevel);
 
 		minRange.x = -minRangeX;
 		minRange.y = -minRangeY;

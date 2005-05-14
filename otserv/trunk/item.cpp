@@ -23,12 +23,13 @@
 #include "definitions.h"
 #include "container.h"
 #include "magic.h"
+#include "player.h"
 
 #include <iostream>
 #include <sstream>
 #include <iomanip>
 
-Item* Item::CreateItem(const unsigned short _type, unsigned char _count /*= 0*/)
+Item* Item::CreateItem(const unsigned short _type, unsigned short _count /*= 0*/)
 {
 	if(items[_type].iscontainer)
 		return new Container(_type);
@@ -36,7 +37,7 @@ Item* Item::CreateItem(const unsigned short _type, unsigned char _count /*= 0*/)
 		return new Teleport(_type);
 	else if(items[_type].ismagicfield){		
 		return new Item(_type, _count);
-	}
+	}	
 	else
 		return new Item(_type, _count);
 }
@@ -55,12 +56,14 @@ void Item::setID(unsigned short newid) {
 
 //////////////////////////////////////////////////
 // return how many items are stacked or 0 if non stackable
-unsigned char Item::getItemCountOrSubtype() const {
+unsigned short Item::getItemCountOrSubtype() const {
 	if(isStackable() ) {
 		return count;
 	}
 	else if(isFluidContainer() || isMultiType())
 		return fluid;
+	else if(isKey())
+		return keyNumber;
 	else if(chargecount != 0)
 		return chargecount;	
 	else
@@ -73,6 +76,7 @@ Item::Item(const unsigned short _type) {
 	count = 0;
 	chargecount = 0;
 	fluid = 0;
+	keyNumber = 0;
 	throwRange = 6;
 	useCount = 0;
 	specialDescription = NULL;
@@ -107,11 +111,12 @@ Item* Item::tranform()
 	return item;
 }
 
-Item::Item(const unsigned short _type, unsigned char _count) {
+Item::Item(const unsigned short _type, unsigned short _count) {
 	id = _type;
 	count = 0;
 	chargecount = 0;
 	fluid = 0;
+	keyNumber = 0;
 	useCount = 0;
 	specialDescription = NULL;
 	text = NULL;
@@ -129,6 +134,8 @@ Item::Item(const unsigned short _type, unsigned char _count) {
 	}
 	else if(isFluidContainer() || isMultiType() )
 		fluid = _count;
+	else if(isKey())
+		keyNumber = _count;
 	else
 		chargecount = _count;
 	throwRange = 6;
@@ -141,6 +148,7 @@ Item::Item()
 	chargecount = 0;
 	throwRange = 6;
 	useCount = 0;
+	keyNumber = 0;
 	specialDescription = NULL;
 	text = NULL;
 }
@@ -273,6 +281,10 @@ bool Item::isWeapon() const
   return (items[id].weaponType != NONE && items[id].weaponType != AMO);
 }
 
+bool Item::isKey() const
+{
+	return items[id].iskey;
+}
 
 WeaponType Item::getWeaponType() const {
 	  return items[id].weaponType;
@@ -394,6 +406,7 @@ void Item::clearSpecialDescription(){
 	specialDescription = NULL;
 }
 
+//Teleport class
 Teleport::Teleport(const unsigned short _type) : Item(_type)
 {
 	useCount = 0;	
@@ -437,6 +450,3 @@ xmlNodePtr Teleport::serialize()
 
 	return xmlptr;
 }
-
-
-

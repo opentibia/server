@@ -699,6 +699,20 @@ void Monster::onCreatureDisappear(const Creature *creature, unsigned char stackP
 	OnCreatureLeave(creature);
 }
 
+void Monster::onThingDisappear(const Thing* thing, unsigned char stackPos){
+	const Creature *creature = dynamic_cast<const Creature*>(thing);
+	if(creature)
+		OnCreatureLeave(creature);
+}
+void Monster::onThingAppear(const Thing* thing){
+	const Creature *creature = dynamic_cast<const Creature*>(thing);
+	if(creature){
+		if(isInRange(creature->pos)) {
+			OnCreatureEnter(creature);
+		}
+	}
+}
+
 void Monster::onTeleport(const Creature *creature, const Position *oldPos, unsigned char oldstackpos)
 {
 	if(isInRange(creature->pos) && isInRange(*oldPos)) {

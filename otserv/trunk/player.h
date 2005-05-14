@@ -177,10 +177,20 @@ public:
 	virtual void dropLoot(Container *corpse);
 	virtual int getLookCorpse();
 	bool NeedUpdateStats();	
-	void onThingDisappear(const Thing* thing, unsigned char stackPos);
+	//ground	
 	void onThingAppear(const Thing* thing);  
 	void onThingTransform(const Thing* thing,int stackpos);
-	void onThingRemove(const Thing* thing);
+	void onThingDisappear(const Thing* thing, unsigned char stackPos);
+	void onThingRemove(const Thing* thing); //auto-close containers
+	//container
+	void onItemAddContainer(const Container* container,const Item* item);
+	void onItemRemoveContainer(const Container* container,const unsigned char slot);
+	void onItemUpdateContainer(const Container* container,const Item* item,const unsigned char slot);
+	//invnetory - for this use int sendInventory(unsigned char sl_id)
+	//void onItemAddInvnetory(const unsigned char sl_id);
+	//void onItemRemoveInvnetory(const unsigned char sl_id);
+	//void onItemUpdateInvnetory(const unsigned char sl_id);
+
 	void sendDistanceShoot(const Position &from, const Position &to, unsigned char type);
 	void sendMagicEffect(const Position &pos, unsigned char type);
 	void sendAnimatedText(const Position &pos, unsigned char color, std::string text);

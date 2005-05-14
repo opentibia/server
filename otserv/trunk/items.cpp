@@ -31,9 +31,9 @@ ItemType::ItemType()
 {
 	iscontainer     = false;
 	ismagicfield 	= false;
-	fluidcontainer	= false;
+	fluidcontainer	= false;		
 	stackable       = false;
-  multitype       = false;
+	multitype       = false;
 	useable	        = false;
 	notMoveable     = false;
 	alwaysOnTop     = false;
@@ -363,7 +363,7 @@ int Items::loadXMLInfos(std::string file)
 						itemtype->weight = atof(weight);
           			else
             			std::cout << "missing weight tag for item: " << id << std::endl;
-
+            			
 					// and optional properties
           			char* description = (char*)xmlGetProp(p, (xmlChar*)"descr");
           			if (description)
@@ -414,8 +414,7 @@ int Items::loadXMLInfos(std::string file)
 					char* type = (char*)xmlGetProp(p, (xmlChar*)"type");
 				  	if (type){
             			if (!strcmp(type, "container")){
-							// we have a container...
-							// TODO set that we got a container						
+							// we have a container...							
               				char* maxitems = (char*)xmlGetProp(p, (xmlChar*)"maxitems");
 							if (maxitems)
                 				itemtype->maxItems = atoi(maxitems);
@@ -576,12 +575,16 @@ int Items::loadXMLInfos(std::string file)
 							else
 	       						std::cout << "missing field type for field: " << id << std::endl;
 							
-						}
-					}//type
-				} 
+						}						
+						else if(!strcmp(type, "key"))
+						{
+							itemtype->iskey = true;							
+						}										
+					}//type					
+				}
 				else {
 					std::cout << "invalid item " << id << std::endl;
-				}//type
+				}	
 			}//item - id						
 			p = p->next;
 		}

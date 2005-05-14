@@ -50,6 +50,7 @@ using namespace std;
 
 #include "npc.h"
 #include "spells.h"
+#include "actions.h"
 #include "ioplayer.h"
 
 #include "luascript.h"
@@ -65,6 +66,7 @@ extern OTSYS_THREAD_LOCKVAR maploadlock;
 
 extern LuaScript g_config;
 extern Spells spells;
+extern Actions actions;
 extern std::map<long, Creature*> channel;
 extern std::vector< std::pair<unsigned long, unsigned long> > bannedIPs;
 
@@ -298,7 +300,7 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 		if(attackedplayer){
 			std::stringstream s;
 			s << "a dead human. You recognize " 
-				<< attackedplayer->getName() << "."; 				
+				<< attackedplayer->getName() << ". ";
 			if(attacker){
 				if(attackedplayer->sex != 0)
 					s << "He";
@@ -2844,8 +2846,23 @@ void Game::checkPlayer(unsigned long id)
 				return;
 			}
 				
-			if(!tile->isPz())
-				player->mana += min(5, player->manamax - player->mana);						
+			if(!tile->isPz()){
+				player->mana += min(5, player->manamax - player->mana);
+				if(player->food > 1000){
+					player->food -= thinkTicks;					
+					if(player->healthmax - player->health > 0){
+						player->health += min(5, player->healthmax - player->health);
+						std::vector<Creature*> list;
+						getSpectators(Range(creature->pos), list);
+
+						for(unsigned int i = 0; i < list.size(); i++){
+							Player* p = dynamic_cast<Player*>(list[i]);
+							if(p)
+								p->sendCreatureHealth(player);
+						}
+					}
+				}				
+			}
 			
 			int lastLv = player->level;
 			
@@ -3256,32 +3273,49 @@ bool Game::creatureSaySpell(Creature *creature, const std::string &text)
 }
 
 
-bool Game::creatureUseItem(Creature *creature, const Position& pos, Item* item)
+bool Game::playerUseItemEx(Player *player, const Position& posFrom,const unsigned char  stack_from,
+		const Position &posTo,const unsigned char stack_to, const unsigned short itemid)
 {
 	OTSYS_THREAD_LOCK(gameLock)
 	bool ret = false;
-	std::string var = std::string(""); 
-
+	Item *item = dynamic_cast<Item*>(getThing(posFrom,stack_from,player));
+	if(!item)
+		return ret;
+		
 	//Runes
 	std::map<unsigned short, Spell*>::iterator sit = spells.getAllRuneSpells()->find(item->getID());
 	if(sit != spells.getAllRuneSpells()->end()) {
-		if(sit->second->getMagLv() <= creature->maglevel || creature->access != 0)
+		std::string var = std::string(""); 
+		if(sit->second->getMagLv() <= player->maglevel || player->access != 0)
 		{
-			bool success = sit->second->getSpellScript()->castSpell(creature, pos, var);
+			bool success = sit->second->getSpellScript()->castSpell(player, posTo, var);
 			ret = success;
+			item->setItemCharge(std::max((int)item->getItemCharge() - 1, 0) );
+			if(item->getItemCharge() == 0) {				
+				sendRemoveThing(player,posFrom,item,stack_from);
+				removeThing(player,posFrom,item);
+			}
 		}
 		else
-		{
-			Player *p = dynamic_cast<Player *>(creature);
-			if(p)
-				p->sendCancel("You don't have the required magic level to use that rune.");
+		{			
+			player->sendCancel("You don't have the required magic level to use that rune.");
 		}
+	}
+	else{
+		actions.UseItemEx(player,posFrom,stack_from,posTo,stack_to,itemid);
 	}
 
 	OTSYS_THREAD_UNLOCK(gameLock)
 	return ret;
 }
 
+
+bool Game::playerUseItem(Player *player, const Position& pos, const unsigned char stackpos, const unsigned short itemid)
+{
+	OTSYS_THREAD_LOCK(gameLock)
+	actions.UseItem(player,pos,stackpos,itemid);
+	OTSYS_THREAD_UNLOCK(gameLock)
+}
 
 void Game::flushSendBuffers(){
 	OTSYS_THREAD_LOCK(gameLock)
@@ -3328,4 +3362,297 @@ void Game::FreeThing(Thing* thing){
 	ToReleaseThings.push_back(thing);
 	OTSYS_THREAD_UNLOCK(gameLock)
 	return;
+}
+/*
+ADD
+container(player,pos-cid,thing)
+inventory(player,pos-i,[ignored])
+ground([ignored],postion,thing)
+
+REMOVE
+container(player,pos-cid,thing,autoclose?)
+inventory(player,pos-i,thing,autoclose?)
+ground([ignored],postion,thing,autoclose?,stackpos)
+
+UPDATE
+container(player,pos-cid,thing)
+inventory(player,pos-i,[ignored])
+ground([ignored],postion,thing,stackpos)
+*/
+void Game::sendAddThing(Player* player,const Position &pos,const Thing* thing){
+	if(pos.x == 0xFFFF) {		
+		if(!player)
+			return;
+		if(pos.y & 0x40) { //container
+			if(!thing)
+				return;
+								
+			const Item *item = dynamic_cast<const Item*>(thing);
+			if(!item)
+				return;
+								
+			unsigned char containerid = pos.y & 0x0F;
+			Container* container = player->getContainer(containerid);
+			if(!container)
+				return;
+			
+			std::vector<Creature*> list;
+			Position centerpos = (container->pos.x == 0xFFFF ? player->pos : container->pos);
+			map->getSpectators(Range(centerpos,2,2,2,2,false), list);
+			
+			if(!list.empty()) {
+				for(int i = 0; i < list.size(); ++i) {
+					Player *spectator = dynamic_cast<Player*>(list[i]);
+					if(spectator)
+						spectator->onItemAddContainer(container,item);
+				}
+			}
+			else
+				player->onItemAddContainer(container,item);
+
+		}
+		else //inventory
+		{
+			player->sendInventory(pos.y);
+		}
+	}
+	else //ground
+	{
+		if(!thing)
+			return;
+			
+		std::vector<Creature*> list;
+		map->getSpectators(Range(pos,true), list);		
+		for(unsigned int i = 0; i < list.size(); ++i) {
+			list[i]->onThingAppear(thing);
+		}			
+	}	
+}
+
+void Game::sendRemoveThing(Player* player,const Position &pos,const Thing* thing,const unsigned char stackpos /*=1*/ ,const bool autoclose/* =false*/){
+	if(!thing)
+		return;
+	
+	const Item *item = dynamic_cast<const Item*>(thing);
+	bool perform_autoclose = false;
+	if(item){
+		const Container *container = dynamic_cast<const Container*>(item);
+		if(container && autoclose)
+			perform_autoclose = true;		
+	}
+	
+	if(pos.x == 0xFFFF) {
+		if(!player)
+			return;		
+		if(pos.y & 0x40) { //container									
+			if(!item)
+				return;
+									
+			unsigned char containerid = pos.y & 0x0F;
+			Container* container = player->getContainer(containerid);
+			if(!container)
+				return;
+			//check that item is in the container
+			unsigned char slot = container->getSlotNumberByItem(item);
+			
+			std::vector<Creature*> list;
+			Position centerpos = (container->pos.x == 0xFFFF ? player->pos : container->pos);
+			map->getSpectators(Range(centerpos,2,2,2,2,false), list);
+			
+			if(!list.empty()) {
+				for(int i = 0; i < list.size(); ++i) {					
+					Player *spectator = dynamic_cast<Player*>(list[i]);
+					if(spectator){
+						spectator->onItemRemoveContainer(container,slot);
+						if(perform_autoclose){
+							spectator->onThingRemove(thing);
+						}
+					}
+				}
+			}
+			else{
+				player->onItemRemoveContainer(container,slot);
+				if(perform_autoclose){
+					player->onThingRemove(thing);
+				}
+			}
+
+		}
+		else //inventory
+		{
+			player->removeItemInventory(pos.y);	
+			if(perform_autoclose){
+				player->onThingRemove(thing);
+			}
+		}
+	}
+	else //ground
+	{		
+		std::vector<Creature*> list;
+		map->getSpectators(Range(pos,true), list);
+		for(unsigned int i = 0; i < list.size(); ++i) {			
+			list[i]->onThingDisappear(thing,stackpos);
+			Player *spectator = dynamic_cast<Player*>(list[i]);
+			if(perform_autoclose && spectator){
+				spectator->onThingRemove(thing);
+			}
+		}			
+	}
+}
+
+void Game::sendUpdateThing(Player* player,const Position &pos,const Thing* thing,const unsigned char stackpos/*=1*/){
+	
+	if(pos.x == 0xFFFF) {		
+		if(!player)
+			return;
+		if(pos.y & 0x40) { //container									
+			if(!thing)
+				return;
+				
+			const Item *item = dynamic_cast<const Item*>(thing);
+			if(!item)
+				return;
+									
+			unsigned char containerid = pos.y & 0x0F;
+			Container* container = player->getContainer(containerid);
+			if(!container)
+				return;
+			//check that item is in the container
+			unsigned char slot = container->getSlotNumberByItem(item);
+			
+			std::vector<Creature*> list;
+			Position centerpos = (container->pos.x == 0xFFFF ? player->pos : container->pos);
+			map->getSpectators(Range(centerpos,2,2,2,2,false), list);
+			
+			if(!list.empty()) {
+				for(int i = 0; i < list.size(); ++i) {					
+					Player *spectator = dynamic_cast<Player*>(list[i]);
+					if(spectator)
+						spectator->onItemUpdateContainer(container,item,slot);
+				}
+			}
+			else{
+				player->onItemUpdateContainer(container,item,slot);
+			}
+
+		}
+		else //inventory
+		{
+			player->sendInventory(pos.y);
+		}
+	}
+	else //ground
+	{		
+		if(!thing)
+			return;		
+		std::vector<Creature*> list;
+		map->getSpectators(Range(pos,true), list);
+		for(unsigned int i = 0; i < list.size(); ++i){
+			Player *spectator = dynamic_cast<Player*>(list[i]);
+			if(spectator)
+				spectator->onThingTransform(thing,stackpos);
+		}			
+	}
+}
+
+void Game::addThing(Player* player,const Position &pos,Thing* thing)
+{
+	if(pos.x == 0xFFFF) {
+		if(!player || !thing)
+			return;
+		Item *item = dynamic_cast<Item*>(thing);
+		if(!item)
+			return;
+		if(pos.y & 0x40) { //container								
+			unsigned char containerid = pos.y & 0x0F;
+			Container* container = player->getContainer(containerid);
+			if(!container)
+				return;
+			
+			container->addItem(item);
+		}
+		else //inventory
+		{
+			player->addItemInventory(item,pos.y,true);
+		}
+	}
+	else //ground
+	{
+		if(!thing)
+			return;
+		Tile *tile = map->getTile(pos.x, pos.y, pos.z);
+		if(tile)
+			tile->addThing(thing);	
+				
+	}		
+}
+
+void Game::removeThing(Player* player,const Position &pos,Thing* thing)
+{
+	if(!thing)
+		return;
+		
+	if(pos.x == 0xFFFF) {
+		if(!player)
+			return;		
+		if(pos.y & 0x40) { //container
+			Item *item = dynamic_cast<Item*>(thing);		
+			if(!item)
+				return;
+									
+			unsigned char containerid = pos.y & 0x0F;
+			Container* container = player->getContainer(containerid);
+			if(!container)
+				return;
+			//check that item is in the container
+			container->removeItem(item);
+		}
+		else //inventory
+		{
+			player->removeItemInventory(pos.y,true);	
+		}
+	}
+	else //ground
+	{		
+		Tile *tile = map->getTile(pos.x, pos.y, pos.z);
+		if(tile)
+			tile->removeThing(thing);
+	}	
+}
+
+Thing* Game::getThing(const Position &pos,unsigned char stack, Player* player /*=NULL*/)
+{	
+	if(pos.x == 0xFFFF) {
+		if(!player)
+			return NULL;
+		if(pos.y & 0x40) { //from container
+			unsigned char containerid = pos.y & 0x0F;
+			Container* container = player->getContainer(containerid);
+			if(!container)
+				return NULL;
+							
+			return container->getItem(pos.z);
+		}
+		else //from inventory
+		{
+			return player->getItem(pos.y);
+		}
+	}
+	else //from ground
+	{
+		if(player){
+			int dist_x = pos.x - player->pos.x;
+			int dist_y = pos.y - player->pos.y;
+			if(dist_x > 1 || dist_x < -1 || dist_y > 1 || dist_y < -1 || (pos.z != player->pos.z)){
+				player->sendCancel("Too far away.");
+				return NULL;
+			}
+		}
+		
+		Tile *t = getTile(pos.x, pos.y, pos.z);
+		if(!t)
+			return NULL;
+		
+		return t->getThingByStackPos(stack);
+	}	
 }

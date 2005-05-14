@@ -87,6 +87,8 @@ public:
   virtual void sendThingRemove(const Thing *thing) = 0;
   virtual void sendThingTransform(const Thing* thing,int stackpos) = 0;
   virtual void sendItemAddContainer(const Container *container, const Item *item) = 0;
+  virtual void sendItemRemoveContainer(const Container* container,const unsigned char slot) = 0;
+  virtual void sendItemUpdateContainer(const Container* container,const Item* item,const unsigned char slot) = 0;
   virtual void sendDistanceShoot(const Position &from, const Position &to, unsigned char type) = 0;
   virtual void sendMagicEffect(const Position &pos, unsigned char type) = 0;
   virtual void sendAnimatedText(const Position &pos, unsigned char color, std::string text) = 0;

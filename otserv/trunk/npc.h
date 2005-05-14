@@ -45,7 +45,7 @@ public:
 //	virtual void onThingMove(const Player *player, const Thing *thing, const Position *oldPos,
 //	unsigned char oldstackpos, unsigned char oldcount, unsigned char count);
 	virtual void onCreatureAppear(unsigned long cid);
-	virtual void onCreatureDisappear(int cid);
+	virtual void onCreatureDisappear(int cid);	
 //	virtual void onCreatureTurn(const Creature *creature, unsigned char stackpos);
 	virtual void onCreatureSay(int cid, SpeakClasses, const std::string &text);
 	virtual void onThink();
@@ -112,6 +112,8 @@ protected:
 		unsigned char oldstackpos, unsigned char oldcount, unsigned char count);
   virtual void onCreatureAppear(const Creature *creature);
   virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos, bool tele);
+  virtual void onThingDisappear(const Thing* thing, unsigned char stackPos);
+  virtual void onThingAppear(const Thing* thing);
   virtual void onCreatureTurn(const Creature *creature, unsigned char stackpos);
   virtual void onCreatureSay(const Creature *creature, SpeakClasses type, const std::string &text);
   virtual void onCreatureChangeOutfit(const Creature* creature);

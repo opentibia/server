@@ -144,9 +144,9 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name){
 						int sl_id = atoi((const char*)xmlGetProp(slot, (const xmlChar *)"slotid"));
 						unsigned int id = atoi((const char*)xmlGetProp(slot->children, (const xmlChar *) "id"));
 						Item* myitem = Item::CreateItem(id);
-						myitem->unserialize(slot->children);				
+						myitem->unserialize(slot->children);
 						//we dont want to sendinventory before login
-						player->addItemInventory(myitem, sl_id, true);						
+						player->addItemInventory(myitem, sl_id, true);
 						Container* default_container = dynamic_cast<Container*>(myitem);
 						if(default_container){							
 							LoadContainer(slot->children,default_container);
@@ -166,7 +166,7 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name){
 						unsigned int id = atoi((const char*)xmlGetProp(slot->children, (const xmlChar *) "id"));
 						Item* myitem = Item::CreateItem(id);
 						myitem->unserialize(slot->children);
-						Container* default_container = dynamic_cast<Container*>(myitem);						
+						Container* default_container = dynamic_cast<Container*>(myitem);
 						if(default_container){							
 							player->addDepot(default_container , dp_id);
 							LoadContainer(slot->children,default_container);
@@ -291,7 +291,8 @@ bool IOPlayerXML::savePlayer(Player* player){
 	pn = xmlNewNode(NULL,(const xmlChar*)"health");
 	sb << player->health;     xmlSetProp(pn, (const xmlChar*) "now", (const xmlChar*)sb.str().c_str());        sb.str("");
 	sb << player->healthmax;  xmlSetProp(pn, (const xmlChar*) "max", (const xmlChar*)sb.str().c_str());        sb.str("");
-	                     xmlSetProp(pn, (const xmlChar*) "food", (const xmlChar*)"0");	   
+	sb << player->food;  	  xmlSetProp(pn, (const xmlChar*) "food", (const xmlChar*)sb.str().c_str());       sb.str("");
+	                     
 	xmlAddChild(root, pn);
 	
 	pn = xmlNewNode(NULL,(const xmlChar*)"mana");
@@ -326,8 +327,8 @@ bool IOPlayerXML::savePlayer(Player* player){
    	  if (player->items[i])
           {
     	  pn = xmlNewNode(NULL,(const xmlChar*)"slot");
-    	  sb << i;                             
-          xmlSetProp(pn, (const xmlChar*) "slotid", (const xmlChar*)sb.str().c_str());            
+    	  sb << i;
+          xmlSetProp(pn, (const xmlChar*) "slotid", (const xmlChar*)sb.str().c_str());
           sb.str("");
           
 		nn = player->items[i]->serialize();

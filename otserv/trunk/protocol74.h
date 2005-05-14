@@ -185,6 +185,8 @@ private:
 	void sendContainer(unsigned char index, Container *container);
 	void sendCloseContainer(unsigned char containerid);
 	void sendItemAddContainer(const Container *container, const Item *item);
+	void sendItemRemoveContainer(const Container* container,const unsigned char slot);
+	void sendItemUpdateContainer(const Container* container,const Item* item,const unsigned char slot);
 
 	// translate a tile to clientreadable format
   void GetTileDescription(const Tile* tile, NetworkMessage &msg);

@@ -143,8 +143,8 @@ class Game {
 	  */
 		bool removeCreature(Creature* c);
 
-		uint32_t getPlayersOnline() {return (uint32_t)AutoList<Creature>::list.size();};
-		//uint32_t getPlayersOnline() {return (uint32_t)AutoList<Player>::list.size();};
+		//uint32_t getPlayersOnline() {return (uint32_t)AutoList<Creature>::list.size();};
+		uint32_t getPlayersOnline() {return (uint32_t)AutoList<Player>::list.size();};
 
     void thingMove(Creature *player, Thing *thing,
         unsigned short to_x, unsigned short to_y, unsigned char to_z, unsigned char count);
@@ -199,12 +199,17 @@ class Game {
 	bool creatureThrowRune(Creature *creature, const Position& centerpos, const MagicEffectClass& me);
 	bool creatureCastSpell(Creature *creature, const Position& centerpos, const MagicEffectClass& me);
 	bool creatureSaySpell(Creature *creature, const std::string &text);
-	bool creatureUseItem(Creature *creature, const Position& pos, Item* item);
+	//bool creatureUseItem(Creature *creature, const Position& pos, Item* item);
+	bool playerUseItemEx(Player *player, const Position& posFrom,const unsigned char  stack_from,
+		const Position &posTo,const unsigned char stack_to, const unsigned short itemid);
+	bool playerUseItem(Player *player, const Position& pos, const unsigned char stackpos, const unsigned short itemid);
+	//bool playerUseItemEx(...);
     void changeOutfitAfter(unsigned long id, int looktype, long time);
     void changeSpeed(unsigned long id, unsigned short speed);
     void addEvent(long ticks, int type, void *data);
 	void addEvent(SchedulerTask*);
 	void creatureBroadcastTileUpdated(const Position& pos);
+	void teleport(Thing *thing, Position newPos);
       
    std::vector<Player*> BufferedPlayers;   
    void flushSendBuffers();
@@ -212,6 +217,15 @@ class Game {
    
    std::vector<Thing*> ToReleaseThings;   
    void FreeThing(Thing* thing);
+
+   Thing* getThing(const Position &pos,unsigned char stack,Player* player = NULL);
+   void addThing(Player* player,const Position &pos,Thing* thing);
+   void removeThing(Player* player,const Position &pos,Thing* thing);
+   
+   void sendAddThing(Player* player,const Position &pos,const Thing* thing);
+   void sendRemoveThing(Player* player,const Position &pos,const Thing* thing,const unsigned char stackpos = 1,const bool autoclose = false);
+   void sendUpdateThing(Player* player,const Position &pos,const Thing* thing,const unsigned char stackpos = 1);
+		
    
     Creature* getCreatureByID(unsigned long id);
 	Creature* getCreatureByName(const char* s);
@@ -258,7 +272,7 @@ class Game {
 		void changeOutfit(unsigned long id, int looktype);
 		bool creatureOnPrepareAttack(Creature *creature, Position pos);
 		void creatureMakeDamage(Creature *creature, Creature *attackedCreature, fight_t damagetype);
-		void teleport(Thing *thing, Position newPos);
+		//void teleport(Thing *thing, Position newPos);
 
 		bool creatureMakeMagic(Creature *creature, const Position& centerpos, const MagicEffectClass* me);
 		bool creatureOnPrepareMagicAttack(Creature *creature, Position pos, const MagicEffectClass* me);
