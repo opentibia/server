@@ -54,7 +54,8 @@ class Container : public Item
 		int size() const {return actualitems;};
 		int capacity() const {return maxitems;};
 		void setParent(Container* container) {parent = container;};
-		Container *getParent()  {return parent;}
+		Container *getParent() {return parent;}
+		Container *getParent() const {return parent;}
 
 		ContainerList::const_iterator getItems() const;     // begin();
 		ContainerList::const_iterator getEnd() const;       // iterator beyond the last element
