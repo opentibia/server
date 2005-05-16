@@ -113,3 +113,19 @@ void LuaScript::setField (const char *index, int val) {
       lua_pushnumber(luaState, (double)val);
       lua_settable(luaState, -3);
     }
+
+
+int LuaScript::getField (lua_State *L , const char *key) {
+      int result;
+      lua_pushstring(L, key);
+      lua_gettable(L, -2);  /* get table[key] */
+      result = (int)lua_tonumber(L, -1);
+      lua_pop(L, 1);  /* remove number and key*/
+      return result;
+}
+
+void LuaScript::setField (lua_State *L, const char *index, int val) {
+      lua_pushstring(L, index);
+      lua_pushnumber(L, (double)val);
+      lua_settable(L, -3);
+    }

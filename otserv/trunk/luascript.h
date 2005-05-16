@@ -42,6 +42,9 @@ public:
   int OpenFile(const char* file);
   int getField (const char *key);
   void LuaScript::setField (const char *index, int value);
+  //static version
+  static int getField (lua_State *L , const char *key);
+  static void setField (lua_State *L, const char *index, int val);
   // get a global string
   std::string getGlobalString(std::string var, const std::string &defString = "");
   int getGlobalNumber(std::string var, const int defNum = 0);
