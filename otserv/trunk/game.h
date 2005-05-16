@@ -146,6 +146,7 @@ class Game {
 		//uint32_t getPlayersOnline() {return (uint32_t)AutoList<Creature>::list.size();};
 		uint32_t getPlayersOnline() {return (uint32_t)AutoList<Player>::list.size();};
 
+	
     void thingMove(Creature *player, Thing *thing,
         unsigned short to_x, unsigned short to_y, unsigned char to_z, unsigned char count);
 	
@@ -203,7 +204,6 @@ class Game {
 	bool playerUseItemEx(Player *player, const Position& posFrom,const unsigned char  stack_from,
 		const Position &posTo,const unsigned char stack_to, const unsigned short itemid);
 	bool playerUseItem(Player *player, const Position& pos, const unsigned char stackpos, const unsigned short itemid);
-	//bool playerUseItemEx(...);
     void changeOutfitAfter(unsigned long id, int looktype, long time);
     void changeSpeed(unsigned long id, unsigned short speed);
     void addEvent(long ticks, int type, void *data);
@@ -316,6 +316,7 @@ class Game {
 		friend class GameState;
 		friend class Spawn;
 		friend class SpawnManager;
+		friend class ActionScript;
 };
 
 // from scheduler.h

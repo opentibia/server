@@ -3095,7 +3095,7 @@ void Game::decayItem(Item *item)
 			}
 			else {
 				mapstate.removeThing(tile, item);
-				//tile->removeThing(magicItem);				
+				//tile->removeThing(magicItem);	
 				//delete magicItem;
 				FreeThing(magicItem);
 			}			
@@ -3303,6 +3303,7 @@ bool Game::playerUseItemEx(Player *player, const Position& posFrom,const unsigne
 	}
 	else{
 		actions.UseItemEx(player,posFrom,stack_from,posTo,stack_to,itemid);
+		ret = true;
 	}
 
 	OTSYS_THREAD_UNLOCK(gameLock)
@@ -3640,15 +3641,6 @@ Thing* Game::getThing(const Position &pos,unsigned char stack, Player* player /*
 	}
 	else //from ground
 	{
-		if(player){
-			int dist_x = pos.x - player->pos.x;
-			int dist_y = pos.y - player->pos.y;
-			if(dist_x > 1 || dist_x < -1 || dist_y > 1 || dist_y < -1 || (pos.z != player->pos.z)){
-				player->sendCancel("Too far away.");
-				return NULL;
-			}
-		}
-		
 		Tile *t = getTile(pos.x, pos.y, pos.z);
 		if(!t)
 			return NULL;
