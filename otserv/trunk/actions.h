@@ -69,6 +69,7 @@ protected:
 	//use map
 	typedef std::map<unsigned short, Action*> ActionUseMap;
 	ActionUseMap useItemMap;
+	int canUse(const Player *player,const Position &pos) const;
 };
 
 enum tThingType{
@@ -79,18 +80,30 @@ enum tThingType{
 	thingTypeUnknown,
 };
 
+enum ePlayerInfo{
+	PlayerInfoFood,
+	PlayerInfoAccess,
+	PlayerInfoLevel,
+	PlayerInfoMagLevel,
+	PlayerInfoMana,
+	PlayerInfoHealth,
+	PlayerInfoName,
+	PlayerInfoPosition,	
+};
+
 struct KnownThing{
 	Thing *thing;
 	tThingType type;
 	PositionEx pos;	
 };
 
+
 class Action
 {
 public:
 	Action(Game* igame,std::string scriptname);
 	virtual ~Action();
-	bool isLoaded(){return loaded;}
+	bool isLoaded() const {return loaded;}
 	ActionScript *getScript(){return script;};
 	
 	void ClearMap();
@@ -107,7 +120,7 @@ protected:
 	std::map<unsigned int,KnownThing*> ThingMap;
 	unsigned int lastuid;
 	ActionScript *script;
-	bool loaded;
+	bool loaded;	
 };
 
 class ActionScript : protected LuaScript{
@@ -115,25 +128,51 @@ public:
 	ActionScript(Action* iaction,std::string scriptname);
 	virtual ~ActionScript(){}
 	bool execute(Player *player,Item* item, PositionEx &posFrom, PositionEx &posTo);
-	bool isLoaded(){return loaded;}
+	bool isLoaded()const {return loaded;}
 	static Action* getAction(lua_State *L);
-		
-	
 	//lua functions
 	static int luaActionDoRemoveItem(lua_State *L);
-	static int luaActionDoFeedPlayer(lua_State *L);
-	static int luaActionGetPlayerFood(lua_State *L);
+	static int luaActionDoFeedPlayer(lua_State *L);	
 	static int luaActionDoSendCancel(lua_State *L);
 	static int luaActionDoTeleportThing(lua_State *L);
 	static int luaActionDoTransformItem(lua_State *L);
-protected:		
+	static int luaActionDoPlayerSay(lua_State *L);
+	static int luaActionDoSendMagicEffect(lua_State *L);
+	static int luaActionDoChangeTypeItem(lua_State *L);
+	static int luaActionDoSendAnimatedText(lua_State *L);
+	
+	static int luaActionDoPlayerAddSkillTry(lua_State *L);
+	static int luaActionDoPlayerAddHealth(lua_State *L);
+	static int luaActionDoPlayerAddMana(lua_State *L);
+	static int luaActionDoPlayerAddItem(lua_State *L);
+	static int luaActionDoPlayerSendTextMessage(lua_State *L);
+	
+	//get player info functions
+	static int luaActionGetPlayerFood(lua_State *L);	
+	static int luaActionGetPlayerAccess(lua_State *L);
+	static int luaActionGetPlayerLevel(lua_State *L);
+	static int luaActionGetPlayerMagLevel(lua_State *L);
+	static int luaActionGetPlayerMana(lua_State *L);
+	static int luaActionGetPlayerHealth(lua_State *L);
+	static int luaActionGetPlayerName(lua_State *L);
+	static int luaActionGetPlayerPosition(lua_State *L);	
+	static int luaActionGetPlayerSkill(lua_State *L);
+	
+protected:			
+	
 	Action *_action;	
 	int registerFunctions();
-	bool loaded; 
-private:
-	void internalAddPositionEx(lua_State *L, PositionEx& pos);
+	bool loaded;	
+	
+	static void internalAddPositionEx(lua_State *L, const PositionEx& pos);
 	static void internalGetPositionEx(lua_State *L, PositionEx& pos);
-	void internalAddItem(lua_State *L, Item *item, unsigned int itemid);
+	static unsigned long internalGetNumber(lua_State *L);
+	static const char* internalGetString(lua_State *L);
+	static void internalAddThing(lua_State *L, const Thing *thing, const unsigned int thingid);
+	
+	static Position internalGetRealPosition(Player *player, const Position &pos);
+	static int internalGetPlayerInfo(lua_State *L, ePlayerInfo info);
+	
 };
 
 #endif // __actions_h_
