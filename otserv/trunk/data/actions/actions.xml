@@ -9,4 +9,8 @@
 <action itemid="430" script="teleport.lua" />
 <action itemid="2554" script="shovel.lua" />
 
+<action itemid="2006" script="fluids.lua" />
+<action itemid="2070" script="music.lua" />
+<action itemid="2580" script="fishing.lua" />
+
 </actions>
