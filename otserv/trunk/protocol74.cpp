@@ -1371,8 +1371,8 @@ void Protocol74::sendThingMove(const Creature *creature, const Container *fromCo
 					//add item
 					/*msg.AddByte(0x70);
 					msg.AddByte(cid);
-					msg.AddItem(fromItem->getID(), count);*/
-					AddItemContainer(msg,cid,fromItem,count);
+					msg.AddItem(fromItem);*/
+					AddItemContainer(msg,cid,fromItem);
 				}
 			}
 			else {
