@@ -207,6 +207,8 @@ void NetworkMessage::SkipBytes(int count)
 
 void NetworkMessage::AddByte(unsigned char value)
 {
+  if(!canAdd(1))
+    return;
   m_MsgBuf[m_ReadPos++] = value;
   m_MsgSize++;
 }
@@ -214,6 +216,8 @@ void NetworkMessage::AddByte(unsigned char value)
 
 void NetworkMessage::AddU16(unsigned short value)
 {
+  if(!canAdd(2))
+    return;
   m_MsgBuf[m_ReadPos++] = (unsigned char)(value);
   m_MsgBuf[m_ReadPos++] = (unsigned char)(value >> 8);
   m_MsgSize += 2;
@@ -222,6 +226,8 @@ void NetworkMessage::AddU16(unsigned short value)
 
 void NetworkMessage::AddU32(unsigned int value)
 {
+  if(!canAdd(4))
+    return;
   m_MsgBuf[m_ReadPos++] = (unsigned char)(value);
   m_MsgBuf[m_ReadPos++] = (unsigned char)(value >>  8);
   m_MsgBuf[m_ReadPos++] = (unsigned char)(value >> 16);
@@ -239,6 +245,8 @@ void NetworkMessage::AddString(const std::string &value)
 void NetworkMessage::AddString(const char* value)
 {
   unsigned short stringlen = (unsigned short) strlen(value);
+  if(!canAdd(stringlen+2))
+    return;
   AddU16(stringlen);
   strcpy((char*)m_MsgBuf + m_ReadPos, value);
   m_ReadPos += stringlen;
@@ -275,6 +283,8 @@ void NetworkMessage::AddItem(const Item *item)
 }
 
 void NetworkMessage::JoinMessages(NetworkMessage &add){
+	if(!canAdd(add.m_MsgSize))
+      return;
 	memcpy(&m_MsgBuf[m_ReadPos],&(add.m_MsgBuf[2]),add.m_MsgSize);
 	m_ReadPos += add.m_MsgSize;
   	m_MsgSize += add.m_MsgSize;

@@ -85,6 +85,9 @@ public:
 
 	
 protected:
+  inline bool canAdd(int size){
+    return (size + m_ReadPos < NETWORKMESSAGE_MAXSIZE);
+  };
   int m_MsgSize;
   int m_ReadPos;
 
