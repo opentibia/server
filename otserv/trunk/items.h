@@ -73,6 +73,7 @@ public:
 	bool ismagicfield;
 	int  magicfieldtype;
 	bool iscontainer;
+	bool isWrittable;
 	bool fluidcontainer;
 	bool iskey;
 	bool stackable;

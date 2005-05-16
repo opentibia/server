@@ -98,7 +98,7 @@ public:
 
     // get the number of items
     unsigned short getItemCountOrSubtype() const;
-	void setItemCountOrSubtype(unsigned char n) {count = n;};
+	void setItemCountOrSubtype(unsigned char n);
 
 	unsigned char getItemCharge() const {return chargecount;};
 	void setItemCharge(unsigned char n) {chargecount = n;};

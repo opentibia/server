@@ -57,7 +57,7 @@ void Item::setID(unsigned short newid) {
 //////////////////////////////////////////////////
 // return how many items are stacked or 0 if non stackable
 unsigned short Item::getItemCountOrSubtype() const {
-	if(isStackable() ) {
+	if(isStackable()) {
 		return count;
 	}
 	else if(isFluidContainer() || isMultiType())
@@ -69,6 +69,27 @@ unsigned short Item::getItemCountOrSubtype() const {
 	else
 		return 0;
 }
+
+void Item::setItemCountOrSubtype(unsigned char n)
+{
+	if(isStackable()){
+		if(n == 0){
+			count = 1;
+		}
+		else if(n > 100){
+			count = 100;
+		}
+		else{
+			count = n;
+		}
+	}
+	else if(isFluidContainer() || isMultiType())
+		fluid = n;
+	else if(isKey())
+		keyNumber = n;
+	else
+		chargecount = n;
+};
 
 
 Item::Item(const unsigned short _type) {
@@ -120,7 +141,8 @@ Item::Item(const unsigned short _type, unsigned short _count) {
 	useCount = 0;
 	specialDescription = NULL;
 	text = NULL;
-
+	setItemCountOrSubtype(_count);
+	/*
 	if(isStackable()){
 		if(_count == 0){
 			count = 1;
@@ -138,6 +160,7 @@ Item::Item(const unsigned short _type, unsigned short _count) {
 		keyNumber = _count;
 	else
 		chargecount = _count;
+	*/
 	throwRange = 6;
 }
 
@@ -173,12 +196,16 @@ int Item::unserialize(xmlNodePtr p){
 		text = new std::string(tmp);
 	
 	tmp=(const char*)xmlGetProp(p, (const xmlChar *) "count");
+	/*
 	if(tmp && isStackable() )
 		count=atoi(tmp);
 	else if(tmp && (isFluidContainer() || isMultiType()))
 		fluid=atoi(tmp);
 	else if(tmp)
 		chargecount=atoi(tmp);	
+	*/
+	if(tmp)
+		setItemCountOrSubtype(atoi(tmp));
 	
 	return 0;
 }
@@ -202,7 +229,7 @@ xmlNodePtr Item::serialize(){
 		s << *text;
 		xmlSetProp(ret, (const xmlChar*)"text", (const xmlChar*)s.str().c_str());
 	}
-	
+	/*
 	s.str(""); //empty the stringstream
 	if(isStackable()){		
 		s << (int)count;
@@ -216,7 +243,12 @@ xmlNodePtr Item::serialize(){
 		s << (int)getItemCharge();
 		xmlSetProp(ret, (const xmlChar*)"count", (const xmlChar*)s.str().c_str());
 	}
-	
+	*/
+	s.str(""); //empty the stringstream
+	if(getItemCountOrSubtype() != 0){
+		s << getItemCountOrSubtype();
+		xmlSetProp(ret, (const xmlChar*)"count", (const xmlChar*)s.str().c_str());
+	}
 		
 	return ret;
 }

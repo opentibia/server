@@ -254,11 +254,11 @@ int Items::loadFromDat(std::string file)
         case 0x14: // player color templates
             break;
 
-				case 0x07: // writtable objects
+				case 0x07: // writtable objects					
                     fgetc(f); //max characters that can be written in it (0 unlimited)
                     fgetc(f); //max number of  newlines ? 0, 2, 4, 7
 				    break;
-				case 0x08: // writtable objects that can't be edited 
+				case 0x08: // writtable objects that can't be edited 					
                     fgetc(f); //always 0 max characters that can be written in it (0 unlimited) 
                     fgetc(f); //always 4 max number of  newlines ? 
 				    break;
@@ -279,7 +279,39 @@ int Items::loadFromDat(std::string file)
 				    break;
 				//new from 7.4    
 				case 0x1D:  // line spot ...
-                    fgetc(f); // 86 -> openable holes, 77-> can be used to go down, 76 can be used to go up, 82 -> stairs up, 79 switch,    
+                    optbyte = fgetc(f); // 86 -> openable holes, 77-> can be used to go down, 76 can be used to go up, 82 -> stairs up, 79 switch,    
+                    switch(optbyte){
+					case 0x4C: //ladders
+						break;
+					case 0x4D: //crate
+						break;
+					case 0x4E: //rope spot?
+						break;
+					case 0x4F: //switch
+						break;
+					case 0x50: //doors
+						break;
+					case 0x51: //doors?
+						break;
+					case 0x52: //stairs
+						break;
+					case 0x53: //mailbox
+						break;
+					case 0x54: //depot
+						break;
+					case 0x55: //trash
+						break;
+					case 0x56: //hole
+						break;
+					case 0x57: //items with special description?
+						break;					
+					case 0x58: //writtable
+						iType->isWrittable = true;
+						break;
+					default:
+						std::cout << "unknown action byte: " << (unsigned short)optbyte << std::endl;
+						break;
+					}
                     fgetc(f); // always 4                  
                     break;         
 				case 0x1B:  // walls 2 types of them same material (total 4 pairs)                  
