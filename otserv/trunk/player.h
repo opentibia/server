@@ -246,9 +246,11 @@ protected:
 	virtual void onThingMove(const Creature *creature, const Thing *thing, const Position *oldPos,
 		unsigned char oldstackpos, unsigned char oldcount, unsigned char count);
 
-	void addSkillTryInternal(int skilltry,int skill,std::string &skillname);
+	void addSkillTryInternal(int skilltry,int skill);
+	std::string Player::getSkillName(int skillid);
 
   friend class Game;
+  friend class ActionScript;
   friend class Map;
 
 	Protocol *client;

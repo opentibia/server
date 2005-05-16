@@ -778,7 +778,7 @@ void Player::addSkillTry(int skilltry)
                     case MAGIC: return;	break;//TODO: should add skill try?
 					default: skill = 0; skillname = "fist fighting"; break;
 			 	}//switch
-			 	addSkillTryInternal(skilltry,skill,skillname);
+			 	addSkillTryInternal(skilltry,skill);
 			}			
 		}
 	}
@@ -786,12 +786,12 @@ void Player::addSkillTry(int skilltry)
 
 void Player::addSkillShieldTry(int skilltry){
 	//look for a shield
-	std::string skillname = "shielding";
+	
 	for (int slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++) {
 		if (items[slot]) {
 			if (items[slot]->isWeapon()) {
 				if (items[slot]->getWeaponType() == SHIELD) {
-					addSkillTryInternal(skilltry,5,skillname);
+					addSkillTryInternal(skilltry,5);
 					break;
 			 	}			 	
 			}			
@@ -799,14 +799,45 @@ void Player::addSkillShieldTry(int skilltry){
 	}	
 }
 
-void Player::addSkillTryInternal(int skilltry,int skill,std::string &skillname){
+std::string Player::getSkillName(int skillid){
+	std::string skillname;
+	switch(skillid){
+	case 0:
+		skillname = "fist fighting"; 
+		break;
+	case 1:
+		skillname = "club fighting";
+		break;
+	case 2:
+		skillname = "sword fighting";
+		break;
+	case 3:
+		skillname = "axe fighting";
+		break;
+	case 4:
+		skillname = "distance fighting";
+		break;
+	case 5:
+		skillname = "shielding";
+		break;
+	case 6:
+		skillname = "fishing";
+		break;
+	default:
+		skillname = "unkown";
+		break;
+	}
+	return skillname;
+}
+
+void Player::addSkillTryInternal(int skilltry,int skill){
 	
 	skills[skill][SKILL_TRIES] += skilltry;			
 	//for skill level advances
 	//int reqTries = (int) ( SkillBases[skill] * pow((float) VocMultipliers[skill][voc], (float) ( skills[skill][SKILL_LEVEL] - 10) ) );			 
 #if __DEBUG__
 	//for debug
-	cout << Creature::getName() << ", has the vocation: " << voc << " and is training his " << skillname << "(" << skill << "). Tries: " << skills[skill][SKILL_TRIES] << "(" << getReqSkilltries (skill, (skills[skill][SKILL_LEVEL] + 1), voc) << ")" << std::endl;
+	cout << Creature::getName() << ", has the vocation: " << voc << " and is training his " << getSkillName(skill) << "(" << skill << "). Tries: " << skills[skill][SKILL_TRIES] << "(" << getReqSkilltries (skill, (skills[skill][SKILL_LEVEL] + 1), voc) << ")" << std::endl;
 	cout << "Current skill: " << skills[skill][SKILL_LEVEL] << std::endl;
 #endif			 
 	//Need skill up?
@@ -815,7 +846,7 @@ void Player::addSkillTryInternal(int skilltry,int skill,std::string &skillname){
 	 	skills[skill][SKILL_TRIES] = 0;
 		skills[skill][SKILL_PERCENT] = 0;				 
 		std::stringstream advMsg;
-		advMsg << "You advanced in " << skillname << ".";
+		advMsg << "You advanced in " << getSkillName(skill) << ".";
 		client->sendTextMessage(MSG_ADVANCE, advMsg.str().c_str());
 		client->sendSkills();
 	}
