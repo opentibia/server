@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+
+<spawns>
+
+<spawn centerx="28" centerx="30" centerz="7" radius="7">
+	<monster name="demon" x="29" y="30" spawntime="60"/>
+	<monster name="minotaur archer" x="27" y="30" spawntime="60"/>
+	<monster name="giant spider" x="27" y="29" spawntime="120"/>
+<spawn/>
+
+<spawns/>
