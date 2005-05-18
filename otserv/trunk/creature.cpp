@@ -4,6 +4,7 @@
 
 #include <string>
 #include <sstream>
+#include <algorithm>
 
 #include "creature.h"
 #include "tile.h"
@@ -16,6 +17,7 @@ Creature::Creature(const char *name, unsigned long _id) :
  ,access(0)
 {
   direction  = NORTH;
+	master = NULL;
 
   this->name = name;
 
@@ -61,6 +63,27 @@ void Creature::drainMana(int damage)
 void Creature::setAttackedCreature(unsigned long id)
 {
   attackedCreature = id;
+}
+
+void Creature::setMaster(Creature* creature)
+{
+	master = creature;
+}
+
+void Creature::addSummon(Creature *creature)
+{
+	creature->setMaster(this);
+	summons.push_back(creature);
+	//monster->useThing();
+}
+
+void Creature::removeSummon(Creature *creature)
+{
+	std::vector<Creature*>::iterator it = std::find(summons.begin(), summons.end(), creature);
+	if(it != summons.end()) {
+		summons.erase(it);
+		//(*it)->releaseThing();
+	}
 }
 
 void Creature::addCondition(const CreatureCondition& condition, bool refresh)

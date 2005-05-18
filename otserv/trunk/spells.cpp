@@ -76,7 +76,7 @@ bool Spells::loadFromXml()
 			
 			if (strcmp(str, "spell") == 0){
 				if ((const char*)xmlGetProp(p, (const xmlChar *)"enabled")) {
-					enabled = (bool)atoi((const char*)xmlGetProp(p, (const xmlChar *)"enabled"));
+					enabled = (bool)(atoi((const char*)xmlGetProp(p, (const xmlChar *)"enabled")) > 0);
 				}
 				
 				if (enabled){
@@ -115,7 +115,7 @@ bool Spells::loadFromXml()
 			}
 			else if (strcmp(str, "rune") == 0){
 				if ((const char*)xmlGetProp(p, (const xmlChar *)"enabled")) {
-					enabled = (bool)atoi((const char*)xmlGetProp(p, (const xmlChar *)"enabled"));
+					enabled = (bool)(atoi((const char*)xmlGetProp(p, (const xmlChar *)"enabled")) > 0);
 				}
 				
 				if (enabled){
@@ -273,7 +273,7 @@ bool SpellScript::castSpell(Creature* creature, const Position& pos, std::string
 
 	lua_pcall(luaState, 5, 1, 0);
 
-	bool ret = (bool)lua_toboolean(luaState, -1);
+	bool ret = (bool)(lua_toboolean(luaState, -1) > 0);
 	lua_pop(luaState, 1);
 
 	return ret;
@@ -384,11 +384,11 @@ void SpellScript::internalGetMagicEffect(lua_State *L, MagicEffectClass& me)
 	lua_pop(L, 1);
 
 	lua_next(L, -2);
-	me.offensive = lua_toboolean(L, -1);
+	me.offensive = (bool)(lua_toboolean(L, -1) > 0);
 	lua_pop(L, 1);
 
 	lua_next(L, -2);
-	me.drawblood = lua_toboolean(L, -1);
+	me.drawblood = (bool)(lua_toboolean(L, -1) > 0);
 	lua_pop(L, 1);
 
 	lua_next(L, -2);
@@ -455,7 +455,7 @@ int SpellScript::luaActionDoTargetGroundSpell(lua_State *L)
 	MagicEffectItem* fieldItem = new MagicEffectItem(transformMap);
 	MagicEffectTargetGroundClass magicGround(fieldItem);
 
-	magicGround.offensive = lua_toboolean(L, -1);
+	magicGround.offensive = (bool)(lua_toboolean(L, -1) > 0);
 	lua_pop(L,1);
 	
 	magicGround.animationEffect = (char)lua_tonumber(L, -1);
@@ -481,7 +481,7 @@ int SpellScript::luaActionDoAreaSpell(lua_State *L)
 
 	internalGetArea(L, magicArea);
 
-	bool needDirection = (bool)lua_toboolean(L, -1);
+	bool needDirection = (bool)(lua_toboolean(L, -1) > 0);
 	lua_pop(L,1);
 
 	Position centerpos;
@@ -531,7 +531,7 @@ int SpellScript::luaActionDoAreaExSpell(lua_State *L)
     
 	internalGetArea(L, magicAreaEx);
 
-	bool needDirection = (bool)lua_toboolean(L, -1);
+	bool needDirection = (bool)(lua_toboolean(L, -1) > 0);
 	lua_pop(L,1);
 
 	Position centerpos;
@@ -578,7 +578,7 @@ int SpellScript::luaActionDoAreaGroundSpell(lua_State *L)
 
 	internalGetArea(L, magicGroundEx);
 
-	bool needDirection = (bool)lua_toboolean(L, -1);
+	bool needDirection = (bool)(lua_toboolean(L, -1) > 0);
 	lua_pop(L,1);
 
 	Position centerpos;

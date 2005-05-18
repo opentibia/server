@@ -48,6 +48,7 @@ ItemType::ItemType()
 	floorChangeWest = false;
 
 	isteleport = false;
+	iskey = false;
 	
 	runeMagLevel    = -1;
 	magicfieldtype = -1;
@@ -610,7 +611,7 @@ int Items::loadXMLInfos(std::string file)
 						}						
 						else if(!strcmp(type, "key"))
 						{
-							itemtype->iskey = true;							
+							itemtype->iskey = true;
 						}										
 					}//type					
 				}

@@ -124,8 +124,8 @@ public:
   
   //for magic level advances
   unsigned int getReqMana(int maglevel, int voc); 
-  
-  //items
+  	
+	//items
 	containerLayout vcontainers;
   void preSave();
     virtual void useThing() {
@@ -226,19 +226,19 @@ protected:
 	virtual void onThingMove(const Creature *creature, const Container *fromContainer, unsigned char from_slotid,
 		const Item* fromItem, int oldFromCount, slots_t toSlot, const Item *toItem, int oldToCount, int count);
 
-	//container to ground (100%)
+	//container to ground
 	virtual void onThingMove(const Creature *creature, const Container *fromContainer, unsigned char from_slotid,
 		const Item* fromItem, int oldFromCount, const Position &toPos, const Item *toItem, int oldToCount, int count);
 
-	//inventory to ground (100%)
+	//inventory to ground
 	virtual void onThingMove(const Creature *creature, slots_t fromSlot,
 		const Item* fromItem, int oldFromCount, const Position &toPos, const Item *toItem, int oldToCount, int count);
 
-	//ground to container (100%)
+	//ground to container
 	virtual void onThingMove(const Creature *creature, const Position &fromPos, int stackpos, const Item* fromItem,
 		int oldFromCount, const Container *toContainer, unsigned char to_slotid, const Item *toItem, int oldToCount, int count);
 
-	//ground to inventory (100%)
+	//ground to inventory
 	virtual void onThingMove(const Creature *creature, const Position &fromPos, int stackpos, const Item* fromItem,
 		int oldFromCount, slots_t toSlot, const Item *toItem, int oldToCount, int count);
 

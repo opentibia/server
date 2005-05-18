@@ -65,7 +65,7 @@ bool Protocol74::ConnectPlayer()
   if(stat->playersonline >= g_config.getGlobalNumber("maxplayers") && player->access == 0)
     return false;
   else                    
-    return game->placeCreature(player);
+    return game->placeCreature(player->pos, player);
 }
 
 
@@ -770,41 +770,17 @@ void Protocol74::sendContainer(unsigned char index, Container *container)
 	WriteBuffer(msg);
 }
 
+void Protocol74::sendCloseContainer(unsigned char containerid)
+{
+	NetworkMessage msg;
+
+	msg.AddByte(0x6F);
+	msg.AddByte(containerid);
+	WriteBuffer(msg);
+}
+
 void Protocol74::parseUseItem(NetworkMessage &msg)
 {
-	//open main backpack
-	//FFFF	0300	00	5506	00	00
-	//sent:
-	//n		bpid	len	backpack						max		cur	
-	//00	5506	08	006261636B7061636B	1400	09	5406540654063B08C206DE0661DE066431080C4E08
-
-	//open bag 0, new window
-	//FFFF	4000	00	5406	00	01
-	//sent:
-	//n		bpid	len	backpack						max		cur	
-	//01	5406	03	00626167						0801	00
-	
-	//open bag 1, new window
-	//FFFF	4000	01	5406	01	02
-	//sent:
-	//n		bpid	len	backpack						max		cur	
-	//02	5406	03	00626167						0801	00
-
-	//close bag 0
-	//8701
-	//sent:
-
-	//open bag 0, new window
-	//FFFF	4000	00	5406	00	01
-	//sent:
-	//n		bpid	len	backpack						max		cur	
-	//01	5406	03	00626167						0801	00
-
-	//open bag 2, new window
-	//FFFF	4000	02	5406	02	03
-	//sent:
-	//n		bpid	len	backpack						max		cur	
-	//03	5406	03	00626167						0801	00
 	unsigned short x = msg.GetU16();
 	unsigned short y = msg.GetU16();
 	unsigned char z = msg.GetByte();	
@@ -858,7 +834,15 @@ void Protocol74::parseUseItem(NetworkMessage &msg)
 
 		if(newcontainer) {			
 			if(newcontainer->depot == 0){
-				sendContainer(index, newcontainer);
+				unsigned char oldcontainerid = player->getContainerID(newcontainer);
+
+				if(newcontainer->getParent() == NULL && oldcontainerid != 0xFF) {
+					player->closeContainer(oldcontainerid);
+					sendCloseContainer(oldcontainerid);
+				}
+				else {
+					sendContainer(index, newcontainer);
+				}
 			}
 			else{				
 				Container *newcontainer2 = player->getDepot(newcontainer->depot);
@@ -880,12 +864,18 @@ void Protocol74::parseCloseContainer(NetworkMessage &msg)
 {
 	unsigned char containerid = msg.GetByte();
 	player->closeContainer(containerid);
+	sendCloseContainer(containerid);
+
+	/*
+	unsigned char containerid = msg.GetByte();
+	player->closeContainer(containerid);
 
 	msg.Reset();
 
 	msg.AddByte(0x6F);
 	msg.AddByte(containerid);
 	WriteBuffer(msg);
+	*/
 }
 
 void Protocol74::parseUpArrowContainer(NetworkMessage &msg)
@@ -1280,7 +1270,7 @@ void Protocol74::sendTileUpdated(const Position &pos)
 	WriteBuffer(msg);
 }
 
-//container to container (100%)
+//container to container
 void Protocol74::sendThingMove(const Creature *creature, const Container *fromContainer, unsigned char from_slotid,
 	const Item* fromItem, int oldFromCount, Container *toContainer, unsigned char to_slotid, const Item *toItem, int oldToCount, int count)
 {
@@ -1439,9 +1429,6 @@ void Protocol74::sendThingMove(const Creature *creature, slots_t fromSlot, const
 	int oldFromCount, const Container *toContainer, unsigned char to_slotid, const Item *toItem, int oldToCount, int count)
 {
 	NetworkMessage msg;
-	//Update up-arrow
-	//
-
 
 	Container *container = NULL;
 	for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
@@ -1489,6 +1476,19 @@ void Protocol74::sendThingMove(const Creature *creature, slots_t fromSlot, const
 		AddPlayerInventoryItem(msg,player, fromSlot);
 	}
 	
+	//Update up-arrow
+	//
+	const Container *itemContainer = dynamic_cast<const Container*>(fromItem);
+	if(itemContainer) {
+		for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
+			container = cit->second;
+
+			if(container == itemContainer) {
+				sendContainer(cit->first, container);
+			}
+		}
+	}
+
 	WriteBuffer(msg);
 }
 
@@ -1506,14 +1506,11 @@ void Protocol74::sendThingMove(const Creature *creature, slots_t fromSlot, const
 	WriteBuffer(msg);
 }
 
-//container to inventory (100%)
+//container to inventory
 void Protocol74::sendThingMove(const Creature *creature, const Container *fromContainer,
 	unsigned char from_slotid, const Item* fromItem, int oldFromCount, slots_t toSlot, const Item *toItem, int oldToCount, int count)
 {
 	NetworkMessage msg;
-	//Update up-arrow
-	//
-
 
 	Container *container = NULL;
 	for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
@@ -1551,19 +1548,34 @@ void Protocol74::sendThingMove(const Creature *creature, const Container *fromCo
 		AddPlayerInventoryItem(msg,player, toSlot);
 	}
 
+	//Update up-arrow
+	//
+	const Container *itemContainer = dynamic_cast<const Container*>(fromItem);
+	if(itemContainer) {
+		for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
+			container = cit->second;
+
+			if(container == itemContainer) {
+				sendContainer(cit->first, container);
+			}
+		}
+	}
+
 	WriteBuffer(msg);
 }
 
-//container to ground (100%)
+//container to ground
 void Protocol74::sendThingMove(const Creature *creature, const Container *fromContainer, unsigned char from_slotid,
 	const Item* fromItem, int oldFromCount, const Position &toPos, const Item *toItem, int oldToCount, int count)
 {
 	NetworkMessage msg;
 
+	bool updateContainerArrow = false;
+
 	//Update up-arrow
 	if((fromContainer->pos.x == 0xFFFF && creature == player) &&
 		(std::abs(player->pos.x - toPos.x) <= 1 && std::abs(player->pos.y - toPos.y) <= 1)) {
-			//
+			updateContainerArrow = true;
 	}
 	//Auto-close container's
 	else if(std::abs(player->pos.x - toPos.x) > 1 || std::abs(player->pos.y - toPos.y) > 1) {
@@ -1609,19 +1621,31 @@ void Protocol74::sendThingMove(const Creature *creature, const Container *fromCo
 		}
 	}
 
+	//Update up-arrow
+	//
+	if(updateContainerArrow) {
+		const Container *itemContainer = dynamic_cast<const Container*>(fromItem);
+		if(itemContainer) {
+			for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
+				if(cit->second == itemContainer) {
+					sendContainer(cit->first, cit->second);
+				}
+			}
+		}
+	}
+
 	WriteBuffer(msg);
 }
 
-//inventory to ground (100%)
+//inventory to ground
 void Protocol74::sendThingMove(const Creature *creature, slots_t fromSlot,
 	const Item* fromItem, int oldFromCount, const Position &toPos, const Item *toItem, int oldToCount, int count)
 {
 	NetworkMessage msg;
 
-	//Update up-arrow (if container)
 	if(creature == player) {
 		if(std::abs(player->pos.x - toPos.x) <= 1 && std::abs(player->pos.y - toPos.y) <= 1 && player->pos.z == toPos.z ) {
-			//
+			//Update up-arrow (if container)?
 		}
 		//Auto-close container's
 		else {
@@ -1653,15 +1677,18 @@ void Protocol74::sendThingMove(const Creature *creature, slots_t fromSlot,
 	WriteBuffer(msg);
 }
 
-//ground to container (100%)
+//ground to container
 void Protocol74::sendThingMove(const Creature *creature, const Position &fromPos, int stackpos, const Item* fromItem,
 	int oldFromCount, const Container *toContainer, unsigned char to_slotid, const Item *toItem, int oldToCount, int count)
 {
 	NetworkMessage msg;
 
+	bool updateContainerArrow = false;
+
 	//Update up-arrow
 	if((toContainer->pos.x == 0xFFFF && creature == player))
 	{
+		updateContainerArrow = true;
 	}
 	//Auto-close container's
 	else if((toContainer->pos.x == 0xFFFF) || (std::abs(player->pos.x - toContainer->pos.x) > 1 ||
@@ -1723,10 +1750,23 @@ void Protocol74::sendThingMove(const Creature *creature, const Position &fromPos
 		}
 	}
 
+	if(updateContainerArrow) {
+		const Container *itemContainer = dynamic_cast<const Container*>(fromItem);
+		if(itemContainer) {
+			for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
+				container = cit->second;
+
+				if(container == itemContainer) {
+					sendContainer(cit->first, container);
+				}
+			}
+		}
+	}
+
 	WriteBuffer(msg);
 }
 
-//ground to inventory (100%)
+//ground to inventory
 void Protocol74::sendThingMove(const Creature *creature, const Position &fromPos, int stackpos, const Item* fromItem,
 	int oldFromCount, slots_t toSlot, const Item *toItem, int oldToCount, int count)
 {

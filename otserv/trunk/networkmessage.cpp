@@ -279,7 +279,7 @@ void NetworkMessage::AddItem(const Item *item)
   AddU16(item->getID());
 
   if (item->isStackable() || item->isMultiType() || item->isFluidContainer())
-    AddByte(item->getItemCountOrSubtype());
+    AddByte((unsigned char)item->getItemCountOrSubtype());
 }
 
 void NetworkMessage::JoinMessages(NetworkMessage &add){

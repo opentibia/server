@@ -342,6 +342,9 @@ void Map::setTile(unsigned short _x, unsigned short _y, unsigned char _z, unsign
 			delete tile->ground;
 
 		tile->ground = Item::CreateItem(groundId);
+		tile->ground->pos.x = _x;
+		tile->ground->pos.y = _y;
+		tile->ground->pos.z = _z;
   }
   else
   {
@@ -358,14 +361,13 @@ void Map::setTile(unsigned short _x, unsigned short _y, unsigned char _z, unsign
   } 
 }
 
-Position Map::placeCreature(Creature* c){
-	Position pos = c->pos;
+Position Map::placeCreature(Position &pos, Creature* c){
 	if (!c->canMovedTo(getTile(pos.x, pos.y, pos.z)))
 	{   
 		bool found =false;
 		for(int cx =pos.x-1; cx <= pos.x+1 && !found; cx++){
 			for(int cy = pos.y-1; cy <= pos.y+1 && !found; cy++){
-				std::cout << "search pos x:" <<cx <<" y: "<< cy << std::endl;                
+				std::cout << "search pos x: " << cx <<" y: "<< cy << std::endl;                
 				if (c->canMovedTo(getTile(cx, cy, pos.z))){
 					pos.x = cx;
 					pos.y = cy;
@@ -397,7 +399,7 @@ Position Map::placeCreature(Creature* c){
 bool Map::removeCreature(Creature* c)
 {
 	OTSYS_THREAD_LOCK(mapLock)
-	/* int stackpos = */ getTile(c->pos.x, c->pos.y, c->pos.z)->getCreatureStackPos(c);
+	/*int stackpos =  getTile(c->pos.x, c->pos.y, c->pos.z)->getCreatureStackPos(c);*/
 	getTile(c->pos.x, c->pos.y, c->pos.z)->removeThing(c);
 
 	OTSYS_THREAD_UNLOCK(mapLock)

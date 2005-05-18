@@ -18,6 +18,9 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
+#ifndef __TEMPLATES_H__
+#define __TEMPLATES_H__
+
 #include <vector>
 
 // cross compatibility vc++ and gcc
@@ -26,6 +29,8 @@
 #else
 #include <hash_map>
 #endif
+
+#include "creature.h"
 
 template<class T> class AutoList
 {
@@ -99,3 +104,5 @@ protected:
 	static list_type list;
 	static unsigned long count;
 };
+
+#endif

@@ -112,6 +112,8 @@ class Monster : protected AutoID<Monster>, public AutoList<Monster>, public Crea
 public:
   Monster(const char *name, Game* game);
   virtual ~Monster();
+	//const Monster& operator=(const Monster& rhs);
+
 	virtual void useThing() {
 		//std::cout << "Monster: useThing() " << (int)this << std::endl;
 		useCount++;
@@ -200,9 +202,6 @@ protected:
 	virtual bool isAttackable() const { return true; };
   virtual bool isPushable() const { return pushable; };
 
-	//virtual void onCreatureTurn(const Creature *creature, unsigned char stackpos);
-  //virtual void onCreatureSay(const Creature *creature, unsigned char type, const std::string &text);
-  //virtual void onCreatureChangeOutfit(const Creature* creature);
 	virtual int onThink(int& newThinkTicks);
   virtual void setAttackedCreature(unsigned long id);
   virtual std::string getDescription() const;

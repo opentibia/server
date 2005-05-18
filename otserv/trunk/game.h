@@ -28,16 +28,12 @@
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 
-//#include "spawn.h"
+#include "spawn.h"
 #include "position.h"
 #include "item.h"
 #include "container.h"
-//#include "creature.h"
-//#include "monster.h"
-//#include "player.h"
 #include "magic.h"
 #include "map.h"
-//#include "scheduler.h"
 
 
 class Creature;   // see creature.h
@@ -134,7 +130,7 @@ class Game {
 	  * Adds the Creature to playersOnline and to the map
 	  * \param c Creature to add
 	  */
-    bool placeCreature(Creature* c);
+    bool placeCreature(Position &pos, Creature* c);
 
 	/**
 	  * Remove Creature from the map.
@@ -221,6 +217,7 @@ class Game {
    Thing* getThing(const Position &pos,unsigned char stack,Player* player = NULL);
    void addThing(Player* player,const Position &pos,Thing* thing);
    void removeThing(Player* player,const Position &pos,Thing* thing);
+	 Position getThingMapPos(Player *player, const Position &pos);
    
    void sendAddThing(Player* player,const Position &pos,const Thing* thing);
    void sendRemoveThing(Player* player,const Position &pos,const Thing* thing,const unsigned char stackpos = 1,const bool autoclose = false);
@@ -305,7 +302,7 @@ class Game {
 		void decayItem(Item *item);
 		void decaySplash(Item* item);
 	
-		//void checkSpawns(int n);
+		void checkSpawns(int t);
 		std::priority_queue<SchedulerTask*, std::vector<SchedulerTask*>, lessSchedTask > eventList;
 
 		uint32_t max_players;

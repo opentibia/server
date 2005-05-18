@@ -36,7 +36,7 @@ Monster::Monster(const char *name, Game* game) :
  ,AutoList<Monster>(id)
  ,Creature(name, id)
 {
-	//std::cout << "Monster constructor " << (unsigned long)this  <<std::endl;		
+	//std::cout << "Monster constructor " << (unsigned long)this  <<std::endl;
 	useCount = 0;
 	oldThinkTicks = 0;
 	loaded = false;
@@ -503,15 +503,12 @@ int Monster::onThink(int& newThinkTicks)
 
 		long long delay = ((long long)this->lastmove + (long long)stepDuration) - ((long long)OTSYS_TIME());
 
-		//long long delay = ((long long)this->lastmove +
-		//	(long long)this->getStepDuration(Item::items[ground].speed)) - ((long long)OTSYS_TIME());
-
 		if(delay > 0) {
-///*
+/*
 #if __DEBUG__     
 			std::cout << "Delaying "<< this->getName() << " --- " << delay << std::endl;		
 #endif
-//*/
+*/
 			newThinkTicks = (int)delay;
 			int ret = oldThinkTicks;
 			oldThinkTicks = newThinkTicks;
@@ -546,12 +543,10 @@ int Monster::onThink(int& newThinkTicks)
 		int ret = oldThinkTicks;
 		oldThinkTicks = newThinkTicks;
 		return ret;
-		//return stepDuration;
 	}
 
 	newThinkTicks = 0;
 	return oldThinkTicks;
-	//return 0;
 }
 
 int Monster::getTargetDistance()
@@ -599,7 +594,6 @@ void Monster::calcMovePosition()
 					if(!game->map->canThrowItemTo(tmppos, targetPos, false, true))
 						continue;
 					
-					//if((this->pos.x != x && this->pos.y != y)) {
 					if(!(this->pos.x == x && this->pos.y == y)) {
 						Tile *t = NULL;
 						if((!(t = game->map->getTile(x, y, pos.z))) ||
@@ -706,10 +700,8 @@ void Monster::onThingDisappear(const Thing* thing, unsigned char stackPos){
 }
 void Monster::onThingAppear(const Thing* thing){
 	const Creature *creature = dynamic_cast<const Creature*>(thing);
-	if(creature){
-		if(isInRange(creature->pos)) {
-			OnCreatureEnter(creature);
-		}
+	if(creature && isInRange(creature->pos)){
+		OnCreatureEnter(creature);
 	}
 }
 

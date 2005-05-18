@@ -38,6 +38,7 @@
 
 #include "status.h"
 #include "spells.h"
+
 #include "actions.h"
 //#include "spawn.h"
 
@@ -320,10 +321,12 @@ int main(int argc, char *argv[])
 	std::cout << "[done]" << std::endl;
 
 
-
   // load map file
   g_game.loadMap(g_config.getGlobalString("mapfile"));
-	//SpawnManager::initialize(&g_game);
+
+	SpawnManager::initialize(&g_game);
+	SpawnManager::instance()->loadSpawns(g_config.getGlobalString("spawnfile"));
+	SpawnManager::instance()->startup();
 
   // Call to WSA Startup on Windows Systems...
 #ifdef WIN32

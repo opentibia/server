@@ -21,7 +21,6 @@
 #ifndef __CONST74_H__
 #define __CONST74_H__
 
-
 #define NETWORKMESSAGE_MAXSIZE 16768
 
 enum MagicEffectClasses {

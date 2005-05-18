@@ -73,10 +73,10 @@ unsigned short Item::getItemCountOrSubtype() const {
 void Item::setItemCountOrSubtype(unsigned char n)
 {
 	if(isStackable()){
-		if(n == 0){
+		/*if(n == 0){
 			count = 1;
-		}
-		else if(n > 100){
+		}*/
+		if(n > 100){
 			count = 100;
 		}
 		else{

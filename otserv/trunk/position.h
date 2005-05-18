@@ -32,6 +32,29 @@ public:
 
 	int x,y,z;
 
+	bool operator<(const Position& p) const {
+		if(z < p.z)
+			return true;
+		if(z > p.z)
+			return false;
+
+		if(y < p.y)
+			return true;
+		if(y > p.y)
+			return false;
+
+		if(x < p.x)
+			return true;
+		if(x > p.x)
+			return false;
+
+		return false;
+	}
+
+	bool operator>(const Position& p) const {
+		return ! (*this < p);
+	}
+
 	bool operator==(const Position p)  const {
 		if(p.x==x && p.y==y && p.z ==z)
 			return true;

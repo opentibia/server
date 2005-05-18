@@ -48,11 +48,6 @@ Player::Player(const char *name, Protocol *p) :
 {	
   client     = p;
   client->setPlayer(this);
-	/*
-	exhaustedTicks  = 0;
-	pzLocked = false;
-	inFightTicks = 0;
-	*/
 	looktype   = PLAYER_MALE_1;
 	voc        = 0;
   cap        = 300;
@@ -598,7 +593,6 @@ bool Player::substractMoneyContainer(Container *container, unsigned long *money)
 		return false;
 }
 
-
 void Player::speak(const std::string &text)
 {
 }
@@ -824,7 +818,7 @@ std::string Player::getSkillName(int skillid){
 		skillname = "fishing";
 		break;
 	default:
-		skillname = "unkown";
+		skillname = "unknown";
 		break;
 	}
 	return skillname;
@@ -863,7 +857,7 @@ void Player::addSkillTryInternal(int skilltry,int skill){
 
 
 unsigned int Player::getReqMana(int maglevel, int voc) {
-  //ATTANTION: MAKE SURE THAT CHARS HAVE REASONABLE MAGIC LEVELS. ESPECIALY KNIGHTS!!!!!!!!!!!
+  //ATTENTION: MAKE SURE THAT CHARS HAVE REASONABLE MAGIC LEVELS. ESPECIALY KNIGHTS!!!!!!!!!!!
   float ManaMultiplier[5] = { 1.0f, 1.1f, 1.1f, 1.4f, 3 };
   unsigned int reqMana = (unsigned int) ( 400 * pow(ManaMultiplier[voc], maglevel-1) );       //will calculate required mana for a magic level
   if (reqMana % 20 < 10) //CIP must have been bored when they invented this odd rounding
@@ -951,15 +945,7 @@ void Player::dropLoot(Container *corpse)
 			corpse->addItem(item);
 			items[slot] = NULL;
 		}
-	}
-	/*
-	//drop backpack if any
-	if(items[SLOT_BACKPACK]){
-		corpse->addItem(items[SLOT_BACKPACK]);
-		items[SLOT_BACKPACK] = NULL;
-	}
-	*/
-	
+	}	
 }
 
 fight_t Player::getFightType()
@@ -1250,7 +1236,7 @@ void Player::onThingMove(const Creature *creature, const Container *fromContaine
 	client->sendThingMove(creature, fromContainer, from_slotid, fromItem, oldFromCount, toSlot, toItem, oldToCount, count);
 }
 
-//container to ground (100%)
+//container to ground
 void Player::onThingMove(const Creature *creature, const Container *fromContainer, unsigned char from_slotid,
 	const Item* fromItem, int oldFromCount, const Position &toPos, const Item *toItem, int oldToCount, int count)
 {
@@ -1265,15 +1251,10 @@ void Player::onThingMove(const Creature *creature, slots_t fromSlot,
 }
 
 //ground to container
-/*
-void Player::onThingMove(const Creature *creature, const Position *oldPos, const Item* item, unsigned char stackpos,
-	const Container *toContainer, const Item* dropitem, unsigned char to_slotid, bool concat)
-*/
 void Player::onThingMove(const Creature *creature, const Position &fromPos, int stackpos, const Item* fromItem,
 	int oldFromCount, const Container *toContainer, unsigned char to_slotid, const Item *toItem, int oldToCount, int count)
 {
 	client->sendThingMove(creature, fromPos, stackpos, fromItem, oldFromCount, toContainer, to_slotid, toItem, oldToCount, count);
-	//client->sendThingMove(creature, oldPos, item, stackpos, toContainer, dropitem, to_slotid, concat);
 }
 
 //ground to inventory
@@ -1296,6 +1277,7 @@ void Player::onCreatureAppear(const Creature *creature)
 
 void Player::onCreatureDisappear(const Creature *creature, unsigned char stackPos, bool tele /*= false*/)
 {
+	
 	const Thing *thing = dynamic_cast<const Thing*>(creature);
 	if(thing)
   		client->sendThingDisappear(thing, stackPos, tele);

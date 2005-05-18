@@ -63,7 +63,8 @@ Account IOAccountSQL::loadAccount(unsigned long accno){
 			std::string ss = std::string((*i)[0]);
 			acc.charList.push_back(ss.c_str());
 		}
-					
+		
+		acc.charList.sort();
 	}
 	catch(mysqlpp::BadQuery e){
 		std::cout << "MYSQL-ERROR: " << e.error << std::endl;

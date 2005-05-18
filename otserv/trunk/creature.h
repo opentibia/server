@@ -25,10 +25,10 @@
 
 #include "thing.h"
 #include "position.h"
-//#include "networkmessage.h"
 #include "container.h"
 #include "magic.h"
 #include <vector>
+
 #include "templates.h"
 
 enum slots_t {
@@ -138,7 +138,13 @@ public:
   virtual std::string getDescription(bool self = false) const;
   virtual void setAttackedCreature(unsigned long id);
 
-  virtual int getWeaponDamage() const {
+	virtual void setMaster(Creature* creature);
+	virtual Creature* getMaster() {return master;}
+
+	virtual void addSummon(Creature *creature);
+	virtual void removeSummon(Creature *creature);
+
+	virtual int getWeaponDamage() const {
 	return 1+(int)(10.0*rand()/(RAND_MAX+1.0));
   }
   virtual int getArmor() const {
@@ -174,14 +180,11 @@ public:
   Position masterPos;
 
   int health, healthmax;
-
   uint64_t lastmove;
 
-  //int lastDamage;
-
   unsigned short getSpeed() const {            
-           return speed; 
-           };
+		return speed;
+	};
 
   virtual int getStepDuration(int underground) { return (1000*120*100)/(getSpeed()*underground); };
   void setNormalSpeed()
@@ -222,12 +225,13 @@ public:
 	virtual int getInflicatedDamage(unsigned long id);
 
 protected:
+	Creature *master;
+	std::vector<Creature*> summons;
+
 	Conditions conditions;
 	typedef std::vector< std::pair<uint64_t, long> > DamageList;
 	typedef std::map<long, DamageList > TotalDamageList;
 	TotalDamageList totaldamagelist;
-
-
 
 protected:
 	virtual int onThink(int& newThinkTicks){newThinkTicks = 300; return 300;};
@@ -255,27 +259,27 @@ protected:
 	virtual void onThingMove(const Creature *creature, slots_t fromSlot, const Item* fromItem,
 		int oldFromCount, const Container *toContainer, unsigned char to_slotid, const Item *toItem, int oldToCount, int count) {};
 
-	//inventory to inventory (100%)
+	//inventory to inventory
 	virtual void onThingMove(const Creature *creature, slots_t fromSlot, const Item* fromItem,
 		int oldFromCount, slots_t toSlot, const Item* toItem, int oldToCount, int count) {};
 
-	//container to inventory (100%)
+	//container to inventory
 	virtual void onThingMove(const Creature *creature, const Container *fromContainer, unsigned char from_slotid,
 		const Item* fromItem, int oldFromCount, slots_t toSlot, const Item *toItem, int oldToCount, int count) {};
 
-	//container to ground (100%)
+	//container to ground
 	virtual void onThingMove(const Creature *creature, const Container *fromContainer, unsigned char from_slotid,
 		const Item* fromItem, int oldFromCount, const Position &toPos, const Item *toItem, int oldToCount, int count) {};
 
-	//inventory to ground (100%)
+	//inventory to ground
 	virtual void onThingMove(const Creature *creature, slots_t fromSlot,
 		const Item* fromItem, int oldFromCount, const Position &toPos, const Item *toItem, int oldToCount, int count) {};
 	
-	//ground to container (100%)
+	//ground to container
 	virtual void onThingMove(const Creature *creature, const Position &fromPos, int stackpos, const Item* fromItem,
 		int oldFromCount, const Container *toContainer, unsigned char to_slotid, const Item *toItem, int oldToCount, int count) {};
 
-	//ground to inventory (100%)
+	//ground to inventory
 	virtual void onThingMove(const Creature *creature, const Position &fromPos, int stackpos, const Item* fromItem,
 		int oldFromCount, slots_t toSlot, const Item *toItem, int oldToCount, int count) {};
 

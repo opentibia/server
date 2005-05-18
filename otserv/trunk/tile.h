@@ -9,12 +9,27 @@
 #include "magic.h"
 
 #include "definitions.h"
-class Creature;
+#include "templates.h"
+#include "scheduler.h"
 
+class Creature;
 
 typedef std::vector<Item*> ItemVector;
 typedef std::vector<Creature*> CreatureVector;
 
+enum EventType
+{
+	EVENT_CREATURE_ENTER,
+	EVENT_CREATURE_LEAVE,
+	EVENT_ITEM_ADD,
+	EVENT_ITEM_REMOVE
+};
+
+class Event {
+public:
+	virtual void onCreatureEnter(const Creature *creature, const Position &pos) {};
+	virtual void onCreatureLeave(const Creature *creature, const Position &pos) {};
+};
 
 class Tile
 {
@@ -34,7 +49,6 @@ public:
     decaySplashAfter = 0;
   }
 
-  //Item           ground;
   Item*           ground;
   Item*          splash;
   ItemVector     topItems;
@@ -66,7 +80,18 @@ public:
   
   std::string getDescription() const;
 
+	/*
+	void RegisterTrigger(enum EventType et, Event* event)
+	{
+		event_map.insert(event_pair(et, event));
+	}
+	*/
+
 protected:
+	typedef std::multimap<enum EventType, Event*, std::less<enum EventType> > EventMap;
+	typedef EventMap::value_type event_pair;
+	EventMap event_map;
+
   bool pz;
 };
 

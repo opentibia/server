@@ -29,10 +29,8 @@
 #include "item.h"
 #include "creature.h"
 #include "magic.h"
-//#include "otsystem.h"
 
 #include "scheduler.h"
-//#include "networkmessage.h"
 #include "tools.h"
 #include "tile.h"
 
@@ -231,10 +229,11 @@ class Map {
 
 	/**
 	  * Place a creature on the map
+	  * \param pos The position to place the creature
 	  * \param c Creature pointer to the creature to place
 	  * \returns The postition the Creature was actually added at
 	  */
-    Position placeCreature(Creature* c);
+    Position placeCreature(Position &pos, Creature* c);
 	
 	/**
 	  * Remove a creature from the map.

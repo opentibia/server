@@ -111,7 +111,7 @@ private:
   virtual void sendNetworkMessage(NetworkMessage *msg);
   virtual void sendIcons(int icons);
 
-	//container to container (100%)
+	//container to container
 	virtual void sendThingMove(const Creature *creature, const Container *fromContainer, unsigned char from_slotid,
 		const Item* fromItem, int oldFromCount, Container *toContainer, unsigned char to_slotid, const Item *toItem, int oldToCount, int count);
 
@@ -123,23 +123,23 @@ private:
 	virtual void sendThingMove(const Creature *creature, slots_t fromSlot, const Item* fromItem,
 		int oldFromCount, slots_t toSlot, const Item* toItem, int oldToCount, int count);
 
-	//container to inventory (100%)
+	//container to inventory
 	virtual void sendThingMove(const Creature *creature, const Container *fromContainer, unsigned char from_slotid,
 		const Item* fromItem, int oldFromCount, slots_t toSlot, const Item *toItem, int oldToCount, int count);
 
-	//container to ground (100%)
+	//container to ground
 	virtual void sendThingMove(const Creature *creature, const Container *fromContainer, unsigned char from_slotid,
 		const Item* fromItem, int oldFromCount, const Position &toPos, const Item *toItem, int oldToCount, int count);
 
-	//inventory to ground (100%)
+	//inventory to ground
 	virtual void sendThingMove(const Creature *creature, slots_t fromSlot,
 		const Item* fromItem, int oldFromCount, const Position &toPos, const Item *toItem, int oldToCount, int count);
 
-	//ground to container (100%)
+	//ground to container
 	virtual void sendThingMove(const Creature *creature, const Position &fromPos, int stackpos, const Item* fromItem,
 		int oldFromCount, const Container *toContainer, unsigned char to_slotid, const Item *toItem, int oldToCount, int count);
 
-	//ground to inventory (100%)
+	//ground to inventory
 	virtual void sendThingMove(const Creature *creature, const Position &fromPos, int stackpos, const Item* fromItem,
 		int oldFromCount, slots_t toSlot, const Item *toItem, int oldToCount, int count);
 

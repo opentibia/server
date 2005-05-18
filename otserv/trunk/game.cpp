@@ -334,11 +334,16 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 		//game->addEvent(makeTask(decayTime*1000, boost::bind(&Game::decayItem, this->game, corpseitem->pos, corpseitem->getID(), tile->getThingStackPos(corpseitem)) ) );
 		game->addEvent(makeTask(decayTime*1000, std::bind2nd(std::mem_fun(&Game::decayItem), corpseitem)));
 		
-		//free if attackedCreature is not a player		
+		if(attackedCreature && attackedCreature->getMaster() != NULL) {
+			attackedCreature->getMaster()->removeSummon(attackedCreature);
+			game->FreeThing(attackedCreature);
+		}
+
+		//free if attackedCreature is not a player
+		/*
 		if(attackedplayer == NULL)
 			game->FreeThing(attackedCreature);
-		
-			
+		*/
 	}
 
 	//Add blood?
@@ -561,7 +566,7 @@ Creature* Game::getCreatureByName(const char* s)
   return NULL; //just in case the player doesnt exist
 }
 
-bool Game::placeCreature(Creature* c)
+bool Game::placeCreature(Position &pos, Creature* c)
 {
 	OTSYS_THREAD_LOCK(gameLock)
 	if (c->access == 0 && getPlayersOnline() >= max_players){
@@ -570,13 +575,6 @@ bool Game::placeCreature(Creature* c)
 		return false;
 	}
 
-
-	// add player to the online list
-	//playersOnline[c->getID()] = c;
-	/*Player* player = dynamic_cast<Player*>(c);
-	if (player) {
-		player->useThing();
-	}*/
 	c->useThing();
 	if(dynamic_cast<Player*>(c))
 		std::cout << (uint32_t)getPlayersOnline() << " players online." << std::endl;
@@ -587,7 +585,7 @@ bool Game::placeCreature(Creature* c)
 	//creature added to the online list, now let the map place it
 
 	map->lock();
-	Position spawn = map->placeCreature(c);
+	Position spawn = map->placeCreature(pos, c);
 	map->unlock();
 
 	std::vector<Creature*> list;
@@ -597,20 +595,15 @@ bool Game::placeCreature(Creature* c)
 	{
 		list[i]->onCreatureAppear(c);
 	}
+	
 	OTSYS_THREAD_UNLOCK(gameLock)
 
-    return true;
+  return true;
 }
 
 bool Game::removeCreature(Creature* c)
 {
 	OTSYS_THREAD_LOCK(gameLock)
-	//removeCreature from the online list
-
-	/*std::map<unsigned long, Creature*>::iterator pit = playersOnline.find(c->getID());
-	if (pit != playersOnline.end()) {
-		playersOnline.erase(pit);*/
-
 
 #ifdef __DEBUG__
 		std::cout << "removing creature "<< std::endl;
@@ -1020,6 +1013,8 @@ void Game::thingMoveInternal(Creature *player,
 								fromItem->setItemCountOrSubtype(fromItem->getItemCountOrSubtype() + surplusCount);
 							}
 						}
+
+
 					}
 					else if(count < oldFromCount) {
 						int subcount = oldFromCount - count;
@@ -1036,8 +1031,9 @@ void Game::thingMoveInternal(Creature *player,
 						}
 					}
 
-					if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() == 0) {
+					if(fromItem->getItemCountOrSubtype() == 0) {
 						fromContainer->removeItem(fromItem);
+						this->FreeThing(fromItem);
 					}
 				}
 				else {
@@ -1069,9 +1065,11 @@ void Game::thingMoveInternal(Creature *player,
 				else
 					player->onThingMove(player, fromContainer, from_slotid, fromItem, oldFromCount, toContainer, to_slotid, toItem, oldToCount, count);
 
+				/*
 				if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() == 0) {
 					delete fromItem;
 				}
+				*/
 			}
 		}
 		else {
@@ -1099,8 +1097,9 @@ void Game::thingMoveInternal(Creature *player,
 								player->sendCancel("Sorry not enough room.");
 							}
 
-							if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() == 0) {
+							if(fromItem->getItemCountOrSubtype() == 0) {
 								p->removeItemInventory(from_cid, true);
+								this->FreeThing(fromItem);
 							}
 						}
 						else if(count < oldFromCount) {
@@ -1110,8 +1109,9 @@ void Game::thingMoveInternal(Creature *player,
 							p->removeItemInventory(to_cid, true);
 							p->addItemInventory(Item::CreateItem(fromItem->getID(), count), to_cid, true);
 
-							if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() == 0) {
+							if(fromItem->getItemCountOrSubtype() == 0) {
 								p->removeItemInventory(from_cid, true);
+								this->FreeThing(fromItem);
 							}
 						}
 						else {
@@ -1128,9 +1128,11 @@ void Game::thingMoveInternal(Creature *player,
 
 					player->onThingMove(player, (slots_t)from_cid, fromItem, oldFromCount, (slots_t)to_cid, toItem, oldToCount, count);
 
+					/*
 					if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() == 0) {
 						delete fromItem;
 					}
+					*/
 				}
 			}
 			//container to inventory
@@ -1156,8 +1158,9 @@ void Game::thingMoveInternal(Creature *player,
 								player->sendCancel("Sorry not enough room.");
 							}
 
-							if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() == 0) {
+							if(fromItem->getItemCountOrSubtype() == 0) {
 								fromContainer->removeItem(fromItem);
+								this->FreeThing(fromItem);
 							}
 						}
 						else if(count < oldFromCount) {
@@ -1171,8 +1174,9 @@ void Game::thingMoveInternal(Creature *player,
 								fromContainer->addItem(toItem);
 							}
 
-							if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() == 0) {
+							if(fromItem->getItemCountOrSubtype() == 0) {
 								fromContainer->removeItem(fromItem);
+								this->FreeThing(fromItem);
 							}
 						}
 						else {
@@ -1206,9 +1210,11 @@ void Game::thingMoveInternal(Creature *player,
 					else
 						player->onThingMove(player, fromContainer, from_slotid, fromItem, oldFromCount, (slots_t)to_cid, toItem, oldToCount, count);
 
+					/*
 					if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() == 0) {
 						delete fromItem;
 					}
+					*/
 				}
 			}
 			//inventory to container
@@ -1255,8 +1261,9 @@ void Game::thingMoveInternal(Creature *player,
 							}
 						}
 
-						if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() == 0) {
+						if(fromItem->getItemCountOrSubtype() == 0) {
 							p->removeItemInventory(from_cid, true);
+							this->FreeThing(fromItem);
 						}
 					}
 					else if(p->removeItemInventory(from_cid, true)) {
@@ -1274,16 +1281,18 @@ void Game::thingMoveInternal(Creature *player,
 					else
 						player->onThingMove(player, (slots_t)from_cid, fromItem, oldFromCount, toContainer, to_slotid, toItem, oldToCount, count);
 
+					/*
 					if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() == 0) {
 						delete fromItem;
 					}
+					*/
 				}
 			}
 		}
 	}
 }
 
-//container/inventory to ground (100%)
+//container/inventory to ground
 void Game::thingMoveInternal(Creature *player,
 	unsigned char from_cid, unsigned char from_slotid, bool fromInventory,
 	const Position& toPos, unsigned char count)
@@ -1331,8 +1340,9 @@ void Game::thingMoveInternal(Creature *player,
 							toTile->addThing(surplusItem);
 						}
 
-						if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() == 0) {
+						if(fromItem->getItemCountOrSubtype() == 0) {
 							fromContainer->removeItem(fromItem);
+							this->FreeThing(fromItem);
 						}
 					}
 					else if(count < oldFromCount) {
@@ -1343,8 +1353,9 @@ void Game::thingMoveInternal(Creature *player,
 						moveItem->pos = toPos;
 						toTile->addThing(moveItem);
 
-						if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() == 0) {
+						if(fromItem->getItemCountOrSubtype() == 0) {
 							fromContainer->removeItem(fromItem);
+							this->FreeThing(fromItem);
 						}
 					}
 					else if(fromContainer->removeItem(fromItem)) {
@@ -1373,9 +1384,11 @@ void Game::thingMoveInternal(Creature *player,
 					list[i]->onThingMove(player, fromContainer, from_slotid, fromItem, oldFromCount, toPos, toItem, oldToCount, count);
 				}
 
+				/*
 				if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() == 0) {
 					delete fromItem;
 				}
+				*/
 			}
 		}
 		else {
@@ -1408,8 +1421,9 @@ void Game::thingMoveInternal(Creature *player,
 							toTile->addThing(surplusItem);
 						}
 
-						if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() == 0) {
+						if(fromItem->getItemCountOrSubtype() == 0) {
 							p->removeItemInventory(from_cid, true);
+							this->FreeThing(fromItem);
 						}
 					}
 					else if(count < oldFromCount) {
@@ -1420,8 +1434,9 @@ void Game::thingMoveInternal(Creature *player,
 						moveItem->pos = toPos;
 						toTile->addThing(moveItem);
 
-						if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() == 0) {
+						if(fromItem->getItemCountOrSubtype() == 0) {
 							p->removeItemInventory(from_cid, true);
+							this->FreeThing(fromItem);
 						}
 					}
 					else if(p->removeItemInventory(from_cid, true)) {
@@ -1450,17 +1465,17 @@ void Game::thingMoveInternal(Creature *player,
 					list[i]->onThingMove(player, (slots_t)from_cid, fromItem, oldFromCount, toPos, toItem, oldToCount, count);
 				}
 
+				/*
 				if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() == 0) {
 					delete fromItem;
 				}
+				*/
 			}
 		}
 	}
 }
 
 //ground to container/inventory
-//ground to inventory (100%)
-//ground to container (100%)
 void Game::thingMoveInternal(Creature *player, const Position& fromPos, unsigned char stackPos,
 	unsigned char to_cid, unsigned char to_slotid, bool toInventory, unsigned char count)
 {
@@ -1531,8 +1546,9 @@ void Game::thingMoveInternal(Creature *player, const Position& fromPos, unsigned
 							}
 						}
 
-						if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() == 0) {
+						if(fromItem->getItemCountOrSubtype() == 0) {
 							fromTile->removeThing(fromItem);
+							this->FreeThing(fromItem);
 						}
 					}
 					else if(count < oldFromCount) {
@@ -1541,8 +1557,9 @@ void Game::thingMoveInternal(Creature *player, const Position& fromPos, unsigned
 
 						toContainer->addItem(Item::CreateItem(fromItem->getID(), count));
 
-						if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() == 0) {
+						if(fromItem->getItemCountOrSubtype() == 0) {
 							fromTile->removeThing(fromItem);
+							this->FreeThing(fromItem);
 						}
 					}
 					else if(fromTile->removeThing(fromItem)) {
@@ -1561,9 +1578,11 @@ void Game::thingMoveInternal(Creature *player, const Position& fromPos, unsigned
 					list[i]->onThingMove(player, fromPos, stackpos, fromItem, oldFromCount, toContainer, to_slotid, toItem, oldToCount, count);
 				}
 
+				/*
 				if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() == 0) {
 					delete fromItem;
 				}
+				*/
 			}
 		}
 		//Put on equipment from ground
@@ -1589,8 +1608,9 @@ void Game::thingMoveInternal(Creature *player, const Position& fromPos, unsigned
 							p->sendCancel("Sorry not enough room.");
 						}
 
-						if(fromItem && fromItem->getItemCountOrSubtype() == 0) {
+						if(fromItem->getItemCountOrSubtype() == 0) {
 							fromTile->removeThing(fromItem);
+							this->FreeThing(fromItem);
 						}
 					}
 					else if(count < oldFromCount) {
@@ -1605,8 +1625,9 @@ void Game::thingMoveInternal(Creature *player, const Position& fromPos, unsigned
 							toItem->pos = fromPos;
 						}
 
-						if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() == 0) {
+						if(fromItem->getItemCountOrSubtype() == 0) {
 							fromTile->removeThing(fromItem);
+							this->FreeThing(fromItem);
 						}
 					}
 					else {
@@ -1639,9 +1660,11 @@ void Game::thingMoveInternal(Creature *player, const Position& fromPos, unsigned
 					list[i]->onThingMove(player, fromPos, stackpos, fromItem, oldFromCount, (slots_t)to_cid, toItem, oldToCount, count);
 				}
 
+				/*
 				if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() == 0) {
 					delete fromItem;
 				}
+				*/
 			}
 		}
 	}
@@ -1925,32 +1948,33 @@ void Game::creatureSay(Creature *creature, SpeakClasses type, const std::string 
 					break;
 				}
 
+				Position pos;
 				// Set the NPC pos
 				if(creature->direction == NORTH) {
-					npc->pos.x = creature->pos.x;
-					npc->pos.y = creature->pos.y - 1;
-					npc->pos.z = creature->pos.z;
+					pos.x = creature->pos.x;
+					pos.y = creature->pos.y - 1;
+					pos.z = creature->pos.z;
 				}
 				// South
 				if(creature->direction == SOUTH) {
-					npc->pos.x = creature->pos.x;
-					npc->pos.y = creature->pos.y + 1;
-					npc->pos.z = creature->pos.z;
+					pos.x = creature->pos.x;
+					pos.y = creature->pos.y + 1;
+					pos.z = creature->pos.z;
 				}
 				// East
 				if(creature->direction == EAST) {
-					npc->pos.x = creature->pos.x + 1;
-					npc->pos.y = creature->pos.y;
-					npc->pos.z = creature->pos.z;
+					pos.x = creature->pos.x + 1;
+					pos.y = creature->pos.y;
+					pos.z = creature->pos.z;
 				}
 				// West
 				if(creature->direction == WEST) {
-					npc->pos.x = creature->pos.x - 1;
-					npc->pos.y = creature->pos.y;
-					npc->pos.z = creature->pos.z;
+					pos.x = creature->pos.x - 1;
+					pos.y = creature->pos.y;
+					pos.z = creature->pos.z;
 				}
 				// Place the npc
-				placeCreature(npc);
+				placeCreature(pos, npc);
 			} break; // case 's':
 
 			// Summon?
@@ -1967,32 +1991,36 @@ void Game::creatureSay(Creature *creature, SpeakClasses type, const std::string 
 					break;
 				}
 
+				Position pos;
+
 				// Set the NPC pos
 				if(creature->direction == NORTH) {
-					monster->pos.x = creature->pos.x;
-					monster->pos.y = creature->pos.y - 1;
-					monster->pos.z = creature->pos.z;
+					pos.x = creature->pos.x;
+					pos.y = creature->pos.y - 1;
+					pos.z = creature->pos.z;
 				}
 				// South
 				if(creature->direction == SOUTH) {
-					monster->pos.x = creature->pos.x;
-					monster->pos.y = creature->pos.y + 1;
-					monster->pos.z = creature->pos.z;
+					pos.x = creature->pos.x;
+					pos.y = creature->pos.y + 1;
+					pos.z = creature->pos.z;
 				}
 				// East
 				if(creature->direction == EAST) {
-					monster->pos.x = creature->pos.x + 1;
-					monster->pos.y = creature->pos.y;
-					monster->pos.z = creature->pos.z;
+					pos.x = creature->pos.x + 1;
+					pos.y = creature->pos.y;
+					pos.z = creature->pos.z;
 				}
 				// West
 				if(creature->direction == WEST) {
-					monster->pos.x = creature->pos.x - 1;
-					monster->pos.y = creature->pos.y;
-					monster->pos.z = creature->pos.z;
+					pos.x = creature->pos.x - 1;
+					pos.y = creature->pos.y;
+					pos.z = creature->pos.z;
 				}
+
 				// Place the npc
-				placeCreature(monster);
+				placeCreature(pos, monster);
+				//creature->addSummon(monster);
 			} break; // case 'm':
 
 			// IP ban
@@ -3171,14 +3199,11 @@ void Game::decaySplash(Item* item)
 	OTSYS_THREAD_UNLOCK(gameLock)
 }
 
-
-/*
-void Game::checkSpawns(int n)
+void Game::checkSpawns(int t)
 {
-	SpawnManager::instance()->checkSpawns(n);
-	this->addEvent(makeTask(5000, std::bind2nd(std::mem_fun(&Game::checkSpawns), 0)));
+	SpawnManager::instance()->checkSpawns(t);
+	this->addEvent(makeTask(t, std::bind2nd(std::mem_fun(&Game::checkSpawns), t)));
 }
-*/
 
 void Game::CreateDamageUpdate(Creature* creature, Creature* attackCreature, int damage)
 {
@@ -3278,32 +3303,42 @@ bool Game::playerUseItemEx(Player *player, const Position& posFrom,const unsigne
 {
 	OTSYS_THREAD_LOCK(gameLock)
 	bool ret = false;
-	Item *item = dynamic_cast<Item*>(getThing(posFrom,stack_from,player));
-	if(!item)
-		return ret;
-		
-	//Runes
-	std::map<unsigned short, Spell*>::iterator sit = spells.getAllRuneSpells()->find(item->getID());
-	if(sit != spells.getAllRuneSpells()->end()) {
-		std::string var = std::string(""); 
-		if(sit->second->getMagLv() <= player->maglevel || player->access != 0)
-		{
-			bool success = sit->second->getSpellScript()->castSpell(player, posTo, var);
-			ret = success;
-			item->setItemCharge(std::max((int)item->getItemCharge() - 1, 0) );
-			if(item->getItemCharge() == 0) {				
-				sendRemoveThing(player,posFrom,item,stack_from);
-				removeThing(player,posFrom,item);
+
+	Position thingpos = getThingMapPos(player, posFrom);
+	
+	if( (abs(thingpos.x - player->pos.x) > 1) || (abs(thingpos.y - player->pos.y) > 1) ) {
+		player->sendCancel("To far away...");
+	}
+	else {
+		Item *item = dynamic_cast<Item*>(getThing(posFrom, stack_from, player));
+		if(!item)
+			return ret;
+			
+		//Runes
+		std::map<unsigned short, Spell*>::iterator sit = spells.getAllRuneSpells()->find(item->getID());
+		if(sit != spells.getAllRuneSpells()->end()) {
+			std::string var = std::string(""); 
+			if(sit->second->getMagLv() <= player->maglevel || player->access != 0)
+			{
+				bool success = sit->second->getSpellScript()->castSpell(player, posTo, var);
+				ret = success;
+				if(success) {
+					item->setItemCharge(std::max((int)item->getItemCharge() - 1, 0) );
+					if(item->getItemCharge() == 0) {				
+						sendRemoveThing(player,posFrom,item,stack_from);
+						removeThing(player,posFrom,item);
+					}
+				}
+			}
+			else
+			{			
+				player->sendCancel("You don't have the required magic level to use that rune.");
 			}
 		}
-		else
-		{			
-			player->sendCancel("You don't have the required magic level to use that rune.");
+		else{
+			actions.UseItemEx(player,posFrom,stack_from,posTo,stack_to,itemid);
+			ret = true;
 		}
-	}
-	else{
-		actions.UseItemEx(player,posFrom,stack_from,posTo,stack_to,itemid);
-		ret = true;
 	}
 
 	OTSYS_THREAD_UNLOCK(gameLock)
@@ -3316,6 +3351,8 @@ bool Game::playerUseItem(Player *player, const Position& pos, const unsigned cha
 	OTSYS_THREAD_LOCK(gameLock)
 	actions.UseItem(player,pos,stackpos,itemid);
 	OTSYS_THREAD_UNLOCK(gameLock)
+
+	return true;
 }
 
 void Game::flushSendBuffers(){
@@ -3619,6 +3656,36 @@ void Game::removeThing(Player* player,const Position &pos,Thing* thing)
 		if(tile)
 			tile->removeThing(thing);
 	}	
+}
+
+Position Game::getThingMapPos(Player *player, const Position &pos)
+{
+	if(pos.x == 0xFFFF){
+		Position dummyPos(0,0,0);
+		if(!player)
+			return dummyPos;
+		if(pos.y & 0x40) { //from container						
+			unsigned char containerid = pos.y & 0x0F;
+			const Container* container = player->getContainer(containerid);
+			if(!container){
+				return dummyPos;
+			}			
+			while(container->getParent() != NULL) {				
+				container = container->getParent();				
+			}			
+			if(container->pos.x == 0xFFFF)				
+				return player->pos;			
+			else
+				return container->pos;
+		}
+		else //from inventory
+		{
+			return player->pos;
+		}
+	}
+	else{
+		return pos;
+	}
 }
 
 Thing* Game::getThing(const Position &pos,unsigned char stack, Player* player /*=NULL*/)

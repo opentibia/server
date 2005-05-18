@@ -279,6 +279,15 @@ bool Tile::removeThing(Thing *thing)
       if (*it == thing)
       {
         creatures.erase(it);
+
+				EventMap::iterator it, lb, ub;
+				lb = event_map.lower_bound(EVENT_CREATURE_LEAVE);
+				ub = event_map.upper_bound(EVENT_CREATURE_LEAVE);
+
+				for(it = lb; it != ub; ++it) {
+					(*it).second->onCreatureLeave(creature, creature->pos);
+				}
+
         return true;
       }
   }
@@ -290,7 +299,11 @@ bool Tile::removeThing(Thing *thing)
   else
   {
     ItemVector::iterator it;
-    Item *item = (Item*)thing;
+    Item *item = dynamic_cast<Item*>(thing);
+		if(!item)
+			return false;
+		
+		bool ret = false;
 
     if (item->isAlwaysOnTop())
     {
@@ -298,7 +311,8 @@ bool Tile::removeThing(Thing *thing)
         if (*it == item)
         {
           topItems.erase(it);
-          return true;
+					ret = true;
+					break;
         }
     }
     else
@@ -307,9 +321,24 @@ bool Tile::removeThing(Thing *thing)
         if (*it == item)
         {
           downItems.erase(it);
-          return true;
+					ret = true;
+					break;
         }
-    }
+		}
+
+		/*
+		if(ret) {
+			EventMap::iterator it, lb, ub;
+			lb = event_map.lower_bound(EVENT_ITEM_REMOVE);
+			ub = event_map.upper_bound(EVENT_ITEM_REMOVE);
+
+			for(it = lb; it != ub; ++it) {
+				(*it).second->onItemRemove(creature);
+			}
+		}
+		*/
+
+		return ret;
   }
 
   return false;
@@ -345,10 +374,21 @@ void Tile::addThing(Thing *thing) {
 	Creature* creature = dynamic_cast<Creature*>(thing);
 	if (creature) {
     creatures.insert(creatures.begin(), creature);
+
+		EventMap::iterator it, lb, ub;
+		lb = event_map.lower_bound(EVENT_CREATURE_ENTER);
+		ub = event_map.upper_bound(EVENT_CREATURE_ENTER);
+
+		for(it = lb; it != ub; ++it) {
+			(*it).second->onCreatureEnter(creature, creature->pos);
+		}
   }
   else
   {
-    Item *item = (Item*)thing;
+    Item *item = dynamic_cast<Item*>(thing);
+		if(!item)
+			return;
+
     if (item->isGroundTile())
     {
       ground = item;
@@ -361,7 +401,16 @@ void Tile::addThing(Thing *thing) {
     {
       downItems.insert(downItems.begin(), item);
     }
-  }
+		/*
+		EventMap::iterator it, lb, ub;
+		lb = event_map.lower_bound(EVENT_ITEM_ADD);
+		ub = event_map.upper_bound(EVENT_ITEM_ADD);
+
+		for(it = lb; it != ub; ++it) {
+			(*it).second->onAddItem(creature);
+		}
+		*/
+	}
 }
 
 bool Tile::isPz() const

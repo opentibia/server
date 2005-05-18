@@ -62,12 +62,12 @@ bool Actions::loadFromXml()
 
 	if (doc){
 		this->loaded=true;
-		xmlNodePtr root, p, tmp;
+		xmlNodePtr root, p;
 		root = xmlDocGetRootElement(doc);
 		
 		if (xmlStrcmp(root->name,(const xmlChar*) "actions")){			
 			xmlFreeDoc(doc);
-			return -1;
+			return false;
 		}		
 		p = root->children;
             
@@ -215,7 +215,7 @@ void Action::ClearMap()
 	std::map<unsigned int,KnownThing*>::iterator it;
 	for(it = ThingMap.begin(); it != ThingMap.end();it++ ){
 		delete it->second;
-		it->second == NULL;
+		it->second = NULL;
 	}
 	ThingMap.clear();
 }
@@ -963,7 +963,6 @@ int ActionScript::luaActionGetPlayerSkill(lua_State *L)
 	unsigned int cid = (unsigned int)internalGetNumber(L);
 	
 	Action *action = getAction(L);
-	int value;	
 	
 	const KnownThing* tmp = action->GetPlayerByUID(cid);
 	if(tmp){
