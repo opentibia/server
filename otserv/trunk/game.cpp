@@ -61,8 +61,8 @@ using namespace std;
 extern OTSYS_THREAD_LOCKVAR maploadlock;
 #endif
 
-#define EVENT_CHECKPLAYER          123
-#define EVENT_CHECKPLAYERATTACKING 124
+#define EVENT_CHECKCREATURE          123
+#define EVENT_CHECKCREATUREATTACKING 124
 
 extern LuaScript g_config;
 extern Spells spells;
@@ -569,36 +569,42 @@ Creature* Game::getCreatureByName(const char* s)
 bool Game::placeCreature(Position &pos, Creature* c)
 {
 	OTSYS_THREAD_LOCK(gameLock)
-	if (c->access == 0 && getPlayersOnline() >= max_players){
-		//we cant add the player, server is full	
-		OTSYS_THREAD_UNLOCK(gameLock)
-		return false;
-	}
-
-	c->useThing();
-	if(dynamic_cast<Player*>(c))
-		std::cout << (uint32_t)getPlayersOnline() << " players online." << std::endl;
-		
-	addEvent(makeTask(1000, std::bind2nd(std::mem_fun(&Game::checkPlayer), c->getID())));
-	addEvent(makeTask(2000, std::bind2nd(std::mem_fun(&Game::checkPlayerAttacking), c->getID())));
 	
-	//creature added to the online list, now let the map place it
+	bool success = false;
+	Player *p = dynamic_cast<Player*>(c);
 
-	map->lock();
-	Position spawn = map->placeCreature(pos, c);
-	map->unlock();
+	if (!p || c->access != 0 || getPlayersOnline() < max_players) {
+		map->lock();
+		success = map->placeCreature(pos, c);
+		map->unlock();
 
-	std::vector<Creature*> list;
-	map->getSpectators(Range(spawn, true), list);
+		if(success) {
+			c->useThing();
 
-	for(unsigned int i = 0; i < list.size(); ++i)
-	{
-		list[i]->onCreatureAppear(c);
+			if(p) {
+				std::cout << (uint32_t)getPlayersOnline() << " players online." << std::endl;
+			}
+				
+			addEvent(makeTask(1000, std::bind2nd(std::mem_fun(&Game::checkCreature), c->getID())));
+			addEvent(makeTask(2000, std::bind2nd(std::mem_fun(&Game::checkCreatureAttacking), c->getID())));
+
+			std::vector<Creature*> list;
+			map->getSpectators(Range(pos, true), list);
+
+			for(unsigned int i = 0; i < list.size(); ++i)
+			{
+				list[i]->onCreatureAppear(c);
+			}
+		}
+	}
+	else {
+		//we cant add the player, server is full	
+		success = false;
 	}
 	
 	OTSYS_THREAD_UNLOCK(gameLock)
 
-  return true;
+  return success;
 }
 
 bool Game::removeCreature(Creature* c)
@@ -738,20 +744,33 @@ bool Game::onPrepareMoveThing(Creature *player, const Thing* thing,
 bool Game::onPrepareMoveThing(Creature *player, const Thing* thing, const Tile *fromTile, const Tile *toTile)
 {
 	const Item *item = dynamic_cast<const Item*>(thing);
+	const Player* player_t = dynamic_cast<const Player*>(thing);
+
 	/*if(!toTile && player == creature){
 			player->sendCancelWalk("Sorry, not possible...");
 			return;
 	}*/	
 	
+	if(item && (!toTile || !item->canMovedTo(toTile))) {
+	 	player->sendCancel("Sorry, not possible...");
+		return false;
+	}
+	else if(player_t && (!toTile || !thing->canMovedTo(toTile)) ) {
+   	player->sendCancelWalk("Sorry, not possible...");
+		return false;
+	}
+
+	/*
 	if ((!toTile) || (toTile && !thing->canMovedTo(toTile)) || 
 			(item && (item->isBlocking() && toTile->getCreature())) ){
 		const Player* player_t = dynamic_cast<const Player*>(thing);
     	if (player_t && player == player_t)
-      		player->sendCancelWalk("Sorry, not possible...");      	
-    	else
-      		player->sendCancel("Sorry, not possible...");
+      	player->sendCancelWalk("Sorry, not possible...");      	
+			else {
+      	player->sendCancel("Sorry, not possible...");
+			}
 		return false;
-  }
+  }*/
 	if (fromTile && fromTile->splash == thing && fromTile->splash->isNotMoveable()) {		
 			player->sendCancel("You cannot move this object.");
 #ifdef __DEBUG__
@@ -778,7 +797,7 @@ bool Game::onPrepareMoveThing(Creature *player, const Item* fromItem, const Cont
 		return false;
 	}
 	else if((!fromItem->isStackable() || !toItem || fromItem->getID() != toItem->getID() || toItem->getItemCountOrSubtype() >= 100) && toContainer->size() + 1 > toContainer->capacity()) {		
-		player->sendCancel("Sorry, not enough room.");
+		player->sendCancel("Sorry not enough room.");
 		return false;
 	}
 
@@ -842,7 +861,7 @@ bool Game::onPrepareMoveThing(Player *player, const Position& fromPos, const Ite
 bool Game::onPrepareMoveThing(Player *player, slots_t fromSlot, const Item *fromItem, slots_t toSlot, const Item *toItem)
 {
 	if(toItem && (!toItem->isStackable() || toItem->getID() != fromItem->getID())) {
-		player->sendCancel("Sorry, not enough room.");
+		player->sendCancel("Sorry not enough room.");
 		return false;
 	}
 
@@ -1930,6 +1949,8 @@ void Game::creatureSay(Creature *creature, SpeakClasses type, const std::string 
 	// First, check if this was a GM command
 	if(text[0] == '/' && creature->access > 0)
 	{
+		Player *player = dynamic_cast<Player*>(creature);
+
 		// Get the command
 		switch(text[1])
 		{
@@ -1973,8 +1994,18 @@ void Game::creatureSay(Creature *creature, SpeakClasses type, const std::string 
 					pos.y = creature->pos.y;
 					pos.z = creature->pos.z;
 				}
+
 				// Place the npc
-				placeCreature(pos, npc);
+				if(!placeCreature(pos, npc))
+				{
+					delete npc;
+
+					if(player) {
+						player->sendMagicEffect(player->pos, NM_ME_PUFF);
+						player->sendCancel("Sorry not enough room.");
+					}
+				}
+
 			} break; // case 's':
 
 			// Summon?
@@ -2019,8 +2050,17 @@ void Game::creatureSay(Creature *creature, SpeakClasses type, const std::string 
 				}
 
 				// Place the npc
-				placeCreature(pos, monster);
-				//creature->addSummon(monster);
+				if(!placeCreature(pos, monster)) {
+					delete monster;
+
+					if(player) {
+						player->sendMagicEffect(player->pos, NM_ME_PUFF);
+						player->sendCancel("Sorry not enough room.");
+					}
+				}
+				else
+					creature->addSummon(monster);
+
 			} break; // case 'm':
 
 			// IP ban
@@ -2050,7 +2090,8 @@ void Game::creatureSay(Creature *creature, SpeakClasses type, const std::string 
 					}
 				}
 			}
-			break;	
+			break;
+
 			case 'r':
 			{
 				Creature *c = getCreatureByName(text.substr(3).c_str());
@@ -2076,90 +2117,97 @@ void Game::creatureSay(Creature *creature, SpeakClasses type, const std::string 
 					}
 				}
 			}
-			break;	
-			case 't':
-            {
-                teleport(creature, creature->masterPos);
-            }
-            break;
-            case 'c':
-            {
-              // Create a non-const copy of the command
-							std::string cmd = text;
-							// Erase the first 2 bytes
-							cmd.erase(0,3);  
-							Creature* c = getCreatureByName(cmd.c_str());
-							if(c) {
-								teleport(c, creature->pos);
-							}
-						}
-            break;
-		  case 'i': // Create new items in the ground ;)
-            {
-			std::string cmd = text;
-			cmd.erase(0,3);
-			std::string::size_type pos = cmd.find(0x20, 0);
-			if(pos == std::string::npos)
-				break;
-			
-			int type = atoi(cmd.substr(0, pos).c_str());
-			cmd.erase(0, pos+1);
-			int count = std::min(atoi(cmd.c_str()), 100);
-			
-			Item *newItem = Item::CreateItem(type, count);
-			if(!newItem)
-				break;
-			
-			Tile *t = getTile(creature->pos.x, creature->pos.y, creature->pos.z);
-			if(!t)
-			{
-				delete newItem;
-				break;
-			}
-			newItem->pos = creature->pos;
-			t->addThing(newItem);
-			
-			Game::creatureBroadcastTileUpdated(creature->pos);
-			
-            }
-            break;
-		  case 'q': // Testing command to see your money and to substract too.
-            {
-			std::string cmd = text;
-			cmd.erase(0,3);
-			
-			Player *p = dynamic_cast<Player *>(creature);
-			if(!p)
-				break;
-			
-			int count = atoi(cmd.c_str());
-			unsigned long money = p->getMoney();
-			if(!count)
-			{
-				std::stringstream info;
-				info << "You have " << money << " of money.";
-				p->sendCancel(info.str().c_str());
-				break;
-			}
-			else if(count > money)
-			{
-				std::stringstream info;
-				info << "You have " << money << " of money and is not suficient.";
-				p->sendCancel(info.str().c_str());
-				break;
-			}
-			
-			p->substractMoney(count);
-            }
-            break;
-          case 'z': //protocol command
-			std::string cmd = text;
-			cmd.erase(0,3);
-			int color = atoi(cmd.c_str());
-			Player *p = dynamic_cast<Player *>(creature);			
-			if(p)		
-				p->sendMagicEffect(p->pos,color);					
 			break;
+
+			case 't':
+			{
+				teleport(creature, creature->masterPos);
+			}
+			break;
+
+			case 'c':
+      {
+        // Create a non-const copy of the command
+				std::string cmd = text;
+				// Erase the first 2 bytes
+				cmd.erase(0,3);  
+				Creature* c = getCreatureByName(cmd.c_str());
+				if(c) {
+					teleport(c, creature->pos);
+				}
+			}
+      break;
+
+		  case 'i': // Create new items in the ground ;)
+			{
+				std::string cmd = text;
+				cmd.erase(0,3);
+				std::string::size_type pos = cmd.find(0x20, 0);
+				if(pos == std::string::npos)
+					break;
+				
+				int type = atoi(cmd.substr(0, pos).c_str());
+				cmd.erase(0, pos+1);
+				int count = std::min(atoi(cmd.c_str()), 100);
+				
+				Item *newItem = Item::CreateItem(type, count);
+				if(!newItem)
+					break;
+				
+				Tile *t = getTile(creature->pos.x, creature->pos.y, creature->pos.z);
+				if(!t)
+				{
+					delete newItem;
+					break;
+				}
+				newItem->pos = creature->pos;
+				t->addThing(newItem);
+				
+				Game::creatureBroadcastTileUpdated(creature->pos);			
+			}
+			break;
+
+		  case 'q': // Testing command to see your money and to substract too.
+      {
+				std::string cmd = text;
+				cmd.erase(0,3);
+				
+				Player *p = dynamic_cast<Player *>(creature);
+				if(!p)
+					break;
+				
+				int count = atoi(cmd.c_str());
+				unsigned long money = p->getMoney();
+				if(!count)
+				{
+					std::stringstream info;
+					info << "You have " << money << " of money.";
+					p->sendCancel(info.str().c_str());
+					break;
+				}
+				else if(count > money)
+				{
+					std::stringstream info;
+					info << "You have " << money << " of money and is not suficient.";
+					p->sendCancel(info.str().c_str());
+					break;
+				}
+				
+				p->substractMoney(count);
+			}
+			break;
+
+			case 'z': //protocol command
+			{
+				std::string cmd = text;
+				cmd.erase(0,3);
+				int color = atoi(cmd.c_str());
+				if(player) {
+					player->sendMagicEffect(player->pos, color);
+				}
+			}
+			break;
+
 		}
 	}
 
@@ -2850,7 +2898,7 @@ std::list<Position> Game::getPathTo(Creature *creature, Position start, Position
 	return map->getPathTo(creature, start, to, creaturesBlock);
 }
 
-void Game::checkPlayer(unsigned long id)
+void Game::checkCreature(unsigned long id)
 {
 	OTSYS_THREAD_LOCK(gameLock)
 	Creature *creature = getCreatureByID(id);
@@ -2861,13 +2909,11 @@ void Game::checkPlayer(unsigned long id)
 		int oldThinkTicks = creature->onThink(thinkTicks);
 		
 		if(thinkTicks > 0) {
-			addEvent(makeTask(thinkTicks, std::bind2nd(std::mem_fun(&Game::checkPlayer), id)));
+			addEvent(makeTask(thinkTicks, std::bind2nd(std::mem_fun(&Game::checkCreature), id)));
 		}
 
 		Player* player = dynamic_cast<Player*>(creature);
 		if(player){
-			//addEvent(makeTask(1000, std::bind2nd(std::mem_fun(&Game::checkPlayer), id)));
-			
 			Tile *tile = getTile(player->pos.x, player->pos.y, player->pos.z);
 			if(tile == NULL){
 				std::cout << "CheckPlayer NULL tile: " << player->getName() << std::endl;
@@ -2938,7 +2984,7 @@ void Game::checkPlayer(unsigned long id)
 			//End Magic Level Advance
 
 			if(player->inFightTicks >= 1000) {
-				player->inFightTicks -= thinkTicks; /*1000;*/
+				player->inFightTicks -= thinkTicks;
 				
 				if(player->inFightTicks < 1000)
 					player->pzLocked = false;
@@ -2946,31 +2992,27 @@ void Game::checkPlayer(unsigned long id)
 			}
 			
 			if(player->exhaustedTicks >=1000){
-				player->exhaustedTicks -= thinkTicks; /*1000;*/
+				player->exhaustedTicks -= thinkTicks;
 			}
 			
 			if(player->manaShieldTicks >=1000){
-				player->manaShieldTicks -= thinkTicks; /*1000;*/
+				player->manaShieldTicks -= thinkTicks;
 				
 				if(player->manaShieldTicks  < 1000)
 					player->sendIcons();
 			}
 			
 			if(player->hasteTicks >=1000){
-				player->hasteTicks -= thinkTicks; /*1000*/;
+				player->hasteTicks -= thinkTicks;
 			}	
 		}
 		else {
- 			/*
-			addEvent(makeTask(300, std::bind2nd(std::mem_fun(&Game::checkPlayer), id)));
-			*/
-
 			if(creature->manaShieldTicks >=1000){
-					creature->manaShieldTicks -= thinkTicks; /*300*/;
+				creature->manaShieldTicks -= thinkTicks;
 			}
 				
 			if(creature->hasteTicks >=1000){
-				creature->hasteTicks -= thinkTicks; /*300*/;
+				creature->hasteTicks -= thinkTicks;
 			}
 		}
 
@@ -2984,7 +3026,7 @@ void Game::checkPlayer(unsigned long id)
 
 				CreatureCondition& condition = condVec[0];
 
-				if(condition.onTick(oldThinkTicks /*decTick*/)) {
+				if(condition.onTick(oldThinkTicks)) {
 					const MagicEffectTargetCreatureCondition* magicTargetCondition =  condition.getCondition();
 					Creature* c = getCreatureByID(magicTargetCondition->getOwnerID());
 					creatureMakeMagic(c, creature->pos, magicTargetCondition);
@@ -3052,7 +3094,7 @@ void Game::changeSpeed(unsigned long id, unsigned short speed)
 	OTSYS_THREAD_UNLOCK(gameLock)
 }
 
-void Game::checkPlayerAttacking(unsigned long id)
+void Game::checkCreatureAttacking(unsigned long id)
 {
 	OTSYS_THREAD_LOCK(gameLock)
 
@@ -3064,7 +3106,7 @@ void Game::checkPlayerAttacking(unsigned long id)
 			monster->onAttack();
 		}
 		else {
-			addEvent(makeTask(2000, std::bind2nd(std::mem_fun(&Game::checkPlayerAttacking), id)));
+			addEvent(makeTask(2000, std::bind2nd(std::mem_fun(&Game::checkCreatureAttacking), id)));
 
 			if (creature->attackedCreature != 0)
 			{

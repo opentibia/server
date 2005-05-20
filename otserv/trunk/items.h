@@ -91,6 +91,7 @@ public:
 	bool floorChangeSouth;
 	bool floorChangeEast;
 	bool floorChangeWest;
+	bool blockpickupable;
 };
 
 

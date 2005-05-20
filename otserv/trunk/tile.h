@@ -70,7 +70,7 @@ public:
   Thing* getThingByStackPos(int pos);
 
   bool isBlockingProjectile() const;
-	bool isBlocking() const;
+	bool isBlocking(bool ispickupable = false) const;
 
   bool isPz() const;
   void setPz();

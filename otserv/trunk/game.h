@@ -297,8 +297,8 @@ class Game {
 			void*    data;
 		};
 
-		void checkPlayerAttacking(unsigned long id);
-		void checkPlayer(unsigned long id);
+		void checkCreatureAttacking(unsigned long id);
+		void checkCreature(unsigned long id);
 		void decayItem(Item *item);
 		void decaySplash(Item* item);
 	

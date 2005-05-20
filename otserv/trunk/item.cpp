@@ -24,6 +24,7 @@
 #include "container.h"
 #include "magic.h"
 #include "player.h"
+#include "tile.h"
 
 #include <iostream>
 #include <sstream>
@@ -184,6 +185,12 @@ Item::~Item()
 		delete text;
 }
 
+bool Item::canMovedTo(const Tile *tile) const
+{
+	return !tile->isBlocking(isPickupable());
+	//return Thing::canMovedTo(tile);
+}
+
 int Item::unserialize(xmlNodePtr p){
 	id=atoi((const char*)xmlGetProp(p, (const xmlChar *) "id"));
 	
@@ -257,8 +264,11 @@ bool Item::isBlockingProjectile() const {
 	return items[id].blockingProjectile;
 }
 
-bool Item::isBlocking() const {
-	return items[id].blocking;
+bool Item::isBlocking(bool ispickupable /*= false*/) const {
+	if(ispickupable && items[id].blocking)
+		return items[id].blockpickupable;
+	else
+		return items[id].blocking;
 }
 
 bool Item::isStackable() const {

@@ -231,9 +231,8 @@ class Map {
 	  * Place a creature on the map
 	  * \param pos The position to place the creature
 	  * \param c Creature pointer to the creature to place
-	  * \returns The postition the Creature was actually added at
 	  */
-    Position placeCreature(Position &pos, Creature* c);
+    bool placeCreature(Position &pos, Creature* c);
 	
 	/**
 	  * Remove a creature from the map.

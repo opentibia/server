@@ -30,18 +30,18 @@ bool Tile::isBlockingProjectile() const
   return false;
 }
 
-bool Tile::isBlocking() const
+bool Tile::isBlocking(bool ispickupable /*= false*/) const
 {
-  if(ground && ground->isBlocking() == true)
+  if(ground && ground->isBlocking(ispickupable) == true)
     return true;
   
 	ItemVector::const_iterator iit;
   for (iit = topItems.begin(); iit != topItems.end(); ++iit)
-    if ((*iit)->isBlocking())
+    if ((*iit)->isBlocking(ispickupable))
       return true;
 
   for (iit = downItems.begin(); iit != downItems.end(); ++iit)
-    if ((*iit)->isBlocking())
+    if ((*iit)->isBlocking(ispickupable))
       return true;
 
 

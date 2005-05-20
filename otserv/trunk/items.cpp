@@ -46,6 +46,7 @@ ItemType::ItemType()
 	floorChangeSouth = false;
 	floorChangeEast = false;
 	floorChangeWest = false;
+	blockpickupable = true;
 
 	isteleport = false;
 	iskey = false;
@@ -264,6 +265,9 @@ int Items::loadFromDat(std::string file)
                     fgetc(f); //always 4 max number of  newlines ? 
 				    break;
 				case 0x13: // mostly blocking items, but also items that can pile up in level (boxes, chairs etc)
+					iType->blockpickupable = false;
+					//std::cout << "0x13: " << id << std::endl;
+
                     fgetc(f); //always 8
                     fgetc(f); //always 0
                     break;

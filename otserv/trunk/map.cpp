@@ -361,50 +361,69 @@ void Map::setTile(unsigned short _x, unsigned short _y, unsigned char _z, unsign
   } 
 }
 
-Position Map::placeCreature(Position &pos, Creature* c){
-	if (!c->canMovedTo(getTile(pos.x, pos.y, pos.z)))
+//Position Map::placeCreature(Position &pos, Creature* c){
+bool Map::placeCreature(Position &pos, Creature* c)
+{
+	Tile* tile = getTile(pos.x, pos.y, pos.z);
+	bool success = tile && c->canMovedTo(tile);
+	if(!success)
 	{   
-		bool found =false;
-		for(int cx =pos.x-1; cx <= pos.x+1 && !found; cx++){
-			for(int cy = pos.y-1; cy <= pos.y+1 && !found; cy++){
-				std::cout << "search pos x: " << cx <<" y: "<< cy << std::endl;                
-				if (c->canMovedTo(getTile(cx, cy, pos.z))){
+		for(int cx =pos.x - 1; cx <= pos.x + 1 && !success; cx++) {
+			for(int cy = pos.y - 1; cy <= pos.y + 1 && !success; cy++){
+#ifdef __DEBUG__
+				std::cout << "search pos x: " << cx <<" y: "<< cy << std::endl;
+#endif
+
+				tile = getTile(cx, cy, pos.z);
+				success = tile && c->canMovedTo(tile);
+
+				if(success) {
 					pos.x = cx;
 					pos.y = cy;
-					found = true;
 				}
 			}
 		}
-		if(!found){
-			pos.x = c->masterPos.x;
-			pos.y = c->masterPos.y;
-			pos.z = c->masterPos.z;
+
+		if(!success){
+			Player *player = dynamic_cast<Player*>(c);
+			if(player) {
+				pos.x = c->masterPos.x;
+				pos.y = c->masterPos.y;
+				pos.z = c->masterPos.z;
+
+				tile = getTile(pos.x, pos.y, pos.z);
+				success = tile && player->canMovedTo(tile);
+			}
 		}    
 
 	}
-	Tile* tile=getTile(pos.x, pos.y, pos.z);
-	if (!tile){
-         pos = Position();
-         tile=getTile(pos.x, pos.y, pos.z);
-    }
+
+	if(!success || !tile) {
+#ifdef __DEBUG__
+	std::cout << "Failed to place creature onto map!" << std::endl;
+#endif
+		return false;
+	}
+
 	std::cout << "POS: " << c->pos << std::endl;
 	tile->addThing(c);
 	c->pos = pos;
 
-	return pos;
-         
-
+	return true;
 }
 
 bool Map::removeCreature(Creature* c)
 {
 	OTSYS_THREAD_LOCK(mapLock)
-	/*int stackpos =  getTile(c->pos.x, c->pos.y, c->pos.z)->getCreatureStackPos(c);*/
-	getTile(c->pos.x, c->pos.y, c->pos.z)->removeThing(c);
+	bool ret = true;
+
+	Tile *tile = getTile(c->pos.x, c->pos.y, c->pos.z);
+	if(!tile || !tile->removeThing(c))
+		ret = false;
 
 	OTSYS_THREAD_UNLOCK(mapLock)
 
-    return true;
+	return ret;
 }
 
 void Map::getSpectators(const Range& range, std::vector<Creature*>& list)

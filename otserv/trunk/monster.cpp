@@ -737,8 +737,8 @@ void Monster::OnCreatureEnter(const Creature *creature)
 			//Update move position
 			calcMovePosition();
 
-			game->addEvent(makeTask(500, std::bind2nd(std::mem_fun(&Game::checkPlayer), getID())));
-			game->addEvent(makeTask(500, std::bind2nd(std::mem_fun(&Game::checkPlayerAttacking), getID())));
+			game->addEvent(makeTask(500, std::bind2nd(std::mem_fun(&Game::checkCreature), getID())));
+			game->addEvent(makeTask(500, std::bind2nd(std::mem_fun(&Game::checkCreatureAttacking), getID())));
 		}
 	}
 }
@@ -862,7 +862,7 @@ bool Monster::doAttacks(Player* attackedPlayer)
 void Monster::onAttack()
 {
 	if (attackedCreature != 0) {
-		game->addEvent(makeTask(500, std::bind2nd(std::mem_fun(&Game::checkPlayerAttacking), getID())));
+		game->addEvent(makeTask(500, std::bind2nd(std::mem_fun(&Game::checkCreatureAttacking), getID())));
 
 		exhaustedTicks -= 500;
 

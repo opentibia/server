@@ -52,10 +52,9 @@ public:
 	static Item* CreateItem(const unsigned short _type, unsigned short _count = 0); //Factory member to create item of right type based on type
 	static Items items;
 
-   	unsigned short getID() const;    // ID as in ItemType
-   	void setID(unsigned short newid);
-		
-    
+  unsigned short getID() const;    // ID as in ItemType
+  void setID(unsigned short newid);
+		    
 	WeaponType getWeaponType() const;
 	amu_t	getAmuType() const;
 	subfight_t getSubfightType() const;
@@ -65,7 +64,7 @@ public:
 	int getSlotPosition() const;
 		
 	bool isBlockingProjectile() const;
-	bool isBlocking() const;
+	bool isBlocking(bool ispickupable = false) const;
 	bool isStackable() const;
 	bool isFluidContainer() const;
     bool isMultiType() const;
@@ -107,18 +106,20 @@ public:
 	void setFluidType(unsigned char n) {fluid = n;};
 	
 	unsigned short getKeyNumber() const {return keyNumber;};
+
 	/**
 	 * Called when the item is about to decay/transform to the next step.
 	 * \returns The item to decay to.
 	 */
 	virtual Item* tranform();
 
-    // Constructor for items
-    Item(const unsigned short _type);
-    Item(const unsigned short _type, unsigned short _count);
+  // Constructor for items
+  Item(const unsigned short _type);
+  Item(const unsigned short _type, unsigned short _count);
 	Item();
-    virtual ~Item();
-    virtual void useThing() {
+
+  virtual ~Item();
+  virtual void useThing() {
 		//std::cout << "Item: useThing() " << (int)this << std::endl;
 		useCount++;
 	};
@@ -130,6 +131,8 @@ public:
 		if (useCount <= 0)
 			delete this;
 	};
+	
+	virtual bool canMovedTo(const Tile *tile) const;
 };
 
 class Teleport : public Item
