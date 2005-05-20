@@ -42,6 +42,8 @@
 #include "tasks.h"
 #include "otsystem.h"
 #include "actions.h"
+#include "game.h"
+
 extern LuaScript g_config;
 extern Actions actions;
 std::map<long, Creature*> channel;
@@ -527,7 +529,7 @@ void Protocol74::parseMoveByMouse(NetworkMessage &msg)
 		sendCancelWalk("");
 	}
   else{     
-		game->addEvent(makeTask(0, MovePlayer(player->getID()), path, 400, StopMovePlayer(player->getID())));
+		game->addEvent(makeTask<Direction>(0, MovePlayer(player->getID()), path, 400, StopMovePlayer(player->getID())));
  }
 }
 

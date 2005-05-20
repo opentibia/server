@@ -22,59 +22,55 @@
 #ifndef __OTSERV_SCHEDULER_H
 #define __OTSERV_SCHEDULER_H
 
+#include <boost/function.hpp>
+#include <boost/bind.hpp>
 #include <functional>
 #include "otsystem.h"
 
 class Game;
 
-class SchedulerTask : public std::unary_function<Game*, int> {
+class SchedulerTask {
 		  public:
-					 inline __int64 getCycle() const {
-								return _cycle;
-					 }
-
 					 // definition to make sure lower cycles end up front
 					 // in the priority_queue used in the scheduler
 					 inline bool operator<(const SchedulerTask& other) const {
 								return getCycle() > other.getCycle();
 					 }
 
-					 virtual result_type operator()(const argument_type&) = 0;
+					 virtual void operator()(Game* arg) = 0;
 
 					 virtual void setTicks(const __int64 ticks) {
 								_cycle = OTSYS_TIME() + ticks;;
 					 }
 
+					 inline __int64 getCycle() const {
+								return _cycle;
+					 }
+
 					 virtual ~SchedulerTask() { };
+
 		  protected:
 					 __int64 _cycle;
 };
 
-template<class Functor>
 class TSchedulerTask : public SchedulerTask {
 		  public:
-					 TSchedulerTask(Functor f) : _f(f) { }
-
-					 virtual result_type operator()(const argument_type& arg) {
-								_f(arg);
-                return 0;
+					 TSchedulerTask(boost::function1<void, Game*> f) : _f(f) {
 					 }
 
+					 virtual void operator()(Game* arg) {
+								_f(arg);
+					 }
+
+					 virtual ~TSchedulerTask() { }
+
 		  protected:
-					 Functor _f;
+					 boost::function1<void, Game*> _f;
 };
 
-template<class Functor>
-TSchedulerTask<Functor>* makeTask(Functor f) {
-		  return new TSchedulerTask<Functor>(f);
-}
+SchedulerTask* makeTask(boost::function1<void, Game*> f);
 
-template<class Functor>
-TSchedulerTask<Functor>* makeTask(__int64 ticks, Functor f) {
-		  TSchedulerTask<Functor> *t = new TSchedulerTask<Functor>(f);
-		  t->setTicks(ticks);
-		  return t;
-}
+SchedulerTask* makeTask(__int64 ticks, boost::function1<void, Game*> f);
 
 class lessSchedTask : public std::binary_function<SchedulerTask*, SchedulerTask*, bool> {
 		  public:

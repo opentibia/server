@@ -153,7 +153,7 @@ void GameState::onAttack(Creature* attacker, const Position& pos, const MagicEff
 
 			//mapstate.addThing(tile, magicItem);
 
-			game->addEvent(makeTask(newmagicItem->getDecayTime(), std::bind2nd(std::mem_fun(&Game::decayItem), magicItem)));
+			game->addEvent(makeTask(newmagicItem->getDecayTime(), boost::bind(&Game::decayItem, _1, magicItem)));
 		}
 	}
 
@@ -332,7 +332,7 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 		//Start decaying
 		unsigned short decayTime = Item::items[corpseitem->getID()].decayTime;
 		//game->addEvent(makeTask(decayTime*1000, boost::bind(&Game::decayItem, this->game, corpseitem->pos, corpseitem->getID(), tile->getThingStackPos(corpseitem)) ) );
-		game->addEvent(makeTask(decayTime*1000, std::bind2nd(std::mem_fun(&Game::decayItem), corpseitem)));
+		game->addEvent(makeTask(decayTime*1000, boost::bind(&Game::decayItem, _1, corpseitem)));
 		
 		if(attackedCreature && attackedCreature->getMaster() != NULL) {
 			attackedCreature->getMaster()->removeSummon(attackedCreature);

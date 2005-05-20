@@ -64,6 +64,9 @@ CC = @CC@
 CXX = @CXX@
 DEBUG = @DEBUG@
 EXEEXT = @EXEEXT@
+HAVE_LIB = @HAVE_LIB@
+LIB = @LIB@
+LTLIB = @LTLIB@
 LUA50_CFLAGS = @LUA50_CFLAGS@
 LUA50_LIBS = @LUA50_LIBS@
 MAKEINFO = @MAKEINFO@
@@ -80,8 +83,8 @@ AUTOMAKE_OPTIONS = foreign
 noinst_PROGRAMS = otserv
 
 AM_CXXFLAGS = $(XML_CPPFLAGS) $(OTSERV_FLAGS) $(LUA50_CFLAGS) -D_THREAD_SAFE -D_REENTRANT -Werror
-otserv_LDADD = $(XML_LIBS) $(LUA50_LIBS) $(BOOST_LIBS) -ldl -lmysqlpp
-otserv_SOURCES = account.cpp container.cpp creature.cpp game.cpp ioaccount.cpp ioaccountsql.cpp 	ioaccountxml.cpp iomapxml.cpp ioplayer.cpp ioplayersql.cpp ioplayerxml.cpp 	item.cpp items.cpp luascript.cpp magic.cpp map.cpp monster.cpp networkmessage.cpp npc.cpp 	otserv.cpp player.cpp position.cpp protocol.cpp protocol74.cpp spells.cpp 	status.cpp thing.cpp tile.cpp tools.cpp account.h bootstrap.sh config.h const74.h 	container.h creature.h definitions.h game.h ioaccount.h ioaccountsql.h ioaccountxml.h 	iomap.h iomapxml.h ioplayer.h ioplayersql.h ioplayerxml.h item.h items.h 	luascript.h magic.h map.h monster.h networkmessage.h npc.h otsystem.h player.h 	position.h protocol.h protocol74.h scheduler.h spells.h stamp-h status.h 	tasks.h templates.h texcept.h thing.h tile.h tools.h
+otserv_LDADD = $(XML_LIBS) $(LUA50_LIBS) $(BOOST_LIBS) -ldl
+otserv_SOURCES = account.cpp container.cpp creature.cpp game.cpp ioaccount.cpp 	ioaccountxml.cpp iomapxml.cpp ioplayer.cpp ioplayerxml.cpp 	item.cpp items.cpp luascript.cpp magic.cpp map.cpp monster.cpp networkmessage.cpp npc.cpp 	otserv.cpp player.cpp position.cpp protocol.cpp protocol74.cpp spells.cpp 	status.cpp thing.cpp tile.cpp tools.cpp account.h bootstrap.sh config.h const74.h 	container.h creature.h definitions.h game.h ioaccount.h ioaccountxml.h 	iomap.h iomapxml.h ioplayer.h ioplayerxml.h item.h items.h 	luascript.h magic.h map.h monster.h networkmessage.h npc.h otsystem.h player.h 	position.h protocol.h protocol74.h scheduler.h spells.h stamp-h status.h 	tasks.h templates.h texcept.h thing.h tile.h tools.h spawn.cpp spawn.h 	actions.h actions.cpp scheduler.cpp
 
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
@@ -97,13 +100,14 @@ LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 otserv_OBJECTS =  account.$(OBJEXT) container.$(OBJEXT) \
 creature.$(OBJEXT) game.$(OBJEXT) ioaccount.$(OBJEXT) \
-ioaccountsql.$(OBJEXT) ioaccountxml.$(OBJEXT) iomapxml.$(OBJEXT) \
-ioplayer.$(OBJEXT) ioplayersql.$(OBJEXT) ioplayerxml.$(OBJEXT) \
-item.$(OBJEXT) items.$(OBJEXT) luascript.$(OBJEXT) magic.$(OBJEXT) \
-map.$(OBJEXT) monster.$(OBJEXT) networkmessage.$(OBJEXT) npc.$(OBJEXT) \
-otserv.$(OBJEXT) player.$(OBJEXT) position.$(OBJEXT) protocol.$(OBJEXT) \
+ioaccountxml.$(OBJEXT) iomapxml.$(OBJEXT) ioplayer.$(OBJEXT) \
+ioplayerxml.$(OBJEXT) item.$(OBJEXT) items.$(OBJEXT) \
+luascript.$(OBJEXT) magic.$(OBJEXT) map.$(OBJEXT) monster.$(OBJEXT) \
+networkmessage.$(OBJEXT) npc.$(OBJEXT) otserv.$(OBJEXT) \
+player.$(OBJEXT) position.$(OBJEXT) protocol.$(OBJEXT) \
 protocol74.$(OBJEXT) spells.$(OBJEXT) status.$(OBJEXT) thing.$(OBJEXT) \
-tile.$(OBJEXT) tools.$(OBJEXT)
+tile.$(OBJEXT) tools.$(OBJEXT) spawn.$(OBJEXT) actions.$(OBJEXT) \
+scheduler.$(OBJEXT)
 otserv_DEPENDENCIES = 
 otserv_LDFLAGS = 
 CXXFLAGS = @CXXFLAGS@
@@ -122,14 +126,14 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = tar
 GZIP_ENV = --best
-DEP_FILES =  .deps/account.P .deps/container.P .deps/creature.P \
-.deps/game.P .deps/ioaccount.P .deps/ioaccountsql.P \
-.deps/ioaccountxml.P .deps/iomapxml.P .deps/ioplayer.P \
-.deps/ioplayersql.P .deps/ioplayerxml.P .deps/item.P .deps/items.P \
-.deps/luascript.P .deps/magic.P .deps/map.P .deps/monster.P \
-.deps/networkmessage.P .deps/npc.P .deps/otserv.P .deps/player.P \
-.deps/position.P .deps/protocol.P .deps/protocol74.P .deps/spells.P \
-.deps/status.P .deps/thing.P .deps/tile.P .deps/tools.P
+DEP_FILES =  .deps/account.P .deps/actions.P .deps/container.P \
+.deps/creature.P .deps/game.P .deps/ioaccount.P .deps/ioaccountxml.P \
+.deps/iomapxml.P .deps/ioplayer.P .deps/ioplayerxml.P .deps/item.P \
+.deps/items.P .deps/luascript.P .deps/magic.P .deps/map.P \
+.deps/monster.P .deps/networkmessage.P .deps/npc.P .deps/otserv.P \
+.deps/player.P .deps/position.P .deps/protocol.P .deps/protocol74.P \
+.deps/scheduler.P .deps/spawn.P .deps/spells.P .deps/status.P \
+.deps/thing.P .deps/tile.P .deps/tools.P
 SOURCES = $(otserv_SOURCES)
 OBJECTS = $(otserv_OBJECTS)
 
@@ -236,7 +240,7 @@ TAGS:  $(HEADERS) $(SOURCES) config.h.in $(TAGS_DEPENDENCIES) $(LISP)
 	  awk '    { files[$$0] = 1; } \
 	       END { for (i in files) print i; }'`; \
 	test -z "$(ETAGS_ARGS)config.h.in$$unique$(LISP)$$tags" \
-	  || (cd $(srcdir) && etags $(ETAGS_ARGS) $$tags config.h.in $$unique $(LISP) -o $$here/TAGS)
+	  || (cd $(srcdir) && etags -o $$here/TAGS $(ETAGS_ARGS) $$tags config.h.in $$unique $(LISP))
 
 mostlyclean-tags:
 
