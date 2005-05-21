@@ -49,6 +49,16 @@ Creature::Creature(const char *name, unsigned long _id) :
   speed = 220;
 }
 
+Creature::~Creature()
+{
+	std::vector<Creature*>::iterator cit;
+	for(cit = summons.begin(); cit != summons.end(); ++cit) {
+		(*cit)->setMaster(NULL);
+		(*cit)->releaseThing();
+	}
+
+	summons.clear();
+}
 
 void Creature::drainHealth(int damage)
 {
@@ -73,16 +83,17 @@ void Creature::setMaster(Creature* creature)
 void Creature::addSummon(Creature *creature)
 {
 	creature->setMaster(this);
+	creature->useThing();
 	summons.push_back(creature);
-	//monster->useThing();
 }
 
 void Creature::removeSummon(Creature *creature)
 {
-	std::vector<Creature*>::iterator it = std::find(summons.begin(), summons.end(), creature);
-	if(it != summons.end()) {
-		summons.erase(it);
-		//(*it)->releaseThing();
+	std::vector<Creature*>::iterator cit = std::find(summons.begin(), summons.end(), creature);
+	if(cit != summons.end()) {
+		summons.erase(cit);
+		(*cit)->setMaster(NULL);
+		(*cit)->releaseThing();
 	}
 }
 

@@ -72,6 +72,7 @@ SchedulerTask* makeTask(boost::function1<void, Game*> f);
 
 SchedulerTask* makeTask(__int64 ticks, boost::function1<void, Game*> f);
 
+
 class lessSchedTask : public std::binary_function<SchedulerTask*, SchedulerTask*, bool> {
 		  public:
 		  bool operator()(SchedulerTask*& t1, SchedulerTask*& t2) {

@@ -361,7 +361,6 @@ void Map::setTile(unsigned short _x, unsigned short _y, unsigned char _z, unsign
   } 
 }
 
-//Position Map::placeCreature(Position &pos, Creature* c){
 bool Map::placeCreature(Position &pos, Creature* c)
 {
 	Tile* tile = getTile(pos.x, pos.y, pos.z);
@@ -414,16 +413,15 @@ bool Map::placeCreature(Position &pos, Creature* c)
 
 bool Map::removeCreature(Creature* c)
 {
-	OTSYS_THREAD_LOCK(mapLock)
+	//OTSYS_THREAD_LOCK(mapLock)
 	bool ret = true;
 
 	Tile *tile = getTile(c->pos.x, c->pos.y, c->pos.z);
 	if(!tile || !tile->removeThing(c))
-		ret = false;
+		return false;
 
-	OTSYS_THREAD_UNLOCK(mapLock)
-
-	return ret;
+	//OTSYS_THREAD_UNLOCK(mapLock)
+	return true;
 }
 
 void Map::getSpectators(const Range& range, std::vector<Creature*>& list)

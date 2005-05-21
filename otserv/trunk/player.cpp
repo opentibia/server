@@ -202,7 +202,7 @@ int Player::getWeaponDamage() const
 							else{	//miss
 								return 0;
 							}
-						}						
+						}
 						break;
 					case MAGIC:
 						damagemax = (level*2+maglevel*3) * 1.25;
@@ -1050,6 +1050,8 @@ Item * Player::GetDistWeapon() const{
 					else{
 						return NULL;
 					}
+				break;
+
 				case MAGIC:
 					return items[slot];
 				default:

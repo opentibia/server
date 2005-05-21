@@ -109,7 +109,7 @@ class Creature : public AutoList<Creature>, public Thing
 {
 public:
   Creature(const char *name, unsigned long _id);
-  virtual ~Creature() {};
+  virtual ~Creature();
 
   virtual const std::string& getName() const {return name; };
 
@@ -186,7 +186,8 @@ public:
 		return speed;
 	};
 
-  virtual int getStepDuration(int underground) { return (1000*120*100)/(getSpeed()*underground); };
+  virtual int getStepDuration(int underground) { return (1000 * 120 * (underground / 100)) / getSpeed(); };
+  //virtual int getStepDuration(int underground) { return (1000*120*100)/(getSpeed()*underground); };
   void setNormalSpeed()
   {
 		if(access!=0){

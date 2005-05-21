@@ -331,7 +331,6 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 
 		//Start decaying
 		unsigned short decayTime = Item::items[corpseitem->getID()].decayTime;
-		//game->addEvent(makeTask(decayTime*1000, boost::bind(&Game::decayItem, this->game, corpseitem->pos, corpseitem->getID(), tile->getThingStackPos(corpseitem)) ) );
 		game->addEvent(makeTask(decayTime*1000, boost::bind(&Game::decayItem, _1, corpseitem)));
 		
 		if(attackedCreature && attackedCreature->getMaster() != NULL) {
@@ -612,24 +611,53 @@ bool Game::removeCreature(Creature* c)
 	OTSYS_THREAD_LOCK(gameLock)
 
 #ifdef __DEBUG__
-		std::cout << "removing creature "<< std::endl;
+	std::cout << "removing creature "<< std::endl;
 #endif
-		Tile *tile = map->getTile(c->pos.x, c->pos.y, c->pos.z);
-		if(tile != NULL){			
-			int stackpos = tile->getCreatureStackPos(c);
-			//map->removeCreature(c);
-			if(stackpos != 255){
-				tile->removeThing(c);
-				std::vector<Creature*> list;
-				getSpectators(Range(c->pos, true), list);
-				for(unsigned int i = 0; i < list.size(); ++i)
-				{			
-					list[i]->onCreatureDisappear(c, stackpos);
-				}	
-				std::cout << (uint32_t)getPlayersOnline() << " players online." << std::endl;
+	Tile *tile = map->getTile(c->pos.x, c->pos.y, c->pos.z);
+	if(tile != NULL){			
+		map->lock();
+		int stackpos = tile->getCreatureStackPos(c);
+		bool success = map->removeCreature(c);
+		map->unlock();
+
+		if(success)
+		{
+			this->FreeThing(c);
+
+			std::vector<Creature*> list;
+			getSpectators(Range(c->pos, true), list);
+			for(unsigned int i = 0; i < list.size(); ++i)
+			{			
+				list[i]->onCreatureDisappear(c, stackpos);
+			}	
+
+			for(std::vector<Creature*>::iterator cit = c->summons.begin(); cit != c->summons.end(); ++cit) {
+				Tile *tile = map->getTile((*cit)->pos.x, (*cit)->pos.y, (*cit)->pos.z);
+				if(tile != NULL){
+					map->lock();
+					int stackpos = tile->getCreatureStackPos(*cit);
+					bool success = map->removeCreature(*cit);
+					map->unlock();
+
+					if(success) {
+						(*cit)->setMaster(NULL);
+						this->FreeThing(*cit);
+
+						list.clear();
+						getSpectators(Range((*cit)->pos, true), list);
+						for(unsigned int i = 0; i < list.size(); ++i)
+						{
+							list[i]->onCreatureDisappear(*cit, stackpos);
+						}
+					}
+				}
 			}
+
+			std::cout << (uint32_t)getPlayersOnline() << " players online." << std::endl;
 		}
-	std::cout << (uint32_t)getPlayersOnline()-1 << " players online." << std::endl;
+	}
+
+	std::cout << (uint32_t)getPlayersOnline() - 1 << " players online." << std::endl;
 	Player* player = dynamic_cast<Player*>(c);
 
 	if (player)
@@ -641,12 +669,12 @@ bool Game::removeCreature(Creature* c)
 		
 		//std::string charName = c->getName();
 		IOPlayer::instance()->savePlayer(player);
-		FreeThing(player);
+		//FreeThing(player);
 		//player->releaseThing();
 	}	
 	OTSYS_THREAD_UNLOCK(gameLock)
 
-    return true;
+	return true;
 }
 
 void Game::thingMove(Creature *player, Thing *thing,
@@ -2233,40 +2261,37 @@ void Game::teleport(Thing *thing, Position newPos) {
 		return; 
 	OTSYS_THREAD_LOCK(gameLock)
 	Creature *creature;
-	Tile *from = getTile( thing->pos.x, thing->pos.y, thing->pos.z );
-	Tile *to = getTile( newPos.x, newPos.y, newPos.z );
-	if(!to) {
-		OTSYS_THREAD_UNLOCK(gameLock)
-		return;
-	}
+	Tile *fromTile = getTile( thing->pos.x, thing->pos.y, thing->pos.z );
+	Tile *toTile = getTile( newPos.x, newPos.y, newPos.z );
+	if(fromTile && toTile) {
+		int osp = fromTile->getThingStackPos(thing);  
+		if (fromTile->removeThing(thing)) { 
+			toTile->addThing(thing); 
+			Position oldPos = thing->pos;
+	            
+			std::vector<Creature*> list;
+			getSpectators(Range(oldPos, true), list);
+			for(size_t i = 0; i < list.size(); ++i) {
+				creature = dynamic_cast<Creature*>(thing);
+				if(creature)
+					list[i]->onCreatureDisappear(creature, osp, true);
+				else
+					creatureBroadcastTileUpdated(oldPos);
+				//list[i]->onTileUpdated(oldPos);
+			}
 
-	int osp = from->getThingStackPos(thing);  
-	if (from->removeThing(thing)) { 
-		to->addThing(thing); 
-		Position oldPos = thing->pos;
-            
-		std::vector<Creature*> list;
-		getSpectators(Range(oldPos, true), list);
-		for(size_t i = 0; i < list.size(); ++i) {
-			creature = dynamic_cast<Creature*>(thing);
-			if(creature)
-				list[i]->onCreatureDisappear(creature, osp, true);
-			else
-				creatureBroadcastTileUpdated(oldPos);
-			//list[i]->onTileUpdated(oldPos);
-		}
+			thing->pos = newPos;
 
-		thing->pos = newPos;
-
-		list.clear();
-		getSpectators(Range(thing->pos, true), list);
-		for(size_t i = 0; i < list.size(); ++i)
-		{
-			creature = dynamic_cast<Creature*>(thing);
-			if(creature)
-				list[i]->onTeleport(creature, &oldPos, osp);
-			else
-				creatureBroadcastTileUpdated(newPos);
+			list.clear();
+			getSpectators(Range(thing->pos, true), list);
+			for(size_t i = 0; i < list.size(); ++i)
+			{
+				creature = dynamic_cast<Creature*>(thing);
+				if(creature)
+					list[i]->onTeleport(creature, &oldPos, osp);
+				else
+					creatureBroadcastTileUpdated(newPos);
+			}
 		}
 	}
 	
@@ -2697,9 +2722,12 @@ bool Game::creatureOnPrepareMagicAttack(Creature *creature, Position pos, const 
 		Player* player = dynamic_cast<Player*>(creature);
 		if(player) {
 			if(player->access == 0) {
-				if(player->exhaustedTicks >= 1000 && me->causeExhaustion(true)) {										
-					player->sendTextMessage(MSG_SMALLINFO, "You are exhausted.",player->pos, NM_ME_PUFF);
-					player->exhaustedTicks += (long)g_config.getGlobalNumber("exhaustedadd", 0);
+				if(player->exhaustedTicks >= 1000 && me->causeExhaustion(true)) {
+					if(me->offensive) {
+						player->sendTextMessage(MSG_SMALLINFO, "You are exhausted.",player->pos, NM_ME_PUFF);
+						player->exhaustedTicks += (long)g_config.getGlobalNumber("exhaustedadd", 0);
+					}
+
 					return false;
 				}
 				else if(player->mana < me->manaCost) {															
@@ -3068,12 +3096,8 @@ void Game::changeSpeed(unsigned long id, unsigned short speed)
 {
     OTSYS_THREAD_LOCK(gameLock) 
 	Creature *creature = getCreatureByID(id);
-	if(creature){
-		if(creature->hasteTicks >= 1000 || creature->speed == speed){
-            OTSYS_THREAD_UNLOCK(gameLock)                    
-			return;
-		}
-	
+	if(creature && creature->hasteTicks < 1000 && creature->speed != speed)
+	{
 		creature->speed = speed;
 		Player* player = dynamic_cast<Player*>(creature);
 		if(player){
@@ -3091,6 +3115,7 @@ void Game::changeSpeed(unsigned long id, unsigned short speed)
 				p->sendChangeSpeed(creature);
 		}
 	}
+
 	OTSYS_THREAD_UNLOCK(gameLock)
 }
 
@@ -3114,11 +3139,11 @@ void Game::checkCreatureAttacking(unsigned long id)
 				if (attackedCreature)
 				{
 					Tile* fromtile = getTile(creature->pos.x, creature->pos.y, creature->pos.z);
-					if(fromtile == NULL){
-						std::cout << "CheckAttackingPlayer NULL tile: " << creature->getName() << std::endl;
-						return;
-					}						
-					if (!attackedCreature->isAttackable() == 0 && fromtile->isPz() && creature->access == 0)
+					if(fromtile == NULL) {
+						std::cout << "checkCreatureAttacking NULL tile: " << creature->getName() << std::endl;
+						//return;
+					}
+					if (!attackedCreature->isAttackable() == 0 && fromtile && fromtile->isPz() && creature->access == 0)
 					{
 						Player* player = dynamic_cast<Player*>(creature);
 						if (player) {							
@@ -3237,7 +3262,9 @@ void Game::decaySplash(Item* item)
 				//delete item;
 		}
 	}
-    flushSendBuffers();
+  
+	flushSendBuffers();
+	
 	OTSYS_THREAD_UNLOCK(gameLock)
 }
 
@@ -3347,34 +3374,34 @@ bool Game::playerUseItemEx(Player *player, const Position& posFrom,const unsigne
 	bool ret = false;
 
 	Position thingpos = getThingMapPos(player, posFrom);
-	
-	if( (abs(thingpos.x - player->pos.x) > 1) || (abs(thingpos.y - player->pos.y) > 1) ) {
-		player->sendCancel("To far away...");
-	}
-	else {
-		Item *item = dynamic_cast<Item*>(getThing(posFrom, stack_from, player));
-		if(!item)
-			return ret;
-			
+	Item *item = dynamic_cast<Item*>(getThing(posFrom, stack_from, player));
+
+	if(item) {
 		//Runes
 		std::map<unsigned short, Spell*>::iterator sit = spells.getAllRuneSpells()->find(item->getID());
 		if(sit != spells.getAllRuneSpells()->end()) {
-			std::string var = std::string(""); 
-			if(sit->second->getMagLv() <= player->maglevel || player->access != 0)
-			{
-				bool success = sit->second->getSpellScript()->castSpell(player, posTo, var);
-				ret = success;
-				if(success) {
-					item->setItemCharge(std::max((int)item->getItemCharge() - 1, 0) );
-					if(item->getItemCharge() == 0) {				
-						sendRemoveThing(player,posFrom,item,stack_from);
-						removeThing(player,posFrom,item);
+			if( (abs(thingpos.x - player->pos.x) > 1) || (abs(thingpos.y - player->pos.y) > 1) ) {
+				player->sendCancel("To far away...");
+				ret = false;
+			}
+			else {
+				std::string var = std::string("");
+				if(player->access != 0 || sit->second->getMagLv() <= player->maglevel)
+				{
+					bool success = sit->second->getSpellScript()->castSpell(player, posTo, var);
+					ret = success;
+					if(success) {
+						item->setItemCharge(std::max((int)item->getItemCharge() - 1, 0) );
+						if(item->getItemCharge() == 0) {				
+							sendRemoveThing(player,posFrom,item,stack_from);
+							removeThing(player,posFrom,item);
+						}
 					}
 				}
-			}
-			else
-			{			
-				player->sendCancel("You don't have the required magic level to use that rune.");
+				else
+				{			
+					player->sendCancel("You don't have the required magic level to use that rune.");
+				}
 			}
 		}
 		else{

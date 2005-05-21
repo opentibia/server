@@ -74,6 +74,7 @@ void Protocol::setPlayer(Player* p)
 }
 
 void Protocol::sleepTillMove(){
+	/*
 	int ground =	0;
 	Tile *t = game->getTile(player->pos.x, player->pos.y, player->pos.z);
 	
@@ -84,12 +85,31 @@ void Protocol::sleepTillMove(){
 	if(Item::items[ground].speed != 0)
 		delay = ((long long)player->lastmove + (long long)player->getStepDuration(Item::items[ground].speed)) -
 				((long long)OTSYS_TIME());
+	*/
 
-	if(delay > 0){
+	long long delay = 0;
+	int stepDuration = 0;
+
+	Tile *tile =game->getTile(player->pos.x, player->pos.y, player->pos.z);
+	if(tile && tile->ground) {
+		int groundid = tile->ground->getID();
+
+		uint8_t stepspeed = Item::items[groundid].speed;
+		if(stepspeed != 0) {
+			stepDuration = player->getStepDuration(stepspeed);
+
+			if(player->lastmove != 0) {
+				delay = (((long long)(player->lastmove)) + ((long long)(stepDuration))) - ((long long)(OTSYS_TIME()));
+			}
+		}
+	}
+
+
+		if(delay > 0 ){
              
-        #if __DEBUG__     
+#if __DEBUG__     
 		std::cout << "Delaying "<< player->getName() << " --- " << delay << std::endl;		
-		#endif
+#endif
 		
 		OTSYS_SLEEP((uint32_t)delay);
 	}

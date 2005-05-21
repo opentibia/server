@@ -493,19 +493,32 @@ int Monster::onThink(int& newThinkTicks)
 	}
 
 	if(attackedCreature != 0) {
-		int ground = 0;
-		Tile *t =game->getTile(this->pos.x, this->pos.y, this->pos.z);
-		if(t && t->ground) {
-			ground = t->ground->getID();
+		long long delay = 0;
+		int stepDuration = 0;
+
+		Tile *tile =game->getTile(this->pos.x, this->pos.y, this->pos.z);
+		if(tile && tile->ground) {
+			int groundid = tile->ground->getID();
+
+			uint8_t stepspeed = Item::items[groundid].speed;
+			if(stepspeed != 0) {
+				stepDuration = this->getStepDuration(stepspeed);
+
+/*
+#if __DEBUG__
+				std::cout << "ground id: "<< (int)groundid << ", ground speed: " << (int)stepspeed << ", stepDuration: "<< (int)stepDuration << std::endl;
+#endif
+*/
+
+				if(this->lastmove != 0) {
+					delay = (((long long)(this->lastmove)) + ((long long)(stepDuration))) - ((long long)(OTSYS_TIME()));
+				}
+			}
 		}
-
-		int stepDuration = this->getStepDuration(Item::items[ground].speed);
-
-		long long delay = ((long long)this->lastmove + (long long)stepDuration) - ((long long)OTSYS_TIME());
 
 		if(delay > 0) {
 /*
-#if __DEBUG__     
+#if __DEBUG__
 			std::cout << "Delaying "<< this->getName() << " --- " << delay << std::endl;		
 #endif
 */

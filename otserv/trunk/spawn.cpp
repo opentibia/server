@@ -148,6 +148,7 @@ bool SpawnManager::loadSpawns(std::string filename)
 		}
 	}
 
+	return true;
 }
 
 bool SpawnManager::startup()
@@ -210,6 +211,7 @@ Monster* Spawn::respawn(unsigned long spawnid, Position &pos, std::string &name)
 	if(monster && monster->isLoaded()) {
 
 		if(game->placeCreature(pos, monster)) {
+			monster->useThing();
 			spawnedmap.insert(spawned_pair(spawnid, monster));
 			spawnmap[spawnid].lastspawn = OTSYS_TIME();
 		}
