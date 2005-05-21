@@ -12,6 +12,8 @@
 
 using namespace std;
 
+template<class Creature> typename AutoList<Creature>::list_type AutoList<Creature>::list;
+
 Creature::Creature(const char *name, unsigned long _id) :
  AutoList<Creature>(_id)
  ,access(0)
