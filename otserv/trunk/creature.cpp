@@ -79,11 +79,13 @@ void Creature::setAttackedCreature(unsigned long id)
 
 void Creature::setMaster(Creature* creature)
 {
+	//std::cout << "setMaster: " << this << " master=" << creature << std::endl;
 	master = creature;
 }
 
 void Creature::addSummon(Creature *creature)
 {
+	//std::cout << "addSummon: " << this << " summon=" << creature << std::endl;
 	creature->setMaster(this);
 	creature->useThing();
 	summons.push_back(creature);
@@ -91,11 +93,12 @@ void Creature::addSummon(Creature *creature)
 
 void Creature::removeSummon(Creature *creature)
 {
+	//std::cout << "removeSummon: " << this << " summon=" << creature << std::endl;
 	std::vector<Creature*>::iterator cit = std::find(summons.begin(), summons.end(), creature);
 	if(cit != summons.end()) {
-		summons.erase(cit);
 		(*cit)->setMaster(NULL);
 		(*cit)->releaseThing();
+		summons.erase(cit);
 	}
 }
 
@@ -180,8 +183,7 @@ int Creature::getGainedExperience(Creature* attacker)
 
 std::vector<long> Creature::getInflicatedDamageCreatureList()
 {
-	std::vector<long> damagelist;
-
+	std::vector<long> damagelist;	
 	std::map<long, DamageList >::const_iterator tdIt;
 	for(tdIt = totaldamagelist.begin(); tdIt != totaldamagelist.end(); ++tdIt) {
 		damagelist.push_back(tdIt->first);
