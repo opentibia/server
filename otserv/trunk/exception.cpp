@@ -61,15 +61,15 @@ bool ExceptionHandler::InstallHandler(){
 	OTSYS_THREAD_UNLOCK(maploadlock);
 	if( installed == true)
 		return false;
-		/*
-			mov eax,fs:[0]
-			mov [prevSEH],eax
-			mov [chain].prevSEH,eax
-			mov [chain].SEHfunction,_SEHHandler
-			lea eax,[chain]
-			mov fs:[0],eax
-		*/
-		SEHChain *prevSEH;
+	/*
+		mov eax,fs:[0]
+		mov [prevSEH],eax
+		mov [chain].prevSEH,eax
+		mov [chain].SEHfunction,_SEHHandler
+		lea eax,[chain]
+		mov fs:[0],eax
+	*/
+	SEHChain *prevSEH;
 	__asm__ ("movl %%fs:0,%%eax;movl %%eax,%0;":"=r"(prevSEH)::"%eax" );
 	chain.prev = prevSEH;
 	chain.SEHfunction = (void*)&_SEHHandler;
@@ -134,8 +134,9 @@ EXCEPTION_DISPOSITION
 	*outdriver << buffer;
 	FunctionMap::iterator functions;
 	for(functions = functionMap.begin(); functions != functionMap.end(); ++functions) {
-		if(functions->first > (unsigned long)(ExceptionRecord->ExceptionAddress)) {
-			functions--;						
+		if(functions->first > (unsigned long)(ExceptionRecord->ExceptionAddress) && 
+				functions != functionMap.begin()) {
+			functions--;			
 			*outdriver << "(" <<functions->second << ")" ;
 			break;
 		}
@@ -154,22 +155,22 @@ EXCEPTION_DISPOSITION
 			//
 			FunctionMap::iterator functions;
 			for(functions = functionMap.begin(); functions != functionMap.end(); ++functions) {
-				if(functions->first > stack_val) {				
-					functions--;
+				if(functions->first > stack_val && functions != functionMap.begin()) {
+					functions--;										
 					ltoa((unsigned long)esp,buffer,16);
 					*outdriver << "0x" << buffer << "  ";
 					ltoa(stack_val,buffer,16);
 					*outdriver << functions->second <<"(0x" << buffer <<")" << std::endl;
 					break;
 				}
-			}		
+			}			
 		}
 		esp++;
 	}
 	*outdriver << "*****************************************************" << std::endl;
 	if(file)
 		((std::ofstream*)outdriver)->close();
-	/*MessageBox(NULL,"Please send the file report.txt to support service ;). Thanks","Error",MB_OK |MB_ICONERROR);*/
+	MessageBox(NULL,"Please send the file report.txt to support service ;). Thanks","Error",MB_OK |MB_ICONERROR);
 	std::cout << "Error report generated. Killing server." <<std::endl;
 	exit(1); //force exit
 	return ExceptionContinueSearch;
@@ -190,6 +191,10 @@ bool ExceptionHandler::LoadMap(){
 	long n = 0;
     if (input.fail()){
 		OTSYS_THREAD_UNLOCK(maploadlock);
+		std::cout << "Failed loading symbols. otserv.map not found. " << std::endl;
+		std::cout << "Go to http://otfans.net/index.php?showtopic=1716 for more info." << std::endl;
+		system("pause");
+		exit(1);
         return false;
 	}
     //read until found .text           0x00401000
