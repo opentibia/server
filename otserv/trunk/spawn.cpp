@@ -241,8 +241,8 @@ void Spawn::idle(int t)
 			if(it->first != 0) {
 				spawnmap[it->first].lastspawn = OTSYS_TIME();
 			}
-
-			delete it->second;
+			it->second->releaseThing();
+			//delete it->second;
 			spawnedmap.erase(it++);
 		}
 		else if(!isInSpawnRange(it->second->pos) && it->first != 0) {
