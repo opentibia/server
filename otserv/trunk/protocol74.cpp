@@ -51,8 +51,8 @@ std::map<long, Creature*> channel;
 Protocol74::Protocol74(SOCKET s)
 {
   OTSYS_THREAD_LOCKVARINIT(bufferLock);
-  windowTextID = 0;
-  readItem = NULL;
+  //windowTextID = 0;
+  //readItem = NULL;
   this->s = s;
 }
 
