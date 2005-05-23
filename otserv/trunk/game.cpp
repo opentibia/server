@@ -234,11 +234,12 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 		//Remove character
 		unsigned char stackpos = tile->getCreatureStackPos(attackedCreature);
 		
-		tile->removeThing(attackedCreature);
-		
+		game->sendRemoveThing(NULL,attackedCreature->pos,attackedCreature,stackpos);
+		tile->removeThing(attackedCreature);		
+		/*
 		for(int i = 0; i < spectatorlist.size(); ++i) {				
 			spectatorlist[i]->onCreatureDisappear(attackedCreature, stackpos);
-		}
+		}*/
 		//mapstate.removeThing(tile, attackedCreature);		
 		
 		//Get all creatures that will gain xp from this kill..
@@ -296,6 +297,8 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 			attackedCreature->dropLoot(lootcontainer);
 		}
 		
+		tile->addThing(corpseitem);
+				
 		Player *attackedplayer = dynamic_cast<Player*>(attackedCreature);
 		if(attackedplayer){
 			std::stringstream s;
@@ -312,13 +315,17 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 					s << attacker->getName();
 				else
 					s << "a " << attacker->getName();
-			}
-				
+			}				
 			corpseitem->setSpecialDescription(s.str());
+			
+			//send corpse to the dead player. It is not in spectator list
+			// because was removed
+			attackedplayer->onThingAppear(corpseitem);			
 		}
 		
-		tile->addThing(corpseitem);
-
+		game->sendAddThing(NULL,corpseitem->pos,corpseitem);
+		
+		/*
 		Player *spectator = NULL;
 		for(int i = 0; i < spectatorlist.size(); ++i) {
 			spectator = dynamic_cast<Player*>(spectatorlist[i]);
@@ -326,7 +333,7 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 				spectator->onThingAppear(corpseitem);
 			}
 		}
-
+		*/
 		//mapstate.addThing(tile, corpseitem);
 
 		//Start decaying
@@ -335,14 +342,13 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 		
 		if(attackedCreature && attackedCreature->getMaster() != NULL) {
 			attackedCreature->getMaster()->removeSummon(attackedCreature);
-			game->FreeThing(attackedCreature);
+			//game->FreeThing(attackedCreature);
 		}
 
-		//free if attackedCreature is not a player
-		/*
+		//free if attackedCreature is not a player		
 		if(attackedplayer == NULL)
 			game->FreeThing(attackedCreature);
-		*/
+		
 	}
 
 	//Add blood?
@@ -358,7 +364,10 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 
 		if(hadSplash) {
 			unsigned char stackpos = tile->getThingStackPos(tile->splash);
-
+			//Todo: check if both splashs are of the same type
+			game->sendRemoveThing(NULL,attackedCreature->pos,tile->splash,stackpos);	
+			game->sendAddThing(NULL,attackedCreature->pos,tile->splash);
+			/*
 			Player *spectator = NULL;
 			for(int i = 0; i < spectatorlist.size(); ++i) {
 				spectator = dynamic_cast<Player*>(spectatorlist[i]);
@@ -367,18 +376,18 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 					spectator->onThingAppear(tile->splash);
 				}
 			}
-
+			*/
 			//mapstate.refreshThing(tile, tile->splash);
 		}
 		else {
-			Player *spectator = NULL;
+			/*Player *spectator = NULL;
 			for(int i = 0; i < spectatorlist.size(); ++i) {
 				spectator = dynamic_cast<Player*>(spectatorlist[i]);
 				if(spectator) {
 					spectator->onThingAppear(tile->splash);
 				}
-			}
-
+			}*/
+			game->sendAddThing(NULL,attackedCreature->pos,tile->splash);
 			//mapstate.addThing(tile, tile->splash);
 		}
 
@@ -573,11 +582,13 @@ bool Game::placeCreature(Position &pos, Creature* c)
 	Player *p = dynamic_cast<Player*>(c);
 
 	if (!p || c->access != 0 || getPlayersOnline() < max_players) {
-		map->lock();
+		//map->lock();
 		success = map->placeCreature(pos, c);
-		map->unlock();
-
+		//map->unlock();
+		
 		if(success) {
+			
+			sendAddThing(NULL,c->pos,c);
 			c->useThing();
 
 			if(p) {
@@ -587,13 +598,13 @@ bool Game::placeCreature(Position &pos, Creature* c)
 			addEvent(makeTask(1000, std::bind2nd(std::mem_fun(&Game::checkCreature), c->getID())));
 			addEvent(makeTask(2000, std::bind2nd(std::mem_fun(&Game::checkCreatureAttacking), c->getID())));
 
-			std::vector<Creature*> list;
+			/*std::vector<Creature*> list;
 			map->getSpectators(Range(pos, true), list);
 
 			for(unsigned int i = 0; i < list.size(); ++i)
 			{
 				list[i]->onCreatureAppear(c);
-			}
+			}*/
 		}
 	}
 	else {
@@ -615,63 +626,63 @@ bool Game::removeCreature(Creature* c)
 #endif
 	Tile *tile = map->getTile(c->pos.x, c->pos.y, c->pos.z);
 	if(tile != NULL){			
-		map->lock();
+		//map->lock();
 		int stackpos = tile->getCreatureStackPos(c);
-		bool success = map->removeCreature(c);
-		map->unlock();
+		//bool success = map->removeCreature(c);
+		//map->unlock();
+		sendRemoveThing(NULL,c->pos,c,stackpos);
+		removeThing(NULL,c->pos,c);
 
-		if(success)
-		{
-			this->FreeThing(c);
+		//if(success)
+		//{
+		 	this->FreeThing(c);
 
-			std::vector<Creature*> list;
+			/*std::vector<Creature*> list;
 			getSpectators(Range(c->pos, true), list);
 			for(unsigned int i = 0; i < list.size(); ++i)
 			{			
 				list[i]->onCreatureDisappear(c, stackpos);
-			}	
+			}*/
 
 			for(std::vector<Creature*>::iterator cit = c->summons.begin(); cit != c->summons.end(); ++cit) {
 				Tile *tile = map->getTile((*cit)->pos.x, (*cit)->pos.y, (*cit)->pos.z);
 				if(tile != NULL){
-					map->lock();
+					//map->lock();
 					int stackpos = tile->getCreatureStackPos(*cit);
-					bool success = map->removeCreature(*cit);
-					map->unlock();
-
-					if(success) {
-						(*cit)->setMaster(NULL);
-						this->FreeThing(*cit);
-
-						list.clear();
+					//bool success = map->removeCreature(*cit);
+					//map->unlock();
+					sendRemoveThing(NULL,(*cit)->pos,*cit,stackpos);
+					//if(success) {
+					(*cit)->setMaster(NULL);
+					this->FreeThing(*cit);
+					removeThing(NULL,(*cit)->pos,*cit);
+						/*list.clear();
 						getSpectators(Range((*cit)->pos, true), list);
 						for(unsigned int i = 0; i < list.size(); ++i)
 						{
 							list[i]->onCreatureDisappear(*cit, stackpos);
-						}
-					}
+						}*/
+					//}
 				}
 			}
-
-			std::cout << (uint32_t)getPlayersOnline() << " players online." << std::endl;
-		}
+			
+		//}
+		Player* player = dynamic_cast<Player*>(c);
+		if (player)
+		{
+			// Removing the player from the map of channel users
+			std::map<long, Creature*>::iterator sit = channel.find(player->getID());
+			if( sit != channel.end() )
+				channel.erase(sit);
+		
+			//std::string charName = c->getName();
+			IOPlayer::instance()->savePlayer(player);			
+			std::cout << (uint32_t)getPlayersOnline() - 1 << " players online." << std::endl;
+		}	
 	}
 
-	std::cout << (uint32_t)getPlayersOnline() - 1 << " players online." << std::endl;
-	Player* player = dynamic_cast<Player*>(c);
-
-	if (player)
-	{
-		// Removing the player from the map of channel users
-		std::map<long, Creature*>::iterator sit = channel.find(player->getID());
-		if( sit != channel.end() )
-			channel.erase(sit);
-		
-		//std::string charName = c->getName();
-		IOPlayer::instance()->savePlayer(player);
-		//FreeThing(player);
-		//player->releaseThing();
-	}	
+	
+	
 	OTSYS_THREAD_UNLOCK(gameLock)
 
 	return true;
@@ -3176,20 +3187,24 @@ void Game::decayItem(Item *item)
 		should all items have a pointer to their parent (like containers)?*/
 	if(item && item->pos.x != 0xFFFF) {
 		Tile *tile = getTile(item->pos.x, item->pos.y, item->pos.z);
-		MapState mapstate(this->map);
+		//MapState mapstate(this->map);
 		Position pos;
 		
 		MagicEffectItem* magicItem = dynamic_cast<MagicEffectItem*>(item);
 
 		if(magicItem) {
 			pos = magicItem->pos;
+			int stackpos = tile->getThingStackPos(magicItem);
 			if(magicItem->transform()) {
-				mapstate.replaceThing(tile, magicItem, magicItem);
+				//mapstate.replaceThing(tile, magicItem, magicItem);				
+				sendUpdateThing(NULL,pos,magicItem,stackpos);
 				//addEvent(makeTask(magicItem->getDecayTime(), boost::bind(&Game::decayItem, this, magicItem->pos, magicItem->getID(), tile->getThingStackPos(magicItem)) ) );
 				addEvent(makeTask(magicItem->getDecayTime(), std::bind2nd(std::mem_fun(&Game::decayItem), magicItem)));
 			}
 			else {
-				mapstate.removeThing(tile, item);
+				sendRemoveThing(NULL,pos,magicItem,stackpos);
+				removeThing(NULL,pos,magicItem);
+				//mapstate.removeThing(tile, item);
 				//tile->removeThing(magicItem);	
 				//delete magicItem;
 				FreeThing(magicItem);
@@ -3199,15 +3214,32 @@ void Game::decayItem(Item *item)
 		else {
 			Item* newitem = item->tranform();
 
-			pos = item->pos;			
-
+			pos = item->pos;
+			int stackpos = tile->getThingStackPos(item);
+			
 			if (newitem == NULL /*decayTo == 0*/) {
-				mapstate.removeThing(tile, item);
+				sendRemoveThing(NULL,pos,item,stackpos,true);
+				removeThing(NULL,pos,item);
+				//mapstate.removeThing(tile, item);
 				//t->removeThing(item);
 			}
 			else {
-				mapstate.replaceThing(tile, item, newitem);
-
+				//mapstate.replaceThing(tile, item, newitem);
+				tile->removeThing(item);
+				//autoclose.
+				if(dynamic_cast<Container*>(item)){
+					std::vector<Creature*> list;
+					getSpectators(Range(pos, true), list);			
+					for(unsigned int i = 0; i < list.size(); ++i) {
+						Player *spectator = dynamic_cast<Player*>(list[i]);
+						if(spectator)
+							spectator->onThingRemove(item);
+					}
+				}
+				
+				tile->insertThing(newitem, stackpos);
+				sendUpdateThing(NULL,pos,newitem,stackpos);
+				
 				unsigned short decayTime = Item::items[newitem->getID()].decayTime;
 				addEvent(makeTask(decayTime*1000, std::bind2nd(std::mem_fun(&Game::decayItem), newitem)));
 				//mapstate.refreshThing(tile, item);
@@ -3215,15 +3247,15 @@ void Game::decayItem(Item *item)
 			FreeThing(item);
 			//delete item;
 		}
-		std::vector<Creature*> list;
+		/*std::vector<Creature*> list;
 		getSpectators(Range(pos, true), list);
 			
 		for(unsigned int i = 0; i < list.size(); ++i) {
 			Player *spectator = dynamic_cast<Player*>(list[i]);
 			if(!spectator)
 				continue;				
-			mapstate.getMapChanges(spectator);
-		}
+			//mapstate.getMapChanges(spectator);
+		}*/
 		
 		flushSendBuffers();
 	}
@@ -3243,23 +3275,27 @@ void Game::decaySplash(Item* item)
 		{
 			unsigned short decayTo   = Item::items[item->getID()].decayTo;
 			unsigned short decayTime = Item::items[item->getID()].decayTime;
+			int stackpos = t->getThingStackPos(item);
 
 			if (decayTo == 0)
-			{
+			{				
 				t->splash = NULL;
+				sendRemoveThing(NULL,item->pos,item,stackpos);
+				FreeThing(item);				
 			}
 			else
 			{
 				item->setID(decayTo);
 				t->decaySplashAfter = OTSYS_TIME() + decayTime*1000;
 				addEvent(makeTask(decayTime*1000, std::bind2nd(std::mem_fun(&Game::decaySplash), item)));
+				sendUpdateThing(NULL,item->pos,item,stackpos);
 			}
 			
-			creatureBroadcastTileUpdated(item->pos);
+			//creatureBroadcastTileUpdated(item->pos);
 
-			if (decayTo == 0)
+			/*if (decayTo == 0)
 				FreeThing(item);
-				//delete item;
+				//delete item;*/
 		}
 	}
   
@@ -3527,7 +3563,7 @@ void Game::sendAddThing(Player* player,const Position &pos,const Thing* thing){
 	{
 		if(!thing)
 			return;
-			
+		
 		std::vector<Creature*> list;
 		map->getSpectators(Range(pos,true), list);		
 		for(unsigned int i = 0; i < list.size(); ++i) {
@@ -3542,9 +3578,9 @@ void Game::sendRemoveThing(Player* player,const Position &pos,const Thing* thing
 	
 	const Item *item = dynamic_cast<const Item*>(thing);
 	bool perform_autoclose = false;
-	if(item){
+	if(autoclose && item){
 		const Container *container = dynamic_cast<const Container*>(item);
-		if(container && autoclose)
+		if(container)
 			perform_autoclose = true;		
 	}
 	
@@ -3651,13 +3687,14 @@ void Game::sendUpdateThing(Player* player,const Position &pos,const Thing* thing
 	else //ground
 	{		
 		if(!thing)
-			return;		
+			return;
 		std::vector<Creature*> list;
 		map->getSpectators(Range(pos,true), list);
 		for(unsigned int i = 0; i < list.size(); ++i){
 			Player *spectator = dynamic_cast<Player*>(list[i]);
-			if(spectator)
+			if(spectator){
 				spectator->onThingTransform(thing,stackpos);
+			}
 		}			
 	}
 }

@@ -73,7 +73,7 @@ typedef std::map<Tile*, TileChangeDataVec > TileChangeDataVecMap;
 
 class Tile;
 class Map;
-
+/*
 class MapState {
 public:
 	MapState(Map* imap);
@@ -95,7 +95,7 @@ protected:
 	TileChangeDataVecMap changesItemMap;
 	TileExDataMap preChangeItemMap;
 };
-
+*/
 class Range {
 public:
 	

@@ -59,7 +59,7 @@ using namespace std;
 extern LuaScript g_config;
 extern Spells spells;
 extern std::map<long, Creature*> channel;
-
+/*
 MapState::MapState(Map* imap)
 : map(imap)
 {
@@ -148,7 +148,7 @@ void MapState::refreshThing(Tile *t, Thing *thing)
 	removeThingInternal(t, thing, true);
 	addThingInternal(t, thing, true);
 }
-*/
+*//*
 void MapState::replaceThing(Tile *t, Thing *oldThing, Thing *newThing)
 {
 	//First change to this tile?
@@ -249,7 +249,7 @@ void MapState::getMapChanges(Player *spectator)
 					msg.AddPosition(thIt->oldPos);
 					msg.AddByte(thIt->stackpos);
 					msg.AddItem(item);
-					*/
+					*//*
 				}
 			}
 			else if(thIt->type == CHANGE_ADD) {
@@ -267,7 +267,7 @@ void MapState::getMapChanges(Player *spectator)
 				/*	msg.AddByte(0x6a);
 					msg.AddPosition(thIt->oldPos);
 					msg.AddItem(item);
-				}*/
+				}*//*
 			}
 		}
 	}
@@ -282,7 +282,7 @@ void MapState::addTile(Tile *t, Position& tilepos)
 		pd.isBlocking = t->isBlocking();
 	}
 }
-
+*/
 Map::Map()
 {
 /*	//first we fill the map with
