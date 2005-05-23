@@ -286,7 +286,7 @@ protected:
 
   friend class Game;
   friend class Map;
-	friend class MapState;
+	//friend class MapState;
 	friend class GameState;
 
   Direction direction;
