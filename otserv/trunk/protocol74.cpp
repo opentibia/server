@@ -2019,22 +2019,24 @@ void Protocol74::sendThingAppear(const Thing *thing){
 }
 
 void Protocol74::sendThingTransform(const Thing* thing,int stackpos){
-	const Item *item = dynamic_cast<const Item*>(thing);
-	if(item){
-		NetworkMessage msg;
-		if(stackpos == 0){
-			AddTileUpdated(msg,thing->pos);
+	if(CanSee(thing->pos.x, thing->pos.y, thing->pos.z)) {
+		const Item *item = dynamic_cast<const Item*>(thing);
+		if(item){
+			NetworkMessage msg;
+			if(stackpos == 0){
+				AddTileUpdated(msg,thing->pos);
+			}
+			else if(stackpos < 10){
+				msg.AddByte(0x6B);
+				msg.AddPosition(thing->pos);
+				msg.AddByte(stackpos);
+				msg.AddItem(item);
+			}
+			else{
+				return;
+			}
+			WriteBuffer(msg);
 		}
-		else if(stackpos < 10){
-			msg.AddByte(0x6B);
-			msg.AddPosition(thing->pos);
-			msg.AddByte(stackpos);
-			msg.AddItem(item);
-		}
-		else{
-			return;
-		}
-		WriteBuffer(msg);
 	}
 }
 
