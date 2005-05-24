@@ -146,9 +146,11 @@ bool SpawnManager::loadSpawns(std::string filename)
 
 			p = p->next;
 		}
+
+		return true;
 	}
 
-	return true;
+	return false;
 }
 
 bool SpawnManager::startup()
@@ -189,10 +191,18 @@ bool Spawn::startup()
 
 bool Spawn::addMonster(std::string name, int x, int y, int spawntime)
 {
+	Position tmpPos(centerPos.x + x, centerPos.y, centerPos.z);
+	if(!isInSpawnRange(tmpPos)) {
+#ifdef __DEBUG__
+		std::cout << "Monster is outside the spawn-area!" << std::endl;
+#endif
+		return false;
+	}
+
 	struct spawninfo si;
 	si.name = name;
-	si.pos.x = x;
-	si.pos.y = y;
+	si.pos.x = centerPos.x + x;
+	si.pos.y = centerPos.y + y;
 	si.pos.z = centerPos.z;
 	si.spawntime = spawntime;
 	si.lastspawn = 0;

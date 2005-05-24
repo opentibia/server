@@ -258,17 +258,21 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 		if(attackedCreatureState) { //should never be NULL..
 			//Add experience
 			for(std::vector<long>::const_iterator iit = creaturelist.begin(); iit != creaturelist.end(); ++iit) {
-				Creature* gainexpCreature = game->getCreatureByID(*iit);
-				if(gainexpCreature) {
-					Player *gainexpPlayer = dynamic_cast<Player*>(gainexpCreature);
+				Creature* gainExpCreature = game->getCreatureByID(*iit);
+				if(gainExpCreature) {
+					int gainedExperience = attackedCreature->getGainedExperience(gainExpCreature);
+					if(gainedExperience <= 0)
+						continue;
 
-					if(gainexpPlayer) {
-						gainexpPlayer->experience += attackedCreature->getGainedExperience(gainexpCreature);
+					Player *gainExpPlayer = dynamic_cast<Player*>(gainExpCreature);
+
+					if(gainExpPlayer) {
+						gainExpPlayer->experience += gainedExperience;
 					}
 
 					//Need to add this creature and all that can see it to spectators, unless they already added
 					std::vector<Creature*> creaturelist;
-					game->getSpectators(Range(gainexpCreature->pos, true), creaturelist);
+					game->getSpectators(Range(gainExpCreature->pos, true), creaturelist);
 
 					for(std::vector<Creature*>::const_iterator cit = creaturelist.begin(); cit != creaturelist.end(); ++cit) {
 						if(std::find(spectatorlist.begin(), spectatorlist.end(), *cit) == spectatorlist.end()) {
@@ -277,7 +281,7 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 					}
 
 					//Add creature to attackerlist
-					attackedCreatureState->attackerlist.push_back(gainexpCreature);
+					attackedCreatureState->attackerlist.push_back(gainExpCreature);
 				}
 			}
 		}
@@ -681,8 +685,6 @@ bool Game::removeCreature(Creature* c)
 		}	
 	}
 
-	
-	
 	OTSYS_THREAD_UNLOCK(gameLock)
 
 	return true;
@@ -898,6 +900,16 @@ bool Game::onPrepareMoveThing(Player *player, const Position& fromPos, const Ite
 }
 
 bool Game::onPrepareMoveThing(Player *player, slots_t fromSlot, const Item *fromItem, slots_t toSlot, const Item *toItem)
+{
+	if(toItem && (!toItem->isStackable() || toItem->getID() != fromItem->getID())) {
+		player->sendCancel("Sorry not enough room.");
+		return false;
+	}
+
+	return true;
+}
+
+bool Game::onPrepareMoveThing(Player *player, const Container *fromContainer, const Item *fromItem, slots_t toSlot, const Item *toItem)
 {
 	if(toItem && (!toItem->isStackable() || toItem->getID() != fromItem->getID())) {
 		player->sendCancel("Sorry not enough room.");
@@ -1195,7 +1207,7 @@ void Game::thingMoveInternal(Creature *player,
 			}
 			//container to inventory
 			else if(!fromInventory && fromContainer && toInventory) {
-				if(onPrepareMoveThing(p, fromItem, (slots_t)to_cid)) {
+				if(onPrepareMoveThing(p, fromItem, (slots_t)to_cid) && onPrepareMoveThing(p, fromContainer, fromItem, (slots_t)to_cid, toItem)) {
 					int oldFromCount = fromItem->getItemCountOrSubtype();
 					int oldToCount = 0;
 
@@ -2552,12 +2564,12 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 						if(creature && target->health <= 0) {
 
 							for(std::vector<Creature*>::const_iterator cit = creatureState.attackerlist.begin(); cit != creatureState.attackerlist.end(); ++cit) {
-								Creature* gainexpCreature = *cit;
+								Creature* gainExpCreature = *cit;
 								
-								if(spectator->CanSee(gainexpCreature->pos.x, gainexpCreature->pos.y, gainexpCreature->pos.z)) {
+								if(spectator->CanSee(gainExpCreature->pos.x, gainExpCreature->pos.y, gainExpCreature->pos.z)) {
 									std::stringstream exp;
-									exp << target->getGainedExperience(gainexpCreature);
-									spectator->sendAnimatedText(gainexpCreature->pos, 983, exp.str());
+									exp << target->getGainedExperience(gainExpCreature);
+									spectator->sendAnimatedText(gainExpCreature->pos, 983, exp.str());
 									//msg.AddAnimatedText(gainexpCreature->pos, 983, exp.str());
 									spectator->sendStats();
 									//msg.AddPlayerStats(spectator);

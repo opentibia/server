@@ -45,6 +45,12 @@ bool IOMapXML::loadMap(Map* map, std::string identifier){
 	height=atoi((const char*)xmlGetProp(root, (const xmlChar *) "height"));
 	std::cout << width << "  " << height << std::endl;
 
+	std::string spawnfile = "";
+	if(xmlGetProp(root, (const xmlChar *) "width")) {
+		map->spawnfile = identifier.substr(0, identifier.rfind('/') + 1);
+		map->spawnfile += (const char*)xmlGetProp(root, (const xmlChar *) "spawnfile");
+	}
+
 	tile=root->children;
 
 	int px,py,pz;

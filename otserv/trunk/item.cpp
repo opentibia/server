@@ -187,6 +187,9 @@ Item::~Item()
 
 bool Item::canMovedTo(const Tile *tile) const
 {
+	if(isBlocking() && !tile->creatures.empty())
+		return false;
+
 	return !tile->isBlocking(isPickupable());
 	//return Thing::canMovedTo(tile);
 }

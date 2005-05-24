@@ -30,7 +30,7 @@
 #include "creature.h"
 #include "magic.h"
 
-#include "scheduler.h"
+//#include "scheduler.h"
 #include "tools.h"
 #include "tile.h"
 
@@ -44,6 +44,7 @@ class Game;
 
 #define MAP_LAYER     16
 
+/*
 class TilePreChangeData {
 public:
 	Position pos;
@@ -70,6 +71,7 @@ typedef std::vector<struct tilechangedata> TileChangeDataVec;
 
 typedef std::map<Tile*, TilePreChangeData > TileExDataMap;
 typedef std::map<Tile*, TileChangeDataVec > TileChangeDataVecMap;
+*/
 
 class Tile;
 class Map;
@@ -114,8 +116,8 @@ public:
 
 		minRange.x = -9;
 		minRange.y = -7;
-		maxRange.x = std::max(topleft.x + 9, bottomright.x + 9) - topleft.x; //(bottomright.x - topleft.x);
-		maxRange.y = std::max(topleft.y + 7, bottomright.y + 7) - topleft.y; //(bottomright.y - topleft.y);
+		maxRange.x = std::max(topleft.x + 9, bottomright.x + 9) - topleft.x;
+		maxRange.y = std::max(topleft.y + 7, bottomright.y + 7) - topleft.y;
 	}
 
 	Range(Position centerpos, int minRangeX, int maxRangeX, int minRangeY, int maxRangeY, bool multilevel = true)
@@ -262,8 +264,6 @@ class Map {
 	  */
 	std::list<Position> getPathTo(Creature* creature, Position start, Position to, bool creaturesBlock=true);
 
-	//bool removeItem(Tile t, Item);
-
 	/** The Map-Lock */
 	OTSYS_THREAD_LOCKVAR mapLock;
     protected:    
@@ -281,6 +281,9 @@ class Map {
 	//FIXME friend for derived classes?
 	friend class IOMapXML;
 	friend class IOMap;
+
+private:
+	std::string spawnfile;
 
 };
 #endif

@@ -283,7 +283,8 @@ void MapState::addTile(Tile *t, Position& tilepos)
 	}
 }
 */
-Map::Map()
+Map::Map() :
+spawnfile("")
 {
 /*	//first we fill the map with
   for(int y = 0; y < MAP_HEIGHT; y++)

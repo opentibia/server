@@ -322,11 +322,11 @@ int main(int argc, char *argv[])
 
 
   // load map file
-  g_game.loadMap(g_config.getGlobalString("mapfile"));
-
-	SpawnManager::initialize(&g_game);
-	SpawnManager::instance()->loadSpawns(g_config.getGlobalString("spawnfile"));
-	SpawnManager::instance()->startup();
+	if(g_game.loadMap(g_config.getGlobalString("mapfile"))) {
+		SpawnManager::initialize(&g_game);
+		SpawnManager::instance()->loadSpawns(g_game.getSpawnFile() /*g_config.getGlobalString("spawnfile")*/);
+		SpawnManager::instance()->startup();
+	}
 
   // Call to WSA Startup on Windows Systems...
 #ifdef WIN32
