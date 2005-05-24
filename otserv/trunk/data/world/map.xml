@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<map width="512" height="512" templex="100" templey="100" templez="7">
+<map width="512" height="512" templex="100" templey="100" templez="7" spawnfile="map-spawn.xml">
 <tile x="32" y="40" z="5" ground="420">
 <item id="1556"/>
 </tile>
