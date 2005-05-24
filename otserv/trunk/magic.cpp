@@ -142,7 +142,7 @@ void MagicEffectClass::FailedToCast(Player* spectator, const Creature* attacker,
 {
 	if(!hasTarget && attacker) {
 		if(attacker == spectator) {
-			spectator->sendTextMessage(MSG_SMALLINFO, "Sorry not possible.");
+			spectator->sendTextMessage(MSG_SMALLINFO, "You can only use this rune on creatures.");
 			//msg.AddTextMessage(MSG_SMALLINFO, "Sorry not possible.");
 		}
 		spectator->sendMagicEffect(attacker->pos, NM_ME_PUFF);

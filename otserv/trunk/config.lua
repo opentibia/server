@@ -7,11 +7,6 @@
 -- sets what map to load
 mapfile = "data/world/map.xml"
 
-
--- spawnfile
--- holds the monster spawns
-spawnfile = "data/world/map-spawn.xml"
-
 -- loginmsg
 -- the message the player gets when he logs in
 loginmsg = "Welcome to OTServ. For help visit tibia.de/forum"

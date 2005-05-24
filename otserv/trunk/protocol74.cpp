@@ -842,7 +842,8 @@ void Protocol74::parseUseItem(NetworkMessage &msg)
 			if(newcontainer->depot == 0){
 				unsigned char oldcontainerid = player->getContainerID(newcontainer);
 
-				if(newcontainer->getParent() == NULL && oldcontainerid != 0xFF) {
+				//if(newcontainer->getParent() == NULL && oldcontainerid != 0xFF) {
+				if(oldcontainerid != 0xFF) {
 					player->closeContainer(oldcontainerid);
 					sendCloseContainer(oldcontainerid);
 				}
