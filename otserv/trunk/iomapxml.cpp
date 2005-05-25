@@ -46,7 +46,7 @@ bool IOMapXML::loadMap(Map* map, std::string identifier){
 	std::cout << width << "  " << height << std::endl;
 
 	std::string spawnfile = "";
-	if(xmlGetProp(root, (const xmlChar *) "width")) {
+	if(xmlGetProp(root, (const xmlChar *) "spawnfile")) {
 		map->spawnfile = identifier.substr(0, identifier.rfind('/') + 1);
 		map->spawnfile += (const char*)xmlGetProp(root, (const xmlChar *) "spawnfile");
 	}
