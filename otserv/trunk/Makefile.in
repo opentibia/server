@@ -70,6 +70,8 @@ LTLIB = @LTLIB@
 LUA50_CFLAGS = @LUA50_CFLAGS@
 LUA50_LIBS = @LUA50_LIBS@
 MAKEINFO = @MAKEINFO@
+MYSQLPP_LIBS = @MYSQLPP_LIBS@
+MYSQL_FLAGS = @MYSQL_FLAGS@
 OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 PKG_CONFIG = @PKG_CONFIG@
@@ -82,10 +84,10 @@ AUTOMAKE_OPTIONS = foreign
 
 noinst_PROGRAMS = otserv
 
-AM_CXXFLAGS = $(XML_CPPFLAGS) $(OTSERV_FLAGS) $(LUA50_CFLAGS) -D_THREAD_SAFE -D_REENTRANT -Werror
+AM_CXXFLAGS = $(XML_CPPFLAGS) $(OTSERV_FLAGS) $(LUA50_CFLAGS) $(MYSQL_FLAGS) -D_THREAD_SAFE -D_REENTRANT -Werror
 otserv_LDADD = $(XML_LIBS) $(LUA50_LIBS) $(BOOST_LIBS) -ldl
-otserv_SOURCES = account.cpp container.cpp creature.cpp game.cpp ioaccount.cpp 	ioaccountxml.cpp iomapxml.cpp ioplayer.cpp ioplayerxml.cpp 	item.cpp items.cpp luascript.cpp magic.cpp map.cpp monster.cpp networkmessage.cpp npc.cpp 	otserv.cpp player.cpp position.cpp protocol.cpp protocol74.cpp spells.cpp 	status.cpp thing.cpp tile.cpp tools.cpp account.h bootstrap.sh config.h const74.h 	container.h creature.h definitions.h game.h ioaccount.h ioaccountxml.h 	iomap.h iomapxml.h ioplayer.h ioplayerxml.h item.h items.h 	luascript.h magic.h map.h monster.h networkmessage.h npc.h otsystem.h player.h 	position.h protocol.h protocol74.h scheduler.h spells.h stamp-h status.h 	tasks.h templates.h texcept.h thing.h tile.h tools.h spawn.cpp spawn.h 	actions.h actions.cpp scheduler.cpp
-
+@USE_MYSQL_TRUE@otserv_SOURCES = account.cpp container.cpp creature.cpp game.cpp ioaccount.cpp 	ioaccountxml.cpp iomapxml.cpp ioplayer.cpp ioplayerxml.cpp 	item.cpp items.cpp luascript.cpp magic.cpp map.cpp monster.cpp networkmessage.cpp npc.cpp 	otserv.cpp player.cpp position.cpp protocol.cpp protocol74.cpp spells.cpp 	status.cpp thing.cpp tile.cpp tools.cpp account.h bootstrap.sh config.h const74.h 	container.h creature.h definitions.h game.h ioaccount.h ioaccountxml.h 	iomap.h iomapxml.h ioplayer.h ioplayerxml.h item.h items.h 	luascript.h magic.h map.h monster.h networkmessage.h npc.h otsystem.h player.h 	position.h protocol.h protocol74.h scheduler.h spells.h stamp-h status.h 	tasks.h templates.h texcept.h thing.h tile.h tools.h spawn.cpp spawn.h 	actions.h actions.cpp scheduler.cpp ioplayersql.cpp ioplayersql.h ioaccountsql.cpp ioaccountsql.h
+@USE_MYSQL_FALSE@otserv_SOURCES = account.cpp container.cpp creature.cpp game.cpp ioaccount.cpp 	ioaccountxml.cpp iomapxml.cpp ioplayer.cpp ioplayerxml.cpp 	item.cpp items.cpp luascript.cpp magic.cpp map.cpp monster.cpp networkmessage.cpp npc.cpp 	otserv.cpp player.cpp position.cpp protocol.cpp protocol74.cpp spells.cpp 	status.cpp thing.cpp tile.cpp tools.cpp account.h bootstrap.sh config.h const74.h 	container.h creature.h definitions.h game.h ioaccount.h ioaccountxml.h 	iomap.h iomapxml.h ioplayer.h ioplayerxml.h item.h items.h 	luascript.h magic.h map.h monster.h networkmessage.h npc.h otsystem.h player.h 	position.h protocol.h protocol74.h scheduler.h spells.h stamp-h status.h 	tasks.h templates.h texcept.h thing.h tile.h tools.h spawn.cpp spawn.h 	actions.h actions.cpp scheduler.cpp
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
 CONFIG_HEADER = config.h
@@ -98,16 +100,30 @@ DEFS = @DEFS@ -I. -I$(srcdir) -I.
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
-otserv_OBJECTS =  account.$(OBJEXT) container.$(OBJEXT) \
-creature.$(OBJEXT) game.$(OBJEXT) ioaccount.$(OBJEXT) \
-ioaccountxml.$(OBJEXT) iomapxml.$(OBJEXT) ioplayer.$(OBJEXT) \
-ioplayerxml.$(OBJEXT) item.$(OBJEXT) items.$(OBJEXT) \
-luascript.$(OBJEXT) magic.$(OBJEXT) map.$(OBJEXT) monster.$(OBJEXT) \
-networkmessage.$(OBJEXT) npc.$(OBJEXT) otserv.$(OBJEXT) \
-player.$(OBJEXT) position.$(OBJEXT) protocol.$(OBJEXT) \
-protocol74.$(OBJEXT) spells.$(OBJEXT) status.$(OBJEXT) thing.$(OBJEXT) \
-tile.$(OBJEXT) tools.$(OBJEXT) spawn.$(OBJEXT) actions.$(OBJEXT) \
-scheduler.$(OBJEXT)
+@USE_MYSQL_FALSE@otserv_OBJECTS =  account.$(OBJEXT) container.$(OBJEXT) \
+@USE_MYSQL_FALSE@creature.$(OBJEXT) game.$(OBJEXT) ioaccount.$(OBJEXT) \
+@USE_MYSQL_FALSE@ioaccountxml.$(OBJEXT) iomapxml.$(OBJEXT) \
+@USE_MYSQL_FALSE@ioplayer.$(OBJEXT) ioplayerxml.$(OBJEXT) \
+@USE_MYSQL_FALSE@item.$(OBJEXT) items.$(OBJEXT) luascript.$(OBJEXT) \
+@USE_MYSQL_FALSE@magic.$(OBJEXT) map.$(OBJEXT) monster.$(OBJEXT) \
+@USE_MYSQL_FALSE@networkmessage.$(OBJEXT) npc.$(OBJEXT) \
+@USE_MYSQL_FALSE@otserv.$(OBJEXT) player.$(OBJEXT) position.$(OBJEXT) \
+@USE_MYSQL_FALSE@protocol.$(OBJEXT) protocol74.$(OBJEXT) \
+@USE_MYSQL_FALSE@spells.$(OBJEXT) status.$(OBJEXT) thing.$(OBJEXT) \
+@USE_MYSQL_FALSE@tile.$(OBJEXT) tools.$(OBJEXT) spawn.$(OBJEXT) \
+@USE_MYSQL_FALSE@actions.$(OBJEXT) scheduler.$(OBJEXT)
+@USE_MYSQL_TRUE@otserv_OBJECTS =  account.$(OBJEXT) container.$(OBJEXT) \
+@USE_MYSQL_TRUE@creature.$(OBJEXT) game.$(OBJEXT) ioaccount.$(OBJEXT) \
+@USE_MYSQL_TRUE@ioaccountxml.$(OBJEXT) iomapxml.$(OBJEXT) \
+@USE_MYSQL_TRUE@ioplayer.$(OBJEXT) ioplayerxml.$(OBJEXT) item.$(OBJEXT) \
+@USE_MYSQL_TRUE@items.$(OBJEXT) luascript.$(OBJEXT) magic.$(OBJEXT) \
+@USE_MYSQL_TRUE@map.$(OBJEXT) monster.$(OBJEXT) \
+@USE_MYSQL_TRUE@networkmessage.$(OBJEXT) npc.$(OBJEXT) otserv.$(OBJEXT) \
+@USE_MYSQL_TRUE@player.$(OBJEXT) position.$(OBJEXT) protocol.$(OBJEXT) \
+@USE_MYSQL_TRUE@protocol74.$(OBJEXT) spells.$(OBJEXT) status.$(OBJEXT) \
+@USE_MYSQL_TRUE@thing.$(OBJEXT) tile.$(OBJEXT) tools.$(OBJEXT) \
+@USE_MYSQL_TRUE@spawn.$(OBJEXT) actions.$(OBJEXT) scheduler.$(OBJEXT) \
+@USE_MYSQL_TRUE@ioplayersql.$(OBJEXT) ioaccountsql.$(OBJEXT)
 otserv_DEPENDENCIES = 
 otserv_LDFLAGS = 
 CXXFLAGS = @CXXFLAGS@
@@ -127,13 +143,14 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 TAR = tar
 GZIP_ENV = --best
 DEP_FILES =  .deps/account.P .deps/actions.P .deps/container.P \
-.deps/creature.P .deps/game.P .deps/ioaccount.P .deps/ioaccountxml.P \
-.deps/iomapxml.P .deps/ioplayer.P .deps/ioplayerxml.P .deps/item.P \
-.deps/items.P .deps/luascript.P .deps/magic.P .deps/map.P \
-.deps/monster.P .deps/networkmessage.P .deps/npc.P .deps/otserv.P \
-.deps/player.P .deps/position.P .deps/protocol.P .deps/protocol74.P \
-.deps/scheduler.P .deps/spawn.P .deps/spells.P .deps/status.P \
-.deps/thing.P .deps/tile.P .deps/tools.P
+.deps/creature.P .deps/game.P .deps/ioaccount.P .deps/ioaccountsql.P \
+.deps/ioaccountxml.P .deps/iomapxml.P .deps/ioplayer.P \
+.deps/ioplayersql.P .deps/ioplayerxml.P .deps/item.P .deps/items.P \
+.deps/luascript.P .deps/magic.P .deps/map.P .deps/monster.P \
+.deps/networkmessage.P .deps/npc.P .deps/otserv.P .deps/player.P \
+.deps/position.P .deps/protocol.P .deps/protocol74.P .deps/scheduler.P \
+.deps/spawn.P .deps/spells.P .deps/status.P .deps/thing.P .deps/tile.P \
+.deps/tools.P
 SOURCES = $(otserv_SOURCES)
 OBJECTS = $(otserv_OBJECTS)
 
