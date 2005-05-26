@@ -20,7 +20,7 @@
 
 #include "ioaccount.h"
 
-#ifdef USE_SQL
+#ifdef USE_MYSQL
 #include "ioaccountsql.h"
 #else
 #include "ioaccountxml.h"
@@ -30,7 +30,7 @@ IOAccount* IOAccount::_instance = NULL;
 
 IOAccount* IOAccount::instance(){
 	if(!_instance){
-#ifdef USE_SQL
+#ifdef USE_MYSQL
 	_instance = (IOAccount*)new IOAccountSQL;
 #else
 	_instance = (IOAccount*)new IOAccountXML;

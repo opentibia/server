@@ -20,7 +20,7 @@
 
 #include "ioplayer.h"
 
-#ifdef USE_SQL
+#ifdef USE_MYSQL
 	#include "ioplayersql.h"
 #else
 	#include "ioplayerxml.h"
@@ -30,7 +30,7 @@ IOPlayer* IOPlayer::_instance = NULL;
 
 IOPlayer* IOPlayer::instance(){
 	if(!_instance){
-#ifdef USE_SQL
+#ifdef USE_MYSQL
  _instance = (IOPlayer*)new IOPlayerSQL;
 #else
 	_instance = (IOPlayer*)new IOPlayerXML;
