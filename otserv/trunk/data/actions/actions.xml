@@ -17,7 +17,9 @@
 <action itemid="2597" script="rwitems.lua" />
 <action itemid="2598" script="rwitems.lua" />
 <action itemid="2599" script="rwitems.lua" />
+<action itemid="2661" script="rwitems.lua" />
 <action itemid="2554" script="shovel.lua" /> --update
 <action itemid="2120" script="rope.lua" />
+
 
 </actions>
