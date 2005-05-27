@@ -51,8 +51,8 @@ std::map<long, Creature*> channel;
 Protocol74::Protocol74(SOCKET s)
 {
   OTSYS_THREAD_LOCKVARINIT(bufferLock);
-  //windowTextID = 0;
-  //readItem = NULL;
+  windowTextID = 0;
+  readItem = NULL;
   this->s = s;
 }
 
@@ -173,7 +173,7 @@ void Protocol74::parsePacket(NetworkMessage &msg)
 	  parseUpArrowContainer(msg);	
 	  break;
 	case 0x89:
-	  //parseTextWindow(msg);
+	  parseTextWindow(msg);
 	  break;
     case 0x8C: // throw item
       parseLookAt(msg);
@@ -1080,17 +1080,27 @@ void Protocol74::parseAttack(NetworkMessage &msg)
   unsigned long playerid = msg.GetU32();
   player->setAttackedCreature(playerid);
 }
-/*
+
 void Protocol74::parseTextWindow(NetworkMessage  &msg){
 	unsigned long id = msg.GetU32();
 	std::string new_text = msg.GetString();
 	if(readItem && windowTextID == id){	
+		sendTextMessage(MSG_SMALLINFO, "Write not working yet.");
+		//move to Game, and use gameLock
+		/*//TODO: check that the item is in
+		//an accesible place for the player
+		unsigned short itemid = readItem->getID();
 		readItem->setText(new_text);
+		if(readItem->getID() != id){
+			//TODO:update the item in the clients. 
+			//Can be done when find a method to get 
+			// items position its pointer.
+		}*/
 		readItem->releaseThing();
 		readItem = NULL;
 	}
 }
-*/
+
 /*
 void Protocol74::sendAction(Action* action){
 
@@ -2037,6 +2047,16 @@ void Protocol74::sendThingTransform(const Thing* thing,int stackpos){
 			}
 			WriteBuffer(msg);
 		}
+		//update container icon
+		if(dynamic_cast<const Container*>(item)){
+			const Container *updateContainer = dynamic_cast<const Container*>(item);
+			for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
+				Container *container = cit->second;
+				if(container == updateContainer) {
+					sendContainer(cit->first, container);
+				}
+			}
+		}
 	}
 }
 
@@ -2111,7 +2131,7 @@ void Protocol74::sendItemUpdateContainer(const Container *container, const Item*
 		WriteBuffer(msg);
 	}
 }
-/*
+
 void Protocol74::sendTextWindow(Item* item,const unsigned short maxlen, const bool canWrite){
 	NetworkMessage msg;				
 	msg.AddByte(0x96);
@@ -2132,7 +2152,7 @@ void Protocol74::sendTextWindow(Item* item,const unsigned short maxlen, const bo
 	
 	WriteBuffer(msg);
 }
-*/
+
 ////////////// Add common messages
 void Protocol74::AddTextMessage(NetworkMessage &msg,MessageClasses mclass, const char* message)
 {
@@ -2353,17 +2373,19 @@ void Protocol74::RemoveItemContainer(NetworkMessage &msg,unsigned char cid,unsig
 //////////////////////////
 
 void Protocol74::flushOutputBuffer(){
-	OTSYS_THREAD_LOCK(bufferLock)
+	//OTSYS_THREAD_LOCK(bufferLock)
+	OTSYS_THREAD_LOCK_CLASS lockClass(bufferLock);	
 	//force writetosocket	
 	OutputBuffer.WriteToSocket(s);
 	OutputBuffer.Reset();
 	player->SendBuffer = false;	
-	OTSYS_THREAD_UNLOCK(bufferLock)
+	//OTSYS_THREAD_UNLOCK(bufferLock)
 	return;
 }
 
 void Protocol74::WriteBuffer(NetworkMessage &add){		
-	OTSYS_THREAD_LOCK(bufferLock)
+	//OTSYS_THREAD_LOCK(bufferLock)
+	OTSYS_THREAD_LOCK_CLASS lockClass(bufferLock);
 	if(player->SendBuffer == false){
 		game->addPlayerBuffer(player);
 		player->SendBuffer = true;
@@ -2373,7 +2395,7 @@ void Protocol74::WriteBuffer(NetworkMessage &add){
 		player->SendBuffer = true;
 	}	
 	OutputBuffer.JoinMessages(add);	
-	OTSYS_THREAD_UNLOCK(bufferLock)	
+	//OTSYS_THREAD_UNLOCK(bufferLock)	
   	return;
 }
 

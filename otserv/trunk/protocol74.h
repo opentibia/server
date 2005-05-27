@@ -86,6 +86,7 @@ private:
 	void parseUseItem(NetworkMessage &msg);
 	void parseCloseContainer(NetworkMessage &msg);
 	void parseUpArrowContainer(NetworkMessage &msg);
+	void parseTextWindow(NetworkMessage &msg);
 
 /*
 	void sendPlayerItemAppear(Action* action);
@@ -95,7 +96,7 @@ private:
 	void sendPlayerChangeAppearance(Action* action);
 */
 
-	void sendPlayerLookAt(std::string);
+	//void sendPlayerLookAt(std::string);
 
 	// channel tabs
 	void parseGetChannels(NetworkMessage &msg);
@@ -187,6 +188,7 @@ private:
 	void sendItemAddContainer(const Container *container, const Item *item);
 	void sendItemRemoveContainer(const Container* container,const unsigned char slot);
 	void sendItemUpdateContainer(const Container* container,const Item* item,const unsigned char slot);
+	void sendTextWindow(Item* item,const unsigned short maxlen, const bool canWrite);
 
 	// translate a tile to clientreadable format
   void GetTileDescription(const Tile* tile, NetworkMessage &msg);
@@ -215,6 +217,8 @@ private:
 	
   
   OTSYS_THREAD_LOCKVAR bufferLock;
+  unsigned long windowTextID;
+  Item *readItem;
    
 };
 

@@ -95,6 +95,7 @@ public:
   virtual void sendCreatureHealth(const Creature *creature) = 0;
   virtual void sendSkills() = 0;
   virtual void sendPing() = 0;
+  virtual void sendTextWindow(Item* item,const unsigned short maxlen, const bool canWrite) = 0;
   //virtual void sendCreatureDisappear(const Creature *creature, unsigned char stackPos) = 0;
   virtual void sendThingDisappear(const Thing *thing, unsigned char stackPos, bool tele) = 0;
   virtual void sendCreatureTurn(const Creature *creature, unsigned char stackPos) = 0;
