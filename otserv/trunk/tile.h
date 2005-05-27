@@ -45,8 +45,8 @@ public:
   {
     pz               = false;
     splash           = NULL;
-		ground           = NULL;
-    decaySplashAfter = 0;
+	ground           = NULL;
+    //decaySplashAfter = 0;
   }
 
   Item*           ground;
@@ -55,13 +55,14 @@ public:
   CreatureVector creatures;
   ItemVector     downItems;
 
-  __int64        decaySplashAfter;
+  //__int64        decaySplashAfter;
 
   bool removeThing(Thing *thing);
   void addThing(Thing *thing);
 	bool insertThing(Thing *thing, int stackpos);
 	MagicEffectItem* getFieldItem();
 	Teleport* getTeleportItem();
+	Thing* Tile::getTopMoveableThing();
 
   int getCreatureStackPos(Creature *c) const;
   int getThingStackPos(const Thing *thing) const;

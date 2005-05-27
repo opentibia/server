@@ -126,6 +126,11 @@ int Tile::getCreatureStackPos(Creature *c) const
 int Tile::getThingStackPos(const Thing *thing) const
 {
   int n = 0;
+  if(ground){
+	if(ground == thing){
+		return 0;
+	}
+  }
 
   if (splash)
   {
@@ -342,6 +347,26 @@ bool Tile::removeThing(Thing *thing)
   }
 
   return false;
+}
+
+Thing* Tile::getTopMoveableThing(){	
+	if(ground && !ground->isNotMoveable())
+    	return ground;
+	if (splash && !splash->isNotMoveable())
+    	return splash;
+    
+    for(int i = 0; i < topItems.size(); i++){
+		if(topItems[i] && !topItems[i]->isNotMoveable())
+			return topItems[i];
+	}
+	for(int i = 0; i < creatures.size(); i++){
+			return creatures[i];
+	}
+	for(int i = 0; i < downItems.size(); i++){
+		if(downItems[i] && !downItems[i]->isNotMoveable())
+			return downItems[i];
+	}
+	return NULL;
 }
 
 Teleport* Tile::getTeleportItem()
