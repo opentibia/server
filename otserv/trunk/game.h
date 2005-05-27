@@ -25,6 +25,7 @@
 
 #include <queue>
 #include <vector>
+
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 
@@ -296,9 +297,18 @@ protected:
 
 	void checkCreatureAttacking(unsigned long id);
 	void checkCreature(unsigned long id);
-	void decayItem(Item *item);
-	void decaySplash(Item* item);
-
+	//void decayItem(Item *item);
+	//void decaySplash(Item* item);
+	void checkDecay(int t);
+	
+	#define DECAY_INTERVAL  10000
+	void startDecay(Item* item);
+	struct decayBlock{
+		long decayTime;
+		std::vector<Item*> decayItems;
+	};
+	std::vector<decayBlock*> decayVector;
+	
 	void checkSpawns(int t);
 	std::priority_queue<SchedulerTask*, std::vector<SchedulerTask*>, lessSchedTask > eventList;
 
