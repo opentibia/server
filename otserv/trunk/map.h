@@ -211,10 +211,10 @@ class Map {
     ~Map();
     
 	/** Lock the map */
-	void lock(){OTSYS_THREAD_LOCK(mapLock);};
+	//void lock(){OTSYS_THREAD_LOCK(mapLock);};
 
 	/** Unlock the map */
-	void unlock(){OTSYS_THREAD_UNLOCK(mapLock);};
+	//void unlock(){OTSYS_THREAD_UNLOCK(mapLock);};
 
 	/**
 	  * Load a map.
@@ -265,7 +265,7 @@ class Map {
 	std::list<Position> getPathTo(Creature* creature, Position start, Position to, bool creaturesBlock=true);
 
 	/** The Map-Lock */
-	OTSYS_THREAD_LOCKVAR mapLock;
+	//OTSYS_THREAD_LOCKVAR mapLock;
     protected:    
     /**
 	  * Get the Creatures within a specific Range */

@@ -296,7 +296,7 @@ spawnfile("")
   }
 */
 
-  OTSYS_THREAD_LOCKVARINIT(mapLock);
+  //OTSYS_THREAD_LOCKVARINIT(mapLock);
 }
 
 
@@ -366,6 +366,7 @@ bool Map::placeCreature(Position &pos, Creature* c)
 {
 	Tile* tile = getTile(pos.x, pos.y, pos.z);
 	bool success = tile && c->canMovedTo(tile);
+	//bool success = tile!=NULL;
 	if(!success)
 	{   
 		for(int cx =pos.x - 1; cx <= pos.x + 1 && !success; cx++) {
