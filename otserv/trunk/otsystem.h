@@ -45,6 +45,7 @@
 #define OTSYS_THREAD_LOCKVARRELEASE(a) DeleteCriticalSection(&a);
 #define OTSYS_THREAD_LOCK(a)        EnterCriticalSection(&a);
 #define OTSYS_THREAD_UNLOCK(a)      LeaveCriticalSection(&a);
+#define OTSYS_THREAD_UNLOCK_PTR(a)  LeaveCriticalSection(a);
 
 #define OTSYS_THREAD_TIMEOUT			  WAIT_TIMEOUT
 #define OTSYS_THREAD_SIGNALVARINIT(a) a = CreateEvent(NULL, FALSE, FALSE, NULL)
@@ -128,6 +129,7 @@ inline void OTSYS_THREAD_LOCKVARINIT(OTSYS_THREAD_LOCKVAR& l) {
 
 #define OTSYS_THREAD_LOCK(a)          pthread_mutex_lock(&a);
 #define OTSYS_THREAD_UNLOCK(a)        pthread_mutex_unlock(&a);
+#deinfe OTSYS_THREAD_UNLOCK_PTR(a)    pthread_mutex_unlock(a);
 #define OTSYS_THREAD_TIMEOUT			  ETIMEDOUT
 #define OTSYS_THREAD_SIGNALVARINIT(a) pthread_cond_init(&a, NULL);
 #define OTSYS_THREAD_SIGNAL_SEND(a)   pthread_cond_signal(&a);
@@ -171,6 +173,18 @@ inline int OTSYS_THREAD_WAITSIGNAL_TIMED(OTSYS_THREAD_SIGNALVAR& signal, OTSYS_T
 
 #endif // #if defined WIN32 || defined __WINDOWS__
 
+
+class OTSYS_THREAD_LOCK_CLASS{
+public:
+	inline OTSYS_THREAD_LOCK_CLASS(OTSYS_THREAD_LOCKVAR &a){
+		mutex = &a;
+		OTSYS_THREAD_LOCK(a)
+	};
+	inline ~OTSYS_THREAD_LOCK_CLASS(){
+		OTSYS_THREAD_UNLOCK_PTR(mutex)
+	};
+	OTSYS_THREAD_LOCKVAR *mutex;
+};
 
 
 
