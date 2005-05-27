@@ -2,6 +2,7 @@
 
 <items>
 <item id="1988" name="backpack" type="container" position="backpack" maxitems="20" weight="120" descr="asd"/>
+<item id="2554" name="shovel" type="item" weight="35.0" />
 <item id="2433" name="magic staff" type="weapon" position="twohand" skill="magic" attack="35" defence="20" shottype="energy" weight="20" />
 <item id="2434" name="dragon hammer" type="weapon" position="weapon" skill="club" attack="35" defence="20" weight="20" />
 <item id="2455" name="Crossbow" type="weapon" position="twohand" skill="distance" amutype="bolt" attack="0" defence="0" weight="40" />
@@ -30,6 +31,13 @@
 <item id="3132" name="dead human" weight="1200" decayto="3133" decaytime="30" />
 <item id="3133" name="human skeleton" weight="900" decayto="3134" decaytime="30" />
 <item id="3134" name="human skeleton" weight="600" />
+
+<item id="468" name="" decayto="0" weight="0" />
+<item id="469" name="hole" decayto="468" decaytime="20" weight="0" />
+<item id="481" name="" decayto="0" weight="0" />
+<item id="482" name="hole" decayto="481" decaytime="20" weight="0" />
+<item id="483" name="" decayto="0" weight="0" />
+<item id="484" name="hole" decayto="483" decaytime="20" weight="0" />
 
 <!--fluid containers-->
 <item id="2006" name="vial" weight="1.8" />
