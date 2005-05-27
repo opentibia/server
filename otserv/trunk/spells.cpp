@@ -879,9 +879,12 @@ int SpellScript::luaActionMakeArrows(lua_State *L){
 			magicTarget.damageEffect = 12; //NM_ME_MAGIC_ENERGIE = 12
 			Item* new_item = Item::CreateItem(id,count);
 			if(!player->addItem(new_item)){
-				delete new_item;
+				spell->game->addThing(NULL,player->pos,new_item);
+				new_item->pos = player->pos;
+				spell->game->sendAddThing(NULL,player->pos,new_item);
+				/*delete new_item;
 				magicTarget.damageEffect = 2; //NM_ME_PUFF  
-  				magicTarget.manaCost = 0;
+  				magicTarget.manaCost = 0;*/
 			} 
  		}
  		
@@ -933,9 +936,13 @@ int SpellScript::luaActionMakeFood(lua_State *L){
   			
   			Item* new_item = Item::CreateItem(foodtype,count);
 			if(!player->addItem(new_item)){
-				delete new_item;
+				//add item on the ground
+				spell->game->addThing(NULL,player->pos,new_item);
+				new_item->pos = player->pos;
+				spell->game->sendAddThing(NULL,player->pos,new_item);
+				/*delete new_item;
 				magicTarget.damageEffect = 2; //NM_ME_PUFF  
-  				magicTarget.manaCost = 0;
+  				magicTarget.manaCost = 0;*/
 			} 
 		}
   
