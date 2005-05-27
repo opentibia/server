@@ -41,6 +41,10 @@
 #define	SLOTP_DEPOT 1024
 #define	SLOTP_TWO_HAND 2048
 
+enum eRWInfo{
+	CAN_BE_READ = 1,
+	CAN_BE_WRITTEN = 2,
+};
 
 class ItemType {
 public:
@@ -62,6 +66,7 @@ public:
 	unsigned long 		slot_position;
   unsigned short decayTo;
   unsigned short decayTime;
+  bool	canDecay;
 
 	unsigned short damage;
 
@@ -73,9 +78,9 @@ public:
 	bool ismagicfield;
 	int  magicfieldtype;
 	bool iscontainer;
-	bool isWrittable;
+	int  RWInfo;
+	unsigned short readonlyId;
 	bool fluidcontainer;
-	bool iskey;
 	bool stackable;
 	bool multitype;
 	bool useable;

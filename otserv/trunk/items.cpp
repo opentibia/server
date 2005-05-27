@@ -31,6 +31,8 @@ ItemType::ItemType()
 {
 	iscontainer     = false;
 	ismagicfield 	= false;
+	RWInfo			= 0;
+	readonlyId		= 0;
 	fluidcontainer	= false;		
 	stackable       = false;
 	multitype       = false;
@@ -49,7 +51,6 @@ ItemType::ItemType()
 	blockpickupable = true;
 
 	isteleport = false;
-	iskey = false;
 	
 	runeMagLevel    = -1;
 	magicfieldtype = -1;
@@ -67,6 +68,7 @@ ItemType::ItemType()
   armor      =    0;
   decayTo    =    0;
   decayTime  =   60;
+  canDecay	 = true;
 
 	damage = 0;
 }
@@ -257,10 +259,12 @@ int Items::loadFromDat(std::string file)
             break;
 
 				case 0x07: // writtable objects					
+					iType->RWInfo |= CAN_BE_WRITTEN | CAN_BE_READ;
                     fgetc(f); //max characters that can be written in it (0 unlimited)
-                    fgetc(f); //max number of  newlines ? 0, 2, 4, 7
+                    fgetc(f); //max number of  newlines ? 0, 2, 4, 7                    
 				    break;
 				case 0x08: // writtable objects that can't be edited 					
+					iType->RWInfo |= CAN_BE_READ;
                     fgetc(f); //always 0 max characters that can be written in it (0 unlimited) 
                     fgetc(f); //always 4 max number of  newlines ? 
 				    break;
@@ -310,8 +314,8 @@ int Items::loadFromDat(std::string file)
 						break;
 					case 0x57: //items with special description?
 						break;					
-					case 0x58: //writtable
-						iType->isWrittable = true;
+					case 0x58: //writtable?						
+						iType->RWInfo |= CAN_BE_READ;
 						break;
 					default:
 						std::cout << "unknown action byte: " << (unsigned short)optbyte << std::endl;
@@ -407,8 +411,12 @@ int Items::loadXMLInfos(std::string file)
 						itemtype->description = description;
 
           			char* decayTo = (char*)xmlGetProp(p, (xmlChar*)"decayto");
-          			if (decayTo)
+          			if (decayTo){
 						itemtype->decayTo = atoi(decayTo);
+						if(itemtype->decayTo == 0){
+							itemtype->canDecay = false;
+						}
+					}
 
           			char* decayTime = (char*)xmlGetProp(p, (xmlChar*)"decaytime");
           			if (decayTime)
@@ -613,10 +621,18 @@ int Items::loadXMLInfos(std::string file)
 	       						std::cout << "missing field type for field: " << id << std::endl;
 							
 						}						
-						else if(!strcmp(type, "key"))
-						{
-							itemtype->iskey = true;
-						}										
+						else if(!strcmp(type, "write1time")){
+							char* sreadonlyid = (char*)xmlGetProp(p, (xmlChar*)"readonlyid");
+          					if (sreadonlyid){
+								itemtype->readonlyId = atoi(sreadonlyid);
+							}
+							else{
+								std::cout << "missing readonlyid tag for item: " << id << std::endl;
+							}
+						}
+						else{
+							//std::cout << "unknown type for item: " << id << std::endl;						
+						}
 					}//type					
 				}
 				else {
