@@ -18,6 +18,7 @@ AC_ARG_WITH(debug,   --with-debug      enable debuging,DEBUG=-DDEBUG)
 
 AC_SUBST(DEBUG)
 
+AM_CONDITIONAL(USE_MYSQL, false)
 #check if we want mysql
 AC_ARG_ENABLE(mysqlpp,   --enable-mysqlpp      enable MySQL support, [
     AM_CONDITIONAL(USE_MYSQL, true)
