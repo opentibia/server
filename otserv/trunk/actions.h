@@ -127,7 +127,7 @@ class ActionScript : protected LuaScript{
 public:
 	ActionScript(Action* iaction,std::string scriptname);
 	virtual ~ActionScript(){}
-	bool execute(Player *player,Item* item, PositionEx &posFrom, PositionEx &posTo);
+	bool executeUse(Player *player,Item* item, PositionEx &posFrom, PositionEx &posTo);
 	bool isLoaded()const {return loaded;}
 	static Action* getAction(lua_State *L);
 	//lua functions
@@ -146,9 +146,15 @@ public:
 	static int luaActionDoPlayerAddMana(lua_State *L);
 	static int luaActionDoPlayerAddItem(lua_State *L);
 	static int luaActionDoPlayerSendTextMessage(lua_State *L);
+	static int luaActionDoShowTextWindow(lua_State *L);
+	static int luaActionDoDecayItem(lua_State *L);
+	
+	//get item info
+	static int luaActionGetItemRWInfo(lua_State *L);
+	static int luaActionGetThingfromPos(lua_State *L);
 	
 	//get player info functions
-	static int luaActionGetPlayerFood(lua_State *L);	
+	static int luaActionGetPlayerFood(lua_State *L);
 	static int luaActionGetPlayerAccess(lua_State *L);
 	static int luaActionGetPlayerLevel(lua_State *L);
 	static int luaActionGetPlayerMagLevel(lua_State *L);
