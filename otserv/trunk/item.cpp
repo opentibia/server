@@ -29,18 +29,24 @@
 #include <iostream>
 #include <sstream>
 #include <iomanip>
-
+extern unsigned long nitemsload;
 Item* Item::CreateItem(const unsigned short _type, unsigned short _count /*= 0*/)
 {
-	if(items[_type].iscontainer)
-		return new Container(_type);
-	else if(items[_type].isteleport)
-		return new Teleport(_type);
-	else if(items[_type].ismagicfield){		
-		return new Item(_type, _count);
+	Item *newItem;
+	if(items[_type].iscontainer){
+		newItem = new Container(_type);		
+	}
+	else if(items[_type].isteleport){		
+		newItem = new Teleport(_type);
+	}
+	else if(items[_type].ismagicfield){	
+		newItem =  new Item(_type, _count);
 	}	
-	else
-		return new Item(_type, _count);
+	else{
+		newItem =  new Item(_type, _count);
+	}
+	newItem->useThing();
+	return newItem;
 }
 
 //////////////////////////////////////////////////
@@ -63,8 +69,8 @@ unsigned short Item::getItemCountOrSubtype() const {
 	}
 	else if(isFluidContainer() || isMultiType())
 		return fluid;
-	else if(isKey())
-		return keyNumber;
+	else if(actionId != 0)
+		return actionId;
 	else if(chargecount != 0)
 		return chargecount;	
 	else
@@ -86,38 +92,90 @@ void Item::setItemCountOrSubtype(unsigned char n)
 	}
 	else if(isFluidContainer() || isMultiType())
 		fluid = n;
-	else if(isKey())
-		keyNumber = n;
 	else
 		chargecount = n;
 };
 
+void Item::setActionId(unsigned short n){
+	 if(n < 100)
+	 	n = 100;
+	actionId = n;
+}
 
 Item::Item(const unsigned short _type) {
 	id = _type;
-	count = 0;
+	count = 0;	
 	chargecount = 0;
 	fluid = 0;
-	keyNumber = 0;
+	actionId = 0;
 	throwRange = 6;
 	useCount = 0;
+	isDecaying  = 0;
 	specialDescription = NULL;
 	text = NULL;
 }
 
-Item* Item::tranform()
+Item::Item(const Item &i){
+	id = i.id;
+	count = i.count;
+	chargecount = i.chargecount;
+	throwRange = i.throwRange;
+	useCount = 0;
+	isDecaying  = 0;
+	actionId = i.actionId;
+	if(i.specialDescription != NULL){
+		specialDescription = new std::string(*(i.specialDescription));
+	}
+	else{
+		specialDescription = NULL;
+	}
+	if(i.text != NULL){
+		text = new std::string(*(i.text));
+	}
+	else{
+		text = NULL;
+	}	
+}
+
+Item* Item::decay()
 {
 	unsigned short decayTo   = Item::items[getID()].decayTo;
 	//unsigned short decayTime = Item::items[getID()].decayTime;
 	
 	if(decayTo == 0) {
-		return 0;
+		return NULL;
 	}
 	
-	Item *item = Item::CreateItem(decayTo,getItemCountOrSubtype());
-	item->pos = this->pos;
+	if(items[id].iscontainer){
+		if(items[decayTo].iscontainer){
+			//container -> container			
+			setID(decayTo);
+			return this;
+		}
+		else{
+			//container -> no container			
+			Item *item = Item::CreateItem(decayTo,getItemCountOrSubtype());
+			item->pos = this->pos;
+			return item;
+		}
+	}
+	else{
+		if(items[decayTo].iscontainer){
+			//no container -> container
+			Item *item = Item::CreateItem(decayTo,getItemCountOrSubtype());
+			item->pos = this->pos;
+			return item;
+		}
+		else{
+			//no contaier -> no container
+			setID(decayTo);
+			return this;
+		}
+	}
+	
+	
 	//move items if they both are containers
-	Container *containerfrom = dynamic_cast<Container*>(this);
+	/*Container *containerfrom = dynamic_cast<Container*>(this);
 	Container *containerto = dynamic_cast<Container*>(item);
 	if(containerto && containerfrom){
 		std::vector<Item*> itemlist;
@@ -130,7 +188,11 @@ Item* Item::tranform()
 		}						
 	}
 
-	return item;
+	return item;*/
+}
+
+long Item::getDecayTime(){
+	return items[id].decayTime*1000;
 }
 
 Item::Item(const unsigned short _type, unsigned short _count) {
@@ -138,8 +200,9 @@ Item::Item(const unsigned short _type, unsigned short _count) {
 	count = 0;
 	chargecount = 0;
 	fluid = 0;
-	keyNumber = 0;
+	actionId = 0;
 	useCount = 0;
+	isDecaying  = 0;
 	specialDescription = NULL;
 	text = NULL;
 	setItemCountOrSubtype(_count);
@@ -157,8 +220,6 @@ Item::Item(const unsigned short _type, unsigned short _count) {
 	}
 	else if(isFluidContainer() || isMultiType() )
 		fluid = _count;
-	else if(isKey())
-		keyNumber = _count;
 	else
 		chargecount = _count;
 	*/
@@ -172,7 +233,8 @@ Item::Item()
 	chargecount = 0;
 	throwRange = 6;
 	useCount = 0;
-	keyNumber = 0;
+	isDecaying  = 0;
+	actionId = 0;
 	specialDescription = NULL;
 	text = NULL;
 }
@@ -216,6 +278,11 @@ int Item::unserialize(xmlNodePtr p){
 	*/
 	if(tmp)
 		setItemCountOrSubtype(atoi(tmp));
+		
+	tmp=(const char*)xmlGetProp(p, (const xmlChar *) "actionId");
+	if(tmp)
+		setActionId(atoi(tmp));
+	
 	
 	return 0;
 }
@@ -257,7 +324,12 @@ xmlNodePtr Item::serialize(){
 	s.str(""); //empty the stringstream
 	if(getItemCountOrSubtype() != 0){
 		s << getItemCountOrSubtype();
-		xmlSetProp(ret, (const xmlChar*)"count", (const xmlChar*)s.str().c_str());
+		if(actionId != 0){
+			xmlSetProp(ret, (const xmlChar*)"actionId", (const xmlChar*)s.str().c_str());
+		}
+		else{
+			xmlSetProp(ret, (const xmlChar*)"count", (const xmlChar*)s.str().c_str());
+		}
 	}
 		
 	return ret;
@@ -324,11 +396,6 @@ bool Item::isWeapon() const
   //now also returns true on SHIELDS!!! Check back with getWeponType!
   //old: return (items[id].weaponType != NONE && items[id].weaponType != SHIELD && items[id].weaponType != AMO);
   return (items[id].weaponType != NONE && items[id].weaponType != AMO);
-}
-
-bool Item::isKey() const
-{
-	return items[id].iskey;
 }
 
 WeaponType Item::getWeaponType() const {
@@ -443,14 +510,46 @@ std::string Item::getName() const
 }
 
 void Item::setSpecialDescription(std::string desc){
+	if(specialDescription)
+		delete specialDescription;
 	specialDescription = new std::string(desc);	
 }
 
 void Item::clearSpecialDescription(){
-	delete specialDescription;
+	if(specialDescription)
+		delete specialDescription;
 	specialDescription = NULL;
 }
 
+void Item::setText(std::string desc){
+	if(text)
+		delete text;
+	text = new std::string(desc);	
+	if(items[id].readonlyId != 0){//write 1 time
+		id = items[id].readonlyId;
+	}
+}
+
+void Item::clearText(){
+	if(text)
+		delete text;
+	text = NULL;
+}
+
+std::string Item::getText(){
+	if(!text)
+		return std::string("");
+	return *text;
+}
+
+
+int Item::getRWInfo() const {
+	return items[id].RWInfo;
+}
+
+bool Item::canDecay(){
+	return items[id].canDecay;	
+}	
 //Teleport class
 Teleport::Teleport(const unsigned short _type) : Item(_type)
 {

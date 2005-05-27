@@ -44,7 +44,7 @@ protected:
 	unsigned char count; // number of stacked items
 	unsigned char chargecount; //number of charges on the item
 	unsigned char fluid;
-	unsigned short keyNumber;
+	unsigned short actionId;
 private:
 	int useCount;
 	
@@ -62,6 +62,7 @@ public:
 	int getArmor() const;
 	int getDefense() const;
 	int getSlotPosition() const;
+	int getRWInfo() const;
 		
 	bool isBlockingProjectile() const;
 	bool isBlocking(bool ispickupable = false) const;
@@ -73,7 +74,6 @@ public:
 	bool isNotMoveable() const;
 	bool isPickupable() const;
 	bool isWeapon() const;
-	bool isKey() const;
 	//bool isContainer() const;
 	bool noFloorChange() const;
 	bool floorChangeNorth() const;
@@ -91,7 +91,10 @@ public:
 	std::string getName() const ;
 	void setSpecialDescription(std::string desc);
 	void clearSpecialDescription();
-		
+	void setText(std::string desc);
+	void clearText();
+	std::string Item::getText();
+	
 	virtual int unserialize(xmlNodePtr p);
 	virtual xmlNodePtr serialize();
 
@@ -105,28 +108,33 @@ public:
 	unsigned char getFluidType() const {return fluid;};
 	void setFluidType(unsigned char n) {fluid = n;};
 	
-	unsigned short getKeyNumber() const {return keyNumber;};
+	void setActionId(unsigned short n);
+	
+	virtual long getDecayTime();
+	bool canDecay();
 
 	/**
 	 * Called when the item is about to decay/transform to the next step.
 	 * \returns The item to decay to.
 	 */
-	virtual Item* tranform();
+	virtual Item* decay();
+	bool isDecaying;
 
   // Constructor for items
   Item(const unsigned short _type);
   Item(const unsigned short _type, unsigned short _count);
 	Item();
+	Item(const Item &i);
 
   virtual ~Item();
   virtual void useThing() {
-		//std::cout << "Item: useThing() " << (int)this << std::endl;
+		//std::cout << "Item: useThing() " << this << std::endl;
 		useCount++;
 	};
 	
 	virtual void releaseThing() {
 		useCount--;
-		//std::cout << "Item: releaseThing() " << (int)this << std::endl;
+		//std::cout << "Item: releaseThing() " << this << std::endl;
 		//if (useCount == 0)
 		if (useCount <= 0)
 			delete this;
@@ -141,13 +149,13 @@ public:
 	Teleport(const unsigned short _type);
 	virtual ~Teleport();
 	virtual void useThing() {
-		//std::cout << "Teleport: useThing() " << (int)this << std::endl;
+		//std::cout << "Teleport: useThing() " << this << std::endl;
 		useCount++;
 	};
 	
 	virtual void releaseThing() {
 		useCount--;
-		//std::cout << "Teleport: releaseThing() " << (int)this << std::endl;
+		//std::cout << "Teleport: releaseThing() " << this << std::endl;
 		//if (useCount == 0)
 		if (useCount <= 0)
 			delete this;
