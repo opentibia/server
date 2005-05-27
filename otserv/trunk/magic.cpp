@@ -466,11 +466,12 @@ MagicEffectItem::MagicEffectItem(const TransformMap& transformMap)
 	this->transformMap = transformMap;
 	useCount = 0;
 	unsigned short type = 0;
+	//decaytime = 0;
+	//updateDecay = false;
 	TransformMap::const_iterator dm = transformMap.begin();
 	if(dm != transformMap.end()) {
-		type = dm->first;
-	}
-
+		type = dm->first;		
+	}	
 	setID(type);
 	buildCondition();
 }
@@ -479,7 +480,14 @@ bool MagicEffectItem::transform(const MagicEffectItem *rhs)
 {
 	this->transformMap = rhs->transformMap;
 	setID(rhs->getID());
-
+	if(transformMap.begin() != transformMap.end()){
+		//decaytime = OTSYS_TIME() + transformMap.begin()->second.first;
+		//updateDecay = true;
+	}
+	else{
+		//decaytime = 0;
+		//updateDecay = false;
+	}	
 	buildCondition();
 	return true;
 }
@@ -487,16 +495,30 @@ bool MagicEffectItem::transform(const MagicEffectItem *rhs)
 long MagicEffectItem::getDecayTime()
 {
 	TransformMap::iterator dm = transformMap.find(getID());
-	if(dm != transformMap.end()) {
-		return dm->second.first;
-	}
+	//if(!updateDecay){
+		if(dm != transformMap.end()) {
+			return dm->second.first;
+		}
+	//}
+	/*else{
+		uint64_t ret = decaytime - OTSYS_TIME();
+		if(ret < 0){
+			ret = 0;
+		}
+		decaytime = 0;
+		updateDecay = false;
+		return ret;
+	}*/
 	
 	return 0;
 }
 
-bool MagicEffectItem::transform()
+Item* MagicEffectItem::decay()
 {
 	TransformMap::iterator dm = transformMap.find(getID());
+	//if(updateDecay){
+	//	return this;
+	//}
 	if(dm != transformMap.end()) {
 
 		//get next id to transform to
@@ -505,11 +527,11 @@ bool MagicEffectItem::transform()
 		if(dm != transformMap.end()) {
 			setID(dm->first);
 			buildCondition();
-			return true;
+			return this;
 		}
 	}
 
-	return false;
+	return NULL;
 }
 
 void MagicEffectItem::buildCondition()

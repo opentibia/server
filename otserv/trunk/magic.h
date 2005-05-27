@@ -159,6 +159,8 @@ public:
 	}
 
 	const unsigned long getOwnerID() const {return ownerid;}
+	void setOwnerID(unsigned long owner) { ownerid=owner;}
+	
 
 protected:
 	unsigned long ownerid;
@@ -226,12 +228,12 @@ public:
 	MagicEffectItem(const TransformMap& transformMap);
 
 	virtual void useThing() {
-		//std::cout << "Magic: useThing() " << (int)this << std::endl;
+		//std::cout << "Magic: useThing() " << this << std::endl;
 		useCount++;
 	};
 	
 	virtual void releaseThing() {
-		//std::cout << "Magic: releaseThing() " << (int)this << std::endl;
+		//std::cout << "Magic: releaseThing() " << this << std::endl;
 		useCount--;
 		//if (useCount == 0)
 		if (useCount <= 0)
@@ -247,12 +249,16 @@ public:
 
 	virtual int getDamage(Creature *target, const Creature *attacker = NULL) const;
 
-	bool transform();
+	//bool transform();
+	virtual Item* decay();
 	bool transform(const MagicEffectItem *rhs);
 	long getDecayTime();
+	
 protected:
 	int useCount;
 	void buildCondition();
+	//uint64_t decaytime;
+	//bool updateDecay;
 	TransformMap transformMap;
 	ConditionVec condition;
 };
