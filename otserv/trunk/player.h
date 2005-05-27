@@ -66,8 +66,7 @@ public:
 	static const unsigned long min_id = 16777217U;
 	static const unsigned long max_id = 4294967295U;
 
-  void speak(const std::string &text);
-
+  void speak(const std::string &text);	
 	bool addItem(Item* item);
 	bool internalAddItemContainer(Container *container,Item* item);
 	//bool removeItem(unsigned short id,unsigned short count);
@@ -129,13 +128,13 @@ public:
 	containerLayout vcontainers;
   void preSave();
     virtual void useThing() {
-		//std::cout << "Player: useThing() " << (int)this << std::endl;
+		//std::cout << "Player: useThing() " << this << std::endl;
 		useCount++;
 	};
 	
 	virtual void releaseThing() {
 		useCount--;
-		//std::cout << "Player: releaseThing() " << (int)this << std::endl;
+		//std::cout << "Player: releaseThing() " << this << std::endl;
 		if (useCount == 0)
 			delete this;
 	};
@@ -164,6 +163,7 @@ public:
   void sendTextMessage(MessageClasses mclass, const char* message);
   void sendTextMessage(MessageClasses mclass, const char* message,const Position &pos, unsigned char type);
   void sendPing();
+  void sendTextWindow(Item* item,const unsigned short maxlen, const bool canWrite);  
   void receivePing();
   void flushMsg();
 
@@ -206,6 +206,8 @@ protected:
   virtual void onCreatureChangeOutfit(const Creature* creature);
   virtual void onTeleport(const Creature *creature, const Position *oldPos, unsigned char oldstackpos); 
   virtual int onThink(int& newThinkTicks);
+  //virtual void onPlace();
+  //virtual void onRemove();
   virtual std::string getDescription(bool self = false) const;
 	virtual void onTileUpdated(const Position &pos);
 

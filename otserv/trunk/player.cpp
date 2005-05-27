@@ -658,18 +658,22 @@ int Player::addItemInventory(Item* item, int pos, bool internal /*= false*/) {
 bool Player::addItem(Item *item){
 	//find an empty inventory slot
 	if(!items[SLOT_RIGHT]){
-		addItemInventory(item,SLOT_RIGHT);
-		return true;
+		if(!(items[SLOT_LEFT] && (items[SLOT_LEFT]->getSlotPosition() & SLOTP_TWO_HAND))){
+			addItemInventory(item,SLOT_RIGHT);
+			return true;
+		}		
 	}
 	else if(!items[SLOT_LEFT]){
-		addItemInventory(item,SLOT_LEFT);
-		return true;
+		if(!(items[SLOT_RIGHT] && (items[SLOT_RIGHT]->getSlotPosition() & SLOTP_TWO_HAND))){
+			addItemInventory(item,SLOT_LEFT);
+			return true;
+		}
 	}
 	else if(!items[SLOT_AMMO]){
 		addItemInventory(item,SLOT_AMMO);
 		return true;
 	}
-	//find a in container
+	//find a free slot in container
 	for(int i=0; i< 11;i++){
 		Container *container = dynamic_cast<Container*>(items[i]);
 		if(container){
@@ -757,25 +761,30 @@ unsigned int Player::getReqSkilltries (int skill, int level, int voc) {
 
 void Player::addSkillTry(int skilltry)
 {
-	int skill;	
+	int skill;
+	bool foundSkill;
+	foundSkill = false;
 	std::string skillname;
 	//TODO:what happens with 2 weapons?
 	for (int slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++) {
 		if (items[slot]) {
 			if (items[slot]->isWeapon()) {
 				switch (items[slot]->getWeaponType()) {
-					case SWORD: skill = 2; skillname = "sword fighting"; break;
-					case CLUB: skill = 1; skillname = "club fighting"; break;
-					case AXE: skill = 3; skillname = "axe fighting"; break;
-					case DIST: skill = 4; skillname = "distance fighting"; break;
+					case SWORD: skill = 2; break;
+					case CLUB: skill = 1; break;
+					case AXE: skill = 3; break;
+					case DIST: skill = 4; break;
                     case SHIELD: continue; break;
-                    case MAGIC: return;	break;//TODO: should add skill try?
-					default: skill = 0; skillname = "fist fighting"; break;
+                    case MAGIC: return; break;//TODO: should add skill try?
+					default: skill = 0; break;
 			 	}//switch
 			 	addSkillTryInternal(skilltry,skill);
+			 	foundSkill = true;
 			}			
 		}
 	}
+	if(foundSkill == false)
+		addSkillTryInternal(skilltry,0);//add fist try
 }
 
 void Player::addSkillShieldTry(int skilltry){
@@ -1185,6 +1194,10 @@ void Player::sendCreatureHealth(const Creature *creature){
 	client->sendCreatureHealth(creature);
 }
 
+void Player::sendTextWindow(Item* item,const unsigned short maxlen, const bool canWrite){
+	client->sendTextWindow(item,maxlen,canWrite);
+}
+
 
 bool Player::NeedUpdateStats(){
 	if(lastSentStats.health != this->health ||
@@ -1271,18 +1284,13 @@ void Player::setAttackedCreature(unsigned long id){
 }
 
 void Player::onCreatureAppear(const Creature *creature)
-{
-	const Thing *thing = dynamic_cast< const Thing*>(creature);
-	if(thing)
-  		client->sendThingAppear(thing);
+{	
+ 	client->sendThingAppear(creature);
 }
 
 void Player::onCreatureDisappear(const Creature *creature, unsigned char stackPos, bool tele /*= false*/)
-{
-	
-	const Thing *thing = dynamic_cast<const Thing*>(creature);
-	if(thing)
-  		client->sendThingDisappear(thing, stackPos, tele);
+{	
+  	client->sendThingDisappear(creature, stackPos, tele);
 }
 
 void Player::onThingAppear(const Thing* thing){
