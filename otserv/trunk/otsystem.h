@@ -129,7 +129,7 @@ inline void OTSYS_THREAD_LOCKVARINIT(OTSYS_THREAD_LOCKVAR& l) {
 
 #define OTSYS_THREAD_LOCK(a)          pthread_mutex_lock(&a);
 #define OTSYS_THREAD_UNLOCK(a)        pthread_mutex_unlock(&a);
-#deinfe OTSYS_THREAD_UNLOCK_PTR(a)    pthread_mutex_unlock(a);
+#define OTSYS_THREAD_UNLOCK_PTR(a)    pthread_mutex_unlock(a);
 #define OTSYS_THREAD_TIMEOUT			  ETIMEDOUT
 #define OTSYS_THREAD_SIGNALVARINIT(a) pthread_cond_init(&a, NULL);
 #define OTSYS_THREAD_SIGNAL_SEND(a)   pthread_cond_signal(&a);
