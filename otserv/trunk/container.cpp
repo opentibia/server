@@ -33,7 +33,8 @@ Container::~Container()
 {
 	for(ContainerList::iterator cit = lcontained.begin(); cit != lcontained.end(); ++cit)
 	{
-    delete (*cit);
+    //delete (*cit);
+    (*cit)->releaseThing();
   }
     
 	lcontained.clear();
