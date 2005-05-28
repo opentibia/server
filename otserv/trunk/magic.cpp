@@ -272,7 +272,8 @@ MagicEffectTargetGroundClass::MagicEffectTargetGroundClass(MagicEffectItem* item
 MagicEffectTargetGroundClass::~MagicEffectTargetGroundClass()
 {
 	if(magicItem) {
-		delete magicItem;
+		//delete magicItem;
+		magicItem->releaseThing();
 		magicItem = NULL;
 	}
 }
@@ -430,7 +431,8 @@ MagicEffectAreaGroundClass::MagicEffectAreaGroundClass(MagicEffectItem* item)
 MagicEffectAreaGroundClass::~MagicEffectAreaGroundClass()
 {
 	if(magicItem) {
-		delete magicItem;
+		//delete magicItem;
+		magicItem->releaseThing();
 		magicItem = NULL;
 	}
 }

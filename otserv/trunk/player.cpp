@@ -124,7 +124,8 @@ Player::~Player()
 {
 	for (int i = 0; i < 11; i++) {
 		if (items[i])
-      delete items[i];
+      //delete items[i];
+      items[i]->releaseThing();
 	}
 
   delete client;
@@ -351,7 +352,8 @@ bool Player::substractMoney(unsigned long money)
 				if(money >= goldcoins)
 				{
 					money -= goldcoins;
-					delete items[i];
+					//delete items[i];
+					items[i]->releaseThing();
 					items[i] = NULL;
 					
 				}
@@ -368,7 +370,8 @@ bool Player::substractMoney(unsigned long money)
 				if(money >= goldcoins)
 				{
 					money -= goldcoins;
-					delete items[i];
+					//delete items[i];
+					items[i]->releaseThing();
 					items[i] = NULL;
 					
 				}
@@ -406,7 +409,8 @@ bool Player::substractMoney(unsigned long money)
 					}
 					else
 					{
-						delete items[i];
+						//delete items[i];
+						items[i]->releaseThing();
 						items[i] = NULL;
 						
 						if(goldcoins)
@@ -467,7 +471,8 @@ bool Player::substractMoneyContainer(Container *container, unsigned long *money)
 				{
 					i--; // If we remove an item from the container then we need substract 1 to the container's main item counter
 					*money -= goldcoins;
-					delete item;
+					//delete item;
+					item->releaseThing();
 				}
 				else
 				{
@@ -507,7 +512,8 @@ bool Player::substractMoneyContainer(Container *container, unsigned long *money)
 				{
 					i--; // If we remove an item from the container then we need substract 1 to the container's main item counter
 					*money -= goldcoins;
-					delete item;
+					//delete item;
+					item->releaseThing();
 				}
 				else
 				{
@@ -558,7 +564,8 @@ bool Player::substractMoneyContainer(Container *container, unsigned long *money)
 					{
 						if(goldcoins)
 						{
-							delete item;
+							//delete item;
+							item->releaseThing();
 							Item *new_item = Item::CreateItem(ITEM_COINS_GOLD, goldcoins);
 							item = new_item;
 							container->addItem(item);
@@ -575,7 +582,8 @@ bool Player::substractMoneyContainer(Container *container, unsigned long *money)
 						}
 						else
 						{
-							delete item;
+							//delete item;
+							item->releaseThing();
 							item = NULL;
 						}
 					}
@@ -637,7 +645,8 @@ int Player::addItemInventory(Item* item, int pos, bool internal /*= false*/) {
 	if(pos > 0 && pos < 11)
   {
 		if (items[pos]) {
-      delete items[pos];
+      //delete items[pos];
+      		items[pos]->releaseThing();
 		}
 
 		items[pos] = item;
@@ -1003,13 +1012,15 @@ void Player::RemoveDistItem(){
 		else if(DistItem == items[SLOT_AMMO]){
 			sl_id = SLOT_AMMO;
 		}
+		
 		if(n > 1){
 			DistItem->setItemCountOrSubtype(n-1);
 		}
 		else{
 			//remove the item			
 			items[sl_id] = NULL;
-			delete DistItem;
+			DistItem->releaseThing();
+			//delete DistItem;
 		}		
 		//update inventory
 		client->sendInventory(sl_id);

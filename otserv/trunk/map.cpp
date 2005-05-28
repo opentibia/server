@@ -340,7 +340,8 @@ void Map::setTile(unsigned short _x, unsigned short _y, unsigned char _z, unsign
   if (tile != NULL)
   {
 		if(tile->ground)
-			delete tile->ground;
+			//delete tile->ground;
+			tile->ground->releaseThing();
 
 		tile->ground = Item::CreateItem(groundId);
 		tile->ground->pos.x = _x;
