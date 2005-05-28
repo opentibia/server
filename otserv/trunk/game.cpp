@@ -641,8 +641,11 @@ bool Game::removeCreature(Creature* c)
 		int stackpos = tile->getCreatureStackPos(c);
 		//bool success = map->removeCreature(c);
 		//map->unlock();
-		sendRemoveThing(NULL,c->pos,c,stackpos);
+		//NOTE: we can reverse order of removeThing and sendRemoveThing
+		// because we are sure that the creature is on the ground
 		removeThing(NULL,c->pos,c);
+		sendRemoveThing(NULL,c->pos,c,stackpos);
+		
 
 		//if(success)
 		//{
@@ -3393,8 +3396,10 @@ void Game::checkDecay(int t){
 							startDecay(newitem);
 						}
 						else{
-							sendRemoveThing(NULL,pos,item,stackpos,true);
+							//NOTE: we can reverse order of removeThing and sendRemoveThing
+							// because we are sure that the item is on the ground
 							removeThing(NULL,pos,item);
+							sendRemoveThing(NULL,pos,item,stackpos,true);
 							FreeThing(item);
 						}//newitem
 					}//pos != 0xFFFF
@@ -3611,6 +3616,7 @@ void Game::flushSendBuffers(){
 
 	for(std::vector<Player*>::iterator it = BufferedPlayers.begin(); it != BufferedPlayers.end(); ++it) {
 		(*it)->flushMsg();
+		(*it)->SendBuffer = false;
 		(*it)->releaseThing();
 /*
 #ifdef __DEBUG__
@@ -3638,10 +3644,11 @@ void Game::addPlayerBuffer(Player* p){
 	std::cout << "addPlayerBuffer() - useThing()" << std::endl;
 #endif
 */
-
-	p->useThing();
-
-	BufferedPlayers.push_back(p);
+	if(p->SendBuffer == false){
+		p->useThing();
+		BufferedPlayers.push_back(p);
+		p->SendBuffer = true;
+	}
 	//OTSYS_THREAD_UNLOCK(gameLock)
 	return;
 }

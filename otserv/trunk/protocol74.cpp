@@ -1927,7 +1927,6 @@ void Protocol74::sendCancelWalk(const char *msg)
 void Protocol74::sendThingDisappear(const Thing *thing, unsigned char stackPos, bool tele)
 {
 	NetworkMessage msg;
-	
 	const Creature* creature = dynamic_cast<const Creature*>(thing);
 	if(!tele) {		
 		if(creature && creature->health > 0){
@@ -1945,6 +1944,14 @@ void Protocol74::sendThingDisappear(const Thing *thing, unsigned char stackPos, 
 		AddRemoveThing(msg,thing->pos, stackPos);
 		if(creature && stackPos > 9){
 			AddCreatureHealth(msg,creature);
+		}
+		Tile *tile = game->getTile(thing->pos.x, thing->pos.y, thing->pos.z);
+		if(tile && tile->getThingCount() > 8) {
+			//We need to pop up this item
+			Thing *newthing = tile->getThingByStackPos(9);
+			if(newthing != NULL) {
+				AddTileUpdated(msg, thing->pos);
+			}
 		}
 	}
 
@@ -2373,29 +2380,24 @@ void Protocol74::RemoveItemContainer(NetworkMessage &msg,unsigned char cid,unsig
 //////////////////////////
 
 void Protocol74::flushOutputBuffer(){
-	//OTSYS_THREAD_LOCK(bufferLock)
-	OTSYS_THREAD_LOCK_CLASS lockClass(bufferLock);	
+	OTSYS_THREAD_LOCK_CLASS lockClass(bufferLock);
 	//force writetosocket	
 	OutputBuffer.WriteToSocket(s);
 	OutputBuffer.Reset();
-	player->SendBuffer = false;	
-	//OTSYS_THREAD_UNLOCK(bufferLock)
+		
 	return;
 }
 
-void Protocol74::WriteBuffer(NetworkMessage &add){		
-	//OTSYS_THREAD_LOCK(bufferLock)
-	OTSYS_THREAD_LOCK_CLASS lockClass(bufferLock);
-	if(player->SendBuffer == false){
-		game->addPlayerBuffer(player);
-		player->SendBuffer = true;
-	}	
+void Protocol74::WriteBuffer(NetworkMessage &add){
+	
+	game->addPlayerBuffer(player);	
+	
+	OTSYS_THREAD_LOCK(bufferLock)
 	if(OutputBuffer.getMessageLength() + add.getMessageLength() > NETWORKMESSAGE_MAXSIZE){				
-		this->flushOutputBuffer();	
-		player->SendBuffer = true;
+		this->flushOutputBuffer();
 	}	
 	OutputBuffer.JoinMessages(add);	
-	//OTSYS_THREAD_UNLOCK(bufferLock)	
+	OTSYS_THREAD_UNLOCK(bufferLock)	
   	return;
 }
 
