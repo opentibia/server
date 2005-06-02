@@ -4,11 +4,10 @@
 
 <action itemid="2674" script="food.lua" />
 <action itemid="2676" script="food.lua" />
-<action itemid="2697" script="food.lua" />
+<action itemid="2679" script="food.lua" />
 <action itemid="1386" script="teleport.lua" />
 <action itemid="430" script="teleport.lua" />
 
-<action itemid="2006" script="fluids.lua" />
 <action itemid="2070" script="music.lua" />
 <action itemid="2580" script="fishing.lua" />
 
@@ -18,8 +17,16 @@
 <action itemid="2598" script="rwitems.lua" />
 <action itemid="2599" script="rwitems.lua" />
 <action itemid="2661" script="rwitems.lua" />
-<action itemid="2554" script="shovel.lua" /> --update
+<action itemid="2554" script="shovel.lua" />
 <action itemid="2120" script="rope.lua" />
+
+<action itemid="1968" script="rwitems.lua" />
+<action itemid="1209" script="door.lua" />
+<action itemid="1211" script="door.lua" />
+<action itemid="2090" script="key.lua" />
+<action itemid="1945" script="switch.lua" />
+<action itemid="1946" script="switch.lua" />
+<action itemid="2006" script="fluids.lua" /> --upadte
 
 
 </actions>
