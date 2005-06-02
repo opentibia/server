@@ -418,6 +418,15 @@ void Tile::addThing(Thing *thing) {
     {
       ground = item;
     }
+    else if (item->isSplash()){
+		if(splash == NULL){
+			splash = item;
+		}
+		else{
+			//Should not add the splash directly
+			//use game->addthing method
+		}
+	}
     else if (item->isAlwaysOnTop())
     {
       topItems.insert(topItems.begin(), item);
