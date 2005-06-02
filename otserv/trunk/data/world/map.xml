@@ -94,7 +94,7 @@
 <tile x="17" y="20" z="6" ground="354"/>
 <tile x="18" y="20" z="6" ground="354"/>
 <tile x="19" y="20" z="6" ground="354"/>
-<tile x="20" y="20" z="6" ground="354"/>
+<tile x="20" y="20" z="6" ground="468"/>
 <tile x="21" y="20" z="6" ground="354"/>
 <tile x="12" y="21" z="6" ground="354"/>
 <tile x="13" y="21" z="6" ground="354"/>
@@ -2458,13 +2458,21 @@
 <tile x="23" y="21" z="7" ground="490"/>
 <tile x="24" y="21" z="7" ground="490"/>
 <tile x="25" y="21" z="7" ground="490"/>
-<tile x="26" y="21" z="7" ground="490"/>
-<tile x="27" y="21" z="7" ground="490"/>
-<tile x="28" y="21" z="7" ground="405"/>
-<tile x="29" y="21" z="7" ground="490"/>
-<tile x="30" y="21" z="7" ground="490"/>
-<tile x="31" y="21" z="7" ground="490"/>
-<tile x="32" y="21" z="7" ground="490"/>
+<tile x="26" y="21" z="7" pz="1" ground="782"/>
+<tile x="27" y="21" z="7" pz="1" ground="782"/>
+<tile x="28" y="21" z="7" pz="1" ground="782"/>
+<tile x="29" y="21" z="7" ground="490">
+<item id="1103"/>
+</tile>
+<tile x="30" y="21" z="7" ground="490">
+<item id="1103"/>
+</tile>
+<tile x="31" y="21" z="7" ground="490">
+<item id="1103"/>
+</tile>
+<tile x="32" y="21" z="7" ground="490">
+<item id="1103"/>
+</tile>
 <tile x="33" y="21" z="7" ground="490"/>
 <tile x="34" y="21" z="7" ground="490"/>
 <tile x="35" y="21" z="7" ground="490"/>
@@ -2579,13 +2587,18 @@
 <tile x="23" y="22" z="7" ground="490"/>
 <tile x="24" y="22" z="7" ground="490"/>
 <tile x="25" y="22" z="7" ground="490"/>
-<tile x="26" y="22" z="7" ground="490"/>
-<tile x="27" y="22" z="7" ground="490"/>
-<tile x="28" y="22" z="7" ground="405"/>
-<tile x="29" y="22" z="7" ground="490"/>
-<tile x="30" y="22" z="7" ground="490"/>
-<tile x="31" y="22" z="7" ground="490"/>
-<tile x="32" y="22" z="7" ground="490"/>
+<tile x="26" y="22" z="7" pz="1" ground="782"/>
+<tile x="27" y="22" z="7" pz="1" ground="782"/>
+<tile x="28" y="22" z="7" pz="1" ground="782"/>
+<tile x="29" y="22" z="7" pz="1" ground="782"/>
+<tile x="30" y="22" z="7" pz="1" ground="782"/>
+<tile x="31" y="22" z="7" pz="1" ground="782">
+<item id="1617"/>
+<item id="2592" depot="1"/>
+</tile>
+<tile x="32" y="22" z="7" ground="405">
+<item id="1105"/>
+</tile>
 <tile x="33" y="22" z="7" ground="490"/>
 <tile x="34" y="22" z="7" ground="490"/>
 <tile x="35" y="22" z="7" ground="490"/>
@@ -2678,13 +2691,21 @@
 <tile x="23" y="23" z="7" ground="490"/>
 <tile x="24" y="23" z="7" ground="490"/>
 <tile x="25" y="23" z="7" ground="490"/>
-<tile x="26" y="23" z="7" ground="490"/>
-<tile x="27" y="23" z="7" ground="490"/>
-<tile x="28" y="23" z="7" ground="405"/>
-<tile x="29" y="23" z="7" ground="490"/>
-<tile x="30" y="23" z="7" ground="490"/>
-<tile x="31" y="23" z="7" ground="490"/>
-<tile x="32" y="23" z="7" ground="490"/>
+<tile x="26" y="23" z="7" pz="1" ground="782"/>
+<tile x="27" y="23" z="7" pz="1" ground="782"/>
+<tile x="28" y="23" z="7" pz="1" ground="782"/>
+<tile x="29" y="23" z="7" pz="1" ground="405">
+<item id="1109"/>
+</tile>
+<tile x="30" y="23" z="7" pz="1" ground="782">
+<item id="1103"/>
+</tile>
+<tile x="31" y="23" z="7" pz="1" ground="782">
+<item id="1621"/>
+</tile>
+<tile x="32" y="23" z="7" ground="405">
+<item id="1105"/>
+</tile>
 <tile x="33" y="23" z="7" ground="490"/>
 <tile x="34" y="23" z="7" ground="490"/>
 <tile x="35" y="23" z="7" ground="490"/>
@@ -2777,13 +2798,18 @@
 <tile x="23" y="24" z="7" ground="490"/>
 <tile x="24" y="24" z="7" ground="490"/>
 <tile x="25" y="24" z="7" ground="490"/>
-<tile x="26" y="24" z="7" ground="490"/>
-<tile x="27" y="24" z="7" ground="490"/>
-<tile x="28" y="24" z="7" ground="405"/>
-<tile x="29" y="24" z="7" ground="490"/>
-<tile x="30" y="24" z="7" ground="490"/>
-<tile x="31" y="24" z="7" ground="490"/>
-<tile x="32" y="24" z="7" ground="490"/>
+<tile x="26" y="24" z="7" pz="1" ground="782"/>
+<tile x="27" y="24" z="7" pz="1" ground="782"/>
+<tile x="28" y="24" z="7" pz="1" ground="782"/>
+<tile x="29" y="24" z="7" pz="1" ground="782"/>
+<tile x="30" y="24" z="7" pz="1" ground="782"/>
+<tile x="31" y="24" z="7" pz="1" ground="782">
+<item id="1617"/>
+<item id="2592" depot="1"/>
+</tile>
+<tile x="32" y="24" z="7" ground="405">
+<item id="1105"/>
+</tile>
 <tile x="33" y="24" z="7" ground="490"/>
 <tile x="34" y="24" z="7" ground="490"/>
 <tile x="35" y="24" z="7" ground="490"/>
@@ -2876,13 +2902,23 @@
 <tile x="23" y="25" z="7" ground="490"/>
 <tile x="24" y="25" z="7" ground="490"/>
 <tile x="25" y="25" z="7" ground="490"/>
-<tile x="26" y="25" z="7" ground="490"/>
-<tile x="27" y="25" z="7" ground="490"/>
-<tile x="28" y="25" z="7" ground="405"/>
-<tile x="29" y="25" z="7" ground="490"/>
-<tile x="30" y="25" z="7" ground="490"/>
-<tile x="31" y="25" z="7" ground="490"/>
-<tile x="32" y="25" z="7" ground="490"/>
+<tile x="26" y="25" z="7" pz="1" ground="782">
+<item id="1945"/>
+</tile>
+<tile x="27" y="25" z="7" pz="1" ground="782"/>
+<tile x="28" y="25" z="7" pz="1" ground="782"/>
+<tile x="29" y="25" z="7" ground="405">
+<item id="1103"/>
+</tile>
+<tile x="30" y="25" z="7" ground="405">
+<item id="1103"/>
+</tile>
+<tile x="31" y="25" z="7" ground="405">
+<item id="1103"/>
+</tile>
+<tile x="32" y="25" z="7" ground="405">
+<item id="1104"/>
+</tile>
 <tile x="33" y="25" z="7" ground="490"/>
 <tile x="34" y="25" z="7" ground="490"/>
 <tile x="35" y="25" z="7" ground="490"/>
@@ -3167,10 +3203,18 @@
 <tile x="17" y="28" z="7" ground="490"/>
 <tile x="18" y="28" z="7" ground="490"/>
 <tile x="19" y="28" z="7" ground="490"/>
-<tile x="20" y="28" z="7" ground="490"/>
-<tile x="21" y="28" z="7" ground="490"/>
-<tile x="22" y="28" z="7" ground="490"/>
-<tile x="23" y="28" z="7" ground="490"/>
+<tile x="20" y="28" z="7" ground="490">
+<item id="1038"/>
+</tile>
+<tile x="21" y="28" z="7" ground="490">
+<item id="1037"/>
+</tile>
+<tile x="22" y="28" z="7" ground="490">
+<item id="1037"/>
+</tile>
+<tile x="23" y="28" z="7" ground="490">
+<item id="1039"/>
+</tile>
 <tile x="24" y="28" z="7" ground="490"/>
 <tile x="25" y="28" z="7" ground="490"/>
 <tile x="26" y="28" z="7" ground="490"/>
@@ -3266,10 +3310,16 @@
 <tile x="17" y="29" z="7" ground="490"/>
 <tile x="18" y="29" z="7" ground="490"/>
 <tile x="19" y="29" z="7" ground="490"/>
-<tile x="20" y="29" z="7" ground="490"/>
-<tile x="21" y="29" z="7" ground="490"/>
-<tile x="22" y="29" z="7" ground="490"/>
-<tile x="23" y="29" z="7" ground="790"/>
+<tile x="20" y="29" z="7" ground="490">
+<item id="1043"/>
+</tile>
+<tile x="21" y="29" z="7" ground="415"/>
+<tile x="22" y="29" z="7" ground="415">
+<item id="1718" uniqueId="2000" ></item>
+</tile>
+<tile x="23" y="29" z="7" ground="415">
+<item id="1041"/>
+</tile>
 <tile x="24" y="29" z="7" ground="790"/>
 <tile x="25" y="29" z="7" ground="790"/>
 <tile x="26" y="29" z="7" ground="790"/>
@@ -3365,13 +3415,21 @@
 <tile x="17" y="30" z="7" ground="490"/>
 <tile x="18" y="30" z="7" ground="490"/>
 <tile x="19" y="30" z="7" ground="490"/>
-<tile x="20" y="30" z="7" ground="490"/>
-<tile x="21" y="30" z="7" ground="490"/>
-<tile x="22" y="30" z="7" ground="490"/>
-<tile x="23" y="30" z="7" ground="790"/>
+<tile x="20" y="30" z="7" ground="490">
+<item id="1043"/>
+</tile>
+<tile x="21" y="30" z="7" ground="415">
+<item id="1748"><inside><item id="1968" text="Otserv test map." /></inside></item>
+</tile>
+<tile x="22" y="30" z="7" ground="415"/>
+<tile x="23" y="30" z="7" ground="415">
+<item id="1209" actionId="200" uniqueId="1000" />
+</tile>
 <tile x="24" y="30" z="7" ground="790"/>
 <tile x="25" y="30" z="7" ground="790"/>
-<tile x="26" y="30" z="7" ground="790"/>
+<tile x="26" y="30" z="7" ground="790">
+<item id="2090" actionId="200"/>
+</tile>
 <tile x="27" y="30" z="7" ground="790"/>
 <tile x="28" y="30" z="7" ground="790"/>
 <tile x="29" y="30" z="7" ground="790"/>
@@ -3464,10 +3522,14 @@
 <tile x="17" y="31" z="7" ground="490"/>
 <tile x="18" y="31" z="7" ground="490"/>
 <tile x="19" y="31" z="7" ground="490"/>
-<tile x="20" y="31" z="7" ground="490"/>
-<tile x="21" y="31" z="7" ground="490"/>
-<tile x="22" y="31" z="7" ground="490"/>
-<tile x="23" y="31" z="7" ground="790"/>
+<tile x="20" y="31" z="7" ground="490">
+<item id="1043"/>
+</tile>
+<tile x="21" y="31" z="7" ground="415"/>
+<tile x="22" y="31" z="7" ground="415"/>
+<tile x="23" y="31" z="7" ground="415">
+<item id="1041"/>
+</tile>
 <tile x="24" y="31" z="7" ground="790"/>
 <tile x="25" y="31" z="7" ground="790"/>
 <tile x="26" y="31" z="7" ground="790"/>
@@ -3563,10 +3625,18 @@
 <tile x="17" y="32" z="7" ground="490"/>
 <tile x="18" y="32" z="7" ground="490"/>
 <tile x="19" y="32" z="7" ground="490"/>
-<tile x="20" y="32" z="7" ground="490"/>
-<tile x="21" y="32" z="7" ground="490"/>
-<tile x="22" y="32" z="7" ground="490"/>
-<tile x="23" y="32" z="7" ground="790"/>
+<tile x="20" y="32" z="7" ground="490">
+<item id="1043"/>
+</tile>
+<tile x="21" y="32" z="7" ground="415">
+<item id="1039"/>
+</tile>
+<tile x="22" y="32" z="7" ground="415">
+<item id="1039"/>
+</tile>
+<tile x="23" y="32" z="7" ground="415">
+<item id="1044"/>
+</tile>
 <tile x="24" y="32" z="7" ground="790"/>
 <tile x="25" y="32" z="7" ground="790"/>
 <tile x="26" y="32" z="7" ground="790"/>
