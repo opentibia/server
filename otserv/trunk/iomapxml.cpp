@@ -24,7 +24,7 @@
 
 bool IOMapXML::loadMap(Map* map, std::string identifier){
 	xmlDocPtr doc;
-	xmlNodePtr root, tile, p;
+	xmlNodePtr root, tile, p, tmpNode;
 	int width, height;
 
 	xmlLineNumbersDefault(1);
@@ -104,7 +104,22 @@ bool IOMapXML::loadMap(Map* map, std::string identifier){
 				if(tmp){					
 					int depotnumber = atoi(tmp);					
 					container->depot = depotnumber;
-				}      			
+				}
+				if(p->children && strcmp((const char*)p->children->name, "inside") == 0){
+					tmpNode = p->children->children;
+					while(tmpNode){
+						unsigned int id = atoi((const char*)xmlGetProp(tmpNode, (const xmlChar *) "id"));
+						Item* myitem = Item::CreateItem(id);
+						myitem->unserialize(tmpNode);
+						container->addItem(myitem);
+			
+						Container* in_container = dynamic_cast<Container*>(myitem);
+						if(in_container){
+							LoadContainer(tmpNode,in_container);
+						}
+						tmpNode = tmpNode->next;
+					}
+				}
 				//loadContainer
 			}
 
@@ -125,4 +140,37 @@ bool IOMapXML::loadMap(Map* map, std::string identifier){
   xmlFreeDoc(doc);
 	
 	return true;
+}
+
+bool IOMapXML::LoadContainer(xmlNodePtr nodeitem,Container* ccontainer)
+{
+	xmlNodePtr tmp,p;
+	if(nodeitem==NULL){
+		return false;
+	}
+	tmp=nodeitem->children;
+	if(tmp==NULL){
+		return false;
+	}
+                  
+	if (strcmp((const char*)tmp->name, "inside") == 0){
+		//load items
+		p=tmp->children;
+		while(p){			
+			unsigned int id = atoi((const char*)xmlGetProp(p, (const xmlChar *) "id"));
+			Item* myitem = Item::CreateItem(id);
+			myitem->unserialize(p);			
+			ccontainer->addItem(myitem);
+			
+			Container* in_container = dynamic_cast<Container*>(myitem);
+			if(in_container){
+				LoadContainer(p,in_container);
+			}
+			p=p->next;
+		}
+
+		return true;
+	}
+
+	return false;
 }
