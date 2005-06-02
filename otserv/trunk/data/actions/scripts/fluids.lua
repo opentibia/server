@@ -1,7 +1,7 @@
 -- example of fluids --
 
 function onUse(cid, item, frompos, item2, topos)
-	-- itemid means that is a creature
+	-- itemid 1 means that is a creature
 	if item2.itemid == 1 then
 		if item.type == 0 then
 			doPlayerSendCancel(cid,"It is empty.")
@@ -18,11 +18,21 @@ function onUse(cid, item, frompos, item2, topos)
 					doPlayerSay(cid,"Gulp.",1)
 				end
 			else
-				doPlayerSay(cid,"I cant.",1)
+				splash = doCreateItem(2025,item.type,topos)
+				doChangeTypeItem(item.uid,0)
+				doDecayItem(splash)
 			end
 		end
 	elseif item2.itemid == 490 then
 		doChangeTypeItem(item.uid,1)
+	else
+		if item.type == 0 then
+			doPlayerSendCancel(cid,"It is empty.")
+		else
+			splash = doCreateItem(2025,item.type,topos)
+			doChangeTypeItem(item.uid,0)
+			doDecayItem(splash)
+		end
 	end
 	
 	return 1
