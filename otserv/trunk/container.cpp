@@ -33,9 +33,12 @@ Container::~Container()
 {
 	for(ContainerList::iterator cit = lcontained.begin(); cit != lcontained.end(); ++cit)
 	{
-    //delete (*cit);
-    (*cit)->releaseThing();
-  }
+    	//delete (*cit);    
+    	(*cit)->releaseThing();
+    	Container* container = dynamic_cast<Container*>(*cit);
+    	if(container)
+    		container->setParent(NULL);
+  	}
     
 	lcontained.clear();
 }
