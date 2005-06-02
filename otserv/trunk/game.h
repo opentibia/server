@@ -197,7 +197,7 @@ public:
 	//bool creatureUseItem(Creature *creature, const Position& pos, Item* item);
 	bool playerUseItemEx(Player *player, const Position& posFrom,const unsigned char  stack_from,
 		const Position &posTo,const unsigned char stack_to, const unsigned short itemid);
-	bool playerUseItem(Player *player, const Position& pos, const unsigned char stackpos, const unsigned short itemid);
+	bool playerUseItem(Player *player, const Position& pos, const unsigned char stackpos, const unsigned short itemid, const unsigned char index);
   void changeOutfitAfter(unsigned long id, int looktype, long time);
   void changeSpeed(unsigned long id, unsigned short speed);
   void addEvent(long ticks, int type, void *data);

@@ -268,7 +268,8 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 					Player *gainExpPlayer = dynamic_cast<Player*>(gainExpCreature);
 
 					if(gainExpPlayer) {
-						gainExpPlayer->experience += gainedExperience;
+						//gainExpPlayer->experience += gainedExperience;
+						gainExpPlayer->addExp(gainedExperience);
 					}
 
 					//Need to add this creature and all that can see it to spectators, unless they already added
@@ -371,8 +372,8 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 
 		if(hadSplash) {
 			unsigned char stackpos = tile->getThingStackPos(tile->splash);
-			//Todo: check if both splashs are of the same type
 			tile->splash->setID(2019);
+			tile->splash->setItemCountOrSubtype(FLUID_BLOOD);
 			game->sendRemoveThing(NULL,attackedCreature->pos,tile->splash,stackpos);
 			game->sendAddThing(NULL,attackedCreature->pos,tile->splash);
 			/*
@@ -638,15 +639,11 @@ bool Game::removeCreature(Creature* c)
 	Tile *tile = map->getTile(c->pos.x, c->pos.y, c->pos.z);
 	if(tile != NULL){			
 		//map->lock();
-		int stackpos = tile->getCreatureStackPos(c);
+		//int stackpos = tile->getCreatureStackPos(c);
 		//bool success = map->removeCreature(c);
 		//map->unlock();
-		//NOTE: we can reverse order of removeThing and sendRemoveThing
-		// because we are sure that the creature is on the ground
 		removeThing(NULL,c->pos,c);
-		sendRemoveThing(NULL,c->pos,c,stackpos);
 		
-
 		//if(success)
 		//{
 		 	this->FreeThing(c);
@@ -662,10 +659,10 @@ bool Game::removeCreature(Creature* c)
 				Tile *tile = map->getTile((*cit)->pos.x, (*cit)->pos.y, (*cit)->pos.z);
 				if(tile != NULL){
 					//map->lock();
-					int stackpos = tile->getCreatureStackPos(*cit);
+					//int stackpos = tile->getCreatureStackPos(*cit);
 					//bool success = map->removeCreature(*cit);
 					//map->unlock();
-					sendRemoveThing(NULL,(*cit)->pos,*cit,stackpos);
+					//sendRemoveThing(NULL,(*cit)->pos,*cit,stackpos);
 					//if(success) {
 					(*cit)->setMaster(NULL);
 					this->FreeThing(*cit);
@@ -2228,10 +2225,10 @@ void Game::creatureSay(Creature *creature, SpeakClasses type, const std::string 
 					delete newItem;
 					break;
 				}
-				newItem->pos = creature->pos;
-				t->addThing(newItem);
-				
-				Game::creatureBroadcastTileUpdated(creature->pos);			
+				//newItem->pos = creature->pos;
+				//t->addThing(newItem);
+				//Game::creatureBroadcastTileUpdated(creature->pos);
+				addThing(NULL,creature->pos,newItem);
 			}
 			break;
 
@@ -2787,7 +2784,8 @@ bool Game::creatureOnPrepareMagicAttack(Creature *creature, Position pos, const 
 				}
 				else
 					player->mana -= me->manaCost;
-					player->manaspent += me->manaCost;
+					//player->manaspent += me->manaCost;
+					player->addManaspent(me->manaCost);
 			}
 		}
 
@@ -3002,9 +3000,9 @@ void Game::checkCreature(unsigned long id)
 			}
 				
 			if(!tile->isPz()){
-				player->mana += min(5, player->manamax - player->mana);
 				if(player->food > 1000){
-					player->food -= thinkTicks;					
+					player->mana += min(5, player->manamax - player->mana);
+					player->food -= thinkTicks;
 					if(player->healthmax - player->health > 0){
 						player->health += min(5, player->healthmax - player->health);
 						std::vector<Creature*> list;
@@ -3018,7 +3016,7 @@ void Game::checkCreature(unsigned long id)
 					}
 				}				
 			}
-			
+			/* //moved to player.cpp
 			int lastLv = player->level;
 			
 			while (player->experience >= player->getExpForLv(player->level+1)) {
@@ -3037,13 +3035,15 @@ void Game::checkCreature(unsigned long id)
 				lvMsg << "You advanced from level " << lastLv << " to level " << player->level << ".";				
 				player->sendTextMessage(MSG_ADVANCE,lvMsg.str().c_str());
 			}
+			*/
 			//send stast only if have changed
 			if(player->NeedUpdateStats())
 				player->sendStats();
 			
 			player->sendPing();
 			
-			//Magic Level Advance
+			//moved to player.cpp
+			/*//Magic Level Advance
 			int reqMana = player->getReqMana(player->maglevel+1, player->voc);
 			//ATTANTION: MAKE SURE THAT CHARACTERS HAVE REASONABLE MAGIC LEVELS. ESPECIALY KNIGHTS!!!!!!!!!!!
 			/*
@@ -3051,7 +3051,7 @@ void Game::checkCreature(unsigned long id)
 				reqMana = reqMana - (reqMana % 20);
 			else
 				reqMana = reqMana - (reqMana % 20) + 20;
-			*/
+			/
 			if (player->access == 0 && player->manaspent >= reqMana) {
 				player->manaspent -= reqMana;
 				player->maglevel++;
@@ -3062,7 +3062,7 @@ void Game::checkCreature(unsigned long id)
 				//msg.AddPlayerStats(player);
 				//player->sendNetworkMessage(&msg);
 			}
-			//End Magic Level Advance
+			//End Magic Level Advance*/
 
 			if(player->inFightTicks >= 1000) {
 				player->inFightTicks -= thinkTicks;
@@ -3371,9 +3371,9 @@ void Game::checkDecay(int t){
 						Item* newitem = item->decay();
 						Tile *tile = getTile(item->pos.x, item->pos.y, item->pos.z);
 						Position pos = item->pos;
-						int stackpos = tile->getThingStackPos(item);
 						
 						if(newitem){
+							int stackpos = tile->getThingStackPos(item);
 							if(newitem == item){
 								sendUpdateThing(NULL,pos,newitem,stackpos);
 							}
@@ -3396,10 +3396,7 @@ void Game::checkDecay(int t){
 							startDecay(newitem);
 						}
 						else{
-							//NOTE: we can reverse order of removeThing and sendRemoveThing
-							// because we are sure that the item is on the ground
 							removeThing(NULL,pos,item);
-							sendRemoveThing(NULL,pos,item,stackpos,true);
 							FreeThing(item);
 						}//newitem
 					}//pos != 0xFFFF
@@ -3578,7 +3575,7 @@ bool Game::playerUseItemEx(Player *player, const Position& posFrom,const unsigne
 					if(success) {
 						item->setItemCharge(std::max((int)item->getItemCharge() - 1, 0) );
 						if(item->getItemCharge() == 0) {				
-							sendRemoveThing(player,posFrom,item,stack_from);
+							//sendRemoveThing(player,posFrom,item,stack_from);
 							removeThing(player,posFrom,item);
 						}
 					}
@@ -3600,11 +3597,11 @@ bool Game::playerUseItemEx(Player *player, const Position& posFrom,const unsigne
 }
 
 
-bool Game::playerUseItem(Player *player, const Position& pos, const unsigned char stackpos, const unsigned short itemid)
+bool Game::playerUseItem(Player *player, const Position& pos, const unsigned char stackpos, const unsigned short itemid, unsigned char index)
 {
 	//OTSYS_THREAD_LOCK(gameLock)
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
-	actions.UseItem(player,pos,stackpos,itemid);
+	actions.UseItem(player,pos,stackpos,itemid,index);
 	//OTSYS_THREAD_UNLOCK(gameLock)
 
 	return true;
@@ -3856,23 +3853,26 @@ void Game::sendUpdateThing(Player* player,const Position &pos,const Thing* thing
 
 void Game::addThing(Player* player,const Position &pos,Thing* thing)
 {
+	if(!thing)
+		return;
+	Item *item = dynamic_cast<Item*>(thing);
+	
 	if(pos.x == 0xFFFF) {
-		if(!player || !thing)
+		if(!player || !item)
 			return;
-		Item *item = dynamic_cast<Item*>(thing);
-		if(!item)
-			return;
+		
 		if(pos.y & 0x40) { //container								
 			unsigned char containerid = pos.y & 0x0F;
 			Container* container = player->getContainer(containerid);
 			if(!container)
 				return;
-			
 			container->addItem(item);
+			sendAddThing(player,pos,thing);
 		}
 		else //inventory
 		{
 			player->addItemInventory(item,pos.y,true);
+			sendAddThing(player,pos,thing);
 		}
 	}
 	else //ground
@@ -3880,9 +3880,28 @@ void Game::addThing(Player* player,const Position &pos,Thing* thing)
 		if(!thing)
 			return;
 		Tile *tile = map->getTile(pos.x, pos.y, pos.z);
-		if(tile)
-			tile->addThing(thing);	
-				
+		if(tile){
+			thing->pos = pos;
+			if(item && item->isSplash()){
+				if(tile->splash){
+					Item *oldsplash = tile->splash;
+					sendRemoveThing(NULL,pos,tile->splash,tile->getThingStackPos(tile->splash));
+					tile->splash = item;
+					sendAddThing(NULL,pos,tile->splash);
+					//TODO: find a better way to say that item is not used
+					oldsplash->pos.x = 0xFFFF;
+					FreeThing(oldsplash);
+				}
+				else{
+					tile->splash = item;
+					sendAddThing(NULL,pos,tile->splash);
+				}
+			}
+			else{
+				tile->addThing(thing);
+				sendAddThing(player,pos,thing);
+			}
+		}
 	}		
 }
 
@@ -3893,9 +3912,9 @@ void Game::removeThing(Player* player,const Position &pos,Thing* thing)
 		
 	if(pos.x == 0xFFFF) {
 		if(!player)
-			return;		
+			return;
 		if(pos.y & 0x40) { //container
-			Item *item = dynamic_cast<Item*>(thing);		
+			Item *item = dynamic_cast<Item*>(thing);
 			if(!item)
 				return;
 									
@@ -3903,20 +3922,24 @@ void Game::removeThing(Player* player,const Position &pos,Thing* thing)
 			Container* container = player->getContainer(containerid);
 			if(!container)
 				return;
-			//check that item is in the container
+			sendRemoveThing(player,pos,thing,0,true);
 			container->removeItem(item);
 		}
 		else //inventory
 		{
-			player->removeItemInventory(pos.y,true);	
+			sendRemoveThing(player,pos,thing,0,true);
+			//player->removeItemInventory(pos.y,true);	
 		}
 	}
 	else //ground
 	{		
 		Tile *tile = map->getTile(pos.x, pos.y, pos.z);
-		if(tile)
+		if(tile){
+			unsigned char stackpos = tile->getThingStackPos(thing);
+			sendRemoveThing(player,pos,thing,stackpos,true);
 			tile->removeThing(thing);
-	}	
+		}
+	}
 }
 
 Position Game::getThingMapPos(Player *player, const Position &pos)
