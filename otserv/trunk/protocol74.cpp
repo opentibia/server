@@ -787,9 +787,10 @@ void Protocol74::sendCloseContainer(unsigned char containerid)
 
 void Protocol74::parseUseItem(NetworkMessage &msg)
 {
-	unsigned short x = msg.GetU16();
-	unsigned short y = msg.GetU16();
-	unsigned char z = msg.GetByte();	
+	//unsigned short x = msg.GetU16();
+	//unsigned short y = msg.GetU16();
+	//unsigned char z = msg.GetByte();
+	Position pos = msg.GetPosition();
 	unsigned short item = msg.GetU16();
 	unsigned char stack = msg.GetByte();
 	unsigned char index = msg.GetByte();
@@ -798,7 +799,7 @@ void Protocol74::parseUseItem(NetworkMessage &msg)
 	std::cout << "parseUseItem: " << "x: " << x << ", y: " << (int)y <<  ", z: " << (int)z << ", item: " << (int)item << ", stack: " << (int)stack << ", index: " << (int)index << std::endl;
 #endif
 
-	if(Item::items[item].iscontainer)
+/*	if(Item::items[item].iscontainer)
 	{
 		msg.Reset();
 		Container *newcontainer = NULL;
@@ -861,10 +862,10 @@ void Protocol74::parseUseItem(NetworkMessage &msg)
 			}
 		}
 	}// iscontainer
-	else{		
-		Position pos(x,y,z);
-		game->playerUseItem(player, pos, stack, item);
-	}
+	else{		*/
+		//Position pos(x,y,z);
+		game->playerUseItem(player, pos, stack, item, index);
+	//}
 }
 
 void Protocol74::parseCloseContainer(NetworkMessage &msg)
@@ -1842,7 +1843,7 @@ void Protocol74::autoCloseContainers(const Container *container, NetworkMessage 
 	std::vector<unsigned char> containerlist;
 	for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
 		Container *tmpcontainer = cit->second;
-		while(tmpcontainer != NULL) {							
+		while(tmpcontainer != NULL) {
 			if(tmpcontainer == container) {
 				containerlist.push_back(cit->first);
 				break;

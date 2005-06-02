@@ -183,8 +183,8 @@ private:
   void flushOutputBuffer();
   void WriteMsg(NetworkMessage &msg);
 
-	void sendContainer(unsigned char index, Container *container);
-	void sendCloseContainer(unsigned char containerid);
+	virtual void sendContainer(unsigned char index, Container *container);
+	virtual void sendCloseContainer(unsigned char containerid);
 	void sendItemAddContainer(const Container *container, const Item *item);
 	void sendItemRemoveContainer(const Container* container,const unsigned char slot);
 	void sendItemUpdateContainer(const Container* container,const Item* item,const unsigned char slot);
