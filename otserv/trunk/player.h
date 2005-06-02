@@ -92,6 +92,8 @@ public:
   int sex, voc;
   int cap;
   int food;
+  void addManaspent(unsigned long spent);
+  void addExp(unsigned long exp);
   unsigned char level_percent;
   unsigned char maglevel_percent;
   bool cancelMove;
@@ -163,7 +165,13 @@ public:
   void sendTextMessage(MessageClasses mclass, const char* message);
   void sendTextMessage(MessageClasses mclass, const char* message,const Position &pos, unsigned char type);
   void sendPing();
+  void sendCloseContainer(unsigned char containerid);
+  void sendContainer(unsigned char index, Container *container);
   void sendTextWindow(Item* item,const unsigned short maxlen, const bool canWrite);  
+  void sendDistanceShoot(const Position &from, const Position &to, unsigned char type);
+  void sendMagicEffect(const Position &pos, unsigned char type);
+  void sendAnimatedText(const Position &pos, unsigned char color, std::string text);
+  void sendCreatureHealth(const Creature *creature);
   void receivePing();
   void flushMsg();
 
@@ -190,11 +198,7 @@ public:
 	//void onItemAddInvnetory(const unsigned char sl_id);
 	//void onItemRemoveInvnetory(const unsigned char sl_id);
 	//void onItemUpdateInvnetory(const unsigned char sl_id);
-
-	void sendDistanceShoot(const Position &from, const Position &to, unsigned char type);
-	void sendMagicEffect(const Position &pos, unsigned char type);
-	void sendAnimatedText(const Position &pos, unsigned char color, std::string text);
-	void sendCreatureHealth(const Creature *creature);
+	
 
 protected:
   int useCount;

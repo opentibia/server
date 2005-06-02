@@ -36,6 +36,7 @@ using namespace std;
 #include "networkmessage.h"
 
 extern LuaScript g_config;
+extern Game g_game;
 
 template<class Player> typename AutoList<Player>::list_type AutoList<Player>::list;
 template<class Player> typename AutoID<Player>::list_type AutoID<Player>::list;
@@ -1119,11 +1120,11 @@ void Player::sendCancel(const char *msg)
 }
 void Player::sendChangeSpeed(Creature* creature){
      client->sendChangeSpeed(creature);
-     }
+}
 
 void Player::sendToChannel(Creature *creature,SpeakClasses type, const std::string &text, unsigned short channelId){
      client->sendToChannel(creature, type, text, channelId);
-     }
+}
 
 void Player::sendCancelAttacking()
 {
@@ -1209,6 +1210,13 @@ void Player::sendTextWindow(Item* item,const unsigned short maxlen, const bool c
 	client->sendTextWindow(item,maxlen,canWrite);
 }
 
+void Player::sendCloseContainer(unsigned char containerid){
+	client->sendCloseContainer(containerid);
+}
+
+void Player::sendContainer(unsigned char index, Container *container){
+	client->sendContainer(index,container);
+}
 
 bool Player::NeedUpdateStats(){
 	if(lastSentStats.health != this->health ||
@@ -1359,6 +1367,43 @@ void Player::onTileUpdated(const Position &pos)
 
 void Player::onTeleport(const Creature *creature, const Position *oldPos, unsigned char oldstackpos) { 
   client->sendThingMove(creature, creature,oldPos, oldstackpos, true, 1, 1); 
+}
+
+void Player::addManaspent(unsigned long spent){
+	this->manaspent += spent;
+	//Magic Level Advance
+	int reqMana = this->getReqMana(this->maglevel+1, this->voc);
+	if (this->access == 0 && this->manaspent >= reqMana) {
+		this->manaspent -= reqMana;
+		this->maglevel++;
+		std::stringstream MaglvMsg;
+		MaglvMsg << "You advanced from magic level " << (this->maglevel - 1) << " to magic level " << this->maglevel << ".";
+		this->sendTextMessage(MSG_ADVANCE, MaglvMsg.str().c_str());
+		this->sendStats();
+	}
+	//End Magic Level Advance*/
+}
+
+void Player::addExp(unsigned long exp){
+	this->experience += exp;
+	int lastLv = this->level;
+	while (this->experience >= this->getExpForLv(this->level+1)) {
+		this->level++;
+		this->healthmax += this->HPGain[voc];
+		this->health += this->HPGain[voc];
+		this->manamax += this->ManaGain[voc];
+		this->mana += this->ManaGain[voc];
+		this->cap += this->CapGain[voc];
+	}
+	if(lastLv != this->level)
+	{
+		this->setNormalSpeed();
+		g_game.changeSpeed(this->getID(), this->getSpeed());
+		std::stringstream lvMsg;
+		lvMsg << "You advanced from level " << lastLv << " to level " << level << ".";
+		this->sendTextMessage(MSG_ADVANCE,lvMsg.str().c_str());
+		this->sendStats();
+	}
 }
 
 unsigned long Player::getIP() const
