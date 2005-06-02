@@ -55,21 +55,25 @@ public:
 	virtual ~Actions();
 	
 	void UseItem(Player* player, const Position &pos,const unsigned char stack, 
-		unsigned short itemid);
+		const unsigned short itemid, const unsigned char index);
 	void UseItemEx(Player* player, const Position &from_pos,
 		const unsigned char from_stack,const Position &to_pos,
 		const unsigned char to_stack,const unsigned short itemid);
+	
+	bool openContainer(Player *player,Container *container, const unsigned char index);
 	
 	Game* game;
 	bool loaded;
 
 	bool isLoaded(){return loaded;}	
+	//bool reload();
   
 protected:
-	//use map
 	typedef std::map<unsigned short, Action*> ActionUseMap;
 	ActionUseMap useItemMap;
+	ActionUseMap uniqueItemMap;
 	int canUse(const Player *player,const Position &pos) const;
+	Action *loadAction(xmlNodePtr xmlaction);
 };
 
 enum tThingType{
@@ -97,17 +101,19 @@ struct KnownThing{
 	PositionEx pos;	
 };
 
-
 class Action
 {
 public:
 	Action(Game* igame,std::string scriptname);
 	virtual ~Action();
 	bool isLoaded() const {return loaded;}
+	bool allowFarUse() const {return allowfaruse;};
+	void setAllowFarUse(bool v){allowfaruse = v;};
 	ActionScript *getScript(){return script;};
 	
 	void ClearMap();
-	int AddThingToMap(Thing *thing,PositionEx &pos);
+	static void AddThingToMapUnique(Thing *thing);
+	unsigned int AddThingToMap(Thing *thing,PositionEx &pos);
 	const KnownThing* GetThingByUID(int uid);
 	const KnownThing* GetItemByUID(int uid);
 	const KnownThing* GetCreatureByUID(int uid);
@@ -118,9 +124,11 @@ public:
 	
 protected:
 	std::map<unsigned int,KnownThing*> ThingMap;
+	static std::map<unsigned int,KnownThing*> uniqueIdMap;
 	unsigned int lastuid;
 	ActionScript *script;
-	bool loaded;	
+	bool loaded;
+	bool allowfaruse;
 };
 
 class ActionScript : protected LuaScript{
@@ -148,6 +156,7 @@ public:
 	static int luaActionDoPlayerSendTextMessage(lua_State *L);
 	static int luaActionDoShowTextWindow(lua_State *L);
 	static int luaActionDoDecayItem(lua_State *L);
+	static int luaActionDoCreateItem(lua_State *L);
 	
 	//get item info
 	static int luaActionGetItemRWInfo(lua_State *L);

@@ -76,20 +76,19 @@ bool Actions::loadFromXml()
 			const char* str = (char*)p->name;
 			
 			if (strcmp(str, "action") == 0){
-				int itemid;
+				int itemid,uniqueid;
 				if(readXMLInteger(p,"itemid",itemid)){
-					const char* scriptfile = (const char*)xmlGetProp(p,(xmlChar*)"script");					
-					action = new Action(game,std::string("data/actions/scripts/") + scriptfile);
-					if(action->isLoaded()){
-						useItemMap[itemid] = action;
-					}
-					else{
-						delete action;
-					}
+					action = loadAction(p);
+					useItemMap[itemid] = action;
+					action = NULL;
+				}
+				else if(readXMLInteger(p,"uniqueid",uniqueid)){
+					action = loadAction(p);
+					uniqueItemMap[uniqueid] = action;
 					action = NULL;
 				}
 				else{
-					//error message
+					std::cout << "missing action id." << std::endl;
 				}
 			}
 			p = p->next;
@@ -98,6 +97,28 @@ bool Actions::loadFromXml()
 		xmlFreeDoc(doc);
 	}
 	return this->loaded;
+}
+
+Action *Actions::loadAction(xmlNodePtr xmlaction){
+	Action *action = NULL;
+	const char* scriptfile = (const char*)xmlGetProp(xmlaction,(xmlChar*)"script");
+	if(scriptfile){
+		action = new Action(game,std::string("data/actions/scripts/") + scriptfile);
+		if(action->isLoaded()){
+			const char* sallow = (const char*)xmlGetProp(xmlaction,(xmlChar*)"allowfaruse");
+			if(sallow && strcmp(sallow,"1")==0){
+				action->setAllowFarUse(true);
+			}
+		}
+		else{
+			delete action;
+			action = NULL;
+		}
+	}
+	else{
+		std::cout << "Missing script tag."  << std::endl;
+	}
+	return action;
 }
 
 int Actions::canUse(const Player *player,const Position &pos) const
@@ -113,7 +134,7 @@ int Actions::canUse(const Player *player,const Position &pos) const
 }
 
 void Actions::UseItem(Player* player, const Position &pos,const unsigned char stack, 
-	unsigned short itemid)
+	const unsigned short itemid, const unsigned char index)
 {	
 	if(canUse(player,pos)== 1){
 		player->sendCancel("Too far away.");
@@ -126,30 +147,71 @@ void Actions::UseItem(Player* player, const Position &pos,const unsigned char st
 	if(item->getID() != itemid)
 		return;
 	
-	ActionUseMap::iterator it = useItemMap.find(itemid);
-	
-    if (it != useItemMap.end()){
-		PositionEx posEx(pos,stack);
-    	if(!it->second->getScript()->executeUse(player,item,posEx,posEx)){
-			player->sendCancel("You can not use this object.");
-    		return;
+	//look for the item in action maps	
+	Action *action = NULL;
+	if(item->getUniqueId() != 0){
+		ActionUseMap::iterator it = uniqueItemMap.find(item->getUniqueId());
+    	if (it != uniqueItemMap.end()){
+			action = it->second;
 		}
 	}
-    else{
-		//not found
-		player->sendCancel("You can not use this object.");
-    	return;
+	if(!action){
+		ActionUseMap::iterator it = useItemMap.find(itemid);
+    	if (it != useItemMap.end()){
+	    	action = it->second;
+		}
+	}
+	
+	//if found execute it
+	if(action){
+		PositionEx posEx(pos,stack);
+		if(action->getScript()->executeUse(player,item,posEx,posEx)){
+			return;
+		}
+	}
+	
+	//if it is a container try to open it
+	if(dynamic_cast<Container*>(item)){
+		if(openContainer(player,dynamic_cast<Container*>(item),index))
+			return;
 	}
     
+    //we dont know what to do with this item
+    player->sendCancel("You can not use this object.");
     return;
 	
+}
+
+bool Actions::openContainer(Player *player,Container *container, const unsigned char index){
+	if(container->depot == 0){ //normal container
+		unsigned char oldcontainerid = player->getContainerID(container);
+		if(oldcontainerid != 0xFF) {
+			player->closeContainer(oldcontainerid);
+			player->sendCloseContainer(oldcontainerid);
+		}
+		else {
+			player->sendContainer(index, container);
+		}
+	}
+	else{// depot container
+		Container *container2 = player->getDepot(container->depot);
+		if(container2){
+			//update depot coordinates					
+			container2->pos = container->pos;
+			player->sendContainer(index, container2);
+		}
+		else{
+			return false;
+		}
+	}
+	return true;
 }
 
 void Actions::UseItemEx(Player* player, const Position &from_pos,
 	const unsigned char from_stack,const Position &to_pos,
 	const unsigned char to_stack,const unsigned short itemid)
 {
-	if(canUse(player,from_pos)== 1){
+	if(canUse(player,from_pos) == 1){
 		player->sendCancel("Too far away.");
 		return;
 	}
@@ -161,21 +223,35 @@ void Actions::UseItemEx(Player* player, const Position &from_pos,
 	if(item->getID() != itemid)
 		return;
 	
-	ActionUseMap::iterator it = useItemMap.find(itemid);
-	
-    if (it != useItemMap.end()){
-		PositionEx posFromEx(from_pos,from_stack);
-		PositionEx posToEx(to_pos,to_stack);    	
-    	if(!it->second->getScript()->executeUse(player,item,posFromEx,posToEx)){
-			player->sendCancel("You can not use this object.");
-    		return;
+	Action *action = NULL;
+	if(item->getUniqueId() != 0){
+		ActionUseMap::iterator it = uniqueItemMap.find(item->getUniqueId());
+    	if (it != uniqueItemMap.end()){
+			action = it->second;
 		}
 	}
-    else{
-		//not found
-		player->sendCancel("You can not use this object.");
-    	return;
+	if(!action){
+		ActionUseMap::iterator it = useItemMap.find(itemid);
+    	if (it != useItemMap.end()){
+	    	action = it->second;
+		}
 	}
+	
+	if(action){
+		if(action->allowFarUse() == false){
+			if(canUse(player,to_pos) == 1){
+				player->sendCancel("Too far away.");
+				return;
+			}
+		}
+		PositionEx posFromEx(from_pos,from_stack);
+		PositionEx posToEx(to_pos,to_stack);    	
+    	if(action->getScript()->executeUse(player,item,posFromEx,posToEx))
+    		return;
+	}
+    
+	//not found
+	player->sendCancel("You can not use this object.");
 }
 
 //
@@ -192,10 +268,13 @@ bool readXMLInteger(xmlNodePtr p, const char *tag, int &value)
 	}
 }
 
+std::map<unsigned int,KnownThing*> Action::uniqueIdMap;
+
 Action::Action(Game* igame,std::string scriptname):
 game(igame)
 {
 	loaded = false;
+	allowfaruse = false;
 	lastuid = 0;
 	script = new ActionScript(this,scriptname);
 	if(script->isLoaded())
@@ -218,31 +297,69 @@ void Action::ClearMap()
 		it->second = NULL;
 	}
 	ThingMap.clear();
+	lastuid = 0;
 }
 
-int Action::AddThingToMap(Thing *thing,PositionEx &pos)
+void Action::AddThingToMapUnique(Thing *thing){
+	Item *item = dynamic_cast<Item*>(thing);
+	if(item && item->getUniqueId() != 0 ){
+		unsigned short uid = item->getUniqueId();
+		KnownThing *tmp = uniqueIdMap[uid];
+		if(!tmp){
+			KnownThing *tmp = new KnownThing;
+			tmp->thing = thing;
+			tmp->type = thingTypeItem;
+			uniqueIdMap[uid] = tmp;
+		}
+		else{
+			std::cout << "Duplicate uniqueId " <<  uid << std::endl;
+		}
+	}
+}
+
+unsigned int Action::AddThingToMap(Thing *thing,PositionEx &pos)
 {
+	Item *item = dynamic_cast<Item*>(thing);
+	if(item && item->pos.x != 0xFFFF && item->getUniqueId()){
+		unsigned short uid = item->getUniqueId();
+		KnownThing *tmp = uniqueIdMap[uid];
+		if(!tmp){
+			std::cout << "Item with unique id not included in the map!." << std::endl;
+		}
+		KnownThing *newKT = new KnownThing;
+		newKT->thing = thing;
+		newKT->type = thingTypeItem;
+		newKT->pos = pos;
+		ThingMap[uid] = newKT;
+		return uid;
+	}
+	
 	std::map<unsigned int,KnownThing*>::iterator it;
 	for(it = ThingMap.begin(); it != ThingMap.end();it++ ){
 		if(it->second->thing == thing){
 			return it->first;
 		}
 	}
-	lastuid++;
-	KnownThing *tmp = new KnownThing;	
+	
+	KnownThing *tmp = new KnownThing;
 	tmp->thing = thing;
 	tmp->pos = pos;
+	
 	if(dynamic_cast<Item*>(thing))
-		tmp->type = thingTypeItem;	
+		tmp->type = thingTypeItem;
 	else if(dynamic_cast<Player*>(thing))
-		tmp->type = thingTypePlayer;	
+		tmp->type = thingTypePlayer;
 	else if(dynamic_cast<Monster*>(thing))
-		tmp->type = thingTypeMonster;	
+		tmp->type = thingTypeMonster;
 	else if(dynamic_cast<Npc*>(thing))
 		tmp->type = thingTypeNpc;	
 	else
-		tmp->type = thingTypeUnknown;	
+		tmp->type = thingTypeUnknown;
 	
+	lastuid++;
+	while(ThingMap[lastuid]){
+		lastuid++;
+	}
 	ThingMap[lastuid] = tmp;
 	return lastuid;
 }
@@ -251,13 +368,22 @@ const KnownThing* Action::GetThingByUID(int uid)
 {
 	KnownThing *tmp = ThingMap[uid];
 	if(tmp)
-		return tmp;	
+		return tmp;
+	tmp = uniqueIdMap[uid];
+	if(tmp && tmp->thing->pos.x != 0xFFFF){
+		KnownThing *newKT = new KnownThing;
+		newKT->thing = tmp->thing;
+		newKT->type = tmp->type;
+		newKT->pos = tmp->thing->pos;
+		ThingMap[uid] = newKT;
+		return newKT;
+	}
 	return NULL;
 }
 
 const KnownThing* Action::GetItemByUID(int uid)
 {
-	KnownThing *tmp = ThingMap[uid];
+	const KnownThing *tmp = GetThingByUID(uid);
 	if(tmp){
 		if(tmp->type == thingTypeItem)
 			return tmp;
@@ -267,7 +393,7 @@ const KnownThing* Action::GetItemByUID(int uid)
 
 const KnownThing* Action::GetCreatureByUID(int uid)
 {
-	KnownThing *tmp = ThingMap[uid];
+	const KnownThing *tmp = GetThingByUID(uid);
 	if(tmp){
 		if(tmp->type == thingTypePlayer || tmp->type == thingTypeMonster
 			|| tmp->type == thingTypeNpc )
@@ -278,7 +404,7 @@ const KnownThing* Action::GetCreatureByUID(int uid)
 
 const KnownThing* Action::GetPlayerByUID(int uid)
 {
-	KnownThing *tmp = ThingMap[uid];
+	const KnownThing *tmp = GetThingByUID(uid);
 	if(tmp){
 		if(tmp->type == thingTypePlayer)
 			return tmp;
@@ -363,7 +489,7 @@ int ActionScript::registerFunctions()
 	lua_register(luaState, "doPlayerAddHealth", ActionScript::luaActionDoPlayerAddHealth);
 	//doPlayerAddMana(uid,mana)
 	lua_register(luaState, "doPlayerAddMana", ActionScript::luaActionDoPlayerAddMana);
-	//doPlayerAddItem(uid,itemid,count or type)
+	//doPlayerAddItem(uid,itemid,count or type) . returns uid of the created item
 	lua_register(luaState, "doPlayerAddItem", ActionScript::luaActionDoPlayerAddItem);
 	//doPlayerSendTextMessage(uid,MessageClasses,message)
 	lua_register(luaState, "doPlayerSendTextMessage", ActionScript::luaActionDoPlayerSendTextMessage);		
@@ -371,12 +497,19 @@ int ActionScript::registerFunctions()
 	lua_register(luaState, "doShowTextWindow", ActionScript::luaActionDoShowTextWindow);	
 	//doDecayItem(uid)
 	lua_register(luaState, "doDecayItem", ActionScript::luaActionDoDecayItem);
+	//doCreateItem(itemid,type or count,position) .only working on ground. returns uid of the created item
+	lua_register(luaState, "doCreateItem", ActionScript::luaActionDoCreateItem);
 	
-	//doCreateItem(itemid,type count or actionId,position) //only working on ground
-	//doSummonCreature(name, position)
 	//doMoveItem(uid,toPos)
-	//doPlayerAddCondition(....)
+	//doMovePlayer(cid,direction)
+	//doSetItemActionId(uid,actionid)
+	//doSetItemText(uid,text)
+	//doSetItemSpecialDescription(uid,desc)
+	//getPlayerStorageValue(valueid)
+	//setPlayerStorageValue(valueid, newvalue)
 	
+	//doSummonCreature(name, position)
+	//doPlayerAddCondition(....)
 	//doPlayerRemoveItem(itemid,count)
 	
 	return true;
@@ -466,16 +599,19 @@ void ActionScript::internalAddThing(lua_State *L, const Thing* thing, const unsi
 		setField(L,"uid", thingid);
 		setField(L,"itemid", item->getID());
 		setField(L,"type", item->getItemCountOrSubtype());
+		setField(L,"actionid", item->getActionId());
 	}
 	else if(dynamic_cast<const Creature*>(thing)){
 		setField(L,"uid", thingid);
 		setField(L,"itemid", 1);
 		setField(L,"type", 0);	//can be used to specify monster,npc or player?
+		setField(L,"actionid", 0);
 	}	
 	else{
 		setField(L,"uid", 0);
 		setField(L,"itemid", 0);
 		setField(L,"type", 0);
+		setField(L,"actionid", 0);
 	}
 }
 
@@ -608,6 +744,11 @@ int ActionScript::luaActionDoRemoveItem(lua_State *L)
 	if(tmp){
 		tmpitem = (Item*)tmp->thing;
 		tmppos = tmp->pos;
+		if(tmpitem->isSplash()){
+			lua_pushnumber(L, -1);
+			std::cout << "luaDoRemoveItem: can not remove a splash" << std::endl;
+			return 1;
+		}
 	}
 	else{
 		lua_pushnumber(L, -1);
@@ -620,7 +761,7 @@ int ActionScript::luaActionDoRemoveItem(lua_State *L)
 		action->game->sendUpdateThing(action->_player,(Position&)tmppos,tmpitem,tmppos.stackpos);
 	}
 	else{
-		action->game->sendRemoveThing(action->_player,(Position&)tmppos,tmpitem,tmppos.stackpos);
+		//action->game->sendRemoveThing(action->_player,(Position&)tmppos,tmpitem,tmppos.stackpos);
 		action->game->removeThing(action->_player,(Position&)tmppos,tmpitem);
 		action->game->FreeThing(tmpitem);
 	}	
@@ -899,7 +1040,7 @@ int ActionScript::luaActionDoPlayerAddItem(lua_State *L)
 	unsigned int cid = (unsigned int)internalGetNumber(L);	
 	
 	Action *action = getAction(L);
-	
+	unsigned int uid;
 	const KnownThing* tmp = action->GetPlayerByUID(cid);
 	if(tmp){
 		Player *player = (Player*)(tmp->thing);
@@ -907,9 +1048,11 @@ int ActionScript::luaActionDoPlayerAddItem(lua_State *L)
 		if(!player->addItem(newitem)){
 			//add item on the ground
 			action->game->addThing(NULL,action->_player->pos,newitem);
-			newitem->pos = action->_player->pos;
-			action->game->sendAddThing(NULL,action->_player->pos,newitem);
+			//newitem->pos = action->_player->pos;
+			//action->game->sendAddThing(NULL,action->_player->pos,newitem);
 		}
+		PositionEx pos = newitem->pos;
+		uid = action->AddThingToMap((Thing*)newitem,pos);
 	}
 	else{
 		lua_pushnumber(L, -1);
@@ -917,7 +1060,7 @@ int ActionScript::luaActionDoPlayerAddItem(lua_State *L)
 		return 1;
 	}		
 		
-	lua_pushnumber(L, 0);
+	lua_pushnumber(L, uid);
 	return 1;
 }
 
@@ -1094,7 +1237,7 @@ int ActionScript::luaActionGetThingfromPos(lua_State *L)
 		}
 		
 		if(thing){
-			int thingid = action->AddThingToMap(thing,pos);
+			unsigned int thingid = action->AddThingToMap(thing,pos);
 			internalAddThing(L,thing,thingid);
 		}
 		else{
@@ -1108,4 +1251,23 @@ int ActionScript::luaActionGetThingfromPos(lua_State *L)
 		internalAddThing(L,NULL,0);
 		return 1;
 	}	
+}
+
+int ActionScript::luaActionDoCreateItem(lua_State *L){
+	//doCreateItem(itemid,type or count,position) .only working on ground. returns uid of the created item
+	PositionEx pos;
+	internalGetPositionEx(L,pos);
+	int type = (int)internalGetNumber(L);
+	int itemid = (int)internalGetNumber(L);
+	
+	Action *action = getAction(L);
+	
+	Item *newitem = Item::CreateItem(itemid,type);
+	action->game->addThing(NULL,(Position&)pos,newitem);
+	//newitem->pos = pos;
+	//action->game->sendAddThing(NULL,(Position&)pos,newitem);
+	unsigned int uid = action->AddThingToMap((Thing*)newitem,pos);
+	
+	lua_pushnumber(L, uid);
+	return 1;	
 }
