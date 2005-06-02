@@ -45,6 +45,7 @@ protected:
 	unsigned char chargecount; //number of charges on the item
 	unsigned char fluid;
 	unsigned short actionId;
+	unsigned short uniqueId;
 private:
 	int useCount;
 	
@@ -71,6 +72,7 @@ public:
     bool isMultiType() const;
 	bool isAlwaysOnTop() const;
 	bool isGroundTile() const;
+	bool isSplash() const;
 	bool isNotMoveable() const;
 	bool isPickupable() const;
 	bool isWeapon() const;
@@ -109,6 +111,10 @@ public:
 	void setFluidType(unsigned char n) {fluid = n;};
 	
 	void setActionId(unsigned short n);
+	unsigned short getActionId() const;
+	
+	void setUniqueId(unsigned short n);
+	unsigned short getUniqueId() const;
 	
 	virtual long getDecayTime();
 	bool canDecay();

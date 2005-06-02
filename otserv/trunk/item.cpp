@@ -25,11 +25,13 @@
 #include "magic.h"
 #include "player.h"
 #include "tile.h"
+#include "actions.h"
 
 #include <iostream>
 #include <sstream>
 #include <iomanip>
-extern unsigned long nitemsload;
+
+
 Item* Item::CreateItem(const unsigned short _type, unsigned short _count /*= 0*/)
 {
 	Item *newItem;
@@ -69,10 +71,9 @@ unsigned short Item::getItemCountOrSubtype() const {
 	}
 	else if(isFluidContainer() || isMultiType())
 		return fluid;
-	else if(actionId != 0)
-		return actionId;
-	else if(chargecount != 0)
-		return chargecount;	
+	//else if(chargecount != 0)
+	else if(items[id].runeMagLevel != -1)
+		return chargecount;
 	else
 		return 0;
 }
@@ -92,7 +93,7 @@ void Item::setItemCountOrSubtype(unsigned char n)
 	}
 	else if(isFluidContainer() || isMultiType())
 		fluid = n;
-	else
+	else if(items[id].runeMagLevel != -1)
 		chargecount = n;
 };
 
@@ -102,12 +103,31 @@ void Item::setActionId(unsigned short n){
 	actionId = n;
 }
 
+unsigned short Item::getActionId() const{
+	return actionId;
+}
+
+void Item::setUniqueId(unsigned short n){
+	//uniqueId only can be set 1 time
+	if(uniqueId != 0)
+		return;
+	 if(n < 1000)
+	 	n = 1000;
+	uniqueId = n;
+	Action::AddThingToMapUnique(this);
+}
+
+unsigned short Item::getUniqueId() const{
+	return uniqueId;
+}
+
 Item::Item(const unsigned short _type) {
 	id = _type;
 	count = 0;	
 	chargecount = 0;
 	fluid = 0;
 	actionId = 0;
+	uniqueId = 0;
 	throwRange = 6;
 	useCount = 0;
 	isDecaying  = 0;
@@ -123,6 +143,7 @@ Item::Item(const Item &i){
 	useCount = 0;
 	isDecaying  = 0;
 	actionId = i.actionId;
+	uniqueId = i.uniqueId;
 	if(i.specialDescription != NULL){
 		specialDescription = new std::string(*(i.specialDescription));
 	}
@@ -201,6 +222,7 @@ Item::Item(const unsigned short _type, unsigned short _count) {
 	chargecount = 0;
 	fluid = 0;
 	actionId = 0;
+	uniqueId = 0;
 	useCount = 0;
 	isDecaying  = 0;
 	specialDescription = NULL;
@@ -235,6 +257,7 @@ Item::Item()
 	useCount = 0;
 	isDecaying  = 0;
 	actionId = 0;
+	uniqueId = 0;
 	specialDescription = NULL;
 	text = NULL;
 }
@@ -283,6 +306,9 @@ int Item::unserialize(xmlNodePtr p){
 	if(tmp)
 		setActionId(atoi(tmp));
 	
+	tmp=(const char*)xmlGetProp(p, (const xmlChar *) "uniqueId");
+	if(tmp)
+		setUniqueId(atoi(tmp));
 	
 	return 0;
 }
@@ -324,14 +350,20 @@ xmlNodePtr Item::serialize(){
 	s.str(""); //empty the stringstream
 	if(getItemCountOrSubtype() != 0){
 		s << getItemCountOrSubtype();
-		if(actionId != 0){
-			xmlSetProp(ret, (const xmlChar*)"actionId", (const xmlChar*)s.str().c_str());
-		}
-		else{
-			xmlSetProp(ret, (const xmlChar*)"count", (const xmlChar*)s.str().c_str());
-		}
+		xmlSetProp(ret, (const xmlChar*)"count", (const xmlChar*)s.str().c_str());
 	}
-		
+	
+	s.str("");
+	if(actionId != 0){
+		s << actionId;
+		xmlSetProp(ret, (const xmlChar*)"actionId", (const xmlChar*)s.str().c_str());
+	}
+	
+	s.str("");	
+	if(uniqueId != 0){
+		s << uniqueId;
+		xmlSetProp(ret, (const xmlChar*)"uniqueId", (const xmlChar*)s.str().c_str());
+	}
 	return ret;
 }
 
@@ -368,6 +400,10 @@ bool Item::isNotMoveable() const {
 
 bool Item::isGroundTile() const {
 	return items[id].groundtile;
+}
+
+bool Item::isSplash() const{
+	return items[id].issplash;
 }
 
 bool Item::isPickupable() const {
@@ -481,7 +517,10 @@ std::string Item::getDescription() const
 				else{
 					s << items[fluid].name;
 				}
-				s << ".";								
+				s << ".";
+			}
+			else if(items[id].iskey){
+				s << "You see a " << items[id].name << "(Key:" << actionId << ")." ;
 			}
 			else
 			{

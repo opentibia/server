@@ -34,12 +34,14 @@ ItemType::ItemType()
 	RWInfo			= 0;
 	readonlyId		= 0;
 	fluidcontainer	= false;		
+	iskey			= false;
 	stackable       = false;
 	multitype       = false;
 	useable	        = false;
 	notMoveable     = false;
 	alwaysOnTop     = false;
 	groundtile      = false;
+	issplash		= false;
 	blocking        = false; // people can walk on it
 	pickupable      = false; // people can pick it up
 	blockingProjectile = false;
@@ -629,6 +631,12 @@ int Items::loadXMLInfos(std::string file)
 							else{
 								std::cout << "missing readonlyid tag for item: " << id << std::endl;
 							}
+						}
+						else if(!strcmp(type, "key")){
+							itemtype->iskey = true;
+						}
+						else if(!strcmp(type, "splash")){
+							itemtype->issplash = true;
 						}
 						else{
 							//std::cout << "unknown type for item: " << id << std::endl;						

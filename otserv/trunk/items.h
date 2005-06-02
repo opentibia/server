@@ -80,6 +80,7 @@ public:
 	bool iscontainer;
 	int  RWInfo;
 	unsigned short readonlyId;
+	bool iskey;
 	bool fluidcontainer;
 	bool stackable;
 	bool multitype;
@@ -87,6 +88,7 @@ public:
 	bool notMoveable;
 	bool alwaysOnTop;
 	bool groundtile;
+	bool issplash;
 	int  runeMagLevel;
 	bool blocking;   // people can walk on it
 	bool pickupable; // people can pick it up
