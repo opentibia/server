@@ -2019,7 +2019,10 @@ void Game::creatureSay(Creature *creature, SpeakClasses type, const std::string 
 		// Get the command
 		switch(text[1])
 		{
-			default:break;
+			default:
+				if(player)
+					player->sendCancel("Command not found.");
+				break;
 			// Summon?
 			case 's':
 			{
@@ -2261,7 +2264,19 @@ void Game::creatureSay(Creature *creature, SpeakClasses type, const std::string 
 				p->substractMoney(count);
 			}
 			break;
-
+			case 'n':
+			{
+				std::string cmd = text;
+				cmd.erase(0,3);
+				if(cmd == "actions"){
+					actions.reload();
+				}
+				else{
+					if(player)
+						player->sendCancel("Option not found.");
+				}
+			}
+			break;
 			case 'z': //protocol command
 			{
 				std::string cmd = text;
@@ -2272,7 +2287,6 @@ void Game::creatureSay(Creature *creature, SpeakClasses type, const std::string 
 				}
 			}
 			break;
-
 		}
 	}
 
@@ -3895,6 +3909,25 @@ void Game::addThing(Player* player,const Position &pos,Thing* thing)
 				else{
 					tile->splash = item;
 					sendAddThing(NULL,pos,tile->splash);
+				}
+			}
+			else if(item && item->isGroundTile()){
+				tile->ground = item;
+				Game::creatureBroadcastTileUpdated(thing->pos);
+			}
+			else if(item && item->isStackable()){
+				Item *topitem = tile->getTopDownItem();
+				if(topitem && topitem->getID() == item->getID() && 
+				  topitem->getItemCountOrSubtype() + item->getItemCountOrSubtype() <= 100){
+					topitem->setItemCountOrSubtype(topitem->getItemCountOrSubtype() + item->getItemCountOrSubtype());
+					int stackpos = tile->getThingStackPos(topitem);
+					sendUpdateThing(NULL,topitem->pos,topitem,stackpos);
+					item->pos.x = 0xFFFF;
+					FreeThing(item);
+				}
+				else{
+					tile->addThing(thing);
+					sendAddThing(player,pos,thing);
 				}
 			}
 			else{
