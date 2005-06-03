@@ -43,9 +43,13 @@
 <item id="2006" name="vial" weight="1.8" />
 
 <!-- multitype -->
-<item id="2019" name="pool" weight="0" decayto="2020" decaytime="45" />
-<item id="2020" name="pool" weight="0" decayto="2021" decaytime="45" />
-<item id="2021" name="pool" weight="0" />
+<item id="2019" type="splash" name="pool" weight="0" decayto="2020" decaytime="45" />
+<item id="2020" type="splash" name="pool" weight="0" decayto="2021" decaytime="45" />
+<item id="2021" type="splash" name="pool" weight="0" />
+
+<item id="2025" type="splash" name="pool" weight="0" decayto="2026" decaytime="45" /> 
+<item id="2026" type="splash" name="pool" weight="0" decayto="2027" decaytime="45" /> 
+<item id="2027" type="splash" name="pool" weight="0" />
 
 <!--liquids-->
 <item id="1" name="water" weight="0" />
@@ -66,5 +70,7 @@
 <item id="2148" name="gold coin" weight="0.1" />
 <item id="2152" name="platinum coin" weight="0.1" />
 
+<!--keys-->
+<item id="2090" type="key" name="crystal key" weight="1.0" />
 
 </items>
