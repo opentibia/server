@@ -62,7 +62,9 @@ public:
 	bool insertThing(Thing *thing, int stackpos);
 	MagicEffectItem* getFieldItem();
 	Teleport* getTeleportItem();
-	Thing* Tile::getTopMoveableThing();
+	Thing* getTopMoveableThing();
+	Creature* getTopCreature();
+	Item* getTopDownItem();
 
   int getCreatureStackPos(Creature *c) const;
   int getThingStackPos(const Thing *thing) const;

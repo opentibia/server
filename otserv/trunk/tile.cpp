@@ -395,6 +395,22 @@ MagicEffectItem* Tile::getFieldItem()
 	return NULL;
 }
 
+Creature* Tile::getTopCreature(){
+  	if(downItems.begin() != downItems.end())
+  	{
+		return *(creatures.begin());
+  	}
+	return NULL;
+}
+
+Item* Tile::getTopDownItem(){
+	if(downItems.begin() != downItems.end())
+  	{
+		return *(downItems.begin());
+  	}
+	return NULL;
+}
+
 void Tile::addThing(Thing *thing) {
 	Creature* creature = dynamic_cast<Creature*>(thing);
 	if (creature) {
