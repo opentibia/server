@@ -47,9 +47,27 @@ Actions::~Actions()
 		delete it->second;
 		useItemMap.erase(it);
 		it = useItemMap.begin();
-	}	
+	}
 }
 
+bool Actions::reload(){
+	this->loaded = false;
+	//unload
+	ActionUseMap::iterator it = useItemMap.begin();
+	while(it != useItemMap.end()) {
+		delete it->second;
+		useItemMap.erase(it);
+		it = useItemMap.begin();
+	}
+	it = uniqueItemMap.begin();
+	while(it != uniqueItemMap.end()) {
+		delete it->second;
+		uniqueItemMap.erase(it);
+		it = uniqueItemMap.begin();
+	}
+	//load
+	return loadFromXml();
+}
 
 bool Actions::loadFromXml()
 {
@@ -317,6 +335,13 @@ void Action::AddThingToMapUnique(Thing *thing){
 	}
 }
 
+void Action::UpdateThingPos(int uid, PositionEx &pos){
+	KnownThing *tmp = ThingMap[uid];
+	if(tmp){
+		tmp->pos = pos;
+	}		
+}
+
 unsigned int Action::AddThingToMap(Thing *thing,PositionEx &pos)
 {
 	Item *item = dynamic_cast<Item*>(thing);
@@ -505,6 +530,7 @@ int ActionScript::registerFunctions()
 	//doSetItemActionId(uid,actionid)
 	//doSetItemText(uid,text)
 	//doSetItemSpecialDescription(uid,desc)
+	//getPzInfo(pos) 1 is pz. 0 no pz.
 	//getPlayerStorageValue(valueid)
 	//setPlayerStorageValue(valueid, newvalue)
 	
@@ -825,7 +851,6 @@ int ActionScript::luaActionDoTeleportThing(lua_State *L)
 	unsigned int id = (unsigned int)internalGetNumber(L);	
 	
 	Action *action = getAction(L);
-	
 	Thing *tmpthing;
 	
 	const KnownThing* tmp = action->GetThingByUID(id);
@@ -848,6 +873,14 @@ int ActionScript::luaActionDoTeleportThing(lua_State *L)
 	}
 	
 	action->game->teleport(tmpthing,(Position&)pos);
+	Tile *tile = action->game->getTile(pos.x, pos.y, pos.z);
+	if(tile){
+		pos.stackpos = tile->getThingStackPos(tmpthing);
+	}
+	else{
+		pos.stackpos = 1;
+	}
+	action->UpdateThingPos(id,pos);
 	
 	lua_pushnumber(L, 0);
 	return 1;
@@ -1043,15 +1076,25 @@ int ActionScript::luaActionDoPlayerAddItem(lua_State *L)
 	unsigned int uid;
 	const KnownThing* tmp = action->GetPlayerByUID(cid);
 	if(tmp){
+		PositionEx pos;
 		Player *player = (Player*)(tmp->thing);
 		Item *newitem = Item::CreateItem(itemid,type);
 		if(!player->addItem(newitem)){
 			//add item on the ground
 			action->game->addThing(NULL,action->_player->pos,newitem);
+			Tile *tile = action->game->getTile(newitem->pos.x, newitem->pos.y, newitem->pos.z);
+			if(tile){
+				pos.stackpos = tile->getThingStackPos(newitem);
+			}
+			else{
+				pos.stackpos = 1;
+			}
 			//newitem->pos = action->_player->pos;
 			//action->game->sendAddThing(NULL,action->_player->pos,newitem);
 		}
-		PositionEx pos = newitem->pos;
+		pos.x = newitem->pos.x;
+		pos.y = newitem->pos.y;
+		pos.z = newitem->pos.z;
 		uid = action->AddThingToMap((Thing*)newitem,pos);
 	}
 	else{
@@ -1216,6 +1259,7 @@ int ActionScript::luaActionGetThingfromPos(lua_State *L)
 	//Note: 
 	//	stackpos = 255. Get the top thing(item moveable or creature).
 	//	stackpos = 254. Get MagicFieldtItem
+	//	stackpos = 253. Get Creature
 	
 	PositionEx pos;
 	internalGetPositionEx(L,pos);
@@ -1232,11 +1276,17 @@ int ActionScript::luaActionGetThingfromPos(lua_State *L)
 		else if(pos.stackpos == 254){
 			thing = tile->getFieldItem();
 		}
+		else if(pos.stackpos == 253){
+			thing = tile->getTopCreature();
+		}
 		else{
 			thing = tile->getThingByStackPos(pos.stackpos);
 		}
 		
 		if(thing){
+			if(pos.stackpos > 250){
+				pos.stackpos = tile->getThingStackPos(thing);
+			}
 			unsigned int thingid = action->AddThingToMap(thing,pos);
 			internalAddThing(L,thing,thingid);
 		}
@@ -1264,6 +1314,13 @@ int ActionScript::luaActionDoCreateItem(lua_State *L){
 	
 	Item *newitem = Item::CreateItem(itemid,type);
 	action->game->addThing(NULL,(Position&)pos,newitem);
+	Tile *tile = action->game->getTile(pos.x, pos.y, pos.z);
+	if(tile){
+		pos.stackpos = tile->getThingStackPos(newitem);
+	}
+	else{
+		pos.stackpos = 1;
+	}
 	//newitem->pos = pos;
 	//action->game->sendAddThing(NULL,(Position&)pos,newitem);
 	unsigned int uid = action->AddThingToMap((Thing*)newitem,pos);

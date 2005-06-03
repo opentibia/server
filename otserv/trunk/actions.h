@@ -66,7 +66,7 @@ public:
 	bool loaded;
 
 	bool isLoaded(){return loaded;}	
-	//bool reload();
+	bool reload();
   
 protected:
 	typedef std::map<unsigned short, Action*> ActionUseMap;
@@ -113,6 +113,7 @@ public:
 	
 	void ClearMap();
 	static void AddThingToMapUnique(Thing *thing);
+	void UpdateThingPos(int uid, PositionEx &pos);
 	unsigned int AddThingToMap(Thing *thing,PositionEx &pos);
 	const KnownThing* GetThingByUID(int uid);
 	const KnownThing* GetItemByUID(int uid);
