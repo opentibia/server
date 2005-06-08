@@ -3,6 +3,9 @@
 -- Comments start with a --
 ----------------------------
 
+-- datadir
+datadir = "data/"
+
 -- mapfile
 -- sets what map to load
 mapfile = "data/world/map.xml"
