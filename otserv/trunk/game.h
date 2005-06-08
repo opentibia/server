@@ -39,6 +39,7 @@
 
 class Creature;   // see creature.h
 class Player;
+class Commands;
 class SchedulerTask;
 class lessSchedTask;
 
@@ -139,6 +140,7 @@ public:
 	bool removeCreature(Creature* c);
 
 	uint32_t getPlayersOnline() {return (uint32_t)AutoList<Player>::list.size();};
+	uint32_t getMonstersOnline() {return (uint32_t)AutoList<Monster>::list.size();};
 
 
 	void thingMove(Creature *player, Thing *thing,
@@ -315,7 +317,12 @@ protected:
 	uint32_t max_players;
 
 	Map* map;
+	
+	std::vector<std::string> commandTags;
+	void addCommandTag(std::string tag);
+	void resetCommandTag();
 
+	friend class Commands;
 	friend class Monster;
 	friend class GameState;
 	friend class Spawn;
