@@ -18,13 +18,17 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
+#include <sstream>
+
 #include "ioplayer.h"
 #include "ioplayerxml.h"
 #include "ioaccount.h"
 #include "item.h"
-#include <sstream>
+#include "luascript.h"
 
 xmlMutexPtr xmlmutex;
+
+extern LuaScript g_config;
 
 IOPlayerXML::IOPlayerXML(){
 	if(xmlmutex == NULL){
@@ -33,8 +37,8 @@ IOPlayerXML::IOPlayerXML(){
 }
 
 bool IOPlayerXML::loadPlayer(Player* player, std::string name){
-
-	std::string filename="data/players/"+name+".xml";
+	std::string datadir = g_config.getGlobalString("datadir");
+	std::string filename = datadir + "players/" + name + ".xml";
 	std::transform (filename.begin(),filename.end(), filename.begin(), tolower);
 
 	xmlDocPtr doc;	
@@ -56,9 +60,9 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name){
 		const char *account = (const char*)xmlGetProp(root, (const xmlChar *) "account");
 		
 		//need to unlock and relock in order to load xml account
-		xmlMutexUnlock(xmlmutex); 
+		//xmlMutexUnlock(xmlmutex); 
 		Account a = IOAccount::instance()->loadAccount(atoi(account));
-		xmlMutexLock(xmlmutex);
+		//xmlMutexLock(xmlmutex);
 		
 		player->password = a.password;
 		if (a.accnumber == 0 || a.accnumber != (unsigned long)atoi(account)) {
@@ -77,6 +81,14 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name){
 		player->voc=atoi((const char*)xmlGetProp(root, (const xmlChar *) "voc"));
 		player->access=atoi((const char*)xmlGetProp(root, (const xmlChar *) "access"));
 		player->setNormalSpeed();
+		
+		if(xmlGetProp(root, (const xmlChar *) "lastlogin")){
+			player->lastlogin = atoi((const char*)xmlGetProp(root, (const xmlChar *) "lastlogin"));
+		}
+		else{
+			player->lastlogin = 0;
+		}
+		
 		//level percent
 		player->level_percent  = (unsigned char)(100*(player->experience-player->getExpForLv(player->level))/(1.*player->getExpForLv(player->level+1)-player->getExpForLv(player->level)));
 		while (p)
@@ -178,6 +190,18 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name){
 				slot=slot->next;
 				}
 			}
+			else if(str == "storage"){
+				slot = p->children;
+				while(slot){
+					if (strcmp((const char*)slot->name, "data") == 0)
+					{
+						unsigned long key = atoi((const char*)xmlGetProp(slot, (const xmlChar *)"key"));
+						long value = atoi((const char*)xmlGetProp(slot, (const xmlChar *) "value"));
+						player->addStorageValue(key,value);
+					}
+					slot = slot->next;
+				}
+			}
 			p=p->next;
 		}
 		std::cout << "loaded " << filename << std::endl;
@@ -247,7 +271,8 @@ bool IOPlayerXML::SaveContainer(xmlNodePtr nodeitem,Container* ccontainer)
 
 
 bool IOPlayerXML::savePlayer(Player* player){
-	std::string filename = "data/players/"+player->getName()+".xml";
+	std::string datadir = g_config.getGlobalString("datadir");
+	std::string filename = datadir + "players/" + player->getName() + ".xml";
 	std::transform (filename.begin(),filename.end(), filename.begin(), tolower);
     std::stringstream sb;
     
@@ -275,6 +300,7 @@ bool IOPlayerXML::savePlayer(Player* player){
 	sb << player->access;             xmlSetProp(root, (const xmlChar*) "access", (const xmlChar*)sb.str().c_str());	sb.str("");	
 	sb << player->cap;    	          xmlSetProp(root, (const xmlChar*) "cap", (const xmlChar*)sb.str().c_str());       sb.str("");
 	sb << player->maglevel;	          xmlSetProp(root, (const xmlChar*) "maglevel", (const xmlChar*)sb.str().c_str());  sb.str("");
+	sb << player->lastlogin;	      xmlSetProp(root, (const xmlChar*) "lastlogin", (const xmlChar*)sb.str().c_str());  sb.str("");
 
 	pn = xmlNewNode(NULL,(const xmlChar*)"spawn");
 	sb << player->pos.x;    xmlSetProp(pn, (const xmlChar*) "x", (const xmlChar*)sb.str().c_str());        sb.str("");
@@ -308,7 +334,7 @@ bool IOPlayerXML::savePlayer(Player* player){
 	sb << player->looklegs;         xmlSetProp(pn, (const xmlChar*) "legs", (const xmlChar*)sb.str().c_str());        sb.str("");
 	sb << player->lookfeet;         xmlSetProp(pn, (const xmlChar*) "feet", (const xmlChar*)sb.str().c_str());        sb.str("");
 	xmlAddChild(root, pn);
-    	               
+    
     	      
 	sn = xmlNewNode(NULL,(const xmlChar*)"skills");
 	for (int i = 0; i <= 6; i++)
@@ -362,6 +388,21 @@ bool IOPlayerXML::savePlayer(Player* player){
 		}
       
    xmlAddChild(root, sn);
+   
+	sn = xmlNewNode(NULL,(const xmlChar*)"storage");
+	for(StorageMap::const_iterator cit = player->getStorageIteratorBegin(); cit != player->getStorageIteratorEnd();cit++){
+		pn = xmlNewNode(NULL,(const xmlChar*)"data");
+    	sb << cit->first;
+        xmlSetProp(pn, (const xmlChar*) "key", (const xmlChar*)sb.str().c_str());
+        sb.str("");
+          
+		sb << cit->second;
+        xmlSetProp(pn, (const xmlChar*) "value", (const xmlChar*)sb.str().c_str());
+        sb.str("");
+        
+		xmlAddChild(sn, pn);
+	}
+    xmlAddChild(root, sn);
 	
 	//Save the character
     if (xmlSaveFile(filename.c_str(), doc))
