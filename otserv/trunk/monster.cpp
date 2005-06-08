@@ -24,8 +24,10 @@
 
 #include "monster.h"
 #include "spells.h"
+#include "luascript.h"
 
 extern Spells spells;
+extern LuaScript g_config;
 
 template<class Monster> typename AutoList<Monster>::list_type AutoList<Monster>::list;
 template<class Monster> typename AutoID<Monster>::list_type AutoID<Monster>::list;
@@ -47,8 +49,9 @@ Monster::Monster(const char *name, Game* game) :
 	targetDistance = 1;
 	runawayHealth = 0;
 	pushable = true;
-
-	std::string filename = "data/monster/" + std::string(name) + ".xml";
+	
+	std::string datadir = g_config.getGlobalString("datadir");
+	std::string filename = datadir + "monster/" + std::string(name) + ".xml";
 	std::transform(filename.begin(), filename.end(), filename.begin(), tolower);
 	xmlDocPtr doc = xmlParseFile(filename.c_str());
 	if (doc){

@@ -30,9 +30,10 @@
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 
-
-
 #include "npc.h"
+#include "luascript.h"
+
+extern LuaScript g_config;
 
 template<class Npc> typename AutoList<Npc>::list_type AutoList<Npc>::list;
 template<class Npc> typename AutoID<Npc>::list_type AutoID<Npc>::list;
@@ -45,7 +46,8 @@ Npc::Npc(const char *name, Game* game) :
 {
 	useCount = 0;
 	this->loaded = false;
-	std::string filename = "data/npc/" + std::string(name) + ".xml";
+	std::string datadir = g_config.getGlobalString("datadir");
+	std::string filename = datadir + "npc/" + std::string(name) + ".xml";
 	std::transform(filename.begin(), filename.end(), filename.begin(), tolower);
 	xmlDocPtr doc = xmlParseFile(filename.c_str());
 	if (doc){
@@ -236,7 +238,9 @@ NpcScript::NpcScript(std::string scriptname, Npc* npc){
 	luaopen_math(luaState);
 	luaopen_string(luaState);
 	luaopen_io(luaState);
-    lua_dofile(luaState, "data/npc/scripts/lib/npc.lua");
+	
+	std::string datadir = g_config.getGlobalString("datadir");
+    lua_dofile(luaState, std::string(datadir + "npc/scripts/lib/npc.lua").c_str());
 	
 	FILE* in=fopen(scriptname.c_str(), "r");
 	if(!in)
