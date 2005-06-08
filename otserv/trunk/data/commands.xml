@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+
+<commands>
+<command cmd="/B" access="1" />
+<command cmd="/b" access="1" />
+<command cmd="/c" access="1" />
+<command cmd="/i" access="1" />
+<command cmd="/m" access="1" />
+<command cmd="/q" access="1" />
+<command cmd="/reload" access="1" />
+<command cmd="/s" access="1" />
+<command cmd="/t" access="1" />
+<command cmd="/z" access="1" />
+</commands>
