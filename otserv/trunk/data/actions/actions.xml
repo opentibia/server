@@ -26,7 +26,12 @@
 <action itemid="2090" script="key.lua" />
 <action itemid="1945" script="switch.lua" />
 <action itemid="1946" script="switch.lua" />
-<action itemid="2006" script="fluids.lua" /> --upadte
+<action itemid="2006" script="fluids.lua" />
 
+<action uniqueid="2000" script="quest.lua" />
+<action uniqueid="2001" script="quest.lua" />
+<action uniqueid="2002" script="quest.lua" />
+<action actionid="5000" script="quest.lua" />
+<action actionid="5001" script="quest.lua" />
 
 </actions>
