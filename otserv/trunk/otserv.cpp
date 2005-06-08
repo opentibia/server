@@ -24,6 +24,7 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <ctime>
 
 #include "otsystem.h"
 #include "networkmessage.h"
@@ -40,6 +41,7 @@
 #include "spells.h"
 
 #include "actions.h"
+#include "commands.h"
 //#include "spawn.h"
 
 #include "luascript.h"
@@ -60,6 +62,8 @@ Items Item::items;
 Game g_game;
 Spells spells(&g_game);
 Actions actions(&g_game);
+Commands commands(&g_game);
+
 //SpawnManager spawnmanager;
 #if defined __EXCEPTION_TRACER__
 #include "exception.h"
@@ -212,6 +216,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 					} else {
 						Status* stat = Status::instance();
 						stat->addPlayer();
+						player->lastlogin = std::time(NULL);
 						s = 0;            // protocol/player will close socket
 						protocol->ReceiveLoop();
 						stat->removePlayer();
@@ -263,7 +268,7 @@ int main(int argc, char *argv[])
 	ExceptionHandler mainExceptionHandler;	
 	mainExceptionHandler.InstallHandler();
 #endif
-  std::cout << ":: OTServ Development-Version 0.3.0 - Preview" << std::endl;
+  std::cout << ":: OTServ Development-Version 0.4.0 - CVS Preview" << std::endl;
   std::cout << ":: ====================" << std::endl;
   std::cout << "::" << std::endl;
 
@@ -287,7 +292,7 @@ int main(int argc, char *argv[])
 
   //load spells data
   std::cout << ":: Loading spells spells.xml... ";
-  if (!spells.loadFromXml())
+  if(!spells.loadFromXml(g_config.getGlobalString("datadir")))
   {
     ErrorMessage("Unable to load spells.xml!");
     return -1;
@@ -296,13 +301,22 @@ int main(int argc, char *argv[])
   
   //load actions data
   std::cout << ":: Loading actions actions.xml... ";
-  if(!actions.loadFromXml())
+  if(!actions.loadFromXml(g_config.getGlobalString("datadir")))
   {
 	ErrorMessage("Unable to load actions.xml!");
     return -1;
   }
   std::cout << "[done]" << std::endl;
-
+  
+  //load commands data
+  std::cout << ":: Loading commands commands.xml... ";
+  if(!commands.loadXml(g_config.getGlobalString("datadir")))
+  {
+	ErrorMessage("Unable to load commands.xml!");
+    return -1;
+  }
+  std::cout << "[done]" << std::endl;
+  
   // load item data
   std::cout << ":: reading tibia.dat ...            ";
 	if (Item::items.loadFromDat("tibia.dat"))
@@ -312,10 +326,10 @@ int main(int argc, char *argv[])
 	}
 	std::cout << "[done]" << std::endl;
 
-  std::cout << ":: reading data/items/items.xml ... ";
-	if (Item::items.loadXMLInfos("data/items/items.xml"))
+  std::cout << ":: reading " << g_config.getGlobalString("datadir") << "items/items.xml ... ";
+	if (Item::items.loadXMLInfos(g_config.getGlobalString("datadir") + "items/items.xml"))
   {
-    ErrorMessage("Could not load data/items/items.xml ...!");
+    ErrorMessage("Could not load /items/items.xml ...!");
     return -1;
 	}
 	std::cout << "[done]" << std::endl;
