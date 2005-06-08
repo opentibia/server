@@ -38,14 +38,14 @@ Spells::Spells(Game* igame): game(igame){
                    
                    }
 
-bool Spells::loadFromXml()
+bool Spells::loadFromXml(const std::string &datadir)
 {
 	std::string name, words;
   bool enabled = false;
   int vocId, maglv = 0, mana = 0, id = 0, charges = 0;
   this->loaded = false;
 
-	std::string filename = "data/spells/spells.xml";
+	std::string filename = datadir + "spells/spells.xml";
 	std::transform(filename.begin(), filename.end(), filename.begin(), tolower);
   xmlDocPtr doc = xmlParseFile(filename.c_str());
 
@@ -94,7 +94,7 @@ bool Spells::loadFromXml()
 						mana = atoi((const char*)xmlGetProp(p, (const xmlChar *)"mana"));
 					}
 
-					Spell* spell = new InstantSpell(name, words, maglv, mana, game);
+					Spell* spell = new InstantSpell(datadir, name, words, maglv, mana, game);
 					
 					tmp=p->children;
 					while (tmp){
@@ -140,7 +140,7 @@ bool Spells::loadFromXml()
 						mana = atoi((const char*)xmlGetProp(p, (const xmlChar *)"mana"));
 					}
 
-					Spell* spell = new RuneSpell(name, id, charges, maglv, mana, game);
+					Spell* spell = new RuneSpell(datadir, name, id, charges, maglv, mana, game);
 					
 					tmp=p->children;
 					while (tmp){
@@ -192,28 +192,28 @@ Spell::~Spell(){
 	}
 }
 
-InstantSpell::InstantSpell(std::string iname, std::string iwords, int magLv, int mana, Game* game)
+InstantSpell::InstantSpell(const std::string &datadir, std::string iname, std::string iwords, int magLv, int mana, Game* game)
 : Spell(iname, magLv, mana, game), words(iwords)
 {
-	this->script = new SpellScript(std::string("data/spells/instant/")+(this->words)+std::string(".lua"), this);
+	this->script = new SpellScript(datadir, std::string(datadir + "spells/instant/")+(this->words)+std::string(".lua"), this);
 	if(!this->script->isLoaded())
 		this->loaded=false;
 }
 
 
-RuneSpell::RuneSpell(std::string iname, unsigned short id, unsigned short charges, int magLv, int mana, Game* game)
+RuneSpell::RuneSpell(const std::string &datadir, std::string iname, unsigned short id, unsigned short charges, int magLv, int mana, Game* game)
 : Spell(iname, magLv, mana, game)
 {
 	this->id = id;
 	this->charges = charges;
 
-	this->script = new SpellScript(std::string("data/spells/runes/")+(this->name)+std::string(".lua"), this);
+	this->script = new SpellScript(datadir, std::string(datadir + "spells/runes/")+(this->name)+std::string(".lua"), this);
 	if(!this->script->isLoaded())
 		this->loaded=false;
 }
 
                  
-SpellScript::SpellScript(std::string scriptname, Spell* spell){
+SpellScript::SpellScript(const std::string &datadir, std::string scriptname, Spell* spell){
 	this->loaded = false;
 	if(scriptname == "")
 		return;
@@ -223,7 +223,7 @@ SpellScript::SpellScript(std::string scriptname, Spell* spell){
 	luaopen_math(luaState);
 	luaopen_string(luaState);
 	luaopen_io(luaState);
-    lua_dofile(luaState, "data/spells/lib/spells.lua");
+    lua_dofile(luaState, std::string(datadir + "spells/lib/spells.lua").c_str());
 	
 	FILE* in=fopen(scriptname.c_str(), "r");
 	if(!in)

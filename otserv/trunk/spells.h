@@ -44,7 +44,7 @@ class Spells
 {
 public:
   Spells(Game* game);
-  bool loadFromXml();
+  bool loadFromXml(const std::string&);
   virtual ~Spells();
 
 	Game* game;
@@ -112,7 +112,7 @@ protected:
 class InstantSpell : public Spell
 {
 public:
-	InstantSpell(std::string name, std::string words, int magLv, int mana, Game* game);
+	InstantSpell(const std::string &, std::string name, std::string words, int magLv, int mana, Game* game);
 	std::string getWords(){return words;};
 
 protected:
@@ -122,7 +122,7 @@ protected:
 class RuneSpell : public Spell
 {
 public:
-	RuneSpell(std::string name, unsigned short id, unsigned short charges, int magLv, int mana, Game* game);
+	RuneSpell(const std::string& ,std::string name, unsigned short id, unsigned short charges, int magLv, int mana, Game* game);
 
 protected:
   unsigned short id;
@@ -131,7 +131,7 @@ protected:
 
 class SpellScript : protected LuaScript{
 public:
-	SpellScript(std::string scriptname, Spell* spell);
+	SpellScript(const std::string&, std::string scriptname, Spell* spell);
 	virtual ~SpellScript(){}
   bool castSpell(Creature* creature, const Position& pos, std::string var);
   bool isLoaded(){return loaded;}
