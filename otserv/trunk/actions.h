@@ -51,7 +51,7 @@ class Actions
 public:
 	Actions(){};
 	Actions(Game* igame);
-	bool loadFromXml();
+	bool loadFromXml(const std::string &datadir);
 	virtual ~Actions();
 	
 	void UseItem(Player* player, const Position &pos,const unsigned char stack, 
@@ -69,10 +69,13 @@ public:
 	bool reload();
   
 protected:
+	std::string datadir;
 	typedef std::map<unsigned short, Action*> ActionUseMap;
 	ActionUseMap useItemMap;
 	ActionUseMap uniqueItemMap;
+	ActionUseMap actionItemMap;
 	int canUse(const Player *player,const Position &pos) const;
+	Action *getAction(const Item *item);
 	Action *loadAction(xmlNodePtr xmlaction);
 };
 
@@ -104,12 +107,26 @@ struct KnownThing{
 class Action
 {
 public:
-	Action(Game* igame,std::string scriptname);
+	Action(Game* igame,const std::string &datadir, const std::string &scriptname);
 	virtual ~Action();
 	bool isLoaded() const {return loaded;}
 	bool allowFarUse() const {return allowfaruse;};
 	void setAllowFarUse(bool v){allowfaruse = v;};
-	ActionScript *getScript(){return script;};
+	bool executeUse(Player *player,Item* item, PositionEx &posFrom, PositionEx &posTo);
+	
+protected:
+	ActionScript *script;
+	bool loaded;
+	bool allowfaruse;
+};
+
+class ActionScript : protected LuaScript{
+public:
+	ActionScript(Game* igame,const std::string &datadir, const std::string &scriptname);
+	virtual ~ActionScript(){}
+	bool isLoaded()const {return loaded;}
+	
+	lua_State* getLuaState(){return luaState;}
 	
 	void ClearMap();
 	static void AddThingToMapUnique(Thing *thing);
@@ -120,25 +137,6 @@ public:
 	const KnownThing* GetCreatureByUID(int uid);
 	const KnownThing* GetPlayerByUID(int uid);
 	
-	Game *game;
-	Player *_player;
-	
-protected:
-	std::map<unsigned int,KnownThing*> ThingMap;
-	static std::map<unsigned int,KnownThing*> uniqueIdMap;
-	unsigned int lastuid;
-	ActionScript *script;
-	bool loaded;
-	bool allowfaruse;
-};
-
-class ActionScript : protected LuaScript{
-public:
-	ActionScript(Action* iaction,std::string scriptname);
-	virtual ~ActionScript(){}
-	bool executeUse(Player *player,Item* item, PositionEx &posFrom, PositionEx &posTo);
-	bool isLoaded()const {return loaded;}
-	static Action* getAction(lua_State *L);
 	//lua functions
 	static int luaActionDoRemoveItem(lua_State *L);
 	static int luaActionDoFeedPlayer(lua_State *L);	
@@ -162,6 +160,13 @@ public:
 	//get item info
 	static int luaActionGetItemRWInfo(lua_State *L);
 	static int luaActionGetThingfromPos(lua_State *L);
+	//set item
+	static int luaActionDoSetItemActionId(lua_State *L);
+	static int luaActionDoSetItemText(lua_State *L);
+	static int luaActionDoSetItemSpecialDescription(lua_State *L);
+	
+	//get tile info
+	static int luaActionGetTilePzInfo(lua_State *L);
 	
 	//get player info functions
 	static int luaActionGetPlayerFood(lua_State *L);
@@ -173,13 +178,25 @@ public:
 	static int luaActionGetPlayerName(lua_State *L);
 	static int luaActionGetPlayerPosition(lua_State *L);	
 	static int luaActionGetPlayerSkill(lua_State *L);
+	static int luaActionGetPlayerStorageValue(lua_State *L);
+	static int luaActionSetPlayerStorageValue(lua_State *L);
 	
 protected:			
 	
-	Action *_action;	
-	int registerFunctions();
-	bool loaded;	
+	Game *game;
+	Player *_player;
+	unsigned int lastuid;
 	
+	friend class Action;
+	
+	std::map<unsigned int,KnownThing*> ThingMap;
+	static std::map<unsigned int,KnownThing*> uniqueIdMap;
+	
+	//lua related functions
+	int registerFunctions();
+	bool loaded;
+	//lua interface helpers
+	static ActionScript* getActionScript(lua_State *L);
 	static void internalAddPositionEx(lua_State *L, const PositionEx& pos);
 	static void internalGetPositionEx(lua_State *L, PositionEx& pos);
 	static unsigned long internalGetNumber(lua_State *L);
