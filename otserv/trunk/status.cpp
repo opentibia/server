@@ -23,8 +23,10 @@
 #include <libxml/parser.h>
 #include "luascript.h"
 #include <sstream>
+#include "game.h"
 
 extern LuaScript g_config;
+extern Game g_game;
 
 Status* Status::_Status = NULL;
 
@@ -92,6 +94,12 @@ std::string Status::getStatusString(){
 	xmlSetProp(p, (const xmlChar*) "peak", (const xmlChar*)ss.str().c_str());
 	ss.str("");
 	xmlAddChild(root, p);
+	
+	p=xmlNewNode(NULL,(const xmlChar*)"monsters");
+	ss << g_game.getMonstersOnline();
+	xmlSetProp(p, (const xmlChar*) "total", (const xmlChar*)ss.str().c_str());
+	ss.str("");
+	xmlAddChild(root, p);
 
 	p=xmlNewNode(NULL,(const xmlChar*)"map");
 	xmlSetProp(p, (const xmlChar*) "name", (const xmlChar*)this->mapname.c_str());
@@ -102,13 +110,18 @@ std::string Status::getStatusString(){
 
 	xmlNewTextChild(root, NULL, (const xmlChar*)"motd", (const xmlChar*)g_config.getGlobalString("motd", "").c_str());
 
-	char* s=NULL;
-	int len=0;
+	char *s = NULL;
+	int len = 0;
 	xmlDocDumpMemory(doc, (xmlChar**)&s, &len);
-
-	xml=std::string(s, len);
+	
+	if(s)
+		xml = std::string(s, len);
+	else
+		xml = "";
 
 	xmlFree(s);
+	//free(s);
+	//xmlFreeDoc(doc);
 
 	return xml;
 }
