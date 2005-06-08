@@ -796,7 +796,7 @@ void Protocol74::parseUseItem(NetworkMessage &msg)
 	unsigned char index = msg.GetByte();
 
 #ifdef __DEBUG__
-	std::cout << "parseUseItem: " << "x: " << x << ", y: " << (int)y <<  ", z: " << (int)z << ", item: " << (int)item << ", stack: " << (int)stack << ", index: " << (int)index << std::endl;
+	std::cout << "parseUseItem: " << "x: " << pos.x << ", y: " << (int)pos.y <<  ", z: " << (int)pos.z << ", item: " << (int)item << ", stack: " << (int)stack << ", index: " << (int)index << std::endl;
 #endif
 
 /*	if(Item::items[item].iscontainer)
@@ -2023,7 +2023,7 @@ void Protocol74::sendThingAppear(const Thing *thing){
 		const Item *item = dynamic_cast<const Item*>(thing);
 		if(item){
 			Tile *tile = game->getTile(item->pos.x,item->pos.y,item->pos.z);
-			if(tile->getThingCount() > 10){
+			if(tile->getThingCount() > 8){
 				AddTileUpdated(msg,item->pos);
 			}
 			else{
