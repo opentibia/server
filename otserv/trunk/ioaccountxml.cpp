@@ -23,8 +23,10 @@
 #include <functional>
 #include <sstream>
 #include <string.h>
+#include "luascript.h"
 
 extern xmlMutexPtr xmlmutex;
+extern LuaScript g_config; 
 
 IOAccountXML::IOAccountXML(){
 	if(xmlmutex == NULL){
@@ -36,7 +38,8 @@ Account IOAccountXML::loadAccount(unsigned long accno){
 	Account acc;
 
 	std::stringstream accsstr;
-	accsstr << "data/accounts/" << accno << ".xml";;
+	std::string datadir = g_config.getGlobalString("datadir");
+	accsstr << datadir + "accounts/" << accno << ".xml";;
 	std::string filename = accsstr.str();
 	std::transform(filename.begin(), filename.end(), filename.begin(), tolower);
 	xmlMutexLock(xmlmutex);
