@@ -36,6 +36,7 @@ using namespace std;
 #include <stdio.h>
 
 #include "items.h"
+#include "commands.h"
 #include "game.h"
 #include "tile.h"
 
@@ -67,6 +68,7 @@ extern OTSYS_THREAD_LOCKVAR maploadlock;
 extern LuaScript g_config;
 extern Spells spells;
 extern Actions actions;
+extern Commands commands;
 extern std::map<long, Creature*> channel;
 extern std::vector< std::pair<unsigned long, unsigned long> > bannedIPs;
 
@@ -372,9 +374,13 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 
 		if(hadSplash) {
 			unsigned char stackpos = tile->getThingStackPos(tile->splash);
-			tile->splash->setID(2019);
-			tile->splash->setItemCountOrSubtype(FLUID_BLOOD);
-			game->sendRemoveThing(NULL,attackedCreature->pos,tile->splash,stackpos);
+			Item *splash;
+			splash = tile->splash;
+			splash->setID(2019);
+			splash->setItemCountOrSubtype(FLUID_BLOOD);
+			tile->splash = NULL;
+			game->sendRemoveThing(NULL,attackedCreature->pos,splash,stackpos);
+			tile->splash = splash;
 			game->sendAddThing(NULL,attackedCreature->pos,tile->splash);
 			/*
 			Player *spectator = NULL;
@@ -2007,291 +2013,39 @@ void BanIPAddress(std::pair<unsigned long, unsigned long>& IpNetMask)
 	bannedIPs.push_back(IpNetMask);
 }
 
+void Game::addCommandTag(std::string tag){
+	bool found = false;
+	for(int i=0;i< commandTags.size() ;i++){
+		if(commandTags[i] == tag){
+			found = true;
+			break;
+		}
+	}
+	if(!found){
+		commandTags.push_back(tag);
+	}
+}
+
+void Game::resetCommandTag(){
+	commandTags.clear();
+}
+
 void Game::creatureSay(Creature *creature, SpeakClasses type, const std::string &text)
 {
 	//OTSYS_THREAD_LOCK(gameLock)
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
+	bool GMcommand = false;
 	// First, check if this was a GM command
-	if(text[0] == '/' && creature->access > 0)
-	{
-		Player *player = dynamic_cast<Player*>(creature);
-
-		// Get the command
-		switch(text[1])
-		{
-			default:
-				if(player)
-					player->sendCancel("Command not found.");
-				break;
-			// Summon?
-			case 's':
-			{
-				// Create a non-const copy of the command
-				std::string cmd = text;
-				// Erase the first 2 bytes
-				cmd.erase(0,3);
-				// The string contains the name of the NPC we want.
-				Npc *npc = new Npc(cmd.c_str(), (Game *)this);
-				if(!npc->isLoaded()){
-					delete npc;
-					break;
-				}
-
-				Position pos;
-				// Set the NPC pos
-				if(creature->direction == NORTH) {
-					pos.x = creature->pos.x;
-					pos.y = creature->pos.y - 1;
-					pos.z = creature->pos.z;
-				}
-				// South
-				if(creature->direction == SOUTH) {
-					pos.x = creature->pos.x;
-					pos.y = creature->pos.y + 1;
-					pos.z = creature->pos.z;
-				}
-				// East
-				if(creature->direction == EAST) {
-					pos.x = creature->pos.x + 1;
-					pos.y = creature->pos.y;
-					pos.z = creature->pos.z;
-				}
-				// West
-				if(creature->direction == WEST) {
-					pos.x = creature->pos.x - 1;
-					pos.y = creature->pos.y;
-					pos.z = creature->pos.z;
-				}
-
-				// Place the npc
-				if(!placeCreature(pos, npc))
-				{
-					delete npc;
-
-					if(player) {
-						player->sendMagicEffect(player->pos, NM_ME_PUFF);
-						player->sendCancel("Sorry not enough room.");
-					}
-				}
-
-			} break; // case 's':
-
-			// Summon?
-			case 'm':
-			{
-				// Create a non-const copy of the command
-				std::string cmd = text;
-				// Erase the first 2 bytes
-				cmd.erase(0,3);
-				// The string contains the name of the NPC we want.
-				Monster *monster = new Monster(cmd.c_str(), (Game *)this);
-				if(!monster->isLoaded()){
-					delete monster;
-					break;
-				}
-
-				Position pos;
-
-				// Set the NPC pos
-				if(creature->direction == NORTH) {
-					pos.x = creature->pos.x;
-					pos.y = creature->pos.y - 1;
-					pos.z = creature->pos.z;
-				}
-				// South
-				if(creature->direction == SOUTH) {
-					pos.x = creature->pos.x;
-					pos.y = creature->pos.y + 1;
-					pos.z = creature->pos.z;
-				}
-				// East
-				if(creature->direction == EAST) {
-					pos.x = creature->pos.x + 1;
-					pos.y = creature->pos.y;
-					pos.z = creature->pos.z;
-				}
-				// West
-				if(creature->direction == WEST) {
-					pos.x = creature->pos.x - 1;
-					pos.y = creature->pos.y;
-					pos.z = creature->pos.z;
-				}
-
-				// Place the npc
-				if(!placeCreature(pos, monster)) {
-					delete monster;
-
-					if(player) {
-						player->sendMagicEffect(player->pos, NM_ME_PUFF);
-						player->sendCancel("Sorry not enough room.");
-					}
-				}
-				else
-					creature->addSummon(monster);
-
-			} break; // case 'm':
-
-			// IP ban
-			case 'b':
-			{
-				Creature *c = getCreatureByName(text.substr(3).c_str());
-				if(c) {
-					MagicEffectClass me;
-
-					me.animationColor = 0xB4;
-					me.damageEffect = NM_ME_MAGIC_BLOOD;
-					me.maxDamage = c->health + c->mana;
-					me.minDamage = c->health + + c->mana;
-					me.offensive = true;
-
-					creatureMakeMagic(creature, c->pos, &me);
-
-					Player* p = dynamic_cast<Player*>(c);
-					if(p) {
-						std::pair<unsigned long, unsigned long> IpNetMask;
-						IpNetMask.first = p->getIP();
-						IpNetMask.second = 0xFFFFFFFF;
-
-						if(IpNetMask.first > 0) {
-							bannedIPs.push_back(IpNetMask);
-						}
-					}
-				}
-			}
-			break;
-
-			case 'r':
-			{
-				Creature *c = getCreatureByName(text.substr(3).c_str());
-				if(c) {
-					MagicEffectClass me;
-					me.animationColor = 0xB4;
-					me.damageEffect = NM_ME_MAGIC_BLOOD;
-					me.maxDamage = c->health + + c->mana;
-					me.minDamage = c->health + + c->mana;
-					me.offensive = true;
-
-					creatureMakeMagic(creature, c->pos, &me);
-
-					Player* p = dynamic_cast<Player*>(c);
-					if(p) {
-						std::pair<unsigned long, unsigned long> IpNetMask;
-						IpNetMask.first = p->getIP();
-						IpNetMask.second = 0x00FFFFFF;
-
-						if(IpNetMask.first > 0) {
-							bannedIPs.push_back(IpNetMask);
-						}
-					}
-				}
-			}
-			break;
-
-			case 't':
-			{
-				teleport(creature, creature->masterPos);
-			}
-			break;
-
-			case 'c':
-      {
-        // Create a non-const copy of the command
-				std::string cmd = text;
-				// Erase the first 2 bytes
-				cmd.erase(0,3);  
-				Creature* c = getCreatureByName(cmd.c_str());
-				if(c) {
-					teleport(c, creature->pos);
-				}
-			}
-      break;
-
-		  case 'i': // Create new items in the ground ;)
-			{
-				std::string cmd = text;
-				cmd.erase(0,3);
-				std::string::size_type pos = cmd.find(0x20, 0);
-				if(pos == std::string::npos)
-					break;
-				
-				int type = atoi(cmd.substr(0, pos).c_str());
-				cmd.erase(0, pos+1);
-				int count = std::min(atoi(cmd.c_str()), 100);
-				
-				Item *newItem = Item::CreateItem(type, count);
-				if(!newItem)
-					break;
-				
-				Tile *t = getTile(creature->pos.x, creature->pos.y, creature->pos.z);
-				if(!t)
-				{
-					delete newItem;
-					break;
-				}
-				//newItem->pos = creature->pos;
-				//t->addThing(newItem);
-				//Game::creatureBroadcastTileUpdated(creature->pos);
-				addThing(NULL,creature->pos,newItem);
-			}
-			break;
-
-		  case 'q': // Testing command to see your money and to substract too.
-      {
-				std::string cmd = text;
-				cmd.erase(0,3);
-				
-				Player *p = dynamic_cast<Player *>(creature);
-				if(!p)
-					break;
-				
-				int count = atoi(cmd.c_str());
-				unsigned long money = p->getMoney();
-				if(!count)
-				{
-					std::stringstream info;
-					info << "You have " << money << " of money.";
-					p->sendCancel(info.str().c_str());
-					break;
-				}
-				else if(count > money)
-				{
-					std::stringstream info;
-					info << "You have " << money << " of money and is not suficient.";
-					p->sendCancel(info.str().c_str());
-					break;
-				}
-				
-				p->substractMoney(count);
-			}
-			break;
-			case 'n':
-			{
-				std::string cmd = text;
-				cmd.erase(0,3);
-				if(cmd == "actions"){
-					actions.reload();
-				}
-				else{
-					if(player)
-						player->sendCancel("Option not found.");
-				}
-			}
-			break;
-			case 'z': //protocol command
-			{
-				std::string cmd = text;
-				cmd.erase(0,3);
-				int color = atoi(cmd.c_str());
-				if(player) {
-					player->sendMagicEffect(player->pos, color);					
-				}
+	for(int i=0;i< commandTags.size() ;i++){
+		if(commandTags[i] == text.substr(0,1)){
+			if(commands.exeCommand(creature,text)){
+				GMcommand = true;
 			}
 			break;
 		}
 	}
-
-	// It was no command, or it was just a player
-	else {
+	if(!GMcommand){
+		// It was no command, or it was just a player
 		std::vector<Creature*> list;
 		getSpectators(Range(creature->pos), list);
 
@@ -2301,8 +2055,6 @@ void Game::creatureSay(Creature *creature, SpeakClasses type, const std::string 
 		}
 
 	}
-
-
 	//OTSYS_THREAD_UNLOCK(gameLock)
 }
 
@@ -3588,8 +3340,7 @@ bool Game::playerUseItemEx(Player *player, const Position& posFrom,const unsigne
 					ret = success;
 					if(success) {
 						item->setItemCharge(std::max((int)item->getItemCharge() - 1, 0) );
-						if(item->getItemCharge() == 0) {				
-							//sendRemoveThing(player,posFrom,item,stack_from);
+						if(item->getItemCharge() == 0) {
 							removeThing(player,posFrom,item);
 						}
 					}
@@ -3841,7 +3592,9 @@ void Game::sendUpdateThing(Player* player,const Position &pos,const Thing* thing
 				}
 			}
 			else{
-				player->onItemUpdateContainer(container,item,slot);
+				//never should be here
+				std::cout << "Error: sendUpdateThing" << std::endl;
+				//player->onItemUpdateContainer(container,item,slot);
 			}
 
 		}
@@ -3898,8 +3651,10 @@ void Game::addThing(Player* player,const Position &pos,Thing* thing)
 			thing->pos = pos;
 			if(item && item->isSplash()){
 				if(tile->splash){
+					unsigned char stackpos = tile->getThingStackPos(tile->splash);
 					Item *oldsplash = tile->splash;
-					sendRemoveThing(NULL,pos,tile->splash,tile->getThingStackPos(tile->splash));
+					tile->splash = NULL;
+					sendRemoveThing(NULL,pos,oldsplash,stackpos);
 					tile->splash = item;
 					sendAddThing(NULL,pos,tile->splash);
 					//TODO: find a better way to say that item is not used
@@ -3969,8 +3724,8 @@ void Game::removeThing(Player* player,const Position &pos,Thing* thing)
 		Tile *tile = map->getTile(pos.x, pos.y, pos.z);
 		if(tile){
 			unsigned char stackpos = tile->getThingStackPos(thing);
-			sendRemoveThing(player,pos,thing,stackpos,true);
 			tile->removeThing(thing);
+			sendRemoveThing(NULL,pos,thing,stackpos,true);
 		}
 	}
 }
