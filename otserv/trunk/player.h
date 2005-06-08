@@ -26,6 +26,7 @@
 #include "container.h"
 
 #include <vector>
+#include <ctime>
 #include <algorithm>
 
 class Protocol;
@@ -51,6 +52,7 @@ class NetworkMessage;
 typedef std::pair<unsigned char, Container*> containerItem;
 typedef std::vector<containerItem> containerLayout;
 typedef std::map<unsigned long, Container*> DepotMap;
+typedef std::map<unsigned long,long> StorageMap;
 
 //////////////////////////////////////////////////////////////////////
 // Defines a player...
@@ -84,6 +86,11 @@ public:
 	void addContainer(unsigned char containerid, Container *container);
 	void closeContainer(unsigned char containerid);
 
+	void addStorageValue(const unsigned long key, const long value);
+	bool getStorageValue(const unsigned long key, long &value) const;
+	inline StorageMap::const_iterator getStorageIteratorBegin() const {return storageMap.begin();}
+	inline StorageMap::const_iterator getStorageIteratorEnd() const {return storageMap.end();}
+
 	Item* getItem(int pos) const;
 	Item* GetDistWeapon() const;
 	
@@ -109,6 +116,7 @@ public:
   bool substractMoneyContainer(Container *container, unsigned long *money);
   char fightMode, followMode;
   int accountNumber;
+  time_t lastlogin;
   
   std::string password;
 
@@ -281,7 +289,9 @@ protected:
 	SentStats lastSentStats;
 	// we need our name
 	std::string name;	
-	unsigned long guid;	
+	unsigned long guid;
+	
+	StorageMap storageMap;
 };
 
 

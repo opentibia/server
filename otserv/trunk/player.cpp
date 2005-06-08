@@ -64,6 +64,7 @@ Player::Player(const char *name, Protocol *p) :
   maglevel   = 20;
 
   access     = 0;
+  lastlogin  = 0;
   cancelMove = false;
   SendBuffer = false;
   npings = 0;
@@ -1084,6 +1085,22 @@ Item * Player::GetDistWeapon() const{
   	return NULL;
 }
 
+void Player::addStorageValue(const unsigned long key, const long value){
+	storageMap[key] = value;
+}
+
+bool Player::getStorageValue(unsigned long key, long &value) const{
+	StorageMap::const_iterator it;
+	it = storageMap.find(key);
+	if(it != storageMap.end()){
+		value = it->second;
+		return true;
+	}
+	else{
+		value = 0;
+		return false;
+	}
+}
 
 bool Player::CanSee(int x, int y, int z) const
 {
