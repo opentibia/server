@@ -114,7 +114,7 @@ void Item::setUniqueId(unsigned short n){
 	 if(n < 1000)
 	 	n = 1000;
 	uniqueId = n;
-	Action::AddThingToMapUnique(this);
+	ActionScript::AddThingToMapUnique(this);
 }
 
 unsigned short Item::getUniqueId() const{
@@ -469,7 +469,7 @@ std::string Item::getDescription() const
 	if(specialDescription){
 		s << "You see " << (*specialDescription) << ".";
 		if(items[id].weight > 0)
-				s << "It weighs " << std::fixed << std::setprecision(1) << items[id].weight << " oz.";
+				s << std::endl << "It weighs " << std::fixed << std::setprecision(1) << items[id].weight << " oz.";
 	}
 	else if (items[id].name.length()) {
 		if(isStackable() && count > 1) {
@@ -520,7 +520,7 @@ std::string Item::getDescription() const
 				s << ".";
 			}
 			else if(items[id].iskey){
-				s << "You see a " << items[id].name << "(Key:" << actionId << ")." ;
+				s << "You see a " << items[id].name << "(Key:" << actionId << ")." << std::endl;
 			}
 			else
 			{
