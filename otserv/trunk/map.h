@@ -228,6 +228,13 @@ class Map {
 	  * \returns A pointer to that tile.
 	  */
     Tile* getTile(unsigned short _x, unsigned short _y, unsigned char _z);
+    
+	/**
+	  * Set a single tile.
+	  * \param groundId Ground kind (ID)
+	  * \returns Nothing =]
+	  */
+    void setTile(unsigned short _x, unsigned short _y, unsigned char _z, unsigned short groundId);
 
 	/**
 	  * Place a creature on the map
@@ -266,7 +273,7 @@ class Map {
 
 	/** The Map-Lock */
 	//OTSYS_THREAD_LOCKVAR mapLock;
-    protected:    
+  protected:    
     /**
 	  * Get the Creatures within a specific Range */
 	void getSpectators(const Range& range, std::vector<Creature*>& list);
@@ -274,7 +281,7 @@ class Map {
     typedef std::map<unsigned long, Tile*> TileMap;
 	TileMap tileMaps[32][32][MAP_LAYER];	
 
-    void Map::setTile(unsigned short _x, unsigned short _y, unsigned char _z, unsigned short groundId);
+  // setTile moved into public
 
 	friend class MapState;
 	friend class Game;

@@ -19,30 +19,29 @@
 //////////////////////////////////////////////////////////////////////
 
 
-#ifndef __IOMAPXML_H
-#define __IOMAPXML_H
+#ifndef __IOMAPJXB2_H
+#define __IOMAPJXB2_H
 
 #include <string>
-#include <libxml/xmlmemory.h>
-#include <libxml/parser.h>
 
 #include "iomap.h"
 
 class Map;
 
-/** Map-Loader implementation based on XML-Files */
-class IOMapXML : public IOMap {
+/** Map-Loader implementation based on JXB2 format */
+class IOMapJXB2 : public IOMap {
   public:
-	IOMapXML(){};
-	~IOMapXML(){};
-	virtual char* getSourceDescription(){ return "OTX (XML2-based)"; };
-	/** Load the map from an XML file
+	IOMapJXB2(){};
+	~IOMapJXB2(){};
+	virtual char* getSourceDescription(){ return "JXB2 (JXBMAP based)"; };
+	/** Load the map from an JXB2 file
 	  * \param map Pointer to the Map
-	  * \param identifier Name of the XML-File to load
+	  * \param identifier Name of the JXB2 to load
 	  * \returns Whether map load was successful*/
 	bool loadMap(Map* map, std::string identifier);
-private:
-	bool LoadContainer(xmlNodePtr nodeitem,Container* ccontainer);
+//private:
+// may be implemented when get on JXB3
+//	bool LoadContainer(xmlNodePtr nodeitem,Container* ccontainer);
 };
 
 #endif

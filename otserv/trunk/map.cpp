@@ -34,6 +34,7 @@ using namespace std;
 
 #include "iomap.h"
 #include "iomapxml.h"
+#include "iomapjxb2.h"
 
 #include "otsystem.h"
 #include <stdio.h>
@@ -306,9 +307,12 @@ Map::~Map()
 
 
 bool Map::loadMap(std::string filename) {
-
+#ifdef _JXB2MAP_
+	IOMap* loader = new IOMapJXB2();
+#else
 	IOMap* loader = new IOMapXML();
-	std::cout << "Loading map from: " << loader->getSourceDescription() << std::endl;
+#endif	
+	std::cout << ":: Loading map from: " << loader->getSourceDescription() << std::endl;
 	return loader->loadMap(this, filename);
 }
 

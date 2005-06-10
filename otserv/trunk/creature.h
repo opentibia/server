@@ -211,6 +211,8 @@ public:
   int level;		// level
   int speed;
 
+  Direction direction;
+
   virtual bool canMovedTo(const Tile *tile) const;
 
   virtual void sendCancel(const char *msg) { };
@@ -289,7 +291,7 @@ protected:
 	//friend class MapState;
 	friend class GameState;
 
-  Direction direction;
+//  Direction direction; // moved to public
   std::string name;
 };
 
