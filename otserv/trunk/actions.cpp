@@ -529,6 +529,8 @@ int ActionScript::registerFunctions()
 	lua_register(luaState, "getPlayerMagLevel", ActionScript::luaActionGetPlayerMagLevel);
 	//getPlayerName(uid)	
 	lua_register(luaState, "getPlayerName", ActionScript::luaActionGetPlayerName);
+	//getPlayerAccess(uid)	
+	lua_register(luaState, "getPlayerAccess", ActionScript::luaActionGetPlayerAccess);
 	//getPlayerPosition(uid)
 	lua_register(luaState, "getPlayerPosition", ActionScript::luaActionGetPlayerPosition);
 	//getPlayerSkill(uid,skillid)
@@ -590,12 +592,12 @@ int ActionScript::registerFunctions()
 	lua_register(luaState, "doDecayItem", ActionScript::luaActionDoDecayItem);
 	//doCreateItem(itemid,type or count,position) .only working on ground. returns uid of the created item
 	lua_register(luaState, "doCreateItem", ActionScript::luaActionDoCreateItem);
-	
+	//doSummonCreature(name, position)
+	lua_register(luaState, "doSummonCreature", ActionScript::luaActionDoSummonCreature);
 	
 	//doMoveItem(uid,toPos)
 	//doMovePlayer(cid,direction)
 	
-	//doSummonCreature(name, position)
 	//doPlayerAddCondition(....)
 	//doPlayerRemoveItem(itemid,count)
 	
@@ -824,7 +826,6 @@ int ActionScript::luaActionDoRemoveItem(lua_State *L)
 		action->game->sendUpdateThing(action->_player,(Position&)tmppos,tmpitem,tmppos.stackpos);
 	}
 	else{
-		//action->game->sendRemoveThing(action->_player,(Position&)tmppos,tmpitem,tmppos.stackpos);
 		action->game->removeThing(action->_player,(Position&)tmppos,tmpitem);
 		action->game->FreeThing(tmpitem);
 	}	
@@ -1126,8 +1127,6 @@ int ActionScript::luaActionDoPlayerAddItem(lua_State *L)
 			else{
 				pos.stackpos = 1;
 			}
-			//newitem->pos = action->_player->pos;
-			//action->game->sendAddThing(NULL,action->_player->pos,newitem);
 		}
 		pos.x = newitem->pos.x;
 		pos.y = newitem->pos.y;
@@ -1358,8 +1357,7 @@ int ActionScript::luaActionDoCreateItem(lua_State *L){
 	else{
 		pos.stackpos = 1;
 	}
-	//newitem->pos = pos;
-	//action->game->sendAddThing(NULL,(Position&)pos,newitem);
+	
 	unsigned int uid = action->AddThingToMap((Thing*)newitem,pos);
 	
 	lua_pushnumber(L, uid);
@@ -1517,4 +1515,31 @@ int ActionScript::luaActionGetTilePzInfo(lua_State *L)
 		lua_pushnumber(L, -1);
 	}
 	return 1;
+}
+
+int ActionScript::luaActionDoSummonCreature(lua_State *L){
+	//doSummonCreature(name, position)
+	PositionEx pos;
+	internalGetPositionEx(L,pos);
+	const char *name = internalGetString(L);
+	
+	ActionScript *action = getActionScript(L);
+	
+	Monster *monster = new Monster(name, action->game);
+	if(!monster->isLoaded()){
+		delete monster;
+		lua_pushnumber(L, 0);
+		return 1;
+	}
+	
+	if(!action->game->placeCreature((Position&)pos, monster)) {
+		delete monster;
+		lua_pushnumber(L, 0);
+		return 1;
+	}
+	
+	unsigned int cid = action->AddThingToMap((Thing*)monster,pos);
+	
+	lua_pushnumber(L, cid);
+	return 1;	
 }

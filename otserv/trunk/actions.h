@@ -156,6 +156,7 @@ public:
 	static int luaActionDoShowTextWindow(lua_State *L);
 	static int luaActionDoDecayItem(lua_State *L);
 	static int luaActionDoCreateItem(lua_State *L);
+	static int luaActionDoSummonCreature(lua_State *L);
 	
 	//get item info
 	static int luaActionGetItemRWInfo(lua_State *L);
