@@ -34,4 +34,7 @@
 <action actionid="5000" script="quest.lua" />
 <action actionid="5001" script="quest.lua" />
 
+
+<action itemid="1985" script="summon.lua" />
+
 </actions>
