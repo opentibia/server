@@ -391,10 +391,12 @@ void Protocol74::checkCreatureAsKnown(unsigned long id, bool &known, unsigned lo
   knownPlayers.push_back(id);
 
 	// to many known players?
-  if(knownPlayers.size() > 64) //should be 150 for 7.4 client
+  //if(knownPlayers.size() > 64) //should be 150 for 7.4 client
+  if(knownPlayers.size() > 150)
   {
     // lets try to remove one from the end of the list
-    for (int n = 0; n < 64; n++)
+    //for (int n = 0; n < 64; n++)
+    for (int n = 0; n < 150; n++)
     {
       removedKnown = knownPlayers.front();
 
@@ -407,7 +409,7 @@ void Protocol74::checkCreatureAsKnown(unsigned long id, bool &known, unsigned lo
       knownPlayers.push_back(removedKnown);
     }
 
-    // hopefully we found someone to remove :S, we got only 64 tries
+    // hopefully we found someone to remove :S, we got only 150 tries
     // if not... lets kick some players with debug errors :)
 	  knownPlayers.pop_front();
   }
@@ -1043,9 +1045,11 @@ void Protocol74::parseSay(NetworkMessage &msg)
   
   std::string receiver;
   unsigned short channelId = 0;
-  if (type == 4)
+  if (type == SPEAK_PRIVATE)
     receiver = msg.GetString();
-  if (type == 5)
+  if (type == SPEAK_CHANNEL_Y ||
+  	   type == SPEAK_CHANNEL_R1 ||
+	   type == SPEAK_CHANNEL_R2)
     channelId = msg.GetU16();
   std::string text = msg.GetString();
 
@@ -1059,7 +1063,6 @@ void Protocol74::parseSay(NetworkMessage &msg)
     case SPEAK_WHISPER:
       game->creatureWhisper(player, text);
       break;
-
     case SPEAK_YELL:
       game->creatureYell(player, text);
       break;
@@ -1068,6 +1071,8 @@ void Protocol74::parseSay(NetworkMessage &msg)
       game->creatureSpeakTo(player, receiver, text);
       break;
     case SPEAK_CHANNEL_Y:
+	case SPEAK_CHANNEL_R1:
+	case SPEAK_CHANNEL_R2:
       game->creatureToChannel(player, type, text, channelId);
       break;
     case SPEAK_BROADCAST:
@@ -1970,8 +1975,20 @@ void Protocol74::sendThingAppear(const Thing *thing){
     		
 			msg.AddByte(0x32);
     		msg.AddByte(0x00);
-
-    		msg.AddByte(0x00);
+    		
+    		msg.AddByte(0x00); //can report bugs 0,1
+    		
+    		/*msg.AddByte(0x0B);//TODO?. GM actions
+    		msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+    		msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+    		msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+    		msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+    		msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+    		msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+    		msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+    		msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+    		*/
+    		
     		msg.AddByte(0x64);
     		msg.AddPosition(player->pos);
     		GetMapDescription(player->pos.x-8, player->pos.y-6, player->pos.z, 18, 14, msg);
