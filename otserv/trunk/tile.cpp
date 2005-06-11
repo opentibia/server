@@ -396,7 +396,7 @@ MagicEffectItem* Tile::getFieldItem()
 }
 
 Creature* Tile::getTopCreature(){
-  	if(downItems.begin() != downItems.end())
+  	if(creatures.begin() != creatures.end())
   	{
 		return *(creatures.begin());
   	}
