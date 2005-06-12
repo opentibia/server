@@ -38,9 +38,19 @@ class Creature;   // see creature.h
 class Player;
 class Game;
 
-
-#define MAP_WIDTH    512
-#define MAP_HEIGHT   512
+#ifdef M1K
+ #define MAP_WIDTH    1024
+ #define MAP_HEIGHT   1024
+#elif M2K
+ #define MAP_WIDTH    2048
+ #define MAP_HEIGHT   2048
+#elif M4K
+ #define MAP_WIDTH    4096
+ #define MAP_HEIGHT   4096
+#else       
+ #define MAP_WIDTH    512
+ #define MAP_HEIGHT   512
+#endif   
 
 #define MAP_LAYER     16
 
