@@ -265,8 +265,15 @@ int Player::getDefense() const
 		else
 			defense += items[SLOT_RIGHT]->getDefense();		
 	}
-	
-	return defense;
+	//////////
+	if(defense == 0) 
+		defense = (int)random_range(0,(int)skills[SKILL_SHIELD][SKILL_LEVEL]);
+	else 
+		defense += (int)random_range(0,(int)skills[SKILL_SHIELD][SKILL_LEVEL]);
+
+  	return random_range(int(defense*0.25), int(1+(int)(defense*rand())/(RAND_MAX+1.0)));
+  	///////////
+	//return defense;
 }
 
 unsigned long Player::getMoney()
@@ -667,6 +674,8 @@ int Player::addItemInventory(Item* item, int pos, bool internal /*= false*/) {
 }
 
 bool Player::addItem(Item *item){
+	if(!item)
+		return false;
 	//find an empty inventory slot
 	if(!items[SLOT_RIGHT]){
 		if(!(items[SLOT_LEFT] && (items[SLOT_LEFT]->getSlotPosition() & SLOTP_TWO_HAND))){
@@ -695,8 +704,12 @@ bool Player::addItem(Item *item){
 }
 
 bool Player::internalAddItemContainer(Container *container,Item* item){
+	bool isContainerHolding = false;
+	if(dynamic_cast<Container*>(item)){
+		((Container*)item)->isHolding(container, isContainerHolding);
+	}
 	//check if it is full
-	if(container->size() < container->capacity()){
+	if(!isContainerHolding && container->size() < container->capacity()){
 		//add the item
 		container->addItem(item);
 		//update container
