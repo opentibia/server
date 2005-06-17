@@ -639,7 +639,7 @@ int Items::loadXMLInfos(std::string file)
 							itemtype->issplash = true;
 						}
 						else{
-							//std::cout << "unknown type for item: " << id << std::endl;						
+							std::cout << "unknown type for item: " << id << std::endl;
 						}
 					}//type					
 				}
