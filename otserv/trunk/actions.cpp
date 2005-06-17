@@ -489,7 +489,7 @@ const KnownThing* ActionScript::GetItemByUID(int uid)
 	if(tmp){
 		if(tmp->type == thingTypeItem)
 			return tmp;
-	}		
+	}
 	return NULL;
 }
 
@@ -500,7 +500,7 @@ const KnownThing* ActionScript::GetCreatureByUID(int uid)
 		if(tmp->type == thingTypePlayer || tmp->type == thingTypeMonster
 			|| tmp->type == thingTypeNpc )
 			return tmp;
-	}		
+	}
 	return NULL;
 }
 
@@ -510,7 +510,7 @@ const KnownThing* ActionScript::GetPlayerByUID(int uid)
 	if(tmp){
 		if(tmp->type == thingTypePlayer)
 			return tmp;
-	}		
+	}
 	return NULL;
 }
 
@@ -622,17 +622,17 @@ Position ActionScript::internalGetRealPosition(Player *player, const Position &p
 		Position dummyPos(0,0,0);
 		if(!player)
 			return dummyPos;
-		if(pos.y & 0x40) { //from container						
+		if(pos.y & 0x40) { //from container
 			unsigned char containerid = pos.y & 0x0F;
 			const Container* container = player->getContainer(containerid);
 			if(!container){
 				return dummyPos;
-			}			
+			}
 			while(container->getParent() != NULL) {
-				container = container->getParent();				
-			}			
-			if(container->pos.x == 0xFFFF)				
-				return player->pos;			
+				container = container->getParent();
+			}
+			if(container->pos.x == 0xFFFF)
+				return player->pos;
 			else
 				return container->pos;
 		}
@@ -1529,12 +1529,14 @@ int ActionScript::luaActionDoSummonCreature(lua_State *L){
 	if(!monster->isLoaded()){
 		delete monster;
 		lua_pushnumber(L, 0);
+		std::cout << "luadoSummonCreature: Monster not found" << std::endl;
 		return 1;
 	}
 	
 	if(!action->game->placeCreature((Position&)pos, monster)) {
 		delete monster;
 		lua_pushnumber(L, 0);
+		std::cout << "luadoSummonCreature: Can not place the monster" << std::endl;
 		return 1;
 	}
 	
