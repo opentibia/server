@@ -121,7 +121,7 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 
 	//SPAWN
 	std::string pos = std::string(row.lookup_by_name("pos"));
-	std::cout << pos << std::endl;
+	//std::cout << pos << std::endl;
 	tokenizer tokens(pos, sep);
 
 	tokenizer::iterator spawnit = tokens.begin();
@@ -166,6 +166,7 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 		int skillid=r.lookup_by_name("id");
 		player->skills[skillid][SKILL_LEVEL]=r.lookup_by_name("skill");
 		player->skills[skillid][SKILL_TRIES]=r.lookup_by_name("tries");
+		player->skills[skillid][SKILL_PERCENT] = (unsigned int)(100*(player->skills[skillid][SKILL_TRIES])/(1.*player->getReqSkilltries(skillid, (player->skills[skillid][SKILL_LEVEL]+1), player->voc)));
 	}
 
 	//load the items
@@ -194,10 +195,26 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 			int type = r.lookup_by_name("type");
 			int count = r.lookup_by_name("number");
 			Item* myItem = Item::CreateItem(type, count);
+			if((int)r.lookup_by_name("actionid") >= 100)
+				myItem->setActionId((int)r.lookup_by_name("actionid"));
+			myItem->setText(r.lookup_by_name("text").get_string());	
+			myItem->setSpecialDescription(r.lookup_by_name("specialdesc").get_string());
 			std::pair<Item*, int> myPair(myItem, r.lookup_by_name("pid"));
 			itemmap[r.lookup_by_name("sid")] = myPair;
-			if(int slotid = r.lookup_by_name("slot"))
-				player->addItemInventory(myItem, slotid,true);
+			if(int slotid = r.lookup_by_name("slot")){
+				if(slotid > 0 && slotid <= 10){
+					player->addItemInventory(myItem, slotid,true);
+				}
+				else{
+					if(dynamic_cast<Container*>(myItem)){
+						player->addDepot(dynamic_cast<Container*>(myItem), slotid - 100);
+					}
+					else{
+						std::cout << "Error loading depot "<< slotid << " for player " << 
+							player->getGUID() << std::endl;
+					}
+				}
+			}
 		}
 	}
 	catch(std::exception er){
@@ -220,6 +237,27 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 			}
 		}
 	}
+	//load storage map
+	try{
+		mysqlpp::Query query = con.query();
+		query << "SELECT * FROM playerstorage WHERE player ='" << player->getGUID() << "'";
+#ifdef __DEBUG__
+		std::cout << query.preview() << std::endl;
+#endif
+		res = query.store();
+	}
+	catch(mysqlpp::BadQuery e){
+		std::cout << "MYSQL-ERROR: " << e.error << std::endl;
+		return false;
+	}
+	for(mysqlpp::Result::iterator i = res.begin(); i != res.end(); i++){
+		mysqlpp::Row r = *i;
+		unsigned long key = r.lookup_by_name("key");
+		long value = r.lookup_by_name("value");
+		player->addStorageValue(key,value);
+	}
+	
+	
 	return true;
 	
 }
@@ -266,7 +304,8 @@ bool IOPlayerSQL::savePlayer(Player* player){
 	query << "`speed` = " << player->speed << ", ";
 	query << "`cap` = " << player->cap << ", ";
 	query << "`food` = " << player->food << ", ";
-	query << "`sex` = " << player->sex << " ";
+	query << "`sex` = " << player->sex << ", ";
+	query << "`lastlogin` = " << player->lastlogin << " ";
 	query << " WHERE `id` = "<< player->getGUID() <<" LIMIT 1";
 #ifdef __DEBUG__
 	std::cout << query.preview() << std::endl;
@@ -275,7 +314,7 @@ bool IOPlayerSQL::savePlayer(Player* player){
 
 
 	//then we write the individual skills
-	query.reset();
+	/*query.reset();
 	query << "DELETE FROM skills WHERE player="<< player->getGUID();
 #ifdef __DEBUG__
 	std::cout << query.preview() << std::endl;
@@ -293,6 +332,16 @@ bool IOPlayerSQL::savePlayer(Player* player){
 	std::cout << query.preview() << std::endl;
 #endif
 	query.execute();
+*/
+	for(int i = 0; i <= 6; i++){
+		query.reset();
+		query << "UPDATE `skills` SET `skill` = " << player->skills[i][SKILL_LEVEL] <<", `tries` = "<<
+		   player->skills[i][SKILL_TRIES] << " WHERE `player` = " << player->getGUID() << " AND  `id` = " << i;
+#ifdef __DEBUG__
+		std::cout << query.preview() << std::endl;
+#endif
+		query.execute();
+	}
 
 	//now item saving
 	query.reset();
@@ -303,15 +352,43 @@ bool IOPlayerSQL::savePlayer(Player* player){
 	query.execute();
 	query.reset();
 	std::string itemsstring;
-	query << "INSERT INTO `items` (`player` , `slot` , `sid` , `pid` , `type` , `number` ) VALUES"; 
+	query << "INSERT INTO `items` (`player` , `slot` , `sid` , `pid` , `type` , `number` , `actionid` , `text` , `specialdesc` ) VALUES"; 
 	int runningID=0;
 	for (int i = 1; i <= 10; i++){
 		if(player->items[i])
 			itemsstring += getItems(player->items[i],runningID,i,player->getGUID(),0);
 	}
+	//save depot items
+	for(DepotMap::reverse_iterator it = player->depots.rbegin(); it !=player->depots.rend() ;++it){
+    	itemsstring += getItems(it->second,runningID,it->first+100,player->getGUID(),0);
+	}
+      
 	if(itemsstring.length()){
 		itemsstring.erase(itemsstring.length()-1);
 		query << itemsstring;
+#ifdef __DEBUG__
+		std::cout << query.preview() << std::endl;
+#endif
+		query.execute();
+	}
+	//save storage map
+	query.reset();
+	query << "DELETE FROM playerstorage WHERE player="<< player->getGUID();
+#ifdef __DEBUG__
+	std::cout << query.preview() << std::endl;
+#endif
+	query.execute();
+	
+	query.reset();
+	query << "INSERT INTO `playerstorage` (`player` , `key` , `value` ) VALUES"; 
+	std::stringstream ss;
+	for(StorageMap::const_iterator cit = player->getStorageIteratorBegin(); cit != player->getStorageIteratorEnd();cit++){
+    	ss << "(" << player->getGUID() <<","<< cit->first <<","<< cit->second<<"),";
+	}
+	std::string ststring = ss.str();
+	if(ststring.length()){
+		ststring.erase(ststring.length()-1);
+		query << ststring;
 #ifdef __DEBUG__
 		std::cout << query.preview() << std::endl;
 #endif
@@ -333,15 +410,16 @@ bool IOPlayerSQL::savePlayer(Player* player){
 std::string IOPlayerSQL::getItems(Item* i, int &startid, int slot, int player,int parentid){
 	++startid;
 	std::stringstream ss;
-	ss << "(" << player <<"," << slot << ","<< startid <<","<< parentid <<"," << i->getID()<<","<< (int)i->getItemCountOrSubtype() <<"),";
-	std::cout << "i";
+	ss << "(" << player <<"," << slot << ","<< startid <<","<< parentid <<"," << i->getID()<<","<< (int)i->getItemCountOrSubtype() << "," << 
+	(int)i->getActionId()<<",'"<< i->getText() <<"','" << i->getSpecialDescription() <<"'),";
+	//std::cout << "i";
 	if(Container* c = dynamic_cast<Container*>(i)){
-		std::cout << "c";	
+		//std::cout << "c";	
 		int pid = startid;
 		for(ContainerList::const_iterator it = c->getItems(); it != c->getEnd(); it++){
-			std::cout << "s";
+			//std::cout << "s";
 			ss << getItems(*it, startid, 0, player, pid);
-			std::cout << "r";
+			//std::cout << "r";
 		}
 	}
 	return ss.str();
