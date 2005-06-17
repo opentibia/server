@@ -36,7 +36,13 @@ Account IOAccountSQL::loadAccount(unsigned long accno){
 
 
 	mysqlpp::Connection con;
-	con.connect(db.c_str(), host.c_str(), user.c_str(), pass.c_str()); 
+	try{
+		con.connect(db.c_str(), host.c_str(), user.c_str(), pass.c_str()); 
+	}
+	catch(mysqlpp::BadQuery e){
+		std::cout << "MYSQL-ERROR: " << e.error << std::endl;
+		return acc;
+	}
 	try{
 		mysqlpp::Query query = con.query();
 		query << "SELECT * FROM accounts WHERE accno =" << accno;
