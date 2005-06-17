@@ -549,9 +549,18 @@ std::string Item::getName() const
 }
 
 void Item::setSpecialDescription(std::string desc){
-	if(specialDescription)
+	if(specialDescription){
 		delete specialDescription;
-	specialDescription = new std::string(desc);	
+		specialDescription = NULL;
+	}
+	if(desc.length() > 1)
+		specialDescription = new std::string(desc);	
+}
+
+std::string Item::getSpecialDescription(){
+	if(!specialDescription)
+		return std::string("");
+	return *specialDescription;
 }
 
 void Item::clearSpecialDescription(){
@@ -561,11 +570,15 @@ void Item::clearSpecialDescription(){
 }
 
 void Item::setText(std::string desc){
-	if(text)
+	if(text){
 		delete text;
-	text = new std::string(desc);	
-	if(items[id].readonlyId != 0){//write 1 time
-		id = items[id].readonlyId;
+		text = NULL;
+	}
+	if(desc.length() > 1){
+		text = new std::string(desc);	
+		if(items[id].readonlyId != 0){//write 1 time
+			id = items[id].readonlyId;
+		}
 	}
 }
 
@@ -580,7 +593,6 @@ std::string Item::getText(){
 		return std::string("");
 	return *text;
 }
-
 
 int Item::getRWInfo() const {
 	return items[id].RWInfo;

@@ -92,6 +92,7 @@ public:
 	std::string getDescription() const;
 	std::string getName() const ;
 	void setSpecialDescription(std::string desc);
+	std::string getSpecialDescription();
 	void clearSpecialDescription();
 	void setText(std::string desc);
 	void clearText();
