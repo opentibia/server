@@ -1,0 +1,807 @@
+<?xml version="1.0"?>
+<map width="512" height="512" templex="100" templey="100" templez="7">
+<tile x="18" y="17" z="7" ground="419"/>
+<tile x="19" y="17" z="7" ground="419"/>
+<tile x="20" y="17" z="7" ground="419"/>
+<tile x="21" y="17" z="7" ground="419"/>
+<tile x="22" y="17" z="7" ground="419"/>
+<tile x="23" y="17" z="7" ground="419"/>
+<tile x="24" y="17" z="7" ground="419"/>
+<tile x="25" y="17" z="7" ground="419"/>
+<tile x="26" y="17" z="7" ground="419"/>
+<tile x="27" y="17" z="7" ground="419"/>
+<tile x="28" y="17" z="7" ground="419"/>
+<tile x="29" y="17" z="7" ground="419"/>
+<tile x="30" y="17" z="7" ground="419"/>
+<tile x="31" y="17" z="7" ground="419"/>
+<tile x="32" y="17" z="7" ground="419"/>
+<tile x="33" y="17" z="7" ground="419"/>
+<tile x="34" y="17" z="7" ground="419"/>
+<tile x="35" y="17" z="7" ground="419"/>
+<tile x="36" y="17" z="7" ground="419"/>
+<tile x="37" y="17" z="7" ground="419"/>
+<tile x="38" y="17" z="7" ground="419"/>
+<tile x="39" y="17" z="7" ground="419"/>
+<tile x="40" y="17" z="7" ground="419"/>
+<tile x="41" y="17" z="7" ground="419"/>
+<tile x="42" y="17" z="7" ground="419"/>
+<tile x="43" y="17" z="7" ground="419"/>
+<tile x="44" y="17" z="7" ground="419"/>
+<tile x="18" y="18" z="7" ground="419"/>
+<tile x="19" y="18" z="7" ground="419"/>
+<tile x="20" y="18" z="7" ground="419"/>
+<tile x="21" y="18" z="7" ground="419"/>
+<tile x="22" y="18" z="7" ground="419"/>
+<tile x="23" y="18" z="7" ground="419"/>
+<tile x="24" y="18" z="7" ground="419"/>
+<tile x="25" y="18" z="7" ground="419"/>
+<tile x="26" y="18" z="7" ground="419"/>
+<tile x="27" y="18" z="7" ground="419"/>
+<tile x="28" y="18" z="7" ground="419"/>
+<tile x="29" y="18" z="7" ground="419"/>
+<tile x="30" y="18" z="7" ground="419"/>
+<tile x="31" y="18" z="7" ground="419"/>
+<tile x="32" y="18" z="7" ground="419"/>
+<tile x="33" y="18" z="7" ground="419"/>
+<tile x="34" y="18" z="7" ground="419"/>
+<tile x="35" y="18" z="7" ground="419"/>
+<tile x="36" y="18" z="7" ground="419"/>
+<tile x="37" y="18" z="7" ground="419"/>
+<tile x="38" y="18" z="7" ground="419"/>
+<tile x="39" y="18" z="7" ground="419"/>
+<tile x="40" y="18" z="7" ground="419"/>
+<tile x="41" y="18" z="7" ground="419"/>
+<tile x="42" y="18" z="7" ground="419"/>
+<tile x="43" y="18" z="7" ground="419"/>
+<tile x="44" y="18" z="7" ground="419"/>
+<tile x="18" y="19" z="7" ground="419"/>
+<tile x="19" y="19" z="7" ground="419"/>
+<tile x="20" y="19" z="7" ground="419"/>
+<tile x="21" y="19" z="7" ground="419"/>
+<tile x="22" y="19" z="7" ground="419"/>
+<tile x="23" y="19" z="7" ground="419"/>
+<tile x="24" y="19" z="7" ground="419"/>
+<tile x="25" y="19" z="7" ground="419"/>
+<tile x="26" y="19" z="7" ground="419"/>
+<tile x="27" y="19" z="7" ground="419"/>
+<tile x="28" y="19" z="7" ground="419"/>
+<tile x="29" y="19" z="7" ground="419"/>
+<tile x="30" y="19" z="7" ground="419"/>
+<tile x="31" y="19" z="7" ground="419"/>
+<tile x="32" y="19" z="7" ground="419"/>
+<tile x="33" y="19" z="7" ground="419"/>
+<tile x="34" y="19" z="7" ground="419"/>
+<tile x="35" y="19" z="7" ground="419"/>
+<tile x="36" y="19" z="7" ground="419"/>
+<tile x="37" y="19" z="7" ground="419"/>
+<tile x="38" y="19" z="7" ground="419"/>
+<tile x="39" y="19" z="7" ground="419"/>
+<tile x="40" y="19" z="7" ground="419"/>
+<tile x="41" y="19" z="7" ground="419"/>
+<tile x="42" y="19" z="7" ground="419"/>
+<tile x="43" y="19" z="7" ground="419"/>
+<tile x="44" y="19" z="7" ground="419"/>
+<tile x="18" y="20" z="7" ground="419"/>
+<tile x="19" y="20" z="7" ground="419"/>
+<tile x="20" y="20" z="7" ground="419"/>
+<tile x="21" y="20" z="7" ground="419"/>
+<tile x="22" y="20" z="7" ground="419"/>
+<tile x="23" y="20" z="7" ground="419"/>
+<tile x="24" y="20" z="7" ground="419"/>
+<tile x="25" y="20" z="7" ground="419"/>
+<tile x="26" y="20" z="7" ground="419"/>
+<tile x="27" y="20" z="7" ground="419"/>
+<tile x="28" y="20" z="7" ground="419"/>
+<tile x="29" y="20" z="7" ground="419"/>
+<tile x="30" y="20" z="7" ground="419"/>
+<tile x="31" y="20" z="7" ground="419"/>
+<tile x="32" y="20" z="7" ground="419"/>
+<tile x="33" y="20" z="7" ground="419"/>
+<tile x="34" y="20" z="7" ground="419"/>
+<tile x="35" y="20" z="7" ground="419"/>
+<tile x="36" y="20" z="7" ground="419"/>
+<tile x="37" y="20" z="7" ground="419"/>
+<tile x="38" y="20" z="7" ground="419"/>
+<tile x="39" y="20" z="7" ground="419"/>
+<tile x="40" y="20" z="7" ground="419"/>
+<tile x="41" y="20" z="7" ground="419"/>
+<tile x="42" y="20" z="7" ground="419"/>
+<tile x="43" y="20" z="7" ground="419"/>
+<tile x="44" y="20" z="7" ground="419"/>
+<tile x="18" y="21" z="7" ground="419"/>
+<tile x="19" y="21" z="7" ground="419"/>
+<tile x="20" y="21" z="7" ground="419"/>
+<tile x="21" y="21" z="7" ground="419"/>
+<tile x="22" y="21" z="7" ground="419"/>
+<tile x="23" y="21" z="7" ground="419">
+<item id="1113"/>
+</tile>
+<tile x="24" y="21" z="7" ground="419">
+<item id="1271"/>
+</tile>
+<tile x="25" y="21" z="7" ground="419">
+<item id="1114"/>
+</tile>
+<tile x="26" y="21" z="7" ground="419">
+<item id="1271"/>
+</tile>
+<tile x="27" y="21" z="7" ground="419">
+<item id="1114"/>
+</tile>
+<tile x="28" y="21" z="7" ground="419">
+<item id="1271"/>
+</tile>
+<tile x="29" y="21" z="7" ground="419">
+<item id="1114"/>
+</tile>
+<tile x="30" y="21" z="7" ground="419">
+<item id="1271"/>
+</tile>
+<tile x="31" y="21" z="7" ground="419">
+<item id="1114"/>
+</tile>
+<tile x="32" y="21" z="7" ground="419">
+<item id="1271"/>
+</tile>
+<tile x="33" y="21" z="7" ground="419">
+<item id="1114"/>
+</tile>
+<tile x="34" y="21" z="7" ground="419">
+<item id="1271"/>
+</tile>
+<tile x="35" y="21" z="7" ground="419">
+<item id="1114"/>
+</tile>
+<tile x="36" y="21" z="7" ground="419">
+<item id="1271"/>
+</tile>
+<tile x="37" y="21" z="7" ground="419">
+<item id="1114"/>
+</tile>
+<tile x="38" y="21" z="7" ground="419">
+<item id="1271"/>
+</tile>
+<tile x="39" y="21" z="7" ground="419">
+<item id="1114"/>
+</tile>
+<tile x="40" y="21" z="7" ground="419"/>
+<tile x="41" y="21" z="7" ground="419"/>
+<tile x="42" y="21" z="7" ground="419"/>
+<tile x="43" y="21" z="7" ground="419"/>
+<tile x="44" y="21" z="7" ground="419"/>
+<tile x="18" y="22" z="7" ground="419"/>
+<tile x="19" y="22" z="7" ground="419"/>
+<tile x="20" y="22" z="7" ground="419"/>
+<tile x="21" y="22" z="7" ground="419"/>
+<tile x="22" y="22" z="7" ground="419"/>
+<tile x="23" y="22" z="7" ground="414">
+<item id="1116"/>
+</tile>
+<tile x="24" y="22" z="7" ground="414">
+<item id="1622"/>
+<item id="2590" depot="1"/>
+</tile>
+<tile x="25" y="22" z="7" ground="414"/>
+<tile x="26" y="22" z="7" ground="414"/>
+<tile x="27" y="22" z="7" ground="414"/>
+<tile x="28" y="22" z="7" ground="414"/>
+<tile x="29" y="22" z="7" ground="414"/>
+<tile x="30" y="22" z="7" ground="414"/>
+<tile x="31" y="22" z="7" ground="414"/>
+<tile x="32" y="22" z="7" ground="414"/>
+<tile x="33" y="22" z="7" ground="414"/>
+<tile x="34" y="22" z="7" ground="414"/>
+<tile x="35" y="22" z="7" ground="414"/>
+<tile x="36" y="22" z="7" ground="414"/>
+<tile x="37" y="22" z="7" ground="414"/>
+<tile x="38" y="22" z="7" ground="414"/>
+<tile x="39" y="22" z="7" ground="414">
+<item id="1116"/>
+</tile>
+<tile x="40" y="22" z="7" ground="419"/>
+<tile x="41" y="22" z="7" ground="419"/>
+<tile x="42" y="22" z="7" ground="419"/>
+<tile x="43" y="22" z="7" ground="419"/>
+<tile x="44" y="22" z="7" ground="419"/>
+<tile x="18" y="23" z="7" ground="419"/>
+<tile x="19" y="23" z="7" ground="419"/>
+<tile x="20" y="23" z="7" ground="419"/>
+<tile x="21" y="23" z="7" ground="419"/>
+<tile x="22" y="23" z="7" ground="419"/>
+<tile x="23" y="23" z="7" ground="419">
+<item id="1270"/>
+</tile>
+<tile x="24" y="23" z="7" ground="414">
+<item id="1622"/>
+</tile>
+<tile x="25" y="23" z="7" ground="414">
+<item id="1112"/>
+</tile>
+<tile x="26" y="23" z="7" ground="414">
+<item id="1112"/>
+</tile>
+<tile x="27" y="23" z="7" ground="414"/>
+<tile x="28" y="23" z="7" ground="414"/>
+<tile x="29" y="23" z="7" ground="414"/>
+<tile x="30" y="23" z="7" ground="414"/>
+<tile x="31" y="23" z="7" ground="414"/>
+<tile x="32" y="23" z="7" ground="414"/>
+<tile x="33" y="23" z="7" ground="414"/>
+<tile x="34" y="23" z="7" ground="414"/>
+<tile x="35" y="23" z="7" ground="414"/>
+<tile x="36" y="23" z="7" ground="414"/>
+<tile x="37" y="23" z="7" ground="414"/>
+<tile x="38" y="23" z="7" ground="414"/>
+<tile x="39" y="23" z="7" ground="414">
+<item id="1116"/>
+</tile>
+<tile x="40" y="23" z="7" ground="419"/>
+<tile x="41" y="23" z="7" ground="419"/>
+<tile x="42" y="23" z="7" ground="419"/>
+<tile x="43" y="23" z="7" ground="419"/>
+<tile x="44" y="23" z="7" ground="419"/>
+<tile x="18" y="24" z="7" ground="419"/>
+<tile x="19" y="24" z="7" ground="419"/>
+<tile x="20" y="24" z="7" ground="419"/>
+<tile x="21" y="24" z="7" ground="419"/>
+<tile x="22" y="24" z="7" ground="419"/>
+<tile x="23" y="24" z="7" ground="419">
+<item id="1116"/>
+</tile>
+<tile x="24" y="24" z="7" ground="414">
+<item id="1622"/>
+<item id="2590" depot="1"/>
+</tile>
+<tile x="25" y="24" z="7" ground="414"/>
+<tile x="26" y="24" z="7" ground="414"/>
+<tile x="27" y="24" z="7" ground="414"/>
+<tile x="28" y="24" z="7" ground="414"/>
+<tile x="29" y="24" z="7" ground="414"/>
+<tile x="30" y="24" z="7" ground="414"/>
+<tile x="31" y="24" z="7" ground="414"/>
+<tile x="32" y="24" z="7" ground="414"/>
+<tile x="33" y="24" z="7" ground="414"/>
+<tile x="34" y="24" z="7" ground="414"/>
+<tile x="35" y="24" z="7" ground="414"/>
+<tile x="36" y="24" z="7" ground="414"/>
+<tile x="37" y="24" z="7" ground="414"/>
+<tile x="38" y="24" z="7" ground="414"/>
+<tile x="39" y="24" z="7" ground="414">
+<item id="1116"/>
+</tile>
+<tile x="40" y="24" z="7" ground="419"/>
+<tile x="41" y="24" z="7" ground="419"/>
+<tile x="42" y="24" z="7" ground="419"/>
+<tile x="43" y="24" z="7" ground="419"/>
+<tile x="44" y="24" z="7" ground="419"/>
+<tile x="18" y="25" z="7" ground="419"/>
+<tile x="19" y="25" z="7" ground="419"/>
+<tile x="20" y="25" z="7" ground="419"/>
+<tile x="21" y="25" z="7" ground="419"/>
+<tile x="22" y="25" z="7" ground="419"/>
+<tile x="23" y="25" z="7" ground="419">
+<item id="1270"/>
+</tile>
+<tile x="24" y="25" z="7" ground="414">
+<item id="1112"/>
+</tile>
+<tile x="25" y="25" z="7" ground="414">
+<item id="1112"/>
+</tile>
+<tile x="26" y="25" z="7" ground="414">
+<item id="1112"/>
+</tile>
+<tile x="27" y="25" z="7" ground="414"/>
+<tile x="28" y="25" z="7" ground="414"/>
+<tile x="29" y="25" z="7" ground="414"/>
+<tile x="30" y="25" z="7" ground="414"/>
+<tile x="31" y="25" z="7" ground="414"/>
+<tile x="32" y="25" z="7" ground="414"/>
+<tile x="33" y="25" z="7" ground="414"/>
+<tile x="34" y="25" z="7" ground="414"/>
+<tile x="35" y="25" z="7" ground="414"/>
+<tile x="36" y="25" z="7" ground="414"/>
+<tile x="37" y="25" z="7" ground="414"/>
+<tile x="38" y="25" z="7" ground="414"/>
+<tile x="39" y="25" z="7" ground="414">
+<item id="1116"/>
+</tile>
+<tile x="40" y="25" z="7" ground="419"/>
+<tile x="41" y="25" z="7" ground="419"/>
+<tile x="42" y="25" z="7" ground="419"/>
+<tile x="43" y="25" z="7" ground="419"/>
+<tile x="44" y="25" z="7" ground="419"/>
+<tile x="18" y="26" z="7" ground="419"/>
+<tile x="19" y="26" z="7" ground="419"/>
+<tile x="20" y="26" z="7" ground="419"/>
+<tile x="21" y="26" z="7" ground="419"/>
+<tile x="22" y="26" z="7" ground="419"/>
+<tile x="23" y="26" z="7" ground="419">
+<item id="1116"/>
+</tile>
+<tile x="24" y="26" z="7" ground="414"/>
+<tile x="25" y="26" z="7" ground="414"/>
+<tile x="26" y="26" z="7" ground="414"/>
+<tile x="27" y="26" z="7" ground="414"/>
+<tile x="28" y="26" z="7" ground="414"/>
+<tile x="29" y="26" z="7" ground="414"/>
+<tile x="30" y="26" z="7" ground="414"/>
+<tile x="31" y="26" z="7" ground="414"/>
+<tile x="32" y="26" z="7" ground="414"/>
+<tile x="33" y="26" z="7" ground="414"/>
+<tile x="34" y="26" z="7" ground="414"/>
+<tile x="35" y="26" z="7" ground="414"/>
+<tile x="36" y="26" z="7" ground="414"/>
+<tile x="37" y="26" z="7" ground="414"/>
+<tile x="38" y="26" z="7" ground="414"/>
+<tile x="39" y="26" z="7" ground="414">
+<item id="1116"/>
+</tile>
+<tile x="40" y="26" z="7" ground="419"/>
+<tile x="41" y="26" z="7" ground="419"/>
+<tile x="42" y="26" z="7" ground="419"/>
+<tile x="43" y="26" z="7" ground="419"/>
+<tile x="44" y="26" z="7" ground="419"/>
+<tile x="18" y="27" z="7" ground="419"/>
+<tile x="19" y="27" z="7" ground="419"/>
+<tile x="20" y="27" z="7" ground="419"/>
+<tile x="21" y="27" z="7" ground="419"/>
+<tile x="22" y="27" z="7" ground="419"/>
+<tile x="23" y="27" z="7" ground="419">
+<item id="1116"/>
+</tile>
+<tile x="24" y="27" z="7" ground="414"/>
+<tile x="25" y="27" z="7" ground="414"/>
+<tile x="26" y="27" z="7" ground="414"/>
+<tile x="27" y="27" z="7" ground="414"/>
+<tile x="28" y="27" z="7" ground="414"/>
+<tile x="29" y="27" z="7" ground="414"/>
+<tile x="30" y="27" z="7" ground="414"/>
+<tile x="31" y="27" z="7" ground="414"/>
+<tile x="32" y="27" z="7" ground="414"/>
+<tile x="33" y="27" z="7" ground="414"/>
+<tile x="34" y="27" z="7" ground="414"/>
+<tile x="35" y="27" z="7" ground="414"/>
+<tile x="36" y="27" z="7" ground="414"/>
+<tile x="37" y="27" z="7" ground="414"/>
+<tile x="38" y="27" z="7" ground="414"/>
+<tile x="39" y="27" z="7" ground="414">
+<item id="1116"/>
+</tile>
+<tile x="40" y="27" z="7" ground="419"/>
+<tile x="41" y="27" z="7" ground="419"/>
+<tile x="42" y="27" z="7" ground="419"/>
+<tile x="43" y="27" z="7" ground="419"/>
+<tile x="44" y="27" z="7" ground="419"/>
+<tile x="18" y="28" z="7" ground="419"/>
+<tile x="19" y="28" z="7" ground="419"/>
+<tile x="20" y="28" z="7" ground="419"/>
+<tile x="21" y="28" z="7" ground="419"/>
+<tile x="22" y="28" z="7" ground="419"/>
+<tile x="23" y="28" z="7" ground="419">
+<item id="1122"/>
+</tile>
+<tile x="24" y="28" z="7" ground="414"/>
+<tile x="25" y="28" z="7" ground="414"/>
+<tile x="26" y="28" z="7" ground="414"/>
+<tile x="27" y="28" z="7" ground="414"/>
+<tile x="28" y="28" z="7" ground="414"/>
+<tile x="29" y="28" z="7" ground="414"/>
+<tile x="30" y="28" z="7" ground="414"/>
+<tile x="31" y="28" z="7" ground="414"/>
+<tile x="32" y="28" z="7" ground="414"/>
+<tile x="33" y="28" z="7" ground="414"/>
+<tile x="34" y="28" z="7" ground="414"/>
+<tile x="35" y="28" z="7" ground="414"/>
+<tile x="36" y="28" z="7" ground="414"/>
+<tile x="37" y="28" z="7" ground="414"/>
+<tile x="38" y="28" z="7" ground="414"/>
+<tile x="39" y="28" z="7" ground="414">
+<item id="1116"/>
+</tile>
+<tile x="40" y="28" z="7" ground="419"/>
+<tile x="41" y="28" z="7" ground="419"/>
+<tile x="42" y="28" z="7" ground="419"/>
+<tile x="43" y="28" z="7" ground="419"/>
+<tile x="44" y="28" z="7" ground="419"/>
+<tile x="18" y="29" z="7" ground="419"/>
+<tile x="19" y="29" z="7" ground="419"/>
+<tile x="20" y="29" z="7" ground="419"/>
+<tile x="21" y="29" z="7" ground="419"/>
+<tile x="22" y="29" z="7" ground="419"/>
+<tile x="23" y="29" z="7" ground="419">
+<item id="1123"/>
+</tile>
+<tile x="24" y="29" z="7" ground="414"/>
+<tile x="25" y="29" z="7" ground="414"/>
+<tile x="26" y="29" z="7" ground="414"/>
+<tile x="27" y="29" z="7" ground="414"/>
+<tile x="28" y="29" z="7" ground="414"/>
+<tile x="29" y="29" z="7" ground="414"/>
+<tile x="30" y="29" z="7" ground="414"/>
+<tile x="31" y="29" z="7" ground="414"/>
+<tile x="32" y="29" z="7" ground="414"/>
+<tile x="33" y="29" z="7" ground="414"/>
+<tile x="34" y="29" z="7" ground="414"/>
+<tile x="35" y="29" z="7" ground="414"/>
+<tile x="36" y="29" z="7" ground="414"/>
+<tile x="37" y="29" z="7" ground="414"/>
+<tile x="38" y="29" z="7" ground="414"/>
+<tile x="39" y="29" z="7" ground="414">
+<item id="1116"/>
+</tile>
+<tile x="40" y="29" z="7" ground="419"/>
+<tile x="41" y="29" z="7" ground="419"/>
+<tile x="42" y="29" z="7" ground="419"/>
+<tile x="43" y="29" z="7" ground="419"/>
+<tile x="44" y="29" z="7" ground="419"/>
+<tile x="18" y="30" z="7" ground="419"/>
+<tile x="19" y="30" z="7" ground="419"/>
+<tile x="20" y="30" z="7" ground="419"/>
+<tile x="21" y="30" z="7" ground="419"/>
+<tile x="22" y="30" z="7" ground="419"/>
+<tile x="23" y="30" z="7" ground="419">
+<item id="1116"/>
+</tile>
+<tile x="24" y="30" z="7" ground="414"/>
+<tile x="25" y="30" z="7" ground="414"/>
+<tile x="26" y="30" z="7" ground="414"/>
+<tile x="27" y="30" z="7" ground="414"/>
+<tile x="28" y="30" z="7" ground="414"/>
+<tile x="29" y="30" z="7" ground="414"/>
+<tile x="30" y="30" z="7" ground="414"/>
+<tile x="31" y="30" z="7" ground="414"/>
+<tile x="32" y="30" z="7" ground="414"/>
+<tile x="33" y="30" z="7" ground="414"/>
+<tile x="34" y="30" z="7" ground="414"/>
+<tile x="35" y="30" z="7" ground="414"/>
+<tile x="36" y="30" z="7" ground="414"/>
+<tile x="37" y="30" z="7" ground="414"/>
+<tile x="38" y="30" z="7" ground="414"/>
+<tile x="39" y="30" z="7" ground="414">
+<item id="1116"/>
+</tile>
+<tile x="40" y="30" z="7" ground="419"/>
+<tile x="41" y="30" z="7" ground="419"/>
+<tile x="42" y="30" z="7" ground="419"/>
+<tile x="43" y="30" z="7" ground="419"/>
+<tile x="44" y="30" z="7" ground="419"/>
+<tile x="18" y="31" z="7" ground="419"/>
+<tile x="19" y="31" z="7" ground="419"/>
+<tile x="20" y="31" z="7" ground="419"/>
+<tile x="21" y="31" z="7" ground="419"/>
+<tile x="22" y="31" z="7" ground="419"/>
+<tile x="23" y="31" z="7" ground="419">
+<item id="1270"/>
+</tile>
+<tile x="24" y="31" z="7" ground="414">
+<item id="1112"/>
+</tile>
+<tile x="25" y="31" z="7" ground="414">
+<item id="1112"/>
+</tile>
+<tile x="26" y="31" z="7" ground="414">
+<item id="1112"/>
+</tile>
+<tile x="27" y="31" z="7" ground="414"/>
+<tile x="28" y="31" z="7" ground="414"/>
+<tile x="29" y="31" z="7" ground="414"/>
+<tile x="30" y="31" z="7" ground="414"/>
+<tile x="31" y="31" z="7" ground="414"/>
+<tile x="32" y="31" z="7" ground="414"/>
+<tile x="33" y="31" z="7" ground="414"/>
+<tile x="34" y="31" z="7" ground="414"/>
+<tile x="35" y="31" z="7" ground="414"/>
+<tile x="36" y="31" z="7" ground="414"/>
+<tile x="37" y="31" z="7" ground="414"/>
+<tile x="38" y="31" z="7" ground="414"/>
+<tile x="39" y="31" z="7" ground="414">
+<item id="1116"/>
+</tile>
+<tile x="40" y="31" z="7" ground="419"/>
+<tile x="41" y="31" z="7" ground="419"/>
+<tile x="42" y="31" z="7" ground="419"/>
+<tile x="43" y="31" z="7" ground="419"/>
+<tile x="44" y="31" z="7" ground="419"/>
+<tile x="18" y="32" z="7" ground="419"/>
+<tile x="19" y="32" z="7" ground="419"/>
+<tile x="20" y="32" z="7" ground="419"/>
+<tile x="21" y="32" z="7" ground="419"/>
+<tile x="22" y="32" z="7" ground="419"/>
+<tile x="23" y="32" z="7" ground="419">
+<item id="1116"/>
+</tile>
+<tile x="24" y="32" z="7" ground="414">
+<item id="1622"/>
+<item id="2590" depot="1"/>
+</tile>
+<tile x="25" y="32" z="7" ground="414"/>
+<tile x="26" y="32" z="7" ground="414"/>
+<tile x="27" y="32" z="7" ground="414"/>
+<tile x="28" y="32" z="7" ground="414"/>
+<tile x="29" y="32" z="7" ground="414"/>
+<tile x="30" y="32" z="7" ground="414"/>
+<tile x="31" y="32" z="7" ground="414"/>
+<tile x="32" y="32" z="7" ground="414"/>
+<tile x="33" y="32" z="7" ground="414"/>
+<tile x="34" y="32" z="7" ground="414"/>
+<tile x="35" y="32" z="7" ground="414"/>
+<tile x="36" y="32" z="7" ground="414"/>
+<tile x="37" y="32" z="7" ground="414"/>
+<tile x="38" y="32" z="7" ground="414"/>
+<tile x="39" y="32" z="7" ground="414">
+<item id="1116"/>
+</tile>
+<tile x="40" y="32" z="7" ground="419"/>
+<tile x="41" y="32" z="7" ground="419"/>
+<tile x="42" y="32" z="7" ground="419"/>
+<tile x="43" y="32" z="7" ground="419"/>
+<tile x="44" y="32" z="7" ground="419"/>
+<tile x="18" y="33" z="7" ground="419"/>
+<tile x="19" y="33" z="7" ground="419"/>
+<tile x="20" y="33" z="7" ground="419"/>
+<tile x="21" y="33" z="7" ground="419"/>
+<tile x="22" y="33" z="7" ground="419"/>
+<tile x="23" y="33" z="7" ground="419">
+<item id="1270"/>
+</tile>
+<tile x="24" y="33" z="7" ground="414">
+<item id="1622"/>
+</tile>
+<tile x="25" y="33" z="7" ground="414">
+<item id="1112"/>
+</tile>
+<tile x="26" y="33" z="7" ground="414">
+<item id="1112"/>
+</tile>
+<tile x="27" y="33" z="7" ground="414"/>
+<tile x="28" y="33" z="7" ground="414"/>
+<tile x="29" y="33" z="7" ground="414"/>
+<tile x="30" y="33" z="7" ground="414"/>
+<tile x="31" y="33" z="7" ground="414"/>
+<tile x="32" y="33" z="7" ground="414"/>
+<tile x="33" y="33" z="7" ground="414"/>
+<tile x="34" y="33" z="7" ground="414"/>
+<tile x="35" y="33" z="7" ground="414"/>
+<tile x="36" y="33" z="7" ground="414"/>
+<tile x="37" y="33" z="7" ground="414"/>
+<tile x="38" y="33" z="7" ground="414"/>
+<tile x="39" y="33" z="7" ground="414">
+<item id="1116"/>
+</tile>
+<tile x="40" y="33" z="7" ground="419"/>
+<tile x="41" y="33" z="7" ground="419"/>
+<tile x="42" y="33" z="7" ground="419"/>
+<tile x="43" y="33" z="7" ground="419"/>
+<tile x="44" y="33" z="7" ground="419"/>
+<tile x="18" y="34" z="7" ground="419"/>
+<tile x="19" y="34" z="7" ground="419"/>
+<tile x="20" y="34" z="7" ground="419"/>
+<tile x="21" y="34" z="7" ground="419"/>
+<tile x="22" y="34" z="7" ground="419"/>
+<tile x="23" y="34" z="7" ground="419">
+<item id="1116"/>
+</tile>
+<tile x="24" y="34" z="7" ground="414">
+<item id="1622"/>
+<item id="2590" depot="1"/>
+</tile>
+<tile x="25" y="34" z="7" ground="414"/>
+<tile x="26" y="34" z="7" ground="414"/>
+<tile x="27" y="34" z="7" ground="414"/>
+<tile x="28" y="34" z="7" ground="414"/>
+<tile x="29" y="34" z="7" ground="414"/>
+<tile x="30" y="34" z="7" ground="414"/>
+<tile x="31" y="34" z="7" ground="414"/>
+<tile x="32" y="34" z="7" ground="414"/>
+<tile x="33" y="34" z="7" ground="414"/>
+<tile x="34" y="34" z="7" ground="414"/>
+<tile x="35" y="34" z="7" ground="414"/>
+<tile x="36" y="34" z="7" ground="414"/>
+<tile x="37" y="34" z="7" ground="414"/>
+<tile x="38" y="34" z="7" ground="414"/>
+<tile x="39" y="34" z="7" ground="414">
+<item id="1116"/>
+</tile>
+<tile x="40" y="34" z="7" ground="419"/>
+<tile x="41" y="34" z="7" ground="419"/>
+<tile x="42" y="34" z="7" ground="419"/>
+<tile x="43" y="34" z="7" ground="419"/>
+<tile x="44" y="34" z="7" ground="419"/>
+<tile x="18" y="35" z="7" ground="419"/>
+<tile x="19" y="35" z="7" ground="419"/>
+<tile x="20" y="35" z="7" ground="419"/>
+<tile x="21" y="35" z="7" ground="419"/>
+<tile x="22" y="35" z="7" ground="419"/>
+<tile x="23" y="35" z="7" ground="419">
+<item id="1116"/>
+</tile>
+<tile x="24" y="35" z="7" ground="414">
+<item id="1112"/>
+</tile>
+<tile x="25" y="35" z="7" ground="414">
+<item id="1112"/>
+</tile>
+<tile x="26" y="35" z="7" ground="414">
+<item id="1112"/>
+</tile>
+<tile x="27" y="35" z="7" ground="414">
+<item id="1114"/>
+</tile>
+<tile x="28" y="35" z="7" ground="414">
+<item id="1114"/>
+</tile>
+<tile x="29" y="35" z="7" ground="414">
+<item id="1114"/>
+</tile>
+<tile x="30" y="35" z="7" ground="414">
+<item id="1124"/>
+</tile>
+<tile x="31" y="35" z="7" ground="414">
+<item id="1125"/>
+</tile>
+<tile x="32" y="35" z="7" ground="414">
+<item id="1118"/>
+</tile>
+<tile x="33" y="35" z="7" ground="414">
+<item id="1114"/>
+</tile>
+<tile x="34" y="35" z="7" ground="414">
+<item id="1114"/>
+</tile>
+<tile x="35" y="35" z="7" ground="414">
+<item id="1114"/>
+</tile>
+<tile x="36" y="35" z="7" ground="414">
+<item id="1114"/>
+</tile>
+<tile x="37" y="35" z="7" ground="414">
+<item id="1114"/>
+</tile>
+<tile x="38" y="35" z="7" ground="414">
+<item id="1114"/>
+</tile>
+<tile x="39" y="35" z="7" ground="414">
+<item id="1115"/>
+</tile>
+<tile x="40" y="35" z="7" ground="419"/>
+<tile x="41" y="35" z="7" ground="419"/>
+<tile x="42" y="35" z="7" ground="419"/>
+<tile x="43" y="35" z="7" ground="419"/>
+<tile x="44" y="35" z="7" ground="419"/>
+<tile x="18" y="36" z="7" ground="419"/>
+<tile x="19" y="36" z="7" ground="419"/>
+<tile x="20" y="36" z="7" ground="419"/>
+<tile x="21" y="36" z="7" ground="419"/>
+<tile x="22" y="36" z="7" ground="419"/>
+<tile x="23" y="36" z="7" ground="419"/>
+<tile x="24" y="36" z="7" ground="419"/>
+<tile x="25" y="36" z="7" ground="419"/>
+<tile x="26" y="36" z="7" ground="419"/>
+<tile x="27" y="36" z="7" ground="419"/>
+<tile x="28" y="36" z="7" ground="419"/>
+<tile x="29" y="36" z="7" ground="419"/>
+<tile x="30" y="36" z="7" ground="419"/>
+<tile x="31" y="36" z="7" ground="419"/>
+<tile x="32" y="36" z="7" ground="419"/>
+<tile x="33" y="36" z="7" ground="419"/>
+<tile x="34" y="36" z="7" ground="419"/>
+<tile x="35" y="36" z="7" ground="419"/>
+<tile x="36" y="36" z="7" ground="419"/>
+<tile x="37" y="36" z="7" ground="419"/>
+<tile x="38" y="36" z="7" ground="419"/>
+<tile x="39" y="36" z="7" ground="419"/>
+<tile x="40" y="36" z="7" ground="419"/>
+<tile x="41" y="36" z="7" ground="419"/>
+<tile x="42" y="36" z="7" ground="419"/>
+<tile x="43" y="36" z="7" ground="419"/>
+<tile x="44" y="36" z="7" ground="419"/>
+<tile x="18" y="37" z="7" ground="419"/>
+<tile x="19" y="37" z="7" ground="419"/>
+<tile x="20" y="37" z="7" ground="419"/>
+<tile x="21" y="37" z="7" ground="419"/>
+<tile x="22" y="37" z="7" ground="419"/>
+<tile x="23" y="37" z="7" ground="419"/>
+<tile x="24" y="37" z="7" ground="419"/>
+<tile x="25" y="37" z="7" ground="419"/>
+<tile x="26" y="37" z="7" ground="419"/>
+<tile x="27" y="37" z="7" ground="419"/>
+<tile x="28" y="37" z="7" ground="419"/>
+<tile x="29" y="37" z="7" ground="419"/>
+<tile x="30" y="37" z="7" ground="419"/>
+<tile x="31" y="37" z="7" ground="419"/>
+<tile x="32" y="37" z="7" ground="419"/>
+<tile x="33" y="37" z="7" ground="419"/>
+<tile x="34" y="37" z="7" ground="419"/>
+<tile x="35" y="37" z="7" ground="419"/>
+<tile x="36" y="37" z="7" ground="419"/>
+<tile x="37" y="37" z="7" ground="419"/>
+<tile x="38" y="37" z="7" ground="419"/>
+<tile x="39" y="37" z="7" ground="419"/>
+<tile x="40" y="37" z="7" ground="419"/>
+<tile x="41" y="37" z="7" ground="419"/>
+<tile x="42" y="37" z="7" ground="419"/>
+<tile x="43" y="37" z="7" ground="419"/>
+<tile x="44" y="37" z="7" ground="419"/>
+<tile x="18" y="38" z="7" ground="419"/>
+<tile x="19" y="38" z="7" ground="419"/>
+<tile x="20" y="38" z="7" ground="419"/>
+<tile x="21" y="38" z="7" ground="419"/>
+<tile x="22" y="38" z="7" ground="419"/>
+<tile x="23" y="38" z="7" ground="419"/>
+<tile x="24" y="38" z="7" ground="419"/>
+<tile x="25" y="38" z="7" ground="419"/>
+<tile x="26" y="38" z="7" ground="419"/>
+<tile x="27" y="38" z="7" ground="419"/>
+<tile x="28" y="38" z="7" ground="419"/>
+<tile x="29" y="38" z="7" ground="419"/>
+<tile x="30" y="38" z="7" ground="419"/>
+<tile x="31" y="38" z="7" ground="419"/>
+<tile x="32" y="38" z="7" ground="419"/>
+<tile x="33" y="38" z="7" ground="419"/>
+<tile x="34" y="38" z="7" ground="419"/>
+<tile x="35" y="38" z="7" ground="419"/>
+<tile x="36" y="38" z="7" ground="419"/>
+<tile x="37" y="38" z="7" ground="419"/>
+<tile x="38" y="38" z="7" ground="419"/>
+<tile x="39" y="38" z="7" ground="419"/>
+<tile x="40" y="38" z="7" ground="419"/>
+<tile x="41" y="38" z="7" ground="419"/>
+<tile x="42" y="38" z="7" ground="419"/>
+<tile x="43" y="38" z="7" ground="419"/>
+<tile x="44" y="38" z="7" ground="419"/>
+<tile x="18" y="39" z="7" ground="419"/>
+<tile x="19" y="39" z="7" ground="419"/>
+<tile x="20" y="39" z="7" ground="419"/>
+<tile x="21" y="39" z="7" ground="419"/>
+<tile x="22" y="39" z="7" ground="419"/>
+<tile x="23" y="39" z="7" ground="419"/>
+<tile x="24" y="39" z="7" ground="419"/>
+<tile x="25" y="39" z="7" ground="419"/>
+<tile x="26" y="39" z="7" ground="419"/>
+<tile x="27" y="39" z="7" ground="419"/>
+<tile x="28" y="39" z="7" ground="419"/>
+<tile x="29" y="39" z="7" ground="419"/>
+<tile x="30" y="39" z="7" ground="419"/>
+<tile x="31" y="39" z="7" ground="419"/>
+<tile x="32" y="39" z="7" ground="419"/>
+<tile x="33" y="39" z="7" ground="419"/>
+<tile x="34" y="39" z="7" ground="419"/>
+<tile x="35" y="39" z="7" ground="419"/>
+<tile x="36" y="39" z="7" ground="419"/>
+<tile x="37" y="39" z="7" ground="419"/>
+<tile x="38" y="39" z="7" ground="419"/>
+<tile x="39" y="39" z="7" ground="419"/>
+<tile x="40" y="39" z="7" ground="419"/>
+<tile x="41" y="39" z="7" ground="419"/>
+<tile x="42" y="39" z="7" ground="419"/>
+<tile x="43" y="39" z="7" ground="419"/>
+<tile x="44" y="39" z="7" ground="419"/>
+<tile x="18" y="40" z="7" ground="419"/>
+<tile x="19" y="40" z="7" ground="419"/>
+<tile x="20" y="40" z="7" ground="419"/>
+<tile x="21" y="40" z="7" ground="419"/>
+<tile x="22" y="40" z="7" ground="419"/>
+<tile x="23" y="40" z="7" ground="419"/>
+<tile x="24" y="40" z="7" ground="419"/>
+<tile x="25" y="40" z="7" ground="419"/>
+<tile x="26" y="40" z="7" ground="419"/>
+<tile x="27" y="40" z="7" ground="419"/>
+<tile x="28" y="40" z="7" ground="419"/>
+<tile x="29" y="40" z="7" ground="419"/>
+<tile x="30" y="40" z="7" ground="419"/>
+<tile x="31" y="40" z="7" ground="419"/>
+<tile x="32" y="40" z="7" ground="419"/>
+<tile x="33" y="40" z="7" ground="419"/>
+<tile x="34" y="40" z="7" ground="419"/>
+<tile x="35" y="40" z="7" ground="419"/>
+<tile x="36" y="40" z="7" ground="419"/>
+<tile x="37" y="40" z="7" ground="419"/>
+<tile x="38" y="40" z="7" ground="419"/>
+<tile x="39" y="40" z="7" ground="419"/>
+<tile x="40" y="40" z="7" ground="419"/>
+<tile x="41" y="40" z="7" ground="419"/>
+<tile x="42" y="40" z="7" ground="419"/>
+<tile x="43" y="40" z="7" ground="419"/>
+<tile x="44" y="40" z="7" ground="419"/>
+</map>
