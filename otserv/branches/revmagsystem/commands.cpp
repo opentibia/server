@@ -181,6 +181,8 @@ bool Commands::exeCommand(Creature *creature, const std::string &cmd){
 	(this->*cfunc)(creature, str_command, str_param);
 	if(player)
 		player->sendTextMessage(MSG_RED_TEXT,cmd.c_str());
+
+	return true;
 }
 	
 
@@ -192,30 +194,33 @@ bool Commands::placeNpc(Creature* c, const std::string &cmd, const std::string &
 		return true;
 	}
 	Position pos;
+	Direction dir = c->getDirection();
+
 	// Set the NPC pos
-	if(c->direction == NORTH) {
+	if(dir == NORTH) {
 		pos.x = c->pos.x;
 		pos.y = c->pos.y - 1;
 		pos.z = c->pos.z;
 	}
 	// South
-	if(c->direction == SOUTH) {
+	if(dir == SOUTH) {
 		pos.x = c->pos.x;
 		pos.y = c->pos.y + 1;
 		pos.z = c->pos.z;
 	}
 	// East
-	if(c->direction == EAST) {
+	if(dir == EAST) {
 		pos.x = c->pos.x + 1;
 		pos.y = c->pos.y;
 		pos.z = c->pos.z;
 	}
 	// West
-	if(c->direction == WEST) {
+	if(dir == WEST) {
 		pos.x = c->pos.x - 1;
 		pos.y = c->pos.y;
 		pos.z = c->pos.z;
 	}
+
 	// Place the npc
 	if(!game->placeCreature(pos, npc))
 	{
@@ -227,43 +232,45 @@ bool Commands::placeNpc(Creature* c, const std::string &cmd, const std::string &
 		}
 		return true;
 	}
+
 	return true;
 }
 
 bool Commands::placeMonster(Creature* c, const std::string &cmd, const std::string &param)
 {
-
 	Monster *monster = new Monster(param.c_str(), game);
 	if(!monster->isLoaded()){
 		delete monster;
 		return true;
 	}
 	Position pos;
+	Direction dir = c->getDirection();
 
 	// Set the Monster pos
-	if(c->direction == NORTH) {
+	if(dir == NORTH) {
 		pos.x = c->pos.x;
 		pos.y = c->pos.y - 1;
 		pos.z = c->pos.z;
 	}
 	// South
-	if(c->direction == SOUTH) {
+	if(dir == SOUTH) {
 		pos.x = c->pos.x;
 		pos.y = c->pos.y + 1;
 		pos.z = c->pos.z;
 	}
 	// East
-	if(c->direction == EAST) {
+	if(dir == EAST) {
 		pos.x = c->pos.x + 1;
 		pos.y = c->pos.y;
 		pos.z = c->pos.z;
 	}
 	// West
-	if(c->direction == WEST) {
+	if(dir == WEST) {
 		pos.x = c->pos.x - 1;
 		pos.y = c->pos.y;
 		pos.z = c->pos.z;
 	}
+
 	// Place the npc
 	if(!game->placeCreature(pos, monster)) {
 		delete monster;
@@ -289,6 +296,7 @@ bool Commands::banPlayer(Creature* c, const std::string &cmd, const std::string 
 	
 	Creature *creature = game->getCreatureByName(param.c_str());
 	if(creature) {
+		/*
 		MagicEffectClass me;
 		
 		me.animationColor = 0xB4;
@@ -297,7 +305,7 @@ bool Commands::banPlayer(Creature* c, const std::string &cmd, const std::string 
 		me.minDamage = c->health + + c->mana;
 		me.offensive = true;
 
-		game->creatureMakeMagic(c, creature->pos, &me);
+		//game->creatureMakeMagic(c, creature->pos, &me);
 
 		Player* player = dynamic_cast<Player*>(creature);
 		if(player) {
@@ -308,7 +316,10 @@ bool Commands::banPlayer(Creature* c, const std::string &cmd, const std::string 
 				bannedIPs.push_back(IpNetMask);
 			}
 		}
+		*/
 	}
+
+	return true;
 }
 
 bool Commands::teleportMasterPos(Creature* c, const std::string &cmd, const std::string &param){
@@ -392,7 +403,10 @@ bool Commands::reloadInfo(Creature* c, const std::string &cmd, const std::string
 		Player *player = dynamic_cast<Player*>(c);
 		if(player)
 			player->sendCancel("Option not found.");
+		return false;
 	}
+
+	return true;
 }
 
 bool Commands::testCommand(Creature* c, const std::string &cmd, const std::string &param)
@@ -402,4 +416,6 @@ bool Commands::testCommand(Creature* c, const std::string &cmd, const std::strin
 	if(player) {
 		player->sendMagicEffect(player->pos, color);					
 	}
+
+	return true;
 }

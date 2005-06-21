@@ -1310,7 +1310,7 @@ int ActionScript::luaActionGetThingfromPos(lua_State *L)
 			thing = tile->getTopMoveableThing();
 		}
 		else if(pos.stackpos == 254){
-			thing = tile->getFieldItem();
+			thing = NULL; //tile->getFieldItem();
 		}
 		else if(pos.stackpos == 253){
 			thing = tile->getTopCreature();

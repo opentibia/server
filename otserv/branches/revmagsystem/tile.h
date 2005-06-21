@@ -6,7 +6,7 @@
 
 #include "item.h"
 #include "container.h"
-#include "magic.h"
+//#include "magic.h"
 
 #include "definitions.h"
 #include "templates.h"
@@ -34,33 +34,25 @@ public:
 class Tile
 {
 public:
-  Creature* getCreature() const{
-		if(creatures.size())
-    		return creatures[0];
-    	else
-    		return NULL;
-  }
+  Creature* getCreature() const;
 
   Tile()
   {
-    pz               = false;
-    splash           = NULL;
-	ground           = NULL;
-    //decaySplashAfter = 0;
+    pz = false;
+    splash = NULL;
+		ground = NULL;
   }
 
-  Item*           ground;
-  Item*          splash;
-  ItemVector     topItems;
+  Item* ground;
+  Item* splash;
+  ItemVector topItems;
   CreatureVector creatures;
-  ItemVector     downItems;
-
-  //__int64        decaySplashAfter;
+  ItemVector downItems;
 
   bool removeThing(Thing *thing);
   void addThing(Thing *thing);
 	bool insertThing(Thing *thing, int stackpos);
-	MagicEffectItem* getFieldItem();
+	//MagicEffectItem* getFieldItem() const;
 	Teleport* getTeleportItem();
 	Thing* getTopMoveableThing();
 	Creature* getTopCreature();

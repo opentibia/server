@@ -22,7 +22,7 @@
 
 #include "definitions.h"
 #include "container.h"
-#include "magic.h"
+//#include "magic.h"
 #include "player.h"
 #include "tile.h"
 #include "actions.h"

@@ -171,11 +171,11 @@ private:
   virtual void sendCancelAttacking();
   void sendSetOutfit(const Creature* creature);
 	virtual void sendTileUpdated(const Position &Pos);
-	//virtual void sendContainerUpdated(Item *item, unsigned char from_id, unsigned char to_id, unsigned char from_slot, unsigned char to_slot, bool remove);
 	virtual void sendInventory(unsigned char sl_id);
 	virtual void sendStats();
 	virtual void sendTextMessage(MessageClasses mclass, const char* message);
 	virtual void sendTextMessage(MessageClasses mclass, const char* message,const Position &pos, unsigned char type);
+	virtual void sendLightLevel(unsigned char lightlevel, unsigned char color);
 	
   virtual bool CanSee(int x, int y, int z) const;
   virtual void logout();

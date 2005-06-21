@@ -33,7 +33,7 @@
 #include "position.h"
 #include "item.h"
 #include "container.h"
-#include "magic.h"
+//#include "magic.h"
 #include "map.h"
 
 
@@ -46,54 +46,6 @@ class lessSchedTask;
 #define MAP_WIDTH    512
 #define MAP_HEIGHT   512
 #define MAP_LAYER     16
-
-
-/** State of a creature at a given time
-  * Keeps track of all the changes to be able to send to the client
-	*/
-
-class CreatureState {
-public:
-	CreatureState() {};
-	~CreatureState() {};
-
-	int damage;
-	int manaDamage;
-	bool drawBlood;
-	std::vector<Creature*> attackerlist;
-};
-
-//typedef map::map<Creature*, CreatureState> CreatureStateMap;
-typedef std::vector< std::pair<Creature*, CreatureState> > CreatureStateVec;
-typedef std::map<Tile*, CreatureStateVec> CreatureStates;
-
-/** State of the game at a given time
-  * Keeps track of all the changes to be able to send to the client
-	*/
-
-class Game;
-
-class GameState {
-public:
-	GameState(Game *game, const Range &range);
-	~GameState() {};
-
-	void onAttack(Creature* attacker, const Position& pos, const MagicEffectClass* me);
-	void onAttack(Creature* attacker, const Position& pos, Creature* attackedCreature);
-	void getChanges(Player* spectator);
-	const CreatureStateVec& getCreatureStateList(Tile* tile) {return creaturestates[tile];};
-	const std::vector<Creature*>& getSpectators() {return spectatorlist;}
-
-protected:
-	void addCreatureState(Tile* tile, Creature* attackedCreature, int damage, int manaDamage, bool drawBlood);
-	void onAttackedCreature(Tile* tile, Creature* attacker, Creature* attackedCreature, int damage, bool drawBlood);
-	//void removeCreature(Creature* creature, unsigned char stackPos);
-	Game *game;
-
-	std::vector<Creature*> spectatorlist;
-	//MapState mapstate;
-	CreatureStates creaturestates;
-};
 
 /**
   * Main Game class.
@@ -193,16 +145,16 @@ public:
 	void creatureMonsterYell(Monster* monster, const std::string& text);
 	void creatureChangeOutfit(Creature *creature);
 
-	bool creatureThrowRune(Creature *creature, const Position& centerpos, const MagicEffectClass& me);
-	bool creatureCastSpell(Creature *creature, const Position& centerpos, const MagicEffectClass& me);
+	//bool creatureThrowRune(Creature *creature, const Position& centerpos, const MagicEffectClass& me);
+	//bool creatureCastSpell(Creature *creature, const Position& centerpos, const MagicEffectClass& me);
 	bool creatureSaySpell(Creature *creature, const std::string &text);
-	//bool creatureUseItem(Creature *creature, const Position& pos, Item* item);
+	
 	bool playerUseItemEx(Player *player, const Position& posFrom,const unsigned char  stack_from,
 		const Position &posTo,const unsigned char stack_to, const unsigned short itemid);
 	bool playerUseItem(Player *player, const Position& pos, const unsigned char stackpos, const unsigned short itemid, const unsigned char index);
   void changeOutfitAfter(unsigned long id, int looktype, long time);
   void changeSpeed(unsigned long id, unsigned short speed);
-  void addEvent(long ticks, int type, void *data);
+
 	void addEvent(SchedulerTask*);
 	void creatureBroadcastTileUpdated(const Position& pos);
 	void teleport(Thing *thing, Position newPos);
@@ -222,14 +174,20 @@ public:
   void sendAddThing(Player* player,const Position &pos,const Thing* thing);
   void sendRemoveThing(Player* player,const Position &pos,const Thing* thing,const unsigned char stackpos = 1,const bool autoclose = false);
   void sendUpdateThing(Player* player,const Position &pos,const Thing* thing,const unsigned char stackpos = 1);
-		
    
+	Player* getPlayerByID(unsigned long id);
 	Creature* getCreatureByID(unsigned long id);
 	Creature* getCreatureByName(const char* s);
 
-	std::list<Position> getPathTo(Creature *creature, Position start, Position to, bool creaturesBlock=true);
-	
+	std::list<Position> getPathTo(Creature *creature, Position start, Position to, bool creaturesBlock=true);	
+	bool canThrowTo(Position from, Position to, bool creaturesBlock /* = true*/, bool isProjectile = false);
 
+	void Game::creatureAttackCreature(Creature *attacker, Creature *attackedCreature, attacktype_t attackType, amuEffect_t ammunition, int damage);
+	void internalCreatureAttackCreature(Creature *attacker, Creature *attackedCreature, attacktype_t attackType, amuEffect_t ammunition, int damage);
+	void internalCreatureAttackedCreature(Creature *attacker, Creature *attackedCreature);
+	void addMagicEffect(const Position &pos, unsigned char type);
+
+	void addCondition(Creature *creature, conditiontype_t conditionType, int time, int n);
 	/** Lockvar for Game. */
   OTSYS_THREAD_LOCKVAR gameLock;    
 
@@ -268,22 +226,7 @@ protected:
 			unsigned short to_x, unsigned short to_y, unsigned char to_z, unsigned char count);
 
 	void changeOutfit(unsigned long id, int looktype);
-	bool creatureOnPrepareAttack(Creature *creature, Position pos);
-	void creatureMakeDamage(Creature *creature, Creature *attackedCreature, fight_t damagetype);
-	//void teleport(Thing *thing, Position newPos);
-
-	bool creatureMakeMagic(Creature *creature, const Position& centerpos, const MagicEffectClass* me);
-	bool creatureOnPrepareMagicAttack(Creature *creature, Position pos, const MagicEffectClass* me);
-
-	/**
-		* Change the players hitpoints
-		* Return: the mana damage and the actual hitpoint loss
-		*/
-	void creatureApplyDamage(Creature *creature, int damage, int &outDamage, int &outManaDamage);
-
-	void CreateDamageUpdate(Creature* player, Creature* attackCreature, int damage);
 	void getSpectators(const Range& range, std::vector<Creature*>& list);
-	void CreateManaDamageUpdate(Creature* player, Creature* attackCreature, int damage);
 
 	OTSYS_THREAD_LOCKVAR eventLock;
 	OTSYS_THREAD_SIGNALVAR eventSignal;
@@ -299,8 +242,6 @@ protected:
 
 	void checkCreatureAttacking(unsigned long id);
 	void checkCreature(unsigned long id);
-	//void decayItem(Item *item);
-	//void decaySplash(Item* item);
 	void checkDecay(int t);
 	
 	#define DECAY_INTERVAL  10000
@@ -310,6 +251,9 @@ protected:
 		std::vector<Item*> decayItems;
 	};
 	std::vector<decayBlock*> decayVector;
+	unsigned char lightlevel;
+	int lightdelta;
+	void checkLight(int delta);
 	
 	void checkSpawns(int t);
 	std::priority_queue<SchedulerTask*, std::vector<SchedulerTask*>, lessSchedTask > eventList;
@@ -324,7 +268,6 @@ protected:
 
 	friend class Commands;
 	friend class Monster;
-	friend class GameState;
 	friend class Spawn;
 	friend class SpawnManager;
 	friend class ActionScript;

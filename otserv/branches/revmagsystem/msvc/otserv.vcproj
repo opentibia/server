@@ -18,12 +18,12 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="-DUSE_SQL"
+				AdditionalOptions="-D__EXCEPTION_TRACER__"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;_CONSOLE;"
+				PreprocessorDefinitions="WIN32;_CONSOLE;__DEBUG__"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="1"
+				RuntimeLibrary="3"
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -33,11 +33,13 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="libxml2.lib liblua.lib liblualib.lib wsock32.lib /NODEFAULTLIB:libcmtd.lib  mysql++.lib mysqlclient.lib zlib.lib"
+				AdditionalOptions="libxml2.lib lualibD.lib luaD.lib wsock32.lib /NODEFAULTLIB:libcmtd.lib libmysql.lib mysql++D.lib"
 				OutputFile="$(OutDir)/otserv.exe"
 				LinkIncremental="2"
+				AdditionalLibraryDirectories="$(VCInstallDir)mysql++-1.7.32\Debug;C:\program\MySQL\MySQL Server 4.1\lib\debug"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/otserv.pdb"
+				GenerateMapFile="FALSE"
 				SubSystem="1"
 				TargetMachine="1"/>
 			<Tool
@@ -71,7 +73,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/D &quot;_X86_&quot; /c "
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
-				RuntimeLibrary="0"
+				RuntimeLibrary="2"
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -81,9 +83,10 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="libxml2.lib lualib.lib lua.lib wsock32.lib"
+				AdditionalOptions="libxml2.lib lualib.lib lua.lib wsock32.lib libmysql.lib mysql++.lib"
 				OutputFile="$(OutDir)/otserv.exe"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="$(VCInstallDir)mysql++-1.7.32\Release;C:\program\MySQL\MySQL Server 4.1\lib\opt"
 				GenerateDebugInformation="TRUE"
 				SubSystem="1"
 				OptimizeReferences="2"
@@ -122,10 +125,19 @@
 				RelativePath="..\account.cpp">
 			</File>
 			<File
+				RelativePath="..\actions.cpp">
+			</File>
+			<File
+				RelativePath="..\commands.cpp">
+			</File>
+			<File
 				RelativePath="..\container.cpp">
 			</File>
 			<File
 				RelativePath="..\creature.cpp">
+			</File>
+			<File
+				RelativePath="..\exception.cpp">
 			</File>
 			<File
 				RelativePath="..\game.cpp">
@@ -191,6 +203,24 @@
 				RelativePath="..\protocol74.cpp">
 			</File>
 			<File
+				RelativePath="..\scheduler.cpp">
+			</File>
+			<File
+				RelativePath="..\spawn.cpp">
+				<FileConfiguration
+					Name="Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+				</FileConfiguration>
+			</File>
+			<File
 				RelativePath="..\spells.cpp">
 			</File>
 			<File
@@ -214,6 +244,15 @@
 				RelativePath="..\account.h">
 			</File>
 			<File
+				RelativePath="..\actions.h">
+			</File>
+			<File
+				RelativePath="..\commands.h">
+			</File>
+			<File
+				RelativePath="..\const74.h">
+			</File>
+			<File
 				RelativePath="..\container.h">
 			</File>
 			<File
@@ -223,13 +262,13 @@
 				RelativePath="..\definitions.h">
 			</File>
 			<File
+				RelativePath="..\exception.h">
+			</File>
+			<File
 				RelativePath="..\game.h">
 			</File>
 			<File
 				RelativePath="..\ioaccount.h">
-			</File>
-			<File
-				RelativePath="..\ioaccountsql.h">
 			</File>
 			<File
 				RelativePath="..\ioaccountxml.h">
@@ -293,6 +332,9 @@
 			</File>
 			<File
 				RelativePath="..\scheduler.h">
+			</File>
+			<File
+				RelativePath="..\spawn.h">
 			</File>
 			<File
 				RelativePath="..\spells.h">

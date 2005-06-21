@@ -28,7 +28,7 @@
 #include "position.h"
 #include "item.h"
 #include "creature.h"
-#include "magic.h"
+//#include "magic.h"
 
 //#include "scheduler.h"
 #include "tools.h"
@@ -54,60 +54,6 @@ class Game;
 
 #define MAP_LAYER     16
 
-/*
-class TilePreChangeData {
-public:
-	Position pos;
-	bool isBlocking;
-	unsigned char thingCount;
-};
-
-enum itemchange_t {
-  CHANGE_REMOVE,
-	CHANGE_ADD,
-	CHANGE_TRANSFORM
-};
-
-struct tilechangedata {
-	Position oldPos;
-	Thing *thing;
-	Thing *oldthing;
-	int stackpos;
-	itemchange_t type;
-};
-
-typedef std::vector<TilePreChangeData> TileExDataVec;
-typedef std::vector<struct tilechangedata> TileChangeDataVec;
-
-typedef std::map<Tile*, TilePreChangeData > TileExDataMap;
-typedef std::map<Tile*, TileChangeDataVec > TileChangeDataVecMap;
-*/
-
-class Tile;
-class Map;
-/*
-class MapState {
-public:
-	MapState(Map* imap);
-	void addThing(Tile *t, Thing *thing);
-	bool removeThing(Tile *t, Thing *thing);
-	//void refreshThing(Tile *t, Thing *thing);
-	void replaceThing(Tile *t, Thing *oldThing, Thing *newThing);
-
-	void getMapChanges(Player *spectator);
-
-protected:
-	Map* map;
-	void addThingInternal(Tile *t, Thing *thing, bool Register);
-	bool removeThingInternal(Tile *t, Thing *thing, bool Register);
-
-	void addTile(Tile *t, Position& tilepos);
-	bool isTileStored(const Tile *t) const;
-	
-	TileChangeDataVecMap changesItemMap;
-	TileExDataMap preChangeItemMap;
-};
-*/
 class Range {
 public:
 	
@@ -267,7 +213,7 @@ class Map {
 	 *	\param isProjectile Takes into consideration for windows/door-ways.
 	 *	\returns The result if you can throw there or not
 	 */
-		bool canThrowItemTo(Position from, Position to, bool creaturesBlock /* = true*/, bool isProjectile = false);
+		bool canThrowTo(Position from, Position to, bool creaturesBlock /* = true*/, bool isProjectile = false);
 
 		bool isPathValid(Creature *creature, const std::list<Position>& path);
 

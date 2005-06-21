@@ -21,27 +21,11 @@
 #ifndef __MAGIC_H__
 #define __MAGIC_H__
 
-#include "position.h"
-#include "item.h"
-
-#include "const74.h"
 class Creature;
 class Player;
-class Item;
 class Position;
-
-#include "tools.h"
-
-enum attacktype_t {
-	ATTACK_NONE = 0,
-	ATTACK_ENERGY = 1,
-	ATTACK_BURST = 2,
-	ATTACK_FIRE = 8,
-	ATTACK_PHYSICAL = 16,
-	ATTACK_POISON = 32,
-	ATTACK_PARALYZE = 64,
-	ATTACK_DRUNKNESS = 128
-};
+class Item;
+class Game;
 
 /*
 MagicEffectClass
@@ -67,17 +51,80 @@ MagicEffectClass
 */
 //------------------------------------------------------------------------------
 
-class MagicEffectItem;
-
-typedef std::vector<Position> MagicAreaVec;
-
-class MagicEffectClass {
+class MagicSpell {
 public:
-	MagicEffectClass();
-	virtual ~MagicEffectClass() {};
-	
-	virtual bool isIndirect() const;
-	virtual bool causeExhaustion(bool hasTarget) const;
+	MagicSpell(Spell *ispell);
+	virtual ~MagicSpell();
+	virtual bool doCastSpell(Creature* spellCastCreature, const Position& pos, const std::string& var) const = 0;
+	//virtual bool doCastSpell(Creature* spellCastCreature, Creature* targetCreature, const std::string& var) const = 0;
+	virtual bool causeExhaustion() = 0;
+
+protected:
+	virtual void setArea(const AreaVector& vec) = 0;
+	virtual void getArea(const Position& centerpos, std::vector<Position>& vec, unsigned char direction) const = 0;
+	Spell *spell;
+};
+
+class ConjureItemSpell : public MagicSpell {
+public:
+	ConjureItemSpell(Spell *ispell, const std::vector<unsigned short>& items, int icount, unsigned char imagicEffect);
+	virtual ~ConjureItemSpell() {};
+	virtual bool doCastSpell(Creature* spellCastCreature, const Position& pos, const std::string& var) const;
+	//virtual bool doCastSpell(Creature* spellCastCreature, Creature* targetCreature, const std::string& var) const = 0;
+	virtual bool causeExhaustion() {return true;};
+
+protected:
+	virtual void setArea(const AreaVector& vec) {};
+	virtual void getArea(const Position& centerpos, std::vector<Position>& vec, unsigned char direction) const {};
+
+	std::vector<unsigned short> items;
+	int count;
+	unsigned char magicEffect;
+};
+
+class ChangeSpeedSpell : public MagicSpell {
+public:
+	ChangeSpeedSpell(Spell *ispell, int itime, int iaddspeed, unsigned char imagicEffect);
+	virtual ~ChangeSpeedSpell() {};
+	virtual bool doCastSpell(Creature* spellCastCreature, const Position& pos, const std::string& var) const;
+	//virtual bool doCastSpell(Creature* spellCastCreature, Creature* targetCreature, const std::string& var) const = 0;
+	virtual bool causeExhaustion() {return true;};
+
+protected:
+	virtual void setArea(const AreaVector& vec) {};
+	virtual void getArea(const Position& centerpos, std::vector<Position>& vec, unsigned char direction) const {};
+
+	int time;
+	int addspeed;
+	unsigned char magicEffect;
+};
+
+class MagicAttackSpell : public MagicSpell {
+public:
+	MagicAttackSpell(Spell *ispell, attacktype_t iattackType, unsigned char idistanceEffect,
+		const AreaVector& ivec, bool ineedDirection, amuEffect_t iamuInfo);
+	virtual ~MagicAttackSpell() {};
+	virtual bool doCastSpell(Creature* spellCastCreature, const Position& pos, const std::string& var) const;
+	virtual bool causeExhaustion() {return true;};
+
+protected:
+	virtual void setArea(const AreaVector& vec) {areaVec = vec;};
+	virtual void getArea(const Position& centerpos, std::vector<Position>& vec, unsigned char direction) const;
+
+	amuEffect_t amuInfo;
+	attacktype_t attackType;
+	bool needDirection;
+	std::vector< std::vector<unsigned char> > areaVec;
+
+//std::vector<Position> areaVec;
+
+	//std::vector< std::vector<unsigned char> > areaVec;
+
+	/*
+	//virtual bool causeExhaustion(bool hasTarget) const;
+
+	//virtual void getMagicEffect(Player* spectator, Creature *spellCastCreature, Creature *targetCreature) const;
+	//virtual void getMagicEffect(Player* spectator, Creature *spellCastCreature, const Position& pos) const;
 
 	virtual int getDamage(Creature* target, const Creature* attacker = NULL) const;
 
@@ -91,11 +138,11 @@ public:
 
 	virtual MagicEffectItem* getMagicItem(const Creature* attacker, bool isPz, bool isBlocking) const;
 
-	virtual bool canCast(bool isBlocking, bool hasCreature) const;
-
 	virtual void FailedToCast(Player* spectator, const Creature* attacker,
 		bool isBlocking, bool hasTarget) const;
+	*/
 
+	/*
 	int minDamage;
 	int maxDamage;
 	bool offensive;
@@ -108,8 +155,10 @@ public:
 	unsigned char animationEffect;
 	unsigned char hitEffect;
 	unsigned char damageEffect;
+	*/
 };
 
+/*
 //Need a target. Example sudden death
 class MagicEffectTargetClass : public MagicEffectClass {
 public:
@@ -125,27 +174,21 @@ public:
 	virtual bool canCast(bool isBlocking, bool hasCreature) const
 	{
 		return !isBlocking && hasCreature;
-		//return MagicEffectClass::canCast(isBlocking, hasCreature);
 	}
 };
+*/
 
+/*
 //Is created indirectly, need a target and make magic damage (burning/poisoned/energized)
 class MagicEffectTargetCreatureCondition : public MagicEffectTargetClass
 {
 public:
 	MagicEffectTargetCreatureCondition() {};
-	MagicEffectTargetCreatureCondition(unsigned long creatureid);
+	//MagicEffectTargetCreatureCondition(unsigned long creatureid);
 	virtual ~MagicEffectTargetCreatureCondition() {};
 
-	virtual bool isIndirect() const
-	{
-		return true;
-	}
-
-	virtual bool causeExhaustion(bool hasTarget) const
-	{
-		return false;
-	}
+	virtual bool isIndirect() const{return true;}
+	virtual bool causeExhaustion(bool hasTarget) const {return false;}
 
 	virtual int getDamage(Creature *target, const Creature *attacker = NULL) const;
 
@@ -160,13 +203,14 @@ public:
 
 	const unsigned long getOwnerID() const {return ownerid;}
 	void setOwnerID(unsigned long owner) { ownerid=owner;}
-	
 
 protected:
-	unsigned long ownerid;
+	//unsigned long ownerid;
 };
+*/
 
 
+/*
 class CreatureCondition {
 public:
 	CreatureCondition(long ticks, long count, const MagicEffectTargetCreatureCondition& magicTargetCondition) {
@@ -198,16 +242,18 @@ private:
 	long internalTicks;
 	MagicEffectTargetCreatureCondition magicTargetCondition;
 };
+*/
 
 //<<delayTicks, conditionCount>, MagicEffectTargetCreatureCondition>
-typedef std::vector<CreatureCondition> ConditionVec;
+//typedef std::vector<CreatureCondition> ConditionVec;
 
 //<duration, ConditionVec>
-typedef std::pair<long, ConditionVec> TransformItem;;
+//typedef std::pair<long, ConditionVec> TransformItem;;
 
 //<type, <duration, <<delayTicks, conditionCount>, MagicEffectTargetCreatureCondition>> >
-typedef std::map<unsigned short, TransformItem> TransformMap;
+//typedef std::map<unsigned short, TransformItem> TransformMap;
 
+/*
 //Needs target, holds a damage list. Example: Soul fire.
 class MagicEffectTargetExClass : public MagicEffectTargetClass
 {
@@ -220,7 +266,9 @@ public:
 protected:
 	ConditionVec condition;
 };
+*/
 
+/*
 //magic field (Fire/Energy/Poison) and solid objects (Magic-wall/Wild growth)
 class MagicEffectItem : public Item, public MagicEffectClass
 {
@@ -242,14 +290,10 @@ public:
 	
 	const MagicEffectTargetCreatureCondition* getCondition() const;
 
-	virtual bool causeExhaustion(bool hasTarget) const
-	{
-		return false;
-	}
+	virtual bool causeExhaustion(bool hasTarget) const {return false;}
 
 	virtual int getDamage(Creature *target, const Creature *attacker = NULL) const;
 
-	//bool transform();
 	virtual Item* decay();
 	bool transform(const MagicEffectItem *rhs);
 	long getDecayTime();
@@ -257,12 +301,12 @@ public:
 protected:
 	int useCount;
 	void buildCondition();
-	//uint64_t decaytime;
-	//bool updateDecay;
 	TransformMap transformMap;
 	ConditionVec condition;
 };
+*/
 
+/*
 //Create a solid object. Example: Magic wall, Wild growth
 class MagicEffectTargetGroundClass : public MagicEffectTargetClass {
 public:
@@ -295,7 +339,9 @@ public:
 protected:
 	MagicEffectItem* magicItem;
 };
+*/
 
+/*
 //Don't need a target. Example: GFB
 class MagicEffectAreaClass : public MagicEffectClass {
 public:
@@ -317,7 +363,9 @@ public:
 	
 	std::vector< std::vector<unsigned char> > areaVec;
 };
+*/
 
+/*
 //Dont need target. Example: Poison storm
 class MagicEffectAreaExClass : public MagicEffectAreaClass
 {
@@ -330,7 +378,9 @@ public:
 protected:
 	ConditionVec condition;
 };
+*/
 
+/*
 //Don't need a target. Example: Fire bomb
 class MagicEffectAreaGroundClass : public MagicEffectAreaClass
 {
@@ -345,6 +395,8 @@ public:
 protected:
 	MagicEffectItem* magicItem;
 };
-#include "creature.h"
+*/
+
+//#include "creature.h"
 #endif //__MAGIC_H__
 

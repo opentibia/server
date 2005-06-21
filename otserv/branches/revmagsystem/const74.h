@@ -24,10 +24,10 @@
 #define NETWORKMESSAGE_MAXSIZE 16768
 
 enum MagicEffectClasses {
-	NM_ME_DRAW_BLOOD  	= 0x00,
-	NM_ME_LOOSE_ENERGY	= 0x01, //fishing?
-	NM_ME_PUFF			= 0x02,
-	NM_ME_BLOCKHIT		= 0x03,
+	NM_ME_DRAW_BLOOD  	   = 0x00,
+	NM_ME_LOOSE_ENERGY	   = 0x01, //fishing?
+	NM_ME_PUFF             = 0x02,
+	NM_ME_BLOCKHIT         = 0x03,
 	NM_ME_EXPLOSION_AREA   = 0x04,
 	NM_ME_EXPLOSION_DAMAGE = 0x05,
 	NM_ME_FIRE_AREA        = 0x06,
@@ -49,6 +49,7 @@ enum MagicEffectClasses {
 	NM_ME_SOUND_PURPLE     = 0x16, //22
 	NM_ME_SOUND_BLUE       = 0x17, //23
 	NM_ME_SOUND_WHITE      = 0x18, //24
+	NM_ME_NONE             = 0xFF //don't send to client, just for internal use
 };
 
 #define NM_ANI_BOLT              1
@@ -66,6 +67,7 @@ enum MagicEffectClasses {
 #define NM_ANI_SPEAR             0
 #define NM_ANI_POWERBOLT         13
 #define NM_ANI_FLYPOISONFIELD    14
+#define NM_ANI_NONE							 255 //don't send to client, just for internal use
 
 enum SpeakClasses {
 	SPEAK_SAY	  	= 0x01,
@@ -94,7 +96,7 @@ enum MessageClasses {
 	MSG_INFO      = 0x16,
 	MSG_SMALLINFO = 0x17,
 	MSG_BLUE_TEXT = 0x18,
-	MSG_RED_TEXT  = 0x19,
+	MSG_RED_TEXT  = 0x19
 };
 
 
@@ -144,7 +146,6 @@ enum amu_t{
 	AMU_BOLT,
 	AMU_ARROW
 };
-
 
 enum subfight_t {
 	DIST_NONE = 0,

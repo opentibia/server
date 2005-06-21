@@ -9,8 +9,15 @@
 #include <iostream>
 
 #include "tile.h"
-
 #include "creature.h"
+
+Creature* Tile::getCreature() const
+{
+	if(creatures.size())
+		return creatures[0];
+
+	return NULL;
+}
 
 bool Tile::isBlockingProjectile() const
 {
@@ -360,7 +367,7 @@ Thing* Tile::getTopMoveableThing(){
 			return topItems[i];
 	}
 	for(int i = 0; i < creatures.size(); i++){
-			return creatures[i];
+		return creatures[i];
 	}
 	for(int i = 0; i < downItems.size(); i++){
 		if(downItems[i] && !downItems[i]->isNotMoveable())
@@ -382,7 +389,8 @@ Teleport* Tile::getTeleportItem()
 	return NULL;
 }
 
-MagicEffectItem* Tile::getFieldItem()
+/*
+MagicEffectItem* Tile::getFieldItem() const
 {
   MagicEffectItem* fieldItem = NULL;
   for (ItemVector::const_iterator iit = downItems.begin(); iit != downItems.end(); ++iit)
@@ -394,6 +402,7 @@ MagicEffectItem* Tile::getFieldItem()
 
 	return NULL;
 }
+*/
 
 Creature* Tile::getTopCreature(){
   	if(creatures.begin() != creatures.end())
@@ -435,14 +444,14 @@ void Tile::addThing(Thing *thing) {
       ground = item;
     }
     else if (item->isSplash()){
-		if(splash == NULL){
-			splash = item;
+			if(splash == NULL){
+				splash = item;
+			}
+			else{
+				//Should not add the splash directly
+				//use game->addthing method
+			}
 		}
-		else{
-			//Should not add the splash directly
-			//use game->addthing method
-		}
-	}
     else if (item->isAlwaysOnTop())
     {
       topItems.insert(topItems.begin(), item);

@@ -75,7 +75,7 @@ Monster::Monster(const char *name, Game* game) :
 		}
 
 		if ((const char*)xmlGetProp(root, (const xmlChar *)"pushable")) {
-			this->pushable = (bool)atoi((const char*)xmlGetProp(root, (const xmlChar *)"pushable"));
+			this->pushable = (bool)(atoi((const char*)xmlGetProp(root, (const xmlChar *)"pushable")) == 1);
 		}
 
 		if ((const char*)xmlGetProp(root, (const xmlChar *)"level")) {
@@ -582,7 +582,7 @@ int Monster::getCurrentDistanceToTarget()
 void Monster::calcMovePosition()
 {
 	int currentdist = getCurrentDistanceToTarget();
-	if((currentdist == getTargetDistance() && game->map->canThrowItemTo(this->pos, targetPos, false, true))
+	if((currentdist == getTargetDistance() && game->map->canThrowTo(this->pos, targetPos, false, true))
 		|| (isfleeing && currentdist >= getTargetDistance()))
 		return;
 
@@ -607,7 +607,7 @@ void Monster::calcMovePosition()
 				if(dist <= distance &&
 					((dist > prevdist || (dist == prevdist && walkdist > 0 && walkdist < minwalkdist)))) {
 
-					if(!game->map->canThrowItemTo(tmppos, targetPos, false, true))
+					if(!game->map->canThrowTo(tmppos, targetPos, false, true))
 						continue;
 					
 					if(!(this->pos.x == x && this->pos.y == y)) {
@@ -825,7 +825,7 @@ bool Monster::doAttacks(Player* attackedPlayer)
 		if(timeprobsystem.onTick(500)) {
 			if(!hasmelee || (hasmelee && paIt->first->fighttype == FIGHT_MELEE)) {
 				curPhysicalAttack = paIt->first;
-				game->creatureMakeDamage(this, attackedPlayer, getFightType());
+				//game->creatureMakeDamage(this, attackedPlayer, getFightType());
 			}
 		}
 	}
@@ -838,7 +838,7 @@ bool Monster::doAttacks(Player* attackedPlayer)
 
 					std::map<unsigned short, Spell*>::iterator rit = spells.getAllRuneSpells()->find(raIt->first);
 					if( rit != spells.getAllRuneSpells()->end() ) {
-						bool success = rit->second->getSpellScript()->castSpell(this, attackedPlayer->pos, "");
+						bool success = false; //rit->second->getSpellScript()->castSpell(this, attackedPlayer->pos, "");
 
 						if(success) {
 							ret = true;
@@ -858,7 +858,7 @@ bool Monster::doAttacks(Player* attackedPlayer)
 
 					std::map<std::string, Spell*>::iterator rit = spells.getAllSpells()->find(iaIt->first);
 					if( rit != spells.getAllSpells()->end() ) {
-						bool success = rit->second->getSpellScript()->castSpell(this, this->pos, "");
+						bool success = false; //rit->second->getSpellScript()->castSpell(this, this->pos, "");
 
 						if(success) {
 							ret = true;

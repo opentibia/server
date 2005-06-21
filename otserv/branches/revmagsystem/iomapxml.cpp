@@ -72,11 +72,13 @@ bool IOMapXML::loadMap(Map* map, std::string identifier){
       pz = atoi(tmp);
       
 			tmp = (char*)xmlGetProp(tile, (const xmlChar *) "ground");
+/*
 #ifdef __DEBUG__
 			if(tmp == NULL) {
 				std::cout << "No ground tile! x: " << px << ", y: " << py << " z: " << pz << std::endl;
 			}
 #endif
+*/
 
 			unsigned short ground = 0;
 

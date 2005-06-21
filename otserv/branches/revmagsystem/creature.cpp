@@ -29,26 +29,26 @@ Creature::Creature(const char *name, unsigned long _id) :
 	lookfeet   = 0;
 	lookmaster = 0;
 	looktype   = PLAYER_MALE_1;
-	pzLocked = false;
 
 	lookcorpse = 3128;
 
-  health     = 1000;//150;
-  healthmax  = 1000;//150;
+  health     = 1000;
+  healthmax  = 1000;
   experience = 100000;
-  lastmove=0;
+  lastmove = 0;
 
-	inFightTicks = 0;
-	inFightTicks = 0;
-  manaShieldTicks = 0;
+	exhaustedTicks = 0;
+	manaShieldTicks = 0;
   hasteTicks = 0;
 	paralyzeTicks = 0;
-	exhaustedTicks  = 0;
-	pzLocked = false;
 	immunities = 0;
+
+	lastDamage = 0;
+	lastManaDamage = 0;
 
   attackedCreature = 0;
   speed = 220;
+	addspeed = 0;
 }
 
 Creature::~Creature()
@@ -70,6 +70,65 @@ void Creature::drainHealth(int damage)
 void Creature::drainMana(int damage)
 {
   mana -= min(mana, damage);
+}
+
+void Creature::applyDamage(Creature *attacker, attacktype_t type, int damage)
+{
+	if(damage == 0) {
+		lastManaDamage = 0;
+		lastDamage = 0;
+		return;
+	}
+
+	if((getImmunities() & type) == type) {
+		lastManaDamage = 0;
+		lastDamage = 0;
+		return;
+	}
+
+	if (damage > 0) {
+		if (manaShieldTicks >= 1000 && (damage < mana) ) {
+			lastManaDamage = damage;
+			lastDamage = 0;
+		}
+		else if (manaShieldTicks >= 1000 && (damage > mana) ) {
+			lastManaDamage = mana;
+			lastDamage -= lastManaDamage;
+		}
+		else if((manaShieldTicks < 1000) && (damage > health))
+			lastDamage = health;
+		else if (manaShieldTicks >= 1000 && (damage > (health + mana))){
+			lastDamage = health;
+			lastManaDamage = mana;
+		}
+		else {
+			lastDamage = damage;
+			lastManaDamage = 0;
+		}
+
+		if(manaShieldTicks < 1000)
+			drainHealth(lastDamage);
+		else if(lastManaDamage > 0) {
+			drainHealth(lastDamage);
+			drainMana(lastManaDamage);
+		}
+		else {
+			drainMana(lastDamage);
+		}
+
+		addInflictedDamage(attacker, lastDamage);
+	}
+	else {
+		int newhealth = health - damage;
+		
+		if(newhealth > healthmax)
+			newhealth = healthmax;
+			
+		health = newhealth;
+
+		lastDamage = health - newhealth;
+		lastManaDamage = 0;
+	}
 }
 
 void Creature::setAttackedCreature(unsigned long id)
@@ -102,6 +161,21 @@ void Creature::removeSummon(Creature *creature)
 	}
 }
 
+Item* Creature::getCorpse(Creature *attacker)
+{
+	Item *corpseitem = Item::CreateItem(this->getLookCorpse());
+	corpseitem->pos = this->pos;
+
+	//Add eventual loot
+	Container *container = dynamic_cast<Container*>(corpseitem);
+	if(container) {
+		this->dropLoot(container);
+	}
+
+	return corpseitem;
+}
+
+/*
 void Creature::addCondition(const CreatureCondition& condition, bool refresh)
 {
 	if(condition.getCondition()->attackType == ATTACK_NONE)
@@ -115,6 +189,7 @@ void Creature::addCondition(const CreatureCondition& condition, bool refresh)
 
 	condVec.push_back(condition);
 }
+*/
 
 void Creature::addInflictedDamage(Creature* attacker, int damage)
 {

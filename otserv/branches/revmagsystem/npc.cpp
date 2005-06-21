@@ -81,10 +81,12 @@ Npc::Npc(const char *name, Game* game) :
 		while (p)
 		{
 			const char* str = (char*)p->name;
+			/*
 			if (strcmp(str, "mana") == 0){
 				this->mana = atoi((const char*)xmlGetProp(p, (const xmlChar *)"now"));
 				this->manamax = atoi((const char*)xmlGetProp(p, (const xmlChar *)"max"));
 			}
+			*/
 			if (strcmp(str, "health") == 0){
 				this->health = atoi((const char*)xmlGetProp(p, (const xmlChar *)"now"));
 				this->healthmax = atoi((const char*)xmlGetProp(p, (const xmlChar *)"max"));
@@ -98,15 +100,18 @@ Npc::Npc(const char *name, Game* game) :
 				this->lookfeet = atoi((const char*)xmlGetProp(p, (const xmlChar *)"feet"));
 				this->lookcorpse = atoi((const char*)xmlGetProp(p, (const xmlChar *)"corpse"));
 			}
+			/*
 			if (strcmp(str, "attack") == 0){
 				std::string attacktype = (const char*)xmlGetProp(p, (const xmlChar *)"type");
 				if(attacktype == "melee")
 					this->fighttype = FIGHT_MELEE;
 				this->damage = atoi((const char*)xmlGetProp(p, (const xmlChar *)"damage"));
 			}
+
 			if (strcmp(str, "loot") == 0){
 				//TODO implement loot
 			}
+			*/
 				
 			p = p->next;
 		}

@@ -1,5 +1,4 @@
-
-function onCast(cid, creaturePos, level, maglv, var)
-	n = makeArrows(cid,2544,15);	
-	return n
+function onLoad()
+items = {2544}
+createConjureItemSpell(items, 15, NM_ME_MAGIC_ENERGIE)
 end

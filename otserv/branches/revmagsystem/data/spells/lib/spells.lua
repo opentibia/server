@@ -1,23 +1,3 @@
-function MagicDamageObject(iattackType, ianimationEffect, ihitEffect, idamageEffect, ianimationColor, ioffensive, idrawblood, iminDmg, imaxDmg)
-  local self = {
-  attackType = iattackType,
-  animationEffect = ianimationEffect,
-  hitEffect = ihitEffect,
-  damageEffect = idamageEffect,
-  animationColor = ianimationColor,
-  offensive = ioffensive,
-  drawblood = idrawblood,
-  minDmg = iminDmg,
-  maxDmg = imaxDmg}
-
-  function self:ordered()
-    --print('ordered()')
-    return {self.attackType, self.animationEffect, self.hitEffect, self.damageEffect, self.animationColor, self.offensive, self.drawblood, self.minDmg, self.maxDmg}
-  end
-  
-return self
-end
-
 NM_ME_DRAW_BLOOD = 0
 NM_ME_LOOSE_ENERGY = 1
 NM_ME_PUFF = 2
@@ -57,10 +37,6 @@ NM_ANI_POWERBOLT = 13
 
 -- only for internal use, dont send to client
 NM_ANI_NONE = 0
-
-GREEN	    = 19
-RED       = 180
-DARK_BLUE = 2
 
 ATTACK_NONE      = 0
 ATTACK_ENERGY    = 1

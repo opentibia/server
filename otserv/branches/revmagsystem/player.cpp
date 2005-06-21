@@ -58,7 +58,11 @@ Player::Player(const char *name, Protocol *p) :
   this->name= name;
   food       = 0;
 
-  level      = 1;
+	inFightTicks = 0;
+	//exhaustedTicks  = 0;
+	pzLocked = false;
+
+	level      = 1;
   experience = 180;
 
   maglevel   = 20;
@@ -70,16 +74,18 @@ Player::Player(const char *name, Protocol *p) :
   npings = 0;
   internal_ping = 0;
   fightMode = followMode = 0;
+
   for(int i = 0; i < 7; i++)
   {
-    skills[i][SKILL_LEVEL] = 1;
+		skills[i][SKILL_LEVEL] = 1;
     skills[i][SKILL_TRIES] = 0;
-	skills[i][SKILL_PERCENT] = 0;
-	for(int j=0;j<2;j++){
-		SkillAdvanceCache[i][j].level = 0;
-		SkillAdvanceCache[i][j].voc = 0;
-		SkillAdvanceCache[i][j].tries = 0;
-	}
+		skills[i][SKILL_PERCENT] = 0;
+
+		for(int j=0;j<2;j++){
+			SkillAdvanceCache[i][j].level = 0;
+			SkillAdvanceCache[i][j].voc = 0;
+			SkillAdvanceCache[i][j].tries = 0;
+		}
   }
 
 	lastSentStats.health = 0;
@@ -99,7 +105,6 @@ Player::Player(const char *name, Protocol *p) :
 		items[i] = NULL;
 
   useCount = 0;
-  
   
   CapGain[0]  = 10;     //for level advances
   CapGain[1]  = 10;     //e.g. Sorcerers will get 10 Cap with each level up
@@ -131,6 +136,10 @@ Player::~Player()
 	}
 
   delete client;
+}
+
+bool Player::isPushable() const {
+	return ((client->getSleepTicks() <= 0) && access == 0);
 }
 
 std::string Player::getDescription(bool self) const
@@ -610,9 +619,11 @@ bool Player::substractMoneyContainer(Container *container, unsigned long *money)
 		return false;
 }
 
+/*
 void Player::speak(const std::string &text)
 {
 }
+*/
 
 void Player::sendIcons()
 {
@@ -623,21 +634,26 @@ void Player::sendIcons()
 	if(manaShieldTicks >= 1000){
 		icons |= ICON_MANASHIELD;
 	}
-	if(speed > getNormalSpeed()){
+	if(getSpeed() > getNormalSpeed()){
 		icons |= ICON_HASTE;
 	}
-	if(conditions.hasCondition(ATTACK_FIRE) /*burningTicks >= 1000*/){
+	if(getSpeed() < getNormalSpeed()){
+		icons |= ICON_PARALYZE;
+	}
+	/*
+	if(conditions.hasCondition(ATTACK_FIRE)){
 		icons |= ICON_BURN | ICON_SWORDS;
 	}
-	if(conditions.hasCondition(ATTACK_ENERGY) /*energizedTicks >= 1000*/){
+	if(conditions.hasCondition(ATTACK_ENERGY)){
 		icons |= ICON_ENERGY | ICON_SWORDS;
 	}
-	if(conditions.hasCondition(ATTACK_POISON)/*poisonedTicks >= 1000*/){
+	if(conditions.hasCondition(ATTACK_POISON)){
 		icons |= ICON_POISON | ICON_SWORDS;
 	}
-	if(conditions.hasCondition(ATTACK_PARALYZE) /*speed < getNormalSpeed()*/ /*paralyzeTicks >= 1000*/) {
+	if(conditions.hasCondition(ATTACK_PARALYZE)) {
 		icons |= ICON_PARALYZE | ICON_SWORDS;
 	}
+	*/
 
 	client->sendIcons(icons);             
 }
@@ -969,6 +985,32 @@ int Player::getLookCorpse(){
 		return ITEM_FEMALE_CORPSE;
 }
 
+Item* Player::getCorpse(Creature *attacker)
+{
+	Item *corpseitem = Creature::getCorpse(attacker);
+
+	std::stringstream s;
+	s << "a dead human. You recognize " << getName() << ". ";
+
+	if(attacker) {
+		if(this->sex != 0)
+			s << "He";
+		else
+			s << "She";
+
+		s << " was killed by ";
+		Player *attackerPlayer = dynamic_cast<Player*>(attacker);
+		if(attackerPlayer)
+			s << attacker->getName();
+		else
+			s << "a " << attacker->getName();
+
+		corpseitem->setSpecialDescription(s.str());
+	}
+
+	return corpseitem;
+}
+
 void Player::dropLoot(Container *corpse)
 {
 	for (int slot = 0; slot < 11; slot++)
@@ -1148,12 +1190,13 @@ void Player::sendCancel(const char *msg)
 {
   client->sendCancel(msg);
 }
-void Player::sendChangeSpeed(Creature* creature){
-     client->sendChangeSpeed(creature);
+void Player::sendChangeSpeed(Creature* creature)
+{
+	client->sendChangeSpeed(creature);
 }
 
 void Player::sendToChannel(Creature *creature,SpeakClasses type, const std::string &text, unsigned short channelId){
-     client->sendToChannel(creature, type, text, channelId);
+	client->sendToChannel(creature, type, text, channelId);
 }
 
 void Player::sendCancelAttacking()
@@ -1238,6 +1281,11 @@ void Player::sendCreatureHealth(const Creature *creature){
 
 void Player::sendTextWindow(Item* item,const unsigned short maxlen, const bool canWrite){
 	client->sendTextWindow(item,maxlen,canWrite);
+}
+
+void Player::sendLightLevel(unsigned char lightlevel, unsigned char color)
+{
+	client->sendLightLevel(lightlevel, color);
 }
 
 void Player::sendCloseContainer(unsigned char containerid){
@@ -1328,8 +1376,41 @@ void Player::onThingMove(const Creature *creature, const Position &fromPos, int 
 	client->sendThingMove(creature, fromPos, stackpos, fromItem, oldFromCount, toSlot, toItem, oldToCount, count);
 }
 
+void Player::applyDamage(Creature *attacker, attacktype_t type, int damage)
+{
+	if(access == 0) {
+		//reduce damage here based on type of attack (stone skin, elven amulet)
+
+		int newdamage = damage;
+		if(type == ATTACK_MELEE || ATTACK_PHYSICAL) {
+			//TODO: Decent formulas and such...
+			newdamage = damage;
+			int armorpoint = getArmor();
+			int defensepoint = getDefense();
+			int probability = rand() % 100;
+			
+			if(probability < defensepoint) {
+				newdamage = 0;
+				addSkillShieldTry(1);
+			}
+			else
+			{
+				newdamage -= (int)(newdamage * armorpoint / 100);
+				addSkillShieldTry(2);
+			}
+		}
+		
+		Player* attackerPlayer = dynamic_cast<Player*>(attacker);
+		if(attackerPlayer && newdamage > 0) {
+			newdamage = (int)floor(newdamage / 2.0);
+		}
+
+		Creature::applyDamage(attacker, type, newdamage);
+	}
+}
+
 void Player::setAttackedCreature(unsigned long id){
-     attackedCreature = id;
+	attackedCreature = id;
 }
 
 void Player::onCreatureAppear(const Creature *creature)
@@ -1339,7 +1420,7 @@ void Player::onCreatureAppear(const Creature *creature)
 
 void Player::onCreatureDisappear(const Creature *creature, unsigned char stackPos, bool tele /*= false*/)
 {	
-  	client->sendThingDisappear(creature, stackPos, tele);
+	client->sendThingDisappear(creature, stackPos, tele);
 }
 
 void Player::onThingAppear(const Thing* thing){
@@ -1399,7 +1480,13 @@ void Player::onTeleport(const Creature *creature, const Position *oldPos, unsign
   client->sendThingMove(creature, creature,oldPos, oldstackpos, true, 1, 1); 
 }
 
-void Player::addManaspent(unsigned long spent){
+void Player::useMana(int amount)
+{
+	mana -= amount;
+	addManaSpent(amount);
+}
+
+void Player::addManaSpent(unsigned long spent){
 	this->manaspent += spent;
 	//Magic Level Advance
 	int reqMana = this->getReqMana(this->maglevel+1, this->voc);
@@ -1443,8 +1530,7 @@ unsigned long Player::getIP() const
 
 void Player::die() {
 	
-    client->sendTextMessage(MSG_ADVANCE, "You are dead.");
-    client->sendTextMessage(MSG_EVENT, "Own3d!");
+  client->sendTextMessage(MSG_ADVANCE, "You are dead.");
 		
 	//Magic Level downgrade
 	unsigned long sumMana = 0;
@@ -1457,11 +1543,12 @@ void Player::die() {
                 
 	lostMana = (long)(sumMana * 0.1);   //player loses 10% of all spent mana when he dies
     
-    while(lostMana > manaspent){
+	while(lostMana > manaspent){
 		lostMana -= manaspent;
 		manaspent = getReqMana(maglevel, voc);
 		maglevel--;
 	}
+
 	manaspent -= lostMana;
 	//End Magic Level downgrade
                 
@@ -1493,13 +1580,14 @@ void Player::die() {
 				break;
 			}
 		}
+
 		skills[i][SKILL_TRIES] -= lostSkilltries;
 	}               
 	//End Skill loss
         
 	//Level Downgrade
 	long newLevel = level;
-	while((unsigned long)(experience - getLostExperience()) < getExpForLv(newLevel)) //0.1f is also used in die().. maybe we make a little function for exp-loss?
+	while((unsigned long)(experience - getLostExperience()) < getExpForLv(newLevel))
 	{
 		if(newLevel > 1)
 			newLevel--;
@@ -1525,7 +1613,7 @@ void Player::preSave()
 		pos.y = masterPos.y;
 		pos.z = masterPos.z;
 		
-		experience -= getLostExperience(); //(int)(experience*0.1f);        //0.1f is also used in die().. maybe we make a little function for exp-loss?
+		experience -= getLostExperience();
 				
 		while(experience < getExpForLv(level))
 		{

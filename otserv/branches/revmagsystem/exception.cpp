@@ -155,7 +155,7 @@ EXCEPTION_DISPOSITION
 	MEMORYSTATUS mstate;
 	GlobalMemoryStatus(&mstate);
 	*outdriver << "Memory load: " << mstate.dwMemoryLoad << std::endl <<
-		"Total phys: " << mstate.dwTotalPhys/1024 << " K availble phys: " << 
+		"Total phys: " << mstate.dwTotalPhys/1024 << " K available phys: " << 
 		mstate.dwAvailPhys/1024 << " K" << std::endl;
 	//-process info
 	FILETIME FTcreation,FTexit,FTkernel,FTuser;

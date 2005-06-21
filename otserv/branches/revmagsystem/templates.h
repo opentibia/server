@@ -30,8 +30,6 @@
 #include <hash_map>
 #endif
 
-#include "creature.h"
-
 template<class T> class AutoList
 {
 public:
