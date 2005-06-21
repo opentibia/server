@@ -111,7 +111,7 @@ public:
   bool substractMoneyContainer(Container *container, unsigned long *money);
   
   //for skill advances
-  unsigned int getReqSkilltries (int skill, int level, int voc);
+  unsigned int getReqSkilltries(int skill, int level, int voc);
   
   //for magic level advances
   unsigned int getReqMana(int maglevel, int voc); 
@@ -154,7 +154,9 @@ public:
   void sendTextMessage(MessageClasses mclass, const char* message,const Position &pos, unsigned char type);
   void sendPing();
   void sendTextWindow(Item* item,const unsigned short maxlen, const bool canWrite);
-	void sendLightLevel(unsigned char lightlevel, unsigned char color);
+	void sendWorldLightLevel(unsigned char lightlevel, unsigned char color);
+	void sendPlayerLightLevel(Player* player);
+
   void sendCloseContainer(unsigned char containerid);
   void sendContainer(unsigned char index, Container *container);
   //void sendTextWindow(Item* item,const unsigned short maxlen, const bool canWrite);  
@@ -192,11 +194,14 @@ public:
 	//void onItemRemoveInvnetory(const unsigned char sl_id);
 	//void onItemUpdateInvnetory(const unsigned char sl_id);
 	
+	virtual unsigned char getLightLevel() const {return lightlevel;};
+	virtual setLightLevel(unsigned char light) {lightlevel = light;};
 
 protected:
   int accountNumber;
   std::string password;
   int useCount;
+	unsigned char lightlevel;
 
   bool pzLocked;
   long inFightTicks;

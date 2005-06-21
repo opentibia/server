@@ -120,6 +120,7 @@ protected:
 	friend class MagicAttackSpell;
 	friend class ConjureItemSpell;
 	friend class ChangeSpeedSpell;
+	friend class LightSpell;
 };
 
 class InstantSpell : public Spell
@@ -155,6 +156,7 @@ public:
 
 	static int luaActionCreateConjureItemSpell(lua_State *L);
 	static int luaActionCreateChangeSpeedSpell(lua_State *L);
+	static int luaActionCreateLightSpell(lua_State *L);
 	static int luaActionCreateAreaAttackSpell(lua_State *L);
 
 	//help functions

@@ -33,7 +33,6 @@
 #include "position.h"
 #include "item.h"
 #include "container.h"
-//#include "magic.h"
 #include "map.h"
 
 
@@ -182,11 +181,12 @@ public:
 	std::list<Position> getPathTo(Creature *creature, Position start, Position to, bool creaturesBlock=true);	
 	bool canThrowTo(Position from, Position to, bool creaturesBlock /* = true*/, bool isProjectile = false);
 
-	void Game::creatureAttackCreature(Creature *attacker, Creature *attackedCreature, attacktype_t attackType, amuEffect_t ammunition, int damage);
+	void creatureAttackCreature(Creature *attacker, Creature *attackedCreature, attacktype_t attackType, amuEffect_t ammunition, int damage);
 	void internalCreatureAttackCreature(Creature *attacker, Creature *attackedCreature, attacktype_t attackType, amuEffect_t ammunition, int damage);
 	void internalCreatureAttackedCreature(Creature *attacker, Creature *attackedCreature);
 	void addMagicEffect(const Position &pos, unsigned char type);
 
+	void creatureChangeLight(Player* player, int time, unsigned char lightlevel);
 	void addCondition(Creature *creature, conditiontype_t conditionType, int time, int n);
 	/** Lockvar for Game. */
   OTSYS_THREAD_LOCKVAR gameLock;    

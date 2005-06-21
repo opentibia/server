@@ -217,6 +217,7 @@ public:
   uint64_t lastmove;
 
   unsigned short getSpeed() const {return speed + addspeed;};
+	virtual unsigned char getLightLevel() const{return 0;};
 
   virtual int getStepDuration(int underground) { return (1000 * 120 * (underground / 100)) / getSpeed(); };
   //virtual int getStepDuration(int underground) { return (1000*120*100)/(getSpeed()*underground); };

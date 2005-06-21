@@ -88,16 +88,6 @@ private:
 	void parseUpArrowContainer(NetworkMessage &msg);
 	void parseTextWindow(NetworkMessage &msg);
 
-/*
-	void sendPlayerItemAppear(Action* action);
-	void sendPlayerItemChange(Action* action);
-	void sendPlayerItemDisappear(Action* action);
-	void sendPlayerAppearance(Action* action);
-	void sendPlayerChangeAppearance(Action* action);
-*/
-
-	//void sendPlayerLookAt(std::string);
-
 	// channel tabs
 	void parseGetChannels(NetworkMessage &msg);
 	void parseOpenChannel(NetworkMessage &msg);
@@ -107,7 +97,6 @@ private:
 	virtual void sendChannel(unsigned short channelId);
 	virtual void sendOpenPriv(std::string &receiver);
 	virtual void sendToChannel(const Creature *creature, SpeakClasses type, const std::string &text, unsigned short channelId);
-	//void sendPlayerChangeGround(Action* action);
 
   virtual void sendNetworkMessage(NetworkMessage *msg);
   virtual void sendIcons(int icons);
@@ -175,7 +164,8 @@ private:
 	virtual void sendStats();
 	virtual void sendTextMessage(MessageClasses mclass, const char* message);
 	virtual void sendTextMessage(MessageClasses mclass, const char* message,const Position &pos, unsigned char type);
-	virtual void sendLightLevel(unsigned char lightlevel, unsigned char color);
+	virtual void sendWorldLightLevel(unsigned char lightlevel, unsigned char color);
+	virtual void sendPlayerLightLevel(const Player* player);
 	
   virtual bool CanSee(int x, int y, int z) const;
   virtual void logout();
@@ -214,7 +204,6 @@ private:
   virtual void AddItemContainer(NetworkMessage &msg,unsigned char cid, const Item *item,unsigned char count);
   virtual void TransformItemContainer(NetworkMessage &msg,unsigned char cid,unsigned char slot, const Item *item);
   virtual void RemoveItemContainer(NetworkMessage &msg,unsigned char cid,unsigned char slot);
-	
   
   OTSYS_THREAD_LOCKVAR bufferLock;
   unsigned long windowTextID;

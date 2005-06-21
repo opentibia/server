@@ -396,7 +396,7 @@ int SpellScript::registerFunctions()
 	lua_register(luaState, "createConjureItemSpell", SpellScript::luaActionCreateConjureItemSpell);
 	lua_register(luaState, "createAreaAttackSpell", SpellScript::luaActionCreateAreaAttackSpell);
 	lua_register(luaState, "createChangeSpeedSpell", SpellScript::luaActionCreateChangeSpeedSpell);
-
+	lua_register(luaState, "createLightSpell", SpellScript::luaActionCreateLightSpell);
 	
 	//getPlayerLevel(uid)
 	lua_register(luaState, "getPlayerLevel", SpellScript::luaActionGetPlayerLevel);
@@ -539,6 +539,23 @@ int SpellScript::luaActionCreateChangeSpeedSpell(lua_State *L)
 	spell->magicspell = new ChangeSpeedSpell(spell, time, newspeed, magicEffect);
 	return 1;
 }
+
+int SpellScript::luaActionCreateLightSpell(lua_State *L)
+{
+	unsigned char magicEffect = (int)lua_tonumber(L, -1);
+	lua_pop(L, 1);
+
+	unsigned char lightlevel = (int)lua_tonumber(L, -1);
+	lua_pop(L, 1);
+
+	int time = (int)lua_tonumber(L, -1);
+	lua_pop(L, 1);
+
+	Spell* spell = getSpell(L);
+	spell->magicspell = new LightSpell(spell, time, lightlevel, magicEffect);
+	return 1;
+}
+
 
 int SpellScript::luaActionCreateAreaAttackSpell(lua_State *L)
 {

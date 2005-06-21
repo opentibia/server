@@ -85,6 +85,23 @@ bool ChangeSpeedSpell::doCastSpell(Creature* spellCastCreature, const Position& 
 
 	return true;
 }
+//---------------------------------------------------------------
+LightSpell::LightSpell(Spell *ispell, int itime, unsigned char ilightlevel, unsigned char imagicEffect) :
+ MagicSpell(ispell), time(itime), lightlevel(ilightlevel), magicEffect(imagicEffect)
+{
+	//
+}
+
+bool LightSpell::doCastSpell(Creature* spellCastCreature, const Position& pos, const std::string& var) const
+{
+	Player* spellCastPlayer = dynamic_cast<Player*>(spellCastCreature);
+	if(spellCastPlayer) {
+		spell->game->creatureChangeLight(spellCastPlayer, time, lightlevel);
+		return 1;
+	}
+
+	return 0;
+}
 
 //---------------------------------------------------------------
 MagicAttackSpell::MagicAttackSpell(Spell *ispell, attacktype_t iattackType, unsigned char idistanceEffect,

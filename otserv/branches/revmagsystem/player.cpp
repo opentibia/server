@@ -66,6 +66,7 @@ Player::Player(const char *name, Protocol *p) :
   experience = 180;
 
   maglevel   = 20;
+	lightlevel = 0;
 
   access     = 0;
   lastlogin  = 0;
@@ -1283,9 +1284,14 @@ void Player::sendTextWindow(Item* item,const unsigned short maxlen, const bool c
 	client->sendTextWindow(item,maxlen,canWrite);
 }
 
-void Player::sendLightLevel(unsigned char lightlevel, unsigned char color)
+void Player::sendWorldLightLevel(unsigned char lightlevel, unsigned char color)
 {
-	client->sendLightLevel(lightlevel, color);
+	client->sendWorldLightLevel(lightlevel, color);
+}
+
+void Player::sendPlayerLightLevel(Player* player)
+{
+	client->sendPlayerLightLevel(player);
 }
 
 void Player::sendCloseContainer(unsigned char containerid){

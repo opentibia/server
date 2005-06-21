@@ -99,6 +99,23 @@ protected:
 	unsigned char magicEffect;
 };
 
+class LightSpell : public MagicSpell {
+public:
+	LightSpell(Spell *ispell, int itime, unsigned char ilightlevel, unsigned char imagicEffect);
+	virtual ~LightSpell() {};
+	virtual bool doCastSpell(Creature* spellCastCreature, const Position& pos, const std::string& var) const;
+	//virtual bool doCastSpell(Creature* spellCastCreature, Creature* targetCreature, const std::string& var) const = 0;
+	virtual bool causeExhaustion() {return true;};
+
+protected:
+	virtual void setArea(const AreaVector& vec) {};
+	virtual void getArea(const Position& centerpos, std::vector<Position>& vec, unsigned char direction) const {};
+
+	int time;
+	unsigned char lightlevel;
+	unsigned char magicEffect;
+};
+
 class MagicAttackSpell : public MagicSpell {
 public:
 	MagicAttackSpell(Spell *ispell, attacktype_t iattackType, unsigned char idistanceEffect,

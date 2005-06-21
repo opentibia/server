@@ -96,7 +96,8 @@ public:
   virtual void sendSkills() = 0;
   virtual void sendPing() = 0;
   virtual void sendTextWindow(Item* item,const unsigned short maxlen, const bool canWrite) = 0;
-	virtual void sendLightLevel(unsigned char lightlevel, unsigned char color) = 0;
+	virtual void sendWorldLightLevel(unsigned char lightlevel, unsigned char color) = 0;
+	virtual void sendPlayerLightLevel(const Player* player) = 0;
   virtual void sendContainer(unsigned char index, Container *container) = 0;
   virtual void sendCloseContainer(unsigned char containerid) = 0;
   //virtual void sendCreatureDisappear(const Creature *creature, unsigned char stackPos) = 0;

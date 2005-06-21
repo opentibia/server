@@ -2006,7 +2006,7 @@ void Game::checkCreature(unsigned long id)
 				return;
 			}
 			
-			player->sendLightLevel(lightlevel, 0xD7);
+			player->sendWorldLightLevel(lightlevel, 0xD7);
 
 			if(!tile->isPz()){
 				if(player->food > 1000){
@@ -2122,6 +2122,26 @@ void Game::addCondition(Creature *creature, conditiontype_t conditionType, int t
 			creature->hasteTicks = time;
 			//changeSpeed(creature->getID(),
 			*/
+		}
+	}
+}
+
+void Game::creatureChangeLight(Player* player, int time, unsigned char lightlevel)
+{
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
+	if(player->getLightLevel() > lightlevel) {
+		return;
+	}
+
+	player->setLightLevel(lightlevel);
+
+	std::vector<Creature*> list;
+  getSpectators(Range(player->pos), list);   
+	
+	for(unsigned int i = 0; i < list.size(); i++) {
+		Player* spectator = dynamic_cast<Player*>(list[i]);
+		if(spectator) {
+			 spectator->sendPlayerLightLevel(player);
 		}
 	}
 }

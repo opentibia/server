@@ -9,5 +9,7 @@
 <spell name="Create Food" words="exevo pan" maglv="0" mana="30" enabled="1">
 <vocation id="0" /><vocation id="1" /><vocation id="2" /><vocation id="3" />
 </spell>
-
+<spell name="Light" words="utevo lux" maglv="0" mana="20" enabled="1">
+<vocation id="0" /><vocation id="1" /><vocation id="2" /><vocation id="3" />
+</spell>
 </spells>

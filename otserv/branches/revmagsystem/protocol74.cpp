@@ -2120,16 +2120,27 @@ void Protocol74::sendTextWindow(Item* item,const unsigned short maxlen, const bo
 	WriteBuffer(msg);
 }
 
-void Protocol74::sendLightLevel(unsigned char lightlevel, unsigned char color)
+void Protocol74::sendWorldLightLevel(unsigned char lightlevel, unsigned char color)
 { 
 	NetworkMessage msg; 
 	msg.AddByte(0x82);
 	msg.AddByte(lightlevel);		 // 6F - Light level
 	msg.AddByte(color /*0xA7*/); // D7 - Light color
-	msg.WriteToSocket(s);    
 
 	WriteBuffer(msg);
 }
+
+void Protocol74::sendPlayerLightLevel(const Player* player)
+{
+	NetworkMessage msg;
+	msg.AddByte(0x8D);
+	msg.AddU32(player->getID());
+	msg.AddByte(player->getLightLevel());	//Light amount
+	msg.AddByte(215);											//color
+
+	WriteBuffer(msg);
+}
+
 
 ////////////// Add common messages
 void Protocol74::AddTextMessage(NetworkMessage &msg,MessageClasses mclass, const char* message)
