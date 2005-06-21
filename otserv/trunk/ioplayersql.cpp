@@ -59,7 +59,7 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 	mysqlpp::Result res;
 	try{
 		mysqlpp::Query query = con.query();
-		query << "SELECT * FROM players WHERE name ='" << name << "'";
+		query << "SELECT * FROM players WHERE name ='" << mysqlpp::escape << name << "'";
 #ifdef __DEBUG__
 		std::cout << query.preview() << std::endl;
 #endif		
@@ -132,7 +132,7 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 	//there is no "fuck" in the sources, but every major programm got
 	//one and i think here is a good place to add one
 
-	std::cout << "sql loading: " << player->pos << std::endl;
+	//std::cout << "sql loading: " << player->pos << std::endl;
 
 	//MASTERSPAWN
 	std::string masterpos = std::string(row.lookup_by_name("masterpos"));
@@ -149,7 +149,7 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 
 	try{
 		mysqlpp::Query query = con.query();
-		query << "SELECT * FROM skills WHERE player ='" << player->getGUID() << "'";
+		query << "SELECT * FROM skills WHERE player =" << player->getGUID();
 #ifdef __DEBUG__
 		std::cout << query.preview() << std::endl;
 #endif		
@@ -172,7 +172,7 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 	//load the items
 	try{
 		mysqlpp::Query query = con.query();
-		query << "SELECT * FROM items WHERE player ='" << player->getGUID() << "'" << " ORDER BY sid ASC";
+		query << "SELECT * FROM items WHERE player =" << player->getGUID() << " ORDER BY sid ASC";
 #ifdef __DEBUG__
 		std::cout << query.preview() << std::endl;
 #endif
@@ -240,7 +240,7 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 	//load storage map
 	try{
 		mysqlpp::Query query = con.query();
-		query << "SELECT * FROM playerstorage WHERE player ='" << player->getGUID() << "'";
+		query << "SELECT * FROM playerstorage WHERE player =" << player->getGUID();
 #ifdef __DEBUG__
 		std::cout << query.preview() << std::endl;
 #endif
@@ -272,10 +272,22 @@ bool IOPlayerSQL::savePlayer(Player* player){
 
 	mysqlpp::Connection con;
 	con.connect(db.c_str(), host.c_str(), user.c_str(), pass.c_str()); 
-	mysqlpp::Result res;
+	//mysqlpp::Result res;
 
-	//Start the transaction
 	mysqlpp::Query query = con.query();
+	//check if the player have to be saved or not
+	query << "SELECT save FROM players WHERE `id` = " << player->getGUID();
+#ifdef __DEBUG__
+	std::cout << query.preview() << std::endl;
+#endif
+	mysqlpp::Result res = query.store();
+	mysqlpp::Row row = *(res.begin());
+	int save = row.lookup_by_name("save");
+	if(save != 1)
+		return true;
+
+	//Start the transaction	
+	query.reset();
 	query << "BEGIN;";
 	query.execute();
 
@@ -411,7 +423,7 @@ std::string IOPlayerSQL::getItems(Item* i, int &startid, int slot, int player,in
 	++startid;
 	std::stringstream ss;
 	ss << "(" << player <<"," << slot << ","<< startid <<","<< parentid <<"," << i->getID()<<","<< (int)i->getItemCountOrSubtype() << "," << 
-	(int)i->getActionId()<<",'"<< i->getText() <<"','" << i->getSpecialDescription() <<"'),";
+	(int)i->getActionId()<<",'"<< mysqlpp::escape << i->getText() <<"','" << mysqlpp::escape << i->getSpecialDescription() <<"'),";
 	//std::cout << "i";
 	if(Container* c = dynamic_cast<Container*>(i)){
 		//std::cout << "c";	
