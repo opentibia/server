@@ -22,14 +22,12 @@
 #ifndef __creature_h
 #define __creature_h
 
-
+#include "tools.h"
+#include "const74.h"
 #include "thing.h"
-#include "position.h"
-#include "container.h"
-#include "magic.h"
-#include <vector>
-
 #include "templates.h"
+#include <vector>
+#include <map>
 
 enum slots_t {
 	SLOT_WHEREEVER=0,
@@ -50,6 +48,40 @@ enum fight_t {
 	FIGHT_MELEE,
 	FIGHT_DIST,
 	FIGHT_MAGICDIST
+};
+
+enum conditiontype_t {
+	CONDITION_POISONED,
+	CONDITION_BURNING,
+	CONDITION_ELECTRIFIED,
+	CONDITION_DRUNK,
+	CONDITION_SLOWED,
+	CONDITION_HASTE,
+	CONDITION_MAGICSHIELD
+};
+
+enum attacktype_t {
+	ATTACK_NONE = 0,
+	ATTACK_ENERGY = 1,
+	ATTACK_BURST = 2,
+	ATTACK_FIRE = 8,
+	ATTACK_PHYSICAL = 16,
+	ATTACK_POISON = 32,
+	ATTACK_PARALYZE = 64,
+	ATTACK_DRUNKNESS = 128,
+	ATTACK_MELEE = 256
+};
+
+enum race_t {
+	RACE_VENOM,
+	RACE_BLOOD,
+	RACE_UNDEAD
+};
+
+struct amuEffect_t {
+	unsigned char hitEffect;
+	unsigned char damageEffect;
+	unsigned char areaEffect;
 };
 
 // Macros
@@ -77,15 +109,14 @@ enum playerLooks
 	PLAYER_FEMALE_7=0x8E,
 };
 
-
 class Map;
-
 class Item;
-
-class Thing;
+class Container;
 class Player;
 class Monster;
 
+//std::map<condition_t, 
+/*
 class Conditions : public std::map<attacktype_t, ConditionVec>
 {
 public:
@@ -99,7 +130,7 @@ public:
 		return false;
 	}
 };
-
+*/
 
 //////////////////////////////////////////////////////////////////////
 // Defines the Base class for all creatures and base functions which 
@@ -113,7 +144,6 @@ public:
 
   virtual const std::string& getName() const {return name; };
 
-  //void setID(int id){this->id=id;}
   unsigned long getID() const { return listid; }
   unsigned long getExpForLv(const int& lv) const { 
 		return (int)((50*lv*lv*lv)/3 - 100 * lv * lv + (850*lv) / 3 - 200);
@@ -123,7 +153,20 @@ public:
 
   virtual fight_t getFightType(){return FIGHT_MELEE;};
 	virtual subfight_t getSubFightType() {return DIST_NONE;}
+
 	virtual void RemoveDistItem(){return;}
+
+	virtual bool isImmune(attacktype_t attackType)
+	{
+		if(access != 0)
+			return true;
+
+		if(attackType == ATTACK_NONE)
+			return false;
+
+		return !((getImmunities() & attackType) == attackType);
+	}
+
 	virtual int getImmunities() const
 	{
 		if(access != 0) 
@@ -132,8 +175,10 @@ public:
 		else
 			return immunities;
 	};
-  virtual void drainHealth(int);
-  virtual void drainMana(int);
+
+	virtual void applyDamage(Creature *attacker, attacktype_t type, int damage);
+	virtual race_t getCreatureType() {return RACE_BLOOD;}
+
   virtual void die(){};
   virtual std::string getDescription(bool self = false) const;
   virtual void setAttackedCreature(unsigned long id);
@@ -144,36 +189,25 @@ public:
 	virtual void addSummon(Creature *creature);
 	virtual void removeSummon(Creature *creature);
 
-	virtual int getWeaponDamage() const {
-	return 1+(int)(10.0*rand()/(RAND_MAX+1.0));
-  }
-  virtual int getArmor() const {
-  	return 0;
-  }
-  virtual int getDefense() const {
-  	return 0;
-  }
+	virtual int getWeaponDamage() const {return 1+(int)(10.0*rand()/(RAND_MAX+1.0));}
+  virtual int getArmor() const {return 0;}
+  virtual int getDefense() const {return 0;}
 
   unsigned long attackedCreature;
 
   virtual bool isAttackable() const { return true; };
 	virtual bool isPushable() const {return true;}
-	virtual void dropLoot(Container *corpse) {return;};
+	virtual Item* getCorpse(Creature *attacker);
 	virtual int getLookCorpse() {return lookcorpse;};
 
-//  virtual int sendInventory(){return 0;};
   virtual int addItemInventory(Item* item, int pos){return 0;};
   virtual Item* getItem(int pos){return NULL;}
   virtual Direction getDirection(){return direction;}
-	void addCondition(const CreatureCondition& condition, bool refresh);
-	Conditions& getConditions() {return conditions;};
 	
   int lookhead, lookbody, looklegs, lookfeet, looktype, lookcorpse, lookmaster;
-  int mana, manamax, manaspent;
-  bool pzLocked;
   
-  long inFightTicks, exhaustedTicks;
 	long manaShieldTicks, hasteTicks, paralyzeTicks;
+	int lastDamage, lastManaDamage;
 	int immunities;
 
   unsigned long experience;
@@ -182,42 +216,39 @@ public:
   int health, healthmax;
   uint64_t lastmove;
 
-  unsigned short getSpeed() const {            
-		return speed;
-	};
+  unsigned short getSpeed() const {return speed + addspeed;};
 
   virtual int getStepDuration(int underground) { return (1000 * 120 * (underground / 100)) / getSpeed(); };
   //virtual int getStepDuration(int underground) { return (1000*120*100)/(getSpeed()*underground); };
   void setNormalSpeed()
   {
-		if(access!=0){
-			speed = 900;     
-			return;    
+		if(access != 0){
+			speed = 900;
+			return;
 		}
 		
-		speed = 220 + (2* (level - 1)); 
+		speed = 220 + (2* (level - 1));
   }
   
 	int getNormalSpeed()
   {
-		if(access!=0){     
+		if(access!=0) {
 			return 900;    
 		}
-		return 220 + (2* (level - 1)); 
+
+		return 220 + (2* (level - 1));
   }
 
   int access;		//access level
   int maglevel;	// magic level
   int level;		// level
   int speed;
-
-  Direction direction;
+	int addspeed;
 
   virtual bool canMovedTo(const Tile *tile) const;
 
   virtual void sendCancel(const char *msg) { };
   virtual void sendCancelWalk(const char *msg) { };
-
 
 	virtual void addInflictedDamage(Creature* attacker, int damage);
 	virtual int getGainedExperience(Creature* attacker);
@@ -227,16 +258,30 @@ public:
 	virtual int getTotalInflictedDamage();
 	virtual int getInflicatedDamage(unsigned long id);
 
+	bool isExhausted() {return exhaustedTicks >= 1000;}
+	void addExhaustion(long ticks) {exhaustedTicks += ticks;}
+
+	int getMana() {return mana;}
+
 protected:
+  std::string name;
+  Direction direction;
+
+  int mana, manamax, manaspent;
+	long exhaustedTicks;
+
 	Creature *master;
 	std::vector<Creature*> summons;
 
-	Conditions conditions;
+	//Conditions conditions;
 	typedef std::vector< std::pair<uint64_t, long> > DamageList;
 	typedef std::map<long, DamageList > TotalDamageList;
 	TotalDamageList totaldamagelist;
 
-protected:
+  virtual void drainHealth(int);
+  virtual void drainMana(int);
+	virtual void dropLoot(Container *corpse) {return;};
+
 	virtual int onThink(int& newThinkTicks){newThinkTicks = 300; return 300;};
   virtual void onThingMove(const Creature *player, const Thing *thing, const Position *oldPos,
 		unsigned char oldstackpos, unsigned char oldcount, unsigned char count) { };
@@ -288,11 +333,10 @@ protected:
 
   friend class Game;
   friend class Map;
-	//friend class MapState;
 	friend class GameState;
 
-//  Direction direction; // moved to public
-  std::string name;
+	//Direction direction;
+  //std::string name;
 };
 
 

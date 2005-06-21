@@ -65,15 +65,14 @@ public:
 	void setGUID(unsigned long _guid) {guid = _guid;};
 	unsigned long getGUID() const { return guid;};
 
+	const int getAccountNumber() {return accountNumber;};
+	const std::string& getPassword() {return password;};
+
 	static const unsigned long min_id = 16777217U;
 	static const unsigned long max_id = 4294967295U;
 
-  void speak(const std::string &text);	
 	bool addItem(Item* item);
 	bool internalAddItemContainer(Container *container,Item* item);
-	//bool removeItem(unsigned short id,unsigned short count);
-	//bool removeItem(Item* item);
-	//int getItemCount(unsigned short id);
 
 	int removeItemInventory(int pos, bool internal = false);
 	int addItemInventory(Item* item, int pos, bool internal = false);
@@ -86,47 +85,30 @@ public:
 	void addContainer(unsigned char containerid, Container *container);
 	void closeContainer(unsigned char containerid);
 
+	virtual Item* Player::getCorpse(Creature *attacker);
+
 	void addStorageValue(const unsigned long key, const long value);
 	bool getStorageValue(const unsigned long key, long &value) const;
 	inline StorageMap::const_iterator getStorageIteratorBegin() const {return storageMap.begin();}
 	inline StorageMap::const_iterator getStorageIteratorEnd() const {return storageMap.end();}
 
+	Direction getDirection() {return direction;};
 	Item* getItem(int pos) const;
 	Item* GetDistWeapon() const;
 	
 	std::string getName(){return name;};
 	
-  int sex, voc;
-  int cap;
-  int food;
-  void addManaspent(unsigned long spent);
+	void useMana(int amount);
   void addExp(unsigned long exp);
-  unsigned char level_percent;
-  unsigned char maglevel_percent;
-  bool cancelMove;
-  bool SendBuffer;
-  long internal_ping;
-  long npings;
+
   virtual int getWeaponDamage() const;
   virtual int getArmor() const;
   virtual int getDefense() const;
+
   unsigned long getMoney();
   unsigned long getMoneyContainer(Container *container);
   bool substractMoney(unsigned long money);
   bool substractMoneyContainer(Container *container, unsigned long *money);
-  char fightMode, followMode;
-  int accountNumber;
-  time_t lastlogin;
-  
-  std::string password;
-
-  Item* items[11]; //equipement of the player
-  unsigned int skills[7][3];
-  
-  //reminder: 0 = None, 1 = Sorcerer, 2 = Druid, 3 = Paladin, 4 = Knight
-  unsigned short CapGain[5];          //for level advances
-  unsigned short ManaGain[5];
-  unsigned short HPGain[5];
   
   //for skill advances
   unsigned int getReqSkilltries (int skill, int level, int voc);
@@ -134,8 +116,6 @@ public:
   //for magic level advances
   unsigned int getReqMana(int maglevel, int voc); 
   	
-	//items
-	containerLayout vcontainers;
   void preSave();
     virtual void useThing() {
 		//std::cout << "Player: useThing() " << this << std::endl;
@@ -152,7 +132,7 @@ public:
 	unsigned long getIP() const;
 	Container* getDepot(unsigned long depotId);
 	bool addDepot(Container* depot,unsigned long depotIs);
-	//depots	
+	//depots
 	DepotMap depots;
 
 	void RemoveDistItem();
@@ -173,13 +153,16 @@ public:
   void sendTextMessage(MessageClasses mclass, const char* message);
   void sendTextMessage(MessageClasses mclass, const char* message,const Position &pos, unsigned char type);
   void sendPing();
+  void sendTextWindow(Item* item,const unsigned short maxlen, const bool canWrite);
+	void sendLightLevel(unsigned char lightlevel, unsigned char color);
   void sendCloseContainer(unsigned char containerid);
   void sendContainer(unsigned char index, Container *container);
-  void sendTextWindow(Item* item,const unsigned short maxlen, const bool canWrite);  
+  //void sendTextWindow(Item* item,const unsigned short maxlen, const bool canWrite);  
   void sendDistanceShoot(const Position &from, const Position &to, unsigned char type);
   void sendMagicEffect(const Position &pos, unsigned char type);
   void sendAnimatedText(const Position &pos, unsigned char color, std::string text);
   void sendCreatureHealth(const Creature *creature);
+
   void receivePing();
   void flushMsg();
 
@@ -187,12 +170,14 @@ public:
   void addSkillShieldTry(int skilltry);
   void die();      //player loses exp/skills/maglevel on death
 
-  virtual void setAttackedCreature(unsigned long id);
+ 	virtual void applyDamage(Creature *attacker, attacktype_t type, int realdamage);
+
+	virtual void setAttackedCreature(unsigned long id);
   virtual bool isAttackable() const { return (access == 0); };
-  virtual bool isPushable() const { return (access == 0); };
-	virtual void dropLoot(Container *corpse);
+  virtual bool isPushable() const;
 	virtual int getLookCorpse();
-	bool NeedUpdateStats();	
+	bool NeedUpdateStats();
+
 	//ground	
 	void onThingAppear(const Thing* thing);  
 	void onThingTransform(const Thing* thing,int stackpos);
@@ -202,24 +187,56 @@ public:
 	void onItemAddContainer(const Container* container,const Item* item);
 	void onItemRemoveContainer(const Container* container,const unsigned char slot);
 	void onItemUpdateContainer(const Container* container,const Item* item,const unsigned char slot);
-	//invnetory - for this use int sendInventory(unsigned char sl_id)
+	//inventory - for this use int sendInventory(unsigned char sl_id)
 	//void onItemAddInvnetory(const unsigned char sl_id);
 	//void onItemRemoveInvnetory(const unsigned char sl_id);
 	//void onItemUpdateInvnetory(const unsigned char sl_id);
 	
 
 protected:
+  int accountNumber;
+  std::string password;
   int useCount;
 
-  virtual void onCreatureAppear(const Creature *creature);
+  bool pzLocked;
+  long inFightTicks;
+
+	//items
+	containerLayout vcontainers;
+
+	//inventory
+  Item* items[11]; //equipement of the player
+  unsigned int skills[7][3];
+  
+  //reminder: 0 = None, 1 = Sorcerer, 2 = Druid, 3 = Paladin, 4 = Knight
+  unsigned short CapGain[5];          //for level advances
+  unsigned short ManaGain[5];
+  unsigned short HPGain[5];
+
+  int sex, voc;
+  int cap;
+  int food;
+
+  char fightMode, followMode;
+
+  unsigned char level_percent;
+  unsigned char maglevel_percent;
+  bool cancelMove;
+  bool SendBuffer;
+  long internal_ping;
+  long npings;
+  time_t lastlogin;
+
+  void addManaSpent(unsigned long spent);
+
+	virtual void onCreatureAppear(const Creature *creature);
   virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos, bool tele);
   virtual void onCreatureTurn(const Creature *creature, unsigned char stackpos);
   virtual void onCreatureSay(const Creature *creature, SpeakClasses type, const std::string &text);
   virtual void onCreatureChangeOutfit(const Creature* creature);
   virtual void onTeleport(const Creature *creature, const Position *oldPos, unsigned char oldstackpos); 
   virtual int onThink(int& newThinkTicks);
-  //virtual void onPlace();
-  //virtual void onRemove();
+	virtual void dropLoot(Container *corpse);
   virtual std::string getDescription(bool self = false) const;
 	virtual void onTileUpdated(const Position &pos);
 
@@ -266,14 +283,22 @@ protected:
   friend class Game;
   friend class ActionScript;
   friend class Map;
+	friend class MovePlayer;
+	friend class StopMovePlayer;
+	friend class Protocol74;
+
+	friend class IOPlayerSQL;
+	friend class IOPlayerXML;
 
 	Protocol *client;
+
 	//cache some data
 	struct SkillCache{
 		unsigned int tries;
 		int level;
 		int voc;
 	};
+
 	SkillCache SkillAdvanceCache[7][2];
 	struct SentStats{
 		int health;
@@ -286,6 +311,7 @@ protected:
 		int manaspent;
 		int maglevel;
 	};
+
 	SentStats lastSentStats;
 	// we need our name
 	std::string name;	

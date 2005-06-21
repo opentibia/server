@@ -95,8 +95,6 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 	playerExceptionHandler.InstallHandler();
 #endif
 
-  srand((unsigned)time(NULL));
-
   SOCKET s = *(SOCKET*)dat;
     
   NetworkMessage msg;
@@ -178,12 +176,12 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
       msg.GetU32();
       std::string name     = msg.GetString();
       std::string password = msg.GetString();
-            if(version < 740){
-                msg.Reset();
+			if(version < 740){
+				msg.Reset();
 				msg.AddByte(0x14);
 				msg.AddString("Only clients with protocol 7.4 allowed!");
 				msg.WriteToSocket(s);
-            }      
+			}
 			else if(isclientBanished(s)) {
 				msg.Reset();
 				msg.AddByte(0x14);
@@ -198,7 +196,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 				player->useThing();
 				IOPlayer::instance()->loadPlayer(player, name);	
 
-				if (player->password == password)
+				if (player->getPassword() == password)
 				{					
 					if(playerexist && ! g_config.getGlobalNumber("allowclones", 0)){
 						std::cout << "reject player..." << std::endl;
@@ -216,7 +214,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 					} else {
 						Status* stat = Status::instance();
 						stat->addPlayer();
-						player->lastlogin = std::time(NULL);
+						//player->lastlogin = std::time(NULL);
 						s = 0;            // protocol/player will close socket
 						protocol->ReceiveLoop();
 						stat->removePlayer();
@@ -271,6 +269,8 @@ int main(int argc, char *argv[])
   std::cout << ":: OTServ Development-Version 0.4.0 - CVS Preview" << std::endl;
   std::cout << ":: ====================" << std::endl;
   std::cout << "::" << std::endl;
+	
+	std::srand ( time(NULL) );
 
   // ignore sigpipe...
 #if defined __WINDOWS__ || defined WIN32	
