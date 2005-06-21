@@ -47,6 +47,8 @@ s_defcommands Commands::defined_commands[] = {
 	{"/q",&Commands::substract_contMoney},
 	{"/reload",&Commands::reloadInfo},
 	{"/z",&Commands::testCommand},
+	{"/goto",&Commands::teleportTo},
+	{"/info",&Commands::getInfo},
 };
 
 
@@ -400,6 +402,44 @@ bool Commands::testCommand(Creature* c, const std::string &cmd, const std::strin
 	int color = atoi(param.c_str());
 	Player *player = dynamic_cast<Player*>(c);
 	if(player) {
-		player->sendMagicEffect(player->pos, color);					
+		player->sendMagicEffect(player->pos, color);
 	}
+}
+
+bool Commands::teleportTo(Creature* c, const std::string &cmd, const std::string &param){
+	Creature* creature = game->getCreatureByName(param.c_str());
+	if(creature) {
+		game->teleport(c, creature->pos);
+	}
+	return true;	
+}
+
+bool Commands::getInfo(Creature* c, const std::string &cmd, const std::string &param){
+	Creature* creature = game->getCreatureByName(param.c_str());
+	Player *player = dynamic_cast<Player*>(c);
+	if(!player)
+		return true;
+	
+	if(creature && dynamic_cast<Player*>(creature)) {
+		std::stringstream info;
+		Player* p = dynamic_cast<Player*>(creature);
+		char ip[4];
+		if(p->access >= player->access && player != p){
+			player->sendTextMessage(MSG_BLUE_TEXT,"You can not get info about this player.");
+			return true;
+		}
+		*(unsigned long*)&ip = p->getIP();
+		info << "name:   " << p->getName() << std::endl <<
+		        "access: " << p->access << std::endl <<
+		        "level:  " << p->level << std::endl <<
+		        "maglvl: " << p->maglevel << std::endl <<
+		        "speed:  " <<  p->speed <<std::endl <<
+		        "position " << p->pos << std::endl << 
+				"ip: " << (int)ip[0] << "." << (int)ip[1] << "." << (int)ip[2] << "." << (int)ip[3];
+		player->sendTextMessage(MSG_BLUE_TEXT,info.str().c_str());
+	}
+	else{
+		player->sendTextMessage(MSG_BLUE_TEXT,"Player not found.");
+	}
+	return true;
 }

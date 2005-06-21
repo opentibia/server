@@ -54,10 +54,12 @@ protected:
 	bool banPlayer(Creature* c, const std::string &cmd, const std::string &param);
 	bool teleportMasterPos(Creature* c, const std::string &cmd, const std::string &param);
 	bool teleportHere(Creature* c, const std::string &cmd, const std::string &param);
+	bool teleportTo(Creature* c, const std::string &cmd, const std::string &param);
 	bool createItems(Creature* c, const std::string &cmd, const std::string &param);
 	bool substract_contMoney(Creature* c, const std::string &cmd, const std::string &param);
 	bool reloadInfo(Creature* c, const std::string &cmd, const std::string &param);
 	bool testCommand(Creature* c, const std::string &cmd, const std::string &param);
+	bool getInfo(Creature* c, const std::string &cmd, const std::string &param);
 	
 	//table of commands
 	static s_defcommands defined_commands[];
