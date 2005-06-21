@@ -56,9 +56,9 @@ CREATE TABLE `items` (
   `pid` int(11) NOT NULL default '0',
   `type` int(11) NOT NULL default '0',
   `number` tinyint(4) NOT NULL default '0',
-  `actionid` int(6) NOT NULL default '0',
-  `text` text NOT NULL,
-  `specialdesc` text NOT NULL,
+  `actionid` int(5) NOT NULL default '0',
+  `text` text NOT NULL default '',
+  `specialdesc` text NOT NULL default '',
   KEY `player` (`player`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -106,6 +106,7 @@ CREATE TABLE `players` (
   `food` int(11) NOT NULL default '0',
   `sex` int(11) NOT NULL default '0',
   `lastlogin` int(11) unsigned NOT NULL default '0',
+  `save` int(11) unsigned NOT NULL default '1',
   UNIQUE KEY `id` (`id`),
   KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -117,7 +118,7 @@ CREATE TABLE `players` (
 
 /*!40000 ALTER TABLE `players` DISABLE KEYS */;
 LOCK TABLES `players` WRITE;
-INSERT INTO `players` VALUES (1,'Hurz',1,1,18,1,675,840,840,2,76000,20,30,40,50,128,20,640,640,21700,'20;20;7','29;30;7',900,300,129,1,0);
+INSERT INTO `players` VALUES (1,'Hurz',1,1,18,1,675,840,840,2,76000,20,30,40,50,128,20,640,640,21700,'20;20;7','29;30;7',900,300,129,1,0,1);
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `players` ENABLE KEYS */;
 
@@ -152,8 +153,8 @@ DROP TABLE IF EXISTS `skills`;
 CREATE TABLE `skills` (
   `player` int(11) NOT NULL default '0',
   `id` tinyint(4) NOT NULL default '0',
-  `skill` int(11) NOT NULL default '0',
-  `tries` int(11) NOT NULL default '0',
+  `skill` int(11) unsigned NOT NULL default '0',
+  `tries` int(11) unsigned NOT NULL default '0',
   KEY `player` (`player`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
