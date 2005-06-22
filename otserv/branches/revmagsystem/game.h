@@ -151,6 +151,9 @@ public:
 	bool playerUseItemEx(Player *player, const Position& posFrom,const unsigned char  stack_from,
 		const Position &posTo,const unsigned char stack_to, const unsigned short itemid);
 	bool playerUseItem(Player *player, const Position& pos, const unsigned char stackpos, const unsigned short itemid, const unsigned char index);
+	void playerUseBattleWindow(Player *player, Position &posFrom, unsigned char stackpos, unsigned short itemid, unsigned long creatureid);
+	bool playerUseMagicItem(Player *player, const Position& posFrom, Item* item);
+
   void changeOutfitAfter(unsigned long id, int looktype, long time);
   void changeSpeed(unsigned long id, unsigned short speed);
 
@@ -184,6 +187,8 @@ public:
 	void creatureAttackCreature(Creature *attacker, Creature *attackedCreature, attacktype_t attackType, amuEffect_t ammunition, int damage);
 	void internalCreatureAttackCreature(Creature *attacker, Creature *attackedCreature, attacktype_t attackType, amuEffect_t ammunition, int damage);
 	void internalCreatureAttackedCreature(Creature *attacker, Creature *attackedCreature);
+
+	void addAnimationShoot(Creature *attacker, const Position& posTo, unsigned char distanceEffect);
 	void addMagicEffect(const Position &pos, unsigned char type);
 
 	void creatureChangeLight(Player* player, int time, unsigned char lightlevel);

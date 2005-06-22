@@ -126,8 +126,8 @@ public:
 			delete this;
 	};
 
-	static const unsigned long min_id = 65537U;
-	static const unsigned long max_id = 16777216U;	
+	static const unsigned long min_id = 0x40000000;	//65537U;
+	static const unsigned long max_id = 0xFFFFFFFF; //16777216U;	
 
 	virtual void onAttack();
 	bool isLoaded() const {return loaded;}

@@ -12,4 +12,7 @@
 <spell name="Light" words="utevo lux" maglv="0" mana="20" enabled="1">
 <vocation id="0" /><vocation id="1" /><vocation id="2" /><vocation id="3" />
 </spell>
+
+<rune name="Sudden death" id="2268" charges="1" maglv="15" mana="0" enabled="1"></rune>
+
 </spells>

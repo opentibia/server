@@ -84,8 +84,8 @@ public:
 			delete this;
 	};
 
-	static const unsigned long min_id = 10000U;
-	static const unsigned long max_id = 65536U;
+	static const unsigned long min_id = 0x1FFFFFFF; //10000U;
+	static const unsigned long max_id = 0x3FFFFFFF; //65536U;
 
   void speak(const std::string &text){};
   std::string getName(){return name;};

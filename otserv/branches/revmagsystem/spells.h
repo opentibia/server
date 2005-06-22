@@ -102,6 +102,7 @@ public:
 
 	bool isLoaded(){return loaded;}
 	virtual bool castSpell(Creature* creature, const Position& pos, const std::string& var) const;
+	virtual bool castSpell(Creature* creature, Creature* targetCreature) const;
 	std::string getName() const {return name;};
 	int getMana() const {return mana;};
 	int getMagLv() const {return magLv;};
@@ -116,11 +117,14 @@ protected:
   int magLv, mana;
   bool loaded;
 
+	bool internalCastSpell(Creature* creature, const Position& pos) const;
+
 	friend class SpellScript;
-	friend class MagicAttackSpell;
 	friend class ConjureItemSpell;
 	friend class ChangeSpeedSpell;
 	friend class LightSpell;
+	friend class MagicAreaSpell;
+	friend class MagicTargetSpell;
 };
 
 class InstantSpell : public Spell
@@ -128,7 +132,7 @@ class InstantSpell : public Spell
 public:
 	InstantSpell(const std::string &, std::string name, std::string words, int magLv, int mana, Game* game);
 	virtual bool castSpell(Creature* creature, const Position& pos, const std::string& var) const;
-
+	virtual bool castSpell(Creature* creature, Creature* targetCreature) const {return false;};
 	std::string getWords(){return words;};
 
 protected:
@@ -140,7 +144,7 @@ class RuneSpell : public Spell
 public:
 	RuneSpell(const std::string& ,std::string name, unsigned short id, unsigned short charges, int magLv, int mana, Game* game);
 	virtual bool castSpell(Creature* creature, const Position& pos, const std::string& var) const;
-
+	virtual bool castSpell(Creature* creature, Creature* targetCreature) const;
 protected:
   unsigned short id;
 	unsigned short charges;
@@ -158,46 +162,20 @@ public:
 	static int luaActionCreateChangeSpeedSpell(lua_State *L);
 	static int luaActionCreateLightSpell(lua_State *L);
 	static int luaActionCreateAreaAttackSpell(lua_State *L);
+	static int luaActionCreateTargetSpell(lua_State *L);
 
 	//help functions
 	static int luaActionGetPlayerLevel(lua_State *L);
 	static int luaActionGetPlayerMagLevel(lua_State *L);
 
-	/*
-	static int luaActionDoTargetSpell(lua_State *L);
-	static int luaActionDoTargetExSpell(lua_State *L);
-	static int luaActionDoTargetGroundSpell(lua_State *L);
-	static int luaActionDoAreaSpell(lua_State *L);
-	static int luaActionDoAreaExSpell(lua_State *L);
-	static int luaActionDoAreaGroundSpell(lua_State *L);
-	
-	static int luaActionCreateAreaAttackSpell(lua_State *L);
-	static int luaActionAddCondition(lua_State *L);
-
-  static int luaActionGetPos(lua_State *L);
-  static int luaActionChangeOutfit(lua_State *L);
-  static int luaActionManaShield(lua_State *L);
-  static int luaActionChangeSpeed(lua_State *L);
-  static int luaActionGetSpeed(lua_State *L);
-  static int luaActionMakeRune(lua_State *L);
-  static int luaActionMakeArrows(lua_State *L);
-  static int luaActionMakeFood(lua_State *L);
-	*/
 protected:
 	std::string scriptname;
 	bool loaded;
 
 	static void internalGetArea(lua_State *L, AreaVector& vec);
+	static attacktype_t internalGetAttackType(lua_State *L);
   static Spell* getSpell(lua_State *L);
 
 	int registerFunctions();
-
-	//bool onTargetCreature((Creature* creature, const Position& pos, std::string var);
-	//static void internalGetPosition(lua_State *L, Position& pos);
-	//static void internalGetMagicEffect(lua_State *L, MagicEffectClass &me);
-	//static void internalGetArea(lua_State *L, MagicEffectAreaClass &magicArea);
-	//static void internalLoadDamageVec(lua_State *L, ConditionVec& condvec);
-	//static void internalLoadTransformVec(lua_State *L, TransformMap& transformMap);
-	//static int internalMakeRune(Player *p,unsigned short sl_id,Spell *S,unsigned short id, unsigned char charges);
 };
 #endif // __spells_h_

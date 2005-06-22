@@ -56,8 +56,8 @@ public:
 	MagicSpell(Spell *ispell);
 	virtual ~MagicSpell();
 	virtual bool doCastSpell(Creature* spellCastCreature, const Position& pos, const std::string& var) const = 0;
-	//virtual bool doCastSpell(Creature* spellCastCreature, Creature* targetCreature, const std::string& var) const = 0;
-	virtual bool causeExhaustion() = 0;
+	virtual bool doCastSpell(Creature* spellCastCreature, Creature* targetCreature) const = 0;
+	virtual bool causeExhaustion() {return true;};
 
 protected:
 	virtual void setArea(const AreaVector& vec) = 0;
@@ -70,8 +70,7 @@ public:
 	ConjureItemSpell(Spell *ispell, const std::vector<unsigned short>& items, int icount, unsigned char imagicEffect);
 	virtual ~ConjureItemSpell() {};
 	virtual bool doCastSpell(Creature* spellCastCreature, const Position& pos, const std::string& var) const;
-	//virtual bool doCastSpell(Creature* spellCastCreature, Creature* targetCreature, const std::string& var) const = 0;
-	virtual bool causeExhaustion() {return true;};
+	virtual bool doCastSpell(Creature* spellCastCreature, Creature* targetCreature) const {return false;};
 
 protected:
 	virtual void setArea(const AreaVector& vec) {};
@@ -87,8 +86,7 @@ public:
 	ChangeSpeedSpell(Spell *ispell, int itime, int iaddspeed, unsigned char imagicEffect);
 	virtual ~ChangeSpeedSpell() {};
 	virtual bool doCastSpell(Creature* spellCastCreature, const Position& pos, const std::string& var) const;
-	//virtual bool doCastSpell(Creature* spellCastCreature, Creature* targetCreature, const std::string& var) const = 0;
-	virtual bool causeExhaustion() {return true;};
+	virtual bool doCastSpell(Creature* spellCastCreature, Creature* targetCreature) const {return false;};
 
 protected:
 	virtual void setArea(const AreaVector& vec) {};
@@ -103,9 +101,8 @@ class LightSpell : public MagicSpell {
 public:
 	LightSpell(Spell *ispell, int itime, unsigned char ilightlevel, unsigned char imagicEffect);
 	virtual ~LightSpell() {};
-	virtual bool doCastSpell(Creature* spellCastCreature, const Position& pos, const std::string& var) const;
-	//virtual bool doCastSpell(Creature* spellCastCreature, Creature* targetCreature, const std::string& var) const = 0;
-	virtual bool causeExhaustion() {return true;};
+	virtual bool doCastSpell(Creature* spellCastCreature, const Position& pos, const std::string& var) const {return false;};
+	virtual bool doCastSpell(Creature* spellCastCreature, Creature* targetCreature) const;
 
 protected:
 	virtual void setArea(const AreaVector& vec) {};
@@ -116,13 +113,30 @@ protected:
 	unsigned char magicEffect;
 };
 
-class MagicAttackSpell : public MagicSpell {
+class MagicTargetSpell : public MagicSpell {
 public:
-	MagicAttackSpell(Spell *ispell, attacktype_t iattackType, unsigned char idistanceEffect,
-		const AreaVector& ivec, bool ineedDirection, amuEffect_t iamuInfo);
-	virtual ~MagicAttackSpell() {};
+	MagicTargetSpell(Spell *ispell, attacktype_t iattackType, unsigned char idistanceEffect,
+		amuEffect_t iamuInfo);
+	virtual ~MagicTargetSpell() {};
 	virtual bool doCastSpell(Creature* spellCastCreature, const Position& pos, const std::string& var) const;
-	virtual bool causeExhaustion() {return true;};
+	virtual bool doCastSpell(Creature* spellCastCreature, Creature* targetCreature) const;
+
+protected:
+	virtual void setArea(const AreaVector& vec) {};
+	virtual void getArea(const Position& centerpos, std::vector<Position>& vec, unsigned char direction) const;
+
+	unsigned short distanceEffect;
+	amuEffect_t amuInfo;
+	attacktype_t attackType;
+};
+
+class MagicAreaSpell : public MagicSpell {
+public:
+	MagicAreaSpell(Spell *ispell, attacktype_t iattackType, unsigned char idistanceEffect,
+		const AreaVector& ivec, bool ineedDirection, amuEffect_t iamuInfo);
+	virtual ~MagicAreaSpell() {};
+	virtual bool doCastSpell(Creature* spellCastCreature, const Position& pos, const std::string& var) const;
+	virtual bool doCastSpell(Creature* spellCastCreature, Creature* targetCreature) const {return false;};
 
 protected:
 	virtual void setArea(const AreaVector& vec) {areaVec = vec;};
@@ -130,6 +144,7 @@ protected:
 
 	amuEffect_t amuInfo;
 	attacktype_t attackType;
+	unsigned char distanceEffect;
 	bool needDirection;
 	std::vector< std::vector<unsigned char> > areaVec;
 

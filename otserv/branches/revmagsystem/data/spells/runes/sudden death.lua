@@ -1,32 +1,26 @@
--- doTargetMagic
--- attackType: Type of attack
--- cid: creature id.
--- Targetpos: Target position.
--- animationEffect: Projectile animation.
--- damageEffect: Effect to show when spell hits a player.
--- animationColor: Color of the text that is shown above the player when hit.
--- offensive: Indicates if the spell is a healing/attack spell.
--- drawblood: Determines if the spell causes blood splash.
--- minDmg: Minimal damage.
--- maxDmg: Maximum damage.
--- returns true if the spell was casted.
-
+function onLoad()
 attackType = ATTACK_PHYSICAL
 animationEffect = NM_ANI_SUDDENDEATH
 
 hitEffect = NM_ME_MORT_AREA
 damageEffect = NM_ME_DRAW_BLOOD
-animationColor = RED
-offensive = true
-drawblood = true
 
-SuddenDeathObject = MagicDamageObject(attackType, animationEffect, hitEffect, damageEffect, animationColor, offensive, drawblood, 0, 0)
+createTargetSpell(attackType, animationEffect, hitEffect, damageEffect)
+end
 
-function onCast(cid, creaturePos, level, maglv, var)
-centerpos = {x=creaturePos.x, y=creaturePos.y, z=creaturePos.z}
+function onCast(cid, var)
+end
 
-SuddenDeathObject.minDmg = (level * 2 + maglv *3) * 1.3 - 30
-SuddenDeathObject.maxDmg = (level * 2 + maglv *3) * 1.7
+-- called one time for each creature that is inside the 'spell area'
+-- cid: spellcaster
+-- tid: target creature
+function onUse(cid, tid, var)
 
-return doTargetMagic(cid, centerpos, SuddenDeathObject:ordered())
+level = getPlayerLevel(cid)
+maglv = getPlayerMagLevel(cid)
+
+minDmg = (level * 2 + maglv *3) * 1.3 - 30
+maxDmg = (level * 2 + maglv *3) * 1.7
+
+return math.random(minDmg, maxDmg)
 end

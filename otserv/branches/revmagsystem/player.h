@@ -68,8 +68,8 @@ public:
 	const int getAccountNumber() {return accountNumber;};
 	const std::string& getPassword() {return password;};
 
-	static const unsigned long min_id = 16777217U;
-	static const unsigned long max_id = 4294967295U;
+	static const unsigned long min_id = 0x10000000; //16777217U;
+	static const unsigned long max_id = 0x20000000; //4294967295U;
 
 	bool addItem(Item* item);
 	bool internalAddItemContainer(Container *container,Item* item);

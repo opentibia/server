@@ -92,7 +92,8 @@ LightSpell::LightSpell(Spell *ispell, int itime, unsigned char ilightlevel, unsi
 	//
 }
 
-bool LightSpell::doCastSpell(Creature* spellCastCreature, const Position& pos, const std::string& var) const
+//bool LightSpell::doCastSpell(Creature* spellCastCreature, const Position& pos, const std::string& var) const
+bool LightSpell::doCastSpell(Creature* spellCastCreature, Creature* targetCreature) const
 {
 	Player* spellCastPlayer = dynamic_cast<Player*>(spellCastCreature);
 	if(spellCastPlayer) {
@@ -104,14 +105,84 @@ bool LightSpell::doCastSpell(Creature* spellCastCreature, const Position& pos, c
 }
 
 //---------------------------------------------------------------
-MagicAttackSpell::MagicAttackSpell(Spell *ispell, attacktype_t iattackType, unsigned char idistanceEffect,
+MagicTargetSpell::MagicTargetSpell(Spell *ispell, attacktype_t iattackType, unsigned char idistanceEffect, amuEffect_t iamuInfo) : 
+ MagicSpell(ispell), attackType(iattackType), distanceEffect(idistanceEffect), amuInfo(iamuInfo)
+{
+	//
+}
+
+bool MagicTargetSpell::doCastSpell(Creature* spellCastCreature, const Position& pos, const std::string& var) const
+{
+	Player*	spellCastPlayer = dynamic_cast<Player*>(spellCastCreature);
+	if(spellCastCreature->access != 0 || spell->game->canThrowTo(spellCastCreature->pos, pos, false, true)) {
+		Tile *tile = spell->game->getTile(pos.x, pos.y, pos.z);
+		if(tile) {
+			if(tile->creatures.empty()) {
+				if(spellCastPlayer) {
+					spellCastPlayer->sendTextMessage(MSG_SMALLINFO, "You can only use this rune on creatures.");
+				}
+
+				spell->game->addMagicEffect(spellCastCreature->pos, NM_ME_PUFF);
+			}
+			else {
+				if(distanceEffect != 0xFF) {
+					spell->game->addAnimationShoot(spellCastCreature, pos, distanceEffect);
+				}
+
+				CreatureVector targetlist;
+				CreatureVector::iterator cit;
+				for(cit = tile->creatures.begin(); cit != tile->creatures.end(); ++cit) {
+					int damage = spell->script->onUse(spellCastCreature, *cit, var);
+					spell->game->internalCreatureAttackCreature(spellCastCreature, *cit, attackType, amuInfo, damage);
+					targetlist.push_back(*cit);
+				}
+
+				for(CreatureVector::iterator cit = targetlist.begin(); cit != targetlist.end(); ++cit) {
+					spell->game->internalCreatureAttackedCreature(spellCastCreature, *cit);
+				}
+			}
+		}
+
+		return true;
+	}
+
+	if(spellCastPlayer) {
+		spellCastPlayer->sendCancel("Sorry not possible.");
+	}
+
+	return false;
+}
+
+bool MagicTargetSpell::doCastSpell(Creature* spellCastCreature, Creature* targetCreature) const
+{
+	if(spell->game->canThrowTo(spellCastCreature->pos, targetCreature->pos, false, true)) {
+		
+		spell->game->addAnimationShoot(spellCastCreature, targetCreature->pos, distanceEffect);
+
+		Player*	spellCastPlayer = dynamic_cast<Player*>(spellCastCreature);
+		int damage = spell->script->onUse(spellCastCreature, targetCreature, "");
+		spell->game->creatureAttackCreature(spellCastCreature, targetCreature, attackType, amuInfo, damage);
+
+		return true;
+	}
+
+	return false;
+}
+
+void MagicTargetSpell::getArea(const Position& centerpos, std::vector<Position>& vec, unsigned char direction) const
+{
+	vec.push_back(centerpos);
+}
+
+//---------------------------------------------------------------
+MagicAreaSpell::MagicAreaSpell(Spell *ispell, attacktype_t iattackType, unsigned char idistanceEffect,
 	const AreaVector& ivec, bool ineedDirection, amuEffect_t iamuInfo) : 
- MagicSpell(ispell), attackType(iattackType), needDirection(ineedDirection), amuInfo(iamuInfo)
+ MagicSpell(ispell), attackType(iattackType), distanceEffect(idistanceEffect), needDirection(ineedDirection), amuInfo(iamuInfo)
 {
 	setArea(ivec);
 }
 
-bool MagicAttackSpell::doCastSpell(Creature* spellCastCreature, const Position& pos, const std::string& var) const
+bool MagicAreaSpell::doCastSpell(Creature* spellCastCreature, const Position& pos, const std::string& var) const
 {
 	CreatureVector targetlist;
 	CreatureVector::iterator cit;
@@ -134,6 +205,10 @@ bool MagicAttackSpell::doCastSpell(Creature* spellCastCreature, const Position& 
 		if(tile && ((spellCastCreature->access != 0 || !tile->isPz()) ) ) {
 			if(spell->game->canThrowTo(spellCastCreature->pos, *it, false, true)) {
 
+				if(distanceEffect != 0xFF) {
+					spell->game->addAnimationShoot(spellCastCreature, pos, distanceEffect);
+				}
+
 				if(tile->creatures.empty()) {
 					spell->game->addMagicEffect(*it, amuInfo.areaEffect);
 				}
@@ -155,7 +230,7 @@ bool MagicAttackSpell::doCastSpell(Creature* spellCastCreature, const Position& 
 	return true;
 }
 
-void MagicAttackSpell::getArea(const Position& centerpos, std::vector<Position>& vec, unsigned char direction) const
+void MagicAreaSpell::getArea(const Position& centerpos, std::vector<Position>& vec, unsigned char direction) const
 {
 	int rows = (int)areaVec.size();
 	int cols = (int)(rows > 0 ? areaVec[0].size() : 0);

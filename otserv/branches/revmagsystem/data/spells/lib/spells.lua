@@ -36,7 +36,7 @@ NM_ANI_SNOWBALL = 12
 NM_ANI_POWERBOLT = 13
 
 -- only for internal use, dont send to client
-NM_ANI_NONE = 0
+NM_ANI_NONE = 255
 
 ATTACK_NONE      = 0
 ATTACK_ENERGY    = 1

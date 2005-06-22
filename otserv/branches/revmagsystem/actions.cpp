@@ -26,11 +26,14 @@
 #include "npc.h"
 #include "game.h"
 #include "item.h"
+#include "spells.h"
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h> 
 
 #include "actions.h"
+
+extern Spells spells;
 
 bool readXMLInteger(xmlNodePtr p, const char *tag, int &value);
 
@@ -215,11 +218,10 @@ void Actions::UseItem(Player* player, const Position &pos,const unsigned char st
 		if(openContainer(player,dynamic_cast<Container*>(item),index))
 			return;
 	}
-    
-    //we dont know what to do with this item
-    player->sendCancel("You can not use this object.");
-    return;
-	
+
+	//we dont know what to do with this item
+	player->sendCancel("You can not use this object.");
+	return;
 }
 
 bool Actions::openContainer(Player *player,Container *container, const unsigned char index){
@@ -260,8 +262,10 @@ void Actions::UseItemEx(Player* player, const Position &from_pos,
 	if(!item)
 		return;
 	
-	if(item->getID() != itemid)
+	if(item->getID() != itemid) {
+		player->sendCancel("Sorry not possible.");
 		return;
+	}
 	
 	Action *action = getAction(item);
 	
@@ -278,6 +282,54 @@ void Actions::UseItemEx(Player* player, const Position &from_pos,
     		return;
 	}
     
+	//Runes
+	std::map<unsigned short, Spell*>::iterator sit = spells.getAllRuneSpells()->find(item->getID());
+	if(sit != spells.getAllRuneSpells()->end()) {
+		std::string var = std::string("");
+		bool success = sit->second->castSpell(player, to_pos, var);
+
+		if(success) {
+			item->setItemCharge(std::max((int)item->getItemCharge() - 1, 0) );
+			if(item->getItemCharge() == 0) {
+				game->removeThing(player, from_pos, item);
+			}
+		}
+		
+		return;
+	}
+
+	//not found
+	player->sendCancel("You can not use this object.");
+}
+
+void Actions::UseItemEx(Player* player, const Position &from_pos,
+	const unsigned char from_stack, unsigned short itemid, Creature* creature)
+{
+	Item *item = dynamic_cast<Item*>(game->getThing(from_pos,from_stack,player));
+	if(!item)
+		return;
+	
+	if(item->getID() != itemid) {
+		player->sendCancel("Sorry not possible.");
+		return;
+	}
+
+	//Runes
+	std::map<unsigned short, Spell*>::iterator sit = spells.getAllRuneSpells()->find(item->getID());
+	if(sit != spells.getAllRuneSpells()->end()) {
+		std::string var = std::string("");
+		bool success = sit->second->castSpell(player, creature);
+
+		if(success) {
+			item->setItemCharge(std::max((int)item->getItemCharge() - 1, 0) );
+			if(item->getItemCharge() == 0) {
+				game->removeThing(player, from_pos, item);
+			}
+		}
+		
+		return;
+	}
+
 	//not found
 	player->sendCancel("You can not use this object.");
 }

@@ -163,6 +163,9 @@ void Protocol74::parsePacket(NetworkMessage &msg)
     case 0x83: // use item
       parseUseItemEx(msg);
       break;
+		case 0x84:
+			parseBattleWindow(msg);
+			break;
     case 0x85:	//rotate item
       //parseRotateItem(msg);
 	  break;
@@ -233,29 +236,9 @@ void Protocol74::parsePacket(NetworkMessage &msg)
          parseDebug(msg);
          break;  
   }
-  game->flushSendBuffers();  
-				//so we got the action, now we ask the map to execut it
-/*  if(action.type!=ACTION_NONE){
-  	switch(map->requestAction(player, &action)){
-		case TMAP_ERROR_TILE_OCCUPIED:
-			sendPlayerSorry(TMAP_ERROR_TILE_OCCUPIED);
-		break;
-	}
-  }
-  */
+
+	game->flushSendBuffers();  
 }
-
-/*int Protocol74::doAction(Action* action){
-	if(action->type!=ACTION_NONE){
-		switch(map->requestAction(player,action)){
-			case TMAP_ERROR_TILE_OCCUPIED:
-				sendPlayerSorry(TMAP_ERROR_TILE_OCCUPIED);
-			break;
-		}
-	}
-	return 0;
-}*/
-
 
 void Protocol74::GetTileDescription(const Tile* tile, NetworkMessage &msg)
 {
@@ -309,7 +292,7 @@ void Protocol74::GetMapDescription(unsigned short x, unsigned short y, unsigned 
 	if (z > 7) {
 		//startz = std::min(z + 2, MAP_LAYER - 1);
 		//endz = std::max(z - 2, 6 /*(8 - 2)*/);
-        startz = z - 2;   
+		startz = z - 2;
 		endz = std::min(MAP_LAYER - 1, z + 2);
 		zstep = 1;
 	}
@@ -1027,7 +1010,19 @@ void Protocol74::parseSay(NetworkMessage &msg)
 void Protocol74::parseAttack(NetworkMessage &msg)
 {
   unsigned long playerid = msg.GetU32();
+	unsigned char stackpos = msg.GetByte();
+
   player->setAttackedCreature(playerid);
+}
+
+void Protocol74::parseBattleWindow(NetworkMessage &msg)
+{
+	Position posFrom = msg.GetPosition();
+	unsigned short item = msg.GetU16();
+	unsigned char stack = msg.GetByte();
+	unsigned long creatureid = msg.GetU32();
+
+	game->playerUseBattleWindow(player, posFrom, stack, item, creatureid);
 }
 
 void Protocol74::parseTextWindow(NetworkMessage  &msg){

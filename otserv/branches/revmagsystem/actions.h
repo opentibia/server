@@ -59,6 +59,12 @@ public:
 	void UseItemEx(Player* player, const Position &from_pos,
 		const unsigned char from_stack,const Position &to_pos,
 		const unsigned char to_stack,const unsigned short itemid);
+
+	/*
+	For usage with actions that came from the battle window
+	*/
+	void UseItemEx(Player* player, const Position &from_pos,
+		const unsigned char from_stack, unsigned short itemid, Creature* creature);
 	
 	bool openContainer(Player *player,Container *container, const unsigned char index);
 	

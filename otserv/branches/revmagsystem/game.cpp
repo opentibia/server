@@ -57,9 +57,6 @@ using namespace std;
 extern OTSYS_THREAD_LOCKVAR maploadlock;
 #endif
 
-//#define EVENT_CHECKCREATURE          123
-//#define EVENT_CHECKCREATUREATTACKING 124
-
 extern LuaScript g_config;
 extern Spells spells;
 extern Actions actions;
@@ -1803,6 +1800,22 @@ void Game::creatureAttackCreature(Creature *attacker, Creature *attackedCreature
 	internalCreatureAttackedCreature(attacker, attackedCreature);
 }
 
+void Game::addAnimationShoot(Creature *attacker, const Position& posTo, unsigned char distanceEffect)
+{
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
+
+	std::vector<Creature*> list;
+	getSpectators(Range(attacker->pos, posTo), list);
+	std::vector<Creature *>::iterator it;
+	Player* spectator = NULL;
+	for(it = list.begin(); it != list.end(); ++it) {
+		spectator = dynamic_cast<Player*>(*it);
+		if(spectator) {
+			spectator->sendDistanceShoot(attacker->pos, posTo, distanceEffect);
+		}
+	}
+}
+
 void Game::internalCreatureAttackCreature(Creature *attacker, Creature *attackedCreature, attacktype_t attackType, amuEffect_t ammunition, int damage)
 {
 	attackedCreature->applyDamage(attacker, attackType, damage);
@@ -2238,16 +2251,7 @@ void Game::checkCreatureAttacking(unsigned long id)
 										Position toPos = attackedCreature->pos;
 										//TODO: Add chance to miss target completly
 
-										getSpectators(Range(creature->pos, toPos), list);
-										std::vector<Creature *>::iterator it;
-										Player* spectator = NULL;
-										for(it = list.begin(); it != list.end(); ++it) {
-											spectator = dynamic_cast<Player*>(*it);
-											if(spectator) {
-												spectator->sendDistanceShoot(creature->pos, toPos, creature->getSubFightType());
-											}
-										}
-										
+										addAnimationShoot(creature, toPos, creature->getSubFightType());
 										creature->RemoveDistItem();
 										//thingMoveInternal(creature, SLOT_AMMO, 0, true, attackedCreature->pos, 1);
 										//creatureAttackCreature(creature, attackedCreature, ATTACK_PHYSICAL, creature->getWeaponDamage());
@@ -2441,6 +2445,8 @@ bool Game::playerUseItemEx(Player *player, const Position& posFrom,const unsigne
 		const Position &posTo,const unsigned char stack_to, const unsigned short itemid)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
+
+	/*
 	bool ret = false;
 
 	Position thingpos = getThingMapPos(player, posFrom);
@@ -2474,14 +2480,14 @@ bool Game::playerUseItemEx(Player *player, const Position& posFrom,const unsigne
 			}
 		}
 		else{
-			actions.UseItemEx(player,posFrom,stack_from,posTo,stack_to,itemid);
 			ret = true;
 		}
 	}
+	*/
 
-	return ret;
+	actions.UseItemEx(player,posFrom,stack_from,posTo,stack_to,itemid);
+	return true;
 }
-
 
 bool Game::playerUseItem(Player *player, const Position& pos, const unsigned char stackpos, const unsigned short itemid, unsigned char index)
 {
@@ -2490,7 +2496,19 @@ bool Game::playerUseItem(Player *player, const Position& pos, const unsigned cha
 	return true;
 }
 
-void Game::flushSendBuffers(){
+void Game::playerUseBattleWindow(Player *player, Position &posFrom, unsigned char stackpos, unsigned short itemid, unsigned long creatureid)
+{
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
+
+	Creature *creature = getCreatureByID(creatureid);
+	if(!creature || dynamic_cast<Player*>(creature))
+		return;
+
+	actions.UseItemEx(player, posFrom, stackpos, itemid, creature);
+}
+
+void Game::flushSendBuffers()
+{
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
 
 	for(std::vector<Player*>::iterator it = BufferedPlayers.begin(); it != BufferedPlayers.end(); ++it) {
@@ -2515,7 +2533,8 @@ void Game::flushSendBuffers(){
 	return;
 }
 
-void Game::addPlayerBuffer(Player* p){
+void Game::addPlayerBuffer(Player* p)
+{
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
 /*
 #ifdef __DEBUG__
@@ -2530,7 +2549,8 @@ void Game::addPlayerBuffer(Player* p){
 	return;
 }
 
-void Game::FreeThing(Thing* thing){
+void Game::FreeThing(Thing* thing)
+{
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
 	//std::cout << "freeThing() " << thing <<std::endl;
 	ToReleaseThings.push_back(thing);
@@ -2773,18 +2793,6 @@ void Game::addThing(Player* player,const Position &pos,Thing* thing)
 					tile->splash = item;
 
 					sendUpdateThing(NULL, pos, item, oldstackpos);
-
-					/*
-					unsigned char stackpos = tile->getThingStackPos(tile->splash);
-					Item *oldsplash = tile->splash;
-					tile->splash = NULL;
-					sendRemoveThing(NULL,pos,oldsplash,stackpos);
-					tile->splash = item;
-					sendAddThing(NULL,pos,tile->splash);
-					//TODO: find a better way to say that item is not used
-					oldsplash->pos.x = 0xFFFF;
-					FreeThing(oldsplash);
-					*/
 				}
 				else{
 					tile->splash = item;
