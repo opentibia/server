@@ -423,7 +423,7 @@ bool Commands::getInfo(Creature* c, const std::string &cmd, const std::string &p
 	if(creature && dynamic_cast<Player*>(creature)) {
 		std::stringstream info;
 		Player* p = dynamic_cast<Player*>(creature);
-		char ip[4];
+		unsigned char ip[4];
 		if(p->access >= player->access && player != p){
 			player->sendTextMessage(MSG_BLUE_TEXT,"You can not get info about this player.");
 			return true;

@@ -31,7 +31,7 @@ CREATE TABLE `accounts` (
   `premDays` int(11) NOT NULL default '0',
   UNIQUE KEY `id` (`id`),
   KEY `accno` (`accno`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) CHARSET=latin1;
 
 --
 -- Dumping data for table `accounts`
@@ -60,7 +60,7 @@ CREATE TABLE `items` (
   `text` text NOT NULL default '',
   `specialdesc` text NOT NULL default '',
   KEY `player` (`player`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) CHARSET=latin1;
 
 --
 -- Dumping data for table `items`
@@ -109,7 +109,7 @@ CREATE TABLE `players` (
   `save` int(11) unsigned NOT NULL default '1',
   UNIQUE KEY `id` (`id`),
   KEY `name` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) CHARSET=latin1;
 
 --
 -- Dumping data for table `players`
@@ -119,6 +119,7 @@ CREATE TABLE `players` (
 /*!40000 ALTER TABLE `players` DISABLE KEYS */;
 LOCK TABLES `players` WRITE;
 INSERT INTO `players` VALUES (1,'Hurz',1,1,18,1,675,840,840,2,76000,20,30,40,50,128,20,640,640,21700,'20;20;7','29;30;7',900,300,129,1,0,1);
+INSERT INTO `players` VALUES (2,'Player',0,1,18,1,675,840,840,2,76000,20,30,40,50,128,20,640,640,21700,'27;23;7','27;23;7',900,300,129,1,0,1);
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `players` ENABLE KEYS */;
 
@@ -132,7 +133,7 @@ CREATE TABLE `playerstorage` (
   `key` int(11) unsigned NOT NULL default '0',
   `value` int(11) NOT NULL default '0',
   KEY `player` (`player`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) CHARSET=latin1;
 
 --
 -- Dumping data for table `playerstorage`
@@ -156,7 +157,7 @@ CREATE TABLE `skills` (
   `skill` int(11) unsigned NOT NULL default '0',
   `tries` int(11) unsigned NOT NULL default '0',
   KEY `player` (`player`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) CHARSET=latin1;
 
 --
 -- Dumping data for table `skills`
