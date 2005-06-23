@@ -31,7 +31,7 @@ CREATE TABLE `accounts` (
   `premDays` int(11) NOT NULL default '0',
   UNIQUE KEY `id` (`id`),
   KEY `accno` (`accno`)
-) ENGINE=InnoDB CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `accounts`
@@ -60,7 +60,7 @@ CREATE TABLE `items` (
   `text` text NOT NULL default '',
   `specialdesc` text NOT NULL default '',
   KEY `player` (`player`)
-) ENGINE=InnoDB CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `items`
@@ -109,7 +109,7 @@ CREATE TABLE `players` (
   `save` int(11) unsigned NOT NULL default '1',
   UNIQUE KEY `id` (`id`),
   KEY `name` (`name`)
-) ENGINE=InnoDB CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `players`
@@ -133,7 +133,7 @@ CREATE TABLE `playerstorage` (
   `key` int(11) unsigned NOT NULL default '0',
   `value` int(11) NOT NULL default '0',
   KEY `player` (`player`)
-) ENGINE=InnoDB CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `playerstorage`
@@ -157,7 +157,7 @@ CREATE TABLE `skills` (
   `skill` int(11) unsigned NOT NULL default '0',
   `tries` int(11) unsigned NOT NULL default '0',
   KEY `player` (`player`)
-) ENGINE=InnoDB CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `skills`
