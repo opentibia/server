@@ -78,18 +78,18 @@ void Protocol74::ReceiveLoop()
   NetworkMessage msg;
   
 	while (!pendingLogout && msg.ReadFromSocket(s))
-  {
-    parsePacket(msg);
-  }
+	{
+    	parsePacket(msg);
+	}
 
 	if (s) {
 		closesocket(s);
 		s = 0;
 	}
 
-  // logout by disconnect?  -> kick
-  if (!pendingLogout /*player*/)
-  {		
+	// logout by disconnect?  -> kick
+	if (!pendingLogout /*player*/)
+	{		
 		if(player->inFightTicks >=1000 && player->health >0) {
 			//disconnect?
 			game->removeCreature(player);
@@ -97,7 +97,7 @@ void Protocol74::ReceiveLoop()
 		else{
 			game->removeCreature(player);
 		}
-  }
+	}
 }
 
 
@@ -462,7 +462,7 @@ void Protocol74::parseCloseChannel(NetworkMessage &msg){
 void Protocol74::parseOpenPriv(NetworkMessage &msg){
      std::string receiver; 
      receiver = msg.GetString();
-     Creature* c = game->getCreatureByName(receiver.c_str());
+     Creature* c = game->getCreatureByName(receiver);
      Player* player = dynamic_cast<Player*>(c);
      if(player) 
      	sendOpenPriv(receiver);

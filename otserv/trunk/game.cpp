@@ -571,23 +571,23 @@ Creature* Game::getCreatureByID(unsigned long id)
   return NULL; //just in case the player doesnt exist
 }
 
-Creature* Game::getCreatureByName(const char* s)
+Creature* Game::getCreatureByName(const std::string &s)
 {
 	std::string txt1 = s;
 	std::transform(txt1.begin(), txt1.end(), txt1.begin(), upchar);
 
 	//std::map<unsigned long, Creature*>::iterator it;
-  //for( it = playersOnline.begin(); it != playersOnline.end(); ++it)
+  	//for( it = playersOnline.begin(); it != playersOnline.end(); ++it)
 	for (AutoList<Creature>::listiterator it = AutoList<Creature>::list.begin(); it != AutoList<Creature>::list.end(); ++it)
 	{
 		std::string txt2 = (*it).second->getName();
 		std::transform(txt2.begin(), txt2.end(), txt2.begin(), upchar);
 		if(txt1 == txt2)
-    {
-      return it->second;
-    }
-  }
-  return NULL; //just in case the player doesnt exist
+		{
+			return it->second;
+    	}
+	}
+	return NULL; //just in case the player doesnt exist
 }
 
 bool Game::placeCreature(Position &pos, Creature* c)
@@ -2168,7 +2168,7 @@ void Game::creatureSpeakTo(Creature *creature, const std::string &receiver, cons
 {
 	//OTSYS_THREAD_LOCK(gameLock) 
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
-	Creature* c = getCreatureByName(receiver.c_str());
+	Creature* c = getCreatureByName(receiver);
 	if(c)
 		c->onCreatureSay(creature, SPEAK_PRIVATE, text);
 	//OTSYS_THREAD_UNLOCK(gameLock)
@@ -3742,7 +3742,7 @@ Position Game::getThingMapPos(Player *player, const Position &pos)
 			if(!container){
 				return dummyPos;
 			}			
-			while(container->getParent() != NULL) {				
+			while(container->getParent() != NULL) {
 				container = container->getParent();				
 			}			
 			if(container->pos.x == 0xFFFF)				

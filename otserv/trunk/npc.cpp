@@ -353,7 +353,7 @@ int NpcScript::luaCreatureGetName2(lua_State *L){
 	const char* s = lua_tostring(L, -1);
 	lua_pop(L,1);
 	Npc* mynpc = getNpc(L);
-	Creature *c = mynpc->game->getCreatureByName(s);
+	Creature *c = mynpc->game->getCreatureByName(std::string(s));
 	
 	if(c && c->access == 0) {
 		lua_pushnumber(L, c->getID());

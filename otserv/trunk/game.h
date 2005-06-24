@@ -225,7 +225,7 @@ public:
 		
    
 	Creature* getCreatureByID(unsigned long id);
-	Creature* getCreatureByName(const char* s);
+	Creature* getCreatureByName(const std::string &s);
 
 	std::list<Position> getPathTo(Creature *creature, Position start, Position to, bool creaturesBlock=true);
 	

@@ -193,7 +193,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 			else {
 				Protocol74 *protocol = new Protocol74(s);				
 				Player *player;
-				bool playerexist = g_game.getCreatureByName(name.c_str()) != NULL;
+				bool playerexist = g_game.getCreatureByName(name) != NULL;
 				player = new Player(name.c_str(), protocol);
 				player->useThing();
 				IOPlayer::instance()->loadPlayer(player, name);	

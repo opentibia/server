@@ -417,8 +417,11 @@ int SpellScript::luaActionDoTargetSpell(lua_State *L)
 	magicTarget.manaCost = spell->getMana();
 
 	Creature* creature = spell->game->getCreatureByID((unsigned long)lua_tonumber(L, -1));
-  lua_pop(L,1);
-		
+  	lua_pop(L,1);
+	if(!creature){
+		lua_pushboolean(L, false);
+		return 1;
+	}
 	bool isSuccess = spell->game->creatureThrowRune(creature, centerpos, magicTarget);
 	lua_pushboolean(L, isSuccess);
 	return 1;
@@ -441,7 +444,10 @@ int SpellScript::luaActionDoTargetExSpell(lua_State *L)
 
 	Creature* creature = spell->game->getCreatureByID((unsigned long)lua_tonumber(L, -1));
   lua_pop(L,1);
-	
+	if(!creature){
+		lua_pushboolean(L, false);
+		return 1;
+	}
 	bool isSuccess = spell->game->creatureThrowRune(creature, centerpos, magicTargetEx);
 	lua_pushboolean(L, isSuccess);
 	return 1;
@@ -465,10 +471,13 @@ int SpellScript::luaActionDoTargetGroundSpell(lua_State *L)
 	internalGetPosition(L, centerpos);
 
 	Spell* spell = getSpell(L);
-  magicGround.manaCost = spell->getMana();
+ 	magicGround.manaCost = spell->getMana();
 
 	Creature* creature = spell->game->getCreatureByID((unsigned long)lua_tonumber(L, -1));
-	
+	if(!creature){
+		lua_pushboolean(L, false);
+		return 1;
+	}
 	bool isSuccess = spell->game->creatureThrowRune(creature, centerpos, magicGround);
 	lua_pushboolean(L, isSuccess);
 	return 1;
@@ -492,6 +501,10 @@ int SpellScript::luaActionDoAreaSpell(lua_State *L)
   
 	Creature* creature = spell->game->getCreatureByID((unsigned long)lua_tonumber(L, -1));
 	lua_pop(L,1);
+	if(!creature){
+		lua_pushboolean(L, false);
+		return 1;
+	}
 	 
 	if(needDirection){
 		switch(creature->getDirection()) {
@@ -542,6 +555,10 @@ int SpellScript::luaActionDoAreaExSpell(lua_State *L)
   
 	Creature* creature = spell->game->getCreatureByID((unsigned long)lua_tonumber(L, -1));
 	lua_pop(L,1);
+	if(!creature){
+		lua_pushboolean(L, false);
+		return 1;
+	}
 		 	
 	if(needDirection){
 		switch(creature->getDirection()) {
@@ -589,6 +606,10 @@ int SpellScript::luaActionDoAreaGroundSpell(lua_State *L)
 
 	Creature* creature = spell->game->getCreatureByID((unsigned long)lua_tonumber(L, -1));
 	lua_pop(L, 1);
+	if(!creature){
+		lua_pushboolean(L, false);
+		return 1;
+	}
 	
 	if(needDirection){
 		switch(creature->getDirection()) {
@@ -721,7 +742,7 @@ int SpellScript::luaActionGetPos(lua_State *L){
 	const char* s = lua_tostring(L, -1);
 	lua_pop(L,1);
 	Spell* spell = getSpell(L);
-	Creature* c = spell->game->getCreatureByName(s);
+	Creature* c = spell->game->getCreatureByName(std::string(s));
 	Player* p = dynamic_cast<Player*>(c);
 	if(!c || !p){
       lua_newtable(L);

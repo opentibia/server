@@ -289,7 +289,7 @@ bool Commands::broadcastMessage(Creature* c, const std::string &cmd, const std::
 
 bool Commands::banPlayer(Creature* c, const std::string &cmd, const std::string &param){
 	
-	Creature *creature = game->getCreatureByName(param.c_str());
+	Creature *creature = game->getCreatureByName(param);
 	if(creature) {
 		MagicEffectClass me;
 		
@@ -319,7 +319,7 @@ bool Commands::teleportMasterPos(Creature* c, const std::string &cmd, const std:
 }
 
 bool Commands::teleportHere(Creature* c, const std::string &cmd, const std::string &param){
-	Creature* creature = game->getCreatureByName(param.c_str());
+	Creature* creature = game->getCreatureByName(param);
 	if(creature) {
 		game->teleport(creature, c->pos);
 	}
@@ -407,7 +407,7 @@ bool Commands::testCommand(Creature* c, const std::string &cmd, const std::strin
 }
 
 bool Commands::teleportTo(Creature* c, const std::string &cmd, const std::string &param){
-	Creature* creature = game->getCreatureByName(param.c_str());
+	Creature* creature = game->getCreatureByName(param);
 	if(creature) {
 		game->teleport(c, creature->pos);
 	}
@@ -415,7 +415,7 @@ bool Commands::teleportTo(Creature* c, const std::string &cmd, const std::string
 }
 
 bool Commands::getInfo(Creature* c, const std::string &cmd, const std::string &param){
-	Creature* creature = game->getCreatureByName(param.c_str());
+	Creature* creature = game->getCreatureByName(param);
 	Player *player = dynamic_cast<Player*>(c);
 	if(!player)
 		return true;
@@ -435,7 +435,8 @@ bool Commands::getInfo(Creature* c, const std::string &cmd, const std::string &p
 		        "maglvl: " << p->maglevel << std::endl <<
 		        "speed:  " <<  p->speed <<std::endl <<
 		        "position " << p->pos << std::endl << 
-				"ip: " << (int)ip[0] << "." << (int)ip[1] << "." << (int)ip[2] << "." << (int)ip[3];
+				"ip: " << (unsigned int)ip[0] << "." << (unsigned int)ip[1] << 
+				   "." << (unsigned int)ip[2] << "." << (unsigned int)ip[3];
 		player->sendTextMessage(MSG_BLUE_TEXT,info.str().c_str());
 	}
 	else{
