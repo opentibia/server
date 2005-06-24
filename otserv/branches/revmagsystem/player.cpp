@@ -67,6 +67,7 @@ Player::Player(const char *name, Protocol *p) :
 
   maglevel   = 20;
 	lightlevel = 0;
+	last_worldlightlevel = -1;
 
   access     = 0;
   lastlogin  = 0;
@@ -1286,7 +1287,10 @@ void Player::sendTextWindow(Item* item,const unsigned short maxlen, const bool c
 
 void Player::sendWorldLightLevel(unsigned char lightlevel, unsigned char color)
 {
-	client->sendWorldLightLevel(lightlevel, color);
+	if(last_worldlightlevel != lightlevel){
+		client->sendWorldLightLevel(lightlevel, color);
+		last_worldlightlevel = lightlevel;
+	}
 }
 
 void Player::sendPlayerLightLevel(Player* player)

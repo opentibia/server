@@ -195,13 +195,14 @@ public:
 	//void onItemUpdateInvnetory(const unsigned char sl_id);
 	
 	virtual unsigned char getLightLevel() const {return lightlevel;};
-	virtual setLightLevel(unsigned char light) {lightlevel = light;};
+	virtual void setLightLevel(unsigned char light) {lightlevel = light;};
 
 protected:
   int accountNumber;
   std::string password;
   int useCount;
 	unsigned char lightlevel;
+	int last_worldlightlevel;
 
   bool pzLocked;
   long inFightTicks;

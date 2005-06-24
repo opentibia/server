@@ -258,7 +258,7 @@ bool Spell::castSpell(Creature* creature, const Position& pos, const std::string
 			switch(manausage) {
 				case MANAUSAGE_PERCENT: {
 					double percent = ((double)std::min(this->getMana(), 100) / 100);
-					manaCost = std::ceil(player->getMana() * percent);
+					manaCost = (int)std::ceil(player->getMana() * percent);
 					break;
 				}
 
@@ -422,7 +422,7 @@ int SpellScript::onUse(Creature* spellCastCreature, Creature *target, const std:
 	}
 #endif
 
-	int ret = lua_tonumber(luaState, -1);
+	int ret = (int)lua_tonumber(luaState, -1);
 	lua_pop(luaState, 1);
 
 	return ret;
