@@ -549,6 +549,7 @@ int ActionScript::registerFunctions()
 	lua_register(luaState, "getItemRWInfo", ActionScript::luaActionGetItemRWInfo);
 	//getThingfromPos(pos)
 	lua_register(luaState, "getThingfromPos", ActionScript::luaActionGetThingfromPos);
+	//getThingPos(uid)
 	
 	//doRemoveItem(uid,n)
 	lua_register(luaState, "doRemoveItem", ActionScript::luaActionDoRemoveItem);
@@ -1066,8 +1067,25 @@ int ActionScript::luaActionDoPlayerAddHealth(lua_State *L)
 	const KnownThing* tmp = action->GetPlayerByUID(cid);
 	if(tmp){
 		Player *player = (Player*)(tmp->thing);
-		player->health = std::min(player->healthmax,player->health+addhealth);
+		int tmp = player->health + addhealth;
+		if(tmp <= 0){
+			player->health = 1;
+		}
+		else if(tmp > player->healthmax){
+			player->health = player->healthmax;
+		}
+		else{
+			player->health = tmp;
+		}
 		player->sendStats();
+		
+		std::vector<Creature*> list;
+		action->game->getSpectators(Range(player->pos,true), list);
+		for(unsigned int i = 0; i < list.size(); i++){
+			Player* p = dynamic_cast<Player*>(list[i]);
+			if(p)
+				p->sendCreatureHealth(player);
+		}
 	}
 	else{
 		lua_pushnumber(L, -1);
