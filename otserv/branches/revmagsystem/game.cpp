@@ -1793,6 +1793,206 @@ void Game::creatureToChannel(Creature *creature, SpeakClasses type, const std::s
 	}
 }
 
+void Game::executeAttack(Attack *attack, Creature *attackedCreature){
+	
+	eDamgeType damageType;
+	std::vector<Creature*> attackedlist;
+	std::vector<Creature*> attackerlist;
+	Player* attackedPlayer = dynamic_cast<Player*>(attackedCreature);
+	//TODO: use ownerid to set damage by fire/energy/....
+	Creature* attacker = dynamic_cast<Creature*>(attack->getOwner());
+	Player* attackerPlayer = dynamic_cast<Player*>(attacker);
+	Player *spectator = NULL;
+	std::vector<Creature*>::iterator cit;
+	
+	long damage = attack->getDamage(attackedCreature, damageType);
+	//add shield skill
+	if(attack->addShieldTry()){
+		attackedPlayer->addSkillShieldTry(1);
+	}
+	//perform damage
+	if(damage > 0){
+		switch(damageType){
+		case DAMAGE_HEALTH:
+			//TODO: check conditions for mana shield
+			if(attackedCreature->manaShieldTicks > 1000){
+				if(damage < attackedCreature->mana){
+					std::cout << "Error. Mana shield error." << std::cout;
+					attackedCreature->drainHealth(damage);
+				}
+				else{
+					attackedCreature->drainMana(attackedCreature->mana);
+					attackedCreature->drainHealth(damage - attackedCreature->mana);
+				}
+			}
+			else{
+				attackedCreature->drainHealth(damage);
+			}
+			//update creature health
+			getSpectators(Range(attackedCreature->pos), attackedlist);
+
+			for(cit = attackedlist.begin(); cit != attackedlist.end(); ++cit) {
+				spectator = dynamic_cast<Player*>(*cit);
+				if(!spectator)
+					continue;
+				spectator->sendCreatureHealth(attackedCreature);
+			}
+			//send text to attacked player
+			if(attackedPlayer){
+				std::stringstream dmgmesg;
+				if(damage == 1) {
+					dmgmesg << "You lose 1 hitpoint";
+				}
+				else
+					dmgmesg << "You lose " << damage << " hitpoints";
+						
+				if(attacker) {
+					dmgmesg << " due to an attack by " << attacker->getName();
+				}
+				else
+					dmgmesg <<".";
+				
+				attackedPlayer->sendTextMessage(MSG_EVENT, dmgmesg.str().c_str());
+				if(attackedPlayer <= 0){
+					attackedPlayer->die(); //handles exp/skills/maglevel loss
+				}
+			}
+			break;
+		case DAMAGE_MANA:
+			attackedCreature->drainMana(damage);
+			break;
+		}
+	}
+	//update attackedPlayer stats
+	if(attackedPlayer)
+		attackedPlayer->sendStats();
+	
+	//skill update
+	if(attackerPlayer && attack->getSkillId()){
+		attackerPlayer->addSkillTryInternal(1,attack->getSkillId());
+	}
+	//draw animations
+	MagicEffectClasses me;
+	eATextColor text_color;
+	eBloodColor blood_color;
+	subfight_t shoot;
+	attack->getDrawInfo(me,text_color,blood_color,shoot);
+	if(me != NM_ME_NONE){
+		if(attackedlist.empty()){
+			getSpectators(Range(attackedCreature->pos), attackedlist);
+		}
+		for(cit = attackedlist.begin(); cit != attackedlist.end(); ++cit) {
+			spectator = dynamic_cast<Player*>(*cit);
+			if(!spectator)
+				continue;
+			spectator->sendMagicEffect(attackedCreature->pos, NM_ME_BLOCKHIT);
+		}
+	}
+	if(text_color != ATEXT_NONE && damage != 0){
+		std::stringstream dmg;
+		dmg << damage;
+		if(attackedlist.empty()){
+			getSpectators(Range(attackedCreature->pos), attackedlist);
+		}
+		for(cit = attackedlist.begin(); cit != attackedlist.end(); ++cit) {
+			spectator = dynamic_cast<Player*>(*cit);
+			if(!spectator)
+				continue;
+			spectator->sendAnimatedText(attackedCreature->pos, text_color, dmg.str());
+		}
+	}
+	if(blood_color != BLOOD_NONE){
+		addSplash(attackedCreature->pos, 2019, blood_color);
+	}
+	if(shoot != DIST_NONE && attacker){
+		addAnimationShoot(attacker,attackedCreature->pos,shoot);
+	}
+	
+	
+	//check for attackedcreature dead
+	if(attackedCreature->health <= 0){
+		
+		removeCreature(attackedCreature);
+		
+		if(attacker && 
+		  attacker->attackedCreature == attackedCreature->getID()) {
+			attacker->setAttackedCreature(0);
+			if(attackerPlayer) {
+				attackerPlayer->sendCancelAttacking();
+			}
+		}
+		
+		//Blood pool
+		//TODO: modify creature to get blood color?
+		if(attackedCreature->getCreatureType() != RACE_UNDEAD) {
+			addSplash(attackedCreature->pos, 2016, blood_color);
+		}
+
+		//Get corpse
+		Item *corpseitem = attackedCreature->getCorpse(attacker);
+		//Add eventual loot
+		Container *lootcontainer = dynamic_cast<Container*>(corpseitem);
+		if(lootcontainer) {
+			attackedCreature->dropLoot(lootcontainer);
+		}
+		//set corpse description
+		if(attackedPlayer){
+			std::stringstream s;
+			s << "a dead human. You recognize " 
+				<< attackedPlayer->getName() << ". ";
+			if(attacker){
+				if(attackedPlayer->sex != 0)
+					s << "He";
+				else
+					s << "She";
+				s << " was killed by ";
+				if(attackerPlayer)
+					s << attacker->getName();
+				else
+					s << "a " << attacker->getName();
+			}
+			corpseitem->setSpecialDescription(s.str());
+			//send corpse to the dead player. It is not in spectator list
+			// because was removed
+			attackedPlayer->onThingAppear(corpseitem);
+		}
+		addThing(NULL, corpseitem->pos, corpseitem);
+		startDecay(corpseitem);
+		
+		//TODO:Add experience	
+	}
+}
+
+void Game::addSplash(const Position &pos,unsigned short type, eBloodColor color){
+	Tile *tile = getTile(pos.x,pos.y,pos.z);
+	if(!tile)
+		return;
+	
+	bool hadSplash = (tile->splash != NULL);
+	if (!tile->splash) {
+		Item *item = Item::CreateItem(type, color);
+		item->pos = pos;
+		tile->splash = item;
+		startDecay(tile->splash);
+	}
+
+	if(hadSplash) {
+		unsigned char stackpos = tile->getThingStackPos(tile->splash);
+		Item *splash;
+		splash = tile->splash;
+		splash->setID(type);
+		splash->setItemCountOrSubtype(color);
+		tile->splash = NULL;
+		sendRemoveThing(NULL,pos,splash,stackpos);
+		tile->splash = splash;
+		sendAddThing(NULL,pos,tile->splash);
+	}
+	else {
+		sendAddThing(NULL,pos,tile->splash);
+	}
+}
+
+
 void Game::creatureAttackCreature(Creature *attacker, Creature *attackedCreature, attacktype_t attackType, amuEffect_t ammunition, int damage)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
@@ -2221,7 +2421,7 @@ void Game::checkCreatureAttacking(unsigned long id)
 					Tile* fromtile = getTile(creature->pos.x, creature->pos.y, creature->pos.z);
 					if(fromtile == NULL) {
 						std::cout << "checkCreatureAttacking NULL tile: " << creature->getName() << std::endl;
-						//return;
+						return;
 					}
 					if (!attackedCreature->isAttackable() == 0 && fromtile && fromtile->isPz() && creature->access == 0)
 					{

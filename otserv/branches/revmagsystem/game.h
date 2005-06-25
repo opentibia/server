@@ -34,7 +34,7 @@
 #include "item.h"
 #include "container.h"
 #include "map.h"
-
+#include "attack.h"
 
 class Creature;   // see creature.h
 class Player;
@@ -187,6 +187,8 @@ public:
 	void creatureAttackCreature(Creature *attacker, Creature *attackedCreature, attacktype_t attackType, amuEffect_t ammunition, int damage);
 	void internalCreatureAttackCreature(Creature *attacker, Creature *attackedCreature, attacktype_t attackType, amuEffect_t ammunition, int damage);
 	void internalCreatureAttackedCreature(Creature *attacker, Creature *attackedCreature);
+	void executeAttack(Attack *attack, Creature *attackedCreature);
+	void addSplash(const Position &pos,unsigned short type, eBloodColor color);
 
 	void addAnimationShoot(Creature *attacker, const Position& posTo, unsigned char distanceEffect);
 	void addMagicEffect(const Position &pos, unsigned char type);
