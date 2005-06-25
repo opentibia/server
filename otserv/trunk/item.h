@@ -46,6 +46,8 @@ protected:
 	unsigned char fluid;
 	unsigned short actionId;
 	unsigned short uniqueId;
+	std::string *specialDescription;
+	std::string *text;	//text written
 private:
 	int useCount;
 	
@@ -83,8 +85,7 @@ public:
 	bool floorChangeEast() const;
 	bool floorChangeWest() const;
 	
-	std::string *specialDescription;
-	std::string *text;	//text written
+	bool isRemoved;
 
 	int use(){std::cout << "use " << id << std::endl; return 0;};
 	int use(Item*){std::cout << "use with item ptr " << id << std::endl; return 0;};

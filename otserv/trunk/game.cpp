@@ -3119,18 +3119,16 @@ void Game::checkDecay(int t){
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
 	addEvent(makeTask(DECAY_INTERVAL, boost::bind(&Game::checkDecay,this,DECAY_INTERVAL)));
 	
-	int last = decayVector.size();
 	
-	for(int i = 0; i < last; i++){
-		decayVector[i]->decayTime -= t;
-	}
-	
-	for(int i = 0; i < last; i++){
-		if(decayVector[i]->decayTime <= 0){
-			for(int k = 0; k < decayVector[i]->decayItems.size(); k++){
+	list<decayBlock*>::iterator it;
+	for(it = decayVector.begin();it != decayVector.end();){
+		(*it)->decayTime -= t;
+		if((*it)->decayTime <= 0){
+			list<Item*>::iterator it2;
+			for(it2 = (*it)->decayItems.begin(); it2 != (*it)->decayItems.end(); it2++){
 				/*todo: Decaying item could be in a  container carried by a player,
 				should all items have a pointer to their parent (like containers)?*/
-				Item* item = decayVector[i]->decayItems[k];
+				Item* item = *it2;
 				item->isDecaying = false;
 				if(item->canDecay()){
 					if(item->pos.x != 0xFFFF){
@@ -3168,21 +3166,13 @@ void Game::checkDecay(int t){
 					}//pos != 0xFFFF
 				}//item->canDecay()
 				FreeThing(item);
-			}//for
-		}
-	}
-	
-	vector<decayBlock*>::iterator it2 = decayVector.begin();
-	while(it2 != decayVector.end()){		
-		if((*it2)->decayTime <= 0){
-			delete (*it2);
-			decayVector.erase(it2);
-			it2 = decayVector.begin();
-		}
+			}//for it2
+			it = decayVector.erase(it);
+		}//(*it)->decayTime <= 0
 		else{
-			it2++;
+			it++;
 		}
-	}
+	}//for it
 		
 	flushSendBuffers();	
 }
@@ -3199,7 +3189,7 @@ void Game::startDecay(Item* item){
 	dtime = (dtime/DECAY_INTERVAL)*DECAY_INTERVAL;
 	item->useThing();
 	//search if there are any block with this time
-	vector<decayBlock*>::iterator it;
+	list<decayBlock*>::iterator it;
 	for(it = decayVector.begin();it != decayVector.end();it++){
 		if((*it)->decayTime == dtime){			
 			(*it)->decayItems.push_back(item);
@@ -3657,8 +3647,7 @@ void Game::addThing(Player* player,const Position &pos,Thing* thing)
 					sendRemoveThing(NULL,pos,oldsplash,stackpos);
 					tile->splash = item;
 					sendAddThing(NULL,pos,tile->splash);
-					//TODO: find a better way to say that item is not used
-					oldsplash->pos.x = 0xFFFF;
+					oldsplash->isRemoved = true;
 					FreeThing(oldsplash);
 				}
 				else{
@@ -3697,15 +3686,13 @@ void Game::removeThing(Player* player,const Position &pos,Thing* thing)
 {
 	if(!thing)
 		return;
-		
+	Item *item = dynamic_cast<Item*>(thing);
+	
 	if(pos.x == 0xFFFF) {
-		if(!player)
+		if(!player || !item)
 			return;
+			
 		if(pos.y & 0x40) { //container
-			Item *item = dynamic_cast<Item*>(thing);
-			if(!item)
-				return;
-									
 			unsigned char containerid = pos.y & 0x0F;
 			Container* container = player->getContainer(containerid);
 			if(!container)
@@ -3718,6 +3705,7 @@ void Game::removeThing(Player* player,const Position &pos,Thing* thing)
 			sendRemoveThing(player,pos,thing,0,true);
 			//player->removeItemInventory(pos.y,true);	
 		}
+		item->isRemoved = true;
 	}
 	else //ground
 	{		
@@ -3726,6 +3714,9 @@ void Game::removeThing(Player* player,const Position &pos,Thing* thing)
 			unsigned char stackpos = tile->getThingStackPos(thing);
 			tile->removeThing(thing);
 			sendRemoveThing(NULL,pos,thing,stackpos,true);
+		}
+		if(item){
+			item->isRemoved = true;
 		}
 	}
 }

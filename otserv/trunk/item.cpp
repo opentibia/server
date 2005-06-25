@@ -47,6 +47,7 @@ Item* Item::CreateItem(const unsigned short _type, unsigned short _count /*= 0*/
 	else{
 		newItem =  new Item(_type, _count);
 	}
+	newItem->isRemoved = false;
 	newItem->useThing();
 	return newItem;
 }
@@ -128,6 +129,7 @@ Item::Item(const unsigned short _type) {
 	fluid = 0;
 	actionId = 0;
 	uniqueId = 0;
+	isRemoved = true;
 	throwRange = 6;
 	useCount = 0;
 	isDecaying  = 0;
@@ -224,6 +226,7 @@ Item::Item(const unsigned short _type, unsigned short _count) {
 	actionId = 0;
 	uniqueId = 0;
 	useCount = 0;
+	isRemoved = true;
 	isDecaying  = 0;
 	specialDescription = NULL;
 	text = NULL;
@@ -258,6 +261,7 @@ Item::Item()
 	isDecaying  = 0;
 	actionId = 0;
 	uniqueId = 0;
+	isRemoved = true;
 	specialDescription = NULL;
 	text = NULL;
 }
@@ -599,6 +603,8 @@ int Item::getRWInfo() const {
 }
 
 bool Item::canDecay(){
+	if(isRemoved)
+		return false;
 	return items[id].canDecay;	
 }	
 //Teleport class

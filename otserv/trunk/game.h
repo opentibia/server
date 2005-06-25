@@ -307,9 +307,9 @@ protected:
 	void startDecay(Item* item);
 	struct decayBlock{
 		long decayTime;
-		std::vector<Item*> decayItems;
+		std::list<Item*> decayItems;
 	};
-	std::vector<decayBlock*> decayVector;
+	std::list<decayBlock*> decayVector;
 	
 	void checkSpawns(int t);
 	std::priority_queue<SchedulerTask*, std::vector<SchedulerTask*>, lessSchedTask > eventList;
