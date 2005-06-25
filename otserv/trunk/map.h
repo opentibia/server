@@ -289,7 +289,9 @@ class Map {
 	void getSpectators(const Range& range, std::vector<Creature*>& list);
     
     typedef std::map<unsigned long, Tile*> TileMap;
-	TileMap tileMaps[32][32][MAP_LAYER];	
+	//TileMap tileMaps[32][32][MAP_LAYER];	
+	//TileMap tileMaps[256][256];
+	TileMap tileMaps[128][128];
 
   // setTile moved into public
 

@@ -5,7 +5,7 @@
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
-// as published by the Free Software Foundumpion; either version 2
+// as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
 // 
 // This program is distributed in the hope that it will be useful,
@@ -14,7 +14,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software Foundumpion,
+// along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
@@ -33,8 +33,11 @@
 using namespace std;
 
 #include "iomap.h"
-#include "iomapxml.h"
+#ifdef _JXB2MAP_
 #include "iomapjxb2.h"
+#else
+#include "iomapxml.h"
+#endif
 
 #include "otsystem.h"
 #include <stdio.h>
@@ -320,12 +323,17 @@ Tile* Map::getTile(unsigned short _x, unsigned short _y, unsigned char _z)
 {
   if (_z < MAP_LAYER)
   {
-    // _x & 0x3F  is like _x % 64
-	// _x & 0x1F  is like _x % 32
-    TileMap *tm = &tileMaps[_x & 0x1F][_y & 0x1F][_z];
-
+	// _x & 0x7F  is like _x % 128
+	//TileMap *tm = &tileMaps[_x & 0x1F][_y & 0x1F][_z];
+	//TileMap *tm = &tileMaps[_x & 0xFF][_y & 0xFF];
+    TileMap *tm = &tileMaps[_x & 0x7F][_y & 0x7F];
+	if(!tm)
+		return NULL;
+	
     // search in the stl map for the requested tile
-    TileMap::iterator it = tm->find((_x << 16) | _y);
+    //TileMap::iterator it = tm->find((_x << 16) | _y);
+    //TileMap::iterator it = tm->find(_x & 0xFF00) << 8 | (_y & 0xFF00) | _z);
+    TileMap::iterator it = tm->find((_x & 0xFF80) << 16 | (_y & 0xFF80) << 1 | _z);
 
     // ... found
     if (it != tm->end())
@@ -363,7 +371,9 @@ void Map::setTile(unsigned short _x, unsigned short _y, unsigned char _z, unsign
 			tile->ground->pos.z = _z;
 		}
 
-		tileMaps[_x & 0x1F][_y & 0x1F][_z][(_x << 16) | _y] = tile;
+		//tileMaps[_x & 0x1F][_y & 0x1F][_z][(_x << 16) | _y] = tile;
+		//tileMaps[_x & 0xFF][_y & 0xFF][ _x & 0xFF00) << 8 | (_y & 0xFF00) | _z] = tile;
+		tileMaps[_x & 0x7F][_y & 0x7F][ (_x & 0xFF80) << 16 | (_y & 0xFF80) << 1 | _z] = tile;
   } 
 }
 
