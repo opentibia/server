@@ -133,12 +133,12 @@ bool MagicTargetSpell::doCastSpell(Creature* spellCastCreature, const Position& 
 				CreatureVector::iterator cit;
 				for(cit = tile->creatures.begin(); cit != tile->creatures.end(); ++cit) {
 					int damage = spell->script->onUse(spellCastCreature, *cit, var);
-					spell->game->internalCreatureAttackCreature(spellCastCreature, *cit, attackType, amuInfo, damage);
+					//spell->game->internalCreatureAttackCreature(spellCastCreature, *cit, attackType, amuInfo, damage);
 					targetlist.push_back(*cit);
 				}
 
 				for(CreatureVector::iterator cit = targetlist.begin(); cit != targetlist.end(); ++cit) {
-					spell->game->internalCreatureAttackedCreature(spellCastCreature, *cit);
+					//spell->game->internalCreatureAttackedCreature(spellCastCreature, *cit);
 				}
 			}
 		}
@@ -161,7 +161,7 @@ bool MagicTargetSpell::doCastSpell(Creature* spellCastCreature, Creature* target
 
 		Player*	spellCastPlayer = dynamic_cast<Player*>(spellCastCreature);
 		int damage = spell->script->onUse(spellCastCreature, targetCreature, "");
-		spell->game->creatureAttackCreature(spellCastCreature, targetCreature, attackType, amuInfo, damage);
+		//spell->game->creatureAttackCreature(spellCastCreature, targetCreature, attackType, amuInfo, damage);
 
 		return true;
 	}
@@ -215,7 +215,7 @@ bool MagicAreaSpell::doCastSpell(Creature* spellCastCreature, const Position& po
 				else {
 					for(cit = tile->creatures.begin(); cit != tile->creatures.end(); ++cit) {
 						int damage = spell->script->onUse(spellCastCreature, *cit, var);
-						spell->game->internalCreatureAttackCreature(spellCastCreature, *cit, attackType, amuInfo, damage);
+						//spell->game->internalCreatureAttackCreature(spellCastCreature, *cit, attackType, amuInfo, damage);
 						targetlist.push_back(*cit);
 					}
 				}
@@ -224,7 +224,7 @@ bool MagicAreaSpell::doCastSpell(Creature* spellCastCreature, const Position& po
 	}
 
 	for(CreatureVector::iterator cit = targetlist.begin(); cit != targetlist.end(); ++cit) {
-		spell->game->internalCreatureAttackedCreature(spellCastCreature, *cit);
+		//spell->game->internalCreatureAttackedCreature(spellCastCreature, *cit);
 	}
 
 	return true;
