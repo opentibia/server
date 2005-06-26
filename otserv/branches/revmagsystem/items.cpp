@@ -567,7 +567,14 @@ int Items::loadXMLInfos(std::string file)
 							}
 							else
 								std::cout << "missing amutype for item: " << id << std::endl;
-								
+							
+							char* attack = (char*)xmlGetProp(p, (xmlChar*)"attack");
+
+							if (attack)
+								itemtype->attack = atoi(attack);
+							else
+								std::cout << "missing attack for item:  " << id << std::endl;
+							
     						char *sshoottype = (char*)xmlGetProp(p, (xmlChar*)"shottype");
               				if (sshoottype){
 						    	if (!strcmp(sshoottype, "bolt"))
