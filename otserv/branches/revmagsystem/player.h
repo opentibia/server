@@ -24,6 +24,7 @@
 
 #include "creature.h"
 #include "container.h"
+#include "attack.h"
 
 #include <vector>
 #include <ctime>
@@ -32,6 +33,7 @@
 class Protocol;
 
 enum skills_t {
+	SKILL_NONE=-1,
     SKILL_FIST=0,
     SKILL_CLUB=1,
     SKILL_SWORD=2,
@@ -85,7 +87,7 @@ public:
 	void addContainer(unsigned char containerid, Container *container);
 	void closeContainer(unsigned char containerid);
 
-	virtual Item* Player::getCorpse(Creature *attacker);
+	virtual Item* getCorpse(Creature *attacker);
 
 	void addStorageValue(const unsigned long key, const long value);
 	bool getStorageValue(const unsigned long key, long &value) const;
@@ -94,14 +96,13 @@ public:
 
 	Direction getDirection() {return direction;};
 	Item* getItem(int pos) const;
-	Item* GetDistWeapon() const;
 	
 	std::string getName(){return name;};
 	
 	void useMana(int amount);
   void addExp(unsigned long exp);
 
-  virtual int getWeaponDamage() const;
+  //virtual int getWeaponDamage() const;
   virtual int getArmor() const;
   virtual int getDefense() const;
 
@@ -135,9 +136,9 @@ public:
 	//depots
 	DepotMap depots;
 
-	void RemoveDistItem();
-  fight_t getFightType();
-	subfight_t getSubFightType();
+	Attack *getAttack();
+	void removeDistItem(Item *item);
+	Item* getDistWeapon(Item *item) const;
 
   bool CanSee(int x, int y, int z) const;
 
@@ -146,6 +147,9 @@ public:
   void sendCancelAttacking();
   void sendChangeSpeed(Creature* creature);
   void sendToChannel(Creature *creature, SpeakClasses type, const std::string &text, unsigned short channelId);
+  void sendColorSquare(Creature *creature, unsigned char color);
+  
+  
   virtual void sendCancel(const char *msg);
   virtual void sendCancelWalk(const char *msg);  
   int sendInventory(unsigned char sl_id);
@@ -184,6 +188,7 @@ public:
 	void onThingAppear(const Thing* thing);  
 	void onThingTransform(const Thing* thing,int stackpos);
 	void onThingDisappear(const Thing* thing, unsigned char stackPos);
+	void onDisappearMySelf(const unsigned char stackPos) const;
 	void onThingRemove(const Thing* thing); //auto-close containers
 	//container
 	void onItemAddContainer(const Container* container,const Item* item);
@@ -289,6 +294,8 @@ protected:
   friend class Game;
   friend class ActionScript;
   friend class Map;
+  	friend class AttackMelee;
+  	friend class AttackDistancePhysical;
 	friend class MovePlayer;
 	friend class StopMovePlayer;
 	friend class Protocol74;

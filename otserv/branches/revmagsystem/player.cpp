@@ -80,7 +80,7 @@ Player::Player(const char *name, Protocol *p) :
   for(int i = 0; i < 7; i++)
   {
 		skills[i][SKILL_LEVEL] = 1;
-    skills[i][SKILL_TRIES] = 0;
+    	skills[i][SKILL_TRIES] = 0;
 		skills[i][SKILL_PERCENT] = 0;
 
 		for(int j=0;j<2;j++){
@@ -177,7 +177,7 @@ Item* Player::getItem(int pos) const
 		return items[pos];
 	return NULL;
 }
-
+/*
 int Player::getWeaponDamage() const
 {
 	double damagemax = 0;
@@ -239,7 +239,7 @@ int Player::getWeaponDamage() const
 	// return it
 	return 1+(int)(damagemax*rand()/(RAND_MAX+1.0));
 }
-
+*/
 int Player::getArmor() const
 {
 	int armor=0;
@@ -276,15 +276,7 @@ int Player::getDefense() const
 		else
 			defense += items[SLOT_RIGHT]->getDefense();		
 	}
-	//////////
-	if(defense == 0) 
-		defense = (int)random_range(0,(int)skills[SKILL_SHIELD][SKILL_LEVEL]);
-	else 
-		defense += (int)random_range(0,(int)skills[SKILL_SHIELD][SKILL_LEVEL]);
-
-  	return random_range(int(defense*0.25), int(1+(int)(defense*rand())/(RAND_MAX+1.0)));
-  	///////////
-	//return defense;
+	return defense;
 }
 
 unsigned long Player::getMoney()
@@ -1009,6 +1001,11 @@ Item* Player::getCorpse(Creature *attacker)
 
 		corpseitem->setSpecialDescription(s.str());
 	}
+	//Add eventual loot
+	Container *container = dynamic_cast<Container*>(corpseitem);
+	if(container) {
+		this->dropLoot(container);
+	}
 
 	return corpseitem;
 }
@@ -1024,7 +1021,82 @@ void Player::dropLoot(Container *corpse)
 		}
 	}	
 }
+Attack* Player::getAttack(){
+	Attack *attack = NULL;
+	for (int slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++){
+    	if (items[slot]){
+			if ((items[slot]->isWeapon())){
+				Item *distItem;
+				switch (items[slot]->getWeaponType()){
+				case DIST:
+					distItem = getDistWeapon(items[slot]);
+					if(distItem){
+						attack = new AttackDistancePhysical();
+						static_cast<AttackDistancePhysical*>(attack)->initialize(this,distItem);
+						return attack;
+					}
+					break;
+				case MAGIC:
+					break;
+				case SHIELD:
+					break;
+				default:
+					attack = new AttackMelee();
+					static_cast<AttackMelee*>(attack)->initialize(this,items[slot]);
+					return attack;
+					break;
+				}
+			}
+    	}
+	}
+	attack = new AttackMelee();
+	static_cast<AttackMelee*>(attack)->initialize(this,(Item*)NULL);
+	return attack;
+}
 
+void Player::removeDistItem(Item *item){
+	unsigned char sl_id;
+	if(item->isStackable() == false)
+		return;
+	//remove one dist item
+	unsigned char n = item->getItemCountOrSubtype();
+	if(item == items[SLOT_RIGHT]){
+		sl_id = SLOT_RIGHT;
+	}
+	else if(item == items[SLOT_LEFT]){
+		sl_id = SLOT_LEFT;
+	}
+	else if(item == items[SLOT_AMMO]){
+		sl_id = SLOT_AMMO;
+	}
+		
+	if(n > 1){
+		item->setItemCountOrSubtype(n-1);
+	}
+	else{
+		//remove the item			
+		items[sl_id] = NULL;
+		item->releaseThing();
+	}		
+	//update inventory
+	client->sendInventory(sl_id);
+}
+
+Item * Player::getDistWeapon(Item *item) const{
+
+	if(item->getAmuType() == AMU_NONE){
+		return item;
+	}
+	if(items[SLOT_AMMO]){
+		//compare ammo types
+		if(items[SLOT_AMMO]->getWeaponType() == AMO && 
+			item->getAmuType() == items[SLOT_AMMO]->getAmuType()){
+			return items[SLOT_AMMO];
+		}
+	}
+	return NULL;
+}
+/*
 fight_t Player::getFightType()
 {
   for (int slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++)
@@ -1053,7 +1125,8 @@ fight_t Player::getFightType()
   }
   return FIGHT_MELEE;
 }
-
+*/
+/*
 void Player::RemoveDistItem(){
 	Item *DistItem = GetDistWeapon();
 	unsigned char sl_id;
@@ -1086,7 +1159,8 @@ void Player::RemoveDistItem(){
 	}
 	return;
 }
-
+*/
+/*
 subfight_t Player::getSubFightType()
 {
 	fight_t type = getFightType();
@@ -1141,7 +1215,7 @@ Item * Player::GetDistWeapon() const{
   	}//for
   	return NULL;
 }
-
+*/
 void Player::addStorageValue(const unsigned long key, const long value){
 	storageMap[key] = value;
 }
@@ -1444,6 +1518,11 @@ void Player::onThingTransform(const Thing* thing,int stackpos){
 void Player::onThingDisappear(const Thing* thing, unsigned char stackPos){
 	client->sendThingDisappear(thing, stackPos, false);
 }
+
+void Player::onDisappearMySelf(const unsigned char stackPos) const{
+	client->sendThingDisappear(this, stackPos, false);
+}
+
 //auto-close containers
 void Player::onThingRemove(const Thing* thing){
 	client->sendThingRemove(thing);
@@ -1488,6 +1567,10 @@ void Player::onTileUpdated(const Position &pos)
 
 void Player::onTeleport(const Creature *creature, const Position *oldPos, unsigned char oldstackpos) { 
   client->sendThingMove(creature, creature,oldPos, oldstackpos, true, 1, 1); 
+}
+
+void Player::sendColorSquare(Creature *creature, unsigned char color){
+	client->sendColorSquare(creature,color);
 }
 
 void Player::useMana(int amount)
