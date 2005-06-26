@@ -151,10 +151,10 @@ public:
   Direction getDirection() const { return direction; }
   void setDirection(Direction dir) { direction = dir; }
 
-  virtual fight_t getFightType(){return FIGHT_MELEE;};
-	virtual subfight_t getSubFightType() {return DIST_NONE;}
+  //virtual fight_t getFightType(){return FIGHT_MELEE;};
+	//virtual subfight_t getSubFightType() {return DIST_NONE;}
 
-	virtual void RemoveDistItem(){return;}
+	//virtual void RemoveDistItem(){return;}
 
 	virtual bool isImmune(attacktype_t attackType)
 	{

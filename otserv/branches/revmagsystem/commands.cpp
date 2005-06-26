@@ -414,7 +414,8 @@ bool Commands::testCommand(Creature* c, const std::string &cmd, const std::strin
 	int color = atoi(param.c_str());
 	Player *player = dynamic_cast<Player*>(c);
 	if(player) {
-		player->sendMagicEffect(player->pos, color);					
+		//player->sendMagicEffect(player->pos, color);
+		player->sendColorSquare(player, (unsigned char)color);
 	}
 
 	return true;

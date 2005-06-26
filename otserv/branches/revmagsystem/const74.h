@@ -22,9 +22,10 @@
 #define __CONST74_H__
 
 #define NETWORKMESSAGE_MAXSIZE 16768
+#define GM_MIN_LEVEL 1
 
 enum MagicEffectClasses {
-	NM_ME_DRAW_BLOOD  	   = 0x00,
+	NM_ME_BLOOD  	   	   = 0x00,
 	NM_ME_LOOSE_ENERGY	   = 0x01, //fishing?
 	NM_ME_PUFF             = 0x02,
 	NM_ME_BLOCKHIT         = 0x03,
@@ -49,6 +50,7 @@ enum MagicEffectClasses {
 	NM_ME_SOUND_PURPLE     = 0x16, //22
 	NM_ME_SOUND_BLUE       = 0x17, //23
 	NM_ME_SOUND_WHITE      = 0x18, //24
+	NM_ME_DRAW_BLOOD       = 0xFE, //don't send to client, just for internal use
 	NM_ME_NONE             = 0xFF //don't send to client, just for internal use
 };
 
