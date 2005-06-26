@@ -267,16 +267,16 @@ bool Game::removeCreature(Creature* c)
 	if(tile != NULL) {			
 		removeThing(NULL,c->pos,c);
 		
-		if(!player || player->health > 0) {
-			FreeThing(c);
-		}
+		//if(!player || player->health > 0) {
+		FreeThing(c);
+		//}
 
 		for(std::vector<Creature*>::iterator cit = c->summons.begin(); cit != c->summons.end(); ++cit) {
 			Tile *tile = map->getTile((*cit)->pos.x, (*cit)->pos.y, (*cit)->pos.z);
 			if(tile != NULL){
 				(*cit)->setMaster(NULL);
-				this->FreeThing(*cit);
 				removeThing(NULL,(*cit)->pos,*cit);
+				this->FreeThing(*cit);
 			}
 		}
 			
@@ -1800,14 +1800,18 @@ void Game::executeAttack(Attack *attack, Creature *attackedCreature){
 	std::vector<Creature*> attackerlist;
 	Player* attackedPlayer = dynamic_cast<Player*>(attackedCreature);
 	//TODO: use ownerid to set damage by fire/energy/....
-	Creature* attacker = dynamic_cast<Creature*>(attack->getOwner());
-	Player* attackerPlayer = dynamic_cast<Player*>(attacker);
+	Creature *attacker = dynamic_cast<Creature*>(attack->getOwner());
+	Player *attackerPlayer = dynamic_cast<Player*>(attacker);
 	Player *spectator = NULL;
 	std::vector<Creature*>::iterator cit;
 	
+	if(attackedCreature->access >= GM_MIN_LEVEL){
+		return;
+	}
+	
 	long damage = attack->getDamage(attackedCreature, damageType);
 	//add shield skill
-	if(attack->addShieldTry()){
+	if(attackedPlayer && attack->addShieldTry()){
 		attackedPlayer->addSkillShieldTry(1);
 	}
 	//perform damage
@@ -1853,7 +1857,7 @@ void Game::executeAttack(Attack *attack, Creature *attackedCreature){
 					dmgmesg <<".";
 				
 				attackedPlayer->sendTextMessage(MSG_EVENT, dmgmesg.str().c_str());
-				if(attackedPlayer <= 0){
+				if(attackedPlayer->health <= 0){
 					attackedPlayer->die(); //handles exp/skills/maglevel loss
 				}
 			}
@@ -1868,7 +1872,7 @@ void Game::executeAttack(Attack *attack, Creature *attackedCreature){
 		attackedPlayer->sendStats();
 	
 	//skill update
-	if(attackerPlayer && attack->getSkillId()){
+	if(attackerPlayer && attack->getSkillId() != SKILL_NONE){
 		attackerPlayer->addSkillTryInternal(1,attack->getSkillId());
 	}
 	//draw animations
@@ -1876,7 +1880,25 @@ void Game::executeAttack(Attack *attack, Creature *attackedCreature){
 	eATextColor text_color;
 	eBloodColor blood_color;
 	subfight_t shoot;
-	attack->getDrawInfo(me,text_color,blood_color,shoot);
+	eSquareColor square_color;
+	attack->getDrawInfo(me,text_color,blood_color,shoot,square_color);
+	
+	if(square_color != SQ_COLOR_NONE){
+		if(attackerlist.empty()){
+			getSpectators(Range(attacker->pos), attackerlist);
+		}
+		for(cit = attackerlist.begin(); cit != attackerlist.end(); ++cit) {
+			spectator = dynamic_cast<Player*>(*cit);
+			if(!spectator)
+				continue;
+			spectator->sendColorSquare(attacker, square_color);
+		}
+	}
+	
+	if(shoot != DIST_NONE && attacker){
+		addAnimationShoot(attacker,attackedCreature->pos,shoot);
+	}
+	
 	if(me != NM_ME_NONE){
 		if(attackedlist.empty()){
 			getSpectators(Range(attackedCreature->pos), attackedlist);
@@ -1885,9 +1907,10 @@ void Game::executeAttack(Attack *attack, Creature *attackedCreature){
 			spectator = dynamic_cast<Player*>(*cit);
 			if(!spectator)
 				continue;
-			spectator->sendMagicEffect(attackedCreature->pos, NM_ME_BLOCKHIT);
+			spectator->sendMagicEffect(attackedCreature->pos, me);
 		}
 	}
+	
 	if(text_color != ATEXT_NONE && damage != 0){
 		std::stringstream dmg;
 		dmg << damage;
@@ -1901,19 +1924,13 @@ void Game::executeAttack(Attack *attack, Creature *attackedCreature){
 			spectator->sendAnimatedText(attackedCreature->pos, text_color, dmg.str());
 		}
 	}
-	if(blood_color != BLOOD_NONE){
+	
+	if(blood_color != BLOOD_NONE && damage != 0){
 		addSplash(attackedCreature->pos, 2019, blood_color);
 	}
-	if(shoot != DIST_NONE && attacker){
-		addAnimationShoot(attacker,attackedCreature->pos,shoot);
-	}
-	
-	
+		
 	//check for attackedcreature dead
 	if(attackedCreature->health <= 0){
-		
-		removeCreature(attackedCreature);
-		
 		if(attacker && 
 		  attacker->attackedCreature == attackedCreature->getID()) {
 			attacker->setAttackedCreature(0);
@@ -1930,36 +1947,14 @@ void Game::executeAttack(Attack *attack, Creature *attackedCreature){
 
 		//Get corpse
 		Item *corpseitem = attackedCreature->getCorpse(attacker);
-		//Add eventual loot
-		Container *lootcontainer = dynamic_cast<Container*>(corpseitem);
-		if(lootcontainer) {
-			attackedCreature->dropLoot(lootcontainer);
-		}
-		//set corpse description
-		if(attackedPlayer){
-			std::stringstream s;
-			s << "a dead human. You recognize " 
-				<< attackedPlayer->getName() << ". ";
-			if(attacker){
-				if(attackedPlayer->sex != 0)
-					s << "He";
-				else
-					s << "She";
-				s << " was killed by ";
-				if(attackerPlayer)
-					s << attacker->getName();
-				else
-					s << "a " << attacker->getName();
-			}
-			corpseitem->setSpecialDescription(s.str());
-			//send corpse to the dead player. It is not in spectator list
-			// because was removed
-			attackedPlayer->onThingAppear(corpseitem);
-		}
 		addThing(NULL, corpseitem->pos, corpseitem);
 		startDecay(corpseitem);
 		
-		//TODO:Add experience	
+		//remove creature
+		removeThing(NULL, attackedCreature->pos, attackedCreature);
+		
+		//TODO:Add experience
+		removeCreature(attackedCreature);
 	}
 }
 
@@ -1992,14 +1987,14 @@ void Game::addSplash(const Position &pos,unsigned short type, eBloodColor color)
 	}
 }
 
-
+/*
 void Game::creatureAttackCreature(Creature *attacker, Creature *attackedCreature, attacktype_t attackType, amuEffect_t ammunition, int damage)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
 	internalCreatureAttackCreature(attacker, attackedCreature, attackType, ammunition, damage);
 	internalCreatureAttackedCreature(attacker, attackedCreature);
 }
-
+*/
 void Game::addAnimationShoot(Creature *attacker, const Position& posTo, unsigned char distanceEffect)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
@@ -2015,7 +2010,7 @@ void Game::addAnimationShoot(Creature *attacker, const Position& posTo, unsigned
 		}
 	}
 }
-
+/*
 void Game::internalCreatureAttackCreature(Creature *attacker, Creature *attackedCreature, attacktype_t attackType, amuEffect_t ammunition, int damage)
 {
 	attackedCreature->applyDamage(attacker, attackType, damage);
@@ -2050,7 +2045,7 @@ void Game::internalCreatureAttackCreature(Creature *attacker, Creature *attacked
 		{
 			spectator->sendMagicEffect(attackedCreature->pos, NM_ME_BLOCKHIT);
 		}
-		*/
+		*//*
 		else if(attackType != ATTACK_NONE && attackedCreature->lastDamage == 0 && attackedCreature->lastManaDamage == 0) {
 			spectator->sendMagicEffect(attackedCreature->pos, NM_ME_PUFF);
 		}
@@ -2148,7 +2143,7 @@ void Game::internalCreatureAttackedCreature(Creature *attacker, Creature *attack
 		removeCreature(attackedCreature);
 	}
 }
-
+*/
 void Game::addMagicEffect(const Position &pos, unsigned char type)
 {
 	CreatureVector::iterator cit;
@@ -2433,8 +2428,16 @@ void Game::checkCreatureAttacking(unsigned long id)
 					}
 					else
 					{
-						if (attackedCreature != NULL && attackedCreature->health > 0) {
-							switch(creature->getFightType()) {
+						if(attackedCreature != NULL && attackedCreature->health > 0) {
+							Player* player = dynamic_cast<Player*>(creature);
+							if(player){
+								Attack *creature_attack = player->getAttack();
+								if(creature_attack){
+									executeAttack(creature_attack, attackedCreature);
+									delete creature_attack;
+								}
+							}
+							/*switch(creature->getFightType()) {
 								case FIGHT_MELEE: {
 									if((std::abs(creature->pos.x-attackedCreature->pos.x) <= 1) &&
 										(std::abs(creature->pos.y-attackedCreature->pos.y) <= 1) &&
@@ -2467,6 +2470,7 @@ void Game::checkCreatureAttacking(unsigned long id)
 
 							//creatureAttackedCreature(creature, attackedCreature);
 							//this->creatureMakeDamage(creature, attackedCreature, creature->getFightType());
+							*/
 						}
 					}
 				}
@@ -2889,7 +2893,10 @@ void Game::sendRemoveThing(Player* player,const Position &pos,const Thing* thing
 			if(perform_autoclose && spectator){
 				spectator->onThingRemove(thing);
 			}
-		}			
+		}
+		if(dynamic_cast<const Player*>(thing)){
+			dynamic_cast<const Player*>(thing)->onDisappearMySelf(stackpos);
+		}
 	}
 }
 

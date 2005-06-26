@@ -184,9 +184,9 @@ public:
 	std::list<Position> getPathTo(Creature *creature, Position start, Position to, bool creaturesBlock=true);	
 	bool canThrowTo(Position from, Position to, bool creaturesBlock /* = true*/, bool isProjectile = false);
 
-	void creatureAttackCreature(Creature *attacker, Creature *attackedCreature, attacktype_t attackType, amuEffect_t ammunition, int damage);
-	void internalCreatureAttackCreature(Creature *attacker, Creature *attackedCreature, attacktype_t attackType, amuEffect_t ammunition, int damage);
-	void internalCreatureAttackedCreature(Creature *attacker, Creature *attackedCreature);
+	//void creatureAttackCreature(Creature *attacker, Creature *attackedCreature, attacktype_t attackType, amuEffect_t ammunition, int damage);
+	//void internalCreatureAttackCreature(Creature *attacker, Creature *attackedCreature, attacktype_t attackType, amuEffect_t ammunition, int damage);
+	//void internalCreatureAttackedCreature(Creature *attacker, Creature *attackedCreature);
 	void executeAttack(Attack *attack, Creature *attackedCreature);
 	void addSplash(const Position &pos,unsigned short type, eBloodColor color);
 
