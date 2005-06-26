@@ -159,6 +159,7 @@ private:
   virtual void sendCancelWalk(const char *msg);
   virtual void sendChangeSpeed(const Creature* creature);
   virtual void sendCancelAttacking();
+  virtual void sendColorSquare(Creature *creature, unsigned char color);
   void sendSetOutfit(const Creature* creature);
 	virtual void sendTileUpdated(const Position &Pos);
 	virtual void sendInventory(unsigned char sl_id);

@@ -122,6 +122,7 @@ public:
   virtual void sendChannel(unsigned short channelId) = 0;
   virtual void sendToChannel(const Creature * creature, SpeakClasses type, const std::string &text, unsigned short channelId) = 0;
   virtual void sendOpenPriv(std::string &receiver) =0;
+  virtual void sendColorSquare(Creature *creature, unsigned char color) = 0;
   virtual void flushOutputBuffer() = 0;
   virtual void logout() = 0;
 

@@ -79,26 +79,26 @@ void Protocol74::ReceiveLoop()
 	NetworkMessage msg;
   
 	while (!pendingLogout && msg.ReadFromSocket(s))
-  {
-    parsePacket(msg);
-  }
+  	{
+    	parsePacket(msg);
+  	}
 
 	if (s) {
 		closesocket(s);
 		s = 0;
 	}
 
-  // logout by disconnect?  -> kick
-  if (!pendingLogout /*player*/)
-  {		
+  	// logout by disconnect?  -> kick
+  	if (!pendingLogout)
+  	{		
 		if(player->inFightTicks >=1000 && player->health >0) {
-			//disconnect?
+			OTSYS_SLEEP(10000);
 			game->removeCreature(player);
 		}
 		else{
 			game->removeCreature(player);
 		}
-  }
+  	}
 }
 
 void Protocol74::parsePacket(NetworkMessage &msg)
@@ -106,11 +106,12 @@ void Protocol74::parsePacket(NetworkMessage &msg)
 	if(msg.getMessageLength() <= 0)
 		return;
 
-  uint8_t recvbyte = msg.GetByte();
+  	uint8_t recvbyte = msg.GetByte();
   	//a dead player can not performs actions
-	if (player->health <= 0 && recvbyte != 0x14) {
+  	//not working because health is set to maxhealht in Player::die
+	/*if(player->health <= 0 && recvbyte != 0x14){
 	    return;
-  	}	
+  	}*/	
     
   switch(recvbyte)
   {
@@ -2136,6 +2137,13 @@ void Protocol74::sendPlayerLightLevel(const Player* player)
 	WriteBuffer(msg);
 }
 
+void Protocol74::sendColorSquare(Creature *creature, unsigned char color){
+	NetworkMessage msg;
+	msg.AddByte(0x86);
+	msg.AddU32(creature->getID());
+	msg.AddByte(color);
+	WriteBuffer(msg);
+}
 
 ////////////// Add common messages
 void Protocol74::AddTextMessage(NetworkMessage &msg,MessageClasses mclass, const char* message)
