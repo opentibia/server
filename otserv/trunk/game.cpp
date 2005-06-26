@@ -2304,8 +2304,12 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 
 	Tile *targettile = getTile(centerpos.x, centerpos.y, centerpos.z);
 	bool bSuccess = false;
-	bool hasTarget = !targettile->creatures.empty();
-	bool isBlocking = targettile->isBlocking();
+	bool hasTarget = false;
+	bool isBlocking = true;
+	if(targettile){
+		hasTarget = !targettile->creatures.empty();
+		isBlocking = targettile->isBlocking();
+	}
 
 	if(targettile && me->canCast(targettile->isBlocking(), !targettile->creatures.empty())) {
 		bSuccess = true;
