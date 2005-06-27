@@ -55,7 +55,14 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 
 
 	mysqlpp::Connection con;
-	con.connect(db.c_str(), host.c_str(), user.c_str(), pass.c_str()); 
+	try{
+		con.connect(db.c_str(), host.c_str(), user.c_str(), pass.c_str()); 
+	}
+	catch(mysqlpp::BadQuery e){
+		std::cout << "MYSQL-ERROR: " << e.error << std::endl;
+		return false;
+	}
+
 	mysqlpp::Result res;
 	try{
 		mysqlpp::Query query = con.query();
@@ -271,25 +278,47 @@ bool IOPlayerSQL::savePlayer(Player* player){
 	player->preSave();
 
 	mysqlpp::Connection con;
-	con.connect(db.c_str(), host.c_str(), user.c_str(), pass.c_str()); 
-	//mysqlpp::Result res;
+	try{
+		con.connect(db.c_str(), host.c_str(), user.c_str(), pass.c_str()); 
+	}
+	catch(mysqlpp::BadQuery e){
+		std::cout << "MYSQL-ERROR: " << e.error << std::endl;
+		return false;
+	}
 
 	mysqlpp::Query query = con.query();
+	
 	//check if the player have to be saved or not
 	query << "SELECT save FROM players WHERE `id` = " << player->getGUID();
 #ifdef __DEBUG__
 	std::cout << query.preview() << std::endl;
 #endif
-	mysqlpp::Result res = query.store();
-	mysqlpp::Row row = *(res.begin());
-	int save = row.lookup_by_name("save");
+	int save = 0;
+	try{
+		mysqlpp::Result res = query.store();
+		if(res.size() != 1)
+			return false;
+		mysqlpp::Row row = *(res.begin());
+		save = row.lookup_by_name("save");
+	}
+	catch(mysqlpp::BadQuery e){
+		std::cout << "MYSQL-ERROR: " << e.error << std::endl;
+		return false;
+	}
+	
 	if(save != 1)
 		return true;
-
+	
 	//Start the transaction	
 	query.reset();
 	query << "BEGIN;";
-	query.execute();
+	try{
+		query.execute();
+	}
+	catch(mysqlpp::BadQuery e){
+		std::cout << "MYSQL-ERROR: " << e.error << std::endl;
+		return false;
+	}
 
 	//First, an UPDATE query to write the player itself
 
@@ -322,7 +351,13 @@ bool IOPlayerSQL::savePlayer(Player* player){
 #ifdef __DEBUG__
 	std::cout << query.preview() << std::endl;
 #endif
-	query.execute();
+	try{
+		query.execute();
+	}
+	catch(mysqlpp::BadQuery e){
+		std::cout << "MYSQL-ERROR: " << e.error << std::endl;
+		return false;
+	}
 
 
 	//then we write the individual skills
@@ -352,7 +387,13 @@ bool IOPlayerSQL::savePlayer(Player* player){
 #ifdef __DEBUG__
 		std::cout << query.preview() << std::endl;
 #endif
-		query.execute();
+		try{
+			query.execute();
+		}
+			catch(mysqlpp::BadQuery e){
+			std::cout << "MYSQL-ERROR: " << e.error << std::endl;
+			return false;
+		}
 	}
 
 	//now item saving
@@ -361,7 +402,13 @@ bool IOPlayerSQL::savePlayer(Player* player){
 #ifdef __DEBUG__
 	std::cout << query.preview() << std::endl;
 #endif
-	query.execute();
+	try{
+		query.execute();
+	}
+	catch(mysqlpp::BadQuery e){
+		std::cout << "MYSQL-ERROR: " << e.error << std::endl;
+		return false;
+	}
 	query.reset();
 	std::string itemsstring;
 	query << "INSERT INTO `items` (`player` , `slot` , `sid` , `pid` , `type` , `number` , `actionid` , `text` , `specialdesc` ) VALUES"; 
@@ -381,7 +428,13 @@ bool IOPlayerSQL::savePlayer(Player* player){
 #ifdef __DEBUG__
 		std::cout << query.preview() << std::endl;
 #endif
-		query.execute();
+		try{
+			query.execute();
+		}
+		catch(mysqlpp::BadQuery e){
+			std::cout << "MYSQL-ERROR: " << e.error << std::endl;
+			return false;
+		}
 	}
 	//save storage map
 	query.reset();
@@ -389,7 +442,13 @@ bool IOPlayerSQL::savePlayer(Player* player){
 #ifdef __DEBUG__
 	std::cout << query.preview() << std::endl;
 #endif
-	query.execute();
+	try{
+		query.execute();
+	}
+	catch(mysqlpp::BadQuery e){
+		std::cout << "MYSQL-ERROR: " << e.error << std::endl;
+		return false;
+	}
 	
 	query.reset();
 	query << "INSERT INTO `playerstorage` (`player` , `key` , `value` ) VALUES"; 
@@ -404,7 +463,13 @@ bool IOPlayerSQL::savePlayer(Player* player){
 #ifdef __DEBUG__
 		std::cout << query.preview() << std::endl;
 #endif
-		query.execute();
+		try{
+			query.execute();
+		}
+		catch(mysqlpp::BadQuery e){
+			std::cout << "MYSQL-ERROR: " << e.error << std::endl;
+			return false;
+		}
 	}
 	
 	//End the transaction
@@ -413,7 +478,13 @@ bool IOPlayerSQL::savePlayer(Player* player){
 #ifdef __DEBUG__
 	std::cout << query.preview() << std::endl;
 #endif
-	query.execute();
+	try{
+		query.execute();
+	}
+	catch(mysqlpp::BadQuery e){
+		std::cout << "MYSQL-ERROR: " << e.error << std::endl;
+		return false;
+	}
 
 	return true;
 
