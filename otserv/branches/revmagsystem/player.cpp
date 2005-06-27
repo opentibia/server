@@ -263,7 +263,7 @@ int Player::getArmor() const
 int Player::getDefense() const
 {
 	int defense=0;
-	
+	//defense 0 from 3rd attack in a turn
 	if(items[SLOT_LEFT]){		
 		if(items[SLOT_LEFT]->getWeaponType() == SHIELD)
 			defense += skills[SKILL_SHIELD][SKILL_LEVEL] + items[SLOT_LEFT]->getDefense();
@@ -792,7 +792,7 @@ unsigned int Player::getReqSkilltries (int skill, int level, int voc) {
 	SkillAdvanceCache[skill][j].tries = (unsigned int) ( SkillBases[skill] * pow((float) SkillMultipliers[skill][voc], (float) ( level - 11) ) );	
     return SkillAdvanceCache[skill][j].tries;
 }
-
+/*
 void Player::addSkillTry(int skilltry)
 {
 	int skill;
@@ -820,7 +820,7 @@ void Player::addSkillTry(int skilltry)
 	if(foundSkill == false)
 		addSkillTryInternal(skilltry,0);//add fist try
 }
-
+*/
 void Player::addSkillShieldTry(int skilltry){
 	//look for a shield
 	
@@ -1028,17 +1028,20 @@ Attack* Player::getAttack(){
 			if ((items[slot]->isWeapon())){
 				Item *distItem;
 				switch (items[slot]->getWeaponType()){
-				case DIST:
+				case WEAPON | DIST:
 					distItem = getDistWeapon(items[slot]);
 					if(distItem){
-						attack = new AttackDistancePhysical();
-						static_cast<AttackDistancePhysical*>(attack)->initialize(this,distItem);
+						attack = new AttackDistance();
+						static_cast<AttackDistance*>(attack)->initialize(this,distItem);
 						return attack;
 					}
 					break;
-				case MAGIC:
+				case WEAPON | MAGIC:
+					attack = new AttackDistance();
+					static_cast<AttackDistance*>(attack)->initialize(this,items[slot]);
+					return attack;
 					break;
-				case SHIELD:
+				case WEAPON | SHIELD:
 					break;
 				default:
 					attack = new AttackMelee();
@@ -1089,7 +1092,7 @@ Item * Player::getDistWeapon(Item *item) const{
 	}
 	if(items[SLOT_AMMO]){
 		//compare ammo types
-		if(items[SLOT_AMMO]->getWeaponType() == AMO && 
+		if((items[SLOT_AMMO]->getWeaponType() & AMO) != 0 && 
 			item->getAmuType() == items[SLOT_AMMO]->getAmuType()){
 			return items[SLOT_AMMO];
 		}
@@ -1459,7 +1462,7 @@ void Player::onThingMove(const Creature *creature, const Position &fromPos, int 
 {
 	client->sendThingMove(creature, fromPos, stackpos, fromItem, oldFromCount, toSlot, toItem, oldToCount, count);
 }
-
+/*
 void Player::applyDamage(Creature *attacker, attacktype_t type, int damage)
 {
 	if(access == 0) {
@@ -1492,7 +1495,7 @@ void Player::applyDamage(Creature *attacker, attacktype_t type, int damage)
 		Creature::applyDamage(attacker, type, newdamage);
 	}
 }
-
+*/
 void Player::setAttackedCreature(unsigned long id){
 	attackedCreature = id;
 }

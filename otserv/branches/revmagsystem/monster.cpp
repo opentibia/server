@@ -791,14 +791,14 @@ std::string Monster::getDescription() const
 	return str;
 }
 
-int Monster::getWeaponDamage() const
+/*int Monster::getWeaponDamage() const
 {
 	if(curPhysicalAttack != NULL)
 		return random_range(curPhysicalAttack->minWeapondamage, curPhysicalAttack->maxWeapondamage);
 	else
 		return 0;
 }
-
+*/
 void Monster::dropLoot(Container *corpse)
 {
 	for(std::vector<Item*>::iterator cit = lootItems.begin(); cit != lootItems.end(); ++cit) {		

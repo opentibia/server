@@ -431,7 +431,8 @@ bool Item::isWeapon() const
 { 
   //now also returns true on SHIELDS!!! Check back with getWeponType!
   //old: return (items[id].weaponType != NONE && items[id].weaponType != SHIELD && items[id].weaponType != AMO);
-  return (items[id].weaponType != NONE && items[id].weaponType != AMO);
+  //return (items[id].weaponType != NONE && items[id].weaponType != AMO);
+  return ((items[id].weaponType & WEAPON) != 0);
 }
 
 WeaponType Item::getWeaponType() const {

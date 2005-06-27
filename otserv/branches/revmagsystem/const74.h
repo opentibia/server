@@ -50,7 +50,6 @@ enum MagicEffectClasses {
 	NM_ME_SOUND_PURPLE     = 0x16, //22
 	NM_ME_SOUND_BLUE       = 0x17, //23
 	NM_ME_SOUND_WHITE      = 0x18, //24
-	NM_ME_DRAW_BLOOD       = 0xFE, //don't send to client, just for internal use
 	NM_ME_NONE             = 0xFF //don't send to client, just for internal use
 };
 
@@ -140,7 +139,17 @@ enum Icons {
 
 enum WeaponType 
 {
-  NONE, SWORD, CLUB, AXE, DIST, MAGIC, AMO, SHIELD
+  NONE = 0,
+  WEAPON = 1,
+  AMO = 2, 
+  SWORD = 4, 
+  CLUB = 8, 
+  AXE = 16, 
+  DIST = 32, 
+  MAGIC = 64,
+  AMO_DIST = 128,
+  AMO_MAGIC = 256, 
+  SHIELD = 512,
 };
 
 enum amu_t{

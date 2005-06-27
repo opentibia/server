@@ -71,7 +71,7 @@ void Creature::drainMana(int damage)
 {
   mana -= min(mana, damage);
 }
-
+/*
 void Creature::applyDamage(Creature *attacker, attacktype_t type, int damage)
 {
 	if(damage == 0) {
@@ -130,7 +130,7 @@ void Creature::applyDamage(Creature *attacker, attacktype_t type, int damage)
 		lastManaDamage = 0;
 	}
 }
-
+*/
 void Creature::setAttackedCreature(unsigned long id)
 {
   attackedCreature = id;

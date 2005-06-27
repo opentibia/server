@@ -194,7 +194,7 @@ public:
 	void addMagicEffect(const Position &pos, unsigned char type);
 
 	void creatureChangeLight(Player* player, int time, unsigned char lightlevel);
-	void addCondition(Creature *creature, conditiontype_t conditionType, int time, int n);
+	//void addCondition(Creature *creature, conditiontype_t conditionType, int time, int n);
 	/** Lockvar for Game. */
   OTSYS_THREAD_LOCKVAR gameLock;    
 

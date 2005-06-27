@@ -60,6 +60,7 @@ public:
   WeaponType     weaponType;
   amu_t			amuType;
   subfight_t	shootType;
+  MagicEffectClasses hitEffect;
   int            attack;
   int            defence;
   int 			 armor;

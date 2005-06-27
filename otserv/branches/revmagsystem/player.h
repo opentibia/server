@@ -172,11 +172,11 @@ public:
   void receivePing();
   void flushMsg();
 
-  void addSkillTry(int skilltry);
+  //void addSkillTry(int skilltry);
   void addSkillShieldTry(int skilltry);
   void die();      //player loses exp/skills/maglevel on death
 
- 	virtual void applyDamage(Creature *attacker, attacktype_t type, int realdamage);
+ 	//virtual void applyDamage(Creature *attacker, attacktype_t type, int realdamage);
 
 	virtual void setAttackedCreature(unsigned long id);
   virtual bool isAttackable() const { return (access == 0); };
@@ -295,8 +295,8 @@ protected:
   //friend class ActionScript;
 	friend class BaseScript;
   friend class Map;
-	friend class AttackMelee;
-	friend class AttackDistancePhysical;
+  	friend class AttackMelee;
+  	friend class AttackDistance;
 	friend class MovePlayer;
 	friend class StopMovePlayer;
 	friend class Protocol74;

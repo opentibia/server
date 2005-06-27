@@ -59,13 +59,19 @@ enum eAttackDistanceBlockType{
 enum eAttackTypes{
 	ATTACK_TYPE_NONE,
 	ATTACK_TYPE_MELEE,
-	ATTACK_TYPE_DISTANCE_PHYSICAL,
-	ATTACK_TYPE_DISTANCE_MAGIC,
+	ATTACK_TYPE_DISTANCE,
 	ATTACK_TYPE_MAGIC, //energy,poison,fire,explosion,sd
 	ATTACK_TYPE_HEALTH,
 	ATTACK_TYPE_MANA,
-	ATTACK_TYPE_LIFE,
-	ATTACK_TYPE_PARALYZE,
+};
+
+enum eAttackMagicTypes{
+	ATTACK_MAGIC_NONE,
+	ATTACK_MAGIC_ENERGY,
+	ATTACK_MAGIC_POISON,
+	ATTACK_MAGIC_FIRE,
+	ATTACK_MAGIC_EXPLOSION,
+	ATTACK_MAGIC_SD,
 };
 
 class Attack{
@@ -75,28 +81,31 @@ public:
 	
 	unsigned long getOwnerId(){return ownerId;}
 	Creature* getOwner() {return owner;}
-	eAttackTypes getAttackType(){return attack_type;}
+	//eAttackTypes getAttackType(){return attack_type;}
 	
-	//static Attack* createAttack(.....);
+	//static Attack* createMagicAttack(.....);
 	
 	virtual void getDrawInfo(MagicEffectClasses &me, eATextColor &text_color,
-					eBloodColor &blood_color, subfight_t &shoot, eSquareColor &sqcolor) = 0;
+					eBloodColor &blood_color, MagicEffectClasses &blood_effect,subfight_t &shoot, eSquareColor &sqcolor) = 0;
 	virtual long getSkillId() = 0;
-	virtual bool addShieldTry() = 0;
+	virtual long addShieldTry() = 0;
 	virtual long getDamage(Creature *AttackedCreature, eDamgeType &type) = 0;
+	//virtual std::string getDescription();
 	
 protected:
 	
 	bool checkManaShield(Creature *attackedCreature, long damage);
 	void getDrawInfoManaShield(MagicEffectClasses &me, eATextColor &text_color
-			,eBloodColor &blood_color, subfight_t &shoot);
+			,eBloodColor &blood_color);
 	void getDrawInfoRace(race_t race ,MagicEffectClasses &me, eATextColor &text_color
 			,eBloodColor &blood_color);
 	
 	bool manaAttack;
 	unsigned long ownerId;
 	Creature *owner;
-	eAttackTypes attack_type;
+	//eAttackTypes attack_type;
+	long base_damage;
+	MagicEffectClasses internal_hit_me;
 };
 
 class AttackMelee : public Attack {
@@ -108,36 +117,32 @@ public:
 	void initialize(Creature *attacker, long damage);
 	
 	virtual void getDrawInfo(MagicEffectClasses &me, eATextColor &text_color,
-					eBloodColor &blood_color, subfight_t &shoot, eSquareColor &sqcolor);
+					eBloodColor &blood_color, MagicEffectClasses &blood_effect, subfight_t &shoot, eSquareColor &sqcolor);
 	virtual long getSkillId();
-	virtual bool addShieldTry();
+	virtual long addShieldTry();
 	virtual long getDamage(Creature *AttackedCreature, eDamgeType &type);
 protected:
-	long base_damage;
 	long skill;
-	MagicEffectClasses internal_me;
 	eSquareColor internal_sq;
 	race_t attacked_race;
 	bool addSkillTry;
 	//condition *condition;
 };
 
-class AttackDistancePhysical : public Attack {
+class AttackDistance : public Attack {
 public:
-	AttackDistancePhysical();
-	virtual ~AttackDistancePhysical(){};
+	AttackDistance();
+	virtual ~AttackDistance(){};
 	
-	void initialize(Creature *attacker, Item* weapon);
-	void initialize(Creature *attacker, long damage, subfight_t type, long block_type = 3);
+	void initialize(Creature *attacker, Item* dist_item);
+	void initialize(Creature *attacker, long damage, subfight_t type, MagicEffectClasses hitEffect = NM_ME_NONE, long block_type = 3, eSquareColor sqcolor = SQ_COLOR_BLACK);
 	
 	virtual void getDrawInfo(MagicEffectClasses &me, eATextColor &text_color,
-					eBloodColor &blood_color, subfight_t &shoot, eSquareColor &sqcolor);
+					eBloodColor &blood_color, MagicEffectClasses &blood_effect, subfight_t &shoot, eSquareColor &sqcolor);
 	virtual long getSkillId();
-	virtual bool addShieldTry();
+	virtual long addShieldTry();
 	virtual long getDamage(Creature *AttackedCreature, eDamgeType &type);
 protected:
-	long base_damage;
-	MagicEffectClasses internal_me;
 	eSquareColor internal_sq;
 	subfight_t internal_shoot;
 	race_t attacked_race;
@@ -145,6 +150,33 @@ protected:
 	long hitchance;
 	bool addSkillTry;
 	Item *internal_dist_item;
+	//condition *condition;
+};
+
+
+class AttackMagic : public Attack {
+public:
+	AttackMagic();
+	virtual ~AttackMagic(){};
+	
+	//void initialize(Creature *attacker, long damage, subfight_t type, MagicEffectClasses hitEffect = NM_ME_NONE, long block_type = 3, bool _drawBlood = true);
+	void initialize(Creature *attacker, long damage,eAttackMagicTypes _magicType, long block_type /*= 3*/);
+	void initialize(unsigned long _ownerid, long damage,eAttackMagicTypes _magicType, long block_type /*= 3*/);
+	
+	virtual void getDrawInfo(MagicEffectClasses &me, eATextColor &text_color,
+					eBloodColor &blood_color, MagicEffectClasses &blood_effect, subfight_t &shoot, eSquareColor &sqcolor);
+	virtual long getSkillId();
+	virtual long addShieldTry();
+	virtual long getDamage(Creature *AttackedCreature, eDamgeType &type);
+protected:
+	
+	void internalInitialize(long damage,eAttackMagicTypes _magicType, long block_type);
+	
+	race_t attacked_race;
+	long internal_block_type;
+	bool drawBlood;
+	eAttackMagicTypes magicType;
+	eATextColor internal_text_color;
 	//condition *condition;
 };
 

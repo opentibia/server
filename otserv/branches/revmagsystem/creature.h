@@ -51,13 +51,18 @@ enum fight_t {
 };
 
 enum conditiontype_t {
-	CONDITION_POISONED,
-	CONDITION_BURNING,
-	CONDITION_ELECTRIFIED,
+	CONDITION_POISON,
+	CONDITION_FIRE,
+	CONDITION_ENERGY,
 	CONDITION_DRUNK,
 	CONDITION_SLOWED,
 	CONDITION_HASTE,
-	CONDITION_MAGICSHIELD
+	CONDITION_MAGICSHIELD,
+	CONDITION_PZLOCK,
+	CONDITION_INFIGHT,
+	CONDITION_LIGH,
+	CONDITION_INVISIBLE,
+	CONDITION_EXHAUSTED
 };
 
 enum attacktype_t {
@@ -170,13 +175,14 @@ public:
 	virtual int getImmunities() const
 	{
 		if(access != 0) 
-			return  ATTACK_ENERGY | ATTACK_BURST | ATTACK_FIRE |
-			ATTACK_PHYSICAL | ATTACK_POISON | ATTACK_PARALYZE | ATTACK_DRUNKNESS;
+			return 0xFFFFFFFF;
+			//return  ATTACK_ENERGY | ATTACK_BURST | ATTACK_FIRE |
+			//ATTACK_PHYSICAL | ATTACK_POISON | ATTACK_PARALYZE | ATTACK_DRUNKNESS;
 		else
 			return immunities;
 	};
 
-	virtual void applyDamage(Creature *attacker, attacktype_t type, int damage);
+	//virtual void applyDamage(Creature *attacker, attacktype_t type, int damage);
 	virtual race_t getCreatureType() {return RACE_BLOOD;}
 
   virtual void die(){};
@@ -189,7 +195,7 @@ public:
 	virtual void addSummon(Creature *creature);
 	virtual void removeSummon(Creature *creature);
 
-	virtual int getWeaponDamage() const {return 1+(int)(10.0*rand()/(RAND_MAX+1.0));}
+	//virtual int getWeaponDamage() const {return 1+(int)(10.0*rand()/(RAND_MAX+1.0));}
   virtual int getArmor() const {return 0;}
   virtual int getDefense() const {return 0;}
 

@@ -65,6 +65,7 @@ ItemType::ItemType()
   slot_position = SLOTP_RIGHT | SLOTP_LEFT | SLOTP_AMMO;
   amuType = AMU_NONE;
   shootType = DIST_NONE;
+  hitEffect = NM_ME_NONE;
   attack     =    0;
   defence    =    0;
   armor      =    0;
@@ -472,18 +473,19 @@ int Items::loadXMLInfos(std::string file)
             			else if (!strcmp(type, "weapon")){
 							// we have a weapon...
 							// find out which type of weapon we have...
+							itemtype->weaponType = WEAPON;
               				char *skill = (char*)xmlGetProp(p, (xmlChar*)"skill");
               				if (skill){
 						    	if (!strcmp(skill, "sword"))
-								  	itemtype->weaponType = SWORD;
+								  	itemtype->weaponType = static_cast<WeaponType>(itemtype->weaponType | SWORD);
 							  	else if (!strcmp(skill, "club"))
-							    	itemtype->weaponType = CLUB;
+							    	itemtype->weaponType = static_cast<WeaponType>(itemtype->weaponType | CLUB);
 							  	else if (!strcmp(skill, "axe"))
-									itemtype->weaponType = AXE;
+									itemtype->weaponType = static_cast<WeaponType>(itemtype->weaponType | AXE);
 								else if (!strcmp(skill, "shielding"))
-									itemtype->weaponType = SHIELD;
+									itemtype->weaponType = static_cast<WeaponType>(itemtype->weaponType | SHIELD);
 							  	else if (!strcmp(skill, "distance")){
-									itemtype->weaponType = DIST;
+									itemtype->weaponType = static_cast<WeaponType>(itemtype->weaponType | DIST);
 									char *amutype = (char*)xmlGetProp(p, (xmlChar*)"amutype");
               						if (amutype){
 						    			if (!strcmp(amutype, "bolt"))
@@ -518,7 +520,7 @@ int Items::loadXMLInfos(std::string file)
 									}																
 								}
 								else if (!strcmp(skill, "magic")){
-									itemtype->weaponType = MAGIC;
+									itemtype->weaponType = static_cast<WeaponType>(itemtype->weaponType | MAGIC);
 									char *sshoottype = (char*)xmlGetProp(p, (xmlChar*)"shottype");
               						if (sshoottype){
 										if (!strcmp(sshoottype, "fire"))
@@ -531,7 +533,7 @@ int Items::loadXMLInfos(std::string file)
 									
 								}
 							  	else if (!strcmp(skill, "shielding"))
-									itemtype->weaponType = SHIELD;
+									itemtype->weaponType = static_cast<WeaponType>(itemtype->weaponType | SHIELD);
                 				else
                   					std::cout << "wrong skill tag for weapon" << std::endl;
               				}
@@ -550,12 +552,24 @@ int Items::loadXMLInfos(std::string file)
 							itemtype->defence = atoi(defence);
 							else
 								std::cout << "missing defence tag for weapon: " << id << std::endl;
+								
+							char *sshoottype = (char*)xmlGetProp(p, (xmlChar*)"hiteffect");
+              				if (sshoottype){
+						    	if (!strcmp(sshoottype, "explosion"))
+								  	itemtype->hitEffect = NM_ME_EXPLOSION_DAMAGE;
+							  	else if (!strcmp(sshoottype, "fire"))
+							    	itemtype->hitEffect = NM_ME_HITBY_FIRE ;
+							    else if (!strcmp(sshoottype, "energy"))
+							    	itemtype->hitEffect = NM_ME_ENERGY_DAMAGE;
+                				else
+                  					std::cout << "wrong hiteffect tag for item: " << id << std::endl;
+							}
 						
 						}
 						else if (!strcmp(type, "amunition"))
 						{
 							// we got some amo
-							itemtype->weaponType = AMO;							
+							itemtype->weaponType = AMO;
 							char *amutype = (char*)xmlGetProp(p, (xmlChar*)"amutype");
               				if (amutype){
 						    	if (!strcmp(amutype, "bolt"))
@@ -587,11 +601,43 @@ int Items::loadXMLInfos(std::string file)
 							    	itemtype->shootType = DIST_BURSTARROW;
 							    else if (!strcmp(sshoottype, "power-bolt"))
 							    	itemtype->shootType = DIST_POWERBOLT;
+							    else if (!strcmp(sshoottype, "fire"))
+							    	itemtype->shootType = DIST_FIRE;
+							    else if (!strcmp(sshoottype, "energy"))
+							    	itemtype->shootType = DIST_ENERGY;
                 				else
                   					std::cout << "wrong shootype tag for item: " << id << std::endl;                  					
               				}
               				else
 								std::cout << "missing shoottype for item: " << id <<  std::endl;
+							
+							char *skill = (char*)xmlGetProp(p, (xmlChar*)"skill");
+              				if (skill){
+							  	if (!strcmp(skill, "distance")){
+									itemtype->weaponType = static_cast<WeaponType>(itemtype->weaponType | AMO_DIST);
+								}
+								else if (!strcmp(skill, "magic")){
+									itemtype->weaponType = static_cast<WeaponType>(itemtype->weaponType | AMO_MAGIC);
+								}
+                				else
+                  					std::cout << "wrong skill tag for ammunition " << id <<std::endl;
+              				}
+              				else{
+								itemtype->weaponType = static_cast<WeaponType>(itemtype->weaponType | AMO_DIST);
+							}
+							
+							char *hittype = (char*)xmlGetProp(p, (xmlChar*)"hiteffect");
+              				if(hittype){
+						    	if (!strcmp(hittype, "explosion"))
+								  	itemtype->hitEffect = NM_ME_EXPLOSION_DAMAGE;
+							  	else if (!strcmp(hittype, "fire"))
+							    	itemtype->hitEffect = NM_ME_HITBY_FIRE ;
+							    else if (!strcmp(hittype, "energy"))
+							    	itemtype->hitEffect = NM_ME_ENERGY_DAMAGE;
+                				else
+                  					std::cout << "wrong hitEffect tag for item: " << id << std::endl;
+							}
+							
 						}//ammunition
             			else if (!strcmp(type, "armor")){
 							char* sarmor = (char*)xmlGetProp(p, (xmlChar*)"arm");

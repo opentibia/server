@@ -78,10 +78,10 @@ bool ChangeSpeedSpell::doCastSpell(Creature* spellCastCreature, const Position& 
 	}
 	
 	if(addspeed > 0) {
-		spell->game->addCondition(spellCastCreature, CONDITION_HASTE, time, addspeed);
+		//spell->game->addCondition(spellCastCreature, CONDITION_HASTE, time, addspeed);
 	}
 	else
-		spell->game->addCondition(spellCastCreature, CONDITION_SLOWED, time, addspeed);
+		//spell->game->addCondition(spellCastCreature, CONDITION_SLOWED, time, addspeed);
 
 	return true;
 }

@@ -1811,8 +1811,8 @@ void Game::executeAttack(Attack *attack, Creature *attackedCreature){
 	
 	long damage = attack->getDamage(attackedCreature, damageType);
 	//add shield skill
-	if(attackedPlayer && attack->addShieldTry()){
-		attackedPlayer->addSkillShieldTry(1);
+	if(attackedPlayer && attack->addShieldTry() != 0){
+		attackedPlayer->addSkillShieldTry(attack->addShieldTry());
 	}
 	//perform damage
 	if(damage > 0){
@@ -1823,24 +1823,31 @@ void Game::executeAttack(Attack *attack, Creature *attackedCreature){
 				if(damage < attackedCreature->mana){
 					std::cout << "Error. Mana shield error." << std::cout;
 					attackedCreature->drainHealth(damage);
+					if(attacker)
+						attackedCreature->addInflictedDamage(attacker, damage);
 				}
 				else{
 					attackedCreature->drainMana(attackedCreature->mana);
 					attackedCreature->drainHealth(damage - attackedCreature->mana);
+					if(attacker)
+						attackedCreature->addInflictedDamage(attacker, damage - attackedCreature->mana);
 				}
 			}
 			else{
 				attackedCreature->drainHealth(damage);
+				if(attacker)
+					attackedCreature->addInflictedDamage(attacker, damage);
 			}
+			
 			//update creature health
 			getSpectators(Range(attackedCreature->pos), attackedlist);
-
 			for(cit = attackedlist.begin(); cit != attackedlist.end(); ++cit) {
 				spectator = dynamic_cast<Player*>(*cit);
 				if(!spectator)
 					continue;
 				spectator->sendCreatureHealth(attackedCreature);
 			}
+			
 			//send text to attacked player
 			if(attackedPlayer){
 				std::stringstream dmgmesg;
@@ -1877,16 +1884,16 @@ void Game::executeAttack(Attack *attack, Creature *attackedCreature){
 	}
 	//draw animations
 	MagicEffectClasses me;
+	MagicEffectClasses blood_me;
 	eATextColor text_color;
 	eBloodColor blood_color;
 	subfight_t shoot;
 	eSquareColor square_color;
-	attack->getDrawInfo(me,text_color,blood_color,shoot,square_color);
+	attack->getDrawInfo(me,text_color,blood_color,blood_me,shoot,square_color);
 	
-	if(attackedPlayer && square_color != SQ_COLOR_NONE){
-		attackedPlayer->sendColorSquare(attacker, square_color);
-
-		/*
+	//if(attackedPlayer && square_color != SQ_COLOR_NONE){
+		//attackedPlayer->sendColorSquare(attacker, square_color);
+	if(attacker && square_color != SQ_COLOR_NONE){
 		if(attackerlist.empty()){
 			getSpectators(Range(attacker->pos), attackerlist);
 		}
@@ -1896,10 +1903,9 @@ void Game::executeAttack(Attack *attack, Creature *attackedCreature){
 				continue;
 			spectator->sendColorSquare(attacker, square_color);
 		}
-		*/
 	}
 	
-	if(shoot != DIST_NONE && attacker){
+	if(attacker && shoot != DIST_NONE){
 		addAnimationShoot(attacker,attackedCreature->pos,shoot);
 	}
 	
@@ -1929,10 +1935,23 @@ void Game::executeAttack(Attack *attack, Creature *attackedCreature){
 		}
 	}
 	
+	if(blood_me != NM_ME_NONE && damage != 0){
+		if(attackedlist.empty()){
+			getSpectators(Range(attackedCreature->pos), attackedlist);
+		}
+		for(cit = attackedlist.begin(); cit != attackedlist.end(); ++cit) {
+			spectator = dynamic_cast<Player*>(*cit);
+			if(!spectator)
+				continue;
+			spectator->sendMagicEffect(attackedCreature->pos, blood_me);
+		}
+	}
+	
 	if(blood_color != BLOOD_NONE && damage != 0){
 		addSplash(attackedCreature->pos, 2019, blood_color);
 	}
-		
+	
+	
 	//check for attackedcreature dead
 	if(attackedCreature->health <= 0){
 		if(attacker && 
@@ -2304,7 +2323,7 @@ void Game::checkCreature(unsigned long id)
 		flushSendBuffers();
 	}
 }
-
+/*
 void Game::addCondition(Creature *creature, conditiontype_t conditionType, int time, int n)
 {
 	attacktype_t attackType = ATTACK_NONE;
@@ -2334,10 +2353,10 @@ void Game::addCondition(Creature *creature, conditiontype_t conditionType, int t
 			creature->hasteTicks = time;
 			//changeSpeed(creature->getID(),
 			*/
-		}
+		/*}
 	}
 }
-
+*/
 void Game::creatureChangeLight(Player* player, int time, unsigned char lightlevel)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
@@ -2417,6 +2436,7 @@ void Game::checkCreatureAttacking(unsigned long id)
 				Creature *attackedCreature = getCreatureByID(creature->attackedCreature);
 				if (attackedCreature)
 				{
+					//TODO: change the way of checking npvp zones and pz
 					Tile* fromtile = getTile(creature->pos.x, creature->pos.y, creature->pos.z);
 					if(fromtile == NULL) {
 						std::cout << "checkCreatureAttacking NULL tile: " << creature->getName() << std::endl;

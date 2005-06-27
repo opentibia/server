@@ -1900,53 +1900,46 @@ void Protocol74::sendThingAppear(const Thing *thing){
 		const Player* add_player = dynamic_cast<const Player*>(creature);
 		if(add_player == player){
 			msg.AddByte(0x0A);
-    	msg.AddU32(player->getID());
+    		msg.AddU32(player->getID());
     		
 			msg.AddByte(0x32);
-    	msg.AddByte(0x00);
+    		msg.AddByte(0x00);
     	
-    	msg.AddByte(0x00); //can report bugs 0,1
+    		msg.AddByte(0x00); //can report bugs 0,1
     	
-    	/*msg.AddByte(0x0B);//TODO?. GM actions
-    	msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-    	msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-    	msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-    	msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-    	msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-    	msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-    	msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-    	msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-    	*/
+    		/*msg.AddByte(0x0B);//TODO?. GM actions
+    		msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+    		msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+    		msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+    		msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+    		msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+    		msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+    		msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+    		msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+    		*/
     		
-    	msg.AddByte(0x64);
-    	msg.AddPosition(player->pos);
-    	GetMapDescription(player->pos.x-8, player->pos.y-6, player->pos.z, 18, 14, msg);
+			msg.AddByte(0x64);
+			msg.AddPosition(player->pos);
+			GetMapDescription(player->pos.x-8, player->pos.y-6, player->pos.z, 18, 14, msg);
 
 			AddMagicEffect(msg,player->pos, NM_ME_ENERGY_AREA);
 
 			AddPlayerStats(msg,player);	
 
 			msg.AddByte(0x82);
-    	msg.AddByte(0x6F); //LIGHT LEVEL
-    	msg.AddByte(0xD7);//light? (seems constant)
+			msg.AddByte(0x6F); //LIGHT LEVEL
+    		msg.AddByte(0xD7);//light? (seems constant)
 
-    	/*msg.AddByte(0x8d);//8d
-    	msg.AddU32(player->getID());
-    	msg.AddByte(0x03);//00
-    	msg.AddByte(0xd7);//d7*/
+			/*msg.AddByte(0x8d);//8d
+			msg.AddU32(player->getID());
+			msg.AddByte(0x03);//00
+			msg.AddByte(0xd7);//d7*/
   
-   		AddPlayerSkills(msg,player);
+   			AddPlayerSkills(msg,player);
   
-    	AddPlayerInventoryItem(msg,player, 1);
-    	AddPlayerInventoryItem(msg,player, 2);
-    	AddPlayerInventoryItem(msg,player, 3);
-    	AddPlayerInventoryItem(msg,player, 4);
-    	AddPlayerInventoryItem(msg,player, 5);
-    	AddPlayerInventoryItem(msg,player, 6);
-    	AddPlayerInventoryItem(msg,player, 7);
-	    AddPlayerInventoryItem(msg,player, 8);
-    	AddPlayerInventoryItem(msg,player, 9);
-    	AddPlayerInventoryItem(msg,player, 10);
+  			for(int i=1;i<=10;i++){
+    			AddPlayerInventoryItem(msg,player, i);
+			}
 	
  			AddTextMessage(msg,MSG_EVENT, g_config.getGlobalString("loginmsg", "Welcome.").c_str());
 			WriteBuffer(msg);
@@ -1957,13 +1950,13 @@ void Protocol74::sendThingAppear(const Thing *thing){
 		}
 		else if(CanSee(creature->pos.x, creature->pos.y, creature->pos.z)){
 			bool known;
-    	unsigned long removedKnown;
-    	checkCreatureAsKnown(creature->getID(), known, removedKnown);
+			unsigned long removedKnown;
+			checkCreatureAsKnown(creature->getID(), known, removedKnown);
 			AddAppearThing(msg,creature->pos);
 			AddCreature(msg,creature, known, removedKnown);		
     	
 			// login bubble
-    	AddMagicEffect(msg,creature->pos, NM_ME_ENERGY_AREA);
+    		AddMagicEffect(msg,creature->pos, NM_ME_ENERGY_AREA);
 		}
 	}
 	else if(CanSee(thing->pos.x, thing->pos.y, thing->pos.z))

@@ -182,7 +182,7 @@ protected:
 
 	virtual fight_t getFightType() {return curPhysicalAttack->fighttype;};
 	virtual subfight_t getSubFightType()  {return curPhysicalAttack->disttype;}
-	virtual int getWeaponDamage() const;
+	//virtual int getWeaponDamage() const;
 
 	void OnCreatureEnter(const Creature *creature);
 	void OnCreatureLeave(const Creature *creature);
