@@ -235,6 +235,8 @@ bool Spell::internalCastSpell(Creature* creature, const Position& pos) const
 		creature->sendCancel("You cannot throw there.");
 		return false;
 	}
+
+	return true;
 }
 
 bool Spell::castSpell(Creature* creature, const Position& pos, const std::string& var) const
@@ -311,10 +313,10 @@ bool Spell::castSpell(Creature* creature, Creature* target) const
 }
 
 //
-InstantSpell::InstantSpell(const std::string &datadir, std::string iname, std::string iwords, int magLv, int mana, Game* game)
-: Spell(iname, magLv, mana, game), words(iwords)
+InstantSpell::InstantSpell(const std::string &datadir, std::string iname, std::string iwords, int magLv, int mana, Game* game) :
+ Spell(iname, magLv, mana, game), words(iwords)
 {
-	this->script = new SpellScript(datadir, std::string(datadir + "spells/instant/")+(this->words)+std::string(".lua"), this);
+	this->script = new SpellScript(game, datadir, std::string(datadir + "spells/instant/")+(this->words)+std::string(".lua"), this);
 	if(!script->isLoaded())
 		this->loaded = false;
 }
@@ -338,7 +340,7 @@ RuneSpell::RuneSpell(const std::string &datadir, std::string iname, unsigned sho
 	this->id = id;
 	this->charges = charges;
 
-	this->script = new SpellScript(datadir, std::string(datadir + "spells/runes/")+(this->name)+std::string(".lua"), this);
+	this->script = new SpellScript(game, datadir, std::string(datadir + "spells/runes/")+(this->name)+std::string(".lua"), this);
 	if(!script->isLoaded())
 		this->loaded=false;
 }
@@ -365,7 +367,28 @@ bool RuneSpell::castSpell(Creature* creature, Creature* target) const
 	return Spell::castSpell(creature, target);
 }
 
-SpellScript::SpellScript(const std::string &datadir, std::string filename, Spell* spell){
+//SpellScript::SpellScript(const std::string &datadir, std::string filename, Spell* spell) :
+//	BaseScript(
+
+SpellScript::SpellScript(Game* igame, const std::string &datadir, const std::string &scriptname, Spell* spell) :
+	BaseScript(igame)
+{
+  lua_dofile(luaState, std::string(datadir + "spells/lib/spells.lua").c_str());
+	this->setGlobalNumber("addressOfSpell", (int) spell);
+	loadScript(scriptname);
+
+	lua_pushstring(luaState, "onLoad");
+	lua_gettable(luaState, LUA_GLOBALSINDEX);
+
+	int result = lua_pcall(luaState, 0, 0, 0);
+
+#ifdef __DEBUG__
+	if(result) {
+		std::cout << "onLoad() - bad script: " << scriptname << std::endl;
+	}
+#endif
+
+	/*
 	this->loaded = false;
 	scriptname = "";
 
@@ -388,6 +411,7 @@ SpellScript::SpellScript(const std::string &datadir, std::string filename, Spell
 		fclose(in);
 
 	lua_dofile(luaState, scriptname.c_str());
+
 	this->loaded=true;
 	this->setGlobalNumber("addressOfSpell", (int) spell);
 	this->registerFunctions();
@@ -402,6 +426,7 @@ SpellScript::SpellScript(const std::string &datadir, std::string filename, Spell
 		std::cout << "onLoad() - bad script: " << scriptname << std::endl;
 	}
 #endif
+	*/
 }
 
 int SpellScript::onUse(Creature* spellCastCreature, Creature *target, const std::string& var)
@@ -430,47 +455,22 @@ int SpellScript::onUse(Creature* spellCastCreature, Creature *target, const std:
 
 int SpellScript::registerFunctions()
 {
+	BaseScript::registerFunctions();
+
 	lua_register(luaState, "createConjureItemSpell", SpellScript::luaActionCreateConjureItemSpell);
 	lua_register(luaState, "createAreaAttackSpell", SpellScript::luaActionCreateAreaAttackSpell);
 	lua_register(luaState, "createChangeSpeedSpell", SpellScript::luaActionCreateChangeSpeedSpell);
 	lua_register(luaState, "createLightSpell", SpellScript::luaActionCreateLightSpell);
 	lua_register(luaState, "createTargetSpell", SpellScript::luaActionCreateTargetSpell);
-	
+
 	//getPlayerLevel(uid)
-	lua_register(luaState, "getPlayerLevel", SpellScript::luaActionGetPlayerLevel);
+	//lua_register(luaState, "getPlayerLevel", SpellScript::luaActionGetPlayerLevel);
 
 	//getPlayerMagLevel(uid)
-	lua_register(luaState, "getPlayerMagLevel", SpellScript::luaActionGetPlayerMagLevel);
+	//lua_register(luaState, "getPlayerMagLevel", SpellScript::luaActionGetPlayerMagLevel);
 	
 	return true;
 }
-
-/*
-bool SpellScript::castSpell(Creature* creature, const Position& pos, std::string var)
-{
-	lua_pushstring(luaState, "onCast");
-	lua_gettable(luaState, LUA_GLOBALSINDEX);
-	lua_pushnumber(luaState, creature->getID());
-
-	lua_pushstring(luaState, var.c_str());
-
-	int result = lua_pcall(luaState, 5, 2, 0);
-
-	if(result == 0) {
-		lua_pushnil(L);  //first key
-		if(lua_next(L, -2) != 0) {
-			min = lua_tonumber(luaState, -1);
-		}
-
-		bool ret = (bool)(lua_toboolean(luaState, -1) > 0);
-		lua_pop(luaState, 1);
-
-		return ret;
-	}
-
-	return false;
-}
-*/
 
 Spell* SpellScript::getSpell(lua_State *L){
 	lua_getglobal(L, "addressOfSpell");
@@ -482,38 +482,6 @@ Spell* SpellScript::getSpell(lua_State *L){
 		return 0;
 	}
 	return myspell;
-}
-
-int SpellScript::luaActionGetPlayerLevel(lua_State *L)
-{
-	Spell* spell = getSpell(L);
-	unsigned long cid  = (unsigned long)lua_tonumber(L, -1);
-	lua_pop(L, 1);
-
-	Player *player = spell->game->getPlayerByID(cid);
-	if(player) {
-		lua_pushnumber(L, player->level);
-		return 1;
-	}
-
-	lua_pushnumber(L, 0);
-	return 1;
-}
-
-int SpellScript::luaActionGetPlayerMagLevel(lua_State *L)
-{
-	Spell* spell = getSpell(L);
-	unsigned long cid  = (unsigned long)lua_tonumber(L, -1);
-	lua_pop(L, 1);
-
-	Player *player = spell->game->getPlayerByID(cid);
-	if(player) {
-		lua_pushnumber(L, player->maglevel);
-		return 1;
-	}
-
-	lua_pushnumber(L, 0);
-	return 1;
 }
 
 int SpellScript::luaActionCreateConjureItemSpell(lua_State *L)

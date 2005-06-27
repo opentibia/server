@@ -25,6 +25,7 @@
 
 #include "game.h"
 #include "player.h"
+#include "actions.h"
 #include "luascript.h"
 
 extern "C"
@@ -150,10 +151,11 @@ protected:
 	unsigned short charges;
 };
 
-class SpellScript : protected LuaScript
+class SpellScript : protected BaseScript
 {
 public:
-	SpellScript(const std::string&, std::string filename, Spell* spell);
+	//SpellScript(const std::string&, std::string filename, Spell* spell);
+	SpellScript(Game* igame,const std::string &datadir, const std::string &scriptname, Spell* spell);
 	virtual ~SpellScript(){}
   bool isLoaded(){return loaded;}
 	int onUse(Creature* spellCastCreature, Creature *target, const std::string& var);
@@ -165,8 +167,8 @@ public:
 	static int luaActionCreateTargetSpell(lua_State *L);
 
 	//help functions
-	static int luaActionGetPlayerLevel(lua_State *L);
-	static int luaActionGetPlayerMagLevel(lua_State *L);
+	//static int luaActionGetPlayerLevel(lua_State *L);
+	//static int luaActionGetPlayerMagLevel(lua_State *L);
 
 protected:
 	std::string scriptname;
@@ -176,6 +178,6 @@ protected:
 	static attacktype_t internalGetAttackType(lua_State *L);
   static Spell* getSpell(lua_State *L);
 
-	int registerFunctions();
+	virtual int registerFunctions();
 };
 #endif // __spells_h_

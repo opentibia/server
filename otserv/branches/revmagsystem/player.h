@@ -292,10 +292,11 @@ protected:
 	std::string Player::getSkillName(int skillid);
 
   friend class Game;
-  friend class ActionScript;
+  //friend class ActionScript;
+	friend class BaseScript;
   friend class Map;
-  	friend class AttackMelee;
-  	friend class AttackDistancePhysical;
+	friend class AttackMelee;
+	friend class AttackDistancePhysical;
 	friend class MovePlayer;
 	friend class StopMovePlayer;
 	friend class Protocol74;

@@ -277,7 +277,8 @@ protected:
 	friend class Monster;
 	friend class Spawn;
 	friend class SpawnManager;
-	friend class ActionScript;
+	friend class BaseScript;
+	//friend class ActionScript;
 };
 
 template<class ArgType>

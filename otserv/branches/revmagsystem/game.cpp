@@ -1883,7 +1883,10 @@ void Game::executeAttack(Attack *attack, Creature *attackedCreature){
 	eSquareColor square_color;
 	attack->getDrawInfo(me,text_color,blood_color,shoot,square_color);
 	
-	if(square_color != SQ_COLOR_NONE){
+	if(attackedPlayer && square_color != SQ_COLOR_NONE){
+		attackedPlayer->sendColorSquare(attacker, square_color);
+
+		/*
 		if(attackerlist.empty()){
 			getSpectators(Range(attacker->pos), attackerlist);
 		}
@@ -1893,6 +1896,7 @@ void Game::executeAttack(Attack *attack, Creature *attackedCreature){
 				continue;
 			spectator->sendColorSquare(attacker, square_color);
 		}
+		*/
 	}
 	
 	if(shoot != DIST_NONE && attacker){
@@ -2540,7 +2544,7 @@ void Game::checkDecay(int t)
 	}
 	
 	vector<decayBlock*>::iterator it2 = decayVector.begin();
-	while(it2 != decayVector.end()){		
+	while(it2 != decayVector.end()){
 		if((*it2)->decayTime <= 0){
 			delete (*it2);
 			decayVector.erase(it2);
@@ -2649,45 +2653,6 @@ bool Game::playerUseItemEx(Player *player, const Position& posFrom,const unsigne
 		const Position &posTo,const unsigned char stack_to, const unsigned short itemid)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
-
-	/*
-	bool ret = false;
-
-	Position thingpos = getThingMapPos(player, posFrom);
-	Item *item = dynamic_cast<Item*>(getThing(posFrom, stack_from, player));
-
-	if(item) {
-		//Runes
-		std::map<unsigned short, Spell*>::iterator sit = spells.getAllRuneSpells()->find(item->getID());
-		if(sit != spells.getAllRuneSpells()->end()) {
-			if( (abs(thingpos.x - player->pos.x) > 1) || (abs(thingpos.y - player->pos.y) > 1) ) {
-				player->sendCancel("To far away...");
-				ret = false;
-			}
-			else {
-				std::string var = std::string("");
-				if(player->access != 0 || sit->second->getMagLv() <= player->maglevel)
-				{
-					bool success = false; //sit->second->getSpellScript()->castSpell(player, posTo, var);
-					ret = success;
-					if(success) {
-						item->setItemCharge(std::max((int)item->getItemCharge() - 1, 0) );
-						if(item->getItemCharge() == 0) {
-							removeThing(player,posFrom,item);
-						}
-					}
-				}
-				else
-				{			
-					player->sendCancel("You don't have the required magic level to use that rune.");
-				}
-			}
-		}
-		else{
-			ret = true;
-		}
-	}
-	*/
 
 	actions.UseItemEx(player,posFrom,stack_from,posTo,stack_to,itemid);
 	return true;

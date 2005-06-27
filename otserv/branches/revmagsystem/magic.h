@@ -136,7 +136,7 @@ public:
 		const AreaVector& ivec, bool ineedDirection, amuEffect_t iamuInfo);
 	virtual ~MagicAreaSpell() {};
 	virtual bool doCastSpell(Creature* spellCastCreature, const Position& pos, const std::string& var) const;
-	virtual bool doCastSpell(Creature* spellCastCreature, Creature* targetCreature) const {return false;};
+	virtual bool doCastSpell(Creature* spellCastCreature, Creature* targetCreature) const;
 
 protected:
 	virtual void setArea(const AreaVector& vec) {areaVec = vec;};

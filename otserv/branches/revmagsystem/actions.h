@@ -101,7 +101,8 @@ enum ePlayerInfo{
 	PlayerInfoMana,
 	PlayerInfoHealth,
 	PlayerInfoName,
-	PlayerInfoPosition,	
+	PlayerInfoPosition,
+	PlayerInfoSpeed
 };
 
 struct KnownThing{
@@ -126,11 +127,12 @@ protected:
 	bool allowfaruse;
 };
 
-class ActionScript : protected LuaScript{
+class BaseScript : protected LuaScript{
 public:
-	ActionScript(Game* igame,const std::string &datadir, const std::string &scriptname);
-	virtual ~ActionScript(){}
+	BaseScript(Game* igame);
+	virtual ~BaseScript(){}
 	bool isLoaded()const {return loaded;}
+	bool loadScript(const std::string& scriptname);
 	
 	lua_State* getLuaState(){return luaState;}
 	
@@ -164,6 +166,8 @@ public:
 	static int luaActionDoCreateItem(lua_State *L);
 	static int luaActionDoSummonCreature(lua_State *L);
 	
+	static int luaActionDoPlayerChangeSpeed(lua_State *L);
+
 	//get item info
 	static int luaActionGetItemRWInfo(lua_State *L);
 	static int luaActionGetThingfromPos(lua_State *L);
@@ -174,8 +178,9 @@ public:
 	
 	//get tile info
 	static int luaActionGetTilePzInfo(lua_State *L);
-	
+
 	//get player info functions
+	static int luaActionGetPlayerSpeed(lua_State *L);
 	static int luaActionGetPlayerFood(lua_State *L);
 	static int luaActionGetPlayerAccess(lua_State *L);
 	static int luaActionGetPlayerLevel(lua_State *L);
@@ -200,10 +205,10 @@ protected:
 	static std::map<unsigned int,KnownThing*> uniqueIdMap;
 	
 	//lua related functions
-	int registerFunctions();
+	virtual int registerFunctions();
 	bool loaded;
 	//lua interface helpers
-	static ActionScript* getActionScript(lua_State *L);
+	static BaseScript* getScript(lua_State *L);
 	static void internalAddPositionEx(lua_State *L, const PositionEx& pos);
 	static void internalGetPositionEx(lua_State *L, PositionEx& pos);
 	static unsigned long internalGetNumber(lua_State *L);
@@ -213,6 +218,13 @@ protected:
 	static Position internalGetRealPosition(Player *player, const Position &pos);
 	static int internalGetPlayerInfo(lua_State *L, ePlayerInfo info);
 	
+};
+
+class ActionScript : public BaseScript {
+	ActionScript(Game *igame,const std::string &datadir,const std::string &scriptname);
+	virtual ~ActionScript() {};
+
+	friend class Action;
 };
 
 #endif // __actions_h_
