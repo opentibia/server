@@ -41,8 +41,8 @@ bool IOMapXML::loadMap(Map* map, std::string identifier){
 		exit(1);
 	}
 
-	width=atoi((const char*)xmlGetProp(root, (const xmlChar *) "width"));
-	height=atoi((const char*)xmlGetProp(root, (const xmlChar *) "height"));
+	map->mapwidth=atoi((const char*)xmlGetProp(root, (const xmlChar *) "width"));
+	map->mapheight=atoi((const char*)xmlGetProp(root, (const xmlChar *) "height"));
 	std::cout << width << "  " << height << std::endl;
 
 	std::string spawnfile = "";

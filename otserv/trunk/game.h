@@ -111,7 +111,18 @@ public:
 	  * \param filename the name of the mapfile to load
 	  */
 	bool loadMap(std::string filename);
-
+	
+	/**
+	  * Get the map size - info purpose only
+	  * \param a the referenced witdh var
+	  * \param b the referenced height var
+	  */
+	void getMapDimensions(int& a, int& b) {
+     a = map->mapwidth;  
+     b = map->mapheight;  
+     return;
+  }
+  
 	const std::string& getSpawnFile() {return map->spawnfile;}
 
 	/**

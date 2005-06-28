@@ -226,21 +226,30 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 				g_game.FreeThing(player);
 				//player->releaseThing();
 			}
+    } 
+    // Since Cip made 02xx as Tibia protocol,
+    // Lets make FFxx as "our great info protocol" ;P
+  	else if (protId == 0xFFFF) {
+	  	if (msg.GetRaw() == "info"){
+		  	Status* status = Status::instance();
+			
+        uint64_t running = (OTSYS_TIME() - status->start)/1000;
+	  		std::cout << ":: Uptime: " << running << std::endl;
+			
+  			std::string str = status->getStatusString();
+	  		send(s, str.c_str(), (int)str.size(), 0); 
+  		}
+	  }
+  	// Another ServerInfo protocol
+	  // Starting from 01, so the above could be 00 ;)
+  	else if (protId == 0xFF01) { 
+      // This one doesn't need to read nothing, so we could save time and bandwidth
+      // Can be called thgough a program that understand the NetMsg protocol
+      Status* status = Status::instance();
+      status->getInfo(msg);
+      msg.WriteToSocket(s);
     }
-	else if(protId == 0xFFFF){
-		if(msg.GetRaw() == "info"){
-			Status* status = Status::instance();
-			
-      uint64_t running = (OTSYS_TIME() - status->start)/1000;
-			std::cout << ":: Uptime: " << running << seconds << std::endl;
-			
-			std::string str = status->getStatusString();
-			send(s, str.c_str(), (int)str.size(), 0); 
-		}
-	}
-	
   }
-
   if (s)
     closesocket(s);
 #if defined __EXCEPTION_TRACER__
@@ -256,8 +265,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 
 
 
-void ErrorMessage(const char* message)
-{
+void ErrorMessage(const char* message) {
   std::cout << std::endl << std::endl << "Error: " << message;
 
   std::string s;
@@ -415,12 +423,8 @@ int main(int argc, char *argv[])
   IpNetMask.first  = inet_addr(ip.c_str());
   IpNetMask.second = 0;
   serverIPs.push_back(IpNetMask);
-
-
-
   
   std::cout << ":: Starting Server... ";
-
 
   // start the server listen...
   sockaddr_in local_adress;
@@ -475,6 +479,8 @@ int main(int argc, char *argv[])
 
   std::cout << "[done]" << std::endl << ":: OpenTibia Server Running..." << std::endl;
   Status* status = Status::instance();
+  status->playersmax = g_config.getGlobalNumber("maxplayers");
+  
 	
   while (true)
   {

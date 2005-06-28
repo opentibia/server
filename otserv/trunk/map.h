@@ -283,6 +283,10 @@ class Map {
 
 	/** The Map-Lock */
 	//OTSYS_THREAD_LOCKVAR mapLock;
+	
+	/* Map Width and Height - for Info purposes */
+	int mapwidth, mapheight;
+	
   protected:    
     /**
 	  * Get the Creatures within a specific Range */

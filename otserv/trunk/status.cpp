@@ -24,6 +24,7 @@
 #include "luascript.h"
 #include <sstream>
 #include "game.h"
+#include "networkmessage.h"
 
 extern LuaScript g_config;
 extern Game g_game;
@@ -37,15 +38,16 @@ Status* Status::instance(){
 }
 
 Status::Status(){
-	this->playersonline=0;
-	this->playersmax=0;
+	this->playersonline = 0;
+	this->playersmax    = 0;
+	this->playerspeak   = 0;
 	this->start=OTSYS_TIME();
 }
 
 void Status::addPlayer(){
 	this->playersonline++;
-	if(playersmax < playersonline)
-	  playersmax=playersonline;
+	if(playerspeak < playersonline)
+	  playerspeak = playersonline;
 }
 void Status::removePlayer(){
 	this->playersonline--;
@@ -89,8 +91,10 @@ std::string Status::getStatusString(){
 	ss << this->playersonline;
 	xmlSetProp(p, (const xmlChar*) "online", (const xmlChar*)ss.str().c_str());
 	ss.str("");
-	xmlSetProp(p, (const xmlChar*) "max", (const xmlChar*)g_config.getGlobalString("maxplayers", "").c_str());
 	ss << this->playersmax;
+	xmlSetProp(p, (const xmlChar*) "max", (const xmlChar*)ss.str().c_str());
+	ss.str("");
+	ss << this->playerspeak;
 	xmlSetProp(p, (const xmlChar*) "peak", (const xmlChar*)ss.str().c_str());
 	ss.str("");
 	xmlAddChild(root, p);
@@ -125,3 +129,70 @@ std::string Status::getStatusString(){
 
 	return xml;
 }
+
+void Status::getInfo(NetworkMessage &nm) {
+  // the client selects which information may be 
+  // sent back, so we'll save some bandwidth and 
+  // make many
+  bool bserverinfo0 = nm.GetByte() == 1;
+  bool bserverinfo1 = nm.GetByte() == 1;
+  bool bserverinfo2 = nm.GetByte() == 1;
+  bool bplayersinfo = nm.GetByte() == 1;
+  bool bmapinfo     = nm.GetByte() == 1;
+  
+  nm.Reset();   
+  uint64_t running = (OTSYS_TIME() - this->start) / 1000;
+  // since we haven't all the things on the right place like map's 
+  // creator/info and other things, i'll put the info chunked into
+  // operators, so the httpd server will only receive the existing
+  // properties of the server, such serverinfo, playersinfo and so
+  
+  if (bserverinfo0) {
+    nm.AddByte(0x10); // server info
+    nm.AddString(g_config.getGlobalString("servername", "").c_str());
+    nm.AddString(g_config.getGlobalString("ip", "").c_str());
+    nm.AddString(g_config.getGlobalString("port", "").c_str());   
+  }
+  
+  if (bserverinfo1) {
+    nm.AddByte(0x11); // server info - owner info
+ 	  nm.AddString(g_config.getGlobalString("ownername", "").c_str());
+    nm.AddString(g_config.getGlobalString("owneremail", "").c_str());
+  }
+  
+  if (bserverinfo2) {
+    nm.AddByte(0x12); // server info - misc
+    nm.AddString(g_config.getGlobalString("motd", "").c_str());
+    nm.AddString(g_config.getGlobalString("location", "").c_str());
+    nm.AddString(g_config.getGlobalString("url", "").c_str());
+    nm.AddU32((uint32_t)(running >> 32)); // this method prevents a big number parsing
+    nm.AddU32((uint32_t)(running));       // since servers can be online for months ;)
+    nm.AddString("0.4.0_CVS");
+  }  
+
+  if (bplayersinfo) {
+    nm.AddByte(0x20); // players info
+    nm.AddU32(this->playersonline);
+    nm.AddU32(this->playersmax);
+    nm.AddU32(this->playerspeak);
+  } 
+  
+  if (bmapinfo) {
+    nm.AddByte(0x30); // map info
+    nm.AddString(this->mapname.c_str());
+    nm.AddString(this->mapauthor.c_str());
+    int mw, mh;
+    g_game.getMapDimensions(mw, mh);  
+    nm.AddU16(mw);
+    nm.AddU16(mh);
+  }  
+
+  return;   
+  // just one thing, I'm good with monospaced text, right?
+  // if you haven't undertood the joke, look at the top ^^
+}
+
+bool Status::hasSlot() {
+  return this->playersonline < this->playersmax;
+}
+

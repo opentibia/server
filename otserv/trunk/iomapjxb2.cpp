@@ -45,11 +45,8 @@ bool IOMapJXB2::loadMap(Map* map, std::string identifier){
   
   std::cout << ":: Map dimensions: " << width << "x" << height << std::endl;
   
-  // UPDATED ON 9.JUN.2005:
-  //   not needed anymore ;]
-     
-  // int xorig = ((MAP_WIDTH) - width) / 2;
-  // int yorig = ((MAP_HEIGHT) - height) / 2;
+  map->mapwidth = width;
+  map->mapheight = height;
   
   int ax, ay, az, id, count, tmp, npclen, letter, itemcount;
   unsigned short gid;
@@ -66,12 +63,6 @@ bool IOMapJXB2::loadMap(Map* map, std::string identifier){
       fclose(f);
       return false;
     }
-    
-    // UPDATED ON 9.JUN.2005: 
-    //   not needed anymore ;]   
-    
-    // ax += xorig;
-    // ay += yorig;
     
     gid = fgetc(f);
     gid += fgetc(f) << 8;

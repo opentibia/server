@@ -24,14 +24,20 @@
 #include <string>
 #include "otsystem.h"
 #include "definitions.h"
+#include "networkmessage.h"
 
 
 class Status{
   public:
+  // procs       
 	void addPlayer();
 	void removePlayer();
 	static Status* instance();
 	std::string getStatusString();
+	void getInfo(NetworkMessage &nm);
+	bool hasSlot();
+	
+	// vars
 	int playersonline, playersmax, playerspeak;
 	std::string ownername, owneremail;
 	std::string motd;
