@@ -29,6 +29,7 @@ Creature::Creature(const char *name, unsigned long _id) :
 	lookfeet   = 0;
 	lookmaster = 0;
 	looktype   = PLAYER_MALE_1;
+	looktype_ex = 0;
 
 	lookcorpse = 3128;
 
@@ -37,10 +38,6 @@ Creature::Creature(const char *name, unsigned long _id) :
   experience = 100000;
   lastmove = 0;
 
-	exhaustedTicks = 0;
-	manaShieldTicks = 0;
-  hasteTicks = 0;
-	paralyzeTicks = 0;
 	immunities = 0;
 
 	lastDamage = 0;
@@ -48,7 +45,8 @@ Creature::Creature(const char *name, unsigned long _id) :
 
   attackedCreature = 0;
   speed = 220;
-	addspeed = 0;
+//	addspeed = 0;
+	isInvisible = false;
 }
 
 Creature::~Creature()
@@ -71,66 +69,7 @@ void Creature::drainMana(int damage)
 {
   mana -= min(mana, damage);
 }
-/*
-void Creature::applyDamage(Creature *attacker, attacktype_t type, int damage)
-{
-	if(damage == 0) {
-		lastManaDamage = 0;
-		lastDamage = 0;
-		return;
-	}
 
-	if((getImmunities() & type) == type) {
-		lastManaDamage = 0;
-		lastDamage = 0;
-		return;
-	}
-
-	if (damage > 0) {
-		if (manaShieldTicks >= 1000 && (damage < mana) ) {
-			lastManaDamage = damage;
-			lastDamage = 0;
-		}
-		else if (manaShieldTicks >= 1000 && (damage > mana) ) {
-			lastManaDamage = mana;
-			lastDamage -= lastManaDamage;
-		}
-		else if((manaShieldTicks < 1000) && (damage > health))
-			lastDamage = health;
-		else if (manaShieldTicks >= 1000 && (damage > (health + mana))){
-			lastDamage = health;
-			lastManaDamage = mana;
-		}
-		else {
-			lastDamage = damage;
-			lastManaDamage = 0;
-		}
-
-		if(manaShieldTicks < 1000)
-			drainHealth(lastDamage);
-		else if(lastManaDamage > 0) {
-			drainHealth(lastDamage);
-			drainMana(lastManaDamage);
-		}
-		else {
-			drainMana(lastDamage);
-		}
-
-		addInflictedDamage(attacker, lastDamage);
-	}
-	else {
-		int newhealth = health - damage;
-		
-		if(newhealth > healthmax)
-			newhealth = healthmax;
-			
-		health = newhealth;
-
-		lastDamage = health - newhealth;
-		lastManaDamage = 0;
-	}
-}
-*/
 void Creature::setAttackedCreature(unsigned long id)
 {
   attackedCreature = id;
@@ -285,4 +224,70 @@ std::string Creature::getDescription(bool self) const
 	s << "You see a " << name << ".";
 	str = s.str();
 	return str;
+}
+
+
+void Creature::addCondition(Condition *condition){
+	if(!condition){
+		std::cout << "null condition" << std::endl;
+		return;
+	}
+	conditiontype_t cond_type = condition->getType();
+	Condition *prev_cond = getCondition(cond_type);
+	if(prev_cond){
+		prev_cond->addCondition(condition);
+	}
+	else{
+		if(condition->startCondition(this)){
+			conditions.push_back(condition);
+		}
+	}
+}
+
+void Creature::removeCondition(conditiontype_t c_type){
+	ConditionList::iterator it;
+	for(it = conditions.begin(); it != conditions.end(); ++it){
+		if((*it)->getType() == c_type){
+			(*it)->endCondition(REASON_ABORT);
+			delete *it;
+			conditions.erase(it);
+		}
+	}
+}
+
+void Creature::executeConditions(int newticks){
+	ConditionList::iterator it;
+	for(it = conditions.begin(); it != conditions.end();){
+		(*it)->ticks -= newticks;
+		if((*it)->ticks <= 0){
+			(*it)->endCondition(REASON_ENDTICKS);
+			delete *it;
+			it = conditions.erase(it);
+		}
+		else{
+			(*it)->executeCondition();
+			++it;
+		}
+	}
+}
+
+Condition* Creature::getCondition(conditiontype_t c_type){
+	ConditionList::iterator it;
+	if(conditions.size() == 0)
+		return NULL;
+	
+	for(it = conditions.begin(); it != conditions.end(); ++it){
+		if((*it)->getType() == c_type)
+			return *it;
+	}
+	return NULL;
+}
+
+bool Creature::hasCondition(conditiontype_t c_type){
+	return (getCondition(c_type) != NULL);
+}
+
+void Creature::addExhaustion(long ticks){
+	Condition *cond = Condition::createCondition(CONDITION_EXHAUSTED, ticks, 0);
+	this->addCondition(cond);
 }

@@ -73,6 +73,8 @@ public:
 	static const unsigned long min_id = 0x10000000; //16777217U;
 	static const unsigned long max_id = 0x20000000; //4294967295U;
 
+	bool isExhausted() {return this->hasCondition(CONDITION_EXHAUSTED);}
+
 	bool addItem(Item* item);
 	bool internalAddItemContainer(Container *container,Item* item);
 
@@ -210,7 +212,7 @@ protected:
 	int last_worldlightlevel;
 
   bool pzLocked;
-  long inFightTicks;
+  //long inFightTicks;
 
 	//items
 	containerLayout vcontainers;
@@ -294,7 +296,8 @@ protected:
   friend class Game;
   //friend class ActionScript;
 	friend class BaseScript;
-  friend class Map;
+	friend class ConditionGeneric;
+	friend class Map;
   	friend class AttackMelee;
   	friend class AttackDistance;
 	friend class MovePlayer;

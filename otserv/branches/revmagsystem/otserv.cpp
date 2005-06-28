@@ -172,13 +172,13 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
     {
       unsigned char  clientos = msg.GetByte();
       unsigned short version  = msg.GetU16();
-      unsigned char  unknown = msg.GetByte();
-      msg.GetU32();
+      unsigned char  unknown = msg.GetByte();	//gm client
+      msg.GetU32(); //account number
       std::string name     = msg.GetString();
       std::string password = msg.GetString();
 			if(version < 740){
 				msg.Reset();
-				msg.AddByte(0x14);
+					msg.AddByte(0x14);
 				msg.AddString("Only clients with protocol 7.4 allowed!");
 				msg.WriteToSocket(s);
 			}

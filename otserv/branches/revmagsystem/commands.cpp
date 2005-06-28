@@ -415,7 +415,13 @@ bool Commands::testCommand(Creature* c, const std::string &cmd, const std::strin
 	Player *player = dynamic_cast<Player*>(c);
 	if(player) {
 		//player->sendMagicEffect(player->pos, color);
-		player->sendColorSquare(player, (unsigned char)color);
+		//---------------------------------------------
+		//player->sendColorSquare(player, (unsigned char)color);
+		//---------------------------------------------
+		player->looktype = 0;
+		player->looktype_ex = color;
+		game->creatureChangeOutfit(player);
+		//---------------------------------------------
 	}
 
 	return true;

@@ -46,6 +46,13 @@ class lessSchedTask;
 #define MAP_HEIGHT   512
 #define MAP_LAYER     16
 
+enum eLightState{
+	LIGHT_STATE_DAY,
+	LIGHT_STATE_NIGHT,
+	LIGHT_STATE_SUNSET,
+	LIGHT_STATE_SUNRISE,
+};
+
 /**
   * Main Game class.
   * This class is responsible to controll everything that happens
@@ -194,6 +201,7 @@ public:
 	void addMagicEffect(const Position &pos, unsigned char type);
 
 	void creatureChangeLight(Player* player, int time, unsigned char lightlevel);
+	unsigned char getLightLevel();
 	//void addCondition(Creature *creature, conditiontype_t conditionType, int time, int n);
 	/** Lockvar for Game. */
   OTSYS_THREAD_LOCKVAR gameLock;    
@@ -258,8 +266,16 @@ protected:
 		std::vector<Item*> decayItems;
 	};
 	std::vector<decayBlock*> decayVector;
+	
+	static const unsigned char LIGHT_LEVEL_DAY = 220;
+	static const unsigned char LIGHT_LEVEL_NIGHT = 25;
+	static const int SUNSET = 1305;
+	static const int SUNRISE = 430;
 	unsigned char lightlevel;
-	int lightdelta;
+	eLightState light_state;
+	int light_hour;
+	int light_hour_delta;
+	//int lightdelta;
 	void checkLight(int delta);
 	
 	void checkSpawns(int t);

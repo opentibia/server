@@ -58,7 +58,7 @@ Player::Player(const char *name, Protocol *p) :
   this->name= name;
   food       = 0;
 
-	inFightTicks = 0;
+	//inFightTicks = 0;
 	//exhaustedTicks  = 0;
 	pzLocked = false;
 
@@ -622,7 +622,7 @@ void Player::speak(const std::string &text)
 void Player::sendIcons()
 {
 	int icons = 0;
-	if(inFightTicks >= 6000 || inFightTicks ==4000 || inFightTicks == 2000){
+	/*if(inFightTicks >= 6000 || inFightTicks ==4000 || inFightTicks == 2000){
 		icons |= ICON_SWORDS;
 	}
 	if(manaShieldTicks >= 1000){
@@ -633,7 +633,7 @@ void Player::sendIcons()
 	}
 	if(getSpeed() < getNormalSpeed()){
 		icons |= ICON_PARALYZE;
-	}
+	}*/
 	/*
 	if(conditions.hasCondition(ATTACK_FIRE)){
 		icons |= ICON_BURN | ICON_SWORDS;
@@ -648,8 +648,12 @@ void Player::sendIcons()
 		icons |= ICON_PARALYZE | ICON_SWORDS;
 	}
 	*/
+	ConditionList::iterator it;
+	for(it = conditions.begin(); it != conditions.end(); ++it){
+		icons |= (*it)->getIcons();
+	}
 
-	client->sendIcons(icons);             
+	client->sendIcons(icons);
 }
 
 int Player::sendInventory(unsigned char sl_id){
@@ -1328,7 +1332,7 @@ void Player::sendPing(){
 	}
 	if(npings >= 6){
 		//std::cout << "logout" << std::endl;
-		if(inFightTicks >=1000 && health >0) {
+		if(/*inFightTicks >=1000 &&*/ health >0) {
 			//logout?
 			//client->logout();
 		}

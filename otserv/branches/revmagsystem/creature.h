@@ -25,8 +25,10 @@
 #include "tools.h"
 #include "const74.h"
 #include "thing.h"
+#include "condition.h"
 #include "templates.h"
 #include <vector>
+#include <list>
 #include <map>
 
 enum slots_t {
@@ -48,21 +50,6 @@ enum fight_t {
 	FIGHT_MELEE,
 	FIGHT_DIST,
 	FIGHT_MAGICDIST
-};
-
-enum conditiontype_t {
-	CONDITION_POISON,
-	CONDITION_FIRE,
-	CONDITION_ENERGY,
-	CONDITION_DRUNK,
-	CONDITION_SLOWED,
-	CONDITION_HASTE,
-	CONDITION_MAGICSHIELD,
-	CONDITION_PZLOCK,
-	CONDITION_INFIGHT,
-	CONDITION_LIGH,
-	CONDITION_INVISIBLE,
-	CONDITION_EXHAUSTED
 };
 
 enum attacktype_t {
@@ -119,7 +106,6 @@ class Item;
 class Container;
 class Player;
 class Monster;
-
 //std::map<condition_t, 
 /*
 class Conditions : public std::map<attacktype_t, ConditionVec>
@@ -210,9 +196,9 @@ public:
   virtual Item* getItem(int pos){return NULL;}
   virtual Direction getDirection(){return direction;}
 	
-  int lookhead, lookbody, looklegs, lookfeet, looktype, lookcorpse, lookmaster;
+  int lookhead, lookbody, looklegs, lookfeet, looktype, looktype_ex, lookcorpse, lookmaster;
   
-	long manaShieldTicks, hasteTicks, paralyzeTicks;
+	
 	int lastDamage, lastManaDamage;
 	int immunities;
 
@@ -222,7 +208,7 @@ public:
   int health, healthmax;
   uint64_t lastmove;
 
-  unsigned short getSpeed() const {return speed + addspeed;};
+  unsigned short getSpeed() const {return speed /*+ addspeed*/;};
 	virtual unsigned char getLightLevel() const{return 0;};
 
   virtual int getStepDuration(int underground) { return (1000 * 120 * (underground / 100)) / getSpeed(); };
@@ -250,7 +236,8 @@ public:
   int maglevel;	// magic level
   int level;		// level
   int speed;
-	int addspeed;
+	//int addspeed;
+	bool isInvisible;
 
   virtual bool canMovedTo(const Tile *tile) const;
 
@@ -265,22 +252,31 @@ public:
 	virtual int getTotalInflictedDamage();
 	virtual int getInflicatedDamage(unsigned long id);
 
-	bool isExhausted() {return exhaustedTicks >= 1000;}
-	void addExhaustion(long ticks) {exhaustedTicks += ticks;}
+	void addExhaustion(long ticks);
 
 	int getMana() {return mana;}
-
+	
+	void addCondition(Condition *condition);
+	void removeCondition(conditiontype_t c_type);
+	void executeConditions(int newticks);
+	Condition* getCondition(conditiontype_t c_type);
+	bool hasCondition(conditiontype_t c_type);
+	
 protected:
   std::string name;
   Direction direction;
-
+  
   int mana, manamax, manaspent;
-	long exhaustedTicks;
+	//long exhaustedTicks;
 
 	Creature *master;
 	std::vector<Creature*> summons;
 
 	//Conditions conditions;
+	typedef std::list<Condition *> ConditionList;
+	ConditionList conditions;
+	
+		
 	typedef std::vector< std::pair<uint64_t, long> > DamageList;
 	typedef std::map<long, DamageList > TotalDamageList;
 	TotalDamageList totaldamagelist;

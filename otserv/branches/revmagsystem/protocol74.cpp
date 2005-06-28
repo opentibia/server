@@ -91,7 +91,7 @@ void Protocol74::ReceiveLoop()
   	// logout by disconnect?  -> kick
   	if (!pendingLogout)
   	{		
-		if(player->inFightTicks >=1000 && player->health >0) {
+		if(player->hasCondition(CONDITION_INFIGHT) && player->health > 0) {
 			OTSYS_SLEEP(10000);
 			game->removeCreature(player);
 		}
@@ -408,7 +408,7 @@ void Protocol74::checkCreatureAsKnown(unsigned long id, bool &known, unsigned lo
 // Parse methods
 void Protocol74::parseLogout(NetworkMessage &msg)
 {
-    if(player->inFightTicks >=1000 && player-> health >0) {
+    if(player->hasCondition(CONDITION_INFIGHT) && player-> health >0) {
          sendCancel("You may not logout during or immediately after a fight!");
          return;
      }    
@@ -622,10 +622,15 @@ void Protocol74::sendSetOutfit(const Creature* creature) {
 		newmsg.AddByte(0x8E);
 		newmsg.AddU32(creature->getID());
 		newmsg.AddByte(creature->looktype);
-		newmsg.AddByte(creature->lookhead);
-		newmsg.AddByte(creature->lookbody);
-		newmsg.AddByte(creature->looklegs);
-		newmsg.AddByte(creature->lookfeet);
+		if(creature->looktype == 0){
+			newmsg.AddU16(creature->looktype_ex);
+		}
+		else{
+			newmsg.AddByte(creature->lookhead);
+			newmsg.AddByte(creature->lookbody);
+			newmsg.AddByte(creature->looklegs);
+			newmsg.AddByte(creature->lookfeet);
+		}
 		WriteBuffer(newmsg);
 	}
 }
@@ -1927,8 +1932,8 @@ void Protocol74::sendThingAppear(const Thing *thing){
 			AddPlayerStats(msg,player);	
 
 			msg.AddByte(0x82);
-			msg.AddByte(0x6F); //LIGHT LEVEL
-    		msg.AddByte(0xD7);//light? (seems constant)
+			msg.AddByte(game->getLightLevel()); //LIGHT LEVEL
+    		msg.AddByte(0xD7);//light color
 
 			/*msg.AddByte(0x8d);//8d
 			msg.AddU32(player->getID());
@@ -2198,14 +2203,23 @@ void Protocol74::AddCreature(NetworkMessage &msg,const Creature *creature, bool 
 
   msg.AddByte(creature->health*100/creature->healthmax);
   msg.AddByte((unsigned char)creature->getDirection());
-
   msg.AddByte(creature->looktype);
-  msg.AddByte(creature->lookhead);
-  msg.AddByte(creature->lookbody);
-  msg.AddByte(creature->looklegs);
-  msg.AddByte(creature->lookfeet);
+  if(creature->looktype == 0){
+	msg.AddU16(creature->looktype_ex);
+  }
+  else{
+  	msg.AddByte(creature->lookhead);
+  	msg.AddByte(creature->lookbody);
+  	msg.AddByte(creature->looklegs);
+  	msg.AddByte(creature->lookfeet);
+  }
 
-  msg.AddByte(0x00); // light level
+  if(dynamic_cast<const Player*>(creature)){
+  	msg.AddByte(dynamic_cast<const Player*>(creature)->getLightLevel()); // light level
+  }
+  else{
+	msg.AddByte(0x00); // light level
+  }
   msg.AddByte(0xDC); // light color
 
   msg.AddU16(creature->getSpeed());

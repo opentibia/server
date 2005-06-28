@@ -830,7 +830,7 @@ bool Monster::doAttacks(Player* attackedPlayer)
 		}
 	}
 
-	if(exhaustedTicks <= 0) {
+	if(1/*exhaustedTicks <= 0*/) {
 		for(RuneAttackSpells::iterator raIt = runeSpells.begin(); raIt != runeSpells.end(); ++raIt) {
 			for(TimeProbabilityClassVec::iterator asIt = raIt->second.begin(); asIt != raIt->second.end(); ++asIt) {
 				TimeProbabilityClass& timeprobsystem = *asIt;
@@ -842,8 +842,8 @@ bool Monster::doAttacks(Player* attackedPlayer)
 
 						if(success) {
 							ret = true;
-							exhaustedTicks = timeprobsystem.getExhaustion();
-							if(exhaustedTicks > 0)
+							//exhaustedTicks = timeprobsystem.getExhaustion();
+							if(1/*exhaustedTicks > 0*/)
 								return true;
 						}
 					}
@@ -862,8 +862,8 @@ bool Monster::doAttacks(Player* attackedPlayer)
 
 						if(success) {
 							ret = true;
-							exhaustedTicks = timeprobsystem.getExhaustion();
-							if(exhaustedTicks > 0)
+							//exhaustedTicks = timeprobsystem.getExhaustion();
+							if(0/*exhaustedTicks > 0*/)
 								return true;
 						}
 					}
@@ -880,11 +880,11 @@ void Monster::onAttack()
 	if (attackedCreature != 0) {
 		game->addEvent(makeTask(500, std::bind2nd(std::mem_fun(&Game::checkCreatureAttacking), getID())));
 
-		exhaustedTicks -= 500;
+		//exhaustedTicks -= 500;
 
-		if(exhaustedTicks < 0)
+		/*if(exhaustedTicks < 0)
 			exhaustedTicks = 0;
-
+		*/
 		Player *attackedPlayer = dynamic_cast<Player*>(game->getCreatureByID(this->attackedCreature));
 		if (attackedPlayer) {
 			Tile* fromtile = game->map->getTile(this->pos.x, this->pos.y, this->pos.z);

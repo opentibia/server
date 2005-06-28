@@ -37,6 +37,7 @@ using namespace std;
 
 #include "items.h"
 #include "commands.h"
+#include "condition.h"
 #include "game.h"
 #include "tile.h"
 
@@ -78,13 +79,20 @@ Game::Game()
 	addEvent(makeTask(DECAY_INTERVAL, boost::bind(&Game::checkDecay,this,DECAY_INTERVAL)));	
 
 	//int daycycle = g_config.getGlobalNumber("daycycle", 3600);
-	int daycycle = 3600;
+	/*int daycycle = 3600;
 	lightdelta = std::max(1, (int)std::ceil((double)daycycle / 255));
 	lightlevel = 0;
 
 	if(lightdelta > 0) {
 		addEvent(makeTask(lightdelta * 1000, boost::bind(&Game::checkLight, this, lightdelta)));
-	}
+	}*/
+	//int daycycle = g_config.getGlobalNumber("daycycle", 3600);
+	int daycycle = 3600;
+	light_hour_delta = 1440*10/daycycle;
+	light_hour = 0;
+	lightlevel = LIGHT_LEVEL_NIGHT;
+	light_state = LIGHT_STATE_NIGHT;
+	addEvent(makeTask(10000, boost::bind(&Game::checkLight, this, 10000)));
 }
 
 
@@ -1723,14 +1731,16 @@ void Game::creatureYell(Creature *creature, std::string &text)
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
 
 	Player* player = dynamic_cast<Player*>(creature);
-	if(player && player->access == 0 && player->isExhausted() /*&& player->exhaustedTicks >=1000*/) {
-		player->exhaustedTicks += (long)g_config.getGlobalNumber("exhaustedadd", 0);		
+	if(player && player->access == 0 && player->isExhausted() ) {
+		//player->exhaustedTicks += (long)g_config.getGlobalNumber("exhaustedadd", 0);
+		player->addExhaustion((long)g_config.getGlobalNumber("exhaustedadd", 0));
 		player->sendTextMessage(MSG_SMALLINFO, "You are exhausted.");
 	}
 	else {
 		Player *player = dynamic_cast<Player*>(creature);
 		if(player) {
-			player->exhaustedTicks = (long)g_config.getGlobalNumber("exhausted", 0);
+			//player->exhaustedTicks = (long)g_config.getGlobalNumber("exhausted", 0);
+			player->addExhaustion((long)g_config.getGlobalNumber("exhaustedadd", 0));
 		}
 
 		std::transform(text.begin(), text.end(), text.begin(), upchar);
@@ -1818,8 +1828,7 @@ void Game::executeAttack(Attack *attack, Creature *attackedCreature){
 	if(damage > 0){
 		switch(damageType){
 		case DAMAGE_HEALTH:
-			//TODO: check conditions for mana shield
-			if(attackedCreature->manaShieldTicks > 1000){
+			if(attackedCreature->hasCondition(CONDITION_MAGICSHIELD)){
 				if(damage < attackedCreature->mana){
 					std::cout << "Error. Mana shield error." << std::cout;
 					attackedCreature->drainHealth(damage);
@@ -1882,6 +1891,20 @@ void Game::executeAttack(Attack *attack, Creature *attackedCreature){
 	if(attackerPlayer && attack->getSkillId() != SKILL_NONE){
 		attackerPlayer->addSkillTryInternal(1,attack->getSkillId());
 	}
+	
+	//add pzlock and infight ticks
+	Condition *cond;
+	if(attackerPlayer && attackerPlayer->access < GM_MIN_LEVEL){
+		cond = Condition::createCondition(CONDITION_PZLOCK, 30000, 0);
+		attackerPlayer->addCondition(cond);
+		cond = Condition::createCondition(CONDITION_INFIGHT, 30000, 0);
+		attackerPlayer->addCondition(cond);
+	}
+	if(attackedPlayer && attackerPlayer->access < GM_MIN_LEVEL){
+		cond = Condition::createCondition(CONDITION_INFIGHT, 30000, 0);
+		attackedPlayer->addCondition(cond);
+	}
+	
 	//draw animations
 	MagicEffectClasses me;
 	MagicEffectClasses blood_me;
@@ -2229,6 +2252,8 @@ void Game::checkCreature(unsigned long id)
 			addEvent(makeTask(thinkTicks, std::bind2nd(std::mem_fun(&Game::checkCreature), id)));
 		}
 
+		creature->executeConditions(oldThinkTicks);
+
 		Player* player = dynamic_cast<Player*>(creature);
 		if(player){
 			Tile *tile = getTile(player->pos.x, player->pos.y, player->pos.z);
@@ -2262,7 +2287,8 @@ void Game::checkCreature(unsigned long id)
 				player->sendStats();
 			
 			player->sendPing();
-
+			player->sendIcons();
+			/*
 			if(player->inFightTicks >= 1000) {
 				player->inFightTicks -= thinkTicks;
 				
@@ -2295,7 +2321,7 @@ void Game::checkCreature(unsigned long id)
 				creature->hasteTicks -= thinkTicks;
 			}
 		}
-
+		*/
 		/*
 		Conditions& conditions = creature->getConditions();
 		for(Conditions::iterator condIt = conditions.begin(); condIt != conditions.end(); ++condIt) {
@@ -2319,9 +2345,10 @@ void Game::checkCreature(unsigned long id)
 			}
 		}
 		*/
-
+		}
 		flushSendBuffers();
 	}
+	
 }
 /*
 void Game::addCondition(Creature *creature, conditiontype_t conditionType, int time, int n)
@@ -2396,7 +2423,7 @@ void Game::changeSpeed(unsigned long id, unsigned short speed)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
 	Creature *creature = getCreatureByID(id);
-	if(creature && creature->hasteTicks < 1000 && creature->speed != speed)
+	if(creature && /*creature->hasteTicks < 1000 &&*/ creature->speed != speed)
 	{
 		creature->speed = speed;
 		Player* player = dynamic_cast<Player*>(creature);
@@ -2614,7 +2641,7 @@ void Game::checkSpawns(int t)
 
 void Game::checkLight(int t)
 {
-  int newlightlevel = lightlevel + lightdelta;
+  /*int newlightlevel = lightlevel + lightdelta;
 
 	if(newlightlevel < 0) {
 		lightlevel = 0;
@@ -2629,6 +2656,45 @@ void Game::checkLight(int t)
 	}
 	
 	addEvent(makeTask(lightdelta * 1000, boost::bind(&Game::checkLight, this, lightdelta)));
+	*/
+	addEvent(makeTask(10000, boost::bind(&Game::checkLight, this, 10000)));
+	
+	light_hour = light_hour + light_hour_delta;
+	if(light_hour > 1440)
+		light_hour = light_hour - 1440;
+	
+	if(std::abs(light_hour - SUNRISE) < 2*light_hour_delta){
+		light_state = LIGHT_STATE_SUNRISE;
+	}
+	else if(std::abs(light_hour - SUNSET) < 2*light_hour_delta){
+		light_state = LIGHT_STATE_SUNSET;
+	}
+	
+	int newlightlevel = lightlevel;
+	switch(light_state){
+	case LIGHT_STATE_SUNRISE:
+		newlightlevel += (LIGHT_LEVEL_DAY - LIGHT_LEVEL_NIGHT)/30;
+		break;
+	case LIGHT_STATE_SUNSET:
+		newlightlevel -= (LIGHT_LEVEL_DAY - LIGHT_LEVEL_NIGHT)/30;
+		break;
+	}
+	
+	if(newlightlevel <= LIGHT_LEVEL_NIGHT){
+		lightlevel = LIGHT_LEVEL_NIGHT;
+		light_state = LIGHT_STATE_NIGHT;
+	}
+	else if(newlightlevel >= LIGHT_LEVEL_DAY){
+		lightlevel = LIGHT_LEVEL_DAY;
+		light_state = LIGHT_STATE_DAY;
+	}
+	else{
+		lightlevel = newlightlevel;
+	}
+}
+
+unsigned char Game::getLightLevel(){
+	return lightlevel;
 }
 
 bool Game::creatureSaySpell(Creature *creature, const std::string &text)

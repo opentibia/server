@@ -36,9 +36,7 @@ internal_hit_me(NM_ME_NONE)
 
 
 bool Attack::checkManaShield(Creature *attackedCreature, long damage){
-	//TODO: check conditions for mana shield
-	// player->getCondition(MANA_SHIELD) ?
-	if(attackedCreature->manaShieldTicks > 1000 && damage < attackedCreature->getMana()){
+	if(attackedCreature->hasCondition(CONDITION_MAGICSHIELD) && damage < attackedCreature->getMana()){
 		manaAttack = true;
 		return true;
 	}
