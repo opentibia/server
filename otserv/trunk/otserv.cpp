@@ -229,7 +229,11 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
     }
 	else if(protId == 0xFFFF){
 		if(msg.GetRaw() == "info"){
-			Status* status =Status::instance();
+			Status* status = Status::instance();
+			
+      uint64_t running = (OTSYS_TIME() - status->start)/1000;
+			std::cout << ":: Uptime: " << running << seconds << std::endl;
+			
 			std::string str = status->getStatusString();
 			send(s, str.c_str(), (int)str.size(), 0); 
 		}
@@ -470,7 +474,7 @@ int main(int argc, char *argv[])
 
 
   std::cout << "[done]" << std::endl << ":: OpenTibia Server Running..." << std::endl;
-
+  Status* status = Status::instance();
 	
   while (true)
   {
