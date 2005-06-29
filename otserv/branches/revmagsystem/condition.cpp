@@ -33,40 +33,42 @@ condition_type(CONDITION_NONE)
 
 Condition* Condition::createCondition(conditiontype_t _type, int _ticks, int param)
 {
-	/*********************************/
-	/* DO NOT USE SWITCH(gcc bug)	 */
-	/*********************************/
-	if(_type == CONDITION_NONE){
+	switch(_type){
+	case CONDITION_NONE:
 		return NULL;
-	}
-	else if(_type == CONDITION_POISON ||
-			_type == CONDITION_FIRE	||
-			_type == CONDITION_ENERGY){
+		break;
+	case CONDITION_POISON:
+	case CONDITION_FIRE:
+	case CONDITION_ENERGY:
 		//return new ConditionDamage(_type,_ticks,param);
 		return NULL;
-	}
-	else if(_type == CONDITION_SPEED){
-		//param could be positive and negative
+		break;
+	case CONDITION_SPEED:
+		//param can be positive and negative
 		//return new ConditionSpeed(ticks,param);
 		return NULL;
-	}
-	else if(_type == CONDITION_OUTFIT){
+		break;
+	case CONDITION_OUTFIT:
 		//if param = 0 -> invisble
-		//elseif param < 110 -> looktype = param
+		//elseif param <= 110 -> looktype = param
 		//else -> looktype = 0, looktype_ex = param >> 8
 		//return new ConditionOutfit(_ticks,param);
 		return NULL;
-	}
-	else if(_type == CONDITION_LIGHT){
+		break;
+	case CONDITION_LIGHT:
 		//return new ConditionLight(_ticks, param & 0xFF, (param & 0xFF00) >> 8);
 		return NULL;
-	}
-	else if(_type == CONDITION_MAGICSHIELD ||
-			_type == CONDITION_PZLOCK ||
-			_type == CONDITION_INFIGHT ||
-			_type == CONDITION_DRUNK ||
-			_type == CONDITION_EXHAUSTED){
+		break;
+	case CONDITION_MAGICSHIELD:
+	case CONDITION_PZLOCK:
+	case CONDITION_INFIGHT:
+	case CONDITION_DRUNK:
+	case CONDITION_EXHAUSTED:
 		return new ConditionGeneric(_type,_ticks);
+		break;
+	default:
+		return NULL;
+		break;
 	}
 }
 
@@ -96,7 +98,7 @@ bool ConditionGeneric::startCondition(Creature *c)
 	}
 }
 
-void ConditionGeneric::executeCondition(){
+void ConditionGeneric::executeCondition(int interval){
 	//nothing
 }
 

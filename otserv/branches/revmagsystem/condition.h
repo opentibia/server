@@ -36,7 +36,7 @@ enum conditiontype_t {
 	CONDITION_PZLOCK,		//Generic -- Player only
 	CONDITION_INFIGHT,		//Generic -- Player only
 	CONDITION_DRUNK,		//Generic -- Player only
-	CONDITION_EXHAUSTED,	//Generic -- Player only
+	CONDITION_EXHAUSTED,	//Generic
 	CONDITION_FOOD,			//Generic -- Player only -- NOT IMPLEMENTED YET
 };
 
@@ -52,7 +52,7 @@ public:
 	virtual ~Condition(){};
 	
 	virtual bool startCondition(Creature *c) = 0;
-	virtual void executeCondition() = 0;
+	virtual void executeCondition(int interval) = 0;
 	virtual void endCondition(int reason) = 0;
 	
 	virtual void addCondition(Condition *condition) = 0;
@@ -79,7 +79,7 @@ public:
 	virtual ~ConditionGeneric(){};
 	
 	virtual bool startCondition(Creature *c);
-	virtual void executeCondition();
+	virtual void executeCondition(int interval);
 	virtual void endCondition(int reason);
 	
 	virtual void addCondition(Condition *condition);
@@ -96,7 +96,7 @@ public:
 	virtual ~ConditionDamage(){};
 	
 	virtual bool startCondition(Creature *c);
-	virtual void executeCondition();
+	virtual void executeCondition(int interval);
 	virtual void endCondition(int reason);
 	
 	virtual void addCondition(Condition *condition);
@@ -105,7 +105,7 @@ public:
 	
 };
 */
-/*
+
 class ConditionSpeed: public Condition
 {
 public:
@@ -113,15 +113,15 @@ public:
 	virtual ~ConditionSpeed(){};
 	
 	virtual bool startCondition(Creature *c);
-	virtual void executeCondition();
+	virtual void executeCondition(int interval);
 	virtual void endCondition(int reason);
 	
 	virtual void addCondition(Condition *condition);
 	
 	virtual unsigned char getIcons();
 };
-*/
-/*
+
+
 class ConditionOutfit: public Condition
 {
 public:
@@ -129,15 +129,15 @@ public:
 	virtual ~ConditionOutfit(){};
 	
 	virtual bool startCondition(Creature *c);
-	virtual void executeCondition();
+	virtual void executeCondition(int interval);
 	virtual void endCondition(int reason);
 	
 	virtual void addCondition(Condition *condition);
 	
 	virtual unsigned char getIcons();
 };
-*/
-/*
+
+
 class ConditionLight: public Condition
 {
 public:
@@ -145,13 +145,13 @@ public:
 	virtual ~ConditionLight(){};
 	
 	virtual bool startCondition(Creature *c);
-	virtual void executeCondition();
+	virtual void executeCondition(int interval);
 	virtual void endCondition(int reason);
 	
 	virtual void addCondition(Condition *condition);
 	
 	virtual unsigned char getIcons();
 };
-*/
+
 
 #endif

@@ -236,6 +236,7 @@ void Creature::addCondition(Condition *condition){
 	Condition *prev_cond = getCondition(cond_type);
 	if(prev_cond){
 		prev_cond->addCondition(condition);
+		delete condition;
 	}
 	else{
 		if(condition->startCondition(this)){
@@ -265,7 +266,7 @@ void Creature::executeConditions(int newticks){
 			it = conditions.erase(it);
 		}
 		else{
-			(*it)->executeCondition();
+			(*it)->executeCondition(newticks);
 			++it;
 		}
 	}
