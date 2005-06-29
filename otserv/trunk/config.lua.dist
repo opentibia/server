@@ -73,4 +73,12 @@ sql_host = "localhost"
 sql_user = "root"
 sql_pass = ""
 sql_db   = "otserv"
+
+
+--- SQL MAP part
+sqlmap = "test_map"
+map_host = "localhost"
+map_user = "root"
+map_pass = ""
+map_db   = ""
 ----------------------------

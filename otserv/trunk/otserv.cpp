@@ -64,7 +64,6 @@ Spells spells(&g_game);
 Actions actions(&g_game);
 Commands commands(&g_game);
 
-//SpawnManager spawnmanager;
 #if defined __EXCEPTION_TRACER__
 #include "exception.h"
 #endif
@@ -178,12 +177,12 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
       msg.GetU32();
       std::string name     = msg.GetString();
       std::string password = msg.GetString();
-            if(version < 740){
-                msg.Reset();
+			if(version < 740){
+				msg.Reset();
 				msg.AddByte(0x14);
 				msg.AddString("Only clients with protocol 7.4 allowed!");
 				msg.WriteToSocket(s);
-            }      
+			}
 			else if(isclientBanished(s)) {
 				msg.Reset();
 				msg.AddByte(0x14);
@@ -347,12 +346,21 @@ int main(int argc, char *argv[])
 	std::cout << "[done]" << std::endl;
 
 
-  // load map file
+#ifdef _SQLMAP_
+   std::cout << ":: Reading spawn info from database ... \n";
+   if(g_game.loadMap(g_config.getGlobalString("sqlmap"))) {
+      SpawnManager::initialize(&g_game);
+      SpawnManager::instance()->loadSpawnsSQL(g_config.getGlobalString("sqlmap"));
+      SpawnManager::instance()->startup();
+   }
+#else
+	// load map file
 	if(g_game.loadMap(g_config.getGlobalString("mapfile"))) {
 		SpawnManager::initialize(&g_game);
-		SpawnManager::instance()->loadSpawns(g_game.getSpawnFile() /*g_config.getGlobalString("spawnfile")*/);
+		SpawnManager::instance()->loadSpawnsXML(g_game.getSpawnFile());
 		SpawnManager::instance()->startup();
 	}
+#endif
 
   // Call to WSA Startup on Windows Systems...
 #ifdef WIN32

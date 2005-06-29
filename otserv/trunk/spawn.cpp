@@ -21,9 +21,18 @@
 #include "spawn.h"
 #include "game.h"
 #include "player.h"
+#include "npc.h"
+
+#ifdef _SQLMAP_
+#include <mysql++.h>
+#include <boost/tokenizer.hpp>
+typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
+#endif
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h> 
+
+extern LuaScript g_config;
 
 SpawnManager* SpawnManager::_instance = NULL;
 Game* SpawnManager::game = NULL;
@@ -53,7 +62,7 @@ SpawnManager* SpawnManager::instance() {
 	return _instance;
 }
 
-bool SpawnManager::loadSpawns(std::string filename)
+bool SpawnManager::loadSpawnsXML(std::string filename)
 {
 	std::transform(filename.begin(), filename.end(), filename.begin(), tolower);
 	xmlDocPtr doc = xmlParseFile(filename.c_str());
@@ -152,6 +161,176 @@ bool SpawnManager::loadSpawns(std::string filename)
 
 	return false;
 }
+
+#ifdef _SQLMAP_
+bool SpawnManager::loadSpawnsSQL(std::string identifier)
+{
+	std::string host = g_config.getGlobalString("map_host");
+	std::string user = g_config.getGlobalString("map_user");
+	std::string pass = g_config.getGlobalString("map_pass");
+	std::string db   = g_config.getGlobalString("map_db");
+
+#ifdef __DEBUG__
+	std::cout "host" << host << "user" << user << "pass" << pass << "db" << db << std::endl;
+#endif     
+	mysqlpp::Connection con;
+
+	try{
+		con.connect(db.c_str(), host.c_str(), user.c_str(), pass.c_str()); 
+	}
+	catch(mysqlpp::BadQuery e){
+		std::cout << "MYSQL-ERROR: " << e.error << std::endl;
+		return false;
+	}
+	
+	mysqlpp::Result res;
+	
+	//Monsters
+
+	//Try & Find the Monter's	
+	try{
+     mysqlpp::Query query = con.query();
+		query << "SELECT * FROM " << identifier << "_monsters WHERE name !=''";
+	 
+#ifdef __DEBUG__
+	std::cout << query.preview() << std::endl;
+#endif	
+	
+	 res = query.store();
+	} //End Try
+	catch(mysqlpp::BadQuery e){
+		std::cout << "MYSQL-ERROR: " << e.error << std::endl;
+		return false;
+	}
+
+	std::cout << ":: Found: " << res.size() << " Monsters(s)/Spawn(s)" << std::endl;
+    if(res.size() < 1){//No Monsters
+       std::cout << "No Monsters found" << std::endl;
+       return false;
+    }
+		//if there are any monster spawns to load
+    else{
+       //Load Monsters
+			try{
+        mysqlpp::Result Monster;
+        mysqlpp::Query query = con.query();
+
+        for(int i=1; i <= res.size(); ++i){
+          query.reset();
+          query << "SELECT * FROM " << identifier << "_monsters WHERE id = '" << i <<"' and id != ''";
+          Monster = query.store();
+          mysqlpp::Row row = *Monster.begin();          
+          //Get the Monster's Position on Map
+          std::string pos = std::string(row.lookup_by_name("spawnpos"));
+          boost::char_separator<char> sep(";");
+          tokenizer spawnpostokens(pos, sep);
+          tokenizer::iterator spawnposit = spawnpostokens.begin();
+					Position spawnpos;
+          spawnpos.x=atoi(spawnposit->c_str()); spawnposit++;
+					spawnpos.y=atoi(spawnposit->c_str()); spawnposit++;
+					spawnpos.z=atoi(spawnposit->c_str());
+					std::string name;
+          if(std::string(row.lookup_by_name("name")) != ""){name = std::string(row.lookup_by_name("name"));}
+          int time = row.lookup_by_name("time");
+
+          Spawn *spawn = new Spawn(game, spawnpos, 1);
+					spawns.push_back(spawn);
+          spawn->addMonster(name, 0, 0, time * 1000);
+        }//End For Loop
+			}//End Try
+			catch(mysqlpp::BadQuery e){
+				std::cout << "MYSQL-ERROR: " << e.error << std::endl;
+				return false;
+			}//End Catch    
+		}
+	
+	//NPC's	
+	//Try & Find the NPC's	
+	try{
+		mysqlpp::Query query = con.query();
+		query << "SELECT * FROM " << identifier << "_npcs WHERE name !=''";
+	 
+#ifdef __DEBUG__
+		std::cout << query.preview() << std::endl;
+#endif	
+	
+	 res = query.store();
+	}//End Try
+	catch(mysqlpp::BadQuery e){
+		std::cout << "MYSQL-ERROR: " << e.error << std::endl;
+		return false;
+	}
+
+	std::cout << ":: Found: " << res.size() << " NPC(s)" << std::endl;
+    if(res.size() < 1){//No NPC's
+       std::cout << "No NPC's found" << std::endl;
+       return false;
+		}
+		//if there are any NPC's to load
+    else{
+       //Load Monsters
+			try{
+        mysqlpp::Result Monster;
+        mysqlpp::Query query = con.query();
+
+        for(int i=1; i <= res.size(); ++i){
+          query.reset();
+          query << "SELECT * FROM " << identifier << "_npcs WHERE id = '" << i <<"' and id != ''";
+          Monster = query.store();
+          mysqlpp::Row row = *Monster.begin();          
+          //Get the NPC's Position on Map
+          std::string pos = std::string(row.lookup_by_name("pos"));
+          boost::char_separator<char> sep(";");
+          tokenizer postokens(pos, sep);
+          tokenizer::iterator posit = postokens.begin();
+					Position npcpos;
+          npcpos.x=atoi(posit->c_str()); posit++;
+					npcpos.y=atoi(posit->c_str()); posit++;
+					npcpos.z=atoi(posit->c_str());
+					std::string name;
+          if(std::string(row.lookup_by_name("name")) != ""){name = std::string(row.lookup_by_name("name"));}
+          int dir = row.lookup_by_name("dir");
+          Npc* npc = new Npc(name.c_str(), game);
+          
+          npc->pos = npcpos;
+          switch(dir){
+             case 1:
+                npc->direction=(NORTH);
+                break;
+             
+             case 2:
+                npc->direction=(SOUTH);
+                break;
+             
+             case 3:
+                npc->direction=(WEST);
+                break;
+             
+             case 4:
+                npc->direction=(EAST);
+                break;
+             
+             default:
+              //  std::cout << "Invalid direction for " << name << "  " <<x<<" "<<y<<" "<<z<<".";
+                return false;
+                break;
+          }
+					
+					if(!game->placeCreature(npc->pos, npc)){
+						delete npc;
+					}
+				}//End For Loop
+        return true;
+			}//End Try
+			catch(mysqlpp::BadQuery e){
+				std::cout << "MYSQL-ERROR: " << e.error << std::endl;
+				return false;
+			}//End Catch    
+    
+		}
+    return true;
+}
+#endif
 
 bool SpawnManager::startup()
 {
