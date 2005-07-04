@@ -1763,8 +1763,12 @@ void Game::thingMoveInternal(Creature *player, unsigned short from_x, unsigned s
 	unsigned char stackPos, unsigned short to_x, unsigned short to_y, unsigned char to_z, unsigned char count)
 {
 	Tile *fromTile = getTile(from_x, from_y, from_z);
-	Thing *thing = fromTile->getThingByStackPos(stackPos);
+	if(!fromTile)
+		return;
 	Tile *toTile   = getTile(to_x, to_y, to_z);
+	if(!toTile)
+		return;
+	Thing *thing = fromTile->getThingByStackPos(stackPos);
 
 #ifdef __DEBUG__
 								std::cout << "moving"

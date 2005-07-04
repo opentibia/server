@@ -373,7 +373,7 @@ bool IOPlayerXML::savePlayer(Player* player){
 	
 	for(DepotMap::reverse_iterator it = player->depots.rbegin(); it !=player->depots.rend()  ;++it){
     	  pn = xmlNewNode(NULL,(const xmlChar*)"depot");
-    	  sb << it->first;                             
+    	  sb << it->first;
           xmlSetProp(pn, (const xmlChar*) "depotid", (const xmlChar*)sb.str().c_str());
           sb.str("");
           

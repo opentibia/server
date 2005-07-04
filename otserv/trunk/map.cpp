@@ -67,7 +67,9 @@ extern Spells spells;
 extern std::map<long, Creature*> channel;
 
 Map::Map() :
-spawnfile("")
+spawnfile(""),
+mapwidth(0),
+mapheight(0)
 {
 /*	//first we fill the map with
   for(int y = 0; y < MAP_HEIGHT; y++)
