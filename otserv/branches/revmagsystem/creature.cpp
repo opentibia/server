@@ -7,12 +7,15 @@
 #include <algorithm>
 
 #include "creature.h"
+#include "player.h"
 #include "tile.h"
+#include "game.h"
 #include "otsystem.h"
 
 using namespace std;
 
 template<class Creature> typename AutoList<Creature>::list_type AutoList<Creature>::list;
+extern Game g_game;
 
 Creature::Creature(const char *name, unsigned long _id) :
  AutoList<Creature>(_id)
@@ -243,6 +246,8 @@ void Creature::addCondition(Condition *condition){
 			conditions.push_back(condition);
 		}
 	}
+	if(dynamic_cast<Player*>(this))
+		dynamic_cast<Player*>(this)->sendIcons();
 }
 
 void Creature::removeCondition(conditiontype_t c_type){
@@ -291,4 +296,15 @@ bool Creature::hasCondition(conditiontype_t c_type){
 void Creature::addExhaustion(long ticks){
 	Condition *cond = Condition::createCondition(CONDITION_EXHAUSTED, ticks, 0);
 	this->addCondition(cond);
+}
+
+unsigned short Creature::getSpeed() const{
+	return speed;
+}
+
+void Creature::setSpeed(const int _speed){
+	if(speed != _speed){
+		speed = _speed;
+		g_game.changeSpeed(this);
+	}
 }

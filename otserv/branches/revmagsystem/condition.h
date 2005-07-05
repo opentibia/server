@@ -21,6 +21,9 @@
 #ifndef __condition_h_
 #define __condition_h_
 
+#include <list>
+#include <string>
+
 class Creature;
 class Player;
 
@@ -29,7 +32,8 @@ enum conditiontype_t {
 	CONDITION_POISON,		//Damage
 	CONDITION_FIRE,			//Damage
 	CONDITION_ENERGY,		//Damage
-	CONDITION_SPEED,		//Speed
+	CONDITION_HASTE,		//Speed
+	CONDITION_PARALYZE,		//Speed
 	CONDITION_OUTFIT,		//Outfit
 	CONDITION_LIGHT,		//Light   -- Player only
 	CONDITION_MAGICSHIELD,	//Generic -- Player only
@@ -47,9 +51,13 @@ enum condition_endreason_t {
 
 
 class Condition{
-public:
+protected:
 	Condition();
+public:
 	virtual ~Condition(){};
+	
+	virtual std::string serialize(){return std::string();}
+	virtual bool unserialize(std::string ){return true;}
 	
 	virtual bool startCondition(Creature *c) = 0;
 	virtual void executeCondition(int interval) = 0;
@@ -88,7 +96,6 @@ public:
 };
 
 
-/*
 class ConditionDamage: public Condition
 {
 public:
@@ -104,12 +111,12 @@ public:
 	virtual unsigned char getIcons();
 	
 };
-*/
+
 
 class ConditionSpeed: public Condition
 {
 public:
-	ConditionSpeed(int _ticks, int change_speed);
+	ConditionSpeed(conditiontype_t _type, int _ticks, int change_speed);
 	virtual ~ConditionSpeed(){};
 	
 	virtual bool startCondition(Creature *c);
@@ -119,7 +126,11 @@ public:
 	virtual void addCondition(Condition *condition);
 	
 	virtual unsigned char getIcons();
+	
+protected:
+	int speed_delta;
 };
+
 
 
 class ConditionOutfit: public Condition

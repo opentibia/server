@@ -27,6 +27,7 @@
 #include "game.h"
 #include "item.h"
 #include "spells.h"
+#include "condition.h"
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h> 
@@ -1635,13 +1636,17 @@ int BaseScript::luaActionDoPlayerChangeSpeed(lua_State *L){
 	
 	BaseScript *action = getScript(L);
 	
-	const KnownThing* tmp = action->GetPlayerByUID(cid);
+	const KnownThing* tmp = action->GetCreatureByUID(cid);
 	if(tmp){
-		Player *player = (Player*)(tmp->thing);
-
-		//action->game->addCondition(player
-
+		//CONDITION_HASTE and CONDITION_PARALYZE
+		// are equivalent in Condition::createCondition
+		// final condition type is decided depending on the sign of speedchange
+		Condition *cond = Condition::createCondition(CONDITION_HASTE, time, speedchange);
+		((Creature*)(tmp->thing))->addCondition(cond);
+		
+		
 		/*
+		Player *player = (Player*)(tmp->thing);
 		spell->game->addEvent(makeTask(time, boost::bind(&Game::changeSpeed, spell->game,creature->getID(), creature->getNormalSpeed()) ) );
 		Player* p = dynamic_cast<Player*>(creature);
 		if(p) {

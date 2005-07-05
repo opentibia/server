@@ -21,6 +21,8 @@
 #include "creature.h"
 #include "player.h"
 #include "condition.h"
+#include <utility>
+
 
 Condition::Condition():
 ticks(0),
@@ -33,7 +35,7 @@ condition_type(CONDITION_NONE)
 
 Condition* Condition::createCondition(conditiontype_t _type, int _ticks, int param)
 {
-	switch(_type){
+	switch((int)_type){
 	case CONDITION_NONE:
 		return NULL;
 		break;
@@ -43,10 +45,17 @@ Condition* Condition::createCondition(conditiontype_t _type, int _ticks, int par
 		//return new ConditionDamage(_type,_ticks,param);
 		return NULL;
 		break;
-	case CONDITION_SPEED:
+	case CONDITION_HASTE:
+	case CONDITION_PARALYZE:
 		//param can be positive and negative
-		//return new ConditionSpeed(ticks,param);
-		return NULL;
+		conditiontype_t speed_cond_type;
+		if(param >= 0){
+			speed_cond_type = CONDITION_HASTE;
+		}
+		else{
+			speed_cond_type = CONDITION_PARALYZE;
+		}
+		return new ConditionSpeed(speed_cond_type,_ticks,param);
 		break;
 	case CONDITION_OUTFIT:
 		//if param = 0 -> invisble
@@ -85,6 +94,7 @@ bool ConditionGeneric::startCondition(Creature *c)
 		player = dynamic_cast<Player*>(c);
 		if(condition_type == CONDITION_PZLOCK){
 			player->pzLocked = true;
+			player->sendIcons();
 		}
 		return true;
 	}
@@ -132,6 +142,56 @@ unsigned char ConditionGeneric::getIcons()
 	case CONDITION_PZLOCK:
 	case CONDITION_EXHAUSTED:
 		return 0;
+		break;
+	}
+}
+
+
+//SPEED CONDITION
+
+ConditionSpeed::ConditionSpeed(conditiontype_t _type, int _ticks, int change_speed)
+{
+	condition_type = _type;
+	speed_delta = change_speed;
+	ticks = _ticks;
+}
+
+bool ConditionSpeed::startCondition(Creature *c)
+{
+	creature = c;
+	creature->setSpeed(creature->getSpeed() + speed_delta);
+	return true;
+}
+
+void ConditionSpeed::executeCondition(int interval)
+{
+}
+
+void ConditionSpeed::endCondition(int reason)
+{
+	creature->setSpeed(creature->getSpeed() - speed_delta);
+}
+
+void ConditionSpeed::addCondition(Condition *add_condition)
+{
+	if(add_condition->getType() == condition_type){
+		if(add_condition->ticks > this->ticks)
+			this->ticks = add_condition->ticks;
+		ConditionSpeed conditionSpeed = static_cast<ConditionSpeed&>(*add_condition);
+		int old_delta = speed_delta;
+		speed_delta = conditionSpeed.speed_delta;
+		creature->setSpeed(creature->getSpeed() + speed_delta - old_delta);
+	}
+}
+	
+unsigned char ConditionSpeed::getIcons()
+{
+	switch((int)condition_type){
+	case CONDITION_HASTE:
+		return ICON_HASTE;
+		break;
+	case CONDITION_PARALYZE:
+		 return ICON_PARALYZE;
 		break;
 	}
 }

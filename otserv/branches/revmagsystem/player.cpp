@@ -1036,20 +1036,20 @@ Attack* Player::getAttack(){
 					distItem = getDistWeapon(items[slot]);
 					if(distItem){
 						attack = new AttackDistance();
-						static_cast<AttackDistance*>(attack)->initialize(this,distItem);
+						static_cast<AttackDistance&>(*attack).initialize(this,distItem);
 						return attack;
 					}
 					break;
 				case WEAPON | MAGIC:
 					attack = new AttackDistance();
-					static_cast<AttackDistance*>(attack)->initialize(this,items[slot]);
+					static_cast<AttackDistance&>(*attack).initialize(this,items[slot]);
 					return attack;
 					break;
 				case WEAPON | SHIELD:
 					break;
 				default:
 					attack = new AttackMelee();
-					static_cast<AttackMelee*>(attack)->initialize(this,items[slot]);
+					static_cast<AttackMelee&>(*attack).initialize(this,items[slot]);
 					return attack;
 					break;
 				}
@@ -1057,7 +1057,7 @@ Attack* Player::getAttack(){
     	}
 	}
 	attack = new AttackMelee();
-	static_cast<AttackMelee*>(attack)->initialize(this,(Item*)NULL);
+	static_cast<AttackMelee&>(*attack).initialize(this,(Item*)NULL);
 	return attack;
 }
 
@@ -1614,12 +1614,16 @@ void Player::addExp(unsigned long exp){
 	}
 	if(lastLv != this->level)
 	{
+		//g_game.changeSpeed(this->getID(), this->getSpeed());
+		removeCondition(CONDITION_HASTE);
+		removeCondition(CONDITION_PARALYZE);
 		this->setNormalSpeed();
-		g_game.changeSpeed(this->getID(), this->getSpeed());
+		g_game.changeSpeed(this);
 		std::stringstream lvMsg;
 		lvMsg << "You advanced from level " << lastLv << " to level " << level << ".";
 		this->sendTextMessage(MSG_ADVANCE,lvMsg.str().c_str());
 		this->sendStats();
+		this->sendIcons();
 	}
 }
 

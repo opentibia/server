@@ -67,7 +67,7 @@ enum attacktype_t {
 enum race_t {
 	RACE_VENOM,
 	RACE_BLOOD,
-	RACE_UNDEAD
+	RACE_UNDEAD,
 };
 
 struct amuEffect_t {
@@ -208,8 +208,9 @@ public:
   int health, healthmax;
   uint64_t lastmove;
 
-  unsigned short getSpeed() const {return speed /*+ addspeed*/;};
-	virtual unsigned char getLightLevel() const{return 0;};
+  unsigned short getSpeed() const;
+  void setSpeed(const int _speed);
+  virtual unsigned char getLightLevel() const{return 0;};
 
   virtual int getStepDuration(int underground) { return (1000 * 120 * (underground / 100)) / getSpeed(); };
   //virtual int getStepDuration(int underground) { return (1000*120*100)/(getSpeed()*underground); };

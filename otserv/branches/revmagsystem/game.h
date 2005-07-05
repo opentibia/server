@@ -162,7 +162,8 @@ public:
 	bool playerUseMagicItem(Player *player, const Position& posFrom, Item* item);
 
   void changeOutfitAfter(unsigned long id, int looktype, long time);
-  void changeSpeed(unsigned long id, unsigned short speed);
+  //void changeSpeed(unsigned long id, unsigned short speed);
+  void changeSpeed(Creature* creature);
 
 	void addEvent(SchedulerTask*);
 	void creatureBroadcastTileUpdated(const Position& pos);

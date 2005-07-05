@@ -1831,22 +1831,19 @@ void Game::executeAttack(Attack *attack, Creature *attackedCreature){
 			if(attackedCreature->hasCondition(CONDITION_MAGICSHIELD)){
 				if(damage < attackedCreature->mana){
 					std::cout << "Error. Mana shield error." << std::cout;
-					attackedCreature->drainHealth(damage);
-					if(attacker)
-						attackedCreature->addInflictedDamage(attacker, damage);
 				}
 				else{
-					attackedCreature->drainMana(attackedCreature->mana);
-					attackedCreature->drainHealth(damage - attackedCreature->mana);
-					if(attacker)
-						attackedCreature->addInflictedDamage(attacker, damage - attackedCreature->mana);
+					int mana_damage = attackedCreature->mana;
+					damage = damage - mana_damage;
+					attackedCreature->drainMana(mana_damage);
 				}
 			}
-			else{
-				attackedCreature->drainHealth(damage);
-				if(attacker)
-					attackedCreature->addInflictedDamage(attacker, damage);
-			}
+			
+			if(damage > attackedCreature->health)
+				damage = attackedCreature->health;
+			attackedCreature->drainHealth(damage);
+			if(attacker)
+				attackedCreature->addInflictedDamage(attacker, damage);
 			
 			//update creature health
 			getSpectators(Range(attackedCreature->pos), attackedlist);
@@ -2419,17 +2416,17 @@ void Game::changeOutfitAfter(unsigned long id, int looktype, long time)
 	addEvent(makeTask(time, boost::bind(&Game::changeOutfit, this, id, looktype)));
 }
 
-void Game::changeSpeed(unsigned long id, unsigned short speed)
+void Game::changeSpeed(Creature *creature/*unsigned long id, unsigned short speed*/)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
-	Creature *creature = getCreatureByID(id);
-	if(creature && /*creature->hasteTicks < 1000 &&*/ creature->speed != speed)
+	//Creature *creature = getCreatureByID(id);
+	if(creature /*&& creature->hasteTicks < 1000 && creature->speed != speed*/)
 	{
-		creature->speed = speed;
+		//creature->speed = speed;
 		Player* player = dynamic_cast<Player*>(creature);
 		if(player){
 			player->sendChangeSpeed(creature);
-			player->sendIcons();
+			//player->sendIcons();
 		}
 
 		std::vector<Creature*> list;
