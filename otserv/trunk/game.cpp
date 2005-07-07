@@ -437,6 +437,7 @@ void GameState::getChanges(Player *spectator)
 
 Game::Game()
 {
+	this->shutdown = false;
 	this->map = NULL;
 	OTSYS_THREAD_LOCKVARINIT(gameLock);
 	OTSYS_THREAD_LOCKVARINIT(eventLock);

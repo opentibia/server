@@ -47,10 +47,17 @@
 #include "luascript.h"
 #include "account.h"
 
-#ifndef WIN32
-#include <fcntl.h>
-#include <arpa/inet.h>
-#include <signal.h>
+#ifdef WIN32
+	#define EINTR WSAEINTR
+#else
+	#include <fcntl.h>
+	#include <arpa/inet.h>
+	#include <signal.h>
+	#include <errno.h>
+	
+	#define SOCKET_ERROR -1
+
+	extern int errno; 
 #endif
 
 std::vector< std::pair<unsigned long, unsigned long> > serverIPs;
@@ -433,74 +440,113 @@ int main(int argc, char *argv[])
   serverIPs.push_back(IpNetMask);
   
   std::cout << ":: Starting Server... ";
+  
+  Status* status = Status::instance();
+  status->playersmax = g_config.getGlobalNumber("maxplayers");
 
   // start the server listen...
-  sockaddr_in local_adress;
-  memset(&local_adress, 0, sizeof(sockaddr_in)); // zero the struct 
+  int listen_errors;
+  int accept_errors;
+  listen_errors = 0;
+  accept_errors = 0;
+  while(!g_game.shutdown && listen_errors < 100){
+	sockaddr_in local_adress;
+  	memset(&local_adress, 0, sizeof(sockaddr_in)); // zero the struct 
 
-  local_adress.sin_family      = AF_INET;
-  local_adress.sin_port        = htons(atoi(g_config.getGlobalString("port").c_str()));
-  local_adress.sin_addr.s_addr = htonl(INADDR_ANY);
+  	local_adress.sin_family      = AF_INET;
+  	local_adress.sin_port        = htons(atoi(g_config.getGlobalString("port").c_str()));
+  	local_adress.sin_addr.s_addr = htonl(INADDR_ANY);
  
-  // first we create a new socket
-  SOCKET listen_socket = socket(AF_INET, SOCK_STREAM, 0);
+  	// first we create a new socket
+  	SOCKET listen_socket = socket(AF_INET, SOCK_STREAM, 0);
   
-  if (listen_socket <= 0)
-  {
+  	if (listen_socket <= 0){
 #ifdef WIN32
-    WSACleanup();   
+	    WSACleanup(); 
 #endif
-    ErrorMessage("Unable to create server socket (1)!");
-    return -1;
-  } // if (listen_socket <= 0)
+    	ErrorMessage("Unable to create server socket (1)!");
+    	return -1;
+  	} // if (listen_socket <= 0)
 
 #ifndef WIN32
-    int yes=1;
+    int yes = 1;
     // lose the pesky "Address already in use" error message
     if (setsockopt(listen_socket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof (int)) == -1)
     {
-      ErrorMessage("Unable to set socket options!");
-      return -1;
+      	ErrorMessage("Unable to set socket options!");
+      	return -1;
     }
 #endif
 
-  // bind socket on port
-  if (bind(listen_socket, (struct sockaddr*)&local_adress, sizeof(struct sockaddr_in)) < 0)
-  {
+  	// bind socket on port
+  	if (bind(listen_socket, (struct sockaddr*)&local_adress, sizeof(struct sockaddr_in)) < 0)
+  	{
 #ifdef WIN32
-    WSACleanup();    
+	    WSACleanup();    
 #endif
-    ErrorMessage("Unable to create server socket (2)!");
-    return -1;
-  } // if (bind(...))
+    	ErrorMessage("Unable to create server socket (2)!");
+    	return -1;
+  	} // if (bind(...))
   
-  // now we start listen on the new socket
-  if (listen(listen_socket, 10) == -1)
-  {
+  	// now we start listen on the new socket
+  	if (listen(listen_socket, 10) == SOCKET_ERROR)
+  	{
 #ifdef WIN32
-    WSACleanup();
+    	WSACleanup();
 #endif
-    ErrorMessage("Listen on server socket not possible!");
-    return -1;
-  } // if (listen(*listen_socket, 10) == -1)
+    	ErrorMessage("Listen on server socket not possible!");
+    	return -1;
+  	} // if (listen(*listen_socket, 10) == -1)
 
 
-  std::cout << "[done]" << std::endl << ":: OpenTibia Server Running..." << std::endl;
-  Status* status = Status::instance();
-  status->playersmax = g_config.getGlobalNumber("maxplayers");
+  	std::cout << "[done]" << std::endl << ":: OpenTibia Server Running..." << std::endl;
   
-	
-  while (true)
-  {
-    SOCKET s = accept(listen_socket, NULL, NULL); // accept a new connection
-
-    if (s > 0)
-    {
-      OTSYS_CREATE_THREAD(ConnectionHandler, (void*)&s);
-    }
+  	while (!g_game.shutdown && accept_errors < 100)
+  	{
+		fd_set listen_set;
+		timeval tv;
+		memset(&listen_set,0,sizeof(fd_set));
+#ifdef WIN32
+		listen_set.fd_count = 1;
+		listen_set.fd_array[0] = listen_socket;
+#endif
+		tv.tv_sec = 1;
+		tv.tv_usec = 0;
+		
+		int reads = select(1, &listen_set, NULL, NULL, &tv);
+		
+		int errnum;
+#ifdef WIN32
+		errnum = WSAGetLastError();
+#else
+		errnum = errno;
+#endif
+		
+		if(reads == SOCKET_ERROR){
+			break;
+		}
+		else if(reads == 0 && errnum == EINTR){
+			accept_errors++;
+			continue;
+		}
+		
+    	SOCKET s = accept(listen_socket, NULL, NULL); // accept a new connection
+    	if(s > 0){
+      		OTSYS_CREATE_THREAD(ConnectionHandler, (void*)&s);
+    	}
+    	else{
+			accept_errors++;
+		}
+  	}
+  	closesocket(listen_socket);
+  	listen_errors++;
   }
+#ifdef WIN32
+  WSACleanup();
+#endif
+
 #if defined __EXCEPTION_TRACER__	
-	mainExceptionHandler.RemoveHandler();
+  mainExceptionHandler.RemoveHandler();
 #endif
 	return 0;
 }
