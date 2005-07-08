@@ -287,80 +287,80 @@ int main(int argc, char *argv[])
 	ExceptionHandler mainExceptionHandler;	
 	mainExceptionHandler.InstallHandler();
 #endif
-  std::cout << ":: OTServ Development-Version 0.4.0 - CVS Preview" << std::endl;
-  std::cout << ":: ====================" << std::endl;
-  std::cout << "::" << std::endl;
-
-  // ignore sigpipe...
+	std::cout << ":: OTServ Development-Version 0.4.0 - CVS Preview" << std::endl;
+	std::cout << ":: ====================" << std::endl;
+	std::cout << "::" << std::endl;
+	
+	// ignore sigpipe...
 #if defined __WINDOWS__ || defined WIN32	
-	//nothing yet
+		//nothing yet
 #else
-  struct sigaction sigh;
-  sigh.sa_handler = SIG_IGN;
-  sigaction(SIGPIPE, &sigh, NULL);
+	struct sigaction sigh;
+	sigh.sa_handler = SIG_IGN;
+	sigaction(SIGPIPE, &sigh, NULL);
 #endif
-
-  // read global config
-  std::cout << ":: Loading lua script config.lua... ";
-  if (!g_config.OpenFile("config.lua"))
-  {
-    ErrorMessage("Unable to load config.lua!");
-    return -1;
-  }
-  std::cout << "[done]" << std::endl;
-
-  //load spells data
-  std::cout << ":: Loading spells spells.xml... ";
-  if(!spells.loadFromXml(g_config.getGlobalString("datadir")))
-  {
-    ErrorMessage("Unable to load spells.xml!");
-    return -1;
-  }
-  std::cout << "[done]" << std::endl;
-  
-  //load actions data
-  std::cout << ":: Loading actions actions.xml... ";
-  if(!actions.loadFromXml(g_config.getGlobalString("datadir")))
-  {
-	ErrorMessage("Unable to load actions.xml!");
-    return -1;
-  }
-  std::cout << "[done]" << std::endl;
-  
-  //load commands data
-  std::cout << ":: Loading commands commands.xml... ";
-  if(!commands.loadXml(g_config.getGlobalString("datadir")))
-  {
-	ErrorMessage("Unable to load commands.xml!");
-    return -1;
-  }
-  std::cout << "[done]" << std::endl;
-  
-  // load item data
-  std::cout << ":: reading tibia.dat ...            ";
-	if (Item::items.loadFromDat("tibia.dat"))
-  {
-    ErrorMessage("Could not load tibia.dat!");
-    return -1;
+	
+	// read global config
+	std::cout << ":: Loading lua script config.lua... ";
+	if (!g_config.OpenFile("config.lua"))
+	{
+		ErrorMessage("Unable to load config.lua!");
+		return -1;
 	}
 	std::cout << "[done]" << std::endl;
-
-  std::cout << ":: reading " << g_config.getGlobalString("datadir") << "items/items.xml ... ";
+	
+	//load spells data
+	std::cout << ":: Loading spells spells.xml... ";
+	if(!spells.loadFromXml(g_config.getGlobalString("datadir")))
+	{
+		ErrorMessage("Unable to load spells.xml!");
+		return -1;
+	}
+	std::cout << "[done]" << std::endl;
+	
+	//load actions data
+	std::cout << ":: Loading actions actions.xml... ";
+	if(!actions.loadFromXml(g_config.getGlobalString("datadir")))
+	{
+		ErrorMessage("Unable to load actions.xml!");
+		return -1;
+	}
+	std::cout << "[done]" << std::endl;
+	
+	//load commands data
+	std::cout << ":: Loading commands commands.xml... ";
+	if(!commands.loadXml(g_config.getGlobalString("datadir")))
+	{
+		ErrorMessage("Unable to load commands.xml!");
+		return -1;
+	}
+	std::cout << "[done]" << std::endl;
+	
+	// load item data
+	std::cout << ":: reading tibia.dat ...            ";
+	if (Item::items.loadFromDat("tibia.dat"))
+	{
+		ErrorMessage("Could not load tibia.dat!");
+		return -1;
+	}
+	std::cout << "[done]" << std::endl;
+	
+	std::cout << ":: reading " << g_config.getGlobalString("datadir") << "items/items.xml ... ";
 	if (Item::items.loadXMLInfos(g_config.getGlobalString("datadir") + "items/items.xml"))
-  {
-    ErrorMessage("Could not load /items/items.xml ...!");
-    return -1;
+	{
+		ErrorMessage("Could not load /items/items.xml ...!");
+		return -1;
 	}
 	std::cout << "[done]" << std::endl;
 
 
 #ifdef _SQLMAP_
-   std::cout << ":: Reading spawn info from database ... \n";
-   if(g_game.loadMap(g_config.getGlobalString("sqlmap"))) {
-      SpawnManager::initialize(&g_game);
-      SpawnManager::instance()->loadSpawnsSQL(g_config.getGlobalString("sqlmap"));
-      SpawnManager::instance()->startup();
-   }
+	std::cout << ":: Reading spawn info from database ... \n";
+	if(g_game.loadMap(g_config.getGlobalString("sqlmap"))) {
+		SpawnManager::initialize(&g_game);
+		SpawnManager::instance()->loadSpawnsSQL(g_config.getGlobalString("sqlmap"));
+		SpawnManager::instance()->startup();
+	}
 #else
 	// load map file
 	if(g_game.loadMap(g_config.getGlobalString("mapfile"))) {
@@ -370,176 +370,179 @@ int main(int argc, char *argv[])
 	}
 #endif
 
-  // Call to WSA Startup on Windows Systems...
+  	// Call to WSA Startup on Windows Systems...
 #ifdef WIN32
-  WORD wVersionRequested; 
-  WSADATA wsaData; 
-  wVersionRequested = MAKEWORD( 1, 1 );
-
-  if (WSAStartup(wVersionRequested, &wsaData) != 0)
-  {
-    ErrorMessage("Winsock startup failed!!");
-    return -1;
-  } 
-  
-  if ((LOBYTE(wsaData.wVersion) != 1) || (HIBYTE(wsaData.wVersion) != 1)) 
-  { 
-    WSACleanup( ); 
-    ErrorMessage("No Winsock 1.1 found!");
-    return -1;
-  } 
+	WORD wVersionRequested; 
+	WSADATA wsaData; 
+	wVersionRequested = MAKEWORD( 1, 1 );
+	
+	if (WSAStartup(wVersionRequested, &wsaData) != 0)
+	{
+		ErrorMessage("Winsock startup failed!!");
+		return -1;
+	} 
+	
+	if ((LOBYTE(wsaData.wVersion) != 1) || (HIBYTE(wsaData.wVersion) != 1)) 
+	{ 
+		WSACleanup( ); 
+		ErrorMessage("No Winsock 1.1 found!");
+		return -1;
+	} 
 #endif
 
 
-  std::pair<unsigned long, unsigned long> IpNetMask;
-  IpNetMask.first  = inet_addr("127.0.0.1");
-  IpNetMask.second = 0xFFFFFFFF;
-  serverIPs.push_back(IpNetMask);
-
-  char szHostName[128];
-  if (gethostname(szHostName, 128) == 0)
-  {
-	 std::cout << "::" << std::endl << ":: Running on host " << szHostName << std::endl;
-
-    hostent *he = gethostbyname(szHostName);
-
-    if (he)
-    {
-		std::cout << ":: Local IP address(es):  ";
-      unsigned char** addr = (unsigned char**)he->h_addr_list;
-
-      while (addr[0] != NULL)
-      {
-		  std::cout << (unsigned int)(addr[0][0]) << "."
-             << (unsigned int)(addr[0][1]) << "."
-             << (unsigned int)(addr[0][2]) << "."
-             << (unsigned int)(addr[0][3]) << "  ";
-
-        IpNetMask.first  = *(unsigned long*)(*addr);
-        IpNetMask.second = 0x0000FFFF;
-        serverIPs.push_back(IpNetMask);
-
-        addr++;
-      }
+	std::pair<unsigned long, unsigned long> IpNetMask;
+	IpNetMask.first  = inet_addr("127.0.0.1");
+	IpNetMask.second = 0xFFFFFFFF;
+	serverIPs.push_back(IpNetMask);
+	
+	char szHostName[128];
+	if (gethostname(szHostName, 128) == 0)
+	{
+		std::cout << "::" << std::endl << ":: Running on host " << szHostName << std::endl;
+	
+		hostent *he = gethostbyname(szHostName);
+		
+		if (he)
+		{
+			std::cout << ":: Local IP address(es):  ";
+			unsigned char** addr = (unsigned char**)he->h_addr_list;
+	
+			while (addr[0] != NULL)
+			{
+				std::cout << (unsigned int)(addr[0][0]) << "."
+				<< (unsigned int)(addr[0][1]) << "."
+				<< (unsigned int)(addr[0][2]) << "."
+				<< (unsigned int)(addr[0][3]) << "  ";
+		
+			IpNetMask.first  = *(unsigned long*)(*addr);
+			IpNetMask.second = 0x0000FFFF;
+			serverIPs.push_back(IpNetMask);
+		
+			addr++;
+			}
 
 		std::cout << std::endl;
-    }
-  }
+    		}
+  	}
   
-  std::cout << ":: Global IP address:     ";
-  std::string ip;
-
+	std::cout << ":: Global IP address:     ";
+	std::string ip;
+	
 	if(argc > 1)
 		ip = argv[1];
 	else
 		ip = g_config.getGlobalString("ip", "127.0.0.1");
-
+	
 	std::cout << ip << std::endl << "::" << std::endl;
-
-  IpNetMask.first  = inet_addr(ip.c_str());
-  IpNetMask.second = 0;
-  serverIPs.push_back(IpNetMask);
-  
-  std::cout << ":: Starting Server... ";
-  
-  Status* status = Status::instance();
-  status->playersmax = g_config.getGlobalNumber("maxplayers");
-
-  // start the server listen...
-  int listen_errors;
-  int accept_errors;
-  listen_errors = 0;
-  accept_errors = 0;
-  while(!g_game.shutdown && listen_errors < 100){
-	sockaddr_in local_adress;
-  	memset(&local_adress, 0, sizeof(sockaddr_in)); // zero the struct 
-
-  	local_adress.sin_family      = AF_INET;
-  	local_adress.sin_port        = htons(atoi(g_config.getGlobalString("port").c_str()));
-  	local_adress.sin_addr.s_addr = htonl(INADDR_ANY);
- 
-  	// first we create a new socket
-  	SOCKET listen_socket = socket(AF_INET, SOCK_STREAM, 0);
-  
-  	if (listen_socket <= 0){
+	
+	IpNetMask.first  = inet_addr(ip.c_str());
+	IpNetMask.second = 0;
+	serverIPs.push_back(IpNetMask);
+	
+	std::cout << ":: Starting Server... ";
+	
+	Status* status = Status::instance();
+	status->playersmax = g_config.getGlobalNumber("maxplayers");
+	
+	// start the server listen...
+	int listen_errors;
+	int accept_errors;
+	listen_errors = 0;
+	accept_errors = 0;
+	while(!g_game.shutdown && listen_errors < 100){
+		sockaddr_in local_adress;
+		memset(&local_adress, 0, sizeof(sockaddr_in)); // zero the struct 
+	
+		local_adress.sin_family      = AF_INET;
+		local_adress.sin_port        = htons(atoi(g_config.getGlobalString("port").c_str()));
+		local_adress.sin_addr.s_addr = htonl(INADDR_ANY);
+	
+		// first we create a new socket
+		SOCKET listen_socket = socket(AF_INET, SOCK_STREAM, 0);
+	
+		if (listen_socket <= 0){
 #ifdef WIN32
-	    WSACleanup(); 
+	    		WSACleanup(); 
 #endif
-    	ErrorMessage("Unable to create server socket (1)!");
-    	return -1;
-  	} // if (listen_socket <= 0)
+			ErrorMessage("Unable to create server socket (1)!");
+			return -1;
+  		} // if (listen_socket <= 0)
 
 #ifndef WIN32
-    int yes = 1;
-    // lose the pesky "Address already in use" error message
-    if (setsockopt(listen_socket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof (int)) == -1)
-    {
-      	ErrorMessage("Unable to set socket options!");
-      	return -1;
-    }
+		int yes = 1;
+		// lose the pesky "Address already in use" error message
+		if (setsockopt(listen_socket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof (int)) == -1)
+		{
+			ErrorMessage("Unable to set socket options!");
+			return -1;
+		}
 #endif
 
-  	// bind socket on port
-  	if (bind(listen_socket, (struct sockaddr*)&local_adress, sizeof(struct sockaddr_in)) < 0)
-  	{
+		// bind socket on port
+		if (bind(listen_socket, (struct sockaddr*)&local_adress, sizeof(struct sockaddr_in)) < 0)
+		{
 #ifdef WIN32
-	    WSACleanup();    
+	    		WSACleanup();    
 #endif
-    	ErrorMessage("Unable to create server socket (2)!");
-    	return -1;
-  	} // if (bind(...))
+			ErrorMessage("Unable to create server socket (2)!");
+			return -1;
+  		} // if (bind(...))
   
-  	// now we start listen on the new socket
-  	if (listen(listen_socket, 10) == SOCKET_ERROR)
-  	{
+		// now we start listen on the new socket
+		if (listen(listen_socket, 10) == SOCKET_ERROR)
+		{
 #ifdef WIN32
-    	WSACleanup();
+    			WSACleanup();
 #endif
-    	ErrorMessage("Listen on server socket not possible!");
-    	return -1;
-  	} // if (listen(*listen_socket, 10) == -1)
+    			ErrorMessage("Listen on server socket not possible!");
+			return -1;
+		} // if (listen(*listen_socket, 10) == -1)
 
 
-  	std::cout << "[done]" << std::endl << ":: OpenTibia Server Running..." << std::endl;
-  
-  	while (!g_game.shutdown && accept_errors < 100)
-  	{
-		fd_set listen_set;
-		timeval tv;
-		FD_ZERO(&listen_set);
-		FD_SET(listen_socket, &listen_set);
-		tv.tv_sec = 1;
-		tv.tv_usec = 0;
-		
-		int reads = select(1, &listen_set, NULL, NULL, &tv);
-		int errnum;
+		std::cout << "[done]" << std::endl << ":: OpenTibia Server Running..." << std::endl;
+	
+		while (!g_game.shutdown && accept_errors < 100)
+		{
+			fd_set listen_set;
+			timeval tv;
+			FD_ZERO(&listen_set);
+			FD_SET(listen_socket, &listen_set);
+			tv.tv_sec = 1;
+			tv.tv_usec = 0;
+			
+			int reads = select(1, &listen_set, NULL, NULL, &tv);
+			int errnum;
 #ifdef WIN32
-		errnum = WSAGetLastError();
+			errnum = WSAGetLastError();
 #else
-		errnum = errno;
+			errnum = errno;
 #endif
-		if(reads == SOCKET_ERROR){
-			break;
-		}
-		else if(reads == 0 && errnum == ERROR_EINTR){
-			accept_errors++;
-			continue;
-		}
+			if(reads == SOCKET_ERROR){
+				break;
+			}
+			else if(reads == 0 && errnum == ERROR_EINTR){
+				accept_errors++;
+				continue;
+			}
 		
-    	SOCKET s = accept(listen_socket, NULL, NULL); // accept a new connection
-    	if(s > 0){
-      		OTSYS_CREATE_THREAD(ConnectionHandler, (void*)&s);
-    	}
-    	else{
-			accept_errors++;
+			SOCKET s = accept(listen_socket, NULL, NULL); // accept a new connection
+			if(s > 0){
+					OTSYS_CREATE_THREAD(ConnectionHandler, (void*)&s);
+			}
+			else{
+					accept_errors++;
+			}
 		}
+		closesocket(listen_socket);
+		listen_errors++;
   	}
-  	closesocket(listen_socket);
-  	listen_errors++;
-  }
-  WSACleanup();
+#ifdef WIN32
+  	WSACleanup();
+#endif
+
 #if defined __EXCEPTION_TRACER__	
-  mainExceptionHandler.RemoveHandler();
+  	mainExceptionHandler.RemoveHandler();
 #endif
 	return 0;
 }
