@@ -243,7 +243,7 @@ public:
 
 	/** Lockvar for Game. */
   OTSYS_THREAD_LOCKVAR gameLock; 
-  bool shutdown;   
+  bool shutdown;
 
 protected:
 	bool onPrepareMoveThing(Creature *player, const Thing* thing, const Position& fromPos, const Position& toPos);

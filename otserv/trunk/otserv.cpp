@@ -48,7 +48,7 @@
 #include "account.h"
 
 #ifdef WIN32
-	#define EINTR WSAEINTR
+	#define ERROR_EINTR WSAEINTR
 #else
 	#include <fcntl.h>
 	#include <arpa/inet.h>
@@ -56,7 +56,8 @@
 	#include <errno.h>
 	
 	#define SOCKET_ERROR -1
-
+	#define ERROR_EINTR EINTR
+	
 	extern int errno; 
 #endif
 
@@ -505,30 +506,22 @@ int main(int argc, char *argv[])
   	{
 		fd_set listen_set;
 		timeval tv;
-		memset(&listen_set,0,sizeof(fd_set));
-#ifdef WIN32
-		listen_set.fd_count = 1;
-		listen_set.fd_array[0] = listen_socket;
-#else
 		FD_ZERO(&listen_set);
 		FD_SET(listen_socket, &listen_set);
-#endif
 		tv.tv_sec = 1;
 		tv.tv_usec = 0;
 		
 		int reads = select(1, &listen_set, NULL, NULL, &tv);
-		
 		int errnum;
 #ifdef WIN32
 		errnum = WSAGetLastError();
 #else
 		errnum = errno;
 #endif
-		
 		if(reads == SOCKET_ERROR){
 			break;
 		}
-		else if(reads == 0 && errnum == EINTR){
+		else if(reads == 0 && errnum == ERROR_EINTR){
 			accept_errors++;
 			continue;
 		}
@@ -544,10 +537,7 @@ int main(int argc, char *argv[])
   	closesocket(listen_socket);
   	listen_errors++;
   }
-#ifdef WIN32
   WSACleanup();
-#endif
-
 #if defined __EXCEPTION_TRACER__	
   mainExceptionHandler.RemoveHandler();
 #endif
