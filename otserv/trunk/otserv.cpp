@@ -509,6 +509,9 @@ int main(int argc, char *argv[])
 #ifdef WIN32
 		listen_set.fd_count = 1;
 		listen_set.fd_array[0] = listen_socket;
+#else
+		FD_ZERO(&listen_set);
+		FD_SET(listen_socket, &listen_set);
 #endif
 		tv.tv_sec = 1;
 		tv.tv_usec = 0;
