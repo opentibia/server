@@ -156,6 +156,7 @@ void GameState::onAttack(Creature* attacker, const Position& pos, const MagicEff
 			//mapstate.addThing(tile, magicItem);
 
 			//game->addEvent(makeTask(newmagicItem->getDecayTime(), boost::bind(&Game::decayItem, _1, magicItem)));
+			magicItem->isRemoved = false;
 			game->startDecay(magicItem);
 		}
 	}
@@ -1767,11 +1768,11 @@ void Game::thingMoveInternal(Creature *player, unsigned short from_x, unsigned s
 	if(!fromTile)
 		return;
 	Tile *toTile   = getTile(to_x, to_y, to_z);
-	if(!toTile){
+	/*if(!toTile){
 		if(dynamic_cast<Player*>(player))
 			dynamic_cast<Player*>(player)->sendCancelWalk("Sorry, not possible...");
 		return;
-	}
+	}*/
 	Thing *thing = fromTile->getThingByStackPos(stackPos);
 
 #ifdef __DEBUG__
