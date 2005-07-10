@@ -33,8 +33,7 @@
 #include <stdlib.h>
 #include <conio.h>
 #include <sys/timeb.h>
-
-#define OTSYS_THREAD_RETURN  void
+#include <winsock.h>
 
 #define OTSYS_CREATE_THREAD(a, b) _beginthread(a, 0, b)
 
@@ -104,8 +103,6 @@ typedef int socklen_t;
 #include <netdb.h>
 #include <stdint.h>
 
-
-#define OTSYS_THREAD_RETURN void*
 
 inline void OTSYS_CREATE_THREAD(void *(*a)(void*), void *b)
 {
