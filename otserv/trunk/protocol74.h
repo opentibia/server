@@ -44,6 +44,7 @@ public:
   bool ConnectPlayer();
   void ReceiveLoop();  
   void WriteBuffer(NetworkMessage &add);
+  virtual void reinitializeProtocol();
 
 private:
   // the socket the player is on...
@@ -219,7 +220,8 @@ private:
   OTSYS_THREAD_LOCKVAR bufferLock;
   unsigned long windowTextID;
   Item *readItem;
-   
+  
+  friend OTSYS_THREAD_RETURN ConnectionHandler(void *dat);   
 };
 
 #endif

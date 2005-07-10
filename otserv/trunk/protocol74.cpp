@@ -62,6 +62,13 @@ Protocol74::~Protocol74()
 	OTSYS_THREAD_LOCKVARRELEASE(bufferLock);	
 }
 
+void Protocol74::reinitializeProtocol()
+{
+	windowTextID = 0;
+  	readItem = NULL;
+  	OutputBuffer.Reset();
+  	knownPlayers.clear();
+}
 
 bool Protocol74::ConnectPlayer()
 {	
@@ -75,28 +82,27 @@ bool Protocol74::ConnectPlayer()
 
 void Protocol74::ReceiveLoop()
 {
-  NetworkMessage msg;
-  
-	while (!pendingLogout && msg.ReadFromSocket(s))
-	{
-    	parsePacket(msg);
-	}
-
-	if (s) {
-		closesocket(s);
-		s = 0;
-	}
-
-	// logout by disconnect?  -> kick
-	if (!pendingLogout /*player*/)
-	{		
-		if(player->inFightTicks >=1000 && player->health >0) {
-			//disconnect?
-			game->removeCreature(player);
+	NetworkMessage msg;
+  	do{
+		while(pendingLogout == false && msg.ReadFromSocket(s)){
+    		parsePacket(msg);
 		}
-		else{
-			game->removeCreature(player);
+
+		if(s){
+			closesocket(s);
+			s = 0;
 		}
+		// logout by disconnect?  -> kick
+		if(pendingLogout == false){
+			while(player->inFightTicks >= 1000 && player->health > 0){
+				if(s != 0)
+					break;
+				OTSYS_SLEEP(250);
+			}
+		}
+	}while(s != 0 && player->health > 0);
+	if(pendingLogout == false){
+		game->removeCreature(player);
 	}
 }
 
@@ -424,7 +430,7 @@ void Protocol74::checkCreatureAsKnown(unsigned long id, bool &known, unsigned lo
 // Parse methods
 void Protocol74::parseLogout(NetworkMessage &msg)
 {
-    if(player->inFightTicks >=1000 && player-> health >0) {
+    if(player->inFightTicks >=1000 && player-> health > 0){
          sendCancel("You may not logout during or immediately after a fight!");
          return;
      }    
@@ -433,7 +439,7 @@ void Protocol74::parseLogout(NetworkMessage &msg)
 
 void Protocol74::logout(){
 	// we ask the game to remove us
-	if (game->removeCreature(player)) {
+	if(game->removeCreature(player)){
 		pendingLogout = true;
 	}	
 }

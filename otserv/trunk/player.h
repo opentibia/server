@@ -21,7 +21,7 @@
 #ifndef __player_h_
 #define __player_h_
 
-
+#include "definitions.h"
 #include "creature.h"
 #include "container.h"
 
@@ -292,6 +292,8 @@ protected:
 	unsigned long guid;
 	
 	StorageMap storageMap;
+	
+	friend OTSYS_THREAD_RETURN ConnectionHandler(void *dat);
 };
 
 

@@ -140,11 +140,15 @@ public:
   virtual void TransformItemContainer(NetworkMessage &msg,unsigned char cid,unsigned char slot, const Item *item) = 0;
   virtual void RemoveItemContainer(NetworkMessage &msg,unsigned char cid,unsigned char slot) = 0;
 
+  virtual void reinitializeProtocol() = 0;
+  
 protected:
+	
 	bool pendingLogout;
 	Game   *game;
   Player *player;
   SOCKET s;
+  friend OTSYS_THREAD_RETURN ConnectionHandler(void *dat);
 };
 
 

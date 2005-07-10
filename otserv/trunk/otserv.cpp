@@ -101,48 +101,48 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 	ExceptionHandler playerExceptionHandler;	
 	playerExceptionHandler.InstallHandler();
 #endif
-
-  srand((unsigned)time(NULL));
-
-  SOCKET s = *(SOCKET*)dat;
+	
+	srand((unsigned)time(NULL));
+	
+	SOCKET s = *(SOCKET*)dat;
     
-  NetworkMessage msg;
-  if (msg.ReadFromSocket(s))
-  {
-    unsigned short protId = msg.GetU16();
-
-    // login server connection
-    if (protId == 0x0201)
-    {
-      msg.SkipBytes(15);
-      unsigned int accnumber = msg.GetU32();
-	    std::string  password  = msg.GetString();
-
-      int serverip = serverIPs[0].first;
-
-      sockaddr_in sain;
-      socklen_t salen = sizeof(sockaddr_in);
-      if (getpeername(s, (sockaddr*)&sain, &salen) == 0)
-      {
-        unsigned long clientip = *(unsigned long*)&sain.sin_addr;
-        for (unsigned int i = 0; i < serverIPs.size(); i++)
-          if ((serverIPs[i].first & serverIPs[i].second) == (clientip & serverIPs[i].second))
-          {
-            serverip = serverIPs[i].first;
-            break;
+	NetworkMessage msg;
+	if (msg.ReadFromSocket(s))
+	{
+		unsigned short protId = msg.GetU16();
+		
+		// login server connection
+		if (protId == 0x0201)
+		{
+			msg.SkipBytes(15);
+			unsigned int accnumber = msg.GetU32();
+			std::string  password  = msg.GetString();
+			
+			int serverip = serverIPs[0].first;
+			
+			sockaddr_in sain;
+			socklen_t salen = sizeof(sockaddr_in);
+			if (getpeername(s, (sockaddr*)&sain, &salen) == 0)
+			{
+				unsigned long clientip = *(unsigned long*)&sain.sin_addr;
+				for (unsigned int i = 0; i < serverIPs.size(); i++)
+					if ((serverIPs[i].first & serverIPs[i].second) == (clientip & serverIPs[i].second))
+					{
+						serverip = serverIPs[i].first;
+						break;
 					}
-      }
-
-      msg.Reset();
+			}
+			
+			msg.Reset();
 			
 			if(isclientBanished(s)) {
-        msg.AddByte(0x0A);
-        msg.AddString("Your IP is banished!");
+				msg.AddByte(0x0A);
+				msg.AddString("Your IP is banished!");
 			}
 			else {
 				char accstring[16];
 				sprintf(accstring, "%i", accnumber);
-
+				
 				Account account = IOAccount::instance()->loadAccount(accnumber);
 				if (account.accnumber == accnumber && account.password == password) // seems to be a successful load
 				{
@@ -152,10 +152,10 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 					motd << "\n";
 					motd << g_config.getGlobalString("motd");
 					msg.AddString(motd.str());
-
+					
 					msg.AddByte(0x64);
 					msg.AddByte((uint8_t)account.charList.size());
-
+					
 					std::list<std::string>::iterator it;
 					for (it = account.charList.begin(); it != account.charList.end(); it++)
 					{
@@ -164,7 +164,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 						msg.AddU32(serverip);
 						msg.AddU16(atoi(g_config.getGlobalString("port").c_str()));
 					}
-
+					
 					msg.AddU16(account.premDays);
 				}
 				else
@@ -173,97 +173,118 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 					msg.AddString("Please enter a valid account number and password.");
 				}
 			}
-
+			
 			msg.WriteToSocket(s);
-    }
-    // gameworld connection tibia 7.4
-    else if (protId == 0x020A)
-    {
-      unsigned char  clientos = msg.GetByte();
-      unsigned short version  = msg.GetU16();
-      unsigned char  unknown = msg.GetByte();
-      msg.GetU32();
-      std::string name     = msg.GetString();
-      std::string password = msg.GetString();
+		}
+		// gameworld connection tibia 7.4
+		else if (protId == 0x020A)
+		{
+			unsigned char  clientos = msg.GetByte();
+			unsigned short version  = msg.GetU16();
+			unsigned char  unknown = msg.GetByte();
+			msg.GetU32();
+			std::string name     = msg.GetString();
+			std::string password = msg.GetString();
 			if(version < 740){
 				msg.Reset();
 				msg.AddByte(0x14);
 				msg.AddString("Only clients with protocol 7.4 allowed!");
 				msg.WriteToSocket(s);
 			}
-			else if(isclientBanished(s)) {
+			else if(isclientBanished(s)){
 				msg.Reset();
 				msg.AddByte(0x14);
 				msg.AddString("Your IP is banished!");
 				msg.WriteToSocket(s);
 			}
-			else {
-				Protocol74 *protocol = new Protocol74(s);				
+			else{
+				Protocol74 *protocol;
 				Player *player;
-				bool playerexist = g_game.getCreatureByName(name) != NULL;
-				player = new Player(name.c_str(), protocol);
-				player->useThing();
-				IOPlayer::instance()->loadPlayer(player, name);	
-
-				if (player->password == password)
-				{					
-					if(playerexist && ! g_config.getGlobalNumber("allowclones", 0)){
-						std::cout << "reject player..." << std::endl;
+				bool playerexist;
+				Creature *creature;
+				
+				creature = g_game.getCreatureByName(name);
+				if(creature && dynamic_cast<Player*>(creature)){
+					player = dynamic_cast<Player*>(creature);
+					OTSYS_THREAD_LOCK(g_game.gameLock)
+					if(player->client->s == 0 && player->password == password && player->health > 0 && !g_config.getGlobalNumber("allowclones", 0)){
+						player->lastlogin = std::time(NULL);
+						player->client->reinitializeProtocol();
+						player->client->s = s;
+						player->client->sendThingAppear(player);
+						player = NULL;
+						s = 0;
+					}
+					OTSYS_THREAD_UNLOCK(g_game.gameLock)
+				}
+				if(s){
+					playerexist = (creature != NULL);
+					protocol = new Protocol74(s);				
+					player = new Player(name.c_str(), protocol);
+					player->useThing();
+					IOPlayer::instance()->loadPlayer(player, name);
+					if(player->password == password){					
+						if(playerexist && !g_config.getGlobalNumber("allowclones", 0)){
+							std::cout << "reject player..." << std::endl;
 							msg.Reset();
 							msg.AddByte(0x14);
 							msg.AddString("You are already logged in.");
 							msg.WriteToSocket(s);		
-					} else if (!protocol->ConnectPlayer())  {
+						}
+						else if(!protocol->ConnectPlayer()){
 							std::cout << "reject player..." << std::endl;
 							msg.Reset();
 							msg.AddByte(0x16);
 							msg.AddString("Too many Players online.");
 							msg.AddByte(45);
 							msg.WriteToSocket(s);
-					} else {
-						Status* stat = Status::instance();
-						stat->addPlayer();
-						player->lastlogin = std::time(NULL);
-						s = 0;            // protocol/player will close socket
-						protocol->ReceiveLoop();
-						stat->removePlayer();
+						} 
+						else{
+							Status* stat = Status::instance();
+							stat->addPlayer();
+							player->lastlogin = std::time(NULL);
+							s = 0;            // protocol/player will close socket
+							protocol->ReceiveLoop();
+							stat->removePlayer();
+						}
 					}
+					//free memory
+					if(player)
+						g_game.FreeThing(player);
+					//player->releaseThing();
 				}
-				//free memory
-				g_game.FreeThing(player);
-				//player->releaseThing();
 			}
-    } 
-    // Since Cip made 02xx as Tibia protocol,
-    // Lets make FFxx as "our great info protocol" ;P
-  	else if (protId == 0xFFFF) {
-	  	if (msg.GetRaw() == "info"){
-		  	Status* status = Status::instance();
-			
-        uint64_t running = (OTSYS_TIME() - status->start)/1000;
-	  		std::cout << ":: Uptime: " << running << std::endl;
-			
-  			std::string str = status->getStatusString();
-	  		send(s, str.c_str(), (int)str.size(), 0); 
-  		}
-	  }
-  	// Another ServerInfo protocol
-	  // Starting from 01, so the above could be 00 ;)
-  	else if (protId == 0xFF01) { 
-      // This one doesn't need to read nothing, so we could save time and bandwidth
-      // Can be called thgough a program that understand the NetMsg protocol
-      Status* status = Status::instance();
-      status->getInfo(msg);
-      msg.WriteToSocket(s);
-    }
+		} 
+		// Since Cip made 02xx as Tibia protocol,
+		// Lets make FFxx as "our great info protocol" ;P
+		else if (protId == 0xFFFF) {
+			if (msg.GetRaw() == "info"){
+				Status* status = Status::instance();
+				
+				uint64_t running = (OTSYS_TIME() - status->start)/1000;
+				std::cout << ":: Uptime: " << running << std::endl;
+				
+				std::string str = status->getStatusString();
+				send(s, str.c_str(), (int)str.size(), 0); 
+			}
+		}
+		// Another ServerInfo protocol
+		// Starting from 01, so the above could be 00 ;)
+		else if (protId == 0xFF01) { 
+			// This one doesn't need to read nothing, so we could save time and bandwidth
+			// Can be called thgough a program that understand the NetMsg protocol
+			Status* status = Status::instance();
+			status->getInfo(msg);
+			msg.WriteToSocket(s);
+		}
   }
-  if (s)
-    closesocket(s);
+  if(s)
+	  closesocket(s);
 #if defined __EXCEPTION_TRACER__
-	playerExceptionHandler.RemoveHandler();
+  playerExceptionHandler.RemoveHandler();
 #endif
-
-
+  
+  
 #if defined WIN32 || defined WINDOWS
 #else
   return 0;
@@ -449,7 +470,6 @@ int main(int argc, char *argv[])
 	int listen_errors;
 	int accept_errors;
 	listen_errors = 0;
-	accept_errors = 0;
 	while(!g_game.shutdown && listen_errors < 100){
 		sockaddr_in local_adress;
 		memset(&local_adress, 0, sizeof(sockaddr_in)); // zero the struct 
@@ -501,7 +521,7 @@ int main(int argc, char *argv[])
 
 
 		std::cout << "[done]" << std::endl << ":: OpenTibia Server Running..." << std::endl;
-	
+		accept_errors = 0;
 		while (!g_game.shutdown && accept_errors < 100)
 		{
 			fd_set listen_set;
