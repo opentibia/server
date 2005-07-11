@@ -214,6 +214,7 @@ public:
 	
 	void setAcceptTrade(bool b);
 	bool getAcceptTrade() {return acceptTrade;};
+	Item* getTradeItem() {return tradeItem;};
 
 protected:
   int useCount;

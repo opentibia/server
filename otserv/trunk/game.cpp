@@ -2778,7 +2778,9 @@ void Game::checkPlayerWalk(unsigned long id)
 	flushSendBuffers();
 
 	if(!player->pathlist.empty()) {
-		player->eventAutoWalk = addEvent(makeTask(player->getSleepTicks(), std::bind2nd(std::mem_fun(&Game::checkPlayerWalk), id)));
+		int ticks = std::max(0, (int)player->getSleepTicks());
+		std::cout << "checkPlayerWalk - " << ticks << std::endl;
+		player->eventAutoWalk = addEvent(makeTask(ticks, std::bind2nd(std::mem_fun(&Game::checkPlayerWalk), id)));
 	}
 	else
 		player->eventAutoWalk = 0;
@@ -3313,7 +3315,8 @@ void Game::playerAutoWalk(Player* player, std::list<Direction>& path)
   // the interval seems to depend on the speed of the char?
 	//player->eventAutoWalk = addEvent(makeTask<Direction>(0, MovePlayer(player->getID()), path, 400, StopMovePlayer(player->getID())));
 	player->pathlist = path;
-	player->eventAutoWalk = addEvent(makeTask(player->getSleepTicks(), std::bind2nd(std::mem_fun(&Game::checkPlayerWalk), player->getID())));
+	int ticks = std::max(0, (int)player->getSleepTicks());
+	player->eventAutoWalk = addEvent(makeTask(ticks, std::bind2nd(std::mem_fun(&Game::checkPlayerWalk), player->getID())));
 }
 
 bool Game::playerUseItemEx(Player *player, const Position& posFrom,const unsigned char  stack_from,
@@ -3390,6 +3393,12 @@ void Game::playerRequestTrade(Player *player, const Position& pos,
 
 	if (player->tradePartner != 0 && tradePartner->tradePartner != player->getID()){
 		player->sendTextMessage(MSG_INFO, "This player is already trading.");
+		return;
+	}
+
+	Container *tradeContainer = dynamic_cast<Container*>(tradeItem);
+	if(tradeContainer && tradeContainer->getItemHoldingCount() + 1 > 100){
+		player->sendTextMessage(MSG_INFO, "You can not trade more than 100 items.");
 		return;
 	}
 
@@ -3870,6 +3879,12 @@ Thing* Game::getThing(const Position &pos,unsigned char stack, Player* player /*
 	}
 	else //from ground
 	{
+		if(player) {
+			if(std::abs(player->pos.x - pos.x) > 1 || std::abs(player->pos.y - pos.y) > 1 || player->pos.z != pos.z) {
+				return NULL;
+			}
+		}
+
 		Tile *t = getTile(pos.x, pos.y, pos.z);
 		if(!t)
 			return NULL;

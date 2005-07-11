@@ -24,6 +24,7 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <list>
 
 #include "networkmessage.h"
 #include "protocol74.h"
@@ -833,7 +834,39 @@ void Protocol74::sendTradeItemRequest(const Player* player, const Item* item, bo
 
 	const Container *tradeContainer = dynamic_cast<const Container*>(item);
 	if(tradeContainer) {
-		//recursive all containers
+		std::list<const Container*> stack;
+		std::list<const Item*> itemstack;
+
+		itemstack.push_back(tradeContainer);
+		for (ContainerList::const_iterator it = tradeContainer->getItems(); it != tradeContainer->getEnd(); ++it) {
+			Container *container = dynamic_cast<Container*>(*it);
+			if(container) {
+				stack.push_back(container);
+			}
+			else
+				itemstack.push_back(*it);
+		}
+		
+		while(stack.size() > 0) {
+			const Container *container = stack.front();
+			stack.pop_front();
+
+			for (ContainerList::const_iterator it = container->getItems(); it != container->getEnd(); ++it) {
+				Container *container = dynamic_cast<Container*>(*it);
+				if(container) {
+					stack.push_back(container);
+				}
+
+				itemstack.push_back(*it);
+			}
+		}
+
+		msg.AddByte(itemstack.size());
+		while(itemstack.size() > 0) {
+			const Item* item = itemstack.front();
+			itemstack.pop_front();
+			msg.AddItem(item);
+		}
 	}
 	else {
 		msg.AddByte(1);
@@ -1879,11 +1912,24 @@ void Protocol74::sendThingMove(const Creature *creature, const Thing *thing,
 //close container and its child containers
 void Protocol74::autoCloseContainers(const Container *container, NetworkMessage &msg)
 {
+	/*
+	if(container == player->getTradeItem()) {
+		game->playerCloseTrade(player);
+	}
+	*/
+
 	std::vector<unsigned char> containerlist;
 	for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
 		Container *tmpcontainer = cit->second;
 		while(tmpcontainer != NULL) {
 			if(tmpcontainer == container) {
+
+				/*
+				if(container == player->getTradeItem()) {
+					game->playerCloseTrade(player);
+				}
+				*/
+
 				containerlist.push_back(cit->first);
 				break;
 			}

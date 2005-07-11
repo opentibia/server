@@ -161,6 +161,38 @@ unsigned char Container::getSlotNumberByItem(const Item* item) const
 	return 0xFF;
 }
 
+long Container::getItemHoldingCount() const
+{
+	int holdcount = 0;
+
+	std::list<const Container*> stack;
+
+	for (ContainerList::const_iterator cit = getItems(); cit != getEnd(); ++cit) {
+		Container *container = dynamic_cast<Container*>(*cit);
+		if(container) {
+			stack.push_back(container);
+		}
+		else
+			++holdcount;
+	}
+	
+	while(stack.size() > 0) {
+		const Container *container = stack.front();
+		stack.pop_front();
+
+		for (ContainerList::const_iterator it = container->getItems(); it != container->getEnd(); ++it) {
+			Container *container = dynamic_cast<Container*>(*it);
+			if(container) {
+				stack.push_back(container);
+			}
+
+			++holdcount;
+		}
+	}
+
+	return holdcount;
+}
+
 ContainerList::const_iterator Container::getItems() const {
 	return lcontained.begin();
 }

@@ -55,7 +55,7 @@ public:
 	}
 
 	virtual void setTicks(const __int64 ticks) {
-		_cycle = OTSYS_TIME() + ticks;;
+		_cycle = OTSYS_TIME() + ticks;
 	}
 
 	inline __int64 getCycle() const {

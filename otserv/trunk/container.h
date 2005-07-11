@@ -66,6 +66,7 @@ class Container : public Item
 		const Item* getItem(unsigned long slot_num) const;
 		unsigned char getSlotNumberByItem(const Item* item) const;
 		void isHolding(const Item* item, bool& found) const; //search all containers for the item recursively
+		long getItemHoldingCount() const;
 		//Item& operator<<(Item*); // put items into the container
 };
 
