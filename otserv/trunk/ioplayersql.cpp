@@ -64,7 +64,6 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 		Database mysql;
 		DBQuery query;
 		DBResult result;
-		DBResult result_temp;
 	
 		mysql.connect(db.c_str(), host.c_str(), user.c_str(), pass.c_str());
 		//mysql.Connect("otserv", "localhost", "root", "test");

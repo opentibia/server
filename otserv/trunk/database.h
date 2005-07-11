@@ -28,8 +28,6 @@
 #include <sstream>
 #include <map>
 
-//#define DB_BUFFER_SIZE 2048
-
 enum db_error_t {
 	DB_ERROR_UNKNOWN = 100,
 	DB_ERROR_INIT,
@@ -119,7 +117,7 @@ class DBError
 {
 public:
 	DBError(const char *msg, db_error_t type=DB_ERROR_UNKNOWN){
-		m_msg = msg;
+		m_msg = std::string(msg);
 		m_type = type;
 	};
 	~DBError(){};
@@ -127,7 +125,7 @@ public:
 	/** Get the error message
 	*\returns The text message
 	*/
-	const char *getMsg(){ return m_msg; };
+	const char *getMsg(){ return m_msg.c_str(); };
 	
 	/** Get the error type
 	*\returns The error type
@@ -135,7 +133,7 @@ public:
 	int getType(){ return m_type; };
 	
 private:
-	const char *m_msg;
+	std::string m_msg;
 	int m_type;
 };
 

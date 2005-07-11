@@ -244,17 +244,10 @@ bool Database::storeQuery(DBQuery &q, DBResult &dbres)
 
 std::string Database::escapeString(std::string s)
 {
-	//char output[DB_BUFFER_SIZE];
 	char* output = new char[s.size() * 2 + 1];
-	/*
-	if((DB_BUFFER_SIZE * 0.9) < s.size())
-	{
-		throw DBError("Database::EscapeString()", DB_ERROR_BUFFER_EXCEEDED);
-		return std::string("");
-	}
-	*/
+	
 	mysql_escape_string(output, s.c_str(), s.size());
 	std::string r = std::string(output);
-	delete output;
+	delete[] output;
 	return r;
 }
