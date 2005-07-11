@@ -22,7 +22,12 @@
 #include <algorithm>
 #include <functional>
 #include <sstream>
-#include <mysql++.h>
+#ifdef _OLD_MYSQL_
+	#include <mysql++.h>
+#else
+	#include "database.h"
+	#include <iostream>
+#endif
 #include "luascript.h"
 
 extern LuaScript g_config;
@@ -34,7 +39,59 @@ Account IOAccountSQL::loadAccount(unsigned long accno){
 	std::string pass = g_config.getGlobalString("sql_pass");
 	std::string db   = g_config.getGlobalString("sql_db");
 
+#ifndef _OLD_MYSQL_
+	Database mysql;
+	DBQuery query;
+	DBResult result;
+	
+	try
+	{
+		mysql.Connect(db.c_str(), host.c_str(), user.c_str(), pass.c_str());
+	
+		query << "SELECT * FROM accounts WHERE accno='" << accno << "'";
+		if(!mysql.StoreQuery(query, result))
+			return acc;
+			
+		acc.accnumber = result.GetDataInt("accno");
+		acc.password = result.GetDataString("password");
+		//std::cout << "pass " << acc.password << "      acc " << acc.accnumber << std::endl;
+		acc.accType = result.GetDataInt("type");
+		acc.premDays = result.GetDataInt("premDays");
 
+		query << "SELECT name FROM players where account='" << accno << "'";
+		if(!mysql.StoreQuery(query, result))
+			return acc;
+		
+		for(int i=0; i < result.GetNumRows(); ++i)
+		{
+			std::string ss = result.GetDataString("name", i);
+			acc.charList.push_back(ss.c_str());
+		}
+		
+		acc.charList.sort();
+	}
+	catch(DBError e)
+	{
+		switch(e.GetType())
+		{
+		case DB_ERROR_QUERY:
+		case DB_ERROR_STORE:
+		case DB_ERROR_DATA_NOT_FOUND:
+			std::cout << "DB WARNING: (" << e.GetType() << ") " << e.GetMsg() << std::endl;
+			break;
+		default:
+			std::cout << "DB ERROR: (" << e.GetType() << ") " << e.GetMsg() << std::endl;
+			return acc;
+		}
+	}
+	catch(...)
+	{
+		std::cout << "ERROR: Unknown exception raised.\n\tFile: " << __FILE__ << "\n\tLine: " << __LINE__ << std::endl;
+		return acc;
+	}
+	
+#else
+	/////////////////////////////////
 	mysqlpp::Connection con;
 	try{
 		con.connect(db.c_str(), host.c_str(), user.c_str(), pass.c_str()); 
@@ -75,7 +132,8 @@ Account IOAccountSQL::loadAccount(unsigned long accno){
 	catch(mysqlpp::BadQuery e){
 		std::cout << "MYSQL-ERROR: " << e.error << std::endl;
 		return acc;
-	}
-	
+	}	
+#endif // _OLD_MYSQL_
+
 	return acc;
 }

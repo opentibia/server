@@ -25,7 +25,6 @@
 #include "item.h"
 #include "luascript.h"
 
-
 #include <iostream>
 #include <iomanip>
 
@@ -36,7 +35,12 @@
 #include <hash_map>
 #endif
 
-#include <mysql++.h>
+#ifdef _OLD_MYSQL_
+	#include <mysql++.h>
+#else
+	//#include "mysql.h"
+	#include "database.h"
+#endif
 #include <boost/tokenizer.hpp>
 
 
@@ -53,7 +57,210 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 	std::string pass = g_config.getGlobalString("sql_pass");
 	std::string db   = g_config.getGlobalString("sql_db");
 
+#ifndef _OLD_MYSQL_
 
+	try
+	{
+		Database mysql;
+		DBQuery query;
+		DBResult result;
+		DBResult result_temp;
+	
+		mysql.Connect(db.c_str(), host.c_str(), user.c_str(), pass.c_str());
+		//mysql.Connect("otserv", "localhost", "root", "test");
+
+		query << "SELECT * FROM players WHERE name='" << name << "'";
+		//std::cout << query.GetText() << std::endl;
+		if(!mysql.StoreQuery(query, result) || result.GetNumRows() != 1)
+			return false;
+		
+		int accno = result.GetDataInt("account");
+		if(accno < 1)
+			return false;
+		
+		/*
+		DBResult result_temp;
+		query << "SELECT * FROM accounts WHERE id='" << accno << "'";
+		if(!mysql.StoreQuery(query, result_temp) || result_temp.GetNumRows() != 1)
+			return false;
+		*/
+		
+		// Check the password. TODO: Change this to use only 1 connection, doing the query from here.
+		Account a = IOAccount::instance()->loadAccount(accno);
+			
+		player->password = a.password;
+		if (a.accnumber == 0 || a.accnumber != accno)
+			return false;
+		
+		// Getting all player properties
+		player->setGUID((int)result.GetDataInt("id"));
+		
+		player->accountNumber = result.GetDataInt("account");
+		player->sex=result.GetDataInt("sex");
+		
+		player->setDirection((Direction)result.GetDataInt("direction"));
+		player->experience=result.GetDataLong("experience");
+		player->level=result.GetDataInt("level");
+		player->maglevel=result.GetDataInt("maglevel");
+	
+		player->voc=result.GetDataInt("vocation");
+		player->access=result.GetDataInt("access");
+		player->setNormalSpeed();
+		
+		player->mana=result.GetDataInt("mana");
+		player->manamax=result.GetDataInt("manamax");
+		player->manaspent=result.GetDataInt("manaspent");
+	
+		player->health=result.GetDataInt("health");
+		player->healthmax=result.GetDataInt("healthmax");
+		player->food=result.GetDataInt("food");
+	
+		player->looktype=result.GetDataInt("looktype");
+		player->lookmaster = player->looktype;
+		player->lookhead=result.GetDataInt("lookhead");
+		player->lookbody=result.GetDataInt("lookbody");
+		player->looklegs=result.GetDataInt("looklegs");
+		player->lookfeet=result.GetDataInt("lookfeet");
+	
+		boost::char_separator<char> sep(";");
+	
+		//SPAWN
+		std::string pos = result.GetDataString("pos");
+		//std::cout << pos << std::endl;
+		tokenizer tokens(pos, sep);
+	
+		tokenizer::iterator spawnit = tokens.begin();
+		player->pos.x=atoi(spawnit->c_str()); spawnit++;
+		player->pos.y=atoi(spawnit->c_str()); spawnit++;
+		player->pos.z=atoi(spawnit->c_str());
+		
+		//there is no "fuck" in the sources, but every major programm got
+		//one and i think here is a good place to add one
+	
+		//std::cout << "sql loading: " << player->pos << std::endl;
+	
+		//MASTERSPAWN
+		std::string masterpos = result.GetDataString("masterpos");
+		tokenizer mastertokens(masterpos, sep);
+	
+		tokenizer::iterator mspawnit = mastertokens.begin();
+		player->masterPos.x=atoi(mspawnit->c_str()); mspawnit++;
+		player->masterPos.y=atoi(mspawnit->c_str()); mspawnit++;
+		player->masterPos.z=atoi(mspawnit->c_str());
+	
+	
+		// we need to find out our skills
+		// so we query the skill table
+		query << "SELECT * FROM skills WHERE player='" << player->getGUID() << "'";
+		if(mysql.StoreQuery(query, result))
+		{
+			//now iterate over the skills
+			for(int i=0; i < result.GetNumRows(); ++i)
+			{
+				int skillid=result.GetDataInt("id",i);
+				player->skills[skillid][SKILL_LEVEL]=result.GetDataInt("skill",i);
+				player->skills[skillid][SKILL_TRIES]=result.GetDataInt("tries",i);
+				player->skills[skillid][SKILL_PERCENT] = (unsigned int)(100*(player->skills[skillid][SKILL_TRIES])/(1.*player->getReqSkilltries(skillid, (player->skills[skillid][SKILL_LEVEL]+1), player->voc)));
+			}
+		}
+		
+		//load the items
+		
+		// cross compatibility vc++ and gcc
+#ifdef __GNUC__
+		__gnu_cxx::hash_map<int,std::pair<Item*,int> > itemmap;
+#else
+		stdext::hash_map<int,std::pair<Item*,int> > itemmap;
+#endif
+		query << "SELECT * FROM items WHERE player='" << player->getGUID() << "' ORDER BY sid ASC";
+		if(mysql.StoreQuery(query, result) && (result.GetNumRows() > 0))
+		{
+			
+			for(int i=0; i < result.GetNumRows(); ++i)
+			{
+				int type = result.GetDataInt("type",i);
+				int count = result.GetDataInt("number",i);
+				Item* myItem = Item::CreateItem(type, count);
+				if(result.GetDataInt("actionid",i) >= 100)
+					myItem->setActionId(result.GetDataInt("actionid",i));
+				myItem->setText(result.GetDataString("text",i));	
+				myItem->setSpecialDescription(result.GetDataString("specialdesc",i));
+				std::pair<Item*, int> myPair(myItem, result.GetDataInt("pid",i));
+				itemmap[result.GetDataInt("sid",i)] = myPair;
+				if(int slotid = result.GetDataInt("slot",i))
+				{
+					if(slotid > 0 && slotid <= 10){
+						player->addItemInventory(myItem, slotid,true);
+					}
+					else{
+						if(dynamic_cast<Container*>(myItem)){
+							player->addDepot(dynamic_cast<Container*>(myItem), slotid - 100);
+						}
+						else{
+							std::cout << "Error loading depot "<< slotid << " for player " << 
+								player->getGUID() << std::endl;
+						}
+					}
+				}
+			}
+		}
+		
+		// cross compatibility vc++ and gcc
+#ifdef __GNUC__
+		__gnu_cxx::hash_map<int,std::pair<Item*,int> >::iterator it;
+#else
+		stdext::hash_map<int,std::pair<Item*,int> >::iterator it;
+#endif
+		for(int i = (int)itemmap.size(); i > 0; --i) 
+		{
+			it = itemmap.find(i);
+			if(it == itemmap.end())
+				continue;
+	
+			if(int p=(*it).second.second) {
+				if(Container* c = dynamic_cast<Container*>(itemmap[p].first)) {
+					c->addItem((*it).second.first);
+				}
+			}
+		}
+		
+		
+		//load storage map
+		query << "SELECT * FROM playerstorage WHERE player='" << player->getGUID() << "'";
+		
+		if(mysql.StoreQuery(query,result))
+		{
+			for(int i=0; i < result.GetNumRows(); ++i)
+			{
+				unsigned long key = result.GetDataInt("key",i);
+				long value = result.GetDataInt("value",i);
+				player->addStorageValue(key,value);
+			}
+		}
+		
+	}
+	catch(DBError e)
+	{
+		switch(e.GetType())
+		{
+		case DB_ERROR_QUERY:
+		case DB_ERROR_STORE:
+		case DB_ERROR_DATA_NOT_FOUND:
+			std::cout << "DB WARNING: (" << e.GetType() << ") " << e.GetMsg() << std::endl;
+			break;
+		default:
+			std::cout << "DB ERROR: (" << e.GetType() << ") " << e.GetMsg() << std::endl;
+			return false;
+		}
+	}
+	catch(...)
+	{
+		std::cout << "ERROR: Unknown exception raised.\n\tFile: " << __FILE__ << "\n\tLine: " << __LINE__ << std::endl;
+		return false;
+	}
+	
+#else
+	///////////////////////////////
 	mysqlpp::Connection con;
 	try{
 		con.connect(db.c_str(), host.c_str(), user.c_str(), pass.c_str()); 
@@ -263,10 +470,10 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 		long value = r.lookup_by_name("value");
 		player->addStorageValue(key,value);
 	}
-	
-	
+
+#endif // _OLD_MYSQL_
+
 	return true;
-	
 }
 
 bool IOPlayerSQL::savePlayer(Player* player){
@@ -276,7 +483,152 @@ bool IOPlayerSQL::savePlayer(Player* player){
 	std::string db   = g_config.getGlobalString("sql_db");
 
 	player->preSave();
-
+	
+#ifndef _OLD_MYSQL_
+	
+	try
+	{
+		Database mysql;
+		DBQuery query;
+		DBResult result;
+		
+		mysql.Connect(db.c_str(), host.c_str(), user.c_str(), pass.c_str());
+		
+		//check if the player have to be saved or not
+		query << "SELECT save FROM players WHERE id='" << player->getGUID() << "'";
+		if(!mysql.StoreQuery(query,result) || (result.GetNumRows() != 1) )
+			return false;
+		
+		if(result.GetDataInt("save") != 1) // If save var is not 1 don't save the player info
+			return true;
+		
+		
+		//Start the transaction	
+		query << "BEGIN;";
+		if(!mysql.ExecuteQuery(query))
+			return false;
+		
+		//First, an UPDATE query to write the player itself
+		query << "UPDATE `players` SET ";
+		query << "`level` = " << player->level << ", ";
+		query << "`vocation` = " << player->voc << ", ";
+		query << "`health` = " << player->health << ", ";
+		query << "`healthmax` = " << player->healthmax << ", ";
+		query << "`direction` = " << (int)player->getDirection() << ", ";
+		query << "`experience` = " << player->experience << ", ";
+		query << "`lookbody` = " << player->lookbody << ", ";
+		query << "`lookfeet` = " << player->lookfeet << ", ";
+		query << "`lookhead` = " << player->lookhead << ", ";
+		query << "`looklegs` = " << player->looklegs << ", ";
+		query << "`looktype` = " << player->looktype << ", ";
+		query << "`maglevel` = " << player->maglevel << ", ";
+		query << "`mana` = " << player->mana << ", ";
+		query << "`manamax` = " << player->manamax << ", ";
+		query << "`manaspent` = " << player->manaspent << ", ";
+		query << "`masterpos` = '" << player->masterPos.x<<";"<< player->masterPos.y<<";"<< player->masterPos.z << "', ";
+		query << "`pos` = '" << player->pos.x<<";"<< player->pos.y<<";"<< player->pos.z << "', ";
+		query << "`speed` = " << player->speed << ", ";
+		query << "`cap` = " << player->cap << ", ";
+		query << "`food` = " << player->food << ", ";
+		query << "`sex` = " << player->sex << ", ";
+		query << "`lastlogin` = " << player->lastlogin << " ";
+		query << " WHERE `id` = "<< player->getGUID() <<" LIMIT 1";
+		
+		if(!mysql.ExecuteQuery(query))
+			return false;
+		
+		// Saving Skills
+		for(int i = 0; i <= 6; i++)
+		{
+			query << "UPDATE `skills` SET `skill` = " << player->skills[i][SKILL_LEVEL] <<", `tries` = "<< player->skills[i][SKILL_TRIES] << " WHERE `player` = " << player->getGUID() << " AND  `id` = " << i;
+		
+			if(!mysql.ExecuteQuery(query))
+				return false;
+		}
+		
+		//now item saving
+		query << "DELETE FROM items WHERE player='"<< player->getGUID() << "'";
+		
+		if(!mysql.ExecuteQuery(query))
+			return false;
+		
+		std::string itemsstring;
+		query << "INSERT INTO `items` (`player` , `slot` , `sid` , `pid` , `type` , `number` , `actionid` , `text` , `specialdesc` ) VALUES"; 
+		int runningID=0;
+		for (int i = 1; i <= 10; i++)
+		{
+			if(player->items[i])
+				itemsstring += getItems(player->items[i],runningID,i,player->getGUID(),0);
+		}
+		
+		//save depot items
+		for(DepotMap::reverse_iterator it = player->depots.rbegin(); it !=player->depots.rend() ;++it)
+		{
+			itemsstring += getItems(it->second,runningID,it->first+100,player->getGUID(),0);
+		}
+		
+		if(itemsstring.length())
+		{
+			itemsstring.erase(itemsstring.length()-1);
+			query << itemsstring;
+			// TODO: Check if the length of the query is too long...
+			
+			if(!mysql.ExecuteQuery(query))
+				return false;
+		}
+		
+		//save storage map
+		query.Reset();
+		query << "DELETE FROM playerstorage WHERE player='"<< player->getGUID() << "'";
+		
+		if(!mysql.ExecuteQuery(query))
+			return false;
+		
+		query << "INSERT INTO `playerstorage` (`player` , `key` , `value` ) VALUES"; 
+		std::stringstream ss;
+		for(StorageMap::const_iterator cit = player->getStorageIteratorBegin(); cit != player->getStorageIteratorEnd();cit++)
+		{
+			ss << "(" << player->getGUID() <<","<< cit->first <<","<< cit->second<<"),";
+		}
+		std::string ststring = ss.str();
+		if(ststring.length())
+		{
+			ststring.erase(ststring.length()-1);
+			query << ststring;
+			
+			if(!mysql.ExecuteQuery(query))
+				return false;
+		}
+	
+		//End the transaction
+		query.Reset();
+		query << "COMMIT;";
+		
+		if(!mysql.ExecuteQuery(query))
+			return false;
+		
+	}
+	catch(DBError e)
+	{
+		switch(e.GetType())
+		{
+		case DB_ERROR_QUERY:
+		case DB_ERROR_STORE:
+		case DB_ERROR_DATA_NOT_FOUND:
+			std::cout << "DB WARNING: (" << e.GetType() << ") " << e.GetMsg() << std::endl;
+			break;
+		default:
+			std::cout << "DB ERROR: (" << e.GetType() << ") " << e.GetMsg() << std::endl;
+			return false;
+		}
+	}
+	catch(...)
+	{
+		std::cout << "ERROR: Unknown exception raised.\n\tFile: " << __FILE__ << "\n\tLine: " << __LINE__ << std::endl;
+		return false;
+	}
+#else
+	//////////////////////////////////////////////////////
 	mysqlpp::Connection con;
 	try{
 		con.connect(db.c_str(), host.c_str(), user.c_str(), pass.c_str()); 
@@ -485,16 +837,22 @@ bool IOPlayerSQL::savePlayer(Player* player){
 		std::cout << "MYSQL-ERROR: " << e.error << std::endl;
 		return false;
 	}
-
+#endif // _OLD_MYSQL_
 	return true;
 
 }
 
-std::string IOPlayerSQL::getItems(Item* i, int &startid, int slot, int player,int parentid){
+std::string IOPlayerSQL::getItems(Item* i, int &startid, int slot, int player,int parentid)
+{
 	++startid;
 	std::stringstream ss;
+#ifndef _OLD_MYSQL_
+	ss << "(" << player <<"," << slot << ","<< startid <<","<< parentid <<"," << i->getID()<<","<< (int)i->getItemCountOrSubtype() << "," << 
+	(int)i->getActionId()<<",'"<< Database::EscapeString(i->getText()) <<"','" << Database::EscapeString(i->getSpecialDescription()) <<"'),";
+#else
 	ss << "(" << player <<"," << slot << ","<< startid <<","<< parentid <<"," << i->getID()<<","<< (int)i->getItemCountOrSubtype() << "," << 
 	(int)i->getActionId()<<",'"<< mysqlpp::escape << i->getText() <<"','" << mysqlpp::escape << i->getSpecialDescription() <<"'),";
+#endif // _OLD_MYSQL_
 	//std::cout << "i";
 	if(Container* c = dynamic_cast<Container*>(i)){
 		//std::cout << "c";	
@@ -505,5 +863,6 @@ std::string IOPlayerSQL::getItems(Item* i, int &startid, int slot, int player,in
 			//std::cout << "r";
 		}
 	}
+
 	return ss.str();
 }
