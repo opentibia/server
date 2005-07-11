@@ -291,22 +291,28 @@ bool Commands::broadcastMessage(Creature* c, const std::string &cmd, const std::
 
 bool Commands::banPlayer(Creature* c, const std::string &cmd, const std::string &param){
 	
-	Creature *creature = game->getCreatureByName(param);
-	if(creature) {
+	Creature *creatureBan = game->getCreatureByName(param);
+	if(creatureBan) {
 		MagicEffectClass me;
 		
 		me.animationColor = 0xB4;
 		me.damageEffect = NM_ME_MAGIC_BLOOD;
-		me.maxDamage = c->health + c->mana;
-		me.minDamage = c->health + + c->mana;
+		me.maxDamage = (creatureBan->health + creatureBan->mana)*10;
+		me.minDamage = (creatureBan->health + creatureBan->mana)*10;
 		me.offensive = true;
 
-		game->creatureMakeMagic(c, creature->pos, &me);
+		game->creatureMakeMagic(NULL, creatureBan->pos, &me);
 
-		Player* player = dynamic_cast<Player*>(creature);
-		if(player) {
+		Player* playerBan = dynamic_cast<Player*>(creatureBan);
+		Player* player = dynamic_cast<Player*>(c);
+		if(playerBan){
+			if(player && player->access <= playerBan->access){
+				player->sendTextMessage(MSG_BLUE_TEXT,"You can not ban this player.");
+				return true;
+			}
+			playerBan->sendTextMessage(MSG_RED_TEXT,"You have been baned.");
 			std::pair<unsigned long, unsigned long> IpNetMask;
-			IpNetMask.first = player->getIP();
+			IpNetMask.first = playerBan->getIP();
 			IpNetMask.second = 0xFFFFFFFF;
 			if(IpNetMask.first > 0) {
 				bannedIPs.push_back(IpNetMask);

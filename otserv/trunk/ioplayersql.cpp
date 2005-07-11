@@ -486,8 +486,8 @@ bool IOPlayerSQL::savePlayer(Player* player){
 	
 #ifndef _OLD_MYSQL_
 	
-	try
-	{
+	//try
+	//{
 		Database mysql;
 		DBQuery query;
 		DBResult result;
@@ -607,7 +607,7 @@ bool IOPlayerSQL::savePlayer(Player* player){
 		if(!mysql.executeQuery(query))
 			return false;
 		
-	}
+	/*}
 	catch(DBError e)
 	{
 		switch(e.getType())
@@ -626,7 +626,7 @@ bool IOPlayerSQL::savePlayer(Player* player){
 	{
 		std::cout << "ERROR: Unknown exception raised.\n\tFile: " << __FILE__ << "\n\tLine: " << __LINE__ << std::endl;
 		return false;
-	}
+	}*/
 #else
 	//////////////////////////////////////////////////////
 	mysqlpp::Connection con;
