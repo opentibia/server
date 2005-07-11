@@ -2769,17 +2769,23 @@ void Game::checkPlayerWalk(unsigned long id)
 			break;
 	}
 
+/*
 #ifdef __DEBUG__
 	std::cout << "move to: " << dir << std::endl;
 #endif
+*/
 
-	this->thingMove(player, player, pos.x, pos.y, pos.z, 1);
 	player->lastmove = OTSYS_TIME();
+	this->thingMove(player, player, pos.x, pos.y, pos.z, 1);
 	flushSendBuffers();
 
 	if(!player->pathlist.empty()) {
 		int ticks = std::max(0, (int)player->getSleepTicks());
+/*
+#ifdef __DEBUG__
 		std::cout << "checkPlayerWalk - " << ticks << std::endl;
+#endif
+*/
 		player->eventAutoWalk = addEvent(makeTask(ticks, std::bind2nd(std::mem_fun(&Game::checkPlayerWalk), id)));
 	}
 	else
@@ -3316,6 +3322,9 @@ void Game::playerAutoWalk(Player* player, std::list<Direction>& path)
 	//player->eventAutoWalk = addEvent(makeTask<Direction>(0, MovePlayer(player->getID()), path, 400, StopMovePlayer(player->getID())));
 	player->pathlist = path;
 	int ticks = std::max(0, (int)player->getSleepTicks());
+#ifdef __DEBUG__
+		std::cout << "playerAutoWalk - " << ticks << std::endl;
+#endif
 	player->eventAutoWalk = addEvent(makeTask(ticks, std::bind2nd(std::mem_fun(&Game::checkPlayerWalk), player->getID())));
 }
 

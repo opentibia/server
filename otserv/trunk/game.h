@@ -383,6 +383,7 @@ private:
 template<class ArgType>
 SchedulerTask* makeTask(__int64 ticks, boost::function<int(Game*, ArgType)> f1, std::list<ArgType>& call_list, __int64 interval, boost::function<bool(Game*)> f2) {
 	TCallList<ArgType> *t = new TCallList<ArgType>(f1, f2, call_list, interval);
+	t->setEventId(0);
 	t->setTicks(ticks);
 	return t;
 }

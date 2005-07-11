@@ -31,10 +31,12 @@ class Game;
 
 class SchedulerTask {
 public:
+	/*
 	SchedulerTask() {
 		_eventid = 0;
 		_cycle = 0;
   }
+	*/
 
 	virtual ~SchedulerTask() { };
 

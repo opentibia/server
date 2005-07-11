@@ -84,7 +84,7 @@ bool Protocol74::ConnectPlayer()
 void Protocol74::ReceiveLoop()
 {
 	NetworkMessage msg;
-  	do{
+	do{
 		while(pendingLogout == false && msg.ReadFromSocket(s)){
     		parsePacket(msg);
 		}
@@ -102,6 +102,7 @@ void Protocol74::ReceiveLoop()
 			}
 		}
 	}while(s != 0 && player->health > 0);
+	
 	if(pendingLogout == false){
 		game->removeCreature(player);
 	}
