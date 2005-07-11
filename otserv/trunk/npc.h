@@ -88,7 +88,7 @@ public:
 	static const unsigned long max_id = 65536U;
 
   void speak(const std::string &text){};
-  std::string getName(){return name;};
+  const std::string& getName() const {return name;};
   fight_t getFightType(){return fighttype;};
 
   int mana, manamax;

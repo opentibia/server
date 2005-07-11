@@ -183,6 +183,8 @@ bool Commands::exeCommand(Creature *creature, const std::string &cmd){
 	(this->*cfunc)(creature, str_command, str_param);
 	if(player)
 		player->sendTextMessage(MSG_RED_TEXT,cmd.c_str());
+
+	return true;
 }
 	
 
@@ -308,9 +310,12 @@ bool Commands::banPlayer(Creature* c, const std::string &cmd, const std::string 
 			IpNetMask.second = 0xFFFFFFFF;
 			if(IpNetMask.first > 0) {
 				bannedIPs.push_back(IpNetMask);
+				return true;
 			}
 		}
 	}
+
+	return false;
 }
 
 bool Commands::teleportMasterPos(Creature* c, const std::string &cmd, const std::string &param){
@@ -395,6 +400,8 @@ bool Commands::reloadInfo(Creature* c, const std::string &cmd, const std::string
 		if(player)
 			player->sendCancel("Option not found.");
 	}
+
+	return true;
 }
 
 bool Commands::testCommand(Creature* c, const std::string &cmd, const std::string &param)
@@ -404,6 +411,8 @@ bool Commands::testCommand(Creature* c, const std::string &cmd, const std::strin
 	if(player) {
 		player->sendMagicEffect(player->pos, color);
 	}
+
+	return true;
 }
 
 bool Commands::teleportTo(Creature* c, const std::string &cmd, const std::string &param){

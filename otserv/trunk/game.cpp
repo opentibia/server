@@ -34,20 +34,14 @@ using namespace std;
 
 #include "otsystem.h"
 #include <stdio.h>
-
 #include "items.h"
 #include "commands.h"
 #include "game.h"
 #include "tile.h"
 
 #include "player.h"
-
-//
 #include "creature.h"
 #include "monster.h"
-//
-
-//#include "networkmessage.h"
 
 #include "npc.h"
 #include "spells.h"
@@ -153,9 +147,6 @@ void GameState::onAttack(Creature* attacker, const Position& pos, const MagicEff
 				}
 			}
 
-			//mapstate.addThing(tile, magicItem);
-
-			//game->addEvent(makeTask(newmagicItem->getDecayTime(), boost::bind(&Game::decayItem, _1, magicItem)));
 			magicItem->isRemoved = false;
 			game->startDecay(magicItem);
 		}
@@ -438,6 +429,7 @@ void GameState::getChanges(Player *spectator)
 
 Game::Game()
 {
+	eventIdCount = 1000;
 	this->shutdown = false;
 	this->map = NULL;
 	OTSYS_THREAD_LOCKVARINIT(gameLock);
@@ -448,6 +440,7 @@ Game::Game()
 	OTSYS_THREAD_SIGNALVARINIT(eventSignal);
 	BufferedPlayers.clear();
 	OTSYS_CREATE_THREAD(eventThread, this);
+
 	addEvent(makeTask(DECAY_INTERVAL, boost::bind(&Game::checkDecay,this,DECAY_INTERVAL)));	
 }
 
@@ -508,12 +501,24 @@ OTSYS_THREAD_RETURN Game::eventThread(void *p)
 #endif
       task = _this->eventList.top();
       _this->eventList.pop();
-    }
+		}
 
-    OTSYS_THREAD_UNLOCK(_this->eventLock);
+		bool runtask = false;
+
+		if(task) {
+			std::map<unsigned long, SchedulerTask*>::iterator it = _this->eventIdMap.find(task->getEventId());
+			if(it != _this->eventIdMap.end()) {
+				_this->eventIdMap.erase(it);
+				runtask = true;
+			}
+		}
+
+		OTSYS_THREAD_UNLOCK(_this->eventLock);
     if (task) {
-      (*task)(_this);
-      delete task;
+			if(runtask) {
+				(*task)(_this);
+			}
+			delete task;
     }
   }
 #if defined __EXCEPTION_TRACER__
@@ -522,19 +527,58 @@ OTSYS_THREAD_RETURN Game::eventThread(void *p)
 
 }
 
-void Game::addEvent(SchedulerTask* event) {
-  bool do_signal = false;
+unsigned long Game::addEvent(SchedulerTask* event) {
   OTSYS_THREAD_LOCK(eventLock)
 
-    eventList.push(event);
-  if (eventList.empty() || *event < *eventList.top())
+	if(event->getEventId() == 0) {
+		++eventIdCount;
+		event->setEventId(eventIdCount);
+	}
+
+#ifdef __DEBUG__EVENTSCHEDULER__
+		std::cout << "addEvent - " << event->getEventId() << std::endl;
+#endif
+
+	eventIdMap[event->getEventId()] = event;
+	
+  bool do_signal = false;
+	if (eventList.empty() || *event < *eventList.top())
     do_signal = true;
+
+	eventList.push(event);
+
+	/*
+	if (eventList.empty() ||  *event < *eventList.top())
+    do_signal = true;
+	*/
 
   OTSYS_THREAD_UNLOCK(eventLock)
 
-    if (do_signal)
-      OTSYS_THREAD_SIGNAL_SEND(eventSignal);
+	if (do_signal)
+		OTSYS_THREAD_SIGNAL_SEND(eventSignal);
 
+	return event->getEventId();
+}
+
+bool Game::stopEvent(unsigned long eventid) {
+	if(eventid == 0)
+		return false;
+
+  OTSYS_THREAD_LOCK_CLASS lockClass(eventLock);
+
+	std::map<unsigned long, SchedulerTask*>::iterator it = eventIdMap.find(eventIdCount);
+	if(it != eventIdMap.end()) {
+
+#ifdef __DEBUG__EVENTSCHEDULER__
+		std::cout << "stopEvent - eventid: " << eventid << "/" << it->second->getEventId() << std::endl;
+#endif
+
+		it->second->setEventId(0); //invalidate the event
+		eventIdMap.erase(it);
+		return true;
+	}
+
+	return false;
 }
 
 /*****************************************************************************/
@@ -559,17 +603,6 @@ Creature* Game::getCreatureByID(unsigned long id)
 		return (*it).second;
 	}
 
-	/*
-	std::map<unsigned long, Creature*>::iterator it;
-  for( it = playersOnline.begin(); it != playersOnline.end(); ++it )
-  {
-    if(it->second->getID() == id )
-    {
-      return it->second;
-    }
-  }
-	*/
-
   return NULL; //just in case the player doesnt exist
 }
 
@@ -578,8 +611,6 @@ Creature* Game::getCreatureByName(const std::string &s)
 	std::string txt1 = s;
 	std::transform(txt1.begin(), txt1.end(), txt1.begin(), upchar);
 
-	//std::map<unsigned long, Creature*>::iterator it;
-  	//for( it = playersOnline.begin(); it != playersOnline.end(); ++it)
 	for (AutoList<Creature>::listiterator it = AutoList<Creature>::list.begin(); it != AutoList<Creature>::list.end(); ++it)
 	{
 		std::string txt2 = (*it).second->getName();
@@ -594,17 +625,13 @@ Creature* Game::getCreatureByName(const std::string &s)
 
 bool Game::placeCreature(Position &pos, Creature* c)
 {
-	//OTSYS_THREAD_LOCK(gameLock)
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
 	
 	bool success = false;
 	Player *p = dynamic_cast<Player*>(c);
 
 	if (!p || c->access != 0 || getPlayersOnline() < max_players) {
-		//map->lock();
-		success = map->placeCreature(pos, c);
-		//map->unlock();
-		
+		success = map->placeCreature(pos, c);		
 		if(success) {
 			
 			sendAddThing(NULL,c->pos,c);
@@ -616,14 +643,6 @@ bool Game::placeCreature(Position &pos, Creature* c)
 				
 			addEvent(makeTask(1000, std::bind2nd(std::mem_fun(&Game::checkCreature), c->getID())));
 			addEvent(makeTask(2000, std::bind2nd(std::mem_fun(&Game::checkCreatureAttacking), c->getID())));
-
-			/*std::vector<Creature*> list;
-			map->getSpectators(Range(pos, true), list);
-
-			for(unsigned int i = 0; i < list.size(); ++i)
-			{
-				list[i]->onCreatureAppear(c);
-			}*/
 		}
 	}
 	else {
@@ -631,8 +650,6 @@ bool Game::placeCreature(Position &pos, Creature* c)
 		success = false;
 	}
 	
-	//OTSYS_THREAD_UNLOCK(gameLock)
-
   return success;
 }
 
@@ -646,46 +663,19 @@ bool Game::removeCreature(Creature* c)
 #endif
 	Tile *tile = map->getTile(c->pos.x, c->pos.y, c->pos.z);
 	if(tile != NULL){			
-		//map->lock();
-		//int stackpos = tile->getCreatureStackPos(c);
-		//bool success = map->removeCreature(c);
-		//map->unlock();
 		removeThing(NULL,c->pos,c);
 		
-		//if(success)
-		//{
-		 	this->FreeThing(c);
+	 	this->FreeThing(c);
 
-			/*std::vector<Creature*> list;
-			getSpectators(Range(c->pos, true), list);
-			for(unsigned int i = 0; i < list.size(); ++i)
-			{			
-				list[i]->onCreatureDisappear(c, stackpos);
-			}*/
-
-			for(std::vector<Creature*>::iterator cit = c->summons.begin(); cit != c->summons.end(); ++cit) {
-				Tile *tile = map->getTile((*cit)->pos.x, (*cit)->pos.y, (*cit)->pos.z);
-				if(tile != NULL){
-					//map->lock();
-					//int stackpos = tile->getCreatureStackPos(*cit);
-					//bool success = map->removeCreature(*cit);
-					//map->unlock();
-					//sendRemoveThing(NULL,(*cit)->pos,*cit,stackpos);
-					//if(success) {
-					(*cit)->setMaster(NULL);
-					this->FreeThing(*cit);
-					removeThing(NULL,(*cit)->pos,*cit);
-						/*list.clear();
-						getSpectators(Range((*cit)->pos, true), list);
-						for(unsigned int i = 0; i < list.size(); ++i)
-						{
-							list[i]->onCreatureDisappear(*cit, stackpos);
-						}*/
-					//}
-				}
+		for(std::vector<Creature*>::iterator cit = c->summons.begin(); cit != c->summons.end(); ++cit) {
+			Tile *tile = map->getTile((*cit)->pos.x, (*cit)->pos.y, (*cit)->pos.z);
+			if(tile != NULL){
+				(*cit)->setMaster(NULL);
+				this->FreeThing(*cit);
+				removeThing(NULL,(*cit)->pos,*cit);
 			}
+		}
 			
-		//}
 		Player* player = dynamic_cast<Player*>(c);
 		if (player)
 		{
@@ -694,13 +684,10 @@ bool Game::removeCreature(Creature* c)
 			if( sit != channel.end() )
 				channel.erase(sit);
 		
-			//std::string charName = c->getName();
 			IOPlayer::instance()->savePlayer(player);			
 			std::cout << (uint32_t)getPlayersOnline() - 1 << " players online." << std::endl;
 		}	
 	}
-
-	//OTSYS_THREAD_UNLOCK(gameLock)
 
 	return true;
 }
@@ -806,32 +793,16 @@ bool Game::onPrepareMoveThing(Creature *player, const Thing* thing, const Tile *
 {
 	const Item *item = dynamic_cast<const Item*>(thing);
 	const Player* player_t = dynamic_cast<const Player*>(thing);
-
-	/*if(!toTile && player == creature){
-			player->sendCancelWalk("Sorry, not possible...");
-			return;
-	}*/	
 	
 	if(item && (!toTile || !item->canMovedTo(toTile))) {
-	 	player->sendCancel("Sorry, not possible...");
+	 	player->sendCancel("Sorry, not possible.");
 		return false;
 	}
 	else if(player_t && (!toTile || !thing->canMovedTo(toTile)) ) {
-   	player->sendCancelWalk("Sorry, not possible...");
+   	player->sendCancelWalk("Sorry, not possible.");
 		return false;
 	}
 
-	/*
-	if ((!toTile) || (toTile && !thing->canMovedTo(toTile)) || 
-			(item && (item->isBlocking() && toTile->getCreature())) ){
-		const Player* player_t = dynamic_cast<const Player*>(thing);
-    	if (player_t && player == player_t)
-      	player->sendCancelWalk("Sorry, not possible...");      	
-			else {
-      	player->sendCancel("Sorry, not possible...");
-			}
-		return false;
-  }*/
 	if (fromTile && fromTile->splash == thing && fromTile->splash->isNotMoveable()) {
 			player->sendCancel("You cannot move this object.");
 #ifdef __DEBUG__
@@ -881,24 +852,24 @@ bool Game::onPrepareMoveCreature(Creature *player, const Creature* creatureMovin
 	const Player* playerMoving = dynamic_cast<const Player*>(creatureMoving);
 
 	if (player->access == 0 && player != creatureMoving && !creatureMoving->isPushable()) {		
-    	player->sendCancel("Sorry, not possible.");
+		player->sendCancel("Sorry, not possible.");
     return false;
   }
 	if(!toTile && player == creatureMoving){		
-    		player->sendCancelWalk("Sorry, not possible.");
+		player->sendCancelWalk("Sorry, not possible.");
 	}
   else if (playerMoving && toTile->isPz() && playerMoving->pzLocked) {
 		if (player == creatureMoving/*thing*/ && player->pzLocked) {			
-			player->sendCancelWalk("You can't enter a protection zone after attacking another creature.");
+			player->sendCancelWalk("You can not enter a protection zone after attacking another player.");
 			return false;
 		}
 		else if (playerMoving->pzLocked) {			
-			player->sendCancel("Sorry, not possible...");
+			player->sendCancel("Sorry, not possible.");
 			return false;
 		}
   }
   else if (playerMoving && fromTile->isPz() && player != creatureMoving) {
-		player->sendCancel("Sorry, not possible...");
+		player->sendCancel("Sorry, not possible.");
 		return false;
   }
 
@@ -922,7 +893,7 @@ bool Game::onPrepareMoveThing(Player *player, const Position& fromPos, const Ite
 bool Game::onPrepareMoveThing(Player *player, slots_t fromSlot, const Item *fromItem, slots_t toSlot, const Item *toItem)
 {
 	if(toItem && (!toItem->isStackable() || toItem->getID() != fromItem->getID())) {
-		player->sendCancel("Sorry not enough room.");
+		player->sendCancel("Sorry, not enough room.");
 		return false;
 	}
 
@@ -932,7 +903,7 @@ bool Game::onPrepareMoveThing(Player *player, slots_t fromSlot, const Item *from
 bool Game::onPrepareMoveThing(Player *player, const Container *fromContainer, const Item *fromItem, slots_t toSlot, const Item *toItem)
 {
 	if(toItem && (!toItem->isStackable() || toItem->getID() != fromItem->getID())) {
-		player->sendCancel("Sorry not enough room.");
+		player->sendCancel("Sorry, not enough room.");
 		return false;
 	}
 
@@ -1842,7 +1813,7 @@ void Game::thingMoveInternal(Creature *player, unsigned short from_x, unsigned s
 				}                                            
 				//change level end   
 				else 
-					player->sendCancelWalk("Sorry, not possible...");
+					player->sendCancelWalk("Sorry, not possible.");
 				
 				return;
 			}
@@ -2755,6 +2726,64 @@ std::list<Position> Game::getPathTo(Creature *creature, Position start, Position
 	return map->getPathTo(creature, start, to, creaturesBlock);
 }
 
+void Game::checkPlayerWalk(unsigned long id)
+{
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
+	Player *player = dynamic_cast<Player*>(getCreatureByID(id));
+
+	if(!player)
+		return;
+
+	Position pos = player->pos;
+	Direction dir = player->pathlist.front();
+	player->pathlist.pop_front();
+
+	switch (dir) {
+		case NORTH:
+			pos.y--;
+			break;
+		case EAST:
+			pos.x++;
+			break;
+		case SOUTH:
+			pos.y++;
+			break;
+		case WEST:
+			pos.x--;
+			break;
+		case NORTHEAST:
+			pos.x++;
+			pos.y--;
+			break;
+		case NORTHWEST:
+			pos.x--;
+			pos.y--;
+			break;
+		case SOUTHWEST:
+			pos.x--;
+			pos.y++;
+			break;
+		case SOUTHEAST:
+			pos.x++;
+			pos.y++;
+			break;
+	}
+
+#ifdef __DEBUG__
+	std::cout << "move to: " << dir << std::endl;
+#endif
+
+	this->thingMove(player, player, pos.x, pos.y, pos.z, 1);
+	player->lastmove = OTSYS_TIME();
+	flushSendBuffers();
+
+	if(!player->pathlist.empty()) {
+		player->eventAutoWalk = addEvent(makeTask(player->getSleepTicks(), std::bind2nd(std::mem_fun(&Game::checkPlayerWalk), id)));
+	}
+	else
+		player->eventAutoWalk = 0;
+}
+
 void Game::checkCreature(unsigned long id)
 {
 	//OTSYS_THREAD_LOCK(gameLock)
@@ -2795,53 +2824,12 @@ void Game::checkCreature(unsigned long id)
 					}
 				}				
 			}
-			/* //moved to player.cpp
-			int lastLv = player->level;
-			
-			while (player->experience >= player->getExpForLv(player->level+1)) {
-				player->level++;
-				player->healthmax += player->HPGain[player->voc];
-				player->health += player->HPGain[player->voc];
-				player->manamax += player->ManaGain[player->voc];
-				player->mana += player->ManaGain[player->voc];
-				player->cap += player->CapGain[player->voc];
-			}
-			if(lastLv != player->level)
-			{
-				player->setNormalSpeed();
-				changeSpeed(player->getID(), player->getSpeed());
-				std::stringstream lvMsg;
-				lvMsg << "You advanced from level " << lastLv << " to level " << player->level << ".";				
-				player->sendTextMessage(MSG_ADVANCE,lvMsg.str().c_str());
-			}
-			*/
+
 			//send stast only if have changed
 			if(player->NeedUpdateStats())
 				player->sendStats();
 			
 			player->sendPing();
-			
-			//moved to player.cpp
-			/*//Magic Level Advance
-			int reqMana = player->getReqMana(player->maglevel+1, player->voc);
-			//ATTANTION: MAKE SURE THAT CHARACTERS HAVE REASONABLE MAGIC LEVELS. ESPECIALY KNIGHTS!!!!!!!!!!!
-			/*
-			if (reqMana % 20 < 10) //CIP must have been bored when they invented this odd rounding
-				reqMana = reqMana - (reqMana % 20);
-			else
-				reqMana = reqMana - (reqMana % 20) + 20;
-			/
-			if (player->access == 0 && player->manaspent >= reqMana) {
-				player->manaspent -= reqMana;
-				player->maglevel++;
-				std::stringstream MaglvMsg;
-				MaglvMsg << "You advanced from magic level " << (player->maglevel - 1) << " to magic level " << player->maglevel << ".";				
-				player->sendTextMessage(MSG_ADVANCE, MaglvMsg.str().c_str());
-				player->sendStats();
-				//msg.AddPlayerStats(player);
-				//player->sendNetworkMessage(&msg);
-			}
-			//End Magic Level Advance*/
 
 			if(player->inFightTicks >= 1000) {
 				player->inFightTicks -= thinkTicks;
@@ -3316,6 +3304,17 @@ bool Game::creatureSaySpell(Creature *creature, const std::string &text)
 	return ret;
 }
 
+void Game::playerAutoWalk(Player* player, std::list<Direction>& path)
+{
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
+	stopEvent(player->eventAutoWalk);
+
+  // then we schedule the movement...
+  // the interval seems to depend on the speed of the char?
+	//player->eventAutoWalk = addEvent(makeTask<Direction>(0, MovePlayer(player->getID()), path, 400, StopMovePlayer(player->getID())));
+	player->pathlist = path;
+	player->eventAutoWalk = addEvent(makeTask(player->getSleepTicks(), std::bind2nd(std::mem_fun(&Game::checkPlayerWalk), player->getID())));
+}
 
 bool Game::playerUseItemEx(Player *player, const Position& posFrom,const unsigned char  stack_from,
 		const Position &posTo,const unsigned char stack_to, const unsigned short itemid)
@@ -3367,12 +3366,99 @@ bool Game::playerUseItemEx(Player *player, const Position& posFrom,const unsigne
 
 bool Game::playerUseItem(Player *player, const Position& pos, const unsigned char stackpos, const unsigned short itemid, unsigned char index)
 {
-	//OTSYS_THREAD_LOCK(gameLock)
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
 	actions.UseItem(player,pos,stackpos,itemid,index);
-	//OTSYS_THREAD_UNLOCK(gameLock)
-
 	return true;
+}
+
+void Game::playerRequestTrade(Player *player, const Position& pos,
+	const unsigned char stackpos, const unsigned short itemid, unsigned long playerid)
+{
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
+
+	Player *tradePartner = dynamic_cast<Player*>(getCreatureByID(playerid));
+	if(!tradePartner) {
+		player->sendTextMessage(MSG_INFO, "Sorry, not possible.");
+		return;
+	}
+
+	Item *tradeItem = dynamic_cast<Item*>(getThing(pos, stackpos, player));
+	if(!tradeItem || tradeItem->getID() != itemid) {
+		player->sendCancel("Sorry, not possible.");
+		return;
+	}
+
+	if (player->tradePartner != 0 && tradePartner->tradePartner != player->getID()){
+		player->sendTextMessage(MSG_INFO, "This player is already trading.");
+		return;
+	}
+
+	player->tradePartner = playerid;
+	player->tradeItem = tradeItem;
+
+	player->sendTradeItemRequest(player, tradeItem, true);
+
+	if (tradePartner->tradePartner == 0){
+		std::stringstream trademsg;
+		trademsg << player->getName() <<" wants to trade with you.";
+		tradePartner->sendTextMessage(MSG_INFO, trademsg.str().c_str());
+	}
+	else {
+		Item* counterOfferItem = tradePartner->tradeItem;
+		player->sendTradeItemRequest(tradePartner, counterOfferItem, false);
+		tradePartner->sendTradeItemRequest(player, tradeItem, false);
+	}
+}
+
+void Game::playerAcceptTrade(Player* player)
+{
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
+	
+	player->setAcceptTrade(true);
+	Player *tradePartner = dynamic_cast<Player*>(getCreatureByID(player->tradePartner));
+	if(tradePartner && tradePartner->getAcceptTrade()) {
+		Item *tradeItem1 = player->tradeItem;
+		Item *tradeItem2 = tradePartner->tradeItem;
+
+		/*
+		tradeItem1->useThing();
+		this->removeThing(player, tradeItem1->pos, tradeItem1);
+
+		tradeItem2->useThing();
+		this->removeThing(tradePartner, tradeItem2->pos, tradeItem2);
+
+		if(!player->addItem(tradeItem2)) {
+			tradeItem2->releaseThing();
+		}
+
+		if(!tradePartner->addItem(tradeItem1)) {
+			tradeItem1->releaseThing();
+		}
+
+		player->setAcceptTrade(false);
+		player->sendCloseTrade();
+
+		tradePartner->setAcceptTrade(false);
+		tradePartner->sendCloseTrade();
+		*/
+	}
+}
+
+void Game::playerCloseTrade(Player* player)
+{
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
+	
+	Player *tradePartner = dynamic_cast<Player*>(getCreatureByID(player->tradePartner));
+
+	player->setAcceptTrade(false);
+	player->sendTextMessage(MSG_SMALLINFO, "Trade cancelled.");
+	player->sendCloseTrade();
+
+	if(tradePartner) {
+		tradePartner->setAcceptTrade(false);
+		tradePartner->sendTextMessage(MSG_SMALLINFO, "Trade cancelled.");
+		tradePartner->sendCloseTrade();
+	}
 }
 
 void Game::flushSendBuffers(){

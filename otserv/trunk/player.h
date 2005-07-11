@@ -94,8 +94,10 @@ public:
 	Item* getItem(int pos) const;
 	Item* GetDistWeapon() const;
 	
-	std::string getName(){return name;};
+	const std::string& getName() const {return name;};
 	
+	//bool pendingCancelAutoWalk;
+	unsigned long eventAutoWalk;
   int sex, voc;
   int cap;
   int food;
@@ -103,7 +105,7 @@ public:
   void addExp(unsigned long exp);
   unsigned char level_percent;
   unsigned char maglevel_percent;
-  bool cancelMove;
+  //bool cancelMove;
   bool SendBuffer;
   long internal_ping;
   long npings;
@@ -167,7 +169,8 @@ public:
   void sendChangeSpeed(Creature* creature);
   void sendToChannel(Creature *creature, SpeakClasses type, const std::string &text, unsigned short channelId);
   virtual void sendCancel(const char *msg);
-  virtual void sendCancelWalk(const char *msg);  
+  virtual void sendCancelWalk(const char *msg);
+	virtual void sendCancelAutoWalking();
   int sendInventory(unsigned char sl_id);
   void sendStats();
   void sendTextMessage(MessageClasses mclass, const char* message);
@@ -180,6 +183,8 @@ public:
   void sendMagicEffect(const Position &pos, unsigned char type);
   void sendAnimatedText(const Position &pos, unsigned char color, std::string text);
   void sendCreatureHealth(const Creature *creature);
+	void sendTradeItemRequest(const Player* player, const Item* item, bool ack);
+	void sendCloseTrade();
   void receivePing();
   void flushMsg();
 
@@ -189,7 +194,7 @@ public:
 
   virtual void setAttackedCreature(unsigned long id);
   virtual bool isAttackable() const { return (access == 0); };
-  virtual bool isPushable() const { return (access == 0); };
+  virtual bool isPushable() const;
 	virtual void dropLoot(Container *corpse);
 	virtual int getLookCorpse();
 	bool NeedUpdateStats();	
@@ -207,11 +212,18 @@ public:
 	//void onItemRemoveInvnetory(const unsigned char sl_id);
 	//void onItemUpdateInvnetory(const unsigned char sl_id);
 	
+	void setAcceptTrade(bool b);
+	bool getAcceptTrade() {return acceptTrade;};
 
 protected:
   int useCount;
-
-  virtual void onCreatureAppear(const Creature *creature);
+	unsigned long tradePartner;
+	bool acceptTrade;
+	Item *tradeItem;
+	std::list<Direction> pathlist;
+	
+	long long getSleepTicks() const;
+	virtual void onCreatureAppear(const Creature *creature);
   virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos, bool tele);
   virtual void onCreatureTurn(const Creature *creature, unsigned char stackpos);
   virtual void onCreatureSay(const Creature *creature, SpeakClasses type, const std::string &text);
@@ -261,7 +273,7 @@ protected:
 		unsigned char oldstackpos, unsigned char oldcount, unsigned char count);
 
 	void addSkillTryInternal(int skilltry,int skill);
-	std::string Player::getSkillName(int skillid);
+	std::string getSkillName(int skillid);
 
   friend class Game;
   friend class ActionScript;

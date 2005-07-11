@@ -25,100 +25,108 @@
 
 #include "scheduler.h"
 #include "position.h"
+#include "player.h"
 #include "game.h"
 
+/*
 class MovePlayer : public std::binary_function<Game*, Direction, int> {
-		  public:
-					 MovePlayer(unsigned long playerid) : _pid(playerid) { }
+public:
+	MovePlayer(unsigned long playerid) : _pid(playerid) {}
 
-					 virtual result_type operator()(const first_argument_type& game, const second_argument_type& dir) const {
-								OTSYS_THREAD_LOCK(game->gameLock)
-									// get the player we want to move...
-									Creature* creature = game->getCreatureByID(_pid);
+	virtual result_type operator()(const first_argument_type& game, const second_argument_type& dir) const
+	{
+		OTSYS_THREAD_LOCK(game->gameLock)
+		// get the player we want to move...
+		Creature* creature = game->getCreatureByID(_pid);
 
-								Player* player = dynamic_cast<Player*>(creature);
-								if (!player) { // player is not available anymore it seems...
-									OTSYS_THREAD_UNLOCK(game->gameLock)
-										return -1;
-								}
-                                if(player->cancelMove){                                             
-                                OTSYS_THREAD_UNLOCK(game->gameLock)                       
-                                return 0;
-                                }
-                                
-								Position pos = player->pos;
-								switch (dir) {
-									case NORTH:
-												pos.y--;
-												break;
-									case EAST:
-												pos.x++;
-												break;
-									case SOUTH:
-												pos.y++;
-												break;
-									case WEST:
-												pos.x--;
-												break;
-									case NORTHEAST:
-											pos.x++;
-											pos.y--;
-										break;
-									case NORTHWEST:
-											pos.x--;
-											pos.y--;
-										break;
-									case SOUTHWEST:
-											pos.x--;
-											pos.y++;
-										break;
-									case SOUTHEAST:
-											pos.x++;
-											pos.y++;
-										break;
-								}
+		Player* player = dynamic_cast<Player*>(creature);
+		if (!player) { // player is not available anymore it seems...
+			OTSYS_THREAD_UNLOCK(game->gameLock)
+			return 0;
+		}
+
+		if(player->cancelMove) {
+	    OTSYS_THREAD_UNLOCK(game->gameLock)
+		  return 1;
+    }
+		       
+		Position pos = player->pos;
+		switch (dir) {
+			case NORTH:
+					pos.y--;
+					break;
+			case EAST:
+					pos.x++;
+					break;
+			case SOUTH:
+					pos.y++;
+					break;
+			case WEST:
+					pos.x--;
+					break;
+			case NORTHEAST:
+					pos.x++;
+					pos.y--;
+				break;
+			case NORTHWEST:
+					pos.x--;
+					pos.y--;
+				break;
+			case SOUTHWEST:
+					pos.x--;
+					pos.y++;
+				break;
+			case SOUTHEAST:
+					pos.x++;
+					pos.y++;
+				break;
+		}
 
 #ifdef __DEBUG__
-								std::cout << "move to: " << dir << std::endl;
+		std::cout << "move to: " << dir << std::endl;
 #endif
-								game->thingMove(player, player, pos.x, pos.y, pos.z, 1);
-								game->flushSendBuffers();
-								OTSYS_THREAD_UNLOCK(game->gameLock)
 
-                return 0;
-					 }
+		game->thingMove(player, player, pos.x, pos.y, pos.z, 1);
 
-		  protected:
-					 unsigned long _pid;
+		game->flushSendBuffers();
+		OTSYS_THREAD_UNLOCK(game->gameLock)
 
+		if(player->pos != pos) {
+			return 0;
+		}
+		else
+			return 1;
+	}
+
+protected:
+	unsigned long _pid;
 };
 
 class StopMovePlayer : public std::unary_function<Game*, bool> {
-		  public:
-					 StopMovePlayer(unsigned long playerid) : _pid(playerid) { }
+public:
+		StopMovePlayer(unsigned long playerid) : _pid(playerid) { }
+		
+		virtual result_type operator()(const argument_type& game) const {
+			// get the player we want to move...
+			Creature* creature = game->getCreatureByID(_pid);
+			Player* player = dynamic_cast<Player*>(creature);
+			if (!player) { // player is not available anymore it seems...
+				return false;
+			}
+			else {
+				if(player->cancelMove) {
+					player->cancelMove = false;
+					player->sendCancelWalk("");
+					return true;
+				}
+			}
 
-					 virtual result_type operator()(const argument_type& game) const {
-									// get the player we want to move...
-									Creature* creature = game->getCreatureByID(_pid);
+			return false;
+		}
 
-								Player* player = dynamic_cast<Player*>(creature);
-								if (!player) { // player is not available anymore it seems...
-										return false;
-								}
-                                else{
-                                     if(player->cancelMove){
-                                     player->cancelMove = false;
-                                     player->sendCancelWalk("");
-                                     return true;
-                                                            }
-                                     else
-                                     return false;
-                                     }
-                     return false;
-					 }
-
-		  protected:
-					 unsigned long _pid;
+protected:
+	unsigned long _pid;
 
 };
+*/
 #endif

@@ -55,21 +55,29 @@ Player::Player(const char *name, Protocol *p) :
   mana       = 0;
   manamax    = 0;
   manaspent  = 0;
-  this->name= name;
+  this->name = name;
   food       = 0;
 
-  level      = 1;
+	eventAutoWalk = 0;
+	//isAutoWalking = false;
+	//pendingCancelAutoWalk = false;
+	level      = 1;
   experience = 180;
 
   maglevel   = 20;
 
   access     = 0;
   lastlogin  = 0;
-  cancelMove = false;
+  //cancelMove = false;
   SendBuffer = false;
   npings = 0;
   internal_ping = 0;
   fightMode = followMode = 0;
+
+	tradePartner = 0;
+	acceptTrade = false;
+	tradeItem = NULL;
+
   for(int i = 0; i < 7; i++)
   {
     skills[i][SKILL_LEVEL] = 1;
@@ -131,6 +139,15 @@ Player::~Player()
 	}
 
   delete client;
+}
+
+bool Player::isPushable() const {
+	return ((getSleepTicks() <= 0) && access == 0);
+}
+
+long long Player::getSleepTicks() const
+{
+	return client->getSleepTicks();
 }
 
 std::string Player::getDescription(bool self) const
@@ -1120,6 +1137,18 @@ bool Player::CanSee(int x, int y, int z) const
   return client->CanSee(x, y, z);
 }
 
+void Player::setAcceptTrade(bool b)
+{
+	if(b) {
+		acceptTrade = true;
+	}
+	else {
+		tradeItem = NULL;
+		tradePartner = 0;
+		acceptTrade = false;
+	}
+}
+
 Container* Player::getDepot(unsigned long depotId){	
 	DepotMap::iterator it = depots.find(depotId);
 	if (it != depots.end()){	
@@ -1160,6 +1189,15 @@ void Player::sendCancelAttacking()
 {
   attackedCreature = 0;   
   client->sendCancelAttacking();
+}
+
+void Player::sendCancelAutoWalking()
+{
+	if(!pathlist.empty()) {
+		client->sendCancelAutoWalk(pathlist.front());
+	}
+	else
+		client->sendCancelAutoWalk(getDirection());
 }
 
 void Player::sendCancelWalk(const char *msg)
@@ -1234,6 +1272,16 @@ void Player::sendAnimatedText(const Position &pos, unsigned char color, std::str
 
 void Player::sendCreatureHealth(const Creature *creature){
 	client->sendCreatureHealth(creature);
+}
+
+void Player::sendTradeItemRequest(const Player* player, const Item* item, bool ack)
+{
+	client->sendTradeItemRequest(player, item, ack);
+}
+
+void Player::sendCloseTrade()
+{
+	client->sendCloseTrade();
 }
 
 void Player::sendTextWindow(Item* item,const unsigned short maxlen, const bool canWrite){

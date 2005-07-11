@@ -36,7 +36,6 @@
 #include "magic.h"
 #include "map.h"
 
-
 class Creature;   // see creature.h
 class Player;
 class Commands;
@@ -207,14 +206,21 @@ public:
 	bool creatureThrowRune(Creature *creature, const Position& centerpos, const MagicEffectClass& me);
 	bool creatureCastSpell(Creature *creature, const Position& centerpos, const MagicEffectClass& me);
 	bool creatureSaySpell(Creature *creature, const std::string &text);
-	//bool creatureUseItem(Creature *creature, const Position& pos, Item* item);
+	void playerAutoWalk(Player* player, std::list<Direction>& path);
 	bool playerUseItemEx(Player *player, const Position& posFrom,const unsigned char  stack_from,
 		const Position &posTo,const unsigned char stack_to, const unsigned short itemid);
 	bool playerUseItem(Player *player, const Position& pos, const unsigned char stackpos, const unsigned short itemid, const unsigned char index);
+
+	void playerRequestTrade(Player *player, const Position& pos,
+		const unsigned char stackpos, const unsigned short itemid, unsigned long playerid);
+	void playerAcceptTrade(Player* player);
+	void playerCloseTrade(Player* player);
+
   void changeOutfitAfter(unsigned long id, int looktype, long time);
   void changeSpeed(unsigned long id, unsigned short speed);
-  void addEvent(long ticks, int type, void *data);
-	void addEvent(SchedulerTask*);
+	unsigned long addEvent(SchedulerTask*);
+	bool stopEvent(unsigned long eventid);
+
 	void creatureBroadcastTileUpdated(const Position& pos);
 	void teleport(Thing *thing, Position newPos);
       
@@ -309,8 +315,9 @@ protected:
 		void*    data;
 	};
 
-	void checkCreatureAttacking(unsigned long id);
+	void checkPlayerWalk(unsigned long id);
 	void checkCreature(unsigned long id);
+	void checkCreatureAttacking(unsigned long id);
 	//void decayItem(Item *item);
 	//void decaySplash(Item* item);
 	void checkDecay(int t);
@@ -325,6 +332,8 @@ protected:
 	
 	void checkSpawns(int t);
 	std::priority_queue<SchedulerTask*, std::vector<SchedulerTask*>, lessSchedTask > eventList;
+	std::map<unsigned long, SchedulerTask*> eventIdMap;
+	unsigned long eventIdCount;
 
 	uint32_t max_players;
 
@@ -344,64 +353,38 @@ protected:
 
 template<class ArgType>
 class TCallList : public SchedulerTask {
-		  public:
-					 TCallList(boost::function<int(Game*, ArgType)> f1, boost::function<bool(Game*)> f2, std::list<ArgType>& call_list, __int64 interval) :
-								_f1(f1), _f2(f2), _list(call_list), _interval(interval) {
-								}
-					 void operator()(Game* arg) {
-								if (!_f2(arg)) {
-										  int ret = _f1(arg, _list.front());
-										  _list.pop_front();
-										  if (!_list.empty()) {
-													 SchedulerTask* newTask = new TCallList(_f1, _f2, _list, _interval);
-													 newTask->setTicks(_interval);
-													 arg->addEvent(newTask);
-										  }
-								}
-								return;
-					 }
+public:
+	TCallList(boost::function<int(Game*, ArgType)> f1, boost::function<bool(Game*)> f2, std::list<ArgType>& call_list, __int64 interval) :
+	_f1(f1), _f2(f2), _list(call_list), _interval(interval) {
+	}
+	
+	void operator()(Game* arg) {
+		if(_eventid != 0 && !_f2(arg)) {
+			int ret = _f1(arg, _list.front());
+			_list.pop_front();
+			if (ret && !_list.empty()) {
+				SchedulerTask* newTask = new TCallList(_f1, _f2, _list, _interval);
+				newTask->setTicks(_interval);
+				newTask->setEventId(this->getEventId());
+				arg->addEvent(newTask);
+			}
+		}
 
-		  private:
-		  		boost::function<int(Game*, ArgType)> _f1;
-				boost::function<bool(Game*)>_f2;
-				std::list<ArgType> _list;
-				__int64 _interval;
+		return;
+	}
+
+private:
+	boost::function<int(Game*, ArgType)> _f1;
+	boost::function<bool(Game*)>_f2;
+	std::list<ArgType> _list;
+	__int64 _interval;
 };
-
-// from scheduler.h
-// needed here for proper initialisation order forced by gcc 3.4.2+
-//template<class Functor, class Functor2,  class Arg>
-//class TCallList : public SchedulerTask {
-//		  public:
-//					 TCallList(Functor f, Functor2 f2, std::list<Arg>& call_list, __int64 interval) : _f(f), _f2(f2), _list(call_list), _interval(interval) {
-//					 }
-//
-//					 result_type operator()(const argument_type& arg) {
-//                              if(!_f2(arg)){   
-//								result_type ret = _f(arg, _list.front());
-//								_list.pop_front();
-//								if (!_list.empty()) {
-//										  SchedulerTask* newtask = new TCallList<Functor, Functor2, Arg>(_f, _f2, _list, _interval);
-//										  newtask->setTicks(_interval);
-//										  arg->addEvent(newtask);
-//								}
-//								return ret;
-//                          }	
-//										return result_type();
-//					 }
-//		  protected:
-//					 Functor _f;
-//					 Functor2 _f2;
-//					 std::list<Arg> _list;
-//					 __int64 _interval;
-//};
-//
 
 template<class ArgType>
 SchedulerTask* makeTask(__int64 ticks, boost::function<int(Game*, ArgType)> f1, std::list<ArgType>& call_list, __int64 interval, boost::function<bool(Game*)> f2) {
-		  TCallList<ArgType> *t = new TCallList<ArgType>(f1, f2, call_list, interval);
-		  t->setTicks(ticks);
-		  return t;
+	TCallList<ArgType> *t = new TCallList<ArgType>(f1, f2, call_list, interval);
+	t->setTicks(ticks);
+	return t;
 }
 
 #endif

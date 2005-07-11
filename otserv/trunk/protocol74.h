@@ -89,6 +89,10 @@ private:
 	void parseUpArrowContainer(NetworkMessage &msg);
 	void parseTextWindow(NetworkMessage &msg);
 
+	void parseRequestTrade(NetworkMessage &msg);
+	void parseAcceptTrade(NetworkMessage &msg);
+	void parseCloseTrade();
+
 /*
 	void sendPlayerItemAppear(Action* action);
 	void sendPlayerItemChange(Action* action);
@@ -168,6 +172,7 @@ private:
 
   virtual void sendCancel(const char *msg);
   virtual void sendCancelWalk(const char *msg);
+	virtual void sendCancelAutoWalk(Direction lastdir);
   virtual void sendChangeSpeed(const Creature* creature);
   virtual void sendCancelAttacking();
   void sendSetOutfit(const Creature* creature);
@@ -177,6 +182,7 @@ private:
 	virtual void sendStats();
 	virtual void sendTextMessage(MessageClasses mclass, const char* message);
 	virtual void sendTextMessage(MessageClasses mclass, const char* message,const Position &pos, unsigned char type);
+	//virtual void sendCancelAutoWalking(Direction lastdir);
 	
   virtual bool CanSee(int x, int y, int z) const;
   virtual void logout();
@@ -185,6 +191,8 @@ private:
   void WriteMsg(NetworkMessage &msg);
 
 	virtual void sendContainer(unsigned char index, Container *container);
+	virtual void sendTradeItemRequest(const Player* player, const Item* item, bool ack);
+	virtual void sendCloseTrade();
 	virtual void sendCloseContainer(unsigned char containerid);
 	void sendItemAddContainer(const Container *container, const Item *item);
 	void sendItemRemoveContainer(const Container* container,const unsigned char slot);

@@ -20,7 +20,7 @@ bool IOMapSQL::loadMap(Map* map, std::string identifier){
 	std::string pass = g_config.getGlobalString("map_pass");
 	std::string db   = g_config.getGlobalString("map_db");
 #ifdef __DEBUG__
-	std::cout "host" << host << "user" << user << "pass" << pass << "db" << db << std::endl;
+	std::cout << "host" << host << "user" << user << "pass" << pass << "db" << db << std::endl;
 #endif     
     mysqlpp::Connection con;
 try{

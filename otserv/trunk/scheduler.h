@@ -30,54 +30,67 @@
 class Game;
 
 class SchedulerTask {
-		  public:
-					 // definition to make sure lower cycles end up front
-					 // in the priority_queue used in the scheduler
-					 inline bool operator<(const SchedulerTask& other) const {
-								return getCycle() > other.getCycle();
-					 }
+public:
+	SchedulerTask() {
+		_eventid = 0;
+		_cycle = 0;
+  }
 
-					 virtual void operator()(Game* arg) = 0;
+	virtual ~SchedulerTask() { };
 
-					 virtual void setTicks(const __int64 ticks) {
-								_cycle = OTSYS_TIME() + ticks;;
-					 }
+	// definition to make sure lower cycles end up front
+	// in the priority_queue used in the scheduler
+	inline bool operator<(const SchedulerTask& other) const {
+		return getCycle() > other.getCycle();
+	}
 
-					 inline __int64 getCycle() const {
-								return _cycle;
-					 }
+	virtual void operator()(Game* arg) = 0;
 
-					 virtual ~SchedulerTask() { };
+	virtual void setEventId(unsigned long id) {
+		_eventid = id;
+	}
 
-		  protected:
-					 __int64 _cycle;
+	inline unsigned long getEventId() const {
+		return _eventid;
+	}
+
+	virtual void setTicks(const __int64 ticks) {
+		_cycle = OTSYS_TIME() + ticks;;
+	}
+
+	inline __int64 getCycle() const {
+		return _cycle;
+	}
+
+protected:
+	unsigned long _eventid;
+	__int64 _cycle;
 };
 
 class TSchedulerTask : public SchedulerTask {
-		  public:
-					 TSchedulerTask(boost::function1<void, Game*> f) : _f(f) {
-					 }
+public:
+	TSchedulerTask(boost::function1<void, Game*> f) : _f(f) {
+	}
 
-					 virtual void operator()(Game* arg) {
-								_f(arg);
-					 }
+	virtual void operator()(Game* arg) {
+		_f(arg);
+	}
 
-					 virtual ~TSchedulerTask() { }
+	virtual ~TSchedulerTask() { }
 
-		  protected:
-					 boost::function1<void, Game*> _f;
+protected:
+	boost::function1<void, Game*> _f;
 };
 
 SchedulerTask* makeTask(boost::function1<void, Game*> f);
-
 SchedulerTask* makeTask(__int64 ticks, boost::function1<void, Game*> f);
 
 
 class lessSchedTask : public std::binary_function<SchedulerTask*, SchedulerTask*, bool> {
-		  public:
-		  bool operator()(SchedulerTask*& t1, SchedulerTask*& t2) {
-					 return *t1 < *t2;
-		  }
+public:
+	bool operator()(SchedulerTask*& t1, SchedulerTask*& t2) {
+		return *t1 < *t2;
+	}
 };
 
 #endif

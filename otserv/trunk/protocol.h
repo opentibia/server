@@ -95,6 +95,8 @@ public:
   virtual void sendCreatureHealth(const Creature *creature) = 0;
   virtual void sendSkills() = 0;
   virtual void sendPing() = 0;
+	virtual void sendTradeItemRequest(const Player* player, const Item* item, bool ack) = 0;
+	virtual void sendCloseTrade() = 0;
   virtual void sendTextWindow(Item* item,const unsigned short maxlen, const bool canWrite) = 0;
   virtual void sendContainer(unsigned char index, Container *container) = 0;
   virtual void sendCloseContainer(unsigned char containerid) = 0;
@@ -108,12 +110,15 @@ public:
   virtual void sendIcons(int icons) = 0;
   virtual void sendCancel(const char *msg) = 0;
   virtual void sendCancelWalk(const char *msg) = 0;
+	virtual void sendCancelAutoWalk(Direction lastdir) = 0;
   virtual void sendStats() = 0;
   virtual void sendChangeSpeed(const Creature* creature) = 0;
   virtual void sendCancelAttacking() = 0;
   virtual void sendInventory(unsigned char sl_id) = 0;
   virtual void sendTextMessage(MessageClasses mclass, const char* message) = 0;
   virtual void sendTextMessage(MessageClasses mclass, const char* message,const Position &pos, unsigned char type) = 0;
+	//virtual void sendCancelAutoWalking(Direction lastdir) = 0;
+	long long getSleepTicks();
   virtual void sleepTillMove();
   virtual void sendChannels() = 0;
   virtual void sendChannel(unsigned short channelId) = 0;
