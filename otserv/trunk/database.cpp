@@ -36,7 +36,7 @@ DBResult::~DBResult()
 	m_numRows = 0;
 }
 
-void DBResult::AddRow(MYSQL_ROW r, unsigned int num_fields)
+void DBResult::addRow(MYSQL_ROW r, unsigned int num_fields)
 {
 	char **row = new char*[num_fields];
 	for(unsigned int i=0; i < num_fields; ++i)
@@ -49,7 +49,7 @@ void DBResult::AddRow(MYSQL_ROW r, unsigned int num_fields)
 	m_numRows++;
 }
 
-void DBResult::ClearRows()
+void DBResult::clearRows()
 {
 	std::map<unsigned int, char **>::iterator it;
 	for(it = m_listRows.begin(); it != m_listRows.end();)
@@ -63,7 +63,7 @@ void DBResult::ClearRows()
 	m_numRows = 0;
 }
 
-void DBResult::ClearFieldNames()
+void DBResult::clearFieldNames()
 {
 	std::map<std::string, unsigned int>::iterator it;
 	for(it = m_listNames.begin(); it != m_listNames.end();)
@@ -74,7 +74,7 @@ void DBResult::ClearFieldNames()
 	m_numFields = 0;
 }
 
-int DBResult::GetDataInt(std::string s, unsigned int nrow)
+int DBResult::getDataInt(std::string s, unsigned int nrow)
 {
 	std::map<std::string, unsigned int>::iterator it=m_listNames.find(s);
 	if(it != m_listNames.end())
@@ -86,11 +86,12 @@ int DBResult::GetDataInt(std::string s, unsigned int nrow)
 		}
 	}
 	
-	throw DBError("DBResult::GetDataInt()", DB_ERROR_DATA_NOT_FOUND);
+	//throw DBError("DBResult::GetDataInt()", DB_ERROR_DATA_NOT_FOUND);
+	std::cout << "MYSQL ERROR DBResult::GetDataInt()" << std::endl;
 	return 0; // Failed
 }
 
-long DBResult::GetDataLong(std::string s, unsigned int nrow)
+long DBResult::getDataLong(std::string s, unsigned int nrow)
 {
 	std::map<std::string, unsigned int>::iterator it=m_listNames.find(s);
 	if(it != m_listNames.end())
@@ -102,12 +103,13 @@ long DBResult::GetDataLong(std::string s, unsigned int nrow)
 		}
 	}
 	
-	throw DBError("DBResult::GetDataLong()", DB_ERROR_DATA_NOT_FOUND);
+	//throw DBError("DBResult::GetDataLong()", DB_ERROR_DATA_NOT_FOUND);
+	std::cout << "MYSQL ERROR DBResult::GetDataLong()" << std::endl;
 	return 0; // Failed
 }
 
 
-std::string DBResult::GetDataString(std::string s, unsigned int nrow)
+std::string DBResult::getDataString(std::string s, unsigned int nrow)
 {
 	std::map<std::string, unsigned int>::iterator it=m_listNames.find(s);
 	if(it != m_listNames.end())
@@ -119,7 +121,8 @@ std::string DBResult::GetDataString(std::string s, unsigned int nrow)
 		}
 	}
 	
-	throw DBError("DBResult::GetDataString()", DB_ERROR_DATA_NOT_FOUND);
+	//throw DBError("DBResult::GetDataString()", DB_ERROR_DATA_NOT_FOUND);
+	std::cout << "MYSQL ERROR DBResult::GetDataString()" << std::endl;
 	return std::string(""); // Failed
 }
 
@@ -129,8 +132,10 @@ Database::Database()
 	m_connected = false;
 	
 	// Initialize mysql
-	if(mysql_init(&m_handle) == NULL)
-		throw DBError("mysql_init", DB_ERROR_INIT);
+	if(mysql_init(&m_handle) == NULL){
+		//throw DBError("mysql_init", DB_ERROR_INIT);
+		std::cout << "MYSQL ERROR mysql_init" << std::endl;
+	}
 	else
 		m_initialized = true;
 }
@@ -144,7 +149,7 @@ Database::~Database()
 	}
 }
 
-bool Database::Connect(const char *db_name, const char *db_host, const char *db_user, const char *db_pass)
+bool Database::connect(const char *db_name, const char *db_host, const char *db_user, const char *db_pass)
 {
 	if(!m_initialized)
 		return false;
@@ -152,14 +157,16 @@ bool Database::Connect(const char *db_name, const char *db_host, const char *db_
 	// Connect to the database host
 	if(!mysql_real_connect(&m_handle, db_host, db_user, db_pass, NULL, 0, NULL, 0))
 	{
-		throw DBError(mysql_error(&m_handle), DB_ERROR_CONNECT);
+		//throw DBError(mysql_error(&m_handle), DB_ERROR_CONNECT);
+		std::cout << "MYSQL ERROR mysql_real_connect: " << mysql_error(&m_handle)  << std::endl;
 		return false;
 	}
 	
 	// Select the correct database
 	if(mysql_select_db(&m_handle, db_name))
 	{
-		throw DBError("mysql_select_db", DB_ERROR_SELECT);
+		//throw DBError("mysql_select_db", DB_ERROR_SELECT);
+		std::cout << "MYSQL ERROR mysql_select_db"  << std::endl;
 		return false;
 	}
 	
@@ -167,24 +174,25 @@ bool Database::Connect(const char *db_name, const char *db_host, const char *db_
 	return true;
 }
 
-bool Database::ExecuteQuery(DBQuery &q)
+bool Database::executeQuery(DBQuery &q)
 {
 	if(!m_initialized || !m_connected)
 		return false;
 	
 	// Execute the query
-	if(mysql_real_query(&m_handle, q.GetText(), q.GetSize()))
+	if(mysql_real_query(&m_handle, q.getText(), q.getSize()))
 	{
-		throw DBError( q.GetText() , DB_ERROR_QUERY );
+		//throw DBError( q.getText() , DB_ERROR_QUERY );
+		std::cout << "MYSQL ERROR mysql_real_query: " << q.getText() << " " << mysql_error(&m_handle)  << std::endl;
 		return false;
 	}
 	
 	// All is ok
-	q.Reset();
+	q.reset();
 	return true;
 }
 
-bool Database::StoreQuery(DBQuery &q, DBResult &dbres)
+bool Database::storeQuery(DBQuery &q, DBResult &dbres)
 {	
 	MYSQL_ROW row;
 	MYSQL_FIELD *fields;
@@ -192,7 +200,7 @@ bool Database::StoreQuery(DBQuery &q, DBResult &dbres)
 	unsigned int num_fields;
 	
 	// Execute the query
-	if(!this->ExecuteQuery(q))
+	if(!this->executeQuery(q))
 		return false;
 	
 	
@@ -200,7 +208,8 @@ bool Database::StoreQuery(DBQuery &q, DBResult &dbres)
 	r = mysql_store_result(&m_handle);
 	if(!r)
 	{
-		throw DBError( mysql_error(&m_handle), DB_ERROR_STORE );
+		//throw DBError( mysql_error(&m_handle), DB_ERROR_STORE );
+		std::cout << "MYSQL ERROR mysql_store_result: " << q.getText() << " " << mysql_error(&m_handle)  << std::endl;
 		return false;
 	}
 	
@@ -208,18 +217,18 @@ bool Database::StoreQuery(DBQuery &q, DBResult &dbres)
 	num_fields = mysql_num_fields(r);
 	
 	// Getting the field names
-	dbres.ClearFieldNames();
+	dbres.clearFieldNames();
 	fields = mysql_fetch_fields(r);
 	for(int i=0; i < num_fields; ++i)
 	{
-		dbres.SetFieldName(std::string(fields[i].name), i);
+		dbres.setFieldName(std::string(fields[i].name), i);
 	}
 	
 	// Adding the rows to a list
-	dbres.ClearRows();
+	dbres.clearRows();
 	while(row = mysql_fetch_row(r))
 	{
-		dbres.AddRow(row, num_fields);
+		dbres.addRow(row, num_fields);
 	}
 	
 	// Free query result
@@ -227,23 +236,25 @@ bool Database::StoreQuery(DBQuery &q, DBResult &dbres)
 	r = NULL;
 	
 	// Check if there are rows in the query
-	if(dbres.GetNumRows() > 0)
+	if(dbres.getNumRows() > 0)
 		return true;
 	else
 		return false;
 }
 
-std::string Database::EscapeString(std::string s)
+std::string Database::escapeString(std::string s)
 {
-	char output[DB_BUFFER_SIZE];
-	
+	//char output[DB_BUFFER_SIZE];
+	char* output = new char[s.size() * 2 + 1];
+	/*
 	if((DB_BUFFER_SIZE * 0.9) < s.size())
 	{
 		throw DBError("Database::EscapeString()", DB_ERROR_BUFFER_EXCEEDED);
 		return std::string("");
 	}
-	
+	*/
 	mysql_escape_string(output, s.c_str(), s.size());
-	
-	return std::string(output);
+	std::string r = std::string(output);
+	delete output;
+	return r;
 }

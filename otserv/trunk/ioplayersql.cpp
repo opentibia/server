@@ -59,22 +59,22 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 
 #ifndef _OLD_MYSQL_
 
-	try
-	{
+	//try
+	//{
 		Database mysql;
 		DBQuery query;
 		DBResult result;
 		DBResult result_temp;
 	
-		mysql.Connect(db.c_str(), host.c_str(), user.c_str(), pass.c_str());
+		mysql.connect(db.c_str(), host.c_str(), user.c_str(), pass.c_str());
 		//mysql.Connect("otserv", "localhost", "root", "test");
 
-		query << "SELECT * FROM players WHERE name='" << name << "'";
+		query << "SELECT * FROM players WHERE name='" << Database::escapeString(name) << "'";
 		//std::cout << query.GetText() << std::endl;
-		if(!mysql.StoreQuery(query, result) || result.GetNumRows() != 1)
+		if(!mysql.storeQuery(query, result) || result.getNumRows() != 1)
 			return false;
 		
-		int accno = result.GetDataInt("account");
+		int accno = result.getDataInt("account");
 		if(accno < 1)
 			return false;
 		
@@ -93,39 +93,39 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 			return false;
 		
 		// Getting all player properties
-		player->setGUID((int)result.GetDataInt("id"));
+		player->setGUID((int)result.getDataInt("id"));
 		
-		player->accountNumber = result.GetDataInt("account");
-		player->sex=result.GetDataInt("sex");
+		player->accountNumber = result.getDataInt("account");
+		player->sex=result.getDataInt("sex");
 		
-		player->setDirection((Direction)result.GetDataInt("direction"));
-		player->experience=result.GetDataLong("experience");
-		player->level=result.GetDataInt("level");
-		player->maglevel=result.GetDataInt("maglevel");
+		player->setDirection((Direction)result.getDataInt("direction"));
+		player->experience=result.getDataLong("experience");
+		player->level=result.getDataInt("level");
+		player->maglevel=result.getDataInt("maglevel");
 	
-		player->voc=result.GetDataInt("vocation");
-		player->access=result.GetDataInt("access");
+		player->voc=result.getDataInt("vocation");
+		player->access=result.getDataInt("access");
 		player->setNormalSpeed();
 		
-		player->mana=result.GetDataInt("mana");
-		player->manamax=result.GetDataInt("manamax");
-		player->manaspent=result.GetDataInt("manaspent");
+		player->mana=result.getDataInt("mana");
+		player->manamax=result.getDataInt("manamax");
+		player->manaspent=result.getDataInt("manaspent");
 	
-		player->health=result.GetDataInt("health");
-		player->healthmax=result.GetDataInt("healthmax");
-		player->food=result.GetDataInt("food");
+		player->health=result.getDataInt("health");
+		player->healthmax=result.getDataInt("healthmax");
+		player->food=result.getDataInt("food");
 	
-		player->looktype=result.GetDataInt("looktype");
+		player->looktype=result.getDataInt("looktype");
 		player->lookmaster = player->looktype;
-		player->lookhead=result.GetDataInt("lookhead");
-		player->lookbody=result.GetDataInt("lookbody");
-		player->looklegs=result.GetDataInt("looklegs");
-		player->lookfeet=result.GetDataInt("lookfeet");
+		player->lookhead=result.getDataInt("lookhead");
+		player->lookbody=result.getDataInt("lookbody");
+		player->looklegs=result.getDataInt("looklegs");
+		player->lookfeet=result.getDataInt("lookfeet");
 	
 		boost::char_separator<char> sep(";");
 	
 		//SPAWN
-		std::string pos = result.GetDataString("pos");
+		std::string pos = result.getDataString("pos");
 		//std::cout << pos << std::endl;
 		tokenizer tokens(pos, sep);
 	
@@ -140,7 +140,7 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 		//std::cout << "sql loading: " << player->pos << std::endl;
 	
 		//MASTERSPAWN
-		std::string masterpos = result.GetDataString("masterpos");
+		std::string masterpos = result.getDataString("masterpos");
 		tokenizer mastertokens(masterpos, sep);
 	
 		tokenizer::iterator mspawnit = mastertokens.begin();
@@ -152,14 +152,14 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 		// we need to find out our skills
 		// so we query the skill table
 		query << "SELECT * FROM skills WHERE player='" << player->getGUID() << "'";
-		if(mysql.StoreQuery(query, result))
+		if(mysql.storeQuery(query, result))
 		{
 			//now iterate over the skills
-			for(int i=0; i < result.GetNumRows(); ++i)
+			for(int i=0; i < result.getNumRows(); ++i)
 			{
-				int skillid=result.GetDataInt("id",i);
-				player->skills[skillid][SKILL_LEVEL]=result.GetDataInt("skill",i);
-				player->skills[skillid][SKILL_TRIES]=result.GetDataInt("tries",i);
+				int skillid=result.getDataInt("id",i);
+				player->skills[skillid][SKILL_LEVEL]=result.getDataInt("skill",i);
+				player->skills[skillid][SKILL_TRIES]=result.getDataInt("tries",i);
 				player->skills[skillid][SKILL_PERCENT] = (unsigned int)(100*(player->skills[skillid][SKILL_TRIES])/(1.*player->getReqSkilltries(skillid, (player->skills[skillid][SKILL_LEVEL]+1), player->voc)));
 			}
 		}
@@ -173,21 +173,21 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 		stdext::hash_map<int,std::pair<Item*,int> > itemmap;
 #endif
 		query << "SELECT * FROM items WHERE player='" << player->getGUID() << "' ORDER BY sid ASC";
-		if(mysql.StoreQuery(query, result) && (result.GetNumRows() > 0))
+		if(mysql.storeQuery(query, result) && (result.getNumRows() > 0))
 		{
 			
-			for(int i=0; i < result.GetNumRows(); ++i)
+			for(int i=0; i < result.getNumRows(); ++i)
 			{
-				int type = result.GetDataInt("type",i);
-				int count = result.GetDataInt("number",i);
+				int type = result.getDataInt("type",i);
+				int count = result.getDataInt("number",i);
 				Item* myItem = Item::CreateItem(type, count);
-				if(result.GetDataInt("actionid",i) >= 100)
-					myItem->setActionId(result.GetDataInt("actionid",i));
-				myItem->setText(result.GetDataString("text",i));	
-				myItem->setSpecialDescription(result.GetDataString("specialdesc",i));
-				std::pair<Item*, int> myPair(myItem, result.GetDataInt("pid",i));
-				itemmap[result.GetDataInt("sid",i)] = myPair;
-				if(int slotid = result.GetDataInt("slot",i))
+				if(result.getDataInt("actionid",i) >= 100)
+					myItem->setActionId(result.getDataInt("actionid",i));
+				myItem->setText(result.getDataString("text",i));	
+				myItem->setSpecialDescription(result.getDataString("specialdesc",i));
+				std::pair<Item*, int> myPair(myItem, result.getDataInt("pid",i));
+				itemmap[result.getDataInt("sid",i)] = myPair;
+				if(int slotid = result.getDataInt("slot",i))
 				{
 					if(slotid > 0 && slotid <= 10){
 						player->addItemInventory(myItem, slotid,true);
@@ -228,28 +228,28 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 		//load storage map
 		query << "SELECT * FROM playerstorage WHERE player='" << player->getGUID() << "'";
 		
-		if(mysql.StoreQuery(query,result))
+		if(mysql.storeQuery(query,result))
 		{
-			for(int i=0; i < result.GetNumRows(); ++i)
+			for(int i=0; i < result.getNumRows(); ++i)
 			{
-				unsigned long key = result.GetDataInt("key",i);
-				long value = result.GetDataInt("value",i);
+				unsigned long key = result.getDataInt("key",i);
+				long value = result.getDataInt("value",i);
 				player->addStorageValue(key,value);
 			}
 		}
 		
-	}
+	/*}
 	catch(DBError e)
 	{
-		switch(e.GetType())
+		switch(e.getType())
 		{
 		case DB_ERROR_QUERY:
 		case DB_ERROR_STORE:
 		case DB_ERROR_DATA_NOT_FOUND:
-			std::cout << "DB WARNING: (" << e.GetType() << ") " << e.GetMsg() << std::endl;
+			std::cout << "DB WARNING: (" << e.getType() << ") " << e.getMsg() << std::endl;
 			break;
 		default:
-			std::cout << "DB ERROR: (" << e.GetType() << ") " << e.GetMsg() << std::endl;
+			std::cout << "DB ERROR: (" << e.getType() << ") " << e.getMsg() << std::endl;
 			return false;
 		}
 	}
@@ -257,7 +257,7 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 	{
 		std::cout << "ERROR: Unknown exception raised.\n\tFile: " << __FILE__ << "\n\tLine: " << __LINE__ << std::endl;
 		return false;
-	}
+	}*/
 	
 #else
 	///////////////////////////////
@@ -477,6 +477,7 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 }
 
 bool IOPlayerSQL::savePlayer(Player* player){
+	//return true;
 	std::string host = g_config.getGlobalString("sql_host");
 	std::string user = g_config.getGlobalString("sql_user");
 	std::string pass = g_config.getGlobalString("sql_pass");
@@ -492,20 +493,20 @@ bool IOPlayerSQL::savePlayer(Player* player){
 		DBQuery query;
 		DBResult result;
 		
-		mysql.Connect(db.c_str(), host.c_str(), user.c_str(), pass.c_str());
+		mysql.connect(db.c_str(), host.c_str(), user.c_str(), pass.c_str());
 		
 		//check if the player have to be saved or not
 		query << "SELECT save FROM players WHERE id='" << player->getGUID() << "'";
-		if(!mysql.StoreQuery(query,result) || (result.GetNumRows() != 1) )
+		if(!mysql.storeQuery(query,result) || (result.getNumRows() != 1) )
 			return false;
 		
-		if(result.GetDataInt("save") != 1) // If save var is not 1 don't save the player info
+		if(result.getDataInt("save") != 1) // If save var is not 1 don't save the player info
 			return true;
 		
 		
 		//Start the transaction	
 		query << "BEGIN;";
-		if(!mysql.ExecuteQuery(query))
+		if(!mysql.executeQuery(query))
 			return false;
 		
 		//First, an UPDATE query to write the player itself
@@ -534,7 +535,7 @@ bool IOPlayerSQL::savePlayer(Player* player){
 		query << "`lastlogin` = " << player->lastlogin << " ";
 		query << " WHERE `id` = "<< player->getGUID() <<" LIMIT 1";
 		
-		if(!mysql.ExecuteQuery(query))
+		if(!mysql.executeQuery(query))
 			return false;
 		
 		// Saving Skills
@@ -542,14 +543,14 @@ bool IOPlayerSQL::savePlayer(Player* player){
 		{
 			query << "UPDATE `skills` SET `skill` = " << player->skills[i][SKILL_LEVEL] <<", `tries` = "<< player->skills[i][SKILL_TRIES] << " WHERE `player` = " << player->getGUID() << " AND  `id` = " << i;
 		
-			if(!mysql.ExecuteQuery(query))
+			if(!mysql.executeQuery(query))
 				return false;
 		}
 		
 		//now item saving
 		query << "DELETE FROM items WHERE player='"<< player->getGUID() << "'";
 		
-		if(!mysql.ExecuteQuery(query))
+		if(!mysql.executeQuery(query))
 			return false;
 		
 		std::string itemsstring;
@@ -573,15 +574,15 @@ bool IOPlayerSQL::savePlayer(Player* player){
 			query << itemsstring;
 			// TODO: Check if the length of the query is too long...
 			
-			if(!mysql.ExecuteQuery(query))
+			if(!mysql.executeQuery(query))
 				return false;
 		}
 		
 		//save storage map
-		query.Reset();
+		query.reset();
 		query << "DELETE FROM playerstorage WHERE player='"<< player->getGUID() << "'";
 		
-		if(!mysql.ExecuteQuery(query))
+		if(!mysql.executeQuery(query))
 			return false;
 		
 		query << "INSERT INTO `playerstorage` (`player` , `key` , `value` ) VALUES"; 
@@ -596,29 +597,29 @@ bool IOPlayerSQL::savePlayer(Player* player){
 			ststring.erase(ststring.length()-1);
 			query << ststring;
 			
-			if(!mysql.ExecuteQuery(query))
+			if(!mysql.executeQuery(query))
 				return false;
 		}
 	
 		//End the transaction
-		query.Reset();
+		query.reset();
 		query << "COMMIT;";
 		
-		if(!mysql.ExecuteQuery(query))
+		if(!mysql.executeQuery(query))
 			return false;
 		
 	}
 	catch(DBError e)
 	{
-		switch(e.GetType())
+		switch(e.getType())
 		{
 		case DB_ERROR_QUERY:
 		case DB_ERROR_STORE:
 		case DB_ERROR_DATA_NOT_FOUND:
-			std::cout << "DB WARNING: (" << e.GetType() << ") " << e.GetMsg() << std::endl;
+			std::cout << "DB WARNING: (" << e.getType() << ") " << e.getMsg() << std::endl;
 			break;
 		default:
-			std::cout << "DB ERROR: (" << e.GetType() << ") " << e.GetMsg() << std::endl;
+			std::cout << "DB ERROR: (" << e.getType() << ") " << e.getMsg() << std::endl;
 			return false;
 		}
 	}
@@ -635,6 +636,10 @@ bool IOPlayerSQL::savePlayer(Player* player){
 	}
 	catch(mysqlpp::BadQuery e){
 		std::cout << "MYSQL-ERROR: " << e.error << std::endl;
+		return false;
+	}
+	catch(...){
+		std::cout << "ERROR donde peta siempre." << std::endl;
 		return false;
 	}
 
@@ -848,7 +853,7 @@ std::string IOPlayerSQL::getItems(Item* i, int &startid, int slot, int player,in
 	std::stringstream ss;
 #ifndef _OLD_MYSQL_
 	ss << "(" << player <<"," << slot << ","<< startid <<","<< parentid <<"," << i->getID()<<","<< (int)i->getItemCountOrSubtype() << "," << 
-	(int)i->getActionId()<<",'"<< Database::EscapeString(i->getText()) <<"','" << Database::EscapeString(i->getSpecialDescription()) <<"'),";
+	(int)i->getActionId()<<",'"<< Database::escapeString(i->getText()) <<"','" << Database::escapeString(i->getSpecialDescription()) <<"'),";
 #else
 	ss << "(" << player <<"," << slot << ","<< startid <<","<< parentid <<"," << i->getID()<<","<< (int)i->getItemCountOrSubtype() << "," << 
 	(int)i->getActionId()<<",'"<< mysqlpp::escape << i->getText() <<"','" << mysqlpp::escape << i->getSpecialDescription() <<"'),";

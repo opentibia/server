@@ -44,43 +44,43 @@ Account IOAccountSQL::loadAccount(unsigned long accno){
 	DBQuery query;
 	DBResult result;
 	
-	try
-	{
-		mysql.Connect(db.c_str(), host.c_str(), user.c_str(), pass.c_str());
+//	try
+//	{
+		mysql.connect(db.c_str(), host.c_str(), user.c_str(), pass.c_str());
 	
 		query << "SELECT * FROM accounts WHERE accno='" << accno << "'";
-		if(!mysql.StoreQuery(query, result))
+		if(!mysql.storeQuery(query, result))
 			return acc;
 			
-		acc.accnumber = result.GetDataInt("accno");
-		acc.password = result.GetDataString("password");
+		acc.accnumber = result.getDataInt("accno");
+		acc.password = result.getDataString("password");
 		//std::cout << "pass " << acc.password << "      acc " << acc.accnumber << std::endl;
-		acc.accType = result.GetDataInt("type");
-		acc.premDays = result.GetDataInt("premDays");
+		acc.accType = result.getDataInt("type");
+		acc.premDays = result.getDataInt("premDays");
 
 		query << "SELECT name FROM players where account='" << accno << "'";
-		if(!mysql.StoreQuery(query, result))
+		if(!mysql.storeQuery(query, result))
 			return acc;
 		
-		for(int i=0; i < result.GetNumRows(); ++i)
+		for(int i=0; i < result.getNumRows(); ++i)
 		{
-			std::string ss = result.GetDataString("name", i);
+			std::string ss = result.getDataString("name", i);
 			acc.charList.push_back(ss.c_str());
 		}
 		
 		acc.charList.sort();
-	}
+/*	}
 	catch(DBError e)
 	{
-		switch(e.GetType())
+		switch(e.getType())
 		{
 		case DB_ERROR_QUERY:
 		case DB_ERROR_STORE:
 		case DB_ERROR_DATA_NOT_FOUND:
-			std::cout << "DB WARNING: (" << e.GetType() << ") " << e.GetMsg() << std::endl;
+			std::cout << "DB WARNING: (" << e.getType() << ") " << e.getMsg() << std::endl;
 			break;
 		default:
-			std::cout << "DB ERROR: (" << e.GetType() << ") " << e.GetMsg() << std::endl;
+			std::cout << "DB ERROR: (" << e.getType() << ") " << e.getMsg() << std::endl;
 			return acc;
 		}
 	}
@@ -88,7 +88,7 @@ Account IOAccountSQL::loadAccount(unsigned long accno){
 	{
 		std::cout << "ERROR: Unknown exception raised.\n\tFile: " << __FILE__ << "\n\tLine: " << __LINE__ << std::endl;
 		return acc;
-	}
+	}*/
 	
 #else
 	/////////////////////////////////

@@ -28,7 +28,7 @@
 #include <sstream>
 #include <map>
 
-#define DB_BUFFER_SIZE 2048
+//#define DB_BUFFER_SIZE 2048
 
 enum db_error_t {
 	DB_ERROR_UNKNOWN = 100,
@@ -48,17 +48,17 @@ public:
 	~DBQuery(){};
 	
 	/** Reset the actual query */
-	void Reset(){ this->str(""); };
+	void reset(){ this->str(""); };
 	
 	/** Get the text of the query
 	*\returns The text of the actual query
 	*/
-	const char *GetText(){ return this->str().c_str(); };
+	const char *getText(){ return this->str().c_str(); };
 	
 	/** Get size of the query text
 	*\returns The size of the query text
 	*/
-	int GetSize(){ return (int)this->str().size(); };
+	int getSize(){ return (int)this->str().size(); };
 };
 
 class DBResult
@@ -72,38 +72,38 @@ public:
 	*\param s The name of the field
 	*\param nrow The number of the row
 	*/ 
-	int GetDataInt(std::string s, unsigned int nrow=0);
+	int getDataInt(std::string s, unsigned int nrow=0);
 	
 	/** Get the Long value of a field in database
 	*\returns The Long value of the selected field and row
 	*\param s The name of the field
 	*\param nrow The number of the row
 	*/
-	long GetDataLong(std::string s, unsigned int nrow=0);
+	long getDataLong(std::string s, unsigned int nrow=0);
 	
 	/** Get the String of a field in database
 	*\returns The String of the selected field and row
 	*\param s The name of the field
 	*\param nrow The number of the row
 	*/
-	std::string GetDataString(std::string s, unsigned int nrow=0);
+	std::string getDataString(std::string s, unsigned int nrow=0);
 	
 	/** Get the number of rows
 	*\returns The number of rows
 	*/
-	unsigned int GetNumRows(){ return m_numRows; };
+	unsigned int getNumRows(){ return m_numRows; };
 	
 	/** Get the number of fields
 	*\returns The number of fields
 	*/
-	unsigned int GetNumFields(){ return m_numFields; };
+	unsigned int getNumFields(){ return m_numFields; };
 	
 private:
 	friend class Database;
-	void AddRow(MYSQL_ROW r, unsigned int num_fields);
-	void ClearRows();
-	void ClearFieldNames();
-	void SetFieldName(std::string s, unsigned int n){
+	void addRow(MYSQL_ROW r, unsigned int num_fields);
+	void clearRows();
+	void clearFieldNames();
+	void setFieldName(std::string s, unsigned int n){
 		m_listNames[s] = n; 
 		m_numFields++;
 	};
@@ -127,12 +127,12 @@ public:
 	/** Get the error message
 	*\returns The text message
 	*/
-	const char *GetMsg(){ return m_msg; };
+	const char *getMsg(){ return m_msg; };
 	
 	/** Get the error type
 	*\returns The error type
 	*/
-	int GetType(){ return m_type; };
+	int getType(){ return m_type; };
 	
 private:
 	const char *m_msg;
@@ -155,7 +155,7 @@ public:
 	*\param db_user The "username" used in the connection
 	*\param db_pass The "password" of the username used
 	*/ 
-	bool Connect(const char *db_name, const char *db_host, const char *db_user, const char *db_pass);
+	bool connect(const char *db_name, const char *db_host, const char *db_user, const char *db_pass);
 	
 	/** Execute a query which don't get any information of the database (for ex.: INSERT, UPDATE, etc)
 	*\returns
@@ -163,7 +163,7 @@ public:
 	* 	FALSE if the query fails
 	*\ref q The query object
 	*/ 
-	bool ExecuteQuery(DBQuery &q);
+	bool executeQuery(DBQuery &q);
 	
 	/** Store a query which get information of the database (for ex.: SELECT)
 	*\returns
@@ -172,13 +172,13 @@ public:
 	*\ref q The query object
 	*\ref res The DBResult object where to insert the results of the query
 	*/ 
-	bool StoreQuery(DBQuery &q, DBResult &res);
+	bool storeQuery(DBQuery &q, DBResult &res);
 	
 	/** Escape the special characters in a string for no problems with the query
 	*\returns The string modified
 	*\param s The source string
 	*/
-	static std::string EscapeString(std::string s);
+	static std::string escapeString(std::string s);
 	
 private:
 	bool m_initialized;
