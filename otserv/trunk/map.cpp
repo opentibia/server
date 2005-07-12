@@ -33,8 +33,11 @@
 using namespace std;
 
 #include "iomap.h"
-#ifdef _JXB2MAP_
-#include "iomapjxb2.h"
+
+#ifdef _SQLMAP_
+#include "iomapsql.h"
+#elif _BINMAP_
+#include "iomapbin.h"
 #else
 #include "iomapxml.h"
 #endif
@@ -52,9 +55,6 @@ using namespace std;
 #include "npc.h"
 #include "spells.h"
 
-#ifdef _SQLMAP_
-#include "iomapsql.h"
-#endif
 
 #include "luascript.h"
 #include <ctype.h>
@@ -93,8 +93,8 @@ Map::~Map()
 bool Map::loadMap(std::string filename) {
 #ifdef _SQLMAP_
 	IOMap* loader = new IOMapSQL();
-#elif _JXB2MAP_
-	IOMap* loader = new IOMapJXB2();
+#elif _BINMAP_
+	IOMap* loader = new IOMapBin();
 #else
 	IOMap* loader = new IOMapXML();
 #endif
