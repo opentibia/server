@@ -503,6 +503,7 @@ OTSYS_THREAD_RETURN Game::eventThread(void *p)
       _this->eventList.pop();
 		}
 
+		///*
 		bool runtask = false;
 
 		if(task) {
@@ -512,6 +513,7 @@ OTSYS_THREAD_RETURN Game::eventThread(void *p)
 				runtask = true;
 			}
 		}
+		//*/
 
 		OTSYS_THREAD_UNLOCK(_this->eventLock);
     if (task) {
@@ -528,6 +530,7 @@ OTSYS_THREAD_RETURN Game::eventThread(void *p)
 }
 
 unsigned long Game::addEvent(SchedulerTask* event) {
+  bool do_signal = false;
   OTSYS_THREAD_LOCK(eventLock)
 
 	if(event->getEventId() == 0) {
@@ -541,16 +544,12 @@ unsigned long Game::addEvent(SchedulerTask* event) {
 
 	eventIdMap[event->getEventId()] = event;
 	
-  bool do_signal = false;
-	if (eventList.empty() || *event < *eventList.top())
-    do_signal = true;
-
 	eventList.push(event);
 
-	/*
+	///*
 	if (eventList.empty() ||  *event < *eventList.top())
     do_signal = true;
-	*/
+	//*/
 
   OTSYS_THREAD_UNLOCK(eventLock)
 
@@ -561,6 +560,8 @@ unsigned long Game::addEvent(SchedulerTask* event) {
 }
 
 bool Game::stopEvent(unsigned long eventid) {
+	return false;
+
 	if(eventid == 0)
 		return false;
 
@@ -573,7 +574,7 @@ bool Game::stopEvent(unsigned long eventid) {
 		std::cout << "stopEvent - eventid: " << eventid << "/" << it->second->getEventId() << std::endl;
 #endif
 
-		it->second->setEventId(0); //invalidate the event
+		//it->second->setEventId(0); //invalidate the event
 		eventIdMap.erase(it);
 		return true;
 	}
