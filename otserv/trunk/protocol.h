@@ -109,8 +109,8 @@ public:
 	//virtual void sendContainerUpdated(Item *item, unsigned char from_id, unsigned char to_id, unsigned char from_slot, unsigned char to_slot, bool remove) = 0;
   virtual void sendIcons(int icons) = 0;
   virtual void sendCancel(const char *msg) = 0;
-  virtual void sendCancelWalk(const char *msg) = 0;
-	virtual void sendCancelAutoWalk(Direction lastdir) = 0;
+  virtual void sendCancelWalk() = 0;
+	//virtual void sendCancelAutoWalk(Direction lastdir) = 0;
   virtual void sendStats() = 0;
   virtual void sendChangeSpeed(const Creature* creature) = 0;
   virtual void sendCancelAttacking() = 0;

@@ -54,9 +54,9 @@ public:
 	bool loadFromXml(const std::string &datadir);
 	virtual ~Actions();
 	
-	void UseItem(Player* player, const Position &pos,const unsigned char stack, 
+	bool UseItem(Player* player, const Position &pos,const unsigned char stack, 
 		const unsigned short itemid, const unsigned char index);
-	void UseItemEx(Player* player, const Position &from_pos,
+	bool UseItemEx(Player* player, const Position &from_pos,
 		const unsigned char from_stack,const Position &to_pos,
 		const unsigned char to_stack,const unsigned short itemid);
 	

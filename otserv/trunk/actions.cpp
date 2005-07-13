@@ -179,25 +179,25 @@ Action *Actions::getAction(const Item *item){
 	return NULL;
 }
 
-void Actions::UseItem(Player* player, const Position &pos,const unsigned char stack, 
+bool Actions::UseItem(Player* player, const Position &pos,const unsigned char stack, 
 	const unsigned short itemid, const unsigned char index)
 {	
 	if(canUse(player,pos)== 1){
 		player->sendCancel("Too far away.");
-		return;
+		return false;
 	}
 	Item *item = dynamic_cast<Item*>(game->getThing(pos,stack,player));
 	if(!item){
 		std::cout << "no item" << std::endl;
 		player->sendCancel("You can not use this object.");
-		return;
+		return false;
 	}
 	
 	if(item->getID() != itemid){
 		std::cout << "no id" << std::endl;
 		player->sendCancel("You can not use this object.");
-		return;
-	}
+		return false;
+	} 
 	
 	//look for the item in action maps	
 	Action *action = getAction(item);
@@ -206,20 +206,19 @@ void Actions::UseItem(Player* player, const Position &pos,const unsigned char st
 	if(action){
 		PositionEx posEx(pos,stack);
 		if(action->executeUse(player,item,posEx,posEx)){
-			return;
+			return true;
 		}
 	}
 	
 	//if it is a container try to open it
 	if(dynamic_cast<Container*>(item)){
 		if(openContainer(player,dynamic_cast<Container*>(item),index))
-			return;
+			return true;
 	}
     
-    //we dont know what to do with this item
-    player->sendCancel("You can not use this object.");
-    return;
-	
+  //we dont know what to do with this item
+  player->sendCancel("You can not use this object.");
+  return false;	
 }
 
 bool Actions::openContainer(Player *player,Container *container, const unsigned char index){
@@ -247,21 +246,21 @@ bool Actions::openContainer(Player *player,Container *container, const unsigned 
 	return true;
 }
 
-void Actions::UseItemEx(Player* player, const Position &from_pos,
+bool Actions::UseItemEx(Player* player, const Position &from_pos,
 	const unsigned char from_stack,const Position &to_pos,
 	const unsigned char to_stack,const unsigned short itemid)
 {
 	if(canUse(player,from_pos) == 1){
 		player->sendCancel("Too far away.");
-		return;
+		return false;
 	}
 	
 	Item *item = dynamic_cast<Item*>(game->getThing(from_pos,from_stack,player));
 	if(!item)
-		return;
+		return false;
 	
 	if(item->getID() != itemid)
-		return;
+		return false;
 	
 	Action *action = getAction(item);
 	
@@ -269,17 +268,18 @@ void Actions::UseItemEx(Player* player, const Position &from_pos,
 		if(action->allowFarUse() == false){
 			if(canUse(player,to_pos) == 1){
 				player->sendCancel("Too far away.");
-				return;
+				return false;
 			}
 		}
 		PositionEx posFromEx(from_pos,from_stack);
 		PositionEx posToEx(to_pos,to_stack);    	
     	if(action->executeUse(player,item,posFromEx,posToEx))
-    		return;
+    		return true;
 	}
     
 	//not found
 	player->sendCancel("You can not use this object.");
+	return false;
 }
 
 //

@@ -481,11 +481,12 @@ OTSYS_THREAD_RETURN Game::eventThread(void *p)
 #endif
 
     SchedulerTask* task = NULL;
+		bool runtask = false;
 
     // check if there are events waiting...
     OTSYS_THREAD_LOCK(_this->eventLock)
 
-      int ret;
+		int ret;
     if (_this->eventList.size() == 0) {
       // unlock mutex and wait for signal
       ret = OTSYS_THREAD_WAITSIGNAL(_this->eventSignal, _this->eventLock);
@@ -503,9 +504,6 @@ OTSYS_THREAD_RETURN Game::eventThread(void *p)
       _this->eventList.pop();
 		}
 
-		///*
-		bool runtask = false;
-
 		if(task) {
 			std::map<unsigned long, SchedulerTask*>::iterator it = _this->eventIdMap.find(task->getEventId());
 			if(it != _this->eventIdMap.end()) {
@@ -513,7 +511,6 @@ OTSYS_THREAD_RETURN Game::eventThread(void *p)
 				runtask = true;
 			}
 		}
-		//*/
 
 		OTSYS_THREAD_UNLOCK(_this->eventLock);
     if (task) {
@@ -536,6 +533,9 @@ unsigned long Game::addEvent(SchedulerTask* event) {
 	if(event->getEventId() == 0) {
 		++eventIdCount;
 		event->setEventId(eventIdCount);
+	}
+	else {
+		std::cout << "addEvent - " << event->getEventId() << std::endl;
 	}
 
 #ifdef __DEBUG__EVENTSCHEDULER__
@@ -563,14 +563,14 @@ unsigned long Game::addEvent(SchedulerTask* event) {
 }
 
 bool Game::stopEvent(unsigned long eventid) {
-	return false;
+	//return false;
 
 	if(eventid == 0)
 		return false;
 
   OTSYS_THREAD_LOCK(eventLock)
 
-	std::map<unsigned long, SchedulerTask*>::iterator it = eventIdMap.find(eventIdCount);
+	std::map<unsigned long, SchedulerTask*>::iterator it = eventIdMap.find(eventid);
 	if(it != eventIdMap.end()) {
 
 #ifdef __DEBUG__EVENTSCHEDULER__
@@ -810,7 +810,10 @@ bool Game::onPrepareMoveThing(Creature *player, const Thing* thing, const Tile *
 		return false;
 	}
 	else if(player_t && (!toTile || !thing->canMovedTo(toTile)) ) {
-   	player->sendCancelWalk("Sorry, not possible.");
+		player_t->sendTextMessage(MSG_SMALLINFO, "Sorry, not possible.");
+		player_t->sendCancelWalk();
+
+		//player->sendCancelWalk("Sorry, not possible.");
 		return false;
 	}
 
@@ -861,17 +864,31 @@ bool Game::onPrepareMoveCreature(Creature *player, const Creature* creatureMovin
 	const Tile *fromTile, const Tile *toTile)
 {
 	const Player* playerMoving = dynamic_cast<const Player*>(creatureMoving);
+	Player* player_t = dynamic_cast<Player*>(player);
 
 	if (player->access == 0 && player != creatureMoving && !creatureMoving->isPushable()) {		
 		player->sendCancel("Sorry, not possible.");
     return false;
   }
 	if(!toTile && player == creatureMoving){		
-		player->sendCancelWalk("Sorry, not possible.");
+		//player->sendCancelWalk("Sorry, not possible.");
+
+		if(player_t) {
+			player_t->sendTextMessage(MSG_SMALLINFO, "Sorry, not possible.");
+			player_t->sendCancelWalk();
+		}
+
+		return false;
 	}
   else if (playerMoving && toTile->isPz() && playerMoving->pzLocked) {
 		if (player == creatureMoving/*thing*/ && player->pzLocked) {			
-			player->sendCancelWalk("You can not enter a protection zone after attacking another player.");
+
+			if(player_t) {
+				player_t->sendTextMessage(MSG_SMALLINFO, "You can not enter a protection zone after attacking another player.");
+				player_t->sendCancelWalk();
+			}
+
+			//player->sendCancelWalk("You can not enter a protection zone after attacking another player.");
 			return false;
 		}
 		else if (playerMoving->pzLocked) {			
@@ -1743,7 +1760,7 @@ void Game::thingMoveInternal(Creature *player, const Position& fromPos, unsigned
 }
 
 //ground to ground
-void Game::thingMoveInternal(Creature *player, unsigned short from_x, unsigned short from_y, unsigned char from_z,
+void Game::thingMoveInternal(Creature *creature, unsigned short from_x, unsigned short from_y, unsigned char from_z,
 	unsigned char stackPos, unsigned short to_x, unsigned short to_y, unsigned char to_z, unsigned char count)
 {
 	Tile *fromTile = getTile(from_x, from_y, from_z);
@@ -1769,27 +1786,19 @@ void Game::thingMoveInternal(Creature *player, unsigned short from_x, unsigned s
 
 	if (thing)
 	{
-		Creature* creature = dynamic_cast<Creature*>(thing);
-		Player* playerMoving = dynamic_cast<Player*>(creature);
 		Item* item = dynamic_cast<Item*>(thing);
+		Creature* creatureMoving = dynamic_cast<Creature*>(thing);
+		Player* playerMoving = dynamic_cast<Player*>(creatureMoving);
+		Player* player = dynamic_cast<Player*>(creature);
 		
 		Position oldPos;
 		oldPos.x = from_x;
 		oldPos.y = from_y;
 		oldPos.z = from_z;
-		if(creature){
-			// we need to update the direction the player is facing to...
-			// otherwise we are facing some problems in turning into the
-			// direction we were facing before the movement
-			// check y first cuz after a diagonal move we lock to east or west
-			if (to_y < oldPos.y) ((Player*)thing)->direction = NORTH;
-			if (to_y > oldPos.y) ((Player*)thing)->direction = SOUTH;
-			if (to_x > oldPos.x) ((Player*)thing)->direction = EAST;
-			if (to_x < oldPos.x) ((Player*)thing)->direction = WEST;
-		}
+
 		if(fromTile)
 		{
-			if(!toTile && player == creature){      
+			if(!toTile && creature == creatureMoving){      
 				//change level begin          
 				Tile* downTile = getTile(to_x, to_y, to_z+1);
 				//diagonal begin
@@ -1819,31 +1828,52 @@ void Game::thingMoveInternal(Creature *player, unsigned short from_x, unsigned s
 					else if(downTile->floorChange(WEST)){
 						teleport(playerMoving, Position(playerMoving->pos.x+2, playerMoving->pos.y, playerMoving->pos.z+1));                           
 					}
-					else 
-						player->sendCancelWalk("Sorry, not possible...");  
-				}                                            
+					else {
+						if(player) {
+							player->sendTextMessage(MSG_SMALLINFO, "Sorry, not possible.");
+							player->sendCancelWalk();
+						}
+
+						//player->sendCancelWalk("Sorry, not possible.");
+						return;
+					}
+				}
 				//change level end   
-				else 
-					player->sendCancelWalk("Sorry, not possible.");
+				else if(player) {
+					player->sendTextMessage(MSG_SMALLINFO, "Sorry, not possible.");
+					player->sendCancelWalk();
+					//creature->sendCancelWalk("Sorry, not possible.");
+				}
 				
 				return;
 			}
 
-			if(!onPrepareMoveThing(player, thing, Position(from_x, from_y, from_z), Position(to_x, to_y, to_z)))
+			if(!onPrepareMoveThing(creature, thing, Position(from_x, from_y, from_z), Position(to_x, to_y, to_z)))
 				return;
 			
-			if(creature && !onPrepareMoveCreature(player, creature, fromTile, toTile))
+			if(creatureMoving && !onPrepareMoveCreature(creature, creatureMoving, fromTile, toTile))
 				return;
 			
-			if(!onPrepareMoveThing(player, thing, fromTile, toTile))
+			if(!onPrepareMoveThing(creature, thing, fromTile, toTile))
 				return;
-			
+
 			Teleport *teleportitem = toTile->getTeleportItem();
 			if(teleportitem) {
 				teleport(thing, teleportitem->getDestPos());
 				return;
 			}
 			
+			if(creatureMoving){
+				// we need to update the direction the player is facing to...
+				// otherwise we are facing some problems in turning into the
+				// direction we were facing before the movement
+				// check y first cuz after a diagonal move we lock to east or west
+				if (to_y < oldPos.y) ((Player*)thing)->direction = NORTH;
+				if (to_y > oldPos.y) ((Player*)thing)->direction = SOUTH;
+				if (to_x > oldPos.x) ((Player*)thing)->direction = EAST;
+				if (to_x < oldPos.x) ((Player*)thing)->direction = WEST;
+			}
+
 			int oldstackpos = fromTile->getThingStackPos(thing);
 			if (fromTile && fromTile->removeThing(thing))
 			{
@@ -1853,16 +1883,13 @@ void Game::thingMoveInternal(Creature *player, unsigned short from_x, unsigned s
 				thing->pos.y = to_y;
 				thing->pos.z = to_z;
 				
-				if (creature) 
+				if (playerMoving && playerMoving->attackedCreature != 0) 
 				{
-					Player* playerMoving = dynamic_cast<Player*>(creature);
-					if(playerMoving && creature->attackedCreature != 0){
-						Creature* c = getCreatureByID(creature->attackedCreature);
-						if(c){      
-							if((std::abs(creature->pos.x-c->pos.x) > 8) ||
-							(std::abs(creature->pos.y-c->pos.y) > 5) || (creature->pos.z != c->pos.z)){                      
-								playerMoving->sendCancelAttacking();
-							}
+					Creature* c = getCreatureByID(creatureMoving->attackedCreature);
+					if(c){      
+						if((std::abs(creatureMoving->pos.x-c->pos.x) > 8) ||
+						(std::abs(creatureMoving->pos.y-c->pos.y) > 5) || (creatureMoving->pos.z != c->pos.z)){                      
+							playerMoving->sendCancelAttacking();
 						}
 					}
 				}
@@ -1876,7 +1903,7 @@ void Game::thingMoveInternal(Creature *player, unsigned short from_x, unsigned s
 				
 				for(unsigned int i = 0; i < list.size(); ++i)
 				{
-					list[i]->onThingMove(player, thing, &oldPos, oldstackpos, 1, 1);
+					list[i]->onThingMove(creature, thing, &oldPos, oldstackpos, 1, 1);
 				}
 
 				//change level begin
@@ -1939,11 +1966,11 @@ void Game::thingMoveInternal(Creature *player, unsigned short from_x, unsigned s
 				}                                      
 				//change level end
 
-				if(creature) {
+				if(creatureMoving) {
 					const MagicEffectItem* fieldItem = toTile->getFieldItem();
 					
 					if(fieldItem) {
-						fieldItem->getDamage(creature);
+						fieldItem->getDamage(creatureMoving);
 						const MagicEffectTargetCreatureCondition *magicTargetCondition = fieldItem->getCondition();
 						
 						if(magicTargetCondition && ((magicTargetCondition->attackType == ATTACK_FIRE) || 
@@ -2055,19 +2082,30 @@ void Game::teleport(Thing *thing, Position newPos) {
 		return; 
 	//OTSYS_THREAD_LOCK(gameLock)
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
-	Creature *creature;
+	
 	Tile *fromTile = getTile( thing->pos.x, thing->pos.y, thing->pos.z );
 	Tile *toTile = getTile( newPos.x, newPos.y, newPos.z );
 	if(fromTile && toTile) {
 		int osp = fromTile->getThingStackPos(thing);  
-		if (fromTile->removeThing(thing)) { 
+		if (fromTile->removeThing(thing)) {
 			toTile->addThing(thing); 
 			Position oldPos = thing->pos;
 	            
+			Creature *creature = dynamic_cast<Creature*>(thing); 
+			if(creature){
+				// we need to update the direction the player is facing to...
+				// otherwise we are facing some problems in turning into the
+				// direction we were facing before the movement
+				// check y first cuz after a diagonal move we lock to east or west
+				if (newPos.y < oldPos.y) creature->direction = NORTH;
+				if (newPos.y > oldPos.y) creature->direction = SOUTH;
+				if (newPos.x > oldPos.x) creature->direction = EAST;
+				if (newPos.x < oldPos.x) creature->direction = WEST;
+			}
+			
 			std::vector<Creature*> list;
 			getSpectators(Range(oldPos, true), list);
 			for(size_t i = 0; i < list.size(); ++i) {
-				creature = dynamic_cast<Creature*>(thing);
 				if(creature)
 					list[i]->onCreatureDisappear(creature, osp, true);
 				else
@@ -2791,7 +2829,7 @@ void Game::checkPlayerWalk(unsigned long id)
 	flushSendBuffers();
 
 	if(!player->pathlist.empty()) {
-		int ticks = std::max(400, (int)player->getSleepTicks());
+		int ticks = std::max(50, (int)player->getSleepTicks());
 /*
 #ifdef __DEBUG__
 		std::cout << "checkPlayerWalk - " << ticks << std::endl;
@@ -3332,7 +3370,7 @@ void Game::playerAutoWalk(Player* player, std::list<Direction>& path)
   // the interval seems to depend on the speed of the char?
 	//player->eventAutoWalk = addEvent(makeTask<Direction>(0, MovePlayer(player->getID()), path, 400, StopMovePlayer(player->getID())));
 	player->pathlist = path;
-	int ticks = std::max(400, (int)player->getSleepTicks());
+	int ticks = std::max(50, (int)player->getSleepTicks());
 #ifdef __DEBUG__
 		std::cout << "playerAutoWalk - " << ticks << std::endl;
 #endif

@@ -176,8 +176,8 @@ private:
   virtual void sendCreatureSay(const Creature *creature, SpeakClasses type, const std::string &text);
 
   virtual void sendCancel(const char *msg);
-  virtual void sendCancelWalk(const char *msg);
-	virtual void sendCancelAutoWalk(Direction lastdir);
+  virtual void sendCancelWalk();
+	//virtual void sendCancelAutoWalk(Direction lastdir);
   virtual void sendChangeSpeed(const Creature* creature);
   virtual void sendCancelAttacking();
   void sendSetOutfit(const Creature* creature);

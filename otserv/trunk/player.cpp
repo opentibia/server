@@ -1173,7 +1173,7 @@ void Player::sendNetworkMessage(NetworkMessage *msg)
   client->sendNetworkMessage(msg);
 }
 
-void Player::sendCancel(const char *msg)
+void Player::sendCancel(const char *msg) const
 {
   client->sendCancel(msg);
 }
@@ -1191,6 +1191,7 @@ void Player::sendCancelAttacking()
   client->sendCancelAttacking();
 }
 
+/*
 void Player::sendCancelAutoWalking()
 {
 	if(!pathlist.empty()) {
@@ -1199,10 +1200,11 @@ void Player::sendCancelAutoWalking()
 	else
 		client->sendCancelAutoWalk(getDirection());
 }
+*/
 
-void Player::sendCancelWalk(const char *msg)
+void Player::sendCancelWalk() const
 {
-  client->sendCancelWalk(msg);
+  client->sendCancelWalk();
 }
 void Player::sendStats(){
 	//update level and maglevel percents
@@ -1225,16 +1227,20 @@ void Player::sendStats(){
 	
 	client->sendStats();
 }
-void Player::sendTextMessage(MessageClasses mclass, const char* message){
+
+void Player::sendTextMessage(MessageClasses mclass, const char* message) const
+{
 	client->sendTextMessage(mclass,message);
 }
 
 void Player::flushMsg(){
 	client->flushOutputBuffer();
 }
-void Player::sendTextMessage(MessageClasses mclass, const char* message,const Position &pos, unsigned char type){
+void Player::sendTextMessage(MessageClasses mclass, const char* message,const Position &pos, unsigned char type) const
+{
 	client->sendTextMessage(mclass,message,pos,type);
 }
+
 void Player::sendPing(){
 	internal_ping++;
 	if(internal_ping >= 5){ //1 ping each 5 seconds

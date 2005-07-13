@@ -168,13 +168,13 @@ public:
   void sendCancelAttacking();
   void sendChangeSpeed(Creature* creature);
   void sendToChannel(Creature *creature, SpeakClasses type, const std::string &text, unsigned short channelId);
-  virtual void sendCancel(const char *msg);
-  virtual void sendCancelWalk(const char *msg);
-	virtual void sendCancelAutoWalking();
+  virtual void sendCancel(const char *msg) const;
+  virtual void sendCancelWalk() const;
+	//virtual void sendCancelAutoWalking();
   int sendInventory(unsigned char sl_id);
   void sendStats();
-  void sendTextMessage(MessageClasses mclass, const char* message);
-  void sendTextMessage(MessageClasses mclass, const char* message,const Position &pos, unsigned char type);
+  void sendTextMessage(MessageClasses mclass, const char* message) const;
+  void sendTextMessage(MessageClasses mclass, const char* message,const Position &pos, unsigned char type) const;
   void sendPing();
   void sendCloseContainer(unsigned char containerid);
   void sendContainer(unsigned char index, Container *container);
