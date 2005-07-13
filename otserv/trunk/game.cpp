@@ -3445,6 +3445,13 @@ void Game::playerRequestTrade(Player *player, const Position& pos,
 	}
 
 	Item *tradeItem = dynamic_cast<Item*>(getThing(pos, stackpos, player));
+	if(pos.x != 0xFFFF) {
+		if( (abs(player->pos.x - pos.x) > 1) || (abs(player->pos.y - pos.y) > 1) ) {
+			player->sendCancel("To far away...");
+			return;
+		}
+	}
+
 	if(!tradeItem || tradeItem->getID() != itemid) {
 		player->sendCancel("Sorry, not possible.");
 		return;
@@ -4028,12 +4035,6 @@ Thing* Game::getThing(const Position &pos,unsigned char stack, Player* player /*
 	}
 	else //from ground
 	{
-		if(player) {
-			if(std::abs(player->pos.x - pos.x) > 1 || std::abs(player->pos.y - pos.y) > 1 || player->pos.z != pos.z) {
-				return NULL;
-			}
-		}
-
 		Tile *t = getTile(pos.x, pos.y, pos.z);
 		if(!t)
 			return NULL;
