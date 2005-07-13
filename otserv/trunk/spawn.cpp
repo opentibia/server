@@ -372,9 +372,9 @@ bool Spawn::addMonster(std::string name, int x, int y, int spawntime)
 {
 	Position tmpPos(centerPos.x + x, centerPos.y, centerPos.z);
 	if(!isInSpawnRange(tmpPos)) {
-#ifdef __DEBUG__
+// #ifdef __DEBUG__
 		std::cout << "Monster is outside the spawn-area!" << std::endl;
-#endif
+// #endif
 		return false;
 	}
 

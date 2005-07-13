@@ -19,8 +19,12 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "iomapbin.h"
+#include "spawn.h"
 
 #include <iostream>
+#include <stdlib.h>
+
+extern Game g_game;
 
 bool IOMapBin::loadMap(Map* map, std::string identifier){
   fh = fopen(identifier.c_str() ,"rb"); 
@@ -117,7 +121,7 @@ void IOMapBin::loadJXB3(Map* map){
 
 void IOMapBin::loadOTM(Map* map){
   std::cout << ":: File type detected: OpenTibia Map (OTM)" << std::endl;
-  int i, j, op, len, width, height, tmp, itemcount;
+  int cx, cy, i, j, op, len, width, height, tmp, itemcount, count, total;
   do {
     op = fgetc(fh);
     switch(op) {
@@ -148,7 +152,7 @@ void IOMapBin::loadOTM(Map* map){
            fgetc(fh);            // Radius
            break; 
       case 0x40:
-           int ax, ay, az, id, gid, count; 
+           int ax, ay, az, id, gid; 
            Tile *t;
            while (true) {
              ax = fgetc(fh);
@@ -204,32 +208,55 @@ void IOMapBin::loadOTM(Map* map){
            }
            break; 
       case 0x50:
-//           SpawnManager::initialize(&g_game);
-           // TODO: load the spawns
+           SpawnManager::initialize(&g_game);
+           total = 0;
            
            int num = fgetc(fh);
            num += fgetc(fh) << 8;
            
            Position pos;
-           int radius;
+           int radius, len;
+           long int secs;
+           std::string cname;
 
            for (i = 0; i < num; num--) {
-             int len = fgetc(fh);
-             std::string cname = "";
-             for (j = 0; j < len; len --) {
-               fgetc(fh); // get the creature name
-             }
+             len = fgetc(fh);
+             cname = "";
 
-             fgetc(fh); fgetc(fh); // X
-             fgetc(fh); fgetc(fh); // Y
-             fgetc(fh);            // Z
-             fgetc(fh);            // Radius
-             fgetc(fh);            // Count of creatures in this spawn
-             fgetc(fh); fgetc(fh); // Time to respawn
-             fgetc(fh);            // 1 = check for players near, 0 = dont check
+             for (j = 0; j < len; len --) {
+               cname.push_back(fgetc(fh)); // get the creature name
+             }
+             std::cout << cname.c_str() << std::endl;
+
+             pos.x = fgetc(fh); 
+             pos.x += fgetc(fh) << 8;
+             pos.y = fgetc(fh); 
+             pos.y += fgetc(fh) << 8;
+             pos.z = fgetc(fh); 
+             radius = fgetc(fh) + 1;
+             
+             count = fgetc(fh);
+             total += count;
+             secs = fgetc(fh);
+             secs += fgetc(fh) << 8; 
+             
+             Spawn *spawn = new Spawn(&g_game, pos, radius);
+             SpawnManager::instance()->spawns.push_back(spawn);
+             
+             for (j = 0; j < count; count--){
+               cx = (rand() % (radius * 2)) - radius;
+               cy = (rand() % (radius * 2)) - radius;
+               
+               spawn->addMonster(cname, cx, cy, secs * 1000);
+             }
+             
+             // the checker is not needed on the CVS, since
+             // it checks automatically if creatures are near
+             fgetc(fh); // 1 = check for players near, 0 = dont check
            }
            
-//           SpawnManager::instance()->startup();
+           std::cout << ":: Creatures loaded in spawns: " << total << std::endl;
+           SpawnManager::instance()->startup();
            break; 
     }  
   } while (!feof(fh) || op == 0xF0 );

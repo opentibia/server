@@ -321,6 +321,11 @@ int main(int argc, char *argv[])
 	sigaction(SIGPIPE, &sigh, NULL);
 #endif
 	
+	// random numbers generator
+	std::cout << ":: Initializing the random numbers... ";
+	srand ( time(NULL) );
+	std::cout << "[done]" << std::endl;
+	
 	// read global config
 	std::cout << ":: Loading lua script config.lua... ";
 	if (!g_config.OpenFile("config.lua"))
