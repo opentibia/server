@@ -8,7 +8,7 @@ datadir = "data/"
 
 -- mapfile
 -- sets what map to load
-mapfile = "data/world/map.xml"
+mapfile = "data/world/map.otx"
 
 -- loginmsg
 -- the message the player gets when he logs in
@@ -17,7 +17,6 @@ loginmsg = "Welcome to OTServ. For help visit tibia.de/forum"
 -- port
 -- the port otserv listens on
 port = "7171"
-
 
 -- servername
 -- name of our server
