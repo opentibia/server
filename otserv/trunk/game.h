@@ -214,6 +214,7 @@ public:
 	void playerRequestTrade(Player *player, const Position& pos,
 		const unsigned char stackpos, const unsigned short itemid, unsigned long playerid);
 	void playerAcceptTrade(Player* player);
+	void playerLookInTrade(Player* player, bool lookAtCounterOffer, int index);
 	void playerCloseTrade(Player* player);
 
   void changeOutfitAfter(unsigned long id, int looktype, long time);
@@ -252,6 +253,8 @@ public:
   bool shutdown;
 
 protected:
+	std::vector<Item*> tradeItems; //list of items that are in trading state
+
 	bool onPrepareMoveThing(Creature *player, const Thing* thing, const Position& fromPos, const Position& toPos);
 	bool onPrepareMoveThing(Creature *player, const Thing* thing, const Tile *fromTile, const Tile *toTile);
 	bool onPrepareMoveThing(Creature *player, const Item* fromItem, const Container *fromContainer, const Container *toContainer, const Item* toItem);

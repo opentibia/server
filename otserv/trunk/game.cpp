@@ -544,12 +544,15 @@ unsigned long Game::addEvent(SchedulerTask* event) {
 
 	eventIdMap[event->getEventId()] = event;
 	
-	eventList.push(event);
-
-	///*
 	if (eventList.empty() ||  *event < *eventList.top())
     do_signal = true;
-	//*/
+
+	eventList.push(event);
+
+	/*
+	if (eventList.empty() ||  *event < *eventList.top())
+    do_signal = true;
+	*/
 
   OTSYS_THREAD_UNLOCK(eventLock)
 
@@ -565,7 +568,7 @@ bool Game::stopEvent(unsigned long eventid) {
 	if(eventid == 0)
 		return false;
 
-  OTSYS_THREAD_LOCK_CLASS lockClass(eventLock);
+  OTSYS_THREAD_LOCK(eventLock)
 
 	std::map<unsigned long, SchedulerTask*>::iterator it = eventIdMap.find(eventIdCount);
 	if(it != eventIdMap.end()) {
@@ -576,9 +579,12 @@ bool Game::stopEvent(unsigned long eventid) {
 
 		//it->second->setEventId(0); //invalidate the event
 		eventIdMap.erase(it);
+
+	  OTSYS_THREAD_UNLOCK(eventLock)
 		return true;
 	}
 
+  OTSYS_THREAD_UNLOCK(eventLock)
 	return false;
 }
 
@@ -680,6 +686,10 @@ bool Game::removeCreature(Creature* c)
 		Player* player = dynamic_cast<Player*>(c);
 		if (player)
 		{
+			if(player->tradePartner != 0) {
+				playerCloseTrade(player);
+			}
+
 			// Removing the player from the map of channel users
 			std::map<long, Creature*>::iterator sit = channel.find(player->getID());
 			if( sit != channel.end() )
@@ -2781,7 +2791,7 @@ void Game::checkPlayerWalk(unsigned long id)
 	flushSendBuffers();
 
 	if(!player->pathlist.empty()) {
-		int ticks = std::max(0, (int)player->getSleepTicks());
+		int ticks = std::max(400, (int)player->getSleepTicks());
 /*
 #ifdef __DEBUG__
 		std::cout << "checkPlayerWalk - " << ticks << std::endl;
@@ -3322,10 +3332,11 @@ void Game::playerAutoWalk(Player* player, std::list<Direction>& path)
   // the interval seems to depend on the speed of the char?
 	//player->eventAutoWalk = addEvent(makeTask<Direction>(0, MovePlayer(player->getID()), path, 400, StopMovePlayer(player->getID())));
 	player->pathlist = path;
-	int ticks = std::max(0, (int)player->getSleepTicks());
+	int ticks = std::max(400, (int)player->getSleepTicks());
 #ifdef __DEBUG__
 		std::cout << "playerAutoWalk - " << ticks << std::endl;
 #endif
+
 	player->eventAutoWalk = addEvent(makeTask(ticks, std::bind2nd(std::mem_fun(&Game::checkPlayerWalk), player->getID())));
 }
 
@@ -3401,6 +3412,12 @@ void Game::playerRequestTrade(Player *player, const Position& pos,
 		return;
 	}
 
+	if (std::find(tradeItems.begin(), tradeItems.end(), tradeItem) != tradeItems.end()){
+		player->sendTextMessage(MSG_INFO, "This item is already beeing traded.");
+		//player->sendCancel("Sorry, not possible.");
+		return;
+	}
+
 	if (player->tradePartner != 0 && tradePartner->tradePartner != player->getID()){
 		player->sendTextMessage(MSG_INFO, "This player is already trading.");
 		return;
@@ -3414,6 +3431,7 @@ void Game::playerRequestTrade(Player *player, const Position& pos,
 
 	player->tradePartner = playerid;
 	player->tradeItem = tradeItem;
+	tradeItems.push_back(tradeItem);
 
 	player->sendTradeItemRequest(player, tradeItem, true);
 
@@ -3439,6 +3457,15 @@ void Game::playerAcceptTrade(Player* player)
 		Item *tradeItem1 = player->tradeItem;
 		Item *tradeItem2 = tradePartner->tradeItem;
 
+		std::vector<Item*>::iterator it;
+		if((it = std::find(tradeItems.begin(), tradeItems.end(), tradeItem1)) != tradeItems.end()) {
+			tradeItems.erase(it);
+		}
+
+		if((it = std::find(tradeItems.begin(), tradeItems.end(), tradeItem2)) != tradeItems.end()) {
+			tradeItems.erase(it);
+		}
+
 		/*
 		tradeItem1->useThing();
 		this->removeThing(player, tradeItem1->pos, tradeItem1);
@@ -3463,17 +3490,91 @@ void Game::playerAcceptTrade(Player* player)
 	}
 }
 
+void Game::playerLookInTrade(Player* player, bool lookAtCounterOffer, int index)
+{
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
+
+	Player *tradePartner = dynamic_cast<Player*>(getCreatureByID(player->tradePartner));
+	Item *tradeItem = NULL;
+
+	if(lookAtCounterOffer)
+		tradeItem = tradePartner->getTradeItem();
+	else
+		tradeItem = player->getTradeItem();
+
+	if(index == 0) {
+		player->sendTextMessage(MSG_INFO, tradeItem->getDescription().c_str());
+		return;
+	}
+
+	Container *tradeContainer = dynamic_cast<Container*>(tradeItem);
+	if(!tradeContainer || index > tradeContainer->getItemHoldingCount())
+		return;
+
+	bool foundItem = false;
+	std::list<const Container*> stack;
+	for (ContainerList::const_iterator it = tradeContainer->getItems(); it != tradeContainer->getEnd(); ++it) {
+		Container *container = dynamic_cast<Container*>(*it);
+		if(container) {
+			stack.push_back(container);
+		}
+
+		--index;
+		if(index == 0) {
+			tradeItem = *it;
+			foundItem = true;
+			break;
+		}
+	}
+	
+	while(!foundItem && stack.size() > 0) {
+		const Container *container = stack.front();
+		stack.pop_front();
+
+		for (ContainerList::const_iterator it = container->getItems(); it != container->getEnd(); ++it) {
+			Container *container = dynamic_cast<Container*>(*it);
+			if(container) {
+				stack.push_back(container);
+			}
+
+			--index;
+			if(index == 0) {
+				tradeItem = *it;
+				foundItem = true;
+				break;
+			}
+		}
+	}
+	
+	if(foundItem) {
+		player->sendTextMessage(MSG_INFO, tradeItem->getDescription().c_str());
+	}
+}
+
 void Game::playerCloseTrade(Player* player)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
 	
 	Player *tradePartner = dynamic_cast<Player*>(getCreatureByID(player->tradePartner));
 
+	std::vector<Item*>::iterator it;
+	if(player->getTradeItem()) {
+		if((it = std::find(tradeItems.begin(), tradeItems.end(), player->getTradeItem())) != tradeItems.end()) {
+			tradeItems.erase(it);
+		}
+	}
+
 	player->setAcceptTrade(false);
 	player->sendTextMessage(MSG_SMALLINFO, "Trade cancelled.");
 	player->sendCloseTrade();
 
 	if(tradePartner) {
+		if(tradePartner->getTradeItem()) {
+			if((it = std::find(tradeItems.begin(), tradeItems.end(), tradePartner->getTradeItem())) != tradeItems.end()) {
+				tradeItems.erase(it);
+			}
+		}
+
 		tradePartner->setAcceptTrade(false);
 		tradePartner->sendTextMessage(MSG_SMALLINFO, "Trade cancelled.");
 		tradePartner->sendCloseTrade();

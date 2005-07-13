@@ -46,7 +46,9 @@ typedef unsigned char uint8_t;
 #undef MAX
 #endif
 
+#ifndef NOMINMAX
 #define NOMINMAX
+#endif
 
 #else
 

@@ -67,6 +67,10 @@ private:
 	void parseMoveEast(NetworkMessage &msg);
 	void parseMoveSouth(NetworkMessage &msg);
 	void parseMoveWest(NetworkMessage &msg);
+	void parseMoveNorthEast(NetworkMessage &msg);
+	void parseMoveSouthEast(NetworkMessage &msg);
+	void parseMoveSouthWest(NetworkMessage &msg);
+	void parseMoveNorthWest(NetworkMessage &msg);
   
 	void parseTurnNorth(NetworkMessage &msg);
 	void parseTurnEast(NetworkMessage &msg);
@@ -90,6 +94,7 @@ private:
 	void parseTextWindow(NetworkMessage &msg);
 
 	void parseRequestTrade(NetworkMessage &msg);
+	void parseLookInTrade(NetworkMessage &msg);
 	void parseAcceptTrade(NetworkMessage &msg);
 	void parseCloseTrade();
 
@@ -193,6 +198,7 @@ private:
 	virtual void sendContainer(unsigned char index, Container *container);
 	virtual void sendTradeItemRequest(const Player* player, const Item* item, bool ack);
 	virtual void sendCloseTrade();
+
 	virtual void sendCloseContainer(unsigned char containerid);
 	void sendItemAddContainer(const Container *container, const Item *item);
 	void sendItemRemoveContainer(const Container* container,const unsigned char slot);

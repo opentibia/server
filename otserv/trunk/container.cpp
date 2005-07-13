@@ -172,8 +172,8 @@ long Container::getItemHoldingCount() const
 		if(container) {
 			stack.push_back(container);
 		}
-		else
-			++holdcount;
+
+		++holdcount;
 	}
 	
 	while(stack.size() > 0) {

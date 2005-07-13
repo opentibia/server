@@ -126,7 +126,7 @@ void Protocol74::parsePacket(NetworkMessage &msg)
       parseLogout(msg);
       break;
 
-    case 0x64: // client moving with steps
+		case 0x64: // client moving with steps
   	  parseMoveByMouse(msg);
       break;
 
@@ -146,11 +146,31 @@ void Protocol74::parsePacket(NetworkMessage &msg)
       parseMoveWest(msg);
       break;
 
-    case 0x6F: // turn north
+    case 0x6A:
+			parseMoveNorthEast(msg);
+      //this->game->thingMove(player, player, (player->pos.x+1), (player->pos.y-1), player->pos.z, 1);   
+      break;
+
+    case 0x6B:
+			parseMoveSouthEast(msg);
+      //this->game->thingMove(player, player, (player->pos.x+1), (player->pos.y+1), player->pos.z, 1);   
+      break;
+
+    case 0x6C:
+			parseMoveSouthWest(msg);
+      //this->game->thingMove(player, player, (player->pos.x-1), (player->pos.y+1), player->pos.z, 1);   
+      break;
+
+    case 0x6D:
+			parseMoveNorthWest(msg);
+      //this->game->thingMove(player, player, (player->pos.x-1), (player->pos.y-1), player->pos.z, 1);   
+      break;
+
+		case 0x6F: // turn north
 			parseTurnNorth(msg);
       break;
 
-    case 0x70: // turn east
+		case 0x70: // turn east
       parseTurnEast(msg);
       break;
 
@@ -166,13 +186,17 @@ void Protocol74::parsePacket(NetworkMessage &msg)
 			parseRequestTrade(msg);
 			break;
 
+		case 0x7E: // Look at an item in trade
+			parseLookInTrade(msg);
+			break;
+
 		case 0x7F: // Accept trade
 			parseAcceptTrade(msg);
 			break;
-
+		
 		case 0x80: // Close/cancel trade
 			parseCloseTrade();
-			break; 
+			break;
 
     case 0x78: // throw item
 			parseThrow(msg);
@@ -259,22 +283,6 @@ void Protocol74::parsePacket(NetworkMessage &msg)
 
     case 0xC9: // change position
       // update position   
-      break;
-
-    case 0x6a:
-      this->game->thingMove(player, player, (player->pos.x+1), (player->pos.y-1), player->pos.z, 1);   
-      break;
-
-    case 0x6b:
-      this->game->thingMove(player, player, (player->pos.x+1), (player->pos.y+1), player->pos.z, 1);   
-      break;
-
-    case 0x6c:
-      this->game->thingMove(player, player, (player->pos.x-1), (player->pos.y+1), player->pos.z, 1);   
-      break;
-
-    case 0x6d:
-      this->game->thingMove(player, player, (player->pos.x-1), (player->pos.y-1), player->pos.z, 1);   
       break;
 
     default:
@@ -574,7 +582,6 @@ void Protocol74::parseMoveNorth(NetworkMessage &msg)
 {
 	if(game->stopEvent(player->eventAutoWalk)) {
 		player->sendCancelAutoWalking();
-		//sendCancelWalk("");
 	}
 
 	this->sleepTillMove();
@@ -587,7 +594,6 @@ void Protocol74::parseMoveEast(NetworkMessage &msg)
 {
 	if(game->stopEvent(player->eventAutoWalk)) {
 		player->sendCancelAutoWalking();
-		//sendCancelWalk("");
 	}
 
 	this->sleepTillMove();
@@ -601,7 +607,6 @@ void Protocol74::parseMoveSouth(NetworkMessage &msg)
 {
 	if(game->stopEvent(player->eventAutoWalk)) {
 		player->sendCancelAutoWalking();
-		//sendCancelWalk("");
 	}
 
 	this->sleepTillMove();
@@ -615,13 +620,60 @@ void Protocol74::parseMoveWest(NetworkMessage &msg)
 {
 	if(game->stopEvent(player->eventAutoWalk)) {
 		player->sendCancelAutoWalking();
-		//sendCancelWalk("");
 	}
 
 	this->sleepTillMove();
 
 	game->thingMove(player, player,
 		player->pos.x-1, player->pos.y, player->pos.z, 1);
+}
+
+void Protocol74::parseMoveNorthEast(NetworkMessage &msg)
+{
+	if(game->stopEvent(player->eventAutoWalk)) {
+		player->sendCancelAutoWalking();
+	}
+
+	this->sleepTillMove();
+
+	game->thingMove(player, player,
+		(player->pos.x+1), (player->pos.y-1), player->pos.z, 1);
+}
+
+void Protocol74::parseMoveSouthEast(NetworkMessage &msg)
+{
+	if(game->stopEvent(player->eventAutoWalk)) {
+		player->sendCancelAutoWalking();
+	}
+
+	this->sleepTillMove();
+
+	game->thingMove(player, player,
+		(player->pos.x+1), (player->pos.y+1), player->pos.z, 1);
+}
+
+void Protocol74::parseMoveSouthWest(NetworkMessage &msg)
+{
+	if(game->stopEvent(player->eventAutoWalk)) {
+		player->sendCancelAutoWalking();
+	}
+
+	this->sleepTillMove();
+
+	game->thingMove(player, player,
+		(player->pos.x-1), (player->pos.y+1), player->pos.z, 1);
+}
+
+void Protocol74::parseMoveNorthWest(NetworkMessage &msg)
+{
+	if(game->stopEvent(player->eventAutoWalk)) {
+		player->sendCancelAutoWalking();
+	}
+
+	this->sleepTillMove();
+
+	game->thingMove(player, player,
+		(player->pos.x-1), (player->pos.y-1), player->pos.z, 1);   
 }
 
 
@@ -844,8 +896,8 @@ void Protocol74::sendTradeItemRequest(const Player* player, const Item* item, bo
 			if(container) {
 				stack.push_back(container);
 			}
-			else
-				itemstack.push_back(*it);
+			
+			itemstack.push_back(*it);
 		}
 		
 		while(stack.size() > 0) {
@@ -1172,6 +1224,14 @@ void Protocol74::parseAcceptTrade(NetworkMessage &msg)
 	game->playerAcceptTrade(player);
 }
 
+void Protocol74::parseLookInTrade(NetworkMessage &msg)
+{
+	bool counterOffer = msg.GetByte();
+	int index = msg.GetByte();
+	
+	game->playerLookInTrade(player, counterOffer, index);
+}
+
 void Protocol74::parseCloseTrade()
 {
 	game->playerCloseTrade(player);
@@ -1362,6 +1422,23 @@ void Protocol74::sendTileUpdated(const Position &pos)
 void Protocol74::sendThingMove(const Creature *creature, const Container *fromContainer, unsigned char from_slotid,
 	const Item* fromItem, int oldFromCount, Container *toContainer, unsigned char to_slotid, const Item *toItem, int oldToCount, int count)
 {
+	//Auto-close trade
+	if(player->getTradeItem()) {
+		if(player->getTradeItem() && (fromItem == player->getTradeItem() || toItem == player->getTradeItem())) {
+			game->playerCloseTrade(player);
+		}
+		else {
+			const Container *tradeContainer = dynamic_cast<const Container*>(player->getTradeItem());
+			while(tradeContainer != NULL) {
+				if(toContainer == tradeContainer || fromContainer == tradeContainer) {
+					game->playerCloseTrade(player);
+					break;
+				}
+				tradeContainer = tradeContainer->getParent();
+			}
+		}
+	}
+
 	NetworkMessage msg;
 
 	if(fromContainer && fromContainer->pos.x != 0xFFFF && toContainer->pos.x != 0xFFFF) {
@@ -1466,6 +1543,23 @@ void Protocol74::sendThingMove(const Creature *creature, const Container *fromCo
 void Protocol74::sendThingMove(const Creature *creature, slots_t fromSlot, const Item* fromItem,
 	int oldFromCount, const Container *toContainer, unsigned char to_slotid, const Item *toItem, int oldToCount, int count)
 {
+	//Auto-close trade
+	if(player->getTradeItem()) {
+		if(player->getTradeItem() && (fromItem == player->getTradeItem() || toItem == player->getTradeItem())) {
+			game->playerCloseTrade(player);
+		}
+		else {
+			const Container *tradeContainer = dynamic_cast<const Container*>(player->getTradeItem());
+			while(tradeContainer != NULL) {
+				if(toContainer == tradeContainer) {
+					game->playerCloseTrade(player);
+					break;
+				}
+				tradeContainer = tradeContainer->getParent();
+			}
+		}
+	}
+
 	NetworkMessage msg;
 
 	Container *container = NULL;
@@ -1522,8 +1616,12 @@ void Protocol74::sendThingMove(const Creature *creature, slots_t fromSlot, const
 	int oldFromCount, slots_t toSlot, const Item* toItem, int oldToCount, int count)
 {
 	NetworkMessage msg;
-
 	if(creature == player) {
+		//Auto-close trade
+		if(player->getTradeItem() && (fromItem == player->getTradeItem() || toItem == player->getTradeItem())) {
+			game->playerCloseTrade(player);
+		}
+
 		AddPlayerInventoryItem(msg, player, fromSlot);
 		AddPlayerInventoryItem(msg, player, toSlot);
 	}
@@ -1535,6 +1633,23 @@ void Protocol74::sendThingMove(const Creature *creature, slots_t fromSlot, const
 void Protocol74::sendThingMove(const Creature *creature, const Container *fromContainer,
 	unsigned char from_slotid, const Item* fromItem, int oldFromCount, slots_t toSlot, const Item *toItem, int oldToCount, int count)
 {
+	//Auto-close trade
+	if(player->getTradeItem()) {
+		if(player->getTradeItem() && (fromItem == player->getTradeItem() || toItem == player->getTradeItem())) {
+			game->playerCloseTrade(player);
+		}
+		else {
+			const Container *tradeContainer = dynamic_cast<const Container*>(player->getTradeItem());
+			while(tradeContainer != NULL) {
+				if(fromContainer == tradeContainer) {
+					game->playerCloseTrade(player);
+					break;
+				}
+				tradeContainer = tradeContainer->getParent();
+			}
+		}
+	}
+
 	NetworkMessage msg;
 
 	Container *container = NULL;
@@ -1583,8 +1698,24 @@ void Protocol74::sendThingMove(const Creature *creature, const Container *fromCo
 void Protocol74::sendThingMove(const Creature *creature, const Container *fromContainer, unsigned char from_slotid,
 	const Item* fromItem, int oldFromCount, const Position &toPos, const Item *toItem, int oldToCount, int count)
 {
-	NetworkMessage msg;
+	//Auto-close trade
+	if(player->getTradeItem()) {
+		if(player->getTradeItem() && (fromItem == player->getTradeItem() || toItem == player->getTradeItem())) {
+			game->playerCloseTrade(player);
+		}
+		else {
+			const Container *tradeContainer = dynamic_cast<const Container*>(player->getTradeItem());
+			while(tradeContainer != NULL) {
+				if(fromContainer == tradeContainer) {
+					game->playerCloseTrade(player);
+					break;
+				}
+				tradeContainer = tradeContainer->getParent();
+			}
+		}
+	}
 
+	NetworkMessage msg;
 	bool updateContainerArrow = false;
 
 	//Update up-arrow
@@ -1649,6 +1780,11 @@ void Protocol74::sendThingMove(const Creature *creature, const Container *fromCo
 void Protocol74::sendThingMove(const Creature *creature, slots_t fromSlot,
 	const Item* fromItem, int oldFromCount, const Position &toPos, const Item *toItem, int oldToCount, int count)
 {
+	//Auto-close trade
+	if(player->getTradeItem() && (fromItem == player->getTradeItem() || toItem == player->getTradeItem())) {
+		game->playerCloseTrade(player);
+	}
+
 	NetworkMessage msg;
 
 	if(creature == player) {
@@ -1689,8 +1825,24 @@ void Protocol74::sendThingMove(const Creature *creature, slots_t fromSlot,
 void Protocol74::sendThingMove(const Creature *creature, const Position &fromPos, int stackpos, const Item* fromItem,
 	int oldFromCount, const Container *toContainer, unsigned char to_slotid, const Item *toItem, int oldToCount, int count)
 {
-	NetworkMessage msg;
+	//Auto-close trade
+	if(player->getTradeItem()) {
+		if(player->getTradeItem() && (fromItem == player->getTradeItem() || toItem == player->getTradeItem())) {
+			game->playerCloseTrade(player);
+		}
+		else {
+			const Container *tradeContainer = dynamic_cast<const Container*>(player->getTradeItem());
+			while(tradeContainer != NULL) {
+				if(toContainer == tradeContainer) {
+					game->playerCloseTrade(player);
+					break;
+				}
+				tradeContainer = tradeContainer->getParent();
+			}
+		}
+	}
 
+	NetworkMessage msg;
 	bool updateContainerArrow = false;
 
 	//Update up-arrow
@@ -1765,7 +1917,13 @@ void Protocol74::sendThingMove(const Creature *creature, const Position &fromPos
 void Protocol74::sendThingMove(const Creature *creature, const Position &fromPos, int stackpos, const Item* fromItem,
 	int oldFromCount, slots_t toSlot, const Item *toItem, int oldToCount, int count)
 {
+	//Auto-close trade
+	if(player->getTradeItem() && (fromItem == player->getTradeItem() || toItem == player->getTradeItem())) {
+		game->playerCloseTrade(player);
+	}
+
 	NetworkMessage msg;
+
 	if(creature == player) {
 		AddPlayerInventoryItem(msg, player, toSlot);
 	}
@@ -1821,37 +1979,51 @@ void Protocol74::sendThingMove(const Creature *creature, const Thing *thing,
   {
     if (!tele && CanSee(oldPos->x, oldPos->y, oldPos->z))
     {
-		AddRemoveThing(msg,*oldPos,oldStackPos);      
+			AddRemoveThing(msg,*oldPos,oldStackPos);      
     }
 
     if (!(tele && thing == this->player) && CanSee(thing->pos.x, thing->pos.y, thing->pos.z))
     {
-		AddAppearThing(msg,thing->pos);      
+			AddAppearThing(msg,thing->pos);      
       if (c) {
         bool known;
         unsigned long removedKnown;
         checkCreatureAsKnown(((Creature*)thing)->getID(), known, removedKnown);
   			AddCreature(msg,(Creature*)thing, known, removedKnown);
-      }
-	  else {
-        	msg.AddItem((Item*)thing);
-			//Auto-close container's				
-			if(std::abs(player->pos.x - thing->pos.x) > 1 || std::abs(player->pos.y - thing->pos.y) > 1 || player->pos.z != thing->pos.z ) {
-				const Container *container = dynamic_cast<const Container*>(thing);
-				if(container) {						
-					autoCloseContainers(container, msg);						
-				}					
+			}
+			else {
+				msg.AddItem((Item*)thing);
+				
+				//Auto-close trade
+				if(player->getTradeItem() && dynamic_cast<const Item*>(thing) == player->getTradeItem()) {
+					game->playerCloseTrade(player);
+				}
+
+				//Auto-close container's
+				if(std::abs(player->pos.x - thing->pos.x) > 1 || std::abs(player->pos.y - thing->pos.y) > 1 || player->pos.z != thing->pos.z ) {
+					const Container *container = dynamic_cast<const Container*>(thing);
+					if(container) {						
+						autoCloseContainers(container, msg);						
+					}					
+				}
 			}
 		}
-    }
   }
 	
   if (thing == this->player) {
+		//Auto-close trade
+		Item *tradeItem = player->getTradeItem();
+		if(tradeItem && tradeItem->pos.x != 0xFFFF) {
+			if(std::abs(player->pos.x - tradeItem->pos.x) > 1 || std::abs(player->pos.y - tradeItem->pos.y) > 1 || player->pos.z != tradeItem->pos.z) {
+				game->playerCloseTrade(player);
+			}
+		}
+
     if(tele){
-             msg.AddByte(0x64); 
-             msg.AddPosition(player->pos); 
-             GetMapDescription(player->pos.x-8, player->pos.y-6, player->pos.z, 18, 14, msg); 
-             }  
+			msg.AddByte(0x64); 
+			msg.AddPosition(player->pos); 
+			GetMapDescription(player->pos.x-8, player->pos.y-6, player->pos.z, 18, 14, msg); 
+		}
     else{               
 			if (oldPos->y > thing->pos.y) { // north, for old x
 				msg.AddByte(0x65);
@@ -1891,21 +2063,6 @@ void Protocol74::sendThingMove(const Creature *creature, const Thing *thing,
 		}
   }	
 
-	/*
-	Tile *fromTile = game->getTile(oldPos->x, oldPos->y, oldPos->z);
-	if(fromTile && fromTile->getThingCount() > 8) {
-#ifdef __DEBUG__
-		std::cout << "Pop-up item from below..." << std::endl;
-#endif
-		//We need to pop up this item
-		Thing *newthing = fromTile->getThingByStackPos(9);
-
-		if(newthing != NULL) {
-			AddTileUpdated(msg, *oldPos);
-		}
-	}
-	*/
-
 	WriteBuffer(msg);
 }
 
@@ -1913,24 +2070,11 @@ void Protocol74::sendThingMove(const Creature *creature, const Thing *thing,
 //close container and its child containers
 void Protocol74::autoCloseContainers(const Container *container, NetworkMessage &msg)
 {
-	/*
-	if(container == player->getTradeItem()) {
-		game->playerCloseTrade(player);
-	}
-	*/
-
 	std::vector<unsigned char> containerlist;
 	for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
 		Container *tmpcontainer = cit->second;
 		while(tmpcontainer != NULL) {
 			if(tmpcontainer == container) {
-
-				/*
-				if(container == player->getTradeItem()) {
-					game->playerCloseTrade(player);
-				}
-				*/
-
 				containerlist.push_back(cit->first);
 				break;
 			}
@@ -2021,6 +2165,11 @@ void Protocol74::sendCancelWalk(const char *msg)
 
 void Protocol74::sendThingDisappear(const Thing *thing, unsigned char stackPos, bool tele)
 {
+	//Auto-close trade
+	if(player->getTradeItem() && dynamic_cast<const Item*>(thing) == player->getTradeItem()) {
+		game->playerCloseTrade(player);
+	}
+
 	NetworkMessage msg;
 	const Creature* creature = dynamic_cast<const Creature*>(thing);
 	if(!tele) {		
@@ -2189,6 +2338,11 @@ void Protocol74::sendPing()
 }
 
 void Protocol74::sendThingRemove(const Thing *thing){
+	//Auto-close trade
+	if(player->getTradeItem() && dynamic_cast<const Item*>(thing) == player->getTradeItem()) {
+		game->playerCloseTrade(player);
+	}
+
 	NetworkMessage msg;
 	const Container *container = dynamic_cast<const Container *>(thing);
 	if(container) {
@@ -2228,7 +2382,7 @@ void Protocol74::sendItemAddContainer(const Container *container, const Item *it
 	}
 }
 
-void Protocol74::sendItemRemoveContainer(const Container *container, const unsigned char slot){
+void Protocol74::sendItemRemoveContainer(const Container *container, const unsigned char slot)   {
 	NetworkMessage msg;
 	unsigned char cid = player->getContainerID(container);
 	if(cid != 0xFF){
