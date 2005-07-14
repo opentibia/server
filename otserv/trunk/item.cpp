@@ -129,7 +129,6 @@ Item::Item(const unsigned short _type) {
 	fluid = 0;
 	actionId = 0;
 	uniqueId = 0;
-	isRemoved = true;
 	throwRange = 6;
 	useCount = 0;
 	isDecaying  = 0;
@@ -226,7 +225,6 @@ Item::Item(const unsigned short _type, unsigned short _count) {
 	actionId = 0;
 	uniqueId = 0;
 	useCount = 0;
-	isRemoved = true;
 	isDecaying  = 0;
 	specialDescription = NULL;
 	text = NULL;
@@ -261,7 +259,6 @@ Item::Item()
 	isDecaying  = 0;
 	actionId = 0;
 	uniqueId = 0;
-	isRemoved = true;
 	specialDescription = NULL;
 	text = NULL;
 }

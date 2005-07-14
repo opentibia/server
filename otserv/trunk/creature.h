@@ -105,16 +105,17 @@ public:
 // Defines the Base class for all creatures and base functions which 
 // every creature has
 
-class Creature : public AutoList<Creature>, public Thing
+class Creature : public AutoID, public Thing
 {
 public:
-  Creature(const char *name, unsigned long _id);
+  Creature(const char *name);
   virtual ~Creature();
 
   virtual const std::string& getName() const {return name; };
 
-  //void setID(int id){this->id=id;}
-  unsigned long getID() const { return listid; }
+  void setID(){this->id = auto_id | this->idRange();}
+  virtual unsigned long idRange() = 0;
+  unsigned long getID() const { return id; }
   unsigned long getExpForLv(const int& lv) const { 
 		return (int)((50*lv*lv*lv)/3 - 100 * lv * lv + (850*lv) / 3 - 200);
 	}
@@ -219,7 +220,9 @@ public:
   int maglevel;	// magic level
   int level;		// level
   int speed;
-
+  unsigned long eventCheck;
+  unsigned long eventCheckAttacking;
+ 
   Direction direction;
 
   virtual bool canMovedTo(const Tile *tile) const;
@@ -302,6 +305,7 @@ protected:
 	friend class GameState;
 
 //  Direction direction; // moved to public
+  unsigned long id;
   std::string name;
 };
 

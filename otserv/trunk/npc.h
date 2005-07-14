@@ -67,26 +67,25 @@ protected:
 	bool loaded;
 };
 
-class Npc : protected AutoID<Npc>, public AutoList<Npc>, public Creature
+class Npc : public Creature
 {
 public:
   Npc(const char *name, Game* game);
   virtual ~Npc();
 	virtual void useThing() {
-		//std::cout << "Npc: useThing() " << (int)this << std::endl;
+		//std::cout << "Npc: useThing() " << this << std::endl;
 		useCount++;
 	};
 	
 	virtual void releaseThing() {
-		//std::cout << "Npc: releaseThing() " << (int)this << std::endl;
+		//std::cout << "Npc: releaseThing() " << this << std::endl;
 		useCount--;
 		if (useCount == 0)
 			delete this;
 	};
 
-	static const unsigned long min_id = 10000U;
-	static const unsigned long max_id = 65536U;
-
+	virtual unsigned long idRange(){ return 0x30000000;}
+	
   void speak(const std::string &text){};
   const std::string& getName() const {return name;};
   fight_t getFightType(){return fighttype;};

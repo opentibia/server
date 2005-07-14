@@ -6,6 +6,7 @@
 Thing::Thing()
 {
   throwRange = 1;
+  isRemoved = true;
 }
 
 

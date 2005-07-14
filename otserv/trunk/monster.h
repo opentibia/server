@@ -107,28 +107,28 @@ public:
 	int maxWeapondamage;
 };
 
-class Monster : protected AutoID<Monster>, public AutoList<Monster>, public Creature
+class Monster : public Creature
 {
 public:
   Monster(const char *name, Game* game);
   virtual ~Monster();
 	//const Monster& operator=(const Monster& rhs);
-
+	//virtual unsigned long idRange(){ return 0x40000000;}
+	// use range 0x10000000 to able use runes on monsters
+	virtual unsigned long idRange(){ return 0x10000000;}
 	virtual void useThing() {
-		//std::cout << "Monster: useThing() " << (int)this << std::endl;
+		//std::cout << "Monster: useThing() " << this << std::endl;
 		useCount++;
 	};
 	
 	virtual void releaseThing() {
-		//std::cout << "Monster: releaseThing() " << (int)this << std::endl;
+		//std::cout << "Monster: releaseThing() " << this << std::endl;
 		useCount--;
 		if (useCount == 0)
 			delete this;
 	};
 
-	static const unsigned long min_id = 65537U;
-	static const unsigned long max_id = 16777216U;	
-
+	
 	virtual void onAttack();
 	bool isLoaded() const {return loaded;}
 

@@ -38,14 +38,8 @@ using namespace std;
 extern LuaScript g_config;
 extern Game g_game;
 
-template<class Player> typename AutoList<Player>::list_type AutoList<Player>::list;
-template<class Player> typename AutoID<Player>::list_type AutoID<Player>::list;
-template<class Player> unsigned long AutoID<Player>::count = Player::min_id;
-
 Player::Player(const char *name, Protocol *p) :
-  AutoID<Player>()
- ,AutoList<Player>(id)
- ,Creature(name, id)
+ Creature(name)
 {	
   client     = p;
   client->setPlayer(this);
@@ -137,7 +131,7 @@ Player::~Player()
       //delete items[i];
       items[i]->releaseThing();
 	}
-
+	//std::cout << "Player destructor " << this->getID() << std::endl;
   delete client;
 }
 
@@ -1496,10 +1490,7 @@ unsigned long Player::getIP() const
 }
 
 void Player::die() {
-	
-    client->sendTextMessage(MSG_ADVANCE, "You are dead.");
-    client->sendTextMessage(MSG_EVENT, "Own3d!");
-		
+			
 	//Magic Level downgrade
 	unsigned long sumMana = 0;
 	long lostMana = 0;

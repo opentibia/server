@@ -12,11 +12,12 @@
 
 using namespace std;
 
-template<class Creature> typename AutoList<Creature>::list_type AutoList<Creature>::list;
+OTSYS_THREAD_LOCKVAR AutoID::autoIDLock;
+unsigned long AutoID::count;
+AutoID::list_type AutoID::list;
 
-Creature::Creature(const char *name, unsigned long _id) :
- AutoList<Creature>(_id)
- ,access(0)
+Creature::Creature(const char *name) :
+access(0)
 {
   direction  = NORTH;
 	master = NULL;
@@ -46,6 +47,8 @@ Creature::Creature(const char *name, unsigned long _id) :
 	exhaustedTicks  = 0;
 	pzLocked = false;
 	immunities = 0;
+	eventCheck = 0;
+	eventCheckAttacking = 0;
 
   attackedCreature = 0;
   speed = 220;

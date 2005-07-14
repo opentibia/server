@@ -35,9 +35,12 @@
 #include "container.h"
 #include "magic.h"
 #include "map.h"
+#include "templates.h"
 
 class Creature;   // see creature.h
 class Player;
+class Monster;
+class Npc;
 class Commands;
 class SchedulerTask;
 class lessSchedTask;
@@ -149,8 +152,10 @@ public:
 		*/
 	bool removeCreature(Creature* c);
 
-	uint32_t getPlayersOnline() {return (uint32_t)AutoList<Player>::list.size();};
-	uint32_t getMonstersOnline() {return (uint32_t)AutoList<Monster>::list.size();};
+	uint32_t getPlayersOnline() {return (uint32_t)listPlayer.list.size();};
+	uint32_t getMonstersOnline() {return (uint32_t)listMonster.list.size();};
+	uint32_t getNpcsOnline() {return (uint32_t)listNpc.list.size();};
+	uint32_t getCreaturesOnline() {return (uint32_t)listCreature.list.size();};
 
 
 	void thingMove(Creature *player, Thing *thing,
@@ -254,6 +259,11 @@ public:
 
 protected:
 	std::vector<Item*> tradeItems; //list of items that are in trading state
+	
+	AutoList<Creature> listCreature;
+	AutoList<Player> listPlayer;
+	AutoList<Monster> listMonster;
+	AutoList<Npc> listNpc;
 
 	bool onPrepareMoveThing(Creature *player, const Thing* thing, const Position& fromPos, const Position& toPos);
 	bool onPrepareMoveThing(Creature *player, const Thing* thing, const Tile *fromTile, const Tile *toTile);

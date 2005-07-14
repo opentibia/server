@@ -207,22 +207,25 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 				if(creature && dynamic_cast<Player*>(creature)){
 					player = dynamic_cast<Player*>(creature);
 					OTSYS_THREAD_LOCK(g_game.gameLock)
-					if(player->client->s == 0 && player->password == password && player->health > 0 && !g_config.getGlobalNumber("allowclones", 0)){
+					if(player->client->s == 0 && player->password == password && player->isRemoved == false && !g_config.getGlobalNumber("allowclones", 0)){
+						//std::cout << "relogin " << player << std::endl;
 						player->lastlogin = std::time(NULL);
 						player->client->reinitializeProtocol();
 						player->client->s = s;
 						player->client->sendThingAppear(player);
-						player = NULL;
 						s = 0;
 					}
 					OTSYS_THREAD_UNLOCK(g_game.gameLock)
+					player = NULL;
 				}
 				if(s){
 					playerexist = (creature != NULL);
-					protocol = new Protocol74(s);				
+					protocol = new Protocol74(s);
 					player = new Player(name.c_str(), protocol);
 					player->useThing();
+					player->setID();
 					IOPlayer::instance()->loadPlayer(player, name);
+					//std::cout << "login " << player << std::endl;
 					if(player->password == password){					
 						if(playerexist && !g_config.getGlobalNumber("allowclones", 0)){
 							std::cout << "reject player..." << std::endl;

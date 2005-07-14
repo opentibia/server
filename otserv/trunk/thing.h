@@ -23,6 +23,7 @@ public:
   virtual void releaseThing() = 0;
 
   int throwRange;
+  bool isRemoved;
 
   Position pos;
 

@@ -29,14 +29,8 @@
 extern Spells spells;
 extern LuaScript g_config;
 
-template<class Monster> typename AutoList<Monster>::list_type AutoList<Monster>::list;
-template<class Monster> typename AutoID<Monster>::list_type AutoID<Monster>::list;
-template<class Monster> unsigned long AutoID<Monster>::count = Monster::min_id;
-
 Monster::Monster(const char *name, Game* game) : 
-  AutoID<Monster>()
- ,AutoList<Monster>(id)
- ,Creature(name, id)
+ Creature(name)
 {
 	//std::cout << "Monster constructor " << (unsigned long)this  <<std::endl;
 	useCount = 0;

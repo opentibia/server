@@ -38,13 +38,13 @@ class Container : public Item
 		Container(const unsigned short _type);
 		virtual ~Container();
 		virtual void useThing() {
-			//std::cout << "Container: useThing() " << (int)this << std::endl;
+			//std::cout << "Container: useThing() " << this << std::endl;
 			useCount++;
 		};
 	
 		virtual void releaseThing() {
 			useCount--;
-			//std::cout << "Container: releaseThing() " << (int)this << std::endl;
+			//std::cout << "Container: releaseThing() " << this << std::endl;
 			//if (useCount == 0)
 			if (useCount <= 0)
 				delete this;

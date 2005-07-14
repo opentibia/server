@@ -57,16 +57,14 @@ typedef std::map<unsigned long,long> StorageMap;
 //////////////////////////////////////////////////////////////////////
 // Defines a player...
 
-class Player : protected AutoID<Player>, public AutoList<Player>, public Creature
+class Player : public Creature
 {
 public:
 	Player(const char *name, Protocol* p);
 	virtual ~Player();
 	void setGUID(unsigned long _guid) {guid = _guid;};
 	unsigned long getGUID() const { return guid;};
-
-	static const unsigned long min_id = 16777217U;
-	static const unsigned long max_id = 4294967295U;
+	virtual unsigned long idRange(){ return 0x10000000;}
 
   void speak(const std::string &text);	
 	bool addItem(Item* item);

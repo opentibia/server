@@ -35,14 +35,9 @@
 
 extern LuaScript g_config;
 
-template<class Npc> typename AutoList<Npc>::list_type AutoList<Npc>::list;
-template<class Npc> typename AutoID<Npc>::list_type AutoID<Npc>::list;
-template<class Npc> unsigned long AutoID<Npc>::count = Npc::min_id;
 
 Npc::Npc(const char *name, Game* game) :
-  AutoID<Npc>()
- ,AutoList<Npc>(id)
- ,Creature(name, id)
+ Creature(name)
 {
 	useCount = 0;
 	this->loaded = false;
