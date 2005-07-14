@@ -109,7 +109,8 @@ private:
 	unsigned int m_numFields;
 	unsigned int m_lastNumFields;
 	unsigned int m_numRows;
-	std::map<std::string, unsigned int> m_listNames;
+	typedef std::map<std::string, unsigned int> listNames_type;
+	listNames_type m_listNames;
 	std::map<unsigned int, char **> m_listRows;
 };
 

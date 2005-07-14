@@ -65,18 +65,14 @@ void DBResult::clearRows()
 
 void DBResult::clearFieldNames()
 {
-	std::map<std::string, unsigned int>::iterator it;
-	for(it = m_listNames.begin(); it != m_listNames.end();)
-	{
-		m_listNames.erase(it++);
-	}
+	m_listNames.clear();
 	m_lastNumFields = m_numFields;
 	m_numFields = 0;
 }
 
 int DBResult::getDataInt(std::string s, unsigned int nrow)
 {
-	std::map<std::string, unsigned int>::iterator it=m_listNames.find(s);
+	listNames_type::iterator it=m_listNames.find(s);
 	if(it != m_listNames.end())
 	{
 		std::map<unsigned int, char **>::iterator it2=m_listRows.find(nrow);
@@ -93,7 +89,7 @@ int DBResult::getDataInt(std::string s, unsigned int nrow)
 
 long DBResult::getDataLong(std::string s, unsigned int nrow)
 {
-	std::map<std::string, unsigned int>::iterator it=m_listNames.find(s);
+	listNames_type::iterator it=m_listNames.find(s);
 	if(it != m_listNames.end())
 	{
 		std::map<unsigned int, char **>::iterator it2=m_listRows.find(nrow);
@@ -111,7 +107,7 @@ long DBResult::getDataLong(std::string s, unsigned int nrow)
 
 std::string DBResult::getDataString(std::string s, unsigned int nrow)
 {
-	std::map<std::string, unsigned int>::iterator it=m_listNames.find(s);
+	listNames_type::iterator it=m_listNames.find(s);
 	if(it != m_listNames.end())
 	{
 		std::map<unsigned int, char **>::iterator it2=m_listRows.find(nrow);
