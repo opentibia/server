@@ -26,6 +26,7 @@
 #include "creature.h"
 #include "game.h"
 #include "luascript.h"
+#include "templates.h"
 
 extern "C"
 {
@@ -85,6 +86,9 @@ public:
 	};
 
 	virtual unsigned long idRange(){ return 0x30000000;}
+	static AutoList<Npc> listNpc;
+	void removeList() {listNpc.removeList(getID());}
+	void addList() {listNpc.addList(this);}
 	
   void speak(const std::string &text){};
   const std::string& getName() const {return name;};

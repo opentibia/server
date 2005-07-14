@@ -152,10 +152,10 @@ public:
 		*/
 	bool removeCreature(Creature* c);
 
-	uint32_t getPlayersOnline() {return (uint32_t)listPlayer.list.size();};
-	uint32_t getMonstersOnline() {return (uint32_t)listMonster.list.size();};
-	uint32_t getNpcsOnline() {return (uint32_t)listNpc.list.size();};
-	uint32_t getCreaturesOnline() {return (uint32_t)listCreature.list.size();};
+	uint32_t getPlayersOnline();
+	uint32_t getMonstersOnline();
+	uint32_t getNpcsOnline();
+	uint32_t getCreaturesOnline();
 
 
 	void thingMove(Creature *player, Thing *thing,
@@ -261,9 +261,6 @@ protected:
 	std::vector<Item*> tradeItems; //list of items that are in trading state
 	
 	AutoList<Creature> listCreature;
-	AutoList<Player> listPlayer;
-	AutoList<Monster> listMonster;
-	AutoList<Npc> listNpc;
 
 	bool onPrepareMoveThing(Creature *player, const Thing* thing, const Position& fromPos, const Position& toPos);
 	bool onPrepareMoveThing(Creature *player, const Thing* thing, const Tile *fromTile, const Tile *toTile);

@@ -29,6 +29,8 @@
 extern Spells spells;
 extern LuaScript g_config;
 
+AutoList<Monster> Monster::listMonster;
+
 Monster::Monster(const char *name, Game* game) : 
  Creature(name)
 {

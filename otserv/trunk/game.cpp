@@ -36,14 +36,13 @@ using namespace std;
 #include <stdio.h>
 #include "items.h"
 #include "commands.h"
+#include "creature.h"
+#include "player.h"
+#include "monster.h"
+#include "npc.h"
 #include "game.h"
 #include "tile.h"
 
-#include "player.h"
-#include "creature.h"
-#include "monster.h"
-
-#include "npc.h"
 #include "spells.h"
 #include "actions.h"
 #include "ioplayer.h"
@@ -606,7 +605,10 @@ bool Game::stopEvent(unsigned long eventid) {
 
 /*****************************************************************************/
 
-
+uint32_t Game::getPlayersOnline() {return (uint32_t)Player::listPlayer.list.size();};
+uint32_t Game::getMonstersOnline() {return (uint32_t)Monster::listMonster.list.size();};
+uint32_t Game::getNpcsOnline() {return (uint32_t)Npc::listNpc.list.size();};
+uint32_t Game::getCreaturesOnline() {return (uint32_t)listCreature.list.size();};
 
 Tile* Game::getTile(unsigned short _x, unsigned short _y, unsigned char _z)
 {
@@ -653,24 +655,15 @@ bool Game::placeCreature(Position &pos, Creature* c)
 	if (!p || c->access != 0 || getPlayersOnline() < max_players) {
 		success = map->placeCreature(pos, c);		
 		if(success) {
+			c->useThing();
 			
-			c->isRemoved = false;
 			c->setID();
-			listCreature.addList(c);
 			//std::cout << "place: " << c << " " << c->getID() << std::endl;
-			if(p){
-				listPlayer.addList(p);
-			}
-			else if(dynamic_cast<Monster*>(c)){
-				listMonster.addList(dynamic_cast<Monster*>(c));
-			}
-			else if(dynamic_cast<Npc*>(c)){
-				listNpc.addList(dynamic_cast<Npc*>(c));
-			}
+			listCreature.addList(c);
+			c->addList();
+			c->isRemoved = false;
 			
 			sendAddThing(NULL,c->pos,c);
-			c->useThing();
-
 			if(p) {
 				std::cout << (uint32_t)getPlayersOnline() << " players online." << std::endl;
 			}
@@ -689,64 +682,44 @@ bool Game::placeCreature(Position &pos, Creature* c)
 
 bool Game::removeCreature(Creature* c)
 {
-	//OTSYS_THREAD_LOCK(gameLock)
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
 	if(c->isRemoved == true)
 		return false;
 #ifdef __DEBUG__
 	std::cout << "removing creature "<< std::endl;
 #endif
-	//Tile *tile = map->getTile(c->pos.x, c->pos.y, c->pos.z);
-	
+
 	//std::cout << "remove: " << c << " " << c->getID() << std::endl;
 	listCreature.removeList(c->getID());
-	if(dynamic_cast<Player*>(c)){
-		listPlayer.removeList(c->getID());
+	c->removeList();
+	
+	removeThing(NULL,c->pos,c);
+	c->isRemoved = true;
+	
+	for(std::vector<Creature*>::iterator cit = c->summons.begin(); cit != c->summons.end(); ++cit) {
+		removeCreature(*cit);
 	}
-	else if(dynamic_cast<Monster*>(c)){
-		listMonster.removeList(c->getID());
-	}
-	else{ //if(dynamic_cast<Npc*>(c))
-		listNpc.removeList(c->getID());
+		
+	stopEvent(c->eventCheck);
+	stopEvent(c->eventCheckAttacking);
+	
+	Player* player = dynamic_cast<Player*>(c);
+	if(player){
+		if(player->tradePartner != 0) {
+			playerCloseTrade(player);
+		}
+		if(player->eventAutoWalk)
+			stopEvent(player->eventAutoWalk);
+		// Removing the player from the map of channel users
+		std::map<long, Creature*>::iterator sit = channel.find(player->getID());
+		if( sit != channel.end() )
+			channel.erase(sit);
+		
+		IOPlayer::instance()->savePlayer(player);
+		std::cout << (uint32_t)getPlayersOnline() << " players online." << std::endl;
 	}
 	
-	//if(tile != NULL){			
-		removeThing(NULL,c->pos,c);
-		
-	 	this->FreeThing(c);
-
-		for(std::vector<Creature*>::iterator cit = c->summons.begin(); cit != c->summons.end(); ++cit) {
-			removeCreature(*cit);
-			/*Tile *tile = map->getTile((*cit)->pos.x, (*cit)->pos.y, (*cit)->pos.z);
-			if(tile != NULL){
-				(*cit)->setMaster(NULL);
-				this->FreeThing(*cit);
-				removeThing(NULL,(*cit)->pos,*cit);
-			}*/
-		}
-		
-		c->isRemoved = true;
-		
-		stopEvent(c->eventCheck);
-		stopEvent(c->eventCheckAttacking);
-		
-		Player* player = dynamic_cast<Player*>(c);
-		if (player)
-		{
-			if(player->tradePartner != 0) {
-				playerCloseTrade(player);
-			}
-			if(player->eventAutoWalk)
-				stopEvent(player->eventAutoWalk);
-			// Removing the player from the map of channel users
-			std::map<long, Creature*>::iterator sit = channel.find(player->getID());
-			if( sit != channel.end() )
-				channel.erase(sit);
-		
-			IOPlayer::instance()->savePlayer(player);
-			std::cout << (uint32_t)getPlayersOnline() << " players online." << std::endl;
-		}	
-	//}
+	this->FreeThing(c);
 
 	return true;
 }
@@ -2275,7 +2248,7 @@ void Game::creatureBroadcastMessage(Creature *creature, const std::string &text)
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
 
 	//for (cit = playersOnline.begin(); cit != playersOnline.end(); cit++)
-	for (AutoList<Player>::listiterator it = listPlayer.list.begin(); it != listPlayer.list.end(); ++it)
+	for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin(); it != Player::listPlayer.list.end(); ++it)
 	{
 		(*it).second->onCreatureSay(creature, SPEAK_BROADCAST, text);
 	}

@@ -26,6 +26,7 @@
 #include "creature.h"
 #include "game.h"
 #include "tile.h"
+#include "templates.h"
 
 class Creature;
 
@@ -116,6 +117,10 @@ public:
 	//virtual unsigned long idRange(){ return 0x40000000;}
 	// use range 0x10000000 to able use runes on monsters
 	virtual unsigned long idRange(){ return 0x10000000;}
+	static AutoList<Monster> listMonster;
+	void removeList() {listMonster.removeList(getID());}
+	void addList() {listMonster.addList(this);}
+	
 	virtual void useThing() {
 		//std::cout << "Monster: useThing() " << this << std::endl;
 		useCount++;

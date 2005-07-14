@@ -38,6 +38,8 @@ using namespace std;
 extern LuaScript g_config;
 extern Game g_game;
 
+AutoList<Player> Player::listPlayer;
+
 Player::Player(const char *name, Protocol *p) :
  Creature(name)
 {	

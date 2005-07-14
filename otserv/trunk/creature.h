@@ -116,6 +116,8 @@ public:
   void setID(){this->id = auto_id | this->idRange();}
   virtual unsigned long idRange() = 0;
   unsigned long getID() const { return id; }
+  virtual void removeList() = 0;
+  virtual void addList() = 0;
   unsigned long getExpForLv(const int& lv) const { 
 		return (int)((50*lv*lv*lv)/3 - 100 * lv * lv + (850*lv) / 3 - 200);
 	}

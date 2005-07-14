@@ -28,6 +28,7 @@
 #include <vector>
 #include <ctime>
 #include <algorithm>
+#include "templates.h"
 
 class Protocol;
 
@@ -65,6 +66,9 @@ public:
 	void setGUID(unsigned long _guid) {guid = _guid;};
 	unsigned long getGUID() const { return guid;};
 	virtual unsigned long idRange(){ return 0x10000000;}
+	static AutoList<Player> listPlayer;
+	void removeList() {listPlayer.removeList(getID());}
+	void addList() {listPlayer.addList(this);}
 
   void speak(const std::string &text);	
 	bool addItem(Item* item);
