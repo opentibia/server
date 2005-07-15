@@ -133,6 +133,10 @@ Player::~Player()
       //delete items[i];
       items[i]->releaseThing();
 	}
+	DepotMap::iterator it;
+	for(it = depots.begin();it != depots.end(); it++){
+      	it->second->releaseThing();
+	}
 	//std::cout << "Player destructor " << this->getID() << std::endl;
   delete client;
 }
@@ -1149,7 +1153,7 @@ Container* Player::getDepot(unsigned long depotId){
 	DepotMap::iterator it = depots.find(depotId);
 	if (it != depots.end()){	
       return it->second;
-	}    
+	}
 	return NULL;
 }
 

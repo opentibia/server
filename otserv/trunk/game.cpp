@@ -2404,12 +2404,12 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 						me->getMagicEffect(spectator, creature, target, target->pos, creatureState.damage, tile->isPz(), false);
 
 						//could be death due to a magic damage with no owner (fire/poison/energy)
-						if(creature && target->health <= 0) {
+						if(creature && target->isRemoved == true) {
 
 							for(std::vector<Creature*>::const_iterator cit = creatureState.attackerlist.begin(); cit != creatureState.attackerlist.end(); ++cit) {
 								Creature* gainExpCreature = *cit;
 								if(dynamic_cast<Player*>(gainExpCreature))
-									dynamic_cast<Player*>(gainExpCreature)->sendStats();	
+									dynamic_cast<Player*>(gainExpCreature)->sendStats();
 								
 								if(spectator->CanSee(gainExpCreature->pos.x, gainExpCreature->pos.y, gainExpCreature->pos.z)) {
 									std::stringstream exp;
@@ -3202,8 +3202,7 @@ void Game::decaySplash(Item* item)
 void Game::checkDecay(int t){
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
 	addEvent(makeTask(DECAY_INTERVAL, boost::bind(&Game::checkDecay,this,DECAY_INTERVAL)));
-	
-	
+		
 	list<decayBlock*>::iterator it;
 	for(it = decayVector.begin();it != decayVector.end();){
 		(*it)->decayTime -= t;
@@ -3251,6 +3250,7 @@ void Game::checkDecay(int t){
 				}//item->canDecay()
 				FreeThing(item);
 			}//for it2
+			delete *it;
 			it = decayVector.erase(it);
 		}//(*it)->decayTime <= 0
 		else{
