@@ -198,6 +198,7 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 						else{
 							std::cout << "Error loading depot "<< slotid << " for player " << 
 								player->getGUID() << std::endl;
+							delete myItem;
 						}
 					}
 				}

@@ -236,14 +236,53 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 		
 		game->sendRemoveThing(NULL,attackedCreature->pos,attackedCreature,stackpos);
 		tile->removeThing(attackedCreature);*/
+		
+		//Prepare body
+		Item *corpseitem = Item::CreateItem(attackedCreature->getLookCorpse());
+		corpseitem->pos = CreaturePos;
+		tile->addThing(corpseitem);
+		
+		//Add eventual loot
+		Container *lootcontainer = dynamic_cast<Container*>(corpseitem);
+		if(lootcontainer) {
+			attackedCreature->dropLoot(lootcontainer);
+		}
+		
 		if(attackedplayer){
 			attackedplayer->onThingDisappear(attackedplayer,stackpos);
 			attackedplayer->die();        //handles exp/skills/maglevel loss
 		}
+		//remove creature
 		game->removeCreature(attackedCreature);
 		// Update attackedCreature pos because contains
 		//  temple position for players
 		attackedCreature->pos = CreaturePos;
+		//add body
+		game->sendAddThing(NULL,corpseitem->pos,corpseitem);
+		
+		if(attackedplayer){
+			//set body special description
+			std::stringstream s;
+			s << "a dead human. You recognize " 
+				<< attackedplayer->getName() << ". ";
+			if(attacker){
+				if(attackedplayer->sex != 0)
+					s << "He";
+				else
+					s << "She";
+				s << " was killed by ";
+				Player *attackerplayer = dynamic_cast<Player*>(attacker);
+				if(attackerplayer)
+					s << attacker->getName();
+				else
+					s << "a " << attacker->getName();
+			}				
+			corpseitem->setSpecialDescription(s.str());
+			//send corpse to the dead player. It is not in spectator list
+			// because was removed
+			attackedplayer->onThingAppear(corpseitem);
+		}
+		game->startDecay(corpseitem);
 		
 		/*
 		for(int i = 0; i < spectatorlist.size(); ++i) {				
@@ -300,43 +339,6 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 		if(player){
 			player->sendStats();
 		}
-			    
-		//Add body
-		Item *corpseitem = Item::CreateItem(attackedCreature->getLookCorpse());
-		corpseitem->pos = CreaturePos;
-
-		//Add eventual loot
-		Container *lootcontainer = dynamic_cast<Container*>(corpseitem);
-		if(lootcontainer) {
-			attackedCreature->dropLoot(lootcontainer);
-		}
-		
-		tile->addThing(corpseitem);
-		
-		if(attackedplayer){
-			std::stringstream s;
-			s << "a dead human. You recognize " 
-				<< attackedplayer->getName() << ". ";
-			if(attacker){
-				if(attackedplayer->sex != 0)
-					s << "He";
-				else
-					s << "She";
-				s << " was killed by ";
-				Player *attackerplayer = dynamic_cast<Player*>(attacker);
-				if(attackerplayer)
-					s << attacker->getName();
-				else
-					s << "a " << attacker->getName();
-			}				
-			corpseitem->setSpecialDescription(s.str());
-			
-			//send corpse to the dead player. It is not in spectator list
-			// because was removed
-			attackedplayer->onThingAppear(corpseitem);			
-		}
-		
-		game->sendAddThing(NULL,corpseitem->pos,corpseitem);
 		
 		/*
 		Player *spectator = NULL;
@@ -352,7 +354,6 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 		//Start decaying
 		//unsigned short decayTime = Item::items[corpseitem->getID()].decayTime;
 		//game->addEvent(makeTask(decayTime*1000, boost::bind(&Game::decayItem, _1, corpseitem)));
-		game->startDecay(corpseitem);
 		
 		if(attackedCreature && attackedCreature->getMaster() != NULL) {
 			attackedCreature->getMaster()->removeSummon(attackedCreature);

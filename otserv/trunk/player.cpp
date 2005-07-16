@@ -205,7 +205,7 @@ int Player::getWeaponDamage() const
 						damagemax = 3*skills[SKILL_AXE][SKILL_LEVEL] + 2*Item::items[items[slot]->getID()].attack;
 						break;
 					case DIST:
-						distitem = 	GetDistWeapon();
+						distitem = GetDistWeapon();
 						if(distitem){
 							damagemax = 3*skills[SKILL_DIST][SKILL_LEVEL]+ 2*Item::items[distitem->getID()].attack;
 							//hit or miss
@@ -814,7 +814,12 @@ void Player::addSkillTry(int skilltry)
 					case SWORD: skill = 2; break;
 					case CLUB: skill = 1; break;
 					case AXE: skill = 3; break;
-					case DIST: skill = 4; break;
+					case DIST: 
+						if(GetDistWeapon())
+							skill = 4;
+						else
+							skill = 0;
+						break;
                     case SHIELD: continue; break;
                     case MAGIC: return; break;//TODO: should add skill try?
 					default: skill = 0; break;
