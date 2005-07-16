@@ -97,6 +97,13 @@ protected:
 	CreatureStates creaturestates;
 };
 
+enum enum_world_type{
+	WORLD_TYPE_NO_PVP,
+	WORLD_TYPE_PVP,
+	WORLD_TYPE_PVP_ENFORCED,
+};
+
+
 /**
   * Main Game class.
   * This class is responsible to controll everything that happens
@@ -124,7 +131,8 @@ public:
      b = map->mapheight;  
      return;
   }
-  
+  	void setWorldType(enum_world_type type);
+  	enum_world_type getWorldType() const {return worldType;}
 	const std::string& getSpawnFile() {return map->spawnfile;}
 
 	/**
@@ -346,6 +354,7 @@ protected:
 	unsigned long eventIdCount;
 
 	uint32_t max_players;
+	enum_world_type worldType;
 
 	Map* map;
 	

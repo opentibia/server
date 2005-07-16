@@ -88,17 +88,21 @@ void GameState::onAttack(Creature* attacker, const Position& pos, const MagicEff
 
 		int damage = me->getDamage(targetCreature, attacker);
 		int manaDamage = 0;
-
+		
 		if (damage > 0) {
 			if(attackPlayer && attackPlayer->access == 0) {
-				if(targetPlayer && targetPlayer != attackPlayer)
+				if(targetPlayer && targetPlayer != attackPlayer && game->getWorldType() != WORLD_TYPE_NO_PVP)
 					attackPlayer->pzLocked = true;
 			}
 
-			if(targetCreature->access == 0 && targetPlayer) {
+			if(targetCreature->access == 0 && targetPlayer && game->getWorldType() != WORLD_TYPE_NO_PVP) {
 				targetPlayer->inFightTicks = (long)g_config.getGlobalNumber("pzlocked", 0);
 				targetPlayer->sendIcons();
 			}
+		}
+		
+		if(game->getWorldType() == WORLD_TYPE_NO_PVP && attackPlayer && targetPlayer && attackPlayer->access == 0){
+			damage = 0;
 		}
 		
 		if(damage != 0) {
@@ -291,15 +295,16 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 		//mapstate.removeThing(tile, attackedCreature);		
 		
 		//Get all creatures that will gain xp from this kill..
-		std::vector<long> creaturelist;
-		creaturelist = attackedCreature->getInflicatedDamageCreatureList();
-
 		CreatureState* attackedCreatureState = NULL;
-		CreatureStateVec& creatureStateVec = creaturestates[tile];
-		for(CreatureStateVec::iterator csIt = creatureStateVec.begin(); csIt != creatureStateVec.end(); ++csIt) {
-			if(csIt->first == attackedCreature) {
-				attackedCreatureState = &csIt->second;
-				break;
+		std::vector<long> creaturelist;
+		if(!(dynamic_cast<Player*>(attackedCreature) && game->getWorldType() != WORLD_TYPE_PVP_ENFORCED)){
+			creaturelist = attackedCreature->getInflicatedDamageCreatureList();
+			CreatureStateVec& creatureStateVec = creaturestates[tile];
+			for(CreatureStateVec::iterator csIt = creatureStateVec.begin(); csIt != creatureStateVec.end(); ++csIt) {
+				if(csIt->first == attackedCreature) {
+					attackedCreatureState = &csIt->second;
+					break;
+				}
 			}
 		}
 
@@ -445,6 +450,7 @@ Game::Game()
 	eventIdCount = 1000;
 	this->shutdown = false;
 	this->map = NULL;
+	this->worldType = WORLD_TYPE_PVP;
 	OTSYS_THREAD_LOCKVARINIT(gameLock);
 	OTSYS_THREAD_LOCKVARINIT(eventLock);
 	OTSYS_THREAD_LOCKVARINIT(AutoID::autoIDLock);
@@ -463,6 +469,10 @@ Game::~Game()
 {
 }
 
+void Game::setWorldType(enum_world_type type)
+{
+	this->worldType = type;
+}
 
 bool Game::loadMap(std::string filename) {
 	if(!map)
@@ -624,12 +634,15 @@ void Game::setTile(unsigned short _x, unsigned short _y, unsigned char _z, unsig
 
 Creature* Game::getCreatureByID(unsigned long id)
 {
+	if(id == 0)
+		return NULL;
+	
 	AutoList<Creature>::listiterator it = listCreature.list.find(id);
 	if(it != listCreature.list.end()) {
 		return (*it).second;
 	}
 
-  return NULL; //just in case the player doesnt exist
+	return NULL; //just in case the player doesnt exist
 }
 
 Creature* Game::getCreatureByName(const std::string &s)
@@ -2565,7 +2578,7 @@ bool Game::creatureOnPrepareAttack(Creature *creature, Position pos)
 			}
 			else if(targettile && targettile->isPz()) {
 				if(player) {					
-					player->sendTextMessage(MSG_SMALLINFO, "You may not attack a person in a protection zone.");					
+					player->sendTextMessage(MSG_SMALLINFO, "You may not attack a person in a protection zone.");
 					player->sendCancelAttacking();
 				}
 
@@ -2622,7 +2635,7 @@ void Game::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fi
 {
 	if(!creatureOnPrepareAttack(creature, attackedCreature->pos))
 		return;
-		
+			
 	//OTSYS_THREAD_LOCK(gameLock)
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
 	
@@ -2630,6 +2643,19 @@ void Game::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fi
 	Player* attackedPlayer = dynamic_cast<Player*>(attackedCreature);
 
 	Tile* targettile = getTile(attackedCreature->pos.x, attackedCreature->pos.y, attackedCreature->pos.z);
+
+	if(attackedCreature->access != 0){
+		if(player){
+			player->sendCancelAttacking();
+			player->sendTextMessage(MSG_SMALLINFO, "You may not attack this player.");
+		}
+	  	return;
+	}
+	if(getWorldType() == WORLD_TYPE_NO_PVP && player && attackedPlayer && player->access == 0){
+		player->sendCancelAttacking();
+		player->sendTextMessage(MSG_SMALLINFO, "You may not attack this player.");
+		return;
+	}
 
 	//can the attacker reach the attacked?
 	bool inReach = false;
@@ -2675,14 +2701,6 @@ void Game::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fi
 	 attackedPlayer->sendIcons();
   }
 	
-	if(attackedCreature->access != 0){
-		if(player)
-			player->sendCancelAttacking();
-
-      //OTSYS_THREAD_UNLOCK(gameLock)
-      return;
-	}
-
 	if(!inReach){
 		//OTSYS_THREAD_UNLOCK(gameLock)                  
 		return;

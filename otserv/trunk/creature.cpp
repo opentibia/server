@@ -13,7 +13,7 @@
 using namespace std;
 
 OTSYS_THREAD_LOCKVAR AutoID::autoIDLock;
-unsigned long AutoID::count;
+unsigned long AutoID::count = 1000;
 AutoID::list_type AutoID::list;
 
 Creature::Creature(const char *name) :

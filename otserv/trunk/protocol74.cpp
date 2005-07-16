@@ -95,6 +95,7 @@ void Protocol74::ReceiveLoop()
 		}
 		// logout by disconnect?  -> kick
 		if(pendingLogout == false){
+			player->setAttackedCreature(0);
 			while(player->inFightTicks >= 1000 && player->isRemoved == false && s == 0){
 				OTSYS_SLEEP(250);
 			}

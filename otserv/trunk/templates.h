@@ -70,15 +70,10 @@ public:
 	AutoID() {
 		unsigned long newid;
 		OTSYS_THREAD_LOCK_CLASS lockClass(autoIDLock);
-		
-		if(count >= 0xFFFFFF)
-			count = 0;
-		else
-			count++;
-		
+
 		while(list.find(count) != list.end()){
 			if(count >= 0xFFFFFF)
-				count = 0;
+				count = 1000;
 			else
 			count++;
 		}

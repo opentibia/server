@@ -48,6 +48,9 @@ ip = "127.0.0.1"
 motd = "Welcome to OpenTibia Pre-Release"
 motdnum="1"
 
+-- world type. options: pvp, no-pvp, pvp-enforced
+worldtype = "pvp"
+
 -- max number of players allowed
 maxplayers = "10000"
 
@@ -67,7 +70,7 @@ allowclones = 0
 vocations = {"a sorcerer", "a druid", "a paladin", "a knight"}
 
 
---- SQL part (probaly buggy)
+--- SQL part
 sql_host = "localhost"
 sql_user = "root"
 sql_pass = ""

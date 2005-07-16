@@ -47,6 +47,8 @@
 #include "luascript.h"
 #include "account.h"
 
+#include "tools.h"
+
 #ifdef WIN32
 	#define ERROR_EINTR WSAEINTR
 #else
@@ -381,6 +383,20 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 	std::cout << "[done]" << std::endl;
+	
+	std::string worldtype = g_config.getGlobalString("worldtype");
+	std::transform(worldtype.begin(), worldtype.end(), worldtype.begin(), upchar);
+	if(worldtype == "PVP")
+		g_game.setWorldType(WORLD_TYPE_PVP);
+	else if(worldtype == "NO-PVP")
+		g_game.setWorldType(WORLD_TYPE_NO_PVP);
+	else if(worldtype == "PVP-ENFORCED")
+		g_game.setWorldType(WORLD_TYPE_PVP_ENFORCED);
+	else{
+		ErrorMessage("Unknown world type!");
+		return -1;
+	}
+	std::cout << ":: World Type: " << worldtype << std::endl;
 
 
 #ifdef _SQLMAP_
@@ -400,8 +416,8 @@ int main(int argc, char *argv[])
 		SpawnManager::instance()->loadSpawnsXML(g_game.getSpawnFile());
 		SpawnManager::instance()->startup();
 	}
-#endif
-
+#endif		
+	
   	// Call to WSA Startup on Windows Systems...
 #ifdef WIN32
 	WORD wVersionRequested; 

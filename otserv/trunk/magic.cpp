@@ -25,6 +25,7 @@
 
 #include "magic.h"
 
+extern Game g_game;
 
 MagicEffectClass::MagicEffectClass()
 {
@@ -88,25 +89,23 @@ void MagicEffectClass::getMagicEffect(Player* spectator, const Creature* attacke
 {
 	if(!isBlocking && target != NULL /*hasTarget*/) {
 		if(spectator->CanSee(pos.x, pos.y, pos.z)) {
-			if(target->access == 0) {
+			if((g_game.getWorldType() == WORLD_TYPE_NO_PVP && dynamic_cast<const Player*>(attacker) &&
+				dynamic_cast<const Player*>(target) && target->access == 0 && attacker->access == 0) ||
+				target->access != 0)
+				spectator->sendMagicEffect(pos, NM_ME_PUFF);
+			else{
 				if(damageEffect != 0xFF) {
 					if(offensive && (target->getImmunities() & attackType) == attackType) {
 						spectator->sendMagicEffect(pos, NM_ME_BLOCKHIT);
-						//msg.AddMagicEffect(pos, NM_ME_BLOCKHIT);
 					}
 					else {
 						spectator->sendMagicEffect(pos, damageEffect);
-						//msg.AddMagicEffect(pos, damageEffect);
 					}
 				}
-
 				if(hitEffect != 0xFF)
 					spectator->sendMagicEffect(pos, hitEffect);
-					//msg.AddMagicEffect(pos, hitEffect);
+					
 			}
-			else
-				spectator->sendMagicEffect(pos, NM_ME_PUFF);
-				//msg.AddMagicEffect(pos, NM_ME_PUFF);
 		}
 	}
 }
