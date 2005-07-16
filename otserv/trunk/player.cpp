@@ -196,18 +196,22 @@ int Player::getWeaponDamage() const
 				Item *distitem;
 				switch (items[slot]->getWeaponType()){
 					case SWORD:
-						damagemax = 3*skills[SKILL_SWORD][SKILL_LEVEL] + 2*Item::items[items[slot]->getID()].attack;
+						//damagemax = 3*skills[SKILL_SWORD][SKILL_LEVEL] + 2*Item::items[items[slot]->getID()].attack;
+						damagemax = skills[SKILL_SWORD][SKILL_LEVEL]*Item::items[items[slot]->getID()].attack/20 + Item::items[items[slot]->getID()].attack;
 						break;
 					case CLUB:
-						damagemax = 3*skills[SKILL_CLUB][SKILL_LEVEL] + 2*Item::items[items[slot]->getID()].attack;
+						//damagemax = 3*skills[SKILL_CLUB][SKILL_LEVEL] + 2*Item::items[items[slot]->getID()].attack;
+						damagemax = skills[SKILL_CLUB][SKILL_LEVEL]*Item::items[items[slot]->getID()].attack/20 + Item::items[items[slot]->getID()].attack;
 						break;
 					case AXE:
-						damagemax = 3*skills[SKILL_AXE][SKILL_LEVEL] + 2*Item::items[items[slot]->getID()].attack;
+						//damagemax = 3*skills[SKILL_AXE][SKILL_LEVEL] + 2*Item::items[items[slot]->getID()].attack;
+						damagemax = skills[SKILL_AXE][SKILL_LEVEL]*Item::items[items[slot]->getID()].attack/20 + Item::items[items[slot]->getID()].attack; 
 						break;
 					case DIST:
 						distitem = GetDistWeapon();
 						if(distitem){
-							damagemax = 3*skills[SKILL_DIST][SKILL_LEVEL]+ 2*Item::items[distitem->getID()].attack;
+							//damagemax = 3*skills[SKILL_DIST][SKILL_LEVEL]+ 2*Item::items[distitem->getID()].attack;
+							damagemax = skills[SKILL_DIST][SKILL_LEVEL]*Item::items[distitem->getID()].attack/20 + Item::items[distitem->getID()].attack; 
 							//hit or miss
 							int hitchance;
 							if(distitem->getWeaponType() == AMO){//projectile

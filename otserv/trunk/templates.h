@@ -70,13 +70,17 @@ public:
 	AutoID() {
 		unsigned long newid;
 		OTSYS_THREAD_LOCK_CLASS lockClass(autoIDLock);
-
+		count++;
+		if(count >= 0xFFFFFF)
+			count = 1000;
+		
 		while(list.find(count) != list.end()){
 			if(count >= 0xFFFFFF)
 				count = 1000;
 			else
-			count++;
+				count++;
 		}
+		list.insert(count);
 		auto_id = count;
 	}
 	virtual ~AutoID(){

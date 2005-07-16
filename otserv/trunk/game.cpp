@@ -188,7 +188,7 @@ void GameState::onAttack(Creature* attacker, const Position& pos, Creature* atta
 		damage = 0;
 	else
 	{
-		damage -= (int)(damage*armor/100);
+		damage -= (int)((damage*armor/100)*(rand()/(RAND_MAX+1.0)));
 	}
 	
 	int manaDamage = 0;
