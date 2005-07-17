@@ -716,7 +716,7 @@ bool Game::removeCreature(Creature* c)
 		
 	stopEvent(c->eventCheck);
 	stopEvent(c->eventCheckAttacking);
-	
+
 	Player* player = dynamic_cast<Player*>(c);
 	if(player){
 		if(player->tradePartner != 0) {
@@ -734,7 +734,6 @@ bool Game::removeCreature(Creature* c)
 	}
 	
 	this->FreeThing(c);
-
 	return true;
 }
 
@@ -2005,8 +2004,11 @@ void Game::thingMoveInternal(Creature *creature, unsigned short from_x, unsigned
 					const MagicEffectItem* fieldItem = toTile->getFieldItem();
 					
 					if(fieldItem) {
-						fieldItem->getDamage(creatureMoving);
 						const MagicEffectTargetCreatureCondition *magicTargetCondition = fieldItem->getCondition();
+
+						if(!(getWorldType() == WORLD_TYPE_NO_PVP && playerMoving && magicTargetCondition && magicTargetCondition->getOwnerID() != 0)) {
+							fieldItem->getDamage(creatureMoving);
+						}
 						
 						if(magicTargetCondition && ((magicTargetCondition->attackType == ATTACK_FIRE) || 
 								(magicTargetCondition->attackType == ATTACK_POISON) ||

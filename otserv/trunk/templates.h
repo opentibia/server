@@ -68,7 +68,7 @@ public:
 class AutoID {
 public:
 	AutoID() {
-		unsigned long newid;
+		//unsigned long newid;
 		OTSYS_THREAD_LOCK_CLASS lockClass(autoIDLock);
 		count++;
 		if(count >= 0xFFFFFF)

@@ -22,8 +22,10 @@
 #define __DATABASE_H
 
 #ifdef WIN32
-	#include <winsock2.h>
+//#include <winsock2.h>
+#include <winsock.h>
 #endif
+
 #include <mysql.h>
 #include <sstream>
 #include <map>

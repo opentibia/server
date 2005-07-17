@@ -241,7 +241,7 @@ void IOMapBin::loadOTM(Map* map){
              secs += fgetc(fh) << 8; 
              
              Spawn *spawn = new Spawn(&g_game, pos, radius);
-             SpawnManager::instance()->spawns.push_back(spawn);
+             //SpawnManager::instance()->spawns.push_back(spawn);
              
              for (j = 0; j < count; count--){
                cx = (rand() % (radius * 2)) - radius;

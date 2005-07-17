@@ -5,6 +5,13 @@
 #include <functional>
 #include <sstream>
 
+// cross compatibility vc++ and gcc
+#ifdef __GNUC__
+#include <ext/hash_map>
+#else
+#include <hash_map>
+#endif
+
 #include <mysql++.h>
 
 #include "luascript.h"
@@ -116,11 +123,11 @@ try{
           pz = row.lookup_by_name("pz");
           save = row.lookup_by_name("save");
           if(std::string(row.lookup_by_name("house")) != ""){house = std::string(row.lookup_by_name("house"));}
-
+/*
 #ifdef __DEBUG__
 			if(gid == 0) {std::cout << "No ground tile! x: " << x << ", y: " << y << " z: " << z << std::endl;}
 #endif
-
+*/
           map->setTile(x,y,z,gid);
           Tile *t;
           t = map->getTile(x,y,z);
