@@ -305,7 +305,7 @@ bool Map::canThrowItemTo(Position from, Position to, bool creaturesBlock /* = tr
 			}
 			else if(creaturesBlock && !t->creatures.empty())
 				return false;
-			else if((from.x != x && from.y != y) && t->isBlocking())
+			else if(!(from.x == x && from.y == y) && t->isBlocking())
 				return false;
 		}
 
