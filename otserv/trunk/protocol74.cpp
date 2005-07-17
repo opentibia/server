@@ -1078,6 +1078,8 @@ void Protocol74::parseThrow(NetworkMessage &msg)
 	//ground to ground
 	else {
 		Tile *fromTile = game->getTile(from_x, from_y, from_z);
+		if(!fromTile)
+			return;
 		Creature *movingCreature = dynamic_cast<Creature*>(fromTile->getThingByStackPos(from_stack));
 		
 		if(movingCreature) {

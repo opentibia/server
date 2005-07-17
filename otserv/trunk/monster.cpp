@@ -34,7 +34,7 @@ AutoList<Monster> Monster::listMonster;
 Monster::Monster(const char *name, Game* game) : 
  Creature(name)
 {
-	//std::cout << "Monster constructor " << (unsigned long)this  <<std::endl;
+	//std::cout << "Monster constructor " << this  <<std::endl;
 	useCount = 0;
 	oldThinkTicks = 0;
 	loaded = false;
@@ -452,7 +452,7 @@ Monster::~Monster()
 	for(std::map<PhysicalAttackClass*, TimeProbabilityClass>::iterator it = physicalAttacks.begin(); it != physicalAttacks.end(); ++it) {
 		delete it->first;
 	}
-	//std::cout << "Monster destructor " << (unsigned long)this  <<std::endl;
+	//std::cout << "Monster destructor " << this  <<std::endl;
 	physicalAttacks.clear();
 }
 
@@ -884,7 +884,7 @@ void Monster::onAttack()
 		Player *attackedPlayer = dynamic_cast<Player*>(game->getCreatureByID(this->attackedCreature));
 		if (attackedPlayer) {
 			Tile* fromtile = game->map->getTile(this->pos.x, this->pos.y, this->pos.z);
-			if (!attackedPlayer->isAttackable() == 0 && fromtile->isPz() && this->access == 0) {
+			if (!attackedPlayer->isAttackable() == 0 && fromtile && fromtile->isPz() && this->access == 0) {
 				return;
 			}
 			else {
