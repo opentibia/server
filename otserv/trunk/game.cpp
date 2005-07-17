@@ -3966,6 +3966,17 @@ void Game::addThing(Player* player,const Position &pos,Thing* thing)
 			thing->pos = pos;
 			if(item && item->isSplash()){
 				if(tile->splash){
+					int oldstackpos = tile->getThingStackPos(tile->splash);
+					Item *oldsplash = tile->splash;
+
+					oldsplash->isRemoved = true;
+					FreeThing(oldsplash);
+
+					tile->splash = item;
+
+					sendUpdateThing(NULL, pos, item, oldstackpos);
+
+					/*
 					unsigned char stackpos = tile->getThingStackPos(tile->splash);
 					Item *oldsplash = tile->splash;
 					tile->splash = NULL;
@@ -3974,6 +3985,7 @@ void Game::addThing(Player* player,const Position &pos,Thing* thing)
 					sendAddThing(NULL,pos,tile->splash);
 					oldsplash->isRemoved = true;
 					FreeThing(oldsplash);
+					*/
 				}
 				else{
 					tile->splash = item;
