@@ -1199,8 +1199,9 @@ void Protocol74::parseSay(NetworkMessage &msg)
 
 void Protocol74::parseAttack(NetworkMessage &msg)
 {
-  unsigned long playerid = msg.GetU32();
-  player->setAttackedCreature(playerid);
+  unsigned long creatureid = msg.GetU32();
+	game->playerSetAttackedCreature(player, creatureid);
+  //player->setAttackedCreature(playerid);
 }
 
 void Protocol74::parseTextWindow(NetworkMessage &msg)

@@ -585,6 +585,12 @@ int Items::loadXMLInfos(std::string file)
               				}
               				else
 								std::cout << "missing shoottype for item: " << id <<  std::endl;
+
+							char* attack = (char*)xmlGetProp(p, (xmlChar*)"attack");
+							if (attack)
+								itemtype->attack = atoi(attack);
+							else
+								std::cout << "missing attack tag for ammunition: " << id << std::endl;
 						}//ammunition
             			else if (!strcmp(type, "armor")){
 							char* sarmor = (char*)xmlGetProp(p, (xmlChar*)"arm");

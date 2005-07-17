@@ -18,7 +18,7 @@
 <item id="2130" name="Golden Amulet" type="armor" position="amulet" attack="0" defence="0" weight="999" arm="0"/>
 <item id="2123" name="Ring of the Skies" type="armor" position="ring" weight="0.9" arm="0" />
 <item id="2453" name="Sprite Wand" type="weapon" position="weapon" skill="magic" attack="50" defence="50" weight="28" />
-<item id="2547" name="Power Bolt" type="amunition" position="hand" amutype="bolt" shottype="power-bolt" attack="0" defence="0" weight="23" />
+<item id="2547" name="power bolt" type="amunition" position="hand" amutype="bolt" shottype="power-bolt" attack="60" defence="0" weight="23" />
 <item id="2111" name="Snowball" type="weapon" skill="distance" shottype="snowball" attack="0" defence="0" weight="0.8"/>
 
 

@@ -222,8 +222,6 @@ public:
   int maglevel;	// magic level
   int level;		// level
   int speed;
-  unsigned long eventCheck;
-  unsigned long eventCheckAttacking;
  
   Direction direction;
 
@@ -242,6 +240,9 @@ public:
 	virtual int getInflicatedDamage(unsigned long id);
 
 protected:
+  unsigned long eventCheck;
+  unsigned long eventCheckAttacking;
+
 	Creature *master;
 	std::vector<Creature*> summons;
 

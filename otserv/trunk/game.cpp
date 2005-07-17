@@ -683,7 +683,7 @@ bool Game::placeCreature(Position &pos, Creature* c)
 			}
 			
 			c->eventCheck = addEvent(makeTask(1000, std::bind2nd(std::mem_fun(&Game::checkCreature), c->getID())));
-			c->eventCheckAttacking = addEvent(makeTask(2000, std::bind2nd(std::mem_fun(&Game::checkCreatureAttacking), c->getID())));
+			//c->eventCheckAttacking = addEvent(makeTask(2000, std::bind2nd(std::mem_fun(&Game::checkCreatureAttacking), c->getID())));
 		}
 	}
 	else {
@@ -2899,7 +2899,7 @@ void Game::checkCreature(unsigned long id)
 		int oldThinkTicks = creature->onThink(thinkTicks);
 		
 		if(thinkTicks > 0) {
-			addEvent(makeTask(thinkTicks, std::bind2nd(std::mem_fun(&Game::checkCreature), id)));
+			creature->eventCheck = addEvent(makeTask(thinkTicks, std::bind2nd(std::mem_fun(&Game::checkCreature), id)));
 		}
 
 		Player* player = dynamic_cast<Player*>(creature);
@@ -3058,7 +3058,7 @@ void Game::checkCreatureAttacking(unsigned long id)
 			monster->onAttack();
 		}
 		else {
-			addEvent(makeTask(2000, std::bind2nd(std::mem_fun(&Game::checkCreatureAttacking), id)));
+			creature->eventCheckAttacking = addEvent(makeTask(2000, std::bind2nd(std::mem_fun(&Game::checkCreatureAttacking), id)));
 
 			if (creature->attackedCreature != 0)
 			{
@@ -3671,6 +3671,20 @@ void Game::playerCloseTrade(Player* player)
 		tradePartner->sendTextMessage(MSG_SMALLINFO, "Trade cancelled.");
 		tradePartner->sendCloseTrade();
 	}
+}
+
+void Game::playerSetAttackedCreature(Player* player, unsigned long creatureid)
+{
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
+	
+	player->setAttackedCreature(creatureid);
+	stopEvent(player->eventCheckAttacking);
+
+	if(creatureid != 0) {
+		player->eventCheckAttacking = addEvent(makeTask(2000, std::bind2nd(std::mem_fun(&Game::checkCreatureAttacking), player->getID())));
+	}
+	else
+		player->eventCheckAttacking = 0;
 }
 
 void Game::flushSendBuffers(){

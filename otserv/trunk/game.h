@@ -229,6 +229,7 @@ public:
 	void playerAcceptTrade(Player* player);
 	void playerLookInTrade(Player* player, bool lookAtCounterOffer, int index);
 	void playerCloseTrade(Player* player);
+	void playerSetAttackedCreature(Player* player, unsigned long creatureid);
 
   void changeOutfitAfter(unsigned long id, int looktype, long time);
   void changeSpeed(unsigned long id, unsigned short speed);

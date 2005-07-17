@@ -2233,10 +2233,10 @@
 
 
 <!--ammunition-->
-<item id="2352" name="crystal arrow" type="amunition" position="hand" amutype="arrow" shottype="arrow" attack="0" defence="0" weight="0.7" />
+<item id="2352" name="crystal arrow" type="amunition" position="hand" amutype="arrow" shottype="arrow" attack="200" defence="0" weight="0.7" />
 <item id="2543" name="bolt" type="amunition" position="hand" amutype="bolt" shottype="bolt" attack="0" defence="0" weight="0.8" />
-<item id="2547" name="Power Bolt" type="amunition" position="hand" amutype="bolt" shottype="power-bolt" attack="0" defence="0" weight="23" />
-<item id="2544" name="arrow" type="amunition" position="hand" amutype="arrow" shottype="arrow" attack="0" defence="0" weight="0.7" />
+<item id="2547" name="power bolt" type="amunition" position="hand" amutype="bolt" shottype="power-bolt" attack="60" defence="0" weight="23" />
+<item id="2544" name="arrow" type="amunition" position="hand" amutype="arrow" shottype="arrow" attack="30" defence="0" weight="0.7" />
 <item id="2545" name="poison arrow" type="amunition" position="hand" amutype="arrow" shottype="poison-arrow" attack="0" defence="0" weight="0.8" arm="0"/>
 <item id="2546" name="burst arrow" type="amunition" position="hand" amutype="arrow" shottype="burst-arrow" attack="0" defence="0" weight="0.9" arm="0"/>
 <!--end ammunition-->
