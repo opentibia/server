@@ -71,7 +71,7 @@ public:
 		if(_exhaustionticks >= 0)
 			exhaustionTicks = _exhaustionticks;
 	}
-
+  	
 	int getExhaustion() const {return exhaustionTicks;}
 
 private:
@@ -133,6 +133,13 @@ public:
 			delete this;
 	};
 
+	virtual int getArmor() const {
+  		return this->armor;
+  	}
+  	
+	virtual int getDefense() const {
+  		return this->defense;
+  	}
 	
 	virtual void onAttack();
 	bool isLoaded() const {return loaded;}
@@ -144,6 +151,8 @@ private:
 	int oldThinkTicks;
 	Position targetPos;
 	Position moveToPos;
+	int armor;
+	int defense;
 	void doMoveTo(const Position& destpos, bool isRouteValid);
 
 	int getCurrentDistanceToTarget();

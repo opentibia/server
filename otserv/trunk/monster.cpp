@@ -45,6 +45,8 @@ Monster::Monster(const char *name, Game* game) :
 	targetDistance = 1;
 	runawayHealth = 0;
 	pushable = true;
+	this->defense = 0;
+	this->armor = 0;
 	
 	std::string datadir = g_config.getGlobalString("datadir");
 	std::string filename = datadir + "monster/" + std::string(name) + ".xml";
@@ -78,6 +80,12 @@ Monster::Monster(const char *name, Game* game) :
 			level = atoi((const char*)xmlGetProp(root, (const xmlChar *)"level"));
 			setNormalSpeed();
 			maglevel = atoi((const char*)xmlGetProp(root, (const xmlChar *)"maglevel"));
+		}
+		if ((const char*)xmlGetProp(root, (const xmlChar *)"defense")) {
+			this->defense = atoi((const char*)xmlGetProp(root, (const xmlChar *)"defense"));
+		}
+		if ((const char*)xmlGetProp(root, (const xmlChar *)"armor")) {
+			this->armor = atoi((const char*)xmlGetProp(root, (const xmlChar *)"armor"));
 		}
 
 		while (p)
