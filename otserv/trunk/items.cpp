@@ -51,6 +51,9 @@ ItemType::ItemType()
 	floorChangeEast = false;
 	floorChangeWest = false;
 	blockpickupable = true;
+	
+	isDoor = false;
+	isDoorWithLock = false;
 
 	isteleport = false;
 	
@@ -177,17 +180,17 @@ int Items::loadFromDat(std::string file)
                          iType->floorChangeNorth = true;
                          iType->floorChangeEast = true;
                          }                                       
-                                     
+			
 			switch (optbyte)
 			{
 	   		case 0x00:
 		   		//is groundtile	   				
     			iType->groundtile = true;
     			iType->speed=(int)fgetc(f);
-				if(iType->speed==0) {
-                  iType->blocking=true;
-                  }    
-                  fgetc(f);
+					if(iType->speed==0) {
+						iType->blocking=true;
+					}
+					fgetc(f);
 		   		break;
 
         case 0x01: // all OnTop
@@ -212,17 +215,18 @@ int Items::loadFromDat(std::string file)
 
 				case 0x0A:
 					//is multitype !!! wrong definition (only water splash on floor)
-                    iType->multitype=true;
+					iType->multitype=true;
 					break;
 
 				case 0x0B:
 					//is blocking
 					iType->blocking=true;
+					//std::cout << "0x0B\t"<< (int) id << std::endl;
 					break;
 				
 				case 0x0C:
 					//is on moveable
-                    iType->notMoveable=true;
+					iType->notMoveable=true;
 					break;
 	
 				case 0x0F:
@@ -232,66 +236,91 @@ int Items::loadFromDat(std::string file)
 
 				case 0x10:
 					//makes light (skip 4 bytes)
-                    fgetc(f); //number of tiles around
-                    fgetc(f); // always 0
-                    fgetc(f); // 215 items, 208 fe non existant items other values
-                    fgetc(f); // always 0
+					fgetc(f); //number of tiles around
+					fgetc(f); // always 0
+					fgetc(f); // 215 items, 208 fe non existant items other values
+					fgetc(f); // always 0
 					break;
 
         case 0x06: // ladder up (id 1386)   why a group for just 1 item ???   
-            break;
+					break;
         case 0x09: //can contain fluids
         	iType->fluidcontainer = true;
-            break;
+					break;
         case 0x0D: // blocks missiles (walls, magic wall etc)
 					iType->blockingProjectile = true;
-          break;
+					//std::cout << "0x0D\t"<< (int) id << std::endl;
+					break;
         case 0x0E: // blocks monster movement (flowers, parcels etc)
-            break;
+					break;
         case 0x11: // can see what is under (ladder holes, stairs holes etc)
             break;
         case 0x12: // ground tiles that don't cause level change
 					iType->noFloorChange = true;
-            break;
+					break;
         case 0x18: // cropses that don't decay
-            break;
+					break;
         /*case 0x19: //(removed in 7.4) monster has animation even when iddle (rot, wasp, slime, fe)
             break;*/
         case 0x14: // player color templates
-            break;
+					break;
 
 				case 0x07: // writtable objects					
 					iType->RWInfo |= CAN_BE_WRITTEN | CAN_BE_READ;
-                    fgetc(f); //max characters that can be written in it (0 unlimited)
-                    fgetc(f); //max number of  newlines ? 0, 2, 4, 7                    
-				    break;
+					fgetc(f); //max characters that can be written in it (0 unlimited)
+					fgetc(f); //max number of  newlines ? 0, 2, 4, 7                    
+					break;
 				case 0x08: // writtable objects that can't be edited 					
 					iType->RWInfo |= CAN_BE_READ;
-                    fgetc(f); //always 0 max characters that can be written in it (0 unlimited) 
-                    fgetc(f); //always 4 max number of  newlines ? 
-				    break;
+					fgetc(f); //always 0 max characters that can be written in it (0 unlimited) 
+					fgetc(f); //always 4 max number of  newlines ? 
+					break;
 				case 0x13: // mostly blocking items, but also items that can pile up in level (boxes, chairs etc)
 					iType->blockpickupable = false;
 					//std::cout << "0x13: " << id << std::endl;
 
-                    fgetc(f); //always 8
-                    fgetc(f); //always 0
-                    break;
-				case 0x16: // ground, blocking items and mayby some more 
-				unsigned char a;
-                    a = fgetc(f); //12, 186, 210, 129 and other.. 
-                    fgetc(f); //always 0
-                    //if(a == 210)
-                    //printf("%d - %d %d\n", iType->id, a);
-                    //iType->floorChange = true;
-				    break;
+					fgetc(f); //always 8
+					fgetc(f); //always 0
+					break;
+				case 0x16: //for minimap drawing					
+					//0: black color - tar
+					//30: light-blue color - swamp
+					//12: dark-green color - forrest/bushes/trees
+					//24: light-green color - forrest edges
+					//40: dark-blue - water
+					//86: dark-grey color - various items, mountain edges, stone portals
+					//87: dark-grey color - mountains
+					//114: light-brown - underground edges
+					//121: dark-brown - underground
+					//129: light-grey color - normal ground
+					//179: light-blue color - ice
+					//186: red color - blocking items
+					//192: orange color - lava
+					//207: "sand" color - sand
+					//210: yellow color
+
+					unsigned short subopt;
+					subopt = fgetc(f);
+				  subopt += fgetc(f) << 8;
+					
+					//std::cout << "0x16\t"<< (int) id << ": " << (int) subopt << std::endl;
+
+					//a = fgetc(f); //12, 186, 210, 129 and other.. 
+					//std::cout << (int) id << ": ";
+					//std::cout << "\t" << "byte 1: "<< (int) a;
+					//a = fgetc(f); //always 0
+					//std::cout << "\t" << "byte 2: "<< (int) a << std::endl;
+					//if(a == 210)
+					//printf("%d - %d %d\n", iType->id, a);
+					//iType->floorChange = true;
+					break;
 				case 0x1A: 
-                    //7.4 (change no data ?? ) action that can be performed (doors-> open, hole->open, book->read) not all included ex. wall torches
-				    break;
+					//7.4 (change no data ?? ) action that can be performed (doors-> open, hole->open, book->read) not all included ex. wall torches
+					break;
 				//new from 7.4    
 				case 0x1D:  // line spot ...
-                    optbyte = fgetc(f); // 86 -> openable holes, 77-> can be used to go down, 76 can be used to go up, 82 -> stairs up, 79 switch,    
-                    switch(optbyte){
+					optbyte = fgetc(f); // 86 -> openable holes, 77-> can be used to go down, 76 can be used to go up, 82 -> stairs up, 79 switch,
+					switch(optbyte){
 					case 0x4C: //ladders
 						break;
 					case 0x4D: //crate
@@ -301,8 +330,12 @@ int Items::loadFromDat(std::string file)
 					case 0x4F: //switch
 						break;
 					case 0x50: //doors
+						iType->isDoor = true;
+						//std::cout << "0x1D\t0x50\t"<< (int) id << std::endl;
 						break;
-					case 0x51: //doors?
+					case 0x51: //doors with locks
+						iType->isDoorWithLock = true;
+						//std::cout << "0x1D\t0x51\t"<< (int) id << std::endl;
 						break;
 					case 0x52: //stairs
 						break;
@@ -323,16 +356,18 @@ int Items::loadFromDat(std::string file)
 						std::cout << "unknown action byte: " << (unsigned short)optbyte << std::endl;
 						break;
 					}
-                    fgetc(f); // always 4                  
-                    break;         
+					
+					fgetc(f); // always value 4
+					break;         
 				case 0x1B:  // walls 2 types of them same material (total 4 pairs)                  
-                    break;
-                case 0x19:  // wall items                 
-                    break;    
-                case 0x17:  // seems like decorables with 4 states of turning (exception first 4 are unique statues)                 
-                    break;
-                case 0x1C:  // ?? ...                 
-                    break;        
+					break;
+				
+				case 0x19:  // wall items                 
+					break;    
+				case 0x17:  // seems like decorables with 4 states of turning (exception first 4 are unique statues)                 
+					break;
+				case 0x1C:  // ?? ...                 
+					break;        
                         
 				default:
 						std::cout << "unknown byte: " << (unsigned short)optbyte << std::endl;

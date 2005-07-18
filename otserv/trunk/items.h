@@ -99,6 +99,9 @@ public:
 	bool floorChangeEast;
 	bool floorChangeWest;
 	bool blockpickupable;
+
+	bool isDoor;
+	bool isDoorWithLock;
 };
 
 

@@ -728,7 +728,6 @@ bool Player::internalAddItemContainer(Container *container,Item* item){
 	bool isContainerHolding = false;
 	Container* itemContainer = dynamic_cast<Container*>(item);
 	if(itemContainer){
-		//((Container*)item)->isHolding(container, isContainerHolding);
 		isContainerHolding = itemContainer->isHoldingItem(container);
 	}
 

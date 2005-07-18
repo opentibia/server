@@ -1922,7 +1922,8 @@ void Game::thingMoveInternal(Creature *creature, unsigned short from_x, unsigned
 					if(c){      
 						if((std::abs(creatureMoving->pos.x-c->pos.x) > 8) ||
 						(std::abs(creatureMoving->pos.y-c->pos.y) > 5) || (creatureMoving->pos.z != c->pos.z)){                      
-							playerMoving->sendCancelAttacking();
+							//playerMoving->sendCancelAttacking();
+							playerSetAttackedCreature(playerMoving, 0);
 						}
 					}
 				}
@@ -2572,7 +2573,8 @@ bool Game::creatureOnPrepareAttack(Creature *creature, Position pos)
 			if(tile && tile->isPz()) {
 				if(player) {					
 					player->sendTextMessage(MSG_SMALLINFO, "You may not attack a person while your in a protection zone.");	
-					player->sendCancelAttacking();
+					playerSetAttackedCreature(player, 0);
+					//player->sendCancelAttacking();
 				}
 
 				return false;
@@ -2580,7 +2582,8 @@ bool Game::creatureOnPrepareAttack(Creature *creature, Position pos)
 			else if(targettile && targettile->isPz()) {
 				if(player) {					
 					player->sendTextMessage(MSG_SMALLINFO, "You may not attack a person in a protection zone.");
-					player->sendCancelAttacking();
+					playerSetAttackedCreature(player, 0);
+					//player->sendCancelAttacking();
 				}
 
 				return false;
@@ -2647,13 +2650,15 @@ void Game::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fi
 
 	if(attackedCreature->access != 0){
 		if(player){
-			player->sendCancelAttacking();
+			//player->sendCancelAttacking();
+			playerSetAttackedCreature(player, 0);
 			player->sendTextMessage(MSG_SMALLINFO, "You may not attack this player.");
 		}
 	  	return;
 	}
 	if(getWorldType() == WORLD_TYPE_NO_PVP && player && attackedPlayer && player->access == 0){
-		player->sendCancelAttacking();
+		//player->sendCancelAttacking();
+		playerSetAttackedCreature(player, 0);
 		player->sendTextMessage(MSG_SMALLINFO, "You may not attack this player.");
 		return;
 	}
@@ -2703,7 +2708,10 @@ void Game::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fi
   }
 	
 	if(!inReach){
-		//OTSYS_THREAD_UNLOCK(gameLock)                  
+		if(player) {
+			player->sendTextMessage(MSG_SMALLINFO, "Target lost.");
+			playerSetAttackedCreature(player, 0);
+		}
 		return;
 	}
 
@@ -3057,8 +3065,6 @@ void Game::checkCreatureAttacking(unsigned long id)
 			monster->onAttack();
 		}
 		else {
-			creature->eventCheckAttacking = addEvent(makeTask(2000, std::bind2nd(std::mem_fun(&Game::checkCreatureAttacking), id)));
-
 			if (creature->attackedCreature != 0)
 			{
 				Creature *attackedCreature = getCreatureByID(creature->attackedCreature);
@@ -3074,7 +3080,9 @@ void Game::checkCreatureAttacking(unsigned long id)
 						Player* player = dynamic_cast<Player*>(creature);
 						if (player) {							
 							player->sendTextMessage(MSG_SMALLINFO, "You may not attack a person in a protection zone.");
-							player->sendCancelAttacking();
+							//player->sendCancelAttacking();
+							playerSetAttackedCreature(player, 0);
+							return;
 						}
 					}
 					else
@@ -3084,6 +3092,8 @@ void Game::checkCreatureAttacking(unsigned long id)
 							this->creatureMakeDamage(creature, attackedCreature, creature->getFightType());
 						}
 					}
+
+					creature->eventCheckAttacking = addEvent(makeTask(2000, std::bind2nd(std::mem_fun(&Game::checkCreatureAttacking), id)));
 				}
 			}
 		}
@@ -3680,7 +3690,11 @@ void Game::playerCloseTrade(Player* player)
 void Game::playerSetAttackedCreature(Player* player, unsigned long creatureid)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
-	
+		
+	if(player->attackedCreature != 0 && creatureid == 0) {
+		player->sendCancelAttacking();
+	}
+
 	player->setAttackedCreature(creatureid);
 	stopEvent(player->eventCheckAttacking);
 

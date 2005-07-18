@@ -369,14 +369,19 @@ xmlNodePtr Item::serialize(){
 }
 
 bool Item::isBlockingProjectile() const {
-	return items[id].blockingProjectile;
+	const ItemType& it = items[id];
+	if((it.isDoor || it.isDoorWithLock) && it.blocking)
+		return true;
+
+	return it.blockingProjectile;
 }
 
 bool Item::isBlocking(bool ispickupable /*= false*/) const {
-	if(ispickupable && items[id].blocking)
-		return items[id].blockpickupable;
+	const ItemType& it = items[id];
+	if(ispickupable && it.blocking)
+		return it.blockpickupable;
 	else
-		return items[id].blocking;
+		return it.blocking;
 }
 
 bool Item::isStackable() const {

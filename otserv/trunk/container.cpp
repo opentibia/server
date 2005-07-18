@@ -89,27 +89,6 @@ bool Container::removeItem(Item* item)
 	return false;
 }
 
-/*
-void Container::isHolding(const Item* item, bool& found) const
-{
-	if(found || item == NULL)
-		return;
-
-	for (ContainerList::const_iterator cit = lcontained.begin(); cit != lcontained.end(); ++cit) {
-		Container *container = dynamic_cast<Container*>(*cit);
-		if(container) {
-
-			if(container == item) {
-				found = true;
-				break;
-			}
-			else
-				return container->isHolding(item, found);
-		}
-	}
-}
-*/
-
 void Container::moveItem(unsigned char from_slot, unsigned char to_slot)
 {
 	int n = 0;

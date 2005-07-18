@@ -167,7 +167,6 @@ public:
 
   void sendIcons();  
   void sendNetworkMessage(NetworkMessage *msg);
-  void sendCancelAttacking();
   void sendChangeSpeed(Creature* creature);
   void sendToChannel(Creature *creature, SpeakClasses type, const std::string &text, unsigned short channelId);
   virtual void sendCancel(const char *msg) const;
@@ -225,6 +224,7 @@ protected:
 	Item *tradeItem;
 	std::list<Direction> pathlist;
 	
+  void sendCancelAttacking();
 	long long getSleepTicks() const;
 	virtual void onCreatureAppear(const Creature *creature);
   virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos, bool tele);
