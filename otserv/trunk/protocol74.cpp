@@ -1242,7 +1242,7 @@ void Protocol74::parseAcceptTrade(NetworkMessage &msg)
 
 void Protocol74::parseLookInTrade(NetworkMessage &msg)
 {
-	bool counterOffer = msg.GetByte();
+	bool counterOffer = (msg.GetByte() == 0x01);
 	int index = msg.GetByte();
 	
 	game->playerLookInTrade(player, counterOffer, index);

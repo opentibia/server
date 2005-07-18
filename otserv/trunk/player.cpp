@@ -726,9 +726,12 @@ bool Player::addItem(Item *item){
 
 bool Player::internalAddItemContainer(Container *container,Item* item){
 	bool isContainerHolding = false;
-	if(dynamic_cast<Container*>(item)){
-		((Container*)item)->isHolding(container, isContainerHolding);
+	Container* itemContainer = dynamic_cast<Container*>(item);
+	if(itemContainer){
+		//((Container*)item)->isHolding(container, isContainerHolding);
+		isContainerHolding = itemContainer->isHoldingItem(container);
 	}
+
 	//check if it is full
 	if(!isContainerHolding && container->size() < container->capacity()){
 		//add the item

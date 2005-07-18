@@ -24,7 +24,7 @@ Container::Container(const unsigned short _type) : Item(_type)
 {
 	maxitems = items[this->getID()].maxItems;
 	actualitems = 0;
-	parent = 0;
+	parent = NULL;
 	depot = 0;
 	useCount = 0;
 }
@@ -89,6 +89,7 @@ bool Container::removeItem(Item* item)
 	return false;
 }
 
+/*
 void Container::isHolding(const Item* item, bool& found) const
 {
 	if(found || item == NULL)
@@ -107,6 +108,7 @@ void Container::isHolding(const Item* item, bool& found) const
 		}
 	}
 }
+*/
 
 void Container::moveItem(unsigned char from_slot, unsigned char to_slot)
 {
@@ -167,8 +169,9 @@ long Container::getItemHoldingCount() const
 
 	std::list<const Container*> stack;
 
-	for (ContainerList::const_iterator cit = getItems(); cit != getEnd(); ++cit) {
-		Container *container = dynamic_cast<Container*>(*cit);
+	ContainerList::const_iterator it;
+	for (it = getItems(); it != getEnd(); ++it) {
+		Container *container = dynamic_cast<Container*>(*it);
 		if(container) {
 			stack.push_back(container);
 		}
@@ -191,6 +194,42 @@ long Container::getItemHoldingCount() const
 	}
 
 	return holdcount;
+}
+
+bool Container::isHoldingItem(const Item* item) const
+{
+	std::list<const Container*> stack;
+
+	ContainerList::const_iterator it;
+	for (it = getItems(); it != getEnd(); ++it) {
+		Container *container = dynamic_cast<Container*>(*it);
+
+		if(*it == item) {
+			return true;
+		}
+
+		if(container) {
+			stack.push_back(container);
+		}
+	}
+	
+	while(stack.size() > 0) {
+		const Container *container = stack.front();
+		stack.pop_front();
+
+		for (it = container->getItems(); it != container->getEnd(); ++it) {
+			Container *container = dynamic_cast<Container*>(*it);
+			if(*it == item) {
+				return true;
+			}
+
+			if(container) {
+				stack.push_back(container);
+			}
+		}
+	}
+
+	return false;
 }
 
 ContainerList::const_iterator Container::getItems() const {

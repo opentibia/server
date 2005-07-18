@@ -25,6 +25,7 @@
 
 #include <queue>
 #include <vector>
+#include <set>
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
@@ -267,7 +268,7 @@ public:
   bool shutdown;
 
 protected:
-	std::vector<Item*> tradeItems; //list of items that are in trading state
+	std::set<Item*> tradeItems; //list of items that are in trading state
 	
 	AutoList<Creature> listCreature;
 

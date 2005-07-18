@@ -37,8 +37,7 @@
 
 #ifdef _OLD_MYSQL_
 	#include <mysql++.h>
-#else
-	//#include "mysql.h"
+#elif USE_MYSQL
 	#include "database.h"
 #endif
 #include <boost/tokenizer.hpp>

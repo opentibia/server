@@ -227,8 +227,8 @@ public:
 
   virtual bool canMovedTo(const Tile *tile) const;
 
-  virtual void sendCancel(const char *msg) { };
-  virtual void sendCancelWalk(const char *msg) { };
+  virtual void sendCancel(const char *msg) const { };
+  virtual void sendCancelWalk(const char *msg) const { };
 
 
 	virtual void addInflictedDamage(Creature* attacker, int damage);

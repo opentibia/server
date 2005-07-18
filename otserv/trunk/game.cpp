@@ -876,17 +876,16 @@ bool Game::onPrepareMoveThing(Creature *player, const Item* fromItem, const Cont
 		player->sendCancel("Sorry, not possible.");
 		return false;
 	}
-	else if((!fromItem->isStackable() || !toItem || fromItem->getID() != toItem->getID() || toItem->getItemCountOrSubtype() >= 100) && toContainer->size() + 1 > toContainer->capacity()) {		
-		player->sendCancel("Sorry not enough room.");
-		return false;
-	}
-
-	const Container *itemContainer = dynamic_cast<const Container*>(fromItem);
-	if(itemContainer) {
-		bool isContainerHolding = false;
-		itemContainer->isHolding(toContainer, isContainerHolding);
-		if(isContainerHolding || (toContainer == itemContainer) || (fromContainer && fromContainer == itemContainer)) {			
-			player->sendCancel("This is impossible.");
+	else {
+		const Container *itemContainer = dynamic_cast<const Container*>(fromItem);
+		if(itemContainer) {
+			if(itemContainer->isHoldingItem(toContainer) || (toContainer == itemContainer) || (fromContainer && fromContainer == itemContainer)) {
+				player->sendCancel("This is impossible.");
+				return false;
+			}
+		}
+		else if((!fromItem->isStackable() || !toItem || fromItem->getID() != toItem->getID() || toItem->getItemCountOrSubtype() >= 100) && toContainer->size() + 1 > toContainer->capacity()) {		
+			player->sendCancel("Sorry not enough room.");
 			return false;
 		}
 	}
@@ -3523,7 +3522,7 @@ void Game::playerRequestTrade(Player *player, const Position& pos,
 
 	player->tradePartner = playerid;
 	player->tradeItem = tradeItem;
-	tradeItems.push_back(tradeItem);
+	tradeItems.insert(tradeItems.begin(), tradeItem);
 
 	player->sendTradeItemRequest(player, tradeItem, true);
 
@@ -3549,12 +3548,15 @@ void Game::playerAcceptTrade(Player* player)
 		Item *tradeItem1 = player->tradeItem;
 		Item *tradeItem2 = tradePartner->tradeItem;
 
-		std::vector<Item*>::iterator it;
-		if((it = std::find(tradeItems.begin(), tradeItems.end(), tradeItem1)) != tradeItems.end()) {
+		std::set<Item*>::iterator it;
+
+		it = tradeItems.find(tradeItem1);
+		if(it != tradeItems.end()) {
 			tradeItems.erase(it);
 		}
 
-		if((it = std::find(tradeItems.begin(), tradeItems.end(), tradeItem2)) != tradeItems.end()) {
+		it = tradeItems.find(tradeItem2);
+		if(it != tradeItems.end()) {
 			tradeItems.erase(it);
 		}
 
@@ -3651,7 +3653,8 @@ void Game::playerCloseTrade(Player* player)
 
 	std::vector<Item*>::iterator it;
 	if(player->getTradeItem()) {
-		if((it = std::find(tradeItems.begin(), tradeItems.end(), player->getTradeItem())) != tradeItems.end()) {
+		std::set<Item*>::iterator it = tradeItems.find(player->getTradeItem());
+		if(it != tradeItems.end()) {
 			tradeItems.erase(it);
 		}
 	}
@@ -3662,7 +3665,8 @@ void Game::playerCloseTrade(Player* player)
 
 	if(tradePartner) {
 		if(tradePartner->getTradeItem()) {
-			if((it = std::find(tradeItems.begin(), tradeItems.end(), tradePartner->getTradeItem())) != tradeItems.end()) {
+			std::set<Item*>::iterator it = tradeItems.find(tradePartner->getTradeItem());
+			if(it != tradeItems.end()) {
 				tradeItems.erase(it);
 			}
 		}

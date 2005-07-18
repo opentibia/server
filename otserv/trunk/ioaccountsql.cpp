@@ -24,7 +24,7 @@
 #include <sstream>
 #ifdef _OLD_MYSQL_
 	#include <mysql++.h>
-#else
+#elif USE_MYSQL
 	#include "database.h"
 	#include <iostream>
 #endif
