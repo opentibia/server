@@ -1,79 +1,100 @@
-otserv 0.2.7
-=======
+============================================
+========== OpenTibia Server 0.4.0 ==========
+============================================
+===== www.otserv.org	www.otfans.net =====
+============================================
+Readme by Pekay.
+
+
 What is this?
-	otserv is a programm that acts like a tibia server.
-	You can connect to it, walk around, talk, create items.
+	OTServ is an emulator of the famous game; Tibia. It acts as a server
+	that lets people play on.
+	You can do a lot in-game. Such as walking, talking, trading, hunting and more.
 
 How does it work?
-	Just start otserv.exe. Then, you need Tibia 7.1. 7.11
-	doesnt work as you cant specify a server to connect to.
-	Set the server IP in the client to 127.0.0.1
-	Then connect like to the normal tibia server.
-	Leave account number and password blank.
-	Never ever enter your real acc# and/or password when
-	not connecting to the CIP servers.
-	Then you are logged in.
+	In the past Otserv could be played on Tibia 7.1 or 7.11.
+	Otserv is now played using Tibia 7.4 or Tibia 7.41.
+	To play it you can either download the IP changer (works with
+	only Tibia 7.4) or change the shortcut to Tibia.
+	If you are making a shortcut to it, open the properties of the shortcut
+	and you should see a box marked "Target:" and should look roughly
+	like this: "C:/tibia directory/Tibia.exe".
+	on the end it will have host and port properties on it, so then the target box
+	will be like the following:
+	
+	"C:/<Tibia directory>/Tibia.exe" host 127.0.0.1 port 7171
+	
+	Once that's done, start the Otserv up, quite simple, just execute otserv.exe by
+	double clicking it. Then startup Tibia by double clicking its shortcut you made earlier,
+	then go to Options and Network and tick off "Test Server Login". Then login with the
+	following:
+		Account Number: 111111
+		Password: tibia
+	And check it out. Once you are done, have a look around in the folders
+	and take a look at the config. :)
 
 What's New?
-	- many small fixes
-	- you may change your outfit
-	- player saving nows uses XML
-	  and saves equipement
-	- map saving now uses XML
-	- you can walk using your mouse
+	-Actions (when using a tile or item)
+	-SQL can be used for accounts and players
+	-Crash tracking
+	-Monsters
+	-Spawns
+	-Commands
+	-Autowalk
+	-Binary map also available (JXB3 / OTM)
+	-Enhanced items database
+	-Runes with charges
+	-Depots
+	-And more!
 
 
 How do I use this new stuff?
-	Most stuff doesnt have to be explained. Expect perhaps the XML
-	stuff wich isnt really important if you arent a programmer.
-	What is important to mention is, that the way map-saves are made
-	and loaded has changed a bit.
-	The map is no longer called otserv.map but is now in data/world
-	and is called map.xml It is generated when you use the save command
-	the first time.
-	If you want to load a map in the old format, you have to make sure,
-	that map.xml *doesnt exist*.
-	The order in which otserv will read the map is:
-	1. map.xml
-	2. then otserv.map
-	3. generate empty map
+	I'm just going over what might not be familiar to you here.
 
-
-
-How to use the old stuff?
-	Create items by saying !i <itemid>
-  	  see items.txt for item ids
-	Delete items by saying !d
-	Save the map by saying !s
-	Shutdown the server by saying !q
+	The word "actions" might be unfamiliar to you. What it is an action?
+	For instance when you click on a door it will open, or drinking mana-fluids.
+	There is other cool stuff such as SQL-support, This is useful if you have a big community of
+	players for your server. You can use the other option which is xml-based which is good for beginners.
+	Binary map, well this seems quite new doesn't it. For a long time maps have been in xml format
+	and nowadays some maps are like 20 megabytes large which takes quite long to load. So you can now
+	convert your xml map to a binary map format by a simple converter. This can be found at the OTfans.net Forums.
 
 Problems?
-	If you should ever have problems, that your client
-	crashes when you login, you have to delete the map
-	(otserv.map) and replace it with otserv_default.map.
-	TO USE MULTIPLAYER MAKE SURE YOUR COMPUTER DOESNT
-	BLOCK PORT 7171
+	The server is now stable nowadays, but if you do find bugs you can report them at the CVS Bug Report board
+	on OTFans Forums (http://otfans.net/index.php?act=SF&s=&f=78). If your server crashes, you should get a report generated
+	at your Otserv folder named report.txt, you should also report this at the CVS Report Board, this report will help solving
+	bugs a lot.
 
 Credits?
-	Shi'Voc - Coding of initial otserv
-	Acrimon - Coding of initial otserv
 	Tliff - Coding, some kind of project leader
-	TiMMit - Coding
-	Reebow - special support, protocoll
-	Matkus - Front end coding
-	Privateer - Documentation on the protocoll
-	Torvik - Item list
-	Yorick - Board mod
-	Decar - Fansiter
-	Nibbles and MMN-o - Decoration on IRC ;)
-	The people that helped to name the items
-        Aire, Coding
+	SimOne - Coder/Developer and Map Editor
+	Spinm - Coder/Developer
+	Primer - Coder/Developer
+	J4K3xBl4sT3r - Coding/JXB Map Editor/Binary Map Format
+	Shivoc - Past coding/developing
+	Snack - Past coding/developing
+	GriZzm0 - Actions Documentation/Actions coding
+	Pekay - README Documentation
 
-
+	
+Forum Credits (OtFans.net):
+	Yorick - Admin
+	Nuker - Admin
+	Verkon - Admin
+	Tliff - Admin
+	
+	Pekay - Super Moderator
+	SimOne - Super Moderator
+	
+	Joel - Moderator
+	Acemo - Moderator
+	Jero - Moderator
+	J4K3xBl4sT3r - Moderator
+	
 Help?
-	We always need help. Post on the otserv board at
-	www.tibia.de/forum if you want to help.
-	Proposals are also always welcome.
+	We always need help. Post on the forums of OTFans!
+	www.otfans.net if you want to help.
+	Theres a lot to be found there.
 
 Anything else?
 	No.
