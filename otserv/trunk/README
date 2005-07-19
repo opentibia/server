@@ -7,9 +7,8 @@ Readme by Pekay.
 
 
 What is this?
-	OTServ is an emulator of the famous game; Tibia. It acts as a server
-	that lets people play on.
-	You can do a lot in-game. Such as walking, talking, trading, hunting and more.
+	OTserv is a free MMORPG emulation, that creates a own gameworld server,
+        based on the CIPsoft's Tibia.
 
 How does it work?
 	In the past Otserv could be played on Tibia 7.1 or 7.11.
@@ -22,8 +21,11 @@ How does it work?
 	on the end it will have host and port properties on it, so then the target box
 	will be like the following:
 	
-	"C:/<Tibia directory>/Tibia.exe" host 127.0.0.1 port 7171
+	"C:/<Tibia directory>/Tibia.exe" host HOSTNAME port PORT
 	
+        where HOSTNAME is the IP or HostName of the server and PORT is the port where the server acts.
+        if the server is located on your machine, it will be "host localhost port 7171".
+
 	Once that's done, start the Otserv up, quite simple, just execute otserv.exe by
 	double clicking it. Then startup Tibia by double clicking its shortcut you made earlier,
 	then go to Options and Network and tick off "Test Server Login". Then login with the
@@ -33,20 +35,24 @@ How does it work?
 	And check it out. Once you are done, have a look around in the folders
 	and take a look at the config. :)
 
-What's New?
-	-Actions (when using a tile or item)
-	-SQL can be used for accounts and players
-	-Crash tracking
-	-Monsters
-	-Spawns
-	-Commands
-	-Autowalk
-	-Binary map also available (JXB3 / OTM)
-	-Enhanced items database
-	-Runes with charges
-	-Depots
-	-And more!
+	NEVER ever enter your real acc# and/or password when
+	not connecting to the CIP servers.
+	Then you are logged in.
 
+What's New?
+        - Full rearranjed protocol and game system
+	- Actions (when using a tile or item)
+        - SQL databases (for accounts and players)
+	- Crash tracking
+	- Monsters
+	- Spawns
+	- Commands
+	- Autowalk
+	- Binary map also available (JXB3 / OTM)
+	- Enhanced items database
+	- Runes with charges
+	- Depots
+	- And more!
 
 How do I use this new stuff?
 	I'm just going over what might not be familiar to you here.
@@ -67,16 +73,17 @@ Problems?
 
 Credits?
 	Tliff - Coding, some kind of project leader
-	SimOne - Coder/Developer and Map Editor
-	Spinm - Coder/Developer
-	Primer - Coder/Developer
-	J4K3xBl4sT3r - Coding/JXB Map Editor/Binary Map Format
-	Shivoc - Past coding/developing
-	Snack - Past coding/developing
-	GriZzm0 - Actions Documentation/Actions coding
+	Shi'Voc - Initial project developer
+        Hacktivex - Initial project developer, not more a member of the team
+        Fandoras - Developer, not more a member of the team
+	SimOne - Developer and Map Editor
+	Spinm - Developer
+	Primer - Developer
+	j4K3xBl4sT3r - Developer, Map Editor, and Binary Map Format
+	Snack - Developer
+	GriZzm0 - Actions Documentation / Actions coding
 	Pekay - README Documentation
 
-	
 Forum Credits (OtFans.net):
 	Yorick - Admin
 	Nuker - Admin
@@ -89,12 +96,12 @@ Forum Credits (OtFans.net):
 	Joel - Moderator
 	Acemo - Moderator
 	Jero - Moderator
-	J4K3xBl4sT3r - Moderator
+	j4K3xBl4sT3r - Moderator
 	
 Help?
 	We always need help. Post on the forums of OTFans!
-	www.otfans.net if you want to help.
-	Theres a lot to be found there.
+	http://otfans.net if you want to help. Theres a lot to be found there.
+        http://otfans.wgbrasil.com for brazilians, our official BR site, hosted by j4K3xBl4sT3r
 
 Anything else?
 	No.
