@@ -48,7 +48,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "MD5.h"
+#include "md5.h"
 
 /* Padding */
 static unsigned char MD5_PADDING[64] = {
