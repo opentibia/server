@@ -23,6 +23,7 @@
 
 #include <string>
 #include <iostream>
+#include <iomanip>
 #include <sstream>
 #include <ctime>
 
@@ -48,6 +49,7 @@
 #include "account.h"
 
 #include "tools.h"
+#include "md5.h"
 
 #ifdef WIN32
 	#define ERROR_EINTR WSAEINTR
@@ -78,6 +80,54 @@ Commands commands(&g_game);
 #include "exception.h"
 #endif
 #include "networkmessage.h"
+
+enum passwordType_t{
+	PASSWORD_TYPE_PLAIN,
+	PASSWORD_TYPE_MD5,
+};
+
+passwordType_t passwordType;
+
+bool passwordTest(std::string &plain, std::string &hash)
+{
+	if(passwordType == PASSWORD_TYPE_MD5){
+		MD5_CTX m_md5;
+		std::stringstream hexStream;
+		std::string plainHash;
+	
+		
+	
+		MD5Init(&m_md5, 0);
+		MD5Update(&m_md5, (const unsigned char*)plain.c_str(), plain.length());
+		MD5Final(&m_md5);
+	
+		hexStream.flags(std::ios::hex);
+		for(int i=0;i<16;i++){
+			hexStream << std::setw(2) << std::setfill('0') << (unsigned long)m_md5.digest[i];
+		}
+	
+		plainHash = hexStream.str();
+		std::transform(plainHash.begin(), plainHash.end(), plainHash.begin(), upchar);
+		std::transform(hash.begin(), hash.end(), hash.begin(), upchar);
+		if(plainHash == hash){
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
+	else{
+		if(plain == hash){
+			return true;
+		}
+		else{
+			return false;
+		}
+		
+	}
+	
+}
+				
 
 bool isclientBanished(SOCKET s)
 {
@@ -146,7 +196,8 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 				sprintf(accstring, "%i", accnumber);
 				
 				Account account = IOAccount::instance()->loadAccount(accnumber);
-				if (account.accnumber == accnumber && account.password == password) // seems to be a successful load
+				//if (account.accnumber == accnumber && account.password == password) // seems to be a successful load
+				if (account.accnumber == accnumber && passwordTest(password,account.password)) // seems to be a successful load
 				{
 					msg.AddByte(0x14);
 					std::stringstream motd;
@@ -209,7 +260,8 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 				if(creature && dynamic_cast<Player*>(creature)){
 					player = dynamic_cast<Player*>(creature);
 					OTSYS_THREAD_LOCK(g_game.gameLock)
-					if(player->client->s == 0 && player->password == password && player->isRemoved == false && !g_config.getGlobalNumber("allowclones", 0)){
+					//if(player->client->s == 0 && player->password == password && player->isRemoved == false && !g_config.getGlobalNumber("allowclones", 0)){
+					if(player->client->s == 0 && passwordTest(password,player->password) && player->isRemoved == false && !g_config.getGlobalNumber("allowclones", 0)){
 						//std::cout << "relogin " << player << std::endl;
 						player->lastlogin = std::time(NULL);
 						player->client->reinitializeProtocol();
@@ -228,7 +280,8 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 					player->setID();
 					IOPlayer::instance()->loadPlayer(player, name);
 					//std::cout << "login " << player << std::endl;
-					if(player->password == password){					
+					//if(player->password == password){
+						if(passwordTest(password,player->password)){
 						if(playerexist && !g_config.getGlobalNumber("allowclones", 0)){
 							std::cout << "reject player..." << std::endl;
 							msg.Reset();
@@ -398,6 +451,13 @@ int main(int argc, char *argv[])
 	}
 	std::cout << ":: World Type: " << worldtype << std::endl;
 
+	if(g_config.getGlobalString("md5passwords") == "yes"){
+		passwordType = PASSWORD_TYPE_MD5;
+		std::cout << ":: Use MD5 passwords" << std::endl;
+	}
+	else{
+		passwordType = PASSWORD_TYPE_PLAIN;
+	}
 
 #ifdef _SQLMAP_
 	std::cout << ":: Reading spawn info from database ... \n";

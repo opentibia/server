@@ -3601,6 +3601,9 @@ void Game::playerLookInTrade(Player* player, bool lookAtCounterOffer, int index)
 	Player *tradePartner = dynamic_cast<Player*>(getCreatureByID(player->tradePartner));
 	Item *tradeItem = NULL;
 
+	if(!tradePartner)
+		return;
+
 	if(lookAtCounterOffer)
 		tradeItem = tradePartner->getTradeItem();
 	else

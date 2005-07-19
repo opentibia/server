@@ -39,7 +39,7 @@
 	#include <mysql++.h>
 #elif USE_MYSQL
 	#include "database.h"
-	#include <mysql++.h>
+	//#include <mysql++.h>
 #endif
 #include <boost/tokenizer.hpp>
 
@@ -574,8 +574,11 @@ bool IOPlayerSQL::savePlayer(Player* player){
 			++runningID;
 			parentid = 0;
 
+			/*streamitems << "(" << player->getGUID() <<"," << slotid << ","<< runningID <<","<< parentid <<"," << item->getID()<<","<< (int)item->getItemCountOrSubtype() << "," << 
+				(int)item->getActionId()<<",'"<< mysqlpp::escape << item->getText() <<"','" << mysqlpp::escape << item->getSpecialDescription() <<"'),";*/
+				
 			streamitems << "(" << player->getGUID() <<"," << slotid << ","<< runningID <<","<< parentid <<"," << item->getID()<<","<< (int)item->getItemCountOrSubtype() << "," << 
-				(int)item->getActionId()<<",'"<< mysqlpp::escape << item->getText() <<"','" << mysqlpp::escape << item->getSpecialDescription() <<"'),";
+				(int)item->getActionId()<<",'"<< Database::escapeString(item->getText()) <<"','" << Database::escapeString(item->getSpecialDescription()) <<"'),";
 
 			topcontainer = dynamic_cast<Container*>(item);
 			if(topcontainer) {
@@ -587,14 +590,16 @@ bool IOPlayerSQL::savePlayer(Player* player){
 						stack.push_back(containerStackPair(container, runningID));
 					}
 					
+					/*streamitems << "(" << player->getGUID() <<"," << 0 /*slotid*//* << ","<< runningID <<","<< parentid <<"," << (*it)->getID()<<","<< (int)(*it)->getItemCountOrSubtype() << "," << 
+					(int)(*it)->getActionId()<<",'"<< mysqlpp::escape << (*it)->getText() <<"','" << mysqlpp::escape << (*it)->getSpecialDescription() <<"'),";*/
 					streamitems << "(" << player->getGUID() <<"," << 0 /*slotid*/ << ","<< runningID <<","<< parentid <<"," << (*it)->getID()<<","<< (int)(*it)->getItemCountOrSubtype() << "," << 
-					(int)(*it)->getActionId()<<",'"<< mysqlpp::escape << (*it)->getText() <<"','" << mysqlpp::escape << (*it)->getSpecialDescription() <<"'),";
+					(int)(*it)->getActionId()<<",'"<< Database::escapeString((*it)->getText()) <<"','" <<  Database::escapeString((*it)->getSpecialDescription()) <<"'),";
 				}
 				
 				while(stack.size() > 0) {
 
 					//split into sub-queries
-					if(streamitems.str().length() > 1024) {
+					if(streamitems.str().length() > 8192) {
 						DBQuery subquery;
 						subquery << query.str();
 
@@ -621,8 +626,10 @@ bool IOPlayerSQL::savePlayer(Player* player){
 							stack.push_back(containerStackPair(container, runningID));
 						}
 
+						/*streamitems << "(" << player->getGUID() <<"," << 0 /*slotid*//* << ","<< runningID <<","<< parentid <<"," << (*it)->getID()<<","<< (int)(*it)->getItemCountOrSubtype() << "," << 
+						(int)(*it)->getActionId()<<",'"<< mysqlpp::escape << (*it)->getText() <<"','" << mysqlpp::escape << (*it)->getSpecialDescription() <<"'),";*/
 						streamitems << "(" << player->getGUID() <<"," << 0 /*slotid*/ << ","<< runningID <<","<< parentid <<"," << (*it)->getID()<<","<< (int)(*it)->getItemCountOrSubtype() << "," << 
-						(int)(*it)->getActionId()<<",'"<< mysqlpp::escape << (*it)->getText() <<"','" << mysqlpp::escape << (*it)->getSpecialDescription() <<"'),";
+						(int)(*it)->getActionId()<<",'"<< Database::escapeString((*it)->getText()) <<"','" << Database::escapeString((*it)->getSpecialDescription()) <<"'),";
 					}
 				}
 			}
@@ -643,8 +650,10 @@ bool IOPlayerSQL::savePlayer(Player* player){
 			++runningID;
 			parentid = 0;
 
+			/*streamitems << "(" << player->getGUID() <<"," << dit->first + 100 << ","<< runningID <<","<< parentid <<"," << item->getID()<<","<< (int)item->getItemCountOrSubtype() << "," << 
+				(int)item->getActionId()<<",'"<< mysqlpp::escape << item->getText() <<"','" << mysqlpp::escape << item->getSpecialDescription() <<"'),";*/
 			streamitems << "(" << player->getGUID() <<"," << dit->first + 100 << ","<< runningID <<","<< parentid <<"," << item->getID()<<","<< (int)item->getItemCountOrSubtype() << "," << 
-				(int)item->getActionId()<<",'"<< mysqlpp::escape << item->getText() <<"','" << mysqlpp::escape << item->getSpecialDescription() <<"'),";
+				(int)item->getActionId()<<",'"<< Database::escapeString(item->getText()) <<"','" << Database::escapeString(item->getSpecialDescription()) <<"'),";
 
 			topcontainer = dynamic_cast<Container*>(item);
 			if(topcontainer) {
@@ -656,14 +665,16 @@ bool IOPlayerSQL::savePlayer(Player* player){
 						stack.push_back(containerStackPair(container, runningID));
 					}
 					
+					/*streamitems << "(" << player->getGUID() <<"," << 0 /*slotid*//* << ","<< runningID <<","<< parentid <<"," << (*it)->getID()<<","<< (int)(*it)->getItemCountOrSubtype() << "," << 
+					(int)(*it)->getActionId()<<",'"<< mysqlpp::escape << (*it)->getText() <<"','" << mysqlpp::escape << (*it)->getSpecialDescription() <<"'),";*/
 					streamitems << "(" << player->getGUID() <<"," << 0 /*slotid*/ << ","<< runningID <<","<< parentid <<"," << (*it)->getID()<<","<< (int)(*it)->getItemCountOrSubtype() << "," << 
-					(int)(*it)->getActionId()<<",'"<< mysqlpp::escape << (*it)->getText() <<"','" << mysqlpp::escape << (*it)->getSpecialDescription() <<"'),";
+					(int)(*it)->getActionId()<<",'"<< Database::escapeString((*it)->getText()) <<"','" << Database::escapeString((*it)->getSpecialDescription()) <<"'),";
 				}
 				
 				while(stack.size() > 0) {
 
 					//split into sub-queries
-					if(streamitems.str().length() > 1024) {
+					if(streamitems.str().length() > 8192) {
 						DBQuery subquery;
 						subquery << query.str();
 
@@ -691,7 +702,7 @@ bool IOPlayerSQL::savePlayer(Player* player){
 						}
 
 						streamitems << "(" << player->getGUID() <<"," << 0 /*slotid*/ << ","<< runningID <<","<< parentid <<"," << (*it)->getID()<<","<< (int)(*it)->getItemCountOrSubtype() << "," << 
-						(int)(*it)->getActionId()<<",'"<< mysqlpp::escape << (*it)->getText() <<"','" << mysqlpp::escape << (*it)->getSpecialDescription() <<"'),";
+						(int)(*it)->getActionId()<<",'"<< Database::escapeString((*it)->getText()) <<"','" << Database::escapeString((*it)->getSpecialDescription()) <<"'),";
 					}
 				}
 			}

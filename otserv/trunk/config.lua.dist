@@ -48,6 +48,9 @@ ip = "127.0.0.1"
 motd = "Welcome to OpenTibia Pre-Release"
 motdnum="1"
 
+-- use md5 passwords for accounts, yes/no
+md5passwords = "no"
+
 -- world type. options: pvp, no-pvp, pvp-enforced
 worldtype = "pvp"
 
