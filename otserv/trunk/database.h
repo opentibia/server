@@ -58,7 +58,7 @@ public:
 	/** Get size of the query text
 	*\returns The size of the query text
 	*/
-	int getSize(){ return (int)this->str().size(); };
+	int getSize(){ return (int)this->str().length(); };
 };
 
 class DBResult

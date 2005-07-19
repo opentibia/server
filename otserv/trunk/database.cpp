@@ -175,11 +175,14 @@ bool Database::executeQuery(DBQuery &q)
 	if(!m_initialized || !m_connected)
 		return false;
 	
+	std::string s = q.str();
+	const char* querytext = s.c_str();
+	int querylength = s.length(); //strlen(querytext);
 	// Execute the query
-	if(mysql_real_query(&m_handle, q.getText(), q.getSize()))
+	if(mysql_real_query(&m_handle, querytext, querylength))
 	{
 		//throw DBError( q.getText() , DB_ERROR_QUERY );
-		std::cout << "MYSQL ERROR mysql_real_query: " << q.getText() << " " << mysql_error(&m_handle)  << std::endl;
+		std::cout << "MYSQL ERROR mysql_real_query: " << q.str() << " " << mysql_error(&m_handle)  << std::endl;
 		return false;
 	}
 	

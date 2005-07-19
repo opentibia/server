@@ -563,7 +563,8 @@ void Item::setSpecialDescription(std::string desc){
 		specialDescription = new std::string(desc);	
 }
 
-std::string Item::getSpecialDescription(){
+std::string Item::getSpecialDescription()
+{
 	if(!specialDescription)
 		return std::string("");
 	return *specialDescription;
@@ -594,7 +595,8 @@ void Item::clearText(){
 	text = NULL;
 }
 
-std::string Item::getText(){
+std::string Item::getText()
+{
 	if(!text)
 		return std::string("");
 	return *text;

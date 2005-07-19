@@ -27,7 +27,7 @@
 
 /** Baseclass for all Player-Loaders */
 class IOPlayerSQL : protected IOPlayer{
-  public:
+public:
 	/** Get a textual description of what source is used
 	  * \returns Name of the source*/
 	char* getSourceDescription(){return "Player source: SQL";};
@@ -39,8 +39,8 @@ class IOPlayerSQL : protected IOPlayer{
 	 bool savePlayer(Player* player);
 	IOPlayerSQL(){};
 	~IOPlayerSQL(){};
-  protected:
-	std::string getItems(Item* i, int &startid, int startslot, int player, int parentid);
+protected:
+		std::string getItems(Item* i, int &startid, int startslot, int player, int parentid);
 };
 
 #endif

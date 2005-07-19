@@ -181,12 +181,12 @@ bool Container::isHoldingItem(const Item* item) const
 
 	ContainerList::const_iterator it;
 	for (it = getItems(); it != getEnd(); ++it) {
-		Container *container = dynamic_cast<Container*>(*it);
 
 		if(*it == item) {
 			return true;
 		}
 
+		Container *container = dynamic_cast<Container*>(*it);
 		if(container) {
 			stack.push_back(container);
 		}
@@ -197,11 +197,12 @@ bool Container::isHoldingItem(const Item* item) const
 		stack.pop_front();
 
 		for (it = container->getItems(); it != container->getEnd(); ++it) {
-			Container *container = dynamic_cast<Container*>(*it);
+
 			if(*it == item) {
 				return true;
 			}
 
+			Container *container = dynamic_cast<Container*>(*it);
 			if(container) {
 				stack.push_back(container);
 			}

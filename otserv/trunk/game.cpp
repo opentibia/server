@@ -3343,8 +3343,8 @@ void Game::CreateDamageUpdate(Creature* creature, Creature* attackCreature, int 
 		if(attackCreature) {
 			dmgmesg << " due to an attack by " << attackCreature->getName();
 		}
-		else
-			dmgmesg <<".";
+		dmgmesg <<".";
+
 		player->sendTextMessage(MSG_EVENT, dmgmesg.str().c_str());
 		//msg.AddTextMessage(MSG_EVENT, dmgmesg.str().c_str());
 	}
@@ -3366,8 +3366,8 @@ void Game::CreateManaDamageUpdate(Creature* creature, Creature* attackCreature, 
 		if(attackCreature) {
 			dmgmesg << " blocking an attack by " << attackCreature->getName();
 		}
-		else
-			dmgmesg <<".";
+		dmgmesg <<".";
+
 		player->sendTextMessage(MSG_EVENT, dmgmesg.str().c_str());
 		//msg.AddTextMessage(MSG_EVENT, dmgmesg.str().c_str());
 	}
