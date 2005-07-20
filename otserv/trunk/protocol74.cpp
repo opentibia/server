@@ -2578,7 +2578,7 @@ void Protocol74::AddPlayerStats(NetworkMessage &msg,const Player *player)
   msg.AddByte(0xA0);
   msg.AddU16(player->getHealth());
 	msg.AddU16(player->getPlayerInfo(PLAYERINFO_MAXHEALTH));
-	msg.AddU16(std::floor(player->getFreeCapacity()));
+	msg.AddU16((unsigned short)std::floor(player->getFreeCapacity()));
   msg.AddU32(player->getExperience());
   msg.AddByte(player->getPlayerInfo(PLAYERINFO_LEVEL));
   msg.AddByte(player->getPlayerInfo(PLAYERINFO_LEVELPERCENT));
