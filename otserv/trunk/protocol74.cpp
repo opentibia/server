@@ -1457,9 +1457,20 @@ void Protocol74::sendThingMove(const Creature *creature, const Container *fromCo
 
 	NetworkMessage msg;
 
-	if(fromContainer && fromContainer->pos.x != 0xFFFF && toContainer->pos.x != 0xFFFF) {
-		//Auto-close container's
-		if(std::abs(player->pos.x - toContainer->pos.x) > 1 || std::abs(player->pos.y - toContainer->pos.y) > 1) {
+	//!NOTE: SIMONE check if this is really ok
+	if(fromContainer && fromContainer->pos.x != 0xFFFF) 
+	{
+		if(toContainer->pos.x != 0xFFFF) {
+			//Auto-close container's
+			if(std::abs(player->pos.x - toContainer->pos.x) > 1 || std::abs(player->pos.y - toContainer->pos.y) > 1) {
+				const Container *container = dynamic_cast<const Container*>(fromItem);
+				if(container) {				
+					autoCloseContainers(container, msg);
+				}
+			}
+		}
+		else
+		{
 			const Container *container = dynamic_cast<const Container*>(fromItem);
 			if(container) {				
 				autoCloseContainers(container, msg);
