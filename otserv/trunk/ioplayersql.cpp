@@ -95,21 +95,23 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 		player->setGUID((int)result.getDataInt("id"));
 		
 		player->accountNumber = result.getDataInt("account");
-		player->sex=result.getDataInt("sex");
+		player->sex= (playersex_t)result.getDataInt("sex");
 		
 		player->setDirection((Direction)result.getDataInt("direction"));
 		player->experience=result.getDataLong("experience");
 		player->level=result.getDataInt("level");
-		player->maglevel=result.getDataInt("maglevel");
+		player->level_percent  = (unsigned char)(100*(player->experience-player->getExpForLv(player->level))/(1.*player->getExpForLv(player->level+1)-player->getExpForLv(player->level)));
 	
-		player->voc=result.getDataInt("vocation");
+		player->vocation=(playervoc_t)result.getDataInt("vocation");
 		player->access=result.getDataInt("access");
 		player->setNormalSpeed();
 		
 		player->mana=result.getDataInt("mana");
 		player->manamax=result.getDataInt("manamax");
 		player->manaspent=result.getDataInt("manaspent");
-	
+		player->maglevel=result.getDataInt("maglevel");
+		player->maglevel_percent  = (unsigned char)(100*(player->manaspent/(1.*player->getReqMana(player->maglevel+1, player->vocation))));
+
 		player->health=result.getDataInt("health");
 		player->healthmax=result.getDataInt("healthmax");
 		player->food=result.getDataInt("food");
@@ -159,7 +161,7 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 				int skillid=result.getDataInt("id",i);
 				player->skills[skillid][SKILL_LEVEL]=result.getDataInt("skill",i);
 				player->skills[skillid][SKILL_TRIES]=result.getDataInt("tries",i);
-				player->skills[skillid][SKILL_PERCENT] = (unsigned int)(100*(player->skills[skillid][SKILL_TRIES])/(1.*player->getReqSkilltries(skillid, (player->skills[skillid][SKILL_LEVEL]+1), player->voc)));
+				player->skills[skillid][SKILL_PERCENT] = (unsigned int)(100*(player->skills[skillid][SKILL_TRIES])/(1.*player->getReqSkillTries(skillid, (player->skills[skillid][SKILL_LEVEL]+1), player->vocation)));
 			}
 		}
 		
@@ -189,7 +191,7 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 				if(int slotid = result.getDataInt("slot",i))
 				{
 					if(slotid > 0 && slotid <= 10){
-						player->addItemInventory(myItem, slotid,true);
+						player->addItemInventory(myItem, slotid, true);
 					}
 					else{
 						if(dynamic_cast<Container*>(myItem)){
@@ -224,7 +226,8 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 			}
 		}
 		
-		
+		player->updateInventoryWeigth();
+
 		//load storage map
 		query << "SELECT * FROM playerstorage WHERE player='" << player->getGUID() << "'";
 		
@@ -309,8 +312,8 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 	player->setDirection((Direction)(int)row.lookup_by_name("direction"));
 	player->experience=row.lookup_by_name("experience");
 	player->level=row.lookup_by_name("level");
-	player->maglevel=row.lookup_by_name("maglevel");
-	
+	player->level_percent  = (unsigned char)(100*(player->experience-player->getExpForLv(player->level))/(1.*player->getExpForLv(player->level+1)-player->getExpForLv(player->level)));
+	player->capacity = row.lookup_by_name("cap");
 
 	player->voc=row.lookup_by_name("vocation");
 	player->access=row.lookup_by_name("access");
@@ -319,6 +322,8 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 	player->mana=row.lookup_by_name("mana");
 	player->manamax=row.lookup_by_name("manamax");
 	player->manaspent=row.lookup_by_name("manaspent");
+	player->maglevel=row.lookup_by_name("maglevel");
+	player->maglevel_percent  = (unsigned char)(100*(player->manaspent/(1.*player->getReqMana(player->maglevel+1, player->vocation))));
 
 	player->health=row.lookup_by_name("health");
 	player->healthmax=row.lookup_by_name("healthmax");
@@ -512,7 +517,7 @@ bool IOPlayerSQL::savePlayer(Player* player){
 		//First, an UPDATE query to write the player itself
 		query << "UPDATE `players` SET ";
 		query << "`level` = " << player->level << ", ";
-		query << "`vocation` = " << player->voc << ", ";
+		query << "`vocation` = " << (int)player->vocation << ", ";
 		query << "`health` = " << player->health << ", ";
 		query << "`healthmax` = " << player->healthmax << ", ";
 		query << "`direction` = " << (int)player->getDirection() << ", ";
@@ -529,7 +534,8 @@ bool IOPlayerSQL::savePlayer(Player* player){
 		query << "`masterpos` = '" << player->masterPos.x<<";"<< player->masterPos.y<<";"<< player->masterPos.z << "', ";
 		query << "`pos` = '" << player->pos.x<<";"<< player->pos.y<<";"<< player->pos.z << "', ";
 		query << "`speed` = " << player->speed << ", ";
-		query << "`cap` = " << player->cap << ", ";
+		//query << "`cap` = " << player->cap << ", ";
+		query << "`cap` = " << player->getCapacity() << ", ";
 		query << "`food` = " << player->food << ", ";
 		query << "`sex` = " << player->sex << ", ";
 		query << "`lastlogin` = " << player->lastlogin << " ";

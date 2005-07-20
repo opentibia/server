@@ -212,6 +212,43 @@ bool Container::isHoldingItem(const Item* item) const
 	return false;
 }
 
+double Container::getWeight() const
+{
+	double weight = items[id].weight;
+	std::list<const Container*> stack;
+
+	ContainerList::const_iterator it;
+	for (it = getItems(); it != getEnd(); ++it) {
+
+		Container *container = dynamic_cast<Container*>(*it);
+		if(container) {
+			stack.push_back(container);
+			weight += items[container->getID()].weight;
+		}
+		else
+			weight += (*it)->getWeight();
+
+		//weight += (*it)->getWeight();
+	}
+	
+	while(stack.size() > 0) {
+		const Container *container = stack.front();
+		stack.pop_front();
+
+		for (ContainerList::const_iterator it = container->getItems(); it != container->getEnd(); ++it) {
+			Container *container = dynamic_cast<Container*>(*it);
+			if(container) {
+				stack.push_back(container);
+				weight += items[container->getID()].weight;
+			}
+			else
+				weight += (*it)->getWeight();
+		}
+	}
+
+	return weight;
+}
+
 ContainerList::const_iterator Container::getItems() const {
 	return lcontained.begin();
 }

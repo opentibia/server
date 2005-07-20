@@ -48,6 +48,33 @@ enum skillsid_t {
     SKILL_PERCENT=2
 };
 
+enum playerinfo_t {
+		PLAYERINFO_LEVEL,
+		PLAYERINFO_LEVELPERCENT,
+		PLAYERINFO_HEALTH,
+		PLAYERINFO_MAXHEALTH,
+		PLAYERINFO_MANA,
+		PLAYERINFO_MAXMANA,
+		PLAYERINFO_MANAPERCENT,
+		PLAYERINFO_MAGICLEVEL,
+		PLAYERINFO_MAGICLEVELPERCENT
+};
+
+enum playersex_t {
+	PLAYERSEX_FEMALE = 0,
+	PLAYERSEX_MALE = 1,
+	PLAYERSEX_OLDMALE = 2
+};
+
+//0 = None, 1 = Sorcerer, 2 = Druid, 3 = Paladin, 4 = Knight
+enum playervoc_t {
+	VOCATION_NONE = 0,
+	VOCATION_SORCERER = 1,
+	VOCATION_DRUID = 2,
+	VOCATION_PALADIN = 3,
+	VOCATION_KNIGHT = 4
+};
+
 enum freeslot_t{
 	SLOT_TYPE_NONE,
 	SLOT_TYPE_INVENTORY,
@@ -77,11 +104,12 @@ public:
 	void addList() {listPlayer.addList(this);}
 	void kickPlayer();
 
-  void speak(const std::string &text);	
 	bool addItem(Item* item, bool test = false);
 	bool internalAddItemContainer(Container *container,Item* item);
+
 	freeslot_t getFreeSlot(Container **container,unsigned char &slot );
 	Container* getFreeContainerSlot(Container *parent);
+
 	//bool removeItem(unsigned short id,unsigned short count);
 	bool removeItem(Item* item, bool test = false);
 	bool internalRemoveItemContainer(Container *parent, Item* item, bool test = false);
@@ -95,6 +123,7 @@ public:
 
 	Container* getContainer(unsigned char containerid);
 	unsigned char getContainerID(const Container* container) const;
+	bool isHoldingContainer(const Container* container) const;
 	void addContainer(unsigned char containerid, Container *container);
 	void closeContainer(unsigned char containerid);
 
@@ -103,24 +132,41 @@ public:
 	inline StorageMap::const_iterator getStorageIteratorBegin() const {return storageMap.begin();}
 	inline StorageMap::const_iterator getStorageIteratorEnd() const {return storageMap.end();}
 
+	int getHealth() const {return health;}
+	int getMana() const {return mana;}
+	int getMagicLevel() const {return maglevel;}
+	playersex_t getSex() {return sex;}
+
+	const std::string& getName() const {return name;};
+	int getPlayerInfo(playerinfo_t playerinfo) const;
+	int getSkill(skills_t skilltype, skillsid_t skillinfo) const;
+	std::string getSkillName(int skillid);
+  void addSkillTry(int skilltry);
+  void addSkillShieldTry(int skilltry);
+
+	unsigned long getExperience() const {return experience;};
+	double getCapacity() const {
+		if(access == 0) {
+			return capacity;
+		}
+		else
+			return 0.00;
+	}
+
+	double getFreeCapacity() const {
+		if(access == 0) {
+			return std::max(0.00, capacity - inventoryWeight);
+		}
+		else
+			return 0.00;
+	}
+	void updateInventoryWeigth();
+
 	Item* getItem(int pos) const;
 	Item* GetDistWeapon() const;
 	
-	const std::string& getName() const {return name;};
-	
-	//bool pendingCancelAutoWalk;
-	unsigned long eventAutoWalk;
-  int sex, voc;
-  int cap;
-  int food;
-  void addManaspent(unsigned long spent);
+  void addManaSpent(unsigned long spent);
   void addExp(unsigned long exp);
-  unsigned char level_percent;
-  unsigned char maglevel_percent;
-  //bool cancelMove;
-  bool SendBuffer;
-  long internal_ping;
-  long npings;
   virtual int getWeaponDamage() const;
   virtual int getArmor() const;
   virtual int getDefense() const;
@@ -128,25 +174,8 @@ public:
   unsigned long getMoneyContainer(Container *container);
   bool substractMoney(unsigned long money);
   bool substractMoneyContainer(Container *container, unsigned long *money);
-  char fightMode, followMode;
-  int accountNumber;
-  time_t lastlogin;
   
-  std::string password;
-
-  Item* items[11]; //equipement of the player
-  unsigned int skills[7][3];
-  
-  //reminder: 0 = None, 1 = Sorcerer, 2 = Druid, 3 = Paladin, 4 = Knight
-  unsigned short CapGain[5];          //for level advances
-  unsigned short ManaGain[5];
-  unsigned short HPGain[5];
-  
-  //for skill advances
-  unsigned int getReqSkilltries (int skill, int level, int voc);
-  
-  //for magic level advances
-  unsigned int getReqMana(int maglevel, int voc); 
+	unsigned long eventAutoWalk;
   	
 	//items
 	containerLayout vcontainers;
@@ -181,7 +210,6 @@ public:
   void sendToChannel(Creature *creature, SpeakClasses type, const std::string &text, unsigned short channelId);
   virtual void sendCancel(const char *msg) const;
   virtual void sendCancelWalk() const;
-	//virtual void sendCancelAutoWalking();
   int sendInventory(unsigned char sl_id);
   void sendStats();
   void sendTextMessage(MessageClasses mclass, const char* message) const;
@@ -199,26 +227,29 @@ public:
   void receivePing();
   void flushMsg();
 
-  void addSkillTry(int skilltry);
-  void addSkillShieldTry(int skilltry);
-  void die();      //player loses exp/skills/maglevel on death
+	void die();      //player loses exp/skills/maglevel on death
 
   virtual void setAttackedCreature(unsigned long id);
   virtual bool isAttackable() const { return (access == 0); };
   virtual bool isPushable() const;
 	virtual void dropLoot(Container *corpse);
 	virtual int getLookCorpse();
-	bool NeedUpdateStats();	
+	bool NeedUpdateStats();
+
+	virtual std::string getDescription(bool self = false) const;
+
 	//ground	
 	void onThingAppear(const Thing* thing);  
 	void onThingTransform(const Thing* thing,int stackpos);
 	void onThingDisappear(const Thing* thing, unsigned char stackPos);
 	void onThingRemove(const Thing* thing); //auto-close containers
+
 	//container
 	void onItemAddContainer(const Container* container,const Item* item);
 	void onItemRemoveContainer(const Container* container,const unsigned char slot);
 	void onItemUpdateContainer(const Container* container,const Item* item,const unsigned char slot);
-	//invnetory - for this use int sendInventory(unsigned char sl_id)
+
+	//inventory - for this use int sendInventory(unsigned char sl_id)
 	//void onItemAddInvnetory(const unsigned char sl_id);
 	//void onItemRemoveInvnetory(const unsigned char sl_id);
 	//void onItemUpdateInvnetory(const unsigned char sl_id);
@@ -228,14 +259,9 @@ public:
 	Item* getTradeItem() {return tradeItem;};
 
 protected:
-  int useCount;
-	unsigned long tradePartner;
-	bool acceptTrade;
-	Item *tradeItem;
-	std::list<Direction> pathlist;
-	
-  void sendCancelAttacking();
+	void sendCancelAttacking();
 	long long getSleepTicks() const;
+	void addSkillTryInternal(int skilltry,int skill);
 	virtual void onCreatureAppear(const Creature *creature);
   virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos, bool tele);
   virtual void onCreatureTurn(const Creature *creature, unsigned char stackpos);
@@ -243,9 +269,7 @@ protected:
   virtual void onCreatureChangeOutfit(const Creature* creature);
   virtual void onTeleport(const Creature *creature, const Position *oldPos, unsigned char oldstackpos); 
   virtual int onThink(int& newThinkTicks);
-  //virtual void onPlace();
-  //virtual void onRemove();
-  virtual std::string getDescription(bool self = false) const;
+
 	virtual void onTileUpdated(const Position &pos);
 
 	//container to container
@@ -285,40 +309,92 @@ protected:
 	virtual void onThingMove(const Creature *creature, const Thing *thing, const Position *oldPos,
 		unsigned char oldstackpos, unsigned char oldcount, unsigned char count);
 
-	void addSkillTryInternal(int skilltry,int skill);
-	std::string getSkillName(int skillid);
-
-  friend class Game;
-  friend class ActionScript;
-  friend class Map;
-
+protected:
 	Protocol *client;
+	int useCount;
+
+  playervoc_t vocation;
+	playersex_t sex;
+  int food;
+	
+	double inventoryWeight;
+	double capacity;
+
+  bool SendBuffer;
+  long internal_ping;
+  long npings;
+
+  char fightMode, followMode;
+
+	//account variables
+  int accountNumber;
+  std::string password;
+  time_t lastlogin;
+
+  //inventory variables
+	Item* items[11]; //equipement of the player
+
+	//player advances variables
+  unsigned int skills[7][3];
+  
+  //reminder: 0 = None, 1 = Sorcerer, 2 = Druid, 3 = Paladin, 4 = Knight
+  unsigned short CapGain[5];          //for level advances
+  unsigned short ManaGain[5];
+  unsigned short HPGain[5];
+
+	unsigned char level_percent;
+  unsigned char maglevel_percent;
+
+	//trade variables
+	unsigned long tradePartner;
+	bool acceptTrade;
+	Item *tradeItem;
+
+	//autowalking
+	std::list<Direction> pathlist;
+
 	//cache some data
 	struct SkillCache{
 		unsigned int tries;
 		int level;
-		int voc;
+		//int voc;
+		playervoc_t vocation;
 	};
+
 	SkillCache SkillAdvanceCache[7][2];
 	struct SentStats{
 		int health;
 		int healthmax;
 		unsigned long experience;
 		int level;
-		int cap;
+		double freeCapacity;
+		//int cap;
 		int mana;
 		int manamax;
 		int manaspent;
 		int maglevel;
 	};
+
 	SentStats lastSentStats;
 	// we need our name
 	std::string name;	
 	unsigned long guid;
 	
 	StorageMap storageMap;
-	
+
+	//for skill advances
+  unsigned int getReqSkillTries (int skill, int level, playervoc_t voc);
+  
+  //for magic level advances
+  unsigned int getReqMana(int maglevel, playervoc_t voc); 
+
 	friend OTSYS_THREAD_RETURN ConnectionHandler(void *dat);
+
+	friend class Game;
+  friend class ActionScript;
+  friend class Map;
+  friend class IOPlayerXML;
+  friend class IOPlayerSQL;
 };
 
 

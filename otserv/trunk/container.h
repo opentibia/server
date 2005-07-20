@@ -67,6 +67,7 @@ class Container : public Item
 		unsigned char getSlotNumberByItem(const Item* item) const;
 		bool isHoldingItem(const Item* item) const;
 		long getItemHoldingCount() const;
+		virtual double getWeight() const;
 };
 
 #endif //__OTSERV_CONTAINER_H

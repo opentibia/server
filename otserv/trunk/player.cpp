@@ -46,8 +46,9 @@ Player::Player(const char *name, Protocol *p) :
   client     = p;
   client->setPlayer(this);
 	looktype   = PLAYER_MALE_1;
-	voc        = 0;
-  cap        = 300;
+	vocation   = VOCATION_NONE;
+  //cap      = 300;
+	capacity = 300.00;
   mana       = 0;
   manamax    = 0;
   manaspent  = 0;
@@ -55,8 +56,6 @@ Player::Player(const char *name, Protocol *p) :
   food       = 0;
 
 	eventAutoWalk = 0;
-	//isAutoWalking = false;
-	//pendingCancelAutoWalk = false;
 	level      = 1;
   experience = 180;
 
@@ -64,7 +63,6 @@ Player::Player(const char *name, Protocol *p) :
 
   access     = 0;
   lastlogin  = 0;
-  //cancelMove = false;
   SendBuffer = false;
   npings = 0;
   internal_ping = 0;
@@ -78,17 +76,20 @@ Player::Player(const char *name, Protocol *p) :
   {
     skills[i][SKILL_LEVEL] = 1;
     skills[i][SKILL_TRIES] = 0;
-	skills[i][SKILL_PERCENT] = 0;
-	for(int j=0;j<2;j++){
-		SkillAdvanceCache[i][j].level = 0;
-		SkillAdvanceCache[i][j].voc = 0;
-		SkillAdvanceCache[i][j].tries = 0;
-	}
+		skills[i][SKILL_PERCENT] = 0;
+		
+		for(int j = 0; j < 2; j++){
+			SkillAdvanceCache[i][j].level = 0;
+			SkillAdvanceCache[i][j].vocation = VOCATION_NONE;
+			SkillAdvanceCache[i][j].tries = 0;
+		}
   }
 
 	lastSentStats.health = 0;
 	lastSentStats.healthmax = 0;
-	lastSentStats.cap = 0;
+	//lastSentStats.cap = 0;
+	//lastSentStats.capacity = 0;
+	lastSentStats.freeCapacity = 0;
 	lastSentStats.experience = 0;
 	lastSentStats.level = 0;
 	lastSentStats.mana = 0;
@@ -156,20 +157,21 @@ std::string Player::getDescription(bool self) const
 	std::string str;
 	
 	if(self){
-		s << "You see yourself."; 
-		if(voc > 0)
-			s << " You are " << g_config.getGlobalStringField("vocations", voc) << ".";
+		s << "You see yourself.";
+
+		if(vocation != VOCATION_NONE)
+			s << " You are " << g_config.getGlobalStringField("vocations", (int)vocation) << ".";
 	}
 	else {	
 		s << "You see " << name << " (Level " << level <<").";
 	
-		if(voc > 0){
-			if(sex != 0)
-				s << " He";
-			else
+		if(vocation != VOCATION_NONE){
+			if(sex == PLAYERSEX_FEMALE)
 				s << " She";
+			else
+				s << " He";
 
-				s << " is "<< g_config.getGlobalStringField("vocations", voc) << ".";
+				s << " is "<< g_config.getGlobalStringField("vocations", (int)vocation) << ".";
 		}
 	}
 	
@@ -631,9 +633,11 @@ bool Player::substractMoneyContainer(Container *container, unsigned long *money)
 		return false;
 }
 
+/*
 void Player::speak(const std::string &text)
 {
 }
+*/
 
 void Player::sendIcons()
 {
@@ -663,6 +667,18 @@ void Player::sendIcons()
 	client->sendIcons(icons);             
 }
 
+void Player::updateInventoryWeigth()
+{
+	inventoryWeight = 0.00;
+	if(access == 0) {
+		for(int slotid = 0; slotid < 11; ++slotid){
+			if(getItem(slotid)) {
+				inventoryWeight += getItem(slotid)->getWeight();
+			}
+		}
+	}
+}
+
 int Player::sendInventory(unsigned char sl_id){
 	client->sendInventory(sl_id);
 	return true;
@@ -675,8 +691,7 @@ int Player::addItemInventory(Item* item, int pos, bool internal /*= false*/) {
 	if(pos > 0 && pos < 11)
   {
 		if (items[pos]) {
-      //delete items[pos];
-      		items[pos]->releaseThing();
+			items[pos]->releaseThing();
 		}
 
 		items[pos] = item;
@@ -684,7 +699,10 @@ int Player::addItemInventory(Item* item, int pos, bool internal /*= false*/) {
 			items[pos]->pos.x = 0xFFFF;
 		}
 
+		updateInventoryWeigth();
+
 		if(!internal) {
+			client->sendStats();
 			client->sendInventory(pos);	
 		}
   }
@@ -697,30 +715,43 @@ int Player::addItemInventory(Item* item, int pos, bool internal /*= false*/) {
 bool Player::addItem(Item *item, bool test /*=false*/){
 	if(!item)
 		return false;
+
+	if(access == 0 && getFreeCapacity() < item->getWeight()) {
+		return false;
+	}
+
 	Container *container;
 	unsigned char slot;
-	//TODO: verify cap and others
 	
 	switch(getFreeSlot(&container,slot)){
-	case SLOT_TYPE_NONE:
-		return false;
-	case SLOT_TYPE_INVENTORY:
-		if(!test){
-			addItemInventory(item,slot);
-		}
-		return true;
-	case SLOT_TYPE_CONTAINER:
-		if(container->isHoldingItem(item) == true){
+		case SLOT_TYPE_NONE:
 			return false;
-		}
-		if(!test){
-			//add the item
-			container->addItem(item);
-			//update container
-			client->sendItemAddContainer(container,item);
-		}
-		return true;
+		case SLOT_TYPE_INVENTORY:
+			if(!test){
+				addItemInventory(item,slot);
+			}
+			return true;
+		case SLOT_TYPE_CONTAINER:
+			if(container->isHoldingItem(item) == true){
+				return false;
+			}
+
+			if(!test){
+				//add the item
+				container->addItem(item);
+
+				NeedUpdateStats();
+				client->sendStats();
+
+				//update container
+				client->sendItemAddContainer(container,item);
+			}
+
+			return true;
 	}
+
+	return false;
+
 /*	//find an empty inventory slot
 	if(!items[SLOT_RIGHT]){
 		if(!(items[SLOT_LEFT] && (items[SLOT_LEFT]->getSlotPosition() & SLOTP_TWO_HAND))){
@@ -776,6 +807,7 @@ bool Player::internalAddItemContainer(Container *container,Item* item){
 	
 }
 */
+
 freeslot_t Player::getFreeSlot(Container **container,unsigned char &slot )
 {
 	*container = NULL;
@@ -786,16 +818,19 @@ freeslot_t Player::getFreeSlot(Container **container,unsigned char &slot )
 			return SLOT_TYPE_INVENTORY;
 		}		
 	}
-	else if(!items[SLOT_LEFT]){
+
+	if(!items[SLOT_LEFT]){
 		if(!(items[SLOT_RIGHT] && (items[SLOT_RIGHT]->getSlotPosition() & SLOTP_TWO_HAND))){
 			slot = SLOT_LEFT;
 			return SLOT_TYPE_INVENTORY;
 		}
 	}
-	else if(!items[SLOT_AMMO]){
+
+	if(!items[SLOT_AMMO]){
 		slot = SLOT_AMMO;
 		return SLOT_TYPE_INVENTORY;
 	}
+
 	//look in containers
 	for(int i=0; i< 11;i++){
 		Container *tmpcontainer = dynamic_cast<Container*>(items[i]);
@@ -813,14 +848,13 @@ freeslot_t Player::getFreeSlot(Container **container,unsigned char &slot )
 Container* Player::getFreeContainerSlot(Container *parent)
 {
 	//check if it is full
-	if(parent->size() < parent->capacity()){
+	if(parent->size() < parent->capacity() && parent != getTradeItem()){
 		return parent;
 	}
 	else{ //look for more containers inside
-		for(ContainerList::const_iterator cit = parent->getItems(); 
-			cit != parent->getEnd(); ++cit){
+		for(ContainerList::const_iterator cit = parent->getItems(); cit != parent->getEnd(); ++cit){
 			Container * temp_container = dynamic_cast<Container*>(*cit);
-			if(temp_container){
+			if(temp_container && temp_container != getTradeItem()){
 				return getFreeContainerSlot(temp_container);
 			}
 		}
@@ -858,6 +892,8 @@ bool Player::internalRemoveItemContainer(Container *parent, Item* item, bool tes
 			if(slot != 0xFF){
 				if(!test){
 					parent->removeItem(item);
+					updateInventoryWeigth();
+					client->sendStats();
 					client->sendItemRemoveContainer(parent,slot);
 				}
 				return true;
@@ -877,9 +913,14 @@ int Player::removeItemInventory(int pos, bool internal /*= false*/)
 {
 	if(pos > 0 && pos < 11) {
 
-		items[pos] = NULL;
+		if(items[pos]) {
+			items[pos] = NULL;
+		}
+
+		updateInventoryWeigth();
 
 		if(!internal) {
+			client->sendStats();
 			client->sendInventory(pos);
 		}
 	}
@@ -889,23 +930,24 @@ int Player::removeItemInventory(int pos, bool internal /*= false*/)
 	return true;
 }
 
-unsigned int Player::getReqSkilltries (int skill, int level, int voc) {
+unsigned int Player::getReqSkillTries (int skill, int level, playervoc_t voc) {
 	//first find on cache
 	for(int i=0;i<2;i++){
-		if(SkillAdvanceCache[skill][i].level == level && SkillAdvanceCache[skill][i].voc == voc){
+		if(SkillAdvanceCache[skill][i].level == level && SkillAdvanceCache[skill][i].vocation == voc){
 #ifdef __DEBUG__
 	std::cout << "Skill cache hit: " << this->name << " " << skill << " " << level << " " << voc <<std::endl;
 #endif
 			return SkillAdvanceCache[skill][i].tries;
 		}
 	}
-    unsigned short int SkillBases[7] = { 50, 50, 50, 50, 30, 100, 20 };       // follows the order of enum skills_t
-    float SkillMultipliers[7][5] = {
+	// follows the order of enum skills_t  
+	unsigned short int SkillBases[7] = { 50, 50, 50, 50, 30, 100, 20 };
+	float SkillMultipliers[7][5] = {
                                    {1.5f, 1.5f, 1.5f, 1.2f, 1.1f},     // Fist
                                    {2.0f, 2.0f, 1.8f, 1.2f, 1.1f},     // Club
                                    {2.0f, 2.0f, 1.8f, 1.2f, 1.1f},     // Sword
                                    {2.0f, 2.0f, 1.8f, 1.2f, 1.1f},     // Axe
-                                   {2.0f, 2.0f, 1.8f, 1.4f, 1.1f},     // Distance
+                                   {2.0f, 2.0f, 1.8f, 1.1f, 1.4f},     // Distance
                                    {1.5f, 1.5f, 1.5f, 1.1f, 1.1f},     // Shielding
                                    {1.1f, 1.1f, 1.1f, 1.1f, 1.1f}      // Fishing
 	                           };
@@ -922,7 +964,7 @@ unsigned int Player::getReqSkilltries (int skill, int level, int voc) {
 		j = 0;
 	}	
 	SkillAdvanceCache[skill][j].level = level;
-	SkillAdvanceCache[skill][j].voc = voc;
+	SkillAdvanceCache[skill][j].vocation = voc;
 	SkillAdvanceCache[skill][j].tries = (unsigned int) ( SkillBases[skill] * pow((float) SkillMultipliers[skill][voc], (float) ( level - 11) ) );	
     return SkillAdvanceCache[skill][j].tries;
 }
@@ -975,6 +1017,31 @@ void Player::addSkillShieldTry(int skilltry){
 	}	
 }
 
+int Player::getPlayerInfo(playerinfo_t playerinfo) const
+{
+	switch(playerinfo) {
+		case PLAYERINFO_LEVEL: return level; break;
+		case PLAYERINFO_LEVELPERCENT: return level_percent; break;
+		case PLAYERINFO_MAGICLEVEL: return maglevel; break;
+		case PLAYERINFO_MAGICLEVELPERCENT: return maglevel_percent; break;
+		case PLAYERINFO_HEALTH: return health; break;
+		case PLAYERINFO_MAXHEALTH: return healthmax; break;
+		case PLAYERINFO_MANA: return health; break;
+		case PLAYERINFO_MAXMANA: return manamax; break;
+		case PLAYERINFO_MANAPERCENT: return maglevel_percent; break;
+
+		default:
+			return 0; break;
+	}
+
+	return 0;
+}
+
+int Player::getSkill(skills_t skilltype, skillsid_t skillinfo) const
+{
+	return skills[skilltype][skillinfo];
+}
+
 std::string Player::getSkillName(int skillid){
 	std::string skillname;
 	switch(skillid){
@@ -1013,11 +1080,11 @@ void Player::addSkillTryInternal(int skilltry,int skill){
 	//int reqTries = (int) ( SkillBases[skill] * pow((float) VocMultipliers[skill][voc], (float) ( skills[skill][SKILL_LEVEL] - 10) ) );			 
 #if __DEBUG__
 	//for debug
-	cout << Creature::getName() << ", has the vocation: " << voc << " and is training his " << getSkillName(skill) << "(" << skill << "). Tries: " << skills[skill][SKILL_TRIES] << "(" << getReqSkilltries (skill, (skills[skill][SKILL_LEVEL] + 1), voc) << ")" << std::endl;
+	cout << Creature::getName() << ", has the vocation: " << (int)vocation << " and is training his " << getSkillName(skill) << "(" << skill << "). Tries: " << skills[skill][SKILL_TRIES] << "(" << getReqSkillTries(skill, (skills[skill][SKILL_LEVEL] + 1), vocation) << ")" << std::endl;
 	cout << "Current skill: " << skills[skill][SKILL_LEVEL] << std::endl;
 #endif			 
 	//Need skill up?
-	if (skills[skill][SKILL_TRIES] >= getReqSkilltries (skill, (skills[skill][SKILL_LEVEL] + 1), voc)) {
+	if (skills[skill][SKILL_TRIES] >= getReqSkillTries(skill, (skills[skill][SKILL_LEVEL] + 1), vocation)) {
 	 	skills[skill][SKILL_LEVEL]++;
 	 	skills[skill][SKILL_TRIES] = 0;
 		skills[skill][SKILL_PERCENT] = 0;				 
@@ -1028,7 +1095,7 @@ void Player::addSkillTryInternal(int skilltry,int skill){
 	}
 	else{
 	 //update percent
-	 int new_percent = (unsigned int)(100*(skills[skill][SKILL_TRIES])/(1.*getReqSkilltries (skill, (skills[skill][SKILL_LEVEL]+1), voc)));
+	 int new_percent = (unsigned int)(100*(skills[skill][SKILL_TRIES])/(1.*getReqSkillTries(skill, (skills[skill][SKILL_LEVEL]+1), vocation)));
 				 
 	 	if(skills[skill][SKILL_PERCENT] != new_percent){
 			skills[skill][SKILL_PERCENT] = new_percent;
@@ -1038,11 +1105,14 @@ void Player::addSkillTryInternal(int skilltry,int skill){
 }
 
 
-unsigned int Player::getReqMana(int maglevel, int voc) {
+unsigned int Player::getReqMana(int maglevel, playervoc_t voc) {
   //ATTENTION: MAKE SURE THAT CHARS HAVE REASONABLE MAGIC LEVELS. ESPECIALY KNIGHTS!!!!!!!!!!!
-  float ManaMultiplier[5] = { 1.0f, 1.1f, 1.1f, 1.4f, 3 };
-  unsigned int reqMana = (unsigned int) ( 400 * pow(ManaMultiplier[voc], maglevel-1) );       //will calculate required mana for a magic level
-  if (reqMana % 20 < 10) //CIP must have been bored when they invented this odd rounding
+  float ManaMultiplier[5] = { 1.0f, 1.1f, 1.1f, 1.4f, 3};
+
+	//will calculate required mana for a magic level
+  unsigned int reqMana = (unsigned int) ( 400 * pow(ManaMultiplier[(int)voc], maglevel-1) );
+
+	if (reqMana % 20 < 10) //CIP must have been bored when they invented this odd rounding
     reqMana = reqMana - (reqMana % 20);
   else
     reqMana = reqMana - (reqMana % 20) + 20;
@@ -1059,6 +1129,24 @@ Container* Player::getContainer(unsigned char containerid)
 	}
 
 	return NULL;
+}
+
+bool Player::isHoldingContainer(const Container* container) const
+{
+	const Container* topContainer = container;
+	while(topContainer->getParent() != NULL) {
+		topContainer = container->getParent();
+	}
+
+	//find a free slot in container
+	for(int i=0; i< 11; i++){
+		Container *container = dynamic_cast<Container*>(items[i]);
+		if(container && topContainer == container){
+			return true;
+		}
+	}
+
+	return false;
 }
 
 unsigned char Player::getContainerID(const Container* container) const
@@ -1185,7 +1273,11 @@ void Player::RemoveDistItem(){
 			items[sl_id] = NULL;
 			DistItem->releaseThing();
 			//delete DistItem;
-		}		
+		}
+
+		updateInventoryWeigth();
+		client->sendStats();
+
 		//update inventory
 		client->sendInventory(sl_id);
 	}
@@ -1338,18 +1430,21 @@ void Player::sendCancelWalk() const
 {
   client->sendCancelWalk();
 }
+
 void Player::sendStats(){
 	//update level and maglevel percents
-	if(lastSentStats.experience != this->experience || 
-			lastSentStats.level != this->level)
-	    level_percent  = (unsigned char)(100*(experience-getExpForLv(level))/(1.*getExpForLv(level+1)-getExpForLv(level)));		
-	if(lastSentStats.manaspent != this->manaspent || 
-			lastSentStats.maglevel != this->maglevel)
-	    maglevel_percent  = (unsigned char)(100*(manaspent/(1.*getReqMana(maglevel+1,voc))));
+	if(lastSentStats.experience != this->experience || lastSentStats.level != this->level)
+		level_percent  = (unsigned char)(100*(experience-getExpForLv(level))/(1.*getExpForLv(level+1)-getExpForLv(level)));		
+			
+	if(lastSentStats.manaspent != this->manaspent || lastSentStats.maglevel != this->maglevel)
+		maglevel_percent  = (unsigned char)(100*(manaspent/(1.*getReqMana(maglevel+1,vocation))));
+			
 	//save current stats 
 	lastSentStats.health = this->health;
 	lastSentStats.healthmax = this->healthmax;
-	lastSentStats.cap = this->cap;
+	lastSentStats.freeCapacity = this->getFreeCapacity();
+	//lastSentStats.capacity = this->capacity;
+	//lastSentStats.cap = this->cap;
 	lastSentStats.experience = this->experience;
 	lastSentStats.level = this->level;
 	lastSentStats.mana = this->mana;
@@ -1437,7 +1532,9 @@ void Player::sendContainer(unsigned char index, Container *container){
 bool Player::NeedUpdateStats(){
 	if(lastSentStats.health != this->health ||
 		 lastSentStats.healthmax != this->healthmax ||
-		 lastSentStats.cap != this->cap ||
+		 //lastSentStats.cap != this->cap ||
+		 //(int)lastSentStats.capacity != (int)this->capacity ||
+		 (int)lastSentStats.freeCapacity != (int)this->getFreeCapacity() ||
 		 lastSentStats.experience != this->experience ||
 		 lastSentStats.level != this->level ||
 		 lastSentStats.mana != this->mana ||
@@ -1585,10 +1682,10 @@ void Player::onTeleport(const Creature *creature, const Position *oldPos, unsign
   client->sendThingMove(creature, creature,oldPos, oldstackpos, true, 1, 1); 
 }
 
-void Player::addManaspent(unsigned long spent){
+void Player::addManaSpent(unsigned long spent){
 	this->manaspent += spent;
 	//Magic Level Advance
-	int reqMana = this->getReqMana(this->maglevel+1, this->voc);
+	int reqMana = this->getReqMana(this->maglevel+1, this->vocation);
 	if (this->access == 0 && this->manaspent >= reqMana) {
 		this->manaspent -= reqMana;
 		this->maglevel++;
@@ -1605,11 +1702,12 @@ void Player::addExp(unsigned long exp){
 	int lastLv = this->level;
 	while (this->experience >= this->getExpForLv(this->level+1)) {
 		this->level++;
-		this->healthmax += this->HPGain[voc];
-		this->health += this->HPGain[voc];
-		this->manamax += this->ManaGain[voc];
-		this->mana += this->ManaGain[voc];
-		this->cap += this->CapGain[voc];
+		this->healthmax += this->HPGain[(int)vocation];
+		this->health += this->HPGain[(int)vocation];
+		this->manamax += this->ManaGain[(int)vocation];
+		this->mana += this->ManaGain[(int)vocation];
+		this->capacity += this->CapGain[(int)vocation];
+		//this->cap += this->CapGain[voc];
 	}
 	if(lastLv != this->level)
 	{
@@ -1633,7 +1731,7 @@ void Player::die() {
 	unsigned long sumMana = 0;
 	long lostMana = 0;
 	for (int i = 1; i <= maglevel; i++) {              //sum up all the mana
-		sumMana += getReqMana(i, voc);
+		sumMana += getReqMana(i, vocation);
 	}
                 
 	sumMana += manaspent;
@@ -1642,41 +1740,41 @@ void Player::die() {
     
     while(lostMana > manaspent){
 		lostMana -= manaspent;
-		manaspent = getReqMana(maglevel, voc);
+		manaspent = getReqMana(maglevel, vocation);
 		maglevel--;
 	}
 	manaspent -= lostMana;
 	//End Magic Level downgrade
                 
 	//Skill loss
-	long lostSkilltries;
-	unsigned long sumSkilltries;
+	long lostSkillTries;
+	unsigned long sumSkillTries;
 	for (int i = 0; i <= 6; i++) {  //for each skill
-		lostSkilltries = 0;         //reset to 0
-		sumSkilltries = 0;
+		lostSkillTries = 0;         //reset to 0
+		sumSkillTries = 0;
                     
 		for (unsigned c = 11; c <= skills[i][SKILL_LEVEL]; c++) { //sum up all required tries for all skill levels
-			sumSkilltries += getReqSkilltries(i, c, voc);
+			sumSkillTries += getReqSkillTries(i, c, vocation);
 		}
                     
-		sumSkilltries += skills[i][SKILL_TRIES];
+		sumSkillTries += skills[i][SKILL_TRIES];
                     
-		lostSkilltries = (long) (sumSkilltries * 0.1);           //player loses 10% of his skill tries
+		lostSkillTries = (long) (sumSkillTries * 0.1);           //player loses 10% of his skill tries
 
-		while(lostSkilltries > skills[i][SKILL_TRIES]){
-			lostSkilltries -= skills[i][SKILL_TRIES];
-			skills[i][SKILL_TRIES] = getReqSkilltries(i, skills[i][SKILL_LEVEL], voc);
+		while(lostSkillTries > skills[i][SKILL_TRIES]){
+			lostSkillTries -= skills[i][SKILL_TRIES];
+			skills[i][SKILL_TRIES] = getReqSkillTries(i, skills[i][SKILL_LEVEL], vocation);
 			if(skills[i][SKILL_LEVEL] > 10){
 				skills[i][SKILL_LEVEL]--;
 			}
 			else{
 				skills[i][SKILL_LEVEL] = 10;
 				skills[i][SKILL_TRIES] = 0;
-				lostSkilltries = 0;
+				lostSkillTries = 0;
 				break;
 			}
 		}
-		skills[i][SKILL_TRIES] -= lostSkilltries;
+		skills[i][SKILL_TRIES] -= lostSkillTries;
 	}               
 	//End Skill loss
         
@@ -1720,18 +1818,18 @@ void Player::preSave()
 			/* This checks (but not the downgrade sentences) aren't really necesary cause if the
 			player has a "normal" hp,mana,etc when he gets level 1 he will not lose more
 			hp,mana,etc... but here they are :P */
-			if ((healthmax -= HPGain[voc]) < 0) //This could be avoided with a proper use of unsigend int
+			if ((healthmax -= HPGain[(int)vocation]) < 0) //This could be avoided with a proper use of unsigend int
 				healthmax = 0;
 			
 			health = healthmax;
 			
-			if ((manamax -= ManaGain[voc]) < 0) //This could be avoided with a proper use of unsigend int
+			if ((manamax -= ManaGain[(int)vocation]) < 0) //This could be avoided with a proper use of unsigend int
 				manamax = 0;
 			
 			mana = manamax;
 			
-			if ((cap -= CapGain[voc]) < 0) //This could be avoided with a proper use of unsigend int
-				cap = 0;         
+			if ((capacity -= CapGain[(int)vocation]) < 0) //This could be avoided with a proper use of unsigend int
+				capacity = 0.0;         
 		}
 	}
 }

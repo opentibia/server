@@ -478,9 +478,12 @@ bool Commands::closeServer(Creature* c, const std::string &cmd, const std::strin
 			++it;
 		}
 	}
+
+	return true;
 }
 
 bool Commands::openServer(Creature* c, const std::string &cmd, const std::string &param)
 {
 	game->setGameState(GAME_STATE_NORMAL);
+	return true;
 }

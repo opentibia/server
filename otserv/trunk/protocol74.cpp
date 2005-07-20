@@ -525,15 +525,13 @@ void Protocol74::parseCancelMove(NetworkMessage &msg)
 
 	game->stopEvent(player->eventAutoWalk);
 	player->sendCancelWalk();
-
-	//player->sendCancelAutoWalking();
-	//player->cancelMove = true;
+	//this->sleepTillMove();
 }
 
 void Protocol74::parseModes(NetworkMessage &msg)
 {
-	player->fightMode = msg.GetByte();
-	player->followMode = msg.GetByte();
+	//player->fightMode = msg.GetByte();
+	//player->followMode = msg.GetByte();
 }
 
 void Protocol74::parseDebug(NetworkMessage &msg)
@@ -725,16 +723,16 @@ void Protocol74::parseRequestOutfit(NetworkMessage &msg)
   msg.AddByte(player->lookbody);
   msg.AddByte(player->looklegs);
   msg.AddByte(player->lookfeet);
-  switch (player->sex) {
-	  case 0:
+  switch (player->getSex()) {
+	  case PLAYERSEX_FEMALE:
 		  msg.AddByte(PLAYER_FEMALE_1);
 		  msg.AddByte(PLAYER_FEMALE_7);
 		  break;
-	  case 1:
+	  case PLAYERSEX_MALE:
 		  msg.AddByte(PLAYER_MALE_1);
 		  msg.AddByte(PLAYER_MALE_7);
 		  break;
-	  case 2:
+	  case PLAYERSEX_OLDMALE:
 		  msg.AddByte(160);
 		  msg.AddByte(160);
 		  break;
@@ -828,20 +826,23 @@ void Protocol74::sendIcons(int icons){
 
 void Protocol74::parseSetOutfit(NetworkMessage &msg)
 {
-    int temp = msg.GetByte();
-    if ( (player->sex == 0 && temp >= PLAYER_FEMALE_1 && temp <= PLAYER_FEMALE_7) || (player->sex == 1 && temp >= PLAYER_MALE_1 && temp <= PLAYER_MALE_7)){ 
-	player->looktype= temp;
-	player->lookmaster = player->looktype;
-	player->lookhead=msg.GetByte();
-	player->lookbody=msg.GetByte();
-	player->looklegs=msg.GetByte();
-	player->lookfeet=msg.GetByte();
+	int temp = msg.GetByte();
+	if ( (player->getSex() == PLAYERSEX_FEMALE && temp >= PLAYER_FEMALE_1 && temp <= PLAYER_FEMALE_7) ||
+			 (player->getSex() == PLAYERSEX_MALE && temp >= PLAYER_MALE_1 && temp <= PLAYER_MALE_7))
+	{
+		player->looktype= temp;
+		player->lookmaster = player->looktype;
+		player->lookhead=msg.GetByte();
+		player->lookbody=msg.GetByte();
+		player->looklegs=msg.GetByte();
+		player->lookfeet=msg.GetByte();
 
-	if (player->sex > 1) {
+		//if (player->sex > 1) {
 		std::cout << "set outfit to: " << (int)(player->lookhead) << " / " << (int)player->lookbody << " / " << (int)player->looklegs << " / " <<  (int)player->lookfeet << std::endl;
+		//}
+
+		game->creatureChangeOutfit(player);
 	}
-	game->creatureChangeOutfit(player);
-    }
 }
 
 
@@ -1108,10 +1109,12 @@ void Protocol74::parseLookAt(NetworkMessage &msg){
   NetworkMessage newmsg;
   std::stringstream ss;
 
+/*
 #ifdef __DEBUG__
 	ss << "You look at " << LookPos << " and see Item # " << ItemNum << ".";
   AddTextMessage(newmsg,MSG_INFO, ss.str().c_str());
 #else
+*/
 	Item *item = NULL;
 	Creature *creature = NULL;
 
@@ -1141,7 +1144,16 @@ void Protocol74::parseLookAt(NetworkMessage &msg){
 	}
 
 	if(item) {
-		AddTextMessage(newmsg,MSG_INFO, item->getDescription().c_str());
+		bool fullDescription = false;
+		if(LookPos.x == 0xFFFF) {
+			fullDescription = true;
+		}
+		else if(std::abs(player->pos.x - LookPos.x) <= 1 && std::abs(player->pos.y - LookPos.y) <= 1 &&
+			LookPos.z == player->pos.z) {
+				fullDescription = true;
+			}
+
+		AddTextMessage(newmsg,MSG_INFO, item->getDescription(fullDescription).c_str());
 	}
 	else if(creature) {
 		if(player == creature)
@@ -1149,7 +1161,7 @@ void Protocol74::parseLookAt(NetworkMessage &msg){
 	else
 		AddTextMessage(newmsg,MSG_INFO, creature->getDescription().c_str());
 	}
-#endif
+//#endif
   
   sendNetworkMessage(&newmsg);
 }
@@ -1456,9 +1468,12 @@ void Protocol74::sendThingMove(const Creature *creature, const Container *fromCo
 		}
 	}
 
+	if(player->NeedUpdateStats()) {
+		player->sendStats();
+	}
+
 	NetworkMessage msg;
 
-	//!NOTE: SIMONE check if this is really ok
 	if(fromContainer && fromContainer->pos.x != 0xFFFF) 
 	{
 		if(toContainer->pos.x != 0xFFFF) {
@@ -1472,9 +1487,11 @@ void Protocol74::sendThingMove(const Creature *creature, const Container *fromCo
 		}
 		else
 		{
-			const Container *container = dynamic_cast<const Container*>(fromItem);
-			if(container) {				
-				autoCloseContainers(container, msg);
+			if(creature != player) {
+				const Container *container = dynamic_cast<const Container*>(fromItem);
+				if(container) {				
+					autoCloseContainers(container, msg);
+				}
 			}
 		}
 	}
@@ -1588,6 +1605,10 @@ void Protocol74::sendThingMove(const Creature *creature, slots_t fromSlot, const
 		}
 	}
 
+	if(player->NeedUpdateStats()) {
+		player->sendStats();
+	}
+
 	NetworkMessage msg;
 
 	Container *container = NULL;
@@ -1645,6 +1666,10 @@ void Protocol74::sendThingMove(const Creature *creature, slots_t fromSlot, const
 {
 	NetworkMessage msg;
 	if(creature == player) {
+		if(player->NeedUpdateStats()) {
+			player->sendStats();
+		}
+
 		//Auto-close trade
 		if(player->getTradeItem() && (fromItem == player->getTradeItem() || toItem == player->getTradeItem())) {
 			game->playerCloseTrade(player);
@@ -1676,6 +1701,10 @@ void Protocol74::sendThingMove(const Creature *creature, const Container *fromCo
 				tradeContainer = tradeContainer->getParent();
 			}
 		}
+	}
+
+	if(player->NeedUpdateStats()) {
+		player->sendStats();
 	}
 
 	NetworkMessage msg;
@@ -1741,6 +1770,10 @@ void Protocol74::sendThingMove(const Creature *creature, const Container *fromCo
 				tradeContainer = tradeContainer->getParent();
 			}
 		}
+	}
+
+	if(player->NeedUpdateStats()) {
+		player->sendStats();
 	}
 
 	NetworkMessage msg;
@@ -1816,6 +1849,10 @@ void Protocol74::sendThingMove(const Creature *creature, slots_t fromSlot,
 	NetworkMessage msg;
 
 	if(creature == player) {
+		if(player->NeedUpdateStats()) {
+			player->sendStats();
+		}
+
 		if(std::abs(player->pos.x - toPos.x) <= 1 && std::abs(player->pos.y - toPos.y) <= 1 && player->pos.z == toPos.z ) {
 			//Update up-arrow (if container)?
 		}
@@ -1868,6 +1905,10 @@ void Protocol74::sendThingMove(const Creature *creature, const Position &fromPos
 				tradeContainer = tradeContainer->getParent();
 			}
 		}
+	}
+
+	if(player->NeedUpdateStats()) {
+		player->sendStats();
 	}
 
 	NetworkMessage msg;
@@ -1948,6 +1989,10 @@ void Protocol74::sendThingMove(const Creature *creature, const Position &fromPos
 	//Auto-close trade
 	if(player->getTradeItem() && (fromItem == player->getTradeItem() || toItem == player->getTradeItem())) {
 		game->playerCloseTrade(player);
+	}
+
+	if(player->NeedUpdateStats()) {
+		player->sendStats();
 	}
 
 	NetworkMessage msg;
@@ -2531,36 +2576,36 @@ void Protocol74::AddCreature(NetworkMessage &msg,const Creature *creature, bool 
 void Protocol74::AddPlayerStats(NetworkMessage &msg,const Player *player)
 {
   msg.AddByte(0xA0);
-  msg.AddU16(player->health);
-  msg.AddU16(player->healthmax);
-  msg.AddU16(player->cap);
-  msg.AddU32(player->experience);
-  msg.AddByte(player->level);
-  msg.AddByte(player->level_percent);
-  msg.AddU16(player->mana);
-  msg.AddU16(player->manamax);
-  msg.AddByte(player->maglevel);
-  msg.AddByte(player->maglevel_percent);
+  msg.AddU16(player->getHealth());
+	msg.AddU16(player->getPlayerInfo(PLAYERINFO_MAXHEALTH));
+	msg.AddU16(std::floor(player->getFreeCapacity()));
+  msg.AddU32(player->getExperience());
+  msg.AddByte(player->getPlayerInfo(PLAYERINFO_LEVEL));
+  msg.AddByte(player->getPlayerInfo(PLAYERINFO_LEVELPERCENT));
+  msg.AddU16(player->getMana());
+	msg.AddU16(player->getPlayerInfo(PLAYERINFO_MAXMANA));
+  msg.AddByte(player->getMagicLevel());
+	msg.AddByte(player->getPlayerInfo(PLAYERINFO_MAGICLEVELPERCENT));
 }
 
 void Protocol74::AddPlayerSkills(NetworkMessage &msg,const Player *player)
 {
   msg.AddByte(0xA1);
 
-  msg.AddByte(player->skills[SKILL_FIST  ][SKILL_LEVEL]);
-  msg.AddByte(player->skills[SKILL_FIST  ][SKILL_PERCENT]);
-  msg.AddByte(player->skills[SKILL_CLUB  ][SKILL_LEVEL]);
-  msg.AddByte(player->skills[SKILL_CLUB  ][SKILL_PERCENT]);
-  msg.AddByte(player->skills[SKILL_SWORD ][SKILL_LEVEL]);
-  msg.AddByte(player->skills[SKILL_SWORD  ][SKILL_PERCENT]);
-  msg.AddByte(player->skills[SKILL_AXE   ][SKILL_LEVEL]);
-  msg.AddByte(player->skills[SKILL_AXE  ][SKILL_PERCENT]);
-  msg.AddByte(player->skills[SKILL_DIST  ][SKILL_LEVEL]);
-  msg.AddByte(player->skills[SKILL_DIST  ][SKILL_PERCENT]);
-  msg.AddByte(player->skills[SKILL_SHIELD][SKILL_LEVEL]);
-  msg.AddByte(player->skills[SKILL_SHIELD  ][SKILL_PERCENT]);
-  msg.AddByte(player->skills[SKILL_FISH  ][SKILL_LEVEL]);
-  msg.AddByte(player->skills[SKILL_FISH  ][SKILL_PERCENT]);
+  msg.AddByte(player->getSkill(SKILL_FIST,   SKILL_LEVEL));
+  msg.AddByte(player->getSkill(SKILL_FIST,   SKILL_PERCENT));
+  msg.AddByte(player->getSkill(SKILL_CLUB,   SKILL_LEVEL));
+  msg.AddByte(player->getSkill(SKILL_CLUB,   SKILL_PERCENT));
+  msg.AddByte(player->getSkill(SKILL_SWORD,  SKILL_LEVEL));
+  msg.AddByte(player->getSkill(SKILL_SWORD,  SKILL_PERCENT));
+  msg.AddByte(player->getSkill(SKILL_AXE,    SKILL_LEVEL));
+  msg.AddByte(player->getSkill(SKILL_AXE,    SKILL_PERCENT));
+  msg.AddByte(player->getSkill(SKILL_DIST,   SKILL_LEVEL));
+  msg.AddByte(player->getSkill(SKILL_DIST,   SKILL_PERCENT));
+  msg.AddByte(player->getSkill(SKILL_SHIELD, SKILL_LEVEL));
+  msg.AddByte(player->getSkill(SKILL_SHIELD, SKILL_PERCENT));
+  msg.AddByte(player->getSkill(SKILL_FISH,   SKILL_LEVEL));
+  msg.AddByte(player->getSkill(SKILL_FISH,   SKILL_PERCENT));
 }
 
 

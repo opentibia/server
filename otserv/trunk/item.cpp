@@ -468,24 +468,39 @@ int Item::getSlotPosition() const {
 	return items[id].slot_position;
 }
 
-std::string Item::getDescription() const
+double Item::getWeight() const {
+	if(isStackable()){
+		return items[id].weight * std::max(1, (int)count);
+	}
+
+	return items[id].weight;
+}
+
+std::string Item::getDescription(bool fullDescription) const
 {
 	std::stringstream s;
 	std::string str;
 	if(specialDescription){
 		s << "You see " << (*specialDescription) << ".";
-		if(items[id].weight > 0)
-				s << std::endl << "It weighs " << std::fixed << std::setprecision(1) << items[id].weight << " oz.";
+
+		if(fullDescription) {
+			if(items[id].weight > 0)
+					s << std::endl << "It weighs " << std::fixed << std::setprecision(1) << items[id].weight << " oz.";
+		}
 	}
 	else if (items[id].name.length()) {
 		if(isStackable() && count > 1) {
 			s<<"You see "<< (int)count << " " << items[id].name << "s" << "." << std::endl;
-			s << "They weight " << std::fixed << std::setprecision(1) << ((double) count * items[id].weight) << " oz.";
+
+			if(fullDescription) {
+				s << "They weight " << std::fixed << std::setprecision(1) << ((double) count * items[id].weight) << " oz.";
+			}
 		}		
 		else {
 			if(items[id].runeMagLevel != -1)
 			{
 				s << "You see a spell rune for level " << items[id].runeMagLevel << "." << std::endl;
+
 				s << "It's an \"" << items[id].name << "\" spell (";
 				if(getItemCharge())
 					s << (int)getItemCharge();
@@ -533,12 +548,15 @@ std::string Item::getDescription() const
 				s << "You see a " << items[id].name << "." << std::endl;
 			}
 			
-			if(items[id].weight > 0)
-				s << "It weighs " << std::fixed << std::setprecision(1) << items[id].weight << " oz.";
-			
-			if(items[id].description.length())
-			{
-				s << std::endl << items[id].description;
+			if(fullDescription) {
+				double weight = getWeight();
+				if(weight > 0)
+					s << "It weighs " << std::fixed << std::setprecision(1) << weight << " oz.";
+				
+				if(items[id].description.length())
+				{
+					s << std::endl << items[id].description;
+				}
 			}
 		}
 	}

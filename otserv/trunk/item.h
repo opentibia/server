@@ -61,6 +61,7 @@ public:
 	WeaponType getWeaponType() const;
 	amu_t	getAmuType() const;
 	subfight_t getSubfightType() const;
+	virtual double getWeight() const;
 	int getAttack() const;
 	int getArmor() const;
 	int getDefense() const;
@@ -84,13 +85,11 @@ public:
 	bool floorChangeSouth() const;
 	bool floorChangeEast() const;
 	bool floorChangeWest() const;
-	
-	//bool isRemoved;
 
 	int use(){std::cout << "use " << id << std::endl; return 0;};
 	int use(Item*){std::cout << "use with item ptr " << id << std::endl; return 0;};
 	int use(Creature*){std::cout << "use with creature ptr " << id << std::endl; return 0;};
-	std::string getDescription() const;
+	std::string getDescription(bool fullDescription) const;
 	std::string getName() const ;
 	void setSpecialDescription(std::string desc);
 	std::string getSpecialDescription();
@@ -102,8 +101,8 @@ public:
 	virtual int unserialize(xmlNodePtr p);
 	virtual xmlNodePtr serialize();
 
-    // get the number of items
-    unsigned short getItemCountOrSubtype() const;
+  // get the number of items
+  unsigned short getItemCountOrSubtype() const;
 	void setItemCountOrSubtype(unsigned char n);
 
 	unsigned char getItemCharge() const {return chargecount;};

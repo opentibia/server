@@ -270,10 +270,10 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 			s << "a dead human. You recognize " 
 				<< attackedplayer->getName() << ". ";
 			if(attacker){
-				if(attackedplayer->sex != 0)
-					s << "He";
-				else
+				if(attackedplayer->getSex() == PLAYERSEX_FEMALE)
 					s << "She";
+				else
+					s << "He";
 				s << " was killed by ";
 				Player *attackerplayer = dynamic_cast<Player*>(attacker);
 				if(attackerplayer)
@@ -743,76 +743,62 @@ bool Game::removeCreature(Creature* c)
 	return true;
 }
 
-void Game::thingMove(Creature *player, Thing *thing,
+void Game::thingMove(Creature *creature, Thing *thing,
 	unsigned short to_x, unsigned short to_y, unsigned char to_z, unsigned char count)
 {
-	//OTSYS_THREAD_LOCK(gameLock)
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
+
 	Tile *fromTile = map->getTile(thing->pos.x, thing->pos.y, thing->pos.z);
 
 	if (fromTile)
 	{
 		int oldstackpos = fromTile->getThingStackPos(thing);
-		thingMoveInternal(player, thing->pos.x, thing->pos.y, thing->pos.z, oldstackpos, to_x, to_y, to_z, count);
+		thingMoveInternal(creature, thing->pos.x, thing->pos.y, thing->pos.z, oldstackpos, to_x, to_y, to_z, count);
 	}
-
-	//OTSYS_THREAD_UNLOCK(gameLock)
 }
 
 
-void Game::thingMove(Creature *player, unsigned short from_x, unsigned short from_y, unsigned char from_z,
+void Game::thingMove(Creature *creature, unsigned short from_x, unsigned short from_y, unsigned char from_z,
 	unsigned char stackPos, unsigned short to_x, unsigned short to_y, unsigned char to_z, unsigned char count)
 {
-	//OTSYS_THREAD_LOCK(gameLock)
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
-  
-	thingMoveInternal(player, from_x, from_y, from_z, stackPos, to_x, to_y, to_z, count);
-  
-	//OTSYS_THREAD_UNLOCK(gameLock)
+
+	thingMoveInternal(creature, from_x, from_y, from_z, stackPos, to_x, to_y, to_z, count);
 }
 
 //container/inventory to container/inventory
-void Game::thingMove(Creature *player,
+void Game::thingMove(Player *player,
 	unsigned char from_cid, unsigned char from_slotid, bool fromInventory,
 	unsigned char to_cid, unsigned char to_slotid, bool toInventory,
 	unsigned char count)
 {
-	//OTSYS_THREAD_LOCK(gameLock)
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
 		
 	thingMoveInternal(player, from_cid, from_slotid, fromInventory,
 		to_cid, to_slotid, toInventory, count);
-		
-	//OTSYS_THREAD_UNLOCK(gameLock)
 }
 
 //container/inventory to ground
-void Game::thingMove(Creature *player,
+void Game::thingMove(Player *player,
 	unsigned char from_cid, unsigned char from_slotid, bool fromInventory,
 	const Position& toPos, unsigned char count)
 {
-	//OTSYS_THREAD_LOCK(gameLock)
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
-		
+
 	thingMoveInternal(player, from_cid, from_slotid, fromInventory, toPos, count);
-		
-	//OTSYS_THREAD_UNLOCK(gameLock)
 }
 
 //ground to container/inventory
-void Game::thingMove(Creature *player,
+void Game::thingMove(Player *player,
 	const Position& fromPos, unsigned char stackPos,
 	unsigned char to_cid, unsigned char to_slotid, bool toInventory,
 	unsigned char count)
 {
-	//OTSYS_THREAD_LOCK(gameLock)
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
-		
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);		
 	thingMoveInternal(player, fromPos, stackPos, to_cid, to_slotid, toInventory, count);
-		
-	//OTSYS_THREAD_UNLOCK(gameLock)
 }
 
+/*ground -> ground*/
 bool Game::onPrepareMoveThing(Creature *player, const Thing* thing,
 	const Position& fromPos, const Position& toPos)
 {
@@ -840,34 +826,36 @@ bool Game::onPrepareMoveThing(Creature *player, const Thing* thing,
 	return true;
 }
 
-bool Game::onPrepareMoveThing(Creature *player, const Thing* thing, const Tile *fromTile, const Tile *toTile)
+/*ground -> ground*/
+bool Game::onPrepareMoveThing(Creature *creature, const Thing* thing,
+	const Tile *fromTile, const Tile *toTile)
 {
 	const Item *item = dynamic_cast<const Item*>(thing);
-	const Player* player_t = dynamic_cast<const Player*>(thing);
+	const Player* player = dynamic_cast<const Player*>(thing);
 	
 	if(item && (!toTile || !item->canMovedTo(toTile))) {
-	 	player->sendCancel("Sorry, not possible.");
+	 	creature->sendCancel("Sorry, not possible.");
 		return false;
 	}
-	else if(player_t && (!toTile || !thing->canMovedTo(toTile)) ) {
-		player_t->sendTextMessage(MSG_SMALLINFO, "Sorry, not possible.");
-		player_t->sendCancelWalk();
+	else if(player && (!toTile || !thing->canMovedTo(toTile)) ) {
+		player->sendTextMessage(MSG_SMALLINFO, "Sorry, not possible.");
+		player->sendCancelWalk();
 
 		//player->sendCancelWalk("Sorry, not possible.");
 		return false;
 	}
 
 	if (fromTile && fromTile->splash == thing && fromTile->splash->isNotMoveable()) {
-			player->sendCancel("You cannot move this object.");
+			creature->sendCancel("You cannot move this object.");
 #ifdef __DEBUG__
-		cout << player->getName() << " is trying to move a splash item!" << std::endl;
+		cout << creature->getName() << " is trying to move a splash item!" << std::endl;
 #endif
 		return false;
 	}
 	else if (item && item->isNotMoveable()) {
-			player->sendCancel("You cannot move this object.");
+			creature->sendCancel("You cannot move this object.");
 #ifdef __DEBUG__
-		cout << player->getName() << " is trying to move an unmoveable item!" << std::endl;
+		cout << creature->getName() << " is trying to move an unmoveable item!" << std::endl;
 #endif
 		return false;
 	}
@@ -875,7 +863,33 @@ bool Game::onPrepareMoveThing(Creature *player, const Thing* thing, const Tile *
 	return thing->canMovedTo(toTile);
 }
 
-bool Game::onPrepareMoveThing(Creature *player, const Item* fromItem, const Container *fromContainer,
+/*inventory -> container*/
+bool Game::onPrepareMoveThing(Player *player, const Item* fromItem, slots_t fromSlot,
+	const Container *toContainer, const Item *toItem)
+{
+	if(!fromItem->isPickupable()) {		
+		player->sendCancel("Sorry, not possible.");
+		return false;
+	}
+	else {
+		const Container *itemContainer = dynamic_cast<const Container*>(fromItem);
+		if(itemContainer) {
+			if(itemContainer->isHoldingItem(toContainer) || (toContainer == itemContainer) /*|| (fromContainer && fromContainer == itemContainer)*/) {
+				player->sendCancel("This is impossible.");
+				return false;
+			}
+		}
+		else if((!fromItem->isStackable() || !toItem || fromItem->getID() != toItem->getID() || toItem->getItemCountOrSubtype() >= 100) && toContainer->size() + 1 > toContainer->capacity()) {
+			player->sendCancel("Sorry not enough room.");
+			return false;
+		}
+	}
+
+	return true;
+}
+
+/*container -> container*/
+bool Game::onPrepareMoveThing(Player *player, const Item* fromItem, const Container *fromContainer,
 	const Container *toContainer, const Item *toItem)
 {	
 	if(!fromItem->isPickupable()) {		
@@ -883,6 +897,12 @@ bool Game::onPrepareMoveThing(Creature *player, const Item* fromItem, const Cont
 		return false;
 	}
 	else {
+		if((!fromContainer || !player->isHoldingContainer(fromContainer)) && player->isHoldingContainer(toContainer)) {
+			if(player->access == 0 && player->getFreeCapacity() < fromItem->getWeight()) {
+				player->sendCancel("You do not have enough capacity left.");
+				return false;
+			}
+		}
 		const Container *itemContainer = dynamic_cast<const Container*>(fromItem);
 		if(itemContainer) {
 			if(itemContainer->isHoldingItem(toContainer) || (toContainer == itemContainer) || (fromContainer && fromContainer == itemContainer)) {
@@ -899,17 +919,18 @@ bool Game::onPrepareMoveThing(Creature *player, const Item* fromItem, const Cont
 	return true;
 }
 
-bool Game::onPrepareMoveCreature(Creature *player, const Creature* creatureMoving,
+/*ground -> ground*/
+bool Game::onPrepareMoveCreature(Creature *creature, const Creature* creatureMoving,
 	const Tile *fromTile, const Tile *toTile)
 {
 	const Player* playerMoving = dynamic_cast<const Player*>(creatureMoving);
-	Player* player_t = dynamic_cast<Player*>(player);
+	Player* player_t = dynamic_cast<Player*>(creature);
 
-	if (player->access == 0 && player != creatureMoving && !creatureMoving->isPushable()) {		
-		player->sendCancel("Sorry, not possible.");
+	if (creature->access == 0 && creature != creatureMoving && !creatureMoving->isPushable()) {		
+		creature->sendCancel("Sorry, not possible.");
     return false;
   }
-	if(!toTile && player == creatureMoving){		
+	if(!toTile && creature == creatureMoving){		
 		//player->sendCancelWalk("Sorry, not possible.");
 
 		if(player_t) {
@@ -920,7 +941,7 @@ bool Game::onPrepareMoveCreature(Creature *player, const Creature* creatureMovin
 		return false;
 	}
   else if (playerMoving && toTile->isPz() && playerMoving->pzLocked) {
-		if (player == creatureMoving/*thing*/ && player->pzLocked) {			
+		if (creature == creatureMoving && creature->pzLocked) {
 
 			if(player_t) {
 				player_t->sendTextMessage(MSG_SMALLINFO, "You can not enter a protection zone after attacking another player.");
@@ -931,18 +952,19 @@ bool Game::onPrepareMoveCreature(Creature *player, const Creature* creatureMovin
 			return false;
 		}
 		else if (playerMoving->pzLocked) {			
-			player->sendCancel("Sorry, not possible.");
+			creature->sendCancel("Sorry, not possible.");
 			return false;
 		}
   }
-  else if (playerMoving && fromTile->isPz() && player != creatureMoving) {
-		player->sendCancel("Sorry, not possible.");
+  else if (playerMoving && fromTile->isPz() && creature != creatureMoving) {
+		creature->sendCancel("Sorry, not possible.");
 		return false;
   }
 
 	return true;
 }
 
+/*ground -> inventory*/
 bool Game::onPrepareMoveThing(Player *player, const Position& fromPos, const Item *item, slots_t toSlot)
 {
 	if( (abs(player->pos.x - fromPos.x) > 1) || (abs(player->pos.y - fromPos.y) > 1) ) {
@@ -954,10 +976,17 @@ bool Game::onPrepareMoveThing(Player *player, const Position& fromPos, const Ite
 		return false;
 	}
 
+	if(player->access == 0 && player->getFreeCapacity() < item->getWeight()) {
+		player->sendCancel("You do not have enough capacity left.");
+		return false;
+	}
+
 	return true;
 }
 
-bool Game::onPrepareMoveThing(Player *player, slots_t fromSlot, const Item *fromItem, slots_t toSlot, const Item *toItem)
+/*inventory -> inventory*/
+bool Game::onPrepareMoveThing(Player *player, slots_t fromSlot, const Item *fromItem,
+	slots_t toSlot, const Item *toItem)
 {
 	if(toItem && (!toItem->isStackable() || toItem->getID() != fromItem->getID())) {
 		player->sendCancel("Sorry, not enough room.");
@@ -967,7 +996,9 @@ bool Game::onPrepareMoveThing(Player *player, slots_t fromSlot, const Item *from
 	return true;
 }
 
-bool Game::onPrepareMoveThing(Player *player, const Container *fromContainer, const Item *fromItem, slots_t toSlot, const Item *toItem)
+/*container -> inventory*/
+bool Game::onPrepareMoveThing(Player *player, const Container *fromContainer, const Item *fromItem,
+	slots_t toSlot, const Item *toItem)
 {
 	if(toItem && (!toItem->isStackable() || toItem->getID() != fromItem->getID())) {
 		player->sendCancel("Sorry, not enough room.");
@@ -977,6 +1008,7 @@ bool Game::onPrepareMoveThing(Player *player, const Container *fromContainer, co
 	return true;
 }
 
+/*->inventory*/
 bool Game::onPrepareMoveThing(Player *player, const Item *item, slots_t toSlot)
 {
 	switch(toSlot)
@@ -1001,7 +1033,7 @@ bool Game::onPrepareMoveThing(Player *player, const Item *item, slots_t toSlot)
 		if(item->getSlotPosition() & SLOTP_RIGHT){
 			if(item->getSlotPosition() & SLOTP_TWO_HAND){
 				if(player->items[SLOT_LEFT] != NULL){
-					player->sendCancel("Two handed item .");
+					player->sendCancel("First remove the two-handed item.");
 					return false;
 				}
 				return true	;				
@@ -1009,7 +1041,7 @@ bool Game::onPrepareMoveThing(Player *player, const Item *item, slots_t toSlot)
 			else{
 				if(player->items[SLOT_LEFT]){
 					if(player->items[SLOT_LEFT]->getSlotPosition() & SLOTP_TWO_HAND){
-						player->sendCancel("Two handed item .");
+						player->sendCancel("First remove the two-handed item.");
 						return false;
 					}
 					return true;
@@ -1022,7 +1054,7 @@ bool Game::onPrepareMoveThing(Player *player, const Item *item, slots_t toSlot)
 		if(item->getSlotPosition() & SLOTP_LEFT){
 			if(item->getSlotPosition() & SLOTP_TWO_HAND){
 				if(player->items[SLOT_RIGHT] != NULL){
-					player->sendCancel("Two handed item .");
+					player->sendCancel("First remove the two-handed item.");
 					return false;
 				}
 				return true	;				
@@ -1030,7 +1062,7 @@ bool Game::onPrepareMoveThing(Player *player, const Item *item, slots_t toSlot)
 			else{
 				if(player->items[SLOT_RIGHT]){
 					if(player->items[SLOT_RIGHT]->getSlotPosition() & SLOTP_TWO_HAND){
-						player->sendCancel("Two handed item .");
+						player->sendCancel("First remove the two-handed item.");
 						return false;
 					}
 					return true;
@@ -1056,68 +1088,154 @@ bool Game::onPrepareMoveThing(Player *player, const Item *item, slots_t toSlot)
 			return true;
 		break;
 	}
+
 	player->sendCancel("You cannot put that object in that place.");
 	return false;
 }
 
 //container/inventory to container/inventory
-void Game::thingMoveInternal(Creature *player,
+void Game::thingMoveInternal(Player *player,
 	unsigned char from_cid, unsigned char from_slotid, bool fromInventory,
 	unsigned char to_cid, unsigned char to_slotid, bool toInventory,
 	unsigned char count)
 {
-	Player *p = dynamic_cast<Player*>(player);
-	if(p) {
-		Container *fromContainer = NULL;
-		Container *toContainer = NULL;
-		Item *fromItem = NULL;
-		Item *toItem = NULL;
+	Container *fromContainer = NULL;
+	Container *toContainer = NULL;
+	Item *fromItem = NULL;
+	Item *toItem = NULL;
 
-		if(fromInventory) {
-			fromItem = p->getItem(from_cid);
-			fromContainer = dynamic_cast<Container *>(fromItem);
+	if(fromInventory) {
+		fromItem = player->getItem(from_cid);
+		fromContainer = dynamic_cast<Container *>(fromItem);
+	}
+	else {
+		fromContainer = player->getContainer(from_cid);
+
+		if(fromContainer) {
+			if(from_slotid >= fromContainer->size())
+				return;
+
+			fromItem = fromContainer->getItem(from_slotid);
 		}
-		else {
-			fromContainer = p->getContainer(from_cid);
+	}
 
-			if(fromContainer) {
-				if(from_slotid >= fromContainer->size())
-					return;
+	if(toInventory) {
+		toItem = player->getItem(to_cid);
+		toContainer = dynamic_cast<Container *>(toItem);
+	}
+	else {
+		toContainer = player->getContainer(to_cid);
 
-				fromItem = fromContainer->getItem(from_slotid);
+		if(toContainer) {
+			if(to_slotid >= toContainer->capacity())
+				return;
+
+			toItem = toContainer->getItem(to_slotid);
+			Container *toSlotContainer = dynamic_cast<Container*>(toItem);
+			if(toSlotContainer) {
+				toContainer = toSlotContainer;
+				toItem = NULL;
 			}
 		}
+	}
 
-		if(toInventory) {
-			toItem = p->getItem(to_cid);
-			toContainer = dynamic_cast<Container *>(toItem);
-		}
-		else {
-			toContainer = p->getContainer(to_cid);
+	if(!fromItem || (toItem == fromItem) || (fromItem->isStackable() && count > fromItem->getItemCountOrSubtype()))
+		return;
 
-			if(toContainer) {
-				if(to_slotid >= toContainer->capacity())
-					return;
+	//Container to container
+	if(!fromInventory && fromContainer && toContainer) {
+		if(onPrepareMoveThing(player, fromItem, fromContainer, toContainer, toItem)) {
 
-				toItem = toContainer->getItem(to_slotid);
-				Container *toSlotContainer = dynamic_cast<Container*>(toItem);
-				if(toSlotContainer) {
-					toContainer = toSlotContainer;
-					toItem = NULL;
+			//double oldToWeigth = toContainer->getWeight();
+			int oldFromCount = fromItem->getItemCountOrSubtype();
+			int oldToCount = 0;
+
+			//move around an item in a container
+			if(fromItem->isStackable()) {
+				if(toItem && toItem != fromItem && toItem->getID() == fromItem->getID())
+				{
+					oldToCount = toItem->getItemCountOrSubtype();
+					int newToCount = std::min(100, oldToCount + count);
+					toItem->setItemCountOrSubtype(newToCount);
+
+					int subcount = oldFromCount - count;
+					fromItem->setItemCountOrSubtype(subcount);
+
+					int surplusCount = oldToCount + count  - 100;
+					if(surplusCount > 0) {
+						Item *surplusItem = Item::CreateItem(fromItem->getID(), surplusCount);
+						if(onPrepareMoveThing(player, surplusItem, fromContainer, toContainer, NULL)) {
+							toContainer->addItem(surplusItem);
+						}
+						else {
+							delete surplusItem;
+							count -= surplusCount; //re-define the actual amount we move.
+							fromItem->setItemCountOrSubtype(fromItem->getItemCountOrSubtype() + surplusCount);
+						}
+					}
+				}
+				else if(count < oldFromCount) {
+					int subcount = oldFromCount - count;
+					fromItem->setItemCountOrSubtype(subcount);
+	
+					toContainer->addItem(Item::CreateItem(fromItem->getID(), count));
+				}
+				else {
+					if(fromContainer == toContainer) {
+						fromContainer->moveItem(from_slotid, 0);
+					}
+					else if(fromContainer->removeItem(fromItem)) {
+						toContainer->addItem(fromItem);
+					}
+				}
+
+				if(fromItem->getItemCountOrSubtype() == 0) {
+					fromContainer->removeItem(fromItem);
+					this->FreeThing(fromItem);
 				}
 			}
+			else {
+				if(fromContainer == toContainer) {
+					fromContainer->moveItem(from_slotid, 0);
+				}
+				else if(fromContainer->removeItem(fromItem)) {
+					toContainer->addItem(fromItem);
+				}
+			}
+
+			if(player->isHoldingContainer(fromContainer) != player->isHoldingContainer(toContainer)) {
+				player->updateInventoryWeigth();
+			}
+
+			std::vector<Creature*> list;
+
+			Position fromPos = (fromContainer->pos.x == 0xFFFF ? player->pos : fromContainer->pos);
+			Position toPos = (toContainer->pos.x == 0xFFFF ? player->pos : toContainer->pos);
+
+			if(fromPos == toPos) {
+				getSpectators(Range(fromPos, false), list);
+			}
+			else {
+				getSpectators(Range(fromPos, toPos), list);
+			}
+
+			if(!list.empty()) {
+				for(int i = 0; i < list.size(); ++i) {
+					list[i]->onThingMove(player, fromContainer, from_slotid, fromItem, oldFromCount, toContainer, to_slotid, toItem, oldToCount, count);
+				}
+			}
+			else
+				player->onThingMove(player, fromContainer, from_slotid, fromItem, oldFromCount, toContainer, to_slotid, toItem, oldToCount, count);
 		}
+	}
+	else {
+		//inventory to inventory
+		if(fromInventory && toInventory && !toContainer) {
+			if(onPrepareMoveThing(player, fromItem, (slots_t)to_cid) && onPrepareMoveThing(player, (slots_t)from_cid, fromItem, (slots_t)to_cid, toItem)) {
 
-		if(!fromItem || (toItem == fromItem) || (fromItem->isStackable() && count > fromItem->getItemCountOrSubtype()))
-			return;
-
-		//Container to container
-		if(!fromInventory && fromContainer && toContainer) {
-			if(onPrepareMoveThing(p, fromItem, fromContainer, toContainer, toItem)) {
 				int oldFromCount = fromItem->getItemCountOrSubtype();
 				int oldToCount = 0;
 
-				//move around an item in a container
 				if(fromItem->isStackable()) {
 					if(toItem && toItem != fromItem && toItem->getID() == fromItem->getID())
 					{
@@ -1131,527 +1249,134 @@ void Game::thingMoveInternal(Creature *player,
 
 						int surplusCount = oldToCount + count  - 100;
 						if(surplusCount > 0) {
-							Item *surplusItem = Item::CreateItem(fromItem->getID(), surplusCount);
-							if(onPrepareMoveThing(p, surplusItem, fromContainer, toContainer, NULL)) {
-								toContainer->addItem(surplusItem);
-							}
-							else {
-								delete surplusItem;
-								count -= surplusCount; //re-define the actual amount we move.
-								fromItem->setItemCountOrSubtype(fromItem->getItemCountOrSubtype() + surplusCount);
-							}
+							fromItem->setItemCountOrSubtype(fromItem->getItemCountOrSubtype() + surplusCount);
+							player->sendCancel("Sorry not enough room.");
 						}
 
-
+						if(fromItem->getItemCountOrSubtype() == 0) {
+							player->removeItemInventory(from_cid, true);
+							this->FreeThing(fromItem);
+						}
 					}
 					else if(count < oldFromCount) {
 						int subcount = oldFromCount - count;
 						fromItem->setItemCountOrSubtype(subcount);
 		
-						toContainer->addItem(Item::CreateItem(fromItem->getID(), count));
+						player->removeItemInventory(to_cid, true);
+						player->addItemInventory(Item::CreateItem(fromItem->getID(), count), to_cid, true);
+
+						if(fromItem->getItemCountOrSubtype() == 0) {
+							player->removeItemInventory(from_cid, true);
+							this->FreeThing(fromItem);
+						}
 					}
 					else {
-						if(fromContainer == toContainer) {
-							fromContainer->moveItem(from_slotid, 0);
-						}
-						else if(fromContainer->removeItem(fromItem)) {
-							toContainer->addItem(fromItem);
+						if(player->removeItemInventory(from_cid, true)) {
+							player->removeItemInventory(to_cid, true);
+							player->addItemInventory(fromItem, to_cid, true);
 						}
 					}
-
-					if(fromItem->getItemCountOrSubtype() == 0) {
-						fromContainer->removeItem(fromItem);
-						this->FreeThing(fromItem);
-					}
 				}
-				else {
-					if(fromContainer == toContainer) {
-						fromContainer->moveItem(from_slotid, 0);
-					}
-					else if(fromContainer->removeItem(fromItem)) {
-						toContainer->addItem(fromItem);
-					}
+				else if(player->removeItemInventory(from_cid, true)) {
+					player->removeItemInventory(to_cid, true);
+					player->addItemInventory(fromItem, to_cid, true);
 				}
 
-				std::vector<Creature*> list;
-
-				Position fromPos = (fromContainer->pos.x == 0xFFFF ? player->pos : fromContainer->pos);
-				Position toPos = (toContainer->pos.x == 0xFFFF ? player->pos : toContainer->pos);
-
-				if(fromPos == toPos) {
-					getSpectators(Range(fromPos, false), list);
-				}
-				else {
-					getSpectators(Range(fromPos, toPos), list);
-				}
-
-				if(!list.empty()) {
-					for(int i = 0; i < list.size(); ++i) {
-						list[i]->onThingMove(player, fromContainer, from_slotid, fromItem, oldFromCount, toContainer, to_slotid, toItem, oldToCount, count);
-					}
-				}
-				else
-					player->onThingMove(player, fromContainer, from_slotid, fromItem, oldFromCount, toContainer, to_slotid, toItem, oldToCount, count);
-
-				/*
-				if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() == 0) {
-					delete fromItem;
-				}
-				*/
+				player->onThingMove(player, (slots_t)from_cid, fromItem, oldFromCount, (slots_t)to_cid, toItem, oldToCount, count);
 			}
 		}
-		else {
-			//inventory to inventory
-			if(fromInventory && toInventory && !toContainer) {
-				if(onPrepareMoveThing(p, fromItem, (slots_t)to_cid) && onPrepareMoveThing(p, (slots_t)from_cid, fromItem, (slots_t)to_cid, toItem)) {
+		//container to inventory
+		else if(!fromInventory && fromContainer && toInventory) {
+			if(onPrepareMoveThing(player, fromItem, (slots_t)to_cid) && onPrepareMoveThing(player, fromContainer, fromItem, (slots_t)to_cid, toItem)) {
+				double oldToWeigth = 0;
+				int oldFromCount = fromItem->getItemCountOrSubtype();
+				int oldToCount = 0;
 
-					int oldFromCount = fromItem->getItemCountOrSubtype();
-					int oldToCount = 0;
+				if(fromItem->isStackable()) {
+					if(toItem && toItem != fromItem && toItem->getID() == fromItem->getID())
+					{
+						oldToWeigth = toItem->getWeight();
+						oldToCount = toItem->getItemCountOrSubtype();
 
-					if(fromItem->isStackable()) {
-						if(toItem && toItem != fromItem && toItem->getID() == fromItem->getID())
-						{
-							oldToCount = toItem->getItemCountOrSubtype();
+						int newToCount = std::min(100, oldToCount + count);
+						toItem->setItemCountOrSubtype(newToCount);
 
-							int newToCount = std::min(100, oldToCount + count);
-							toItem->setItemCountOrSubtype(newToCount);
+						int subcount = oldFromCount - count;
+						fromItem->setItemCountOrSubtype(subcount);
 
-							int subcount = oldFromCount - count;
-							fromItem->setItemCountOrSubtype(subcount);
-
-							int surplusCount = oldToCount + count  - 100;
-							if(surplusCount > 0) {
-								fromItem->setItemCountOrSubtype(fromItem->getItemCountOrSubtype() + surplusCount);
-								player->sendCancel("Sorry not enough room.");
-							}
-
-							if(fromItem->getItemCountOrSubtype() == 0) {
-								p->removeItemInventory(from_cid, true);
-								this->FreeThing(fromItem);
-							}
+						int surplusCount = oldToCount + count  - 100;
+						if(surplusCount > 0) {
+							fromItem->setItemCountOrSubtype(fromItem->getItemCountOrSubtype() + surplusCount);
+							player->sendCancel("Sorry not enough room.");
 						}
-						else if(count < oldFromCount) {
-							int subcount = oldFromCount - count;
-							fromItem->setItemCountOrSubtype(subcount);
-			
-							p->removeItemInventory(to_cid, true);
-							p->addItemInventory(Item::CreateItem(fromItem->getID(), count), to_cid, true);
 
-							if(fromItem->getItemCountOrSubtype() == 0) {
-								p->removeItemInventory(from_cid, true);
-								this->FreeThing(fromItem);
-							}
-						}
-						else {
-							if(p->removeItemInventory(from_cid, true)) {
-								p->removeItemInventory(to_cid, true);
-								p->addItemInventory(fromItem, to_cid, true);
-							}
+						if(fromItem->getItemCountOrSubtype() == 0) {
+							fromContainer->removeItem(fromItem);
+							this->FreeThing(fromItem);
 						}
 					}
-					else if(p->removeItemInventory(from_cid, true)) {
-						p->removeItemInventory(to_cid, true);
-						p->addItemInventory(fromItem, to_cid, true);
-					}
-
-					player->onThingMove(player, (slots_t)from_cid, fromItem, oldFromCount, (slots_t)to_cid, toItem, oldToCount, count);
-
-					/*
-					if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() == 0) {
-						delete fromItem;
-					}
-					*/
-				}
-			}
-			//container to inventory
-			else if(!fromInventory && fromContainer && toInventory) {
-				if(onPrepareMoveThing(p, fromItem, (slots_t)to_cid) && onPrepareMoveThing(p, fromContainer, fromItem, (slots_t)to_cid, toItem)) {
-					int oldFromCount = fromItem->getItemCountOrSubtype();
-					int oldToCount = 0;
-
-					if(fromItem->isStackable()) {
-						if(toItem && toItem != fromItem && toItem->getID() == fromItem->getID())
-						{
-							oldToCount = toItem->getItemCountOrSubtype();
-
-							int newToCount = std::min(100, oldToCount + count);
-							toItem->setItemCountOrSubtype(newToCount);
-
-							int subcount = oldFromCount - count;
-							fromItem->setItemCountOrSubtype(subcount);
-
-							int surplusCount = oldToCount + count  - 100;
-							if(surplusCount > 0) {
-								fromItem->setItemCountOrSubtype(fromItem->getItemCountOrSubtype() + surplusCount);
-								player->sendCancel("Sorry not enough room.");
-							}
-
-							if(fromItem->getItemCountOrSubtype() == 0) {
-								fromContainer->removeItem(fromItem);
-								this->FreeThing(fromItem);
-							}
-						}
-						else if(count < oldFromCount) {
-							int subcount = oldFromCount - count;
-							fromItem->setItemCountOrSubtype(subcount);
-			
-							p->removeItemInventory(to_cid, true);
-							p->addItemInventory(Item::CreateItem(fromItem->getID(), count), to_cid, true);
-
-							if(toItem) {
-								fromContainer->addItem(toItem);
-							}
-
-							if(fromItem->getItemCountOrSubtype() == 0) {
-								fromContainer->removeItem(fromItem);
-								this->FreeThing(fromItem);
-							}
-						}
-						else {
-							if(fromContainer->removeItem(fromItem)) {
-								p->removeItemInventory(to_cid, true);
-								p->addItemInventory(fromItem, to_cid, true);
-
-								if(toItem) {
-									fromContainer->addItem(toItem);
-								}
-							}
-						}
-					}
-					else if(fromContainer->removeItem(fromItem)) {
-						p->removeItemInventory(to_cid, true);
-						p->addItemInventory(fromItem, to_cid, true);
+					else if(count < oldFromCount) {
+						int subcount = oldFromCount - count;
+						fromItem->setItemCountOrSubtype(subcount);
+		
+						player->removeItemInventory(to_cid, true);
+						player->addItemInventory(Item::CreateItem(fromItem->getID(), count), to_cid, true);
 
 						if(toItem) {
 							fromContainer->addItem(toItem);
 						}
-					}
-
-					if(fromContainer->pos.x != 0xFFFF) {
-						std::vector<Creature*> list;
-						getSpectators(Range(fromContainer->pos, false), list);
-
-						for(int i = 0; i < list.size(); ++i) {
-							list[i]->onThingMove(player, fromContainer, from_slotid, fromItem, oldFromCount, (slots_t)to_cid, toItem, oldToCount, count);
-						}
-					}
-					else
-						player->onThingMove(player, fromContainer, from_slotid, fromItem, oldFromCount, (slots_t)to_cid, toItem, oldToCount, count);
-
-					/*
-					if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() == 0) {
-						delete fromItem;
-					}
-					*/
-				}
-			}
-			//inventory to container
-			else if(fromInventory && toContainer) {
-				int oldFromCount = fromItem->getItemCountOrSubtype();
-				int oldToCount = 0;
-
-				if(onPrepareMoveThing(player, fromItem, NULL, toContainer, toItem)) {
-
-					if(fromItem->isStackable()) {
-						if(toItem && toItem != fromItem && toItem->getID() == fromItem->getID())
-						{
-							oldToCount = toItem->getItemCountOrSubtype();
-
-							int newToCount = std::min(100, oldToCount + count);
-							toItem->setItemCountOrSubtype(newToCount);
-
-							int subcount = oldFromCount - count;
-							fromItem->setItemCountOrSubtype(subcount);
-
-							int surplusCount = oldToCount + count  - 100;
-							if(surplusCount > 0) {
-								Item *surplusItem = Item::CreateItem(fromItem->getID(), surplusCount);
-
-								if(onPrepareMoveThing(player, surplusItem, NULL, toContainer, NULL)) {
-									toContainer->addItem(surplusItem);
-								}
-								else {
-									delete surplusItem;
-									count -= surplusCount; //re-define the actual amount we move.
-									fromItem->setItemCountOrSubtype(fromItem->getItemCountOrSubtype() + surplusCount);
-								}
-							}
-						}
-						else if(count < oldFromCount) {
-							int subcount = oldFromCount - count;
-							fromItem->setItemCountOrSubtype(subcount);
-			
-							toContainer->addItem(Item::CreateItem(fromItem->getID(), count));
-						}
-						else {
-							if(p->removeItemInventory((slots_t)from_cid, true)) {
-								toContainer->addItem(fromItem);
-							}
-						}
-
-						if(fromItem->getItemCountOrSubtype() == 0) {
-							p->removeItemInventory(from_cid, true);
-							this->FreeThing(fromItem);
-						}
-					}
-					else if(p->removeItemInventory(from_cid, true)) {
-						toContainer->addItem(fromItem);
-					}
-
-					if(toContainer->pos.x != 0xFFFF) {
-						std::vector<Creature*> list;
-						getSpectators(Range(toContainer->pos, false), list);
-
-						for(int i = 0; i < list.size(); ++i) {
-							list[i]->onThingMove(player, (slots_t)from_cid, fromItem, oldFromCount, toContainer, to_slotid, toItem, oldToCount, count);
-						}
-					}
-					else
-						player->onThingMove(player, (slots_t)from_cid, fromItem, oldFromCount, toContainer, to_slotid, toItem, oldToCount, count);
-
-					/*
-					if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() == 0) {
-						delete fromItem;
-					}
-					*/
-				}
-			}
-		}
-	}
-}
-
-//container/inventory to ground
-void Game::thingMoveInternal(Creature *player,
-	unsigned char from_cid, unsigned char from_slotid, bool fromInventory,
-	const Position& toPos, unsigned char count)
-{
-	Player* p = dynamic_cast<Player*>(player);
-	if(p) {
-		Container *fromContainer = NULL;
-		Tile *toTile = getTile(toPos.x, toPos.y, toPos.z);
-		if(!toTile)
-			return;
-
-		if(!fromInventory) {
-			fromContainer = p->getContainer(from_cid);
-			if(!fromContainer)
-				return;
-			
-			Position fromPos = (fromContainer->pos.x == 0xFFFF ? player->pos : fromContainer->pos);			
-			Item *fromItem = dynamic_cast<Item*>(fromContainer->getItem(from_slotid));
-			Item *toItem = dynamic_cast<Item*>(toTile->getThingByStackPos(toTile->getThingCount() - 1));
-
-			if(!fromItem || (toItem == fromItem) || (fromItem->isStackable() && count > fromItem->getItemCountOrSubtype()))
-				return;
-
-			if(onPrepareMoveThing(p, fromItem, fromPos, toPos) && onPrepareMoveThing(p, fromItem, NULL, toTile)) {
-				int oldFromCount = fromItem->getItemCountOrSubtype();
-				int oldToCount = 0;
-
-				//Do action...
-				if(fromItem->isStackable()) {
-					if(toItem && toItem->getID() == fromItem->getID())
-					{
-						oldToCount = toItem->getItemCountOrSubtype();
-
-						int newToCount = std::min(100, oldToCount + count);
-						toItem->setItemCountOrSubtype(newToCount);
-
-						int subcount = oldFromCount - count;
-						fromItem->setItemCountOrSubtype(subcount);
-
-						int surplusCount = oldToCount + count  - 100;
-						if(surplusCount > 0) {
-							Item *surplusItem = Item::CreateItem(fromItem->getID(), surplusCount);
-							surplusItem->pos = toPos;
-							
-							toTile->addThing(surplusItem);
-						}
 
 						if(fromItem->getItemCountOrSubtype() == 0) {
 							fromContainer->removeItem(fromItem);
 							this->FreeThing(fromItem);
 						}
 					}
-					else if(count < oldFromCount) {
-						int subcount = oldFromCount - count;
-						fromItem->setItemCountOrSubtype(subcount);
+					else {
+						if(fromContainer->removeItem(fromItem)) {
+							player->removeItemInventory(to_cid, true);
+							player->addItemInventory(fromItem, to_cid, true);
 
-						Item *moveItem = Item::CreateItem(fromItem->getID(), count);
-						moveItem->pos = toPos;
-						toTile->addThing(moveItem);
-
-						if(fromItem->getItemCountOrSubtype() == 0) {
-							fromContainer->removeItem(fromItem);
-							this->FreeThing(fromItem);
+							if(toItem) {
+								fromContainer->addItem(toItem);
+							}
 						}
-					}
-					else if(fromContainer->removeItem(fromItem)) {
-						fromItem->pos = toPos;
-						toTile->addThing(fromItem);
 					}
 				}
 				else if(fromContainer->removeItem(fromItem)) {
-					fromItem->pos = toPos;
-					toTile->addThing(fromItem);
-				}
+					player->removeItemInventory(to_cid, true);
+					player->addItemInventory(fromItem, to_cid, true);
 
-				std::vector<Creature*> list;
-				getSpectators(Range(fromPos, false), list);
-
-				std::vector<Creature*> tolist;
-				getSpectators(Range(toPos, true), tolist);
-
-				for(std::vector<Creature*>::const_iterator it = tolist.begin(); it != tolist.end(); ++it) {
-					if(std::find(list.begin(), list.end(), *it) == list.end()) {
-						list.push_back(*it);
+					if(toItem) {
+						fromContainer->addItem(toItem);
 					}
 				}
 
-				for(int i = 0; i < list.size(); ++i) {
-					list[i]->onThingMove(player, fromContainer, from_slotid, fromItem, oldFromCount, toPos, toItem, oldToCount, count);
+				if(!player->isHoldingContainer(fromContainer)) {
+					player->updateInventoryWeigth();
 				}
 
-				/*
-				if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() == 0) {
-					delete fromItem;
+				if(fromContainer->pos.x != 0xFFFF) {
+					std::vector<Creature*> list;
+					getSpectators(Range(fromContainer->pos, false), list);
+
+					for(int i = 0; i < list.size(); ++i) {
+						list[i]->onThingMove(player, fromContainer, from_slotid, fromItem, oldFromCount, (slots_t)to_cid, toItem, oldToCount, count);
+					}
 				}
-				*/
+				else
+					player->onThingMove(player, fromContainer, from_slotid, fromItem, oldFromCount, (slots_t)to_cid, toItem, oldToCount, count);
 			}
 		}
-		else {
-			Item *fromItem = p->getItem(from_cid);
-			if(!fromItem)
-				return;
-			
-			if(onPrepareMoveThing(p, fromItem, player->pos, toPos) && onPrepareMoveThing(p, fromItem, NULL, toTile)) {
-				Item *toItem = dynamic_cast<Item*>(toTile->getThingByStackPos(toTile->getThingCount() - 1));
-				int oldFromCount = fromItem->getItemCountOrSubtype();
-				int oldToCount = 0;
+		//inventory to container
+		else if(fromInventory && toContainer) {
+			int oldFromCount = fromItem->getItemCountOrSubtype();
+			int oldToCount = 0;
 
-				//Do action...
+			if(onPrepareMoveThing(player, fromItem, (slots_t)from_cid, toContainer, toItem)) {
+			//if(onPrepareMoveThing(player, fromItem, NULL, toContainer, toItem)) {
 				if(fromItem->isStackable()) {
-					if(toItem && toItem->getID() == fromItem->getID())
+					if(toItem && toItem != fromItem && toItem->getID() == fromItem->getID())
 					{
-						oldToCount = toItem->getItemCountOrSubtype();
-
-						int newToCount = std::min(100, oldToCount + count);
-						toItem->setItemCountOrSubtype(newToCount);
-
-						int subcount = oldFromCount - count;
-						fromItem->setItemCountOrSubtype(subcount);
-
-						int surplusCount = oldToCount + count  - 100;
-						if(surplusCount > 0) {
-							Item *surplusItem = Item::CreateItem(fromItem->getID(), surplusCount);
-							surplusItem->pos = toPos;
-							
-							toTile->addThing(surplusItem);
-						}
-
-						if(fromItem->getItemCountOrSubtype() == 0) {
-							p->removeItemInventory(from_cid, true);
-							this->FreeThing(fromItem);
-						}
-					}
-					else if(count < oldFromCount) {
-						int subcount = oldFromCount - count;
-						fromItem->setItemCountOrSubtype(subcount);
-
-						Item *moveItem = Item::CreateItem(fromItem->getID(), count);
-						moveItem->pos = toPos;
-						toTile->addThing(moveItem);
-
-						if(fromItem->getItemCountOrSubtype() == 0) {
-							p->removeItemInventory(from_cid, true);
-							this->FreeThing(fromItem);
-						}
-					}
-					else if(p->removeItemInventory(from_cid, true)) {
-						fromItem->pos = toPos;
-						toTile->addThing(fromItem);
-					}
-				}
-				else if(p->removeItemInventory(from_cid, true)) {
-					fromItem->pos = toPos;
-					toTile->addThing(fromItem);
-				}
-
-				std::vector<Creature*> list;
-				getSpectators(Range(player->pos, false), list);
-
-				std::vector<Creature*> tolist;
-				getSpectators(Range(toPos, true), tolist);
-
-				for(std::vector<Creature*>::const_iterator it = tolist.begin(); it != tolist.end(); ++it) {
-					if(std::find(list.begin(), list.end(), *it) == list.end()) {
-						list.push_back(*it);
-					}
-				}
-
-				for(int i = 0; i < list.size(); ++i) {
-					list[i]->onThingMove(player, (slots_t)from_cid, fromItem, oldFromCount, toPos, toItem, oldToCount, count);
-				}
-
-				/*
-				if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() == 0) {
-					delete fromItem;
-				}
-				*/
-			}
-		}
-	}
-}
-
-//ground to container/inventory
-void Game::thingMoveInternal(Creature *player, const Position& fromPos, unsigned char stackPos,
-	unsigned char to_cid, unsigned char to_slotid, bool toInventory, unsigned char count)
-{
-	Player* p = dynamic_cast<Player*>(player);
-	if(p) {
-		Tile *fromTile = getTile(fromPos.x, fromPos.y, fromPos.z);
-		if(!fromTile)
-			return;
-
-		Container *toContainer = NULL;
-
-		Item *fromItem = dynamic_cast<Item*>(fromTile->getThingByStackPos(stackPos));
-		Item *toItem = NULL;
-
-		if(!fromItem)
-			return;
-
-		if(toInventory) {
-			toItem = p->getItem(to_cid);
-			toContainer = dynamic_cast<Container*>(toItem);
-		}
-		else {
-			toContainer = p->getContainer(to_cid);
-			if(!toContainer)
-				return;
-
-			toItem = toContainer->getItem(to_slotid);
-			Container *toSlotContainer = dynamic_cast<Container*>(toItem);
-
-			if(toSlotContainer) {
-				toContainer = toSlotContainer;
-				toItem = NULL;
-			}
-		}
-
-		if(!fromItem || (toItem == fromItem) || (fromItem->isStackable() && count > fromItem->getItemCountOrSubtype()))
-			return;
-
-		if(toContainer) {
-			if(onPrepareMoveThing(player, fromItem, fromPos, p->pos) &&
-				 onPrepareMoveThing(player, fromItem, NULL, toContainer, toItem))
-			{
-				int oldFromCount = fromItem->getItemCountOrSubtype();
-				int oldToCount = 0;
-				int stackpos = fromTile->getThingStackPos(fromItem);
-
-				if(fromItem->isStackable()) {
-					if(toItem && toItem->getID() == fromItem->getID()) {
 						oldToCount = toItem->getItemCountOrSubtype();
 
 						int newToCount = std::min(100, oldToCount + count);
@@ -1673,107 +1398,378 @@ void Game::thingMoveInternal(Creature *player, const Position& fromPos, unsigned
 								fromItem->setItemCountOrSubtype(fromItem->getItemCountOrSubtype() + surplusCount);
 							}
 						}
-
-						if(fromItem->getItemCountOrSubtype() == 0) {
-							fromTile->removeThing(fromItem);
-							this->FreeThing(fromItem);
-						}
 					}
 					else if(count < oldFromCount) {
 						int subcount = oldFromCount - count;
 						fromItem->setItemCountOrSubtype(subcount);
-
+		
 						toContainer->addItem(Item::CreateItem(fromItem->getID(), count));
-
-						if(fromItem->getItemCountOrSubtype() == 0) {
-							fromTile->removeThing(fromItem);
-							this->FreeThing(fromItem);
-						}
-					}
-					else if(fromTile->removeThing(fromItem)) {
-						toContainer->addItem(fromItem);
-					}
-				}
-				else {
-					if(fromTile->removeThing(fromItem)) {
-						toContainer->addItem(fromItem);
-					}
-				}
-					
-				std::vector<Creature*> list;
-				getSpectators(Range(fromPos, true), list);
-				for(int i = 0; i < list.size(); ++i) {
-					list[i]->onThingMove(player, fromPos, stackpos, fromItem, oldFromCount, toContainer, to_slotid, toItem, oldToCount, count);
-				}
-
-				/*
-				if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() == 0) {
-					delete fromItem;
-				}
-				*/
-			}
-		}
-		//Put on equipment from ground
-		else if(toInventory) {
-			if(onPrepareMoveThing(p, fromPos, fromItem, (slots_t)to_cid) && onPrepareMoveThing(p, fromItem, (slots_t)to_cid)) {
-				int oldFromCount = fromItem->getItemCountOrSubtype();
-				int oldToCount = 0;
-				int stackpos = fromTile->getThingStackPos(fromItem);
-
-				if(fromItem->isStackable()) {
-					if(toItem && toItem->getID() == fromItem->getID()) {
-						oldToCount = toItem->getItemCountOrSubtype();
-
-						int newToCount = std::min(100, oldToCount + count);
-						toItem->setItemCountOrSubtype(newToCount);
-
-						int subcount = oldFromCount - count;
-						fromItem->setItemCountOrSubtype(subcount);
-
-						int surplusCount = oldToCount + count  - 100;
-						if(surplusCount > 0) {
-							fromItem->setItemCountOrSubtype(fromItem->getItemCountOrSubtype() + surplusCount);
-							p->sendCancel("Sorry not enough room.");
-						}
-
-						if(fromItem->getItemCountOrSubtype() == 0) {
-							fromTile->removeThing(fromItem);
-							this->FreeThing(fromItem);
-						}
-					}
-					else if(count < oldFromCount) {
-						int subcount = oldFromCount - count;
-						fromItem->setItemCountOrSubtype(subcount);
-
-						p->removeItemInventory(to_cid, true);
-						p->addItemInventory(Item::CreateItem(fromItem->getID(), count), to_cid, true);
-
-						if(toItem) {
-							fromTile->addThing(toItem);
-							toItem->pos = fromPos;
-						}
-
-						if(fromItem->getItemCountOrSubtype() == 0) {
-							fromTile->removeThing(fromItem);
-							this->FreeThing(fromItem);
-						}
 					}
 					else {
-						if(fromTile->removeThing(fromItem)) {
-							p->removeItemInventory(to_cid, true);
-							p->addItemInventory(fromItem, to_cid, true);
-
-							if(toItem) {
-								fromTile->addThing(toItem);
-								toItem->pos = fromPos;
-							}
+						if(player->removeItemInventory((slots_t)from_cid, true)) {
+							toContainer->addItem(fromItem);
 						}
+					}
+
+					if(fromItem->getItemCountOrSubtype() == 0) {
+						player->removeItemInventory(from_cid, true);
+						this->FreeThing(fromItem);
+					}
+				}
+				else if(player->removeItemInventory(from_cid, true)) {
+					toContainer->addItem(fromItem);
+				}
+
+				if(!player->isHoldingContainer(toContainer)) {
+					player->updateInventoryWeigth();
+				}
+
+				if(toContainer->pos.x != 0xFFFF) {
+					std::vector<Creature*> list;
+					getSpectators(Range(toContainer->pos, false), list);
+
+					for(int i = 0; i < list.size(); ++i) {
+						list[i]->onThingMove(player, (slots_t)from_cid, fromItem, oldFromCount, toContainer, to_slotid, toItem, oldToCount, count);
+					}
+				}
+				else
+					player->onThingMove(player, (slots_t)from_cid, fromItem, oldFromCount, toContainer, to_slotid, toItem, oldToCount, count);
+			}
+		}
+	}
+}
+
+//container/inventory to ground
+void Game::thingMoveInternal(Player *player,
+	unsigned char from_cid, unsigned char from_slotid, bool fromInventory,
+	const Position& toPos, unsigned char count)
+{
+	Container *fromContainer = NULL;
+	Tile *toTile = getTile(toPos.x, toPos.y, toPos.z);
+	if(!toTile)
+		return;
+
+	/*container to ground*/
+	if(!fromInventory) {
+		fromContainer = player->getContainer(from_cid);
+		if(!fromContainer)
+			return;
+		
+		Position fromPos = (fromContainer->pos.x == 0xFFFF ? player->pos : fromContainer->pos);			
+		Item *fromItem = dynamic_cast<Item*>(fromContainer->getItem(from_slotid));
+		Item *toItem = dynamic_cast<Item*>(toTile->getThingByStackPos(toTile->getThingCount() - 1));
+
+		if(!fromItem || (toItem == fromItem) || (fromItem->isStackable() && count > fromItem->getItemCountOrSubtype()))
+			return;
+
+		if(onPrepareMoveThing(player, fromItem, fromPos, toPos) && onPrepareMoveThing(player, fromItem, NULL, toTile)) {
+			int oldFromCount = fromItem->getItemCountOrSubtype();
+			int oldToCount = 0;
+
+			//Do action...
+			if(fromItem->isStackable()) {
+				if(toItem && toItem->getID() == fromItem->getID())
+				{
+					oldToCount = toItem->getItemCountOrSubtype();
+
+					int newToCount = std::min(100, oldToCount + count);
+					toItem->setItemCountOrSubtype(newToCount);
+
+					int subcount = oldFromCount - count;
+					fromItem->setItemCountOrSubtype(subcount);
+
+					int surplusCount = oldToCount + count  - 100;
+					if(surplusCount > 0) {
+						Item *surplusItem = Item::CreateItem(fromItem->getID(), surplusCount);
+						surplusItem->pos = toPos;
+						
+						toTile->addThing(surplusItem);
+					}
+
+					if(fromItem->getItemCountOrSubtype() == 0) {
+						fromContainer->removeItem(fromItem);
+						this->FreeThing(fromItem);
+					}
+				}
+				else if(count < oldFromCount) {
+					int subcount = oldFromCount - count;
+					fromItem->setItemCountOrSubtype(subcount);
+
+					Item *moveItem = Item::CreateItem(fromItem->getID(), count);
+					moveItem->pos = toPos;
+					toTile->addThing(moveItem);
+
+					if(fromItem->getItemCountOrSubtype() == 0) {
+						fromContainer->removeItem(fromItem);
+						this->FreeThing(fromItem);
+					}
+				}
+				else if(fromContainer->removeItem(fromItem)) {
+					fromItem->pos = toPos;
+					toTile->addThing(fromItem);
+				}
+			}
+			else if(fromContainer->removeItem(fromItem)) {
+				fromItem->pos = toPos;
+				toTile->addThing(fromItem);
+			}
+
+			if(player->isHoldingContainer(fromContainer)) {
+				player->updateInventoryWeigth();
+			}
+
+			std::vector<Creature*> list;
+			getSpectators(Range(fromPos, false), list);
+
+			std::vector<Creature*> tolist;
+			getSpectators(Range(toPos, true), tolist);
+
+			for(std::vector<Creature*>::const_iterator it = tolist.begin(); it != tolist.end(); ++it) {
+				if(std::find(list.begin(), list.end(), *it) == list.end()) {
+					list.push_back(*it);
+				}
+			}
+
+			for(int i = 0; i < list.size(); ++i) {
+				list[i]->onThingMove(player, fromContainer, from_slotid, fromItem, oldFromCount, toPos, toItem, oldToCount, count);
+			}
+		}
+	}
+	else /*inventory to ground*/{
+		Item *fromItem = player->getItem(from_cid);
+		if(!fromItem)
+			return;
+		
+		if(onPrepareMoveThing(player, fromItem, player->pos, toPos) && onPrepareMoveThing(player, fromItem, NULL, toTile)) {
+			Item *toItem = dynamic_cast<Item*>(toTile->getThingByStackPos(toTile->getThingCount() - 1));
+			int oldFromCount = fromItem->getItemCountOrSubtype();
+			int oldToCount = 0;
+
+			//Do action...
+			if(fromItem->isStackable()) {
+				if(toItem && toItem->getID() == fromItem->getID())
+				{
+					oldToCount = toItem->getItemCountOrSubtype();
+
+					int newToCount = std::min(100, oldToCount + count);
+					toItem->setItemCountOrSubtype(newToCount);
+
+					int subcount = oldFromCount - count;
+					fromItem->setItemCountOrSubtype(subcount);
+
+					int surplusCount = oldToCount + count  - 100;
+					if(surplusCount > 0) {
+						Item *surplusItem = Item::CreateItem(fromItem->getID(), surplusCount);
+						surplusItem->pos = toPos;
+						
+						toTile->addThing(surplusItem);
+					}
+
+					if(fromItem->getItemCountOrSubtype() == 0) {
+						player->removeItemInventory(from_cid, true);
+						this->FreeThing(fromItem);
+					}
+				}
+				else if(count < oldFromCount) {
+					int subcount = oldFromCount - count;
+					fromItem->setItemCountOrSubtype(subcount);
+
+					Item *moveItem = Item::CreateItem(fromItem->getID(), count);
+					moveItem->pos = toPos;
+					toTile->addThing(moveItem);
+
+					if(fromItem->getItemCountOrSubtype() == 0) {
+						player->removeItemInventory(from_cid, true);
+						this->FreeThing(fromItem);
+					}
+				}
+				else if(player->removeItemInventory(from_cid, true)) {
+					fromItem->pos = toPos;
+					toTile->addThing(fromItem);
+				}
+			}
+			else if(player->removeItemInventory(from_cid, true)) {
+				fromItem->pos = toPos;
+				toTile->addThing(fromItem);
+			}
+
+			player->updateInventoryWeigth();
+
+			std::vector<Creature*> list;
+			getSpectators(Range(player->pos, false), list);
+
+			std::vector<Creature*> tolist;
+			getSpectators(Range(toPos, true), tolist);
+
+			for(std::vector<Creature*>::const_iterator it = tolist.begin(); it != tolist.end(); ++it) {
+				if(std::find(list.begin(), list.end(), *it) == list.end()) {
+					list.push_back(*it);
+				}
+			}
+
+			for(int i = 0; i < list.size(); ++i) {
+				list[i]->onThingMove(player, (slots_t)from_cid, fromItem, oldFromCount, toPos, toItem, oldToCount, count);
+			}
+		}
+	}
+}
+
+//ground to container/inventory
+void Game::thingMoveInternal(Player *player, const Position& fromPos, unsigned char stackPos,
+	unsigned char to_cid, unsigned char to_slotid, bool toInventory, unsigned char count)
+{
+	Tile *fromTile = getTile(fromPos.x, fromPos.y, fromPos.z);
+	if(!fromTile)
+		return;
+
+	Container *toContainer = NULL;
+
+	Item *fromItem = dynamic_cast<Item*>(fromTile->getThingByStackPos(stackPos));
+	Item *toItem = NULL;
+
+	if(!fromItem)
+		return;
+
+	if(toInventory) {
+		toItem = player->getItem(to_cid);
+		toContainer = dynamic_cast<Container*>(toItem);
+	}
+	else {
+		toContainer = player->getContainer(to_cid);
+		if(!toContainer)
+			return;
+
+		toItem = toContainer->getItem(to_slotid);
+		Container *toSlotContainer = dynamic_cast<Container*>(toItem);
+
+		if(toSlotContainer) {
+			toContainer = toSlotContainer;
+			toItem = NULL;
+		}
+	}
+
+	if(!fromItem || (toItem == fromItem) || (fromItem->isStackable() && count > fromItem->getItemCountOrSubtype()))
+		return;
+
+	/*ground to container*/
+	if(toContainer) {
+		if(onPrepareMoveThing(player, fromItem, fromPos, player->pos) &&
+				onPrepareMoveThing(player, fromItem, NULL, toContainer, toItem))
+		{
+			int oldFromCount = fromItem->getItemCountOrSubtype();
+			int oldToCount = 0;
+			int stackpos = fromTile->getThingStackPos(fromItem);
+
+			if(fromItem->isStackable()) {
+				if(toItem && toItem->getID() == fromItem->getID()) {
+					oldToCount = toItem->getItemCountOrSubtype();
+
+					int newToCount = std::min(100, oldToCount + count);
+					toItem->setItemCountOrSubtype(newToCount);
+
+					int subcount = oldFromCount - count;
+					fromItem->setItemCountOrSubtype(subcount);
+
+					int surplusCount = oldToCount + count  - 100;
+					if(surplusCount > 0) {
+						Item *surplusItem = Item::CreateItem(fromItem->getID(), surplusCount);
+
+						if(onPrepareMoveThing(player, surplusItem, NULL, toContainer, NULL)) {
+							toContainer->addItem(surplusItem);
+						}
+						else {
+							delete surplusItem;
+							count -= surplusCount; //re-define the actual amount we move.
+							fromItem->setItemCountOrSubtype(fromItem->getItemCountOrSubtype() + surplusCount);
+						}
+					}
+
+					if(fromItem->getItemCountOrSubtype() == 0) {
+						fromTile->removeThing(fromItem);
+						this->FreeThing(fromItem);
+					}
+				}
+				else if(count < oldFromCount) {
+					int subcount = oldFromCount - count;
+					fromItem->setItemCountOrSubtype(subcount);
+
+					toContainer->addItem(Item::CreateItem(fromItem->getID(), count));
+
+					if(fromItem->getItemCountOrSubtype() == 0) {
+						fromTile->removeThing(fromItem);
+						this->FreeThing(fromItem);
+					}
+				}
+				else if(fromTile->removeThing(fromItem)) {
+					toContainer->addItem(fromItem);
+				}
+			}
+			else {
+				if(fromTile->removeThing(fromItem)) {
+					toContainer->addItem(fromItem);
+				}
+			}
+				
+			if(player->isHoldingContainer(toContainer)) {
+				player->updateInventoryWeigth();
+			}
+
+			std::vector<Creature*> list;
+			getSpectators(Range(fromPos, true), list);
+			for(int i = 0; i < list.size(); ++i) {
+				list[i]->onThingMove(player, fromPos, stackpos, fromItem, oldFromCount, toContainer, to_slotid, toItem, oldToCount, count);
+			}
+		}
+	}
+	//ground to inventory
+	else if(toInventory) {
+		if(onPrepareMoveThing(player, fromPos, fromItem, (slots_t)to_cid) && onPrepareMoveThing(player, fromItem, (slots_t)to_cid)) {
+			int oldFromCount = fromItem->getItemCountOrSubtype();
+			int oldToCount = 0;
+			int stackpos = fromTile->getThingStackPos(fromItem);
+
+			if(fromItem->isStackable()) {
+				if(toItem && toItem->getID() == fromItem->getID()) {
+					oldToCount = toItem->getItemCountOrSubtype();
+
+					int newToCount = std::min(100, oldToCount + count);
+					toItem->setItemCountOrSubtype(newToCount);
+
+					int subcount = oldFromCount - count;
+					fromItem->setItemCountOrSubtype(subcount);
+
+					int surplusCount = oldToCount + count  - 100;
+					if(surplusCount > 0) {
+						fromItem->setItemCountOrSubtype(fromItem->getItemCountOrSubtype() + surplusCount);
+						player->sendCancel("Sorry not enough room.");
+					}
+
+					if(fromItem->getItemCountOrSubtype() == 0) {
+						fromTile->removeThing(fromItem);
+						this->FreeThing(fromItem);
+					}
+				}
+				else if(count < oldFromCount) {
+					int subcount = oldFromCount - count;
+					fromItem->setItemCountOrSubtype(subcount);
+
+					player->removeItemInventory(to_cid, true);
+					player->addItemInventory(Item::CreateItem(fromItem->getID(), count), to_cid, true);
+
+					if(toItem) {
+						fromTile->addThing(toItem);
+						toItem->pos = fromPos;
+					}
+
+					if(fromItem->getItemCountOrSubtype() == 0) {
+						fromTile->removeThing(fromItem);
+						this->FreeThing(fromItem);
 					}
 				}
 				else {
 					if(fromTile->removeThing(fromItem)) {
-						p->removeItemInventory(to_cid, true);
-						p->addItemInventory(fromItem, to_cid, true);
+						player->removeItemInventory(to_cid, true);
+						player->addItemInventory(fromItem, to_cid, true);
 
 						if(toItem) {
 							fromTile->addThing(toItem);
@@ -1781,18 +1777,25 @@ void Game::thingMoveInternal(Creature *player, const Position& fromPos, unsigned
 						}
 					}
 				}
+			}
+			else {
+				if(fromTile->removeThing(fromItem)) {
+					player->removeItemInventory(to_cid, true);
+					player->addItemInventory(fromItem, to_cid, true);
 
-				std::vector<Creature*> list;
-				getSpectators(Range(fromPos, true), list);
-				for(int i = 0; i < list.size(); ++i) {
-					list[i]->onThingMove(player, fromPos, stackpos, fromItem, oldFromCount, (slots_t)to_cid, toItem, oldToCount, count);
+					if(toItem) {
+						fromTile->addThing(toItem);
+						toItem->pos = fromPos;
+					}
 				}
+			}
 
-				/*
-				if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() == 0) {
-					delete fromItem;
-				}
-				*/
+			player->updateInventoryWeigth();
+
+			std::vector<Creature*> list;
+			getSpectators(Range(fromPos, true), list);
+			for(int i = 0; i < list.size(); ++i) {
+				list[i]->onThingMove(player, fromPos, stackpos, fromItem, oldFromCount, (slots_t)to_cid, toItem, oldToCount, count);
 			}
 		}
 	}
@@ -1922,13 +1925,12 @@ void Game::thingMoveInternal(Creature *creature, unsigned short from_x, unsigned
 				thing->pos.y = to_y;
 				thing->pos.z = to_z;
 				
-				if (playerMoving && playerMoving->attackedCreature != 0) 
-				{
-					Creature* c = getCreatureByID(creatureMoving->attackedCreature);
-					if(c){      
-						if((std::abs(creatureMoving->pos.x-c->pos.x) > 8) ||
-						(std::abs(creatureMoving->pos.y-c->pos.y) > 5) || (creatureMoving->pos.z != c->pos.z)){                      
-							//playerMoving->sendCancelAttacking();
+				if (playerMoving && playerMoving->attackedCreature != 0) {
+					Creature* attackedCreature = getCreatureByID(creatureMoving->attackedCreature);
+					if(attackedCreature){      
+						if((std::abs(creatureMoving->pos.x - attackedCreature->pos.x) > 8) ||
+						(std::abs(creatureMoving->pos.y - attackedCreature->pos.y) > 5) || (creatureMoving->pos.z != attackedCreature->pos.z)){                      
+							player->sendTextMessage(MSG_SMALLINFO, "Target lost.");
 							playerSetAttackedCreature(playerMoving, 0);
 						}
 					}
@@ -2119,7 +2121,7 @@ void Game::creatureSay(Creature *creature, SpeakClasses type, const std::string 
 	//OTSYS_THREAD_UNLOCK(gameLock)
 }
 
-void Game::teleport(Thing *thing, Position newPos) {
+void Game::teleport(Thing *thing, const Position& newPos) {
 
 	if(newPos == thing->pos)  
 		return; 
@@ -2144,6 +2146,18 @@ void Game::teleport(Thing *thing, Position newPos) {
 				if (newPos.y > oldPos.y) creature->direction = SOUTH;
 				if (newPos.x > oldPos.x) creature->direction = EAST;
 				if (newPos.x < oldPos.x) creature->direction = WEST;
+
+				Player *player = dynamic_cast<Player*>(creature);
+				if(player && player->attackedCreature != 0)  {
+					Creature* attackedCreature = getCreatureByID(player->attackedCreature);
+					if(attackedCreature){      
+						if((std::abs(newPos.x - attackedCreature->pos.x) > 8) ||
+						(std::abs(newPos.y - attackedCreature->pos.y) > 5) || (newPos.z != attackedCreature->pos.z)){                      
+							player->sendTextMessage(MSG_SMALLINFO, "Target lost.");
+							playerSetAttackedCreature(player, 0);
+						}
+					}
+				}
 			}
 			
 			std::vector<Creature*> list;
@@ -2170,7 +2184,7 @@ void Game::teleport(Thing *thing, Position newPos) {
 			}
 		}
 	}
-	
+
 	//OTSYS_THREAD_UNLOCK(gameLock)
 }
 
@@ -2516,9 +2530,9 @@ void Game::creatureApplyDamage(Creature *creature, int damage, int &outDamage, i
 			outManaDamage = creature->mana;
 		}
 
-		if(creature->manaShieldTicks < 1000)
+		if(creature->manaShieldTicks < 1000 || (creature->mana == 0))
 			creature->drainHealth(outDamage);
-		else if(outManaDamage >0){
+		else if(outManaDamage > 0){
 			creature->drainHealth(outDamage);
 			creature->drainMana(outManaDamage);
 		}
@@ -2631,7 +2645,7 @@ bool Game::creatureOnPrepareMagicAttack(Creature *creature, Position pos, const 
 				else
 					player->mana -= me->manaCost;
 					//player->manaspent += me->manaCost;
-					player->addManaspent(me->manaCost);
+					player->addManaSpent(me->manaCost);
 			}
 		}
 
@@ -2714,10 +2728,13 @@ void Game::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fi
   }
 	
 	if(!inReach){
+		/*
 		if(player) {
 			player->sendTextMessage(MSG_SMALLINFO, "Target lost.");
 			playerSetAttackedCreature(player, 0);
 		}
+		*/
+
 		return;
 	}
 
@@ -3407,7 +3424,7 @@ bool Game::creatureSaySpell(Creature *creature, const std::string &text)
 		}
 	}
 	else if(player){
-		std::map<std::string, Spell*>* tmp = spells.getVocSpells(player->voc);
+		std::map<std::string, Spell*>* tmp = spells.getVocSpells(player->vocation);
 		if(tmp){
 			std::map<std::string, Spell*>::iterator sit = tmp->find(temp);
 			if( sit != tmp->end() ) {
@@ -3523,7 +3540,6 @@ void Game::playerRequestTrade(Player *player, const Position& pos,
 		return;
 	}
 
-	//if (std::find(tradeItems.begin(), tradeItems.end(), tradeItem) != tradeItems.end()){
 	if(tradeItems.find(tradeItem) != tradeItems.end()){
 		player->sendTextMessage(MSG_INFO, "This item is already beeing traded.");
 		//player->sendCancel("Sorry, not possible.");
@@ -3591,36 +3607,17 @@ void Game::playerAcceptTrade(Player* player)
 			tradePartner->addItem(tradeItem1);
 		}
 		else{
-			player->sendTextMessage(MSG_SMALLINFO, "Sorry not posible.");
-			tradePartner->sendTextMessage(MSG_SMALLINFO, "Sorry not posible.");
+			player->sendTextMessage(MSG_SMALLINFO, "Sorry not possible.");
+			tradePartner->sendTextMessage(MSG_SMALLINFO, "Sorry not possible.");
 		}
 		
 		player->setAcceptTrade(false);
 		player->sendCloseTrade();
+		player->onThingRemove(tradeItem1);
 
 		tradePartner->setAcceptTrade(false);
 		tradePartner->sendCloseTrade();
-		/*
-		tradeItem1->useThing();
-		this->removeThing(player, tradeItem1->pos, tradeItem1);
-
-		tradeItem2->useThing();
-		this->removeThing(tradePartner, tradeItem2->pos, tradeItem2);
-
-		if(!player->addItem(tradeItem2)) {
-			tradeItem2->releaseThing();
-		}
-
-		if(!tradePartner->addItem(tradeItem1)) {
-			tradeItem1->releaseThing();
-		}
-
-		player->setAcceptTrade(false);
-		player->sendCloseTrade();
-
-		tradePartner->setAcceptTrade(false);
-		tradePartner->sendCloseTrade();
-		*/
+		tradePartner->onThingRemove(tradeItem2);
 	}
 }
 
@@ -3629,10 +3626,10 @@ void Game::playerLookInTrade(Player* player, bool lookAtCounterOffer, int index)
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
 
 	Player *tradePartner = dynamic_cast<Player*>(getCreatureByID(player->tradePartner));
-	Item *tradeItem = NULL;
-
 	if(!tradePartner)
 		return;
+
+	Item *tradeItem = NULL;
 
 	if(lookAtCounterOffer)
 		tradeItem = tradePartner->getTradeItem();
@@ -3643,7 +3640,7 @@ void Game::playerLookInTrade(Player* player, bool lookAtCounterOffer, int index)
 		return;
 
 	if(index == 0) {
-		player->sendTextMessage(MSG_INFO, tradeItem->getDescription().c_str());
+		player->sendTextMessage(MSG_INFO, tradeItem->getDescription(true).c_str());
 		return;
 	}
 
@@ -3687,7 +3684,7 @@ void Game::playerLookInTrade(Player* player, bool lookAtCounterOffer, int index)
 	}
 	
 	if(foundItem) {
-		player->sendTextMessage(MSG_INFO, tradeItem->getDescription().c_str());
+		player->sendTextMessage(MSG_INFO, tradeItem->getDescription(true).c_str());
 	}
 }
 

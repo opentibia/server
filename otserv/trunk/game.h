@@ -173,28 +173,28 @@ public:
 	uint32_t getCreaturesOnline();
 
 
-	void thingMove(Creature *player, Thing *thing,
+	void thingMove(Creature *creature, Thing *thing,
 			unsigned short to_x, unsigned short to_y, unsigned char to_z, unsigned char count);
 
 	//container/inventory to container/inventory
-	void thingMove(Creature *player,
+	void thingMove(Player *player,
 			unsigned char from_cid, unsigned char from_slotid, bool fromInventory,
 			unsigned char to_cid, unsigned char to_slotid, bool toInventory,
 			unsigned char count);
 
 	//container/inventory to ground
-	void thingMove(Creature *player,
+	void thingMove(Player *player,
 			unsigned char from_cid, unsigned char from_slotid, bool fromInventory,
 			const Position& toPos, unsigned char count);
 
 	//ground to container/inventory
-	void thingMove(Creature *player,
+	void thingMove(Player *player,
 			const Position& fromPos, unsigned char stackPos,
 			unsigned char to_cid, unsigned char to_slotid,
 			bool isInventory, unsigned char count);
 	
 	//ground to ground
-	void thingMove(Creature *player,
+	void thingMove(Creature *creature,
 			unsigned short from_x, unsigned short from_y, unsigned char from_z,
 			unsigned char stackPos,
 			unsigned short to_x, unsigned short to_y, unsigned char to_z, unsigned char count);
@@ -246,7 +246,7 @@ public:
 	bool stopEvent(unsigned long eventid);
 
 	void creatureBroadcastTileUpdated(const Position& pos);
-	void teleport(Thing *thing, Position newPos);
+	void teleport(Thing *thing, const Position& newPos);
       
   std::vector<Player*> BufferedPlayers;   
   void flushSendBuffers();
@@ -282,28 +282,53 @@ protected:
 	
 	AutoList<Creature> listCreature;
 
-	bool onPrepareMoveThing(Creature *player, const Thing* thing, const Position& fromPos, const Position& toPos);
-	bool onPrepareMoveThing(Creature *player, const Thing* thing, const Tile *fromTile, const Tile *toTile);
-	bool onPrepareMoveThing(Creature *player, const Item* fromItem, const Container *fromContainer, const Container *toContainer, const Item* toItem);
-	bool onPrepareMoveCreature(Creature *player, const Creature* creatureMoving, const Tile *fromTile, const Tile *toTile);
+	/*ground -> ground*/
+	bool onPrepareMoveThing(Creature *player, const Thing* thing,
+		const Position& fromPos, const Position& toPos);
+
+	/*ground -> ground*/
+	bool onPrepareMoveThing(Creature *creature, const Thing* thing,
+		const Tile *fromTile, const Tile *toTile);
+
+	/*inventory -> container*/
+	bool onPrepareMoveThing(Player *player, const Item* fromItem, slots_t fromSlot,
+		const Container *toContainer, const Item *toItem);
+
+	/*container -> container*/
+	bool onPrepareMoveThing(Player *player, const Item* fromItem, const Container *fromContainer,
+		const Container *toContainer, const Item *toItem);
+
+	/*ground -> ground*/
+	bool onPrepareMoveCreature(Creature *creature, const Creature* creatureMoving,
+		const Tile *fromTile, const Tile *toTile);
+
+	/*ground -> inventory*/
 	bool onPrepareMoveThing(Player *player, const Position& fromPos, const Item *item, slots_t toSlot);
-	bool onPrepareMoveThing(Player *player, slots_t fromSlot, const Item *fromItem, slots_t toSlot, const Item *toItem);
-	bool onPrepareMoveThing(Player *player, const Container *fromContainer, const Item *fromItem, slots_t toSlot, const Item *toItem);
+
+	/*inventory -> inventory*/
+	bool onPrepareMoveThing(Player *player, slots_t fromSlot, const Item *fromItem,
+		slots_t toSlot, const Item *toItem);
+
+	/*container -> inventory*/
+	bool onPrepareMoveThing(Player *player, const Container *fromContainer, const Item *fromItem,
+		slots_t toSlot, const Item *toItem);
+
+	/*->inventory*/
 	bool onPrepareMoveThing(Player *player, const Item *item, slots_t toSlot);
 
 	//container/inventory to container/inventory
-	void thingMoveInternal(Creature *player,
+	void thingMoveInternal(Player *player,
 			unsigned char from_cid, unsigned char from_slotid, bool fromInventory,
 			unsigned char to_cid, unsigned char to_slotid, bool toInventory,
 			unsigned char count);
 
 	//container/inventory to ground
-	void thingMoveInternal(Creature *player,
+	void thingMoveInternal(Player *player,
 			unsigned char from_cid, unsigned char from_slotid, bool fromInventory,
 			const Position& toPos, unsigned char count);
 
 	//ground to container/inventory
-	void thingMoveInternal(Creature *player,
+	void thingMoveInternal(Player *player,
 			const Position& fromPos, unsigned char stackPos,
 			unsigned char to_cid, unsigned char to_slotid,
 			bool toInventory, unsigned char count);
