@@ -104,6 +104,12 @@ enum enum_world_type{
 	WORLD_TYPE_PVP_ENFORCED,
 };
 
+enum enum_game_state{
+	GAME_STATE_NORMAL,
+	GAME_STATE_CLOSED,
+	GAME_STATE_SHUTDOWN,
+};
+
 
 /**
   * Main Game class.
@@ -230,6 +236,8 @@ public:
 	void playerAcceptTrade(Player* player);
 	void playerLookInTrade(Player* player, bool lookAtCounterOffer, int index);
 	void playerCloseTrade(Player* player);
+	void autoCloseTrade(Item* item, Position &pos);
+	
 	void playerSetAttackedCreature(Player* player, unsigned long creatureid);
 
   void changeOutfitAfter(unsigned long id, int looktype, long time);
@@ -262,10 +270,12 @@ public:
 
 	std::list<Position> getPathTo(Creature *creature, Position start, Position to, bool creaturesBlock=true);
 	
+	enum_game_state getGameState();
+	void setGameState(enum_game_state newstate){game_state = newstate;}
 
 	/** Lockvar for Game. */
   OTSYS_THREAD_LOCKVAR gameLock; 
-  bool shutdown;
+  
 
 protected:
 	std::set<Item*> tradeItems; //list of items that are in trading state
@@ -363,6 +373,8 @@ protected:
 	std::vector<std::string> commandTags;
 	void addCommandTag(std::string tag);
 	void resetCommandTag();
+	
+	enum_game_state game_state;
 
 	friend class Commands;
 	friend class Monster;

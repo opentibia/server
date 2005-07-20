@@ -235,7 +235,7 @@ private:
   unsigned long windowTextID;
   Item *readItem;
   
-  friend OTSYS_THREAD_RETURN ConnectionHandler(void *dat);   
+  friend OTSYS_THREAD_RETURN ConnectionHandler(void *dat);
 };
 
 #endif

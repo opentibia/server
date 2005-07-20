@@ -95,7 +95,8 @@ void Protocol74::ReceiveLoop()
 		}
 		// logout by disconnect?  -> kick
 		if(pendingLogout == false){
-			player->setAttackedCreature(0);
+			game->playerSetAttackedCreature(player, 0);
+			//player->setAttackedCreature(0);
 			while(player->inFightTicks >= 1000 && player->isRemoved == false && s == 0){
 				OTSYS_SLEEP(250);
 			}
@@ -1980,43 +1981,43 @@ void Protocol74::sendThingMove(const Creature *creature, const Position &fromPos
 
 //ground to ground
 void Protocol74::sendThingMove(const Creature *creature, const Thing *thing,
-	const Position *oldPos, unsigned char oldStackPos, unsigned char oldcount, unsigned char count, bool tele)
+							   const Position *oldPos, unsigned char oldStackPos, unsigned char oldcount, unsigned char count, bool tele)
 {
 	NetworkMessage msg;
-
+	
 	const Creature* c = dynamic_cast<const Creature*>(thing);
-  if (!tele && c && (CanSee(oldPos->x, oldPos->y, oldPos->z)) && (CanSee(thing->pos.x, thing->pos.y, thing->pos.z)))
-  {
-    msg.AddByte(0x6D);
-    msg.AddPosition(*oldPos);
-    msg.AddByte(oldStackPos);
-    msg.AddPosition(thing->pos);
-
+	if (!tele && c && (CanSee(oldPos->x, oldPos->y, oldPos->z)) && (CanSee(thing->pos.x, thing->pos.y, thing->pos.z)))
+	{
+		msg.AddByte(0x6D);
+		msg.AddPosition(*oldPos);
+		msg.AddByte(oldStackPos);
+		msg.AddPosition(thing->pos);
+		
 		Tile *fromTile = game->getTile(oldPos->x, oldPos->y, oldPos->z);
 		if(fromTile && fromTile->getThingCount() > 8) {
 			//We need to pop up this item
 			Thing *newthing = fromTile->getThingByStackPos(9);
-
+			
 			if(newthing != NULL) {
 				AddTileUpdated(msg, *oldPos);
 			}
 		}
 	}
-  else
-  {
-    if (!tele && CanSee(oldPos->x, oldPos->y, oldPos->z))
-    {
+	else
+	{
+		if (!tele && CanSee(oldPos->x, oldPos->y, oldPos->z))
+		{
 			AddRemoveThing(msg,*oldPos,oldStackPos);      
-    }
-
-    if (!(tele && thing == this->player) && CanSee(thing->pos.x, thing->pos.y, thing->pos.z))
-    {
+		}
+		
+		if (!(tele && thing == this->player) && CanSee(thing->pos.x, thing->pos.y, thing->pos.z))
+		{
 			AddAppearThing(msg,thing->pos);      
-      if (c) {
-        bool known;
-        unsigned long removedKnown;
-        checkCreatureAsKnown(((Creature*)thing)->getID(), known, removedKnown);
-  			AddCreature(msg,(Creature*)thing, known, removedKnown);
+			if (c) {
+				bool known;
+				unsigned long removedKnown;
+				checkCreatureAsKnown(((Creature*)thing)->getID(), known, removedKnown);
+				AddCreature(msg,(Creature*)thing, known, removedKnown);
 			}
 			else {
 				msg.AddItem((Item*)thing);
@@ -2025,7 +2026,7 @@ void Protocol74::sendThingMove(const Creature *creature, const Thing *thing,
 				if(player->getTradeItem() && dynamic_cast<const Item*>(thing) == player->getTradeItem()) {
 					game->playerCloseTrade(player);
 				}
-
+				
 				//Auto-close container's
 				if(std::abs(player->pos.x - thing->pos.x) > 1 || std::abs(player->pos.y - thing->pos.y) > 1 || player->pos.z != thing->pos.z ) {
 					const Container *container = dynamic_cast<const Container*>(thing);
@@ -2035,9 +2036,9 @@ void Protocol74::sendThingMove(const Creature *creature, const Thing *thing,
 				}
 			}
 		}
-  }
+	}
 	
-  if (thing == this->player) {
+	if (thing == this->player) {
 		//Auto-close trade
 		Item *tradeItem = player->getTradeItem();
 		if(tradeItem && tradeItem->pos.x != 0xFFFF) {
@@ -2045,13 +2046,13 @@ void Protocol74::sendThingMove(const Creature *creature, const Thing *thing,
 				game->playerCloseTrade(player);
 			}
 		}
-
-    if(tele){
+		
+		if(tele){
 			msg.AddByte(0x64); 
 			msg.AddPosition(player->pos); 
 			GetMapDescription(player->pos.x-8, player->pos.y-6, player->pos.z, 18, 14, msg); 
 		}
-    else{               
+		else{               
 			if (oldPos->y > thing->pos.y) { // north, for old x
 				msg.AddByte(0x65);
 				GetMapDescription(oldPos->x - 8, thing->pos.y - 6, thing->pos.z, 18, 1, msg);
@@ -2067,7 +2068,7 @@ void Protocol74::sendThingMove(const Creature *creature, const Thing *thing,
 				GetMapDescription(thing->pos.x - 8, thing->pos.y - 6, thing->pos.z, 1, 14, msg);
 			}
 		}
-
+		
 		//Auto-close container's
 		std::vector<Container *> containers;
 		for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
@@ -2076,7 +2077,7 @@ void Protocol74::sendThingMove(const Creature *creature, const Thing *thing,
 			while(container->getParent()) {
 				container = container->getParent();
 			}
-
+			
 			//Only add those we need to close
 			if(container && container->pos.x != 0xFFFF) {				
 				if(std::abs(player->pos.x - container->pos.x) > 1 || std::abs(player->pos.y - container->pos.y) > 1 || player->pos.z != container->pos.z) {
@@ -2084,12 +2085,12 @@ void Protocol74::sendThingMove(const Creature *creature, const Thing *thing,
 				}
 			}
 		}
-
+		
 		for(std::vector<Container *>::const_iterator it = containers.begin(); it != containers.end(); ++it) {
 			autoCloseContainers(*it, msg);
 		}
-  }	
-
+	}	
+	
 	WriteBuffer(msg);
 }
 

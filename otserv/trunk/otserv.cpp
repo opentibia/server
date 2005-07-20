@@ -281,13 +281,22 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 					IOPlayer::instance()->loadPlayer(player, name);
 					//std::cout << "login " << player << std::endl;
 					//if(player->password == password){
-						if(passwordTest(password,player->password)){
+					if(passwordTest(password,player->password)){
 						if(playerexist && !g_config.getGlobalNumber("allowclones", 0)){
 							std::cout << "reject player..." << std::endl;
 							msg.Reset();
 							msg.AddByte(0x14);
 							msg.AddString("You are already logged in.");
 							msg.WriteToSocket(s);		
+						}
+						else if(g_game.getGameState() == GAME_STATE_SHUTDOWN){
+							//notghing to do
+						}
+						else if(g_game.getGameState() == GAME_STATE_CLOSED && player->access == 0){
+							msg.Reset();
+							msg.AddByte(0x14);
+							msg.AddString("Server temporaly closed.");
+							msg.WriteToSocket(s);
 						}
 						else if(!protocol->ConnectPlayer()){
 							std::cout << "reject player..." << std::endl;
@@ -557,7 +566,7 @@ int main(int argc, char *argv[])
 	int listen_errors;
 	int accept_errors;
 	listen_errors = 0;
-	while(!g_game.shutdown && listen_errors < 100){
+	while(g_game.getGameState() != GAME_STATE_SHUTDOWN && listen_errors < 100){
 		sockaddr_in local_adress;
 		memset(&local_adress, 0, sizeof(sockaddr_in)); // zero the struct 
 	
@@ -568,7 +577,7 @@ int main(int argc, char *argv[])
 		// first we create a new socket
 		SOCKET listen_socket = socket(AF_INET, SOCK_STREAM, 0);
 	
-		if (listen_socket <= 0){
+		if(listen_socket <= 0){
 #ifdef WIN32
 	    		WSACleanup(); 
 #endif
@@ -579,16 +588,14 @@ int main(int argc, char *argv[])
 #ifndef WIN32
 		int yes = 1;
 		// lose the pesky "Address already in use" error message
-		if (setsockopt(listen_socket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof (int)) == -1)
-		{
+		if(setsockopt(listen_socket, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof (int)) == -1){
 			ErrorMessage("Unable to set socket options!");
 			return -1;
 		}
 #endif
 
 		// bind socket on port
-		if (bind(listen_socket, (struct sockaddr*)&local_adress, sizeof(struct sockaddr_in)) < 0)
-		{
+		if(bind(listen_socket, (struct sockaddr*)&local_adress, sizeof(struct sockaddr_in)) < 0){
 #ifdef WIN32
 	    		WSACleanup();    
 #endif
@@ -597,8 +604,7 @@ int main(int argc, char *argv[])
   		} // if (bind(...))
   
 		// now we start listen on the new socket
-		if (listen(listen_socket, 10) == SOCKET_ERROR)
-		{
+		if(listen(listen_socket, 10) == SOCKET_ERROR){
 #ifdef WIN32
     			WSACleanup();
 #endif
@@ -609,8 +615,7 @@ int main(int argc, char *argv[])
 
 		std::cout << "[done]" << std::endl << ":: OpenTibia Server Running..." << std::endl;
 		accept_errors = 0;
-		while (!g_game.shutdown && accept_errors < 100)
-		{
+		while(g_game.getGameState() != GAME_STATE_SHUTDOWN && accept_errors < 100){
 			fd_set listen_set;
 			timeval tv;
 			FD_ZERO(&listen_set);

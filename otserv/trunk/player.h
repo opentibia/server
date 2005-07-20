@@ -48,6 +48,12 @@ enum skillsid_t {
     SKILL_PERCENT=2
 };
 
+enum freeslot_t{
+	SLOT_TYPE_NONE,
+	SLOT_TYPE_INVENTORY,
+	SLOT_TYPE_CONTAINER
+};
+
 class NetworkMessage;
 
 typedef std::pair<unsigned char, Container*> containerItem;
@@ -69,12 +75,16 @@ public:
 	static AutoList<Player> listPlayer;
 	void removeList() {listPlayer.removeList(getID());}
 	void addList() {listPlayer.addList(this);}
+	void kickPlayer();
 
   void speak(const std::string &text);	
-	bool addItem(Item* item);
+	bool addItem(Item* item, bool test = false);
 	bool internalAddItemContainer(Container *container,Item* item);
+	freeslot_t getFreeSlot(Container **container,unsigned char &slot );
+	Container* getFreeContainerSlot(Container *parent);
 	//bool removeItem(unsigned short id,unsigned short count);
-	//bool removeItem(Item* item);
+	bool removeItem(Item* item, bool test = false);
+	bool internalRemoveItemContainer(Container *parent, Item* item, bool test = false);
 	//int getItemCount(unsigned short id);
 
 	int removeItemInventory(int pos, bool internal = false);

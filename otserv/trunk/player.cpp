@@ -694,10 +694,34 @@ int Player::addItemInventory(Item* item, int pos, bool internal /*= false*/) {
 	return true;
 }
 
-bool Player::addItem(Item *item){
+bool Player::addItem(Item *item, bool test /*=false*/){
 	if(!item)
 		return false;
-	//find an empty inventory slot
+	Container *container;
+	unsigned char slot;
+	//TODO: verify cap and others
+	
+	switch(getFreeSlot(&container,slot)){
+	case SLOT_TYPE_NONE:
+		return false;
+	case SLOT_TYPE_INVENTORY:
+		if(!test){
+			addItemInventory(item,slot);
+		}
+		return true;
+	case SLOT_TYPE_CONTAINER:
+		if(container->isHoldingItem(item) == true){
+			return false;
+		}
+		if(!test){
+			//add the item
+			container->addItem(item);
+			//update container
+			client->sendItemAddContainer(container,item);
+		}
+		return true;
+	}
+/*	//find an empty inventory slot
 	if(!items[SLOT_RIGHT]){
 		if(!(items[SLOT_LEFT] && (items[SLOT_LEFT]->getSlotPosition() & SLOTP_TWO_HAND))){
 			addItemInventory(item,SLOT_RIGHT);
@@ -721,9 +745,9 @@ bool Player::addItem(Item *item){
 			return internalAddItemContainer(container,item);
 		}
 	}	
-	return false;
+	return false;*/
 }
-
+/*
 bool Player::internalAddItemContainer(Container *container,Item* item){
 	bool isContainerHolding = false;
 	Container* itemContainer = dynamic_cast<Container*>(item);
@@ -750,6 +774,103 @@ bool Player::internalAddItemContainer(Container *container,Item* item){
 	}
 	return false;
 	
+}
+*/
+freeslot_t Player::getFreeSlot(Container **container,unsigned char &slot )
+{
+	*container = NULL;
+	//first look free slot in inventory
+	if(!items[SLOT_RIGHT]){
+		if(!(items[SLOT_LEFT] && (items[SLOT_LEFT]->getSlotPosition() & SLOTP_TWO_HAND))){
+			slot = SLOT_RIGHT;
+			return SLOT_TYPE_INVENTORY;
+		}		
+	}
+	else if(!items[SLOT_LEFT]){
+		if(!(items[SLOT_RIGHT] && (items[SLOT_RIGHT]->getSlotPosition() & SLOTP_TWO_HAND))){
+			slot = SLOT_LEFT;
+			return SLOT_TYPE_INVENTORY;
+		}
+	}
+	else if(!items[SLOT_AMMO]){
+		slot = SLOT_AMMO;
+		return SLOT_TYPE_INVENTORY;
+	}
+	//look in containers
+	for(int i=0; i< 11;i++){
+		Container *tmpcontainer = dynamic_cast<Container*>(items[i]);
+		if(tmpcontainer){
+			Container *container_freeslot = getFreeContainerSlot(tmpcontainer);
+			if(container_freeslot){
+				*container = container_freeslot;
+				return SLOT_TYPE_CONTAINER;
+			}
+		}
+	}
+	return SLOT_TYPE_NONE;
+}
+
+Container* Player::getFreeContainerSlot(Container *parent)
+{
+	//check if it is full
+	if(parent->size() < parent->capacity()){
+		return parent;
+	}
+	else{ //look for more containers inside
+		for(ContainerList::const_iterator cit = parent->getItems(); 
+			cit != parent->getEnd(); ++cit){
+			Container * temp_container = dynamic_cast<Container*>(*cit);
+			if(temp_container){
+				return getFreeContainerSlot(temp_container);
+			}
+		}
+	}
+	return NULL;
+}
+
+bool Player::removeItem(Item* item, bool test /*=false*/)
+{
+	Container *tmpcontainer;
+	//look for the item
+	for(int i=0; i< 11;i++){
+		if(item == items[i]){
+			if(!test){
+				removeItemInventory(i);
+			}
+			return true;
+		}
+		else if(tmpcontainer = dynamic_cast<Container*>(items[i])){
+			if(internalRemoveItemContainer(tmpcontainer,item, test) == true){
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+bool Player::internalRemoveItemContainer(Container *parent, Item* item, bool test /*=false*/)
+{
+	Container * temp_container;
+	for(ContainerList::const_iterator cit = parent->getItems(); 
+		cit != parent->getEnd(); ++cit){
+		if(*cit == item){
+			unsigned char slot =  parent->getSlotNumberByItem(item);
+			if(slot != 0xFF){
+				if(!test){
+					parent->removeItem(item);
+					client->sendItemRemoveContainer(parent,slot);
+				}
+				return true;
+			}
+			else{
+				return false;
+			}
+		}
+		else if(temp_container = dynamic_cast<Container*>(*cit)){
+			return internalRemoveItemContainer(temp_container, item);
+		}
+	}
+	return false;
 }
 
 int Player::removeItemInventory(int pos, bool internal /*= false*/)
@@ -1613,4 +1734,9 @@ void Player::preSave()
 				cap = 0;         
 		}
 	}
+}
+
+void Player::kickPlayer()
+{
+	client->logout();
 }

@@ -448,7 +448,7 @@ void GameState::getChanges(Player *spectator)
 Game::Game()
 {
 	eventIdCount = 1000;
-	this->shutdown = false;
+	this->game_state = GAME_STATE_NORMAL;
 	this->map = NULL;
 	this->worldType = WORLD_TYPE_PVP;
 	OTSYS_THREAD_LOCKVARINIT(gameLock);
@@ -472,6 +472,12 @@ Game::~Game()
 void Game::setWorldType(enum_world_type type)
 {
 	this->worldType = type;
+}
+
+enum_game_state Game::getGameState()
+{
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
+	return game_state;
 }
 
 bool Game::loadMap(std::string filename) {
@@ -3459,6 +3465,7 @@ bool Game::playerUseItemEx(Player *player, const Position& posFrom,const unsigne
 					bool success = sit->second->getSpellScript()->castSpell(player, posTo, var);
 					ret = success;
 					if(success) {
+						autoCloseTrade(item, thingpos);
 						item->setItemCharge(std::max((int)item->getItemCharge() - 1, 0) );
 						if(item->getItemCharge() == 0) {
 							removeThing(player,posFrom,item);
@@ -3495,31 +3502,35 @@ void Game::playerRequestTrade(Player *player, const Position& pos,
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
 
 	Player *tradePartner = dynamic_cast<Player*>(getCreatureByID(playerid));
-	if(!tradePartner) {
+	if(!tradePartner || tradePartner == player) {
 		player->sendTextMessage(MSG_INFO, "Sorry, not possible.");
 		return;
 	}
 
 	Item *tradeItem = dynamic_cast<Item*>(getThing(pos, stackpos, player));
-	if(pos.x != 0xFFFF) {
-		if( (abs(player->pos.x - pos.x) > 1) || (abs(player->pos.y - pos.y) > 1) ) {
-			player->sendCancel("To far away...");
-			return;
-		}
-	}
-
-	if(!tradeItem || tradeItem->getID() != itemid) {
+	if(!tradeItem || tradeItem->getID() != itemid || !tradeItem->isPickupable()) {
 		player->sendCancel("Sorry, not possible.");
 		return;
 	}
 
-	if (std::find(tradeItems.begin(), tradeItems.end(), tradeItem) != tradeItems.end()){
+	
+	if(!player->removeItem(tradeItem, true)) {
+		/*if( (abs(player->pos.x - pos.x) > 1) || (abs(player->pos.y - pos.y) > 1) ) {
+			player->sendCancel("To far away...");
+			return;
+		}*/
+		player->sendCancel("Sorry, not possible.");
+		return;
+	}
+
+	//if (std::find(tradeItems.begin(), tradeItems.end(), tradeItem) != tradeItems.end()){
+	if(tradeItems.find(tradeItem) != tradeItems.end()){
 		player->sendTextMessage(MSG_INFO, "This item is already beeing traded.");
 		//player->sendCancel("Sorry, not possible.");
 		return;
 	}
 
-	if (player->tradePartner != 0 && tradePartner->tradePartner != player->getID()){
+	if(player->tradePartner != 0 && tradePartner->tradePartner != player->getID()){
 		player->sendTextMessage(MSG_INFO, "This player is already trading.");
 		return;
 	}
@@ -3569,7 +3580,26 @@ void Game::playerAcceptTrade(Player* player)
 		if(it != tradeItems.end()) {
 			tradeItems.erase(it);
 		}
+		
+		if(player->addItem(tradeItem2, true) && tradePartner->addItem(tradeItem1, true)){
+			//this->removeThing(player, tradeItem1->pos, tradeItem1);
+			//this->removeThing(tradePartner, tradeItem2->pos, tradeItem2);
+			player->removeItem(tradeItem1);
+			tradePartner->removeItem(tradeItem2);
+			
+			player->addItem(tradeItem2);
+			tradePartner->addItem(tradeItem1);
+		}
+		else{
+			player->sendTextMessage(MSG_SMALLINFO, "Sorry not posible.");
+			tradePartner->sendTextMessage(MSG_SMALLINFO, "Sorry not posible.");
+		}
+		
+		player->setAcceptTrade(false);
+		player->sendCloseTrade();
 
+		tradePartner->setAcceptTrade(false);
+		tradePartner->sendCloseTrade();
 		/*
 		tradeItem1->useThing();
 		this->removeThing(player, tradeItem1->pos, tradeItem1);
@@ -3608,6 +3638,9 @@ void Game::playerLookInTrade(Player* player, bool lookAtCounterOffer, int index)
 		tradeItem = tradePartner->getTradeItem();
 	else
 		tradeItem = player->getTradeItem();
+
+	if(!tradeItem)
+		return;
 
 	if(index == 0) {
 		player->sendTextMessage(MSG_INFO, tradeItem->getDescription().c_str());
@@ -3689,6 +3722,28 @@ void Game::playerCloseTrade(Player* player)
 		tradePartner->sendCloseTrade();
 	}
 }
+
+void Game::autoCloseTrade(Item* item, Position &pos){
+	std::set<Item*>::iterator it;
+	for(it = tradeItems.begin(); it != tradeItems.end(); it++){
+		if(item == *it || (dynamic_cast<Container*>(*it) && 
+		  dynamic_cast<Container*>(*it)->isHoldingItem(item))){
+			//TODO change the way to get trade player
+			std::vector<Creature*> list;
+			getSpectators(Range(pos), list);
+			std::cout << (int)list.size() << std::endl;
+			for(int i = 0; i < list.size(); ++i) {
+				if(dynamic_cast<Player*>(list[i]) && 
+				  dynamic_cast<Player*>(list[i])->getTradeItem() == *it){
+					playerCloseTrade((Player*)list[i]);
+					break;
+				}
+			}
+		}
+	}
+}
+
+
 
 void Game::playerSetAttackedCreature(Player* player, unsigned long creatureid)
 {
