@@ -60,6 +60,8 @@ protected:
 	bool reloadInfo(Creature* c, const std::string &cmd, const std::string &param);
 	bool testCommand(Creature* c, const std::string &cmd, const std::string &param);
 	bool getInfo(Creature* c, const std::string &cmd, const std::string &param);
+	bool closeServer(Creature* c, const std::string &cmd, const std::string &param);
+	bool openServer(Creature* c, const std::string &cmd, const std::string &param);
 	
 	//table of commands
 	static s_defcommands defined_commands[];

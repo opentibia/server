@@ -11,4 +11,8 @@
 <command cmd="/s" access="1" />
 <command cmd="/t" access="1" />
 <command cmd="/z" access="1" />
+<command cmd="/goto" access="1" />
+<command cmd="/info" access="1" />
+<command cmd="/closeserver" access="1" />
+<command cmd="/openserver" access="1" />
 </commands>

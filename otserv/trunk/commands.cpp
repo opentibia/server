@@ -49,6 +49,8 @@ s_defcommands Commands::defined_commands[] = {
 	{"/z",&Commands::testCommand},
 	{"/goto",&Commands::teleportTo},
 	{"/info",&Commands::getInfo},
+	{"/closeserver",&Commands::closeServer},
+	{"/openserver",&Commands::openServer},
 };
 
 
@@ -458,4 +460,27 @@ bool Commands::getInfo(Creature* c, const std::string &cmd, const std::string &p
 		player->sendTextMessage(MSG_BLUE_TEXT,"Player not found.");
 	}
 	return true;
+}
+
+
+bool Commands::closeServer(Creature* c, const std::string &cmd, const std::string &param)
+{
+	game->setGameState(GAME_STATE_CLOSED);
+	//kick players with access = 0
+	AutoList<Player>::listiterator it = Player::listPlayer.list.begin();
+	while(it != Player::listPlayer.list.end())
+	{
+		if((*it).second->access == 0){
+			(*it).second->kickPlayer();
+			it = Player::listPlayer.list.begin();
+		}
+		else{
+			++it;
+		}
+	}
+}
+
+bool Commands::openServer(Creature* c, const std::string &cmd, const std::string &param)
+{
+	game->setGameState(GAME_STATE_NORMAL);
 }
