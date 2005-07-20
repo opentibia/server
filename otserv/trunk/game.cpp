@@ -883,12 +883,20 @@ bool Game::onPrepareMoveThing(Player *player, const Item* fromItem, slots_t from
 			player->sendCancel("Sorry not enough room.");
 			return false;
 		}
+		
+		Container const *topContainer = toContainer->getTopParent();
+		if(!topContainer)
+			topContainer = toContainer;
+		if(topContainer->depot != 0 && player->max_depot_items != 0 && topContainer->getItemHoldingCount() >= player->max_depot_items){
+			return false;
+		}
 	}
 
 	return true;
 }
 
 /*container -> container*/
+/*ground -> container*/
 bool Game::onPrepareMoveThing(Player *player, const Item* fromItem, const Container *fromContainer,
 	const Container *toContainer, const Item *toItem)
 {	
@@ -912,6 +920,13 @@ bool Game::onPrepareMoveThing(Player *player, const Item* fromItem, const Contai
 		}
 		else if((!fromItem->isStackable() || !toItem || fromItem->getID() != toItem->getID() || toItem->getItemCountOrSubtype() >= 100) && toContainer->size() + 1 > toContainer->capacity()) {		
 			player->sendCancel("Sorry not enough room.");
+			return false;
+		}
+		
+		Container const *topContainer = toContainer->getTopParent();
+		if(!topContainer)
+			topContainer = toContainer;
+		if(topContainer->depot != 0 && player->max_depot_items != 0 && topContainer->getItemHoldingCount() >= player->max_depot_items){
 			return false;
 		}
 	}

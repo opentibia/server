@@ -204,6 +204,8 @@ bool Actions::UseItem(Player* player, const Position &pos,const unsigned char st
 	
 	//if found execute it
 	if(action){
+		Position itempos = game->getThingMapPos(player, pos);
+		game->autoCloseTrade(item,itempos);
 		PositionEx posEx(pos,stack);
 		if(action->executeUse(player,item,posEx,posEx)){
 			return true;
@@ -271,12 +273,14 @@ bool Actions::UseItemEx(Player* player, const Position &from_pos,
 				return false;
 			}
 		}
+		Position itempos = game->getThingMapPos(player, from_pos);
+		game->autoCloseTrade(item,itempos);
 		PositionEx posFromEx(from_pos,from_stack);
-		PositionEx posToEx(to_pos,to_stack);    	
+		PositionEx posToEx(to_pos,to_stack);
     	if(action->executeUse(player,item,posFromEx,posToEx))
     		return true;
 	}
-    
+	
 	//not found
 	player->sendCancel("You can not use this object.");
 	return false;
@@ -617,9 +621,11 @@ ActionScript* ActionScript::getActionScript(lua_State *L){
 }
 
 
-Position ActionScript::internalGetRealPosition(Player *player, const Position &pos)
+Position ActionScript::internalGetRealPosition(ActionScript *action, Player *player, const Position &pos)
 {
-	if(pos.x == 0xFFFF){
+	if(action)
+		return action->game->getThingMapPos(player, pos);
+	/*if(pos.x == 0xFFFF){
 		Position dummyPos(0,0,0);
 		if(!player)
 			return dummyPos;
@@ -644,7 +650,7 @@ Position ActionScript::internalGetRealPosition(Player *player, const Position &p
 	}
 	else{
 		return pos;
-	}
+	}*/
 }
 
 void ActionScript::internalAddThing(lua_State *L, const Thing* thing, const unsigned int thingid)
@@ -988,7 +994,7 @@ int ActionScript::luaActionDoSendMagicEffect(lua_State *L)
 	
 	ActionScript *action = getActionScript(L);
 	
-	Position realpos = internalGetRealPosition(action->_player,(Position&)pos);
+	Position realpos = internalGetRealPosition(action, action->_player,(Position&)pos);
 	std::vector<Creature*> list;
 	action->game->getSpectators(Range(realpos, true), list);
 	for(unsigned int i = 0; i < list.size(); ++i){
@@ -1195,7 +1201,7 @@ int ActionScript::luaActionDoSendAnimatedText(lua_State *L)
 	
 	ActionScript *action = getActionScript(L);
 	
-	Position realpos = internalGetRealPosition(action->_player,(Position&)pos);
+	Position realpos = internalGetRealPosition(action, action->_player,(Position&)pos);
 	std::vector<Creature*> list;
 	action->game->getSpectators(Range(realpos, true), list);
 	for(unsigned int i = 0; i < list.size(); ++i){

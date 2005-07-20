@@ -124,6 +124,7 @@ Player::Player(const char *name, Protocol *p) :
   HPGain[2]   = 5;
   HPGain[3]   = 10;
   HPGain[4]   = 15;  
+  max_depot_items = 1000;
 } 
 
 
@@ -1387,6 +1388,7 @@ bool Player::addDepot(Container* depot,unsigned long depotId){
 		return false;
 		
 	depot->pos.x = 0xFFFF;
+	depot->depot = depotId;
 	
 	depots[depotId] = depot;
 	return true;

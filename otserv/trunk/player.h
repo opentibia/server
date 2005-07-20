@@ -197,6 +197,7 @@ public:
 	bool addDepot(Container* depot,unsigned long depotIs);
 	//depots	
 	DepotMap depots;
+	long max_depot_items;
 
 	void RemoveDistItem();
   fight_t getFightType();

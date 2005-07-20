@@ -22,6 +22,7 @@
 
 Container::Container(const unsigned short _type) : Item(_type)
 {
+	//std::cout << "Container constructor " << this << std::endl;
 	maxitems = items[this->getID()].maxItems;
 	actualitems = 0;
 	parent = NULL;
@@ -31,6 +32,7 @@ Container::Container(const unsigned short _type) : Item(_type)
 
 Container::~Container()
 {
+	//std::cout << "Container destructor " << this << std::endl;
 	for(ContainerList::iterator cit = lcontained.begin(); cit != lcontained.end(); ++cit)
 	{
     	//delete (*cit);
@@ -257,3 +259,20 @@ ContainerList::const_iterator Container::getEnd() const {
 	return lcontained.end();
 }
 
+Container *Container::getTopParent()
+{
+	Container *aux = this->getParent();
+	while(aux->getParent() != NULL) {
+		aux = aux->getParent();
+	}
+	return aux;
+}
+
+Container *Container::getTopParent() const
+{
+	Container *aux = this->getParent();
+	while(aux->getParent() != NULL) {
+		aux = aux->getParent();
+	}
+	return aux;
+}
