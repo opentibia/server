@@ -101,7 +101,7 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 		player->experience=result.getDataLong("experience");
 		player->level=result.getDataInt("level");
 		player->level_percent  = (unsigned char)(100*(player->experience-player->getExpForLv(player->level))/(1.*player->getExpForLv(player->level+1)-player->getExpForLv(player->level)));
-		player->capacity = row.lookup_by_name("cap");
+		player->capacity = result.getDataInt("cap");
 
 		player->vocation=(playervoc_t)result.getDataInt("vocation");
 		player->access=result.getDataInt("access");
