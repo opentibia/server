@@ -89,22 +89,35 @@ void MagicEffectClass::getMagicEffect(Player* spectator, const Creature* attacke
 {
 	if(!isBlocking && target != NULL /*hasTarget*/) {
 		if(spectator->CanSee(pos.x, pos.y, pos.z)) {
+			/*
 			if((g_game.getWorldType() == WORLD_TYPE_NO_PVP && dynamic_cast<const Player*>(attacker) &&
 				dynamic_cast<const Player*>(target) && target->access == 0 && attacker->access == 0) ||
-				target->access != 0)
-				spectator->sendMagicEffect(pos, NM_ME_PUFF);
-			else{
-				if(damageEffect != 0xFF) {
-					if(offensive && (target->getImmunities() & attackType) == attackType) {
-						spectator->sendMagicEffect(pos, NM_ME_BLOCKHIT);
+				target->access != 0) {
+					if(damage < 0) {
+						if(damageEffect != 0xFF) {
+							spectator->sendMagicEffect(pos, damageEffect);
+						}
 					}
-					else {
-						spectator->sendMagicEffect(pos, damageEffect);
+					else if(hitEffect != 0xFF) {
+						spectator->sendMagicEffect(pos, hitEffect);
 					}
 				}
+				//spectator->sendMagicEffect(pos, NM_ME_PUFF);
+			else*/{
+				if(damageEffect != 0xFF) {
+					if(!offensive || !(g_game.getWorldType() == WORLD_TYPE_NO_PVP && dynamic_cast<const Player*>(attacker) &&
+						dynamic_cast<const Player*>(target) && target->access == 0 && attacker->access == 0) || target->access != 0) {
+							if(offensive && (target->getImmunities() & attackType) == attackType) {
+								spectator->sendMagicEffect(pos, NM_ME_BLOCKHIT);
+							}
+							else {
+								spectator->sendMagicEffect(pos, damageEffect);
+							}
+						}
+				}
+
 				if(hitEffect != 0xFF)
 					spectator->sendMagicEffect(pos, hitEffect);
-					
 			}
 		}
 	}

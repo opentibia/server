@@ -1685,6 +1685,9 @@ void Player::onTeleport(const Creature *creature, const Position *oldPos, unsign
 }
 
 void Player::addManaSpent(unsigned long spent){
+	if(spent == 0)
+		return;
+
 	this->manaspent += spent;
 	//Magic Level Advance
 	int reqMana = this->getReqMana(this->maglevel+1, this->vocation);

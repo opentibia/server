@@ -261,6 +261,9 @@ ContainerList::const_iterator Container::getEnd() const {
 
 Container *Container::getTopParent()
 {
+	if(getParent() == NULL)
+		return this;
+
 	Container *aux = this->getParent();
 	while(aux->getParent() != NULL) {
 		aux = aux->getParent();
@@ -268,9 +271,13 @@ Container *Container::getTopParent()
 	return aux;
 }
 
-Container *Container::getTopParent() const
+const Container *Container::getTopParent() const
 {
+	if(getParent() == NULL)
+		return this;
+
 	Container *aux = this->getParent();
+
 	while(aux->getParent() != NULL) {
 		aux = aux->getParent();
 	}

@@ -99,10 +99,10 @@ void GameState::onAttack(Creature* attacker, const Position& pos, const MagicEff
 				targetPlayer->inFightTicks = (long)g_config.getGlobalNumber("pzlocked", 0);
 				targetPlayer->sendIcons();
 			}
-		}
-		
-		if(game->getWorldType() == WORLD_TYPE_NO_PVP && attackPlayer && targetPlayer && attackPlayer->access == 0){
-			damage = 0;
+
+			if(game->getWorldType() == WORLD_TYPE_NO_PVP && attackPlayer && targetPlayer && attackPlayer->access == 0){
+				damage = 0;
+			}
 		}
 		
 		if(damage != 0) {
@@ -1861,29 +1861,33 @@ void Game::thingMoveInternal(Creature *creature, unsigned short from_x, unsigned
 				//diagonal begin
 				if(downTile){
 					if(downTile->floorChange(NORTH) && downTile->floorChange(EAST)){
-						teleport(playerMoving, Position(playerMoving->pos.x-2, playerMoving->pos.y+2, playerMoving->pos.z+1));                           
+						teleport(playerMoving, Position(playerMoving->pos.x-2, playerMoving->pos.y+2, playerMoving->pos.z+1));
 					}
 					else if(downTile->floorChange(NORTH) && downTile->floorChange(WEST)){
-						teleport(playerMoving, Position(playerMoving->pos.x+2, playerMoving->pos.y+2, playerMoving->pos.z+1));                           
+						teleport(playerMoving, Position(playerMoving->pos.x+2, playerMoving->pos.y+2, playerMoving->pos.z+1));
 					}
 					else if(downTile->floorChange(SOUTH) && downTile->floorChange(EAST)){
-						teleport(playerMoving, Position(playerMoving->pos.x-2, playerMoving->pos.y-2, playerMoving->pos.z+1));                           
+						teleport(playerMoving, Position(playerMoving->pos.x-2, playerMoving->pos.y-2, playerMoving->pos.z+1));
 					}
 					else if(downTile->floorChange(SOUTH) && downTile->floorChange(WEST)){
-						teleport(playerMoving, Position(playerMoving->pos.x+2, playerMoving->pos.y-2, playerMoving->pos.z+1));                           
+						teleport(playerMoving, Position(playerMoving->pos.x+2, playerMoving->pos.y-2, playerMoving->pos.z+1));
 					}
 					//diagonal end                                                           
 					else if(downTile->floorChange(NORTH)){
-						teleport(playerMoving, Position(playerMoving->pos.x, playerMoving->pos.y+2, playerMoving->pos.z+1));                           
+						//teleport(playerMoving, Position(playerMoving->pos.x, playerMoving->pos.y+2, playerMoving->pos.z+1));
+						teleport(playerMoving, Position(to_x, to_y + 1, playerMoving->pos.z+1));
 					}
 					else if(downTile->floorChange(SOUTH)){
-						teleport(playerMoving, Position(playerMoving->pos.x, playerMoving->pos.y-2, playerMoving->pos.z+1));                           
+						//teleport(playerMoving, Position(playerMoving->pos.x, playerMoving->pos.y-2, playerMoving->pos.z+1));
+						teleport(playerMoving, Position(to_x, to_y - 1, playerMoving->pos.z+1));
 					}
 					else if(downTile->floorChange(EAST)){
-						teleport(playerMoving, Position(playerMoving->pos.x-2, playerMoving->pos.y, playerMoving->pos.z+1));                           
+						//teleport(playerMoving, Position(playerMoving->pos.x-2, playerMoving->pos.y, playerMoving->pos.z+1));
+						teleport(playerMoving, Position(to_x - 1, to_y, playerMoving->pos.z+1));
 					}
 					else if(downTile->floorChange(WEST)){
-						teleport(playerMoving, Position(playerMoving->pos.x+2, playerMoving->pos.y, playerMoving->pos.z+1));                           
+						//teleport(playerMoving, Position(playerMoving->pos.x+2, playerMoving->pos.y, playerMoving->pos.z+1));
+						teleport(playerMoving, Position(to_x + 1, to_y, playerMoving->pos.z+1));
 					}
 					else {
 						if(player) {
@@ -1925,10 +1929,10 @@ void Game::thingMoveInternal(Creature *creature, unsigned short from_x, unsigned
 				// otherwise we are facing some problems in turning into the
 				// direction we were facing before the movement
 				// check y first cuz after a diagonal move we lock to east or west
-				if (to_y < oldPos.y) ((Player*)thing)->direction = NORTH;
-				if (to_y > oldPos.y) ((Player*)thing)->direction = SOUTH;
-				if (to_x > oldPos.x) ((Player*)thing)->direction = EAST;
-				if (to_x < oldPos.x) ((Player*)thing)->direction = WEST;
+				if (to_y < oldPos.y) creatureMoving->direction = NORTH;
+				if (to_y > oldPos.y) creatureMoving->direction = SOUTH;
+				if (to_x > oldPos.x) creatureMoving->direction = EAST;
+				if (to_x < oldPos.x) creatureMoving->direction = WEST;
 			}
 
 			int oldstackpos = fromTile->getThingStackPos(thing);
@@ -1969,7 +1973,7 @@ void Game::thingMoveInternal(Creature *creature, unsigned short from_x, unsigned
 					if(downTile){
 						//diagonal begin
 						if(downTile->floorChange(NORTH) && downTile->floorChange(EAST)){
-							teleport(playerMoving, Position(playerMoving->pos.x-1, playerMoving->pos.y+1, playerMoving->pos.z+1));                           
+							teleport(playerMoving, Position(playerMoving->pos.x-1, playerMoving->pos.y+1, playerMoving->pos.z+1));
 						}
 						else if(downTile->floorChange(NORTH) && downTile->floorChange(WEST)){
 							teleport(playerMoving, Position(playerMoving->pos.x+1, playerMoving->pos.y+1, playerMoving->pos.z+1));                           
@@ -2153,14 +2157,14 @@ void Game::teleport(Thing *thing, const Position& newPos) {
 	            
 			Creature *creature = dynamic_cast<Creature*>(thing); 
 			if(creature){
-				// we need to update the direction the player is facing to...
-				// otherwise we are facing some problems in turning into the
-				// direction we were facing before the movement
-				// check y first cuz after a diagonal move we lock to east or west
-				if (newPos.y < oldPos.y) creature->direction = NORTH;
-				if (newPos.y > oldPos.y) creature->direction = SOUTH;
-				if (newPos.x > oldPos.x) creature->direction = EAST;
-				if (newPos.x < oldPos.x) creature->direction = WEST;
+				if (newPos.y < oldPos.y)
+					creature->direction = NORTH;
+				if (newPos.y > oldPos.y)
+					creature->direction = SOUTH;
+				if (newPos.x > oldPos.x && (std::abs(newPos.x - oldPos.x) >= std::abs(newPos.y - oldPos.y)) )
+					creature->direction = EAST;
+				if (newPos.x < oldPos.x && (std::abs(newPos.x - oldPos.x) >= std::abs(newPos.y - oldPos.y)))
+					creature->direction = WEST;
 
 				Player *player = dynamic_cast<Player*>(creature);
 				if(player && player->attackedCreature != 0)  {
@@ -2683,13 +2687,14 @@ void Game::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fi
 
 	Tile* targettile = getTile(attackedCreature->pos.x, attackedCreature->pos.y, attackedCreature->pos.z);
 
+	/* moved to playerSetAttackedCreature()
 	if(attackedCreature->access != 0){
 		if(player){
 			//player->sendCancelAttacking();
 			playerSetAttackedCreature(player, 0);
 			player->sendTextMessage(MSG_SMALLINFO, "You may not attack this player.");
 		}
-	  	return;
+	  return;
 	}
 	if(getWorldType() == WORLD_TYPE_NO_PVP && player && attackedPlayer && player->access == 0){
 		//player->sendCancelAttacking();
@@ -2697,6 +2702,7 @@ void Game::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fi
 		player->sendTextMessage(MSG_SMALLINFO, "You may not attack this player.");
 		return;
 	}
+	*/
 
 	//can the attacker reach the attacked?
 	bool inReach = false;
@@ -3764,6 +3770,23 @@ void Game::playerSetAttackedCreature(Player* player, unsigned long creatureid)
 	if(player->attackedCreature != 0 && creatureid == 0) {
 		player->sendCancelAttacking();
 	}
+
+	Creature* attackedCreature = NULL;
+	if(creatureid != 0) {
+		attackedCreature = getCreatureByID(creatureid);
+	}
+
+	if(attackedCreature) {
+		if(attackedCreature->access != 0 || (getWorldType() == WORLD_TYPE_NO_PVP && player->access == 0 && dynamic_cast<Player*>(attackedCreature))) {
+			player->sendTextMessage(MSG_SMALLINFO, "You may not attack this player.");
+			player->sendCancelAttacking();
+			player->setAttackedCreature(0);
+			stopEvent(player->eventCheckAttacking);
+			player->eventCheckAttacking = 0;
+			return;
+		}
+	}
+
 
 	player->setAttackedCreature(creatureid);
 	stopEvent(player->eventCheckAttacking);

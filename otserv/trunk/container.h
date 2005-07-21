@@ -57,7 +57,7 @@ class Container : public Item
 		Container *getParent() {return parent;}
 		Container *getParent() const {return parent;}
 		Container *getTopParent();
-		Container *getTopParent() const;
+		const Container *getTopParent() const;
 
 		ContainerList::const_iterator getItems() const;     // begin();
 		ContainerList::const_iterator getEnd() const;       // iterator beyond the last element
