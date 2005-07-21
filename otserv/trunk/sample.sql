@@ -103,6 +103,7 @@ CREATE TABLE `players` (
   `pos` varchar(255) NOT NULL default '',
   `speed` int(11) NOT NULL default '0',
   `cap` int(11) NOT NULL default '0',
+  `maxdepotitems` int(11) NOT NULL default '1000',
   `food` int(11) NOT NULL default '0',
   `sex` int(11) NOT NULL default '0',
   `lastlogin` int(11) unsigned NOT NULL default '0',

@@ -95,34 +95,35 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 		player->setGUID((int)result.getDataInt("id"));
 		
 		player->accountNumber = result.getDataInt("account");
-		player->sex= (playersex_t)result.getDataInt("sex");
+		player->sex = (playersex_t)result.getDataInt("sex");
 		
 		player->setDirection((Direction)result.getDataInt("direction"));
-		player->experience=result.getDataLong("experience");
-		player->level=result.getDataInt("level");
+		player->experience = result.getDataLong("experience");
+		player->level = result.getDataInt("level");
 		player->level_percent  = (unsigned char)(100*(player->experience-player->getExpForLv(player->level))/(1.*player->getExpForLv(player->level+1)-player->getExpForLv(player->level)));
 		player->capacity = result.getDataInt("cap");
-
-		player->vocation=(playervoc_t)result.getDataInt("vocation");
-		player->access=result.getDataInt("access");
+		player->max_depot_items = result.getDataInt("maxdepotitems");
+	
+		player->vocation = (playervoc_t)result.getDataInt("vocation");
+		player->access = result.getDataInt("access");
 		player->setNormalSpeed();
 		
-		player->mana=result.getDataInt("mana");
-		player->manamax=result.getDataInt("manamax");
-		player->manaspent=result.getDataInt("manaspent");
-		player->maglevel=result.getDataInt("maglevel");
+		player->mana = result.getDataInt("mana");
+		player->manamax = result.getDataInt("manamax");
+		player->manaspent = result.getDataInt("manaspent");
+		player->maglevel = result.getDataInt("maglevel");
 		player->maglevel_percent  = (unsigned char)(100*(player->manaspent/(1.*player->getReqMana(player->maglevel+1, player->vocation))));
 
-		player->health=result.getDataInt("health");
-		player->healthmax=result.getDataInt("healthmax");
-		player->food=result.getDataInt("food");
+		player->health = result.getDataInt("health");
+		player->healthmax = result.getDataInt("healthmax");
+		player->food = result.getDataInt("food");
 	
-		player->looktype=result.getDataInt("looktype");
+		player->looktype = result.getDataInt("looktype");
 		player->lookmaster = player->looktype;
-		player->lookhead=result.getDataInt("lookhead");
-		player->lookbody=result.getDataInt("lookbody");
-		player->looklegs=result.getDataInt("looklegs");
-		player->lookfeet=result.getDataInt("lookfeet");
+		player->lookhead = result.getDataInt("lookhead");
+		player->lookbody = result.getDataInt("lookbody");
+		player->looklegs = result.getDataInt("looklegs");
+		player->lookfeet = result.getDataInt("lookfeet");
 	
 		boost::char_separator<char> sep(";");
 	
@@ -132,9 +133,9 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 		tokenizer tokens(pos, sep);
 	
 		tokenizer::iterator spawnit = tokens.begin();
-		player->pos.x=atoi(spawnit->c_str()); spawnit++;
-		player->pos.y=atoi(spawnit->c_str()); spawnit++;
-		player->pos.z=atoi(spawnit->c_str());
+		player->pos.x = atoi(spawnit->c_str()); spawnit++;
+		player->pos.y = atoi(spawnit->c_str()); spawnit++;
+		player->pos.z = atoi(spawnit->c_str());
 		
 		//there is no "fuck" in the sources, but every major programm got
 		//one and i think here is a good place to add one
@@ -146,9 +147,9 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 		tokenizer mastertokens(masterpos, sep);
 	
 		tokenizer::iterator mspawnit = mastertokens.begin();
-		player->masterPos.x=atoi(mspawnit->c_str()); mspawnit++;
-		player->masterPos.y=atoi(mspawnit->c_str()); mspawnit++;
-		player->masterPos.z=atoi(mspawnit->c_str());
+		player->masterPos.x = atoi(mspawnit->c_str()); mspawnit++;
+		player->masterPos.y = atoi(mspawnit->c_str()); mspawnit++;
+		player->masterPos.z = atoi(mspawnit->c_str());
 	
 	
 		// we need to find out our skills
@@ -160,8 +161,8 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 			for(int i=0; i < result.getNumRows(); ++i)
 			{
 				int skillid=result.getDataInt("id",i);
-				player->skills[skillid][SKILL_LEVEL]=result.getDataInt("skill",i);
-				player->skills[skillid][SKILL_TRIES]=result.getDataInt("tries",i);
+				player->skills[skillid][SKILL_LEVEL] = result.getDataInt("skill",i);
+				player->skills[skillid][SKILL_TRIES] = result.getDataInt("tries",i);
 				player->skills[skillid][SKILL_PERCENT] = (unsigned int)(100*(player->skills[skillid][SKILL_TRIES])/(1.*player->getReqSkillTries(skillid, (player->skills[skillid][SKILL_LEVEL]+1), player->vocation)));
 			}
 		}
@@ -315,6 +316,7 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 	player->level=row.lookup_by_name("level");
 	player->level_percent  = (unsigned char)(100*(player->experience-player->getExpForLv(player->level))/(1.*player->getExpForLv(player->level+1)-player->getExpForLv(player->level)));
 	player->capacity = row.lookup_by_name("cap");
+	player->max_depot_items = row.lookup_by_name("maxdepotitems");
 
 	player->voc=row.lookup_by_name("vocation");
 	player->access=row.lookup_by_name("access");
@@ -849,7 +851,8 @@ bool IOPlayerSQL::savePlayer(Player* player){
 	query << "`masterpos` = '" << player->masterPos.x<<";"<< player->masterPos.y<<";"<< player->masterPos.z << "', ";
 	query << "`pos` = '" << player->pos.x<<";"<< player->pos.y<<";"<< player->pos.z << "', ";
 	query << "`speed` = " << player->speed << ", ";
-	query << "`cap` = " << player->cap << ", ";
+	//query << "`cap` = " << player->cap << ", ";
+	query << "`cap` = " << player->getCapacity() << ", ";
 	query << "`food` = " << player->food << ", ";
 	query << "`sex` = " << player->sex << ", ";
 	query << "`lastlogin` = " << player->lastlogin << " ";
