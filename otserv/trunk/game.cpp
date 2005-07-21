@@ -844,6 +844,10 @@ bool Game::onPrepareMoveThing(Creature *creature, const Thing* thing,
 		//player->sendCancelWalk("Sorry, not possible.");
 		return false;
 	}
+	else if(!player && toTile && toTile->ground && !toTile->ground->noFloorChange()) {
+		creature->sendCancel("Sorry, not possible.");
+		return false;
+	}
 
 	if (fromTile && fromTile->splash == thing && fromTile->splash->isNotMoveable()) {
 			creature->sendCancel("You cannot move this object.");
@@ -941,18 +945,16 @@ bool Game::onPrepareMoveCreature(Creature *creature, const Creature* creatureMov
 	const Tile *fromTile, const Tile *toTile)
 {
 	const Player* playerMoving = dynamic_cast<const Player*>(creatureMoving);
-	Player* player_t = dynamic_cast<Player*>(creature);
+	Player* player = dynamic_cast<Player*>(creature);
 
 	if (creature->access == 0 && creature != creatureMoving && !creatureMoving->isPushable()) {		
 		creature->sendCancel("Sorry, not possible.");
     return false;
   }
-	if(!toTile && creature == creatureMoving){		
-		//player->sendCancelWalk("Sorry, not possible.");
-
-		if(player_t) {
-			player_t->sendTextMessage(MSG_SMALLINFO, "Sorry, not possible.");
-			player_t->sendCancelWalk();
+	if(!toTile){
+		if(creature == creatureMoving && player) {
+			player->sendTextMessage(MSG_SMALLINFO, "Sorry, not possible.");
+			player->sendCancelWalk();
 		}
 
 		return false;
@@ -960,9 +962,9 @@ bool Game::onPrepareMoveCreature(Creature *creature, const Creature* creatureMov
   else if (playerMoving && toTile->isPz() && playerMoving->pzLocked) {
 		if (creature == creatureMoving && creature->pzLocked) {
 
-			if(player_t) {
-				player_t->sendTextMessage(MSG_SMALLINFO, "You can not enter a protection zone after attacking another player.");
-				player_t->sendCancelWalk();
+			if(player) {
+				player->sendTextMessage(MSG_SMALLINFO, "You can not enter a protection zone after attacking another player.");
+				player->sendCancelWalk();
 			}
 
 			//player->sendCancelWalk("You can not enter a protection zone after attacking another player.");
@@ -973,7 +975,7 @@ bool Game::onPrepareMoveCreature(Creature *creature, const Creature* creatureMov
 			return false;
 		}
   }
-  else if (playerMoving && fromTile->isPz() && creature != creatureMoving) {
+  else if (playerMoving && fromTile->isPz() && !toTile->isPz() && creature != creatureMoving) {
 		creature->sendCancel("Sorry, not possible.");
 		return false;
   }
@@ -1976,56 +1978,72 @@ void Game::thingMoveInternal(Creature *creature, unsigned short from_x, unsigned
 						//diagonal begin
 						if(downTile->floorChange(NORTH) && downTile->floorChange(EAST)){
 							teleport(playerMoving, Position(playerMoving->pos.x-1, playerMoving->pos.y+1, playerMoving->pos.z+1));
+							//teleport(thing, Position(from_x-1, from_y+1, from_z+1));
 						}
 						else if(downTile->floorChange(NORTH) && downTile->floorChange(WEST)){
-							teleport(playerMoving, Position(playerMoving->pos.x+1, playerMoving->pos.y+1, playerMoving->pos.z+1));                           
+							teleport(playerMoving, Position(playerMoving->pos.x+1, playerMoving->pos.y+1, playerMoving->pos.z+1));
+							//teleport(thing, Position(from_x+1, from_y+1, from_z+1));
 						}
 						else if(downTile->floorChange(SOUTH) && downTile->floorChange(EAST)){
-							teleport(playerMoving, Position(playerMoving->pos.x-1, playerMoving->pos.y-1, playerMoving->pos.z+1));                           
+							teleport(playerMoving, Position(playerMoving->pos.x-1, playerMoving->pos.y-1, playerMoving->pos.z+1));
+							//teleport(thing, Position(from_x-1, from_y-1, from_z+1));
 						}
 						else if(downTile->floorChange(SOUTH) && downTile->floorChange(WEST)){
-							teleport(playerMoving, Position(playerMoving->pos.x+1, playerMoving->pos.y-1, playerMoving->pos.z+1));                           
+							teleport(playerMoving, Position(playerMoving->pos.x+1, playerMoving->pos.y-1, playerMoving->pos.z+1));
+							//teleport(thing, Position(from_x+1, from_y-1, from_z+1));
 						}                          
 						//diagonal end
 						else if(downTile->floorChange(NORTH)){
-							teleport(playerMoving, Position(playerMoving->pos.x, playerMoving->pos.y+1, playerMoving->pos.z+1));                           
+							teleport(playerMoving, Position(playerMoving->pos.x, playerMoving->pos.y+1, playerMoving->pos.z+1));
+							//teleport(thing, Position(from_x, from_y+1, from_z+1));
 						}
 						else if(downTile->floorChange(SOUTH)){
-							teleport(playerMoving, Position(playerMoving->pos.x, playerMoving->pos.y-1, playerMoving->pos.z+1));                           
+							teleport(playerMoving, Position(playerMoving->pos.x, playerMoving->pos.y-1, playerMoving->pos.z+1));
+							//teleport(thing, Position(from_x, from_y-1, from_z+1));
 						}
 						else if(downTile->floorChange(EAST)){
-							teleport(playerMoving, Position(playerMoving->pos.x-1, playerMoving->pos.y, playerMoving->pos.z+1));                           
+							teleport(playerMoving, Position(playerMoving->pos.x-1, playerMoving->pos.y, playerMoving->pos.z+1));
+							//teleport(thing, Position(from_x-1, from_y, from_z+1));
 						}
 						else if(downTile->floorChange(WEST)){
-							teleport(playerMoving, Position(playerMoving->pos.x+1, playerMoving->pos.y, playerMoving->pos.z+1));                           
+							teleport(playerMoving, Position(playerMoving->pos.x+1, playerMoving->pos.y, playerMoving->pos.z+1));
+							//teleport(thing, Position(from_x+1, from_y, from_z+1));
 						}
 					}
 				}
 				//diagonal begin
 				else if(playerMoving && toTile->floorChange(NORTH) && toTile->floorChange(EAST)){
-					teleport(playerMoving, Position(playerMoving->pos.x+1, playerMoving->pos.y-1, playerMoving->pos.z-1));                           
+					teleport(playerMoving, Position(playerMoving->pos.x+1, playerMoving->pos.y-1, playerMoving->pos.z-1));
+					//teleport(thing, Position(from_x+1, from_y-1, from_z-1));
 				}
 				else if(playerMoving && toTile->floorChange(NORTH) && toTile->floorChange(WEST)){
-					teleport(playerMoving, Position(playerMoving->pos.x-1, playerMoving->pos.y-1, playerMoving->pos.z-1));                           
+					teleport(playerMoving, Position(playerMoving->pos.x-1, playerMoving->pos.y-1, playerMoving->pos.z-1));
+					//teleport(thing, Position(from_x-1, from_y-1, from_z-1));
 				}
 				else if(playerMoving && toTile->floorChange(SOUTH) && toTile->floorChange(EAST)){
-					teleport(playerMoving, Position(playerMoving->pos.x+1, playerMoving->pos.y+1, playerMoving->pos.z-1));                           
+					teleport(playerMoving, Position(playerMoving->pos.x+1, playerMoving->pos.y+1, playerMoving->pos.z-1));
+					//teleport(thing, Position(from_x+1, from_y+1, from_z-1));
 				}
 				else if(playerMoving && toTile->floorChange(SOUTH) && toTile->floorChange(WEST)){
-					teleport(playerMoving, Position(playerMoving->pos.x-1, playerMoving->pos.y+1, playerMoving->pos.z-1));                           
+					teleport(playerMoving, Position(playerMoving->pos.x-1, playerMoving->pos.y+1, playerMoving->pos.z-1));
+					//teleport(thing, Position(from_x-1, from_y+1, from_z-1));
 				}
 				//diagonal end                            
 				else if(playerMoving && toTile->floorChange(NORTH)){
-					teleport(playerMoving, Position(playerMoving->pos.x, playerMoving->pos.y-1, playerMoving->pos.z-1));                           
+					teleport(playerMoving, Position(playerMoving->pos.x, playerMoving->pos.y-1, playerMoving->pos.z-1));
+					//teleport(thing, Position(from_x, from_y-1, from_z-1));
 				}
 				else if(playerMoving && toTile->floorChange(SOUTH)){
-					teleport(playerMoving, Position(playerMoving->pos.x, playerMoving->pos.y+1, playerMoving->pos.z-1));                           
+					teleport(playerMoving, Position(playerMoving->pos.x, playerMoving->pos.y+1, playerMoving->pos.z-1));
+					//teleport(thing, Position(from_x, from_y+1, from_z-1));
 				}
 				else if(playerMoving && toTile->floorChange(EAST)){
 					teleport(playerMoving, Position(playerMoving->pos.x+1, playerMoving->pos.y, playerMoving->pos.z-1));
+					//teleport(thing, Position(from_x+1, from_y, from_z-1));
 				}
 				else if(playerMoving && toTile->floorChange(WEST)){
-					teleport(playerMoving, Position(playerMoving->pos.x-1, playerMoving->pos.y, playerMoving->pos.z-1));                           
+					teleport(playerMoving, Position(playerMoving->pos.x-1, playerMoving->pos.y, playerMoving->pos.z-1));
+					//teleport(thing, Position(from_x-1, from_y, from_z-1));
 				}                                      
 				//change level end
 

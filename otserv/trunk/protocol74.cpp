@@ -644,6 +644,7 @@ void Protocol74::parseMoveNorthEast(NetworkMessage &msg)
 	}
 
 	this->sleepTillMove();
+	this->sleepTillMove();
 
 	game->thingMove(player, player,
 		(player->pos.x+1), (player->pos.y-1), player->pos.z, 1);
@@ -656,6 +657,7 @@ void Protocol74::parseMoveSouthEast(NetworkMessage &msg)
 		player->sendCancelWalk();
 	}
 
+	this->sleepTillMove();
 	this->sleepTillMove();
 
 	game->thingMove(player, player,
@@ -670,6 +672,7 @@ void Protocol74::parseMoveSouthWest(NetworkMessage &msg)
 	}
 
 	this->sleepTillMove();
+	this->sleepTillMove();
 
 	game->thingMove(player, player,
 		(player->pos.x-1), (player->pos.y+1), player->pos.z, 1);
@@ -682,6 +685,7 @@ void Protocol74::parseMoveNorthWest(NetworkMessage &msg)
 		player->sendCancelWalk();
 	}
 
+	this->sleepTillMove();
 	this->sleepTillMove();
 
 	game->thingMove(player, player,
