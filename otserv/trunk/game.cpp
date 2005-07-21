@@ -888,6 +888,7 @@ bool Game::onPrepareMoveThing(Player *player, const Item* fromItem, slots_t from
 		if(!topContainer)
 			topContainer = toContainer;
 		if(topContainer->depot != 0 && player->max_depot_items != 0 && topContainer->getItemHoldingCount() >= player->max_depot_items){
+			player->sendCancel("You can not put more items in this depot.");
 			return false;
 		}
 	}
@@ -927,6 +928,7 @@ bool Game::onPrepareMoveThing(Player *player, const Item* fromItem, const Contai
 		if(!topContainer)
 			topContainer = toContainer;
 		if(topContainer->depot != 0 && player->max_depot_items != 0 && topContainer->getItemHoldingCount() >= player->max_depot_items){
+			player->sendCancel("You can not put more items in this depot.");
 			return false;
 		}
 	}
