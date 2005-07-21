@@ -1136,7 +1136,7 @@ bool Player::isHoldingContainer(const Container* container) const
 {
 	const Container* topContainer = container;
 	while(topContainer->getParent() != NULL) {
-		topContainer = container->getParent();
+		topContainer = topContainer->getParent();
 	}
 
 	//find a free slot in container
