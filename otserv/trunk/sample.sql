@@ -26,10 +26,10 @@ DROP TABLE IF EXISTS `accounts`;
 CREATE TABLE `accounts` (
   `id` int(11) NOT NULL auto_increment,
   `accno` int(11) unsigned NOT NULL default '0',
-  `password` varchar(255) NOT NULL default '',
+  `password` varchar(32) NOT NULL default '',
   `type` int(11) NOT NULL default '0',
   `premDays` int(11) NOT NULL default '0',
-  `email` varchar(255) NOT NULL default '',
+  `email` varchar(50) NOT NULL default '',
   UNIQUE KEY `id` (`id`),
   KEY `accno` (`accno`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -81,7 +81,7 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `players`;
 CREATE TABLE `players` (
   `id` int(11) unsigned NOT NULL auto_increment,
-  `name` varchar(255) NOT NULL default '',
+  `name` varchar(32) NOT NULL default '',
   `access` int(11) NOT NULL default '0',
   `account` int(11) NOT NULL default '0',
   `level` int(11) NOT NULL default '0',
@@ -100,15 +100,15 @@ CREATE TABLE `players` (
   `mana` int(11) NOT NULL default '0',
   `manamax` int(11) NOT NULL default '0',
   `manaspent` int(11) NOT NULL default '0',
-  `masterpos` varchar(255) NOT NULL default '',
-  `pos` varchar(255) NOT NULL default '',
+  `masterpos` varchar(16) NOT NULL default '',
+  `pos` varchar(16) NOT NULL default '',
   `speed` int(11) NOT NULL default '0',
   `cap` int(11) NOT NULL default '0',
   `maxdepotitems` int(11) NOT NULL default '1000',
   `food` int(11) NOT NULL default '0',
   `sex` int(11) NOT NULL default '0',
   `lastlogin` int(11) unsigned NOT NULL default '0',
-  `lastip` varchar(255) unsigned NOT NULL default '',
+  `lastip` varchar(16) NOT NULL default '',
   `save` int(11) unsigned NOT NULL default '1',
   UNIQUE KEY `id` (`id`),
   KEY `name` (`name`)
@@ -121,8 +121,8 @@ CREATE TABLE `players` (
 
 /*!40000 ALTER TABLE `players` DISABLE KEYS */;
 LOCK TABLES `players` WRITE;
-INSERT INTO `players` VALUES (1,'Hurz',1,1,18,1,675,840,840,2,76000,20,30,40,50,128,20,640,640,21700,'20;20;7','29;30;7',900,300,129,1,0,1);
-INSERT INTO `players` VALUES (2,'Player',0,1,18,1,675,840,840,2,76000,20,30,40,50,128,20,640,640,21700,'27;23;7','27;23;7',900,300,129,1,0,1);
+INSERT INTO `players` VALUES (1,'Hurz',1,1,18,1,675,840,840,2,76000,20,30,40,50,128,20,640,640,21700,'20;20;7','29;30;7',900,300,1000,129,1,0,'',1);
+INSERT INTO `players` VALUES (2,'Player',0,1,18,1,675,840,840,2,76000,20,30,40,50,128,20,640,640,21700,'27;23;7','27;23;7',900,300,1000,129,1,0,'',1);
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `players` ENABLE KEYS */;
 
