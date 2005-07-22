@@ -40,7 +40,7 @@ How does it work?
 	Then you are logged in.
 
 What's New?
-        - Full rearranjed protocol and game system
+        - Full rearranged protocol and game system
 	- Actions (when using a tile or item)
         - SQL databases (for accounts and players)
 	- Crash tracking
@@ -66,30 +66,31 @@ How do I use this new stuff?
 	convert your xml map to a binary map format by a simple converter. This can be found at the OTfans.net Forums.
 
 Problems?
-	The server is now stable nowadays, but if you do find bugs you can report them at the CVS Bug Report board
-	on OTFans Forums (http://otfans.net/index.php?act=SF&s=&f=78). If your server crashes, you should get a report generated
-	at your Otserv folder named report.txt, you should also report this at the CVS Report Board, this report will help solving
-	bugs a lot.
+	The server is now stable nowadays, but if you do find bugs you can report them at the 
+	CVS Bug Report board on OTFans Forums (http://otfans.net/index.php?act=SF&s=&f=78). If your 
+	server crashes, you should get a report generated at your Otserv folder named report.txt, 
+	you should also report this at the CVS Report Board, this report will help solving bugs a lot.
 
 Credits?
 	Shi'Voc - Initial project developer
 	Acrimon - Initial project developer
 	Tliff - Developer, some kind of project leader
-	TiMMit - Developer (still member?)
+        Yorick - Fansite / Forum administrator
 	Reebow - Developer (special protocol support), not more a member of the team
-        Hacktivex - Developer, not more a member of the team
+        Haktivex - Developer, not more a member of the team
         Fandoras - Developer, not more a member of the team
-	Matkus - Developer (still member?)
-	Privateer - Documentation on the protocol (still member?)
-	Torvik - Item list (still member?)
 	Decar - Fansiter, not more a member of the team
+	Pekay - README Documentation
 	SimOne - Developer and Map Editor
+	j4K3xBl4sT3r - Developer and Map Editor
+	GriZzm0 - Developer and Scripting
 	Spin - Developer
 	Primer - Developer
-	j4K3xBl4sT3r - Developer and Map Editor
-	Snack - Developer
-	GriZzm0 - Developer and Scripting
-	Pekay - README Documentation
+	TiMMit - Developer (still member?)
+	Matkus - Developer (still member?)
+	Snack - Developer (still member?)
+	Privateer - Documentation on the protocol (still member?)
+	Torvik - Item list (still member?)
 
 Forum Credits (OtFans.net):
 	Yorick - Admin
@@ -104,11 +105,11 @@ Forum Credits (OtFans.net):
 	Acemo - Moderator
 	Jero - Moderator
 	j4K3xBl4sT3r - Moderator
-	
+	 
 Help?
 	We always need help. Post on the forums of OTFans!
 	http://otfans.net if you want to help. Theres a lot to be found there.
-        http://otfans.wgbrasil.com for brazilians, our official BR site, hosted by j4K3xBl4sT3r
+	For Brasilian Users - http://otfans.wgbrasil.com hosted by j4K3xBl4sT3r.
 
 Anything else?
 	No.
