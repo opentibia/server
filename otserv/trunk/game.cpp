@@ -2347,13 +2347,14 @@ void Game::creatureToChannel(Creature *creature, SpeakClasses type, const std::s
 	//OTSYS_THREAD_LOCK(gameLock)
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
 
+	if(creature->access == 0){
+		type = SPEAK_CHANNEL_Y;
+	}
 	std::map<long, Creature*>::iterator cit;
 	for (cit = channel.begin(); cit != channel.end(); cit++)
 	{
 		Player* player = dynamic_cast<Player*>(cit->second);
 		if(player){
-			if(player->access == 0)
-				type = SPEAK_CHANNEL_Y;
 			player->sendToChannel(creature, type, text, channelId);
 		}
 	}
