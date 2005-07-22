@@ -912,7 +912,7 @@ bool Game::onPrepareMoveThing(Player *player, const Item* fromItem, const Contai
 	else {
 		if((!fromContainer || !player->isHoldingContainer(fromContainer)) && player->isHoldingContainer(toContainer)) {
 			if(player->access == 0 && player->getFreeCapacity() < fromItem->getWeight()) {
-				player->sendCancel("You do not have enough capacity left.");
+				player->sendCancel("This object is too heavy.");
 				return false;
 			}
 		}
@@ -996,7 +996,7 @@ bool Game::onPrepareMoveThing(Player *player, const Position& fromPos, const Ite
 	}
 
 	if(player->access == 0 && player->getFreeCapacity() < item->getWeight()) {
-		player->sendCancel("You do not have enough capacity left.");
+		player->sendCancel("This object is too heavy.");
 		return false;
 	}
 
@@ -1019,6 +1019,11 @@ bool Game::onPrepareMoveThing(Player *player, slots_t fromSlot, const Item *from
 bool Game::onPrepareMoveThing(Player *player, const Container *fromContainer, const Item *fromItem,
 	slots_t toSlot, const Item *toItem)
 {
+	if(player->access == 0 && !player->isHoldingContainer(fromContainer) && player->getFreeCapacity() < fromItem->getWeight()) {
+		player->sendCancel("This object is too heavy.");
+		return false;
+	}
+
 	if(toItem && (!toItem->isStackable() || toItem->getID() != fromItem->getID())) {
 		player->sendCancel("Sorry, not enough room.");
 		return false;
