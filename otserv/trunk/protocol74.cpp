@@ -1174,44 +1174,42 @@ void Protocol74::parseLookAt(NetworkMessage &msg){
 
 void Protocol74::parseSay(NetworkMessage &msg)
 {
-  SpeakClasses type = (SpeakClasses)msg.GetByte();
+	SpeakClasses type = (SpeakClasses)msg.GetByte();
   
-  std::string receiver;
-  unsigned short channelId = 0;
-  if (type == SPEAK_PRIVATE)
-    receiver = msg.GetString();
-  if (type == SPEAK_CHANNEL_Y ||
-  	   type == SPEAK_CHANNEL_R1 ||
-	   type == SPEAK_CHANNEL_R2)
-    channelId = msg.GetU16();
-  std::string text = msg.GetString();
+	std::string receiver;
+	unsigned short channelId = 0;
+	if(type == SPEAK_PRIVATE)
+		receiver = msg.GetString();
+	if(type == SPEAK_CHANNEL_Y ||
+		type == SPEAK_CHANNEL_R1 ||
+		type == SPEAK_CHANNEL_R2)
+		channelId = msg.GetU16();
+	std::string text = msg.GetString();
 
 	game->creatureSaySpell(player, text);
 
-  switch (type)
-  {
+	switch (type){
     case SPEAK_SAY:
-      game->creatureSay(player, type, text);
-      break;
+    	game->creatureSay(player, type, text);
+    	break;
     case SPEAK_WHISPER:
-      game->creatureWhisper(player, text);
-      break;
+    	game->creatureWhisper(player, text);
+    	break;
     case SPEAK_YELL:
-      game->creatureYell(player, text);
-      break;
-
+    	game->creatureYell(player, text);
+    	break;
     case SPEAK_PRIVATE:
-      game->creatureSpeakTo(player, receiver, text);
-      break;
+      	game->creatureSpeakTo(player, receiver, text);
+		break;
     case SPEAK_CHANNEL_Y:
 	case SPEAK_CHANNEL_R1:
 	case SPEAK_CHANNEL_R2:
-      game->creatureToChannel(player, type, text, channelId);
-      break;
+    	game->creatureToChannel(player, type, text, channelId);
+    	break;
     case SPEAK_BROADCAST:
-      game->creatureBroadcastMessage(player, text);
-      break;
-  }
+    	game->creatureBroadcastMessage(player, text);
+    	break;
+  	}
 }
 
 void Protocol74::parseAttack(NetworkMessage &msg)
@@ -2057,6 +2055,21 @@ void Protocol74::sendThingMove(const Creature *creature, const Thing *thing,
 		if (!tele && CanSee(oldPos->x, oldPos->y, oldPos->z))
 		{
 			AddRemoveThing(msg,*oldPos,oldStackPos);      
+		}
+		
+		if(!(tele && thing == this->player) && CanSee(oldPos->x, oldPos->y, oldPos->z)){
+			//Auto-close trade
+			if(player->getTradeItem() && dynamic_cast<const Item*>(thing) == player->getTradeItem()) {
+				game->playerCloseTrade(player);
+			}
+				
+			//Auto-close container's
+			if(std::abs(player->pos.x - thing->pos.x) > 1 || std::abs(player->pos.y - thing->pos.y) > 1 || player->pos.z != thing->pos.z ) {
+				const Container *container = dynamic_cast<const Container*>(thing);
+				if(container) {						
+					autoCloseContainers(container, msg);						
+				}					
+			}
 		}
 		
 		if (!(tele && thing == this->player) && CanSee(thing->pos.x, thing->pos.y, thing->pos.z))

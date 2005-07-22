@@ -688,7 +688,12 @@ bool Game::placeCreature(Position &pos, Creature* c)
 				std::cout << (uint32_t)getPlayersOnline() << " players online." << std::endl;
 			}
 			
-			c->eventCheck = addEvent(makeTask(1000, std::bind2nd(std::mem_fun(&Game::checkCreature), c->getID())));
+			if(p){
+				c->eventCheck = addEvent(makeTask(1000, std::bind2nd(std::mem_fun(&Game::checkCreature), c->getID())));
+			}
+			else{
+				c->eventCheck = addEvent(makeTask(500, std::bind2nd(std::mem_fun(&Game::checkCreature), c->getID())));
+			}
 			//c->eventCheckAttacking = addEvent(makeTask(2000, std::bind2nd(std::mem_fun(&Game::checkCreatureAttacking), c->getID())));
 		}
 	}
@@ -2346,8 +2351,11 @@ void Game::creatureToChannel(Creature *creature, SpeakClasses type, const std::s
 	for (cit = channel.begin(); cit != channel.end(); cit++)
 	{
 		Player* player = dynamic_cast<Player*>(cit->second);
-		if(player)
-		player->sendToChannel(creature, type, text, channelId);
+		if(player){
+			if(player->access == 0)
+				type = SPEAK_CHANNEL_Y;
+			player->sendToChannel(creature, type, text, channelId);
+		}
 	}
 
 	//OTSYS_THREAD_UNLOCK(gameLock)
@@ -2971,6 +2979,8 @@ void Game::checkCreature(unsigned long id)
 
 	if (creature && creature->isRemoved == false)
 	{
+		creature->eventCheck = 0;
+		
 		int thinkTicks = 0;
 		int oldThinkTicks = creature->onThink(thinkTicks);
 		
@@ -3129,6 +3139,7 @@ void Game::checkCreatureAttacking(unsigned long id)
 	Creature *creature = getCreatureByID(id);
 	if (creature != NULL && creature->isRemoved == false)
 	{
+		creature->eventCheckAttacking = 0;
 		Monster *monster = dynamic_cast<Monster*>(creature);
 		if (monster) {
 			monster->onAttack();
@@ -3643,11 +3654,19 @@ void Game::playerAcceptTrade(Player* player)
 			tradeItems.erase(it);
 		}
 		
+		player->setAcceptTrade(false);
+		tradePartner->setAcceptTrade(false);
+		player->sendCloseTrade();
+		tradePartner->sendCloseTrade();
+		
 		if(player->addItem(tradeItem2, true) && tradePartner->addItem(tradeItem1, true)){
 			//this->removeThing(player, tradeItem1->pos, tradeItem1);
 			//this->removeThing(tradePartner, tradeItem2->pos, tradeItem2);
 			player->removeItem(tradeItem1);
 			tradePartner->removeItem(tradeItem2);
+			
+			player->onThingRemove(tradeItem1);
+			tradePartner->onThingRemove(tradeItem2);
 			
 			player->addItem(tradeItem2);
 			tradePartner->addItem(tradeItem1);
@@ -3656,14 +3675,6 @@ void Game::playerAcceptTrade(Player* player)
 			player->sendTextMessage(MSG_SMALLINFO, "Sorry not possible.");
 			tradePartner->sendTextMessage(MSG_SMALLINFO, "Sorry not possible.");
 		}
-		
-		player->setAcceptTrade(false);
-		player->sendCloseTrade();
-		player->onThingRemove(tradeItem1);
-
-		tradePartner->setAcceptTrade(false);
-		tradePartner->sendCloseTrade();
-		tradePartner->onThingRemove(tradeItem2);
 	}
 }
 

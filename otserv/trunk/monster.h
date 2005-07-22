@@ -159,7 +159,7 @@ private:
 	int getTargetDistance();
 	void calcMovePosition();
 	bool isInRange(const Position &pos);
-	Creature* findTarget();
+	Creature* findTarget(const Creature *ignoreCreature = NULL);
 	#define CHANCE_MAX  100000
 	bool LoadLootNode(xmlNodePtr);
 	bool LoadLootContainer(xmlNodePtr,Container*);	

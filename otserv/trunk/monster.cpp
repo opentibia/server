@@ -464,7 +464,7 @@ Monster::~Monster()
 	physicalAttacks.clear();
 }
 
-Creature* Monster::findTarget()
+Creature* Monster::findTarget(const Creature *ignoreCreature /*= NULL*/)
 {
 	if(attackedCreature == 0) {
 		std::vector<Creature*> tmplist;
@@ -474,7 +474,7 @@ Creature* Monster::findTarget()
 		for(std::vector<Creature*>::const_iterator cit = tmplist.begin(); cit != tmplist.end(); ++cit) {
 			const Player* player = dynamic_cast<const Player*>(*cit);
 
-			if(player && player->access == 0) {
+			if(player && player->access == 0 && player != ignoreCreature) {
 				playerlist.push_back(*cit);
 			}
 		}
@@ -756,9 +756,14 @@ void Monster::OnCreatureEnter(const Creature *creature)
 
 			//Update move position
 			calcMovePosition();
-
-			game->addEvent(makeTask(500, std::bind2nd(std::mem_fun(&Game::checkCreature), getID())));
-			game->addEvent(makeTask(500, std::bind2nd(std::mem_fun(&Game::checkCreatureAttacking), getID())));
+			if(!this->eventCheck){
+				this->eventCheck = game->addEvent(makeTask(500, std::bind2nd(std::mem_fun(&Game::checkCreature), getID())));
+			}
+			if(!this->eventCheckAttacking){
+				this->eventCheckAttacking = game->addEvent(makeTask(500, std::bind2nd(std::mem_fun(&Game::checkCreatureAttacking), getID())));
+			}
+			//game->addEvent(makeTask(500, std::bind2nd(std::mem_fun(&Game::checkCreature), getID())));
+			//game->addEvent(makeTask(500, std::bind2nd(std::mem_fun(&Game::checkCreatureAttacking), getID())));
 		}
 	}
 }
@@ -771,10 +776,9 @@ void Monster::OnCreatureLeave(const Creature *creature)
 		targetPos.x = 0;
 		targetPos.y = 0;
 		targetPos.z = 0;
-
-		Creature* creature = NULL;
-		if((creature = findTarget())) {
-			OnCreatureEnter(creature);
+		Creature* targetCreature = NULL;
+		if((targetCreature = findTarget(creature))) {
+			OnCreatureEnter(targetCreature);
 		}
 	}
 }
@@ -882,7 +886,7 @@ bool Monster::doAttacks(Player* attackedPlayer)
 void Monster::onAttack()
 {
 	if (attackedCreature != 0) {
-		game->addEvent(makeTask(500, std::bind2nd(std::mem_fun(&Game::checkCreatureAttacking), getID())));
+		this->eventCheckAttacking = game->addEvent(makeTask(500, std::bind2nd(std::mem_fun(&Game::checkCreatureAttacking), getID())));
 
 		exhaustedTicks -= 500;
 
