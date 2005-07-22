@@ -874,15 +874,6 @@ int SpellScript::luaActionMakeArrows(lua_State *L){
 	Player* player = dynamic_cast<Player*>(creature);
 	if(player){
  		MagicEffectTargetClass magicTarget;
- 		/*  succesfull make rune
-  		attackType = ATTACK_NONE
-  		animationEffect = NM_ANI_NONE
-  		hitEffect = NM_ME_NONE
-		damageEffect = NM_ME_MAGIC_ENERGIE
-		animationColor = GREEN		
-		offensive = false		
-		drawblood = false
- 		*/
 
 		magicTarget.offensive = false;
  		magicTarget.drawblood = false;
@@ -898,18 +889,16 @@ int SpellScript::luaActionMakeArrows(lua_State *L){
 		else{			
 			magicTarget.manaCost = spell->getMana();
 			magicTarget.damageEffect = 12; //NM_ME_MAGIC_ENERGIE = 12
-			Item* new_item = Item::CreateItem(id,count);
-			if(!player->addItem(new_item)){
-				spell->game->addThing(NULL,player->pos,new_item);
-				//new_item->pos = player->pos;
-				//spell->game->sendAddThing(NULL,player->pos,new_item);
-				/*delete new_item;
-				magicTarget.damageEffect = 2; //NM_ME_PUFF  
-  				magicTarget.manaCost = 0;*/
-			} 
  		}
  		
 		bool isSuccess = spell->game->creatureThrowRune(player, player->pos, magicTarget);
+
+		if(isSuccesss) {
+			Item* new_item = Item::CreateItem(id,count);
+			if(!player->addItem(new_item)){
+				spell->game->addThing(NULL,player->pos,new_item);
+			}
+		}
 		
  		lua_pushnumber(L, 1);
  		return 1;
@@ -944,8 +933,13 @@ int SpellScript::luaActionMakeFood(lua_State *L){
   		else{  
   			magicTarget.manaCost = spell->getMana();
   			magicTarget.damageEffect = 12; //NM_ME_MAGIC_ENERGIE = 12    	
-  			int r,foodtype;
-    		r = rand()%7;        
+		}
+  
+		bool isSuccess = spell->game->creatureThrowRune(player, player->pos, magicTarget);
+
+		if(isSuccess) {
+			int r,foodtype;
+			r = rand()%7;
 			if(r == 0) foodtype = ITEM_MEAT;
 			if(r == 1) foodtype = ITEM_HAM;
 			if(r == 2) foodtype = ITEM_GRAPE;
@@ -953,21 +947,14 @@ int SpellScript::luaActionMakeFood(lua_State *L){
 			if(r == 4) foodtype = ITEM_BREAD;
 			if(r == 5) foodtype = ITEM_CHEESE;
 			if(r == 6) foodtype = ITEM_ROLL;
-    		if(r == 7) foodtype = ITEM_BREAD;
-  			
-  			Item* new_item = Item::CreateItem(foodtype,count);
+    	if(r == 7) foodtype = ITEM_BREAD;
+  		
+  		Item* new_item = Item::CreateItem(foodtype,count);
 			if(!player->addItem(new_item)){
 				//add item on the ground
 				spell->game->addThing(NULL,player->pos,new_item);
-				//new_item->pos = player->pos;
-				//spell->game->sendAddThing(NULL,player->pos,new_item);
-				/*delete new_item;
-				magicTarget.damageEffect = 2; //NM_ME_PUFF  
-  				magicTarget.manaCost = 0;*/
-			} 
+			}
 		}
-  
-		bool isSuccess = spell->game->creatureThrowRune(player, player->pos, magicTarget);
   
 		lua_pushnumber(L, 1);
 		return 1;
