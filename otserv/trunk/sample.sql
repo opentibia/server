@@ -41,7 +41,7 @@ CREATE TABLE `accounts` (
 
 /*!40000 ALTER TABLE `accounts` DISABLE KEYS */;
 LOCK TABLES `accounts` WRITE;
-INSERT INTO `accounts` VALUES (1,1,'test',0,0);
+INSERT INTO `accounts` VALUES (1,1,'test',0,0,'');
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `accounts` ENABLE KEYS */;
 
