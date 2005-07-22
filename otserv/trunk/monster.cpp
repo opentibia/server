@@ -483,7 +483,7 @@ Creature* Monster::findTarget()
 			return NULL;
 
 		size_t index = random_range(0, playerlist.size() - 1);
-		return tmplist[index];
+		return playerlist[index];
 	}
 
 	return NULL;
