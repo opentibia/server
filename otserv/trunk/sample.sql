@@ -29,6 +29,7 @@ CREATE TABLE `accounts` (
   `password` varchar(255) NOT NULL default '',
   `type` int(11) NOT NULL default '0',
   `premDays` int(11) NOT NULL default '0',
+  `email` varchar(255) NOT NULL default '',
   UNIQUE KEY `id` (`id`),
   KEY `accno` (`accno`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -107,6 +108,7 @@ CREATE TABLE `players` (
   `food` int(11) NOT NULL default '0',
   `sex` int(11) NOT NULL default '0',
   `lastlogin` int(11) unsigned NOT NULL default '0',
+  `lastip` varchar(255) unsigned NOT NULL default '',
   `save` int(11) unsigned NOT NULL default '1',
   UNIQUE KEY `id` (`id`),
   KEY `name` (`name`)

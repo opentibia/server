@@ -103,6 +103,7 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 		player->level_percent  = (unsigned char)(100*(player->experience-player->getExpForLv(player->level))/(1.*player->getExpForLv(player->level+1)-player->getExpForLv(player->level)));
 		player->capacity = result.getDataInt("cap");
 		player->max_depot_items = result.getDataInt("maxdepotitems");
+		player->lastlogin = result.getDataInt("lastlogin");
 	
 		player->vocation = (playervoc_t)result.getDataInt("vocation");
 		player->access = result.getDataInt("access");
@@ -541,7 +542,8 @@ bool IOPlayerSQL::savePlayer(Player* player){
 		query << "`cap` = " << player->getCapacity() << ", ";
 		query << "`food` = " << player->food << ", ";
 		query << "`sex` = " << player->sex << ", ";
-		query << "`lastlogin` = " << player->lastlogin << " ";
+		query << "`lastlogin` = " << player->getLastLogin() << ", ";
+		query << "`lastip` = " << player->getIP() << " ";
 		query << " WHERE `id` = "<< player->getGUID() <<" LIMIT 1";
 		
 		if(!mysql.executeQuery(query))

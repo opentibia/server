@@ -160,6 +160,9 @@ public:
 		else
 			return 0.00;
 	}
+	
+	time_t getLastLogin() const { return lastlogin; };
+	
 	void updateInventoryWeigth();
 
 	Item* getItem(int pos) const;

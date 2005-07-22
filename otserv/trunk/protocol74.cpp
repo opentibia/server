@@ -24,6 +24,7 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <time.h>
 #include <list>
 
 #include "networkmessage.h"
@@ -2350,6 +2351,13 @@ void Protocol74::sendThingAppear(const Thing *thing){
     	AddPlayerInventoryItem(msg,player, 10);
 
    		AddTextMessage(msg,MSG_EVENT, g_config.getGlobalString("loginmsg", "Welcome.").c_str());
+   		std::string tempstring;
+   		tempstring = "Your last visit was on ";
+   		time_t lastlogin = player->getLastLogin();
+   		tempstring += ctime(&lastlogin);
+   		tempstring.erase(tempstring.length() -1);
+   		tempstring += ".";
+   		AddTextMessage(msg,MSG_EVENT, tempstring.c_str());
 			WriteBuffer(msg);
 			//force flush
 			flushOutputBuffer();
