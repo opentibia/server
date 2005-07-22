@@ -893,7 +893,7 @@ int SpellScript::luaActionMakeArrows(lua_State *L){
  		
 		bool isSuccess = spell->game->creatureThrowRune(player, player->pos, magicTarget);
 
-		if(isSuccesss) {
+		if(isSuccess) {
 			Item* new_item = Item::CreateItem(id,count);
 			if(!player->addItem(new_item)){
 				spell->game->addThing(NULL,player->pos,new_item);
