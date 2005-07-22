@@ -2174,67 +2174,62 @@ void Game::teleport(Thing *thing, const Position& newPos) {
 
 	if(newPos == thing->pos)  
 		return; 
-	//OTSYS_THREAD_LOCK(gameLock)
+	
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
 	
-	Tile *fromTile = getTile( thing->pos.x, thing->pos.y, thing->pos.z );
 	Tile *toTile = getTile( newPos.x, newPos.y, newPos.z );
-	if(fromTile && toTile) {
-		int osp = fromTile->getThingStackPos(thing);  
-		if (fromTile->removeThing(thing)) {
-			toTile->addThing(thing); 
+	if(toTile){
+		Creature *creature = dynamic_cast<Creature*>(thing); 
+		if(creature){
+			Tile *fromTile = getTile( thing->pos.x, thing->pos.y, thing->pos.z );
+			if(!fromTile)
+				return;
+			
+			int osp = fromTile->getThingStackPos(thing);  
+			fromTile->removeThing(thing);
+			toTile->addThing(thing);
 			Position oldPos = thing->pos;
-	            
-			Creature *creature = dynamic_cast<Creature*>(thing); 
-			if(creature){
-				if (newPos.y < oldPos.y)
-					creature->direction = NORTH;
-				if (newPos.y > oldPos.y)
-					creature->direction = SOUTH;
-				if (newPos.x > oldPos.x && (std::abs(newPos.x - oldPos.x) >= std::abs(newPos.y - oldPos.y)) )
-					creature->direction = EAST;
-				if (newPos.x < oldPos.x && (std::abs(newPos.x - oldPos.x) >= std::abs(newPos.y - oldPos.y)))
-					creature->direction = WEST;
-
-				Player *player = dynamic_cast<Player*>(creature);
-				if(player && player->attackedCreature != 0)  {
-					Creature* attackedCreature = getCreatureByID(player->attackedCreature);
-					if(attackedCreature){      
-						if((std::abs(newPos.x - attackedCreature->pos.x) > 8) ||
-						(std::abs(newPos.y - attackedCreature->pos.y) > 5) || (newPos.z != attackedCreature->pos.z)){                      
-							player->sendTextMessage(MSG_SMALLINFO, "Target lost.");
-							playerSetAttackedCreature(player, 0);
-						}
+			
+			std::vector<Creature*> list;
+			getSpectators(Range(thing->pos, true), list);
+			for(size_t i = 0; i < list.size(); ++i) {
+				list[i]->onCreatureDisappear(creature, osp, true);
+			}
+			
+			if(newPos.y < oldPos.y)
+				creature->direction = NORTH;
+			if(newPos.y > oldPos.y)
+				creature->direction = SOUTH;
+			if(newPos.x > oldPos.x && (std::abs(newPos.x - oldPos.x) >= std::abs(newPos.y - oldPos.y)) )
+				creature->direction = EAST;
+			if(newPos.x < oldPos.x && (std::abs(newPos.x - oldPos.x) >= std::abs(newPos.y - oldPos.y)))
+				creature->direction = WEST;
+			
+			Player *player = dynamic_cast<Player*>(creature);
+			if(player && player->attackedCreature != 0){
+				Creature* attackedCreature = getCreatureByID(player->attackedCreature);
+				if(attackedCreature){
+					if((std::abs(newPos.x - attackedCreature->pos.x) > 8) ||
+					(std::abs(newPos.y - attackedCreature->pos.y) > 5) || (newPos.z != attackedCreature->pos.z)){
+						player->sendTextMessage(MSG_SMALLINFO, "Target lost.");
+						playerSetAttackedCreature(player, 0);
 					}
 				}
 			}
 			
-			std::vector<Creature*> list;
-			getSpectators(Range(oldPos, true), list);
-			for(size_t i = 0; i < list.size(); ++i) {
-				if(creature)
-					list[i]->onCreatureDisappear(creature, osp, true);
-				else
-					creatureBroadcastTileUpdated(oldPos);
-				//list[i]->onTileUpdated(oldPos);
-			}
-
 			thing->pos = newPos;
-
 			list.clear();
 			getSpectators(Range(thing->pos, true), list);
-			for(size_t i = 0; i < list.size(); ++i)
-			{
-				creature = dynamic_cast<Creature*>(thing);
-				if(creature)
-					list[i]->onTeleport(creature, &oldPos, osp);
-				else
-					creatureBroadcastTileUpdated(newPos);
+			for(size_t i = 0; i < list.size(); ++i){
+				list[i]->onTeleport(creature, &oldPos, osp);
 			}
 		}
-	}
+		else{
+			removeThing(NULL, thing->pos, thing, false);
+			addThing(NULL,newPos,thing);
+		}
+	}//if(toTile)
 
-	//OTSYS_THREAD_UNLOCK(gameLock)
 }
 
 
@@ -4167,7 +4162,7 @@ void Game::addThing(Player* player,const Position &pos,Thing* thing)
 	}		
 }
 
-void Game::removeThing(Player* player,const Position &pos,Thing* thing)
+void Game::removeThing(Player* player,const Position &pos,Thing* thing,  bool setRemoved /*= true*/)
 {
 	if(!thing)
 		return;
@@ -4190,7 +4185,8 @@ void Game::removeThing(Player* player,const Position &pos,Thing* thing)
 			sendRemoveThing(player,pos,thing,0,true);
 			//player->removeItemInventory(pos.y,true);	
 		}
-		item->isRemoved = true;
+		if(setRemoved)
+			item->isRemoved = true;
 	}
 	else //ground
 	{		
@@ -4200,7 +4196,7 @@ void Game::removeThing(Player* player,const Position &pos,Thing* thing)
 			tile->removeThing(thing);
 			sendRemoveThing(NULL,pos,thing,stackpos,true);
 		}
-		if(item){
+		if(item && setRemoved){
 			item->isRemoved = true;
 		}
 	}
