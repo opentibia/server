@@ -2353,7 +2353,7 @@ void Protocol74::sendThingAppear(const Thing *thing){
    		AddTextMessage(msg,MSG_EVENT, g_config.getGlobalString("loginmsg", "Welcome.").c_str());
    		std::string tempstring;
    		tempstring = "Your last visit was on ";
-   		time_t lastlogin = player->getLastLogin();
+   		time_t lastlogin = player->getLastLoginSaved();
    		tempstring += ctime(&lastlogin);
    		tempstring.erase(tempstring.length() -1);
    		tempstring += ".";

@@ -63,6 +63,7 @@ Player::Player(const char *name, Protocol *p) :
 
   access     = 0;
   lastlogin  = 0;
+  lastLoginSaved = 0;
   SendBuffer = false;
   npings = 0;
   internal_ping = 0;

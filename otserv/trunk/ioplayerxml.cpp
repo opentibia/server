@@ -85,10 +85,10 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name){
 		player->setNormalSpeed();
 		
 		if(xmlGetProp(root, (const xmlChar *) "lastlogin")){
-			player->lastlogin = atoi((const char*)xmlGetProp(root, (const xmlChar *) "lastlogin"));
+			player->lastLoginSaved = atoi((const char*)xmlGetProp(root, (const xmlChar *) "lastlogin"));
 		}
 		else{
-			player->lastlogin = 0;
+			player->lastLoginSaved = 0;
 		}
 		
 		//level percent

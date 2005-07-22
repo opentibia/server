@@ -161,7 +161,7 @@ public:
 			return 0.00;
 	}
 	
-	time_t getLastLogin() const { return lastlogin; };
+	time_t getLastLoginSaved() const { return lastLoginSaved; };
 	
 	void updateInventoryWeigth();
 
@@ -334,6 +334,7 @@ protected:
   int accountNumber;
   std::string password;
   time_t lastlogin;
+  time_t lastLoginSaved;
 
   //inventory variables
 	Item* items[11]; //equipement of the player
