@@ -742,7 +742,7 @@ bool Player::addItem(Item *item, bool test /*=false*/){
 				//add the item
 				container->addItem(item);
 
-				NeedUpdateStats();
+				updateInventoryWeigth();
 				client->sendStats();
 
 				//update container
