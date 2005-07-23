@@ -9,7 +9,7 @@
 <action itemid="430" script="teleport.lua" />
 
 <action itemid="2070" script="music.lua" />
-<action itemid="2580" script="fishing.lua" />
+<action itemid="2580" script="fishing.lua" allowfaruse="1" />
 
 <action itemid="1947" script="rwitems.lua" />
 <action itemid="1954" script="rwitems.lua" />

@@ -1175,7 +1175,7 @@ void Game::thingMoveInternal(Player *player,
 	if(!fromInventory && fromContainer && toContainer) {
 		if(onPrepareMoveThing(player, fromItem, fromContainer, toContainer, toItem)) {
 
-			//double oldToWeigth = toContainer->getWeight();
+			autoCloseTrade(fromItem);
 			int oldFromCount = fromItem->getItemCountOrSubtype();
 			int oldToCount = 0;
 
@@ -1187,6 +1187,10 @@ void Game::thingMoveInternal(Player *player,
 					int newToCount = std::min(100, oldToCount + count);
 					toItem->setItemCountOrSubtype(newToCount);
 
+					if(oldToCount != newToCount) {
+						autoCloseTrade(toItem);
+					}
+
 					int subcount = oldFromCount - count;
 					fromItem->setItemCountOrSubtype(subcount);
 
@@ -1194,6 +1198,7 @@ void Game::thingMoveInternal(Player *player,
 					if(surplusCount > 0) {
 						Item *surplusItem = Item::CreateItem(fromItem->getID(), surplusCount);
 						if(onPrepareMoveThing(player, surplusItem, fromContainer, toContainer, NULL)) {
+							autoCloseTrade(toContainer);
 							toContainer->addItem(surplusItem);
 						}
 						else {
@@ -1207,13 +1212,16 @@ void Game::thingMoveInternal(Player *player,
 					int subcount = oldFromCount - count;
 					fromItem->setItemCountOrSubtype(subcount);
 	
-					toContainer->addItem(Item::CreateItem(fromItem->getID(), count));
+					Item* moveItem = Item::CreateItem(fromItem->getID(), count);
+					toContainer->addItem(moveItem);
+					autoCloseTrade(toContainer);
 				}
 				else {
 					if(fromContainer == toContainer) {
 						fromContainer->moveItem(from_slotid, 0);
 					}
 					else if(fromContainer->removeItem(fromItem)) {
+						autoCloseTrade(toContainer);
 						toContainer->addItem(fromItem);
 					}
 				}
@@ -1228,6 +1236,7 @@ void Game::thingMoveInternal(Player *player,
 					fromContainer->moveItem(from_slotid, 0);
 				}
 				else if(fromContainer->removeItem(fromItem)) {
+					autoCloseTrade(toContainer);
 					toContainer->addItem(fromItem);
 				}
 			}
@@ -1262,6 +1271,7 @@ void Game::thingMoveInternal(Player *player,
 		if(fromInventory && toInventory && !toContainer) {
 			if(onPrepareMoveThing(player, fromItem, (slots_t)to_cid) && onPrepareMoveThing(player, (slots_t)from_cid, fromItem, (slots_t)to_cid, toItem)) {
 
+				autoCloseTrade(fromItem);
 				int oldFromCount = fromItem->getItemCountOrSubtype();
 				int oldToCount = 0;
 
@@ -1269,9 +1279,12 @@ void Game::thingMoveInternal(Player *player,
 					if(toItem && toItem != fromItem && toItem->getID() == fromItem->getID())
 					{
 						oldToCount = toItem->getItemCountOrSubtype();
-
 						int newToCount = std::min(100, oldToCount + count);
 						toItem->setItemCountOrSubtype(newToCount);
+
+						if(oldToCount != newToCount) {
+							autoCloseTrade(toItem);
+						}
 
 						int subcount = oldFromCount - count;
 						fromItem->setItemCountOrSubtype(subcount);
@@ -1291,6 +1304,7 @@ void Game::thingMoveInternal(Player *player,
 						int subcount = oldFromCount - count;
 						fromItem->setItemCountOrSubtype(subcount);
 		
+						autoCloseTrade(toItem);
 						player->removeItemInventory(to_cid, true);
 						player->addItemInventory(Item::CreateItem(fromItem->getID(), count), to_cid, true);
 
@@ -1317,18 +1331,20 @@ void Game::thingMoveInternal(Player *player,
 		//container to inventory
 		else if(!fromInventory && fromContainer && toInventory) {
 			if(onPrepareMoveThing(player, fromItem, (slots_t)to_cid) && onPrepareMoveThing(player, fromContainer, fromItem, (slots_t)to_cid, toItem)) {
-				double oldToWeigth = 0;
+				autoCloseTrade(fromItem);
 				int oldFromCount = fromItem->getItemCountOrSubtype();
 				int oldToCount = 0;
 
 				if(fromItem->isStackable()) {
 					if(toItem && toItem != fromItem && toItem->getID() == fromItem->getID())
 					{
-						oldToWeigth = toItem->getWeight();
 						oldToCount = toItem->getItemCountOrSubtype();
-
 						int newToCount = std::min(100, oldToCount + count);
 						toItem->setItemCountOrSubtype(newToCount);
+
+						if(oldToCount != newToCount) {
+							autoCloseTrade(toItem);
+						}
 
 						int subcount = oldFromCount - count;
 						fromItem->setItemCountOrSubtype(subcount);
@@ -1402,14 +1418,17 @@ void Game::thingMoveInternal(Player *player,
 			int oldToCount = 0;
 
 			if(onPrepareMoveThing(player, fromItem, (slots_t)from_cid, toContainer, toItem)) {
-			//if(onPrepareMoveThing(player, fromItem, NULL, toContainer, toItem)) {
+				autoCloseTrade(fromItem);
 				if(fromItem->isStackable()) {
 					if(toItem && toItem != fromItem && toItem->getID() == fromItem->getID())
 					{
 						oldToCount = toItem->getItemCountOrSubtype();
-
 						int newToCount = std::min(100, oldToCount + count);
 						toItem->setItemCountOrSubtype(newToCount);
+
+						if(oldToCount != newToCount) {
+							autoCloseTrade(toItem);
+						}
 
 						int subcount = oldFromCount - count;
 						fromItem->setItemCountOrSubtype(subcount);
@@ -1419,6 +1438,7 @@ void Game::thingMoveInternal(Player *player,
 							Item *surplusItem = Item::CreateItem(fromItem->getID(), surplusCount);
 
 							if(onPrepareMoveThing(player, surplusItem, NULL, toContainer, NULL)) {
+								autoCloseTrade(toContainer);
 								toContainer->addItem(surplusItem);
 							}
 							else {
@@ -1431,11 +1451,12 @@ void Game::thingMoveInternal(Player *player,
 					else if(count < oldFromCount) {
 						int subcount = oldFromCount - count;
 						fromItem->setItemCountOrSubtype(subcount);
-		
+						autoCloseTrade(toContainer);
 						toContainer->addItem(Item::CreateItem(fromItem->getID(), count));
 					}
 					else {
 						if(player->removeItemInventory((slots_t)from_cid, true)) {
+							autoCloseTrade(toContainer);
 							toContainer->addItem(fromItem);
 						}
 					}
@@ -1446,6 +1467,7 @@ void Game::thingMoveInternal(Player *player,
 					}
 				}
 				else if(player->removeItemInventory(from_cid, true)) {
+					autoCloseTrade(toContainer);
 					toContainer->addItem(fromItem);
 				}
 
@@ -1492,6 +1514,7 @@ void Game::thingMoveInternal(Player *player,
 			return;
 
 		if(onPrepareMoveThing(player, fromItem, fromPos, toPos) && onPrepareMoveThing(player, fromItem, NULL, toTile)) {
+			autoCloseTrade(fromItem);
 			int oldFromCount = fromItem->getItemCountOrSubtype();
 			int oldToCount = 0;
 
@@ -1500,9 +1523,12 @@ void Game::thingMoveInternal(Player *player,
 				if(toItem && toItem->getID() == fromItem->getID())
 				{
 					oldToCount = toItem->getItemCountOrSubtype();
-
 					int newToCount = std::min(100, oldToCount + count);
 					toItem->setItemCountOrSubtype(newToCount);
+
+					if(oldToCount != newToCount) {
+						autoCloseTrade(toItem);
+					}
 
 					int subcount = oldFromCount - count;
 					fromItem->setItemCountOrSubtype(subcount);
@@ -1570,6 +1596,7 @@ void Game::thingMoveInternal(Player *player,
 			return;
 		
 		if(onPrepareMoveThing(player, fromItem, player->pos, toPos) && onPrepareMoveThing(player, fromItem, NULL, toTile)) {
+			autoCloseTrade(fromItem);
 			Item *toItem = dynamic_cast<Item*>(toTile->getThingByStackPos(toTile->getThingCount() - 1));
 			int oldFromCount = fromItem->getItemCountOrSubtype();
 			int oldToCount = 0;
@@ -1579,9 +1606,12 @@ void Game::thingMoveInternal(Player *player,
 				if(toItem && toItem->getID() == fromItem->getID())
 				{
 					oldToCount = toItem->getItemCountOrSubtype();
-
 					int newToCount = std::min(100, oldToCount + count);
 					toItem->setItemCountOrSubtype(newToCount);
+
+					if(oldToCount != newToCount) {
+						autoCloseTrade(toItem);
+					}
 
 					int subcount = oldFromCount - count;
 					fromItem->setItemCountOrSubtype(subcount);
@@ -1685,6 +1715,7 @@ void Game::thingMoveInternal(Player *player, const Position& fromPos, unsigned c
 		if(onPrepareMoveThing(player, fromItem, fromPos, player->pos) &&
 				onPrepareMoveThing(player, fromItem, NULL, toContainer, toItem))
 		{
+			autoCloseTrade(fromItem);
 			int oldFromCount = fromItem->getItemCountOrSubtype();
 			int oldToCount = 0;
 			int stackpos = fromTile->getThingStackPos(fromItem);
@@ -1692,9 +1723,12 @@ void Game::thingMoveInternal(Player *player, const Position& fromPos, unsigned c
 			if(fromItem->isStackable()) {
 				if(toItem && toItem->getID() == fromItem->getID()) {
 					oldToCount = toItem->getItemCountOrSubtype();
-
 					int newToCount = std::min(100, oldToCount + count);
 					toItem->setItemCountOrSubtype(newToCount);
+
+					if(oldToCount != newToCount) {
+						autoCloseTrade(toItem);
+					}
 
 					int subcount = oldFromCount - count;
 					fromItem->setItemCountOrSubtype(subcount);
@@ -1704,6 +1738,7 @@ void Game::thingMoveInternal(Player *player, const Position& fromPos, unsigned c
 						Item *surplusItem = Item::CreateItem(fromItem->getID(), surplusCount);
 
 						if(onPrepareMoveThing(player, surplusItem, NULL, toContainer, NULL)) {
+							autoCloseTrade(toContainer);
 							toContainer->addItem(surplusItem);
 						}
 						else {
@@ -1722,6 +1757,7 @@ void Game::thingMoveInternal(Player *player, const Position& fromPos, unsigned c
 					int subcount = oldFromCount - count;
 					fromItem->setItemCountOrSubtype(subcount);
 
+					autoCloseTrade(toContainer);
 					toContainer->addItem(Item::CreateItem(fromItem->getID(), count));
 
 					if(fromItem->getItemCountOrSubtype() == 0) {
@@ -1730,11 +1766,13 @@ void Game::thingMoveInternal(Player *player, const Position& fromPos, unsigned c
 					}
 				}
 				else if(fromTile->removeThing(fromItem)) {
+					autoCloseTrade(toContainer);
 					toContainer->addItem(fromItem);
 				}
 			}
 			else {
 				if(fromTile->removeThing(fromItem)) {
+					autoCloseTrade(toContainer);
 					toContainer->addItem(fromItem);
 				}
 			}
@@ -1753,6 +1791,7 @@ void Game::thingMoveInternal(Player *player, const Position& fromPos, unsigned c
 	//ground to inventory
 	else if(toInventory) {
 		if(onPrepareMoveThing(player, fromPos, fromItem, (slots_t)to_cid) && onPrepareMoveThing(player, fromItem, (slots_t)to_cid)) {
+			autoCloseTrade(fromItem);
 			int oldFromCount = fromItem->getItemCountOrSubtype();
 			int oldToCount = 0;
 			int stackpos = fromTile->getThingStackPos(fromItem);
@@ -1760,9 +1799,12 @@ void Game::thingMoveInternal(Player *player, const Position& fromPos, unsigned c
 			if(fromItem->isStackable()) {
 				if(toItem && toItem->getID() == fromItem->getID()) {
 					oldToCount = toItem->getItemCountOrSubtype();
-
 					int newToCount = std::min(100, oldToCount + count);
 					toItem->setItemCountOrSubtype(newToCount);
+
+					if(oldToCount != newToCount) {
+						autoCloseTrade(toItem);
+					}
 
 					int subcount = oldFromCount - count;
 					fromItem->setItemCountOrSubtype(subcount);
@@ -1786,6 +1828,7 @@ void Game::thingMoveInternal(Player *player, const Position& fromPos, unsigned c
 					player->addItemInventory(Item::CreateItem(fromItem->getID(), count), to_cid, true);
 
 					if(toItem) {
+						autoCloseTrade(toItem);
 						fromTile->addThing(toItem);
 						toItem->pos = fromPos;
 					}
@@ -1801,6 +1844,7 @@ void Game::thingMoveInternal(Player *player, const Position& fromPos, unsigned c
 						player->addItemInventory(fromItem, to_cid, true);
 
 						if(toItem) {
+							autoCloseTrade(toItem);
 							fromTile->addThing(toItem);
 							toItem->pos = fromPos;
 						}
@@ -1813,6 +1857,7 @@ void Game::thingMoveInternal(Player *player, const Position& fromPos, unsigned c
 					player->addItemInventory(fromItem, to_cid, true);
 
 					if(toItem) {
+						autoCloseTrade(toItem);
 						fromTile->addThing(toItem);
 						toItem->pos = fromPos;
 					}
@@ -1958,22 +2003,30 @@ void Game::thingMoveInternal(Creature *creature, unsigned short from_x, unsigned
 				thing->pos.y = to_y;
 				thing->pos.z = to_z;
 				
-				if (playerMoving && playerMoving->attackedCreature != 0) {
-					Creature* attackedCreature = getCreatureByID(creatureMoving->attackedCreature);
-					if(attackedCreature){      
-						if((std::abs(creatureMoving->pos.x - attackedCreature->pos.x) > 8) ||
-						(std::abs(creatureMoving->pos.y - attackedCreature->pos.y) > 5) || (creatureMoving->pos.z != attackedCreature->pos.z)){                      
-							player->sendTextMessage(MSG_SMALLINFO, "Target lost.");
-							playerSetAttackedCreature(playerMoving, 0);
+				if (playerMoving) {
+					if(playerMoving->attackedCreature != 0) {
+						Creature* attackedCreature = getCreatureByID(creatureMoving->attackedCreature);
+						if(attackedCreature){      
+							if((std::abs(creatureMoving->pos.x - attackedCreature->pos.x) > 8) ||
+							(std::abs(creatureMoving->pos.y - attackedCreature->pos.y) > 5) || (creatureMoving->pos.z != attackedCreature->pos.z)){
+								player->sendTextMessage(MSG_SMALLINFO, "Target lost.");
+								playerSetAttackedCreature(playerMoving, 0);
+							}
+						}
+					}
+					else if(playerMoving->tradePartner != 0) {
+						Creature* tradePartner = getCreatureByID(playerMoving->tradePartner);
+						if(tradePartner) {
+							if((std::abs(playerMoving->pos.x - tradePartner->pos.x) > 2) ||
+							(std::abs(playerMoving->pos.y - tradePartner->pos.y) > 2) || (playerMoving->pos.z != tradePartner->pos.z)){
+								playerCloseTrade(playerMoving);
+							}
 						}
 					}
 				}
 
+				autoCloseTrade(item);
 				std::vector<Creature*> list;
-				/*
-				getSpectators(Range(min(oldPos.x, (int)to_x) - 9, max(oldPos.x, (int)to_x) + 9,
-														min(oldPos.y, (int)to_y) - 7, max(oldPos.y, (int)to_y) + 7, oldPos.z, true), list);
-				*/
 				getSpectators(Range(oldPos, Position(to_x, to_y, to_z)), list);
 				
 				for(unsigned int i = 0; i < list.size(); ++i)
@@ -2891,8 +2944,10 @@ void Game::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fi
 		//spectator->sendNetworkMessage(&msg);
 	}
 
-	if(damagetype != FIGHT_MELEE)
+	if(damagetype != FIGHT_MELEE) {
+		//
 		creature->RemoveDistItem();
+	}
 		
 	//OTSYS_THREAD_UNLOCK(gameLock)
 }
@@ -3535,7 +3590,7 @@ bool Game::playerUseItemEx(Player *player, const Position& posFrom,const unsigne
 					bool success = sit->second->getSpellScript()->castSpell(player, posTo, var);
 					ret = success;
 					if(success) {
-						autoCloseTrade(item, thingpos);
+						autoCloseTrade(item);
 						item->setItemCharge(std::max((int)item->getItemCharge() - 1, 0) );
 						if(item->getItemCharge() == 0) {
 							removeThing(player,posFrom,item);
@@ -3612,7 +3667,8 @@ void Game::playerRequestTrade(Player *player, const Position& pos,
 
 	player->tradePartner = playerid;
 	player->tradeItem = tradeItem;
-	tradeItems.insert(tradeItems.begin(), tradeItem);
+	//tradeItems.insert(tradeItems.begin(), tradeItem);
+	tradeItems[tradeItem] = player->getID();
 
 	player->sendTradeItemRequest(player, tradeItem, true);
 
@@ -3638,7 +3694,7 @@ void Game::playerAcceptTrade(Player* player)
 		Item *tradeItem1 = player->tradeItem;
 		Item *tradeItem2 = tradePartner->tradeItem;
 
-		std::set<Item*>::iterator it;
+		std::map<Item*, unsigned long>::iterator it;
 
 		it = tradeItems.find(tradeItem1);
 		if(it != tradeItems.end()) {
@@ -3750,7 +3806,7 @@ void Game::playerCloseTrade(Player* player)
 
 	std::vector<Item*>::iterator it;
 	if(player->getTradeItem()) {
-		std::set<Item*>::iterator it = tradeItems.find(player->getTradeItem());
+		std::map<Item*, unsigned long>::iterator it = tradeItems.find(player->getTradeItem());
 		if(it != tradeItems.end()) {
 			tradeItems.erase(it);
 		}
@@ -3762,7 +3818,7 @@ void Game::playerCloseTrade(Player* player)
 
 	if(tradePartner) {
 		if(tradePartner->getTradeItem()) {
-			std::set<Item*>::iterator it = tradeItems.find(tradePartner->getTradeItem());
+			std::map<Item*, unsigned long>::iterator it = tradeItems.find(tradePartner->getTradeItem());
 			if(it != tradeItems.end()) {
 				tradeItems.erase(it);
 			}
@@ -3774,12 +3830,25 @@ void Game::playerCloseTrade(Player* player)
 	}
 }
 
-void Game::autoCloseTrade(Item* item, Position &pos){
-	std::set<Item*>::iterator it;
-	for(it = tradeItems.begin(); it != tradeItems.end(); it++){
-		if(item == *it || (dynamic_cast<Container*>(*it) && 
-		  dynamic_cast<Container*>(*it)->isHoldingItem(item)))
+void Game::autoCloseTrade(const Item* item){
+	if(!item)
+		return;
+
+	std::map<Item*, unsigned long>::const_iterator it;
+	const Container* container = NULL;
+	for(it = tradeItems.begin(); it != tradeItems.end(); it++) {
+		if(item == it->first || 
+			/*((container =dynamic_cast<const Container*>(item)) && container->isHoldingItem(it->first)) ||*/ 
+			((container =dynamic_cast<const Container*>(it->first)) && container->isHoldingItem(item)))
 		{
+			Player* player = dynamic_cast<Player*>(getCreatureByID(it->second));
+			if(player) {
+				playerCloseTrade(player);
+			}
+
+			break;
+
+			/*
 			//TODO change the way to get trade player
 			std::vector<Creature*> list;
 			getSpectators(Range(pos), list);
@@ -3792,11 +3861,10 @@ void Game::autoCloseTrade(Item* item, Position &pos){
 				}
 			}
 			break;
+			*/
 		}
 	}
 }
-
-
 
 void Game::playerSetAttackedCreature(Player* player, unsigned long creatureid)
 {

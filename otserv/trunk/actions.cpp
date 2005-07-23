@@ -205,7 +205,7 @@ bool Actions::UseItem(Player* player, const Position &pos,const unsigned char st
 	//if found execute it
 	if(action){
 		Position itempos = game->getThingMapPos(player, pos);
-		game->autoCloseTrade(item,itempos);
+		game->autoCloseTrade(item);
 		PositionEx posEx(pos,stack);
 		if(action->executeUse(player,item,posEx,posEx)){
 			return true;
@@ -274,7 +274,7 @@ bool Actions::UseItemEx(Player* player, const Position &from_pos,
 			}
 		}
 		Position itempos = game->getThingMapPos(player, from_pos);
-		game->autoCloseTrade(item,itempos);
+		game->autoCloseTrade(item);
 		PositionEx posFromEx(from_pos,from_stack);
 		PositionEx posToEx(to_pos,to_stack);
     	if(action->executeUse(player,item,posFromEx,posToEx))

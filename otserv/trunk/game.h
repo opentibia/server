@@ -236,7 +236,7 @@ public:
 	void playerAcceptTrade(Player* player);
 	void playerLookInTrade(Player* player, bool lookAtCounterOffer, int index);
 	void playerCloseTrade(Player* player);
-	void autoCloseTrade(Item* item, Position &pos);
+	void autoCloseTrade(const Item* item);
 	
 	void playerSetAttackedCreature(Player* player, unsigned long creatureid);
 
@@ -278,7 +278,8 @@ public:
   
 
 protected:
-	std::set<Item*> tradeItems; //list of items that are in trading state
+	std::map<Item*, unsigned long> tradeItems; //list of items that are in trading state, mapped to the player
+	//std::set<Item*> tradeItems; //list of items that are in trading state
 	
 	AutoList<Creature> listCreature;
 
