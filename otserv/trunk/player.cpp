@@ -1136,10 +1136,11 @@ Container* Player::getContainer(unsigned char containerid)
 
 bool Player::isHoldingContainer(const Container* container) const
 {
-	const Container* topContainer = container;
+	/*const Container* topContainer = container;
 	while(topContainer->getParent() != NULL) {
 		topContainer = topContainer->getParent();
-	}
+	}*/
+	const Container* topContainer = container->getTopParent();
 
 	//find a free slot in container
 	for(int i=0; i< 11; i++){
@@ -1218,7 +1219,7 @@ void Player::dropLoot(Container *corpse)
 			corpse->addItem(item);
 			items[slot] = NULL;
 		}
-	}	
+	}
 }
 
 fight_t Player::getFightType()
@@ -1256,6 +1257,9 @@ void Player::RemoveDistItem(){
 	if(DistItem){
 		if(DistItem->isStackable() == false)
 			return;
+		if(DistItem == getTradeItem())
+			g_game.playerCloseTrade(this);
+			
 		//remove one dist item
 		unsigned char n = DistItem->getItemCountOrSubtype();
 		if(DistItem == items[SLOT_RIGHT]){
@@ -1822,9 +1826,9 @@ void Player::preSave()
 			else
 				break;
 			
-			/* This checks (but not the downgrade sentences) aren't really necesary cause if the
-			player has a "normal" hp,mana,etc when he gets level 1 he will not lose more
-			hp,mana,etc... but here they are :P */
+			// This checks (but not the downgrade sentences) aren't really necesary cause if the
+			// player has a "normal" hp,mana,etc when he gets level 1 he will not lose more
+			// hp,mana,etc... but here they are :P 
 			if ((healthmax -= HPGain[(int)vocation]) < 0) //This could be avoided with a proper use of unsigend int
 				healthmax = 0;
 			
