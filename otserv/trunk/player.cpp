@@ -905,7 +905,8 @@ bool Player::internalRemoveItemContainer(Container *parent, Item* item, bool tes
 			}
 		}
 		else if(temp_container = dynamic_cast<Container*>(*cit)){
-			return internalRemoveItemContainer(temp_container, item);
+			if(internalRemoveItemContainer(temp_container, item, test))
+				return true;
 		}
 	}
 	return false;

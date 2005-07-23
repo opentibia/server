@@ -78,8 +78,8 @@ enum SpeakClasses {
 	SPEAK_CHANNEL?? 	= 0x08,*/
 	SPEAK_BROADCAST	= 0x09,
 	SPEAK_CHANNEL_Y	= 0x05,	//yellow
-	SPEAK_CHANNEL_R1= 0x0A,	//red
-	SPEAK_CHANNEL_R2= 0x0E,	//red
+	SPEAK_CHANNEL_R1= 0x0A,	//red - #c text -- gamemaster command
+	SPEAK_CHANNEL_R2= 0x0E,	//red - #d text -- counsellor command(?)
 	SPEAK_CHANNEL_O	= 0x0C,	//orange
 			
 	SPEAK_MONSTER1 	= 0x10,

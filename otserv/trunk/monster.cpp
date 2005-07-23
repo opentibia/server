@@ -652,8 +652,17 @@ void Monster::calcMovePosition()
 
 				if(dist < prevdist || (prevdist == 0)) {
 					Tile *t;
+					if((!(t = game->map->getTile(x, y, pos.z))) ||
+							t->isBlocking() ||
+							t->isPz() || 
+							t->creatures.size() ||
+							t->floorChange() ||
+							t->getTeleportItem())
+						continue;
+					/*
 					if((!(t = game->map->getTile(x, y, pos.z))) || t->isBlocking() || t->isPz() || t->creatures.size())
 						continue;
+					*/
 					
 					prevdist = dist;
 					moveToPos.x = x;

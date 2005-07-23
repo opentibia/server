@@ -2955,7 +2955,7 @@ void Game::checkPlayerWalk(unsigned long id)
 	flushSendBuffers();
 
 	if(!player->pathlist.empty()) {
-		int ticks = std::max(50, (int)player->getSleepTicks());
+		int ticks = (int)player->getSleepTicks();
 /*
 #ifdef __DEBUG__
 		std::cout << "checkPlayerWalk - " << ticks << std::endl;
@@ -3502,7 +3502,7 @@ void Game::playerAutoWalk(Player* player, std::list<Direction>& path)
   // the interval seems to depend on the speed of the char?
 	//player->eventAutoWalk = addEvent(makeTask<Direction>(0, MovePlayer(player->getID()), path, 400, StopMovePlayer(player->getID())));
 	player->pathlist = path;
-	int ticks = std::max(50, (int)player->getSleepTicks());
+	int ticks = (int)player->getSleepTicks();
 #ifdef __DEBUG__
 		std::cout << "playerAutoWalk - " << ticks << std::endl;
 #endif
@@ -3777,7 +3777,8 @@ void Game::autoCloseTrade(Item* item, Position &pos){
 	std::set<Item*>::iterator it;
 	for(it = tradeItems.begin(); it != tradeItems.end(); it++){
 		if(item == *it || (dynamic_cast<Container*>(*it) && 
-		  dynamic_cast<Container*>(*it)->isHoldingItem(item))){
+		  dynamic_cast<Container*>(*it)->isHoldingItem(item)))
+		{
 			//TODO change the way to get trade player
 			std::vector<Creature*> list;
 			getSpectators(Range(pos), list);
@@ -3789,6 +3790,7 @@ void Game::autoCloseTrade(Item* item, Position &pos){
 					break;
 				}
 			}
+			break;
 		}
 	}
 }

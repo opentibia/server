@@ -1456,7 +1456,7 @@ void Protocol74::sendThingMove(const Creature *creature, const Container *fromCo
 {
 	//Auto-close trade
 	if(player->getTradeItem()) {
-		if(player->getTradeItem() && (fromItem == player->getTradeItem() || toItem == player->getTradeItem())) {
+		if(fromItem == player->getTradeItem() || toItem == player->getTradeItem()) {
 			game->playerCloseTrade(player);
 		}
 		else {
