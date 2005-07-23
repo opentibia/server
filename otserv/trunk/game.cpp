@@ -3655,7 +3655,8 @@ void Game::playerAcceptTrade(Player* player)
 		player->sendCloseTrade();
 		tradePartner->sendCloseTrade();
 		
-		if(player->addItem(tradeItem2, true) && tradePartner->addItem(tradeItem1, true)){
+		if(player->addItem(tradeItem2, true) && tradePartner->addItem(tradeItem1, true) && 
+			player->removeItem(tradeItem1, true) && tradePartner->removeItem(tradeItem2, true)){
 			//this->removeThing(player, tradeItem1->pos, tradeItem1);
 			//this->removeThing(tradePartner, tradeItem2->pos, tradeItem2);
 			player->removeItem(tradeItem1);
