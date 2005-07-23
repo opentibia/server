@@ -884,7 +884,7 @@ int SpellScript::luaActionMakeArrows(lua_State *L){
 
 		if(player->mana < spell->getMana()){
 			magicTarget.damageEffect = 2; //NM_ME_PUFF  
-  			magicTarget.manaCost = player->mana*5; //force not enough mana
+  			magicTarget.manaCost = spell->getMana()*5; //force not enough mana
 		}
 		else{			
 			magicTarget.manaCost = spell->getMana();
@@ -928,7 +928,7 @@ int SpellScript::luaActionMakeFood(lua_State *L){
 
 		if(player->mana < spell->getMana()){
   			magicTarget.damageEffect = 2; //NM_ME_PUFF  
-    		magicTarget.manaCost = player->mana*5; //force not enough mana
+    		magicTarget.manaCost = spell->getMana()*5; //force not enough mana
   		}
   		else{  
   			magicTarget.manaCost = spell->getMana();
