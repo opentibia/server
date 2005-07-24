@@ -126,7 +126,8 @@ public:
 
   virtual fight_t getFightType(){return FIGHT_MELEE;};
 	virtual subfight_t getSubFightType() {return DIST_NONE;}
-	virtual void RemoveDistItem(){return;}
+	virtual Item* getDistItem() {return NULL;};
+	virtual void removeDistItem(){return;}
 	virtual int getImmunities() const
 	{
 		if(access != 0) 

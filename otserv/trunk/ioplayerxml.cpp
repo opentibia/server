@@ -81,7 +81,9 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name){
 		player->vocation = (playervoc_t)atoi((const char*)xmlGetProp(root, (const xmlChar *) "voc"));
 		player->access=atoi((const char*)xmlGetProp(root, (const xmlChar *) "access"));
 		player->capacity = atoi((const char*)xmlGetProp(root, (const xmlChar *) "cap"));
-		player->max_depot_items = atoi((const char*)xmlGetProp(root, (const xmlChar *) "maxdepotitems"));
+		if(xmlGetProp(root, (const xmlChar *) "maxdepotitems")) {
+			player->max_depot_items = atoi((const char*)xmlGetProp(root, (const xmlChar *) "maxdepotitems"));
+		}
 		player->setNormalSpeed();
 		
 		if(xmlGetProp(root, (const xmlChar *) "lastlogin")){

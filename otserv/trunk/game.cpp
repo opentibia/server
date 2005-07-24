@@ -320,7 +320,6 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 					Player *gainExpPlayer = dynamic_cast<Player*>(gainExpCreature);
 
 					if(gainExpPlayer) {
-						//gainExpPlayer->experience += gainedExperience;
 						gainExpPlayer->addExp(gainedExperience);
 					}
 
@@ -805,7 +804,7 @@ void Game::thingMove(Player *player,
 
 /*ground -> ground*/
 bool Game::onPrepareMoveThing(Creature *player, const Thing* thing,
-	const Position& fromPos, const Position& toPos)
+	const Position& fromPos, const Position& toPos, int count)
 {
 	/*
 	if( (abs(fromPos.x - toPos.x) > 1) || (abs(fromPos.y - toPos.y) > 1) ) {
@@ -833,7 +832,7 @@ bool Game::onPrepareMoveThing(Creature *player, const Thing* thing,
 
 /*ground -> ground*/
 bool Game::onPrepareMoveThing(Creature *creature, const Thing* thing,
-	const Tile *fromTile, const Tile *toTile)
+	const Tile *fromTile, const Tile *toTile, int count)
 {
 	const Item *item = dynamic_cast<const Item*>(thing);
 	const Player* player = dynamic_cast<const Player*>(thing);
@@ -874,7 +873,7 @@ bool Game::onPrepareMoveThing(Creature *creature, const Thing* thing,
 
 /*inventory -> container*/
 bool Game::onPrepareMoveThing(Player *player, const Item* fromItem, slots_t fromSlot,
-	const Container *toContainer, const Item *toItem)
+	const Container *toContainer, const Item *toItem, int count)
 {
 	if(!fromItem->isPickupable()) {		
 		player->sendCancel("Sorry, not possible.");
@@ -908,7 +907,7 @@ bool Game::onPrepareMoveThing(Player *player, const Item* fromItem, slots_t from
 /*container -> container*/
 /*ground -> container*/
 bool Game::onPrepareMoveThing(Player *player, const Item* fromItem, const Container *fromContainer,
-	const Container *toContainer, const Item *toItem)
+	const Container *toContainer, const Item *toItem, int count)
 {	
 	if(!fromItem->isPickupable()) {		
 		player->sendCancel("Sorry, not possible.");
@@ -916,7 +915,7 @@ bool Game::onPrepareMoveThing(Player *player, const Item* fromItem, const Contai
 	}
 	else {
 		if((!fromContainer || !player->isHoldingContainer(fromContainer)) && player->isHoldingContainer(toContainer)) {
-			if(player->access == 0 && player->getFreeCapacity() < fromItem->getWeight()) {
+			if(player->access == 0 && player->getFreeCapacity() < Item::items[fromItem->getID()].weight * std::max(1, count)) {
 				player->sendCancel("This object is too heavy.");
 				return false;
 			}
@@ -989,7 +988,8 @@ bool Game::onPrepareMoveCreature(Creature *creature, const Creature* creatureMov
 }
 
 /*ground -> inventory*/
-bool Game::onPrepareMoveThing(Player *player, const Position& fromPos, const Item *item, slots_t toSlot)
+bool Game::onPrepareMoveThing(Player *player, const Position& fromPos, const Item *item,
+	slots_t toSlot, int count)
 {
 	if( (abs(player->pos.x - fromPos.x) > 1) || (abs(player->pos.y - fromPos.y) > 1) ) {
 		player->sendCancel("To far away...");
@@ -1000,7 +1000,7 @@ bool Game::onPrepareMoveThing(Player *player, const Position& fromPos, const Ite
 		return false;
 	}
 
-	if(player->access == 0 && player->getFreeCapacity() < item->getWeight()) {
+	if(player->access == 0 && player->getFreeCapacity() < Item::items[item->getID()].weight * std::max(1, count)) {
 		player->sendCancel("This object is too heavy.");
 		return false;
 	}
@@ -1010,7 +1010,7 @@ bool Game::onPrepareMoveThing(Player *player, const Position& fromPos, const Ite
 
 /*inventory -> inventory*/
 bool Game::onPrepareMoveThing(Player *player, slots_t fromSlot, const Item *fromItem,
-	slots_t toSlot, const Item *toItem)
+	slots_t toSlot, const Item *toItem, int count)
 {
 	if(toItem && (!toItem->isStackable() || toItem->getID() != fromItem->getID())) {
 		player->sendCancel("Sorry, not enough room.");
@@ -1022,9 +1022,10 @@ bool Game::onPrepareMoveThing(Player *player, slots_t fromSlot, const Item *from
 
 /*container -> inventory*/
 bool Game::onPrepareMoveThing(Player *player, const Container *fromContainer, const Item *fromItem,
-	slots_t toSlot, const Item *toItem)
+	slots_t toSlot, const Item *toItem, int count)
 {
-	if(player->access == 0 && !player->isHoldingContainer(fromContainer) && player->getFreeCapacity() < fromItem->getWeight()) {
+	if(player->access == 0 && !player->isHoldingContainer(fromContainer) &&
+		player->getFreeCapacity() < Item::items[fromItem->getID()].weight * std::max(1, count)) {
 		player->sendCancel("This object is too heavy.");
 		return false;
 	}
@@ -1038,7 +1039,8 @@ bool Game::onPrepareMoveThing(Player *player, const Container *fromContainer, co
 }
 
 /*->inventory*/
-bool Game::onPrepareMoveThing(Player *player, const Item *item, slots_t toSlot)
+bool Game::onPrepareMoveThing(Player *player, const Item *item,
+	slots_t toSlot, int count)
 {
 	switch(toSlot)
 	{
@@ -1173,7 +1175,7 @@ void Game::thingMoveInternal(Player *player,
 
 	//Container to container
 	if(!fromInventory && fromContainer && toContainer) {
-		if(onPrepareMoveThing(player, fromItem, fromContainer, toContainer, toItem)) {
+		if(onPrepareMoveThing(player, fromItem, fromContainer, toContainer, toItem, count)) {
 
 			autoCloseTrade(fromItem);
 			int oldFromCount = fromItem->getItemCountOrSubtype();
@@ -1197,7 +1199,7 @@ void Game::thingMoveInternal(Player *player,
 					int surplusCount = oldToCount + count  - 100;
 					if(surplusCount > 0) {
 						Item *surplusItem = Item::CreateItem(fromItem->getID(), surplusCount);
-						if(onPrepareMoveThing(player, surplusItem, fromContainer, toContainer, NULL)) {
+						if(onPrepareMoveThing(player, surplusItem, fromContainer, toContainer, NULL, count)) {
 							autoCloseTrade(toContainer);
 							toContainer->addItem(surplusItem);
 						}
@@ -1269,7 +1271,7 @@ void Game::thingMoveInternal(Player *player,
 	else {
 		//inventory to inventory
 		if(fromInventory && toInventory && !toContainer) {
-			if(onPrepareMoveThing(player, fromItem, (slots_t)to_cid) && onPrepareMoveThing(player, (slots_t)from_cid, fromItem, (slots_t)to_cid, toItem)) {
+			if(onPrepareMoveThing(player, fromItem, (slots_t)to_cid, count) && onPrepareMoveThing(player, (slots_t)from_cid, fromItem, (slots_t)to_cid, toItem, count)) {
 
 				autoCloseTrade(fromItem);
 				int oldFromCount = fromItem->getItemCountOrSubtype();
@@ -1330,7 +1332,7 @@ void Game::thingMoveInternal(Player *player,
 		}
 		//container to inventory
 		else if(!fromInventory && fromContainer && toInventory) {
-			if(onPrepareMoveThing(player, fromItem, (slots_t)to_cid) && onPrepareMoveThing(player, fromContainer, fromItem, (slots_t)to_cid, toItem)) {
+			if(onPrepareMoveThing(player, fromItem, (slots_t)to_cid, count) && onPrepareMoveThing(player, fromContainer, fromItem, (slots_t)to_cid, toItem, count)) {
 				autoCloseTrade(fromItem);
 				int oldFromCount = fromItem->getItemCountOrSubtype();
 				int oldToCount = 0;
@@ -1417,7 +1419,7 @@ void Game::thingMoveInternal(Player *player,
 			int oldFromCount = fromItem->getItemCountOrSubtype();
 			int oldToCount = 0;
 
-			if(onPrepareMoveThing(player, fromItem, (slots_t)from_cid, toContainer, toItem)) {
+			if(onPrepareMoveThing(player, fromItem, (slots_t)from_cid, toContainer, toItem, count)) {
 				autoCloseTrade(fromItem);
 				if(fromItem->isStackable()) {
 					if(toItem && toItem != fromItem && toItem->getID() == fromItem->getID())
@@ -1437,7 +1439,7 @@ void Game::thingMoveInternal(Player *player,
 						if(surplusCount > 0) {
 							Item *surplusItem = Item::CreateItem(fromItem->getID(), surplusCount);
 
-							if(onPrepareMoveThing(player, surplusItem, NULL, toContainer, NULL)) {
+							if(onPrepareMoveThing(player, surplusItem, NULL, toContainer, NULL, count)) {
 								autoCloseTrade(toContainer);
 								toContainer->addItem(surplusItem);
 							}
@@ -1513,7 +1515,7 @@ void Game::thingMoveInternal(Player *player,
 		if(!fromItem || (toItem == fromItem) || (fromItem->isStackable() && count > fromItem->getItemCountOrSubtype()))
 			return;
 
-		if(onPrepareMoveThing(player, fromItem, fromPos, toPos) && onPrepareMoveThing(player, fromItem, NULL, toTile)) {
+		if(onPrepareMoveThing(player, fromItem, fromPos, toPos, count) && onPrepareMoveThing(player, fromItem, NULL, toTile, count)) {
 			autoCloseTrade(fromItem);
 			int oldFromCount = fromItem->getItemCountOrSubtype();
 			int oldToCount = 0;
@@ -1595,7 +1597,7 @@ void Game::thingMoveInternal(Player *player,
 		if(!fromItem)
 			return;
 		
-		if(onPrepareMoveThing(player, fromItem, player->pos, toPos) && onPrepareMoveThing(player, fromItem, NULL, toTile)) {
+		if(onPrepareMoveThing(player, fromItem, player->pos, toPos, count) && onPrepareMoveThing(player, fromItem, NULL, toTile, count)) {
 			autoCloseTrade(fromItem);
 			Item *toItem = dynamic_cast<Item*>(toTile->getThingByStackPos(toTile->getThingCount() - 1));
 			int oldFromCount = fromItem->getItemCountOrSubtype();
@@ -1712,8 +1714,8 @@ void Game::thingMoveInternal(Player *player, const Position& fromPos, unsigned c
 
 	/*ground to container*/
 	if(toContainer) {
-		if(onPrepareMoveThing(player, fromItem, fromPos, player->pos) &&
-				onPrepareMoveThing(player, fromItem, NULL, toContainer, toItem))
+		if(onPrepareMoveThing(player, fromItem, fromPos, player->pos, count) &&
+				onPrepareMoveThing(player, fromItem, NULL, toContainer, toItem, count))
 		{
 			autoCloseTrade(fromItem);
 			int oldFromCount = fromItem->getItemCountOrSubtype();
@@ -1737,7 +1739,7 @@ void Game::thingMoveInternal(Player *player, const Position& fromPos, unsigned c
 					if(surplusCount > 0) {
 						Item *surplusItem = Item::CreateItem(fromItem->getID(), surplusCount);
 
-						if(onPrepareMoveThing(player, surplusItem, NULL, toContainer, NULL)) {
+						if(onPrepareMoveThing(player, surplusItem, NULL, toContainer, NULL, count)) {
 							autoCloseTrade(toContainer);
 							toContainer->addItem(surplusItem);
 						}
@@ -1790,7 +1792,7 @@ void Game::thingMoveInternal(Player *player, const Position& fromPos, unsigned c
 	}
 	//ground to inventory
 	else if(toInventory) {
-		if(onPrepareMoveThing(player, fromPos, fromItem, (slots_t)to_cid) && onPrepareMoveThing(player, fromItem, (slots_t)to_cid)) {
+		if(onPrepareMoveThing(player, fromPos, fromItem, (slots_t)to_cid, count) && onPrepareMoveThing(player, fromItem, (slots_t)to_cid, count)) {
 			autoCloseTrade(fromItem);
 			int oldFromCount = fromItem->getItemCountOrSubtype();
 			int oldToCount = 0;
@@ -1968,13 +1970,13 @@ void Game::thingMoveInternal(Creature *creature, unsigned short from_x, unsigned
 				return;
 			}
 
-			if(!onPrepareMoveThing(creature, thing, Position(from_x, from_y, from_z), Position(to_x, to_y, to_z)))
+			if(!onPrepareMoveThing(creature, thing, Position(from_x, from_y, from_z), Position(to_x, to_y, to_z), count))
 				return;
 			
 			if(creatureMoving && !onPrepareMoveCreature(creature, creatureMoving, fromTile, toTile))
 				return;
 			
-			if(!onPrepareMoveThing(creature, thing, fromTile, toTile))
+			if(!onPrepareMoveThing(creature, thing, fromTile, toTile, count))
 				return;
 
 			Teleport *teleportitem = toTile->getTeleportItem();
@@ -2769,23 +2771,6 @@ void Game::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fi
 
 	Tile* targettile = getTile(attackedCreature->pos.x, attackedCreature->pos.y, attackedCreature->pos.z);
 
-	/* moved to playerSetAttackedCreature()
-	if(attackedCreature->access != 0){
-		if(player){
-			//player->sendCancelAttacking();
-			playerSetAttackedCreature(player, 0);
-			player->sendTextMessage(MSG_SMALLINFO, "You may not attack this player.");
-		}
-	  return;
-	}
-	if(getWorldType() == WORLD_TYPE_NO_PVP && player && attackedPlayer && player->access == 0){
-		//player->sendCancelAttacking();
-		playerSetAttackedCreature(player, 0);
-		player->sendTextMessage(MSG_SMALLINFO, "You may not attack this player.");
-		return;
-	}
-	*/
-
 	//can the attacker reach the attacked?
 	bool inReach = false;
 
@@ -2944,9 +2929,8 @@ void Game::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fi
 		//spectator->sendNetworkMessage(&msg);
 	}
 
-	if(damagetype != FIGHT_MELEE) {
-		//
-		creature->RemoveDistItem();
+	if(damagetype != FIGHT_MELEE && player) {
+		player->removeDistItem();
 	}
 		
 	//OTSYS_THREAD_UNLOCK(gameLock)
@@ -4247,8 +4231,13 @@ void Game::removeThing(Player* player,const Position &pos,Thing* thing,  bool se
 			Container* container = player->getContainer(containerid);
 			if(!container)
 				return;
+
 			sendRemoveThing(player,pos,thing,0,true);
 			container->removeItem(item);
+			if(player && player->isHoldingContainer(container)) {
+				player->updateInventoryWeigth();
+				player->sendStats();
+			}
 		}
 		else //inventory
 		{

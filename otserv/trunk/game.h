@@ -138,8 +138,9 @@ public:
      b = map->mapheight;  
      return;
   }
-  	void setWorldType(enum_world_type type);
-  	enum_world_type getWorldType() const {return worldType;}
+  
+	void setWorldType(enum_world_type type);
+  enum_world_type getWorldType() const {return worldType;}
 	const std::string& getSpawnFile() {return map->spawnfile;}
 
 	/**
@@ -285,37 +286,38 @@ protected:
 
 	/*ground -> ground*/
 	bool onPrepareMoveThing(Creature *player, const Thing* thing,
-		const Position& fromPos, const Position& toPos);
+		const Position& fromPos, const Position& toPos, int count);
 
 	/*ground -> ground*/
 	bool onPrepareMoveThing(Creature *creature, const Thing* thing,
-		const Tile *fromTile, const Tile *toTile);
+		const Tile *fromTile, const Tile *toTile, int count);
 
 	/*inventory -> container*/
 	bool onPrepareMoveThing(Player *player, const Item* fromItem, slots_t fromSlot,
-		const Container *toContainer, const Item *toItem);
+		const Container *toContainer, const Item *toItem, int count);
 
 	/*container -> container*/
 	bool onPrepareMoveThing(Player *player, const Item* fromItem, const Container *fromContainer,
-		const Container *toContainer, const Item *toItem);
+		const Container *toContainer, const Item *toItem, int count);
 
 	/*ground -> ground*/
 	bool onPrepareMoveCreature(Creature *creature, const Creature* creatureMoving,
 		const Tile *fromTile, const Tile *toTile);
 
 	/*ground -> inventory*/
-	bool onPrepareMoveThing(Player *player, const Position& fromPos, const Item *item, slots_t toSlot);
+	bool onPrepareMoveThing(Player *player, const Position& fromPos, const Item *item,
+		slots_t toSlot, int count);
 
 	/*inventory -> inventory*/
 	bool onPrepareMoveThing(Player *player, slots_t fromSlot, const Item *fromItem,
-		slots_t toSlot, const Item *toItem);
+		slots_t toSlot, const Item *toItem, int count);
 
 	/*container -> inventory*/
 	bool onPrepareMoveThing(Player *player, const Container *fromContainer, const Item *fromItem,
-		slots_t toSlot, const Item *toItem);
+		slots_t toSlot, const Item *toItem, int count);
 
 	/*->inventory*/
-	bool onPrepareMoveThing(Player *player, const Item *item, slots_t toSlot);
+	bool onPrepareMoveThing(Player *player, const Item *item, slots_t toSlot, int count);
 
 	//container/inventory to container/inventory
 	void thingMoveInternal(Player *player,

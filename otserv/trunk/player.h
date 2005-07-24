@@ -132,6 +132,7 @@ public:
 	inline StorageMap::const_iterator getStorageIteratorBegin() const {return storageMap.begin();}
 	inline StorageMap::const_iterator getStorageIteratorEnd() const {return storageMap.end();}
 
+	int getLevel() const {return level;}
 	int getHealth() const {return health;}
 	int getMana() const {return mana;}
 	int getMagicLevel() const {return maglevel;}
@@ -202,7 +203,7 @@ public:
 	DepotMap depots;
 	long max_depot_items;
 
-	void RemoveDistItem();
+	virtual void removeDistItem();
   fight_t getFightType();
 	subfight_t getSubFightType();
 

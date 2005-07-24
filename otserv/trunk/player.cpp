@@ -1251,12 +1251,13 @@ fight_t Player::getFightType()
   return FIGHT_MELEE;
 }
 
-void Player::RemoveDistItem(){
+void Player::removeDistItem(){
 	Item *DistItem = GetDistWeapon();
 	unsigned char sl_id;
 	if(DistItem){
 		if(DistItem->isStackable() == false)
 			return;
+		
 		if(DistItem == getTradeItem())
 			g_game.playerCloseTrade(this);
 			
@@ -1718,7 +1719,6 @@ void Player::addExp(unsigned long exp){
 		this->manamax += this->ManaGain[(int)vocation];
 		this->mana += this->ManaGain[(int)vocation];
 		this->capacity += this->CapGain[(int)vocation];
-		//this->cap += this->CapGain[voc];
 	}
 	if(lastLv != this->level)
 	{
