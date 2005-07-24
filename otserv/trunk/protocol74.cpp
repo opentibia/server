@@ -993,6 +993,19 @@ void Protocol74::parseUpArrowContainer(NetworkMessage &msg)
 
 void Protocol74::parseThrow(NetworkMessage &msg)
 {
+/*
+  78 
+  ff ff 
+  40 00 
+  01 
+  6a 0a 
+  01 
+  ff ff 
+  40 00 
+  05 
+  0a
+*/     
+
   unsigned short from_x     = msg.GetU16();
   unsigned short from_y     = msg.GetU16(); 
   unsigned char  from_z     = msg.GetByte();
