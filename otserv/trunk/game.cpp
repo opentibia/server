@@ -3838,7 +3838,7 @@ void Game::autoCloseTrade(const Item* item){
 	const Container* container = NULL;
 	for(it = tradeItems.begin(); it != tradeItems.end(); it++) {
 		if(item == it->first || 
-			/*((container =dynamic_cast<const Container*>(item)) && container->isHoldingItem(it->first)) ||*/ 
+			((container =dynamic_cast<const Container*>(item)) && container->getSlotNumberByItem(it->first) == 0xFF && container->isHoldingItem(it->first)) ||
 			((container =dynamic_cast<const Container*>(it->first)) && container->isHoldingItem(item)))
 		{
 			Player* player = dynamic_cast<Player*>(getCreatureByID(it->second));
@@ -3889,7 +3889,6 @@ void Game::playerSetAttackedCreature(Player* player, unsigned long creatureid)
 			return;
 		}
 	}
-
 
 	player->setAttackedCreature(creatureid);
 	stopEvent(player->eventCheckAttacking);

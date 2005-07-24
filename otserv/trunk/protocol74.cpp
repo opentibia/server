@@ -275,7 +275,6 @@ void Protocol74::parsePacket(NetworkMessage &msg)
     case 0x69: // client quit without logout <- wrong
 			if(game->stopEvent(player->eventAutoWalk)) {
 				sendCancelWalk();
-				//player->sendCancelAutoWalking();
 			}
       break;
 
@@ -346,9 +345,7 @@ void Protocol74::GetMapDescription(unsigned short x, unsigned short y, unsigned 
 	int skip = -1;
 	int startz, endz, offset, zstep, cc = 0;
 	if (z > 7) {
-		//startz = std::min(z + 2, MAP_LAYER - 1);
-		//endz = std::max(z - 2, 6 /*(8 - 2)*/);
-        startz = z - 2;   
+		startz = z - 2;
 		endz = std::min(MAP_LAYER - 1, z + 2);
 		zstep = 1;
 	}
@@ -522,11 +519,11 @@ void Protocol74::sendOpenPriv(std::string &receiver){
 
 void Protocol74::parseCancelMove(NetworkMessage &msg)
 {
-	sendCancelAttacking();
+	//sendCancelAttacking();
+	game->playerSetAttackedCreature(player, 0);
 
 	game->stopEvent(player->eventAutoWalk);
 	player->sendCancelWalk();
-	//this->sleepTillMove();
 }
 
 void Protocol74::parseModes(NetworkMessage &msg)
@@ -539,15 +536,15 @@ void Protocol74::parseDebug(NetworkMessage &msg)
 {
   int dataLength = msg.getMessageLength()-3;
   if(dataLength!=0){
-  printf("data: ");
-  size_t data = msg.GetByte();
-  while( dataLength > 0){
-  printf("%d ", data);
-  if(--dataLength >0)
-                  data = msg.GetByte();
-  }
-  printf("\n");
-  }
+		printf("data: ");
+		size_t data = msg.GetByte();
+		while( dataLength > 0){
+			printf("%d ", data);
+			if(--dataLength >0)
+				data = msg.GetByte();
+		}
+		printf("\n");
+	}
 }
 
 void Protocol74::parseMoveByMouse(NetworkMessage &msg)
@@ -599,7 +596,6 @@ void Protocol74::parseMoveNorth(NetworkMessage &msg)
 void Protocol74::parseMoveEast(NetworkMessage &msg)
 {
 	if(game->stopEvent(player->eventAutoWalk)) {
-		//player->sendCancelAutoWalking();
 		player->sendCancelWalk();
 	}
 
@@ -613,7 +609,6 @@ void Protocol74::parseMoveEast(NetworkMessage &msg)
 void Protocol74::parseMoveSouth(NetworkMessage &msg)
 {
 	if(game->stopEvent(player->eventAutoWalk)) {
-		//player->sendCancelAutoWalking();
 		player->sendCancelWalk();
 	}
 
@@ -627,7 +622,6 @@ void Protocol74::parseMoveSouth(NetworkMessage &msg)
 void Protocol74::parseMoveWest(NetworkMessage &msg)
 {
 	if(game->stopEvent(player->eventAutoWalk)) {
-		//player->sendCancelAutoWalking();
 		player->sendCancelWalk();
 	}
 
@@ -640,7 +634,6 @@ void Protocol74::parseMoveWest(NetworkMessage &msg)
 void Protocol74::parseMoveNorthEast(NetworkMessage &msg)
 {
 	if(game->stopEvent(player->eventAutoWalk)) {
-		//player->sendCancelAutoWalking();
 		player->sendCancelWalk();
 	}
 
@@ -654,7 +647,6 @@ void Protocol74::parseMoveNorthEast(NetworkMessage &msg)
 void Protocol74::parseMoveSouthEast(NetworkMessage &msg)
 {
 	if(game->stopEvent(player->eventAutoWalk)) {
-		//player->sendCancelAutoWalking();
 		player->sendCancelWalk();
 	}
 
@@ -668,7 +660,6 @@ void Protocol74::parseMoveSouthEast(NetworkMessage &msg)
 void Protocol74::parseMoveSouthWest(NetworkMessage &msg)
 {
 	if(game->stopEvent(player->eventAutoWalk)) {
-		//player->sendCancelAutoWalking();
 		player->sendCancelWalk();
 	}
 
@@ -682,7 +673,6 @@ void Protocol74::parseMoveSouthWest(NetworkMessage &msg)
 void Protocol74::parseMoveNorthWest(NetworkMessage &msg)
 {
 	if(game->stopEvent(player->eventAutoWalk)) {
-		//player->sendCancelAutoWalking();
 		player->sendCancelWalk();
 	}
 
@@ -1217,7 +1207,6 @@ void Protocol74::parseAttack(NetworkMessage &msg)
 {
   unsigned long creatureid = msg.GetU32();
 	game->playerSetAttackedCreature(player, creatureid);
-  //player->setAttackedCreature(playerid);
 }
 
 void Protocol74::parseTextWindow(NetworkMessage &msg)
