@@ -154,6 +154,8 @@ private:
 	int armor;
 	int defense;
 	void doMoveTo(const Position& destpos, bool isRouteValid);
+	bool hasDistanceAttack;
+	bool canPushItems;
 
 	int getCurrentDistanceToTarget();
 	int getTargetDistance();

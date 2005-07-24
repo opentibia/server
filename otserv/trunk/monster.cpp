@@ -41,6 +41,8 @@ Monster::Monster(const char *name, Game* game) :
 	isfleeing = false;
 	this->game = game;
 	curPhysicalAttack = NULL;
+	hasDistanceAttack = false;
+	canPushItems = false;
 
 	targetDistance = 1;
 	runawayHealth = 0;
@@ -157,6 +159,7 @@ Monster::Monster(const char *name, Game* game) :
 						}
 						else if(strcmp(attacktype.c_str(), "distance") == 0)
 						{
+							hasDistanceAttack = true;
 							PhysicalAttackClass* physicalattack = new PhysicalAttackClass();
 
 							physicalattack->fighttype = FIGHT_DIST;
@@ -740,6 +743,9 @@ void Monster::onTeleport(const Creature *creature, const Position *oldPos, unsig
 		//Creature just moving around in-range
 		if(attackedCreature == creature->getID()) {
 			targetPos = creature->pos;
+		}
+		else if(attackedCreature == 0){
+			OnCreatureEnter(creature);
 		}
 	}
 	else if(!isInRange(*oldPos) && isInRange(creature->pos)) {
