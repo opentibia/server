@@ -398,8 +398,9 @@ std::list<Position> Map::getPathTo(Creature *creature, Position start, Position 
 						AStarNode* n = new AStarNode;
 						n->x=x;
 						n->y=y;
-						n->h = (float)abs(n->x - to.x) + (float)abs(n->y - to.y);
-						n->g = current->g + 1;
+						n->h = abs(n->x - to.x) + abs(n->y - to.y);
+						//n->h = (float)abs(n->x - to.x) + (float)abs(n->y - to.y);
+						//n->g = current->g + 1;
 						n->parent = current;
 						if(n->x == to.x && n->y == to.y){
 							found = n;

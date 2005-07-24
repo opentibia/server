@@ -197,7 +197,8 @@ struct AStarNode{
 	/** Parent of this node. Null if this is the rootnode */
 	AStarNode* parent;
 	/** Heuristics variable */
-	float f, g, h;
+	//float f, g, h;
+	int h;
 	/** Operator to sort so we can find the best node */
 	bool operator<(const AStarNode &node){return this->h < node.h;}
 };
