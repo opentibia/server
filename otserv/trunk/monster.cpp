@@ -207,6 +207,7 @@ Monster::Monster(const char *name, Game* game) :
 							physicalAttacks[physicalattack] = TimeProbabilityClass(cycleTicks, probability, exhaustionTicks);
 						}
 						else if(strcmp(attacktype.c_str(), "instant") == 0) {
+							hasDistanceAttack = true;
 							std::string spellname = (const char*)xmlGetProp(tmp, (const xmlChar *)"name");
 
 							if(spells.getAllSpells()->find(spellname) != spells.getAllSpells()->end())
@@ -215,6 +216,7 @@ Monster::Monster(const char *name, Game* game) :
 							}
 						}
 						else if(strcmp(attacktype.c_str(), "rune") == 0) {
+							hasDistanceAttack = true;
 							std::string spellname = (const char*)xmlGetProp(tmp, (const xmlChar *)"name");
 							std::transform(spellname.begin(), spellname.end(), spellname.begin(), tolower);
 							
