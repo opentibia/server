@@ -913,9 +913,10 @@ bool Game::onPrepareMoveThing(Player *player, const Item* fromItem, const Contai
 		player->sendCancel("Sorry, not possible.");
 		return false;
 	}
-	else {
+	else {		
+		double itemWeight = (fromItem->isStackable() ? Item::items[fromItem->getID()].weight * std::max(1, count) : fromItem->getWeight());
 		if((!fromContainer || !player->isHoldingContainer(fromContainer)) && player->isHoldingContainer(toContainer)) {
-			if(player->access == 0 && player->getFreeCapacity() < Item::items[fromItem->getID()].weight * std::max(1, count)) {
+			if(player->access == 0 && player->getFreeCapacity() < itemWeight) {
 				player->sendCancel("This object is too heavy.");
 				return false;
 			}
@@ -1000,7 +1001,8 @@ bool Game::onPrepareMoveThing(Player *player, const Position& fromPos, const Ite
 		return false;
 	}
 
-	if(player->access == 0 && player->getFreeCapacity() < Item::items[item->getID()].weight * std::max(1, count)) {
+	double itemWeight = (item->isStackable() ? Item::items[item->getID()].weight * std::max(1, count) : item->getWeight());
+	if(player->access == 0 && player->getFreeCapacity() < itemWeight) {
 		player->sendCancel("This object is too heavy.");
 		return false;
 	}
@@ -1024,8 +1026,9 @@ bool Game::onPrepareMoveThing(Player *player, slots_t fromSlot, const Item *from
 bool Game::onPrepareMoveThing(Player *player, const Container *fromContainer, const Item *fromItem,
 	slots_t toSlot, const Item *toItem, int count)
 {
+	double itemWeight = (fromItem->isStackable() ? Item::items[fromItem->getID()].weight * std::max(1, count) : fromItem->getWeight());
 	if(player->access == 0 && !player->isHoldingContainer(fromContainer) &&
-		player->getFreeCapacity() < Item::items[fromItem->getID()].weight * std::max(1, count)) {
+		player->getFreeCapacity() < itemWeight) {
 		player->sendCancel("This object is too heavy.");
 		return false;
 	}
