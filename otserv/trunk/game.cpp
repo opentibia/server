@@ -894,9 +894,17 @@ bool Game::onPrepareMoveThing(Player *player, const Item* fromItem, slots_t from
 		}
 		
 		Container const *topContainer = toContainer->getTopParent();
+		int itemsToadd;
 		if(!topContainer)
 			topContainer = toContainer;
-		if(topContainer->depot != 0 && player->max_depot_items != 0 && topContainer->getItemHoldingCount() >= player->max_depot_items){
+		
+		Container const *fromContainer = dynamic_cast<const Container*>(fromItem);
+		if(fromContainer)
+			itemsToadd = fromContainer->getItemHoldingCount() + 1;
+		else
+			itemsToadd = 1;
+		
+		if(topContainer->depot != 0 && player->max_depot_items != 0 && topContainer->getItemHoldingCount() + itemsToadd >= player->max_depot_items){
 			player->sendCancel("You can not put more items in this depot.");
 			return false;
 		}
@@ -936,8 +944,16 @@ bool Game::onPrepareMoveThing(Player *player, const Item* fromItem, const Contai
 		}
 		
 		Container const *topContainer = toContainer->getTopParent();
+		int itemsToadd;
 		if(!topContainer)
 			topContainer = toContainer;
+		
+		Container const *fromContainer = dynamic_cast<const Container*>(fromItem);
+		if(fromContainer)
+			itemsToadd = fromContainer->getItemHoldingCount() + 1;
+		else
+			itemsToadd = 1;
+		
 		if(topContainer->depot != 0 && player->max_depot_items != 0 && topContainer->getItemHoldingCount() >= player->max_depot_items){
 			player->sendCancel("You can not put more items in this depot.");
 			return false;
@@ -3639,11 +3655,26 @@ void Game::playerRequestTrade(Player *player, const Position& pos,
 		return;
 	}
 
+	/*
 	if(tradeItems.find(tradeItem) != tradeItems.end()){
 		player->sendTextMessage(MSG_INFO, "This item is already beeing traded.");
 		//player->sendCancel("Sorry, not possible.");
 		return;
 	}
+	*/
+	
+	std::map<Item*, unsigned long>::const_iterator it;
+	const Container* container = NULL;
+	for(it = tradeItems.begin(); it != tradeItems.end(); it++) {
+		if(tradeItem == it->first || 
+			((container = dynamic_cast<const Container*>(tradeItem)) && container->getSlotNumberByItem(it->first) == 0xFF && container->isHoldingItem(it->first)) ||
+			((container = dynamic_cast<const Container*>(it->first)) && container->isHoldingItem(tradeItem)))
+		{
+			player->sendTextMessage(MSG_INFO, "This item is already beeing traded.");
+			return;
+		}
+	}
+
 
 	if(player->tradePartner != 0 && tradePartner->tradePartner != player->getID()){
 		player->sendTextMessage(MSG_INFO, "This player is already trading.");
@@ -3659,6 +3690,7 @@ void Game::playerRequestTrade(Player *player, const Position& pos,
 	player->tradePartner = playerid;
 	player->tradeItem = tradeItem;
 	//tradeItems.insert(tradeItems.begin(), tradeItem);
+	tradeItem->useThing();
 	tradeItems[tradeItem] = player->getID();
 
 	player->sendTradeItemRequest(player, tradeItem, true);
@@ -3689,11 +3721,13 @@ void Game::playerAcceptTrade(Player* player)
 
 		it = tradeItems.find(tradeItem1);
 		if(it != tradeItems.end()) {
+			FreeThing(it->first);
 			tradeItems.erase(it);
 		}
 
 		it = tradeItems.find(tradeItem2);
 		if(it != tradeItems.end()) {
+			FreeThing(it->first);
 			tradeItems.erase(it);
 		}
 		
@@ -3799,6 +3833,7 @@ void Game::playerCloseTrade(Player* player)
 	if(player->getTradeItem()) {
 		std::map<Item*, unsigned long>::iterator it = tradeItems.find(player->getTradeItem());
 		if(it != tradeItems.end()) {
+			FreeThing(it->first);
 			tradeItems.erase(it);
 		}
 	}
@@ -3811,6 +3846,7 @@ void Game::playerCloseTrade(Player* player)
 		if(tradePartner->getTradeItem()) {
 			std::map<Item*, unsigned long>::iterator it = tradeItems.find(tradePartner->getTradeItem());
 			if(it != tradeItems.end()) {
+				FreeThing(it->first);
 				tradeItems.erase(it);
 			}
 		}
@@ -3833,8 +3869,8 @@ void Game::autoCloseTrade(const Item* item){
 			((container = dynamic_cast<const Container*>(it->first)) && container->isHoldingItem(item)))
 		{
 			Player* player = dynamic_cast<Player*>(getCreatureByID(it->second));
-			if(player) {
-					playerCloseTrade(player);
+			if(player){
+				playerCloseTrade(player);
 			}
 
 			break;
