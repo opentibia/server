@@ -2088,23 +2088,6 @@ void Protocol74::sendThingMove(const Creature *creature, const Thing *thing,
 			AddRemoveThing(msg,*oldPos,oldStackPos);      
 		}
 		
-		if(!(tele && thing == this->player) && CanSee(oldPos->x, oldPos->y, oldPos->z)){
-			/*
-			//Auto-close trade
-			if(player->getTradeItem() && dynamic_cast<const Item*>(thing) == player->getTradeItem()) {
-				game->playerCloseTrade(player);
-			}
-			*/
-				
-			//Auto-close container's
-			if(std::abs(player->pos.x - thing->pos.x) > 1 || std::abs(player->pos.y - thing->pos.y) > 1 || player->pos.z != thing->pos.z ) {
-				const Container *container = dynamic_cast<const Container*>(thing);
-				if(container) {						
-					autoCloseContainers(container, msg);						
-				}					
-			}
-		}
-		
 		if (!(tele && thing == this->player) && CanSee(thing->pos.x, thing->pos.y, thing->pos.z))
 		{
 			AddAppearThing(msg,thing->pos);      
