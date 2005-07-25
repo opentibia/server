@@ -163,6 +163,7 @@ private:
 	int getTargetDistance();
 	void calcMovePosition();
 	void randMovePosition();
+	void getCloseCombatPosition(const Position &target, Position &dest);
 	bool canMoveTo(unsigned short x, unsigned short y, unsigned char z);
 	bool isInRange(const Position &pos);
 	Creature* findTarget(long range, const Creature *ignoreCreature = NULL);

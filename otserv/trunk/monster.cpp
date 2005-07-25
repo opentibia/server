@@ -510,7 +510,9 @@ Creature* Monster::findTarget(long range, const Creature *ignoreCreature /*= NUL
 					playerlist.push_back(*cit);
 				}
 				else{
-					std::list<Position> tmp_route = game->map->getPathTo(this, this->pos, player->pos, false, canPushItems);
+					Position closePos;
+					getCloseCombatPosition(player->pos, closePos);
+					std::list<Position> tmp_route = game->map->getPathTo(this, this->pos, closePos, true, canPushItems);
 					if(tmp_route.size() != 0){
 						playerlist.push_back(*cit);
 					}
@@ -689,35 +691,47 @@ void Monster::calcMovePosition()
 	}
 	//Close combat
 	else if(currentdist > distance || currentdist == 0 || (distance > 1 && !hasDistanceAttack)) {
-		//Close combat
-		int prevdist = 0;
-		for(int y = targetPos.y - 1; y <= targetPos.y + 1; ++y) {
-			for(int x = targetPos.x - 1; x <= targetPos.x + 1; ++x) {
-				if((targetPos.x == x && targetPos.y == y))
+		getCloseCombatPosition(targetPos, moveToPos);
+	}
+}
+
+void Monster::getCloseCombatPosition(const Position &target, Position &dest)
+{
+	//Close combat
+	std::vector<Position> positionList;
+	Position tmpPos;
+	int prevdist = 0;
+	for(int y = target.y - 1; y <= target.y + 1; ++y) {
+		for(int x = target.x - 1; x <= target.x + 1; ++x) {
+			if((target.x == x && target.y == y))
+				continue;
+				
+			int dist = std::max(std::abs(pos.x - x), std::abs(pos.y - y));
+				
+			if(dist <= prevdist || (prevdist == 0)) {
+				if(!canMoveTo(x,y,pos.z))
 					continue;
-
-				int dist = std::max(std::abs(pos.x - x), std::abs(pos.y - y));
-
-				if(dist < prevdist || (prevdist == 0)) {
-					if(!canMoveTo(x,y,pos.z))
-						continue;
-					/*
-					if((!(t = game->map->getTile(x, y, pos.z))) || t->isBlocking() || t->isPz() || t->creatures.size())
-						continue;
-					*/
-					
-					prevdist = dist;
-					moveToPos.x = x;
-					moveToPos.y = y;
-					moveToPos.z = pos.z;
-				}
+				
+				if(dist < prevdist)
+					positionList.clear();
+				
+				prevdist = dist;
+				tmpPos.x = x;
+				tmpPos.y = y;
+				tmpPos.z = pos.z;
+				
+				positionList.push_back(tmpPos);
 			}
 		}
-
-		if(prevdist == 0) {
-			moveToPos = targetPos;
-		}
 	}
+
+	if(positionList.empty()){
+		dest = target;
+		return;
+	}
+	
+	size_t index = random_range(0, positionList.size() - 1);
+	dest = positionList[index];
 }
 
 void Monster::randMovePosition()
@@ -725,22 +739,13 @@ void Monster::randMovePosition()
 	//only close combat	
 	std::vector<Position> positionList;
 	Position randMovePos;
-	
-	if(targetPos.x == pos.x){
-		for(int y = pos.y - 1; y <= pos.y + 1; ++y){
-			if(std::abs(y - targetPos.y) <= 1 && canMoveTo(pos.x,y,pos.z)){
-				randMovePos.x = pos.x;
-				randMovePos.y = y;
-				randMovePos.z = pos.z;
-				positionList.push_back(randMovePos);
-			}
-		}
-	}
-	else{ //targetPos.y == pos.y
+	for(int y = pos.y - 1; y <= pos.y + 1; ++y){
 		for(int x = pos.x - 1; x <= pos.x + 1; ++x){
-			if(std::abs(x - targetPos.x) <= 1 && canMoveTo(x,pos.y,pos.z)){
+			if(std::abs(y - targetPos.y) <= 1 && std::abs(x - targetPos.x) <= 1 &&
+				((std::abs(y - pos.y) == 1)^(std::abs(x - pos.x) == 1)) &&
+					 canMoveTo(x,y,pos.z)){
 				randMovePos.x = x;
-				randMovePos.y = pos.y;
+				randMovePos.y = y;
 				randMovePos.z = pos.z;
 				positionList.push_back(randMovePos);
 			}
