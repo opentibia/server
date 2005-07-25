@@ -29,12 +29,12 @@ function onCast(cid, creaturePos, level, maglv, var)
 centerpos = {x=creaturePos.x, y=creaturePos.y, z=creaturePos.z}
 n = tonumber(var)   -- try to convert it to a number
 if n ~= nil then
-	-- bugged
-	-- ultimateExplosionObject.minDmg = var+0
-	-- UltimateExplosionObject.maxDmg = var+0
+	-- UE testing dmg exevo gran mas vis "dmg
+	UltimateExplosionObject.minDmg = var+0
+	UltimateExplosionObject.maxDmg = var+0
 
-	UltimateExplosionObject.minDmg = 0
-	UltimateExplosionObject.maxDmg = 0 
+	-- UltimateExplosionObject.minDmg = 0
+	-- UltimateExplosionObject.maxDmg = 0 
 else
 	UltimateExplosionObject.minDmg = (level * 2 + maglv * 3) * 2.3 - 30
 	UltimateExplosionObject.maxDmg = (level * 2 + maglv * 3) * 3.0 	
