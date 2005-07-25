@@ -882,12 +882,13 @@ bool Game::onPrepareMoveThing(Player *player, const Item* fromItem, slots_t from
 	else {
 		const Container *itemContainer = dynamic_cast<const Container*>(fromItem);
 		if(itemContainer) {
-			if(itemContainer->isHoldingItem(toContainer) || (toContainer == itemContainer) /*|| (fromContainer && fromContainer == itemContainer)*/) {
+			if(itemContainer->isHoldingItem(toContainer) || (toContainer == itemContainer)) {
 				player->sendCancel("This is impossible.");
 				return false;
 			}
 		}
-		else if((!fromItem->isStackable() || !toItem || fromItem->getID() != toItem->getID() || toItem->getItemCountOrSubtype() >= 100) && toContainer->size() + 1 > toContainer->capacity()) {
+		
+		if((!fromItem->isStackable() || !toItem || fromItem->getID() != toItem->getID() || toItem->getItemCountOrSubtype() >= 100) && toContainer->size() + 1 > toContainer->capacity()) {
 			player->sendCancel("Sorry not enough room.");
 			return false;
 		}
@@ -928,7 +929,8 @@ bool Game::onPrepareMoveThing(Player *player, const Item* fromItem, const Contai
 				return false;
 			}
 		}
-		else if((!fromItem->isStackable() || !toItem || fromItem->getID() != toItem->getID() || toItem->getItemCountOrSubtype() >= 100) && toContainer->size() + 1 > toContainer->capacity()) {		
+		
+		if((!fromItem->isStackable() || !toItem || fromItem->getID() != toItem->getID() || toItem->getItemCountOrSubtype() >= 100) && toContainer->size() + 1 > toContainer->capacity()) {		
 			player->sendCancel("Sorry not enough room.");
 			return false;
 		}
@@ -3438,6 +3440,8 @@ void Game::startDecay(Item* item){
 
 void Game::checkSpawns(int t)
 {
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
+	
 	SpawnManager::instance()->checkSpawns(t);
 	this->addEvent(makeTask(t, std::bind2nd(std::mem_fun(&Game::checkSpawns), t)));
 }
