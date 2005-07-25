@@ -60,9 +60,9 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name){
 		const char *account = (const char*)xmlGetProp(root, (const xmlChar *) "account");
 		
 		//need to unlock and relock in order to load xml account
-		//xmlMutexUnlock(xmlmutex); 
+		xmlMutexUnlock(xmlmutex); 
 		Account a = IOAccount::instance()->loadAccount(atoi(account));
-		//xmlMutexLock(xmlmutex);
+		xmlMutexLock(xmlmutex);
 		
 		player->password = a.password;
 		if (a.accnumber == 0 || a.accnumber != (unsigned long)atoi(account)) {
