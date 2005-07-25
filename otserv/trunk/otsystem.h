@@ -26,7 +26,7 @@
 #include "definitions.h"
 
 #if defined WIN32 || defined __WINDOWS__
-
+//#define _WIN32_WINNT 0x0501
 #include <windows.h>
 #include <process.h>    /* _beginthread, _endthread */
 #include <stddef.h>
