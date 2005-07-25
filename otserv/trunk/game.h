@@ -237,7 +237,7 @@ public:
 	void playerAcceptTrade(Player* player);
 	void playerLookInTrade(Player* player, bool lookAtCounterOffer, int index);
 	void playerCloseTrade(Player* player);
-	void autoCloseTrade(const Item* item);
+	void autoCloseTrade(const Item* item, bool itemMoved = false);
 	
 	void playerSetAttackedCreature(Player* player, unsigned long creatureid);
 

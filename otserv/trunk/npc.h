@@ -71,7 +71,7 @@ protected:
 class Npc : public Creature
 {
 public:
-  Npc(const char *name, Game* game);
+  Npc(const std::string& name, Game* game);
   virtual ~Npc();
 	virtual void useThing() {
 		//std::cout << "Npc: useThing() " << this << std::endl;

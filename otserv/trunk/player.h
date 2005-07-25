@@ -94,7 +94,7 @@ typedef std::map<unsigned long,long> StorageMap;
 class Player : public Creature
 {
 public:
-	Player(const char *name, Protocol* p);
+	Player(const std::string& name, Protocol* p);
 	virtual ~Player();
 	void setGUID(unsigned long _guid) {guid = _guid;};
 	unsigned long getGUID() const { return guid;};

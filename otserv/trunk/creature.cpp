@@ -16,13 +16,13 @@ OTSYS_THREAD_LOCKVAR AutoID::autoIDLock;
 unsigned long AutoID::count = 1000;
 AutoID::list_type AutoID::list;
 
-Creature::Creature(const char *name) :
+Creature::Creature(const std::string& name) :
 access(0)
 {
   direction  = NORTH;
 	master = NULL;
 
-  this->name = name;
+	this->name = name;
 
   lookhead   = 0;
 	lookbody   = 0;

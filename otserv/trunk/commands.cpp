@@ -192,7 +192,7 @@ bool Commands::exeCommand(Creature *creature, const std::string &cmd){
 
 bool Commands::placeNpc(Creature* c, const std::string &cmd, const std::string &param)
 {
-	Npc *npc = new Npc(param.c_str(), game);
+	Npc *npc = new Npc(param, game);
 	if(!npc->isLoaded()){
 		delete npc;
 		return true;
@@ -239,7 +239,7 @@ bool Commands::placeNpc(Creature* c, const std::string &cmd, const std::string &
 bool Commands::placeMonster(Creature* c, const std::string &cmd, const std::string &param)
 {
 
-	Monster *monster = new Monster(param.c_str(), game);
+	Monster *monster = new Monster(param, game);
 	if(!monster->isLoaded()){
 		delete monster;
 		return true;

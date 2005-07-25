@@ -65,8 +65,7 @@ public:
   {
     pz               = false;
     splash           = NULL;
-	ground           = NULL;
-    //decaySplashAfter = 0;
+		ground           = NULL;
   }
 
   Item*           ground;
@@ -74,8 +73,6 @@ public:
   ItemVector     topItems;
   CreatureVector creatures;
   ItemVector     downItems;
-
-  //__int64        decaySplashAfter;
 
   bool removeThing(Thing *thing);
   void addThing(Thing *thing);
@@ -86,12 +83,13 @@ public:
 	Creature* getTopCreature();
 	Item* getTopDownItem();
 	Item* getMoveableBlockingItem();
-
+	
   int getCreatureStackPos(Creature *c) const;
   int getThingStackPos(const Thing *thing) const;
 	int getThingCount() const;
 
-  Thing* getThingByStackPos(int pos);
+  Thing* getTopThing();
+	Thing* getThingByStackPos(int pos);
 
   bool isBlockingProjectile() const;
 	bool isBlocking(bool ispickupable = false, bool ignoreMoveableBlocking = false) const;

@@ -625,6 +625,11 @@ Position ActionScript::internalGetRealPosition(ActionScript *action, Player *pla
 {
 	if(action)
 		return action->game->getThingMapPos(player, pos);
+	else {
+		Position dummyPos(0,0,0);
+		return dummyPos;
+	}
+
 	/*if(pos.x == 0xFFFF){
 		Position dummyPos(0,0,0);
 		if(!player)

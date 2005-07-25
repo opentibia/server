@@ -247,7 +247,7 @@ void IOMapBin::loadOTM(Map* map){
                cx = (rand() % (radius * 2)) - radius;
                cy = (rand() % (radius * 2)) - radius;
                
-               spawn->addMonster(cname, cx, cy, secs * 1000);
+               spawn->addMonster(cname, NORTH, cx, cy, secs * 1000);
              }
              
              // the checker is not needed on the CVS, since

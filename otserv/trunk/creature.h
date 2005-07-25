@@ -108,10 +108,10 @@ public:
 class Creature : public AutoID, public Thing
 {
 public:
-  Creature(const char *name);
+  Creature(const std::string& name);
   virtual ~Creature();
 
-  virtual const std::string& getName() const {return name; };
+	virtual const std::string& getName() const {return name; };
 
   void setID(){this->id = auto_id | this->idRange();}
   virtual unsigned long idRange() = 0;
@@ -309,9 +309,10 @@ protected:
 	//friend class MapState;
 	friend class GameState;
 
-//  Direction direction; // moved to public
   unsigned long id;
-  std::string name;
+
+	//Direction direction; // moved to public
+	std::string name;
 };
 
 

@@ -36,7 +36,7 @@ class Spawn /*: public Event*/ {
 public:
 	Spawn(Game *igame, Position pos, int _radius);
 	void idle(int t);
-	bool addMonster(std::string name, int x, int y, int spawntime);
+	bool addMonster(std::string name, Direction dir, int x, int y, int spawntime);
 
 public:
 	bool startup();
@@ -52,11 +52,12 @@ private:
 	int radius;
 
 	bool isInSpawnRange(const Position &pos);
-	Monster* respawn(unsigned long spawnid, Position &pos, std::string &name);
+	Monster* respawn(unsigned long spawnid, Position &pos, std::string &name, Direction dir);
 
 	struct spawninfo {
 		Position pos;
 		std::string name;
+		Direction dir;
 		int spawntime;
 		uint64_t lastspawn;
 	};

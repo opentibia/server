@@ -275,7 +275,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 				if(s){
 					playerexist = (creature != NULL);
 					protocol = new Protocol74(s);
-					player = new Player(name.c_str(), protocol);
+					player = new Player(name, protocol);
 					player->useThing();
 					player->setID();
 					IOPlayer::instance()->loadPlayer(player, name);

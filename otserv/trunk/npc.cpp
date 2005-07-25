@@ -37,7 +37,7 @@ extern LuaScript g_config;
 
 AutoList<Npc> Npc::listNpc;
 
-Npc::Npc(const char *name, Game* game) :
+Npc::Npc(const std::string& name, Game* game) :
  Creature(name)
 {
 	useCount = 0;

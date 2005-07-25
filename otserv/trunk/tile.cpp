@@ -428,6 +428,15 @@ Item* Tile::getTopDownItem(){
 	return NULL;
 }
 
+Thing* Tile::getTopThing()
+{
+	if(getThingCount() >= 1) {
+		return getThingByStackPos(1);
+	}
+	else 
+		return getThingByStackPos(0);
+}
+
 Item* Tile::getMoveableBlockingItem()
 {
 	for (ItemVector::const_iterator iit = downItems.begin(); iit != downItems.end(); ++iit)

@@ -112,6 +112,8 @@ bool SpawnManager::loadSpawnsXML(std::string filename)
 
 				std::string name;
 				int x, y, spawntime;
+				Direction direction = NORTH;
+				int rawdir = 0; //NORTH
 
 				xmlNodePtr tmp = p->children;
 				while (tmp) {
@@ -124,6 +126,9 @@ bool SpawnManager::loadSpawnsXML(std::string filename)
 							tmp = tmp->next;
 							break;
 						}
+
+						if((const char*)xmlGetProp(tmp, (const xmlChar *)"direction"))
+							rawdir = atoi((const char*)xmlGetProp(tmp, (const xmlChar *)"direction"));
 
 						if((const char*)xmlGetProp(tmp, (const xmlChar *)"x"))
 							x = atoi((const char*)xmlGetProp(tmp, (const xmlChar *)"x"));
@@ -146,7 +151,17 @@ bool SpawnManager::loadSpawnsXML(std::string filename)
 							break;
 						}
 
-						spawn->addMonster(name, x, y, spawntime * 1000);
+						switch(rawdir) {
+							case 0: direction = NORTH; break;
+							case 1: direction = EAST; break;
+							case 2: direction = SOUTH; break;
+							case 3: direction = WEST; break;
+
+							default:
+								direction = NORTH;
+								break;
+						}
+						spawn->addMonster(name, direction, x, y, spawntime * 1000);
 					}
 
 					tmp = tmp->next;
@@ -235,7 +250,7 @@ bool SpawnManager::loadSpawnsSQL(std::string identifier)
 
           Spawn *spawn = new Spawn(game, spawnpos, 1);
 					spawns.push_back(spawn);
-          spawn->addMonster(name, 0, 0, time * 1000);
+          spawn->addMonster(name, NORTH, 0, 0, time * 1000);
         }//End For Loop
 			}//End Try
 			catch(mysqlpp::BadQuery e){
@@ -290,7 +305,7 @@ bool SpawnManager::loadSpawnsSQL(std::string identifier)
 					std::string name;
           if(std::string(row.lookup_by_name("name")) != ""){name = std::string(row.lookup_by_name("name"));}
           int dir = row.lookup_by_name("dir");
-          Npc* npc = new Npc(name.c_str(), game);
+          Npc* npc = new Npc(name, game);
           
           npc->pos = npcpos;
           switch(dir){
@@ -362,13 +377,13 @@ Spawn::Spawn(Game *igame, Position pos, int _radius)
 bool Spawn::startup()
 {
 	for(SpawnMap::iterator sit = spawnmap.begin(); sit != spawnmap.end(); ++sit) {
-		respawn(sit->first, sit->second.pos, sit->second.name);
+		respawn(sit->first, sit->second.pos, sit->second.name, sit->second.dir);
 	}
 
 	return true;
 }
 
-bool Spawn::addMonster(std::string name, int x, int y, int spawntime)
+bool Spawn::addMonster(std::string name, Direction dir, int x, int y, int spawntime)
 {
 	Position tmpPos(centerPos.x + x, centerPos.y, centerPos.z);
 	if(!isInSpawnRange(tmpPos)) {
@@ -380,6 +395,7 @@ bool Spawn::addMonster(std::string name, int x, int y, int spawntime)
 
 	struct spawninfo si;
 	si.name = name;
+	si.dir = dir;
 	si.pos.x = centerPos.x + x;
 	si.pos.y = centerPos.y + y;
 	si.pos.z = centerPos.z;
@@ -392,12 +408,12 @@ bool Spawn::addMonster(std::string name, int x, int y, int spawntime)
 	return true;
 }
 
-Monster* Spawn::respawn(unsigned long spawnid, Position &pos, std::string &name)
+Monster* Spawn::respawn(unsigned long spawnid, Position &pos, std::string &name, Direction dir)
 {
-	Monster *monster = new Monster(name.c_str(), game);
-	monster->masterPos = centerPos;
-
+	Monster *monster = new Monster(name, game);
 	if(monster && monster->isLoaded()) {
+		monster->setDirection(dir);
+		monster->masterPos = centerPos;
 
 		if(game->placeCreature(pos, monster)) {
 			monster->useThing();
@@ -464,7 +480,7 @@ void Spawn::idle(int t)
 					continue;
 				}
 
-				respawn(sit->first, sit->second.pos, sit->second.name);
+				respawn(sit->first, sit->second.pos, sit->second.name, sit->second.dir);
 			}
 		}
 	}

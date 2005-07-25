@@ -111,7 +111,7 @@ public:
 class Monster : public Creature
 {
 public:
-  Monster(const char *name, Game* game);
+	Monster(const std::string& name, Game* game);
   virtual ~Monster();
 	//const Monster& operator=(const Monster& rhs);
 	//virtual unsigned long idRange(){ return 0x40000000;}
@@ -229,8 +229,8 @@ protected:
 
 	virtual int onThink(int& newThinkTicks);
   virtual void setAttackedCreature(unsigned long id);
-  virtual std::string getDescription() const;
-  std::string monstername;
+  //virtual std::string getDescription() const;
+	std::string getDescription(bool self) const;
 	bool loaded;
 };
 

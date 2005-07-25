@@ -1129,8 +1129,8 @@ void Protocol74::parseLookAt(NetworkMessage &msg){
 	if(LookPos.x != 0xFFFF) {
 		Tile* tile = game->getTile(LookPos.x, LookPos.y, LookPos.z);
 		if(tile){
-			item = dynamic_cast<Item*>(tile->getThingByStackPos(stackpos));
-			creature = dynamic_cast<Creature*>(tile->getThingByStackPos(stackpos));
+			item = dynamic_cast<Item*>(tile->getTopThing());
+			creature = dynamic_cast<Creature*>(tile->getTopThing());
 		}
 	}
 	else {
@@ -2593,7 +2593,7 @@ void Protocol74::AddCreature(NetworkMessage &msg,const Creature *creature, bool 
     msg.AddByte(0x61);
     msg.AddByte(0x00);
 		//AddU32(0);
-	msg.AddU32(remove);
+		msg.AddU32(remove);
     msg.AddU32(creature->getID());
     msg.AddString(creature->getName());
   }

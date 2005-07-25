@@ -31,7 +31,7 @@ extern LuaScript g_config;
 
 AutoList<Monster> Monster::listMonster;
 
-Monster::Monster(const char *name, Game* game) : 
+Monster::Monster(const std::string& name, Game* game) : 
  Creature(name)
 {
 	//std::cout << "Monster constructor " << this  <<std::endl;
@@ -39,6 +39,7 @@ Monster::Monster(const char *name, Game* game) :
 	oldThinkTicks = 0;
 	loaded = false;
 	isfleeing = false;
+	this->name = name;
 	this->game = game;
 	curPhysicalAttack = NULL;
 	hasDistanceAttack = false;
@@ -69,7 +70,7 @@ Monster::Monster(const char *name, Game* game) :
 		p = root->children;
 
 		if ((const char*)xmlGetProp(root, (const xmlChar *)"name")) {
-			monstername = (const char*)xmlGetProp(root, (const xmlChar *)"name");
+			this->name = (const char*)xmlGetProp(root, (const xmlChar *)"name");
 		}
 		
 		if ((const char*)xmlGetProp(root, (const xmlChar *)"experience")) {
@@ -898,12 +899,15 @@ void Monster::setAttackedCreature(unsigned long id)
 	attackedCreature = id;
 }
 
-std::string Monster::getDescription() const
+std::string Monster::getDescription(bool self) const
 {
   std::stringstream s;
 	std::string str;
+	
+	str = getName();
+	std::transform(str.begin(), str.end(), str.begin(), tolower);
 
-	s << "You see a " << getName().c_str() << ".";
+	s << "You see a " << str << ".";
 	str = s.str();
 
 	return str;
@@ -1133,7 +1137,7 @@ bool Monster::monsterMoveItem(Item* item, int radius)
 {
 	Position centerPos = item->pos;
 	Position tryPos;
-	int try_x, try_y;
+	//int try_x, try_y;
 	int itemCount;
 	if(item->isStackable()){
 		itemCount = item->getItemCountOrSubtype();

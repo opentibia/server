@@ -40,7 +40,7 @@ extern Game g_game;
 
 AutoList<Player> Player::listPlayer;
 
-Player::Player(const char *name, Protocol *p) :
+Player::Player(const std::string& name, Protocol *p) :
  Creature(name)
 {	
   client     = p;
