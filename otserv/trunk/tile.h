@@ -85,6 +85,7 @@ public:
 	Thing* getTopMoveableThing();
 	Creature* getTopCreature();
 	Item* getTopDownItem();
+	Item* getMoveableBlockingItem();
 
   int getCreatureStackPos(Creature *c) const;
   int getThingStackPos(const Thing *thing) const;
@@ -93,7 +94,7 @@ public:
   Thing* getThingByStackPos(int pos);
 
   bool isBlockingProjectile() const;
-	bool isBlocking(bool ispickupable = false) const;
+	bool isBlocking(bool ispickupable = false, bool ignoreMoveableBlocking = false) const;
 
   bool isPz() const;
   void setPz();

@@ -320,20 +320,20 @@ bool Map::canThrowItemTo(Position from, Position to, bool creaturesBlock /* = tr
 	return true;
 }
 
-bool Map::isPathValid(Creature *creature, const std::list<Position>& path)
+bool Map::isPathValid(Creature *creature, const std::list<Position>& path, bool ignoreMoveableBlockingItems /*= false)*/)
 {
 	std::list<Position>::const_iterator iit;
 	for(iit = path.begin(); iit != path.end(); ++iit) {
 
 		Tile *t = getTile(iit->x, iit->y, iit->z);		
-		if(!t || t->isBlocking() || (!t->creatures.empty() && (t->getCreature() != creature || t->creatures.size() > 1)))
+		if(!t || t->isBlocking(false, ignoreMoveableBlockingItems) || (!t->creatures.empty() && (t->getCreature() != creature || t->creatures.size() > 1)))
 			return false;
 	}
 
 	return true;
 }
 
-std::list<Position> Map::getPathTo(Creature *creature, Position start, Position to, bool creaturesBlock){
+std::list<Position> Map::getPathTo(Creature *creature, Position start, Position to, bool creaturesBlock /*=true*/, bool ignoreMoveableBlockingItems /*= false*/){
 	std::list<Position> path;
 /*	if(start.z != to.z)
 		return path;
@@ -365,8 +365,8 @@ std::list<Position> Map::getPathTo(Creature *creature, Position start, Position 
 					int y = current->y + dy;
 
 					Tile *t = getTile(x, y, z);
-					if(!t || t->isBlocking() ||
-						(!t->creatures.empty() && (t->getCreature() != creature || t->creatures.size() > 1)) ||
+					if(!t || t->isBlocking(false,ignoreMoveableBlockingItems) ||
+						(creaturesBlock && !t->creatures.empty() && (t->getCreature() != creature || t->creatures.size() > 1)) ||
 							t->floorChange() || t->getTeleportItem())
 					continue;
 

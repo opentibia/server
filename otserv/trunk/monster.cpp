@@ -43,6 +43,8 @@ Monster::Monster(const char *name, Game* game) :
 	curPhysicalAttack = NULL;
 	hasDistanceAttack = false;
 	canPushItems = false;
+	staticAttack = 20;
+	changeTargetChance = 0;
 
 	targetDistance = 1;
 	runawayHealth = 0;
@@ -69,11 +71,11 @@ Monster::Monster(const char *name, Game* game) :
 		if ((const char*)xmlGetProp(root, (const xmlChar *)"name")) {
 			monstername = (const char*)xmlGetProp(root, (const xmlChar *)"name");
 		}
-
+		
 		if ((const char*)xmlGetProp(root, (const xmlChar *)"experience")) {
 			this->experience = atoi((const char*)xmlGetProp(root, (const xmlChar *)"experience"));
 		}
-
+		
 		if ((const char*)xmlGetProp(root, (const xmlChar *)"pushable")) {
 			this->pushable = (bool)atoi((const char*)xmlGetProp(root, (const xmlChar *)"pushable"));
 		}
@@ -89,7 +91,20 @@ Monster::Monster(const char *name, Game* game) :
 		if ((const char*)xmlGetProp(root, (const xmlChar *)"armor")) {
 			this->armor = atoi((const char*)xmlGetProp(root, (const xmlChar *)"armor"));
 		}
-
+		if ((const char*)xmlGetProp(root, (const xmlChar *)"canpushitems")) {
+			canPushItems = (bool)atoi((const char*)xmlGetProp(root, (const xmlChar *)"canpushitems"));
+		}
+		if ((const char*)xmlGetProp(root, (const xmlChar *)"staticattack")) {
+			staticAttack = atoi((const char*)xmlGetProp(root, (const xmlChar *)"staticattack"));
+			if(staticAttack == 0)
+				staticAttack = 1;
+			else if(staticAttack >= RAND_MAX)
+				staticAttack == RAND_MAX + 1;
+		}
+		if ((const char*)xmlGetProp(root, (const xmlChar *)"changetarget")) { //0 never, 10000 always
+			changeTargetChance = atoi((const char*)xmlGetProp(root, (const xmlChar *)"changetarget"));
+		}
+		
 		while (p)
 		{
 			const char* str = (char*)p->name;
@@ -467,18 +482,39 @@ Monster::~Monster()
 	physicalAttacks.clear();
 }
 
-Creature* Monster::findTarget(const Creature *ignoreCreature /*= NULL*/)
+bool Monster::validateDistanceAttack(const Creature *target)
+{
+	return game->map->canThrowItemTo(this->pos, target->pos, false, true);
+}
+
+bool Monster::validateDistanceAttack(const Position &pos)
+{
+	return game->map->canThrowItemTo(this->pos, pos, false, true);
+}
+
+Creature* Monster::findTarget(long range, const Creature *ignoreCreature /*= NULL*/)
 {
 	if(attackedCreature == 0) {
 		std::vector<Creature*> tmplist;
-		game->getSpectators(Range(this->pos, false), tmplist);
+		if(range == 0)
+			game->getSpectators(Range(this->pos,false), tmplist);
+		else
+			game->getSpectators(Range(this->pos, range, range, range, range, false), tmplist);
 		
 		std::vector<Creature*> playerlist;
 		for(std::vector<Creature*>::const_iterator cit = tmplist.begin(); cit != tmplist.end(); ++cit) {
 			const Player* player = dynamic_cast<const Player*>(*cit);
 
 			if(player && player->access == 0 && player != ignoreCreature) {
-				playerlist.push_back(*cit);
+				if(hasDistanceAttack && validateDistanceAttack(player)){
+					playerlist.push_back(*cit);
+				}
+				else{
+					std::list<Position> tmp_route = game->map->getPathTo(this, this->pos, player->pos, false, canPushItems);
+					if(tmp_route.size() != 0){
+						playerlist.push_back(*cit);
+					}
+				}
 			}
 		}
 
@@ -542,7 +578,7 @@ int Monster::onThink(int& newThinkTicks)
 		this->lastmove = OTSYS_TIME();
 
 		bool isRouteValid = true;
-		if(!game->map->isPathValid(this, route)) {
+		if(!game->map->isPathValid(this, route, canPushItems)) {
 			calcMovePosition();
 			isRouteValid = false;
 		}
@@ -560,6 +596,21 @@ int Monster::onThink(int& newThinkTicks)
 			}
 		}
 
+		if(getCurrentDistanceToTarget() == 1 && rand() % staticAttack == 0){
+			randMovePosition();
+			isRouteValid = false;
+		}
+		
+		if(changeTargetChance > rand()*10000/(RAND_MAX+1)){
+			attackedCreature = 0;
+			Creature *newtarget = findTarget(3);
+			if(newtarget){
+				attackedCreature = 0;
+				isRouteValid = false;
+				OnCreatureEnter(newtarget);
+			}
+		}
+		
 		doMoveTo(moveToPos, isRouteValid);
 
 		newThinkTicks = stepDuration;
@@ -589,12 +640,12 @@ int Monster::getCurrentDistanceToTarget()
 void Monster::calcMovePosition()
 {
 	int currentdist = getCurrentDistanceToTarget();
-	if((currentdist == getTargetDistance() && game->map->canThrowItemTo(this->pos, targetPos, false, true))
+	if((currentdist == getTargetDistance() && hasDistanceAttack && validateDistanceAttack(targetPos))
 		|| (isfleeing && currentdist >= getTargetDistance()))
 		return;
 
 	int distance = getTargetDistance();
-	if(distance > 1) {
+	if(distance > 1 && hasDistanceAttack) {
 
 		int prevdist = 0;
 		int minwalkdist = 0;
@@ -617,14 +668,8 @@ void Monster::calcMovePosition()
 					if(!game->map->canThrowItemTo(tmppos, targetPos, false, true))
 						continue;
 					
-					if(!(this->pos.x == x && this->pos.y == y)) {
-						Tile *t = NULL;
-						if((!(t = game->map->getTile(x, y, pos.z))) ||
-								t->isBlocking() ||
-								t->isPz() || 
-								t->creatures.size() ||
-								t->floorChange() ||
-								t->getTeleportItem())
+					if(!(this->pos.x == x && this->pos.y == y)){
+						if(!canMoveTo(x,y,pos.z))
 							continue;
 					}
 /*				
@@ -643,7 +688,7 @@ void Monster::calcMovePosition()
 		}
 	}
 	//Close combat
-	else if(currentdist > distance || currentdist == 0) {
+	else if(currentdist > distance || currentdist == 0 || (distance > 1 && !hasDistanceAttack)) {
 		//Close combat
 		int prevdist = 0;
 		for(int y = targetPos.y - 1; y <= targetPos.y + 1; ++y) {
@@ -654,13 +699,7 @@ void Monster::calcMovePosition()
 				int dist = std::max(std::abs(pos.x - x), std::abs(pos.y - y));
 
 				if(dist < prevdist || (prevdist == 0)) {
-					Tile *t;
-					if((!(t = game->map->getTile(x, y, pos.z))) ||
-							t->isBlocking() ||
-							t->isPz() || 
-							t->creatures.size() ||
-							t->floorChange() ||
-							t->getTeleportItem())
+					if(!canMoveTo(x,y,pos.z))
 						continue;
 					/*
 					if((!(t = game->map->getTile(x, y, pos.z))) || t->isBlocking() || t->isPz() || t->creatures.size())
@@ -681,6 +720,40 @@ void Monster::calcMovePosition()
 	}
 }
 
+void Monster::randMovePosition()
+{
+	//only close combat	
+	std::vector<Position> positionList;
+	Position randMovePos;
+	
+	if(targetPos.x == pos.x){
+		for(int y = pos.y - 1; y <= pos.y + 1; ++y){
+			if(std::abs(y - targetPos.y) <= 1 && canMoveTo(pos.x,y,pos.z)){
+				randMovePos.x = pos.x;
+				randMovePos.y = y;
+				randMovePos.z = pos.z;
+				positionList.push_back(randMovePos);
+			}
+		}
+	}
+	else{ //targetPos.y == pos.y
+		for(int x = pos.x - 1; x <= pos.x + 1; ++x){
+			if(std::abs(x - targetPos.x) <= 1 && canMoveTo(x,pos.y,pos.z)){
+				randMovePos.x = x;
+				randMovePos.y = pos.y;
+				randMovePos.z = pos.z;
+				positionList.push_back(randMovePos);
+			}
+		}
+	}
+	
+	if(positionList.empty())
+		return;
+
+	size_t index = random_range(0, positionList.size() - 1);
+	moveToPos = positionList[index];
+}
+
 bool Monster::isInRange(const Position &p)
 {
 	return ((std::abs(p.x - this->pos.x) <= 9) && (std::abs(p.y - this->pos.y) <= 7) &&
@@ -698,6 +771,9 @@ void Monster::onThingMove(const Creature *creature, const Thing *thing,
 			if(attackedCreature == creature->getID()) {
 				targetPos = creature->pos;
 			}
+			else if(attackedCreature == 0){
+				OnCreatureEnter(creature);
+			}
 		}
 		else if(isInRange(moveCreature->pos) && !isInRange(*oldPos)) {
 			OnCreatureEnter(creature);
@@ -711,6 +787,12 @@ void Monster::onThingMove(const Creature *creature, const Thing *thing,
 			calcMovePosition();
 		}
 	}
+	/*else if(attackedCreature == 0){
+		const Item* moveItem = dynamic_cast<const Item *>(thing);
+		if(moveItem && moveItem->isBlocking()){
+			OnCreatureLeave(NULL);
+		}
+	}*/
 }
 
 void Monster::onCreatureAppear(const Creature *creature)
@@ -730,6 +812,12 @@ void Monster::onThingDisappear(const Thing* thing, unsigned char stackPos){
 	if(creature)
 		OnCreatureLeave(creature);
 }
+
+void Monster::onThingTransform(const Thing* thing,int stackpos){
+	if(attackedCreature == 0)
+		OnCreatureLeave(NULL);
+}
+
 void Monster::onThingAppear(const Thing* thing){
 	const Creature *creature = dynamic_cast<const Creature*>(thing);
 	if(creature && isInRange(creature->pos)){
@@ -785,16 +873,16 @@ void Monster::OnCreatureEnter(const Creature *creature)
 
 void Monster::OnCreatureLeave(const Creature *creature)
 {
-	if(attackedCreature == creature->getID()) {
+	if(creature && attackedCreature == creature->getID()) {
 		attackedCreature = 0;
 
 		targetPos.x = 0;
 		targetPos.y = 0;
 		targetPos.z = 0;
-		Creature* targetCreature = NULL;
-		if((targetCreature = findTarget(creature))) {
-			OnCreatureEnter(targetCreature);
-		}
+	}
+	Creature* targetCreature = NULL;
+	if(attackedCreature == 0 && (targetCreature = findTarget(0, creature))){
+		OnCreatureEnter(targetCreature);
 	}
 }
 
@@ -836,10 +924,12 @@ bool Monster::doAttacks(Player* attackedPlayer)
 
 	bool trymelee = getCurrentDistanceToTarget() <= 1;
 	bool hasmelee = false;
-	for(PhysicalAttacks::iterator paIt = physicalAttacks.begin(); paIt != physicalAttacks.end(); ++paIt) {
-		if(trymelee && paIt->first->fighttype == FIGHT_MELEE) {
-			hasmelee = true;
-			break;
+	if(trymelee){
+		for(PhysicalAttacks::iterator paIt = physicalAttacks.begin(); paIt != physicalAttacks.end(); ++paIt) {
+			if(paIt->first->fighttype == FIGHT_MELEE) {
+				hasmelee = true;
+				break;
+			}
 		}
 	}
 	
@@ -916,9 +1006,18 @@ void Monster::onAttack()
 			}
 			else {
 				if (attackedPlayer != NULL && attackedPlayer->health > 0) {
-					doAttacks(attackedPlayer);
+					if(validateDistanceAttack(attackedPlayer)){
+						doAttacks(attackedPlayer);
+					}
+					else{
+						//select other target
+						OnCreatureLeave(attackedPlayer);
+					}
 				}
 			}
+		}
+		else{
+			this->attackedCreature = 0;
 		}
 	}
 }
@@ -966,11 +1065,26 @@ void Monster::doMoveTo(const Position& destpos, bool isRouteValid)
 
 	//if(route.size() == 0 || route.back() != destpos || route.front() != this->pos){
 	if(route.size() == 0 || route.back() != destpos || !isRouteValid /*!game->map->isPathValid(this, route)*/){
-		route = this->game->getPathTo(this, this->pos, destpos);
+		route = game->map->getPathTo(this, this->pos, destpos, true, canPushItems);
 	}
 
 	if(route.size() == 0){
 		//still no route
+		if(attackedCreature != 0){
+			Player *attackedPlayer = dynamic_cast<Player*>(game->getCreatureByID(attackedCreature));
+			if(attackedPlayer){
+				if(hasDistanceAttack && validateDistanceAttack(attackedPlayer)){
+					//stop here and attack
+					moveToPos = this->pos;
+					//TODO: invalidate route in other way
+					route = game->map->getPathTo(this, this->pos, moveToPos, true, canPushItems);
+				}
+				else{
+					//select other target
+					OnCreatureLeave(attackedPlayer);
+				}
+			}
+		}
 		return;
 	}
 	else
@@ -982,6 +1096,70 @@ void Monster::doMoveTo(const Position& destpos, bool isRouteValid)
 	
 	int dx = nextStep.x - this->pos.x;
 	int dy = nextStep.y - this->pos.y;
-
+	
+	if(canPushItems){
+		//move/destroy blocking moveable items
+		Tile *tile =game->getTile(nextStep.x,nextStep.y ,this->pos.z);
+		int countItems;
+		if(tile){
+			countItems = 0;
+			while(Item* blockItem = tile->getMoveableBlockingItem()){
+				if(countItems < 2){
+					if(!monsterMoveItem(blockItem, 3)){
+						//destroy it
+						game->removeThing(NULL, blockItem->pos, blockItem);
+					}
+				}
+				else{
+					//destroy items directly
+					game->removeThing(NULL, blockItem->pos, blockItem);
+				}
+				countItems++;
+			}
+		}
+	}
+	
 	this->game->thingMove(this, this,this->pos.x + dx, this->pos.y + dy, this->pos.z, 1);
+}
+
+bool Monster::monsterMoveItem(Item* item, int radius)
+{
+	Position centerPos = item->pos;
+	Position tryPos;
+	int try_x, try_y;
+	int itemCount;
+	if(item->isStackable()){
+		itemCount = item->getItemCountOrSubtype();
+	}
+	else{
+		itemCount = 1;
+	}
+	//try random position in raiuds
+	tryPos.z = item->pos.z;
+	for(int i = 0; i < 4*radius; i++){
+		tryPos.x = item->pos.x + rand() % radius;
+		tryPos.y = item->pos.y + rand() % radius;
+		if(game->map->canThrowItemTo(item->pos,tryPos)){
+			game->thingMove(this, item ,tryPos.x, tryPos.y, tryPos.z, itemCount);
+			if(item->pos == tryPos){
+				return true;
+			}
+		}
+	}
+	return false;
+}
+bool Monster::canMoveTo(unsigned short x, unsigned short y, unsigned char z)
+{
+	Tile *t;
+	if((!(t = game->map->getTile(x, y, pos.z))) ||
+			t->isBlocking() ||
+			t->isPz() || 
+			t->creatures.size() ||
+			t->floorChange() ||
+			t->getTeleportItem()){
+		return false;
+	}
+	else{
+		return true;
+	}
 }

@@ -47,18 +47,18 @@ bool Tile::isBlockingProjectile() const
   return false;
 }
 
-bool Tile::isBlocking(bool ispickupable /*= false*/) const
+bool Tile::isBlocking(bool ispickupable /*= false*/, bool ignoreMoveableBlocking /*=false*/) const
 {
   if(ground && ground->isBlocking(ispickupable) == true)
     return true;
   
 	ItemVector::const_iterator iit;
   for (iit = topItems.begin(); iit != topItems.end(); ++iit)
-    if ((*iit)->isBlocking(ispickupable))
+    if((*iit)->isBlocking(ispickupable) && !(ignoreMoveableBlocking && !(*iit)->isNotMoveable()))
       return true;
 
   for (iit = downItems.begin(); iit != downItems.end(); ++iit)
-    if ((*iit)->isBlocking(ispickupable))
+    if ((*iit)->isBlocking(ispickupable) && !(ignoreMoveableBlocking && !(*iit)->isNotMoveable()))
       return true;
 
 
@@ -393,7 +393,7 @@ Teleport* Tile::getTeleportItem()
   {
 		teleport = dynamic_cast<Teleport*>(*iit);
 		if (teleport)
-      return teleport;
+			return teleport;
   }
 
 	return NULL;
@@ -401,13 +401,13 @@ Teleport* Tile::getTeleportItem()
 
 MagicEffectItem* Tile::getFieldItem()
 {
-  MagicEffectItem* fieldItem = NULL;
-  for (ItemVector::const_iterator iit = downItems.begin(); iit != downItems.end(); ++iit)
-  {
+  	MagicEffectItem* fieldItem = NULL;
+  	for (ItemVector::const_iterator iit = downItems.begin(); iit != downItems.end(); ++iit)
+  	{
 		fieldItem = dynamic_cast<MagicEffectItem*>(*iit);
-		if (fieldItem)
-      return fieldItem;
-  }
+		if(fieldItem)
+			return fieldItem;
+  	}
 
 	return NULL;
 }
@@ -428,10 +428,20 @@ Item* Tile::getTopDownItem(){
 	return NULL;
 }
 
+Item* Tile::getMoveableBlockingItem()
+{
+	for (ItemVector::const_iterator iit = downItems.begin(); iit != downItems.end(); ++iit)
+	{
+		if((*iit)->isBlocking() && !(*iit)->isNotMoveable())
+			return *iit;
+  	}
+	return NULL;
+}
+
 void Tile::addThing(Thing *thing) {
 	Creature* creature = dynamic_cast<Creature*>(thing);
 	if (creature) {
-    creatures.insert(creatures.begin(), creature);
+    	creatures.insert(creatures.begin(), creature);
 
 		EventMap::iterator it, lb, ub;
 		lb = event_map.lower_bound(EVENT_CREATURE_ENTER);

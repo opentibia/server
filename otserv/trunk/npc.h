@@ -116,6 +116,7 @@ protected:
   virtual void onCreatureAppear(const Creature *creature);
   virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos, bool tele);
   virtual void onThingDisappear(const Thing* thing, unsigned char stackPos);
+  virtual void onThingTransform(const Thing* thing,int stackpos){};
   virtual void onThingAppear(const Thing* thing);
   virtual void onCreatureTurn(const Creature *creature, unsigned char stackpos);
   virtual void onCreatureSay(const Creature *creature, SpeakClasses type, const std::string &text);

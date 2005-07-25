@@ -3822,30 +3822,15 @@ void Game::autoCloseTrade(const Item* item){
 	const Container* container = NULL;
 	for(it = tradeItems.begin(); it != tradeItems.end(); it++) {
 		if(item == it->first || 
-			((container =dynamic_cast<const Container*>(item)) && container->getSlotNumberByItem(it->first) == 0xFF && container->isHoldingItem(it->first)) ||
-			((container =dynamic_cast<const Container*>(it->first)) && container->isHoldingItem(item)))
+			((container = dynamic_cast<const Container*>(item)) && container->getSlotNumberByItem(it->first) == 0xFF && container->isHoldingItem(it->first)) ||
+			((container = dynamic_cast<const Container*>(it->first)) && container->isHoldingItem(item)))
 		{
 			Player* player = dynamic_cast<Player*>(getCreatureByID(it->second));
 			if(player) {
-				playerCloseTrade(player);
+					playerCloseTrade(player);
 			}
 
 			break;
-
-			/*
-			//TODO change the way to get trade player
-			std::vector<Creature*> list;
-			getSpectators(Range(pos), list);
-			std::cout << (int)list.size() << std::endl;
-			for(int i = 0; i < list.size(); ++i) {
-				if(dynamic_cast<Player*>(list[i]) && 
-				  dynamic_cast<Player*>(list[i])->getTradeItem() == *it){
-					playerCloseTrade((Player*)list[i]);
-					break;
-				}
-			}
-			break;
-			*/
 		}
 	}
 }
@@ -4122,10 +4107,7 @@ void Game::sendUpdateThing(Player* player,const Position &pos,const Thing* thing
 		std::vector<Creature*> list;
 		map->getSpectators(Range(pos,true), list);
 		for(unsigned int i = 0; i < list.size(); ++i){
-			Player *spectator = dynamic_cast<Player*>(list[i]);
-			if(spectator){
-				spectator->onThingTransform(thing,stackpos);
-			}
+			list[i]->onThingTransform(thing,stackpos);
 		}			
 	}
 }

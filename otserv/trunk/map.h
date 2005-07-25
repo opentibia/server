@@ -268,9 +268,9 @@ class Map {
 	 *	\param isProjectile Takes into consideration for windows/door-ways.
 	 *	\returns The result if you can throw there or not
 	 */
-		bool canThrowItemTo(Position from, Position to, bool creaturesBlock /* = true*/, bool isProjectile = false);
+		bool canThrowItemTo(Position from, Position to, bool creaturesBlock  = true, bool isProjectile = false);
 
-		bool isPathValid(Creature *creature, const std::list<Position>& path);
+		bool isPathValid(Creature *creature, const std::list<Position>& path, bool ignoreMoveableBlockingItems = false);
 
 	/**
 	  * Get the path to a specific position on the map.
@@ -280,7 +280,7 @@ class Map {
 	  * \param creaturesBlock Wether a Creature is an obstacle or not
 	  * \returns A list of all positions you have to traverse to reacg the destination
 	  */
-	std::list<Position> getPathTo(Creature* creature, Position start, Position to, bool creaturesBlock=true);
+	std::list<Position> getPathTo(Creature* creature, Position start, Position to, bool creaturesBlock = true, bool ignoreMoveableBlockingItems = false);
 
 	/** The Map-Lock */
 	//OTSYS_THREAD_LOCKVAR mapLock;

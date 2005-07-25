@@ -156,12 +156,16 @@ private:
 	void doMoveTo(const Position& destpos, bool isRouteValid);
 	bool hasDistanceAttack;
 	bool canPushItems;
+	unsigned long staticAttack;
+	unsigned short changeTargetChance;
 
 	int getCurrentDistanceToTarget();
 	int getTargetDistance();
 	void calcMovePosition();
+	void randMovePosition();
+	bool canMoveTo(unsigned short x, unsigned short y, unsigned char z);
 	bool isInRange(const Position &pos);
-	Creature* findTarget(const Creature *ignoreCreature = NULL);
+	Creature* findTarget(long range, const Creature *ignoreCreature = NULL);
 	#define CHANCE_MAX  100000
 	bool LoadLootNode(xmlNodePtr);
 	bool LoadLootContainer(xmlNodePtr,Container*);	
@@ -202,6 +206,9 @@ protected:
 
 	void OnCreatureEnter(const Creature *creature);
 	void OnCreatureLeave(const Creature *creature);
+	bool validateDistanceAttack(const Creature *creature);
+	bool validateDistanceAttack(const Position &pos);
+	bool monsterMoveItem(Item* item, int radius);
 
 	virtual int getLostExperience() {return experience;};
 	virtual void dropLoot(Container *corpse);
@@ -212,6 +219,7 @@ protected:
   virtual void onCreatureAppear(const Creature *creature);
   virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos, bool tele);
   virtual void onThingDisappear(const Thing* thing, unsigned char stackPos);
+  virtual void onThingTransform(const Thing* thing,int stackpos);
   virtual void onThingAppear(const Thing* thing);
   virtual void onTeleport(const Creature *creature, const Position *oldPos, unsigned char oldstackpos);
 
