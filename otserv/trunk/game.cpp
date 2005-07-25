@@ -2476,7 +2476,7 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 	for(MagicAreaVec::iterator maIt = tmpMagicAreaVec.begin(); maIt != tmpMagicAreaVec.end(); ++maIt) {
 		Tile *t = map->getTile(maIt->x, maIt->y, maIt->z);
 		if(t && (!creature || (creature->access != 0 || !me->offensive || !t->isPz()) ) ) {
-			if(!t->isBlocking() && map->canThrowItemTo(frompos, (*maIt), false, true) && !t->floorChange()) {
+			if(/*!t->isBlocking() &&*/ map->canThrowItemTo(frompos, (*maIt), false, true) && !t->floorChange()) {
 				
 				if(maIt->x < topLeft.x)
 					topLeft.x = maIt->x;
@@ -3667,7 +3667,7 @@ void Game::playerRequestTrade(Player *player, const Position& pos,
 	const Container* container = NULL;
 	for(it = tradeItems.begin(); it != tradeItems.end(); it++) {
 		if(tradeItem == it->first || 
-			((container = dynamic_cast<const Container*>(tradeItem)) && container->getSlotNumberByItem(it->first) == 0xFF && container->isHoldingItem(it->first)) ||
+			((container = dynamic_cast<const Container*>(tradeItem)) && container->isHoldingItem(it->first)) ||
 			((container = dynamic_cast<const Container*>(it->first)) && container->isHoldingItem(tradeItem)))
 		{
 			player->sendTextMessage(MSG_INFO, "This item is already beeing traded.");

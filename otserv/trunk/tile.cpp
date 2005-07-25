@@ -430,7 +430,7 @@ Item* Tile::getTopDownItem(){
 
 Thing* Tile::getTopThing()
 {
-	if(getThingCount() >= 1) {
+	if(getThingCount() > 1) {
 		return getThingByStackPos(1);
 	}
 	else 
