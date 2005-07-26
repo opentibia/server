@@ -1481,6 +1481,10 @@ void Game::thingMoveInternal(Player *player,
 						if(player->removeItemInventory((slots_t)from_cid, true)) {
 							autoCloseTrade(toContainer);
 							toContainer->addItem(fromItem);
+
+							if(player->isHoldingContainer(toContainer)) {
+								player->updateInventoryWeigth();
+							}
 						}
 					}
 
@@ -1492,6 +1496,10 @@ void Game::thingMoveInternal(Player *player,
 				else if(player->removeItemInventory(from_cid, true)) {
 					autoCloseTrade(toContainer);
 					toContainer->addItem(fromItem);
+
+					if(player->isHoldingContainer(toContainer)) {
+						player->updateInventoryWeigth();
+					}
 				}
 
 				if(!player->isHoldingContainer(toContainer)) {
