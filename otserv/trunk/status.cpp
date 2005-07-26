@@ -123,9 +123,8 @@ std::string Status::getStatusString(){
 	else
 		xml = "";
 
-	xmlFree(s);
-	//free(s);
-	//xmlFreeDoc(doc);
+	xmlFreeOTSERV(s);
+	xmlFreeDoc(doc);
 
 	return xml;
 }

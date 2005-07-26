@@ -123,6 +123,7 @@ unsigned short Item::getUniqueId() const{
 }
 
 Item::Item(const unsigned short _type) {
+	//std::cout << "Item constructor1 " << this << std::endl;
 	id = _type;
 	count = 0;	
 	chargecount = 0;
@@ -137,6 +138,7 @@ Item::Item(const unsigned short _type) {
 }
 
 Item::Item(const Item &i){
+	//std::cout << "Item copy constructor " << this << std::endl;
 	id = i.id;
 	count = i.count;
 	chargecount = i.chargecount;
@@ -218,6 +220,7 @@ long Item::getDecayTime(){
 }
 
 Item::Item(const unsigned short _type, unsigned short _count) {
+	//std::cout << "Item constructor2 " << this << std::endl;
 	id = _type;
 	count = 0;
 	chargecount = 0;
@@ -251,6 +254,7 @@ Item::Item(const unsigned short _type, unsigned short _count) {
 
 Item::Item()
 {
+	//std::cout << "Item constructor3 " << this << std::endl;
 	id = 0;
 	count = 0;
 	chargecount = 0;
@@ -265,6 +269,7 @@ Item::Item()
 
 Item::~Item()
 {
+	//std::cout << "Item destructor " << this << std::endl;
 	if(specialDescription)
 		delete specialDescription;
 	if(text)
@@ -281,17 +286,26 @@ bool Item::canMovedTo(const Tile *tile) const
 }
 
 int Item::unserialize(xmlNodePtr p){
-	id=atoi((const char*)xmlGetProp(p, (const xmlChar *) "id"));
+	char *tmp;
+	tmp = (char*)xmlGetProp(p, (const xmlChar *) "id");
+	if(tmp){
+		id = atoi(tmp);
+		xmlFreeOTSERV(tmp);
+	}
 	
-	const char* tmp=(const char*)xmlGetProp(p, (const xmlChar *) "special_description");
-	if(tmp)
+	tmp = (char*)xmlGetProp(p, (const xmlChar *) "special_description");
+	if(tmp){
 		specialDescription = new std::string(tmp);
+		xmlFreeOTSERV(tmp);
+	}
 		
-	tmp=(const char*)xmlGetProp(p, (const xmlChar *) "text");
-	if(tmp)
+	tmp = (char*)xmlGetProp(p, (const xmlChar *) "text");
+	if(tmp){
 		text = new std::string(tmp);
+		xmlFreeOTSERV(tmp);
+	}
 	
-	tmp=(const char*)xmlGetProp(p, (const xmlChar *) "count");
+	tmp = (char*)xmlGetProp(p, (const xmlChar *) "count");
 	/*
 	if(tmp && isStackable() )
 		count=atoi(tmp);
@@ -300,16 +314,22 @@ int Item::unserialize(xmlNodePtr p){
 	else if(tmp)
 		chargecount=atoi(tmp);	
 	*/
-	if(tmp)
+	if(tmp){
 		setItemCountOrSubtype(atoi(tmp));
+		xmlFreeOTSERV(tmp);
+	}
 		
-	tmp=(const char*)xmlGetProp(p, (const xmlChar *) "actionId");
-	if(tmp)
+	tmp = (char*)xmlGetProp(p, (const xmlChar *) "actionId");
+	if(tmp){
 		setActionId(atoi(tmp));
+		xmlFreeOTSERV(tmp);
+	}
 	
-	tmp=(const char*)xmlGetProp(p, (const xmlChar *) "uniqueId");
-	if(tmp)
+	tmp = (char*)xmlGetProp(p, (const xmlChar *) "uniqueId");
+	if(tmp){
 		setUniqueId(atoi(tmp));
+		xmlFreeOTSERV(tmp);
+	}
 	
 	return 0;
 }
@@ -317,7 +337,7 @@ int Item::unserialize(xmlNodePtr p){
 xmlNodePtr Item::serialize(){
 	std::stringstream s;
 	xmlNodePtr ret;
-	ret=xmlNewNode(NULL,(const xmlChar*)"item");
+	ret = xmlNewNode(NULL,(const xmlChar*)"item");
 	s.str(""); //empty the stringstream
 	s << getID();
 	xmlSetProp(ret, (const xmlChar*)"id", (const xmlChar*)s.str().c_str());
@@ -645,10 +665,22 @@ Teleport::~Teleport()
 int Teleport::unserialize(xmlNodePtr p)
 {
 	Item::unserialize(p);
-
-	destPos.x = atoi((const char*)xmlGetProp(p, (const xmlChar *) "destx"));
-	destPos.y = atoi((const char*)xmlGetProp(p, (const xmlChar *) "desty"));
-	destPos.z = atoi((const char*)xmlGetProp(p, (const xmlChar *) "destz"));
+	char *tmp = (char*)xmlGetProp(p, (const xmlChar *) "destx");
+	if(tmp){
+		destPos.x = atoi(tmp);
+		xmlFreeOTSERV(tmp);
+	}
+	tmp = (char*)xmlGetProp(p, (const xmlChar *) "desty");
+	if(tmp){
+		destPos.y = atoi(tmp);
+		xmlFreeOTSERV(tmp);
+	}
+	tmp = (char*)xmlGetProp(p, (const xmlChar *) "destz");
+	if(tmp){
+		destPos.z = atoi(tmp);
+		xmlFreeOTSERV(tmp);
+	}
+	
 
 	return 0;
 }

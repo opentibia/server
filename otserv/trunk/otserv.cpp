@@ -440,7 +440,7 @@ int main(int argc, char *argv[])
 	std::cout << "[done]" << std::endl;
 	
 	// load item data
-	std::cout << ":: reading tibia.dat ...            ";
+	std::cout << ":: Reading tibia.dat ...            ";
 	if (Item::items.loadFromDat("tibia.dat"))
 	{
 		ErrorMessage("Could not load tibia.dat!");
@@ -448,7 +448,7 @@ int main(int argc, char *argv[])
 	}
 	std::cout << "[done]" << std::endl;
 	
-	std::cout << ":: reading " << g_config.getGlobalString("datadir") << "items/items.xml ... ";
+	std::cout << ":: Reading " << g_config.getGlobalString("datadir") << "items/items.xml ... ";
 	if (Item::items.loadXMLInfos(g_config.getGlobalString("datadir") + "items/items.xml"))
 	{
 		ErrorMessage("Could not load /items/items.xml ...!");

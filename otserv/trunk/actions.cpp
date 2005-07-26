@@ -126,19 +126,23 @@ bool Actions::loadFromXml(const std::string &_datadir)
 
 Action *Actions::loadAction(xmlNodePtr xmlaction){
 	Action *action = NULL;
-	const char* scriptfile = (const char*)xmlGetProp(xmlaction,(xmlChar*)"script");
+	char* scriptfile = (char*)xmlGetProp(xmlaction,(xmlChar*)"script");
 	if(scriptfile){
 		action = new Action(game,datadir, datadir + std::string("actions/scripts/") + scriptfile);
 		if(action->isLoaded()){
-			const char* sallow = (const char*)xmlGetProp(xmlaction,(xmlChar*)"allowfaruse");
-			if(sallow && strcmp(sallow,"1")==0){
-				action->setAllowFarUse(true);
+			char* sallow = (char*)xmlGetProp(xmlaction,(xmlChar*)"allowfaruse");
+			if(sallow){
+				if(strcmp(sallow,"1")==0){
+					action->setAllowFarUse(true);
+				}
+				xmlFreeOTSERV(sallow);
 			}
 		}
 		else{
 			delete action;
 			action = NULL;
 		}
+		xmlFreeOTSERV(scriptfile);
 	}
 	else{
 		std::cout << "Missing script tag."  << std::endl;
@@ -290,12 +294,13 @@ bool Actions::UseItemEx(Player* player, const Position &from_pos,
 
 bool readXMLInteger(xmlNodePtr p, const char *tag, int &value)
 {
-	const char* sinteger = (const char*)xmlGetProp(p, (xmlChar*)tag);
+	char* sinteger = (char*)xmlGetProp(p, (xmlChar*)tag);
 	if(!sinteger)
 		return false;
 	else{
 		unsigned short integer = atoi(sinteger);
 		value = integer;
+		xmlFreeOTSERV(sinteger);
 		return true;
 	}
 }

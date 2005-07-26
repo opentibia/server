@@ -93,7 +93,7 @@ bool Commands::loadXml(const std::string &_datadir){
 			const char* str = (char*)p->name;
 			
 			if (strcmp(str, "command") == 0){
-				const char *tmp = (const char*)xmlGetProp(p, (const xmlChar *) "cmd");
+				char *tmp = (char*)xmlGetProp(p, (const xmlChar *) "cmd");
 				if(tmp){
 					CommandMap::iterator it = commandMap.find(tmp);
 					int alevel;
@@ -115,6 +115,7 @@ bool Commands::loadXml(const std::string &_datadir){
 						//error
 						std::cout << "Unknown command " << tmp << std::endl;
 					}
+					xmlFreeOTSERV(tmp);
 				}
 				else{
 					std::cout << "missing cmd." << std::endl;

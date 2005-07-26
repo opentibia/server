@@ -25,6 +25,7 @@
 bool IOMapXML::loadMap(Map* map, std::string identifier){
 	xmlDocPtr doc;
 	xmlNodePtr root, tile, p, tmpNode;
+	char* tmp;
 
 	xmlLineNumbersDefault(1);
 	std::cout << "loaded map " << identifier << std::endl;
@@ -40,20 +41,28 @@ bool IOMapXML::loadMap(Map* map, std::string identifier){
 		exit(1);
 	}
 
-	map->mapwidth=atoi((const char*)xmlGetProp(root, (const xmlChar *) "width"));
-	map->mapheight=atoi((const char*)xmlGetProp(root, (const xmlChar *) "height"));
+	tmp = (char*)xmlGetProp(root, (const xmlChar *) "width");
+	if(tmp){
+		map->mapwidth = atoi(tmp);
+		xmlFreeOTSERV(tmp);
+	}
+	tmp = (char*)xmlGetProp(root, (const xmlChar *) "height");
+	if(tmp){
+		map->mapheight = atoi(tmp);
+		xmlFreeOTSERV(tmp);
+	}
 	std::cout << map->mapwidth << "  " << map->mapheight << std::endl;
 
 	std::string spawnfile = "";
-	if(xmlGetProp(root, (const xmlChar *) "spawnfile")) {
+	if(tmp = (char*)xmlGetProp(root, (const xmlChar *) "spawnfile")){
 		map->spawnfile = identifier.substr(0, identifier.rfind('/') + 1);
-		map->spawnfile += (const char*)xmlGetProp(root, (const xmlChar *) "spawnfile");
+		map->spawnfile += tmp;
+		xmlFreeOTSERV(tmp);
 	}
 
 	tile=root->children;
 
 	int px,py,pz;
-  	char* tmp;
   	Tile *t;
 
   	while(tile){ 

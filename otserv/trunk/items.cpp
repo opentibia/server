@@ -132,8 +132,40 @@ int Items::loadFromDat(std::string file)
 #ifdef __DEBUG__
 		int lastoptbyte = 0;
 #endif
+		//TODO: some other way of finding levelchange items
+        if(iType->id == 1396 || iType->id ==1385 || iType->id ==1394 || iType->id ==1404){
+			iType->floorChangeNorth = true;
+        }
+        if(iType->id == 1392|| iType->id ==1402){
+        	iType->floorChangeSouth = true;
+        }
+        if(iType->id == 1388|| iType->id ==1398){
+            iType->floorChangeEast = true;
+        }
+        if(iType->id == 1390|| iType->id ==1400){
+            iType->floorChangeWest = true;
+        }
+                         
+        //diagonal             
+        if(iType->id == 1559){
+            iType->floorChangeSouth = true;
+            iType->floorChangeWest = true;
+        }
+        if(iType->id == 1557){
+            iType->floorChangeSouth = true;
+			iType->floorChangeEast = true;
+        }
+        if(iType->id == 1553){
+            iType->floorChangeNorth = true;
+            iType->floorChangeWest = true;
+        }
+        if(iType->id == 1555){
+            iType->floorChangeNorth = true;
+            iType->floorChangeEast = true;
+		}                                       
+		
 		// read the options until we find a 0xff
-		int optbyte;
+		int optbyte;	
 		
 		while (((optbyte = fgetc(f)) >= 0) &&   // no error
 				   (optbyte != 0xFF))			    // end of options
@@ -149,37 +181,6 @@ int Items::loadFromDat(std::string file)
 			}
 			lastoptbyte = optbyte;
 #endif
-            //TODO: some other way of finding levelchange items
-            if(iType->id == 1396 || iType->id ==1385 || iType->id ==1394 || iType->id ==1404){
-                         iType->floorChangeNorth = true;
-                         }
-            if(iType->id == 1392|| iType->id ==1402){
-                         iType->floorChangeSouth = true;
-                         }
-            if(iType->id == 1388|| iType->id ==1398){
-                         iType->floorChangeEast = true;
-                         }
-            if(iType->id == 1390|| iType->id ==1400){
-                         iType->floorChangeWest = true;
-                         }
-                         
-            //diagonal             
-            if(iType->id == 1559){
-                         iType->floorChangeSouth = true;
-                         iType->floorChangeWest = true;
-                         }
-            if(iType->id == 1557){
-                         iType->floorChangeSouth = true;
-                         iType->floorChangeEast = true;
-                         }
-            if(iType->id == 1553){
-                         iType->floorChangeNorth = true;
-                         iType->floorChangeWest = true;
-                         }
-            if(iType->id == 1555){
-                         iType->floorChangeNorth = true;
-                         iType->floorChangeEast = true;
-                         }                                       
 			
 			switch (optbyte)
 			{
@@ -406,6 +407,7 @@ int Items::loadFromDat(std::string file)
 int Items::loadXMLInfos(std::string file)
 {
 	xmlDocPtr doc;
+	char *tmp;
 	doc = xmlParseFile(file.c_str());
 
 	if (doc) {
@@ -420,10 +422,10 @@ int Items::loadXMLInfos(std::string file)
 		p = root->children;
 		while (p) {
 			std::string elem = (char*)p->name;
-			if (elem == "item" && xmlGetProp(p, (xmlChar*)"id")) {
+			if (elem == "item" && (tmp = (char*)xmlGetProp(p, (xmlChar*)"id"))) {
 				// get the id...
-				int id = atoi((const char*)xmlGetProp(p, (xmlChar*)"id"));
-
+				int id = atoi(tmp);
+				xmlFreeOTSERV(tmp);
 				// now let's find the item and load it's definition...
 				ItemMap::iterator it = items.find(id);
 				if ((it != items.end()) && (it->second != NULL)){
@@ -431,37 +433,48 @@ int Items::loadXMLInfos(std::string file)
 
 					// set general properties...
 					char* name = (char*)xmlGetProp(p, (xmlChar*)"name");
-          			if (name)
+          			if(name){
 						itemtype->name = name;
+						xmlFreeOTSERV(name);
+					}
           			else
             			std::cout << "missing name tag for item: " << id << std::endl;
 
           			char* weight = (char*)xmlGetProp(p, (xmlChar*)"weight");
-          			if (weight)
+          			if(weight){
 						itemtype->weight = atof(weight);
+						xmlFreeOTSERV(weight);
+					}
           			else
             			std::cout << "missing weight tag for item: " << id << std::endl;
             			
 					// and optional properties
           			char* description = (char*)xmlGetProp(p, (xmlChar*)"descr");
-          			if (description)
+          			if(description){
 						itemtype->description = description;
+						xmlFreeOTSERV(description);
+					}
 
           			char* decayTo = (char*)xmlGetProp(p, (xmlChar*)"decayto");
           			if (decayTo){
 						itemtype->decayTo = atoi(decayTo);
+						xmlFreeOTSERV(decayTo);
 						if(itemtype->decayTo == 0){
 							itemtype->canDecay = false;
 						}
 					}
 
           			char* decayTime = (char*)xmlGetProp(p, (xmlChar*)"decaytime");
-          			if (decayTime)
+          			if (decayTime){
 						itemtype->decayTime = atoi(decayTime);
+						xmlFreeOTSERV(decayTime);
+					}
 		
 					char* damage = (char*)xmlGetProp(p, (xmlChar*)"damage");
-					if(damage)
+					if(damage){
 						itemtype->damage = atoi(damage);
+						xmlFreeOTSERV(damage);
+					}
 					
 					char *position = (char*)xmlGetProp(p, (xmlChar*)"position");
 					if(position){
@@ -489,17 +502,20 @@ int Items::loadXMLInfos(std::string file)
 	       					std::cout << "wrong position tag for item: " << id << std::endl;
 						
 						itemtype->slot_position |= SLOTP_LEFT | SLOTP_RIGHT | SLOTP_AMMO;
+						xmlFreeOTSERV(position);
 					}
 					
 					// now set special properties...
 					// first we check the type...
 					char* type = (char*)xmlGetProp(p, (xmlChar*)"type");
-				  	if (type){
+				  	if(type){
             			if (!strcmp(type, "container")){
 							// we have a container...							
               				char* maxitems = (char*)xmlGetProp(p, (xmlChar*)"maxitems");
-							if (maxitems)
+							if(maxitems){
                 				itemtype->maxItems = atoi(maxitems);
+                				xmlFreeOTSERV(maxitems);
+							}
               				else
 								std::cout << "item " << id << " is a container but lacks a maxitems definition." << std::endl;
 
@@ -520,13 +536,15 @@ int Items::loadXMLInfos(std::string file)
 							  	else if (!strcmp(skill, "distance")){
 									itemtype->weaponType = DIST;
 									char *amutype = (char*)xmlGetProp(p, (xmlChar*)"amutype");
-              						if (amutype){
+              						if(amutype){
 						    			if (!strcmp(amutype, "bolt"))
 								  			itemtype->amuType = AMU_BOLT;
 							  			else if (!strcmp(amutype, "arrow"))
 							    			itemtype->amuType = AMU_ARROW;
                 						else
                   							std::cout << "wrong amutype tag" << std::endl;
+                  						
+                  						xmlFreeOTSERV(amutype);
 									}
 									else{ //no ammunition, check shoottype
 										char *sshoottype = (char*)xmlGetProp(p, (xmlChar*)"shottype");
@@ -547,42 +565,52 @@ int Items::loadXMLInfos(std::string file)
 							    				itemtype->shootType = DIST_SPEAR;
                 							else
                   								std::cout << "wrong shootype tag" << std::endl;
+                  							
+                  							xmlFreeOTSERV(sshoottype);
 										}
 										else
 											std::cout << "missing shoottype type for distante-item: " << id << std::endl;
-									}																
+									}
 								}
-								else if (!strcmp(skill, "magic")){
+								else if(!strcmp(skill, "magic")){
 									itemtype->weaponType = MAGIC;
 									char *sshoottype = (char*)xmlGetProp(p, (xmlChar*)"shottype");
-              						if (sshoottype){
+              						if(sshoottype){
 										if (!strcmp(sshoottype, "fire"))
 							    			itemtype->shootType = DIST_FIRE;
 							    		else if (!strcmp(sshoottype, "energy"))
 							    			itemtype->shootType = DIST_ENERGY;
 							    		else
 							    			std::cout << "wrong shootype tag" << std::endl;
+							    		
+							    		xmlFreeOTSERV(sshoottype);
 									}									
 									
 								}
-							  	else if (!strcmp(skill, "shielding"))
+							  	else if(!strcmp(skill, "shielding"))
 									itemtype->weaponType = SHIELD;
                 				else
                   					std::cout << "wrong skill tag for weapon" << std::endl;
+                  				
+                  				xmlFreeOTSERV(skill);
               				}
               				else
 								std::cout << "missing skill tag for weapon" << std::endl;
 							
 							char* attack = (char*)xmlGetProp(p, (xmlChar*)"attack");
 
-							if (attack)
+							if (attack){
 								itemtype->attack = atoi(attack);
+								xmlFreeOTSERV(attack);
+							}
 							else
 								std::cout << "missing attack tag for weapon: " << id << std::endl;
 							
 							char* defence = (char*)xmlGetProp(p, (xmlChar*)"defence");
-							if (defence)
-							itemtype->defence = atoi(defence);
+							if (defence){
+								itemtype->defence = atoi(defence);
+								xmlFreeOTSERV(defence);
+							}
 							else
 								std::cout << "missing defence tag for weapon: " << id << std::endl;
 						
@@ -592,13 +620,15 @@ int Items::loadXMLInfos(std::string file)
 							// we got some amo
 							itemtype->weaponType = AMO;							
 							char *amutype = (char*)xmlGetProp(p, (xmlChar*)"amutype");
-              				if (amutype){
+              				if(amutype){
 						    	if (!strcmp(amutype, "bolt"))
 								  	itemtype->amuType = AMU_BOLT;
 							  	else if (!strcmp(amutype, "arrow"))
 							    	itemtype->amuType = AMU_ARROW;
                 				else
                   					std::cout << "wrong amutype tag for item: " << id << std::endl;
+                  				
+                  				xmlFreeOTSERV(amutype);
 							}
 							else
 								std::cout << "missing amutype for item: " << id << std::endl;
@@ -616,21 +646,27 @@ int Items::loadXMLInfos(std::string file)
 							    else if (!strcmp(sshoottype, "power-bolt"))
 							    	itemtype->shootType = DIST_POWERBOLT;
                 				else
-                  					std::cout << "wrong shootype tag for item: " << id << std::endl;                  					
+                  					std::cout << "wrong shootype tag for item: " << id << std::endl;
+                  				
+                  				xmlFreeOTSERV(sshoottype);
               				}
               				else
 								std::cout << "missing shoottype for item: " << id <<  std::endl;
 
 							char* attack = (char*)xmlGetProp(p, (xmlChar*)"attack");
-							if (attack)
+							if (attack){
 								itemtype->attack = atoi(attack);
+								xmlFreeOTSERV(attack);
+							}
 							else
 								std::cout << "missing attack tag for ammunition: " << id << std::endl;
 						}//ammunition
             			else if (!strcmp(type, "armor")){
 							char* sarmor = (char*)xmlGetProp(p, (xmlChar*)"arm");
-		            		if (sarmor)
+		            		if (sarmor){
 								itemtype->armor = atoi(sarmor);
+								xmlFreeOTSERV(sarmor);
+							}
               				else
 								std::cout << "missing arm tag for armor: " << id << std::endl;
 						}//armor
@@ -638,8 +674,10 @@ int Items::loadXMLInfos(std::string file)
 						{
 							// runes..
 							char* runemaglv = (char*)xmlGetProp(p, (xmlChar*)"maglevel");
-							if(runemaglv)
+							if(runemaglv){
 								itemtype->runeMagLevel = atoi(runemaglv);
+								xmlFreeOTSERV(runemaglv);
+							}
 							else
 	       						std::cout << "missing maglevel for rune: " << id << std::endl;
 						}//rune
@@ -651,7 +689,7 @@ int Items::loadXMLInfos(std::string file)
 						{
 							itemtype->ismagicfield = true;
 							char* fieldtype = (char*)xmlGetProp(p, (xmlChar*)"fieldtype");
-							if(fieldtype)		
+							if(fieldtype){
 						    	if (!strcmp(fieldtype, "fire"))
 								  	itemtype->magicfieldtype = MAGIC_FIELD_FIRE;
 							  	else if (!strcmp(fieldtype, "energy"))
@@ -660,6 +698,9 @@ int Items::loadXMLInfos(std::string file)
 							    	itemtype->magicfieldtype = MAGIC_FIELD_POISON_GREEN;
                 				else
                   					std::cout << "wrong field type tag for item: " << id << std::endl;
+                  				
+                  				xmlFreeOTSERV(fieldtype);
+							}
 							else
 	       						std::cout << "missing field type for field: " << id << std::endl;
 							
@@ -668,6 +709,7 @@ int Items::loadXMLInfos(std::string file)
 							char* sreadonlyid = (char*)xmlGetProp(p, (xmlChar*)"readonlyid");
           					if (sreadonlyid){
 								itemtype->readonlyId = atoi(sreadonlyid);
+								xmlFreeOTSERV(sreadonlyid);
 							}
 							else{
 								std::cout << "missing readonlyid tag for item: " << id << std::endl;
@@ -682,6 +724,7 @@ int Items::loadXMLInfos(std::string file)
 						else{
 							std::cout << "unknown type for item: " << id << std::endl;
 						}
+						xmlFreeOTSERV(type);
 					}//type					
 				}
 				else {
