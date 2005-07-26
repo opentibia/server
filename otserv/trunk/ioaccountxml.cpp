@@ -59,13 +59,18 @@ Account IOAccountXML::loadAccount(unsigned long accno){
 		p = root->children;
 
 		// perhaps verify name
-		const char* pwd = (const char*)xmlGetProp(root, (const xmlChar *)"pass");
-		
-		acc.password  = pwd;		
+		char* nodeValue = NULL;
+		nodeValue = (char*)xmlGetProp(root, (const xmlChar *)"pass");
+		acc.password  = nodeValue;
+		xmlFreeOTSERV(nodeValue);
 
-		acc.accType   = atoi((const char*)xmlGetProp(root, (xmlChar*)"type"));
-		acc.premDays  = atoi((const char*)xmlGetProp(root, (xmlChar*)"premDays"));
+		nodeValue = (char*)xmlGetProp(root, (xmlChar*)"type");
+		acc.accType  = atoi(nodeValue);
+		xmlFreeOTSERV(nodeValue);
 
+		nodeValue = (char*)xmlGetProp(root, (xmlChar*)"premDays");
+		acc.premDays  = atoi(nodeValue);
+		xmlFreeOTSERV(nodeValue);
 
 		// now load in characters.
 		while (p)
@@ -77,10 +82,15 @@ Account IOAccountXML::loadAccount(unsigned long accno){
 				tmp = p->children;
 				while(tmp)
 				{
-					const char* temp_a = (const char*)xmlGetProp(tmp, (xmlChar*)"name");
+					nodeValue = (char*)xmlGetProp(tmp, (xmlChar*)"name");
 
-					if(temp_a && strcmp((const char*)tmp->name, "character") == 0)
-						acc.charList.push_back(std::string(temp_a));
+					if(nodeValue) {
+						if(strcmp((const char*)tmp->name, "character") == 0) {
+							acc.charList.push_back(std::string(nodeValue));
+						}
+
+						xmlFreeOTSERV(nodeValue);
+					}
 
 					tmp = tmp->next;
 				}

@@ -83,7 +83,7 @@ Monster::Monster(const std::string& name, Game* game) :
 		
 		nodeValue = (char*)xmlGetProp(root, (const xmlChar *)"experience");
 		if(nodeValue) {
-			experience = atoi((const char*)xmlGetProp(root, (const xmlChar *)"experience"));
+			experience = atoi(nodeValue);
 			xmlFreeOTSERV(nodeValue);
 		}
 		
@@ -108,7 +108,7 @@ Monster::Monster(const std::string& name, Game* game) :
 
 		nodeValue = (char*)xmlGetProp(root, (const xmlChar *)"defense");
 		if(nodeValue) {
-			defense = atoi((const char*)xmlGetProp(root, (const xmlChar *)"defense"));
+			defense = atoi(nodeValue);
 			xmlFreeOTSERV(nodeValue);
 		}
 

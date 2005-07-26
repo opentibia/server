@@ -27,6 +27,7 @@
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 
+#include "definitions.h"
 #include "ioaccount.h"
 
 /** Player-Loaders implemented with XML */
