@@ -41,6 +41,9 @@ Monster::Monster(const std::string& name, Game* game) :
 	isfleeing = false;
 	this->name = name;
 	this->game = game;
+	level = 8;
+	maglevel = 0;
+	experience = 0;
 	curPhysicalAttack = NULL;
 	hasDistanceAttack = false;
 	canPushItems = false;
@@ -50,8 +53,8 @@ Monster::Monster(const std::string& name, Game* game) :
 	targetDistance = 1;
 	runawayHealth = 0;
 	pushable = true;
-	this->defense = 0;
-	this->armor = 0;
+	defense = 0;
+	armor = 0;
 	
 	std::string datadir = g_config.getGlobalString("datadir");
 	std::string filename = datadir + "monster/" + std::string(name) + ".xml";
@@ -60,6 +63,7 @@ Monster::Monster(const std::string& name, Game* game) :
 	if (doc){
 		loaded = true;
 		xmlNodePtr root, p, tmp;
+		char* nodeValue = NULL;
 		root = xmlDocGetRootElement(doc);
 
 		if (xmlStrcmp(root->name,(const xmlChar*) "monster")){
@@ -69,41 +73,72 @@ Monster::Monster(const std::string& name, Game* game) :
 
 		p = root->children;
 
-		if ((const char*)xmlGetProp(root, (const xmlChar *)"name")) {
-			this->name = (const char*)xmlGetProp(root, (const xmlChar *)"name");
+		nodeValue = (char*)xmlGetProp(root, (const xmlChar *)"name");
+		if(nodeValue) {
+			this->name = nodeValue;
+			xmlFreeOTSERV(nodeValue);
+		}
+		else
+			loaded = false;
+		
+		nodeValue = (char*)xmlGetProp(root, (const xmlChar *)"experience");
+		if(nodeValue) {
+			experience = atoi((const char*)xmlGetProp(root, (const xmlChar *)"experience"));
+			xmlFreeOTSERV(nodeValue);
 		}
 		
-		if ((const char*)xmlGetProp(root, (const xmlChar *)"experience")) {
-			this->experience = atoi((const char*)xmlGetProp(root, (const xmlChar *)"experience"));
-		}
-		
-		if ((const char*)xmlGetProp(root, (const xmlChar *)"pushable")) {
-			this->pushable = (bool)atoi((const char*)xmlGetProp(root, (const xmlChar *)"pushable"));
+		nodeValue = (char*)xmlGetProp(root, (const xmlChar *)"pushable");
+		if(nodeValue) {
+			pushable = (bool)atoi(nodeValue);
+			xmlFreeOTSERV(nodeValue);
 		}
 
-		if ((const char*)xmlGetProp(root, (const xmlChar *)"level")) {
-			level = atoi((const char*)xmlGetProp(root, (const xmlChar *)"level"));
+		nodeValue = (char*)xmlGetProp(root, (const xmlChar *)"level");
+		if(nodeValue) {
+			level = atoi(nodeValue);
+			xmlFreeOTSERV(nodeValue);
 			setNormalSpeed();
-			maglevel = atoi((const char*)xmlGetProp(root, (const xmlChar *)"maglevel"));
 		}
-		if ((const char*)xmlGetProp(root, (const xmlChar *)"defense")) {
-			this->defense = atoi((const char*)xmlGetProp(root, (const xmlChar *)"defense"));
+		
+		nodeValue = (char*)xmlGetProp(root, (const xmlChar *)"maglevel");
+		if(nodeValue) {
+			maglevel = atoi(nodeValue);
+			xmlFreeOTSERV(nodeValue);
 		}
-		if ((const char*)xmlGetProp(root, (const xmlChar *)"armor")) {
-			this->armor = atoi((const char*)xmlGetProp(root, (const xmlChar *)"armor"));
+
+		nodeValue = (char*)xmlGetProp(root, (const xmlChar *)"defense");
+		if(nodeValue) {
+			defense = atoi((const char*)xmlGetProp(root, (const xmlChar *)"defense"));
+			xmlFreeOTSERV(nodeValue);
 		}
-		if ((const char*)xmlGetProp(root, (const xmlChar *)"canpushitems")) {
-			canPushItems = (bool)atoi((const char*)xmlGetProp(root, (const xmlChar *)"canpushitems"));
+
+		nodeValue = (char*)xmlGetProp(root, (const xmlChar *)"armor");
+		if(nodeValue) {
+			armor = atoi(nodeValue);
+			xmlFreeOTSERV(nodeValue);
 		}
-		if ((const char*)xmlGetProp(root, (const xmlChar *)"staticattack")) {
-			staticAttack = atoi((const char*)xmlGetProp(root, (const xmlChar *)"staticattack"));
+		
+		nodeValue = (char*)xmlGetProp(root, (const xmlChar *)"canpushitems");
+		if(nodeValue) {
+			canPushItems = (bool)atoi(nodeValue);
+			xmlFreeOTSERV(nodeValue);
+		}
+
+		nodeValue = (char*)xmlGetProp(root, (const xmlChar *)"staticattack");
+		if(nodeValue) {
+			staticAttack = atoi(nodeValue);
+			xmlFreeOTSERV(nodeValue);
+			
 			if(staticAttack == 0)
 				staticAttack = 1;
 			else if(staticAttack >= RAND_MAX)
-				staticAttack == RAND_MAX + 1;
+				staticAttack = RAND_MAX + 1;
 		}
-		if ((const char*)xmlGetProp(root, (const xmlChar *)"changetarget")) { //0 never, 10000 always
-			changeTargetChance = atoi((const char*)xmlGetProp(root, (const xmlChar *)"changetarget"));
+
+		nodeValue = (char*)xmlGetProp(root, (const xmlChar *)"changetarget"); //0 never, 10000 always
+		if (nodeValue) {
+			changeTargetChance = atoi(nodeValue);
+			xmlFreeOTSERV(nodeValue);
 		}
 		
 		while (p)
@@ -111,30 +146,69 @@ Monster::Monster(const std::string& name, Game* game) :
 			const char* str = (char*)p->name;
 			
 			if (strcmp(str, "health") == 0) {
-				this->health = atoi((const char*)xmlGetProp(p, (const xmlChar *)"now"));
-				this->healthmax = atoi((const char*)xmlGetProp(p, (const xmlChar *)"max"));
+				nodeValue = (char*)xmlGetProp(p, (const xmlChar *)"now");
+				if(nodeValue) {
+					health = atoi(nodeValue);
+					xmlFreeOTSERV(nodeValue);
+				}
+				else
+					loaded = false;
+
+				nodeValue = (char*)xmlGetProp(p, (const xmlChar *)"max");
+				if(nodeValue) {
+					healthmax = atoi(nodeValue);
+					xmlFreeOTSERV(nodeValue);
+				}
+				else
+					loaded = false;
 			}
 			if (strcmp(str, "combat") == 0) {
-				this->targetDistance = std::max(1, atoi((const char*)xmlGetProp(p, (const xmlChar *)"targetdistance")));
-				this->runawayHealth = atoi((const char*)xmlGetProp(p, (const xmlChar *)"runonhealth"));
+				nodeValue = (char*)xmlGetProp(p, (const xmlChar *)"targetdistance");
+				if(nodeValue) {
+					targetDistance = std::max(1, atoi(nodeValue));
+					xmlFreeOTSERV(nodeValue);
+				}
+
+				nodeValue = (char*)xmlGetProp(p, (const xmlChar *)"runonhealth");
+				if(nodeValue) {
+					runawayHealth = atoi(nodeValue);
+					xmlFreeOTSERV(nodeValue);
+				}
 			}
 			else if (strcmp(str, "look") == 0) {
-				this->looktype = atoi((const char*)xmlGetProp(p, (const xmlChar *)"type"));
-				this->lookmaster = this->looktype;
-				if ((const char*)xmlGetProp(p, (const xmlChar *)"head"))
-					this->lookhead = atoi((const char*)xmlGetProp(p, (const xmlChar *)"head"));
+				nodeValue = (char*)xmlGetProp(p, (const xmlChar *)"type");
+				looktype = atoi(nodeValue);
+				lookmaster = this->looktype;
 
-				if ((const char*)xmlGetProp(p, (const xmlChar *)"body"))
-					this->lookbody = atoi((const char*)xmlGetProp(p, (const xmlChar *)"body"));
+				nodeValue = (char*)xmlGetProp(p, (const xmlChar *)"head");
+				if(nodeValue) {
+					lookhead = atoi(nodeValue);
+					xmlFreeOTSERV(nodeValue);
+				}
 
-				if ((const char*)xmlGetProp(p, (const xmlChar *)"legs"))
-					this->looklegs = atoi((const char*)xmlGetProp(p, (const xmlChar *)"legs"));
+				nodeValue = (char*)xmlGetProp(p, (const xmlChar *)"body");
+				if(nodeValue) {
+					lookbody = atoi(nodeValue);
+					xmlFreeOTSERV(nodeValue);
+				}
 
-				if ((const char*)xmlGetProp(p, (const xmlChar *)"feet"))
-					this->lookfeet = atoi((const char*)xmlGetProp(p, (const xmlChar *)"feet"));
+				nodeValue = (char*)xmlGetProp(p, (const xmlChar *)"legs");
+				if(nodeValue) {
+					looklegs = atoi(nodeValue);
+					xmlFreeOTSERV(nodeValue);
+				}
 
-				if ((const char*)xmlGetProp(p, (const xmlChar *)"corpse"))
-					this->lookcorpse = atoi((const char*)xmlGetProp(p, (const xmlChar *)"corpse"));
+				nodeValue = (char*)xmlGetProp(p, (const xmlChar *)"feet");
+				if(nodeValue) {
+					lookfeet = atoi(nodeValue);
+					xmlFreeOTSERV(nodeValue);
+				}
+				
+				nodeValue = (char*)xmlGetProp(p, (const xmlChar *)"corpse");
+				if(nodeValue) {
+					lookcorpse = atoi(nodeValue);
+					xmlFreeOTSERV(nodeValue);
+				}
 			}
 			else if (strcmp(str, "attacks") == 0)
 			{
@@ -147,29 +221,50 @@ Monster::Monster(const std::string& name, Game* game) :
 						int probability = -1;
 						int exhaustionTicks = -1;
 
-						if((const char*)xmlGetProp(tmp, (const xmlChar *)"exhaustion"))
-							exhaustionTicks = atoi((const char*)xmlGetProp(tmp, (const xmlChar *)"exhaustion"));
+						nodeValue = (char*)xmlGetProp(tmp, (const xmlChar *)"exhaustion");
+						if(nodeValue) {
+							exhaustionTicks = atoi(nodeValue);
+							xmlFreeOTSERV(nodeValue);
+						}
 
-						if((const char*)xmlGetProp(tmp, (const xmlChar *)"cycleticks"))
-							cycleTicks = atoi((const char*)xmlGetProp(tmp, (const xmlChar *)"cycleticks"));
+						nodeValue = (char*)xmlGetProp(tmp, (const xmlChar *)"cycleticks");
+						if(nodeValue) {
+							cycleTicks = atoi(nodeValue);
+							xmlFreeOTSERV(nodeValue);
+						}
 
-						if((const char*)xmlGetProp(tmp, (const xmlChar *)"probability"))
-							probability = atoi((const char*)xmlGetProp(tmp, (const xmlChar *)"probability"));
+						nodeValue = (char*)xmlGetProp(tmp, (const xmlChar *)"probability");
+						if(nodeValue) {
+							probability = atoi(nodeValue);
+							xmlFreeOTSERV(nodeValue);
+						}
 
 						TimeProbabilityClass timeprobsystem(cycleTicks, probability, exhaustionTicks);
 
-						std::string attacktype = (const char*)xmlGetProp(tmp, (const xmlChar *)"type");
+						nodeValue = (char*)xmlGetProp(tmp, (const xmlChar *)"type");
+						std::string attacktype = "";
+						if(nodeValue) {
+							attacktype = nodeValue;
+							xmlFreeOTSERV(nodeValue);
+						}
 
 						if(strcmp(attacktype.c_str(), "melee") == 0)
 						{
 							PhysicalAttackClass* physicalattack = new PhysicalAttackClass();
 							
 							physicalattack->fighttype = FIGHT_MELEE;
-							if(xmlGetProp(tmp, (const xmlChar *)"mindamage")) 
-								physicalattack->minWeapondamage = atoi((const char*)xmlGetProp(tmp, (const xmlChar *)"mindamage"));
+
+							nodeValue = (char*)xmlGetProp(tmp, (const xmlChar *)"mindamage");
+							if(nodeValue) {
+								physicalattack->minWeapondamage = atoi(nodeValue);
+								xmlFreeOTSERV(nodeValue);
+							}
 							
-							if(xmlGetProp(tmp, (const xmlChar *)"maxdamage"))
-								physicalattack->maxWeapondamage = atoi((const char*)xmlGetProp(tmp, (const xmlChar *)"maxdamage"));
+							nodeValue = (char*)xmlGetProp(tmp, (const xmlChar *)"maxdamage");
+							if(nodeValue) {
+								physicalattack->maxWeapondamage = atoi(nodeValue);
+								xmlFreeOTSERV(nodeValue);
+							}
 
 							physicalAttacks[physicalattack] = TimeProbabilityClass(cycleTicks, probability, exhaustionTicks);
 						}
@@ -179,7 +274,13 @@ Monster::Monster(const std::string& name, Game* game) :
 							PhysicalAttackClass* physicalattack = new PhysicalAttackClass();
 
 							physicalattack->fighttype = FIGHT_DIST;
-							std::string subattacktype = (const char*)xmlGetProp(tmp, (const xmlChar *)"name");
+							std::string subattacktype = "";
+
+							nodeValue = (char*)xmlGetProp(tmp, (const xmlChar *)"name");
+							if(nodeValue) {
+								subattacktype = nodeValue;
+								xmlFreeOTSERV(nodeValue);
+							}
 
 							if(strcmp(subattacktype.c_str(), "bolt") == 0)
 								physicalattack->disttype = DIST_BOLT;
@@ -200,16 +301,29 @@ Monster::Monster(const std::string& name, Game* game) :
 							else if(strcmp(subattacktype.c_str(), "poisonfield") == 0)
 								physicalattack->disttype = DIST_POISONFIELD;
 
-							if(xmlGetProp(tmp, (const xmlChar *)"mindamage"))
-								physicalattack->minWeapondamage = atoi((const char*)xmlGetProp(tmp, (const xmlChar *)"mindamage"));
-							if(xmlGetProp(tmp, (const xmlChar *)"maxdamage"))
-								physicalattack->maxWeapondamage = atoi((const char*)xmlGetProp(tmp, (const xmlChar *)"maxdamage"));
+							nodeValue = (char*)xmlGetProp(tmp, (const xmlChar *)"mindamage");
+							if(nodeValue) {
+								physicalattack->minWeapondamage = atoi(nodeValue);
+								xmlFreeOTSERV(nodeValue);
+							}
+
+							nodeValue = (char*)xmlGetProp(tmp, (const xmlChar *)"maxdamage");
+							if(nodeValue) {
+								physicalattack->maxWeapondamage = atoi(nodeValue);
+								xmlFreeOTSERV(nodeValue);
+							}
 					
 							physicalAttacks[physicalattack] = TimeProbabilityClass(cycleTicks, probability, exhaustionTicks);
 						}
 						else if(strcmp(attacktype.c_str(), "instant") == 0) {
 							hasDistanceAttack = true;
-							std::string spellname = (const char*)xmlGetProp(tmp, (const xmlChar *)"name");
+							std::string spellname = "";
+							
+							nodeValue = (char*)xmlGetProp(tmp, (const xmlChar *)"name");
+							if(nodeValue) {
+								spellname = nodeValue;
+								xmlFreeOTSERV(nodeValue);
+							}
 
 							if(spells.getAllSpells()->find(spellname) != spells.getAllSpells()->end())
 							{
@@ -218,7 +332,14 @@ Monster::Monster(const std::string& name, Game* game) :
 						}
 						else if(strcmp(attacktype.c_str(), "rune") == 0) {
 							hasDistanceAttack = true;
-							std::string spellname = (const char*)xmlGetProp(tmp, (const xmlChar *)"name");
+							std::string spellname = "";
+							
+							nodeValue = (char*)xmlGetProp(tmp, (const xmlChar *)"name");
+							if(nodeValue) {
+								spellname = nodeValue;
+								xmlFreeOTSERV(nodeValue);
+							}
+
 							std::transform(spellname.begin(), spellname.end(), spellname.begin(), tolower);
 							
 							std::map<unsigned short, Spell*>::const_iterator rsIt;
@@ -240,7 +361,13 @@ Monster::Monster(const std::string& name, Game* game) :
 				while(tmp)
 				{
 					if (strcmp((const char*)tmp->name, "defense") == 0) {
-						std::string immunity = (const char*)xmlGetProp(tmp, (const xmlChar *)"immunity");
+						std::string immunity = "";
+						
+						nodeValue = (char*)xmlGetProp(tmp, (const xmlChar *)"immunity");
+						if(nodeValue) {
+							immunity = nodeValue;
+							xmlFreeOTSERV(nodeValue);
+						}
 
 						if(strcmp(immunity.c_str(), "energy") == 0)
 							immunities |= ATTACK_ENERGY;
@@ -269,22 +396,36 @@ Monster::Monster(const std::string& name, Game* game) :
 					if (strcmp((const char*)tmp->name, "voice") == 0) {
 						int cycleTicks, probability, exhaustionTicks;
 
-						if((const char*)xmlGetProp(tmp, (const xmlChar *)"exhaustion"))
-							exhaustionTicks = atoi((const char*)xmlGetProp(tmp, (const xmlChar *)"exhaustion"));
+						nodeValue = (char*)xmlGetProp(tmp, (const xmlChar *)"exhaustion");
+						if(nodeValue) {
+							exhaustionTicks = atoi(nodeValue);
+							xmlFreeOTSERV(nodeValue);
+						}
 						else
 							exhaustionTicks = 0;
 
-						if((const char*)xmlGetProp(tmp, (const xmlChar *)"cycleticks"))
-							cycleTicks = atoi((const char*)xmlGetProp(tmp, (const xmlChar *)"cycleticks"));
+						nodeValue = (char*)xmlGetProp(tmp, (const xmlChar *)"cycleticks");
+						if(nodeValue) {
+							cycleTicks = atoi(nodeValue);
+							xmlFreeOTSERV(nodeValue);
+						}
 						else
 							cycleTicks = 30000;
 
-						if((const char*)xmlGetProp(tmp, (const xmlChar *)"probability"))
-							probability = atoi((const char*)xmlGetProp(tmp, (const xmlChar *)"probability"));
+						nodeValue = (char*)xmlGetProp(tmp, (const xmlChar *)"probability");
+						if(nodeValue) {
+							probability = atoi(nodeValue);
+							xmlFreeOTSERV(nodeValue);
+						}
 						else
 							probability = 30;
 						
-						std::string sentence = (const char*)xmlGetProp(tmp, (const xmlChar *)"sentence");
+						std::string sentence = "";
+						nodeValue = (char*)xmlGetProp(tmp, (const xmlChar *)"sentence");
+						if(nodeValue) {
+							sentence = nodeValue;
+							xmlFreeOTSERV(nodeValue);
+						}
 
 						if(sentence.length() > 0) {
 							yellingSentences.push_back(make_pair(sentence, TimeProbabilityClass(cycleTicks, probability, exhaustionTicks)));
@@ -309,14 +450,16 @@ Monster::Monster(const std::string& name, Game* game) :
 
 bool Monster::LoadLootNode(xmlNodePtr tmp){
 	unsigned short s_id;
-	char *sxml;
+	char* nodeValue = NULL;
 	Item *tmpItem;
 	while(tmp){
 		s_id = 0;
-		sxml = (char*)xmlGetProp(tmp, (const xmlChar *) "id");
-		if(sxml){
-			s_id = atoi(sxml);
+		nodeValue = (char*)xmlGetProp(tmp, (const xmlChar *) "id");
+		if(nodeValue){
+			s_id = atoi(nodeValue);
+			xmlFreeOTSERV(nodeValue);
 		}
+
 		if(s_id != 0){					
 			if(Item::items[s_id].stackable == false){
 				tmpItem = LoadLootItem(tmp,s_id);
@@ -347,9 +490,11 @@ Item* Monster::LoadLootItemStackable(xmlNodePtr tmp,unsigned short id){
 	unsigned long chance1,chancemax;
 	unsigned char countmax,n;
 	
-	char *s_count = (char*)xmlGetProp(tmp, (const xmlChar *) "countmax");
-	if(s_count) {
-		countmax = atoi(s_count);
+	char* nodeValue = (char*)xmlGetProp(tmp, (const xmlChar *) "countmax");
+	if(nodeValue) {
+		countmax = atoi(nodeValue);
+		xmlFreeOTSERV(nodeValue);
+
 		if(countmax > 100){			
 			countmax = 100;
 		}
@@ -358,9 +503,12 @@ Item* Monster::LoadLootItemStackable(xmlNodePtr tmp,unsigned short id){
 		std::cout << "missing countmax for loot id = "<< id << std::endl;
 		countmax = 1;
 	}
-	char* s_chance = (char*)xmlGetProp(tmp, (xmlChar*)"chancemax");
-    if (s_chance){
-		chancemax = atoi(s_chance);
+
+	nodeValue = (char*)xmlGetProp(tmp, (xmlChar*)"chancemax");
+	if (nodeValue){
+		chancemax = atoi(nodeValue);
+		xmlFreeOTSERV(nodeValue);
+
 		if(chancemax > CHANCE_MAX)
 			chancemax = 0;
 	}
@@ -368,9 +516,12 @@ Item* Monster::LoadLootItemStackable(xmlNodePtr tmp,unsigned short id){
 		std::cout << "missing chancemax for loot id = "<< id << std::endl;
 		chancemax = 0;
 	}
-	s_chance = (char*)xmlGetProp(tmp, (xmlChar*)"chance1");
-    if (s_chance){
-		chance1 = atoi(s_chance);
+
+	nodeValue = (char*)xmlGetProp(tmp, (xmlChar*)"chance1");
+	if (nodeValue){
+		chance1 = atoi(nodeValue);
+		xmlFreeOTSERV(nodeValue);
+
 		if(chance1 > CHANCE_MAX)
 			chance1 = CHANCE_MAX;
 	}
@@ -378,6 +529,7 @@ Item* Monster::LoadLootItemStackable(xmlNodePtr tmp,unsigned short id){
 		std::cout << "missing chance1 for loot id = "<< id << std::endl;
 		chance1 = CHANCE_MAX;
 	}
+
 	if(chance1 <= chancemax){
 		std::cout << "Wrong chance for loot id = "<< id << std::endl;
 		return NULL;
@@ -407,9 +559,11 @@ Item* Monster::LoadLootItemStackable(xmlNodePtr tmp,unsigned short id){
 Item* Monster::LoadLootItem(xmlNodePtr tmp,unsigned short id){
 	Item *tmpItem;
 	unsigned long chance;
-	char* s_chance = (char*)xmlGetProp(tmp, (xmlChar*)"chance");
-    if (s_chance){
-		chance = atoi(s_chance);
+	char* nodeValue = (char*)xmlGetProp(tmp, (xmlChar*)"chance");
+	if (nodeValue){
+		chance = atoi(nodeValue);
+		xmlFreeOTSERV(nodeValue);
+
 		if(chance > CHANCE_MAX)
 			chance = CHANCE_MAX;
 	}
@@ -417,6 +571,7 @@ Item* Monster::LoadLootItem(xmlNodePtr tmp,unsigned short id){
 		std::cout << "missing chance for loot id = "<< id << std::endl;
 		chance = CHANCE_MAX;
 	}
+
 	if(GetRandom() < chance){
 		tmpItem = Item::CreateItem(id);
 	}
@@ -433,6 +588,7 @@ unsigned long Monster::GetRandom(){
 
 bool Monster::LoadLootContainer(xmlNodePtr nodeitem,Container* ccontainer){
 	xmlNodePtr tmp,p;
+	char* nodeValue = NULL;
 	unsigned short s_id;	
 	Item *new_item;	
 	if(nodeitem==NULL){
@@ -446,7 +602,14 @@ bool Monster::LoadLootContainer(xmlNodePtr nodeitem,Container* ccontainer){
 		if (strcmp((const char*)tmp->name, "inside") == 0){			
 			p=tmp->children;
 			while(p){
-				s_id = atoi((const char*)xmlGetProp(p, (const xmlChar *) "id"));				
+				nodeValue = (char*)xmlGetProp(p, (const xmlChar *) "id");
+				s_id = 0;
+
+				if(nodeValue) {
+					s_id = atoi(nodeValue);
+					xmlFreeOTSERV(nodeValue);
+				}
+
 				if(s_id != 0){				
 					if(Item::items[s_id].stackable == false){
 						new_item = LoadLootItem(p,s_id);
