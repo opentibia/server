@@ -79,8 +79,10 @@ public:
 	bool insertThing(Thing *thing, int stackpos);
 	MagicEffectItem* getFieldItem();
 	Teleport* getTeleportItem();
+
 	Thing* getTopMoveableThing();
 	Creature* getTopCreature();
+	Item* getTopTopItem();
 	Item* getTopDownItem();
 	Item* getMoveableBlockingItem();
 	

@@ -561,7 +561,7 @@ std::string Item::getDescription(bool fullDescription) const
 				s << ".";
 			}
 			else if(items[id].iskey){
-				s << "You see a " << items[id].name << "(Key:" << actionId << ")." << std::endl;
+				s << "You see a " << items[id].name << " (Key:" << actionId << ")." << std::endl;
 			}
 			else
 			{

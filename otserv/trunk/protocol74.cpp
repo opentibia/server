@@ -315,7 +315,7 @@ void Protocol74::GetTileDescription(const Tile* tile, NetworkMessage &msg)
 		for (it = tile->topItems.begin(); ((it !=tile->topItems.end()) && (count < 10)); ++it)
 		{		
 			msg.AddItem(*it);
-			count++;			
+			count++;
 		}
 
 		CreatureVector::const_iterator itc;
@@ -325,7 +325,7 @@ void Protocol74::GetTileDescription(const Tile* tile, NetworkMessage &msg)
 			unsigned long removedKnown;
 			checkCreatureAsKnown((*itc)->getID(), known, removedKnown);
 			AddCreature(msg,*itc, known, removedKnown);
-			count++;			
+			count++;
 		}
 
 

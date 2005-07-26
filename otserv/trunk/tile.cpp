@@ -401,40 +401,73 @@ Teleport* Tile::getTeleportItem()
 
 MagicEffectItem* Tile::getFieldItem()
 {
-  	MagicEffectItem* fieldItem = NULL;
-  	for (ItemVector::const_iterator iit = downItems.begin(); iit != downItems.end(); ++iit)
-  	{
-		fieldItem = dynamic_cast<MagicEffectItem*>(*iit);
-		if(fieldItem)
-			return fieldItem;
-  	}
+  MagicEffectItem* fieldItem = NULL;
+  for (ItemVector::const_iterator iit = downItems.begin(); iit != downItems.end(); ++iit)
+  {
+	fieldItem = dynamic_cast<MagicEffectItem*>(*iit);
+	if(fieldItem)
+		return fieldItem;
+  }
 
 	return NULL;
 }
 
 Creature* Tile::getTopCreature(){
-  	if(creatures.begin() != creatures.end())
-  	{
+	if(creatures.begin() != creatures.end()) {
 		return *(creatures.begin());
-  	}
+	}
+
 	return NULL;
 }
 
-Item* Tile::getTopDownItem(){
-	if(downItems.begin() != downItems.end())
-  	{
+Item* Tile::getTopDownItem()
+{
+	if(downItems.begin() != downItems.end()) {
 		return *(downItems.begin());
-  	}
+	}
+
+	return NULL;
+}
+
+Item* Tile::getTopTopItem()
+{
+	if(topItems.begin() != topItems.end()) {
+		return *(topItems.begin());
+	}
+
 	return NULL;
 }
 
 Thing* Tile::getTopThing()
 {
+	Thing* thing = NULL;
+	thing = getTopCreature();
+	if(thing != NULL)
+		return thing;
+
+	thing = getTopDownItem();
+	if(thing != NULL)
+		return thing;
+
+	thing = getTopTopItem();
+	if(thing != NULL)
+		return thing;
+	
+	if(splash)
+		return splash;
+
+	if(ground)
+		return ground;
+
+	return NULL;
+
+	/*
 	if(getThingCount() > 1) {
 		return getThingByStackPos(1);
 	}
 	else 
 		return getThingByStackPos(0);
+	*/
 }
 
 Item* Tile::getMoveableBlockingItem()

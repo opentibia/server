@@ -3560,16 +3560,20 @@ void Game::playerAutoWalk(Player* player, std::list<Direction>& path)
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
 	stopEvent(player->eventAutoWalk);
 
-  // then we schedule the movement...
-  // the interval seems to depend on the speed of the char?
-	//player->eventAutoWalk = addEvent(makeTask<Direction>(0, MovePlayer(player->getID()), path, 400, StopMovePlayer(player->getID())));
 	player->pathlist = path;
 	int ticks = (int)player->getSleepTicks();
+/*
 #ifdef __DEBUG__
-		std::cout << "playerAutoWalk - " << ticks << std::endl;
+	std::cout << "playerAutoWalk - " << ticks << std::endl;
 #endif
+*/
 
 	player->eventAutoWalk = addEvent(makeTask(ticks, std::bind2nd(std::mem_fun(&Game::checkPlayerWalk), player->getID())));
+
+	// then we schedule the movement...
+  // the interval seems to depend on the speed of the char?
+	//player->eventAutoWalk = addEvent(makeTask<Direction>(0, MovePlayer(player->getID()), path, 400, StopMovePlayer(player->getID())));
+	//player->pathlist = path;
 }
 
 bool Game::playerUseItemEx(Player *player, const Position& posFrom,const unsigned char  stack_from,
