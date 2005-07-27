@@ -713,11 +713,12 @@ bool Game::removeCreature(Creature* c)
 	std::cout << "removing creature "<< std::endl;
 #endif
 
+	if(!removeThing(NULL,c->pos,c))
+		return false;
+	
 	//std::cout << "remove: " << c << " " << c->getID() << std::endl;
 	listCreature.removeList(c->getID());
 	c->removeList();
-	
-	removeThing(NULL,c->pos,c);
 	c->isRemoved = true;
 	
 	for(std::vector<Creature*>::iterator cit = c->summons.begin(); cit != c->summons.end(); ++cit) {
@@ -1780,8 +1781,9 @@ void Game::thingMoveInternal(Player *player, const Position& fromPos, unsigned c
 					}
 
 					if(fromItem->getItemCountOrSubtype() == 0) {
-						fromTile->removeThing(fromItem);
-						this->FreeThing(fromItem);
+						if(fromTile->removeThing(fromItem)){
+							this->FreeThing(fromItem);
+						}
 					}
 				}
 				else if(count < oldFromCount) {
@@ -1792,8 +1794,9 @@ void Game::thingMoveInternal(Player *player, const Position& fromPos, unsigned c
 					toContainer->addItem(Item::CreateItem(fromItem->getID(), count));
 
 					if(fromItem->getItemCountOrSubtype() == 0) {
-						fromTile->removeThing(fromItem);
-						this->FreeThing(fromItem);
+						if(fromTile->removeThing(fromItem)){
+							this->FreeThing(fromItem);
+						}
 					}
 				}
 				else if(fromTile->removeThing(fromItem)) {
@@ -1847,8 +1850,9 @@ void Game::thingMoveInternal(Player *player, const Position& fromPos, unsigned c
 					}
 
 					if(fromItem->getItemCountOrSubtype() == 0) {
-						fromTile->removeThing(fromItem);
-						this->FreeThing(fromItem);
+						if(fromTile->removeThing(fromItem)){
+							this->FreeThing(fromItem);
+						}
 					}
 				}
 				else if(count < oldFromCount) {
@@ -1865,8 +1869,9 @@ void Game::thingMoveInternal(Player *player, const Position& fromPos, unsigned c
 					}
 
 					if(fromItem->getItemCountOrSubtype() == 0) {
-						fromTile->removeThing(fromItem);
-						this->FreeThing(fromItem);
+						if(fromTile->removeThing(fromItem)){
+							this->FreeThing(fromItem);
+						}
 					}
 				}
 				else {
@@ -2270,7 +2275,9 @@ void Game::teleport(Thing *thing, const Position& newPos) {
 				return;
 			
 			int osp = fromTile->getThingStackPos(thing);  
-			fromTile->removeThing(thing);
+			if(!fromTile->removeThing(thing))
+				return;
+			
 			toTile->addThing(thing);
 			Position oldPos = thing->pos;
 			
@@ -2309,8 +2316,9 @@ void Game::teleport(Thing *thing, const Position& newPos) {
 			}
 		}
 		else{
-			removeThing(NULL, thing->pos, thing, false);
-			addThing(NULL,newPos,thing);
+			if(removeThing(NULL, thing->pos, thing, false)){
+				addThing(NULL,newPos,thing);
+			}
 		}
 	}//if(toTile)
 
@@ -3399,26 +3407,28 @@ void Game::checkDecay(int t){
 								sendUpdateThing(NULL,pos,newitem,stackpos);
 							}
 							else{
-								tile->removeThing(item);
-								//autoclose containers
-								if(dynamic_cast<Container*>(item)){
-									std::vector<Creature*> list;
-									getSpectators(Range(pos, true), list);
-									for(unsigned int j = 0; j < list.size(); ++j){
-										Player *spectator = dynamic_cast<Player*>(list[j]);
-										if(spectator)
-											spectator->onThingRemove(item);
+								if(tile->removeThing(item)){
+									//autoclose containers
+									if(dynamic_cast<Container*>(item)){
+										std::vector<Creature*> list;
+										getSpectators(Range(pos, true), list);
+										for(unsigned int j = 0; j < list.size(); ++j){
+											Player *spectator = dynamic_cast<Player*>(list[j]);
+											if(spectator)
+												spectator->onThingRemove(item);
+										}
 									}
+									tile->insertThing(newitem, stackpos);
+									sendUpdateThing(NULL,pos,newitem,stackpos);
+									FreeThing(item);
 								}
-								tile->insertThing(newitem, stackpos);
-								sendUpdateThing(NULL,pos,newitem,stackpos);
-								FreeThing(item);
 							}
 							startDecay(newitem);
 						}
 						else{
-							removeThing(NULL,pos,item);
-							FreeThing(item);
+							if(removeThing(NULL,pos,item)){
+								FreeThing(item);
+							}
 						}//newitem
 					}//pos != 0xFFFF
 				}//item->canDecay()
@@ -3612,7 +3622,9 @@ bool Game::playerUseItemEx(Player *player, const Position& posFrom,const unsigne
 						autoCloseTrade(item);
 						item->setItemCharge(std::max((int)item->getItemCharge() - 1, 0) );
 						if(item->getItemCharge() == 0) {
-							removeThing(player,posFrom,item);
+							if(removeThing(player,posFrom,item)){
+								FreeThing(item);
+							}
 						}
 					}
 				}
@@ -4254,24 +4266,26 @@ void Game::addThing(Player* player,const Position &pos,Thing* thing)
 	}		
 }
 
-void Game::removeThing(Player* player,const Position &pos,Thing* thing,  bool setRemoved /*= true*/)
+bool Game::removeThing(Player* player,const Position &pos,Thing* thing,  bool setRemoved /*= true*/)
 {
 	if(!thing)
-		return;
+		return false;
 	Item *item = dynamic_cast<Item*>(thing);
 	
 	if(pos.x == 0xFFFF) {
 		if(!player || !item)
-			return;
+			return false;
 			
 		if(pos.y & 0x40) { //container
 			unsigned char containerid = pos.y & 0x0F;
 			Container* container = player->getContainer(containerid);
 			if(!container)
-				return;
+				return false;
 
 			sendRemoveThing(player,pos,thing,0,true);
-			container->removeItem(item);
+			if(!container->removeItem(item))
+				return false;
+			
 			if(player && player->isHoldingContainer(container)) {
 				player->updateInventoryWeigth();
 				player->sendStats();
@@ -4279,23 +4293,32 @@ void Game::removeThing(Player* player,const Position &pos,Thing* thing,  bool se
 		}
 		else //inventory
 		{
-			sendRemoveThing(player,pos,thing,0,true);
-			//player->removeItemInventory(pos.y,true);	
+			//sendRemoveThing(player,pos,thing,0,true);
+			if(!player->removeItemInventory(pos.y))
+				return false;
+			player->onThingRemove(thing);
+			//player->removeItemInventory(pos.y,true);
 		}
 		if(setRemoved)
 			item->isRemoved = true;
+		return true;
 	}
 	else //ground
 	{		
 		Tile *tile = map->getTile(pos.x, pos.y, pos.z);
 		if(tile){
 			unsigned char stackpos = tile->getThingStackPos(thing);
-			tile->removeThing(thing);
+			if(!tile->removeThing(thing))
+				return false;
 			sendRemoveThing(NULL,pos,thing,stackpos,true);
+		}
+		else{
+			return false;
 		}
 		if(item && setRemoved){
 			item->isRemoved = true;
 		}
+		return true;
 	}
 }
 

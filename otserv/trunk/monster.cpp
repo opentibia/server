@@ -132,7 +132,7 @@ Monster::Monster(const std::string& name, Game* game) :
 			if(staticAttack == 0)
 				staticAttack = 1;
 			else if(staticAttack >= RAND_MAX)
-				staticAttack = RAND_MAX + 1;
+				staticAttack = RAND_MAX;
 		}
 
 		nodeValue = (char*)xmlGetProp(root, (const xmlChar *)"changetarget"); //0 never, 10000 always
@@ -1281,12 +1281,16 @@ void Monster::doMoveTo(const Position& destpos, bool isRouteValid)
 				if(countItems < 2){
 					if(!monsterMoveItem(blockItem, 3)){
 						//destroy it
-						game->removeThing(NULL, blockItem->pos, blockItem);
+						if(game->removeThing(NULL, blockItem->pos, blockItem)){
+							game->FreeThing(blockItem);
+						}
 					}
 				}
 				else{
 					//destroy items directly
-					game->removeThing(NULL, blockItem->pos, blockItem);
+					if(game->removeThing(NULL, blockItem->pos, blockItem)){
+						game->FreeThing(blockItem);
+					}
 				}
 				countItems++;
 			}

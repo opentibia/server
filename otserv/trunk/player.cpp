@@ -337,15 +337,24 @@ bool Player::substractMoney(unsigned long money)
 		return false;
 	
 	std::list<Container*> stack;
+	MoneyMap moneyMap;
+	MoneyItem* tmp;
+	
 	ContainerList::iterator it;
-	for(int i = 0; i < 11 && money > 0 ;i++){
+	for(int i = 0; i < 11 && money > 0 ;i++){	
 		if(items[i]){
 			if(Container *tmpcontainer = dynamic_cast<Container*>(items[i])){
 				stack.push_back(tmpcontainer);
 			}
 			else{
 				if(items[i]->getWorth() != 0){
-					Item *item = items[i];
+					tmp = new MoneyItem;
+					tmp->item = items[i];
+					tmp->slot = i;
+					tmp->location = SLOT_TYPE_INVENTORY;
+					tmp->parent = NULL;
+					moneyMap.insert(moneymap_pair(items[i]->getWorth(),tmp));
+					/*Item *item = items[i];
 					removeItemInventory(i);
 					if(money >= item->getWorth()){
 						money = money - item->getWorth();
@@ -356,7 +365,7 @@ bool Player::substractMoney(unsigned long money)
 						break;
 					}
 					item->releaseThing();
-					item = NULL;
+					item = NULL;*/
 				}
 			}
 		}
@@ -365,10 +374,16 @@ bool Player::substractMoney(unsigned long money)
 	while(stack.size() > 0 && money > 0){
 		Container *container = stack.front();
 		stack.pop_front();
-		for(int i = 0; i < container->size() && money > 0; ){
+		for(int i = 0; i < container->size() && money > 0; i++){	
 			Item *item = container->getItem(i);
 			if(item && item->getWorth() != 0){
-				unsigned char slot = container->getSlotNumberByItem(item);
+				tmp = new MoneyItem;
+				tmp->item = item;
+				tmp->slot = 0;
+				tmp->location = SLOT_TYPE_CONTAINER;
+				tmp->parent = container;
+				moneyMap.insert(moneymap_pair(item->getWorth(),tmp));
+				/*unsigned char slot = container->getSlotNumberByItem(item);
 				onItemRemoveContainer(container,slot);
 				container->removeItem(item);
 				if(money >=  item->getWorth()){
@@ -380,10 +395,7 @@ bool Player::substractMoney(unsigned long money)
 				}
 				item->releaseThing();
 				item = NULL;
-				continue;
-			}
-			else{
-				i++;
+				continue;*/
 			}
 			Container *containerItem = dynamic_cast<Container*>(item);
 			if(containerItem){
@@ -391,6 +403,40 @@ bool Player::substractMoney(unsigned long money)
 			}
 		}
 	}
+	
+	MoneyMap::iterator it2;
+	for(it2 = moneyMap.begin(); it2 != moneyMap.end() && money > 0; it2++){
+		Item *item = it2->second->item;
+		
+		if(it2->second->location == SLOT_TYPE_INVENTORY){
+			removeItemInventory(it2->second->slot);
+		}
+		else if(it2->second->location == SLOT_TYPE_CONTAINER){
+			Container *container = it2->second->parent;
+			unsigned char slot = container->getSlotNumberByItem(item);
+			onItemRemoveContainer(container,slot);
+			container->removeItem(item);
+		}
+		
+		if(it2->first <= money){
+			money = money - it2->first;
+		}
+		else{
+			substractMoneyItem(item, money);
+			money = 0;
+		}
+		item->releaseThing();
+		item = NULL;
+		delete it2->second;
+		it2->second = NULL;
+	}
+	for(; it2 != moneyMap.end(); it2++){
+		delete it2->second;
+		it2->second = NULL;
+	}
+	
+	moneyMap.clear();
+	
 	if(money != 0)
 		return false;
 	

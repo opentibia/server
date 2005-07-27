@@ -845,8 +845,9 @@ int ActionScript::luaActionDoRemoveItem(lua_State *L)
 		action->game->sendUpdateThing(action->_player,(Position&)tmppos,tmpitem,tmppos.stackpos);
 	}
 	else{
-		action->game->removeThing(action->_player,(Position&)tmppos,tmpitem);
-		action->game->FreeThing(tmpitem);
+		if(action->game->removeThing(action->_player,(Position&)tmppos,tmpitem)){
+			action->game->FreeThing(tmpitem);
+		}
 	}	
 	
 	lua_pushnumber(L, 0);

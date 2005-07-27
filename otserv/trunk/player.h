@@ -388,6 +388,16 @@ protected:
 	
 	StorageMap storageMap;
 
+	struct MoneyItem{
+		Item* item;
+		freeslot_t location;
+		int slot;
+		Container *parent;
+	};
+	typedef std::multimap<int, struct MoneyItem*, std::less<int> > MoneyMap;
+	typedef MoneyMap::value_type moneymap_pair;
+
+
 	//for skill advances
   unsigned int getReqSkillTries (int skill, int level, playervoc_t voc);
   

@@ -258,7 +258,7 @@ public:
 
   Thing* getThing(const Position &pos,unsigned char stack,Player* player = NULL);
   void addThing(Player* player,const Position &pos,Thing* thing);
-  void removeThing(Player* player,const Position &pos,Thing* thing, bool setRemoved = true);
+  bool removeThing(Player* player,const Position &pos,Thing* thing, bool setRemoved = true);
   Position getThingMapPos(Player *player, const Position &pos);
   
   void sendAddThing(Player* player,const Position &pos,const Thing* thing);
