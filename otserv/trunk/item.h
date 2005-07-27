@@ -67,6 +67,7 @@ public:
 	int getDefense() const;
 	int getSlotPosition() const;
 	int getRWInfo() const;
+	int getWorth() const;
 		
 	bool isBlockingProjectile() const;
 	bool isBlocking(bool ispickupable = false) const;

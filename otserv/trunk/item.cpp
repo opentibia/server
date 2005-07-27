@@ -705,3 +705,17 @@ xmlNodePtr Teleport::serialize()
 
 	return xmlptr;
 }
+
+int Item::getWorth() const
+{
+	switch(getID()){
+	case ITEM_COINS_GOLD:
+		return getItemCountOrSubtype();
+	case ITEM_COINS_PLATINUM:
+		return getItemCountOrSubtype() * 100;
+	case ITEM_COINS_CRYSTAL:
+		return getItemCountOrSubtype() * 10000;
+	default:
+		return 0;
+	}
+}

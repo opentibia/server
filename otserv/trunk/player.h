@@ -175,9 +175,9 @@ public:
   virtual int getArmor() const;
   virtual int getDefense() const;
   unsigned long getMoney();
-  unsigned long getMoneyContainer(Container *container);
   bool substractMoney(unsigned long money);
-  bool substractMoneyContainer(Container *container, unsigned long *money);
+  bool substractMoneyItem(Item *item, unsigned long money);
+  
   
 	unsigned long eventAutoWalk;
   	

@@ -303,338 +303,132 @@ int Player::getDefense() const
 
 unsigned long Player::getMoney()
 {
-	unsigned long money=0;
-	
-	for(int i=SLOT_HEAD; i <= SLOT_AMMO; i++)
-	{
-		Container* new_container = dynamic_cast<Container*>(items[i]);
-		if(new_container)
-		{
-			money += getMoneyContainer(new_container);
-		}
-		else if(items[i])
-		{
-			switch(items[i]->getID())
-			{
-			case ITEM_COINS_GOLD:
-				//gold coins
-				money += items[i]->getItemCountOrSubtype();
-				break;
-			case ITEM_COINS_PLATINUM:
-				//platinum coins
-				money += items[i]->getItemCountOrSubtype() * 100;
-				break;
+	unsigned long money = 0;
+	std::list<const Container*> stack;
+	ContainerList::const_iterator cit;
+	for(int i=0; i< 11;i++){
+		if(items[i]){
+			if(Container *tmpcontainer = dynamic_cast<Container*>(items[i])){
+				stack.push_back(tmpcontainer);
+			}
+			else{
+				money = money + items[i]->getWorth();
 			}
 		}
 	}
 	
-	return money;
-}
-
-unsigned long Player::getMoneyContainer(Container *container)
-{
-	unsigned long money=0;
-	
-	for(int i=0; i<container->size();i++)
-	{
-		Item *item = container->getItem(i);
-		
-		Container* new_container = dynamic_cast<Container*>(item);
-		if(new_container)
-		{
-			money += getMoneyContainer(new_container);
-		}
-		else if(item)
-		{
-			switch(item->getID())
-			{
-			case ITEM_COINS_GOLD:
-				//gold coins
-				money += item->getItemCountOrSubtype();
-				break;
-			case ITEM_COINS_PLATINUM:
-				//platinum coins
-				money += item->getItemCountOrSubtype() * 100;
-				break;
+	while(stack.size() > 0) {
+		const Container *container = stack.front();
+		stack.pop_front();
+		for(cit = container->getItems(); cit != container->getEnd(); ++cit) {
+			money = money + (*cit)->getWorth();
+			Container *container = dynamic_cast<Container*>(*cit);
+			if(container) {
+				stack.push_back(container);
 			}
 		}
 	}
-	
 	return money;
 }
 
 bool Player::substractMoney(unsigned long money)
 {
-	int goldcoins;
-	int platcoins;
-	NetworkMessage msg;
+	if(getMoney() < money)
+		return false;
 	
-	for(int i=SLOT_HEAD; i <= SLOT_AMMO; i++)
-	{
-		Container* new_container = dynamic_cast<Container*>(items[i]);
-		if(new_container && money)
-		{
-			substractMoneyContainer(new_container, &money);
-		}
-		else if(items[i] && money)
-		{
-			switch(items[i]->getID())
-			{
-			case ITEM_COINS_GOLD:
-				//gold coins
-				goldcoins = items[i]->getItemCountOrSubtype();
-				if(money >= goldcoins)
-				{
-					money -= goldcoins;
-					//delete items[i];
-					items[i]->releaseThing();
-					items[i] = NULL;
-					
-				}
-				else
-				{
-					items[i]->setItemCountOrSubtype(goldcoins - money);
-					money = 0;
-				}
-				client->sendInventory(i);
-				break;
-			case ITEM_COINS_PLATINUM:
-				//platinum coins
-				goldcoins = items[i]->getItemCountOrSubtype() * 100;
-				if(money >= goldcoins)
-				{
-					money -= goldcoins;
-					//delete items[i];
-					items[i]->releaseThing();
-					items[i] = NULL;
-					
-				}
-				else
-				{
-					platcoins = (int)((goldcoins - money)/100);
-					goldcoins = (goldcoins - money)%100;
-					money = 0;
-					if(platcoins)
-					{
-						items[i]->setItemCountOrSubtype(platcoins);
-						if(goldcoins)
-						{
-							Item *new_item = Item::CreateItem(ITEM_COINS_GOLD, goldcoins);
-							Container *default_container = dynamic_cast<Container*>(getItem(SLOT_BACKPACK));
-							
-							if(default_container && default_container->addItem(new_item)) // There is space in container
-							{
-								for(containerLayout::const_iterator cit = getContainers(); cit != getEndContainer(); ++cit) {
-									if(cit->second == default_container) {
-										//add item
-										msg.AddByte(0x70);
-										msg.AddByte(cit->first);
-										msg.AddU16(new_item->getID());
-										msg.AddByte(new_item->getItemCountOrSubtype());
-									}
-								}
-							}
-							else // There is no space in container
-							{
-								//TODO: place the item in ground...
-								delete new_item;
-							}
-						}
+	std::list<Container*> stack;
+	ContainerList::iterator it;
+	for(int i = 0; i < 11 && money > 0 ;i++){
+		if(items[i]){
+			if(Container *tmpcontainer = dynamic_cast<Container*>(items[i])){
+				stack.push_back(tmpcontainer);
+			}
+			else{
+				if(items[i]->getWorth() != 0){
+					Item *item = items[i];
+					removeItemInventory(i);
+					if(money >= item->getWorth()){
+						money = money - item->getWorth();
 					}
-					else
-					{
-						//delete items[i];
-						items[i]->releaseThing();
-						items[i] = NULL;
-						
-						if(goldcoins)
-						{
-							Item *new_item = Item::CreateItem(ITEM_COINS_GOLD, goldcoins);
-							items[i] = new_item;
-						}
+					else{
+						substractMoneyItem(item, money);
+						money = 0;
+						break;
 					}
+					item->releaseThing();
+					item = NULL;
 				}
-				client->sendInventory(i);
-				break;
 			}
 		}
 	}
 	
-	if(money == 0)
-		return true;
-	else
+	while(stack.size() > 0 && money > 0){
+		Container *container = stack.front();
+		stack.pop_front();
+		for(int i = 0; i < container->size() && money > 0; ){
+			Item *item = container->getItem(i);
+			if(item && item->getWorth() != 0){
+				unsigned char slot = container->getSlotNumberByItem(item);
+				onItemRemoveContainer(container,slot);
+				container->removeItem(item);
+				if(money >=  item->getWorth()){
+					money = money - item->getWorth();
+				}
+				else{
+					substractMoneyItem(item, money);
+					money = 0;
+				}
+				item->releaseThing();
+				item = NULL;
+				continue;
+			}
+			else{
+				i++;
+			}
+			Container *containerItem = dynamic_cast<Container*>(item);
+			if(containerItem){
+				stack.push_back(containerItem);
+			}
+		}
+	}
+	if(money != 0)
 		return false;
+	
+	return true;
 }
 
-bool Player::substractMoneyContainer(Container *container, unsigned long *money)
+bool Player::substractMoneyItem(Item *item, unsigned long money)
 {
-	int goldcoins;
-	int platcoins;
-	NetworkMessage msg;
+	if(money >= item->getWorth())
+		return false;
 	
-	for(int i=0; i<container->size();i++)
-	{
-		Item *item = container->getItem(i);
-		
-		Container* new_container = dynamic_cast<Container*>(item);
-		if(new_container && *money)
-		{
-			substractMoneyContainer(new_container, money);
-		}
-		else if(item && *money)
-		{
-			switch(item->getID())
-			{
-			case ITEM_COINS_GOLD:
-				//gold coins
-				msg.Reset();
-				goldcoins = item->getItemCountOrSubtype();
-				
-				for(containerLayout::const_iterator cit = getContainers(); cit != getEndContainer(); ++cit) {
-					if(cit->second == container) {
-						//remove item
-						msg.AddByte(0x72);
-						msg.AddByte(cit->first);
-						msg.AddByte(i);
-					}
-				}
-				
-				container->removeItem(item);
-				
-				if(*money >= goldcoins)
-				{
-					i--; // If we remove an item from the container then we need substract 1 to the container's main item counter
-					*money -= goldcoins;
-					//delete item;
-					item->releaseThing();
-				}
-				else
-				{
-					item->setItemCountOrSubtype(goldcoins - *money);
-					*money = 0;
-					container->addItem(item);
-					for(containerLayout::const_iterator cit = getContainers(); cit != getEndContainer(); ++cit) {
-						if(cit->second == container) {
-							//add item
-							msg.AddByte(0x70);
-							msg.AddByte(cit->first);
-							msg.AddU16(item->getID());
-							msg.AddByte(item->getItemCountOrSubtype());
-						}
-					}
-				}
-				
-				sendNetworkMessage(&msg);
-				break;
-			case ITEM_COINS_PLATINUM:
-				//platinum coins
-				msg.Reset();
-				goldcoins = item->getItemCountOrSubtype() * 100;
-				
-				NetworkMessage msg2;
-				for(containerLayout::const_iterator cit = getContainers(); cit != getEndContainer(); ++cit) {
-					if(cit->second == container) {
-						//remove item
-						msg.AddByte(0x72);
-						msg.AddByte(cit->first);
-						msg.AddByte(i);
-					}
-				}
-				container->removeItem(item);
-				
-				if(*money >= goldcoins)
-				{
-					i--; // If we remove an item from the container then we need substract 1 to the container's main item counter
-					*money -= goldcoins;
-					//delete item;
-					item->releaseThing();
-				}
-				else
-				{
-					platcoins = (int)((goldcoins - *money)/100);
-					goldcoins = (int)(goldcoins - *money)%100;
-					*money = 0;
-					
-					if(platcoins)
-					{
-						item->setItemCountOrSubtype(platcoins);
-						
-						container->addItem(item);
-						for(containerLayout::const_iterator cit = getContainers(); cit != getEndContainer(); ++cit) {
-							if(cit->second == container) {
-								//add item
-								msg.AddByte(0x70);
-								msg.AddByte(cit->first);
-								msg.AddU16(item->getID());
-								msg.AddByte(item->getItemCountOrSubtype());
-							}
-						}
-						
-						if(goldcoins)
-						{
-							Item *new_item = Item::CreateItem(ITEM_COINS_GOLD, goldcoins);
-							Container *default_container = dynamic_cast<Container*>(getItem(SLOT_BACKPACK));
-							
-							if(default_container && default_container->addItem(new_item)) // There is space in container
-							{
-								for(containerLayout::const_iterator cit = getContainers(); cit != getEndContainer(); ++cit) {
-									if(cit->second == default_container) {
-										//add item
-										msg.AddByte(0x70);
-										msg.AddByte(cit->first);
-										msg.AddU16(new_item->getID());
-										msg.AddByte(new_item->getItemCountOrSubtype());
-									}
-								}
-							}
-							else // There is no space in container
-							{
-								//TODO: place the item in ground...
-								delete new_item;
-							}
-						}
-					}
-					else
-					{
-						if(goldcoins)
-						{
-							//delete item;
-							item->releaseThing();
-							Item *new_item = Item::CreateItem(ITEM_COINS_GOLD, goldcoins);
-							item = new_item;
-							container->addItem(item);
-							
-							for(containerLayout::const_iterator cit = getContainers(); cit != getEndContainer(); ++cit) {
-								if(cit->second == container) {
-									//add item
-									msg.AddByte(0x70);
-									msg.AddByte(cit->first);
-									msg.AddU16(item->getID());
-									msg.AddByte(item->getItemCountOrSubtype());
-								}
-							}
-						}
-						else
-						{
-							//delete item;
-							item->releaseThing();
-							item = NULL;
-						}
-					}
-				}
-				
-				sendNetworkMessage(&msg);
-				break;
-			}
-		}
+	int remaind = item->getWorth() - money;
+	int crys = remaind / 10000;
+	remaind = remaind - crys * 10000;
+	int plat = remaind / 100;
+	remaind = remaind - plat * 100;
+	int gold = remaind;
+	if(crys != 0){
+		Item *remaindItem = Item::CreateItem(ITEM_COINS_CRYSTAL, crys);
+		if(!this->addItem(remaindItem))
+			g_game.addThing(NULL,this->pos,remaindItem);
+			
 	}
 	
-	if(*money == 0)
-		return true;
-	else
-		return false;
+	if(plat != 0){
+		Item *remaindItem = Item::CreateItem(ITEM_COINS_PLATINUM, plat);
+		if(!this->addItem(remaindItem))
+			g_game.addThing(NULL,this->pos,remaindItem);
+	}
+	
+	if(gold != 0){
+		Item *remaindItem = Item::CreateItem(ITEM_COINS_GOLD, gold);
+		if(!this->addItem(remaindItem))
+			g_game.addThing(NULL,this->pos,remaindItem);
+	}
+	
+	return true;
 }
-
 /*
 void Player::speak(const std::string &text)
 {

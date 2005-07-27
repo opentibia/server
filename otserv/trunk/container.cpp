@@ -180,8 +180,9 @@ long Container::getItemHoldingCount() const
 bool Container::isHoldingItem(const Item* item) const
 {
 	std::list<const Container*> stack;
-
+	
 	ContainerList::const_iterator it;
+	/*
 	for (it = getItems(); it != getEnd(); ++it) {
 
 		if(*it == item) {
@@ -193,7 +194,8 @@ bool Container::isHoldingItem(const Item* item) const
 			stack.push_back(container);
 		}
 	}
-	
+	*/
+	stack.push_back(this);
 	while(stack.size() > 0) {
 		const Container *container = stack.front();
 		stack.pop_front();
@@ -204,9 +206,9 @@ bool Container::isHoldingItem(const Item* item) const
 				return true;
 			}
 
-			Container *container = dynamic_cast<Container*>(*it);
-			if(container) {
-				stack.push_back(container);
+			Container *containerIt = dynamic_cast<Container*>(*it);
+			if(containerIt){
+				stack.push_back(containerIt);
 			}
 		}
 	}

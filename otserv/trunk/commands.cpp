@@ -392,7 +392,11 @@ bool Commands::substract_contMoney(Creature* c, const std::string &cmd, const st
 		player->sendCancel(info.str().c_str());
 		return true;
 	}
-	player->substractMoney(count);
+	if(player->substractMoney(count) != true){
+		std::stringstream info;
+		info << "Can not substract money!";
+		player->sendCancel(info.str().c_str());
+	}
 	return true;
 }
 

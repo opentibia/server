@@ -595,7 +595,9 @@ int ActionScript::registerFunctions()
 	//doPlayerAddItem(uid,itemid,count or type) . returns uid of the created item
 	lua_register(luaState, "doPlayerAddItem", ActionScript::luaActionDoPlayerAddItem);
 	//doPlayerSendTextMessage(uid,MessageClasses,message)
-	lua_register(luaState, "doPlayerSendTextMessage", ActionScript::luaActionDoPlayerSendTextMessage);		
+	lua_register(luaState, "doPlayerSendTextMessage", ActionScript::luaActionDoPlayerSendTextMessage);
+	//doPlayerRemoveMoney(uid,money)
+	lua_register(luaState, "doPlayerRemoveMoney", ActionScript::luaActionDoPlayerRemoveMoney);
 	//doShowTextWindow(uid,maxlen,canWrite)	
 	lua_register(luaState, "doShowTextWindow", ActionScript::luaActionDoShowTextWindow);	
 	//doDecayItem(uid)
@@ -1578,4 +1580,32 @@ int ActionScript::luaActionDoSummonCreature(lua_State *L){
 	
 	lua_pushnumber(L, cid);
 	return 1;	
+}
+
+
+int ActionScript::luaActionDoPlayerRemoveMoney(lua_State *L)
+{
+	//doPlayerRemoveMoney(uid,money)
+	int money = (int)internalGetNumber(L);
+	unsigned int cid = (unsigned int)internalGetNumber(L);	
+					
+	ActionScript *action = getActionScript(L);
+	
+	const KnownThing* tmp = action->GetPlayerByUID(cid);
+	if(tmp){
+		Player *player = (Player*)(tmp->thing);
+		if(player->substractMoney(money)){
+			lua_pushnumber(L, 1);
+		}
+		else{
+			lua_pushnumber(L, 0);
+		}
+	}
+	else{
+		lua_pushnumber(L, -1);
+		std::cout << "doPlayerRemoveMoney: player not found" << std::endl;
+		return 1;
+	}		
+		
+	return 1;
 }
