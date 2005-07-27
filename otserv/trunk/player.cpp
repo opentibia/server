@@ -425,7 +425,7 @@ bool Player::substractMoney(unsigned long money)
 			substractMoneyItem(item, money);
 			money = 0;
 		}
-		item->releaseThing();
+		g_game.FreeThing(item);
 		item = NULL;
 		delete it2->second;
 		it2->second = NULL;
