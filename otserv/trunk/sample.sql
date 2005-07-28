@@ -30,6 +30,7 @@ CREATE TABLE `accounts` (
   `type` int(11) NOT NULL default '0',
   `premDays` int(11) NOT NULL default '0',
   `email` varchar(50) NOT NULL default '',
+  `blocked` tinyint(4) NOT NULL default '0',
   UNIQUE KEY `id` (`id`),
   KEY `accno` (`accno`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -41,7 +42,7 @@ CREATE TABLE `accounts` (
 
 /*!40000 ALTER TABLE `accounts` DISABLE KEYS */;
 LOCK TABLES `accounts` WRITE;
-INSERT INTO `accounts` VALUES (1,1,'test',0,0,'');
+INSERT INTO `accounts` VALUES (1,1,'test',0,0,'',0);
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `accounts` ENABLE KEYS */;
 
