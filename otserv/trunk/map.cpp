@@ -205,8 +205,9 @@ bool Map::placeCreature(Position &pos, Creature* c)
 #endif
 		return false;
 	}
-
+    #ifdef __DEBUG__
 	std::cout << "POS: " << c->pos << std::endl;
+	#endif
 	tile->addThing(c);
 	c->pos = pos;
 

@@ -2508,7 +2508,7 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 	for(MagicAreaVec::iterator maIt = tmpMagicAreaVec.begin(); maIt != tmpMagicAreaVec.end(); ++maIt) {
 		Tile *t = map->getTile(maIt->x, maIt->y, maIt->z);
 		if(t && (!creature || (creature->access != 0 || !me->offensive || !t->isPz()) ) ) {
-			if(/*!t->isBlocking() &&*/ map->canThrowItemTo(frompos, (*maIt), false, true) && !t->floorChange()) {
+			if(/*!t->isBlocking() &&*/ !t->isBlockingProjectile() && map->canThrowItemTo(frompos, (*maIt), false, true) && !t->floorChange()) {
 				
 				if(maIt->x < topLeft.x)
 					topLeft.x = maIt->x;
