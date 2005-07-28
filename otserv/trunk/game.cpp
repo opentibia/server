@@ -1951,7 +1951,7 @@ void Game::thingMoveInternal(Creature *creature, unsigned short from_x, unsigned
 	oldPos.z = from_z;
 	
 	// *** Creature moving itself to a non-tile
-	if(!toTile && creature == creatureMoving){      
+	if(!toTile && creatureMoving && creatureMoving == creature){      
 		//change level begin          
 		Tile* downTile = getTile(to_x, to_y, to_z+1);
 		//diagonal begin
