@@ -1918,6 +1918,7 @@ void Game::thingMoveInternal(Creature *creature, unsigned short from_x, unsigned
 	Tile *fromTile = getTile(from_x, from_y, from_z);
 	if(!fromTile)
 		return;
+	
 	Tile *toTile   = getTile(to_x, to_y, to_z);
 	/*if(!toTile){
 		if(dynamic_cast<Player*>(player))
@@ -1936,239 +1937,254 @@ void Game::thingMoveInternal(Creature *creature, unsigned short from_x, unsigned
 				<< std::endl;
 #endif
 
-	if (thing)
-	{
-		Item* item = dynamic_cast<Item*>(thing);
-		Creature* creatureMoving = dynamic_cast<Creature*>(thing);
-		Player* playerMoving = dynamic_cast<Player*>(creatureMoving);
-		Player* player = dynamic_cast<Player*>(creature);
-		
-		Position oldPos;
-		oldPos.x = from_x;
-		oldPos.y = from_y;
-		oldPos.z = from_z;
-
-		if(fromTile)
+	if (!thing)
+		return;
+	
+	Item* item = dynamic_cast<Item*>(thing);
+	Creature* creatureMoving = dynamic_cast<Creature*>(thing);
+	Player* playerMoving = dynamic_cast<Player*>(creatureMoving);
+	Player* player = dynamic_cast<Player*>(creature);
+	
+	Position oldPos;
+	oldPos.x = from_x;
+	oldPos.y = from_y;
+	oldPos.z = from_z;
+	
+	// *** Creature moving itself to a non-tile
+	if(!toTile && creature == creatureMoving){      
+		//change level begin          
+		Tile* downTile = getTile(to_x, to_y, to_z+1);
+		//diagonal begin
+		if(!downTile)
 		{
-			if(!toTile && creature == creatureMoving){      
-				//change level begin          
+			  
+			if(player) {
+				player->sendTextMessage(MSG_SMALLINFO, "Sorry, not possible.");
+				player->sendCancelWalk();
+				//creature->sendCancelWalk("Sorry, not possible.");
+			}
+			
+			return;
+		}
+		
+		if(downTile->floorChange(NORTH) && downTile->floorChange(EAST)){
+			teleport(creatureMoving, Position(creatureMoving->pos.x-2, creatureMoving->pos.y+2, creatureMoving->pos.z+1));
+		}
+		else if(downTile->floorChange(NORTH) && downTile->floorChange(WEST)){
+			teleport(creatureMoving, Position(creatureMoving->pos.x+2, creatureMoving->pos.y+2, creatureMoving->pos.z+1));
+		}
+		else if(downTile->floorChange(SOUTH) && downTile->floorChange(EAST)){
+			teleport(creatureMoving, Position(creatureMoving->pos.x-2, creatureMoving->pos.y-2, creatureMoving->pos.z+1));
+		}
+		else if(downTile->floorChange(SOUTH) && downTile->floorChange(WEST)){
+			teleport(creatureMoving, Position(creatureMoving->pos.x+2, creatureMoving->pos.y-2, creatureMoving->pos.z+1));
+		}
+		//diagonal end                                                           
+		else if(downTile->floorChange(NORTH)){
+			//teleport(creatureMoving, Position(creatureMoving->pos.x, creatureMoving->pos.y+2, creatureMoving->pos.z+1));
+			teleport(creatureMoving, Position(to_x, to_y + 1, creatureMoving->pos.z+1));
+		}
+		else if(downTile->floorChange(SOUTH)){
+			//teleport(creatureMoving, Position(creatureMoving->pos.x, creatureMoving->pos.y-2, creatureMoving->pos.z+1));
+			teleport(creatureMoving, Position(to_x, to_y - 1, creatureMoving->pos.z+1));
+		}
+		else if(downTile->floorChange(EAST)){
+			//teleport(creatureMoving, Position(creatureMoving->pos.x-2, creatureMoving->pos.y, creatureMoving->pos.z+1));
+			teleport(creatureMoving, Position(to_x - 1, to_y, creatureMoving->pos.z+1));
+		}
+		else if(downTile->floorChange(WEST)){
+			//teleport(creatureMoving, Position(creatureMoving->pos.x+2, creatureMoving->pos.y, creatureMoving->pos.z+1));
+			teleport(creatureMoving, Position(to_x + 1, to_y, creatureMoving->pos.z+1));
+		}
+		else
+			if(player) {
+				player->sendTextMessage(MSG_SMALLINFO, "Sorry, not possible.");
+				player->sendCancelWalk();
+			}
+		
+		//change level end 
+		return;
+	}
+
+	
+	// *** Checking if the thing can be moved around
+	
+	if(!toTile)
+		return;
+	
+	if(!onPrepareMoveThing(creature, thing, oldPos, Position(to_x, to_y, to_z), count))
+		return;
+	
+	if(creatureMoving && !onPrepareMoveCreature(creature, creatureMoving, fromTile, toTile))
+		return;
+	
+	if(!onPrepareMoveThing(creature, thing, fromTile, toTile, count))
+		return;
+
+	
+	// *** If the destiny is a teleport item, teleport the thing
+		
+	Teleport *teleportitem = toTile->getTeleportItem();
+	if(teleportitem) {
+		teleport(thing, teleportitem->getDestPos());
+		return;
+	}
+
+	// *** Normal moving
+	
+	if(creatureMoving)
+	{	
+		// we need to update the direction the player is facing to...
+		// otherwise we are facing some problems in turning into the
+		// direction we were facing before the movement
+		// check y first cuz after a diagonal move we lock to east or west
+		if (to_y < oldPos.y) creatureMoving->direction = NORTH;
+		if (to_y > oldPos.y) creatureMoving->direction = SOUTH;
+		if (to_x > oldPos.x) creatureMoving->direction = EAST;
+		if (to_x < oldPos.x) creatureMoving->direction = WEST;
+	}
+
+	int oldstackpos = fromTile->getThingStackPos(thing);
+	if (fromTile->removeThing(thing))
+	{
+		toTile->addThing(thing);
+		
+		thing->pos.x = to_x;
+		thing->pos.y = to_y;
+		thing->pos.z = to_z;
+		
+		std::vector<Creature*> list;
+		getSpectators(Range(oldPos, Position(to_x, to_y, to_z)), list);
+		
+		for(unsigned int i = 0; i < list.size(); ++i)
+		{
+			list[i]->onThingMove(creature, thing, &oldPos, oldstackpos, 1, 1);
+		}
+		
+		autoCloseTrade(item, true);
+		
+		if (playerMoving) 
+		{
+			if(playerMoving->attackedCreature != 0) {
+				Creature* attackedCreature = getCreatureByID(creatureMoving->attackedCreature);
+				if(attackedCreature){      
+					if((std::abs(creatureMoving->pos.x - attackedCreature->pos.x) > 8) ||
+					(std::abs(creatureMoving->pos.y - attackedCreature->pos.y) > 5) || (creatureMoving->pos.z != attackedCreature->pos.z)){
+						player->sendTextMessage(MSG_SMALLINFO, "Target lost.");
+						playerSetAttackedCreature(playerMoving, 0);
+					}
+				}
+			}
+			else if(playerMoving->tradePartner != 0) {
+				Creature* tradePartner = getCreatureByID(playerMoving->tradePartner);
+				if(tradePartner) {
+					if((std::abs(playerMoving->pos.x - tradePartner->pos.x) > 2) ||
+					(std::abs(playerMoving->pos.y - tradePartner->pos.y) > 2) || (playerMoving->pos.z != tradePartner->pos.z)){
+						playerCloseTrade(playerMoving);
+					}
+				}
+			}
+
+			//change level begin
+			if(toTile->ground && !(toTile->ground->noFloorChange()))
+			{          
 				Tile* downTile = getTile(to_x, to_y, to_z+1);
-				//diagonal begin
 				if(downTile){
+					//diagonal begin
 					if(downTile->floorChange(NORTH) && downTile->floorChange(EAST)){
-						teleport(playerMoving, Position(playerMoving->pos.x-2, playerMoving->pos.y+2, playerMoving->pos.z+1));
+						teleport(playerMoving, Position(playerMoving->pos.x-1, playerMoving->pos.y+1, playerMoving->pos.z+1));
+						//teleport(thing, Position(from_x-1, from_y+1, from_z+1));
 					}
 					else if(downTile->floorChange(NORTH) && downTile->floorChange(WEST)){
-						teleport(playerMoving, Position(playerMoving->pos.x+2, playerMoving->pos.y+2, playerMoving->pos.z+1));
+						teleport(playerMoving, Position(playerMoving->pos.x+1, playerMoving->pos.y+1, playerMoving->pos.z+1));
+						//teleport(thing, Position(from_x+1, from_y+1, from_z+1));
 					}
 					else if(downTile->floorChange(SOUTH) && downTile->floorChange(EAST)){
-						teleport(playerMoving, Position(playerMoving->pos.x-2, playerMoving->pos.y-2, playerMoving->pos.z+1));
+						teleport(playerMoving, Position(playerMoving->pos.x-1, playerMoving->pos.y-1, playerMoving->pos.z+1));
+						//teleport(thing, Position(from_x-1, from_y-1, from_z+1));
 					}
 					else if(downTile->floorChange(SOUTH) && downTile->floorChange(WEST)){
-						teleport(playerMoving, Position(playerMoving->pos.x+2, playerMoving->pos.y-2, playerMoving->pos.z+1));
-					}
-					//diagonal end                                                           
+						teleport(playerMoving, Position(playerMoving->pos.x+1, playerMoving->pos.y-1, playerMoving->pos.z+1));
+						//teleport(thing, Position(from_x+1, from_y-1, from_z+1));
+					}                          
+					//diagonal end
 					else if(downTile->floorChange(NORTH)){
-						//teleport(playerMoving, Position(playerMoving->pos.x, playerMoving->pos.y+2, playerMoving->pos.z+1));
-						teleport(playerMoving, Position(to_x, to_y + 1, playerMoving->pos.z+1));
+						teleport(playerMoving, Position(playerMoving->pos.x, playerMoving->pos.y+1, playerMoving->pos.z+1));
+						//teleport(thing, Position(from_x, from_y+1, from_z+1));
 					}
 					else if(downTile->floorChange(SOUTH)){
-						//teleport(playerMoving, Position(playerMoving->pos.x, playerMoving->pos.y-2, playerMoving->pos.z+1));
-						teleport(playerMoving, Position(to_x, to_y - 1, playerMoving->pos.z+1));
+						teleport(playerMoving, Position(playerMoving->pos.x, playerMoving->pos.y-1, playerMoving->pos.z+1));
+						//teleport(thing, Position(from_x, from_y-1, from_z+1));
 					}
 					else if(downTile->floorChange(EAST)){
-						//teleport(playerMoving, Position(playerMoving->pos.x-2, playerMoving->pos.y, playerMoving->pos.z+1));
-						teleport(playerMoving, Position(to_x - 1, to_y, playerMoving->pos.z+1));
+						teleport(playerMoving, Position(playerMoving->pos.x-1, playerMoving->pos.y, playerMoving->pos.z+1));
+						//teleport(thing, Position(from_x-1, from_y, from_z+1));
 					}
 					else if(downTile->floorChange(WEST)){
-						//teleport(playerMoving, Position(playerMoving->pos.x+2, playerMoving->pos.y, playerMoving->pos.z+1));
-						teleport(playerMoving, Position(to_x + 1, to_y, playerMoving->pos.z+1));
-					}
-					else {
-						if(player) {
-							player->sendTextMessage(MSG_SMALLINFO, "Sorry, not possible.");
-							player->sendCancelWalk();
-						}
-
-						//player->sendCancelWalk("Sorry, not possible.");
-						return;
+						teleport(playerMoving, Position(playerMoving->pos.x+1, playerMoving->pos.y, playerMoving->pos.z+1));
+						//teleport(thing, Position(from_x+1, from_y, from_z+1));
 					}
 				}
-				//change level end   
-				else if(player) {
-					player->sendTextMessage(MSG_SMALLINFO, "Sorry, not possible.");
-					player->sendCancelWalk();
-					//creature->sendCancelWalk("Sorry, not possible.");
-				}
-				
-				return;
 			}
-
-			if(!onPrepareMoveThing(creature, thing, Position(from_x, from_y, from_z), Position(to_x, to_y, to_z), count))
-				return;
-			
-			if(creatureMoving && !onPrepareMoveCreature(creature, creatureMoving, fromTile, toTile))
-				return;
-			
-			if(!onPrepareMoveThing(creature, thing, fromTile, toTile, count))
-				return;
-
-			Teleport *teleportitem = toTile->getTeleportItem();
-			if(teleportitem) {
-				teleport(thing, teleportitem->getDestPos());
-				return;
+			//diagonal begin
+			else if(toTile->floorChange(NORTH) && toTile->floorChange(EAST)){
+				teleport(playerMoving, Position(playerMoving->pos.x+1, playerMoving->pos.y-1, playerMoving->pos.z-1));
+				//teleport(thing, Position(from_x+1, from_y-1, from_z-1));
 			}
-			
-			if(creatureMoving){
-				// we need to update the direction the player is facing to...
-				// otherwise we are facing some problems in turning into the
-				// direction we were facing before the movement
-				// check y first cuz after a diagonal move we lock to east or west
-				if (to_y < oldPos.y) creatureMoving->direction = NORTH;
-				if (to_y > oldPos.y) creatureMoving->direction = SOUTH;
-				if (to_x > oldPos.x) creatureMoving->direction = EAST;
-				if (to_x < oldPos.x) creatureMoving->direction = WEST;
+			else if(toTile->floorChange(NORTH) && toTile->floorChange(WEST)){
+				teleport(playerMoving, Position(playerMoving->pos.x-1, playerMoving->pos.y-1, playerMoving->pos.z-1));
+				//teleport(thing, Position(from_x-1, from_y-1, from_z-1));
 			}
-
-			int oldstackpos = fromTile->getThingStackPos(thing);
-			if (fromTile && fromTile->removeThing(thing))
-			{
-				toTile->addThing(thing);
+			else if(toTile->floorChange(SOUTH) && toTile->floorChange(EAST)){
+				teleport(playerMoving, Position(playerMoving->pos.x+1, playerMoving->pos.y+1, playerMoving->pos.z-1));
+				//teleport(thing, Position(from_x+1, from_y+1, from_z-1));
+			}
+			else if(toTile->floorChange(SOUTH) && toTile->floorChange(WEST)){
+				teleport(playerMoving, Position(playerMoving->pos.x-1, playerMoving->pos.y+1, playerMoving->pos.z-1));
+				//teleport(thing, Position(from_x-1, from_y+1, from_z-1));
+			}
+			//diagonal end                            
+			else if(toTile->floorChange(NORTH)){
+				teleport(playerMoving, Position(playerMoving->pos.x, playerMoving->pos.y-1, playerMoving->pos.z-1));
+				//teleport(thing, Position(from_x, from_y-1, from_z-1));
+			}
+			else if(toTile->floorChange(SOUTH)){
+				teleport(playerMoving, Position(playerMoving->pos.x, playerMoving->pos.y+1, playerMoving->pos.z-1));
+				//teleport(thing, Position(from_x, from_y+1, from_z-1));
+			}
+			else if(toTile->floorChange(EAST)){
+				teleport(playerMoving, Position(playerMoving->pos.x+1, playerMoving->pos.y, playerMoving->pos.z-1));
+				//teleport(thing, Position(from_x+1, from_y, from_z-1));
+			}
+			else if(toTile->floorChange(WEST)){
+				teleport(playerMoving, Position(playerMoving->pos.x-1, playerMoving->pos.y, playerMoving->pos.z-1));
+				//teleport(thing, Position(from_x-1, from_y, from_z-1));
+			}                                      
+			//change level end
+		}
+		
+		// Magic Field in destiny field
+		if(creatureMoving)
+		{
+			const MagicEffectItem* fieldItem = toTile->getFieldItem();
+			
+			if(fieldItem) {
+				const MagicEffectTargetCreatureCondition *magicTargetCondition = fieldItem->getCondition();
+	
+				if(!(getWorldType() == WORLD_TYPE_NO_PVP && playerMoving && magicTargetCondition && magicTargetCondition->getOwnerID() != 0)) {
+					fieldItem->getDamage(creatureMoving);
+				}
 				
-				thing->pos.x = to_x;
-				thing->pos.y = to_y;
-				thing->pos.z = to_z;
-				
-				if (playerMoving) {
-					if(playerMoving->attackedCreature != 0) {
-						Creature* attackedCreature = getCreatureByID(creatureMoving->attackedCreature);
-						if(attackedCreature){      
-							if((std::abs(creatureMoving->pos.x - attackedCreature->pos.x) > 8) ||
-							(std::abs(creatureMoving->pos.y - attackedCreature->pos.y) > 5) || (creatureMoving->pos.z != attackedCreature->pos.z)){
-								player->sendTextMessage(MSG_SMALLINFO, "Target lost.");
-								playerSetAttackedCreature(playerMoving, 0);
-							}
-						}
-					}
-					else if(playerMoving->tradePartner != 0) {
-						Creature* tradePartner = getCreatureByID(playerMoving->tradePartner);
-						if(tradePartner) {
-							if((std::abs(playerMoving->pos.x - tradePartner->pos.x) > 2) ||
-							(std::abs(playerMoving->pos.y - tradePartner->pos.y) > 2) || (playerMoving->pos.z != tradePartner->pos.z)){
-								playerCloseTrade(playerMoving);
-							}
-						}
-					}
-				}
-
-				autoCloseTrade(item, true);
-				std::vector<Creature*> list;
-				getSpectators(Range(oldPos, Position(to_x, to_y, to_z)), list);
-				
-				for(unsigned int i = 0; i < list.size(); ++i)
-				{
-					list[i]->onThingMove(creature, thing, &oldPos, oldstackpos, 1, 1);
-				}
-
-				//change level begin
-				if(playerMoving && toTile->ground && !(toTile->ground->noFloorChange())){          
-					Tile* downTile = getTile(to_x, to_y, to_z+1);
-					if(downTile){
-						//diagonal begin
-						if(downTile->floorChange(NORTH) && downTile->floorChange(EAST)){
-							teleport(playerMoving, Position(playerMoving->pos.x-1, playerMoving->pos.y+1, playerMoving->pos.z+1));
-							//teleport(thing, Position(from_x-1, from_y+1, from_z+1));
-						}
-						else if(downTile->floorChange(NORTH) && downTile->floorChange(WEST)){
-							teleport(playerMoving, Position(playerMoving->pos.x+1, playerMoving->pos.y+1, playerMoving->pos.z+1));
-							//teleport(thing, Position(from_x+1, from_y+1, from_z+1));
-						}
-						else if(downTile->floorChange(SOUTH) && downTile->floorChange(EAST)){
-							teleport(playerMoving, Position(playerMoving->pos.x-1, playerMoving->pos.y-1, playerMoving->pos.z+1));
-							//teleport(thing, Position(from_x-1, from_y-1, from_z+1));
-						}
-						else if(downTile->floorChange(SOUTH) && downTile->floorChange(WEST)){
-							teleport(playerMoving, Position(playerMoving->pos.x+1, playerMoving->pos.y-1, playerMoving->pos.z+1));
-							//teleport(thing, Position(from_x+1, from_y-1, from_z+1));
-						}                          
-						//diagonal end
-						else if(downTile->floorChange(NORTH)){
-							teleport(playerMoving, Position(playerMoving->pos.x, playerMoving->pos.y+1, playerMoving->pos.z+1));
-							//teleport(thing, Position(from_x, from_y+1, from_z+1));
-						}
-						else if(downTile->floorChange(SOUTH)){
-							teleport(playerMoving, Position(playerMoving->pos.x, playerMoving->pos.y-1, playerMoving->pos.z+1));
-							//teleport(thing, Position(from_x, from_y-1, from_z+1));
-						}
-						else if(downTile->floorChange(EAST)){
-							teleport(playerMoving, Position(playerMoving->pos.x-1, playerMoving->pos.y, playerMoving->pos.z+1));
-							//teleport(thing, Position(from_x-1, from_y, from_z+1));
-						}
-						else if(downTile->floorChange(WEST)){
-							teleport(playerMoving, Position(playerMoving->pos.x+1, playerMoving->pos.y, playerMoving->pos.z+1));
-							//teleport(thing, Position(from_x+1, from_y, from_z+1));
-						}
-					}
-				}
-				//diagonal begin
-				else if(playerMoving && toTile->floorChange(NORTH) && toTile->floorChange(EAST)){
-					teleport(playerMoving, Position(playerMoving->pos.x+1, playerMoving->pos.y-1, playerMoving->pos.z-1));
-					//teleport(thing, Position(from_x+1, from_y-1, from_z-1));
-				}
-				else if(playerMoving && toTile->floorChange(NORTH) && toTile->floorChange(WEST)){
-					teleport(playerMoving, Position(playerMoving->pos.x-1, playerMoving->pos.y-1, playerMoving->pos.z-1));
-					//teleport(thing, Position(from_x-1, from_y-1, from_z-1));
-				}
-				else if(playerMoving && toTile->floorChange(SOUTH) && toTile->floorChange(EAST)){
-					teleport(playerMoving, Position(playerMoving->pos.x+1, playerMoving->pos.y+1, playerMoving->pos.z-1));
-					//teleport(thing, Position(from_x+1, from_y+1, from_z-1));
-				}
-				else if(playerMoving && toTile->floorChange(SOUTH) && toTile->floorChange(WEST)){
-					teleport(playerMoving, Position(playerMoving->pos.x-1, playerMoving->pos.y+1, playerMoving->pos.z-1));
-					//teleport(thing, Position(from_x-1, from_y+1, from_z-1));
-				}
-				//diagonal end                            
-				else if(playerMoving && toTile->floorChange(NORTH)){
-					teleport(playerMoving, Position(playerMoving->pos.x, playerMoving->pos.y-1, playerMoving->pos.z-1));
-					//teleport(thing, Position(from_x, from_y-1, from_z-1));
-				}
-				else if(playerMoving && toTile->floorChange(SOUTH)){
-					teleport(playerMoving, Position(playerMoving->pos.x, playerMoving->pos.y+1, playerMoving->pos.z-1));
-					//teleport(thing, Position(from_x, from_y+1, from_z-1));
-				}
-				else if(playerMoving && toTile->floorChange(EAST)){
-					teleport(playerMoving, Position(playerMoving->pos.x+1, playerMoving->pos.y, playerMoving->pos.z-1));
-					//teleport(thing, Position(from_x+1, from_y, from_z-1));
-				}
-				else if(playerMoving && toTile->floorChange(WEST)){
-					teleport(playerMoving, Position(playerMoving->pos.x-1, playerMoving->pos.y, playerMoving->pos.z-1));
-					//teleport(thing, Position(from_x-1, from_y, from_z-1));
-				}                                      
-				//change level end
-
-				if(creatureMoving) {
-					const MagicEffectItem* fieldItem = toTile->getFieldItem();
-					
-					if(fieldItem) {
-						const MagicEffectTargetCreatureCondition *magicTargetCondition = fieldItem->getCondition();
-
-						if(!(getWorldType() == WORLD_TYPE_NO_PVP && playerMoving && magicTargetCondition && magicTargetCondition->getOwnerID() != 0)) {
-							fieldItem->getDamage(creatureMoving);
-						}
-						
-						if(magicTargetCondition && ((magicTargetCondition->attackType == ATTACK_FIRE) || 
-								(magicTargetCondition->attackType == ATTACK_POISON) ||
-								(magicTargetCondition->attackType == ATTACK_ENERGY))) {	
-							Creature *c = getCreatureByID(magicTargetCondition->getOwnerID());
-							creatureMakeMagic(c, thing->pos, magicTargetCondition);
-						}
-					}
+				if(magicTargetCondition && ((magicTargetCondition->attackType == ATTACK_FIRE) || 
+						(magicTargetCondition->attackType == ATTACK_POISON) ||
+						(magicTargetCondition->attackType == ATTACK_ENERGY))) {	
+					Creature *c = getCreatureByID(magicTargetCondition->getOwnerID());
+					creatureMakeMagic(c, thing->pos, magicTargetCondition);
 				}
 			}
 		}
 	}
 }
-
 
 void Game::getSpectators(const Range& range, std::vector<Creature*>& list)
 {
