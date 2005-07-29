@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// Base class for the Account Loader/Saver
+// Logger class - captures everything that happens on the server
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -20,6 +20,8 @@
 
 #include "logger.h"
 #include <iostream>
+
+#ifdef _LOGFILE_
 
 int Logger::masterLogLevel = 3;
 int Logger::masterFormat = 0;
@@ -95,3 +97,5 @@ LoggingChannel* Logger::getChannel(std::string channel){
     }
     return channels[channel];
 } 
+
+#endif
