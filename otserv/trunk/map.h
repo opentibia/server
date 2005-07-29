@@ -239,6 +239,7 @@ class Map {
 	  * \returns A pointer to that tile.
 	  */
     Tile* getTile(unsigned short _x, unsigned short _y, unsigned char _z);
+    Tile* getTile(const Position &pos);
     
 	/**
 	  * Set a single tile.

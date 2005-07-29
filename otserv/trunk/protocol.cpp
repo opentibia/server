@@ -78,7 +78,7 @@ long long Protocol::getSleepTicks()
 	long long delay = 0;
 	int stepDuration = 0;
 
-	Tile *tile =game->getTile(player->pos.x, player->pos.y, player->pos.z);
+	Tile *tile = game->getTile(player->pos.x, player->pos.y, player->pos.z);
 	if(tile && tile->ground) {
 		int groundid = tile->ground->getID();
 

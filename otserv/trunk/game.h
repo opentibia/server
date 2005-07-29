@@ -179,25 +179,25 @@ public:
 
 	//container/inventory to container/inventory
 	void thingMove(Player *player,
-			unsigned char from_cid, unsigned char from_slotid, bool fromInventory,
+			unsigned char from_cid, unsigned char from_slotid, unsigned short itemid,bool fromInventory,
 			unsigned char to_cid, unsigned char to_slotid, bool toInventory,
 			unsigned char count);
 
 	//container/inventory to ground
 	void thingMove(Player *player,
-			unsigned char from_cid, unsigned char from_slotid, bool fromInventory,
+			unsigned char from_cid, unsigned char from_slotid, unsigned short itemid, bool fromInventory,
 			const Position& toPos, unsigned char count);
 
 	//ground to container/inventory
 	void thingMove(Player *player,
-			const Position& fromPos, unsigned char stackPos,
+			const Position& fromPos, unsigned char stackPos, unsigned short itemid,
 			unsigned char to_cid, unsigned char to_slotid,
 			bool isInventory, unsigned char count);
 	
 	//ground to ground
 	void thingMove(Creature *creature,
 			unsigned short from_x, unsigned short from_y, unsigned char from_z,
-			unsigned char stackPos,
+			unsigned char stackPos,unsigned short itemid,
 			unsigned short to_x, unsigned short to_y, unsigned char to_z, unsigned char count);
 
 	/**
@@ -321,18 +321,18 @@ protected:
 
 	//container/inventory to container/inventory
 	void thingMoveInternal(Player *player,
-			unsigned char from_cid, unsigned char from_slotid, bool fromInventory,
-			unsigned char to_cid, unsigned char to_slotid, bool toInventory,
-			unsigned char count);
+			unsigned char from_cid, unsigned char from_slotid, unsigned short itemid, 
+			bool fromInventory,unsigned char to_cid, unsigned char to_slotid, 
+			bool toInventory,unsigned char count);
 
 	//container/inventory to ground
 	void thingMoveInternal(Player *player,
-			unsigned char from_cid, unsigned char from_slotid, bool fromInventory,
-			const Position& toPos, unsigned char count);
+			unsigned char from_cid, unsigned char from_slotid, unsigned short itemid,
+			bool fromInventory,const Position& toPos, unsigned char count);
 
 	//ground to container/inventory
 	void thingMoveInternal(Player *player,
-			const Position& fromPos, unsigned char stackPos,
+			const Position& fromPos, unsigned char stackPos,unsigned short itemid,
 			unsigned char to_cid, unsigned char to_slotid,
 			bool toInventory, unsigned char count);
 
@@ -340,7 +340,7 @@ protected:
   // recursive locks
   void thingMoveInternal(Creature *player,
       unsigned short from_x, unsigned short from_y, unsigned char from_z,
-      unsigned char stackPos,
+      unsigned char stackPos,unsigned short itemid,
 			unsigned short to_x, unsigned short to_y, unsigned char to_z, unsigned char count);
 
 	void changeOutfit(unsigned long id, int looktype);

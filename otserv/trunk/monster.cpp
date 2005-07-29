@@ -713,7 +713,7 @@ int Monster::onThink(int& newThinkTicks)
 		long long delay = 0;
 		int stepDuration = 0;
 
-		Tile *tile =game->getTile(this->pos.x, this->pos.y, this->pos.z);
+		Tile *tile = game->getTile(this->pos.x, this->pos.y, this->pos.z);
 		if(tile && tile->ground) {
 			int groundid = tile->ground->getID();
 

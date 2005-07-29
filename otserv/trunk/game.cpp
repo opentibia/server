@@ -73,7 +73,8 @@ GameState::GameState(Game *game, const Range &range)
 
 void GameState::onAttack(Creature* attacker, const Position& pos, const MagicEffectClass* me)
 {
-	Tile *tile = game->map->getTile(pos.x, pos.y, pos.z);
+	//Tile *tile = game->map->getTile(pos.x, pos.y, pos.z);
+	Tile *tile = game->map->getTile(pos);
 
 	if(!tile)
 		return;
@@ -199,7 +200,8 @@ void GameState::onAttack(Creature* attacker, const Position& pos, Creature* atta
 	if (damage < -50 || attackedCreature->access != 0)
 		damage = 0;
 		
-	Tile *tile = game->map->getTile(pos.x, pos.y, pos.z);
+	//Tile *tile = game->map->getTile(pos.x, pos.y, pos.z);
+	Tile *tile = game->map->getTile(pos);
 	bool blood;
 	if(damage != 0){
 		game->creatureApplyDamage(attackedCreature, damage, damage, manaDamage);
@@ -753,54 +755,55 @@ void Game::thingMove(Creature *creature, Thing *thing,
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
 
-	Tile *fromTile = map->getTile(thing->pos.x, thing->pos.y, thing->pos.z);
+	//Tile *fromTile = map->getTile(thing->pos.x, thing->pos.y, thing->pos.z);
+	Tile *fromTile = map->getTile(thing->pos);
 
 	if (fromTile)
 	{
 		int oldstackpos = fromTile->getThingStackPos(thing);
-		thingMoveInternal(creature, thing->pos.x, thing->pos.y, thing->pos.z, oldstackpos, to_x, to_y, to_z, count);
+		thingMoveInternal(creature, thing->pos.x, thing->pos.y, thing->pos.z, oldstackpos,0, to_x, to_y, to_z, count);
 	}
 }
 
 
 void Game::thingMove(Creature *creature, unsigned short from_x, unsigned short from_y, unsigned char from_z,
-	unsigned char stackPos, unsigned short to_x, unsigned short to_y, unsigned char to_z, unsigned char count)
+	unsigned char stackPos, unsigned short itemid, unsigned short to_x, unsigned short to_y, unsigned char to_z, unsigned char count)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
 
-	thingMoveInternal(creature, from_x, from_y, from_z, stackPos, to_x, to_y, to_z, count);
+	thingMoveInternal(creature, from_x, from_y, from_z, stackPos, itemid, to_x, to_y, to_z, count);
 }
 
 //container/inventory to container/inventory
 void Game::thingMove(Player *player,
-	unsigned char from_cid, unsigned char from_slotid, bool fromInventory,
+	unsigned char from_cid, unsigned char from_slotid, unsigned short itemid, bool fromInventory,
 	unsigned char to_cid, unsigned char to_slotid, bool toInventory,
 	unsigned char count)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
 		
-	thingMoveInternal(player, from_cid, from_slotid, fromInventory,
+	thingMoveInternal(player, from_cid, from_slotid, itemid, fromInventory,
 		to_cid, to_slotid, toInventory, count);
 }
 
 //container/inventory to ground
 void Game::thingMove(Player *player,
-	unsigned char from_cid, unsigned char from_slotid, bool fromInventory,
+	unsigned char from_cid, unsigned char from_slotid, unsigned short itemid, bool fromInventory,
 	const Position& toPos, unsigned char count)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
 
-	thingMoveInternal(player, from_cid, from_slotid, fromInventory, toPos, count);
+	thingMoveInternal(player, from_cid, from_slotid, itemid, fromInventory, toPos, count);
 }
 
 //ground to container/inventory
 void Game::thingMove(Player *player,
-	const Position& fromPos, unsigned char stackPos,
+	const Position& fromPos, unsigned char stackPos, unsigned short itemid,
 	unsigned char to_cid, unsigned char to_slotid, bool toInventory,
 	unsigned char count)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);		
-	thingMoveInternal(player, fromPos, stackPos, to_cid, to_slotid, toInventory, count);
+	thingMoveInternal(player, fromPos, stackPos, itemid, to_cid, to_slotid, toInventory, count);
 }
 
 /*ground -> ground*/
@@ -1003,6 +1006,10 @@ bool Game::onPrepareMoveCreature(Creature *creature, const Creature* creatureMov
 		creature->sendCancel("Sorry, not possible.");
 		return false;
   }
+  else if(creature != creatureMoving && toTile->getTeleportItem()){
+		creature->sendCancel("Sorry, not possible.");
+		return false;
+  }
 
 	return true;
 }
@@ -1148,8 +1155,8 @@ bool Game::onPrepareMoveThing(Player *player, const Item *item,
 
 //container/inventory to container/inventory
 void Game::thingMoveInternal(Player *player,
-	unsigned char from_cid, unsigned char from_slotid, bool fromInventory,
-	unsigned char to_cid, unsigned char to_slotid, bool toInventory,
+	unsigned char from_cid, unsigned char from_slotid, unsigned short itemid,
+	bool fromInventory,unsigned char to_cid, unsigned char to_slotid, bool toInventory,
 	unsigned char count)
 {
 	Container *fromContainer = NULL;
@@ -1192,7 +1199,7 @@ void Game::thingMoveInternal(Player *player,
 		}
 	}
 
-	if(!fromItem || (toItem == fromItem) || (fromItem->isStackable() && count > fromItem->getItemCountOrSubtype()))
+	if(!fromItem || (toItem == fromItem) || (fromItem->isStackable() && count > fromItem->getItemCountOrSubtype()) || fromItem->getID() != itemid)
 		return;
 
 	//Container to container
@@ -1524,11 +1531,12 @@ void Game::thingMoveInternal(Player *player,
 
 //container/inventory to ground
 void Game::thingMoveInternal(Player *player,
-	unsigned char from_cid, unsigned char from_slotid, bool fromInventory,
+	unsigned char from_cid, unsigned char from_slotid, unsigned short itemid, bool fromInventory,
 	const Position& toPos, unsigned char count)
 {
 	Container *fromContainer = NULL;
-	Tile *toTile = getTile(toPos.x, toPos.y, toPos.z);
+	//Tile *toTile = getTile(toPos.x, toPos.y, toPos.z);
+	Tile *toTile = map->getTile(toPos);
 	if(!toTile)
 		return;
 
@@ -1542,7 +1550,7 @@ void Game::thingMoveInternal(Player *player,
 		Item *fromItem = dynamic_cast<Item*>(fromContainer->getItem(from_slotid));
 		Item *toItem = dynamic_cast<Item*>(toTile->getThingByStackPos(toTile->getThingCount() - 1));
 
-		if(!fromItem || (toItem == fromItem) || (fromItem->isStackable() && count > fromItem->getItemCountOrSubtype()))
+		if(!fromItem || (toItem == fromItem) || (fromItem->isStackable() && count > fromItem->getItemCountOrSubtype()) || fromItem->getID() != itemid)
 			return;
 
 		if(onPrepareMoveThing(player, fromItem, fromPos, toPos, count) && onPrepareMoveThing(player, fromItem, NULL, toTile, count)) {
@@ -1624,7 +1632,7 @@ void Game::thingMoveInternal(Player *player,
 	}
 	else /*inventory to ground*/{
 		Item *fromItem = player->getItem(from_cid);
-		if(!fromItem)
+		if(!fromItem || fromItem->getID() != itemid)
 			return;
 		
 		if(onPrepareMoveThing(player, fromItem, player->pos, toPos, count) && onPrepareMoveThing(player, fromItem, NULL, toTile, count)) {
@@ -1707,9 +1715,10 @@ void Game::thingMoveInternal(Player *player,
 
 //ground to container/inventory
 void Game::thingMoveInternal(Player *player, const Position& fromPos, unsigned char stackPos,
-	unsigned char to_cid, unsigned char to_slotid, bool toInventory, unsigned char count)
+	unsigned short itemid, unsigned char to_cid, unsigned char to_slotid, bool toInventory, unsigned char count)
 {
-	Tile *fromTile = getTile(fromPos.x, fromPos.y, fromPos.z);
+	//Tile *fromTile = getTile(fromPos.x, fromPos.y, fromPos.z);
+	Tile *fromTile = map->getTile(fromPos);
 	if(!fromTile)
 		return;
 
@@ -1718,7 +1727,7 @@ void Game::thingMoveInternal(Player *player, const Position& fromPos, unsigned c
 	Item *fromItem = dynamic_cast<Item*>(fromTile->getThingByStackPos(stackPos));
 	Item *toItem = NULL;
 
-	if(!fromItem)
+	if(!fromItem || fromItem->getID() != itemid || fromItem != fromTile->getTopDownItem())
 		return;
 
 	if(toInventory) {
@@ -1913,7 +1922,7 @@ void Game::thingMoveInternal(Player *player, const Position& fromPos, unsigned c
 
 //ground to ground
 void Game::thingMoveInternal(Creature *creature, unsigned short from_x, unsigned short from_y, unsigned char from_z,
-	unsigned char stackPos, unsigned short to_x, unsigned short to_y, unsigned char to_z, unsigned char count)
+	unsigned char stackPos, unsigned short itemid, unsigned short to_x, unsigned short to_y, unsigned char to_z, unsigned char count)
 {
 	Tile *fromTile = getTile(from_x, from_y, from_z);
 	if(!fromTile)
@@ -2021,10 +2030,12 @@ void Game::thingMoveInternal(Creature *creature, unsigned short from_x, unsigned
 	if(!onPrepareMoveThing(creature, thing, fromTile, toTile, count))
 		return;
 
+	if(item && (item->getID() != itemid || item != fromTile->getTopDownItem()))
+		return;
 	
 	// *** If the destiny is a teleport item, teleport the thing
 		
-	Teleport *teleportitem = toTile->getTeleportItem();
+	const Teleport *teleportitem = toTile->getTeleportItem();
 	if(teleportitem) {
 		teleport(thing, teleportitem->getDestPos());
 		return;
@@ -2211,7 +2222,8 @@ void Game::creatureTurn(Creature *creature, Direction dir)
     {
 		creature->direction = dir;
 
-		int stackpos = getTile(creature->pos.x, creature->pos.y, creature->pos.z)->getThingStackPos(creature);
+		//int stackpos = getTile(creature->pos.x, creature->pos.y, creature->pos.z)->getThingStackPos(creature);
+		int stackpos = map->getTile(creature->pos)->getThingStackPos(creature);
 
 		std::vector<Creature*> list;
 		map->getSpectators(Range(creature->pos, true), list);
@@ -2282,11 +2294,13 @@ void Game::teleport(Thing *thing, const Position& newPos) {
 	
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
 	
-	Tile *toTile = getTile( newPos.x, newPos.y, newPos.z );
+	//Tile *toTile = getTile( newPos.x, newPos.y, newPos.z );
+	Tile *toTile = map->getTile(newPos);
 	if(toTile){
 		Creature *creature = dynamic_cast<Creature*>(thing); 
 		if(creature){
-			Tile *fromTile = getTile( thing->pos.x, thing->pos.y, thing->pos.z );
+			//Tile *fromTile = getTile( thing->pos.x, thing->pos.y, thing->pos.z );
+			Tile *fromTile = map->getTile(thing->pos);
 			if(!fromTile)
 				return;
 			
@@ -2544,7 +2558,8 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 	//need some more work to work for all situations...
 	GameState gamestate(this, Range(topLeft, bottomRight));
 
-	Tile *targettile = getTile(centerpos.x, centerpos.y, centerpos.z);
+	//Tile *targettile = getTile(centerpos.x, centerpos.y, centerpos.z);
+	Tile *targettile = map->getTile(centerpos);
 	bool bSuccess = false;
 	bool hasTarget = false;
 	bool isBlocking = true;
@@ -2582,7 +2597,8 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 			std::vector<Position>::const_iterator tlIt;
 			for(tlIt = poslist.begin(); tlIt != poslist.end(); ++tlIt) {
 				Position pos = *tlIt;
-				Tile *tile = getTile(pos.x, pos.y, pos.z);			
+				//Tile *tile = getTile(pos.x, pos.y, pos.z);			
+				Tile *tile = map->getTile(pos);
 				const CreatureStateVec& creatureStateVec = gamestate.getCreatureStateList(tile);
 					
 				if(creatureStateVec.empty()) { //no targets
@@ -2742,8 +2758,10 @@ bool Game::creatureOnPrepareAttack(Creature *creature, Position pos)
   if(creature){ 
 		Player* player = dynamic_cast<Player*>(creature);
 
-		Tile* tile = (Tile*)getTile(creature->pos.x, creature->pos.y, creature->pos.z);
-		Tile* targettile = getTile(pos.x, pos.y, pos.z);
+		//Tile* tile = (Tile*)getTile(creature->pos.x, creature->pos.y, creature->pos.z);
+		Tile* tile = map->getTile(creature->pos);
+		//Tile* targettile = getTile(pos.x, pos.y, pos.z);
+		Tile* targettile = map->getTile(pos);
 
 		if(creature->access == 0) {
 			if(tile && tile->isPz()) {
@@ -2822,7 +2840,8 @@ void Game::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fi
 	Player* player = dynamic_cast<Player*>(creature);
 	Player* attackedPlayer = dynamic_cast<Player*>(attackedCreature);
 
-	Tile* targettile = getTile(attackedCreature->pos.x, attackedCreature->pos.y, attackedCreature->pos.z);
+	//Tile* targettile = getTile(attackedCreature->pos.x, attackedCreature->pos.y, attackedCreature->pos.z);
+	Tile* targettile = map->getTile(attackedCreature->pos);
 
 	//can the attacker reach the attacked?
 	bool inReach = false;
@@ -3078,7 +3097,8 @@ void Game::checkCreature(unsigned long id)
 
 		Player* player = dynamic_cast<Player*>(creature);
 		if(player){
-			Tile *tile = getTile(player->pos.x, player->pos.y, player->pos.z);
+			//Tile *tile = getTile(player->pos.x, player->pos.y, player->pos.z);
+			Tile *tile = map->getTile(player->pos);
 			if(tile == NULL){
 				std::cout << "CheckPlayer NULL tile: " << player->getName() << std::endl;
 				return;
@@ -3238,7 +3258,8 @@ void Game::checkCreatureAttacking(unsigned long id)
 				Creature *attackedCreature = getCreatureByID(creature->attackedCreature);
 				if (attackedCreature)
 				{
-					Tile* fromtile = getTile(creature->pos.x, creature->pos.y, creature->pos.z);
+					//Tile* fromtile = getTile(creature->pos.x, creature->pos.y, creature->pos.z);
+					Tile* fromtile = map->getTile(creature->pos);
 					if(fromtile == NULL) {
 						std::cout << "checkCreatureAttacking NULL tile: " << creature->getName() << std::endl;
 						//return;
@@ -3414,7 +3435,8 @@ void Game::checkDecay(int t){
 				if(item->canDecay()){
 					if(item->pos.x != 0xFFFF){
 						Item* newitem = item->decay();
-						Tile *tile = getTile(item->pos.x, item->pos.y, item->pos.z);
+						//Tile *tile = getTile(item->pos.x, item->pos.y, item->pos.z);
+						Tile *tile = map->getTile(item->pos);
 						Position pos = item->pos;
 						
 						if(newitem){
@@ -4224,7 +4246,8 @@ void Game::addThing(Player* player,const Position &pos,Thing* thing)
 	{
 		if(!thing)
 			return;
-		Tile *tile = map->getTile(pos.x, pos.y, pos.z);
+		//Tile *tile = map->getTile(pos.x, pos.y, pos.z);
+		Tile *tile = map->getTile(pos);
 		if(tile){
 			thing->pos = pos;
 			if(item && item->isSplash()){
@@ -4321,7 +4344,8 @@ bool Game::removeThing(Player* player,const Position &pos,Thing* thing,  bool se
 	}
 	else //ground
 	{		
-		Tile *tile = map->getTile(pos.x, pos.y, pos.z);
+		//Tile *tile = map->getTile(pos.x, pos.y, pos.z);
+		Tile *tile = map->getTile(pos);
 		if(tile){
 			unsigned char stackpos = tile->getThingStackPos(thing);
 			if(!tile->removeThing(thing))
@@ -4388,7 +4412,8 @@ Thing* Game::getThing(const Position &pos,unsigned char stack, Player* player /*
 	}
 	else //from ground
 	{
-		Tile *t = getTile(pos.x, pos.y, pos.z);
+		//Tile *t = getTile(pos.x, pos.y, pos.z);
+		Tile *t = map->getTile(pos);
 		if(!t)
 			return NULL;
 		

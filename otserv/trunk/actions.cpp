@@ -761,7 +761,8 @@ int ActionScript::internalGetPlayerInfo(lua_State *L, ePlayerInfo info)
 			break;
 		case PlayerInfoPosition:			
 			pos = player->pos;
-			tile = action->game->map->getTile(player->pos.x, player->pos.y, player->pos.z);
+			//tile = action->game->map->getTile(player->pos.x, player->pos.y, player->pos.z);
+			tile = action->game->map->getTile(player->pos);
 			if(tile)
 				pos.stackpos = tile->getCreatureStackPos(player);
 			internalAddPositionEx(L,pos);
@@ -931,7 +932,8 @@ int ActionScript::luaActionDoTeleportThing(lua_State *L)
 	}
 	
 	action->game->teleport(tmpthing,(Position&)pos);
-	Tile *tile = action->game->getTile(pos.x, pos.y, pos.z);
+	//Tile *tile = action->game->getTile(pos.x, pos.y, pos.z);
+	Tile *tile = action->game->map->getTile(pos);
 	if(tile){
 		pos.stackpos = tile->getThingStackPos(tmpthing);
 	}
@@ -1157,7 +1159,8 @@ int ActionScript::luaActionDoPlayerAddItem(lua_State *L)
 		if(!player->addItem(newitem)){
 			//add item on the ground
 			action->game->addThing(NULL,action->_player->pos,newitem);
-			Tile *tile = action->game->getTile(newitem->pos.x, newitem->pos.y, newitem->pos.z);
+			//Tile *tile = action->game->getTile(newitem->pos.x, newitem->pos.y, newitem->pos.z);
+			Tile *tile = action->game->map->getTile(newitem->pos);
 			if(tile){
 				pos.stackpos = tile->getThingStackPos(newitem);
 			}
@@ -1339,7 +1342,9 @@ int ActionScript::luaActionGetThingfromPos(lua_State *L)
 	
 	ActionScript *action = getActionScript(L);
 	
-	Tile *tile = action->game->getTile(pos.x, pos.y, pos.z);
+	//Tile *tile = action->game->getTile(pos.x, pos.y, pos.z);
+	Tile *tile = action->game->map->getTile(pos);
+	
 	Thing *thing = NULL;
 	
 	if(tile){
@@ -1387,7 +1392,8 @@ int ActionScript::luaActionDoCreateItem(lua_State *L){
 	
 	Item *newitem = Item::CreateItem(itemid,type);
 	action->game->addThing(NULL,(Position&)pos,newitem);
-	Tile *tile = action->game->getTile(pos.x, pos.y, pos.z);
+	//Tile *tile = action->game->getTile(pos.x, pos.y, pos.z);
+	Tile *tile = action->game->map->getTile(pos);
 	if(tile){
 		pos.stackpos = tile->getThingStackPos(newitem);
 	}
@@ -1537,7 +1543,8 @@ int ActionScript::luaActionGetTilePzInfo(lua_State *L)
 	
 	ActionScript *action = getActionScript(L);
 	
-	Tile *tile = action->game->getTile(pos.x, pos.y, pos.z);
+	//Tile *tile = action->game->getTile(pos.x, pos.y, pos.z);
+	Tile *tile = action->game->map->getTile(pos);
 	
 	if(tile){
 		if(tile->isPz()){

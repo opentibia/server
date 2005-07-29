@@ -1045,7 +1045,7 @@ void Protocol74::parseThrow(NetworkMessage &msg)
 			to_cid = static_cast<unsigned char>(to_y);
 		}
 		
-		game->thingMove(player, from_cid, from_z, fromInventory, to_cid, to_z, toInventory, count);
+		game->thingMove(player, from_cid, from_z, itemid,fromInventory, to_cid, to_z, toInventory, count);
 	}
 	//container/inventory to ground
 	else if(from_x == 0xFFFF && to_x != 0xFFFF) {
@@ -1059,7 +1059,7 @@ void Protocol74::parseThrow(NetworkMessage &msg)
 			from_cid = static_cast<unsigned char>(from_y);
 		}
 
-		game->thingMove(player, from_cid, from_z, fromInventory, Position(to_x, to_y, to_z), count);
+		game->thingMove(player, from_cid, from_z, itemid, fromInventory, Position(to_x, to_y, to_z), count);
 	}
 	//ground to container/inventory
 	else if(from_x != 0xFFFF && to_x == 0xFFFF) {
@@ -1083,7 +1083,7 @@ void Protocol74::parseThrow(NetworkMessage &msg)
 			}
 		}
 
-		game->thingMove(player, Position(from_x, from_y, from_z), from_stack, to_cid, to_z, toInventory, count);
+		game->thingMove(player, Position(from_x, from_y, from_z), from_stack, itemid, to_cid, to_z, toInventory, count);
 	}
 	//ground to ground
 	else {
@@ -1099,14 +1099,14 @@ void Protocol74::parseThrow(NetworkMessage &msg)
 			}
 		}
 
-		game->thingMove(player, from_x, from_y, from_z, from_stack, to_x, to_y, to_z, count);
+		game->thingMove(player, from_x, from_y, from_z, from_stack, itemid, to_x, to_y, to_z, count);
 	}
 }
 
 
 void Protocol74::parseLookAt(NetworkMessage &msg){
-  Position LookPos = msg.GetPosition();
-  unsigned short ItemNum = msg.GetU16();
+	Position LookPos = msg.GetPosition();
+	unsigned short ItemNum = msg.GetU16();
 	unsigned char stackpos = msg.GetByte();
 
 #ifdef __DEBUG__
@@ -1114,8 +1114,8 @@ void Protocol74::parseLookAt(NetworkMessage &msg){
   std::cout << "itemnum: " << ItemNum << " stackpos: " << (long)stackpos<< std::endl;
 #endif
 
-  NetworkMessage newmsg;
-  std::stringstream ss;
+	NetworkMessage newmsg;
+	std::stringstream ss;
 
 /*
 #ifdef __DEBUG__
@@ -1159,15 +1159,15 @@ void Protocol74::parseLookAt(NetworkMessage &msg){
 		else if(std::abs(player->pos.x - LookPos.x) <= 1 && std::abs(player->pos.y - LookPos.y) <= 1 &&
 			LookPos.z == player->pos.z) {
 				fullDescription = true;
-			}
+		}
 
 		AddTextMessage(newmsg,MSG_INFO, item->getDescription(fullDescription).c_str());
 	}
 	else if(creature) {
 		if(player == creature)
 			AddTextMessage(newmsg,MSG_INFO, creature->getDescription(true).c_str());
-	else
-		AddTextMessage(newmsg,MSG_INFO, creature->getDescription().c_str());
+		else
+			AddTextMessage(newmsg,MSG_INFO, creature->getDescription().c_str());
 	}
 //#endif
   

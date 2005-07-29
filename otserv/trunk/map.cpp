@@ -100,7 +100,9 @@ bool Map::loadMap(std::string filename) {
 #endif
 
 	std::cout << ":: Loading map from: " << loader->getSourceDescription() << std::endl;
-	return loader->loadMap(this, filename);
+	bool success = loader->loadMap(this, filename);
+	delete loader;
+	return success;
 }
 
 Tile* Map::getTile(unsigned short _x, unsigned short _y, unsigned char _z)
@@ -126,6 +128,11 @@ Tile* Map::getTile(unsigned short _x, unsigned short _y, unsigned char _z)
 	
 	 // or not
   return NULL;
+}
+
+Tile* Map::getTile(const Position &pos)
+{
+	return getTile(pos.x, pos.y, pos.z);
 }
 
 

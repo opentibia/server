@@ -386,7 +386,7 @@ Thing* Tile::getTopMoveableThing(){
 	return NULL;
 }
 
-Teleport* Tile::getTeleportItem()
+Teleport* Tile::getTeleportItem() const
 {
   Teleport* teleport = NULL;
   for (ItemVector::const_iterator iit = topItems.begin(); iit != topItems.end(); ++iit)

@@ -356,7 +356,8 @@ bool Commands::createItems(Creature* c, const std::string &cmd, const std::strin
 	if(!newItem)
 		return true;
 	
-	Tile *t = game->getTile(c->pos.x, c->pos.y, c->pos.z);
+	//Tile *t = game->getTile(c->pos.x, c->pos.y, c->pos.z);
+	Tile *t = game->map->getTile(c->pos);
 	if(!t)
 	{
 		delete newItem;

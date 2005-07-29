@@ -170,7 +170,7 @@ public:
 	};
 	
 	void setDestPos(const Position &pos) {destPos = pos;};
-	const Position& getDestPos() {return destPos;};
+	const Position& getDestPos() const {return destPos;};
 private:
 	int useCount;
 	virtual int unserialize(xmlNodePtr p);
