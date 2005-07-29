@@ -177,8 +177,11 @@ Monster::Monster(const std::string& name, Game* game) :
 			}
 			else if (strcmp(str, "look") == 0) {
 				nodeValue = (char*)xmlGetProp(p, (const xmlChar *)"type");
-				looktype = atoi(nodeValue);
-				lookmaster = this->looktype;
+				if(nodeValue) {
+					looktype = atoi(nodeValue);
+					lookmaster = this->looktype;
+					xmlFreeOTSERV(nodeValue);
+				}
 
 				nodeValue = (char*)xmlGetProp(p, (const xmlChar *)"head");
 				if(nodeValue) {

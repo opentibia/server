@@ -101,7 +101,6 @@ bool Map::loadMap(std::string filename) {
 
 	std::cout << ":: Loading map from: " << loader->getSourceDescription() << std::endl;
 	return loader->loadMap(this, filename);
-	delete loader;
 }
 
 Tile* Map::getTile(unsigned short _x, unsigned short _y, unsigned char _z)
