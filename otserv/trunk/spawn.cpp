@@ -62,6 +62,12 @@ SpawnManager* SpawnManager::instance() {
 	return _instance;
 }
 
+bool SpawnManager::addSpawn(Spawn* spawn)
+{
+	spawns.push_back(spawn);
+	return true;
+}
+
 bool SpawnManager::loadSpawnsXML(std::string filename)
 {
 	std::transform(filename.begin(), filename.end(), filename.begin(), tolower);

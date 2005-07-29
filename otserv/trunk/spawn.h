@@ -79,6 +79,7 @@ public:
 
 	static SpawnManager* instance();
 	static bool initialize(Game *igame);
+	static bool addSpawn(Spawn* spawn);
 	static bool loadSpawnsXML(std::string filename);
 #ifdef _SQLMAP_
 	static bool loadSpawnsSQL(std::string identifier);
