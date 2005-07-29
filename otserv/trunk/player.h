@@ -336,6 +336,7 @@ protected:
   std::string password;
   time_t lastlogin;
   time_t lastLoginSaved;
+  unsigned long lastip;
 
   //inventory variables
 	Item* items[11]; //equipement of the player
@@ -408,6 +409,7 @@ protected:
 
 	friend class Game;
   friend class ActionScript;
+  friend class Commands;
   friend class Map;
   friend class IOPlayerXML;
   friend class IOPlayerSQL;

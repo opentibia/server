@@ -543,7 +543,7 @@ bool IOPlayerSQL::savePlayer(Player* player){
 		query << "`food` = " << player->food << ", ";
 		query << "`sex` = " << player->sex << ", ";
 		query << "`lastlogin` = " << player->lastlogin << ", ";
-		query << "`lastip` = " << player->getIP() << " ";
+		query << "`lastip` = " << player->lastip << " ";
 		query << " WHERE `id` = "<< player->getGUID() <<" LIMIT 1";
 		
 		if(!mysql.executeQuery(query))

@@ -315,7 +315,7 @@ bool Commands::banPlayer(Creature* c, const std::string &cmd, const std::string 
 			}
 			playerBan->sendTextMessage(MSG_RED_TEXT,"You have been baned.");
 			std::pair<unsigned long, unsigned long> IpNetMask;
-			IpNetMask.first = playerBan->getIP();
+			IpNetMask.first = playerBan->lastip;
 			IpNetMask.second = 0xFFFFFFFF;
 			if(IpNetMask.first > 0) {
 				bannedIPs.push_back(IpNetMask);
@@ -450,7 +450,7 @@ bool Commands::getInfo(Creature* c, const std::string &cmd, const std::string &p
 			player->sendTextMessage(MSG_BLUE_TEXT,"You can not get info about this player.");
 			return true;
 		}
-		*(unsigned long*)&ip = p->getIP();
+		*(unsigned long*)&ip = p->lastip;
 		info << "name:   " << p->getName() << std::endl <<
 		        "access: " << p->access << std::endl <<
 		        "level:  " << p->level << std::endl <<

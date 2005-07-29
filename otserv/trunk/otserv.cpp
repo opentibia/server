@@ -267,6 +267,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 						player->client->reinitializeProtocol();
 						player->client->s = s;
 						player->client->sendThingAppear(player);
+						player->lastip = player->getIP();
 						s = 0;
 					}
 					OTSYS_THREAD_UNLOCK(g_game.gameLock)
@@ -310,6 +311,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 							Status* stat = Status::instance();
 							stat->addPlayer();
 							player->lastlogin = std::time(NULL);
+							player->lastip = player->getIP();
 							s = 0;            // protocol/player will close socket
 							protocol->ReceiveLoop();
 							stat->removePlayer();
