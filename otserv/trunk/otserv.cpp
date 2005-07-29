@@ -291,12 +291,12 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 							msg.WriteToSocket(s);		
 						}
 						else if(g_game.getGameState() == GAME_STATE_SHUTDOWN){
-							//notghing to do
+							//nothing to do
 						}
 						else if(g_game.getGameState() == GAME_STATE_CLOSED && player->access == 0){
 							msg.Reset();
 							msg.AddByte(0x14);
-							msg.AddString("Server temporaly closed.");
+							msg.AddString("Server temporarly closed.");
 							msg.WriteToSocket(s);
 						}
 						else if(!protocol->ConnectPlayer()){
