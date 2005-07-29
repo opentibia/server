@@ -346,34 +346,17 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 			player->sendStats();
 		}
 		
-		/*
-		Player *spectator = NULL;
-		for(int i = 0; i < spectatorlist.size(); ++i) {
-			spectator = dynamic_cast<Player*>(spectatorlist[i]);
-			if(spectator) {
-				spectator->onThingAppear(corpseitem);
-			}
-		}
-		*/
-		//mapstate.addThing(tile, corpseitem);
-
-		//Start decaying
-		//unsigned short decayTime = Item::items[corpseitem->getID()].decayTime;
-		//game->addEvent(makeTask(decayTime*1000, boost::bind(&Game::decayItem, _1, corpseitem)));
-		
 		if(attackedCreature && attackedCreature->getMaster() != NULL) {
 			attackedCreature->getMaster()->removeSummon(attackedCreature);
-			//game->FreeThing(attackedCreature);
 		}
-
-		//free if attackedCreature is not a player		
-		/*if(attackedplayer == NULL)
-			game->FreeThing(attackedCreature);*/
 	}
 
 	//Add blood?
 	if((drawBlood || attackedCreature->health <= 0) && damage > 0) {
 
+		game->addThing(NULL, CreaturePos, Item::CreateItem(2019, FLUID_BLOOD));
+
+		/*
 		bool hadSplash = (tile->splash != NULL);
 
 		if (!tile->splash) {
@@ -393,29 +376,11 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 			game->sendRemoveThing(NULL,CreaturePos,splash,stackpos);
 			tile->splash = splash;
 			game->sendAddThing(NULL,CreaturePos,tile->splash);
-			/*
-			Player *spectator = NULL;
-			for(int i = 0; i < spectatorlist.size(); ++i) {
-				spectator = dynamic_cast<Player*>(spectatorlist[i]);
-				if(spectator) {
-					spectator->onThingDisappear(tile->splash, stackpos);
-					spectator->onThingAppear(tile->splash);
-				}
-			}
-			*/
-			//mapstate.refreshThing(tile, tile->splash);
 		}
 		else {
-			/*Player *spectator = NULL;
-			for(int i = 0; i < spectatorlist.size(); ++i) {
-				spectator = dynamic_cast<Player*>(spectatorlist[i]);
-				if(spectator) {
-					spectator->onThingAppear(tile->splash);
-				}
-			}*/
 			game->sendAddThing(NULL,CreaturePos,tile->splash);
-			//mapstate.addThing(tile, tile->splash);
 		}
+		*/
 
 		//Start decaying
 		//unsigned short decayTime = Item::items[tile->splash->getID()].decayTime;
@@ -2804,7 +2769,7 @@ bool Game::creatureOnPrepareMagicAttack(Creature *creature, Position pos, const 
 		Player* player = dynamic_cast<Player*>(creature);
 		if(player) {
 			if(player->access == 0) {
-				if(player->exhaustedTicks >= 1000 && me->causeExhaustion(true)) {
+				if(player->exhaustedTicks > 0 /*>= 1000*/ && me->causeExhaustion(true)) {
 					if(me->offensive) {
 						player->sendTextMessage(MSG_SMALLINFO, "You are exhausted.",player->pos, NM_ME_PUFF);
 						player->exhaustedTicks += (long)g_config.getGlobalNumber("exhaustedadd", 0);
@@ -3086,14 +3051,14 @@ void Game::checkCreature(unsigned long id)
 
 	if (creature && creature->isRemoved == false)
 	{
-		creature->eventCheck = 0;
-		
 		int thinkTicks = 0;
 		int oldThinkTicks = creature->onThink(thinkTicks);
 		
 		if(thinkTicks > 0) {
 			creature->eventCheck = addEvent(makeTask(thinkTicks, std::bind2nd(std::mem_fun(&Game::checkCreature), id)));
 		}
+		else
+			creature->eventCheck = 0;
 
 		Player* player = dynamic_cast<Player*>(creature);
 		if(player){
@@ -3137,8 +3102,11 @@ void Game::checkCreature(unsigned long id)
 					player->sendIcons(); 
 			}
 			
-			if(player->exhaustedTicks >=1000){
+			if(player->exhaustedTicks > 0/*>=1000*/){
 				player->exhaustedTicks -= thinkTicks;
+
+				if(player->exhaustedTicks < 0)
+					player->exhaustedTicks = 0;
 			}
 			
 			if(player->manaShieldTicks >=1000){
@@ -3521,6 +3489,7 @@ void Game::checkSpawns(int t)
 void Game::CreateDamageUpdate(Creature* creature, Creature* attackCreature, int damage)
 {
 	Player* player = dynamic_cast<Player*>(creature);
+	Player* attackPlayer = dynamic_cast<Player*>(attackCreature);
 	if(!player)
 		return;
 	//player->sendStats();
@@ -3534,8 +3503,11 @@ void Game::CreateDamageUpdate(Creature* creature, Creature* attackCreature, int 
 		else
 			dmgmesg << "You lose " << damage << " hitpoints";
 				
-		if(attackCreature) {
+		if(attackPlayer) {
 			dmgmesg << " due to an attack by " << attackCreature->getName();
+		}
+		else if(attackCreature) {
+			dmgmesg << " due to an attack by a " << attackCreature->getName();
 		}
 		dmgmesg <<".";
 

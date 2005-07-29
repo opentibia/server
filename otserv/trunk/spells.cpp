@@ -823,15 +823,6 @@ int SpellScript::luaActionMakeRune(lua_State *L){
 	Player* player = dynamic_cast<Player*>(creature);
 	if(player){
 		MagicEffectTargetClass magicTarget;
-		/*  succesfull make rune
-			attackType = ATTACK_NONE
-			animationEffect = NM_ANI_NONE
-			hitEffect = NM_ME_NONE
-			damageEffect = NM_ME_MAGIC_ENERGIE
-			animationColor = GREEN
-			offensive = false
-			drawblood = false
-		*/
 
 		magicTarget.offensive = false;
 		magicTarget.drawblood = false;
@@ -844,12 +835,13 @@ int SpellScript::luaActionMakeRune(lua_State *L){
 		int a = internalMakeRune(player,SLOT_RIGHT,spell,type,charges);
 		if(a == 1) //spend mana
 			player->mana -= spell->getMana();
-		//try to create rune 2
-		int b = internalMakeRune(player,SLOT_LEFT,spell,type,charges);
+			
+			//try to create rune 2
+			int b = internalMakeRune(player,SLOT_LEFT,spell,type,charges);
 
 		if(a == -1 && b == -1){ //not enough mana
-			magicTarget.damageEffect = 2; //NM_ME_PUFF		
-			magicTarget.manaCost = player->mana*5; //force not enough mana
+			magicTarget.damageEffect = 2; //NM_ME_PUFF
+			magicTarget.manaCost = player->getPlayerInfo(PLAYERINFO_MAXMANA) + 1; //force not enough mana
 		}
 		else if( a == 0 && b == 0){ //not create any rune
 			magicTarget.damageEffect = 2; //NM_ME_PUFF		
@@ -864,6 +856,7 @@ int SpellScript::luaActionMakeRune(lua_State *L){
 				magicTarget.manaCost = 0; 
 			}
 		}
+
 		bool isSuccess = spell->game->creatureThrowRune(player, player->pos, magicTarget);
 
 		lua_pushnumber(L, 1);
@@ -876,7 +869,7 @@ int SpellScript::luaActionMakeRune(lua_State *L){
 //create new runes and delete blank ones
 int SpellScript::internalMakeRune(Player *p,unsigned short sl_id,Spell *S,unsigned short id, unsigned char charges){
 	//check mana
-	if(p->mana < S->getMana())
+	if(p->mana < S->getMana() || p->exhaustedTicks > 0)
 		return -1;
 	Item *item = p->getItem(sl_id);
 	if(item){

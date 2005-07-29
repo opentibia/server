@@ -108,6 +108,13 @@ public:
 	int maxWeapondamage;
 };
 
+enum monsterstate_t {
+	STATE_IDLE,
+	STATE_TARGETNOTREACHABLE,
+	STATE_ATTACKING,
+	STATE_FLEEING
+};
+
 class Monster : public Creature
 {
 public:
@@ -147,15 +154,17 @@ public:
 private:
 	Game* game;
 	std::list<Position> route;
-	bool isfleeing;
+	monsterstate_t state;
+	bool updateRoute;
 	int oldThinkTicks;
 	Position targetPos;
 	Position moveToPos;
 	int armor;
 	int defense;
-	void doMoveTo(const Position& destpos, bool isRouteValid);
+	void doMoveTo(int dx, int dy);
 	bool hasDistanceAttack;
 	bool canPushItems;
+	unsigned long staticLook;
 	unsigned long staticAttack;
 	unsigned short changeTargetChance;
 
@@ -163,10 +172,16 @@ private:
 	int getTargetDistance();
 	void calcMovePosition();
 	void randMovePosition();
+	void updateLookDirection();
 	void getCloseCombatPosition(const Position &target, Position &dest);
 	bool canMoveTo(unsigned short x, unsigned short y, unsigned char z);
 	bool isInRange(const Position &pos);
-	Creature* findTarget(long range, const Creature *ignoreCreature = NULL);
+	bool isCreatureReachable(const  Creature* creature);
+	Creature* findTarget(long range, bool &canReach, const Creature *ignoreCreature = NULL);
+	void stopAttack();
+	void stopThink();
+	void getSleepTicks(long long &delay, int& stepDuration);
+
 	#define CHANCE_MAX  100000
 	bool LoadLootNode(xmlNodePtr);
 	bool LoadLootContainer(xmlNodePtr,Container*);	
@@ -180,10 +195,10 @@ protected:
 	PhysicalAttackClass	*curPhysicalAttack;
 
 	int targetDistance;
-	int runawayHealth;
+	int runAwayHealth;
 	bool pushable;
 
-	bool doAttacks(Player* attackedPlayer);
+	bool doAttacks(Player* attackedPlayer, bool aggressive = false);
 
 	typedef std::vector<TimeProbabilityClass> TimeProbabilityClassVec;
 
@@ -205,7 +220,7 @@ protected:
 	virtual subfight_t getSubFightType()  {return curPhysicalAttack->disttype;}
 	virtual int getWeaponDamage() const;
 
-	void OnCreatureEnter(const Creature *creature);
+	void OnCreatureEnter(const Creature *creature, bool canReach = true);
 	void OnCreatureLeave(const Creature *creature);
 	bool validateDistanceAttack(const Creature *creature);
 	bool validateDistanceAttack(const Position &pos);
