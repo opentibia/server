@@ -45,6 +45,7 @@ ItemType::ItemType()
 	blocking        = false; // people can walk on it
 	pickupable      = false; // people can pick it up
 	blockingProjectile = false;
+	canWalkThrough = false;
 	noFloorChange = false;
 	floorChangeNorth = false;
 	floorChangeSouth = false;
@@ -60,22 +61,21 @@ ItemType::ItemType()
 	runeMagLevel    = -1;
 	magicfieldtype = -1;
 	
-	speed		= 0;
-	id         =  100;
-	maxItems   =    8;  // maximum size if this is a container
-	weight     =   50;  // weight of the item, e.g. throwing distance depends on it
-  weaponType = NONE;
+	speed		      = 0;
+	id            = 100;
+	maxItems      = 8;  // maximum size if this is a container
+	weight        = 0;  // weight of the item, e.g. throwing distance depends on it
+  weaponType    = NONE;
   slot_position = SLOTP_RIGHT | SLOTP_LEFT | SLOTP_AMMO;
-  amuType = AMU_NONE;
-  shootType = DIST_NONE;
+  amuType    =		AMU_NONE;
+  shootType	 =		DIST_NONE;
   attack     =    0;
   defence    =    0;
   armor      =    0;
   decayTo    =    0;
-  decayTime  =   60;
-  canDecay	 = true;
-
-	damage = 0;
+  decayTime  =		60;
+  canDecay	 =		true;
+	damage		 =		0;
 }
 
 ItemType::~ItemType()
@@ -121,7 +121,7 @@ int Items::loadFromDat(std::string file)
 #ifdef __DEBUG__
 	bool warningwrongoptordershown = false;
 #endif
-	
+
 	fseek(f, 0x0C, SEEK_SET);
 	// loop throw all Items until we reach the end of file
 	while(ftell(f) < size)
@@ -181,7 +181,7 @@ int Items::loadFromDat(std::string file)
 			}
 			lastoptbyte = optbyte;
 #endif
-			
+
 			switch (optbyte)
 			{
 	   		case 0x00:
@@ -195,7 +195,11 @@ int Items::loadFromDat(std::string file)
 		   		break;
 
         case 0x01: // all OnTop
-        case 0x02: // can walk trough (open doors, arces, bug pen fence ??)
+					iType->alwaysOnTop=true;
+					break;
+
+        case 0x02: // can walk through (open doors, arces, bug pen fence ??)
+					iType->canWalkThrough = true;
           iType->alwaysOnTop=true;
           break;
 
@@ -374,7 +378,7 @@ int Items::loadFromDat(std::string file)
 						std::cout << "unknown byte: " << (unsigned short)optbyte << std::endl;
 			}
 		}
-		
+
 		// now skip the size and sprite data		
  		int width  = fgetc(f);
  		int height = fgetc(f);
@@ -433,30 +437,30 @@ int Items::loadXMLInfos(std::string file)
 
 					// set general properties...
 					char* name = (char*)xmlGetProp(p, (xmlChar*)"name");
-          			if(name){
+					if(name){
 						itemtype->name = name;
 						xmlFreeOTSERV(name);
 					}
-          			else
-            			std::cout << "missing name tag for item: " << id << std::endl;
+						else
+							std::cout << "missing name tag for item: " << id << std::endl;
 
-          			char* weight = (char*)xmlGetProp(p, (xmlChar*)"weight");
-          			if(weight){
+					char* weight = (char*)xmlGetProp(p, (xmlChar*)"weight");
+					if(weight){
 						itemtype->weight = atof(weight);
 						xmlFreeOTSERV(weight);
 					}
-          			else
-            			std::cout << "missing weight tag for item: " << id << std::endl;
+     			else
+         			std::cout << "missing weight tag for item: " << id << std::endl;
             			
 					// and optional properties
-          			char* description = (char*)xmlGetProp(p, (xmlChar*)"descr");
-          			if(description){
+          char* description = (char*)xmlGetProp(p, (xmlChar*)"descr");
+          if(description){
 						itemtype->description = description;
 						xmlFreeOTSERV(description);
 					}
 
-          			char* decayTo = (char*)xmlGetProp(p, (xmlChar*)"decayto");
-          			if (decayTo){
+     			char* decayTo = (char*)xmlGetProp(p, (xmlChar*)"decayto");
+     			if (decayTo){
 						itemtype->decayTo = atoi(decayTo);
 						xmlFreeOTSERV(decayTo);
 						if(itemtype->decayTo == 0){
@@ -464,12 +468,18 @@ int Items::loadXMLInfos(std::string file)
 						}
 					}
 
-          			char* decayTime = (char*)xmlGetProp(p, (xmlChar*)"decaytime");
-          			if (decayTime){
+     			char* decayTime = (char*)xmlGetProp(p, (xmlChar*)"decaytime");
+     			if (decayTime){
 						itemtype->decayTime = atoi(decayTime);
 						xmlFreeOTSERV(decayTime);
 					}
 		
+					char* blockingProjectile = (char*)xmlGetProp(p, (xmlChar*)"blockingprojectile");
+					if(blockingProjectile){
+						itemtype->blockingProjectile = true;
+						xmlFreeOTSERV(blockingProjectile);
+					}
+
 					char* damage = (char*)xmlGetProp(p, (xmlChar*)"damage");
 					if(damage){
 						itemtype->damage = atoi(damage);

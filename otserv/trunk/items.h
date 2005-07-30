@@ -55,53 +55,53 @@ public:
 
   unsigned short maxItems;   // maximum size if this is a container
 	double weight;						 // weight of the item, e.g. throwing distance depends on it
-	std::string    name;			 // the name of the item
-	std::string description;	 // additional description... as in "The blade is a magic flame." for fireswords
-  WeaponType     weaponType;
-  amu_t			amuType;
-  subfight_t	shootType;
-  int            attack;
-  int            defence;
-  int 			 armor;
-	unsigned long 		slot_position;
-  unsigned short decayTo;
-  unsigned short decayTime;
-  bool	canDecay;
-
-	unsigned short damage;
+	std::string			name;			 // the name of the item
+	std::string			description;	 // additional description... as in "The blade is a magic flame." for fireswords
+  WeaponType			weaponType;
+  amu_t						amuType;
+  subfight_t			shootType;
+  int							attack;
+  int							defence;
+  int							armor;
+	unsigned long		slot_position;
+  unsigned short	decayTo;
+  unsigned short	decayTime;
+  bool						canDecay;
+	unsigned short	damage;
 
 	uint8_t speed;
 
 	bool isteleport;
 
 	// other bools
-	bool ismagicfield;
-	int  magicfieldtype;
-	bool iscontainer;
-	int  RWInfo;
-	unsigned short readonlyId;
-	bool iskey;
-	bool fluidcontainer;
-	bool stackable;
-	bool multitype;
-	bool useable;
-	bool notMoveable;
-	bool alwaysOnTop;
-	bool groundtile;
-	bool issplash;
-	int  runeMagLevel;
-	bool blocking;   // people can walk on it
-	bool pickupable; // people can pick it up
-	bool blockingProjectile;
-	bool noFloorChange;
-	bool floorChangeNorth;
-	bool floorChangeSouth;
-	bool floorChangeEast;
-	bool floorChangeWest;
-	bool blockpickupable;
+	bool						ismagicfield;
+	int							magicfieldtype;
+	bool						iscontainer;
+	int							RWInfo;
+	unsigned short	readonlyId;
+	bool						iskey;
+	bool						fluidcontainer;
+	bool						stackable;
+	bool						multitype;
+	bool						useable;
+	bool						notMoveable;
+	bool						alwaysOnTop;
+	bool						groundtile;
+	bool						issplash;
+	int							runeMagLevel;
+	bool						blocking;						// people can walk on it
+	bool						pickupable;					// people can pick it up
+	bool						blockingProjectile;
+	bool						canWalkThrough;
+	bool						noFloorChange;
+	bool						floorChangeNorth;
+	bool						floorChangeSouth;
+	bool						floorChangeEast;
+	bool						floorChangeWest;
+	bool						blockpickupable;
 
-	bool isDoor;
-	bool isDoorWithLock;
+	bool						isDoor;
+	bool						isDoorWithLock;
 };
 
 

@@ -773,6 +773,7 @@ void Game::thingMove(Player *player,
 }
 
 /*ground -> ground*/
+/*ground -> container*/
 bool Game::onPrepareMoveThing(Creature *player, const Thing* thing,
 	const Position& fromPos, const Position& toPos, int count)
 {
@@ -783,13 +784,13 @@ bool Game::onPrepareMoveThing(Creature *player, const Thing* thing,
 	}
 	*/	
 		
-	if( (abs(player->pos.x - fromPos.x) > 1) || (abs(player->pos.y - fromPos.y) > 1) ) {			
+	if( (abs(player->pos.x - fromPos.x) > 1) || (abs(player->pos.y - fromPos.y) > 1) || (player->pos.z != fromPos.z)) {
 		player->sendCancel("To far away...");
 		return false;
 	}
 	else if( (abs(fromPos.x - toPos.x) > thing->throwRange) || (abs(fromPos.y - toPos.y) > thing->throwRange)
 		|| (fromPos.z != toPos.z) /*TODO: Make it possible to throw items to different floors*/ ) {		
-		player->sendCancel("To far away...");
+		player->sendCancel("Destination is out of reach.");
 		return false;
 	}
 	else if(!map->canThrowItemTo(fromPos, toPos, false)) {
@@ -984,7 +985,7 @@ bool Game::onPrepareMoveCreature(Creature *creature, const Creature* creatureMov
 bool Game::onPrepareMoveThing(Player *player, const Position& fromPos, const Item *item,
 	slots_t toSlot, int count)
 {
-	if( (abs(player->pos.x - fromPos.x) > 1) || (abs(player->pos.y - fromPos.y) > 1) ) {
+	if( (abs(player->pos.x - fromPos.x) > 1) || (abs(player->pos.y - fromPos.y) > 1) || (player->pos.z != fromPos.z)) {
 		player->sendCancel("To far away...");
 		return false;
 	}
@@ -2770,7 +2771,7 @@ bool Game::creatureOnPrepareMagicAttack(Creature *creature, Position pos, const 
 		Player* player = dynamic_cast<Player*>(creature);
 		if(player) {
 			if(player->access == 0) {
-				if(player->exhaustedTicks > 0 /*>= 1000*/ && me->causeExhaustion(true)) {
+				if(player->exhaustedTicks >= 1000 && me->causeExhaustion(true)) {
 					if(me->offensive) {
 						player->sendTextMessage(MSG_SMALLINFO, "You are exhausted.",player->pos, NM_ME_PUFF);
 						player->exhaustedTicks += (long)g_config.getGlobalNumber("exhaustedadd", 0);
@@ -3103,7 +3104,7 @@ void Game::checkCreature(unsigned long id)
 					player->sendIcons(); 
 			}
 			
-			if(player->exhaustedTicks > 0/*>=1000*/){
+			if(player->exhaustedTicks >= 1000){
 				player->exhaustedTicks -= thinkTicks;
 
 				if(player->exhaustedTicks < 0)

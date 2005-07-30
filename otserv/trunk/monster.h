@@ -115,6 +115,11 @@ enum monsterstate_t {
 	STATE_FLEEING
 };
 
+enum monstermode_t {
+	MODE_NORMAL,
+	MODE_AGGRESSIVE
+};
+
 class Monster : public Creature
 {
 public:
@@ -198,7 +203,7 @@ protected:
 	int runAwayHealth;
 	bool pushable;
 
-	bool doAttacks(Player* attackedPlayer, bool aggressive = false);
+	bool doAttacks(Creature* attackedCreature, monstermode_t mode = MODE_NORMAL);
 
 	typedef std::vector<TimeProbabilityClass> TimeProbabilityClassVec;
 

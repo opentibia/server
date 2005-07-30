@@ -390,10 +390,23 @@ xmlNodePtr Item::serialize(){
 
 bool Item::isBlockingProjectile() const {
 	const ItemType& it = items[id];
-	if((it.isDoor || it.isDoorWithLock) && it.blocking)
-		return true;
+	/*
+	if((it.isDoor || it.isDoorWithLock) && it.blocking) {
+		return false;
+	}
+	*/
 
 	return it.blockingProjectile;
+	
+	/*
+	if(!it.canWalkThrough)
+		return false;
+
+	if(it.blocking && !it.blockingProjectile && it.alwaysOnTop)
+		return false;
+
+	return it.blockingProjectile;
+	*/
 }
 
 bool Item::isBlocking(bool ispickupable /*= false*/) const {

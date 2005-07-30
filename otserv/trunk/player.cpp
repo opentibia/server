@@ -1264,17 +1264,6 @@ void Player::sendCancelAttacking()
   client->sendCancelAttacking();
 }
 
-/*
-void Player::sendCancelAutoWalking()
-{
-	if(!pathlist.empty()) {
-		client->sendCancelAutoWalk(pathlist.front());
-	}
-	else
-		client->sendCancelAutoWalk(getDirection());
-}
-*/
-
 void Player::sendCancelWalk() const
 {
   client->sendCancelWalk();

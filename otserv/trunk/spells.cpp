@@ -869,7 +869,7 @@ int SpellScript::luaActionMakeRune(lua_State *L){
 //create new runes and delete blank ones
 int SpellScript::internalMakeRune(Player *p,unsigned short sl_id,Spell *S,unsigned short id, unsigned char charges){
 	//check mana
-	if(p->mana < S->getMana() || p->exhaustedTicks > 0)
+	if(p->mana < S->getMana() || p->exhaustedTicks >= 1000)
 		return -1;
 	Item *item = p->getItem(sl_id);
 	if(item){

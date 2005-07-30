@@ -853,8 +853,8 @@ int Monster::onThink(int& newThinkTicks)
 			std::vector<Position> positionList;
 			Position tmppos;
 
-			tmppos = this->pos; 
-			positionList.push_back(tmppos);
+			//tmppos = this->pos; 
+	 		//positionList.push_back(tmppos);
 
 			tmppos.x = this->pos.x + 1;
 			tmppos.y = this->pos.y;
@@ -884,11 +884,13 @@ int Monster::onThink(int& newThinkTicks)
 			if(((std::abs(targetPos.x - tmppos.x) <= 9) && (std::abs(targetPos.y - tmppos.y) <= 7)) && canMoveTo(tmppos.x, tmppos.y, tmppos.z))
 				positionList.push_back(tmppos);
 	
-			size_t index = random_range(0, positionList.size() - 1);
-			int dx = positionList[index].x - this->pos.x;
-			int dy = positionList[index].y - this->pos.y;
-			
-			doMoveTo(dx, dy);
+			if(!positionList.empty()) {
+				size_t index = random_range(0, positionList.size() - 1);
+				int dx = positionList[index].x - this->pos.x;
+				int dy = positionList[index].y - this->pos.y;
+				
+				doMoveTo(dx, dy);
+			}
 		}
 		else if(!route.empty()){
 			Position nextStep = route.front();
@@ -934,9 +936,73 @@ void Monster::updateLookDirection()
 	int deltax = targetPos.x - this->pos.x;
 	int deltay = targetPos.y - this->pos.y;
 
-	if(std::abs(deltax) <= 1 && std::abs(deltay) <= 1) {
+	if(!(deltax == 0 && deltay == 0)) {
 		Direction newdir = this->getDirection();
 
+		//if(std::abs(deltax) <= 1 && std::abs(deltax) <= 1) {
+			//SE
+			if(deltax < 0 && deltay < 0) {
+				if(std::abs(deltax) > std::abs(deltay)) {
+					newdir = WEST;
+				}
+				else if(std::abs(deltay) > std::abs(deltax)) {
+					newdir = NORTH;
+				}
+				else if(getDirection() != NORTH && getDirection() != WEST) {
+					newdir = (rand() % 2 == 0 ? NORTH : WEST);
+				}
+			}
+			//SW
+			else if(deltax > 0 && deltay < 0) {
+				if(std::abs(deltax) > std::abs(deltay)) {
+					newdir = EAST;
+				}
+				else if(std::abs(deltay) > std::abs(deltax)) {
+					newdir = NORTH;
+				}
+				else if(getDirection() != NORTH && getDirection() != EAST) {
+					newdir = (rand() % 2 == 0 ? NORTH : EAST);
+				}
+			}
+			//NW
+			else if(deltax > 0 && deltay > 0) {
+				if(std::abs(deltax) > std::abs(deltay)) {
+					newdir = EAST;
+				}
+				else if(std::abs(deltay) > std::abs(deltax)) {
+					newdir = SOUTH;
+				}
+				else if(getDirection() != SOUTH && getDirection() != EAST) {
+					newdir = (rand() % 2 == 0 ? SOUTH : EAST);
+				}
+			}
+			//NE
+			else if(deltax < 0 && deltay > 0) {
+				if(std::abs(deltax) > std::abs(deltay)) {
+					newdir = WEST;
+				}
+				else if(std::abs(deltay) > std::abs(deltax)) {
+					newdir = SOUTH;
+				}
+				else if(getDirection() != SOUTH && getDirection() != EAST) {
+					newdir = (rand() % 2 == 0 ? SOUTH : WEST);
+				}
+			}
+			//N
+			else if(deltax == 0 && deltay > 0)
+				newdir = SOUTH;
+			//S
+			else if(deltax == 0 && deltay < 0)
+				newdir = NORTH;
+			//W
+			else if(deltax > 0 && deltay == 0)
+				newdir = EAST;
+			//E
+			else if(deltax < 0 && deltay == 0)
+				newdir = WEST;
+		//}
+
+		/*
 		//SE
 		if( deltax < 0 && deltay < 0)
 			newdir = WEST;
@@ -961,6 +1027,7 @@ void Monster::updateLookDirection()
 		//E
 		else if(deltax < 0 && deltay == 0)
 			newdir = WEST;
+		*/
 
 		if(newdir != this->getDirection()) {
 			game->creatureTurn(this, newdir);
@@ -1118,6 +1185,7 @@ void Monster::onThingMove(const Creature *creature, const Thing *thing,
 					targetPos = moveCreature->pos;
 					//Update move position
 					calcMovePosition();
+					updateLookDirection();
 					route.clear();
 				}
 			}
@@ -1196,6 +1264,13 @@ void Monster::onThingDisappear(const Thing* thing, unsigned char stackPos)
 
 void Monster::onThingTransform(const Thing* thing,int stackpos)
 {
+	if(state == STATE_ATTACKING) {
+		Creature *attackedCreature = game->getCreatureByID(this->attackedCreature);
+		if (!attackedCreature || !isCreatureReachable(attackedCreature)) {
+			state = STATE_TARGETNOTREACHABLE;
+		}
+	}
+	
 	if(state == STATE_TARGETNOTREACHABLE) {
 		state = STATE_IDLE;
 		attackedCreature = 0;
@@ -1235,6 +1310,7 @@ void Monster::onTeleport(const Creature *creature, const Position *oldPos, unsig
 				targetPos = creature->pos;
 				//Update move position
 				calcMovePosition();
+				updateLookDirection();
 				route.clear();
 			}
 		}
@@ -1264,10 +1340,10 @@ void Monster::OnCreatureEnter(const Creature *creature, bool canReach /* = true*
 			if(canReach) {
 				state = STATE_ATTACKING;
 
-				Player *attackedPlayer = dynamic_cast<Player*>(game->getCreatureByID(this->attackedCreature));
-				if (attackedPlayer) {
-					if(validateDistanceAttack(attackedPlayer)){
-						doAttacks(attackedPlayer, true);
+				Creature *attackedCreature = game->getCreatureByID(this->attackedCreature);
+				if (attackedCreature) {
+					if(validateDistanceAttack(attackedCreature)){
+						doAttacks(attackedCreature, MODE_AGGRESSIVE);
 					}
 				}
 			}
@@ -1366,8 +1442,14 @@ void Monster::dropLoot(Container *corpse)
 	}
 }
 
-bool Monster::doAttacks(Player* attackedPlayer, bool aggressive /*=false*/)
+bool Monster::doAttacks(Creature* attackedCreature, monstermode_t mode /*= MODE_NORMAL*/)
 {
+	int modeProb = 0;
+	switch(mode) {
+		case MODE_NORMAL: modeProb = 0; break;
+		case MODE_AGGRESSIVE: modeProb = 50; break;
+	}
+
 	bool ret = false;
 
 	bool trymelee = getCurrentDistanceToTarget() <= 1;
@@ -1383,10 +1465,10 @@ bool Monster::doAttacks(Player* attackedPlayer, bool aggressive /*=false*/)
 	
 	for(PhysicalAttacks::iterator paIt = physicalAttacks.begin(); paIt != physicalAttacks.end(); ++paIt) {
 		TimeProbabilityClass& timeprobsystem = paIt->second;
-		if(timeprobsystem.onTick(500) || aggressive) {
+		if(timeprobsystem.onTick(500) || (random_range(1, 100) <= modeProb)) {
 			if(!hasmelee || (hasmelee && paIt->first->fighttype == FIGHT_MELEE)) {
 				curPhysicalAttack = paIt->first;
-				game->creatureMakeDamage(this, attackedPlayer, getFightType());
+				game->creatureMakeDamage(this, attackedCreature, getFightType());
 			}
 		}
 	}
@@ -1395,11 +1477,11 @@ bool Monster::doAttacks(Player* attackedPlayer, bool aggressive /*=false*/)
 		for(RuneAttackSpells::iterator raIt = runeSpells.begin(); raIt != runeSpells.end(); ++raIt) {
 			for(TimeProbabilityClassVec::iterator asIt = raIt->second.begin(); asIt != raIt->second.end(); ++asIt) {
 				TimeProbabilityClass& timeprobsystem = *asIt;
-				if(timeprobsystem.onTick(500) || aggressive) {
+				if(timeprobsystem.onTick(500) || (random_range(1, 100) <= modeProb)) {
 
 					std::map<unsigned short, Spell*>::iterator rit = spells.getAllRuneSpells()->find(raIt->first);
 					if( rit != spells.getAllRuneSpells()->end() ) {
-						bool success = rit->second->getSpellScript()->castSpell(this, attackedPlayer->pos, "");
+						bool success = rit->second->getSpellScript()->castSpell(this, attackedCreature->pos, "");
 
 						if(success) {
 							ret = true;
@@ -1416,7 +1498,7 @@ bool Monster::doAttacks(Player* attackedPlayer, bool aggressive /*=false*/)
 		for(InstantAttackSpells::iterator iaIt = instantSpells.begin(); iaIt != instantSpells.end(); ++iaIt) {
 			for(TimeProbabilityClassVec::iterator asIt = iaIt->second.begin(); asIt != iaIt->second.end(); ++asIt) {
 				TimeProbabilityClass& timeprobsystem = *asIt;
-				if(timeprobsystem.onTick(500) || aggressive) {
+				if(timeprobsystem.onTick(500) || (random_range(1, 100) <= modeProb)) {
 
 					std::map<std::string, Spell*>::iterator rit = spells.getAllSpells()->find(iaIt->first);
 					if( rit != spells.getAllSpells()->end() ) {
@@ -1516,7 +1598,7 @@ void Monster::doMoveTo(int dx, int dy)
 	
 	this->game->thingMove(this, this,this->pos.x + dx, this->pos.y + dy, this->pos.z, 1);
 
-	if(state == STATE_ATTACKING && getCurrentDistanceToTarget() <= 1) {
+	if(state == STATE_ATTACKING && this->pos == moveToPos /*getCurrentDistanceToTarget() <= 1*/) {
 		updateLookDirection();
 	}
 }
