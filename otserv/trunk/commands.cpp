@@ -51,6 +51,7 @@ s_defcommands Commands::defined_commands[] = {
 	{"/info",&Commands::getInfo},
 	{"/closeserver",&Commands::closeServer},
 	{"/openserver",&Commands::openServer},
+	{"/getonline",&Commands::onlineList},
 };
 
 
@@ -454,8 +455,8 @@ bool Commands::getInfo(Creature* c, const std::string &cmd, const std::string &p
 		*(unsigned long*)&ip = p->lastip;
 		info << "name:   " << p->getName() << std::endl <<
 		        "access: " << p->access << std::endl <<
-		        "level:  " << p->level << std::endl <<
-		        "maglvl: " << p->maglevel << std::endl <<
+		        "level:  " << p->getPlayerInfo(PLAYERINFO_LEVEL) << std::endl <<
+		        "maglvl: " << p->getPlayerInfo(PLAYERINFO_MAGICLEVEL) << std::endl <<
 		        "speed:  " <<  p->speed <<std::endl <<
 		        "position " << p->pos << std::endl << 
 				"ip: " << (unsigned int)ip[0] << "." << (unsigned int)ip[1] << 
@@ -491,5 +492,30 @@ bool Commands::closeServer(Creature* c, const std::string &cmd, const std::strin
 bool Commands::openServer(Creature* c, const std::string &cmd, const std::string &param)
 {
 	game->setGameState(GAME_STATE_NORMAL);
+	return true;
+}
+
+bool Commands::onlineList(Creature* c, const std::string &cmd, const std::string &param)
+{
+	Player* player = dynamic_cast<Player*>(c);
+	unsigned long alevel = 0;
+	if(!player)
+		return false;
+	
+	if(param == "gm")
+		alevel = 1;
+	
+	std::stringstream players;
+	players << "name   level" << std::endl;
+	
+	AutoList<Player>::listiterator it = Player::listPlayer.list.begin();
+	for(;it != Player::listPlayer.list.end();++it)
+	{
+		if((*it).second->access >= alevel){
+			players << (*it).second->getName() << "   " << 
+				(*it).second->getPlayerInfo(PLAYERINFO_LEVEL) << std::endl;
+		}
+	}
+	player->sendTextMessage(MSG_BLUE_TEXT,players.str().c_str());
 	return true;
 }

@@ -15,4 +15,5 @@
 <command cmd="/info" access="1" />
 <command cmd="/closeserver" access="1" />
 <command cmd="/openserver" access="1" />
+<command cmd="/getonline" access="1" />
 </commands>
