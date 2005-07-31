@@ -109,7 +109,7 @@ CREATE TABLE `players` (
   `food` int(11) NOT NULL default '0',
   `sex` int(11) NOT NULL default '0',
   `lastlogin` int(11) unsigned NOT NULL default '0',
-  `lastip` varchar(16) NOT NULL default '',
+  `lastip` int(11) unsigned NOT NULL default '0',
   `save` int(11) unsigned NOT NULL default '1',
   UNIQUE KEY `id` (`id`),
   KEY `name` (`name`)
