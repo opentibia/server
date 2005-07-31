@@ -356,7 +356,7 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 		Item* splash = Item::CreateItem(2019, FLUID_BLOOD);
 		game->addThing(NULL, CreaturePos, splash);
 		game->startDecay(splash);
-
+		
 		/*
 		bool hadSplash = (tile->splash != NULL);
 
@@ -985,6 +985,7 @@ bool Game::onPrepareMoveCreature(Creature *creature, const Creature* creatureMov
 bool Game::onPrepareMoveThing(Player *player, const Position& fromPos, const Item *item,
 	slots_t toSlot, int count)
 {
+
 	if( (abs(player->pos.x - fromPos.x) > 1) || (abs(player->pos.y - fromPos.y) > 1) || (player->pos.z != fromPos.z)) {
 		player->sendCancel("To far away...");
 		return false;
@@ -1694,7 +1695,7 @@ void Game::thingMoveInternal(Player *player, const Position& fromPos, unsigned c
 	Item *fromItem = dynamic_cast<Item*>(fromTile->getThingByStackPos(stackPos));
 	Item *toItem = NULL;
 
-	if(!fromItem || fromItem->getID() != itemid || fromItem != fromTile->getTopDownItem())
+	if(!fromItem || (fromItem->getID() != itemid) || (fromItem != fromTile->getTopDownItem()))
 		return;
 
 	if(toInventory) {
@@ -1715,7 +1716,7 @@ void Game::thingMoveInternal(Player *player, const Position& fromPos, unsigned c
 		}
 	}
 
-	if(!fromItem || (toItem == fromItem) || (fromItem->isStackable() && count > fromItem->getItemCountOrSubtype()))
+	if((toItem == fromItem) || (fromItem->isStackable() && count > fromItem->getItemCountOrSubtype()))
 		return;
 
 	/*ground to container*/
@@ -2033,10 +2034,12 @@ void Game::thingMoveInternal(Creature *creature, unsigned short from_x, unsigned
 		
 		std::vector<Creature*> list;
 		getSpectators(Range(oldPos, Position(to_x, to_y, to_z)), list);
-		
+		//first inform creature that is being moved
+		creature->onThingMove(creature, thing, &oldPos, oldstackpos, 1, 1);
 		for(unsigned int i = 0; i < list.size(); ++i)
 		{
-			list[i]->onThingMove(creature, thing, &oldPos, oldstackpos, 1, 1);
+			if(list[i] != creature)
+				list[i]->onThingMove(creature, thing, &oldPos, oldstackpos, 1, 1);
 		}
 		
 		autoCloseTrade(item, true);
@@ -2308,8 +2311,11 @@ void Game::teleport(Thing *thing, const Position& newPos) {
 			thing->pos = newPos;
 			list.clear();
 			getSpectators(Range(thing->pos, true), list);
+			//first inform creature that is being moved
+			creature->onTeleport(creature, &oldPos, osp);
 			for(size_t i = 0; i < list.size(); ++i){
-				list[i]->onTeleport(creature, &oldPos, osp);
+				if(list[i] != creature)
+					list[i]->onTeleport(creature, &oldPos, osp);
 			}
 		}
 		else{

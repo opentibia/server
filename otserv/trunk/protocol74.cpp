@@ -1023,6 +1023,9 @@ void Protocol74::parseThrow(NetworkMessage &msg)
 	 << ", count: " << (int)count << std::endl;*/
 	bool toInventory = false;
 	bool fromInventory = false;
+	
+	if(from_x == to_x && from_y == to_y && from_z == to_z)
+		return;
 
 	//container/inventory to container/inventory
 	if(from_x == 0xFFFF && to_x == 0xFFFF) {
