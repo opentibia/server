@@ -498,12 +498,15 @@ bool Commands::openServer(Creature* c, const std::string &cmd, const std::string
 bool Commands::onlineList(Creature* c, const std::string &cmd, const std::string &param)
 {
 	Player* player = dynamic_cast<Player*>(c);
-	unsigned long alevel = 0;
+	unsigned long alevelmin = 0;
+	unsigned long alevelmax = 10000;
 	if(!player)
 		return false;
 	
 	if(param == "gm")
-		alevel = 1;
+		alevelmin = 1;
+	else if(param == "normal")
+		alevelmax = 0;
 	
 	std::stringstream players;
 	players << "name   level" << std::endl;
@@ -511,7 +514,7 @@ bool Commands::onlineList(Creature* c, const std::string &cmd, const std::string
 	AutoList<Player>::listiterator it = Player::listPlayer.list.begin();
 	for(;it != Player::listPlayer.list.end();++it)
 	{
-		if((*it).second->access >= alevel){
+		if((*it).second->access >= alevelmin && (*it).second->access <= alevelmax){
 			players << (*it).second->getName() << "   " << 
 				(*it).second->getPlayerInfo(PLAYERINFO_LEVEL) << std::endl;
 		}

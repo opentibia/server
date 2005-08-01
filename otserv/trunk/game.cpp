@@ -124,7 +124,10 @@ void GameState::onAttack(Creature* attacker, const Position& pos, const MagicEff
 			//Replace existing magic field
 			magicItem->transform(newmagicItem);
 			
-			unsigned char stackpos = tile->getThingStackPos(magicItem);
+			game->removeThing(NULL, pos, magicItem, false);
+			game->addThing(NULL, pos, magicItem);
+			
+			/*unsigned char stackpos = tile->getThingStackPos(magicItem);
 			Player *spectator = NULL;
 			for(int i = 0; i < spectatorlist.size(); ++i) {
 				spectator = dynamic_cast<Player*>(spectatorlist[i]);
@@ -132,7 +135,7 @@ void GameState::onAttack(Creature* attacker, const Position& pos, const MagicEff
 					spectator->onThingDisappear(magicItem, stackpos);
 					spectator->onThingAppear(magicItem);
 				}
-			}
+			}*/
 
 			//mapstate.refreshThing(tile, magicItem);
 		}
