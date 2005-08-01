@@ -68,22 +68,29 @@ enum MagicEffectClasses {
 #define NM_ANI_FLYPOISONFIELD    14
 
 enum SpeakClasses {
-	SPEAK_SAY	  	= 0x01,
-	SPEAK_WHISPER 	= 0x02,
-	SPEAK_YELL	  	= 0x03,
-	SPEAK_PRIVATE 	= 0x04,
-	SPEAK_RED	  	= 0x0B,
-	/*SPEAK_CHANNEL?? 	= 0x06,
-	SPEAK_CHANNEL?? 	= 0x07,
-	SPEAK_CHANNEL?? 	= 0x08,*/
-	SPEAK_BROADCAST	= 0x09,
-	SPEAK_CHANNEL_Y	= 0x05,	//yellow
-	SPEAK_CHANNEL_R1= 0x0A,	//red - #c text -- gamemaster command
-	SPEAK_CHANNEL_R2= 0x0E,	//red - #d text -- counsellor command(?)
-	SPEAK_CHANNEL_O	= 0x0C,	//orange
+	SPEAK_SAY	  		= 0x01, 
+	SPEAK_WHISPER 		= 0x02, 
+	SPEAK_YELL	  		= 0x03, 
+	//SPEAK_			= 0x0D,	
+	
+	SPEAK_BROADCAST		= 0x09, 
+	
+	SPEAK_PRIVATE 		= 0x04, 
+	SPEAK_PRIVATE_RED	= 0x0B,	//@name@text
+	//SPEAK_			= 0x0F, 
+	
+	//SPEAK_CHANNEL?? 	= 0x06,
+	
+	//SPEAK_CHANNEL?? 	= 0x07,
+	//SPEAK_CHANNEL?? 	= 0x08,
+	
+	SPEAK_CHANNEL_Y		= 0x05,	//yellow
+	SPEAK_CHANNEL_R1	= 0x0A,	//red - #c text -- gamemaster command
+	SPEAK_CHANNEL_R2	= 0x0E,	//red - #d text -- counsellor command(?)
+	SPEAK_CHANNEL_O		= 0x0C,	//orange
 			
-	SPEAK_MONSTER1 	= 0x10,
-	SPEAK_MONSTER2 	= 0x11,
+	SPEAK_MONSTER1 		= 0x10,
+	SPEAK_MONSTER2 		= 0x11,
 };
 
 enum MessageClasses {

@@ -1185,7 +1185,8 @@ void Protocol74::parseSay(NetworkMessage &msg)
   
 	std::string receiver;
 	unsigned short channelId = 0;
-	if(type == SPEAK_PRIVATE)
+	if(type == SPEAK_PRIVATE ||
+		type == SPEAK_PRIVATE_RED)
 		receiver = msg.GetString();
 	if(type == SPEAK_CHANNEL_Y ||
 		type == SPEAK_CHANNEL_R1 ||
@@ -1206,7 +1207,8 @@ void Protocol74::parseSay(NetworkMessage &msg)
     	game->creatureYell(player, text);
     	break;
     case SPEAK_PRIVATE:
-      	game->creatureSpeakTo(player, receiver, text);
+	case SPEAK_PRIVATE_RED:
+      	game->creatureSpeakTo(player, type, receiver, text);
 		break;
     case SPEAK_CHANNEL_Y:
 	case SPEAK_CHANNEL_R1:

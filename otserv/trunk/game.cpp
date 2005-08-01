@@ -2392,13 +2392,16 @@ void Game::creatureYell(Creature *creature, std::string &text)
 	//OTSYS_THREAD_UNLOCK(gameLock)
 }
 
-void Game::creatureSpeakTo(Creature *creature, const std::string &receiver, const std::string &text)
+void Game::creatureSpeakTo(Creature *creature, SpeakClasses type,const std::string &receiver, const std::string &text)
 {
 	//OTSYS_THREAD_LOCK(gameLock) 
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
 	Creature* c = getCreatureByName(receiver);
+	if(creature->access == 0)
+		type = SPEAK_PRIVATE;
+	
 	if(c)
-		c->onCreatureSay(creature, SPEAK_PRIVATE, text);
+		c->onCreatureSay(creature, type, text);
 	//OTSYS_THREAD_UNLOCK(gameLock)
 }
 
