@@ -522,6 +522,7 @@ bool Commands::onlineList(Creature* c, const std::string &cmd, const std::string
 		}
 		if(i % 50 == 0){
 			player->sendTextMessage(MSG_BLUE_TEXT,players.str().c_str());
+			players.str("");
 		}
 		i++;
 	}
