@@ -488,7 +488,7 @@ void Spawn::idle(int t)
 {
 	SpawnedMap::iterator it;
 	for(it = spawnedmap.begin(); it != spawnedmap.end();) {
-		if (it->second->health <= 0) {
+		if (it->second->isRemoved == true /*it->second->health <= 0*/) {
 			if(it->first != 0) {
 				spawnmap[it->first].lastspawn = OTSYS_TIME();
 			}
