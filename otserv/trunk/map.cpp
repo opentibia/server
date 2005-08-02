@@ -107,27 +107,26 @@ bool Map::loadMap(std::string filename) {
 
 Tile* Map::getTile(unsigned short _x, unsigned short _y, unsigned char _z)
 {
-  if (_z < MAP_LAYER)
-  {
-	// _x & 0x7F  is like _x % 128
-	//TileMap *tm = &tileMaps[_x & 0x1F][_y & 0x1F][_z];
-	//TileMap *tm = &tileMaps[_x & 0xFF][_y & 0xFF];
-    TileMap *tm = &tileMaps[_x & 0x7F][_y & 0x7F];
-	if(!tm)
-		return NULL;
+	if(_z < MAP_LAYER){
+		// _x & 0x7F  is like _x % 128
+		//TileMap *tm = &tileMaps[_x & 0x1F][_y & 0x1F][_z];
+		//TileMap *tm = &tileMaps[_x & 0xFF][_y & 0xFF];
+    	TileMap *tm = &tileMaps[_x & 0x7F][_y & 0x7F];
+		if(!tm)
+			return NULL;
 	
-    // search in the stl map for the requested tile
-    //TileMap::iterator it = tm->find((_x << 16) | _y);
-    //TileMap::iterator it = tm->find(_x & 0xFF00) << 8 | (_y & 0xFF00) | _z);
-    TileMap::iterator it = tm->find((_x & 0xFF80) << 16 | (_y & 0xFF80) << 1 | _z);
+    	// search in the stl map for the requested tile
+    	//TileMap::iterator it = tm->find((_x << 16) | _y);
+    	//TileMap::iterator it = tm->find(_x & 0xFF00) << 8 | (_y & 0xFF00) | _z);
+    	TileMap::iterator it = tm->find((_x & 0xFF80) << 16 | (_y & 0xFF80) << 1 | _z);
 
-    // ... found
-    if (it != tm->end())
-      return it->second;
-  }
+    	// ... found
+    	if(it != tm->end())
+      		return it->second;
+  	}
 	
-	 // or not
-  return NULL;
+	// or not
+	return NULL;
 }
 
 Tile* Map::getTile(const Position &pos)

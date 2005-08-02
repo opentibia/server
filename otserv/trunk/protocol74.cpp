@@ -115,184 +115,180 @@ void Protocol74::parsePacket(NetworkMessage &msg)
 {
 	if(msg.getMessageLength() <= 0)
 		return;
-
-  uint8_t recvbyte = msg.GetByte();
-  	//a dead player can not performs actions
+	
+	uint8_t recvbyte = msg.GetByte();
+	//a dead player can not performs actions
 	if (player->isRemoved == true && recvbyte != 0x14) {
-	    return;
-  	}	
+		return;
+	}	
     
-  switch(recvbyte)
-  {
+	switch(recvbyte)
+	{
     case 0x14: // logout
-      parseLogout(msg);
-      break;
-
-		case 0x64: // client moving with steps
-  	  parseMoveByMouse(msg);
-      break;
-
-    case 0x65: // move north
-      parseMoveNorth(msg);
-      break;
-
-    case 0x66: // move east
-      parseMoveEast(msg);
-      break;
-
-    case 0x67: // move south
-      parseMoveSouth(msg);
-      break;
-
-    case 0x68: // move west
-      parseMoveWest(msg);
-      break;
-
-    case 0x6A:
-			parseMoveNorthEast(msg);
-      //this->game->thingMove(player, player, (player->pos.x+1), (player->pos.y-1), player->pos.z, 1);   
-      break;
-
-    case 0x6B:
-			parseMoveSouthEast(msg);
-      //this->game->thingMove(player, player, (player->pos.x+1), (player->pos.y+1), player->pos.z, 1);   
-      break;
-
-    case 0x6C:
-			parseMoveSouthWest(msg);
-      //this->game->thingMove(player, player, (player->pos.x-1), (player->pos.y+1), player->pos.z, 1);   
-      break;
-
-    case 0x6D:
-			parseMoveNorthWest(msg);
-      //this->game->thingMove(player, player, (player->pos.x-1), (player->pos.y-1), player->pos.z, 1);   
-      break;
-
-		case 0x6F: // turn north
-			parseTurnNorth(msg);
-      break;
-
-		case 0x70: // turn east
-      parseTurnEast(msg);
-      break;
-
-    case 0x71: // turn south
-      parseTurnSouth(msg);
-      break;
-
-    case 0x72: // turn west
-      parseTurnWest(msg);
-      break;
-
-		case 0x7D: // Request trade
-			parseRequestTrade(msg);
-			break;
-
-		case 0x7E: // Look at an item in trade
-			parseLookInTrade(msg);
-			break;
-
-		case 0x7F: // Accept trade
-			parseAcceptTrade(msg);
-			break;
+		parseLogout(msg);
+		break;
 		
-		case 0x80: // Close/cancel trade
-			parseCloseTrade();
-			break;
-
+	case 0x64: // client moving with steps
+		parseMoveByMouse(msg);
+		break;
+		
+    case 0x65: // move north
+		parseMoveNorth(msg);
+		break;
+		
+    case 0x66: // move east
+		parseMoveEast(msg);
+		break;
+		
+    case 0x67: // move south
+		parseMoveSouth(msg);
+		break;
+		
+    case 0x68: // move west
+		parseMoveWest(msg);
+		break;
+		
+    case 0x6A:
+		parseMoveNorthEast(msg);
+		break;
+		
+    case 0x6B:
+		parseMoveSouthEast(msg);
+		break;
+		
+    case 0x6C:
+		parseMoveSouthWest(msg);
+		break;
+		
+    case 0x6D:
+		parseMoveNorthWest(msg);
+		break;
+		
+	case 0x6F: // turn north
+		parseTurnNorth(msg);
+		break;
+		
+	case 0x70: // turn east
+		parseTurnEast(msg);
+		break;
+		
+    case 0x71: // turn south
+		parseTurnSouth(msg);
+		break;
+		
+    case 0x72: // turn west
+		parseTurnWest(msg);
+		break;
+		
+	case 0x7D: // Request trade
+		parseRequestTrade(msg);
+		break;
+		
+	case 0x7E: // Look at an item in trade
+		parseLookInTrade(msg);
+		break;
+		
+	case 0x7F: // Accept trade
+		parseAcceptTrade(msg);
+		break;
+		
+	case 0x80: // Close/cancel trade
+		parseCloseTrade();
+		break;
+		
     case 0x78: // throw item
-			parseThrow(msg);
-			break;
-
+		parseThrow(msg);
+		break;
+		
     case 0x82: // use item
-			parseUseItem(msg);
-			break;
-
+		parseUseItem(msg);
+		break;
+		
     case 0x83: // use item
-      parseUseItemEx(msg);
-      break;
-
+		parseUseItemEx(msg);
+		break;
+		
     case 0x85:	//rotate item
-      //parseRotateItem(msg);
-	  break;
-
+		//parseRotateItem(msg);
+		break;
+		
     case 0x87: // close container
-      parseCloseContainer(msg);
-      break;
-
-		case 0x88: //"up-arrow" - container
-			parseUpArrowContainer(msg);	
-			break;
-
-		case 0x89:
-			parseTextWindow(msg);
-			break;
-
+		parseCloseContainer(msg);
+		break;
+		
+	case 0x88: //"up-arrow" - container
+		parseUpArrowContainer(msg);	
+		break;
+		
+	case 0x89:
+		parseTextWindow(msg);
+		break;
+		
     case 0x8C: // throw item
-      parseLookAt(msg);
-      break;
-
+		parseLookAt(msg);
+		break;
+		
     case 0x96:  // say something
-      parseSay(msg);
-      break;
-
+		parseSay(msg);
+		break;
+		
     case 0xA1: // attack
-      parseAttack(msg);
-      break;
-
+		parseAttack(msg);
+		break;
+		
     case 0xD2: // request Outfit
-      parseRequestOutfit(msg);
-      break;
-
+		parseRequestOutfit(msg);
+		break;
+		
     case 0xD3: // set outfit
-      parseSetOutfit(msg);
-      break;
-
+		parseSetOutfit(msg);
+		break;
+		
     case 0x97: // request Channels
-      parseGetChannels(msg);
-      break;
-
+		parseGetChannels(msg);
+		break;
+		
     case 0x98: // open Channel
-      parseOpenChannel(msg);
-      break;
-
+		parseOpenChannel(msg);
+		break;
+		
     case 0x99: // close Channel
-      //parseCloseChannel(msg);
-      break;
-
+		//parseCloseChannel(msg);
+		break;
+		
     case 0x9A: // open priv
-      parseOpenPriv(msg);
-      break;
-
+		parseOpenPriv(msg);
+		break;
+		
     case 0xBE: // cancel move
-      parseCancelMove(msg);
-      break;
-
+		parseCancelMove(msg);
+		break;
+		
     case 0xA0: // set attack and follow mode
-      parseModes(msg);
-      break;
-
+		parseModes(msg);
+		break;
+		
     case 0x69: // client quit without logout <- wrong
-			if(game->stopEvent(player->eventAutoWalk)) {
-				sendCancelWalk();
-			}
-      break;
-
+		if(game->stopEvent(player->eventAutoWalk)) {
+			sendCancelWalk();
+		}
+		break;
+		
     case 0x1E: // keep alive / ping response
-    	player->receivePing();
-      break;
-
+		player->receivePing();
+		break;
+		
     case 0xC9: // change position
-      // update position   
-      break;
-
+		// update position   
+		break;
+		
     default:
-			printf("unknown packet header: %x \n", recvbyte);
-			parseDebug(msg);
-			break;
+		printf("unknown packet header: %x \n", recvbyte);
+		parseDebug(msg);
+		break;
 	}
-
-  game->flushSendBuffers();  
+	
+	game->flushSendBuffers();  
 }
 
 void Protocol74::GetTileDescription(const Tile* tile, NetworkMessage &msg)
@@ -496,8 +492,8 @@ void Protocol74::parseOpenChannel(NetworkMessage &msg){
 void Protocol74::parseCloseChannel(NetworkMessage &msg){
 	/* unsigned short channelId = */msg.GetU16();
 	std::map<long, Creature*>::iterator sit = channel.find(player->getID());
-	if( sit != channel.end() ) {
-			channel.erase(sit);
+	if(sit != channel.end()){
+		channel.erase(sit);
 	}
 }
 
@@ -710,35 +706,34 @@ void Protocol74::parseTurnWest(NetworkMessage &msg)
 
 void Protocol74::parseRequestOutfit(NetworkMessage &msg)
 {
-  msg.Reset();
-
-  msg.AddByte(0xC8);
-  msg.AddByte(player->looktype);
-  msg.AddByte(player->lookhead);
-  msg.AddByte(player->lookbody);
-  msg.AddByte(player->looklegs);
-  msg.AddByte(player->lookfeet);
-  switch (player->getSex()) {
-	  case PLAYERSEX_FEMALE:
-		  msg.AddByte(PLAYER_FEMALE_1);
-		  msg.AddByte(PLAYER_FEMALE_7);
-		  break;
-	  case PLAYERSEX_MALE:
-		  msg.AddByte(PLAYER_MALE_1);
-		  msg.AddByte(PLAYER_MALE_7);
-		  break;
-	  case PLAYERSEX_OLDMALE:
-		  msg.AddByte(160);
-		  msg.AddByte(160);
-		  break;
-	  default:
-		  msg.AddByte(PLAYER_MALE_1);
-		  msg.AddByte(PLAYER_MALE_7);
-  }
-
+	msg.Reset();
+	
+	msg.AddByte(0xC8);
+	msg.AddByte(player->looktype);
+	msg.AddByte(player->lookhead);
+	msg.AddByte(player->lookbody);
+	msg.AddByte(player->looklegs);
+	msg.AddByte(player->lookfeet);
+	switch (player->getSex()) {
+	case PLAYERSEX_FEMALE:
+		msg.AddByte(PLAYER_FEMALE_1);
+		msg.AddByte(PLAYER_FEMALE_7);
+		break;
+	case PLAYERSEX_MALE:
+		msg.AddByte(PLAYER_MALE_1);
+		msg.AddByte(PLAYER_MALE_7);
+		break;
+	case PLAYERSEX_OLDMALE:
+		msg.AddByte(160);
+		msg.AddByte(160);
+		break;
+	default:
+		msg.AddByte(PLAYER_MALE_1);
+		msg.AddByte(PLAYER_MALE_7);
+	}
+	
 	WriteBuffer(msg);
 }
-
 
 void Protocol74::sendSetOutfit(const Creature* creature) {
 	if (CanSee(creature->pos.x, creature->pos.y, creature->pos.z)) {
@@ -2326,62 +2321,63 @@ void Protocol74::sendThingAppear(const Thing *thing){
 		const Player* add_player = dynamic_cast<const Player*>(creature);
 		if(add_player == player){
 			msg.AddByte(0x0A);
-    	msg.AddU32(player->getID());
-    		
+			msg.AddU32(player->getID());
+			
 			msg.AddByte(0x32);
-    	msg.AddByte(0x00);
-    		
-    	msg.AddByte(0x00); //can report bugs 0,1
-    		
-    	/*msg.AddByte(0x0B);//TODO?. GM actions
-    	msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-    	msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-    	msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-    	msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-    	msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-    	msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-    	msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-    	msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-    	*/
-    	
-    	msg.AddByte(0x64);
-    	msg.AddPosition(player->pos);
-    	GetMapDescription(player->pos.x-8, player->pos.y-6, player->pos.z, 18, 14, msg);
-
+			msg.AddByte(0x00);
+			
+			msg.AddByte(0x00); //can report bugs 0,1
+			
+		   	/*msg.AddByte(0x0B);//TODO?. GM actions
+		   	msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+		   	msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+		   	msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+		   	msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+		   	msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+		   	msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+			msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+		    msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+			*/
+			
+			msg.AddByte(0x64);
+			msg.AddPosition(player->pos);
+			GetMapDescription(player->pos.x-8, player->pos.y-6, player->pos.z, 18, 14, msg);
+			
 			AddMagicEffect(msg,player->pos, NM_ME_ENERGY_AREA);
-
+			
 			AddPlayerStats(msg,player);	
-
+			
 			msg.AddByte(0x82);
 			msg.AddByte(0x6F); //LIGHT LEVEL
-    	msg.AddByte(0xd7);//light? (seems constant)
-
-    	/*msg.AddByte(0x8d);//8d
-    	msg.AddU32(player->getID());
-    	msg.AddByte(0x03);//00
-    	msg.AddByte(0xd7);//d7*/
-
-    	AddPlayerSkills(msg,player);
-
-    	AddPlayerInventoryItem(msg,player, 1);
-    	AddPlayerInventoryItem(msg,player, 2);
-    	AddPlayerInventoryItem(msg,player, 3);
-    	AddPlayerInventoryItem(msg,player, 4);
-    	AddPlayerInventoryItem(msg,player, 5);
-    	AddPlayerInventoryItem(msg,player, 6);
-    	AddPlayerInventoryItem(msg,player, 7);
-	    AddPlayerInventoryItem(msg,player, 8);
-    	AddPlayerInventoryItem(msg,player, 9);
-    	AddPlayerInventoryItem(msg,player, 10);
-
-   		AddTextMessage(msg,MSG_EVENT, g_config.getGlobalString("loginmsg", "Welcome.").c_str());
-   		std::string tempstring;
-   		tempstring = "Your last visit was on ";
-   		time_t lastlogin = player->getLastLoginSaved();
-   		tempstring += ctime(&lastlogin);
-   		tempstring.erase(tempstring.length() -1);
-   		tempstring += ".";
-   		AddTextMessage(msg,MSG_EVENT, tempstring.c_str());
+			msg.AddByte(0xd7);//light? (seems constant)
+			
+			/*msg.AddByte(0x8d);//8d
+			msg.AddU32(player->getID());
+			msg.AddByte(0x03);//00
+			msg.AddByte(0xd7);//d7
+			*/
+			
+			AddPlayerSkills(msg,player);
+			
+			AddPlayerInventoryItem(msg,player, 1);
+			AddPlayerInventoryItem(msg,player, 2);
+			AddPlayerInventoryItem(msg,player, 3);
+			AddPlayerInventoryItem(msg,player, 4);
+			AddPlayerInventoryItem(msg,player, 5);
+			AddPlayerInventoryItem(msg,player, 6);
+			AddPlayerInventoryItem(msg,player, 7);
+			AddPlayerInventoryItem(msg,player, 8);
+			AddPlayerInventoryItem(msg,player, 9);
+			AddPlayerInventoryItem(msg,player, 10);
+			
+			AddTextMessage(msg,MSG_EVENT, g_config.getGlobalString("loginmsg", "Welcome.").c_str());
+			std::string tempstring;
+			tempstring = "Your last visit was on ";
+			time_t lastlogin = player->getLastLoginSaved();
+			tempstring += ctime(&lastlogin);
+			tempstring.erase(tempstring.length() -1);
+			tempstring += ".";
+			AddTextMessage(msg,MSG_EVENT, tempstring.c_str());
 			WriteBuffer(msg);
 			//force flush
 			flushOutputBuffer();
@@ -2389,12 +2385,12 @@ void Protocol74::sendThingAppear(const Thing *thing){
 		}
 		else if(CanSee(creature->pos.x, creature->pos.y, creature->pos.z)){
 			bool known;
-    		unsigned long removedKnown;
-    		checkCreatureAsKnown(creature->getID(), known, removedKnown);
+			unsigned long removedKnown;
+			checkCreatureAsKnown(creature->getID(), known, removedKnown);
 			AddAppearThing(msg,creature->pos);
 			AddCreature(msg,creature, known, removedKnown);		
-    		// login bubble
-    		AddMagicEffect(msg,creature->pos, NM_ME_ENERGY_AREA);
+			// login bubble
+			AddMagicEffect(msg,creature->pos, NM_ME_ENERGY_AREA);
 		}
 	}
 	else if(CanSee(thing->pos.x, thing->pos.y, thing->pos.z))
