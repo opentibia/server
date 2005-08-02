@@ -238,7 +238,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 			msg.GetU32();
 			std::string name     = msg.GetString();
 			std::string password = msg.GetString();
-			if(version < 740){
+			if(version != 740 && version != 741){
 				msg.Reset();
 				msg.AddByte(0x14);
 				msg.AddString("Only clients with protocol 7.4 allowed!");
