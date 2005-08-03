@@ -484,6 +484,7 @@ void Protocol74::parseGetChannels(NetworkMessage &msg){
 void Protocol74::parseOpenChannel(NetworkMessage &msg){
 	unsigned short channelId = msg.GetU16();
 	sendChannel(channelId);
+	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock);
 	std::map<long, Creature*>::iterator sit = channel.find(player->getID());
 	if( sit == channel.end() ) {
 		channel[player->getID()] = player;
@@ -492,6 +493,7 @@ void Protocol74::parseOpenChannel(NetworkMessage &msg){
 
 void Protocol74::parseCloseChannel(NetworkMessage &msg){
 	/* unsigned short channelId = */msg.GetU16();
+	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock);
 	std::map<long, Creature*>::iterator sit = channel.find(player->getID());
 	if(sit != channel.end()){
 		channel.erase(sit);
@@ -501,6 +503,7 @@ void Protocol74::parseCloseChannel(NetworkMessage &msg){
 void Protocol74::parseOpenPriv(NetworkMessage &msg){
 	std::string receiver; 
 	receiver = msg.GetString();
+	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock);
 	Creature* c = game->getCreatureByName(receiver);
 	Player* player = dynamic_cast<Player*>(c);
 	if(player)
@@ -977,7 +980,7 @@ void Protocol74::parseCloseContainer(NetworkMessage &msg)
 void Protocol74::parseUpArrowContainer(NetworkMessage &msg)
 {
 	unsigned char containerid = msg.GetByte();
-
+	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock);
 	Container *container = player->getContainer(containerid);
 	if(!container)
 		return;
@@ -1125,7 +1128,8 @@ void Protocol74::parseLookAt(NetworkMessage &msg){
 */
 	Item *item = NULL;
 	Creature *creature = NULL;
-
+	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock);
+	
 	if(LookPos.x != 0xFFFF) {
 		Tile* tile = game->getTile(LookPos.x, LookPos.y, LookPos.z);
 		if(tile){
