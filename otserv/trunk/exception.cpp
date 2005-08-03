@@ -365,7 +365,7 @@ bool ExceptionHandler::LoadMap(){
     }
     // close file
     input.close();
-	std::cout << "Loaded " << n << " stack symbols" <<std::endl;
+	//std::cout << "Loaded " << n << " stack symbols" <<std::endl;
 	maploaded = true;
 	//OTSYS_THREAD_UNLOCK(maploadlock);
 	return true;

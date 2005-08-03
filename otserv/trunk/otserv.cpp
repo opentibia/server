@@ -387,7 +387,8 @@ int main(int argc, char *argv[])
 	}*/
 
 
-	std::cout << ":: OTServ Development-Version 0.4.0 - CVS Preview" << std::endl;
+	//std::cout << ":: OTServ Development-Version 0.4.0 - CVS Preview" << std::endl;
+	std::cout << ":: OTServ Version 0.4.0" << std::endl;
 	std::cout << ":: ====================" << std::endl;
 	std::cout << "::" << std::endl;
 	

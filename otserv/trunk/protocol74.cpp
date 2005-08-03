@@ -828,7 +828,7 @@ void Protocol74::parseSetOutfit(NetworkMessage &msg)
 		player->lookfeet=msg.GetByte();
 
 		//if (player->sex > 1) {
-		std::cout << "set outfit to: " << (int)(player->lookhead) << " / " << (int)player->lookbody << " / " << (int)player->looklegs << " / " <<  (int)player->lookfeet << std::endl;
+		//std::cout << "set outfit to: " << (int)(player->lookhead) << " / " << (int)player->lookbody << " / " << (int)player->looklegs << " / " <<  (int)player->lookfeet << std::endl;
 		//}
 
 		game->creatureChangeOutfit(player);
