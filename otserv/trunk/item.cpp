@@ -397,16 +397,6 @@ bool Item::isBlockingProjectile() const {
 	*/
 
 	return it.blockingProjectile;
-	
-	/*
-	if(!it.canWalkThrough)
-		return false;
-
-	if(it.blocking && !it.blockingProjectile && it.alwaysOnTop)
-		return false;
-
-	return it.blockingProjectile;
-	*/
 }
 
 bool Item::isBlocking(bool ispickupable /*= false*/) const {
@@ -543,12 +533,7 @@ std::string Item::getDescription(bool fullDescription) const
 			}
 			else if(isWeapon() && (getAttack() || getDefense()))
 			{
-				if(getAttack() != 0){					
-					s << "You see a " << items[id].name << " (Atk:" << (int)getAttack() << " Def:" << (int)getDefense() << ")." << std::endl;					
-				}
-				else{
-					s << "You see a " << items[id].name << " (Def:" << (int)getDefense() << ")." << std::endl;
-				}				
+				s << "You see a " << items[id].name << " (Atk:" << (int)getAttack() << " Def:" << (int)getDefense() << ")." << std::endl;
 			}
 			else if(getArmor())
 			{
