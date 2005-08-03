@@ -433,7 +433,8 @@ void Protocol74::checkCreatureAsKnown(unsigned long id, bool &known, unsigned lo
       removedKnown = knownPlayers.front();
 
       Creature *c = game->getCreatureByID(removedKnown);
-      if ((!c) || (!CanSee(c->pos.x, c->pos.y, c->pos.z)))
+      //if ((!c) || (!CanSee(c->pos.x, c->pos.y, c->pos.z)))
+      if ((!c) || (!CanSee(c)))
         break;
 
       // this creature we can't remove, still in sight, so back to the end
@@ -736,7 +737,8 @@ void Protocol74::parseRequestOutfit(NetworkMessage &msg)
 }
 
 void Protocol74::sendSetOutfit(const Creature* creature) {
-	if (CanSee(creature->pos.x, creature->pos.y, creature->pos.z)) {
+	//if (CanSee(creature->pos.x, creature->pos.y, creature->pos.z)) {
+	if (CanSee(creature)) {
 		NetworkMessage newmsg;
 		newmsg.AddByte(0x8E);
 		newmsg.AddU32(creature->getID());
@@ -1271,121 +1273,6 @@ void Protocol74::parseCloseTrade()
 	game->playerCloseTrade(player);
 }
 
-/*
-void Protocol74::sendAction(Action* action){
-
-	std::string buf = "  ";
-	if(action->type==ACTION_ITEM_APPEAR){
-		sendPlayerItemAppear(action);
-	}
-	if(action->type==ACTION_ITEM_DISAPPEAR){
-		sendPlayerItemDisappear(action);
-	}
-	if(action->type==ACTION_ITEM_CHANGE){
-		sendPlayerItemChange(action);
-	}
-	if(action->type==ACTION_GROUND_CHANGE){
-		sendPlayerChangeGround(action);
-	}
-	if(action->type==ACTION_LOOK_AT){
-		this->sendPlayerLookAt(action->buffer);
-	}
-	if(action->type==ACTION_REQUEST_APPEARANCE){
-		sendPlayerAppearance(action);
-	}
-	if(action->type==ACTION_CHANGE_APPEARANCE){
-		sendPlayerChangeAppearance(action);
-	}
-}
-*/
-
-
-/*void Protocol74::sendPlayerItemAppear(Action* action){
-	std::string buf = "  ";
-	buf+=(char)0x6A;
-	ADD2BYTE(buf, action->pos1.x);
-	ADD2BYTE(buf, action->pos1.y);
-	buf+=(char)action->pos1.z;
-	ADD2BYTE(buf, action->id);
-	if(action->count!=0)
-	buf+=(unsigned char)action->count;
-	std::cout << "Count:" << action->count << std::endl;
-	buf[0]=(char)(buf.size()-2)%256;
-	buf[1]=(char)((buf.size()-2)/256)%256;
-//	SendData(psocket,buf);
-}
-*/
-
-/*
-void Protocol74::sendPlayerItemDisappear(Action* action){
-	std::string buf = "  ";
-	buf+=(char)0x6C;
-	ADD2BYTE(buf, action->pos1.x);
-	ADD2BYTE(buf, action->pos1.y);
-	buf+=(char)action->pos1.z;
-	buf+=(char)action->stack;
-	buf[0]=(char)(buf.size()-2)%256;
-	buf[1]=(char)((buf.size()-2)/256)%256;
-//	SendData(psocket,buf);
-}
-*/
-
-/*
-void Protocol74::sendPlayerChangeAppearance(Action* action){
-	std::string buf = "  ";
-	buf+=(char)0x8E;
-	ADD4BYTE(buf, action->creature->getID());
-	buf+=action->creature->getLook();
-	buf[0]=(char)(buf.size()-2)%256;
-	buf[1]=(char)((buf.size()-2)/256)%256;
-	SendData(psocket,buf);
-}
-*/
-
-
-/*void Protocol74::sendPlayerLookAt(std::string msg){
-	std::string buf = "  ";
-	buf+=(char)0xB4;
-	buf+=(char)0x13;
-	ADD2BYTE(buf, msg.size());
-	buf+=msg;
-	buf[0]=(char)(buf.size()-2)%256;
-	buf[1]=(char)((buf.size()-2)/256)%256;
-//	SendData(psocket,buf);
-}*/
-
-
-/*void Protocol74::sendPlayerChangeGround(Action* action){
-	std::string buf = "  ";
-	buf+=(char)0x6B;
-	ADD2BYTE(buf, action->pos1.x);
-	ADD2BYTE(buf, action->pos1.y);
-	buf+=(char)action->pos1.z;
-	//this is a stackpos but is fixed as ground is always 0x00
-	buf+=(char)0x00;
-	ADD2BYTE(buf,action->id);
-	buf[0]=(char)(buf.size()-2)%256;
-	buf[1]=(char)((buf.size()-2)/256)%256;
-//	SendData(psocket,buf);
-}
-
-  */
-
-/*
-void Protocol74::sendPlayerItemChange(Action* action){
-	std::string buf = "  ";
-	buf+=(char)(0x6B);
-	ADDPOS(buf, action->pos1);
-	buf+=(char)action->stack;//stack?
-	ADD2BYTE(buf,action->id);
-	ADD1BYTE(buf,action->count);
-	buf[0]=(char)(buf.size()-2)%256;
-	buf[1]=(char)((buf.size()-2)/256)%256;
-//	SendData(psocket,buf);
-}
-*/
-
-
 bool Protocol74::CanSee(int x, int y, int z) const
 {
 #ifdef __DEBUG__
@@ -1413,6 +1300,13 @@ bool Protocol74::CanSee(int x, int y, int z) const
   return false;
 }
 
+bool Protocol74::CanSee(const Creature *c) const
+{
+	if(c->isRemoved == true)
+		return false;
+	
+	return CanSee(c->pos.x, c->pos.y, c->pos.z);
+}
 
 void Protocol74::sendNetworkMessage(NetworkMessage *msg)
 {
@@ -2064,6 +1958,9 @@ void Protocol74::sendThingMove(const Creature *creature, const Thing *thing,
 	NetworkMessage msg;
 	
 	const Creature* c = dynamic_cast<const Creature*>(thing);
+	if(c && c->isRemoved)
+		return;
+	
 	if (!tele && c && (CanSee(oldPos->x, oldPos->y, oldPos->z)) && (CanSee(thing->pos.x, thing->pos.y, thing->pos.z)))
 	{
 		msg.AddByte(0x6D);
@@ -2085,7 +1982,7 @@ void Protocol74::sendThingMove(const Creature *creature, const Thing *thing,
 	{
 		if (!tele && CanSee(oldPos->x, oldPos->y, oldPos->z))
 		{
-			AddRemoveThing(msg,*oldPos,oldStackPos);      
+			AddRemoveThing(msg,*oldPos,oldStackPos);
 		}
 		
 		if (!(tele && thing == this->player) && CanSee(thing->pos.x, thing->pos.y, thing->pos.z))
@@ -2202,7 +2099,8 @@ void Protocol74::autoCloseContainers(const Container *container, NetworkMessage 
 
 void Protocol74::sendCreatureTurn(const Creature *creature, unsigned char stackPos)
 {
-  if (CanSee(creature->pos.x, creature->pos.y, creature->pos.z))
+  //if (CanSee(creature->pos.x, creature->pos.y, creature->pos.z))
+  if (CanSee(creature))
   {
     NetworkMessage msg;
 
@@ -2277,20 +2175,24 @@ void Protocol74::sendCancelWalk()
 
 void Protocol74::sendThingDisappear(const Thing *thing, unsigned char stackPos, bool tele)
 {
+	NetworkMessage msg;
+	const Creature* creature = dynamic_cast<const Creature*>(thing);
 	//Auto-close trade
 	if(player->getTradeItem() && dynamic_cast<const Item*>(thing) == player->getTradeItem()) {
 		game->playerCloseTrade(player);
 	}
-
-	NetworkMessage msg;
-	const Creature* creature = dynamic_cast<const Creature*>(thing);
+	
+	if(creature && creature->isRemoved)
+		return;
+	
 	if(!tele) {		
 		if(creature && creature->health > 0){
 			const Player* remove_player = dynamic_cast<const Player*>(creature);
 			if(remove_player == player)
 				return;
 
-			if(CanSee(creature->pos.x, creature->pos.y, creature->pos.z)){    	
+			//if(CanSee(creature->pos.x, creature->pos.y, creature->pos.z)){
+			if(CanSee(creature)){
     			AddMagicEffect(msg,thing->pos, NM_ME_PUFF);
 			}
 		}
@@ -2383,7 +2285,8 @@ void Protocol74::sendThingAppear(const Thing *thing){
 			flushOutputBuffer();
 			return;
 		}
-		else if(CanSee(creature->pos.x, creature->pos.y, creature->pos.z)){
+		//else if(CanSee(creature->pos.x, creature->pos.y, creature->pos.z)){
+		else if(CanSee(creature)){
 			bool known;
 			unsigned long removedKnown;
 			checkCreatureAsKnown(creature->getID(), known, removedKnown);

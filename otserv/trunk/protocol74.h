@@ -190,6 +190,7 @@ private:
 	//virtual void sendCancelAutoWalking(Direction lastdir);
 	
   virtual bool CanSee(int x, int y, int z) const;
+  virtual bool CanSee(const Creature*) const;
   virtual void logout();
   
   void flushOutputBuffer();

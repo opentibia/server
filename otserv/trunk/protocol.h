@@ -43,6 +43,7 @@ public:
 	unsigned long getIP() const;
 
   virtual bool CanSee(int x, int y, int z) const = 0;
+  virtual bool CanSee(const Creature*) const = 0;
   virtual void sendNetworkMessage(NetworkMessage *msg) = 0;
 
   //container to container
