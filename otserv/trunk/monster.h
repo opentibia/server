@@ -225,8 +225,11 @@ protected:
 	virtual subfight_t getSubFightType()  {return curPhysicalAttack->disttype;}
 	virtual int getWeaponDamage() const;
 
-	void OnCreatureEnter(const Creature *creature, bool canReach = true);
-	void OnCreatureLeave(const Creature *creature);
+	void onCreatureEnter(const Creature *creature, bool canReach = true);
+	void onCreatureLeave(const Creature *creature);
+	void onCreatureMove(const Creature *creature, const Position *oldPos);
+
+	void selectTarget(const Creature* creature, bool canReach /* = true*/);
 	bool validateDistanceAttack(const Creature *creature);
 	bool validateDistanceAttack(const Position &pos);
 	bool monsterMoveItem(Item* item, int radius);
