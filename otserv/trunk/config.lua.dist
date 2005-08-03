@@ -12,7 +12,7 @@ mapfile = "data/world/map.otx"
 
 -- loginmsg
 -- the message the player gets when he logs in
-loginmsg = "Welcome to OTServ. For help visit tibia.de/forum"
+loginmsg = "Welcome to OTServ. For help visit http://www.otfans.net"
 
 -- port
 -- the port otserv listens on
