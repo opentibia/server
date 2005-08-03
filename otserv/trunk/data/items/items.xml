@@ -33,11 +33,11 @@
 <item id="3134" name="human skeleton" weight="600" />
 
 <item id="468" name="" decayto="0" weight="0" />
-<item id="469" name="hole" decayto="468" decaytime="20" weight="0" />
+<item id="469" name="hole" decayto="468" decaytime="20" weight="0" floorchange="1"/>
 <item id="481" name="" decayto="0" weight="0" />
-<item id="482" name="hole" decayto="481" decaytime="20" weight="0" />
+<item id="482" name="hole" decayto="481" decaytime="20" weight="0" floorchange="1"/>
 <item id="483" name="" decayto="0" weight="0" />
-<item id="484" name="hole" decayto="483" decaytime="20" weight="0" />
+<item id="484" name="hole" decayto="483" decaytime="20" weight="0" floorchange="1"/>
 
 <!--fluid containers-->
 <item id="2006" name="vial" weight="1.8" />
@@ -62,6 +62,27 @@
 <item id="10" name="lifefluid" weight="0"/>
 <item id="11" name="oil" weight="0"/>
 <item id="15" name="wine" weight="0"/>
+
+<!--level changeable items-->
+<item id="1396" name="" weight="0" floorchangenorth="1"/>
+<item id="1385" name="" weight="0" floorchangenorth="1"/>
+<item id="1394" name="" weight="0" floorchangenorth="1"/>
+<item id="1404" name="" weight="0" floorchangenorth="1"/>
+<item id="1392" name="" weight="0" floorchangesouth="1"/>
+<item id="1402" name="" weight="0" floorchangesouth="1"/>
+<item id="1388" name="" weight="0" floorchangeeast="1"/>
+<item id="1398" name="" weight="0" floorchangeeast="1"/>
+<item id="1390" name="" weight="0" floorchangewest="1"/>
+<item id="1400" name="" weight="0" floorchangewest="1"/>
+
+<item id="1559" name="" weight="0" floorchangesouth="1" floorchangewest="1"/>
+<item id="1557" name="" weight="0" floorchangesouth="1" floorchangewest="1"/>
+<item id="1553" name="" weight="0" floorchangenorth="1" floorchangeeast="1"/>
+<item id="1555" name="" weight="0" floorchangenorth="1" floorchangeeast="1"/>
+
+<item id="411" name="" weight="0" floorchange="1"/>
+<item id="383" name="" weight="0" floorchange="1"/>
+<item id="479" name="" weight="0" floorchange="1"/>
 
 <!--runes-->
 <item id="2273" name="adura vita" type="rune" maglevel="8" weight="0.1" />

@@ -794,7 +794,6 @@ bool Game::onPrepareMoveThing(Creature *creature, const Thing* thing,
 	else if(player && (!toTile || !thing->canMovedTo(toTile)) ) {
 		player->sendTextMessage(MSG_SMALLINFO, "Sorry, not possible.");
 		player->sendCancelWalk();
-
 		//player->sendCancelWalk("Sorry, not possible.");
 		return false;
 	}
@@ -802,7 +801,12 @@ bool Game::onPrepareMoveThing(Creature *creature, const Thing* thing,
 		creature->sendCancel("Sorry, not possible.");
 		return false;
 	}
-
+    else if(player && toTile && !toTile->ground) {
+		player->sendTextMessage(MSG_SMALLINFO, "Sorry, not possible.");
+		player->sendCancelWalk();
+		return false;
+	}
+	
 	if (fromTile && fromTile->splash == thing && fromTile->splash->isNotMoveable()) {
 			creature->sendCancel("You cannot move this object.");
 #ifdef __DEBUG__
@@ -1980,7 +1984,7 @@ void Game::thingMoveInternal(Creature *creature, unsigned short from_x, unsigned
 
 	if(item && (item->getID() != itemid || item != fromTile->getTopDownItem()))
 		return;
-	
+		                 
 	// *** If the destiny is a teleport item, teleport the thing
 		
 	const Teleport *teleportitem = toTile->getTeleportItem();
@@ -2048,9 +2052,9 @@ void Game::thingMoveInternal(Creature *creature, unsigned short from_x, unsigned
 
 			//change level begin
 			if(toTile->ground && !(toTile->ground->noFloorChange()))
-			{          
+			{       
 				Tile* downTile = getTile(to_x, to_y, to_z+1);
-				if(downTile){
+				if(downTile){        
 					//diagonal begin
 					if(downTile->floorChange(NORTH) && downTile->floorChange(EAST)){
 						teleport(playerMoving, Position(playerMoving->pos.x-1, playerMoving->pos.y+1, playerMoving->pos.z+1));
@@ -2084,6 +2088,10 @@ void Game::thingMoveInternal(Creature *creature, unsigned short from_x, unsigned
 					else if(downTile->floorChange(WEST)){
 						teleport(playerMoving, Position(playerMoving->pos.x+1, playerMoving->pos.y, playerMoving->pos.z+1));
 						//teleport(thing, Position(from_x+1, from_y, from_z+1));
+					}
+					else { //allow just real tiles to be hole'like
+                        // TODO: later can be changed to check for piled items like chairs, boxes
+						teleport(playerMoving, Position(playerMoving->pos.x, playerMoving->pos.y, playerMoving->pos.z+1));
 					}
 				}
 			}

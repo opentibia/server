@@ -133,7 +133,7 @@ int Items::loadFromDat(std::string file)
 		int lastoptbyte = 0;
 #endif
 		//TODO: some other way of finding levelchange items
-        if(iType->id == 1396 || iType->id ==1385 || iType->id ==1394 || iType->id ==1404){
+        /*if(iType->id == 1396 || iType->id ==1385 || iType->id ==1394 || iType->id ==1404){
 			iType->floorChangeNorth = true;
         }
         if(iType->id == 1392|| iType->id ==1402){
@@ -162,7 +162,7 @@ int Items::loadFromDat(std::string file)
         if(iType->id == 1555){
             iType->floorChangeNorth = true;
             iType->floorChangeEast = true;
-		}                                       
+		}*/                                       
 		
 		// read the options until we find a 0xff
 		int optbyte;	
@@ -250,7 +250,7 @@ int Items::loadFromDat(std::string file)
         case 0x06: // ladder up (id 1386)   why a group for just 1 item ???   
 					break;
         case 0x09: //can contain fluids
-        	iType->fluidcontainer = true;
+        	        iType->fluidcontainer = true;
 					break;
         case 0x0D: // blocks missiles (walls, magic wall etc)
 					iType->blockingProjectile = true;
@@ -259,13 +259,13 @@ int Items::loadFromDat(std::string file)
         case 0x0E: // blocks monster movement (flowers, parcels etc)
 					break;
         case 0x11: // can see what is under (ladder holes, stairs holes etc)
-            break;
+                    break;
         case 0x12: // ground tiles that don't cause level change
 					iType->noFloorChange = true;
 					break;
         case 0x18: // cropses that don't decay
 					break;
-        /*case 0x19: //(removed in 7.4) monster has animation even when iddle (rot, wasp, slime, fe)
+        /*case 0x19: //(changed to 0x1C in 7.4) monster has animation even when iddle (rot, wasp, slime, fe)
             break;*/
         case 0x14: // player color templates
 					break;
@@ -350,7 +350,7 @@ int Items::loadFromDat(std::string file)
 						break;
 					case 0x55: //trash
 						break;
-					case 0x56: //hole
+					case 0x56: //hole 	
 						break;
 					case 0x57: //items with special description?
 						break;					
@@ -371,7 +371,7 @@ int Items::loadFromDat(std::string file)
 					break;    
 				case 0x17:  // seems like decorables with 4 states of turning (exception first 4 are unique statues)                 
 					break;
-				case 0x1C:  // ?? ...                 
+				case 0x1C:  // monster has animation even when iddle (rot, wasp, slime, fe)                 
 					break;        
                         
 				default:
@@ -479,7 +479,37 @@ int Items::loadXMLInfos(std::string file)
 						itemtype->blockingProjectile = true;
 						xmlFreeOTSERV(blockingProjectile);
 					}
-
+					
+                    char* floorChange = (char*)xmlGetProp(p, (xmlChar*)"floorchange");
+					if(floorChange){
+						itemtype->noFloorChange = false;
+						xmlFreeOTSERV(floorChange);
+					}
+					
+					char* floorChangeNorth = (char*)xmlGetProp(p, (xmlChar*)"floorchangenorth");
+					if(floorChangeNorth){
+						itemtype->floorChangeNorth = true;
+						xmlFreeOTSERV(floorChangeNorth);
+					}
+					
+					char* floorChangeSouth = (char*)xmlGetProp(p, (xmlChar*)"floorchangesouth");
+					if(floorChangeSouth){
+						itemtype->floorChangeSouth = true;
+						xmlFreeOTSERV(floorChangeSouth);
+					}
+					
+					char* floorChangeEast = (char*)xmlGetProp(p, (xmlChar*)"floorchangeeast");
+					if(floorChangeEast){
+						itemtype->floorChangeEast = true;
+						xmlFreeOTSERV(floorChangeEast);
+					}
+					
+					char* floorChangeWest = (char*)xmlGetProp(p, (xmlChar*)"floorchangewest");
+					if(floorChangeWest){
+						itemtype->floorChangeWest = true;
+						xmlFreeOTSERV(floorChangeWest);
+					}
+					
 					char* damage = (char*)xmlGetProp(p, (xmlChar*)"damage");
 					if(damage){
 						itemtype->damage = atoi(damage);
