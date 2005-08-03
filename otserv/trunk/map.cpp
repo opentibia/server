@@ -71,17 +71,6 @@ spawnfile(""),
 mapwidth(0),
 mapheight(0)
 {
-/*	//first we fill the map with
-  for(int y = 0; y < MAP_HEIGHT; y++)
-  {
-    for(int x = 0; x < MAP_WIDTH; x++)
-    {
-      //				setTile(x,y,7,102);
-    }
-  }
-*/
-
-  //OTSYS_THREAD_LOCKVARINIT(mapLock);
 }
 
 

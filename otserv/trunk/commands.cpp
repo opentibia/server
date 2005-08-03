@@ -519,8 +519,8 @@ bool Commands::onlineList(Creature* c, const std::string &cmd, const std::string
 		if((*it).second->access >= alevelmin && (*it).second->access <= alevelmax){
 			players << (*it).second->getName() << "   " << 
 				(*it).second->getPlayerInfo(PLAYERINFO_LEVEL) << std::endl;
+			i++;
 		}
-		i++;
 		if(i % 10 == 0){
 			player->sendTextMessage(MSG_BLUE_TEXT,players.str().c_str());
 			players.str("");
