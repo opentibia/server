@@ -239,13 +239,7 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 	}
 	//Remove player?
 	if(attackedCreature->health <= 0 && attackedCreature->isRemoved == false) {
-		unsigned char stackpos = tile->getThingStackPos(attackedCreature);
-		/*//Remove character
-		unsigned char stackpos = tile->getCreatureStackPos(attackedCreature);
-		
-		game->sendRemoveThing(NULL,attackedCreature->pos,attackedCreature,stackpos);
-		tile->removeThing(attackedCreature);*/
-		
+		unsigned char stackpos = tile->getThingStackPos(attackedCreature);		
 		//Prepare body
 		Item *corpseitem = Item::CreateItem(attackedCreature->getLookCorpse());
 		corpseitem->pos = CreaturePos;
@@ -393,22 +387,6 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 	}
 }
 
-/*
-void GameState::removeCreature(Creature *creature, unsigned char stackPos)
-{
-	//Player *deadplayer = dynamic_cast<Player*>(creature);
-	//if(deadplayer == NULL) //remove from online list if it is not a player
-	//	game->playersOnline.erase(game->playersOnline.find(creature->getID()));
-
-	//distribute the change to all non-players that a character has been removed
-	for(unsigned int i = 0; i < spectatorlist.size(); ++i) {
-		Player *player = dynamic_cast<Player*>(spectatorlist[i]);
-		if(!player) {			
-			spectatorlist[i]->onCreatureDisappear(creature, stackPos);
-		}
-	}
-}
-*/
 
 void GameState::getChanges(Player *spectator)
 {
@@ -565,8 +543,6 @@ unsigned long Game::addEvent(SchedulerTask* event) {
 }
 
 bool Game::stopEvent(unsigned long eventid) {
-	//return false;
-
 	if(eventid == 0)
 		return false;
 
@@ -893,17 +869,15 @@ bool Game::onPrepareMoveThing(Player *player, const Item* fromItem, const Contai
 	const Container *toContainer, const Item *toItem, int count)
 {	
 	if(!fromItem->isPickupable()) {		
-		player->sendCancel("Sorry, not possible.");
+		player->sendCancel("You cannot move this object.");
 		return false;
 	}
 	else {		
-		double itemWeight = (fromItem->isStackable() ? Item::items[fromItem->getID()].weight * std::max(1, count) : fromItem->getWeight());
-		if((!fromContainer || !player->isHoldingContainer(fromContainer)) && player->isHoldingContainer(toContainer)) {
-			if(player->access == 0 && player->getFreeCapacity() < itemWeight) {
-				player->sendCancel("This object is too heavy.");
-				return false;
-			}
+		if((!fromItem->isStackable() || !toItem || fromItem->getID() != toItem->getID() || toItem->getItemCountOrSubtype() >= 100) && toContainer->size() + 1 > toContainer->capacity()) {		
+			player->sendCancel("Sorry not enough room.");
+			return false;
 		}
+
 		const Container *itemContainer = dynamic_cast<const Container*>(fromItem);
 		if(itemContainer) {
 			if(itemContainer->isHoldingItem(toContainer) || (toContainer == itemContainer) || (fromContainer && fromContainer == itemContainer)) {
@@ -911,10 +885,13 @@ bool Game::onPrepareMoveThing(Player *player, const Item* fromItem, const Contai
 				return false;
 			}
 		}
-		
-		if((!fromItem->isStackable() || !toItem || fromItem->getID() != toItem->getID() || toItem->getItemCountOrSubtype() >= 100) && toContainer->size() + 1 > toContainer->capacity()) {		
-			player->sendCancel("Sorry not enough room.");
-			return false;
+
+		double itemWeight = (fromItem->isStackable() ? Item::items[fromItem->getID()].weight * std::max(1, count) : fromItem->getWeight());
+		if((!fromContainer || !player->isHoldingContainer(fromContainer)) && player->isHoldingContainer(toContainer)) {
+			if(player->access == 0 && player->getFreeCapacity() < itemWeight) {
+				player->sendCancel("This object is too heavy.");
+				return false;
+			}
 		}
 		
 		Container const *topContainer = toContainer->getTopParent();
@@ -1023,15 +1000,15 @@ bool Game::onPrepareMoveThing(Player *player, slots_t fromSlot, const Item *from
 bool Game::onPrepareMoveThing(Player *player, const Container *fromContainer, const Item *fromItem,
 	slots_t toSlot, const Item *toItem, int count)
 {
+	if(toItem && (!toItem->isStackable() || toItem->getID() != fromItem->getID())) {
+		player->sendCancel("Sorry, not enough room.");
+		return false;
+	}
+
 	double itemWeight = (fromItem->isStackable() ? Item::items[fromItem->getID()].weight * std::max(1, count) : fromItem->getWeight());
 	if(player->access == 0 && !player->isHoldingContainer(fromContainer) &&
 		player->getFreeCapacity() < itemWeight) {
 		player->sendCancel("This object is too heavy.");
-		return false;
-	}
-
-	if(toItem && (!toItem->isStackable() || toItem->getID() != fromItem->getID())) {
-		player->sendCancel("Sorry, not enough room.");
 		return false;
 	}
 
@@ -2210,11 +2187,6 @@ void Game::creatureTurn(Creature *creature, Direction dir)
    //OTSYS_THREAD_UNLOCK(gameLock)
 }
 
-void BanIPAddress(std::pair<unsigned long, unsigned long>& IpNetMask)
-{
-	bannedIPs.push_back(IpNetMask);
-}
-
 void Game::addCommandTag(std::string tag){
 	bool found = false;
 	for(int i=0;i< commandTags.size() ;i++){
@@ -2458,12 +2430,6 @@ void Game::creatureToChannel(Creature *creature, SpeakClasses type, const std::s
 	//OTSYS_THREAD_UNLOCK(gameLock)
 }
 
-/*
-void creatureMakeMagic::creatureAddDamageAnimation(Player* spectator, const CreatureState& creatureState, NetworkMessage& msg)
-{
-	//
-}
-*/
 
 /** \todo Someone _PLEASE_ clean up this mess */
 bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, const MagicEffectClass* me)
@@ -3195,8 +3161,8 @@ void Game::changeOutfitAfter(unsigned long id, int looktype, long time){
 
 void Game::changeSpeed(unsigned long id, unsigned short speed)
 {
-    //OTSYS_THREAD_LOCK(gameLock) 
-    OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
+	//OTSYS_THREAD_LOCK(gameLock) 
+  OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
 	Creature *creature = getCreatureByID(id);
 	if(creature && creature->hasteTicks < 1000 && creature->speed != speed)
 	{
@@ -3274,132 +3240,6 @@ void Game::checkCreatureAttacking(unsigned long id)
 	//OTSYS_THREAD_UNLOCK(gameLock)
 }
 
-//void Game::decayItem(Position& pos, unsigned short id, unsigned char stackpos)
-/*void Game::decayItem(Item *item)
-{
-	OTSYS_THREAD_LOCK(gameLock)
-
-	/*todo: Decaying item could be in a  container carried by a player,
-		should all items have a pointer to their parent (like containers)?*/
-	/*if(item && item->pos.x != 0xFFFF) {
-		Tile *tile = getTile(item->pos.x, item->pos.y, item->pos.z);
-		//MapState mapstate(this->map);
-		Position pos;
-		
-		MagicEffectItem* magicItem = dynamic_cast<MagicEffectItem*>(item);
-
-		if(magicItem) {
-			pos = magicItem->pos;
-			int stackpos = tile->getThingStackPos(magicItem);
-			if(magicItem->transform()) {
-				//mapstate.replaceThing(tile, magicItem, magicItem);				
-				sendUpdateThing(NULL,pos,magicItem,stackpos);
-				//addEvent(makeTask(magicItem->getDecayTime(), boost::bind(&Game::decayItem, this, magicItem->pos, magicItem->getID(), tile->getThingStackPos(magicItem)) ) );
-				addEvent(makeTask(magicItem->getDecayTime(), std::bind2nd(std::mem_fun(&Game::decayItem), magicItem)));
-			}
-			else {
-				sendRemoveThing(NULL,pos,magicItem,stackpos);
-				removeThing(NULL,pos,magicItem);
-				//mapstate.removeThing(tile, item);
-				//tile->removeThing(magicItem);	
-				//delete magicItem;
-				FreeThing(magicItem);
-			}			
-			//creatureBroadcastTileUpdated(pos);
-		}
-		else {
-			Item* newitem = item->tranform();
-
-			pos = item->pos;
-			int stackpos = tile->getThingStackPos(item);
-			
-			if (newitem == NULL /*decayTo == 0*//*) {
-				sendRemoveThing(NULL,pos,item,stackpos,true);
-				removeThing(NULL,pos,item);
-				//mapstate.removeThing(tile, item);
-				//t->removeThing(item);
-			}
-			else {
-				//mapstate.replaceThing(tile, item, newitem);
-				tile->removeThing(item);
-				//autoclose.
-				if(dynamic_cast<Container*>(item)){
-					std::vector<Creature*> list;
-					getSpectators(Range(pos, true), list);			
-					for(unsigned int i = 0; i < list.size(); ++i) {
-						Player *spectator = dynamic_cast<Player*>(list[i]);
-						if(spectator)
-							spectator->onThingRemove(item);
-					}
-				}
-				
-				tile->insertThing(newitem, stackpos);
-				sendUpdateThing(NULL,pos,newitem,stackpos);
-				
-				//unsigned short decayTime = Item::items[newitem->getID()].decayTime;
-				addEvent(makeTask(newitem->getDecayTime(), std::bind2nd(std::mem_fun(&Game::decayItem), newitem)));
-				//mapstate.refreshThing(tile, item);
-			}
-			FreeThing(item);
-			//delete item;
-		}
-		/*std::vector<Creature*> list;
-		getSpectators(Range(pos, true), list);
-			
-		for(unsigned int i = 0; i < list.size(); ++i) {
-			Player *spectator = dynamic_cast<Player*>(list[i]);
-			if(!spectator)
-				continue;				
-			//mapstate.getMapChanges(spectator);
-		}*/
-		/*
-		flushSendBuffers();
-	}
-
-	OTSYS_THREAD_UNLOCK(gameLock)
-}
-*/
-/*
-void Game::decaySplash(Item* item)
-{
-	OTSYS_THREAD_LOCK(gameLock)
-
-	if (item) {
-		Tile *t = getTile(item->pos.x, item->pos.y, item->pos.z);
-
-		if ((t) && (t->decaySplashAfter <= OTSYS_TIME()))
-		{
-			unsigned short decayTo   = Item::items[item->getID()].decayTo;
-			unsigned short decayTime = Item::items[item->getID()].decayTime;
-			int stackpos = t->getThingStackPos(item);
-
-			if (decayTo == 0)
-			{				
-				t->splash = NULL;
-				sendRemoveThing(NULL,item->pos,item,stackpos);
-				FreeThing(item);				
-			}
-			else
-			{
-				item->setID(decayTo);
-				t->decaySplashAfter = OTSYS_TIME() + decayTime*1000;
-				addEvent(makeTask(decayTime*1000, std::bind2nd(std::mem_fun(&Game::decaySplash), item)));
-				sendUpdateThing(NULL,item->pos,item,stackpos);
-			}
-			
-			//creatureBroadcastTileUpdated(item->pos);
-
-			/*if (decayTo == 0)
-				FreeThing(item);
-				//delete item;*//*
-		}
-	}
-  
-	flushSendBuffers();
-	
-	OTSYS_THREAD_UNLOCK(gameLock)
-}
-*/
 void Game::checkDecay(int t){
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
 	addEvent(makeTask(DECAY_INTERVAL, boost::bind(&Game::checkDecay,this,DECAY_INTERVAL)));
@@ -3600,7 +3440,11 @@ bool Game::creatureSaySpell(Creature *creature, const std::string &text)
 void Game::playerAutoWalk(Player* player, std::list<Direction>& path)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
+
 	stopEvent(player->eventAutoWalk);
+
+	if(player->isRemoved)
+		return;
 
 	player->pathlist = path;
 	int ticks = (int)player->getSleepTicks();
@@ -3621,8 +3465,11 @@ void Game::playerAutoWalk(Player* player, std::list<Direction>& path)
 bool Game::playerUseItemEx(Player *player, const Position& posFrom,const unsigned char  stack_from,
 		const Position &posTo,const unsigned char stack_to, const unsigned short itemid)
 {
-	//OTSYS_THREAD_LOCK(gameLock)
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
+
+	if(player->isRemoved)
+		return false;
+
 	bool ret = false;
 
 	Position thingpos = getThingMapPos(player, posFrom);
@@ -3672,6 +3519,9 @@ bool Game::playerUseItemEx(Player *player, const Position& posFrom,const unsigne
 bool Game::playerUseItem(Player *player, const Position& pos, const unsigned char stackpos, const unsigned short itemid, unsigned char index)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
+
+	if(player->isRemoved)
+		return false;
 	actions.UseItem(player,pos,stackpos,itemid,index);
 	return true;
 }
@@ -3680,6 +3530,9 @@ void Game::playerRequestTrade(Player *player, const Position& pos,
 	const unsigned char stackpos, const unsigned short itemid, unsigned long playerid)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
+
+	if(player->isRemoved)
+		return;
 
 	Player *tradePartner = dynamic_cast<Player*>(getCreatureByID(playerid));
 	if(!tradePartner || tradePartner == player) {
@@ -3759,6 +3612,9 @@ void Game::playerAcceptTrade(Player* player)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
 	
+	if(player->isRemoved)
+		return;
+
 	player->setAcceptTrade(true);
 	Player *tradePartner = dynamic_cast<Player*>(getCreatureByID(player->tradePartner));
 	if(tradePartner && tradePartner->getAcceptTrade()) {
@@ -3931,6 +3787,9 @@ void Game::playerSetAttackedCreature(Player* player, unsigned long creatureid)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock);
 		
+	if(player->isRemoved)
+		return;
+
 	if(player->attackedCreature != 0 && creatureid == 0) {
 		player->sendCancelAttacking();
 	}
@@ -4247,17 +4106,6 @@ void Game::addThing(Player* player,const Position &pos,Thing* thing)
 					tile->splash = item;
 
 					sendUpdateThing(NULL, pos, item, oldstackpos);
-
-					/*
-					unsigned char stackpos = tile->getThingStackPos(tile->splash);
-					Item *oldsplash = tile->splash;
-					tile->splash = NULL;
-					sendRemoveThing(NULL,pos,oldsplash,stackpos);
-					tile->splash = item;
-					sendAddThing(NULL,pos,tile->splash);
-					oldsplash->isRemoved = true;
-					FreeThing(oldsplash);
-					*/
 				}
 				else{
 					tile->splash = item;
