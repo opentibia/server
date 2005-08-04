@@ -159,8 +159,7 @@ void Map::setTile(unsigned short _x, unsigned short _y, unsigned char _z, unsign
 bool Map::placeCreature(Position &pos, Creature* c)
 {
 	Tile* tile = getTile(pos.x, pos.y, pos.z);
-	bool success = tile && c->canMovedTo(tile);
-	//bool success = tile!=NULL;
+	bool success = tile && !tile->floorChange() && c->canMovedTo(tile);
 	if(!success)
 	{   
 		for(int cx =pos.x - 1; cx <= pos.x + 1 && !success; cx++) {
@@ -170,7 +169,7 @@ bool Map::placeCreature(Position &pos, Creature* c)
 #endif
 
 				tile = getTile(cx, cy, pos.z);
-				success = tile && c->canMovedTo(tile);
+				success = tile && !tile->floorChange() && c->canMovedTo(tile);
 
 				if(success) {
 					pos.x = cx;
@@ -187,7 +186,7 @@ bool Map::placeCreature(Position &pos, Creature* c)
 				pos.z = c->masterPos.z;
 
 				tile = getTile(pos.x, pos.y, pos.z);
-				success = tile && player->canMovedTo(tile);
+				success = tile && !tile->floorChange() && player->canMovedTo(tile);
 			}
 		}    
 
