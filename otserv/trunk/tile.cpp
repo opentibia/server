@@ -301,15 +301,6 @@ bool Tile::removeThing(Thing *thing)
       if (*it == thing)
       {
         creatures.erase(it);
-
-				EventMap::iterator it, lb, ub;
-				lb = event_map.lower_bound(EVENT_CREATURE_LEAVE);
-				ub = event_map.upper_bound(EVENT_CREATURE_LEAVE);
-
-				for(it = lb; it != ub; ++it) {
-					(*it).second->onCreatureLeave(creature, creature->pos);
-				}
-
         return true;
       }
   }
@@ -340,27 +331,15 @@ bool Tile::removeThing(Thing *thing)
     else
     {
       for (it = downItems.begin(); it != downItems.end(); ++it)
-        if (*it == item)
-        {
-          downItems.erase(it);
-					ret = true;
-					break;
-        }
-		}
+        	if (*it == item)
+        	{
+          		downItems.erase(it);
+				ret = true;
+				break;
+        	}
+	}
 
-		/*
-		if(ret) {
-			EventMap::iterator it, lb, ub;
-			lb = event_map.lower_bound(EVENT_ITEM_REMOVE);
-			ub = event_map.upper_bound(EVENT_ITEM_REMOVE);
-
-			for(it = lb; it != ub; ++it) {
-				(*it).second->onItemRemove(creature);
-			}
-		}
-		*/
-
-		return ret;
+	return ret;
   }
 
   return false;
@@ -484,14 +463,6 @@ void Tile::addThing(Thing *thing) {
 	Creature* creature = dynamic_cast<Creature*>(thing);
 	if (creature) {
     	creatures.insert(creatures.begin(), creature);
-
-		EventMap::iterator it, lb, ub;
-		lb = event_map.lower_bound(EVENT_CREATURE_ENTER);
-		ub = event_map.upper_bound(EVENT_CREATURE_ENTER);
-
-		for(it = lb; it != ub; ++it) {
-			(*it).second->onCreatureEnter(creature, creature->pos);
-		}
   }
   else
   {
@@ -520,16 +491,7 @@ void Tile::addThing(Thing *thing) {
     {
       downItems.insert(downItems.begin(), item);
     }
-		/*
-		EventMap::iterator it, lb, ub;
-		lb = event_map.lower_bound(EVENT_ITEM_ADD);
-		ub = event_map.upper_bound(EVENT_ITEM_ADD);
-
-		for(it = lb; it != ub; ++it) {
-			(*it).second->onAddItem(creature);
-		}
-		*/
-	}
+  }
 }
 
 bool Tile::isPz() const

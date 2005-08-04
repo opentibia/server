@@ -41,7 +41,6 @@
 
 #include "luascript.h"
 
-//#include "tasks.h"
 #include "otsystem.h"
 #include "actions.h"
 #include "game.h"

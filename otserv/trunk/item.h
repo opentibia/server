@@ -29,8 +29,6 @@
 #include <list>
 #include <vector>
 
-#include "texcept.h"
-
 #include "thing.h"
 #include "items.h"
 
@@ -87,9 +85,6 @@ public:
 	bool floorChangeEast() const;
 	bool floorChangeWest() const;
 
-	int use(){std::cout << "use " << id << std::endl; return 0;};
-	int use(Item*){std::cout << "use with item ptr " << id << std::endl; return 0;};
-	int use(Creature*){std::cout << "use with creature ptr " << id << std::endl; return 0;};
 	std::string getDescription(bool fullDescription) const;
 	std::string getName() const ;
 	void setSpecialDescription(std::string desc);

@@ -33,7 +33,6 @@ using namespace std;
 #include "protocol.h"
 #include "player.h"
 #include "luascript.h"
-#include "networkmessage.h"
 
 extern LuaScript g_config;
 extern Game g_game;
@@ -43,40 +42,39 @@ AutoList<Player> Player::listPlayer;
 Player::Player(const std::string& name, Protocol *p) :
  Creature(name)
 {	
-  client     = p;
-  client->setPlayer(this);
+	client     = p;
+	client->setPlayer(this);
 	looktype   = PLAYER_MALE_1;
 	vocation   = VOCATION_NONE;
-  //cap      = 300;
 	capacity = 300.00;
-  mana       = 0;
-  manamax    = 0;
-  manaspent  = 0;
-  this->name = name;
-  food       = 0;
+	mana       = 0;
+	manamax    = 0;
+	manaspent  = 0;
+	this->name = name;
+	food       = 0;
 
 	eventAutoWalk = 0;
 	level      = 1;
-  experience = 180;
+	experience = 180;
 
-  maglevel   = 20;
+	maglevel   = 20;
 
-  access     = 0;
-  lastlogin  = 0;
-  lastLoginSaved = 0;
-  SendBuffer = false;
-  npings = 0;
-  internal_ping = 0;
-  fightMode = followMode = 0;
+  	access     = 0;
+  	lastlogin  = 0;
+  	lastLoginSaved = 0;
+  	SendBuffer = false;
+  	npings = 0;
+  	internal_ping = 0;
+  	fightMode = followMode = 0;
 
 	tradePartner = 0;
 	acceptTrade = false;
 	tradeItem = NULL;
 
-  for(int i = 0; i < 7; i++)
-  {
-    skills[i][SKILL_LEVEL] = 1;
-    skills[i][SKILL_TRIES] = 0;
+  	for(int i = 0; i < 7; i++)
+  	{
+    	skills[i][SKILL_LEVEL] = 1;
+    	skills[i][SKILL_TRIES] = 0;
 		skills[i][SKILL_PERCENT] = 0;
 		
 		for(int j = 0; j < 2; j++){
@@ -84,7 +82,7 @@ Player::Player(const std::string& name, Protocol *p) :
 			SkillAdvanceCache[i][j].vocation = VOCATION_NONE;
 			SkillAdvanceCache[i][j].tries = 0;
 		}
-  }
+  	}
 
 	lastSentStats.health = 0;
 	lastSentStats.healthmax = 0;
@@ -104,28 +102,27 @@ Player::Player(const std::string& name, Protocol *p) :
 	for(int i = 0; i < 11; i++)
 		items[i] = NULL;
 
-  useCount = 0;
+  	useCount = 0;
   
   
-  CapGain[0]  = 10;     //for level advances
-  CapGain[1]  = 10;     //e.g. Sorcerers will get 10 Cap with each level up
-  CapGain[2]  = 10;     
-  CapGain[3]  = 20;
-  CapGain[4]  = 25;
+  	CapGain[0]  = 10;     //for level advances
+  	CapGain[1]  = 10;     //e.g. Sorcerers will get 10 Cap with each level up
+  	CapGain[2]  = 10;     
+  	CapGain[3]  = 20;
+	CapGain[4]  = 25;
   
-  ManaGain[0] = 5;      //for level advances
-  ManaGain[1] = 30;
-  ManaGain[2] = 30;
-  ManaGain[3] = 15;
-  ManaGain[4] = 5;
+  	ManaGain[0] = 5;      //for level advances
+  	ManaGain[1] = 30;
+  	ManaGain[2] = 30;
+  	ManaGain[3] = 15;
+  	ManaGain[4] = 5;
   
-  
-  HPGain[0]   = 5;      //for level advances
-  HPGain[1]   = 5;
-  HPGain[2]   = 5;
-  HPGain[3]   = 10;
-  HPGain[4]   = 15;  
-  max_depot_items = 1000;
+	HPGain[0]   = 5;      //for level advances
+  	HPGain[1]   = 5;
+  	HPGain[2]   = 5;
+  	HPGain[3]   = 10;
+  	HPGain[4]   = 15;  
+  	max_depot_items = 1000;
 } 
 
 
@@ -383,19 +380,6 @@ bool Player::substractMoney(unsigned long money)
 				tmp->location = SLOT_TYPE_CONTAINER;
 				tmp->parent = container;
 				moneyMap.insert(moneymap_pair(item->getWorth(),tmp));
-				/*unsigned char slot = container->getSlotNumberByItem(item);
-				onItemRemoveContainer(container,slot);
-				container->removeItem(item);
-				if(money >=  item->getWorth()){
-					money = money - item->getWorth();
-				}
-				else{
-					substractMoneyItem(item, money);
-					money = 0;
-				}
-				item->releaseThing();
-				item = NULL;
-				continue;*/
 			}
 			Container *containerItem = dynamic_cast<Container*>(item);
 			if(containerItem){
@@ -475,11 +459,6 @@ bool Player::substractMoneyItem(Item *item, unsigned long money)
 	
 	return true;
 }
-/*
-void Player::speak(const std::string &text)
-{
-}
-*/
 
 void Player::sendIcons()
 {
@@ -593,62 +572,7 @@ bool Player::addItem(Item *item, bool test /*=false*/){
 	}
 
 	return false;
-
-/*	//find an empty inventory slot
-	if(!items[SLOT_RIGHT]){
-		if(!(items[SLOT_LEFT] && (items[SLOT_LEFT]->getSlotPosition() & SLOTP_TWO_HAND))){
-			addItemInventory(item,SLOT_RIGHT);
-			return true;
-		}		
-	}
-	else if(!items[SLOT_LEFT]){
-		if(!(items[SLOT_RIGHT] && (items[SLOT_RIGHT]->getSlotPosition() & SLOTP_TWO_HAND))){
-			addItemInventory(item,SLOT_LEFT);
-			return true;
-		}
-	}
-	else if(!items[SLOT_AMMO]){
-		addItemInventory(item,SLOT_AMMO);
-		return true;
-	}
-	//find a free slot in container
-	for(int i=0; i< 11;i++){
-		Container *container = dynamic_cast<Container*>(items[i]);
-		if(container){
-			return internalAddItemContainer(container,item);
-		}
-	}	
-	return false;*/
 }
-/*
-bool Player::internalAddItemContainer(Container *container,Item* item){
-	bool isContainerHolding = false;
-	Container* itemContainer = dynamic_cast<Container*>(item);
-	if(itemContainer){
-		isContainerHolding = itemContainer->isHoldingItem(container);
-	}
-
-	//check if it is full
-	if(!isContainerHolding && container->size() < container->capacity()){
-		//add the item
-		container->addItem(item);
-		//update container
-		client->sendItemAddContainer(container,item);
-		return true;
-	}
-	else{ //look for more containers inside
-		for(ContainerList::const_iterator cit = container->getItems(); 
-			cit != container->getEnd(); ++cit){
-			Container * temp_container = dynamic_cast<Container*>(*cit);
-			if(temp_container){
-				return internalAddItemContainer(temp_container,item);				
-			}
-		}
-	}
-	return false;
-	
-}
-*/
 
 freeslot_t Player::getFreeSlot(Container **container,unsigned char &slot )
 {
@@ -1239,11 +1163,6 @@ bool Player::addDepot(Container* depot,unsigned long depotId){
 	
 	depots[depotId] = depot;
 	return true;
-}
-
-void Player::sendNetworkMessage(NetworkMessage *msg)
-{
-  client->sendNetworkMessage(msg);
 }
 
 void Player::sendCancel(const char *msg) const

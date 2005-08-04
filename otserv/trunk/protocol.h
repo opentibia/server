@@ -25,13 +25,12 @@
 
 #include "definitions.h"
 #include "game.h"
-#include "texcept.h"
 
 #include <string>
 
 #include "player.h"
 
-
+class NetworkMessage;
 // base class to represent different protokolls...
 class Protocol
 {
@@ -101,24 +100,20 @@ public:
   virtual void sendTextWindow(Item* item,const unsigned short maxlen, const bool canWrite) = 0;
   virtual void sendContainer(unsigned char index, Container *container) = 0;
   virtual void sendCloseContainer(unsigned char containerid) = 0;
-  //virtual void sendCreatureDisappear(const Creature *creature, unsigned char stackPos) = 0;
   virtual void sendThingDisappear(const Thing *thing, unsigned char stackPos, bool tele) = 0;
   virtual void sendCreatureTurn(const Creature *creature, unsigned char stackPos) = 0;
   virtual void sendCreatureSay(const Creature *creature, SpeakClasses type, const std::string &text) = 0;
   virtual void sendSetOutfit(const Creature* creature) = 0;
 	virtual void sendTileUpdated(const Position &pos) = 0;
-	//virtual void sendContainerUpdated(Item *item, unsigned char from_id, unsigned char to_id, unsigned char from_slot, unsigned char to_slot, bool remove) = 0;
   virtual void sendIcons(int icons) = 0;
   virtual void sendCancel(const char *msg) = 0;
   virtual void sendCancelWalk() = 0;
-	//virtual void sendCancelAutoWalk(Direction lastdir) = 0;
   virtual void sendStats() = 0;
   virtual void sendChangeSpeed(const Creature* creature) = 0;
   virtual void sendCancelAttacking() = 0;
   virtual void sendInventory(unsigned char sl_id) = 0;
   virtual void sendTextMessage(MessageClasses mclass, const char* message) = 0;
   virtual void sendTextMessage(MessageClasses mclass, const char* message,const Position &pos, unsigned char type) = 0;
-	//virtual void sendCancelAutoWalking(Direction lastdir) = 0;
 	long long getSleepTicks();
   virtual void sleepTillMove();
   virtual void sendChannels() = 0;

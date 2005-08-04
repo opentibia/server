@@ -125,7 +125,6 @@ public:
 	virtual bool canCast(bool isBlocking, bool hasCreature) const
 	{
 		return !isBlocking && hasCreature;
-		//return MagicEffectClass::canCast(isBlocking, hasCreature);
 	}
 };
 
@@ -249,7 +248,6 @@ public:
 
 	virtual int getDamage(Creature *target, const Creature *attacker = NULL) const;
 
-	//bool transform();
 	virtual Item* decay();
 	bool transform(const MagicEffectItem *rhs);
 	long getDecayTime();
@@ -257,8 +255,6 @@ public:
 protected:
 	int useCount;
 	void buildCondition();
-	//uint64_t decaytime;
-	//bool updateDecay;
 	TransformMap transformMap;
 	ConditionVec condition;
 };

@@ -66,7 +66,6 @@ public:
 	std::vector<Creature*> attackerlist;
 };
 
-//typedef map::map<Creature*, CreatureState> CreatureStateMap;
 typedef std::vector< std::pair<Creature*, CreatureState> > CreatureStateVec;
 typedef std::map<Tile*, CreatureStateVec> CreatureStates;
 
@@ -83,18 +82,15 @@ public:
 
 	void onAttack(Creature* attacker, const Position& pos, const MagicEffectClass* me);
 	void onAttack(Creature* attacker, const Position& pos, Creature* attackedCreature);
-	void getChanges(Player* spectator);
 	const CreatureStateVec& getCreatureStateList(Tile* tile) {return creaturestates[tile];};
 	const std::vector<Creature*>& getSpectators() {return spectatorlist;}
 
 protected:
 	void addCreatureState(Tile* tile, Creature* attackedCreature, int damage, int manaDamage, bool drawBlood);
 	void onAttackedCreature(Tile* tile, Creature* attacker, Creature* attackedCreature, int damage, bool drawBlood);
-	//void removeCreature(Creature* creature, unsigned char stackPos);
 	Game *game;
 
 	std::vector<Creature*> spectatorlist;
-	//MapState mapstate;
 	CreatureStates creaturestates;
 };
 
@@ -280,7 +276,6 @@ public:
 
 protected:
 	std::map<Item*, unsigned long> tradeItems; //list of items that are in trading state, mapped to the player
-	//std::set<Item*> tradeItems; //list of items that are in trading state
 	
 	AutoList<Creature> listCreature;
 
@@ -346,7 +341,6 @@ protected:
 	void changeOutfit(unsigned long id, int looktype);
 	bool creatureOnPrepareAttack(Creature *creature, Position pos);
 	void creatureMakeDamage(Creature *creature, Creature *attackedCreature, fight_t damagetype);
-	//void teleport(Thing *thing, Position newPos);
 
 	bool creatureMakeMagic(Creature *creature, const Position& centerpos, const MagicEffectClass* me);
 	bool creatureOnPrepareMagicAttack(Creature *creature, Position pos, const MagicEffectClass* me);
@@ -376,8 +370,6 @@ protected:
 	void checkPlayerWalk(unsigned long id);
 	void checkCreature(unsigned long id);
 	void checkCreatureAttacking(unsigned long id);
-	//void decayItem(Item *item);
-	//void decaySplash(Item* item);
 	void checkDecay(int t);
 	
 	#define DECAY_INTERVAL  10000
@@ -444,7 +436,6 @@ private:
 template<class ArgType>
 SchedulerTask* makeTask(__int64 ticks, boost::function<int(Game*, ArgType)> f1, std::list<ArgType>& call_list, __int64 interval, boost::function<bool(Game*)> f2) {
 	TCallList<ArgType> *t = new TCallList<ArgType>(f1, f2, call_list, interval);
-	//t->setEventId(0);
 	t->setTicks(ticks);
 	return t;
 }

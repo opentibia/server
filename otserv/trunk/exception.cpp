@@ -69,12 +69,10 @@ ExceptionHandler::~ExceptionHandler(){
 }
 
 bool ExceptionHandler::InstallHandler(){
-	//OTSYS_THREAD_LOCK(maploadlock);
 	#if defined WIN32 || defined __WINDOWS__
 	OTSYS_THREAD_LOCK_CLASS lockObj(maploadlock);
 	if(maploaded == false)
 		LoadMap();
-	//OTSYS_THREAD_UNLOCK(maploadlock);
 	if( installed == true)
 		return false;
 	/*
@@ -303,9 +301,7 @@ void printPointer(std::ostream* output,unsigned long p){
 
 #ifdef __GNUC__
 bool ExceptionHandler::LoadMap(){
-	//OTSYS_THREAD_LOCK(maploadlock);
 	if(maploaded == true){
-		//OTSYS_THREAD_UNLOCK(maploadlock);
 		return false;
 	}
 	installed = false;
@@ -316,7 +312,6 @@ bool ExceptionHandler::LoadMap(){
 	max_off = 0;
 	long n = 0;
     if (input.fail()){
-		//OTSYS_THREAD_UNLOCK(maploadlock);
 		std::cout << "Failed loading symbols. otserv.map not found. " << std::endl;
 		std::cout << "Go to http://otfans.net/index.php?showtopic=1716 for more info." << std::endl;
 		system("pause");
@@ -330,7 +325,6 @@ bool ExceptionHandler::LoadMap(){
 	}
      
 	if(input.eof()){
-		//OTSYS_THREAD_UNLOCK(maploadlock);
 		return false;
 	}
 	
@@ -367,7 +361,6 @@ bool ExceptionHandler::LoadMap(){
     input.close();
 	//std::cout << "Loaded " << n << " stack symbols" <<std::endl;
 	maploaded = true;
-	//OTSYS_THREAD_UNLOCK(maploadlock);
 	return true;
 }
 #else

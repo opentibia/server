@@ -35,7 +35,6 @@ Container::~Container()
 	//std::cout << "Container destructor " << this << std::endl;
 	for(ContainerList::iterator cit = lcontained.begin(); cit != lcontained.end(); ++cit)
 	{
-    	//delete (*cit);
     	Container* container = dynamic_cast<Container*>(*cit);
     	if(container)
     		container->setParent(NULL);
@@ -182,19 +181,6 @@ bool Container::isHoldingItem(const Item* item) const
 	std::list<const Container*> stack;
 	
 	ContainerList::const_iterator it;
-	/*
-	for (it = getItems(); it != getEnd(); ++it) {
-
-		if(*it == item) {
-			return true;
-		}
-
-		Container *container = dynamic_cast<Container*>(*it);
-		if(container) {
-			stack.push_back(container);
-		}
-	}
-	*/
 	stack.push_back(this);
 	while(stack.size() > 0) {
 		const Container *container = stack.front();

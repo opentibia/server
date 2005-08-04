@@ -164,7 +164,6 @@ Item::Item(const Item &i){
 Item* Item::decay()
 {
 	unsigned short decayTo   = Item::items[getID()].decayTo;
-	//unsigned short decayTime = Item::items[getID()].decayTime;
 	
 	if(decayTo == 0) {
 		return NULL;
@@ -196,23 +195,6 @@ Item* Item::decay()
 			return this;
 		}
 	}
-	
-	
-	//move items if they both are containers
-	/*Container *containerfrom = dynamic_cast<Container*>(this);
-	Container *containerto = dynamic_cast<Container*>(item);
-	if(containerto && containerfrom){
-		std::vector<Item*> itemlist;
-		for (ContainerList::const_iterator cit = containerfrom->getItems(); cit != containerfrom->getEnd(); ++cit) {
-			itemlist.push_back(*cit);							
-		}
-		for(std::vector<Item*>::reverse_iterator it = itemlist.rbegin(); it != itemlist.rend(); ++it){
-			containerfrom->removeItem(*it);
-			containerto->addItem(*it);
-		}						
-	}
-
-	return item;*/
 }
 
 long Item::getDecayTime(){
@@ -306,14 +288,6 @@ int Item::unserialize(xmlNodePtr p){
 	}
 	
 	tmp = (char*)xmlGetProp(p, (const xmlChar *) "count");
-	/*
-	if(tmp && isStackable() )
-		count=atoi(tmp);
-	else if(tmp && (isFluidContainer() || isMultiType()))
-		fluid=atoi(tmp);
-	else if(tmp)
-		chargecount=atoi(tmp);	
-	*/
 	if(tmp){
 		setItemCountOrSubtype(atoi(tmp));
 		xmlFreeOTSERV(tmp);
@@ -353,21 +327,7 @@ xmlNodePtr Item::serialize(){
 		s << *text;
 		xmlSetProp(ret, (const xmlChar*)"text", (const xmlChar*)s.str().c_str());
 	}
-	/*
-	s.str(""); //empty the stringstream
-	if(isStackable()){		
-		s << (int)count;
-		xmlSetProp(ret, (const xmlChar*)"count", (const xmlChar*)s.str().c_str());
-	}
-	else if(isFluidContainer() || isMultiType()){
-		s << (int)fluid;
-		xmlSetProp(ret, (const xmlChar*)"count", (const xmlChar*)s.str().c_str());
-	}
-	else if(getItemCharge() > 0){		
-		s << (int)getItemCharge();
-		xmlSetProp(ret, (const xmlChar*)"count", (const xmlChar*)s.str().c_str());
-	}
-	*/
+
 	s.str(""); //empty the stringstream
 	if(getItemCountOrSubtype() != 0){
 		s << getItemCountOrSubtype();
@@ -390,12 +350,6 @@ xmlNodePtr Item::serialize(){
 
 bool Item::isBlockingProjectile() const {
 	const ItemType& it = items[id];
-	/*
-	if((it.isDoor || it.isDoorWithLock) && it.blocking) {
-		return false;
-	}
-	*/
-
 	return it.blockingProjectile;
 }
 

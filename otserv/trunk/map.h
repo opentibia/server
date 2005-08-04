@@ -30,7 +30,6 @@
 #include "creature.h"
 #include "magic.h"
 
-//#include "scheduler.h"
 #include "tools.h"
 #include "tile.h"
 
@@ -110,7 +109,7 @@ private:
 		minRange.x = -9; //minRange.x = -8;
 		minRange.y = -7; //minRange.y = -6;
 		
-    //just the visible ones
+    	//just the visible ones
 		maxRange.x = 9; //maxRange.x = 8;
 		maxRange.y = 7; //maxRange.y = 6;
 		
@@ -170,12 +169,6 @@ class Map {
     Map();
     ~Map();
     
-	/** Lock the map */
-	//void lock(){OTSYS_THREAD_LOCK(mapLock);};
-
-	/** Unlock the map */
-	//void unlock(){OTSYS_THREAD_UNLOCK(mapLock);};
-
 	/**
 	  * Load a map.
 	  * \param filename Mapfile to load
@@ -232,8 +225,6 @@ class Map {
 	  */
 	std::list<Position> getPathTo(Creature* creature, Position start, Position to, bool creaturesBlock = true, bool ignoreMoveableBlockingItems = false);
 
-	/** The Map-Lock */
-	//OTSYS_THREAD_LOCKVAR mapLock;
 	
 	/* Map Width and Height - for Info purposes */
 	int mapwidth, mapheight;
@@ -248,9 +239,6 @@ class Map {
 	//TileMap tileMaps[256][256];
 	TileMap tileMaps[128][128];
 
-  // setTile moved into public
-
-	friend class MapState;
 	friend class Game;
 	//FIXME friend for derived classes?
 	friend class IOMapXML;

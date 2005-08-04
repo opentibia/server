@@ -306,12 +306,9 @@ protected:
   friend class Game;
   friend class Map;
   friend class Commands;
-	//friend class MapState;
 	friend class GameState;
 
   unsigned long id;
-
-	//Direction direction; // moved to public
 	std::string name;
 };
 

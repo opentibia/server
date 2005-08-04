@@ -23,13 +23,7 @@
 
 #include <set>
 #include <map>
-/*// cross compatibility vc++ and gcc
-#ifdef __GNUC__
-#include <ext/hash_map>
-#else
-#include <hash_map>
-#endif
-*/
+
 
 #include "creature.h"
 #include "otsystem.h"
@@ -50,15 +44,7 @@ public:
 	void removeList(unsigned long _id){
 		list.erase(_id);
 	}
-
-	// cross compatibility vc++ and gcc
-	/*#ifdef __GNUC__
-	__gnu_cxx::hash_map<unsigned long, T*> list;
-	typedef __gnu_cxx::hash_map<unsigned long, T*> list_type;
-	#else
-	stdext::hash_map<unsigned long, T*> list;
-	typedef stdext::hash_map<unsigned long, T*> list_type;
-	#endif*/
+	
 	typedef std::map<unsigned long, T*> list_type;
 	list_type list;
 
@@ -68,7 +54,6 @@ public:
 class AutoID {
 public:
 	AutoID() {
-		//unsigned long newid;
 		OTSYS_THREAD_LOCK_CLASS lockClass(autoIDLock);
 		count++;
 		if(count >= 0xFFFFFF)

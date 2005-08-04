@@ -252,7 +252,6 @@ protected:
 
 	virtual int onThink(int& newThinkTicks);
   virtual void setAttackedCreature(unsigned long id);
-  //virtual std::string getDescription() const;
 	std::string getDescription(bool self) const;
 	bool loaded;
 };

@@ -26,7 +26,6 @@
 
 #include "protocol.h"
 #include "creature.h"
-#include "texcept.h"
 #include "item.h"
 #include "container.h"
 #include <string>
@@ -98,15 +97,6 @@ private:
 	void parseAcceptTrade(NetworkMessage &msg);
 	void parseCloseTrade();
 
-/*
-	void sendPlayerItemAppear(Action* action);
-	void sendPlayerItemChange(Action* action);
-	void sendPlayerItemDisappear(Action* action);
-	void sendPlayerAppearance(Action* action);
-	void sendPlayerChangeAppearance(Action* action);
-*/
-
-	//void sendPlayerLookAt(std::string);
 
 	// channel tabs
 	void parseGetChannels(NetworkMessage &msg);
@@ -117,7 +107,6 @@ private:
 	virtual void sendChannel(unsigned short channelId);
 	virtual void sendOpenPriv(std::string &receiver);
 	virtual void sendToChannel(const Creature *creature, SpeakClasses type, const std::string &text, unsigned short channelId);
-	//void sendPlayerChangeGround(Action* action);
 
   virtual void sendNetworkMessage(NetworkMessage *msg);
   virtual void sendIcons(int icons);
@@ -171,23 +160,19 @@ private:
   virtual void sendCreatureHealth(const Creature *creature);
   virtual void sendSkills();
   virtual void sendPing();
-  //virtual void sendCreatureDisappear(const Creature *creature, unsigned char stackPos);
   virtual void sendCreatureTurn(const Creature *creature, unsigned char stackpos);
   virtual void sendCreatureSay(const Creature *creature, SpeakClasses type, const std::string &text);
 
   virtual void sendCancel(const char *msg);
   virtual void sendCancelWalk();
-	//virtual void sendCancelAutoWalk(Direction lastdir);
   virtual void sendChangeSpeed(const Creature* creature);
   virtual void sendCancelAttacking();
   void sendSetOutfit(const Creature* creature);
 	virtual void sendTileUpdated(const Position &Pos);
-	//virtual void sendContainerUpdated(Item *item, unsigned char from_id, unsigned char to_id, unsigned char from_slot, unsigned char to_slot, bool remove);
 	virtual void sendInventory(unsigned char sl_id);
 	virtual void sendStats();
 	virtual void sendTextMessage(MessageClasses mclass, const char* message);
 	virtual void sendTextMessage(MessageClasses mclass, const char* message,const Position &pos, unsigned char type);
-	//virtual void sendCancelAutoWalking(Direction lastdir);
 	
   virtual bool CanSee(int x, int y, int z) const;
   virtual bool CanSee(const Creature*) const;

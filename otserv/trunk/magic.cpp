@@ -89,36 +89,20 @@ void MagicEffectClass::getMagicEffect(Player* spectator, const Creature* attacke
 {
 	if(!isBlocking && target != NULL /*hasTarget*/) {
 		if(spectator->CanSee(pos.x, pos.y, pos.z)) {
-			/*
-			if((g_game.getWorldType() == WORLD_TYPE_NO_PVP && dynamic_cast<const Player*>(attacker) &&
-				dynamic_cast<const Player*>(target) && target->access == 0 && attacker->access == 0) ||
-				target->access != 0) {
-					if(damage < 0) {
-						if(damageEffect != 0xFF) {
+			if(damageEffect != 0xFF) {
+				if(!offensive || !(g_game.getWorldType() == WORLD_TYPE_NO_PVP && dynamic_cast<const Player*>(attacker) &&
+					dynamic_cast<const Player*>(target) && target->access == 0 && attacker->access == 0) || target->access != 0) {
+						if(offensive && (target->getImmunities() & attackType) == attackType) {
+							spectator->sendMagicEffect(pos, NM_ME_BLOCKHIT);
+						}
+						else {
 							spectator->sendMagicEffect(pos, damageEffect);
 						}
 					}
-					else if(hitEffect != 0xFF) {
-						spectator->sendMagicEffect(pos, hitEffect);
-					}
-				}
-				//spectator->sendMagicEffect(pos, NM_ME_PUFF);
-			else*/{
-				if(damageEffect != 0xFF) {
-					if(!offensive || !(g_game.getWorldType() == WORLD_TYPE_NO_PVP && dynamic_cast<const Player*>(attacker) &&
-						dynamic_cast<const Player*>(target) && target->access == 0 && attacker->access == 0) || target->access != 0) {
-							if(offensive && (target->getImmunities() & attackType) == attackType) {
-								spectator->sendMagicEffect(pos, NM_ME_BLOCKHIT);
-							}
-							else {
-								spectator->sendMagicEffect(pos, damageEffect);
-							}
-						}
-				}
-
-				if(hitEffect != 0xFF)
-					spectator->sendMagicEffect(pos, hitEffect);
 			}
+
+			if(hitEffect != 0xFF)
+				spectator->sendMagicEffect(pos, hitEffect);
 		}
 	}
 }
@@ -129,7 +113,6 @@ void MagicEffectClass::getDistanceShoot(Player* spectator, const Creature* attac
 	if(animationEffect > 0) {
 		if(spectator->CanSee(attacker->pos.x, attacker->pos.y, attacker->pos.z) || spectator->CanSee(to.x, to.y, to.z)) {
 			spectator->sendDistanceShoot(attacker->pos, to, animationEffect);
-			//msg.AddDistanceShoot(attacker->pos, to, animationEffect);
 		}
 	}
 }
@@ -155,10 +138,8 @@ void MagicEffectClass::FailedToCast(Player* spectator, const Creature* attacker,
 	if(!hasTarget && attacker) {
 		if(attacker == spectator) {
 			spectator->sendTextMessage(MSG_SMALLINFO, "You can only use this rune on creatures.");
-			//msg.AddTextMessage(MSG_SMALLINFO, "Sorry not possible.");
 		}
 		spectator->sendMagicEffect(attacker->pos, NM_ME_PUFF);
-		//msg.AddMagicEffect(attacker->pos, NM_ME_PUFF);
 	}
 }
 
@@ -178,7 +159,6 @@ void MagicEffectTargetClass::getMagicEffect(Player* spectator, const Creature* a
 		if(attacker) {
 			if(spectator->CanSee(attacker->pos.x, attacker->pos.y, attacker->pos.z)) {
 				spectator->sendMagicEffect(attacker->pos, NM_ME_PUFF);
-				//msg.AddMagicEffect(attacker->pos, NM_ME_PUFF);
 			}
 		}
 	}
@@ -190,7 +170,6 @@ void MagicEffectTargetClass::getDistanceShoot(Player* spectator, const Creature*
 	if(animationEffect > 0 && hasTarget) {
 		if(spectator->CanSee(attacker->pos.x, attacker->pos.y, attacker->pos.z) || spectator->CanSee(to.x, to.y, to.z)) {
 			spectator->sendDistanceShoot(attacker->pos, to, animationEffect);
-			//msg.AddDistanceShoot(attacker->pos, to, animationEffect);
 		}
 	}
 }
@@ -267,7 +246,6 @@ void MagicEffectTargetCreatureCondition::getMagicEffect(Player* spectator, const
 	else {
 		if(spectator->CanSee(pos.x, pos.y, pos.z)) {
 			spectator->sendMagicEffect(pos, NM_ME_PUFF);
-			//msg.AddMagicEffect(pos, NM_ME_PUFF);
 		}
 	}
 
@@ -284,7 +262,6 @@ MagicEffectTargetGroundClass::MagicEffectTargetGroundClass(MagicEffectItem* item
 MagicEffectTargetGroundClass::~MagicEffectTargetGroundClass()
 {
 	if(magicItem) {
-		//delete magicItem;
 		magicItem->releaseThing();
 		magicItem = NULL;
 	}
@@ -319,14 +296,11 @@ void MagicEffectTargetGroundClass::FailedToCast(Player* spectator, const Creatur
 		if(hasTarget) {
 			if(player && player == spectator) {
 				spectator->sendTextMessage(MSG_SMALLINFO, "There is not enough room.");
-				//msg.AddTextMessage(MSG_SMALLINFO, "There is not enough room.");
 			}
 			spectator->sendMagicEffect(player->pos, NM_ME_PUFF);
-			//msg.AddMagicEffect(player->pos, NM_ME_PUFF);
 		}
 		else if(player && player == spectator) {
 			spectator->sendTextMessage(MSG_SMALLINFO, "You cannot throw there.");
-			//msg.AddTextMessage(MSG_SMALLINFO, "You cannot throw there.");
 		}
 	}
 }
@@ -343,7 +317,6 @@ void MagicEffectTargetGroundClass::getDistanceShoot(Player* spectator, const Cre
 	if(!hasTarget && animationEffect > 0) {
 		if(spectator->CanSee(attacker->pos.x, attacker->pos.y, attacker->pos.z) || spectator->CanSee(to.x, to.y, to.z)) {
 			spectator->sendDistanceShoot(attacker->pos, to, animationEffect);
-			//msg.AddDistanceShoot(attacker->pos, to, animationEffect);
 		}
 	}
 }
@@ -365,7 +338,6 @@ void MagicEffectAreaClass::getMagicEffect(Player* spectator, const Creature* att
 		if(!isBlocking && areaEffect != 0xFF && (attacker->access != 0 || !isPz)) {
 			if(spectator->CanSee(pos.x, pos.y, pos.z)) {
 				spectator->sendMagicEffect(pos, areaEffect);
-				//msg.AddMagicEffect(pos, areaEffect);
 			}
 		}
 	}
@@ -480,8 +452,6 @@ MagicEffectItem::MagicEffectItem(const TransformMap& transformMap)
 	this->transformMap = transformMap;
 	useCount = 0;
 	unsigned short type = 0;
-	//decaytime = 0;
-	//updateDecay = false;
 	TransformMap::const_iterator dm = transformMap.begin();
 	if(dm != transformMap.end()) {
 		type = dm->first;		
@@ -494,14 +464,6 @@ bool MagicEffectItem::transform(const MagicEffectItem *rhs)
 {
 	this->transformMap = rhs->transformMap;
 	setID(rhs->getID());
-	if(transformMap.begin() != transformMap.end()){
-		//decaytime = OTSYS_TIME() + transformMap.begin()->second.first;
-		//updateDecay = true;
-	}
-	else{
-		//decaytime = 0;
-		//updateDecay = false;
-	}	
 	buildCondition();
 	return true;
 }
@@ -509,20 +471,10 @@ bool MagicEffectItem::transform(const MagicEffectItem *rhs)
 long MagicEffectItem::getDecayTime()
 {
 	TransformMap::iterator dm = transformMap.find(getID());
-	//if(!updateDecay){
-		if(dm != transformMap.end()) {
-			return dm->second.first;
-		}
-	//}
-	/*else{
-		uint64_t ret = decaytime - OTSYS_TIME();
-		if(ret < 0){
-			ret = 0;
-		}
-		decaytime = 0;
-		updateDecay = false;
-		return ret;
-	}*/
+	
+	if(dm != transformMap.end()) {
+		return dm->second.first;
+	}
 	
 	return 0;
 }
@@ -530,9 +482,6 @@ long MagicEffectItem::getDecayTime()
 Item* MagicEffectItem::decay()
 {
 	TransformMap::iterator dm = transformMap.find(getID());
-	//if(updateDecay){
-	//	return this;
-	//}
 	if(dm != transformMap.end()) {
 
 		//get next id to transform to
@@ -567,13 +516,8 @@ void MagicEffectItem::buildCondition()
 
 int MagicEffectItem::getDamage(Creature *target, const Creature *attacker /*= NULL*/) const
 {
-	/* ALWAYS ATTACK_NONE
-	if((attackType != ATTACK_NONE) && (target->getImmunities() & attackType) == attackType)
-		return 0;
-	*/
 
 	if(target->access == 0) {
-		//target->addMagicDamage(dmgContainer, true);
 
 		bool refresh = true;
 		for(ConditionVec::const_iterator condIt = condition.begin(); condIt != condition.end(); ++condIt) {

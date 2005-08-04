@@ -81,7 +81,6 @@ enum freeslot_t{
 	SLOT_TYPE_CONTAINER
 };
 
-class NetworkMessage;
 
 typedef std::pair<unsigned char, Container*> containerItem;
 typedef std::vector<containerItem> containerLayout;
@@ -210,7 +209,6 @@ public:
   bool CanSee(int x, int y, int z) const;
 
   void sendIcons();  
-  void sendNetworkMessage(NetworkMessage *msg);
   void sendChangeSpeed(Creature* creature);
   void sendToChannel(Creature *creature, SpeakClasses type, const std::string &text, unsigned short channelId);
   virtual void sendCancel(const char *msg) const;
