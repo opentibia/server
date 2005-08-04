@@ -85,8 +85,8 @@ public:
   bool isPz() const;
   void setPz();
   
-  bool floorChange();
-  bool floorChange(Direction direction);
+  bool floorChange() const;
+  bool floorChange(Direction direction) const;
   
   std::string getDescription() const;
 

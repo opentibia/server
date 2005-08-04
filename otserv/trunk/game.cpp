@@ -912,6 +912,10 @@ bool Game::onPrepareMoveCreature(Creature *creature, const Creature* creatureMov
 		creature->sendCancel("Sorry, not possible.");
 		return false;
   }
+	else if(creature != creatureMoving && toTile->floorChange()){
+		creature->sendCancel("Sorry, not possible.");
+		return false;
+	}
   else if(creature != creatureMoving && toTile->getTeleportItem()){
 		creature->sendCancel("Sorry, not possible.");
 		return false;

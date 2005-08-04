@@ -64,27 +64,28 @@ bool Tile::isBlocking(bool ispickupable /*= false*/, bool ignoreMoveableBlocking
 
   return false;
 }
-bool Tile::floorChange(){
-  ItemVector::iterator iit;
+bool Tile::floorChange() const
+{
+  ItemVector::const_iterator iit;
   if(ground && !(ground->noFloorChange() == true))
     return true;
+
   for (iit = topItems.begin(); iit != topItems.end(); ++iit){  
-         if ((*iit)->floorChangeNorth() || (*iit)->floorChangeSouth() || (*iit)->floorChangeEast() || (*iit)->floorChangeWest())
-         return true;      
-      }
+		if ((*iit)->floorChangeNorth() || (*iit)->floorChangeSouth() || (*iit)->floorChangeEast() || (*iit)->floorChangeWest())
+		return true;      
+	}
 
   for (iit = downItems.begin(); iit != downItems.end(); ++iit){ 
-         if ((*iit)->floorChangeNorth() || (*iit)->floorChangeSouth() || (*iit)->floorChangeEast() || (*iit)->floorChangeWest())
-         return true;
-      }
-
+		if ((*iit)->floorChangeNorth() || (*iit)->floorChangeSouth() || (*iit)->floorChangeEast() || (*iit)->floorChangeWest())
+			return true;
+	}
 
   return false;
-     }
-bool Tile::floorChange(Direction direction)
-{
-  
-  ItemVector::iterator iit;
+}
+
+bool Tile::floorChange(Direction direction) const
+{  
+  ItemVector::const_iterator iit;
   for (iit = topItems.begin(); iit != topItems.end(); ++iit){
     if(direction == NORTH){  
          if ((*iit)->floorChangeNorth())
