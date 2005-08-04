@@ -572,7 +572,7 @@ int ActionScript::registerFunctions()
 	lua_register(luaState, "doTransformItem", ActionScript::luaActionDoTransformItem);
 	//doPlayerSay(uid,text,type)
 	lua_register(luaState, "doPlayerSay", ActionScript::luaActionDoPlayerSay);
-	//doPlayerSendMagicEffect(uid,position,type)
+	//doSendMagicEffect(uid,position,type)
 	lua_register(luaState, "doSendMagicEffect", ActionScript::luaActionDoSendMagicEffect);
 	//doChangeTypeItem(uid,new_type)	
 	lua_register(luaState, "doChangeTypeItem", ActionScript::luaActionDoChangeTypeItem);
