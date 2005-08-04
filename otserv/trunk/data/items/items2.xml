@@ -27,13 +27,14 @@
 <item id="1997" name="bag" type="container" position="backpack" maxitems="8" weight="8.0" />
 <item id="1740" name="chest" type="container" maxitems="15" decayto="0" weight="120.0" />
 <item id="1738" name="box" type="container" maxitems="15" weight="50.0" />
-<item id="1774" name="barrel" weight="" />
-<item id="1770" name="barrel" weight="" />
-<item id="1739" name="crate" weight="" />
+<item id="1774" name="barrel" maxitems="9" weight="" />
+<item id="1770" name="barrel" maxitems="9" weight="" />
+<item id="1739" name="crate" maxitems="6" weight="" />
 <item id="1741" name="box" maxitems="9" weight="" />
 <item id="1749" name="box" maxitems="9" weight="" />
 <item id="1750" name="big box" maxitems="12" weight="" />
-<item id="2331" name="present" maxitems="5" weight="" />
+<item id="2331" name="present" type="container" maxitems="5" weight="" />
+<item id="1990" name="present" type="container" maxitems="5" weight="" />
 <item id="1746" name="treasure chest" type="container" maxitems="15" weight="120.0" />
 
 <!--end container-->
@@ -44,6 +45,7 @@
 <item id="2609" name="altar" weight="" />
 <item id="2606" name="altar" weight="" />
 <item id="2607" name="altar" weight="" />
+<item id="2614" name="altar" weight="" />
 <item id="2615" name="altar" weight="" />
 <item id="2555" name="anvil" weight="500.0" />
 <item id="2561" name="baking tray"  weight="12.0" />
@@ -75,6 +77,12 @@
 <item id="2613" name="sacrifical stone"  weight="" />
 <item id="2610" name="sacrifical stone"  weight="" />
 <item id="2611" name="sacrifical stone"  weight="" />
+<item id="2618" name="sacrifical stone"  weight="" />
+<item id="2620" name="sacrifical stone"  weight="" />
+<item id="2621" name="sacrifical stone"  weight="" />
+<item id="2622" name="sacrifical stone"  weight="" />
+<item id="2623" name="sacrifical stone"  weight="" />
+
 <item id="2558" name="saw"  weight="" />
 <item id="2550" name="scythe"  weight="30.0" />
 
@@ -185,8 +193,7 @@
 <item id="2364" name="post horn" weight="15.0" />
 <item id="2371" name="post horn" weight="15.0" />
 <item id="2378" name="post horn" weight="15.0" />
-<item id="2332" name="horn" weight="0.8" />
-<item id="2029" name="horn" weight="0.8" />
+<item id="2332" name="horn" weight="0.8" /> 
 <!--end instruments-->
 
 
@@ -246,9 +253,9 @@
 <item id="1640" name="table" weight="" />
 <item id="1641" name="table" weight="" />
 
-<item id="1396" name="wooden stairs" weight="" />
-<item id="1385" name="stairs" weight="" />
-<item id="1386" name="stairs" weight="" />
+<item id="1396" name="wooden stairs" weight="" floorchangenorth="1"/>
+<item id="1385" name="stairs" weight="" floorchangenorth="1" />
+<item id="1386" name="ladder" weight="" />
 
 <item id="1546" name="bars" weight="" />
 <item id="1547" name="bars" weight="" />
@@ -514,42 +521,45 @@
 <item id="1204" name="light wall" weight="" />
 
 <!--constructions houses door-->
-<item id="1209" name="closed door" weight="" />
-<item id="1210" name="closed door" weight="" />
-<item id="1212" name="closed door" weight="" />
-<item id="1213" name="closed door" weight="" />
+<item id="1209" name="closed door" weight="" blockingprojectile="1" />
+<item id="1210" name="closed door" weight="" blockingprojectile="1" />
+<item id="1212" name="closed door" weight="" blockingprojectile="1" />
+<item id="1213" name="closed door" weight="" blockingprojectile="1" />
 <item id="1211" name="open door" weight="" />
 <item id="1214" name="open door" weight="" />
 
-<item id="1219" name="closed door" weight="" />
-<item id="1221" name="closed door" weight="" />
+<item id="1219" name="closed door" weight="" blockingprojectile="1" />
+<item id="1221" name="closed door" weight="" blockingprojectile="1" />
 <item id="1220" name="open door" weight="" />
 <item id="1222" name="open door" weight="" />
 
-<item id="1223" name="closed door" weight="" />
+<item id="1223" name="closed door" weight="" blockingprojectile="1" />
 <item id="1224" name="open door" weight="" />
-<item id="1225" name="closed door" weight="" />
+<item id="1225" name="closed door" weight="" blockingprojectile="1" />
 <item id="1226" name="open door" weight="" />
-<item id="1227" name="closed door" weight="" />
+<item id="1227" name="closed door" weight="" blockingprojectile="1" />
 <item id="1228" name="open door" weight="" />
-<item id="1229" name="closed door" weight="" />
+<item id="1229" name="closed door" weight="" blockingprojectile="1" />
 <item id="1230" name="open door" weight="" />
 <item id="1233" name="open door" weight="" />
 <item id="1236" name="open door" weight="" />
 <item id="1238" name="open door" weight="" />
 <item id="1240" name="open door" weight="" />
-<item id="1231" name="closed door" weight="" />
-<item id="1232" name="closed door" weight="" />
-<item id="1234" name="closed door" weight="" />
-<item id="1235" name="closed door" weight="" />
-<item id="1239" name="closed door" weight="" />
-<item id="1241" name="closed door" weight="" />
-<item id="1243" name="closed door" weight="" />
-<item id="1245" name="closed door" weight="" />
-<item id="1247" name="closed door" weight="" />
-<item id="1249" name="closed door" weight="" />
-<item id="1250" name="closed door" weight="" />
-<item id="1241" name="open door" weight="" />
+<item id="1231" name="closed door" weight="" blockingprojectile="1" />
+<item id="1232" name="closed door" weight="" blockingprojectile="1" />
+<item id="1234" name="closed door" weight="" blockingprojectile="1" />
+<item id="1235" name="closed door" weight="" blockingprojectile="1" />
+<item id="1237" name="closed door" weight="" blockingprojectile="1" />
+
+<item id="1239" name="closed door" weight="" blockingprojectile="1" />
+<item id="1241" name="closed door" weight="" blockingprojectile="1" />
+<item id="1243" name="closed door" weight="" blockingprojectile="1" />
+<item id="1245" name="closed door" weight="" blockingprojectile="1" />
+<item id="1247" name="closed door" weight="" blockingprojectile="1" />
+<item id="1249" name="closed door" weight="" blockingprojectile="1" />
+<item id="1250" name="closed door" weight="" blockingprojectile="1" />
+
+<item id="1242" name="open door" weight="" />
 <item id="1244" name="open door" weight="" />
 <item id="1246" name="open door" weight="" />
 <item id="1248" name="open door" weight="" />
@@ -559,25 +569,27 @@
 <item id="1258" name="open door" weight="" />
 <item id="1260" name="open door" weight="" />
 <item id="1262" name="open door" weight="" />
-<item id="1252" name="closed door" weight="" />
-<item id="1253" name="closed door" weight="" />
-<item id="1255" name="closed door" weight="" />
-<item id="1257" name="closed door" weight="" />
-<item id="1259" name="closed door" weight="" />
-<item id="1261" name="closed door" weight="" />
+<item id="1252" name="closed door" weight="" blockingprojectile="1" />
+<item id="1253" name="closed door" weight="" blockingprojectile="1" />
+<item id="1255" name="closed door" weight="" blockingprojectile="1" />
+<item id="1257" name="closed door" weight="" blockingprojectile="1" />
+<item id="1259" name="closed door" weight="" blockingprojectile="1" />
+<item id="1261" name="closed door" weight="" blockingprojectile="1" />
 
 
 <!-- extras -->
 
-<item id="489" name="hole" weight="" />
+<item id="489" name="hole" weight="" floorchange="1"/>
 <item id="384" name="hole" weight="" />
-<item id="475" name="hole" weight="" />
-<item id="470" name="hole" weight="" />
-<item id="479" name="hole" weight="" />
-<item id="475" name="hole" weight="" />
+<item id="475" name="hole" weight="" floorchange="1"/>
+<item id="470" name="hole" weight="" floorchange="1"/>
+<item id="479" name="hole" weight="" floorchange="1"/>
+<item id="476" name="hole" weight="" floorchange="1"/>
 
+<item id="369" name="" weight="" floorchange="1"/>
+<item id="370" name="" weight="" floorchange="1"/>
 
-<item id="480" name="hole" weight="" />
+<item id="480" name="hole" weight="" floorchange="1"/>
 <item id="385" name="hole" weight="" />
 <item id="392" name="hole" weight="" />
 
@@ -586,6 +598,7 @@
 <item id="2112" name="teddy bear" weight="1.0" />
 <item id="2735" name="small oil lamp" weight="1.0" />
 <item id="2356" name="small oil lamp" weight="1.0" />
+<item id="2359" name="small oil lamp" weight="1.0" />
 <item id="2062" name="small oil lamp" weight="1.0" />
 <item id="2063" name="small oil lamp" weight="1.0" />
 <item id="1560" name="egipcian column" weight="" />
@@ -607,23 +620,23 @@
 <item id="2255" name="wooden trash" weight="" />
 <item id="2259" name="stone rubbish" weight="" />
 
-<item id="1398" name="ramp" weight="" />
+<item id="1398" name="ramp" weight="" floorchangeeast="1"/>
 <item id="1399" name="ramp" weight="" />
-<item id="1400" name="ramp" weight="" />
+<item id="1400" name="ramp" weight="" floorchangewest="1"/>
 <item id="1401" name="ramp" weight="" />
-<item id="1402" name="ramp" weight="" />
+<item id="1402" name="ramp" weight="" floorchangesouth="1"/>
 <item id="1403" name="ramp" weight="" />
-<item id="1404" name="ramp" weight="" />
+<item id="1404" name="ramp" weight="" floorchangenorth="1"/>
 <item id="1405" name="ramp" weight="" />
 
 <item id="1552" name="ramp" weight="" />
-<item id="1553" name="ramp" weight="" />
+<item id="1553" name="ramp" weight="" floorchangenorth="1" floorchangewest="1"/>
 <item id="1554" name="ramp" weight="" />
-<item id="1555" name="ramp" weight="" />
+<item id="1555" name="ramp" weight="" floorchangenorth="1" floorchangeeast="1"/>
 <item id="1556" name="ramp" weight="" />
-<item id="1557" name="ramp" weight="" />
+<item id="1557" name="ramp" weight="" floorchangesouth="1" floorchangeeast="1"/>
 <item id="1558" name="ramp" weight="" />
-<item id="1559" name="ramp" weight="" />
+<item id="1559" name="ramp" weight="" floorchangesouth="1" floorchangewest="1"/>
 
 <item id="1900" name="bloodspot" weight="" />
 <item id="1900" name="bloodspot" weight="" />
@@ -639,13 +652,13 @@
 <item id="478" name="ramp" weight="" />
 <item id="487" name="ramp" weight="" />
 <item id="488" name="ramp" weight="" />
-<item id="1388" name="ramp" weight="" />
+<item id="1388" name="ramp" weight="" floorchangeeast="1"/>
 <item id="1389" name="ramp" weight="" />
-<item id="1390" name="ramp" weight="" />
+<item id="1390" name="ramp" weight="" floorchangewest="1"/>
 <item id="1391" name="ramp" weight="" />
-<item id="1392" name="ramp" weight="" />
+<item id="1392" name="ramp" weight="" floorchangesouth="1"/>
 <item id="1393" name="ramp" weight="" />
-<item id="1394" name="ramp" weight="" />
+<item id="1394" name="ramp" weight="" floorchangenorth="1"/>
 <item id="1395" name="ramp" weight="" />
 
 <item id="1516" name="wooden railing" weight="" />
@@ -656,6 +669,19 @@
 <item id="1521" name="wooden railing" weight="" />
 <item id="1522" name="wooden railing" weight="" />
 <item id="1523" name="wooden railing" weight="" />
+
+<item id="1582" name="marble railing" weight="" />
+<item id="1583" name="marble railing" weight="" />
+<item id="1584" name="marble railing" weight="" />
+<item id="1585" name="marble railing" weight="" />
+<item id="1586" name="marble railing" weight="" />
+<item id="1587" name="marble railing" weight="" />
+<item id="1588" name="marble railing" weight="" />
+<item id="1589" name="marble railing" weight="" />
+<item id="1590" name="marble railing" weight="" />
+<item id="1591" name="marble railing" weight="" />
+<item id="1592" name="marble railing" weight="" />
+<item id="1593" name="marble railing" weight="" />
 
 <item id="1754" name="bed" weight="" />
 <item id="1755" name="bed" weight="" />
@@ -897,7 +923,7 @@
 <item id="1460" name="sinotaur" weight=""/>
 <item id="1461" name="sinotaur" weight=""/>
 <item id="1462" name="sinotaur" weight=""/>
-<item id="1445" name="sonument" weight=""/>
+<item id="1445" name="monument" weight=""/>
 <item id="1466" name="pedestal" weight=""/>
 <item id="1469" name="pedestal" weight=""/>
 <item id="1451" name="sandstone statue" weight=""/>
@@ -1434,10 +1460,11 @@
 <item id="407" name="black marble floor" weight="" />
 <item id="965" name="white marble floor" weight="" />
 <item id="966" name="black marble floor" weight="" />
-<item id="408" name="trapdoor" weight="" />
-<item id="410" name="trapdoor" weight="" />
-<item id="411" name="stair" weight="" />
-<item id="432" name="stair" weight="" />
+<item id="408" name="trapdoor" weight="" floorchange="1"/>
+<item id="409" name="trapdoor" weight="" floorchange="1"/>
+<item id="410" name="trapdoor" weight="" floorchange="1"/>
+<item id="411" name="stair" weight="" floorchange="1"/>
+<item id="432" name="stair" weight="" floorchange="1"/>
 <item id="412" name="stone tile" weight="" />
 <item id="413" name="a tile" weight="" />
 <item id="414" name="tiled floor" weight="" />
@@ -1449,14 +1476,14 @@
 <item id="420" name="tiled floor" weight="" />
 <item id="421" name="a tile" weight="" />
 <item id="422" name="a tile" weight="" />
-<item id="423" name="stair" weight="" />
+<item id="423" name="stair" weight="" floorchange="1"/>
 <item id="424" name="stone tile" weight="" />
 <item id="425" name="stone tile" weight="" />
 <item id="426" name="stone tile" weight="" />
-<item id="427" name="trapdoor" weight="" />
-<item id="428" name="ladder" weight="" />
+<item id="427" name="trapdoor" weight="" floorchange="1"/>
+<item id="428" name="ladder" weight="" floorchange="1"/>
 <item id="409" name="ladder" weight="" />
-<item id="429" name="trapdoor" weight="" />
+<item id="429" name="trapdoor" weight="" floorchange="1"/>
 <item id="431" name="stone floor" weight="" />
 <item id="446" name="wooden floor" weight="" />
 <item id="448" name="wooden floor" weight="" />
@@ -1468,10 +1495,10 @@
 <item id="454" name="wooden floor" weight="" />
 <item id="455" name="wooden floor" weight="" />
 <item id="456" name="wooden floor" weight="" />
+<item id="457" name="marble" weight="" />
+<item id="462" name="" weight="" floorchange="1"/>
 
-
-
-<item id="485" name="ice" weight="" />
+<item id="485" name="ice" weight="" floorchange="1"/>
 <item id="486" name="sand" weight="" />
 <item id="487" name="sand" weight="" />
 <item id="490" name="water" weight="" />
@@ -1815,7 +1842,7 @@
 <item id="474" name="time tile" weight="" />
 
 <item id="430" name="sewer grate" weight="" />
-<item id="924" name="stairs" weight="" />
+<item id="924" name="stairs" weight="" floorchange="1"/>
 <item id="1284" name="drawbridge" weight="" />
 <item id="102" name="grass" weight="" />
 <item id="103" name="dirt" weight="" />
@@ -1952,7 +1979,7 @@
 <item id="333" name="grass" weight="" />
 <item id="334" name="grass" weight="" />
 <item id="102" name="grass" weight="" />
-<item id="433" name="stairs" weight="" />
+<item id="433" name="stairs" weight="" floorchange="1"/>
 <item id="368" name="earth ground" weight="" />
 
 <!--magic walls-->
@@ -1990,7 +2017,7 @@
 <item id="2497" name="crusader helmet" type="armor" position="head" attack="0" defence="0" weight="52.0" arm="8"/>
 <item id="2490" name="dark helmet" type="armor" position="head" attack="0" defence="0" weight="46.0" arm="6"/>
 <item id="2493" name="demon helmet" type="armor" position="head" attack="0" defence="0" weight="29.5" arm="10"/>
-<item id="2462" name="devil's helmet" type="armor" position="head" attack="0" defence="0" weight="50.0" arm="7"/>
+<item id="2462" name="devil helmet" type="armor" position="head" attack="0" defence="0" weight="50.0" arm="7"/>
 <item id="2471" name="golden helmet" type="armor" position="head" attack="0" defence="0" weight="32.0" arm="12"/>
 <item id="2459" name="iron helmet" type="armor" position="head" attack="0" defence="0" weight="30" arm="5"/>
 <item id="2461" name="leather helmet" type="armor" position="head" attack="0" defence="0" weight="22.0" arm="1"/>
@@ -2008,6 +2035,9 @@
 <item id="2474" name="winged helmet" type="armor" position="head" attack="0" defence="0" weight="22.0" arm="10"/>
 <item id="2506" name="dragon scale helmet" type="armor" position="head" attack="0" defence="0" weight="" arm="0"/>
 <item id="2502" name="dwarven helmet" type="armor" position="head" attack="0" defence="0" weight="" arm="5"/>
+<item id="2664" name="cowl" type="armor" position="head" attack="0" defence="0" weight="7.0" arm="1"/>
+<item id="2660" name="hidden turbant" type="armor" position="head" attack="0" defence="0" descr="Its the helmet of the true wizards." weight="2.0" arm="1"/> 
+
 
 <!--end helmets-->
 
@@ -2015,6 +2045,7 @@
 <item id="2641" name="traper boots" type="armor" position="boots" attack="0" defence="0" weight="9.0" arm="3"/> 
 <item id="2195" name="boots of haste" type="armor" position="boots" attack="0" defence="0" weight="7.5" arm="0"/>
 <item id="2640" name="boots of waterwalking" type="armor" position="boots" attack="0" defence="0" weight="8.0" arm="0"/>
+<item id="2358" name="boots of waterwalking" type="armor" position="boots" attack="0" defence="0" weight="8.0" arm="0"/>
 <item id="2644" name="bunny slippers" type="armor" position="boots" attack="0" defence="0" weight="" arm="0"/>
 <item id="2646" name="golden boots" type="armor" position="boots" attack="0" defence="0" weight="32.0" arm="4"/>
 <item id="2643" name="leather boots" type="armor" position="boots" attack="0" defence="0" weight="9.0" arm="1"/>
@@ -2051,7 +2082,7 @@
 <item id="2484" name="studded armor" type="armor" position="body" descr="" weight="71.0" arm="5"/>
 <item id="2508" name="native armor" type="armor" position="body" descr="" weight="50.0" arm="1"/>
 <item id="2503" name="dwarven armor" type="armor" position="body" descr="" weight="90.0" arm="10"/>
-<item id="2503" name="elven armor" type="armor" position="body" descr="" weight="114.0" arm="15"/>
+<item id="2505" name="elven armor" type="armor" position="body" descr="" weight="114.0" arm="15"/>
 <!--end armor-->
 
 <!--legs-->
@@ -2096,7 +2127,7 @@
 <item id="2527" name="rose shield" type="weapon" position="weapon" skill="shielding" attack="0" defence="27" descr="" weight="52.0" arm="0"/>
 <item id="2540" name="scarab shield" type="weapon" position="weapon" skill="shielding" attack="0" defence="25" descr="" weight="75.0" arm="0"/>
 <item id="2517" name="shield of honour" type="weapon" position="weapon" skill="shielding" attack="0" defence="33" descr="" weight="54.0" arm="0"/>
-<item id="2514" name="shield of the mastermind" type="weapon" position="weapon" skill="shielding" attack="0" defence="37" descr="it' is an enchanted shield." weight="57.0" arm="0"/>
+<item id="2514" name="mastermind shield" type="weapon" position="weapon" skill="shielding" attack="0" defence="37" descr="it is an enchanted shield." weight="57.0" arm="0"/>
 <item id="2509" name="steel shield" type="weapon" position="weapon" skill="shielding" attack="0" defence="21" descr="" weight="69.0" arm="0"/>
 <item id="2526" name="studded shield" type="weapon" position="weapon" skill="shielding" attack="0" defence="15" descr="" weight="59.0" arm="0"/>
 <item id="2528" name="tower shield" type="weapon" position="weapon" skill="shielding" attack="0" defence="32" descr="" weight="82.0" arm="0"/>
@@ -2117,7 +2148,7 @@
 <item id="2446" name="the pharao sword" type="weapon" position="weapon" skill="sword" attack="43" defence="23" weight="150.0"/>
 <item id="2393" name="giantsword" type="weapon" position="twohand" skill="sword" attack="46" defence="22" weight="180.0"/>
 <item id="2442" name="heavy machete" type="weapon" position="weapon" skill="sword" attack="16" defence="10" weight="18.4"/>
-<item id="2396" name="ice rapier" type="weapon" position="weapon" skill="sword" attack="100" defence="1" descr="A deadly but fragile weapon." weight="15.0"/>
+<item id="2396" name="ice rapier" type="weapon" position="weapon" skill="sword" attack="30" defence="1" descr="A deadly but fragile weapon." weight="15.0"/>
 <item id="2412" name="katana" type="weapon" position="weapon" skill="sword" attack="16" defence="12" weight="31.0"/>
 <item id="2403" name="knife" type="weapon" position="weapon" skill="sword" attack="7" defence="5" weight="4.2"/>
 <item id="2397" name="longsword" type="weapon" position="weapon" skill="sword" attack="17" defence="14" weight="42.0"/>
@@ -2136,7 +2167,8 @@
 <item id="2376" name="sword" type="weapon" position="weapon" skill="sword" attack="14" defence="12" weight="35.0"/>
 <item id="2377" name="two-handed sword" type="weapon" position="twohand" skill="sword" attack="30" defence="25" weight="70.0"/>
 <item id="2408" name="warlord sword" type="weapon" position="weapon" skill="sword" attack="53" defence="38" descr="Strong powers flow in this magic sword." weight="0.0"/>
-
+<item id="2451" name="djinn blade" type="weapon" position="weapon" skill="sword" attack="38" defence="22" weight="24.5"/>
+<item id="2438" name="apocalipsis" type="weapon" position="weapon" skill="sword" attack="30" defence="65" descr="The darkness flow in this weapon." weight="4.5"/>
 <!--end sword-->
 
 <!--aXe-->
@@ -2146,11 +2178,11 @@
 <item id="2378" name="battle axe" type="weapon" position="weapon" skill="axe" attack="25" defence="10" weight="50.0" arm="0"/>
 <item id="2440" name="daramanian waraxe" type="weapon" position="weapon" skill="axe" attack="39" defence="15" weight="52.5" arm="0"/>
 <item id="2387" name="double axe" type="weapon" position="weapon" skill="axe" attack="35" defence="12" weight="70.0" arm="0"/>
-<item id="2414" name="dragon lance" type="weapon" position="weapon" skill="axe" attack="47" defence="16" descr="The extraordinary sharp blade penetrates every armor." weight="67.0" arm="0"/>
+<item id="2414" name="dragon lance" type="weapon" position="twohand" skill="axe" attack="47" defence="16" descr="The extraordinary sharp blade penetrates every armor." weight="67.0" arm="0"/>
 <item id="2435" name="dwarfish axe" type="weapon" position="weapon" skill="axe" attack="21" defence="19" weight="82.0" arm="0"/>
 <item id="2418" name="golden sickle" type="weapon" position="weapon" skill="axe" attack="13" defence="6" weight="19.5" arm="0"/>
 <item id="2415" name="great axe" type="weapon" position="weapon" skill="axe" attack="52" defence="22" weight="90.0" arm="0"/>
-<item id="2427" name="guardian halberd" type="weapon" position="weapon" skill="axe" attack="46" defence="15" weight="110.0" arm="0"/>
+<item id="2443" name="guardian halberd" type="weapon" position="weapon" skill="axe" attack="46" defence="15" weight="110.0" arm="0"/>
 <item id="2381" name="halberd" type="weapon" position="twohand" skill="axe" attack="35" defence="14" weight="90.0" arm="0"/>
 <item id="2380" name="hand axe" type="weapon" position="weapon" skill="axe" attack="10" defence="5" weight="18.0" arm="0"/>
 <item id="2388" name="hatchet" type="weapon" position="weapon" skill="axe" attack="15" defence="8" weight="35.0" arm="0"/>
@@ -2163,6 +2195,8 @@
 <!--end aXe-->
 
 <!--club-->
+<item id="2444" name="hammer of wrath" type="weapon" position="weapon" skill="club" attack="48" defence="12" weight="70.0" arm="0"/>
+<item id="2351" name="cobrafang dagger" descr="This ritual weapon was forged from the sharp fang of a giant cobra." weight="6.0"/> 
 
 <item id="2417" name="battlehammer" type="weapon" position="weapon" skill="club" attack="24" defence="14" weight="68.0" arm="0"/>
 <item id="2449" name="bone club" type="weapon" position="weapon" skill="club" attack="12" defence="8" weight="39.0" arm="0"/>
@@ -2172,7 +2206,7 @@
 <item id="2445" name="crystal mace" type="weapon" position="weapon" skill="club" attack="38" defence="16" weight="80.0" arm="0"/>
 <item id="2439" name="daramanian mace" type="weapon" position="weapon" skill="club" attack="21" defence="12" weight="68.0" arm="0"/>
 <item id="2434" name="dragon hammer" type="weapon" position="weapon" skill="club" attack="32" defence="20" weight="97.0" arm="0"/>
-<item id="2437" name="golden mace" type="weapon" position="weapon" skill="club" attack="" defence="" weight="" arm="0"/>
+<item id="2437" name="golden mace" type="weapon" position="weapon" skill="club" attack="50" defence="20" weight="4.7" arm="0"/>
 <item id="2422" name="iron hammer" type="weapon" position="weapon" skill="club" attack="18" defence="10" weight="66.0" arm="0"/>
 <item id="2398" name="mace" type="weapon" position="weapon" skill="club" attack="16" defence="11" weight="28.0" arm="0"/>
 <item id="2394" name="morning star" type="weapon" position="weapon" skill="club" attack="25" defence="11" weight="54.0" arm="0"/>
@@ -2205,6 +2239,8 @@
 <!--end magical items-->
 
 <!--amulets-->
+<item id="2138" name="starlight" type="armor" position="amulet" attack="0" defence="0" weight="52.0" arm="3"/>
+
 <item id="2130" name="golden amulet" type="armor" position="amulet" attack="0" defence="0" weight="9.0" arm="0"/>
 <item id="2173" name="amulet of loss" type="armor" position="amulet" weight="4.2" arm="0" />
 <item id="2142" name="ancient amulet" type="armor" position="amulet" weight="8.0" arm="0" />
@@ -2233,11 +2269,11 @@
 
 
 <!--ammunition-->
-<item id="2352" name="crystal arrow" type="amunition" position="hand" amutype="arrow" shottype="arrow" attack="200" defence="0" weight="0.7" />
-<item id="2543" name="bolt" type="amunition" position="hand" amutype="bolt" shottype="bolt" attack="0" defence="0" weight="0.8" />
-<item id="2547" name="power bolt" type="amunition" position="hand" amutype="bolt" shottype="power-bolt" attack="60" defence="0" weight="23" />
-<item id="2544" name="arrow" type="amunition" position="hand" amutype="arrow" shottype="arrow" attack="30" defence="0" weight="0.7" />
-<item id="2545" name="poison arrow" type="amunition" position="hand" amutype="arrow" shottype="poison-arrow" attack="0" defence="0" weight="0.8" arm="0"/>
+<item id="2352" name="crystal arrow" type="amunition" position="hand" amutype="arrow" shottype="arrow" attack="0" defence="0" weight="0.7" />
+<item id="2543" name="bolt" type="amunition" position="hand" amutype="bolt" shottype="bolt" attack="30" defence="0" weight="0.8" />
+<item id="2547" name="Power Bolt" type="amunition" position="hand" amutype="bolt" shottype="power-bolt" attack="50" defence="0" weight="0.8" />
+<item id="2544" name="arrow" type="amunition" position="hand" amutype="arrow" shottype="arrow" attack="20" defence="0" weight="0.7" />
+<item id="2545" name="poison arrow" type="amunition" position="hand" amutype="arrow" shottype="poison-arrow" attack="10" defence="0" weight="0.8" arm="0"/>
 <item id="2546" name="burst arrow" type="amunition" position="hand" amutype="arrow" shottype="burst-arrow" attack="0" defence="0" weight="0.9" arm="0"/>
 <!--end ammunition-->
 
@@ -2255,16 +2291,16 @@
 <!-- decayto hole -->
 
 <item id="468" name="stone" decayto="0" weight="0" /> 
-<item id="469" name="hole" decayto="468" decaytime="60" weight="0" /> 
+<item id="469" name="hole" decayto="468" decaytime="60" weight="0" floorchange="1"/> 
 <item id="481" name="stone" decayto="0" weight="0" /> 
-<item id="482" name="hole" decayto="481" decaytime="60" weight="0" /> 
+<item id="482" name="hole" decayto="481" decaytime="60" weight="0" floorchange="1"/> 
 <item id="483" name="stone" decayto="0" weight="0" /> 
-<item id="484" name="hole" decayto="483" decaytime="60" weight="0" /> 
+<item id="484" name="hole" decayto="483" decaytime="60" weight="0" floorchange="1"/> 
 
-<item id="383" name="hole" decayto="1335" decaytime="60" weight="0" />
+<item id="383" name="hole" decayto="1335" decaytime="60" weight="0" floorchange="1"/>
 <item id="1335" name="stone" decayto="0" weight="0" />
 
-<item id="294" name="hole" decayto="293" decaytime="60" weight="0" /> 
+<item id="294" name="hole" decayto="293" decaytime="60" weight="0" floorchange="1"/> 
 <item id="293" name="grass" decayto="0" weight="0" />
 
 <!-- end decayto hole -->
@@ -2661,8 +2697,8 @@
 <item id="1490" name="poison field" weight="0.0" decaytime="20" damage="10" />
 <item id="1496" name="poison field" weight="0.0" decaytime="20" damage="10" />
 
-<item id="1190" name="magic wall" weight="0.0" decaytime="20" />
-<item id="1191" name="magic wall" weight="0.0" decaytime="20" />
+<item id="1497" name="magic wall" weight="0.0" />
+<item id="1498" name="magic wall" weight="0.0" decayto="1497" decaytime="20" />
 
 <item id="1491" name="energy" weight="0.0"  decaytime="30" damage="30" />
 <item id="1495" name="energy" weight="0.0"  decaytime="30" damage="30" />
@@ -2715,6 +2751,7 @@
 <!--liquids--> 
 
 <!--Items with fluid--> 
+<item id="2023" name="amphora" weight="60.0" />
 <item id="2034" name="big amphora" weight="200.0" />
 <item id="2574" name="grey ewers" weight="1.0" />
 <item id="2575" name="yellow ewers" weight="1.0" />
@@ -2752,8 +2789,8 @@
 <item id="2181" name="wooden wand" weight="26.5" />
 <item id="2189" name="yellow spellwand" weight="23.0" />
 <item id="2190" name="blue spellwand" weight="23.0" />
-<item id="2162" name="magic lightwand" weight="15.0" />
-<item id="2163" name="magic lightwand" weight="15.0" />
+<item id="2162" name="magic lightwand" decayto="0" weight="15.0" />
+<item id="2163" name="magic lightwand" decayto="2062" decaytime="240" weight="15.0" />
 
 <!--End wands-->
 
