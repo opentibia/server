@@ -579,6 +579,10 @@
 
 <!-- extras -->
 
+<item id="2737" name="wheat" weight="" decayto="2738" decaytime="60"/>
+<item id="2738" name="wheat" weight="" decayto="2739" decaytime="60"/>
+<item id="2739" name="wheat" weight="" decayto="2737" decaytime="60"/>
+
 <item id="489" name="hole" weight="" floorchange="1"/>
 <item id="384" name="hole" weight="" />
 <item id="475" name="hole" weight="" floorchange="1"/>
@@ -646,7 +650,6 @@
 <item id="1904" name="bloodspot" weight="" />
 <item id="1905" name="bloodspot" weight="" />
 <item id="1486" name="stone coal basin" weight="" />
-<item id="2737" name="wheat" weight="" />
 <item id="1277" name="wooden pilar" weight="" />
 <item id="477" name="ramp" weight="" />
 <item id="478" name="ramp" weight="" />
@@ -919,10 +922,10 @@
 <item id="1464" name="goblin" weight=""/>
 <item id="1465" name="goblin" weight=""/>
 <item id="1444" name="hero" weight=""/>
-<item id="1446" name="sinotaur" weight=""/>
-<item id="1460" name="sinotaur" weight=""/>
-<item id="1461" name="sinotaur" weight=""/>
-<item id="1462" name="sinotaur" weight=""/>
+<item id="1446" name="minotaur" weight=""/>
+<item id="1460" name="minotaur" weight=""/>
+<item id="1461" name="minotaur" weight=""/>
+<item id="1462" name="minotaur" weight=""/>
 <item id="1445" name="monument" weight=""/>
 <item id="1466" name="pedestal" weight=""/>
 <item id="1469" name="pedestal" weight=""/>
@@ -1104,8 +1107,8 @@
 <!--trees-->
 
 <item id="2707" name="beech" weight=""/>
-<item id="2785" name="blueberry bush" weight=""/>
-<item id="2786" name="blueberry bush" weight=""/>
+<item id="2785" name="blueberry bush" weight="" decayto="0" />
+<item id="2786" name="blueberry bush" weight="" decayto="2785" decaytime="120"/>
 <item id="2767" name="bush" weight=""/>
 <item id="2724" name="cactus" weight=""/>
 <item id="2727" name="cactus" weight=""/>
@@ -1501,9 +1504,9 @@
 <item id="485" name="ice" weight="" floorchange="1"/>
 <item id="486" name="sand" weight="" />
 <item id="487" name="sand" weight="" />
-<item id="490" name="water" weight="" />
-<item id="491" name="water" weight="" />
-<item id="492" name="water" weight="" />
+<item id="490" name="water" weight="" decayto="0" />
+<item id="491" name="water" weight=""/>
+<item id="492" name="water" weight="" decayto="490" decaytime="120"/>
 <item id="493" name="water" weight="" />
 <item id="494" name="water" weight="" />
 <item id="495" name="water" weight="" />
