@@ -124,9 +124,15 @@ void GameState::onAttack(Creature* attacker, const Position& pos, const MagicEff
 			//Replace existing magic field
 			magicItem->transform(newmagicItem);
 			
-			game->removeThing(NULL, pos, magicItem, false);
-			game->addThing(NULL, pos, magicItem);
-			
+			int stackpos = tile->getThingStackPos(magicItem);
+			if(tile->removeThing(magicItem)) {
+				tile->addThing(magicItem);
+
+				for(int i = 0; i < spectatorlist.size(); ++i) {
+					spectatorlist[i]->onThingDisappear(magicItem, stackpos);
+					spectatorlist[i]->onThingAppear(magicItem);
+				}
+			}
 		}
 		else {
 			magicItem = new MagicEffectItem(*newmagicItem);
