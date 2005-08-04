@@ -126,10 +126,13 @@ void GameState::onAttack(Creature* attacker, const Position& pos, const MagicEff
 			
 			int stackpos = tile->getThingStackPos(magicItem);
 			if(tile->removeThing(magicItem)) {
-				tile->addThing(magicItem);
 
 				for(int i = 0; i < spectatorlist.size(); ++i) {
 					spectatorlist[i]->onThingDisappear(magicItem, stackpos);
+				}
+
+				tile->addThing(magicItem);
+				for(int i = 0; i < spectatorlist.size(); ++i) {
 					spectatorlist[i]->onThingAppear(magicItem);
 				}
 			}
