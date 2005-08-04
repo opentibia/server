@@ -76,8 +76,8 @@
 <item id="1400" name="" weight="0" floorchangewest="1"/>
 
 <item id="1559" name="" weight="0" floorchangesouth="1" floorchangewest="1"/>
-<item id="1557" name="" weight="0" floorchangesouth="1" floorchangewest="1"/>
-<item id="1553" name="" weight="0" floorchangenorth="1" floorchangeeast="1"/>
+<item id="1557" name="" weight="0" floorchangesouth="1" floorchangeeast="1"/>
+<item id="1553" name="" weight="0" floorchangenorth="1" floorchangewest="1"/>
 <item id="1555" name="" weight="0" floorchangenorth="1" floorchangeeast="1"/>
 
 <item id="411" name="" weight="0" floorchange="1"/>
