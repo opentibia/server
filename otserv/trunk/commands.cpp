@@ -52,6 +52,7 @@ s_defcommands Commands::defined_commands[] = {
 	{"/closeserver",&Commands::closeServer},
 	{"/openserver",&Commands::openServer},
 	{"/getonline",&Commands::onlineList},
+	{"/a",&Commands::teleportNTiles},
 };
 
 
@@ -533,5 +534,31 @@ bool Commands::onlineList(Creature* c, const std::string &cmd, const std::string
 	players.str("");
 	players << "Total: " << i << " player(s)" << std::endl;
 	player->sendTextMessage(MSG_BLUE_TEXT,players.str().c_str());
+	return true;
+}
+
+bool Commands::teleportNTiles(Creature* c, const std::string &cmd, const std::string &param){
+				
+	int ntiles = atoi(param.c_str());
+	if(ntiles != 0)
+	{
+		Position new_pos;
+		new_pos = c->pos;
+		switch(c->direction){
+		case NORTH:
+			new_pos.y = new_pos.y - ntiles;
+			break;
+		case SOUTH:
+			new_pos.y = new_pos.y + ntiles;
+			break;
+		case EAST:
+			new_pos.x = new_pos.x + ntiles;
+			break;
+		case WEST:
+			new_pos.x = new_pos.x - ntiles;
+			break;
+		}
+		game->teleport(c, new_pos);
+	}
 	return true;
 }
