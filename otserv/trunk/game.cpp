@@ -405,7 +405,6 @@ bool Game::loadMap(std::string filename) {
 
 #ifdef __DEBUG_CRITICALSECTION__
 
-OTSYS_THREAD_LOCK_CLASS::LogList OTSYS_THREAD_LOCK_CLASS::loglist;
 OTSYS_THREAD_RETURN Game::monitorThread(void *p)
 {
   Game* _this = (Game*)p;
