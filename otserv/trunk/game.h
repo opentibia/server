@@ -360,6 +360,10 @@ protected:
 
 	static OTSYS_THREAD_RETURN eventThread(void *p);
 
+#ifdef __DEBUG_CRITICALSECTION__
+	static OTSYS_THREAD_RETURN monitorThread(void *p);
+#endif
+
 	struct GameEvent
 	{
 		__int64  tick;

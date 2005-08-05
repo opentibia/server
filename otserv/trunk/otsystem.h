@@ -22,11 +22,12 @@
 #ifndef __OTTHREAD_H__
 #define __OTTHREAD_H__
 
-
 #include "definitions.h"
 
+#include <list>
+#include <algorithm>
+
 #if defined WIN32 || defined __WINDOWS__
-//#define _WIN32_WINNT 0x0501
 #include <windows.h>
 #include <process.h>    /* _beginthread, _endthread */
 #include <stddef.h>
@@ -37,18 +38,38 @@
 
 #define OTSYS_CREATE_THREAD(a, b) _beginthread(a, 0, b)
 
+#ifndef __DEBUG_CRITICALSECTION__
+	#define OTSYS_THREAD_LOCKVAR CRITICAL_SECTION
 
-#define OTSYS_THREAD_LOCKVAR CRITICAL_SECTION
+	#define OTSYS_THREAD_LOCKVARINIT(a) InitializeCriticalSection(&a);
+	#define OTSYS_THREAD_LOCKVARRELEASE(a) DeleteCriticalSection(&a);
+	#define OTSYS_THREAD_LOCK(a, b)        EnterCriticalSection(&a);
+	#define OTSYS_THREAD_UNLOCK(a, b)      LeaveCriticalSection(&a);
+	#define OTSYS_THREAD_UNLOCK_PTR(a, b)  LeaveCriticalSection(a);
+#else
+	#define OTSYS_THREAD_LOCKVAR HANDLE
+	
+	static void addLockLog(OTSYS_THREAD_LOCKVAR* a, const char* s, bool lock);
 
-#define OTSYS_THREAD_LOCKVARINIT(a) InitializeCriticalSection(&a);
-#define OTSYS_THREAD_LOCKVARRELEASE(a) DeleteCriticalSection(&a);
-#define OTSYS_THREAD_LOCK(a)        EnterCriticalSection(&a);
-#define OTSYS_THREAD_UNLOCK(a)      LeaveCriticalSection(&a);
-#define OTSYS_THREAD_UNLOCK_PTR(a)  LeaveCriticalSection(a);
+	struct logBlock {
+		bool lock;
+		int mutexaddr;
+		std::string str;
+		uint64_t time;
+		int threadid;
+	};
 
-#define OTSYS_THREAD_TIMEOUT			  WAIT_TIMEOUT
-#define OTSYS_THREAD_SIGNALVARINIT(a) a = CreateEvent(NULL, FALSE, FALSE, NULL)
-#define OTSYS_THREAD_SIGNAL_SEND(a)   SetEvent(a);
+	#define OTSYS_THREAD_LOCKVARINIT(a)    a = CreateMutex(NULL, FALSE, NULL);
+	#define OTSYS_THREAD_LOCKVARRELEASE(a) CloseHandle(a);
+	#define OTSYS_THREAD_LOCK(a, b) { WaitForSingleObject(a,INFINITE); addLockLog(&a, b, true);}
+	inline int OTSYS_THREAD_LOCKEX(HANDLE a, int b)   {return WaitForSingleObject(a, b);}
+	#define OTSYS_THREAD_UNLOCK(a, b)         {addLockLog(&a, b, false); ReleaseMutex(a);}
+	#define OTSYS_THREAD_UNLOCK_PTR(a, b)     {addLockLog(a, b, false); ReleaseMutex(*a);}
+#endif
+
+	#define OTSYS_THREAD_TIMEOUT			  WAIT_TIMEOUT
+	#define OTSYS_THREAD_SIGNALVARINIT(a) a = CreateEvent(NULL, FALSE, FALSE, NULL)
+	#define OTSYS_THREAD_SIGNAL_SEND(a)   SetEvent(a);
 
 typedef HANDLE OTSYS_THREAD_SIGNALVAR;
 
@@ -61,9 +82,11 @@ inline __int64 OTSYS_TIME()
 
 inline int OTSYS_THREAD_WAITSIGNAL(OTSYS_THREAD_SIGNALVAR& signal, OTSYS_THREAD_LOCKVAR& lock)
 {
-  LeaveCriticalSection(&lock);
+  //LeaveCriticalSection(&lock);
+	OTSYS_THREAD_UNLOCK(lock, "OTSYS_THREAD_WAITSIGNAL");
   WaitForSingleObject(signal, INFINITE);
-  EnterCriticalSection(&lock);
+  //EnterCriticalSection(&lock);
+	OTSYS_THREAD_LOCK(lock, "OTSYS_THREAD_WAITSIGNAL");
 
   return -0x4711;
 }
@@ -81,9 +104,11 @@ inline int OTSYS_THREAD_WAITSIGNAL_TIMED(OTSYS_THREAD_SIGNALVAR& signal, OTSYS_T
   if (tout64 > 0)
     tout = (DWORD)(tout64);
 
-  LeaveCriticalSection(&lock);
+  //LeaveCriticalSection(&lock);
+	OTSYS_THREAD_UNLOCK(lock, "OTSYS_THREAD_WAITSIGNAL_TIMED");
   int ret = WaitForSingleObject(signal, tout);
-  EnterCriticalSection(&lock);
+  //EnterCriticalSection(&lock);
+	OTSYS_THREAD_LOCK(lock, "OTSYS_THREAD_WAITSIGNAL_TIMED");
 
   return ret;
 }
@@ -171,18 +196,80 @@ inline int OTSYS_THREAD_WAITSIGNAL_TIMED(OTSYS_THREAD_SIGNALVAR& signal, OTSYS_T
 #endif // #if defined WIN32 || defined __WINDOWS__
 
 
+#ifdef __DEBUG_CRITICALSECTION__
+
+class OTSYS_THREAD_LOCK_CLASS{
+public:
+	inline OTSYS_THREAD_LOCK_CLASS(OTSYS_THREAD_LOCKVAR &a){
+		logmsg = NULL;
+		mutex = &a;
+		OTSYS_THREAD_LOCK(a, NULL)
+	};
+
+	inline OTSYS_THREAD_LOCK_CLASS(OTSYS_THREAD_LOCKVAR &a, const char* s){
+		mutex = &a;
+		OTSYS_THREAD_LOCK(a, NULL)
+
+		logmsg = s;
+
+		OTSYS_THREAD_LOCK_CLASS::addLog(mutex, s, true);
+	}
+
+	static void addLog(OTSYS_THREAD_LOCKVAR* a, const char *s, bool lock) {
+		if(s == NULL)
+			return;
+
+		logBlock lb;
+		lb.mutexaddr = (int)a;
+		lb.lock = lock;
+		lb.str = s;
+		lb.time = OTSYS_TIME();
+		lb.threadid = GetCurrentThreadId();
+
+		OTSYS_THREAD_LOCK_CLASS::loglist.push_back(lb);
+
+		if(OTSYS_THREAD_LOCK_CLASS::loglist.size() > 1000) {
+			OTSYS_THREAD_LOCK_CLASS::loglist.pop_front();
+		}
+	}
+
+	inline ~OTSYS_THREAD_LOCK_CLASS(){
+		OTSYS_THREAD_LOCK_CLASS::addLog(mutex, logmsg, false);
+		OTSYS_THREAD_UNLOCK_PTR(mutex, NULL)
+	};
+		
+	OTSYS_THREAD_LOCKVAR *mutex;
+	const char* logmsg;
+	typedef std::list< logBlock > LogList;
+	static LogList loglist;
+};
+
+static void addLockLog(OTSYS_THREAD_LOCKVAR* a, const char* s, bool lock)
+{
+	OTSYS_THREAD_LOCK_CLASS::addLog(a, s, lock);
+}
+
+#else
+
 class OTSYS_THREAD_LOCK_CLASS{
 public:
 	inline OTSYS_THREAD_LOCK_CLASS(OTSYS_THREAD_LOCKVAR &a){
 		mutex = &a;
-		OTSYS_THREAD_LOCK(a)
+		OTSYS_THREAD_LOCK(a, NULL)
 	};
+
+	inline OTSYS_THREAD_LOCK_CLASS(OTSYS_THREAD_LOCKVAR &a, const char* s){
+		mutex = &a;
+		OTSYS_THREAD_LOCK(a, NULL)
+	}
+
 	inline ~OTSYS_THREAD_LOCK_CLASS(){
-		OTSYS_THREAD_UNLOCK_PTR(mutex)
+		OTSYS_THREAD_UNLOCK_PTR(mutex, NULL)
 	};
+		
 	OTSYS_THREAD_LOCKVAR *mutex;
 };
 
-
+#endif //__DEBUG_CRITICALSECTION__
 
 #endif // #ifndef __OTTHREAD_H__

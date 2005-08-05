@@ -100,11 +100,11 @@ void Protocol74::ReceiveLoop()
 			while(player->inFightTicks >= 1000 && player->isRemoved == false && s == 0){
 				OTSYS_SLEEP(250);
 			}
-			OTSYS_THREAD_LOCK(game->gameLock)
+			OTSYS_THREAD_LOCK(game->gameLock, "Protocol74::ReceiveLoop()")
 			if(s == 0 && player->isRemoved == false){
 				game->removeCreature(player);
 			}
-			OTSYS_THREAD_UNLOCK(game->gameLock)
+			OTSYS_THREAD_UNLOCK(game->gameLock, "Protocol74::ReceiveLoop()")
 		}
 	}while(s != 0 && player->isRemoved == false);
 }
@@ -483,7 +483,7 @@ void Protocol74::parseGetChannels(NetworkMessage &msg){
 void Protocol74::parseOpenChannel(NetworkMessage &msg){
 	unsigned short channelId = msg.GetU16();
 	sendChannel(channelId);
-	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock);
+	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol74::parseOpenChannel()");
 	std::map<long, Creature*>::iterator sit = channel.find(player->getID());
 	if( sit == channel.end() ) {
 		channel[player->getID()] = player;
@@ -492,7 +492,7 @@ void Protocol74::parseOpenChannel(NetworkMessage &msg){
 
 void Protocol74::parseCloseChannel(NetworkMessage &msg){
 	/* unsigned short channelId = */msg.GetU16();
-	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock);
+	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol74::parseCloseChannel()");
 	std::map<long, Creature*>::iterator sit = channel.find(player->getID());
 	if(sit != channel.end()){
 		channel.erase(sit);
@@ -502,7 +502,7 @@ void Protocol74::parseCloseChannel(NetworkMessage &msg){
 void Protocol74::parseOpenPriv(NetworkMessage &msg){
 	std::string receiver; 
 	receiver = msg.GetString();
-	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock);
+	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol74::parseOpenPriv()");
 	Creature* c = game->getCreatureByName(receiver);
 	Player* player = dynamic_cast<Player*>(c);
 	if(player)
@@ -979,7 +979,7 @@ void Protocol74::parseCloseContainer(NetworkMessage &msg)
 void Protocol74::parseUpArrowContainer(NetworkMessage &msg)
 {
 	unsigned char containerid = msg.GetByte();
-	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock);
+	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol74::parseUpArrowContainer()");
 	Container *container = player->getContainer(containerid);
 	if(!container)
 		return;
@@ -1127,7 +1127,7 @@ void Protocol74::parseLookAt(NetworkMessage &msg){
 */
 	Item *item = NULL;
 	Creature *creature = NULL;
-	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock);
+	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol74::parseLookAt()");
 	
 	if(LookPos.x != 0xFFFF) {
 		Tile* tile = game->getTile(LookPos.x, LookPos.y, LookPos.z);
@@ -2667,7 +2667,7 @@ void Protocol74::RemoveItemContainer(NetworkMessage &msg,unsigned char cid,unsig
 //////////////////////////
 
 void Protocol74::flushOutputBuffer(){
-	OTSYS_THREAD_LOCK_CLASS lockClass(bufferLock);
+	OTSYS_THREAD_LOCK_CLASS lockClass(bufferLock, "Protocol74::flushOutputBuffer()");
 	//force writetosocket	
 	OutputBuffer.WriteToSocket(s);
 	OutputBuffer.Reset();
@@ -2679,12 +2679,12 @@ void Protocol74::WriteBuffer(NetworkMessage &add){
 	
 	game->addPlayerBuffer(player);	
 	
-	OTSYS_THREAD_LOCK(bufferLock)
+	OTSYS_THREAD_LOCK(bufferLock, "Protocol74::WriteBuffer")
 	if(OutputBuffer.getMessageLength() + add.getMessageLength() > NETWORKMESSAGE_MAXSIZE){				
 		this->flushOutputBuffer();
 	}	
 	OutputBuffer.JoinMessages(add);	
-	OTSYS_THREAD_UNLOCK(bufferLock)	
+	OTSYS_THREAD_UNLOCK(bufferLock, "Protocol74::WriteBuffer")	
   	return;
 }
 

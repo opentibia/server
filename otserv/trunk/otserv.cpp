@@ -255,7 +255,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 				bool playerexist;
 				Creature *creature;
 				
-				OTSYS_THREAD_LOCK(g_game.gameLock)
+				OTSYS_THREAD_LOCK(g_game.gameLock, "ConnectionHandler()")
 				creature = g_game.getCreatureByName(name);
 				if(creature && dynamic_cast<Player*>(creature)){
 					player = dynamic_cast<Player*>(creature);
@@ -270,7 +270,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 					}
 					player = NULL;
 				}
-				OTSYS_THREAD_UNLOCK(g_game.gameLock)
+				OTSYS_THREAD_UNLOCK(g_game.gameLock, "ConnectionHandler()")
 				if(s){
 					playerexist = (creature != NULL);
 					protocol = new Protocol74(s);
