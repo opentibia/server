@@ -282,8 +282,10 @@ void Protocol74::parsePacket(NetworkMessage &msg)
 		break;
 		
     default:
-		printf("unknown packet header: %x \n", recvbyte);
-		parseDebug(msg);
+#ifdef __DEBUG__
+			printf("unknown packet header: %x \n", recvbyte);
+			parseDebug(msg);
+#endif
 		break;
 	}
 	
