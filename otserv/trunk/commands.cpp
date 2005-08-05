@@ -521,12 +521,13 @@ bool Commands::onlineList(Creature* c, const std::string &cmd, const std::string
 				(*it).second->getPlayerInfo(PLAYERINFO_LEVEL) << std::endl;
 			i++;
 		}
-		if(i % 10 == 0){
+		if(i == 10){
 			player->sendTextMessage(MSG_BLUE_TEXT,players.str().c_str());
 			players.str("");
+			i = 0;
 		}
 	}
-	if(i % 10 != 0)
+	if(i != 0)
 		player->sendTextMessage(MSG_BLUE_TEXT,players.str().c_str());
 	
 	players.str("");
