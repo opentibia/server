@@ -655,7 +655,6 @@ int main(int argc, char *argv[])
 			SOCKET s = accept(listen_socket, NULL, NULL); // accept a new connection
 			if(s > 0){
 					OTSYS_CREATE_THREAD(ConnectionHandler, (void*)&s);
-					OTSYS_SLEEP(20);
 			}
 			else{
 					accept_errors++;
