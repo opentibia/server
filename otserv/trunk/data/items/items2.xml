@@ -2145,11 +2145,11 @@
 <item id="2450" name="bone sword" type="weapon" position="weapon" skill="sword" attack="14" defence="10" weight="1.0"/>
 <item id="2407" name="bright sword" type="weapon" position="weapon" skill="sword" attack="36" defence="30" descr="The blade shimmers in light blue." weight="29.0"/>
 <item id="2413" name="broad sword" type="weapon" position="weapon" skill="sword" attack="26" defence="23" weight="52.5"/>
-<item id="2395" name="carlinsword" type="weapon" position="weapon" skill="sword" attack="15" defence="13" weight="40.0"/>
+<item id="2395" name="carlin sword" type="weapon" position="weapon" skill="sword" attack="15" defence="13" weight="40.0"/>
 <item id="2404" name="combat knife" type="weapon" position="weapon" skill="sword" attack="8" defence="6" weight="8.7"/>
 <item id="2379" name="dagger" type="weapon" position="weapon" skill="sword" attack="8" defence="6" weight="9.5"/>
 <item id="2446" name="the pharao sword" type="weapon" position="weapon" skill="sword" attack="43" defence="23" weight="150.0"/>
-<item id="2393" name="giantsword" type="weapon" position="twohand" skill="sword" attack="46" defence="22" weight="180.0"/>
+<item id="2393" name="giant sword" type="weapon" position="twohand" skill="sword" attack="46" defence="22" weight="180.0"/>
 <item id="2442" name="heavy machete" type="weapon" position="weapon" skill="sword" attack="16" defence="10" weight="18.4"/>
 <item id="2396" name="ice rapier" type="weapon" position="weapon" skill="sword" attack="30" defence="1" descr="A deadly but fragile weapon." weight="15.0"/>
 <item id="2412" name="katana" type="weapon" position="weapon" skill="sword" attack="16" defence="12" weight="31.0"/>
@@ -2219,7 +2219,7 @@
 <item id="2421" name="thunder hammer" type="weapon" position="weapon" skill="club" attack="49" defence="35" weight="125.0" arm="0"/>
 <item id="2391" name="war hammer" type="weapon" position="twohand" skill="club" attack="45" defence="10" weight="85.0" arm="0"/>
 <item id="2436" name="skull staff" type="weapon" skill="club" attack="36" defence="12" descr="the staff longs for death." weight="17.0"/>
-<item id="2433" name="magic staff" type="weapon" skill="magic" attack="35" defence="20" shottype="energy" weight="20.0" />
+<item id="2433" name="magic staff" type="weapon" position="twohand" skill="magic" attack="35" defence="20" shottype="energy" weight="20.0" />
 <item id="2453" name="sprite wand" type="weapon" skill="magic" attack="50" defence="50" shottype="energy" weight="28.0" />
 <!--end club-->
 

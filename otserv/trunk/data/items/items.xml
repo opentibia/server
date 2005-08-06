@@ -1,25 +1,25 @@
 <?xml version="1.0"?>
 
 <items>
-<item id="1988" name="backpack" type="container" position="backpack" maxitems="20" weight="120" descr="asd"/>
-<item id="2554" name="shovel" type="item" weight="35.0" />
-<item id="2433" name="magic staff" type="weapon" position="twohand" skill="magic" attack="35" defence="20" shottype="energy" weight="20" />
+<item id="1988" name="backpack" type="container" position="backpack" maxitems="20" weight="18.0" />
+<item id="2554" name="shovel"  weight="35.0" />
+<item id="2433" name="magic staff" type="weapon" position="twohand" skill="magic" attack="35" defence="20" shottype="energy" weight="20.0" />
 <item id="2434" name="dragon hammer" type="weapon" position="weapon" skill="club" attack="35" defence="20" weight="20" />
-<item id="2455" name="Crossbow" type="weapon" position="twohand" skill="distance" amutype="bolt" attack="0" defence="0" weight="40" />
-<item id="2456" name="Bow" type="weapon" position="twohand" skill="distance" amutype="arrow" attack="0" defence="0" weight="31"/>
-<item id="2392" name="Fire Sword" type="weapon" position="weapon" skill="sword" attack="35" defence="20" descr="The blade is a magic flame." weight="23"/>
-<item id="2432" name="Fire Axe" type="weapon" position="weapon" skill="axe" attack="38" defence="16" descr="The blade is a magic flame." weight="40"/>
-<item id="2436" name="Skull Staff" type="weapon" position="weapon" skill="club" attack="36" defence="12" descr="The staff longs for death." weight="17"/>
-<item id="2472" name="Magic Plate Armor" type="armor" position="body" descr="An enchanted gem glows on the plate armor." weight="85" arm="17"/>
-<item id="2507" name="Dragon Scale Legs" type="armor" position="legs" attack="0" defence="0" weight="48" arm="10"/>
-<item id="2522" name="Great Shield" type="weapon" position="weapon" skill="shielding" attack="0" defence="38" weight="84" arm="0"/>
-<item id="2496" name="Horned Helmet" type="armor" position="helmet" attack="0" defence="0" weight="999" arm="11"/>
-<item id="2641" name="Traper Boots" type="armor" position="boots" attack="0" defence="0" weight="29" arm="3"/> 
-<item id="2130" name="Golden Amulet" type="armor" position="amulet" attack="0" defence="0" weight="999" arm="0"/>
-<item id="2123" name="Ring of the Skies" type="armor" position="ring" weight="0.9" arm="0" />
-<item id="2453" name="Sprite Wand" type="weapon" position="weapon" skill="magic" attack="50" defence="50" weight="28" />
-<item id="2547" name="power bolt" type="amunition" position="hand" amutype="bolt" shottype="power-bolt" attack="60" defence="0" weight="23" />
-<item id="2111" name="Snowball" type="weapon" skill="distance" shottype="snowball" attack="0" defence="0" weight="0.8"/>
+<item id="2455" name="crossbow" type="weapon" position="twohand" skill="distance" amutype="bolt" attack="0" defence="0" weight="40" />
+<item id="2456" name="bow" type="weapon" position="twohand" skill="distance" amutype="arrow" attack="0" defence="0" weight="31"/>
+<item id="2392" name="fire sword" type="weapon" position="weapon" skill="sword" attack="35" defence="20" descr="The blade is a magic flame." weight="23"/>
+<item id="2432" name="fire axe" type="weapon" position="weapon" skill="axe" attack="38" defence="16" descr="The blade is a magic flame." weight="40"/>
+<item id="2436" name="skull staff" type="weapon" position="weapon" skill="club" attack="36" defence="12" descr="The staff longs for death." weight="17"/>
+<item id="2472" name="magic plate armor" type="armor" position="body" descr="An enchanted gem glows on the plate armor." weight="85" arm="17"/>
+<item id="2507" name="dragon scale legs" type="armor" position="legs" attack="0" defence="0" weight="48" arm="10"/>
+<item id="2522" name="great shield" type="weapon" position="weapon" skill="shielding" attack="0" defence="38" weight="84" arm="0"/>
+<item id="2496" name="horned helmet" type="armor" position="helmet" attack="0" defence="0" weight="51.0" arm="11"/>
+<item id="2641" name="traper boots" type="armor" position="boots" attack="0" defence="0" weight="9.0" arm="3"/> 
+<item id="2130" name="golden amulet" type="armor" position="amulet" attack="0" defence="0" weight="9.0" arm="0"/>
+<item id="2123" name="ring of the skies" type="armor" position="ring" weight="0.9" arm="0" />
+<item id="2453" name="sprite wand" type="weapon" skill="magic" attack="50" defence="50" shottype="energy" weight="28.0" />
+<item id="2547" name="power bolt" type="amunition" position="hand" amutype="bolt" shottype="power-bolt" attack="60" defence="0" weight="0.8" />
+<item id="2111" name="snowball" type="weapon" position="weapon" skill="distance" shottype="snowball" attack="0" defence="0" weight="0.8"/>
 
 
 <item id="1387" name="magic forcefield" descr="You can through the other side." type="teleport" weight=""/>
