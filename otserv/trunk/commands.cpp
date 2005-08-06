@@ -501,7 +501,7 @@ bool Commands::onlineList(Creature* c, const std::string &cmd, const std::string
 	Player* player = dynamic_cast<Player*>(c);
 	unsigned long alevelmin = 0;
 	unsigned long alevelmax = 10000;
-	int i;
+	int i,n;
 	if(!player)
 		return false;
 	
@@ -514,12 +514,14 @@ bool Commands::onlineList(Creature* c, const std::string &cmd, const std::string
 	players << "name   level" << std::endl;
 	
 	i = 0;
+	n = 0;
 	AutoList<Player>::listiterator it = Player::listPlayer.list.begin();
 	for(;it != Player::listPlayer.list.end();++it)
 	{
 		if((*it).second->access >= alevelmin && (*it).second->access <= alevelmax){
 			players << (*it).second->getName() << "   " << 
 				(*it).second->getPlayerInfo(PLAYERINFO_LEVEL) << std::endl;
+			n++;
 			i++;
 		}
 		if(i == 10){
@@ -532,7 +534,7 @@ bool Commands::onlineList(Creature* c, const std::string &cmd, const std::string
 		player->sendTextMessage(MSG_BLUE_TEXT,players.str().c_str());
 	
 	players.str("");
-	players << "Total: " << i << " player(s)" << std::endl;
+	players << "Total: " << n << " player(s)" << std::endl;
 	player->sendTextMessage(MSG_BLUE_TEXT,players.str().c_str());
 	return true;
 }
