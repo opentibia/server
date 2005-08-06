@@ -258,7 +258,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 				Player *player;
 				bool playerexist;
 				Creature *creature;
-				
+				OTSYS_SLEEP(1000);
 				OTSYS_THREAD_LOCK(g_game.gameLock, "ConnectionHandler()")
 				creature = g_game.getCreatureByName(name);
 				if(creature && dynamic_cast<Player*>(creature)){
@@ -655,6 +655,7 @@ int main(int argc, char *argv[])
 			SOCKET s = accept(listen_socket, NULL, NULL); // accept a new connection
 			if(s > 0){
 					OTSYS_CREATE_THREAD(ConnectionHandler, (void*)&s);
+					OTSYS_SLEEP(20);
 			}
 			else{
 					accept_errors++;

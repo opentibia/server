@@ -118,6 +118,7 @@ void Protocol74::parsePacket(NetworkMessage &msg)
 	uint8_t recvbyte = msg.GetByte();
 	//a dead player can not performs actions
 	if (player->isRemoved == true && recvbyte != 0x14) {
+		OTSYS_SLEEP(10);
 		return;
 	}	
     
@@ -288,8 +289,8 @@ void Protocol74::parsePacket(NetworkMessage &msg)
 #endif
 		break;
 	}
-	
-	game->flushSendBuffers();  
+	game->flushSendBuffers();
+	OTSYS_SLEEP(10);
 }
 
 void Protocol74::GetTileDescription(const Tile* tile, NetworkMessage &msg)
