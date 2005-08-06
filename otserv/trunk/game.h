@@ -97,15 +97,14 @@ protected:
 enum enum_world_type{
 	WORLD_TYPE_NO_PVP,
 	WORLD_TYPE_PVP,
-	WORLD_TYPE_PVP_ENFORCED,
+	WORLD_TYPE_PVP_ENFORCED
 };
 
 enum enum_game_state{
 	GAME_STATE_NORMAL,
 	GAME_STATE_CLOSED,
-	GAME_STATE_SHUTDOWN,
+	GAME_STATE_SHUTDOWN
 };
-
 
 /**
   * Main Game class.
@@ -242,7 +241,7 @@ public:
 	unsigned long addEvent(SchedulerTask*);
 	bool stopEvent(unsigned long eventid);
 
-	void creatureBroadcastTileUpdated(const Position& pos);
+	//void creatureBroadcastTileUpdated(const Position& pos);
 	void teleport(Thing *thing, const Position& newPos);
       
   std::vector<Player*> BufferedPlayers;   
@@ -352,8 +351,8 @@ protected:
 	void creatureApplyDamage(Creature *creature, int damage, int &outDamage, int &outManaDamage);
 
 	void CreateDamageUpdate(Creature* player, Creature* attackCreature, int damage);
-	void getSpectators(const Range& range, std::vector<Creature*>& list);
 	void CreateManaDamageUpdate(Creature* player, Creature* attackCreature, int damage);
+	void getSpectators(const Range& range, std::vector<Creature*>& list);
 
 	OTSYS_THREAD_LOCKVAR eventLock;
 	OTSYS_THREAD_SIGNALVAR eventSignal;

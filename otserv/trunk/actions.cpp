@@ -1011,9 +1011,12 @@ int ActionScript::luaActionDoSendMagicEffect(lua_State *L)
 	
 	Position realpos = internalGetRealPosition(action, action->_player,(Position&)pos);
 	std::vector<Creature*> list;
+	std::vector<Creature*>::iterator it;
+
 	action->game->getSpectators(Range(realpos, true), list);
-	for(unsigned int i = 0; i < list.size(); ++i){
-		Player *p = dynamic_cast<Player*>(list[i]);
+
+	for(it = list.begin(); it != list.end(); ++it) {
+		Player *p = dynamic_cast<Player*>(*it);
 		if(p)
 			p->sendMagicEffect(realpos,type);
 	}	
@@ -1101,9 +1104,11 @@ int ActionScript::luaActionDoPlayerAddHealth(lua_State *L)
 		player->sendStats();
 		
 		std::vector<Creature*> list;
+		std::vector<Creature*>::iterator it;
+
 		action->game->getSpectators(Range(player->pos,true), list);
-		for(unsigned int i = 0; i < list.size(); i++){
-			Player* p = dynamic_cast<Player*>(list[i]);
+		for(it = list.begin(); it != list.end(); ++it) {
+			Player* p = dynamic_cast<Player*>(*it);
 			if(p)
 				p->sendCreatureHealth(player);
 		}
@@ -1219,9 +1224,12 @@ int ActionScript::luaActionDoSendAnimatedText(lua_State *L)
 	
 	Position realpos = internalGetRealPosition(action, action->_player,(Position&)pos);
 	std::vector<Creature*> list;
+	std::vector<Creature*>::iterator it;
+
 	action->game->getSpectators(Range(realpos, true), list);
-	for(unsigned int i = 0; i < list.size(); ++i){
-		Player *p = dynamic_cast<Player*>(list[i]);
+
+	for(it = list.begin(); it != list.end(); ++it) {
+		Player *p = dynamic_cast<Player*>(*it);
 		if(p)
 			p->sendAnimatedText(realpos, color, text);
 	}

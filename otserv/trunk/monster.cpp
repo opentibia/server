@@ -818,9 +818,10 @@ int Monster::onThink(int& newThinkTicks)
 		if(updateRoute) {
 			route = game->map->getPathTo(this, this->pos, moveToPos, true, canPushItems);
 
-			if(route.empty()) {
+			if(route.empty() && (!hasDistanceAttack || !validateDistanceAttack(targetPos))) {
 				state = STATE_TARGETNOTREACHABLE;
 			}
+
 			if(!route.empty() && route.front() == this->pos) {
 				route.pop_front();
 			}
@@ -1265,8 +1266,8 @@ void Monster::onCreatureMove(const Creature *creature, const Position *oldPos)
 				targetPos = creature->pos;
 				//Update move position
 				calcMovePosition();
-				updateLookDirection();
-				route.clear();
+				//updateLookDirection();
+				//route.clear();
 			}
 		}
 		else if(state == STATE_IDLE || state == STATE_TARGETNOTREACHABLE) {
@@ -1330,7 +1331,10 @@ void Monster::selectTarget(const Creature* creature, bool canReach /* = true*/)
 	if(canReach) {
 		state = STATE_ATTACKING;
 
-		Creature *attackedCreature = game->getCreatureByID(this->attackedCreature);
+		updateLookDirection();
+
+		Creature *attackedCreature = const_cast<Creature*>(creature);
+		//Creature *attackedCreature = game->getCreatureByID(this->attackedCreature);
 		if(attackedCreature) {
 			if(validateDistanceAttack(attackedCreature)){
 				doAttacks(attackedCreature, MODE_AGGRESSIVE);
@@ -1560,13 +1564,20 @@ bool Monster::monsterMoveItem(Item* item, int radius)
 	else{
 		itemCount = 1;
 	}
-	//try random position in raiuds
+	//try random position in radius
 	tryPos.z = item->pos.z;
 	for(int i = 0; i < 4*radius; i++){
 		tryPos.x = item->pos.x + rand() % radius;
 		tryPos.y = item->pos.y + rand() % radius;
 		if(game->map->canThrowItemTo(item->pos,tryPos)){
-			game->thingMove(this, item ,tryPos.x, tryPos.y, tryPos.z, itemCount);
+			//game->thingMove(this, item ,tryPos.x, tryPos.y, tryPos.z, itemCount);
+
+			Tile *fromTile = game->getTile(item->pos.x, item->pos.y, item->pos.z);
+			int oldstackpos = fromTile->getThingStackPos(item);
+
+			game->thingMoveInternal(this, item->pos.x, item->pos.y, item->pos.z,
+				oldstackpos, item->getID(), tryPos.x, tryPos.y, tryPos.z, count);
+
 			if(item->pos == tryPos){
 				return true;
 			}
