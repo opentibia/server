@@ -106,7 +106,7 @@ public:
 	bool addItem(Item* item, bool test = false);
 	bool internalAddItemContainer(Container *container,Item* item);
 
-	freeslot_t getFreeSlot(Container **container,unsigned char &slot );
+	freeslot_t getFreeSlot(Container **container,unsigned char &slot, const Item* item);
 	Container* getFreeContainerSlot(Container *parent);
 
 	//bool removeItem(unsigned short id,unsigned short count);

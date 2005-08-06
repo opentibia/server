@@ -544,7 +544,7 @@ bool Player::addItem(Item *item, bool test /*=false*/){
 	Container *container;
 	unsigned char slot;
 	
-	switch(getFreeSlot(&container,slot)){
+	switch(getFreeSlot(&container,slot, item)){
 		case SLOT_TYPE_NONE:
 			return false;
 		case SLOT_TYPE_INVENTORY:
@@ -574,21 +574,23 @@ bool Player::addItem(Item *item, bool test /*=false*/){
 	return false;
 }
 
-freeslot_t Player::getFreeSlot(Container **container,unsigned char &slot )
+freeslot_t Player::getFreeSlot(Container **container,unsigned char &slot, const Item* item)
 {
 	*container = NULL;
-	//first look free slot in inventory
-	if(!items[SLOT_RIGHT]){
-		if(!(items[SLOT_LEFT] && (items[SLOT_LEFT]->getSlotPosition() & SLOTP_TWO_HAND))){
-			slot = SLOT_RIGHT;
-			return SLOT_TYPE_INVENTORY;
-		}		
-	}
+	if(!(item->getSlotPosition() & SLOTP_TWO_HAND) || (!items[SLOT_RIGHT] && !items[SLOT_LEFT])) {
+		//first look free slot in inventory
+		if(!items[SLOT_RIGHT]){
+			if(!(items[SLOT_LEFT] && (items[SLOT_LEFT]->getSlotPosition() & SLOTP_TWO_HAND))){
+				slot = SLOT_RIGHT;
+				return SLOT_TYPE_INVENTORY;
+			}		
+		}
 
-	if(!items[SLOT_LEFT]){
-		if(!(items[SLOT_RIGHT] && (items[SLOT_RIGHT]->getSlotPosition() & SLOTP_TWO_HAND))){
-			slot = SLOT_LEFT;
-			return SLOT_TYPE_INVENTORY;
+		if(!items[SLOT_LEFT]){
+			if(!(items[SLOT_RIGHT] && (items[SLOT_RIGHT]->getSlotPosition() & SLOTP_TWO_HAND))){
+				slot = SLOT_LEFT;
+				return SLOT_TYPE_INVENTORY;
+			}
 		}
 	}
 
