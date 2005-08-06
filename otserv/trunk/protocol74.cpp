@@ -2683,7 +2683,7 @@ void Protocol74::WriteBuffer(NetworkMessage &add){
 	game->addPlayerBuffer(player);	
 	
 	OTSYS_THREAD_LOCK(bufferLock, "Protocol74::WriteBuffer")
-	if(OutputBuffer.getMessageLength() + add.getMessageLength() > NETWORKMESSAGE_MAXSIZE){				
+	if(OutputBuffer.getMessageLength() + add.getMessageLength() >= NETWORKMESSAGE_MAXSIZE - 16){
 		this->flushOutputBuffer();
 	}	
 	OutputBuffer.JoinMessages(add);	

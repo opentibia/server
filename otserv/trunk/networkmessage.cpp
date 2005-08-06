@@ -244,8 +244,8 @@ void NetworkMessage::AddString(const std::string &value)
 
 void NetworkMessage::AddString(const char* value)
 {
-  unsigned short stringlen = (unsigned short) strlen(value);
-  if(!canAdd(stringlen+2))
+  unsigned long stringlen = (unsigned long) strlen(value);
+  if(!canAdd(stringlen+2) || stringlen > 8192)
     return;
   AddU16(stringlen);
   strcpy((char*)m_MsgBuf + m_ReadPos, value);
