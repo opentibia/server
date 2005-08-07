@@ -689,7 +689,7 @@ bool Monster::isCreatureReachable(const  Creature* creature)
 
 Creature* Monster::findTarget(long range, bool &canReach, const Creature *ignoreCreature /*= NULL*/)
 {
-	std::vector<Creature*> tmplist;
+	SpectatorVec tmplist;
 	if(range == 0)
 		game->getSpectators(Range(this->pos,false), tmplist);
 	else
@@ -698,7 +698,7 @@ Creature* Monster::findTarget(long range, bool &canReach, const Creature *ignore
 	std::vector<Creature*> targetlist;
 	std::vector<Creature*> unreachablelist;
 	const Player* player = NULL;
-	for(std::vector<Creature*>::const_iterator cit = tmplist.begin(); cit != tmplist.end(); ++cit) {
+	for(SpectatorVec::const_iterator cit = tmplist.begin(); cit != tmplist.end(); ++cit) {
 		if(ignoreCreature == *cit || (*cit)->access > 0 || !(player = dynamic_cast<const Player*>(*cit)))
 			continue;
 
@@ -1387,7 +1387,7 @@ std::string Monster::getDescription(bool self) const
 	str = getName();
 	std::transform(str.begin(), str.end(), str.begin(), tolower);
 
-	s << "You see a " << str << ".";
+	s << "a " << str << ".";
 	str = s.str();
 
 	return str;

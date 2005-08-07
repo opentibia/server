@@ -509,11 +509,13 @@ void Spawn::idle(int t)
 		if(spawnedmap.count(sit->first) == 0) {
 			if((OTSYS_TIME() - sit->second.lastspawn) >= sit->second.spawntime) {
 
-				std::vector<Creature*> list;
+				SpectatorVec list;
+				SpectatorVec::iterator it;
+
 				game->getSpectators(Range(sit->second.pos, true), list);
 
 				bool playerFound = false;
-				for(std::vector<Creature*>::iterator it = list.begin(); it != list.end(); ++it) {
+				for(it = list.begin(); it != list.end(); ++it) {
 					Player *player = dynamic_cast<Player*>(*it);
 					if(player && player->access == 0) {
 						playerFound = true;

@@ -156,13 +156,13 @@ std::string Player::getDescription(bool self) const
 	std::string str;
 	
 	if(self){
-		s << "You see yourself.";
+		s << "yourself.";
 
 		if(vocation != VOCATION_NONE)
 			s << " You are " << g_config.getGlobalStringField("vocations", (int)vocation) << ".";
 	}
 	else {	
-		s << "You see " << name << " (Level " << level <<").";
+		s << name << " (Level " << level <<").";
 	
 		if(vocation != VOCATION_NONE){
 			if(sex == PLAYERSEX_FEMALE)

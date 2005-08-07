@@ -85,7 +85,7 @@ public:
 	bool floorChangeEast() const;
 	bool floorChangeWest() const;
 
-	std::string getDescription(bool fullDescription) const;
+	virtual std::string getDescription(bool fullDescription) const;
 	std::string getName() const ;
 	void setSpecialDescription(std::string desc);
 	std::string getSpecialDescription();

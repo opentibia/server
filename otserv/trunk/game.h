@@ -83,14 +83,14 @@ public:
 	void onAttack(Creature* attacker, const Position& pos, const MagicEffectClass* me);
 	void onAttack(Creature* attacker, const Position& pos, Creature* attackedCreature);
 	const CreatureStateVec& getCreatureStateList(Tile* tile) {return creaturestates[tile];};
-	const std::vector<Creature*>& getSpectators() {return spectatorlist;}
+	const SpectatorVec& getSpectators() {return spectatorlist;}
 
 protected:
 	void addCreatureState(Tile* tile, Creature* attackedCreature, int damage, int manaDamage, bool drawBlood);
 	void onAttackedCreature(Tile* tile, Creature* attacker, Creature* attackedCreature, int damage, bool drawBlood);
 	Game *game;
 
-	std::vector<Creature*> spectatorlist;
+	SpectatorVec spectatorlist;
 	CreatureStates creaturestates;
 };
 
@@ -352,7 +352,7 @@ protected:
 
 	void CreateDamageUpdate(Creature* player, Creature* attackCreature, int damage);
 	void CreateManaDamageUpdate(Creature* player, Creature* attackCreature, int damage);
-	void getSpectators(const Range& range, std::vector<Creature*>& list);
+	void getSpectators(const Range& range, SpectatorVec& list);
 
 	OTSYS_THREAD_LOCKVAR eventLock;
 	OTSYS_THREAD_SIGNALVAR eventSignal;

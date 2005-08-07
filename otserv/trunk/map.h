@@ -159,6 +159,9 @@ template<class T> class lessPointer : public std::binary_function<T*, T*, bool> 
 		  }
 };
 
+//typedef std::vector<Creature*> SpectatorVec;
+typedef std::list<Creature*> SpectatorVec;
+
 /**
   * Map class.
   * Holds all the actual map-data
@@ -232,7 +235,7 @@ class Map {
   protected:    
     /**
 	  * Get the Creatures within a specific Range */
-	void getSpectators(const Range& range, std::vector<Creature*>& list);
+	void getSpectators(const Range& range, SpectatorVec& list);
     
     typedef std::map<unsigned long, Tile*> TileMap;
 	//TileMap tileMaps[32][32][MAP_LAYER];	

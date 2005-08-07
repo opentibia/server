@@ -132,8 +132,8 @@ void GameState::onAttack(Creature* attacker, const Position& pos, const MagicEff
 			int stackpos = tile->getThingStackPos(magicItem);
 			if(tile->removeThing(magicItem)) {
 
-				std::vector<Creature*> list;
-				std::vector<Creature*>::iterator it;
+				SpectatorVec list;
+				SpectatorVec::iterator it;
 
 				game->getSpectators(Range(pos, true), list);
 				
@@ -175,8 +175,8 @@ void GameState::onAttack(Creature* attacker, const Position& pos, const MagicEff
 
 			tile->addThing(magicItem);
 
-			std::vector<Creature*> list;
-			std::vector<Creature*>::iterator it;
+			SpectatorVec list;
+			SpectatorVec::iterator it;
 
 			game->getSpectators(Range(pos, true), list);
 
@@ -304,23 +304,26 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 		game->sendAddThing(NULL,corpseitem->pos,corpseitem);
 		
 		if(attackedplayer){
-			//set body special description
-			std::stringstream s;
-			s << "a dead human. You recognize " 
-				<< attackedplayer->getName() << ". ";
+			std::stringstream ss;
+			ss << corpseitem->getDescription(false);
+
+			ss << "You recognize " << attackedplayer->getName() << ". ";
 			if(attacker){
-				if(attackedplayer->getSex() == PLAYERSEX_FEMALE)
-					s << "She";
-				else
-					s << "He";
-				s << " was killed by ";
+				ss << (attackedplayer->getSex() == PLAYERSEX_FEMALE ? "She" : "He") << " was killed by ";
+
 				Player *attackerplayer = dynamic_cast<Player*>(attacker);
-				if(attackerplayer)
-					s << attacker->getName();
-				else
-					s << "a " << attacker->getName();
-			}				
-			corpseitem->setSpecialDescription(s.str());
+				if(attackerplayer) {
+					ss << attacker->getName();
+				}
+				else {
+					std::string creaturename = attacker->getName();
+					std::transform(creaturename.begin(), creaturename.end(), creaturename.begin(), tolower);
+					ss << "a " << creaturename;
+				}
+			}
+
+			//set body special description
+			corpseitem->setSpecialDescription(ss.str());
 			//send corpse to the dead player. It is not in spectator list
 			// because was removed
 			attackedplayer->onThingAppear(corpseitem);
@@ -357,10 +360,10 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 					}
 
 					//Need to add this creature and all that can see it to spectators, unless they already added
-					std::vector<Creature*> creaturelist;
+					SpectatorVec creaturelist;
 					game->getSpectators(Range(gainExpCreature->pos, true), creaturelist);
 
-					for(std::vector<Creature*>::const_iterator cit = creaturelist.begin(); cit != creaturelist.end(); ++cit) {
+					for(SpectatorVec::const_iterator cit = creaturelist.begin(); cit != creaturelist.end(); ++cit) {
 						if(std::find(spectatorlist.begin(), spectatorlist.end(), *cit) == spectatorlist.end()) {
 							spectatorlist.push_back(*cit);
 						}
@@ -1301,8 +1304,8 @@ void Game::thingMoveInternal(Player *player,
 				player->updateInventoryWeigth();
 			}
 
-			std::vector<Creature*> list;
-			std::vector<Creature*>::iterator it;
+			SpectatorVec list;
+			SpectatorVec::iterator it;
 
 			Position fromPos = (fromContainer->pos.x == 0xFFFF ? player->pos : fromContainer->pos);
 			Position toPos = (toContainer->pos.x == 0xFFFF ? player->pos : toContainer->pos);
@@ -1468,8 +1471,8 @@ void Game::thingMoveInternal(Player *player,
 				}
 
 				if(fromContainer->pos.x != 0xFFFF) {
-					std::vector<Creature*> list;
-					std::vector<Creature*>::iterator it;
+					SpectatorVec list;
+					SpectatorVec::iterator it;
 
 					getSpectators(Range(fromContainer->pos, false), list);
 
@@ -1563,8 +1566,8 @@ void Game::thingMoveInternal(Player *player,
 				}
 
 				if(toContainer->pos.x != 0xFFFF) {
-					std::vector<Creature*> list;
-					std::vector<Creature*>::iterator it;
+					SpectatorVec list;
+					SpectatorVec::iterator it;
 
 					getSpectators(Range(toContainer->pos, false), list);
 
@@ -1672,12 +1675,12 @@ void Game::thingMoveInternal(Player *player,
 				player->updateInventoryWeigth();
 			}
 
-			std::vector<Creature*> list;
-			std::vector<Creature*>::iterator it;
+			SpectatorVec list;
+			SpectatorVec::iterator it;
 
 			getSpectators(Range(fromPos, false), list);
 
-			std::vector<Creature*> tolist;
+			SpectatorVec tolist;
 			getSpectators(Range(toPos, true), tolist);
 
 			for(it = tolist.begin(); it != tolist.end(); ++it) {
@@ -1765,12 +1768,12 @@ void Game::thingMoveInternal(Player *player,
 
 			player->updateInventoryWeigth();
 
-			std::vector<Creature*> list;
-			std::vector<Creature*>::iterator it;
+			SpectatorVec list;
+			SpectatorVec::iterator it;
 
 			getSpectators(Range(player->pos, false), list);
 
-			std::vector<Creature*> tolist;
+			SpectatorVec tolist;
 			getSpectators(Range(toPos, true), tolist);
 
 			for(it = tolist.begin(); it != tolist.end(); ++it) {
@@ -1907,8 +1910,8 @@ void Game::thingMoveInternal(Player *player, const Position& fromPos, unsigned c
 				player->updateInventoryWeigth();
 			}
 
-			std::vector<Creature*> list;
-			std::vector<Creature*>::iterator it;
+			SpectatorVec list;
+			SpectatorVec::iterator it;
 
 			getSpectators(Range(fromPos, true), list);
 
@@ -2007,8 +2010,8 @@ void Game::thingMoveInternal(Player *player, const Position& fromPos, unsigned c
 
 			player->updateInventoryWeigth();
 
-			std::vector<Creature*> list;
-			std::vector<Creature*>::iterator it;
+			SpectatorVec list;
+			SpectatorVec::iterator it;
 
 			getSpectators(Range(fromPos, true), list);
 
@@ -2173,8 +2176,8 @@ void Game::thingMoveInternal(Creature *creature, unsigned short from_x, unsigned
 		thing->pos.y = to_y;
 		thing->pos.z = to_z;
 		
-		std::vector<Creature*> list;
-		std::vector<Creature*>::iterator it;
+		SpectatorVec list;
+		SpectatorVec::iterator it;
 
 		getSpectators(Range(oldPos, Position(to_x, to_y, to_z)), list);
 
@@ -2307,7 +2310,7 @@ void Game::thingMoveInternal(Creature *creature, unsigned short from_x, unsigned
 	}
 }
 
-void Game::getSpectators(const Range& range, std::vector<Creature*>& list)
+void Game::getSpectators(const Range& range, SpectatorVec& list)
 {
 	map->getSpectators(range, list);
 }
@@ -2346,8 +2349,8 @@ void Game::creatureTurn(Creature *creature, Direction dir)
 
 		int stackpos = map->getTile(creature->pos)->getThingStackPos(creature);
 
-		std::vector<Creature*> list;
-		std::vector<Creature*>::iterator it;
+		SpectatorVec list;
+		SpectatorVec::iterator it;
 
 		map->getSpectators(Range(creature->pos, true), list);
 
@@ -2385,9 +2388,9 @@ void Game::resetCommandTag(){
 }
 
 void Game::creatureSay(Creature *creature, SpeakClasses type, const std::string &text)
-{
-	
+{	
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::creatureSay()");
+
 	bool GMcommand = false;
 	// First, check if this was a GM command
 	for(int i=0;i< commandTags.size() ;i++){
@@ -2400,16 +2403,25 @@ void Game::creatureSay(Creature *creature, SpeakClasses type, const std::string 
 	}
 	if(!GMcommand){
 		// It was no command, or it was just a player
-		std::vector<Creature*> list;
+		SpectatorVec list;
+		SpectatorVec::iterator it;
+
 		getSpectators(Range(creature->pos), list);
 
-		for(unsigned int i = 0; i < list.size(); ++i)
-		{
-			list[i]->onCreatureSay(creature, type, text);
+		//players
+		for(it = list.begin(); it != list.end(); ++it) {
+			if(dynamic_cast<Player*>(*it)) {
+				(*it)->onCreatureSay(creature, type, text);
+			}
 		}
-
+		
+		//none-players
+		for(it = list.begin(); it != list.end(); ++it) {
+			if(!dynamic_cast<Player*>(*it)) {
+				(*it)->onCreatureSay(creature, type, text);
+			}
+		}
 	}
-	
 }
 
 void Game::teleport(Thing *thing, const Position& newPos) {
@@ -2436,8 +2448,8 @@ void Game::teleport(Thing *thing, const Position& newPos) {
 			toTile->addThing(thing);
 			Position oldPos = thing->pos;
 			
-			std::vector<Creature*> list;
-			std::vector<Creature*>::iterator it;
+			SpectatorVec list;
+			SpectatorVec::iterator it;
 
 			getSpectators(Range(thing->pos, true), list);
 			
@@ -2495,15 +2507,6 @@ void Game::teleport(Thing *thing, const Position& newPos) {
 					(*it)->onTeleport(creature, &oldPos, osp);
 				}
 			}
-
-			/*
-			//first inform creature that is being moved
-			creature->onTeleport(creature, &oldPos, osp);
-			for(size_t i = 0; i < list.size(); ++i){
-				if(list[i] != creature)
-					list[i]->onTeleport(creature, &oldPos, osp);
-			}
-			*/
 		}
 		else{
 			if(removeThing(NULL, thing->pos, thing, false)){
@@ -2519,8 +2522,8 @@ void Game::creatureChangeOutfit(Creature *creature)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::creatureChangeOutfit()");
 
-	std::vector<Creature*> list;
-	std::vector<Creature*>::iterator it;
+	SpectatorVec list;
+	SpectatorVec::iterator it;
 
 	getSpectators(Range(creature->pos, true), list);
 
@@ -2543,8 +2546,8 @@ void Game::creatureWhisper(Creature *creature, const std::string &text)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::creatureWhisper()");
 
-	std::vector<Creature*> list;
-	std::vector<Creature*>::iterator it;
+	SpectatorVec list;
+	SpectatorVec::iterator it;
 
 	getSpectators(Range(creature->pos), list);
 
@@ -2582,8 +2585,8 @@ void Game::creatureYell(Creature *creature, std::string &text)
 		creature->exhaustedTicks = (long)g_config.getGlobalNumber("exhausted", 0);
 		std::transform(text.begin(), text.end(), text.begin(), upchar);
 
-		std::vector<Creature*> list;
-		std::vector<Creature*>::iterator it;
+		SpectatorVec list;
+		SpectatorVec::iterator it;
 
 		getSpectators(Range(creature->pos, 18, 18, 14, 14), list);
 
@@ -2606,22 +2609,33 @@ void Game::creatureYell(Creature *creature, std::string &text)
 void Game::creatureSpeakTo(Creature *creature, SpeakClasses type,const std::string &receiver, const std::string &text)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::creatureSpeakTo");
-
-	Creature* c = getCreatureByName(receiver);
-	if(creature->access == 0)
-		type = SPEAK_PRIVATE;
 	
-	if(c) {
-		c->onCreatureSay(creature, type, text);	
+	Player* player = dynamic_cast<Player*>(creature);
+	if(!player)
+		return;
+
+	Player* toPlayer = dynamic_cast<Player*>(getCreatureByName(receiver));
+	if(!toPlayer) {
+		player->sendTextMessage(MSG_SMALLINFO, "A player with this name is not online.");
+		return;
 	}
+
+	if(toPlayer->access == 0)
+		type = SPEAK_PRIVATE;
+
+	toPlayer->onCreatureSay(creature, type, text);	
+
+	std::stringstream ss;
+	ss << "Message sent to " << toPlayer->getName() << ".";
+	player->sendTextMessage(MSG_SMALLINFO, ss.str().c_str());
 }
 
 void Game::creatureMonsterYell(Monster* monster, const std::string& text) 
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::creatureMonsterYell()");
 
-	std::vector<Creature*> list;
-	std::vector<Creature*>::iterator it;
+	SpectatorVec list;
+	SpectatorVec::iterator it;
 
 	map->getSpectators(Range(monster->pos, 18, 18, 14, 14), list);
 
@@ -2650,18 +2664,24 @@ void Game::creatureToChannel(Creature *creature, SpeakClasses type, const std::s
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::creatureToChannel()");
 
-	if(creature->access == 0){
+	Player* player = dynamic_cast<Player*>(creature);
+	if(!player)
+		return;
+
+	if(player->access == 0){
 		type = SPEAK_CHANNEL_Y;
 	}
 
 	std::map<long, Creature*>::iterator cit;
 	for (cit = channel.begin(); cit != channel.end(); cit++)
 	{
-		Player* player = dynamic_cast<Player*>(cit->second);
-		if(player){
-			player->sendToChannel(creature, type, text, channelId);
+		Player* toPlayer = dynamic_cast<Player*>(cit->second);
+		if(toPlayer){
+			toPlayer->sendToChannel(creature, type, text, channelId);
 		}
 	}
+
+	player->sendTextMessage(MSG_SMALLINFO, "Message sent.");
 }
 
 
@@ -2758,8 +2778,8 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 		}
 	}
 
-	std::vector<Creature*> spectatorlist = gamestate.getSpectators();
-	std::vector<Creature*>::iterator it;
+	SpectatorVec spectatorlist = gamestate.getSpectators();
+	SpectatorVec::iterator it;
 
 	for(it = spectatorlist.begin(); it != spectatorlist.end(); ++it) {
 		Player* spectator = dynamic_cast<Player*>(*it);
@@ -3068,8 +3088,8 @@ void Game::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fi
 	else if(player)
 		player->addSkillTry(1);
 	
-	std::vector<Creature*> spectatorlist = gamestate.getSpectators();
-	std::vector<Creature*>::iterator it;
+	SpectatorVec spectatorlist = gamestate.getSpectators();
+	SpectatorVec::iterator it;
 
 	for(it = spectatorlist.begin(); it != spectatorlist.end(); ++it) {
 		Player* spectator = dynamic_cast<Player*>(*it);
@@ -3238,8 +3258,8 @@ void Game::checkCreature(unsigned long id)
 					player->food -= thinkTicks;
 					if(player->healthmax - player->health > 0){
 						player->health += min(5, player->healthmax - player->health);
-						std::vector<Creature*> list;
-						std::vector<Creature*>::iterator it;
+						SpectatorVec list;
+						SpectatorVec::iterator it;
 
 						getSpectators(Range(creature->pos), list);
 
@@ -3350,8 +3370,8 @@ void Game::changeSpeed(unsigned long id, unsigned short speed)
 			player->sendIcons();
 		}
 
-		std::vector<Creature*> list;
-		std::vector<Creature*>::iterator it;
+		SpectatorVec list;
+		SpectatorVec::iterator it;
 
 		getSpectators(Range(creature->pos), list);
 
@@ -3448,8 +3468,8 @@ void Game::checkDecay(int t)
 									if(tile->removeThing(item)){
 										//autoclose containers
 										if(dynamic_cast<Container*>(item)){
-											std::vector<Creature*> list;
-											std::vector<Creature*>::iterator it;
+											SpectatorVec list;
+											SpectatorVec::iterator it;
 
 											getSpectators(Range(pos, true), list);
 
@@ -3861,7 +3881,9 @@ void Game::playerLookInTrade(Player* player, bool lookAtCounterOffer, int index)
 		return;
 
 	if(index == 0) {
-		player->sendTextMessage(MSG_INFO, tradeItem->getDescription(true).c_str());
+		stringstream ss;
+		ss << "You see " << tradeItem->getDescription(true);
+		player->sendTextMessage(MSG_INFO, ss.str().c_str());
 		return;
 	}
 
@@ -3905,7 +3927,9 @@ void Game::playerLookInTrade(Player* player, bool lookAtCounterOffer, int index)
 	}
 	
 	if(foundItem) {
-		player->sendTextMessage(MSG_INFO, tradeItem->getDescription(true).c_str());
+		stringstream ss;
+		ss << "You see " << tradeItem->getDescription(true);
+		player->sendTextMessage(MSG_INFO, ss.str().c_str());
 	}
 }
 
@@ -4087,8 +4111,8 @@ void Game::sendAddThing(Player* player,const Position &pos,const Thing* thing){
 			if(!container)
 				return;
 			
-			std::vector<Creature*> list;
-			std::vector<Creature*>::iterator it;
+			SpectatorVec list;
+			SpectatorVec::iterator it;
 
 			Position centerpos = (container->pos.x == 0xFFFF ? player->pos : container->pos);
 			getSpectators(Range(centerpos,2,2,2,2,false), list);
@@ -4114,8 +4138,8 @@ void Game::sendAddThing(Player* player,const Position &pos,const Thing* thing){
 		if(!thing)
 			return;
 		
-		std::vector<Creature*> list;
-		std::vector<Creature*>::iterator it;
+		SpectatorVec list;
+		SpectatorVec::iterator it;
 
 		getSpectators(Range(pos,true), list);
 
@@ -4162,8 +4186,8 @@ void Game::sendRemoveThing(Player* player,const Position &pos,const Thing* thing
 			//check that item is in the container
 			unsigned char slot = container->getSlotNumberByItem(item);
 			
-			std::vector<Creature*> list;
-			std::vector<Creature*>::iterator it;
+			SpectatorVec list;
+			SpectatorVec::iterator it;
 
 			Position centerpos = (container->pos.x == 0xFFFF ? player->pos : container->pos);
 			getSpectators(Range(centerpos,2,2,2,2,false), list);
@@ -4197,8 +4221,8 @@ void Game::sendRemoveThing(Player* player,const Position &pos,const Thing* thing
 	}
 	else //ground
 	{		
-		std::vector<Creature*> list;
-		std::vector<Creature*>::iterator it;
+		SpectatorVec list;
+		SpectatorVec::iterator it;
 
 		getSpectators(Range(pos,true), list);
 
@@ -4243,8 +4267,8 @@ void Game::sendUpdateThing(Player* player,const Position &pos,const Thing* thing
 			//check that item is in the container
 			unsigned char slot = container->getSlotNumberByItem(item);
 			
-			std::vector<Creature*> list;
-			std::vector<Creature*>::iterator it;
+			SpectatorVec list;
+			SpectatorVec::iterator it;
 
 			Position centerpos = (container->pos.x == 0xFFFF ? player->pos : container->pos);
 			getSpectators(Range(centerpos,2,2,2,2,false), list);
@@ -4273,8 +4297,8 @@ void Game::sendUpdateThing(Player* player,const Position &pos,const Thing* thing
 		if(!thing)
 			return;
 
-		std::vector<Creature*> list;
-		std::vector<Creature*>::iterator it;
+		SpectatorVec list;
+		SpectatorVec::iterator it;
 
 		getSpectators(Range(pos,true), list);
 
@@ -4347,8 +4371,8 @@ void Game::addThing(Player* player,const Position &pos,Thing* thing)
 			else if(item && item->isGroundTile()){
 				tile->ground = item;
 
-				std::vector<Creature*> list;
-				std::vector<Creature*>::iterator it;
+				SpectatorVec list;
+				SpectatorVec::iterator it;
 
 				getSpectators(Range(thing->pos, true), list);
 

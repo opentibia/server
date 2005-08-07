@@ -220,7 +220,7 @@ bool Map::removeCreature(Creature* c)
 	return true;
 }
 
-void Map::getSpectators(const Range& range, std::vector<Creature*>& list)
+void Map::getSpectators(const Range& range, SpectatorVec& list)
 {
 /*
 #ifdef __DEBUG__

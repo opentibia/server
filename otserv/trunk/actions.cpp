@@ -1014,8 +1014,8 @@ int ActionScript::luaActionDoSendMagicEffect(lua_State *L)
 	ActionScript *action = getActionScript(L);
 	
 	Position realpos = internalGetRealPosition(action, action->_player,(Position&)pos);
-	std::vector<Creature*> list;
-	std::vector<Creature*>::iterator it;
+	SpectatorVec list;
+	SpectatorVec::iterator it;
 
 	action->game->getSpectators(Range(realpos, true), list);
 
@@ -1107,8 +1107,8 @@ int ActionScript::luaActionDoPlayerAddHealth(lua_State *L)
 		}
 		player->sendStats();
 		
-		std::vector<Creature*> list;
-		std::vector<Creature*>::iterator it;
+		SpectatorVec list;
+		SpectatorVec::iterator it;
 
 		action->game->getSpectators(Range(player->pos,true), list);
 		for(it = list.begin(); it != list.end(); ++it) {
@@ -1227,8 +1227,8 @@ int ActionScript::luaActionDoSendAnimatedText(lua_State *L)
 	ActionScript *action = getActionScript(L);
 	
 	Position realpos = internalGetRealPosition(action, action->_player,(Position&)pos);
-	std::vector<Creature*> list;
-	std::vector<Creature*>::iterator it;
+	SpectatorVec list;
+	SpectatorVec::iterator it;
 
 	action->game->getSpectators(Range(realpos, true), list);
 

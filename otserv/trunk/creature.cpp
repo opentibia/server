@@ -210,7 +210,7 @@ std::string Creature::getDescription(bool self) const
 {
   std::stringstream s;
 	std::string str;	
-	s << "You see a " << name << ".";
+	s << "a " << name << ".";
 	str = s.str();
 	return str;
 }

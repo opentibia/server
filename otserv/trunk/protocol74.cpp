@@ -1167,13 +1167,21 @@ void Protocol74::parseLookAt(NetworkMessage &msg){
 				fullDescription = true;
 		}
 
-		AddTextMessage(newmsg,MSG_INFO, item->getDescription(fullDescription).c_str());
+		std::stringstream ss;
+		ss << "You see " << item->getDescription(fullDescription);
+		AddTextMessage(newmsg,MSG_INFO, ss.str().c_str());
 	}
 	else if(creature) {
-		if(player == creature)
-			AddTextMessage(newmsg,MSG_INFO, creature->getDescription(true).c_str());
-		else
-			AddTextMessage(newmsg,MSG_INFO, creature->getDescription().c_str());
+		if(player == creature) {
+			std::stringstream ss;
+			ss << "You see " << creature->getDescription(true);
+			AddTextMessage(newmsg,MSG_INFO, ss.str().c_str());
+		}
+		else {
+			std::stringstream ss;
+			ss << "You see " << creature->getDescription().c_str();
+			AddTextMessage(newmsg,MSG_INFO, ss.str().c_str());
+		}
 	}
 //#endif
   

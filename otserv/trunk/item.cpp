@@ -457,28 +457,30 @@ std::string Item::getDescription(bool fullDescription) const
 {
 	std::stringstream s;
 	std::string str;
+	const ItemType& it = items[id];
+
 	if(specialDescription){
-		s << "You see " << (*specialDescription) << ".";
+		s << (*specialDescription) << ".";
 
 		if(fullDescription) {
-			if(items[id].weight > 0)
-					s << std::endl << "It weighs " << std::fixed << std::setprecision(1) << items[id].weight << " oz.";
+			if(it.weight > 0)
+				s << std::endl << "It weighs " << std::fixed << std::setprecision(1) << it.weight << " oz.";
 		}
 	}
-	else if (items[id].name.length()) {
+	else if (it.name.length()) {
 		if(isStackable() && count > 1) {
-			s<<"You see "<< (int)count << " " << items[id].name << "s" << "." << std::endl;
+			s << (int)count << " " << it.name << "s" << "." << std::endl;
 
 			if(fullDescription) {
-				s << "They weight " << std::fixed << std::setprecision(1) << ((double) count * items[id].weight) << " oz.";
+				s << "They weight " << std::fixed << std::setprecision(1) << ((double) count * it.weight) << " oz.";
 			}
 		}		
 		else {
 			if(items[id].runeMagLevel != -1)
 			{
-				s << "You see a spell rune for level " << items[id].runeMagLevel << "." << std::endl;
+				s << "a spell rune for level " << it.runeMagLevel << "." << std::endl;
 
-				s << "It's an \"" << items[id].name << "\" spell (";
+				s << "It's an \"" << it.name << "\" spell (";
 				if(getItemCharge())
 					s << (int)getItemCharge();
 				else
@@ -487,14 +489,14 @@ std::string Item::getDescription(bool fullDescription) const
 			}
 			else if(isWeapon() && (getAttack() || getDefense()))
 			{
-				s << "You see a " << items[id].name << " (Atk:" << (int)getAttack() << " Def:" << (int)getDefense() << ")." << std::endl;
+				s << "a " << it.name << " (Atk:" << (int)getAttack() << " Def:" << (int)getDefense() << ")." << std::endl;
 			}
 			else if(getArmor())
 			{
-				s << "You see a " << items[id].name << " (Arm:"<< (int)getArmor() << ")." << std::endl;
+				s << "a " << it.name << " (Arm:"<< (int)getArmor() << ")." << std::endl;
 			}
 			else if(isFluidContainer()){
-				s << "You see a " << items[id].name;
+				s << "a " << it.name;
 				if(fluid == 0){
 					s << ". It is empty.";
 				}
@@ -503,7 +505,7 @@ std::string Item::getDescription(bool fullDescription) const
 				}
 			}
 			else if(isMultiType()){				
-				s << "You see a " << items[id].name << " of ";
+				s << "a " << it.name << " of ";
 				if(fluid == 0){
 					s << items[1].name;
 				}
@@ -512,14 +514,21 @@ std::string Item::getDescription(bool fullDescription) const
 				}
 				s << ".";
 			}
-			else if(items[id].iskey){
-				s << "You see a " << items[id].name << " (Key:" << actionId << ")." << std::endl;
+			else if(it.iskey){
+				s << "a " << it.name << " (Key:" << actionId << ")." << std::endl;
 			}
-			else
+			else if(it.iscontainer) {
+				const Container* container = dynamic_cast<const Container*>(this);
+				s << "a " << it.name << " (Vol:" << container->capacity() << ")." << std::endl;	
+			}
+			else if(it.groundtile)
 			{
-				s << "You see a " << items[id].name << "." << std::endl;
+				s << it.name << "." << std::endl;
 			}
-			
+			else {
+				s << "a " << it.name << "." << std::endl;
+			}
+
 			if(fullDescription) {
 				double weight = getWeight();
 				if(weight > 0)
@@ -533,7 +542,7 @@ std::string Item::getDescription(bool fullDescription) const
 		}
 	}
 	else
-		s<<"You see an item of type " << id <<".";
+		s<<"an item of type " << id <<".";
 	
 	str = s.str();
 	return str;
