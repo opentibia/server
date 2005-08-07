@@ -40,9 +40,9 @@ How does it work?
 	Then you are logged in.
 
 What's New?
-        - Full rearranged protocol and game system
+	- Full rearranged protocol and game system
 	- Actions (when using a tile or item)
-        - SQL databases (for accounts and players)
+	- SQL databases (for accounts and players)
 	- Crash tracking
 	- Monsters
 	- Spawns
@@ -65,6 +65,30 @@ How do I use this new stuff?
 	and nowadays some maps are like 20 megabytes large which takes quite long to load. So you can now
 	convert your xml map to a binary map format by a simple converter. This can be found at the OTfans.net Forums.
 
+MySQL Server
+	SQL has been introduced to otserv, in previous releases, players, accounts, items and others were and
+	still are in XML, but now people have the choice to have thier players and accounts and items in an SQL
+	Server database. Having an SQL database is good for people that like to easily edit players, accounts or whatever
+	in the aspect. For example you can set all players have capacity of 1000 in ONE instruction ;). It has
+	many advantages.
+	
+		Instructions to setup a server:
+			1. Download Xampp (not Xampp Lite) (http://www.apachefriends.org/download.php?xampp-win32-1.4.14-installer.exe)
+			2. Install
+			3. Open "xampp-control.exe"
+			4. Click on the buttons to open "MySQL" and "Apache"
+			5. Go on your browser and type in the address bar "localhost" or "127.0.0.1"
+			6. Find the name "phpmyadmin" and go to it
+			7. You will find some controls, make a database called "otserv"
+			8. Now you will be taken to the database, click the tab "SQL"
+			9. Goto the file named sample.sql, its in the folder this README is in.
+			10. Copy the text in that file and paste it in that text box on your browser then press ok ;)
+			11. SQL instructions have been executed and a sample account(Account number: 1, Password: test) and player should be made.
+			12. Now go to your folder and open config.lua and make sure the SQL Stuff there is correct such as the mysql user and password ;).
+				Should be all correct for you anyway ;).
+			13. Start the server and login.
+			
+	
 Problems?
 	The server is now stable nowadays, but if you do find bugs you can report them at the 
 	CVS Bug Report board on OTFans Forums (http://otfans.net/index.php?act=SF&s=&f=78). If your 
@@ -75,10 +99,10 @@ Credits?
 	Shi'Voc - Initial project developer
 	Acrimon - Initial project developer
 	Tliff - Developer, some kind of project leader
-        Yorick - Fansite / Forum administrator
+	Yorick - Fansite / Forum administrator
 	Reebow - Developer (special protocol support), not more a member of the team
-        Haktivex - Developer, not more a member of the team
-        Fandoras - Developer, not more a member of the team
+	Haktivex - Developer, not more a member of the team
+	Fandoras - Developer, not more a member of the team
 	Decar - Fansiter, not more a member of the team
 	Pekay - README Documentation
 	SimOne - Developer and Map Editor
