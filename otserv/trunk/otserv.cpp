@@ -383,15 +383,16 @@ int main(int argc, char *argv[])
 	ExceptionHandler mainExceptionHandler;	
 	mainExceptionHandler.InstallHandler();
 #endif
-	/*ULONG  HeapFragValue = 2;
+#ifdef __WIN_LOW_FRAG_HEAP__
+	ULONG  HeapFragValue = 2;
 
     if(HeapSetInformation(GetProcessHeap(),HeapCompatibilityInformation,&HeapFragValue,sizeof(HeapFragValue))){
 		std::cout << "Heap Success" << std::endl;
 	}
     else{
 		std::cout << "Heap Error" << std::endl;
-	}*/
-
+	}
+#endif
 
 	//std::cout << ":: OTServ Development-Version 0.4.0 - CVS Preview" << std::endl;
 	std::cout << ":: OTServ Version 0.4.0" << std::endl;

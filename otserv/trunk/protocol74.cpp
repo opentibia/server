@@ -279,7 +279,7 @@ void Protocol74::parsePacket(NetworkMessage &msg)
 		break;
 		
     case 0xC9: // change position
-		// update position   
+		// update position 
 		break;
 		
     default:
@@ -290,7 +290,6 @@ void Protocol74::parsePacket(NetworkMessage &msg)
 		break;
 	}
 	game->flushSendBuffers();
-	OTSYS_SLEEP(10);
 }
 
 void Protocol74::GetTileDescription(const Tile* tile, NetworkMessage &msg)

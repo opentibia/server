@@ -317,7 +317,7 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 				}
 				else {
 					std::string creaturename = attacker->getName();
-					std::transform(creaturename.begin(), creaturename.end(), creaturename.begin(), tolower);
+					std::transform(creaturename.begin(), creaturename.end(), creaturename.begin(), (int(*)(int))tolower);
 					ss << "a " << creaturename;
 				}
 			}
@@ -3564,7 +3564,9 @@ void Game::CreateDamageUpdate(Creature* creature, Creature* attackCreature, int 
 			dmgmesg << " due to an attack by " << attackCreature->getName();
 		}
 		else if(attackCreature) {
-			dmgmesg << " due to an attack by a " << attackCreature->getName();
+			std::string strname = attackCreature->getName();
+			std::transform(strname.begin(), strname.end(), strname.begin(), (int(*)(int))tolower);
+			dmgmesg << " due to an attack by a " << strname;
 		}
 		dmgmesg <<".";
 
@@ -3614,7 +3616,7 @@ bool Game::creatureSaySpell(Creature *creature, const std::string &text)
 		var = std::string(""); 
 	}
 
-	std::transform(temp.begin(), temp.end(), temp.begin(), (int(*)(int))tolower);	
+	std::transform(temp.begin(), temp.end(), temp.begin(), (int(*)(int))tolower);
 
 	if(creature->access != 0 || !player){
 		std::map<std::string, Spell*>::iterator sit = spells.getAllSpells()->find(temp);

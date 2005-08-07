@@ -28,6 +28,9 @@
 #include <algorithm>
 
 #if defined WIN32 || defined __WINDOWS__
+#ifdef __WIN_LOW_FRAG_HEAP__
+#define _WIN32_WINNT 0x0501
+#endif
 #include <windows.h>
 #include <process.h>    /* _beginthread, _endthread */
 #include <stddef.h>
