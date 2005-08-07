@@ -285,7 +285,9 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 					//std::cout << "login " << player << std::endl;
 					if(passwordTest(password,player->password)){
 						if(playerexist && !g_config.getGlobalNumber("allowclones", 0)){
+							#ifdef __DEBUG_PLAYERS__
 							std::cout << "reject player..." << std::endl;
+							#endif
 							msg.Reset();
 							msg.AddByte(0x14);
 							msg.AddString("You are already logged in.");
@@ -301,7 +303,9 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 							msg.WriteToSocket(s);
 						}
 						else if(!protocol->ConnectPlayer()){
+							#ifdef __DEBUG_PLAYERS__
 							std::cout << "reject player..." << std::endl;
+							#endif
 							msg.Reset();
 							msg.AddByte(0x16);
 							msg.AddString("Too many Players online.");
@@ -332,8 +336,9 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 				Status* status = Status::instance();
 				
 				uint64_t running = (OTSYS_TIME() - status->start)/1000;
+				#ifdef __DEBUG__
 				std::cout << ":: Uptime: " << running << std::endl;
-				
+				#endif
 				std::string str = status->getStatusString();
 				send(s, str.c_str(), (int)str.size(), 0); 
 			}

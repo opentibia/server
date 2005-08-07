@@ -192,13 +192,17 @@ bool Actions::UseItem(Player* player, const Position &pos,const unsigned char st
 	}
 	Item *item = dynamic_cast<Item*>(game->getThing(pos,stack,player));
 	if(!item){
+		#ifdef __DEBUG__
 		std::cout << "no item" << std::endl;
+		#endif
 		player->sendCancel("You can not use this object.");
 		return false;
 	}
 	
 	if(item->getID() != itemid){
+		#ifdef __DEBUG__
 		std::cout << "no id" << std::endl;
+		#endif
 		player->sendCancel("You can not use this object.");
 		return false;
 	} 

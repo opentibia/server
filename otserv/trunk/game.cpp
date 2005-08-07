@@ -684,7 +684,9 @@ bool Game::placeCreature(Position &pos, Creature* c)
 			
 			sendAddThing(NULL,c->pos,c);
 			if(p) {
+				#ifdef __DEBUG_PLAYERS__
 				std::cout << (uint32_t)getPlayersOnline() << " players online." << std::endl;
+				#endif
 			}
 			
 			if(p){
@@ -741,7 +743,9 @@ bool Game::removeCreature(Creature* c)
 			channel.erase(sit);
 		
 		IOPlayer::instance()->savePlayer(player);
+		#ifdef __DEBUG_PLAYERS__
 		std::cout << (uint32_t)getPlayersOnline() << " players online." << std::endl;
+		#endif
 	}
 	
 	this->FreeThing(c);
@@ -3430,44 +3434,45 @@ void Game::checkDecay(int t)
 				item->isDecaying = false;
 				if(item->canDecay()){
 					if(item->pos.x != 0xFFFF){
-						Item* newitem = item->decay();
-						//Tile *tile = getTile(item->pos.x, item->pos.y, item->pos.z);
 						Tile *tile = map->getTile(item->pos);
-						Position pos = item->pos;
-						
-						if(newitem){
-							int stackpos = tile->getThingStackPos(item);
-							if(newitem == item){
-								sendUpdateThing(NULL,pos,newitem,stackpos);
+						if(tile){
+							Position pos = item->pos;
+							Item* newitem = item->decay();
+							
+							if(newitem){
+								int stackpos = tile->getThingStackPos(item);
+								if(newitem == item){
+									sendUpdateThing(NULL,pos,newitem,stackpos);
+								}
+								else{
+									if(tile->removeThing(item)){
+										//autoclose containers
+										if(dynamic_cast<Container*>(item)){
+											std::vector<Creature*> list;
+											std::vector<Creature*>::iterator it;
+
+											getSpectators(Range(pos, true), list);
+
+											for(it = list.begin(); it != list.end(); ++it) {
+												Player* spectator = dynamic_cast<Player*>(*it);
+												if(spectator)
+													spectator->onThingRemove(item);
+											}
+										}
+	
+										tile->insertThing(newitem, stackpos);
+										sendUpdateThing(NULL,pos,newitem,stackpos);
+										FreeThing(item);
+									}
+								}
+								startDecay(newitem);
 							}
 							else{
-								if(tile->removeThing(item)){
-									//autoclose containers
-									if(dynamic_cast<Container*>(item)){
-										std::vector<Creature*> list;
-										std::vector<Creature*>::iterator it;
-
-										getSpectators(Range(pos, true), list);
-
-										for(it = list.begin(); it != list.end(); ++it) {
-											Player* spectator = dynamic_cast<Player*>(*it);
-											if(spectator)
-												spectator->onThingRemove(item);
-										}
-									}
-
-									tile->insertThing(newitem, stackpos);
-									sendUpdateThing(NULL,pos,newitem,stackpos);
+								if(removeThing(NULL,pos,item)){
 									FreeThing(item);
 								}
-							}
-							startDecay(newitem);
-						}
-						else{
-							if(removeThing(NULL,pos,item)){
-								FreeThing(item);
-							}
-						}//newitem
+							}//newitem
+						}//tile
 					}//pos != 0xFFFF
 				}//item->canDecay()
 				FreeThing(item);
