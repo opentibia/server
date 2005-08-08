@@ -70,7 +70,7 @@ void DBResult::clearFieldNames()
 	m_numFields = 0;
 }
 
-int DBResult::getDataInt(std::string s, unsigned int nrow)
+int DBResult::getDataInt(const std::string &s, unsigned int nrow)
 {
 	listNames_type::iterator it=m_listNames.find(s);
 	if(it != m_listNames.end())
@@ -87,7 +87,7 @@ int DBResult::getDataInt(std::string s, unsigned int nrow)
 	return 0; // Failed
 }
 
-long DBResult::getDataLong(std::string s, unsigned int nrow)
+long DBResult::getDataLong(const std::string &s, unsigned int nrow)
 {
 	listNames_type::iterator it=m_listNames.find(s);
 	if(it != m_listNames.end())
@@ -105,7 +105,7 @@ long DBResult::getDataLong(std::string s, unsigned int nrow)
 }
 
 
-std::string DBResult::getDataString(std::string s, unsigned int nrow)
+std::string DBResult::getDataString(const std::string &s, unsigned int nrow)
 {
 	listNames_type::iterator it=m_listNames.find(s);
 	if(it != m_listNames.end())
@@ -241,8 +241,11 @@ bool Database::storeQuery(DBQuery &q, DBResult &dbres)
 		return false;
 }
 
-std::string Database::escapeString(std::string s)
+std::string Database::escapeString(const std::string &s)
 {
+	if(s.size() == 0)
+		return std::string("");
+	
 	char* output = new char[s.size() * 2 + 1];
 	
 	mysql_escape_string(output, s.c_str(), s.size());

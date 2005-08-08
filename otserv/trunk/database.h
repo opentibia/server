@@ -72,21 +72,21 @@ public:
 	*\param s The name of the field
 	*\param nrow The number of the row
 	*/ 
-	int getDataInt(std::string s, unsigned int nrow=0);
+	int getDataInt(const std::string &s, unsigned int nrow=0);
 	
 	/** Get the Long value of a field in database
 	*\returns The Long value of the selected field and row
 	*\param s The name of the field
 	*\param nrow The number of the row
 	*/
-	long getDataLong(std::string s, unsigned int nrow=0);
+	long getDataLong(const std::string &s, unsigned int nrow=0);
 	
 	/** Get the String of a field in database
 	*\returns The String of the selected field and row
 	*\param s The name of the field
 	*\param nrow The number of the row
 	*/
-	std::string getDataString(std::string s, unsigned int nrow=0);
+	std::string getDataString(const std::string &s, unsigned int nrow=0);
 	
 	/** Get the number of rows
 	*\returns The number of rows
@@ -103,7 +103,7 @@ private:
 	void addRow(MYSQL_ROW r, unsigned int num_fields);
 	void clearRows();
 	void clearFieldNames();
-	void setFieldName(std::string s, unsigned int n){
+	void setFieldName(const std::string &s, unsigned int n){
 		m_listNames[s] = n; 
 		m_numFields++;
 	};
@@ -111,7 +111,7 @@ private:
 	unsigned int m_numFields;
 	unsigned int m_lastNumFields;
 	unsigned int m_numRows;
-	typedef std::map<std::string, unsigned int> listNames_type;
+	typedef std::map<const std::string, unsigned int> listNames_type;
 	listNames_type m_listNames;
 	std::map<unsigned int, char **> m_listRows;
 };
@@ -179,7 +179,7 @@ public:
 	*\returns The string modified
 	*\param s The source string
 	*/
-	static std::string escapeString(std::string s);
+	static std::string escapeString(const std::string &s);
 	
 private:
 	bool m_initialized;
