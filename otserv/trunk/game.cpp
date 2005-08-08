@@ -3510,6 +3510,8 @@ void Game::startDecay(Item* item){
 	//get decay time
 	item->isDecaying = true;
 	unsigned long dtime = item->getDecayTime();
+	if(dtime == 0)
+		return;
 	//round time
 	if(dtime < DECAY_INTERVAL)
 		dtime = DECAY_INTERVAL;
