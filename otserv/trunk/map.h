@@ -159,7 +159,6 @@ template<class T> class lessPointer : public std::binary_function<T*, T*, bool> 
 		  }
 };
 
-//typedef std::vector<Creature*> SpectatorVec;
 typedef std::list<Creature*> SpectatorVec;
 
 /**

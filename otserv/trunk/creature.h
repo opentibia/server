@@ -140,7 +140,8 @@ public:
   virtual void drainMana(int);
   virtual void die(){};
   virtual std::string getDescription(bool self = false) const;
-  virtual void setAttackedCreature(unsigned long id);
+  virtual void setAttackedCreature(const Creature* creature);
+  //virtual void setAttackedCreature(unsigned long id);
 
 	virtual void setMaster(Creature* creature);
 	virtual Creature* getMaster() {return master;}

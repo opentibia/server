@@ -122,7 +122,7 @@ protected:
   virtual void onCreatureSay(const Creature *creature, SpeakClasses type, const std::string &text);
   virtual void onCreatureChangeOutfit(const Creature* creature);
   virtual int onThink(int& newThinkTicks);
-  virtual void setAttackedCreature(unsigned long id);
+  //virtual void setAttackedCreature(unsigned long id);
   virtual std::string getDescription(bool self = false) const;
 
 	virtual bool isAttackable() const { return false; };

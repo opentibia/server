@@ -266,9 +266,11 @@ void Npc::onCreatureTurn(const Creature *creature, unsigned char stackpos){
 	//not implemented yet, do we need it?
 }
 
+/*
 void Npc::setAttackedCreature(unsigned long id){
 	//not implemented yet
 }
+*/
 
 void Npc::onCreatureSay(const Creature *creature, SpeakClasses type, const std::string &text){
 	if(creature->getID() == this->getID())

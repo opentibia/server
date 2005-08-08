@@ -58,6 +58,7 @@ Creature::~Creature()
 {
 	std::vector<Creature*>::iterator cit;
 	for(cit = summons.begin(); cit != summons.end(); ++cit) {
+    (*cit)->setAttackedCreature(NULL);
 		(*cit)->setMaster(NULL);
 		(*cit)->releaseThing();
 	}
@@ -75,9 +76,19 @@ void Creature::drainMana(int damage)
   mana -= min(mana, damage);
 }
 
-void Creature::setAttackedCreature(unsigned long id)
+//void Creature::setAttackedCreature(unsigned long id)
+void Creature::setAttackedCreature(const Creature* creature)
 {
-  attackedCreature = id;
+	std::vector<Creature*>::iterator cit;
+	for(cit = summons.begin(); cit != summons.end(); ++cit) {
+    (*cit)->setAttackedCreature(creature);
+  }
+
+  if(creature) {
+    attackedCreature = creature->getID();
+  }
+  else
+    attackedCreature = 0;
 }
 
 void Creature::setMaster(Creature* creature)

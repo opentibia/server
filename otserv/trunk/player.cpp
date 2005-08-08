@@ -1181,7 +1181,7 @@ void Player::sendToChannel(Creature *creature,SpeakClasses type, const std::stri
 
 void Player::sendCancelAttacking()
 {
-  attackedCreature = 0;   
+  attackedCreature = 0;
   client->sendCancelAttacking();
 }
 
@@ -1370,9 +1370,12 @@ void Player::onThingMove(const Creature *creature, const Position &fromPos, int 
 	client->sendThingMove(creature, fromPos, stackpos, fromItem, oldFromCount, toSlot, toItem, oldToCount, count);
 }
 
-void Player::setAttackedCreature(unsigned long id){
-     attackedCreature = id;
+/*
+void Player::setAttackedCreature(unsigned long id)
+{
+  attackedCreature = id;
 }
+*/
 
 void Player::onCreatureAppear(const Creature *creature)
 {	
@@ -1381,7 +1384,7 @@ void Player::onCreatureAppear(const Creature *creature)
 
 void Player::onCreatureDisappear(const Creature *creature, unsigned char stackPos, bool tele /*= false*/)
 {	
-  	client->sendThingDisappear(creature, stackPos, tele);
+  client->sendThingDisappear(creature, stackPos, tele);
 }
 
 void Player::onThingAppear(const Thing* thing){

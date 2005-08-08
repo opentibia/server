@@ -520,7 +520,6 @@ void Protocol74::sendOpenPriv(std::string &receiver){
 
 void Protocol74::parseCancelMove(NetworkMessage &msg)
 {
-	//sendCancelAttacking();
 	game->playerSetAttackedCreature(player, 0);
 
 	game->stopEvent(player->eventAutoWalk);

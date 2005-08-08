@@ -222,6 +222,7 @@ public:
 	bool creatureThrowRune(Creature *creature, const Position& centerpos, const MagicEffectClass& me);
 	bool creatureCastSpell(Creature *creature, const Position& centerpos, const MagicEffectClass& me);
 	bool creatureSaySpell(Creature *creature, const std::string &text);
+
 	void playerAutoWalk(Player* player, std::list<Direction>& path);
 	bool playerUseItemEx(Player *player, const Position& posFrom,const unsigned char  stack_from,
 		const Position &posTo,const unsigned char stack_to, const unsigned short itemid);
@@ -233,6 +234,7 @@ public:
 	void playerLookInTrade(Player* player, bool lookAtCounterOffer, int index);
 	void playerCloseTrade(Player* player);
 	void autoCloseTrade(const Item* item, bool itemMoved = false);
+  void autoCloseAttack(Player* player, Creature* target);
 	
 	void playerSetAttackedCreature(Player* player, unsigned long creatureid);
 

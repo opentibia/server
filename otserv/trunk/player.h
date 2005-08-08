@@ -232,7 +232,7 @@ public:
 
 	void die();      //player loses exp/skills/maglevel on death
 
-  virtual void setAttackedCreature(unsigned long id);
+  //virtual void setAttackedCreature(unsigned long id);
   virtual bool isAttackable() const { return (access == 0); };
   virtual bool isPushable() const;
 	virtual void dropLoot(Container *corpse);

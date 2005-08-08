@@ -110,9 +110,10 @@ public:
 
 enum monsterstate_t {
 	STATE_IDLE,
+  STATE_IDLESUMMON,
 	STATE_TARGETNOTREACHABLE,
 	STATE_ATTACKING,
-	STATE_FLEEING
+	STATE_FLEEING,
 };
 
 enum monstermode_t {
@@ -153,7 +154,9 @@ public:
   		return this->defense;
   	}
 	
-	virtual void onAttack();
+  virtual void setMaster(Creature* creature);
+  bool isSummon() {return (getMaster() != NULL);}
+  virtual void onAttack();
 	bool isLoaded() const {return loaded;}
 
 private:
@@ -164,6 +167,7 @@ private:
 	int oldThinkTicks;
 	Position targetPos;
 	Position moveToPos;
+  bool hasLostMaster;
 	int armor;
 	int defense;
 	void doMoveTo(int dx, int dy);
@@ -184,6 +188,7 @@ private:
 	bool isCreatureReachable(const  Creature* creature);
 	Creature* findTarget(long range, bool &canReach, const Creature *ignoreCreature = NULL);
 	void stopAttack();
+  void startThink();
 	void stopThink();
 	void getSleepTicks(long long &delay, int& stepDuration);
 
@@ -194,6 +199,7 @@ private:
 	Item* LoadLootItem(xmlNodePtr,unsigned short);
 	unsigned long GetRandom();
 
+	void selectTarget(const Creature* creature, bool canReach /* = true*/);
 
 protected:
 	int useCount;
@@ -229,7 +235,6 @@ protected:
 	void onCreatureLeave(const Creature *creature);
 	void onCreatureMove(const Creature *creature, const Position *oldPos);
 
-	void selectTarget(const Creature* creature, bool canReach /* = true*/);
 	bool validateDistanceAttack(const Creature *creature);
 	bool validateDistanceAttack(const Position &pos);
 	bool monsterMoveItem(Item* item, int radius);
@@ -251,7 +256,9 @@ protected:
   virtual bool isPushable() const { return pushable; };
 
 	virtual int onThink(int& newThinkTicks);
-  virtual void setAttackedCreature(unsigned long id);
+  virtual void setAttackedCreature(const Creature* creature);
+  //virtual void setAttackedCreature(unsigned long id);
+
 	std::string getDescription(bool self) const;
 	bool loaded;
 };

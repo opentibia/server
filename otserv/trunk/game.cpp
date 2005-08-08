@@ -2184,7 +2184,11 @@ void Game::thingMoveInternal(Creature *creature, unsigned short from_x, unsigned
 		//players
 		for(it = list.begin(); it != list.end(); ++it)
 		{
-			if(dynamic_cast<Player*>(*it)) {
+			if(Player* p = dynamic_cast<Player*>(*it)) {
+        if(p->attackedCreature == creature->getID()) {
+          autoCloseAttack(p, creature);
+        }
+
 				(*it)->onThingMove(creature, thing, &oldPos, oldstackpos, 1, 1);
 			}
 		}
@@ -2203,12 +2207,8 @@ void Game::thingMoveInternal(Creature *creature, unsigned short from_x, unsigned
 		{
 			if(playerMoving->attackedCreature != 0) {
 				Creature* attackedCreature = getCreatureByID(creatureMoving->attackedCreature);
-				if(attackedCreature){      
-					if((std::abs(creatureMoving->pos.x - attackedCreature->pos.x) > 8) ||
-					(std::abs(creatureMoving->pos.y - attackedCreature->pos.y) > 5) || (creatureMoving->pos.z != attackedCreature->pos.z)){
-						player->sendTextMessage(MSG_SMALLINFO, "Target lost.");
-						playerSetAttackedCreature(playerMoving, 0);
-					}
+				if(attackedCreature){
+          autoCloseAttack(playerMoving, attackedCreature);
 				}
 			}
 			else if(playerMoving->tradePartner != 0) {
@@ -2455,7 +2455,11 @@ void Game::teleport(Thing *thing, const Position& newPos) {
 			
 			//players
 			for(it = list.begin(); it != list.end(); ++it) {
-				if(dynamic_cast<Player*>(*it)) {
+				if(Player* p = dynamic_cast<Player*>(*it)) {
+          if(p->attackedCreature == creature->getID()) {
+            autoCloseAttack(p, creature);
+          }
+
 					(*it)->onCreatureDisappear(creature, osp, true);
 				}
 			}
@@ -2476,26 +2480,27 @@ void Game::teleport(Thing *thing, const Position& newPos) {
 			if(newPos.x < oldPos.x && (std::abs(newPos.x - oldPos.x) >= std::abs(newPos.y - oldPos.y)))
 				creature->direction = WEST;
 			
+			thing->pos = newPos;
+
 			Player *player = dynamic_cast<Player*>(creature);
 			if(player && player->attackedCreature != 0){
 				Creature* attackedCreature = getCreatureByID(player->attackedCreature);
 				if(attackedCreature){
-					if((std::abs(newPos.x - attackedCreature->pos.x) > 8) ||
-					(std::abs(newPos.y - attackedCreature->pos.y) > 5) || (newPos.z != attackedCreature->pos.z)){
-						player->sendTextMessage(MSG_SMALLINFO, "Target lost.");
-						playerSetAttackedCreature(player, 0);
-					}
+          autoCloseAttack(player, attackedCreature);
 				}
 			}
 			
-			thing->pos = newPos;
 			list.clear();
 			getSpectators(Range(thing->pos, true), list);
 
 			//players
 			for(it = list.begin(); it != list.end(); ++it)
 			{
-				if(dynamic_cast<Player*>(*it)) {
+				if(Player* p = dynamic_cast<Player*>(*it)) {
+          if(p->attackedCreature == creature->getID()) {
+            autoCloseAttack(p, creature);
+          }
+
 					(*it)->onTeleport(creature, &oldPos, osp);
 				}
 			}
@@ -2943,7 +2948,6 @@ bool Game::creatureOnPrepareAttack(Creature *creature, Position pos)
 				if(player) {					
 					player->sendTextMessage(MSG_SMALLINFO, "You may not attack a person while your in a protection zone.");	
 					playerSetAttackedCreature(player, 0);
-					//player->sendCancelAttacking();
 				}
 
 				return false;
@@ -2951,8 +2955,7 @@ bool Game::creatureOnPrepareAttack(Creature *creature, Position pos)
 			else if(targettile && targettile->isPz()) {
 				if(player) {					
 					player->sendTextMessage(MSG_SMALLINFO, "You may not attack a person in a protection zone.");
-					playerSetAttackedCreature(player, 0);
-					//player->sendCancelAttacking();
+					playerSetAttackedCreature(player, NULL);
 				}
 
 				return false;
@@ -3063,13 +3066,6 @@ void Game::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fi
   }
 	
 	if(!inReach){
-		/*
-		if(player) {
-			player->sendTextMessage(MSG_SMALLINFO, "Target lost.");
-			playerSetAttackedCreature(player, 0);
-		}
-		*/
-
 		return;
 	}
 
@@ -3991,6 +3987,15 @@ void Game::autoCloseTrade(const Item* item, bool itemMoved /*= false*/)
 	}
 }
 
+void Game::autoCloseAttack(Player* player, Creature* target)
+{
+  if((std::abs(player->pos.x - target->pos.x) > 7) ||
+  (std::abs(player->pos.y - target->pos.y) > 5) || (player->pos.z != target->pos.z)){
+	  player->sendTextMessage(MSG_SMALLINFO, "Target lost.");
+	  playerSetAttackedCreature(player, 0);
+  } 
+}
+
 void Game::playerSetAttackedCreature(Player* player, unsigned long creatureid)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerSetAttackedCreature()");
@@ -4007,18 +4012,24 @@ void Game::playerSetAttackedCreature(Player* player, unsigned long creatureid)
 		attackedCreature = getCreatureByID(creatureid);
 	}
 
-	if(attackedCreature) {
-		if(attackedCreature->access != 0 || (getWorldType() == WORLD_TYPE_NO_PVP && player->access == 0 && dynamic_cast<Player*>(attackedCreature))) {
-			player->sendTextMessage(MSG_SMALLINFO, "You may not attack this player.");
-			player->sendCancelAttacking();
-			player->setAttackedCreature(0);
-			stopEvent(player->eventCheckAttacking);
-			player->eventCheckAttacking = 0;
-			return;
-		}
+	if(!attackedCreature || (attackedCreature->access != 0 || (getWorldType() == WORLD_TYPE_NO_PVP && player->access == 0 && dynamic_cast<Player*>(attackedCreature)))) {
+    if(attackedCreature) {
+		  player->sendTextMessage(MSG_SMALLINFO, "You may not attack this player.");
+    }
+
+		player->sendCancelAttacking();
+		player->setAttackedCreature(NULL);
+		stopEvent(player->eventCheckAttacking);
+		player->eventCheckAttacking = 0;
+	}
+  else if(attackedCreature) {
+    player->setAttackedCreature(attackedCreature);
+    stopEvent(player->eventCheckAttacking);
+    player->eventCheckAttacking = addEvent(makeTask(2000, std::bind2nd(std::mem_fun(&Game::checkCreatureAttacking), player->getID())));
 	}
 
-	player->setAttackedCreature(creatureid);
+	/*
+  //player->setAttackedCreature(creatureid);
 	stopEvent(player->eventCheckAttacking);
 
 	if(creatureid != 0) {
@@ -4026,6 +4037,7 @@ void Game::playerSetAttackedCreature(Player* player, unsigned long creatureid)
 	}
 	else
 		player->eventCheckAttacking = 0;
+  */
 }
 
 void Game::flushSendBuffers()
