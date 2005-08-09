@@ -2955,7 +2955,7 @@ bool Game::creatureOnPrepareAttack(Creature *creature, Position pos)
 			else if(targettile && targettile->isPz()) {
 				if(player) {					
 					player->sendTextMessage(MSG_SMALLINFO, "You may not attack a person in a protection zone.");
-					playerSetAttackedCreature(player, NULL);
+					playerSetAttackedCreature(player, 0);
 				}
 
 				return false;
