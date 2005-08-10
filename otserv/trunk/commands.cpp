@@ -39,6 +39,7 @@ extern bool readXMLInteger(xmlNodePtr p, const char *tag, int &value);
 s_defcommands Commands::defined_commands[] = { 
 	{"/s",&Commands::placeNpc},
 	{"/m",&Commands::placeMonster},
+	{"/summon",&Commands::placeSummon},
 	{"/B",&Commands::broadcastMessage},
 	{"/b",&Commands::banPlayer},
 	{"/t",&Commands::teleportMasterPos},
@@ -241,7 +242,6 @@ bool Commands::placeNpc(Creature* c, const std::string &cmd, const std::string &
 
 bool Commands::placeMonster(Creature* c, const std::string &cmd, const std::string &param)
 {
-
 	Monster *monster = new Monster(param, game);
 	if(!monster->isLoaded()){
 		delete monster;
@@ -273,7 +273,58 @@ bool Commands::placeMonster(Creature* c, const std::string &cmd, const std::stri
 		pos.y = c->pos.y;
 		pos.z = c->pos.z;
 	}
-	// Place the npc
+
+	// Place the monster
+	if(!game->placeCreature(pos, monster)) {
+		delete monster;
+		Player *player = dynamic_cast<Player*>(c);
+		if(player) {
+			player->sendMagicEffect(player->pos, NM_ME_PUFF);
+			player->sendCancel("Sorry not enough room.");
+		}
+		return true;
+	}
+	else{
+		//c->addSummon(monster);
+		return true;
+	}
+}
+
+bool Commands::placeSummon(Creature* c, const std::string &cmd, const std::string &param)
+{
+	Monster *monster = new Monster(param, game);
+	if(!monster->isLoaded()){
+		delete monster;
+		return true;
+	}
+	Position pos;
+
+	// Set the Monster pos
+	if(c->direction == NORTH) {
+		pos.x = c->pos.x;
+		pos.y = c->pos.y - 1;
+		pos.z = c->pos.z;
+	}
+	// South
+	if(c->direction == SOUTH) {
+		pos.x = c->pos.x;
+		pos.y = c->pos.y + 1;
+		pos.z = c->pos.z;
+	}
+	// East
+	if(c->direction == EAST) {
+		pos.x = c->pos.x + 1;
+		pos.y = c->pos.y;
+		pos.z = c->pos.z;
+	}
+	// West
+	if(c->direction == WEST) {
+		pos.x = c->pos.x - 1;
+		pos.y = c->pos.y;
+		pos.z = c->pos.z;
+	}
+
+	// Place the monster
 	if(!game->placeCreature(pos, monster)) {
 		delete monster;
 		Player *player = dynamic_cast<Player*>(c);

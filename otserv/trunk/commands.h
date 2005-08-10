@@ -50,6 +50,7 @@ protected:
 	//commands
 	bool placeNpc(Creature* c, const std::string &cmd, const std::string &param);
 	bool placeMonster(Creature* c, const std::string &cmd, const std::string &param);
+	bool placeSummon(Creature* c, const std::string &cmd, const std::string &param);
 	bool broadcastMessage(Creature* c, const std::string &cmd, const std::string &param);
 	bool banPlayer(Creature* c, const std::string &cmd, const std::string &param);
 	bool teleportMasterPos(Creature* c, const std::string &cmd, const std::string &param);

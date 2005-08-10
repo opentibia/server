@@ -6,6 +6,7 @@
 <command cmd="/c" access="1" />
 <command cmd="/i" access="1" />
 <command cmd="/m" access="1" />
+<command cmd="/summon" access="1" />
 <command cmd="/q" access="1" />
 <command cmd="/reload" access="1" />
 <command cmd="/s" access="1" />

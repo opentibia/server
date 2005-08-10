@@ -177,12 +177,14 @@ private:
 	unsigned long staticAttack;
 	unsigned short changeTargetChance;
 
-	int getCurrentDistanceToTarget();
+	int getCurrentDistanceToTarget(const Position &target);
 	int getTargetDistance();
 	void calcMovePosition();
-	void randMovePosition();
 	void updateLookDirection();
-	void getCloseCombatPosition(const Position &target, Position &dest);
+
+	bool getRandomPosition(const Position &target, Position &dest);
+  bool getDistancePosition(const Position &target, const int& maxTryDist, bool fullPathSearch, Position &dest);
+	bool getCloseCombatPosition(const Position &target, Position &dest);
 	bool canMoveTo(unsigned short x, unsigned short y, unsigned char z);
 	bool isInRange(const Position &pos);
 	bool isCreatureReachable(const  Creature* creature);
@@ -190,6 +192,8 @@ private:
 	void stopAttack();
   void startThink();
 	void stopThink();
+  void reThink();
+
 	void getSleepTicks(long long &delay, int& stepDuration);
 
 	#define CHANCE_MAX  100000
