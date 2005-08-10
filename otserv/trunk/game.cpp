@@ -856,26 +856,34 @@ bool Game::onPrepareMoveThing(Creature *player, const Thing* thing,
 bool Game::onPrepareMoveThing(Creature *creature, const Thing* thing,
 	const Tile *fromTile, const Tile *toTile, int count)
 {
+	const Player* player = dynamic_cast<const Player*>(creature);
+
 	const Item *item = dynamic_cast<const Item*>(thing);
-	const Player* player = dynamic_cast<const Player*>(thing);
+	const Creature* movingCreature = dynamic_cast<const Creature*>(thing);
+	const Player* movingPlayer = dynamic_cast<const Player*>(thing);
 	
 	if(item && (!toTile || !item->canMovedTo(toTile))) {
 	 	creature->sendCancel("Sorry, not possible.");
 		return false;
 	}
-	else if(player && (!toTile || !thing->canMovedTo(toTile)) ) {
-		player->sendTextMessage(MSG_SMALLINFO, "Sorry, not possible.");
-		player->sendCancelWalk();
-		//player->sendCancelWalk("Sorry, not possible.");
+	else if(movingCreature && (!toTile || !thing->canMovedTo(toTile)) ) {
+    if(player) {
+		  player->sendTextMessage(MSG_SMALLINFO, "Sorry, not possible.");
+		  player->sendCancelWalk();
+    }
+
 		return false;
 	}
-	else if(!player && toTile && toTile->ground && !toTile->ground->noFloorChange()) {
+	else if(!movingPlayer && toTile && toTile->floorChange()) {
 		creature->sendCancel("Sorry, not possible.");
 		return false;
 	}
-    else if(player && toTile && !toTile->ground) {
-		player->sendTextMessage(MSG_SMALLINFO, "Sorry, not possible.");
-		player->sendCancelWalk();
+  else if(movingCreature && toTile && !toTile->ground) {
+    if(player) {
+      player->sendTextMessage(MSG_SMALLINFO, "Sorry, not possible.");
+      player->sendCancelWalk();
+    }
+
 		return false;
 	}
 	
