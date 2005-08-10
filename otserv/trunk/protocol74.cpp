@@ -2546,6 +2546,7 @@ void Protocol74::AddPlayerStats(NetworkMessage &msg,const Player *player)
 	msg.AddU16(player->getPlayerInfo(PLAYERINFO_MAXMANA));
   msg.AddByte(player->getMagicLevel());
 	msg.AddByte(player->getPlayerInfo(PLAYERINFO_MAGICLEVELPERCENT));
+  msg.AddByte(player->getPlayerInfo(PLAYERINFO_SOUL)); //soulpoints
 }
 
 void Protocol74::AddPlayerSkills(NetworkMessage &msg,const Player *player)

@@ -105,7 +105,15 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name){
 		}
 		else
 			isLoaded = false;
-
+			
+        nodeValue = (char*)xmlGetProp(root, (const xmlChar *) "soul");
+		if(nodeValue) {
+			player->soul=atoi(nodeValue);
+			xmlFreeOTSERV(nodeValue);
+		}
+		else
+			isLoaded = false;
+        
 		nodeValue = (char*)xmlGetProp(root, (const xmlChar *) "level");
 		if(nodeValue) {
 			player->level=atoi(nodeValue);
@@ -572,6 +580,7 @@ bool IOPlayerXML::savePlayer(Player* player){
 	if (sb.str() == "West") {sb.str(""); sb << "3";}
 	xmlSetProp(root, (const xmlChar*) "lookdir", (const xmlChar*)sb.str().c_str());                             sb.str("");
 	sb << player->experience;         xmlSetProp(root, (const xmlChar*) "exp", (const xmlChar*)sb.str().c_str());       sb.str("");	
+	sb << (unsigned short)player->soul; /* workaround for outputing number */       xmlSetProp(root, (const xmlChar*) "soul", (const xmlChar*)sb.str().c_str());       sb.str("");	
 	sb << (int)player->vocation;      xmlSetProp(root, (const xmlChar*) "voc", (const xmlChar*)sb.str().c_str());       sb.str("");
 	sb << player->level;              xmlSetProp(root, (const xmlChar*) "level", (const xmlChar*)sb.str().c_str());     sb.str("");	
 	sb << player->access;             xmlSetProp(root, (const xmlChar*) "access", (const xmlChar*)sb.str().c_str());	sb.str("");	

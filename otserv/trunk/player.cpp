@@ -60,6 +60,7 @@ Player::Player(const std::string& name, Protocol *p) :
 	maglevel   = 20;
 
   	access     = 0;
+  	soul     = 0;
   	lastlogin  = 0;
   	lastLoginSaved = 0;
   	SendBuffer = false;
@@ -798,7 +799,8 @@ int Player::getPlayerInfo(playerinfo_t playerinfo) const
 		case PLAYERINFO_MANA: return health; break;
 		case PLAYERINFO_MAXMANA: return manamax; break;
 		case PLAYERINFO_MANAPERCENT: return maglevel_percent; break;
-
+        case PLAYERINFO_SOUL: return soul; break;
+        
 		default:
 			return 0; break;
 	}
@@ -1210,6 +1212,7 @@ void Player::sendStats(){
 	lastSentStats.manamax = this->manamax;
 	lastSentStats.manaspent = this->manaspent;
 	lastSentStats.maglevel = this->maglevel;
+	lastSentStats.soul = this->soul;
 	
 	client->sendStats();
 }
@@ -1299,6 +1302,7 @@ bool Player::NeedUpdateStats(){
 		 lastSentStats.mana != this->mana ||
 		 lastSentStats.manamax != this->manamax ||
 		 lastSentStats.manaspent != this->manaspent ||
+		 lastSentStats.soul != this->soul ||
 		 lastSentStats.maglevel != this->maglevel){
 		return true;
 	}
