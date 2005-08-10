@@ -1076,7 +1076,7 @@ bool Monster::getDistancePosition(const Position &target, const int& maxTryDist,
 		  if((target.x == x && target.y == y))
 			  continue;
 
-      tryDist = std::sqrt( std::pow(std::abs(target.x - x), 2) + std::pow(std::abs(target.y - y), 2));
+      tryDist = (int)std::sqrt( std::pow((float)std::abs(target.x - x), 2) + std::pow((float)std::abs(target.y - y), 2) );
 
   		tmpPos.x = x;
       tmpPos.y = y;
