@@ -223,7 +223,7 @@ public:
 			return;
 
     logBlock lb;
-		lb.mutexaddr = (unsigned long)(*a);
+		lb.mutexaddr = (unsigned long)(a);
 		lb.lock = lock;
 		lb.str = s;
 		lb.time = OTSYS_TIME();
