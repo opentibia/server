@@ -92,6 +92,7 @@ CREATE TABLE `players` (
   `healthmax` int(11) NOT NULL default '0',
   `direction` int(11) NOT NULL default '0',
   `experience` int(11) NOT NULL default '0',
+  `soul` int(2) NOT NULL default '0',
   `lookbody` int(11) NOT NULL default '0',
   `lookfeet` int(11) NOT NULL default '0',
   `lookhead` int(11) NOT NULL default '0',
