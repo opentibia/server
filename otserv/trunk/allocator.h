@@ -25,6 +25,10 @@
 #include <boost/pool/pool.hpp>
 #include "otsystem.h"
 
+struct poolTag {
+  size_t poolbytes;
+};
+
 class PoolManager {
 public:
 	static PoolManager& getInstance() {
@@ -33,45 +37,41 @@ public:
 	}
 
   void* allocate(size_t size) {
-    std::map<size_t, poolBlock* >::iterator it;
+    Pools::iterator it;
+    OTSYS_THREAD_LOCK_CLASS(poolLock, NULL);
+
     for(it = pools.begin(); it != pools.end(); ++it) {
-      if(it->first >= size) {
-        OTSYS_THREAD_LOCK_CLASS(it->second->lock, NULL);
-        return it->second->pool->ordered_malloc();
+      if(it->first >= size + sizeof(poolTag)) {
+        poolTag* tag = reinterpret_cast<poolTag*>(it->second->ordered_malloc());
+        tag->poolbytes = it->first;
+        return tag + 1;
       }
     }
 
-    return NULL;
-
-    /*
-    if(it == pools.end()) {
-      pools[size] = new boost::pool<>(size, 1024);
-      return pools[size]->ordered_malloc();
-    }
-    else
-      return it->second->ordered_malloc();
-    */
+    poolTag* tag = reinterpret_cast<poolTag*>(std::malloc(size + sizeof(poolTag)));
+    tag->poolbytes = 0;
+    return tag + 1;
 	}
 
-	void deallocate(void* deletable /*, size_t size*/) {
+	void deallocate(void* deletable) {
     if(deletable == NULL)
       return;
 
-    std::map<size_t, poolBlock* >::iterator it;
-    for(it = pools.begin(); it != pools.end(); ++it) {
-      if(it->second->pool->is_from(deletable)) {
-        OTSYS_THREAD_LOCK_CLASS(it->second->lock, NULL);
-        it->second->pool->ordered_free(deletable);
-      }
-    }
+    poolTag* const tag = reinterpret_cast<poolTag*>(deletable) - 1U;
+    if(tag->poolbytes) {
+      Pools::iterator it;
+      OTSYS_THREAD_LOCK_CLASS(poolLock, NULL);
 
-    //pools[size]->ordered_free(deletable);
+      it = pools.find(tag->poolbytes);
+      it->second->ordered_free(tag);
+    }
+    else
+      std::free(tag);
 	}
 
 	~PoolManager() {
-    std::map<size_t, poolBlock* >::iterator it = pools.begin();
+    Pools::iterator it = pools.begin();
     while(it != pools.end()) {
-      delete it->second->pool;
       delete it->second;
       it = pools.erase(it);
     }
@@ -79,14 +79,12 @@ public:
 
 private:
   void addPool(size_t size, size_t next_size) {
-    poolBlock* pb = new poolBlock;
-    OTSYS_THREAD_LOCKVARINIT(pb->lock);
-    pb->pool = new boost::pool<>(size, next_size);
-
-    pools[size] = pb;
+    pools[size] = new boost::pool<>(size, next_size); 
   }
 
 	PoolManager() {
+    OTSYS_THREAD_LOCKVARINIT(poolLock);
+
     addPool(32, 1024);
     addPool(64, 1024);
     addPool(128, 1024);
@@ -102,13 +100,10 @@ private:
 
 	PoolManager(const PoolManager&);
 	const PoolManager& operator=(const PoolManager&);
-  
-  struct poolBlock {
-    OTSYS_THREAD_LOCKVAR lock;
-     boost::pool<>* pool;
-  };
 
-  std::map<size_t, poolBlock* > pools;
+  typedef std::map<size_t, boost::pool<>* > Pools;
+  Pools pools;
+  OTSYS_THREAD_LOCKVAR poolLock;
 };
 
 #endif
