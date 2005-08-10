@@ -99,7 +99,6 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 		
 		player->setDirection((Direction)result.getDataInt("direction"));
 		player->experience = result.getDataLong("experience");
-		player->soul = result.getDataLong("soul");
 		player->level = result.getDataInt("level");
 		player->level_percent  = (unsigned char)(100*(player->experience-player->getExpForLv(player->level))/(1.*player->getExpForLv(player->level+1)-player->getExpForLv(player->level)));
 		player->capacity = result.getDataInt("cap");
@@ -315,7 +314,6 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 	
 	player->setDirection((Direction)(int)row.lookup_by_name("direction"));
 	player->experience=row.lookup_by_name("experience");
-	player->soul=row.lookup_by_name("soul");
 	player->level=row.lookup_by_name("level");
 	player->level_percent  = (unsigned char)(100*(player->experience-player->getExpForLv(player->level))/(1.*player->getExpForLv(player->level+1)-player->getExpForLv(player->level)));
 	player->capacity = row.lookup_by_name("cap");
@@ -528,7 +526,6 @@ bool IOPlayerSQL::savePlayer(Player* player){
 		query << "`healthmax` = " << player->healthmax << ", ";
 		query << "`direction` = " << (int)player->getDirection() << ", ";
 		query << "`experience` = " << player->experience << ", ";
-		query << "`soul` = " << (unsigned short) player->soul << ", "; //probably needed for no number to char conversion
 		query << "`lookbody` = " << player->lookbody << ", ";
 		query << "`lookfeet` = " << player->lookfeet << ", ";
 		query << "`lookhead` = " << player->lookhead << ", ";

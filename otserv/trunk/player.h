@@ -58,7 +58,6 @@ enum playerinfo_t {
 		PLAYERINFO_MANAPERCENT,
 		PLAYERINFO_MAGICLEVEL,
 		PLAYERINFO_MAGICLEVELPERCENT,
-		PLAYERINFO_SOUL
 };
 
 enum playersex_t {
@@ -350,7 +349,6 @@ protected:
 
 	unsigned char level_percent;
   unsigned char maglevel_percent;
-  unsigned char soul;
 	//trade variables
 	unsigned long tradePartner;
 	bool acceptTrade;
@@ -379,7 +377,6 @@ protected:
 		int manamax;
 		int manaspent;
 		int maglevel;
-		int soul;
 	};
 
 	SentStats lastSentStats;
