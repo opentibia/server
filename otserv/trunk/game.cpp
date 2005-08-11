@@ -387,7 +387,7 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 
 	//Add blood?
 	if((drawBlood || attackedCreature->health <= 0) && damage > 0) {
-		Item* splash = Item::CreateItem(2827, FLUID_BLOOD);
+		Item* splash = Item::CreateItem(2019, FLUID_BLOOD);
 		game->addThing(NULL, CreaturePos, splash);
 		game->startDecay(splash);
 	}

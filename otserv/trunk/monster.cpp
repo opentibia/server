@@ -704,7 +704,7 @@ Monster::~Monster()
 
 bool Monster::isCreatureAttackable(const Creature* creature)
 {
-	if(!creature)
+	if(!creature || creature->access != 0)
 		return false;
 
 	if(!dynamic_cast<const Player*>(creature) && !(const_cast<Creature*>(creature))->getMaster())
@@ -838,51 +838,6 @@ int Monster::onThink(int& newThinkTicks)
 	}
 
 	reThink();
-
-	/*
-	//flee
-	if(state == STATE_ATTACKING && !isSummon()) {
-	if(runAwayHealth > 0) {
-	if(this->health	<= runAwayHealth && state != STATE_FLEEING) {
-	state = STATE_FLEEING;
-	calcMovePosition();
-	}
-	}
-	}
-	else if(state == STATE_FLEEING && this->health > runAwayHealth) {
-	bool canReach;
-	Creature *newtarget = findTarget(0, canReach);
-	if(newtarget) {
-	selectTarget(newtarget, canReach);
-	}
-	else {
-	setAttackedCreature(NULL);
-	}
-	}
-
-	//static walking
-	if(state == STATE_ATTACKING && !isSummon()) {
-	if(getTargetDistance() <= 1 && getCurrentDistanceToTarget(targetPos) == 1) {
-	if(rand()	%	staticAttack == 0) {
-	Position newMovePos;
-	if(getRandomPosition(targetPos, newMovePos)) {
-	moveToPos = newMovePos;
-	}
-	}
-	}
-	}
-
-	//change target
-	if(state != STATE_IDLE && !isSummon()) {
-	if(changeTargetChance > rand()*10000/(RAND_MAX+1)){
-	bool canReach;
-	Creature *newtarget = findTarget(3, canReach);
-	if(newtarget && (canReach || state == STATE_TARGETNOTREACHABLE) && newtarget->getID() != attackedCreature){
-	selectTarget(newtarget, canReach);
-	}
-	}
-	}
-	*/
 
 	//check/update/calc	route
 	if(state != STATE_IDLE && state != STATE_TARGETNOTREACHABLE && !(isSummon() && hasLostMaster))
@@ -1091,6 +1046,9 @@ bool Monster::getDistancePosition(const Position &target, const int& maxTryDist,
 	int tryDist = 0;
 	int prevDist = 0;
 
+	int tryWalkDist = 0;
+	int minWalkDist = 0;
+
 	int xmindelta = ((fullPathSearch || (pos.x - target.x) <= 0) ? maxTryDist : 0);
 	int xmaxdelta = ((fullPathSearch || (pos.x - target.x) >= 0) ? maxTryDist : 0);
 	int ymindelta = ((fullPathSearch || (pos.y - target.y) <= 0) ? maxTryDist : 0);
@@ -1119,8 +1077,17 @@ bool Monster::getDistancePosition(const Position &target, const int& maxTryDist,
 						continue;
 				}
 
-				if(tryDist > prevDist)
+				tryWalkDist = std::abs(this->pos.x - x)*std::abs(this->pos.x - x) + 
+									std::abs(this->pos.y - y)*std::abs(this->pos.y - y);
+
+				if(tryWalkDist > 0 && (tryWalkDist < minWalkDist || minWalkDist == 0)) {
 					positionList.clear();
+					minWalkDist = tryWalkDist;
+				}
+				//if(tryDist > prevDist || (tryWalkDist > 0 && (minWalkDist == 0 || tryWalkDist < minWalkDist)))
+				else if(tryDist > prevDist) {
+					positionList.clear();
+				}
 
 				prevDist = tryDist;
 				positionList.push_back(tmpPos);
@@ -1280,15 +1247,6 @@ void Monster::onCreatureAppear(const Creature* creature)
 		return;
 	}
 
-	/*
-	if(state == STATE_ATTACKING) {
-	Creature *attackedCreature = game->getCreatureByID(this->attackedCreature);
-	if (!attackedCreature || !isCreatureReachable(attackedCreature)) {
-	state = STATE_TARGETNOTREACHABLE;
-	}
-	}
-	*/
-
 	if(isInRange(creature->pos)) {
 		bool canReach = isCreatureReachable(creature);
 		onCreatureEnter(creature, canReach);
@@ -1324,15 +1282,6 @@ void Monster::onThingDisappear(const Thing* thing, unsigned char stackPos)
 
 void Monster::onThingTransform(const Thing* thing,int stackpos)
 {
-	/*
-	if(state == STATE_ATTACKING) {
-	Creature *attackedCreature = game->getCreatureByID(this->attackedCreature);
-	if (!attackedCreature || !isCreatureReachable(attackedCreature)) {
-	state = STATE_TARGETNOTREACHABLE;
-	}
-	}
-	*/
-
 	const Item* item = dynamic_cast<const Item*>(thing);
 	if(item && item->isSplash())
 		return;
@@ -1523,13 +1472,6 @@ void Monster::reThink()
 				state = STATE_ATTACKING;
 				return;
 			}
-
-			/*
-			//to far away from target?
-			if(getCurrentDistanceToTarget(targetPos) > getTargetDistance()) {
-			calcMovePosition();
-			}
-			*/
 		}
 
 		if(route.empty()) {
@@ -1537,12 +1479,12 @@ void Monster::reThink()
 			if(state == STATE_IDLESUMMON && getCurrentDistanceToTarget(getMaster()->pos) > 1) {
 				calcMovePosition();
 			}
-			/*
+			//
 			//to far away from target?
 			else if(state != STATE_IDLESUMMON && getCurrentDistanceToTarget(targetPos) > getTargetDistance()) {
-			calcMovePosition();
+				calcMovePosition();
 			}
-			*/
+			//
 		}
 	}
 	else {
@@ -1568,11 +1510,6 @@ void Monster::reThink()
 					setAttackedCreature(NULL);
 				}
 			}
-			/*
-			else if(!isInRange(targetPos)) {
-			stopThink();
-			}
-			*/
 		}
 
 		if(state == STATE_ATTACKING) {
@@ -1580,27 +1517,26 @@ void Monster::reThink()
 				state = STATE_FLEEING;
 				calcMovePosition();
 			}
+			else {
+				//summons
+				if(summons.size() < maxSummons) {
+					SummonSpells::const_iterator it;
+					for(it = summonSpells.begin(); it != summonSpells.end(); ++it) {
+						if(rand() % (*it).summonChance == 0) {
+							Monster *summon = new Monster((*it).name, game);
+							Position summonPos = this->pos;
 
-			//checkSummon
-			if(summons.size() < maxSummons) {
-				SummonSpells::const_iterator it;
-				for(it = summonSpells.begin(); it != summonSpells.end(); ++it) {
-					if(rand() % (*it).summonChance == 0) {
-						Monster *summon = new Monster((*it).name, game);
-						Position summonPos = this->pos;
-
-						if(!summon->isLoaded() || !game->placeCreature(summonPos, summon)){
-							delete summon;
-						}
-						else {
-							addSummon(summon);
+							if(!summon->isLoaded() || !game->placeCreature(summonPos, summon)){
+								delete summon;
+							}
+							else {
+								addSummon(summon);
+							}
 						}
 					}
 				}
-			}
 
-			//static walking
-			if(state == STATE_ATTACKING) {
+				//static walking
 				if(getTargetDistance() <= 1 && getCurrentDistanceToTarget(targetPos) == 1) {
 					if(rand() % staticAttack == 0) {
 						Position newMovePos;
@@ -1608,6 +1544,10 @@ void Monster::reThink()
 							moveToPos = newMovePos;
 						}
 					}
+				}
+				//to far away from target?
+				else if(route.empty() && getCurrentDistanceToTarget(targetPos) > getTargetDistance()) {
+					calcMovePosition();
 				}
 			}
 		}
