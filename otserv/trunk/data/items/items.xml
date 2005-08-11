@@ -33,24 +33,24 @@
 <item id="3133" name="human skeleton" weight="900" decayto="3134" decaytime="30" />
 <item id="3134" name="human skeleton" weight="600" />
 
-<item id="597" name="" decayto="0" weight="0" />
-<item id="580" name="hole" decayto="597" decaytime="20" weight="0" floorchange="1"/>
-<item id="592" name="" decayto="0" weight="0" />
-<item id="593" name="hole" decayto="592" decaytime="20" weight="0" floorchange="1"/>
-<item id="594" name="" decayto="0" weight="0" />
-<item id="595" name="hole" decayto="594" decaytime="20" weight="0" floorchange="1"/>
+<item id="468" name="" decayto="0" weight="0" />
+<item id="469" name="hole" decayto="468" decaytime="20" weight="0" floorchange="1"/>
+<item id="481" name="" decayto="0" weight="0" />
+<item id="482" name="hole" decayto="481" decaytime="20" weight="0" floorchange="1"/>
+<item id="483" name="" decayto="0" weight="0" />
+<item id="484" name="hole" decayto="483" decaytime="20" weight="0" floorchange="1"/>
 
 <!--fluid containers-->
-<item id="2812" name="vial" weight="1.8" />
+<item id="2006" name="vial" weight="1.8" />
 
 <!-- multitype -->
-<item id="2824" type="splash" name="pool" weight="0" decayto="2825" decaytime="45" />
-<item id="2825" type="splash" name="pool" weight="0" decayto="2826" decaytime="45" />
-<item id="2826" type="splash" name="pool" weight="0" />
+<item id="2019" type="splash" name="pool" weight="0" decayto="2020" decaytime="45" />
+<item id="2020" type="splash" name="pool" weight="0" decayto="2021" decaytime="45" />
+<item id="2021" type="splash" name="pool" weight="0" />
 
-<item id="2827" type="splash" name="pool" weight="0" decayto="2828" decaytime="45" /> 
-<item id="2828" type="splash" name="pool" weight="0" decayto="2829" decaytime="45" /> 
-<item id="2829" type="splash" name="pool" weight="0" />
+<item id="2025" type="splash" name="pool" weight="0" decayto="2026" decaytime="45" /> 
+<item id="2026" type="splash" name="pool" weight="0" decayto="2027" decaytime="45" /> 
+<item id="2027" type="splash" name="pool" weight="0" />
 
 <!--liquids-->
 <item id="1" name="water" weight="0" />
@@ -65,21 +65,16 @@
 <item id="15" name="wine" weight="0"/>
 
 <!--level changeable items-->
-<item id="1958" name="" weight="0" floorchangenorth="1"/>
-<item id="1939" name="" weight="0" floorchangenorth="1"/>
-<item id="1928" name="" weight="0" floorchangenorth="1"/>
-<item id="1947" name="" weight="0" floorchangenorth="1"/>
-<item id="1956" name="" weight="0" floorchangenorth="1"/>
-
-<item id="1945" name="" weight="0" floorchangesouth="1"/>
+<item id="1396" name="" weight="0" floorchangenorth="1"/>
+<item id="1385" name="" weight="0" floorchangenorth="1"/>
+<item id="1394" name="" weight="0" floorchangenorth="1"/>
+<item id="1404" name="" weight="0" floorchangenorth="1"/>
+<item id="1392" name="" weight="0" floorchangesouth="1"/>
 <item id="1402" name="" weight="0" floorchangesouth="1"/>
-
-<item id="1950" name="" weight="0" floorchangeeast="1"/>
-<item id="1941" name="" weight="0" floorchangeeast="1"/>
-
-<item id="1943" name="" weight="0" floorchangewest="1"/>
-<item id="1952" name="" weight="0" floorchangewest="1"/>
-<item id="1959" name="" weight="0" floorchangewest="1"/>
+<item id="1388" name="" weight="0" floorchangeeast="1"/>
+<item id="1398" name="" weight="0" floorchangeeast="1"/>
+<item id="1390" name="" weight="0" floorchangewest="1"/>
+<item id="1400" name="" weight="0" floorchangewest="1"/>
 
 <item id="1559" name="" weight="0" floorchangesouth="1" floorchangewest="1"/>
 <item id="1557" name="" weight="0" floorchangesouth="1" floorchangeeast="1"/>
@@ -91,11 +86,11 @@
 <item id="479" name="" weight="0" floorchange="1"/>
 
 <!--runes-->
-<item id="3098" name="adura vita" type="rune" maglevel="8" weight="0.1" />
-<item id="3093" name="adori vita vis" type="rune" maglevel="15" weight="0.1" />
+<item id="2273" name="adura vita" type="rune" maglevel="8" weight="0.1" />
+<item id="2268" name="adori vita vis" type="rune" maglevel="15" weight="0.1" />
 
-<item id="2968" name="gold coin" weight="0.1" />
-<item id="2973" name="platinum coin" weight="0.1" />
+<item id="2148" name="gold coin" weight="0.1" />
+<item id="2152" name="platinum coin" weight="0.1" />
 
 <!--keys-->
 <item id="2090" type="key" name="crystal key" weight="1.0" />
