@@ -246,7 +246,7 @@ protected:
   unsigned long eventCheckAttacking;
 
 	Creature *master;
-	std::vector<Creature*> summons;
+	std::list<Creature*> summons;
 
 	Conditions conditions;
 	typedef std::vector< std::pair<uint64_t, long> > DamageList;

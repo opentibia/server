@@ -56,7 +56,7 @@ access(0)
 
 Creature::~Creature()
 {
-	std::vector<Creature*>::iterator cit;
+	std::list<Creature*>::iterator cit;
 	for(cit = summons.begin(); cit != summons.end(); ++cit) {
 		(*cit)->setAttackedCreature(NULL);
 		(*cit)->setMaster(NULL);
@@ -79,7 +79,7 @@ void Creature::drainMana(int damage)
 //void Creature::setAttackedCreature(unsigned long id)
 void Creature::setAttackedCreature(const Creature* creature)
 {
-	std::vector<Creature*>::iterator cit;
+	std::list<Creature*>::iterator cit;
 	for(cit = summons.begin(); cit != summons.end(); ++cit) {
 		(*cit)->setAttackedCreature(creature);
 	}
@@ -103,12 +103,13 @@ void Creature::addSummon(Creature *creature)
 	creature->setMaster(this);
 	creature->useThing();
 	summons.push_back(creature);
+
 }
 
 void Creature::removeSummon(Creature *creature)
 {
 	//std::cout << "removeSummon: " << this << " summon=" << creature << std::endl;
-	std::vector<Creature*>::iterator cit = std::find(summons.begin(), summons.end(), creature);
+	std::list<Creature*>::iterator cit = std::find(summons.begin(), summons.end(), creature);
 	if(cit != summons.end()) {
 		(*cit)->setMaster(NULL);
 		(*cit)->releaseThing();

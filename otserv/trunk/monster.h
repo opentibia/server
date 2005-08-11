@@ -175,7 +175,8 @@ private:
 	bool canPushItems;
 	unsigned long staticLook;
 	unsigned long staticAttack;
-	unsigned short changeTargetChance;
+	unsigned short changeTargetChance;  
+  int maxSummons;
 
 	int getCurrentDistanceToTarget(const Position &target);
 	int getTargetDistance();
@@ -229,6 +230,14 @@ protected:
 	typedef std::vector<std::pair<std::string, TimeProbabilityClass> > YellingSentences;
 	YellingSentences yellingSentences;
 
+	struct summonBlock {
+    std::string name;
+    unsigned long summonChance;
+  };
+
+  typedef std::list<summonBlock> SummonSpells;
+	SummonSpells summonSpells; 
+
 	std::vector<Item *> lootItems;
 
 	virtual fight_t getFightType() {return curPhysicalAttack->fighttype;};
@@ -242,8 +251,9 @@ protected:
 	bool validateDistanceAttack(const Creature *creature);
 	bool validateDistanceAttack(const Position &pos);
 	bool monsterMoveItem(Item* item, int radius);
+	bool isCreatureAttackable(const Creature* creature);
 
-	virtual int getLostExperience() {return experience;};
+	virtual int getLostExperience() {return (isSummon() ? 0 : experience);};
 	virtual void dropLoot(Container *corpse);
 
 	virtual void onThingMove(const Creature *creature, const Thing *thing, const Position *oldPos,

@@ -59,35 +59,33 @@ Player::Player(const std::string& name, Protocol *p) :
 
 	maglevel   = 20;
 
-  	access     = 0;
-  	lastlogin  = 0;
-  	lastLoginSaved = 0;
-  	SendBuffer = false;
-  	npings = 0;
-  	internal_ping = 0;
-  	fightMode = followMode = 0;
+	access     = 0;
+	lastlogin  = 0;
+	lastLoginSaved = 0;
+	SendBuffer = false;
+	npings = 0;
+	internal_ping = 0;
+	fightMode = followMode = 0;
 
 	tradePartner = 0;
 	acceptTrade = false;
 	tradeItem = NULL;
 
-  	for(int i = 0; i < 7; i++)
-  	{
-    	skills[i][SKILL_LEVEL] = 1;
-    	skills[i][SKILL_TRIES] = 0;
+	for(int i = 0; i < 7; i++)
+	{
+		skills[i][SKILL_LEVEL] = 1;
+		skills[i][SKILL_TRIES] = 0;
 		skills[i][SKILL_PERCENT] = 0;
-		
+	
 		for(int j = 0; j < 2; j++){
 			SkillAdvanceCache[i][j].level = 0;
 			SkillAdvanceCache[i][j].vocation = VOCATION_NONE;
 			SkillAdvanceCache[i][j].tries = 0;
 		}
-  	}
+	}
 
 	lastSentStats.health = 0;
 	lastSentStats.healthmax = 0;
-	//lastSentStats.cap = 0;
-	//lastSentStats.capacity = 0;
 	lastSentStats.freeCapacity = 0;
 	lastSentStats.experience = 0;
 	lastSentStats.level = 0;
@@ -102,27 +100,27 @@ Player::Player(const std::string& name, Protocol *p) :
 	for(int i = 0; i < 11; i++)
 		items[i] = NULL;
 
-  	useCount = 0;
+ 	useCount = 0;
   
   
-  	CapGain[0]  = 10;     //for level advances
-  	CapGain[1]  = 10;     //e.g. Sorcerers will get 10 Cap with each level up
-  	CapGain[2]  = 10;     
-  	CapGain[3]  = 20;
+ 	CapGain[0]  = 10;     //for level advances
+ 	CapGain[1]  = 10;     //e.g. Sorcerers will get 10 Cap with each level up
+ 	CapGain[2]  = 10;     
+ 	CapGain[3]  = 20;
 	CapGain[4]  = 25;
   
-  	ManaGain[0] = 5;      //for level advances
-  	ManaGain[1] = 30;
-  	ManaGain[2] = 30;
-  	ManaGain[3] = 15;
-  	ManaGain[4] = 5;
+ 	ManaGain[0] = 5;      //for level advances
+ 	ManaGain[1] = 30;
+ 	ManaGain[2] = 30;
+ 	ManaGain[3] = 15;
+ 	ManaGain[4] = 5;
   
 	HPGain[0]   = 5;      //for level advances
-  	HPGain[1]   = 5;
-  	HPGain[2]   = 5;
-  	HPGain[3]   = 10;
-  	HPGain[4]   = 15;  
-  	max_depot_items = 1000;
+ 	HPGain[1]   = 5;
+ 	HPGain[2]   = 5;
+ 	HPGain[3]   = 10;
+ 	HPGain[4]   = 15;  
+ 	max_depot_items = 1000;
 } 
 
 

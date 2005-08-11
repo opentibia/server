@@ -726,7 +726,7 @@ bool Game::removeCreature(Creature* c)
 	c->removeList();
 	c->isRemoved = true;
 	
-	for(std::vector<Creature*>::iterator cit = c->summons.begin(); cit != c->summons.end(); ++cit) {
+	for(std::list<Creature*>::iterator cit = c->summons.begin(); cit != c->summons.end(); ++cit) {
 		removeCreature(*cit);
 	}
 		
@@ -2323,33 +2323,8 @@ void Game::getSpectators(const Range& range, SpectatorVec& list)
 	map->getSpectators(range, list);
 }
 
-/*
-void Game::creatureBroadcastTileUpdated(const Position& pos)
-{
-	std::vector<Creature*> list;
-	std::vector<Creature*>::iterator it;
-
-	getSpectators(Range(pos, true), list);
-
-	//players
-	for(it = list.begin(); it != list.end(); ++it) {
-		if(dynamic_cast<Player*>(*it)) {
-			(*it)->onTileUpdated(pos);
-		}
-	}
-
-	//none-players
-	for(it = list.begin(); it != list.end(); ++it) {
-		if(!dynamic_cast<Player*>(*it)) {
-			(*it)->onTileUpdated(pos);
-		}
-	}
-}
-*/
-
 void Game::creatureTurn(Creature *creature, Direction dir)
 {
-	
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::creatureTurn()");
 
 	if (creature->direction != dir) {
