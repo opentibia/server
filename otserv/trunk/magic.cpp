@@ -191,8 +191,8 @@ int MagicEffectTargetExClass::getDamage(Creature *target, const Creature *attack
 
 		bool refresh = true;
 		for(ConditionVec::const_iterator condIt = condition.begin(); condIt != condition.end(); ++condIt) {
-			if(condIt == condition.begin()) //skip first
-				continue;
+			/*if(condIt == condition.begin()) //skip first
+				continue;*/
 			
 			if((condIt->getCondition()->attackType != ATTACK_NONE) &&
 				(target->getImmunities() & condIt->getCondition()->attackType) != condIt->getCondition()->attackType) {

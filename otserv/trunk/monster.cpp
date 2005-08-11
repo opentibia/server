@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// otserv main. The only place where things get instantiated.
+//
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -69,7 +69,7 @@ Creature(name)
 		char* nodeValue = NULL;
 		root = xmlDocGetRootElement(doc);
 
-		if (xmlStrcmp(root->name,(const xmlChar*)	"monster")){
+		if (xmlStrcmp(root->name,(const xmlChar*) "monster")){
 			//TODO:	use	exceptions here
 			std::cerr << "Malformed	XML" << std::endl;
 		}
@@ -151,7 +151,7 @@ Creature(name)
 		}
 
 		while	(p)
-	 {
+		{
 			const char* str = (char*)p->name;
 
 			if (strcmp(str, "health") == 0) {
@@ -262,7 +262,7 @@ Creature(name)
 
 						if(strcmp(attacktype.c_str(), "melee") == 0)
 					 {
-							PhysicalAttackClass* physicalattack = new	PhysicalAttackClass();
+							PhysicalAttackClass* physicalattack = new PhysicalAttackClass();
 
 							physicalattack->fighttype = FIGHT_MELEE;
 
@@ -283,10 +283,10 @@ Creature(name)
 						else if(strcmp(attacktype.c_str(), "distance") == 0)
 					 {
 							hasDistanceAttack = true;
-							PhysicalAttackClass* physicalattack = new	PhysicalAttackClass();
+							PhysicalAttackClass* physicalattack = new PhysicalAttackClass();
 
 							physicalattack->fighttype = FIGHT_DIST;
-							std::string	subattacktype = "";
+							std::string subattacktype = "";
 
 							nodeValue = (char*)xmlGetProp(tmp, (const xmlChar *)"name");
 							if(nodeValue) {
@@ -329,7 +329,7 @@ Creature(name)
 						}
 						else if(strcmp(attacktype.c_str(), "instant") == 0) {
 							hasDistanceAttack = true;
-							std::string	spellname = "";
+							std::string spellname = "";
 
 							nodeValue = (char*)xmlGetProp(tmp, (const xmlChar *)"name");
 							if(nodeValue) {
@@ -344,7 +344,7 @@ Creature(name)
 						}
 						else if(strcmp(attacktype.c_str(), "rune") == 0) {
 							hasDistanceAttack = true;
-							std::string	spellname = "";
+							std::string spellname = "";
 
 							nodeValue = (char*)xmlGetProp(tmp, (const xmlChar *)"name");
 							if(nodeValue) {
@@ -354,7 +354,7 @@ Creature(name)
 
 							std::transform(spellname.begin(), spellname.end(), spellname.begin(), tolower);
 
-							std::map<unsigned	short, Spell*>::const_iterator rsIt;
+							std::map<unsigned short, Spell*>::const_iterator rsIt;
 							for(rsIt = spells.getAllRuneSpells()->begin(); rsIt != spells.getAllRuneSpells()->end(); ++rsIt) {
 								if(strcmp(rsIt->second->getName().c_str(), spellname.c_str()) == 0) {
 									runeSpells[rsIt->first].push_back(timeprobsystem);
@@ -373,7 +373,7 @@ Creature(name)
 				while(tmp)
 			 {
 					if (strcmp((const char*)tmp->name, "defense") == 0) {
-						std::string	immunity = "";
+						std::string immunity = "";
 
 						nodeValue = (char*)xmlGetProp(tmp, (const xmlChar *)"immunity");
 						if(nodeValue) {
@@ -432,7 +432,7 @@ Creature(name)
 						else
 							probability = 30;
 
-						std::string	sentence = "";
+						std::string sentence = "";
 						nodeValue = (char*)xmlGetProp(tmp, (const xmlChar *)"sentence");
 						if(nodeValue) {
 							sentence = nodeValue;
@@ -525,7 +525,7 @@ bool Monster::LoadLootNode(xmlNodePtr	tmp){
 				lootItems.push_back(tmpItem);
 				Container* loot_container = dynamic_cast<Container*>(tmpItem);
 				if(loot_container) {
-					LoadLootContainer(tmp	,loot_container);
+					LoadLootContainer(tmp, loot_container);
 					//removes empty container
 					if(loot_container->size() == 0){
 						lootItems.pop_back();
@@ -597,10 +597,10 @@ Item* Monster::LoadLootItemStackable(xmlNodePtr	tmp,unsigned short id){
 		}
 		else{
 			//if chancemax < randvalue < chance1
-			//get	number of	items	using	a	linear relation	between
+			//get number of items using a linear relation between
 			// n and chances
-			//n = (unsigned	char)(countmax*(randvalue-chancemax)/(chance1-chancemax));
-			n = (unsigned	char)(randvalue	%	countmax + 1);
+			//n = (unsigned char)(countmax*(randvalue-chancemax)/(chance1-chancemax));
+			n = (unsigned	char)(randvalue % countmax + 1);
 		}		
 		tmpItem = Item::CreateItem(id,n);
 	}
@@ -610,7 +610,7 @@ Item* Monster::LoadLootItemStackable(xmlNodePtr	tmp,unsigned short id){
 	return tmpItem;
 }
 
-Item* Monster::LoadLootItem(xmlNodePtr tmp,unsigned	short	id){
+Item* Monster::LoadLootItem(xmlNodePtr tmp,unsigned short id){
 	Item *tmpItem;
 	unsigned long chance;
 	char* nodeValue = (char*)xmlGetProp(tmp, (xmlChar*)"chance");
@@ -621,8 +621,8 @@ Item* Monster::LoadLootItem(xmlNodePtr tmp,unsigned	short	id){
 		if(chance > CHANCE_MAX)
 			chance = CHANCE_MAX;
 	}
-	else{		
-		std::cout << "missing	chance for loot	id = "<< id << std::endl;
+	else{
+		std::cout << "missing chance for loot id = "<< id << std::endl;
 		chance = CHANCE_MAX;
 	}
 
@@ -636,8 +636,7 @@ Item* Monster::LoadLootItem(xmlNodePtr tmp,unsigned	short	id){
 }
 
 unsigned long Monster::GetRandom(){
-	return (unsigned long)((rand()<< 16	|	
-		rand())	%	CHANCE_MAX);
+	return (unsigned long)((rand()<< 16 |	rand()) % CHANCE_MAX);
 }
 
 bool Monster::LoadLootContainer(xmlNodePtr nodeitem,Container* ccontainer){
@@ -649,11 +648,11 @@ bool Monster::LoadLootContainer(xmlNodePtr nodeitem,Container* ccontainer){
 		return false;
 	}
 	tmp=nodeitem->children;
-	if(tmp==NULL){		
+	if(tmp==NULL){
 		return false;
-	}	
+	}
 	while(tmp){
-		if (strcmp((const char*)tmp->name, "inside") == 0){			
+		if (strcmp((const char*)tmp->name, "inside") == 0){
 			p=tmp->children;
 			while(p){
 				nodeValue = (char*)xmlGetProp(p, (const xmlChar *) "id");
@@ -742,7 +741,7 @@ bool Monster::isCreatureReachable(const Creature* creature)
 		return true;
 	}
 	else {
-		std::list<Position>	tmproute;
+		std::list<Position> tmproute;
 		Position closePos;
 		getCloseCombatPosition(creature->pos, closePos);
 		tmproute = game->map->getPathTo(this, this->pos, closePos, true, canPushItems);
@@ -839,7 +838,7 @@ int Monster::onThink(int& newThinkTicks)
 
 	reThink();
 
-	//check/update/calc	route
+	//check/update/calc route
 	if(state != STATE_IDLE && state != STATE_TARGETNOTREACHABLE && !(isSummon() && hasLostMaster))
  {
 		if(!updateRoute && !game->map->isPathValid(this, route, canPushItems)) {
@@ -861,7 +860,7 @@ int Monster::onThink(int& newThinkTicks)
 		}
 	}
 
-	//process	movement
+	//process movement
 	if(state != STATE_IDLE && !(state == STATE_IDLESUMMON && hasLostMaster)) {
 		if(state == STATE_TARGETNOTREACHABLE) {
 			Position newMovePos;
@@ -920,7 +919,7 @@ void Monster::updateLookDirection()
 	int deltay = targetPos.y - this->pos.y;
 
 	if(!(deltax == 0 && deltay == 0)) {
-		Direction	newdir = this->getDirection();
+		Direction newdir = this->getDirection();
 
 		//SE
 		if(deltax < 0 && deltay < 0) {
@@ -1010,7 +1009,7 @@ void Monster::calcMovePosition()
 		//Close combat
 		if(!foundDistPath) {
 			int currentDist = getCurrentDistanceToTarget(targetPos);
-			if(currentDist > getTargetDistance()) {
+			if(currentDist > getTargetDistance() || currentDist == 0) {
 				getCloseCombatPosition(targetPos, newMovePos);
 			}
 		}
@@ -1111,7 +1110,7 @@ bool Monster::getDistancePosition(const Position &target, const int& maxTryDist,
 bool Monster::getCloseCombatPosition(const Position &target, Position &dest)
 {
 	//Close combat
-	std::vector<Position>	positionList;
+	std::vector<Position> positionList;
 	Position tmpPos;
 	int prevdist = 0;
 	for(int y = target.y - 1; y <= target.y + 1; ++y) {
@@ -1195,7 +1194,7 @@ bool Monster::getRandomPosition(const Position &target, Position &dest)
 			return false;
 	}
 	else if(getCurrentDistanceToTarget(target) <= 1) {
-		//only close combat	
+		//only close combat
 		std::vector<Position>	positionList;
 		Position randMovePos;
 		for(int y = pos.y - 1; y <= pos.y + 1; ++y){
@@ -1369,7 +1368,7 @@ void Monster::onCreatureMove(const Creature* creature, const Position* oldPos)
 	}
 }
 
-void Monster::onCreatureEnter(const Creature *creature, bool canReach	/* = true*/)
+void Monster::onCreatureEnter(const Creature* creature, bool canReach /* = true*/)
 {
 	if(isSummon()) {
 		//master found
@@ -1652,14 +1651,14 @@ void Monster::setAttackedCreature(const Creature* creature)
 
 std::string	Monster::getDescription(bool self) const
 {
-	std::stringstream	s;
+	std::stringstream ss;
 	std::string str;
 
 	str = getName();
 	std::transform(str.begin(), str.end(), str.begin(), tolower);
 
-	s << "a " << str << ".";
-	str = s.str();
+	ss << "a " << str << ".";
+	str = ss.str();
 
 	return str;
 }
@@ -1716,7 +1715,7 @@ bool Monster::doAttacks(Creature* attackedCreature, monstermode_t mode /*= MODE_
 				TimeProbabilityClass& timeprobsystem = *asIt;
 				if(timeprobsystem.onTick(500) || (random_range(1, 100) <= modeProb)) {
 
-					std::map<unsigned	short, Spell*>::iterator rit = spells.getAllRuneSpells()->find(raIt->first);
+					std::map<unsigned short, Spell*>::iterator rit = spells.getAllRuneSpells()->find(raIt->first);
 					if(rit != spells.getAllRuneSpells()->end()) {
 						bool success = rit->second->getSpellScript()->castSpell(this, attackedCreature->pos, "");
 
@@ -1833,7 +1832,7 @@ bool Monster::monsterMoveItem(Item* item, int radius)
 	else{
 		itemCount = 1;
 	}
-	//try	random position in radius
+	//try random position in radius
 	tryPos.z = item->pos.z;
 	for(int i = 0; i < 4*radius; i++){
 		tryPos.x = item->pos.x + rand() % radius;
