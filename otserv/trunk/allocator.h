@@ -72,6 +72,11 @@ void* operator new[](size_t bytes);
 void operator delete(void *p);
 void operator delete[](void* p);
 
+#ifdef _MSC_VER
+void operator delete(void* p, int dummy);
+void operator delete[](void* p, int dummy);
+#endif
+
 #ifdef __OTSERV_ALLOCATOR_STATS__
 OTSYS_THREAD_RETURN allocatorStatsThread(void *a);
 #endif
@@ -220,26 +225,6 @@ private:
 	#endif
 	OTSYS_THREAD_LOCKVAR poolLock;
 };
-
-void * operator new(size_t i,int dummy){
-	return malloc(i);
-}
-
-void * operator new(size_t i){
-	return PoolManager::getInstance().allocate(i);
-}
-
-void * operator new[](size_t i){
-	return PoolManager::getInstance().allocate(i);
-}
-
-void operator delete(void *p){
-	PoolManager::getInstance().deallocate(p);
-}
-
-void operator delete[](void *p){
-	PoolManager::getInstance().deallocate(p);
-}
 
 #ifdef __OTSERV_ALLOCATOR_STATS__
 OTSYS_THREAD_RETURN allocatorStatsThread(void *a){

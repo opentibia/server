@@ -48,6 +48,7 @@ void* operator new[](size_t bytes, int dummy)
 	return malloc(bytes);
 }
 
+#ifdef _MSC_VER
 void operator delete(void* p, int dummy)
 {
 	std::free(p);
@@ -57,14 +58,5 @@ void operator delete[](void* p, int dummy)
 {
 	std::free(p);
 }
+#endif
 
-OTSYS_THREAD_RETURN releaseMemoryThread(void *a)
-{
-	while(1){
-		OTSYS_SLEEP(60000);
-		#ifdef __OTSERV_ALLOCATOR_STATS__
-		PoolManager::getInstance().dumpStats();
-		#endif
-		PoolManager::getInstance().releaseMemory();
-	}
-}
