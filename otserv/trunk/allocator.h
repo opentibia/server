@@ -31,50 +31,50 @@
 
 template<typename T>
 class dummyallocator {
-	public:
-		typedef std::size_t size_type;
-		typedef std::ptrdiff_t difference_type;
-		typedef T* pointer;
-		typedef const T* const_pointer;
-		typedef T& reference;
-		typedef const T& const_reference;
-		typedef T value_type;
-		template <class U> struct rebind {
-			typedef dummyallocator<U> other;
-		};
-		dummyallocator(  ) throw(  )                          {}
-		dummyallocator(const dummyallocator&) throw(  )          {}
-		template <class U>
-			dummyallocator(const dummyallocator<U>&) throw(  )       {}
-		~dummyallocator(  ) throw(  )                         {}
-		pointer address(reference x) const                 {return &x;}
-		const_pointer address(const_reference x) const     {return &x;}
-		pointer allocate(size_type n, void* hint = 0) {
-			return static_cast<T*>(std::malloc(n * sizeof(T)) );
-		}
-		void deallocate(pointer p, size_type n) {
-			std::free(static_cast<void*>(p));
-		}
-		size_type max_size(  ) const throw(  ) {
-			return std::numeric_limits<size_type>::max() / sizeof(T);
-		}
-		void construct(pointer p, const T& val) {
-			new(static_cast<void*>(p)) T(val);
-		}
-		void destroy(pointer p) {
-			p->~T(  );
-		}
+public:
+	typedef std::size_t size_type;
+	typedef std::ptrdiff_t difference_type;
+	typedef T* pointer;
+	typedef const T* const_pointer;
+	typedef T& reference;
+	typedef const T& const_reference;
+	typedef T value_type;
+	template <class U> struct rebind {
+		typedef dummyallocator<U> other;
+	};
+	dummyallocator(  ) throw(  )                          {}
+	dummyallocator(const dummyallocator&) throw(  )          {}
+	template <class U>
+		dummyallocator(const dummyallocator<U>&) throw(  )       {}
+	~dummyallocator(  ) throw(  )                         {}
+	pointer address(reference x) const                 {return &x;}
+	const_pointer address(const_reference x) const     {return &x;}
+	pointer allocate(size_type n, void* hint = 0) {
+		return static_cast<T*>(std::malloc(n * sizeof(T)) );
+	}
+	void deallocate(pointer p, size_type n) {
+		std::free(static_cast<void*>(p));
+	}
+	size_type max_size(  ) const throw(  ) {
+		return std::numeric_limits<size_type>::max() / sizeof(T);
+	}
+	void construct(pointer p, const T& val) {
+		new(static_cast<void*>(p)) T(val);
+	}
+	void destroy(pointer p) {
+		p->~T(  );
+	}
 };
 
 void* operator new(size_t bytes, int dummy);
-void* operator new[](size_t bytes, int dummy);
-void operator delete(void* p, int dummy);
-void operator delete[](void* p, int dummy);
 void* operator new(size_t bytes);
 void* operator new[](size_t bytes);
 void operator delete(void *p);
+void operator delete[](void* p);
 
-OTSYS_THREAD_RETURN releaseMemoryThread(void *a);
+#ifdef __OTSERV_ALLOCATOR_STATS__
+OTSYS_THREAD_RETURN allocatorStatsThread(void *a);
+#endif
 
 struct poolTag {
 	size_t poolbytes;
@@ -93,7 +93,8 @@ public:
 		
 		for(it = pools.begin(); it != pools.end(); ++it) {
 			if(it->first >= size + sizeof(poolTag)) {
-				poolTag* tag = reinterpret_cast<poolTag*>(it->second->ordered_malloc());
+				//poolTag* tag = reinterpret_cast<poolTag*>(it->second->ordered_malloc());
+				poolTag* tag = reinterpret_cast<poolTag*>(it->second->malloc());
 				tag->poolbytes = it->first;
 				#ifdef __OTSERV_ALLOCATOR_STATS__
 				poolsStats[it->first]->allocations++;
@@ -118,7 +119,8 @@ public:
 			OTSYS_THREAD_LOCK_CLASS(poolLock, NULL);
 			
 			it = pools.find(tag->poolbytes);
-			it->second->ordered_free(tag);
+			//it->second->ordered_free(tag);
+			it->second->free(tag);
 			#ifdef __OTSERV_ALLOCATOR_STATS__
 			poolsStats[it->first]->deallocations++;
 			#endif
@@ -127,31 +129,37 @@ public:
 			std::free(tag);
 	}
 	
+	/*
 	void releaseMemory(){
 		Pools::iterator it;
 		for(it = pools.begin(); it != pools.end(); ++it) {
 			it->second->release_memory();
 		}
 	}
+	*/
 	
 	#ifdef __OTSERV_ALLOCATOR_STATS__
 	void dumpStats(){
 		time_t rawtime;
 		time(&rawtime);
 		std::ofstream output("mem_dump.txt",std::ios_base::app);
-		output << "Otserv Allocator Stats " << std::ctime(&rawtime);
+		output << "Otserv Allocator Stats: " << std::ctime(&rawtime);
 		PoolsStats::iterator it;
 		for(it = poolsStats.begin(); it != poolsStats.end(); ++it) {
 			output << (int)(it->first) << " alloc: " << (int)(it->second->allocations) << 
 				" dealloc: " << (int)(it->second->deallocations) << 
-				" unused: " << (int)(it->second->unused) << 
-				std::endl;
+				" unused: " << (int)(it->second->unused);
+			if(it->second->allocations != 0){
+				output << " avg: " << (int)((it->first) - (it->second->unused)/(it->second->allocations)) << 
+				" %unused: " << (int)((it->second->unused)*100/(it->second->allocations)/(it->first));
+			}
+			output << std::endl;
 		}
 		output << std::endl;
 		output.close();
 	}
 	#endif
-	
+
 	~PoolManager() {
 		Pools::iterator it = pools.begin();
 		while(it != pools.end()) {
@@ -181,16 +189,16 @@ private:
 	
 	PoolManager() {
 		OTSYS_THREAD_LOCKVARINIT(poolLock);
-		addPool(32, 1024);
-		addPool(64, 1024);
-		addPool(128, 1024);
+		addPool(32, 16384);
+		addPool(64, 16384);
+		addPool(128, 4096);
 		addPool(256, 256);
 		addPool(512, 256);
-		addPool(1024, 256);
-		addPool(2048, 256);
-		addPool(4096, 256);
-		addPool(8192, 256);
-		addPool(18432, 256);
+		addPool(768, 256);
+		addPool(2048, 128);
+		addPool(4096, 128);
+		addPool(8192, 128);
+		addPool(18432, 128);
 	}
 	
 	PoolManager(const PoolManager&);
@@ -212,5 +220,37 @@ private:
 	#endif
 	OTSYS_THREAD_LOCKVAR poolLock;
 };
+
+void * operator new(size_t i,int dummy){
+	return malloc(i);
+}
+
+void * operator new(size_t i){
+	return PoolManager::getInstance().allocate(i);
+}
+
+void * operator new[](size_t i){
+	return PoolManager::getInstance().allocate(i);
+}
+
+void operator delete(void *p){
+	PoolManager::getInstance().deallocate(p);
+}
+
+void operator delete[](void *p){
+	PoolManager::getInstance().deallocate(p);
+}
+
+#ifdef __OTSERV_ALLOCATOR_STATS__
+OTSYS_THREAD_RETURN allocatorStatsThread(void *a){
+	while(1){
+		OTSYS_SLEEP(120000);
+		#ifdef __OTSERV_ALLOCATOR_STATS__
+		PoolManager::getInstance().dumpStats();
+		#endif
+		//PoolManager::getInstance().releaseMemory();
+	}
+}
+#endif
 
 #endif

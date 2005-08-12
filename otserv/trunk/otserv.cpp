@@ -50,6 +50,10 @@
 #include "tools.h"
 #include "md5.h"
 
+#ifdef __OTSERV_ALLOCATOR__
+#include "allocator.h"
+#endif
+
 #ifdef WIN32
 	#define ERROR_EINTR WSAEINTR
 #else
@@ -98,8 +102,6 @@ bool passwordTest(std::string &plain, std::string &hash)
 		std::stringstream hexStream;
 		std::string plainHash;
 	
-		
-	
 		MD5Init(&m_md5, 0);
 		MD5Update(&m_md5, (const unsigned char*)plain.c_str(), plain.length());
 		MD5Final(&m_md5);
@@ -130,12 +132,11 @@ bool passwordTest(std::string &plain, std::string &hash)
 	}
 	
 }
-				
 
 bool isclientBanished(SOCKET s)
 {
 	sockaddr_in sain;
-  socklen_t salen = sizeof(sockaddr_in);
+	socklen_t salen = sizeof(sockaddr_in);
 
 	if (getpeername(s, (sockaddr*)&sain, &salen) == 0)
 	{
@@ -379,6 +380,9 @@ void ErrorMessage(const char* message) {
 
 int main(int argc, char *argv[])
 {
+#ifdef __OTSERV_ALLOCATOR_STATS__
+	OTSYS_CREATE_THREAD(allocatorStatsThread, NULL);
+#endif
 #if defined __EXCEPTION_TRACER__
 	ExceptionHandler mainExceptionHandler;	
 	mainExceptionHandler.InstallHandler();

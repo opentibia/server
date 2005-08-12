@@ -36,7 +36,7 @@ extern LuaScript g_config;
 
 SpawnManager* SpawnManager::_instance = NULL;
 Game* SpawnManager::game = NULL;
-std::vector<Spawn*> SpawnManager::spawns;
+spawnsList SpawnManager::spawns;
 
 SpawnManager::SpawnManager()
 {
@@ -45,7 +45,7 @@ SpawnManager::SpawnManager()
 
 SpawnManager::~SpawnManager()
 {
-	for(std::vector<Spawn*>::iterator it = spawns.begin(); it != spawns.end(); ++it)
+	for(spawnsList::iterator it = spawns.begin(); it != spawns.end(); ++it)
 		delete *it;
 
 	spawns.clear();
@@ -395,7 +395,7 @@ bool SpawnManager::loadSpawnsSQL(std::string identifier)
 
 bool SpawnManager::startup()
 {
-	for(std::vector<Spawn*>::iterator it = spawns.begin(); it != spawns.end(); ++it) {
+	for(spawnsList::iterator it = spawns.begin(); it != spawns.end(); ++it) {
 		(*it)->startup();
 	}
 
@@ -408,7 +408,7 @@ bool SpawnManager::startup()
 
 void SpawnManager::checkSpawns(int t)
 {
-	for(std::vector<Spawn*>::iterator it = spawns.begin(); it != spawns.end(); ++it) {
+	for(spawnsList::iterator it = spawns.begin(); it != spawns.end(); ++it) {
 		(*it)->idle(t);
 	}
 }

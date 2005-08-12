@@ -31,6 +31,8 @@
 #include <map>
 
 class Game;
+class Spawn;
+typedef std::list<Spawn*> spawnsList;
 
 class Spawn /*: public Event*/ {
 public:
@@ -76,7 +78,7 @@ class SpawnManager {
 public:
 	SpawnManager();
 	~SpawnManager();
-
+	
 	static SpawnManager* instance();
 	static bool initialize(Game *igame);
 	static bool addSpawn(Spawn* spawn);
@@ -84,7 +86,7 @@ public:
 #ifdef _SQLMAP_
 	static bool loadSpawnsSQL(std::string identifier);
 #elif _BINMAP_
-    static std::vector<Spawn*> spawns;
+    static spawnsList spawns;
 #endif
 	static bool startup();
 
@@ -92,7 +94,7 @@ public:
 protected:
 	static SpawnManager* _instance;
 #ifndef _BINMAP_
-	static std::vector<Spawn*> spawns;
+	static spawnsList spawns;
 #endif
 	static Game *game;
 };

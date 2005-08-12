@@ -238,7 +238,7 @@ protected:
   typedef std::list<summonBlock> SummonSpells;
 	SummonSpells summonSpells; 
 
-	std::vector<Item *> lootItems;
+	std::list<Item *> lootItems;
 
 	virtual fight_t getFightType() {return curPhysicalAttack->fighttype;};
 	virtual subfight_t getSubFightType()  {return curPhysicalAttack->disttype;}

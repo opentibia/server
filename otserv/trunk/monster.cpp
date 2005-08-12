@@ -1676,7 +1676,7 @@ void Monster::dropLoot(Container *corpse)
 	if(isSummon())
 		return;
 
-	for(std::vector<Item*>::iterator cit = lootItems.begin(); cit != lootItems.end(); ++cit) {
+	for(std::list<Item*>::iterator cit = lootItems.begin(); cit != lootItems.end(); ++cit) {
 		corpse->addItem(*cit);
 	}
 }
