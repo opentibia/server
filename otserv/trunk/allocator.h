@@ -226,16 +226,4 @@ private:
 	OTSYS_THREAD_LOCKVAR poolLock;
 };
 
-#ifdef __OTSERV_ALLOCATOR_STATS__
-OTSYS_THREAD_RETURN allocatorStatsThread(void *a){
-	while(1){
-		OTSYS_SLEEP(120000);
-		#ifdef __OTSERV_ALLOCATOR_STATS__
-		PoolManager::getInstance().dumpStats();
-		#endif
-		//PoolManager::getInstance().releaseMemory();
-	}
-}
-#endif
-
 #endif

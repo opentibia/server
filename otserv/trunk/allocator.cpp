@@ -37,18 +37,21 @@ void operator delete(void *p)
 	PoolManager::getInstance().deallocate(p);
 }
 
+void operator delete[](void *p){
+	PoolManager::getInstance().deallocate(p);
+}
+
 //dummy new/delete operators
 void* operator new(size_t bytes, int dummy)
 {
 	return malloc(bytes);
 }
-
+#ifdef _MSC_VER
 void* operator new[](size_t bytes, int dummy)
 {
 	return malloc(bytes);
 }
 
-#ifdef _MSC_VER
 void operator delete(void* p, int dummy)
 {
 	std::free(p);
@@ -60,3 +63,14 @@ void operator delete[](void* p, int dummy)
 }
 #endif
 
+#ifdef __OTSERV_ALLOCATOR_STATS__
+OTSYS_THREAD_RETURN allocatorStatsThread(void *a){
+	while(1){
+		OTSYS_SLEEP(120000);
+		#ifdef __OTSERV_ALLOCATOR_STATS__
+		PoolManager::getInstance().dumpStats();
+		#endif
+		//PoolManager::getInstance().releaseMemory();
+	}
+}
+#endif
