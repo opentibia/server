@@ -37,8 +37,8 @@
 
 using namespace std;
 
-#include "otsystem.h"
 #include <stdio.h>
+#include "otsystem.h"
 #include "items.h"
 #include "commands.h"
 #include "creature.h"
@@ -54,6 +54,10 @@ using namespace std;
 
 #include "luascript.h"
 #include <ctype.h>
+
+#ifdef __OTSERV_ALLOCATOR__
+#include "allocator.h"
+#endif
 
 #if defined __EXCEPTION_TRACER__
 #include "exception.h"
@@ -408,6 +412,10 @@ Game::Game()
 	OTSYS_THREAD_SIGNALVARINIT(eventSignal);
 	BufferedPlayers.clear();
 	OTSYS_CREATE_THREAD(eventThread, this);
+
+#ifdef __OTSERV_ALLOCATOR__
+	OTSYS_CREATE_THREAD(releaseMemoryThread, NULL);
+#endif
 
 #ifdef __DEBUG_CRITICALSECTION__
 	OTSYS_CREATE_THREAD(monitorThread, this);

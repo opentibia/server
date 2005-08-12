@@ -242,7 +242,7 @@ bool Commands::placeNpc(Creature* c, const std::string &cmd, const std::string &
 
 bool Commands::placeMonster(Creature* c, const std::string &cmd, const std::string &param)
 {
-	Monster *monster = new Monster(param, game);
+	Monster* monster = new Monster(param, game);
 	if(!monster->isLoaded()){
 		delete monster;
 		return true;
@@ -292,7 +292,7 @@ bool Commands::placeMonster(Creature* c, const std::string &cmd, const std::stri
 
 bool Commands::placeSummon(Creature* c, const std::string &cmd, const std::string &param)
 {
-	Monster *monster = new Monster(param, game);
+	Monster* monster = new Monster(param, game);
 	if(!monster->isLoaded()){
 		delete monster;
 		return true;
@@ -347,7 +347,7 @@ bool Commands::broadcastMessage(Creature* c, const std::string &cmd, const std::
 
 bool Commands::banPlayer(Creature* c, const std::string &cmd, const std::string &param){
 	
-	Creature *creatureBan = game->getCreatureByName(param);
+	Creature* creatureBan = game->getCreatureByName(param);
 	if(creatureBan) {
 		MagicEffectClass me;
 		
@@ -366,7 +366,7 @@ bool Commands::banPlayer(Creature* c, const std::string &cmd, const std::string 
 				player->sendTextMessage(MSG_BLUE_TEXT,"You can not ban this player.");
 				return true;
 			}
-			playerBan->sendTextMessage(MSG_RED_TEXT,"You have been baned.");
+			playerBan->sendTextMessage(MSG_RED_TEXT,"You have been banned.");
 			std::pair<unsigned long, unsigned long> IpNetMask;
 			IpNetMask.first = playerBan->lastip;
 			IpNetMask.second = 0xFFFFFFFF;
