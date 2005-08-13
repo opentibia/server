@@ -75,6 +75,7 @@ protected:
 	ActionUseMap uniqueItemMap;
 	ActionUseMap actionItemMap;
 	int canUse(const Player *player,const Position &pos) const;
+	int canUseFar(const Player *player,const Position &to_pos, const bool blockWalls) const;
 	Action *getAction(const Item *item);
 	Action *loadAction(xmlNodePtr xmlaction);
 };
@@ -111,13 +112,16 @@ public:
 	virtual ~Action();
 	bool isLoaded() const {return loaded;}
 	bool allowFarUse() const {return allowfaruse;};
+	bool blockWalls() const {return blockwalls;};
 	void setAllowFarUse(bool v){allowfaruse = v;};
+	void setBlockWalls(bool v){blockwalls = v;};
 	bool executeUse(Player *player,Item* item, PositionEx &posFrom, PositionEx &posTo);
 	
 protected:
 	ActionScript *script;
 	bool loaded;
 	bool allowfaruse;
+	bool blockwalls;
 };
 
 class ActionScript : protected LuaScript{

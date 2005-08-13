@@ -65,6 +65,12 @@ bool Actions::reload(){
 		uniqueItemMap.erase(it);
 		it = uniqueItemMap.begin();
 	}
+	it = actionItemMap.begin();
+	while(it != actionItemMap.end()) {
+		delete it->second;
+		actionItemMap.erase(it);
+		it = actionItemMap.begin();
+	}
 	//load
 	return loadFromXml(datadir);
 }
@@ -132,8 +138,15 @@ Action *Actions::loadAction(xmlNodePtr xmlaction){
 		if(action->isLoaded()){
 			char* sallow = (char*)xmlGetProp(xmlaction,(xmlChar*)"allowfaruse");
 			if(sallow){
-				if(strcmp(sallow,"1")==0){
+				if(strcmp(sallow,"1") == 0){
 					action->setAllowFarUse(true);
+				}
+				xmlFreeOTSERV(sallow);
+			}
+			sallow = (char*)xmlGetProp(xmlaction,(xmlChar*)"blockwalls");
+			if(sallow){
+				if(strcmp(sallow,"0") == 0){
+					action->setBlockWalls(false);
 				}
 				xmlFreeOTSERV(sallow);
 			}
@@ -158,6 +171,20 @@ int Actions::canUse(const Player *player,const Position &pos) const
 		if(dist_x > 1 || dist_y > 1 || (pos.z != player->pos.z)){
 			return 1;
 		}
+	}
+	return 0;
+}
+
+int Actions::canUseFar(const Player *player,const Position &to_pos, const bool blockWalls) const
+{
+	if(to_pos.x == 0xFFFF){
+		return 0;
+	}
+	if(player->pos.x - to_pos.x > 7 || player->pos.y - to_pos.y > 5 || player->pos.z != to_pos.z){
+		return 1;
+	}
+	if(blockWalls && !game->map->canThrowItemTo(player->pos, to_pos, false, true)){
+		return 2;
 	}
 	return 0;
 }
@@ -271,6 +298,9 @@ bool Actions::UseItemEx(Player* player, const Position &from_pos,
 	
 	if(item->getID() != itemid)
 		return false;
+		
+	if(!item->isUseable())
+		return false;
 	
 	Action *action = getAction(item);
 	
@@ -281,6 +311,15 @@ bool Actions::UseItemEx(Player* player, const Position &from_pos,
 				return false;
 			}
 		}
+		if(canUseFar(player, to_pos, action->blockWalls()) == 1){
+			player->sendCancel("Too far away.");
+			return false;
+		}
+		else if(canUseFar(player, to_pos, action->blockWalls()) == 2){
+			player->sendCancel("You cannot throw there.");
+			return false;
+		}
+		
 		Position itempos = game->getThingMapPos(player, from_pos);
 		game->autoCloseTrade(item);
 		PositionEx posFromEx(from_pos,from_stack);
@@ -314,6 +353,7 @@ Action::Action(Game* igame,const std::string &datadir, const std::string &script
 {
 	loaded = false;
 	allowfaruse = false;
+	blockwalls = true;
 	script = new ActionScript(igame,datadir,scriptname);
 	if(script->isLoaded())
 		loaded = true;

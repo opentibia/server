@@ -78,6 +78,7 @@ public:
 	bool isNotMoveable() const;
 	bool isPickupable() const;
 	bool isWeapon() const;
+	bool isUseable() const;
 	//bool isContainer() const;
 	bool noFloorChange() const;
 	bool floorChangeNorth() const;

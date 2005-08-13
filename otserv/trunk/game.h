@@ -407,6 +407,7 @@ protected:
 	friend class Spawn;
 	friend class SpawnManager;
 	friend class ActionScript;
+	friend class Actions;
 };
 
 template<class ArgType>

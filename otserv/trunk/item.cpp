@@ -393,6 +393,10 @@ bool Item::isPickupable() const {
 	return items[id].pickupable;
 }
 
+bool Item::isUseable() const{
+	return items[id].useable;
+}
+
 bool Item::noFloorChange() const {
 	return items[id].noFloorChange;
 }
