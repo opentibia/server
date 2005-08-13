@@ -180,7 +180,7 @@ private:
 
 	int getCurrentDistanceToTarget(const Position &target);
 	int getTargetDistance();
-	void calcMovePosition();
+	bool calcMovePosition();
 	void updateLookDirection();
 
 	bool getRandomPosition(const Position &target, Position &dest);
