@@ -191,17 +191,17 @@ public:
 		return speed;
 	};
 
-	virtual int getStepDuration(int underground) {
-		return (1000 * underground) / getSpeed();
+	int getStepDuration(int underground, int speed) {
+		return (1000 * underground) / speed;
 	};
   
 	/*
-	virtual int getStepDuration(int underground) {
+	int getStepDuration(int underground) {
 		return (1000 * 120 * (underground / 100)) / getSpeed();
 	};
 	*/
 
-  //virtual int getStepDuration(int underground) { return (1000*120*100)/(getSpeed()*underground); };
+  //int getStepDuration(int underground) { return (1000*120*100)/(getSpeed()*underground); };
   void setNormalSpeed()
   {
 		if(access!=0){

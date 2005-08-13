@@ -163,7 +163,8 @@ private:
 	Game* game;
 	std::list<Position> route;
 	monsterstate_t state;
-	bool updateRoute;
+	bool updateMovePos;
+	//bool updateRoute;
 	int oldThinkTicks;
 	Position targetPos;
 	Position moveToPos;
@@ -180,6 +181,7 @@ private:
 
 	int getCurrentDistanceToTarget(const Position &target);
 	int getTargetDistance();
+	void setUpdateMovePos();
 	bool calcMovePosition();
 	void updateLookDirection();
 
@@ -193,7 +195,7 @@ private:
 	void stopAttack();
   void startThink();
 	void stopThink();
-  void reThink();
+  void reThink(bool checkOnlyState = true);
 
 	void getSleepTicks(long long &delay, int& stepDuration);
 

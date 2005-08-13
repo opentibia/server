@@ -84,7 +84,7 @@ long long Protocol::getSleepTicks()
 
 		uint8_t stepspeed = Item::items[groundid].speed;
 		if(stepspeed != 0) {
-			stepDuration = player->getStepDuration(stepspeed);
+			stepDuration = player->getStepDuration(stepspeed, player->getSpeed());
 
 			if(player->lastmove != 0) {
 				delay = (((long long)(player->lastmove)) + ((long long)(stepDuration))) - ((long long)(OTSYS_TIME()));

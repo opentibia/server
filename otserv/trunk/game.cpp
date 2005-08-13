@@ -2060,13 +2060,13 @@ void Game::thingMoveInternal(Creature *creature, unsigned short from_x, unsigned
 	Thing *thing = fromTile->getThingByStackPos(stackPos);
 
 #ifdef __DEBUG__
-								std::cout << "moving"
+				//				std::cout << "moving"
 				/*
 				<< ": from_x: "<< (int)from_x << ", from_y: "<< (int)from_y << ", from_z: "<< (int)from_z
 				<< ", stackpos: "<< (int)stackPos
 				<< ", to_x: "<< (int)to_x << ", to_y: "<< (int)to_y << ", to_z: "<< (int)to_z
 				*/
-				<< std::endl;
+				//<< std::endl;
 #endif
 
 	if (!thing)
