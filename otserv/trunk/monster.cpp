@@ -1453,7 +1453,7 @@ void Monster::onCreatureLeave(const Creature *creature)
 
 void Monster::selectTarget(const Creature* creature, bool canReach /* = true*/)
 {
-	attackedCreature = creature->getID();
+	Creature::setAttackedCreature(creature);
 	targetPos = creature->pos;
 
 	//start fleeing?
@@ -1679,11 +1679,14 @@ void Monster::setAttackedCreature(const Creature* creature)
 		stopThink();
 	}
 	else {
-		Creature::setAttackedCreature(creature);
+		//Creature::setAttackedCreature(creature);
 
 		if(creature) {
 			bool canReach = isCreatureReachable(creature);
 			selectTarget(creature, canReach);
+		}
+		else {
+			Creature::setAttackedCreature(NULL);
 		}
 	}
 }
