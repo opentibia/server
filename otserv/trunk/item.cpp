@@ -169,7 +169,7 @@ Item* Item::decay()
 		return NULL;
 	}
 	
-	if(items[id].iscontainer){
+	if(dynamic_cast<Container*>(this)){
 		if(items[decayTo].iscontainer){
 			//container -> container			
 			setID(decayTo);
@@ -461,6 +461,7 @@ std::string Item::getDescription(bool fullDescription) const
 {
 	std::stringstream s;
 	std::string str;
+	const Container* container;
 	const ItemType& it = items[id];
 
 	if(specialDescription){
@@ -521,13 +522,12 @@ std::string Item::getDescription(bool fullDescription) const
 			else if(it.iskey){
 				s << "a " << it.name << " (Key:" << actionId << ")." << std::endl;
 			}
-			else if(it.iscontainer) {
-				const Container* container = dynamic_cast<const Container*>(this);
-				s << "a " << it.name << " (Vol:" << container->capacity() << ")." << std::endl;	
-			}
 			else if(it.groundtile)
 			{
 				s << it.name << "." << std::endl;
+			}
+			else if(it.iscontainer && (container = dynamic_cast<const Container*>(this))) {
+				s << "a " << it.name << " (Vol:" << container->capacity() << ")." << std::endl;	
 			}
 			else {
 				s << "a " << it.name << "." << std::endl;

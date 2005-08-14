@@ -143,11 +143,6 @@ bool Player::isPushable() const {
 	return ((getSleepTicks() <= 0) && access == 0);
 }
 
-long long Player::getSleepTicks() const
-{
-	return client->getSleepTicks();
-}
-
 std::string Player::getDescription(bool self) const
 {
 	std::stringstream s;

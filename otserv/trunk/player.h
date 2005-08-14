@@ -263,7 +263,6 @@ public:
 
 protected:
 	void sendCancelAttacking();
-	long long getSleepTicks() const;
 	void addSkillTryInternal(int skilltry,int skill);
 	virtual void onCreatureAppear(const Creature *creature);
   virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos, bool tele);

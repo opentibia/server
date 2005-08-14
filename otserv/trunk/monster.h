@@ -36,15 +36,15 @@ public:
 	{
 		setDefault();
 	}
-
+	
 	TimeProbabilityClass(int _cycleTicks, int _probability, int _exhaustionticks)
 	{
 		setDefault();
 		init(_cycleTicks, _probability, _exhaustionticks);
 	};
-
+	
 	~TimeProbabilityClass() {};
-
+	
 	bool onTick(int ticks)
 	{
 		ticksleft -= ticks;
@@ -54,7 +54,7 @@ public:
 			bool ret = (random_range(1, 100) <= probability);
 			return ret;
 		}
-
+		
 		return false;
 	}
 	
@@ -64,16 +64,16 @@ public:
 			this->ticksleft = _cycleTicks;
 			this->cycleTicks = _cycleTicks;
 		}
-
+		
 		if(_probability >= 0)
 			probability = std::min(100, _probability);
-
+		
 		if(_exhaustionticks >= 0)
 			exhaustionTicks = _exhaustionticks;
 	}
-  	
+	
 	int getExhaustion() const {return exhaustionTicks;}
-
+	
 private:
 	void setDefault()
 	{
@@ -82,7 +82,7 @@ private:
 		probability = 80;
 		exhaustionTicks = 0;
 	}
-
+	
 	int ticksleft;
 	int cycleTicks;
 	int probability;
@@ -98,34 +98,34 @@ public:
 		minWeapondamage = 0;
 		maxWeapondamage = 1;
 	};
-
+	
 	~PhysicalAttackClass() {};
-
+	
 	fight_t fighttype;
 	subfight_t disttype;
-
+	
 	int minWeapondamage;
 	int maxWeapondamage;
 };
 
 enum monsterstate_t {
 	STATE_IDLE,
-  STATE_IDLESUMMON,
-	STATE_TARGETNOTREACHABLE,
-	STATE_ATTACKING,
-	STATE_FLEEING,
+		STATE_IDLESUMMON,
+		STATE_TARGETNOTREACHABLE,
+		STATE_ATTACKING,
+		STATE_FLEEING,
 };
 
 enum monstermode_t {
 	MODE_NORMAL,
-	MODE_AGGRESSIVE
+		MODE_AGGRESSIVE
 };
 
 class Monster : public Creature
 {
 public:
 	Monster(const std::string& name, Game* game);
-  virtual ~Monster();
+	virtual ~Monster();
 	//const Monster& operator=(const Monster& rhs);
 	//virtual unsigned long idRange(){ return 0x40000000;}
 	// use range 0x10000000 to able use runes on monsters
@@ -145,20 +145,20 @@ public:
 		if (useCount == 0)
 			delete this;
 	};
-
-	virtual int getArmor() const {
-  		return this->armor;
-  	}
-  	
-	virtual int getDefense() const {
-  		return this->defense;
-  	}
 	
-  virtual void setMaster(Creature* creature);
-  bool isSummon() {return (getMaster() != NULL);}
-  virtual void onAttack();
+	virtual int getArmor() const {
+		return this->armor;
+	}
+	
+	virtual int getDefense() const {
+		return this->defense;
+	}
+	
+	virtual void setMaster(Creature* creature);
+	bool isSummon() {return (getMaster() != NULL);}
+	virtual void onAttack();
 	bool isLoaded() const {return loaded;}
-
+	
 private:
 	Game* game;
 	std::list<Position> route;
@@ -168,7 +168,7 @@ private:
 	int oldThinkTicks;
 	Position targetPos;
 	Position moveToPos;
-  bool hasLostMaster;
+	bool hasLostMaster;
 	int armor;
 	int defense;
 	void doMoveTo(int dx, int dy);
@@ -177,104 +177,102 @@ private:
 	unsigned long staticLook;
 	unsigned long staticAttack;
 	unsigned short changeTargetChance;  
-  int maxSummons;
-
+	int maxSummons;
+	
 	int getCurrentDistanceToTarget(const Position &target);
 	int getTargetDistance();
 	void setUpdateMovePos();
 	bool calcMovePosition();
 	void updateLookDirection();
-
+	
 	bool getRandomPosition(const Position &target, Position &dest);
-  bool getDistancePosition(const Position &target, const int& maxTryDist, bool fullPathSearch, Position &dest);
+	bool getDistancePosition(const Position &target, const int& maxTryDist, bool fullPathSearch, Position &dest);
 	bool getCloseCombatPosition(const Position &target, Position &dest);
 	bool canMoveTo(unsigned short x, unsigned short y, unsigned char z);
 	bool isInRange(const Position &pos);
 	bool isCreatureReachable(const  Creature* creature);
 	Creature* findTarget(long range, bool &canReach, const Creature *ignoreCreature = NULL);
 	void stopAttack();
-  void startThink();
+	void startThink();
 	void stopThink();
-  void reThink(bool checkOnlyState = true);
-
-	void getSleepTicks(long long &delay, int& stepDuration);
-
+	void reThink(bool checkOnlyState = true);
+	
 	#define CHANCE_MAX  100000
 	bool LoadLootNode(xmlNodePtr);
 	bool LoadLootContainer(xmlNodePtr,Container*);	
 	Item* LoadLootItemStackable(xmlNodePtr,unsigned short);
 	Item* LoadLootItem(xmlNodePtr,unsigned short);
-	unsigned long GetRandom();
-
+	unsigned long getRandom();
+	
 	void selectTarget(const Creature* creature, bool canReach /* = true*/);
-
+	
 protected:
 	int useCount;
 	PhysicalAttackClass	*curPhysicalAttack;
-
+	
 	int targetDistance;
 	int runAwayHealth;
 	bool pushable;
-
+	
 	bool doAttacks(Creature* attackedCreature, monstermode_t mode = MODE_NORMAL);
-
+	
 	typedef std::vector<TimeProbabilityClass> TimeProbabilityClassVec;
-
+	
 	typedef std::map<std::string, TimeProbabilityClassVec> InstantAttackSpells;
 	InstantAttackSpells instantSpells;
 	
 	typedef std::map<unsigned short, TimeProbabilityClassVec> RuneAttackSpells;
 	RuneAttackSpells runeSpells;
-
+	
 	typedef std::map<PhysicalAttackClass*, TimeProbabilityClass> PhysicalAttacks;
 	PhysicalAttacks physicalAttacks;
-
+	
 	typedef std::vector<std::pair<std::string, TimeProbabilityClass> > YellingSentences;
 	YellingSentences yellingSentences;
-
+	
 	struct summonBlock {
-    std::string name;
-    unsigned long summonChance;
-  };
-
-  typedef std::list<summonBlock> SummonSpells;
+		std::string name;
+		unsigned long summonChance;
+	};
+	
+	typedef std::list<summonBlock> SummonSpells;
 	SummonSpells summonSpells; 
-
+	
 	std::list<Item *> lootItems;
-
+	
 	virtual fight_t getFightType() {return curPhysicalAttack->fighttype;};
 	virtual subfight_t getSubFightType()  {return curPhysicalAttack->disttype;}
 	virtual int getWeaponDamage() const;
-
+	
 	void onCreatureEnter(const Creature *creature, bool canReach = true);
 	void onCreatureLeave(const Creature *creature);
 	void onCreatureMove(const Creature *creature, const Position *oldPos);
-
+	
 	bool validateDistanceAttack(const Creature *creature);
 	bool validateDistanceAttack(const Position &pos);
 	bool monsterMoveItem(Item* item, int radius);
 	bool isCreatureAttackable(const Creature* creature);
-
+	
 	virtual int getLostExperience() {return (isSummon() ? 0 : experience);};
 	virtual void dropLoot(Container *corpse);
-
+	
 	virtual void onThingMove(const Creature *creature, const Thing *thing, const Position *oldPos,
 		unsigned char oldstackpos, unsigned char oldcount, unsigned char count);
-
-  virtual void onCreatureAppear(const Creature *creature);
-  virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos, bool tele);
-  virtual void onThingDisappear(const Thing* thing, unsigned char stackPos);
-  virtual void onThingTransform(const Thing* thing,int stackpos);
-  virtual void onThingAppear(const Thing* thing);
-  virtual void onTeleport(const Creature *creature, const Position *oldPos, unsigned char oldstackpos);
-
+	
+	virtual void onCreatureAppear(const Creature *creature);
+	virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos, bool tele);
+	virtual void onThingDisappear(const Thing* thing, unsigned char stackPos);
+	virtual void onThingTransform(const Thing* thing,int stackpos);
+	virtual void onThingAppear(const Thing* thing);
+	virtual void onTeleport(const Creature *creature, const Position *oldPos, unsigned char oldstackpos);
+	
 	virtual bool isAttackable() const { return true; };
-  virtual bool isPushable() const { return pushable; };
-
+	virtual bool isPushable() const { return pushable; };
+	
 	virtual int onThink(int& newThinkTicks);
-  virtual void setAttackedCreature(const Creature* creature);
-  //virtual void setAttackedCreature(unsigned long id);
-
+	virtual void setAttackedCreature(const Creature* creature);
+	//virtual void setAttackedCreature(unsigned long id);
+	
 	std::string getDescription(bool self) const;
 	bool loaded;
 };

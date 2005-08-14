@@ -590,7 +590,7 @@ Item* Monster::LoadLootItemStackable(xmlNodePtr	tmp,unsigned short id){
 		return NULL;
 	}
 
-	unsigned long randvalue = GetRandom();
+	unsigned long randvalue = getRandom();
 
 	if(randvalue < chance1){
 		if(randvalue < chancemax){
@@ -601,7 +601,7 @@ Item* Monster::LoadLootItemStackable(xmlNodePtr	tmp,unsigned short id){
 			//get number of items using a linear relation between
 			// n and chances
 			//n = (unsigned char)(countmax*(randvalue-chancemax)/(chance1-chancemax));
-			n = (unsigned	char)(randvalue % countmax + 1);
+			n = (unsigned char)(randvalue % countmax + 1);
 		}		
 		tmpItem = Item::CreateItem(id,n);
 	}
@@ -627,7 +627,7 @@ Item* Monster::LoadLootItem(xmlNodePtr tmp,unsigned short id){
 		chance = CHANCE_MAX;
 	}
 
-	if(GetRandom() < chance){
+	if(getRandom() < chance){
 		tmpItem = Item::CreateItem(id);
 	}
 	else{
@@ -636,8 +636,8 @@ Item* Monster::LoadLootItem(xmlNodePtr tmp,unsigned short id){
 	return tmpItem;
 }
 
-unsigned long Monster::GetRandom(){
-	return (unsigned long)((rand()<< 16 |	rand()) % CHANCE_MAX);
+unsigned long Monster::getRandom(){
+	return (unsigned long)((rand()<< 16 | rand()) % CHANCE_MAX);
 }
 
 bool Monster::LoadLootContainer(xmlNodePtr nodeitem,Container* ccontainer){
@@ -802,26 +802,6 @@ Creature* Monster::findTarget(long range, bool &canReach, const Creature *ignore
 	return targetlist[index];
 }
 
-void Monster::getSleepTicks(long long &delay, int& stepDuration)
-{
-	delay = 0;
-	stepDuration = 0;
-
-	Tile *tile =game->getTile(this->pos.x, this->pos.y, this->pos.z);
-	if(tile && tile->ground) {
-		int groundid = tile->ground->getID();
-
-		uint8_t stepspeed = Item::items[groundid].speed;
-		if(stepspeed != 0) {
-			stepDuration = this->getStepDuration(stepspeed, (getSpeed() != 0 ? getSpeed() : 220));
-
-			if(lastmove != 0) {
-				delay = (((long	long)(this->lastmove)) + ((long	long)(stepDuration))) - ((long long)(OTSYS_TIME()));
-			}
-		}
-	}
-}
-
 int Monster::onThink(int& newThinkTicks)
 {
 	bool yelled = false;
@@ -833,9 +813,8 @@ int Monster::onThink(int& newThinkTicks)
 	}
 
 	long long delay;
-	int stepDuration;
-	getSleepTicks(delay, stepDuration);
-
+	delay = getSleepTicks();
+	
 	if(state == STATE_TARGETNOTREACHABLE || attackedCreature != 0) {
 		if(delay > 0) {
 			newThinkTicks = (int)delay;
@@ -846,7 +825,7 @@ int Monster::onThink(int& newThinkTicks)
 
 		this->lastmove = OTSYS_TIME();
 	}
-
+	
 	reThink(false);
 
 	//check/update/calc route
@@ -897,7 +876,7 @@ int Monster::onThink(int& newThinkTicks)
 			updateLookDirection();
 		}
 
-		newThinkTicks = stepDuration;
+		newThinkTicks = getStepDuration();
 		int ret = oldThinkTicks;
 		oldThinkTicks = newThinkTicks;
 		return ret;
@@ -1560,7 +1539,7 @@ void Monster::reThink(bool checkOnlyState /* = true*/)
 			if(summons.size() < maxSummons) {
 				SummonSpells::const_iterator it;
 				for(it = summonSpells.begin(); it != summonSpells.end(); ++it) {
-					if(rand() % (*it).summonChance == 0) {
+					if(getRandom() < (*it).summonChance) {
 						Monster *summon = new Monster((*it).name, game);
 						Position summonPos = this->pos;
 

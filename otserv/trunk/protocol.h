@@ -114,7 +114,6 @@ public:
   virtual void sendInventory(unsigned char sl_id) = 0;
   virtual void sendTextMessage(MessageClasses mclass, const char* message) = 0;
   virtual void sendTextMessage(MessageClasses mclass, const char* message,const Position &pos, unsigned char type) = 0;
-	long long getSleepTicks();
   virtual void sleepTillMove();
   virtual void sendChannels() = 0;
   virtual void sendChannel(unsigned short channelId) = 0;

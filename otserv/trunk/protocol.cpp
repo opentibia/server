@@ -70,34 +70,12 @@ unsigned long Protocol::getIP() const
 void Protocol::setPlayer(Player* p)
 {
 	player = p;
-  game    = &g_game;
-}
-
-long long Protocol::getSleepTicks()
-{
-	long long delay = 0;
-	int stepDuration = 0;
-
-	Tile *tile = game->getTile(player->pos.x, player->pos.y, player->pos.z);
-	if(tile && tile->ground) {
-		int groundid = tile->ground->getID();
-
-		uint8_t stepspeed = Item::items[groundid].speed;
-		if(stepspeed != 0) {
-			stepDuration = player->getStepDuration(stepspeed, player->getSpeed());
-
-			if(player->lastmove != 0) {
-				delay = (((long long)(player->lastmove)) + ((long long)(stepDuration))) - ((long long)(OTSYS_TIME()));
-			}
-		}
-	}
-
-	return delay;
+	game   = &g_game;
 }
 
 void Protocol::sleepTillMove()
 {
-	long long delay = getSleepTicks();
+	long long delay = player->getSleepTicks();
 	if(delay > 0 ){
              
 #if __DEBUG__     
