@@ -34,7 +34,7 @@
 </loot>
 
 <summons maxSummons="2">
-	<summon name="poison spider" chance="4"/>
+	<summon name="poison spider" chance="5000"/>
 </summons>
 
 </monster>
