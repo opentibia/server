@@ -1618,7 +1618,7 @@ void Game::thingMoveInternal(Player *player,
 		
 		Position fromPos = (fromContainer->pos.x == 0xFFFF ? player->pos : fromContainer->pos);			
 		Item *fromItem = dynamic_cast<Item*>(fromContainer->getItem(from_slotid));
-		Item *toItem = dynamic_cast<Item*>(toTile->getThingByStackPos(toTile->getThingCount() - 1));
+		Item* toItem = dynamic_cast<Item*>(toTile->getTopDownItem());
 
 		if(!fromItem || (toItem == fromItem) || (fromItem->isStackable() && count > fromItem->getItemCountOrSubtype()) || fromItem->getID() != itemid)
 			return;
@@ -1719,7 +1719,7 @@ void Game::thingMoveInternal(Player *player,
 		
 		if(onPrepareMoveThing(player, fromItem, player->pos, toPos, count) && onPrepareMoveThing(player, fromItem, NULL, toTile, count)) {
 			autoCloseTrade(fromItem, true);
-			Item *toItem = dynamic_cast<Item*>(toTile->getThingByStackPos(toTile->getThingCount() - 1));
+			Item* toItem = dynamic_cast<Item*>(toTile->getTopDownItem());
 			int oldFromCount = fromItem->getItemCountOrSubtype();
 			int oldToCount = 0;
 
@@ -1811,14 +1811,13 @@ void Game::thingMoveInternal(Player *player,
 void Game::thingMoveInternal(Player *player, const Position& fromPos, unsigned char stackPos,
 	unsigned short itemid, unsigned char to_cid, unsigned char to_slotid, bool toInventory, unsigned char count)
 {
-	//Tile *fromTile = getTile(fromPos.x, fromPos.y, fromPos.z);
 	Tile *fromTile = map->getTile(fromPos);
 	if(!fromTile)
 		return;
 
 	Container *toContainer = NULL;
 
-	Item *fromItem = dynamic_cast<Item*>(fromTile->getThingByStackPos(stackPos));
+	Item* fromItem = dynamic_cast<Item*>(fromTile->getTopDownItem());
 	Item *toItem = NULL;
 
 	if(!fromItem || (fromItem->getID() != itemid) || (fromItem != fromTile->getTopDownItem()))
