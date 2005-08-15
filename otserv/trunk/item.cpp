@@ -474,10 +474,10 @@ std::string Item::getDescription(bool fullDescription) const
 	}
 	else if (it.name.length()) {
 		if(isStackable() && count > 1) {
-			s << (int)count << " " << it.name << "s" << "." << std::endl;
+			s << (int)count << " " << it.name << "s.";
 
 			if(fullDescription) {
-				s << "They weight " << std::fixed << std::setprecision(1) << ((double) count * it.weight) << " oz.";
+				s << std::endl << "They weight " << std::fixed << std::setprecision(1) << ((double) count * it.weight) << " oz.";
 			}
 		}		
 		else {
@@ -490,23 +490,23 @@ std::string Item::getDescription(bool fullDescription) const
 					s << (int)getItemCharge();
 				else
 					s << "1";
-				s << "x)." << std::endl;
+				s << "x)";
 			}
 			else if(isWeapon() && (getAttack() || getDefense()))
 			{
-				s << "a " << it.name << " (Atk:" << (int)getAttack() << " Def:" << (int)getDefense() << ")." << std::endl;
+				s << "a " << it.name << " (Atk:" << (int)getAttack() << " Def:" << (int)getDefense() << ")";
 			}
 			else if(getArmor())
 			{
-				s << "a " << it.name << " (Arm:"<< (int)getArmor() << ")." << std::endl;
+				s << "a " << it.name << " (Arm:"<< (int)getArmor() << ")";
 			}
 			else if(isFluidContainer()){
 				s << "a " << it.name;
 				if(fluid == 0){
-					s << ". It is empty.";
+					s << ". It is empty";
 				}
 				else{
-					s << " of " << items[fluid].name << ".";
+					s << " of " << items[fluid].name;
 				}
 			}
 			else if(isMultiType()){				
@@ -517,26 +517,25 @@ std::string Item::getDescription(bool fullDescription) const
 				else{
 					s << items[fluid].name;
 				}
-				s << ".";
 			}
 			else if(it.iskey){
-				s << "a " << it.name << " (Key:" << actionId << ")." << std::endl;
+				s << "a " << it.name << " (Key:" << actionId << ")";
 			}
 			else if(it.groundtile)
 			{
-				s << it.name << "." << std::endl;
+				s << it.name;
 			}
 			else if(it.iscontainer && (container = dynamic_cast<const Container*>(this))) {
-				s << "a " << it.name << " (Vol:" << container->capacity() << ")." << std::endl;	
+				s << "a " << it.name << " (Vol:" << container->capacity() << ")";
 			}
 			else {
-				s << "a " << it.name << "." << std::endl;
+				s << "a " << it.name;
 			}
-
+			s << ".";
 			if(fullDescription) {
 				double weight = getWeight();
 				if(weight > 0)
-					s << "It weighs " << std::fixed << std::setprecision(1) << weight << " oz.";
+					s << std::endl << "It weighs " << std::fixed << std::setprecision(1) << weight << " oz.";
 				
 				if(items[id].description.length())
 				{
