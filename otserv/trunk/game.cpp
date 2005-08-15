@@ -1714,7 +1714,7 @@ void Game::thingMoveInternal(Player *player,
 	}
 	else /*inventory to ground*/{
 		Item *fromItem = player->getItem(from_cid);
-		if(!fromItem || fromItem->getID() != itemid)
+		if(!fromItem || (fromItem->isStackable() && count > fromItem->getItemCountOrSubtype()) || fromItem->getID() != itemid)
 			return;
 		
 		if(onPrepareMoveThing(player, fromItem, player->pos, toPos, count) && onPrepareMoveThing(player, fromItem, NULL, toTile, count)) {
