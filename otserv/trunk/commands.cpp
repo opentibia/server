@@ -347,33 +347,31 @@ bool Commands::broadcastMessage(Creature* c, const std::string &cmd, const std::
 
 bool Commands::banPlayer(Creature* c, const std::string &cmd, const std::string &param){
 	
-	Creature* creatureBan = game->getCreatureByName(param);
-	if(creatureBan) {
+	Player* playerBan = game->getPlayerByName(param);
+	if(playerBan) {
 		MagicEffectClass me;
 		
 		me.animationColor = 0xB4;
 		me.damageEffect = NM_ME_MAGIC_BLOOD;
-		me.maxDamage = (creatureBan->health + creatureBan->mana)*10;
-		me.minDamage = (creatureBan->health + creatureBan->mana)*10;
+		me.maxDamage = (playerBan->health + playerBan->mana)*10;
+		me.minDamage = (playerBan->health + playerBan->mana)*10;
 		me.offensive = true;
 
-		game->creatureMakeMagic(NULL, creatureBan->pos, &me);
+		game->creatureMakeMagic(NULL, playerBan->pos, &me);
 
-		Player* playerBan = dynamic_cast<Player*>(creatureBan);
 		Player* player = dynamic_cast<Player*>(c);
-		if(playerBan){
-			if(player && player->access <= playerBan->access){
-				player->sendTextMessage(MSG_BLUE_TEXT,"You can not ban this player.");
-				return true;
-			}
-			playerBan->sendTextMessage(MSG_RED_TEXT,"You have been banned.");
-			std::pair<unsigned long, unsigned long> IpNetMask;
-			IpNetMask.first = playerBan->lastip;
-			IpNetMask.second = 0xFFFFFFFF;
-			if(IpNetMask.first > 0) {
-				bannedIPs.push_back(IpNetMask);
-				return true;
-			}
+		if(player && player->access <= playerBan->access){
+			player->sendTextMessage(MSG_BLUE_TEXT,"You cannot ban this player.");
+			return true;
+		}
+
+		playerBan->sendTextMessage(MSG_RED_TEXT,"You have been banned.");
+		std::pair<unsigned long, unsigned long> IpNetMask;
+		IpNetMask.first = playerBan->lastip;
+		IpNetMask.second = 0xFFFFFFFF;
+		if(IpNetMask.first > 0) {
+			bannedIPs.push_back(IpNetMask);
+			return true;
 		}
 	}
 
@@ -409,16 +407,13 @@ bool Commands::createItems(Creature* c, const std::string &cmd, const std::strin
 	if(!newItem)
 		return true;
 	
-	//Tile *t = game->getTile(c->pos.x, c->pos.y, c->pos.z);
 	Tile *t = game->map->getTile(c->pos);
 	if(!t)
 	{
 		delete newItem;
 		return true;
 	}
-	//newItem->pos = creature->pos;
-	//t->addThing(newItem);
-	//Game::creatureBroadcastTileUpdated(creature->pos);
+
 	game->addThing(NULL,c->pos,newItem);
 	return true;
 
@@ -491,26 +486,25 @@ bool Commands::teleportTo(Creature* c, const std::string &cmd, const std::string
 }
 
 bool Commands::getInfo(Creature* c, const std::string &cmd, const std::string &param){
-	Creature* creature = game->getCreatureByName(param);
 	Player *player = dynamic_cast<Player*>(c);
 	if(!player)
 		return true;
 	
-	if(creature && dynamic_cast<Player*>(creature)) {
+	Player* paramPlayer = game->getPlayerByName(param);
+	if(paramPlayer) {
 		std::stringstream info;
-		Player* p = dynamic_cast<Player*>(creature);
 		unsigned char ip[4];
-		if(p->access >= player->access && player != p){
+		if(paramPlayer->access >= player->access && player != paramPlayer){
 			player->sendTextMessage(MSG_BLUE_TEXT,"You can not get info about this player.");
 			return true;
 		}
-		*(unsigned long*)&ip = p->lastip;
-		info << "name:   " << p->getName() << std::endl <<
-		        "access: " << p->access << std::endl <<
-		        "level:  " << p->getPlayerInfo(PLAYERINFO_LEVEL) << std::endl <<
-		        "maglvl: " << p->getPlayerInfo(PLAYERINFO_MAGICLEVEL) << std::endl <<
-		        "speed:  " <<  p->speed <<std::endl <<
-		        "position " << p->pos << std::endl << 
+		*(unsigned long*)&ip = paramPlayer->lastip;
+		info << "name:   " << paramPlayer->getName() << std::endl <<
+		        "access: " << paramPlayer->access << std::endl <<
+		        "level:  " << paramPlayer->getPlayerInfo(PLAYERINFO_LEVEL) << std::endl <<
+		        "maglvl: " << paramPlayer->getPlayerInfo(PLAYERINFO_MAGICLEVEL) << std::endl <<
+		        "speed:  " <<  paramPlayer->speed <<std::endl <<
+		        "position " << paramPlayer->pos << std::endl << 
 				"ip: " << (unsigned int)ip[0] << "." << (unsigned int)ip[1] << 
 				   "." << (unsigned int)ip[2] << "." << (unsigned int)ip[3];
 		player->sendTextMessage(MSG_BLUE_TEXT,info.str().c_str());
@@ -518,6 +512,7 @@ bool Commands::getInfo(Creature* c, const std::string &cmd, const std::string &p
 	else{
 		player->sendTextMessage(MSG_BLUE_TEXT,"Player not found.");
 	}
+
 	return true;
 }
 

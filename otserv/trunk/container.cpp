@@ -148,22 +148,15 @@ long Container::getItemHoldingCount() const
 	int holdcount = 0;
 
 	std::list<const Container*> stack;
-
-	ContainerList::const_iterator it;
-	for (it = getItems(); it != getEnd(); ++it) {
-		Container *container = dynamic_cast<Container*>(*it);
-		if(container) {
-			stack.push_back(container);
-		}
-
-		++holdcount;
-	}
+	stack.push_back(this);
 	
+	ContainerList::const_iterator it;
+
 	while(stack.size() > 0) {
 		const Container *container = stack.front();
 		stack.pop_front();
 
-		for (ContainerList::const_iterator it = container->getItems(); it != container->getEnd(); ++it) {
+		for (it = container->getItems(); it != container->getEnd(); ++it) {
 			Container *container = dynamic_cast<Container*>(*it);
 			if(container) {
 				stack.push_back(container);
@@ -179,9 +172,10 @@ long Container::getItemHoldingCount() const
 bool Container::isHoldingItem(const Item* item) const
 {
 	std::list<const Container*> stack;
+	stack.push_back(this);
 	
 	ContainerList::const_iterator it;
-	stack.push_back(this);
+
 	while(stack.size() > 0) {
 		const Container *container = stack.front();
 		stack.pop_front();
@@ -208,18 +202,7 @@ double Container::getWeight() const
 	std::list<const Container*> stack;
 
 	ContainerList::const_iterator it;
-	for (it = getItems(); it != getEnd(); ++it) {
-
-		Container *container = dynamic_cast<Container*>(*it);
-		if(container) {
-			stack.push_back(container);
-			weight += items[container->getID()].weight;
-		}
-		else
-			weight += (*it)->getWeight();
-
-		//weight += (*it)->getWeight();
-	}
+	stack.push_back(this);
 	
 	while(stack.size() > 0) {
 		const Container *container = stack.front();

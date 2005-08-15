@@ -653,9 +653,23 @@ Creature* Game::getCreatureByID(unsigned long id)
 	return NULL; //just in case the player doesnt exist
 }
 
+Player* Game::getPlayerByID(unsigned long id)
+{
+	if(id == 0)
+		return NULL;
+
+	AutoList<Player>::listiterator it = Player::listPlayer.list.find(id);
+	if(it != Player::listPlayer.list.end()) {
+		return (*it).second;
+	}
+
+	return NULL; //just in case the player doesnt exist
+}
+
 Creature* Game::getCreatureByName(const std::string &s)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::getCreatureByName()");
+
 	std::string txt1 = s;
 	std::transform(txt1.begin(), txt1.end(), txt1.begin(), upchar);
 	for(AutoList<Creature>::listiterator it = listCreature.list.begin(); it != listCreature.list.end(); ++it){
@@ -664,6 +678,23 @@ Creature* Game::getCreatureByName(const std::string &s)
 		if(txt1 == txt2)
 			return it->second;
 	}
+
+	return NULL; //just in case the creature doesnt exist
+}
+
+Player* Game::getPlayerByName(const std::string &s)
+{
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::getPlayerByName()");
+
+	std::string txt1 = s;
+	std::transform(txt1.begin(), txt1.end(), txt1.begin(), upchar);
+	for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin(); it != Player::listPlayer.list.end(); ++it){
+		std::string txt2 = (*it).second->getName();
+		std::transform(txt2.begin(), txt2.end(), txt2.begin(), upchar);
+		if(txt1 == txt2)
+			return it->second;
+	}
+
 	return NULL; //just in case the player doesnt exist
 }
 
@@ -2219,7 +2250,7 @@ void Game::thingMoveInternal(Creature *creature, unsigned short from_x, unsigned
 				}
 			}
 			else if(playerMoving->tradePartner != 0) {
-				Creature* tradePartner = getCreatureByID(playerMoving->tradePartner);
+				Player* tradePartner = getPlayerByID(playerMoving->tradePartner);
 				if(tradePartner) {
 					if((std::abs(playerMoving->pos.x - tradePartner->pos.x) > 2) ||
 					(std::abs(playerMoving->pos.y - tradePartner->pos.y) > 2) || (playerMoving->pos.z != tradePartner->pos.z)){
@@ -2601,7 +2632,7 @@ void Game::creatureSpeakTo(Creature *creature, SpeakClasses type,const std::stri
 	if(!player)
 		return;
 
-	Player* toPlayer = dynamic_cast<Player*>(getCreatureByName(receiver));
+	Player* toPlayer = getPlayerByName(receiver);
 	if(!toPlayer) {
 		player->sendTextMessage(MSG_SMALLINFO, "A player with this name is not online.");
 		return;
@@ -3141,7 +3172,7 @@ void Game::checkPlayerWalk(unsigned long id)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::checkPlayerWalk");
 
-	Player *player = dynamic_cast<Player*>(getCreatureByID(id));
+	Player *player = getPlayerByID(id);
 
 	if(!player)
 		return;
@@ -3719,7 +3750,7 @@ void Game::playerRequestTrade(Player *player, const Position& pos,
 	if(player->isRemoved)
 		return;
 
-	Player *tradePartner = dynamic_cast<Player*>(getCreatureByID(playerid));
+	Player *tradePartner = getPlayerByID(playerid);
 	if(!tradePartner || tradePartner == player) {
 		player->sendTextMessage(MSG_INFO, "Sorry, not possible.");
 		return;
@@ -3801,7 +3832,7 @@ void Game::playerAcceptTrade(Player* player)
 		return;
 
 	player->setAcceptTrade(true);
-	Player *tradePartner = dynamic_cast<Player*>(getCreatureByID(player->tradePartner));
+	Player *tradePartner = getPlayerByID(player->tradePartner);
 	if(tradePartner && tradePartner->getAcceptTrade()) {
 		Item *tradeItem1 = player->tradeItem;
 		Item *tradeItem2 = tradePartner->tradeItem;
@@ -3848,7 +3879,7 @@ void Game::playerLookInTrade(Player* player, bool lookAtCounterOffer, int index)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerLookInTrade()");
 
-	Player *tradePartner = dynamic_cast<Player*>(getCreatureByID(player->tradePartner));
+	Player *tradePartner = getPlayerByID(player->tradePartner);
 	if(!tradePartner)
 		return;
 
@@ -3875,25 +3906,15 @@ void Game::playerLookInTrade(Player* player, bool lookAtCounterOffer, int index)
 
 	bool foundItem = false;
 	std::list<const Container*> stack;
-	for (ContainerList::const_iterator it = tradeContainer->getItems(); it != tradeContainer->getEnd(); ++it) {
-		Container *container = dynamic_cast<Container*>(*it);
-		if(container) {
-			stack.push_back(container);
-		}
-
-		--index;
-		if(index == 0) {
-			tradeItem = *it;
-			foundItem = true;
-			break;
-		}
-	}
+	stack.push_back(tradeContainer);
 	
+	ContainerList::const_iterator it;
+
 	while(!foundItem && stack.size() > 0) {
 		const Container *container = stack.front();
 		stack.pop_front();
 
-		for (ContainerList::const_iterator it = container->getItems(); it != container->getEnd(); ++it) {
+		for (it = container->getItems(); it != container->getEnd(); ++it) {
 			Container *container = dynamic_cast<Container*>(*it);
 			if(container) {
 				stack.push_back(container);
@@ -3919,7 +3940,7 @@ void Game::playerCloseTrade(Player* player)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerCloseTrade()");
 	
-	Player *tradePartner = dynamic_cast<Player*>(getCreatureByID(player->tradePartner));
+	Player *tradePartner = getPlayerByID(player->tradePartner);
 
 	std::vector<Item*>::iterator it;
 	if(player->getTradeItem()) {
@@ -3961,7 +3982,7 @@ void Game::autoCloseTrade(const Item* item, bool itemMoved /*= false*/)
 			(itemMoved && (container = dynamic_cast<const Container*>(item)) && container->isHoldingItem(it->first)) ||
 			((container = dynamic_cast<const Container*>(it->first)) && container->isHoldingItem(item)))
 		{
-			Player* player = dynamic_cast<Player*>(getCreatureByID(it->second));
+			Player* player = getPlayerByID(it->second);
 			if(player){
 				playerCloseTrade(player);
 			}

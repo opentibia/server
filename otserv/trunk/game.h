@@ -262,9 +262,11 @@ public:
   void sendRemoveThing(Player* player,const Position &pos,const Thing* thing,const unsigned char stackpos = 1,const bool autoclose = false);
   void sendUpdateThing(Player* player,const Position &pos,const Thing* thing,const unsigned char stackpos = 1);
 		
-   
 	Creature* getCreatureByID(unsigned long id);
+	Player* getPlayerByID(unsigned long id);
+
 	Creature* getCreatureByName(const std::string &s);
+	Player* getPlayerByName(const std::string &s);
 
 	std::list<Position> getPathTo(Creature *creature, Position start, Position to, bool creaturesBlock=true);
 	

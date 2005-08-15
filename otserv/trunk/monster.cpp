@@ -1459,12 +1459,12 @@ void Monster::selectTarget(const Creature* creature, bool canReach /* = true*/)
 }
 
 //something changed, check if we should change state
-void Monster::reThink(bool checkOnlyState /* = true*/)
+void Monster::reThink(bool updateOnlyState /* = true*/)
 {
 	if(isSummon()) {
 		//try find a path to the target
 		if(state == STATE_TARGETNOTREACHABLE) {
-			if(checkOnlyState) {
+			if(updateOnlyState) {
 				setUpdateMovePos();
 			}
 			else if(calcMovePosition()) {

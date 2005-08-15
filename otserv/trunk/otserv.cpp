@@ -256,14 +256,12 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 			}
 			else{
 				Protocol74 *protocol;
-				Player *player;
 				bool playerexist;
-				Creature *creature;
+				Player *player = NULL;
 				OTSYS_SLEEP(1000);
 				OTSYS_THREAD_LOCK(g_game.gameLock, "ConnectionHandler()")
-				creature = g_game.getCreatureByName(name);
-				if(creature && dynamic_cast<Player*>(creature)){
-					player = dynamic_cast<Player*>(creature);
+				player = g_game.getPlayerByName(name);
+				if(player){
 					if(player->client->s == 0 && passwordTest(password,player->password) && player->isRemoved == false && !g_config.getGlobalNumber("allowclones", 0)){
 						//std::cout << "relogin " << player << std::endl;
 						player->lastlogin = std::time(NULL);
@@ -277,7 +275,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 				}
 				OTSYS_THREAD_UNLOCK(g_game.gameLock, "ConnectionHandler()")
 				if(s){
-					playerexist = (creature != NULL);
+					playerexist = (player != NULL);
 					protocol = new Protocol74(s);
 					player = new Player(name, protocol);
 					player->useThing();

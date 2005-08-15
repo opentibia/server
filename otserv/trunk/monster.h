@@ -195,7 +195,7 @@ private:
 	void stopAttack();
 	void startThink();
 	void stopThink();
-	void reThink(bool checkOnlyState = true);
+	void reThink(bool updateOnlyState = true);
 	
 	#define CHANCE_MAX  100000
 	bool LoadLootNode(xmlNodePtr);

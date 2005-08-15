@@ -505,8 +505,7 @@ void Protocol74::parseOpenPriv(NetworkMessage &msg){
 	std::string receiver; 
 	receiver = msg.GetString();
 	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol74::parseOpenPriv()");
-	Creature* c = game->getCreatureByName(receiver);
-	Player* player = dynamic_cast<Player*>(c);
+	Player* player = game->getPlayerByName(receiver);
 	if(player)
 		sendOpenPriv(receiver);
 }
@@ -897,24 +896,20 @@ void Protocol74::sendTradeItemRequest(const Player* player, const Item* item, bo
 
 	const Container *tradeContainer = dynamic_cast<const Container*>(item);
 	if(tradeContainer) {
-		std::list<const Container*> stack;
-		std::list<const Item*> itemstack;
 
+		std::list<const Container*> stack;
+		stack.push_back(tradeContainer);
+
+		std::list<const Item*> itemstack;
 		itemstack.push_back(tradeContainer);
-		for (ContainerList::const_iterator it = tradeContainer->getItems(); it != tradeContainer->getEnd(); ++it) {
-			Container *container = dynamic_cast<Container*>(*it);
-			if(container) {
-				stack.push_back(container);
-			}
-			
-			itemstack.push_back(*it);
-		}
-		
+
+		ContainerList::const_iterator it;
+
 		while(stack.size() > 0) {
 			const Container *container = stack.front();
 			stack.pop_front();
 
-			for (ContainerList::const_iterator it = container->getItems(); it != container->getEnd(); ++it) {
+			for (it = container->getItems(); it != container->getEnd(); ++it) {
 				Container *container = dynamic_cast<Container*>(*it);
 				if(container) {
 					stack.push_back(container);
