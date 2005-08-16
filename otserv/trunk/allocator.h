@@ -21,6 +21,8 @@
 #ifndef __OTSERV_ALLOCATOR_H
 #define __OTSERV_ALLOCATOR_H
 
+#ifdef __OTSERV_ALLOCATOR__
+
 #include <memory>
 #include <limits>
 #include <cstdlib>
@@ -226,5 +228,7 @@ private:
 	#endif
 	OTSYS_THREAD_LOCKVAR poolLock;
 };
+
+#endif
 
 #endif
