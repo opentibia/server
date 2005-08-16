@@ -255,12 +255,11 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 				msg.WriteToSocket(s);
 			}
 			else{
-				Protocol74 *protocol;
-				bool playerexist;
-				Player *player = NULL;
 				OTSYS_SLEEP(1000);
 				OTSYS_THREAD_LOCK(g_game.gameLock, "ConnectionHandler()")
-				player = g_game.getPlayerByName(name);
+
+				Player* player = g_game.getPlayerByName(name);
+				bool playerexist = (player != NULL);
 				if(player){
 					if(player->client->s == 0 && passwordTest(password,player->password) && player->isRemoved == false && !g_config.getGlobalNumber("allowclones", 0)){
 						//std::cout << "relogin " << player << std::endl;
@@ -275,7 +274,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 				}
 				OTSYS_THREAD_UNLOCK(g_game.gameLock, "ConnectionHandler()")
 				if(s){
-					playerexist = (player != NULL);
+					Protocol74* protocol;
 					protocol = new Protocol74(s);
 					player = new Player(name, protocol);
 					player->useThing();
