@@ -48,7 +48,7 @@ void DBResult::addRow(MYSQL_ROW r, unsigned int num_fields)
 	m_listRows[m_numRows] = row;
 	m_numRows++;
 }
-
+/*
 void DBResult::clearRows()
 {
 	std::map<unsigned int, char **>::iterator it;
@@ -67,6 +67,23 @@ void DBResult::clearFieldNames()
 {
 	m_listNames.clear();
 	m_lastNumFields = m_numFields;
+	m_numFields = 0;
+}
+*/
+
+void DBResult::clear()
+{
+	std::map<unsigned int, char **>::iterator it;
+	for(it = m_listRows.begin(); it != m_listRows.end();)
+	{
+		for(unsigned int i = 0; i < m_numFields; ++i)
+			delete[] it->second[i];
+		
+		delete[] it->second;
+		m_listRows.erase(it++);
+	}
+	m_numRows = 0;
+	m_listNames.clear();
 	m_numFields = 0;
 }
 
@@ -215,8 +232,9 @@ bool Database::storeQuery(DBQuery &q, DBResult &dbres)
 	// Getting the rows of the result
 	num_fields = mysql_num_fields(r);
 	
+	dbres.clear();
 	// Getting the field names
-	dbres.clearFieldNames();
+	//dbres.clearFieldNames();
 	fields = mysql_fetch_fields(r);
 	for(int i=0; i < num_fields; ++i)
 	{
@@ -224,7 +242,7 @@ bool Database::storeQuery(DBQuery &q, DBResult &dbres)
 	}
 	
 	// Adding the rows to a list
-	dbres.clearRows();
+	//dbres.clearRows();
 	while(row = mysql_fetch_row(r))
 	{
 		dbres.addRow(row, num_fields);

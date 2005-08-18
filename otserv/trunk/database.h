@@ -64,7 +64,7 @@ public:
 class DBResult
 {
 public:
-	DBResult(){ m_numFields=0; m_numRows=0; m_lastNumFields=0; };
+	DBResult(){ m_numFields=0; m_numRows=0; /*m_lastNumFields=0;*/ };
 	~DBResult();
 	
 	/** Get the Integer value of a field in database
@@ -101,15 +101,16 @@ public:
 private:
 	friend class Database;
 	void addRow(MYSQL_ROW r, unsigned int num_fields);
-	void clearRows();
-	void clearFieldNames();
+	void clear();
+	//void clearRows();
+	//void clearFieldNames();
 	void setFieldName(const std::string &s, unsigned int n){
 		m_listNames[s] = n; 
 		m_numFields++;
 	};
 	
 	unsigned int m_numFields;
-	unsigned int m_lastNumFields;
+	//unsigned int m_lastNumFields;
 	unsigned int m_numRows;
 	typedef std::map<const std::string, unsigned int> listNames_type;
 	listNames_type m_listNames;

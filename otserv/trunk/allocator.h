@@ -112,6 +112,10 @@ public:
 		}
 		
 		poolTag* tag = reinterpret_cast<poolTag*>(std::malloc(size + sizeof(poolTag)));
+		#ifdef __OTSERV_ALLOCATOR_STATS__
+		poolsStats[0]->allocations++;
+		poolsStats[0]->unused += size;
+		#endif
 		tag->poolbytes = 0;
 		return tag + 1;
 	}
@@ -132,8 +136,12 @@ public:
 			poolsStats[it->first]->deallocations++;
 			#endif
 		}
-		else
+		else{
 			std::free(tag);
+			#ifdef __OTSERV_ALLOCATOR_STATS__
+			poolsStats[0]->deallocations++;
+			#endif
+		}
 	}
 	
 	/*
@@ -156,7 +164,7 @@ public:
 			output << (int)(it->first) << " alloc: " << (int)(it->second->allocations) << 
 				" dealloc: " << (int)(it->second->deallocations) << 
 				" unused: " << (int)(it->second->unused);
-			if(it->second->allocations != 0){
+			if(it->second->allocations != 0 && it->first != 0){
 				output << " avg: " << (int)((it->first) - (it->second->unused)/(it->second->allocations)) << 
 				" %unused: " << (int)((it->second->unused)*100/(it->second->allocations)/(it->first));
 			}
@@ -207,6 +215,13 @@ private:
 		addPool(4096, 128);
 		addPool(8192, 128);
 		addPool(18432, 128);
+		#ifdef __OTSERV_ALLOCATOR_STATS__
+		t_PoolStats * tmp = new(0) t_PoolStats;
+		tmp->unused = 0;
+		tmp->allocations = 0;
+		tmp->deallocations = 0;
+		poolsStats[0] = tmp;
+		#endif
 	}
 	
 	PoolManager(const PoolManager&);
