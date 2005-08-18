@@ -96,7 +96,7 @@ public:
 	
 	void* allocate(size_t size) {
 		Pools::iterator it;
-		OTSYS_THREAD_LOCK_CLASS(poolLock, NULL);
+		OTSYS_THREAD_LOCK(poolLock, NULL);
 		
 		for(it = pools.begin(); it != pools.end(); ++it) {
 			if(it->first >= size + sizeof(poolTag)) {
@@ -107,6 +107,7 @@ public:
 				poolsStats[it->first]->allocations++;
 				poolsStats[it->first]->unused+= it->first - (size + sizeof(poolTag));
 				#endif
+				OTSYS_THREAD_UNLOCK(poolLock, NULL);
 				return tag + 1;
 			}
 		}
@@ -117,6 +118,7 @@ public:
 		poolsStats[0]->unused += size;
 		#endif
 		tag->poolbytes = 0;
+		OTSYS_THREAD_UNLOCK(poolLock, NULL);
 		return tag + 1;
 	}
 	
@@ -125,9 +127,9 @@ public:
 			return;
 		
 		poolTag* const tag = reinterpret_cast<poolTag*>(deletable) - 1U;
+		OTSYS_THREAD_LOCK(poolLock, NULL);
 		if(tag->poolbytes) {
 			Pools::iterator it;
-			OTSYS_THREAD_LOCK_CLASS(poolLock, NULL);
 			
 			it = pools.find(tag->poolbytes);
 			//it->second->ordered_free(tag);
@@ -142,6 +144,7 @@ public:
 			poolsStats[0]->deallocations++;
 			#endif
 		}
+		OTSYS_THREAD_UNLOCK(poolLock, NULL);
 	}
 	
 	/*
