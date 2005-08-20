@@ -695,6 +695,10 @@ bool Monster::LoadLootContainer(xmlNodePtr nodeitem,Container* ccontainer){
 
 Monster::~Monster()
 {
+	for(std::list<Item*>::iterator cit = lootItems.begin(); cit != lootItems.end(); ++cit) {
+		(*cit)->releaseThing();
+	}
+
 	for(std::map<PhysicalAttackClass*, TimeProbabilityClass>::iterator it = physicalAttacks.begin(); it != physicalAttacks.end(); ++it) {
 		delete it->first;
 	}
@@ -1700,6 +1704,8 @@ void Monster::dropLoot(Container *corpse)
 	for(std::list<Item*>::iterator cit = lootItems.begin(); cit != lootItems.end(); ++cit) {
 		corpse->addItem(*cit);
 	}
+
+	lootItems.clear();
 }
 
 bool Monster::doAttacks(Creature* attackedCreature, monstermode_t mode /*= MODE_NORMAL*/)
