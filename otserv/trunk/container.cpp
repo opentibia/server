@@ -208,7 +208,7 @@ double Container::getWeight() const
 		const Container *container = stack.front();
 		stack.pop_front();
 
-		for (ContainerList::const_iterator it = container->getItems(); it != container->getEnd(); ++it) {
+		for (it = container->getItems(); it != container->getEnd(); ++it) {
 			Container *container = dynamic_cast<Container*>(*it);
 			if(container) {
 				stack.push_back(container);
