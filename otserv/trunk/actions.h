@@ -53,6 +53,7 @@ public:
 	Actions(Game* igame);
 	bool loadFromXml(const std::string &datadir);
 	virtual ~Actions();
+	void clear();
 	
 	bool UseItem(Player* player, const Position &pos,const unsigned char stack, 
 		const unsigned short itemid, const unsigned char index);
@@ -127,7 +128,7 @@ protected:
 class ActionScript : protected LuaScript{
 public:
 	ActionScript(Game* igame,const std::string &datadir, const std::string &scriptname);
-	virtual ~ActionScript(){}
+	virtual ~ActionScript();
 	bool isLoaded()const {return loaded;}
 	
 	lua_State* getLuaState(){return luaState;}

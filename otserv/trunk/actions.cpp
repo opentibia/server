@@ -42,17 +42,11 @@ Actions::Actions(Game* igame)
 
 Actions::~Actions()
 {
-	ActionUseMap::iterator it = useItemMap.begin();
-	while(it != useItemMap.end()) {
-		delete it->second;
-		useItemMap.erase(it);
-		it = useItemMap.begin();
-	}
+	clear();
 }
 
-bool Actions::reload(){
-	this->loaded = false;
-	//unload
+void Actions::clear()
+{
 	ActionUseMap::iterator it = useItemMap.begin();
 	while(it != useItemMap.end()) {
 		delete it->second;
@@ -71,6 +65,12 @@ bool Actions::reload(){
 		actionItemMap.erase(it);
 		it = actionItemMap.begin();
 	}
+}
+
+bool Actions::reload(){
+	this->loaded = false;
+	//unload
+	clear();
 	//load
 	return loadFromXml(datadir);
 }
@@ -436,6 +436,21 @@ _player(NULL)
 	this->registerFunctions();
 }
 
+ActionScript::~ActionScript()
+{
+	std::map<unsigned int,KnownThing*>::iterator it;
+	for(it = ThingMap.begin(); it != ThingMap.end();it++ ){
+		delete it->second;
+	}
+
+	ThingMap.clear();
+
+	for(it = uniqueIdMap.begin(); it != uniqueIdMap.end();it++ ){
+		delete it->second;
+	}
+	
+	uniqueIdMap.clear();
+}
 
 void ActionScript::ClearMap()
 {
