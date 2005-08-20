@@ -457,22 +457,26 @@ bool Spawn::addMonster(std::string name, Direction dir, int x, int y, int spawnt
 Monster* Spawn::respawn(unsigned long spawnid, Position &pos, std::string &name, Direction dir)
 {
 	Monster *monster = new Monster(name, game);
-	if(monster && monster->isLoaded()) {
-		monster->setDirection(dir);
-		monster->masterPos = centerPos;
+	if(monster) {
+		if(monster->isLoaded()) {
+			monster->setDirection(dir);
+			monster->masterPos = centerPos;
 
-		if(game->placeCreature(pos, monster)) {
-			monster->useThing();
-			spawnedmap.insert(spawned_pair(spawnid, monster));
-			spawnmap[spawnid].lastspawn = OTSYS_TIME();
+			if(game->placeCreature(pos, monster)) {
+				monster->useThing();
+				spawnedmap.insert(spawned_pair(spawnid, monster));
+				spawnmap[spawnid].lastspawn = OTSYS_TIME();
+				return monster;
+			}
+
 		}
-		else {
-			delete monster;
-			monster = NULL;
-		}
+
+		//not loaded, or could not place it on the map
+		delete monster;
+		monster = NULL;
 	}
 
-	return monster;
+	return NULL;
 }
 
 bool Spawn::isInSpawnRange(const Position &p)
