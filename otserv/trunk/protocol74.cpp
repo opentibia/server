@@ -1357,25 +1357,6 @@ void Protocol74::sendTileUpdated(const Position &pos)
 void Protocol74::sendThingMove(const Creature *creature, const Container *fromContainer, unsigned char from_slotid,
 	const Item* fromItem, int oldFromCount, Container *toContainer, unsigned char to_slotid, const Item *toItem, int oldToCount, int count)
 {
-	/*
-	//Auto-close trade
-	if(player->getTradeItem()) {
-		if(fromItem == player->getTradeItem() || toItem == player->getTradeItem()) {
-			game->playerCloseTrade(player);
-		}
-		else {
-			const Container *tradeContainer = dynamic_cast<const Container*>(player->getTradeItem());
-			while(tradeContainer != NULL) {
-				if(toContainer == tradeContainer || fromContainer == tradeContainer) {
-					game->playerCloseTrade(player);
-					break;
-				}
-				tradeContainer = tradeContainer->getParent();
-			}
-		}
-	}
-	*/
-
 	if(player->NeedUpdateStats()) {
 		player->sendStats();
 	}
@@ -1496,25 +1477,6 @@ void Protocol74::sendThingMove(const Creature *creature, const Container *fromCo
 void Protocol74::sendThingMove(const Creature *creature, slots_t fromSlot, const Item* fromItem,
 	int oldFromCount, const Container *toContainer, unsigned char to_slotid, const Item *toItem, int oldToCount, int count)
 {
-	/*
-	//Auto-close trade
-	if(player->getTradeItem()) {
-		if(player->getTradeItem() && (fromItem == player->getTradeItem() || toItem == player->getTradeItem())) {
-			game->playerCloseTrade(player);
-		}
-		else {
-			const Container *tradeContainer = dynamic_cast<const Container*>(player->getTradeItem());
-			while(tradeContainer != NULL) {
-				if(toContainer == tradeContainer) {
-					game->playerCloseTrade(player);
-					break;
-				}
-				tradeContainer = tradeContainer->getParent();
-			}
-		}
-	}
-	*/
-
 	if(player->NeedUpdateStats()) {
 		player->sendStats();
 	}
@@ -1580,13 +1542,6 @@ void Protocol74::sendThingMove(const Creature *creature, slots_t fromSlot, const
 			player->sendStats();
 		}
 
-		/*
-		//Auto-close trade
-		if(player->getTradeItem() && (fromItem == player->getTradeItem() || toItem == player->getTradeItem())) {
-			game->playerCloseTrade(player);
-		}
-		*/
-
 		AddPlayerInventoryItem(msg, player, fromSlot);
 		AddPlayerInventoryItem(msg, player, toSlot);
 	}
@@ -1598,25 +1553,6 @@ void Protocol74::sendThingMove(const Creature *creature, slots_t fromSlot, const
 void Protocol74::sendThingMove(const Creature *creature, const Container *fromContainer,
 	unsigned char from_slotid, const Item* fromItem, int oldFromCount, slots_t toSlot, const Item *toItem, int oldToCount, int count)
 {
-	/*
-	//Auto-close trade
-	if(player->getTradeItem()) {
-		if(player->getTradeItem() && (fromItem == player->getTradeItem() || toItem == player->getTradeItem())) {
-			game->playerCloseTrade(player);
-		}
-		else {
-			const Container *tradeContainer = dynamic_cast<const Container*>(player->getTradeItem());
-			while(tradeContainer != NULL) {
-				if(fromContainer == tradeContainer) {
-					game->playerCloseTrade(player);
-					break;
-				}
-				tradeContainer = tradeContainer->getParent();
-			}
-		}
-	}
-	*/
-
 	if(player->NeedUpdateStats()) {
 		player->sendStats();
 	}
@@ -1669,25 +1605,6 @@ void Protocol74::sendThingMove(const Creature *creature, const Container *fromCo
 void Protocol74::sendThingMove(const Creature *creature, const Container *fromContainer, unsigned char from_slotid,
 	const Item* fromItem, int oldFromCount, const Position &toPos, const Item *toItem, int oldToCount, int count)
 {
-	/*
-	//Auto-close trade
-	if(player->getTradeItem()) {
-		if(player->getTradeItem() && (fromItem == player->getTradeItem() || toItem == player->getTradeItem())) {
-			game->playerCloseTrade(player);
-		}
-		else {
-			const Container *tradeContainer = dynamic_cast<const Container*>(player->getTradeItem());
-			while(tradeContainer != NULL) {
-				if(fromContainer == tradeContainer) {
-					game->playerCloseTrade(player);
-					break;
-				}
-				tradeContainer = tradeContainer->getParent();
-			}
-		}
-	}
-	*/
-
 	if(player->NeedUpdateStats()) {
 		player->sendStats();
 	}
@@ -1757,25 +1674,6 @@ void Protocol74::sendThingMove(const Creature *creature, const Container *fromCo
 void Protocol74::sendThingMove(const Creature *creature, slots_t fromSlot,
 	const Item* fromItem, int oldFromCount, const Position &toPos, const Item *toItem, int oldToCount, int count)
 {
-	/*
-	//Auto-close trade
-	if(player->getTradeItem()) {
-		if(fromItem == player->getTradeItem() || toItem == player->getTradeItem()) {
-			game->playerCloseTrade(player);
-		}
-		else {
-			const Container *tradeContainer = dynamic_cast<const Container*>(player->getTradeItem());
-			while(tradeContainer != NULL) {
-				if(fromItem == tradeContainer) {
-					game->playerCloseTrade(player);
-					break;
-				}
-				tradeContainer = tradeContainer->getParent();
-			}
-		}
-	}
-	*/
-
 	NetworkMessage msg;
 
 	if(creature == player) {
@@ -1820,25 +1718,6 @@ void Protocol74::sendThingMove(const Creature *creature, slots_t fromSlot,
 void Protocol74::sendThingMove(const Creature *creature, const Position &fromPos, int stackpos, const Item* fromItem,
 	int oldFromCount, const Container *toContainer, unsigned char to_slotid, const Item *toItem, int oldToCount, int count)
 {
-	/*
-	//Auto-close trade
-	if(player->getTradeItem()) {
-		if(player->getTradeItem() && (fromItem == player->getTradeItem() || toItem == player->getTradeItem())) {
-			game->playerCloseTrade(player);
-		}
-		else {
-			const Container *tradeContainer = dynamic_cast<const Container*>(player->getTradeItem());
-			while(tradeContainer != NULL) {
-				if(toContainer == tradeContainer) {
-					game->playerCloseTrade(player);
-					break;
-				}
-				tradeContainer = tradeContainer->getParent();
-			}
-		}
-	}
-	*/
-
 	if(player->NeedUpdateStats()) {
 		player->sendStats();
 	}
@@ -1918,13 +1797,6 @@ void Protocol74::sendThingMove(const Creature *creature, const Position &fromPos
 void Protocol74::sendThingMove(const Creature *creature, const Position &fromPos, int stackpos, const Item* fromItem,
 	int oldFromCount, slots_t toSlot, const Item *toItem, int oldToCount, int count)
 {
-	/*
-	//Auto-close trade
-	if(player->getTradeItem() && (fromItem == player->getTradeItem() || toItem == player->getTradeItem())) {
-		game->playerCloseTrade(player);
-	}
-	*/
-
 	if(player->NeedUpdateStats()) {
 		player->sendStats();
 	}
@@ -2004,13 +1876,6 @@ void Protocol74::sendThingMove(const Creature *creature, const Thing *thing,
 			else {
 				msg.AddItem((Item*)thing);
 				
-				/*
-				//Auto-close trade
-				if(player->getTradeItem() && dynamic_cast<const Item*>(thing) == player->getTradeItem()) {
-					game->playerCloseTrade(player);
-				}
-				*/
-				
 				//Auto-close container's
 				if(std::abs(player->pos.x - thing->pos.x) > 1 || std::abs(player->pos.y - thing->pos.y) > 1 || player->pos.z != thing->pos.z ) {
 					const Container *container = dynamic_cast<const Container*>(thing);
@@ -2023,16 +1888,6 @@ void Protocol74::sendThingMove(const Creature *creature, const Thing *thing,
 	}
 	
 	if (thing == this->player) {
-		/*
-		//Auto-close trade
-		Item *tradeItem = player->getTradeItem();
-		if(tradeItem && tradeItem->pos.x != 0xFFFF) {
-			if(std::abs(player->pos.x - tradeItem->pos.x) > 1 || std::abs(player->pos.y - tradeItem->pos.y) > 1 || player->pos.z != tradeItem->pos.z) {
-				game->playerCloseTrade(player);
-			}
-		}
-		*/
-		
 		if(tele){
 			msg.AddByte(0x64); 
 			msg.AddPosition(player->pos); 
