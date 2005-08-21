@@ -97,7 +97,9 @@ enum ePlayerInfo{
 	PlayerInfoMana,
 	PlayerInfoHealth,
 	PlayerInfoName,
-	PlayerInfoPosition,	
+	PlayerInfoPosition,
+	PlayerInfoVocation,
+	PlayerInfoMasterPos,
 };
 
 struct KnownThing{
@@ -163,6 +165,8 @@ public:
 	static int luaActionDoCreateItem(lua_State *L);
 	static int luaActionDoSummonCreature(lua_State *L);
 	static int luaActionDoPlayerRemoveMoney(lua_State *L);
+	static int luaActionDoPlayerSetMasterPos(lua_State *L);
+	static int luaActionDoPlayerSetVocation(lua_State *L);
 	
 	//get item info
 	static int luaActionGetItemRWInfo(lua_State *L);
@@ -185,6 +189,9 @@ public:
 	static int luaActionGetPlayerName(lua_State *L);
 	static int luaActionGetPlayerPosition(lua_State *L);	
 	static int luaActionGetPlayerSkill(lua_State *L);
+	static int luaActionGetPlayerVocation(lua_State *L);
+	static int luaActionGetPlayerMasterPos(lua_State *L);
+	
 	static int luaActionGetPlayerStorageValue(lua_State *L);
 	static int luaActionSetPlayerStorageValue(lua_State *L);
 	

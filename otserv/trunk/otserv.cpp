@@ -200,7 +200,6 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 				sprintf(accstring, "%i", accnumber);
 				
 				Account account = IOAccount::instance()->loadAccount(accnumber);
-				//if (account.accnumber == accnumber && account.password == password) // seems to be a successful load
 				if (account.accnumber == accnumber && passwordTest(password,account.password)) // seems to be a successful load
 				{
 					msg.AddByte(0x14);

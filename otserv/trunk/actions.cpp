@@ -603,12 +603,18 @@ int ActionScript::registerFunctions()
 	lua_register(luaState, "getPlayerPosition", ActionScript::luaActionGetPlayerPosition);
 	//getPlayerSkill(uid,skillid)
 	lua_register(luaState, "getPlayerSkill", ActionScript::luaActionGetPlayerSkill);
+	//getPlayerMasterPos(cid)
+	lua_register(luaState, "getPlayerMasterPos", ActionScript::luaActionGetPlayerMasterPos);
+	//getPlayerVocation(cid)
+	lua_register(luaState, "getPlayerVocation", ActionScript::luaActionGetPlayerVocation);
+	//getPlayerItemCount(uid,itemid)
+	//getPlayerItem(uid,itemid)
+	
+	
 	//getPlayerStorageValue(uid,valueid)
 	lua_register(luaState, "getPlayerStorageValue", ActionScript::luaActionGetPlayerStorageValue);
 	//setPlayerStorageValue(uid,valueid, newvalue)
 	lua_register(luaState, "setPlayerStorageValue", ActionScript::luaActionSetPlayerStorageValue);
-	//getPlayerItemCount(uid,itemid)
-	//getPlayerItem(uid,itemid)
 	
 	//getTilePzInfo(pos) 1 is pz. 0 no pz.
 	lua_register(luaState, "getTilePzInfo", ActionScript::luaActionGetTilePzInfo);
@@ -641,8 +647,6 @@ int ActionScript::registerFunctions()
 	lua_register(luaState, "doSetItemText", ActionScript::luaActionDoSetItemText);
 	//doSetItemSpecialDescription(uid,desc)
 	lua_register(luaState, "doSetItemSpecialDescription", ActionScript::luaActionDoSetItemSpecialDescription);
-
-
 	//doSendAnimatedText(position,text,color)
 	lua_register(luaState, "doSendAnimatedText", ActionScript::luaActionDoSendAnimatedText);
 	//doPlayerAddSkillTry(uid,skillid,n)
@@ -665,6 +669,10 @@ int ActionScript::registerFunctions()
 	lua_register(luaState, "doCreateItem", ActionScript::luaActionDoCreateItem);
 	//doSummonCreature(name, position)
 	lua_register(luaState, "doSummonCreature", ActionScript::luaActionDoSummonCreature);
+	//doPlayerSetMasterPos(cid,pos)
+	lua_register(luaState, "doPlayerSetMasterPos", ActionScript::luaActionDoPlayerSetMasterPos);
+	//doPlayerSetVocation(cid,voc)
+	lua_register(luaState, "doPlayerSetVocation", ActionScript::luaActionDoPlayerSetVocation);
 	
 	//doMoveItem(uid,toPos)
 	//doMovePlayer(cid,direction)
@@ -695,33 +703,6 @@ Position ActionScript::internalGetRealPosition(ActionScript *action, Player *pla
 		Position dummyPos(0,0,0);
 		return dummyPos;
 	}
-
-	/*if(pos.x == 0xFFFF){
-		Position dummyPos(0,0,0);
-		if(!player)
-			return dummyPos;
-		if(pos.y & 0x40) { //from container
-			unsigned char containerid = pos.y & 0x0F;
-			const Container* container = player->getContainer(containerid);
-			if(!container){
-				return dummyPos;
-			}
-			while(container->getParent() != NULL) {
-				container = container->getParent();
-			}
-			if(container->pos.x == 0xFFFF)
-				return player->pos;
-			else
-				return container->pos;
-		}
-		else //from inventory
-		{
-			return player->pos;
-		}
-	}
-	else{
-		return pos;
-	}*/
 }
 
 void ActionScript::internalAddThing(lua_State *L, const Thing* thing, const unsigned int thingid)
@@ -827,8 +808,16 @@ int ActionScript::internalGetPlayerInfo(lua_State *L, ePlayerInfo info)
 			internalAddPositionEx(L,pos);
 			return 1;
 			break;
+		case PlayerInfoMasterPos:
+			pos = player->masterPos;
+			internalAddPositionEx(L,pos);
+			return 1;
+			break;
 		case PlayerInfoFood:
 			value = player->food/1000;
+			break;
+		case PlayerInfoVocation:
+			value = player->vocation;
 			break;
 		default:
 			std::cout << "GetPlayerInfo: Unkown player info " << info << std::endl;
@@ -872,6 +861,11 @@ int ActionScript::luaActionGetPlayerName(lua_State *L){
 int ActionScript::luaActionGetPlayerPosition(lua_State *L){	
 	return internalGetPlayerInfo(L,PlayerInfoPosition);}
 	
+int ActionScript::luaActionGetPlayerVocation(lua_State *L){
+	return internalGetPlayerInfo(L,PlayerInfoVocation);}
+
+int ActionScript::luaActionGetPlayerMasterPos(lua_State *L){
+	return internalGetPlayerInfo(L,PlayerInfoMasterPos);}
 //
 
 int ActionScript::luaActionDoRemoveItem(lua_State *L)
@@ -1684,3 +1678,50 @@ int ActionScript::luaActionDoPlayerRemoveMoney(lua_State *L)
 		
 	return 1;
 }
+
+int ActionScript::luaActionDoPlayerSetMasterPos(lua_State *L)
+{
+	//doPlayerSetMasterPos(cid,pos)
+	PositionEx pos;
+	internalGetPositionEx(L,pos);
+	unsigned int cid = (unsigned int)internalGetNumber(L);	
+	
+	ActionScript *action = getActionScript(L);
+	
+	const KnownThing* tmp = action->GetPlayerByUID(cid);
+	if(tmp){
+		Player *player = (Player*)tmp->thing;
+		player->masterPos = pos;
+	}
+	else{
+		lua_pushnumber(L, -1);
+		std::cout << "doPlayerSetMasterPos: player not found" << std::endl;
+		return 1;
+	}
+	lua_pushnumber(L, 0);
+	return 1;
+}
+
+int ActionScript::luaActionDoPlayerSetVocation(lua_State *L)
+{
+	//doPlayerSetVocation(cid,voc)
+	int voc = (int)internalGetNumber(L);
+	unsigned int cid = (unsigned int)internalGetNumber(L);	
+					
+	ActionScript *action = getActionScript(L);
+	
+	const KnownThing* tmp = action->GetPlayerByUID(cid);
+	if(tmp){
+		Player *player = (Player*)(tmp->thing);
+		player->vocation = (playervoc_t)voc;
+	}
+	else{
+		lua_pushnumber(L, -1);
+		std::cout << "doPlayerSetVocation: player not found" << std::endl;
+		return 1;
+	}
+	
+	lua_pushnumber(L, 0);
+	return 1;
+}
+
