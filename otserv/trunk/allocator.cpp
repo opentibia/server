@@ -68,7 +68,7 @@ void operator delete[](void* p, int dummy)
 #ifdef __OTSERV_ALLOCATOR_STATS__
 OTSYS_THREAD_RETURN allocatorStatsThread(void *a){
 	while(1){
-		OTSYS_SLEEP(120000);
+		OTSYS_SLEEP(30000);
 		PoolManager::getInstance().dumpStats();
 		//PoolManager::getInstance().releaseMemory();
 	}

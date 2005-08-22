@@ -149,6 +149,7 @@ public:
   static int luaActionChangeOutfit(lua_State *L);
   static int luaActionManaShield(lua_State *L);
   static int luaActionChangeSpeed(lua_State *L);
+  static int luaActionChangeSpeedMonster(lua_State *L);
   static int luaActionGetSpeed(lua_State *L);
   static int luaActionMakeRune(lua_State *L);
   static int luaActionMakeArrows(lua_State *L);

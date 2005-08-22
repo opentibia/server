@@ -285,6 +285,7 @@ int SpellScript::registerFunctions(){
 	lua_register(luaState, "getPosition", SpellScript::luaActionGetPos);
 	lua_register(luaState, "getSpeed", SpellScript::luaActionGetSpeed);
 	lua_register(luaState, "changeSpeed", SpellScript::luaActionChangeSpeed);
+	lua_register(luaState, "changeSpeedMonster", SpellScript::luaActionChangeSpeedMonster);
 	lua_register(luaState, "makeRune", SpellScript::luaActionMakeRune);
 	lua_register(luaState, "makeArrows", SpellScript::luaActionMakeArrows);
 	lua_register(luaState, "makeFood", SpellScript::luaActionMakeFood);
@@ -762,6 +763,26 @@ int SpellScript::luaActionChangeSpeed(lua_State *L){
     creature->hasteTicks = time;  
 	return 0;
 }
+
+int SpellScript::luaActionChangeSpeedMonster(lua_State *L){
+	long time = (long)lua_tonumber(L, -1)*1000;
+	lua_pop(L,1);
+	
+	int speed = (int)lua_tonumber(L, -1);
+	lua_pop(L,1);
+	
+	Spell* spell = getSpell(L);
+	Creature* creature = spell->game->getCreatureByID((unsigned long)lua_tonumber(L, -1));
+	lua_pop(L,1);
+	
+	if(creature){
+		spell->game->addEvent(makeTask(time, boost::bind(&Game::changeSpeed, spell->game,creature->getID(), creature->getSpeed())));
+		spell->game->changeSpeed(creature->getID(), speed);
+		creature->hasteTicks = time;
+    }
+	return 0;
+}
+
 
 int SpellScript::luaActionGetSpeed(lua_State *L){
 	Spell* spell = getSpell(L);
