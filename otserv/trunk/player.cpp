@@ -750,7 +750,7 @@ void Player::addSkillTry(int skilltry)
 	bool foundSkill;
 	foundSkill = false;
 	std::string skillname;
-	//TODO:what happens with 2 weapons?
+	
 	for (int slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++) {
 		if (items[slot]) {
 			if (items[slot]->isWeapon()) {
@@ -770,6 +770,7 @@ void Player::addSkillTry(int skilltry)
 			 	}//switch
 			 	addSkillTryInternal(skilltry,skill);
 			 	foundSkill = true;
+			 	break;
 			}			
 		}
 	}
