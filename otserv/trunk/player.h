@@ -136,6 +136,8 @@ public:
 	int getMana() const {return mana;}
 	int getMagicLevel() const {return maglevel;}
 	playersex_t getSex() {return sex;}
+	bool gainManaTick();
+	bool gainHealthTick();
 	
 	const std::string& getName() const {return name;};
 	int getPlayerInfo(playerinfo_t playerinfo) const;
@@ -342,9 +344,13 @@ protected:
 	unsigned int skills[7][3];
 	
 	//reminder: 0 = None, 1 = Sorcerer, 2 = Druid, 3 = Paladin, 4 = Knight
-	unsigned short CapGain[5];          //for level advances
-	unsigned short ManaGain[5];
-	unsigned short HPGain[5];
+	static const int CapGain[5];          //for level advances
+	static const int ManaGain[5];
+	static const int HPGain[5];
+	static const int gainManaVector[5][2];
+	static const int gainHealthVector[5][2];
+	unsigned short manaTick;
+	unsigned short healthTick;
 	
 	unsigned char level_percent;
 	unsigned char maglevel_percent;

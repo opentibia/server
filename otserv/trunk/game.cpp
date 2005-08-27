@@ -3263,19 +3263,20 @@ void Game::checkCreature(unsigned long id)
 				
 			if(!tile->isPz()){
 				if(player->food > 1000){
-					player->mana += min(5, player->manamax - player->mana);
+					//player->mana += min(5, player->manamax - player->mana);
+					player->gainManaTick();
 					player->food -= thinkTicks;
 					if(player->healthmax - player->health > 0){
-						player->health += min(5, player->healthmax - player->health);
-						SpectatorVec list;
-						SpectatorVec::iterator it;
-
-						getSpectators(Range(creature->pos), list);
-
-						for(it = list.begin(); it != list.end(); ++it) {
-							Player* p = dynamic_cast<Player*>(*it);
-							if(p)
-								p->sendCreatureHealth(player);
+						//player->health += min(5, player->healthmax - player->health);
+						if(player->gainHealthTick()){
+							SpectatorVec list;
+							SpectatorVec::iterator it;
+							getSpectators(Range(creature->pos), list);
+							for(it = list.begin(); it != list.end(); ++it) {
+								Player* p = dynamic_cast<Player*>(*it);
+								if(p)
+									p->sendCreatureHealth(player);
+							}
 						}
 					}
 				}				

@@ -39,6 +39,15 @@ extern Game g_game;
 
 AutoList<Player> Player::listPlayer;
 
+//for old mana/healgt regeneration
+//const int Player::gainManaVector[5][2] = {{1,5},{1,5},{1,5},{1,5},{1,5}};
+//const int Player::gainHealthVector[5][2] = {{1,5},{1,5},{1,5},{1,5},{1,5}};
+const int Player::gainManaVector[5][2] = {{6,1},{3,1},{3,1},{4,1},{6,1}};
+const int Player::gainHealthVector[5][2] = {{6,1},{6,1},{6,1},{4,1},{3,1}};
+const int Player::CapGain[5] = {10, 10, 10, 20, 25};
+const int Player::ManaGain[5] = {5, 30, 30, 15, 5};
+const int Player::HPGain[5] = {5, 5, 5, 10, 15};
+
 Player::Player(const std::string& name, Protocol *p) :
  Creature(name)
 {	
@@ -102,7 +111,7 @@ Player::Player(const std::string& name, Protocol *p) :
 
  	useCount = 0;
   
-  
+  	/*
  	CapGain[0]  = 10;     //for level advances
  	CapGain[1]  = 10;     //e.g. Sorcerers will get 10 Cap with each level up
  	CapGain[2]  = 10;     
@@ -120,7 +129,11 @@ Player::Player(const std::string& name, Protocol *p) :
  	HPGain[2]   = 5;
  	HPGain[3]   = 10;
  	HPGain[4]   = 15;  
+ 	*/
  	max_depot_items = 1000;
+ 	
+ 	manaTick = 0;
+ 	healthTick = 0;
 } 
 
 
@@ -836,7 +849,7 @@ std::string Player::getSkillName(int skillid){
 
 void Player::addSkillTryInternal(int skilltry,int skill){
 	
-	skills[skill][SKILL_TRIES] += skilltry;			
+	skills[skill][SKILL_TRIES] += skilltry;
 	//for skill level advances
 	//int reqTries = (int) ( SkillBases[skill] * pow((float) VocMultipliers[skill][voc], (float) ( skills[skill][SKILL_LEVEL] - 10) ) );			 
 #if __DEBUG__
@@ -1185,7 +1198,7 @@ void Player::sendCancelWalk() const
 void Player::sendStats(){
 	//update level and maglevel percents
 	if(lastSentStats.experience != this->experience || lastSentStats.level != this->level)
-		level_percent  = (unsigned char)(100*(experience-getExpForLv(level))/(1.*getExpForLv(level+1)-getExpForLv(level)));		
+		level_percent  = (unsigned char)(100*(experience-getExpForLv(level))/(1.*getExpForLv(level+1)-getExpForLv(level)));
 			
 	if(lastSentStats.manaspent != this->manaspent || lastSentStats.maglevel != this->maglevel)
 		maglevel_percent  = (unsigned char)(100*(manaspent/(1.*getReqMana(maglevel+1,vocation))));
@@ -1482,7 +1495,7 @@ unsigned long Player::getIP() const
 }
 
 void Player::die() {
-			
+	
 	//Magic Level downgrade
 	unsigned long sumMana = 0;
 	long lostMana = 0;
@@ -1593,4 +1606,38 @@ void Player::preSave()
 void Player::kickPlayer()
 {
 	client->logout();
+}
+
+bool Player::gainManaTick()
+{
+	int add;
+	manaTick++;
+	if(vocation >= 0 && vocation < 5){
+		if(manaTick < gainManaVector[vocation][0])
+			return false;
+		manaTick = 0;
+		add = gainManaVector[vocation][1];
+	}
+	else{
+		add = 5;
+	}
+	mana += min(add, manamax - mana);
+	return true;
+}
+
+bool Player::gainHealthTick()
+{
+	int add;
+	healthTick++;
+	if(vocation >= 0 && vocation < 5){
+		if(healthTick < gainHealthVector[vocation][0])
+			return false;
+		healthTick = 0;
+		add = gainHealthVector[vocation][1];
+	}
+	else{
+		add = 5;
+	}
+	health += min(add, healthmax - health);
+	return true;
 }
