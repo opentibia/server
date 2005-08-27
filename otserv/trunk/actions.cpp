@@ -444,12 +444,13 @@ ActionScript::~ActionScript()
 	}
 
 	ThingMap.clear();
-
+	/*
 	for(it = uniqueIdMap.begin(); it != uniqueIdMap.end();it++ ){
 		delete it->second;
 	}
 	
 	uniqueIdMap.clear();
+	*/
 }
 
 void ActionScript::ClearMap()
