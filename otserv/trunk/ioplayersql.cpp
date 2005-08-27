@@ -485,7 +485,8 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 	return true;
 }
 
-bool IOPlayerSQL::savePlayer(Player* player){
+bool IOPlayerSQL::savePlayer(Player* player)
+{
 	//return true;
 	std::string host = g_config.getGlobalString("sql_host");
 	std::string user = g_config.getGlobalString("sql_user");
@@ -585,64 +586,12 @@ bool IOPlayerSQL::savePlayer(Player* player){
 			++runningID;
 			parentid = 0;
 
-			/*streamitems << "(" << player->getGUID() <<"," << slotid << ","<< runningID <<","<< parentid <<"," << item->getID()<<","<< (int)item->getItemCountOrSubtype() << "," << 
-				(int)item->getActionId()<<",'"<< mysqlpp::escape << item->getText() <<"','" << mysqlpp::escape << item->getSpecialDescription() <<"'),";*/
-				
 			streamitems << "(" << player->getGUID() <<"," << slotid << ","<< runningID <<","<< parentid <<"," << item->getID()<<","<< (int)item->getItemCountOrSubtype() << "," << 
 				(int)item->getActionId()<<",'"<< Database::escapeString(item->getText()) <<"','" << Database::escapeString(item->getSpecialDescription()) <<"'),";
 
 			topcontainer = dynamic_cast<Container*>(item);
 			if(topcontainer) {
-				parentid = runningID;
-				for (it = topcontainer->getItems(); it != topcontainer->getEnd(); ++it) {
-					++runningID;
-					container = dynamic_cast<Container*>(*it);
-					if(container) {
-						stack.push_back(containerStackPair(container, runningID));
-					}
-					
-					/*streamitems << "(" << player->getGUID() <<"," << 0 /*slotid*//* << ","<< runningID <<","<< parentid <<"," << (*it)->getID()<<","<< (int)(*it)->getItemCountOrSubtype() << "," << 
-					(int)(*it)->getActionId()<<",'"<< mysqlpp::escape << (*it)->getText() <<"','" << mysqlpp::escape << (*it)->getSpecialDescription() <<"'),";*/
-					streamitems << "(" << player->getGUID() <<"," << 0 /*slotid*/ << ","<< runningID <<","<< parentid <<"," << (*it)->getID()<<","<< (int)(*it)->getItemCountOrSubtype() << "," << 
-					(int)(*it)->getActionId()<<",'"<< Database::escapeString((*it)->getText()) <<"','" <<  Database::escapeString((*it)->getSpecialDescription()) <<"'),";
-				}
-				
-				while(stack.size() > 0) {
-
-					//split into sub-queries
-					if(streamitems.str().length() > 8192) {
-						DBQuery subquery;
-						subquery << query.str();
-
-						itemsstring = streamitems.str();
-						itemsstring.erase(itemsstring.length()-1);
-						subquery << itemsstring;
-
-						if(!mysql.executeQuery(subquery))
-							return false;
-
-						streamitems.str("");
-						itemsstring = "";
-					}
-
-					containerStackPair csPair = stack.front();
-					container = csPair.first;
-					parentid = csPair.second;
-					stack.pop_front();
-
-					for (it = container->getItems(); it != container->getEnd(); ++it) {
-						++runningID;
-						Container *container = dynamic_cast<Container*>(*it);
-						if(container) {
-							stack.push_back(containerStackPair(container, runningID));
-						}
-
-						/*streamitems << "(" << player->getGUID() <<"," << 0 /*slotid*//* << ","<< runningID <<","<< parentid <<"," << (*it)->getID()<<","<< (int)(*it)->getItemCountOrSubtype() << "," << 
-						(int)(*it)->getActionId()<<",'"<< mysqlpp::escape << (*it)->getText() <<"','" << mysqlpp::escape << (*it)->getSpecialDescription() <<"'),";*/
-						streamitems << "(" << player->getGUID() <<"," << 0 /*slotid*/ << ","<< runningID <<","<< parentid <<"," << (*it)->getID()<<","<< (int)(*it)->getItemCountOrSubtype() << "," << 
-						(int)(*it)->getActionId()<<",'"<< Database::escapeString((*it)->getText()) <<"','" << Database::escapeString((*it)->getSpecialDescription()) <<"'),";
-					}
-				}
+				stack.push_back(containerStackPair(topcontainer, runningID));
 			}
 
 			/*
@@ -650,72 +599,95 @@ bool IOPlayerSQL::savePlayer(Player* player){
 				itemsstring += getItems(player->items[i],runningID,i,player->getGUID(),0);
 			*/
 		}
+				
+		while(stack.size() > 0) {
+
+			//split into sub-queries
+			if(streamitems.str().length() > 8192) {
+				DBQuery subquery;
+				subquery << query.str();
+
+				itemsstring = streamitems.str();
+				itemsstring.erase(itemsstring.length()-1);
+				subquery << itemsstring;
+
+				if(!mysql.executeQuery(subquery))
+					return false;
+
+				streamitems.str("");
+				itemsstring = "";
+			}
+
+			containerStackPair csPair = stack.front();
+			container = csPair.first;
+			parentid = csPair.second;
+			stack.pop_front();
+
+			for (it = container->getItems(); it != container->getEnd(); ++it) {
+				++runningID;
+				Container *container = dynamic_cast<Container*>(*it);
+				if(container) {
+					stack.push_back(containerStackPair(container, runningID));
+				}
+
+				streamitems << "(" << player->getGUID() <<"," << 0 /*slotid*/ << ","<< runningID <<","<< parentid <<"," << (*it)->getID()<<","<< (int)(*it)->getItemCountOrSubtype() << "," << 
+				(int)(*it)->getActionId()<<",'"<< Database::escapeString((*it)->getText()) <<"','" << Database::escapeString((*it)->getSpecialDescription()) <<"'),";
+			}
+		}
 		
 		itemsstring += streamitems.str();
+		streamitems.str("");
 
 		//save depot items
 		for(DepotMap::reverse_iterator dit = player->depots.rbegin(); dit !=player->depots.rend() ;++dit)
 		{
-			//itemsstring += getItems(it->second,runningID,it->first+100,player->getGUID(),0);
 			item = dit->second;
 			++runningID;
 			parentid = 0;
 
-			/*streamitems << "(" << player->getGUID() <<"," << dit->first + 100 << ","<< runningID <<","<< parentid <<"," << item->getID()<<","<< (int)item->getItemCountOrSubtype() << "," << 
-				(int)item->getActionId()<<",'"<< mysqlpp::escape << item->getText() <<"','" << mysqlpp::escape << item->getSpecialDescription() <<"'),";*/
 			streamitems << "(" << player->getGUID() <<"," << dit->first + 100 << ","<< runningID <<","<< parentid <<"," << item->getID()<<","<< (int)item->getItemCountOrSubtype() << "," << 
 				(int)item->getActionId()<<",'"<< Database::escapeString(item->getText()) <<"','" << Database::escapeString(item->getSpecialDescription()) <<"'),";
 
 			topcontainer = dynamic_cast<Container*>(item);
-			if(topcontainer) {
-				parentid = runningID;
-				for (it = topcontainer->getItems(); it != topcontainer->getEnd(); ++it) {
-					++runningID;
-					container = dynamic_cast<Container*>(*it);
-					if(container) {
-						stack.push_back(containerStackPair(container, runningID));
-					}
-					
-					/*streamitems << "(" << player->getGUID() <<"," << 0 /*slotid*//* << ","<< runningID <<","<< parentid <<"," << (*it)->getID()<<","<< (int)(*it)->getItemCountOrSubtype() << "," << 
-					(int)(*it)->getActionId()<<",'"<< mysqlpp::escape << (*it)->getText() <<"','" << mysqlpp::escape << (*it)->getSpecialDescription() <<"'),";*/
-					streamitems << "(" << player->getGUID() <<"," << 0 /*slotid*/ << ","<< runningID <<","<< parentid <<"," << (*it)->getID()<<","<< (int)(*it)->getItemCountOrSubtype() << "," << 
-					(int)(*it)->getActionId()<<",'"<< Database::escapeString((*it)->getText()) <<"','" << Database::escapeString((*it)->getSpecialDescription()) <<"'),";
-				}
+			if(topcontainer) {				
+				stack.push_back(containerStackPair(topcontainer, runningID));
+			}
+
+			//itemsstring += getItems(it->second,runningID,it->first+100,player->getGUID(),0);
+		}
 				
-				while(stack.size() > 0) {
+		while(stack.size() > 0) {
 
-					//split into sub-queries
-					if(streamitems.str().length() > 8192) {
-						DBQuery subquery;
-						subquery << query.str();
+			//split into sub-queries
+			if(streamitems.str().length() > 8192) {
+				DBQuery subquery;
+				subquery << query.str();
 
-						itemsstring = streamitems.str();
-						itemsstring.erase(itemsstring.length()-1);
-						subquery << itemsstring;
+				itemsstring = streamitems.str();
+				itemsstring.erase(itemsstring.length()-1);
+				subquery << itemsstring;
 
-						if(!mysql.executeQuery(subquery))
-							return false;
+				if(!mysql.executeQuery(subquery))
+					return false;
 
-						streamitems.str("");
-						itemsstring = "";
-					}
+				streamitems.str("");
+				itemsstring = "";
+			}
 
-					containerStackPair csPair = stack.front();
-					container = csPair.first;
-					parentid = csPair.second;
-					stack.pop_front();
+			containerStackPair csPair = stack.front();
+			container = csPair.first;
+			parentid = csPair.second;
+			stack.pop_front();
 
-					for (it = container->getItems(); it != container->getEnd(); ++it) {
-						++runningID;
-						Container *container = dynamic_cast<Container*>(*it);
-						if(container) {
-							stack.push_back(containerStackPair(container, runningID));
-						}
-
-						streamitems << "(" << player->getGUID() <<"," << 0 /*slotid*/ << ","<< runningID <<","<< parentid <<"," << (*it)->getID()<<","<< (int)(*it)->getItemCountOrSubtype() << "," << 
-						(int)(*it)->getActionId()<<",'"<< Database::escapeString((*it)->getText()) <<"','" << Database::escapeString((*it)->getSpecialDescription()) <<"'),";
-					}
+			for (it = container->getItems(); it != container->getEnd(); ++it) {
+				++runningID;
+				Container *container = dynamic_cast<Container*>(*it);
+				if(container) {
+					stack.push_back(containerStackPair(container, runningID));
 				}
+
+				streamitems << "(" << player->getGUID() <<"," << 0 /*slotid*/ << ","<< runningID <<","<< parentid <<"," << (*it)->getID()<<","<< (int)(*it)->getItemCountOrSubtype() << "," << 
+				(int)(*it)->getActionId()<<",'"<< Database::escapeString((*it)->getText()) <<"','" << Database::escapeString((*it)->getSpecialDescription()) <<"'),";
 			}
 		}
 
@@ -724,8 +696,10 @@ bool IOPlayerSQL::savePlayer(Player* player){
 		if(itemsstring.length())
 		{
 			itemsstring.erase(itemsstring.length()-1);
+			
+			std::cout << itemsstring << std::endl;
+
 			query << itemsstring;
-			// TODO: Check if the length of the query is too long...
 			
 			if(!mysql.executeQuery(query))
 				return false;
