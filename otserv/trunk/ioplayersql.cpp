@@ -696,9 +696,6 @@ bool IOPlayerSQL::savePlayer(Player* player)
 		if(itemsstring.length())
 		{
 			itemsstring.erase(itemsstring.length()-1);
-			
-			std::cout << itemsstring << std::endl;
-
 			query << itemsstring;
 			
 			if(!mysql.executeQuery(query))
