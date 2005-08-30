@@ -18,7 +18,6 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-
 #ifndef __IOMAPBIN_H
 #define __IOMAPBIN_H
 
@@ -33,18 +32,17 @@ class IOMapBin : public IOMap {
   public:
 	IOMapBin(){};
 	~IOMapBin(){};
-	virtual char* getSourceDescription(){ return "Binary file (JXB3 or OTM)"; };
+	virtual char* getSourceDescription(){ return "Binary file (OpenTibia Map, revision 1.1.2)"; };
 	/** Load the map from an binary file
 	  * \param map Pointer to the Map
 	  * \param identifier Name of the binary file to load
 	  * \returns Whether map load was successful */
 	bool loadMap(Map* map, std::string identifier);
 private:
-	FILE* fh;
-	/** Load the JXB3 data
+    FILE* fh;
+	/** Load the OTM data (revision 1.1.2)
 	  * no params for this function
 	  * \returns void */
-    void loadJXB3(Map* map);
     void loadOTM(Map* map);
 };
 
