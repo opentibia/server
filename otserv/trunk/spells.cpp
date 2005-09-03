@@ -852,13 +852,23 @@ int SpellScript::luaActionMakeRune(lua_State *L){
 		magicTarget.hitEffect = 255; //NM_ME_NONE
 		magicTarget.animationColor = 19; //GREEN
 
+		int a = -1;
+		int b = -1;
+
 		//try to create rune 1
-		int a = internalMakeRune(player,SLOT_RIGHT,spell,type,charges);
-		if(a == 1) //spend mana
-			player->mana -= spell->getMana();
-			
+		a = internalMakeRune(player,SLOT_RIGHT,spell,type,charges);
+		if(a == 1) {
+			magicTarget.manaCost = spell->getMana();
+		}
+
+		//check if we got enough mana for the left hand
+		if(player->getMana() - magicTarget.manaCost >= magicTarget.manaCost) {
 			//try to create rune 2
-			int b = internalMakeRune(player,SLOT_LEFT,spell,type,charges);
+			b = internalMakeRune(player,SLOT_LEFT,spell,type,charges);
+			if(b == 1) {
+				magicTarget.manaCost += spell->getMana();
+			}
+		}
 
 		if(a == -1 && b == -1){ //not enough mana
 			magicTarget.damageEffect = 2; //NM_ME_PUFF
@@ -868,15 +878,20 @@ int SpellScript::luaActionMakeRune(lua_State *L){
 			magicTarget.damageEffect = 2; //NM_ME_PUFF		
 			magicTarget.manaCost = 0;
 		}
-		else{
+		else if(a == 1 || b == 1) {
 			magicTarget.damageEffect = 12; //NM_ME_MAGIC_ENERGIE = 12
+		}
+
+		/*else{
+			magicTarget.damageEffect = 12; //NM_ME_MAGIC_ENERGIE = 12
+
 			if(b==1){
 				magicTarget.manaCost = spell->getMana();
 			}
 			else{	//only create 1 rune
 				magicTarget.manaCost = 0; 
 			}
-		}
+		}*/
 
 		bool isSuccess = spell->game->creatureThrowRune(player, player->pos, magicTarget);
 
@@ -932,7 +947,7 @@ int SpellScript::luaActionMakeArrows(lua_State *L){
 
 		if(player->mana < spell->getMana()){
 			magicTarget.damageEffect = 2; //NM_ME_PUFF  
-  			magicTarget.manaCost = spell->getMana()*5; //force not enough mana
+  			magicTarget.manaCost = player->getPlayerInfo(PLAYERINFO_MAXMANA) + 1; //force not enough mana
 		}
 		else{			
 			magicTarget.manaCost = spell->getMana();
@@ -976,7 +991,7 @@ int SpellScript::luaActionMakeFood(lua_State *L){
 
 		if(player->mana < spell->getMana()){
   			magicTarget.damageEffect = 2; //NM_ME_PUFF  
-    		magicTarget.manaCost = spell->getMana()*5; //force not enough mana
+    		magicTarget.manaCost = player->getPlayerInfo(PLAYERINFO_MAXMANA) + 1; //force not enough mana
   		}
   		else{  
   			magicTarget.manaCost = spell->getMana();

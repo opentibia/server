@@ -565,10 +565,8 @@ bool IOPlayerSQL::savePlayer(Player* player)
 		if(!mysql.executeQuery(query))
 			return false;
 		
-		std::string itemsstring;
 		query << "INSERT INTO `items` (`player` , `slot` , `sid` , `pid` , `type` , `number` , `actionid` , `text` , `specialdesc` ) VALUES"; 
-		int runningID=0;
-		int parentid = 0;
+		int runningID = 0;
 
 		typedef std::pair<Container*, int> containerStackPair;
 		std::list<containerStackPair> stack;
@@ -577,14 +575,15 @@ bool IOPlayerSQL::savePlayer(Player* player)
 		Container* container = NULL;
 		Container* topcontainer = NULL;
 
+		int parentid = 0;
 		std::stringstream streamitems;
+		std::string itemsstring;
 		for (int slotid = 1; slotid <= 10; ++slotid) {
 			if(!player->items[slotid])
 				continue;
 
 			item = player->items[slotid];
 			++runningID;
-			parentid = 0;
 
 			streamitems << "(" << player->getGUID() <<"," << slotid << ","<< runningID <<","<< parentid <<"," << item->getID()<<","<< (int)item->getItemCountOrSubtype() << "," << 
 				(int)item->getActionId()<<",'"<< Database::escapeString(item->getText()) <<"','" << Database::escapeString(item->getSpecialDescription()) <<"'),";
@@ -634,16 +633,13 @@ bool IOPlayerSQL::savePlayer(Player* player)
 				(int)(*it)->getActionId()<<",'"<< Database::escapeString((*it)->getText()) <<"','" << Database::escapeString((*it)->getSpecialDescription()) <<"'),";
 			}
 		}
-		
-		itemsstring += streamitems.str();
-		streamitems.str("");
 
+		parentid = 0;
 		//save depot items
 		for(DepotMap::reverse_iterator dit = player->depots.rbegin(); dit !=player->depots.rend() ;++dit)
 		{
 			item = dit->second;
 			++runningID;
-			parentid = 0;
 
 			streamitems << "(" << player->getGUID() <<"," << dit->first + 100 << ","<< runningID <<","<< parentid <<"," << item->getID()<<","<< (int)item->getItemCountOrSubtype() << "," << 
 				(int)item->getActionId()<<",'"<< Database::escapeString(item->getText()) <<"','" << Database::escapeString(item->getSpecialDescription()) <<"'),";
@@ -690,16 +686,18 @@ bool IOPlayerSQL::savePlayer(Player* player)
 				(int)(*it)->getActionId()<<",'"<< Database::escapeString((*it)->getText()) <<"','" << Database::escapeString((*it)->getSpecialDescription()) <<"'),";
 			}
 		}
-
-		itemsstring += streamitems.str();
 		
-		if(itemsstring.length())
+		if(streamitems.str().length() > 0)
 		{
+			itemsstring = streamitems.str();
 			itemsstring.erase(itemsstring.length()-1);
 			query << itemsstring;
 			
 			if(!mysql.executeQuery(query))
 				return false;
+			
+			streamitems.str("");
+			itemsstring = "";
 		}
 		
 		//save storage map
