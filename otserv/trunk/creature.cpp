@@ -231,13 +231,11 @@ std::vector<long> Creature::getInflicatedDamageCreatureList()
 
 bool Creature::canMovedTo(const Tile *tile) const
 {
-	if(tile){   
-		if (tile->creatures.size())
-			return false;
-		
-		return Thing::canMovedTo(tile);
+	if(tile) {
+		return (tile->isBlocking(BLOCK_SOLID) == RET_NOERROR);
 	}
-	else return false;
+
+	return false;
 }
 
 std::string Creature::getDescription(bool self) const
@@ -251,7 +249,6 @@ std::string Creature::getDescription(bool self) const
 
 int Creature::getStepDuration() const
 {
-	int underground;
 	int duration = 500;
 	Tile *tile = g_game.getTile(pos.x, pos.y, pos.z);
 	if(tile && tile->ground){

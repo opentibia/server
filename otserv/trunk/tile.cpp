@@ -29,45 +29,99 @@
 
 #include "creature.h"
 
-bool Tile::isBlockingProjectile() const
+ReturnValue Tile::isBlocking(int objectstate, bool ignoreCreature /* = false*/, bool ignoreMoveableBlocking /*=false*/) const
 {
-	if(ground && ground->isBlockingProjectile() == true)
-    return true;
-  
-  ItemVector::const_iterator iit;
-  for (iit = topItems.begin(); iit != topItems.end(); ++iit)
-    if ((*iit)->isBlockingProjectile())
-      return true;
+	if(isPz() && ((objectstate & BLOCK_PZ) == BLOCK_PZ)) {
+		return RET_PROTECTIONZONE;
+	}
 
-  for (iit = downItems.begin(); iit != downItems.end(); ++iit)
-    if ((*iit)->isBlockingProjectile())
-      return true;
+	
+	if(((objectstate & BLOCK_PATHFIND) == BLOCK_PATHFIND) && (floorChange() || getTeleportItem())) {
+		return RET_THEREISNOWAY;
+	}
+		
+	if(ground) {
+		const ItemType& groundType = Item::items[ground->getID()];
 
+		if(((objectstate & BLOCK_PROJECTILE) == BLOCK_PROJECTILE) &&
+			groundType.blockProjectile)
+			return RET_CANNOTTHROW;
 
-  return false;
-}
+		if((groundType.blockPathFind || groundType.blockSolid) && ((objectstate & BLOCK_PATHFIND) == BLOCK_PATHFIND))
+			return RET_THEREISNOWAY;
 
-bool Tile::isBlocking(bool ispickupable /*= false*/, bool ignoreMoveableBlocking /*=false*/) const
-{
-  if(ground && ground->isBlocking(ispickupable) == true)
-    return true;
-  
+		if(((objectstate & BLOCK_PICKUPABLE) == BLOCK_PICKUPABLE)) {			
+			if(groundType.blockSolid && (groundType.blockPickupable || groundType.pickupable))
+				return RET_NOTENOUGHROOM;
+		}
+
+		if(((objectstate & BLOCK_SOLID) == BLOCK_SOLID) && groundType.blockSolid)
+			return RET_NOTENOUGHROOM;
+	}
+	else if( !((objectstate & BLOCK_PROJECTILE) == BLOCK_PROJECTILE)) {
+		return RET_NOTILE;
+	}
+
+	if(!ignoreCreature && !creatures.empty() && ((objectstate & BLOCK_SOLID) == BLOCK_SOLID))
+		return RET_CREATUREBLOCK;
+
 	ItemVector::const_iterator iit;
-  for (iit = topItems.begin(); iit != topItems.end(); ++iit)
-    if((*iit)->isBlocking(ispickupable) && !(ignoreMoveableBlocking && !(*iit)->isNotMoveable()))
-      return true;
+	for (iit = topItems.begin(); iit != topItems.end(); ++iit) {
+		const ItemType& iiType = Item::items[(*iit)->getID()];
 
-  for (iit = downItems.begin(); iit != downItems.end(); ++iit)
-    if ((*iit)->isBlocking(ispickupable) && !(ignoreMoveableBlocking && !(*iit)->isNotMoveable()))
-      return true;
+		if(((objectstate & BLOCK_PROJECTILE) == BLOCK_PROJECTILE)) {
+			if(iiType.blockProjectile)
+				return RET_CANNOTTHROW;
+			/*else
+				continue;*/
+		}
 
+		if((iiType.blockPathFind || iiType.blockSolid) && ((objectstate & BLOCK_PATHFIND) == BLOCK_PATHFIND) &&
+			!(ignoreMoveableBlocking && iiType.moveable))
+			return RET_THEREISNOWAY;
 
-  return false;
+		if(((objectstate & BLOCK_PICKUPABLE) == BLOCK_PICKUPABLE)) {			
+			if(iiType.blockSolid && (iiType.blockPickupable || iiType.pickupable))
+				return RET_NOTENOUGHROOM;
+		}
+
+		if(((objectstate & BLOCK_SOLID) == BLOCK_SOLID) && iiType.blockSolid &&
+			!(ignoreMoveableBlocking && iiType.moveable))
+			return RET_NOTENOUGHROOM;
+	}
+	
+	for (iit = downItems.begin(); iit != downItems.end(); ++iit) {
+		const ItemType& iiType = Item::items[(*iit)->getID()];
+
+		if(((objectstate & BLOCK_PROJECTILE) == BLOCK_PROJECTILE)) {
+			if(iiType.blockProjectile)
+				return RET_CANNOTTHROW;
+			/*else
+				continue;*/
+		}
+
+		if((iiType.blockPathFind || iiType.blockSolid) && ((objectstate & BLOCK_PATHFIND) == BLOCK_PATHFIND) &&
+			!(ignoreMoveableBlocking && iiType.moveable))
+			return RET_THEREISNOWAY;
+
+		if(((objectstate & BLOCK_PICKUPABLE) == BLOCK_PICKUPABLE)) {
+			if(iiType.blockSolid && (iiType.blockPickupable || iiType.pickupable))
+				return RET_NOTENOUGHROOM;
+		}
+
+		if(((objectstate & BLOCK_SOLID) == BLOCK_SOLID) && iiType.blockSolid &&
+			!(ignoreMoveableBlocking && iiType.moveable))
+			return RET_NOTENOUGHROOM;
+	}
+
+	//return false;
+	return RET_NOERROR;
 }
+
 bool Tile::floorChange() const
 {
   ItemVector::const_iterator iit;
-  if(ground && !(ground->noFloorChange() == true))
+  if(ground && ground->floorChange())
     return true;
 
   for (iit = topItems.begin(); iit != topItems.end(); ++iit){  
@@ -88,42 +142,41 @@ bool Tile::floorChange(Direction direction) const
   ItemVector::const_iterator iit;
   for (iit = topItems.begin(); iit != topItems.end(); ++iit){
     if(direction == NORTH){  
-         if ((*iit)->floorChangeNorth())
-         return true;
-      }
+			if ((*iit)->floorChangeNorth())
+				return true;
+		}
     else if(direction == SOUTH){
-         if ((*iit)->floorChangeSouth())
-         return true;
-         }
+			if ((*iit)->floorChangeSouth())
+				return true;
+		}
     else if(direction == EAST){
-         if ((*iit)->floorChangeEast())
-         return true;
-         }
+			if ((*iit)->floorChangeEast())
+				return true;
+		}
     else if(direction == WEST){
-         if ((*iit)->floorChangeWest())
-         return true;
-         }           
-      }
+			if ((*iit)->floorChangeWest())
+				return true;
+		}
+	}
 
   for (iit = downItems.begin(); iit != downItems.end(); ++iit){
     if(direction == NORTH){  
-         if ((*iit)->floorChangeNorth())
-         return true;
-      }
+			if ((*iit)->floorChangeNorth())
+				return true;
+		}
     else if(direction == SOUTH){
-         if ((*iit)->floorChangeSouth())
-         return true;
-         }
+			if ((*iit)->floorChangeSouth())
+				return true;
+		}
     else if(direction == EAST){
-         if ((*iit)->floorChangeEast())
-         return true;
-         }
+			if ((*iit)->floorChangeEast())
+				return true;
+		}
     else if(direction == WEST){
-         if ((*iit)->floorChangeWest())
-         return true;
-         } 
-      }
-
+			if ((*iit)->floorChangeWest())
+				return true;
+		}
+	}
 
   return false;
 }
@@ -222,14 +275,6 @@ int Tile::getThingCount() const
 
 std::string Tile::getDescription() const
 {
-/*	std::string ret;
-	std::cout << "Items: "<< size() << std::endl;
-	for(unsigned int i=0; i < size(); i++)
-		std::cout << "ID: "<< (*this)[i]->getID() << std::endl;
-	Tile::iterator it;
-	it=end();
-	it--;
-	ret=(*it)->getDescription();*/
   std::string ret="You dont know why, but you cant see anything!";
 	return ret;
 }
@@ -316,8 +361,6 @@ bool Tile::removeThing(Thing *thing)
     Item *item = dynamic_cast<Item*>(thing);
 		if(!item)
 			return false;
-		
-		bool ret = false;
 
     if (item->isAlwaysOnTop())
     {
@@ -325,22 +368,16 @@ bool Tile::removeThing(Thing *thing)
         if (*it == item)
         {
           topItems.erase(it);
-					ret = true;
-					break;
+					return true;
         }
     }
-    else
-    {
+    else {
       for (it = downItems.begin(); it != downItems.end(); ++it)
-        	if (*it == item)
-        	{
-          		downItems.erase(it);
-				ret = true;
-				break;
-        	}
-	}
-
-	return ret;
+        if (*it == item) {
+					downItems.erase(it);
+					return true;
+				}
+		}
   }
 
   return false;
@@ -440,21 +477,14 @@ Thing* Tile::getTopThing()
 		return ground;
 
 	return NULL;
-
-	/*
-	if(getThingCount() > 1) {
-		return getThingByStackPos(1);
-	}
-	else 
-		return getThingByStackPos(0);
-	*/
 }
 
 Item* Tile::getMoveableBlockingItem()
 {
 	for (ItemVector::const_iterator iit = downItems.begin(); iit != downItems.end(); ++iit)
 	{
-		if((*iit)->isBlocking() && !(*iit)->isNotMoveable())
+		const ItemType& iiType = Item::items[(*iit)->getID()];
+		if((iiType.blockPathFind || iiType.blockSolid) && iiType.moveable)
 			return *iit;
   	}
 	return NULL;

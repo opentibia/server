@@ -1961,20 +1961,20 @@ void Protocol74::autoCloseContainers(const Container *container, NetworkMessage 
 
 void Protocol74::sendCreatureTurn(const Creature *creature, unsigned char stackPos)
 {
-  //if (CanSee(creature->pos.x, creature->pos.y, creature->pos.z))
+	//if (CanSee(creature->pos.x, creature->pos.y, creature->pos.z))
   if (CanSee(creature))
   {
-    NetworkMessage msg;
+		NetworkMessage msg;
 
-    msg.AddByte(0x6B);
-    msg.AddPosition(creature->pos);
-    msg.AddByte(stackPos); 
+		msg.AddByte(0x6B);
+		msg.AddPosition(creature->pos);
+		msg.AddByte(stackPos); 
 
-    msg.AddByte(0x63);
-    msg.AddByte(0x00);
-    msg.AddU32(creature->getID());
-    msg.AddByte(creature->getDirection());
-	WriteBuffer(msg);
+		msg.AddByte(0x63);
+		msg.AddByte(0x00);
+		msg.AddU32(creature->getID());
+		msg.AddByte(creature->getDirection());
+		WriteBuffer(msg);
   }
 }
 

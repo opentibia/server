@@ -265,7 +265,8 @@ void Map::getSpectators(const Range& range, SpectatorVec& list)
 	}	
 }
 
-bool Map::canThrowItemTo(Position from, Position to, bool creaturesBlock /* = true*/, bool isProjectile /*= false*/)
+//bool Map::canThrowItemTo(Position from, Position to, bool creaturesBlock /* = true*/, bool isProjectile /*= false*/)
+ReturnValue Map::canThrowObjectTo(Position from, Position to, int objectstate /*= BLOCK_PROJECTILE*/)
 {
 	if(from.x > to.x) {
 		swap(from.x, to.x);
@@ -290,17 +291,29 @@ bool Map::canThrowItemTo(Position from, Position to, bool creaturesBlock /* = tr
 
 	for(int x = from.x; x != to.x; x += xstep) {
 		//cout << "x: " << (steep ? y : x) << ", y: " << (steep ? x : y) << std::endl;
-		t = getTile((steep ? y : x), (steep ? x : y), from.z);
 
-		if(t) {
-			if(isProjectile) {
-				if(t->isBlockingProjectile())
+		if(!(from.x == x && from.y == y)) {
+
+			t = getTile((steep ? y : x), (steep ? x : y), from.z);
+
+			if(t) {
+				//ReturnValue ret = t->isBlocking(((x == to.x && y == to.y) ? objectstate : BLOCK_PROJECTILE));
+				ReturnValue ret = t->isBlocking(objectstate);
+
+				if(ret != RET_NOERROR)
+					return ret;
+
+				/*
+				if(isProjectile) {
+					if(t->isBlockingProjectile())
+						return false;
+				}
+				else if(creaturesBlock && !t->creatures.empty())
 					return false;
+				else if(!(from.x == x && from.y == y) && t->isBlocking(BLOCK_SOLID | BLOCK_PROJECTILE))
+					return false;
+				*/
 			}
-			else if(creaturesBlock && !t->creatures.empty())
-				return false;
-			else if(!(from.x == x && from.y == y) && t->isBlocking())
-				return false;
 		}
 
 		error += deltaerr;
@@ -311,23 +324,42 @@ bool Map::canThrowItemTo(Position from, Position to, bool creaturesBlock /* = tr
 		}
 	}
 
-	return true;
+	return RET_NOERROR;
+	//return true;
 }
 
-bool Map::isPathValid(Creature *creature, const std::list<Position>& path, bool ignoreMoveableBlockingItems /*= false)*/)
+ReturnValue Map::isPathValid(Creature *creature, const std::list<Position>& path, int pathSize,
+	bool ignoreMoveableBlockingItems /*= false)*/)
 {
+	int pathCount = 0;
 	std::list<Position>::const_iterator iit;
 	for(iit = path.begin(); iit != path.end(); ++iit) {
 
-		Tile *t = getTile(iit->x, iit->y, iit->z);		
-		if(!t || t->isBlocking(false, ignoreMoveableBlockingItems) || (!t->creatures.empty() && (t->getCreature() != creature || t->creatures.size() > 1)))
-			return false;
+		Tile *t = getTile(iit->x, iit->y, iit->z);
+		if(t) {
+			ReturnValue ret = t->isBlocking(BLOCK_SOLID | BLOCK_PATHFIND, false, ignoreMoveableBlockingItems);
+			if(ret == RET_CREATUREBLOCK && t->getCreature() == creature && t->creatures.size() == 1)
+				ret = RET_NOERROR;
+
+			if(ret != RET_NOERROR) {
+				//std::cout << "isPathValid - false: " << (int) ret << std::endl;
+				return ret;
+			}
+		}
+		else
+			return RET_NOTILE;
+			//return false;
+
+		if(pathCount++ >= pathSize)
+			return RET_NOERROR;
 	}
 
-	return true;
+	return RET_NOERROR;
+	//return true;
 }
 
-std::list<Position> Map::getPathTo(Creature *creature, Position start, Position to, bool creaturesBlock /*=true*/, bool ignoreMoveableBlockingItems /*= false*/){
+std::list<Position> Map::getPathTo(Creature *creature, Position start, Position to,
+	bool creaturesBlock /*=true*/, bool ignoreMoveableBlockingItems /*= false*/, int maxNodSize /*= 100*/){
 	std::list<Position> path;
 /*	if(start.z != to.z)
 		return path;
@@ -344,7 +376,7 @@ std::list<Position> Map::getPathTo(Creature *creature, Position start, Position 
 	startNode->y=start.y;
 	AStarNode* found = NULL;
 	openNodes.push_back(startNode);
-	while(!found && closedNodes.size() < 100){
+	while(!found && closedNodes.size() < maxNodSize){
 		//get best node from open list
 		openNodes.sort(lessPointer<AStarNode>());
 		if(openNodes.size() == 0)
@@ -354,15 +386,22 @@ std::list<Position> Map::getPathTo(Creature *creature, Position start, Position 
 		closedNodes.push_back(current);
 		for(int dx=-1; dx <= 1; dx++){
 			for(int dy=-1; dy <= 1; dy++){
-				if(abs(dx) != abs(dy)){
+				if(std::abs(dx) != std::abs(dy)){
 					int x = current->x + dx;
 					int y = current->y + dy;
 
 					Tile *t = getTile(x, y, z);
-					if(!t || t->isBlocking(false,ignoreMoveableBlockingItems) ||
-						(creaturesBlock && !t->creatures.empty() && (t->getCreature() != creature || t->creatures.size() > 1)) ||
-							t->floorChange() || t->getTeleportItem())
-					continue;
+					if(t) {
+						ReturnValue ret = t->isBlocking(BLOCK_SOLID | BLOCK_PATHFIND, !creaturesBlock, ignoreMoveableBlockingItems);
+						if(ret == RET_CREATUREBLOCK && t->getCreature() == creature && t->creatures.size() == 1)
+							ret = RET_NOERROR;
+
+						if(ret != RET_NOERROR) {
+							continue;
+						}
+					}
+					else
+						continue;
 
 					bool isInClosed = false;
 					for(std::list<AStarNode*>::iterator it = closedNodes.begin();
@@ -431,8 +470,8 @@ std::list<Position> Map::getPathTo(Creature *creature, Position start, Position 
 		delete *it;
 	}
 	
-	for(std::list<Position>::iterator it = path.begin(); it != path.end(); it++){
+	/*for(std::list<Position>::iterator it = path.begin(); it != path.end(); it++){
 		Position p = *it;
-	}
+	}*/
 	return path;
 }

@@ -260,11 +260,28 @@ Item::~Item()
 
 bool Item::canMovedTo(const Tile *tile) const
 {
+	/*
 	if(isBlocking() && !tile->creatures.empty())
 		return false;
 
 	return !tile->isBlocking(isPickupable());
-	//return Thing::canMovedTo(tile);
+	*/
+
+	if(tile) {
+		int objectstate = 0;
+
+		if(isPickupable()) {
+			objectstate |= BLOCK_PICKUPABLE;
+		}
+
+		if(isBlocking()) {
+			objectstate |= BLOCK_SOLID;
+		}
+
+		return (tile->isBlocking(objectstate) == RET_NOERROR);
+	}
+
+	return false;
 }
 
 int Item::unserialize(xmlNodePtr p){
@@ -348,17 +365,9 @@ xmlNodePtr Item::serialize(){
 	return ret;
 }
 
-bool Item::isBlockingProjectile() const {
+bool Item::isBlocking() const {
 	const ItemType& it = items[id];
-	return it.blockingProjectile;
-}
-
-bool Item::isBlocking(bool ispickupable /*= false*/) const {
-	const ItemType& it = items[id];
-	if(ispickupable && it.blocking)
-		return it.blockpickupable;
-	else
-		return it.blocking;
+	return it.blockSolid;
 }
 
 bool Item::isStackable() const {
@@ -378,7 +387,7 @@ bool Item::isAlwaysOnTop() const {
 }
 
 bool Item::isNotMoveable() const {
-	return items[id].notMoveable;
+	return !items[id].moveable;
 }
 
 bool Item::isGroundTile() const {
@@ -397,8 +406,8 @@ bool Item::isUseable() const{
 	return items[id].useable;
 }
 
-bool Item::noFloorChange() const {
-	return items[id].noFloorChange;
+bool Item::floorChange() const {
+	return items[id].floorChange;
 }
 
 bool Item::floorChangeNorth() const {

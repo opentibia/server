@@ -183,7 +183,9 @@ int Actions::canUseFar(const Player *player,const Position &to_pos, const bool b
 	if(player->pos.x - to_pos.x > 7 || player->pos.y - to_pos.y > 5 || player->pos.z != to_pos.z){
 		return 1;
 	}
-	if(blockWalls && !game->map->canThrowItemTo(player->pos, to_pos, false, true)){
+	
+	if(blockWalls && (game->map->canThrowObjectTo(player->pos, to_pos, BLOCK_PROJECTILE) != RET_NOERROR)){
+	//if(blockWalls && !game->map->canThrowItemTo(player->pos, to_pos, false, true)){
 		return 2;
 	}
 	return 0;

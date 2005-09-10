@@ -119,7 +119,8 @@ void GameState::onAttack(Creature* attacker, const Position& pos, const MagicEff
 	}
 
 	//Solid ground items/Magic items (fire/poison/energy)
-	MagicEffectItem *newmagicItem = me->getMagicItem(attacker, tile->isPz(), tile->isBlocking());
+	MagicEffectItem *newmagicItem = me->getMagicItem(attacker, tile->isPz(),
+		(tile->isBlocking(BLOCK_SOLID, true) != RET_NOERROR));
 
 	if(newmagicItem) {
 
@@ -280,6 +281,7 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 	//Remove player?
 	if(attackedCreature->health <= 0 && attackedCreature->isRemoved == false) {
 		unsigned char stackpos = tile->getThingStackPos(attackedCreature);		
+		
 		//Prepare body
 		Item *corpseitem = Item::CreateItem(attackedCreature->getLookCorpse());
 		corpseitem->pos = CreaturePos;
@@ -300,6 +302,7 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 		// Update attackedCreature pos because contains
 		//  temple position for players
 		attackedCreature->pos = CreaturePos;
+
 		//add body
 		game->sendAddThing(NULL,corpseitem->pos,corpseitem);
 		
@@ -328,7 +331,7 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 			// because was removed
 			attackedplayer->onThingAppear(corpseitem);
 		}
-		game->startDecay(corpseitem);	
+		game->startDecay(corpseitem);
 		
 		//Get all creatures that will gain xp from this kill..
 		CreatureState* attackedCreatureState = NULL;
@@ -419,6 +422,9 @@ Game::Game()
 
 Game::~Game()
 {
+	if(map) {
+		delete map;
+	}
 }
 
 void Game::setWorldType(enum_world_type type)
@@ -634,7 +640,6 @@ Tile* Game::getTile(unsigned short _x, unsigned short _y, unsigned char _z)
 	return map->getTile(_x, _y, _z);
 }
 
-
 void Game::setTile(unsigned short _x, unsigned short _y, unsigned char _z, unsigned short groundId)
 {
 	map->setTile(_x, _y, _z, groundId);	
@@ -729,6 +734,7 @@ bool Game::placeCreature(Position &pos, Creature* c)
 			else{
 				c->eventCheck = addEvent(makeTask(500, std::bind2nd(std::mem_fun(&Game::checkCreature), c->getID())));
 			}
+
 			//c->eventCheckAttacking = addEvent(makeTask(2000, std::bind2nd(std::mem_fun(&Game::checkCreatureAttacking), c->getID())));
 		}
 	}
@@ -875,9 +881,33 @@ bool Game::onPrepareMoveThing(Creature *player, const Thing* thing,
 		player->sendCancel("Destination is out of reach.");
 		return false;
 	}
-	else if(!map->canThrowItemTo(fromPos, toPos, false)) {
-		player->sendCancel("You cannot throw there.");
-		return false;
+	else {
+		ReturnValue ret = map->canThrowObjectTo(fromPos, toPos, BLOCK_PROJECTILE);
+		if(ret != RET_NOERROR) {
+			player->sendCancel("You cannot throw there.");
+			return false;
+		}
+
+		const Item* item = dynamic_cast<const Item*>(thing);
+		if(item) {
+			int blockstate = 0;
+			if(item->isBlocking())
+				blockstate |= BLOCK_SOLID;
+
+			if(item->isPickupable())
+				blockstate |= BLOCK_PICKUPABLE;
+
+			if(blockstate != 0) {
+				switch(map->canThrowObjectTo(fromPos, toPos, blockstate)) {
+					case RET_NOERROR: return true;
+					case RET_NOTENOUGHROOM: player->sendCancel("Not enough room."); break;
+
+					default:
+						player->sendCancel("Sorry not possible.");
+						break;
+				}
+			}
+		}
 	}
 	
 	return true;
@@ -893,11 +923,11 @@ bool Game::onPrepareMoveThing(Creature *creature, const Thing* thing,
 	const Creature* movingCreature = dynamic_cast<const Creature*>(thing);
 	const Player* movingPlayer = dynamic_cast<const Player*>(thing);
 	
-	if(item && (!toTile || !item->canMovedTo(toTile))) {
+	if(item && !item->canMovedTo(toTile)) {
 	 	creature->sendCancel("Sorry, not possible.");
 		return false;
 	}
-	else if(movingCreature && (!toTile || !thing->canMovedTo(toTile)) ) {
+	else if(movingCreature && !movingCreature->canMovedTo(toTile)) {
     if(player) {
 		  player->sendTextMessage(MSG_SMALLINFO, "Sorry, not possible.");
 		  player->sendCancelWalk();
@@ -933,7 +963,7 @@ bool Game::onPrepareMoveThing(Creature *creature, const Thing* thing,
 		return false;
 	}
 
-	return thing->canMovedTo(toTile);
+	return true; //return thing->canMovedTo(toTile);
 }
 
 /*inventory -> container*/
@@ -2260,7 +2290,7 @@ void Game::thingMoveInternal(Creature *creature, unsigned short from_x, unsigned
 			}
 
 			//change level begin
-			if(toTile->ground && !(toTile->ground->noFloorChange()))
+			if(toTile->ground && toTile->ground->floorChange())
 			{       
 				Tile* downTile = getTile(to_x, to_y, to_z+1);
 				if(downTile){        
@@ -2739,8 +2769,9 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 	for(MagicAreaVec::iterator maIt = tmpMagicAreaVec.begin(); maIt != tmpMagicAreaVec.end(); ++maIt) {
 		Tile *t = map->getTile(maIt->x, maIt->y, maIt->z);
 		if(t && (!creature || (creature->access != 0 || !me->offensive || !t->isPz()) ) ) {
-			if(!t->isBlockingProjectile() && (me->isIndirect() ||
-				(map->canThrowItemTo(frompos, (*maIt), false, true) && !t->floorChange()))) {
+			if((t->isBlocking(BLOCK_PROJECTILE) == RET_NOERROR) && (me->isIndirect() ||
+				//(map->canThrowItemTo(frompos, (*maIt), false, true) && !t->floorChange()))) {
+				((map->canThrowObjectTo(frompos, (*maIt), BLOCK_PROJECTILE) == RET_NOERROR) && !t->floorChange()))) {
 				
 				if(maIt->x < topLeft.x)
 					topLeft.x = maIt->x;
@@ -2783,10 +2814,10 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 	bool isBlocking = true;
 	if(targettile){
 		hasTarget = !targettile->creatures.empty();
-		isBlocking = targettile->isBlocking();
+		isBlocking = (targettile->isBlocking(BLOCK_SOLID, true) != NO_ERROR);
 	}
 
-	if(targettile && me->canCast(targettile->isBlocking(), !targettile->creatures.empty())) {
+	if(targettile && me->canCast(isBlocking, !targettile->creatures.empty())) {
 		bSuccess = true;
 
 		//Apply the permanent effect to the map
@@ -2935,7 +2966,8 @@ bool Game::creatureThrowRune(Creature *creature, const Position& centerpos, cons
 	if(creature->pos.z != centerpos.z) {	
 		creature->sendCancel("You need to be on the same floor.");
 	}
-	else if(!map->canThrowItemTo(creature->pos, centerpos, false, true)) {		
+	//else if(!map->canThrowItemTo(creature->pos, centerpos, false, true)) {		
+	else if(map->canThrowObjectTo(creature->pos, centerpos, BLOCK_PROJECTILE) != RET_NOERROR) {
 		creature->sendCancel("You cannot throw there.");
 	}
 	else
@@ -3049,7 +3081,8 @@ void Game::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fi
 				(std::abs(creature->pos.y-attackedCreature->pos.y) <= 5) &&
 				(creature->pos.z == attackedCreature->pos.z)) {
 
-					if(map->canThrowItemTo(creature->pos, attackedCreature->pos, false, true))
+					//if(map->canThrowItemTo(creature->pos, attackedCreature->pos, false, true))
+					if(map->canThrowObjectTo(creature->pos, attackedCreature->pos, BLOCK_PROJECTILE) == RET_NOERROR)
 						inReach = true;
 				}
 		break;
@@ -3058,7 +3091,8 @@ void Game::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fi
 				(std::abs(creature->pos.y-attackedCreature->pos.y) <= 5) &&
 				(creature->pos.z == attackedCreature->pos.z)) {
 
-					if(map->canThrowItemTo(creature->pos, attackedCreature->pos, false, true))
+					//if(map->canThrowItemTo(creature->pos, attackedCreature->pos, false, true))
+					if(map->canThrowObjectTo(creature->pos, attackedCreature->pos, BLOCK_PROJECTILE) == RET_NOERROR)
 						inReach = true;
 				}	
 		break;

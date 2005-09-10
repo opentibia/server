@@ -42,19 +42,19 @@ class Tile
 public:
   Creature* getCreature() const{
 		if(creatures.size())
-    		return creatures[0];
-    	else
-    		return NULL;
+			return creatures[0];
+		else
+			return NULL;
   }
 
   Tile()
   {
-    pz               = false;
-    splash           = NULL;
-		ground           = NULL;
+    pz     = false;
+    splash = NULL;
+		ground = NULL;
   }
 
-  Item*           ground;
+  Item*          ground;
   Item*          splash;
   ItemVector     topItems;
   CreatureVector creatures;
@@ -79,8 +79,9 @@ public:
   Thing* getTopThing();
 	Thing* getThingByStackPos(int pos);
 
-  bool isBlockingProjectile() const;
-	bool isBlocking(bool ispickupable = false, bool ignoreMoveableBlocking = false) const;
+  //bool isBlockingProjectile() const;
+	//bool isBlocking(bool ispickupable = false, bool ignoreMoveableBlocking = false) const;
+	ReturnValue isBlocking(int objectstate, bool ignoreCreature = false, bool ignoreMoveableBlocking = false) const;
 
   bool isPz() const;
   void setPz();
@@ -91,7 +92,6 @@ public:
   std::string getDescription() const;
 
 protected:
-
   bool pz;
 };
 

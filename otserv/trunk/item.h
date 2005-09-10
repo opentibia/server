@@ -38,7 +38,7 @@ class Player;
 class Item : public Thing
 {
 protected:
-    unsigned id;  // the same id as in ItemType
+	unsigned id;  // the same id as in ItemType
 	unsigned char count; // number of stacked items
 	unsigned char chargecount; //number of charges on the item
 	unsigned char fluid;
@@ -67,11 +67,12 @@ public:
 	int getRWInfo() const;
 	int getWorth() const;
 		
-	bool isBlockingProjectile() const;
-	bool isBlocking(bool ispickupable = false) const;
+	//bool isBlockingProjectile() const;
+	bool isBlocking() const;
+	//bool isBlocking(bool ispickupable = false) const;
 	bool isStackable() const;
 	bool isFluidContainer() const;
-    bool isMultiType() const;
+	bool isMultiType() const;
 	bool isAlwaysOnTop() const;
 	bool isGroundTile() const;
 	bool isSplash() const;
@@ -80,7 +81,7 @@ public:
 	bool isWeapon() const;
 	bool isUseable() const;
 	//bool isContainer() const;
-	bool noFloorChange() const;
+	bool floorChange() const;
 	bool floorChangeNorth() const;
 	bool floorChangeSouth() const;
 	bool floorChangeEast() const;
@@ -99,7 +100,7 @@ public:
 	virtual xmlNodePtr serialize();
 
   // get the number of items
-  unsigned short getItemCountOrSubtype() const;
+	unsigned short getItemCountOrSubtype() const;
 	void setItemCountOrSubtype(unsigned char n);
 
 	unsigned char getItemCharge() const {return chargecount;};
@@ -125,13 +126,13 @@ public:
 	bool isDecaying;
 
   // Constructor for items
-  Item(const unsigned short _type);
-  Item(const unsigned short _type, unsigned short _count);
+	Item(const unsigned short _type);
+	Item(const unsigned short _type, unsigned short _count);
 	Item();
 	Item(const Item &i);
 
-  virtual ~Item();
-  virtual void useThing() {
+	virtual ~Item();
+	virtual void useThing() {
 		//std::cout << "Item: useThing() " << this << std::endl;
 		useCount++;
 	};

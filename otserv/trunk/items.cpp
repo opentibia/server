@@ -30,31 +30,39 @@
 ItemType::ItemType()
 {
 	iscontainer     = false;
-	ismagicfield 	= false;
-	RWInfo			= 0;
-	readonlyId		= 0;
+	ismagicfield    = false;
+	RWInfo          = 0;
+	readonlyId      = 0;
 	fluidcontainer	= false;		
-	iskey			= false;
+	iskey           = false;
 	stackable       = false;
 	multitype       = false;
 	useable	        = false;
-	notMoveable     = false;
+	//notMoveable   = false;
+	moveable        = true;
 	alwaysOnTop     = false;
 	groundtile      = false;
-	issplash		= false;
-	blocking        = false; // people can walk on it
+	issplash		    = false;
 	pickupable      = false; // people can pick it up
-	blockingProjectile = false;
 	canWalkThrough = false;
-	noFloorChange = false;
+	//noFloorChange = false;
+	floorChange = true;
 	floorChangeNorth = false;
 	floorChangeSouth = false;
 	floorChangeEast = false;
 	floorChangeWest = false;
-	blockpickupable = true;
+
+	//blocking      = false; // people can walk on it
+	//blockingProjectile = false;
+	//blockpickupable = true;
+
+	blockSolid = false;
+	blockPickupable = true;
+	blockProjectile = false;
+	blockPathFind = false;
 	
-	isDoor = false;
-	isDoorWithLock = false;
+	//isDoor = false;
+	//isDoorWithLock = false;
 	
 	isteleport = false;
 	
@@ -157,9 +165,9 @@ int Items::loadFromDat(std::string file)
 				//is groundtile	   				
 				iType->groundtile = true;
 				iType->speed=(int)fgetc(f);
-				if(iType->speed==0) {
+				/*if(iType->speed==0) {
 					iType->blocking=true;
-				}
+				}*/
 				fgetc(f);
 				break;
 				
@@ -194,13 +202,13 @@ int Items::loadFromDat(std::string file)
 				
 			case 0x0B:
 				//is blocking
-				iType->blocking=true;
+				iType->blockSolid=true;
 				//std::cout << "0x0B\t"<< (int) id << std::endl;
 				break;
 				
 			case 0x0C:
-				//is on moveable
-				iType->notMoveable=true;
+				//is not moveable
+				iType->moveable=false;
 				break;
 				
 			case 0x0F:
@@ -211,9 +219,10 @@ int Items::loadFromDat(std::string file)
 			case 0x10:
 				//makes light (skip 4 bytes)
 				fgetc(f); //number of tiles around
-				fgetc(f); // always 0
-				fgetc(f); // 215 items, 208 fe non existant items other values
-				fgetc(f); // always 0
+				fgetc(f);
+
+				fgetc(f); // light color
+				fgetc(f);
 				break;
 				
 			case 0x06: // ladder up (id 1386)   why a group for just 1 item ???   
@@ -222,39 +231,56 @@ int Items::loadFromDat(std::string file)
 				iType->fluidcontainer = true;
 				break;
 			case 0x0D: // blocks missiles (walls, magic wall etc)
-				iType->blockingProjectile = true;
+				iType->blockProjectile = true;
 				//std::cout << "0x0D\t"<< (int) id << std::endl;
 				break;
 			case 0x0E: // blocks monster movement (flowers, parcels etc)
+				iType->blockPathFind = true;
 				break;
 			case 0x11: // can see what is under (ladder holes, stairs holes etc)
 				break;
 			case 0x12: // ground tiles that don't cause level change
-				iType->noFloorChange = true;
+				iType->floorChange = false;
 				break;
-			case 0x18: // cropses that don't decay
+			case 0x18: //draw with height offset for all parts (2x2) of the sprite
 				break;
 				/*case 0x19: //(changed to 0x1C in 7.4) monster has animation even when iddle (rot, wasp, slime, fe)
 				break;*/
 			case 0x14: // player color templates
 				break;
 				
-			case 0x07: // writtable objects					
+			case 0x07: // writtable objects
+			{
 				iType->RWInfo |= CAN_BE_WRITTEN | CAN_BE_READ;
-				fgetc(f); //max characters that can be written in it (0 unlimited)
-				fgetc(f); //max number of  newlines ? 0, 2, 4, 7                    
+
+				unsigned short subopt;
+				subopt = fgetc(f);
+				subopt += fgetc(f) << 8;
+
+				//std::cout << "id:" << (int) id << "0x07: " << (int) subopt << std::endl;
+
+				//fgetc(f); //max characters that can be written in it (0 unlimited)
+				//fgetc(f); //max number of  newlines ? 0, 2, 4, 7                    
 				break;
-			case 0x08: // writtable objects that can't be edited 					
+			}
+			case 0x08: // writtable objects that can't be edited
+			{
 				iType->RWInfo |= CAN_BE_READ;
-				fgetc(f); //always 0 max characters that can be written in it (0 unlimited) 
-				fgetc(f); //always 4 max number of  newlines ? 
+				unsigned short subopt;
+				subopt = fgetc(f);
+				subopt += fgetc(f) << 8;
+
+				//std::cout << "id:" << (int) id << "0x08: " << (int) subopt << std::endl;
+				//fgetc(f); //always 0 max characters that can be written in it (0 unlimited) 
+				//fgetc(f); //always 4 max number of  newlines ? 
 				break;
-			case 0x13: // mostly blocking items, but also items that can pile up in level (boxes, chairs etc)
-				iType->blockpickupable = false;
+			}
+			case 0x13: //items that have height
+				iType->blockPickupable = false;
 				//std::cout << "0x13: " << id << std::endl;
 				
-				fgetc(f); //always 8
-				fgetc(f); //always 0
+				fgetc(f); //height offset
+				fgetc(f);
 				break;
 			case 0x16: //for minimap drawing					
 				//0: black color - tar
@@ -276,23 +302,12 @@ int Items::loadFromDat(std::string file)
 				unsigned short subopt;
 				subopt = fgetc(f);
 				subopt += fgetc(f) << 8;
-				
-				//std::cout << "0x16\t"<< (int) id << ": " << (int) subopt << std::endl;
-				
-				//a = fgetc(f); //12, 186, 210, 129 and other.. 
-				//std::cout << (int) id << ": ";
-				//std::cout << "\t" << "byte 1: "<< (int) a;
-				//a = fgetc(f); //always 0
-				//std::cout << "\t" << "byte 2: "<< (int) a << std::endl;
-				//if(a == 210)
-				//printf("%d - %d %d\n", iType->id, a);
-				//iType->floorChange = true;
 				break;
-			case 0x1A: 
+			case 0x1A: //unknown
 				//7.4 (change no data ?? ) action that can be performed (doors-> open, hole->open, book->read) not all included ex. wall torches
 				break;
 				//new from 7.4    
-			case 0x1D:  // line spot ...
+			case 0x1D:  // Ctrl+H
 				optbyte = fgetc(f); // 86 -> openable holes, 77-> can be used to go down, 76 can be used to go up, 82 -> stairs up, 79 switch,
 				switch(optbyte){
 				case 0x4C: //ladders
@@ -304,12 +319,8 @@ int Items::loadFromDat(std::string file)
 				case 0x4F: //switch
 					break;
 				case 0x50: //doors
-					iType->isDoor = true;
-					//std::cout << "0x1D\t0x50\t"<< (int) id << std::endl;
 					break;
 				case 0x51: //doors with locks
-					iType->isDoorWithLock = true;
-					//std::cout << "0x1D\t0x51\t"<< (int) id << std::endl;
 					break;
 				case 0x52: //stairs
 					break;
@@ -332,7 +343,7 @@ int Items::loadFromDat(std::string file)
 				}
 				fgetc(f); // always value 4
 				break;         
-			case 0x1B:  // walls 2 types of them same material (total 4 pairs)                  
+			case 0x1B:  // walls 2 types of them same material (total 4 pairs)
 				break;
 				
 			case 0x19:  // wall items                 
@@ -444,13 +455,13 @@ int Items::loadXMLInfos(std::string file)
 					
 					char* blockingProjectile = (char*)xmlGetProp(p, (xmlChar*)"blockingprojectile");
 					if(blockingProjectile){
-						itemtype->blockingProjectile = true;
+						itemtype->blockProjectile = true;
 						xmlFreeOTSERV(blockingProjectile);
 					}
 					
-                    char* floorChange = (char*)xmlGetProp(p, (xmlChar*)"floorchange");
+					char* floorChange = (char*)xmlGetProp(p, (xmlChar*)"floorchange");
 					if(floorChange){
-						itemtype->noFloorChange = false;
+						itemtype->floorChange = true;
 						xmlFreeOTSERV(floorChange);
 					}
 					

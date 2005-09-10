@@ -109,7 +109,7 @@ private:
 		minRange.x = -9; //minRange.x = -8;
 		minRange.y = -7; //minRange.y = -6;
 		
-    	//just the visible ones
+		//just the visible ones
 		maxRange.x = 9; //maxRange.x = 8;
 		maxRange.y = 7; //maxRange.y = 6;
 		
@@ -213,9 +213,11 @@ class Map {
 	 *	\param isProjectile Takes into consideration for windows/door-ways.
 	 *	\returns The result if you can throw there or not
 	 */
-		bool canThrowItemTo(Position from, Position to, bool creaturesBlock  = true, bool isProjectile = false);
+		//bool canThrowItemTo(Position from, Position to, bool creaturesBlock  = true, bool isProjectile = false);
+		ReturnValue canThrowObjectTo(Position from, Position to, int objectstate = BLOCK_PROJECTILE);
 
-		bool isPathValid(Creature *creature, const std::list<Position>& path, bool ignoreMoveableBlockingItems = false);
+		ReturnValue isPathValid(Creature *creature, const std::list<Position>& path, int pathSize,
+			bool ignoreMoveableBlockingItems = false);
 
 	/**
 	  * Get the path to a specific position on the map.
@@ -225,7 +227,8 @@ class Map {
 	  * \param creaturesBlock Wether a Creature is an obstacle or not
 	  * \returns A list of all positions you have to traverse to reacg the destination
 	  */
-	std::list<Position> getPathTo(Creature* creature, Position start, Position to, bool creaturesBlock = true, bool ignoreMoveableBlockingItems = false);
+	std::list<Position> getPathTo(Creature* creature, Position start, Position to,
+		bool creaturesBlock = true, bool ignoreMoveableBlockingItems = false, int maxNodSize = 100);
 
 	
 	/* Map Width and Height - for Info purposes */

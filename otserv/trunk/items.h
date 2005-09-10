@@ -84,24 +84,30 @@ public:
 	bool						stackable;
 	bool						multitype;
 	bool						useable;
-	bool						notMoveable;
+	bool						moveable;
+	//bool						notMoveable;
 	bool						alwaysOnTop;
 	bool						groundtile;
 	bool						issplash;
 	int							runeMagLevel;
-	bool						blocking;						// people can walk on it
-	bool						pickupable;					// people can pick it up
-	bool						blockingProjectile;
+	bool						floorChange;
+	//bool						blocking;						// people can walk on it
+	bool						pickupable;					  // people can pick it up
+	//bool						blockingProjectile;
 	bool						canWalkThrough;
-	bool						noFloorChange;
+	//bool						noFloorChange;
 	bool						floorChangeNorth;
 	bool						floorChangeSouth;
 	bool						floorChangeEast;
 	bool						floorChangeWest;
 	bool						blockpickupable;
 
-	bool						isDoor;
-	bool						isDoorWithLock;
+	//bool						isDoor;
+	//bool						isDoorWithLock;
+	bool blockSolid;
+	bool blockPickupable;
+	bool blockProjectile;
+	bool blockPathFind;
 };
 
 
