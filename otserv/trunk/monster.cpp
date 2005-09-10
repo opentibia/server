@@ -1889,7 +1889,7 @@ bool Monster::canMoveTo(unsigned short x, unsigned short y, unsigned char z)
 {
 	Tile *t = game->map->getTile(x, y, pos.z);
 	if(t) {
-		return (t->isBlocking(BLOCK_SOLID | /*BLOCK_PATHFIND |*/ BLOCK_PZ, false, canPushItems) == RET_NOERROR);
+		return (t->isBlocking(BLOCK_SOLID /*| BLOCK_PATHFIND*/ | BLOCK_PZ, false, canPushItems) == RET_NOERROR);
 	}
 
 	return false;
