@@ -140,13 +140,14 @@ Player::Player(const std::string& name, Protocol *p) :
 Player::~Player()
 {
 	for (int i = 0; i < 11; i++) {
-		if (items[i])
-      //delete items[i];
-      items[i]->releaseThing();
+		if (items[i]) {
+			items[i]->releaseThing();
+		}
 	}
+
 	DepotMap::iterator it;
 	for(it = depots.begin();it != depots.end(); it++){
-      	it->second->releaseThing();
+		it->second->releaseThing();
 	}
 	//std::cout << "Player destructor " << this->getID() << std::endl;
   delete client;
