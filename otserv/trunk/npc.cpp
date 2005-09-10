@@ -231,12 +231,12 @@ Npc::~Npc()
 
 std::string Npc::getDescription(bool self) const
 {
-    std::stringstream s;
+	std::stringstream s;
 	std::string str;	
-	s << "You see " << name << ".";
+	s << name << ".";
 	str = s.str();
 	return str;
-            }
+}
             
 void Npc::onThingMove(const Player *player, const Thing *thing, const Position *oldPos,
 	unsigned char oldstackpos, unsigned char oldcount, unsigned char count){
