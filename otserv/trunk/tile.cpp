@@ -35,7 +35,6 @@ ReturnValue Tile::isBlocking(int objectstate, bool ignoreCreature /* = false*/, 
 		return RET_PROTECTIONZONE;
 	}
 
-	
 	if(((objectstate & BLOCK_PATHFIND) == BLOCK_PATHFIND) && (floorChange() || getTeleportItem())) {
 		return RET_THEREISNOWAY;
 	}

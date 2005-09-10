@@ -727,12 +727,13 @@ bool Monster::isCreatureAttackable(const Creature* creature)
 
 bool Monster::validateDistanceAttack(const Creature *target)
 {
-	return isInRange(pos) && game->map->canThrowItemTo(this->pos, target->pos, false, true);
+	//return isInRange(pos) && game->map->canThrowItemTo(this->pos, target->pos, false, true);
+	return isInRange(pos) && (game->map->canThrowObjectTo(this->pos, target->pos, BLOCK_PROJECTILE) == RET_NOERROR);
 }
 
 bool Monster::validateDistanceAttack(const Position &pos)
 {
-	return isInRange(pos) && game->map->canThrowItemTo(this->pos, pos, false, true);
+	return isInRange(pos) && (game->map->canThrowObjectTo(this->pos, pos, BLOCK_PROJECTILE) == RET_NOERROR);
 }
 
 bool Monster::isCreatureReachable(const Creature* creature)
@@ -1073,7 +1074,8 @@ bool Monster::getDistancePosition(const Position &target, const int& maxTryDist,
 
 			if(tryDist <= (maxTryDist * maxTryDist) && (tryDist >= prevDist) && (tryDist > (minTryDist * minTryDist))) {
 
-				if(!game->map->canThrowItemTo(tmpPos, target, false, true))
+				//if(!game->map->canThrowItemTo(tmpPos, target, false, true))
+				if(game->map->canThrowObjectTo(tmpPos, target, BLOCK_PROJECTILE) == RET_NOERROR)
 					continue;
 
 				if(tmpPos != this->pos) {
@@ -1104,8 +1106,8 @@ bool Monster::getDistancePosition(const Position &target, const int& maxTryDist,
 
 	if(positionList.empty()){
 		dest = this->pos;
-		//dest = target;
-		return currentDistance <= maxTryDist && game->map->canThrowItemTo(this->pos, target, false, true);
+		return currentDistance <= maxTryDist && (game->map->canThrowObjectTo(this->pos, target, BLOCK_PROJECTILE) == RET_NOERROR);
+		//return currentDistance <= maxTryDist && game->map->canThrowItemTo(this->pos, target, false, true);
 	}
 
 	size_t index = random_range(0, positionList.size() - 1);
@@ -1867,10 +1869,9 @@ bool Monster::monsterMoveItem(Item* item, int radius)
 	for(int i = 0; i < 4*radius; i++){
 		tryPos.x = item->pos.x + rand() % radius;
 		tryPos.y = item->pos.y + rand() % radius;
-		if(game->map->canThrowItemTo(item->pos,tryPos)){
-			//game->thingMove(this, item ,tryPos.x, tryPos.y, tryPos.z, itemCount);
-
-			Tile *fromTile = game->getTile(item->pos.x, item->pos.y, item->pos.z);
+		//if(game->map->canThrowItemTo(item->pos,tryPos)){
+		if(game->map->canThrowObjectTo(item->pos, tryPos, BLOCK_SOLID) == RET_NOERROR){
+			Tile* fromTile = game->getTile(item->pos.x, item->pos.y, item->pos.z);
 			int oldstackpos = fromTile->getThingStackPos(item);
 
 			game->thingMoveInternal(this, item->pos.x, item->pos.y, item->pos.z,
@@ -1883,8 +1884,17 @@ bool Monster::monsterMoveItem(Item* item, int radius)
 	}
 	return false;
 }
+
 bool Monster::canMoveTo(unsigned short x, unsigned short y, unsigned char z)
 {
+	Tile *t = game->map->getTile(x, y, pos.z);
+	if(t) {
+		return (t->isBlocking(BLOCK_SOLID | /*BLOCK_PATHFIND |*/ BLOCK_PZ, false, canPushItems) == RET_NOERROR);
+	}
+
+	return false;
+
+	/*
 	Tile *t;
 	if((!(t = game->map->getTile(x, y, pos.z))) ||
 		t->isBlocking() ||
@@ -1897,4 +1907,5 @@ bool Monster::canMoveTo(unsigned short x, unsigned short y, unsigned char z)
 	else{
 		return true;
 	}
+	*/
 }
