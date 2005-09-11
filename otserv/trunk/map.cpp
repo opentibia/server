@@ -337,7 +337,7 @@ ReturnValue Map::isPathValid(Creature *creature, const std::list<Position>& path
 
 		Tile *t = getTile(iit->x, iit->y, iit->z);
 		if(t) {
-			ReturnValue ret = t->isBlocking(BLOCK_SOLID /*| BLOCK_PATHFIND*/, false, ignoreMoveableBlockingItems);
+			ReturnValue ret = t->isBlocking(BLOCK_SOLID | BLOCK_PATHFIND, false, ignoreMoveableBlockingItems);
 			if(ret == RET_CREATUREBLOCK && t->getCreature() == creature && t->creatures.size() == 1)
 				ret = RET_NOERROR;
 
@@ -392,7 +392,7 @@ std::list<Position> Map::getPathTo(Creature *creature, Position start, Position 
 
 					Tile *t = getTile(x, y, z);
 					if(t) {
-						ReturnValue ret = t->isBlocking(BLOCK_SOLID /*| BLOCK_PATHFIND*/, !creaturesBlock, ignoreMoveableBlockingItems);
+						ReturnValue ret = t->isBlocking(BLOCK_SOLID | BLOCK_PATHFIND, !creaturesBlock, ignoreMoveableBlockingItems);
 						if(ret == RET_CREATUREBLOCK && t->getCreature() == creature && t->creatures.size() == 1)
 							ret = RET_NOERROR;
 

@@ -3777,7 +3777,7 @@ bool Game::playerUseItem(Player *player, const Position& pos, const unsigned cha
 	return true;
 }
 
-void Game::playerRequestTrade(Player *player, const Position& pos,
+void Game::playerRequestTrade(Player* player, const Position& pos,
 	const unsigned char stackpos, const unsigned short itemid, unsigned long playerid)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerRequestTrade()");
@@ -3788,6 +3788,15 @@ void Game::playerRequestTrade(Player *player, const Position& pos,
 	Player *tradePartner = getPlayerByID(playerid);
 	if(!tradePartner || tradePartner == player) {
 		player->sendTextMessage(MSG_INFO, "Sorry, not possible.");
+		return;
+	}
+
+	if(player->tradeState != TRADE_NONE && !(player->tradeState == TRADE_ACKNOWLEDGE && player->tradePartner == playerid)) {
+		player->sendCancel("You are already trading.");
+		return;
+	}
+	else if(tradePartner->tradeState != TRADE_NONE && tradePartner->tradePartner != player->getID()) {
+		player->sendCancel("This player is already trading.");
 		return;
 	}
 
@@ -3806,14 +3815,6 @@ void Game::playerRequestTrade(Player *player, const Position& pos,
 		player->sendCancel("Sorry, not possible.");
 		return;
 	}
-
-	/*
-	if(tradeItems.find(tradeItem) != tradeItems.end()){
-		player->sendTextMessage(MSG_INFO, "This item is already beeing traded.");
-		//player->sendCancel("Sorry, not possible.");
-		return;
-	}
-	*/
 	
 	std::map<Item*, unsigned long>::const_iterator it;
 	const Container* container = NULL;
@@ -3827,13 +3828,7 @@ void Game::playerRequestTrade(Player *player, const Position& pos,
 		}
 	}
 
-
-	if(player->tradePartner != 0 && tradePartner->tradePartner != player->getID()){
-		player->sendTextMessage(MSG_INFO, "This player is already trading.");
-		return;
-	}
-
-	Container *tradeContainer = dynamic_cast<Container*>(tradeItem);
+	Container* tradeContainer = dynamic_cast<Container*>(tradeItem);
 	if(tradeContainer && tradeContainer->getItemHoldingCount() + 1 > 100){
 		player->sendTextMessage(MSG_INFO, "You can not trade more than 100 items.");
 		return;
@@ -3841,16 +3836,18 @@ void Game::playerRequestTrade(Player *player, const Position& pos,
 
 	player->tradePartner = playerid;
 	player->tradeItem = tradeItem;
-	//tradeItems.insert(tradeItems.begin(), tradeItem);
+	player->tradeState = TRADE_INITIATED;
 	tradeItem->useThing();
 	tradeItems[tradeItem] = player->getID();
 
 	player->sendTradeItemRequest(player, tradeItem, true);
 
-	if (tradePartner->tradePartner == 0){
+	if(tradePartner->tradeState == TRADE_NONE){
 		std::stringstream trademsg;
 		trademsg << player->getName() <<" wants to trade with you.";
 		tradePartner->sendTextMessage(MSG_INFO, trademsg.str().c_str());
+		tradePartner->tradeState = TRADE_ACKNOWLEDGE;
+		tradePartner->tradePartner = player->getID();
 	}
 	else {
 		Item* counterOfferItem = tradePartner->tradeItem;
@@ -3975,7 +3972,7 @@ void Game::playerCloseTrade(Player* player)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerCloseTrade()");
 	
-	Player *tradePartner = getPlayerByID(player->tradePartner);
+	Player* tradePartner = getPlayerByID(player->tradePartner);
 
 	std::vector<Item*>::iterator it;
 	if(player->getTradeItem()) {

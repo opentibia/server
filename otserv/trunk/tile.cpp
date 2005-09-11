@@ -46,8 +46,10 @@ ReturnValue Tile::isBlocking(int objectstate, bool ignoreCreature /* = false*/, 
 			groundType.blockProjectile)
 			return RET_CANNOTTHROW;
 
+		/*
 		if((groundType.blockPathFind || groundType.blockSolid) && ((objectstate & BLOCK_PATHFIND) == BLOCK_PATHFIND))
 			return RET_THEREISNOWAY;
+		*/
 
 		if(((objectstate & BLOCK_PICKUPABLE) == BLOCK_PICKUPABLE)) {			
 			if(groundType.blockSolid && (groundType.blockPickupable || groundType.pickupable))
@@ -75,9 +77,11 @@ ReturnValue Tile::isBlocking(int objectstate, bool ignoreCreature /* = false*/, 
 				continue;*/
 		}
 
+		/*
 		if((iiType.blockPathFind || iiType.blockSolid) && ((objectstate & BLOCK_PATHFIND) == BLOCK_PATHFIND) &&
 			!(ignoreMoveableBlocking && iiType.moveable))
 			return RET_THEREISNOWAY;
+			*/
 
 		if(((objectstate & BLOCK_PICKUPABLE) == BLOCK_PICKUPABLE)) {			
 			if(iiType.blockSolid && (iiType.blockPickupable || iiType.pickupable))
@@ -99,9 +103,11 @@ ReturnValue Tile::isBlocking(int objectstate, bool ignoreCreature /* = false*/, 
 				continue;*/
 		}
 
+		/*
 		if((iiType.blockPathFind || iiType.blockSolid) && ((objectstate & BLOCK_PATHFIND) == BLOCK_PATHFIND) &&
 			!(ignoreMoveableBlocking && iiType.moveable))
 			return RET_THEREISNOWAY;
+		*/
 
 		if(((objectstate & BLOCK_PICKUPABLE) == BLOCK_PICKUPABLE)) {
 			if(iiType.blockSolid && (iiType.blockPickupable || iiType.pickupable))

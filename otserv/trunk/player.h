@@ -33,7 +33,7 @@
 class Protocol;
 
 enum skills_t {
-    SKILL_FIST=0,
+	SKILL_FIST=0,
 	SKILL_CLUB=1,
 	SKILL_SWORD=2,
 	SKILL_AXE=3,
@@ -43,7 +43,7 @@ enum skills_t {
 };
 
 enum skillsid_t {
-    SKILL_LEVEL=0,
+	SKILL_LEVEL=0,
 	SKILL_TRIES=1,
 	SKILL_PERCENT=2
 };
@@ -79,6 +79,13 @@ enum freeslot_t{
 	SLOT_TYPE_NONE,
 	SLOT_TYPE_INVENTORY,
 	SLOT_TYPE_CONTAINER
+};
+
+enum trade_state {
+	TRADE_NONE,
+	TRADE_INITIATED,
+	TRADE_ACCEPT,
+	TRADE_ACKNOWLEDGE
 };
 
 
@@ -260,7 +267,7 @@ public:
 	//void onItemUpdateInvnetory(const unsigned char sl_id);
 	
 	void setAcceptTrade(bool b);
-	bool getAcceptTrade() {return acceptTrade;};
+	bool getAcceptTrade() {return (tradeState == TRADE_ACCEPT);};
 	Item* getTradeItem() {return tradeItem;};
 	
 protected:
@@ -356,7 +363,8 @@ protected:
 	unsigned char maglevel_percent;
 	//trade variables
 	unsigned long tradePartner;
-	bool acceptTrade;
+	trade_state tradeState;
+	//bool acceptTrade;
 	Item *tradeItem;
 	
 	//autowalking

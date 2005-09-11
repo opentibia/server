@@ -77,7 +77,7 @@ Player::Player(const std::string& name, Protocol *p) :
 	fightMode = followMode = 0;
 
 	tradePartner = 0;
-	acceptTrade = false;
+	tradeState = TRADE_NONE;
 	tradeItem = NULL;
 
 	for(int i = 0; i < 7; i++)
@@ -1145,12 +1145,14 @@ bool Player::CanSee(int x, int y, int z) const
 void Player::setAcceptTrade(bool b)
 {
 	if(b) {
-		acceptTrade = true;
+		tradeState = TRADE_ACCEPT;
+		//acceptTrade = true;
 	}
 	else {
 		tradeItem = NULL;
 		tradePartner = 0;
-		acceptTrade = false;
+		tradeState = TRADE_NONE;
+		//acceptTrade = false;
 	}
 }
 
