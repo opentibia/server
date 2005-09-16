@@ -2814,7 +2814,7 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 	bool isBlocking = true;
 	if(targettile){
 		hasTarget = !targettile->creatures.empty();
-		isBlocking = (targettile->isBlocking(BLOCK_SOLID, true) != NO_ERROR);
+		isBlocking = (targettile->isBlocking(BLOCK_SOLID, true) != RET_NOERROR);
 	}
 
 	if(targettile && me->canCast(isBlocking, !targettile->creatures.empty())) {

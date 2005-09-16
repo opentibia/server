@@ -65,6 +65,9 @@
 	#define SOCKET_ERROR -1
 	#define ERROR_EINTR EINTR
 	
+	/* Comment below line if you want to execute otserv with root user (NOT RECOMMENDED) */
+	#define NO_ROOT_PERMISSION
+	
 	extern int errno; 
 #endif
 
@@ -398,6 +401,14 @@ int main(int argc, char *argv[])
 	//std::cout << ":: OTServ Version 0.4.0" << std::endl;
 	std::cout << ":: ====================" << std::endl;
 	std::cout << "::" << std::endl;
+	
+#ifdef NO_ROOT_PERMISSION
+	if( getuid() == 0 || geteuid() == 0 )
+	{
+		std::cout << std::endl << "OTServ executed as root user, please login with a normal user." << std::endl;
+		return 1;
+	}
+#endif
 	
 	// ignore sigpipe...
 #if defined __WINDOWS__ || defined WIN32	
