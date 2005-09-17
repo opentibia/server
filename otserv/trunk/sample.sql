@@ -108,6 +108,8 @@ CREATE TABLE `players` (
   `maxdepotitems` int(11) NOT NULL default '1000',
   `food` int(11) NOT NULL default '0',
   `sex` int(11) NOT NULL default '0',
+  `guildname` varchar(32) NOT NULL default '',
+  `guildrank` varchar(32) NOT NULL default '',
   `lastlogin` int(11) unsigned NOT NULL default '0',
   `lastip` int(11) unsigned NOT NULL default '0',
   `save` int(11) unsigned NOT NULL default '1',

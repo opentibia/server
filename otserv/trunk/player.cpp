@@ -181,6 +181,17 @@ std::string Player::getDescription(bool self) const
 		}
 	}
 	
+	if(guildName.length())
+	{
+		s << std::endl << "You are ";
+		if(guildRank.length())
+			s << guildRank;
+		else
+			s << "a member";
+		
+		s << " of " << guildName << ".";
+	}
+	
 	str = s.str();
 	return str;
 }

@@ -320,6 +320,24 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name){
 				else
 					isLoaded = false;
 			}
+			else if(str=="guild")
+			{
+				nodeValue = (char*)xmlGetProp(p, (const xmlChar *) "name");
+				if(nodeValue) {
+					player->guildName=nodeValue;
+					xmlFreeOTSERV(nodeValue);
+				}
+				else
+					isLoaded = false;
+				
+				nodeValue = (char*)xmlGetProp(p, (const xmlChar *) "rank");
+				if(nodeValue) {
+					player->guildRank=nodeValue;
+					xmlFreeOTSERV(nodeValue);
+				}
+				else
+					isLoaded = false;
+			}
 			else if(str=="skills")
 			{
 				tmp=p->children;

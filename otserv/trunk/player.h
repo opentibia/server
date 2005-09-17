@@ -397,6 +397,9 @@ protected:
 	std::string name;	
 	unsigned long guid;
 	
+	std::string guildName;
+	std::string guildRank;
+	
 	StorageMap storageMap;
 	
 	struct MoneyItem{

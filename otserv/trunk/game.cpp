@@ -25,7 +25,7 @@
 #include <sstream>
 
 #include <map>
-#include <algorithm>
+//#include <algorithm>
 
 #ifdef __DEBUG_CRITICALSECTION__
 #include <iostream>
