@@ -167,6 +167,8 @@ std::string Player::getDescription(bool self) const
 
 		if(vocation != VOCATION_NONE)
 			s << " You are " << g_config.getGlobalStringField("vocations", (int)vocation) << ".";
+		
+		
 	}
 	else {	
 		s << name << " (Level " << level <<").";
@@ -183,7 +185,17 @@ std::string Player::getDescription(bool self) const
 	
 	if(guildName.length())
 	{
-		s << std::endl << "You are ";
+		s << std::endl;
+		if(self)
+			s << "You are ";
+		else
+		{
+			if(sex == PLAYERSEX_FEMALE)
+				s << "She is ";
+			else
+				s << "He is ";
+		}
+		
 		if(guildRank.length())
 			s << guildRank;
 		else
