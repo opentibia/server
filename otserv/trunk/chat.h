@@ -50,9 +50,12 @@ public:
 	};
 	
 	bool talk(Player *fromPlayer, SpeakClasses type, std::string &text, unsigned short channelId){
-		//TODO: Check player rights for the text "type" (the colour of messages)
 		bool success = false;
 		UsersMap::iterator it;
+		//DONE?: Check player rights for the text "type" (the colour of messages)
+		if(fromPlayer->access == 0){
+			type = SPEAK_CHANNEL_Y;
+		}
 		for(it = m_users.begin(); it != m_users.end(); ++it)
 		{
 			Player *toPlayer = dynamic_cast<Player*>(it->second);
