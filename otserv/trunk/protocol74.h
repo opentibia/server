@@ -103,8 +103,8 @@ private:
 	void parseOpenChannel(NetworkMessage &msg);
 	void parseOpenPriv(NetworkMessage &msg);
 	void parseCloseChannel(NetworkMessage &msg);
-	virtual void sendChannels();
-	virtual void sendChannel(unsigned short channelId);
+	virtual void sendChannelsDialog();
+	virtual void sendChannel(unsigned short channelId, std::string channelName);
 	virtual void sendOpenPriv(std::string &receiver);
 	virtual void sendToChannel(const Creature *creature, SpeakClasses type, const std::string &text, unsigned short channelId);
 

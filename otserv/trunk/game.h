@@ -215,7 +215,7 @@ public:
   void creatureYell(Creature *creature, std::string &text);
   void creatureSpeakTo(Creature *creature, SpeakClasses type, const std::string &receiver, const std::string &text);
   void creatureBroadcastMessage(Creature *creature, const std::string &text);
-  void creatureToChannel(Creature *creature, SpeakClasses type, const std::string &text, unsigned short channelId);
+  //void creatureToChannel(Creature *creature, SpeakClasses type, const std::string &text, unsigned short channelId);
 	void creatureMonsterYell(Monster* monster, const std::string& text);
 	void creatureChangeOutfit(Creature *creature);
 

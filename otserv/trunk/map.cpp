@@ -64,7 +64,7 @@ using namespace std;
 
 extern LuaScript g_config;
 extern Spells spells;
-extern std::map<long, Creature*> channel;
+//extern std::map<long, Creature*> channel;
 
 Map::Map() :
 spawnfile(""),

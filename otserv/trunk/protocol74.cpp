@@ -36,6 +36,7 @@
 #include "creature.h"
 #include "player.h"
 #include "status.h"
+#include "chat.h"
 
 #include <stdio.h>
 
@@ -47,7 +48,8 @@
 
 extern LuaScript g_config;
 extern Actions actions;
-std::map<long, Creature*> channel;
+//std::map<long, Creature*> channel;
+Chat g_chat;
 
 Protocol74::Protocol74(SOCKET s)
 {
@@ -479,26 +481,32 @@ void Protocol74::logout(){
 }
 
 void Protocol74::parseGetChannels(NetworkMessage &msg){
-	sendChannels();
+	sendChannelsDialog();
 }
 
 void Protocol74::parseOpenChannel(NetworkMessage &msg){
 	unsigned short channelId = msg.GetU16();
-	sendChannel(channelId);
+	sendChannel(channelId, g_chat.getChannelName(player, channelId));
 	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol74::parseOpenChannel()");
+	/*
 	std::map<long, Creature*>::iterator sit = channel.find(player->getID());
 	if( sit == channel.end() ) {
 		channel[player->getID()] = player;
 	}
+	*/
+	g_chat.addUserToChannel(player, channelId);
 }
 
 void Protocol74::parseCloseChannel(NetworkMessage &msg){
-	/* unsigned short channelId = */msg.GetU16();
+	unsigned short channelId = msg.GetU16();
 	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol74::parseCloseChannel()");
+	/*
 	std::map<long, Creature*>::iterator sit = channel.find(player->getID());
 	if(sit != channel.end()){
 		channel.erase(sit);
 	}
+	*/
+	g_chat.removeUserFromChannel(player, channelId);
 }
 
 void Protocol74::parseOpenPriv(NetworkMessage &msg){
@@ -778,37 +786,49 @@ void Protocol74::sendTextMessage(MessageClasses mclass, const char* message,cons
 	WriteBuffer(msg);
 }
 
-void Protocol74::sendChannels(){
-     NetworkMessage newmsg;
-	 newmsg.AddByte(0xAB);
-	 
-	 newmsg.AddByte(3); //how many
-	 
-	 newmsg.AddByte(0xFF); //priv chan
-	 newmsg.AddByte(0xFF); //priv chan
-	 newmsg.AddString("Private Chat Channel");
-	 
-	 newmsg.AddByte(0x00); //clan chan
-	 newmsg.AddByte(0x00); //clan chan
-	 newmsg.AddString("Clan Channel");
-	 
-	 newmsg.AddByte(0x04);
-	 newmsg.AddByte(0x00);
-	 newmsg.AddString("Game-Chat");
-	 WriteBuffer(newmsg);
+void Protocol74::sendChannelsDialog(){
+	NetworkMessage newmsg;
+	ChannelList list;
+	
+	list = g_chat.getChannelList(player);
+	
+	newmsg.AddByte(0xAB);
+	
+	newmsg.AddByte(list.size()); //how many
+	
+	while(list.size())
+	{
+		ChatChannel *channel;
+		channel = list.front();
+		list.pop_front();
+		
+		newmsg.AddU16(channel->getId());
+		newmsg.AddString(channel->getName());
+	}
+	/*
+	newmsg.AddByte(0xFF); //priv chan
+	newmsg.AddByte(0xFF); //priv chan
+	newmsg.AddString("Private Chat Channel");
+	
+	newmsg.AddByte(0x00); //clan chan
+	newmsg.AddByte(0x00); //clan chan
+	newmsg.AddString("Clan Channel");
+	
+	newmsg.AddByte(0x04);
+	newmsg.AddByte(0x00);
+	newmsg.AddString("Game-Chat");
+	*/
+	WriteBuffer(newmsg);
 }
 
-void Protocol74::sendChannel(unsigned short channelId){
+void Protocol74::sendChannel(unsigned short channelId, std::string channelName){
      NetworkMessage newmsg;
-     if(channelId == 4){
-		newmsg.AddByte(0xAC);
-	 
-		newmsg.AddU16(channelId);
-	 
-		newmsg.AddString("Game-Chat");
-		WriteBuffer(newmsg);
-     }
-	 
+		
+	newmsg.AddByte(0xAC);
+	newmsg.AddU16(channelId);
+	newmsg.AddString(channelName);
+	
+	WriteBuffer(newmsg); 
 }
 
 void Protocol74::sendIcons(int icons){
@@ -1217,7 +1237,8 @@ void Protocol74::parseSay(NetworkMessage &msg)
     case SPEAK_CHANNEL_Y:
 	case SPEAK_CHANNEL_R1:
 	case SPEAK_CHANNEL_R2:
-    	game->creatureToChannel(player, type, text, channelId);
+    		//game->creatureToChannel(player, type, text, channelId);
+    		g_chat.talkToChannel(player, type, text, channelId);
     	break;
     case SPEAK_BROADCAST:
     	game->creatureBroadcastMessage(player, text);

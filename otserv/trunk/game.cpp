@@ -51,6 +51,7 @@ using namespace std;
 #include "spells.h"
 #include "actions.h"
 #include "ioplayer.h"
+#include "chat.h"
 
 #include "luascript.h"
 #include <ctype.h>
@@ -67,7 +68,8 @@ extern LuaScript g_config;
 extern Spells spells;
 extern Actions actions;
 extern Commands commands;
-extern std::map<long, Creature*> channel;
+extern Chat g_chat;
+//extern std::map<long, Creature*> channel;
 extern std::vector< std::pair<unsigned long, unsigned long> > bannedIPs;
 
 GameState::GameState(Game *game, const Range &range)
@@ -777,11 +779,13 @@ bool Game::removeCreature(Creature* c)
 		}
 		if(player->eventAutoWalk)
 			stopEvent(player->eventAutoWalk);
+		/*
 		// Removing the player from the map of channel users
 		std::map<long, Creature*>::iterator sit = channel.find(player->getID());
 		if( sit != channel.end() )
 			channel.erase(sit);
-		
+		*/
+		g_chat.removeUserFromAllChannels(player);
 		IOPlayer::instance()->savePlayer(player);
 		#ifdef __DEBUG_PLAYERS__
 		std::cout << (uint32_t)getPlayersOnline() << " players online." << std::endl;
@@ -2707,7 +2711,7 @@ void Game::creatureBroadcastMessage(Creature *creature, const std::string &text)
 		(*it).second->onCreatureSay(creature, SPEAK_BROADCAST, text);
 	}	
 }
-
+/*
 void Game::creatureToChannel(Creature *creature, SpeakClasses type, const std::string &text, unsigned short channelId)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::creatureToChannel()");
@@ -2720,6 +2724,7 @@ void Game::creatureToChannel(Creature *creature, SpeakClasses type, const std::s
 		type = SPEAK_CHANNEL_Y;
 	}
 
+	
 	std::map<long, Creature*>::iterator cit;
 	for (cit = channel.begin(); cit != channel.end(); cit++)
 	{
@@ -2731,7 +2736,7 @@ void Game::creatureToChannel(Creature *creature, SpeakClasses type, const std::s
 
 	player->sendTextMessage(MSG_SMALLINFO, "Message sent.");
 }
-
+*/
 
 /** \todo Someone _PLEASE_ clean up this mess */
 bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, const MagicEffectClass* me)
