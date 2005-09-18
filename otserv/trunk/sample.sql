@@ -110,6 +110,7 @@ CREATE TABLE `players` (
   `sex` int(11) NOT NULL default '0',
   `guildname` varchar(32) NOT NULL default '',
   `guildrank` varchar(32) NOT NULL default '',
+  `guildnick` varchar(32) NOT NULL default '',
   `lastlogin` int(11) unsigned NOT NULL default '0',
   `lastip` int(11) unsigned NOT NULL default '0',
   `save` int(11) unsigned NOT NULL default '1',

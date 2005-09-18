@@ -337,6 +337,14 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name){
 				}
 				else
 					isLoaded = false;
+				
+				nodeValue = (char*)xmlGetProp(p, (const xmlChar *) "nick");
+				if(nodeValue) {
+					player->guildNick=nodeValue;
+					xmlFreeOTSERV(nodeValue);
+				}
+				else
+					isLoaded = false;
 			}
 			else if(str=="skills")
 			{
@@ -631,6 +639,11 @@ bool IOPlayerXML::savePlayer(Player* player){
 	sb << player->lookfeet;         xmlSetProp(pn, (const xmlChar*) "feet", (const xmlChar*)sb.str().c_str());        sb.str("");
 	xmlAddChild(root, pn);
     
+    	pn = xmlNewNode(NULL,(const xmlChar*)"guild");
+	sb << player->guildName;     xmlSetProp(pn, (const xmlChar*) "name", (const xmlChar*)sb.str().c_str());        sb.str("");
+	sb << player->guildRank;  xmlSetProp(pn, (const xmlChar*) "rank", (const xmlChar*)sb.str().c_str());        sb.str("");
+	sb << player->guildNick;  	  xmlSetProp(pn, (const xmlChar*) "nick", (const xmlChar*)sb.str().c_str());       sb.str("");               
+	xmlAddChild(root, pn);
     	      
 	sn = xmlNewNode(NULL,(const xmlChar*)"skills");
 	for (int i = 0; i <= 6; i++)

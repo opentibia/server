@@ -400,6 +400,7 @@ protected:
 	
 	std::string guildName;
 	std::string guildRank;
+	std::string guildNick;
 	
 	StorageMap storageMap;
 	

@@ -486,7 +486,7 @@ void Protocol74::parseGetChannels(NetworkMessage &msg){
 
 void Protocol74::parseOpenChannel(NetworkMessage &msg){
 	unsigned short channelId = msg.GetU16();
-	sendChannel(channelId, g_chat.getChannelName(player, channelId));
+	//sendChannel(channelId, g_chat.getChannelName(player, channelId));
 	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol74::parseOpenChannel()");
 	/*
 	std::map<long, Creature*>::iterator sit = channel.find(player->getID());
@@ -494,7 +494,8 @@ void Protocol74::parseOpenChannel(NetworkMessage &msg){
 		channel[player->getID()] = player;
 	}
 	*/
-	g_chat.addUserToChannel(player, channelId);
+	if(g_chat.addUserToChannel(player, channelId))
+		sendChannel(channelId, g_chat.getChannelName(player, channelId));
 }
 
 void Protocol74::parseCloseChannel(NetworkMessage &msg){

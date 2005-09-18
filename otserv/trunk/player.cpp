@@ -185,15 +185,14 @@ std::string Player::getDescription(bool self) const
 	
 	if(guildName.length())
 	{
-		s << std::endl;
 		if(self)
-			s << "You are ";
+			s << " You are ";
 		else
 		{
 			if(sex == PLAYERSEX_FEMALE)
-				s << "She is ";
+				s << " She is ";
 			else
-				s << "He is ";
+				s << " He is ";
 		}
 		
 		if(guildRank.length())
@@ -201,7 +200,12 @@ std::string Player::getDescription(bool self) const
 		else
 			s << "a member";
 		
-		s << " of " << guildName << ".";
+		s << " of " << guildName;
+		
+		if(guildNick.length())
+			s << " (" << guildNick << ")";
+		
+		s << ".";
 	}
 	
 	str = s.str();
