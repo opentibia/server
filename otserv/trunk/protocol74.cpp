@@ -1207,7 +1207,7 @@ void Protocol74::parseLookAt(NetworkMessage &msg){
 void Protocol74::parseSay(NetworkMessage &msg)
 {
 	SpeakClasses type = (SpeakClasses)msg.GetByte();
-  
+
 	std::string receiver;
 	unsigned short channelId = 0;
 	if(type == SPEAK_PRIVATE ||
@@ -1219,32 +1219,34 @@ void Protocol74::parseSay(NetworkMessage &msg)
 		channelId = msg.GetU16();
 	std::string text = msg.GetString();
 
-	game->creatureSaySpell(player, text);
+	if(game->creatureSaySpell(player, text))
+		type = SPEAK_SAY;
 
-	switch (type){
-    case SPEAK_SAY:
-    	game->creatureSay(player, type, text);
-    	break;
-    case SPEAK_WHISPER:
-    	game->creatureWhisper(player, text);
-    	break;
-    case SPEAK_YELL:
-    	game->creatureYell(player, text);
-    	break;
-    case SPEAK_PRIVATE:
-	case SPEAK_PRIVATE_RED:
-      	game->creatureSpeakTo(player, type, receiver, text);
+	switch (type)
+	{
+	case SPEAK_SAY:
+		game->creatureSay(player, type, text);
 		break;
-    case SPEAK_CHANNEL_Y:
+	case SPEAK_WHISPER:
+		game->creatureWhisper(player, text);
+		break;
+	case SPEAK_YELL:
+		game->creatureYell(player, text);
+		break;
+	case SPEAK_PRIVATE:
+	case SPEAK_PRIVATE_RED:
+		game->creatureSpeakTo(player, type, receiver, text);
+		break;
+	case SPEAK_CHANNEL_Y:
 	case SPEAK_CHANNEL_R1:
 	case SPEAK_CHANNEL_R2:
-    		//game->creatureToChannel(player, type, text, channelId);
-    		g_chat.talkToChannel(player, type, text, channelId);
-    	break;
-    case SPEAK_BROADCAST:
-    	game->creatureBroadcastMessage(player, text);
-    	break;
-  	}
+		//game->creatureToChannel(player, type, text, channelId);
+		g_chat.talkToChannel(player, type, text, channelId);
+		break;
+	case SPEAK_BROADCAST:
+		game->creatureBroadcastMessage(player, text);
+		break;
+	}
 }
 
 void Protocol74::parseAttack(NetworkMessage &msg)
