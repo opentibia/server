@@ -36,8 +36,8 @@ using namespace std;
 
 #ifdef _SQLMAP_
 #include "iomapsql.h"
-#elif _BINMAP_
-#include "iomapbin.h"
+//#elif _BINMAP_
+//#include "iomapbin.h"
 #else
 #include "iomapxml.h"
 #endif
@@ -82,8 +82,8 @@ Map::~Map()
 bool Map::loadMap(std::string filename) {
 #ifdef _SQLMAP_
 	IOMap* loader = new IOMapSQL();
-#elif _BINMAP_
-	IOMap* loader = new IOMapBin();
+//#elif _BINMAP_
+//	IOMap* loader = new IOMapBin();
 #else
 	IOMap* loader = new IOMapXML();
 #endif

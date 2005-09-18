@@ -506,8 +506,8 @@ int main(int argc, char *argv[])
 		SpawnManager::instance()->loadSpawnsSQL(g_config.getGlobalString("sqlmap"));
 		SpawnManager::instance()->startup();
 	}
-#elif _BINMAP_
-	g_game.loadMap(g_config.getGlobalString("mapfile"));
+//#elif _BINMAP_
+//	g_game.loadMap(g_config.getGlobalString("mapfile"));
     // doesnt need to load spawns, it will be loaded from the bin (OTM)
 #else
 	// load map file
