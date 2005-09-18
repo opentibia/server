@@ -255,7 +255,7 @@ void Protocol74::parsePacket(NetworkMessage &msg)
 		break;
 		
     case 0x99: // close Channel
-		//parseCloseChannel(msg);
+		parseCloseChannel(msg);
 		break;
 		
     case 0x9A: // open priv
