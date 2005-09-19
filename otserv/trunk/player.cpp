@@ -833,6 +833,7 @@ int Player::getPlayerInfo(playerinfo_t playerinfo) const
 		case PLAYERINFO_MANA: return health; break;
 		case PLAYERINFO_MAXMANA: return manamax; break;
 		case PLAYERINFO_MANAPERCENT: return maglevel_percent; break;
+		case PLAYERINFO_SOUL: return 100; break;
 		default:
 			return 0; break;
 	}
