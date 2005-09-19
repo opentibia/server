@@ -142,7 +142,7 @@ void Map::setTile(unsigned short _x, unsigned short _y, unsigned char _z, unsign
   else
   {
     tile = new Tile();
-		if(groundId != 0 && Item::items[groundId].groundtile) {
+		if(groundId != 0 && Item::items[groundId].isGroundTile()) {
 			tile->ground = Item::CreateItem(groundId);
 
 			tile->ground->pos.x = _x;

@@ -25,6 +25,7 @@
 #include <map>
 #include <string>
 #include "const74.h"
+#include "itemloader.h"
 
 
 #define SLOTP_WHEREEVER 0xFFFFFFFF
@@ -43,7 +44,7 @@
 
 enum eRWInfo{
 	CAN_BE_READ = 1,
-	CAN_BE_WRITTEN = 2,
+	CAN_BE_WRITTEN = 2
 };
 
 class ItemType {
@@ -51,7 +52,18 @@ public:
 	ItemType();
 	~ItemType();
 
+	itemgroup_t group;
+
+	bool isGroundTile() const;
+	bool isContainer() const;
+	bool isTeleport() const;
+	bool isMagicField() const;
+	bool isKey() const;
+	bool isSplash() const;
+	bool isFluidContainer() const;
+
 	unsigned short id;
+	unsigned short clientId;
 
   unsigned short maxItems;   // maximum size if this is a container
 	double weight;						 // weight of the item, e.g. throwing distance depends on it
@@ -63,51 +75,59 @@ public:
   int							attack;
   int							defence;
   int							armor;
-	unsigned long		slot_position;
+	unsigned short	slot_position;
   unsigned short	decayTo;
   unsigned short	decayTime;
   bool						canDecay;
-	unsigned short	damage;
 
-	uint8_t speed;
-
-	bool isteleport;
+	uint16_t speed;
 
 	// other bools
-	bool						ismagicfield;
-	int							magicfieldtype;
-	bool						iscontainer;
-	int							RWInfo;
-	unsigned short	readonlyId;
-	bool						iskey;
-	bool						fluidcontainer;
-	bool						stackable;
-	bool						multitype;
-	bool						useable;
-	bool						moveable;
-	//bool						notMoveable;
-	bool						alwaysOnTop;
-	bool						groundtile;
-	bool						issplash;
-	int							runeMagLevel;
-	bool						floorChange;
-	//bool						blocking;						// people can walk on it
-	bool						pickupable;					  // people can pick it up
-	//bool						blockingProjectile;
-	bool						canWalkThrough;
-	//bool						noFloorChange;
+	int             magicfieldtype;
+	int             RWInfo;
+	unsigned short  readOnlyId;
+	bool            stackable;
+	bool            useable;
+	bool            moveable;
+	bool            alwaysOnTop;
+	int             runeMagLevel;
+	bool            pickupable;
+	bool            rotateble;
+
+	int             lightLevel;
+	int             lightColor;
+
+	bool						floorChangeDown;
 	bool						floorChangeNorth;
 	bool						floorChangeSouth;
 	bool						floorChangeEast;
 	bool						floorChangeWest;
-	bool						blockpickupable;
+	bool            hasHeight; //blockpickupable
 
-	//bool						isDoor;
-	//bool						isDoorWithLock;
 	bool blockSolid;
 	bool blockPickupable;
 	bool blockProjectile;
 	bool blockPathFind;
+
+	//bool            readable;
+	//bool            ismagicfield;
+	//bool            issplash;
+	//bool            iskey;
+
+	//unsigned short	damage;
+	//bool isteleport;
+	//bool            fluidcontainer;
+	//bool            multitype;
+	//bool            iscontainer;
+	//bool            groundtile;
+	//bool						blockpickupable;
+	//bool						canWalkThrough;
+	//bool						notMoveable;
+	//bool						blocking;						// people can walk on it
+	//bool						blockingProjectile;
+	//bool						noFloorChange;
+	//bool						isDoor;
+	//bool						isDoorWithLock;
 };
 
 
@@ -116,6 +136,7 @@ public:
 	Items();
 	~Items();
 	
+	int loadFromOtb(std::string);
 	int loadFromDat(std::string);
   int loadXMLInfos(std::string);
 	

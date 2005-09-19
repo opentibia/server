@@ -29,65 +29,107 @@
 
 ItemType::ItemType()
 {
-	iscontainer     = false;
-	ismagicfield    = false;
+	group           = ITEM_GROUP_NONE;
+
 	RWInfo          = 0;
-	readonlyId      = 0;
-	fluidcontainer	= false;		
-	iskey           = false;
+	readOnlyId      = 0;
 	stackable       = false;
-	multitype       = false;
 	useable	        = false;
-	//notMoveable   = false;
 	moveable        = true;
 	alwaysOnTop     = false;
-	groundtile      = false;
-	issplash		    = false;
-	pickupable      = false; // people can pick it up
-	canWalkThrough = false;
-	//noFloorChange = false;
-	floorChange = true;
+	pickupable      = false;
+	rotateble       = false;
+	hasHeight       = false;
+
+	floorChangeDown = true;
 	floorChangeNorth = false;
 	floorChangeSouth = false;
 	floorChangeEast = false;
 	floorChangeWest = false;
 
-	//blocking      = false; // people can walk on it
-	//blockingProjectile = false;
-	//blockpickupable = true;
-
 	blockSolid = false;
-	blockPickupable = true;
 	blockProjectile = false;
 	blockPathFind = false;
-	
-	//isDoor = false;
-	//isDoorWithLock = false;
-	
-	isteleport = false;
-	
+		
 	runeMagLevel    = -1;
 	magicfieldtype = -1;
 	
 	speed		      = 0;
 	id            = 100;
+	clientId      = 100;
 	maxItems      = 8;  // maximum size if this is a container
 	weight        = 0;  // weight of the item, e.g. throwing distance depends on it
 	weaponType    = NONE;
 	slot_position = SLOTP_RIGHT | SLOTP_LEFT | SLOTP_AMMO;
-	amuType    =		AMU_NONE;
-	shootType  =		DIST_NONE;
-	attack     =    0;
-	defence    =    0;
-	armor      =    0;
-	decayTo    =    0;
-	decayTime  =	60;
-	canDecay   =	true;
-	damage	   =	0;
+	amuType       = AMU_NONE;
+	shootType     = DIST_NONE;
+	attack        = 0;
+	defence       = 0;
+	armor         = 0;
+	decayTo       = 0;
+	decayTime     = 60;
+	canDecay      =	true;
+
+	lightLevel    = 0;
+	lightColor    = 0;
+
+	//readable        = false;
+	//ismagicfield    = false;
+	//iskey           = false;
+	//issplash		    = false;
+
+	//damage	      =	0;
+	//groundtile      = false;
+	//iscontainer     = false;
+	//fluidcontainer	= false;		
+	//multitype       = false;
+	//isteleport = false;
+	//notMoveable   = false;
+	//canWalkThrough = false;
+	//blocking      = false; // people can walk on it
+	//blockingProjectile = false;
+	//blockpickupable = true;
+	//isDoor = false;
+	//isDoorWithLock = false;
 }
 
 ItemType::~ItemType()
 {
+}
+
+bool ItemType::isGroundTile() const
+{
+	return group == ITEM_GROUP_GROUND;
+}
+
+bool ItemType::isContainer() const
+{
+	return (group == ITEM_GROUP_CONTAINER);
+}
+
+bool ItemType::isTeleport() const
+{
+	return (group == ITEM_GROUP_TELEPORT);
+}
+
+bool ItemType::isMagicField() const
+{
+	return (group == ITEM_GROUP_MAGICFIELD);
+}
+
+bool ItemType::isKey() const
+{
+	return (group == ITEM_GROUP_KEY);
+}
+
+bool ItemType::isSplash() const
+{
+	return (group == ITEM_GROUP_SPLASH);
+}
+
+bool ItemType::isFluidContainer() const
+{
+	return (group == ITEM_GROUP_FLUID);
 }
 
 
@@ -101,6 +143,322 @@ Items::~Items()
 		delete it->second;
 }
 
+
+int Items::loadFromOtb(std::string file)
+{
+	ItemLoader f;
+	if(!f.openFile(file.c_str(), false)) {
+		return f.getError();
+	}
+	
+	unsigned long type,len;
+	NODE node = f.getChildNode(NULL, type);
+	node = f.getChildNode(node, type);
+
+	const unsigned char* data;
+	while(node != NO_NODE) {
+		data = f.getProps(node, len);
+		if(data == NULL && f.getError() != ERROR_NONE)
+			return f.getError();
+		
+		flags_t flags;
+		if(data != NULL) {
+			const unsigned char* p = &data[0];
+			ItemType* iType = new ItemType();
+			bool loadedFlags = false;
+
+			while(p < data + len) {
+				iType->group = (itemgroup_t)type;
+
+				switch(type) {
+					case ITEM_GROUP_NONE:
+					case ITEM_GROUP_GROUND:
+					case ITEM_GROUP_CONTAINER:
+					case ITEM_GROUP_WEAPON:
+					case ITEM_GROUP_AMMUNITION:
+					case ITEM_GROUP_ARMOR:
+					case ITEM_GROUP_RUNE:
+					case ITEM_GROUP_TELEPORT:
+					case ITEM_GROUP_MAGICFIELD:
+					case ITEM_GROUP_WRITEABLE:
+					case ITEM_GROUP_KEY:
+					case ITEM_GROUP_SPLASH:
+					case ITEM_GROUP_FLUID:
+					{
+						if(!loadedFlags) {
+							//read 4 byte flags
+							memcpy((void*)&flags, p, sizeof(flags_t)); p+= sizeof(flags_t);
+
+							iType->blockSolid = ((flags & FLAG_BLOCK_SOLID) == FLAG_BLOCK_SOLID);
+							iType->blockProjectile = ((flags & FLAG_BLOCK_PROJECTILE) == FLAG_BLOCK_PROJECTILE);
+							iType->blockPathFind = ((flags & FLAG_BLOCK_PATHFIND) == FLAG_BLOCK_PATHFIND);
+							iType->hasHeight = ((flags & FLAG_HAS_HEIGHT) == FLAG_HAS_HEIGHT);
+							iType->useable = ((flags & FLAG_USEABLE) == FLAG_USEABLE);
+							iType->pickupable = ((flags & FLAG_PICKUPABLE) == FLAG_PICKUPABLE);
+							iType->moveable = ((flags & FLAG_MOVEABLE) == FLAG_MOVEABLE);
+							iType->stackable = ((flags & FLAG_STACKABLE) == FLAG_STACKABLE);
+							iType->floorChangeDown = ((flags & FLAG_FLOORCHANGEDOWN) == FLAG_FLOORCHANGEDOWN);
+							iType->floorChangeNorth = ((flags & FLAG_FLOORCHANGENORTH) == FLAG_FLOORCHANGENORTH);
+							iType->floorChangeEast = ((flags & FLAG_FLOORCHANGEEAST) == FLAG_FLOORCHANGEEAST);
+							iType->floorChangeSouth = ((flags & FLAG_FLOORCHANGESOUTH) == FLAG_FLOORCHANGESOUTH);
+							iType->floorChangeWest = ((flags & FLAG_FLOORCHANGEWEST) == FLAG_FLOORCHANGEWEST);
+							iType->alwaysOnTop = ((flags & FLAG_ALWAYSONTOP) == FLAG_ALWAYSONTOP);
+							
+							if(type == ITEM_GROUP_WRITEABLE) {
+								iType->RWInfo |= CAN_BE_WRITTEN;
+							}
+
+							if((flags & FLAG_READABLE) == FLAG_READABLE)
+								iType->RWInfo |= CAN_BE_READ;
+
+							iType->rotateble = ((flags & FLAG_ROTABLE) == FLAG_ROTABLE);
+
+							if(p >= data + len) //no attributes
+								break;
+							loadedFlags = true;
+						}
+
+						//attribute
+						attribute_t attrib = *p; p+= sizeof(attribute_t);
+						if(p >= data + len) {
+							delete iType;
+							return ERROR_INVALID_FORMAT;
+						}
+
+						datasize_t datalen = 0;
+						//size of data
+						memcpy(&datalen, p, sizeof(datasize_t)); p+= sizeof(datalen);
+						if(p >= data + len) {
+							delete iType;
+							return ERROR_INVALID_FORMAT;
+						}
+
+						switch(attrib) {
+							case ITEM_ATTR_SERVERID:
+							{
+								if(datalen != sizeof(unsigned short))
+									return ERROR_INVALID_FORMAT;
+
+								memcpy(&iType->id, p, sizeof(unsigned short));
+								break;
+							}
+
+							case ITEM_ATTR_CLIENTID:
+							{
+								if(datalen != sizeof(unsigned short))
+									return ERROR_INVALID_FORMAT;
+
+								memcpy(&iType->clientId, p, sizeof(unsigned short));
+								break;
+							}
+							case ITEM_ATTR_NAME:
+							{
+								char name[128];
+								if(datalen >= sizeof(name))
+									return ERROR_INVALID_FORMAT;
+
+								memcpy(name, p, datalen);
+								name[datalen] = 0;
+								iType->name = name;
+								break;
+							}
+							case ITEM_ATTR_DESCR:
+							{
+								char descr[128];
+								if(datalen >= sizeof(descr))
+									return ERROR_INVALID_FORMAT;
+
+								memcpy(descr, p, datalen);
+								descr[datalen] = 0;
+								iType->description = descr;
+
+								break;
+							}
+							case ITEM_ATTR_SPEED:
+							{
+								if(datalen != sizeof(unsigned short))
+									return ERROR_INVALID_FORMAT;
+
+								memcpy(&iType->speed, p, sizeof(unsigned short));
+								break;
+							}
+							case ITEM_ATTR_SLOT:
+							{
+								if(datalen != sizeof(unsigned short))
+									return ERROR_INVALID_FORMAT;
+
+								memcpy(&iType->slot_position, p, sizeof(unsigned short));
+								break;
+							}
+							case ITEM_ATTR_MAXITEMS:
+							{
+								if(datalen != sizeof(unsigned short))
+									return ERROR_INVALID_FORMAT;
+
+								memcpy(&iType->maxItems, p, sizeof(unsigned short));
+								break;
+							}
+							case ITEM_ATTR_WEIGHT:
+							{
+								if(datalen != sizeof(double))
+									return ERROR_INVALID_FORMAT;
+
+								memcpy(&iType->weight, p, sizeof(double));
+								break;
+							}
+							case ITEM_ATTR_WEAPON:
+							{
+								if(datalen != sizeof(weaponBlock))
+									return ERROR_INVALID_FORMAT;
+
+								weaponBlock wb;
+								memcpy(&wb, p, sizeof(weaponBlock));
+								iType->weaponType = (WeaponType)wb.weaponType;
+								iType->shootType = (subfight_t)wb.shootType;
+								iType->amuType = (amu_t)wb.amuType;
+								iType->attack = wb.attack;
+								iType->defence = wb.defence;
+								break;
+							}
+							case ITEM_ATTR_AMU:
+							{
+								if(datalen != sizeof(amuBlock))
+									return ERROR_INVALID_FORMAT;
+
+								amuBlock ab;
+								memcpy(&ab, p, sizeof(amuBlock));
+								iType->shootType = (subfight_t)ab.shootType;
+								iType->amuType = (amu_t)ab.amuType;
+								iType->attack = ab.attack;
+								break;
+							}
+							case ITEM_ATTR_ARMOR:
+							{
+								if(datalen != sizeof(armorBlock))
+									return ERROR_INVALID_FORMAT;
+
+								armorBlock ab;
+								memcpy(&ab, p, sizeof(armorBlock));
+									
+								iType->armor = ab.armor;
+								iType->weight = ab.weight;
+								iType->slot_position = ab.slot_position;
+
+								break;
+							}
+							case ITEM_ATTR_MAGLEVEL:
+							{
+								if(datalen != sizeof(unsigned short))
+									return ERROR_INVALID_FORMAT;
+								
+								memcpy(&iType->runeMagLevel, p, sizeof(unsigned short));
+								
+								break;
+							}
+							case ITEM_ATTR_MAGFIELDTYPE:
+							{
+								if(datalen != sizeof(unsigned char))
+									return ERROR_INVALID_FORMAT;
+								
+								memcpy(&iType->magicfieldtype, p, sizeof(unsigned char));
+
+								break;
+							}
+							case ITEM_ATTR_WRITEABLE:
+							{
+								if(datalen != sizeof(writeableBlock))
+									return ERROR_INVALID_FORMAT;
+
+								struct writeableBlock wb;
+								memcpy(&wb, p, sizeof(writeableBlock));
+
+								iType->readOnlyId = wb.readOnlyId;
+
+								break;
+							}
+							case ITEM_ATTR_ROTATETO:
+							{
+								if(datalen != sizeof(unsigned short))
+									return ERROR_INVALID_FORMAT;
+								break;
+							}
+							case ITEM_ATTR_DECAY:
+							{
+								if(datalen != sizeof(decayBlock))
+									return ERROR_INVALID_FORMAT;
+
+								decayBlock db;
+								memcpy(&db, p, sizeof(decayBlock));
+								iType->decayTime = db.decayTime;
+								iType->decayTo = db.decayTo;
+								break;
+							}
+
+							case ITEM_ATTR_SPRITEHASH:
+							{
+								if(datalen != 16)
+									return ERROR_INVALID_FORMAT;
+								break;
+							}
+
+							case ITEM_ATTR_MINIMAPCOLOR:
+							{
+								if(datalen != sizeof(unsigned short))
+									return ERROR_INVALID_FORMAT;
+								break;
+							}
+
+							case ITEM_ATTR_07:
+							{
+								if(datalen != sizeof(unsigned short))
+									return ERROR_INVALID_FORMAT;
+								break;
+							}
+
+							case ITEM_ATTR_08:
+							{
+								if(datalen != sizeof(unsigned short))
+									return ERROR_INVALID_FORMAT;
+								break;
+							}
+
+							case ITEM_ATTR_LIGHT:
+							{
+								if(datalen != sizeof(lightBlock))
+									return ERROR_INVALID_FORMAT;
+
+								lightBlock lb;
+								memcpy(&lb, p, sizeof(lightBlock));
+								iType->lightLevel = lb.lightLevel;
+								iType->lightColor = lb.lightColor;
+								break;
+							}
+
+							default:
+								delete iType;
+								return ERROR_INVALID_FORMAT;
+						}
+
+						
+						p+= datalen;
+						break;
+					}
+
+					default:
+						return ERROR_INVALID_FORMAT;
+						break;
+				}
+			}
+
+			// store the found item	  	
+			items[iType->id] = iType;
+		}
+
+		node = f.getNextNode(node, type);
+	}
+	
+	return ERROR_NONE;
+}
 
 int Items::loadFromDat(std::string file)
 {
@@ -136,6 +494,7 @@ int Items::loadFromDat(std::string file)
 	{
 		ItemType* iType= new ItemType();
 		iType->id	  = id;
+		iType->clientId = id;
 		
 #ifdef __DEBUG__
 		int lastoptbyte = 0;
@@ -162,13 +521,10 @@ int Items::loadFromDat(std::string file)
 			switch (optbyte)
 			{
 			case 0x00:
-				//is groundtile	   				
-				iType->groundtile = true;
-				iType->speed=(int)fgetc(f);
-				/*if(iType->speed==0) {
-					iType->blocking=true;
-				}*/
-				fgetc(f);
+				unsigned short read_short;
+				fread(&read_short, 2, 1, f); 
+				iType->speed = read_short;
+				iType->group = ITEM_GROUP_GROUND;
 				break;
 				
 			case 0x01: // all OnTop
@@ -176,13 +532,14 @@ int Items::loadFromDat(std::string file)
 				break;
 				
 			case 0x02: // can walk through (open doors, arces, bug pen fence ??)
-				iType->canWalkThrough = true;
-				iType->alwaysOnTop=true;
+				//iType->canWalkThrough = true;
+				iType->alwaysOnTop = true;
 				break;
 				
 			case 0x03:
 				//is a container
-				iType->iscontainer=true;
+				//iType->iscontainer=true;
+				iType->group = ITEM_GROUP_CONTAINER;
 				break;	   			
 				
 			case 0x04:
@@ -197,7 +554,8 @@ int Items::loadFromDat(std::string file)
 				
 			case 0x0A:
 				//is multitype !!! wrong definition (only water splash on floor)
-				iType->multitype=true;
+				//iType->multitype=true;
+				iType->group = ITEM_GROUP_SPLASH;
 				break;
 				
 			case 0x0B:
@@ -228,7 +586,8 @@ int Items::loadFromDat(std::string file)
 			case 0x06: // ladder up (id 1386)   why a group for just 1 item ???   
 				break;
 			case 0x09: //can contain fluids
-				iType->fluidcontainer = true;
+				//iType->fluidcontainer = true;
+				iType->group = ITEM_GROUP_FLUID;
 				break;
 			case 0x0D: // blocks missiles (walls, magic wall etc)
 				iType->blockProjectile = true;
@@ -240,7 +599,7 @@ int Items::loadFromDat(std::string file)
 			case 0x11: // can see what is under (ladder holes, stairs holes etc)
 				break;
 			case 0x12: // ground tiles that don't cause level change
-				iType->floorChange = false;
+				iType->floorChangeDown = false;
 				break;
 			case 0x18: //draw with height offset for all parts (2x2) of the sprite
 				break;
@@ -251,6 +610,7 @@ int Items::loadFromDat(std::string file)
 				
 			case 0x07: // writtable objects
 			{
+				iType->group = ITEM_GROUP_WRITEABLE;
 				iType->RWInfo |= CAN_BE_WRITTEN | CAN_BE_READ;
 
 				unsigned short subopt;
@@ -276,7 +636,7 @@ int Items::loadFromDat(std::string file)
 				break;
 			}
 			case 0x13: //items that have height
-				iType->blockPickupable = false;
+				iType->hasHeight = true;
 				//std::cout << "0x13: " << id << std::endl;
 				
 				fgetc(f); //height offset
@@ -459,10 +819,10 @@ int Items::loadXMLInfos(std::string file)
 						xmlFreeOTSERV(blockingProjectile);
 					}
 					
-					char* floorChange = (char*)xmlGetProp(p, (xmlChar*)"floorchange");
-					if(floorChange){
-						itemtype->floorChange = true;
-						xmlFreeOTSERV(floorChange);
+					char* floorChangeDown = (char*)xmlGetProp(p, (xmlChar*)"floorchange");
+					if(floorChangeDown){
+						itemtype->floorChangeDown = true;
+						xmlFreeOTSERV(floorChangeDown);
 					}
 					
 					char* floorChangeNorth = (char*)xmlGetProp(p, (xmlChar*)"floorchangenorth");
@@ -489,11 +849,11 @@ int Items::loadXMLInfos(std::string file)
 						xmlFreeOTSERV(floorChangeWest);
 					}
 					
-					char* damage = (char*)xmlGetProp(p, (xmlChar*)"damage");
+					/*char* damage = (char*)xmlGetProp(p, (xmlChar*)"damage");
 					if(damage){
 						itemtype->damage = atoi(damage);
 						xmlFreeOTSERV(damage);
-					}
+					}*/
 					
 					char *position = (char*)xmlGetProp(p, (xmlChar*)"position");
 					if(position){
@@ -702,11 +1062,13 @@ int Items::loadXMLInfos(std::string file)
 						}//rune
 						else if(!strcmp(type, "teleport"))
 						{
-							itemtype->isteleport = true;
+							//itemtype->isteleport = true;
+							itemtype->group = ITEM_GROUP_TELEPORT;
 						}
 						else if(!strcmp(type, "magicfield"))
 						{
-							itemtype->ismagicfield = true;
+							//itemtype->ismagicfield = true;
+							itemtype->group = ITEM_GROUP_MAGICFIELD;
 							char* fieldtype = (char*)xmlGetProp(p, (xmlChar*)"fieldtype");
 							if(fieldtype){
 								if (!strcmp(fieldtype, "fire"))
@@ -727,7 +1089,7 @@ int Items::loadXMLInfos(std::string file)
 						else if(!strcmp(type, "write1time")){
 							char* sreadonlyid = (char*)xmlGetProp(p, (xmlChar*)"readonlyid");
 							if (sreadonlyid){
-								itemtype->readonlyId = atoi(sreadonlyid);
+								itemtype->readOnlyId = atoi(sreadonlyid);
 								xmlFreeOTSERV(sreadonlyid);
 							}
 							else{
@@ -735,10 +1097,12 @@ int Items::loadXMLInfos(std::string file)
 							}
 						}
 						else if(!strcmp(type, "key")){
-							itemtype->iskey = true;
+							//itemtype->iskey = true;
+							itemtype->group = ITEM_GROUP_KEY;
 						}
 						else if(!strcmp(type, "splash")){
-							itemtype->issplash = true;
+							//itemtype->issplash = true;
+							itemtype->group = ITEM_GROUP_SPLASH;
 						}
 						else{
 							std::cout << "unknown type for item: " << id << std::endl;
@@ -771,5 +1135,4 @@ const ItemType& Items::operator[](int id)
 #endif
 	   
 	return dummyItemType;
-}	
-
+}

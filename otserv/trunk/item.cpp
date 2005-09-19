@@ -35,13 +35,13 @@
 Item* Item::CreateItem(const unsigned short _type, unsigned short _count /*= 0*/)
 {
 	Item *newItem;
-	if(items[_type].iscontainer){
+	if(items[_type].isContainer()){
 		newItem = new Container(_type);		
 	}
-	else if(items[_type].isteleport){		
+	else if(items[_type].isTeleport()){		
 		newItem = new Teleport(_type);
 	}
-	else if(items[_type].ismagicfield){	
+	else if(items[_type].isMagicField()){	
 		newItem =  new Item(_type, _count);
 	}	
 	else{
@@ -55,13 +55,13 @@ Item* Item::CreateItem(const unsigned short _type, unsigned short _count /*= 0*/
 //////////////////////////////////////////////////
 // returns the ID of this item's ItemType
 unsigned short Item::getID() const {
-    return id;
+	return id;
 }
 
 //////////////////////////////////////////////////
 // sets the ID of this item's ItemType
 void Item::setID(unsigned short newid) {
-    id = newid;
+	id = newid;
 }
 
 //////////////////////////////////////////////////
@@ -70,7 +70,7 @@ unsigned short Item::getItemCountOrSubtype() const {
 	if(isStackable()) {
 		return count;
 	}
-	else if(isFluidContainer() || isMultiType())
+	else if(isFluidContainer() || isSplash())
 		return fluid;
 	//else if(chargecount != 0)
 	else if(items[id].runeMagLevel != -1)
@@ -92,7 +92,7 @@ void Item::setItemCountOrSubtype(unsigned char n)
 			count = n;
 		}
 	}
-	else if(isFluidContainer() || isMultiType())
+	else if(isFluidContainer() || isSplash())
 		fluid = n;
 	else if(items[id].runeMagLevel != -1)
 		chargecount = n;
@@ -170,7 +170,7 @@ Item* Item::decay()
 	}
 	
 	if(dynamic_cast<Container*>(this)){
-		if(items[decayTo].iscontainer){
+		if(items[decayTo].isContainer()){
 			//container -> container			
 			setID(decayTo);
 			return this;
@@ -183,7 +183,7 @@ Item* Item::decay()
 		}
 	}
 	else{
-		if(items[decayTo].iscontainer){
+		if(items[decayTo].isContainer()){
 			//no container -> container
 			Item *item = Item::CreateItem(decayTo,getItemCountOrSubtype());
 			item->pos = this->pos;
@@ -260,13 +260,6 @@ Item::~Item()
 
 bool Item::canMovedTo(const Tile *tile) const
 {
-	/*
-	if(isBlocking() && !tile->creatures.empty())
-		return false;
-
-	return !tile->isBlocking(isPickupable());
-	*/
-
 	if(tile) {
 		int objectstate = 0;
 
@@ -374,12 +367,15 @@ bool Item::isStackable() const {
 	return items[id].stackable;
 }
 
+/*
 bool Item::isMultiType() const {
-	return items[id].multitype;
+	//return items[id].multitype;
+	return (items[id].group == ITEM_GROUP_SPLASH);
 }
+*/
 
 bool Item::isFluidContainer() const {
-	return items[id].fluidcontainer;
+	return (items[id].isFluidContainer());
 }
 
 bool Item::isAlwaysOnTop() const {
@@ -391,11 +387,11 @@ bool Item::isNotMoveable() const {
 }
 
 bool Item::isGroundTile() const {
-	return items[id].groundtile;
+	return items[id].isGroundTile();
 }
 
 bool Item::isSplash() const{
-	return items[id].issplash;
+	return items[id].isSplash();
 }
 
 bool Item::isPickupable() const {
@@ -406,8 +402,8 @@ bool Item::isUseable() const{
 	return items[id].useable;
 }
 
-bool Item::floorChange() const {
-	return items[id].floorChange;
+bool Item::floorChangeDown() const {
+	return items[id].floorChangeDown;
 }
 
 bool Item::floorChangeNorth() const {
@@ -518,7 +514,7 @@ std::string Item::getDescription(bool fullDescription) const
 					s << " of " << items[fluid].name;
 				}
 			}
-			else if(isMultiType()){				
+			else if(isSplash()){				
 				s << "a " << it.name << " of ";
 				if(fluid == 0){
 					s << items[1].name;
@@ -527,14 +523,14 @@ std::string Item::getDescription(bool fullDescription) const
 					s << items[fluid].name;
 				}
 			}
-			else if(it.iskey){
+			else if(it.isKey()){
 				s << "a " << it.name << " (Key:" << actionId << ")";
 			}
-			else if(it.groundtile)
+			else if(it.isGroundTile()) //groundtile
 			{
 				s << it.name;
 			}
-			else if(it.iscontainer && (container = dynamic_cast<const Container*>(this))) {
+			else if(it.isContainer() && (container = dynamic_cast<const Container*>(this))) {
 				s << "a " << it.name << " (Vol:" << container->capacity() << ")";
 			}
 			else {
@@ -594,8 +590,8 @@ void Item::setText(std::string desc){
 	}
 	if(desc.length() > 1){
 		text = new std::string(desc);	
-		if(items[id].readonlyId != 0){//write 1 time
-			id = items[id].readonlyId;
+		if(items[id].readOnlyId != 0){//write 1 time
+			id = items[id].readOnlyId;
 		}
 	}
 }

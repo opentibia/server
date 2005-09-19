@@ -52,7 +52,7 @@ ReturnValue Tile::isBlocking(int objectstate, bool ignoreCreature /* = false*/, 
 		*/
 
 		if(((objectstate & BLOCK_PICKUPABLE) == BLOCK_PICKUPABLE)) {			
-			if(groundType.blockSolid && (groundType.blockPickupable || groundType.pickupable))
+			if(groundType.blockSolid && (!groundType.hasHeight || groundType.pickupable))
 				return RET_NOTENOUGHROOM;
 		}
 
@@ -84,7 +84,7 @@ ReturnValue Tile::isBlocking(int objectstate, bool ignoreCreature /* = false*/, 
 			*/
 
 		if(((objectstate & BLOCK_PICKUPABLE) == BLOCK_PICKUPABLE)) {			
-			if(iiType.blockSolid && (iiType.blockPickupable || iiType.pickupable))
+			if(iiType.blockSolid && (!iiType.hasHeight || iiType.pickupable))
 				return RET_NOTENOUGHROOM;
 		}
 
@@ -110,7 +110,7 @@ ReturnValue Tile::isBlocking(int objectstate, bool ignoreCreature /* = false*/, 
 		*/
 
 		if(((objectstate & BLOCK_PICKUPABLE) == BLOCK_PICKUPABLE)) {
-			if(iiType.blockSolid && (iiType.blockPickupable || iiType.pickupable))
+			if(iiType.blockSolid && (!iiType.hasHeight || iiType.pickupable))
 				return RET_NOTENOUGHROOM;
 		}
 
@@ -126,7 +126,7 @@ ReturnValue Tile::isBlocking(int objectstate, bool ignoreCreature /* = false*/, 
 bool Tile::floorChange() const
 {
   ItemVector::const_iterator iit;
-  if(ground && ground->floorChange())
+  if(ground && ground->floorChangeDown())
     return true;
 
   for (iit = topItems.begin(); iit != topItems.end(); ++iit){  

@@ -38,7 +38,7 @@ class Player;
 class Item : public Thing
 {
 protected:
-	unsigned id;  // the same id as in ItemType
+	unsigned short id;  // the same id as in ItemType
 	unsigned char count; // number of stacked items
 	unsigned char chargecount; //number of charges on the item
 	unsigned char fluid;
@@ -67,12 +67,10 @@ public:
 	int getRWInfo() const;
 	int getWorth() const;
 		
-	//bool isBlockingProjectile() const;
 	bool isBlocking() const;
-	//bool isBlocking(bool ispickupable = false) const;
 	bool isStackable() const;
 	bool isFluidContainer() const;
-	bool isMultiType() const;
+	//bool isMultiType() const;
 	bool isAlwaysOnTop() const;
 	bool isGroundTile() const;
 	bool isSplash() const;
@@ -80,8 +78,8 @@ public:
 	bool isPickupable() const;
 	bool isWeapon() const;
 	bool isUseable() const;
-	//bool isContainer() const;
-	bool floorChange() const;
+
+	bool floorChangeDown() const;
 	bool floorChangeNorth() const;
 	bool floorChangeSouth() const;
 	bool floorChangeEast() const;

@@ -253,7 +253,7 @@ int Creature::getStepDuration() const
 	Tile *tile = g_game.getTile(pos.x, pos.y, pos.z);
 	if(tile && tile->ground){
 		int groundid = tile->ground->getID();
-		uint8_t stepspeed = Item::items[groundid].speed;
+		uint16_t stepspeed = Item::items[groundid].speed;
 		if(stepspeed != 0) {
 			duration =  (1000 * stepspeed) / (getSpeed() != 0 ? getSpeed() : 220);
 		}

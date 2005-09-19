@@ -267,18 +267,21 @@ void NetworkMessage::AddPosition(const Position &pos)
 
 void NetworkMessage::AddItem(unsigned short id, unsigned char count)
 {
-	AddU16(id);
-
 	const ItemType &it = Item::items[id];
-	if(it.stackable || it.multitype || it.fluidcontainer)
+
+	AddU16(it.clientId);
+
+	if(it.stackable || (it.group == ITEM_GROUP_SPLASH) || (it.group == ITEM_GROUP_FLUID))
 		AddByte(count);
 }
 
 void NetworkMessage::AddItem(const Item *item)
 {
-  AddU16(item->getID());
+	const ItemType &it = Item::items[item->getID()];
 
-  if (item->isStackable() || item->isMultiType() || item->isFluidContainer())
+	AddU16(it.clientId);
+
+	if(it.stackable || (it.group == ITEM_GROUP_SPLASH) || (it.group == ITEM_GROUP_FLUID))
     AddByte((unsigned char)item->getItemCountOrSubtype());
 }
 

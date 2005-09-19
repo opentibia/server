@@ -2311,7 +2311,7 @@ void Game::thingMoveInternal(Creature *creature, unsigned short from_x, unsigned
 			}
 
 			//change level begin
-			if(toTile->ground && toTile->ground->floorChange())
+			if(toTile->ground && toTile->ground->floorChangeDown())
 			{       
 				Tile* downTile = getTile(to_x, to_y, to_z+1);
 				if(downTile){        
