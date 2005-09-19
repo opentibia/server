@@ -865,17 +865,9 @@ void Game::thingMove(Player *player,
 }
 
 /*ground -> ground*/
-/*ground -> container*/
-bool Game::onPrepareMoveThing(Creature *player, const Thing* thing,
+bool Game::onPrepareMoveThing(Creature* player, const Thing* thing,
 	const Position& fromPos, const Position& toPos, int count)
 {
-	/*
-	if( (abs(fromPos.x - toPos.x) > 1) || (abs(fromPos.y - toPos.y) > 1) ) {
-		player->sendCancel("To far away...");
-		return false;
-	}
-	*/	
-		
 	if( (abs(player->pos.x - fromPos.x) > 1) || (abs(player->pos.y - fromPos.y) > 1) || (player->pos.z != fromPos.z)) {
 		player->sendCancel("To far away...");
 		return false;
@@ -886,28 +878,35 @@ bool Game::onPrepareMoveThing(Creature *player, const Thing* thing,
 		return false;
 	}
 	else {
-		ReturnValue ret = map->canThrowObjectTo(fromPos, toPos, BLOCK_PROJECTILE);
-		if(ret != RET_NOERROR) {
-			player->sendCancel("You cannot throw there.");
-			return false;
-		}
-
 		const Item* item = dynamic_cast<const Item*>(thing);
 		if(item) {
 			int blockstate = 0;
 			if(item->isBlocking())
 				blockstate |= BLOCK_SOLID;
 
-			if(item->isPickupable())
+			if(item->isPickupable() || !item->isNotMoveable())
 				blockstate |= BLOCK_PICKUPABLE;
 
 			if(blockstate != 0) {
 				switch(map->canThrowObjectTo(fromPos, toPos, blockstate)) {
-					case RET_NOERROR: return true;
-					case RET_NOTENOUGHROOM: player->sendCancel("Not enough room."); break;
+					case RET_NOERROR:
+						return true;
+						break;
 
+					case RET_CANNOTTHROW:
+						player->sendCancel("You cannot throw there.");
+						return false;
+						break;
+					
+					case RET_CREATUREBLOCK:
+					case RET_NOTENOUGHROOM:
+						player->sendCancel("There is not enough room.");
+						return false;
+						break;
+					
 					default:
 						player->sendCancel("Sorry not possible.");
+						return false;
 						break;
 				}
 			}
@@ -918,8 +917,8 @@ bool Game::onPrepareMoveThing(Creature *player, const Thing* thing,
 }
 
 /*ground -> ground*/
-bool Game::onPrepareMoveThing(Creature *creature, const Thing* thing,
-	const Tile *fromTile, const Tile *toTile, int count)
+bool Game::onPrepareMoveThing(Creature* creature, const Thing* thing,
+	const Tile* fromTile, const Tile *toTile, int count)
 {
 	const Player* player = dynamic_cast<const Player*>(creature);
 
@@ -971,8 +970,8 @@ bool Game::onPrepareMoveThing(Creature *creature, const Thing* thing,
 }
 
 /*inventory -> container*/
-bool Game::onPrepareMoveThing(Player *player, const Item* fromItem, slots_t fromSlot,
-	const Container *toContainer, const Item *toItem, int count)
+bool Game::onPrepareMoveThing(Player* player, const Item* fromItem, slots_t fromSlot,
+	const Container* toContainer, const Item* toItem, int count)
 {
 	if(!fromItem->isPickupable()) {		
 		player->sendCancel("Sorry, not possible.");
@@ -1014,9 +1013,20 @@ bool Game::onPrepareMoveThing(Player *player, const Item* fromItem, slots_t from
 
 /*container -> container*/
 /*ground -> container*/
-bool Game::onPrepareMoveThing(Player *player, const Item* fromItem, const Container *fromContainer,
-	const Container *toContainer, const Item *toItem, int count)
+bool Game::onPrepareMoveThing(Player* player,
+	const Position& fromPos, const Container* fromContainer, const Item* fromItem,
+	const Position& toPos, const Container* toContainer, const Item* toItem, int count)
 {	
+	if( (abs(player->pos.x - fromPos.x) > 1) || (abs(player->pos.y - fromPos.y) > 1) || (player->pos.z != fromPos.z)) {
+		player->sendCancel("To far away...");
+		return false;
+	}
+	else if( (abs(fromPos.x - toPos.x) > fromItem->throwRange) || (abs(fromPos.y - toPos.y) > fromItem->throwRange)
+		|| (fromPos.z != toPos.z)) {		
+		player->sendCancel("Destination is out of reach.");
+		return false;
+	}
+
 	if(!fromItem->isPickupable()) {		
 		player->sendCancel("You cannot move this object.");
 		return false;
@@ -1305,7 +1315,10 @@ void Game::thingMoveInternal(Player *player,
 
 	//Container to container
 	if(!fromInventory && fromContainer && toContainer) {
-		if(onPrepareMoveThing(player, fromItem, fromContainer, toContainer, toItem, count)) {
+		Position fromPos = (fromContainer->pos.x == 0xFFFF ? player->pos : fromContainer->pos);
+		Position toPos = (toContainer->pos.x == 0xFFFF ? player->pos : toContainer->pos);
+
+		if(onPrepareMoveThing(player, fromPos, fromContainer, fromItem, toPos, toContainer, toItem, count)) {
 
 			autoCloseTrade(fromItem, true);
 			int oldFromCount = fromItem->getItemCountOrSubtype();
@@ -1329,7 +1342,7 @@ void Game::thingMoveInternal(Player *player,
 					int surplusCount = oldToCount + count  - 100;
 					if(surplusCount > 0) {
 						Item *surplusItem = Item::CreateItem(fromItem->getID(), surplusCount);
-						if(onPrepareMoveThing(player, surplusItem, fromContainer, toContainer, NULL, count)) {
+						if(onPrepareMoveThing(player, fromPos, fromContainer, surplusItem, toPos, toContainer, NULL, count)) {
 							autoCloseTrade(toContainer);
 							toContainer->addItem(surplusItem);
 						}
@@ -1380,9 +1393,6 @@ void Game::thingMoveInternal(Player *player,
 			SpectatorVec list;
 			SpectatorVec::iterator it;
 
-			Position fromPos = (fromContainer->pos.x == 0xFFFF ? player->pos : fromContainer->pos);
-			Position toPos = (toContainer->pos.x == 0xFFFF ? player->pos : toContainer->pos);
-
 			if(fromPos == toPos) {
 				getSpectators(Range(fromPos, false), list);
 			}
@@ -1412,6 +1422,8 @@ void Game::thingMoveInternal(Player *player,
 	else {
 		//inventory to inventory
 		if(fromInventory && toInventory && !toContainer) {
+			Position fromPos = player->pos;
+			Position toPos = player->pos;
 			if(onPrepareMoveThing(player, fromItem, (slots_t)to_cid, count) && onPrepareMoveThing(player, (slots_t)from_cid, fromItem, (slots_t)to_cid, toItem, count)) {
 
 				autoCloseTrade(fromItem, true);
@@ -1569,6 +1581,9 @@ void Game::thingMoveInternal(Player *player,
 		}
 		//inventory to container
 		else if(fromInventory && toContainer) {
+			Position fromPos = player->pos;
+			Position toPos = (toContainer->pos.x == 0xFFFF ? player->pos : toContainer->pos);
+
 			int oldFromCount = fromItem->getItemCountOrSubtype();
 			int oldToCount = 0;
 
@@ -1592,7 +1607,7 @@ void Game::thingMoveInternal(Player *player,
 						if(surplusCount > 0) {
 							Item *surplusItem = Item::CreateItem(fromItem->getID(), surplusCount);
 
-							if(onPrepareMoveThing(player, surplusItem, NULL, toContainer, NULL, count)) {
+							if(onPrepareMoveThing(player, fromPos, NULL, surplusItem, toPos, toContainer, NULL, count)) {
 								autoCloseTrade(toContainer);
 								toContainer->addItem(surplusItem);
 							}
@@ -1911,9 +1926,11 @@ void Game::thingMoveInternal(Player *player, const Position& fromPos, unsigned c
 
 	/*ground to container*/
 	if(toContainer) {
-		if(onPrepareMoveThing(player, fromItem, fromPos, player->pos, count) &&
-				onPrepareMoveThing(player, fromItem, NULL, toContainer, toItem, count))
-		{
+		/*if(onPrepareMoveThing(player, fromItem, fromPos, player->pos, count) &&
+				onPrepareMoveThing(player, fromItem, NULL, toContainer, toItem, count))*/
+
+		Position toPos = (toContainer->pos.x == 0xFFFF ? player->pos : toContainer->pos);
+		if(onPrepareMoveThing(player, fromPos, NULL, fromItem, toPos, toContainer, toItem, count)) {
 			autoCloseTrade(fromItem, true);
 			int oldFromCount = fromItem->getItemCountOrSubtype();
 			int oldToCount = 0;
@@ -1936,7 +1953,7 @@ void Game::thingMoveInternal(Player *player, const Position& fromPos, unsigned c
 					if(surplusCount > 0) {
 						Item *surplusItem = Item::CreateItem(fromItem->getID(), surplusCount);
 
-						if(onPrepareMoveThing(player, surplusItem, NULL, toContainer, NULL, count)) {
+						if(onPrepareMoveThing(player, fromPos, NULL, surplusItem, toPos, toContainer, NULL, count)) {
 							autoCloseTrade(toContainer);
 							toContainer->addItem(surplusItem);
 						}
@@ -3811,7 +3828,6 @@ void Game::playerRequestTrade(Player* player, const Position& pos,
 		return;
 	}
 
-	
 	if(!player->removeItem(tradeItem, true)) {
 		/*if( (abs(player->pos.x - pos.x) > 1) || (abs(player->pos.y - pos.y) > 1) ) {
 			player->sendCancel("To far away...");

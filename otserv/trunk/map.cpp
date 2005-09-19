@@ -268,52 +268,51 @@ void Map::getSpectators(const Range& range, SpectatorVec& list)
 //bool Map::canThrowItemTo(Position from, Position to, bool creaturesBlock /* = true*/, bool isProjectile /*= false*/)
 ReturnValue Map::canThrowObjectTo(Position from, Position to, int objectstate /*= BLOCK_PROJECTILE*/)
 {
-	if(from.x > to.x) {
-		swap(from.x, to.x);
-		swap(from.y, to.y);
-	}
+	Position start = from;
+	Position end = to;
 
-	bool steep = std::abs(to.y - from.y) > abs(to.x - from.x);
+	/*if(start.x > end.x) {
+		swap(start.x, end.x);
+		swap(start.y, end.y);
+	}*/
+
+	bool steep = std::abs(end.y - start.y) > abs(end.x - start.x);
 
 	if(steep) {
-		swap(from.x, from.y);
-		swap(to.x, to.y);
+		swap(start.x, start.y);
+		swap(end.x, end.y);
 	}
 	
-	int deltax = abs(to.x - from.x);
-	int deltay = abs(to.y - from.y);
+	int deltax = abs(end.x - start.x);
+	int deltay = abs(end.y - start.y);
 	int error = 0;
 	int deltaerr = deltay;
-	int y = from.y;
+	int y = start.y;
 	Tile *t = NULL;
-	int xstep = ((from.x < to.x) ? 1 : -1);
-	int ystep = ((from.y < to.y) ? 1 : -1);
+	int xstep = ((start.x < end.x) ? 1 : -1);
+	int ystep = ((start.y < end.y) ? 1 : -1);
 
-	for(int x = from.x; x != to.x; x += xstep) {
-		//cout << "x: " << (steep ? y : x) << ", y: " << (steep ? x : y) << std::endl;
+	//for(int x = start.x; x != end.x; x += xstep) {
+	for(int x = start.x; x != end.x + xstep; x += xstep) {
+		int rx = (steep ? y : x);
+		int ry = (steep ? x : y);
 
-		if(!(from.x == x && from.y == y)) {
+		if(!(from.x == rx && from.y == ry)) {
 
-			t = getTile((steep ? y : x), (steep ? x : y), from.z);
+			t = getTile(rx, ry, start.z);
+			ReturnValue ret = RET_NOERROR;
 
 			if(t) {
-				//ReturnValue ret = t->isBlocking(((x == to.x && y == to.y) ? objectstate : BLOCK_PROJECTILE));
-				ReturnValue ret = t->isBlocking(objectstate);
-
-				if(ret != RET_NOERROR)
-					return ret;
-
-				/*
-				if(isProjectile) {
-					if(t->isBlockingProjectile())
-						return false;
+				if((to.x == rx && to.y == ry)) {
+					ret = t->isBlocking(objectstate);
 				}
-				else if(creaturesBlock && !t->creatures.empty())
-					return false;
-				else if(!(from.x == x && from.y == y) && t->isBlocking(BLOCK_SOLID | BLOCK_PROJECTILE))
-					return false;
-				*/
+				else {
+					ret = t->isBlocking(BLOCK_PROJECTILE);
+				}
 			}
+
+			if(ret != RET_NOERROR)
+				return ret;
 		}
 
 		error += deltaerr;

@@ -270,7 +270,7 @@ bool Item::canMovedTo(const Tile *tile) const
 	if(tile) {
 		int objectstate = 0;
 
-		if(isPickupable()) {
+		if(isPickupable() || !isNotMoveable()) {
 			objectstate |= BLOCK_PICKUPABLE;
 		}
 

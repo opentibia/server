@@ -295,8 +295,9 @@ protected:
 		const Container *toContainer, const Item *toItem, int count);
 
 	/*container -> container*/
-	bool onPrepareMoveThing(Player *player, const Item* fromItem, const Container *fromContainer,
-		const Container *toContainer, const Item *toItem, int count);
+	bool onPrepareMoveThing(Player* player, const Position& fromPos, const Container* fromContainer,
+		const Item* fromItem, const Position& toPos, const Container* toContainer, const Item* toItem,
+		int count);
 
 	/*ground -> ground*/
 	bool onPrepareMoveCreature(Creature *creature, const Creature* creatureMoving,
