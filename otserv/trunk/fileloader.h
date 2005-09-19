@@ -26,7 +26,7 @@
 
 typedef unsigned long NODE;
 
-#define NO_NODE NULL
+#define NO_NODE 0
 
 enum FILELOADER_ERRORS{
 	ERROR_NONE,
