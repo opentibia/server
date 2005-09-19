@@ -130,6 +130,7 @@ typedef int socklen_t;
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <stdint.h>
+#include <errno.h>
 
 
 inline void OTSYS_CREATE_THREAD(void *(*a)(void*), void *b)
