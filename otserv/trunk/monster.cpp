@@ -1075,7 +1075,7 @@ bool Monster::getDistancePosition(const Position &target, const int& maxTryDist,
 			if(tryDist <= (maxTryDist * maxTryDist) && (tryDist >= prevDist) && (tryDist > (minTryDist * minTryDist))) {
 
 				//if(!game->map->canThrowItemTo(tmpPos, target, false, true))
-				if(game->map->canThrowObjectTo(tmpPos, target, BLOCK_PROJECTILE) == RET_NOERROR)
+				if(game->map->canThrowObjectTo(tmpPos, target, BLOCK_PROJECTILE) != RET_NOERROR)
 					continue;
 
 				if(tmpPos != this->pos) {
