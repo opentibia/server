@@ -169,28 +169,28 @@ int Actions::canUse(const Player *player,const Position &pos) const
 		int dist_x = std::abs(pos.x - player->pos.x);
 		int dist_y = std::abs(pos.y - player->pos.y);
 		if(dist_x > 1 || dist_y > 1 || (pos.z != player->pos.z)){
-			return 1;
+			return TOO_FAR;
 		}
 	}
-	return 0;
+	return CAN_USE;
 }
 
 int Actions::canUseFar(const Player *player,const Position &to_pos, const bool blockWalls) const
 {
 	if(to_pos.x == 0xFFFF){
-		return 0;
+		return CAN_USE;
 	}
-	if(player->pos.x - to_pos.x > 7 || player->pos.y - to_pos.y > 5 || player->pos.z != to_pos.z){
-		return 1;
+	if(std::abs(player->pos.x - to_pos.x) > 7 || std::abs(player->pos.y - to_pos.y) > 5 || player->pos.z != to_pos.z){
+		return TOO_FAR;
 	}
 	
-	if(canUse(player,to_pos) == 1) {
+	if(canUse(player,to_pos) == TOO_FAR){
 		if(blockWalls && (game->map->canThrowObjectTo(player->pos, to_pos, BLOCK_PROJECTILE) != RET_NOERROR)){
-			return 2;
+			return CAN_NOT_THTOW;
 		}
 	}
 
-	return 0;
+	return CAN_USE;
 }
 
 Action *Actions::getAction(const Item *item){
@@ -217,7 +217,7 @@ Action *Actions::getAction(const Item *item){
 bool Actions::UseItem(Player* player, const Position &pos,const unsigned char stack, 
 	const unsigned short itemid, const unsigned char index)
 {	
-	if(canUse(player,pos)== 1){
+	if(canUse(player,pos)== TOO_FAR){
 		player->sendCancel("Too far away.");
 		return false;
 	}
@@ -291,7 +291,7 @@ bool Actions::UseItemEx(Player* player, const Position &from_pos,
 	const unsigned char from_stack,const Position &to_pos,
 	const unsigned char to_stack,const unsigned short itemid)
 {
-	if(canUse(player,from_pos) == 1){
+	if(canUse(player,from_pos) == TOO_FAR){
 		player->sendCancel("Too far away.");
 		return false;
 	}
@@ -310,16 +310,16 @@ bool Actions::UseItemEx(Player* player, const Position &from_pos,
 	
 	if(action){
 		if(action->allowFarUse() == false){
-			if(canUse(player,to_pos) == 1){
+			if(canUse(player,to_pos) == TOO_FAR){
 				player->sendCancel("Too far away.");
 				return false;
 			}
 		}
-		if(canUseFar(player, to_pos, action->blockWalls()) == 1){
+		else if(canUseFar(player, to_pos, action->blockWalls()) == TOO_FAR){
 			player->sendCancel("Too far away.");
 			return false;
 		}
-		else if(canUseFar(player, to_pos, action->blockWalls()) == 2){
+		else if(canUseFar(player, to_pos, action->blockWalls()) == CAN_NOT_THTOW){
 			player->sendCancel("You cannot throw there.");
 			return false;
 		}

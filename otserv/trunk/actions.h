@@ -46,6 +46,12 @@ class Game;
 class ActionScript;
 class Action;
 
+enum tCanUseRet{
+	CAN_USE,
+	TOO_FAR,
+	CAN_NOT_THTOW,
+};
+
 class Actions
 {
 public:
