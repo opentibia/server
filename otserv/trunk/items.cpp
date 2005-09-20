@@ -152,7 +152,7 @@ int Items::loadFromOtb(std::string file)
 	}
 	
 	unsigned long type,len;
-	NODE node = f.getChildNode(NULL, type);
+	NODE node = f.getChildNode(NO_NODE, type);
 	node = f.getChildNode(node, type);
 
 	const unsigned char* data;
