@@ -17,7 +17,7 @@ otserv_SOURCES = account.cpp container.cpp creature.cpp game.cpp ioaccount.cpp \
 	position.h protocol.h protocol74.h scheduler.h spells.h stamp-h status.h \
 	tasks.h templates.h texcept.h thing.h tile.h tools.h spawn.cpp spawn.h \
 	actions.h actions.cpp scheduler.cpp ioplayersql.cpp ioplayersql.h ioaccountsql.cpp ioaccountsql.h \
-	commands.cpp commands.h database.cpp database.h md5.cpp md5.h
+	commands.cpp commands.h database.cpp database.h md5.cpp md5.h fileloader.cpp fileloader.h chat.h
 else
 otserv_SOURCES = account.cpp container.cpp creature.cpp game.cpp ioaccount.cpp \
 	ioaccountxml.cpp iomapxml.cpp ioplayer.cpp ioplayerxml.cpp \
@@ -30,5 +30,5 @@ otserv_SOURCES = account.cpp container.cpp creature.cpp game.cpp ioaccount.cpp \
 	position.h protocol.h protocol74.h scheduler.h spells.h stamp-h status.h \
 	tasks.h templates.h texcept.h thing.h tile.h tools.h spawn.cpp spawn.h \
 	actions.h actions.cpp scheduler.cpp commands.cpp commands.h database.cpp database.h \
-	md5.cpp md5.h
+	md5.cpp md5.h fileloader.cpp fileloader.h chat.h
 endif
