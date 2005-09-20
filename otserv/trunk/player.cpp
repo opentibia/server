@@ -61,6 +61,7 @@ Player::Player(const std::string& name, Protocol *p) :
 	manaspent  = 0;
 	this->name = name;
 	food       = 0;
+	guildId    = 0;
 
 	eventAutoWalk = 0;
 	level      = 1;
@@ -183,7 +184,7 @@ std::string Player::getDescription(bool self) const
 		}
 	}
 	
-	if(guildName.length())
+	if(guildId)
 	{
 		if(self)
 			s << " You are ";

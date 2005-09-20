@@ -399,6 +399,7 @@ protected:
 	std::string name;	
 	unsigned long guid;
 	
+	unsigned long guildId;
 	std::string guildName;
 	std::string guildRank;
 	std::string guildNick;

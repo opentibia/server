@@ -345,6 +345,14 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name){
 				}
 				else
 					isLoaded = false;
+				
+				nodeValue = (char*)xmlGetProp(p, (const xmlChar *) "id");
+				if(nodeValue) {
+					player->guildId=atoi(nodeValue);
+					xmlFreeOTSERV(nodeValue);
+				}
+				else
+					isLoaded = false;
 			}
 			else if(str=="skills")
 			{

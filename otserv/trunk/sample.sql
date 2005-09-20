@@ -76,6 +76,18 @@ UNLOCK TABLES;
 /*!40000 ALTER TABLE `items` ENABLE KEYS */;
 
 --
+-- Table structure for table `guilds`
+--
+
+DROP TABLE IF EXISTS `guilds`;
+CREATE TABLE `guilds` (
+  `guildid` int(11) NOT NULL default '0',
+  `guildname` varchar(100) NOT NULL default '',
+  PRIMARY KEY  (`guildid`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+--
 -- Table structure for table `players`
 --
 
@@ -108,7 +120,7 @@ CREATE TABLE `players` (
   `maxdepotitems` int(11) NOT NULL default '1000',
   `food` int(11) NOT NULL default '0',
   `sex` int(11) NOT NULL default '0',
-  `guildname` varchar(32) NOT NULL default '',
+  `guildid` int(11) unsigned NOT NULL default '0',
   `guildrank` varchar(32) NOT NULL default '',
   `guildnick` varchar(32) NOT NULL default '',
   `lastlogin` int(11) unsigned NOT NULL default '0',
@@ -125,8 +137,8 @@ CREATE TABLE `players` (
 
 /*!40000 ALTER TABLE `players` DISABLE KEYS */;
 LOCK TABLES `players` WRITE;
-INSERT INTO `players` VALUES (1,'Hurz',1,1,18,1,675,840,840,2,76000,20,30,40,50,128,20,640,640,21700,'20;20;7','29;30;7',900,300,1000,129,1,0,'',1);
-INSERT INTO `players` VALUES (2,'Player',0,1,18,1,675,840,840,2,76000,20,30,40,50,128,20,640,640,21700,'27;23;7','27;23;7',900,300,1000,129,1,0,'',1);
+INSERT INTO `players` VALUES (1,'Hurz',1,1,18,1,675,840,840,2,76000,20,30,40,50,128,20,640,640,21700,'20;20;7','29;30;7',900,300,1000,129,1,0,0,'','',0,0,1);
+INSERT INTO `players` VALUES (2,'Player',0,1,18,1,675,840,840,2,76000,20,30,40,50,128,20,640,640,21700,'27;23;7','27;23;7',900,300,1000,129,1,0,0,'','',0,0,1);
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `players` ENABLE KEYS */;
 

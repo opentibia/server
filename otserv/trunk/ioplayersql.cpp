@@ -96,7 +96,8 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 		
 		player->accountNumber = result.getDataInt("account");
 		player->sex = (playersex_t)result.getDataInt("sex");
-		player->guildName = result.getDataString("guildname");
+		
+		player->guildId   = result.getDataLong("guildid");
 		player->guildRank = result.getDataString("guildrank");
 		player->guildNick = result.getDataString("guildnick");
 		
@@ -144,8 +145,6 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 		//there is no "fuck" in the sources, but every major programm got
 		//one and i think here is a good place to add one
 	
-		//std::cout << "sql loading: " << player->pos << std::endl;
-	
 		//MASTERSPAWN
 		std::string masterpos = result.getDataString("masterpos");
 		tokenizer mastertokens(masterpos, sep);
@@ -156,6 +155,13 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name){
 		player->masterPos.z = atoi(mspawnit->c_str());
 	
 	
+		if(player->guildId){
+			query << "SELECT guildname FROM guilds WHERE guildid='" << player->guildId << "'";
+			if(mysql.storeQuery(query, result)){
+				player->guildName = result.getDataString("guildname");
+			}
+		}	
+		
 		// we need to find out our skills
 		// so we query the skill table
 		query << "SELECT * FROM skills WHERE player='" << player->getGUID() << "'";
