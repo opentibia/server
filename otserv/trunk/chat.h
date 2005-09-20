@@ -22,12 +22,18 @@
 #define __CHAT_H
 
 #include <map>
+#include <list>
+#include <string>
+
+#include "const74.h"
+
+class Player;
 
 class ChatChannel
 {
 public:
 	ChatChannel(unsigned short channelId, std::string channelName);
-	~ChatChannel(){}
+	~ChatChannel(){};
 	
 	bool addUser(Player *player);
 	bool removeUser(Player *player);
@@ -49,7 +55,7 @@ class Chat
 {
 public:
 	Chat();
-	~Chat(){}
+	~Chat(){};
 	ChatChannel *createChannel(unsigned short channelId, std::string channelName);
 	bool deleteChannel(unsigned short channelId, std::string &channelName);
 	

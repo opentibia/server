@@ -19,6 +19,7 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "chat.h"
+#include "player.h"
 
 ChatChannel::ChatChannel(unsigned short channelId, std::string channelName)
 {
