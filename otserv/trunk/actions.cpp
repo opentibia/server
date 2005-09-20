@@ -612,6 +612,8 @@ int ActionScript::registerFunctions()
 	lua_register(luaState, "getPlayerMasterPos", ActionScript::luaActionGetPlayerMasterPos);
 	//getPlayerVocation(cid)
 	lua_register(luaState, "getPlayerVocation", ActionScript::luaActionGetPlayerVocation);
+	//getPlayerGuildId(cid)
+	lua_register(luaState, "getPlayerGuildId", ActionScript::luaActionGetPlayerGuildId);
 	//getPlayerItemCount(uid,itemid)
 	//getPlayerItem(uid,itemid)
 	
@@ -824,6 +826,9 @@ int ActionScript::internalGetPlayerInfo(lua_State *L, ePlayerInfo info)
 		case PlayerInfoVocation:
 			value = player->vocation;
 			break;
+		case PlayerInfoGuildId:
+			value = player->guildId;
+			break;
 		default:
 			std::cout << "GetPlayerInfo: Unkown player info " << info << std::endl;
 			value = 0;
@@ -871,6 +876,9 @@ int ActionScript::luaActionGetPlayerVocation(lua_State *L){
 
 int ActionScript::luaActionGetPlayerMasterPos(lua_State *L){
 	return internalGetPlayerInfo(L,PlayerInfoMasterPos);}
+
+int ActionScript::luaActionGetPlayerGuildId(lua_State *L){
+	return internalGetPlayerInfo(L,PlayerInfoGuildId);}
 //
 
 int ActionScript::luaActionDoRemoveItem(lua_State *L)

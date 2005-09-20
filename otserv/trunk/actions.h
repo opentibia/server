@@ -106,6 +106,7 @@ enum ePlayerInfo{
 	PlayerInfoPosition,
 	PlayerInfoVocation,
 	PlayerInfoMasterPos,
+	PlayerInfoGuildId,
 };
 
 struct KnownThing{
@@ -197,6 +198,7 @@ public:
 	static int luaActionGetPlayerSkill(lua_State *L);
 	static int luaActionGetPlayerVocation(lua_State *L);
 	static int luaActionGetPlayerMasterPos(lua_State *L);
+	static int luaActionGetPlayerGuildId(lua_State *L);
 	
 	static int luaActionGetPlayerStorageValue(lua_State *L);
 	static int luaActionSetPlayerStorageValue(lua_State *L);
