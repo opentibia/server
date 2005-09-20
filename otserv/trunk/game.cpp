@@ -2300,7 +2300,8 @@ void Game::thingMoveInternal(Creature *creature, unsigned short from_x, unsigned
           autoCloseAttack(playerMoving, attackedCreature);
 				}
 			}
-			else if(playerMoving->tradePartner != 0) {
+			
+			if(playerMoving->tradePartner != 0) {
 				Player* tradePartner = getPlayerByID(playerMoving->tradePartner);
 				if(tradePartner) {
 					if((std::abs(playerMoving->pos.x - tradePartner->pos.x) > 2) ||

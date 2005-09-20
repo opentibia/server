@@ -184,10 +184,12 @@ int Actions::canUseFar(const Player *player,const Position &to_pos, const bool b
 		return 1;
 	}
 	
-	if(blockWalls && (game->map->canThrowObjectTo(player->pos, to_pos, BLOCK_PROJECTILE) != RET_NOERROR)){
-	//if(blockWalls && !game->map->canThrowItemTo(player->pos, to_pos, false, true)){
-		return 2;
+	if(canUse(player,to_pos) == 1) {
+		if(blockWalls && (game->map->canThrowObjectTo(player->pos, to_pos, BLOCK_PROJECTILE) != RET_NOERROR)){
+			return 2;
+		}
 	}
+
 	return 0;
 }
 
