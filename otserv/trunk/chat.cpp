@@ -83,27 +83,27 @@ Chat::Chat()
 		m_normalChannels[0x06] = newChannel;		
 }
 
-ChatChannel *Chat::createChannel(unsigned short channelId, std::string channelName)
+ChatChannel *Chat::createChannel(Player *player, unsigned short channelId)
 {
-	if(getChannel(channelId, channelName))
+	if(getChannel(player, channelId))
 		return NULL;
 		
 	if(channelId == 0x00){	
-		ChatChannel *newChannel = new ChatChannel(channelId, channelName);
+		ChatChannel *newChannel = new ChatChannel(channelId, player->getGuildName());
 		if(!newChannel)
 			return NULL;
 		
-		m_guildChannels[channelName] = newChannel;
+		m_guildChannels[player->getGuildId()] = newChannel;
 		return newChannel;
 	}
 		
 	return NULL;
 }
 
-bool Chat::deleteChannel(unsigned short channelId, std::string &channelName)
+bool Chat::deleteChannel(Player *player, unsigned short channelId)
 {
 	if(channelId == 0x00){
-		GuildChannelMap::iterator it = m_guildChannels.find(channelName);
+		GuildChannelMap::iterator it = m_guildChannels.find(player->getGuildId());
 		if(it == m_guildChannels.end())
 			return false;
 			
@@ -117,11 +117,7 @@ bool Chat::deleteChannel(unsigned short channelId, std::string &channelName)
 	
 bool Chat::addUserToChannel(Player *player, unsigned short channelId)
 {
-	std::string channelName;
-	if(channelId == 0x00)
-		channelName = player->getGuildName();
-		
-	ChatChannel *channel = getChannel(channelId, channelName);
+	ChatChannel *channel = getChannel(player, channelId);
 	if(!channel)
 		return false;
 		
@@ -133,11 +129,7 @@ bool Chat::addUserToChannel(Player *player, unsigned short channelId)
 
 bool Chat::removeUserFromChannel(Player *player, unsigned short channelId)
 {
-	std::string channelName;
-	if(channelId == 0x00)
-		channelName = player->getGuildName();
-	
-	ChatChannel *channel = getChannel(channelId, channelName);
+	ChatChannel *channel = getChannel(player, channelId);
 	if(!channel)
 		return false;
 		
@@ -160,7 +152,7 @@ void Chat::removeUserFromAllChannels(Player *player)
 	
 bool Chat::talkToChannel(Player *player, SpeakClasses type, std::string &text, unsigned short channelId)
 {
-	ChatChannel *channel = getChannel(channelId, player);
+	ChatChannel *channel = getChannel(player, channelId);
 	if(!channel)
 		return false;
 		
@@ -171,12 +163,8 @@ bool Chat::talkToChannel(Player *player, SpeakClasses type, std::string &text, u
 }
 	
 std::string Chat::getChannelName(Player *player, unsigned short channelId)
-{
-	std::string channelName;
-	if(channelId == 0x00)
-		channelName = player->getGuildName();
-		
-	ChatChannel *channel = getChannel(channelId, channelName);
+{	
+	ChatChannel *channel = getChannel(player, channelId);
 	if(channel)
 		return channel->getName();
 	else
@@ -188,11 +176,12 @@ ChannelList Chat::getChannelList(Player *player)
 	ChannelList list;
 	NormalChannelMap::iterator itn;
 		
-	if(player->getGuildName().length()){
-		ChatChannel *channel = getChannel(0x00, player->getGuildName());
+	// If has guild
+	if(player->getGuildId() && player->getGuildName().length()){
+		ChatChannel *channel = getChannel(player, 0x00);
 		if(channel)
 			list.push_back(channel);
-		else if(channel = createChannel(0x00, player->getGuildName()))
+		else if(channel = createChannel(player, 0x00))
 			list.push_back(channel);
 	}
 		
@@ -204,33 +193,10 @@ ChannelList Chat::getChannelList(Player *player)
 	return list;
 }
 
-ChatChannel *Chat::getChannel(unsigned short channelId, std::string channelName)
+ChatChannel *Chat::getChannel(Player *player, unsigned short channelId)
 {
-	if(channelId == 0x00){
-		GuildChannelMap::iterator it = m_guildChannels.find(channelName);
-		if(it == m_guildChannels.end())
-			return NULL;
-			
-		return it->second;
-	}
-	else{
-		NormalChannelMap::iterator it = m_normalChannels.find(channelId);
-		if(it == m_normalChannels.end())
-			return NULL;
-				
-		return it->second;
-	}
-	return NULL;
-}
-
-ChatChannel *Chat::getChannel(unsigned short channelId, Player *player)
-{
-	if(channelId == 0x00){
-		std::string channelName = player->getGuildName();
-		if(!channelName.length())
-			return NULL;
-				
-		GuildChannelMap::iterator it = m_guildChannels.find(channelName);
+	if(channelId == 0x00){	
+		GuildChannelMap::iterator it = m_guildChannels.find(player->getGuildId());
 		if(it == m_guildChannels.end())
 			return NULL;
 			

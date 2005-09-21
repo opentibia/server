@@ -56,8 +56,8 @@ class Chat
 public:
 	Chat();
 	~Chat(){};
-	ChatChannel *createChannel(unsigned short channelId, std::string channelName);
-	bool deleteChannel(unsigned short channelId, std::string &channelName);
+	ChatChannel *createChannel(Player *player, unsigned short channelId);
+	bool deleteChannel(Player *player, unsigned short channelId);
 	
 	bool addUserToChannel(Player *player, unsigned short channelId);
 	bool removeUserFromChannel(Player *player, unsigned short channelId);
@@ -69,11 +69,10 @@ public:
 	ChannelList getChannelList(Player *player);
 	
 private:
-	ChatChannel *getChannel(unsigned short channelId, std::string channelName);
-	ChatChannel *getChannel(unsigned short channelId, Player *player);
+	ChatChannel *getChannel(Player *player, unsigned short channelId);
 	
 	typedef std::map<unsigned short, ChatChannel*> NormalChannelMap;
-	typedef std::map<std::string, ChatChannel*> GuildChannelMap;
+	typedef std::map<unsigned long, ChatChannel*> GuildChannelMap;
 	NormalChannelMap m_normalChannels;
 	GuildChannelMap m_guildChannels;
 };

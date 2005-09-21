@@ -149,6 +149,8 @@ public:
 	
 	const std::string& getName() const {return name;};
 	const std::string& getGuildName() const {return guildName;};
+	unsigned long getGuildId() const {return guildId;};
+	
 	int getPlayerInfo(playerinfo_t playerinfo) const;
 	int getSkill(skills_t skilltype, skillsid_t skillinfo) const;
 	std::string getSkillName(int skillid);
