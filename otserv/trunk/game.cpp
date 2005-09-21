@@ -2690,7 +2690,7 @@ void Game::creatureSpeakTo(Creature *creature, SpeakClasses type,const std::stri
 		return;
 	}
 
-	if(toPlayer->access == 0)
+	if(creature->access == 0)
 		type = SPEAK_PRIVATE;
 
 	toPlayer->onCreatureSay(creature, type, text);	
