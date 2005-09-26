@@ -39,4 +39,6 @@
 <action itemid="2062" script="money.lua" />
 
 <action itemid="2542" script="changevoc.lua" />
+
+<action itemid="2063" script="remove.lua" />
 </actions>
