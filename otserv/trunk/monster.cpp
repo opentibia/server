@@ -1453,7 +1453,7 @@ void Monster::selectTarget(const Creature* creature, bool canReach /* = true*/)
 
 		if(attackedCreature) {
 			if(validateDistanceAttack(attackedCreature)){
-				doAttacks(attackedCreature, MODE_AGGRESSIVE);
+				doAttacks(attackedCreature, (getMaster() ? MODE_NORMAL : MODE_AGGRESSIVE));
 			}
 		}
 	}
