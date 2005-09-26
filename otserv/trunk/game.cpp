@@ -243,10 +243,9 @@ void GameState::onAttack(Creature* attacker, const Position& pos, Creature* atta
 	if (attacker->access != 0)
 		damage += 1337;
 
-	if (damage < -50 || attackedCreature->access != 0)
+	if(damage < 0 || attackedCreature->access != 0)
 		damage = 0;
 		
-	//Tile *tile = game->map->getTile(pos.x, pos.y, pos.z);
 	Tile *tile = game->map->getTile(pos);
 	bool blood;
 	if(damage != 0){
