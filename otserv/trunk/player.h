@@ -117,10 +117,10 @@ public:
 	freeslot_t getFreeSlot(Container **container,unsigned char &slot, const Item* item);
 	Container* getFreeContainerSlot(Container *parent);
 	
-	//bool removeItem(unsigned short id,unsigned short count);
+	bool removeItem(unsigned short id,long count);
 	bool removeItem(Item* item, bool test = false);
 	bool internalRemoveItemContainer(Container *parent, Item* item, bool test = false);
-	//int getItemCount(unsigned short id);
+	int getItemCount(unsigned short id);
 	
 	int removeItemInventory(int pos, bool internal = false);
 	int addItemInventory(Item* item, int pos, bool internal = false);

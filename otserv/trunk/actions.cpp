@@ -680,12 +680,14 @@ int ActionScript::registerFunctions()
 	lua_register(luaState, "doPlayerSetMasterPos", ActionScript::luaActionDoPlayerSetMasterPos);
 	//doPlayerSetVocation(cid,voc)
 	lua_register(luaState, "doPlayerSetVocation", ActionScript::luaActionDoPlayerSetVocation);
+	//doPlayerRemoveItem(cid,itemid,count)
+	lua_register(luaState, "doPlayerRemoveItem", ActionScript::luaActionDoPlayerRemoveItem);
 	
 	//doMoveItem(uid,toPos)
 	//doMovePlayer(cid,direction)
 	
 	//doPlayerAddCondition(....)
-	//doPlayerRemoveItem(itemid,count)
+	
 	
 	return true;
 }
@@ -921,6 +923,33 @@ int ActionScript::luaActionDoRemoveItem(lua_State *L)
 	return 1;
 }
 
+int ActionScript::luaActionDoPlayerRemoveItem(lua_State *L)
+{	
+	//doPlayerRemoveItem(cid,itemid,count)
+	long count = (unsigned char)internalGetNumber(L);	
+	unsigned short itemid = (unsigned short)internalGetNumber(L);
+	unsigned int cid = (unsigned int)internalGetNumber(L);						
+	
+	ActionScript *action = getActionScript(L);
+	
+	const KnownThing* tmp = action->GetPlayerByUID(cid);
+	if(tmp){
+		Player *player = (Player*)(tmp->thing);
+		if(player->removeItem(itemid, count)){
+			lua_pushnumber(L, 1);
+		}
+		else{
+			lua_pushnumber(L, 0);
+		}
+	}
+	else{
+		lua_pushnumber(L, -1);
+		std::cout << "luaDoPlayerRemoveItem: player not found" << std::endl;
+		return 1;
+	}	
+	
+	return 1;
+}
 
 int ActionScript::luaActionDoFeedPlayer(lua_State *L)
 {	
@@ -939,7 +968,7 @@ int ActionScript::luaActionDoFeedPlayer(lua_State *L)
 		lua_pushnumber(L, -1);
 		std::cout << "luaDoFeedPlayer: player not found" << std::endl;
 		return 1;
-	}		
+	}
 	
 	lua_pushnumber(L, 0);
 	return 1;

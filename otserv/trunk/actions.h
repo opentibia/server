@@ -174,6 +174,7 @@ public:
 	static int luaActionDoPlayerRemoveMoney(lua_State *L);
 	static int luaActionDoPlayerSetMasterPos(lua_State *L);
 	static int luaActionDoPlayerSetVocation(lua_State *L);
+	static int luaActionDoPlayerRemoveItem(lua_State *L);
 	
 	//get item info
 	static int luaActionGetItemRWInfo(lua_State *L);

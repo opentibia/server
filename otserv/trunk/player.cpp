@@ -386,18 +386,6 @@ bool Player::substractMoney(unsigned long money)
 					tmp->location = SLOT_TYPE_INVENTORY;
 					tmp->parent = NULL;
 					moneyMap.insert(moneymap_pair(items[i]->getWorth(),tmp));
-					/*Item *item = items[i];
-					removeItemInventory(i);
-					if(money >= item->getWorth()){
-						money = money - item->getWorth();
-					}
-					else{
-						substractMoneyItem(item, money);
-						money = 0;
-						break;
-					}
-					item->releaseThing();
-					item = NULL;*/
 				}
 			}
 		}
@@ -493,6 +481,118 @@ bool Player::substractMoneyItem(Item *item, unsigned long money)
 	}
 	
 	return true;
+}
+
+bool Player::removeItem(unsigned short id,long count)
+{
+	if(getItemCount(id) < count)
+		return false;
+	
+	std::list<Container*> stack;
+	
+	ContainerList::iterator it;
+	for(int i = 0; i < 11 && count > 0 ;i++){	
+		if(items[i]){
+			if(items[i]->getID() == id){
+				if(items[i]->isStackable()){
+					if(items[i]->getItemCountOrSubtype() > count){
+						items[i]->setItemCountOrSubtype(items[i]->getItemCountOrSubtype() - count);
+						sendInventory(i);
+					}
+					else{
+						count = count - items[i]->getItemCountOrSubtype();
+						g_game.FreeThing(items[i]);
+						removeItemInventory(i);
+					}
+				}
+				else{
+					count--;
+					g_game.FreeThing(items[i]);
+					removeItemInventory(i);
+				}
+			}
+			else if(Container *tmpcontainer = dynamic_cast<Container*>(items[i])){
+				stack.push_back(tmpcontainer);
+			}
+		}
+	}
+	
+	while(stack.size() > 0 && count > 0){
+		Container *container = stack.front();
+		stack.pop_front();
+		for(int i = 0; i < container->size(); i++){	
+			Item *item = container->getItem(i);
+			if(item->getID() == id){
+				if(item->isStackable()){
+					if(item->getItemCountOrSubtype() > count){
+						item->setItemCountOrSubtype(item->getItemCountOrSubtype() - count);
+						onItemUpdateContainer(container,item, i);
+					}
+					else{
+						count = count - item->getItemCountOrSubtype();
+						g_game.FreeThing(item);
+						onItemRemoveContainer(container,i);
+						container->removeItem(item);
+					}
+				}
+				else{
+					count--;
+					g_game.FreeThing(item);
+					onItemRemoveContainer(container,i);
+					container->removeItem(item);
+				}
+			}
+			else if(dynamic_cast<Container*>(item)){
+				stack.push_back(dynamic_cast<Container*>(item));
+			}
+		}
+	}
+	if(count == 0)
+		return true;
+	else
+		return false;
+}
+
+int Player::getItemCount(unsigned short id)
+{
+	unsigned long counter = 0;
+	std::list<const Container*> stack;
+	ContainerList::const_iterator cit;
+	for(int i=0; i< 11;i++){
+		if(items[i]){
+			if(items[i]->getID() == id){
+				if(items[i]->isStackable()){
+					counter = counter + items[i]->getItemCountOrSubtype();
+				}
+				else{
+					counter++;
+				}
+			}
+			if(Container *tmpcontainer = dynamic_cast<Container*>(items[i])){
+				stack.push_back(tmpcontainer);
+			}
+		}
+	}
+	
+	while(stack.size() > 0) {
+		const Container *container = stack.front();
+		stack.pop_front();
+		for(cit = container->getItems(); cit != container->getEnd(); ++cit){
+			if((*cit)->getID() == id){
+				if((*cit)->isStackable()){
+					counter = counter + (*cit)->getItemCountOrSubtype();
+				}
+				else{
+					counter++;
+				}
+			}
+			Container *container = dynamic_cast<Container*>(*cit);
+			if(container) {
+				stack.push_back(container);
+			}
+		}
+	}
+	return counter;
 }
 
 void Player::sendIcons()
