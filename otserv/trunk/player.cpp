@@ -520,7 +520,7 @@ bool Player::removeItem(unsigned short id,long count)
 	while(stack.size() > 0 && count > 0){
 		Container *container = stack.front();
 		stack.pop_front();
-		for(int i = 0; i < container->size(); i++){	
+		for(int i = 0; i < container->size() && count > 0; i++){	
 			Item *item = container->getItem(i);
 			if(item->getID() == id){
 				if(item->isStackable()){
