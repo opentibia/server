@@ -496,6 +496,7 @@ bool Player::removeItem(unsigned short id,long count)
 			if(items[i]->getID() == id){
 				if(items[i]->isStackable()){
 					if(items[i]->getItemCountOrSubtype() > count){
+						count = 0;
 						items[i]->setItemCountOrSubtype(items[i]->getItemCountOrSubtype() - count);
 						sendInventory(i);
 					}
@@ -525,6 +526,7 @@ bool Player::removeItem(unsigned short id,long count)
 			if(item->getID() == id){
 				if(item->isStackable()){
 					if(item->getItemCountOrSubtype() > count){
+						count = 0;
 						item->setItemCountOrSubtype(item->getItemCountOrSubtype() - count);
 						onItemUpdateContainer(container,item, i);
 					}
