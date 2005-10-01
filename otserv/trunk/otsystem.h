@@ -132,6 +132,8 @@ typedef int socklen_t;
 #include <stdint.h>
 #include <errno.h>
 
+#define PTHREAD_MUTEX_RECURSIVE_NP PTHREAD_MUTEX_RECURSIVE
+
 
 inline void OTSYS_CREATE_THREAD(void *(*a)(void*), void *b)
 {
