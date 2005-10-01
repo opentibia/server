@@ -29,7 +29,12 @@
 
 #include "otsystem.h"
 #include "networkmessage.h"
+
+#ifndef __PROTOCOL75__
 #include "protocol74.h"
+#else
+#include "protocol75.h"
+#endif
 
 #include <stdlib.h>
 #include <time.h>
@@ -81,6 +86,7 @@ std::vector< std::pair<unsigned long, unsigned long> > bannedIPs;
 LuaScript g_config;
 
 Items Item::items;
+ReverseItemMap Items::revItems;
 Game g_game;
 Spells spells(&g_game);
 Actions actions(&g_game);
@@ -244,10 +250,18 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 			msg.GetU32();
 			std::string name     = msg.GetString();
 			std::string password = msg.GetString();
+			#ifndef __PROTOCOL75__
 			if(version != 740 && version != 741){
+			#else
+			if(version != 750){
+			#endif
 				msg.Reset();
 				msg.AddByte(0x14);
+				#ifndef __PROTOCOL75__
 				msg.AddString("Only clients with protocol 7.4 allowed!");
+				#else
+				msg.AddString("Only clients with protocol 7.5 allowed!");
+				#endif
 				msg.WriteToSocket(s);
 			}
 			else if(isclientBanished(s)){
@@ -276,8 +290,13 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 				}
 				OTSYS_THREAD_UNLOCK(g_game.gameLock, "ConnectionHandler()")
 				if(s){
+					#ifndef __PROTOCOL75__
 					Protocol74* protocol;
 					protocol = new Protocol74(s);
+					#else
+					Protocol75* protocol;
+					protocol = new Protocol75(s);
+					#endif
 					player = new Player(name, protocol);
 					player->useThing();
 					player->setID();
@@ -461,6 +480,7 @@ int main(int argc, char *argv[])
 	std::cout << "[done]" << std::endl;
 	
 	// load item data
+	#ifndef __PROTOCOL75__
 	std::cout << ":: Reading tibia.dat ...            ";
 	if (Item::items.loadFromDat("tibia.dat"))
 	{
@@ -476,6 +496,16 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 	std::cout << "[done]" << std::endl;
+	#else
+	std::cout << ":: Loading items items.otb ... ";
+	if (Item::items.loadFromOtb("items.otb"))
+	{
+		ErrorMessage("Could not load items.otb!");
+		return -1;
+	}
+	std::cout << "[done]" << std::endl;
+	#endif
+	
 	
 	std::string worldtype = g_config.getGlobalString("worldtype");
 	std::transform(worldtype.begin(), worldtype.end(), worldtype.begin(), upchar);

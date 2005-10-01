@@ -130,6 +130,7 @@ public:
 	//bool						isDoorWithLock;
 };
 
+typedef std::map<unsigned long, unsigned long> ReverseItemMap;
 
 class Items {
 public:
@@ -141,10 +142,13 @@ public:
   int loadXMLInfos(std::string);
 	
 	const ItemType& operator[](int id);
-		 
+	
+	static unsigned long reverseLookUp(unsigned long id);
 protected:
 	typedef std::map<unsigned short, ItemType*> ItemMap;
 	ItemMap items;
+	
+	static ReverseItemMap revItems;
 
 	ItemType dummyItemType; // use this for invalid ids
 };

@@ -62,7 +62,7 @@ bool NetworkMessage::ReadFromSocket(SOCKET socket)
 	m_MsgSize = recv(socket, (char*)m_MsgBuf, 2, 0);
 	
 	// for now we expect 2 bytes at once, it should not be splitted
-	int datasize = m_MsgBuf[0] | m_MsgBuf[1] >> 8;
+	int datasize = m_MsgBuf[0] | m_MsgBuf[1] << 8;
 	if ((m_MsgSize != 2) || (datasize > NETWORKMESSAGE_MAXSIZE-2))
 	{
 		int errnum;
@@ -84,7 +84,7 @@ bool NetworkMessage::ReadFromSocket(SOCKET socket)
 	m_MsgSize += recv(socket, (char*)m_MsgBuf+2, datasize, 0);
 
 	// we got something unexpected/incomplete
-	if ((m_MsgSize <= 2) || ((m_MsgBuf[0] | m_MsgBuf[1] >> 8) != m_MsgSize-2))
+	if ((m_MsgSize <= 2) || ((m_MsgBuf[0] | m_MsgBuf[1] << 8) != m_MsgSize-2))
 	{
 		Reset();
 		return false;
@@ -155,6 +155,12 @@ unsigned short NetworkMessage::GetU16()
   unsigned short v = ((m_MsgBuf[m_ReadPos]) | (m_MsgBuf[m_ReadPos+1] << 8));
   m_ReadPos += 2;
   return v;
+}
+
+unsigned short NetworkMessage::GetItemId()
+{
+	unsigned short v = this->GetU16();
+	return Item::items.reverseLookUp(v);
 }
 
 unsigned int NetworkMessage::GetU32()
@@ -282,7 +288,14 @@ void NetworkMessage::AddItem(const Item *item)
 	AddU16(it.clientId);
 
 	if(it.stackable || (it.group == ITEM_GROUP_SPLASH) || (it.group == ITEM_GROUP_FLUID))
-    AddByte((unsigned char)item->getItemCountOrSubtype());
+    	AddByte((unsigned char)item->getItemCountOrSubtype());
+}
+
+void NetworkMessage::AddItemId(const Item *item)
+{
+	const ItemType &it = Item::items[item->getID()];
+
+	AddU16(it.clientId);
 }
 
 void NetworkMessage::JoinMessages(NetworkMessage &add){

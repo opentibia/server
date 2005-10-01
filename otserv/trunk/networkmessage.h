@@ -52,6 +52,7 @@ public:
   // simply read functions for incoming message
   unsigned char  GetByte();
   unsigned short GetU16();
+  unsigned short GetItemId();
   unsigned int   GetU32();
   std::string    GetString();
   std::string	 GetRaw();
@@ -75,6 +76,7 @@ public:
   void AddPosition(const Position &pos);
 	void AddItem(unsigned short id, unsigned char count);
 	void AddItem(const Item *item);
+	void AddItemId(const Item *item);
   void AddCreature(const Creature *creature, bool known, unsigned int remove);
 
   int getMessageLength(){

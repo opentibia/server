@@ -829,7 +829,7 @@ void Protocol75::parseSetOutfit(NetworkMessage &msg)
 void Protocol75::parseUseItemEx(NetworkMessage &msg)
 {
 	Position pos_from = msg.GetPosition();
-	unsigned short itemid = msg.GetU16();
+	unsigned short itemid = msg.GetItemId();
 	unsigned char from_stackpos = msg.GetByte();
 	Position pos_to = msg.GetPosition();
 	/*unsigned short tile_id = */msg.GetU16();
@@ -851,7 +851,8 @@ void Protocol75::sendContainer(unsigned char index, Container *container)
 	msg.AddByte(0x6E);
 	msg.AddByte(index);
 	
-	msg.AddU16(container->getID());
+	//msg.AddU16(container->getID());
+	msg.AddItemId(container);
 	msg.AddString(container->getName());
 	msg.AddByte(container->capacity());
 	if(container->getParent() != NULL)
@@ -940,7 +941,7 @@ void Protocol75::sendCloseContainer(unsigned char containerid)
 void Protocol75::parseUseItem(NetworkMessage &msg)
 {
 	Position pos = msg.GetPosition();
-	unsigned short item = msg.GetU16();
+	unsigned short itemid = msg.GetItemId();
 	unsigned char stack = msg.GetByte();
 	unsigned char index = msg.GetByte();
 	
@@ -948,7 +949,7 @@ void Protocol75::parseUseItem(NetworkMessage &msg)
 	std::cout << "parseUseItem: " << "x: " << pos.x << ", y: " << (int)pos.y <<  ", z: " << (int)pos.z << ", item: " << (int)item << ", stack: " << (int)stack << ", index: " << (int)index << std::endl;
 #endif
 	
-	game->playerUseItem(player, pos, stack, item, index);
+	game->playerUseItem(player, pos, stack, itemid, index);
 }
 
 void Protocol75::parseCloseContainer(NetworkMessage &msg)
@@ -977,7 +978,7 @@ void Protocol75::parseThrow(NetworkMessage &msg)
 	unsigned short from_x     = msg.GetU16();
 	unsigned short from_y     = msg.GetU16(); 
 	unsigned char  from_z     = msg.GetByte();
-	unsigned short itemid     = msg.GetU16();
+	unsigned short itemid     = msg.GetItemId();
 	unsigned char  from_stack = msg.GetByte();
 	unsigned short to_x       = msg.GetU16();
 	unsigned short to_y       = msg.GetU16(); 
@@ -1230,7 +1231,7 @@ void Protocol75::parseTextWindow(NetworkMessage &msg)
 void Protocol75::parseRequestTrade(NetworkMessage &msg)
 {
 	Position pos = msg.GetPosition();
-	unsigned short itemid = msg.GetU16();
+	unsigned short itemid = msg.GetItemId();
 	unsigned char stack = msg.GetByte();
 	unsigned long playerid = msg.GetU32();
 	
@@ -2250,7 +2251,8 @@ void Protocol75::sendTextWindow(Item* item,const unsigned short maxlen, const bo
 	msg.AddByte(0x96);
 	windowTextID++;
 	msg.AddU32(windowTextID);
-	msg.AddU16(item->getID());
+	//msg.AddU16(item->getID());
+	msg.AddItemId(item);
 	if(canWrite){
 		msg.AddU16(maxlen);		
 		msg.AddString(item->getText());		
