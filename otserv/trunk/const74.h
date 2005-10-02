@@ -143,13 +143,20 @@ enum Icons {
 
 enum WeaponType 
 {
-	NONE, SWORD, CLUB, AXE, DIST, MAGIC, AMO, SHIELD
+	NONE = 0,
+	SWORD = 1, 
+	CLUB = 2,
+	AXE = 3,
+	SHIELD = 4,
+	DIST = 5,
+	MAGIC = 6,
+	AMO = 7,
 };
 
 enum amu_t{
-	AMU_NONE,
-	AMU_BOLT,
-	AMU_ARROW
+	AMU_NONE = 0,
+	AMU_BOLT = 1,
+	AMU_ARROW = 2
 };
 
 

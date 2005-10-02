@@ -238,8 +238,12 @@ int Items::loadFromOtb(std::string file)
 							{
 								if(datalen != sizeof(unsigned short))
 									return ERROR_INVALID_FORMAT;
+								
+								unsigned short serverid = *(unsigned short*)p;
+								if(serverid > 20000 && serverid < 20100)
+									serverid = serverid - 20000;
 
-								memcpy(&iType->id, p, sizeof(unsigned short));
+								iType->id = serverid;
 								break;
 							}
 
@@ -267,7 +271,7 @@ int Items::loadFromOtb(std::string file)
 								char descr[128];
 								if(datalen >= sizeof(descr))
 									return ERROR_INVALID_FORMAT;
-
+	
 								memcpy(descr, p, datalen);
 								descr[datalen] = 0;
 								iType->description = descr;
@@ -286,8 +290,41 @@ int Items::loadFromOtb(std::string file)
 							{
 								if(datalen != sizeof(unsigned short))
 									return ERROR_INVALID_FORMAT;
-
-								memcpy(&iType->slot_position, p, sizeof(unsigned short));
+								
+								unsigned short otb_slot = *(unsigned short*)p;
+								
+								switch(otb_slot){
+								case OTB_SLOT_DEFAULT:
+								case OTB_SLOT_WEAPON:
+								case OTB_SLOT_HAND:
+									//default	
+									break;
+								case OTB_SLOT_HEAD:
+									iType->slot_position = SLOTP_HEAD;
+									break;
+								case OTB_SLOT_BODY:
+									iType->slot_position = SLOTP_ARMOR;
+									break;
+								case OTB_SLOT_LEGS:
+									iType->slot_position = SLOTP_LEGS;
+									break;
+								case OTB_SLOT_BACKPACK:
+									iType->slot_position = SLOTP_BACKPACK;
+									break;
+								case OTB_SLOT_2HAND:
+									iType->slot_position  = SLOTP_TWO_HAND;
+									break;
+								case OTB_SLOT_FEET:
+									iType->slot_position = SLOTP_FEET;
+									break;
+								case OTB_SLOT_AMULET:
+									iType->slot_position = SLOTP_NECKLACE;
+									break;
+								case OTB_SLOT_RING:
+									iType->slot_position = SLOTP_RING;
+									break;
+								}
+								iType->slot_position = iType->slot_position | SLOTP_LEFT | SLOTP_RIGHT | SLOTP_AMMO;
 								break;
 							}
 							case ITEM_ATTR_MAXITEMS:
@@ -327,6 +364,7 @@ int Items::loadFromOtb(std::string file)
 
 								amuBlock ab;
 								memcpy(&ab, p, sizeof(amuBlock));
+								iType->weaponType = AMO;
 								iType->shootType = (subfight_t)ab.shootType;
 								iType->amuType = (amu_t)ab.amuType;
 								iType->attack = ab.attack;
@@ -342,7 +380,8 @@ int Items::loadFromOtb(std::string file)
 									
 								iType->armor = ab.armor;
 								iType->weight = ab.weight;
-								iType->slot_position = ab.slot_position;
+								//ignore this value
+								//iType->slot_position = ab.slot_position;
 
 								break;
 							}

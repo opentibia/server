@@ -90,6 +90,20 @@ enum itemflags_t {
  FLAG_ROTABLE = 32768
 };
 
+enum slotsOTB_t{
+	OTB_SLOT_DEFAULT,
+	OTB_SLOT_HEAD,
+	OTB_SLOT_BODY,
+	OTB_SLOT_LEGS,
+	OTB_SLOT_BACKPACK,
+	OTB_SLOT_WEAPON,
+	OTB_SLOT_2HAND,
+	OTB_SLOT_FEET,
+	OTB_SLOT_AMULET,
+	OTB_SLOT_RING,
+	OTB_SLOT_HAND,
+};
+
 struct decayBlock{
 	unsigned short decayTo;
 	unsigned short decayTime;
