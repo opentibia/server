@@ -1040,14 +1040,9 @@ Container* Player::getContainer(unsigned char containerid)
 
 bool Player::isHoldingContainer(const Container* container) const
 {
-	/*const Container* topContainer = container;
-	while(topContainer->getParent() != NULL) {
-		topContainer = topContainer->getParent();
-	}*/
 	const Container* topContainer = container->getTopParent();
 
-	//find a free slot in container
-	for(int i=0; i< 11; i++){
+	for(int i = 0; i < 11; i++){
 		Container *container = dynamic_cast<Container*>(items[i]);
 		if(container && topContainer == container){
 			return true;

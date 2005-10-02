@@ -1554,11 +1554,12 @@ void Game::thingMoveInternal(Player *player,
 					player->updateInventoryWeigth();
 				}
 
-				if(fromContainer->pos.x != 0xFFFF) {
+				//if(fromContainer->pos.x != 0xFFFF) {
+				if(fromContainer->getTopParent()->pos.x != 0xFFFF) {
 					SpectatorVec list;
 					SpectatorVec::iterator it;
 
-					getSpectators(Range(fromContainer->pos, false), list);
+					getSpectators(Range(fromContainer->getTopParent()->pos, false), list);
 
 					//players
 					for(it = list.begin(); it != list.end(); ++it) {
@@ -1652,11 +1653,11 @@ void Game::thingMoveInternal(Player *player,
 					player->updateInventoryWeigth();
 				}
 
-				if(toContainer->pos.x != 0xFFFF) {
+				if(toContainer->getTopParent()->pos.x != 0xFFFF) {
 					SpectatorVec list;
 					SpectatorVec::iterator it;
 
-					getSpectators(Range(toContainer->pos, false), list);
+					getSpectators(Range(toContainer->getTopParent()->pos, false), list);
 
 					//players
 					for(it = list.begin(); it != list.end(); ++it) {
