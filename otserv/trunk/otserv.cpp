@@ -497,8 +497,8 @@ int main(int argc, char *argv[])
 	}
 	std::cout << "[done]" << std::endl;
 	#else
-	std::cout << ":: Loading items items.otb ... ";
-	if (Item::items.loadFromOtb("items.otb"))
+	std::cout << ":: Loadding " << g_config.getGlobalString("datadir") << "items/items.otb ... ";
+	if (Item::items.loadFromOtb(g_config.getGlobalString("datadir") + "items/items.otb"))
 	{
 		ErrorMessage("Could not load items.otb!");
 		return -1;
