@@ -1338,25 +1338,19 @@ void Protocol75::sendThingMove(const Creature *creature, const Container *fromCo
 	
 	NetworkMessage msg;
 	
-	if(fromContainer && fromContainer->pos.x != 0xFFFF) 
-	{
-		if(toContainer->pos.x != 0xFFFF) {
-			//Auto-close container's
-			if(std::abs(player->pos.x - toContainer->pos.x) > 1 || std::abs(player->pos.y - toContainer->pos.y) > 1) {
-				const Container *container = dynamic_cast<const Container*>(fromItem);
-				if(container) {				
-					autoCloseContainers(container, msg);
-				}
+	//Auto-close container's
+	const Container* moveContainer = dynamic_cast<const Container*>(fromItem);
+	if(moveContainer){
+		bool hasContainerOpen = false;
+		for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
+			if(cit->second == toContainer || cit->second->getTopParent()->isHoldingItem(toContainer)){
+				hasContainerOpen = true;
+				break;
 			}
 		}
-		else
-		{
-			if(creature != player) {
-				const Container *container = dynamic_cast<const Container*>(fromItem);
-				if(container) {				
-					autoCloseContainers(container, msg);
-				}
-			}
+		
+		if(!hasContainerOpen && !player->isHoldingContainer(toContainer)) {
+			autoCloseContainers(moveContainer, msg);
 		}
 	}
 	
@@ -1458,10 +1452,8 @@ void Protocol75::sendThingMove(const Creature *creature, slots_t fromSlot, const
 	
 	NetworkMessage msg;
 	
-	Container *container = NULL;
 	for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
-		container = cit->second;
-		if(container == toContainer) {
+		if(cit->second == toContainer) {
 			unsigned char cid = cit->first;
 			
 			if(fromItem->isStackable()) {
@@ -1489,19 +1481,17 @@ void Protocol75::sendThingMove(const Creature *creature, slots_t fromSlot, const
 	
 	if(creature == player) {
 		AddPlayerInventoryItem(msg,player, fromSlot);
-	}
-	
-	//Update up-arrow
-	//
-	const Container *itemContainer = dynamic_cast<const Container*>(fromItem);
-	if(itemContainer) {
-		for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
-			container = cit->second;
-			
-			if(container == itemContainer) {
-				sendContainer(cit->first, container);
+
+		//Update up-arrow
+		const Container* moveContainer = dynamic_cast<const Container*>(fromItem);
+		if(moveContainer) {
+			for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
+				if(cit->second == moveContainer) {
+					sendContainer(cit->first, cit->second);
+				}
 			}
 		}
+		//
 	}
 	
 	WriteBuffer(msg);
@@ -1534,10 +1524,8 @@ void Protocol75::sendThingMove(const Creature *creature, const Container *fromCo
 	
 	NetworkMessage msg;
 	
-	Container *container = NULL;
 	for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
-		container = cit->second;
-		if(container == fromContainer) {
+		if(cit->second == fromContainer) {
 			unsigned char cid = cit->first;
 			
 			if(!fromItem->isStackable() || (oldFromCount == count && oldToCount + count <= 100)) {
@@ -1558,21 +1546,19 @@ void Protocol75::sendThingMove(const Creature *creature, const Container *fromCo
 	
 	if(creature == player) {
 		AddPlayerInventoryItem(msg,player, toSlot);
-	}
-	
-	//Update up-arrow
-	//
-	const Container *itemContainer = dynamic_cast<const Container*>(fromItem);
-	if(itemContainer) {
-		for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
-			container = cit->second;
-			
-			if(container == itemContainer) {
-				sendContainer(cit->first, container);
+
+		//Update up-arrow
+		const Container* moveContainer = dynamic_cast<const Container*>(fromItem);
+		if(moveContainer) {
+			for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
+				if(cit->second == moveContainer) {
+					sendContainer(cit->first, cit->second);
+				}
 			}
 		}
+		//
 	}
-	
+		
 	WriteBuffer(msg);
 }
 
@@ -1585,21 +1571,20 @@ void Protocol75::sendThingMove(const Creature *creature, const Container *fromCo
 	}
 	
 	NetworkMessage msg;
-	bool updateContainerArrow = false;
-	
-	//Update up-arrow
-	if((fromContainer->pos.x == 0xFFFF && creature == player) &&
-		(std::abs(player->pos.x - toPos.x) <= 1 && std::abs(player->pos.y - toPos.y) <= 1)) {
-		updateContainerArrow = true;
-	}
+
 	//Auto-close container's
-	else if(std::abs(player->pos.x - toPos.x) > 1 || std::abs(player->pos.y - toPos.y) > 1) {
-		const Container *container = dynamic_cast<const Container*>(fromItem);
-		if(container) {			
-			autoCloseContainers(container, msg);			
+	const Container* moveContainer = dynamic_cast<const Container*>(fromItem);
+	bool updateContainerArrow = false;
+
+	if(moveContainer) {
+		//Auto-close container's
+		if(std::abs(player->pos.x - toPos.x) > 1 || std::abs(player->pos.y - toPos.y) > 1) {
+			autoCloseContainers(moveContainer, msg);			
 		}
+		else
+			updateContainerArrow = true;
 	}
-	
+
 	if(CanSee(toPos.x, toPos.y, toPos.z)) {
 		if(toItem && toItem->getID() == fromItem->getID() && fromItem->isStackable() && toItem->getItemCountOrSubtype() != oldToCount) {
 			AddTileUpdated(msg, toItem->pos);
@@ -1630,17 +1615,17 @@ void Protocol75::sendThingMove(const Creature *creature, const Container *fromCo
 	}
 	
 	//Update up-arrow
-	//
 	if(updateContainerArrow) {
-		const Container *itemContainer = dynamic_cast<const Container*>(fromItem);
-		if(itemContainer) {
+		const Container* moveContainer = dynamic_cast<const Container*>(fromItem);
+		if(moveContainer) {
 			for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
-				if(cit->second == itemContainer) {
+				if(cit->second == moveContainer) {
 					sendContainer(cit->first, cit->second);
 				}
 			}
 		}
 	}
+	//
 	
 	WriteBuffer(msg);
 }
@@ -1656,14 +1641,12 @@ void Protocol75::sendThingMove(const Creature *creature, slots_t fromSlot,
 			player->sendStats();
 		}
 		
-		if(std::abs(player->pos.x - toPos.x) <= 1 && std::abs(player->pos.y - toPos.y) <= 1 && player->pos.z == toPos.z ) {
-			//Update up-arrow (if container)?
-		}
-		//Auto-close container's
-		else {
-			const Container *container = dynamic_cast<const Container*>(fromItem);
-			if(container) {								
-				autoCloseContainers(container, msg);				
+		//Auto-closing containers
+		const Container* moveContainer = dynamic_cast<const Container*>(fromItem);
+		if(moveContainer) {
+			//Auto-close container's
+			if(std::abs(player->pos.x - toPos.x) > 1 || std::abs(player->pos.y - toPos.y) > 1) {
+				autoCloseContainers(moveContainer, msg);			
 			}
 		}
 	}
@@ -1698,20 +1681,25 @@ void Protocol75::sendThingMove(const Creature *creature, const Position &fromPos
 	}
 	
 	NetworkMessage msg;
-	bool updateContainerArrow = false;
 	
-	//Update up-arrow
-	if((toContainer->pos.x == 0xFFFF && creature == player))
-	{
-		updateContainerArrow = true;
-	}
-	//Auto-close container's
-	else if((toContainer->pos.x == 0xFFFF) || (std::abs(player->pos.x - toContainer->pos.x) > 1 ||
-		std::abs(player->pos.y - toContainer->pos.y) > 1)) {
-		const Container *container = dynamic_cast<const Container*>(fromItem);
-		if(container) {			
-			autoCloseContainers(container, msg);		
+	//Auto-closing containers
+	const Container* moveContainer = dynamic_cast<const Container*>(fromItem);
+	bool updateContainerArrow = false;
+	if(moveContainer) {
+		bool hasContainerOpen = false;
+		
+		for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit){
+			if(cit->second == toContainer || cit->second->getTopParent()->isHoldingItem(toContainer)){
+				hasContainerOpen = true;
+				break;
+			}
 		}
+		
+		if(!hasContainerOpen && !player->isHoldingContainer(toContainer)){
+			autoCloseContainers(moveContainer, msg);
+		}
+		else
+			updateContainerArrow = true;
 	}
 	//
 	
@@ -1753,13 +1741,12 @@ void Protocol75::sendThingMove(const Creature *creature, const Position &fromPos
 	}
 	
 	if(updateContainerArrow) {
-		const Container *itemContainer = dynamic_cast<const Container*>(fromItem);
-		if(itemContainer) {
+		const Container* moveContainer = dynamic_cast<const Container*>(fromItem);
+		if(moveContainer) {
 			for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
-				container = cit->second;
 				
-				if(container == itemContainer) {
-					sendContainer(cit->first, container);
+				if(cit->second == moveContainer) {
+					sendContainer(cit->first, cit->second);
 				}
 			}
 		}
@@ -1782,10 +1769,10 @@ void Protocol75::sendThingMove(const Creature *creature, const Position &fromPos
 		AddPlayerInventoryItem(msg, player, toSlot);
 	}
 	else {
-		const Container *container = dynamic_cast<const Container*>(fromItem);
 		//Auto-closing containers
-		if(container) {
-			autoCloseContainers(container, msg);						
+		const Container* moveContainer = dynamic_cast<const Container*>(fromItem);
+		if(moveContainer) {
+			autoCloseContainers(moveContainer, msg);						
 		}
 	}
 	
@@ -1852,11 +1839,11 @@ void Protocol75::sendThingMove(const Creature *creature, const Thing *thing,
 				msg.AddItem((Item*)thing);
 				
 				//Auto-close container's
-				if(std::abs(player->pos.x - thing->pos.x) > 1 || std::abs(player->pos.y - thing->pos.y) > 1 || player->pos.z != thing->pos.z ) {
-					const Container *container = dynamic_cast<const Container*>(thing);
-					if(container) {						
-						autoCloseContainers(container, msg);						
-					}					
+				const Container* moveContainer = dynamic_cast<const Container*>(thing);
+				if(moveContainer){
+					if(std::abs(player->pos.x - thing->pos.x) > 1 || std::abs(player->pos.y - thing->pos.y) > 1 || player->pos.z != thing->pos.z ){
+						autoCloseContainers(moveContainer, msg);
+					}
 				}
 			}
 		}
@@ -1895,7 +1882,7 @@ void Protocol75::sendThingMove(const Creature *creature, const Thing *thing,
 			}
 			
 			//Only add those we need to close
-			if(container && container->pos.x != 0xFFFF) {				
+			if(container->pos.x != 0xFFFF) {				
 				if(std::abs(player->pos.x - container->pos.x) > 1 || std::abs(player->pos.y - container->pos.y) > 1 || player->pos.z != container->pos.z) {
 					containers.push_back(cit->second);
 				}
@@ -2190,11 +2177,13 @@ void Protocol75::sendThingRemove(const Thing *thing){
 	}
 	
 	NetworkMessage msg;
-	const Container *container = dynamic_cast<const Container *>(thing);
-	if(container) {
-		//Auto-close container's
-		autoCloseContainers(container, msg);		
+
+	//Auto-close container's
+	const Container* moveContainer = dynamic_cast<const Container *>(thing);
+	if(moveContainer) {
+		autoCloseContainers(moveContainer, msg);		
 	}
+
 	WriteBuffer(msg);
 }
 

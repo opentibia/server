@@ -1681,17 +1681,17 @@ void Protocol74::sendThingMove(const Creature *creature, const Container *fromCo
 	}
 
 	//Update up-arrow
-	//
 	if(updateContainerArrow) {
-		const Container *itemContainer = dynamic_cast<const Container*>(fromItem);
-		if(itemContainer) {
+		const Container* moveContainer = dynamic_cast<const Container*>(fromItem);
+		if(moveContainer) {
 			for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
-				if(cit->second == itemContainer) {
+				if(cit->second == moveContainer) {
 					sendContainer(cit->first, cit->second);
 				}
 			}
 		}
 	}
+	//
 
 	WriteBuffer(msg);
 }
@@ -1777,10 +1777,8 @@ void Protocol74::sendThingMove(const Creature *creature, const Position &fromPos
 			AddTileUpdated(msg, fromPos);
 	}
 
-	Container *container = NULL;
 	for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
-		container = cit->second;
-		if(container == toContainer) {
+		if(cit->second == toContainer) {
 			unsigned char cid = cit->first;
 			
 			if(fromItem->isStackable()) {
@@ -1807,13 +1805,11 @@ void Protocol74::sendThingMove(const Creature *creature, const Position &fromPos
 	}
 
 	if(updateContainerArrow) {
-		const Container *itemContainer = dynamic_cast<const Container*>(fromItem);
-		if(itemContainer) {
+		const Container* moveContainer = dynamic_cast<const Container*>(fromItem);
+		if(moveContainer) {
 			for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
-				container = cit->second;
-
-				if(container == itemContainer) {
-					sendContainer(cit->first, container);
+				if(cit->second == moveContainer) {
+					sendContainer(cit->first, cit->second);
 				}
 			}
 		}
@@ -2258,11 +2254,13 @@ void Protocol74::sendThingRemove(const Thing *thing){
 	}
 
 	NetworkMessage msg;
+
+	//Auto-close container's
 	const Container* moveContainer = dynamic_cast<const Container *>(thing);
 	if(moveContainer) {
-		//Auto-close container's
 		autoCloseContainers(moveContainer, msg);		
 	}
+
 	WriteBuffer(msg);
 }
 
