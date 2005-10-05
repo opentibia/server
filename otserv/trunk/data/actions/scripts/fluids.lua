@@ -18,8 +18,8 @@ function onUse(cid, item, frompos, item2, topos)
 					doPlayerSay(cid,"Gulp.",1)
 				end
 			else
-				splash = doCreateItem(2025,item.type,topos)
 				doChangeTypeItem(item.uid,0)
+				splash = doCreateItem(2025,item.type,topos)
 				doDecayItem(splash)
 			end
 		end
@@ -29,8 +29,8 @@ function onUse(cid, item, frompos, item2, topos)
 		if item.type == 0 then
 			doPlayerSendCancel(cid,"It is empty.")
 		else
-			splash = doCreateItem(2025,item.type,topos)
 			doChangeTypeItem(item.uid,0)
+			splash = doCreateItem(2025,item.type,topos)
 			doDecayItem(splash)
 		end
 	end
