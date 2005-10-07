@@ -650,7 +650,9 @@ bool IOPlayerXML::savePlayer(Player* player){
     	pn = xmlNewNode(NULL,(const xmlChar*)"guild");
 	sb << player->guildName;     xmlSetProp(pn, (const xmlChar*) "name", (const xmlChar*)sb.str().c_str());        sb.str("");
 	sb << player->guildRank;  xmlSetProp(pn, (const xmlChar*) "rank", (const xmlChar*)sb.str().c_str());        sb.str("");
-	sb << player->guildNick;  	  xmlSetProp(pn, (const xmlChar*) "nick", (const xmlChar*)sb.str().c_str());       sb.str("");               
+	sb << player->guildNick;  	  xmlSetProp(pn, (const xmlChar*) "nick", (const xmlChar*)sb.str().c_str());       sb.str("");
+	sb << player->guildId;  	  xmlSetProp(pn, (const xmlChar*) "id", (const xmlChar*)sb.str().c_str());       sb.str("");
+	
 	xmlAddChild(root, pn);
     	      
 	sn = xmlNewNode(NULL,(const xmlChar*)"skills");
