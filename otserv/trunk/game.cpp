@@ -2794,7 +2794,7 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 		if(t && (!creature || (creature->access != 0 || !me->offensive || !t->isPz()) ) ) {
 			if((t->isBlocking(BLOCK_PROJECTILE) == RET_NOERROR) && (me->isIndirect() ||
 				//(map->canThrowItemTo(frompos, (*maIt), false, true) && !t->floorChange()))) {
-				((map->canThrowObjectTo(frompos, (*maIt), BLOCK_PROJECTILE) == RET_NOERROR) && !t->floorChange()))) {
+				((map->canThrowObjectTo(centerpos, (*maIt), BLOCK_PROJECTILE) == RET_NOERROR) && !t->floorChange()))) {
 				
 				if(maIt->x < topLeft.x)
 					topLeft.x = maIt->x;
