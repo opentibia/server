@@ -1378,10 +1378,13 @@ void Protocol74::sendThingMove(const Creature *creature, const Container *fromCo
 	const Container* moveContainer = dynamic_cast<const Container*>(fromItem);
 	if(moveContainer){
 		bool hasContainerOpen = false;
-		for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
-			if(cit->second == toContainer || cit->second->getTopParent()->isHoldingItem(toContainer)){
-				hasContainerOpen = true;
-				break;
+
+		if(toContainer->getTopParent()->pos.x != 0xFFFF) {
+			for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
+				if(cit->second == toContainer || cit->second->getTopParent()->isHoldingItem(toContainer)){
+					hasContainerOpen = true;
+					break;
+				}
 			}
 		}
 		
@@ -1754,10 +1757,12 @@ void Protocol74::sendThingMove(const Creature *creature, const Position &fromPos
 	if(moveContainer) {
 		bool hasContainerOpen = false;
 		
-		for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit){
-			if(cit->second == toContainer || cit->second->getTopParent()->isHoldingItem(toContainer)){
-				hasContainerOpen = true;
-				break;
+		if(toContainer->getTopParent()->pos.x != 0xFFFF) {
+			for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit){
+				if(cit->second == toContainer || cit->second->getTopParent()->isHoldingItem(toContainer)){
+					hasContainerOpen = true;
+					break;
+				}
 			}
 		}
 		
