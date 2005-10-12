@@ -207,6 +207,7 @@ int Items::loadFromOtb(std::string file)
 							iType->floorChangeSouth = ((flags & FLAG_FLOORCHANGESOUTH) == FLAG_FLOORCHANGESOUTH);
 							iType->floorChangeWest = ((flags & FLAG_FLOORCHANGEWEST) == FLAG_FLOORCHANGEWEST);
 							iType->alwaysOnTop = ((flags & FLAG_ALWAYSONTOP) == FLAG_ALWAYSONTOP);
+							iType->canDecay = !((flags & FLAG_CANNOTDECAY) == FLAG_CANNOTDECAY);
 							
 							if(type == ITEM_GROUP_WRITEABLE) {
 								iType->RWInfo |= CAN_BE_WRITTEN;
