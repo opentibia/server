@@ -20,7 +20,6 @@
 
 #include <iostream>
 #include "database.h"
-#include "mysql.h"
 
 DBResult::~DBResult()
 {
