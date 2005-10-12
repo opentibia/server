@@ -87,6 +87,7 @@ private:
 	
 	void parseThrow(NetworkMessage &msg);
 	void parseUseItemEx(NetworkMessage &msg);
+	void parseBattleWindow(NetworkMessage &msg);
 	void parseUseItem(NetworkMessage &msg);
 	void parseCloseContainer(NetworkMessage &msg);
 	void parseUpArrowContainer(NetworkMessage &msg);

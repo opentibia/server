@@ -227,6 +227,7 @@ public:
 	bool playerUseItemEx(Player *player, const Position& posFrom,const unsigned char  stack_from,
 		const Position &posTo,const unsigned char stack_to, const unsigned short itemid);
 	bool playerUseItem(Player *player, const Position& pos, const unsigned char stackpos, const unsigned short itemid, const unsigned char index);
+	bool playerUseBattleWindow(Player *player, Position &posFrom, unsigned char stackpos, unsigned short itemid, unsigned long creatureid);
 
 	void playerRequestTrade(Player *player, const Position& pos,
 		const unsigned char stackpos, const unsigned short itemid, unsigned long playerid);

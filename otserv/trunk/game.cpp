@@ -3800,6 +3800,58 @@ bool Game::playerUseItem(Player *player, const Position& pos, const unsigned cha
 	return true;
 }
 
+bool Game::playerUseBattleWindow(Player *player, Position &posFrom, unsigned char stackpos, unsigned short itemid, unsigned long creatureid)
+{
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerUseBattleWindow");
+
+	if(player->isRemoved)
+		return false;
+
+	Creature *creature = getCreatureByID(creatureid);
+	if(!creature || dynamic_cast<Player*>(creature))
+		return false;
+
+	if(std::abs(creature->pos.x - player->pos.x) > 7 || std::abs(creature->pos.y - player->pos.y) > 5 || creature->pos.z != player->pos.z)
+		return false;
+
+	bool ret = false;
+
+	Position thingpos = getThingMapPos(player, posFrom);
+	Item *item = dynamic_cast<Item*>(getThing(posFrom, stackpos, player));
+	if(item) {
+		//Runes
+		std::map<unsigned short, Spell*>::iterator sit = spells.getAllRuneSpells()->find(item->getID());
+		if(sit != spells.getAllRuneSpells()->end()) {
+			if( (abs(thingpos.x - player->pos.x) > 1) || (abs(thingpos.y - player->pos.y) > 1) ) {
+				player->sendCancel("To far away...");
+			}
+			else {
+				std::string var = std::string("");
+				if(player->access != 0 || sit->second->getMagLv() <= player->maglevel)
+				{
+					bool success = sit->second->getSpellScript()->castSpell(player, creature->pos, var);
+					ret = success;
+					if(success){
+						autoCloseTrade(item);
+						item->setItemCharge(std::max((int)item->getItemCharge() - 1, 0) );
+						if(item->getItemCharge() == 0){
+							if(removeThing(player,posFrom,item)){
+								FreeThing(item);
+							}
+						}
+					}
+				}
+				else
+				{
+					player->sendCancel("You don't have the required magic level to use that rune.");
+				}
+			}
+		}
+	}
+	return ret;
+}
+
+
 void Game::playerRequestTrade(Player* player, const Position& pos,
 	const unsigned char stackpos, const unsigned short itemid, unsigned long playerid)
 {

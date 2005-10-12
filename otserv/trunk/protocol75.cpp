@@ -209,6 +209,10 @@ void Protocol75::parsePacket(NetworkMessage &msg)
 		parseUseItemEx(msg);
 		break;
 		
+	case 0x84: // battle window
+		parseBattleWindow(msg);
+		break;
+	
     case 0x85:	//rotate item
 		//parseRotateItem(msg);
 		break;
@@ -837,6 +841,16 @@ void Protocol75::parseUseItemEx(NetworkMessage &msg)
 	
 	game->playerUseItemEx(player,pos_from,from_stackpos, pos_to, to_stackpos, itemid);
 	
+}
+
+void Protocol75::parseBattleWindow(NetworkMessage &msg)
+{
+	Position pos_from = msg.GetPosition();
+	unsigned short itemid = msg.GetItemId();
+	unsigned char from_stackpos = msg.GetByte();
+	unsigned long creatureid = msg.GetU32();
+
+	game->playerUseBattleWindow(player, pos_from, from_stackpos, itemid, creatureid);
 }
 
 void Protocol75::sendContainer(unsigned char index, Container *container)
