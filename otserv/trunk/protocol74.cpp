@@ -1377,18 +1377,19 @@ void Protocol74::sendThingMove(const Creature *creature, const Container *fromCo
 	//Auto-close container's
 	const Container* moveContainer = dynamic_cast<const Container*>(fromItem);
 	if(moveContainer){
-		bool hasContainerOpen = false;
-
-		if(toContainer->getTopParent()->pos.x != 0xFFFF) {
+		bool hasToContainerOpen = false;
+		Position toMapPos = toContainer->getTopParent()->pos;
+		
+		if(toMapPos.x != 0xFFFF && std::abs(player->pos.x - toMapPos.x) <= 1 && std::abs(player->pos.y - toMapPos.y) <= 1) {
 			for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
 				if(cit->second == toContainer || cit->second->getTopParent()->isHoldingItem(toContainer)){
-					hasContainerOpen = true;
+					hasToContainerOpen = true;
 					break;
 				}
 			}
 		}
 		
-		if(!hasContainerOpen && !player->isHoldingContainer(toContainer)) {
+		if(!hasToContainerOpen && !player->isHoldingContainer(toContainer)) {
 			autoCloseContainers(moveContainer, msg);
 		}
 	}
@@ -1755,18 +1756,19 @@ void Protocol74::sendThingMove(const Creature *creature, const Position &fromPos
 	const Container* moveContainer = dynamic_cast<const Container*>(fromItem);
 	bool updateContainerArrow = false;
 	if(moveContainer) {
-		bool hasContainerOpen = false;
+		bool hasToContainerOpen = false;
+		Position toMapPos = toContainer->getTopParent()->pos;
 		
-		if(toContainer->getTopParent()->pos.x != 0xFFFF) {
+		if(toMapPos.x != 0xFFFF && std::abs(player->pos.x - toMapPos.x) <= 1 && std::abs(player->pos.y - toMapPos.y) <= 1) {
 			for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit){
 				if(cit->second == toContainer || cit->second->getTopParent()->isHoldingItem(toContainer)){
-					hasContainerOpen = true;
+					hasToContainerOpen = true;
 					break;
 				}
 			}
 		}
 		
-		if(!hasContainerOpen && !player->isHoldingContainer(toContainer)){
+		if(!hasToContainerOpen && !player->isHoldingContainer(toContainer)){
 			autoCloseContainers(moveContainer, msg);
 		}
 		else
