@@ -127,9 +127,7 @@ public:
 	Monster(const std::string& name, Game* game);
 	virtual ~Monster();
 	//const Monster& operator=(const Monster& rhs);
-	//virtual unsigned long idRange(){ return 0x40000000;}
-	// use range 0x10000000 to able use runes on monsters
-	virtual unsigned long idRange(){ return 0x10000000;}
+	virtual unsigned long idRange(){ return 0x40000000;}
 	static AutoList<Monster> listMonster;
 	void removeList() {listMonster.removeList(getID());}
 	void addList() {listMonster.addList(this);}
