@@ -1382,6 +1382,21 @@ void Protocol74::sendThingMove(const Creature *creature, const Container *fromCo
 		
 		if(toMapPos.x != 0xFFFF && std::abs(player->pos.x - toMapPos.x) <= 1 && std::abs(player->pos.y - toMapPos.y) <= 1) {
 			for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
+
+				bool skipContainer = false;
+				Container* tmpcontainer = cit->second;
+				while(tmpcontainer != NULL) {
+					if(tmpcontainer == moveContainer) {
+						skipContainer = true;
+						break;
+					}
+
+					tmpcontainer = tmpcontainer->getParent();
+				}
+
+				if(skipContainer)
+					continue;
+
 				if(cit->second == toContainer || cit->second->getTopParent()->isHoldingItem(toContainer)){
 					hasToContainerOpen = true;
 					break;
@@ -1393,29 +1408,6 @@ void Protocol74::sendThingMove(const Creature *creature, const Container *fromCo
 			autoCloseContainers(moveContainer, msg);
 		}
 	}
-
-	/*
-	//Auto-close container's
-	if(fromContainer && fromContainer->getTopParent()->pos.x != 0xFFFF){
-		if(toContainer->->getTopParent()->pos.x != 0xFFFF){
-			if(std::abs(player->pos.x - toContainer->->getTopParent()->pos.x) > 1 || std::abs(player->pos.y - toContainer->getTopParent()->pos.y) > 1) {
-				const Container *container = dynamic_cast<const Container*>(fromItem);
-				if(container) {
-					autoCloseContainers(container, msg);
-				}
-			}
-		}
-		else
-		{
-			if(creature != player){
-				const Container *container = dynamic_cast<const Container*>(fromItem);
-				if(container){				
-					autoCloseContainers(container, msg);
-				}
-			}
-		}
-	}
-	*/
 
 	Item *container = NULL;
 	for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
@@ -1761,6 +1753,21 @@ void Protocol74::sendThingMove(const Creature *creature, const Position &fromPos
 		
 		if(toMapPos.x != 0xFFFF && std::abs(player->pos.x - toMapPos.x) <= 1 && std::abs(player->pos.y - toMapPos.y) <= 1) {
 			for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit){
+
+				bool skipContainer = false;
+				Container* tmpcontainer = cit->second;
+				while(tmpcontainer != NULL) {
+					if(tmpcontainer == moveContainer) {
+						skipContainer = true;
+						break;
+					}
+
+					tmpcontainer = tmpcontainer->getParent();
+				}
+
+				if(skipContainer)
+					continue;
+
 				if(cit->second == toContainer || cit->second->getTopParent()->isHoldingItem(toContainer)){
 					hasToContainerOpen = true;
 					break;
