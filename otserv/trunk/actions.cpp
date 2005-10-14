@@ -20,7 +20,7 @@
 
 
 #include "definitions.h"
-#include "const74.h"
+#include "const75.h"
 #include "player.h"
 #include "monster.h"
 #include "npc.h"

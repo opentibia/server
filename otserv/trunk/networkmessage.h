@@ -24,7 +24,7 @@
 
 #include "definitions.h"
 #include "otsystem.h"
-#include "const74.h"
+#include "const75.h"
 
 class Creature;
 class Player;

@@ -18,8 +18,8 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __CONST74_H__
-#define __CONST74_H__
+#ifndef __CONST75_H__
+#define __CONST75_H__
 
 #define NETWORKMESSAGE_MAXSIZE 16768
 

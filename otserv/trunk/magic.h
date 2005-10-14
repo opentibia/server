@@ -24,7 +24,7 @@
 #include "position.h"
 #include "item.h"
 
-#include "const74.h"
+#include "const75.h"
 class Creature;
 class Player;
 class Item;
