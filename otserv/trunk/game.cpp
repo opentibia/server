@@ -225,20 +225,26 @@ void GameState::onAttack(Creature* attacker, const Position& pos, Creature* atta
 	int armor = attackedCreature->getArmor();
 	int defense = attackedCreature->getDefense();
 	
-	Player *player = dynamic_cast<Player*>(attackedCreature);
-	if(player)
-		player->addSkillShieldTry(1);
+	Player* attackPlayer = dynamic_cast<Player*>(attacker);
+	Player* attackedPlayer = dynamic_cast<Player*>(attackedCreature);
+
+	if(attackedPlayer)
+		attackedPlayer->addSkillShieldTry(1);
 		
-	int probability = rand()%100;
+	int probability = rand() % 10000;
 	
-	if(probability < defense)
+	if(probability * damage < defense * 10000)
 		damage = 0;
 	else
 	{
-		damage -= (int)((damage*armor/100)*(rand()/(RAND_MAX+1.0)));
+		damage -= (armor * (10000 + rand() % 10000)) / 10000;
 	}
 	
 	int manaDamage = 0;
+
+	if(attackPlayer && attackedPlayer){
+		damage -= (int) damage / 2;
+	}
 
 	if (attacker->access != 0)
 		damage += 1337;
@@ -246,7 +252,7 @@ void GameState::onAttack(Creature* attacker, const Position& pos, Creature* atta
 	if(damage < 0 || attackedCreature->access != 0)
 		damage = 0;
 		
-	Tile *tile = game->map->getTile(pos);
+	Tile* tile = game->map->getTile(pos);
 	bool blood;
 	if(damage != 0){
 		game->creatureApplyDamage(attackedCreature, damage, damage, manaDamage);
@@ -255,6 +261,7 @@ void GameState::onAttack(Creature* attacker, const Position& pos, Creature* atta
 	else{//no draw blood
 		blood = false;
 	}
+
 	addCreatureState(tile, attackedCreature, damage, manaDamage, blood);
 	onAttackedCreature(tile, attacker, attackedCreature, damage,  true);		
 }
