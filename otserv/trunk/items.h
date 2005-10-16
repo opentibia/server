@@ -138,8 +138,6 @@ public:
 	~Items();
 	
 	int loadFromOtb(std::string);
-	int loadFromDat(std::string);
-  int loadXMLInfos(std::string);
 	
 	const ItemType& operator[](int id);
 	
