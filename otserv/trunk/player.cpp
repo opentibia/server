@@ -1771,3 +1771,78 @@ bool Player::gainHealthTick()
 	health += min(add, healthmax - health);
 	return true;
 }
+
+void Player::removeList()
+{
+	listPlayer.removeList(getID());
+	
+	for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin(); it != Player::listPlayer.list.end(); ++it)
+	{
+		(*it).second->notifyLogOut(this);
+	}	
+	
+}
+
+void Player::addList()
+{
+	for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin(); it != Player::listPlayer.list.end(); ++it)
+	{
+		(*it).second->notifyLogIn(this);
+	}	
+	
+	listPlayer.addList(this);
+}
+
+void Player::notifyLogIn(Player* login_player)
+{
+	VIPListSet::iterator it = VIPList.find(login_player->getGUID());
+	if(it != VIPList.end()){
+		client->sendVIPLogIn(login_player->getGUID());
+		sendTextMessage(MSG_SMALLINFO, (login_player->getName() + " has logged in.").c_str());
+	}
+}
+
+void Player::notifyLogOut(Player* logout_player)
+{
+	VIPListSet::iterator it = VIPList.find(logout_player->getGUID());
+	if(it != VIPList.end()){
+		client->sendVIPLogOut(logout_player->getGUID());
+		sendTextMessage(MSG_SMALLINFO, (logout_player->getName() + " has logged out.").c_str());
+	}
+}
+
+bool Player::removeVIP(unsigned long _guid)
+{
+	VIPListSet::iterator it = VIPList.find(_guid);
+	if(it != VIPList.end()){
+		VIPList.erase(it);
+		return true;
+	}
+	return false;
+}
+
+bool Player::addVIP(unsigned long _guid, std::string &name, bool isOnline, bool internal /*=false*/)
+{
+	if(guid == _guid){
+		sendTextMessage(MSG_SMALLINFO, "You cannot add yourself.");
+		return false;
+	}
+	
+	if(VIPList.size() > 50){
+		sendTextMessage(MSG_SMALLINFO, "You cannot add more players.");
+		return false;
+	}
+	
+	VIPListSet::iterator it = VIPList.find(_guid);
+	if(it != VIPList.end()){
+		sendTextMessage(MSG_SMALLINFO, "You have already added this player.");
+		return false;
+	}
+	
+	VIPList.insert(_guid);
+	
+	if(!internal)
+		client->sendVIP(_guid, name, isOnline);
+	
+	return true;
+}

@@ -273,6 +273,8 @@ public:
 	
 	enum_game_state getGameState();
 	void setGameState(enum_game_state newstate){game_state = newstate;}
+	
+	bool requestAddVip(Player* player, const std::string &vip_name);
 
 	/** Lockvar for Game. */
   OTSYS_THREAD_LOCKVAR gameLock; 

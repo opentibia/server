@@ -200,8 +200,8 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 				msg.AddString("Your IP is banished!");
 			}
 			else {
-				char accstring[16];
-				sprintf(accstring, "%i", accnumber);
+				//char accstring[16];
+				//sprintf(accstring, "%i", accnumber);
 				
 				Account account = IOAccount::instance()->loadAccount(accnumber);
 				if (account.accnumber == accnumber && passwordTest(password,account.password)) // seems to be a successful load
@@ -236,13 +236,13 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 			
 			msg.WriteToSocket(s);
 		}
-		// gameworld connection tibia 7.4
+		// gameworld connection tibia 7.5
 		else if (protId == 0x020A)
 		{
 			unsigned char  clientos = msg.GetByte();
 			unsigned short version  = msg.GetU16();
 			unsigned char  unknown = msg.GetByte();
-			msg.GetU32();
+			unsigned long accnumber = msg.GetU32();
 			std::string name     = msg.GetString();
 			std::string password = msg.GetString();
 			if(version != 750){
@@ -259,32 +259,34 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 			}
 			else{
 				OTSYS_SLEEP(1000);
-				OTSYS_THREAD_LOCK(g_game.gameLock, "ConnectionHandler()")
-
-				Player* player = g_game.getPlayerByName(name);
-				bool playerexist = (player != NULL);
-				if(player){
-					if(player->client->s == 0 && passwordTest(password,player->password) && player->isRemoved == false && !g_config.getGlobalNumber("allowclones", 0)){
-						//std::cout << "relogin " << player << std::endl;
-						player->lastlogin = std::time(NULL);
-						player->client->reinitializeProtocol();
-						player->client->s = s;
-						player->client->sendThingAppear(player);
-						player->lastip = player->getIP();
-						s = 0;
+				std::string acc_pass;
+				if(IOAccount::instance()->getPassword(accnumber, name, acc_pass) && passwordTest(password,acc_pass)){
+					
+					OTSYS_THREAD_LOCK(g_game.gameLock, "ConnectionHandler()")
+					Player* player = g_game.getPlayerByName(name);
+					bool playerexist = (player != NULL);
+					if(player){
+						if(player->client->s == 0 && player->isRemoved == false && !g_config.getGlobalNumber("allowclones", 0)){
+							player->lastlogin = std::time(NULL);
+							player->client->reinitializeProtocol();
+							player->client->s = s;
+							player->client->sendThingAppear(player);
+							player->lastip = player->getIP();
+							s = 0;
+						}
+						player = NULL;
 					}
-					player = NULL;
-				}
-				OTSYS_THREAD_UNLOCK(g_game.gameLock, "ConnectionHandler()")
-				if(s){
-					Protocol75* protocol;
-					protocol = new Protocol75(s);
-					player = new Player(name, protocol);
-					player->useThing();
-					player->setID();
-					IOPlayer::instance()->loadPlayer(player, name);
-					//std::cout << "login " << player << std::endl;
-					if(passwordTest(password,player->password)){
+					
+					OTSYS_THREAD_UNLOCK(g_game.gameLock, "ConnectionHandler()")
+					
+					if(s){
+						Protocol75* protocol;
+						protocol = new Protocol75(s);
+						player = new Player(name, protocol);
+						player->useThing();
+						player->setID();
+						IOPlayer::instance()->loadPlayer(player, name);	
+					
 						if(playerexist && !g_config.getGlobalNumber("allowclones", 0)){
 							#ifdef __DEBUG_PLAYERS__
 							std::cout << "reject player..." << std::endl;
@@ -322,11 +324,9 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 							protocol->ReceiveLoop();
 							stat->removePlayer();
 						}
+						if(player)
+							g_game.FreeThing(player);
 					}
-					//free memory
-					if(player)
-						g_game.FreeThing(player);
-					//player->releaseThing();
 				}
 			}
 		} 

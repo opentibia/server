@@ -37,6 +37,7 @@ class IOAccountXML : protected IOAccount {
 	  * \returns Name of the source*/
 	virtual char* getSourceDescription(){return "XML";};
 	virtual Account loadAccount(unsigned long accno);
+		virtual bool getPassword(unsigned long accno, const std::string &name, std::string &password);
 	IOAccountXML();
 	virtual ~IOAccountXML(){};
 };

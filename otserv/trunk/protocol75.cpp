@@ -45,6 +45,7 @@
 #include "otsystem.h"
 #include "actions.h"
 #include "game.h"
+#include "ioplayer.h"
 
 extern LuaScript g_config;
 extern Actions actions;
@@ -271,6 +272,14 @@ void Protocol75::parsePacket(NetworkMessage &msg)
 		
     case 0xA0: // set attack and follow mode
 		parseModes(msg);
+		break;
+	
+	case 0xDC:
+		parseAddVip(msg);
+		break;
+		
+	case 0xDD:
+		parseRemVip(msg);
 		break;
 		
     case 0x69: // client quit without logout <- wrong
@@ -1270,6 +1279,20 @@ void Protocol75::parseCloseTrade()
 	game->playerCloseTrade(player);
 }
 
+void Protocol75::parseAddVip(NetworkMessage &msg)
+{
+	std::string vip_name = msg.GetString();
+	if(vip_name.size() > 32)
+		return;
+	game->requestAddVip(player, vip_name);
+}
+
+void Protocol75::parseRemVip(NetworkMessage &msg)
+{
+	unsigned long id = msg.GetU32();
+	player->removeVIP(id);
+}
+
 bool Protocol75::CanSee(int x, int y, int z) const
 {
 #ifdef __DEBUG__
@@ -2143,6 +2166,17 @@ void Protocol75::sendThingAppear(const Thing *thing){
 			tempstring += ".";
 			AddTextMessage(msg,MSG_EVENT, tempstring.c_str());
 			WriteBuffer(msg);
+			
+			for(VIPListSet::iterator it = player->VIPList.begin(); it != player->VIPList.end(); it++){
+				bool online;
+				std::string vip_name;
+				
+				if(IOPlayer::instance()->getNameByGuid((*it), vip_name)){
+					online = (game->getPlayerByName(vip_name) != NULL);
+					sendVIP((*it), vip_name, online);
+				}
+			}
+			
 			//force flush
 			flushOutputBuffer();
 			return;
@@ -2287,7 +2321,7 @@ void Protocol75::sendItemUpdateContainer(const Container *container, const Item*
 }
 
 void Protocol75::sendTextWindow(Item* item,const unsigned short maxlen, const bool canWrite){
-	NetworkMessage msg;				
+	NetworkMessage msg;
 	msg.AddByte(0x96);
 	windowTextID++;
 	msg.AddU32(windowTextID);
@@ -2304,6 +2338,34 @@ void Protocol75::sendTextWindow(Item* item,const unsigned short maxlen, const bo
 		msg.AddString(item->getText());									
 		readItem = NULL;		
 	}
+	
+	WriteBuffer(msg);
+}
+
+void Protocol75::sendVIPLogIn(unsigned long guid)
+{
+	NetworkMessage msg;
+	msg.AddByte(0xD3);
+	msg.AddU32(guid);
+	WriteBuffer(msg);
+}
+
+void Protocol75::sendVIPLogOut(unsigned long guid)
+{
+	NetworkMessage msg;
+	msg.AddByte(0xD4);
+	msg.AddU32(guid);
+	WriteBuffer(msg);
+}
+
+void Protocol75::sendVIP(unsigned long guid, const std::string &name, bool isOnline)
+{
+	NetworkMessage msg;
+	
+	msg.AddByte(0xD2);
+	msg.AddU32(guid);
+	msg.AddString(name);
+	msg.AddByte(isOnline == true ? 1 : 0);
 	
 	WriteBuffer(msg);
 }

@@ -22,31 +22,32 @@
 #include <algorithm>
 #include <functional>
 #include <sstream>
-#ifdef _OLD_MYSQL_
-	#include <mysql++.h>
-#elif USE_MYSQL
-	#include "database.h"
-	#include <iostream>
-#endif
+
+#include "database.h"
+#include <iostream>
+
 #include "luascript.h"
 
 extern LuaScript g_config;
 
+IOAccountSQL::IOAccountSQL()
+{
+	m_host = g_config.getGlobalString("sql_host");
+	m_user = g_config.getGlobalString("sql_user");
+	m_pass = g_config.getGlobalString("sql_pass");
+	m_db   = g_config.getGlobalString("sql_db");
+}
+
 Account IOAccountSQL::loadAccount(unsigned long accno){
 	Account acc;
-	std::string host = g_config.getGlobalString("sql_host");
-	std::string user = g_config.getGlobalString("sql_user");
-	std::string pass = g_config.getGlobalString("sql_pass");
-	std::string db   = g_config.getGlobalString("sql_db");
 
-#ifndef _OLD_MYSQL_
 	Database mysql;
 	DBQuery query;
 	DBResult result;
 	
 //	try
 //	{
-		mysql.connect(db.c_str(), host.c_str(), user.c_str(), pass.c_str());
+		mysql.connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str());
 	
 		query << "SELECT * FROM accounts WHERE accno='" << accno << "'";
 		if(!mysql.storeQuery(query, result))
@@ -90,50 +91,37 @@ Account IOAccountSQL::loadAccount(unsigned long accno){
 		return acc;
 	}*/
 	
-#else
-	/////////////////////////////////
-	mysqlpp::Connection con;
-	try{
-		con.connect(db.c_str(), host.c_str(), user.c_str(), pass.c_str()); 
-	}
-	catch(mysqlpp::BadQuery e){
-		std::cout << "MYSQL-ERROR: " << e.error << std::endl;
-		return acc;
-	}
-	try{
-		mysqlpp::Query query = con.query();
-		query << "SELECT * FROM accounts WHERE accno =" << accno;
-		
-		mysqlpp::Result res = query.store();
-
-		if(res.num_rows() != 1){
-			return acc;
-		}
-
-		mysqlpp::Row row = *res.begin();
-		acc.accnumber = row.lookup_by_name("accno");
-		acc.password = std::string(row.lookup_by_name("password"));
-		//std::cout << "pass " << acc.password << "      acc " << acc.accnumber << std::endl;
-		acc.accType = row.lookup_by_name("type");
-		acc.premDays = row.lookup_by_name("premDays");
-
-		query.reset();
-
-		query << "SELECT name FROM players where account=" << accno;
-		res = query.store();
-		mysqlpp::Result::iterator i;
-		for(i = res.begin(); i != res.end(); i++){
-			std::string ss = std::string((*i)[0]);
-			acc.charList.push_back(ss.c_str());
-		}
-		
-		acc.charList.sort();
-	}
-	catch(mysqlpp::BadQuery e){
-		std::cout << "MYSQL-ERROR: " << e.error << std::endl;
-		return acc;
-	}	
-#endif // _OLD_MYSQL_
 
 	return acc;
+}
+
+
+bool IOAccountSQL::getPassword(unsigned long accno, const std::string &name, std::string &password)
+{
+	
+	Database mysql;
+	DBQuery query;
+	DBResult result;
+	
+	mysql.connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str());
+	
+	query << "SELECT password FROM accounts WHERE accno='" << accno << "'";
+	if(!mysql.storeQuery(query, result))
+		return false;
+	
+	std::string acc_password = result.getDataString("password");
+
+	query << "SELECT name FROM players where account='" << accno << "'";
+	if(!mysql.storeQuery(query, result))
+		return false;
+		
+	for(int i=0; i < result.getNumRows(); ++i)
+	{
+		std::string ss = result.getDataString("name", i);
+		if(ss == name){
+			password = acc_password;
+			return true;
+		}
+	}
+	return false;
 }

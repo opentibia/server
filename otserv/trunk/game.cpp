@@ -69,7 +69,7 @@ extern Spells spells;
 extern Actions actions;
 extern Commands commands;
 extern Chat g_chat;
-//extern std::map<long, Creature*> channel;
+
 extern std::vector< std::pair<unsigned long, unsigned long> > bannedIPs;
 
 GameState::GameState(Game *game, const Range &range)
@@ -785,12 +785,7 @@ bool Game::removeCreature(Creature* c)
 		}
 		if(player->eventAutoWalk)
 			stopEvent(player->eventAutoWalk);
-		/*
-		// Removing the player from the map of channel users
-		std::map<long, Creature*>::iterator sit = channel.find(player->getID());
-		if( sit != channel.end() )
-			channel.erase(sit);
-		*/
+
 		g_chat.removeUserFromAllChannels(player);
 		IOPlayer::instance()->savePlayer(player);
 		#ifdef __DEBUG_PLAYERS__
@@ -2736,32 +2731,6 @@ void Game::creatureBroadcastMessage(Creature *creature, const std::string &text)
 		(*it).second->onCreatureSay(creature, SPEAK_BROADCAST, text);
 	}	
 }
-/*
-void Game::creatureToChannel(Creature *creature, SpeakClasses type, const std::string &text, unsigned short channelId)
-{
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::creatureToChannel()");
-
-	Player* player = dynamic_cast<Player*>(creature);
-	if(!player)
-		return;
-
-	if(player->access == 0){
-		type = SPEAK_CHANNEL_Y;
-	}
-
-	
-	std::map<long, Creature*>::iterator cit;
-	for (cit = channel.begin(); cit != channel.end(); cit++)
-	{
-		Player* toPlayer = dynamic_cast<Player*>(cit->second);
-		if(toPlayer){
-			toPlayer->sendToChannel(creature, type, text, channelId);
-		}
-	}
-
-	player->sendTextMessage(MSG_SMALLINFO, "Message sent.");
-}
-*/
 
 /** \todo Someone _PLEASE_ clean up this mess */
 bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, const MagicEffectClass* me)
@@ -4131,31 +4100,41 @@ void Game::playerSetAttackedCreature(Player* player, unsigned long creatureid)
 	}
 
 	if(!attackedCreature || (attackedCreature->access != 0 || (getWorldType() == WORLD_TYPE_NO_PVP && player->access == 0 && dynamic_cast<Player*>(attackedCreature)))) {
-    if(attackedCreature) {
-		  player->sendTextMessage(MSG_SMALLINFO, "You may not attack this player.");
-    }
+		if(attackedCreature) {
+			player->sendTextMessage(MSG_SMALLINFO, "You may not attack this player.");
+		}
 
 		player->sendCancelAttacking();
 		player->setAttackedCreature(NULL);
 		stopEvent(player->eventCheckAttacking);
 		player->eventCheckAttacking = 0;
 	}
-  else if(attackedCreature) {
-    player->setAttackedCreature(attackedCreature);
-    stopEvent(player->eventCheckAttacking);
-    player->eventCheckAttacking = addEvent(makeTask(2000, std::bind2nd(std::mem_fun(&Game::checkCreatureAttacking), player->getID())));
-	}
-
-	/*
-  //player->setAttackedCreature(creatureid);
-	stopEvent(player->eventCheckAttacking);
-
-	if(creatureid != 0) {
+	else if(attackedCreature) {
+		player->setAttackedCreature(attackedCreature);
+		stopEvent(player->eventCheckAttacking);
 		player->eventCheckAttacking = addEvent(makeTask(2000, std::bind2nd(std::mem_fun(&Game::checkCreatureAttacking), player->getID())));
 	}
-	else
-		player->eventCheckAttacking = 0;
-  */
+	
+}
+
+bool Game::requestAddVip(Player* player, const std::string &vip_name)
+{
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::requestAddVip");
+	std::string real_name;
+	real_name = vip_name;
+	unsigned long guid;
+	unsigned long access_lvl;
+	
+	if(!IOPlayer::instance()->getGuidByName(guid, access_lvl, real_name)){
+		player->sendTextMessage(MSG_SMALLINFO, "A player with that name doesn't exist.");
+		return false;
+	}
+	if(access_lvl > player->access){
+		player->sendTextMessage(MSG_SMALLINFO, "You can not add this player.");
+		return false;
+	}
+	bool online = (getPlayerByName(real_name) != NULL);
+	return player->addVIP(guid, real_name, online);
 }
 
 void Game::flushSendBuffers()

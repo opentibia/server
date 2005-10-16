@@ -46,3 +46,9 @@ Account IOAccount::loadAccount(unsigned long accno){
 	Account acc;
 	return acc;
 }
+
+bool IOAccount::getPassword(unsigned long accno, const std::string &name, std::string &password)
+{
+	return false;
+}
+

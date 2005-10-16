@@ -25,6 +25,8 @@
 #include "ioplayer.h"
 #include "player.h"
 
+class Database;
+
 /** Baseclass for all Player-Loaders */
 class IOPlayerSQL : protected IOPlayer{
 public:
@@ -36,11 +38,25 @@ public:
 	  * \returns Wheter the player was successfully saved
 	  * \param player the player to save
 	  */
-	 bool savePlayer(Player* player);
-	IOPlayerSQL(){};
+	bool savePlayer(Player* player);
+	
+	bool getGuidByName(unsigned long &guid, unsigned long &alvl, std::string &name);
+	bool getNameByGuid(unsigned long guid, std::string &name);
+	
+	IOPlayerSQL();
 	~IOPlayerSQL(){};
 protected:
-		std::string getItems(Item* i, int &startid, int startslot, int player, int parentid);
+	std::string getItems(Item* i, int &startid, int startslot, int player, int parentid);
+	bool storeNameByGuid(Database &mysql, unsigned long guid);
+
+	typedef std::map<unsigned long, std::string> NameCacheMap;
+	
+	NameCacheMap nameCacheMap;
+	
+	std::string m_host;
+	std::string m_user;
+	std::string m_pass;
+	std::string m_db;
 };
 
 #endif

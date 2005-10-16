@@ -31,9 +31,9 @@ IOPlayer* IOPlayer::_instance = NULL;
 IOPlayer* IOPlayer::instance(){
 	if(!_instance){
 #ifdef USE_MYSQL
- _instance = (IOPlayer*)new IOPlayerSQL;
+		_instance = (IOPlayer*)new IOPlayerSQL;
 #else
-	_instance = (IOPlayer*)new IOPlayerXML;
+		_instance = (IOPlayer*)new IOPlayerXML;
 #endif
 	}
     #ifdef __DEBUG__
@@ -47,5 +47,15 @@ bool IOPlayer::loadPlayer(Player* player, std::string name){
 }
 
 bool IOPlayer::savePlayer(Player* player){
+	return false;
+}
+
+bool IOPlayer::getGuidByName(unsigned long &guid, unsigned long &alvl, std::string &name)
+{
+	return false;
+}
+
+bool IOPlayer::getNameByGuid(unsigned long guid, std::string &name)
+{
 	return false;
 }

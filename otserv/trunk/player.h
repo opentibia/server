@@ -94,6 +94,7 @@ typedef std::pair<unsigned char, Container*> containerItem;
 typedef std::vector<containerItem> containerLayout;
 typedef std::map<unsigned long, Container*> DepotMap;
 typedef std::map<unsigned long,long> StorageMap;
+typedef std::set<unsigned long> VIPListSet;
 
 //////////////////////////////////////////////////////////////////////
 // Defines a player...
@@ -107,8 +108,8 @@ public:
 	unsigned long getGUID() const { return guid;};
 	virtual unsigned long idRange(){ return 0x10000000;}
 	static AutoList<Player> listPlayer;
-	void removeList() {listPlayer.removeList(getID());}
-	void addList() {listPlayer.addList(this);}
+	void removeList();
+	void addList();
 	void kickPlayer();
 	
 	bool addItem(Item* item, bool test = false);
@@ -273,6 +274,13 @@ public:
 	void setAcceptTrade(bool b);
 	bool getAcceptTrade() {return (tradeState == TRADE_ACCEPT);};
 	Item* getTradeItem() {return tradeItem;};
+	
+	void notifyLogIn(Player* player);
+	void notifyLogOut(Player* player);
+	bool removeVIP(unsigned long guid);
+	bool addVIP(unsigned long guid, std::string &name, bool isOnline, bool interal = false);
+	
+	VIPListSet VIPList;
 	
 protected:
 	void sendCancelAttacking();

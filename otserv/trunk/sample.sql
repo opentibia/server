@@ -189,6 +189,18 @@ INSERT INTO `skills` VALUES (1,6,10,0),(1,5,10,0),(1,4,10,0),(1,3,10,0),(1,2,10,
 UNLOCK TABLES;
 /*!40000 ALTER TABLE `skills` ENABLE KEYS */;
 
+--
+-- Table structure for table `viplist`
+--
+
+DROP TABLE IF EXISTS `viplist`;
+CREATE TABLE `viplist` (
+   `player` int(10) unsigned NOT NULL default '0',
+   `vip_id` int(10) unsigned NOT NULL default '0',
+   KEY `player` TYPE BTREE (`player`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1'
+
+
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;

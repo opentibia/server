@@ -99,6 +99,9 @@ private:
 	void parseCloseTrade();
 	
 	
+	void parseAddVip(NetworkMessage &msg);
+	void parseRemVip(NetworkMessage &msg);
+	
 	// channel tabs
 	void parseGetChannels(NetworkMessage &msg);
 	void parseOpenChannel(NetworkMessage &msg);
@@ -191,6 +194,10 @@ private:
 	void sendItemRemoveContainer(const Container* container,const unsigned char slot);
 	void sendItemUpdateContainer(const Container* container,const Item* item,const unsigned char slot);
 	void sendTextWindow(Item* item,const unsigned short maxlen, const bool canWrite);
+	
+	virtual void sendVIPLogIn(unsigned long guid);
+	virtual void sendVIPLogOut(unsigned long guid);
+	virtual void sendVIP(unsigned long guid, const std::string &name, bool isOnline);
 	
 	// translate a tile to clientreadable format
 	void GetTileDescription(const Tile* tile, NetworkMessage &msg);
