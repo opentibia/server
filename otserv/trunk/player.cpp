@@ -933,7 +933,7 @@ int Player::getPlayerInfo(playerinfo_t playerinfo) const
 		case PLAYERINFO_MAGICLEVELPERCENT: return maglevel_percent; break;
 		case PLAYERINFO_HEALTH: return health; break;
 		case PLAYERINFO_MAXHEALTH: return healthmax; break;
-		case PLAYERINFO_MANA: return health; break;
+		case PLAYERINFO_MANA: return mana; break;
 		case PLAYERINFO_MAXMANA: return manamax; break;
 		case PLAYERINFO_MANAPERCENT: return maglevel_percent; break;
 		case PLAYERINFO_SOUL: return 100; break;
@@ -1824,18 +1824,21 @@ bool Player::removeVIP(unsigned long _guid)
 bool Player::addVIP(unsigned long _guid, std::string &name, bool isOnline, bool internal /*=false*/)
 {
 	if(guid == _guid){
-		sendTextMessage(MSG_SMALLINFO, "You cannot add yourself.");
+		if(!internal)
+			sendTextMessage(MSG_SMALLINFO, "You cannot add yourself.");
 		return false;
 	}
 	
 	if(VIPList.size() > 50){
-		sendTextMessage(MSG_SMALLINFO, "You cannot add more players.");
+		if(!internal)
+			sendTextMessage(MSG_SMALLINFO, "You cannot add more players.");
 		return false;
 	}
 	
 	VIPListSet::iterator it = VIPList.find(_guid);
 	if(it != VIPList.end()){
-		sendTextMessage(MSG_SMALLINFO, "You have already added this player.");
+		if(!internal)
+			sendTextMessage(MSG_SMALLINFO, "You have already added this player.");
 		return false;
 	}
 	
