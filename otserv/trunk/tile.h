@@ -87,6 +87,7 @@ public:
   void setPz();
   
   bool floorChange() const;
+  bool floorChangeDown() const;
   bool floorChange(Direction direction) const;
   
   std::string getDescription() const;

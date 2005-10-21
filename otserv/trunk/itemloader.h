@@ -108,6 +108,7 @@ enum slotsOTB_t{
 	OTB_SLOT_HAND,
 };
 
+#pragma pack(8)
 struct decayBlock{
 	unsigned short decayTo;
 	unsigned short decayTime;
@@ -141,6 +142,7 @@ struct lightBlock {
 	unsigned short lightLevel;
 	unsigned short lightColor;
 };
+#pragma pack()
 /////////OTB specific//////////////
 
 class ItemLoader : public FileLoader {

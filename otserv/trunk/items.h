@@ -92,7 +92,8 @@ public:
 	bool            alwaysOnTop;
 	int             runeMagLevel;
 	bool            pickupable;
-	bool            rotateble;
+	bool            rotable;
+	int 			rotateTo;
 
 	int             lightLevel;
 	int             lightColor;

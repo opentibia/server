@@ -42,7 +42,8 @@ ItemType::ItemType()
 	moveable        = true;
 	alwaysOnTop     = false;
 	pickupable      = false;
-	rotateble       = false;
+	rotable         = false;
+	rotateTo		= 0;
 	hasHeight       = false;
 
 	floorChangeDown = true;
@@ -216,7 +217,7 @@ int Items::loadFromOtb(std::string file)
 							if((flags & FLAG_READABLE) == FLAG_READABLE)
 								iType->RWInfo |= CAN_BE_READ;
 
-							iType->rotateble = ((flags & FLAG_ROTABLE) == FLAG_ROTABLE);
+							iType->rotable = ((flags & FLAG_ROTABLE) == FLAG_ROTABLE);
 
 							if(p >= data + len) //no attributes
 								break;
@@ -424,6 +425,9 @@ int Items::loadFromOtb(std::string file)
 							{
 								if(datalen != sizeof(unsigned short))
 									return ERROR_INVALID_FORMAT;
+								
+								iType->rotateTo = *(unsigned short*)p;
+								
 								break;
 							}
 							case ITEM_ATTR_DECAY:

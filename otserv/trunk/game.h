@@ -228,6 +228,7 @@ public:
 		const Position &posTo,const unsigned char stack_to, const unsigned short itemid);
 	bool playerUseItem(Player *player, const Position& pos, const unsigned char stackpos, const unsigned short itemid, const unsigned char index);
 	bool playerUseBattleWindow(Player *player, Position &posFrom, unsigned char stackpos, unsigned short itemid, unsigned long creatureid);
+	bool playerRotateItem(Player *player, const Position& pos, const unsigned char stackpos, const unsigned short itemid);
 
 	void playerRequestTrade(Player *player, const Position& pos,
 		const unsigned char stackpos, const unsigned short itemid, unsigned long playerid);

@@ -201,6 +201,15 @@ long Item::getDecayTime(){
 	return items[id].decayTime*1000;
 }
 
+bool Item::rotate()
+{
+	if(items[id].rotable && items[id].rotateTo){
+		id = items[id].rotateTo;
+		return true;
+	}
+	return false;
+}
+
 Item::Item(const unsigned short _type, unsigned short _count) {
 	//std::cout << "Item constructor2 " << this << std::endl;
 	id = _type;

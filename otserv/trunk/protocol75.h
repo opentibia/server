@@ -101,7 +101,9 @@ private:
 	
 	void parseAddVip(NetworkMessage &msg);
 	void parseRemVip(NetworkMessage &msg);
-	
+
+	void parseRotateItem(NetworkMessage &msg);
+		
 	// channel tabs
 	void parseGetChannels(NetworkMessage &msg);
 	void parseOpenChannel(NetworkMessage &msg);

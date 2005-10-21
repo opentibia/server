@@ -215,7 +215,7 @@ void Protocol75::parsePacket(NetworkMessage &msg)
 		break;
 	
     case 0x85:	//rotate item
-		//parseRotateItem(msg);
+		parseRotateItem(msg);
 		break;
 		
     case 0x87: // close container
@@ -1291,6 +1291,16 @@ void Protocol75::parseRemVip(NetworkMessage &msg)
 {
 	unsigned long id = msg.GetU32();
 	player->removeVIP(id);
+}
+
+void Protocol75::parseRotateItem(NetworkMessage &msg)
+{
+	Position pos = msg.GetPosition();
+	unsigned short itemid = msg.GetItemId();
+	unsigned char stackpos = msg.GetByte();
+	
+	game->playerRotateItem(player, pos, stackpos, itemid);
+	
 }
 
 bool Protocol75::CanSee(int x, int y, int z) const

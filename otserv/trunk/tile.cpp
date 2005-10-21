@@ -142,48 +142,67 @@ bool Tile::floorChange() const
   return false;
 }
 
+bool Tile::floorChangeDown() const
+{
+	if(ground && ground->floorChangeDown())
+		return true;
+		
+	ItemVector::const_iterator iit;
+	for(iit = topItems.begin(); iit != topItems.end(); ++iit){
+		if((*iit)->floorChangeDown())
+			return true;
+	}
+
+  	for(iit = downItems.begin(); iit != downItems.end(); ++iit){
+		if((*iit)->floorChangeDown())
+			return true;
+	}
+	
+  	return false;
+}
+
 bool Tile::floorChange(Direction direction) const
 {  
-  ItemVector::const_iterator iit;
-  for (iit = topItems.begin(); iit != topItems.end(); ++iit){
-    if(direction == NORTH){  
+	ItemVector::const_iterator iit;
+	for (iit = topItems.begin(); iit != topItems.end(); ++iit){
+    	if(direction == NORTH){  
 			if ((*iit)->floorChangeNorth())
 				return true;
 		}
-    else if(direction == SOUTH){
+    	else if(direction == SOUTH){
 			if ((*iit)->floorChangeSouth())
 				return true;
 		}
-    else if(direction == EAST){
+    	else if(direction == EAST){
 			if ((*iit)->floorChangeEast())
 				return true;
 		}
-    else if(direction == WEST){
+    	else if(direction == WEST){
 			if ((*iit)->floorChangeWest())
 				return true;
 		}
 	}
 
-  for (iit = downItems.begin(); iit != downItems.end(); ++iit){
-    if(direction == NORTH){  
+  	for (iit = downItems.begin(); iit != downItems.end(); ++iit){
+    	if(direction == NORTH){  
 			if ((*iit)->floorChangeNorth())
 				return true;
 		}
-    else if(direction == SOUTH){
+    	else if(direction == SOUTH){
 			if ((*iit)->floorChangeSouth())
 				return true;
 		}
-    else if(direction == EAST){
+    	else if(direction == EAST){
 			if ((*iit)->floorChangeEast())
 				return true;
 		}
-    else if(direction == WEST){
+    	else if(direction == WEST){
 			if ((*iit)->floorChangeWest())
 				return true;
 		}
 	}
 
-  return false;
+  	return false;
 }
 
 int Tile::getCreatureStackPos(Creature *c) const

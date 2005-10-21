@@ -2314,7 +2314,7 @@ void Game::thingMoveInternal(Creature *creature, unsigned short from_x, unsigned
 			}
 
 			//change level begin
-			if(toTile->ground && toTile->ground->floorChangeDown())
+			if(toTile->floorChangeDown())
 			{       
 				Tile* downTile = getTile(to_x, to_y, to_z+1);
 				if(downTile){        
@@ -3827,6 +3827,20 @@ bool Game::playerUseBattleWindow(Player *player, Position &posFrom, unsigned cha
 	return ret;
 }
 
+bool Game::playerRotateItem(Player *player, const Position& pos, const unsigned char stackpos, const unsigned short itemid)
+{
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerRotateItem()");
+
+	if(player->isRemoved)
+		return false;
+	
+	Item *item = dynamic_cast<Item*>(getThing(pos, stackpos, player));
+	if(item && item->rotate()){
+		sendUpdateThing(player, pos, item, stackpos);
+	}
+	
+	return false;
+}
 
 void Game::playerRequestTrade(Player* player, const Position& pos,
 	const unsigned char stackpos, const unsigned short itemid, unsigned long playerid)

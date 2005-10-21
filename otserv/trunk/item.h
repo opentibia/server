@@ -53,8 +53,8 @@ public:
 	static Item* CreateItem(const unsigned short _type, unsigned short _count = 0); //Factory member to create item of right type based on type
 	static Items items;
 
-  unsigned short getID() const;    // ID as in ItemType
-  void setID(unsigned short newid);
+	unsigned short getID() const;    // ID as in ItemType
+	void setID(unsigned short newid);
 		    
 	WeaponType getWeaponType() const;
 	amu_t	getAmuType() const;
@@ -122,6 +122,8 @@ public:
 	 */
 	virtual Item* decay();
 	bool isDecaying;
+
+	bool rotate();
 
   // Constructor for items
 	Item(const unsigned short _type);

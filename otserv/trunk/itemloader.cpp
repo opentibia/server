@@ -46,4 +46,3 @@ int ItemLoader::setFlags(flags_t flags)
 	return ERROR_NONE;
 }
 
-
