@@ -63,12 +63,11 @@ bool NetworkMessage::ReadFromSocket(SOCKET socket)
 	
 	// for now we expect 2 bytes at once, it should not be splitted
 	int datasize = m_MsgBuf[0] | m_MsgBuf[1] << 8;
-	if ((m_MsgSize != 2) || (datasize > NETWORKMESSAGE_MAXSIZE-2))
-	{
+	if((m_MsgSize != 2) || (datasize > NETWORKMESSAGE_MAXSIZE-2)){
 		int errnum;
 #if defined WIN32 || defined __WINDOWS__
 		errnum = ::WSAGetLastError();
-				if(errnum == EWOULDBLOCK) {
+		if(errnum == EWOULDBLOCK){
 			m_MsgSize = 0;
 			return true;
 		}
@@ -99,42 +98,46 @@ bool NetworkMessage::ReadFromSocket(SOCKET socket)
 
 bool NetworkMessage::WriteToSocket(SOCKET socket)
 {
-  if (m_MsgSize == 0)
-    return true;
+	if (m_MsgSize == 0)
+		return true;
 
-  m_MsgBuf[0] = (unsigned char)(m_MsgSize);
-  m_MsgBuf[1] = (unsigned char)(m_MsgSize >> 8);
+	m_MsgBuf[0] = (unsigned char)(m_MsgSize);
+	m_MsgBuf[1] = (unsigned char)(m_MsgSize >> 8);
   
 	bool ret = true;
-  int sendBytes = 0;
+	int sendBytes = 0;
 	int flags;
 
 #if defined WIN32 || defined __WINDOWS__
 	// Set the socket I/O mode; iMode = 0 for blocking; iMode != 0 for non-blocking
-  unsigned long mode = 1;
-  ioctlsocket(socket, FIONBIO, &mode);
-
+	//unsigned long mode = 1;
+	//ioctlsocket(socket, FIONBIO, &mode);
 	flags = 0;
 #else
 	flags = MSG_DONTWAIT;
 #endif
-
-  do
-  {
-    int b = send(socket, (char*)m_MsgBuf+sendBytes, std::min(m_MsgSize-sendBytes+2, 1000), flags);
-
-		if (b <= 0) {
-			ret = false;
-			break;
+  	do{
+    	int b = send(socket, (char*)m_MsgBuf+sendBytes, std::min(m_MsgSize-sendBytes+2, 1000), flags);
+		if(b <= 0){
+#if defined WIN32 || defined __WINDOWS__
+			int errnum = ::WSAGetLastError();
+			if(errnum == EWOULDBLOCK){
+				b = 0;
+				OTSYS_SLEEP(5);
+			}
+			else
+#endif
+			{
+				ret = false;
+				break;
+			}
 		}
-
-    sendBytes += b;
-  }
-  while (sendBytes < m_MsgSize+2);
+    	sendBytes += b;
+	}while(sendBytes < m_MsgSize+2);
 
 #if defined WIN32 || defined __WINDOWS__
-  mode = 0;
-  ioctlsocket(socket, FIONBIO, &mode);
+	//mode = 0;
+	//ioctlsocket(socket, FIONBIO, &mode);
 #endif
 
   return ret;
