@@ -24,8 +24,8 @@
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
-/* Define to 1 if you have the `mysqlpp' library (-lmysqlpp). */
-#undef HAVE_LIBMYSQLPP
+/* Define to 1 if you have the `mysqlclient' library (-lmysqlclient). */
+#undef HAVE_LIBMYSQLCLIENT
 
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
@@ -33,8 +33,8 @@
 /* Define to 1 if you have the `memset' function. */
 #undef HAVE_MEMSET
 
-/* Define to 1 if you have the <mysql++.h> header file. */
-#undef HAVE_MYSQL___H
+/* Define to 1 if you have the <mysql.h> header file. */
+#undef HAVE_MYSQL_H
 
 /* Define to 1 if you have the <netdb.h> header file. */
 #undef HAVE_NETDB_H

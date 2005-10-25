@@ -30,6 +30,6 @@ otserv_SOURCES = account.cpp container.cpp creature.cpp game.cpp ioaccount.cpp \
 	luascript.h magic.h map.h monster.h networkmessage.h npc.h otsystem.h player.h \
 	position.h protocol.h protocol75.h scheduler.h spells.h stamp-h status.h \
 	tasks.h templates.h texcept.h thing.h tile.h tools.h spawn.cpp spawn.h \
-	actions.h actions.cpp scheduler.cpp commands.cpp commands.h database.cpp database.h \
+	actions.h actions.cpp scheduler.cpp commands.cpp commands.h  \
 	md5.cpp md5.h fileloader.cpp fileloader.h chat.cpp chat.h
 endif
