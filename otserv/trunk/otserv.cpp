@@ -419,6 +419,9 @@ int main(int argc, char *argv[])
 	sigh.sa_handler = SIG_IGN;
 	sigaction(SIGPIPE, &sigh, NULL);
 #endif
+
+//	LOG_MESSAGE("main", EVENT, 1, "Starting server");
+
 	
 	// random numbers generator
 	std::cout << ":: Initializing the random numbers... ";
@@ -580,7 +583,6 @@ int main(int argc, char *argv[])
 	IpNetMask.first  = inet_addr(ip.c_str());
 	IpNetMask.second = 0;
 	serverIPs.push_back(IpNetMask);
-	
 	std::cout << ":: Starting Server... ";
 	
 	Status* status = Status::instance();

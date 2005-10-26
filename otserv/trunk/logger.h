@@ -22,71 +22,35 @@
 #ifndef __LOGGER_H
 #define __LOGGER_H
 
+#ifdef __GNUC__
+#define __OTSERV_PRETTY_FUNCTION__ __PRETTY_FUNCTION__
+#endif
+#ifdef _MSC_VER 
+#define __OTSERV_PRETTY_FUNCTION__ __FUNCDNAME__
+#endif
+
+#define LOG_MESSAGE(channel, type, level, message) \
+	Logger::getInstance()->logMessage(channel, type, level, message, __OTSERV_PRETTY_FUNCTION__, __LINE__, __FILE__);
+
 #include <string>
 #include <map>
 
-#ifdef _LOGFILE_
+enum eLogType {
+	EVENT,
+	WARNING,
+	ERROR
 
-class LogTarget{
- public:
-    LogTarget();
-    virtual void log(std::string)=0;
-};
-
-class ScreenLogger : public LogTarget{
- public:
-    ScreenLogger(std::string);
-    void log(std::string);
-};
-
-class FileLogger : public LogTarget{
- public:
-    FileLogger(std::string);
-    void log(std::string);
-};
-
-class LoggingChannel {
- public:
-    LoggingChannel();
-
-    void setLogLevel(int l);
-    int getLogLevel();
-    
-    void setFormat(int f);
-    int getFormat();
- 
-    void log(std::string msg);
-    void log(std::string msg, std::string function);
-    void log(std::string msg, std::string function, std::string file, int line);
-    void setTarget(std::string);
-
- private:
-    /******************************
-     0 = channel, time with seconds, message
-     1 = channel, time with seconds, function
-     2 = channel, time with milliseconds, function, linenumbers, file
-    */
-    int format;
-    /*****************************
-     0 = Errors
-     1 = Warnings
-     2 = Notices
-     3 = Debug
-     4 = All debug
-    */
-    int logLevel;
-    LogTarget* lt;
 };
 
 class Logger {
- public:
-    static LoggingChannel* getChannel(std::string channel);
- private:
-    static std::map<std::string, LoggingChannel*> channels;
-    static int masterLogLevel;
-    static int masterFormat;
+public:
+	static Logger* getInstance();
+	void logMessage(std::string channel, eLogType type, int level,
+			std::string message, std::string func,
+			int line, std::string file);
+private:
+	static Logger* instance;
+	Logger();
 };
 
-
-#endif
 #endif

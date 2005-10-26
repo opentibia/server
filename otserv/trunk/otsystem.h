@@ -23,6 +23,8 @@
 #define __OTTHREAD_H__
 
 #include "definitions.h"
+#include "logger.h"
+
 
 #include <list>
 #include <algorithm>

@@ -21,81 +21,36 @@
 #include "logger.h"
 #include <iostream>
 
-#ifdef _LOGFILE_
+Logger* Logger::instance = NULL;
 
-int Logger::masterLogLevel = 3;
-int Logger::masterFormat = 0;
+Logger::Logger(){}
 
-ScreenLogger::ScreenLogger(std::string id){
-    //
+Logger* Logger::getInstance(){
+	if(!instance)
+		instance = new Logger();
+	return instance;
 }
 
-void ScreenLogger::log(std::string msg){
-    std::cout << msg << std::endl << std::flush;
+void Logger::logMessage(std::string channel, eLogType type, int level,
+			std::string message, std::string func,
+			int line, std::string file)
+{
+	std::string sType;
+	switch(type){
+		case ERROR:
+			sType = "error";
+			break;
+		case EVENT:
+			sType = "event";
+			break;
+		case WARNING:
+			sType = "warning";
+	}
+	std::cout << "Channel: " << channel << std::endl;
+	std::cout << "Type: " << sType << std::endl;
+	std::cout << "Level: " << level << std::endl;
+	std::cout << "Messafe: " << message << std::endl;
+	std::cout << "Func: " << func << std::endl; 
+	std::cout << "Line: " << line << std::endl; 
+	std::cout << "File: " << file << std::endl; 
 }
-
-
-FileLogger::FileLogger(std::string id){
-    //open the file
-}
-
-void FileLogger::log(std::string msg){
-    //file << msg << std::endl << std::flush;
-}
-
-
-LoggingChannel::LoggingChannel(){
-    //
-    format = 0;
-    logLevel = 3;
-}
-
-void LoggingChannel::setLogLevel(int l){
-    logLevel = l;
-}
-
-int LoggingChannel::getLogLevel(){
-    return logLevel;
-}
-
-   
-void LoggingChannel::setFormat(int f){
-    format = f;
-}
-
-int LoggingChannel::getFormat(){
-    return format;
-}
-
-void LoggingChannel::log(std::string msg, std::string function="", std::string file="", int line=0){
-
-}
-
-void LoggingChannel::setTarget(std::string t){
-    //break up target and find out which logger to use
-    size_t p = t.find(":");
-    std::string method = t.substr(0, p);
-    std::string id = t.substr(p+1);
-    if(method == "screen"){
-	lt = new ScreenLogger(id);
-    }
-    else if(method == "file"){
-	lt = new FileLogger(id);
-    }
-    else{
-	std::cerr << "unknown method: '" << method << "'" << std::endl;  
-    }
-}
-
-LoggingChannel* Logger::getChannel(std::string channel){
-    if(channels.find(channel) != channels.end()){
-	LoggingChannel* c = new LoggingChannel();
-	channels[channel] = c;
-	c->setLogLevel(masterLogLevel);
-	c->setFormat(masterFormat);
-	c->setTarget("screen");
-    }
-    return channels[channel];
-} 
-
-#endif
