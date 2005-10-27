@@ -148,7 +148,6 @@ Items::~Items()
 		delete it->second;
 }
 
-
 int Items::loadFromOtb(std::string file)
 {
 	ItemLoader f;
@@ -157,10 +156,14 @@ int Items::loadFromOtb(std::string file)
 	}
 	
 	unsigned long type,len;
+	const unsigned char* data;
 	NODE node = f.getChildNode(NO_NODE, type);
+	data = f.getProps(node, len);
+	//4 byte flags
+	//attributes (optional)
+	//0x01 = version data
 	node = f.getChildNode(node, type);
 
-	const unsigned char* data;
 	while(node != NO_NODE) {
 		data = f.getProps(node, len);
 		if(data == NULL && f.getError() != ERROR_NONE)
@@ -481,6 +484,86 @@ int Items::loadFromOtb(std::string file)
 								iType->lightColor = lb.lightColor;
 								break;
 							}
+
+							case ITEM_ATTR_DECAY2:
+							{
+								if(datalen != sizeof(decayBlock2))
+									return ERROR_INVALID_FORMAT;
+
+								decayBlock2 db2;
+								memcpy(&db2, p, sizeof(decayBlock2));
+								iType->decayTime = db2.decayTime;
+								iType->decayTo = db2.decayTo;
+								break;
+							}
+
+							case ITEM_ATTR_WEAPON2:
+							{
+								if(datalen != sizeof(weaponBlock2))
+									return ERROR_INVALID_FORMAT;
+
+								weaponBlock2 wb2;
+								memcpy(&wb2, p, sizeof(weaponBlock2));
+								iType->weaponType = (WeaponType)wb2.weaponType;
+								iType->shootType = (subfight_t)wb2.shootType;
+								iType->amuType = (amu_t)wb2.amuType;
+								iType->attack = wb2.attack;
+								iType->defence = wb2.defence;
+								break;
+							}
+
+							case ITEM_ATTR_AMU2:
+							{
+								if(datalen != sizeof(amuBlock2))
+									return ERROR_INVALID_FORMAT;
+
+								amuBlock2 ab2;
+								memcpy(&ab2, p, sizeof(amuBlock2));
+								iType->shootType = (subfight_t)ab2.shootType;
+								iType->amuType = (amu_t)ab2.amuType;
+								iType->attack = ab2.attack;
+								break;
+							}
+
+							case ITEM_ATTR_ARMOR2:
+							{
+								if(datalen != sizeof(armorBlock2))
+									return ERROR_INVALID_FORMAT;
+
+								armorBlock2 ab2;
+								memcpy(&ab2, p, sizeof(armorBlock2));									
+								iType->armor = ab2.armor;
+								iType->weight = ab2.weight;
+								//ignore this value
+								//iType->slot_position = (slots_t)ab2.slot_position;
+
+								break;
+							}
+
+							case ITEM_ATTR_WRITEABLE2:
+							{
+								if(datalen != sizeof(writeableBlock2))
+									return ERROR_INVALID_FORMAT;
+
+								struct writeableBlock2 wb2;
+								memcpy(&wb2, p, sizeof(writeableBlock2));
+								iType->readOnlyId = wb2.readOnlyId;
+
+								break;
+							}
+
+							case ITEM_ATTR_LIGHT2:
+							{
+								if(datalen != sizeof(lightBlock2))
+									return ERROR_INVALID_FORMAT;
+
+								lightBlock2 lb2;
+								memcpy(&lb2, p, sizeof(lightBlock2));
+								iType->lightLevel = lb2.lightLevel;
+								iType->lightColor = lb2.lightColor;
+								break;
+							}
+
 
 							default:
 								delete iType;

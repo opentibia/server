@@ -45,6 +45,10 @@ enum itemgroup_t{
 };
 
 /////////OTB specific//////////////
+enum rootattrib_t{
+	ROOT_ATTR_VERSION = 0x01
+};
+
 enum itemattrib_t {
 	ITEM_ATTR_FIRST = 0x10,
 	ITEM_ATTR_SERVERID = ITEM_ATTR_FIRST,
@@ -68,6 +72,15 @@ enum itemattrib_t {
 	ITEM_ATTR_07,
 	ITEM_ATTR_08,
 	ITEM_ATTR_LIGHT,
+
+	//1-byte aligned
+	ITEM_ATTR_DECAY2,
+	ITEM_ATTR_WEAPON2,
+	ITEM_ATTR_AMU2,
+	ITEM_ATTR_ARMOR2,
+	ITEM_ATTR_WRITEABLE2,
+	ITEM_ATTR_LIGHT2,
+
 	ITEM_ATTR_LAST
 };
 
@@ -114,7 +127,7 @@ struct decayBlock{
 	unsigned short decayTime;
 };
 
-struct weaponBlock {
+struct weaponBlock{
 	unsigned char weaponType;
 	unsigned char amuType;
 	unsigned char shootType;
@@ -122,26 +135,72 @@ struct weaponBlock {
 	unsigned char defence;
 };
 
-struct amuBlock {
+struct amuBlock{
 	unsigned char amuType;
 	unsigned char shootType;
 	unsigned char attack;
 };
 
-struct armorBlock {
+struct armorBlock{
 	unsigned short armor;
 	double weight;
 	unsigned short slot_position;
 };
 
-struct writeableBlock {
+struct writeableBlock{
 	unsigned short readOnlyId;
 };
 
-struct lightBlock {
+struct lightBlock{
 	unsigned short lightLevel;
 	unsigned short lightColor;
 };
+#pragma pack()
+
+//1-byte aligned structs
+#pragma pack(1)
+
+struct VERSIONINFO{
+	unsigned long dwMajorVersion;
+	unsigned long dwMinorVersion;
+	unsigned long dwBuildNumber;
+	char CSDVersion[128];
+};
+
+struct decayBlock2{
+	unsigned short decayTo;
+	unsigned short decayTime;
+};
+
+struct weaponBlock2{
+	unsigned char weaponType;
+	unsigned char amuType;
+	unsigned char shootType;
+	unsigned char attack;
+	unsigned char defence;
+};
+
+struct amuBlock2{
+	unsigned char amuType;
+	unsigned char shootType;
+	unsigned char attack;
+};
+
+struct armorBlock2{
+	unsigned short armor;
+	double weight;
+	unsigned short slot_position;
+};
+
+struct writeableBlock2{
+	unsigned short readOnlyId;
+};
+
+struct lightBlock2{
+	unsigned short lightLevel;
+	unsigned short lightColor;
+};
+
 #pragma pack()
 /////////OTB specific//////////////
 
