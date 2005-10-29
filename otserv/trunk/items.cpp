@@ -519,6 +519,7 @@ int Items::loadFromOtb(std::string file)
 
 								amuBlock2 ab2;
 								memcpy(&ab2, p, sizeof(amuBlock2));
+								iType->weaponType = AMO;
 								iType->shootType = (subfight_t)ab2.shootType;
 								iType->amuType = (amu_t)ab2.amuType;
 								iType->attack = ab2.attack;
