@@ -3834,6 +3834,11 @@ bool Game::playerRotateItem(Player *player, const Position& pos, const unsigned 
 	if(player->isRemoved)
 		return false;
 	
+	if(std::abs(player->pos.x - pos.x) > 1 || std::abs(player->pos.y - pos.y) > 1 || player->pos.z != pos.z){
+		player->sendCancel("To far away.");
+		return false;
+	}
+	
 	Item *item = dynamic_cast<Item*>(getThing(pos, stackpos, player));
 	if(item && item->rotate()){
 		sendUpdateThing(player, pos, item, stackpos);
