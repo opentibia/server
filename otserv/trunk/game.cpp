@@ -2692,14 +2692,26 @@ void Game::creatureSpeakTo(Creature *creature, SpeakClasses type,const std::stri
 		return;
 	}
 
-	if(creature->access == 0)
+	if(creature->access == 0){
 		type = SPEAK_PRIVATE;
+	}
 
 	toPlayer->onCreatureSay(creature, type, text);	
 
 	std::stringstream ss;
 	ss << "Message sent to " << toPlayer->getName() << ".";
 	player->sendTextMessage(MSG_SMALLINFO, ss.str().c_str());
+}
+
+void Game::creatureTalkToChannel(Player *player, SpeakClasses type, std::string &text, unsigned short channelId)
+{
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::creatureTalkToChannel");
+	
+	if(player->access == 0){
+		type = SPEAK_CHANNEL_Y;
+	}
+	
+	g_chat.talkToChannel(player, type, text, channelId);
 }
 
 void Game::creatureMonsterYell(Monster* monster, const std::string& text) 

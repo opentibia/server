@@ -52,9 +52,6 @@ bool ChatChannel::talk(Player *fromPlayer, SpeakClasses type, std::string &text,
 	bool success = false;
 	UsersMap::iterator it;
 	
-	if(fromPlayer->access == 0){
-		type = SPEAK_CHANNEL_Y;
-	}
 	for(it = m_users.begin(); it != m_users.end(); ++it){
 		Player *toPlayer = dynamic_cast<Player*>(it->second);
 		if(toPlayer){

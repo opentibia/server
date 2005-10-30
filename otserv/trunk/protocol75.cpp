@@ -1216,7 +1216,7 @@ void Protocol75::parseSay(NetworkMessage &msg)
 	case SPEAK_CHANNEL_Y:
 	case SPEAK_CHANNEL_R1:
 	case SPEAK_CHANNEL_R2:
-		g_chat.talkToChannel(player, type, text, channelId);
+		game->creatureTalkToChannel(player, type, text, channelId);
 		break;
 	case SPEAK_BROADCAST:
 		game->creatureBroadcastMessage(player, text);
