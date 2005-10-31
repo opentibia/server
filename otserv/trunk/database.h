@@ -26,7 +26,11 @@
 #include <winsock.h>
 #endif
 
+#ifdef __MYSQL_ALT_INCLUDE__
+#include <mysql.h>
+#else
 #include <mysql/mysql.h>
+#endif
 #include <sstream>
 #include <map>
 
