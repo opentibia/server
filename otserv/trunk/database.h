@@ -26,7 +26,7 @@
 #include <winsock.h>
 #endif
 
-#include <mysql.h>
+#include <mysql/mysql.h>
 #include <sstream>
 #include <map>
 
