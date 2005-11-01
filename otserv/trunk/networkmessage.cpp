@@ -110,8 +110,8 @@ bool NetworkMessage::WriteToSocket(SOCKET socket)
 
 #if defined WIN32 || defined __WINDOWS__
 	// Set the socket I/O mode; iMode = 0 for blocking; iMode != 0 for non-blocking
-	//unsigned long mode = 1;
-	//ioctlsocket(socket, FIONBIO, &mode);
+	unsigned long mode = 1;
+	ioctlsocket(socket, FIONBIO, &mode);
 	flags = 0;
 #else
 	flags = MSG_DONTWAIT;
@@ -136,8 +136,8 @@ bool NetworkMessage::WriteToSocket(SOCKET socket)
 	}while(sendBytes < m_MsgSize+2);
 
 #if defined WIN32 || defined __WINDOWS__
-	//mode = 0;
-	//ioctlsocket(socket, FIONBIO, &mode);
+	mode = 0;
+	ioctlsocket(socket, FIONBIO, &mode);
 #endif
 
   return ret;
