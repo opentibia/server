@@ -81,8 +81,9 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `guilds`;
 CREATE TABLE `guilds` (
-  `guildid` int(11) NOT NULL default '0',
+  `guildid` int(11) NOT NULL auto_increment,
   `guildname` varchar(100) NOT NULL default '',
+  `ownerid` int(11) NOT NULL default '0',
   PRIMARY KEY  (`guildid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
