@@ -495,24 +495,32 @@ int main(int argc, char *argv[])
 		passwordType = PASSWORD_TYPE_PLAIN;
 	}
 
-#ifdef _SQLMAP_
-	std::cout << ":: Reading spawn info from database ... \n";
-	if(g_game.loadMap(g_config.getGlobalString("sqlmap"))) {
-		SpawnManager::initialize(&g_game);
-		SpawnManager::instance()->loadSpawnsSQL(g_config.getGlobalString("sqlmap"));
-		SpawnManager::instance()->startup();
+	// loads the map and, if needed, an extra-file spawns
+	switch (g_game.loadMap(g_config.getGlobalString("map"), g_config.getGlobalString("mapkind")))
+	{
+		case -1:
+			{
+		 		std::cout << "FATAL: couldnt determine the map format! exiting" << std::endl;
+				exit(1);
+			} 
+			break;
+		case 1:
+			{
+				SpawnManager::initialize(&g_game);
+				SpawnManager::instance()->loadSpawnsXML(g_game.getSpawnFile());
+				SpawnManager::instance()->startup();
+			}
+			break;
+		#ifdef ENABLESQLMAPSUPPORT	
+		case 2:
+			{
+				SpawnManager::initialize(&g_game);
+				SpawnManager::instance()->loadSpawnsSQL(g_config.getGlobalString("map"));
+				SpawnManager::instance()->startup();
+			}
+			break;
+		#endif
 	}
-//#elif _BINMAP_
-//	g_game.loadMap(g_config.getGlobalString("mapfile"));
-    // doesnt need to load spawns, it will be loaded from the bin (OTM)
-#else
-	// load map file
-	if(g_game.loadMap(g_config.getGlobalString("mapfile"))) {
-		SpawnManager::initialize(&g_game);
-		SpawnManager::instance()->loadSpawnsXML(g_game.getSpawnFile());
-		SpawnManager::instance()->startup();
-	}
-#endif		
 	
   	// Call to WSA Startup on Windows Systems...
 #ifdef WIN32

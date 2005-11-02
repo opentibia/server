@@ -223,7 +223,7 @@ bool SpawnManager::loadSpawnsXML(std::string filename)
 	return false;
 }
 
-#ifdef _SQLMAP_
+#ifdef ENABLESQLMAPSUPPORT	
 bool SpawnManager::loadSpawnsSQL(std::string identifier)
 {
 	std::string host = g_config.getGlobalString("map_host");

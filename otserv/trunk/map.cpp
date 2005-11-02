@@ -34,13 +34,11 @@ using namespace std;
 
 #include "iomap.h"
 
-#ifdef _SQLMAP_
+#ifdef ENABLESQLMAPSUPPORT	
 #include "iomapsql.h"
-//#elif _BINMAP_
-//#include "iomapbin.h"
-#else
-#include "iomapxml.h"
 #endif
+#include "iomapbin.h"
+#include "iomapxml.h"
 
 #include "otsystem.h"
 #include <stdio.h>
@@ -79,19 +77,38 @@ Map::~Map()
 }
 
 
-bool Map::loadMap(std::string filename) {
-#ifdef _SQLMAP_
-	IOMap* loader = new IOMapSQL();
-//#elif _BINMAP_
-//	IOMap* loader = new IOMapBin();
-#else
-	IOMap* loader = new IOMapXML();
-#endif
+int Map::loadMap(std::string filename, std::string filekind) {
+	int ret;
+	IOMap* loader;
+	
+	if (strcmp(filekind.c_str(), "BIN\0") == 0) {
+		loader = new IOMapBin();
+		ret = 0;
+	} else
+	if (strcmp(filekind.c_str(), "TXT\0") == 0) {
+		loader = new IOMapXML();
+		ret = 1;
+	#ifdef ENABLESQLMAPSUPPORT	
+	} else
+	if (strcmp(filekind.c_str(), "SQL\0") == 0) {
+		loader = new IOMapSQL();
+		ret = 2;
+	#endif	
+	} else {
+ 		std::cout << "FATAL: couldnt determine the map format! exiting" << std::endl;
+		exit(1);
+	}
 
 	std::cout << ":: Loading map from: " << loader->getSourceDescription() << std::endl;
 	bool success = loader->loadMap(this, filename);
 	delete loader;
-	return success;
+	
+	if (success)
+	{
+		return ret;
+	} else {
+		return -1;
+	}
 }
 
 Tile* Map::getTile(unsigned short _x, unsigned short _y, unsigned char _z)

@@ -117,11 +117,12 @@ public:
   ~Game();
 	
 	/**
-	  * Load the map from a file.
-	  * Delegates the actual loading to the map-class
-	  * \param filename the name of the mapfile to load
+	  * Load a map.
+	  * \param filename Mapfile to load
+	  * \param filekind Kind of the map, BIN SQL or TXT
+	  * \returns Int 0 built-in spawns, 1 needs xml spawns, 2 needs sql spawns, -1 if got error
 	  */
-	bool loadMap(std::string filename);
+    int loadMap(std::string filename, std::string filekind);
 	
 	/**
 	  * Get the map size - info purpose only

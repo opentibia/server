@@ -6,9 +6,13 @@
 -- datadir
 datadir = "data/"
 
--- mapfile
--- sets what map to load
-mapfile = "data/world/map.otx"
+-- map
+-- sets what map to load, if sql, determines the sql map
+map = "data/world/map.otx"
+
+-- mapkind
+-- BIN for binary, SQL for SQL map, TXT for OTX maps
+mapkind = "TXT"
 
 -- loginmsg
 -- the message the player gets when he logs in
@@ -81,7 +85,6 @@ sql_db   = "otserv"
 
 
 --- SQL MAP part
-sqlmap = "test_map"
 map_host = "localhost"
 map_user = "root"
 map_pass = ""

@@ -174,9 +174,10 @@ class Map {
 	/**
 	  * Load a map.
 	  * \param filename Mapfile to load
-	  * \returns Bool if load was successful.
+	  * \param filekind Kind of the map, BIN SQL or TXT
+	  * \returns Int 0 built-in spawns, 1 needs xml spawns, 2 needs sql spawns, -1 if got error
 	  */
-    bool loadMap(std::string filename);
+    int loadMap(std::string filename, std::string filekind);
 
 	/**
 	  * Get a single tile.

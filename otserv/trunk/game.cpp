@@ -446,11 +446,11 @@ enum_game_state Game::getGameState()
 	return game_state;
 }
 
-bool Game::loadMap(std::string filename) {
+int Game::loadMap(std::string filename, std::string filekind) {
 	if(!map)
 		map = new Map;
 	max_players = atoi(g_config.getGlobalString("maxplayers").c_str());	
-	return map->loadMap(filename);
+	return map->loadMap(filename, filekind);
 }
 
 
