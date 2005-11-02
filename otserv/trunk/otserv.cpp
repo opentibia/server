@@ -496,30 +496,23 @@ int main(int argc, char *argv[])
 	}
 
 	// loads the map and, if needed, an extra-file spawns
-	switch (g_game.loadMap(g_config.getGlobalString("map"), g_config.getGlobalString("mapkind")))
-	{
-		case -1:
-			{
-		 		std::cout << "FATAL: couldnt determine the map format! exiting" << std::endl;
-				exit(1);
-			} 
-			break;
-		case 1:
-			{
-				SpawnManager::initialize(&g_game);
-				SpawnManager::instance()->loadSpawnsXML(g_game.getSpawnFile());
-				SpawnManager::instance()->startup();
-			}
-			break;
-		#ifdef ENABLESQLMAPSUPPORT	
-		case 2:
-			{
-				SpawnManager::initialize(&g_game);
-				SpawnManager::instance()->loadSpawnsSQL(g_config.getGlobalString("map"));
-				SpawnManager::instance()->startup();
-			}
-			break;
-		#endif
+	switch(g_game.loadMap(g_config.getGlobalString("map"), g_config.getGlobalString("mapkind"))){
+	case MAP_LOADER_ERROR:
+		std::cout << "FATAL: couldnt determine the map format! exiting" << std::endl;
+		exit(1); 
+		break;
+	case SPAWN_XML:
+		SpawnManager::initialize(&g_game);
+		SpawnManager::instance()->loadSpawnsXML(g_game.getSpawnFile());
+		SpawnManager::instance()->startup();
+		break;
+	#ifdef ENABLESQLMAPSUPPORT	
+	case SPAWN_SQL,:
+		SpawnManager::initialize(&g_game);
+		SpawnManager::instance()->loadSpawnsSQL(g_config.getGlobalString("map"));
+		SpawnManager::instance()->startup();
+		break;
+	#endif
 	}
 	
   	// Call to WSA Startup on Windows Systems...

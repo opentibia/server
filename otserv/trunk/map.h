@@ -53,6 +53,13 @@ class Game;
 
 #define MAP_LAYER     16
 
+enum SpawnLoadingType_t{
+	MAP_LOADER_ERROR,
+	SPAWN_BUILTIN,
+	SPAWN_XML,
+	SPAWN_SQL,
+};
+
 class Tile;
 class Map;
 
@@ -175,7 +182,7 @@ class Map {
 	  * Load a map.
 	  * \param filename Mapfile to load
 	  * \param filekind Kind of the map, BIN SQL or TXT
-	  * \returns Int 0 built-in spawns, 1 needs xml spawns, 2 needs sql spawns, -1 if got error
+	  * \returns Int SPAWN_BUILTIN built-in spawns, SPAWN_XML needs xml spawns, SPAWN_SQL needs sql spawns, MAP_LOADER_ERROR if got error
 	  */
     int loadMap(std::string filename, std::string filekind);
 

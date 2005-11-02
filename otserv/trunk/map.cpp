@@ -81,20 +81,21 @@ int Map::loadMap(std::string filename, std::string filekind) {
 	int ret;
 	IOMap* loader;
 	
-	if (strcmp(filekind.c_str(), "BIN\0") == 0) {
+	if(filekind == "BIN"){
 		loader = new IOMapBin();
-		ret = 0;
-	} else
-	if (strcmp(filekind.c_str(), "TXT\0") == 0) {
+		ret = SPAWN_BUILTIN;
+	}
+	else if(filekind == "TXT"){
 		loader = new IOMapXML();
-		ret = 1;
+		ret = SPAWN_XML;
+	}
 	#ifdef ENABLESQLMAPSUPPORT	
-	} else
-	if (strcmp(filekind.c_str(), "SQL\0") == 0) {
+	else if(filekind == "SQL"){
 		loader = new IOMapSQL();
-		ret = 2;
+		ret = SPAWN_SQL;
+	}
 	#endif	
-	} else {
+	else{
  		std::cout << "FATAL: couldnt determine the map format! exiting" << std::endl;
 		exit(1);
 	}
@@ -103,11 +104,11 @@ int Map::loadMap(std::string filename, std::string filekind) {
 	bool success = loader->loadMap(this, filename);
 	delete loader;
 	
-	if (success)
-	{
+	if(success){
 		return ret;
-	} else {
-		return -1;
+	}
+	else{
+		return MAP_LOADER_ERROR;
 	}
 }
 
