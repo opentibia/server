@@ -74,15 +74,16 @@ void IOMapBin::loadOTM(Map* map)
 
 				// Map Name
 				len = fgetc(fh);
-				for (pos=0;pos<len;pos++)
-					name[pos]=fgetc(fh);
-				name[pos]='\0';
+				for (pos = 0; pos < len; pos++)
+					name[pos] = fgetc(fh);
+				name[pos] = '\0';
 				std::cout << ":: Map Name: " << name << std::endl;
+				
 				// Map Author
 				len = fgetc(fh);
-				for (pos=0;pos<len;pos++)
-					author[pos]=fgetc(fh);
-				author[pos]='\0';
+				for (pos = 0; pos < len; pos++)
+					author[pos] = fgetc(fh);
+				author[pos] = '\0';
 				std::cout << ":: Map Author: " << author << std::endl;
 				
 				
@@ -90,22 +91,26 @@ void IOMapBin::loadOTM(Map* map)
 			case 0x20: // Map dimensions
 			{
 				int width, height;
-				width = fgetc(fh); width+=fgetc(fh)<<8;
-				height = fgetc(fh); height+=fgetc(fh)<<8;
+				width = fgetc(fh);
+				width += fgetc(fh)<<8;
+				height = fgetc(fh);
+				height += fgetc(fh)<<8;
 				map->mapwidth = width;
 				map->mapheight = height;
 				std::cout << ":: Map dimensions: " << width << "x" << height << std::endl;
 			} break; 
 			case 0x30: // Global Temple Position
 			{
-				// TODO: use the temple point and radius
 				PositionEx templePos;
 
-				templePos.x = fgetc(fh); templePos.x += fgetc(fh);	// X
-				templePos.y = fgetc(fh); templePos.y += fgetc(fh);	// Y
-				templePos.z = fgetc(fh);							// Z
+				templePos.x = fgetc(fh);
+				templePos.x += fgetc(fh);	// X
+				templePos.y = fgetc(fh);
+				templePos.y += fgetc(fh);	// Y
+				templePos.z = fgetc(fh);	// Z
 				int radius = fgetc(fh);						// Radius
 
+				// TODO: use the temple point and radius
 				std::cout << ":: Global Temple Position: " << templePos.x << " " << templePos.y << " " << templePos.z << " Radius: " << radius << std::endl;
 			} break; 
 			case 0x40: // Tiles and items
@@ -123,16 +128,18 @@ void IOMapBin::loadOTM(Map* map)
 					if (x == 0xFFFF && y == 0xFFFF && z == 0xFF) 
 						break;
 		           			             
-					id = fgetc(fh); id+=fgetc(fh)<<8; id+=100;
+					id = fgetc(fh) + 100; 
+					id += fgetc(fh) << 8; 
 			        total += 1;
+			        
 					map->setTile(x, y, z, id);
 					t = map->getTile(x, y, z);
 					
-					// check if teh tile is pz
+					// check if the tile is pz
 					if (fgetc(fh) == 1)
 						t->setPz();
 					
-					int op2 = 0xFF;
+					int op2;
 					int tmpid;
 					do 
 					{
@@ -141,27 +148,32 @@ void IOMapBin::loadOTM(Map* map)
 						{
 							case 0x10: // Action Id
 								fgetc(fh); // len
-								tmpid = fgetc(fh); tmpid+=fgetc(fh)<<8;
-								t->ground->setActionId(tmpid);
+								tmpid = fgetc(fh);
+								tmpid += fgetc(fh) << 8;
+								// t->ground->setActionId(tmpid);
 								break;
 							case 0x20: // Unique Id
 								fgetc(fh); // len
-								tmpid = fgetc(fh); tmpid += fgetc(fh) << 8;
-								t->ground->setUniqueId(tmpid);
-								break; /*
+								tmpid = fgetc(fh);
+								tmpid += fgetc(fh) << 8;
+								//t ->ground->setUniqueId(tmpid);
+								break; 
 							case 0x30: // Target Id
 								fgetc(fh); // len
-								tmpid = fgetc(fh); tmpid += fgetc(fh) << 8;
+								tmpid = fgetc(fh);
+								tmpid += fgetc(fh) << 8;
 								// TODO: implement target ids
-								break; */
+								break; 
 							case 0xA0: // Item
 							{
 								int itemcount = fgetc(fh);
-								for (int count = 0;count<itemcount;count++)
+								for (int count = 0; count < itemcount; count++)
 								{
-									int itemid = fgetc(fh) + 100; itemid += fgetc(fh) << 8;
+									int itemid = fgetc(fh) + 100;
+									itemid += fgetc(fh) << 8;
+									
 									Item *item = Item::CreateItem(itemid);
-									int op3 = 0xFF;
+									int op3;
 									do
 									{
 										op3 = fgetc(fh);
@@ -173,19 +185,22 @@ void IOMapBin::loadOTM(Map* map)
 												break;                 
 											case 0x20: // Action Id
 												fgetc(fh); //len
-												tmpid = fgetc(fh); tmpid += fgetc(fh) << 8;
-												item->setActionId(tmpid);
+												tmpid = fgetc(fh);
+												tmpid += fgetc(fh) << 8;
+												// item->setActionId(tmpid);
 												break; 
 											case 0x30: // Unique Id
 												fgetc(fh); //len
-												tmpid = fgetc(fh); tmpid += fgetc(fh) << 8;
-												item->setUniqueId(tmpid);
-												break; /*
+												tmpid = fgetc(fh);
+												tmpid += fgetc(fh) << 8;
+												// item->setUniqueId(tmpid);
+												break; 
 											case 0x40: // Target Id
 												fgetc(fh); //len
-												tmpid = fgetc(fh); tmpid += fgetc(fh)<<8;
-												item->setTargetId(tmpid);
-												break; */
+												tmpid = fgetc(fh);
+												tmpid += fgetc(fh) << 8;
+												// item->setTargetId(tmpid);
+												break; 
 											case 0x70: //Teleport
 											{
 												Teleport *tele = dynamic_cast<Teleport*>(item);
