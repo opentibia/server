@@ -262,10 +262,12 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 				std::string acc_pass;
 				if(IOAccount::instance()->getPassword(accnumber, name, acc_pass) && passwordTest(password,acc_pass)){
 					
+					bool isLocked = true;
 					OTSYS_THREAD_LOCK(g_game.gameLock, "ConnectionHandler()")
 					Player* player = g_game.getPlayerByName(name);
 					bool playerexist = (player != NULL);
 					if(player){
+						//reattach player?
 						if(player->client->s == 0 && player->isRemoved == false && !g_config.getGlobalNumber("allowclones", 0)){
 							player->lastlogin = std::time(NULL);
 							player->client->reinitializeProtocol();
@@ -274,10 +276,12 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 							player->lastip = player->getIP();
 							s = 0;
 						}
+
+						//guess not...
 						player = NULL;
 					}
 					
-					OTSYS_THREAD_UNLOCK(g_game.gameLock, "ConnectionHandler()")
+					//OTSYS_THREAD_UNLOCK(g_game.gameLock, "ConnectionHandler()")
 					
 					if(s){
 						Protocol75* protocol;
@@ -294,7 +298,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 							msg.Reset();
 							msg.AddByte(0x14);
 							msg.AddString("You are already logged in.");
-							msg.WriteToSocket(s);		
+							msg.WriteToSocket(s);	
 						}
 						else if(g_game.getGameState() == GAME_STATE_SHUTDOWN){
 							//nothing to do
@@ -321,11 +325,21 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 							player->lastlogin = std::time(NULL);
 							player->lastip = player->getIP();
 							s = 0;            // protocol/player will close socket
+							
+							OTSYS_THREAD_UNLOCK(g_game.gameLock, "ConnectionHandler()")
+							isLocked = false;
+							
 							protocol->ReceiveLoop();
 							stat->removePlayer();
 						}
-						if(player)
+
+						if(player){
 							g_game.FreeThing(player);
+						}
+					}
+
+					if(isLocked){
+						OTSYS_THREAD_UNLOCK(g_game.gameLock, "ConnectionHandler()")
 					}
 				}
 			}
@@ -399,7 +413,6 @@ int main(int argc, char *argv[])
 #endif
 
 	std::cout << ":: OTServ Development-Version 0.4.1 - CVS Preview" << std::endl;
-	//std::cout << ":: OTServ Version 0.4.0" << std::endl;
 	std::cout << ":: ====================" << std::endl;
 	std::cout << "::" << std::endl;
 	
