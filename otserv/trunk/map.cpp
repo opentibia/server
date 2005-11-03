@@ -37,7 +37,7 @@ using namespace std;
 #ifdef ENABLESQLMAPSUPPORT	
 #include "iomapsql.h"
 #endif
-#include "iomapbin.h"
+//#include "iomapbin.h"
 #include "iomapxml.h"
 
 #include "otsystem.h"
@@ -81,11 +81,11 @@ int Map::loadMap(std::string filename, std::string filekind) {
 	int ret;
 	IOMap* loader;
 	
-	if(filekind == "BIN"){
+	/*if(filekind == "BIN"){
 		loader = new IOMapBin();
 		ret = SPAWN_BUILTIN;
 	}
-	else if(filekind == "TXT"){
+	else */if(filekind == "TXT"){
 		loader = new IOMapXML();
 		ret = SPAWN_XML;
 	}
