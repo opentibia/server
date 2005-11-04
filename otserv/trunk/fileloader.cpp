@@ -248,7 +248,10 @@ const NODE FileLoader::getNextNode(const NODE prev, unsigned long &type)
 				if(!readByte(byte))
 					return NO_NODE;
 				
-				if(byte != NODE_START){
+				if(byte == NODE_END){
+					return NO_NODE;
+				}
+				else if(byte != NODE_START){
 					m_lastError = ERROR_INVALID_FORMAT;
 					return NO_NODE;
 				}
