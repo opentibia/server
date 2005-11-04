@@ -49,7 +49,7 @@ ip = "127.0.0.1"
 -- motd
 -- The messagebox you sometimes get before you choose characters
 -- not working yet
-motd = "Welcome to OpenTibia Pre-Release"
+motd = "Welcome to OpenTibia 0.4.1"
 motdnum="1"
 
 -- use md5 passwords for accounts, yes/no
