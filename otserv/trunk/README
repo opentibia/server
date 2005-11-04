@@ -1,5 +1,5 @@
 ============================================
-========== OpenTibia Server 0.4.0 ==========
+========== OpenTibia Server 0.4.1 ==========
 ============================================
 ===== www.otserv.org	www.otfans.net =====
 ============================================
@@ -8,13 +8,13 @@ Readme by Pekay.
 
 What is this?
 	OTserv is a free MMORPG emulation, that creates a own gameworld server,
-        based on the CIPsoft's Tibia.
+	based on the CIPsoft's Tibia.
 
 How does it work?
-	In the past Otserv could be played on Tibia 7.1 or 7.11.
-	Otserv is now played using Tibia 7.4 or Tibia 7.41.
+	In the past Otserv could be played on Tibia 7.1, 7.11 and then 7.4.
+	Otserv is now played using Tibia 7.5.
 	To play it you can either download the IP changer (works with
-	only Tibia 7.4) or change the shortcut to Tibia.
+	only Tibia 7.5) or change the shortcut to Tibia.
 	If you are making a shortcut to it, open the properties of the shortcut
 	and you should see a box marked "Target:" and should look roughly
 	like this: "C:/tibia directory/Tibia.exe".
@@ -39,16 +39,33 @@ How does it work?
 	not connecting to the CIP servers.
 	Then you are logged in.
 
-What's New?
+	
+Whats New?	
+	- 7.5 Protocol
+	- OTB (You now dont have to convert your map, change any ID, 7.5 ID's are just stacked on top of older ID's!)
+	- VIP List (SQL Only)
+	- Guild support
+	- Logger added
+	- Rotatable items
+	- Monsters smarter
+	- Loads of glitches and bugs fixed
+	
+
+Features?
 	- Full rearranged protocol and game system
 	- Actions (when using a tile or item)
 	- SQL databases (for accounts and players)
 	- Crash tracking
 	- Monsters
-	- Spawns
+	- 7.5 Protocol
+	- OTB (You now dont have to convert your map, change any ID, 7.5 ID's are just stacked on top of older ID's!)
+	- VIP List (SQL Only)
+	- Guild support
+	- Spawns (and Respawn)
 	- Commands
 	- Autowalk
-	- Binary map also available (JXB3 / OTM)
+	- Rotatable items
+	- Logger
 	- Enhanced items database
 	- Runes with charges
 	- Depots
@@ -104,13 +121,13 @@ Credits?
 	Haktivex - Developer, not more a member of the team
 	Fandoras - Developer, not more a member of the team
 	Decar - Fansiter, not more a member of the team
-	Pekay - README Documentation
-	SimOne - Developer and Map Editor
+	Pekay - README Documentation, Actions Command Console Developer, DS-IRC Client Developer
+	SimOne - Developer and Map Editor, OTB
 	j4K3xBl4sT3r - Developer and Map Editor
 	GriZzm0 - Developer and Scripting
 	Snack - Developer
-	Spin - Developer
-	Primer - Developer
+	Spin - Developer, OTB
+	Primer - Developer, SQL
 	TiMMit - Developer (still member?)
 	Matkus - Developer (still member?)
 	Privateer - Documentation on the protocol (still member?)
@@ -120,20 +137,31 @@ Forum Credits (OtFans.net):
 	Yorick - Admin
 	Nuker - Admin
 	Verkon - Admin
+	Pekay - Admin
 	Tliff - Admin
 	
-	Pekay - Super Moderator
-	SimOne - Super Moderator
+	Runar - Super Moderator
+	GriZzm0 - Super Moderator
+	Jorris (Sixpack) - Super Moderator
 	
-	Joel - Moderator
-	Acemo - Moderator
+	Algenon - Moderator
+	Rifleet - Moderator
+	Orio - Moderator
+	brave - Moderator, OTServ List
+	Gecko Slayer - Moderator
+	Jason - Moderator
+	Qwerty| - Moderator
+	Tibia Rules - Moderator
+	Tijn - Moderator
 	Jero - Moderator
 	j4K3xBl4sT3r - Moderator
 	 
 Help?
 	We always need help. Post on the forums of OTFans!
 	http://otfans.net if you want to help. Theres a lot to be found there.
-	For Brasilian Users - http://otfans.wgbrasil.com hosted by j4K3xBl4sT3r.
+
 
 Anything else?
-	No.
+	Yes! There are utilities available as a seperate package soon at the sourceforge site
+	where the otserv project is, check out Releases there soon on best utilites that are
+	most helpful. We have a chat room now as well on #otserv: http://otfans.net/javachat.php .
