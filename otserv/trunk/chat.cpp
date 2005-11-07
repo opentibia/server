@@ -77,7 +77,11 @@ Chat::Chat()
 		
 	newChannel = new ChatChannel(0x06, "RL-Chat");
 	if(newChannel)
-		m_normalChannels[0x06] = newChannel;		
+		m_normalChannels[0x06] = newChannel;
+				
+	newChannel = new ChatChannel(0x07, "Help");
+	if(newChannel)
+		m_normalChannels[0x07] = newChannel;
 }
 
 ChatChannel *Chat::createChannel(Player *player, unsigned short channelId)
