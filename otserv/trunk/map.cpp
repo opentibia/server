@@ -381,26 +381,22 @@ std::list<Position> Map::getPathTo(Creature *creature, Position start, Position 
 /*	if(start.z != to.z)
 		return path;
 */
-
-	std::list<AStarNode*> openNodes;
-	std::list<AStarNode*> closedNodes;
-	int z = start.z;
-
-	AStarNode* startNode = new AStarNode;
-	startNode->parent=NULL;
-	startNode->h=0;
-	startNode->x=start.x;
-	startNode->y=start.y;
+	AStarNodes nodes;
 	AStarNode* found = NULL;
-	openNodes.push_back(startNode);
-	while(!found && closedNodes.size() < maxNodSize){
-		//get best node from open list
-		openNodes.sort(lessPointer<AStarNode>());
-		if(openNodes.size() == 0)
+	int z = start.z;
+	AStarNode* startNode = nodes.createOpenNode();
+	startNode->parent = NULL;
+	startNode->h = 0;
+	startNode->x = start.x;
+	startNode->y = start.y;
+	
+	while(!found && nodes.countClosedNodes() < maxNodSize){		
+		AStarNode* current = nodes.getBestNode();
+		if(!current)
 			return path; //no path
-		AStarNode* current = openNodes.front();
-		openNodes.pop_front();
-		closedNodes.push_back(current);
+		
+		nodes.closeNode(current);
+		
 		for(int dx=-1; dx <= 1; dx++){
 			for(int dy=-1; dy <= 1; dy++){
 				if(std::abs(dx) != std::abs(dy)){
@@ -419,44 +415,18 @@ std::list<Position> Map::getPathTo(Creature *creature, Position start, Position 
 					}
 					else
 						continue;
-
-					bool isInClosed = false;
-					for(std::list<AStarNode*>::iterator it = closedNodes.begin();
-						it != closedNodes.end(); it++){
-						AStarNode* n = *it;
-						if(n->x == x && n->y == y){
-							isInClosed = true;
-							break;
+					
+					if(!nodes.isInList(x,y)){
+						AStarNode* n = nodes.createOpenNode();
+						if(n){
+							n->x = x;
+							n->y = y;
+							n->h = abs(n->x - to.x)*abs(n->x - to.x) + abs(n->y - to.y)*abs(n->y - to.y);
+							n->parent = current;
+							if(x == to.x && y == to.y){
+								found = n;
+							}
 						}
-					}
-					if(isInClosed)
-						continue;
-
-					bool isInOpen = false;
-					AStarNode* child = NULL;
-					for(std::list<AStarNode*>::iterator it = openNodes.begin();
-						it != openNodes.end(); it++){
-						AStarNode* n = *it;
-						if(n->x == x && n->y == y){
-							isInOpen = true;
-							child = *it;
-							break;
-						}
-					}
-
-					if(!isInOpen){
-						AStarNode* n = new AStarNode;
-						n->x=x;
-						n->y=y;
-						//n->h = abs(n->x - to.x) + abs(n->y - to.y);
-						n->h = abs(n->x - to.x)*abs(n->x - to.x) + abs(n->y - to.y)*abs(n->y - to.y);
-						//n->h = (float)abs(n->x - to.x) + (float)abs(n->y - to.y);
-						//n->g = current->g + 1;
-						n->parent = current;
-						if(n->x == to.x && n->y == to.y){
-							found = n;
-						}
-						openNodes.push_front(n);
 					}
 /*					else{
 						if(current->g + 1 < child->g)
@@ -477,18 +447,94 @@ std::list<Position> Map::getPathTo(Creature *creature, Position start, Position 
 		found = found->parent;
 	}
 
-	for(std::list<AStarNode*>::iterator it = openNodes.begin();
-		it != openNodes.end(); it++){
-		delete *it;
-	}
-
-	for(std::list<AStarNode*>::iterator it = closedNodes.begin();
-		it != closedNodes.end(); it++){
-		delete *it;
-	}
-	
-	/*for(std::list<Position>::iterator it = path.begin(); it != path.end(); it++){
-		Position p = *it;
-	}*/
 	return path;
+}
+
+
+AStarNodes::AStarNodes()
+{
+	curNode = 0;
+	openNodes.reset();
+}
+
+AStarNode* AStarNodes::createOpenNode()
+{
+	if(curNode >= MAX_NODES)
+		return NULL;
+	
+	unsigned long ret_node = curNode;
+	curNode++;
+	openNodes[ret_node] = 1;
+	return &nodes[ret_node];
+}
+
+AStarNode* AStarNodes::getBestNode()
+{
+	if(curNode == 0)
+		return NULL;
+
+	int best_node_h;
+	unsigned long best_node;
+	bool found;
+	
+	best_node_h = 100000;
+	best_node = 0;
+	found = false;
+
+	for(int i = 0; i < curNode; i++){
+		if(nodes[i].h < best_node_h && openNodes[i] == 1){
+			found = true;
+			best_node_h = nodes[i].h;
+			best_node = i;
+		}
+	}
+	if(found){
+		return &nodes[best_node];
+	}
+	else{
+		return NULL;
+	}
+}
+
+void AStarNodes::closeNode(AStarNode* node)
+{
+	unsigned long pos = GET_NODE_INDEX(node);
+	if(pos < 0 || pos >= MAX_NODES){
+		std::cout << "AStarNodes. trying to close node out of range" << std::endl;
+		return;
+	}
+	openNodes[pos] = 0;
+}
+
+unsigned long AStarNodes::countClosedNodes()
+{
+	unsigned long counter = 0;
+	for(int i = 0; i < curNode; i++){
+		if(openNodes[i] == 0){
+			counter++;
+		}
+	}
+	return counter;
+}
+
+unsigned long AStarNodes::countOpenNodes()
+{
+	unsigned long counter = 0;
+	for(int i = 0; i < curNode; i++){
+		if(openNodes[i] == 1){
+			counter++;
+		}
+	}
+	return counter;
+}
+
+
+bool AStarNodes::isInList(unsigned long x, unsigned long y)
+{
+	for(int i = 0; i < curNode; i++){
+		if(nodes[i].x == x && nodes[i].y == y){
+			return true;
+		}
+	}
+	return false;
 }

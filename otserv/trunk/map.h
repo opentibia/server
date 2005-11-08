@@ -24,6 +24,7 @@
 
 
 #include <queue>
+#include <bitset>
 
 #include "position.h"
 #include "item.h"
@@ -158,6 +159,25 @@ struct AStarNode{
 	bool operator<(const AStarNode &node){return this->h < node.h;}
 };
 
+#define MAX_NODES 512
+#define GET_NODE_INDEX(a) (a - &nodes[0])
+
+class AStarNodes{
+public:
+	AStarNodes();
+	~AStarNodes(){};
+
+	AStarNode* createOpenNode();
+	AStarNode* getBestNode();
+	void closeNode(AStarNode* node);
+	unsigned long countClosedNodes();
+	unsigned long countOpenNodes();
+	bool isInList(unsigned long x, unsigned long y);
+private:
+	AStarNode nodes[MAX_NODES];
+	std::bitset<MAX_NODES> openNodes;
+	unsigned long curNode;
+};
 
 template<class T> class lessPointer : public std::binary_function<T*, T*, bool> {
 		  public:
