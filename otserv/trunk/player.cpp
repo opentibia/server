@@ -49,7 +49,7 @@ const int Player::ManaGain[5] = {5, 30, 30, 15, 5};
 const int Player::HPGain[5] = {5, 5, 5, 10, 15};
 
 Player::Player(const std::string& name, Protocol *p) :
- Creature(name)
+Creature()
 {	
 	client     = p;
 	client->setPlayer(this);

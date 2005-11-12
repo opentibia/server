@@ -167,6 +167,10 @@ public:
 			return 0.00;
 	}
 	
+	virtual int getLostExperience() {
+		return (int)std::floor(((double)experience * 0.1));
+	}
+	
 	double getFreeCapacity() const {
 		if(access == 0) {
 			return std::max(0.00, capacity - inventoryWeight);
@@ -335,6 +339,7 @@ protected:
 protected:
 	Protocol *client;
 	int useCount;
+	unsigned long experience;
 	
 	playervoc_t vocation;
 	playersex_t sex;

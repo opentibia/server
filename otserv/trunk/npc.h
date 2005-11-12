@@ -43,14 +43,14 @@ class NpcScript : protected LuaScript{
 public:
 	NpcScript(std::string name, Npc* npc);
 	virtual ~NpcScript(){}
-//	virtual void onThingMove(const Player *player, const Thing *thing, const Position *oldPos,
-//	unsigned char oldstackpos, unsigned char oldcount, unsigned char count);
+	//	virtual void onThingMove(const Player *player, const Thing *thing, const Position *oldPos,
+	//	unsigned char oldstackpos, unsigned char oldcount, unsigned char count);
 	virtual void onCreatureAppear(unsigned long cid);
 	virtual void onCreatureDisappear(int cid);	
-//	virtual void onCreatureTurn(const Creature *creature, unsigned char stackpos);
+	//	virtual void onCreatureTurn(const Creature *creature, unsigned char stackpos);
 	virtual void onCreatureSay(int cid, SpeakClasses, const std::string &text);
 	virtual void onThink();
-//	virtual void onCreatureChangeOutfit(const Creature* creature);
+	//	virtual void onCreatureChangeOutfit(const Creature* creature);
 	static Npc* getNpc(lua_State *L);
 	static int luaActionSay(lua_State *L);
 	static int luaActionMove(lua_State *L);
@@ -60,8 +60,8 @@ public:
 	static int luaActionAttackCreature(lua_State *L);
 	static int luaCreatureGetPos(lua_State *L);
 	static int luaSelfGetPos(lua_State *L);
-
-  bool isLoaded(){return loaded;}
+	
+	bool isLoaded(){return loaded;}
 protected:
 	int registerFunctions();
 	Npc* npc;
@@ -71,8 +71,8 @@ protected:
 class Npc : public Creature
 {
 public:
-  Npc(const std::string& name, Game* game);
-  virtual ~Npc();
+	Npc(const std::string& name, Game* game);
+	virtual ~Npc();
 	virtual void useThing() {
 		//std::cout << "Npc: useThing() " << this << std::endl;
 		useCount++;
@@ -84,56 +84,55 @@ public:
 		if (useCount == 0)
 			delete this;
 	};
-
+	
 	virtual unsigned long idRange(){ return 0x30000000;}
 	static AutoList<Npc> listNpc;
 	void removeList() {listNpc.removeList(getID());}
 	void addList() {listNpc.addList(this);}
 	
-  void speak(const std::string &text){};
-  const std::string& getName() const {return name;};
-  fight_t getFightType(){return fighttype;};
-
-  int mana, manamax;
-
+	void speak(const std::string &text){};
+	const std::string& getName() const {return name;};
+	fight_t getFightType(){return fighttype;};
+	
+	int mana, manamax;
+	
 	//damage per hit
-  int damage;
-
-  fight_t fighttype;
-
+	int damage;
+	
+	fight_t fighttype;
+	
 	Game* game;
-
-  void doSay(std::string msg);
-  void doMove(int dir);
-  void doMoveTo(Position pos);
-  void doAttack(int id);
-  bool isLoaded(){return loaded;}
-
+	
+	void doSay(std::string msg);
+	void doMove(int dir);
+	void doMoveTo(Position pos);
+	void doAttack(int id);
+	bool isLoaded(){return loaded;}
+	
 protected:
 	int useCount;
-  virtual void onThingMove(const Player *player, const Thing *thing, const Position *oldPos,
+	virtual void onThingMove(const Player *player, const Thing *thing, const Position *oldPos,
 		unsigned char oldstackpos, unsigned char oldcount, unsigned char count);
-  virtual void onCreatureAppear(const Creature *creature);
-  virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos, bool tele);
-  virtual void onThingDisappear(const Thing* thing, unsigned char stackPos);
-  virtual void onThingTransform(const Thing* thing,int stackpos){};
-  virtual void onThingAppear(const Thing* thing);
-  virtual void onCreatureTurn(const Creature *creature, unsigned char stackpos);
-  virtual void onCreatureSay(const Creature *creature, SpeakClasses type, const std::string &text);
-  virtual void onCreatureChangeOutfit(const Creature* creature);
-  virtual int onThink(int& newThinkTicks);
-  //virtual void setAttackedCreature(unsigned long id);
-  virtual std::string getDescription(bool self = false) const;
-
+	virtual void onCreatureAppear(const Creature *creature);
+	virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos, bool tele);
+	virtual void onThingDisappear(const Thing* thing, unsigned char stackPos);
+	virtual void onThingTransform(const Thing* thing,int stackpos){};
+	virtual void onThingAppear(const Thing* thing);
+	virtual void onCreatureTurn(const Creature *creature, unsigned char stackpos);
+	virtual void onCreatureSay(const Creature *creature, SpeakClasses type, const std::string &text);
+	virtual void onCreatureChangeOutfit(const Creature* creature);
+	virtual int onThink(int& newThinkTicks);
+	//virtual void setAttackedCreature(unsigned long id);
+	virtual std::string getDescription(bool self = false) const;
+	
 	virtual bool isAttackable() const { return false; };
-  virtual bool isPushable() const { return true; };
-
+	virtual bool isPushable() const { return true; };
+	
 	std::string name;
-  std::string scriptname;
-  NpcScript* script;
-  std::list<Position> route;
+	std::string scriptname;
+	NpcScript* script;
+	std::list<Position> route;
 	bool loaded;
 };
-
 
 #endif // __npc_h_

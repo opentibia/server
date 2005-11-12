@@ -108,10 +108,11 @@ public:
 class Creature : public AutoID, public Thing
 {
 public:
-	Creature(const std::string& name);
+	//Creature(const std::string& name);
+	Creature();
 	virtual ~Creature();
 	
-	virtual const std::string& getName() const {return name; };
+	virtual const std::string& getName() const = 0;
 	
 	void setID(){this->id = auto_id | this->idRange();}
 	virtual unsigned long idRange() = 0;
@@ -181,7 +182,7 @@ public:
 	long manaShieldTicks, hasteTicks, paralyzeTicks;
 	int immunities;
 	
-	unsigned long experience;
+	//unsigned long experience;
 	Position masterPos;
 	
 	int health, healthmax;
@@ -302,7 +303,7 @@ protected:
 	friend class GameState;
 	
 	unsigned long id;
-	std::string name;
+	//std::string name;
 };
 
 

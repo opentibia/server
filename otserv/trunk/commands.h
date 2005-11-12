@@ -71,11 +71,9 @@ protected:
 	
 	typedef std::map<std::string,Command*> CommandMap;
 	CommandMap commandMap;
-	
 };
 
 typedef  bool (Commands::*CommandFunc)(Creature*,const std::string&,const std::string&);
-
 
 struct Command{
 	CommandFunc f;

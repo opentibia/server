@@ -40,7 +40,7 @@
 
 #include "status.h"
 #include "spells.h"
-
+#include "monsters.h"
 #include "actions.h"
 #include "commands.h"
 
@@ -86,6 +86,7 @@ Game g_game;
 Spells spells(&g_game);
 Actions actions(&g_game);
 Commands commands(&g_game);
+Monsters g_monsters;
 
 #if defined __EXCEPTION_TRACER__
 #include "exception.h"
@@ -245,6 +246,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 			unsigned long accnumber = msg.GetU32();
 			std::string name     = msg.GetString();
 			std::string password = msg.GetString();
+			
 			if(version != 750){
 				msg.Reset();
 				msg.AddByte(0x14);
@@ -483,6 +485,15 @@ int main(int argc, char *argv[])
 	if (Item::items.loadFromOtb(g_config.getGlobalString("datadir") + "items/items.otb"))
 	{
 		ErrorMessage("Could not load items.otb!");
+		return -1;
+	}
+	std::cout << "[done]" << std::endl;
+	
+	// load monster data
+	std::cout << ":: Loadding monsters monters/monsters.xml ... ";
+	if(!g_monsters.loadFromXml(g_config.getGlobalString("datadir")))
+	{
+		ErrorMessage("Could not load monsters/monsters.xml!");
 		return -1;
 	}
 	std::cout << "[done]" << std::endl;

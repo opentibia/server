@@ -38,13 +38,14 @@ AutoID::list_type AutoID::list;
 
 extern Game g_game;
 
-Creature::Creature(const std::string& name) :
+//Creature::Creature(const std::string& name) :
+Creature::Creature() :
 access(0)
 {
 	direction  = NORTH;
 	master = NULL;
 	
-	this->name = name;
+	//this->name = name;
 	
 	lookhead   = 0;
 	lookbody   = 0;
@@ -58,7 +59,7 @@ access(0)
 	
 	health     = 1000;//150;
 	healthmax  = 1000;//150;
-	experience = 100000;
+	//experience = 100000;
 	lastmove=0;
 	
 	inFightTicks = 0;
@@ -167,7 +168,8 @@ void Creature::addInflictedDamage(Creature* attacker, int damage)
 }
 
 int Creature::getLostExperience() {
-	return (int)std::floor(((double)experience * 0.1));
+	//return (int)std::floor(((double)experience * 0.1));
+	return 0;
 }
 
 int Creature::getInflicatedDamage(unsigned long id)
@@ -242,7 +244,7 @@ std::string Creature::getDescription(bool self) const
 {
 	std::stringstream s;
 	std::string str;	
-	s << "a " << name << ".";
+	s << "a creature.";
 	str = s.str();
 	return str;
 }

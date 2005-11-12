@@ -22,109 +22,34 @@
 #ifndef __monster_h_
 #define __monster_h_
 
-
 #include "creature.h"
 #include "game.h"
 #include "tile.h"
 #include "templates.h"
+#include "monsters.h"
 
 class Creature;
 
-class TimeProbabilityClass {
-public:
-	TimeProbabilityClass()
-	{
-		setDefault();
-	}
-	
-	TimeProbabilityClass(int _cycleTicks, int _probability, int _exhaustionticks)
-	{
-		setDefault();
-		init(_cycleTicks, _probability, _exhaustionticks);
-	};
-	
-	~TimeProbabilityClass() {};
-	
-	bool onTick(int ticks)
-	{
-		ticksleft -= ticks;
-		
-		if(ticksleft <= 0) {
-			ticksleft = cycleTicks;
-			bool ret = (random_range(1, 100) <= probability);
-			return ret;
-		}
-		
-		return false;
-	}
-	
-	void init(int _cycleTicks, int _probability, int _exhaustionticks)
-	{
-		if(_cycleTicks >= 0) {
-			this->ticksleft = _cycleTicks;
-			this->cycleTicks = _cycleTicks;
-		}
-		
-		if(_probability >= 0)
-			probability = std::min(100, _probability);
-		
-		if(_exhaustionticks >= 0)
-			exhaustionTicks = _exhaustionticks;
-	}
-	
-	int getExhaustion() const {return exhaustionTicks;}
-	
-private:
-	void setDefault()
-	{
-		cycleTicks = 2000;
-		ticksleft = cycleTicks;
-		probability = 80;
-		exhaustionTicks = 0;
-	}
-	
-	int ticksleft;
-	int cycleTicks;
-	int probability;
-	int exhaustionTicks;
-};
-
-class PhysicalAttackClass {
-public:
-	PhysicalAttackClass()
-	{
-		//fighttype = FIGHT_NONE;
-		disttype = DIST_NONE;
-		minWeapondamage = 0;
-		maxWeapondamage = 1;
-	};
-	
-	~PhysicalAttackClass() {};
-	
-	fight_t fighttype;
-	subfight_t disttype;
-	
-	int minWeapondamage;
-	int maxWeapondamage;
-};
-
 enum monsterstate_t {
 	STATE_IDLE,
-		STATE_IDLESUMMON,
-		STATE_TARGETNOTREACHABLE,
-		STATE_ATTACKING,
-		STATE_FLEEING,
+	STATE_IDLESUMMON,
+	STATE_TARGETNOTREACHABLE,
+	STATE_ATTACKING,
+	STATE_FLEEING,
 };
 
 enum monstermode_t {
 	MODE_NORMAL,
-		MODE_AGGRESSIVE
+	MODE_AGGRESSIVE
 };
 
 class Monster : public Creature
 {
+private:
+	Monster(MonsterType *mtype, Game* game);
 public:
-	Monster(const std::string& name, Game* game);
+	static Monster* createMonster(const std::string& name, Game* game);
+
 	virtual ~Monster();
 	//const Monster& operator=(const Monster& rhs);
 	virtual unsigned long idRange(){ return 0x40000000;}
@@ -144,38 +69,28 @@ public:
 			delete this;
 	};
 	
-	virtual int getArmor() const {
-		return this->armor;
-	}
-	
-	virtual int getDefense() const {
-		return this->defense;
-	}
+	virtual int getArmor() const;
+	virtual int getDefense() const;
+	virtual const std::string& getName() const;
 	
 	virtual void setMaster(Creature* creature);
 	bool isSummon() {return (getMaster() != NULL);}
 	virtual void onAttack();
-	bool isLoaded() const {return loaded;}
+	
+	static unsigned long getRandom();
 	
 private:
 	Game* game;
 	std::list<Position> route;
 	monsterstate_t state;
 	bool updateMovePos;
-	//bool updateRoute;
 	int oldThinkTicks;
 	Position targetPos;
 	Position moveToPos;
 	bool hasLostMaster;
-	int armor;
-	int defense;
+	MonsterType *mType;
+	
 	void doMoveTo(int dx, int dy);
-	bool hasDistanceAttack;
-	bool canPushItems;
-	unsigned long staticLook;
-	unsigned long staticAttack;
-	unsigned short changeTargetChance;  
-	int maxSummons;
 	
 	int getCurrentDistanceToTarget(const Position &target);
 	int getTargetDistance();
@@ -195,49 +110,13 @@ private:
 	void stopThink();
 	void reThink(bool updateOnlyState = true);
 	
-	#define CHANCE_MAX  100000
-	bool LoadLootNode(xmlNodePtr);
-	bool LoadLootContainer(xmlNodePtr,Container*);	
-	Item* LoadLootItemStackable(xmlNodePtr,unsigned short);
-	Item* LoadLootItem(xmlNodePtr,unsigned short);
-	unsigned long getRandom();
-	
 	void selectTarget(const Creature* creature, bool canReach /* = true*/);
-	
 protected:
 	int useCount;
 	PhysicalAttackClass	*curPhysicalAttack;
-	
-	int targetDistance;
-	int runAwayHealth;
-	bool pushable;
-	
+		
 	bool doAttacks(Creature* attackedCreature, monstermode_t mode = MODE_NORMAL);
-	
-	typedef std::vector<TimeProbabilityClass> TimeProbabilityClassVec;
-	
-	typedef std::map<std::string, TimeProbabilityClassVec> InstantAttackSpells;
-	InstantAttackSpells instantSpells;
-	
-	typedef std::map<unsigned short, TimeProbabilityClassVec> RuneAttackSpells;
-	RuneAttackSpells runeSpells;
-	
-	typedef std::map<PhysicalAttackClass*, TimeProbabilityClass> PhysicalAttacks;
-	PhysicalAttacks physicalAttacks;
-	
-	typedef std::vector<std::pair<std::string, TimeProbabilityClass> > YellingSentences;
-	YellingSentences yellingSentences;
-	
-	struct summonBlock {
-		std::string name;
-		unsigned long summonChance;
-	};
-	
-	typedef std::list<summonBlock> SummonSpells;
-	SummonSpells summonSpells; 
-	
-	std::list<Item *> lootItems;
-	
+		
 	virtual fight_t getFightType() {return curPhysicalAttack->fighttype;};
 	virtual subfight_t getSubFightType()  {return curPhysicalAttack->disttype;}
 	virtual int getWeaponDamage() const;
@@ -251,7 +130,7 @@ protected:
 	bool monsterMoveItem(Item* item, int radius);
 	bool isCreatureAttackable(const Creature* creature);
 	
-	virtual int getLostExperience() {return (isSummon() ? 0 : experience);};
+	virtual int getLostExperience();
 	virtual void dropLoot(Container *corpse);
 	
 	virtual void onThingMove(const Creature *creature, const Thing *thing, const Position *oldPos,
@@ -265,14 +144,12 @@ protected:
 	virtual void onTeleport(const Creature *creature, const Position *oldPos, unsigned char oldstackpos);
 	
 	virtual bool isAttackable() const { return true; };
-	virtual bool isPushable() const { return pushable; };
+	virtual bool isPushable() const;
 	
 	virtual int onThink(int& newThinkTicks);
 	virtual void setAttackedCreature(const Creature* creature);
-	//virtual void setAttackedCreature(unsigned long id);
 	
 	std::string getDescription(bool self) const;
-	bool loaded;
 };
 
 #endif // __monster_h_

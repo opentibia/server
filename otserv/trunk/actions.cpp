@@ -1672,9 +1672,11 @@ int ActionScript::luaActionDoSummonCreature(lua_State *L){
 	
 	ActionScript *action = getActionScript(L);
 	
-	Monster *monster = new Monster(name, action->game);
-	if(!monster->isLoaded()){
-		delete monster;
+	//Monster *monster = new Monster(name, action->game);
+	Monster* monster = Monster::createMonster(name, action->game);
+	//if(!monster->isLoaded()){
+	if(!monster){
+		//delete monster;
 		lua_pushnumber(L, 0);
 		std::cout << "luadoSummonCreature: Monster not found" << std::endl;
 		return 1;

@@ -38,11 +38,12 @@ extern LuaScript g_config;
 AutoList<Npc> Npc::listNpc;
 
 Npc::Npc(const std::string& name, Game* game) :
- Creature(name)
+ Creature()
 {
 	char *tmp;
 	useCount = 0;
 	this->loaded = false;
+	this->name = name;
 	std::string datadir = g_config.getGlobalString("datadir");
 	std::string filename = datadir + "npc/" + std::string(name) + ".xml";
 	std::transform(filename.begin(), filename.end(), filename.begin(), tolower);

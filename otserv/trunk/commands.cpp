@@ -20,18 +20,21 @@
 
 #include <string>
 #include <sstream>
+#include <utility>
 
 #include "commands.h"
 #include "player.h"
 #include "npc.h"
 #include "game.h"
 #include "actions.h"
+#include "monsters.h"
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 
 extern std::vector< std::pair<unsigned long, unsigned long> > bannedIPs;
 extern Actions actions;
+extern Monsters g_monsters;
 
 extern bool readXMLInteger(xmlNodePtr p, const char *tag, int &value);
 
@@ -242,9 +245,11 @@ bool Commands::placeNpc(Creature* c, const std::string &cmd, const std::string &
 
 bool Commands::placeMonster(Creature* c, const std::string &cmd, const std::string &param)
 {
-	Monster* monster = new Monster(param, game);
-	if(!monster->isLoaded()){
-		delete monster;
+	//Monster* monster = new Monster(param, game);
+	Monster* monster = Monster::createMonster(param, game);
+	//if(!monster->isLoaded()){
+	if(!monster){
+		//delete monster;
 		return true;
 	}
 	Position pos;
@@ -292,9 +297,11 @@ bool Commands::placeMonster(Creature* c, const std::string &cmd, const std::stri
 
 bool Commands::placeSummon(Creature* c, const std::string &cmd, const std::string &param)
 {
-	Monster* monster = new Monster(param, game);
-	if(!monster->isLoaded()){
-		delete monster;
+	//Monster* monster = new Monster(param, game);
+	Monster* monster = Monster::createMonster(param, game);
+	//if(!monster->isLoaded()){
+	if(!monster){
+		//delete monster;
 		return true;
 	}
 	Position pos;
@@ -349,7 +356,7 @@ bool Commands::banPlayer(Creature* c, const std::string &cmd, const std::string 
 	
 	Player* playerBan = game->getPlayerByName(param);
 	if(playerBan) {
-		MagicEffectClass me;
+		/*MagicEffectClass me;
 		
 		me.animationColor = 0xB4;
 		me.damageEffect = NM_ME_MAGIC_BLOOD;
@@ -357,7 +364,7 @@ bool Commands::banPlayer(Creature* c, const std::string &cmd, const std::string 
 		me.minDamage = (playerBan->health + playerBan->mana)*10;
 		me.offensive = true;
 
-		game->creatureMakeMagic(NULL, playerBan->pos, &me);
+		game->creatureMakeMagic(NULL, playerBan->pos, &me);*/
 
 		Player* player = dynamic_cast<Player*>(c);
 		if(player && player->access <= playerBan->access){
@@ -371,8 +378,9 @@ bool Commands::banPlayer(Creature* c, const std::string &cmd, const std::string 
 		IpNetMask.second = 0xFFFFFFFF;
 		if(IpNetMask.first > 0) {
 			bannedIPs.push_back(IpNetMask);
-			return true;
 		}
+		playerBan->kickPlayer();
+		return true;
 	}
 
 	return false;
@@ -454,8 +462,11 @@ bool Commands::reloadInfo(Creature* c, const std::string &cmd, const std::string
 	if(param == "actions"){
 		actions.reload();
 	}
-	else if(param =="commands"){
+	else if(param == "commands"){
 		this->reload();
+	}
+	else if(param == "monsters"){
+		g_monsters.reload();
 	}
 	else{
 		Player *player = dynamic_cast<Player*>(c);
@@ -557,7 +568,7 @@ bool Commands::onlineList(Creature* c, const std::string &cmd, const std::string
 		alevelmax = 0;
 	
 	std::stringstream players;
-	players << "name   level" << std::endl;
+	players << "name   level   mag" << std::endl;
 	
 	i = 0;
 	n = 0;
@@ -566,7 +577,8 @@ bool Commands::onlineList(Creature* c, const std::string &cmd, const std::string
 	{
 		if((*it).second->access >= alevelmin && (*it).second->access <= alevelmax){
 			players << (*it).second->getName() << "   " << 
-				(*it).second->getPlayerInfo(PLAYERINFO_LEVEL) << std::endl;
+				(*it).second->getPlayerInfo(PLAYERINFO_LEVEL) << "    " <<
+				(*it).second->getPlayerInfo(PLAYERINFO_MAGICLEVEL) << std::endl;
 			n++;
 			i++;
 		}
