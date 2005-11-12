@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+
+<npc name="Sven" script="data/npc/scripts/sven.lua" access="1" level="100" maglevel="100">
+	<mana now="800" max="800"/>
+	<health now="130" max="200"/>
+	<look type="35" head="20" body="30" legs="40" feet="50" corpse="2131"/>
+	<attack type="melee" damage="10"/>
+	<loot>
+		<!-- perhaps this should also support item names-->
+		<!-- chance is from 0 to 1 -->
+		<!-- 0 is never; 1 is always -->
+		<lootitem id="1729" chance="1"/>
+	</loot>
+       
+</npc>

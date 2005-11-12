@@ -1,0 +1,98 @@
+<?xml version="1.0"?>
+
+<items>
+<item id="1988" name="backpack" type="container" position="backpack" maxitems="20" weight="18.0" />
+<item id="2554" name="shovel"  weight="35.0" />
+<item id="2433" name="magic staff" type="weapon" position="twohand" skill="magic" attack="35" defence="20" shottype="energy" weight="20.0" />
+<item id="2434" name="dragon hammer" type="weapon" position="weapon" skill="club" attack="35" defence="20" weight="20" />
+<item id="2455" name="crossbow" type="weapon" position="twohand" skill="distance" amutype="bolt" attack="0" defence="0" weight="40" />
+<item id="2456" name="bow" type="weapon" position="twohand" skill="distance" amutype="arrow" attack="0" defence="0" weight="31"/>
+<item id="2392" name="fire sword" type="weapon" position="weapon" skill="sword" attack="35" defence="20" descr="The blade is a magic flame." weight="23"/>
+<item id="2432" name="fire axe" type="weapon" position="weapon" skill="axe" attack="38" defence="16" descr="The blade is a magic flame." weight="40"/>
+<item id="2436" name="skull staff" type="weapon" position="weapon" skill="club" attack="36" defence="12" descr="The staff longs for death." weight="17"/>
+<item id="2472" name="magic plate armor" type="armor" position="body" descr="An enchanted gem glows on the plate armor." weight="85" arm="17"/>
+<item id="2507" name="dragon scale legs" type="armor" position="legs" attack="0" defence="0" weight="48" arm="10"/>
+<item id="2522" name="great shield" type="weapon" position="weapon" skill="shielding" attack="0" defence="38" weight="84" arm="0"/>
+<item id="2496" name="horned helmet" type="armor" position="helmet" attack="0" defence="0" weight="51.0" arm="11"/>
+<item id="2641" name="traper boots" type="armor" position="boots" attack="0" defence="0" weight="9.0" arm="3"/> 
+<item id="2130" name="golden amulet" type="armor" position="amulet" attack="0" defence="0" weight="9.0" arm="0"/>
+<item id="2123" name="ring of the skies" type="armor" position="ring" weight="0.9" arm="0" />
+<item id="2453" name="sprite wand" type="weapon" skill="magic" attack="50" defence="50" shottype="energy" weight="28.0" />
+<item id="2547" name="power bolt" type="amunition" position="hand" amutype="bolt" shottype="power-bolt" attack="60" defence="0" weight="0.8" />
+<item id="2111" name="snowball" type="weapon" position="weapon" skill="distance" shottype="snowball" attack="0" defence="0" weight="0.8"/>
+
+
+<item id="1387" name="magic forcefield" descr="You can through the other side." type="teleport" weight=""/>
+
+<item id="3058" name="dead human" weight="1200.0" decayto="3059" decaytime="360" />
+<item id="3128" name="dead human" weight="1200" decayto="3129" decaytime="30" />
+<item id="3129" name="dead human" weight="1200" decayto="3130" decaytime="30" />
+<item id="3130" name="dead human" weight="1200" decayto="3131" decaytime="30" />
+<item id="3131" name="dead human" weight="1200" decayto="3132" decaytime="30" />
+<item id="3132" name="dead human" weight="1200" decayto="3133" decaytime="30" />
+<item id="3133" name="human skeleton" weight="900" decayto="3134" decaytime="30" />
+<item id="3134" name="human skeleton" weight="600" />
+
+<item id="468" name="" decayto="0" weight="0" />
+<item id="469" name="hole" decayto="468" decaytime="20" weight="0" floorchange="1"/>
+<item id="481" name="" decayto="0" weight="0" />
+<item id="482" name="hole" decayto="481" decaytime="20" weight="0" floorchange="1"/>
+<item id="483" name="" decayto="0" weight="0" />
+<item id="484" name="hole" decayto="483" decaytime="20" weight="0" floorchange="1"/>
+
+<!--fluid containers-->
+<item id="2006" name="vial" weight="1.8" />
+
+<!-- multitype -->
+<item id="2019" type="splash" name="pool" weight="0" decayto="2020" decaytime="45" />
+<item id="2020" type="splash" name="pool" weight="0" decayto="2021" decaytime="45" />
+<item id="2021" type="splash" name="pool" weight="0" />
+
+<item id="2025" type="splash" name="pool" weight="0" decayto="2026" decaytime="45" /> 
+<item id="2026" type="splash" name="pool" weight="0" decayto="2027" decaytime="45" /> 
+<item id="2027" type="splash" name="pool" weight="0" />
+
+<!--liquids-->
+<item id="1" name="water" weight="0" />
+<item id="2" name="blood" weight="0"/>
+<item id="3" name="beer" weight="0"/>
+<item id="4" name="slime" weight="0"/>
+<item id="5" name="lemonade" weight="0"/>
+<item id="6" name="milk" weight="0" />
+<item id="7" name="manafluid" weight="0"/>
+<item id="10" name="lifefluid" weight="0"/>
+<item id="11" name="oil" weight="0"/>
+<item id="15" name="wine" weight="0"/>
+
+<!--level changeable items-->
+<item id="1396" name="" weight="0" floorchangenorth="1"/>
+<item id="1385" name="" weight="0" floorchangenorth="1"/>
+<item id="1394" name="" weight="0" floorchangenorth="1"/>
+<item id="1404" name="" weight="0" floorchangenorth="1"/>
+<item id="1392" name="" weight="0" floorchangesouth="1"/>
+<item id="1402" name="" weight="0" floorchangesouth="1"/>
+<item id="1388" name="" weight="0" floorchangeeast="1"/>
+<item id="1398" name="" weight="0" floorchangeeast="1"/>
+<item id="1390" name="" weight="0" floorchangewest="1"/>
+<item id="1400" name="" weight="0" floorchangewest="1"/>
+
+<item id="1559" name="" weight="0" floorchangesouth="1" floorchangewest="1"/>
+<item id="1557" name="" weight="0" floorchangesouth="1" floorchangeeast="1"/>
+<item id="1553" name="" weight="0" floorchangenorth="1" floorchangewest="1"/>
+<item id="1555" name="" weight="0" floorchangenorth="1" floorchangeeast="1"/>
+
+<item id="411" name="" weight="0" floorchange="1"/>
+<item id="383" name="" weight="0" floorchange="1"/>
+<item id="479" name="" weight="0" floorchange="1"/>
+
+<!--runes-->
+<item id="2273" name="adura vita" type="rune" maglevel="8" weight="0.1" />
+<item id="2268" name="adori vita vis" type="rune" maglevel="15" weight="0.1" />
+
+<item id="2148" name="gold coin" weight="0.1" />
+<item id="2152" name="platinum coin" weight="0.1" />
+
+<!--keys-->
+<item id="2090" type="key" name="crystal key" weight="1.0" />
+
+</items>
