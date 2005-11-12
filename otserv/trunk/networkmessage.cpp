@@ -116,6 +116,7 @@ bool NetworkMessage::WriteToSocket(SOCKET socket)
 #else
 	flags = MSG_DONTWAIT;
 #endif
+	int retry = 0;
   	do{
     	int b = send(socket, (char*)m_MsgBuf+sendBytes, std::min(m_MsgSize-sendBytes+2, 1000), flags);
 		if(b <= 0){
@@ -123,7 +124,12 @@ bool NetworkMessage::WriteToSocket(SOCKET socket)
 			int errnum = ::WSAGetLastError();
 			if(errnum == EWOULDBLOCK){
 				b = 0;
-				OTSYS_SLEEP(5);
+				OTSYS_SLEEP(10);
+				retry++;
+				if(retry == 10){
+					ret = false;
+					break;
+				}
 			}
 			else
 #endif
