@@ -237,7 +237,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 			
 			msg.WriteToSocket(s);
 		}
-		// gameworld connection tibia 7.5
+		// gameworld connection tibia 7.55
 		else if (protId == 0x020A)
 		{
 			unsigned char  clientos = msg.GetByte();
@@ -247,10 +247,10 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 			std::string name     = msg.GetString();
 			std::string password = msg.GetString();
 			
-			if(version != 750){
+			if(version != 755){
 				msg.Reset();
 				msg.AddByte(0x14);
-				msg.AddString("Only clients with protocol 7.5 allowed!");
+				msg.AddString("Only clients with protocol 7.55 allowed!");
 				msg.WriteToSocket(s);
 			}
 			else if(isclientBanished(s)){

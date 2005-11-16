@@ -103,10 +103,10 @@ void Protocol75::ReceiveLoop()
 				OTSYS_SLEEP(250);
 			}
 			OTSYS_THREAD_LOCK(game->gameLock, "Protocol75::ReceiveLoop()")
-				if(s == 0 && player->isRemoved == false){
-					game->removeCreature(player);
-				}
-				OTSYS_THREAD_UNLOCK(game->gameLock, "Protocol75::ReceiveLoop()")
+			if(s == 0 && player->isRemoved == false){
+				game->removeCreature(player);
+			}
+			OTSYS_THREAD_UNLOCK(game->gameLock, "Protocol75::ReceiveLoop()")
 		}
 	}while(s != 0 && player->isRemoved == false);
 }
@@ -2284,12 +2284,12 @@ void Protocol75::sendThingRemove(const Thing *thing){
 
 void Protocol75::sendDistanceShoot(const Position &from, const Position &to, unsigned char type){
 	NetworkMessage msg;
-	AddDistanceShoot(msg,from, to,type );
+	AddDistanceShoot(msg,from, to,type);
 	WriteBuffer(msg);
 }
 void Protocol75::sendMagicEffect(const Position &pos, unsigned char type){
 	NetworkMessage msg;
-	AddMagicEffect(msg,pos,type );
+	AddMagicEffect(msg,pos,type);
 	WriteBuffer(msg);
 }
 void Protocol75::sendAnimatedText(const Position &pos, unsigned char color, std::string text){
@@ -2407,7 +2407,7 @@ void Protocol75::AddMagicEffect(NetworkMessage &msg,const Position &pos, unsigne
 {
 	msg.AddByte(0x83);
 	msg.AddPosition(pos);
-	msg.AddByte(type);
+	msg.AddByte(type+1);
 }
 
 
@@ -2416,7 +2416,7 @@ void Protocol75::AddDistanceShoot(NetworkMessage &msg,const Position &from, cons
 	msg.AddByte(0x85); 
 	msg.AddPosition(from);
 	msg.AddPosition(to);
-	msg.AddByte(type);
+	msg.AddByte(type+1);
 }
 
 
