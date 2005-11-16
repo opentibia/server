@@ -57,6 +57,7 @@ public:
 	void removeList() {listMonster.removeList(getID());}
 	void addList() {listMonster.addList(this);}
 	
+	/*
 	virtual void useThing() {
 		//std::cout << "Monster: useThing() " << this << std::endl;
 		useCount++;
@@ -68,6 +69,7 @@ public:
 		if (useCount == 0)
 			delete this;
 	};
+	*/
 	
 	virtual int getArmor() const;
 	virtual int getDefense() const;
@@ -149,7 +151,7 @@ protected:
 	virtual int onThink(int& newThinkTicks);
 	virtual void setAttackedCreature(const Creature* creature);
 	
-	std::string getDescription(bool self) const;
+	virtual std::string getDescription(uint32_t lookDistance) const;
 };
 
 #endif // __monster_h_

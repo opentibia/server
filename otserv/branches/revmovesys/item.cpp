@@ -47,8 +47,9 @@ Item* Item::CreateItem(const unsigned short _type, unsigned short _count /*= 0*/
 	else{
 		newItem =  new Item(_type, _count);
 	}
-	newItem->isRemoved = false;
-	newItem->useThing();
+	
+	//newItem->isRemoved = false;
+	newItem->useThing2();
 	return newItem;
 }
 
@@ -130,7 +131,7 @@ Item::Item(const unsigned short _type) {
 	fluid = 0;
 	actionId = 0;
 	uniqueId = 0;
-	throwRange = 6;
+	//throwRange = 6;
 	useCount = 0;
 	isDecaying  = 0;
 	specialDescription = NULL;
@@ -142,7 +143,7 @@ Item::Item(const Item &i){
 	id = i.id;
 	count = i.count;
 	chargecount = i.chargecount;
-	throwRange = i.throwRange;
+	//throwRange = i.throwRange;
 	useCount = 0;
 	isDecaying  = 0;
 	actionId = i.actionId;
@@ -163,7 +164,7 @@ Item::Item(const Item &i){
 
 Item* Item::decay()
 {
-	unsigned short decayTo   = Item::items[getID()].decayTo;
+	unsigned short decayTo = Item::items[getID()].decayTo;
 	
 	if(decayTo == 0) {
 		return NULL;
@@ -178,7 +179,7 @@ Item* Item::decay()
 		else{
 			//container -> no container			
 			Item *item = Item::CreateItem(decayTo,getItemCountOrSubtype());
-			item->pos = this->pos;
+			//item->pos = this->pos;
 			return item;
 		}
 	}
@@ -186,7 +187,7 @@ Item* Item::decay()
 		if(items[decayTo].isContainer()){
 			//no container -> container
 			Item *item = Item::CreateItem(decayTo,getItemCountOrSubtype());
-			item->pos = this->pos;
+			//item->pos = this->pos;
 			return item;
 		}
 		else{
@@ -210,7 +211,8 @@ bool Item::rotate()
 	return false;
 }
 
-Item::Item(const unsigned short _type, unsigned short _count) {
+Item::Item(const unsigned short _type, unsigned short _count)
+{
 	//std::cout << "Item constructor2 " << this << std::endl;
 	id = _type;
 	count = 0;
@@ -240,7 +242,8 @@ Item::Item(const unsigned short _type, unsigned short _count) {
 	else
 		chargecount = _count;
 	*/
-	throwRange = 6;
+	
+	//throwRange = 6;
 }
 
 Item::Item()
@@ -249,7 +252,7 @@ Item::Item()
 	id = 0;
 	count = 0;
 	chargecount = 0;
-	throwRange = 6;
+	//throwRange = 6;
 	useCount = 0;
 	isDecaying  = 0;
 	actionId = 0;
@@ -267,6 +270,7 @@ Item::~Item()
 		delete text;
 }
 
+/*
 bool Item::canMovedTo(const Tile *tile) const
 {
 	if(tile) {
@@ -285,6 +289,7 @@ bool Item::canMovedTo(const Tile *tile) const
 
 	return false;
 }
+*/
 
 int Item::unserialize(xmlNodePtr p){
 	char *tmp;
@@ -471,7 +476,7 @@ double Item::getWeight() const {
 	return items[id].weight;
 }
 
-std::string Item::getDescription(bool fullDescription) const
+std::string Item::getDescription(uint32_t lookDistance) const
 {
 	std::stringstream s;
 	std::string str;
@@ -481,7 +486,7 @@ std::string Item::getDescription(bool fullDescription) const
 	if(specialDescription){
 		s << (*specialDescription) << ".";
 
-		if(fullDescription) {
+		if(lookDistance <= 1) {
 			if(it.weight > 0)
 				s << std::endl << "It weighs " << std::fixed << std::setprecision(1) << it.weight << " oz.";
 		}
@@ -490,7 +495,7 @@ std::string Item::getDescription(bool fullDescription) const
 		if(isStackable() && count > 1) {
 			s << (int)count << " " << it.name << "s.";
 
-			if(fullDescription) {
+			if(lookDistance <= 1) {
 				s << std::endl << "They weight " << std::fixed << std::setprecision(1) << ((double) count * it.weight) << " oz.";
 			}
 		}		
@@ -546,7 +551,7 @@ std::string Item::getDescription(bool fullDescription) const
 				s << "a " << it.name;
 			}
 			s << ".";
-			if(fullDescription) {
+			if(lookDistance <= 1) {
 				double weight = getWeight();
 				if(weight > 0)
 					s << std::endl << "It weighs " << std::fixed << std::setprecision(1) << weight << " oz.";
@@ -623,10 +628,12 @@ int Item::getRWInfo() const {
 }
 
 bool Item::canDecay(){
-	if(isRemoved)
+	if(isRemoved())
 		return false;
+
 	return items[id].canDecay;	
-}	
+}
+
 //Teleport class
 Teleport::Teleport(const unsigned short _type) : Item(_type)
 {

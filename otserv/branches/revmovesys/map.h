@@ -225,7 +225,7 @@ class Map {
 	  * \param pos The position to place the creature
 	  * \param c Creature pointer to the creature to place
 	  */
-    bool placeCreature(Position &pos, Creature* c);
+    bool placeCreature(const Position &pos, Creature* c);
 	
 	/**
 	  * Remove a creature from the map.

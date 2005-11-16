@@ -73,6 +73,8 @@ class Npc : public Creature
 public:
 	Npc(const std::string& name, Game* game);
 	virtual ~Npc();
+
+	/*
 	virtual void useThing() {
 		//std::cout << "Npc: useThing() " << this << std::endl;
 		useCount++;
@@ -84,6 +86,7 @@ public:
 		if (useCount == 0)
 			delete this;
 	};
+	*/
 	
 	virtual unsigned long idRange(){ return 0x30000000;}
 	static AutoList<Npc> listNpc;
@@ -122,8 +125,7 @@ protected:
 	virtual void onCreatureSay(const Creature *creature, SpeakClasses type, const std::string &text);
 	virtual void onCreatureChangeOutfit(const Creature* creature);
 	virtual int onThink(int& newThinkTicks);
-	//virtual void setAttackedCreature(unsigned long id);
-	virtual std::string getDescription(bool self = false) const;
+	virtual std::string getDescription(uint32_t lookDistance) const;
 	
 	virtual bool isAttackable() const { return false; };
 	virtual bool isPushable() const { return true; };

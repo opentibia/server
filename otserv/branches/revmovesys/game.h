@@ -75,6 +75,7 @@ typedef std::map<Tile*, CreatureStateVec> CreatureStates;
 
 class Game;
 
+/*
 class GameState {
 public:
 	GameState(Game *game, const Range &range);
@@ -93,6 +94,7 @@ protected:
 	SpectatorVec spectatorlist;
 	CreatureStates creaturestates;
 };
+*/
 
 enum enum_world_type{
 	WORLD_TYPE_NO_PVP,
@@ -155,7 +157,7 @@ public:
 	  * Adds the Creature to playersOnline and to the map
 	  * \param c Creature to add
 	  */
-	bool placeCreature(Position &pos, Creature* c);
+	bool placeCreature(const Position &pos, Creature* c);
 
 	/**
 		* Remove Creature from the map.
@@ -173,6 +175,7 @@ public:
 	void thingMove(Creature *creature, Thing *thing,
 			unsigned short to_x, unsigned short to_y, unsigned char to_z, unsigned char count);
 
+	/*
 	//container/inventory to container/inventory
 	void thingMove(Player *player,
 			unsigned char from_cid, unsigned char from_slotid, unsigned short itemid,bool fromInventory,
@@ -189,6 +192,7 @@ public:
 			const Position& fromPos, unsigned char stackPos, unsigned short itemid,
 			unsigned char to_cid, unsigned char to_slotid,
 			bool isInventory, unsigned char count);
+	*/
 	
 	//ground to ground
 	void thingMove(Creature *creature,
@@ -295,32 +299,35 @@ protected:
 	bool onPrepareMoveThing(Creature *creature, const Thing* thing,
 		const Tile *fromTile, const Tile *toTile, int count);
 
-	/*inventory -> container*/
+	/*
+	/inventory -> container
 	bool onPrepareMoveThing(Player *player, const Item* fromItem, slots_t fromSlot,
 		const Container *toContainer, const Item *toItem, int count);
 
-	/*container -> container*/
+	//container -> container
 	bool onPrepareMoveThing(Player* player, const Position& fromPos, const Container* fromContainer,
 		const Item* fromItem, const Position& toPos, const Container* toContainer, const Item* toItem,
 		int count);
+	*/
 
-	/*ground -> ground*/
+	//ground -> ground
 	bool onPrepareMoveCreature(Creature *creature, const Creature* creatureMoving,
 		const Tile *fromTile, const Tile *toTile);
 
-	/*ground -> inventory*/
+	/*
+	//ground -> inventory
 	bool onPrepareMoveThing(Player *player, const Position& fromPos, const Item *item,
 		slots_t toSlot, int count);
 
-	/*inventory -> inventory*/
+	//inventory -> inventory
 	bool onPrepareMoveThing(Player *player, slots_t fromSlot, const Item *fromItem,
 		slots_t toSlot, const Item *toItem, int count);
 
-	/*container -> inventory*/
+	//container -> inventory
 	bool onPrepareMoveThing(Player *player, const Container *fromContainer, const Item *fromItem,
 		slots_t toSlot, const Item *toItem, int count);
 
-	/*->inventory*/
+	//->inventory
 	bool onPrepareMoveThing(Player *player, const Item *item, slots_t toSlot, int count);
 
 	//container/inventory to container/inventory
@@ -339,6 +346,7 @@ protected:
 			const Position& fromPos, unsigned char stackPos,unsigned short itemid,
 			unsigned char to_cid, unsigned char to_slotid,
 			bool toInventory, unsigned char count);
+	*/
 
 	// use this internal function to move things around to avoid the need of
   // recursive locks
@@ -348,20 +356,21 @@ protected:
 			unsigned short to_x, unsigned short to_y, unsigned char to_z, unsigned char count);
 
 	void changeOutfit(unsigned long id, int looktype);
-	bool creatureOnPrepareAttack(Creature *creature, Position pos);
-	void creatureMakeDamage(Creature *creature, Creature *attackedCreature, fight_t damagetype);
+	//bool creatureOnPrepareAttack(Creature *creature, Position pos);
+	//void creatureMakeDamage(Creature *creature, Creature *attackedCreature, fight_t damagetype);
 
-	bool creatureMakeMagic(Creature *creature, const Position& centerpos, const MagicEffectClass* me);
-	bool creatureOnPrepareMagicAttack(Creature *creature, Position pos, const MagicEffectClass* me);
+	//bool creatureMakeMagic(Creature *creature, const Position& centerpos, const MagicEffectClass* me);
+	//bool creatureOnPrepareMagicAttack(Creature *creature, Position pos, const MagicEffectClass* me);
 
 	/**
 		* Change the players hitpoints
 		* Return: the mana damage and the actual hitpoint loss
 		*/
-	void creatureApplyDamage(Creature *creature, int damage, int &outDamage, int &outManaDamage);
+	//void creatureApplyDamage(Creature *creature, int damage, int &outDamage, int &outManaDamage);
 
-	void CreateDamageUpdate(Creature* player, Creature* attackCreature, int damage);
-	void CreateManaDamageUpdate(Creature* player, Creature* attackCreature, int damage);
+	//void CreateDamageUpdate(Creature* player, Creature* attackCreature, int damage);
+	//void CreateManaDamageUpdate(Creature* player, Creature* attackCreature, int damage);
+
 	void getSpectators(const Range& range, SpectatorVec& list);
 
 	OTSYS_THREAD_LOCKVAR eventLock;

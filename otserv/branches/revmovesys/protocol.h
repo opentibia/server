@@ -43,8 +43,13 @@ public:
 	
 	virtual bool CanSee(int x, int y, int z) const = 0;
 	virtual bool CanSee(const Creature*) const = 0;
-	virtual void sendNetworkMessage(NetworkMessage *msg) = 0;
+	//virtual void sendNetworkMessage(NetworkMessage *msg) = 0;
 	
+	virtual void sleepTillMove();
+	virtual void flushOutputBuffer() = 0;
+	virtual void logout() = 0;
+	
+	/*
 	//container to container
 	virtual void sendThingMove(const Creature *creature, const Container *fromContainer, unsigned char from_slotid,
 		const Item* fromItem, int oldFromCount, Container *toContainer, unsigned char to_slotid, const Item *toItem, int oldToCount, int count) = 0;
@@ -76,13 +81,13 @@ public:
 	//ground to inventory
 	virtual void sendThingMove(const Creature *creature, const Position &fromPos, int stackpos, const Item* fromItem,
 		int oldFromCount, slots_t toSlot, const Item *toItem, int oldToCount, int count) = 0;
-	
+	*/
+
 	//ground to ground
 	virtual void sendThingMove(const Creature *creature, const Thing *thing,
 		const Position *oldPos, unsigned char oldStackPos, unsigned char oldcount,
 		unsigned char count, bool tele = false) = 0;
 	
-	//virtual void sendCreatureAppear(const Creature *creature) = 0;
 	virtual void sendThingAppear(const Thing *thing) = 0;
 	virtual void sendThingRemove(const Thing *thing) = 0;
 	virtual void sendThingTransform(const Thing* thing,int stackpos) = 0;
@@ -120,12 +125,7 @@ public:
 	virtual void sendOpenPriv(std::string &receiver) =0;
 	virtual void sendVIPLogIn(unsigned long guid) = 0;
 	virtual void sendVIPLogOut(unsigned long guid) = 0;
-	virtual void sendVIP(unsigned long guid, const std::string &name, bool isOnline) = 0;
-	
-	
-	virtual void sleepTillMove();
-	virtual void flushOutputBuffer() = 0;
-	virtual void logout() = 0;
+	virtual void sendVIP(unsigned long guid, const std::string &name, bool isOnline) = 0;	
 	
 	virtual void AddTextMessage(NetworkMessage &msg,MessageClasses mclass, const char* message) = 0;
 	virtual void AddAnimatedText(NetworkMessage &msg,const Position &pos, unsigned char color, std::string text) = 0;

@@ -297,9 +297,9 @@ int Tile::getThingCount() const
   return (uint32_t) 1 + (splash ? 1 : 0) + topItems.size() +	creatures.size() + downItems.size();
 }
 
-std::string Tile::getDescription() const
+std::string Tile::getDescription(uint32_t lookDistance) const
 {
-  std::string ret="You dont know why, but you cant see anything!";
+  std::string ret = "You dont know why, but you cant see anything!";
 	return ret;
 }
 
@@ -515,6 +515,8 @@ Item* Tile::getMoveableBlockingItem()
 }
 
 void Tile::addThing(Thing *thing) {
+	thing->setParent(this);
+
 	Creature* creature = dynamic_cast<Creature*>(thing);
 	if (creature) {
     	creatures.insert(creatures.begin(), creature);
@@ -557,4 +559,54 @@ bool Tile::isPz() const
 void Tile::setPz()
 {
   pz = true;
+}
+
+
+ReturnValue Tile::__moveThingTo(Creature* creature, Cylinder* toCylinder, uint32_t index, Thing* thing, uint32_t count)
+{
+	return RET_NOTPOSSIBLE;
+}
+
+ReturnValue Tile::__addThing(Thing* thing)
+{
+	Item* item = dynamic_cast<Item*>(thing);
+	if(item == NULL)
+		return RET_NOTPOSSIBLE;
+
+	return RET_NOERROR;
+}
+
+ReturnValue Tile::__addThing(uint32_t index, Thing* thing)
+{
+	return RET_NOTPOSSIBLE;
+}
+
+ReturnValue Tile::__updateThing(Thing* thing)
+{
+	return RET_NOTPOSSIBLE;
+}
+
+ReturnValue Tile::__updateThing(uint32_t index, Thing* thing)
+{
+	return RET_NOTPOSSIBLE;
+}
+
+ReturnValue Tile::__removeThing(Thing* thing)
+{
+	return RET_NOTPOSSIBLE;
+}
+
+ReturnValue Tile::__removeThing(Thing* thing, uint32_t count)
+{
+	return RET_NOTPOSSIBLE;
+}
+
+uint32_t Tile::__getIndexOfThing(const Thing* thing) const
+{
+	return 0;
+}
+
+void Tile::__internalAddThing(Thing* thing)
+{
+	//
 }

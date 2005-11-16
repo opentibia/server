@@ -25,7 +25,8 @@
 
 
 #include "item.h"
-#include "container.h"
+//#include "container.h"
+#include "cylinder.h"
 #include "magic.h"
 
 #include "definitions.h"
@@ -37,7 +38,7 @@ class Creature;
 typedef std::vector<Item*> ItemVector;
 typedef std::vector<Creature*> CreatureVector;
 
-class Tile
+class Tile : public Cylinder
 {
 public:
   Creature* getCreature() const{
@@ -47,8 +48,12 @@ public:
 			return NULL;
   }
 
-  Tile()
+  Tile(int x, int y, int z)
   {
+		tilePos.x = x;
+		tilePos.y = y;
+		tilePos.z = z;
+
     pz     = false;
     splash = NULL;
 		ground = NULL;
@@ -79,8 +84,6 @@ public:
   Thing* getTopThing();
 	Thing* getThingByStackPos(int pos);
 
-  //bool isBlockingProjectile() const;
-	//bool isBlocking(bool ispickupable = false, bool ignoreMoveableBlocking = false) const;
 	ReturnValue isBlocking(int objectstate, bool ignoreCreature = false, bool ignoreMoveableBlocking = false) const;
 
   bool isPz() const;
@@ -90,9 +93,28 @@ public:
   bool floorChangeDown() const;
   bool floorChange(Direction direction) const;
   
-  std::string getDescription() const;
+  virtual std::string getDescription(uint32_t lookDistance) const;
+
+	//
+	virtual ReturnValue __moveThingTo(Creature* creature, Cylinder* toCylinder, uint32_t index, Thing* thing, uint32_t count);
+
+	virtual ReturnValue __addThing(Thing* thing);
+	virtual ReturnValue __addThing(uint32_t index, Thing* thing);
+
+	virtual ReturnValue __updateThing(Thing* thing);
+	virtual ReturnValue __updateThing(uint32_t index, Thing* thing);
+
+	virtual ReturnValue __removeThing(Thing* thing);
+	virtual ReturnValue __removeThing(Thing* thing, uint32_t count);
+
+	virtual uint32_t __getIndexOfThing(const Thing* thing) const;
+	virtual void __internalAddThing(Thing* thing);
+	virtual int getThrowRange() const {return 0;};
+
+	const Position& getTilePosition() const {return tilePos;};
 
 protected:
+	Position tilePos;
   bool pz;
 };
 

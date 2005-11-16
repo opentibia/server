@@ -20,30 +20,186 @@
 
 #include "container.h"
 
-Container::Container(const unsigned short _type) : Item(_type)
+Container::Container(const uint16_t _type) : Item(_type)
 {
 	//std::cout << "Container constructor " << this << std::endl;
-	maxitems = items[this->getID()].maxItems;
-	actualitems = 0;
-	parent = NULL;
-	depot = 0;
-	useCount = 0;
+	maxSize = items[this->getID()].maxItems;
+	depotId = 0;
 }
 
 Container::~Container()
 {
 	//std::cout << "Container destructor " << this << std::endl;
-	for(ContainerList::iterator cit = lcontained.begin(); cit != lcontained.end(); ++cit)
-	{
-    	Container* container = dynamic_cast<Container*>(*cit);
-    	if(container)
-    		container->setParent(NULL);
-    	(*cit)->releaseThing();
-  	}
+	for(ItemList::iterator cit = itemlist.begin(); cit != itemlist.end(); ++cit){
+		
+		(*cit)->setParent(NULL);
+		(*cit)->releaseThing2();
+	}
     
-	lcontained.clear();
+	itemlist.clear();
 }
 
+double Container::getWeight() const
+{
+	double weight = items[id].weight;
+	std::list<const Container*> stack;
+
+	ItemList::const_iterator it;
+	stack.push_back(this);
+	
+	while(stack.size() > 0) {
+		const Container* container = stack.front();
+		stack.pop_front();
+
+		for (it = container->getItems(); it != container->getEnd(); ++it) {
+			Container* container = dynamic_cast<Container*>(*it);
+			if(container) {
+				stack.push_back(container);
+				weight += items[container->getID()].weight;
+			}
+			else
+				weight += (*it)->getWeight();
+		}
+	}
+
+	return weight;
+}
+
+ItemList::const_iterator Container::getItems() const
+{
+	return itemlist.begin();
+}
+
+ItemList::const_iterator Container::getEnd() const
+{
+	return itemlist.end();
+}
+
+Item* Container::getItem(uint32_t index)
+{
+	size_t n = 0;			
+	for (ItemList::const_iterator cit = getItems(); cit != getEnd(); ++cit) {
+		if(n == index)
+			return *cit;
+		else
+			++n;
+	}
+
+	return NULL;
+}
+
+uint32_t Container::getItemHoldingCount() const
+{
+	uint32_t holdcount = 0;
+
+	std::list<const Container*> stack;
+	stack.push_back(this);
+	
+	ItemList::const_iterator it;
+
+	while(stack.size() > 0) {
+		const Container *container = stack.front();
+		stack.pop_front();
+
+		for (it = container->getItems(); it != container->getEnd(); ++it) {
+			Container *container = dynamic_cast<Container*>(*it);
+			if(container) {
+				stack.push_back(container);
+			}
+
+			++holdcount;
+		}
+	}
+
+	return holdcount;
+}
+
+bool Container::isHoldingItem(const Item* item) const
+{
+	std::list<const Container*> stack;
+	stack.push_back(this);
+	
+	ItemList::const_iterator it;
+
+	while(stack.size() > 0) {
+		const Container *container = stack.front();
+		stack.pop_front();
+
+		for (it = container->getItems(); it != container->getEnd(); ++it) {
+
+			if(*it == item) {
+				return true;
+			}
+
+			Container *containerIt = dynamic_cast<Container*>(*it);
+			if(containerIt){
+				stack.push_back(containerIt);
+			}
+		}
+	}
+
+	return false;
+}
+
+ReturnValue Container::__moveThingTo(Creature* creature, Cylinder* toCylinder, uint32_t index, Thing* thing, uint32_t count)
+{
+	return RET_NOTPOSSIBLE;
+}
+
+ReturnValue Container::__addThing(Thing* thing)
+{
+	Item* item = dynamic_cast<Item*>(thing);
+	if(item == NULL)
+		return RET_NOTPOSSIBLE;
+
+	return RET_NOERROR;
+}
+
+ReturnValue Container::__addThing(uint32_t index, Thing* thing)
+{
+	return RET_NOTPOSSIBLE;
+}
+
+ReturnValue Container::__updateThing(Thing* thing)
+{
+	return RET_NOTPOSSIBLE;
+}
+
+ReturnValue Container::__updateThing(uint32_t index, Thing* thing)
+{
+	return RET_NOTPOSSIBLE;
+}
+
+ReturnValue Container::__removeThing(Thing* thing)
+{
+	return RET_NOTPOSSIBLE;
+}
+
+ReturnValue Container::__removeThing(Thing* thing, uint32_t count)
+{
+	return RET_NOTPOSSIBLE;
+}
+
+uint32_t Container::__getIndexOfThing(const Thing* thing) const
+{
+	uint32_t index = 0;
+	for (ItemList::const_iterator cit = getItems(); cit != getEnd(); ++cit) {
+		if(*cit == thing)
+			return index;
+		else
+			++index;
+	}
+
+	return 0xFF;
+}
+
+void Container::__internalAddThing(Thing* thing)
+{
+	//
+}
+
+
+/*
 bool Container::addItem(Item *newitem) {
 	//first check if we are a container, there is an item to be added and if we can add more items...
 	//if (!iscontainer) throw TE_NoContainer();
@@ -73,7 +229,7 @@ bool Container::addItem(Item *newitem) {
 
 bool Container::removeItem(Item* item)
 {
-	for (ContainerList::iterator cit = lcontained.begin(); cit != lcontained.end(); cit++) {
+	for (ItemList::iterator cit = lcontained.begin(); cit != lcontained.end(); cit++) {
 		if((*cit) == item) {
 
 			Container* container = dynamic_cast<Container*>(*cit); 
@@ -93,7 +249,7 @@ bool Container::removeItem(Item* item)
 void Container::moveItem(unsigned char from_slot, unsigned char to_slot)
 {
 	int n = 0;
-	for (ContainerList::iterator cit = lcontained.begin(); cit != lcontained.end(); ++cit) {
+	for (ItemList::iterator cit = lcontained.begin(); cit != lcontained.end(); ++cit) {
 		if(n == from_slot) {
 			Item *item = (*cit);
 			lcontained.erase(cit);
@@ -104,23 +260,10 @@ void Container::moveItem(unsigned char from_slot, unsigned char to_slot)
 	}
 }
 
-Item* Container::getItem(unsigned long slot_num)
-{
-	size_t n = 0;			
-	for (ContainerList::const_iterator cit = getItems(); cit != getEnd(); ++cit) {
-		if(n == slot_num)
-			return *cit;
-		else
-			++n;
-	}
-
-	return NULL;
-}
-
 const Item* Container::getItem(unsigned long slot_num) const
 {
 	size_t n = 0;			
-	for (ContainerList::const_iterator cit = getItems(); cit != getEnd(); ++cit) {
+	for (ItemList::const_iterator cit = getItems(); cit != getEnd(); ++cit) {
 		if(n == slot_num)
 			return *cit;
 		else
@@ -129,107 +272,9 @@ const Item* Container::getItem(unsigned long slot_num) const
 
 	return NULL;
 }
+*/
 
-unsigned char Container::getSlotNumberByItem(const Item* item) const
-{
-	unsigned char n = 0;			
-	for (ContainerList::const_iterator cit = getItems(); cit != getEnd(); ++cit) {
-		if(*cit == item)
-			return n;
-		else
-			++n;
-	}
-
-	return 0xFF;
-}
-
-long Container::getItemHoldingCount() const
-{
-	int holdcount = 0;
-
-	std::list<const Container*> stack;
-	stack.push_back(this);
-	
-	ContainerList::const_iterator it;
-
-	while(stack.size() > 0) {
-		const Container *container = stack.front();
-		stack.pop_front();
-
-		for (it = container->getItems(); it != container->getEnd(); ++it) {
-			Container *container = dynamic_cast<Container*>(*it);
-			if(container) {
-				stack.push_back(container);
-			}
-
-			++holdcount;
-		}
-	}
-
-	return holdcount;
-}
-
-bool Container::isHoldingItem(const Item* item) const
-{
-	std::list<const Container*> stack;
-	stack.push_back(this);
-	
-	ContainerList::const_iterator it;
-
-	while(stack.size() > 0) {
-		const Container *container = stack.front();
-		stack.pop_front();
-
-		for (it = container->getItems(); it != container->getEnd(); ++it) {
-
-			if(*it == item) {
-				return true;
-			}
-
-			Container *containerIt = dynamic_cast<Container*>(*it);
-			if(containerIt){
-				stack.push_back(containerIt);
-			}
-		}
-	}
-
-	return false;
-}
-
-double Container::getWeight() const
-{
-	double weight = items[id].weight;
-	std::list<const Container*> stack;
-
-	ContainerList::const_iterator it;
-	stack.push_back(this);
-	
-	while(stack.size() > 0) {
-		const Container *container = stack.front();
-		stack.pop_front();
-
-		for (it = container->getItems(); it != container->getEnd(); ++it) {
-			Container *container = dynamic_cast<Container*>(*it);
-			if(container) {
-				stack.push_back(container);
-				weight += items[container->getID()].weight;
-			}
-			else
-				weight += (*it)->getWeight();
-		}
-	}
-
-	return weight;
-}
-
-ContainerList::const_iterator Container::getItems() const {
-	return lcontained.begin();
-}
-
-ContainerList::const_iterator Container::getEnd() const {
-	return lcontained.end();
-}
-
+/*
 Container *Container::getTopParent()
 {
 	if(getParent() == NULL)
@@ -254,3 +299,4 @@ const Container *Container::getTopParent() const
 	}
 	return aux;
 }
+*/

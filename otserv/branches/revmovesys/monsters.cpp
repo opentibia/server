@@ -93,11 +93,11 @@ void MonsterType::createLoot(Container* corpse)
 					delete container;
 				}
 				else{
-					corpse->addItem(container);
+					corpse->__internalAddThing(tmpItem);
 				}
 			}
 			else{
-				corpse->addItem(tmpItem);
+				corpse->__internalAddThing(tmpItem);
 			}
 		}
 	}
@@ -140,11 +140,11 @@ void MonsterType::createLootContainer(Container* parent, const LootBlock& lootbl
 					delete container;
 				}
 				else{
-					parent->addItem(container);
+					parent->__internalAddThing(dynamic_cast<Thing*>(container));
 				}
 			}
 			else{
-				parent->addItem(tmpItem);
+				parent->__internalAddThing(tmpItem);
 			}
 		}
 	}
@@ -260,7 +260,7 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 
 		nodeValue = (char*)xmlGetProp(root, (const xmlChar *)"pushable");
 		if(nodeValue){
-			mType->pushable = (bool)atoi(nodeValue);
+			mType->pushable = (atoi(nodeValue) != 0);
 			xmlFreeOTSERV(nodeValue);
 		}
 
@@ -296,7 +296,7 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 
 		nodeValue = (char*)xmlGetProp(root, (const xmlChar *)"canpushitems");
 		if(nodeValue){
-			mType->canPushItems = (bool)atoi(nodeValue);
+			mType->canPushItems = (atoi(nodeValue) != 0);
 			xmlFreeOTSERV(nodeValue);
 		}
 
@@ -753,7 +753,6 @@ bool Monsters::loadLootContainer(xmlNodePtr node, LootBlock& lBlock)
 {
 	xmlNodePtr tmp,p;
 	char* nodeValue = NULL;
-	unsigned short s_id; 
 	
 	if(node == NULL){
 		return false;

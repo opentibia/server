@@ -22,8 +22,6 @@
 #ifndef __definitions_h
 #define __definitions_h
 
-
-
 typedef unsigned long long uint64_t;
 
 #ifdef XML_GCC_FREE

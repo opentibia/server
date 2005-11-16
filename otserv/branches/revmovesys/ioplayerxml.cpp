@@ -270,9 +270,14 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name){
 			}
 			else if(str=="spawn")
 			{
+				Position spawnPos;
+				spawnPos.x = 0;
+				spawnPos.y = 0;
+				spawnPos.z = 0;
+
 				nodeValue = (char*)xmlGetProp(p, (const xmlChar *) "x");
 				if(nodeValue) {
-					player->pos.x=atoi(nodeValue);
+					spawnPos.x = atoi(nodeValue);
 					xmlFreeOTSERV(nodeValue);
 				}
 				else
@@ -280,7 +285,7 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name){
 
 				nodeValue = (char*)xmlGetProp(p, (const xmlChar *) "y");
 				if(nodeValue) {
-					player->pos.y=atoi(nodeValue);
+					spawnPos.y = atoi(nodeValue);
 					xmlFreeOTSERV(nodeValue);
 				}
 				else
@@ -288,11 +293,13 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name){
 
 				nodeValue = (char*)xmlGetProp(p, (const xmlChar *) "z");
 				if(nodeValue) {
-					player->pos.z=atoi(nodeValue);
+					spawnPos.z = atoi(nodeValue);
 					xmlFreeOTSERV(nodeValue);
 				}
 				else
 					isLoaded = false;
+
+				player->lastLoginPosition = spawnPos;
 			}
 			else if(str=="temple")
 			{
@@ -424,11 +431,13 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name){
 						myitem->unserialize(slot->children);
 
 						//we dont want to sendinventory before login
+						/*
 						player->addItemInventory(myitem, sl_id, true);
 						Container* default_container = dynamic_cast<Container*>(myitem);
 						if(default_container){							
 							LoadContainer(slot->children,default_container);
 						}
+						*/
 					}
 					slot=slot->next;
 				}
@@ -545,7 +554,7 @@ bool IOPlayerXML::LoadContainer(xmlNodePtr nodeitem,Container* ccontainer)
 
 			Item* myitem = Item::CreateItem(id);
 			myitem->unserialize(p);			
-			ccontainer->addItem(myitem);
+			ccontainer->__internalAddThing(myitem);
 			
 			Container* in_container = dynamic_cast<Container*>(myitem);
 			if(in_container){
@@ -615,9 +624,9 @@ bool IOPlayerXML::savePlayer(Player* player){
 	sb << player->lastlogin;	        xmlSetProp(root, (const xmlChar*) "lastlogin", (const xmlChar*)sb.str().c_str());  sb.str("");
 
 	pn = xmlNewNode(NULL,(const xmlChar*)"spawn");
-	sb << player->pos.x;    xmlSetProp(pn, (const xmlChar*) "x", (const xmlChar*)sb.str().c_str());        sb.str("");
-	sb << player->pos.y;  	xmlSetProp(pn, (const xmlChar*) "y", (const xmlChar*)sb.str().c_str());        sb.str("");
-	sb << player->pos.z; 	xmlSetProp(pn, (const xmlChar*) "z", (const xmlChar*)sb.str().c_str());	       sb.str("");
+	sb << player->getPosition().x;    xmlSetProp(pn, (const xmlChar*) "x", (const xmlChar*)sb.str().c_str());        sb.str("");
+	sb << player->getPosition().y;  	xmlSetProp(pn, (const xmlChar*) "y", (const xmlChar*)sb.str().c_str());        sb.str("");
+	sb << player->getPosition().z; 	xmlSetProp(pn, (const xmlChar*) "z", (const xmlChar*)sb.str().c_str());	       sb.str("");
 	xmlAddChild(root, pn);
 	
 	pn = xmlNewNode(NULL,(const xmlChar*)"temple");

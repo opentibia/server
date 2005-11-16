@@ -112,26 +112,26 @@ public:
 	void addList();
 	void kickPlayer();
 	
-	bool addItem(Item* item, bool test = false);
-	bool internalAddItemContainer(Container *container,Item* item);
+	//bool addItem(Item* item, bool test = false);
+	//bool internalAddItemContainer(Container *container,Item* item);
 	
 	freeslot_t getFreeSlot(Container **container,unsigned char &slot, const Item* item);
 	Container* getFreeContainerSlot(Container *parent);
 	
-	bool removeItem(unsigned short id,long count);
-	bool removeItem(Item* item, bool test = false);
-	bool internalRemoveItemContainer(Container *parent, Item* item, bool test = false);
-	int getItemCount(unsigned short id);
+	//bool removeItem(unsigned short id,long count);
+	//bool removeItem(Item* item, bool test = false);
+	//bool internalRemoveItemContainer(Container *parent, Item* item, bool test = false);
+	//int getItemCount(uint16_t id);
 	
-	int removeItemInventory(int pos, bool internal = false);
-	int addItemInventory(Item* item, int pos, bool internal = false);
+	//int removeItemInventory(int pos, bool internal = false);
+	//int addItemInventory(Item* item, int pos, bool internal = false);
 	
 	containerLayout::const_iterator getContainers() const { return vcontainers.begin();}
 	containerLayout::const_iterator getEndContainer() const { return vcontainers.end();}
 	
 	Container* getContainer(unsigned char containerid);
 	unsigned char getContainerID(const Container* container) const;
-	bool isHoldingContainer(const Container* container) const;
+	//bool isHoldingContainer(const Container* container) const;
 	void addContainer(unsigned char containerid, Container *container);
 	void closeContainer(unsigned char containerid);
 	
@@ -158,7 +158,10 @@ public:
 	void addSkillTry(int skilltry);
 	void addSkillShieldTry(int skilltry);
 	
-	unsigned long getExperience() const {return experience;};
+	unsigned long getExperience() const {
+		return experience;
+	}
+
 	double getCapacity() const {
 		if(access == 0) {
 			return capacity;
@@ -180,20 +183,21 @@ public:
 	}
 	
 	time_t getLastLoginSaved() const { return lastLoginSaved; };
+	const Position& getLastLoginPosition() {return lastLoginPosition;};
 	
 	void updateInventoryWeigth();
 	
-	Item* getItem(int pos) const;
-	Item* GetDistWeapon() const;
+	Item* getInventoryItem(slots_t slot) const;
+	//Item* GetDistWeapon() const;
 	
 	void addManaSpent(unsigned long spent);
-	void addExp(unsigned long exp);
+	void addExperience(unsigned long exp);
 	virtual int getWeaponDamage() const;
 	virtual int getArmor() const;
 	virtual int getDefense() const;
 	unsigned long getMoney();
-	bool substractMoney(unsigned long money);
-	bool substractMoneyItem(Item *item, unsigned long money);
+	//bool substractMoney(unsigned long money);
+	//bool substractMoneyItem(Item *item, unsigned long money);
 	
 	
 	unsigned long eventAutoWalk;
@@ -201,18 +205,21 @@ public:
 	//items
 	containerLayout vcontainers;
 	void preSave();
-    virtual void useThing() {
+	
+	/*
+	virtual void useThing(){
 		//std::cout << "Player: useThing() " << this << std::endl;
 		useCount++;
 	};
 	
-	virtual void releaseThing() {
+	virtual void releaseThing(){
 		useCount--;
 		//std::cout << "Player: releaseThing() " << this << std::endl;
 		if (useCount == 0)
 			delete this;
 	};
-	
+	*/
+
 	unsigned long getIP() const;
 	Container* getDepot(unsigned long depotId);
 	bool addDepot(Container* depot,unsigned long depotIs);
@@ -220,7 +227,7 @@ public:
 	DepotMap depots;
 	long max_depot_items;
 	
-	virtual void removeDistItem();
+	//virtual void removeDistItem();
 	fight_t getFightType();
 	subfight_t getSubFightType();
 	
@@ -257,10 +264,12 @@ public:
 	virtual int getLookCorpse();
 	bool NeedUpdateStats();
 	
-	virtual std::string getDescription(bool self = false) const;
+	virtual std::string getDescription(uint32_t lookDistance) const;
 	
-	//ground	
 	void onThingAppear(const Thing* thing);  
+
+	/*
+	//ground	
 	void onThingTransform(const Thing* thing,int stackpos);
 	void onThingDisappear(const Thing* thing, unsigned char stackPos);
 	void onThingRemove(const Thing* thing); //auto-close containers
@@ -274,6 +283,7 @@ public:
 	//void onItemAddInvnetory(const unsigned char sl_id);
 	//void onItemRemoveInvnetory(const unsigned char sl_id);
 	//void onItemUpdateInvnetory(const unsigned char sl_id);
+	*/
 	
 	void setAcceptTrade(bool b);
 	bool getAcceptTrade() {return (tradeState == TRADE_ACCEPT);};
@@ -299,6 +309,7 @@ protected:
 	
 	virtual void onTileUpdated(const Position &pos);
 	
+	/*
 	//container to container
 	virtual void onThingMove(const Creature *creature, const Container *fromContainer, unsigned char from_slotid,
 		const Item* fromItem, int oldFromCount, Container *toContainer, unsigned char to_slotid,
@@ -331,6 +342,7 @@ protected:
 	//ground to inventory
 	virtual void onThingMove(const Creature *creature, const Position &fromPos, int stackpos, const Item* fromItem,
 		int oldFromCount, slots_t toSlot, const Item *toItem, int oldToCount, int count);
+	*/
 	
 	//ground to ground
 	virtual void onThingMove(const Creature *creature, const Thing *thing, const Position *oldPos,
@@ -359,6 +371,7 @@ protected:
 	std::string password;
 	time_t lastlogin;
 	time_t lastLoginSaved;
+	Position lastLoginPosition;
 	unsigned long lastip;
 	
 	//inventory variables
@@ -378,11 +391,11 @@ protected:
 	
 	unsigned char level_percent;
 	unsigned char maglevel_percent;
+
 	//trade variables
 	unsigned long tradePartner;
 	trade_state tradeState;
-	//bool acceptTrade;
-	Item *tradeItem;
+	Item* tradeItem;
 	
 	//autowalking
 	std::list<Direction> pathlist;
@@ -391,7 +404,6 @@ protected:
 	struct SkillCache{
 		unsigned int tries;
 		int level;
-		//int voc;
 		playervoc_t vocation;
 	};
 	
@@ -402,7 +414,6 @@ protected:
 		unsigned long experience;
 		int level;
 		double freeCapacity;
-		//int cap;
 		int mana;
 		int manamax;
 		int manaspent;
@@ -410,10 +421,11 @@ protected:
 	};
 	
 	SentStats lastSentStats;
-	// we need our name
+
 	std::string name;	
 	unsigned long guid;
 	
+	//guild variables
 	unsigned long guildId;
 	std::string guildName;
 	std::string guildRank;
@@ -427,9 +439,9 @@ protected:
 		int slot;
 		Container *parent;
 	};
+
 	typedef std::multimap<int, struct MoneyItem*, std::less<int> > MoneyMap;
 	typedef MoneyMap::value_type moneymap_pair;
-	
 	
 	//for skill advances
 	unsigned int getReqSkillTries (int skill, int level, playervoc_t voc);
@@ -448,4 +460,4 @@ protected:
 };
 
 
-#endif // __player_h_
+#endif // __PLAYER_H__

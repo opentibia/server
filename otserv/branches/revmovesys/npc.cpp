@@ -230,13 +230,12 @@ Npc::~Npc()
 	delete this->script;
 }
 
-std::string Npc::getDescription(bool self) const
+//std::string Npc::getDescription(bool self) const
+std::string Npc::getDescription(uint32_t lookDistance) const
 {
 	std::stringstream s;
-	std::string str;	
 	s << name << ".";
-	str = s.str();
-	return str;
+	return s.str();
 }
             
 void Npc::onThingMove(const Player *player, const Thing *thing, const Position *oldPos,
@@ -304,23 +303,23 @@ void Npc::doAttack(int id){
 void Npc::doMove(int direction){
 	switch(direction){
 		case 0:
-			this->game->thingMove(this, this,this->pos.x, this->pos.y+1, this->pos.z, 1);
+			this->game->thingMove(this, this,getPosition().x, getPosition().y+1, getPosition().z, 1);
 		break;
 		case 1:
-			this->game->thingMove(this, this,this->pos.x+1, this->pos.y, this->pos.z, 1);
+			this->game->thingMove(this, this,getPosition().x+1, getPosition().y, getPosition().z, 1);
 		break;
 		case 2:
-			this->game->thingMove(this, this,this->pos.x, this->pos.y-1, this->pos.z, 1);
+			this->game->thingMove(this, this,getPosition().x, getPosition().y-1, getPosition().z, 1);
 		break;
 		case 3:
-			this->game->thingMove(this, this,this->pos.x-1, this->pos.y, this->pos.z, 1);
+			this->game->thingMove(this, this,getPosition().x-1, getPosition().y, getPosition().z, 1);
 		break;
 	}
 }
 
 void Npc::doMoveTo(Position target){
-	if(route.size() == 0 || route.back() != target || route.front() != this->pos){
-		route = this->game->getPathTo(this, this->pos, target);
+	if(route.size() == 0 || route.back() != target || route.front() != getPosition()){
+		route = this->game->getPathTo(this, getPosition(), target);
 	}
 	if(route.size()==0){
 		//still no route, means there is none
@@ -329,9 +328,9 @@ void Npc::doMoveTo(Position target){
 	else route.pop_front();
 	Position nextStep=route.front();
 	route.pop_front();
-	int dx = nextStep.x - this->pos.x;
-	int dy = nextStep.y - this->pos.y;
-	this->game->thingMove(this, this,this->pos.x + dx, this->pos.y + dy, this->pos.z, 1);
+	int dx = nextStep.x - getPosition().x;
+	int dy = nextStep.y - getPosition().y;
+	this->game->thingMove(this, this, getPosition().x + dx, getPosition().y + dy, getPosition().z, 1);
 }
 
 NpcScript::NpcScript(std::string scriptname, Npc* npc){
@@ -490,9 +489,9 @@ int NpcScript::luaCreatureGetPos(lua_State *L){
 		lua_pushnil(L);
 	}
 	else{
-		lua_pushnumber(L, c->pos.x);
-		lua_pushnumber(L, c->pos.y);
-		lua_pushnumber(L, c->pos.z);
+		lua_pushnumber(L, c->getPosition().x);
+		lua_pushnumber(L, c->getPosition().y);
+		lua_pushnumber(L, c->getPosition().z);
 	}
 	return 3;
 }
@@ -500,9 +499,9 @@ int NpcScript::luaCreatureGetPos(lua_State *L){
 int NpcScript::luaSelfGetPos(lua_State *L){
 	lua_pop(L,1);
 	Npc* mynpc = getNpc(L);
-	lua_pushnumber(L, mynpc->pos.x);
-	lua_pushnumber(L, mynpc->pos.y);
-	lua_pushnumber(L, mynpc->pos.z);
+	lua_pushnumber(L, mynpc->getPosition().x);
+	lua_pushnumber(L, mynpc->getPosition().y);
+	lua_pushnumber(L, mynpc->getPosition().z);
 	return 3;
 }
 

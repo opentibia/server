@@ -45,8 +45,6 @@ access(0)
 	direction  = NORTH;
 	master = NULL;
 	
-	//this->name = name;
-	
 	lookhead   = 0;
 	lookbody   = 0;
 	looklegs   = 0;
@@ -83,7 +81,7 @@ Creature::~Creature()
 	for(cit = summons.begin(); cit != summons.end(); ++cit) {
 		(*cit)->setAttackedCreature(NULL);
 		(*cit)->setMaster(NULL);
-		(*cit)->releaseThing();
+		(*cit)->releaseThing2();
 	}
 	
 	summons.clear();
@@ -124,7 +122,7 @@ void Creature::addSummon(Creature *creature)
 {
 	//std::cout << "addSummon: " << this << " summon=" << creature << std::endl;
 	creature->setMaster(this);
-	creature->useThing();
+	creature->useThing2();
 	summons.push_back(creature);
 	
 }
@@ -135,7 +133,7 @@ void Creature::removeSummon(Creature *creature)
 	std::list<Creature*>::iterator cit = std::find(summons.begin(), summons.end(), creature);
 	if(cit != summons.end()) {
 		(*cit)->setMaster(NULL);
-		(*cit)->releaseThing();
+		(*cit)->releaseThing2();
 		summons.erase(cit);
 	}
 }
@@ -231,6 +229,7 @@ std::vector<long> Creature::getInflicatedDamageCreatureList()
 	return damagelist;
 }
 
+/*
 bool Creature::canMovedTo(const Tile *tile) const
 {
 	if(tile) {
@@ -239,20 +238,19 @@ bool Creature::canMovedTo(const Tile *tile) const
 
 	return false;
 }
+*/
 
-std::string Creature::getDescription(bool self) const
+//std::string Creature::getDescription(bool self) const
+std::string Creature::getDescription(uint32_t lookDistance) const
 {
-	std::stringstream s;
-	std::string str;	
-	s << "a creature.";
-	str = s.str();
+	std::string str = "a creature";
 	return str;
 }
 
 int Creature::getStepDuration() const
 {
 	int duration = 500;
-	Tile *tile = g_game.getTile(pos.x, pos.y, pos.z);
+	Tile* tile = g_game.getTile(getPosition().x, getPosition().y, getPosition().z);
 	if(tile && tile->ground){
 		int groundid = tile->ground->getID();
 		uint16_t stepspeed = Item::items[groundid].speed;

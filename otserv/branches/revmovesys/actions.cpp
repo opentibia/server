@@ -166,9 +166,9 @@ Action *Actions::loadAction(xmlNodePtr xmlaction){
 int Actions::canUse(const Player *player,const Position &pos) const
 {
 	if(pos.x != 0xFFFF){
-		int dist_x = std::abs(pos.x - player->pos.x);
-		int dist_y = std::abs(pos.y - player->pos.y);
-		if(dist_x > 1 || dist_y > 1 || (pos.z != player->pos.z)){
+		int dist_x = std::abs(pos.x - player->getPosition().x);
+		int dist_y = std::abs(pos.y - player->getPosition().y);
+		if(dist_x > 1 || dist_y > 1 || (pos.z != player->getPosition().z)){
 			return TOO_FAR;
 		}
 	}
@@ -180,12 +180,13 @@ int Actions::canUseFar(const Player *player,const Position &to_pos, const bool b
 	if(to_pos.x == 0xFFFF){
 		return CAN_USE;
 	}
-	if(std::abs(player->pos.x - to_pos.x) > 7 || std::abs(player->pos.y - to_pos.y) > 5 || player->pos.z != to_pos.z){
+	if(std::abs(player->getPosition().x - to_pos.x) > 7 || std::abs(player->getPosition().y - to_pos.y) > 5 ||
+		player->getPosition().z != to_pos.z){
 		return TOO_FAR;
 	}
 	
 	if(canUse(player,to_pos) == TOO_FAR){
-		if(blockWalls && (game->map->canThrowObjectTo(player->pos, to_pos, BLOCK_PROJECTILE) != RET_NOERROR)){
+		if(blockWalls && (game->map->canThrowObjectTo(player->getPosition(), to_pos, BLOCK_PROJECTILE) != RET_NOERROR)){
 			return CAN_NOT_THTOW;
 		}
 	}
@@ -262,9 +263,10 @@ bool Actions::UseItem(Player* player, const Position &pos,const unsigned char st
   return false;	
 }
 
-bool Actions::openContainer(Player *player,Container *container, const unsigned char index){
-	if(container->depot == 0){ //normal container
-		unsigned char oldcontainerid = player->getContainerID(container);
+bool Actions::openContainer(Player *player,Container *container, const unsigned char index)
+{
+	//if(container->depotId == 0){ //normal container
+		uint8_t oldcontainerid = player->getContainerID(container);
 		if(oldcontainerid != 0xFF) {
 			player->closeContainer(oldcontainerid);
 			player->sendCloseContainer(oldcontainerid);
@@ -272,18 +274,21 @@ bool Actions::openContainer(Player *player,Container *container, const unsigned 
 		else {
 			player->sendContainer(index, container);
 		}
-	}
+	//}
+
+	/*
 	else{// depot container
-		Container *container2 = player->getDepot(container->depot);
+		Container *container2 = player->getDepot(container->depotId);
 		if(container2){
 			//update depot coordinates					
-			container2->pos = container->pos;
+			//container2->pos = container->pos;
 			player->sendContainer(index, container2);
 		}
 		else{
 			return false;
 		}
 	}
+	*/
 	return true;
 }
 
@@ -377,7 +382,7 @@ bool Action::executeUse(Player *player,Item* item, PositionEx &posFrom, Position
 	//onUse(uidplayer, item1,position1,item2,position2)
 	script->ClearMap();
 	script->_player = player;
-	PositionEx playerpos = player->pos;
+	PositionEx playerpos = player->getPosition();
 	unsigned int cid = script->AddThingToMap((Thing*)player,playerpos);
 	unsigned int itemid1 = script->AddThingToMap(item,posFrom);
 	lua_State*  luaState = script->getLuaState();
@@ -403,7 +408,7 @@ bool Action::executeUse(Player *player,Item* item, PositionEx &posFrom, Position
 	
 	lua_pcall(luaState, 5, 1, 0);
 	
-	bool ret = (bool)script->internalGetNumber(luaState);
+	bool ret = (script->internalGetNumber(luaState) != 0);
 	
 	return ret;
 }
@@ -495,7 +500,8 @@ void ActionScript::UpdateThingPos(int uid, PositionEx &pos){
 unsigned int ActionScript::AddThingToMap(Thing *thing,PositionEx &pos)
 {
 	Item *item = dynamic_cast<Item*>(thing);
-	if(item && item->pos.x != 0xFFFF && item->getUniqueId()){
+	//if(item && item->pos.x != 0xFFFF && item->getUniqueId()){
+	if(item && item->getTile() == item->getParent() && item->getUniqueId()){
 		unsigned short uid = item->getUniqueId();
 		KnownThing *tmp = uniqueIdMap[uid];
 		if(!tmp){
@@ -545,11 +551,11 @@ const KnownThing* ActionScript::GetThingByUID(int uid)
 	if(tmp)
 		return tmp;
 	tmp = uniqueIdMap[uid];
-	if(tmp && tmp->thing->pos.x != 0xFFFF){
+	if(tmp && tmp->thing->getParent() == tmp->thing->getTile()){
 		KnownThing *newKT = new KnownThing;
 		newKT->thing = tmp->thing;
 		newKT->type = tmp->type;
-		newKT->pos = tmp->thing->pos;
+		newKT->pos = tmp->thing->getPosition();
 		ThingMap[uid] = newKT;
 		return newKT;
 	}
@@ -809,9 +815,9 @@ int ActionScript::internalGetPlayerInfo(lua_State *L, ePlayerInfo info)
 			return 1;
 			break;
 		case PlayerInfoPosition:			
-			pos = player->pos;
+			pos = player->getPosition();
 			//tile = action->game->map->getTile(player->pos.x, player->pos.y, player->pos.z);
-			tile = action->game->map->getTile(player->pos);
+			tile = player->getTile(); //action->game->map->getTile(player->pos);
 			if(tile)
 				pos.stackpos = tile->getCreatureStackPos(player);
 			internalAddPositionEx(L,pos);
@@ -925,6 +931,7 @@ int ActionScript::luaActionDoRemoveItem(lua_State *L)
 
 int ActionScript::luaActionDoPlayerRemoveItem(lua_State *L)
 {	
+	/*
 	//doPlayerRemoveItem(cid,itemid,count)
 	long count = (unsigned char)internalGetNumber(L);	
 	unsigned short itemid = (unsigned short)internalGetNumber(L);
@@ -947,7 +954,8 @@ int ActionScript::luaActionDoPlayerRemoveItem(lua_State *L)
 		std::cout << "luaDoPlayerRemoveItem: player not found" << std::endl;
 		return 1;
 	}	
-	
+	*/
+
 	return 1;
 }
 
@@ -1201,7 +1209,7 @@ int ActionScript::luaActionDoPlayerAddHealth(lua_State *L)
 		SpectatorVec list;
 		SpectatorVec::iterator it;
 
-		action->game->getSpectators(Range(player->pos,true), list);
+		action->game->getSpectators(Range(player->getPosition(), true), list);
 		for(it = list.begin(); it != list.end(); ++it) {
 			Player* p = dynamic_cast<Player*>(*it);
 			if(p)
@@ -1244,6 +1252,7 @@ int ActionScript::luaActionDoPlayerAddMana(lua_State *L)
 
 int ActionScript::luaActionDoPlayerAddItem(lua_State *L)
 {
+	/*
 	//doPlayerAddItem(uid,itemid,count or type)
 	int type = (int)internalGetNumber(L);
 	int itemid = (int)internalGetNumber(L);
@@ -1258,9 +1267,10 @@ int ActionScript::luaActionDoPlayerAddItem(lua_State *L)
 		Item *newitem = Item::CreateItem(itemid,type);
 		if(!player->addItem(newitem)){
 			//add item on the ground
-			action->game->addThing(NULL,action->_player->pos,newitem);
+			action->game->addThing(NULL, action->_player->getPosition(), newitem);
 			//Tile *tile = action->game->getTile(newitem->pos.x, newitem->pos.y, newitem->pos.z);
-			Tile *tile = action->game->map->getTile(newitem->pos);
+			//Tile *tile = action->game->map->getTile(newitem->pos);
+			Tile* tile = newitem->getTile();
 			if(tile){
 				pos.stackpos = tile->getThingStackPos(newitem);
 			}
@@ -1268,9 +1278,10 @@ int ActionScript::luaActionDoPlayerAddItem(lua_State *L)
 				pos.stackpos = 1;
 			}
 		}
-		pos.x = newitem->pos.x;
-		pos.y = newitem->pos.y;
-		pos.z = newitem->pos.z;
+		
+		//pos.x = newitem->pos.x;
+		//pos.y = newitem->pos.y;
+		//pos.z = newitem->pos.z;
 		uid = action->AddThingToMap((Thing*)newitem,pos);
 	}
 	else{
@@ -1278,8 +1289,10 @@ int ActionScript::luaActionDoPlayerAddItem(lua_State *L)
 		std::cout << "luaDoPlayerAddItem: player not found" << std::endl;
 		return 1;
 	}		
-		
+
 	lua_pushnumber(L, uid);
+	*/
+
 	return 1;
 }
 
@@ -1362,7 +1375,7 @@ int ActionScript::luaActionGetPlayerSkill(lua_State *L)
 
 int ActionScript::luaActionDoShowTextWindow(lua_State *L){
 	//doShowTextWindow(uid,maxlen,canWrite)
-	bool canWrite = (bool)internalGetNumber(L);
+	bool canWrite = (internalGetNumber(L) != 0);
 	unsigned short maxlen = (unsigned short)internalGetNumber(L);
 	unsigned int uid = (unsigned int)internalGetNumber(L);
 	
@@ -1698,6 +1711,7 @@ int ActionScript::luaActionDoSummonCreature(lua_State *L){
 
 int ActionScript::luaActionDoPlayerRemoveMoney(lua_State *L)
 {
+	/*
 	//doPlayerRemoveMoney(uid,money)
 	int money = (int)internalGetNumber(L);
 	unsigned int cid = (unsigned int)internalGetNumber(L);	
@@ -1719,6 +1733,7 @@ int ActionScript::luaActionDoPlayerRemoveMoney(lua_State *L)
 		std::cout << "doPlayerRemoveMoney: player not found" << std::endl;
 		return 1;
 	}		
+	*/
 		
 	return 1;
 }

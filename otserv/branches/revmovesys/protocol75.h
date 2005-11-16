@@ -28,6 +28,7 @@
 #include "creature.h"
 #include "item.h"
 #include "container.h"
+#include "cylinder.h"
 #include <string>
 
 class NetworkMessage;
@@ -51,6 +52,9 @@ private:
 	std::list<unsigned long> knownPlayers;
 	void checkCreatureAsKnown(unsigned long id, bool &known, unsigned long &removedKnown);
 	
+	Cylinder* internalGetCylinder(unsigned short x, unsigned short y, unsigned char z);
+	Thing* internalGetThing(unsigned short x, unsigned short y, unsigned char z, int index);
+
 	// we have all the parse methods
 	void parsePacket(NetworkMessage &msg);
 	
@@ -114,9 +118,10 @@ private:
 	virtual void sendOpenPriv(std::string &receiver);
 	virtual void sendToChannel(const Creature *creature, SpeakClasses type, const std::string &text, unsigned short channelId);
 	
-	virtual void sendNetworkMessage(NetworkMessage *msg);
+	//virtual void sendNetworkMessage(NetworkMessage *msg);
 	virtual void sendIcons(int icons);
 	
+	/*
 	//container to container
 	virtual void sendThingMove(const Creature *creature, const Container *fromContainer, unsigned char from_slotid,
 		const Item* fromItem, int oldFromCount, Container *toContainer, unsigned char to_slotid, const Item *toItem, int oldToCount, int count);
@@ -148,7 +153,8 @@ private:
 	//ground to inventory
 	virtual void sendThingMove(const Creature *creature, const Position &fromPos, int stackpos, const Item* fromItem,
 		int oldFromCount, slots_t toSlot, const Item *toItem, int oldToCount, int count);
-	
+	*/
+
 	//ground to ground
 	virtual void sendThingMove(const Creature *creature, const Thing *thing,
 		const Position *oldPos, unsigned char oldstackpos, unsigned char oldcount,

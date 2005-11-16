@@ -39,7 +39,7 @@ extern Game g_game;
 
 AutoList<Player> Player::listPlayer;
 
-//for old mana/healgt regeneration
+//for old mana/health regeneration
 //const int Player::gainManaVector[5][2] = {{1,5},{1,5},{1,5},{1,5},{1,5}};
 //const int Player::gainHealthVector[5][2] = {{1,5},{1,5},{1,5},{1,5},{1,5}};
 const int Player::gainManaVector[5][2] = {{6,1},{3,1},{3,1},{4,1},{6,1}};
@@ -112,7 +112,7 @@ Creature()
 
  	useCount = 0;
   
-  	/*
+	/*
  	CapGain[0]  = 10;     //for level advances
  	CapGain[1]  = 10;     //e.g. Sorcerers will get 10 Cap with each level up
  	CapGain[2]  = 10;     
@@ -142,13 +142,13 @@ Player::~Player()
 {
 	for (int i = 0; i < 11; i++) {
 		if (items[i]) {
-			items[i]->releaseThing();
+			items[i]->releaseThing2();
 		}
 	}
 
 	DepotMap::iterator it;
 	for(it = depots.begin();it != depots.end(); it++){
-		it->second->releaseThing();
+		it->second->releaseThing2();
 	}
 	//std::cout << "Player destructor " << this->getID() << std::endl;
   delete client;
@@ -158,18 +158,16 @@ bool Player::isPushable() const {
 	return ((getSleepTicks() <= 0) && access == 0);
 }
 
-std::string Player::getDescription(bool self) const
+std::string Player::getDescription(uint32_t lookDistance) const
 {
 	std::stringstream s;
 	std::string str;
 	
-	if(self){
+	if(lookDistance == -1){
 		s << "yourself.";
 
 		if(vocation != VOCATION_NONE)
 			s << " You are " << g_config.getGlobalStringField("vocations", (int)vocation) << ".";
-		
-		
 	}
 	else {	
 		s << name << " (Level " << level <<").";
@@ -186,7 +184,7 @@ std::string Player::getDescription(bool self) const
 	
 	if(guildId)
 	{
-		if(self)
+		if(lookDistance == -1)
 			s << " You are ";
 		else
 		{
@@ -213,15 +211,17 @@ std::string Player::getDescription(bool self) const
 	return str;
 }
 
-Item* Player::getItem(int pos) const
+Item* Player::getInventoryItem(slots_t slot) const
 {
-	if(pos>0 && pos <11)
-		return items[pos];
+	if(slot > 0 && slot < 11)
+		return items[slot];
+
 	return NULL;
 }
 
 int Player::getWeaponDamage() const
 {
+	/*
 	double damagemax = 0;
 	//TODO:what happens with 2 weapons?
   for (int slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++)
@@ -284,6 +284,9 @@ int Player::getWeaponDamage() const
 
 	// return it
 	return 1+(int)(damagemax*rand()/(RAND_MAX+1.0));
+	*/
+
+	return 0;
 }
 
 int Player::getArmor() const
@@ -308,7 +311,7 @@ int Player::getArmor() const
 
 int Player::getDefense() const
 {
-	int defense=0;
+	int defense = 0;
 	
 	if(items[SLOT_LEFT]){		
 		if(items[SLOT_LEFT]->getWeaponType() == SHIELD)
@@ -337,7 +340,7 @@ unsigned long Player::getMoney()
 {
 	unsigned long money = 0;
 	std::list<const Container*> stack;
-	ContainerList::const_iterator cit;
+	ItemList::const_iterator cit;
 	for(int i=0; i< 11;i++){
 		if(items[i]){
 			if(Container *tmpcontainer = dynamic_cast<Container*>(items[i])){
@@ -363,6 +366,7 @@ unsigned long Player::getMoney()
 	return money;
 }
 
+/*
 bool Player::substractMoney(unsigned long money)
 {
 	if(getMoney() < money)
@@ -372,7 +376,7 @@ bool Player::substractMoney(unsigned long money)
 	MoneyMap moneyMap;
 	MoneyItem* tmp;
 	
-	ContainerList::iterator it;
+	ItemList::iterator it;
 	for(int i = 0; i < 11 && money > 0 ;i++){	
 		if(items[i]){
 			if(Container *tmpcontainer = dynamic_cast<Container*>(items[i])){
@@ -420,7 +424,7 @@ bool Player::substractMoney(unsigned long money)
 		}
 		else if(it2->second->location == SLOT_TYPE_CONTAINER){
 			Container *container = it2->second->parent;
-			unsigned char slot = container->getSlotNumberByItem(item);
+			unsigned char slot = container->getIndexOfThing(item);
 			onItemRemoveContainer(container,slot);
 			container->removeItem(item);
 		}
@@ -464,25 +468,27 @@ bool Player::substractMoneyItem(Item *item, unsigned long money)
 	if(crys != 0){
 		Item *remaindItem = Item::CreateItem(ITEM_COINS_CRYSTAL, crys);
 		if(!this->addItem(remaindItem))
-			g_game.addThing(NULL,this->pos,remaindItem);
+			g_game.addThing(NULL,this->getPosition(),remaindItem);
 			
 	}
 	
 	if(plat != 0){
 		Item *remaindItem = Item::CreateItem(ITEM_COINS_PLATINUM, plat);
 		if(!this->addItem(remaindItem))
-			g_game.addThing(NULL,this->pos,remaindItem);
+			g_game.addThing(NULL,this->getPosition(),remaindItem);
 	}
 	
 	if(gold != 0){
 		Item *remaindItem = Item::CreateItem(ITEM_COINS_GOLD, gold);
 		if(!this->addItem(remaindItem))
-			g_game.addThing(NULL,this->pos,remaindItem);
+			g_game.addThing(NULL,this->getPosition(),remaindItem);
 	}
 	
 	return true;
 }
+*/
 
+/*
 bool Player::removeItem(unsigned short id,long count)
 {
 	if(getItemCount(id) < count)
@@ -490,7 +496,7 @@ bool Player::removeItem(unsigned short id,long count)
 	
 	std::list<Container*> stack;
 	
-	ContainerList::iterator it;
+	ItemList::iterator it;
 	for(int i = 0; i < 11 && count > 0 ;i++){	
 		if(items[i]){
 			if(items[i]->getID() == id){
@@ -554,12 +560,14 @@ bool Player::removeItem(unsigned short id,long count)
 	else
 		return false;
 }
+*/
 
-int Player::getItemCount(unsigned short id)
+/*
+int Player::getItemCount(uint16_t id)
 {
 	unsigned long counter = 0;
 	std::list<const Container*> stack;
-	ContainerList::const_iterator cit;
+	ItemList::const_iterator cit;
 	for(int i=0; i< 11;i++){
 		if(items[i]){
 			if(items[i]->getID() == id){
@@ -596,6 +604,7 @@ int Player::getItemCount(unsigned short id)
 	}
 	return counter;
 }
+*/
 
 void Player::sendIcons()
 {
@@ -637,25 +646,29 @@ void Player::updateInventoryWeigth()
 	}
 }
 
-int Player::sendInventory(unsigned char sl_id){
+int Player::sendInventory(unsigned char sl_id)
+{
 	client->sendInventory(sl_id);
 	return true;
 }
 
-int Player::addItemInventory(Item* item, int pos, bool internal /*= false*/) {
+/*
+int Player::addItemInventory(Item* item, uint32_t index, bool internal //false)
+{
 #ifdef __DEBUG__
 	std::cout << "Should add item at " << pos <<std::endl;
 #endif
 	if(pos > 0 && pos < 11)
   {
-		if (items[pos]) {
-			items[pos]->releaseThing();
+		if (items[index]) {
+			items[index]->releaseThing();
 		}
 
-		items[pos] = item;
-		if(items[pos]) {
-			items[pos]->pos.x = 0xFFFF;
-		}
+		items[index] = item;
+		
+		//if(items[index]) {
+		//	items[pos]->pos.x = 0xFFFF;
+		//}
 
 		updateInventoryWeigth();
 
@@ -669,8 +682,11 @@ int Player::addItemInventory(Item* item, int pos, bool internal /*= false*/) {
 
 	return true;
 }
+*/
 
-bool Player::addItem(Item *item, bool test /*=false*/){
+/*
+bool Player::addItem(Item *item, bool test //false)
+{
 	if(!item)
 		return false;
 
@@ -696,7 +712,7 @@ bool Player::addItem(Item *item, bool test /*=false*/){
 
 			if(!test){
 				//add the item
-				container->addItem(item);
+				container->addThing(item);
 
 				updateInventoryWeigth();
 				client->sendStats();
@@ -710,7 +726,9 @@ bool Player::addItem(Item *item, bool test /*=false*/){
 
 	return false;
 }
+*/
 
+/*
 freeslot_t Player::getFreeSlot(Container **container,unsigned char &slot, const Item* item)
 {
 	*container = NULL;
@@ -749,7 +767,9 @@ freeslot_t Player::getFreeSlot(Container **container,unsigned char &slot, const 
 	}
 	return SLOT_TYPE_NONE;
 }
+*/
 
+/*
 Container* Player::getFreeContainerSlot(Container *parent)
 {
 	//check if it is full
@@ -757,7 +777,7 @@ Container* Player::getFreeContainerSlot(Container *parent)
 		return parent;
 	}
 	else{ //look for more containers inside
-		for(ContainerList::const_iterator cit = parent->getItems(); cit != parent->getEnd(); ++cit){
+		for(ItemList::const_iterator cit = parent->getItems(); cit != parent->getEnd(); ++cit){
 			Container * temp_container = dynamic_cast<Container*>(*cit);
 			if(temp_container && temp_container != getTradeItem()){
 				return getFreeContainerSlot(temp_container);
@@ -766,8 +786,10 @@ Container* Player::getFreeContainerSlot(Container *parent)
 	}
 	return NULL;
 }
+*/
 
-bool Player::removeItem(Item* item, bool test /*=false*/)
+/*
+bool Player::removeItem(Item* item, bool test //false)
 {
 	Container *tmpcontainer;
 	//look for the item
@@ -786,14 +808,16 @@ bool Player::removeItem(Item* item, bool test /*=false*/)
 	}
 	return false;
 }
+*/
 
-bool Player::internalRemoveItemContainer(Container *parent, Item* item, bool test /*=false*/)
+/*
+bool Player::internalRemoveItemContainer(Container *parent, Item* item, bool test //=false)
 {
 	Container * temp_container;
-	for(ContainerList::const_iterator cit = parent->getItems(); 
+	for(ItemList::const_iterator cit = parent->getItems(); 
 		cit != parent->getEnd(); ++cit){
 		if(*cit == item){
-			unsigned char slot =  parent->getSlotNumberByItem(item);
+			unsigned char slot =  parent->getIndexOfThing(item);
 			if(slot != 0xFF){
 				if(!test){
 					parent->removeItem(item);
@@ -814,8 +838,10 @@ bool Player::internalRemoveItemContainer(Container *parent, Item* item, bool tes
 	}
 	return false;
 }
+*/
 
-int Player::removeItemInventory(int pos, bool internal /*= false*/)
+/*
+int Player::removeItemInventory(int pos, bool internal //= false)
 {
 	if(pos > 0 && pos < 11) {
 
@@ -835,8 +861,10 @@ int Player::removeItemInventory(int pos, bool internal /*= false*/)
 
 	return true;
 }
+*/
 
-unsigned int Player::getReqSkillTries (int skill, int level, playervoc_t voc) {
+unsigned int Player::getReqSkillTries(int skill, int level, playervoc_t voc)
+{
 	//first find on cache
 	for(int i=0;i<2;i++){
 		if(SkillAdvanceCache[skill][i].level == level && SkillAdvanceCache[skill][i].vocation == voc){
@@ -877,6 +905,7 @@ unsigned int Player::getReqSkillTries (int skill, int level, playervoc_t voc) {
 
 void Player::addSkillTry(int skilltry)
 {
+	/*
 	int skill;
 	bool foundSkill;
 	foundSkill = false;
@@ -895,8 +924,8 @@ void Player::addSkillTry(int skilltry)
 						else
 							skill = 0;
 						break;
-                    case SHIELD: continue; break;
-                    case MAGIC: return; break;//TODO: should add skill try?
+					case SHIELD: continue; break;
+					case MAGIC: return; break;//TODO: should add skill try?
 					default: skill = 0; break;
 			 	}//switch
 			 	addSkillTryInternal(skilltry,skill);
@@ -905,11 +934,14 @@ void Player::addSkillTry(int skilltry)
 			}			
 		}
 	}
+	
 	if(foundSkill == false)
 		addSkillTryInternal(skilltry,0);//add fist try
+	*/
 }
 
-void Player::addSkillShieldTry(int skilltry){
+void Player::addSkillShieldTry(int skilltry)
+{
 	//look for a shield
 	
 	for (int slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++) {
@@ -949,7 +981,8 @@ int Player::getSkill(skills_t skilltype, skillsid_t skillinfo) const
 	return skills[skilltype][skillinfo];
 }
 
-std::string Player::getSkillName(int skillid){
+std::string Player::getSkillName(int skillid)
+{
 	std::string skillname;
 	switch(skillid){
 	case 0:
@@ -980,8 +1013,8 @@ std::string Player::getSkillName(int skillid){
 	return skillname;
 }
 
-void Player::addSkillTryInternal(int skilltry,int skill){
-	
+void Player::addSkillTryInternal(int skilltry,int skill)
+{
 	skills[skill][SKILL_TRIES] += skilltry;
 	//for skill level advances
 	//int reqTries = (int) ( SkillBases[skill] * pow((float) VocMultipliers[skill][voc], (float) ( skills[skill][SKILL_LEVEL] - 10) ) );			 
@@ -1012,7 +1045,8 @@ void Player::addSkillTryInternal(int skilltry,int skill){
 }
 
 
-unsigned int Player::getReqMana(int maglevel, playervoc_t voc) {
+unsigned int Player::getReqMana(int maglevel, playervoc_t voc)
+{
   //ATTENTION: MAKE SURE THAT CHARS HAVE REASONABLE MAGIC LEVELS. ESPECIALY KNIGHTS!!!!!!!!!!!
   float ManaMultiplier[5] = { 1.0f, 1.1f, 1.1f, 1.4f, 3};
 
@@ -1038,6 +1072,7 @@ Container* Player::getContainer(unsigned char containerid)
 	return NULL;
 }
 
+/*
 bool Player::isHoldingContainer(const Container* container) const
 {
 	const Container* topContainer = container->getTopParent();
@@ -1051,6 +1086,7 @@ bool Player::isHoldingContainer(const Container* container) const
 
 	return false;
 }
+*/
 
 unsigned char Player::getContainerID(const Container* container) const
 {
@@ -1102,7 +1138,8 @@ void Player::closeContainer(unsigned char containerid)
 #endif
 }
 
-int Player::getLookCorpse(){
+int Player::getLookCorpse()
+{
 	if(sex != 0)
 		return ITEM_MALE_CORPSE;
 	else
@@ -1115,7 +1152,7 @@ void Player::dropLoot(Container *corpse)
 	{
 		Item *item = items[slot];		
 		if (item && ((dynamic_cast<Container*>(item)) || random_range(1, 100) <= 10)) {
-			corpse->addItem(item);
+			corpse->__internalAddThing(item);
 			items[slot] = NULL;
 		}
 	}
@@ -1123,6 +1160,7 @@ void Player::dropLoot(Container *corpse)
 
 fight_t Player::getFightType()
 {
+	/*
   for (int slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++)
   {
     if (items[slot])
@@ -1147,9 +1185,12 @@ fight_t Player::getFightType()
 		}
     }
   }
-  return FIGHT_MELEE;
+	*/
+
+	return FIGHT_MELEE;
 }
 
+/*
 void Player::removeDistItem(){
 	Item *DistItem = GetDistWeapon();
 	unsigned char sl_id;
@@ -1190,9 +1231,11 @@ void Player::removeDistItem(){
 	}
 	return;
 }
+*/
 
 subfight_t Player::getSubFightType()
 {
+	/*
 	fight_t type = getFightType();
 	if(type == FIGHT_DIST) {
 		Item *DistItem = GetDistWeapon();
@@ -1206,10 +1249,14 @@ subfight_t Player::getSubFightType()
 			return DistItem->getSubfightType();
 		}	
 	}
+	*/
+
 	return DIST_NONE;
 }
 
-Item * Player::GetDistWeapon() const{
+/*
+Item* Player::GetDistWeapon() const
+{
 	for (int slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++){
 	    if (items[slot]){
 			if ((items[slot]->isWeapon())) {
@@ -1245,12 +1292,15 @@ Item * Player::GetDistWeapon() const{
   	}//for
   	return NULL;
 }
+*/
 
-void Player::addStorageValue(const unsigned long key, const long value){
+void Player::addStorageValue(const unsigned long key, const long value)
+{
 	storageMap[key] = value;
 }
 
-bool Player::getStorageValue(unsigned long key, long &value) const{
+bool Player::getStorageValue(unsigned long key, long &value) const
+{
 	StorageMap::const_iterator it;
 	it = storageMap.find(key);
 	if(it != storageMap.end()){
@@ -1272,17 +1322,16 @@ void Player::setAcceptTrade(bool b)
 {
 	if(b) {
 		tradeState = TRADE_ACCEPT;
-		//acceptTrade = true;
 	}
 	else {
 		tradeItem = NULL;
 		tradePartner = 0;
 		tradeState = TRADE_NONE;
-		//acceptTrade = false;
 	}
 }
 
-Container* Player::getDepot(unsigned long depotId){	
+Container* Player::getDepot(unsigned long depotId)
+{	
 	DepotMap::iterator it = depots.find(depotId);
 	if (it != depots.end()){	
       return it->second;
@@ -1290,28 +1339,37 @@ Container* Player::getDepot(unsigned long depotId){
 	return NULL;
 }
 
-bool Player::addDepot(Container* depot,unsigned long depotId){	
+bool Player::addDepot(Container* depot,unsigned long depotId)
+{
+	/*
 	Container *bdep = getDepot(depotId);
 	if(bdep)
 		return false;
 		
-	depot->pos.x = 0xFFFF;
-	depot->depot = depotId;
+	//depot->pos.x = 0xFFFF;
+	depot->depotId = depotId;
 	
 	depots[depotId] = depot;
 	return true;
+	*/
+
+	return false;
 }
 
 void Player::sendCancel(const char *msg) const
 {
   client->sendCancel(msg);
 }
-void Player::sendChangeSpeed(Creature* creature){
-     client->sendChangeSpeed(creature);
+
+void Player::sendChangeSpeed(Creature* creature)
+{
+	client->sendChangeSpeed(creature);
 }
 
-void Player::sendToChannel(Creature *creature,SpeakClasses type, const std::string &text, unsigned short channelId){
-     client->sendToChannel(creature, type, text, channelId);
+void Player::sendToChannel(Creature *creature, SpeakClasses type,
+	const std::string &text, unsigned short channelId)
+{
+	client->sendToChannel(creature, type, text, channelId);
 }
 
 void Player::sendCancelAttacking()
@@ -1325,7 +1383,8 @@ void Player::sendCancelWalk() const
   client->sendCancelWalk();
 }
 
-void Player::sendStats(){
+void Player::sendStats()
+{
 	//update level and maglevel percents
 	if(lastSentStats.experience != this->experience || lastSentStats.level != this->level)
 		level_percent  = (unsigned char)(100*(experience-getExpForLv(level))/(1.*getExpForLv(level+1)-getExpForLv(level)));
@@ -1337,8 +1396,6 @@ void Player::sendStats(){
 	lastSentStats.health = this->health;
 	lastSentStats.healthmax = this->healthmax;
 	lastSentStats.freeCapacity = this->getFreeCapacity();
-	//lastSentStats.capacity = this->capacity;
-	//lastSentStats.cap = this->cap;
 	lastSentStats.experience = this->experience;
 	lastSentStats.level = this->level;
 	lastSentStats.mana = this->mana;
@@ -1354,15 +1411,19 @@ void Player::sendTextMessage(MessageClasses mclass, const char* message) const
 	client->sendTextMessage(mclass,message);
 }
 
-void Player::flushMsg(){
+void Player::flushMsg()
+{
 	client->flushOutputBuffer();
 }
-void Player::sendTextMessage(MessageClasses mclass, const char* message,const Position &pos, unsigned char type) const
+
+void Player::sendTextMessage(MessageClasses mclass, const char* message,
+	const Position &pos, unsigned char type) const
 {
 	client->sendTextMessage(mclass,message,pos,type);
 }
 
-void Player::sendPing(){
+void Player::sendPing()
+{
 	internal_ping++;
 	if(internal_ping >= 5){ //1 ping each 5 seconds
 		internal_ping = 0;
@@ -1381,23 +1442,28 @@ void Player::sendPing(){
 	}
 }
 
-void Player::receivePing(){
+void Player::receivePing()
+{
 	if(npings > 0)
 		npings--;
 }
 
-void Player::sendDistanceShoot(const Position &from, const Position &to, unsigned char type){
+void Player::sendDistanceShoot(const Position &from, const Position &to, unsigned char type)
+{
 	client->sendDistanceShoot(from, to,type);
 }
 
-void Player::sendMagicEffect(const Position &pos, unsigned char type){
+void Player::sendMagicEffect(const Position &pos, unsigned char type)
+{
 	client->sendMagicEffect(pos,type);
 }
-void Player::sendAnimatedText(const Position &pos, unsigned char color, std::string text){
+void Player::sendAnimatedText(const Position &pos, unsigned char color, std::string text)
+{
 	client->sendAnimatedText(pos,color,text);
 }
 
-void Player::sendCreatureHealth(const Creature *creature){
+void Player::sendCreatureHealth(const Creature *creature)
+{
 	client->sendCreatureHealth(creature);
 }
 
@@ -1411,19 +1477,23 @@ void Player::sendCloseTrade()
 	client->sendCloseTrade();
 }
 
-void Player::sendTextWindow(Item* item,const unsigned short maxlen, const bool canWrite){
+void Player::sendTextWindow(Item* item,const unsigned short maxlen, const bool canWrite)
+{
 	client->sendTextWindow(item,maxlen,canWrite);
 }
 
-void Player::sendCloseContainer(unsigned char containerid){
+void Player::sendCloseContainer(unsigned char containerid)
+{
 	client->sendCloseContainer(containerid);
 }
 
-void Player::sendContainer(unsigned char index, Container *container){
+void Player::sendContainer(unsigned char index, Container *container)
+{
 	client->sendContainer(index,container);
 }
 
-bool Player::NeedUpdateStats(){
+bool Player::NeedUpdateStats()
+{
 	if(lastSentStats.health != this->health ||
 		 lastSentStats.healthmax != this->healthmax ||
 		 //lastSentStats.cap != this->cap ||
@@ -1448,7 +1518,8 @@ void Player::onThingMove(const Creature *creature, const Thing *thing, const Pos
   client->sendThingMove(creature, thing, oldPos, oldstackpos, oldcount, count);
 }
 
- //container to container
+/* 
+//container to container
 void Player::onThingMove(const Creature *creature, const Container *fromContainer, unsigned char from_slotid,
 	const Item* fromItem, int oldFromCount, Container *toContainer, unsigned char to_slotid,
 	const Item *toItem, int oldToCount, int count)
@@ -1504,12 +1575,6 @@ void Player::onThingMove(const Creature *creature, const Position &fromPos, int 
 {
 	client->sendThingMove(creature, fromPos, stackpos, fromItem, oldFromCount, toSlot, toItem, oldToCount, count);
 }
-
-/*
-void Player::setAttackedCreature(unsigned long id)
-{
-  attackedCreature = id;
-}
 */
 
 void Player::onCreatureAppear(const Creature *creature)
@@ -1522,33 +1587,46 @@ void Player::onCreatureDisappear(const Creature *creature, unsigned char stackPo
   client->sendThingDisappear(creature, stackPos, tele);
 }
 
-void Player::onThingAppear(const Thing* thing){
+
+void Player::onThingAppear(const Thing* thing)
+{
 	client->sendThingAppear(thing);
 }
 
-void Player::onThingTransform(const Thing* thing,int stackpos){
+/*
+void Player::onThingTransform(const Thing* thing,int stackpos)
+{
 	client->sendThingTransform(thing,stackpos);
 }
 
-void Player::onThingDisappear(const Thing* thing, unsigned char stackPos){
+void Player::onThingDisappear(const Thing* thing, unsigned char stackPos)
+{
 	client->sendThingDisappear(thing, stackPos, false);
 }
+*/
+
+/*
 //auto-close containers
-void Player::onThingRemove(const Thing* thing){
+void Player::onThingRemove(const Thing* thing)
+{
 	client->sendThingRemove(thing);
 }
 
-void Player::onItemAddContainer(const Container* container,const Item* item){
+void Player::onItemAddContainer(const Container* container,const Item* item)
+{
 	client->sendItemAddContainer(container,item);
 }
 
-void Player::onItemRemoveContainer(const Container* container,const unsigned char slot){
+void Player::onItemRemoveContainer(const Container* container,const unsigned char slot)
+{
 	client->sendItemRemoveContainer(container,slot);
 }
 
-void Player::onItemUpdateContainer(const Container* container,const Item* item,const unsigned char slot){
+void Player::onItemUpdateContainer(const Container* container,const Item* item,const unsigned char slot)
+{
 	client->sendItemUpdateContainer(container,item,slot);
 }
+*/
 
 void Player::onCreatureTurn(const Creature *creature, unsigned char stackPos)
 {
@@ -1560,8 +1638,9 @@ void Player::onCreatureSay(const Creature *creature, SpeakClasses type, const st
   client->sendCreatureSay(creature, type, text);
 }
 
-void Player::onCreatureChangeOutfit(const Creature* creature) {
-		  client->sendSetOutfit(creature);
+void Player::onCreatureChangeOutfit(const Creature* creature)
+{
+	client->sendSetOutfit(creature);
 }
 
 int Player::onThink(int& newThinkTicks)
@@ -1575,11 +1654,13 @@ void Player::onTileUpdated(const Position &pos)
   client->sendTileUpdated(pos);
 }
 
-void Player::onTeleport(const Creature *creature, const Position *oldPos, unsigned char oldstackpos) { 
+void Player::onTeleport(const Creature *creature, const Position *oldPos, unsigned char oldstackpos)
+{ 
   client->sendThingMove(creature, creature,oldPos, oldstackpos, true, 1, 1); 
 }
 
-void Player::addManaSpent(unsigned long spent){
+void Player::addManaSpent(unsigned long spent)
+{
 	if(spent == 0)
 		return;
 
@@ -1597,9 +1678,11 @@ void Player::addManaSpent(unsigned long spent){
 	//End Magic Level Advance*/
 }
 
-void Player::addExp(unsigned long exp){
+void Player::addExperience(unsigned long exp)
+{
 	this->experience += exp;
 	int lastLv = this->level;
+
 	while (this->experience >= this->getExpForLv(this->level+1)) {
 		this->level++;
 		this->healthmax += this->HPGain[(int)vocation];
@@ -1608,6 +1691,7 @@ void Player::addExp(unsigned long exp){
 		this->mana += this->ManaGain[(int)vocation];
 		this->capacity += this->CapGain[(int)vocation];
 	}
+
 	if(lastLv != this->level)
 	{
 		this->setNormalSpeed();
@@ -1624,8 +1708,8 @@ unsigned long Player::getIP() const
 	return client->getIP();
 }
 
-void Player::die() {
-	
+void Player::die()
+{
 	//Magic Level downgrade
 	unsigned long sumMana = 0;
 	long lostMana = 0;
@@ -1637,11 +1721,12 @@ void Player::die() {
                 
 	lostMana = (long)(sumMana * 0.1);   //player loses 10% of all spent mana when he dies
     
-    while(lostMana > manaspent){
+	while(lostMana > manaspent){
 		lostMana -= manaspent;
 		manaspent = getReqMana(maglevel, vocation);
 		maglevel--;
 	}
+
 	manaspent -= lostMana;
 	//End Magic Level downgrade
                 
@@ -1701,11 +1786,11 @@ void Player::preSave()
 	if (health <= 0)
 	{
 		health = healthmax;
-		pos.x = masterPos.x;
-		pos.y = masterPos.y;
-		pos.z = masterPos.z;
+		//pos.x = masterPos.x;
+		//pos.y = masterPos.y;
+		//pos.z = masterPos.z;
 		
-		experience -= getLostExperience(); //(int)(experience*0.1f);        //0.1f is also used in die().. maybe we make a little function for exp-loss?
+		experience -= getLostExperience();
 				
 		while(experience < getExpForLv(level))
 		{
@@ -1780,7 +1865,6 @@ void Player::removeList()
 	{
 		(*it).second->notifyLogOut(this);
 	}	
-	
 }
 
 void Player::addList()

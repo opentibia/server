@@ -270,7 +270,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 					bool playerexist = (player != NULL);
 					if(player){
 						//reattach player?
-						if(player->client->s == 0 && player->isRemoved == false && !g_config.getGlobalNumber("allowclones", 0)){
+						if(player->client->s == 0 && !player->isRemoved() && !g_config.getGlobalNumber("allowclones", 0)){
 							player->lastlogin = std::time(NULL);
 							player->client->reinitializeProtocol();
 							player->client->s = s;
@@ -289,7 +289,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 						Protocol75* protocol;
 						protocol = new Protocol75(s);
 						player = new Player(name, protocol);
-						player->useThing();
+						player->useThing2();
 						player->setID();
 						IOPlayer::instance()->loadPlayer(player, name);	
 					

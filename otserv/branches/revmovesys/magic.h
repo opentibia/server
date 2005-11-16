@@ -226,6 +226,7 @@ class MagicEffectItem : public Item, public MagicEffectClass
 public:
 	MagicEffectItem(const TransformMap& transformMap);
 
+	/*
 	virtual void useThing() {
 		//std::cout << "Magic: useThing() " << this << std::endl;
 		useCount++;
@@ -238,6 +239,7 @@ public:
 		if (useCount <= 0)
 			delete this;
 	};
+	*/
 	
 	const MagicEffectTargetCreatureCondition* getCondition() const;
 

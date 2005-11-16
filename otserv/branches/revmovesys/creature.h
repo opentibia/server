@@ -113,6 +113,7 @@ public:
 	virtual ~Creature();
 	
 	virtual const std::string& getName() const = 0;
+	virtual int getThrowRange() const {return 1;};
 	
 	void setID(){this->id = auto_id | this->idRange();}
 	virtual unsigned long idRange() = 0;
@@ -127,8 +128,8 @@ public:
 	
 	virtual fight_t getFightType(){return FIGHT_MELEE;};
 	virtual subfight_t getSubFightType() {return DIST_NONE;}
-	virtual Item* getDistItem() {return NULL;};
-	virtual void removeDistItem(){return;}
+	//virtual Item* getDistItem() {return NULL;};
+	//virtual void removeDistItem(){return;}
 	virtual int getImmunities() const
 	{
 		if(access != 0) 
@@ -140,9 +141,9 @@ public:
 	virtual void drainHealth(int);
 	virtual void drainMana(int);
 	virtual void die(){};
-	virtual std::string getDescription(bool self = false) const;
+
+	virtual std::string getDescription(uint32_t lookDistance) const;
 	virtual void setAttackedCreature(const Creature* creature);
-	//virtual void setAttackedCreature(unsigned long id);
 	
 	virtual void setMaster(Creature* creature);
 	virtual Creature* getMaster() {return master;}
@@ -220,11 +221,10 @@ public:
 	
 	Direction direction;
 	
-	virtual bool canMovedTo(const Tile *tile) const;
+	//virtual bool canMovedTo(const Tile *tile) const;
 	
 	virtual void sendCancel(const char *msg) const { };
-	virtual void sendCancelWalk(const char *msg) const { };
-	
+	virtual void sendCancelWalk(const char *msg) const { };	
 	
 	virtual void addInflictedDamage(Creature* attacker, int damage);
 	virtual int getGainedExperience(Creature* attacker);
@@ -238,7 +238,7 @@ protected:
 	unsigned long eventCheck;
 	unsigned long eventCheckAttacking;
 	
-	Creature *master;
+	Creature* master;
 	std::list<Creature*> summons;
 	
 	Conditions conditions;
@@ -253,9 +253,13 @@ protected:
 	
 	virtual void onCreatureAppear(const Creature *creature) { };
 	virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos, bool tele = false) { };
+	/*
 	virtual void onThingDisappear(const Thing* thing, unsigned char stackPos) = 0;
 	virtual void onThingTransform(const Thing* thing,int stackpos) = 0;
+	*/
+
 	virtual void onThingAppear(const Thing* thing) = 0;
+
 	virtual void onCreatureTurn(const Creature *creature, unsigned char stackPos) { };
 	virtual void onCreatureSay(const Creature *creature, SpeakClasses type, const std::string &text) { };
 	
@@ -264,6 +268,7 @@ protected:
 	
 	virtual void onTeleport(const Creature *creature, const Position *oldPos, unsigned char oldstackpos) { };
 	
+	/*
 	//container to container
 	virtual void onThingMove(const Creature *creature, const Container *fromContainer, unsigned char from_slotid,
 		const Item* fromItem, int oldFromCount, Container *toContainer, unsigned char to_slotid,
@@ -288,14 +293,15 @@ protected:
 	//inventory to ground
 	virtual void onThingMove(const Creature *creature, slots_t fromSlot,
 		const Item* fromItem, int oldFromCount, const Position &toPos, const Item *toItem, int oldToCount, int count) {};
-	
-	//ground to container
-	virtual void onThingMove(const Creature *creature, const Position &fromPos, int stackpos, const Item* fromItem,
-		int oldFromCount, const Container *toContainer, unsigned char to_slotid, const Item *toItem, int oldToCount, int count) {};
-	
+
 	//ground to inventory
 	virtual void onThingMove(const Creature *creature, const Position &fromPos, int stackpos, const Item* fromItem,
 		int oldFromCount, slots_t toSlot, const Item *toItem, int oldToCount, int count) {};
+	*/
+
+	//ground to container
+	virtual void onThingMove(const Creature *creature, const Position &fromPos, int stackpos, const Item* fromItem,
+		int oldFromCount, const Container *toContainer, unsigned char to_slotid, const Item *toItem, int oldToCount, int count) {};
 	
 	friend class Game;
 	friend class Map;

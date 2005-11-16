@@ -50,7 +50,8 @@ private:
 	int useCount;
 	
 public:
-	static Item* CreateItem(const unsigned short _type, unsigned short _count = 0); //Factory member to create item of right type based on type
+	//Factory member to create item of right type based on type
+	static Item* CreateItem(const unsigned short _type, unsigned short _count = 0);
 	static Items items;
 
 	unsigned short getID() const;    // ID as in ItemType
@@ -70,7 +71,6 @@ public:
 	bool isBlocking() const;
 	bool isStackable() const;
 	bool isFluidContainer() const;
-	//bool isMultiType() const;
 	bool isAlwaysOnTop() const;
 	bool isGroundTile() const;
 	bool isSplash() const;
@@ -85,7 +85,9 @@ public:
 	bool floorChangeEast() const;
 	bool floorChangeWest() const;
 
-	virtual std::string getDescription(bool fullDescription) const;
+	virtual std::string getDescription(uint32_t lookDistance) const;
+	virtual int getThrowRange() const {return 6;};
+
 	std::string getName() const ;
 	void setSpecialDescription(std::string desc);
 	std::string getSpecialDescription();
@@ -132,6 +134,8 @@ public:
 	Item(const Item &i);
 
 	virtual ~Item();
+
+	/*
 	virtual void useThing() {
 		//std::cout << "Item: useThing() " << this << std::endl;
 		useCount++;
@@ -144,8 +148,9 @@ public:
 		if (useCount <= 0)
 			delete this;
 	};
+	*/
 	
-	virtual bool canMovedTo(const Tile *tile) const;
+	//virtual bool canMovedTo(const Tile *tile) const;
 };
 
 class Teleport : public Item
@@ -153,6 +158,8 @@ class Teleport : public Item
 public:
 	Teleport(const unsigned short _type);
 	virtual ~Teleport();
+
+	/*
 	virtual void useThing() {
 		//std::cout << "Teleport: useThing() " << this << std::endl;
 		useCount++;
@@ -165,6 +172,7 @@ public:
 		if (useCount <= 0)
 			delete this;
 	};
+	*/
 	
 	void setDestPos(const Position &pos) {destPos = pos;};
 	const Position& getDestPos() const {return destPos;};

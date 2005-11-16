@@ -814,17 +814,17 @@ int SpellScript::luaActionGetPos(lua_State *L){
       lua_settable(L, -3);
 	}
 	else{
-         lua_newtable(L);
+			lua_newtable(L);
       lua_pushstring(L, "x");
-      lua_pushnumber(L, c->pos.x);
+      lua_pushnumber(L, c->getPosition().x);
       lua_settable(L, -3);
       
       lua_pushstring(L, "y");
-      lua_pushnumber(L, c->pos.y);
+      lua_pushnumber(L, c->getPosition().y);
       lua_settable(L, -3);
       
       lua_pushstring(L, "z");
-      lua_pushnumber(L, c->pos.z);
+      lua_pushnumber(L, c->getPosition().z);
       lua_settable(L, -3);
 	}
 	return 1;
@@ -893,7 +893,7 @@ int SpellScript::luaActionMakeRune(lua_State *L){
 			}
 		}*/
 
-		bool isSuccess = spell->game->creatureThrowRune(player, player->pos, magicTarget);
+		bool isSuccess = spell->game->creatureThrowRune(player, player->getPosition(), magicTarget);
 
 		lua_pushnumber(L, 1);
 		return 1;
@@ -954,14 +954,16 @@ int SpellScript::luaActionMakeArrows(lua_State *L){
 			magicTarget.damageEffect = 12; //NM_ME_MAGIC_ENERGIE = 12
  		}
  		
-		bool isSuccess = spell->game->creatureThrowRune(player, player->pos, magicTarget);
+		/*
+		bool isSuccess = spell->game->creatureThrowRune(player, player->getPosition(), magicTarget);
 
 		if(isSuccess) {
 			Item* new_item = Item::CreateItem(id,count);
 			if(!player->addItem(new_item)){
-				spell->game->addThing(NULL,player->pos,new_item);
+				spell->game->addThing(NULL, player->getPosition(), new_item);
 			}
 		}
+		*/
 		
  		lua_pushnumber(L, 1);
  		return 1;
@@ -998,7 +1000,7 @@ int SpellScript::luaActionMakeFood(lua_State *L){
   			magicTarget.damageEffect = 12; //NM_ME_MAGIC_ENERGIE = 12    	
 		}
   
-		bool isSuccess = spell->game->creatureThrowRune(player, player->pos, magicTarget);
+		bool isSuccess = spell->game->creatureThrowRune(player, player->getPosition(), magicTarget);
 
 		if(isSuccess) {
 			int r,foodtype;
@@ -1012,11 +1014,13 @@ int SpellScript::luaActionMakeFood(lua_State *L){
 			if(r == 6) foodtype = ITEM_ROLL;
     	if(r == 7) foodtype = ITEM_BREAD;
   		
-  		Item* new_item = Item::CreateItem(foodtype,count);
+  		/*
+			Item* new_item = Item::CreateItem(foodtype,count);
 			if(!player->addItem(new_item)){
 				//add item on the ground
-				spell->game->addThing(NULL,player->pos,new_item);
+				spell->game->addThing(NULL, player->getPosition(), new_item);
 			}
+			*/
 		}
   
 		lua_pushnumber(L, 1);

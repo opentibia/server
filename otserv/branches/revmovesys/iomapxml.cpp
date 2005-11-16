@@ -130,13 +130,15 @@ bool IOMapXML::loadMap(Map* map, std::string identifier){
 				myitem->unserialize(p);
 				Container *container = dynamic_cast<Container*>(myitem);
 				if(container){
-					//is depot?					
+					//is depot?
+					/*
 					tmp = (char*)xmlGetProp(p, (const xmlChar *) "depot");
 					if(tmp){					
 						int depotnumber = atoi(tmp);					
-						container->depot = depotnumber;
+						container->depotId = depotnumber;
 						xmlFreeOTSERV(tmp);
 					}
+					*/
 					if(p->children && strcmp((const char*)p->children->name, "inside") == 0){
 						tmpNode = p->children->children;
 						while(tmpNode){
@@ -151,7 +153,7 @@ bool IOMapXML::loadMap(Map* map, std::string identifier){
 						
 							Item* myitem = Item::CreateItem(id);
 							myitem->unserialize(tmpNode);
-							container->addItem(myitem);
+							container->__internalAddThing(myitem);
 			
 							Container* in_container = dynamic_cast<Container*>(myitem);
 							if(in_container){
@@ -162,9 +164,9 @@ bool IOMapXML::loadMap(Map* map, std::string identifier){
 					}
 				}//loadContainer
 
-				myitem->pos.x = px;
-				myitem->pos.y = py;
-				myitem->pos.z = pz;		
+				//myitem->pos.x = px;
+				//myitem->pos.y = py;
+				//myitem->pos.z = pz;		
 			
       			if (myitem->isAlwaysOnTop())
 					t->topItems.push_back(myitem);
@@ -206,7 +208,7 @@ bool IOMapXML::LoadContainer(xmlNodePtr nodeitem,Container* ccontainer)
 			}
 			Item* myitem = Item::CreateItem(id);
 			myitem->unserialize(p);			
-			ccontainer->addItem(myitem);
+			ccontainer->__internalAddThing(myitem);
 			
 			Container* in_container = dynamic_cast<Container*>(myitem);
 			if(in_container){

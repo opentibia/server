@@ -199,6 +199,7 @@ bool Commands::exeCommand(Creature *creature, const std::string &cmd){
 
 bool Commands::placeNpc(Creature* c, const std::string &cmd, const std::string &param)
 {
+	/*
 	Npc *npc = new Npc(param, game);
 	if(!npc->isLoaded()){
 		delete npc;
@@ -207,44 +208,49 @@ bool Commands::placeNpc(Creature* c, const std::string &cmd, const std::string &
 	Position pos;
 	// Set the NPC pos
 	if(c->direction == NORTH) {
-		pos.x = c->pos.x;
-		pos.y = c->pos.y - 1;
-		pos.z = c->pos.z;
+		pos.x = c->getPosition().x;
+		pos.y = c->getPosition().y - 1;
+		pos.z = c->getPosition().z;
 	}
 	// South
 	if(c->direction == SOUTH) {
-		pos.x = c->pos.x;
-		pos.y = c->pos.y + 1;
-		pos.z = c->pos.z;
+		pos.x = c->getPosition().x;
+		pos.y = c->getPosition().y + 1;
+		pos.z = c->getPosition().z;
 	}
 	// East
 	if(c->direction == EAST) {
-		pos.x = c->pos.x + 1;
-		pos.y = c->pos.y;
-		pos.z = c->pos.z;
+		pos.x = c->getPosition().x + 1;
+		pos.y = c->getPosition().y;
+		pos.z = c->getPosition().z;
 	}
 	// West
 	if(c->direction == WEST) {
-		pos.x = c->pos.x - 1;
-		pos.y = c->pos.y;
-		pos.z = c->pos.z;
+		pos.x = c->getPosition().x - 1;
+		pos.y = c->getPosition().y;
+		pos.z = c->getPosition().z;
 	}
+
 	// Place the npc
 	if(!game->placeCreature(pos, npc))
 	{
 		delete npc;
 		Player *player = dynamic_cast<Player*>(c);
 		if(player) {
-			player->sendMagicEffect(player->pos, NM_ME_PUFF);
+			player->sendMagicEffect(player->getPosition(), NM_ME_PUFF);
 			player->sendCancel("Sorry not enough room.");
 		}
 		return true;
 	}
 	return true;
+	*/
+
+	return false;
 }
 
 bool Commands::placeMonster(Creature* c, const std::string &cmd, const std::string &param)
 {
+	/*
 	//Monster* monster = new Monster(param, game);
 	Monster* monster = Monster::createMonster(param, game);
 	//if(!monster->isLoaded()){
@@ -256,27 +262,27 @@ bool Commands::placeMonster(Creature* c, const std::string &cmd, const std::stri
 
 	// Set the Monster pos
 	if(c->direction == NORTH) {
-		pos.x = c->pos.x;
-		pos.y = c->pos.y - 1;
-		pos.z = c->pos.z;
+		pos.x = c->getPosition().x;
+		pos.y = c->getPosition().y - 1;
+		pos.z = c->getPosition().z;
 	}
 	// South
 	if(c->direction == SOUTH) {
-		pos.x = c->pos.x;
-		pos.y = c->pos.y + 1;
-		pos.z = c->pos.z;
+		pos.x = c->getPosition().x;
+		pos.y = c->getPosition().y + 1;
+		pos.z = c->getPosition().z;
 	}
 	// East
 	if(c->direction == EAST) {
-		pos.x = c->pos.x + 1;
-		pos.y = c->pos.y;
-		pos.z = c->pos.z;
+		pos.x = c->getPosition().x + 1;
+		pos.y = c->getPosition().y;
+		pos.z = c->getPosition().z;
 	}
 	// West
 	if(c->direction == WEST) {
-		pos.x = c->pos.x - 1;
-		pos.y = c->pos.y;
-		pos.z = c->pos.z;
+		pos.x = c->getPosition().x - 1;
+		pos.y = c->getPosition().y;
+		pos.z = c->getPosition().z;
 	}
 
 	// Place the monster
@@ -284,7 +290,7 @@ bool Commands::placeMonster(Creature* c, const std::string &cmd, const std::stri
 		delete monster;
 		Player *player = dynamic_cast<Player*>(c);
 		if(player) {
-			player->sendMagicEffect(player->pos, NM_ME_PUFF);
+			player->sendMagicEffect(player->getPosition(), NM_ME_PUFF);
 			player->sendCancel("Sorry not enough room.");
 		}
 		return true;
@@ -293,10 +299,14 @@ bool Commands::placeMonster(Creature* c, const std::string &cmd, const std::stri
 		//c->addSummon(monster);
 		return true;
 	}
+	*/
+
+	return false;
 }
 
 bool Commands::placeSummon(Creature* c, const std::string &cmd, const std::string &param)
 {
+	/*
 	//Monster* monster = new Monster(param, game);
 	Monster* monster = Monster::createMonster(param, game);
 	//if(!monster->isLoaded()){
@@ -308,27 +318,27 @@ bool Commands::placeSummon(Creature* c, const std::string &cmd, const std::strin
 
 	// Set the Monster pos
 	if(c->direction == NORTH) {
-		pos.x = c->pos.x;
-		pos.y = c->pos.y - 1;
-		pos.z = c->pos.z;
+		pos.x = c->getPosition().x;
+		pos.y = c->getPosition().y - 1;
+		pos.z = c->getPosition().z;
 	}
 	// South
 	if(c->direction == SOUTH) {
-		pos.x = c->pos.x;
-		pos.y = c->pos.y + 1;
-		pos.z = c->pos.z;
+		pos.x = c->getPosition().x;
+		pos.y = c->getPosition().y + 1;
+		pos.z = c->getPosition().z;
 	}
 	// East
 	if(c->direction == EAST) {
-		pos.x = c->pos.x + 1;
-		pos.y = c->pos.y;
-		pos.z = c->pos.z;
+		pos.x = c->getPosition().x + 1;
+		pos.y = c->getPosition().y;
+		pos.z = c->getPosition().z;
 	}
 	// West
 	if(c->direction == WEST) {
-		pos.x = c->pos.x - 1;
-		pos.y = c->pos.y;
-		pos.z = c->pos.z;
+		pos.x = c->getPosition().x - 1;
+		pos.y = c->getPosition().y;
+		pos.z = c->getPosition().z;
 	}
 
 	// Place the monster
@@ -336,7 +346,7 @@ bool Commands::placeSummon(Creature* c, const std::string &cmd, const std::strin
 		delete monster;
 		Player *player = dynamic_cast<Player*>(c);
 		if(player) {
-			player->sendMagicEffect(player->pos, NM_ME_PUFF);
+			player->sendMagicEffect(player->getPosition(), NM_ME_PUFF);
 			player->sendCancel("Sorry not enough room.");
 		}
 		return true;
@@ -345,6 +355,9 @@ bool Commands::placeSummon(Creature* c, const std::string &cmd, const std::strin
 		c->addSummon(monster);
 		return true;
 	}
+	*/
+
+	return false;
 }
 
 bool Commands::broadcastMessage(Creature* c, const std::string &cmd, const std::string &param){
@@ -394,7 +407,7 @@ bool Commands::teleportMasterPos(Creature* c, const std::string &cmd, const std:
 bool Commands::teleportHere(Creature* c, const std::string &cmd, const std::string &param){
 	Creature* creature = game->getCreatureByName(param);
 	if(creature) {
-		game->teleport(creature, c->pos);
+		game->teleport(creature, c->getPosition());
 	}
 	return true;
 }
@@ -415,20 +428,21 @@ bool Commands::createItems(Creature* c, const std::string &cmd, const std::strin
 	if(!newItem)
 		return true;
 	
-	Tile *t = game->map->getTile(c->pos);
+	Tile *t = game->map->getTile(c->getPosition());
 	if(!t)
 	{
 		delete newItem;
 		return true;
 	}
 
-	game->addThing(NULL,c->pos,newItem);
+	game->addThing(NULL, c->getPosition(), newItem);
 	return true;
 
 }
 
-bool Commands::substract_contMoney(Creature* c, const std::string &cmd, const std::string &param){
-	
+bool Commands::substract_contMoney(Creature* c, const std::string &cmd, const std::string &param)
+{
+	/*	
 	Player *player = dynamic_cast<Player *>(c);
 	if(!player)
 		return true;
@@ -455,6 +469,9 @@ bool Commands::substract_contMoney(Creature* c, const std::string &cmd, const st
 		player->sendCancel(info.str().c_str());
 	}
 	return true;
+	*/
+
+	return false;
 }
 
 bool Commands::reloadInfo(Creature* c, const std::string &cmd, const std::string &param)
@@ -482,7 +499,7 @@ bool Commands::testCommand(Creature* c, const std::string &cmd, const std::strin
 	int color = atoi(param.c_str());
 	Player *player = dynamic_cast<Player*>(c);
 	if(player) {
-		player->sendMagicEffect(player->pos, color);
+		player->sendMagicEffect(player->getPosition(), color);
 	}
 
 	return true;
@@ -491,7 +508,7 @@ bool Commands::testCommand(Creature* c, const std::string &cmd, const std::strin
 bool Commands::teleportTo(Creature* c, const std::string &cmd, const std::string &param){
 	Creature* creature = game->getCreatureByName(param);
 	if(creature) {
-		game->teleport(c, creature->pos);
+		game->teleport(c, creature->getPosition());
 	}
 	return true;	
 }
@@ -515,7 +532,7 @@ bool Commands::getInfo(Creature* c, const std::string &cmd, const std::string &p
 		        "level:  " << paramPlayer->getPlayerInfo(PLAYERINFO_LEVEL) << std::endl <<
 		        "maglvl: " << paramPlayer->getPlayerInfo(PLAYERINFO_MAGICLEVEL) << std::endl <<
 		        "speed:  " <<  paramPlayer->speed <<std::endl <<
-		        "position " << paramPlayer->pos << std::endl << 
+		        "position " << paramPlayer->getPosition() << std::endl << 
 				"ip: " << (unsigned int)ip[0] << "." << (unsigned int)ip[1] << 
 				   "." << (unsigned int)ip[2] << "." << (unsigned int)ip[3];
 		player->sendTextMessage(MSG_BLUE_TEXT,info.str().c_str());
@@ -602,23 +619,22 @@ bool Commands::teleportNTiles(Creature* c, const std::string &cmd, const std::st
 	int ntiles = atoi(param.c_str());
 	if(ntiles != 0)
 	{
-		Position new_pos;
-		new_pos = c->pos;
+		Position newPos = c->getPosition();
 		switch(c->direction){
 		case NORTH:
-			new_pos.y = new_pos.y - ntiles;
+			newPos.y = newPos.y - ntiles;
 			break;
 		case SOUTH:
-			new_pos.y = new_pos.y + ntiles;
+			newPos.y = newPos.y + ntiles;
 			break;
 		case EAST:
-			new_pos.x = new_pos.x + ntiles;
+			newPos.x = newPos.x + ntiles;
 			break;
 		case WEST:
-			new_pos.x = new_pos.x - ntiles;
+			newPos.x = newPos.x - ntiles;
 			break;
 		}
-		game->teleport(c, new_pos);
+		game->teleport(c, newPos);
 	}
 	return true;
 }

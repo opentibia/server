@@ -150,22 +150,23 @@ void Map::setTile(unsigned short _x, unsigned short _y, unsigned char _z, unsign
   {
 		if(tile->ground)
 			//delete tile->ground;
-			tile->ground->releaseThing();
+			tile->ground->releaseThing2();
 
 		tile->ground = Item::CreateItem(groundId);
-		tile->ground->pos.x = _x;
-		tile->ground->pos.y = _y;
-		tile->ground->pos.z = _z;
+		//tile->ground->pos.x = _x;
+		//tile->ground->pos.y = _y;
+		//tile->ground->pos.z = _z;
   }
   else
   {
-    tile = new Tile();
+    tile = new Tile(_x, _y, _z);
+
 		if(groundId != 0 && Item::items[groundId].isGroundTile()) {
 			tile->ground = Item::CreateItem(groundId);
 
-			tile->ground->pos.x = _x;
-			tile->ground->pos.y = _y;
-			tile->ground->pos.z = _z;
+			//tile->ground->pos.x = _x;
+			//tile->ground->pos.y = _y;
+			//tile->ground->pos.z = _z;
 		}
 
 		//tileMaps[_x & 0x1F][_y & 0x1F][_z][(_x << 16) | _y] = tile;
@@ -174,10 +175,12 @@ void Map::setTile(unsigned short _x, unsigned short _y, unsigned char _z, unsign
   } 
 }
 
-bool Map::placeCreature(Position &pos, Creature* c)
+bool Map::placeCreature(const Position &pos, Creature* c)
 {
 	Tile* tile = getTile(pos.x, pos.y, pos.z);
-	bool success = tile && !tile->floorChange() && !tile->getTeleportItem() && c->canMovedTo(tile);
+	Position tryPos = pos;
+
+	bool success = tile && !tile->floorChange() && !tile->getTeleportItem() /*&& c->canMovedTo(tile)*/;
 	if(!success)
 	{   
 		for(int cx =pos.x - 1; cx <= pos.x + 1 && !success; cx++) {
@@ -187,11 +190,11 @@ bool Map::placeCreature(Position &pos, Creature* c)
 #endif
 
 				tile = getTile(cx, cy, pos.z);
-				success = tile && !tile->floorChange() && !tile->getTeleportItem() && c->canMovedTo(tile);
+				success = tile && !tile->floorChange() && !tile->getTeleportItem() /*&& c->canMovedTo(tile)*/;
 
 				if(success) {
-					pos.x = cx;
-					pos.y = cy;
+					tryPos.x = cx;
+					tryPos.y = cy;
 				}
 			}
 		}
@@ -199,12 +202,12 @@ bool Map::placeCreature(Position &pos, Creature* c)
 		if(!success){
 			Player *player = dynamic_cast<Player*>(c);
 			if(player) {
-				pos.x = c->masterPos.x;
-				pos.y = c->masterPos.y;
-				pos.z = c->masterPos.z;
+				tryPos.x = c->masterPos.x;
+				tryPos.y = c->masterPos.y;
+				tryPos.z = c->masterPos.z;
 
-				tile = getTile(pos.x, pos.y, pos.z);
-				success = tile && !tile->floorChange() && !tile->getTeleportItem() && player->canMovedTo(tile);
+				tile = getTile(tryPos.x, tryPos.y, tryPos.z);
+				success = tile && !tile->floorChange() && !tile->getTeleportItem() /*&& player->canMovedTo(tile)*/;
 			}
 		}    
 
@@ -220,22 +223,15 @@ bool Map::placeCreature(Position &pos, Creature* c)
 	std::cout << "POS: " << c->pos << std::endl;
 	#endif
 	tile->addThing(c);
-	c->pos = pos;
+	//c->pos = pos;
 
 	return true;
 }
 
 bool Map::removeCreature(Creature* c)
 {
-	//OTSYS_THREAD_LOCK(mapLock)
-	bool ret = true;
-
-	Tile *tile = getTile(c->pos.x, c->pos.y, c->pos.z);
-	if(!tile || !tile->removeThing(c))
-		return false;
-
-	//OTSYS_THREAD_UNLOCK(mapLock)
-	return true;
+	Cylinder* cylinder = c->getParent(); //getTile(c->pos.x, c->pos.y, c->pos.z);
+	return cylinder->__removeThing(c);
 }
 
 void Map::getSpectators(const Range& range, SpectatorVec& list)
@@ -283,7 +279,6 @@ void Map::getSpectators(const Range& range, SpectatorVec& list)
 	}	
 }
 
-//bool Map::canThrowItemTo(Position from, Position to, bool creaturesBlock /* = true*/, bool isProjectile /*= false*/)
 ReturnValue Map::canThrowObjectTo(Position from, Position to, int objectstate /*= BLOCK_PROJECTILE*/)
 {
 	Position start = from;
