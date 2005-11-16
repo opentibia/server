@@ -904,6 +904,7 @@ int SpellScript::luaActionMakeRune(lua_State *L){
 
 //create new runes and delete blank ones
 int SpellScript::internalMakeRune(Player *p,unsigned short sl_id,Spell *S,unsigned short id, unsigned char charges){
+	/*
 	//check mana
 	if(p->mana < S->getMana() || p->exhaustedTicks >= 1000)
 		return -1;
@@ -920,10 +921,13 @@ int SpellScript::internalMakeRune(Player *p,unsigned short sl_id,Spell *S,unsign
 	else{
 		return 0;
 	}
+	*/
+
 	return 0;
 }
 
-int SpellScript::luaActionMakeArrows(lua_State *L){
+int SpellScript::luaActionMakeArrows(lua_State *L)
+{
 	unsigned char count = (unsigned char)lua_tonumber(L, -1);
 	lua_pop(L,1);
 

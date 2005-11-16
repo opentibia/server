@@ -19,9 +19,8 @@
 //////////////////////////////////////////////////////////////////////
 
 
-#ifndef __creature_h
-#define __creature_h
-
+#ifndef __CREATURE_H__
+#define __CREATURE_H__
 
 #include "thing.h"
 #include "position.h"
@@ -108,7 +107,6 @@ public:
 class Creature : public AutoID, public Thing
 {
 public:
-	//Creature(const std::string& name);
 	Creature();
 	virtual ~Creature();
 	
@@ -169,8 +167,9 @@ public:
 	virtual int getLookCorpse() {return lookcorpse;};
 	
 	//  virtual int sendInventory(){return 0;};
-	virtual int addItemInventory(Item* item, int pos){return 0;};
-	virtual Item* getItem(int pos){return NULL;}
+	//virtual int addItemInventory(Item* item, int pos){return 0;};
+	//virtual Item* getItem(int pos){return NULL;}
+
 	virtual Direction getDirection(){return direction;}
 	void addCondition(const CreatureCondition& condition, bool refresh);
 	Conditions& getConditions() {return conditions;};
@@ -223,9 +222,6 @@ public:
 	
 	//virtual bool canMovedTo(const Tile *tile) const;
 	
-	virtual void sendCancel(const char *msg) const { };
-	virtual void sendCancelWalk(const char *msg) const { };	
-	
 	virtual void addInflictedDamage(Creature* attacker, int damage);
 	virtual int getGainedExperience(Creature* attacker);
 	virtual std::vector<long> getInflicatedDamageCreatureList();
@@ -248,70 +244,36 @@ protected:
 	
 protected:
 	virtual int onThink(int& newThinkTicks){newThinkTicks = 300; return 300;};
-	virtual void onThingMove(const Creature *player, const Thing *thing, const Position *oldPos,
-		unsigned char oldstackpos, unsigned char oldcount, unsigned char count) { };
-	
-	virtual void onCreatureAppear(const Creature *creature) { };
-	virtual void onThingDisappear(const Thing* thing, unsigned char stackPos) = 0;
 
 	//virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos, bool tele = false) { };
-	/*
-	virtual void onThingTransform(const Thing* thing,int stackpos) = 0;
-	*/
+	//virtual void onThingTransform(const Thing* thing,int stackpos) = 0;
+	//virtual void onCreatureAppear(const Creature *creature) { };
 
 	virtual void onThingAppear(const Thing* thing) = 0;
+	virtual void onThingDisappear(const Thing* thing, unsigned char stackPos) = 0;
 
 	virtual void onCreatureTurn(const Creature *creature, unsigned char stackPos) { };
 	virtual void onCreatureSay(const Creature *creature, SpeakClasses type, const std::string &text) { };
 	
 	virtual void onCreatureChangeOutfit(const Creature* creature) { };
-	virtual void onTileUpdated(const Position &pos) { };
+	
+	virtual void sendCancel(const char *msg) const { };
+	virtual void sendCancelWalk(const char *msg) const { };
+
+	//virtual void onTileUpdated(const Position &pos) { };
 	
 	virtual void onTeleport(const Creature *creature, const Position *oldPos, unsigned char oldstackpos) { };
-	
-	/*
-	//container to container
-	virtual void onThingMove(const Creature *creature, const Container *fromContainer, unsigned char from_slotid,
-		const Item* fromItem, int oldFromCount, Container *toContainer, unsigned char to_slotid,
-		const Item *toItem, int oldToCount, int count) {};
-	
-	//inventory to container
-	virtual void onThingMove(const Creature *creature, slots_t fromSlot, const Item* fromItem,
-		int oldFromCount, const Container *toContainer, unsigned char to_slotid, const Item *toItem, int oldToCount, int count) {};
-	
-	//inventory to inventory
-	virtual void onThingMove(const Creature *creature, slots_t fromSlot, const Item* fromItem,
-		int oldFromCount, slots_t toSlot, const Item* toItem, int oldToCount, int count) {};
-	
-	//container to inventory
-	virtual void onThingMove(const Creature *creature, const Container *fromContainer, unsigned char from_slotid,
-		const Item* fromItem, int oldFromCount, slots_t toSlot, const Item *toItem, int oldToCount, int count) {};
-	
-	//container to ground
-	virtual void onThingMove(const Creature *creature, const Container *fromContainer, unsigned char from_slotid,
-		const Item* fromItem, int oldFromCount, const Position &toPos, const Item *toItem, int oldToCount, int count) {};
-	
-	//inventory to ground
-	virtual void onThingMove(const Creature *creature, slots_t fromSlot,
-		const Item* fromItem, int oldFromCount, const Position &toPos, const Item *toItem, int oldToCount, int count) {};
 
-	//ground to inventory
-	virtual void onThingMove(const Creature *creature, const Position &fromPos, int stackpos, const Item* fromItem,
-		int oldFromCount, slots_t toSlot, const Item *toItem, int oldToCount, int count) {};
-	*/
-
-	//ground to container
-	virtual void onThingMove(const Creature *creature, const Position &fromPos, int stackpos, const Item* fromItem,
-		int oldFromCount, const Container *toContainer, unsigned char to_slotid, const Item *toItem, int oldToCount, int count) {};
-	
+	virtual void onThingMove(const Creature *player, const Thing *thing, const Position *oldPos,
+		unsigned char oldstackpos, unsigned char oldcount, unsigned char count) { };
+		
 	friend class Game;
 	friend class Map;
 	friend class Commands;
 	friend class GameState;
 	
 	unsigned long id;
-	//std::string name;
 };
 
 
-#endif // __creature_h
+#endif

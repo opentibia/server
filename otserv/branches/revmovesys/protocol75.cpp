@@ -544,19 +544,17 @@ void Protocol75::autoCloseContainers(const Container *container, NetworkMessage 
 Cylinder* Protocol75::internalGetCylinder(unsigned short x, unsigned short y, unsigned char z)
 {
 	if(x != 0xFFFF){
-		return NULL; //game->getTile(x, y, z);
+		return game->getTile(x, y, z);
 	}
 	else{
 		//from container/inventory
 		if(y & 0x40){
-			unsigned char from_cid = y & 0x0F;
-			unsigned char slot = z;
-			
-			return NULL; //player->getContainer(from_cid);
+			uint8_t from_cid = y & 0x0F;
+			return player->getContainer(from_cid);
 		}
 		else{
-			unsigned char from_cid = static_cast<unsigned char>(y);
-			return NULL; //player->getItem(from_cid);
+			return NULL;
+			//return Player;
 		}
 	}
 }
@@ -576,8 +574,8 @@ Thing* Protocol75::internalGetThing(unsigned short x, unsigned short y, unsigned
 	else{
 		//from container/inventory
 		if(y & 0x40){
-			unsigned char from_cid = y & 0x0F;
-			unsigned char slot = z;
+			uint8_t from_cid = y & 0x0F;
+			uint8_t slot = z;
 			
 			Container* parentcontainer = player->getContainer(from_cid);
 			if(!parentcontainer)
@@ -586,8 +584,8 @@ Thing* Protocol75::internalGetThing(unsigned short x, unsigned short y, unsigned
 			return parentcontainer->getItem(slot);
 		}
 		else{
-			unsigned char from_cid = static_cast<unsigned char>(y);
-			return player->getItem(from_cid);
+			slots_t slot = (slots_t)static_cast<unsigned char>(y);
+			return player->getInventoryItem(slot);
 		}
 	}
 

@@ -43,45 +43,11 @@ public:
 	
 	virtual bool CanSee(int x, int y, int z) const = 0;
 	virtual bool CanSee(const Creature*) const = 0;
-	//virtual void sendNetworkMessage(NetworkMessage *msg) = 0;
 	
 	virtual void sleepTillMove();
 	virtual void flushOutputBuffer() = 0;
 	virtual void logout() = 0;
-	
-	/*
-	//container to container
-	virtual void sendThingMove(const Creature *creature, const Container *fromContainer, unsigned char from_slotid,
-		const Item* fromItem, int oldFromCount, Container *toContainer, unsigned char to_slotid, const Item *toItem, int oldToCount, int count) = 0;
-	
-	//inventory to container
-	virtual void sendThingMove(const Creature *creature, slots_t fromSlot, const Item* fromItem,
-		int oldFromCount, const Container *toContainer, unsigned char to_slotid, const Item *toItem, int oldToCount, int count) = 0;
-	
-	//inventory to inventory
-	virtual void sendThingMove(const Creature *creature, slots_t fromSlot, const Item* fromItem,
-		int oldFromCount, slots_t toSlot, const Item* toItem, int oldToCount, int count) = 0;
-	
-	//container to inventory
-	virtual void sendThingMove(const Creature *creature, const Container *fromContainer, unsigned char from_slotid,
-		const Item* fromItem, int oldFromCount, slots_t toSlot, const Item *toItem, int oldToCount, int count) = 0;
-	
-	//container to ground
-	virtual void sendThingMove(const Creature *creature, const Container *fromContainer, unsigned char from_slotid,
-		const Item* fromItem, int oldFromCount, const Position &toPos, const Item *toItem, int oldToCount, int count) = 0;
-	
-	//inventory to ground
-	virtual void sendThingMove(const Creature *creature, slots_t fromSlot,
-		const Item* fromItem, int oldFromCount, const Position &toPos, const Item *toItem, int oldToCount, int count) = 0;
-	
-	//ground to container
-	virtual void sendThingMove(const Creature *creature, const Position &fromPos, int stackpos, const Item* fromItem,
-		int oldFromCount, const Container *toContainer, unsigned char to_slotid, const Item *toItem, int oldToCount, int count) = 0;
-	
-	//ground to inventory
-	virtual void sendThingMove(const Creature *creature, const Position &fromPos, int stackpos, const Item* fromItem,
-		int oldFromCount, slots_t toSlot, const Item *toItem, int oldToCount, int count) = 0;
-	*/
+	virtual void reinitializeProtocol() = 0;
 
 	//ground to ground
 	virtual void sendThingMove(const Creature *creature, const Thing *thing,
@@ -116,7 +82,6 @@ public:
 	virtual void sendStats() = 0;
 	virtual void sendChangeSpeed(const Creature* creature) = 0;
 	virtual void sendCancelAttacking() = 0;
-	//virtual void sendInventory(unsigned char sl_id) = 0;
 	virtual void sendTextMessage(MessageClasses mclass, const char* message) = 0;
 	virtual void sendTextMessage(MessageClasses mclass, const char* message,const Position &pos, unsigned char type) = 0;
 	virtual void sendChannelsDialog() = 0;
@@ -126,28 +91,6 @@ public:
 	virtual void sendVIPLogIn(unsigned long guid) = 0;
 	virtual void sendVIPLogOut(unsigned long guid) = 0;
 	virtual void sendVIP(unsigned long guid, const std::string &name, bool isOnline) = 0;	
-
-	/*
-	virtual void AddTextMessage(NetworkMessage &msg,MessageClasses mclass, const char* message) = 0;
-	virtual void AddAnimatedText(NetworkMessage &msg,const Position &pos, unsigned char color, std::string text) = 0;
-	virtual void AddMagicEffect(NetworkMessage &msg,const Position &pos, unsigned char type) = 0;
-	virtual void AddDistanceShoot(NetworkMessage &msg,const Position &from, const Position &to, unsigned char type) = 0;
-	virtual void AddCreature(NetworkMessage &msg,const Creature *creature, bool known, unsigned int remove) = 0;
-	virtual void AddPlayerStats(NetworkMessage &msg) = 0;
-	virtual void AddPlayerInventoryItem(NetworkMessage& msg, slots_t slot, const Item* item) = 0;
-	virtual void AddCreatureSpeak(NetworkMessage &msg,const Creature *creature, SpeakClasses type, std::string text, unsigned short channelId) = 0;
-	virtual void AddCreatureHealth(NetworkMessage &msg,const Creature *creature) = 0;
-	virtual void AddPlayerSkills(NetworkMessage &msg) = 0;
-	virtual void AddRemoveThing(NetworkMessage &msg, const Position &pos,unsigned char stackpos) = 0;
-	virtual void AddAppearThing(NetworkMessage &msg, const Position &pos) = 0;
-	virtual void AddTileUpdated(NetworkMessage &msg, const Position &pos) = 0;
-	virtual void AddItemContainer(NetworkMessage &msg,unsigned char cid, const Item *item) = 0;
-	virtual void AddItemContainer(NetworkMessage &msg,unsigned char cid, const Item *item,unsigned char count) = 0;
-	virtual void TransformItemContainer(NetworkMessage &msg,unsigned char cid,unsigned char slot, const Item *item) = 0;
-	virtual void RemoveItemContainer(NetworkMessage &msg,unsigned char cid,unsigned char slot) = 0;
-	*/
-	
-	virtual void reinitializeProtocol() = 0;
 	
 protected:
 	

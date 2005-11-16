@@ -4683,7 +4683,7 @@ Thing* Game::getThing(const Position &pos,unsigned char stack, Player* player /*
 		}
 		else //from inventory
 		{
-			return player->getItem(pos.y);
+			return player->getInventoryItem((slots_t)pos.y);
 		}
 	}
 	else //from ground

@@ -265,9 +265,6 @@ public:
 	bool NeedUpdateStats();
 	
 	virtual std::string getDescription(uint32_t lookDistance) const;
-	
-	void onThingAppear(const Thing* thing);  
-	void onThingDisappear(const Thing* thing, unsigned char stackPos);
 
 	/*
 	//ground	
@@ -301,55 +298,23 @@ protected:
 	void addSkillTryInternal(int skilltry,int skill);
 	//virtual void onCreatureAppear(const Creature *creature);
 	//virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos, bool tele);
+	//virtual void onTileUpdated(const Position &pos);
+	
+	void onThingAppear(const Thing* thing);
+	void onThingDisappear(const Thing* thing, unsigned char stackPos);
+
 	virtual void onCreatureTurn(const Creature *creature, unsigned char stackpos);
 	virtual void onCreatureSay(const Creature *creature, SpeakClasses type, const std::string &text);
 	virtual void onCreatureChangeOutfit(const Creature* creature);
 	virtual void onTeleport(const Creature *creature, const Position *oldPos, unsigned char oldstackpos); 
 	virtual int onThink(int& newThinkTicks);
 	
-	virtual void onTileUpdated(const Position &pos);
-	
-	/*
-	//container to container
-	virtual void onThingMove(const Creature *creature, const Container *fromContainer, unsigned char from_slotid,
-		const Item* fromItem, int oldFromCount, Container *toContainer, unsigned char to_slotid,
-		const Item *toItem, int oldToCount, int count);
-	
-	//inventory to container
-	virtual void onThingMove(const Creature *creature, slots_t fromSlot, const Item* fromItem,
-		int oldFromCount, const Container *toContainer, unsigned char to_slotid, const Item *toItem, int oldToCount, int count);
-	
-	//inventory to inventory
-	virtual void onThingMove(const Creature *creature, slots_t fromSlot, const Item* fromItem,
-		int oldFromCount, slots_t toSlot, const Item* toItem, int oldToCount, int count);
-	
-	//container to inventory
-	virtual void onThingMove(const Creature *creature, const Container *fromContainer, unsigned char from_slotid,
-		const Item* fromItem, int oldFromCount, slots_t toSlot, const Item *toItem, int oldToCount, int count);
-	
-	//container to ground
-	virtual void onThingMove(const Creature *creature, const Container *fromContainer, unsigned char from_slotid,
-		const Item* fromItem, int oldFromCount, const Position &toPos, const Item *toItem, int oldToCount, int count);
-	
-	//inventory to ground
-	virtual void onThingMove(const Creature *creature, slots_t fromSlot,
-		const Item* fromItem, int oldFromCount, const Position &toPos, const Item *toItem, int oldToCount, int count);
-	
-	//ground to container
-	virtual void onThingMove(const Creature *creature, const Position &fromPos, int stackpos, const Item* fromItem,
-		int oldFromCount, const Container *toContainer, unsigned char to_slotid, const Item *toItem, int oldToCount, int count);
-	
-	//ground to inventory
-	virtual void onThingMove(const Creature *creature, const Position &fromPos, int stackpos, const Item* fromItem,
-		int oldFromCount, slots_t toSlot, const Item *toItem, int oldToCount, int count);
-	*/
-	
 	//ground to ground
 	virtual void onThingMove(const Creature *creature, const Thing *thing, const Position *oldPos,
 		unsigned char oldstackpos, unsigned char oldcount, unsigned char count);
 	
 protected:
-	Protocol *client;
+	Protocol* client;
 	int useCount;
 	unsigned long experience;
 	

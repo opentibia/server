@@ -639,8 +639,9 @@ void Player::updateInventoryWeigth()
 	inventoryWeight = 0.00;
 	if(access == 0) {
 		for(int slotid = 0; slotid < 11; ++slotid){
-			if(getItem(slotid)) {
-				inventoryWeight += getItem(slotid)->getWeight();
+			Item* item = getInventoryItem((slots_t)slotid);
+			if(item){
+				inventoryWeight += item->getWeight();
 			}
 		}
 	}
@@ -1653,10 +1654,12 @@ int Player::onThink(int& newThinkTicks)
 	return 1000;
 }
 
+/*
 void Player::onTileUpdated(const Position &pos)
 {
   client->sendTileUpdated(pos);
 }
+*/
 
 void Player::onTeleport(const Creature *creature, const Position *oldPos, unsigned char oldstackpos)
 { 
