@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////
-// OpenTibia - an opensource roleplaying game
+// OTItemEditor
 //////////////////////////////////////////////////////////////////////
 // 
 //////////////////////////////////////////////////////////////////////
@@ -53,7 +53,7 @@ bool FileLoader::openFile(const char* filename, bool write)
 			m_lastError = ERROR_CAN_NOT_CREATE;
 			return false;
 		}
-}
+	}
 	else {
 		unsigned long version;
 		m_file = fopen(filename, "rb");
@@ -120,6 +120,20 @@ const unsigned char* FileLoader::getProps(const NODE node, unsigned long &size)
 
 	size = position;
 	return m_buffer;
+}
+
+bool FileLoader::getProps(const NODE node, PropStream &props)
+{
+	unsigned long size;
+	const unsigned char* a = getProps(node, size);
+	if(!a){
+		props.init(NULL, 0);
+		return false;
+	}
+	else{
+		props.init((char*)a, size);
+		return true;
+	}
 }
 
 int FileLoader::setProps(void* data, unsigned short size)
