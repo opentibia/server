@@ -181,7 +181,7 @@ private:
 	virtual void sendCancelAttacking();
 	void sendSetOutfit(const Creature* creature);
 	virtual void sendTileUpdated(const Position &Pos);
-	virtual void sendInventory(unsigned char sl_id);
+	//virtual void sendInventory(unsigned char sl_id);
 	virtual void sendStats();
 	virtual void sendTextMessage(MessageClasses mclass, const char* message);
 	virtual void sendTextMessage(MessageClasses mclass, const char* message,const Position &pos, unsigned char type);
@@ -214,16 +214,18 @@ private:
 	void GetMapDescription(unsigned short x, unsigned short y, unsigned char z,
 		unsigned short width, unsigned short height,
 		NetworkMessage &msg);
+	
+	void AddMapDescription(NetworkMessage& msg, const Position& pos);
 	virtual void AddTextMessage(NetworkMessage &msg,MessageClasses mclass, const char* message);
 	virtual void AddAnimatedText(NetworkMessage &msg,const Position &pos, unsigned char color, std::string text);
 	virtual void AddMagicEffect(NetworkMessage &msg,const Position &pos, unsigned char type);
 	virtual void AddDistanceShoot(NetworkMessage &msg,const Position &from, const Position &to, unsigned char type);
 	virtual void AddCreature(NetworkMessage &msg,const Creature *creature, bool known, unsigned int remove);
-	virtual void AddPlayerStats(NetworkMessage &msg,const Player *player);
-	virtual void AddPlayerInventoryItem(NetworkMessage &msg,const Player *player, int item);
+	virtual void AddPlayerStats(NetworkMessage &msg);
+	virtual void AddPlayerInventoryItem(NetworkMessage& msg, slots_t slot, const Item* item);
 	virtual void AddCreatureSpeak(NetworkMessage &msg,const Creature *creature, SpeakClasses type, std::string text, unsigned short channelId);
 	virtual void AddCreatureHealth(NetworkMessage &msg,const Creature *creature);
-	virtual void AddPlayerSkills(NetworkMessage &msg,const Player *player);
+	virtual void AddPlayerSkills(NetworkMessage &msg);
 	virtual void AddRemoveThing(NetworkMessage &msg, const Position &pos,unsigned char stackpos);
 	virtual void AddAppearThing(NetworkMessage &msg, const Position &pos);
 	virtual void AddTileUpdated(NetworkMessage &msg, const Position &pos);

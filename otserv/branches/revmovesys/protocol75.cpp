@@ -1222,17 +1222,19 @@ void Protocol75::sendSetOutfit(const Creature* creature)
 	}
 }
 
+/*
 void Protocol75::sendInventory(unsigned char sl_id)
 {	
 	NetworkMessage msg;
-	AddPlayerInventoryItem(msg,player,sl_id);
+	AddPlayerInventoryItem(msg, ,sl_id);
 	WriteBuffer(msg);
 }
+*/
 
 void Protocol75::sendStats()
 {
 	NetworkMessage msg;
-	AddPlayerStats(msg,player);
+	AddPlayerStats(msg);
 	WriteBuffer(msg);
 }
 
@@ -2124,10 +2126,92 @@ void Protocol75::sendThingDisappear(const Thing *thing, unsigned char stackPos, 
 void Protocol75::sendThingAppear(const Thing* thing)
 {
 	NetworkMessage msg;
+
 	const Creature* creature = dynamic_cast<const Creature*>(thing);
 	if(creature){
-		const Player* add_player = dynamic_cast<const Player*>(creature);
-		if(add_player == player){
+		//const Player* add_player = dynamic_cast<const Player*>(creature);
+		if(creature == player){
+			msg.AddByte(0x0A);
+			msg.AddU32(player->getID());
+			
+			msg.AddByte(0x32);
+			msg.AddByte(0x00);
+			
+			msg.AddByte(0x00); //can report bugs 0,1
+				
+			//msg.AddByte(0x0B);//TODO?. GM actions
+			//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+			//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+			//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+			//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+			//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+			//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+			//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+			//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+				
+			/*
+			msg.AddByte(0x64);
+			msg.AddPosition(pos);
+			GetMapDescription(pos.x - 8, pos.y - 6, pos.z, 18, 14, msg);
+			*/
+
+			AddMapDescription(msg, player->getPosition());			
+			AddMagicEffect(msg, player->getPosition(), NM_ME_ENERGY_AREA);
+				
+			//msg.AddByte(0x8d);//8d
+			//msg.AddU32(player->getID());
+			//msg.AddByte(0x03);//00
+			//msg.AddByte(0xd7);//d7
+			
+			AddPlayerInventoryItem(msg, SLOT_HEAD, player->getInventoryItem(SLOT_HEAD));
+			AddPlayerInventoryItem(msg, SLOT_NECKLACE, player->getInventoryItem(SLOT_NECKLACE));
+			AddPlayerInventoryItem(msg, SLOT_BACKPACK, player->getInventoryItem(SLOT_BACKPACK));
+			AddPlayerInventoryItem(msg, SLOT_ARMOR, player->getInventoryItem(SLOT_ARMOR));
+			AddPlayerInventoryItem(msg, SLOT_RIGHT, player->getInventoryItem(SLOT_RIGHT));
+			AddPlayerInventoryItem(msg, SLOT_LEFT, player->getInventoryItem(SLOT_LEFT));
+			AddPlayerInventoryItem(msg, SLOT_LEGS, player->getInventoryItem(SLOT_LEGS));
+			AddPlayerInventoryItem(msg, SLOT_FEET, player->getInventoryItem(SLOT_FEET));
+			AddPlayerInventoryItem(msg, SLOT_RING, player->getInventoryItem(SLOT_RING));
+			AddPlayerInventoryItem(msg, SLOT_AMMO, player->getInventoryItem(SLOT_AMMO));
+
+			AddPlayerStats(msg);	
+
+			//gameworld light-settings
+			msg.AddByte(0x82);
+			msg.AddByte(0x6F); //level
+			msg.AddByte(0xD7);//color
+
+			//player light level
+			//msg.AddU32(player->getID());
+			//msg->AddByte(0x6F); //level
+			//msg->AddByte(0xDF); //color
+
+			AddPlayerSkills(msg);
+				
+			for(VIPListSet::iterator it = player->VIPList.begin(); it != player->VIPList.end(); it++){
+				bool online;
+				std::string vip_name;
+				
+				if(IOPlayer::instance()->getNameByGuid((*it), vip_name)){
+					online = (game->getPlayerByName(vip_name) != NULL);
+					sendVIP((*it), vip_name, online);
+				}
+			}
+
+			AddTextMessage(msg,MSG_EVENT, g_config.getGlobalString("loginmsg", "Welcome.").c_str());
+			std::string tempstring;
+			tempstring = "Your last visit was on ";
+			time_t lastlogin = player->getLastLoginSaved();
+			tempstring += ctime(&lastlogin);
+			tempstring.erase(tempstring.length() -1);
+			tempstring += ".";
+			AddTextMessage(msg,MSG_EVENT, tempstring.c_str());
+			WriteBuffer(msg);
+				
+			//force flush
+			flushOutputBuffer();
+
+			/*
 			msg.AddByte(0x0A);
 			msg.AddU32(player->getID());
 			
@@ -2136,17 +2220,15 @@ void Protocol75::sendThingAppear(const Thing* thing)
 			
 			msg.AddByte(0x00); //can report bugs 0,1
 			
-			/*
-			msg.AddByte(0x0B);//TODO?. GM actions
-			msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-			msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-			msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-			msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-			msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-			msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-			msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-			msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-			*/
+			//msg.AddByte(0x0B);//TODO?. GM actions
+			//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+			//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+			//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+			//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+			//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+			//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+			//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+			//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
 			
 			msg.AddByte(0x64);
 			msg.AddPosition(player->getPosition());
@@ -2160,12 +2242,10 @@ void Protocol75::sendThingAppear(const Thing* thing)
 			msg.AddByte(0x6F); //LIGHT LEVEL
 			msg.AddByte(0xd7);//light? (seems constant)
 			
-			/*
-			msg.AddByte(0x8d);//8d
-			msg.AddU32(player->getID());
-			msg.AddByte(0x03);//00
-			msg.AddByte(0xd7);//d7
-			*/
+			//msg.AddByte(0x8d);//8d
+			//msg.AddU32(player->getID());
+			//msg.AddByte(0x03);//00
+			//msg.AddByte(0xd7);//d7
 			
 			AddPlayerSkills(msg,player);
 			
@@ -2203,6 +2283,7 @@ void Protocol75::sendThingAppear(const Thing* thing)
 			//force flush
 			flushOutputBuffer();
 			return;
+			*/
 		}
 		else if(CanSee(creature)){
 			bool known;
@@ -2268,7 +2349,7 @@ void Protocol75::sendThingTransform(const Thing* thing,int stackpos)
 void Protocol75::sendSkills()
 {
 	NetworkMessage msg;
-	AddPlayerSkills(msg,player);
+	AddPlayerSkills(msg);
 	WriteBuffer(msg);
 }
 
@@ -2407,6 +2488,13 @@ void Protocol75::sendVIP(unsigned long guid, const std::string &name, bool isOnl
 }
 
 ////////////// Add common messages
+void Protocol75::AddMapDescription(NetworkMessage& msg, const Position& pos)
+{
+	msg.AddByte(0x64); 
+	msg.AddPosition(player->getPosition()); 
+	GetMapDescription(pos.x - 8, pos.y - 6, pos.z, 18, 14, msg);
+}
+
 void Protocol75::AddTextMessage(NetworkMessage &msg,MessageClasses mclass, const char* message)
 {
 	msg.AddByte(0xB4);
@@ -2482,7 +2570,7 @@ void Protocol75::AddCreature(NetworkMessage &msg,const Creature *creature, bool 
 }
 
 
-void Protocol75::AddPlayerStats(NetworkMessage &msg,const Player *player)
+void Protocol75::AddPlayerStats(NetworkMessage &msg)
 {
 	msg.AddByte(0xA0);
 	msg.AddU16(player->getHealth());
@@ -2498,7 +2586,7 @@ void Protocol75::AddPlayerStats(NetworkMessage &msg,const Player *player)
 	msg.AddByte(player->getPlayerInfo(PLAYERINFO_SOUL));
 }
 
-void Protocol75::AddPlayerSkills(NetworkMessage &msg,const Player *player)
+void Protocol75::AddPlayerSkills(NetworkMessage& msg)
 {
 	msg.AddByte(0xA1);
 	
@@ -2519,18 +2607,17 @@ void Protocol75::AddPlayerSkills(NetworkMessage &msg,const Player *player)
 }
 
 
-void Protocol75::AddPlayerInventoryItem(NetworkMessage &msg,const Player *player, int item)
+//void Protocol75::AddPlayerInventoryItem(NetworkMessage &msg,const Player *player, int item)
+void Protocol75::AddPlayerInventoryItem(NetworkMessage& msg, slots_t slot, const Item* item)
 {
-	if (player->getInventoryItem((slots_t)item) == NULL)
-	{
+	if(item == NULL){
 		msg.AddByte(0x79);
-		msg.AddByte(item);
+		msg.AddByte(slot);
 	}
-	else
-	{
+	else{
 		msg.AddByte(0x78);
-		msg.AddByte(item);
-		msg.AddItem(player->getInventoryItem((slots_t)item));
+		msg.AddByte(slot);
+		msg.AddItem(item);
 	}
 }
 

@@ -2491,8 +2491,9 @@ void Game::creatureSay(Creature *creature, SpeakClasses type, const std::string 
 	}
 }
 
-void Game::teleport(Thing *thing, const Position& newPos) {
-
+void Game::teleport(Thing *thing, const Position& newPos)
+{
+	/*
 	if(newPos == thing->getPosition())  
 		return; 
 	
@@ -2527,7 +2528,7 @@ void Game::teleport(Thing *thing, const Position& newPos) {
             autoCloseAttack(p, creature);
           }
 
-					(*it)->onCreatureDisappear(creature, osp, true);
+					(*it)->onThingDisappear(creature, osp, true);
 				}
 			}
 			
@@ -2586,7 +2587,7 @@ void Game::teleport(Thing *thing, const Position& newPos) {
 			}
 		}
 	}//if(toTile)
-
+	*/
 }
 
 
@@ -4306,7 +4307,6 @@ void Game::sendAddThing(Player* player,const Position &pos,const Thing* thing)
 void Game::sendRemoveThing(Player* player,const Position &pos,const Thing* thing,
 	const unsigned char stackpos /*=1*/ ,const bool autoclose/* =false*/)
 {
-	/*
 	if(!thing)
 		return;
 	
@@ -4318,6 +4318,7 @@ void Game::sendRemoveThing(Player* player,const Position &pos,const Thing* thing
 			perform_autoclose = true;		
 	}
 	
+	/*
 	if(pos.x == 0xFFFF) {
 		if(!player)
 			return;		
@@ -4367,7 +4368,7 @@ void Game::sendRemoveThing(Player* player,const Position &pos,const Thing* thing
 			}
 		}
 	}
-	else //ground
+	else*/ //ground
 	{		
 		SpectatorVec list;
 		SpectatorVec::iterator it;
@@ -4380,9 +4381,9 @@ void Game::sendRemoveThing(Player* player,const Position &pos,const Thing* thing
 			if(spectator) {
 				spectator->onThingDisappear(thing,stackpos);
 
-				if(perform_autoclose){
+				/*if(perform_autoclose){
 					spectator->onThingRemove(thing);
-				}
+				}*/
 			}
 		}
 
@@ -4393,7 +4394,6 @@ void Game::sendRemoveThing(Player* player,const Position &pos,const Thing* thing
 			}
 		}
 	}
-	*/
 }
 
 void Game::sendUpdateThing(Player* player,const Position &pos,const Thing* thing,
@@ -4572,11 +4572,12 @@ void Game::addThing(Player* player,const Position &pos,Thing* thing)
 
 bool Game::removeThing(Player* player,const Position &pos,Thing* thing,  bool setRemoved /*= true*/)
 {
-	/*
 	if(!thing)
 		return false;
+
 	Item *item = dynamic_cast<Item*>(thing);
 	
+	/*
 	if(pos.x == 0xFFFF) {
 		if(!player || !item)
 			return false;
@@ -4609,7 +4610,7 @@ bool Game::removeThing(Player* player,const Position &pos,Thing* thing,  bool se
 			item->setParent(NULL);
 		return true;
 	}
-	else //ground
+	else*/ //ground
 	{		
 		//Tile *tile = map->getTile(pos.x, pos.y, pos.z);
 		Tile *tile = map->getTile(pos);
@@ -4628,7 +4629,6 @@ bool Game::removeThing(Player* player,const Position &pos,Thing* thing,  bool se
 		}
 		return true;
 	}
-	*/
 
 	return false;
 }

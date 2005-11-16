@@ -238,7 +238,7 @@ public:
 	void sendToChannel(Creature *creature, SpeakClasses type, const std::string &text, unsigned short channelId);
 	virtual void sendCancel(const char *msg) const;
 	virtual void sendCancelWalk() const;
-	int sendInventory(unsigned char sl_id);
+	//int sendInventory(unsigned char sl_id);
 	void sendStats();
 	void sendTextMessage(MessageClasses mclass, const char* message) const;
 	void sendTextMessage(MessageClasses mclass, const char* message,const Position &pos, unsigned char type) const;
@@ -267,11 +267,11 @@ public:
 	virtual std::string getDescription(uint32_t lookDistance) const;
 	
 	void onThingAppear(const Thing* thing);  
+	void onThingDisappear(const Thing* thing, unsigned char stackPos);
 
 	/*
 	//ground	
 	void onThingTransform(const Thing* thing,int stackpos);
-	void onThingDisappear(const Thing* thing, unsigned char stackPos);
 	void onThingRemove(const Thing* thing); //auto-close containers
 	
 	//container
@@ -299,8 +299,8 @@ public:
 protected:
 	void sendCancelAttacking();
 	void addSkillTryInternal(int skilltry,int skill);
-	virtual void onCreatureAppear(const Creature *creature);
-	virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos, bool tele);
+	//virtual void onCreatureAppear(const Creature *creature);
+	//virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos, bool tele);
 	virtual void onCreatureTurn(const Creature *creature, unsigned char stackpos);
 	virtual void onCreatureSay(const Creature *creature, SpeakClasses type, const std::string &text);
 	virtual void onCreatureChangeOutfit(const Creature* creature);

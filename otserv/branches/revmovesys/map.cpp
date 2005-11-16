@@ -230,8 +230,9 @@ bool Map::placeCreature(const Position &pos, Creature* c)
 
 bool Map::removeCreature(Creature* c)
 {
-	Cylinder* cylinder = c->getParent(); //getTile(c->pos.x, c->pos.y, c->pos.z);
-	return cylinder->__removeThing(c);
+	//Cylinder* cylinder = c->getParent();
+	Tile* tile = dynamic_cast<Tile*>(c->getParent());
+	return tile->removeThing(c);
 }
 
 void Map::getSpectators(const Range& range, SpectatorVec& list)

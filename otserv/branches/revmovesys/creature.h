@@ -252,9 +252,10 @@ protected:
 		unsigned char oldstackpos, unsigned char oldcount, unsigned char count) { };
 	
 	virtual void onCreatureAppear(const Creature *creature) { };
-	virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos, bool tele = false) { };
-	/*
 	virtual void onThingDisappear(const Thing* thing, unsigned char stackPos) = 0;
+
+	//virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos, bool tele = false) { };
+	/*
 	virtual void onThingTransform(const Thing* thing,int stackpos) = 0;
 	*/
 

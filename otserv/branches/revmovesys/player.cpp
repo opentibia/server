@@ -646,11 +646,13 @@ void Player::updateInventoryWeigth()
 	}
 }
 
+/*
 int Player::sendInventory(unsigned char sl_id)
 {
 	client->sendInventory(sl_id);
 	return true;
 }
+*/
 
 /*
 int Player::addItemInventory(Item* item, uint32_t index, bool internal //false)
@@ -1577,15 +1579,17 @@ void Player::onThingMove(const Creature *creature, const Position &fromPos, int 
 }
 */
 
+/*
 void Player::onCreatureAppear(const Creature *creature)
 {	
  	client->sendThingAppear(creature);
 }
 
-void Player::onCreatureDisappear(const Creature *creature, unsigned char stackPos, bool tele /*= false*/)
+void Player::onCreatureDisappear(const Creature *creature, unsigned char stackPos, bool tele //= false)
 {	
   client->sendThingDisappear(creature, stackPos, tele);
 }
+*/
 
 
 void Player::onThingAppear(const Thing* thing)
@@ -1593,15 +1597,15 @@ void Player::onThingAppear(const Thing* thing)
 	client->sendThingAppear(thing);
 }
 
+void Player::onThingDisappear(const Thing* thing, unsigned char stackPos)
+{
+	client->sendThingDisappear(thing, stackPos, false);
+}
+
 /*
 void Player::onThingTransform(const Thing* thing,int stackpos)
 {
 	client->sendThingTransform(thing,stackpos);
-}
-
-void Player::onThingDisappear(const Thing* thing, unsigned char stackPos)
-{
-	client->sendThingDisappear(thing, stackPos, false);
 }
 */
 
