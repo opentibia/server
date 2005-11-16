@@ -31,6 +31,10 @@
 
 extern Spells spells;
 
+long Items::dwMajorVersion = 0;
+long Items::dwMinorVersion = 0;
+long Items::dwBuildNumber = 0;
+
 ItemType::ItemType()
 {
 	group           = ITEM_GROUP_NONE;
@@ -158,10 +162,38 @@ int Items::loadFromOtb(std::string file)
 	unsigned long type,len;
 	const unsigned char* data;
 	NODE node = f.getChildNode(NO_NODE, type);
-	data = f.getProps(node, len);
-	//4 byte flags
-	//attributes (optional)
-	//0x01 = version data
+	
+	PropStream props;
+	if(f.getProps(node,props)){
+		//4 byte flags
+		//attributes
+		//0x01 = version data
+		unsigned long flags;
+		if(!props.GET_ULONG(flags)){
+			return ERROR_INVALID_FORMAT;
+		}
+		attribute_t attr;
+		datasize_t datalen = 0;
+		if(!props.GET_VALUE(attr)){
+			return ERROR_INVALID_FORMAT;
+		}
+		if(attr == ROOT_ATTR_VERSION){
+			if(!props.GET_VALUE(datalen)){
+				return ERROR_INVALID_FORMAT;
+			}
+			if(datalen != sizeof(VERSIONINFO)){
+				return ERROR_INVALID_FORMAT;
+			}
+			VERSIONINFO *vi;
+			if(!props.GET_STRUCT(vi)){
+				return ERROR_INVALID_FORMAT;
+			}
+			Items::dwMajorVersion = vi->dwMajorVersion;
+			Items::dwMinorVersion = vi->dwMinorVersion;
+			Items::dwBuildNumber = vi->dwBuildNumber;
+		}
+	}
+	
 	node = f.getChildNode(node, type);
 
 	while(node != NO_NODE) {
