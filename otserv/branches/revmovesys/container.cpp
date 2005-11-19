@@ -198,6 +198,10 @@ void Container::__internalAddThing(Thing* thing)
 	//
 }
 
+void Container::__internalAddThing(uint32_t index, Thing* thing)
+{
+	//
+}
 
 /*
 bool Container::addItem(Item *newitem) {

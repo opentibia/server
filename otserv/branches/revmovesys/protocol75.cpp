@@ -98,15 +98,17 @@ void Protocol75::ReceiveLoop()
 		// logout by disconnect?  -> kick
 		if(pendingLogout == false){
 			game->playerSetAttackedCreature(player, 0);
-			//player->setAttackedCreature(0);
 			while(player->inFightTicks >= 1000 && !player->isRemoved() && s == 0){
 				OTSYS_SLEEP(250);
 			}
+
 			OTSYS_THREAD_LOCK(game->gameLock, "Protocol75::ReceiveLoop()")
-				if(s == 0 && !player->isRemoved()){
-					game->removeCreature(player);
-				}
-				OTSYS_THREAD_UNLOCK(game->gameLock, "Protocol75::ReceiveLoop()")
+
+			if(s == 0 && !player->isRemoved()){
+				game->removeCreature(player);
+			}
+			
+			OTSYS_THREAD_UNLOCK(game->gameLock, "Protocol75::ReceiveLoop()")
 		}
 	}while(s != 0 && !player->isRemoved());
 }
@@ -916,15 +918,15 @@ void Protocol75::parseCloseContainer(NetworkMessage& msg)
 
 void Protocol75::parseUpArrowContainer(NetworkMessage& msg)
 {
-	unsigned char containerid = msg.GetByte();
+	uint32_t cid = msg.GetByte();
 	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol75::parseUpArrowContainer()");
-	Container* container = player->getContainer(containerid);
+	Container* container = player->getContainer(cid);
 	if(!container)
 		return;
 	
 	Container* parentcontainer = dynamic_cast<Container*>(container->getParent());
 	if(parentcontainer) {
-		sendContainer(containerid, parentcontainer);
+		sendContainer(cid, parentcontainer);
 	}
 }
 
@@ -939,18 +941,28 @@ void Protocol75::parseThrow(NetworkMessage& msg)
 	unsigned short to_y       = msg.GetU16(); 
 	unsigned char  to_z       = msg.GetByte();
 	unsigned char count       = msg.GetByte();
-	/*
+	
 	std::cout << "parseThrow: " << "from_x: " << (int)from_x << ", from_y: " << (int)from_y
 	<<  ", from_z: " << (int)from_z << ", item: " << (int)itemid << ", from_stack: " 
 	<< (int)from_stack << " to_x: " << (int)to_x << ", to_y: " << (int)to_y
 	<<  ", to_z: " << (int)to_z  
-	<< ", count: " << (int)count << std::endl;*/
-	bool toInventory = false;
-	bool fromInventory = false;
+	<< ", count: " << (int)count << std::endl;
 	
 	if(from_x == to_x && from_y == to_y && from_z == to_z)
 		return;
+
+	//for testing...
+	if(from_x == 0xFFFF && to_x == 0xFFFF){
+		Cylinder* fromCylinder = internalGetCylinder(from_x, from_y, from_z);
+		Cylinder* toCylinder = internalGetCylinder(to_x, to_y, to_z);
+
+		game->thingMove(player, fromCylinder, toCylinder, NULL, count);
+		return;
+	}
 	
+	bool toInventory = false;
+	bool fromInventory = false;
+
 	//container/inventory to container/inventory
 	if(from_x == 0xFFFF && to_x == 0xFFFF) {
 		/*
@@ -1220,15 +1232,6 @@ void Protocol75::sendSetOutfit(const Creature* creature)
 	}
 }
 
-/*
-void Protocol75::sendInventory(unsigned char sl_id)
-{	
-	NetworkMessage msg;
-	AddPlayerInventoryItem(msg, ,sl_id);
-	WriteBuffer(msg);
-}
-*/
-
 void Protocol75::sendStats()
 {
 	NetworkMessage msg;
@@ -1294,19 +1297,18 @@ void Protocol75::sendIcons(int icons)
 	WriteBuffer(newmsg);
 }
 
-void Protocol75::sendContainer(unsigned char index, Container* container)
+void Protocol75::sendContainer(uint32_t cid, Container* container)
 {
 	if(!container)
 		return;
 	
 	NetworkMessage msg;
 	
-	player->addContainer(index, container);
+	player->addContainer(cid, container);
 	
 	msg.AddByte(0x6E);
-	msg.AddByte(index);
+	msg.AddByte(cid);
 	
-	//msg.AddU16(container->getID());
 	msg.AddItemId(container);
 	msg.AddString(container->getName());
 	msg.AddByte(container->capacity());
@@ -1384,12 +1386,12 @@ void Protocol75::sendCloseTrade()
 	WriteBuffer(msg);
 }
 
-void Protocol75::sendCloseContainer(unsigned char containerid)
+void Protocol75::sendCloseContainer(uint32_t cid)
 {
 	NetworkMessage msg;
 	
 	msg.AddByte(0x6F);
-	msg.AddByte(containerid);
+	msg.AddByte(cid);
 	WriteBuffer(msg);
 }
 
@@ -2146,31 +2148,20 @@ void Protocol75::sendThingAppear(const Thing* thing)
 			//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
 			//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
 			//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-				
-			/*
-			msg.AddByte(0x64);
-			msg.AddPosition(pos);
-			GetMapDescription(pos.x - 8, pos.y - 6, pos.z, 18, 14, msg);
-			*/
 
 			AddMapDescription(msg, player->getPosition());			
 			AddMagicEffect(msg, player->getPosition(), NM_ME_ENERGY_AREA);
-				
-			//msg.AddByte(0x8d);//8d
-			//msg.AddU32(player->getID());
-			//msg.AddByte(0x03);//00
-			//msg.AddByte(0xd7);//d7
 			
-			AddPlayerInventoryItem(msg, SLOT_HEAD, player->getInventoryItem(SLOT_HEAD));
-			AddPlayerInventoryItem(msg, SLOT_NECKLACE, player->getInventoryItem(SLOT_NECKLACE));
-			AddPlayerInventoryItem(msg, SLOT_BACKPACK, player->getInventoryItem(SLOT_BACKPACK));
-			AddPlayerInventoryItem(msg, SLOT_ARMOR, player->getInventoryItem(SLOT_ARMOR));
-			AddPlayerInventoryItem(msg, SLOT_RIGHT, player->getInventoryItem(SLOT_RIGHT));
-			AddPlayerInventoryItem(msg, SLOT_LEFT, player->getInventoryItem(SLOT_LEFT));
-			AddPlayerInventoryItem(msg, SLOT_LEGS, player->getInventoryItem(SLOT_LEGS));
-			AddPlayerInventoryItem(msg, SLOT_FEET, player->getInventoryItem(SLOT_FEET));
-			AddPlayerInventoryItem(msg, SLOT_RING, player->getInventoryItem(SLOT_RING));
-			AddPlayerInventoryItem(msg, SLOT_AMMO, player->getInventoryItem(SLOT_AMMO));
+			AddInventoryItem(msg, SLOT_HEAD, player->getInventoryItem(SLOT_HEAD));
+			AddInventoryItem(msg, SLOT_NECKLACE, player->getInventoryItem(SLOT_NECKLACE));
+			AddInventoryItem(msg, SLOT_BACKPACK, player->getInventoryItem(SLOT_BACKPACK));
+			AddInventoryItem(msg, SLOT_ARMOR, player->getInventoryItem(SLOT_ARMOR));
+			AddInventoryItem(msg, SLOT_RIGHT, player->getInventoryItem(SLOT_RIGHT));
+			AddInventoryItem(msg, SLOT_LEFT, player->getInventoryItem(SLOT_LEFT));
+			AddInventoryItem(msg, SLOT_LEGS, player->getInventoryItem(SLOT_LEGS));
+			AddInventoryItem(msg, SLOT_FEET, player->getInventoryItem(SLOT_FEET));
+			AddInventoryItem(msg, SLOT_RING, player->getInventoryItem(SLOT_RING));
+			AddInventoryItem(msg, SLOT_AMMO, player->getInventoryItem(SLOT_AMMO));
 
 			AddPlayerStats(msg);	
 
@@ -2180,6 +2171,7 @@ void Protocol75::sendThingAppear(const Thing* thing)
 			msg.AddByte(0xD7);//color
 
 			//player light level
+			//msg.AddByte(0x8d);//8d
 			//msg.AddU32(player->getID());
 			//msg->AddByte(0x6F); //level
 			//msg->AddByte(0xDF); //color
@@ -2208,80 +2200,6 @@ void Protocol75::sendThingAppear(const Thing* thing)
 				
 			//force flush
 			flushOutputBuffer();
-
-			/*
-			msg.AddByte(0x0A);
-			msg.AddU32(player->getID());
-			
-			msg.AddByte(0x32);
-			msg.AddByte(0x00);
-			
-			msg.AddByte(0x00); //can report bugs 0,1
-			
-			//msg.AddByte(0x0B);//TODO?. GM actions
-			//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-			//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-			//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-			//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-			//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-			//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-			//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-			//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-			
-			msg.AddByte(0x64);
-			msg.AddPosition(player->getPosition());
-			GetMapDescription(player->getPosition().x-8, player->getPosition().y-6, player->getPosition().z, 18, 14, msg);
-			
-			AddMagicEffect(msg,player->getPosition(), NM_ME_ENERGY_AREA);
-			
-			AddPlayerStats(msg,player);	
-			
-			msg.AddByte(0x82);
-			msg.AddByte(0x6F); //LIGHT LEVEL
-			msg.AddByte(0xd7);//light? (seems constant)
-			
-			//msg.AddByte(0x8d);//8d
-			//msg.AddU32(player->getID());
-			//msg.AddByte(0x03);//00
-			//msg.AddByte(0xd7);//d7
-			
-			AddPlayerSkills(msg,player);
-			
-			AddPlayerInventoryItem(msg,player, 1);
-			AddPlayerInventoryItem(msg,player, 2);
-			AddPlayerInventoryItem(msg,player, 3);
-			AddPlayerInventoryItem(msg,player, 4);
-			AddPlayerInventoryItem(msg,player, 5);
-			AddPlayerInventoryItem(msg,player, 6);
-			AddPlayerInventoryItem(msg,player, 7);
-			AddPlayerInventoryItem(msg,player, 8);
-			AddPlayerInventoryItem(msg,player, 9);
-			AddPlayerInventoryItem(msg,player, 10);
-			
-			AddTextMessage(msg,MSG_EVENT, g_config.getGlobalString("loginmsg", "Welcome.").c_str());
-			std::string tempstring;
-			tempstring = "Your last visit was on ";
-			time_t lastlogin = player->getLastLoginSaved();
-			tempstring += ctime(&lastlogin);
-			tempstring.erase(tempstring.length() -1);
-			tempstring += ".";
-			AddTextMessage(msg,MSG_EVENT, tempstring.c_str());
-			WriteBuffer(msg);
-			
-			for(VIPListSet::iterator it = player->VIPList.begin(); it != player->VIPList.end(); it++){
-				bool online;
-				std::string vip_name;
-				
-				if(IOPlayer::instance()->getNameByGuid((*it), vip_name)){
-					online = (game->getPlayerByName(vip_name) != NULL);
-					sendVIP((*it), vip_name, online);
-				}
-			}
-			
-			//force flush
-			flushOutputBuffer();
-			return;
-			*/
 		}
 		else if(CanSee(creature)){
 			bool known;
@@ -2386,14 +2304,14 @@ void Protocol75::sendDistanceShoot(const Position &from, const Position &to, uns
 void Protocol75::sendMagicEffect(const Position &pos, unsigned char type)
 {
 	NetworkMessage msg;
-	AddMagicEffect(msg,pos,type );
+	AddMagicEffect(msg, pos, type);
 	WriteBuffer(msg);
 }
 
 void Protocol75::sendAnimatedText(const Position &pos, unsigned char color, std::string text)
 {
 	NetworkMessage msg;
-	AddAnimatedText(msg,pos,color,text);
+	AddAnimatedText(msg, pos, color, text);
 	WriteBuffer(msg);
 }
 
@@ -2404,34 +2322,60 @@ void Protocol75::sendCreatureHealth(const Creature *creature)
 	WriteBuffer(msg);
 }
 
-void Protocol75::sendItemAddContainer(const Container *container, const Item *item)
+//containers
+void Protocol75::sendAddContainerItem(const Container* container, const Item* item)
 {
-	NetworkMessage msg;
-	unsigned char cid = player->getContainerID(container);
-	if(cid != 0xFF){
-		AddItemContainer(msg,cid,item);
+	//void sendItemAddContainer(const Container *container, const Item *item)
+	uint32_t cid = player->getContainerID(container);
+	if(cid != -1){
+		NetworkMessage msg;
+		AddContainerItem(msg, cid, item);
 		WriteBuffer(msg);
 	}
 }
 
-void Protocol75::sendItemRemoveContainer(const Container *container, const unsigned char slot)
+void Protocol75::sendUpdateContainerItem(const Container *container, uint8_t slot, const Item* item)
 {
-	NetworkMessage msg;
-	unsigned char cid = player->getContainerID(container);
-	if(cid != 0xFF){
-		RemoveItemContainer(msg,cid,slot);
+	//void UpdateContainerItem(NetworkMessage& msg, uint8_t cid, uint8_t slot, const Item* item)
+	uint32_t cid = player->getContainerID(container);
+	if(cid != -1){
+		NetworkMessage msg;
+		UpdateContainerItem(msg, cid, slot, item);
 		WriteBuffer(msg);
 	}
 }
 
-void Protocol75::sendItemUpdateContainer(const Container *container, const Item* item,const unsigned char slot)
+void Protocol75::sendRemoveContainerItem(const Container* container, uint8_t slot)
 {
-	NetworkMessage msg;
-	unsigned char cid = player->getContainerID(container);
-	if(cid != 0xFF){
-		TransformItemContainer(msg,cid,slot,item);
+	//void RemoveContainerItem(NetworkMessage& msg, uint8_t cid, uint8_t slot)
+	uint32_t cid = player->getContainerID(container);
+	if(cid != -1){
+		NetworkMessage msg;
+		RemoveContainerItem(msg, cid, slot);
 		WriteBuffer(msg);
 	}
+}
+
+//inventory
+void Protocol75::sendAddInventoryItem(slots_t slot, const Item* item)
+{
+	NetworkMessage msg;
+	AddInventoryItem(msg, slot, item);
+	WriteBuffer(msg);
+}
+
+void Protocol75::sendUpdateInventoryItem(slots_t slot, const Item* item)
+{
+	NetworkMessage msg;
+	UpdateInventoryItem(msg, slot, item);
+	WriteBuffer(msg);
+}
+
+void Protocol75::sendRemoveInventoryItem(slots_t slot)
+{
+	NetworkMessage msg;
+	RemoveInventoryItem(msg, slot);
+	WriteBuffer(msg);
 }
 
 void Protocol75::sendTextWindow(Item* item,const unsigned short maxlen, const bool canWrite)
@@ -2514,12 +2458,11 @@ void Protocol75::AddAnimatedText(NetworkMessage &msg,const Position &pos, unsign
 	msg.AddString(text);
 }
 
-
 void Protocol75::AddMagicEffect(NetworkMessage &msg,const Position &pos, unsigned char type)
 {
 	msg.AddByte(0x83);
 	msg.AddPosition(pos);
-	msg.AddByte(type);
+	msg.AddByte(type + 1);
 }
 
 
@@ -2528,7 +2471,7 @@ void Protocol75::AddDistanceShoot(NetworkMessage &msg,const Position &from, cons
 	msg.AddByte(0x85); 
 	msg.AddPosition(from);
 	msg.AddPosition(to);
-	msg.AddByte(type);
+	msg.AddByte(type + 1);
 }
 
 void Protocol75::AddCreature(NetworkMessage &msg,const Creature *creature, bool known, unsigned int remove)
@@ -2604,22 +2547,6 @@ void Protocol75::AddPlayerSkills(NetworkMessage& msg)
 	msg.AddByte(player->getSkill(SKILL_FISH,   SKILL_PERCENT));
 }
 
-
-//void Protocol75::AddPlayerInventoryItem(NetworkMessage &msg,const Player *player, int item)
-void Protocol75::AddPlayerInventoryItem(NetworkMessage& msg, slots_t slot, const Item* item)
-{
-	if(item == NULL){
-		msg.AddByte(0x79);
-		msg.AddByte(slot);
-	}
-	else{
-		msg.AddByte(0x78);
-		msg.AddByte(slot);
-		msg.AddItem(item);
-	}
-}
-
-
 void Protocol75::AddCreatureSpeak(NetworkMessage &msg,const Creature *creature, SpeakClasses  type, std::string text, unsigned short channelId)
 {
 	msg.AddByte(0xAA);
@@ -2649,7 +2576,7 @@ void Protocol75::AddCreatureHealth(NetworkMessage &msg,const Creature *creature)
 	msg.AddByte(std::max(creature->health,0)*100/creature->healthmax);
 }
 
-void Protocol75::AddRemoveThing(NetworkMessage &msg, const Position &pos,unsigned char stackpos)
+void Protocol75::AddRemoveThing(NetworkMessage& msg, const Position& pos, int stackpos)
 {
 	if(stackpos < 10) {
 		if(CanSee(pos.x, pos.y, pos.z)) {
@@ -2685,18 +2612,60 @@ void Protocol75::AddAppearThing(NetworkMessage &msg, const Position &pos)
 	}
 }
 
-void Protocol75::AddItemContainer(NetworkMessage &msg,unsigned char cid, const Item *item)
+//inventory
+void Protocol75::AddInventoryItem(NetworkMessage& msg, slots_t slot, const Item* item)
+{
+	if(item == NULL){
+		msg.AddByte(0x79);
+		msg.AddByte(slot);
+	}
+	else{
+		msg.AddByte(0x78);
+		msg.AddByte(slot);
+		msg.AddItem(item);
+	}
+}
+
+void Protocol75::UpdateInventoryItem(NetworkMessage& msg, slots_t slot, const Item* item)
+{
+	if(item == NULL){
+		msg.AddByte(0x79);
+		msg.AddByte(slot);
+	}
+	else{
+		msg.AddByte(0x78);
+		msg.AddByte(slot);
+		msg.AddItem(item);
+	}
+}
+
+void Protocol75::RemoveInventoryItem(NetworkMessage& msg, slots_t slot)
+{
+	msg.AddByte(0x79);
+	msg.AddByte(slot);
+}
+
+//containers
+void Protocol75::AddContainerItem(NetworkMessage& msg, uint8_t cid, const Item *item)
 {
 	msg.AddByte(0x70);
 	msg.AddByte(cid);
 	msg.AddItem(item);
 }
 
-void Protocol75::AddItemContainer(NetworkMessage &msg,unsigned char cid, const Item *item,unsigned char count)
+void Protocol75::UpdateContainerItem(NetworkMessage& msg, uint8_t cid, uint8_t slot, const Item* item)
 {
-	msg.AddByte(0x70);
+	msg.AddByte(0x71);
 	msg.AddByte(cid);
-	msg.AddItem(item->getID(), count);
+	msg.AddByte(slot);
+	msg.AddItem(item);
+}
+
+void Protocol75::RemoveContainerItem(NetworkMessage& msg, uint8_t cid, uint8_t slot)
+{
+	msg.AddByte(0x72);
+	msg.AddByte(cid);
+	msg.AddByte(slot);
 }
 
 void Protocol75::AddTileUpdated(NetworkMessage &msg, const Position &pos)
@@ -2723,21 +2692,6 @@ void Protocol75::AddTileUpdated(NetworkMessage &msg, const Position &pos)
 	}
 }
 
-
-void Protocol75::TransformItemContainer(NetworkMessage &msg,unsigned char cid,unsigned char slot,const  Item *item)
-{
-	msg.AddByte(0x71);
-	msg.AddByte(cid);
-	msg.AddByte(slot);
-	msg.AddItem(item);
-}
-
-void Protocol75::RemoveItemContainer(NetworkMessage &msg,unsigned char cid,unsigned char slot)
-{
-	msg.AddByte(0x72);
-	msg.AddByte(cid);
-	msg.AddByte(slot);
-}
 
 //////////////////////////
 

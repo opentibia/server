@@ -109,6 +109,8 @@ public:
 
 	virtual uint32_t __getIndexOfThing(const Thing* thing) const;
 	virtual void __internalAddThing(Thing* thing);
+	virtual void __internalAddThing(uint32_t index, Thing* thing);
+
 	virtual int getThrowRange() const {return 0;};
 
 	const Position& getTilePosition() const {return tilePos;};

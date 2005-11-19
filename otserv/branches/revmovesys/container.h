@@ -40,7 +40,6 @@ public:
 	ItemList::const_iterator getItems() const;
 	ItemList::const_iterator getEnd() const;
 
-	//Item* getItemBySlot(uint32_t slot);
 	Item* getItem(uint32_t index);
 	bool isHoldingItem(const Item* item) const;
 
@@ -61,6 +60,7 @@ public:
 
 	virtual uint32_t __getIndexOfThing(const Thing* thing) const;
 	virtual void __internalAddThing(Thing* thing);
+	virtual void __internalAddThing(uint32_t index, Thing* thing);
 
 	virtual int getThrowRange() const {return 10;};
 

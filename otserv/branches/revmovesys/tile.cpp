@@ -610,3 +610,8 @@ void Tile::__internalAddThing(Thing* thing)
 {
 	//
 }
+
+void Tile::__internalAddThing(uint32_t index, Thing* thing)
+{
+	//
+}

@@ -112,12 +112,11 @@ public:
 	void addList();
 	void kickPlayer();
 	
-	//bool addItem(Item* item, bool test = false);
-	//bool internalAddItemContainer(Container *container,Item* item);
-	
 	freeslot_t getFreeSlot(Container **container,unsigned char &slot, const Item* item);
 	Container* getFreeContainerSlot(Container *parent);
 	
+	//bool addItem(Item* item, bool test = false);
+	//bool internalAddItemContainer(Container *container,Item* item);
 	//bool removeItem(unsigned short id,long count);
 	//bool removeItem(Item* item, bool test = false);
 	//bool internalRemoveItemContainer(Container *parent, Item* item, bool test = false);
@@ -125,15 +124,15 @@ public:
 	
 	//int removeItemInventory(int pos, bool internal = false);
 	//int addItemInventory(Item* item, int pos, bool internal = false);
+	//bool isHoldingContainer(const Container* container) const;
 	
 	containerLayout::const_iterator getContainers() const { return vcontainers.begin();}
 	containerLayout::const_iterator getEndContainer() const { return vcontainers.end();}
 	
-	Container* getContainer(unsigned char containerid);
-	unsigned char getContainerID(const Container* container) const;
-	//bool isHoldingContainer(const Container* container) const;
-	void addContainer(unsigned char containerid, Container *container);
-	void closeContainer(unsigned char containerid);
+	Container* getContainer(uint32_t cid);
+	uint32_t getContainerID(const Container* container) const;
+	void addContainer(uint32_t containerid, Container *container);
+	void closeContainer(uint32_t containerid);
 	
 	void addStorageValue(const unsigned long key, const long value);
 	bool getStorageValue(const unsigned long key, long &value) const;
@@ -196,10 +195,10 @@ public:
 	virtual int getArmor() const;
 	virtual int getDefense() const;
 	unsigned long getMoney();
+
 	//bool substractMoney(unsigned long money);
 	//bool substractMoneyItem(Item *item, unsigned long money);
-	
-	
+		
 	unsigned long eventAutoWalk;
 	
 	//items
@@ -257,7 +256,6 @@ public:
 	
 	void die();      //player loses exp/skills/maglevel on death
 	
-	//virtual void setAttackedCreature(unsigned long id);
 	virtual bool isAttackable() const { return (access == 0); };
 	virtual bool isPushable() const;
 	virtual void dropLoot(Container *corpse);
@@ -266,21 +264,20 @@ public:
 	
 	virtual std::string getDescription(uint32_t lookDistance) const;
 
-	/*
-	//ground	
-	void onThingTransform(const Thing* thing,int stackpos);
-	void onThingRemove(const Thing* thing); //auto-close containers
-	
+	//tiles
+	//void AddRemoveThing(NetworkMessage& msg, const Position& pos, int stackpos);
+	//void AddAppearThing(NetworkMessage& msg, const Position& pos);
+	//void AddTileUpdated(NetworkMessage& msg, const Position& pos);
+
 	//container
-	void onItemAddContainer(const Container* container,const Item* item);
-	void onItemRemoveContainer(const Container* container,const unsigned char slot);
-	void onItemUpdateContainer(const Container* container,const Item* item,const unsigned char slot);
+	void sendAddContainerItem(const Container* container, const Item *item);
+	void sendUpdateContainerItem(const Container* container, uint8_t slot, const Item* item);
+	void sendRemoveContainerItem(const Container* container, uint8_t slot);
 	
-	//inventory - for this use int sendInventory(unsigned char sl_id)
-	//void onItemAddInvnetory(const unsigned char sl_id);
-	//void onItemRemoveInvnetory(const unsigned char sl_id);
-	//void onItemUpdateInvnetory(const unsigned char sl_id);
-	*/
+	//inventory
+	void sendAddInventoryItem(slots_t slot, const Item* item);
+	void sendUpdateInventoryItem(slots_t slot, const Item* item);
+	void sendRemoveInventoryItem(slots_t slot);
 	
 	void setAcceptTrade(bool b);
 	bool getAcceptTrade() {return (tradeState == TRADE_ACCEPT);};
@@ -312,7 +309,24 @@ protected:
 	//ground to ground
 	virtual void onThingMove(const Creature *creature, const Thing *thing, const Position *oldPos,
 		unsigned char oldstackpos, unsigned char oldcount, unsigned char count);
-	
+
+	//
+	virtual ReturnValue __moveThingTo(Creature* creature, Cylinder* toCylinder, uint32_t index, Thing* thing, uint32_t count);
+
+	virtual ReturnValue __addThing(Thing* thing);
+	virtual ReturnValue __addThing(uint32_t index, Thing* thing);
+
+	virtual ReturnValue __updateThing(Thing* thing);
+	virtual ReturnValue __updateThing(uint32_t index, Thing* thing);
+
+	virtual ReturnValue __removeThing(Thing* thing);
+	virtual ReturnValue __removeThing(Thing* thing, uint32_t count);
+
+	virtual uint32_t __getIndexOfThing(const Thing* thing) const;
+
+	virtual void __internalAddThing(Thing* thing);
+	virtual void __internalAddThing(uint32_t index, Thing* thing);
+
 protected:
 	Protocol* client;
 	int useCount;

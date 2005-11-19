@@ -42,6 +42,7 @@ public:
 	virtual uint32_t __getIndexOfThing(const Thing* thing) const = 0;
 	
 	virtual void __internalAddThing(Thing* thing) = 0;
+	virtual void __internalAddThing(uint32_t index, Thing* thing) = 0;
 
 private:
 };

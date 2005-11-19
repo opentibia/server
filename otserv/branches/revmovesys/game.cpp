@@ -790,6 +790,20 @@ bool Game::removeCreature(Creature* c)
 	return true;
 }
 
+//NEW CYLINDER CLASS
+void Game::thingMove(Creature* creature, Cylinder* fromCylinder, Cylinder* toCylinder,
+	Thing* thing, uint32_t count)
+{
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::thingMove()");
+
+	if(fromCylinder == NULL || toCylinder == NULL){
+		creature->sendCancel("Sorry, not possible.");
+		return;
+	}
+
+	fromCylinder->__moveThingTo(creature, toCylinder, 0, thing, count);
+}
+
 void Game::thingMove(Creature *creature, Thing *thing,
 	unsigned short to_x, unsigned short to_y, unsigned char to_z, unsigned char count)
 {
@@ -4226,8 +4240,7 @@ void Game::addPlayerBuffer(Player* p)
 }
 
 void Game::FreeThing(Thing* thing)
-{
-	
+{	
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::FreeThing()");
 	//std::cout << "freeThing() " << thing <<std::endl;
 	ToReleaseThings.push_back(thing);

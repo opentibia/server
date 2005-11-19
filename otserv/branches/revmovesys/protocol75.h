@@ -156,19 +156,27 @@ private:
 	virtual void sendThingMove(const Creature *creature, const Thing *thing,
 		const Position *oldPos, unsigned char oldstackpos, unsigned char oldcount,
 		unsigned char count, bool tele = false);
+	//END, NEEDS REVISION
 	
+	//tiles
 	virtual void sendThingDisappear(const Thing *thing, unsigned char stackPos, bool tele = false);
 	virtual void sendThingAppear(const Thing *thing);
 	virtual void sendThingTransform(const Thing* thing,int stackpos);
 	virtual void sendThingRemove(const Thing *thing);
 	virtual void sendTileUpdated(const Position &Pos);
-	void sendItemAddContainer(const Container *container, const Item *item);
-	void sendItemRemoveContainer(const Container* container,const unsigned char slot);
-	void sendItemUpdateContainer(const Container* container,const Item* item,const unsigned char slot);
-	virtual void sendContainer(unsigned char index, Container *container);
-	virtual void sendCloseContainer(unsigned char containerid);
-	//virtual void sendInventory(unsigned char sl_id);
-	//END, NEEDS REVISION
+
+	//containers
+	void sendAddContainerItem(const Container* container, const Item* item);
+	void sendUpdateContainerItem(const Container *container, uint8_t slot, const Item* item);
+	void sendRemoveContainerItem(const Container* container, uint8_t slot);
+
+	virtual void sendContainer(uint32_t cid, Container *container);
+	virtual void sendCloseContainer(uint32_t cid);
+
+	//inventory
+	virtual void sendAddInventoryItem(slots_t slot, const Item* item);
+	virtual void sendUpdateInventoryItem(slots_t slot, const Item* item);
+	virtual void sendRemoveInventoryItem(slots_t slot);
 
 	//Help functions
 
@@ -189,18 +197,25 @@ private:
 	void AddDistanceShoot(NetworkMessage &msg,const Position &from, const Position &to, unsigned char type);
 	void AddCreature(NetworkMessage &msg,const Creature *creature, bool known, unsigned int remove);
 	void AddPlayerStats(NetworkMessage &msg);
-	void AddPlayerInventoryItem(NetworkMessage& msg, slots_t slot, const Item* item);
 	void AddCreatureSpeak(NetworkMessage &msg,const Creature *creature, SpeakClasses type, std::string text, unsigned short channelId);
 	void AddCreatureHealth(NetworkMessage &msg,const Creature *creature);
 	void AddPlayerSkills(NetworkMessage &msg);
-	void AddRemoveThing(NetworkMessage &msg, const Position &pos,unsigned char stackpos);
-	void AddAppearThing(NetworkMessage &msg, const Position &pos);
-	void AddTileUpdated(NetworkMessage &msg, const Position &pos);
-	void AddItemContainer(NetworkMessage &msg,unsigned char cid, const Item *item);
-	void AddItemContainer(NetworkMessage &msg,unsigned char cid, const Item *item,unsigned char count);
-	void TransformItemContainer(NetworkMessage &msg,unsigned char cid,unsigned char slot, const Item *item);
-	void RemoveItemContainer(NetworkMessage &msg,unsigned char cid,unsigned char slot);
+
+	//tiles
+	void AddRemoveThing(NetworkMessage& msg, const Position& pos, int stackpos);
+	void AddAppearThing(NetworkMessage& msg, const Position& pos);
+	void AddTileUpdated(NetworkMessage& msg, const Position& pos);
+
+	//container
+	void AddContainerItem(NetworkMessage& msg, uint8_t cid, const Item *item);
+	void UpdateContainerItem(NetworkMessage& msg, uint8_t cid, uint8_t slot, const Item* item);
+	void RemoveContainerItem(NetworkMessage& msg, uint8_t cid, uint8_t slot);
 	
+	//inventory
+	void AddInventoryItem(NetworkMessage& msg, slots_t slot, const Item* item);
+	void UpdateInventoryItem(NetworkMessage& msg, slots_t slot, const Item* item);
+	void RemoveInventoryItem(NetworkMessage& msg, slots_t slot);
+
 	OTSYS_THREAD_LOCKVAR bufferLock;
 	unsigned long windowTextID;
 	Item *readItem;

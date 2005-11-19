@@ -54,12 +54,26 @@ public:
 		const Position *oldPos, unsigned char oldStackPos, unsigned char oldcount,
 		unsigned char count, bool tele = false) = 0;
 	
+	//tiles
 	virtual void sendThingAppear(const Thing *thing) = 0;
 	virtual void sendThingRemove(const Thing *thing) = 0;
 	virtual void sendThingTransform(const Thing* thing,int stackpos) = 0;
-	virtual void sendItemAddContainer(const Container *container, const Item *item) = 0;
-	virtual void sendItemRemoveContainer(const Container* container,const unsigned char slot) = 0;
-	virtual void sendItemUpdateContainer(const Container* container,const Item* item,const unsigned char slot) = 0;
+	virtual void sendThingDisappear(const Thing *thing, unsigned char stackPos, bool tele) = 0;
+	virtual void sendTileUpdated(const Position &pos) = 0;
+
+	//containers
+	virtual void sendAddContainerItem(const Container* container, const Item* item) = 0;
+	virtual void sendUpdateContainerItem(const Container *container, uint8_t slot, const Item* item) = 0;
+	virtual void sendRemoveContainerItem(const Container* container, uint8_t slot) = 0;
+
+	virtual void sendContainer(uint32_t cid, Container* container) = 0;
+	virtual void sendCloseContainer(uint32_t cid) = 0;
+
+	//inventory
+	virtual void sendAddInventoryItem(slots_t slot, const Item* item) = 0;
+	virtual void sendUpdateInventoryItem(slots_t slot, const Item* item) = 0;
+	virtual void sendRemoveInventoryItem(slots_t slot) = 0;
+
 	virtual void sendDistanceShoot(const Position &from, const Position &to, unsigned char type) = 0;
 	virtual void sendMagicEffect(const Position &pos, unsigned char type) = 0;
 	virtual void sendAnimatedText(const Position &pos, unsigned char color, std::string text) = 0;
@@ -69,13 +83,9 @@ public:
 	virtual void sendTradeItemRequest(const Player* player, const Item* item, bool ack) = 0;
 	virtual void sendCloseTrade() = 0;
 	virtual void sendTextWindow(Item* item,const unsigned short maxlen, const bool canWrite) = 0;
-	virtual void sendContainer(unsigned char index, Container *container) = 0;
-	virtual void sendCloseContainer(unsigned char containerid) = 0;
-	virtual void sendThingDisappear(const Thing *thing, unsigned char stackPos, bool tele) = 0;
 	virtual void sendCreatureTurn(const Creature *creature, unsigned char stackPos) = 0;
 	virtual void sendCreatureSay(const Creature *creature, SpeakClasses type, const std::string &text) = 0;
 	virtual void sendSetOutfit(const Creature* creature) = 0;
-	virtual void sendTileUpdated(const Position &pos) = 0;
 	virtual void sendIcons(int icons) = 0;
 	virtual void sendCancel(const char *msg) = 0;
 	virtual void sendCancelWalk() = 0;

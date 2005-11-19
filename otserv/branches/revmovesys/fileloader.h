@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////
-// OpenTibia - an opensource roleplaying game
+// OTItemEditor
 //////////////////////////////////////////////////////////////////////
 // 
 //////////////////////////////////////////////////////////////////////
@@ -42,7 +42,7 @@ enum FILELOADER_ERRORS{
 	ERROR_COULDNOTWRITE
 };
 
-
+class PropStream;
 
 class FileLoader{
 public:
@@ -51,6 +51,7 @@ public:
 
 	bool openFile(const char* filename, bool write);
 	const unsigned char* getProps(const NODE, unsigned long &size);
+	bool getProps(const NODE, PropStream& props);
 	const NODE getChildNode(const NODE parent, unsigned long &type);
 	const NODE getNextNode(const NODE prev, unsigned long &type);
 
@@ -73,7 +74,8 @@ protected:
 	inline bool safeSeek(unsigned long pos);
 	inline bool safeTell(long &pos);
 	//inline bool writeData(void* data, int size, bool unescape);
-	inline bool FileLoader::writeData(void* data, int size, bool unescape){
+public:
+	inline bool FileLoader::writeData(const void* data, int size, bool unescape){
 		for(int i = 0; i < size; ++i) {
 			unsigned char c = *(((unsigned char*)data) + i);
 			if(unescape && (c == NODE_START || c == NODE_END || c == ESCAPE_CHAR)) {
@@ -84,7 +86,6 @@ protected:
 					return false;
 				}
 			}
-
 			size_t value = fwrite(&c, 1, 1, m_file);
 			if(value != 1) {
 				m_lastError = ERROR_COULDNOTWRITE;
@@ -94,12 +95,83 @@ protected:
 
 		return true;
 	}
-
+protected:
 
 	FILE *m_file;
 	FILELOADER_ERRORS m_lastError;
 	unsigned long m_buffer_size;
 	unsigned char *m_buffer;
 };
+
+
+class PropStream{
+public:
+	PropStream(){end = NULL; p = NULL;}
+	~PropStream(){};
+
+	void init(char* a, unsigned long size){
+		p = a;
+		end = a + size;
+	}
+
+	template <typename T>
+	inline bool GET_STRUCT(T* &ret){
+		if(size() < sizeof(T)){
+			ret = NULL;
+			return false;
+		}
+		ret = (T*)p;
+		p = p + sizeof(T);
+		return true;
+	}
+	
+	template <typename T>
+	inline bool GET_VALUE(T &ret){
+		if(size() < sizeof(T)){
+			return false;
+		}
+		ret = *((T*)p);
+		p = p + sizeof(T);
+		return true;
+	}
+	
+	inline bool GET_ULONG(unsigned long &ret){
+		return GET_VALUE(ret);
+	}
+	
+	inline bool GET_USHORT(unsigned short &ret){
+		return GET_VALUE(ret);
+	}
+	
+	inline bool GET_UCHAR(unsigned char &ret){
+		return GET_VALUE(ret);
+	}
+	
+	inline bool GET_STRING(std::string &ret){
+		char* str;
+		unsigned short str_len;
+		
+		if(!GET_USHORT(str_len)){
+			return false;
+		}
+		if(size() < str_len){
+			return false;
+		}
+		str = new char[str_len+1];
+		memcpy(str, p, str_len);
+		str[str_len] = 0;
+		ret = str;
+		delete str;
+		p = p + str_len;
+		return true;
+	}
+	
+	
+protected:
+	long size(){return end - p;};
+	char* p;
+	char* end;
+};
+
 
 #endif

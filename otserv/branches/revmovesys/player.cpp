@@ -1064,11 +1064,11 @@ unsigned int Player::getReqMana(int maglevel, playervoc_t voc)
   return reqMana;
 }
 
-Container* Player::getContainer(unsigned char containerid)
+Container* Player::getContainer(uint32_t cid)
 {
   for(containerLayout::iterator cl = vcontainers.begin(); cl != vcontainers.end(); ++cl)
   {
-	  if(cl->first == containerid)
+	  if(cl->first == cid)
 			return cl->second;
 	}
 
@@ -1091,7 +1091,7 @@ bool Player::isHoldingContainer(const Container* container) const
 }
 */
 
-unsigned char Player::getContainerID(const Container* container) const
+uint32_t Player::getContainerID(const Container* container) const
 {
   for(containerLayout::const_iterator cl = vcontainers.begin(); cl != vcontainers.end(); ++cl)
   {
@@ -1099,19 +1099,19 @@ unsigned char Player::getContainerID(const Container* container) const
 			return cl->first;
 	}
 
-	return 0xFF;
+	return -1;
 }
 
-void Player::addContainer(unsigned char containerid, Container *container)
+void Player::addContainer(uint32_t cid, Container *container)
 {
 #ifdef __DEBUG__
 	cout << Creature::getName() << ", addContainer: " << (int)containerid << std::endl;
 #endif
-	if(containerid > 0xF)
+	if(cid > 0xF)
 		return;
 
 	for(containerLayout::iterator cl = vcontainers.begin(); cl != vcontainers.end(); ++cl) {
-		if(cl->first == containerid) {
+		if(cl->first == cid) {
 			cl->second = container;
 			return;
 		}
@@ -1119,17 +1119,17 @@ void Player::addContainer(unsigned char containerid, Container *container)
 	
 	//id doesnt exist, create it
 	containerItem vItem;
-	vItem.first = containerid;
+	vItem.first = cid;
 	vItem.second = container;
 
 	vcontainers.push_back(vItem);
 }
 
-void Player::closeContainer(unsigned char containerid)
+void Player::closeContainer(uint32_t cid)
 {
   for(containerLayout::iterator cl = vcontainers.begin(); cl != vcontainers.end(); ++cl)
   {
-	  if(cl->first == containerid)
+	  if(cl->first == cid)
 	  {
 		  vcontainers.erase(cl);
 			break;
@@ -1485,6 +1485,22 @@ void Player::sendTextWindow(Item* item,const unsigned short maxlen, const bool c
 	client->sendTextWindow(item,maxlen,canWrite);
 }
 
+//container
+void Player::sendAddContainerItem(const Container* container, const Item *item)
+{
+	client->sendAddContainerItem(container, item);
+}
+
+void Player::sendUpdateContainerItem(const Container* container, uint8_t slot, const Item* item)
+{
+	client->sendUpdateContainerItem(container, slot, item);
+}
+
+void Player::sendRemoveContainerItem(const Container* container, uint8_t slot)
+{
+	client->sendRemoveContainerItem(container, slot);
+}
+
 void Player::sendCloseContainer(unsigned char containerid)
 {
 	client->sendCloseContainer(containerid);
@@ -1495,12 +1511,26 @@ void Player::sendContainer(unsigned char index, Container *container)
 	client->sendContainer(index,container);
 }
 
+//inventory
+void Player::sendAddInventoryItem(slots_t slot, const Item* item)
+{
+	client->sendAddInventoryItem(slot, item);
+}
+
+void Player::sendUpdateInventoryItem(slots_t slot, const Item* item)
+{
+	client->sendUpdateInventoryItem(slot, item);
+}
+
+void Player::sendRemoveInventoryItem(slots_t slot)
+{
+	client->sendRemoveInventoryItem(slot);
+}
+
 bool Player::NeedUpdateStats()
 {
 	if(lastSentStats.health != this->health ||
 		 lastSentStats.healthmax != this->healthmax ||
-		 //lastSentStats.cap != this->cap ||
-		 //(int)lastSentStats.capacity != (int)this->capacity ||
 		 (int)lastSentStats.freeCapacity != (int)this->getFreeCapacity() ||
 		 lastSentStats.experience != this->experience ||
 		 lastSentStats.level != this->level ||
@@ -1521,78 +1551,7 @@ void Player::onThingMove(const Creature *creature, const Thing *thing, const Pos
   client->sendThingMove(creature, thing, oldPos, oldstackpos, oldcount, count);
 }
 
-/* 
-//container to container
-void Player::onThingMove(const Creature *creature, const Container *fromContainer, unsigned char from_slotid,
-	const Item* fromItem, int oldFromCount, Container *toContainer, unsigned char to_slotid,
-	const Item *toItem, int oldToCount, int count)
-{
-	client->sendThingMove(creature, fromContainer, from_slotid, fromItem, oldFromCount, toContainer, to_slotid, toItem, oldToCount, count);
-}
-
-//inventory to container
-void Player::onThingMove(const Creature *creature, slots_t fromSlot, const Item* fromItem,
-	int oldFromCount, const Container *toContainer, unsigned char to_slotid, const Item *toItem, int oldToCount, int count)
-{
-	client->sendThingMove(creature, fromSlot, fromItem, oldFromCount, toContainer, to_slotid, toItem, oldToCount, count);
-}
-
-//inventory to inventory
-void Player::onThingMove(const Creature *creature, slots_t fromSlot, const Item* fromItem,
-	int oldFromCount, slots_t toSlot, const Item* toItem, int oldToCount, int count)
-{
-	client->sendThingMove(creature, fromSlot, fromItem, oldFromCount, toSlot, toItem, oldToCount, count);
-}
-
-//container to inventory
-void Player::onThingMove(const Creature *creature, const Container *fromContainer, unsigned char from_slotid,
-	const Item* fromItem, int oldFromCount, slots_t toSlot, const Item *toItem, int oldToCount, int count)
-{
-	client->sendThingMove(creature, fromContainer, from_slotid, fromItem, oldFromCount, toSlot, toItem, oldToCount, count);
-}
-
-//container to ground
-void Player::onThingMove(const Creature *creature, const Container *fromContainer, unsigned char from_slotid,
-	const Item* fromItem, int oldFromCount, const Position &toPos, const Item *toItem, int oldToCount, int count)
-{
-	client->sendThingMove(creature, fromContainer, from_slotid, fromItem, oldFromCount, toPos, toItem, oldToCount, count);
-}
-
-//inventory to ground
-void Player::onThingMove(const Creature *creature, slots_t fromSlot,
-	const Item* fromItem, int oldFromCount, const Position &toPos, const Item *toItem, int oldToCount, int count)
-{
-	client->sendThingMove(creature, fromSlot, fromItem, oldFromCount, toPos, toItem, oldToCount, count);
-}
-
-//ground to container
-void Player::onThingMove(const Creature *creature, const Position &fromPos, int stackpos, const Item* fromItem,
-	int oldFromCount, const Container *toContainer, unsigned char to_slotid, const Item *toItem, int oldToCount, int count)
-{
-	client->sendThingMove(creature, fromPos, stackpos, fromItem, oldFromCount, toContainer, to_slotid, toItem, oldToCount, count);
-}
-
-//ground to inventory
-void Player::onThingMove(const Creature *creature, const Position &fromPos, int stackpos, const Item* fromItem,
-	int oldFromCount, slots_t toSlot, const Item *toItem, int oldToCount, int count)
-{
-	client->sendThingMove(creature, fromPos, stackpos, fromItem, oldFromCount, toSlot, toItem, oldToCount, count);
-}
-*/
-
-/*
-void Player::onCreatureAppear(const Creature *creature)
-{	
- 	client->sendThingAppear(creature);
-}
-
-void Player::onCreatureDisappear(const Creature *creature, unsigned char stackPos, bool tele //= false)
-{	
-  client->sendThingDisappear(creature, stackPos, tele);
-}
-*/
-
-
+//tiles
 void Player::onThingAppear(const Thing* thing)
 {
 	client->sendThingAppear(thing);
@@ -1602,36 +1561,6 @@ void Player::onThingDisappear(const Thing* thing, unsigned char stackPos)
 {
 	client->sendThingDisappear(thing, stackPos, false);
 }
-
-/*
-void Player::onThingTransform(const Thing* thing,int stackpos)
-{
-	client->sendThingTransform(thing,stackpos);
-}
-*/
-
-/*
-//auto-close containers
-void Player::onThingRemove(const Thing* thing)
-{
-	client->sendThingRemove(thing);
-}
-
-void Player::onItemAddContainer(const Container* container,const Item* item)
-{
-	client->sendItemAddContainer(container,item);
-}
-
-void Player::onItemRemoveContainer(const Container* container,const unsigned char slot)
-{
-	client->sendItemRemoveContainer(container,slot);
-}
-
-void Player::onItemUpdateContainer(const Container* container,const Item* item,const unsigned char slot)
-{
-	client->sendItemUpdateContainer(container,item,slot);
-}
-*/
 
 void Player::onCreatureTurn(const Creature *creature, unsigned char stackPos)
 {
@@ -1653,13 +1582,6 @@ int Player::onThink(int& newThinkTicks)
 	newThinkTicks = 1000;
 	return 1000;
 }
-
-/*
-void Player::onTileUpdated(const Position &pos)
-{
-  client->sendTileUpdated(pos);
-}
-*/
 
 void Player::onTeleport(const Creature *creature, const Position *oldPos, unsigned char oldstackpos)
 { 
@@ -1939,4 +1861,140 @@ bool Player::addVIP(unsigned long _guid, std::string &name, bool isOnline, bool 
 		client->sendVIP(_guid, name, isOnline);
 	
 	return true;
+}
+
+
+ReturnValue Player::__moveThingTo(Creature* creature, Cylinder* toCylinder, uint32_t index, Thing* thing, uint32_t count)
+{
+	return RET_NOTPOSSIBLE;
+}
+
+ReturnValue Player::__addThing(Thing* thing)
+{
+	Item* item = dynamic_cast<Item*>(thing);
+	if(item == NULL)
+		return RET_NOTPOSSIBLE;
+
+	return RET_NOERROR;
+}
+
+ReturnValue Player::__addThing(uint32_t index, Thing* thing)
+{
+	return RET_NOTPOSSIBLE;
+}
+
+ReturnValue Player::__updateThing(Thing* thing)
+{
+	return RET_NOTPOSSIBLE;
+}
+
+ReturnValue Player::__updateThing(uint32_t index, Thing* thing)
+{
+	return RET_NOTPOSSIBLE;
+}
+
+ReturnValue Player::__removeThing(Thing* thing)
+{
+	return RET_NOTPOSSIBLE;
+}
+
+ReturnValue Player::__removeThing(Thing* thing, uint32_t count)
+{
+	Item* item = dynamic_cast<Item*>(thing);
+	if(item == NULL){
+#ifdef __DEBUG__
+		std::cout << "Failure: [Player::__removeThing] item == NULL" << std::endl;
+#endif
+		return RET_NOTPOSSIBLE;
+	}
+	
+	if(item->isStackable()) {
+		if(count == 0 || count > item->getItemCountOrSubtype())
+			return RET_NOTPOSSIBLE;
+
+		if(count == item->getItemCountOrSubtype()){
+			uint32_t index = __getIndexOfThing(thing);
+			if(index == -1)
+				return RET_NOTPOSSIBLE;
+
+			items[index]->releaseThing2();
+			items[index] = NULL;
+
+			//send change to client
+			sendRemoveInventoryItem((slots_t)index);
+		}
+		else{
+			uint32_t index = __getIndexOfThing(thing);
+			if(index == -1)
+				return RET_NOTPOSSIBLE;
+
+			item->setItemCountOrSubtype(count);
+
+			//send change to client
+			sendUpdateInventoryItem((slots_t)index, item);
+		}
+	}
+	else{
+		uint32_t index = __getIndexOfThing(thing);
+		if(index == -1)
+			return RET_NOTPOSSIBLE;
+
+		items[index]->releaseThing2();
+		items[index] = NULL;
+
+		//send change to client
+		sendRemoveInventoryItem((slots_t)index);
+	}
+
+	return RET_NOTPOSSIBLE;
+}
+
+uint32_t Player::__getIndexOfThing(const Thing* thing) const
+{
+	for(int i = SLOT_FIRST; i < SLOT_LAST; ++i){
+		if(items[i] == thing)
+			return i;
+	}
+
+	return -1;
+}
+
+void Player::__internalAddThing(Thing* thing)
+{
+	__internalAddThing(0, thing);
+}
+
+void Player::__internalAddThing(uint32_t index, Thing* thing)
+{
+#ifdef __DEBUG__
+	std::cout << "[Player::__internalAddThing] index: " << index << std::endl;
+#endif
+
+	Item* item = dynamic_cast<Item*>(thing);
+	if(item == NULL){
+#ifdef __DEBUG__
+		std::cout << "Failure: [Player::__internalAddThing] item == NULL" << std::endl;
+#endif
+		return;
+	}
+
+	if(index >= 0 && index < 11)
+  {
+		if(items[index]){
+#ifdef __DEBUG__
+			std::cout << "Failure: [Player::__internalAddThing] items[index] is not empty" << std::endl;
+#endif
+			return;
+		}
+		
+		//index == 0 means we should equip this item at the most appropiate slot
+		if(index == 0){
+#ifdef __DEBUG__
+			std::cout << "Failure: [Player::__internalAddThing] index == 0 not implemented" << std::endl;
+#endif
+			return;
+		}
+
+		items[index] = item;
+  }
 }

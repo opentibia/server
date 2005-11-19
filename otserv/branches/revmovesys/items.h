@@ -143,6 +143,11 @@ public:
 	const ItemType& operator[](int id);
 	
 	static unsigned long reverseLookUp(unsigned long id);
+	
+	static long dwMajorVersion;
+	static long dwMinorVersion;
+	static long dwBuildNumber;
+	
 protected:
 	typedef std::map<unsigned short, ItemType*> ItemMap;
 	ItemMap items;

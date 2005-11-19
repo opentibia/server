@@ -429,6 +429,13 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name){
 
 						Item* myitem = Item::CreateItem(id);
 						myitem->unserialize(slot->children);
+						
+						player->__internalAddThing(sl_id, myitem);
+						Container* container = dynamic_cast<Container*>(myitem);
+
+						if(container){							
+							LoadContainer(slot->children, container);
+						}
 
 						//we dont want to sendinventory before login
 						/*
