@@ -791,7 +791,7 @@ bool Game::removeCreature(Creature* c)
 }
 
 //NEW CYLINDER CLASS
-void Game::thingMove(Creature* creature, Cylinder* fromCylinder, Cylinder* toCylinder,
+void Game::thingMove(Creature* creature, Cylinder* fromCylinder, Cylinder* toCylinder, uint8_t index,
 	Thing* thing, uint32_t count)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::thingMove()");
@@ -801,7 +801,13 @@ void Game::thingMove(Creature* creature, Cylinder* fromCylinder, Cylinder* toCyl
 		return;
 	}
 
-	fromCylinder->__moveThingTo(creature, toCylinder, 0, thing, count);
+	ReturnValue ret = fromCylinder->__moveThingTo(creature, toCylinder, index, thing, count);
+
+	switch(ret){
+		RET_NOTPOSSIBLE:
+			creature->sendCancel("Sorry, not possible.");
+			break;
+	}
 }
 
 void Game::thingMove(Creature *creature, Thing *thing,

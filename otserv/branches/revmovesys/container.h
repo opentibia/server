@@ -48,6 +48,7 @@ public:
 
 	//
 	virtual ReturnValue __moveThingTo(Creature* creature, Cylinder* toCylinder, uint32_t index, Thing* thing, uint32_t count);
+	//virtual ReturnValue __queryCanMove(uint32_t index, Thing* thing, uint32_t inCount, uint32_t& outCount);
 
 	virtual ReturnValue __addThing(Thing* thing);
 	virtual ReturnValue __addThing(uint32_t index, Thing* thing);
@@ -65,17 +66,17 @@ public:
 	virtual int getThrowRange() const {return 10;};
 
 	//
-	Cylinder* getParent() {return Cylinder::getParent();};
-	void setParent(Cylinder* cylinder) {Cylinder::setParent(cylinder);};
+	//Cylinder* getParent() {return Cylinder::getParent();};
+	//void setParent(Cylinder* cylinder) {Cylinder::setParent(cylinder);};
 
-	Cylinder* getTopParent() {return Cylinder::getTopParent();}; //returns Tile/Container or a Player
-	Tile* getTile() {return Cylinder::getTile();};
+	//Cylinder* getTopParent() {return Cylinder::getTopParent();}; //returns Tile/Container or a Player
+	//Tile* getTile() {return Cylinder::getTile();};
 
-	const Position& getPosition() const {return Cylinder::getPosition();};
+	//const Position& getPosition() const {return Cylinder::getPosition();};
 	
 	//
-	void useThing2() {Cylinder::useThing2();};
-	void releaseThing2() {Cylinder::releaseThing2();};
+	//void useThing2() {Cylinder::useThing2();};
+	//void releaseThing2() {Cylinder::releaseThing2();};
 
 private:
 	uint32_t depotId;

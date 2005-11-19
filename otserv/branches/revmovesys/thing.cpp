@@ -34,7 +34,7 @@ void Thing::releaseThing2()
 Cylinder* Thing::getTopParent()
 {
 	if(getParent() == NULL)
-		return NULL; //this;
+		return NULL;
 
 	Cylinder* aux = this->getParent();
 
@@ -48,7 +48,7 @@ Cylinder* Thing::getTopParent()
 const Cylinder* Thing::getTopParent() const
 {
 	if(getParent() == NULL)
-		return NULL; //this;
+		return NULL;
 
 	const Cylinder* aux = this->getParent();
 

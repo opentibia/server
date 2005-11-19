@@ -153,9 +153,7 @@ void Map::setTile(unsigned short _x, unsigned short _y, unsigned char _z, unsign
 			tile->ground->releaseThing2();
 
 		tile->ground = Item::CreateItem(groundId);
-		//tile->ground->pos.x = _x;
-		//tile->ground->pos.y = _y;
-		//tile->ground->pos.z = _z;
+		tile->ground->setParent(tile);
   }
   else
   {
@@ -163,10 +161,7 @@ void Map::setTile(unsigned short _x, unsigned short _y, unsigned char _z, unsign
 
 		if(groundId != 0 && Item::items[groundId].isGroundTile()) {
 			tile->ground = Item::CreateItem(groundId);
-
-			//tile->ground->pos.x = _x;
-			//tile->ground->pos.y = _y;
-			//tile->ground->pos.z = _z;
+			tile->ground->setParent(tile);
 		}
 
 		//tileMaps[_x & 0x1F][_y & 0x1F][_z][(_x << 16) | _y] = tile;

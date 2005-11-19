@@ -305,7 +305,7 @@ std::string Tile::getDescription(uint32_t lookDistance) const
 
 bool Tile::insertThing(Thing *thing, int stackpos)
 {
-	Item *item = (Item*)thing;
+	Item *item = dynamic_cast<Item*>(thing);
 	int pos = stackpos;
 
 	if (pos == 0) {
@@ -566,6 +566,11 @@ ReturnValue Tile::__moveThingTo(Creature* creature, Cylinder* toCylinder, uint32
 {
 	return RET_NOTPOSSIBLE;
 }
+
+/*ReturnValue Tile::__queryCanMove(uint32_t index, Thing* thing, uint32_t inCount, uint32_t& outCount)
+{
+	return RET_NOTPOSSIBLE;
+}*/
 
 ReturnValue Tile::__addThing(Thing* thing)
 {

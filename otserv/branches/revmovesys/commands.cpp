@@ -412,7 +412,11 @@ bool Commands::teleportHere(Creature* c, const std::string &cmd, const std::stri
 	return true;
 }
 
-bool Commands::createItems(Creature* c, const std::string &cmd, const std::string &param){
+bool Commands::createItems(Creature* c, const std::string &cmd, const std::string &param)
+{
+	Player *player = dynamic_cast<Player *>(c);
+	if(!player)
+		return true;
 
 	std::string tmp = param;
 	
@@ -424,10 +428,17 @@ bool Commands::createItems(Creature* c, const std::string &cmd, const std::strin
 	tmp.erase(0, pos+1);
 	int count = std::min(atoi(tmp.c_str()), 100);
 				
-	Item *newItem = Item::CreateItem(type, count);
+	Item* newItem = Item::CreateItem(type, count);
 	if(!newItem)
 		return true;
 	
+	ReturnValue ret = player->__addThing(newItem);
+	if(ret != RET_NOERROR){
+		//Tile* tile = game->map->getTile(c->getPosition());
+		//tile->__addThing();
+	}
+
+	/*
 	Tile *t = game->map->getTile(c->getPosition());
 	if(!t)
 	{
@@ -436,6 +447,7 @@ bool Commands::createItems(Creature* c, const std::string &cmd, const std::strin
 	}
 
 	game->addThing(NULL, c->getPosition(), newItem);
+	*/
 	return true;
 
 }

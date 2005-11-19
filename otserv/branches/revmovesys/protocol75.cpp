@@ -555,8 +555,7 @@ Cylinder* Protocol75::internalGetCylinder(unsigned short x, unsigned short y, un
 			return player->getContainer(from_cid);
 		}
 		else{
-			return NULL;
-			//return Player;
+			return player;
 		}
 	}
 }
@@ -955,8 +954,12 @@ void Protocol75::parseThrow(NetworkMessage& msg)
 	if(from_x == 0xFFFF && to_x == 0xFFFF){
 		Cylinder* fromCylinder = internalGetCylinder(from_x, from_y, from_z);
 		Cylinder* toCylinder = internalGetCylinder(to_x, to_y, to_z);
+		
+		uint8_t from_index = static_cast<unsigned char>(from_y & 0x0F);
+		Thing* thing = internalGetThing(from_x, from_y, from_z, from_index);
 
-		game->thingMove(player, fromCylinder, toCylinder, NULL, count);
+		uint8_t to_index = static_cast<unsigned char>(to_y & 0x0F);
+		game->thingMove(player, fromCylinder, toCylinder, to_index, thing, count);
 		return;
 	}
 	
@@ -1071,10 +1074,15 @@ void Protocol75::parseLookAt(NetworkMessage& msg)
 	uint32_t lookDistance = 0;
 	if(thing == player)
 		lookDistance = -1;
-	else
-		lookDistance = 2; /*std::abs(player->getPosition().x - thing->getPosition().x) <= 1 &&
-												std::abs(player->getPosition().y - thing->getPosition().y) <= 1 &&
-												thing->getPosition().z == player->getPosition().z);*/
+	else{
+		const Position& LookPos = player->getPosition();
+		const Position& thingMapPos = thing->getPosition();
+		
+		if(LookPos.z != thingMapPos.z)
+			lookDistance = std::abs(LookPos.z - thingMapPos.z) * 2;
+		else
+			lookDistance = std::sqrt( std::pow(std::abs(LookPos.x - thingMapPos.x), 2) + std::pow(std::abs(LookPos.y - thingMapPos.y), 2));
+	}
 
 	std::stringstream ss;
 	ss << "You see " << thing->getDescription(lookDistance);
@@ -1948,11 +1956,12 @@ void Protocol75::sendThingMove(const Creature *creature, const Thing *thing,
 			if (c) {
 				bool known;
 				unsigned long removedKnown;
-				checkCreatureAsKnown(((Creature*)thing)->getID(), known, removedKnown);
-				AddCreature(msg,(Creature*)thing, known, removedKnown);
+				checkCreatureAsKnown(c->getID(), known, removedKnown);
+				AddCreature(msg, c, known, removedKnown);
 			}
 			else {
-				msg.AddItem((Item*)thing);
+				const Item* item = dynamic_cast<const Item*>(thing);
+				msg.AddItem(item);
 				
 				//Auto-close container's
 				const Container* moveContainer = dynamic_cast<const Container*>(thing);

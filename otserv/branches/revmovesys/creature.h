@@ -106,7 +106,7 @@ public:
 // Defines the Base class for all creatures and base functions which 
 // every creature has
 
-class Creature : public AutoID, public Thing
+class Creature : public AutoID, virtual public Thing
 {
 public:
 	Creature();

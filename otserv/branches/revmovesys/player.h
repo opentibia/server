@@ -18,12 +18,13 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __player_h_
-#define __player_h_
+#ifndef __PLAYER_H__
+#define __PLAYER_H__
 
 #include "definitions.h"
 #include "creature.h"
 #include "container.h"
+#include "cylinder.h"
 
 #include <vector>
 #include <ctime>
@@ -99,7 +100,7 @@ typedef std::set<unsigned long> VIPListSet;
 //////////////////////////////////////////////////////////////////////
 // Defines a player...
 
-class Player : public Creature
+class Player : public Creature, public Cylinder
 {
 public:
 	Player(const std::string& name, Protocol* p);
@@ -107,6 +108,7 @@ public:
 	void setGUID(unsigned long _guid) {guid = _guid;};
 	unsigned long getGUID() const { return guid;};
 	virtual unsigned long idRange(){ return 0x10000000;}
+	virtual int getThrowRange() const {return 1;};
 	static AutoList<Player> listPlayer;
 	void removeList();
 	void addList();
@@ -114,17 +116,6 @@ public:
 	
 	freeslot_t getFreeSlot(Container **container,unsigned char &slot, const Item* item);
 	Container* getFreeContainerSlot(Container *parent);
-	
-	//bool addItem(Item* item, bool test = false);
-	//bool internalAddItemContainer(Container *container,Item* item);
-	//bool removeItem(unsigned short id,long count);
-	//bool removeItem(Item* item, bool test = false);
-	//bool internalRemoveItemContainer(Container *parent, Item* item, bool test = false);
-	//int getItemCount(uint16_t id);
-	
-	//int removeItemInventory(int pos, bool internal = false);
-	//int addItemInventory(Item* item, int pos, bool internal = false);
-	//bool isHoldingContainer(const Container* container) const;
 	
 	containerLayout::const_iterator getContainers() const { return vcontainers.begin();}
 	containerLayout::const_iterator getEndContainer() const { return vcontainers.end();}
@@ -312,6 +303,7 @@ protected:
 
 	//
 	virtual ReturnValue __moveThingTo(Creature* creature, Cylinder* toCylinder, uint32_t index, Thing* thing, uint32_t count);
+	//virtual bool __queryCanMove(uint32_t index, Thing* thing, uint32_t inCount, uint32_t& outCount);
 
 	virtual ReturnValue __addThing(Thing* thing);
 	virtual ReturnValue __addThing(uint32_t index, Thing* thing);

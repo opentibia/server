@@ -171,7 +171,7 @@ public:
 	uint32_t getNpcsOnline();
 	uint32_t getCreaturesOnline();
 
-	void thingMove(Creature* creature, Cylinder* fromCylinder, Cylinder* toCylinder,
+	void thingMove(Creature* creature, Cylinder* fromCylinder, Cylinder* toCylinder, uint8_t index,
 		Thing* thing, uint32_t count);
 
 	void thingMove(Creature *creature, Thing *thing,

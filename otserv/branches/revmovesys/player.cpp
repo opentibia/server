@@ -1866,21 +1866,142 @@ bool Player::addVIP(unsigned long _guid, std::string &name, bool isOnline, bool 
 
 ReturnValue Player::__moveThingTo(Creature* creature, Cylinder* toCylinder, uint32_t index, Thing* thing, uint32_t count)
 {
-	return RET_NOTPOSSIBLE;
-}
-
-ReturnValue Player::__addThing(Thing* thing)
-{
 	Item* item = dynamic_cast<Item*>(thing);
 	if(item == NULL)
 		return RET_NOTPOSSIBLE;
 
+	//check constraints before moving
+	//
+	//
+	//
+	
+	//check how much we really can move (count)
+	//
+	//
+
+	/*uint32_t outCount = 0;
+	ReturnValue ret = __queryCanMove(index, thing, count, outCount);
+	if(ret != RET_NOERROR)
+		return ret;
+	*/
+
+	if(item->isStackable()) {
+		ReturnValue ret = __removeThing(item, count);
+		if(ret != RET_NOERROR)
+			return ret;
+
+		Item* moveItem = Item::CreateItem(item->getID(), count);
+		ret = toCylinder->__addThing(index, moveItem);
+
+		//todo: Fix leak here
+
+		if(item->getItemCountOrSubtype() == 0){
+			g_game.FreeThing(item);
+		}
+
+		if(ret != RET_NOERROR)
+			return ret;
+	}
+	else{
+		ReturnValue ret = __removeThing(item);
+
+		if(ret != RET_NOERROR)
+			return ret;
+
+		ret = toCylinder->__addThing(index, item);
+
+		if(ret != RET_NOERROR)
+			return ret;
+	}
+
+	//close/send container
+	//cancel trade
+	//update capacity/cylinder state (ie. for Tile class check if need to send UpdateTile() packet)
 	return RET_NOERROR;
+}
+
+/*ReturnValue Player::__queryCanMove(uint32_t index, Thing* thing, uint32_t inCount, uint32_t& outCount)
+{
+	Item* fromItem = dynamic_cast<Item*>(thing);
+	if(!fromItem){
+		outCount = 0;
+		return RET_NOTPOSSIBLE;
+	}
+
+	const Position& fromPos = fromItem->getPosition();
+	const Position& toPos = getPosition();
+
+	//check throw distance
+	if( (abs(fromPos.x - toPos.x) > thing->getThrowRange()) || (abs(fromPos.y - toPos.y) > thing->getThrowRange())
+		(abs(fromPos.y - toPos.y) * 2 > thing->getThrowRange() ) {
+		outCount = 0;
+		return RET_DESTINATIONOUTOFREACH;
+	}
+	
+	Item* toItem = getInventoryItem((slots_t)index);
+	if(!toItem){
+		outCount = inCount;
+		return RET_NOERROR;
+	}
+
+	if(toItem == fromItem){
+		return RET_NOTPOSSIBLE;
+	}
+
+	return RET_NOERROR;
+}*/
+
+ReturnValue Player::__addThing(Thing* thing)
+{
+	return __addThing(0, thing);	
 }
 
 ReturnValue Player::__addThing(uint32_t index, Thing* thing)
 {
-	return RET_NOTPOSSIBLE;
+	if(index < 0 || index > 11)
+		return RET_NOTPOSSIBLE;
+
+	Item* item = dynamic_cast<Item*>(thing);
+	if(item == NULL)
+		return RET_NOTPOSSIBLE;
+	
+	if(index == 0){
+		//add to most appropiate slot
+		return RET_NOTPOSSIBLE;
+	}
+
+	Item* toItem = getInventoryItem((slots_t)index);
+	if(toItem){
+		if(toItem->isStackable() && toItem->getID() == item->getID()){
+			uint32_t oldToCount = toItem->getItemCountOrSubtype();
+			uint32_t newToCount = std::min((uint32_t)100, oldToCount + item->getItemCountOrSubtype());
+			toItem->setItemCountOrSubtype(newToCount);
+
+			//send to client
+			sendUpdateInventoryItem((slots_t)index, toItem);
+
+			int remainCount = item->getItemCountOrSubtype() - (newToCount - oldToCount);			
+			item->setItemCountOrSubtype(remainCount);
+
+			if(remainCount != 0)
+				return RET_NOTENOUGHROOM;
+			
+			return RET_NOERROR;
+		}
+
+		return RET_NOTENOUGHROOM;
+	}
+	else{
+		item->setParent(this);
+		items[index] = item;
+
+		//send to client
+		sendAddInventoryItem((slots_t)index, item);
+	}
+
+	//__internalAddThing(index, item);
+	//sendAddInventoryItem((slots_t)index, item);
+	return RET_NOERROR;
 }
 
 ReturnValue Player::__updateThing(Thing* thing)
@@ -1895,7 +2016,15 @@ ReturnValue Player::__updateThing(uint32_t index, Thing* thing)
 
 ReturnValue Player::__removeThing(Thing* thing)
 {
-	return RET_NOTPOSSIBLE;
+	uint32_t index = __getIndexOfThing(thing);
+	if(index == -1)
+		return RET_NOTPOSSIBLE;
+
+	items[index] = NULL;
+
+	//send change to client
+	sendRemoveInventoryItem((slots_t)index);
+	return RET_NOERROR;
 }
 
 ReturnValue Player::__removeThing(Thing* thing, uint32_t count)
@@ -1917,21 +2046,23 @@ ReturnValue Player::__removeThing(Thing* thing, uint32_t count)
 			if(index == -1)
 				return RET_NOTPOSSIBLE;
 
-			items[index]->releaseThing2();
 			items[index] = NULL;
+			item->setParent(NULL);
 
 			//send change to client
 			sendRemoveInventoryItem((slots_t)index);
+			return RET_NOERROR;
 		}
 		else{
 			uint32_t index = __getIndexOfThing(thing);
 			if(index == -1)
 				return RET_NOTPOSSIBLE;
 
-			item->setItemCountOrSubtype(count);
+			item->setItemCountOrSubtype(item->getItemCountOrSubtype() - count);
 
 			//send change to client
 			sendUpdateInventoryItem((slots_t)index, item);
+			return RET_NOERROR;
 		}
 	}
 	else{
@@ -1939,11 +2070,12 @@ ReturnValue Player::__removeThing(Thing* thing, uint32_t count)
 		if(index == -1)
 			return RET_NOTPOSSIBLE;
 
-		items[index]->releaseThing2();
 		items[index] = NULL;
+		item->setParent(NULL);
 
 		//send change to client
 		sendRemoveInventoryItem((slots_t)index);
+		return RET_NOERROR;
 	}
 
 	return RET_NOTPOSSIBLE;
@@ -1996,5 +2128,6 @@ void Player::__internalAddThing(uint32_t index, Thing* thing)
 		}
 
 		items[index] = item;
+		item->setParent(this);
   }
 }

@@ -146,6 +146,11 @@ ReturnValue Container::__moveThingTo(Creature* creature, Cylinder* toCylinder, u
 	return RET_NOTPOSSIBLE;
 }
 
+/*ReturnValue Container::__queryCanMove(uint32_t index, Thing* thing, uint32_t inCount, uint32_t& outCount)
+{
+	return RET_NOTPOSSIBLE;
+}*/
+
 ReturnValue Container::__addThing(Thing* thing)
 {
 	Item* item = dynamic_cast<Item*>(thing);

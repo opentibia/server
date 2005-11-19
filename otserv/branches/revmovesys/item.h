@@ -35,7 +35,7 @@
 class Creature;
 class Player;
 
-class Item : public Thing
+class Item : virtual public Thing
 {
 protected:
 	unsigned short id;  // the same id as in ItemType
