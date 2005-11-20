@@ -95,7 +95,7 @@ bool IOMapOTBM::loadMap(Map* map, std::string identifier)
 {
 	FileLoader f;
 	if(!f.openFile(identifier.c_str(), false)) {
-		return f.getError();
+		return false;
 	}
 	
 	unsigned long type;
@@ -104,20 +104,20 @@ bool IOMapOTBM::loadMap(Map* map, std::string identifier)
 	NODE root = f.getChildNode((NODE)NULL, type);
 
 	if(!f.getProps(root, propStream)){
-		return f.getError();
+		return false;
 	}
 
 	OTBM_root_header* root_header;
 	if(!propStream.GET_STRUCT(root_header)){
-		return ERROR_INVALID_FORMAT;
+		return false;
 	}
 	
 	if(root_header->version != 0){
-		return ERROR_INVALID_FORMAT;
+		return false;
 	}
 	
 	if(root_header->majorVersionItems > Items::dwMajorVersion){
-		return ERROR_INVALID_FORMAT;
+		return false;
 	}
 
 	if(root_header->minorVersionItems > Items::dwMinorVersion){
