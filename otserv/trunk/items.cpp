@@ -64,8 +64,8 @@ ItemType::ItemType()
 	magicfieldtype = -1;
 	
 	speed		      = 0;
-	id            = 100;
-	clientId      = 100;
+	id            = 0;
+	clientId      = 0;
 	maxItems      = 8;  // maximum size if this is a container
 	weight        = 0;  // weight of the item, e.g. throwing distance depends on it
 	weaponType    = NONE;
@@ -192,6 +192,10 @@ int Items::loadFromOtb(std::string file)
 			Items::dwMinorVersion = vi->dwMinorVersion;
 			Items::dwBuildNumber = vi->dwBuildNumber;
 		}
+	}
+	if(Items::dwMinorVersion != CLIENT_VERSION_755){
+		std::cout << "Not supported items.otb client version." << std::endl;
+		return ERROR_INVALID_FORMAT;
 	}
 	
 	node = f.getChildNode(node, type);

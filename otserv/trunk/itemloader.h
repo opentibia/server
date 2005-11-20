@@ -45,6 +45,11 @@ enum itemgroup_t{
 };
 
 /////////OTB specific//////////////
+enum clientVersion_t{
+	CLIENT_VERSION_750 = 1,
+	CLIENT_VERSION_755 = 2,
+};
+
 enum rootattrib_t{
 	ROOT_ATTR_VERSION = 0x01
 };

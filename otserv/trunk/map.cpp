@@ -39,6 +39,7 @@ using namespace std;
 #endif
 //#include "iomapbin.h"
 #include "iomapxml.h"
+#include "iomapotbm.h"
 
 #include "otsystem.h"
 #include <stdio.h>
@@ -87,6 +88,11 @@ int Map::loadMap(std::string filename, std::string filekind) {
 	}
 	else */if(filekind == "TXT"){
 		loader = new IOMapXML();
+		ret = SPAWN_XML;
+	}
+	else if(filekind == "OTBM"){
+		loader = new IOMapOTBM();
+		//ret = SPAWN_BUILTIN;
 		ret = SPAWN_XML;
 	}
 	#ifdef ENABLESQLMAPSUPPORT	
@@ -141,37 +147,33 @@ Tile* Map::getTile(const Position &pos)
 	return getTile(pos.x, pos.y, pos.z);
 }
 
-
 void Map::setTile(unsigned short _x, unsigned short _y, unsigned char _z, unsigned short groundId)
 {
-  Tile *tile = getTile(_x, _y, _z);
+	Tile* tile = setTile(_x, _y, _z);
+	
+	if(tile->ground)
+		//delete tile->ground;
+		tile->ground->releaseThing();
 
-  if (tile != NULL)
-  {
-		if(tile->ground)
-			//delete tile->ground;
-			tile->ground->releaseThing();
-
+	if(groundId != 0 && Item::items[groundId].isGroundTile()){
 		tile->ground = Item::CreateItem(groundId);
 		tile->ground->pos.x = _x;
 		tile->ground->pos.y = _y;
 		tile->ground->pos.z = _z;
-  }
-  else
-  {
-    tile = new Tile();
-		if(groundId != 0 && Item::items[groundId].isGroundTile()) {
-			tile->ground = Item::CreateItem(groundId);
+	}
+}
 
-			tile->ground->pos.x = _x;
-			tile->ground->pos.y = _y;
-			tile->ground->pos.z = _z;
-		}
-
+Tile* Map::setTile(unsigned short _x, unsigned short _y, unsigned char _z)
+{
+	Tile *tile = getTile(_x, _y, _z);
+	
+	if(!tile){
+    	tile = new Tile();
 		//tileMaps[_x & 0x1F][_y & 0x1F][_z][(_x << 16) | _y] = tile;
 		//tileMaps[_x & 0xFF][_y & 0xFF][ _x & 0xFF00) << 8 | (_y & 0xFF00) | _z] = tile;
 		tileMaps[_x & 0x7F][_y & 0x7F][ (_x & 0xFF80) << 16 | (_y & 0xFF80) << 1 | _z] = tile;
-  } 
+  	} 
+  	return tile;
 }
 
 bool Map::placeCreature(Position &pos, Creature* c)

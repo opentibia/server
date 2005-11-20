@@ -522,6 +522,8 @@ int main(int argc, char *argv[])
 
 	// loads the map and, if needed, an extra-file spawns
 	switch(g_game.loadMap(g_config.getGlobalString("map"), g_config.getGlobalString("mapkind"))){
+	case SPAWN_BUILTIN:
+		break;
 	case MAP_LOADER_ERROR:
 		std::cout << "FATAL: couldnt determine the map format! exiting" << std::endl;
 		exit(1); 

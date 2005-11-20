@@ -220,6 +220,8 @@ class Map {
 	  */
     void setTile(unsigned short _x, unsigned short _y, unsigned char _z, unsigned short groundId);
 
+	Tile* setTile(unsigned short _x, unsigned short _y, unsigned char _z);
+
 	/**
 	  * Place a creature on the map
 	  * \param pos The position to place the creature
@@ -274,6 +276,7 @@ class Map {
 
 	friend class Game;
 	//FIXME friend for derived classes?
+	friend class IOMapOTBM;
 	friend class IOMapXML;
 	friend class IOMap;
 
