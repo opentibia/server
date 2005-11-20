@@ -490,7 +490,7 @@ int main(int argc, char *argv[])
 	std::cout << "[done]" << std::endl;
 	
 	// load monster data
-	std::cout << ":: Loadding monsters monters/monsters.xml ... ";
+	std::cout << ":: Loadding monsters monsters/monsters.xml ... ";
 	if(!g_monsters.loadFromXml(g_config.getGlobalString("datadir")))
 	{
 		ErrorMessage("Could not load monsters/monsters.xml!");
