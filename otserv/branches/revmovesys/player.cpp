@@ -1890,13 +1890,36 @@ ReturnValue Player::__moveThingTo(Creature* creature, Cylinder* toCylinder, uint
 		if(ret != RET_NOERROR)
 			return ret;
 
-		Item* moveItem = Item::CreateItem(item->getID(), count);
-		ret = toCylinder->__addThing(index, moveItem);
+		Item* toItem = dynamic_cast<Item*>(toCylinder->__getThing(index));
+		if(toItem){
+			if(toItem->isStackable() && toItem->getID() == item->getID()){
+				uint32_t oldToCount = toItem->getItemCountOrSubtype();
+				uint32_t newToCount = std::min((uint32_t)100, oldToCount + count);
 
-		//todo: Fix leak here
+				if(newToCount != oldToCount){
+					ret = toCylinder->__updateThing(toItem, newToCount);
+				}
 
-		if(item->getItemCountOrSubtype() == 0){
-			g_game.FreeThing(item);
+				int remainder = count - (newToCount - oldToCount);
+				if(remainder != 0){
+					Item* moveItem = Item::CreateItem(item->getID(), remainder);
+					ret = toCylinder->__addThing(0, moveItem);
+				}
+
+				//todo: Fix leak here
+
+				if(item->getItemCountOrSubtype() == 0){
+					g_game.FreeThing(item);
+				}
+			}
+			else{
+				Item* moveItem = Item::CreateItem(item->getID(), count);
+				ret = toCylinder->__addThing(index, moveItem);
+			}
+		}
+		else{
+			Item* moveItem = Item::CreateItem(item->getID(), count);
+			ret = toCylinder->__addThing(index, moveItem);
 		}
 
 		if(ret != RET_NOERROR)
@@ -1970,7 +1993,7 @@ ReturnValue Player::__addThing(uint32_t index, Thing* thing)
 		return RET_NOTPOSSIBLE;
 	}
 
-	Item* toItem = getInventoryItem((slots_t)index);
+	/*Item* toItem = getInventoryItem((slots_t)index);
 	if(toItem){
 		if(toItem->isStackable() && toItem->getID() == item->getID()){
 			uint32_t oldToCount = toItem->getItemCountOrSubtype();
@@ -1989,24 +2012,44 @@ ReturnValue Player::__addThing(uint32_t index, Thing* thing)
 			return RET_NOERROR;
 		}
 
+		Container* container = dynamic_cast<Container*>(toItem);
+		if(container){
+			return container->__moveThingTo(NULL, toCylinder, container->capacity() - 1, thing, count);
+		}
 		return RET_NOTENOUGHROOM;
 	}
-	else{
+	else{*/
 		item->setParent(this);
 		items[index] = item;
 
 		//send to client
 		sendAddInventoryItem((slots_t)index, item);
-	}
+	//}
 
 	//__internalAddThing(index, item);
 	//sendAddInventoryItem((slots_t)index, item);
 	return RET_NOERROR;
 }
 
-ReturnValue Player::__updateThing(Thing* thing)
+ReturnValue Player::__updateThing(Thing* thing, uint32_t count)
 {
-	return RET_NOTPOSSIBLE;
+	uint32_t index = __getIndexOfThing(thing);
+	if(index == -1)
+		return RET_NOTPOSSIBLE;
+
+	Item* item = dynamic_cast<Item*>(thing);
+	if(item == NULL){
+#ifdef __DEBUG__
+		std::cout << "Failure: [Player::__removeThing] item == NULL" << std::endl;
+#endif
+		return RET_NOTPOSSIBLE;
+	}
+
+	item->setItemCountOrSubtype(count);
+
+	sendUpdateInventoryItem((slots_t)index, item);
+
+	return RET_NOERROR;
 }
 
 ReturnValue Player::__updateThing(uint32_t index, Thing* thing)
@@ -2085,6 +2128,14 @@ uint32_t Player::__getIndexOfThing(const Thing* thing) const
 	}
 
 	return -1;
+}
+
+Thing* Player::__getThing(uint32_t index)
+{
+	if(index > SLOT_FIRST && index < SLOT_LAST)
+		return items[index];
+
+	return NULL;
 }
 
 void Player::__internalAddThing(Thing* thing)

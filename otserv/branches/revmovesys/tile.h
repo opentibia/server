@@ -102,13 +102,15 @@ public:
 	virtual ReturnValue __addThing(Thing* thing);
 	virtual ReturnValue __addThing(uint32_t index, Thing* thing);
 
-	virtual ReturnValue __updateThing(Thing* thing);
+	virtual ReturnValue __updateThing(Thing* thing, uint32_t count);
 	virtual ReturnValue __updateThing(uint32_t index, Thing* thing);
 
 	virtual ReturnValue __removeThing(Thing* thing);
 	virtual ReturnValue __removeThing(Thing* thing, uint32_t count);
 
 	virtual uint32_t __getIndexOfThing(const Thing* thing) const;
+	virtual Thing* __getThing(uint32_t index);
+
 	virtual void __internalAddThing(Thing* thing);
 	virtual void __internalAddThing(uint32_t index, Thing* thing);
 

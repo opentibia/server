@@ -34,13 +34,14 @@ public:
 	virtual ReturnValue __addThing(Thing* thing) = 0;
 	virtual ReturnValue __addThing(uint32_t index, Thing* thing) = 0;
 
-	virtual ReturnValue __updateThing(Thing* thing) = 0;
+	virtual ReturnValue __updateThing(Thing* thing, uint32_t count) = 0;
 	virtual ReturnValue __updateThing(uint32_t index, Thing* thing) = 0;
 
 	virtual ReturnValue __removeThing(Thing* thing) = 0;
 	virtual ReturnValue __removeThing(Thing* thing, uint32_t count) = 0;
 
 	virtual uint32_t __getIndexOfThing(const Thing* thing) const = 0;
+	virtual Thing* __getThing(uint32_t index) = 0;
 	
 	virtual void __internalAddThing(Thing* thing) = 0;
 	virtual void __internalAddThing(uint32_t index, Thing* thing) = 0;

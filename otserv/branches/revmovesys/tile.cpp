@@ -586,7 +586,7 @@ ReturnValue Tile::__addThing(uint32_t index, Thing* thing)
 	return RET_NOTPOSSIBLE;
 }
 
-ReturnValue Tile::__updateThing(Thing* thing)
+ReturnValue Tile::__updateThing(Thing* thing, uint32_t count)
 {
 	return RET_NOTPOSSIBLE;
 }
@@ -610,6 +610,12 @@ uint32_t Tile::__getIndexOfThing(const Thing* thing) const
 {
 	return 0;
 }
+
+Thing* Tile::__getThing(uint32_t index)
+{
+	return NULL;
+}
+
 
 void Tile::__internalAddThing(Thing* thing)
 {
