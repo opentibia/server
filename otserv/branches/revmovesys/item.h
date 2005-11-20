@@ -19,8 +19,8 @@
 //////////////////////////////////////////////////////////////////////
 
 
-#ifndef __OTSERV_ITEM_H
-#define __OTSERV_ITEM_H
+#ifndef __ITEM_H__
+#define __ITEM_H__
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
@@ -53,6 +53,8 @@ public:
 	//Factory member to create item of right type based on type
 	static Item* CreateItem(const unsigned short _type, unsigned short _count = 0);
 	static Items items;
+	
+	virtual bool isPushable() const {return isPushable();};
 
 	unsigned short getID() const;    // ID as in ItemType
 	void setID(unsigned short newid);
@@ -134,23 +136,6 @@ public:
 	Item(const Item &i);
 
 	virtual ~Item();
-
-	/*
-	virtual void useThing() {
-		//std::cout << "Item: useThing() " << this << std::endl;
-		useCount++;
-	};
-	
-	virtual void releaseThing() {
-		useCount--;
-		//std::cout << "Item: releaseThing() " << this << std::endl;
-		//if (useCount == 0)
-		if (useCount <= 0)
-			delete this;
-	};
-	*/
-	
-	//virtual bool canMovedTo(const Tile *tile) const;
 };
 
 class Teleport : public Item
@@ -158,21 +143,6 @@ class Teleport : public Item
 public:
 	Teleport(const unsigned short _type);
 	virtual ~Teleport();
-
-	/*
-	virtual void useThing() {
-		//std::cout << "Teleport: useThing() " << this << std::endl;
-		useCount++;
-	};
-	
-	virtual void releaseThing() {
-		useCount--;
-		//std::cout << "Teleport: releaseThing() " << this << std::endl;
-		//if (useCount == 0)
-		if (useCount <= 0)
-			delete this;
-	};
-	*/
 	
 	void setDestPos(const Position &pos) {destPos = pos;};
 	const Position& getDestPos() const {return destPos;};

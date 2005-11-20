@@ -74,19 +74,7 @@ public:
 	Npc(const std::string& name, Game* game);
 	virtual ~Npc();
 
-	/*
-	virtual void useThing() {
-		//std::cout << "Npc: useThing() " << this << std::endl;
-		useCount++;
-	};
-	
-	virtual void releaseThing() {
-		//std::cout << "Npc: releaseThing() " << this << std::endl;
-		useCount--;
-		if (useCount == 0)
-			delete this;
-	};
-	*/
+	virtual bool isPushable() const { return true;};
 	
 	virtual unsigned long idRange(){ return 0x30000000;}
 	static AutoList<Npc> listNpc;
@@ -128,7 +116,6 @@ protected:
 	virtual std::string getDescription(uint32_t lookDistance) const;
 	
 	virtual bool isAttackable() const { return false; };
-	virtual bool isPushable() const { return true; };
 	
 	std::string name;
 	std::string scriptname;

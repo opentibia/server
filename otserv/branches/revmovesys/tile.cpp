@@ -574,6 +574,11 @@ ReturnValue Tile::__queryMaxCount(int32_t index, const Thing* thing, uint32_t co
 	return RET_NOTPOSSIBLE;
 }
 
+ReturnValue Tile::__queryRemove(const Thing* thing, uint32_t count) const
+{
+	return RET_NOERROR;
+}
+
 ReturnValue Tile::__addThing(Thing* thing)
 {
 	Item* item = dynamic_cast<Item*>(thing);
@@ -594,11 +599,6 @@ ReturnValue Tile::__updateThing(Thing* thing, uint32_t count)
 }
 
 ReturnValue Tile::__updateThing(uint32_t index, Thing* thing)
-{
-	return RET_NOTPOSSIBLE;
-}
-
-ReturnValue Tile::__removeThing(Thing* thing)
 {
 	return RET_NOTPOSSIBLE;
 }

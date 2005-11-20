@@ -59,6 +59,9 @@ public:
 		ground = NULL;
   }
 
+	virtual int getThrowRange() const {return 0;};
+	virtual bool isPushable() const {return false;};
+
   Item*          ground;
   Item*          splash;
   ItemVector     topItems;
@@ -97,8 +100,10 @@ public:
 
 	//
 	virtual ReturnValue __moveThingTo(Creature* creature, Cylinder* toCylinder, int32_t index, Thing* thing, uint32_t count);
+
 	virtual ReturnValue __queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
 		uint32_t& maxQueryCount, bool checkCapacity);
+	virtual ReturnValue __queryRemove(const Thing* thing, uint32_t count) const;
 
 	virtual ReturnValue __addThing(Thing* thing);
 	virtual ReturnValue __addThing(uint32_t index, Thing* thing);
@@ -106,7 +111,6 @@ public:
 	virtual ReturnValue __updateThing(Thing* thing, uint32_t count);
 	virtual ReturnValue __updateThing(uint32_t index, Thing* thing);
 
-	virtual ReturnValue __removeThing(Thing* thing);
 	virtual ReturnValue __removeThing(Thing* thing, uint32_t count);
 
 	virtual int32_t __getIndexOfThing(const Thing* thing) const;
@@ -114,8 +118,6 @@ public:
 
 	virtual void __internalAddThing(Thing* thing);
 	virtual void __internalAddThing(uint32_t index, Thing* thing);
-
-	virtual int getThrowRange() const {return 0;};
 
 	const Position& getTilePosition() const {return tilePos;};
 

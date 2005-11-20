@@ -52,28 +52,17 @@ public:
 
 	virtual ~Monster();
 	//const Monster& operator=(const Monster& rhs);
+
+	virtual const std::string& getName() const;
+	virtual bool isPushable() const;
+
 	virtual unsigned long idRange(){ return 0x40000000;}
 	static AutoList<Monster> listMonster;
 	void removeList() {listMonster.removeList(getID());}
 	void addList() {listMonster.addList(this);}
 	
-	/*
-	virtual void useThing() {
-		//std::cout << "Monster: useThing() " << this << std::endl;
-		useCount++;
-	};
-	
-	virtual void releaseThing() {
-		//std::cout << "Monster: releaseThing() " << this << std::endl;
-		useCount--;
-		if (useCount == 0)
-			delete this;
-	};
-	*/
-	
 	virtual int getArmor() const;
 	virtual int getDefense() const;
-	virtual const std::string& getName() const;
 	
 	virtual void setMaster(Creature* creature);
 	bool isSummon() {return (getMaster() != NULL);}
@@ -146,7 +135,6 @@ protected:
 	virtual void onTeleport(const Creature *creature, const Position *oldPos, unsigned char oldstackpos);
 	
 	virtual bool isAttackable() const { return true; };
-	virtual bool isPushable() const;
 	
 	virtual int onThink(int& newThinkTicks);
 	virtual void setAttackedCreature(const Creature* creature);

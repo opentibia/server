@@ -105,17 +105,24 @@ class Player : public Creature, public Cylinder
 public:
 	Player(const std::string& name, Protocol* p);
 	virtual ~Player();
+	
+	const std::string& getName() const {return name;};
+	virtual bool isPushable() const;
+	virtual int getThrowRange() const {return 1;};
+
 	void setGUID(unsigned long _guid) {guid = _guid;};
 	unsigned long getGUID() const { return guid;};
 	virtual unsigned long idRange(){ return 0x10000000;}
-	virtual int getThrowRange() const {return 1;};
 	static AutoList<Player> listPlayer;
 	void removeList();
 	void addList();
 	void kickPlayer();
 	
-	freeslot_t getFreeSlot(Container **container,unsigned char &slot, const Item* item);
-	Container* getFreeContainerSlot(Container *parent);
+	const std::string& getGuildName() const {return guildName;};
+	unsigned long getGuildId() const {return guildId;};
+
+	//freeslot_t getFreeSlot(Container **container,unsigned char &slot, const Item* item);
+	//Container* getFreeContainerSlot(Container *parent);
 	
 	containerLayout::const_iterator getContainers() const { return vcontainers.begin();}
 	containerLayout::const_iterator getEndContainer() const { return vcontainers.end();}
@@ -137,10 +144,6 @@ public:
 	playersex_t getSex() {return sex;}
 	bool gainManaTick();
 	bool gainHealthTick();
-	
-	const std::string& getName() const {return name;};
-	const std::string& getGuildName() const {return guildName;};
-	unsigned long getGuildId() const {return guildId;};
 	
 	int getPlayerInfo(playerinfo_t playerinfo) const;
 	int getSkill(skills_t skilltype, skillsid_t skillinfo) const;
@@ -248,17 +251,11 @@ public:
 	void die();      //player loses exp/skills/maglevel on death
 	
 	virtual bool isAttackable() const { return (access == 0); };
-	virtual bool isPushable() const;
 	virtual void dropLoot(Container *corpse);
 	virtual int getLookCorpse();
 	bool NeedUpdateStats();
 	
 	virtual std::string getDescription(uint32_t lookDistance) const;
-
-	//tiles
-	//void AddRemoveThing(NetworkMessage& msg, const Position& pos, int stackpos);
-	//void AddAppearThing(NetworkMessage& msg, const Position& pos);
-	//void AddTileUpdated(NetworkMessage& msg, const Position& pos);
 
 	//container
 	void sendAddContainerItem(const Container* container, const Item *item);
@@ -303,8 +300,10 @@ protected:
 
 	//
 	virtual ReturnValue __moveThingTo(Creature* creature, Cylinder* toCylinder, int32_t index, Thing* thing, uint32_t count);
+
 	virtual ReturnValue __queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
 		uint32_t& maxQueryCount, bool checkCapacity);
+	virtual ReturnValue __queryRemove(const Thing* thing, uint32_t count) const;
 
 	virtual ReturnValue __addThing(Thing* thing);
 	virtual ReturnValue __addThing(uint32_t index, Thing* thing);
@@ -312,7 +311,6 @@ protected:
 	virtual ReturnValue __updateThing(Thing* thing, uint32_t count);
 	virtual ReturnValue __updateThing(uint32_t index, Thing* thing);
 
-	virtual ReturnValue __removeThing(Thing* thing);
 	virtual ReturnValue __removeThing(Thing* thing, uint32_t count);
 
 	virtual int32_t __getIndexOfThing(const Thing* thing) const;

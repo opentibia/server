@@ -804,7 +804,11 @@ void Game::thingMove(Creature* creature, Cylinder* fromCylinder, Cylinder* toCyl
 	const Position& fromPos = fromCylinder->getPosition();
 	const Position& toPos = toCylinder->getPosition();
 
-	if(creature->getPosition().z > fromPos.z){
+	/*if(!thing->isPushable()){
+		creature->sendCancel("Sorry, not possible.");
+		return;
+	}
+	else*/ if(creature->getPosition().z > fromPos.z){
 		creature->sendCancel("First go upstairs.");
 		return;
 	}

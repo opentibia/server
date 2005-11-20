@@ -154,7 +154,8 @@ Player::~Player()
   delete client;
 }
 
-bool Player::isPushable() const {
+bool Player::isPushable() const
+{
 	return ((getSleepTicks() <= 0) && access == 0);
 }
 
@@ -1880,6 +1881,10 @@ ReturnValue Player::__moveThingTo(Creature* creature, Cylinder* toCylinder, int3
 	//
 	//
 	//
+	ReturnValue ret = __queryRemove(thing, count);
+	if(ret != RET_NOERROR){
+		return ret;
+	}
 
 	bool checkCapacity = true;
 	Player* player = dynamic_cast<Player*>(creature);
@@ -1888,8 +1893,38 @@ ReturnValue Player::__moveThingTo(Creature* creature, Cylinder* toCylinder, int3
 	}
 
 	uint32_t maxQueryCount = 0;
-	ReturnValue ret = toCylinder->__queryMaxCount(index, item, count, maxQueryCount, checkCapacity);
-	if(ret != RET_NOERROR){
+	ret = toCylinder->__queryMaxCount(index, item, count, maxQueryCount, checkCapacity);
+
+	/*
+	if(ret == RET_NOTENOUGHROOM){
+		//Try move the toItem to the source cylinder
+		int32_t from_index = __getIndexOfThing(thing);
+		uint32_t maxExchangeQueryCount = 0;
+		ret = __queryMaxCount(from_index, thing, 100, maxExchangeQueryCount, checkCapacity);
+		if(ret != RET_NOERROR){
+			return ret;
+		}
+
+		Item* toItem = dynamic_cast<Item*>(toCylinder->__getThing(index));
+		if(!toItem){
+			return RET_NOTPOSSIBLE;
+		}
+
+		ret = toCylinder->__queryRemove(toItem, count);
+
+		if(ret != RET_NOERROR){
+			return ret;
+		}
+
+		ret = toCylinder->__removeThing(toItem, 0);
+		if(ret != RET_NOERROR){
+			return ret;
+		}
+
+		ret = __addThing(toItem);
+	}
+	else*/
+ if(ret != RET_NOERROR){
 		return ret;
 	}
 
@@ -1900,8 +1935,9 @@ ReturnValue Player::__moveThingTo(Creature* creature, Cylinder* toCylinder, int3
 
 	if(item->isStackable()) {
 		ReturnValue ret = __removeThing(item, m);
-		if(ret != RET_NOERROR)
+		if(ret != RET_NOERROR){
 			return ret;
+		}
 
 		Item* toItem = dynamic_cast<Item*>(toCylinder->__getThing(index));
 		if(toItem){
@@ -1942,7 +1978,7 @@ ReturnValue Player::__moveThingTo(Creature* creature, Cylinder* toCylinder, int3
 			return ret;
 	}
 	else{
-		ReturnValue ret = __removeThing(item);
+		ReturnValue ret = __removeThing(item, 0);
 
 		if(ret != RET_NOERROR)
 			return ret;
@@ -1971,7 +2007,7 @@ ReturnValue Player::__queryMaxCount(int32_t index, const Thing* thing, uint32_t 
 		return RET_NOTPOSSIBLE;
 	}
 
-	Item* toItem = dynamic_cast<Item*>(__getThing(index));
+	const Item* toItem = dynamic_cast<const Item*>(__getThing(index));
 	if(!toItem){
 		maxQueryCount = 100;
 		return RET_NOERROR;
@@ -1988,6 +2024,25 @@ ReturnValue Player::__queryMaxCount(int32_t index, const Thing* thing, uint32_t 
 
 	maxQueryCount = 0;
 	return RET_NOTENOUGHROOM;
+}
+
+ReturnValue Player::__queryRemove(const Thing* thing, uint32_t count) const
+{
+	const Item* item = dynamic_cast<const Item*>(thing);
+	if(!item){
+		return RET_NOTPOSSIBLE;
+	}
+
+	if(item->isStackable()){
+		if(count == 0 || count > item->getItemCountOrSubtype())
+			return RET_NOTPOSSIBLE;
+	}
+
+	int32_t index = __getIndexOfThing(thing);
+	if(index == -1)
+		return RET_NOTPOSSIBLE;
+
+	return RET_NOERROR;
 }
 
 ReturnValue Player::__addThing(Thing* thing)
@@ -2042,19 +2097,6 @@ ReturnValue Player::__updateThing(Thing* thing, uint32_t count)
 ReturnValue Player::__updateThing(uint32_t index, Thing* thing)
 {
 	return RET_NOTPOSSIBLE;
-}
-
-ReturnValue Player::__removeThing(Thing* thing)
-{
-	int32_t index = __getIndexOfThing(thing);
-	if(index == -1)
-		return RET_NOTPOSSIBLE;
-
-	items[index] = NULL;
-
-	//send change to client
-	sendRemoveInventoryItem((slots_t)index);
-	return RET_NOERROR;
 }
 
 ReturnValue Player::__removeThing(Thing* thing, uint32_t count)

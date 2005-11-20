@@ -114,6 +114,7 @@ public:
 	
 	virtual const std::string& getName() const = 0;
 	virtual int getThrowRange() const {return 1;};
+	virtual bool isPushable() const {return true;};
 	
 	void setID(){this->id = auto_id | this->idRange();}
 	virtual unsigned long idRange() = 0;
@@ -164,7 +165,6 @@ public:
 	unsigned long attackedCreature;
 	
 	virtual bool isAttackable() const { return true; };
-	virtual bool isPushable() const {return true;}
 	virtual void dropLoot(Container *corpse) {return;};
 	virtual int getLookCorpse() {return lookcorpse;};
 	

@@ -189,8 +189,9 @@ ReturnValue Container::__moveThingTo(Creature* creature, Cylinder* toCylinder, i
 		}
 
 		ret = __removeThing(item, m);
-		if(ret != RET_NOERROR)
+		if(ret != RET_NOERROR){
 			return ret;
+		}
 
 		Item* toItem = dynamic_cast<Item*>(toCylinder->__getThing(index));
 		if(toItem){
@@ -235,7 +236,7 @@ ReturnValue Container::__moveThingTo(Creature* creature, Cylinder* toCylinder, i
 	else{
 		//todo: check if exchange item if destination is a inventory cylinder
 
-		ReturnValue ret = __removeThing(item);
+		ReturnValue ret = __removeThing(item, 0);
 
 		if(ret != RET_NOERROR)
 			return ret;
@@ -288,6 +289,11 @@ ReturnValue Container::__queryMaxCount(int32_t index, const Thing* thing, uint32
 		return RET_NOTENOUGHROOM;
 	else 
 		return RET_NOERROR;
+}
+
+ReturnValue Container::__queryRemove(const Thing* thing, uint32_t count) const
+{
+	return RET_NOERROR;
 }
 
 ReturnValue Container::__addThing(Thing* thing)
@@ -390,40 +396,6 @@ ReturnValue Container::__updateThing(uint32_t index, Thing* thing)
 		Player* spectator = dynamic_cast<Player*>(*it);
 		if(spectator){
 			spectator->sendUpdateContainerItem(this, index, item);
-		}
-	}
-
-	return RET_NOERROR;
-}
-
-ReturnValue Container::__removeThing(Thing* thing)
-{
-	int32_t index = __getIndexOfThing(thing);
-	if(index == -1){
-#ifdef __DEBUG__
-		std::cout << "Failure: [Container::__removeThing] item == NULL" << std::endl;
-#endif
-		return RET_NOTPOSSIBLE;
-	}
-
-	ItemList::iterator cit = std::find(itemlist.begin(), itemlist.end(), thing);
-	if(cit == itemlist.end())
-		return RET_NOTPOSSIBLE;
-
-	(*cit)->setParent(NULL);
-	itemlist.erase(cit);
-
-	const Position& cylinderMapPos = getPosition();
-
-	SpectatorVec list;
-	SpectatorVec::iterator it;
-	g_game.getSpectators(Range(cylinderMapPos, 2, 2, 2, 2, false), list);
-
-	//send change to client
-	for(it = list.begin(); it != list.end(); ++it) {
-		Player* spectator = dynamic_cast<Player*>(*it);
-		if(spectator){
-			spectator->sendRemoveContainerItem(this, index);
 		}
 	}
 

@@ -70,8 +70,8 @@ public:
 
 	const Position& getPosition() const;
 	virtual int getThrowRange() const = 0;
+	virtual bool isPushable() const = 0;
 
-	//bool isRemoved() const {return getTile() == NULL;};
 	bool isRemoved() const {return parent == NULL;};
 
 private:
