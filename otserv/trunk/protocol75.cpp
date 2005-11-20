@@ -2439,13 +2439,7 @@ void Protocol75::AddCreature(NetworkMessage &msg,const Creature *creature, bool 
 		msg.AddString(creature->getName());
 	}
 	
-	unsigned char healht_percent = creature->health*100/creature->healthmax;
-	if(healht_percent == 0){
-		msg.AddByte(1);
-	}
-	else{
-		msg.AddByte(healht_percent);
-	}
+	msg.AddByte(std::max(1, creature->health*100/creature->healthmax));
 	
 	msg.AddByte((unsigned char)creature->getDirection());
 	
@@ -2544,7 +2538,7 @@ void Protocol75::AddCreatureHealth(NetworkMessage &msg,const Creature *creature)
 {
 	msg.AddByte(0x8C);
 	msg.AddU32(creature->getID());
-	msg.AddByte(std::max(creature->health,0)*100/creature->healthmax);
+	msg.AddByte(std::max(1, creature->health*100/creature->healthmax));
 }
 
 void Protocol75::AddRemoveThing(NetworkMessage &msg, const Position &pos,unsigned char stackpos){
