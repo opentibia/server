@@ -567,7 +567,8 @@ ReturnValue Tile::__moveThingTo(Creature* creature, Cylinder* toCylinder, int32_
 	return RET_NOTPOSSIBLE;
 }
 
-ReturnValue Tile::__queryMaxCount(int32_t index, const Thing* thing, uint32_t count, uint32_t& maxQueryCount)
+ReturnValue Tile::__queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
+	uint32_t& maxQueryCount, bool checkCapacity)
 {
 	maxQueryCount = 0;
 	return RET_NOTPOSSIBLE;

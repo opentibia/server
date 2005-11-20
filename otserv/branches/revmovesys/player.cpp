@@ -1880,9 +1880,15 @@ ReturnValue Player::__moveThingTo(Creature* creature, Cylinder* toCylinder, int3
 	//
 	//
 	//
-	
+
+	bool checkCapacity = true;
+	Player* player = dynamic_cast<Player*>(creature);
+	if(player == getTopParent() && player == toCylinder->getTopParent()){
+		checkCapacity = false;
+	}
+
 	uint32_t maxQueryCount = 0;
-	ReturnValue ret = toCylinder->__queryMaxCount(index, item, count, maxQueryCount);
+	ReturnValue ret = toCylinder->__queryMaxCount(index, item, count, maxQueryCount, checkCapacity);
 	if(ret != RET_NOERROR){
 		return ret;
 	}
@@ -1956,7 +1962,8 @@ ReturnValue Player::__moveThingTo(Creature* creature, Cylinder* toCylinder, int3
 	return RET_NOERROR;
 }
 
-ReturnValue Player::__queryMaxCount(int32_t index, const Thing* thing, uint32_t count, uint32_t& maxQueryCount)
+ReturnValue Player::__queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
+	uint32_t& maxQueryCount, bool checkCapacity)
 {
 	const Item* item = dynamic_cast<const Item*>(thing);
 	if(item == NULL){

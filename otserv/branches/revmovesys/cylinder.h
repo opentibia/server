@@ -29,7 +29,8 @@ class Creature;
 class Cylinder : virtual public Thing{
 public:	
 	virtual ReturnValue __moveThingTo(Creature* creature, Cylinder* toCylinder, int32_t index, Thing* thing, uint32_t count) = 0;
-	virtual ReturnValue __queryMaxCount(int32_t index, const Thing* thing, uint32_t count, uint32_t& maxQueryCount) = 0;
+	virtual ReturnValue __queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
+		uint32_t& maxQueryCount, bool checkCapacity) = 0;
 
 	virtual ReturnValue __addThing(Thing* thing) = 0;
 	virtual ReturnValue __addThing(uint32_t index, Thing* thing) = 0;

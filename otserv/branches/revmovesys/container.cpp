@@ -161,9 +161,15 @@ ReturnValue Container::__moveThingTo(Creature* creature, Cylinder* toCylinder, i
 	//
 	//
 	//
-	
+
+	bool checkCapacity = true;
+	Player* player = dynamic_cast<Player*>(creature);
+	if(player == getTopParent() && player == toCylinder->getTopParent()){
+		checkCapacity = false;
+	}
+
 	uint32_t maxQueryCount = 0;
-	ReturnValue ret = toCylinder->__queryMaxCount(index, item, count, maxQueryCount);
+	ReturnValue ret = toCylinder->__queryMaxCount(index, item, count, maxQueryCount, checkCapacity);
 	if(ret != RET_NOERROR){
 		return ret;
 	}
@@ -246,8 +252,8 @@ ReturnValue Container::__moveThingTo(Creature* creature, Cylinder* toCylinder, i
 	return RET_NOERROR;
 }
 
-
-ReturnValue Container::__queryMaxCount(int32_t index, const Thing* thing, uint32_t count, uint32_t& maxQueryCount)
+ReturnValue Container::__queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
+	uint32_t& maxQueryCount, bool checkCapacity)
 {
 	const Item* item = dynamic_cast<const Item*>(thing);
 	if(item == NULL){
@@ -257,22 +263,23 @@ ReturnValue Container::__queryMaxCount(int32_t index, const Thing* thing, uint32
 
 	uint32_t freeSlots = (capacity() - size());
 
-	if(index != -1){
-		if(item->isStackable()){
+	if(item->isStackable()){
+		uint32_t n = 0;
+
+		if(index != -1){
 			Item* toItem = dynamic_cast<Item*>(__getThing(index));
 
-			uint32_t n = 0;
 			if(toItem && toItem->getID() == item->getID()){
 				n = 100 - toItem->getItemCountOrSubtype();
 			}
-
-			maxQueryCount = freeSlots * 100 + n;
-
-			if(maxQueryCount == 0)
-				return RET_NOTENOUGHROOM;
-			else 
-				return RET_NOERROR;
 		}
+
+		maxQueryCount = freeSlots * 100 + n;
+
+		if(maxQueryCount == 0)
+			return RET_NOTENOUGHROOM;
+		else 
+			return RET_NOERROR;
 	}
 
 	maxQueryCount = freeSlots;
