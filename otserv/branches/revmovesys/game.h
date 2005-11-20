@@ -171,6 +171,8 @@ public:
 	uint32_t getNpcsOnline();
 	uint32_t getCreaturesOnline();
 
+	void getSpectators(const Range& range, SpectatorVec& list);
+
 	void thingMove(Creature* creature, Cylinder* fromCylinder, Cylinder* toCylinder, uint8_t index,
 		Thing* thing, uint32_t count);
 
@@ -372,8 +374,6 @@ protected:
 
 	//void CreateDamageUpdate(Creature* player, Creature* attackCreature, int damage);
 	//void CreateManaDamageUpdate(Creature* player, Creature* attackCreature, int damage);
-
-	void getSpectators(const Range& range, SpectatorVec& list);
 
 	OTSYS_THREAD_LOCKVAR eventLock;
 	OTSYS_THREAD_SIGNALVAR eventSignal;

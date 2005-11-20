@@ -2037,15 +2037,15 @@ ReturnValue Player::__removeThing(Thing* thing, uint32_t count)
 		return RET_NOTPOSSIBLE;
 	}
 	
+	uint32_t index = __getIndexOfThing(thing);
+	if(index == -1)
+		return RET_NOTPOSSIBLE;
+
 	if(item->isStackable()) {
 		if(count == 0 || count > item->getItemCountOrSubtype())
 			return RET_NOTPOSSIBLE;
 
 		if(count == item->getItemCountOrSubtype()){
-			uint32_t index = __getIndexOfThing(thing);
-			if(index == -1)
-				return RET_NOTPOSSIBLE;
-
 			items[index] = NULL;
 			item->setParent(NULL);
 
@@ -2054,10 +2054,6 @@ ReturnValue Player::__removeThing(Thing* thing, uint32_t count)
 			return RET_NOERROR;
 		}
 		else{
-			uint32_t index = __getIndexOfThing(thing);
-			if(index == -1)
-				return RET_NOTPOSSIBLE;
-
 			item->setItemCountOrSubtype(item->getItemCountOrSubtype() - count);
 
 			//send change to client

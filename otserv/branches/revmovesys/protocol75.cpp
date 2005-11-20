@@ -955,10 +955,10 @@ void Protocol75::parseThrow(NetworkMessage& msg)
 		Cylinder* fromCylinder = internalGetCylinder(from_x, from_y, from_z);
 		Cylinder* toCylinder = internalGetCylinder(to_x, to_y, to_z);
 		
-		uint8_t from_index = static_cast<unsigned char>(from_y & 0x0F);
+		uint8_t from_index = ((from_y & 0x40) ? static_cast<uint8_t>(from_z) : static_cast<uint8_t>(from_y));
 		Thing* thing = internalGetThing(from_x, from_y, from_z, from_index);
 
-		uint8_t to_index = static_cast<unsigned char>(to_y & 0x0F);
+		uint8_t to_index = ((to_y & 0x40) ? static_cast<uint8_t>(to_z) : static_cast<uint8_t>(to_y));
 		game->thingMove(player, fromCylinder, toCylinder, to_index, thing, count);
 		return;
 	}
@@ -1081,7 +1081,8 @@ void Protocol75::parseLookAt(NetworkMessage& msg)
 		if(LookPos.z != thingMapPos.z)
 			lookDistance = std::abs(LookPos.z - thingMapPos.z) * 2;
 		else
-			lookDistance = std::sqrt( std::pow(std::abs(LookPos.x - thingMapPos.x), 2) + std::pow(std::abs(LookPos.y - thingMapPos.y), 2));
+			lookDistance = std::sqrt( std::pow(std::abs(LookPos.x - thingMapPos.x), 2) +
+			std::pow(std::abs(LookPos.y - thingMapPos.y), 2));
 	}
 
 	std::stringstream ss;

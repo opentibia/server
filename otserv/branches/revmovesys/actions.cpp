@@ -266,8 +266,8 @@ bool Actions::UseItem(Player* player, const Position &pos,const unsigned char st
 bool Actions::openContainer(Player *player,Container *container, const unsigned char index)
 {
 	//if(container->depotId == 0){ //normal container
-		uint8_t oldcontainerid = player->getContainerID(container);
-		if(oldcontainerid != 0xFF) {
+		uint32_t oldcontainerid = player->getContainerID(container);
+		if(oldcontainerid != -1) {
 			player->closeContainer(oldcontainerid);
 			player->sendCloseContainer(oldcontainerid);
 		}

@@ -19,6 +19,10 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "container.h"
+#include "game.h"
+#include "player.h"
+
+extern Game g_game;
 
 Container::Container(const uint16_t _type) : Item(_type)
 {
@@ -143,7 +147,58 @@ bool Container::isHoldingItem(const Item* item) const
 
 ReturnValue Container::__moveThingTo(Creature* creature, Cylinder* toCylinder, uint32_t index, Thing* thing, uint32_t count)
 {
-	return RET_NOTPOSSIBLE;
+	Item* item = dynamic_cast<Item*>(thing);
+	if(item == NULL)
+		return RET_NOTPOSSIBLE;
+
+	//check constraints before moving
+	//
+	//
+	//
+	
+	//check how much we really can move (count)
+	//
+	//
+
+	if(item->isStackable()) {
+		uint32_t fromIndex = __getIndexOfThing(item);
+
+		ReturnValue ret = __removeThing(item, count);
+		if(ret != RET_NOERROR)
+			return ret;
+
+		//Special condition if we are moving a stackable item in the same container
+		//index will not be correct after removing "fromItem" if the fromIndex is < index
+		if(this == toCylinder && count == item->getItemCountOrSubtype()){
+			if(fromIndex < index)
+				index = index - 1;
+		}
+
+		Item* moveItem = Item::CreateItem(item->getID(), count);
+		ret = toCylinder->__addThing(index, moveItem);
+
+		//todo: Fix leak here
+
+		if(item->getItemCountOrSubtype() == 0){
+			g_game.FreeThing(item);
+		}
+
+		if(ret != RET_NOERROR)
+			return ret;
+	}
+	else{
+		ReturnValue ret = __removeThing(item);
+
+		if(ret != RET_NOERROR)
+			return ret;
+
+		ret = toCylinder->__addThing(index, item);
+
+		if(ret != RET_NOERROR)
+			return ret;
+	}
+
+	return RET_NOERROR;
 }
 
 /*ReturnValue Container::__queryCanMove(uint32_t index, Thing* thing, uint32_t inCount, uint32_t& outCount)
@@ -162,7 +217,75 @@ ReturnValue Container::__addThing(Thing* thing)
 
 ReturnValue Container::__addThing(uint32_t index, Thing* thing)
 {
-	return RET_NOTPOSSIBLE;
+	if(index < 0 || index >= capacity())
+		return RET_NOTPOSSIBLE;
+
+	Item* item = dynamic_cast<Item*>(thing);
+	if(item == NULL)
+		return RET_NOTPOSSIBLE;
+
+	if(itemlist.size() >= capacity())
+		return RET_NOTENOUGHROOM;
+
+	const Position& cylinderMapPos = getPosition();
+
+	SpectatorVec list;
+	SpectatorVec::iterator it;
+	g_game.getSpectators(Range(cylinderMapPos, 2, 2, 2, 2, false), list);
+
+	Item* toItem = getItem(index);
+	if(toItem){
+		if(toItem->isStackable() && toItem->getID() == item->getID()){
+			uint32_t oldToCount = toItem->getItemCountOrSubtype();
+			uint32_t newToCount = std::min((uint32_t)100, oldToCount + item->getItemCountOrSubtype());
+			toItem->setItemCountOrSubtype(newToCount);
+
+			//send to client
+			int remainCount = item->getItemCountOrSubtype() - (newToCount - oldToCount);			
+			item->setItemCountOrSubtype(remainCount);
+
+			for(it = list.begin(); it != list.end(); ++it) {
+				Player* spectator = dynamic_cast<Player*>(*it);
+				if(spectator){
+					spectator->sendUpdateContainerItem(this, index, toItem);
+				}
+			}
+
+			if(remainCount != 0){
+				if(itemlist.size() >= capacity())
+					return RET_NOTENOUGHROOM;
+
+				item->setParent(this);
+				itemlist.push_front(item);
+
+				//send to client
+				for(it = list.begin(); it != list.end(); ++it) {
+					Player* spectator = dynamic_cast<Player*>(*it);
+					if(spectator){
+						spectator->sendAddContainerItem(this, item);
+					}
+				}
+			}
+			
+			return RET_NOERROR;
+		}
+
+		return RET_NOTENOUGHROOM;
+	}
+	else{
+		item->setParent(this);
+		itemlist.push_front(item);
+
+		//send to client
+		for(it = list.begin(); it != list.end(); ++it) {
+			Player* spectator = dynamic_cast<Player*>(*it);
+			if(spectator){
+				spectator->sendAddContainerItem(this, item);
+			}
+		}
+	}
+
+	return RET_NOERROR;
 }
 
 ReturnValue Container::__updateThing(Thing* thing)
@@ -182,6 +305,72 @@ ReturnValue Container::__removeThing(Thing* thing)
 
 ReturnValue Container::__removeThing(Thing* thing, uint32_t count)
 {
+	uint32_t index = __getIndexOfThing(thing);
+	if(index == -1){
+#ifdef __DEBUG__
+		std::cout << "Failure: [Container::__removeThing] item == NULL" << std::endl;
+#endif
+		return RET_NOTPOSSIBLE;
+	}
+
+	ItemList::iterator cit = std::find(itemlist.begin(), itemlist.end(), thing);
+	if(cit == itemlist.end())
+		return RET_NOTPOSSIBLE;
+
+	const Position& cylinderMapPos = getPosition();
+
+	SpectatorVec list;
+	SpectatorVec::iterator it;
+	g_game.getSpectators(Range(cylinderMapPos, 2, 2, 2, 2, false), list);
+
+	Item* item = *cit;
+	if(item->isStackable()) {
+		if(count == 0 || count > item->getItemCountOrSubtype())
+			return RET_NOTPOSSIBLE;
+
+		if(count == item->getItemCountOrSubtype()){
+			(*cit)->setParent(NULL);
+			itemlist.erase(cit);
+
+			//send change to client
+			for(it = list.begin(); it != list.end(); ++it) {
+				Player* spectator = dynamic_cast<Player*>(*it);
+				if(spectator){
+					spectator->sendRemoveContainerItem(this, index);
+				}
+			}
+
+			return RET_NOERROR;
+		}
+		else{
+			item->setItemCountOrSubtype(item->getItemCountOrSubtype() - count);
+
+			//send change to client
+			for(it = list.begin(); it != list.end(); ++it) {
+				Player* spectator = dynamic_cast<Player*>(*it);
+				if(spectator){
+					spectator->sendUpdateContainerItem(this, index, item);
+				}
+			}
+
+			return RET_NOERROR;
+		}
+	}
+	else{
+		(*cit)->setParent(NULL);
+		itemlist.erase(cit);
+
+		//send change to client
+		for(it = list.begin(); it != list.end(); ++it) {
+			Player* spectator = dynamic_cast<Player*>(*it);
+			if(spectator){
+				spectator->sendRemoveContainerItem(this, index);
+			}
+		}
+
+		return RET_NOERROR;
+	}
+	
 	return RET_NOTPOSSIBLE;
 }
 
@@ -195,17 +384,37 @@ uint32_t Container::__getIndexOfThing(const Thing* thing) const
 			++index;
 	}
 
-	return 0xFF;
+	return -1;
 }
 
 void Container::__internalAddThing(Thing* thing)
 {
-	//
+	__internalAddThing(0, thing);
 }
 
 void Container::__internalAddThing(uint32_t index, Thing* thing)
 {
-	//
+#ifdef __DEBUG__
+	std::cout << "[Container::__internalAddThing] index: " << index << std::endl;
+#endif
+
+	Item* item = dynamic_cast<Item*>(thing);
+	if(item == NULL){
+#ifdef __DEBUG__
+		std::cout << "Failure: [Container::__internalAddThing] item == NULL" << std::endl;
+#endif
+		return;
+	}
+
+	if(index < 0 || index >= capacity()){
+#ifdef __DEBUG__
+		std::cout << "Failure: [Container::__internalAddThing] - index is out of range" << std::endl;
+#endif
+		return;
+	}
+
+	itemlist.push_front(item);
+	item->setParent(this);
 }
 
 /*

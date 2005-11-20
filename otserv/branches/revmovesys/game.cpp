@@ -804,7 +804,7 @@ void Game::thingMove(Creature* creature, Cylinder* fromCylinder, Cylinder* toCyl
 	ReturnValue ret = fromCylinder->__moveThingTo(creature, toCylinder, index, thing, count);
 
 	switch(ret){
-		RET_NOTPOSSIBLE:
+		case RET_NOTPOSSIBLE:
 			creature->sendCancel("Sorry, not possible.");
 			break;
 	}
