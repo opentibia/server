@@ -96,7 +96,7 @@ public:
   virtual std::string getDescription(uint32_t lookDistance) const;
 
 	//
-	virtual ReturnValue __moveThingTo(Creature* creature, Cylinder* toCylinder, uint32_t index, Thing* thing, uint32_t count);
+	virtual ReturnValue __moveThingTo(Creature* creature, Cylinder* toCylinder, int32_t index, Thing* thing, uint32_t count);
 	//virtual ReturnValue __queryCanMove(uint32_t index, Thing* thing, uint32_t inCount, uint32_t& outCount);
 
 	virtual ReturnValue __addThing(Thing* thing);
@@ -108,7 +108,7 @@ public:
 	virtual ReturnValue __removeThing(Thing* thing);
 	virtual ReturnValue __removeThing(Thing* thing, uint32_t count);
 
-	virtual uint32_t __getIndexOfThing(const Thing* thing) const;
+	virtual int32_t __getIndexOfThing(const Thing* thing) const;
 	virtual Thing* __getThing(uint32_t index);
 
 	virtual void __internalAddThing(Thing* thing);

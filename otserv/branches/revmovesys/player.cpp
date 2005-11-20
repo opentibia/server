@@ -1864,11 +1864,17 @@ bool Player::addVIP(unsigned long _guid, std::string &name, bool isOnline, bool 
 }
 
 
-ReturnValue Player::__moveThingTo(Creature* creature, Cylinder* toCylinder, uint32_t index, Thing* thing, uint32_t count)
+ReturnValue Player::__moveThingTo(Creature* creature, Cylinder* toCylinder, int32_t index, Thing* thing, uint32_t count)
 {
 	Item* item = dynamic_cast<Item*>(thing);
 	if(item == NULL)
 		return RET_NOTPOSSIBLE;
+
+	Cylinder* subCylinder = dynamic_cast<Cylinder*>(toCylinder->__getThing(index));
+	if(subCylinder){
+		toCylinder = subCylinder;
+		index = -1;
+	}
 
 	//check constraints before moving
 	//
@@ -1914,12 +1920,20 @@ ReturnValue Player::__moveThingTo(Creature* creature, Cylinder* toCylinder, uint
 			}
 			else{
 				Item* moveItem = Item::CreateItem(item->getID(), count);
-				ret = toCylinder->__addThing(index, moveItem);
+
+				if(index == -1)
+					ret = toCylinder->__addThing(moveItem);
+				else
+					ret = toCylinder->__addThing(index, moveItem);
 			}
 		}
 		else{
 			Item* moveItem = Item::CreateItem(item->getID(), count);
-			ret = toCylinder->__addThing(index, moveItem);
+
+			if(index == -1)
+				ret = toCylinder->__addThing(moveItem);
+			else
+				ret = toCylinder->__addThing(index, moveItem);
 		}
 
 		if(ret != RET_NOERROR)
@@ -1931,7 +1945,10 @@ ReturnValue Player::__moveThingTo(Creature* creature, Cylinder* toCylinder, uint
 		if(ret != RET_NOERROR)
 			return ret;
 
-		ret = toCylinder->__addThing(index, item);
+		if(index == -1)
+			ret = toCylinder->__addThing(item);
+		else
+			ret = toCylinder->__addThing(index, item);
 
 		if(ret != RET_NOERROR)
 			return ret;
@@ -1993,47 +2010,18 @@ ReturnValue Player::__addThing(uint32_t index, Thing* thing)
 		return RET_NOTPOSSIBLE;
 	}
 
-	/*Item* toItem = getInventoryItem((slots_t)index);
-	if(toItem){
-		if(toItem->isStackable() && toItem->getID() == item->getID()){
-			uint32_t oldToCount = toItem->getItemCountOrSubtype();
-			uint32_t newToCount = std::min((uint32_t)100, oldToCount + item->getItemCountOrSubtype());
-			toItem->setItemCountOrSubtype(newToCount);
+	item->setParent(this);
+	items[index] = item;
 
-			//send to client
-			sendUpdateInventoryItem((slots_t)index, toItem);
+	//send to client
+	sendAddInventoryItem((slots_t)index, item);
 
-			int remainCount = item->getItemCountOrSubtype() - (newToCount - oldToCount);			
-			item->setItemCountOrSubtype(remainCount);
-
-			if(remainCount != 0)
-				return RET_NOTENOUGHROOM;
-			
-			return RET_NOERROR;
-		}
-
-		Container* container = dynamic_cast<Container*>(toItem);
-		if(container){
-			return container->__moveThingTo(NULL, toCylinder, container->capacity() - 1, thing, count);
-		}
-		return RET_NOTENOUGHROOM;
-	}
-	else{*/
-		item->setParent(this);
-		items[index] = item;
-
-		//send to client
-		sendAddInventoryItem((slots_t)index, item);
-	//}
-
-	//__internalAddThing(index, item);
-	//sendAddInventoryItem((slots_t)index, item);
 	return RET_NOERROR;
 }
 
 ReturnValue Player::__updateThing(Thing* thing, uint32_t count)
 {
-	uint32_t index = __getIndexOfThing(thing);
+	int32_t index = __getIndexOfThing(thing);
 	if(index == -1)
 		return RET_NOTPOSSIBLE;
 
@@ -2059,7 +2047,7 @@ ReturnValue Player::__updateThing(uint32_t index, Thing* thing)
 
 ReturnValue Player::__removeThing(Thing* thing)
 {
-	uint32_t index = __getIndexOfThing(thing);
+	int32_t index = __getIndexOfThing(thing);
 	if(index == -1)
 		return RET_NOTPOSSIBLE;
 
@@ -2080,7 +2068,7 @@ ReturnValue Player::__removeThing(Thing* thing, uint32_t count)
 		return RET_NOTPOSSIBLE;
 	}
 	
-	uint32_t index = __getIndexOfThing(thing);
+	int32_t index = __getIndexOfThing(thing);
 	if(index == -1)
 		return RET_NOTPOSSIBLE;
 
@@ -2105,10 +2093,6 @@ ReturnValue Player::__removeThing(Thing* thing, uint32_t count)
 		}
 	}
 	else{
-		uint32_t index = __getIndexOfThing(thing);
-		if(index == -1)
-			return RET_NOTPOSSIBLE;
-
 		items[index] = NULL;
 		item->setParent(NULL);
 
@@ -2120,7 +2104,7 @@ ReturnValue Player::__removeThing(Thing* thing, uint32_t count)
 	return RET_NOTPOSSIBLE;
 }
 
-uint32_t Player::__getIndexOfThing(const Thing* thing) const
+int32_t Player::__getIndexOfThing(const Thing* thing) const
 {
 	for(int i = SLOT_FIRST; i < SLOT_LAST; ++i){
 		if(items[i] == thing)

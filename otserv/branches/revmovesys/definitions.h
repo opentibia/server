@@ -19,8 +19,8 @@
 //////////////////////////////////////////////////////////////////////
 
 
-#ifndef __definitions_h
-#define __definitions_h
+#ifndef __DEFINITIONS_H__
+#define __DEFINITIONS_H__
 
 typedef unsigned long long uint64_t;
 
@@ -36,19 +36,12 @@ typedef unsigned long long uint64_t;
 
 #define EWOULDBLOCK WSAEWOULDBLOCK
 
-typedef unsigned int uint32_t;
+typedef unsigned long uint32_t;
+typedef signed long int32_t;
 typedef unsigned short uint16_t;
 typedef unsigned char uint8_t;
 
 #pragma warning(disable:4786) // msvc too long debug names in stl
-
-#ifdef MIN
-#undef MIN
-#endif
-
-#ifdef MAX
-#undef MAX
-#endif
 
 #ifndef NOMINMAX
 #define NOMINMAX
@@ -64,4 +57,4 @@ typedef int64_t __int64;
 #endif
 
 
-#endif // __definitions_h
+#endif // __DEFINITIONS_H__

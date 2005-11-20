@@ -562,7 +562,7 @@ void Tile::setPz()
 }
 
 
-ReturnValue Tile::__moveThingTo(Creature* creature, Cylinder* toCylinder, uint32_t index, Thing* thing, uint32_t count)
+ReturnValue Tile::__moveThingTo(Creature* creature, Cylinder* toCylinder, int32_t index, Thing* thing, uint32_t count)
 {
 	return RET_NOTPOSSIBLE;
 }
@@ -606,9 +606,9 @@ ReturnValue Tile::__removeThing(Thing* thing, uint32_t count)
 	return RET_NOTPOSSIBLE;
 }
 
-uint32_t Tile::__getIndexOfThing(const Thing* thing) const
+int32_t Tile::__getIndexOfThing(const Thing* thing) const
 {
-	return 0;
+	return -1;
 }
 
 Thing* Tile::__getThing(uint32_t index)

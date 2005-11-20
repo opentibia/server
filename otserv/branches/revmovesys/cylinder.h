@@ -28,7 +28,7 @@ class Creature;
 
 class Cylinder : virtual public Thing{
 public:	
-	virtual ReturnValue __moveThingTo(Creature* creature, Cylinder* toCylinder, uint32_t index, Thing* thing, uint32_t count) = 0;
+	virtual ReturnValue __moveThingTo(Creature* creature, Cylinder* toCylinder, int32_t index, Thing* thing, uint32_t count) = 0;
 	//virtual ReturnValue __queryCanMove(uint32_t index, Thing* thing, uint32_t inCount, uint32_t& outCount) = 0;
 
 	virtual ReturnValue __addThing(Thing* thing) = 0;
@@ -40,7 +40,7 @@ public:
 	virtual ReturnValue __removeThing(Thing* thing) = 0;
 	virtual ReturnValue __removeThing(Thing* thing, uint32_t count) = 0;
 
-	virtual uint32_t __getIndexOfThing(const Thing* thing) const = 0;
+	virtual int32_t __getIndexOfThing(const Thing* thing) const = 0;
 	virtual Thing* __getThing(uint32_t index) = 0;
 	
 	virtual void __internalAddThing(Thing* thing) = 0;

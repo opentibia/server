@@ -553,9 +553,32 @@ Cylinder* Protocol75::internalGetCylinder(unsigned short x, unsigned short y, un
 		if(y & 0x40){
 			uint8_t from_cid = y & 0x0F;
 			return player->getContainer(from_cid);
+
+			/*
+			Container* container = player->getContainer(from_cid);
+
+			if(!container)
+				return NULL;
+
+			//check if destination slot is a container
+			Container* childContainer = dynamic_cast<Container*>(container->__getThing(z));
+			if(childContainer)
+				return childContainer;
+			else
+				return container;
+			*/
 		}
 		else{
 			return player;
+
+			/*
+			slots_t slot = (slots_t)static_cast<unsigned char>(y);
+			Container* childContainer = dynamic_cast<Container*>(player->getInventoryItem(slot));
+			if(childContainer)
+				return childContainer;
+			else
+				return player;
+			*/
 		}
 	}
 }
@@ -1321,7 +1344,7 @@ void Protocol75::sendContainer(uint32_t cid, Container* container)
 	msg.AddItemId(container);
 	msg.AddString(container->getName());
 	msg.AddByte(container->capacity());
-	if(container->getParent() != NULL)
+	if(dynamic_cast<const Container*>(container->getParent()) != NULL)
 		msg.AddByte(0x01); // container up ID (can go up) 
 	else
 		msg.AddByte(0x00);

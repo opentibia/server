@@ -796,9 +796,32 @@ void Game::thingMove(Creature* creature, Cylinder* fromCylinder, Cylinder* toCyl
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::thingMove()");
 
-	if(fromCylinder == NULL || toCylinder == NULL){
+	if(fromCylinder == NULL || toCylinder == NULL || thing == NULL){
 		creature->sendCancel("Sorry, not possible.");
 		return;
+	}
+
+	const Position& fromPos = fromCylinder->getPosition();
+	const Position& toPos = toCylinder->getPosition();
+
+	if(creature->getPosition().z > fromPos.z){
+		creature->sendCancel("First go upstairs.");
+		return;
+	}
+	else if(creature->getPosition().z < fromPos.z){
+		creature->sendCancel("First go downstairs.");
+		return;
+	}
+	else if((std::abs(creature->getPosition().x - fromPos.x) > 1) || (std::abs(creature->getPosition().y - fromPos.y) > 1)) {
+		creature->sendCancel("To far away.");
+		return;
+	}
+
+	//check throw distance
+	if( (std::abs(fromPos.x - toPos.x) > thing->getThrowRange()) ||
+			(std::abs(fromPos.y - toPos.y) > thing->getThrowRange()) ||
+			(std::abs(fromPos.y - toPos.y) * 2 > thing->getThrowRange()) ) {
+		creature->sendCancel("Destination is out of reach.");
 	}
 
 	ReturnValue ret = fromCylinder->__moveThingTo(creature, toCylinder, index, thing, count);

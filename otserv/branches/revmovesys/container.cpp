@@ -145,11 +145,17 @@ bool Container::isHoldingItem(const Item* item) const
 	return false;
 }
 
-ReturnValue Container::__moveThingTo(Creature* creature, Cylinder* toCylinder, uint32_t index, Thing* thing, uint32_t count)
+ReturnValue Container::__moveThingTo(Creature* creature, Cylinder* toCylinder, int32_t index, Thing* thing, uint32_t count)
 {
 	Item* item = dynamic_cast<Item*>(thing);
 	if(item == NULL)
 		return RET_NOTPOSSIBLE;
+
+	Cylinder* subCylinder = dynamic_cast<Cylinder*>(toCylinder->__getThing(index));
+	if(subCylinder){
+		toCylinder = subCylinder;
+		index = -1;
+	}
 
 	//check constraints before moving
 	//
@@ -164,7 +170,7 @@ ReturnValue Container::__moveThingTo(Creature* creature, Cylinder* toCylinder, u
 		//Special condition if we are moving a stackable item in the same container
 		//index will not be correct after removing "fromItem" if the fromIndex < index
 		if(this == toCylinder && count == item->getItemCountOrSubtype()){
-			uint32_t fromIndex = __getIndexOfThing(item);
+			int32_t fromIndex = __getIndexOfThing(item);
 			if(fromIndex < index)
 				index = index - 1;
 		}
@@ -197,14 +203,22 @@ ReturnValue Container::__moveThingTo(Creature* creature, Cylinder* toCylinder, u
 			}
 			else{
 				Item* moveItem = Item::CreateItem(item->getID(), count);
-				ret = toCylinder->__addThing(index, moveItem);
+
+				if(index == -1)
+					ret = toCylinder->__addThing(moveItem);
+				else
+					ret = toCylinder->__addThing(index, moveItem);
 			}
 		}
 		else{
 			//todo: check if exchange item if destination is a inventory cylinder
 
 			Item* moveItem = Item::CreateItem(item->getID(), count);
-			ret = toCylinder->__addThing(index, moveItem);
+
+			if(index == -1)
+				ret = toCylinder->__addThing(moveItem);
+			else
+				ret = toCylinder->__addThing(index, moveItem);
 		}
 
 		if(ret != RET_NOERROR)
@@ -218,7 +232,10 @@ ReturnValue Container::__moveThingTo(Creature* creature, Cylinder* toCylinder, u
 		if(ret != RET_NOERROR)
 			return ret;
 
-		ret = toCylinder->__addThing(index, item);
+		if(index == -1)
+			ret = toCylinder->__addThing(item);
+		else
+			ret = toCylinder->__addThing(index, item);
 
 		if(ret != RET_NOERROR)
 			return ret;
@@ -271,7 +288,7 @@ ReturnValue Container::__addThing(uint32_t index, Thing* thing)
 
 ReturnValue Container::__updateThing(Thing* thing, uint32_t count)
 {
-	uint32_t index = __getIndexOfThing(thing);
+	int32_t index = __getIndexOfThing(thing);
 	if(index == -1){
 #ifdef __DEBUG__
 		std::cout << "Failure: [Container::__updateThing] item == NULL" << std::endl;
@@ -310,12 +327,41 @@ ReturnValue Container::__updateThing(uint32_t index, Thing* thing)
 
 ReturnValue Container::__removeThing(Thing* thing)
 {
-	return RET_NOTPOSSIBLE;
+	int32_t index = __getIndexOfThing(thing);
+	if(index == -1){
+#ifdef __DEBUG__
+		std::cout << "Failure: [Container::__removeThing] item == NULL" << std::endl;
+#endif
+		return RET_NOTPOSSIBLE;
+	}
+
+	ItemList::iterator cit = std::find(itemlist.begin(), itemlist.end(), thing);
+	if(cit == itemlist.end())
+		return RET_NOTPOSSIBLE;
+
+	(*cit)->setParent(NULL);
+	itemlist.erase(cit);
+
+	const Position& cylinderMapPos = getPosition();
+
+	SpectatorVec list;
+	SpectatorVec::iterator it;
+	g_game.getSpectators(Range(cylinderMapPos, 2, 2, 2, 2, false), list);
+
+	//send change to client
+	for(it = list.begin(); it != list.end(); ++it) {
+		Player* spectator = dynamic_cast<Player*>(*it);
+		if(spectator){
+			spectator->sendRemoveContainerItem(this, index);
+		}
+	}
+
+	return RET_NOERROR;
 }
 
 ReturnValue Container::__removeThing(Thing* thing, uint32_t count)
 {
-	uint32_t index = __getIndexOfThing(thing);
+	int32_t index = __getIndexOfThing(thing);
 	if(index == -1){
 #ifdef __DEBUG__
 		std::cout << "Failure: [Container::__removeThing] item == NULL" << std::endl;
@@ -384,7 +430,7 @@ ReturnValue Container::__removeThing(Thing* thing, uint32_t count)
 	return RET_NOTPOSSIBLE;
 }
 
-uint32_t Container::__getIndexOfThing(const Thing* thing) const
+int32_t Container::__getIndexOfThing(const Thing* thing) const
 {
 	uint32_t index = 0;
 	for (ItemList::const_iterator cit = getItems(); cit != getEnd(); ++cit) {
