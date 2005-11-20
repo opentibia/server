@@ -1972,7 +1972,11 @@ ReturnValue Player::__queryMaxCount(int32_t index, const Thing* thing, uint32_t 
 
 	if(toItem->isStackable() && item->getID() == toItem->getID()){
 		maxQueryCount = 100 - toItem->getItemCountOrSubtype();
-		return RET_NOERROR;
+
+		if(maxQueryCount == 0)
+			return RET_NOTENOUGHROOM;
+		else 
+			return RET_NOERROR;
 	}
 
 	maxQueryCount = 0;
