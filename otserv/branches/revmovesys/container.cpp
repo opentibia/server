@@ -162,36 +162,38 @@ ReturnValue Container::__moveThingTo(Creature* creature, Cylinder* toCylinder, i
 	//
 	//
 	
-	//check how much we really can move (count)
-	//
-	//
+	uint32_t maxQueryCount = 0;
+	ReturnValue ret = toCylinder->__queryMaxCount(index, item, count, maxQueryCount);
+	if(ret != RET_NOERROR){
+		return ret;
+	}
+
+	uint32_t m = std::min(count, maxQueryCount);
+	if(m == 0){
+		return RET_NOTENOUGHROOM;
+	}
 
 	if(item->isStackable()) {
 		//Special condition if we are moving a stackable item in the same container
 		//index will not be correct after removing "fromItem" if the fromIndex < index
-		if(this == toCylinder && count == item->getItemCountOrSubtype()){
+		if(this == toCylinder && m == item->getItemCountOrSubtype()){
 			int32_t fromIndex = __getIndexOfThing(item);
 			if(fromIndex < index)
 				index = index - 1;
 		}
 
-		ReturnValue ret = __removeThing(item, count);
+		ret = __removeThing(item, m);
 		if(ret != RET_NOERROR)
 			return ret;
 
 		Item* toItem = dynamic_cast<Item*>(toCylinder->__getThing(index));
 		if(toItem){
 			if(toItem->getID() == item->getID()){
-				uint32_t oldToCount = toItem->getItemCountOrSubtype();
-				uint32_t newToCount = std::min((uint32_t)100, oldToCount + count);
+				uint32_t n = std::min((uint32_t)100 - toItem->getItemCountOrSubtype(), m);
+				ret = toCylinder->__updateThing(toItem, toItem->getItemCountOrSubtype() + n);
 				
-				if(newToCount != oldToCount){
-					ret = toCylinder->__updateThing(toItem, newToCount);
-				}
-
-				int remainder = count - (newToCount - oldToCount);
-				if(remainder != 0){
-					Item* moveItem = Item::CreateItem(item->getID(), remainder);
+				if(m - n > 0){
+					Item* moveItem = Item::CreateItem(item->getID(), m - n);
 					ret = toCylinder->__addThing(0, moveItem);
 				}
 
@@ -202,7 +204,7 @@ ReturnValue Container::__moveThingTo(Creature* creature, Cylinder* toCylinder, i
 				}
 			}
 			else{
-				Item* moveItem = Item::CreateItem(item->getID(), count);
+				Item* moveItem = Item::CreateItem(item->getID(), m);
 
 				if(index == -1)
 					ret = toCylinder->__addThing(moveItem);
@@ -213,7 +215,7 @@ ReturnValue Container::__moveThingTo(Creature* creature, Cylinder* toCylinder, i
 		else{
 			//todo: check if exchange item if destination is a inventory cylinder
 
-			Item* moveItem = Item::CreateItem(item->getID(), count);
+			Item* moveItem = Item::CreateItem(item->getID(), m);
 
 			if(index == -1)
 				ret = toCylinder->__addThing(moveItem);
@@ -244,10 +246,42 @@ ReturnValue Container::__moveThingTo(Creature* creature, Cylinder* toCylinder, i
 	return RET_NOERROR;
 }
 
-/*ReturnValue Container::__queryCanMove(uint32_t index, Thing* thing, uint32_t inCount, uint32_t& outCount)
+
+ReturnValue Container::__queryMaxCount(int32_t index, const Thing* thing, uint32_t count, uint32_t& maxQueryCount)
 {
-	return RET_NOTPOSSIBLE;
-}*/
+	const Item* item = dynamic_cast<const Item*>(thing);
+	if(item == NULL){
+		maxQueryCount = 0;
+		return RET_NOTPOSSIBLE;
+	}
+
+	uint32_t freeSlots = (capacity() - size());
+
+	if(index != -1){
+		if(item->isStackable()){
+			Item* toItem = dynamic_cast<Item*>(__getThing(index));
+
+			uint32_t n = 0;
+			if(toItem && toItem->getID() == item->getID()){
+				n = 100 - toItem->getItemCountOrSubtype();
+			}
+
+			maxQueryCount = freeSlots * 100 + n;
+
+			if(maxQueryCount == 0)
+				return RET_NOTENOUGHROOM;
+			else 
+				return RET_NOERROR;
+		}
+	}
+
+	maxQueryCount = freeSlots;
+
+	if(maxQueryCount == 0)
+		return RET_NOTENOUGHROOM;
+	else 
+		return RET_NOERROR;
+}
 
 ReturnValue Container::__addThing(Thing* thing)
 {
@@ -322,7 +356,37 @@ ReturnValue Container::__updateThing(Thing* thing, uint32_t count)
 
 ReturnValue Container::__updateThing(uint32_t index, Thing* thing)
 {
-	return RET_NOTPOSSIBLE;
+	Item* item = dynamic_cast<Item*>(thing);
+	if(item == NULL){
+		return RET_NOTPOSSIBLE;
+	}
+
+	ItemList::iterator cit = std::find(itemlist.begin(), itemlist.end(), thing);
+	if(cit == itemlist.end())
+		return RET_NOTPOSSIBLE;
+	
+	itemlist.insert(cit, item);
+	item->setParent(this);
+
+	(*cit)->releaseThing2(); //<- should release the memory?
+	(*cit)->setParent(NULL);
+	itemlist.erase(cit);
+
+	const Position& cylinderMapPos = getPosition();
+
+	SpectatorVec list;
+	SpectatorVec::iterator it;
+	g_game.getSpectators(Range(cylinderMapPos, 2, 2, 2, 2, false), list);
+
+	//send to client
+	for(it = list.begin(); it != list.end(); ++it) {
+		Player* spectator = dynamic_cast<Player*>(*it);
+		if(spectator){
+			spectator->sendUpdateContainerItem(this, index, item);
+		}
+	}
+
+	return RET_NOERROR;
 }
 
 ReturnValue Container::__removeThing(Thing* thing)
@@ -433,7 +497,7 @@ ReturnValue Container::__removeThing(Thing* thing, uint32_t count)
 int32_t Container::__getIndexOfThing(const Thing* thing) const
 {
 	uint32_t index = 0;
-	for (ItemList::const_iterator cit = getItems(); cit != getEnd(); ++cit) {
+	for(ItemList::const_iterator cit = getItems(); cit != getEnd(); ++cit){
 		if(*cit == thing)
 			return index;
 		else
@@ -446,7 +510,7 @@ int32_t Container::__getIndexOfThing(const Thing* thing) const
 Thing* Container::__getThing(uint32_t index)
 {
 	int count = 0;
-	for (ItemList::const_iterator cit = itemlist.begin(); cit != itemlist.end(); ++cit) {
+	for(ItemList::const_iterator cit = itemlist.begin(); cit != itemlist.end(); ++cit) {
 		if(count == index)
 			return *cit;
 		else
@@ -485,105 +549,3 @@ void Container::__internalAddThing(uint32_t index, Thing* thing)
 	itemlist.push_front(item);
 	item->setParent(this);
 }
-
-/*
-bool Container::addItem(Item *newitem) {
-	//first check if we are a container, there is an item to be added and if we can add more items...
-	//if (!iscontainer) throw TE_NoContainer();
-	if (newitem == NULL)
-		return false;
-
-	// seems we should add the item...
-	// new items just get placed in front of the items we already have...
-	if(lcontained.size() < maxitems) {
-		newitem->pos.x = 0xFFFF;
-
-		//FIXME: is this correct? i dont get what it does. tliff
-		Container* container = dynamic_cast<Container*>(newitem); 
-		if(container) {
-			container->setParent(this);
-		}
-
-		lcontained.push_front(newitem);
-
-		// increase the itemcount
-		++actualitems;
-		return true;
-	}
-
-	return false;
-}
-
-bool Container::removeItem(Item* item)
-{
-	for (ItemList::iterator cit = lcontained.begin(); cit != lcontained.end(); cit++) {
-		if((*cit) == item) {
-
-			Container* container = dynamic_cast<Container*>(*cit); 
-			if(container) {
-				container->setParent(NULL);
-			}
-
-			lcontained.erase(cit);
-			--actualitems;
-			return true;
-		}
-	}
-
-	return false;
-}
-
-void Container::moveItem(unsigned char from_slot, unsigned char to_slot)
-{
-	int n = 0;
-	for (ItemList::iterator cit = lcontained.begin(); cit != lcontained.end(); ++cit) {
-		if(n == from_slot) {
-			Item *item = (*cit);
-			lcontained.erase(cit);
-			lcontained.push_front(item);
-			break;
-		}
-		++n;
-	}
-}
-
-const Item* Container::getItem(unsigned long slot_num) const
-{
-	size_t n = 0;			
-	for (ItemList::const_iterator cit = getItems(); cit != getEnd(); ++cit) {
-		if(n == slot_num)
-			return *cit;
-		else
-			++n;
-	}
-
-	return NULL;
-}
-*/
-
-/*
-Container *Container::getTopParent()
-{
-	if(getParent() == NULL)
-		return this;
-
-	Container *aux = this->getParent();
-	while(aux->getParent() != NULL) {
-		aux = aux->getParent();
-	}
-	return aux;
-}
-
-const Container *Container::getTopParent() const
-{
-	if(getParent() == NULL)
-		return this;
-
-	Container *aux = this->getParent();
-
-	while(aux->getParent() != NULL) {
-		aux = aux->getParent();
-	}
-	return aux;
-}
-*/

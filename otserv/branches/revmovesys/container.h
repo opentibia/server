@@ -48,7 +48,7 @@ public:
 
 	//
 	virtual ReturnValue __moveThingTo(Creature* creature, Cylinder* toCylinder, int32_t index, Thing* thing, uint32_t count);
-	//virtual ReturnValue __queryCanMove(uint32_t index, Thing* thing, uint32_t inCount, uint32_t& outCount);
+	virtual ReturnValue __queryMaxCount(int32_t index, const Thing* thing, uint32_t count, uint32_t& maxQueryCount);
 
 	virtual ReturnValue __addThing(Thing* thing);
 	virtual ReturnValue __addThing(uint32_t index, Thing* thing);
@@ -66,19 +66,6 @@ public:
 	virtual void __internalAddThing(uint32_t index, Thing* thing);
 
 	virtual int getThrowRange() const {return 10;};
-
-	//
-	//Cylinder* getParent() {return Cylinder::getParent();};
-	//void setParent(Cylinder* cylinder) {Cylinder::setParent(cylinder);};
-
-	//Cylinder* getTopParent() {return Cylinder::getTopParent();}; //returns Tile/Container or a Player
-	//Tile* getTile() {return Cylinder::getTile();};
-
-	//const Position& getPosition() const {return Cylinder::getPosition();};
-	
-	//
-	//void useThing2() {Cylinder::useThing2();};
-	//void releaseThing2() {Cylinder::releaseThing2();};
 
 private:
 	uint32_t depotId;

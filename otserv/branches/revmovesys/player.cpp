@@ -1881,34 +1881,30 @@ ReturnValue Player::__moveThingTo(Creature* creature, Cylinder* toCylinder, int3
 	//
 	//
 	
-	//check how much we really can move (count)
-	//
-	//
-
-	/*uint32_t outCount = 0;
-	ReturnValue ret = __queryCanMove(index, thing, count, outCount);
-	if(ret != RET_NOERROR)
+	uint32_t maxQueryCount = 0;
+	ReturnValue ret = toCylinder->__queryMaxCount(index, item, count, maxQueryCount);
+	if(ret != RET_NOERROR){
 		return ret;
-	*/
+	}
+
+	uint32_t m = std::min(count, maxQueryCount);
+	if(m == 0){
+		return RET_NOTENOUGHROOM;
+	}
 
 	if(item->isStackable()) {
-		ReturnValue ret = __removeThing(item, count);
+		ReturnValue ret = __removeThing(item, m);
 		if(ret != RET_NOERROR)
 			return ret;
 
 		Item* toItem = dynamic_cast<Item*>(toCylinder->__getThing(index));
 		if(toItem){
 			if(toItem->isStackable() && toItem->getID() == item->getID()){
-				uint32_t oldToCount = toItem->getItemCountOrSubtype();
-				uint32_t newToCount = std::min((uint32_t)100, oldToCount + count);
-
-				if(newToCount != oldToCount){
-					ret = toCylinder->__updateThing(toItem, newToCount);
-				}
-
-				int remainder = count - (newToCount - oldToCount);
-				if(remainder != 0){
-					Item* moveItem = Item::CreateItem(item->getID(), remainder);
+				uint32_t n = std::min((uint32_t)100 - toItem->getItemCountOrSubtype(), m);
+				ret = toCylinder->__updateThing(toItem, toItem->getItemCountOrSubtype() + n);
+				
+				if(m - n > 0){
+					Item* moveItem = Item::CreateItem(item->getID(), m - n);
 					ret = toCylinder->__addThing(0, moveItem);
 				}
 
@@ -1960,36 +1956,28 @@ ReturnValue Player::__moveThingTo(Creature* creature, Cylinder* toCylinder, int3
 	return RET_NOERROR;
 }
 
-/*ReturnValue Player::__queryCanMove(uint32_t index, Thing* thing, uint32_t inCount, uint32_t& outCount)
+ReturnValue Player::__queryMaxCount(int32_t index, const Thing* thing, uint32_t count, uint32_t& maxQueryCount)
 {
-	Item* fromItem = dynamic_cast<Item*>(thing);
-	if(!fromItem){
-		outCount = 0;
+	const Item* item = dynamic_cast<const Item*>(thing);
+	if(item == NULL){
+		maxQueryCount = 0;
 		return RET_NOTPOSSIBLE;
 	}
 
-	const Position& fromPos = fromItem->getPosition();
-	const Position& toPos = getPosition();
-
-	//check throw distance
-	if( (abs(fromPos.x - toPos.x) > thing->getThrowRange()) || (abs(fromPos.y - toPos.y) > thing->getThrowRange())
-		(abs(fromPos.y - toPos.y) * 2 > thing->getThrowRange() ) {
-		outCount = 0;
-		return RET_DESTINATIONOUTOFREACH;
-	}
-	
-	Item* toItem = getInventoryItem((slots_t)index);
+	Item* toItem = dynamic_cast<Item*>(__getThing(index));
 	if(!toItem){
-		outCount = inCount;
+		maxQueryCount = 100;
 		return RET_NOERROR;
 	}
 
-	if(toItem == fromItem){
-		return RET_NOTPOSSIBLE;
+	if(toItem->isStackable() && item->getID() == toItem->getID()){
+		maxQueryCount = 100 - toItem->getItemCountOrSubtype();
+		return RET_NOERROR;
 	}
 
-	return RET_NOERROR;
-}*/
+	maxQueryCount = 0;
+	return RET_NOTENOUGHROOM;
+}
 
 ReturnValue Player::__addThing(Thing* thing)
 {
