@@ -56,9 +56,6 @@ Creature()
 	state = STATE_IDLE;
 	updateMovePos = false;
 	this->game = game;
-	this->speed = 220;
-	this->level = 8;
-	this->maglevel = 0;
 	curPhysicalAttack = NULL;
 	hasLostMaster = false;
 	
@@ -74,6 +71,8 @@ Creature()
 	lookcorpse = mType->lookcorpse;
 	immunities = mType->immunities;
 	speed = mType->base_speed;
+	level = mType->level;
+	maglevel = mType->maglevel;
 }
 
 unsigned long Monster::getRandom(){

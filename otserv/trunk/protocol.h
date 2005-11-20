@@ -117,7 +117,7 @@ public:
 	virtual void sendChannelsDialog() = 0;
 	virtual void sendChannel(unsigned short channelId, std::string channelName) = 0;
 	virtual void sendToChannel(const Creature * creature, SpeakClasses type, const std::string &text, unsigned short channelId) = 0;
-	virtual void sendOpenPriv(std::string &receiver) =0;
+	virtual void sendOpenPriv(const std::string &receiver) =0;
 	virtual void sendVIPLogIn(unsigned long guid) = 0;
 	virtual void sendVIPLogOut(unsigned long guid) = 0;
 	virtual void sendVIP(unsigned long guid, const std::string &name, bool isOnline) = 0;

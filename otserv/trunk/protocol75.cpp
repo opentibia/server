@@ -511,14 +511,15 @@ void Protocol75::parseOpenPriv(NetworkMessage &msg){
 	receiver = msg.GetString();
 	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol75::parseOpenPriv()");
 	Player* player = game->getPlayerByName(receiver);
-	if(player)
-		sendOpenPriv(receiver);
+	if(player){
+		sendOpenPriv(player->getName());
+	}
 }
 
-void Protocol75::sendOpenPriv(std::string &receiver){
+void Protocol75::sendOpenPriv(const std::string &receiver){
 	NetworkMessage newmsg; 
 	newmsg.AddByte(0xAD); 
-	newmsg.AddString(receiver);      
+	newmsg.AddString(receiver);
 	WriteBuffer(newmsg);
 }     
 
@@ -2438,7 +2439,14 @@ void Protocol75::AddCreature(NetworkMessage &msg,const Creature *creature, bool 
 		msg.AddString(creature->getName());
 	}
 	
-	msg.AddByte(creature->health*100/creature->healthmax);
+	unsigned char healht_percent = creature->health*100/creature->healthmax;
+	if(healht_percent == 0){
+		msg.AddByte(1);
+	}
+	else{
+		msg.AddByte(healht_percent);
+	}
+	
 	msg.AddByte((unsigned char)creature->getDirection());
 	
 	msg.AddByte(creature->looktype);
