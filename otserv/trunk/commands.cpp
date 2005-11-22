@@ -57,6 +57,7 @@ s_defcommands Commands::defined_commands[] = {
 	{"/openserver",&Commands::openServer},
 	{"/getonline",&Commands::onlineList},
 	{"/a",&Commands::teleportNTiles},
+	{"/kick",&Commands::kickPlayer},
 };
 
 
@@ -621,4 +622,19 @@ bool Commands::teleportNTiles(Creature* c, const std::string &cmd, const std::st
 		game->teleport(c, new_pos);
 	}
 	return true;
+}
+
+bool Commands::kickPlayer(Creature* c, const std::string &cmd, const std::string &param)
+{
+	Player* playerKick = game->getPlayerByName(param);
+	if(playerKick){
+		Player* player = dynamic_cast<Player*>(c);
+		if(player && player->access <= playerKick->access){
+			player->sendTextMessage(MSG_BLUE_TEXT,"You cannot kick this player.");
+			return true;
+		}
+		playerKick->kickPlayer();
+		return true;
+	}
+	return false;
 }

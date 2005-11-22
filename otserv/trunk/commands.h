@@ -65,6 +65,7 @@ protected:
 	bool openServer(Creature* c, const std::string &cmd, const std::string &param);
 	bool onlineList(Creature* c, const std::string &cmd, const std::string &param);
 	bool teleportNTiles(Creature* c, const std::string &cmd, const std::string &param);
+	bool kickPlayer(Creature* c, const std::string &cmd, const std::string &param);
 	
 	//table of commands
 	static s_defcommands defined_commands[];
