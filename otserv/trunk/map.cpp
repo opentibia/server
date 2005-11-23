@@ -34,12 +34,13 @@ using namespace std;
 
 #include "iomap.h"
 
-#ifdef ENABLESQLMAPSUPPORT	
+#ifdef __USE_MYSQL__	
 #include "iomapsql.h"
 #endif
 //#include "iomapbin.h"
 #include "iomapxml.h"
 #include "iomapotbm.h"
+#include "iomapbin.h"
 
 #include "otsystem.h"
 #include <stdio.h>
@@ -82,11 +83,11 @@ int Map::loadMap(std::string filename, std::string filekind) {
 	int ret;
 	IOMap* loader;
 	
-	/*if(filekind == "BIN"){
+	if(filekind == "BIN"){
 		loader = new IOMapBin();
 		ret = SPAWN_BUILTIN;
 	}
-	else */if(filekind == "TXT"){
+	else if(filekind == "XML"){
 		loader = new IOMapXML();
 		ret = SPAWN_XML;
 	}
@@ -95,14 +96,14 @@ int Map::loadMap(std::string filename, std::string filekind) {
 		//ret = SPAWN_BUILTIN;
 		ret = SPAWN_XML;
 	}
-	#ifdef ENABLESQLMAPSUPPORT	
+	#ifdef __USE_MYSQL__	
 	else if(filekind == "SQL"){
 		loader = new IOMapSQL();
 		ret = SPAWN_SQL;
 	}
 	#endif	
 	else{
- 		std::cout << "FATAL: couldnt determine the map format! exiting" << std::endl;
+ 		std::cout << "FATAL: couldnt determine the map format! exiting1" << std::endl;
 		exit(1);
 	}
 

@@ -83,19 +83,15 @@ public:
 	static bool initialize(Game *igame);
 	static bool addSpawn(Spawn* spawn);
 	static bool loadSpawnsXML(std::string filename);
-#ifdef _SQLMAP_
+#ifdef __USE_MYSQL__
 	static bool loadSpawnsSQL(std::string identifier);
-#elif _BINMAP_
-    static spawnsList spawns;
 #endif
 	static bool startup();
 
 	void checkSpawns(int t);
 protected:
 	static SpawnManager* _instance;
-#ifndef _BINMAP_
 	static spawnsList spawns;
-#endif
 	static Game *game;
 };
 

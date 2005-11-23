@@ -28,7 +28,7 @@ bool IOMapXML::loadMap(Map* map, std::string identifier){
 	char* tmp;
 
 	xmlLineNumbersDefault(1);
-	std::cout << "loaded map " << identifier << std::endl;
+	std::cout << ":: Loaded map " << identifier << std::endl;
 	doc=xmlParseFile(identifier.c_str());
 	if (!doc) {
 		std::cout << "FATAL: couldnt load map. exiting" << std::endl;
@@ -51,7 +51,7 @@ bool IOMapXML::loadMap(Map* map, std::string identifier){
 		map->mapheight = atoi(tmp);
 		xmlFreeOTSERV(tmp);
 	}
-	std::cout << map->mapwidth << "  " << map->mapheight << std::endl;
+	std::cout << ":: W: " << map->mapwidth << "  H: " << map->mapheight << std::endl;
 
 	std::string spawnfile = "";
 	if(tmp = (char*)xmlGetProp(root, (const xmlChar *) "spawnfile")){

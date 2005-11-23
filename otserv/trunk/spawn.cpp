@@ -23,7 +23,7 @@
 #include "player.h"
 #include "npc.h"
 
-#ifdef _SQLMAP_
+#ifdef __USE_MYSQL__
 #include <mysql++.h>
 #include <boost/tokenizer.hpp>
 typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
@@ -223,7 +223,7 @@ bool SpawnManager::loadSpawnsXML(std::string filename)
 	return false;
 }
 
-#ifdef ENABLESQLMAPSUPPORT	
+#ifdef __USE_MYSQL__	
 bool SpawnManager::loadSpawnsSQL(std::string identifier)
 {
 	std::string host = g_config.getGlobalString("map_host");

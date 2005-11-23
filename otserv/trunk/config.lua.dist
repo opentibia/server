@@ -11,8 +11,12 @@ datadir = "data/"
 map = "data/world/map.otx"
 
 -- mapkind
--- BIN for binary, SQL for SQL map, TXT for OTX maps
-mapkind = "TXT"
+-- OTBM for binary, SQL for SQL map, XML for OTX maps
+mapkind = "XML"
+
+-- sourcedata
+-- SQL for acc/player info from SQL, XML for acc/player info from XML
+sourcedata = "XML"
 
 -- loginmsg
 -- the message the player gets when he logs in
