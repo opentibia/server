@@ -753,7 +753,6 @@ bool Monsters::loadLootContainer(xmlNodePtr node, LootBlock& lBlock)
 {
 	xmlNodePtr tmp,p;
 	char* nodeValue = NULL;
-	unsigned short s_id; 
 	
 	if(node == NULL){
 		return false;

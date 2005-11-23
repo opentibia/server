@@ -57,7 +57,8 @@ enum OTBM_AttrTypes_t{
 	OTBM_ATTR_TELE_DEST = 8,
 	OTBM_ATTR_ITEM = 9,
 	OTBM_ATTR_DEPOT_ID = 10,
-	OTBM_ATTR_EXT_SPAWN_FILE = 11,	
+	OTBM_ATTR_EXT_SPAWN_FILE = 11,
+	OTBM_ATTR_RUNE_CHARGES = 12
 };
 
 #pragma pack(1)
@@ -369,6 +370,19 @@ Item* IOMapOTBM::unserializaItemNode(FileLoader* f, NODE node)
 					return NULL;
 				}
 				break;
+
+			case OTBM_ATTR_RUNE_CHARGES:
+			{
+				unsigned char _charges = 1;
+				if(!propStream.GET_UCHAR(_charges)){
+					delete item;
+					return NULL;
+				}
+
+				item->setItemCharge(_charges);
+				break;
+			}
+
 			default:
 				delete item;
 				return NULL;
