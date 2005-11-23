@@ -37,7 +37,7 @@ IOPlayer* IOPlayer::instance(){
 #ifdef __USE_MYSQL__
         if(g_config.getGlobalString("sourcedata") == "SQL") 
 		_instance = (IOPlayer*)new IOPlayerSQL;
-		else if(g_config.getGlobalString("sourcedata") == "XML")
+		else // if(g_config.getGlobalString("sourcedata") == "XML") //fallback to xml
 #endif
 		_instance = (IOPlayer*)new IOPlayerXML;
 

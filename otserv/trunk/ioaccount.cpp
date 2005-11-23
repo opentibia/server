@@ -37,7 +37,7 @@ IOAccount* IOAccount::instance(){
 #ifdef __USE_MYSQL__
     if(g_config.getGlobalString("sourcedata") == "SQL")   
 	_instance = (IOAccount*)new IOAccountSQL;
-	else if(g_config.getGlobalString("sourcedata") == "XML")
+	else //if(g_config.getGlobalString("sourcedata") == "XML") //fallback to xml
 #endif
 	_instance = (IOAccount*)new IOAccountXML;
 	}
