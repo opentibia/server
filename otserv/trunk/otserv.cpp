@@ -533,7 +533,7 @@ int main(int argc, char *argv[])
 		SpawnManager::instance()->loadSpawnsXML(g_game.getSpawnFile());
 		SpawnManager::instance()->startup();
 		break;
-	#ifdef __USE_MYSQL__	
+	#ifdef ENABLESQLMAPSUPPORT	
 	case SPAWN_SQL:
 		SpawnManager::initialize(&g_game);
 		SpawnManager::instance()->loadSpawnsSQL(g_config.getGlobalString("map"));
