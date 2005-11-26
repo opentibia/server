@@ -99,8 +99,6 @@ public:
   virtual std::string getDescription(uint32_t lookDistance) const;
 
 	//
-	virtual ReturnValue __moveThingTo(Creature* creature, Cylinder* toCylinder, int32_t index, Thing* thing, uint32_t count);
-
 	virtual ReturnValue __queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
 		uint32_t& maxQueryCount, bool checkCapacity);
 	virtual ReturnValue __queryRemove(const Thing* thing, uint32_t count) const;

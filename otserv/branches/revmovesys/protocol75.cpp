@@ -974,24 +974,47 @@ void Protocol75::parseThrow(NetworkMessage& msg)
 		return;
 
 	//for testing...
-	if(from_x == 0xFFFF && to_x == 0xFFFF){
-		Cylinder* fromCylinder = internalGetCylinder(from_x, from_y, from_z);
-		Cylinder* toCylinder = internalGetCylinder(to_x, to_y, to_z);
-		
-		uint8_t from_index = ((from_y & 0x40) ? static_cast<uint8_t>(from_z) : static_cast<uint8_t>(from_y));
-		Thing* thing = internalGetThing(from_x, from_y, from_z, from_index);
-
-		uint8_t to_index = ((to_y & 0x40) ? static_cast<uint8_t>(to_z) : static_cast<uint8_t>(to_y));
-		game->thingMove(player, fromCylinder, toCylinder, to_index, thing, count);
-		return;
-	}
+	Cylinder* fromCylinder = internalGetCylinder(from_x, from_y, from_z);
+	uint8_t from_index = 0;
 	
-	bool toInventory = false;
+	if(from_x == 0xFFFF){
+		if(from_y & 0x40){
+			from_index = static_cast<uint8_t>(from_z);
+		}
+		else{
+			from_index = static_cast<uint8_t>(from_y);
+		}
+	}
+
+	Thing* thing = internalGetThing(from_x, from_y, from_z, from_index);
+
+	Cylinder* toCylinder = internalGetCylinder(to_x, to_y, to_z);
+	uint8_t to_index = 0;
+
+	if(to_x == 0xFFFF){
+		if(to_y & 0x40){
+			to_index = static_cast<uint8_t>(to_z);
+		}
+		else{
+			to_index = static_cast<uint8_t>(to_y);
+		}
+	}
+
+	Creature* movingCreature = dynamic_cast<Creature*>(thing);
+		
+	if(movingCreature) {
+		game->thingMove(player, from_x, from_y, from_z, from_stack, itemid, to_x, to_y, to_z, count);		
+	}
+	else{
+		game->thingMove(player, fromCylinder, toCylinder, to_index, thing, count);
+	}
+
+
+	/*bool toInventory = false;
 	bool fromInventory = false;
 
 	//container/inventory to container/inventory
 	if(from_x == 0xFFFF && to_x == 0xFFFF) {
-		/*
 		unsigned char from_cid;
 		unsigned char to_cid;
 		
@@ -1012,11 +1035,9 @@ void Protocol75::parseThrow(NetworkMessage& msg)
 		}
 		
 		game->thingMove(player, from_cid, from_z, itemid,fromInventory, to_cid, to_z, toInventory, count);
-		*/
 	}
 	//container/inventory to ground
 	else if(from_x == 0xFFFF && to_x != 0xFFFF) {
-		/*
 		unsigned char from_cid;
 		
 		if(0x40 & from_y) {
@@ -1028,11 +1049,9 @@ void Protocol75::parseThrow(NetworkMessage& msg)
 		}
 		
 		game->thingMove(player, from_cid, from_z, itemid, fromInventory, Position(to_x, to_y, to_z), count);
-		*/
 	}
 	//ground to container/inventory
 	else if(from_x != 0xFFFF && to_x == 0xFFFF) {
-		/*
 		unsigned char to_cid;
 		
 		if(0x40 & to_y) {
@@ -1054,10 +1073,9 @@ void Protocol75::parseThrow(NetworkMessage& msg)
 		}
 		
 		game->thingMove(player, Position(from_x, from_y, from_z), from_stack, itemid, to_cid, to_z, toInventory, count);
-		*/
 	}
 	//ground to ground
-	else {
+	else if(from_x != 0xFFFF && to_x != 0xFFFF) {
 		Tile *fromTile = game->getTile(from_x, from_y, from_z);
 		if(!fromTile)
 			return;
@@ -1072,6 +1090,7 @@ void Protocol75::parseThrow(NetworkMessage& msg)
 		
 		game->thingMove(player, from_x, from_y, from_z, from_stack, itemid, to_x, to_y, to_z, count);
 	}
+	*/
 }
 
 void Protocol75::parseLookAt(NetworkMessage& msg)
@@ -2355,6 +2374,50 @@ void Protocol75::sendCreatureHealth(const Creature *creature)
 	WriteBuffer(msg);
 }
 
+//tile
+void Protocol75::sendAddTileItem(const Position& pos, const Item* item)
+{
+	NetworkMessage msg;
+	AddTileItem(msg, pos, item);
+	WriteBuffer(msg);
+}
+
+void Protocol75::sendUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* item)
+{
+	NetworkMessage msg;
+	UpdateTileItem(msg, pos, stackpos, item);
+	WriteBuffer(msg);
+}
+
+void Protocol75::sendRemoveTileItem(const Position& pos, uint32_t stackpos)
+{
+	NetworkMessage msg;
+	RemoveTileItem(msg, pos, stackpos);
+	WriteBuffer(msg);
+}
+
+//inventory
+void Protocol75::sendAddInventoryItem(slots_t slot, const Item* item)
+{
+	NetworkMessage msg;
+	AddInventoryItem(msg, slot, item);
+	WriteBuffer(msg);
+}
+
+void Protocol75::sendUpdateInventoryItem(slots_t slot, const Item* item)
+{
+	NetworkMessage msg;
+	UpdateInventoryItem(msg, slot, item);
+	WriteBuffer(msg);
+}
+
+void Protocol75::sendRemoveInventoryItem(slots_t slot)
+{
+	NetworkMessage msg;
+	RemoveInventoryItem(msg, slot);
+	WriteBuffer(msg);
+}
+
 //containers
 void Protocol75::sendAddContainerItem(const Container* container, const Item* item)
 {
@@ -2387,28 +2450,6 @@ void Protocol75::sendRemoveContainerItem(const Container* container, uint8_t slo
 		RemoveContainerItem(msg, cid, slot);
 		WriteBuffer(msg);
 	}
-}
-
-//inventory
-void Protocol75::sendAddInventoryItem(slots_t slot, const Item* item)
-{
-	NetworkMessage msg;
-	AddInventoryItem(msg, slot, item);
-	WriteBuffer(msg);
-}
-
-void Protocol75::sendUpdateInventoryItem(slots_t slot, const Item* item)
-{
-	NetworkMessage msg;
-	UpdateInventoryItem(msg, slot, item);
-	WriteBuffer(msg);
-}
-
-void Protocol75::sendRemoveInventoryItem(slots_t slot)
-{
-	NetworkMessage msg;
-	RemoveInventoryItem(msg, slot);
-	WriteBuffer(msg);
 }
 
 void Protocol75::sendTextWindow(Item* item,const unsigned short maxlen, const bool canWrite)
@@ -2642,6 +2683,40 @@ void Protocol75::AddAppearThing(NetworkMessage &msg, const Position &pos)
 	if(CanSee(pos.x, pos.y, pos.z)) {		
 		msg.AddByte(0x6A);
 		msg.AddPosition(pos);	
+	}
+}
+
+//tile
+void Protocol75::AddTileItem(NetworkMessage& msg, const Position& pos, const Item* item)
+{
+	if(CanSee(pos.x, pos.y, pos.z)){		
+		msg.AddByte(0x6A);
+		msg.AddPosition(pos);	
+	}
+	
+	msg.AddItem(item);
+}
+
+void Protocol75::UpdateTileItem(NetworkMessage& msg, const Position& pos, uint32_t stackpos, const Item* item)
+{
+	if(stackpos < 10){
+		if(CanSee(pos.x, pos.y, pos.z)){
+			msg.AddByte(0x6B);
+			msg.AddPosition(pos);
+			msg.AddByte(stackpos);
+			msg.AddItem(item);
+		}
+	}
+}
+
+void Protocol75::RemoveTileItem(NetworkMessage& msg, const Position& pos, uint32_t stackpos)
+{
+	if(stackpos < 10){
+		if(CanSee(pos.x, pos.y, pos.z)){
+			msg.AddByte(0x6C);
+			msg.AddPosition(pos);
+			msg.AddByte(stackpos);
+		}
 	}
 }
 

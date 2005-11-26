@@ -61,6 +61,10 @@ public:
 	virtual void sendThingDisappear(const Thing *thing, unsigned char stackPos, bool tele) = 0;
 	virtual void sendTileUpdated(const Position &pos) = 0;
 
+	virtual void sendAddTileItem(const Position& pos, const Item* item) = 0;
+	virtual void sendUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* item) = 0;
+	virtual void sendRemoveTileItem(const Position& pos, uint32_t stackpos) = 0;
+
 	//containers
 	virtual void sendAddContainerItem(const Container* container, const Item* item) = 0;
 	virtual void sendUpdateContainerItem(const Container *container, uint8_t slot, const Item* item) = 0;

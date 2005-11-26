@@ -198,20 +198,6 @@ public:
 	//items
 	containerLayout vcontainers;
 	void preSave();
-	
-	/*
-	virtual void useThing(){
-		//std::cout << "Player: useThing() " << this << std::endl;
-		useCount++;
-	};
-	
-	virtual void releaseThing(){
-		useCount--;
-		//std::cout << "Player: releaseThing() " << this << std::endl;
-		if (useCount == 0)
-			delete this;
-	};
-	*/
 
 	unsigned long getIP() const;
 	Container* getDepot(unsigned long depotId);
@@ -257,6 +243,11 @@ public:
 	
 	virtual std::string getDescription(uint32_t lookDistance) const;
 
+	//tile
+	void sendAddTileItem(const Position& pos, const Item* item);
+	void sendUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* item);
+	void sendRemoveTileItem(const Position& pos, uint32_t stackpos);
+
 	//container
 	void sendAddContainerItem(const Container* container, const Item *item);
 	void sendUpdateContainerItem(const Container* container, uint8_t slot, const Item* item);
@@ -299,8 +290,6 @@ protected:
 		unsigned char oldstackpos, unsigned char oldcount, unsigned char count);
 
 	//
-	virtual ReturnValue __moveThingTo(Creature* creature, Cylinder* toCylinder, int32_t index, Thing* thing, uint32_t count);
-
 	virtual ReturnValue __queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
 		uint32_t& maxQueryCount, bool checkCapacity);
 	virtual ReturnValue __queryRemove(const Thing* thing, uint32_t count) const;

@@ -165,6 +165,10 @@ private:
 	virtual void sendThingRemove(const Thing *thing);
 	virtual void sendTileUpdated(const Position &Pos);
 
+	virtual void sendAddTileItem(const Position& pos, const Item* item);
+	virtual void sendUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* item);
+	virtual void sendRemoveTileItem(const Position& pos, uint32_t stackpos);
+
 	//containers
 	void sendAddContainerItem(const Container* container, const Item* item);
 	void sendUpdateContainerItem(const Container *container, uint8_t slot, const Item* item);
@@ -201,10 +205,14 @@ private:
 	void AddCreatureHealth(NetworkMessage &msg,const Creature *creature);
 	void AddPlayerSkills(NetworkMessage &msg);
 
-	//tiles
 	void AddRemoveThing(NetworkMessage& msg, const Position& pos, int stackpos);
 	void AddAppearThing(NetworkMessage& msg, const Position& pos);
 	void AddTileUpdated(NetworkMessage& msg, const Position& pos);
+
+	//tiles
+	void AddTileItem(NetworkMessage& msg, const Position& pos, const Item* item);
+	void UpdateTileItem(NetworkMessage& msg, const Position& pos, uint32_t stackpos, const Item* item);
+	void RemoveTileItem(NetworkMessage& msg, const Position& pos, uint32_t stackpos);
 
 	//container
 	void AddContainerItem(NetworkMessage& msg, uint8_t cid, const Item *item);

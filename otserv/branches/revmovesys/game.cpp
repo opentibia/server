@@ -791,14 +791,20 @@ bool Game::removeCreature(Creature* c)
 }
 
 //NEW CYLINDER CLASS
-void Game::thingMove(Creature* creature, Cylinder* fromCylinder, Cylinder* toCylinder, uint8_t index,
+ReturnValue Game::creatureMove(Creature* creature, Cylinder* fromCylinder, Cylinder* toCylinder,
+	Creature* moveCreature)
+{
+	return RET_NOTPOSSIBLE;
+}
+
+ReturnValue Game::thingMove(Creature* creature, Cylinder* fromCylinder, Cylinder* toCylinder, uint8_t index,
 	Thing* thing, uint32_t count)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::thingMove()");
 
 	if(fromCylinder == NULL || toCylinder == NULL || thing == NULL){
 		creature->sendCancel("Sorry, not possible.");
-		return;
+		return RET_NOTPOSSIBLE;
 	}
 
 	const Position& fromPos = fromCylinder->getPosition();
@@ -810,15 +816,15 @@ void Game::thingMove(Creature* creature, Cylinder* fromCylinder, Cylinder* toCyl
 	}
 	else*/ if(creature->getPosition().z > fromPos.z){
 		creature->sendCancel("First go upstairs.");
-		return;
+		return RET_NOTPOSSIBLE;
 	}
 	else if(creature->getPosition().z < fromPos.z){
 		creature->sendCancel("First go downstairs.");
-		return;
+		return RET_NOTPOSSIBLE;
 	}
 	else if((std::abs(creature->getPosition().x - fromPos.x) > 1) || (std::abs(creature->getPosition().y - fromPos.y) > 1)) {
 		creature->sendCancel("To far away.");
-		return;
+		return RET_NOTPOSSIBLE;
 	}
 
 	//check throw distance
@@ -828,13 +834,84 @@ void Game::thingMove(Creature* creature, Cylinder* fromCylinder, Cylinder* toCyl
 		creature->sendCancel("Destination is out of reach.");
 	}
 
-	ReturnValue ret = fromCylinder->__moveThingTo(creature, toCylinder, index, thing, count);
+	Item* item = dynamic_cast<Item*>(thing);
+	if(item == NULL)
+		return RET_NOTPOSSIBLE;
 
-	switch(ret){
-		case RET_NOTPOSSIBLE:
-			creature->sendCancel("Sorry, not possible.");
-			break;
+	Cylinder* subCylinder = dynamic_cast<Cylinder*>(toCylinder->__getThing(index));
+	if(subCylinder){
+		toCylinder = subCylinder;
+		index = -1;
 	}
+
+	//check constraints before moving
+	//
+	//
+	//
+
+	bool checkCapacity = true;
+	Player* player = dynamic_cast<Player*>(creature);
+	if(player == fromCylinder->getTopParent() && player == toCylinder->getTopParent()){
+		checkCapacity = false;
+	}
+
+	uint32_t maxQueryCount = 0;
+	ReturnValue ret = toCylinder->__queryMaxCount(index, item, count, maxQueryCount, checkCapacity);
+	if(ret != RET_NOERROR){
+		return ret;
+	}
+
+	uint32_t m = std::min(count, maxQueryCount);
+	uint32_t n = 0;
+	Item* moveItem = item;
+	if(m == 0){
+		return RET_NOTENOUGHROOM;
+	}
+
+	Item* toItem = dynamic_cast<Item*>(toCylinder->__getThing(index));
+	if(toItem){
+		//add (surplus) item(s) at the beginning
+		index = 0;
+	}
+
+	//remove the item
+	ret = fromCylinder->__removeThing(item, m);
+	if(ret != RET_NOERROR){
+		return ret;
+	}
+
+	if(item->isStackable()) {
+		if(toItem && toItem->getID() == item->getID()){
+			n = std::min((uint32_t)100 - toItem->getItemCountOrSubtype(), m);
+			ret = toCylinder->__updateThing(toItem, toItem->getItemCountOrSubtype() + n);
+		}
+		
+		if(m - n > 0){
+			moveItem = Item::CreateItem(item->getID(), m - n);
+		}
+		else{
+			moveItem = NULL;
+		}
+		
+		if(item->getItemCountOrSubtype() == 0){
+			FreeThing(item);
+		}
+	}
+	
+	if(m - n > 0 /*&& moveItem*/){
+		ret = toCylinder->__addThing(index, moveItem);
+	}
+	
+	//fromCylinder->getTopParent()->onRemoveItem()
+	//toCylinder->getTopParent()->onAddItem()
+	//close/send container
+	//cancel trade
+	//update capacity/cylinder state (ie. for Tile class check if need to send UpdateTile() packet)
+
+	if(ret != RET_NOERROR)
+		return ret;
+
+	return RET_NOERROR;
 }
 
 void Game::thingMove(Creature *creature, Thing *thing,
@@ -871,39 +948,6 @@ void Game::thingMove(Creature *creature, unsigned short from_x, unsigned short f
 
 	thingMoveInternal(creature, from_x, from_y, from_z, stackPos, itemid, to_x, to_y, to_z, count);
 }
-
-/*
-//container/inventory to container/inventory
-void Game::thingMove(Player *player,
-	unsigned char from_cid, unsigned char from_slotid, unsigned short itemid, bool fromInventory,
-	unsigned char to_cid, unsigned char to_slotid, bool toInventory,
-	unsigned char count)
-{
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::thingMove() - 3");
-		
-	//thingMoveInternal(player, from_cid, from_slotid, itemid, fromInventory,
-	//	to_cid, to_slotid, toInventory, count);
-}
-
-//container/inventory to ground
-void Game::thingMove(Player *player,
-	unsigned char from_cid, unsigned char from_slotid, unsigned short itemid, bool fromInventory,
-	const Position& toPos, unsigned char count)
-{
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::thingMove() - 4");
-	//thingMoveInternal(player, from_cid, from_slotid, itemid, fromInventory, toPos, count);
-}
-
-//ground to container/inventory
-void Game::thingMove(Player *player,
-	const Position& fromPos, unsigned char stackPos, unsigned short itemid,
-	unsigned char to_cid, unsigned char to_slotid, bool toInventory,
-	unsigned char count)
-{
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::thingMove() - 5");		
-	//thingMoveInternal(player, fromPos, stackPos, itemid, to_cid, to_slotid, toInventory, count);
-}
-*/
 
 /*ground -> ground*/
 bool Game::onPrepareMoveThing(Creature* player, const Thing* thing,

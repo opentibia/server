@@ -145,114 +145,6 @@ bool Container::isHoldingItem(const Item* item) const
 	return false;
 }
 
-ReturnValue Container::__moveThingTo(Creature* creature, Cylinder* toCylinder, int32_t index, Thing* thing, uint32_t count)
-{
-	Item* item = dynamic_cast<Item*>(thing);
-	if(item == NULL)
-		return RET_NOTPOSSIBLE;
-
-	Cylinder* subCylinder = dynamic_cast<Cylinder*>(toCylinder->__getThing(index));
-	if(subCylinder){
-		toCylinder = subCylinder;
-		index = -1;
-	}
-
-	//check constraints before moving
-	//
-	//
-	//
-
-	bool checkCapacity = true;
-	Player* player = dynamic_cast<Player*>(creature);
-	if(player == getTopParent() && player == toCylinder->getTopParent()){
-		checkCapacity = false;
-	}
-
-	uint32_t maxQueryCount = 0;
-	ReturnValue ret = toCylinder->__queryMaxCount(index, item, count, maxQueryCount, checkCapacity);
-	if(ret != RET_NOERROR){
-		return ret;
-	}
-
-	uint32_t m = std::min(count, maxQueryCount);
-	if(m == 0){
-		return RET_NOTENOUGHROOM;
-	}
-
-	if(item->isStackable()) {
-		//Special condition if we are moving a stackable item in the same container
-		//index will not be correct after removing "fromItem" if the fromIndex < index
-		if(this == toCylinder && m == item->getItemCountOrSubtype()){
-			int32_t fromIndex = __getIndexOfThing(item);
-			if(fromIndex < index)
-				index = index - 1;
-		}
-
-		ret = __removeThing(item, m);
-		if(ret != RET_NOERROR){
-			return ret;
-		}
-
-		Item* toItem = dynamic_cast<Item*>(toCylinder->__getThing(index));
-		if(toItem){
-			if(toItem->getID() == item->getID()){
-				uint32_t n = std::min((uint32_t)100 - toItem->getItemCountOrSubtype(), m);
-				ret = toCylinder->__updateThing(toItem, toItem->getItemCountOrSubtype() + n);
-				
-				if(m - n > 0){
-					Item* moveItem = Item::CreateItem(item->getID(), m - n);
-					ret = toCylinder->__addThing(0, moveItem);
-				}
-
-				//todo: Fix leak here
-
-				if(item->getItemCountOrSubtype() == 0){
-					g_game.FreeThing(item);
-				}
-			}
-			else{
-				Item* moveItem = Item::CreateItem(item->getID(), m);
-
-				if(index == -1)
-					ret = toCylinder->__addThing(moveItem);
-				else
-					ret = toCylinder->__addThing(index, moveItem);
-			}
-		}
-		else{
-			//todo: check if exchange item if destination is a inventory cylinder
-
-			Item* moveItem = Item::CreateItem(item->getID(), m);
-
-			if(index == -1)
-				ret = toCylinder->__addThing(moveItem);
-			else
-				ret = toCylinder->__addThing(index, moveItem);
-		}
-
-		if(ret != RET_NOERROR)
-			return ret;
-	}
-	else{
-		//todo: check if exchange item if destination is a inventory cylinder
-
-		ReturnValue ret = __removeThing(item, 0);
-
-		if(ret != RET_NOERROR)
-			return ret;
-
-		if(index == -1)
-			ret = toCylinder->__addThing(item);
-		else
-			ret = toCylinder->__addThing(index, item);
-
-		if(ret != RET_NOERROR)
-			return ret;
-	}
-
-	return RET_NOERROR;
-}
-
 ReturnValue Container::__queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
 	uint32_t& maxQueryCount, bool checkCapacity)
 {
@@ -338,7 +230,7 @@ ReturnValue Container::__updateThing(Thing* thing, uint32_t count)
 	int32_t index = __getIndexOfThing(thing);
 	if(index == -1){
 #ifdef __DEBUG__
-		std::cout << "Failure: [Container::__updateThing] item == NULL" << std::endl;
+		std::cout << "Failure: [Container::__updateThing] index == -1" << std::endl;
 #endif
 		return RET_NOTPOSSIBLE;
 	}
@@ -416,44 +308,25 @@ ReturnValue Container::__removeThing(Thing* thing, uint32_t count)
 	if(cit == itemlist.end())
 		return RET_NOTPOSSIBLE;
 
+	Item* item = *cit;
+
 	const Position& cylinderMapPos = getPosition();
 
 	SpectatorVec list;
 	SpectatorVec::iterator it;
 	g_game.getSpectators(Range(cylinderMapPos, 2, 2, 2, 2, false), list);
 
-	Item* item = *cit;
-	if(item->isStackable()) {
-		if(count == 0 || count > item->getItemCountOrSubtype())
-			return RET_NOTPOSSIBLE;
+	if(item->isStackable() && count != item->getItemCountOrSubtype()){
+		item->setItemCountOrSubtype(item->getItemCountOrSubtype() - count);
 
-		if(count == item->getItemCountOrSubtype()){
-			(*cit)->setParent(NULL);
-			itemlist.erase(cit);
-
-			//send change to client
-			for(it = list.begin(); it != list.end(); ++it) {
-				Player* spectator = dynamic_cast<Player*>(*it);
-				if(spectator){
-					spectator->sendRemoveContainerItem(this, index);
-				}
+		//send change to client
+		for(it = list.begin(); it != list.end(); ++it) {
+			Player* spectator = dynamic_cast<Player*>(*it);
+			if(spectator){
+				spectator->sendUpdateContainerItem(this, index, item);
 			}
-
-			return RET_NOERROR;
 		}
-		else{
-			item->setItemCountOrSubtype(item->getItemCountOrSubtype() - count);
-
-			//send change to client
-			for(it = list.begin(); it != list.end(); ++it) {
-				Player* spectator = dynamic_cast<Player*>(*it);
-				if(spectator){
-					spectator->sendUpdateContainerItem(this, index, item);
-				}
-			}
-
-			return RET_NOERROR;
-		}
+		return RET_NOERROR;
 	}
 	else{
 		(*cit)->setParent(NULL);
@@ -466,7 +339,6 @@ ReturnValue Container::__removeThing(Thing* thing, uint32_t count)
 				spectator->sendRemoveContainerItem(this, index);
 			}
 		}
-
 		return RET_NOERROR;
 	}
 	

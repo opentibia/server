@@ -26,8 +26,12 @@
 #include <iostream>
 
 #include "tile.h"
-
+#include "game.h"
+#include "player.h"
 #include "creature.h"
+
+extern Game g_game;
+
 
 ReturnValue Tile::isBlocking(int objectstate, bool ignoreCreature /* = false*/, bool ignoreMoveableBlocking /*=false*/) const
 {
@@ -407,7 +411,8 @@ bool Tile::removeThing(Thing *thing)
   return false;
 }
 
-Thing* Tile::getTopMoveableThing(){	
+Thing* Tile::getTopMoveableThing()
+{	
 	if(ground && !ground->isNotMoveable())
     	return ground;
 	if (splash && !splash->isNotMoveable())
@@ -514,7 +519,8 @@ Item* Tile::getMoveableBlockingItem()
 	return NULL;
 }
 
-void Tile::addThing(Thing *thing) {
+void Tile::addThing(Thing *thing)
+{
 	thing->setParent(this);
 
 	Creature* creature = dynamic_cast<Creature*>(thing);
@@ -561,17 +567,11 @@ void Tile::setPz()
   pz = true;
 }
 
-
-ReturnValue Tile::__moveThingTo(Creature* creature, Cylinder* toCylinder, int32_t index, Thing* thing, uint32_t count)
-{
-	return RET_NOTPOSSIBLE;
-}
-
 ReturnValue Tile::__queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
 	uint32_t& maxQueryCount, bool checkCapacity)
 {
-	maxQueryCount = 0;
-	return RET_NOTPOSSIBLE;
+	maxQueryCount = count;
+	return RET_NOERROR;
 }
 
 ReturnValue Tile::__queryRemove(const Thing* thing, uint32_t count) const
@@ -581,21 +581,94 @@ ReturnValue Tile::__queryRemove(const Thing* thing, uint32_t count) const
 
 ReturnValue Tile::__addThing(Thing* thing)
 {
-	Item* item = dynamic_cast<Item*>(thing);
-	if(item == NULL)
-		return RET_NOTPOSSIBLE;
-
-	return RET_NOERROR;
+	return __addThing(0, thing);
 }
 
 ReturnValue Tile::__addThing(uint32_t index, Thing* thing)
 {
+	thing->setParent(this);
+
+	const Position& cylinderMapPos = getPosition();
+
+	SpectatorVec list;
+	SpectatorVec::iterator it;
+	g_game.getSpectators(Range(cylinderMapPos, true), list);
+
+	Creature* creature = dynamic_cast<Creature*>(thing);
+	if(creature){
+		creatures.insert(creatures.begin(), creature);
+		return RET_NOERROR;
+  }
+  else{
+    Item* item = dynamic_cast<Item*>(thing);
+
+		if(item == NULL)
+			return RET_NOTPOSSIBLE;
+
+    if(item->isGroundTile()){
+      ground = item;
+    }
+    else if(item->isSplash()){
+			if(splash == NULL){
+				splash = item;
+			}
+			else{
+				//
+			}
+		}
+		else if(item->isAlwaysOnTop()){
+			topItems.insert(topItems.begin(), item);
+		}
+		else{
+			downItems.insert(downItems.begin(), item);
+
+			//send to client
+			for(it = list.begin(); it != list.end(); ++it) {
+				Player* spectator = dynamic_cast<Player*>(*it);
+				if(spectator){
+					spectator->sendAddTileItem(cylinderMapPos, item);
+				}
+			}
+
+			return RET_NOERROR;
+		}
+	}
+
 	return RET_NOTPOSSIBLE;
 }
 
 ReturnValue Tile::__updateThing(Thing* thing, uint32_t count)
 {
-	return RET_NOTPOSSIBLE;
+	int32_t index = __getIndexOfThing(thing);
+	if(index == -1){
+#ifdef __DEBUG__
+		std::cout << "Failure: [Tile::__updateThing] index == -1" << std::endl;
+#endif
+		return RET_NOTPOSSIBLE;
+	}
+
+	Item* item = dynamic_cast<Item*>(thing);
+	if(item == NULL){
+		return RET_NOTPOSSIBLE;
+	}
+
+	item->setItemCountOrSubtype(count);
+
+	const Position& cylinderMapPos = getPosition();
+
+	SpectatorVec list;
+	SpectatorVec::iterator it;
+	g_game.getSpectators(Range(cylinderMapPos, true), list);
+
+	//send to client
+	for(it = list.begin(); it != list.end(); ++it) {
+		Player* spectator = dynamic_cast<Player*>(*it);
+		if(spectator){
+			spectator->sendUpdateTileItem(cylinderMapPos, index, item);
+		}
+	}
+
+	return RET_NOERROR;
 }
 
 ReturnValue Tile::__updateThing(uint32_t index, Thing* thing)
@@ -605,11 +678,107 @@ ReturnValue Tile::__updateThing(uint32_t index, Thing* thing)
 
 ReturnValue Tile::__removeThing(Thing* thing, uint32_t count)
 {
-	return RET_NOTPOSSIBLE;
+	const Position& cylinderMapPos = getPosition();
+
+	SpectatorVec list;
+	SpectatorVec::iterator it;
+	g_game.getSpectators(Range(cylinderMapPos, true), list);
+
+	Creature* creature = dynamic_cast<Creature*>(thing);
+	if(creature){
+    CreatureVector::iterator it;
+		for(it = creatures.begin(); it != creatures.end(); ++it){
+      if(*it == thing){
+        creatures.erase(it);
+        return RET_NOERROR;
+      }
+		}
+	}
+  else if(thing == splash){
+    splash = NULL;
+    return RET_NOERROR;
+  }
+  else{
+    Item *item = dynamic_cast<Item*>(thing);
+		if(item == NULL)
+			return RET_NOTPOSSIBLE;
+
+		uint32_t index = __getIndexOfThing(item);
+		if(index == -1){
+	#ifdef __DEBUG__
+			std::cout << "Failure: [Tile::__removeThing] index == -1" << std::endl;
+	#endif
+			return RET_NOTPOSSIBLE;
+		}
+
+    ItemVector::iterator iit;
+    if(item->isAlwaysOnTop()){
+			for(iit = topItems.begin(); iit != topItems.end(); ++iit){
+        if(*iit == item){
+          topItems.erase(iit);
+					return RET_NOERROR;
+        }
+			}
+    }
+    else {
+      for (iit = downItems.begin(); iit != downItems.end(); ++iit)
+        if (*iit == item) {
+					downItems.erase(iit);
+
+					//send to client
+					for(it = list.begin(); it != list.end(); ++it) {
+						Player* spectator = dynamic_cast<Player*>(*it);
+						if(spectator){
+							spectator->sendRemoveTileItem(cylinderMapPos, index);
+						}
+					}
+
+					return RET_NOERROR;
+				}
+		}
+  }
+
+  return RET_NOTPOSSIBLE;
 }
 
 int32_t Tile::__getIndexOfThing(const Thing* thing) const
 {
+	int n = 0;
+  
+	if(ground){
+		if(ground == thing){
+			return 0;
+		}
+  }
+
+  if(splash){
+    if(thing == splash)
+      return 1;
+
+    ++n;
+  }
+  
+  ItemVector::const_iterator iit;
+  for(iit = topItems.begin(); iit != topItems.end(); ++iit)
+  {
+    ++n;
+    if((*iit) == thing)
+      return n;
+  }
+
+  CreatureVector::const_iterator cit;
+  for(cit = creatures.begin(); cit != creatures.end(); ++cit){
+    ++n;
+    if((*cit) == thing)
+      return n;
+  }
+
+  for(iit = downItems.begin(); iit != downItems.end(); ++iit){
+    ++n;
+    if((*iit) == thing)
+      return n;
+  }
+
 	return -1;
 }
 

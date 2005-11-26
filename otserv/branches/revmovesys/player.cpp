@@ -1486,6 +1486,22 @@ void Player::sendTextWindow(Item* item,const unsigned short maxlen, const bool c
 	client->sendTextWindow(item,maxlen,canWrite);
 }
 
+//tile
+void Player::sendAddTileItem(const Position& pos, const Item* item)
+{
+	client->sendAddTileItem(pos, item);
+}
+
+void Player::sendUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* item)
+{
+	client->sendUpdateTileItem(pos, stackpos, item);
+}
+
+void Player::sendRemoveTileItem(const Position& pos, uint32_t stackpos)
+{
+	client->sendRemoveTileItem(pos, stackpos);
+}
+
 //container
 void Player::sendAddContainerItem(const Container* container, const Item *item)
 {
@@ -1862,140 +1878,6 @@ bool Player::addVIP(unsigned long _guid, std::string &name, bool isOnline, bool 
 		client->sendVIP(_guid, name, isOnline);
 	
 	return true;
-}
-
-
-ReturnValue Player::__moveThingTo(Creature* creature, Cylinder* toCylinder, int32_t index, Thing* thing, uint32_t count)
-{
-	Item* item = dynamic_cast<Item*>(thing);
-	if(item == NULL)
-		return RET_NOTPOSSIBLE;
-
-	Cylinder* subCylinder = dynamic_cast<Cylinder*>(toCylinder->__getThing(index));
-	if(subCylinder){
-		toCylinder = subCylinder;
-		index = -1;
-	}
-
-	//check constraints before moving
-	//
-	//
-	//
-	ReturnValue ret = __queryRemove(thing, count);
-	if(ret != RET_NOERROR){
-		return ret;
-	}
-
-	bool checkCapacity = true;
-	Player* player = dynamic_cast<Player*>(creature);
-	if(player == getTopParent() && player == toCylinder->getTopParent()){
-		checkCapacity = false;
-	}
-
-	uint32_t maxQueryCount = 0;
-	ret = toCylinder->__queryMaxCount(index, item, count, maxQueryCount, checkCapacity);
-
-	/*
-	if(ret == RET_NOTENOUGHROOM){
-		//Try move the toItem to the source cylinder
-		int32_t from_index = __getIndexOfThing(thing);
-		uint32_t maxExchangeQueryCount = 0;
-		ret = __queryMaxCount(from_index, thing, 100, maxExchangeQueryCount, checkCapacity);
-		if(ret != RET_NOERROR){
-			return ret;
-		}
-
-		Item* toItem = dynamic_cast<Item*>(toCylinder->__getThing(index));
-		if(!toItem){
-			return RET_NOTPOSSIBLE;
-		}
-
-		ret = toCylinder->__queryRemove(toItem, count);
-
-		if(ret != RET_NOERROR){
-			return ret;
-		}
-
-		ret = toCylinder->__removeThing(toItem, 0);
-		if(ret != RET_NOERROR){
-			return ret;
-		}
-
-		ret = __addThing(toItem);
-	}
-	else*/
- if(ret != RET_NOERROR){
-		return ret;
-	}
-
-	uint32_t m = std::min(count, maxQueryCount);
-	if(m == 0){
-		return RET_NOTENOUGHROOM;
-	}
-
-	if(item->isStackable()) {
-		ReturnValue ret = __removeThing(item, m);
-		if(ret != RET_NOERROR){
-			return ret;
-		}
-
-		Item* toItem = dynamic_cast<Item*>(toCylinder->__getThing(index));
-		if(toItem){
-			if(toItem->isStackable() && toItem->getID() == item->getID()){
-				uint32_t n = std::min((uint32_t)100 - toItem->getItemCountOrSubtype(), m);
-				ret = toCylinder->__updateThing(toItem, toItem->getItemCountOrSubtype() + n);
-				
-				if(m - n > 0){
-					Item* moveItem = Item::CreateItem(item->getID(), m - n);
-					ret = toCylinder->__addThing(0, moveItem);
-				}
-
-				//todo: Fix leak here
-
-				if(item->getItemCountOrSubtype() == 0){
-					g_game.FreeThing(item);
-				}
-			}
-			else{
-				Item* moveItem = Item::CreateItem(item->getID(), count);
-
-				if(index == -1)
-					ret = toCylinder->__addThing(moveItem);
-				else
-					ret = toCylinder->__addThing(index, moveItem);
-			}
-		}
-		else{
-			Item* moveItem = Item::CreateItem(item->getID(), count);
-
-			if(index == -1)
-				ret = toCylinder->__addThing(moveItem);
-			else
-				ret = toCylinder->__addThing(index, moveItem);
-		}
-
-		if(ret != RET_NOERROR)
-			return ret;
-	}
-	else{
-		ReturnValue ret = __removeThing(item, 0);
-
-		if(ret != RET_NOERROR)
-			return ret;
-
-		if(index == -1)
-			ret = toCylinder->__addThing(item);
-		else
-			ret = toCylinder->__addThing(index, item);
-
-		if(ret != RET_NOERROR)
-			return ret;
-	}
-
-	//close/send container
-	//cancel trade
-	//update capacity/cylinder state (ie. for Tile class check if need to send UpdateTile() packet)
-	return RET_NOERROR;
 }
 
 ReturnValue Player::__queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
