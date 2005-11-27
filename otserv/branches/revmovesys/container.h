@@ -51,8 +51,10 @@ public:
 
 	//
 	virtual ReturnValue __queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
-		uint32_t& maxQueryCount, bool checkCapacity);
+		uint32_t& maxQueryCount, bool checkCapacity) const;
 	virtual ReturnValue __queryRemove(const Thing* thing, uint32_t count) const;
+	virtual ReturnValue __queryAdd(const Thing* thing, uint32_t count) const;
+	virtual Cylinder* __queryDestination(uint32_t index, Thing** destThing);
 
 	virtual ReturnValue __addThing(Thing* thing);
 	virtual ReturnValue __addThing(uint32_t index, Thing* thing);
@@ -64,6 +66,7 @@ public:
 
 	virtual int32_t __getIndexOfThing(const Thing* thing) const;
 	Thing* __getThing(uint32_t index);
+	virtual Thing* __getThing(uint32_t index) const;
 
 	virtual void __internalAddThing(Thing* thing);
 	virtual void __internalAddThing(uint32_t index, Thing* thing);

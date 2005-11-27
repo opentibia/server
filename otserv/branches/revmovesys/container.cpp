@@ -146,7 +146,7 @@ bool Container::isHoldingItem(const Item* item) const
 }
 
 ReturnValue Container::__queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
-	uint32_t& maxQueryCount, bool checkCapacity)
+	uint32_t& maxQueryCount, bool checkCapacity) const
 {
 	const Item* item = dynamic_cast<const Item*>(thing);
 	if(item == NULL){
@@ -185,7 +185,49 @@ ReturnValue Container::__queryMaxCount(int32_t index, const Thing* thing, uint32
 
 ReturnValue Container::__queryRemove(const Thing* thing, uint32_t count) const
 {
+	uint32_t index = __getIndexOfThing(thing);
+
+	if(index == -1){
+		return RET_NOTPOSSIBLE;
+	}
+	
+	Item* destItem = dynamic_cast<Item*>(__getThing(index));
+	if(destItem == NULL){
+		return RET_NOTPOSSIBLE;
+	}
+	
+	if(destItem->isNotMoveable()){
+		return RET_NOTMOVEABLE;
+	}
+
+	if(destItem->isStackable() && (count == 0 || count > destItem->getItemCountOrSubtype())){
+		return RET_NOTPOSSIBLE;
+	}
+
 	return RET_NOERROR;
+}
+
+ReturnValue Container::__queryAdd(const Thing* thing, uint32_t count) const
+{
+	const Item* item = dynamic_cast<const Item*>(thing);
+	if(item == NULL){
+		return RET_NOTPOSSIBLE;
+	}
+
+	return RET_NOERROR;
+}
+
+Cylinder* Container::__queryDestination(uint32_t index, Thing** destThing)
+{
+	*destThing = __getThing(index);
+	Cylinder* subCylinder = dynamic_cast<Cylinder*>(*destThing);
+
+	if(subCylinder){
+		*destThing = NULL;
+		return subCylinder;
+	}
+	else
+		return this;
 }
 
 ReturnValue Container::__addThing(Thing* thing)
@@ -359,6 +401,19 @@ int32_t Container::__getIndexOfThing(const Thing* thing) const
 }
 
 Thing* Container::__getThing(uint32_t index)
+{
+	int count = 0;
+	for(ItemList::const_iterator cit = itemlist.begin(); cit != itemlist.end(); ++cit) {
+		if(count == index)
+			return *cit;
+		else
+			++count;
+	}
+
+	return NULL;
+}
+
+Thing* Container::__getThing(uint32_t index) const
 {
 	int count = 0;
 	for(ItemList::const_iterator cit = itemlist.begin(); cit != itemlist.end(); ++cit) {

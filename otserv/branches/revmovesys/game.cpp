@@ -797,7 +797,7 @@ ReturnValue Game::creatureMove(Creature* creature, Cylinder* fromCylinder, Cylin
 	return RET_NOTPOSSIBLE;
 }
 
-ReturnValue Game::thingMove(Creature* creature, Cylinder* fromCylinder, Cylinder* toCylinder, uint8_t index,
+ReturnValue Game::thingMove(Creature* creature, Cylinder* fromCylinder, Cylinder* toCylinder, int32_t index,
 	Thing* thing, uint32_t count)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::thingMove()");
@@ -830,16 +830,19 @@ ReturnValue Game::thingMove(Creature* creature, Cylinder* fromCylinder, Cylinder
 	//check throw distance
 	if( (std::abs(fromPos.x - toPos.x) > thing->getThrowRange()) ||
 			(std::abs(fromPos.y - toPos.y) > thing->getThrowRange()) ||
-			(std::abs(fromPos.y - toPos.y) * 2 > thing->getThrowRange()) ) {
+			(std::abs(fromPos.z - toPos.z) * 2 > thing->getThrowRange()) ) {
 		creature->sendCancel("Destination is out of reach.");
+		return RET_DESTINATIONOUTOFREACH;
 	}
 
 	Item* item = dynamic_cast<Item*>(thing);
 	if(item == NULL)
 		return RET_NOTPOSSIBLE;
 
-	Cylinder* subCylinder = dynamic_cast<Cylinder*>(toCylinder->__getThing(index));
-	if(subCylinder){
+	Thing* toThing = NULL;
+	Cylinder* subCylinder = toCylinder->__queryDestination(index, &toThing);
+	Item* toItem = dynamic_cast<Item*>(toThing);
+	if(subCylinder != toCylinder){
 		toCylinder = subCylinder;
 		index = -1;
 	}
@@ -855,6 +858,7 @@ ReturnValue Game::thingMove(Creature* creature, Cylinder* fromCylinder, Cylinder
 		checkCapacity = false;
 	}
 
+	//check how much we can move
 	uint32_t maxQueryCount = 0;
 	ReturnValue ret = toCylinder->__queryMaxCount(index, item, count, maxQueryCount, checkCapacity);
 	if(ret != RET_NOERROR){
@@ -866,12 +870,6 @@ ReturnValue Game::thingMove(Creature* creature, Cylinder* fromCylinder, Cylinder
 	Item* moveItem = item;
 	if(m == 0){
 		return RET_NOTENOUGHROOM;
-	}
-
-	Item* toItem = dynamic_cast<Item*>(toCylinder->__getThing(index));
-	if(toItem){
-		//add (surplus) item(s) at the beginning
-		index = 0;
 	}
 
 	//remove the item
@@ -892,14 +890,17 @@ ReturnValue Game::thingMove(Creature* creature, Cylinder* fromCylinder, Cylinder
 		else{
 			moveItem = NULL;
 		}
-		
-		if(item->getItemCountOrSubtype() == 0){
+
+		if(m == item->getItemCountOrSubtype()){
 			FreeThing(item);
 		}
 	}
 	
-	if(m - n > 0 /*&& moveItem*/){
-		ret = toCylinder->__addThing(index, moveItem);
+	if(moveItem /*m - n > 0*/){
+		if(index == -1)
+			ret = toCylinder->__addThing(0, moveItem);
+		else
+			ret = toCylinder->__addThing(index, moveItem);
 	}
 	
 	//fromCylinder->getTopParent()->onRemoveItem()

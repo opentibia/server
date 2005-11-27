@@ -568,15 +568,94 @@ void Tile::setPz()
 }
 
 ReturnValue Tile::__queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
-	uint32_t& maxQueryCount, bool checkCapacity)
+	uint32_t& maxQueryCount, bool checkCapacity) const
 {
 	maxQueryCount = count;
 	return RET_NOERROR;
 }
 
+ReturnValue Tile::__queryAdd(const Thing* thing, uint32_t count) const
+{
+	const Item* item = dynamic_cast<const Item*>(thing);
+	if(item == NULL){
+		return RET_NOTPOSSIBLE;
+	}
+
+	return RET_NOERROR;
+}
+
 ReturnValue Tile::__queryRemove(const Thing* thing, uint32_t count) const
 {
+	uint32_t index = __getIndexOfThing(thing);
+
+	if(index == -1){
+		return RET_NOTPOSSIBLE;
+	}
+	
+	const Item* destItem = dynamic_cast<const Item*>(__getThing(index));
+	if(destItem == NULL){
+		return RET_NOTPOSSIBLE;
+	}
+	
+	if(destItem->isNotMoveable()){
+		return RET_NOTMOVEABLE;
+	}
+
+	if(destItem->isStackable() && (count == 0 || count > destItem->getItemCountOrSubtype())){
+		return RET_NOTPOSSIBLE;
+	}
+
 	return RET_NOERROR;
+}
+
+Cylinder* Tile::__queryDestination(uint32_t index, Thing** destThing)
+{
+	Teleport* teleport = getTeleportItem();
+
+	Tile* destTile = this;
+	*destThing = NULL;
+
+	if(teleport){
+		destTile = g_game.getTile(teleport->getDestPos().x, teleport->getDestPos().y, teleport->getDestPos().z);
+	}
+	else{
+		while(destTile->floorChangeDown()){
+			destTile = g_game.getTile(getTilePosition().x, getTilePosition().y + 1, getTilePosition().z + 1);
+
+			if(destTile == NULL){
+				return NULL;
+			}
+
+			if(destTile->floorChange(NORTH) && destTile->floorChange(EAST)){
+				destTile = g_game.getTile(getTilePosition().x - 2, getTilePosition().y + 2, getTilePosition().z + 1);
+			}
+			else if(destTile->floorChange(NORTH) && destTile->floorChange(WEST)){
+				destTile = g_game.getTile(getTilePosition().x + 2, getTilePosition().y + 2, getTilePosition().z + 1);
+			}
+			else if(destTile->floorChange(SOUTH) && destTile->floorChange(EAST)){
+				destTile = g_game.getTile(getTilePosition().x - 2, getTilePosition().y - 2, getTilePosition().z + 1);
+			}
+			else if(destTile->floorChange(SOUTH) && destTile->floorChange(WEST)){
+				destTile = g_game.getTile(getTilePosition().x + 2, getTilePosition().y - 2, getTilePosition().z + 1);
+			}
+			//diagonal end                                                           
+			else if(destTile->floorChange(NORTH)){
+				destTile = g_game.getTile(getTilePosition().x, getTilePosition().y + 1, getTilePosition().z + 1);
+			}
+			else if(destTile->floorChange(SOUTH)){
+				destTile = g_game.getTile(getTilePosition().x, getTilePosition().y - 1, getTilePosition().z + 1);
+			}
+			else if(destTile->floorChange(EAST)){
+				destTile = g_game.getTile(getTilePosition().x - 1, getTilePosition().y, getTilePosition().z + 1);
+			}
+			else if(destTile->floorChange(WEST)){
+				destTile = g_game.getTile(getTilePosition().x + 1, getTilePosition().y, getTilePosition().z + 1);
+			}
+		}
+	}
+
+	*destThing = destTile->getTopDownItem();
+	return destTile;
 }
 
 ReturnValue Tile::__addThing(Thing* thing)
@@ -722,14 +801,30 @@ ReturnValue Tile::__removeThing(Thing* thing, uint32_t count)
     }
     else {
       for (iit = downItems.begin(); iit != downItems.end(); ++iit)
-        if (*iit == item) {
-					downItems.erase(iit);
+        if(*iit == item) {
 
-					//send to client
-					for(it = list.begin(); it != list.end(); ++it) {
-						Player* spectator = dynamic_cast<Player*>(*it);
-						if(spectator){
-							spectator->sendRemoveTileItem(cylinderMapPos, index);
+					if(item->isStackable() && count != item->getItemCountOrSubtype()){
+						
+						item->setItemCountOrSubtype(item->getItemCountOrSubtype() - count);
+
+						//send to client
+						for(it = list.begin(); it != list.end(); ++it) {
+							Player* spectator = dynamic_cast<Player*>(*it);
+							if(spectator){
+								spectator->sendUpdateTileItem(cylinderMapPos, index, item);
+							}
+						}
+					}
+					else {
+						(*iit)->setParent(NULL);
+						downItems.erase(iit);
+
+						//send to client
+						for(it = list.begin(); it != list.end(); ++it) {
+							Player* spectator = dynamic_cast<Player*>(*it);
+							if(spectator){
+								spectator->sendRemoveTileItem(cylinderMapPos, index);
+							}
 						}
 					}
 
@@ -782,11 +877,63 @@ int32_t Tile::__getIndexOfThing(const Thing* thing) const
 	return -1;
 }
 
-Thing* Tile::__getThing(uint32_t index)
+Thing* Tile::__getThing(uint32_t index) const
 {
-	return NULL;
+  if(index == 0)
+    return ground;
+
+  --index;
+
+  if(splash){
+    if(index == 0)
+      return splash;
+    --index;
+  }
+
+  if((unsigned) index < topItems.size())
+    return topItems[index];
+
+  index -= (uint32_t)topItems.size();
+
+  if((unsigned) index < creatures.size())
+    return creatures[index];
+
+  index -= (uint32_t)creatures.size();
+
+  if((unsigned) index < downItems.size())
+    return downItems[index];
+
+  return NULL;
 }
 
+Thing* Tile::__getThing(uint32_t index)
+{
+  if(index == 0)
+    return ground;
+
+  --index;
+
+  if(splash){
+    if(index == 0)
+      return splash;
+    --index;
+  }
+
+  if((unsigned) index < topItems.size())
+    return topItems[index];
+
+  index -= (uint32_t)topItems.size();
+
+  if((unsigned) index < creatures.size())
+    return creatures[index];
+
+  index -= (uint32_t)creatures.size();
+
+  if((unsigned) index < downItems.size())
+    return downItems[index];
+
+  return NULL;
+}
 
 void Tile::__internalAddThing(Thing* thing)
 {

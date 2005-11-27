@@ -176,7 +176,7 @@ public:
 	ReturnValue creatureMove(Creature* creature, Cylinder* fromCylinder, Cylinder* toCylinder,
 		Creature* moveCreature);
 
-	ReturnValue thingMove(Creature* creature, Cylinder* fromCylinder, Cylinder* toCylinder, uint8_t index,
+	ReturnValue thingMove(Creature* creature, Cylinder* fromCylinder, Cylinder* toCylinder, int32_t index,
 		Thing* thing, uint32_t count);
 
 	void thingMove(Creature *creature, Thing *thing,

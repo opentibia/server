@@ -1881,7 +1881,7 @@ bool Player::addVIP(unsigned long _guid, std::string &name, bool isOnline, bool 
 }
 
 ReturnValue Player::__queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
-	uint32_t& maxQueryCount, bool checkCapacity)
+	uint32_t& maxQueryCount, bool checkCapacity) const
 {
 	const Item* item = dynamic_cast<const Item*>(thing);
 	if(item == NULL){
@@ -1908,6 +1908,16 @@ ReturnValue Player::__queryMaxCount(int32_t index, const Thing* thing, uint32_t 
 	return RET_NOTENOUGHROOM;
 }
 
+ReturnValue Player::__queryAdd(const Thing* thing, uint32_t count) const
+{
+	const Item* item = dynamic_cast<const Item*>(thing);
+	if(item == NULL){
+		return RET_NOTPOSSIBLE;
+	}
+
+	return RET_NOERROR;
+}
+
 ReturnValue Player::__queryRemove(const Thing* thing, uint32_t count) const
 {
 	const Item* item = dynamic_cast<const Item*>(thing);
@@ -1925,6 +1935,19 @@ ReturnValue Player::__queryRemove(const Thing* thing, uint32_t count) const
 		return RET_NOTPOSSIBLE;
 
 	return RET_NOERROR;
+}
+
+Cylinder* Player::__queryDestination(uint32_t index, Thing** destThing)
+{
+	*destThing = __getThing(index);
+	Cylinder* subCylinder = dynamic_cast<Cylinder*>(*destThing);
+
+	if(subCylinder){
+		*destThing = NULL;
+		return subCylinder;
+	}
+	else
+		return this;
 }
 
 ReturnValue Player::__addThing(Thing* thing)
@@ -2038,6 +2061,14 @@ int32_t Player::__getIndexOfThing(const Thing* thing) const
 }
 
 Thing* Player::__getThing(uint32_t index)
+{
+	if(index > SLOT_FIRST && index < SLOT_LAST)
+		return items[index];
+
+	return NULL;
+}
+
+Thing* Player::__getThing(uint32_t index) const
 {
 	if(index > SLOT_FIRST && index < SLOT_LAST)
 		return items[index];
