@@ -155,7 +155,7 @@ Items::~Items()
 int Items::loadFromOtb(std::string file)
 {
 	ItemLoader f;
-	if(!f.openFile(file.c_str(), false)) {
+	if(!f.openFile(file.c_str(), false, true)){
 		return f.getError();
 	}
 	

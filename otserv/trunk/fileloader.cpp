@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////
-// OTItemEditor
+// OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
 // 
 //////////////////////////////////////////////////////////////////////
@@ -20,12 +20,25 @@
 
 #include "fileloader.h"
 
+#ifndef min
+#define min(a,b) ( a < b ? a : b)
+#endif
+#ifndef max
+#define max(a,b) ( a > b ? a : b)
+#endif
+
 FileLoader::FileLoader()
 {
 	m_file = NULL;
 	m_buffer = new unsigned char[1024];
 	m_buffer_size = 1024;
 	m_lastError = ERROR_NONE;
+	//cache
+	m_use_cache = false;
+	m_cache_size = 0;
+	m_cache_index = -1;
+	m_cache_offset = -1;
+	memset(m_cached_data, 0, sizeof(m_cached_data));
 }
 
 
@@ -37,10 +50,15 @@ FileLoader::~FileLoader()
 	}
 
 	delete[] m_buffer;
+
+	for(int i = 0; i < CACHE_BLOCKS; i++){
+		if(m_cached_data[i].data)
+			delete m_cached_data[i].data;
+	}
 }
 
 
-bool FileLoader::openFile(const char* filename, bool write)
+bool FileLoader::openFile(const char* filename, bool write, bool caching /*= false*/)
 {
 	if(write) {
 		m_file = fopen(filename, "wb");
@@ -65,6 +83,12 @@ bool FileLoader::openFile(const char* filename, bool write)
 				return false;
 			}
 			else{
+				if(caching){
+					m_use_cache = true;
+					fseek(m_file, 0, SEEK_END);
+					int file_size = ftell(m_file);
+					m_cache_size = min(32768, max(file_size/20, 8192)) & ~0x1FFF;
+				}
 				return true;
 			}
 		}
@@ -297,13 +321,33 @@ const NODE FileLoader::getNextNode(const NODE prev, unsigned long &type)
 
 inline bool FileLoader::readByte(int &value)
 {
-	value = fgetc(m_file);
-	if(value == EOF){
-		m_lastError = ERROR_EOF;
-		return false;
-	}
-	else
+	if(m_use_cache){
+		if(m_cache_index < 0){
+			m_lastError = ERROR_CACHE_ERROR;
+			return false;
+		}
+		if(m_cache_offset >= m_cached_data[m_cache_index].size){
+			long pos = m_cache_offset + m_cached_data[m_cache_index].base;
+			long tmp = getCacheBlock(pos);
+			if(tmp < 0)
+				return false;
+
+			m_cache_index = tmp;
+			m_cache_offset = pos - m_cached_data[m_cache_index].base;
+		}
+		value = m_cached_data[m_cache_index].data[m_cache_offset];
+		m_cache_offset++;
 		return true;
+	}
+	else{
+		value = fgetc(m_file);
+		if(value == EOF){
+			m_lastError = ERROR_EOF;
+			return false;
+		}
+		else
+			return true;
+	}
 }
 /*
 inline bool FileLoader::writeData(void* data, int size, bool unescape)
@@ -344,26 +388,113 @@ inline bool FileLoader::checks(const NODE node)
 	return true;
 }
 
-inline bool FileLoader::safeSeek(unsigned long pos){
+inline bool FileLoader::safeSeek(unsigned long pos)
+{
+	if(m_use_cache){
+		long i = getCacheBlock(pos);
+		if(i < 0)
+			return false;
 
-	if(fseek(m_file, pos, SEEK_SET)){
-		m_lastError = ERROR_SEEK_ERROR;
-		return false;
+		m_cache_index = i;
+		m_cache_offset = pos - m_cached_data[i].base;
+	}
+	else{
+		if(fseek(m_file, pos, SEEK_SET)){
+			m_lastError = ERROR_SEEK_ERROR;
+			return false;
+		}
 	}
 	return true;
 }
 
 
 
-inline bool FileLoader::safeTell(long &pos){
+inline bool FileLoader::safeTell(long &pos)
+{
+	if(m_use_cache){
+		if(m_cache_index < 0){
+			m_lastError = ERROR_CACHE_ERROR;
+			return false;
+		}
 
-	pos = ftell(m_file);
-	if(pos == -1){
-		m_lastError = ERROR_TELL_ERROR;
-		return false;
-	}
-	else{
-		pos = pos - 1;
+		pos = m_cached_data[m_cache_index].base + m_cache_offset - 1;
 		return true;
 	}
+	else{
+		pos = ftell(m_file);
+		if(pos == -1){
+			m_lastError = ERROR_TELL_ERROR;
+			return false;
+		}
+		else{
+			pos = pos - 1;
+			return true;
+		}
+	}
+}
+
+inline long FileLoader::getCacheBlock(unsigned long pos)
+{
+	bool found = false;
+	long i;
+	long base_pos = pos & ~(m_cache_size - 1);
+	for(i = 0; i < CACHE_BLOCKS; i++){
+		if(m_cached_data[i].loaded){
+			if(m_cached_data[i].base == base_pos){
+				found = true;
+				break;
+			}
+		}
+	}
+	if(!found){
+		i = loadCacheBlock(pos);
+	}
+	return i;
+}
+
+long FileLoader::loadCacheBlock(unsigned long pos)
+{
+	long i;
+	long loading_cache = -1;
+	long base_pos = pos & ~(m_cache_size - 1);
+	for(i = 0; i < CACHE_BLOCKS; i++){
+		if(!m_cached_data[i].loaded){
+			loading_cache = i;
+			break;
+		}
+	}
+	if(loading_cache == -1){
+		for(i = 0; i < CACHE_BLOCKS; i++){
+			if(abs(m_cached_data[i].base - base_pos) > 2*m_cache_size){
+				loading_cache = i;
+				break;
+			}
+		}
+		if(loading_cache == -1){
+			loading_cache = 0;
+		}
+	}
+			
+	if(m_cached_data[loading_cache].data == NULL){
+		m_cached_data[loading_cache].data = new unsigned char[m_cache_size];
+	}
+
+	m_cached_data[loading_cache].base = base_pos;
+
+	if(fseek(m_file, m_cached_data[loading_cache].base, SEEK_SET)){
+		m_lastError = ERROR_SEEK_ERROR;
+		return -1;
+	}
+
+	long size = fread(m_cached_data[loading_cache].data, 1, m_cache_size, m_file);
+	m_cached_data[loading_cache].size = size;
+
+	if(size < pos - m_cached_data[loading_cache].base){
+		m_lastError = ERROR_SEEK_ERROR;
+		return -1;
+	}
+
+	m_cached_data[loading_cache].loaded = 1;
+
+	return loading_cache;
 }

@@ -95,7 +95,7 @@ struct OTBM_Tile_coords{
 bool IOMapOTBM::loadMap(Map* map, std::string identifier)
 {
 	FileLoader f;
-	if(!f.openFile(identifier.c_str(), false)) {
+	if(!f.openFile(identifier.c_str(), false, true)){
 		return false;
 	}
 	

@@ -23,6 +23,7 @@
 
 #include "position.h"
 #include "item.h"
+#include <map>
 
 #include "const75.h"
 class Creature;

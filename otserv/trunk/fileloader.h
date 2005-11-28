@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////
-// OTItemEditor
+// OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
 // 
 //////////////////////////////////////////////////////////////////////
@@ -39,7 +39,8 @@ enum FILELOADER_ERRORS{
 	ERROR_INVALID_NODE,
 	ERROR_INVALID_FORMAT,
 	ERROR_TELL_ERROR,
-	ERROR_COULDNOTWRITE
+	ERROR_COULDNOTWRITE,
+	ERROR_CACHE_ERROR,
 };
 
 class PropStream;
@@ -49,7 +50,7 @@ public:
 	FileLoader();
 	virtual ~FileLoader();
 
-	bool openFile(const char* filename, bool write);
+	bool openFile(const char* filename, bool write, bool caching = false);
 	const unsigned char* getProps(const NODE, unsigned long &size);
 	bool getProps(const NODE, PropStream& props);
 	const NODE getChildNode(const NODE parent, unsigned long &type);
@@ -96,11 +97,25 @@ public:
 		return true;
 	}
 protected:
-
-	FILE *m_file;
+	FILE* m_file;
 	FILELOADER_ERRORS m_lastError;
 	unsigned long m_buffer_size;
-	unsigned char *m_buffer;
+	unsigned char* m_buffer;
+
+	bool m_use_cache;
+	struct _cache{
+		unsigned long loaded;
+		unsigned long base;
+		unsigned long size;
+		unsigned char* data;
+	};
+	#define CACHE_BLOCKS 3
+	unsigned long m_cache_size;
+	_cache m_cached_data[CACHE_BLOCKS];
+	long m_cache_index;
+	long m_cache_offset;
+	inline long getCacheBlock(unsigned long pos);
+	long loadCacheBlock(unsigned long pos);
 };
 
 
