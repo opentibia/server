@@ -43,6 +43,7 @@ public:
 	
 	virtual bool CanSee(int x, int y, int z) const = 0;
 	virtual bool CanSee(const Creature*) const = 0;
+	virtual bool CanSee(const Position& pos) const = 0;
 	
 	virtual void sleepTillMove();
 	virtual void flushOutputBuffer() = 0;
@@ -56,14 +57,18 @@ public:
 	
 	//tiles
 	virtual void sendThingAppear(const Thing *thing) = 0;
-	virtual void sendThingRemove(const Thing *thing) = 0;
-	virtual void sendThingTransform(const Thing* thing,int stackpos) = 0;
 	virtual void sendThingDisappear(const Thing *thing, unsigned char stackPos, bool tele) = 0;
-	virtual void sendTileUpdated(const Position &pos) = 0;
+	//virtual void sendThingRemove(const Thing *thing) = 0;
+	//virtual void sendThingTransform(const Thing* thing,int stackpos) = 0;
+	//virtual void sendTileUpdated(const Position &pos) = 0;
 
 	virtual void sendAddTileItem(const Position& pos, const Item* item) = 0;
 	virtual void sendUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* item) = 0;
 	virtual void sendRemoveTileItem(const Position& pos, uint32_t stackpos) = 0;
+
+	virtual void sendAddCreature(const Creature* creature, bool isLogin) = 0;
+	virtual void sendRemoveCreature(const Creature* creature, uint32_t stackpos, bool isLogout) = 0;
+	virtual void sendMoveCreature(const Creature* creature, const Position& oldPos, uint32_t oldStackPos) = 0;
 
 	//containers
 	virtual void sendAddContainerItem(const Container* container, const Item* item) = 0;

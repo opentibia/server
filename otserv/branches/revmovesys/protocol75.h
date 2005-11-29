@@ -54,6 +54,7 @@ private:
 	
 	virtual bool CanSee(int x, int y, int z) const;
 	virtual bool CanSee(const Creature*) const;
+	virtual bool CanSee(const Position& pos) const;
 	virtual void logout();
 	
 	void flushOutputBuffer();
@@ -156,18 +157,22 @@ private:
 	virtual void sendThingMove(const Creature *creature, const Thing *thing,
 		const Position *oldPos, unsigned char oldstackpos, unsigned char oldcount,
 		unsigned char count, bool tele = false);
+
+	virtual void sendThingDisappear(const Thing *thing, unsigned char stackPos, bool tele = false);
+	virtual void sendThingAppear(const Thing *thing);
+	//virtual void sendThingTransform(const Thing* thing,int stackpos);
+	//virtual void sendThingRemove(const Thing *thing);
+	//virtual void sendTileUpdated(const Position &Pos);
 	//END, NEEDS REVISION
 	
 	//tiles
-	virtual void sendThingDisappear(const Thing *thing, unsigned char stackPos, bool tele = false);
-	virtual void sendThingAppear(const Thing *thing);
-	virtual void sendThingTransform(const Thing* thing,int stackpos);
-	virtual void sendThingRemove(const Thing *thing);
-	virtual void sendTileUpdated(const Position &Pos);
-
 	virtual void sendAddTileItem(const Position& pos, const Item* item);
 	virtual void sendUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* item);
 	virtual void sendRemoveTileItem(const Position& pos, uint32_t stackpos);
+
+	virtual void sendAddCreature(const Creature* creature, bool isLogin);
+	virtual void sendRemoveCreature(const Creature* creature, uint32_t stackpos, bool isLogout);
+	virtual void sendMoveCreature(const Creature* creature, const Position& oldPos, uint32_t oldStackPos);
 
 	//containers
 	void sendAddContainerItem(const Container* container, const Item* item);
@@ -187,6 +192,9 @@ private:
 	// translate a tile to clientreadable format
 	void GetTileDescription(const Tile* tile, NetworkMessage &msg);
 	
+	// translate a floor to clientreadable format
+	void GetFloorDescription(NetworkMessage& msg, int x, int y, int z, int width, int height, int offset, int& skip);
+
 	// translate a map area to clientreadable format
 	void GetMapDescription(unsigned short x, unsigned short y, unsigned char z,
 		unsigned short width, unsigned short height,

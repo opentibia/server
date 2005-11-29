@@ -644,6 +644,27 @@ bool Monster::isInRange(const Position &p)
 		(p.z == getPosition().z));
 }
 
+void Monster::onCreatureAppear(const Creature* creature, bool isLogin)
+{
+	//
+}
+
+void Monster::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout)
+{
+	//
+}
+
+void Monster::onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos)
+{
+	//
+}
+
+void Monster::onTeleport(const Creature* creature, const Position& oldPos, uint32_t oldStackPos)
+{
+	//
+}
+
+/*
 void Monster::onThingMove(const Creature *creature, const Thing* thing,
 	const Position* oldPos, unsigned char oldstackpos, unsigned char oldcount, unsigned char count)
 {
@@ -654,7 +675,9 @@ void Monster::onThingMove(const Creature *creature, const Thing* thing,
 	else
 		reThink();
 }
+*/
 
+/*
 void Monster::onCreatureAppear(const Creature* creature)
 {
 	if(creature == this) {
@@ -666,7 +689,9 @@ void Monster::onCreatureAppear(const Creature* creature)
 		onCreatureEnter(creature, canReach);
 	}
 }
+*/
 
+/*
 void Monster::onCreatureDisappear(const Creature* creature, unsigned char stackPos, bool tele)
 {
 	if(creature == this) {
@@ -676,6 +701,7 @@ void Monster::onCreatureDisappear(const Creature* creature, unsigned char stackP
 
 	onCreatureLeave(creature);
 }
+*/
 
 void Monster::onThingDisappear(const Thing* thing, unsigned char stackPos)
 {
@@ -687,13 +713,14 @@ void Monster::onThingDisappear(const Thing* thing, unsigned char stackPos)
 	}
 
 	if(creature) {
-		onCreatureLeave(creature);
+		creatureLeave(creature);
 	}
 	else {
 		reThink();
 	}
 }
 
+/*
 void Monster::onThingTransform(const Thing* thing,int stackpos)
 {
 	const Item* item = dynamic_cast<const Item*>(thing);
@@ -702,12 +729,14 @@ void Monster::onThingTransform(const Thing* thing,int stackpos)
 
 	reThink();
 }
+*/
 
-void Monster::onThingAppear(const Thing* thing){
+void Monster::onThingAppear(const Thing* thing)
+{
 	const Creature *creature = dynamic_cast<const Creature*>(thing);
 	if(creature && isInRange(creature->getPosition())){
 		bool canReach = isCreatureReachable(creature);
-		onCreatureEnter(creature, canReach);
+		creatureEnter(creature, canReach);
 	}	
 	else {
 		reThink();
@@ -715,6 +744,7 @@ void Monster::onThingAppear(const Thing* thing){
 	}
 }
 
+/*
 void Monster::onTeleport(const Creature	*creature, const Position* oldPos, unsigned char oldstackpos)
 {
 	if(creature == this) {
@@ -729,16 +759,16 @@ void Monster::onTeleport(const Creature	*creature, const Position* oldPos, unsig
 		onCreatureMove(creature, oldPos);
 	}
 }
+*/
 
-
-void Monster::onCreatureMove(const Creature* creature, const Position* oldPos)
+void Monster::creatureMove(const Creature* creature, const Position& oldPos)
 {
 	if(creature == this) {
 		//We been pushed
 		reThink();
 
 	}
-	else if(isInRange(creature->getPosition()) && isInRange(*oldPos)) {
+	else if(isInRange(creature->getPosition()) && isInRange(oldPos)) {
 		//Creature just moving around in-range
 		if(attackedCreature == creature->getID()) {
 			if(state == STATE_ATTACKING && !isCreatureReachable(creature)) {
@@ -775,16 +805,16 @@ void Monster::onCreatureMove(const Creature* creature, const Position* oldPos)
 			}
 		}
 	}
-	else if(isInRange(creature->getPosition()) && !isInRange(*oldPos)) {
+	else if(isInRange(creature->getPosition()) && !isInRange(oldPos)) {
 		bool canReach = isCreatureReachable(creature);
-		onCreatureEnter(creature, canReach);
+		creatureEnter(creature, canReach);
 	}
-	else if(!isInRange(creature->getPosition()) && isInRange(*oldPos)) {
-		onCreatureLeave(creature);
+	else if(!isInRange(creature->getPosition()) && isInRange(oldPos)) {
+		creatureLeave(creature);
 	}
 }
 
-void Monster::onCreatureEnter(const Creature* creature, bool canReach /* = true*/)
+void Monster::creatureEnter(const Creature* creature, bool canReach /* = true*/)
 {
 	if(isSummon()) {
 		//master found
@@ -806,7 +836,7 @@ void Monster::onCreatureEnter(const Creature* creature, bool canReach /* = true*
 	}
 }
 
-void Monster::onCreatureLeave(const Creature *creature)
+void Monster::creatureLeave(const Creature *creature)
 {
 	if(creature == this) {
 		stopThink();
@@ -1246,7 +1276,7 @@ void Monster::doMoveTo(int dx, int dy)
 	moveTo.x += dx;
 	moveTo.y += dy;
 
-	this->game->thingMove(this, this, moveTo.x, moveTo.y, moveTo.z, 1);
+	//this->game->thingMove(this, this, moveTo.x, moveTo.y, moveTo.z, 1);
 
 	if(moveTo != getPosition()) {
 		setUpdateMovePos();
@@ -1278,8 +1308,8 @@ bool Monster::monsterMoveItem(Item* item, int radius)
 			Tile* fromTile = game->getTile(item->getPosition().x, item->getPosition().y, item->getPosition().z);
 			int oldstackpos = fromTile->getThingStackPos(item);
 
-			game->thingMoveInternal(this, item->getPosition().x, item->getPosition().y, item->getPosition().z,
-				oldstackpos, item->getID(), tryPos.x, tryPos.y, tryPos.z, count);
+			//game->thingMoveInternal(this, item->getPosition().x, item->getPosition().y, item->getPosition().z,
+			//	oldstackpos, item->getID(), tryPos.x, tryPos.y, tryPos.z, count);
 
 			if(item->getPosition() == tryPos){
 				return true;

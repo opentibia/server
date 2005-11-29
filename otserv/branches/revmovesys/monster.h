@@ -112,9 +112,9 @@ protected:
 	virtual subfight_t getSubFightType()  {return curPhysicalAttack->disttype;}
 	virtual int getWeaponDamage() const;
 	
-	void onCreatureEnter(const Creature *creature, bool canReach = true);
-	void onCreatureLeave(const Creature *creature);
-	void onCreatureMove(const Creature *creature, const Position *oldPos);
+	void creatureEnter(const Creature *creature, bool canReach = true);
+	void creatureLeave(const Creature *creature);
+	void creatureMove(const Creature *creature, const Position& oldPos);
 	
 	bool validateDistanceAttack(const Creature *creature);
 	bool validateDistanceAttack(const Position &pos);
@@ -124,15 +124,23 @@ protected:
 	virtual int getLostExperience();
 	virtual void dropLoot(Container *corpse);
 	
-	virtual void onThingMove(const Creature *creature, const Thing *thing, const Position *oldPos,
-		unsigned char oldstackpos, unsigned char oldcount, unsigned char count);
+	//old code
+	//virtual void onThingMove(const Creature *creature, const Thing *thing, const Position *oldPos,
+	//	unsigned char oldstackpos, unsigned char oldcount, unsigned char count);
 	
-	virtual void onCreatureAppear(const Creature *creature);
-	virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos, bool tele);
+	//virtual void onCreatureAppear(const Creature *creature);
+	//virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos, bool tele);
+	//virtual void onThingTransform(const Thing* thing,int stackpos);
+
 	virtual void onThingDisappear(const Thing* thing, unsigned char stackPos);
-	virtual void onThingTransform(const Thing* thing,int stackpos);
 	virtual void onThingAppear(const Thing* thing);
-	virtual void onTeleport(const Creature *creature, const Position *oldPos, unsigned char oldstackpos);
+	//old code
+
+	virtual void onCreatureAppear(const Creature* creature, bool isLogin);
+	virtual void onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout);
+
+	virtual void onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos);
+	virtual void onTeleport(const Creature* creature, const Position& oldPos, uint32_t oldStackPos);
 	
 	virtual bool isAttackable() const { return true; };
 	

@@ -311,30 +311,26 @@ void Protocol75::parsePacket(NetworkMessage &msg)
 
 void Protocol75::GetTileDescription(const Tile* tile, NetworkMessage &msg)
 {
-	if (tile)
-	{
+	if(tile){
 		int count = 0;
-		if(tile->ground) {
+		if(tile->ground){
 			msg.AddItem(tile->ground);
 			count++;
 		}
 		
-		if (tile->splash)
-		{
+		if(tile->splash){
 			msg.AddItem(tile->splash);
 			count++;
 		}
 		
 		ItemVector::const_iterator it;
-		for (it = tile->topItems.begin(); ((it !=tile->topItems.end()) && (count < 10)); ++it)
-		{		
+		for(it = tile->topItems.begin(); ((it !=tile->topItems.end()) && (count < 10)); ++it){
 			msg.AddItem(*it);
 			count++;
 		}
 		
 		CreatureVector::const_iterator itc;
-		for (itc = tile->creatures.begin(); ((itc !=tile->creatures.end()) && (count < 10)); ++itc)
-		{
+		for(itc = tile->creatures.begin(); ((itc !=tile->creatures.end()) && (count < 10)); ++itc){
 			bool known;
 			unsigned long removedKnown;
 			checkCreatureAsKnown((*itc)->getID(), known, removedKnown);
@@ -342,11 +338,9 @@ void Protocol75::GetTileDescription(const Tile* tile, NetworkMessage &msg)
 			count++;
 		}
 		
-		
-		for (it = tile->downItems.begin(); ((it !=tile->downItems.end()) && (count < 10)); ++it)
-		{			
+		for(it = tile->downItems.begin(); ((it !=tile->downItems.end()) && (count < 10)); ++it){
 			msg.AddItem(*it);
-			count++;			
+			count++;
 		}
 	}
 }
@@ -355,9 +349,11 @@ void Protocol75::GetMapDescription(unsigned short x, unsigned short y, unsigned 
                                    unsigned short width, unsigned short height,
                                    NetworkMessage &msg)
 {
-	Tile* tile;
+	//Tile* tile;
+	//int cc = 0;
 	int skip = -1;
-	int startz, endz, offset, zstep, cc = 0;
+	int startz, endz, offset, zstep = 0;
+
 	if (z > 7) {
 		startz = z - 2;
 		endz = std::min(MAP_LAYER - 1, z + 2);
@@ -370,9 +366,11 @@ void Protocol75::GetMapDescription(unsigned short x, unsigned short y, unsigned 
 		zstep = -1;
 	}
 	
-	for(int nz = startz; nz != endz + zstep; nz += zstep) {
+	for(int nz = startz; nz != endz + zstep; nz += zstep){
+		GetFloorDescription(msg, x, y, nz, width, height, z - nz, skip);
+
+		/*
 		offset = z - nz;
-		
 		for (int nx = 0; nx < width; nx++)
 			for (int ny = 0; ny < height; ny++) {
 				tile = game->getTile(x + nx + offset, y + ny + offset, nz);
@@ -389,11 +387,6 @@ void Protocol75::GetMapDescription(unsigned short x, unsigned short y, unsigned 
 					
 				}
 				else {
-				/*
-				if(skip == -1) 
-				skip = 0;
-					*/
-					
 					skip++;
 					if (skip == 0xFF) {
 						msg.AddByte(0xFF);
@@ -403,19 +396,50 @@ void Protocol75::GetMapDescription(unsigned short x, unsigned short y, unsigned 
 					}
 				}
 			}
+		*/
 	}
 	
-	if (skip >= 0) {
+	if(skip >= 0){
 		msg.AddByte(skip);
 		msg.AddByte(0xFF);
-		cc += skip;
+		//cc += skip;
 	}
 	
 #ifdef __DEBUG__
-	printf("tiles in total: %d \n", cc);
+	//printf("tiles in total: %d \n", cc);
 #endif
 }
 
+void Protocol75::GetFloorDescription(NetworkMessage& msg, int x, int y, int z, int width, int height, int offset, int& skip)
+{
+	Tile* tile;
+
+	for(int nx = 0; nx < width; nx++){
+		for(int ny = 0; ny < height; ny++){
+			tile = game->getTile(x + nx + offset, y + ny + offset, z);
+			if(tile){
+				if(skip >= 0){
+					msg.AddByte(skip);
+					msg.AddByte(0xFF);
+					//cc +=skip;
+				}   
+				skip = 0;
+				
+				GetTileDescription(tile, msg);
+				//cc++;
+			}
+			else {
+				skip++;
+				if(skip == 0xFF){
+					msg.AddByte(0xFF);
+					msg.AddByte(0xFF);
+					//cc += skip;
+					skip = -1;
+				}
+			}
+		}
+	}
+}
 
 void Protocol75::checkCreatureAsKnown(unsigned long id, bool &known, unsigned long &removedKnown)
 {
@@ -468,6 +492,10 @@ void Protocol75::checkCreatureAsKnown(unsigned long id, bool &known, unsigned lo
 	}
 }
 
+bool Protocol75::CanSee(const Position& pos) const
+{
+	return CanSee(pos.x, pos.y, pos.z);
+}
 
 bool Protocol75::CanSee(int x, int y, int z) const
 {
@@ -732,8 +760,10 @@ void Protocol75::parseMoveNorth(NetworkMessage& msg)
 	
 	this->sleepTillMove();
 	
-	game->thingMove(player, player,
-		player->getPosition().x, player->getPosition().y-1, player->getPosition().z, 1);
+	game->creatureMove(player, NORTH);
+
+	//game->thingMove(player, player,
+	//	player->getPosition().x, player->getPosition().y-1, player->getPosition().z, 1);
 }
 
 void Protocol75::parseMoveEast(NetworkMessage& msg)
@@ -744,8 +774,10 @@ void Protocol75::parseMoveEast(NetworkMessage& msg)
 	
 	this->sleepTillMove();
 	
-	game->thingMove(player, player,
-		player->getPosition().x+1, player->getPosition().y, player->getPosition().z, 1);
+	game->creatureMove(player, EAST);
+
+	//game->thingMove(player, player,
+	//	player->getPosition().x+1, player->getPosition().y, player->getPosition().z, 1);
 }
 
 
@@ -757,8 +789,10 @@ void Protocol75::parseMoveSouth(NetworkMessage& msg)
 	
 	this->sleepTillMove();
 	
-	game->thingMove(player, player,
-		player->getPosition().x, player->getPosition().y+1, player->getPosition().z, 1);
+	game->creatureMove(player, SOUTH);
+
+	//game->thingMove(player, player,
+	//	player->getPosition().x, player->getPosition().y+1, player->getPosition().z, 1);
 }
 
 
@@ -769,9 +803,11 @@ void Protocol75::parseMoveWest(NetworkMessage& msg)
 	}
 	
 	this->sleepTillMove();
-	
-	game->thingMove(player, player,
-		player->getPosition().x-1, player->getPosition().y, player->getPosition().z, 1);
+
+	game->creatureMove(player, WEST);
+
+	//game->thingMove(player, player,
+	//	player->getPosition().x-1, player->getPosition().y, player->getPosition().z, 1);
 }
 
 void Protocol75::parseMoveNorthEast(NetworkMessage& msg)
@@ -783,8 +819,10 @@ void Protocol75::parseMoveNorthEast(NetworkMessage& msg)
 	this->sleepTillMove();
 	this->sleepTillMove();
 	
-	game->thingMove(player, player,
-		(player->getPosition().x+1), (player->getPosition().y-1), player->getPosition().z, 1);
+	game->creatureMove(player, NORTHEAST);
+
+	//game->thingMove(player, player,
+	//	(player->getPosition().x+1), (player->getPosition().y-1), player->getPosition().z, 1);
 }
 
 void Protocol75::parseMoveSouthEast(NetworkMessage& msg)
@@ -796,8 +834,10 @@ void Protocol75::parseMoveSouthEast(NetworkMessage& msg)
 	this->sleepTillMove();
 	this->sleepTillMove();
 	
-	game->thingMove(player, player,
-		(player->getPosition().x+1), (player->getPosition().y+1), player->getPosition().z, 1);
+	game->creatureMove(player, SOUTHEAST);
+
+	//game->thingMove(player, player,
+	//	(player->getPosition().x+1), (player->getPosition().y+1), player->getPosition().z, 1);
 }
 
 void Protocol75::parseMoveSouthWest(NetworkMessage& msg)
@@ -809,8 +849,10 @@ void Protocol75::parseMoveSouthWest(NetworkMessage& msg)
 	this->sleepTillMove();
 	this->sleepTillMove();
 	
-	game->thingMove(player, player,
-		(player->getPosition().x-1), (player->getPosition().y+1), player->getPosition().z, 1);
+	game->creatureMove(player, SOUTHWEST);
+
+	//game->thingMove(player, player,
+	//	(player->getPosition().x-1), (player->getPosition().y+1), player->getPosition().z, 1);
 }
 
 void Protocol75::parseMoveNorthWest(NetworkMessage& msg)
@@ -822,8 +864,10 @@ void Protocol75::parseMoveNorthWest(NetworkMessage& msg)
 	this->sleepTillMove();
 	this->sleepTillMove();
 	
-	game->thingMove(player, player,
-		(player->getPosition().x-1), (player->getPosition().y-1), player->getPosition().z, 1);   
+	game->creatureMove(player, NORTHWEST);
+
+	//game->thingMove(player, player,
+	//	(player->getPosition().x-1), (player->getPosition().y-1), player->getPosition().z, 1);   
 }
 
 void Protocol75::parseTurnNorth(NetworkMessage& msg)
@@ -1003,7 +1047,8 @@ void Protocol75::parseThrow(NetworkMessage& msg)
 	Creature* movingCreature = dynamic_cast<Creature*>(thing);
 		
 	if(movingCreature) {
-		game->thingMove(player, from_x, from_y, from_z, from_stack, itemid, to_x, to_y, to_z, count);		
+		//game->thingMove(player, from_x, from_y, from_z, from_stack, itemid, to_x, to_y, to_z, count);		
+		game->creatureMove(player, fromCylinder, toCylinder, movingCreature);
 	}
 	else{
 		game->thingMove(player, fromCylinder, toCylinder, to_index, thing, count);
@@ -1446,6 +1491,7 @@ void Protocol75::sendCloseContainer(uint32_t cid)
 	WriteBuffer(msg);
 }
 
+/*
 void Protocol75::sendTileUpdated(const Position &pos)
 {
 	NetworkMessage msg;
@@ -1453,7 +1499,7 @@ void Protocol75::sendTileUpdated(const Position &pos)
 	AddTileUpdated(msg, pos);
 	WriteBuffer(msg);
 }
-
+*/
 
 /*
 //container to container
@@ -2086,7 +2132,6 @@ void Protocol75::sendCreatureTurn(const Creature *creature, unsigned char stackP
 	}
 }
 
-
 void Protocol75::sendCreatureSay(const Creature *creature, SpeakClasses type, const std::string &text)
 {
 	NetworkMessage msg;
@@ -2281,6 +2326,7 @@ void Protocol75::sendThingAppear(const Thing* thing)
 	WriteBuffer(msg);
 }
 
+/*
 void Protocol75::sendThingTransform(const Thing* thing,int stackpos)
 {
 	if(CanSee(thing->getPosition().x, thing->getPosition().y, thing->getPosition().z)) {
@@ -2313,6 +2359,7 @@ void Protocol75::sendThingTransform(const Thing* thing,int stackpos)
 		}
 	}
 }
+*/
 
 void Protocol75::sendSkills()
 {
@@ -2328,6 +2375,7 @@ void Protocol75::sendPing()
 	WriteBuffer(msg);
 }
 
+/*
 void Protocol75::sendThingRemove(const Thing *thing)
 {
 	//Auto-close trade
@@ -2345,6 +2393,7 @@ void Protocol75::sendThingRemove(const Thing *thing)
 
 	WriteBuffer(msg);
 }
+*/
 
 void Protocol75::sendDistanceShoot(const Position &from, const Position &to, unsigned char type)
 {
@@ -2396,6 +2445,234 @@ void Protocol75::sendRemoveTileItem(const Position& pos, uint32_t stackpos)
 	WriteBuffer(msg);
 }
 
+void Protocol75::sendAddCreature(const Creature* creature, bool isLogin)
+{
+	NetworkMessage msg;
+
+	if(CanSee(creature->getPosition())){
+		if(creature == player){
+				msg.AddByte(0x0A);
+				msg.AddU32(player->getID());
+					
+				msg.AddByte(0x32);
+				msg.AddByte(0x00);
+					
+				msg.AddByte(0x00); //can report bugs 0,1
+						
+				//msg.AddByte(0x0B);//TODO?. GM actions
+				//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+				//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+				//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+				//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+				//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+				//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+				//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+				//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+
+				AddMapDescription(msg, player->getPosition());
+
+				if(isLogin){
+					AddMagicEffect(msg, player->getPosition(), NM_ME_ENERGY_AREA);
+				}
+					
+				AddInventoryItem(msg, SLOT_HEAD, player->getInventoryItem(SLOT_HEAD));
+				AddInventoryItem(msg, SLOT_NECKLACE, player->getInventoryItem(SLOT_NECKLACE));
+				AddInventoryItem(msg, SLOT_BACKPACK, player->getInventoryItem(SLOT_BACKPACK));
+				AddInventoryItem(msg, SLOT_ARMOR, player->getInventoryItem(SLOT_ARMOR));
+				AddInventoryItem(msg, SLOT_RIGHT, player->getInventoryItem(SLOT_RIGHT));
+				AddInventoryItem(msg, SLOT_LEFT, player->getInventoryItem(SLOT_LEFT));
+				AddInventoryItem(msg, SLOT_LEGS, player->getInventoryItem(SLOT_LEGS));
+				AddInventoryItem(msg, SLOT_FEET, player->getInventoryItem(SLOT_FEET));
+				AddInventoryItem(msg, SLOT_RING, player->getInventoryItem(SLOT_RING));
+				AddInventoryItem(msg, SLOT_AMMO, player->getInventoryItem(SLOT_AMMO));
+
+				AddPlayerStats(msg);	
+
+				//gameworld light-settings
+				msg.AddByte(0x82);
+				msg.AddByte(0x6F); //level
+				msg.AddByte(0xD7);//color
+
+				//player light level
+				//msg.AddByte(0x8d);//8d
+				//msg.AddU32(player->getID());
+				//msg->AddByte(0x6F); //level
+				//msg->AddByte(0xDF); //color
+
+				AddPlayerSkills(msg);
+					
+				for(VIPListSet::iterator it = player->VIPList.begin(); it != player->VIPList.end(); it++){
+					bool online;
+					std::string vip_name;
+					
+					if(IOPlayer::instance()->getNameByGuid((*it), vip_name)){
+						online = (game->getPlayerByName(vip_name) != NULL);
+						sendVIP((*it), vip_name, online);
+					}
+				}
+
+				AddTextMessage(msg,MSG_EVENT, g_config.getGlobalString("loginmsg", "Welcome.").c_str());
+				std::string tempstring;
+				tempstring = "Your last visit was on ";
+				time_t lastlogin = player->getLastLoginSaved();
+				tempstring += ctime(&lastlogin);
+				tempstring.erase(tempstring.length() -1);
+				tempstring += ".";
+				AddTextMessage(msg,MSG_EVENT, tempstring.c_str());
+				WriteBuffer(msg);
+					
+				//force flush
+				flushOutputBuffer();
+		}
+		else{
+			bool known;
+			unsigned long removedKnown;
+			checkCreatureAsKnown(creature->getID(), known, removedKnown);
+			AddAppearThing(msg, creature->getPosition());
+			AddCreature(msg, creature, known, removedKnown);
+
+			if(isLogin){
+				AddMagicEffect(msg, creature->getPosition(), NM_ME_ENERGY_AREA);
+			}
+		}
+		
+		WriteBuffer(msg);
+	}
+}
+
+void Protocol75::sendRemoveCreature(const Creature* creature, uint32_t stackpos, bool isLogout)
+{
+	if(CanSee(creature->getPosition())){
+		NetworkMessage msg;
+		RemoveTileItem(msg, creature->getPosition(), stackpos); 
+
+		if(isLogout){
+			AddMagicEffect(msg, creature->getPosition(), NM_ME_PUFF);
+		}
+	
+		WriteBuffer(msg);
+	}
+}
+
+void Protocol75::sendMoveCreature(const Creature* creature, const Position& oldPos, uint32_t oldStackPos)
+{
+	if(CanSee(oldPos) && CanSee(creature->getPosition())){
+		NetworkMessage msg;
+
+		msg.AddByte(0x6D);
+		msg.AddPosition(oldPos);
+		msg.AddByte(oldStackPos);
+		msg.AddPosition(creature->getPosition());
+
+		if(creature == player){
+			const Position& myPos = creature->getPosition();
+
+			//floor change down
+			if(myPos.z > oldPos.z){
+				msg.AddByte(0xBF);
+
+				//going from surface to underground
+				if(myPos.z == 8){
+					int skip = -1;
+					GetFloorDescription(msg, myPos.x - 8, myPos.y - 6, myPos.z, 18, 14, -1, skip);
+					GetFloorDescription(msg, myPos.x - 8, myPos.y - 6, myPos.z + 1, 18, 14, -2, skip);
+					GetFloorDescription(msg, myPos.x - 8, myPos.y - 6, myPos.z + 2, 18, 14, -3, skip);
+
+					if(skip >= 0){
+						msg.AddByte(skip);
+						msg.AddByte(0xFF);
+					}
+				}
+				//going further down
+				else if(myPos.z > oldPos.z && myPos.z > 8 && myPos.z < 14){
+					int skip = -1;
+					GetFloorDescription(msg, myPos.x - 8, myPos.y - 6, myPos.z + 2, 18, 14, -3, skip);
+
+					if(skip >= 0){
+						msg.AddByte(skip);
+						msg.AddByte(0xFF);
+					}
+				}
+
+				//moving to a floor down makes us out of sync
+				//east
+				msg.AddByte(0x66);
+				GetMapDescription(oldPos.x  + 9, oldPos.y - 7, myPos.z, 1, 14, msg);
+
+				//south
+				msg.AddByte(0x67);
+				GetMapDescription(oldPos.x - 8, oldPos.y + 8, myPos.z, 18, 1, msg);
+			}
+			//floor change up
+			else if(myPos.z < oldPos.z){
+				msg.AddByte(0xBE);
+
+				//going to surface
+				if(myPos.z == 7){
+					int skip = -1;
+					GetFloorDescription(msg, myPos.x - 8, myPos.y - 6, 5, 18, 14, 3, skip); //(floor 7 and 6 already set)
+					GetFloorDescription(msg, myPos.x - 8, myPos.y - 6, 4, 18, 14, 4, skip);
+					GetFloorDescription(msg, myPos.x - 8, myPos.y - 6, 3, 18, 14, 5, skip);
+					GetFloorDescription(msg, myPos.x - 8, myPos.y - 6, 2, 18, 14, 6, skip);
+					GetFloorDescription(msg, myPos.x - 8, myPos.y - 6, 1, 18, 14, 7, skip);
+					GetFloorDescription(msg, myPos.x - 8, myPos.y - 6, 0, 18, 14, 8, skip);
+
+					if(skip >= 0){
+						msg.AddByte(skip);
+						msg.AddByte(0xFF);
+					}
+				}
+				//underground, going one floor up (still underground)
+				else if(myPos.z > 7){
+					int skip = -1;
+					GetFloorDescription(msg, myPos.x - 8, myPos.y - 6, myPos.z - 2, 18, 14, 3, skip);
+
+					if(skip >= 0){
+						msg.AddByte(skip);
+						msg.AddByte(0xFF);
+					}
+				}
+
+
+				//moving to a floor up makes us out of sync
+				//west
+				msg.AddByte(0x68);
+				GetMapDescription(myPos.x - 7, myPos.y - 6, myPos.z, 1, 14, msg);
+
+				//north
+				msg.AddByte(0x65);
+				GetMapDescription(myPos.x - 7, myPos.y - 7, myPos.z, 18, 1, msg);
+			}
+
+			if(oldPos.y > myPos.y){ // north, for old x
+				msg.AddByte(0x65);
+				GetMapDescription(myPos.x - 8, myPos.y - 6, myPos.z, 18, 1, msg);
+			}
+			else if(oldPos.y < myPos.y){ // south, for old x
+				msg.AddByte(0x67);
+				GetMapDescription(myPos.x - 8, myPos.y + 7, myPos.z, 18, 1, msg);
+			}
+
+			if(oldPos.x < myPos.x){ // east, [with new y]
+				msg.AddByte(0x66);
+				GetMapDescription(myPos.x + 9, myPos.y - 6, myPos.z, 1, 14, msg);
+			}
+			else if(oldPos.x > myPos.x){ // west, [with new y]
+				msg.AddByte(0x68);
+				GetMapDescription(myPos.x - 8, myPos.y - 6, myPos.z, 1, 14, msg);
+			}
+		}
+	
+		WriteBuffer(msg);
+	}
+	else if(CanSee(oldPos)){
+		sendRemoveCreature(creature, oldStackPos, false);
+	}
+	else if(CanSee(creature->getPosition())){
+		sendAddCreature(creature, false);
+	}
+}
+
 //inventory
 void Protocol75::sendAddInventoryItem(slots_t slot, const Item* item)
 {
@@ -2421,7 +2698,6 @@ void Protocol75::sendRemoveInventoryItem(slots_t slot)
 //containers
 void Protocol75::sendAddContainerItem(const Container* container, const Item* item)
 {
-	//void sendItemAddContainer(const Container *container, const Item *item)
 	uint32_t cid = player->getContainerID(container);
 	if(cid != -1){
 		NetworkMessage msg;
@@ -2432,7 +2708,6 @@ void Protocol75::sendAddContainerItem(const Container* container, const Item* it
 
 void Protocol75::sendUpdateContainerItem(const Container *container, uint8_t slot, const Item* item)
 {
-	//void UpdateContainerItem(NetworkMessage& msg, uint8_t cid, uint8_t slot, const Item* item)
 	uint32_t cid = player->getContainerID(container);
 	if(cid != -1){
 		NetworkMessage msg;
@@ -2443,7 +2718,6 @@ void Protocol75::sendUpdateContainerItem(const Container *container, uint8_t slo
 
 void Protocol75::sendRemoveContainerItem(const Container* container, uint8_t slot)
 {
-	//void RemoveContainerItem(NetworkMessage& msg, uint8_t cid, uint8_t slot)
 	uint32_t cid = player->getContainerID(container);
 	if(cid != -1){
 		NetworkMessage msg;

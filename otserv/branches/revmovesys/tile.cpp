@@ -619,8 +619,35 @@ Cylinder* Tile::__queryDestination(uint32_t index, Thing** destThing)
 		destTile = g_game.getTile(teleport->getDestPos().x, teleport->getDestPos().y, teleport->getDestPos().z);
 	}
 	else{
+		if(destTile->floorChange()){
+			if(destTile->floorChange(NORTH) && destTile->floorChange(EAST)){
+				destTile = g_game.getTile(getTilePosition().x + 1, getTilePosition().y - 1, getTilePosition().z - 1);
+			}
+			else if(destTile->floorChange(NORTH) && destTile->floorChange(WEST)){
+				destTile = g_game.getTile(getTilePosition().x - 1, getTilePosition().y - 1, getTilePosition().z - 1);
+			}
+			else if(destTile->floorChange(SOUTH) && destTile->floorChange(EAST)){
+				destTile = g_game.getTile(getTilePosition().x + 1, getTilePosition().y + 1, getTilePosition().z - 1);
+			}
+			else if(destTile->floorChange(SOUTH) && destTile->floorChange(WEST)){
+				destTile = g_game.getTile(getTilePosition().x - 1, getTilePosition().y + 1, getTilePosition().z - 1);
+			}
+			else if(destTile->floorChange(NORTH)){
+				destTile = g_game.getTile(getTilePosition().x, getTilePosition().y - 1, getTilePosition().z - 1);
+			}
+			else if(destTile->floorChange(SOUTH)){
+				destTile = g_game.getTile(getTilePosition().x, getTilePosition().y + 1, getTilePosition().z - 1);
+			}
+			else if(destTile->floorChange(EAST)){
+				destTile = g_game.getTile(getTilePosition().x + 1, getTilePosition().y, getTilePosition().z - 1);
+			}
+			else if(destTile->floorChange(WEST)){
+				destTile = g_game.getTile(getTilePosition().x - 1, getTilePosition().y, getTilePosition().z - 1);
+			}                                      
+		}
+
 		while(destTile->floorChangeDown()){
-			destTile = g_game.getTile(getTilePosition().x, getTilePosition().y + 1, getTilePosition().z + 1);
+			destTile = g_game.getTile(getTilePosition().x, getTilePosition().y, getTilePosition().z + 1);
 
 			if(destTile == NULL){
 				return NULL;
@@ -638,7 +665,7 @@ Cylinder* Tile::__queryDestination(uint32_t index, Thing** destThing)
 			else if(destTile->floorChange(SOUTH) && destTile->floorChange(WEST)){
 				destTile = g_game.getTile(getTilePosition().x + 2, getTilePosition().y - 2, getTilePosition().z + 1);
 			}
-			//diagonal end                                                           
+
 			else if(destTile->floorChange(NORTH)){
 				destTile = g_game.getTile(getTilePosition().x, getTilePosition().y + 1, getTilePosition().z + 1);
 			}
@@ -667,12 +694,6 @@ ReturnValue Tile::__addThing(uint32_t index, Thing* thing)
 {
 	thing->setParent(this);
 
-	const Position& cylinderMapPos = getPosition();
-
-	SpectatorVec list;
-	SpectatorVec::iterator it;
-	g_game.getSpectators(Range(cylinderMapPos, true), list);
-
 	Creature* creature = dynamic_cast<Creature*>(thing);
 	if(creature){
 		creatures.insert(creatures.begin(), creature);
@@ -683,6 +704,12 @@ ReturnValue Tile::__addThing(uint32_t index, Thing* thing)
 
 		if(item == NULL)
 			return RET_NOTPOSSIBLE;
+
+		const Position& cylinderMapPos = getPosition();
+
+		SpectatorVec list;
+		SpectatorVec::iterator it;
+		g_game.getSpectators(Range(cylinderMapPos, true), list);
 
     if(item->isGroundTile()){
       ground = item;
@@ -757,12 +784,6 @@ ReturnValue Tile::__updateThing(uint32_t index, Thing* thing)
 
 ReturnValue Tile::__removeThing(Thing* thing, uint32_t count)
 {
-	const Position& cylinderMapPos = getPosition();
-
-	SpectatorVec list;
-	SpectatorVec::iterator it;
-	g_game.getSpectators(Range(cylinderMapPos, true), list);
-
 	Creature* creature = dynamic_cast<Creature*>(thing);
 	if(creature){
     CreatureVector::iterator it;
@@ -773,12 +794,8 @@ ReturnValue Tile::__removeThing(Thing* thing, uint32_t count)
       }
 		}
 	}
-  else if(thing == splash){
-    splash = NULL;
-    return RET_NOERROR;
-  }
-  else{
-    Item *item = dynamic_cast<Item*>(thing);
+	else{
+		Item *item = dynamic_cast<Item*>(thing);
 		if(item == NULL)
 			return RET_NOTPOSSIBLE;
 
@@ -790,21 +807,40 @@ ReturnValue Tile::__removeThing(Thing* thing, uint32_t count)
 			return RET_NOTPOSSIBLE;
 		}
 
-    ItemVector::iterator iit;
-    if(item->isAlwaysOnTop()){
-			for(iit = topItems.begin(); iit != topItems.end(); ++iit){
-        if(*iit == item){
-          topItems.erase(iit);
-					return RET_NOERROR;
-        }
-			}
-    }
-    else {
-      for (iit = downItems.begin(); iit != downItems.end(); ++iit)
-        if(*iit == item) {
+		const Position& cylinderMapPos = getPosition();
 
-					if(item->isStackable() && count != item->getItemCountOrSubtype()){
-						
+		SpectatorVec list;
+		SpectatorVec::iterator it;
+		g_game.getSpectators(Range(cylinderMapPos, true), list);
+
+		if(item == splash){
+			splash = NULL;
+			return RET_NOERROR;
+		}
+
+		ItemVector::iterator iit;
+		if(item->isAlwaysOnTop()){
+			for(iit = topItems.begin(); iit != topItems.end(); ++iit){
+				if(*iit == item){
+					(*iit)->setParent(NULL);
+					topItems.erase(iit);
+
+					//send to client
+					for(it = list.begin(); it != list.end(); ++it) {
+						Player* spectator = dynamic_cast<Player*>(*it);
+						if(spectator){
+							spectator->sendRemoveTileItem(cylinderMapPos, index);
+						}
+					}
+
+					return RET_NOERROR;
+				}
+			}
+		}
+		else{
+			for (iit = downItems.begin(); iit != downItems.end(); ++iit)
+				if(*iit == item){
+					if(item->isStackable() && count != item->getItemCountOrSubtype()){							
 						item->setItemCountOrSubtype(item->getItemCountOrSubtype() - count);
 
 						//send to client

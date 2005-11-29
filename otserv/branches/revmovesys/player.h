@@ -217,7 +217,6 @@ public:
 	void sendToChannel(Creature *creature, SpeakClasses type, const std::string &text, unsigned short channelId);
 	virtual void sendCancel(const char *msg) const;
 	virtual void sendCancelWalk() const;
-	//int sendInventory(unsigned char sl_id);
 	void sendStats();
 	void sendTextMessage(MessageClasses mclass, const char* message) const;
 	void sendTextMessage(MessageClasses mclass, const char* message,const Position &pos, unsigned char type) const;
@@ -242,21 +241,6 @@ public:
 	bool NeedUpdateStats();
 	
 	virtual std::string getDescription(uint32_t lookDistance) const;
-
-	//tile
-	void sendAddTileItem(const Position& pos, const Item* item);
-	void sendUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* item);
-	void sendRemoveTileItem(const Position& pos, uint32_t stackpos);
-
-	//container
-	void sendAddContainerItem(const Container* container, const Item *item);
-	void sendUpdateContainerItem(const Container* container, uint8_t slot, const Item* item);
-	void sendRemoveContainerItem(const Container* container, uint8_t slot);
-	
-	//inventory
-	void sendAddInventoryItem(slots_t slot, const Item* item);
-	void sendUpdateInventoryItem(slots_t slot, const Item* item);
-	void sendRemoveInventoryItem(slots_t slot);
 	
 	void setAcceptTrade(bool b);
 	bool getAcceptTrade() {return (tradeState == TRADE_ACCEPT);};
@@ -268,26 +252,45 @@ public:
 	bool addVIP(unsigned long guid, std::string &name, bool isOnline, bool interal = false);
 	
 	VIPListSet VIPList;
+
+	//tile
+	void sendAddTileItem(const Position& pos, const Item* item);
+	void sendUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* item);
+	void sendRemoveTileItem(const Position& pos, uint32_t stackpos);
 	
-protected:
-	void sendCancelAttacking();
-	void addSkillTryInternal(int skilltry,int skill);
+	virtual void onCreatureAppear(const Creature* creature, bool isLogin);
+	virtual void onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout);
+
+	//old code
 	//virtual void onCreatureAppear(const Creature *creature);
 	//virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos, bool tele);
 	//virtual void onTileUpdated(const Position &pos);
-	
 	void onThingAppear(const Thing* thing);
 	void onThingDisappear(const Thing* thing, unsigned char stackPos);
+	//old code
+
+	virtual void onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos);
+	virtual void onTeleport(const Creature* creature, const Position& oldPos, uint32_t oldStackPos);
 
 	virtual void onCreatureTurn(const Creature *creature, unsigned char stackpos);
 	virtual void onCreatureSay(const Creature *creature, SpeakClasses type, const std::string &text);
 	virtual void onCreatureChangeOutfit(const Creature* creature);
-	virtual void onTeleport(const Creature *creature, const Position *oldPos, unsigned char oldstackpos); 
-	virtual int onThink(int& newThinkTicks);
+
+	//container
+	void sendAddContainerItem(const Container* container, const Item *item);
+	void sendUpdateContainerItem(const Container* container, uint8_t slot, const Item* item);
+	void sendRemoveContainerItem(const Container* container, uint8_t slot);
 	
-	//ground to ground
-	virtual void onThingMove(const Creature *creature, const Thing *thing, const Position *oldPos,
-		unsigned char oldstackpos, unsigned char oldcount, unsigned char count);
+	//inventory
+	void sendAddInventoryItem(slots_t slot, const Item* item);
+	void sendUpdateInventoryItem(slots_t slot, const Item* item);
+	void sendRemoveInventoryItem(slots_t slot);
+
+protected:
+	void sendCancelAttacking();
+	void addSkillTryInternal(int skilltry,int skill);
+
+	virtual int onThink(int& newThinkTicks);
 
 	//
 	virtual ReturnValue __queryMaxCount(int32_t index, const Thing* thing, uint32_t count,

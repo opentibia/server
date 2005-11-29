@@ -1502,6 +1502,21 @@ void Player::sendRemoveTileItem(const Position& pos, uint32_t stackpos)
 	client->sendRemoveTileItem(pos, stackpos);
 }
 
+void Player::onCreatureAppear(const Creature* creature, bool isLogin)
+{
+	client->sendAddCreature(creature, isLogin);
+}
+
+void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout)
+{
+	client->sendRemoveCreature(creature, stackpos, isLogout);
+}
+
+void Player::onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos)
+{
+	client->sendMoveCreature(creature, oldPos, oldStackPos);
+}
+
 //container
 void Player::sendAddContainerItem(const Container* container, const Item *item)
 {
@@ -1562,11 +1577,13 @@ bool Player::NeedUpdateStats()
 	}
 }
 
+/*
 void Player::onThingMove(const Creature *creature, const Thing *thing, const Position *oldPos,
 	unsigned char oldstackpos, unsigned char oldcount, unsigned char count)
 {
   client->sendThingMove(creature, thing, oldPos, oldstackpos, oldcount, count);
 }
+*/
 
 //tiles
 void Player::onThingAppear(const Thing* thing)
@@ -1600,9 +1617,9 @@ int Player::onThink(int& newThinkTicks)
 	return 1000;
 }
 
-void Player::onTeleport(const Creature *creature, const Position *oldPos, unsigned char oldstackpos)
+void Player::onTeleport(const Creature* creature, const Position& oldPos, uint32_t oldStackPos)
 { 
-  client->sendThingMove(creature, creature,oldPos, oldstackpos, true, 1, 1); 
+  //client->sendThingMove(creature, creature,oldPos, oldstackpos, true, 1, 1);
 }
 
 void Player::addManaSpent(unsigned long spent)

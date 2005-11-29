@@ -791,9 +791,128 @@ bool Game::removeCreature(Creature* c)
 }
 
 //NEW CYLINDER CLASS
+ReturnValue Game::creatureMove(Creature* creature, Direction direction)
+{
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::creatureMove()");
+
+	Cylinder* fromCylinder = creature->getTile();
+	Cylinder* toCylinder = NULL;
+
+	switch(direction){
+		case NORTH:
+			toCylinder = getTile(creature->getPosition().x, creature->getPosition().y - 1, creature->getPosition().z);
+		break;
+
+		case SOUTH:
+			toCylinder = getTile(creature->getPosition().x, creature->getPosition().y + 1, creature->getPosition().z);
+		break;
+		
+		case WEST:
+			toCylinder = getTile(creature->getPosition().x - 1, creature->getPosition().y, creature->getPosition().z);
+		break;
+
+		case EAST:
+			toCylinder = getTile(creature->getPosition().x + 1, creature->getPosition().y, creature->getPosition().z);
+		break;
+
+		case SOUTHWEST:
+			toCylinder = getTile(creature->getPosition().x - 1, creature->getPosition().y + 1, creature->getPosition().z);
+		break;
+
+		case NORTHWEST:
+			toCylinder = getTile(creature->getPosition().x - 1, creature->getPosition().y - 1, creature->getPosition().z);
+		break;
+
+		case NORTHEAST:
+			toCylinder = getTile(creature->getPosition().x + 1, creature->getPosition().y - 1, creature->getPosition().z);
+		break;
+
+		case SOUTHEAST:
+			toCylinder = getTile(creature->getPosition().x + 1, creature->getPosition().y + 1, creature->getPosition().z);
+		break;
+	}
+
+	return creatureMove(creature, fromCylinder, toCylinder, creature);
+}
+
 ReturnValue Game::creatureMove(Creature* creature, Cylinder* fromCylinder, Cylinder* toCylinder,
 	Creature* moveCreature)
 {
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::creatureMove()");
+
+	if(fromCylinder == NULL || toCylinder == NULL || moveCreature == NULL){
+		creature->sendCancel("Sorry, not possible.");
+		return RET_NOTPOSSIBLE;
+	}
+
+	const Position& fromPos = fromCylinder->getPosition();
+	const Position& toPos = toCylinder->getPosition();
+
+	/*if(!moveCreature->isPushable()){
+		creature->sendCancel("You cannot move this item.");
+		return RET_NOMOVEABLE;
+	}
+	else*/ if(creature->getPosition().z != fromPos.z){
+		return RET_NOTPOSSIBLE;
+	}
+	else if((std::abs(creature->getPosition().x - fromPos.x) > 1) || (std::abs(creature->getPosition().y - fromPos.y) > 1)) {
+		creature->sendCancel("To far away.");
+		return RET_NOTPOSSIBLE;
+	}
+
+	//check throw distance
+	if( (std::abs(fromPos.x - toPos.x) > moveCreature->getThrowRange()) ||
+			(std::abs(fromPos.y - toPos.y) > moveCreature->getThrowRange()) ||
+			(std::abs(fromPos.z - toPos.z) * 2 > moveCreature->getThrowRange()) ) {
+		//creature->sendCancel("Destination is out of reach.");
+		return RET_DESTINATIONOUTOFREACH;
+	}
+
+	//check constrains
+	//
+	//
+	//
+	
+	uint32_t oldStackPos = fromCylinder->__getIndexOfThing(creature);
+
+	//remove the creature
+	fromCylinder->__removeThing(creature, 0);
+
+	//add the creature
+	toCylinder->__addThing(creature);
+
+	SpectatorVec list;
+	SpectatorVec::iterator it;
+	getSpectators(Range(fromPos, toPos), list);
+
+	//send change to client
+	for(it = list.begin(); it != list.end(); ++it) {
+		Player* spectator = dynamic_cast<Player*>(*it);
+		if(spectator){
+			spectator->onCreatureMove(moveCreature, fromPos, oldStackPos);
+		}
+	}
+
+	Thing* toThing = NULL;
+	Cylinder* subCylinder = toCylinder->__queryDestination(0, &toThing);
+	if(subCylinder != toCylinder){
+		uint32_t oldStackPos = toCylinder->__getIndexOfThing(creature);
+
+		//remove the creature
+		toCylinder->__removeThing(creature, 0);
+
+		//add the creature
+		subCylinder->__addThing(creature);
+
+		//send change to client
+		for(it = list.begin(); it != list.end(); ++it) {
+			Player* spectator = dynamic_cast<Player*>(*it);
+			if(spectator){
+				spectator->onCreatureMove(moveCreature, toPos, oldStackPos);
+			}
+		}
+	}
+
 	return RET_NOTPOSSIBLE;
 }
 
@@ -811,7 +930,7 @@ ReturnValue Game::thingMove(Creature* creature, Cylinder* fromCylinder, Cylinder
 	const Position& toPos = toCylinder->getPosition();
 
 	/*if(!thing->isPushable()){
-		creature->sendCancel("Sorry, not possible.");
+		creature->sendCancel("You cannot move this item.");
 		return;
 	}
 	else*/ if(creature->getPosition().z > fromPos.z){
@@ -915,6 +1034,7 @@ ReturnValue Game::thingMove(Creature* creature, Cylinder* fromCylinder, Cylinder
 	return RET_NOERROR;
 }
 
+/*
 void Game::thingMove(Creature *creature, Thing *thing,
 	unsigned short to_x, unsigned short to_y, unsigned char to_z, unsigned char count)
 {
@@ -949,8 +1069,10 @@ void Game::thingMove(Creature *creature, unsigned short from_x, unsigned short f
 
 	thingMoveInternal(creature, from_x, from_y, from_z, stackPos, itemid, to_x, to_y, to_z, count);
 }
+*/
 
-/*ground -> ground*/
+/*
+//ground -> ground
 bool Game::onPrepareMoveThing(Creature* player, const Thing* thing,
 	const Position& fromPos, const Position& toPos, int count)
 {
@@ -959,7 +1081,7 @@ bool Game::onPrepareMoveThing(Creature* player, const Thing* thing,
 		return false;
 	}
 	else if( (abs(fromPos.x - toPos.x) > thing->getThrowRange()) || (abs(fromPos.y - toPos.y) > thing->getThrowRange())
-		|| (fromPos.z != toPos.z) /*TODO: Make it possible to throw items to different floors*/ ) {		
+		|| (fromPos.z != toPos.z)) {
 		player->sendCancel("Destination is out of reach.");
 		return false;
 	}
@@ -1001,8 +1123,10 @@ bool Game::onPrepareMoveThing(Creature* player, const Thing* thing,
 	
 	return true;
 }
+*/
 
-/*ground -> ground*/
+//ground -> ground
+/*
 bool Game::onPrepareMoveThing(Creature* creature, const Thing* thing,
 	const Tile* fromTile, const Tile *toTile, int count)
 {
@@ -1012,7 +1136,6 @@ bool Game::onPrepareMoveThing(Creature* creature, const Thing* thing,
 	const Creature* movingCreature = dynamic_cast<const Creature*>(thing);
 	const Player* movingPlayer = dynamic_cast<const Player*>(thing);
 	
-	/*
 	if(item && !item->canMovedTo(toTile)) {
 	 	creature->sendCancel("Sorry, not possible.");
 		return false;
@@ -1026,7 +1149,7 @@ bool Game::onPrepareMoveThing(Creature* creature, const Thing* thing,
 		return false;
 	}
 	
-	else*/ if(!movingPlayer && toTile && toTile->floorChange()) {
+	else if(!movingPlayer && toTile && toTile->floorChange()) {
 		creature->sendCancel("Sorry, not possible.");
 		return false;
 	}
@@ -1056,6 +1179,7 @@ bool Game::onPrepareMoveThing(Creature* creature, const Thing* thing,
 
 	return true; //return thing->canMovedTo(toTile);
 }
+*/
 
 /*
 //inventory -> container
@@ -1162,7 +1286,7 @@ bool Game::onPrepareMoveThing(Player* player,
 	return true;
 }
 */
-
+/*
 //ground -> ground
 bool Game::onPrepareMoveCreature(Creature *creature, const Creature* creatureMoving,
 	const Tile *fromTile, const Tile *toTile)
@@ -1214,6 +1338,7 @@ bool Game::onPrepareMoveCreature(Creature *creature, const Creature* creatureMov
 	return true;
 }
 
+*/
 /*
 //ground -> inventory
 bool Game::onPrepareMoveThing(Player *player, const Position& fromPos, const Item *item,
@@ -2212,6 +2337,7 @@ void Game::thingMoveInternal(Player *player, const Position& fromPos, unsigned c
 */
 
 //ground to ground
+/*
 void Game::thingMoveInternal(Creature *creature, unsigned short from_x, unsigned short from_y, unsigned char from_z,
 	unsigned char stackPos, unsigned short itemid, unsigned short to_x, unsigned short to_y, unsigned char to_z, unsigned char count)
 {
@@ -2220,23 +2346,13 @@ void Game::thingMoveInternal(Creature *creature, unsigned short from_x, unsigned
 		return;
 	
 	Tile *toTile   = getTile(to_x, to_y, to_z);
-	/*
-	if(!toTile){
-		if(dynamic_cast<Player*>(player))
-			dynamic_cast<Player*>(player)->sendCancelWalk("Sorry, not possible...");
-		return;
-	}
-	*/
-
 	Thing *thing = fromTile->getThingByStackPos(stackPos);
 
 #ifdef __DEBUG__
 				//				std::cout << "moving"
-				/*
 				<< ": from_x: "<< (int)from_x << ", from_y: "<< (int)from_y << ", from_z: "<< (int)from_z
 				<< ", stackpos: "<< (int)stackPos
 				<< ", to_x: "<< (int)to_x << ", to_y: "<< (int)to_y << ", to_z: "<< (int)to_z
-				*/
 				//<< std::endl;
 #endif
 
@@ -2318,11 +2434,6 @@ void Game::thingMoveInternal(Creature *creature, unsigned short from_x, unsigned
 	
 	if(!onPrepareMoveThing(creature, thing, fromTile, toTile, count))
 		return;
-
-	/*
-	if(item && (item->getID() != itemid || item != fromTile->getTopDownItem()))
-		return;
-	*/
 		                 
 	// *** If the destiny is a teleport item, teleport the thing
 		
@@ -2468,7 +2579,6 @@ void Game::thingMoveInternal(Creature *creature, unsigned short from_x, unsigned
 		}
 		
 		// Magic Field in destiny field
-		/*
 		if(creatureMoving)
 		{
 			const MagicEffectItem* fieldItem = toTile->getFieldItem();
@@ -2488,9 +2598,9 @@ void Game::thingMoveInternal(Creature *creature, unsigned short from_x, unsigned
 				}
 			}
 		}
-		*/
 	}
 }
+*/
 
 void Game::getSpectators(const Range& range, SpectatorVec& list)
 {
@@ -3358,7 +3468,7 @@ void Game::checkPlayerWalk(unsigned long id)
 */
 
 	player->lastmove = OTSYS_TIME();
-	this->thingMove(player, player, pos.x, pos.y, pos.z, 1);
+	//this->thingMove(player, player, pos.x, pos.y, pos.z, 1);
 	flushSendBuffers();
 
 	if(!player->pathlist.empty()) {

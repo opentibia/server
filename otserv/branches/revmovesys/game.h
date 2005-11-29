@@ -176,19 +176,23 @@ public:
 	ReturnValue creatureMove(Creature* creature, Cylinder* fromCylinder, Cylinder* toCylinder,
 		Creature* moveCreature);
 
+	ReturnValue creatureMove(Creature* creature, Direction direction);
+
 	ReturnValue thingMove(Creature* creature, Cylinder* fromCylinder, Cylinder* toCylinder, int32_t index,
 		Thing* thing, uint32_t count);
 
+	/*
+	//OLD CODE
 	void thingMove(Creature *creature, Thing *thing,
 			unsigned short to_x, unsigned short to_y, unsigned char to_z, unsigned char count);
 	
-	//OLD CODE
 	//ground to ground
 	void thingMove(Creature *creature,
 			unsigned short from_x, unsigned short from_y, unsigned char from_z,
 			unsigned char stackPos,unsigned short itemid,
 			unsigned short to_x, unsigned short to_y, unsigned char to_z, unsigned char count);
 	//OLD CODE
+	*/
 
 	/**
 		* Creature wants to turn.
@@ -240,7 +244,6 @@ public:
 	unsigned long addEvent(SchedulerTask*);
 	bool stopEvent(unsigned long eventid);
 
-	//void creatureBroadcastTileUpdated(const Position& pos);
 	void teleport(Thing *thing, const Position& newPos);
       
   std::vector<Player*> BufferedPlayers;   
@@ -281,16 +284,16 @@ protected:
 	
 	AutoList<Creature> listCreature;
 
-	/*ground -> ground*/
+	/*
+	//ground -> ground
 	bool onPrepareMoveThing(Creature *player, const Thing* thing,
 		const Position& fromPos, const Position& toPos, int count);
 
-	/*ground -> ground*/
+	//ground -> ground
 	bool onPrepareMoveThing(Creature *creature, const Thing* thing,
 		const Tile *fromTile, const Tile *toTile, int count);
 
-	/*
-	/inventory -> container
+	//inventory -> container
 	bool onPrepareMoveThing(Player *player, const Item* fromItem, slots_t fromSlot,
 		const Container *toContainer, const Item *toItem, int count);
 
@@ -298,13 +301,11 @@ protected:
 	bool onPrepareMoveThing(Player* player, const Position& fromPos, const Container* fromContainer,
 		const Item* fromItem, const Position& toPos, const Container* toContainer, const Item* toItem,
 		int count);
-	*/
 
 	//ground -> ground
 	bool onPrepareMoveCreature(Creature *creature, const Creature* creatureMoving,
 		const Tile *fromTile, const Tile *toTile);
 
-	/*
 	//ground -> inventory
 	bool onPrepareMoveThing(Player *player, const Position& fromPos, const Item *item,
 		slots_t toSlot, int count);
@@ -336,7 +337,6 @@ protected:
 			const Position& fromPos, unsigned char stackPos,unsigned short itemid,
 			unsigned char to_cid, unsigned char to_slotid,
 			bool toInventory, unsigned char count);
-	*/
 
 	// use this internal function to move things around to avoid the need of
   // recursive locks
@@ -344,11 +344,12 @@ protected:
       unsigned short from_x, unsigned short from_y, unsigned char from_z,
       unsigned char stackPos,unsigned short itemid,
 			unsigned short to_x, unsigned short to_y, unsigned char to_z, unsigned char count);
+	*/
 
 	void changeOutfit(unsigned long id, int looktype);
+
 	//bool creatureOnPrepareAttack(Creature *creature, Position pos);
 	//void creatureMakeDamage(Creature *creature, Creature *attackedCreature, fight_t damagetype);
-
 	//bool creatureMakeMagic(Creature *creature, const Position& centerpos, const MagicEffectClass* me);
 	//bool creatureOnPrepareMagicAttack(Creature *creature, Position pos, const MagicEffectClass* me);
 

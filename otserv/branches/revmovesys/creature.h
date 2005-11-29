@@ -167,10 +167,6 @@ public:
 	virtual bool isAttackable() const { return true; };
 	virtual void dropLoot(Container *corpse) {return;};
 	virtual int getLookCorpse() {return lookcorpse;};
-	
-	//  virtual int sendInventory(){return 0;};
-	//virtual int addItemInventory(Item* item, int pos){return 0;};
-	//virtual Item* getItem(int pos){return NULL;}
 
 	virtual Direction getDirection(){return direction;}
 	void addCondition(const CreatureCondition& condition, bool refresh);
@@ -222,8 +218,6 @@ public:
 	
 	Direction direction;
 	
-	//virtual bool canMovedTo(const Tile *tile) const;
-	
 	virtual void addInflictedDamage(Creature* attacker, int damage);
 	virtual int getGainedExperience(Creature* attacker);
 	virtual std::vector<long> getInflicatedDamageCreatureList();
@@ -232,6 +226,30 @@ public:
 	virtual int getTotalInflictedDamage();
 	virtual int getInflicatedDamage(unsigned long id);
 	
+	virtual void sendCancel(const char *msg) const { };
+
+	virtual int onThink(int& newThinkTicks){newThinkTicks = 300; return 300;};
+
+	//old code
+	//virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos, bool tele = false) { };
+	//virtual void onThingTransform(const Thing* thing,int stackpos) = 0;
+	//virtual void onCreatureAppear(const Creature *creature) { };
+
+	virtual void onThingAppear(const Thing* thing) = 0;
+	virtual void onThingDisappear(const Thing* thing, unsigned char stackPos) = 0;
+	//old code
+
+	virtual void onCreatureAppear(const Creature* creature, bool isLogin) {};
+	virtual void onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout) {};
+
+	virtual void onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos) {};
+	virtual void onTeleport(const Creature* creature, const Position& oldPos, uint32_t oldStackPos) {};
+
+	virtual void onCreatureTurn(const Creature *creature, unsigned char stackPos) { };
+	virtual void onCreatureSay(const Creature *creature, SpeakClasses type, const std::string &text) { };
+	
+	virtual void onCreatureChangeOutfit(const Creature* creature) { };
+
 protected:
 	unsigned long eventCheck;
 	unsigned long eventCheckAttacking;
@@ -243,32 +261,7 @@ protected:
 	typedef std::vector< std::pair<uint64_t, long> > DamageList;
 	typedef std::map<long, DamageList > TotalDamageList;
 	TotalDamageList totaldamagelist;
-	
-protected:
-	virtual int onThink(int& newThinkTicks){newThinkTicks = 300; return 300;};
 
-	//virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos, bool tele = false) { };
-	//virtual void onThingTransform(const Thing* thing,int stackpos) = 0;
-	//virtual void onCreatureAppear(const Creature *creature) { };
-
-	virtual void onThingAppear(const Thing* thing) = 0;
-	virtual void onThingDisappear(const Thing* thing, unsigned char stackPos) = 0;
-
-	virtual void onCreatureTurn(const Creature *creature, unsigned char stackPos) { };
-	virtual void onCreatureSay(const Creature *creature, SpeakClasses type, const std::string &text) { };
-	
-	virtual void onCreatureChangeOutfit(const Creature* creature) { };
-	
-	virtual void sendCancel(const char *msg) const { };
-	virtual void sendCancelWalk(const char *msg) const { };
-
-	//virtual void onTileUpdated(const Position &pos) { };
-	
-	virtual void onTeleport(const Creature *creature, const Position *oldPos, unsigned char oldstackpos) { };
-
-	virtual void onThingMove(const Creature *player, const Thing *thing, const Position *oldPos,
-		unsigned char oldstackpos, unsigned char oldcount, unsigned char count) { };
-		
 	friend class Game;
 	friend class Map;
 	friend class Commands;

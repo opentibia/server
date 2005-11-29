@@ -19,8 +19,8 @@
 //////////////////////////////////////////////////////////////////////
 
 
-#ifndef __npc_h_
-#define __npc_h_
+#ifndef __NPC_H__
+#define __NPC_H__
 
 
 #include "creature.h"
@@ -43,14 +43,16 @@ class NpcScript : protected LuaScript{
 public:
 	NpcScript(std::string name, Npc* npc);
 	virtual ~NpcScript(){}
+	virtual void onCreatureAppear(unsigned long cid);
+	virtual void onCreatureDisappear(int cid);
+
 	//	virtual void onThingMove(const Player *player, const Thing *thing, const Position *oldPos,
 	//	unsigned char oldstackpos, unsigned char oldcount, unsigned char count);
-	virtual void onCreatureAppear(unsigned long cid);
-	virtual void onCreatureDisappear(int cid);	
 	//	virtual void onCreatureTurn(const Creature *creature, unsigned char stackpos);
+	//	virtual void onCreatureChangeOutfit(const Creature* creature);
+
 	virtual void onCreatureSay(int cid, SpeakClasses, const std::string &text);
 	virtual void onThink();
-	//	virtual void onCreatureChangeOutfit(const Creature* creature);
 	static Npc* getNpc(lua_State *L);
 	static int luaActionSay(lua_State *L);
 	static int luaActionMove(lua_State *L);
@@ -102,13 +104,24 @@ public:
 	
 protected:
 	int useCount;
-	virtual void onThingMove(const Player *player, const Thing *thing, const Position *oldPos,
-		unsigned char oldstackpos, unsigned char oldcount, unsigned char count);
-	virtual void onCreatureAppear(const Creature *creature);
-	virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos, bool tele);
-	virtual void onThingDisappear(const Thing* thing, unsigned char stackPos);
-	virtual void onThingTransform(const Thing* thing,int stackpos){};
+
+	//old code
+	//virtual void onThingMove(const Player *player, const Thing *thing, const Position *oldPos,
+	//	unsigned char oldstackpos, unsigned char oldcount, unsigned char count);
+	//virtual void onCreatureAppear(const Creature *creature);
+	//virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos, bool tele);
+	//virtual void onThingTransform(const Thing* thing,int stackpos){};
+
 	virtual void onThingAppear(const Thing* thing);
+	virtual void onThingDisappear(const Thing* thing, unsigned char stackPos);
+	//old code
+
+	virtual void onCreatureAppear(const Creature* creature, bool isLogin);
+	virtual void onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout);
+
+	virtual void onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos);
+	virtual void onTeleport(const Creature* creature, const Position& oldPos, uint32_t oldStackPos);
+
 	virtual void onCreatureTurn(const Creature *creature, unsigned char stackpos);
 	virtual void onCreatureSay(const Creature *creature, SpeakClasses type, const std::string &text);
 	virtual void onCreatureChangeOutfit(const Creature* creature);
@@ -124,4 +137,4 @@ protected:
 	bool loaded;
 };
 
-#endif // __npc_h_
+#endif
