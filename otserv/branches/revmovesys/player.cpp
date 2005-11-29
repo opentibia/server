@@ -1898,13 +1898,15 @@ bool Player::addVIP(unsigned long _guid, std::string &name, bool isOnline, bool 
 }
 
 ReturnValue Player::__queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
-	uint32_t& maxQueryCount, bool checkCapacity) const
+	uint32_t& maxQueryCount, bool isSameParent) const
 {
 	const Item* item = dynamic_cast<const Item*>(thing);
 	if(item == NULL){
 		maxQueryCount = 0;
 		return RET_NOTPOSSIBLE;
 	}
+
+	//if isSameParent is false also check against freeCapacity()
 
 	const Item* toItem = dynamic_cast<const Item*>(__getThing(index));
 	if(!toItem){
@@ -1925,21 +1927,113 @@ ReturnValue Player::__queryMaxCount(int32_t index, const Thing* thing, uint32_t 
 	return RET_NOTENOUGHROOM;
 }
 
-ReturnValue Player::__queryAdd(const Thing* thing, uint32_t count) const
+ReturnValue Player::__queryAdd(uint32_t index, const Thing* thing, uint32_t count) const
 {
 	const Item* item = dynamic_cast<const Item*>(thing);
 	if(item == NULL){
 		return RET_NOTPOSSIBLE;
 	}
 
-	return RET_NOERROR;
+	if(items[index] != NULL){
+		return RET_INVENTORYALREADYEQUIPPED;
+	}
+
+	switch(index){
+		case SLOT_HEAD:
+			if(item->getSlotPosition() & SLOTP_HEAD)
+				return RET_NOERROR;
+			break;
+		case SLOT_NECKLACE:
+			if(item->getSlotPosition() & SLOTP_NECKLACE)
+				return RET_NOERROR;
+			break;
+		case SLOT_BACKPACK:
+			if(item->getSlotPosition() & SLOTP_BACKPACK)
+				return RET_NOERROR;
+			break;
+		case SLOT_ARMOR:
+			if(item->getSlotPosition() & SLOTP_ARMOR)
+				return RET_NOERROR;
+			break;
+		case SLOT_RIGHT:
+			if(item->getSlotPosition() & SLOTP_RIGHT){
+				if(item->getSlotPosition() & SLOTP_TWO_HAND){
+					if(items[SLOT_LEFT] != NULL){
+						//player->sendCancel("First remove the two-handed item.");
+						return RET_DROPTWOHANDEDITEM;
+					}
+					return RET_NOERROR;
+				}
+				else{
+					if(items[SLOT_LEFT]){
+						if(items[SLOT_LEFT]->getSlotPosition() & SLOTP_TWO_HAND){
+							//player->sendCancel("First remove the two-handed item.");
+							return RET_DROPTWOHANDEDITEM;
+						}
+						return RET_NOERROR;
+					}
+					return RET_NOERROR;
+				}
+			}
+			break;
+		case SLOT_LEFT:
+			if(item->getSlotPosition() & SLOTP_LEFT){
+				if(item->getSlotPosition() & SLOTP_TWO_HAND){
+					if(items[SLOT_RIGHT] != NULL){
+						//player->sendCancel("First remove the two-handed item.");
+						return RET_DROPTWOHANDEDITEM;
+					}
+					return RET_NOERROR;
+				}
+				else{
+					if(items[SLOT_RIGHT]){
+						if(items[SLOT_RIGHT]->getSlotPosition() & SLOTP_TWO_HAND){
+							//player->sendCancel("First remove the two-handed item.");
+							return RET_DROPTWOHANDEDITEM;
+						}
+						return RET_NOERROR;
+					}
+					return RET_NOERROR;
+				}
+			}
+			break;
+		case SLOT_LEGS:
+			if(item->getSlotPosition() & SLOTP_LEGS)
+				return RET_NOERROR;
+			break;
+		case SLOT_FEET:
+			if(item->getSlotPosition() & SLOTP_FEET)
+				return RET_NOERROR;
+			break;
+		case SLOT_RING:
+			if(item->getSlotPosition() & SLOTP_RING)
+				return RET_NOERROR;
+			break;
+		case SLOT_AMMO:
+			if(item->getSlotPosition() & SLOTP_AMMO)
+				return RET_NOERROR;
+			break;
+	}
+
+	//player->sendCancel("You cannot put that object in that place.");
+	return RET_CANNOTBEDRESSED;
 }
 
 ReturnValue Player::__queryRemove(const Thing* thing, uint32_t count) const
 {
-	const Item* item = dynamic_cast<const Item*>(thing);
-	if(!item){
+	uint32_t index = __getIndexOfThing(thing);
+
+	if(index == -1){
 		return RET_NOTPOSSIBLE;
+	}
+	
+	const Item* item = dynamic_cast<const Item*>(thing);
+	if(item == NULL){
+		return RET_NOTPOSSIBLE;
+	}
+
+	if(item->isNotMoveable()){
+		return RET_NOTMOVEABLE;
 	}
 
 	if(item->isStackable()){
@@ -1947,19 +2041,30 @@ ReturnValue Player::__queryRemove(const Thing* thing, uint32_t count) const
 			return RET_NOTPOSSIBLE;
 	}
 
-	int32_t index = __getIndexOfThing(thing);
-	if(index == -1)
-		return RET_NOTPOSSIBLE;
-
 	return RET_NOERROR;
 }
 
-Cylinder* Player::__queryDestination(uint32_t index, Thing** destThing)
+Cylinder* Player::__queryDestination(int32_t& index, Thing** destThing)
 {
+	if(index == 0){
+		//find a appropiate slot
+		index = -1;
+
+		for(int i = SLOT_FIRST; i < SLOT_LAST; ++i){
+			if(items[i] == NULL){
+				//__queryAdd(i, 
+				//return index;
+			}
+		}
+
+		return NULL;
+	}
+
 	*destThing = __getThing(index);
 	Cylinder* subCylinder = dynamic_cast<Cylinder*>(*destThing);
 
 	if(subCylinder){
+		index = -1;
 		*destThing = NULL;
 		return subCylinder;
 	}
@@ -2111,20 +2216,19 @@ void Player::__internalAddThing(uint32_t index, Thing* thing)
 #endif
 		return;
 	}
+		
+	//index == 0 means we should equip this item at the most appropiate slot
+	if(index == 0){
+#ifdef __DEBUG__
+		std::cout << "Failure: [Player::__internalAddThing] index == 0 not implemented" << std::endl;
+#endif
+		return;
+	}
 
-	if(index >= 0 && index < 11)
-  {
+	if(index > 0 && index < 11){
 		if(items[index]){
 #ifdef __DEBUG__
 			std::cout << "Failure: [Player::__internalAddThing] items[index] is not empty" << std::endl;
-#endif
-			return;
-		}
-		
-		//index == 0 means we should equip this item at the most appropiate slot
-		if(index == 0){
-#ifdef __DEBUG__
-			std::cout << "Failure: [Player::__internalAddThing] index == 0 not implemented" << std::endl;
 #endif
 			return;
 		}

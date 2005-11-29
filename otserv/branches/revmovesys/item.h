@@ -54,7 +54,7 @@ public:
 	static Item* CreateItem(const unsigned short _type, unsigned short _count = 0);
 	static Items items;
 	
-	virtual bool isPushable() const {return isPushable();};
+	virtual bool isPushable() const {return !isNotMoveable();};
 
 	unsigned short getID() const;    // ID as in ItemType
 	void setID(unsigned short newid);

@@ -146,7 +146,7 @@ bool Container::isHoldingItem(const Item* item) const
 }
 
 ReturnValue Container::__queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
-	uint32_t& maxQueryCount, bool checkCapacity) const
+	uint32_t& maxQueryCount, bool isSameParent) const
 {
 	const Item* item = dynamic_cast<const Item*>(thing);
 	if(item == NULL){
@@ -183,31 +183,7 @@ ReturnValue Container::__queryMaxCount(int32_t index, const Thing* thing, uint32
 		return RET_NOERROR;
 }
 
-ReturnValue Container::__queryRemove(const Thing* thing, uint32_t count) const
-{
-	uint32_t index = __getIndexOfThing(thing);
-
-	if(index == -1){
-		return RET_NOTPOSSIBLE;
-	}
-	
-	Item* destItem = dynamic_cast<Item*>(__getThing(index));
-	if(destItem == NULL){
-		return RET_NOTPOSSIBLE;
-	}
-	
-	if(destItem->isNotMoveable()){
-		return RET_NOTMOVEABLE;
-	}
-
-	if(destItem->isStackable() && (count == 0 || count > destItem->getItemCountOrSubtype())){
-		return RET_NOTPOSSIBLE;
-	}
-
-	return RET_NOERROR;
-}
-
-ReturnValue Container::__queryAdd(const Thing* thing, uint32_t count) const
+ReturnValue Container::__queryAdd(uint32_t index, const Thing* thing, uint32_t count) const
 {
 	const Item* item = dynamic_cast<const Item*>(thing);
 	if(item == NULL){
@@ -217,12 +193,37 @@ ReturnValue Container::__queryAdd(const Thing* thing, uint32_t count) const
 	return RET_NOERROR;
 }
 
-Cylinder* Container::__queryDestination(uint32_t index, Thing** destThing)
+ReturnValue Container::__queryRemove(const Thing* thing, uint32_t count) const
+{
+	uint32_t index = __getIndexOfThing(thing);
+
+	if(index == -1){
+		return RET_NOTPOSSIBLE;
+	}
+	
+	const Item* item = dynamic_cast<const Item*>(thing);
+	if(item == NULL){
+		return RET_NOTPOSSIBLE;
+	}
+	
+	if(item->isNotMoveable()){
+		return RET_NOTMOVEABLE;
+	}
+
+	if(item->isStackable() && (count == 0 || count > item->getItemCountOrSubtype())){
+		return RET_NOTPOSSIBLE;
+	}
+
+	return RET_NOERROR;
+}
+
+Cylinder* Container::__queryDestination(int32_t& index, Thing** destThing)
 {
 	*destThing = __getThing(index);
 	Cylinder* subCylinder = dynamic_cast<Cylinder*>(*destThing);
 
 	if(subCylinder){
+		index = -1;
 		*destThing = NULL;
 		return subCylinder;
 	}

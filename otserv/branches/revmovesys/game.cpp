@@ -791,6 +791,59 @@ bool Game::removeCreature(Creature* c)
 }
 
 //NEW CYLINDER CLASS
+void Game::creatureMove(Player* player, Cylinder* fromCylinder, Cylinder* toCylinder,
+	Creature* moveCreature)
+{
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::creatureMove()");
+
+	ReturnValue ret = RET_NOERROR;
+
+	if(fromCylinder == NULL || toCylinder == NULL || moveCreature == NULL){
+		ret = RET_NOTPOSSIBLE;
+		//player->sendCancel("Sorry, not possible.");
+	}
+
+	if(toCylinder != toCylinder->getTile()){
+		ret = RET_NOTPOSSIBLE;
+		//player->sendCancel("Sorry, not possible.");
+	}
+
+	//if(!moveCreature->isPushable()){
+	//	player->sendCancel("You cannot move this item.");
+	//}
+	//else if(player->getPosition().z != fromCylinder->getPosition().z){
+
+	if(player->getPosition().z != fromCylinder->getPosition().z){
+		ret = RET_NOTPOSSIBLE;
+		//player->sendCancel("Sorry, not possible.");
+	}
+	else if((std::abs(player->getPosition().x - fromCylinder->getPosition().x) > 1) ||
+		(std::abs(player->getPosition().y - fromCylinder->getPosition().y) > 1)) {
+		ret = RET_TOFARAWAY;
+		//player->sendCancel("To far away.");
+	}
+
+	const Position& fromPos = fromCylinder->getPosition();
+	const Position& toPos = toCylinder->getPosition();
+
+	//check throw distance
+	if( (std::abs(fromPos.x - toPos.x) > moveCreature->getThrowRange()) ||
+			(std::abs(fromPos.y - toPos.y) > moveCreature->getThrowRange()) ||
+			(std::abs(fromPos.z - toPos.z) * 2 > moveCreature->getThrowRange()) ) {
+		//creature->sendCancel("Destination is out of reach.");
+		ret = RET_DESTINATIONOUTOFREACH;
+	}
+
+	if(ret == RET_NOERROR){
+		ret = internalCreatureMove(moveCreature, fromCylinder, toCylinder);
+	}
+	
+	if(player == moveCreature && ret != RET_NOERROR){
+		//playerSendErrorMessage(ret)
+		player->sendCancelWalk();
+	}
+}
+
 ReturnValue Game::creatureMove(Creature* creature, Direction direction)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::creatureMove()");
@@ -832,54 +885,41 @@ ReturnValue Game::creatureMove(Creature* creature, Direction direction)
 		break;
 	}
 
-	return creatureMove(creature, fromCylinder, toCylinder, creature);
+	ReturnValue ret = RET_NOERROR;
+	if(toCylinder == NULL){
+		ret = RET_NOTPOSSIBLE;
+	}
+	else{	
+		ret = internalCreatureMove(creature, fromCylinder, toCylinder);
+	}
+
+	if(ret != RET_NOERROR){
+		if(Player* player = dynamic_cast<Player*>(creature)){
+			//playerSendErrorMessage(ret)
+			player->sendCancelWalk();
+		}
+	}
+
+	return ret;
 }
 
-ReturnValue Game::creatureMove(Creature* creature, Cylinder* fromCylinder, Cylinder* toCylinder,
-	Creature* moveCreature)
+ReturnValue Game::internalCreatureMove(Creature* creature, Cylinder* fromCylinder, Cylinder* toCylinder)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::creatureMove()");
-
-	if(fromCylinder == NULL || toCylinder == NULL || moveCreature == NULL){
-		creature->sendCancel("Sorry, not possible.");
-		return RET_NOTPOSSIBLE;
-	}
-
 	Position fromPos = fromCylinder->getPosition();
 	Position toPos = toCylinder->getPosition();
-
-	/*if(!moveCreature->isPushable()){
-		creature->sendCancel("You cannot move this item.");
-		return RET_NOMOVEABLE;
-	}
-	else*/ if(creature->getPosition().z != fromPos.z){
-		return RET_NOTPOSSIBLE;
-	}
-	else if((std::abs(creature->getPosition().x - fromPos.x) > 1) || (std::abs(creature->getPosition().y - fromPos.y) > 1)) {
-		creature->sendCancel("To far away.");
-		return RET_NOTPOSSIBLE;
-	}
-
-	//check throw distance
-	if( (std::abs(fromPos.x - toPos.x) > moveCreature->getThrowRange()) ||
-			(std::abs(fromPos.y - toPos.y) > moveCreature->getThrowRange()) ||
-			(std::abs(fromPos.z - toPos.z) * 2 > moveCreature->getThrowRange()) ) {
-		//creature->sendCancel("Destination is out of reach.");
-		return RET_DESTINATIONOUTOFREACH;
-	}
 
 	//check constrains
 	//
 	//
 	//
 	
-	uint32_t oldStackPos = fromCylinder->__getIndexOfThing(moveCreature);
+	uint32_t oldStackPos = fromCylinder->__getIndexOfThing(creature);
 
 	//remove the creature
-	fromCylinder->__removeThing(moveCreature, 0);
+	fromCylinder->__removeThing(creature, 0);
 
 	//add the creature
-	toCylinder->__addThing(moveCreature);
+	toCylinder->__addThing(creature);
 
 	SpectatorVec list;
 	SpectatorVec::iterator it;
@@ -889,109 +929,113 @@ ReturnValue Game::creatureMove(Creature* creature, Cylinder* fromCylinder, Cylin
 	for(it = list.begin(); it != list.end(); ++it) {
 		Player* spectator = dynamic_cast<Player*>(*it);
 		if(spectator){
-			spectator->onCreatureMove(moveCreature, fromPos, oldStackPos);
+			spectator->onCreatureMove(creature, fromPos, oldStackPos);
 		}
 	}
 
+	int32_t index = 0;
 	Thing* toThing = NULL;
-	Cylinder* subCylinder = toCylinder->__queryDestination(0, &toThing);
+	Cylinder* subCylinder = toCylinder->__queryDestination(index, &toThing);
 	if(subCylinder != toCylinder){
-		uint32_t oldStackPos = toCylinder->__getIndexOfThing(moveCreature);
+		uint32_t oldStackPos = toCylinder->__getIndexOfThing(creature);
 
 		//remove the creature
-		toCylinder->__removeThing(moveCreature, 0);
+		toCylinder->__removeThing(creature, 0);
 
 		//add the creature
-		subCylinder->__addThing(moveCreature);
+		subCylinder->__addThing(creature);
 		toPos = subCylinder->getPosition();
 
 		//send change to client
 		for(it = list.begin(); it != list.end(); ++it) {
 			Player* spectator = dynamic_cast<Player*>(*it);
 			if(spectator){
-				spectator->onCreatureMove(moveCreature, toCylinder->getPosition(), oldStackPos);
+				spectator->onCreatureMove(creature, toCylinder->getPosition(), oldStackPos);
 			}
 		}
 	}
 
 	if(std::abs(fromPos.x - toPos.x) >= std::abs(fromPos.y - toPos.y)){
 		if(toPos.x > fromPos.x)
-			moveCreature->setDirection(EAST);
+			creature->setDirection(EAST);
 		else if(toPos.x < fromPos.x)
-			moveCreature->setDirection(WEST);
+			creature->setDirection(WEST);
 	}
 	else if(toPos.y < fromPos.y)
-		moveCreature->setDirection(NORTH);
+		creature->setDirection(NORTH);
 	else if(toPos.y > fromPos.y)
-		moveCreature->setDirection(SOUTH);
+		creature->setDirection(SOUTH);
 
 	return RET_NOTPOSSIBLE;
 }
 
-ReturnValue Game::thingMove(Creature* creature, Cylinder* fromCylinder, Cylinder* toCylinder, int32_t index,
-	Thing* thing, uint32_t count)
+void Game::moveItem(Player* player, Cylinder* fromCylinder, Cylinder* toCylinder, int32_t index,
+	Item* item, uint32_t count, uint16_t itemid)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::thingMove()");
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::moveItem()");
 
-	if(fromCylinder == NULL || toCylinder == NULL || thing == NULL){
-		creature->sendCancel("Sorry, not possible.");
-		return RET_NOTPOSSIBLE;
+	if(fromCylinder == NULL || toCylinder == NULL || item == NULL || item->getID() != itemid){
+		player->sendCancel("Sorry, not possible.");
 	}
 
 	const Position& fromPos = fromCylinder->getPosition();
 	const Position& toPos = toCylinder->getPosition();
 
-	/*if(!thing->isPushable()){
-		creature->sendCancel("You cannot move this item.");
-		return;
+	ReturnValue ret = RET_NOERROR;
+	if(!item->isPushable()){
+		//player->sendCancel("You cannot move this creature.");
+		ret = RET_NOTMOVEABLE;
 	}
-	else*/ if(creature->getPosition().z > fromPos.z){
-		creature->sendCancel("First go upstairs.");
-		return RET_NOTPOSSIBLE;
+	else if(player->getPosition().z > fromPos.z){
+		//player->sendCancel("First go upstairs.");
+		ret = RET_FIRSTGOUPSTAIRS;
 	}
-	else if(creature->getPosition().z < fromPos.z){
-		creature->sendCancel("First go downstairs.");
-		return RET_NOTPOSSIBLE;
+	else if(player->getPosition().z < fromPos.z){
+		//player->sendCancel("First go downstairs.");
+		ret = RET_FIRSTGODOWNSTAIRS;
 	}
-	else if((std::abs(creature->getPosition().x - fromPos.x) > 1) || (std::abs(creature->getPosition().y - fromPos.y) > 1)) {
-		creature->sendCancel("To far away.");
-		return RET_NOTPOSSIBLE;
+	else if((std::abs(player->getPosition().x - fromPos.x) > 1) || (std::abs(player->getPosition().y - fromPos.y) > 1)) {
+		//player->sendCancel("To far away.");
+		ret = RET_TOFARAWAY;
 	}
 
 	//check throw distance
-	if( (std::abs(fromPos.x - toPos.x) > thing->getThrowRange()) ||
-			(std::abs(fromPos.y - toPos.y) > thing->getThrowRange()) ||
-			(std::abs(fromPos.z - toPos.z) * 2 > thing->getThrowRange()) ) {
-		creature->sendCancel("Destination is out of reach.");
-		return RET_DESTINATIONOUTOFREACH;
+	if((std::abs(fromPos.x - toPos.x) > item->getThrowRange()) ||
+			(std::abs(fromPos.y - toPos.y) > item->getThrowRange()) ||
+			(std::abs(fromPos.z - toPos.z) * 2 > item->getThrowRange()) ) {
+		//player->sendCancel("Destination is out of reach.");
+		ret = RET_DESTINATIONOUTOFREACH;
 	}
 
-	Item* item = dynamic_cast<Item*>(thing);
-	if(item == NULL)
-		return RET_NOTPOSSIBLE;
+	if(ret == RET_NOERROR){
+		ret = internalMoveItem(fromCylinder, toCylinder, index, item, count);
+	}
 
+	if(ret != RET_NOERROR){
+		//playerSendErrorMessage(ret)
+		player->sendCancelWalk();
+	}
+}
+
+ReturnValue Game::internalMoveItem(Cylinder* fromCylinder, Cylinder* toCylinder, int32_t index,
+	Item* item, uint32_t count)
+{
 	Thing* toThing = NULL;
 	Cylinder* subCylinder = toCylinder->__queryDestination(index, &toThing);
+	toCylinder = subCylinder;
+
 	Item* toItem = dynamic_cast<Item*>(toThing);
-	if(subCylinder != toCylinder){
-		toCylinder = subCylinder;
-		index = -1;
-	}
 
 	//check constraints before moving
 	//
 	//
 	//
 
-	bool checkCapacity = true;
-	Player* player = dynamic_cast<Player*>(creature);
-	if(player == fromCylinder->getTopParent() && player == toCylinder->getTopParent()){
-		checkCapacity = false;
-	}
+	bool isSameParent = fromCylinder->getTopParent() == toCylinder->getTopParent();
 
 	//check how much we can move
 	uint32_t maxQueryCount = 0;
-	ReturnValue ret = toCylinder->__queryMaxCount(index, item, count, maxQueryCount, checkCapacity);
+	ReturnValue ret = toCylinder->__queryMaxCount(index, item, count, maxQueryCount, isSameParent);
 	if(ret != RET_NOERROR){
 		return ret;
 	}
@@ -1001,6 +1045,18 @@ ReturnValue Game::thingMove(Creature* creature, Cylinder* fromCylinder, Cylinder
 	Item* moveItem = item;
 	if(m == 0){
 		return RET_NOTENOUGHROOM;
+	}
+
+	//check if we can add this item
+	ret = toCylinder->__queryAdd(index, item, m);
+	if(ret != RET_NOERROR){
+		return ret;
+	}
+
+	//check if we can remove this item
+	ret = fromCylinder->__queryRemove(item, m);
+	if(ret != RET_NOERROR){
+		return ret;
 	}
 
 	//remove the item
@@ -1044,6 +1100,76 @@ ReturnValue Game::thingMove(Creature* creature, Cylinder* fromCylinder, Cylinder
 		return ret;
 
 	return RET_NOERROR;
+}
+
+void Game::addItem(Player* player, Cylinder* toCylinder, Item* item)
+{
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::addItem()");
+
+	ReturnValue ret = internalAddItem(toCylinder, item);
+}
+
+ReturnValue Game::internalAddItem(Cylinder* toCylinder, Item* item, bool test /*= false*/)
+{
+	if(toCylinder == NULL || item == NULL){
+		//creature->sendCancel("Sorry, not possible.");
+		return RET_NOTPOSSIBLE;
+	}
+
+	int32_t index = 0;
+	Thing* toThing = NULL;
+	Cylinder* subCylinder = toCylinder->__queryDestination(index, &toThing);
+	Item* toItem = dynamic_cast<Item*>(toThing);
+	if(subCylinder != toCylinder){
+		toCylinder = subCylinder;
+	}
+
+	//bool checkCapacity = dynamic_cast<Player*>(toCylinder->getTopParent()) != NULL;
+
+	//check how much we can move
+	uint32_t maxQueryCount = 0;
+	ReturnValue ret = toCylinder->__queryMaxCount(index, item, item->getItemCountOrSubtype(), maxQueryCount, false);
+	if(ret != RET_NOERROR){
+		return ret;
+	}
+
+	uint32_t m = std::min((uint32_t)item->getItemCountOrSubtype(), maxQueryCount);
+	uint32_t n = 0;
+	if(m == 0){
+		return RET_NOTENOUGHROOM;
+	}
+
+	//check if we can add this item
+	ret = toCylinder->__queryAdd(index, item, m);
+	if(ret != RET_NOERROR){
+		return ret;
+	}
+
+	if(test){
+		return RET_NOERROR;
+	}
+	
+	toCylinder->__addThing(index, item);
+
+	//toCylinder->getTopParent()->onAddItem()
+	//send container
+	//cancel trade
+	//update capacity for player cylinders
+
+	return RET_NOERROR;
+}
+
+void Game::removeItem(Player* player, Cylinder* fromCylinder, Item* item)
+{
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::removeItem()");
+
+	ReturnValue ret = internalRemoveItem(fromCylinder, item);
+}
+
+ReturnValue Game::internalRemoveItem(Cylinder* fromCylinder, Item* item,  bool test /*= false*/)
+{
+	//FreeThing(item);
+	return RET_NOTPOSSIBLE;
 }
 
 /*

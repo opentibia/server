@@ -29,10 +29,10 @@ class Creature;
 class Cylinder : virtual public Thing{
 public:	
 	virtual ReturnValue __queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
-		uint32_t& maxQueryCount, bool checkCapacity) const = 0;
-	virtual ReturnValue __queryAdd(const Thing* thing, uint32_t count) const = 0;
+		uint32_t& maxQueryCount, bool isSameParent) const = 0;
+	virtual ReturnValue __queryAdd(uint32_t index, const Thing* thing, uint32_t count) const = 0;
 	virtual ReturnValue __queryRemove(const Thing* thing, uint32_t count) const = 0;
-	virtual Cylinder* __queryDestination(uint32_t index, Thing** destThing) = 0;
+	virtual Cylinder* __queryDestination(int32_t& index, Thing** destThing) = 0;
 
 	virtual ReturnValue __addThing(Thing* thing) = 0;
 	virtual ReturnValue __addThing(uint32_t index, Thing* thing) = 0;

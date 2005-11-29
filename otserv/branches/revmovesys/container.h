@@ -34,7 +34,7 @@ public:
 	virtual ~Container();
 
 	virtual int getThrowRange() const {return 10;};
-	virtual bool isPushable() const {return isPushable();};
+	virtual bool isPushable() const {return Item::isPushable();};
 
 	virtual std::string getDescription(uint32_t lookDistance) const {return Item::getDescription(lookDistance);};
 	uint32_t size() const {return (uint32_t)itemlist.size();};
@@ -51,10 +51,10 @@ public:
 
 	//
 	virtual ReturnValue __queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
-		uint32_t& maxQueryCount, bool checkCapacity) const;
+		uint32_t& maxQueryCount, bool isSameParent) const;
+	virtual ReturnValue __queryAdd(uint32_t index, const Thing* thing, uint32_t count) const;
 	virtual ReturnValue __queryRemove(const Thing* thing, uint32_t count) const;
-	virtual ReturnValue __queryAdd(const Thing* thing, uint32_t count) const;
-	virtual Cylinder* __queryDestination(uint32_t index, Thing** destThing);
+	virtual Cylinder* __queryDestination(int32_t& index, Thing** destThing);
 
 	virtual ReturnValue __addThing(Thing* thing);
 	virtual ReturnValue __addThing(uint32_t index, Thing* thing);

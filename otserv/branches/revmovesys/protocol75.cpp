@@ -352,7 +352,7 @@ void Protocol75::GetMapDescription(unsigned short x, unsigned short y, unsigned 
 	//Tile* tile;
 	//int cc = 0;
 	int skip = -1;
-	int startz, endz, offset, zstep = 0;
+	int startz, endz, zstep = 0;
 
 	if (z > 7) {
 		startz = z - 2;
@@ -581,32 +581,9 @@ Cylinder* Protocol75::internalGetCylinder(unsigned short x, unsigned short y, un
 		if(y & 0x40){
 			uint8_t from_cid = y & 0x0F;
 			return player->getContainer(from_cid);
-
-			/*
-			Container* container = player->getContainer(from_cid);
-
-			if(!container)
-				return NULL;
-
-			//check if destination slot is a container
-			Container* childContainer = dynamic_cast<Container*>(container->__getThing(z));
-			if(childContainer)
-				return childContainer;
-			else
-				return container;
-			*/
 		}
 		else{
 			return player;
-
-			/*
-			slots_t slot = (slots_t)static_cast<unsigned char>(y);
-			Container* childContainer = dynamic_cast<Container*>(player->getInventoryItem(slot));
-			if(childContainer)
-				return childContainer;
-			else
-				return player;
-			*/
 		}
 	}
 }
@@ -619,8 +596,16 @@ Thing* Protocol75::internalGetThing(unsigned short x, unsigned short y, unsigned
 		if(tile){
 			if(index == 0)
 				return tile->getTopThing();
-			else
-				return tile->getThingByStackPos(index);
+			else{
+				Thing* thing = tile->getTopDownItem();
+
+				if(thing == NULL){
+					thing = tile->getTopThing();
+				}
+				
+				return thing;
+				//return tile->getThingByStackPos(index);
+			}
 		}
 	}
 	else{
@@ -1029,6 +1014,8 @@ void Protocol75::parseThrow(NetworkMessage& msg)
 			from_index = static_cast<uint8_t>(from_y);
 		}
 	}
+	else
+		from_index = from_stack;
 
 	Thing* thing = internalGetThing(from_x, from_y, from_z, from_index);
 
@@ -1044,16 +1031,13 @@ void Protocol75::parseThrow(NetworkMessage& msg)
 		}
 	}
 
-	Creature* movingCreature = dynamic_cast<Creature*>(thing);
-		
-	if(movingCreature) {
+	if(Creature* movingCreature = dynamic_cast<Creature*>(thing)){
 		//game->thingMove(player, from_x, from_y, from_z, from_stack, itemid, to_x, to_y, to_z, count);		
 		game->creatureMove(player, fromCylinder, toCylinder, movingCreature);
 	}
-	else{
-		game->thingMove(player, fromCylinder, toCylinder, to_index, thing, count);
+	else if(Item* movingItem = dynamic_cast<Item*>(thing)){
+		game->moveItem(player, fromCylinder, toCylinder, to_index, movingItem, count, itemid);
 	}
-
 
 	/*bool toInventory = false;
 	bool fromInventory = false;
@@ -2447,9 +2431,9 @@ void Protocol75::sendRemoveTileItem(const Position& pos, uint32_t stackpos)
 
 void Protocol75::sendAddCreature(const Creature* creature, bool isLogin)
 {
-	NetworkMessage msg;
-
 	if(CanSee(creature->getPosition())){
+		NetworkMessage msg;
+
 		if(creature == player){
 				msg.AddByte(0x0A);
 				msg.AddU32(player->getID());
@@ -2643,7 +2627,7 @@ void Protocol75::sendMoveCreature(const Creature* creature, const Position& oldP
 				msg.AddByte(0x65);
 				GetMapDescription(myPos.x - 7, myPos.y - 7, myPos.z, 18, 1, msg);
 			}
-
+			
 			if(oldPos.y > myPos.y){ // north, for old x
 				msg.AddByte(0x65);
 				GetMapDescription(myPos.x - 8, myPos.y - 6, myPos.z, 18, 1, msg);

@@ -93,7 +93,7 @@ public:
 	int             runeMagLevel;
 	bool            pickupable;
 	bool            rotable;
-	int 			rotateTo;
+	int 			      rotateTo;
 
 	int             lightLevel;
 	int             lightColor;

@@ -458,7 +458,8 @@ MagicEffectItem* Tile::getFieldItem()
 	return NULL;
 }
 
-Creature* Tile::getTopCreature(){
+Creature* Tile::getTopCreature()
+{
 	if(creatures.begin() != creatures.end()) {
 		return *(creatures.begin());
 	}
@@ -568,13 +569,13 @@ void Tile::setPz()
 }
 
 ReturnValue Tile::__queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
-	uint32_t& maxQueryCount, bool checkCapacity) const
+	uint32_t& maxQueryCount, bool isSameParent) const
 {
 	maxQueryCount = count;
 	return RET_NOERROR;
 }
 
-ReturnValue Tile::__queryAdd(const Thing* thing, uint32_t count) const
+ReturnValue Tile::__queryAdd(uint32_t index, const Thing* thing, uint32_t count) const
 {
 	const Item* item = dynamic_cast<const Item*>(thing);
 	if(item == NULL){
@@ -592,23 +593,23 @@ ReturnValue Tile::__queryRemove(const Thing* thing, uint32_t count) const
 		return RET_NOTPOSSIBLE;
 	}
 	
-	const Item* destItem = dynamic_cast<const Item*>(__getThing(index));
-	if(destItem == NULL){
+	const Item* item = dynamic_cast<const Item*>(thing);
+	if(item == NULL){
 		return RET_NOTPOSSIBLE;
 	}
 	
-	if(destItem->isNotMoveable()){
+	if(item->isNotMoveable()){
 		return RET_NOTMOVEABLE;
 	}
 
-	if(destItem->isStackable() && (count == 0 || count > destItem->getItemCountOrSubtype())){
+	if(item->isStackable() && (count == 0 || count > item->getItemCountOrSubtype())){
 		return RET_NOTPOSSIBLE;
 	}
 
 	return RET_NOERROR;
 }
 
-Cylinder* Tile::__queryDestination(uint32_t index, Thing** destThing)
+Cylinder* Tile::__queryDestination(int32_t& index, Thing** destThing)
 {
 	Teleport* teleport = getTeleportItem();
 
@@ -650,7 +651,7 @@ Cylinder* Tile::__queryDestination(uint32_t index, Thing** destThing)
 			destTile = g_game.getTile(getTilePosition().x, getTilePosition().y, getTilePosition().z + 1);
 
 			if(destTile == NULL){
-				return NULL;
+				return this;
 			}
 
 			if(destTile->floorChange(NORTH) && destTile->floorChange(EAST)){
@@ -881,7 +882,7 @@ int32_t Tile::__getIndexOfThing(const Thing* thing) const
 			return 0;
 		}
   }
-
+	
   if(splash){
     if(thing == splash)
       return 1;
@@ -890,8 +891,7 @@ int32_t Tile::__getIndexOfThing(const Thing* thing) const
   }
   
   ItemVector::const_iterator iit;
-  for(iit = topItems.begin(); iit != topItems.end(); ++iit)
-  {
+  for(iit = topItems.begin(); iit != topItems.end(); ++iit){
     ++n;
     if((*iit) == thing)
       return n;

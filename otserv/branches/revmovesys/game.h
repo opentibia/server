@@ -173,13 +173,24 @@ public:
 
 	void getSpectators(const Range& range, SpectatorVec& list);
 
-	ReturnValue creatureMove(Creature* creature, Cylinder* fromCylinder, Cylinder* toCylinder,
-		Creature* moveCreature);
-
 	ReturnValue creatureMove(Creature* creature, Direction direction);
 
-	ReturnValue thingMove(Creature* creature, Cylinder* fromCylinder, Cylinder* toCylinder, int32_t index,
-		Thing* thing, uint32_t count);
+	void creatureMove(Player* player, Cylinder* fromCylinder, Cylinder* toCylinder,
+		Creature* moveCreature);
+
+	ReturnValue internalCreatureMove(Creature* creature, Cylinder* fromCylinder, Cylinder* toCylinder);
+
+	void moveItem(Player* player, Cylinder* fromCylinder, Cylinder* toCylinder, int32_t index,
+		Item* item, uint32_t count, uint16_t itemid);
+	
+	ReturnValue internalMoveItem(Cylinder* fromCylinder, Cylinder* toCylinder, int32_t index,
+		Item* item, uint32_t count);
+
+	void addItem(Player* player, Cylinder* toCylinder, Item* item);
+	ReturnValue internalAddItem(Cylinder* toCylinder, Item* item, bool test = false);
+
+	void removeItem(Player* player, Cylinder* fromCylinder, Item* item);
+	ReturnValue internalRemoveItem(Cylinder* fromCylinder, Item* item,  bool test = false);
 
 	/*
 	//OLD CODE
