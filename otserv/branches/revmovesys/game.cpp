@@ -845,8 +845,8 @@ ReturnValue Game::creatureMove(Creature* creature, Cylinder* fromCylinder, Cylin
 		return RET_NOTPOSSIBLE;
 	}
 
-	const Position& fromPos = fromCylinder->getPosition();
-	const Position& toPos = toCylinder->getPosition();
+	Position fromPos = fromCylinder->getPosition();
+	Position toPos = toCylinder->getPosition();
 
 	/*if(!moveCreature->isPushable()){
 		creature->sendCancel("You cannot move this item.");
@@ -873,13 +873,13 @@ ReturnValue Game::creatureMove(Creature* creature, Cylinder* fromCylinder, Cylin
 	//
 	//
 	
-	uint32_t oldStackPos = fromCylinder->__getIndexOfThing(creature);
+	uint32_t oldStackPos = fromCylinder->__getIndexOfThing(moveCreature);
 
 	//remove the creature
-	fromCylinder->__removeThing(creature, 0);
+	fromCylinder->__removeThing(moveCreature, 0);
 
 	//add the creature
-	toCylinder->__addThing(creature);
+	toCylinder->__addThing(moveCreature);
 
 	SpectatorVec list;
 	SpectatorVec::iterator it;
@@ -896,22 +896,34 @@ ReturnValue Game::creatureMove(Creature* creature, Cylinder* fromCylinder, Cylin
 	Thing* toThing = NULL;
 	Cylinder* subCylinder = toCylinder->__queryDestination(0, &toThing);
 	if(subCylinder != toCylinder){
-		uint32_t oldStackPos = toCylinder->__getIndexOfThing(creature);
+		uint32_t oldStackPos = toCylinder->__getIndexOfThing(moveCreature);
 
 		//remove the creature
-		toCylinder->__removeThing(creature, 0);
+		toCylinder->__removeThing(moveCreature, 0);
 
 		//add the creature
-		subCylinder->__addThing(creature);
+		subCylinder->__addThing(moveCreature);
+		toPos = subCylinder->getPosition();
 
 		//send change to client
 		for(it = list.begin(); it != list.end(); ++it) {
 			Player* spectator = dynamic_cast<Player*>(*it);
 			if(spectator){
-				spectator->onCreatureMove(moveCreature, toPos, oldStackPos);
+				spectator->onCreatureMove(moveCreature, toCylinder->getPosition(), oldStackPos);
 			}
 		}
 	}
+
+	if(std::abs(fromPos.x - toPos.x) >= std::abs(fromPos.y - toPos.y)){
+		if(toPos.x > fromPos.x)
+			moveCreature->setDirection(EAST);
+		else if(toPos.x < fromPos.x)
+			moveCreature->setDirection(WEST);
+	}
+	else if(toPos.y < fromPos.y)
+		moveCreature->setDirection(NORTH);
+	else if(toPos.y > fromPos.y)
+		moveCreature->setDirection(SOUTH);
 
 	return RET_NOTPOSSIBLE;
 }
