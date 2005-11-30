@@ -671,7 +671,7 @@ void Protocol75::parseOpenPriv(NetworkMessage& msg)
 	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol75::parseOpenPriv()");
 	Player* player = game->getPlayerByName(receiver);
 	if(player)
-		sendOpenPriv(receiver);
+		sendOpenPriv(player->getName());
 }
 
 void Protocol75::parseCancelMove(NetworkMessage& msg)
@@ -923,17 +923,45 @@ void Protocol75::parseSetOutfit(NetworkMessage& msg)
 	}
 }
 
-
-void Protocol75::parseUseItemEx(NetworkMessage &msg)
+void Protocol75::parseUseItem(NetworkMessage& msg)
 {
+	Position pos = msg.GetPosition();
+	unsigned short itemId = msg.GetItemId();
+	unsigned char stack = msg.GetByte();
+	unsigned char index = msg.GetByte();
+	
+#ifdef __DEBUG__
+	std::cout << "parseUseItem: " << "x: " << pos.x << ", y: " << (int)pos.y <<  ", z: " << (int)pos.z << ", item: " << (int)item << ", stack: " << (int)stack << ", index: " << (int)index << std::endl;
+#endif
+	
+	game->playerUseItem(player, pos, stack, itemId, index);
+}
+
+void Protocol75::parseUseItemEx(NetworkMessage& msg)
+{
+	/*
+	unsigned short from_x = msg.GetU16();
+	unsigned short from_y = msg.GetU16(); 
+	unsigned char from_z = msg.GetByte();
+	unsigned short itemId = msg.GetItemId();
+	unsigned char from_stack = msg.GetByte();
+	unsigned short to_x = msg.GetU16();
+	unsigned short to_y = msg.GetU16(); 
+	unsigned char to_z = msg.GetByte();
+	unsigned char to_stack = msg.GetByte();
+
+	Cylinder* fromCylinder = internalGetCylinder(from_x, from_y, from_z);
+	Cylinder* toCylinder = internalGetCylinder(to_x, to_y, to_z);
+	*/
+
 	Position pos_from = msg.GetPosition();
 	unsigned short itemid = msg.GetItemId();
 	unsigned char from_stackpos = msg.GetByte();
 	Position pos_to = msg.GetPosition();
-	/*unsigned short tile_id = */msg.GetU16();
+	unsigned short itemId = msg.GetU16();
 	unsigned char to_stackpos = msg.GetByte();
 	
-	game->playerUseItemEx(player,pos_from,from_stackpos, pos_to, to_stackpos, itemid);
+	game->playerUseItemEx(player,pos_from,from_stackpos, pos_to, to_stackpos, itemId);
 }
 
 void Protocol75::parseBattleWindow(NetworkMessage &msg)
@@ -944,20 +972,6 @@ void Protocol75::parseBattleWindow(NetworkMessage &msg)
 	unsigned long creatureid = msg.GetU32();
 
 	game->playerUseBattleWindow(player, pos_from, from_stackpos, itemid, creatureid);
-}
-
-void Protocol75::parseUseItem(NetworkMessage& msg)
-{
-	Position pos = msg.GetPosition();
-	unsigned short itemid = msg.GetItemId();
-	unsigned char stack = msg.GetByte();
-	unsigned char index = msg.GetByte();
-	
-#ifdef __DEBUG__
-	std::cout << "parseUseItem: " << "x: " << pos.x << ", y: " << (int)pos.y <<  ", z: " << (int)pos.z << ", item: " << (int)item << ", stack: " << (int)stack << ", index: " << (int)index << std::endl;
-#endif
-	
-	game->playerUseItem(player, pos, stack, itemid, index);
 }
 
 void Protocol75::parseCloseContainer(NetworkMessage& msg)
@@ -1002,7 +1016,6 @@ void Protocol75::parseThrow(NetworkMessage& msg)
 	if(from_x == to_x && from_y == to_y && from_z == to_z)
 		return;
 
-	//for testing...
 	Cylinder* fromCylinder = internalGetCylinder(from_x, from_y, from_z);
 	uint8_t from_index = 0;
 	
@@ -1289,7 +1302,7 @@ void Protocol75::parseRotateItem(NetworkMessage& msg)
 
 
 // Send methods
-void Protocol75::sendOpenPriv(std::string& receiver)
+void Protocol75::sendOpenPriv(const std::string& receiver)
 {
 	NetworkMessage newmsg; 
 	newmsg.AddByte(0xAD); 
@@ -1989,6 +2002,7 @@ void Protocol75::sendThingMove(const Creature *creature, const Position &fromPos
 
 */
 
+/*
 //ground to ground
 void Protocol75::sendThingMove(const Creature *creature, const Thing *thing,
 							   const Position *oldPos, unsigned char oldStackPos, unsigned char oldcount, unsigned char count, bool tele)
@@ -2076,10 +2090,6 @@ void Protocol75::sendThingMove(const Creature *creature, const Thing *thing,
 		for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
 			Container *container = cit->second;
 			
-			/*while(container->getParent()) {
-				container = container->getParent();
-			}*/
-			
 			//Only add those we need to close
 			//if(container->pos.x != 0xFFFF) {
 			if(container->getTile() == container->getParent()) {
@@ -2096,6 +2106,7 @@ void Protocol75::sendThingMove(const Creature *creature, const Thing *thing,
 	
 	WriteBuffer(msg);
 }
+*/
 
 
 void Protocol75::sendCreatureTurn(const Creature *creature, unsigned char stackPos)
@@ -2161,6 +2172,7 @@ void Protocol75::sendCancelWalk()
 	WriteBuffer(netmsg);
 }
 
+/*
 void Protocol75::sendThingDisappear(const Thing *thing, unsigned char stackPos, bool tele)
 {
 	NetworkMessage msg;
@@ -2203,7 +2215,9 @@ void Protocol75::sendThingDisappear(const Thing *thing, unsigned char stackPos, 
 	
 	WriteBuffer(msg);
 }
+*/
 
+/*
 void Protocol75::sendThingAppear(const Thing* thing)
 {
 	NetworkMessage msg;
@@ -2309,6 +2323,7 @@ void Protocol75::sendThingAppear(const Thing* thing)
 	
 	WriteBuffer(msg);
 }
+*/
 
 /*
 void Protocol75::sendThingTransform(const Thing* thing,int stackpos)

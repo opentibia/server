@@ -51,13 +51,13 @@ public:
 	virtual void reinitializeProtocol() = 0;
 
 	//ground to ground
-	virtual void sendThingMove(const Creature *creature, const Thing *thing,
-		const Position *oldPos, unsigned char oldStackPos, unsigned char oldcount,
-		unsigned char count, bool tele = false) = 0;
+	//virtual void sendThingMove(const Creature *creature, const Thing *thing,
+	//	const Position *oldPos, unsigned char oldStackPos, unsigned char oldcount,
+	//	unsigned char count, bool tele = false) = 0;
 	
 	//tiles
-	virtual void sendThingAppear(const Thing *thing) = 0;
-	virtual void sendThingDisappear(const Thing *thing, unsigned char stackPos, bool tele) = 0;
+	//virtual void sendThingAppear(const Thing *thing) = 0;
+	//virtual void sendThingDisappear(const Thing *thing, unsigned char stackPos, bool tele) = 0;
 	//virtual void sendThingRemove(const Thing *thing) = 0;
 	//virtual void sendThingTransform(const Thing* thing,int stackpos) = 0;
 	//virtual void sendTileUpdated(const Position &pos) = 0;
@@ -106,7 +106,7 @@ public:
 	virtual void sendChannelsDialog() = 0;
 	virtual void sendChannel(unsigned short channelId, std::string channelName) = 0;
 	virtual void sendToChannel(const Creature * creature, SpeakClasses type, const std::string &text, unsigned short channelId) = 0;
-	virtual void sendOpenPriv(std::string &receiver) =0;
+	virtual void sendOpenPriv(const std::string& receiver) =0;
 	virtual void sendVIPLogIn(unsigned long guid) = 0;
 	virtual void sendVIPLogOut(unsigned long guid) = 0;
 	virtual void sendVIP(unsigned long guid, const std::string &name, bool isOnline) = 0;	

@@ -274,7 +274,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 							player->lastlogin = std::time(NULL);
 							player->client->reinitializeProtocol();
 							player->client->s = s;
-							player->client->sendThingAppear(player);
+							player->client->sendAddCreature(player, false);
 							player->lastip = player->getIP();
 							s = 0;
 						}

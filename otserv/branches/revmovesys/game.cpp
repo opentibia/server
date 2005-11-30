@@ -575,7 +575,8 @@ OTSYS_THREAD_RETURN Game::eventThread(void *p)
 
 }
 
-unsigned long Game::addEvent(SchedulerTask* event) {
+unsigned long Game::addEvent(SchedulerTask* event)
+{
   bool do_signal = false;
   OTSYS_THREAD_LOCK(eventLock, "addEvent()")
 
@@ -704,39 +705,59 @@ Player* Game::getPlayerByName(const std::string &s)
 	return NULL; //just in case the player doesnt exist
 }
 
-bool Game::placeCreature(const Position &pos, Creature* c)
+bool Game::placeCreature(const Position &pos, Creature* creature)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::placeCreature()");
 	
 	bool success = false;
-	Player *p = dynamic_cast<Player*>(c);
+	Player* player = dynamic_cast<Player*>(creature);
 
-	if (!p || c->access != 0 || getPlayersOnline() < max_players) {
-		success = map->placeCreature(pos, c);		
+	if (!player || player->access != 0 || getPlayersOnline() < max_players) {
+		success = map->placeCreature(pos, creature);		
 		if(success) {
-			c->useThing2();
 			
-			c->setID();
-			//std::cout << "place: " << c << " " << c->getID() << std::endl;
-			listCreature.addList(c);
-			c->addList();
-			//c->isRemoved = false;
+			//std::cout << "place: " << creature << " " << creature->getID() << std::endl;
+
+			creature->useThing2();
+			creature->setID();
+			listCreature.addList(creature);
+			creature->addList();
 			
-			sendAddThing(NULL, c->getPosition(), c);
-			if(p) {
+			//sendAddThing(NULL, c->getPosition(), creature);
+
+			SpectatorVec list;
+			SpectatorVec::iterator it;
+
+			getSpectators(Range(creature->getPosition(), true), list);
+
+			//players
+			for(it = list.begin(); it != list.end(); ++it) {
+				if(dynamic_cast<Player*>(*it)) {
+					(*it)->onCreatureAppear(creature, true);
+				}
+			}
+
+			//none-players
+			for(it = list.begin(); it != list.end(); ++it) {
+				if(!dynamic_cast<Player*>(*it)) {
+					(*it)->onCreatureAppear(creature, true);
+				}
+			}
+
+			if(player){
 				#ifdef __DEBUG_PLAYERS__
 				std::cout << (uint32_t)getPlayersOnline() << " players online." << std::endl;
 				#endif
 			}
 			
-			if(p){
-				c->eventCheck = addEvent(makeTask(1000, std::bind2nd(std::mem_fun(&Game::checkCreature), c->getID())));
+			if(player){
+				creature->eventCheck = addEvent(makeTask(1000, std::bind2nd(std::mem_fun(&Game::checkCreature), creature->getID())));
 			}
 			else{
-				c->eventCheck = addEvent(makeTask(500, std::bind2nd(std::mem_fun(&Game::checkCreature), c->getID())));
+				creature->eventCheck = addEvent(makeTask(500, std::bind2nd(std::mem_fun(&Game::checkCreature), creature->getID())));
 			}
 
-			//c->eventCheckAttacking = addEvent(makeTask(2000, std::bind2nd(std::mem_fun(&Game::checkCreatureAttacking), c->getID())));
+			//creature->eventCheckAttacking = addEvent(makeTask(2000, std::bind2nd(std::mem_fun(&Game::checkCreatureAttacking), c->getID())));
 		}
 	}
 	else {
@@ -747,31 +768,54 @@ bool Game::placeCreature(const Position &pos, Creature* c)
   return success;
 }
 
-bool Game::removeCreature(Creature* c)
+bool Game::removeCreature(Creature* creature)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::removeCreature()");
-	if(c->isRemoved())
+	if(creature->isRemoved())
 		return false;
+
 #ifdef __DEBUG__
 	std::cout << "removing creature "<< std::endl;
 #endif
 
-	if(!removeThing(NULL, c->getPosition(), c))
-		return false;
+	Cylinder* cylinder = creature->getTile();
+	//std::cout << "remove: " << creature << " " << creature->getID() << std::endl;
+
+	uint32_t index = cylinder->__getIndexOfThing(creature);
+
+	SpectatorVec list;
+	SpectatorVec::iterator it;
+
+	getSpectators(Range(cylinder->getPosition(), true), list);
+
+	//players
+	for(it = list.begin(); it != list.end(); ++it) {
+		Player *spectator = dynamic_cast<Player*>(*it);
+		if(spectator) {
+			spectator->onCreatureDisappear(creature, index, true);
+		}
+	}
+
+	//none-players
+	for(it = list.begin(); it != list.end(); ++it) {
+		if(!dynamic_cast<Player*>(*it)) {
+			(*it)->onCreatureDisappear(creature, index, true);
+		}
+	}
 	
-	//std::cout << "remove: " << c << " " << c->getID() << std::endl;
-	listCreature.removeList(c->getID());
-	c->removeList();
-	//c->isRemoved = true;
+	cylinder->__removeThing(creature, 0);
+
+	listCreature.removeList(creature->getID());
+	creature->removeList();
 	
-	for(std::list<Creature*>::iterator cit = c->summons.begin(); cit != c->summons.end(); ++cit) {
+	for(std::list<Creature*>::iterator cit = creature->summons.begin(); cit != creature->summons.end(); ++cit) {
 		removeCreature(*cit);
 	}
 		
-	stopEvent(c->eventCheck);
-	stopEvent(c->eventCheckAttacking);
+	stopEvent(creature->eventCheck);
+	stopEvent(creature->eventCheckAttacking);
 
-	Player* player = dynamic_cast<Player*>(c);
+	Player* player = dynamic_cast<Player*>(creature);
 	if(player){
 		if(player->tradePartner != 0) {
 			playerCloseTrade(player);
@@ -786,7 +830,9 @@ bool Game::removeCreature(Creature* c)
 		#endif
 	}
 	
-	this->FreeThing(c);
+	FreeThing(creature);
+	creature->setParent(NULL);
+
 	return true;
 }
 
@@ -800,12 +846,10 @@ void Game::creatureMove(Player* player, Cylinder* fromCylinder, Cylinder* toCyli
 
 	if(fromCylinder == NULL || toCylinder == NULL || moveCreature == NULL){
 		ret = RET_NOTPOSSIBLE;
-		//player->sendCancel("Sorry, not possible.");
 	}
 
 	if(toCylinder != toCylinder->getTile()){
 		ret = RET_NOTPOSSIBLE;
-		//player->sendCancel("Sorry, not possible.");
 	}
 
 	//if(!moveCreature->isPushable()){
@@ -815,12 +859,10 @@ void Game::creatureMove(Player* player, Cylinder* fromCylinder, Cylinder* toCyli
 
 	if(player->getPosition().z != fromCylinder->getPosition().z){
 		ret = RET_NOTPOSSIBLE;
-		//player->sendCancel("Sorry, not possible.");
 	}
 	else if((std::abs(player->getPosition().x - fromCylinder->getPosition().x) > 1) ||
 		(std::abs(player->getPosition().y - fromCylinder->getPosition().y) > 1)) {
 		ret = RET_TOFARAWAY;
-		//player->sendCancel("To far away.");
 	}
 
 	const Position& fromPos = fromCylinder->getPosition();
@@ -830,7 +872,6 @@ void Game::creatureMove(Player* player, Cylinder* fromCylinder, Cylinder* toCyli
 	if( (std::abs(fromPos.x - toPos.x) > moveCreature->getThrowRange()) ||
 			(std::abs(fromPos.y - toPos.y) > moveCreature->getThrowRange()) ||
 			(std::abs(fromPos.z - toPos.z) * 2 > moveCreature->getThrowRange()) ) {
-		//creature->sendCancel("Destination is out of reach.");
 		ret = RET_DESTINATIONOUTOFREACH;
 	}
 
@@ -839,6 +880,9 @@ void Game::creatureMove(Player* player, Cylinder* fromCylinder, Cylinder* toCyli
 	}
 	
 	if(player == moveCreature && ret != RET_NOERROR){
+		//player->sendCancel("To far away.");
+		//player->sendCancel("Destination is out of reach.");
+		//player->sendCancel("Sorry, not possible.");
 		//playerSendErrorMessage(ret)
 		player->sendCancelWalk();
 	}
@@ -935,7 +979,7 @@ ReturnValue Game::internalCreatureMove(Creature* creature, Cylinder* fromCylinde
 
 	int32_t index = 0;
 	Thing* toThing = NULL;
-	Cylinder* subCylinder = toCylinder->__queryDestination(index, &toThing);
+	Cylinder* subCylinder = toCylinder->__queryDestination(index, creature, &toThing);
 	if(subCylinder != toCylinder){
 		uint32_t oldStackPos = toCylinder->__getIndexOfThing(creature);
 
@@ -1012,8 +1056,9 @@ void Game::moveItem(Player* player, Cylinder* fromCylinder, Cylinder* toCylinder
 	}
 
 	if(ret != RET_NOERROR){
+		//player->sendCancel("You cannot put that object in that place.");
 		//playerSendErrorMessage(ret)
-		player->sendCancelWalk();
+		//player->sendCancelWalk();
 	}
 }
 
@@ -1021,7 +1066,7 @@ ReturnValue Game::internalMoveItem(Cylinder* fromCylinder, Cylinder* toCylinder,
 	Item* item, uint32_t count)
 {
 	Thing* toThing = NULL;
-	Cylinder* subCylinder = toCylinder->__queryDestination(index, &toThing);
+	Cylinder* subCylinder = toCylinder->__queryDestination(index, item, &toThing);
 	toCylinder = subCylinder;
 
 	Item* toItem = dynamic_cast<Item*>(toThing);
@@ -1031,27 +1076,33 @@ ReturnValue Game::internalMoveItem(Cylinder* fromCylinder, Cylinder* toCylinder,
 	//
 	//
 
-	bool isSameParent = fromCylinder->getTopParent() == toCylinder->getTopParent();
-
-	//check how much we can move
-	uint32_t maxQueryCount = 0;
-	ReturnValue ret = toCylinder->__queryMaxCount(index, item, count, maxQueryCount, isSameParent);
+	//check if we can add this item
+	ReturnValue ret = toCylinder->__queryAdd(index, item, count);
 	if(ret != RET_NOERROR){
 		return ret;
 	}
 
-	uint32_t m = std::min(count, maxQueryCount);
+	//check how much we can move
+	uint32_t maxQueryCount = 0;
+	ret = toCylinder->__queryMaxCount(index, item, count, maxQueryCount);
+	if(ret != RET_NOERROR){
+		return ret;
+	}
+
+	uint32_t m = 0;
 	uint32_t n = 0;
-	Item* moveItem = item;
+
+	if(item->isStackable()){
+		m = std::min((uint32_t)count, maxQueryCount);
+	}
+	else
+		m = maxQueryCount;
+
 	if(m == 0){
 		return RET_NOTENOUGHROOM;
 	}
 
-	//check if we can add this item
-	ret = toCylinder->__queryAdd(index, item, m);
-	if(ret != RET_NOERROR){
-		return ret;
-	}
+	Item* moveItem = item;
 
 	//check if we can remove this item
 	ret = fromCylinder->__queryRemove(item, m);
@@ -1078,7 +1129,7 @@ ReturnValue Game::internalMoveItem(Cylinder* fromCylinder, Cylinder* toCylinder,
 			moveItem = NULL;
 		}
 
-		if(m == item->getItemCountOrSubtype()){
+		if(item->getParent() == NULL){
 			FreeThing(item);
 		}
 	}
@@ -1095,6 +1146,11 @@ ReturnValue Game::internalMoveItem(Cylinder* fromCylinder, Cylinder* toCylinder,
 	//close/send container
 	//cancel trade
 	//update capacity/cylinder state (ie. for Tile class check if need to send UpdateTile() packet)
+
+	//we could not move all, inform the player
+	if(item->isStackable() && maxQueryCount != count){
+		return RET_NOTENOUGHROOM;
+	}
 
 	if(ret != RET_NOERROR)
 		return ret;
@@ -1118,31 +1174,36 @@ ReturnValue Game::internalAddItem(Cylinder* toCylinder, Item* item, bool test /*
 
 	int32_t index = 0;
 	Thing* toThing = NULL;
-	Cylinder* subCylinder = toCylinder->__queryDestination(index, &toThing);
+	Cylinder* subCylinder = toCylinder->__queryDestination(index, item, &toThing);
 	Item* toItem = dynamic_cast<Item*>(toThing);
 	if(subCylinder != toCylinder){
 		toCylinder = subCylinder;
 	}
 
-	//bool checkCapacity = dynamic_cast<Player*>(toCylinder->getTopParent()) != NULL;
+	//check if we can add this item
+	ReturnValue ret = toCylinder->__queryAdd(index, item, item->getItemCountOrSubtype());
+	if(ret != RET_NOERROR){
+		return ret;
+	}
 
 	//check how much we can move
 	uint32_t maxQueryCount = 0;
-	ReturnValue ret = toCylinder->__queryMaxCount(index, item, item->getItemCountOrSubtype(), maxQueryCount, false);
+	ret = toCylinder->__queryMaxCount(index, item, item->getItemCountOrSubtype(), maxQueryCount);
 	if(ret != RET_NOERROR){
 		return ret;
 	}
 
-	uint32_t m = std::min((uint32_t)item->getItemCountOrSubtype(), maxQueryCount);
+	uint32_t m = 0;
 	uint32_t n = 0;
+
+	if(item->isStackable()){
+		m = std::min((uint32_t)item->getItemCountOrSubtype(), maxQueryCount);
+	}
+	else
+		m = maxQueryCount;
+
 	if(m == 0){
 		return RET_NOTENOUGHROOM;
-	}
-
-	//check if we can add this item
-	ret = toCylinder->__queryAdd(index, item, m);
-	if(ret != RET_NOERROR){
-		return ret;
 	}
 
 	if(test){
@@ -2930,7 +2991,6 @@ void Game::teleport(Thing *thing, const Position& newPos)
 	*/
 }
 
-
 void Game::creatureChangeOutfit(Creature *creature)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::creatureChangeOutfit()");
@@ -4083,8 +4143,9 @@ bool Game::playerUseItemEx(Player *player, const Position& posFrom,const unsigne
 
 	bool ret = false;
 
-	Position thingpos = getThingMapPos(player, posFrom);
-	Item *item = dynamic_cast<Item*>(getThing(posFrom, stack_from, player));
+	Position thingpos(0, 0, 0); //= getThingMapPos(player, posFrom);
+	//Item *item = dynamic_cast<Item*>(getThing(posFrom, stack_from, player));
+	Item* item = NULL;
 
 	if(item) {
 		//Runes
@@ -4101,6 +4162,7 @@ bool Game::playerUseItemEx(Player *player, const Position& posFrom,const unsigne
 					bool success = sit->second->getSpellScript()->castSpell(player, posTo, var);
 					ret = success;
 					if(success) {
+						/*
 						autoCloseTrade(item);
 						item->setItemCharge(std::max((int)item->getItemCharge() - 1, 0) );
 						if(item->getItemCharge() == 0) {
@@ -4108,6 +4170,7 @@ bool Game::playerUseItemEx(Player *player, const Position& posFrom,const unsigne
 								FreeThing(item);
 							}
 						}
+						*/
 					}
 				}
 				else
@@ -4153,8 +4216,10 @@ bool Game::playerUseBattleWindow(Player *player, Position &posFrom, unsigned cha
 
 	bool ret = false;
 
-	Position thingpos = getThingMapPos(player, posFrom);
-	Item *item = dynamic_cast<Item*>(getThing(posFrom, stackpos, player));
+	Position thingpos(0, 0,0); //= getThingMapPos(player, posFrom);
+	//Item *item = dynamic_cast<Item*>(getThing(posFrom, stackpos, player));
+	Item* item = NULL;
+
 	if(item) {
 		//Runes
 		std::map<unsigned short, Spell*>::iterator sit = spells.getAllRuneSpells()->find(item->getID());
@@ -4169,6 +4234,7 @@ bool Game::playerUseBattleWindow(Player *player, Position &posFrom, unsigned cha
 					bool success = sit->second->getSpellScript()->castSpell(player, creature->getPosition(), var);
 					ret = success;
 					if(success){
+						/*
 						autoCloseTrade(item);
 						item->setItemCharge(std::max((int)item->getItemCharge() - 1, 0) );
 						if(item->getItemCharge() == 0){
@@ -4176,6 +4242,7 @@ bool Game::playerUseBattleWindow(Player *player, Position &posFrom, unsigned cha
 								FreeThing(item);
 							}
 						}
+						*/
 					}
 				}
 				else
@@ -4200,10 +4267,12 @@ bool Game::playerRotateItem(Player *player, const Position& pos, const unsigned 
 		return false;
 	}
 	
+	/*
 	Item *item = dynamic_cast<Item*>(getThing(pos, stackpos, player));
 	if(item && item->rotate()){
 		sendUpdateThing(player, pos, item, stackpos);
 	}
+	*/
 	
 	return false;
 }
@@ -4574,9 +4643,9 @@ void Game::FreeThing(Thing* thing)
 	return;
 }
 
+/*
 void Game::sendAddThing(Player* player,const Position &pos,const Thing* thing)
 {
-	/*
 	if(pos.x == 0xFFFF) {		
 		if(!player)
 			return;
@@ -4616,7 +4685,7 @@ void Game::sendAddThing(Player* player,const Position &pos,const Thing* thing)
 			player->sendInventory(pos.y);
 		}
 	}
-	else*/ //ground
+	else //ground
 	{
 		if(!thing)
 			return;
@@ -4640,11 +4709,12 @@ void Game::sendAddThing(Player* player,const Position &pos,const Thing* thing)
 			}
 		}
 	}
-	//*/
 }
+*/
 
+/*
 void Game::sendRemoveThing(Player* player,const Position &pos,const Thing* thing,
-	const unsigned char stackpos /*=1*/ ,const bool autoclose/* =false*/)
+	const unsigned char stackpos =1 ,const bool autoclose =false)
 {
 	if(!thing)
 		return;
@@ -4657,7 +4727,6 @@ void Game::sendRemoveThing(Player* player,const Position &pos,const Thing* thing
 			perform_autoclose = true;		
 	}
 	
-	/*
 	if(pos.x == 0xFFFF) {
 		if(!player)
 			return;		
@@ -4707,7 +4776,7 @@ void Game::sendRemoveThing(Player* player,const Position &pos,const Thing* thing
 			}
 		}
 	}
-	else*/ //ground
+	else //ground
 	{		
 		SpectatorVec list;
 		SpectatorVec::iterator it;
@@ -4720,9 +4789,9 @@ void Game::sendRemoveThing(Player* player,const Position &pos,const Thing* thing
 			if(spectator) {
 				spectator->onThingDisappear(thing,stackpos);
 
-				/*if(perform_autoclose){
-					spectator->onThingRemove(thing);
-				}*/
+				//if(perform_autoclose){
+				//	spectator->onThingRemove(thing);
+				//}
 			}
 		}
 
@@ -4734,11 +4803,12 @@ void Game::sendRemoveThing(Player* player,const Position &pos,const Thing* thing
 		}
 	}
 }
+*/
 
+/*
 void Game::sendUpdateThing(Player* player,const Position &pos,const Thing* thing,
-	const unsigned char stackpos/*=1*/)
+	const unsigned char stackpos=1)
 {
-	/*
 	if(pos.x == 0xFFFF) {		
 		if(!player)
 			return;
@@ -4806,12 +4876,12 @@ void Game::sendUpdateThing(Player* player,const Position &pos,const Thing* thing
 			}
 		}			
 	}
-	*/
 }
+*/
 
+/*
 void Game::addThing(Player* player,const Position &pos,Thing* thing)
 {
-	/*
 	if(!thing)
 		return;
 	Item *item = dynamic_cast<Item*>(thing);
@@ -4906,17 +4976,17 @@ void Game::addThing(Player* player,const Position &pos,Thing* thing)
 			}
 		}
 	}
-	*/
 }
+*/
 
-bool Game::removeThing(Player* player,const Position &pos,Thing* thing,  bool setRemoved /*= true*/)
+/*
+bool Game::removeThing(Player* player,const Position &pos,Thing* thing,  bool setRemoved //= true)
 {
 	if(!thing)
 		return false;
 
 	Item *item = dynamic_cast<Item*>(thing);
 	
-	/*
 	if(pos.x == 0xFFFF) {
 		if(!player || !item)
 			return false;
@@ -4949,7 +5019,7 @@ bool Game::removeThing(Player* player,const Position &pos,Thing* thing,  bool se
 			item->setParent(NULL);
 		return true;
 	}
-	else*/ //ground
+	else //ground
 	{		
 		//Tile *tile = map->getTile(pos.x, pos.y, pos.z);
 		Tile *tile = map->getTile(pos);
@@ -4971,7 +5041,9 @@ bool Game::removeThing(Player* player,const Position &pos,Thing* thing,  bool se
 
 	return false;
 }
+*/
 
+/*
 Position Game::getThingMapPos(Player* player, const Position& pos)
 {
 	if(pos.x == 0xFFFF){
@@ -4995,7 +5067,6 @@ Position Game::getThingMapPos(Player* player, const Position& pos)
 				return player->pos;			
 			else
 				return container->pos;
-			*/
 		}
 		else //from inventory
 		{
@@ -5006,8 +5077,10 @@ Position Game::getThingMapPos(Player* player, const Position& pos)
 		return pos;
 	}
 }
+*/
 
-Thing* Game::getThing(const Position &pos,unsigned char stack, Player* player /*=NULL*/)
+/*
+Thing* Game::getThing(const Position &pos,unsigned char stack, Player* player =NULL)
 {	
 	if(pos.x == 0xFFFF) {
 		if(!player)
@@ -5035,3 +5108,4 @@ Thing* Game::getThing(const Position &pos,unsigned char stack, Player* player /*
 		return t->getThingByStackPos(stack);
 	}	
 }
+*/

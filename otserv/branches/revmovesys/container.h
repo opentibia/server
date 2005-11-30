@@ -51,10 +51,10 @@ public:
 
 	//
 	virtual ReturnValue __queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
-		uint32_t& maxQueryCount, bool isSameParent) const;
+		uint32_t& maxQueryCount) const;
 	virtual ReturnValue __queryAdd(uint32_t index, const Thing* thing, uint32_t count) const;
 	virtual ReturnValue __queryRemove(const Thing* thing, uint32_t count) const;
-	virtual Cylinder* __queryDestination(int32_t& index, Thing** destThing);
+	virtual Cylinder* __queryDestination(int32_t& index, const Thing* thing, Thing** destThing);
 
 	virtual ReturnValue __addThing(Thing* thing);
 	virtual ReturnValue __addThing(uint32_t index, Thing* thing);

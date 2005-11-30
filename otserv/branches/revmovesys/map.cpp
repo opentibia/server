@@ -218,7 +218,6 @@ bool Map::placeCreature(const Position &pos, Creature* c)
 	std::cout << "POS: " << c->pos << std::endl;
 	#endif
 	tile->addThing(c);
-	//c->pos = pos;
 
 	return true;
 }

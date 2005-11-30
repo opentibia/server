@@ -265,8 +265,8 @@ public:
 	//virtual void onCreatureAppear(const Creature *creature);
 	//virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos, bool tele);
 	//virtual void onTileUpdated(const Position &pos);
-	void onThingAppear(const Thing* thing);
-	void onThingDisappear(const Thing* thing, unsigned char stackPos);
+	//void onThingAppear(const Thing* thing);
+	//void onThingDisappear(const Thing* thing, unsigned char stackPos);
 	//old code
 
 	virtual void onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos);
@@ -294,10 +294,10 @@ protected:
 
 	//
 	virtual ReturnValue __queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
-		uint32_t& maxQueryCount, bool isSameParent) const;
+		uint32_t& maxQueryCount) const;
 	virtual ReturnValue __queryAdd(uint32_t index, const Thing* thing, uint32_t count) const;
 	virtual ReturnValue __queryRemove(const Thing* thing, uint32_t count) const;
-	virtual Cylinder* __queryDestination(int32_t& index, Thing** destThing);
+	virtual Cylinder* __queryDestination(int32_t& index, const Thing* thing, Thing** destThing);
 
 	virtual ReturnValue __addThing(Thing* thing);
 	virtual ReturnValue __addThing(uint32_t index, Thing* thing);

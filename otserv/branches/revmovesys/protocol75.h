@@ -120,7 +120,7 @@ private:
 	//Send functions
 	virtual void sendChannelsDialog();
 	virtual void sendChannel(unsigned short channelId, std::string channelName);
-	virtual void sendOpenPriv(std::string &receiver);
+	virtual void sendOpenPriv(const std::string& receiver);
 	virtual void sendToChannel(const Creature *creature, SpeakClasses type, const std::string &text, unsigned short channelId);
 	
 	virtual void sendIcons(int icons);
@@ -154,12 +154,12 @@ private:
 	
 	//START, NEEDS REVISION
 	//ground to ground
-	virtual void sendThingMove(const Creature *creature, const Thing *thing,
-		const Position *oldPos, unsigned char oldstackpos, unsigned char oldcount,
-		unsigned char count, bool tele = false);
+	//virtual void sendThingMove(const Creature *creature, const Thing *thing,
+	//	const Position *oldPos, unsigned char oldstackpos, unsigned char oldcount,
+	//	unsigned char count, bool tele = false);
 
-	virtual void sendThingDisappear(const Thing *thing, unsigned char stackPos, bool tele = false);
-	virtual void sendThingAppear(const Thing *thing);
+	//virtual void sendThingDisappear(const Thing *thing, unsigned char stackPos, bool tele = false);
+	//virtual void sendThingAppear(const Thing *thing);
 	//virtual void sendThingTransform(const Thing* thing,int stackpos);
 	//virtual void sendThingRemove(const Thing *thing);
 	//virtual void sendTileUpdated(const Position &Pos);

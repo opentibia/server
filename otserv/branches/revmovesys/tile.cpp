@@ -569,9 +569,9 @@ void Tile::setPz()
 }
 
 ReturnValue Tile::__queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
-	uint32_t& maxQueryCount, bool isSameParent) const
+	uint32_t& maxQueryCount) const
 {
-	maxQueryCount = count;
+	maxQueryCount = std::max((uint32_t)1, count);
 	return RET_NOERROR;
 }
 
@@ -609,7 +609,7 @@ ReturnValue Tile::__queryRemove(const Thing* thing, uint32_t count) const
 	return RET_NOERROR;
 }
 
-Cylinder* Tile::__queryDestination(int32_t& index, Thing** destThing)
+Cylinder* Tile::__queryDestination(int32_t& index, const Thing* thing, Thing** destThing)
 {
 	Teleport* teleport = getTeleportItem();
 

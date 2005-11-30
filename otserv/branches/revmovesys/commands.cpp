@@ -414,7 +414,7 @@ bool Commands::teleportHere(Creature* c, const std::string &cmd, const std::stri
 
 bool Commands::createItems(Creature* c, const std::string &cmd, const std::string &param)
 {
-	Player *player = dynamic_cast<Player *>(c);
+	Player* player = dynamic_cast<Player *>(c);
 	if(!player)
 		return true;
 
@@ -431,12 +431,24 @@ bool Commands::createItems(Creature* c, const std::string &cmd, const std::strin
 	Item* newItem = Item::CreateItem(type, count);
 	if(!newItem)
 		return true;
+
+	ReturnValue ret = game->internalAddItem(player, newItem);
 	
+	if(ret != RET_NOERROR){
+		ret = game->internalAddItem(player->getTile(), newItem);
+
+		if(ret != RET_NOERROR){
+			delete newItem;
+		}
+	}
+
+	/*
 	ReturnValue ret = player->__addThing(newItem);
 	if(ret != RET_NOERROR){
 		//Tile* tile = game->map->getTile(c->getPosition());
 		//tile->__addThing();
 	}
+	*/
 
 	/*
 	Tile *t = game->map->getTile(c->getPosition());

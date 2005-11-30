@@ -222,7 +222,9 @@ bool Actions::UseItem(Player* player, const Position &pos,const unsigned char st
 		player->sendCancel("Too far away.");
 		return false;
 	}
-	Item *item = dynamic_cast<Item*>(game->getThing(pos,stack,player));
+	
+	Item *item = NULL; //dynamic_cast<Item*>(game->getThing(pos,stack,player));
+
 	if(!item){
 		#ifdef __DEBUG__
 		std::cout << "no item" << std::endl;
@@ -243,7 +245,7 @@ bool Actions::UseItem(Player* player, const Position &pos,const unsigned char st
 	Action *action = getAction(item);
 	
 	//if found execute it
-	if(action){
+	/*if(action){
 		Position itempos = game->getThingMapPos(player, pos);
 		game->autoCloseTrade(item);
 		PositionEx posEx(pos,stack);
@@ -251,10 +253,11 @@ bool Actions::UseItem(Player* player, const Position &pos,const unsigned char st
 			return true;
 		}
 	}
+	*/
 	
 	//if it is a container try to open it
-	if(dynamic_cast<Container*>(item)){
-		if(openContainer(player,dynamic_cast<Container*>(item),index))
+	if(Container* container = dynamic_cast<Container*>(item)){
+		if(openContainer(player, container, index))
 			return true;
 	}
     
@@ -301,7 +304,7 @@ bool Actions::UseItemEx(Player* player, const Position &from_pos,
 		return false;
 	}
 	
-	Item *item = dynamic_cast<Item*>(game->getThing(from_pos,from_stack,player));
+	Item *item = NULL; //dynamic_cast<Item*>(game->getThing(from_pos,from_stack,player));
 	if(!item)
 		return false;
 	
@@ -329,12 +332,14 @@ bool Actions::UseItemEx(Player* player, const Position &from_pos,
 			return false;
 		}
 		
+		/*
 		Position itempos = game->getThingMapPos(player, from_pos);
 		game->autoCloseTrade(item);
 		PositionEx posFromEx(from_pos,from_stack);
 		PositionEx posToEx(to_pos,to_stack);
     	if(action->executeUse(player,item,posFromEx,posToEx))
     		return true;
+		*/
 	}
 	
 	//not found
@@ -394,7 +399,7 @@ bool Action::executeUse(Player *player,Item* item, PositionEx &posFrom, Position
 	script->internalAddThing(luaState,item,itemid1);
 	script->internalAddPositionEx(luaState,posFrom);
 	//std::cout << "posTo" <<  (Position)posTo << " stack" << (int)posTo.stackpos <<std::endl;
-	Thing *thing = script->game->getThing((Position)posTo,posTo.stackpos,player);
+	Thing *thing = NULL; //script->game->getThing((Position)posTo,posTo.stackpos,player);
 	if(thing && posFrom != posTo){
 		int thingId2 = script->AddThingToMap(thing,posTo);
 		script->internalAddThing(luaState,thing,thingId2);
@@ -709,7 +714,7 @@ ActionScript* ActionScript::getActionScript(lua_State *L){
 	return myaction;
 }
 
-
+/*
 Position ActionScript::internalGetRealPosition(ActionScript *action, Player *player, const Position &pos)
 {
 	if(action)
@@ -719,6 +724,7 @@ Position ActionScript::internalGetRealPosition(ActionScript *action, Player *pla
 		return dummyPos;
 	}
 }
+*/
 
 void ActionScript::internalAddThing(lua_State *L, const Thing* thing, const unsigned int thingid)
 {	
@@ -915,6 +921,9 @@ int ActionScript::luaActionDoRemoveItem(lua_State *L)
 		return 1;
 	}
 	
+	//action->game->internalRemoveItem(
+
+	/*
 	if(tmpitem->isStackable() && (tmpitem->getItemCountOrSubtype() - n) > 0){
 		tmpitem->setItemCountOrSubtype(tmpitem->getItemCountOrSubtype() - n);
 		action->game->sendUpdateThing(action->_player,(Position&)tmppos,tmpitem,tmppos.stackpos);
@@ -923,7 +932,8 @@ int ActionScript::luaActionDoRemoveItem(lua_State *L)
 		if(action->game->removeThing(action->_player,(Position&)tmppos,tmpitem)){
 			action->game->FreeThing(tmpitem);
 		}
-	}	
+	}
+	*/
 	
 	lua_pushnumber(L, 0);
 	return 1;
@@ -1071,9 +1081,10 @@ int ActionScript::luaActionDoTransformItem(lua_State *L)
 		return 1;
 	}
 	
-	tmpitem->setID(toid);
-	
+	/*
+	tmpitem->setID(toid);	
 	action->game->sendUpdateThing(action->_player,(Position&)tmppos,tmpitem,tmppos.stackpos);
+	*/
 	
 	lua_pushnumber(L, 0);
 	return 1;
@@ -1112,7 +1123,7 @@ int ActionScript::luaActionDoSendMagicEffect(lua_State *L)
 	
 	ActionScript *action = getActionScript(L);
 	
-	Position realpos = internalGetRealPosition(action, action->_player,(Position&)pos);
+	Position realpos(0, 0, 0); //internalGetRealPosition(action, action->_player,(Position&)pos);
 	SpectatorVec list;
 	SpectatorVec::iterator it;
 
@@ -1149,9 +1160,10 @@ int ActionScript::luaActionDoChangeTypeItem(lua_State *L)
 		return 1;
 	}
 	
-	tmpitem->setItemCountOrSubtype(new_type);
-	
+	/*
+	tmpitem->setItemCountOrSubtype(new_type);	
 	action->game->sendUpdateThing(action->_player,(Position&)tmppos,tmpitem,tmppos.stackpos);
+	*/
 	
 	lua_pushnumber(L, 0);
 	return 1;		
@@ -1330,7 +1342,7 @@ int ActionScript::luaActionDoSendAnimatedText(lua_State *L)
 	
 	ActionScript *action = getActionScript(L);
 	
-	Position realpos = internalGetRealPosition(action, action->_player,(Position&)pos);
+	Position realpos(0, 0,0); //internalGetRealPosition(action, action->_player,(Position&)pos);
 	SpectatorVec list;
 	SpectatorVec::iterator it;
 
@@ -1497,7 +1509,8 @@ int ActionScript::luaActionGetThingfromPos(lua_State *L)
 	}
 }
 
-int ActionScript::luaActionDoCreateItem(lua_State *L){
+int ActionScript::luaActionDoCreateItem(lua_State *L)
+{
 	//doCreateItem(itemid,type or count,position) .only working on ground. returns uid of the created item
 	PositionEx pos;
 	internalGetPositionEx(L,pos);
@@ -1506,18 +1519,38 @@ int ActionScript::luaActionDoCreateItem(lua_State *L){
 	
 	ActionScript *action = getActionScript(L);
 	
-	Item *newitem = Item::CreateItem(itemid,type);
-	action->game->addThing(NULL,(Position&)pos,newitem);
+	Item* newItem = Item::CreateItem(itemid, type);
+	ReturnValue ret = action->game->internalAddItem(action->_player, newItem);
+	pos.stackpos = 1;
+
+	if(ret != RET_NOERROR){
+		Tile* tile = action->game->map->getTile(pos);
+
+		if(tile){
+			ret = action->game->internalAddItem(tile, newItem);
+
+			if(ret != RET_NOERROR){
+				delete newItem;
+
+				lua_pushnumber(L, 0);
+				return 0;	
+			}
+
+			pos.stackpos = tile->getThingStackPos(newItem);
+		}
+	}
+
+	//action->game->addThing(NULL,(Position&)pos,newitem);
 	//Tile *tile = action->game->getTile(pos.x, pos.y, pos.z);
-	Tile *tile = action->game->map->getTile(pos);
-	if(tile){
-		pos.stackpos = tile->getThingStackPos(newitem);
+
+	/*if(tile){
+		pos.stackpos = tile->getThingByStackPos(newItem);
 	}
 	else{
 		pos.stackpos = 1;
-	}
+	}*/
 	
-	unsigned int uid = action->AddThingToMap((Thing*)newitem,pos);
+	unsigned int uid = action->AddThingToMap((Thing*)newItem, pos);
 	
 	lua_pushnumber(L, uid);
 	return 1;	

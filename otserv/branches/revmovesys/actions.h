@@ -226,7 +226,7 @@ protected:
 	static const char* internalGetString(lua_State *L);
 	static void internalAddThing(lua_State *L, const Thing *thing, const unsigned int thingid);
 	
-	static Position internalGetRealPosition(ActionScript *action, Player *player, const Position &pos);
+	//static Position internalGetRealPosition(ActionScript *action, Player *player, const Position &pos);
 	static int internalGetPlayerInfo(lua_State *L, ePlayerInfo info);
 	
 };

@@ -1256,16 +1256,16 @@ void Monster::doMoveTo(int dx, int dy)
 				if(countItems < 2){
 					if(!monsterMoveItem(blockItem, 3)){
 						//destroy it
-						if(game->removeThing(NULL, blockItem->getPosition(), blockItem)){
-							game->FreeThing(blockItem);
-						}
+						//if(game->removeThing(NULL, blockItem->getPosition(), blockItem)){
+						//	game->FreeThing(blockItem);
+						//}
 					}
 				}
 				else{
 					//destroy items directly
-					if(game->removeThing(NULL, blockItem->getPosition(), blockItem)){
-						game->FreeThing(blockItem);
-					}
+					//if(game->removeThing(NULL, blockItem->getPosition(), blockItem)){
+					//	game->FreeThing(blockItem);
+					//}
 				}
 				countItems++;
 			}

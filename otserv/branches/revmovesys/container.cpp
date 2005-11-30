@@ -146,7 +146,7 @@ bool Container::isHoldingItem(const Item* item) const
 }
 
 ReturnValue Container::__queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
-	uint32_t& maxQueryCount, bool isSameParent) const
+	uint32_t& maxQueryCount) const
 {
 	const Item* item = dynamic_cast<const Item*>(thing);
 	if(item == NULL){
@@ -217,13 +217,13 @@ ReturnValue Container::__queryRemove(const Thing* thing, uint32_t count) const
 	return RET_NOERROR;
 }
 
-Cylinder* Container::__queryDestination(int32_t& index, Thing** destThing)
+Cylinder* Container::__queryDestination(int32_t& index, const Thing* thing, Thing** destThing)
 {
 	*destThing = __getThing(index);
 	Cylinder* subCylinder = dynamic_cast<Cylinder*>(*destThing);
 
 	if(subCylinder){
-		index = -1;
+		index = 0;
 		*destThing = NULL;
 		return subCylinder;
 	}

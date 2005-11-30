@@ -235,8 +235,8 @@ public:
 	//virtual void onThingTransform(const Thing* thing,int stackpos) = 0;
 	//virtual void onCreatureAppear(const Creature *creature) { };
 
-	virtual void onThingAppear(const Thing* thing) = 0;
-	virtual void onThingDisappear(const Thing* thing, unsigned char stackPos) = 0;
+	//virtual void onThingAppear(const Thing* thing) = 0;
+	//virtual void onThingDisappear(const Thing* thing, unsigned char stackPos) = 0;
 	//old code
 
 	virtual void onCreatureAppear(const Creature* creature, bool isLogin) {};
