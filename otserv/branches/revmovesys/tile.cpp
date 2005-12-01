@@ -647,7 +647,7 @@ Cylinder* Tile::__queryDestination(int32_t& index, const Thing* thing, Thing** d
 			}                                      
 		}
 
-		while(destTile->floorChangeDown()){
+		if(destTile->floorChangeDown()){
 			destTile = g_game.getTile(getTilePosition().x, getTilePosition().y, getTilePosition().z + 1);
 
 			if(destTile == NULL){
@@ -666,7 +666,6 @@ Cylinder* Tile::__queryDestination(int32_t& index, const Thing* thing, Thing** d
 			else if(destTile->floorChange(SOUTH) && destTile->floorChange(WEST)){
 				destTile = g_game.getTile(getTilePosition().x + 2, getTilePosition().y - 2, getTilePosition().z + 1);
 			}
-
 			else if(destTile->floorChange(NORTH)){
 				destTile = g_game.getTile(getTilePosition().x, getTilePosition().y + 1, getTilePosition().z + 1);
 			}

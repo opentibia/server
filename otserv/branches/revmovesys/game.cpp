@@ -979,26 +979,14 @@ ReturnValue Game::internalCreatureMove(Creature* creature, Cylinder* fromCylinde
 
 	int32_t index = 0;
 	Thing* toThing = NULL;
-	Cylinder* subCylinder = toCylinder->__queryDestination(index, creature, &toThing);
-	if(subCylinder != toCylinder){
-		uint32_t oldStackPos = toCylinder->__getIndexOfThing(creature);
-
-		if(fromPos.z == 7 && subCylinder->getPosition().z >= 8){
-			//send change to client
-			for(it = list.begin(); it != list.end(); ++it) {
-				Player* spectator = dynamic_cast<Player*>(*it);
-				if(spectator){
-					spectator->onCreatureDisappear(creature, oldStackPos, false);
-				}
-			}
-		}
-
+	Cylinder* subCylinder = NULL;
+	while((subCylinder = toCylinder->__queryDestination(index, creature, &toThing)) != toCylinder){
 		//remove the creature
+		uint32_t oldStackPos = toCylinder->__getIndexOfThing(creature);
 		toCylinder->__removeThing(creature, 0);
 
 		//add the creature
 		subCylinder->__addThing(creature);
-		toPos = subCylinder->getPosition();
 
 		//send change to client
 		for(it = list.begin(); it != list.end(); ++it) {
@@ -1007,6 +995,9 @@ ReturnValue Game::internalCreatureMove(Creature* creature, Cylinder* fromCylinde
 				spectator->onCreatureMove(creature, toCylinder->getPosition(), oldStackPos);
 			}
 		}
+
+		toPos = subCylinder->getPosition();
+		toCylinder = subCylinder;
 	}
 
 	if(std::abs(fromPos.x - toPos.x) >= std::abs(fromPos.y - toPos.y)){
@@ -1265,7 +1256,7 @@ Item* Game::transformItem(Cylinder* cylinder, Item* item, uint16_t newtype, int3
 		return item;
 
 	if(Container* container = dynamic_cast<Container*>(item)){
-		if(Item::items[newtype].isContainer){
+		if(Item::items[newtype].isContainer()){
 
 			//container to container
 			item->setID(newtype);

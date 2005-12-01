@@ -152,19 +152,6 @@ private:
 	virtual void sendVIPLogOut(unsigned long guid);
 	virtual void sendVIP(unsigned long guid, const std::string &name, bool isOnline);
 	
-	//START, NEEDS REVISION
-	//ground to ground
-	//virtual void sendThingMove(const Creature *creature, const Thing *thing,
-	//	const Position *oldPos, unsigned char oldstackpos, unsigned char oldcount,
-	//	unsigned char count, bool tele = false);
-
-	//virtual void sendThingDisappear(const Thing *thing, unsigned char stackPos, bool tele = false);
-	//virtual void sendThingAppear(const Thing *thing);
-	//virtual void sendThingTransform(const Thing* thing,int stackpos);
-	//virtual void sendThingRemove(const Thing *thing);
-	//virtual void sendTileUpdated(const Position &Pos);
-	//END, NEEDS REVISION
-	
 	//tiles
 	virtual void sendAddTileItem(const Position& pos, const Item* item);
 	virtual void sendUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* item);
@@ -221,6 +208,11 @@ private:
 	void AddTileItem(NetworkMessage& msg, const Position& pos, const Item* item);
 	void UpdateTileItem(NetworkMessage& msg, const Position& pos, uint32_t stackpos, const Item* item);
 	void RemoveTileItem(NetworkMessage& msg, const Position& pos, uint32_t stackpos);
+
+	void MoveUpCreature(NetworkMessage& msg, const Creature* creature,
+		const Position& newPos, const Position& oldPos, uint32_t oldStackPos);
+	void MoveDownCreature(NetworkMessage& msg, const Creature* creature,
+		const Position& newPos, const Position& oldPos, uint32_t oldStackPos);
 
 	//container
 	void AddContainerItem(NetworkMessage& msg, uint8_t cid, const Item *item);
