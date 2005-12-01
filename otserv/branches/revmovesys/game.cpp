@@ -1067,7 +1067,7 @@ void Game::moveItem(Player* player, Cylinder* fromCylinder, Cylinder* toCylinder
 
 	if(ret != RET_NOERROR){
 		//player->sendCancel("You cannot put that object in that place.");
-		//playerSendErrorMessage(ret)
+		playerSendErrorMessage(player, ret);
 	}
 }
 
@@ -1235,7 +1235,7 @@ void Game::removeItem(Player* player, Cylinder* fromCylinder, Item* item)
 	ReturnValue ret = internalRemoveItem(fromCylinder, item);
 
 	if(ret != RET_NOERROR){
-		//playerSendErrorMessage(ret)
+		playerSendErrorMessage(player, ret);
 	}
 }
 
@@ -1303,6 +1303,60 @@ Item* Game::transformItem(Cylinder* cylinder, Item* item, uint16_t newtype, int3
 	}
 
 	return NULL;
+}
+
+void Game::playerSendErrorMessage(Player* player, ReturnValue message)
+{
+	switch(message){
+		case RET_DESTINATIONOUTOFREACH:
+			player->sendCancel("Destination is out of reach.");
+			break;
+
+		case RET_NOTMOVEABLE:
+			player->sendCancel("You cannot move this item.");
+			break;
+
+		case RET_DROPTWOHANDEDITEM:
+			player->sendCancel("First remove the two-handed item.");
+			break;
+
+		case RET_CANNOTBEDRESSED:
+			player->sendCancel("This item cannot be dressed.");
+			break;
+
+		case RET_TOFARAWAY:
+			player->sendCancel("To far away.");
+			break;
+
+		case RET_FIRSTGODOWNSTAIRS:
+			player->sendCancel("First go downstairs.");
+			break;
+
+		case RET_FIRSTGOUPSTAIRS:
+			player->sendCancel("First go upstairs.");
+			break;
+
+		case RET_NOTENOUGHCAPACITY:
+			player->sendCancel("This object is to heavy.");
+			break;
+		
+		case RET_NOTENOUGHROOM:
+			player->sendCancel("There is not enough room.");
+			break;
+
+		case RET_CANNOTTHROW:
+			player->sendCancel("You cannot throw there.");
+			break;
+
+		case RET_THEREISNOWAY:
+			player->sendCancel("There is no way.");
+			break;
+		
+		case RET_NOTPOSSIBLE:
+		default:
+			player->sendCancel("Sorry, not possible.");
+			break;
+	}
 }
 
 /*

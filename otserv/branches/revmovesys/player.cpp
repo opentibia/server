@@ -1938,45 +1938,44 @@ ReturnValue Player::__queryAdd(uint32_t index, const Thing* thing, uint32_t coun
 		return RET_NOTPOSSIBLE;
 	}
 
-	if(items[index] != NULL){
-		if(!items[index]->isStackable() || items[index]->getID() != item->getID()){
-			return RET_INVENTORYALREADYEQUIPPED;
-		}
-	}
+	ReturnValue ret = RET_CANNOTBEDRESSED;
 
 	switch(index){
 		case SLOT_HEAD:
 			if(item->getSlotPosition() & SLOTP_HEAD)
-				return RET_NOERROR;
+				ret = RET_NOERROR;
 			break;
 		case SLOT_NECKLACE:
 			if(item->getSlotPosition() & SLOTP_NECKLACE)
-				return RET_NOERROR;
+				ret = RET_NOERROR;
 			break;
 		case SLOT_BACKPACK:
 			if(item->getSlotPosition() & SLOTP_BACKPACK)
-				return RET_NOERROR;
+				ret = RET_NOERROR;
 			break;
 		case SLOT_ARMOR:
 			if(item->getSlotPosition() & SLOTP_ARMOR)
-				return RET_NOERROR;
+				ret = RET_NOERROR;
 			break;
 		case SLOT_RIGHT:
 			if(item->getSlotPosition() & SLOTP_RIGHT){
 				if(item->getSlotPosition() & SLOTP_TWO_HAND){
 					if(items[SLOT_LEFT] != NULL){
-						return RET_DROPTWOHANDEDITEM;
+						ret = RET_DROPTWOHANDEDITEM;
 					}
-					return RET_NOERROR;
+					else
+					ret = RET_NOERROR;
 				}
 				else{
 					if(items[SLOT_LEFT]){
 						if(items[SLOT_LEFT]->getSlotPosition() & SLOTP_TWO_HAND){
-							return RET_DROPTWOHANDEDITEM;
+							ret = RET_DROPTWOHANDEDITEM;
 						}
-						return RET_NOERROR;
+						else
+							ret = RET_NOERROR;
 					}
-					return RET_NOERROR;
+					else
+						ret = RET_NOERROR;
 				}
 			}
 			break;
@@ -1984,44 +1983,69 @@ ReturnValue Player::__queryAdd(uint32_t index, const Thing* thing, uint32_t coun
 			if(item->getSlotPosition() & SLOTP_LEFT){
 				if(item->getSlotPosition() & SLOTP_TWO_HAND){
 					if(items[SLOT_RIGHT] != NULL){
-						return RET_DROPTWOHANDEDITEM;
+						ret = RET_DROPTWOHANDEDITEM;
 					}
-					return RET_NOERROR;
+					else
+						ret = RET_NOERROR;
 				}
 				else{
 					if(items[SLOT_RIGHT]){
 						if(items[SLOT_RIGHT]->getSlotPosition() & SLOTP_TWO_HAND){
-							return RET_DROPTWOHANDEDITEM;
+							ret = RET_DROPTWOHANDEDITEM;
 						}
-						return RET_NOERROR;
+						else
+							ret = RET_NOERROR;
 					}
-					return RET_NOERROR;
+					else
+						ret = RET_NOERROR;
 				}
 			}
 			break;
 		case SLOT_LEGS:
 			if(item->getSlotPosition() & SLOTP_LEGS)
-				return RET_NOERROR;
+				ret = RET_NOERROR;
 			break;
 		case SLOT_FEET:
 			if(item->getSlotPosition() & SLOTP_FEET)
-				return RET_NOERROR;
+				ret = RET_NOERROR;
 			break;
 		case SLOT_RING:
 			if(item->getSlotPosition() & SLOTP_RING)
-				return RET_NOERROR;
+				ret = RET_NOERROR;
 			break;
 		case SLOT_AMMO:
 			if(item->getSlotPosition() & SLOTP_AMMO)
-				return RET_NOERROR;
+				ret = RET_NOERROR;
 			break;
 		case SLOT_WHEREEVER:
-			return RET_NOTENOUGHROOM;
+			ret = RET_NOTENOUGHROOM;
 			break;
 	}
 
-	//player->sendCancel("You cannot put that object in that place.");
-	return RET_CANNOTBEDRESSED;
+	if(items[index] != NULL){
+		if(!items[index]->isStackable() || items[index]->getID() != item->getID()){
+			ret = RET_INVENTORYALREADYEQUIPPED;
+		}
+	}
+
+	if(ret == RET_NOERROR){
+		//check if enough capacity
+		if(access == 0 && item->getTopParent() != this){
+			double itemWeight = 0;
+
+			if(item->isStackable()){
+				itemWeight = Item::items[item->getID()].weight * count;
+			}
+			else
+				itemWeight = item->getWeight();
+
+			if(getFreeCapacity() < itemWeight){
+				ret = RET_NOTENOUGHCAPACITY;
+			}
+		}
+	}
+
+	return ret;
 }
 
 ReturnValue Player::__queryRemove(const Thing* thing, uint32_t count) const

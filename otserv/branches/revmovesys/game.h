@@ -194,6 +194,8 @@ public:
 
 	Item* transformItem(Cylinder* cylinder, Item* item, uint16_t newtype, int32_t count /*= -1*/);
 
+	void playerSendErrorMessage(Player* player, ReturnValue message);
+
 	/**
 		* Creature wants to turn.
 		* \param creature Creature pointer

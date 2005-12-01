@@ -7,9 +7,6 @@ Thing::Thing()
 {
 	parent = NULL;
 	useCount = 0;
-
-  //throwRange = 1;
-  //isRemoved = true;
 }
 
 
@@ -36,9 +33,9 @@ Cylinder* Thing::getTopParent()
 	if(getParent() == NULL)
 		return dynamic_cast<Cylinder*>(this);
 
-	Cylinder* aux = this->getParent();
+	Cylinder* aux = getParent();
 
-	while(aux->getParent() != NULL){
+	while(aux->getParent() != NULL && aux->getParent()->getParent() != NULL){
 		aux = aux->getParent();
 	}
 
@@ -52,7 +49,7 @@ const Cylinder* Thing::getTopParent() const
 
 	const Cylinder* aux = this->getParent();
 
-	while(aux->getParent() != NULL){
+	while(aux->getParent() != NULL && aux->getParent()->getParent() != NULL){
 		aux = aux->getParent();
 	}
 
@@ -62,27 +59,26 @@ const Cylinder* Thing::getTopParent() const
 Tile* Thing::getTile()
 {
 	Cylinder* cylinder = getTopParent();
+
+	//get root cylinder
+	if(cylinder->getParent())
+		cylinder = cylinder->getParent();
+
 	return dynamic_cast<Tile*>(cylinder);
-	//return NULL;
 }
 
 const Tile* Thing::getTile() const
 {
 	const Cylinder* cylinder = getTopParent();
+
+	//get root cylinder
+	if(cylinder->getParent())
+		cylinder = cylinder->getParent();
+
 	return dynamic_cast<const Tile*>(cylinder);
 }
 
 const Position& Thing::getPosition() const
 {
-	return getTile()->getTilePosition(); //getPosition();
+	return getTile()->getTilePosition();
 }
-
-/*
-bool Thing::canMovedTo(const Tile *tile) const
-{
-	return false;
-  //return !tile->isBlocking();
-}
-*/
-
-

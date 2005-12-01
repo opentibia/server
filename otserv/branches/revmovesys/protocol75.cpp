@@ -2425,23 +2425,29 @@ void Protocol75::sendCreatureHealth(const Creature *creature)
 //tile
 void Protocol75::sendAddTileItem(const Position& pos, const Item* item)
 {
-	NetworkMessage msg;
-	AddTileItem(msg, pos, item);
-	WriteBuffer(msg);
+	if(CanSee(pos)){
+		NetworkMessage msg;
+		AddTileItem(msg, pos, item);
+		WriteBuffer(msg);
+	}
 }
 
 void Protocol75::sendUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* item)
 {
-	NetworkMessage msg;
-	UpdateTileItem(msg, pos, stackpos, item);
-	WriteBuffer(msg);
+	if(CanSee(pos)){
+		NetworkMessage msg;
+		UpdateTileItem(msg, pos, stackpos, item);
+		WriteBuffer(msg);
+	}
 }
 
 void Protocol75::sendRemoveTileItem(const Position& pos, uint32_t stackpos)
 {
-	NetworkMessage msg;
-	RemoveTileItem(msg, pos, stackpos);
-	WriteBuffer(msg);
+	if(CanSee(pos)){
+		NetworkMessage msg;
+		RemoveTileItem(msg, pos, stackpos);
+		WriteBuffer(msg);
+	}
 }
 
 void Protocol75::sendAddCreature(const Creature* creature, bool isLogin)
@@ -2558,6 +2564,11 @@ void Protocol75::sendMoveCreature(const Creature* creature, const Position& oldP
 	if(creature == player){
 		NetworkMessage msg;
 
+		//if(!CanSee(oldPos)){
+		//	//sendRemoveCreature(creature, oldStackPos, false);
+		//	RemoveTileItem(msg, oldPos, oldStackPos);
+		//}
+
 		msg.AddByte(0x6D);
 		msg.AddPosition(oldPos);
 		msg.AddByte(oldStackPos);
@@ -2602,7 +2613,6 @@ void Protocol75::sendMoveCreature(const Creature* creature, const Position& oldP
 			//south
 			msg.AddByte(0x67);
 			GetMapDescription(oldPos.x - 8, oldPos.y + 7, myPos.z, 18, 1, msg);
-			//GetMapDescription(oldPos.x - 8, myPos.y + 7, myPos.z, 18, 1, msg);
 		}
 		//floor change up
 		else if(myPos.z < oldPos.z){
@@ -2973,34 +2983,27 @@ void Protocol75::AddAppearThing(NetworkMessage &msg, const Position &pos)
 //tile
 void Protocol75::AddTileItem(NetworkMessage& msg, const Position& pos, const Item* item)
 {
-	if(CanSee(pos.x, pos.y, pos.z)){		
-		msg.AddByte(0x6A);
-		msg.AddPosition(pos);	
-	}
-	
+	msg.AddByte(0x6A);
+	msg.AddPosition(pos);	
 	msg.AddItem(item);
 }
 
 void Protocol75::UpdateTileItem(NetworkMessage& msg, const Position& pos, uint32_t stackpos, const Item* item)
 {
 	if(stackpos < 10){
-		if(CanSee(pos.x, pos.y, pos.z)){
-			msg.AddByte(0x6B);
-			msg.AddPosition(pos);
-			msg.AddByte(stackpos);
-			msg.AddItem(item);
-		}
+		msg.AddByte(0x6B);
+		msg.AddPosition(pos);
+		msg.AddByte(stackpos);
+		msg.AddItem(item);
 	}
 }
 
 void Protocol75::RemoveTileItem(NetworkMessage& msg, const Position& pos, uint32_t stackpos)
 {
 	if(stackpos < 10){
-		if(CanSee(pos.x, pos.y, pos.z)){
-			msg.AddByte(0x6C);
-			msg.AddPosition(pos);
-			msg.AddByte(stackpos);
-		}
+		msg.AddByte(0x6C);
+		msg.AddPosition(pos);
+		msg.AddByte(stackpos);
 	}
 }
 
