@@ -983,6 +983,16 @@ ReturnValue Game::internalCreatureMove(Creature* creature, Cylinder* fromCylinde
 	if(subCylinder != toCylinder){
 		uint32_t oldStackPos = toCylinder->__getIndexOfThing(creature);
 
+		if(fromPos.z == 7 && subCylinder->getPosition().z >= 8){
+			//send change to client
+			for(it = list.begin(); it != list.end(); ++it) {
+				Player* spectator = dynamic_cast<Player*>(*it);
+				if(spectator){
+					spectator->onCreatureDisappear(creature, oldStackPos, false);
+				}
+			}
+		}
+
 		//remove the creature
 		toCylinder->__removeThing(creature, 0);
 
@@ -1010,7 +1020,7 @@ ReturnValue Game::internalCreatureMove(Creature* creature, Cylinder* fromCylinde
 	else if(toPos.y > fromPos.y)
 		creature->setDirection(SOUTH);
 
-	return RET_NOTPOSSIBLE;
+	return RET_NOERROR;
 }
 
 void Game::moveItem(Player* player, Cylinder* fromCylinder, Cylinder* toCylinder, int32_t index,
@@ -1058,7 +1068,6 @@ void Game::moveItem(Player* player, Cylinder* fromCylinder, Cylinder* toCylinder
 	if(ret != RET_NOERROR){
 		//player->sendCancel("You cannot put that object in that place.");
 		//playerSendErrorMessage(ret)
-		//player->sendCancelWalk();
 	}
 }
 
@@ -1168,7 +1177,6 @@ void Game::addItem(Player* player, Cylinder* toCylinder, Item* item)
 ReturnValue Game::internalAddItem(Cylinder* toCylinder, Item* item, bool test /*= false*/)
 {
 	if(toCylinder == NULL || item == NULL){
-		//creature->sendCancel("Sorry, not possible.");
 		return RET_NOTPOSSIBLE;
 	}
 
@@ -1225,12 +1233,76 @@ void Game::removeItem(Player* player, Cylinder* fromCylinder, Item* item)
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::removeItem()");
 
 	ReturnValue ret = internalRemoveItem(fromCylinder, item);
+
+	if(ret != RET_NOERROR){
+		//playerSendErrorMessage(ret)
+	}
 }
 
 ReturnValue Game::internalRemoveItem(Cylinder* fromCylinder, Item* item,  bool test /*= false*/)
 {
-	//FreeThing(item);
+	//check if we can remove this item
+	uint32_t count = 0;
+	if(item->isStackable()){
+		count = item->getItemCountOrSubtype();
+	}
+
+	ReturnValue ret = fromCylinder->__queryRemove(item, count);
+	if(ret != RET_NOERROR){
+		return ret;
+	}
+
+	//remove the item
+	fromCylinder->__removeThing(item, count);
+
+	FreeThing(item);
 	return RET_NOTPOSSIBLE;
+}
+
+Item* Game::transformItem(Cylinder* cylinder, Item* item, uint16_t newtype, int32_t count /*= -1*/)
+{
+	if(item->getID() == newtype && count == -1)
+		return item;
+
+	if(Container* container = dynamic_cast<Container*>(item)){
+		if(Item::items[newtype].isContainer){
+
+			//container to container
+			item->setID(newtype);
+			cylinder->__updateThing(item, 0);
+
+			//close-trade
+		}
+		//container to none-container
+		else{
+			Item* newItem = Item::CreateItem(newtype, (count == -1 ? 0 : count));
+
+			uint32_t index = cylinder->__getIndexOfThing(item);
+			if(index == -1){
+				return item;
+			}
+
+			cylinder->__updateThing(index, newItem);
+
+			//close-trade
+			//close container
+
+			item->setParent(NULL);
+			FreeThing(item);
+
+			return newItem;
+		}
+	}
+	else{
+		if(item->getID() != newtype){
+			item->setID(newtype);
+		}
+
+		cylinder->__updateThing(item, (count == -1 ? 0 : count));
+		return item;
+	}
+
+	return NULL;
 }
 
 /*

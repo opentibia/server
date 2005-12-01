@@ -316,7 +316,6 @@ ReturnValue Container::__updateThing(uint32_t index, Thing* thing)
 	itemlist.insert(cit, item);
 	item->setParent(this);
 
-	(*cit)->releaseThing2(); //<- should release the memory?
 	(*cit)->setParent(NULL);
 	itemlist.erase(cit);
 

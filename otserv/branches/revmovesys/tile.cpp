@@ -713,18 +713,63 @@ ReturnValue Tile::__addThing(uint32_t index, Thing* thing)
 		g_game.getSpectators(Range(cylinderMapPos, true), list);
 
     if(item->isGroundTile()){
-      ground = item;
+			if(ground == NULL){
+				//send to client
+				for(it = list.begin(); it != list.end(); ++it) {
+					Player* spectator = dynamic_cast<Player*>(*it);
+					if(spectator){
+						spectator->sendAddTileItem(cylinderMapPos, item);
+					}
+				}
+			}
+			else{
+				uint32_t index = __getIndexOfThing(ground);
+
+				//send to client
+				for(it = list.begin(); it != list.end(); ++it) {
+					Player* spectator = dynamic_cast<Player*>(*it);
+					if(spectator){
+						spectator->sendUpdateTileItem(cylinderMapPos, index, item);
+					}
+				}
+			}
+
+			ground = item;
     }
     else if(item->isSplash()){
 			if(splash == NULL){
-				splash = item;
+				//send to client
+				for(it = list.begin(); it != list.end(); ++it) {
+					Player* spectator = dynamic_cast<Player*>(*it);
+					if(spectator){
+						spectator->sendAddTileItem(cylinderMapPos, item);
+					}
+				}
 			}
 			else{
-				//
+				uint32_t index = __getIndexOfThing(splash);
+
+				//send to client
+				for(it = list.begin(); it != list.end(); ++it) {
+					Player* spectator = dynamic_cast<Player*>(*it);
+					if(spectator){
+						spectator->sendUpdateTileItem(cylinderMapPos, index, item);
+					}
+				}
 			}
+
+			splash = item;
 		}
 		else if(item->isAlwaysOnTop()){
 			topItems.insert(topItems.begin(), item);
+
+			//send to client
+			for(it = list.begin(); it != list.end(); ++it) {
+				Player* spectator = dynamic_cast<Player*>(*it);
+				if(spectator){
+					spectator->sendAddTileItem(cylinderMapPos, item);
+				}
+			}
 		}
 		else{
 			downItems.insert(downItems.begin(), item);
@@ -780,6 +825,69 @@ ReturnValue Tile::__updateThing(Thing* thing, uint32_t count)
 
 ReturnValue Tile::__updateThing(uint32_t index, Thing* thing)
 {
+	int32_t pos = index;
+
+	Item* item = dynamic_cast<Item*>(thing);
+	if(item == NULL){
+		return RET_NOTPOSSIBLE;
+	}
+
+	if(pos == 0 && ground){
+		ground = item;
+	}
+
+  --pos;
+	
+	if(pos == 0 && splash){
+		splash = item;
+	}
+
+	--pos;
+
+	if(pos >= 0 && pos < topItems.size()){
+		ItemVector::iterator it = topItems.begin();
+		it += pos;
+		pos = 0;
+
+		topItems.insert(it, item);
+		topItems.erase(it);
+	}
+
+	pos -= (uint32_t)topItems.size();
+
+	if(pos >= 0 && pos < creatures.size()){
+		return RET_NOTPOSSIBLE;
+	}
+
+  pos -= (uint32_t)creatures.size();
+
+	if(pos >= 0 && pos < downItems.size()){
+		ItemVector::iterator it = downItems.begin();
+		it += pos;
+		pos = 0;
+
+		downItems.insert(it, item);
+		topItems.erase(it);
+	}
+
+	if(pos == 0){
+		const Position& cylinderMapPos = getPosition();
+
+		SpectatorVec list;
+		SpectatorVec::iterator it;
+		g_game.getSpectators(Range(cylinderMapPos, true), list);
+
+		//send to client
+		for(it = list.begin(); it != list.end(); ++it) {
+			Player* spectator = dynamic_cast<Player*>(*it);
+			if(spectator){
+				spectator->sendUpdateTileItem(cylinderMapPos, index, item);
+			}
+		}
+
+		return RET_NOERROR;
+	}
+
 	return RET_NOTPOSSIBLE;
 }
 
@@ -814,8 +922,33 @@ ReturnValue Tile::__removeThing(Thing* thing, uint32_t count)
 		SpectatorVec::iterator it;
 		g_game.getSpectators(Range(cylinderMapPos, true), list);
 
+		if(item == ground){
+			ground->setParent(NULL);
+			ground = NULL;
+
+			//send to client
+			for(it = list.begin(); it != list.end(); ++it) {
+				Player* spectator = dynamic_cast<Player*>(*it);
+				if(spectator){
+					spectator->sendRemoveTileItem(cylinderMapPos, index);
+				}
+			}
+
+			return RET_NOERROR;
+		}
+
 		if(item == splash){
+			splash->setParent(NULL);
 			splash = NULL;
+
+			//send to client
+			for(it = list.begin(); it != list.end(); ++it) {
+				Player* spectator = dynamic_cast<Player*>(*it);
+				if(spectator){
+					spectator->sendRemoveTileItem(cylinderMapPos, index);
+				}
+			}
+
 			return RET_NOERROR;
 		}
 

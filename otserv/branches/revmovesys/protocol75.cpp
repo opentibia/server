@@ -2555,7 +2555,7 @@ void Protocol75::sendRemoveCreature(const Creature* creature, uint32_t stackpos,
 
 void Protocol75::sendMoveCreature(const Creature* creature, const Position& oldPos, uint32_t oldStackPos)
 {
-	if(CanSee(oldPos) && CanSee(creature->getPosition())){
+	if(creature == player){
 		NetworkMessage msg;
 
 		msg.AddByte(0x6D);
@@ -2563,104 +2563,115 @@ void Protocol75::sendMoveCreature(const Creature* creature, const Position& oldP
 		msg.AddByte(oldStackPos);
 		msg.AddPosition(creature->getPosition());
 
-		if(creature == player){
-			const Position& myPos = creature->getPosition();
+		const Position& myPos = creature->getPosition();
 
-			//floor change down
-			if(myPos.z > oldPos.z){
-				msg.AddByte(0xBF);
+		//floor change down
+		if(myPos.z > oldPos.z){
+			msg.AddByte(0xBF);
 
-				//going from surface to underground
-				if(myPos.z == 8){
-					int skip = -1;
-					GetFloorDescription(msg, myPos.x - 8, myPos.y - 6, myPos.z, 18, 14, -1, skip);
-					GetFloorDescription(msg, myPos.x - 8, myPos.y - 6, myPos.z + 1, 18, 14, -2, skip);
-					GetFloorDescription(msg, myPos.x - 8, myPos.y - 6, myPos.z + 2, 18, 14, -3, skip);
+			//going from surface to underground
+			if(myPos.z == 8){
+				int skip = -1;
 
-					if(skip >= 0){
-						msg.AddByte(skip);
-						msg.AddByte(0xFF);
-					}
+				GetFloorDescription(msg, oldPos.x - 8, oldPos.y - 6, myPos.z, 18, 14, -1, skip);
+				GetFloorDescription(msg, oldPos.x - 8, oldPos.y - 6, myPos.z + 1, 18, 14, -2, skip);
+				GetFloorDescription(msg, oldPos.x - 8, oldPos.y - 6, myPos.z + 2, 18, 14, -3, skip);
+
+				if(skip >= 0){
+					msg.AddByte(skip);
+					msg.AddByte(0xFF);
 				}
-				//going further down
-				else if(myPos.z > oldPos.z && myPos.z > 8 && myPos.z < 14){
-					int skip = -1;
-					GetFloorDescription(msg, myPos.x - 8, myPos.y - 6, myPos.z + 2, 18, 14, -3, skip);
+			}
+			//going further down
+			else if(myPos.z > oldPos.z && myPos.z > 8 && myPos.z < 14){
+				int skip = -1;
+				GetFloorDescription(msg, oldPos.x - 8, oldPos.y - 6, myPos.z + 2, 18, 14, -3, skip);
 
-					if(skip >= 0){
-						msg.AddByte(skip);
-						msg.AddByte(0xFF);
-					}
+				if(skip >= 0){
+					msg.AddByte(skip);
+					msg.AddByte(0xFF);
 				}
-
-				//moving to a floor down makes us out of sync
-				//east
-				msg.AddByte(0x66);
-				GetMapDescription(oldPos.x  + 9, oldPos.y - 7, myPos.z, 1, 14, msg);
-
-				//south
-				msg.AddByte(0x67);
-				GetMapDescription(oldPos.x - 8, oldPos.y + 8, myPos.z, 18, 1, msg);
-			}
-			//floor change up
-			else if(myPos.z < oldPos.z){
-				msg.AddByte(0xBE);
-
-				//going to surface
-				if(myPos.z == 7){
-					int skip = -1;
-					GetFloorDescription(msg, myPos.x - 8, myPos.y - 6, 5, 18, 14, 3, skip); //(floor 7 and 6 already set)
-					GetFloorDescription(msg, myPos.x - 8, myPos.y - 6, 4, 18, 14, 4, skip);
-					GetFloorDescription(msg, myPos.x - 8, myPos.y - 6, 3, 18, 14, 5, skip);
-					GetFloorDescription(msg, myPos.x - 8, myPos.y - 6, 2, 18, 14, 6, skip);
-					GetFloorDescription(msg, myPos.x - 8, myPos.y - 6, 1, 18, 14, 7, skip);
-					GetFloorDescription(msg, myPos.x - 8, myPos.y - 6, 0, 18, 14, 8, skip);
-
-					if(skip >= 0){
-						msg.AddByte(skip);
-						msg.AddByte(0xFF);
-					}
-				}
-				//underground, going one floor up (still underground)
-				else if(myPos.z > 7){
-					int skip = -1;
-					GetFloorDescription(msg, myPos.x - 8, myPos.y - 6, myPos.z - 2, 18, 14, 3, skip);
-
-					if(skip >= 0){
-						msg.AddByte(skip);
-						msg.AddByte(0xFF);
-					}
-				}
-
-
-				//moving to a floor up makes us out of sync
-				//west
-				msg.AddByte(0x68);
-				GetMapDescription(myPos.x - 7, myPos.y - 6, myPos.z, 1, 14, msg);
-
-				//north
-				msg.AddByte(0x65);
-				GetMapDescription(myPos.x - 7, myPos.y - 7, myPos.z, 18, 1, msg);
-			}
-			
-			if(oldPos.y > myPos.y){ // north, for old x
-				msg.AddByte(0x65);
-				GetMapDescription(myPos.x - 8, myPos.y - 6, myPos.z, 18, 1, msg);
-			}
-			else if(oldPos.y < myPos.y){ // south, for old x
-				msg.AddByte(0x67);
-				GetMapDescription(myPos.x - 8, myPos.y + 7, myPos.z, 18, 1, msg);
 			}
 
-			if(oldPos.x < myPos.x){ // east, [with new y]
-				msg.AddByte(0x66);
-				GetMapDescription(myPos.x + 9, myPos.y - 6, myPos.z, 1, 14, msg);
-			}
-			else if(oldPos.x > myPos.x){ // west, [with new y]
-				msg.AddByte(0x68);
-				GetMapDescription(myPos.x - 8, myPos.y - 6, myPos.z, 1, 14, msg);
-			}
+			//moving down a floor makes us out of sync
+
+			//east
+			msg.AddByte(0x66);
+			GetMapDescription(oldPos.x + 9, oldPos.y - 1 - 6, myPos.z, 1, 14, msg);
+
+			//south
+			msg.AddByte(0x67);
+			GetMapDescription(oldPos.x - 8, oldPos.y + 7, myPos.z, 18, 1, msg);
+			//GetMapDescription(oldPos.x - 8, myPos.y + 7, myPos.z, 18, 1, msg);
 		}
+		//floor change up
+		else if(myPos.z < oldPos.z){
+			msg.AddByte(0xBE);
+
+			//going to surface
+			if(myPos.z == 7){
+				int skip = -1;
+				GetFloorDescription(msg, oldPos.x - 8, oldPos.y - 6, 5, 18, 14, 3, skip); //(floor 7 and 6 already set)
+				GetFloorDescription(msg, oldPos.x - 8, oldPos.y - 6, 4, 18, 14, 4, skip);
+				GetFloorDescription(msg, oldPos.x - 8, oldPos.y - 6, 3, 18, 14, 5, skip);
+				GetFloorDescription(msg, oldPos.x - 8, oldPos.y - 6, 2, 18, 14, 6, skip);
+				GetFloorDescription(msg, oldPos.x - 8, oldPos.y - 6, 1, 18, 14, 7, skip);
+				GetFloorDescription(msg, oldPos.x - 8, oldPos.y - 6, 0, 18, 14, 8, skip);
+
+				if(skip >= 0){
+					msg.AddByte(skip);
+					msg.AddByte(0xFF);
+				}
+			}
+			//underground, going one floor up (still underground)
+			else if(myPos.z > 7){
+				int skip = -1;
+				GetFloorDescription(msg, oldPos.x - 8, oldPos.y - 6, oldPos.z - 2, 18, 14, 3, skip);
+
+				if(skip >= 0){
+					msg.AddByte(skip);
+					msg.AddByte(0xFF);
+				}
+			}
+
+			//moving up a floor up makes us out of sync
+
+			//west
+			msg.AddByte(0x68);
+			GetMapDescription(oldPos.x - 8, oldPos.y + 1 - 6, myPos.z, 1, 14, msg);
+
+			//north
+			msg.AddByte(0x65);
+			GetMapDescription(oldPos.x - 8, oldPos.y - 6, myPos.z, 18, 1, msg);
+		}
+
+		if(oldPos.y > myPos.y){ // north, for old x
+			msg.AddByte(0x65);
+			GetMapDescription(oldPos.x - 8, myPos.y - 6, myPos.z, 18, 1, msg);
+		}
+		else if(oldPos.y < myPos.y){ // south, for old x
+			msg.AddByte(0x67);
+			GetMapDescription(oldPos.x - 8, myPos.y + 7, myPos.z, 18, 1, msg);
+		}
+
+		if(oldPos.x < myPos.x){ // east, [with new y]
+			msg.AddByte(0x66);
+			GetMapDescription(myPos.x + 9, myPos.y - 6, myPos.z, 1, 14, msg);
+		}
+		else if(oldPos.x > myPos.x){ // west, [with new y]
+			msg.AddByte(0x68);
+			GetMapDescription(myPos.x - 8, myPos.y - 6, myPos.z, 1, 14, msg);
+		}
+		
+		WriteBuffer(msg);
+	}
+	else if(CanSee(oldPos) && CanSee(creature->getPosition())){
+		NetworkMessage msg;
+
+		msg.AddByte(0x6D);
+		msg.AddPosition(oldPos);
+		msg.AddByte(oldStackPos);
+		msg.AddPosition(creature->getPosition());
 	
 		WriteBuffer(msg);
 	}

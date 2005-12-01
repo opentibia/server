@@ -192,18 +192,7 @@ public:
 	void removeItem(Player* player, Cylinder* fromCylinder, Item* item);
 	ReturnValue internalRemoveItem(Cylinder* fromCylinder, Item* item,  bool test = false);
 
-	/*
-	//OLD CODE
-	void thingMove(Creature *creature, Thing *thing,
-			unsigned short to_x, unsigned short to_y, unsigned char to_z, unsigned char count);
-	
-	//ground to ground
-	void thingMove(Creature *creature,
-			unsigned short from_x, unsigned short from_y, unsigned char from_z,
-			unsigned char stackPos,unsigned short itemid,
-			unsigned short to_x, unsigned short to_y, unsigned char to_z, unsigned char count);
-	//OLD CODE
-	*/
+	Item* transformItem(Cylinder* cylinder, Item* item, uint16_t newtype, int32_t count /*= -1*/);
 
 	/**
 		* Creature wants to turn.
@@ -263,17 +252,6 @@ public:
   
   std::vector<Thing*> ToReleaseThings;   
   void FreeThing(Thing* thing);
-
-  //old code
-	//Thing* getThing(const Position &pos,unsigned char stack,Player* player = NULL);
-  //void addThing(Player* player,const Position &pos,Thing* thing);
-  //bool removeThing(Player* player,const Position &pos,Thing* thing, bool setRemoved = true);
-  //Position getThingMapPos(Player *player, const Position &pos);
-  
-  //void sendAddThing(Player* player,const Position &pos,const Thing* thing);
-  //void sendRemoveThing(Player* player,const Position &pos,const Thing* thing,const unsigned char stackpos = 1,const bool autoclose = false);
-  //void sendUpdateThing(Player* player,const Position &pos,const Thing* thing,const unsigned char stackpos = 1);
-	//old code
 		
 	Creature* getCreatureByID(unsigned long id);
 	Player* getPlayerByID(unsigned long id);
@@ -296,68 +274,6 @@ protected:
 	std::map<Item*, unsigned long> tradeItems; //list of items that are in trading state, mapped to the player
 	
 	AutoList<Creature> listCreature;
-
-	/*
-	//ground -> ground
-	bool onPrepareMoveThing(Creature *player, const Thing* thing,
-		const Position& fromPos, const Position& toPos, int count);
-
-	//ground -> ground
-	bool onPrepareMoveThing(Creature *creature, const Thing* thing,
-		const Tile *fromTile, const Tile *toTile, int count);
-
-	//inventory -> container
-	bool onPrepareMoveThing(Player *player, const Item* fromItem, slots_t fromSlot,
-		const Container *toContainer, const Item *toItem, int count);
-
-	//container -> container
-	bool onPrepareMoveThing(Player* player, const Position& fromPos, const Container* fromContainer,
-		const Item* fromItem, const Position& toPos, const Container* toContainer, const Item* toItem,
-		int count);
-
-	//ground -> ground
-	bool onPrepareMoveCreature(Creature *creature, const Creature* creatureMoving,
-		const Tile *fromTile, const Tile *toTile);
-
-	//ground -> inventory
-	bool onPrepareMoveThing(Player *player, const Position& fromPos, const Item *item,
-		slots_t toSlot, int count);
-
-	//inventory -> inventory
-	bool onPrepareMoveThing(Player *player, slots_t fromSlot, const Item *fromItem,
-		slots_t toSlot, const Item *toItem, int count);
-
-	//container -> inventory
-	bool onPrepareMoveThing(Player *player, const Container *fromContainer, const Item *fromItem,
-		slots_t toSlot, const Item *toItem, int count);
-
-	//->inventory
-	bool onPrepareMoveThing(Player *player, const Item *item, slots_t toSlot, int count);
-
-	//container/inventory to container/inventory
-	void thingMoveInternal(Player *player,
-			unsigned char from_cid, unsigned char from_slotid, unsigned short itemid, 
-			bool fromInventory,unsigned char to_cid, unsigned char to_slotid, 
-			bool toInventory,unsigned char count);
-
-	//container/inventory to ground
-	void thingMoveInternal(Player *player,
-			unsigned char from_cid, unsigned char from_slotid, unsigned short itemid,
-			bool fromInventory,const Position& toPos, unsigned char count);
-
-	//ground to container/inventory
-	void thingMoveInternal(Player *player,
-			const Position& fromPos, unsigned char stackPos,unsigned short itemid,
-			unsigned char to_cid, unsigned char to_slotid,
-			bool toInventory, unsigned char count);
-
-	// use this internal function to move things around to avoid the need of
-  // recursive locks
-  void thingMoveInternal(Creature *player,
-      unsigned short from_x, unsigned short from_y, unsigned char from_z,
-      unsigned char stackPos,unsigned short itemid,
-			unsigned short to_x, unsigned short to_y, unsigned char to_z, unsigned char count);
-	*/
 
 	void changeOutfit(unsigned long id, int looktype);
 

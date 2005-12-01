@@ -2096,7 +2096,7 @@ Cylinder* Player::__queryDestination(int32_t& index, const Thing* thing, Thing**
 
 ReturnValue Player::__addThing(Thing* thing)
 {
-	return __addThing(0, thing);	
+	return __addThing(0, thing);
 }
 
 ReturnValue Player::__addThing(uint32_t index, Thing* thing)
@@ -2107,7 +2107,7 @@ ReturnValue Player::__addThing(uint32_t index, Thing* thing)
 	Item* item = dynamic_cast<Item*>(thing);
 	if(item == NULL)
 		return RET_NOTPOSSIBLE;
-	
+
 	if(index == 0){
 		return RET_NOTENOUGHROOM;
 	}
@@ -2130,7 +2130,7 @@ ReturnValue Player::__updateThing(Thing* thing, uint32_t count)
 	Item* item = dynamic_cast<Item*>(thing);
 	if(item == NULL){
 #ifdef __DEBUG__
-		std::cout << "Failure: [Player::__removeThing] item == NULL" << std::endl;
+		std::cout << "Failure: [Player::__updateThing] item == NULL" << std::endl;
 #endif
 		return RET_NOTPOSSIBLE;
 	}
@@ -2144,7 +2144,24 @@ ReturnValue Player::__updateThing(Thing* thing, uint32_t count)
 
 ReturnValue Player::__updateThing(uint32_t index, Thing* thing)
 {
-	return RET_NOTPOSSIBLE;
+	if(index < 0 || index > 11)
+		return RET_NOTPOSSIBLE;
+	
+	Item* item = dynamic_cast<Item*>(thing);
+	if(item == NULL){
+#ifdef __DEBUG__
+		std::cout << "Failure: [Player::__updateThing] item == NULL" << std::endl;
+#endif
+		return RET_NOTPOSSIBLE;
+	}
+
+	item->setParent(this);
+	items[index] = item;
+
+	//send to client
+	sendUpdateInventoryItem((slots_t)index, item);
+
+	return RET_NOERROR;
 }
 
 ReturnValue Player::__removeThing(Thing* thing, uint32_t count)
