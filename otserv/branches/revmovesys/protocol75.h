@@ -158,7 +158,7 @@ private:
 	virtual void sendRemoveTileItem(const Position& pos, uint32_t stackpos);
 
 	virtual void sendAddCreature(const Creature* creature, bool isLogin);
-	virtual void sendRemoveCreature(const Creature* creature, uint32_t stackpos, bool isLogout);
+	virtual void sendRemoveCreature(const Creature* creature, const Position& pos, uint32_t stackpos, bool isLogout);
 	virtual void sendMoveCreature(const Creature* creature, const Position& oldPos, uint32_t oldStackPos);
 
 	//containers

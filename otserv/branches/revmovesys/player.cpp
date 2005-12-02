@@ -1509,7 +1509,7 @@ void Player::onCreatureAppear(const Creature* creature, bool isLogin)
 
 void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout)
 {
-	client->sendRemoveCreature(creature, stackpos, isLogout);
+	client->sendRemoveCreature(creature, creature->getPosition(), stackpos, isLogout);
 }
 
 void Player::onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos)

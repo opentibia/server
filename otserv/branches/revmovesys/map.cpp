@@ -253,20 +253,19 @@ void Map::getSpectators(const Range& range, SpectatorVec& list)
 		offsetz = range.centerpos.z - nz;
 		//negative offset means that the player is on a lower floor than ourself
 
-		for (int nx = range.minRange.x + offsetz; nx <= range.maxRange.x + offsetz; ++nx)
-		{
-			for (int ny = range.minRange.y + offsetz; ny <= range.maxRange.y + offsetz; ++ny)
-			{
+		for(int nx = range.minRange.x + offsetz; nx <= range.maxRange.x + offsetz; ++nx){
+			for(int ny = range.minRange.y + offsetz; ny <= range.maxRange.y + offsetz; ++ny){
 				tile = getTile(nx + range.centerpos.x, ny + range.centerpos.y, nz);
-				if (tile)
-				{
-					for (cit = tile->creatures.begin(); cit != tile->creatures.end(); ++cit) {
+				if (tile){
+					for(cit = tile->creatures.begin(); cit != tile->creatures.end(); ++cit){
 /*
 #ifdef __DEBUG__
 						std::cout << "Found " << (*cit)->getName() << " at x: " << (*cit)->pos.x << ", y: " << (*cit)->pos.y << ", z: " << (*cit)->pos.z << ", offset: " << offsetz << std::endl;
 #endif
-*/
-						list.push_back((*cit));
+*/					
+						if(std::find(list.begin(), list.end(), *cit) == list.end()){
+							list.push_back((*cit));
+						}
 					}
 				}
 			}

@@ -50,24 +50,12 @@ public:
 	virtual void logout() = 0;
 	virtual void reinitializeProtocol() = 0;
 
-	//ground to ground
-	//virtual void sendThingMove(const Creature *creature, const Thing *thing,
-	//	const Position *oldPos, unsigned char oldStackPos, unsigned char oldcount,
-	//	unsigned char count, bool tele = false) = 0;
-	
-	//tiles
-	//virtual void sendThingAppear(const Thing *thing) = 0;
-	//virtual void sendThingDisappear(const Thing *thing, unsigned char stackPos, bool tele) = 0;
-	//virtual void sendThingRemove(const Thing *thing) = 0;
-	//virtual void sendThingTransform(const Thing* thing,int stackpos) = 0;
-	//virtual void sendTileUpdated(const Position &pos) = 0;
-
 	virtual void sendAddTileItem(const Position& pos, const Item* item) = 0;
 	virtual void sendUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* item) = 0;
 	virtual void sendRemoveTileItem(const Position& pos, uint32_t stackpos) = 0;
 
 	virtual void sendAddCreature(const Creature* creature, bool isLogin) = 0;
-	virtual void sendRemoveCreature(const Creature* creature, uint32_t stackpos, bool isLogout) = 0;
+	virtual void sendRemoveCreature(const Creature* creature, const Position& pos, uint32_t stackpos, bool isLogout) = 0;
 	virtual void sendMoveCreature(const Creature* creature, const Position& oldPos, uint32_t oldStackPos) = 0;
 
 	//containers

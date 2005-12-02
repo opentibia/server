@@ -967,7 +967,9 @@ ReturnValue Game::internalCreatureMove(Creature* creature, Cylinder* fromCylinde
 
 	SpectatorVec list;
 	SpectatorVec::iterator it;
-	getSpectators(Range(fromPos, toPos), list);
+	//getSpectators(Range(fromPos, toPos), list);
+	getSpectators(Range(fromPos, true), list);
+	getSpectators(Range(toPos, true), list);
 
 	//send change to client
 	for(it = list.begin(); it != list.end(); ++it) {
@@ -987,6 +989,10 @@ ReturnValue Game::internalCreatureMove(Creature* creature, Cylinder* fromCylinde
 
 		//add the creature
 		subCylinder->__addThing(creature);
+
+		list.clear();
+		getSpectators(Range(toCylinder->getPosition(), true), list);
+		getSpectators(Range(subCylinder->getPosition(), true), list);
 
 		//send change to client
 		for(it = list.begin(); it != list.end(); ++it) {
