@@ -91,8 +91,8 @@ enum trade_state {
 };
 
 
-typedef std::pair<unsigned char, Container*> containerItem;
-typedef std::vector<containerItem> containerLayout;
+typedef std::pair<unsigned long, Container*> containervector_pair;
+typedef std::vector<containervector_pair> ContainerVector;
 typedef std::map<unsigned long, Container*> DepotMap;
 typedef std::map<unsigned long,long> StorageMap;
 typedef std::set<unsigned long> VIPListSet;
@@ -121,16 +121,13 @@ public:
 	const std::string& getGuildName() const {return guildName;};
 	unsigned long getGuildId() const {return guildId;};
 
-	//freeslot_t getFreeSlot(Container **container,unsigned char &slot, const Item* item);
-	//Container* getFreeContainerSlot(Container *parent);
-	
-	containerLayout::const_iterator getContainers() const { return vcontainers.begin();}
-	containerLayout::const_iterator getEndContainer() const { return vcontainers.end();}
-	
-	Container* getContainer(uint32_t cid);
-	uint32_t getContainerID(const Container* container) const;
+	//containerLayout::const_iterator getContainers() const { return vcontainers.begin();}
+	//containerLayout::const_iterator getEndContainer() const { return vcontainers.end();}
+
 	void addContainer(uint32_t containerid, Container *container);
 	void closeContainer(uint32_t containerid);
+	uint32_t getContainerID(const Container* container) const;
+	Container* getContainer(uint32_t cid);
 	
 	void addStorageValue(const unsigned long key, const long value);
 	bool getStorageValue(const unsigned long key, long &value) const;
@@ -196,12 +193,13 @@ public:
 	unsigned long eventAutoWalk;
 	
 	//items
-	containerLayout vcontainers;
+	ContainerVector containerVec;
 	void preSave();
 
 	unsigned long getIP() const;
 	Container* getDepot(unsigned long depotId);
 	bool addDepot(Container* depot,unsigned long depotIs);
+
 	//depots	
 	DepotMap depots;
 	long max_depot_items;
@@ -260,14 +258,6 @@ public:
 	
 	virtual void onCreatureAppear(const Creature* creature, bool isLogin);
 	virtual void onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout);
-
-	//old code
-	//virtual void onCreatureAppear(const Creature *creature);
-	//virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos, bool tele);
-	//virtual void onTileUpdated(const Position &pos);
-	//void onThingAppear(const Thing* thing);
-	//void onThingDisappear(const Thing* thing, unsigned char stackPos);
-	//old code
 
 	virtual void onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos);
 	virtual void onTeleport(const Creature* creature, const Position& oldPos, uint32_t oldStackPos);

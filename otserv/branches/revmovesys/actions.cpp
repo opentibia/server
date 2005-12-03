@@ -223,7 +223,7 @@ bool Actions::UseItem(Player* player, const Position &pos,const unsigned char st
 		return false;
 	}
 	
-	Item *item = NULL; //dynamic_cast<Item*>(game->getThing(pos,stack,player));
+	Item *item = dynamic_cast<Item*>(game->internalGetThing(player, pos, stack));
 
 	if(!item){
 		#ifdef __DEBUG__
@@ -245,15 +245,14 @@ bool Actions::UseItem(Player* player, const Position &pos,const unsigned char st
 	Action *action = getAction(item);
 	
 	//if found execute it
-	/*if(action){
-		Position itempos = game->getThingMapPos(player, pos);
+	if(action){
+		//Position itempos = game->getThingMapPos(player, pos);
 		game->autoCloseTrade(item);
-		PositionEx posEx(pos,stack);
-		if(action->executeUse(player,item,posEx,posEx)){
+		PositionEx posEx(pos, stack);
+		if(action->executeUse(player, item, posEx, posEx)){
 			return true;
 		}
 	}
-	*/
 	
 	//if it is a container try to open it
 	if(Container* container = dynamic_cast<Container*>(item)){
@@ -304,7 +303,7 @@ bool Actions::UseItemEx(Player* player, const Position &from_pos,
 		return false;
 	}
 	
-	Item *item = NULL; //dynamic_cast<Item*>(game->getThing(from_pos,from_stack,player));
+	Item *item = dynamic_cast<Item*>(game->internalGetThing(player, from_pos, from_stack));
 	if(!item)
 		return false;
 	
@@ -332,14 +331,12 @@ bool Actions::UseItemEx(Player* player, const Position &from_pos,
 			return false;
 		}
 		
-		/*
-		Position itempos = game->getThingMapPos(player, from_pos);
+		//Position itempos = game->getThingMapPos(player, from_pos);
 		game->autoCloseTrade(item);
-		PositionEx posFromEx(from_pos,from_stack);
-		PositionEx posToEx(to_pos,to_stack);
-    	if(action->executeUse(player,item,posFromEx,posToEx))
-    		return true;
-		*/
+		PositionEx posFromEx(from_pos, from_stack);
+		PositionEx posToEx(to_pos, to_stack);
+		if(action->executeUse(player,item, posFromEx, posToEx))
+			return true;
 	}
 	
 	//not found
@@ -714,18 +711,6 @@ ActionScript* ActionScript::getActionScript(lua_State *L){
 	return myaction;
 }
 
-/*
-Position ActionScript::internalGetRealPosition(ActionScript *action, Player *player, const Position &pos)
-{
-	if(action)
-		return action->game->getThingMapPos(player, pos);
-	else {
-		Position dummyPos(0,0,0);
-		return dummyPos;
-	}
-}
-*/
-
 void ActionScript::internalAddThing(lua_State *L, const Thing* thing, const unsigned int thingid)
 {	
 	lua_newtable(L);
@@ -822,10 +807,9 @@ int ActionScript::internalGetPlayerInfo(lua_State *L, ePlayerInfo info)
 			break;
 		case PlayerInfoPosition:			
 			pos = player->getPosition();
-			//tile = action->game->map->getTile(player->pos.x, player->pos.y, player->pos.z);
-			tile = player->getTile(); //action->game->map->getTile(player->pos);
+			tile = player->getTile();
 			if(tile)
-				pos.stackpos = tile->getCreatureStackPos(player);
+				pos.stackpos = player->getParent()->__getIndexOfThing(player);
 			internalAddPositionEx(L,pos);
 			return 1;
 			break;
@@ -1045,10 +1029,9 @@ int ActionScript::luaActionDoTeleportThing(lua_State *L)
 	}
 	
 	action->game->teleport(tmpthing,(Position&)pos);
-	//Tile *tile = action->game->getTile(pos.x, pos.y, pos.z);
-	Tile *tile = action->game->map->getTile(pos);
+	Tile* tile = action->game->map->getTile(pos);
 	if(tile){
-		pos.stackpos = tile->getThingStackPos(tmpthing);
+		pos.stackpos = tile->__getIndexOfThing(tmpthing);
 	}
 	else{
 		pos.stackpos = 1;
@@ -1123,16 +1106,16 @@ int ActionScript::luaActionDoSendMagicEffect(lua_State *L)
 	
 	ActionScript *action = getActionScript(L);
 	
-	Position realpos(0, 0, 0); //internalGetRealPosition(action, action->_player,(Position&)pos);
+	Position cylinderMapPos(0, 0, 0); //internalGetRealPosition(action, action->_player,(Position&)pos);
 	SpectatorVec list;
 	SpectatorVec::iterator it;
 
-	action->game->getSpectators(Range(realpos, true), list);
+	action->game->getSpectators(Range(cylinderMapPos, true), list);
 
 	for(it = list.begin(); it != list.end(); ++it) {
 		Player *p = dynamic_cast<Player*>(*it);
 		if(p)
-			p->sendMagicEffect(realpos,type);
+			p->sendMagicEffect(cylinderMapPos,type);
 	}	
 	
 	lua_pushnumber(L, 0);
@@ -1342,16 +1325,16 @@ int ActionScript::luaActionDoSendAnimatedText(lua_State *L)
 	
 	ActionScript *action = getActionScript(L);
 	
-	Position realpos(0, 0,0); //internalGetRealPosition(action, action->_player,(Position&)pos);
+	Position cylinderMapPos(0, 0, 0); //internalGetRealPosition(action, action->_player,(Position&)pos);
 	SpectatorVec list;
 	SpectatorVec::iterator it;
 
-	action->game->getSpectators(Range(realpos, true), list);
+	action->game->getSpectators(Range(cylinderMapPos, true), list);
 
 	for(it = list.begin(); it != list.end(); ++it) {
 		Player *p = dynamic_cast<Player*>(*it);
 		if(p)
-			p->sendAnimatedText(realpos, color, text);
+			p->sendAnimatedText(cylinderMapPos, color, text);
 	}
 	
 	lua_pushnumber(L, 0);
@@ -1486,12 +1469,12 @@ int ActionScript::luaActionGetThingfromPos(lua_State *L)
 			thing = tile->getTopCreature();
 		}
 		else{
-			thing = tile->getThingByStackPos(pos.stackpos);
+			thing = tile->__getThing(pos.stackpos);
 		}
 		
 		if(thing){
 			if(pos.stackpos > 250){
-				pos.stackpos = tile->getThingStackPos(thing);
+				pos.stackpos = tile->__getIndexOfThing(thing);
 			}
 			unsigned int thingid = action->AddThingToMap(thing,pos);
 			internalAddThing(L,thing,thingid);
@@ -1536,7 +1519,7 @@ int ActionScript::luaActionDoCreateItem(lua_State *L)
 				return 0;	
 			}
 
-			pos.stackpos = tile->getThingStackPos(newItem);
+			pos.stackpos = tile->__getIndexOfThing(newItem);
 		}
 	}
 

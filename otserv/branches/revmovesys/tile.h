@@ -25,7 +25,6 @@
 
 
 #include "item.h"
-//#include "container.h"
 #include "cylinder.h"
 #include "magic.h"
 
@@ -70,7 +69,7 @@ public:
 
   bool removeThing(Thing *thing);
   void addThing(Thing *thing);
-	bool insertThing(Thing *thing, int stackpos);
+	//bool insertThing(Thing *thing, int stackpos);
 	MagicEffectItem* getFieldItem();
 	Teleport* getTeleportItem() const;
 
@@ -79,13 +78,12 @@ public:
 	Item* getTopTopItem();
 	Item* getTopDownItem();
 	Item* getMoveableBlockingItem();
-	
-  int getCreatureStackPos(Creature *c) const;
-  int getThingStackPos(const Thing *thing) const;
-	int getThingCount() const;
-
   Thing* getTopThing();
-	Thing* getThingByStackPos(int pos);
+	
+  //int getCreatureStackPos(Creature *c) const;
+  //int getThingStackPos(const Thing *thing) const;
+	//Thing* getThingByStackPos(int pos);
+	int getThingCount() const;
 
 	ReturnValue isBlocking(int objectstate, bool ignoreCreature = false, bool ignoreMoveableBlocking = false) const;
 

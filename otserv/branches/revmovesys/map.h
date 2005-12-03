@@ -73,6 +73,7 @@ public:
 	
 	//Creates a union of 2 positions
 	//Should only be used when a player makes a move.
+	/*
 	Range(const Position& pos1, const Position& pos2)
 	{
 		Position topleft(std::min(pos1.x, pos2.x), std::min(pos1.y, pos2.y), pos1.z);
@@ -85,6 +86,7 @@ public:
 		maxRange.x = std::max(topleft.x + 9, bottomright.x + 9) - topleft.x;
 		maxRange.y = std::max(topleft.y + 7, bottomright.y + 7) - topleft.y;
 	}
+	*/
 
 	Range(Position centerpos, int minRangeX, int maxRangeX, int minRangeY, int maxRangeY, bool multilevel = true)
 	{
@@ -114,27 +116,36 @@ private:
 		centerpos = pos;
 		
 		//This is the maximum view that the viewer AND the viewers that is seeing the viewer :o
-		minRange.x = -9; //minRange.x = -8;
-		minRange.y = -7; //minRange.y = -6;
+		minRange.x = -9;
+		minRange.y = -7;
 		
-		//just the visible ones
-		maxRange.x = 9; //maxRange.x = 8;
-		maxRange.y = 7; //maxRange.y = 6;
+		maxRange.x = 9;
+		maxRange.y = 7;
 		
 		zstep = 1;
 
 		if(multilevel) {
 			if(isUnderground()) {
 				//8->15
+				//minRange.z = std::max(centerpos.z - 2, 8);
+				//maxRange.z = std::min(centerpos.z + 2, MAP_LAYER - 1);
+
+				///*
 				minRange.z = std::min(centerpos.z + 2, MAP_LAYER - 1);
 				maxRange.z = std::max(centerpos.z - 2, 8);
 
 				zstep = -1;
+				//*/
 			} else {
+				//minRange.z = 0;
+				//maxRange.z = 7;
+
+				///*
 				minRange.z = 7;
 				maxRange.z = 0;
 
 				zstep = -1;
+				//*/
 			}
 		}
 		else {

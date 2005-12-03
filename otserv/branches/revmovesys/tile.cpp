@@ -209,6 +209,7 @@ bool Tile::floorChange(Direction direction) const
   	return false;
 }
 
+/*
 int Tile::getCreatureStackPos(Creature *c) const
 {
   CreatureVector::const_iterator it;
@@ -218,10 +219,11 @@ int Tile::getCreatureStackPos(Creature *c) const
       return (int) ((it - creatures.begin()) + 1 + topItems.size()) + (splash ? 1 : 0);
   }
 
-  /* todo error */
   return 255;
 }
+*/
 
+/*
 int Tile::getThingStackPos(const Thing *thing) const
 {
   int n = 0;
@@ -261,7 +263,6 @@ int Tile::getThingStackPos(const Thing *thing) const
       return n;
   }
 
-  /* todo error */
   return 255;
 }
 
@@ -272,8 +273,7 @@ Thing* Tile::getThingByStackPos(int pos)
 
   pos--;
 
-  if (splash)
-  {
+  if(splash){
     if (pos == 0)
       return splash;
       //return NULL;
@@ -295,10 +295,11 @@ Thing* Tile::getThingByStackPos(int pos)
 
   return NULL;
 }
+*/
 
 int Tile::getThingCount() const
 {
-  return (uint32_t) 1 + (splash ? 1 : 0) + topItems.size() +	creatures.size() + downItems.size();
+	return (uint32_t) (ground ? 1 : 0) + (splash ? 1 : 0) + topItems.size() +	creatures.size() + downItems.size();
 }
 
 std::string Tile::getDescription(uint32_t lookDistance) const
@@ -307,6 +308,7 @@ std::string Tile::getDescription(uint32_t lookDistance) const
 	return ret;
 }
 
+/*
 bool Tile::insertThing(Thing *thing, int stackpos)
 {
 	Item *item = dynamic_cast<Item*>(thing);
@@ -365,6 +367,8 @@ bool Tile::insertThing(Thing *thing, int stackpos)
 
   return false;
 }
+
+*/
 
 bool Tile::removeThing(Thing *thing)
 {
@@ -511,12 +515,12 @@ Thing* Tile::getTopThing()
 
 Item* Tile::getMoveableBlockingItem()
 {
-	for (ItemVector::const_iterator iit = downItems.begin(); iit != downItems.end(); ++iit)
-	{
+	for (ItemVector::const_iterator iit = downItems.begin(); iit != downItems.end(); ++iit){
 		const ItemType& iiType = Item::items[(*iit)->getID()];
 		if((iiType.blockPathFind || iiType.blockSolid) && iiType.moveable)
 			return *iit;
-  	}
+	}
+
 	return NULL;
 }
 
@@ -577,9 +581,47 @@ ReturnValue Tile::__queryMaxCount(int32_t index, const Thing* thing, uint32_t co
 
 ReturnValue Tile::__queryAdd(uint32_t index, const Thing* thing, uint32_t count) const
 {
-	const Item* item = dynamic_cast<const Item*>(thing);
-	if(item == NULL){
-		return RET_NOTPOSSIBLE;
+	//If its a new (summoned item) always accept it
+	if(thing->getParent() == NULL){
+		return RET_NOERROR;
+	}
+
+	Thing* iithing = NULL;
+
+	if(dynamic_cast<const Creature*>(thing)){
+		if(!creatures.empty())
+			return RET_NOTPOSSIBLE;
+
+		for(uint32_t i = 0; i < getThingCount(); ++i){
+			iithing = __getThing(i);
+
+			if(const Item* iitem = dynamic_cast<const Item*>(iithing)){
+				const ItemType& iiType = Item::items[iitem->getID()];
+
+				if(iiType.blockSolid)
+					return RET_NOTPOSSIBLE;
+			}
+		}
+	}
+	else if(const Item* item = dynamic_cast<const Item*>(thing)){
+		if(!creatures.empty() && item->isBlocking())
+			return RET_NOTENOUGHROOM;
+
+		for(uint32_t i = 0; i < getThingCount(); ++i){
+			iithing = __getThing(i);
+
+			if(const Item* iitem = dynamic_cast<const Item*>(iithing)){
+				const ItemType& iiType = Item::items[iitem->getID()];
+
+				if(item->isPickupable()){
+					if(iiType.blockSolid && (!iiType.hasHeight || iiType.pickupable))
+						return RET_NOTENOUGHROOM;
+				}
+
+				if(item->isBlocking() && iiType.blockSolid)
+					return RET_NOTENOUGHROOM;
+			}
+		}
 	}
 
 	return RET_NOERROR;

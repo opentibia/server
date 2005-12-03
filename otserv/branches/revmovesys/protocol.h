@@ -59,9 +59,9 @@ public:
 	virtual void sendMoveCreature(const Creature* creature, const Position& oldPos, uint32_t oldStackPos) = 0;
 
 	//containers
-	virtual void sendAddContainerItem(const Container* container, const Item* item) = 0;
-	virtual void sendUpdateContainerItem(const Container *container, uint8_t slot, const Item* item) = 0;
-	virtual void sendRemoveContainerItem(const Container* container, uint8_t slot) = 0;
+	virtual void sendAddContainerItem(uint8_t cid, const Item* item) = 0;
+	virtual void sendUpdateContainerItem(uint8_t cid, uint8_t slot, const Item* item) = 0;
+	virtual void sendRemoveContainerItem(uint8_t cid, uint8_t slot) = 0;
 
 	virtual void sendContainer(uint32_t cid, Container* container) = 0;
 	virtual void sendCloseContainer(uint32_t cid) = 0;

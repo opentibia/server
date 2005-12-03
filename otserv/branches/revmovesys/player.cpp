@@ -1067,10 +1067,10 @@ unsigned int Player::getReqMana(int maglevel, playervoc_t voc)
 
 Container* Player::getContainer(uint32_t cid)
 {
-  for(containerLayout::iterator cl = vcontainers.begin(); cl != vcontainers.end(); ++cl)
+  for(ContainerVector::iterator it = containerVec.begin(); it != containerVec.end(); ++it)
   {
-	  if(cl->first == cid)
-			return cl->second;
+	  if(it->first == cid)
+			return it->second;
 	}
 
 	return NULL;
@@ -1094,8 +1094,7 @@ bool Player::isHoldingContainer(const Container* container) const
 
 uint32_t Player::getContainerID(const Container* container) const
 {
-  for(containerLayout::const_iterator cl = vcontainers.begin(); cl != vcontainers.end(); ++cl)
-  {
+  for(ContainerVector::const_iterator cl = containerVec.begin(); cl != containerVec.end(); ++cl){
 	  if(cl->second == container)
 			return cl->first;
 	}
@@ -1103,15 +1102,15 @@ uint32_t Player::getContainerID(const Container* container) const
 	return -1;
 }
 
-void Player::addContainer(uint32_t cid, Container *container)
+void Player::addContainer(uint32_t cid, Container* container)
 {
 #ifdef __DEBUG__
-	cout << Creature::getName() << ", addContainer: " << (int)containerid << std::endl;
+	cout << Creature::getName() << ", addContainer: " << (int)cid << std::endl;
 #endif
 	if(cid > 0xF)
 		return;
 
-	for(containerLayout::iterator cl = vcontainers.begin(); cl != vcontainers.end(); ++cl) {
+	for(ContainerVector::iterator cl = containerVec.begin(); cl != containerVec.end(); ++cl) {
 		if(cl->first == cid) {
 			cl->second = container;
 			return;
@@ -1119,26 +1118,24 @@ void Player::addContainer(uint32_t cid, Container *container)
 	}
 	
 	//id doesnt exist, create it
-	containerItem vItem;
-	vItem.first = cid;
-	vItem.second = container;
+	containervector_pair cv;
+	cv.first = cid;
+	cv.second = container;
 
-	vcontainers.push_back(vItem);
+	containerVec.push_back(cv);
 }
 
 void Player::closeContainer(uint32_t cid)
 {
-  for(containerLayout::iterator cl = vcontainers.begin(); cl != vcontainers.end(); ++cl)
-  {
-	  if(cl->first == cid)
-	  {
-		  vcontainers.erase(cl);
+  for(ContainerVector::iterator cl = containerVec.begin(); cl != containerVec.end(); ++cl){
+	  if(cl->first == cid){
+		  containerVec.erase(cl);
 			break;
 		}
 	}
 
 #ifdef __DEBUG__
-	cout << Creature::getName() << ", closeContainer: " << (int)containerid << std::endl;
+	cout << Creature::getName() << ", closeContainer: " << (int)cid << std::endl;
 #endif
 }
 
@@ -1520,17 +1517,26 @@ void Player::onCreatureMove(const Creature* creature, const Position& oldPos, ui
 //container
 void Player::sendAddContainerItem(const Container* container, const Item *item)
 {
-	client->sendAddContainerItem(container, item);
+	uint32_t cid = getContainerID(container);
+	if(cid != -1){
+		client->sendAddContainerItem(cid, item);
+	}
 }
 
 void Player::sendUpdateContainerItem(const Container* container, uint8_t slot, const Item* item)
 {
-	client->sendUpdateContainerItem(container, slot, item);
+	uint32_t cid = getContainerID(container);
+	if(cid != -1){
+		client->sendUpdateContainerItem(cid, slot, item);
+	}
 }
 
 void Player::sendRemoveContainerItem(const Container* container, uint8_t slot)
 {
-	client->sendRemoveContainerItem(container, slot);
+	uint32_t cid = getContainerID(container);
+	if(cid != -1){
+		client->sendRemoveContainerItem(cid, slot);
+	}
 }
 
 void Player::sendCloseContainer(unsigned char containerid)
@@ -1938,8 +1944,13 @@ ReturnValue Player::__queryAdd(uint32_t index, const Thing* thing, uint32_t coun
 		return RET_NOTPOSSIBLE;
 	}
 
+	if(!item->isPickupable()){
+		return RET_CANNOTPICKUP;
+	}
+	
 	ReturnValue ret = RET_CANNOTBEDRESSED;
 
+	//check if we can dress this object
 	switch(index){
 		case SLOT_HEAD:
 			if(item->getSlotPosition() & SLOTP_HEAD)
@@ -2022,13 +2033,14 @@ ReturnValue Player::__queryAdd(uint32_t index, const Thing* thing, uint32_t coun
 			break;
 	}
 
-	if(items[index] != NULL){
-		if(!items[index]->isStackable() || items[index]->getID() != item->getID()){
-			ret = RET_INVENTORYALREADYEQUIPPED;
-		}
-	}
-
 	if(ret == RET_NOERROR){
+		//need an exchange with source?
+		if(items[index] != NULL){
+			if(!items[index]->isStackable() || items[index]->getID() != item->getID()){
+				ret = RET_NEEDEXCHANGE;
+			}
+		}
+
 		//check if enough capacity
 		if(access == 0 && item->getTopParent() != this){
 			double itemWeight = 0;

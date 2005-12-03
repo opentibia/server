@@ -28,7 +28,6 @@
 #include "creature.h"
 #include "item.h"
 #include "container.h"
-#include "cylinder.h"
 #include <string>
 
 class NetworkMessage;
@@ -48,9 +47,6 @@ private:
 	NetworkMessage OutputBuffer;
 	std::list<unsigned long> knownPlayers;
 	void checkCreatureAsKnown(unsigned long id, bool &known, unsigned long &removedKnown);
-	
-	Cylinder* internalGetCylinder(unsigned short x, unsigned short y, unsigned char z);
-	Thing* internalGetThing(unsigned short x, unsigned short y, unsigned char z, int index);
 	
 	virtual bool CanSee(int x, int y, int z) const;
 	virtual bool CanSee(const Creature*) const;
@@ -162,9 +158,9 @@ private:
 	virtual void sendMoveCreature(const Creature* creature, const Position& oldPos, uint32_t oldStackPos);
 
 	//containers
-	void sendAddContainerItem(const Container* container, const Item* item);
-	void sendUpdateContainerItem(const Container *container, uint8_t slot, const Item* item);
-	void sendRemoveContainerItem(const Container* container, uint8_t slot);
+	void sendAddContainerItem(uint8_t cid, const Item* item);
+	void sendUpdateContainerItem(uint8_t cid, uint8_t slot, const Item* item);
+	void sendRemoveContainerItem(uint8_t cid, uint8_t slot);
 
 	virtual void sendContainer(uint32_t cid, Container *container);
 	virtual void sendCloseContainer(uint32_t cid);
@@ -187,7 +183,7 @@ private:
 		unsigned short width, unsigned short height,
 		NetworkMessage &msg);
 	
-	void autoCloseContainers(const Container *container, NetworkMessage &msg);
+	//void autoCloseContainers(const Container *container, NetworkMessage &msg);
 
 	void AddMapDescription(NetworkMessage& msg, const Position& pos);
 	void AddTextMessage(NetworkMessage &msg,MessageClasses mclass, const char* message);
@@ -200,14 +196,16 @@ private:
 	void AddCreatureHealth(NetworkMessage &msg,const Creature *creature);
 	void AddPlayerSkills(NetworkMessage &msg);
 
-	void AddRemoveThing(NetworkMessage& msg, const Position& pos, int stackpos);
-	void AddAppearThing(NetworkMessage& msg, const Position& pos);
-	void AddTileUpdated(NetworkMessage& msg, const Position& pos);
+	//void AddRemoveThing(NetworkMessage& msg, const Position& pos, int stackpos);
+	//void AddAppearThing(NetworkMessage& msg, const Position& pos);
+	//void AddTileUpdated(NetworkMessage& msg, const Position& pos);
 
 	//tiles
 	void AddTileItem(NetworkMessage& msg, const Position& pos, const Item* item);
+	void AddTileCreature(NetworkMessage& msg, const Position& pos, const Creature* creature);
 	void UpdateTileItem(NetworkMessage& msg, const Position& pos, uint32_t stackpos, const Item* item);
 	void RemoveTileItem(NetworkMessage& msg, const Position& pos, uint32_t stackpos);
+	void UpdateTile(NetworkMessage& msg, const Position& pos);
 
 	void MoveUpCreature(NetworkMessage& msg, const Creature* creature,
 		const Position& newPos, const Position& oldPos, uint32_t oldStackPos);

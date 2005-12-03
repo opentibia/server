@@ -346,11 +346,8 @@ void Protocol75::GetTileDescription(const Tile* tile, NetworkMessage &msg)
 }
 
 void Protocol75::GetMapDescription(unsigned short x, unsigned short y, unsigned char z,
-                                   unsigned short width, unsigned short height,
-                                   NetworkMessage &msg)
+	unsigned short width, unsigned short height, NetworkMessage &msg)
 {
-	//Tile* tile;
-	//int cc = 0;
 	int skip = -1;
 	int startz, endz, zstep = 0;
 
@@ -368,35 +365,6 @@ void Protocol75::GetMapDescription(unsigned short x, unsigned short y, unsigned 
 	
 	for(int nz = startz; nz != endz + zstep; nz += zstep){
 		GetFloorDescription(msg, x, y, nz, width, height, z - nz, skip);
-
-		/*
-		offset = z - nz;
-		for (int nx = 0; nx < width; nx++)
-			for (int ny = 0; ny < height; ny++) {
-				tile = game->getTile(x + nx + offset, y + ny + offset, nz);
-				if (tile) {
-					if (skip >= 0) {
-						msg.AddByte(skip);
-						msg.AddByte(0xFF);
-						cc +=skip;
-					}   
-					skip = 0;
-					
-					GetTileDescription(tile, msg);
-					cc++;
-					
-				}
-				else {
-					skip++;
-					if (skip == 0xFF) {
-						msg.AddByte(0xFF);
-						msg.AddByte(0xFF);
-						cc += skip;
-						skip = -1;
-					}
-				}
-			}
-		*/
 	}
 	
 	if(skip >= 0){
@@ -421,19 +389,16 @@ void Protocol75::GetFloorDescription(NetworkMessage& msg, int x, int y, int z, i
 				if(skip >= 0){
 					msg.AddByte(skip);
 					msg.AddByte(0xFF);
-					//cc +=skip;
 				}   
 				skip = 0;
 				
 				GetTileDescription(tile, msg);
-				//cc++;
 			}
 			else {
 				skip++;
 				if(skip == 0xFF){
 					msg.AddByte(0xFF);
 					msg.AddByte(0xFF);
-					//cc += skip;
 					skip = -1;
 				}
 			}
@@ -546,12 +511,12 @@ void Protocol75::logout()
 	}
 }
 
-
+/*
 //close container and its child containers
 void Protocol75::autoCloseContainers(const Container *container, NetworkMessage &msg)
 {
 	std::vector<unsigned char> ItemList;
-	for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
+	for(ContainerVector::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
 		Container *tmpcontainer = cit->second;
 		while(tmpcontainer != NULL) {
 			if(tmpcontainer == container) {
@@ -569,66 +534,7 @@ void Protocol75::autoCloseContainers(const Container *container, NetworkMessage 
 		msg.AddByte(*it);
 	}						
 }
-
-
-Cylinder* Protocol75::internalGetCylinder(unsigned short x, unsigned short y, unsigned char z)
-{
-	if(x != 0xFFFF){
-		return game->getTile(x, y, z);
-	}
-	else{
-		//from container/inventory
-		if(y & 0x40){
-			uint8_t from_cid = y & 0x0F;
-			return player->getContainer(from_cid);
-		}
-		else{
-			return player;
-		}
-	}
-}
-
-Thing* Protocol75::internalGetThing(unsigned short x, unsigned short y, unsigned char z, int index)
-{
-	if(x != 0xFFFF){
-		Tile* tile = game->getTile(x, y, z);
-
-		if(tile){
-			if(index == 0)
-				return tile->getTopThing();
-			else{
-				Thing* thing = tile->getTopDownItem();
-
-				if(thing == NULL){
-					thing = tile->getTopThing();
-				}
-				
-				return thing;
-				//return tile->getThingByStackPos(index);
-			}
-		}
-	}
-	else{
-		//from container/inventory
-		if(y & 0x40){
-			uint8_t from_cid = y & 0x0F;
-			uint8_t slot = z;
-			
-			Container* parentcontainer = player->getContainer(from_cid);
-			if(!parentcontainer)
-				return NULL;
-			
-			return parentcontainer->getItem(slot);
-		}
-		else{
-			slots_t slot = (slots_t)static_cast<unsigned char>(y);
-			return player->getInventoryItem(slot);
-		}
-	}
-
-	return NULL;
-}
-
+*/
 
 // Parse methods
 void Protocol75::parseLogout(NetworkMessage& msg)
@@ -745,10 +651,7 @@ void Protocol75::parseMoveNorth(NetworkMessage& msg)
 	
 	this->sleepTillMove();
 	
-	game->creatureMove(player, NORTH);
-
-	//game->thingMove(player, player,
-	//	player->getPosition().x, player->getPosition().y-1, player->getPosition().z, 1);
+	game->moveCreature(player, NORTH);
 }
 
 void Protocol75::parseMoveEast(NetworkMessage& msg)
@@ -759,12 +662,8 @@ void Protocol75::parseMoveEast(NetworkMessage& msg)
 	
 	this->sleepTillMove();
 	
-	game->creatureMove(player, EAST);
-
-	//game->thingMove(player, player,
-	//	player->getPosition().x+1, player->getPosition().y, player->getPosition().z, 1);
+	game->moveCreature(player, EAST);
 }
-
 
 void Protocol75::parseMoveSouth(NetworkMessage& msg)
 {
@@ -774,12 +673,8 @@ void Protocol75::parseMoveSouth(NetworkMessage& msg)
 	
 	this->sleepTillMove();
 	
-	game->creatureMove(player, SOUTH);
-
-	//game->thingMove(player, player,
-	//	player->getPosition().x, player->getPosition().y+1, player->getPosition().z, 1);
+	game->moveCreature(player, SOUTH);
 }
-
 
 void Protocol75::parseMoveWest(NetworkMessage& msg)
 {
@@ -789,10 +684,7 @@ void Protocol75::parseMoveWest(NetworkMessage& msg)
 	
 	this->sleepTillMove();
 
-	game->creatureMove(player, WEST);
-
-	//game->thingMove(player, player,
-	//	player->getPosition().x-1, player->getPosition().y, player->getPosition().z, 1);
+	game->moveCreature(player, WEST);
 }
 
 void Protocol75::parseMoveNorthEast(NetworkMessage& msg)
@@ -804,10 +696,7 @@ void Protocol75::parseMoveNorthEast(NetworkMessage& msg)
 	this->sleepTillMove();
 	this->sleepTillMove();
 	
-	game->creatureMove(player, NORTHEAST);
-
-	//game->thingMove(player, player,
-	//	(player->getPosition().x+1), (player->getPosition().y-1), player->getPosition().z, 1);
+	game->moveCreature(player, NORTHEAST);
 }
 
 void Protocol75::parseMoveSouthEast(NetworkMessage& msg)
@@ -819,10 +708,7 @@ void Protocol75::parseMoveSouthEast(NetworkMessage& msg)
 	this->sleepTillMove();
 	this->sleepTillMove();
 	
-	game->creatureMove(player, SOUTHEAST);
-
-	//game->thingMove(player, player,
-	//	(player->getPosition().x+1), (player->getPosition().y+1), player->getPosition().z, 1);
+	game->moveCreature(player, SOUTHEAST);
 }
 
 void Protocol75::parseMoveSouthWest(NetworkMessage& msg)
@@ -834,10 +720,7 @@ void Protocol75::parseMoveSouthWest(NetworkMessage& msg)
 	this->sleepTillMove();
 	this->sleepTillMove();
 	
-	game->creatureMove(player, SOUTHWEST);
-
-	//game->thingMove(player, player,
-	//	(player->getPosition().x-1), (player->getPosition().y+1), player->getPosition().z, 1);
+	game->moveCreature(player, SOUTHWEST);
 }
 
 void Protocol75::parseMoveNorthWest(NetworkMessage& msg)
@@ -849,10 +732,7 @@ void Protocol75::parseMoveNorthWest(NetworkMessage& msg)
 	this->sleepTillMove();
 	this->sleepTillMove();
 	
-	game->creatureMove(player, NORTHWEST);
-
-	//game->thingMove(player, player,
-	//	(player->getPosition().x-1), (player->getPosition().y-1), player->getPosition().z, 1);   
+	game->moveCreature(player, NORTHWEST);
 }
 
 void Protocol75::parseTurnNorth(NetworkMessage& msg)
@@ -926,57 +806,44 @@ void Protocol75::parseSetOutfit(NetworkMessage& msg)
 void Protocol75::parseUseItem(NetworkMessage& msg)
 {
 	Position pos = msg.GetPosition();
-	unsigned short itemId = msg.GetItemId();
-	unsigned char stack = msg.GetByte();
-	unsigned char index = msg.GetByte();
+	uint16_t itemId = msg.GetItemId();
+	uint8_t stackpos = msg.GetByte();
+	uint8_t index = msg.GetByte();
 	
 #ifdef __DEBUG__
 	std::cout << "parseUseItem: " << "x: " << pos.x << ", y: " << (int)pos.y <<  ", z: " << (int)pos.z << ", item: " << (int)item << ", stack: " << (int)stack << ", index: " << (int)index << std::endl;
 #endif
 	
-	game->playerUseItem(player, pos, stack, itemId, index);
+	game->playerUseItem(player, pos,stackpos, index, itemId);
 }
 
 void Protocol75::parseUseItemEx(NetworkMessage& msg)
 {
-	/*
-	unsigned short from_x = msg.GetU16();
-	unsigned short from_y = msg.GetU16(); 
-	unsigned char from_z = msg.GetByte();
-	unsigned short itemId = msg.GetItemId();
-	unsigned char from_stack = msg.GetByte();
-	unsigned short to_x = msg.GetU16();
-	unsigned short to_y = msg.GetU16(); 
-	unsigned char to_z = msg.GetByte();
-	unsigned char to_stack = msg.GetByte();
-
-	Cylinder* fromCylinder = internalGetCylinder(from_x, from_y, from_z);
-	Cylinder* toCylinder = internalGetCylinder(to_x, to_y, to_z);
-	*/
-
-	Position pos_from = msg.GetPosition();
-	unsigned short itemid = msg.GetItemId();
-	unsigned char from_stackpos = msg.GetByte();
-	Position pos_to = msg.GetPosition();
-	unsigned short itemId = msg.GetU16();
-	unsigned char to_stackpos = msg.GetByte();
+	Position fromPos = msg.GetPosition();
+	uint16_t fromItemId = msg.GetItemId();
+	uint8_t fromStackpos = msg.GetByte();
+	Position toPos = msg.GetPosition();
+	uint16_t toItemId = msg.GetU16();
+	uint8_t toStackpos = msg.GetByte();
 	
-	game->playerUseItemEx(player,pos_from,from_stackpos, pos_to, to_stackpos, itemId);
+	game->playerUseItemEx(player, fromPos, fromStackpos, fromItemId, toPos, toStackpos, toItemId);
 }
 
 void Protocol75::parseBattleWindow(NetworkMessage &msg)
 {
-	Position pos_from = msg.GetPosition();
-	unsigned short itemid = msg.GetItemId();
-	unsigned char from_stackpos = msg.GetByte();
-	unsigned long creatureid = msg.GetU32();
+	Position fromPos = msg.GetPosition();
+	uint16_t itemId = msg.GetItemId();
+	uint8_t fromStackPos = msg.GetByte();
+	uint32_t creatureId = msg.GetU32();
 
-	game->playerUseBattleWindow(player, pos_from, from_stackpos, itemid, creatureid);
+	game->playerUseBattleWindow(player, fromPos, fromStackPos, creatureId, itemId);
 }
 
 void Protocol75::parseCloseContainer(NetworkMessage& msg)
 {
 	unsigned char containerid = msg.GetByte();
+
+	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol75::parseCloseContainer()");
 	player->closeContainer(containerid);
 	sendCloseContainer(containerid);
 }
@@ -997,125 +864,26 @@ void Protocol75::parseUpArrowContainer(NetworkMessage& msg)
 
 void Protocol75::parseThrow(NetworkMessage& msg)
 {
-	unsigned short from_x     = msg.GetU16();
-	unsigned short from_y     = msg.GetU16(); 
-	unsigned char  from_z     = msg.GetByte();
-	unsigned short itemid     = msg.GetItemId();
-	unsigned char  from_stack = msg.GetByte();
-	unsigned short to_x       = msg.GetU16();
-	unsigned short to_y       = msg.GetU16(); 
-	unsigned char  to_z       = msg.GetByte();
-	unsigned char count       = msg.GetByte();
-	
-	std::cout << "parseThrow: " << "from_x: " << (int)from_x << ", from_y: " << (int)from_y
-	<<  ", from_z: " << (int)from_z << ", item: " << (int)itemid << ", from_stack: " 
-	<< (int)from_stack << " to_x: " << (int)to_x << ", to_y: " << (int)to_y
-	<<  ", to_z: " << (int)to_z  
+	Position fromPos = msg.GetPosition();
+	uint16_t itemId = msg.GetItemId();
+	uint8_t fromStackpos = msg.GetByte();
+	Position toPos = msg.GetPosition();
+	uint8_t count = msg.GetByte();
+
+	//*
+	std::cout << "parseThrow: " << "from_x: " << (int)fromPos.x << ", from_y: " << (int)fromPos.y
+	<<  ", from_z: " << (int)fromPos.z << ", item: " << (int)itemId << ", fromStackpos: " 
+	<< (int)fromStackpos << " to_x: " << (int)toPos.x << ", to_y: " << (int)toPos.y
+	<<  ", to_z: " << (int)toPos.z  
 	<< ", count: " << (int)count << std::endl;
-	
-	if(from_x == to_x && from_y == to_y && from_z == to_z)
+	//*/
+
+	if(toPos == fromPos)
 		return;
 
-	Cylinder* fromCylinder = internalGetCylinder(from_x, from_y, from_z);
-	uint8_t from_index = 0;
-	
-	if(from_x == 0xFFFF){
-		if(from_y & 0x40){
-			from_index = static_cast<uint8_t>(from_z);
-		}
-		else{
-			from_index = static_cast<uint8_t>(from_y);
-		}
-	}
-	else
-		from_index = from_stack;
+	game->thingMove(player, fromPos, itemId, fromStackpos, toPos, count);
 
-	Thing* thing = internalGetThing(from_x, from_y, from_z, from_index);
-
-	Cylinder* toCylinder = internalGetCylinder(to_x, to_y, to_z);
-	uint8_t to_index = 0;
-
-	if(to_x == 0xFFFF){
-		if(to_y & 0x40){
-			to_index = static_cast<uint8_t>(to_z);
-		}
-		else{
-			to_index = static_cast<uint8_t>(to_y);
-		}
-	}
-
-	if(Creature* movingCreature = dynamic_cast<Creature*>(thing)){
-		//game->thingMove(player, from_x, from_y, from_z, from_stack, itemid, to_x, to_y, to_z, count);		
-		game->creatureMove(player, fromCylinder, toCylinder, movingCreature);
-	}
-	else if(Item* movingItem = dynamic_cast<Item*>(thing)){
-		game->moveItem(player, fromCylinder, toCylinder, to_index, movingItem, count, itemid);
-	}
-
-	/*bool toInventory = false;
-	bool fromInventory = false;
-
-	//container/inventory to container/inventory
-	if(from_x == 0xFFFF && to_x == 0xFFFF) {
-		unsigned char from_cid;
-		unsigned char to_cid;
-		
-		if(from_y & 0x40) {
-			from_cid = from_y & 0x0F;
-		}
-		else {
-			fromInventory = true;
-			from_cid = static_cast<unsigned char>(from_y);
-		}
-		
-		if(to_y & 0x40) {
-			to_cid = static_cast<unsigned char>(to_y & 0x0F);
-		}
-		else {
-			toInventory = true;
-			to_cid = static_cast<unsigned char>(to_y);
-		}
-		
-		game->thingMove(player, from_cid, from_z, itemid,fromInventory, to_cid, to_z, toInventory, count);
-	}
-	//container/inventory to ground
-	else if(from_x == 0xFFFF && to_x != 0xFFFF) {
-		unsigned char from_cid;
-		
-		if(0x40 & from_y) {
-			from_cid = static_cast<unsigned char>(from_y & 0x0F);
-		}
-		else {
-			fromInventory = true;
-			from_cid = static_cast<unsigned char>(from_y);
-		}
-		
-		game->thingMove(player, from_cid, from_z, itemid, fromInventory, Position(to_x, to_y, to_z), count);
-	}
-	//ground to container/inventory
-	else if(from_x != 0xFFFF && to_x == 0xFFFF) {
-		unsigned char to_cid;
-		
-		if(0x40 & to_y) {
-			to_cid = static_cast<unsigned char>(to_y & 0x0F);
-		}
-		else {
-			toInventory = true;
-			to_cid = static_cast<unsigned char>(to_y);
-			
-			if(to_cid > 11) {
-				return;
-			}
-			
-			if(to_cid == 0) {
-				//Special condition, player drops an item to the "capacity window" when the inventory is minimized,
-				//we should add this item to the most appropriate slot/container
-				return;
-			}
-		}
-		
-		game->thingMove(player, Position(from_x, from_y, from_z), from_stack, itemid, to_cid, to_z, toInventory, count);
-	}
+	/*
 	//ground to ground
 	else if(from_x != 0xFFFF && to_x != 0xFFFF) {
 		Tile *fromTile = game->getTile(from_x, from_y, from_z);
@@ -1137,12 +905,9 @@ void Protocol75::parseThrow(NetworkMessage& msg)
 
 void Protocol75::parseLookAt(NetworkMessage& msg)
 {
-	uint16_t x = msg.GetU16();
-	uint16_t y = msg.GetU16();
-	uint8_t z = msg.GetByte();
-
-	unsigned short itemId = msg.GetU16();
-	unsigned char stackpos = msg.GetByte();
+	Position pos = msg.GetPosition();
+	uint16_t itemId = msg.GetItemId();
+	uint8_t stackpos = msg.GetByte();
 	
 	/*
 	#ifdef __DEBUG__
@@ -1151,30 +916,7 @@ void Protocol75::parseLookAt(NetworkMessage& msg)
 	#endif
 	*/
 
-	Thing* thing = internalGetThing(x, y, z, 0);
-	if(!thing)
-		return;
-
-	uint32_t lookDistance = 0;
-	if(thing == player)
-		lookDistance = -1;
-	else{
-		const Position& LookPos = player->getPosition();
-		const Position& thingMapPos = thing->getPosition();
-		
-		if(LookPos.z != thingMapPos.z)
-			lookDistance = std::abs(LookPos.z - thingMapPos.z) * 2;
-		else
-			lookDistance = std::sqrt( std::pow(std::abs(LookPos.x - thingMapPos.x), 2) +
-			std::pow(std::abs(LookPos.y - thingMapPos.y), 2));
-	}
-
-	std::stringstream ss;
-	ss << "You see " << thing->getDescription(lookDistance);
-
-	NetworkMessage newmsg;
-	AddTextMessage(newmsg,MSG_INFO, ss.str().c_str());
-	WriteBuffer(newmsg);
+	game->playerLookAt(player, pos, itemId, stackpos);
 }
 
 void Protocol75::parseSay(NetworkMessage& msg)
@@ -1251,11 +993,11 @@ void Protocol75::parseTextWindow(NetworkMessage& msg)
 void Protocol75::parseRequestTrade(NetworkMessage& msg)
 {
 	Position pos = msg.GetPosition();
-	unsigned short itemid = msg.GetItemId();
-	unsigned char stack = msg.GetByte();
-	unsigned long playerid = msg.GetU32();
+	uint16_t itemId = msg.GetItemId();
+	uint8_t stackpos = msg.GetByte();
+	uint32_t playerId = msg.GetU32();
 	
-	game->playerRequestTrade(player, pos, stack, itemid, playerid);
+	game->playerRequestTrade(player, pos, stackpos, playerId, itemId);
 }
 
 void Protocol75::parseAcceptTrade(NetworkMessage& msg)
@@ -1294,12 +1036,11 @@ void Protocol75::parseRemVip(NetworkMessage& msg)
 void Protocol75::parseRotateItem(NetworkMessage& msg)
 {
 	Position pos = msg.GetPosition();
-	unsigned short itemid = msg.GetItemId();
-	unsigned char stackpos = msg.GetByte();
+	uint16_t itemId = msg.GetItemId();
+	uint8_t stackpos = msg.GetByte();
 	
-	game->playerRotateItem(player, pos, stackpos, itemid);
+	game->playerRotateItem(player, pos, stackpos, itemId);
 }
-
 
 // Send methods
 void Protocol75::sendOpenPriv(const std::string& receiver)
@@ -1498,617 +1239,6 @@ void Protocol75::sendTileUpdated(const Position &pos)
 }
 */
 
-/*
-//container to container
-void Protocol75::sendThingMove(const Creature *creature, const Container *fromContainer, unsigned char from_slotid,
-							   const Item* fromItem, int oldFromCount, Container *toContainer, unsigned char to_slotid, const Item *toItem, int oldToCount, int count)
-{
-	if(player->NeedUpdateStats()) {
-		player->sendStats();
-	}
-	
-	NetworkMessage msg;
-	
-	//Auto-close container's
-	const Container* moveContainer = dynamic_cast<const Container*>(fromItem);
-	if(moveContainer){
-		bool hasToContainerOpen = false;
-		Position toMapPos = toContainer->getTopParent()->pos;
-		
-		if(toMapPos.x != 0xFFFF && std::abs(player->pos.x - toMapPos.x) <= 1 && std::abs(player->pos.y - toMapPos.y) <= 1) {
-			for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
-
-				bool skipContainer = false;
-				Container* tmpcontainer = cit->second;
-				while(tmpcontainer != NULL) {
-					if(tmpcontainer == moveContainer) {
-						skipContainer = true;
-						break;
-					}
-
-					tmpcontainer = tmpcontainer->getParent();
-				}
-
-				if(skipContainer)
-					continue;
-
-				if(cit->second == toContainer || cit->second->getTopParent()->isHoldingItem(toContainer)){
-					hasToContainerOpen = true;
-					break;
-				}
-			}
-		}
-		
-		if(!hasToContainerOpen && !player->isHoldingContainer(toContainer)) {
-			autoCloseContainers(moveContainer, msg);
-		}
-	}
-	
-	Item *container = NULL;
-	for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
-		container  = cit->second;
-		unsigned char cid = cit->first;
-		
-		if(container && container == fromContainer) {
-			if(toContainer == fromContainer) {
-				if(fromItem->isStackable()) {
-					if(toItem && fromItem->getID() == toItem->getID() && toItem->getItemCountOrSubtype() != oldToCount) {
-						//update count						
-						TransformItemContainer(msg,cid,to_slotid,toItem);
-						
-						if(fromItem->getItemCountOrSubtype() > 0 && count != oldFromCount) {
-							//update count							
-							TransformItemContainer(msg,cid,from_slotid,fromItem);
-						}
-						else {
-							//remove item							
-							RemoveItemContainer(msg,cid,from_slotid);
-						}
-						
-						//surplus items
-						if(oldToCount + count > 100) {
-							//add item														
-							AddItemContainer(msg,cid,fromItem,oldToCount + count - 100);
-						}
-					}
-					else {
-						if(count == oldFromCount) {
-							//remove item							
-							RemoveItemContainer(msg,cid,from_slotid);
-						}
-						else {
-							//update count							
-							TransformItemContainer(msg,cid,from_slotid,fromItem);
-						}
-						
-						//add item						
-						AddItemContainer(msg,cid,fromItem,count);
-					}
-				}
-				else {
-					//remove item					
-					RemoveItemContainer(msg,cid,from_slotid);
-					
-					//add item					
-					AddItemContainer(msg,cid,fromItem);
-				}
-			}
-			else {
-				if(fromItem->isStackable() && fromItem->getItemCountOrSubtype() > 0 && count != oldFromCount) {
-					//update count					
-					TransformItemContainer(msg,cid,from_slotid,fromItem);
-				}
-				else {
-					//remove item					
-					RemoveItemContainer(msg,cid,from_slotid);
-				}
-			}
-		}
-		
-		if(container && container == toContainer && toContainer != fromContainer) {
-			if(fromItem->isStackable()) {
-				if(toItem && fromItem->getID() == toItem->getID() && toItem->getItemCountOrSubtype() != oldToCount) {
-					//update count					
-					TransformItemContainer(msg,cid,to_slotid,toItem);
-					
-					//surplus items
-					if(oldToCount + count > 100) {
-						//add item						
-						AddItemContainer(msg,cid,fromItem,oldToCount + count - 100);
-					}
-				}
-				else {
-					//add item					
-					AddItemContainer(msg,cid,fromItem,count);
-				}
-			}
-			else {
-				//add item				
-				AddItemContainer(msg,cid,fromItem);
-			}
-		}
-	}
-	
-	WriteBuffer(msg);
-}
-
-//inventory to container
-void Protocol75::sendThingMove(const Creature *creature, slots_t fromSlot, const Item* fromItem,
-							   int oldFromCount, const Container *toContainer, unsigned char to_slotid, const Item *toItem, int oldToCount, int count)
-{
-	if(player->NeedUpdateStats()) {
-		player->sendStats();
-	}
-	
-	NetworkMessage msg;
-	
-	for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
-		if(cit->second == toContainer) {
-			unsigned char cid = cit->first;
-			
-			if(fromItem->isStackable()) {
-				if(toItem && fromItem->getID() == toItem->getID() && toItem->getItemCountOrSubtype() != oldToCount) {
-					//update count					
-					TransformItemContainer(msg,cid,to_slotid,toItem);
-					
-					//surplus items
-					if(oldToCount + count > 100) {
-						//add item						
-						AddItemContainer(msg,cid,fromItem,oldToCount + count - 100);
-					}
-				}
-				else {
-					//add item					
-					AddItemContainer(msg,cid,fromItem,count);
-				}
-			}
-			else {
-				//add item				
-				AddItemContainer(msg,cid,fromItem);
-			}
-		}
-	}
-	
-	if(creature == player) {
-		AddPlayerInventoryItem(msg,player, fromSlot);
-
-		//Update up-arrow
-		const Container* moveContainer = dynamic_cast<const Container*>(fromItem);
-		if(moveContainer) {
-			for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
-				if(cit->second == moveContainer) {
-					sendContainer(cit->first, cit->second);
-				}
-			}
-		}
-		//
-	}
-	
-	WriteBuffer(msg);
-}
-
-//inventory to inventory
-void Protocol75::sendThingMove(const Creature *creature, slots_t fromSlot, const Item* fromItem,
-							   int oldFromCount, slots_t toSlot, const Item* toItem, int oldToCount, int count)
-{
-	NetworkMessage msg;
-	if(creature == player) {
-		if(player->NeedUpdateStats()) {
-			player->sendStats();
-		}
-		
-		AddPlayerInventoryItem(msg, player, fromSlot);
-		AddPlayerInventoryItem(msg, player, toSlot);
-	}
-	
-	WriteBuffer(msg);
-}
-
-//container to inventory
-void Protocol75::sendThingMove(const Creature *creature, const Container *fromContainer,
-							   unsigned char from_slotid, const Item* fromItem, int oldFromCount, slots_t toSlot, const Item *toItem, int oldToCount, int count)
-{
-	if(player->NeedUpdateStats()) {
-		player->sendStats();
-	}
-	
-	NetworkMessage msg;
-	
-	for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
-		if(cit->second == fromContainer) {
-			unsigned char cid = cit->first;
-			
-			if(!fromItem->isStackable() || (oldFromCount == count && oldToCount + count <= 100)) {
-				//remove item				
-				RemoveItemContainer(msg,cid,from_slotid);
-			}
-			else {
-				//update count				
-				TransformItemContainer(msg,cid,from_slotid,fromItem);
-			}
-			
-			if(toItem && toItem->getID() != fromItem->getID()) {
-				//add item				
-				AddItemContainer(msg,cid,toItem);
-			}
-		}
-	}
-	
-	if(creature == player) {
-		AddPlayerInventoryItem(msg,player, toSlot);
-
-		//Update up-arrow
-		const Container* moveContainer = dynamic_cast<const Container*>(fromItem);
-		if(moveContainer) {
-			for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
-				if(cit->second == moveContainer) {
-					sendContainer(cit->first, cit->second);
-				}
-			}
-		}
-		//
-	}
-		
-	WriteBuffer(msg);
-}
-
-//container to ground
-void Protocol75::sendThingMove(const Creature *creature, const Container *fromContainer, unsigned char from_slotid,
-							   const Item* fromItem, int oldFromCount, const Position &toPos, const Item *toItem, int oldToCount, int count)
-{
-	if(player->NeedUpdateStats()) {
-		player->sendStats();
-	}
-	
-	NetworkMessage msg;
-
-	//Auto-close container's
-	const Container* moveContainer = dynamic_cast<const Container*>(fromItem);
-	bool updateContainerArrow = false;
-
-	if(moveContainer) {
-		//Auto-close container's
-		if(std::abs(player->pos.x - toPos.x) > 1 || std::abs(player->pos.y - toPos.y) > 1) {
-			autoCloseContainers(moveContainer, msg);			
-		}
-		else
-			updateContainerArrow = true;
-	}
-
-	if(CanSee(toPos.x, toPos.y, toPos.z)) {
-		if(toItem && toItem->getID() == fromItem->getID() && fromItem->isStackable() && toItem->getItemCountOrSubtype() != oldToCount) {
-			AddTileUpdated(msg, toItem->pos);
-		}
-		else {
-			AddAppearThing(msg, toPos);
-			if(fromItem->isStackable()) {
-				msg.AddItem(fromItem->getID(), count);
-			}
-			else
-				msg.AddItem(fromItem);
-		}
-	}
-	
-	for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
-		unsigned char cid = cit->first;
-		if(cit->second == fromContainer) {
-			
-			if(!fromItem->isStackable() || fromItem->getItemCountOrSubtype() == 0 || count == oldFromCount) {
-				//remove item				
-				RemoveItemContainer(msg,cid,from_slotid);
-			}
-			else {
-				//update count				
-				TransformItemContainer(msg,cid,from_slotid,fromItem);
-			}
-		}
-	}
-	
-	//Update up-arrow
-	if(updateContainerArrow) {
-		const Container* moveContainer = dynamic_cast<const Container*>(fromItem);
-		if(moveContainer) {
-			for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
-				if(cit->second == moveContainer) {
-					sendContainer(cit->first, cit->second);
-				}
-			}
-		}
-	}
-	//
-	
-	WriteBuffer(msg);
-}
-
-//inventory to ground
-void Protocol75::sendThingMove(const Creature *creature, slots_t fromSlot,
-							   const Item* fromItem, int oldFromCount, const Position &toPos, const Item *toItem, int oldToCount, int count)
-{
-	NetworkMessage msg;
-	
-	if(creature == player) {
-		if(player->NeedUpdateStats()) {
-			player->sendStats();
-		}
-		
-		//Auto-closing containers
-		const Container* moveContainer = dynamic_cast<const Container*>(fromItem);
-		if(moveContainer) {
-			//Auto-close container's
-			if(std::abs(player->pos.x - toPos.x) > 1 || std::abs(player->pos.y - toPos.y) > 1) {
-				autoCloseContainers(moveContainer, msg);			
-			}
-		}
-	}
-	
-	if(CanSee(toPos.x, toPos.y, toPos.z)) {
-		if(toItem && toItem->getID() == fromItem->getID() && fromItem->isStackable() && toItem->getItemCountOrSubtype() != oldToCount) {
-			AddTileUpdated(msg, toItem->pos);
-		}
-		else {
-			AddAppearThing(msg, toPos);
-			if(fromItem->isStackable()) {
-				msg.AddItem(fromItem->getID(), count);
-			}
-			else
-				msg.AddItem(fromItem);
-		}
-	}
-	
-	if(creature == player) {
-		AddPlayerInventoryItem(msg, player, fromSlot);
-	}
-	
-	WriteBuffer(msg);
-}
-
-//ground to container
-void Protocol75::sendThingMove(const Creature *creature, const Position &fromPos, int stackpos, const Item* fromItem,
-							   int oldFromCount, const Container *toContainer, unsigned char to_slotid, const Item *toItem, int oldToCount, int count)
-{
-	if(player->NeedUpdateStats()) {
-		player->sendStats();
-	}
-	
-	NetworkMessage msg;
-	
-	//Auto-closing containers
-	const Container* moveContainer = dynamic_cast<const Container*>(fromItem);
-	bool updateContainerArrow = false;
-	if(moveContainer) {
-		bool hasToContainerOpen = false;
-		Position toMapPos = toContainer->getTopParent()->pos;
-		
-		if(toMapPos.x != 0xFFFF && std::abs(player->pos.x - toMapPos.x) <= 1 && std::abs(player->pos.y - toMapPos.y) <= 1) {
-			for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit){
-
-				bool skipContainer = false;
-				Container* tmpcontainer = cit->second;
-				while(tmpcontainer != NULL) {
-					if(tmpcontainer == moveContainer) {
-						skipContainer = true;
-						break;
-					}
-
-					tmpcontainer = tmpcontainer->getParent();
-				}
-
-				if(skipContainer)
-					continue;
-
-				if(cit->second == toContainer || cit->second->getTopParent()->isHoldingItem(toContainer)){
-					hasToContainerOpen = true;
-					break;
-				}
-			}
-		}
-		
-		if(!hasToContainerOpen && !player->isHoldingContainer(toContainer)){
-			autoCloseContainers(moveContainer, msg);
-		}
-		else
-			updateContainerArrow = true;
-	}
-	//
-	
-	if(CanSee(fromPos.x, fromPos.y, fromPos.z)) {
-		if(!fromItem->isStackable() || (oldFromCount == count && oldToCount + count <= 100)) {
-			AddRemoveThing(msg, fromPos, stackpos);
-		}
-		else
-			AddTileUpdated(msg, fromPos);
-	}
-	
-	Container *container = NULL;
-	for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
-		container = cit->second;
-		if(container == toContainer) {
-			unsigned char cid = cit->first;
-			
-			if(fromItem->isStackable()) {
-				if(toItem && fromItem->getID() == toItem->getID() && toItem->getItemCountOrSubtype() != oldToCount) {
-					//update count					
-					TransformItemContainer(msg,cid,to_slotid,toItem);
-					
-					//surplus items
-					if(oldToCount + count > 100) {
-						//add item						
-						AddItemContainer(msg,cid,fromItem,oldToCount + count - 100);
-					}
-				}
-				else {
-					//add item					
-					AddItemContainer(msg,cid,fromItem,count);
-				}
-			}
-			else {
-				//add item				
-				AddItemContainer(msg,cid,fromItem);
-			}
-		}
-	}
-	
-	if(updateContainerArrow) {
-		const Container* moveContainer = dynamic_cast<const Container*>(fromItem);
-		if(moveContainer) {
-			for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
-				
-				if(cit->second == moveContainer) {
-					sendContainer(cit->first, cit->second);
-				}
-			}
-		}
-	}
-	
-	WriteBuffer(msg);
-}
-
-//ground to inventory
-void Protocol75::sendThingMove(const Creature *creature, const Position &fromPos, int stackpos, const Item* fromItem,
-							   int oldFromCount, slots_t toSlot, const Item *toItem, int oldToCount, int count)
-{
-	if(player->NeedUpdateStats()) {
-		player->sendStats();
-	}
-	
-	NetworkMessage msg;
-	
-	if(creature == player) {
-		AddPlayerInventoryItem(msg, player, toSlot);
-	}
-	else {
-		//Auto-closing containers
-		const Container* moveContainer = dynamic_cast<const Container*>(fromItem);
-		if(moveContainer) {
-			autoCloseContainers(moveContainer, msg);						
-		}
-	}
-	
-	if(CanSee(fromPos.x, fromPos.y, fromPos.z)) {
-		if(!fromItem->isStackable() || (oldFromCount == count && oldToCount + count <= 100)) {
-			AddRemoveThing(msg, fromPos, stackpos);
-			
-			if(toItem && (!toItem->isStackable() || toItem->getID() != fromItem->getID())) {
-				AddAppearThing(msg, fromPos);
-				msg.AddItem(toItem);
-			}
-		}
-		else
-			AddTileUpdated(msg, fromPos);
-	}
-	
-	WriteBuffer(msg);
-}
-
-*/
-
-/*
-//ground to ground
-void Protocol75::sendThingMove(const Creature *creature, const Thing *thing,
-							   const Position *oldPos, unsigned char oldStackPos, unsigned char oldcount, unsigned char count, bool tele)
-{
-	NetworkMessage msg;
-	
-	const Creature* c = dynamic_cast<const Creature*>(thing);
-	if(c && c->isRemoved())
-		return;
-	
-	if (!tele && c && (CanSee(oldPos->x, oldPos->y, oldPos->z)) && (CanSee(thing->getPosition().x, thing->getPosition().y, thing->getPosition().z)))
-	{
-		msg.AddByte(0x6D);
-		msg.AddPosition(*oldPos);
-		msg.AddByte(oldStackPos);
-		msg.AddPosition(thing->getPosition());
-		
-		Tile *fromTile = game->getTile(oldPos->x, oldPos->y, oldPos->z);
-		if(fromTile && fromTile->getThingCount() > 8) {
-			//We need to pop up this item
-			Thing *newthing = fromTile->getThingByStackPos(9);
-			
-			if(newthing != NULL) {
-				AddTileUpdated(msg, *oldPos);
-			}
-		}
-	}
-	else
-	{
-		if (!tele && CanSee(oldPos->x, oldPos->y, oldPos->z))
-		{
-			AddRemoveThing(msg,*oldPos,oldStackPos);
-		}
-		
-		if (!(tele && thing == this->player) && CanSee(thing->getPosition().x, thing->getPosition().y, thing->getPosition().z))
-		{
-			AddAppearThing(msg,thing->getPosition());      
-			if (c) {
-				bool known;
-				unsigned long removedKnown;
-				checkCreatureAsKnown(c->getID(), known, removedKnown);
-				AddCreature(msg, c, known, removedKnown);
-			}
-			else {
-				const Item* item = dynamic_cast<const Item*>(thing);
-				msg.AddItem(item);
-				
-				//Auto-close container's
-				const Container* moveContainer = dynamic_cast<const Container*>(thing);
-				if(moveContainer){
-					if(std::abs(player->getPosition().x - thing->getPosition().x) > 1 ||
-						std::abs(player->getPosition().y - thing->getPosition().y) > 1 || player->getPosition().z != thing->getPosition().z ){
-						autoCloseContainers(moveContainer, msg);
-					}
-				}
-			}
-		}
-	}
-	
-	if (thing == this->player) {
-		if(tele){
-			msg.AddByte(0x64); 
-			msg.AddPosition(player->getPosition()); 
-			GetMapDescription(player->getPosition().x-8, player->getPosition().y-6, player->getPosition().z, 18, 14, msg); 
-		}
-		else{               
-			if (oldPos->y > thing->getPosition().y) { // north, for old x
-				msg.AddByte(0x65);
-				GetMapDescription(oldPos->x - 8, thing->getPosition().y - 6, thing->getPosition().z, 18, 1, msg);
-			} else if (oldPos->y < thing->getPosition().y) { // south, for old x
-				msg.AddByte(0x67);
-				GetMapDescription(oldPos->x - 8, thing->getPosition().y + 7, thing->getPosition().z, 18, 1, msg);
-			}
-			if (oldPos->x < thing->getPosition().x) { // east, [with new y]
-				msg.AddByte(0x66);
-				GetMapDescription(thing->getPosition().x + 9, thing->getPosition().y - 6, thing->getPosition().z, 1, 14, msg);
-			} else if (oldPos->x > thing->getPosition().x) { // west, [with new y]
-				msg.AddByte(0x68);
-				GetMapDescription(thing->getPosition().x - 8, thing->getPosition().y - 6, thing->getPosition().z, 1, 14, msg);
-			}
-		}
-		
-		//Auto-close container's
-		std::vector<Container *> containers;
-		for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
-			Container *container = cit->second;
-			
-			//Only add those we need to close
-			//if(container->pos.x != 0xFFFF) {
-			if(container->getTile() == container->getParent()) {
-				if(std::abs(player->getPosition().x - container->getPosition().x) > 1 || std::abs(player->getPosition().y - container->getPosition().y) > 1 || player->getPosition().z != container->getPosition().z) {
-					containers.push_back(cit->second);
-				}
-			}
-		}
-		
-		for(std::vector<Container *>::const_iterator it = containers.begin(); it != containers.end(); ++it) {
-			autoCloseContainers(*it, msg);
-		}
-	}	
-	
-	WriteBuffer(msg);
-}
-*/
-
-
 void Protocol75::sendCreatureTurn(const Creature *creature, unsigned char stackPos)
 {
 	if (CanSee(creature))
@@ -2171,194 +1301,6 @@ void Protocol75::sendCancelWalk()
 	netmsg.AddByte(player->getDirection()); // direction
 	WriteBuffer(netmsg);
 }
-
-/*
-void Protocol75::sendThingDisappear(const Thing *thing, unsigned char stackPos, bool tele)
-{
-	NetworkMessage msg;
-	const Creature* creature = dynamic_cast<const Creature*>(thing);
-	//Auto-close trade
-	if(player->getTradeItem() && dynamic_cast<const Item*>(thing) == player->getTradeItem()) {
-		game->playerCloseTrade(player);
-	}
-	
-	if(creature && creature->isRemoved())
-		return;
-	
-	if(!tele) {		
-		if(creature && creature->health > 0){
-			const Player* remove_player = dynamic_cast<const Player*>(creature);
-			if(remove_player == player)
-				return;
-			
-			if(CanSee(creature)){
-				AddMagicEffect(msg,thing->getPosition(), NM_ME_PUFF);
-			}
-		}
-	}
-	
-	if(CanSee(thing->getPosition().x, thing->getPosition().y, thing->getPosition().z)) {
-		AddRemoveThing(msg,thing->getPosition(), stackPos);
-		if(creature && stackPos > 9){
-			AddCreatureHealth(msg,creature);
-		}
-
-		Tile* tile = game->getTile(thing->getPosition().x, thing->getPosition().y, thing->getPosition().z);
-		if(tile && tile->getThingCount() > 8) {
-			//We need to pop up this item
-			Thing *newthing = tile->getThingByStackPos(9);
-			if(newthing != NULL) {
-				AddTileUpdated(msg, thing->getPosition());
-			}
-		}
-	}
-	
-	WriteBuffer(msg);
-}
-*/
-
-/*
-void Protocol75::sendThingAppear(const Thing* thing)
-{
-	NetworkMessage msg;
-
-	const Creature* creature = dynamic_cast<const Creature*>(thing);
-	if(creature){
-		//const Player* add_player = dynamic_cast<const Player*>(creature);
-		if(creature == player){
-			msg.AddByte(0x0A);
-			msg.AddU32(player->getID());
-			
-			msg.AddByte(0x32);
-			msg.AddByte(0x00);
-			
-			msg.AddByte(0x00); //can report bugs 0,1
-				
-			//msg.AddByte(0x0B);//TODO?. GM actions
-			//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-			//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-			//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-			//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-			//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-			//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-			//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-			//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-
-			AddMapDescription(msg, player->getPosition());			
-			AddMagicEffect(msg, player->getPosition(), NM_ME_ENERGY_AREA);
-			
-			AddInventoryItem(msg, SLOT_HEAD, player->getInventoryItem(SLOT_HEAD));
-			AddInventoryItem(msg, SLOT_NECKLACE, player->getInventoryItem(SLOT_NECKLACE));
-			AddInventoryItem(msg, SLOT_BACKPACK, player->getInventoryItem(SLOT_BACKPACK));
-			AddInventoryItem(msg, SLOT_ARMOR, player->getInventoryItem(SLOT_ARMOR));
-			AddInventoryItem(msg, SLOT_RIGHT, player->getInventoryItem(SLOT_RIGHT));
-			AddInventoryItem(msg, SLOT_LEFT, player->getInventoryItem(SLOT_LEFT));
-			AddInventoryItem(msg, SLOT_LEGS, player->getInventoryItem(SLOT_LEGS));
-			AddInventoryItem(msg, SLOT_FEET, player->getInventoryItem(SLOT_FEET));
-			AddInventoryItem(msg, SLOT_RING, player->getInventoryItem(SLOT_RING));
-			AddInventoryItem(msg, SLOT_AMMO, player->getInventoryItem(SLOT_AMMO));
-
-			AddPlayerStats(msg);	
-
-			//gameworld light-settings
-			msg.AddByte(0x82);
-			msg.AddByte(0x6F); //level
-			msg.AddByte(0xD7);//color
-
-			//player light level
-			//msg.AddByte(0x8d);//8d
-			//msg.AddU32(player->getID());
-			//msg->AddByte(0x6F); //level
-			//msg->AddByte(0xDF); //color
-
-			AddPlayerSkills(msg);
-				
-			for(VIPListSet::iterator it = player->VIPList.begin(); it != player->VIPList.end(); it++){
-				bool online;
-				std::string vip_name;
-				
-				if(IOPlayer::instance()->getNameByGuid((*it), vip_name)){
-					online = (game->getPlayerByName(vip_name) != NULL);
-					sendVIP((*it), vip_name, online);
-				}
-			}
-
-			AddTextMessage(msg,MSG_EVENT, g_config.getGlobalString("loginmsg", "Welcome.").c_str());
-			std::string tempstring;
-			tempstring = "Your last visit was on ";
-			time_t lastlogin = player->getLastLoginSaved();
-			tempstring += ctime(&lastlogin);
-			tempstring.erase(tempstring.length() -1);
-			tempstring += ".";
-			AddTextMessage(msg,MSG_EVENT, tempstring.c_str());
-			WriteBuffer(msg);
-				
-			//force flush
-			flushOutputBuffer();
-		}
-		else if(CanSee(creature)){
-			bool known;
-			unsigned long removedKnown;
-			checkCreatureAsKnown(creature->getID(), known, removedKnown);
-			AddAppearThing(msg,creature->getPosition());
-			AddCreature(msg,creature, known, removedKnown);		
-			// login bubble
-			AddMagicEffect(msg,creature->getPosition(), NM_ME_ENERGY_AREA);
-		}
-	}
-	else if(CanSee(thing->getPosition().x, thing->getPosition().y, thing->getPosition().z))
-	{
-		const Item *item = dynamic_cast<const Item*>(thing);
-		if(item){
-			Tile *tile = game->getTile(item->getPosition().x,item->getPosition().y,item->getPosition().z);
-			if(tile->getThingCount() > 8){
-				AddTileUpdated(msg,item->getPosition());
-			}
-			else{
-				AddAppearThing(msg,item->getPosition());
-				msg.AddItem(item);
-			}
-		}
-	}
-	
-	WriteBuffer(msg);
-}
-*/
-
-/*
-void Protocol75::sendThingTransform(const Thing* thing,int stackpos)
-{
-	if(CanSee(thing->getPosition().x, thing->getPosition().y, thing->getPosition().z)) {
-		const Item *item = dynamic_cast<const Item*>(thing);
-		if(item){
-			NetworkMessage msg;
-			if(stackpos == 0){
-				AddTileUpdated(msg, thing->getPosition());
-			}
-			else if(stackpos < 10){
-				msg.AddByte(0x6B);
-				msg.AddPosition(thing->getPosition());
-				msg.AddByte(stackpos);
-				msg.AddItem(item);
-			}
-			else{
-				return;
-			}
-			WriteBuffer(msg);
-		}
-		//update container icon
-		if(dynamic_cast<const Container*>(item)){
-			const Container *updateContainer = dynamic_cast<const Container*>(item);
-			for(containerLayout::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
-				Container *container = cit->second;
-				if(container == updateContainer) {
-					sendContainer(cit->first, container);
-				}
-			}
-		}
-	}
-}
-*/
 
 void Protocol75::sendSkills()
 {
@@ -2530,11 +1472,7 @@ void Protocol75::sendAddCreature(const Creature* creature, bool isLogin)
 				flushOutputBuffer();
 		}
 		else{
-			bool known;
-			unsigned long removedKnown;
-			checkCreatureAsKnown(creature->getID(), known, removedKnown);
-			AddAppearThing(msg, creature->getPosition());
-			AddCreature(msg, creature, known, removedKnown);
+			AddTileCreature(msg, creature->getPosition(), creature);
 
 			if(isLogin){
 				AddMagicEffect(msg, creature->getPosition(), NM_ME_ENERGY_AREA);
@@ -2645,34 +1583,25 @@ void Protocol75::sendRemoveInventoryItem(slots_t slot)
 }
 
 //containers
-void Protocol75::sendAddContainerItem(const Container* container, const Item* item)
+void Protocol75::sendAddContainerItem(uint8_t cid, const Item* item)
 {
-	uint32_t cid = player->getContainerID(container);
-	if(cid != -1){
-		NetworkMessage msg;
-		AddContainerItem(msg, cid, item);
-		WriteBuffer(msg);
-	}
+	NetworkMessage msg;
+	AddContainerItem(msg, cid, item);
+	WriteBuffer(msg);
 }
 
-void Protocol75::sendUpdateContainerItem(const Container *container, uint8_t slot, const Item* item)
+void Protocol75::sendUpdateContainerItem(uint8_t cid, uint8_t slot, const Item* item)
 {
-	uint32_t cid = player->getContainerID(container);
-	if(cid != -1){
-		NetworkMessage msg;
-		UpdateContainerItem(msg, cid, slot, item);
-		WriteBuffer(msg);
-	}
+	NetworkMessage msg;
+	UpdateContainerItem(msg, cid, slot, item);
+	WriteBuffer(msg);
 }
 
-void Protocol75::sendRemoveContainerItem(const Container* container, uint8_t slot)
+void Protocol75::sendRemoveContainerItem(uint8_t cid, uint8_t slot)
 {
-	uint32_t cid = player->getContainerID(container);
-	if(cid != -1){
-		NetworkMessage msg;
-		RemoveContainerItem(msg, cid, slot);
-		WriteBuffer(msg);
-	}
+	NetworkMessage msg;
+	RemoveContainerItem(msg, cid, slot);
+	WriteBuffer(msg);
 }
 
 void Protocol75::sendTextWindow(Item* item,const unsigned short maxlen, const bool canWrite)
@@ -2873,48 +1802,23 @@ void Protocol75::AddCreatureHealth(NetworkMessage &msg,const Creature *creature)
 	msg.AddByte(std::max(creature->health,0)*100/creature->healthmax);
 }
 
-void Protocol75::AddRemoveThing(NetworkMessage& msg, const Position& pos, int stackpos)
-{
-	if(stackpos < 10) {
-		if(CanSee(pos.x, pos.y, pos.z)) {
-			msg.AddByte(0x6C);
-			msg.AddPosition(pos);
-			msg.AddByte(stackpos);
-		}
-	}
-	else {
-		//This will cause some problem, we remove an item (example: a player gets removed due to death) from the map, but the client cant see it
-		//(above the 9 limit), real tibia has the same problem so I don't think there is a way to fix this.
-		//Problem: The client won't be informed that the player has been killed
-		//and will show the player as alive (0 hp).
-		//Solution: re-log.
-	}
-	
-	Tile *fromTile = game->getTile(pos.x, pos.y, pos.z);
-	if(fromTile && fromTile->getThingCount() > 8) {
-		//We need to pop up this item
-		Thing *newthing = fromTile->getThingByStackPos(9);
-		
-		if(newthing != NULL) {
-			AddTileUpdated(msg, pos);
-		}
-	}
-}
-
-void Protocol75::AddAppearThing(NetworkMessage &msg, const Position &pos)
-{
-	if(CanSee(pos.x, pos.y, pos.z)) {		
-		msg.AddByte(0x6A);
-		msg.AddPosition(pos);	
-	}
-}
-
 //tile
 void Protocol75::AddTileItem(NetworkMessage& msg, const Position& pos, const Item* item)
 {
 	msg.AddByte(0x6A);
 	msg.AddPosition(pos);	
 	msg.AddItem(item);
+}
+
+void Protocol75::AddTileCreature(NetworkMessage& msg, const Position& pos, const Creature* creature)
+{
+	msg.AddByte(0x6A);
+	msg.AddPosition(pos);	
+
+	bool known;
+	unsigned long removedKnown;
+	checkCreatureAsKnown(creature->getID(), known, removedKnown);
+	AddCreature(msg, creature, known, removedKnown);
 }
 
 void Protocol75::UpdateTileItem(NetworkMessage& msg, const Position& pos, uint32_t stackpos, const Item* item)
@@ -2933,6 +1837,23 @@ void Protocol75::RemoveTileItem(NetworkMessage& msg, const Position& pos, uint32
 		msg.AddByte(0x6C);
 		msg.AddPosition(pos);
 		msg.AddByte(stackpos);
+	}
+}
+
+void Protocol75::UpdateTile(NetworkMessage& msg, const Position& pos)
+{
+	msg.AddByte(0x69);
+	msg.AddPosition(pos);
+		
+	Tile* tile = game->getTile(pos.x, pos.y, pos.z);
+	if(tile){
+		GetTileDescription(tile, msg);
+		msg.AddByte(0);
+		msg.AddByte(0xFF);
+	}
+	else{
+		msg.AddByte(0x01);
+		msg.AddByte(0xFF);
 	}
 }
 
@@ -3086,31 +2007,6 @@ void Protocol75::RemoveContainerItem(NetworkMessage& msg, uint8_t cid, uint8_t s
 	msg.AddByte(cid);
 	msg.AddByte(slot);
 }
-
-void Protocol75::AddTileUpdated(NetworkMessage &msg, const Position &pos)
-{
-#ifdef __DEBUG__
-	std::cout << "Pop-up item from below..." << std::endl;
-#endif
-
-	if (CanSee(pos.x, pos.y, pos.z))
-	{		
-		msg.AddByte(0x69);
-		msg.AddPosition(pos);
-		
-		Tile* tile = game->getTile(pos.x, pos.y, pos.z);
-		if(tile) {
-			GetTileDescription(tile, msg);
-			msg.AddByte(0);
-			msg.AddByte(0xFF);
-		}
-		else {
-			msg.AddByte(0x01);
-			msg.AddByte(0xFF);
-		}
-	}
-}
-
 
 //////////////////////////
 

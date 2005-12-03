@@ -1306,8 +1306,7 @@ bool Monster::monsterMoveItem(Item* item, int radius)
 		//if(game->map->canThrowItemTo(item->pos,tryPos)){
 		if(game->map->canThrowObjectTo(item->getPosition(), tryPos, BLOCK_SOLID) == RET_NOERROR){
 			Tile* fromTile = game->getTile(item->getPosition().x, item->getPosition().y, item->getPosition().z);
-			int oldstackpos = fromTile->getThingStackPos(item);
-
+			//int oldstackpos = fromTile->getThingStackPos(item);
 			//game->thingMoveInternal(this, item->getPosition().x, item->getPosition().y, item->getPosition().z,
 			//	oldstackpos, item->getID(), tryPos.x, tryPos.y, tryPos.z, count);
 

@@ -141,6 +141,9 @@ public:
   enum_world_type getWorldType() const {return worldType;}
 	const std::string& getSpawnFile() {return map->spawnfile;}
 
+	Cylinder* internalGetCylinder(Player* player, const Position& pos);
+	Thing* internalGetThing(Player* player, const Position& pos, int32_t index);
+
 	/**
 	  * Get a single tile of the map.
 	  * \returns A Pointer to the tile */
@@ -173,10 +176,12 @@ public:
 
 	void getSpectators(const Range& range, SpectatorVec& list);
 
-	ReturnValue creatureMove(Creature* creature, Direction direction);
+	void thingMove(Player* player, const Position& fromPos, uint16_t itemId, uint8_t fromStackpos,
+		const Position& toPos, uint8_t count);
 
-	void creatureMove(Player* player, Cylinder* fromCylinder, Cylinder* toCylinder,
-		Creature* moveCreature);
+	void moveCreature(Player* player, Cylinder* fromCylinder, Cylinder* toCylinder,
+	Creature* moveCreature);
+	ReturnValue moveCreature(Creature* creature, Direction direction);
 
 	ReturnValue internalCreatureMove(Creature* creature, Cylinder* fromCylinder, Cylinder* toCylinder);
 
@@ -225,16 +230,20 @@ public:
 	bool creatureSaySpell(Creature *creature, const std::string &text);
 
 	void playerAutoWalk(Player* player, std::list<Direction>& path);
-	bool playerUseItemEx(Player *player, const Position& posFrom,const unsigned char  stack_from,
-		const Position &posTo,const unsigned char stack_to, const unsigned short itemid);
-	bool playerUseItem(Player *player, const Position& pos, const unsigned char stackpos, const unsigned short itemid, const unsigned char index);
-	bool playerUseBattleWindow(Player *player, Position &posFrom, unsigned char stackpos, unsigned short itemid, unsigned long creatureid);
-	bool playerRotateItem(Player *player, const Position& pos, const unsigned char stackpos, const unsigned short itemid);
 
-	void playerRequestTrade(Player *player, const Position& pos,
-		const unsigned char stackpos, const unsigned short itemid, unsigned long playerid);
+	bool playerUseItemEx(Player* player, const Position& fromPos, uint8_t fromStackpos, uint16_t fromItemId,
+		const Position& toPos, uint8_t toStackpos, uint16_t toItemId);
+	bool playerUseItem(Player* player, const Position& pos, uint8_t stackpos, uint8_t index, uint16_t itemId);
+	bool playerUseBattleWindow(Player* player, const Position& posFrom, uint8_t fromStackPos,
+		uint32_t creatureId, uint16_t itemId);
+	bool playerRotateItem(Player* player, const Position& pos, uint8_t stackpos, const uint16_t itemId);
+
+	bool playerRequestTrade(Player* player, const Position& pos, uint8_t stackpos,
+		uint32_t playerId, uint16_t itemId);
 	void playerAcceptTrade(Player* player);
 	void playerLookInTrade(Player* player, bool lookAtCounterOffer, int index);
+	bool playerLookAt(Player* player, const Position& pos, uint16_t itemId, uint8_t stackpos);
+
 	void playerCloseTrade(Player* player);
 	void autoCloseTrade(const Item* item, bool itemMoved = false);
   void autoCloseAttack(Player* player, Creature* target);

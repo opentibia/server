@@ -190,6 +190,10 @@ ReturnValue Container::__queryAdd(uint32_t index, const Thing* thing, uint32_t c
 		return RET_NOTPOSSIBLE;
 	}
 
+	if(!item->isPickupable()){
+		return RET_CANNOTPICKUP;
+	}
+
 	return RET_NOERROR;
 }
 

@@ -249,14 +249,15 @@ void Map::getSpectators(const Range& range, SpectatorVec& list)
 	CreatureVector::iterator cit;
 	Tile *tile;
 
-	for(int nz = range.minRange.z; nz != range.maxRange.z + range.zstep; nz += range.zstep) {
+	//for(int nz = range.minRange.z; nz != range.maxRange.z + range.zstep; nz++) {
+	for(int nz = range.minRange.z; nz != range.maxRange.z + range.zstep; nz += range.zstep){
 		offsetz = range.centerpos.z - nz;
 		//negative offset means that the player is on a lower floor than ourself
 
 		for(int nx = range.minRange.x + offsetz; nx <= range.maxRange.x + offsetz; ++nx){
 			for(int ny = range.minRange.y + offsetz; ny <= range.maxRange.y + offsetz; ++ny){
 				tile = getTile(nx + range.centerpos.x, ny + range.centerpos.y, nz);
-				if (tile){
+				if(tile){
 					for(cit = tile->creatures.begin(); cit != tile->creatures.end(); ++cit){
 /*
 #ifdef __DEBUG__
@@ -264,7 +265,7 @@ void Map::getSpectators(const Range& range, SpectatorVec& list)
 #endif
 */					
 						if(std::find(list.begin(), list.end(), *cit) == list.end()){
-							list.push_back((*cit));
+							list.push_back(*cit);
 						}
 					}
 				}
