@@ -191,13 +191,13 @@ public:
 	ReturnValue internalMoveItem(Cylinder* fromCylinder, Cylinder* toCylinder, int32_t index,
 		Item* item, uint32_t count);
 
-	void addItem(Player* player, Cylinder* toCylinder, Item* item);
+	//void addItem(Player* player, Cylinder* toCylinder, Item* item);
 	ReturnValue internalAddItem(Cylinder* toCylinder, Item* item, bool test = false);
 
-	void removeItem(Player* player, Cylinder* fromCylinder, Item* item);
-	ReturnValue internalRemoveItem(Cylinder* fromCylinder, Item* item,  bool test = false);
+	//void removeItem(Player* player, Cylinder* fromCylinder, Item* item);
+	ReturnValue internalRemoveItem(Item* item,  bool test = false);
 
-	Item* transformItem(Cylinder* cylinder, Item* item, uint16_t newtype, int32_t count /*= -1*/);
+	Item* transformItem(Item* item, uint16_t newtype, int32_t count = -1);
 
 	void playerSendErrorMessage(Player* player, ReturnValue message);
 
@@ -217,11 +217,11 @@ public:
 	  */
 	void creatureSay(Creature *creature, SpeakClasses type, const std::string &text);
 
-	void creatureWhisper(Creature *creature, const std::string &text);
-	void creatureYell(Creature *creature, std::string &text);
-  	void creatureSpeakTo(Creature *creature, SpeakClasses type, const std::string &receiver, const std::string &text);
-	void creatureBroadcastMessage(Creature *creature, const std::string &text);
-  	void creatureTalkToChannel(Player *player, SpeakClasses type, std::string &text, unsigned short channelId);
+	bool playerWhisper(Player* player, const std::string& text);
+	bool playerYell(Player* player, std::string& text);
+  bool playerSpeakTo(Player* player, SpeakClasses type, const std::string& receiver, const std::string& text);
+	bool playerBroadcastMessage(Player* player, const std::string& text);
+  bool playerTalkToChannel(Player *player, SpeakClasses type, std::string &text, unsigned short channelId);
 	void creatureMonsterYell(Monster* monster, const std::string& text);
 	void creatureChangeOutfit(Creature *creature);
 
@@ -240,13 +240,13 @@ public:
 
 	bool playerRequestTrade(Player* player, const Position& pos, uint8_t stackpos,
 		uint32_t playerId, uint16_t itemId);
-	void playerAcceptTrade(Player* player);
-	void playerLookInTrade(Player* player, bool lookAtCounterOffer, int index);
+	bool playerAcceptTrade(Player* player);
+	bool playerLookInTrade(Player* player, bool lookAtCounterOffer, int index);
 	bool playerLookAt(Player* player, const Position& pos, uint16_t itemId, uint8_t stackpos);
 
 	void playerCloseTrade(Player* player);
-	void autoCloseTrade(const Item* item, bool itemMoved = false);
-  void autoCloseAttack(Player* player, Creature* target);
+	//void autoCloseTrade(const Item* item, bool itemMoved = false);
+  //void checkCloseAttack(Player* player, Creature* target);
 	
 	void playerSetAttackedCreature(Player* player, unsigned long creatureid);
 

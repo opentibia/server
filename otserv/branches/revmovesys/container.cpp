@@ -190,8 +190,24 @@ ReturnValue Container::__queryAdd(uint32_t index, const Thing* thing, uint32_t c
 		return RET_NOTPOSSIBLE;
 	}
 
+	if(index < 0 || index >= capacity())
+		return RET_NOTPOSSIBLE;
+
 	if(!item->isPickupable()){
 		return RET_CANNOTPICKUP;
+	}
+
+	if(item == this){
+		return RET_THISISIMPOSSIBLE;
+	}
+
+	const Cylinder* cylinder = item->getParent();
+	while(cylinder){
+		if(cylinder == thing){
+			return RET_THISISIMPOSSIBLE;
+		}
+
+		cylinder = cylinder->getParent();
 	}
 
 	return RET_NOERROR;
@@ -252,20 +268,20 @@ ReturnValue Container::__addThing(uint32_t index, Thing* thing)
 	if(itemlist.size() >= capacity())
 		return RET_NOTENOUGHROOM;
 
+	item->setParent(this);
+	itemlist.push_front(item);
+
 	const Position& cylinderMapPos = getPosition();
 
 	SpectatorVec list;
 	SpectatorVec::iterator it;
 	g_game.getSpectators(Range(cylinderMapPos, 2, 2, 2, 2, false), list);
 
-	item->setParent(this);
-	itemlist.push_front(item);
-
 	//send to client
 	for(it = list.begin(); it != list.end(); ++it) {
 		Player* spectator = dynamic_cast<Player*>(*it);
 		if(spectator){
-			spectator->sendAddContainerItem(this, item);
+			spectator->onAddContainerItem(this, item);
 		}
 	}
 
@@ -299,7 +315,7 @@ ReturnValue Container::__updateThing(Thing* thing, uint32_t count)
 	for(it = list.begin(); it != list.end(); ++it) {
 		Player* spectator = dynamic_cast<Player*>(*it);
 		if(spectator){
-			spectator->sendUpdateContainerItem(this, index, item);
+			spectator->onUpdateContainerItem(this, index, item, item);
 		}
 	}
 
@@ -320,9 +336,6 @@ ReturnValue Container::__updateThing(uint32_t index, Thing* thing)
 	itemlist.insert(cit, item);
 	item->setParent(this);
 
-	(*cit)->setParent(NULL);
-	itemlist.erase(cit);
-
 	const Position& cylinderMapPos = getPosition();
 
 	SpectatorVec list;
@@ -333,9 +346,12 @@ ReturnValue Container::__updateThing(uint32_t index, Thing* thing)
 	for(it = list.begin(); it != list.end(); ++it) {
 		Player* spectator = dynamic_cast<Player*>(*it);
 		if(spectator){
-			spectator->sendUpdateContainerItem(this, index, item);
+			spectator->onUpdateContainerItem(this, index, (*cit), item);
 		}
 	}
+
+	(*cit)->setParent(NULL);
+	itemlist.erase(cit);
 
 	return RET_NOERROR;
 }
@@ -369,22 +385,23 @@ ReturnValue Container::__removeThing(Thing* thing, uint32_t count)
 		for(it = list.begin(); it != list.end(); ++it) {
 			Player* spectator = dynamic_cast<Player*>(*it);
 			if(spectator){
-				spectator->sendUpdateContainerItem(this, index, item);
+				spectator->onUpdateContainerItem(this, index, item, item);
 			}
 		}
+
 		return RET_NOERROR;
 	}
 	else{
-		(*cit)->setParent(NULL);
-		itemlist.erase(cit);
-
 		//send change to client
 		for(it = list.begin(); it != list.end(); ++it) {
 			Player* spectator = dynamic_cast<Player*>(*it);
 			if(spectator){
-				spectator->sendRemoveContainerItem(this, index);
+				spectator->onRemoveContainerItem(this, index, item);
 			}
 		}
+
+		(*cit)->setParent(NULL);
+		itemlist.erase(cit);
 		return RET_NOERROR;
 	}
 	
@@ -428,6 +445,16 @@ Thing* Container::__getThing(uint32_t index) const
 	}
 
 	return NULL;
+}
+
+void Container::postAddNotification(const Thing* thing, bool hasOwnership /*= true*/)
+{
+	//
+}
+
+void Container::postRemoveNotification(const Thing* thing, bool hadOwnership /*= true*/)
+{
+	//
 }
 
 void Container::__internalAddThing(Thing* thing)

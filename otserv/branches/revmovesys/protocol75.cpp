@@ -857,8 +857,10 @@ void Protocol75::parseUpArrowContainer(NetworkMessage& msg)
 		return;
 	
 	Container* parentcontainer = dynamic_cast<Container*>(container->getParent());
-	if(parentcontainer) {
-		sendContainer(cid, parentcontainer);
+	if(parentcontainer){
+		bool hasParent = (dynamic_cast<const Container*>(parentcontainer->getParent()) != NULL);
+		player->addContainer(cid, parentcontainer);
+		sendContainer(cid, parentcontainer, hasParent);
 	}
 }
 
@@ -943,22 +945,22 @@ void Protocol75::parseSay(NetworkMessage& msg)
 		game->creatureSay(player, type, text);
 		break;
 	case SPEAK_WHISPER:
-		game->creatureWhisper(player, text);
+		game->playerWhisper(player, text);
 		break;
 	case SPEAK_YELL:
-		game->creatureYell(player, text);
+		game->playerYell(player, text);
 		break;
 	case SPEAK_PRIVATE:
 	case SPEAK_PRIVATE_RED:
-		game->creatureSpeakTo(player, type, receiver, text);
+		game->playerSpeakTo(player, type, receiver, text);
 		break;
 	case SPEAK_CHANNEL_Y:
 	case SPEAK_CHANNEL_R1:
 	case SPEAK_CHANNEL_R2:
-		game->creatureTalkToChannel(player, type, text, channelId);
+		game->playerTalkToChannel(player, type, text, channelId);
 		break;
 	case SPEAK_BROADCAST:
-		game->creatureBroadcastMessage(player, text);
+		game->playerBroadcastMessage(player, text);
 		break;
 	}
 }
@@ -1131,14 +1133,9 @@ void Protocol75::sendIcons(int icons)
 	WriteBuffer(newmsg);
 }
 
-void Protocol75::sendContainer(uint32_t cid, Container* container)
+void Protocol75::sendContainer(uint32_t cid, const Container* container, bool hasParent)
 {
-	if(!container)
-		return;
-	
 	NetworkMessage msg;
-	
-	player->addContainer(cid, container);
 	
 	msg.AddByte(0x6E);
 	msg.AddByte(cid);
@@ -1146,17 +1143,14 @@ void Protocol75::sendContainer(uint32_t cid, Container* container)
 	msg.AddItemId(container);
 	msg.AddString(container->getName());
 	msg.AddByte(container->capacity());
-	if(dynamic_cast<const Container*>(container->getParent()) != NULL)
-		msg.AddByte(0x01); // container up ID (can go up) 
-	else
-		msg.AddByte(0x00);
-	
+	msg.AddByte(hasParent ? 0x01 : 0x00);
 	msg.AddByte(container->size());
 	
 	ItemList::const_iterator cit;
-	for (cit = container->getItems(); cit != container->getEnd(); ++cit) {
+	for(cit = container->getItems(); cit != container->getEnd(); ++cit){
 		msg.AddItem(*cit);
 	}
+
 	WriteBuffer(msg);
 }
 
@@ -1229,20 +1223,9 @@ void Protocol75::sendCloseContainer(uint32_t cid)
 	WriteBuffer(msg);
 }
 
-/*
-void Protocol75::sendTileUpdated(const Position &pos)
-{
-	NetworkMessage msg;
-	
-	AddTileUpdated(msg, pos);
-	WriteBuffer(msg);
-}
-*/
-
 void Protocol75::sendCreatureTurn(const Creature *creature, unsigned char stackPos)
 {
-	if (CanSee(creature))
-	{
+	if(CanSee(creature)){
 		NetworkMessage msg;
 		
 		msg.AddByte(0x6B);
@@ -1388,6 +1371,15 @@ void Protocol75::sendRemoveTileItem(const Position& pos, uint32_t stackpos)
 	if(CanSee(pos)){
 		NetworkMessage msg;
 		RemoveTileItem(msg, pos, stackpos);
+		WriteBuffer(msg);
+	}
+}
+
+void Protocol75::UpdateTile(const Position& pos)
+{
+	if(CanSee(pos)){
+		NetworkMessage msg;
+		UpdateTile(msg, pos);
 		WriteBuffer(msg);
 	}
 }

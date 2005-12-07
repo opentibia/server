@@ -62,7 +62,7 @@ using namespace std;
 
 extern LuaScript g_config;
 extern Spells spells;
-//extern std::map<long, Creature*> channel;
+
 
 Map::Map() :
 spawnfile(""),
@@ -77,7 +77,8 @@ Map::~Map()
 }
 
 
-int Map::loadMap(std::string filename, std::string filekind) {
+int Map::loadMap(std::string filename, std::string filekind)
+{
 	int ret;
 	IOMap* loader;
 	
@@ -141,7 +142,6 @@ Tile* Map::getTile(const Position &pos)
 	return getTile(pos.x, pos.y, pos.z);
 }
 
-
 void Map::setTile(unsigned short _x, unsigned short _y, unsigned char _z, unsigned short groundId)
 {
   Tile *tile = getTile(_x, _y, _z);
@@ -170,63 +170,39 @@ void Map::setTile(unsigned short _x, unsigned short _y, unsigned char _z, unsign
   } 
 }
 
-bool Map::placeCreature(const Position &pos, Creature* c)
+bool Map::placeCreature(const Position &pos, Creature* creature)
 {
 	Tile* tile = getTile(pos.x, pos.y, pos.z);
-	Position tryPos = pos;
 
-	bool success = tile && !tile->floorChange() && !tile->getTeleportItem() /*&& c->canMovedTo(tile)*/;
-	if(!success)
-	{   
-		for(int cx =pos.x - 1; cx <= pos.x + 1 && !success; cx++) {
+	bool success = (tile && tile->__queryAdd(0, creature, 0) == RET_NOERROR);
+	if(!success){
+		for(int cx = pos.x - 1; cx <= pos.x + 1 && !success; cx++){
 			for(int cy = pos.y - 1; cy <= pos.y + 1 && !success; cy++){
-#ifdef __DEBUG__
-				std::cout << "search pos x: " << cx <<" y: "<< cy << std::endl;
-#endif
-
 				tile = getTile(cx, cy, pos.z);
-				success = tile && !tile->floorChange() && !tile->getTeleportItem() /*&& c->canMovedTo(tile)*/;
-
-				if(success) {
-					tryPos.x = cx;
-					tryPos.y = cy;
+				success = (tile && tile->__queryAdd(0, creature, 0) == RET_NOERROR);
+				if(success){
+					break;
 				}
 			}
 		}
-
-		if(!success){
-			Player *player = dynamic_cast<Player*>(c);
-			if(player) {
-				tryPos.x = c->masterPos.x;
-				tryPos.y = c->masterPos.y;
-				tryPos.z = c->masterPos.z;
-
-				tile = getTile(tryPos.x, tryPos.y, tryPos.z);
-				success = tile && !tile->floorChange() && !tile->getTeleportItem() /*&& player->canMovedTo(tile)*/;
-			}
-		}    
-
 	}
 
-	if(!success || !tile) {
+	if(success){
+		tile->addThing(creature);
+		return true;
+	}
+
 #ifdef __DEBUG__
 	std::cout << "Failed to place creature onto map!" << std::endl;
 #endif
-		return false;
-	}
-    #ifdef __DEBUG__
-	std::cout << "POS: " << c->pos << std::endl;
-	#endif
-	tile->addThing(c);
 
-	return true;
+	return false;
 }
 
-bool Map::removeCreature(Creature* c)
+bool Map::removeCreature(Creature* creature)
 {
-	//Cylinder* cylinder = c->getParent();
-	Tile* tile = dynamic_cast<Tile*>(c->getParent());
-	return tile->removeThing(c);
+	Tile* tile = creature->getTile();
+	return tile->removeThing(creature);
 }
 
 void Map::getSpectators(const Range& range, SpectatorVec& list)

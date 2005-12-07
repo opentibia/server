@@ -152,6 +152,7 @@ private:
 	virtual void sendAddTileItem(const Position& pos, const Item* item);
 	virtual void sendUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* item);
 	virtual void sendRemoveTileItem(const Position& pos, uint32_t stackpos);
+	virtual void UpdateTile(const Position& pos);
 
 	virtual void sendAddCreature(const Creature* creature, bool isLogin);
 	virtual void sendRemoveCreature(const Creature* creature, const Position& pos, uint32_t stackpos, bool isLogout);
@@ -162,7 +163,7 @@ private:
 	void sendUpdateContainerItem(uint8_t cid, uint8_t slot, const Item* item);
 	void sendRemoveContainerItem(uint8_t cid, uint8_t slot);
 
-	virtual void sendContainer(uint32_t cid, Container *container);
+	virtual void sendContainer(uint32_t cid, const Container* container, bool hasParent);
 	virtual void sendCloseContainer(uint32_t cid);
 
 	//inventory
@@ -182,8 +183,6 @@ private:
 	void GetMapDescription(unsigned short x, unsigned short y, unsigned char z,
 		unsigned short width, unsigned short height,
 		NetworkMessage &msg);
-	
-	//void autoCloseContainers(const Container *container, NetworkMessage &msg);
 
 	void AddMapDescription(NetworkMessage& msg, const Position& pos);
 	void AddTextMessage(NetworkMessage &msg,MessageClasses mclass, const char* message);
@@ -195,10 +194,6 @@ private:
 	void AddCreatureSpeak(NetworkMessage &msg,const Creature *creature, SpeakClasses type, std::string text, unsigned short channelId);
 	void AddCreatureHealth(NetworkMessage &msg,const Creature *creature);
 	void AddPlayerSkills(NetworkMessage &msg);
-
-	//void AddRemoveThing(NetworkMessage& msg, const Position& pos, int stackpos);
-	//void AddAppearThing(NetworkMessage& msg, const Position& pos);
-	//void AddTileUpdated(NetworkMessage& msg, const Position& pos);
 
 	//tiles
 	void AddTileItem(NetworkMessage& msg, const Position& pos, const Item* item);

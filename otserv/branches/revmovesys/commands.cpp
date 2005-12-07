@@ -360,13 +360,14 @@ bool Commands::placeSummon(Creature* c, const std::string &cmd, const std::strin
 	return false;
 }
 
-bool Commands::broadcastMessage(Creature* c, const std::string &cmd, const std::string &param){
-	game->creatureBroadcastMessage(c,param);
+bool Commands::broadcastMessage(Creature* c, const std::string &cmd, const std::string &param)
+{
+	//game->creatureBroadcastMessage(c, param);
 	return true;
 }
 
-bool Commands::banPlayer(Creature* c, const std::string &cmd, const std::string &param){
-	
+bool Commands::banPlayer(Creature* c, const std::string &cmd, const std::string &param)
+{	
 	Player* playerBan = game->getPlayerByName(param);
 	if(playerBan) {
 		/*MagicEffectClass me;
@@ -399,12 +400,14 @@ bool Commands::banPlayer(Creature* c, const std::string &cmd, const std::string 
 	return false;
 }
 
-bool Commands::teleportMasterPos(Creature* c, const std::string &cmd, const std::string &param){
+bool Commands::teleportMasterPos(Creature* c, const std::string &cmd, const std::string &param)
+{
 	game->teleport(c, c->masterPos);
 	return true;
 }
 
-bool Commands::teleportHere(Creature* c, const std::string &cmd, const std::string &param){
+bool Commands::teleportHere(Creature* c, const std::string &cmd, const std::string &param)
+{
 	Creature* creature = game->getCreatureByName(param);
 	if(creature) {
 		game->teleport(creature, c->getPosition());
@@ -442,26 +445,7 @@ bool Commands::createItems(Creature* c, const std::string &cmd, const std::strin
 		}
 	}
 
-	/*
-	ReturnValue ret = player->__addThing(newItem);
-	if(ret != RET_NOERROR){
-		//Tile* tile = game->map->getTile(c->getPosition());
-		//tile->__addThing();
-	}
-	*/
-
-	/*
-	Tile *t = game->map->getTile(c->getPosition());
-	if(!t)
-	{
-		delete newItem;
-		return true;
-	}
-
-	game->addThing(NULL, c->getPosition(), newItem);
-	*/
 	return true;
-
 }
 
 bool Commands::substract_contMoney(Creature* c, const std::string &cmd, const std::string &param)

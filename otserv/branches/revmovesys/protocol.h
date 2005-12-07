@@ -53,6 +53,7 @@ public:
 	virtual void sendAddTileItem(const Position& pos, const Item* item) = 0;
 	virtual void sendUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* item) = 0;
 	virtual void sendRemoveTileItem(const Position& pos, uint32_t stackpos) = 0;
+	virtual void UpdateTile(const Position& pos) = 0;
 
 	virtual void sendAddCreature(const Creature* creature, bool isLogin) = 0;
 	virtual void sendRemoveCreature(const Creature* creature, const Position& pos, uint32_t stackpos, bool isLogout) = 0;
@@ -63,7 +64,7 @@ public:
 	virtual void sendUpdateContainerItem(uint8_t cid, uint8_t slot, const Item* item) = 0;
 	virtual void sendRemoveContainerItem(uint8_t cid, uint8_t slot) = 0;
 
-	virtual void sendContainer(uint32_t cid, Container* container) = 0;
+	virtual void sendContainer(uint32_t cid, const Container* container, bool hasParent) = 0;
 	virtual void sendCloseContainer(uint32_t cid) = 0;
 
 	//inventory

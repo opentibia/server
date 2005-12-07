@@ -121,9 +121,6 @@ public:
 	const std::string& getGuildName() const {return guildName;};
 	unsigned long getGuildId() const {return guildId;};
 
-	//containerLayout::const_iterator getContainers() const { return vcontainers.begin();}
-	//containerLayout::const_iterator getEndContainer() const { return vcontainers.end();}
-
 	void addContainer(uint32_t containerid, Container *container);
 	void closeContainer(uint32_t containerid);
 	uint32_t getContainerID(const Container* container) const;
@@ -213,14 +210,12 @@ public:
 	void sendIcons();  
 	void sendChangeSpeed(Creature* creature);
 	void sendToChannel(Creature *creature, SpeakClasses type, const std::string &text, unsigned short channelId);
-	virtual void sendCancel(const char *msg) const;
-	virtual void sendCancelWalk() const;
+	void sendCancel(const char *msg) const;
+	void sendCancelWalk() const;
 	void sendStats();
 	void sendTextMessage(MessageClasses mclass, const char* message) const;
 	void sendTextMessage(MessageClasses mclass, const char* message,const Position &pos, unsigned char type) const;
 	void sendPing();
-	void sendCloseContainer(unsigned char containerid);
-	void sendContainer(unsigned char index, Container *container);
 	void sendTextWindow(Item* item,const unsigned short maxlen, const bool canWrite);  
 	void sendDistanceShoot(const Position &from, const Position &to, unsigned char type);
 	void sendMagicEffect(const Position &pos, unsigned char type);
@@ -252,9 +247,10 @@ public:
 	VIPListSet VIPList;
 
 	//tile
-	void sendAddTileItem(const Position& pos, const Item* item);
-	void sendUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* item);
-	void sendRemoveTileItem(const Position& pos, uint32_t stackpos);
+	virtual void onAddTileItem(const Position& pos, const Item* item);
+	virtual void onUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* olditem, const Item* newitem);
+	virtual void onRemoveTileItem(const Position& pos, uint32_t stackpos, const Item* item);
+	virtual void onUpdateTile(const Position& pos);
 	
 	virtual void onCreatureAppear(const Creature* creature, bool isLogin);
 	virtual void onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout);
@@ -267,16 +263,24 @@ public:
 	virtual void onCreatureChangeOutfit(const Creature* creature);
 
 	//container
-	void sendAddContainerItem(const Container* container, const Item *item);
-	void sendUpdateContainerItem(const Container* container, uint8_t slot, const Item* item);
-	void sendRemoveContainerItem(const Container* container, uint8_t slot);
+	void onAddContainerItem(const Container* container, const Item* item);
+	void onUpdateContainerItem(const Container* container, uint8_t slot, const Item* oldItem, const Item* newItem);
+	void onRemoveContainerItem(const Container* container, uint8_t slot, const Item* item);
 	
+	void onCloseContainer(const Container* container);
+	void onSendContainer(const Container* container);
+	void autoCloseContainers(const Container* container);
+
 	//inventory
-	void sendAddInventoryItem(slots_t slot, const Item* item);
-	void sendUpdateInventoryItem(slots_t slot, const Item* item);
-	void sendRemoveInventoryItem(slots_t slot);
+	void onAddInventoryItem(slots_t slot, const Item* item);
+	void onUpdateInventoryItem(slots_t slot, const Item* oldItem, const Item* newItem);
+	void onRemoveInventoryItem(slots_t slot, const Item* item);
+
+	virtual void postAddNotification(const Thing* thing, bool hasOwnership = true);
+	virtual void postRemoveNotification(const Thing* thing, bool hadOwnership = true);
 
 protected:
+	void checkTradeState(const Item* item);
 	void sendCancelAttacking();
 	void addSkillTryInternal(int skilltry,int skill);
 

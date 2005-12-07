@@ -226,18 +226,12 @@ public:
 	virtual int getTotalInflictedDamage();
 	virtual int getInflicatedDamage(unsigned long id);
 	
-	virtual void sendCancel(const char *msg) const { };
-
 	virtual int onThink(int& newThinkTicks){newThinkTicks = 300; return 300;};
 
-	//old code
-	//virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos, bool tele = false) { };
-	//virtual void onThingTransform(const Thing* thing,int stackpos) = 0;
-	//virtual void onCreatureAppear(const Creature *creature) { };
-
-	//virtual void onThingAppear(const Thing* thing) = 0;
-	//virtual void onThingDisappear(const Thing* thing, unsigned char stackPos) = 0;
-	//old code
+	virtual void onAddTileItem(const Position& pos, const Item* item) {};
+	virtual void onUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* oldItem, const Item* newItem) {};
+	virtual void onRemoveTileItem(const Position& pos, uint32_t stackpos, const Item* item) {};
+	virtual void onUpdateTile(const Position& pos) {};
 
 	virtual void onCreatureAppear(const Creature* creature, bool isLogin) {};
 	virtual void onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout) {};

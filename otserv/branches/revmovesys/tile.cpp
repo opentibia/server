@@ -757,10 +757,7 @@ ReturnValue Tile::__addThing(uint32_t index, Thing* thing)
 			if(ground == NULL){
 				//send to client
 				for(it = list.begin(); it != list.end(); ++it) {
-					Player* spectator = dynamic_cast<Player*>(*it);
-					if(spectator){
-						spectator->sendAddTileItem(cylinderMapPos, item);
-					}
+					(*it)->onAddTileItem(cylinderMapPos, item);
 				}
 			}
 			else{
@@ -768,10 +765,7 @@ ReturnValue Tile::__addThing(uint32_t index, Thing* thing)
 
 				//send to client
 				for(it = list.begin(); it != list.end(); ++it) {
-					Player* spectator = dynamic_cast<Player*>(*it);
-					if(spectator){
-						spectator->sendUpdateTileItem(cylinderMapPos, index, item);
-					}
+					(*it)->onUpdateTileItem(cylinderMapPos, index, ground, item);
 				}
 			}
 
@@ -781,10 +775,7 @@ ReturnValue Tile::__addThing(uint32_t index, Thing* thing)
 			if(splash == NULL){
 				//send to client
 				for(it = list.begin(); it != list.end(); ++it) {
-					Player* spectator = dynamic_cast<Player*>(*it);
-					if(spectator){
-						spectator->sendAddTileItem(cylinderMapPos, item);
-					}
+					(*it)->onAddTileItem(cylinderMapPos, item);
 				}
 			}
 			else{
@@ -792,10 +783,7 @@ ReturnValue Tile::__addThing(uint32_t index, Thing* thing)
 
 				//send to client
 				for(it = list.begin(); it != list.end(); ++it) {
-					Player* spectator = dynamic_cast<Player*>(*it);
-					if(spectator){
-						spectator->sendUpdateTileItem(cylinderMapPos, index, item);
-					}
+					(*it)->onUpdateTileItem(cylinderMapPos, index, splash, item);
 				}
 			}
 
@@ -806,10 +794,7 @@ ReturnValue Tile::__addThing(uint32_t index, Thing* thing)
 
 			//send to client
 			for(it = list.begin(); it != list.end(); ++it) {
-				Player* spectator = dynamic_cast<Player*>(*it);
-				if(spectator){
-					spectator->sendAddTileItem(cylinderMapPos, item);
-				}
+				(*it)->onAddTileItem(cylinderMapPos, item);
 			}
 		}
 		else{
@@ -817,10 +802,7 @@ ReturnValue Tile::__addThing(uint32_t index, Thing* thing)
 
 			//send to client
 			for(it = list.begin(); it != list.end(); ++it) {
-				Player* spectator = dynamic_cast<Player*>(*it);
-				if(spectator){
-					spectator->sendAddTileItem(cylinderMapPos, item);
-				}
+				(*it)->onAddTileItem(cylinderMapPos, item);
 			}
 
 			return RET_NOERROR;
@@ -855,10 +837,7 @@ ReturnValue Tile::__updateThing(Thing* thing, uint32_t count)
 
 	//send to client
 	for(it = list.begin(); it != list.end(); ++it) {
-		Player* spectator = dynamic_cast<Player*>(*it);
-		if(spectator){
-			spectator->sendUpdateTileItem(cylinderMapPos, index, item);
-		}
+		(*it)->onUpdateTileItem(cylinderMapPos, index, item, item);
 	}
 
 	return RET_NOERROR;
@@ -873,13 +852,17 @@ ReturnValue Tile::__updateThing(uint32_t index, Thing* thing)
 		return RET_NOTPOSSIBLE;
 	}
 
+	Item* oldItem = NULL;
+
 	if(pos == 0 && ground){
+		oldItem = ground;
 		ground = item;
 	}
 
   --pos;
 	
 	if(pos == 0 && splash){
+		oldItem = splash;
 		splash = item;
 	}
 
@@ -889,7 +872,8 @@ ReturnValue Tile::__updateThing(uint32_t index, Thing* thing)
 		ItemVector::iterator it = topItems.begin();
 		it += pos;
 		pos = 0;
-
+		
+		oldItem = (*it);
 		topItems.insert(it, item);
 		topItems.erase(it);
 	}
@@ -907,11 +891,14 @@ ReturnValue Tile::__updateThing(uint32_t index, Thing* thing)
 		it += pos;
 		pos = 0;
 
+		oldItem = (*it);
 		downItems.insert(it, item);
 		topItems.erase(it);
 	}
 
 	if(pos == 0){
+		item->setParent(this);
+
 		const Position& cylinderMapPos = getPosition();
 
 		SpectatorVec list;
@@ -920,10 +907,7 @@ ReturnValue Tile::__updateThing(uint32_t index, Thing* thing)
 
 		//send to client
 		for(it = list.begin(); it != list.end(); ++it) {
-			Player* spectator = dynamic_cast<Player*>(*it);
-			if(spectator){
-				spectator->sendUpdateTileItem(cylinderMapPos, index, item);
-			}
+			(*it)->onUpdateTileItem(cylinderMapPos, index, oldItem, item);
 		}
 
 		return RET_NOERROR;
@@ -964,32 +948,25 @@ ReturnValue Tile::__removeThing(Thing* thing, uint32_t count)
 		g_game.getSpectators(Range(cylinderMapPos, true), list);
 
 		if(item == ground){
-			ground->setParent(NULL);
-			ground = NULL;
 
 			//send to client
 			for(it = list.begin(); it != list.end(); ++it) {
-				Player* spectator = dynamic_cast<Player*>(*it);
-				if(spectator){
-					spectator->sendRemoveTileItem(cylinderMapPos, index);
-				}
+				(*it)->onRemoveTileItem(cylinderMapPos, index, item);
 			}
 
+			ground->setParent(NULL);
+			ground = NULL;
 			return RET_NOERROR;
 		}
 
 		if(item == splash){
-			splash->setParent(NULL);
-			splash = NULL;
-
 			//send to client
 			for(it = list.begin(); it != list.end(); ++it) {
-				Player* spectator = dynamic_cast<Player*>(*it);
-				if(spectator){
-					spectator->sendRemoveTileItem(cylinderMapPos, index);
-				}
+				(*it)->onRemoveTileItem(cylinderMapPos, index, item);
 			}
 
+			splash->setParent(NULL);
+			splash = NULL;
 			return RET_NOERROR;
 		}
 
@@ -997,17 +974,13 @@ ReturnValue Tile::__removeThing(Thing* thing, uint32_t count)
 		if(item->isAlwaysOnTop()){
 			for(iit = topItems.begin(); iit != topItems.end(); ++iit){
 				if(*iit == item){
-					(*iit)->setParent(NULL);
-					topItems.erase(iit);
-
 					//send to client
 					for(it = list.begin(); it != list.end(); ++it) {
-						Player* spectator = dynamic_cast<Player*>(*it);
-						if(spectator){
-							spectator->sendRemoveTileItem(cylinderMapPos, index);
-						}
+						(*it)->onRemoveTileItem(cylinderMapPos, index, item);
 					}
 
+					(*iit)->setParent(NULL);
+					topItems.erase(iit);
 					return RET_NOERROR;
 				}
 			}
@@ -1020,23 +993,17 @@ ReturnValue Tile::__removeThing(Thing* thing, uint32_t count)
 
 						//send to client
 						for(it = list.begin(); it != list.end(); ++it) {
-							Player* spectator = dynamic_cast<Player*>(*it);
-							if(spectator){
-								spectator->sendUpdateTileItem(cylinderMapPos, index, item);
-							}
+							(*it)->onUpdateTileItem(cylinderMapPos, index, item, item);
 						}
 					}
 					else {
-						(*iit)->setParent(NULL);
-						downItems.erase(iit);
-
 						//send to client
 						for(it = list.begin(); it != list.end(); ++it) {
-							Player* spectator = dynamic_cast<Player*>(*it);
-							if(spectator){
-								spectator->sendRemoveTileItem(cylinderMapPos, index);
-							}
+							(*it)->onRemoveTileItem(cylinderMapPos, index, item);
 						}
+
+						(*iit)->setParent(NULL);
+						downItems.erase(iit);
 					}
 
 					return RET_NOERROR;
@@ -1143,6 +1110,44 @@ Thing* Tile::__getThing(uint32_t index)
     return downItems[index];
 
   return NULL;
+}
+
+
+void Tile::postAddNotification(const Thing* thing, bool hasOwnership /*= true*/)
+{
+	const Position& cylinderMapPos = getPosition();
+
+	SpectatorVec list;
+	SpectatorVec::iterator it;
+	g_game.getSpectators(Range(cylinderMapPos, true), list);
+
+	for(it = list.begin(); it != list.end(); ++it){
+		if(Player* player = dynamic_cast<Player*>(*it)){
+			player->postAddNotification(thing, false);
+		}
+	}
+}
+
+void Tile::postRemoveNotification(const Thing* thing, bool hadOwnership /*= true*/)
+{
+	const Position& cylinderMapPos = getPosition();
+
+	SpectatorVec list;
+	SpectatorVec::iterator it;
+	g_game.getSpectators(Range(cylinderMapPos, true), list);
+
+	if(getThingCount() > 8){
+		//send to client
+		for(it = list.begin(); it != list.end(); ++it){
+			(*it)->onUpdateTile(cylinderMapPos);
+		}
+	}
+
+	for(it = list.begin(); it != list.end(); ++it){
+		if(Player* player = dynamic_cast<Player*>(*it)){
+			player->postRemoveNotification(thing, false);
+		}
+	}
 }
 
 void Tile::__internalAddThing(Thing* thing)

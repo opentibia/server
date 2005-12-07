@@ -69,7 +69,6 @@ public:
 
   bool removeThing(Thing *thing);
   void addThing(Thing *thing);
-	//bool insertThing(Thing *thing, int stackpos);
 	MagicEffectItem* getFieldItem();
 	Teleport* getTeleportItem() const;
 
@@ -80,6 +79,7 @@ public:
 	Item* getMoveableBlockingItem();
   Thing* getTopThing();
 	
+	//bool insertThing(Thing *thing, int stackpos);
   //int getCreatureStackPos(Creature *c) const;
   //int getThingStackPos(const Thing *thing) const;
 	//Thing* getThingByStackPos(int pos);
@@ -114,6 +114,9 @@ public:
 	virtual int32_t __getIndexOfThing(const Thing* thing) const;
 	virtual Thing* __getThing(uint32_t index);
 	virtual Thing* __getThing(uint32_t index) const;
+
+	virtual void postAddNotification(const Thing* thing, bool hasOwnership = true);
+	virtual void postRemoveNotification(const Thing* thing, bool hadOwnership = true);
 
 	virtual void __internalAddThing(Thing* thing);
 	virtual void __internalAddThing(uint32_t index, Thing* thing);

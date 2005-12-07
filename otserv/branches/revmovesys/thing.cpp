@@ -2,6 +2,7 @@
 #include "thing.h"
 #include "cylinder.h"
 #include "tile.h"
+#include "player.h"
 
 Thing::Thing()
 {
@@ -33,9 +34,17 @@ Cylinder* Thing::getTopParent()
 	if(getParent() == NULL)
 		return dynamic_cast<Cylinder*>(this);
 
+	if(dynamic_cast<Player*>(this)){
+		return dynamic_cast<Cylinder*>(this);
+	}
+
 	Cylinder* aux = getParent();
 
-	while(aux->getParent() != NULL && aux->getParent()->getParent() != NULL){
+	while(aux->getParent() != NULL){
+		if(dynamic_cast<Player*>(aux)){
+			return aux;
+		}
+
 		aux = aux->getParent();
 	}
 
@@ -47,9 +56,17 @@ const Cylinder* Thing::getTopParent() const
 	if(getParent() == NULL)
 		return dynamic_cast<const Cylinder*>(this);
 
-	const Cylinder* aux = this->getParent();
+	if(dynamic_cast<const Player*>(this)){
+		return dynamic_cast<const Cylinder*>(this);
+	}
 
-	while(aux->getParent() != NULL && aux->getParent()->getParent() != NULL){
+	const Cylinder* aux = getParent();
+
+	while(aux->getParent() != NULL){
+		if(dynamic_cast<const Player*>(aux)){
+			return aux;
+		}
+
 		aux = aux->getParent();
 	}
 

@@ -247,7 +247,7 @@ bool Actions::UseItem(Player* player, const Position &pos,const unsigned char st
 	//if found execute it
 	if(action){
 		//Position itempos = game->getThingMapPos(player, pos);
-		game->autoCloseTrade(item);
+		//game->autoCloseTrade(item);
 		PositionEx posEx(pos, stack);
 		if(action->executeUse(player, item, posEx, posEx)){
 			return true;
@@ -265,16 +265,17 @@ bool Actions::UseItem(Player* player, const Position &pos,const unsigned char st
   return false;	
 }
 
-bool Actions::openContainer(Player *player,Container *container, const unsigned char index)
+bool Actions::openContainer(Player* player,Container* container, const unsigned char index)
 {
 	//if(container->depotId == 0){ //normal container
-		uint32_t oldcontainerid = player->getContainerID(container);
-		if(oldcontainerid != -1) {
-			player->closeContainer(oldcontainerid);
-			player->sendCloseContainer(oldcontainerid);
+		uint32_t oldcid = player->getContainerID(container);
+		if(oldcid != -1) {
+			player->onCloseContainer(container);
+			//player->closeContainer(oldcid);
 		}
-		else {
-			player->sendContainer(index, container);
+		else{
+			player->addContainer(index, container);
+			player->onSendContainer(container);
 		}
 	//}
 
@@ -332,7 +333,7 @@ bool Actions::UseItemEx(Player* player, const Position &from_pos,
 		}
 		
 		//Position itempos = game->getThingMapPos(player, from_pos);
-		game->autoCloseTrade(item);
+		//game->autoCloseTrade(item);
 		PositionEx posFromEx(from_pos, from_stack);
 		PositionEx posToEx(to_pos, to_stack);
 		if(action->executeUse(player,item, posFromEx, posToEx))

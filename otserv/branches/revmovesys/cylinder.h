@@ -42,6 +42,9 @@ public:
 
 	virtual ReturnValue __removeThing(Thing* thing, uint32_t count) = 0;
 
+	virtual void postAddNotification(const Thing* thing, bool hasOwnership = true) = 0;
+	virtual void postRemoveNotification(const Thing* thing, bool hadOwnership = true) = 0;
+
 	virtual int32_t __getIndexOfThing(const Thing* thing) const = 0;
 	virtual Thing* __getThing(uint32_t index) = 0;
 	virtual Thing* __getThing(uint32_t index) const = 0;

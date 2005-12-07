@@ -68,6 +68,9 @@ public:
 	Thing* __getThing(uint32_t index);
 	virtual Thing* __getThing(uint32_t index) const;
 
+	virtual void postAddNotification(const Thing* thing, bool hasOwnership = true);
+	virtual void postRemoveNotification(const Thing* thing, bool hadOwnership = true);
+
 	virtual void __internalAddThing(Thing* thing);
 	virtual void __internalAddThing(uint32_t index, Thing* thing);
 
