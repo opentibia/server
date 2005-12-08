@@ -33,7 +33,7 @@ public:
 	Container(const uint16_t _type);
 	virtual ~Container();
 
-	virtual int getThrowRange() const {return 10;};
+	virtual int getThrowRange() const {return Item::getThrowRange();};
 	virtual bool isPushable() const {return Item::isPushable();};
 
 	virtual std::string getDescription(uint32_t lookDistance) const {return Item::getDescription(lookDistance);};

@@ -1130,6 +1130,10 @@ void Game::moveItem(Player* player, Cylinder* fromCylinder, Cylinder* toCylinder
 		ret = RET_DESTINATIONOUTOFREACH;
 	}
 
+	if(!map->canThrowObjectTo2(fromPos, toPos)){
+		ret = RET_CANNOTTHROW;
+	}
+
 	if(ret == RET_NOERROR){
 		ret = internalMoveItem(fromCylinder, toCylinder, index, item, count);
 	}

@@ -88,7 +88,7 @@ public:
 	bool floorChangeWest() const;
 
 	virtual std::string getDescription(uint32_t lookDistance) const;
-	virtual int getThrowRange() const {return 6;};
+	virtual int getThrowRange() const {return (isPickupable() ? 15 : 1);};
 
 	std::string getName() const ;
 	void setSpecialDescription(std::string desc);

@@ -243,8 +243,9 @@ class Map {
 	 *	\param isProjectile Takes into consideration for windows/door-ways.
 	 *	\returns The result if you can throw there or not
 	 */
-		//bool canThrowItemTo(Position from, Position to, bool creaturesBlock  = true, bool isProjectile = false);
 		ReturnValue canThrowObjectTo(Position from, Position to, int objectstate = BLOCK_PROJECTILE);
+
+		bool canThrowObjectTo2(const Position& fromPos, const Position& toPos);
 
 		ReturnValue isPathValid(Creature *creature, const std::list<Position>& path, int pathSize,
 			bool ignoreMoveableBlockingItems = false);

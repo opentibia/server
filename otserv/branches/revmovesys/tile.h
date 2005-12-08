@@ -81,6 +81,7 @@ public:
 	int getThingCount() const;
 
 	ReturnValue isBlocking(int objectstate, bool ignoreCreature = false, bool ignoreMoveableBlocking = false) const;
+	bool isBlockingProjectile() const;
 
   bool isPz() const;
   void setPz();

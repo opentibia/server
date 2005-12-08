@@ -120,6 +120,34 @@ ReturnValue Tile::isBlocking(int objectstate, bool ignoreCreature /*= false*/, b
 	return RET_NOERROR;
 }
 
+
+bool Tile::isBlockingProjectile() const
+{
+	if(ground){
+		const ItemType& groundType = Item::items[ground->getID()];
+
+		if(groundType.blockProjectile)
+			return true;
+	}
+
+	ItemVector::const_iterator iit;
+	for(iit = topItems.begin(); iit != topItems.end(); ++iit){
+		const ItemType& iiType = Item::items[(*iit)->getID()];
+
+		if(iiType.blockProjectile)
+			return true;
+	}
+	
+	for(iit = downItems.begin(); iit != downItems.end(); ++iit){
+		const ItemType& iiType = Item::items[(*iit)->getID()];
+
+		if(iiType.blockProjectile)
+			return true;
+	}
+
+	return false;
+}
+
 bool Tile::floorChange() const
 {
   ItemVector::const_iterator iit;

@@ -248,6 +248,58 @@ void Map::getSpectators(const Range& range, SpectatorVec& list)
 	}	
 }
 
+
+bool Map::canThrowObjectTo2(const Position& fromPos, const Position& toPos)
+{
+	Position start = fromPos;
+	Position end = toPos;
+
+	bool steep = std::abs(end.y - start.y) > abs(end.x - start.x);
+
+	if(steep){
+		swap(start.x, start.y);
+		swap(end.x, end.y);
+	}
+	
+	int deltax = abs(end.x - start.x);
+	int deltay = abs(end.y - start.y);
+	int error = 0;
+	int deltaerr = deltay;
+	int y = start.y;
+	Tile* t = NULL;
+	int xstep = ((start.x < end.x) ? 1 : -1);
+	int ystep = ((start.y < end.y) ? 1 : -1);
+
+	//for(int x = start.x; x != end.x; x += xstep) {
+	for(int x = start.x; x != end.x + xstep; x += xstep){
+		int rx = (steep ? y : x);
+		int ry = (steep ? x : y);
+
+		if(toPos.x == rx && toPos.y == ry){
+			break;
+		}
+		
+		if(fromPos.x == rx && fromPos.y == ry){
+			continue;
+		}
+
+		t = getTile(rx, ry, start.z);
+		if(t){
+			if(t->isBlockingProjectile())
+				return false;
+		}
+
+		error += deltaerr;
+
+		if(2 * error >= deltax){
+			y += ystep;
+			error -= deltax;
+		}
+	}
+
+	return true;
+}
+
 ReturnValue Map::canThrowObjectTo(Position from, Position to, int objectstate /*= BLOCK_PROJECTILE*/)
 {
 	Position start = from;
@@ -306,7 +358,6 @@ ReturnValue Map::canThrowObjectTo(Position from, Position to, int objectstate /*
 	}
 
 	return RET_NOERROR;
-	//return true;
 }
 
 ReturnValue Map::isPathValid(Creature *creature, const std::list<Position>& path, int pathSize,
