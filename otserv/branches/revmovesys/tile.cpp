@@ -32,8 +32,7 @@
 
 extern Game g_game;
 
-
-ReturnValue Tile::isBlocking(int objectstate, bool ignoreCreature /* = false*/, bool ignoreMoveableBlocking /*=false*/) const
+ReturnValue Tile::isBlocking(int objectstate, bool ignoreCreature /*= false*/, bool ignoreMoveableBlocking /*= false*/) const
 {
 	if(isPz() && ((objectstate & BLOCK_PZ) == BLOCK_PZ)) {
 		return RET_PROTECTIONZONE;
@@ -50,10 +49,8 @@ ReturnValue Tile::isBlocking(int objectstate, bool ignoreCreature /* = false*/, 
 			groundType.blockProjectile)
 			return RET_CANNOTTHROW;
 
-		/*
-		if((groundType.blockPathFind || groundType.blockSolid) && ((objectstate & BLOCK_PATHFIND) == BLOCK_PATHFIND))
-			return RET_THEREISNOWAY;
-		*/
+		//if((groundType.blockPathFind || groundType.blockSolid) && ((objectstate & BLOCK_PATHFIND) == BLOCK_PATHFIND))
+		//	return RET_THEREISNOWAY;
 
 		if(((objectstate & BLOCK_PICKUPABLE) == BLOCK_PICKUPABLE)) {			
 			if(groundType.blockSolid && (!groundType.hasHeight || groundType.pickupable))
@@ -77,15 +74,14 @@ ReturnValue Tile::isBlocking(int objectstate, bool ignoreCreature /* = false*/, 
 		if(((objectstate & BLOCK_PROJECTILE) == BLOCK_PROJECTILE)) {
 			if(iiType.blockProjectile)
 				return RET_CANNOTTHROW;
-			/*else
-				continue;*/
+			//else
+			//	continue;
 		}
 
-		/*
-		if((iiType.blockPathFind || iiType.blockSolid) && ((objectstate & BLOCK_PATHFIND) == BLOCK_PATHFIND) &&
-			!(ignoreMoveableBlocking && iiType.moveable))
-			return RET_THEREISNOWAY;
-			*/
+		//if((iiType.blockPathFind || iiType.blockSolid) && ((objectstate & BLOCK_PATHFIND) == BLOCK_PATHFIND) &&
+		//	!(ignoreMoveableBlocking && iiType.moveable))
+		//	return RET_THEREISNOWAY;
+		//
 
 		if(((objectstate & BLOCK_PICKUPABLE) == BLOCK_PICKUPABLE)) {			
 			if(iiType.blockSolid && (!iiType.hasHeight || iiType.pickupable))
@@ -103,15 +99,13 @@ ReturnValue Tile::isBlocking(int objectstate, bool ignoreCreature /* = false*/, 
 		if(((objectstate & BLOCK_PROJECTILE) == BLOCK_PROJECTILE)) {
 			if(iiType.blockProjectile)
 				return RET_CANNOTTHROW;
-			/*else
-				continue;*/
+			//else
+			//	continue;
 		}
 
-		/*
-		if((iiType.blockPathFind || iiType.blockSolid) && ((objectstate & BLOCK_PATHFIND) == BLOCK_PATHFIND) &&
-			!(ignoreMoveableBlocking && iiType.moveable))
-			return RET_THEREISNOWAY;
-		*/
+		//if((iiType.blockPathFind || iiType.blockSolid) && ((objectstate & BLOCK_PATHFIND) == BLOCK_PATHFIND) &&
+		//	!(ignoreMoveableBlocking && iiType.moveable))
+		//	return RET_THEREISNOWAY;
 
 		if(((objectstate & BLOCK_PICKUPABLE) == BLOCK_PICKUPABLE)) {
 			if(iiType.blockSolid && (!iiType.hasHeight || iiType.pickupable))
@@ -123,7 +117,6 @@ ReturnValue Tile::isBlocking(int objectstate, bool ignoreCreature /* = false*/, 
 			return RET_NOTENOUGHROOM;
 	}
 
-	//return false;
 	return RET_NOERROR;
 }
 
@@ -168,138 +161,51 @@ bool Tile::floorChangeDown() const
 bool Tile::floorChange(Direction direction) const
 {  
 	ItemVector::const_iterator iit;
-	for (iit = topItems.begin(); iit != topItems.end(); ++iit){
-    	if(direction == NORTH){  
-			if ((*iit)->floorChangeNorth())
+	for(iit = topItems.begin(); iit != topItems.end(); ++iit){
+		if(direction == NORTH){  
+			if((*iit)->floorChangeNorth())
 				return true;
 		}
-    	else if(direction == SOUTH){
+		else if(direction == SOUTH){
 			if ((*iit)->floorChangeSouth())
-				return true;
+			return true;
 		}
-    	else if(direction == EAST){
+		else if(direction == EAST){
 			if ((*iit)->floorChangeEast())
-				return true;
+			return true;
 		}
-    	else if(direction == WEST){
+		else if(direction == WEST){
 			if ((*iit)->floorChangeWest())
-				return true;
+			return true;
 		}
 	}
 
-  	for (iit = downItems.begin(); iit != downItems.end(); ++iit){
-    	if(direction == NORTH){  
+	for(iit = downItems.begin(); iit != downItems.end(); ++iit){
+		if(direction == NORTH){  
 			if ((*iit)->floorChangeNorth())
-				return true;
+			return true;
 		}
-    	else if(direction == SOUTH){
+		else if(direction == SOUTH){
 			if ((*iit)->floorChangeSouth())
-				return true;
+			return true;
 		}
-    	else if(direction == EAST){
+		else if(direction == EAST){
 			if ((*iit)->floorChangeEast())
-				return true;
+			return true;
 		}
-    	else if(direction == WEST){
+		else if(direction == WEST){
 			if ((*iit)->floorChangeWest())
-				return true;
+			return true;
 		}
 	}
 
-  	return false;
+ 	return false;
 }
 
-/*
-int Tile::getCreatureStackPos(Creature *c) const
-{
-  CreatureVector::const_iterator it;
-  for (it = creatures.begin(); it != creatures.end(); ++it)
-  {
-    if ((*it) == c)
-      return (int) ((it - creatures.begin()) + 1 + topItems.size()) + (splash ? 1 : 0);
-  }
-
-  return 255;
-}
-*/
-
-/*
-int Tile::getThingStackPos(const Thing *thing) const
-{
-  int n = 0;
-  if(ground){
-	if(ground == thing){
-		return 0;
-	}
-  }
-
-  if (splash)
-  {
-    if (thing == splash)
-      return 1;
-    n++;
-  }
-  
-  ItemVector::const_iterator iit;
-  for (iit = topItems.begin(); iit != topItems.end(); ++iit)
-  {
-    n++;
-    if ((*iit) == thing)
-      return n;
-  }
-
-  CreatureVector::const_iterator cit;
-  for (cit = creatures.begin(); cit != creatures.end(); ++cit)
-  {
-    n++;
-    if ((*cit) == thing)
-      return n;
-  }
-
-  for (iit = downItems.begin(); iit != downItems.end(); ++iit)
-  {
-    n++;
-    if ((*iit) == thing)
-      return n;
-  }
-
-  return 255;
-}
-
-Thing* Tile::getThingByStackPos(int pos)
-{
-  if (pos == 0)
-    return ground;
-
-  pos--;
-
-  if(splash){
-    if (pos == 0)
-      return splash;
-      //return NULL;
-    pos--;
-  }
-
-  if ((unsigned) pos < topItems.size())
-    return topItems[pos];
-
-  pos -= (uint32_t)topItems.size();
-
-  if ((unsigned) pos < creatures.size())
-    return creatures[pos];
-
-  pos -= (uint32_t)creatures.size();
-
-  if ((unsigned) pos < downItems.size())
-    return downItems[pos];
-
-  return NULL;
-}
-*/
 
 int Tile::getThingCount() const
 {
-	return (uint32_t) (ground ? 1 : 0) + (splash ? 1 : 0) + topItems.size() +	creatures.size() + downItems.size();
+	return (uint32_t) (ground ? 1 : 0) + (splash ? 1 : 0) + downItems.size()+ topItems.size() + creatures.size();
 }
 
 std::string Tile::getDescription(uint32_t lookDistance) const
@@ -308,141 +214,37 @@ std::string Tile::getDescription(uint32_t lookDistance) const
 	return ret;
 }
 
-/*
-bool Tile::insertThing(Thing *thing, int stackpos)
-{
-	Item *item = dynamic_cast<Item*>(thing);
-	int pos = stackpos;
-
-	if (pos == 0) {
-    //ground = item;
-		return false;
-	}
-
-  pos--;
-
-  if(splash)
-  {
-		if (pos == 0) {
-      //splash = item;
-			return false;
-		}
-
-    pos--;
-  }
-
-	if ((unsigned) pos < topItems.size()) {		
-		ItemVector::iterator it = topItems.begin();
-		while(pos > 0){
-			pos--;
-			++it;
-		}
-		topItems.insert(it, item);
-		return true;
-	}
-
-  pos -= (uint32_t)topItems.size();
-
-	if ((unsigned) pos < creatures.size()) {
-		//creatures.insert(creatures[pos], item);
-		return false;
-	}
-
-  pos -= (uint32_t)creatures.size();
-
-	if ((unsigned) pos < downItems.size()) {
-    	ItemVector::iterator it = downItems.begin();
-		while(pos > 0){	
-			pos--;
-			++it;
-		}
-		downItems.insert(it, item);
-		return true;
-	}
-	else {
-		//Add it to the end.
-		downItems.insert(downItems.end(), item);
-		return true;
-	}
-
-  return false;
-}
-
-*/
-
-bool Tile::removeThing(Thing *thing)
-{
-	Creature* creature = dynamic_cast<Creature*>(thing);
-	if (creature) {
-    CreatureVector::iterator it;
-    for (it = creatures.begin(); it != creatures.end(); ++it)
-      if (*it == thing)
-      {
-        creatures.erase(it);
-        return true;
-      }
-  }
-  else if (thing == splash)
-  {
-    splash = NULL;
-    return true;
-  }
-  else
-  {
-    ItemVector::iterator it;
-    Item *item = dynamic_cast<Item*>(thing);
-		if(!item)
-			return false;
-
-    if (item->isAlwaysOnTop())
-    {
-      for (it = topItems.begin(); it != topItems.end(); ++it)
-        if (*it == item)
-        {
-          topItems.erase(it);
-					return true;
-        }
-    }
-    else {
-      for (it = downItems.begin(); it != downItems.end(); ++it)
-        if (*it == item) {
-					downItems.erase(it);
-					return true;
-				}
-		}
-  }
-
-  return false;
-}
-
 Thing* Tile::getTopMoveableThing()
 {	
 	if(ground && !ground->isNotMoveable())
-    	return ground;
-	if (splash && !splash->isNotMoveable())
-    	return splash;
+		return ground;
     
-    for(int i = 0; i < topItems.size(); i++){
+	if(splash && !splash->isNotMoveable())
+		return splash;
+
+	for(int i = 0; i < topItems.size(); i++){
 		if(topItems[i] && !topItems[i]->isNotMoveable())
 			return topItems[i];
 	}
+
 	for(int i = 0; i < creatures.size(); i++){
-			return creatures[i];
+		return creatures[i];
 	}
+
 	for(int i = 0; i < downItems.size(); i++){
 		if(downItems[i] && !downItems[i]->isNotMoveable())
 			return downItems[i];
 	}
+
 	return NULL;
 }
 
 Teleport* Tile::getTeleportItem() const
 {
   Teleport* teleport = NULL;
-  for (ItemVector::const_iterator iit = topItems.begin(); iit != topItems.end(); ++iit)
-  {
+  for (ItemVector::const_iterator iit = topItems.begin(); iit != topItems.end(); ++iit){
 		teleport = dynamic_cast<Teleport*>(*iit);
-		if (teleport)
+		if(teleport)
 			return teleport;
   }
 
@@ -452,11 +254,10 @@ Teleport* Tile::getTeleportItem() const
 MagicEffectItem* Tile::getFieldItem()
 {
   MagicEffectItem* fieldItem = NULL;
-  for (ItemVector::const_iterator iit = downItems.begin(); iit != downItems.end(); ++iit)
-  {
-	fieldItem = dynamic_cast<MagicEffectItem*>(*iit);
-	if(fieldItem)
-		return fieldItem;
+  for(ItemVector::const_iterator iit = downItems.begin(); iit != downItems.end(); ++iit){
+		fieldItem = dynamic_cast<MagicEffectItem*>(*iit);
+		if(fieldItem)
+			return fieldItem;
   }
 
 	return NULL;
@@ -464,7 +265,7 @@ MagicEffectItem* Tile::getFieldItem()
 
 Creature* Tile::getTopCreature()
 {
-	if(creatures.begin() != creatures.end()) {
+	if(creatures.begin() != creatures.end()){
 		return *(creatures.begin());
 	}
 
@@ -473,7 +274,7 @@ Creature* Tile::getTopCreature()
 
 Item* Tile::getTopDownItem()
 {
-	if(downItems.begin() != downItems.end()) {
+	if(downItems.begin() != downItems.end()){
 		return *(downItems.begin());
 	}
 
@@ -482,7 +283,7 @@ Item* Tile::getTopDownItem()
 
 Item* Tile::getTopTopItem()
 {
-	if(topItems.begin() != topItems.end()) {
+	if(topItems.begin() != topItems.end()){
 		return *(topItems.begin());
 	}
 
@@ -503,7 +304,7 @@ Thing* Tile::getTopThing()
 	thing = getTopTopItem();
 	if(thing != NULL)
 		return thing;
-	
+
 	if(splash)
 		return splash;
 
@@ -515,7 +316,7 @@ Thing* Tile::getTopThing()
 
 Item* Tile::getMoveableBlockingItem()
 {
-	for (ItemVector::const_iterator iit = downItems.begin(); iit != downItems.end(); ++iit){
+	for(ItemVector::const_iterator iit = downItems.begin(); iit != downItems.end(); ++iit){
 		const ItemType& iiType = Item::items[(*iit)->getID()];
 		if((iiType.blockPathFind || iiType.blockSolid) && iiType.moveable)
 			return *iit;
@@ -542,7 +343,7 @@ void Tile::addThing(Thing *thing)
     {
       ground = item;
     }
-    else if (item->isSplash()){
+    else if(item->isSplash()){
 		if(splash == NULL){
 			splash = item;
 		}
@@ -860,7 +661,7 @@ ReturnValue Tile::__updateThing(uint32_t index, Thing* thing)
 	}
 
   --pos;
-	
+
 	if(pos == 0 && splash){
 		oldItem = splash;
 		splash = item;
@@ -1023,14 +824,14 @@ int32_t Tile::__getIndexOfThing(const Thing* thing) const
 			return 0;
 		}
   }
-	
+  
   if(splash){
     if(thing == splash)
       return 1;
 
     ++n;
   }
-  
+
   ItemVector::const_iterator iit;
   for(iit = topItems.begin(); iit != topItems.end(); ++iit){
     ++n;
@@ -1038,12 +839,12 @@ int32_t Tile::__getIndexOfThing(const Thing* thing) const
       return n;
   }
 
-  CreatureVector::const_iterator cit;
-  for(cit = creatures.begin(); cit != creatures.end(); ++cit){
-    ++n;
-    if((*cit) == thing)
-      return n;
-  }
+	CreatureVector::const_iterator cit;
+	for(cit = creatures.begin(); cit != creatures.end(); ++cit){
+		++n;
+		if((*cit) == thing)
+			return n;
+	}
 
   for(iit = downItems.begin(); iit != downItems.end(); ++iit){
     ++n;

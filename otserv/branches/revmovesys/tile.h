@@ -67,7 +67,6 @@ public:
   CreatureVector creatures;
   ItemVector     downItems;
 
-  bool removeThing(Thing *thing);
   void addThing(Thing *thing);
 	MagicEffectItem* getFieldItem();
 	Teleport* getTeleportItem() const;
@@ -79,10 +78,6 @@ public:
 	Item* getMoveableBlockingItem();
   Thing* getTopThing();
 	
-	//bool insertThing(Thing *thing, int stackpos);
-  //int getCreatureStackPos(Creature *c) const;
-  //int getThingStackPos(const Thing *thing) const;
-	//Thing* getThingByStackPos(int pos);
 	int getThingCount() const;
 
 	ReturnValue isBlocking(int objectstate, bool ignoreCreature = false, bool ignoreMoveableBlocking = false) const;

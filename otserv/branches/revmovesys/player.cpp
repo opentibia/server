@@ -1382,7 +1382,6 @@ void Player::onCloseContainer(const Container* container)
 {
 	uint32_t cid = getContainerID(container);
 	if(cid != -1){
-		closeContainer(cid);
 		client->sendCloseContainer(cid);
 	}
 }

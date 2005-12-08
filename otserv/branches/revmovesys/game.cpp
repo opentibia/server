@@ -1073,10 +1073,7 @@ ReturnValue Game::internalCreatureMove(Creature* creature, Cylinder* fromCylinde
 
 		//send change to client
 		for(it = list.begin(); it != list.end(); ++it) {
-			Player* spectator = dynamic_cast<Player*>(*it);
-			if(spectator){
-				spectator->onCreatureMove(creature, toCylinder->getPosition(), oldStackPos);
-			}
+			(*it)->onCreatureMove(creature, toCylinder->getPosition(), oldStackPos);
 		}
 
 		toCylinder->getTopParent()->postRemoveNotification(creature);
@@ -1450,10 +1447,9 @@ void Game::creatureTurn(Creature *creature, Direction dir)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::creatureTurn()");
 
-	if (creature->direction != dir) {
+	if(creature->direction != dir){
 		creature->direction = dir;
 
-		//int stackpos = map->getTile(creature->getPosition())->getThingStackPos(creature);
 		int32_t stackpos = creature->getParent()->__getIndexOfThing(creature);
 
 		SpectatorVec list;
@@ -2382,8 +2378,8 @@ void Game::checkCreature(unsigned long id)
 	}
 }
 
-void Game::changeOutfit(unsigned long id, int looktype){
-     
+void Game::changeOutfit(unsigned long id, int looktype)
+{     
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::changeOutfit()");
 
 	Creature *creature = getCreatureByID(id);
@@ -2480,11 +2476,43 @@ void Game::checkCreatureAttacking(unsigned long id)
 
 void Game::checkDecay(int t)
 {
-	/*
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::checkDecay()");
+	addEvent(makeTask(DECAY_INTERVAL, boost::bind(&Game::checkDecay, this, DECAY_INTERVAL)));
 
-	addEvent(makeTask(DECAY_INTERVAL, boost::bind(&Game::checkDecay,this,DECAY_INTERVAL)));
+	list<decayBlock*>::iterator it;
+	for(it = decayVector.begin();it != decayVector.end();){
+		(*it)->decayTime -= t;
+		if((*it)->decayTime <= 0){
+			list<Item*>::iterator it2;
+			for(it2 = (*it)->decayItems.begin(); it2 != (*it)->decayItems.end(); it2++){
+				Item* item = *it2;
+				item->isDecaying = false;
+				if(item->canDecay()){
+					uint32_t decayTo = Item::items[item->getID()].decayTo;
+
+					if(decayTo != 0){
+						Item* newItem = transformItem(item, decayTo);
+						startDecay(newItem);
+					}
+					else{
+						internalRemoveItem(item);
+					}
+				}
+
+				FreeThing(item);
+			}
+
+			delete *it;
+			it = decayVector.erase(it);
+		}
+		else{
+			it++;
+		}
+	}
 		
+	flushSendBuffers();
+
+	/*		
 	list<decayBlock*>::iterator it;
 	for(it = decayVector.begin();it != decayVector.end();){
 		(*it)->decayTime -= t;

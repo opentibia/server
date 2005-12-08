@@ -324,13 +324,13 @@ void Protocol75::GetTileDescription(const Tile* tile, NetworkMessage &msg)
 		}
 		
 		ItemVector::const_iterator it;
-		for(it = tile->topItems.begin(); ((it !=tile->topItems.end()) && (count < 10)); ++it){
+		for(it = tile->topItems.begin(); ((it != tile->topItems.end()) && (count < 10)); ++it){
 			msg.AddItem(*it);
 			count++;
 		}
 		
 		CreatureVector::const_iterator itc;
-		for(itc = tile->creatures.begin(); ((itc !=tile->creatures.end()) && (count < 10)); ++itc){
+		for(itc = tile->creatures.begin(); ((itc != tile->creatures.end()) && (count < 10)); ++itc){
 			bool known;
 			unsigned long removedKnown;
 			checkCreatureAsKnown((*itc)->getID(), known, removedKnown);
@@ -338,7 +338,7 @@ void Protocol75::GetTileDescription(const Tile* tile, NetworkMessage &msg)
 			count++;
 		}
 		
-		for(it = tile->downItems.begin(); ((it !=tile->downItems.end()) && (count < 10)); ++it){
+		for(it = tile->downItems.begin(); ((it != tile->downItems.end()) && (count < 10)); ++it){
 			msg.AddItem(*it);
 			count++;
 		}
@@ -1536,13 +1536,19 @@ void Protocol75::sendMoveCreature(const Creature* creature, const Position& oldP
 		WriteBuffer(msg);
 	}
 	else if(CanSee(oldPos) && CanSee(creature->getPosition())){
-		NetworkMessage msg;
+		if(oldPos.z == 7 && newPos.z >= 8){
+			sendRemoveCreature(creature, oldPos, oldStackPos, false);
+			sendAddCreature(creature, false);
+		}
+		else{
+			NetworkMessage msg;
 
-		msg.AddByte(0x6D);
-		msg.AddPosition(oldPos);
-		msg.AddByte(oldStackPos);
-		msg.AddPosition(creature->getPosition());
-		WriteBuffer(msg);
+			msg.AddByte(0x6D);
+			msg.AddPosition(oldPos);
+			msg.AddByte(oldStackPos);
+			msg.AddPosition(creature->getPosition());
+			WriteBuffer(msg);
+		}
 	}
 	else if(CanSee(oldPos)){
 		sendRemoveCreature(creature, oldPos, oldStackPos, false);

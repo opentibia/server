@@ -271,7 +271,7 @@ bool Actions::openContainer(Player* player,Container* container, const unsigned 
 		uint32_t oldcid = player->getContainerID(container);
 		if(oldcid != -1) {
 			player->onCloseContainer(container);
-			//player->closeContainer(oldcid);
+			player->closeContainer(oldcid);
 		}
 		else{
 			player->addContainer(index, container);
@@ -397,7 +397,7 @@ bool Action::executeUse(Player *player,Item* item, PositionEx &posFrom, Position
 	script->internalAddThing(luaState,item,itemid1);
 	script->internalAddPositionEx(luaState,posFrom);
 	//std::cout << "posTo" <<  (Position)posTo << " stack" << (int)posTo.stackpos <<std::endl;
-	Thing *thing = NULL; //script->game->getThing((Position)posTo,posTo.stackpos,player);
+	Thing* thing = script->game->internalGetThing(player, posTo, posTo.stackpos);
 	if(thing && posFrom != posTo){
 		int thingId2 = script->AddThingToMap(thing,posTo);
 		script->internalAddThing(luaState,thing,thingId2);

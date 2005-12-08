@@ -67,7 +67,7 @@ class Map;
 class Range {
 public:
 	
-	Range(Position centerpos, bool multilevel = false) {
+	Range(Position centerpos, bool multilevel = false){
 		setRange(centerpos, multilevel);
 	}
 	
@@ -107,7 +107,7 @@ public:
 	bool multilevel;
 
 private:
-	bool isUnderground() const {
+	bool isUnderground() const{
 		return (centerpos.z > 7);
 	}
 
@@ -124,31 +124,22 @@ private:
 		
 		zstep = 1;
 
-		if(multilevel) {
-			if(isUnderground()) {
+		if(multilevel){
+			if(isUnderground()){
 				//8->15
-				//minRange.z = std::max(centerpos.z - 2, 8);
-				//maxRange.z = std::min(centerpos.z + 2, MAP_LAYER - 1);
-
-				///*
 				minRange.z = std::min(centerpos.z + 2, MAP_LAYER - 1);
 				maxRange.z = std::max(centerpos.z - 2, 8);
 
 				zstep = -1;
-				//*/
-			} else {
-				//minRange.z = 0;
-				//maxRange.z = 7;
-
-				///*
-				minRange.z = 7;
+			}
+			else{
+				minRange.z = 8; //people on floor 8 can see floor 7 too
 				maxRange.z = 0;
 
 				zstep = -1;
-				//*/
 			}
 		}
-		else {
+		else{
 			minRange.z = centerpos.z;
 			maxRange.z = centerpos.z;
 		}

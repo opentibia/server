@@ -202,7 +202,7 @@ bool Map::placeCreature(const Position &pos, Creature* creature)
 bool Map::removeCreature(Creature* creature)
 {
 	Tile* tile = creature->getTile();
-	return tile->removeThing(creature);
+	return (tile->__removeThing(creature, 0) == RET_NOERROR);
 }
 
 void Map::getSpectators(const Range& range, SpectatorVec& list)
@@ -228,8 +228,6 @@ void Map::getSpectators(const Range& range, SpectatorVec& list)
 	//for(int nz = range.minRange.z; nz != range.maxRange.z + range.zstep; nz++) {
 	for(int nz = range.minRange.z; nz != range.maxRange.z + range.zstep; nz += range.zstep){
 		offsetz = range.centerpos.z - nz;
-		//negative offset means that the player is on a lower floor than ourself
-
 		for(int nx = range.minRange.x + offsetz; nx <= range.maxRange.x + offsetz; ++nx){
 			for(int ny = range.minRange.y + offsetz; ny <= range.maxRange.y + offsetz; ++ny){
 				tile = getTile(nx + range.centerpos.x, ny + range.centerpos.y, nz);
