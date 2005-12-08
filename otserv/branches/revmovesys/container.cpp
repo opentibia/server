@@ -201,7 +201,7 @@ ReturnValue Container::__queryAdd(uint32_t index, const Thing* thing, uint32_t c
 		return RET_THISISIMPOSSIBLE;
 	}
 
-	const Cylinder* cylinder = item->getParent();
+	const Cylinder* cylinder = getParent();
 	while(cylinder){
 		if(cylinder == thing){
 			return RET_THISISIMPOSSIBLE;
