@@ -233,7 +233,7 @@ bool Tile::floorChange(Direction direction) const
 
 int Tile::getThingCount() const
 {
-	return (uint32_t) (ground ? 1 : 0) + (splash ? 1 : 0) + downItems.size()+ topItems.size() + creatures.size();
+	return (uint32_t) (ground ? 1 : 0) + topItems.size() + creatures.size() + downItems.size();
 }
 
 std::string Tile::getDescription(uint32_t lookDistance) const
@@ -247,9 +247,6 @@ Thing* Tile::getTopMoveableThing()
 	if(ground && !ground->isNotMoveable())
 		return ground;
     
-	if(splash && !splash->isNotMoveable())
-		return splash;
-
 	for(int i = 0; i < topItems.size(); i++){
 		if(topItems[i] && !topItems[i]->isNotMoveable())
 			return topItems[i];
@@ -293,7 +290,7 @@ MagicEffectItem* Tile::getFieldItem()
 
 Creature* Tile::getTopCreature()
 {
-	if(creatures.begin() != creatures.end()){
+	if(!creatures.empty()){
 		return *(creatures.begin());
 	}
 
@@ -302,7 +299,7 @@ Creature* Tile::getTopCreature()
 
 Item* Tile::getTopDownItem()
 {
-	if(downItems.begin() != downItems.end()){
+	if(!downItems.empty()){
 		return *(downItems.begin());
 	}
 
@@ -311,8 +308,8 @@ Item* Tile::getTopDownItem()
 
 Item* Tile::getTopTopItem()
 {
-	if(topItems.begin() != topItems.end()){
-		return *(topItems.begin());
+	if(!topItems.empty()){
+		return topItems.back();
 	}
 
 	return NULL;
@@ -333,9 +330,6 @@ Thing* Tile::getTopThing()
 	if(thing != NULL)
 		return thing;
 
-	if(splash)
-		return splash;
-
 	if(ground)
 		return ground;
 
@@ -351,44 +345,6 @@ Item* Tile::getMoveableBlockingItem()
 	}
 
 	return NULL;
-}
-
-void Tile::addThing(Thing *thing)
-{
-	thing->setParent(this);
-
-	Creature* creature = dynamic_cast<Creature*>(thing);
-	if (creature) {
-    	creatures.insert(creatures.begin(), creature);
-  }
-  else
-  {
-    Item *item = dynamic_cast<Item*>(thing);
-		if(!item)
-			return;
-
-    if (item->isGroundTile())
-    {
-      ground = item;
-    }
-    else if(item->isSplash()){
-		if(splash == NULL){
-			splash = item;
-		}
-		else{
-			//Should not add the splash directly
-			//use game->addthing method
-		}
-	}
-    else if (item->isAlwaysOnTop())
-    {
-      topItems.insert(topItems.begin(), item);
-    }
-    else
-    {
-      downItems.insert(downItems.begin(), item);
-    }
-  }
 }
 
 bool Tile::isPz() const
@@ -489,6 +445,9 @@ Cylinder* Tile::__queryDestination(int32_t& index, const Thing* thing, Thing** d
 
 	if(teleport){
 		destTile = g_game.getTile(teleport->getDestPos().x, teleport->getDestPos().y, teleport->getDestPos().z);
+		if(destTile == NULL){
+			destTile = this;
+		}
 	}
 	else{
 		if(destTile->floorChange()){
@@ -601,25 +560,52 @@ ReturnValue Tile::__addThing(uint32_t index, Thing* thing)
 			ground = item;
     }
     else if(item->isSplash()){
-			if(splash == NULL){
-				//send to client
-				for(it = list.begin(); it != list.end(); ++it) {
-					(*it)->onAddTileItem(cylinderMapPos, item);
-				}
-			}
-			else{
-				uint32_t index = __getIndexOfThing(splash);
-
-				//send to client
-				for(it = list.begin(); it != list.end(); ++it) {
-					(*it)->onUpdateTileItem(cylinderMapPos, index, splash, item);
+			//remove old splash if exists
+			ItemVector::iterator iit;
+			for(iit = topItems.begin(); iit != topItems.end(); ++iit){
+				if((*iit)->isSplash()){
+					Item* oldSplash = *iit;
+					__removeThing(oldSplash, 0);
+					g_game.FreeThing(oldSplash);
+					break;
 				}
 			}
 
-			splash = item;
+			bool isInserted = false;
+			//insert the new one according to its top order
+			for(iit = topItems.begin(); iit != topItems.end(); ++iit){
+				if(Item::items[item->getID()].alwaysOnTopOrder <= Item::items[(*iit)->getID()].alwaysOnTopOrder){
+					topItems.insert(iit, item);
+					isInserted = true;
+					break;
+				}
+			}
+			
+			if(!isInserted){
+				topItems.push_back(item);
+			}
+
+			//send to client
+			for(it = list.begin(); it != list.end(); ++it) {
+				(*it)->onAddTileItem(cylinderMapPos, item);
+			}
 		}
 		else if(item->isAlwaysOnTop()){
-			topItems.insert(topItems.begin(), item);
+			bool isInserted = false;
+			ItemVector::iterator iit;
+			for(iit = topItems.begin(); iit != topItems.end(); ++iit){
+				if(Item::items[item->getID()].alwaysOnTopOrder <= Item::items[(*iit)->getID()].alwaysOnTopOrder){
+					//topItems.insert(ItemVector::iterator(iit.base()), item);
+					topItems.insert(iit, item);
+					isInserted = true;
+					break;
+				}
+			}
+
+			if(!isInserted){
+				//topItems.insert(topItems.begin(), item);
+				topItems.push_back(item);
+			}
 
 			//send to client
 			for(it = list.begin(); it != list.end(); ++it) {
@@ -689,13 +675,6 @@ ReturnValue Tile::__updateThing(uint32_t index, Thing* thing)
 	}
 
   --pos;
-
-	if(pos == 0 && splash){
-		oldItem = splash;
-		splash = item;
-	}
-
-	--pos;
 
 	if(pos >= 0 && pos < topItems.size()){
 		ItemVector::iterator it = topItems.begin();
@@ -788,17 +767,6 @@ ReturnValue Tile::__removeThing(Thing* thing, uint32_t count)
 			return RET_NOERROR;
 		}
 
-		if(item == splash){
-			//send to client
-			for(it = list.begin(); it != list.end(); ++it) {
-				(*it)->onRemoveTileItem(cylinderMapPos, index, item);
-			}
-
-			splash->setParent(NULL);
-			splash = NULL;
-			return RET_NOERROR;
-		}
-
 		ItemVector::iterator iit;
 		if(item->isAlwaysOnTop()){
 			for(iit = topItems.begin(); iit != topItems.end(); ++iit){
@@ -852,15 +820,8 @@ int32_t Tile::__getIndexOfThing(const Thing* thing) const
 			return 0;
 		}
   }
-  
-  if(splash){
-    if(thing == splash)
-      return 1;
 
-    ++n;
-  }
-
-  ItemVector::const_iterator iit;
+	ItemVector::const_iterator iit;
   for(iit = topItems.begin(); iit != topItems.end(); ++iit){
     ++n;
     if((*iit) == thing)
@@ -890,12 +851,6 @@ Thing* Tile::__getThing(uint32_t index) const
 
   --index;
 
-  if(splash){
-    if(index == 0)
-      return splash;
-    --index;
-  }
-
   if((unsigned) index < topItems.size())
     return topItems[index];
 
@@ -918,12 +873,6 @@ Thing* Tile::__getThing(uint32_t index)
     return ground;
 
   --index;
-
-  if(splash){
-    if(index == 0)
-      return splash;
-    --index;
-  }
 
   if((unsigned) index < topItems.size())
     return topItems[index];
@@ -981,10 +930,45 @@ void Tile::postRemoveNotification(const Thing* thing, bool hadOwnership /*= true
 
 void Tile::__internalAddThing(Thing* thing)
 {
-	//
+	__internalAddThing(0, thing);
 }
 
 void Tile::__internalAddThing(uint32_t index, Thing* thing)
 {
-	//
+	thing->setParent(this);
+
+	Creature* creature = dynamic_cast<Creature*>(thing);
+	if(creature){
+		creatures.insert(creatures.begin(), creature);
+  }
+  else{
+    Item* item = dynamic_cast<Item*>(thing);
+
+		if(item == NULL)
+			return;
+
+    if(item->isGroundTile()){
+			if(ground == NULL){
+				ground = item;
+			}
+    }
+		else if(item->isAlwaysOnTop()){
+			bool isInserted = false;
+			ItemVector::iterator iit;
+			for(iit = topItems.begin(); iit != topItems.end(); ++iit){
+				if(Item::items[item->getID()].alwaysOnTopOrder <= Item::items[(*iit)->getID()].alwaysOnTopOrder){
+					topItems.insert(iit, item);
+					isInserted = true;
+					break;
+				}
+			}
+
+			if(!isInserted){
+				topItems.push_back(item);
+			}
+		}
+		else{
+			downItems.insert(downItems.begin(), item);
+		}
+	}
 }

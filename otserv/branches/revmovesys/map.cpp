@@ -188,7 +188,7 @@ bool Map::placeCreature(const Position &pos, Creature* creature)
 	}
 
 	if(success){
-		tile->addThing(creature);
+		tile->__internalAddThing(creature);
 		return true;
 	}
 

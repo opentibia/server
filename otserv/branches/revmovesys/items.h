@@ -90,6 +90,7 @@ public:
 	bool            useable;
 	bool            moveable;
 	bool            alwaysOnTop;
+	unsigned char   alwaysOnTopOrder;
 	int             runeMagLevel;
 	bool            pickupable;
 	bool            rotable;
@@ -103,32 +104,12 @@ public:
 	bool						floorChangeSouth;
 	bool						floorChangeEast;
 	bool						floorChangeWest;
-	bool            hasHeight; //blockpickupable
+	bool            hasHeight;
 
 	bool blockSolid;
 	bool blockPickupable;
 	bool blockProjectile;
 	bool blockPathFind;
-
-	//bool            readable;
-	//bool            ismagicfield;
-	//bool            issplash;
-	//bool            iskey;
-
-	//unsigned short	damage;
-	//bool isteleport;
-	//bool            fluidcontainer;
-	//bool            multitype;
-	//bool            iscontainer;
-	//bool            groundtile;
-	//bool						blockpickupable;
-	//bool						canWalkThrough;
-	//bool						notMoveable;
-	//bool						blocking;						// people can walk on it
-	//bool						blockingProjectile;
-	//bool						noFloorChange;
-	//bool						isDoor;
-	//bool						isDoorWithLock;
 };
 
 typedef std::map<unsigned long, unsigned long> ReverseItemMap;

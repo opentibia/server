@@ -53,8 +53,7 @@ public:
 		tilePos.y = y;
 		tilePos.z = z;
 
-    pz     = false;
-    splash = NULL;
+    pz = false;
 		ground = NULL;
   }
 
@@ -67,7 +66,6 @@ public:
   CreatureVector creatures;
   ItemVector     downItems;
 
-  void addThing(Thing *thing);
 	MagicEffectItem* getFieldItem();
 	Teleport* getTeleportItem() const;
 

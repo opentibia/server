@@ -45,6 +45,7 @@ ItemType::ItemType()
 	useable	        = false;
 	moveable        = true;
 	alwaysOnTop     = false;
+	alwaysOnTopOrder = 0;
 	pickupable      = false;
 	rotable         = false;
 	rotateTo		= 0;
@@ -596,7 +597,15 @@ int Items::loadFromOtb(std::string file)
 								iType->lightColor = lb2.lightColor;
 								break;
 							}
+							
+							case ITEM_ATTR_TOPORDER:
+							{
+								if(datalen != sizeof(unsigned char))
+									return ERROR_INVALID_FORMAT;
 
+								memcpy(&iType->alwaysOnTopOrder, p, sizeof(unsigned char));
+								break;
+							}
 
 							default:
 								delete iType;

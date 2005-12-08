@@ -164,7 +164,7 @@ bool IOMapXML::loadMap(Map* map, std::string identifier){
 					}
 				}//loadContainer
 
-				t->addThing(myitem);
+				t->__internalAddThing(myitem);
 
 				//myitem->pos.x = px;
 				//myitem->pos.y = py;

@@ -318,11 +318,6 @@ void Protocol75::GetTileDescription(const Tile* tile, NetworkMessage &msg)
 			count++;
 		}
 		
-		if(tile->splash){
-			msg.AddItem(tile->splash);
-			count++;
-		}
-		
 		ItemVector::const_iterator it;
 		for(it = tile->topItems.begin(); ((it != tile->topItems.end()) && (count < 10)); ++it){
 			msg.AddItem(*it);
@@ -1223,7 +1218,7 @@ void Protocol75::sendCloseContainer(uint32_t cid)
 	WriteBuffer(msg);
 }
 
-void Protocol75::sendCreatureTurn(const Creature *creature, unsigned char stackPos)
+void Protocol75::sendCreatureTurn(const Creature* creature, unsigned char stackPos)
 {
 	if(CanSee(creature)){
 		NetworkMessage msg;
@@ -1298,26 +1293,6 @@ void Protocol75::sendPing()
 	msg.AddByte(0x1E);
 	WriteBuffer(msg);
 }
-
-/*
-void Protocol75::sendThingRemove(const Thing *thing)
-{
-	//Auto-close trade
-	if(player->getTradeItem() && dynamic_cast<const Item*>(thing) == player->getTradeItem()) {
-		game->playerCloseTrade(player);
-	}
-	
-	NetworkMessage msg;
-
-	//Auto-close container's
-	const Container* moveContainer = dynamic_cast<const Container *>(thing);
-	if(moveContainer) {
-		autoCloseContainers(moveContainer, msg);		
-	}
-
-	WriteBuffer(msg);
-}
-*/
 
 void Protocol75::sendDistanceShoot(const Position &from, const Position &to, unsigned char type)
 {
@@ -1500,10 +1475,12 @@ void Protocol75::sendMoveCreature(const Creature* creature, const Position& oldP
 			RemoveTileItem(msg, oldPos, oldStackPos);
 		}
 		else{
-			msg.AddByte(0x6D);
-			msg.AddPosition(oldPos);
-			msg.AddByte(oldStackPos);
-			msg.AddPosition(creature->getPosition());
+			if(oldStackPos < 10){
+				msg.AddByte(0x6D);
+				msg.AddPosition(oldPos);
+				msg.AddByte(oldStackPos);
+				msg.AddPosition(creature->getPosition());
+			}
 		}
 
 		//floor change down
@@ -1541,13 +1518,15 @@ void Protocol75::sendMoveCreature(const Creature* creature, const Position& oldP
 			sendAddCreature(creature, false);
 		}
 		else{
-			NetworkMessage msg;
+			if(oldStackPos < 10){
+				NetworkMessage msg;
 
-			msg.AddByte(0x6D);
-			msg.AddPosition(oldPos);
-			msg.AddByte(oldStackPos);
-			msg.AddPosition(creature->getPosition());
-			WriteBuffer(msg);
+				msg.AddByte(0x6D);
+				msg.AddPosition(oldPos);
+				msg.AddByte(oldStackPos);
+				msg.AddPosition(creature->getPosition());
+				WriteBuffer(msg);
+			}
 		}
 	}
 	else if(CanSee(oldPos)){
