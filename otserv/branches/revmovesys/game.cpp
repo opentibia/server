@@ -1293,6 +1293,8 @@ ReturnValue Game::internalRemoveItem(Item* item, int32_t count /*= -1*/,  bool t
 		//remove the item
 		cylinder->__removeThing(item, count);
 		item->setParent(NULL);
+
+		cylinder->postRemoveNotification(item);
 		FreeThing(item);
 	}
 	

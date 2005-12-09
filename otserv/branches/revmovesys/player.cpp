@@ -2197,7 +2197,7 @@ void Player::postRemoveNotification(const Thing* thing, bool hadOwnership /*= tr
 	}
 
 	if(const Container* container = dynamic_cast<const Container*>(thing)){
-		if(container->getParent() &&
+		if(!container->isRemoved() &&
 			(container->getTopParent() == this || (dynamic_cast<const Container*>(container->getTopParent()))) &&
 			 (std::abs(container->getPosition().x - getPosition().x) <= 1) &&
 			 (std::abs(container->getPosition().y - getPosition().y) <= 1) &&
