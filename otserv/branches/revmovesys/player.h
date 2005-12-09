@@ -171,6 +171,7 @@ public:
 	
 	time_t getLastLoginSaved() const { return lastLoginSaved; };
 	const Position& getLastLoginPosition() {return lastLoginPosition;};
+	const Position& getLastPosition() {return lastPosition;};
 	
 	void updateInventoryWeigth();
 	
@@ -186,6 +187,8 @@ public:
 
 	//bool substractMoney(unsigned long money);
 	//bool substractMoneyItem(Item *item, unsigned long money);
+	bool removeItemTypeCount(uint16_t itemId, uint32_t count);
+	uint32_t getItemTypeCount(uint16_t itemId);
 		
 	unsigned long eventAutoWalk;
 	
@@ -205,6 +208,7 @@ public:
 	fight_t getFightType();
 	subfight_t getSubFightType();
 	
+	bool CanSee(const Position& pos) const;
 	bool CanSee(int x, int y, int z) const;
 	
 	void sendIcons();  
@@ -332,6 +336,7 @@ protected:
 	time_t lastlogin;
 	time_t lastLoginSaved;
 	Position lastLoginPosition;
+	Position lastPosition; //tmp fix until new battle system
 	unsigned long lastip;
 	
 	//inventory variables

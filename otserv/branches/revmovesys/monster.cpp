@@ -1258,7 +1258,7 @@ bool Monster::monsterMoveItem(Item* item, int radius)
 	}
 	//try random position in radius
 	tryPos.z = item->getPosition().z;
-	for(int i = 0; i < 4*radius; i++){
+	for(int i = 0; i < 4 * radius; i++){
 		tryPos.x = item->getPosition().x + rand() % radius;
 		tryPos.y = item->getPosition().y + rand() % radius;
 		if(game->map->canThrowObjectTo(item->getPosition(), tryPos)){

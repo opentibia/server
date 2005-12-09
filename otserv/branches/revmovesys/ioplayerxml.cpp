@@ -594,14 +594,15 @@ bool IOPlayerXML::SaveContainer(xmlNodePtr nodeitem,Container* ccontainer)
 }
 
 
-bool IOPlayerXML::savePlayer(Player* player){
+bool IOPlayerXML::savePlayer(Player* player)
+{
 	std::string datadir = g_config.getGlobalString("datadir");
 	std::string filename = datadir + "players/" + player->getName() + ".xml";
 	std::transform (filename.begin(),filename.end(), filename.begin(), tolower);
     std::stringstream sb;
     
-    xmlDocPtr doc;        
-    xmlMutexLock(xmlmutex);    
+	xmlDocPtr doc;
+	xmlMutexLock(xmlmutex);    
 	xmlNodePtr nn, sn, pn, root;
 	doc = xmlNewDoc((const xmlChar*)"1.0");
 	doc->children = xmlNewDocNode(doc, NULL, (const xmlChar*)"player", NULL);
@@ -622,7 +623,6 @@ bool IOPlayerXML::savePlayer(Player* player){
 	sb << (int)player->vocation;      xmlSetProp(root, (const xmlChar*) "voc", (const xmlChar*)sb.str().c_str());       sb.str("");
 	sb << player->level;              xmlSetProp(root, (const xmlChar*) "level", (const xmlChar*)sb.str().c_str());     sb.str("");	
 	sb << player->access;             xmlSetProp(root, (const xmlChar*) "access", (const xmlChar*)sb.str().c_str());	sb.str("");	
-	//sb << player->cap;    	        xmlSetProp(root, (const xmlChar*) "cap", (const xmlChar*)sb.str().c_str());       sb.str("");
 	sb << player->getCapacity();      xmlSetProp(root, (const xmlChar*) "cap", (const xmlChar*)sb.str().c_str());       sb.str("");
 	sb << player->maglevel;	          xmlSetProp(root, (const xmlChar*) "maglevel", (const xmlChar*)sb.str().c_str());  sb.str("");
 	sb << player->lastlogin;	        xmlSetProp(root, (const xmlChar*) "lastlogin", (const xmlChar*)sb.str().c_str());  sb.str("");

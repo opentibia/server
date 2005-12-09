@@ -60,6 +60,7 @@ public:
 	CreatureState() {};
 	~CreatureState() {};
 
+	Position pos;
 	int damage;
 	int manaDamage;
 	bool drawBlood;
@@ -75,7 +76,6 @@ typedef std::map<Tile*, CreatureStateVec> CreatureStates;
 
 class Game;
 
-/*
 class GameState {
 public:
 	GameState(Game *game, const Range &range);
@@ -94,7 +94,6 @@ protected:
 	SpectatorVec spectatorlist;
 	CreatureStates creaturestates;
 };
-*/
 
 enum enum_world_type{
 	WORLD_TYPE_NO_PVP,
@@ -160,14 +159,14 @@ public:
 	  * Adds the Creature to playersOnline and to the map
 	  * \param c Creature to add
 	  */
-	bool placeCreature(const Position &pos, Creature* c);
+	bool placeCreature(const Position &pos, Creature* c, bool isLogin = true);
 
 	/**
 		* Remove Creature from the map.
 		* Removes the Creature the map
 		* \param c Creature to remove
 		*/
-	bool removeCreature(Creature* c);
+	bool removeCreature(Creature* creature, bool isLogout = true);
 
 	uint32_t getPlayersOnline();
 	uint32_t getMonstersOnline();
@@ -191,11 +190,8 @@ public:
 	ReturnValue internalMoveItem(Cylinder* fromCylinder, Cylinder* toCylinder, int32_t index,
 		Item* item, uint32_t count);
 
-	//void addItem(Player* player, Cylinder* toCylinder, Item* item);
 	ReturnValue internalAddItem(Cylinder* toCylinder, Item* item, bool test = false);
-
-	//void removeItem(Player* player, Cylinder* fromCylinder, Item* item);
-	ReturnValue internalRemoveItem(Item* item,  bool test = false);
+	ReturnValue internalRemoveItem(Item* item, int32_t count = -1,  bool test = false);
 
 	Item* transformItem(Item* item, uint16_t newtype, int32_t count = -1);
 
@@ -231,10 +227,10 @@ public:
 
 	void playerAutoWalk(Player* player, std::list<Direction>& path);
 
-	bool playerUseItemEx(Player* player, const Position& fromPos, uint8_t fromStackpos, uint16_t fromItemId,
-		const Position& toPos, uint8_t toStackpos, uint16_t toItemId);
+	bool playerUseItemEx(Player* player, const Position& fromPos, uint8_t fromStackPos, uint16_t fromItemId,
+		const Position& toPos, uint8_t toStackPos, uint16_t toItemId);
 	bool playerUseItem(Player* player, const Position& pos, uint8_t stackpos, uint8_t index, uint16_t itemId);
-	bool playerUseBattleWindow(Player* player, const Position& posFrom, uint8_t fromStackPos,
+	bool playerUseBattleWindow(Player* player, const Position& fromPos, uint8_t fromStackPos,
 		uint32_t creatureId, uint16_t itemId);
 	bool playerRotateItem(Player* player, const Position& pos, uint8_t stackpos, const uint16_t itemId);
 
@@ -242,11 +238,8 @@ public:
 		uint32_t playerId, uint16_t itemId);
 	bool playerAcceptTrade(Player* player);
 	bool playerLookInTrade(Player* player, bool lookAtCounterOffer, int index);
-	bool playerLookAt(Player* player, const Position& pos, uint16_t itemId, uint8_t stackpos);
-
 	void playerCloseTrade(Player* player);
-	//void autoCloseTrade(const Item* item, bool itemMoved = false);
-  //void checkCloseAttack(Player* player, Creature* target);
+	bool playerLookAt(Player* player, const Position& pos, uint16_t itemId, uint8_t stackpos);
 	
 	void playerSetAttackedCreature(Player* player, unsigned long creatureid);
 
@@ -288,19 +281,15 @@ protected:
 
 	void changeOutfit(unsigned long id, int looktype);
 
-	//bool creatureOnPrepareAttack(Creature *creature, Position pos);
-	//void creatureMakeDamage(Creature *creature, Creature *attackedCreature, fight_t damagetype);
-	//bool creatureMakeMagic(Creature *creature, const Position& centerpos, const MagicEffectClass* me);
-	//bool creatureOnPrepareMagicAttack(Creature *creature, Position pos, const MagicEffectClass* me);
-
-	/**
-		* Change the players hitpoints
-		* Return: the mana damage and the actual hitpoint loss
-		*/
-	//void creatureApplyDamage(Creature *creature, int damage, int &outDamage, int &outManaDamage);
-
-	//void CreateDamageUpdate(Creature* player, Creature* attackCreature, int damage);
-	//void CreateManaDamageUpdate(Creature* player, Creature* attackCreature, int damage);
+	//battle system
+	bool creatureMakeMagic(Creature *creature, const Position& centerpos, const MagicEffectClass* me);
+	void creatureApplyDamage(Creature *creature, int damage, int &outDamage, int &outManaDamage);
+	bool creatureOnPrepareAttack(Creature *creature, Position pos);
+	bool creatureOnPrepareMagicAttack(Creature *creature, Position pos, const MagicEffectClass* me);
+	void creatureMakeDamage(Creature *creature, Creature *attackedCreature, fight_t damagetype);
+	void CreateDamageUpdate(Creature* player, Creature* attackCreature, int damage);
+	void CreateManaDamageUpdate(Creature* player, Creature* attackCreature, int damage);
+	//battle system
 
 	OTSYS_THREAD_LOCKVAR eventLock;
 	OTSYS_THREAD_SIGNALVAR eventSignal;

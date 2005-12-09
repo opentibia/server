@@ -73,7 +73,6 @@ public:
 	
 	//Creates a union of 2 positions
 	//Should only be used when a player makes a move.
-	/*
 	Range(const Position& pos1, const Position& pos2)
 	{
 		Position topleft(std::min(pos1.x, pos2.x), std::min(pos1.y, pos2.y), pos1.z);
@@ -86,7 +85,6 @@ public:
 		maxRange.x = std::max(topleft.x + 9, bottomright.x + 9) - topleft.x;
 		maxRange.y = std::max(topleft.y + 7, bottomright.y + 7) - topleft.y;
 	}
-	*/
 
 	Range(Position centerpos, int minRangeX, int maxRangeX, int minRangeY, int maxRangeY, bool multilevel = true)
 	{

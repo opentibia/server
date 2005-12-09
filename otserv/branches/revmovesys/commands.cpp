@@ -363,7 +363,7 @@ bool Commands::banPlayer(Creature* c, const std::string &cmd, const std::string 
 {	
 	Player* playerBan = game->getPlayerByName(param);
 	if(playerBan) {
-		/*MagicEffectClass me;
+		MagicEffectClass me;
 		
 		me.animationColor = 0xB4;
 		me.damageEffect = NM_ME_MAGIC_BLOOD;
@@ -371,7 +371,7 @@ bool Commands::banPlayer(Creature* c, const std::string &cmd, const std::string 
 		me.minDamage = (playerBan->health + playerBan->mana)*10;
 		me.offensive = true;
 
-		game->creatureMakeMagic(NULL, playerBan->pos, &me);*/
+		game->creatureMakeMagic(NULL, playerBan->getPosition(), &me);
 
 		Player* player = dynamic_cast<Player*>(c);
 		if(player && player->access <= playerBan->access){
@@ -386,6 +386,7 @@ bool Commands::banPlayer(Creature* c, const std::string &cmd, const std::string 
 		if(IpNetMask.first > 0) {
 			bannedIPs.push_back(IpNetMask);
 		}
+
 		playerBan->kickPlayer();
 		return true;
 	}

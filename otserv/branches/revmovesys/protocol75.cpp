@@ -465,20 +465,26 @@ bool Protocol75::CanSee(int x, int y, int z) const
 	}
 #endif
 	
+	//temporary fix until new battle system
+	Position myPos = player->getLastPosition();
+	if(player->getParent()){
+		myPos = player->getPosition();
+	}
+
 	/*underground 8->15*/
-	if(player->getPosition().z > 7 && z < 6 /*8 - 2*/) {
+	if(myPos.z > 7 && z < 6 /*8 - 2*/) {
 		return false;
 	}
 	/*ground level and above 7->0*/
-	else if(player->getPosition().z <= 7 && z > 7){
+	else if(myPos.z <= 7 && z > 7){
 		return false;
 	}
 	
 	//negative offset means that the action taken place is on a lower floor than ourself
-	int offsetz = player->getPosition().z - z;
+	int offsetz = myPos.z - z;
 	
-	if ((x >= player->getPosition().x - 8 + offsetz) && (x <= player->getPosition().x + 9 + offsetz) &&
-		(y >= player->getPosition().y - 6 + offsetz) && (y <= player->getPosition().y + 7 + offsetz))
+	if ((x >= myPos.x - 8 + offsetz) && (x <= myPos.x + 9 + offsetz) &&
+		(y >= myPos.y - 6 + offsetz) && (y <= myPos.y + 7 + offsetz))
 		return true;
 	
 	return false;

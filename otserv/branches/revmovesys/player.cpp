@@ -492,66 +492,56 @@ bool Player::substractMoneyItem(Item *item, unsigned long money)
 }
 */
 
-/*
-bool Player::removeItem(unsigned short id,long count)
+bool Player::removeItemTypeCount(uint16_t itemId, uint32_t count)
 {
-	if(getItemCount(id) < count)
+	if(getItemTypeCount(itemId) < count)
 		return false;
 	
 	std::list<Container*> stack;
 	
 	ItemList::iterator it;
-	for(int i = 0; i < 11 && count > 0 ;i++){	
+	for(int i = SLOT_FIRST; i < SLOT_LAST && count > 0; ++i){
 		if(items[i]){
-			if(items[i]->getID() == id){
+			if(items[i]->getID() == itemId){
 				if(items[i]->isStackable()){
 					if(items[i]->getItemCountOrSubtype() > count){
-						items[i]->setItemCountOrSubtype(items[i]->getItemCountOrSubtype() - count);
-						sendInventory(i);
+						g_game.internalRemoveItem(items[i], count);
 						count = 0;
 					}
 					else{
-						count = count - items[i]->getItemCountOrSubtype();
-						g_game.FreeThing(items[i]);
-						removeItemInventory(i);
+						g_game.internalRemoveItem(items[i], count);
 					}
 				}
 				else{
 					count--;
-					g_game.FreeThing(items[i]);
-					removeItemInventory(i);
+					g_game.internalRemoveItem(items[i]);
 				}
 			}
-			else if(Container *tmpcontainer = dynamic_cast<Container*>(items[i])){
+			else if(Container* tmpcontainer = dynamic_cast<Container*>(items[i])){
 				stack.push_back(tmpcontainer);
 			}
 		}
 	}
 	
 	while(stack.size() > 0 && count > 0){
-		Container *container = stack.front();
+		Container* container = stack.front();
 		stack.pop_front();
 		for(int i = 0; i < container->size() && count > 0; i++){	
-			Item *item = container->getItem(i);
-			if(item->getID() == id){
+			Item* item = container->getItem(i);
+			if(item->getID() == itemId){
 				if(item->isStackable()){
 					if(item->getItemCountOrSubtype() > count){
-						item->setItemCountOrSubtype(item->getItemCountOrSubtype() - count);
-						onItemUpdateContainer(container,item, i);
+						g_game.internalRemoveItem(item, count);
 						count = 0;
 					}
 					else{
 						count = count - item->getItemCountOrSubtype();
-						g_game.FreeThing(item);
-						onItemRemoveContainer(container,i);
-						container->removeItem(item);
+						g_game.internalRemoveItem(item);
 					}
 				}
 				else{
-					count--;
-					g_game.FreeThing(item);
-					onItemRemoveContainer(container,i);
-					container->removeItem(item);
+					count--;				
+					g_game.internalRemoveItem(item);
 				}
 			}
 			else if(dynamic_cast<Container*>(item)){
@@ -559,56 +549,57 @@ bool Player::removeItem(unsigned short id,long count)
 			}
 		}
 	}
+
 	if(count == 0)
 		return true;
-	else
-		return false;
-}
-*/
 
-/*
-int Player::getItemCount(uint16_t id)
+	return false;
+}
+
+uint32_t Player::getItemTypeCount(uint16_t itemId)
 {
-	unsigned long counter = 0;
+	uint32_t counter = 0;
 	std::list<const Container*> stack;
 	ItemList::const_iterator cit;
-	for(int i=0; i< 11;i++){
+	for(int i = SLOT_FIRST; i < SLOT_LAST; i++){
 		if(items[i]){
-			if(items[i]->getID() == id){
+			if(items[i]->getID() == itemId){
 				if(items[i]->isStackable()){
 					counter = counter + items[i]->getItemCountOrSubtype();
 				}
 				else{
-					counter++;
+					++counter;
 				}
 			}
-			if(Container *tmpcontainer = dynamic_cast<Container*>(items[i])){
+
+			if(Container* tmpcontainer = dynamic_cast<Container*>(items[i])){
 				stack.push_back(tmpcontainer);
 			}
 		}
 	}
 	
-	while(stack.size() > 0) {
-		const Container *container = stack.front();
+	while(stack.size() > 0){
+		const Container* container = stack.front();
 		stack.pop_front();
 		for(cit = container->getItems(); cit != container->getEnd(); ++cit){
-			if((*cit)->getID() == id){
+			if((*cit)->getID() == itemId){
 				if((*cit)->isStackable()){
 					counter = counter + (*cit)->getItemCountOrSubtype();
 				}
 				else{
-					counter++;
+					++counter;
 				}
 			}
+
 			Container *container = dynamic_cast<Container*>(*cit);
-			if(container) {
+			if(container){
 				stack.push_back(container);
 			}
 		}
 	}
+
 	return counter;
 }
-*/
 
 void Player::sendIcons()
 {
@@ -916,12 +907,12 @@ int Player::getLookCorpse()
 
 void Player::dropLoot(Container *corpse)
 {
-	for (int slot = 0; slot < 11; slot++)
-	{
-		Item *item = items[slot];		
-		if (item && ((dynamic_cast<Container*>(item)) || random_range(1, 100) <= 10)) {
+	for(int i = SLOT_FIRST; i < SLOT_LAST; ++i){
+		Item* item = items[i];		
+		if(item && ((dynamic_cast<Container*>(item)) || random_range(1, 100) <= 10)) {
 			corpse->__internalAddThing(item);
-			items[slot] = NULL;
+			onRemoveInventoryItem((slots_t)i, item);
+			items[i] = NULL;
 		}
 	}
 }
@@ -1079,6 +1070,11 @@ bool Player::getStorageValue(unsigned long key, long &value) const
 		value = 0;
 		return false;
 	}
+}
+
+bool Player::CanSee(const Position& pos) const
+{
+	return client->CanSee(pos);
 }
 
 bool Player::CanSee(int x, int y, int z) const
@@ -1536,6 +1532,8 @@ unsigned long Player::getIP() const
 
 void Player::die()
 {
+	lastPosition = getPosition();
+
 	//Magic Level downgrade
 	unsigned long sumMana = 0;
 	long lostMana = 0;
@@ -2199,6 +2197,16 @@ void Player::postRemoveNotification(const Thing* thing, bool hadOwnership /*= tr
 	}
 
 	if(const Container* container = dynamic_cast<const Container*>(thing)){
+		if(container->getParent() &&
+			(container->getTopParent() == this || (dynamic_cast<const Container*>(container->getTopParent()))) &&
+			 (std::abs(container->getPosition().x - getPosition().x) <= 1) &&
+			 (std::abs(container->getPosition().y - getPosition().y) <= 1) &&
+			 (std::abs(container->getPosition().z == getPosition().z)))
+			onSendContainer(container);
+		else
+			autoCloseContainers(container);
+		
+		/*
 		//is now in hands of a unaccessable cylinder? (other player/depot/dustbin)
 		if(!(container->getTopParent() == this || container->getTopParent() == container->getTile())){
 			autoCloseContainers(container);
@@ -2211,6 +2219,7 @@ void Player::postRemoveNotification(const Thing* thing, bool hadOwnership /*= tr
 		else if(getTopParent() != container->getTopParent()){
 			onSendContainer(container);
 		}
+		*/
 	}
 }
 

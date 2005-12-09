@@ -111,7 +111,8 @@ void MagicEffectClass::getDistanceShoot(Player* spectator, const Creature* attac
 			bool hasTarget) const
 {
 	if(animationEffect > 0) {
-		if(spectator->CanSee(attacker->getPosition().x, attacker->getPosition().y, attacker->getPosition().z) || spectator->CanSee(to.x, to.y, to.z)) {
+		if(spectator->CanSee(attacker->getPosition().x, attacker->getPosition().y, attacker->getPosition().z) ||
+			spectator->CanSee(to.x, to.y, to.z)) {
 			spectator->sendDistanceShoot(attacker->getPosition(), to, animationEffect);
 		}
 	}

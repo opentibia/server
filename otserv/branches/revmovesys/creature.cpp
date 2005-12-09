@@ -229,18 +229,6 @@ std::vector<long> Creature::getInflicatedDamageCreatureList()
 	return damagelist;
 }
 
-/*
-bool Creature::canMovedTo(const Tile *tile) const
-{
-	if(tile) {
-		return (tile->isBlocking(BLOCK_SOLID) == RET_NOERROR);
-	}
-
-	return false;
-}
-*/
-
-//std::string Creature::getDescription(bool self) const
 std::string Creature::getDescription(uint32_t lookDistance) const
 {
 	std::string str = "a creature";

@@ -913,19 +913,18 @@ int ActionScript::luaActionDoRemoveItem(lua_State *L)
 }
 
 int ActionScript::luaActionDoPlayerRemoveItem(lua_State *L)
-{	
-	/*
+{
 	//doPlayerRemoveItem(cid,itemid,count)
 	long count = (unsigned char)internalGetNumber(L);	
-	unsigned short itemid = (unsigned short)internalGetNumber(L);
+	unsigned short itemId = (unsigned short)internalGetNumber(L);
 	unsigned int cid = (unsigned int)internalGetNumber(L);						
 	
 	ActionScript *action = getActionScript(L);
 	
 	const KnownThing* tmp = action->GetPlayerByUID(cid);
 	if(tmp){
-		Player *player = (Player*)(tmp->thing);
-		if(player->removeItem(itemid, count)){
+		Player *player = dynamic_cast<Player*>(tmp->thing);
+		if(player->removeItemTypeCount(itemId, count)){
 			lua_pushnumber(L, 1);
 		}
 		else{
@@ -937,7 +936,6 @@ int ActionScript::luaActionDoPlayerRemoveItem(lua_State *L)
 		std::cout << "luaDoPlayerRemoveItem: player not found" << std::endl;
 		return 1;
 	}	
-	*/
 
 	return 1;
 }
@@ -1035,17 +1033,16 @@ int ActionScript::luaActionDoTeleportThing(lua_State *L)
 int ActionScript::luaActionDoTransformItem(lua_State *L)
 {
 	//doTransformItem(uid,toitemid)	
-	unsigned int toid = (unsigned int)internalGetNumber(L);	
+	unsigned int toId = (unsigned int)internalGetNumber(L);	
 	unsigned int itemid = (unsigned int)internalGetNumber(L);	
 	
 	ActionScript *action = getActionScript(L);
 	
 	const KnownThing* tmp = action->GetItemByUID(itemid);	
-	Item *tmpitem = NULL;
+	Item* tmpItem = NULL;
 	PositionEx tmppos;
 	if(tmp){
-		tmpitem = dynamic_cast<Item*>(tmp->thing);
-		tmppos = tmp->pos;		
+		tmpItem = dynamic_cast<Item*>(tmp->thing);
 	}
 	else{
 		lua_pushnumber(L, -1);
@@ -1053,6 +1050,10 @@ int ActionScript::luaActionDoTransformItem(lua_State *L)
 		return 1;
 	}
 	
+	//if(tmpItem){
+	//	action->game->transformItem(tmpItem, toId);
+	//}
+
 	/*
 	tmpitem->setID(toid);	
 	action->game->sendUpdateThing(action->_player,(Position&)tmppos,tmpitem,tmppos.stackpos);

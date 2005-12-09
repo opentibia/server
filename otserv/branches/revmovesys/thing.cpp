@@ -31,21 +31,20 @@ void Thing::releaseThing2()
 
 Cylinder* Thing::getTopParent()
 {
+	//tile
 	if(getParent() == NULL)
 		return dynamic_cast<Cylinder*>(this);
 
-	if(dynamic_cast<Player*>(this)){
-		return dynamic_cast<Cylinder*>(this);
-	}
-
 	Cylinder* aux = getParent();
+	Cylinder* prevaux = dynamic_cast<Cylinder*>(this);
 
 	while(aux->getParent() != NULL){
-		if(dynamic_cast<Player*>(aux)){
-			return aux;
-		}
-
+		prevaux = aux;
 		aux = aux->getParent();
+	}
+
+	if(dynamic_cast<Cylinder*>(prevaux)){
+		return prevaux;
 	}
 
 	return aux;
@@ -53,21 +52,20 @@ Cylinder* Thing::getTopParent()
 
 const Cylinder* Thing::getTopParent() const
 {
+	//tile
 	if(getParent() == NULL)
 		return dynamic_cast<const Cylinder*>(this);
 
-	if(dynamic_cast<const Player*>(this)){
-		return dynamic_cast<const Cylinder*>(this);
-	}
-
 	const Cylinder* aux = getParent();
+	const Cylinder* prevaux = dynamic_cast<const Cylinder*>(this);
 
 	while(aux->getParent() != NULL){
-		if(dynamic_cast<const Player*>(aux)){
-			return aux;
-		}
-
+		prevaux = aux;
 		aux = aux->getParent();
+	}
+
+	if(dynamic_cast<const Cylinder*>(prevaux)){
+		return prevaux;
 	}
 
 	return aux;
