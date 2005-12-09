@@ -225,13 +225,13 @@ ReturnValue Container::__queryRemove(const Thing* thing, uint32_t count) const
 	if(item == NULL){
 		return RET_NOTPOSSIBLE;
 	}
-	
-	if(item->isNotMoveable()){
-		return RET_NOTMOVEABLE;
-	}
 
 	if(item->isStackable() && (count == 0 || count > item->getItemCountOrSubtype())){
 		return RET_NOTPOSSIBLE;
+	}
+
+	if(item->isNotMoveable()){
+		return RET_NOTMOVEABLE;
 	}
 
 	return RET_NOERROR;

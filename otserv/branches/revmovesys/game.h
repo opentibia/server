@@ -185,7 +185,7 @@ public:
 	ReturnValue internalCreatureMove(Creature* creature, Cylinder* fromCylinder, Cylinder* toCylinder);
 
 	void moveItem(Player* player, Cylinder* fromCylinder, Cylinder* toCylinder, int32_t index,
-		Item* item, uint32_t count, uint16_t itemid);
+		Item* item, uint32_t count, uint16_t itemId);
 	
 	ReturnValue internalMoveItem(Cylinder* fromCylinder, Cylinder* toCylinder, int32_t index,
 		Item* item, uint32_t count);

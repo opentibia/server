@@ -1084,11 +1084,11 @@ ReturnValue Game::internalCreatureMove(Creature* creature, Cylinder* fromCylinde
 }
 
 void Game::moveItem(Player* player, Cylinder* fromCylinder, Cylinder* toCylinder, int32_t index,
-	Item* item, uint32_t count, uint16_t itemid)
+	Item* item, uint32_t count, uint16_t itemId)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::moveItem()");
 
-	if(fromCylinder == NULL || toCylinder == NULL || item == NULL || item->getID() != itemid){
+	if(fromCylinder == NULL || toCylinder == NULL || item == NULL || item->getID() != itemId){
 		player->sendCancel("Sorry, not possible.");
 	}
 
@@ -1096,7 +1096,7 @@ void Game::moveItem(Player* player, Cylinder* fromCylinder, Cylinder* toCylinder
 	const Position& toPos = toCylinder->getPosition();
 
 	ReturnValue ret = RET_NOERROR;
-	if(!item->isPushable()){
+	if(!item->isNotMoveable()){
 		ret = RET_NOTMOVEABLE;
 	}
 	else if(player->getPosition().z > fromPos.z){
@@ -1285,7 +1285,7 @@ ReturnValue Game::internalRemoveItem(Item* item, int32_t count /*= -1*/,  bool t
 
 	//check if we can remove this item
 	ReturnValue ret = cylinder->__queryRemove(item, count);
-	if(ret != RET_NOERROR){
+	if(ret != RET_NOERROR && ret != RET_NOTMOVEABLE){
 		return ret;
 	}
 
@@ -2493,7 +2493,7 @@ void Game::checkDecay(int t)
 						startDecay(newItem);
 					}
 					else{
-						internalRemoveItem(item);
+						internalRemoveItem(item, false);
 					}
 				}
 

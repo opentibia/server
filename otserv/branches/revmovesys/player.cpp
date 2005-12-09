@@ -1954,13 +1954,13 @@ ReturnValue Player::__queryRemove(const Thing* thing, uint32_t count) const
 		return RET_NOTPOSSIBLE;
 	}
 
-	if(item->isNotMoveable()){
-		return RET_NOTMOVEABLE;
-	}
-
 	if(item->isStackable()){
 		if(count == 0 || count > item->getItemCountOrSubtype())
 			return RET_NOTPOSSIBLE;
+	}
+
+	if(item->isNotMoveable()){
+		return RET_NOTMOVEABLE;
 	}
 
 	return RET_NOERROR;
