@@ -124,24 +124,17 @@ protected:
 	virtual int getLostExperience();
 	virtual void dropLoot(Container *corpse);
 	
-	//old code
-	//virtual void onThingMove(const Creature *creature, const Thing *thing, const Position *oldPos,
-	//	unsigned char oldstackpos, unsigned char oldcount, unsigned char count);
-	
-	//virtual void onCreatureAppear(const Creature *creature);
-	//virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos, bool tele);
-	//virtual void onThingTransform(const Thing* thing,int stackpos);
-
-	virtual void onThingDisappear(const Thing* thing, unsigned char stackPos);
-	virtual void onThingAppear(const Thing* thing);
-	//old code
+	virtual void onAddTileItem(const Position& pos, const Item* item);
+	virtual void onUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* oldItem, const Item* newItem);
+	virtual void onRemoveTileItem(const Position& pos, uint32_t stackpos, const Item* item);
+	virtual void onUpdateTile(const Position& pos);
 
 	virtual void onCreatureAppear(const Creature* creature, bool isLogin);
 	virtual void onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout);
-
+	
 	virtual void onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos);
 	virtual void onTeleport(const Creature* creature, const Position& oldPos, uint32_t oldStackPos);
-	
+
 	virtual bool isAttackable() const { return true; };
 	
 	virtual int onThink(int& newThinkTicks);

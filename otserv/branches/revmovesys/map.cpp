@@ -249,7 +249,7 @@ void Map::getSpectators(const Range& range, SpectatorVec& list)
 }
 
 
-bool Map::canThrowObjectTo2(const Position& fromPos, const Position& toPos)
+bool Map::canThrowObjectTo(const Position& fromPos, const Position& toPos)
 {
 	Position start = fromPos;
 	Position end = toPos;
@@ -285,7 +285,7 @@ bool Map::canThrowObjectTo2(const Position& fromPos, const Position& toPos)
 
 		t = getTile(rx, ry, start.z);
 		if(t){
-			if(t->isBlockingProjectile())
+			if(t->hasProperty(BLOCKPROJECTILE))
 				return false;
 		}
 
@@ -300,102 +300,34 @@ bool Map::canThrowObjectTo2(const Position& fromPos, const Position& toPos)
 	return true;
 }
 
-ReturnValue Map::canThrowObjectTo(Position from, Position to, int objectstate /*= BLOCK_PROJECTILE*/)
-{
-	Position start = from;
-	Position end = to;
-
-	/*if(start.x > end.x) {
-		swap(start.x, end.x);
-		swap(start.y, end.y);
-	}*/
-
-	bool steep = std::abs(end.y - start.y) > abs(end.x - start.x);
-
-	if(steep) {
-		swap(start.x, start.y);
-		swap(end.x, end.y);
-	}
-	
-	int deltax = abs(end.x - start.x);
-	int deltay = abs(end.y - start.y);
-	int error = 0;
-	int deltaerr = deltay;
-	int y = start.y;
-	Tile *t = NULL;
-	int xstep = ((start.x < end.x) ? 1 : -1);
-	int ystep = ((start.y < end.y) ? 1 : -1);
-
-	//for(int x = start.x; x != end.x; x += xstep) {
-	for(int x = start.x; x != end.x + xstep; x += xstep) {
-		int rx = (steep ? y : x);
-		int ry = (steep ? x : y);
-
-		if(!(from.x == rx && from.y == ry)) {
-
-			t = getTile(rx, ry, start.z);
-			ReturnValue ret = RET_NOERROR;
-
-			if(t) {
-				if((to.x == rx && to.y == ry)) {
-					ret = t->isBlocking(objectstate);
-				}
-				else {
-					ret = t->isBlocking(BLOCK_PROJECTILE);
-				}
-			}
-
-			if(ret != RET_NOERROR)
-				return ret;
-		}
-
-		error += deltaerr;
-
-		if(2 * error >= deltax) {
-			y += ystep;
-			error -= deltax;
-		}
-	}
-
-	return RET_NOERROR;
-}
-
-ReturnValue Map::isPathValid(Creature *creature, const std::list<Position>& path, int pathSize,
+bool Map::isPathValid(Creature *creature, const std::list<Position>& path, int pathSize,
 	bool ignoreMoveableBlockingItems /*= false)*/)
 {
 	int pathCount = 0;
 	std::list<Position>::const_iterator iit;
 	for(iit = path.begin(); iit != path.end(); ++iit) {
 
-		Tile *t = getTile(iit->x, iit->y, iit->z);
-		if(t) {
-			ReturnValue ret = t->isBlocking(BLOCK_SOLID | BLOCK_PATHFIND, false, ignoreMoveableBlockingItems);
-			if(ret == RET_CREATUREBLOCK && t->getCreature() == creature && t->creatures.size() == 1)
-				ret = RET_NOERROR;
-
-			if(ret != RET_NOERROR) {
-				//std::cout << "isPathValid - false: " << (int) ret << std::endl;
-				return ret;
-			}
+		Tile* tile = getTile(iit->x, iit->y, iit->z);
+		if(tile){
+			if(tile->hasProperty(BLOCKSOLID) ||
+				 tile->hasProperty(BLOCKPATHFIND) ||
+				 (!tile->creatures.empty() && creature->getTile() != tile))
+				 return false;
 		}
 		else
-			return RET_NOTILE;
-			//return false;
+			return false;
 
 		if(pathCount++ >= pathSize)
 			return RET_NOERROR;
 	}
 
-	return RET_NOERROR;
-	//return true;
+	return true;
 }
 
 std::list<Position> Map::getPathTo(Creature *creature, Position start, Position to,
-	bool creaturesBlock /*=true*/, bool ignoreMoveableBlockingItems /*= false*/, int maxNodSize /*= 100*/){
+	bool creaturesBlock /*=true*/, bool ignoreMoveableBlockingItems /*= false*/, int maxNodSize /*= 100*/)
+{
 	std::list<Position> path;
-/*	if(start.z != to.z)
-		return path;
-*/
 	AStarNodes nodes;
 	AStarNode* found = NULL;
 	int z = start.z;
@@ -418,15 +350,12 @@ std::list<Position> Map::getPathTo(Creature *creature, Position start, Position 
 					int x = current->x + dx;
 					int y = current->y + dy;
 
-					Tile *t = getTile(x, y, z);
-					if(t) {
-						ReturnValue ret = t->isBlocking(BLOCK_SOLID | BLOCK_PATHFIND, !creaturesBlock, ignoreMoveableBlockingItems);
-						if(ret == RET_CREATUREBLOCK && t->getCreature() == creature && t->creatures.size() == 1)
-							ret = RET_NOERROR;
-
-						if(ret != RET_NOERROR) {
+					Tile* tile = getTile(x, y, z);
+					if(tile){
+						if(tile->hasProperty(BLOCKSOLID) ||
+							tile->hasProperty(BLOCKPATHFIND) ||
+							(!tile->creatures.empty() && creature->getTile() != tile))
 							continue;
-						}
 					}
 					else
 						continue;

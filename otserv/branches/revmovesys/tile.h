@@ -78,8 +78,7 @@ public:
 	
 	int getThingCount() const;
 
-	ReturnValue isBlocking(int objectstate, bool ignoreCreature = false, bool ignoreMoveableBlocking = false) const;
-	bool isBlockingProjectile() const;
+	bool hasProperty(enum ITEMPROPERTY prop) const;
 
   bool isPz() const;
   void setPz();

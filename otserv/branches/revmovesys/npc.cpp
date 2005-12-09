@@ -41,7 +41,6 @@ Npc::Npc(const std::string& name, Game* game) :
  Creature()
 {
 	char *tmp;
-	useCount = 0;
 	this->loaded = false;
 	this->name = name;
 	std::string datadir = g_config.getGlobalString("datadir");
@@ -237,14 +236,34 @@ std::string Npc::getDescription(uint32_t lookDistance) const
 	return s.str();
 }
 
+void Npc::onAddTileItem(const Position& pos, const Item* item)
+{
+	//not implemented yet
+}
+
+void Npc::onUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* oldItem, const Item* newItem)
+{
+	//not implemented yet
+}
+
+void Npc::onRemoveTileItem(const Position& pos, uint32_t stackpos, const Item* item)
+{
+	//not implemented yet
+}
+
+void Npc::onUpdateTile(const Position& pos)
+{
+	//not implemented yet
+}
+
 void Npc::onCreatureAppear(const Creature* creature, bool isLogin)
 {
-	this->script->onCreatureAppear(creature->getID());
+	script->onCreatureAppear(creature->getID());
 }
 
 void Npc::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout)
 {
-	this->script->onCreatureDisappear(creature->getID());
+	script->onCreatureDisappear(creature->getID());
 }
 
 void Npc::onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos)
@@ -257,42 +276,7 @@ void Npc::onTeleport(const Creature* creature, const Position& oldPos, uint32_t 
 	//not implemented yet
 }
 
-/*
-void Npc::onThingMove(const Player *player, const Thing *thing, const Position *oldPos,
-	unsigned char oldstackpos, unsigned char oldcount, unsigned char count){
-	//not yet implemented
-}
-*/
-
-/*
-void Npc::onCreatureAppear(const Creature *creature)
-{
-	this->script->onCreatureAppear(creature->getID());
-}
-*/
-
-/*
-void Npc::onCreatureDisappear(const Creature *creature, unsigned char stackPos, bool tele)
-{
-	this->script->onCreatureDisappear(creature->getID());
-}
-*/
-
-void Npc::onThingDisappear(const Thing* thing, unsigned char stackPos)
-{
-	const Creature *creature = dynamic_cast<const Creature*>(thing);
-	if(creature)
-		this->script->onCreatureDisappear(creature->getID());
-}
-
-void Npc::onThingAppear(const Thing* thing)
-{
-	const Creature *creature = dynamic_cast<const Creature*>(thing);
-	if(creature)
-		this->script->onCreatureAppear(creature->getID());
-}
-
-void Npc::onCreatureTurn(const Creature *creature, unsigned char stackpos)
+void Npc::onCreatureTurn(const Creature* creature, uint32_t stackpos)
 {
 	//not implemented yet, do we need it?
 }
@@ -332,22 +316,20 @@ void Npc::doAttack(int id)
 
 void Npc::doMove(int direction)
 {
-	/*
 	switch(direction){
 		case 0:
-			this->game->thingMove(this, this,getPosition().x, getPosition().y+1, getPosition().z, 1);
+			game->moveCreature(this, SOUTH);
 		break;
 		case 1:
-			this->game->thingMove(this, this,getPosition().x+1, getPosition().y, getPosition().z, 1);
+			game->moveCreature(this, EAST);
 		break;
 		case 2:
-			this->game->thingMove(this, this,getPosition().x, getPosition().y-1, getPosition().z, 1);
+			game->moveCreature(this, NORTH);
 		break;
 		case 3:
-			this->game->thingMove(this, this,getPosition().x-1, getPosition().y, getPosition().z, 1);
+			game->moveCreature(this, WEST);
 		break;
 	}
-	*/
 }
 
 void Npc::doMoveTo(Position target)
@@ -360,12 +342,13 @@ void Npc::doMoveTo(Position target)
 		return;
 	}
 	else route.pop_front();
-	Position nextStep=route.front();
+	Position nextStep = route.front();
 	route.pop_front();
 	int dx = nextStep.x - getPosition().x;
 	int dy = nextStep.y - getPosition().y;
 
 	//this->game->thingMove(this, this, getPosition().x + dx, getPosition().y + dy, getPosition().z, 1);
+	//game->moveCreature(this, 
 }
 
 NpcScript::NpcScript(std::string scriptname, Npc* npc)

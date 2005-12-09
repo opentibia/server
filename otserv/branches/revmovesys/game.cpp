@@ -1130,7 +1130,7 @@ void Game::moveItem(Player* player, Cylinder* fromCylinder, Cylinder* toCylinder
 		ret = RET_DESTINATIONOUTOFREACH;
 	}
 
-	if(!map->canThrowObjectTo2(fromPos, toPos)){
+	if(!map->canThrowObjectTo(fromPos, toPos)){
 		ret = RET_CANNOTTHROW;
 	}
 
@@ -1447,7 +1447,7 @@ void Game::getSpectators(const Range& range, SpectatorVec& list)
 	map->getSpectators(range, list);
 }
 
-void Game::creatureTurn(Creature *creature, Direction dir)
+void Game::creatureTurn(Creature* creature, Direction dir)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::creatureTurn()");
 
@@ -1486,6 +1486,7 @@ void Game::addCommandTag(std::string tag)
 			break;
 		}
 	}
+
 	if(!found){
 		commandTags.push_back(tag);
 	}
@@ -1496,13 +1497,13 @@ void Game::resetCommandTag()
 	commandTags.clear();
 }
 
-void Game::creatureSay(Creature *creature, SpeakClasses type, const std::string &text)
+void Game::creatureSay(Creature* creature, SpeakClasses type, const std::string& text)
 {	
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::creatureSay()");
 
 	bool GMcommand = false;
 	// First, check if this was a GM command
-	for(int i=0;i< commandTags.size() ;i++){
+	for(int i = 0; i < commandTags.size(); i++){
 		if(commandTags[i] == text.substr(0,1)){
 			if(commands.exeCommand(creature,text)){
 				GMcommand = true;
@@ -1510,6 +1511,7 @@ void Game::creatureSay(Creature *creature, SpeakClasses type, const std::string 
 			break;
 		}
 	}
+
 	if(!GMcommand){
 		// It was no command, or it was just a player
 		SpectatorVec list;
@@ -1533,7 +1535,7 @@ void Game::creatureSay(Creature *creature, SpeakClasses type, const std::string 
 	}
 }
 
-void Game::teleport(Thing *thing, const Position& newPos)
+void Game::teleport(Thing* thing, const Position& newPos)
 {
 	/*
 	if(newPos == thing->getPosition())  
@@ -1632,7 +1634,7 @@ void Game::teleport(Thing *thing, const Position& newPos)
 	*/
 }
 
-void Game::creatureChangeOutfit(Creature *creature)
+void Game::creatureChangeOutfit(Creature* creature)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::creatureChangeOutfit()");
 
@@ -2515,87 +2517,25 @@ void Game::checkDecay(int t)
 	}
 		
 	flushSendBuffers();
-
-	/*		
-	list<decayBlock*>::iterator it;
-	for(it = decayVector.begin();it != decayVector.end();){
-		(*it)->decayTime -= t;
-		if((*it)->decayTime <= 0){
-			list<Item*>::iterator it2;
-			for(it2 = (*it)->decayItems.begin(); it2 != (*it)->decayItems.end(); it2++){
-				Item* item = *it2;
-				item->isDecaying = false;
-				if(item->canDecay()){
-					if(item->getPosition().x != 0xFFFF){
-						Tile *tile = map->getTile(item->getPosition());
-						if(tile){
-							Position pos = item->getPosition();
-							Item* newitem = item->decay();
-							
-							if(newitem){
-								int stackpos = tile->getThingStackPos(item);
-								if(newitem == item){
-									sendUpdateThing(NULL,pos,newitem,stackpos);
-								}
-								else{
-									if(tile->removeThing(item)){
-										//autoclose containers
-										if(dynamic_cast<Container*>(item)){
-											SpectatorVec list;
-											SpectatorVec::iterator it;
-
-											getSpectators(Range(pos, true), list);
-
-											for(it = list.begin(); it != list.end(); ++it) {
-												Player* spectator = dynamic_cast<Player*>(*it);
-												if(spectator)
-													spectator->onThingRemove(item);
-											}
-										}
-	
-										tile->insertThing(newitem, stackpos);
-										sendUpdateThing(NULL,pos,newitem,stackpos);
-										FreeThing(item);
-									}
-								}
-								startDecay(newitem);
-							}
-							else{
-								if(removeThing(NULL,pos,item)){
-									FreeThing(item);
-								}
-							}//newitem
-						}//tile
-					}//pos != 0xFFFF
-				}//item->canDecay()
-				FreeThing(item);
-			}//for it2
-			delete *it;
-			it = decayVector.erase(it);
-		}//(*it)->decayTime <= 0
-		else{
-			it++;
-		}
-	}//for it
-		
-	flushSendBuffers();
-	*/
 }
 
 void Game::startDecay(Item* item)
 {
 	if(item->isDecaying)
-		return;//dont add 2 times the same item
+		return; //dont add 2 times the same item
+
 	//get decay time
 	item->isDecaying = true;
 	unsigned long dtime = item->getDecayTime();
 	if(dtime == 0)
 		return;
+
 	//round time
 	if(dtime < DECAY_INTERVAL)
 		dtime = DECAY_INTERVAL;
 	dtime = (dtime/DECAY_INTERVAL)*DECAY_INTERVAL;
 	item->useThing2();
+
 	//search if there are any block with this time
 	list<decayBlock*>::iterator it;
 	for(it = decayVector.begin();it != decayVector.end();it++){
@@ -2604,6 +2544,7 @@ void Game::startDecay(Item* item)
 			return;
 		}
 	}
+
 	//we need a new decayBlock
 	decayBlock* db = new decayBlock;
 	db->decayTime = dtime;
@@ -2741,11 +2682,6 @@ void Game::playerAutoWalk(Player* player, std::list<Direction>& path)
 */
 
 	player->eventAutoWalk = addEvent(makeTask(ticks, std::bind2nd(std::mem_fun(&Game::checkPlayerWalk), player->getID())));
-
-	// then we schedule the movement...
-  // the interval seems to depend on the speed of the char?
-	//player->eventAutoWalk = addEvent(makeTask<Direction>(0, MovePlayer(player->getID()), path, 400, StopMovePlayer(player->getID())));
-	//player->pathlist = path;
 }
 
 bool Game::playerUseItemEx(Player* player, const Position& fromPos, uint8_t fromStackpos, uint16_t fromItemId,

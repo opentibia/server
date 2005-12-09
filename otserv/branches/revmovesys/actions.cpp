@@ -186,8 +186,8 @@ int Actions::canUseFar(const Player *player,const Position &to_pos, const bool b
 	}
 	
 	if(canUse(player,to_pos) == TOO_FAR){
-		if(blockWalls && (game->map->canThrowObjectTo(player->getPosition(), to_pos, BLOCK_PROJECTILE) != RET_NOERROR)){
-			return CAN_NOT_THTOW;
+		if(blockWalls && (!game->map->canThrowObjectTo(player->getPosition(), to_pos))){
+			return CAN_NOT_THROW;
 		}
 	}
 
@@ -327,7 +327,7 @@ bool Actions::UseItemEx(Player* player, const Position &from_pos,
 			player->sendCancel("Too far away.");
 			return false;
 		}
-		else if(canUseFar(player, to_pos, action->blockWalls()) == CAN_NOT_THTOW){
+		else if(canUseFar(player, to_pos, action->blockWalls()) == CAN_NOT_THROW){
 			player->sendCancel("You cannot throw there.");
 			return false;
 		}
@@ -906,19 +906,7 @@ int ActionScript::luaActionDoRemoveItem(lua_State *L)
 		return 1;
 	}
 	
-	//action->game->internalRemoveItem(
-
-	/*
-	if(tmpitem->isStackable() && (tmpitem->getItemCountOrSubtype() - n) > 0){
-		tmpitem->setItemCountOrSubtype(tmpitem->getItemCountOrSubtype() - n);
-		action->game->sendUpdateThing(action->_player,(Position&)tmppos,tmpitem,tmppos.stackpos);
-	}
-	else{
-		if(action->game->removeThing(action->_player,(Position&)tmppos,tmpitem)){
-			action->game->FreeThing(tmpitem);
-		}
-	}
-	*/
+	action->game->internalRemoveItem(tmpitem);
 	
 	lua_pushnumber(L, 0);
 	return 1;
@@ -1523,16 +1511,6 @@ int ActionScript::luaActionDoCreateItem(lua_State *L)
 			pos.stackpos = tile->__getIndexOfThing(newItem);
 		}
 	}
-
-	//action->game->addThing(NULL,(Position&)pos,newitem);
-	//Tile *tile = action->game->getTile(pos.x, pos.y, pos.z);
-
-	/*if(tile){
-		pos.stackpos = tile->getThingByStackPos(newItem);
-	}
-	else{
-		pos.stackpos = 1;
-	}*/
 	
 	unsigned int uid = action->AddThingToMap((Thing*)newItem, pos);
 	

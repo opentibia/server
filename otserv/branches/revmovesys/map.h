@@ -237,17 +237,13 @@ class Map {
 
 	/**
 	 * Checks if you can throw an object to that position
-	 *	\param from from Source point
-	 *	\param to Destination point
-	 *	\param creaturesBlock Wether a Creature is an obstacle or not
-	 *	\param isProjectile Takes into consideration for windows/door-ways.
+	 *	\param fromPos from Source point
+	 *	\param toPos Destination point
 	 *	\returns The result if you can throw there or not
 	 */
-		ReturnValue canThrowObjectTo(Position from, Position to, int objectstate = BLOCK_PROJECTILE);
+		bool canThrowObjectTo(const Position& fromPos, const Position& toPos);
 
-		bool canThrowObjectTo2(const Position& fromPos, const Position& toPos);
-
-		ReturnValue isPathValid(Creature *creature, const std::list<Position>& path, int pathSize,
+		bool isPathValid(Creature *creature, const std::list<Position>& path, int pathSize,
 			bool ignoreMoveableBlockingItems = false);
 
 	/**

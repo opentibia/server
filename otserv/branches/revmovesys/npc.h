@@ -46,11 +46,6 @@ public:
 	virtual void onCreatureAppear(unsigned long cid);
 	virtual void onCreatureDisappear(int cid);
 
-	//	virtual void onThingMove(const Player *player, const Thing *thing, const Position *oldPos,
-	//	unsigned char oldstackpos, unsigned char oldcount, unsigned char count);
-	//	virtual void onCreatureTurn(const Creature *creature, unsigned char stackpos);
-	//	virtual void onCreatureChangeOutfit(const Creature* creature);
-
 	virtual void onCreatureSay(int cid, SpeakClasses, const std::string &text);
 	virtual void onThink();
 	static Npc* getNpc(lua_State *L);
@@ -103,18 +98,10 @@ public:
 	bool isLoaded(){return loaded;}
 	
 protected:
-	int useCount;
-
-	//old code
-	//virtual void onThingMove(const Player *player, const Thing *thing, const Position *oldPos,
-	//	unsigned char oldstackpos, unsigned char oldcount, unsigned char count);
-	//virtual void onCreatureAppear(const Creature *creature);
-	//virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos, bool tele);
-	//virtual void onThingTransform(const Thing* thing,int stackpos){};
-
-	virtual void onThingAppear(const Thing* thing);
-	virtual void onThingDisappear(const Thing* thing, unsigned char stackPos);
-	//old code
+	virtual void onAddTileItem(const Position& pos, const Item* item);
+	virtual void onUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* oldItem, const Item* newItem);
+	virtual void onRemoveTileItem(const Position& pos, uint32_t stackpos, const Item* item);
+	virtual void onUpdateTile(const Position& pos);
 
 	virtual void onCreatureAppear(const Creature* creature, bool isLogin);
 	virtual void onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout);
@@ -122,7 +109,7 @@ protected:
 	virtual void onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos);
 	virtual void onTeleport(const Creature* creature, const Position& oldPos, uint32_t oldStackPos);
 
-	virtual void onCreatureTurn(const Creature *creature, unsigned char stackpos);
+	virtual void onCreatureTurn(const Creature *creature, uint32_t stackpos);
 	virtual void onCreatureSay(const Creature *creature, SpeakClasses type, const std::string &text);
 	virtual void onCreatureChangeOutfit(const Creature* creature);
 	virtual int onThink(int& newThinkTicks);

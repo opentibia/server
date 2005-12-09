@@ -32,7 +32,8 @@
 
 extern Game g_game;
 
-ReturnValue Tile::isBlocking(int objectstate, bool ignoreCreature /*= false*/, bool ignoreMoveableBlocking /*= false*/) const
+/*
+ReturnValue Tile::isBlocking(int objectstate, bool ignoreCreature = false, bool ignoreMoveableBlocking = false) const
 {
 	if(isPz() && ((objectstate & BLOCK_PZ) == BLOCK_PZ)) {
 		return RET_PROTECTIONZONE;
@@ -119,29 +120,22 @@ ReturnValue Tile::isBlocking(int objectstate, bool ignoreCreature /*= false*/, b
 
 	return RET_NOERROR;
 }
+*/
 
-
-bool Tile::isBlockingProjectile() const
+bool Tile::hasProperty(enum ITEMPROPERTY prop) const
 {
-	if(ground){
-		const ItemType& groundType = Item::items[ground->getID()];
-
-		if(groundType.blockProjectile)
-			return true;
+	if(ground && ground->hasProperty(prop)){
+		return true;
 	}
 
 	ItemVector::const_iterator iit;
 	for(iit = topItems.begin(); iit != topItems.end(); ++iit){
-		const ItemType& iiType = Item::items[(*iit)->getID()];
-
-		if(iiType.blockProjectile)
+		if((*iit)->hasProperty(prop))
 			return true;
 	}
 	
 	for(iit = downItems.begin(); iit != downItems.end(); ++iit){
-		const ItemType& iiType = Item::items[(*iit)->getID()];
-
-		if(iiType.blockProjectile)
+		if((*iit)->hasProperty(prop))
 			return true;
 	}
 
@@ -366,11 +360,6 @@ ReturnValue Tile::__queryMaxCount(int32_t index, const Thing* thing, uint32_t co
 
 ReturnValue Tile::__queryAdd(uint32_t index, const Thing* thing, uint32_t count) const
 {
-	//If its a new (summoned item) always accept it
-	if(thing->getParent() == NULL){
-		return RET_NOERROR;
-	}
-
 	Thing* iithing = NULL;
 
 	if(dynamic_cast<const Creature*>(thing)){
@@ -389,6 +378,11 @@ ReturnValue Tile::__queryAdd(uint32_t index, const Thing* thing, uint32_t count)
 		}
 	}
 	else if(const Item* item = dynamic_cast<const Item*>(thing)){
+		//If its a new (summoned item) always accept it
+		if(thing->getParent() == NULL){
+			return RET_NOERROR;
+		}
+
 		if(!creatures.empty() && item->isBlocking())
 			return RET_NOTENOUGHROOM;
 

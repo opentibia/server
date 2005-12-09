@@ -48,7 +48,6 @@ Item* Item::CreateItem(const unsigned short _type, unsigned short _count /*= 0*/
 		newItem =  new Item(_type, _count);
 	}
 	
-	//newItem->isRemoved = false;
 	newItem->useThing2();
 	return newItem;
 }
@@ -270,28 +269,8 @@ Item::~Item()
 		delete text;
 }
 
-/*
-bool Item::canMovedTo(const Tile *tile) const
+int Item::unserialize(xmlNodePtr p)
 {
-	if(tile) {
-		int objectstate = 0;
-
-		if(isPickupable() || !isNotMoveable()) {
-			objectstate |= BLOCK_PICKUPABLE;
-		}
-
-		if(isBlocking()) {
-			objectstate |= BLOCK_SOLID;
-		}
-
-		return (tile->isBlocking(objectstate) == RET_NOERROR);
-	}
-
-	return false;
-}
-*/
-
-int Item::unserialize(xmlNodePtr p){
 	char *tmp;
 	tmp = (char*)xmlGetProp(p, (const xmlChar *) "id");
 	if(tmp){
@@ -332,7 +311,8 @@ int Item::unserialize(xmlNodePtr p){
 	return 0;
 }
 
-xmlNodePtr Item::serialize(){
+xmlNodePtr Item::serialize()
+{
 	std::stringstream s;
 	xmlNodePtr ret;
 	ret = xmlNewNode(NULL,(const xmlChar*)"item");
@@ -372,6 +352,30 @@ xmlNodePtr Item::serialize(){
 	return ret;
 }
 
+bool Item::hasProperty(enum ITEMPROPERTY prop) const
+{
+	const ItemType& it = items[id];
+
+	switch(prop){
+		case BLOCKSOLID:
+			if(it.blockSolid)
+				return true;
+		break;
+
+		case BLOCKPROJECTILE:
+			if(it.blockProjectile)
+				return true;
+		break;
+
+		case BLOCKPATHFIND:
+			if(it.blockPathFind)
+				return true;
+		break;
+	}
+
+	return false;
+}
+
 bool Item::isBlocking() const {
 	const ItemType& it = items[id];
 	return it.blockSolid;
@@ -380,13 +384,6 @@ bool Item::isBlocking() const {
 bool Item::isStackable() const {
 	return items[id].stackable;
 }
-
-/*
-bool Item::isMultiType() const {
-	//return items[id].multitype;
-	return (items[id].group == ITEM_GROUP_SPLASH);
-}
-*/
 
 bool Item::isFluidContainer() const {
 	return (items[id].isFluidContainer());

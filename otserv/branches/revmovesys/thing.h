@@ -24,6 +24,7 @@
 #include "definitions.h"
 #include "position.h"
 
+/*
 enum BlockState {
  BLOCK_SOLID = 1,
  BLOCK_PROJECTILE = 2, 
@@ -31,6 +32,7 @@ enum BlockState {
  BLOCK_PICKUPABLE = 8,
  BLOCK_PZ = 16
 };
+*/
 
 enum ReturnValue {
 	RET_NOERROR,

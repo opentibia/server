@@ -1459,7 +1459,7 @@ bool Player::NeedUpdateStats()
 	}
 }
 
-void Player::onCreatureTurn(const Creature *creature, unsigned char stackPos)
+void Player::onCreatureTurn(const Creature *creature, uint32_t stackPos)
 {
   client->sendCreatureTurn(creature, stackPos);
 }

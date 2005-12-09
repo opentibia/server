@@ -49,7 +49,7 @@ class Action;
 enum tCanUseRet{
 	CAN_USE,
 	TOO_FAR,
-	CAN_NOT_THTOW,
+	CAN_NOT_THROW,
 };
 
 class Actions

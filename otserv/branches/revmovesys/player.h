@@ -258,7 +258,7 @@ public:
 	virtual void onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos);
 	virtual void onTeleport(const Creature* creature, const Position& oldPos, uint32_t oldStackPos);
 
-	virtual void onCreatureTurn(const Creature *creature, unsigned char stackpos);
+	virtual void onCreatureTurn(const Creature *creature, uint32_t stackpos);
 	virtual void onCreatureSay(const Creature *creature, SpeakClasses type, const std::string &text);
 	virtual void onCreatureChangeOutfit(const Creature* creature);
 

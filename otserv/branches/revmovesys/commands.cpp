@@ -197,15 +197,15 @@ bool Commands::exeCommand(Creature *creature, const std::string &cmd){
 }
 	
 
-bool Commands::placeNpc(Creature* c, const std::string &cmd, const std::string &param)
+bool Commands::placeNpc(Creature* creature, const std::string &cmd, const std::string &param)
 {
-	/*
-	Npc *npc = new Npc(param, game);
+	Npc* npc = new Npc(param, game);
 	if(!npc->isLoaded()){
 		delete npc;
 		return true;
 	}
-	Position pos;
+
+	/*Position pos;
 	// Set the NPC pos
 	if(c->direction == NORTH) {
 		pos.x = c->getPosition().x;
@@ -229,35 +229,84 @@ bool Commands::placeNpc(Creature* c, const std::string &cmd, const std::string &
 		pos.x = c->getPosition().x - 1;
 		pos.y = c->getPosition().y;
 		pos.z = c->getPosition().z;
-	}
+	}*/
 
 	// Place the npc
-	if(!game->placeCreature(pos, npc))
-	{
+	if(game->placeCreature(creature->getPosition(), npc)){
+		return true;
+	}
+	else{
 		delete npc;
-		Player *player = dynamic_cast<Player*>(c);
+		Player* player = dynamic_cast<Player*>(creature);
 		if(player) {
 			player->sendMagicEffect(player->getPosition(), NM_ME_PUFF);
 			player->sendCancel("Sorry not enough room.");
 		}
 		return true;
 	}
-	return true;
-	*/
 
 	return false;
 }
 
-bool Commands::placeMonster(Creature* c, const std::string &cmd, const std::string &param)
+bool Commands::placeMonster(Creature* creature, const std::string &cmd, const std::string &param)
 {
-	/*
-	//Monster* monster = new Monster(param, game);
 	Monster* monster = Monster::createMonster(param, game);
-	//if(!monster->isLoaded()){
 	if(!monster){
-		//delete monster;
+		return false;
+	}
+
+	/*
+	Position pos;
+	// Set the Monster pos
+	if(c->direction == NORTH) {
+		pos.x = c->getPosition().x;
+		pos.y = c->getPosition().y - 1;
+		pos.z = c->getPosition().z;
+	}
+	// South
+	if(c->direction == SOUTH) {
+		pos.x = c->getPosition().x;
+		pos.y = c->getPosition().y + 1;
+		pos.z = c->getPosition().z;
+	}
+	// East
+	if(c->direction == EAST) {
+		pos.x = c->getPosition().x + 1;
+		pos.y = c->getPosition().y;
+		pos.z = c->getPosition().z;
+	}
+	// West
+	if(c->direction == WEST) {
+		pos.x = c->getPosition().x - 1;
+		pos.y = c->getPosition().y;
+		pos.z = c->getPosition().z;
+	}
+	*/
+
+	// Place the monster
+	if(game->placeCreature(creature->getPosition(), monster)){
 		return true;
 	}
+	else{
+		delete monster;
+		Player* player = dynamic_cast<Player*>(creature);
+		if(player) {
+			player->sendMagicEffect(player->getPosition(), NM_ME_PUFF);
+			player->sendCancel("Sorry not enough room.");
+		}
+	}
+
+	return false;
+}
+
+bool Commands::placeSummon(Creature* creature, const std::string &cmd, const std::string &param)
+{
+	Monster* monster = Monster::createMonster(param, game);
+	if(!monster){
+		return false;
+	}
+
+	/*
 	Position pos;
 
 	// Set the Monster pos
@@ -284,78 +333,22 @@ bool Commands::placeMonster(Creature* c, const std::string &cmd, const std::stri
 		pos.y = c->getPosition().y;
 		pos.z = c->getPosition().z;
 	}
+	*/
 
 	// Place the monster
-	if(!game->placeCreature(pos, monster)) {
+	if(game->placeCreature(creature->getPosition(), monster)){
+		creature->addSummon(monster);
+		return true;
+	}
+	else{
 		delete monster;
-		Player *player = dynamic_cast<Player*>(c);
+
+		Player* player = dynamic_cast<Player*>(creature);
 		if(player) {
 			player->sendMagicEffect(player->getPosition(), NM_ME_PUFF);
 			player->sendCancel("Sorry not enough room.");
 		}
-		return true;
 	}
-	else{
-		//c->addSummon(monster);
-		return true;
-	}
-	*/
-
-	return false;
-}
-
-bool Commands::placeSummon(Creature* c, const std::string &cmd, const std::string &param)
-{
-	/*
-	//Monster* monster = new Monster(param, game);
-	Monster* monster = Monster::createMonster(param, game);
-	//if(!monster->isLoaded()){
-	if(!monster){
-		//delete monster;
-		return true;
-	}
-	Position pos;
-
-	// Set the Monster pos
-	if(c->direction == NORTH) {
-		pos.x = c->getPosition().x;
-		pos.y = c->getPosition().y - 1;
-		pos.z = c->getPosition().z;
-	}
-	// South
-	if(c->direction == SOUTH) {
-		pos.x = c->getPosition().x;
-		pos.y = c->getPosition().y + 1;
-		pos.z = c->getPosition().z;
-	}
-	// East
-	if(c->direction == EAST) {
-		pos.x = c->getPosition().x + 1;
-		pos.y = c->getPosition().y;
-		pos.z = c->getPosition().z;
-	}
-	// West
-	if(c->direction == WEST) {
-		pos.x = c->getPosition().x - 1;
-		pos.y = c->getPosition().y;
-		pos.z = c->getPosition().z;
-	}
-
-	// Place the monster
-	if(!game->placeCreature(pos, monster)) {
-		delete monster;
-		Player *player = dynamic_cast<Player*>(c);
-		if(player) {
-			player->sendMagicEffect(player->getPosition(), NM_ME_PUFF);
-			player->sendCancel("Sorry not enough room.");
-		}
-		return true;
-	}
-	else{
-		c->addSummon(monster);
-		return true;
-	}
-	*/
 
 	return false;
 }

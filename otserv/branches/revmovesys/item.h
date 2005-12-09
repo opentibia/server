@@ -35,6 +35,13 @@
 class Creature;
 class Player;
 
+enum ITEMPROPERTY{
+ BLOCKSOLID,
+ BLOCKPROJECTILE,
+ BLOCKPATHFIND,
+ BLOCKPZ
+};
+
 class Item : virtual public Thing
 {
 protected:
@@ -70,6 +77,7 @@ public:
 	int getRWInfo() const;
 	int getWorth() const;
 		
+	bool hasProperty(enum ITEMPROPERTY prop) const;
 	bool isBlocking() const;
 	bool isStackable() const;
 	bool isFluidContainer() const;
