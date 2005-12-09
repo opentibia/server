@@ -1096,7 +1096,7 @@ void Game::moveItem(Player* player, Cylinder* fromCylinder, Cylinder* toCylinder
 	const Position& toPos = toCylinder->getPosition();
 
 	ReturnValue ret = RET_NOERROR;
-	if(!item->isNotMoveable()){
+	if(!item->isPushable()){
 		ret = RET_NOTMOVEABLE;
 	}
 	else if(player->getPosition().z > fromPos.z){
