@@ -1625,6 +1625,12 @@ void Protocol75::sendThingMove(const Creature *creature, const Container *fromCo
 		}
 		//
 	}
+	else{
+		const Container* moveContainer = dynamic_cast<const Container*>(fromItem);
+		if(moveContainer){
+			autoCloseContainers(moveContainer, msg);
+		}
+	}
 		
 	WriteBuffer(msg);
 }
