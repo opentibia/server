@@ -25,16 +25,18 @@
 #include "position.h"
 
 /*
-enum BlockState {
- BLOCK_SOLID = 1,
- BLOCK_PROJECTILE = 2, 
- BLOCK_PATHFIND =  4, 
- BLOCK_PICKUPABLE = 8,
- BLOCK_PZ = 16
-};
+enum ITEMTYPE{
+	TYPE_ITEM,
+	TYPE_CONTAINER,
+	TYPE_CREATURE,
+	TYPE_PLAYER,
+	TYPE_MONSTER,
+	TYPE_NPC,
+	TYPE_TILE
+}
 */
 
-enum ReturnValue {
+enum ReturnValue{
 	RET_NOERROR,
 	RET_NOTPOSSIBLE,
 	RET_NOTENOUGHROOM,
@@ -51,13 +53,16 @@ enum ReturnValue {
 	RET_TOFARAWAY,
 	RET_FIRSTGODOWNSTAIRS,
 	RET_FIRSTGOUPSTAIRS,
+	RET_CONTAINERNOTENOUGHROOM,
 	RET_NOTENOUGHCAPACITY,
 	RET_CANNOTPICKUP,
-	RET_THISISIMPOSSIBLE,
+	RET_THISISIMPOSSIBLE
 };
 
 class Tile;
 class Cylinder;
+class Item;
+class Creature;
 
 class Thing {
 public:
@@ -83,6 +88,11 @@ public:
 	const Position& getPosition() const;
 	virtual int getThrowRange() const = 0;
 	virtual bool isPushable() const = 0;
+
+	virtual Item* getItem() {return NULL;};
+	virtual const Item* getItem() const {return NULL;};
+	virtual Creature* getCreature() {return NULL;};
+	virtual const Creature* getCreature() const {return NULL;};
 
 	bool isRemoved() const {return parent == NULL;};
 

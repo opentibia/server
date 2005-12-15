@@ -49,7 +49,8 @@ public:
 	virtual void flushOutputBuffer() = 0;
 	virtual void logout() = 0;
 	virtual void reinitializeProtocol() = 0;
-
+	
+	//tile
 	virtual void sendAddTileItem(const Position& pos, const Item* item) = 0;
 	virtual void sendUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* item) = 0;
 	virtual void sendRemoveTileItem(const Position& pos, uint32_t stackpos) = 0;
@@ -59,7 +60,7 @@ public:
 	virtual void sendRemoveCreature(const Creature* creature, const Position& pos, uint32_t stackpos, bool isLogout) = 0;
 	virtual void sendMoveCreature(const Creature* creature, const Position& oldPos, uint32_t oldStackPos) = 0;
 
-	//containers
+	//container
 	virtual void sendAddContainerItem(uint8_t cid, const Item* item) = 0;
 	virtual void sendUpdateContainerItem(uint8_t cid, uint8_t slot, const Item* item) = 0;
 	virtual void sendRemoveContainerItem(uint8_t cid, uint8_t slot) = 0;

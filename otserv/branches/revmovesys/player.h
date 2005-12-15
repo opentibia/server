@@ -106,6 +106,9 @@ public:
 	Player(const std::string& name, Protocol* p);
 	virtual ~Player();
 	
+	virtual Player* getPlayer() {return this;};
+	virtual const Player* getPlayer() const {return this;};
+
 	const std::string& getName() const {return name;};
 	virtual bool isPushable() const;
 	virtual int getThrowRange() const {return 1;};
@@ -185,8 +188,8 @@ public:
 	virtual int getDefense() const;
 	unsigned long getMoney();
 
-	//bool substractMoney(unsigned long money);
-	//bool substractMoneyItem(Item *item, unsigned long money);
+	bool substractMoney(uint32_t money);
+	bool substractMoneyItem(Item* item, uint32_t money);
 	bool removeItemTypeCount(uint16_t itemId, uint32_t count);
 	uint32_t getItemTypeCount(uint16_t itemId);
 		
@@ -290,20 +293,23 @@ protected:
 
 	virtual int onThink(int& newThinkTicks);
 
+	bool hasCapacity(const Item* item, uint32_t count) const;
+
 	//
+	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,
+		bool childIsOwner = false) const;
 	virtual ReturnValue __queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
 		uint32_t& maxQueryCount) const;
-	virtual ReturnValue __queryAdd(uint32_t index, const Thing* thing, uint32_t count) const;
 	virtual ReturnValue __queryRemove(const Thing* thing, uint32_t count) const;
-	virtual Cylinder* __queryDestination(int32_t& index, const Thing* thing, Thing** destThing);
+	virtual Cylinder* __queryDestination(int32_t& index, const Thing* thing, Item** destItem);
 
-	virtual ReturnValue __addThing(Thing* thing);
-	virtual ReturnValue __addThing(uint32_t index, Thing* thing);
+	virtual void __addThing(Thing* thing);
+	virtual void __addThing(int32_t index, Thing* thing);
 
-	virtual ReturnValue __updateThing(Thing* thing, uint32_t count);
-	virtual ReturnValue __updateThing(uint32_t index, Thing* thing);
+	virtual void __updateThing(Thing* thing, uint32_t count);
+	virtual void __updateThing(uint32_t index, Thing* thing);
 
-	virtual ReturnValue __removeThing(Thing* thing, uint32_t count);
+	virtual void __removeThing(Thing* thing, uint32_t count);
 
 	virtual int32_t __getIndexOfThing(const Thing* thing) const;
 	virtual Thing* __getThing(uint32_t index);
@@ -314,7 +320,6 @@ protected:
 
 protected:
 	Protocol* client;
-	int useCount;
 	unsigned long experience;
 	
 	playervoc_t vocation;

@@ -113,8 +113,6 @@ Creature()
 	for(int i = 0; i < 11; i++)
 		items[i] = NULL;
 
- 	useCount = 0;
-  
 	/*
  	CapGain[0]  = 10;     //for level advances
  	CapGain[1]  = 10;     //e.g. Sorcerers will get 10 Cap with each level up
@@ -368,6 +366,141 @@ unsigned long Player::getMoney()
 		}
 	}
 	return money;
+}
+
+bool Player::substractMoney(uint32_t money)
+{
+	if(getMoney() < money)
+		return false;
+	
+	std::list<Container*> stack;
+	MoneyMap moneyMap;
+	MoneyItem* tmp;
+	
+	ItemList::iterator it;
+	for(int i = SLOT_FIRST; i < SLOT_LAST && money > 0 ;++i){	
+		if(items[i]){
+			if(Container* tmpcontainer = items[i]->getContainer()){
+				stack.push_back(tmpcontainer);
+			}
+			else{
+				if(items[i]->getWorth() != 0){
+					tmp = new MoneyItem;
+					tmp->item = items[i];
+					tmp->slot = i;
+					tmp->location = SLOT_TYPE_INVENTORY;
+					tmp->parent = NULL;
+					moneyMap.insert(moneymap_pair(items[i]->getWorth(),tmp));
+				}
+			}
+		}
+	}
+	
+	while(stack.size() > 0 && money > 0){
+		Container *container = stack.front();
+		stack.pop_front();
+		for(int i = 0; i < container->size() && money > 0; i++){	
+			Item *item = container->getItem(i);
+			if(item && item->getWorth() != 0){
+				tmp = new MoneyItem;
+				tmp->item = item;
+				tmp->slot = 0;
+				tmp->location = SLOT_TYPE_CONTAINER;
+				tmp->parent = container;
+				moneyMap.insert(moneymap_pair(item->getWorth(), tmp));
+			}
+
+			Container* containerItem = item->getContainer();
+			if(containerItem){
+				stack.push_back(containerItem);
+			}
+		}
+	}
+	
+	MoneyMap::iterator it2;
+	for(it2 = moneyMap.begin(); it2 != moneyMap.end() && money > 0; it2++){
+		Item *item = it2->second->item;
+		g_game.internalRemoveItem(item);
+
+		/*
+		if(it2->second->location == SLOT_TYPE_INVENTORY){
+			removeItemInventory(it2->second->slot);
+		}
+		else if(it2->second->location == SLOT_TYPE_CONTAINER){
+			Container *container = it2->second->parent;
+			unsigned char slot = container->getIndexOfThing(item);
+			onItemRemoveContainer(container,slot);
+			container->removeItem(item);
+		}
+		*/
+
+		if(it2->first <= money){
+			money = money - it2->first;
+		}
+		else{
+			substractMoneyItem(item, money);
+			money = 0;
+		}
+
+		//g_game.FreeThing(item);
+		//item = NULL;
+		delete it2->second;
+		it2->second = NULL;
+	}
+
+	for(; it2 != moneyMap.end(); it2++){
+		delete it2->second;
+		it2->second = NULL;
+	}
+	
+	moneyMap.clear();
+	
+	if(money != 0)
+		return false;
+	
+	return true;
+}
+
+bool Player::substractMoneyItem(Item *item, uint32_t money)
+{
+	if(money >= item->getWorth())
+		return false;
+	
+	int remaind = item->getWorth() - money;
+	int crys = remaind / 10000;
+	remaind = remaind - crys * 10000;
+	int plat = remaind / 100;
+	remaind = remaind - plat * 100;
+	int gold = remaind;
+
+	if(crys != 0){
+		Item* remaindItem = Item::CreateItem(ITEM_COINS_CRYSTAL, crys);
+
+		ReturnValue ret = g_game.internalAddItem(this, remaindItem);
+		if(ret != RET_NOERROR){
+			g_game.internalAddItem(getTile(), remaindItem);
+		}
+	}
+	
+	if(plat != 0){
+		Item* remaindItem = Item::CreateItem(ITEM_COINS_PLATINUM, plat);
+
+		ReturnValue ret = g_game.internalAddItem(this, remaindItem);
+		if(ret != RET_NOERROR){
+			g_game.internalAddItem(getTile(), remaindItem);
+		}
+	}
+	
+	if(gold != 0){
+		Item* remaindItem = Item::CreateItem(ITEM_COINS_GOLD, gold);
+
+		ReturnValue ret = g_game.internalAddItem(this, remaindItem);
+		if(ret != RET_NOERROR){
+			g_game.internalAddItem(getTile(), remaindItem);
+		}
+	}
+	
+	return true;
 }
 
 /*
@@ -1138,7 +1271,8 @@ void Player::sendToChannel(Creature *creature, SpeakClasses type,
 
 void Player::sendCancelAttacking()
 {
-  attackedCreature = 0;
+  //attackedCreature = 0;
+  attackedCreature2 = NULL;
   client->sendCancelAttacking();
 }
 
@@ -1289,10 +1423,12 @@ void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bo
 {
 	client->sendRemoveCreature(creature, creature->getPosition(), stackpos, isLogout);
 
-	if(attackedCreature == creature->getID()){
+	//if(attackedCreature == creature->getID()){
+	if(attackedCreature2 == creature){
 		sendTextMessage(MSG_SMALLINFO, "Target lost.");
 		sendCancelAttacking();
-		attackedCreature = NULL;
+		//attackedCreature = 0;
+		attackedCreature2 = NULL;
 	}
 
 	if(creature == this){
@@ -1317,16 +1453,14 @@ void Player::onCreatureMove(const Creature* creature, const Position& oldPos, ui
 {
 	client->sendMoveCreature(creature, oldPos, oldStackPos);
 
-	/*
-	if((creature == this && attackedCreature != NULL) || attackedCreature == creature->getID()){
-		if((std::abs(getPosition().x - attackedCreature->getPosition().x) > 7) ||
-		(std::abs(getPosition().y - attackedCreature->getPosition().y) > 5) || (getPosition().z != attackedCreature->getPosition().z)){
+	if((creature == this && attackedCreature2) || attackedCreature2 == creature){
+		if((std::abs(getPosition().x - attackedCreature2->getPosition().x) > 7) ||
+		(std::abs(getPosition().y - attackedCreature2->getPosition().y) > 5) || (getPosition().z != attackedCreature2->getPosition().z)){
 			sendTextMessage(MSG_SMALLINFO, "Target lost.");
 			sendCancelAttacking();
-			attackedCreature = 0;
+			attackedCreature2 = NULL;
 		} 
 	}
-	*/
 
 	if(creature == this && tradeItem){
 		if((std::abs(getPosition().x - tradeItem->getPosition().x) > 1) ||
@@ -1340,9 +1474,10 @@ void Player::onCreatureMove(const Creature* creature, const Position& oldPos, ui
 //container
 void Player::onAddContainerItem(const Container* container, const Item* item)
 {
-	uint32_t cid = getContainerID(container);
-	if(cid != -1){
-		client->sendAddContainerItem(cid, item);
+  for(ContainerVector::const_iterator cl = containerVec.begin(); cl != containerVec.end(); ++cl){
+		if(cl->second == container){
+			client->sendAddContainerItem(cl->first, item);
+		}
 	}
 
 	checkTradeState(item);
@@ -1350,9 +1485,10 @@ void Player::onAddContainerItem(const Container* container, const Item* item)
 
 void Player::onUpdateContainerItem(const Container* container, uint8_t slot, const Item* oldItem, const Item* newItem)
 {
-	uint32_t cid = getContainerID(container);
-	if(cid != -1){
-		client->sendUpdateContainerItem(cid, slot, newItem);
+  for(ContainerVector::const_iterator cl = containerVec.begin(); cl != containerVec.end(); ++cl){
+		if(cl->second == container){
+			client->sendUpdateContainerItem(cl->first, slot, newItem);
+		}
 	}
 
 	checkTradeState(oldItem);
@@ -1360,9 +1496,10 @@ void Player::onUpdateContainerItem(const Container* container, uint8_t slot, con
 
 void Player::onRemoveContainerItem(const Container* container, uint8_t slot, const Item* item)
 {
-	uint32_t cid = getContainerID(container);
-	if(cid != -1){
-		client->sendRemoveContainerItem(cid, slot);
+  for(ContainerVector::const_iterator cl = containerVec.begin(); cl != containerVec.end(); ++cl){
+		if(cl->second == container){
+			client->sendRemoveContainerItem(cl->first, slot);
+		}
 	}
 
 	checkTradeState(item);
@@ -1376,18 +1513,21 @@ void Player::onRemoveContainerItem(const Container* container, uint8_t slot, con
 
 void Player::onCloseContainer(const Container* container)
 {
-	uint32_t cid = getContainerID(container);
-	if(cid != -1){
-		client->sendCloseContainer(cid);
+  for(ContainerVector::const_iterator cl = containerVec.begin(); cl != containerVec.end(); ++cl){
+		if(cl->second == container){
+			client->sendCloseContainer(cl->first);
+		}
 	}
 }
 
 void Player::onSendContainer(const Container* container)
 {
-	uint32_t cid = getContainerID(container);
-	if(cid != -1){
-		bool hasParent = (dynamic_cast<const Container*>(container->getParent()) != NULL);
-		client->sendContainer(cid, container, hasParent);
+	bool hasParent = (dynamic_cast<const Container*>(container->getParent()) != NULL);
+
+	for(ContainerVector::const_iterator cl = containerVec.begin(); cl != containerVec.end(); ++cl){
+		if(cl->second == container){
+			client->sendContainer(cl->first, container, hasParent);
+		}
 	}
 }
 
@@ -1782,17 +1922,172 @@ void Player::autoCloseContainers(const Container* container)
 	}						
 }
 
+bool Player::hasCapacity(const Item* item, uint32_t count) const
+{
+	if(access == 0 && item->getTopParent() != this){
+		double itemWeight = 0;
+
+		if(item->isStackable()){
+			itemWeight = Item::items[item->getID()].weight * count;
+		}
+		else
+			itemWeight = item->getWeight();
+
+		return (itemWeight < getFreeCapacity());
+	}
+
+	return true;
+}
+
+ReturnValue Player::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
+	bool childIsOwner /*= false*/) const
+{
+	const Item* item = thing->getItem();
+	if(item == NULL){
+		return RET_NOTPOSSIBLE;
+	}
+
+	if(childIsOwner){
+		if(hasCapacity(item, count))
+			return RET_NOERROR;
+		else
+			return RET_NOTENOUGHCAPACITY;
+	}
+	else{
+		if(!item->isPickupable()){
+			return RET_CANNOTPICKUP;
+		}
+		
+		ReturnValue ret = RET_CANNOTBEDRESSED;
+
+		//check if we can dress this object
+		switch(index){
+			case SLOT_HEAD:
+				if(item->getSlotPosition() & SLOTP_HEAD)
+					ret = RET_NOERROR;
+				break;
+			case SLOT_NECKLACE:
+				if(item->getSlotPosition() & SLOTP_NECKLACE)
+					ret = RET_NOERROR;
+				break;
+			case SLOT_BACKPACK:
+				if(item->getSlotPosition() & SLOTP_BACKPACK)
+					ret = RET_NOERROR;
+				break;
+			case SLOT_ARMOR:
+				if(item->getSlotPosition() & SLOTP_ARMOR)
+					ret = RET_NOERROR;
+				break;
+			case SLOT_RIGHT:
+				if(item->getSlotPosition() & SLOTP_RIGHT){
+					if(item->getSlotPosition() & SLOTP_TWO_HAND){
+						if(items[SLOT_LEFT] != item){
+							ret = RET_DROPTWOHANDEDITEM;
+						}
+						else
+						ret = RET_NOERROR;
+					}
+					else{
+						if(items[SLOT_LEFT]){
+							if(items[SLOT_LEFT]->getSlotPosition() & SLOTP_TWO_HAND){
+								ret = RET_DROPTWOHANDEDITEM;
+							}
+							else
+								ret = RET_NOERROR;
+						}
+						else
+							ret = RET_NOERROR;
+					}
+				}
+				break;
+			case SLOT_LEFT:
+				if(item->getSlotPosition() & SLOTP_LEFT){
+					if(item->getSlotPosition() & SLOTP_TWO_HAND){
+						if(items[SLOT_RIGHT] != item){
+							ret = RET_DROPTWOHANDEDITEM;
+						}
+						else
+							ret = RET_NOERROR;
+					}
+					else{
+						if(items[SLOT_RIGHT]){
+							if(items[SLOT_RIGHT]->getSlotPosition() & SLOTP_TWO_HAND){
+								ret = RET_DROPTWOHANDEDITEM;
+							}
+							else
+								ret = RET_NOERROR;
+						}
+						else
+							ret = RET_NOERROR;
+					}
+				}
+				break;
+			case SLOT_LEGS:
+				if(item->getSlotPosition() & SLOTP_LEGS)
+					ret = RET_NOERROR;
+				break;
+			case SLOT_FEET:
+				if(item->getSlotPosition() & SLOTP_FEET)
+					ret = RET_NOERROR;
+				break;
+			case SLOT_RING:
+				if(item->getSlotPosition() & SLOTP_RING)
+					ret = RET_NOERROR;
+				break;
+			case SLOT_AMMO:
+				if(item->getSlotPosition() & SLOTP_AMMO)
+					ret = RET_NOERROR;
+				break;
+			case SLOT_WHEREEVER:
+				ret = RET_NOTENOUGHROOM;
+				break;
+
+			default:
+				ret = RET_NOTPOSSIBLE;
+				break;
+		}
+
+		if(ret == RET_NOERROR){
+			//need an exchange with source?
+			if(items[index] != NULL){
+				if(!items[index]->isStackable() || items[index]->getID() != item->getID()){
+					ret = RET_NEEDEXCHANGE;
+				}
+			}
+
+			//check if enough capacity
+			if(hasCapacity(item, count))
+				return RET_NOERROR;
+			else
+				return RET_NOTENOUGHCAPACITY;
+		}
+
+		return ret;
+	}
+}
+
 ReturnValue Player::__queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
 	uint32_t& maxQueryCount) const
 {
-	const Item* item = dynamic_cast<const Item*>(thing);
+	const Item* item = thing->getItem();
 	if(item == NULL){
 		maxQueryCount = 0;
 		return RET_NOTPOSSIBLE;
 	}
 
-	const Item* toItem = dynamic_cast<const Item*>(__getThing(index));
-	if(!toItem){
+	const Thing* destThing = __getThing(index);
+	const Item* destItem = NULL;
+	if(destThing)
+		destItem = destThing->getItem();
+
+	if(destItem){
+		if(destItem->isStackable() && item->getID() == destItem->getID()){
+			maxQueryCount = 100 - destItem->getItemCountOrSubtype();
+		}
+		else
+			maxQueryCount = 0;
+	}
+	else{
 		if(item->isStackable())
 			maxQueryCount = 100;
 		else
@@ -1801,144 +2096,10 @@ ReturnValue Player::__queryMaxCount(int32_t index, const Thing* thing, uint32_t 
 		return RET_NOERROR;
 	}
 
-	if(toItem->isStackable() && item->getID() == toItem->getID()){
-		maxQueryCount = 100 - toItem->getItemCountOrSubtype();
-
-		if(maxQueryCount == 0)
-			return RET_NOTENOUGHROOM;
-		else 
-			return RET_NOERROR;
-	}
-
-	maxQueryCount = 0;
-	return RET_NOTENOUGHROOM;
-}
-
-ReturnValue Player::__queryAdd(uint32_t index, const Thing* thing, uint32_t count) const
-{
-	const Item* item = dynamic_cast<const Item*>(thing);
-	if(item == NULL){
-		return RET_NOTPOSSIBLE;
-	}
-
-	if(!item->isPickupable()){
-		return RET_CANNOTPICKUP;
-	}
-	
-	ReturnValue ret = RET_CANNOTBEDRESSED;
-
-	//check if we can dress this object
-	switch(index){
-		case SLOT_HEAD:
-			if(item->getSlotPosition() & SLOTP_HEAD)
-				ret = RET_NOERROR;
-			break;
-		case SLOT_NECKLACE:
-			if(item->getSlotPosition() & SLOTP_NECKLACE)
-				ret = RET_NOERROR;
-			break;
-		case SLOT_BACKPACK:
-			if(item->getSlotPosition() & SLOTP_BACKPACK)
-				ret = RET_NOERROR;
-			break;
-		case SLOT_ARMOR:
-			if(item->getSlotPosition() & SLOTP_ARMOR)
-				ret = RET_NOERROR;
-			break;
-		case SLOT_RIGHT:
-			if(item->getSlotPosition() & SLOTP_RIGHT){
-				if(item->getSlotPosition() & SLOTP_TWO_HAND){
-					if(items[SLOT_LEFT] != NULL){
-						ret = RET_DROPTWOHANDEDITEM;
-					}
-					else
-					ret = RET_NOERROR;
-				}
-				else{
-					if(items[SLOT_LEFT]){
-						if(items[SLOT_LEFT]->getSlotPosition() & SLOTP_TWO_HAND){
-							ret = RET_DROPTWOHANDEDITEM;
-						}
-						else
-							ret = RET_NOERROR;
-					}
-					else
-						ret = RET_NOERROR;
-				}
-			}
-			break;
-		case SLOT_LEFT:
-			if(item->getSlotPosition() & SLOTP_LEFT){
-				if(item->getSlotPosition() & SLOTP_TWO_HAND){
-					if(items[SLOT_RIGHT] != NULL){
-						ret = RET_DROPTWOHANDEDITEM;
-					}
-					else
-						ret = RET_NOERROR;
-				}
-				else{
-					if(items[SLOT_RIGHT]){
-						if(items[SLOT_RIGHT]->getSlotPosition() & SLOTP_TWO_HAND){
-							ret = RET_DROPTWOHANDEDITEM;
-						}
-						else
-							ret = RET_NOERROR;
-					}
-					else
-						ret = RET_NOERROR;
-				}
-			}
-			break;
-		case SLOT_LEGS:
-			if(item->getSlotPosition() & SLOTP_LEGS)
-				ret = RET_NOERROR;
-			break;
-		case SLOT_FEET:
-			if(item->getSlotPosition() & SLOTP_FEET)
-				ret = RET_NOERROR;
-			break;
-		case SLOT_RING:
-			if(item->getSlotPosition() & SLOTP_RING)
-				ret = RET_NOERROR;
-			break;
-		case SLOT_AMMO:
-			if(item->getSlotPosition() & SLOTP_AMMO)
-				ret = RET_NOERROR;
-			break;
-		case SLOT_WHEREEVER:
-			ret = RET_NOTENOUGHROOM;
-			break;
-
-		default:
-			ret = RET_NOTPOSSIBLE;
-			break;
-	}
-
-	if(ret == RET_NOERROR){
-		//need an exchange with source?
-		if(items[index] != NULL){
-			if(!items[index]->isStackable() || items[index]->getID() != item->getID()){
-				ret = RET_NEEDEXCHANGE;
-			}
-		}
-
-		//check if enough capacity
-		if(access == 0 && item->getTopParent() != this){
-			double itemWeight = 0;
-
-			if(item->isStackable()){
-				itemWeight = Item::items[item->getID()].weight * count;
-			}
-			else
-				itemWeight = item->getWeight();
-
-			if(getFreeCapacity() < itemWeight){
-				ret = RET_NOTENOUGHCAPACITY;
-			}
-		}
-	}
-
-	return ret;
+	if(maxQueryCount < count)
+		return RET_NOTENOUGHROOM;
+	else
+		return RET_NOERROR;
 }
 
 ReturnValue Player::__queryRemove(const Thing* thing, uint32_t count) const
@@ -1949,14 +2110,13 @@ ReturnValue Player::__queryRemove(const Thing* thing, uint32_t count) const
 		return RET_NOTPOSSIBLE;
 	}
 	
-	const Item* item = dynamic_cast<const Item*>(thing);
+	const Item* item = thing->getItem();
 	if(item == NULL){
 		return RET_NOTPOSSIBLE;
 	}
 
-	if(item->isStackable()){
-		if(count == 0 || count > item->getItemCountOrSubtype())
-			return RET_NOTPOSSIBLE;
+	if(count == 0 || (item->isStackable() && count > item->getItemCountOrSubtype())){
+		return RET_NOTPOSSIBLE;
 	}
 
 	if(item->isNotMoveable()){
@@ -1966,14 +2126,15 @@ ReturnValue Player::__queryRemove(const Thing* thing, uint32_t count) const
 	return RET_NOERROR;
 }
 
-Cylinder* Player::__queryDestination(int32_t& index, const Thing* thing, Thing** destThing)
+Cylinder* Player::__queryDestination(int32_t& index, const Thing* thing, Item** destItem)
 {
 	if(index == 0){
-		*destThing = NULL;
+		*destItem = NULL;
 
-		const Item* item = dynamic_cast<const Item*>(thing);
-		if(item == NULL)
+		const Item* item = thing->getItem();
+		if(item == NULL){
 			return this;
+		}
 
 		//find a appropiate slot
 		for(int i = SLOT_FIRST; i < SLOT_LAST; ++i){
@@ -1989,8 +2150,8 @@ Cylinder* Player::__queryDestination(int32_t& index, const Thing* thing, Thing**
 		for(int i = SLOT_FIRST; i < SLOT_LAST; ++i){
 			if(Container* subContainer = dynamic_cast<Container*>(items[i])){
 				if(subContainer != tradeItem && subContainer->__queryAdd(i, item, (item->isStackable() ? item->getItemCountOrSubtype() : 0)) == RET_NOERROR){
-					index = 0;
-					*destThing = NULL;
+					index = -1;
+					*destItem = NULL;
 					return subContainer;
 				}
 			}
@@ -1999,111 +2160,133 @@ Cylinder* Player::__queryDestination(int32_t& index, const Thing* thing, Thing**
 		return this;
 	}
 
-	*destThing = __getThing(index);
-	Cylinder* subCylinder = dynamic_cast<Cylinder*>(*destThing);
+	Thing* destThing = __getThing(index);
+
+	if(destThing)
+		*destItem = destThing->getItem();
+
+	Cylinder* subCylinder = dynamic_cast<Cylinder*>(destThing);
 
 	if(subCylinder){
-		index = 0;
-		*destThing = NULL;
+		index = -1;
+		*destItem = NULL;
 		return subCylinder;
 	}
 	else
 		return this;
 }
 
-ReturnValue Player::__addThing(Thing* thing)
+void Player::__addThing(Thing* thing)
 {
-	return __addThing(0, thing);
+	__addThing(0, thing);
 }
 
-ReturnValue Player::__addThing(uint32_t index, Thing* thing)
+void Player::__addThing(int32_t index, Thing* thing)
 {
-	if(index < 0 || index > 11)
-		return RET_NOTPOSSIBLE;
-
-	Item* item = dynamic_cast<Item*>(thing);
-	if(item == NULL)
-		return RET_NOTPOSSIBLE;
+	if(index < 0 || index > 11){
+#ifdef __DEBUG__
+		std::cout << "Failure: [Player::__addThing] index < 0 || index > 11" << std::endl;
+#endif
+		return /*RET_NOTPOSSIBLE*/;
+	}
 
 	if(index == 0){
-		return RET_NOTENOUGHROOM;
+#ifdef __DEBUG__
+		std::cout << "Failure: [Player::__addThing] index == 0" << std::endl;
+#endif
+		return /*RET_NOTENOUGHROOM*/;
 	}
+
+	Item* item = thing->getItem();
+	if(item == NULL)
+#ifdef __DEBUG__
+		std::cout << "Failure: [Player::__addThing] item == NULL" << std::endl;
+#endif
+		return /*RET_NOTPOSSIBLE*/;
 
 	item->setParent(this);
 	items[index] = item;
 
 	//send to client
 	onAddInventoryItem((slots_t)index, item);
-
-	return RET_NOERROR;
 }
 
-ReturnValue Player::__updateThing(Thing* thing, uint32_t count)
+void Player::__updateThing(Thing* thing, uint32_t count)
 {
 	int32_t index = __getIndexOfThing(thing);
-	if(index == -1)
-		return RET_NOTPOSSIBLE;
+	if(index == -1){
+#ifdef __DEBUG__
+		std::cout << "Failure: [Player::__updateThing] index == -1" << std::endl;
+#endif
+		return /*RET_NOTPOSSIBLE*/;
+	}
 
-	Item* item = dynamic_cast<Item*>(thing);
+	Item* item = thing->getItem();
 	if(item == NULL){
 #ifdef __DEBUG__
 		std::cout << "Failure: [Player::__updateThing] item == NULL" << std::endl;
 #endif
-		return RET_NOTPOSSIBLE;
+		return /*RET_NOTPOSSIBLE*/;
 	}
 
 	item->setItemCountOrSubtype(count);
 
 	onUpdateInventoryItem((slots_t)index, item, item);
-
-	return RET_NOERROR;
 }
 
-ReturnValue Player::__updateThing(uint32_t index, Thing* thing)
+void Player::__updateThing(uint32_t index, Thing* thing)
 {
-	if(index < 0 || index > 11)
-		return RET_NOTPOSSIBLE;
+	if(index < 0 || index > 11){
+#ifdef __DEBUG__
+		std::cout << "Failure: [Player::__updateThing] index < 0 || index > 11" << std::endl;
+#endif
+		return /*RET_NOTPOSSIBLE*/;
+	}
 	
 	Item* oldItem = items[index];
 	if(!oldItem){
-		return RET_NOTPOSSIBLE;
+#ifdef __DEBUG__
+		std::cout << "Failure: [Player::__updateThing] !oldItem" << std::endl;
+#endif
+		return /*RET_NOTPOSSIBLE*/;
 	}
 
-	Item* item = dynamic_cast<Item*>(thing);
+	Item* item = thing->getItem();
 	if(item == NULL){
 #ifdef __DEBUG__
 		std::cout << "Failure: [Player::__updateThing] item == NULL" << std::endl;
 #endif
-		return RET_NOTPOSSIBLE;
+		return /*RET_NOTPOSSIBLE*/;
 	}
-
 
 	//send to client
 	onUpdateInventoryItem((slots_t)index, oldItem, item);
 
 	item->setParent(this);
 	items[index] = item;
-
-	return RET_NOERROR;
 }
 
-ReturnValue Player::__removeThing(Thing* thing, uint32_t count)
+void Player::__removeThing(Thing* thing, uint32_t count)
 {
-	Item* item = dynamic_cast<Item*>(thing);
+	Item* item = thing->getItem();
 	if(item == NULL){
 #ifdef __DEBUG__
 		std::cout << "Failure: [Player::__removeThing] item == NULL" << std::endl;
 #endif
-		return RET_NOTPOSSIBLE;
+		return /*RET_NOTPOSSIBLE*/;
 	}
-	
-	int32_t index = __getIndexOfThing(thing);
-	if(index == -1)
-		return RET_NOTPOSSIBLE;
 
-	if(item->isStackable()) {
-		if(count == 0 || count > item->getItemCountOrSubtype())
-			return RET_NOTPOSSIBLE;
+	int32_t index = __getIndexOfThing(thing);
+	if(index == -1){
+#ifdef __DEBUG__
+		std::cout << "Failure: [Player::__removeThing] index == -1" << std::endl;
+#endif
+		return /*RET_NOTPOSSIBLE*/;
+	}
+
+	if(item->isStackable()){
+		//if(count == 0 || count > item->getItemCountOrSubtype())
+		//	return RET_NOTPOSSIBLE;
 
 		if(count == item->getItemCountOrSubtype()){
 			//send change to client
@@ -2111,14 +2294,12 @@ ReturnValue Player::__removeThing(Thing* thing, uint32_t count)
 
 			item->setParent(NULL);
 			items[index] = NULL;
-			return RET_NOERROR;
 		}
 		else{
 			item->setItemCountOrSubtype(item->getItemCountOrSubtype() - count);
 
 			//send change to client
 			onUpdateInventoryItem((slots_t)index, item, item);
-			return RET_NOERROR;
 		}
 	}
 	else{
@@ -2127,10 +2308,7 @@ ReturnValue Player::__removeThing(Thing* thing, uint32_t count)
 
 		item->setParent(NULL);
 		items[index] = NULL;
-		return RET_NOERROR;
 	}
-
-	return RET_NOTPOSSIBLE;
 }
 
 int32_t Player::__getIndexOfThing(const Thing* thing) const
@@ -2166,26 +2344,30 @@ void Player::postAddNotification(const Thing* thing, bool hasOwnership /*= true*
 		client->sendStats();
 	}
 
-	if(const Container* container = dynamic_cast<const Container*>(thing)){
-		onSendContainer(container);
-	}
-	else if(thing == this){
-		//check containers
-		std::vector<Container*> containers;
-		for(ContainerVector::iterator it = containerVec.begin(); it != containerVec.end(); ++it){
-			if((std::abs(it->second->getPosition().x - getPosition().x) > 1) ||
-				(std::abs(it->second->getPosition().y - getPosition().y) > 1) ||
-				(std::abs(it->second->getPosition().z != getPosition().z))){
-					containers.push_back(it->second);
-				}
+	if(const Item* item = thing->getItem()){
+		if(const Container* container = item->getContainer()){
+			onSendContainer(container);
 		}
+	}
+	else if(const Creature* creature = thing->getCreature()){
+		if(creature == this){
+			//check containers
+			std::vector<Container*> containers;
+			for(ContainerVector::iterator it = containerVec.begin(); it != containerVec.end(); ++it){
+				if((std::abs(it->second->getPosition().x - getPosition().x) > 1) ||
+					(std::abs(it->second->getPosition().y - getPosition().y) > 1) ||
+					(std::abs(it->second->getPosition().z != getPosition().z))){
+						containers.push_back(it->second);
+					}
+			}
 
-		for(std::vector<Container*>::const_iterator it = containers.begin(); it != containers.end(); ++it){
-			autoCloseContainers(*it);
+			for(std::vector<Container*>::const_iterator it = containers.begin(); it != containers.end(); ++it){
+				autoCloseContainers(*it);
+			}
 		}
-	}
-	else if(const Creature* creature = dynamic_cast<const Creature*>(thing)){
-		//check target lost
+		else{
+			//check target lost
+		}
 	}
 }
 
@@ -2196,30 +2378,17 @@ void Player::postRemoveNotification(const Thing* thing, bool hadOwnership /*= tr
 		client->sendStats();
 	}
 
-	if(const Container* container = dynamic_cast<const Container*>(thing)){
-		if(!container->isRemoved() &&
-			(container->getTopParent() == this || (dynamic_cast<const Container*>(container->getTopParent()))) &&
-			 (std::abs(container->getPosition().x - getPosition().x) <= 1) &&
-			 (std::abs(container->getPosition().y - getPosition().y) <= 1) &&
-			 (std::abs(container->getPosition().z == getPosition().z)))
-			onSendContainer(container);
-		else
-			autoCloseContainers(container);
-		
-		/*
-		//is now in hands of a unaccessable cylinder? (other player/depot/dustbin)
-		if(!(container->getTopParent() == this || container->getTopParent() == container->getTile())){
-			autoCloseContainers(container);
+	if(const Item* item = thing->getItem()){
+		if(const Container* container = item->getContainer()){
+			if(!container->isRemoved() &&
+				(container->getTopParent() == this || (dynamic_cast<const Container*>(container->getTopParent()))) &&
+				(std::abs(container->getPosition().x - getPosition().x) <= 1) &&
+				(std::abs(container->getPosition().y - getPosition().y) <= 1) &&
+				(std::abs(container->getPosition().z == getPosition().z)))
+				onSendContainer(container);
+			else
+				autoCloseContainers(container);
 		}
-		else if((std::abs(container->getPosition().x - getPosition().x) > 1) ||
-			 (std::abs(container->getPosition().y - getPosition().y) > 1) ||
-			 (std::abs(container->getPosition().z != getPosition().z))){
-			autoCloseContainers(container);
-		}
-		else if(getTopParent() != container->getTopParent()){
-			onSendContainer(container);
-		}
-		*/
 	}
 }
 
@@ -2234,7 +2403,7 @@ void Player::__internalAddThing(uint32_t index, Thing* thing)
 	std::cout << "[Player::__internalAddThing] index: " << index << std::endl;
 #endif
 
-	Item* item = dynamic_cast<Item*>(thing);
+	Item* item = thing->getItem();
 	if(item == NULL){
 #ifdef __DEBUG__
 		std::cout << "Failure: [Player::__internalAddThing] item == NULL" << std::endl;

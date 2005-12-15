@@ -873,13 +873,13 @@ void Protocol75::parseThrow(NetworkMessage& msg)
 	Position toPos = msg.GetPosition();
 	uint8_t count = msg.GetByte();
 
-	//*
+	/*
 	std::cout << "parseThrow: " << "from_x: " << (int)fromPos.x << ", from_y: " << (int)fromPos.y
 	<<  ", from_z: " << (int)fromPos.z << ", item: " << (int)itemId << ", fromStackpos: " 
 	<< (int)fromStackpos << " to_x: " << (int)toPos.x << ", to_y: " << (int)toPos.y
 	<<  ", to_z: " << (int)toPos.z  
 	<< ", count: " << (int)count << std::endl;
-	//*/
+	*/
 
 	if(toPos == fromPos)
 		return;

@@ -42,6 +42,7 @@ typedef unsigned short uint16_t;
 typedef unsigned char uint8_t;
 
 #pragma warning(disable:4786) // msvc too long debug names in stl
+#pragma warning(disable:4250) // 'class1' : inherits 'class2::member' via dominance
 
 #ifndef NOMINMAX
 #define NOMINMAX

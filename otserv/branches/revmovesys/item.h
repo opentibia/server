@@ -33,7 +33,7 @@
 #include "items.h"
 
 class Creature;
-class Player;
+class Container;
 
 enum ITEMPROPERTY{
  BLOCKSOLID,
@@ -44,24 +44,28 @@ enum ITEMPROPERTY{
 
 class Item : virtual public Thing
 {
-protected:
-	unsigned short id;  // the same id as in ItemType
-	unsigned char count; // number of stacked items
-	unsigned char chargecount; //number of charges on the item
-	unsigned char fluid;
-	unsigned short actionId;
-	unsigned short uniqueId;
-	std::string *specialDescription;
-	std::string *text;	//text written
-private:
-	int useCount;
-	
 public:
+  // Constructor for items
+	Item(const unsigned short _type);
+	Item(const unsigned short _type, unsigned short _count);
+	Item();
+	Item(const Item &i);
+
+	virtual ~Item();
+
+	virtual Item* getItem() {return this;};
+	virtual const Item* getItem()const {return this;};
+	virtual Container* getContainer() {return NULL;};
+	virtual const Container* getContainer() const {return NULL;};
+
 	//Factory member to create item of right type based on type
 	static Item* CreateItem(const unsigned short _type, unsigned short _count = 0);
 	static Items items;
 	
 	virtual bool isPushable() const {return !isNotMoveable();};
+	virtual int getThrowRange() const {return (isPickupable() ? 15 : 1);};
+
+	virtual std::string getDescription(uint32_t lookDistance) const;
 
 	unsigned short getID() const;    // ID as in ItemType
 	void setID(unsigned short newid);
@@ -80,6 +84,7 @@ public:
 	bool hasProperty(enum ITEMPROPERTY prop) const;
 	bool isBlocking() const;
 	bool isStackable() const;
+	bool isRune() const;
 	bool isFluidContainer() const;
 	bool isAlwaysOnTop() const;
 	bool isGroundTile() const;
@@ -94,9 +99,6 @@ public:
 	bool floorChangeSouth() const;
 	bool floorChangeEast() const;
 	bool floorChangeWest() const;
-
-	virtual std::string getDescription(uint32_t lookDistance) const;
-	virtual int getThrowRange() const {return (isPickupable() ? 15 : 1);};
 
 	std::string getName() const ;
 	void setSpecialDescription(std::string desc);
@@ -137,13 +139,15 @@ public:
 
 	bool rotate();
 
-  // Constructor for items
-	Item(const unsigned short _type);
-	Item(const unsigned short _type, unsigned short _count);
-	Item();
-	Item(const Item &i);
-
-	virtual ~Item();
+protected:
+	unsigned short id;  // the same id as in ItemType
+	unsigned char count; // number of stacked items
+	unsigned char chargecount; //number of charges on the item
+	unsigned char fluid;
+	unsigned short actionId;
+	unsigned short uniqueId;
+	std::string *specialDescription;
+	std::string *text;	//text written
 };
 
 class Teleport : public Item
@@ -154,8 +158,8 @@ public:
 	
 	void setDestPos(const Position &pos) {destPos = pos;};
 	const Position& getDestPos() const {return destPos;};
+
 private:
-	int useCount;
 	virtual int unserialize(xmlNodePtr p);
 	virtual xmlNodePtr serialize();
 	Position destPos;

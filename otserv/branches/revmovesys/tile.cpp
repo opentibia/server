@@ -261,14 +261,8 @@ void Tile::setPz()
 	pz = true;
 }
 
-ReturnValue Tile::__queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
-																	uint32_t& maxQueryCount) const
-{
-	maxQueryCount = std::max((uint32_t)1, count);
-	return RET_NOERROR;
-}
-
-ReturnValue Tile::__queryAdd(uint32_t index, const Thing* thing, uint32_t count) const
+ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
+	bool childIsOwner /*= false*/) const
 {
 	Thing* iithing = NULL;
 
@@ -287,7 +281,7 @@ ReturnValue Tile::__queryAdd(uint32_t index, const Thing* thing, uint32_t count)
 			}
 		}
 	}
-	else if(const Item* item = dynamic_cast<const Item*>(thing)){
+	else if(const Item* item = thing->getItem()){
 		//If its a new (summoned item) always accept it
 		if(thing->getParent() == NULL){
 			return RET_NOERROR;
@@ -316,6 +310,13 @@ ReturnValue Tile::__queryAdd(uint32_t index, const Thing* thing, uint32_t count)
 	return RET_NOERROR;
 }
 
+ReturnValue Tile::__queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
+	uint32_t& maxQueryCount) const
+{
+	maxQueryCount = std::max((uint32_t)1, count);
+	return RET_NOERROR;
+}
+
 ReturnValue Tile::__queryRemove(const Thing* thing, uint32_t count) const
 {
 	uint32_t index = __getIndexOfThing(thing);
@@ -324,12 +325,12 @@ ReturnValue Tile::__queryRemove(const Thing* thing, uint32_t count) const
 		return RET_NOTPOSSIBLE;
 	}
 
-	const Item* item = dynamic_cast<const Item*>(thing);
+	const Item* item = thing->getItem();
 	if(item == NULL){
 		return RET_NOTPOSSIBLE;
 	}
 
-	if(item->isStackable() && (count == 0 || count > item->getItemCountOrSubtype())){
+	if(count == 0 || (item->isStackable() && count > item->getItemCountOrSubtype())){
 		return RET_NOTPOSSIBLE;
 	}
 
@@ -340,12 +341,12 @@ ReturnValue Tile::__queryRemove(const Thing* thing, uint32_t count) const
 	return RET_NOERROR;
 }
 
-Cylinder* Tile::__queryDestination(int32_t& index, const Thing* thing, Thing** destThing)
+Cylinder* Tile::__queryDestination(int32_t& index, const Thing* thing, Item** destItem)
 {
 	Teleport* teleport = getTeleportItem();
 
 	Tile* destTile = this;
-	*destThing = NULL;
+	*destItem = NULL;
 
 	if(teleport){
 		destTile = g_game.getTile(teleport->getDestPos().x, teleport->getDestPos().y, teleport->getDestPos().z);
@@ -415,29 +416,34 @@ Cylinder* Tile::__queryDestination(int32_t& index, const Thing* thing, Thing** d
 		}
 	}
 
-	*destThing = destTile->getTopDownItem();
+	Thing* destThing = destTile->getTopDownItem();
+	if(destThing)
+		*destItem = destThing->getItem();
+
 	return destTile;
 }
 
-ReturnValue Tile::__addThing(Thing* thing)
+void Tile::__addThing(Thing* thing)
 {
-	return __addThing(0, thing);
+	__addThing(0, thing);
 }
 
-ReturnValue Tile::__addThing(uint32_t index, Thing* thing)
+void Tile::__addThing(int32_t index, Thing* thing)
 {
 	thing->setParent(this);
 
-	Creature* creature = dynamic_cast<Creature*>(thing);
+	Creature* creature = thing->getCreature();
 	if(creature){
 		creatures.insert(creatures.begin(), creature);
-		return RET_NOERROR;
 	}
 	else{
-		Item* item = dynamic_cast<Item*>(thing);
-
-		if(item == NULL)
-			return RET_NOTPOSSIBLE;
+		Item* item = thing->getItem();
+		if(item == NULL){
+#ifdef __DEBUG__
+			std::cout << "Failure: [Tile::__addThing] item == NULL" << std::endl;
+#endif
+			return /*RET_NOTPOSSIBLE*/;
+		}
 
 		const Position& cylinderMapPos = getPosition();
 
@@ -470,6 +476,8 @@ ReturnValue Tile::__addThing(uint32_t index, Thing* thing)
 				if((*iit)->isSplash()){
 					Item* oldSplash = *iit;
 					__removeThing(oldSplash, 0);
+
+					oldSplash->setParent(NULL);
 					g_game.FreeThing(oldSplash);
 					break;
 				}
@@ -499,7 +507,6 @@ ReturnValue Tile::__addThing(uint32_t index, Thing* thing)
 			ItemVector::iterator iit;
 			for(iit = topItems.begin(); iit != topItems.end(); ++iit){
 				if(Item::items[item->getID()].alwaysOnTopOrder <= Item::items[(*iit)->getID()].alwaysOnTopOrder){
-					//topItems.insert(ItemVector::iterator(iit.base()), item);
 					topItems.insert(iit, item);
 					isInserted = true;
 					break;
@@ -507,7 +514,6 @@ ReturnValue Tile::__addThing(uint32_t index, Thing* thing)
 			}
 
 			if(!isInserted){
-				//topItems.insert(topItems.begin(), item);
 				topItems.push_back(item);
 			}
 
@@ -523,27 +529,26 @@ ReturnValue Tile::__addThing(uint32_t index, Thing* thing)
 			for(it = list.begin(); it != list.end(); ++it) {
 				(*it)->onAddTileItem(cylinderMapPos, item);
 			}
-
-			return RET_NOERROR;
 		}
 	}
-
-	return RET_NOTPOSSIBLE;
 }
 
-ReturnValue Tile::__updateThing(Thing* thing, uint32_t count)
+void Tile::__updateThing(Thing* thing, uint32_t count)
 {
 	int32_t index = __getIndexOfThing(thing);
 	if(index == -1){
 #ifdef __DEBUG__
 		std::cout << "Failure: [Tile::__updateThing] index == -1" << std::endl;
 #endif
-		return RET_NOTPOSSIBLE;
+		return /*RET_NOTPOSSIBLE*/;
 	}
 
-	Item* item = dynamic_cast<Item*>(thing);
+	Item* item = thing->getItem();
 	if(item == NULL){
-		return RET_NOTPOSSIBLE;
+#ifdef __DEBUG__
+		std::cout << "Failure: [Tile::__updateThing] item == NULL" << std::endl;
+#endif
+		return /*RET_NOTPOSSIBLE*/;
 	}
 
 	item->setItemCountOrSubtype(count);
@@ -558,17 +563,18 @@ ReturnValue Tile::__updateThing(Thing* thing, uint32_t count)
 	for(it = list.begin(); it != list.end(); ++it) {
 		(*it)->onUpdateTileItem(cylinderMapPos, index, item, item);
 	}
-
-	return RET_NOERROR;
 }
 
-ReturnValue Tile::__updateThing(uint32_t index, Thing* thing)
+void Tile::__updateThing(uint32_t index, Thing* thing)
 {
 	int32_t pos = index;
 
-	Item* item = dynamic_cast<Item*>(thing);
+	Item* item = thing->getItem();
 	if(item == NULL){
-		return RET_NOTPOSSIBLE;
+#ifdef __DEBUG__
+		std::cout << "Failure: [Tile::__updateThing] item == NULL" << std::endl;
+#endif
+		return /*RET_NOTPOSSIBLE*/;
 	}
 
 	Item* oldItem = NULL;
@@ -593,7 +599,10 @@ ReturnValue Tile::__updateThing(uint32_t index, Thing* thing)
 	pos -= (uint32_t)topItems.size();
 
 	if(pos >= 0 && pos < creatures.size()){
-		return RET_NOTPOSSIBLE;
+#ifdef __DEBUG__
+		std::cout << "Failure: [Tile::__updateThing] Update object is a creature" << std::endl;
+#endif
+		return /*RET_NOTPOSSIBLE*/;
 	}
 
 	pos -= (uint32_t)creatures.size();
@@ -622,35 +631,44 @@ ReturnValue Tile::__updateThing(uint32_t index, Thing* thing)
 			(*it)->onUpdateTileItem(cylinderMapPos, index, oldItem, item);
 		}
 
-		return RET_NOERROR;
+		return /*RET_NOERROR*/;
 	}
 
-	return RET_NOTPOSSIBLE;
+#ifdef __DEBUG__
+	std::cout << "Failure: [Tile::__updateThing] Update object not found" << std::endl;
+#endif
 }
 
-ReturnValue Tile::__removeThing(Thing* thing, uint32_t count)
+void Tile::__removeThing(Thing* thing, uint32_t count)
 {
 	Creature* creature = dynamic_cast<Creature*>(thing);
 	if(creature){
-		CreatureVector::iterator it;
-		for(it = creatures.begin(); it != creatures.end(); ++it){
-			if(*it == thing){
-				creatures.erase(it);
-				return RET_NOERROR;
-			}
+		CreatureVector::iterator it = std::find(creatures.begin(), creatures.end(), thing);
+
+		if(it == creatures.end()){
+#ifdef __DEBUG__
+		std::cout << "Failure: [Tile::__removeThing] creature not found" << std::endl;
+#endif
+		return /*RET_NOTPOSSIBLE*/;
 		}
+
+		creatures.erase(it);
 	}
 	else{
-		Item *item = dynamic_cast<Item*>(thing);
-		if(item == NULL)
-			return RET_NOTPOSSIBLE;
+		Item* item = thing->getItem();
+		if(item == NULL){
+#ifdef __DEBUG__
+			std::cout << "Failure: [Tile::__removeThing] item == NULL" << std::endl;
+#endif
+			return /*RET_NOTPOSSIBLE*/;
+		}
 
 		uint32_t index = __getIndexOfThing(item);
 		if(index == -1){
 #ifdef __DEBUG__
 			std::cout << "Failure: [Tile::__removeThing] index == -1" << std::endl;
 #endif
-			return RET_NOTPOSSIBLE;
+			return /*RET_NOTPOSSIBLE*/;
 		}
 
 		const Position& cylinderMapPos = getPosition();
@@ -668,7 +686,7 @@ ReturnValue Tile::__removeThing(Thing* thing, uint32_t count)
 
 			ground->setParent(NULL);
 			ground = NULL;
-			return RET_NOERROR;
+			return /*RET_NOERROR*/;
 		}
 
 		ItemVector::iterator iit;
@@ -682,7 +700,7 @@ ReturnValue Tile::__removeThing(Thing* thing, uint32_t count)
 
 					(*iit)->setParent(NULL);
 					topItems.erase(iit);
-					return RET_NOERROR;
+					return /*RET_NOERROR*/;
 				}
 			}
 		}
@@ -707,12 +725,10 @@ ReturnValue Tile::__removeThing(Thing* thing, uint32_t count)
 						downItems.erase(iit);
 					}
 
-					return RET_NOERROR;
+					return /*RET_NOERROR*/;
 				}
 		}
 	}
-
-	return RET_NOTPOSSIBLE;
 }
 
 int32_t Tile::__getIndexOfThing(const Thing* thing) const

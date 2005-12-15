@@ -19,8 +19,8 @@
 //////////////////////////////////////////////////////////////////////
 
 
-#ifndef __monster_h_
-#define __monster_h_
+#ifndef __MONSTER_H__
+#define __MONSTER_H__
 
 #include "creature.h"
 #include "game.h"
@@ -30,7 +30,7 @@
 
 class Creature;
 
-enum monsterstate_t {
+enum monsterstate_t{
 	STATE_IDLE,
 	STATE_IDLESUMMON,
 	STATE_TARGETNOTREACHABLE,
@@ -38,7 +38,7 @@ enum monsterstate_t {
 	STATE_FLEEING,
 };
 
-enum monstermode_t {
+enum monstermode_t{
 	MODE_NORMAL,
 	MODE_AGGRESSIVE
 };
@@ -52,6 +52,9 @@ public:
 
 	virtual ~Monster();
 	//const Monster& operator=(const Monster& rhs);
+
+	virtual Monster* getMonster() {return this;};
+	virtual const Monster* getMonster() const {return this;};
 
 	virtual const std::string& getName() const;
 	virtual bool isPushable() const;
@@ -102,8 +105,8 @@ private:
 	void reThink(bool updateOnlyState = true);
 	
 	void selectTarget(const Creature* creature, bool canReach /* = true*/);
+
 protected:
-	int useCount;
 	PhysicalAttackClass	*curPhysicalAttack;
 		
 	bool doAttacks(Creature* attackedCreature, monstermode_t mode = MODE_NORMAL);
@@ -143,4 +146,4 @@ protected:
 	virtual std::string getDescription(uint32_t lookDistance) const;
 };
 
-#endif // __monster_h_
+#endif

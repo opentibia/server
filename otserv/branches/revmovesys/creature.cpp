@@ -27,6 +27,9 @@
 
 #include "game.h"
 #include "creature.h"
+#include "npc.h"
+#include "player.h"
+#include "monster.h"
 #include "tile.h"
 #include "otsystem.h"
 
@@ -71,7 +74,8 @@ access(0)
 	eventCheck = 0;
 	eventCheckAttacking = 0;
 	
-	attackedCreature = 0;
+	//attackedCreature = 0;
+	attackedCreature2 = NULL;
 	speed = 220;
 }
 
@@ -97,7 +101,6 @@ void Creature::drainMana(int damage)
 	mana -= min(mana, damage);
 }
 
-//void Creature::setAttackedCreature(unsigned long id)
 void Creature::setAttackedCreature(const Creature* creature)
 {
 	std::list<Creature*>::iterator cit;
@@ -105,11 +108,14 @@ void Creature::setAttackedCreature(const Creature* creature)
 		(*cit)->setAttackedCreature(creature);
 	}
 	
-	if(creature) {
-		attackedCreature = creature->getID();
+	if(creature){
+		//attackedCreature = creature->getID();
+		attackedCreature2 = const_cast<Creature*>(creature);
 	}
-	else
-		attackedCreature = 0;
+	else{
+		//attackedCreature = 0;
+		attackedCreature2 = NULL;
+	}
 }
 
 void Creature::setMaster(Creature* creature)

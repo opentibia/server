@@ -24,7 +24,6 @@
 
 
 #include "creature.h"
-#include "game.h"
 #include "luascript.h"
 #include "templates.h"
 
@@ -54,7 +53,6 @@ public:
 	static int luaActionMoveTo(lua_State *L);
 	static int luaCreatureGetName(lua_State *L);
 	static int luaCreatureGetName2(lua_State *L);
-	static int luaActionAttackCreature(lua_State *L);
 	static int luaCreatureGetPos(lua_State *L);
 	static int luaSelfGetPos(lua_State *L);
 	
@@ -71,6 +69,9 @@ public:
 	Npc(const std::string& name, Game* game);
 	virtual ~Npc();
 
+	virtual Npc* getNpc() {return this;};
+	virtual const Npc* getNpc() const {return this;};
+
 	virtual bool isPushable() const { return true;};
 	
 	virtual unsigned long idRange(){ return 0x30000000;}
@@ -80,21 +81,12 @@ public:
 	
 	void speak(const std::string &text){};
 	const std::string& getName() const {return name;};
-	fight_t getFightType(){return fighttype;};
-	
-	int mana, manamax;
-	
-	//damage per hit
-	int damage;
-	
-	fight_t fighttype;
 	
 	Game* game;
 	
 	void doSay(std::string msg);
 	void doMove(int dir);
 	void doMoveTo(Position pos);
-	void doAttack(int id);
 	bool isLoaded(){return loaded;}
 	
 protected:

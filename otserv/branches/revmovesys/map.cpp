@@ -202,7 +202,12 @@ bool Map::placeCreature(const Position &pos, Creature* creature)
 bool Map::removeCreature(Creature* creature)
 {
 	Tile* tile = creature->getTile();
-	return (tile->__removeThing(creature, 0) == RET_NOERROR);
+	if(tile){
+		tile->__removeThing(creature, 0);
+		return true;
+	}
+
+	return false;
 }
 
 void Map::getSpectators(const Range& range, SpectatorVec& list)

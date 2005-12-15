@@ -130,8 +130,6 @@ Item::Item(const unsigned short _type) {
 	fluid = 0;
 	actionId = 0;
 	uniqueId = 0;
-	//throwRange = 6;
-	useCount = 0;
 	isDecaying  = 0;
 	specialDescription = NULL;
 	text = NULL;
@@ -142,8 +140,6 @@ Item::Item(const Item &i){
 	id = i.id;
 	count = i.count;
 	chargecount = i.chargecount;
-	//throwRange = i.throwRange;
-	useCount = 0;
 	isDecaying  = 0;
 	actionId = i.actionId;
 	uniqueId = i.uniqueId;
@@ -219,7 +215,6 @@ Item::Item(const unsigned short _type, unsigned short _count)
 	fluid = 0;
 	actionId = 0;
 	uniqueId = 0;
-	useCount = 0;
 	isDecaying  = 0;
 	specialDescription = NULL;
 	text = NULL;
@@ -252,7 +247,6 @@ Item::Item()
 	count = 0;
 	chargecount = 0;
 	//throwRange = 6;
-	useCount = 0;
 	isDecaying  = 0;
 	actionId = 0;
 	uniqueId = 0;
@@ -383,6 +377,10 @@ bool Item::isBlocking() const {
 
 bool Item::isStackable() const {
 	return items[id].stackable;
+}
+
+bool Item::isRune() const {
+	return (items[id].group == ITEM_GROUP_RUNE);
 }
 
 bool Item::isFluidContainer() const {
@@ -634,7 +632,6 @@ bool Item::canDecay(){
 //Teleport class
 Teleport::Teleport(const unsigned short _type) : Item(_type)
 {
-	useCount = 0;	
 	destPos.x = 0;
 	destPos.y = 0;
 	destPos.z = 0;

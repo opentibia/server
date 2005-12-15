@@ -22,13 +22,13 @@
 #ifndef __CREATURE_H__
 #define __CREATURE_H__
 
+#include <vector>
+
+#include "templates.h"
 #include "thing.h"
 #include "position.h"
 #include "container.h"
 #include "magic.h"
-#include <vector>
-
-#include "templates.h"
 
 enum slots_t {
 	SLOT_WHEREEVER = 0,
@@ -81,11 +81,11 @@ enum playerLooks
 
 class Map;
 
-class Item;
-
 class Thing;
+class Item;
 class Player;
 class Monster;
+class Npc;
 
 class Conditions : public std::map<attacktype_t, ConditionVec>
 {
@@ -112,6 +112,15 @@ public:
 	Creature();
 	virtual ~Creature();
 	
+	virtual Creature* getCreature() {return this;};
+	virtual const Creature* getCreature()const {return this;};
+	virtual Player* getPlayer() {return NULL;};
+	virtual const Player* getPlayer() const {return NULL;};
+	virtual Npc* getNpc() {return NULL;};
+	virtual const Npc* getNpc() const {return NULL;};
+	virtual Monster* getMonster() {return NULL;};
+	virtual const Monster* getMonster() const {return NULL;};
+
 	virtual const std::string& getName() const = 0;
 	virtual int getThrowRange() const {return 1;};
 	virtual bool isPushable() const {return true;};
@@ -121,6 +130,7 @@ public:
 	unsigned long getID() const { return id; }
 	virtual void removeList() = 0;
 	virtual void addList() = 0;
+
 	unsigned long getExpForLv(const int& lv) const { 
 		return (int)((50*lv*lv*lv)/3 - 100 * lv * lv + (850*lv) / 3 - 200);
 	}
@@ -139,6 +149,7 @@ public:
 		else
 			return immunities;
 	};
+
 	virtual void drainHealth(int);
 	virtual void drainMana(int);
 	virtual void die(){};
@@ -152,19 +163,11 @@ public:
 	virtual void addSummon(Creature *creature);
 	virtual void removeSummon(Creature *creature);
 	
-	virtual int getWeaponDamage() const {
-		return 1+(int)(10.0*rand()/(RAND_MAX+1.0));
-	}
-	virtual int getArmor() const {
-		return 0;
-	}
-	virtual int getDefense() const {
-		return 0;
-	}
+	virtual int getWeaponDamage() const {return 1+(int)(10.0*rand()/(RAND_MAX+1.0));}
+	virtual int getArmor() const {return 0;}
+	virtual int getDefense() const {return 0;}
 	
-	unsigned long attackedCreature;
-	
-	virtual bool isAttackable() const { return true; };
+	virtual bool isAttackable() const { return true;};
 	virtual void dropLoot(Container *corpse) {return;};
 	virtual int getLookCorpse() {return lookcorpse;};
 
@@ -172,35 +175,18 @@ public:
 	void addCondition(const CreatureCondition& condition, bool refresh);
 	Conditions& getConditions() {return conditions;};
 	
-	int lookhead, lookbody, looklegs, lookfeet, looktype, lookcorpse, lookmaster;
-	int mana, manamax, manaspent;
-	bool pzLocked;
-	
-	long inFightTicks, exhaustedTicks;
-	long manaShieldTicks, hasteTicks, paralyzeTicks;
-	int immunities;
-	
-	//unsigned long experience;
-	Position masterPos;
-	
-	int health, healthmax;
-	uint64_t lastmove;
-	
 	long long getSleepTicks() const;
 	int getStepDuration() const;
 	
-	unsigned short getSpeed() const {            
-		return speed;
-	};
+	unsigned short getSpeed() const {return speed;};
 	
 	void setNormalSpeed()
 	{
-		if(access!=0){
+		if(access != 0){
 			speed = 900;     
-			return;    
 		}
-		
-		speed = 220 + (2* (level - 1)); 
+		else		
+			speed = 220 + (2* (level - 1)); 
 	}
 	
 	int getNormalSpeed()
@@ -210,13 +196,6 @@ public:
 		}
 		return 220 + (2* (level - 1)); 
 	}
-	
-	int access;		//access level
-	int maglevel;	// magic level
-	int level;		// level
-	int speed;
-	
-	Direction direction;
 	
 	virtual void addInflictedDamage(Creature* attacker, int damage);
 	virtual int getGainedExperience(Creature* attacker);
@@ -244,7 +223,27 @@ public:
 	
 	virtual void onCreatureChangeOutfit(const Creature* creature) { };
 
-protected:
+	int health, healthmax;
+	int mana, manamax, manaspent;
+	int access;		//access level
+	int maglevel;	// magic level
+	int level;		// level
+	long inFightTicks, exhaustedTicks;
+	bool pzLocked;
+	//unsigned long attackedCreature;
+	Creature* attackedCreature2;
+	int lookhead, lookbody, looklegs, lookfeet, looktype, lookcorpse, lookmaster;
+	long manaShieldTicks, hasteTicks, paralyzeTicks;
+	Position masterPos;
+	uint64_t lastmove;
+
+protected:	
+	
+	int immunities;
+	int speed;
+
+	Direction direction;
+
 	unsigned long eventCheck;
 	unsigned long eventCheckAttacking;
 	

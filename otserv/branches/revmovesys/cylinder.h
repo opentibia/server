@@ -24,14 +24,26 @@
 #include "definitions.h"
 #include "thing.h"
 
+class Item;
 class Creature;
 
 class Cylinder : virtual public Thing{
 public:	
 	/**
-	  * Query the cylinder how much it can accept
+	  * Query if the cylinder can add an object
 	  * \param index points to the destination index (inventory slot/container position)
 	  * \param thing the object to move/add
+	  * \param count is the amount that we want to move/add
+	  * \param childIsOwner if set to true the query is from a child-cylinder
+	  * \returns ReturnValue holds the return value
+	  */
+	virtual ReturnValue __queryAdd(int32_t index, const Thing* Item, uint32_t count,
+		bool childIsOwner = false) const = 0;
+
+	/**
+	  * Query the cylinder how much it can accept
+	  * \param index points to the destination index (inventory slot/container position)
+	  * \param item the object to move/add
 	  * \param count is the amount that we want to move/add
 	  * \param maxQueryCount is the max amount that the cylinder can accept
 	  * \returns ReturnValue holds the return value
@@ -40,17 +52,8 @@ public:
 		uint32_t& maxQueryCount) const = 0;
 
 	/**
-	  * Query if the cylinder can add an object
-	  * \param index points to the destination index (inventory slot/container position)
-	  * \param thing the object to move/add
-	  * \param count is the amount that we want to move/add
-	  * \returns ReturnValue holds the return value
-	  */
-	virtual ReturnValue __queryAdd(uint32_t index, const Thing* thing, uint32_t count) const = 0;
-
-	/**
 	  * Query if the cylinder can remove an object
-	  * \param thing the object to move/remove
+	  * \param item the object to move/remove
 	  * \param count is the amount that we want to remove
 	  * \returns ReturnValue holds the return value
 	  */
@@ -60,44 +63,44 @@ public:
 	  * Query the destination cylinder
 	  * \param index points to the destination index (inventory slot/container position),
 		* this method can change the index to point to the new cylinder index
-	  * \destThing is the destination object
+	  * \destItem is the destination object
 	  * \returns Cylinder returns the destination cylinder
 	  */
-	virtual Cylinder* __queryDestination(int32_t& index, const Thing* thing, Thing** destThing) = 0;
+	virtual Cylinder* __queryDestination(int32_t& index, const Thing* thing, Item** destItem) = 0;
 
 	/**
 	  * Add the object to the cylinder
-	  * \param thing is the object to add
+	  * \param item is the object to add
 	  */
-	virtual ReturnValue __addThing(Thing* thing) = 0;
+	virtual void __addThing(Thing* thing) = 0;
 
 	/**
 	  * Add the object to the cylinder
 	  * \param index points to the destination index (inventory slot/container position)
-	  * \param thing is the object to add
+	  * \param item is the object to add
 	  */
-	virtual ReturnValue __addThing(uint32_t index, Thing* thing) = 0;
+	virtual void __addThing(int32_t index, Thing* thing) = 0;
 
 	/**
 	  * Update the item count or type for an object
 	  * \param thing is the object to update
 	  * \param count is the new count value
 	  */
-	virtual ReturnValue __updateThing(Thing* thing, uint32_t count) = 0;
+	virtual void __updateThing(Thing* thing, uint32_t count) = 0;
 
 	/**
 	  * Replace an object with a new
 	  * \param index is the position to change (inventory slot/container position)
 	  * \param thing is the object to update
 	  */
-	virtual ReturnValue __updateThing(uint32_t index, Thing* thing) = 0;
+	virtual void __updateThing(uint32_t index, Thing* thing) = 0;
 
 	/**
 	  * Remove an object
 	  * \param thing is the object to delete
 	  * \param count is the new count value
 	  */
-	virtual ReturnValue __removeThing(Thing* thing, uint32_t count) = 0;
+	virtual void __removeThing(Thing* thing, uint32_t count) = 0;
 
 	/**
 	  * Is sent after an operation (move/add) to update internal values

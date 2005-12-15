@@ -2,6 +2,8 @@
 #include "thing.h"
 #include "cylinder.h"
 #include "tile.h"
+#include "creature.h"
+#include "item.h"
 #include "player.h"
 
 Thing::Thing()

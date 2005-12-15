@@ -292,7 +292,8 @@ int SpellScript::registerFunctions(){
 	return true;
 }
 
-bool SpellScript::castSpell(Creature* creature, const Position& pos, std::string var){
+bool SpellScript::castSpell(Creature* creature, const Position& pos, std::string var)
+{
 	lua_pushstring(luaState, "onCast");
 	lua_gettable(luaState, LUA_GLOBALSINDEX);
 	lua_pushnumber(luaState, creature->getID());
@@ -314,7 +315,8 @@ bool SpellScript::castSpell(Creature* creature, const Position& pos, std::string
 	return ret;
 }
 
-Spell* SpellScript::getSpell(lua_State *L){
+Spell* SpellScript::getSpell(lua_State *L)
+{
 	lua_getglobal(L, "addressOfSpell");
 	int val = (int)lua_tonumber(L, -1);
 	lua_pop(L,1);
@@ -949,7 +951,7 @@ int SpellScript::luaActionMakeArrows(lua_State *L)
  		magicTarget.hitEffect = 255; //NM_ME_NONE
  		magicTarget.animationColor = 19; //GREEN
 
-		if(player->mana < spell->getMana()){
+		if(player->getMana() < spell->getMana()){
 			magicTarget.damageEffect = 2; //NM_ME_PUFF  
   			magicTarget.manaCost = player->getPlayerInfo(PLAYERINFO_MAXMANA) + 1; //force not enough mana
 		}
@@ -995,7 +997,7 @@ int SpellScript::luaActionMakeFood(lua_State *L){
 		magicTarget.hitEffect = 255; //NM_ME_NONE
 		magicTarget.animationColor = 19; //GREEN
 
-		if(player->mana < spell->getMana()){
+		if(player->getMana() < spell->getMana()){
   			magicTarget.damageEffect = 2; //NM_ME_PUFF  
     		magicTarget.manaCost = player->getPlayerInfo(PLAYERINFO_MAXMANA) + 1; //force not enough mana
   		}

@@ -31,6 +31,8 @@
 #include <libxml/parser.h>
 
 #include "npc.h"
+#include "game.h"
+
 #include "luascript.h"
 
 extern LuaScript g_config;
@@ -106,22 +108,6 @@ Npc::Npc(const std::string& name, Game* game) :
 		while (p)
 		{
 			const char* str = (char*)p->name;
-			if(strcmp(str, "mana") == 0){
-				if(tmp = (char*)xmlGetProp(p, (const xmlChar *)"now")) {
-					this->mana = atoi(tmp);
-					xmlFreeOTSERV(tmp);
-				}
-				else{
-					this->mana = 100;
-				}
-				if(tmp = (char*)xmlGetProp(p, (const xmlChar *)"max")) {
-					this->manamax = atoi(tmp);
-					xmlFreeOTSERV(tmp);
-				}
-				else{
-					this->manamax = 100;
-				}
-			}
 			if(strcmp(str, "health") == 0){
 				if(tmp = (char*)xmlGetProp(p, (const xmlChar *)"now")) {
 					this->health = atoi(tmp);
@@ -187,6 +173,7 @@ Npc::Npc(const std::string& name, Game* game) :
 				}
 				
 			}
+			/*
 			if(strcmp(str, "attack") == 0){
 				if(tmp = (char*)xmlGetProp(p, (const xmlChar *)"type")){
 					std::string attacktype = tmp;
@@ -210,6 +197,7 @@ Npc::Npc(const std::string& name, Game* game) :
 			if(strcmp(str, "loot") == 0){
 				//TODO implement loot
 			}
+			*/
 				
 			p = p->next;
 		}
@@ -307,11 +295,6 @@ void Npc::doSay(std::string msg)
 {
 	if(!game->creatureSaySpell(this, msg))
 		this->game->creatureSay(this, SPEAK_SAY, msg);
-}
-
-void Npc::doAttack(int id)
-{
-	attackedCreature = id;
 }
 
 void Npc::doMove(int direction)
@@ -456,7 +439,6 @@ int NpcScript::registerFunctions()
 	lua_register(luaState, "selfMove", NpcScript::luaActionMove);
 	lua_register(luaState, "selfMoveTo", NpcScript::luaActionMoveTo);
 	lua_register(luaState, "selfGetPosition", NpcScript::luaSelfGetPos);
-	lua_register(luaState, "selfAttackCreature", NpcScript::luaActionAttackCreature);
 	lua_register(luaState, "creatureGetName", NpcScript::luaCreatureGetName);
 	lua_register(luaState, "creatureGetName2", NpcScript::luaCreatureGetName2);
 	lua_register(luaState, "creatureGetPosition", NpcScript::luaCreatureGetPos);
@@ -569,15 +551,5 @@ int NpcScript::luaActionMoveTo(lua_State* L)
 	Npc* mynpc=getNpc(L);
 	if(mynpc)
 		mynpc->doMoveTo(target);
-	return 0;
-}
-
-int NpcScript::luaActionAttackCreature(lua_State *L)
-{
-	int id=(int)lua_tonumber(L, -1);
-	lua_pop(L,1);
-	Npc* mynpc=getNpc(L);
-	if(mynpc)
-		mynpc->doAttack(id);
 	return 0;
 }

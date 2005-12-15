@@ -33,10 +33,15 @@ public:
 	Container(const uint16_t _type);
 	virtual ~Container();
 
-	virtual int getThrowRange() const {return Item::getThrowRange();};
-	virtual bool isPushable() const {return Item::isPushable();};
+	//virtual Item* getItem() {return Item::getItem();};
+	//virtual const Item* getItem()const {return Item::getItem();};
+	virtual Container* getContainer() {return this;};
+	virtual const Container* getContainer() const {return this;};
 
-	virtual std::string getDescription(uint32_t lookDistance) const {return Item::getDescription(lookDistance);};
+	//virtual int getThrowRange() const {return Item::getThrowRange();};
+	//virtual bool isPushable() const {return Item::isPushable();};
+	//virtual std::string getDescription(uint32_t lookDistance) const {return Item::getDescription(lookDistance);};
+
 	uint32_t size() const {return (uint32_t)itemlist.size();};
 	uint32_t capacity() const {return maxSize;};
 
@@ -50,19 +55,20 @@ public:
 	virtual double getWeight() const;
 
 	//
+	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,
+		bool childIsOwner = false) const;
 	virtual ReturnValue __queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
 		uint32_t& maxQueryCount) const;
-	virtual ReturnValue __queryAdd(uint32_t index, const Thing* thing, uint32_t count) const;
 	virtual ReturnValue __queryRemove(const Thing* thing, uint32_t count) const;
-	virtual Cylinder* __queryDestination(int32_t& index, const Thing* thing, Thing** destThing);
+	virtual Cylinder* __queryDestination(int32_t& index, const Thing* thing, Item** destItem);
 
-	virtual ReturnValue __addThing(Thing* thing);
-	virtual ReturnValue __addThing(uint32_t index, Thing* thing);
+	virtual void __addThing(Thing* thing);
+	virtual void __addThing(int32_t index, Thing* thing);
 
-	virtual ReturnValue __updateThing(Thing* thing, uint32_t count);
-	virtual ReturnValue __updateThing(uint32_t index, Thing* thing);
+	virtual void __updateThing(Thing* thing, uint32_t count);
+	virtual void __updateThing(uint32_t index, Thing* thing);
 
-	virtual ReturnValue __removeThing(Thing* thing, uint32_t count);
+	virtual void __removeThing(Thing* thing, uint32_t count);
 
 	virtual int32_t __getIndexOfThing(const Thing* thing) const;
 	Thing* __getThing(uint32_t index);
