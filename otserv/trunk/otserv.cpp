@@ -29,7 +29,7 @@
 
 #include "otsystem.h"
 #include "networkmessage.h"
-#include "protocol75.h"
+#include "protocol76.h"
 
 #include <stdlib.h>
 #include <time.h>
@@ -166,7 +166,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 	srand((unsigned)time(NULL));
 	
 	SOCKET s = *(SOCKET*)dat;
-    
+	
 	NetworkMessage msg;
 	if (msg.ReadFromSocket(s))
 	{
@@ -237,7 +237,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 			
 			msg.WriteToSocket(s);
 		}
-		// gameworld connection tibia 7.55
+		// gameworld connection tibia 7.6
 		else if (protId == 0x020A)
 		{
 			unsigned char  clientos = msg.GetByte();
@@ -247,10 +247,10 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 			std::string name     = msg.GetString();
 			std::string password = msg.GetString();
 			
-			if(version != 755){
+			if(version != 760){
 				msg.Reset();
 				msg.AddByte(0x14);
-				msg.AddString("Only clients with protocol 7.55 allowed!");
+				msg.AddString("Only clients with protocol 7.6 allowed!");
 				msg.WriteToSocket(s);
 			}
 			else if(isclientBanished(s)){
@@ -286,8 +286,8 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 					//OTSYS_THREAD_UNLOCK(g_game.gameLock, "ConnectionHandler()")
 					
 					if(s){
-						Protocol75* protocol;
-						protocol = new Protocol75(s);
+						Protocol76* protocol;
+						protocol = new Protocol76(s);
 						player = new Player(name, protocol);
 						player->useThing();
 						player->setID();

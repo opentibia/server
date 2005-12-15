@@ -193,7 +193,7 @@ int Items::loadFromOtb(std::string file)
 			Items::dwBuildNumber = vi->dwBuildNumber;
 		}
 	}
-	if(Items::dwMinorVersion != CLIENT_VERSION_755){
+	if(Items::dwMinorVersion != CLIENT_VERSION_760){
 		std::cout << "Not supported items.otb client version." << std::endl;
 		return ERROR_INVALID_FORMAT;
 	}
@@ -601,10 +601,11 @@ int Items::loadFromOtb(std::string file)
 								break;
 							}
 
-
 							default:
-								delete iType;
-								return ERROR_INVALID_FORMAT;
+								//ignore unknown attributes
+								//delete iType;
+								//return ERROR_INVALID_FORMAT;
+								break;
 						}
 
 						
