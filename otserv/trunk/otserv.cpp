@@ -66,7 +66,8 @@
 	#define ERROR_EINTR EINTR
 	
 	/* Comment below line if you want to execute otserv with root user (NOT RECOMMENDED) */
-	#define NO_ROOT_PERMISSION
+	#define _NO_ROOT_PERMISSION_
+	#define _HOMEDIR_CONF_
 	
 	extern int errno; 
 #endif
@@ -419,7 +420,7 @@ int main(int argc, char *argv[])
 	std::cout << ":: ====================" << std::endl;
 	std::cout << "::" << std::endl;
 	
-#ifdef NO_ROOT_PERMISSION
+#ifdef _NO_ROOT_PERMISSION_
 	if( getuid() == 0 || geteuid() == 0 )
 	{
 		std::cout << std::endl << "OTServ executed as root user, please login with a normal user." << std::endl;
@@ -446,7 +447,14 @@ int main(int argc, char *argv[])
 	
 	// read global config
 	std::cout << ":: Loading lua script config.lua... ";
+#ifdef _HOMEDIR_CONF_
+	std::string configpath;
+	configpath = getenv("HOME");
+	configpath += "/.otserv/config.lua";
+	if (!g_config.OpenFile(configpath.c_str()))
+#else
 	if (!g_config.OpenFile("config.lua"))
+#endif
 	{
 		ErrorMessage("Unable to load config.lua!");
 		return -1;
