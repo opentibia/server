@@ -172,8 +172,11 @@ ReturnValue Container::__queryAdd(int32_t index, const Thing* thing, uint32_t co
 		cylinder = cylinder->getParent();
 	}
 	
-	return getTopParent()->__queryAdd(-1, item, count, true);
-	//return RET_NOERROR;
+	const Cylinder* topParent = getTopParent();
+	if(topParent != this)
+		return topParent->__queryAdd(-1, item, count, true);
+	else
+		return RET_NOERROR;
 }
 
 ReturnValue Container::__queryMaxCount(int32_t index, const Thing* thing, uint32_t count,

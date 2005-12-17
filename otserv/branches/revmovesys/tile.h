@@ -87,7 +87,7 @@ public:
   bool floorChangeDown() const;
   bool floorChange(Direction direction) const;
   
-  virtual std::string getDescription(uint32_t lookDistance) const;
+  virtual std::string getDescription(int32_t lookDistance) const;
 
 	//
 	virtual ReturnValue __queryMaxCount(int32_t index, const Thing* thing, uint32_t count,

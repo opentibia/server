@@ -160,7 +160,7 @@ bool Player::isPushable() const
 	return ((getSleepTicks() <= 0) && access == 0);
 }
 
-std::string Player::getDescription(uint32_t lookDistance) const
+std::string Player::getDescription(int32_t lookDistance) const
 {
 	std::stringstream s;
 	std::string str;
@@ -1981,7 +1981,7 @@ ReturnValue Player::__queryAdd(int32_t index, const Thing* thing, uint32_t count
 			case SLOT_RIGHT:
 				if(item->getSlotPosition() & SLOTP_RIGHT){
 					if(item->getSlotPosition() & SLOTP_TWO_HAND){
-						if(items[SLOT_LEFT] != item){
+						if(items[SLOT_LEFT] && items[SLOT_LEFT] != item){
 							ret = RET_DROPTWOHANDEDITEM;
 						}
 						else
@@ -2003,7 +2003,7 @@ ReturnValue Player::__queryAdd(int32_t index, const Thing* thing, uint32_t count
 			case SLOT_LEFT:
 				if(item->getSlotPosition() & SLOTP_LEFT){
 					if(item->getSlotPosition() & SLOTP_TWO_HAND){
-						if(items[SLOT_RIGHT] != item){
+						if(items[SLOT_RIGHT] && items[SLOT_RIGHT] != item){
 							ret = RET_DROPTWOHANDEDITEM;
 						}
 						else

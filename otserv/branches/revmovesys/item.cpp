@@ -471,7 +471,7 @@ double Item::getWeight() const {
 	return items[id].weight;
 }
 
-std::string Item::getDescription(uint32_t lookDistance) const
+std::string Item::getDescription(int32_t lookDistance) const
 {
 	std::stringstream s;
 	std::string str;

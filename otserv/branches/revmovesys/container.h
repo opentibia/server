@@ -40,7 +40,7 @@ public:
 	//virtual const Item* getItem()const {return Item::getItem();};
 	//virtual int getThrowRange() const {return Item::getThrowRange();};
 	//virtual bool isPushable() const {return Item::isPushable();};
-	//virtual std::string getDescription(uint32_t lookDistance) const {return Item::getDescription(lookDistance);};
+	//virtual std::string getDescription(int32_t lookDistance) const {return Item::getDescription(lookDistance);};
 
 	uint32_t size() const {return (uint32_t)itemlist.size();};
 	uint32_t capacity() const {return maxSize;};

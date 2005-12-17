@@ -143,7 +143,7 @@ protected:
 	virtual int onThink(int& newThinkTicks);
 	virtual void setAttackedCreature(const Creature* creature);
 	
-	virtual std::string getDescription(uint32_t lookDistance) const;
+	virtual std::string getDescription(int32_t lookDistance) const;
 };
 
 #endif

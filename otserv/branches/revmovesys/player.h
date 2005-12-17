@@ -240,7 +240,7 @@ public:
 	virtual int getLookCorpse();
 	bool NeedUpdateStats();
 	
-	virtual std::string getDescription(uint32_t lookDistance) const;
+	virtual std::string getDescription(int32_t lookDistance) const;
 	
 	void setAcceptTrade(bool b);
 	bool getAcceptTrade() {return (tradeState == TRADE_ACCEPT);};

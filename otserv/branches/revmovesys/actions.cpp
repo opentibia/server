@@ -909,7 +909,7 @@ int ActionScript::luaActionDoRemoveItem(lua_State *L)
 		return 1;
 	}
 	
-	action->game->internalRemoveItem(tmpitem);
+	action->game->internalRemoveItem(tmpitem, n);
 	
 	lua_pushnumber(L, 0);
 	return 1;

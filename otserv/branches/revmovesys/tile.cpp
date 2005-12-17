@@ -140,7 +140,7 @@ int Tile::getThingCount() const
 	return (uint32_t) (ground ? 1 : 0) + topItems.size() + creatures.size() + downItems.size();
 }
 
-std::string Tile::getDescription(uint32_t lookDistance) const
+std::string Tile::getDescription(int32_t lookDistance) const
 {
 	std::string ret = "You dont know why, but you cant see anything!";
 	return ret;

@@ -235,7 +235,7 @@ std::vector<long> Creature::getInflicatedDamageCreatureList()
 	return damagelist;
 }
 
-std::string Creature::getDescription(uint32_t lookDistance) const
+std::string Creature::getDescription(int32_t lookDistance) const
 {
 	std::string str = "a creature";
 	return str;

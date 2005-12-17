@@ -3005,9 +3005,9 @@ bool Game::playerLookAt(Player* player, const Position& pos, uint16_t itemId, ui
 		return false;
 	}
 
-	uint32_t lookDistance = 0;
+	int32_t lookDistance = 0;
 	if(thing == player)
-		lookDistance = 0;
+		lookDistance = -1;
 	else{
 		const Position& LookPos = player->getPosition();
 		const Position& thingMapPos = thing->getPosition();

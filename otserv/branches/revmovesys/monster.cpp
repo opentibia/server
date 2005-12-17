@@ -1073,7 +1073,7 @@ void Monster::setAttackedCreature(const Creature* creature)
 	}
 }
 
-std::string Monster::getDescription(uint32_t lookDistance) const
+std::string Monster::getDescription(int32_t lookDistance) const
 {
 	std::stringstream ss;
 	std::string str;

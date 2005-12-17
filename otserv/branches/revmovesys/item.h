@@ -68,7 +68,7 @@ public:
 	virtual bool isPushable() const {return !isNotMoveable();};
 	virtual int getThrowRange() const {return (isPickupable() ? 15 : 1);};
 
-	virtual std::string getDescription(uint32_t lookDistance) const;
+	virtual std::string getDescription(int32_t lookDistance) const;
 
 	unsigned short getID() const;    // ID as in ItemType
 	void setID(unsigned short newid);

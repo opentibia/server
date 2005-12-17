@@ -105,7 +105,7 @@ protected:
 	virtual void onCreatureSay(const Creature *creature, SpeakClasses type, const std::string &text);
 	virtual void onCreatureChangeOutfit(const Creature* creature);
 	virtual int onThink(int& newThinkTicks);
-	virtual std::string getDescription(uint32_t lookDistance) const;
+	virtual std::string getDescription(int32_t lookDistance) const;
 	
 	virtual bool isAttackable() const { return false; };
 	

@@ -217,7 +217,7 @@ Npc::~Npc()
 	delete this->script;
 }
 
-std::string Npc::getDescription(uint32_t lookDistance) const
+std::string Npc::getDescription(int32_t lookDistance) const
 {
 	std::stringstream s;
 	s << name << ".";

@@ -154,7 +154,7 @@ public:
 	virtual void drainMana(int);
 	virtual void die(){};
 
-	virtual std::string getDescription(uint32_t lookDistance) const;
+	virtual std::string getDescription(int32_t lookDistance) const;
 	virtual void setAttackedCreature(const Creature* creature);
 	
 	virtual void setMaster(Creature* creature);

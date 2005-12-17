@@ -72,7 +72,7 @@ public:
 	void useThing2();
 	void releaseThing2();
 	
-	virtual std::string getDescription(uint32_t lookDistance) const = 0;
+	virtual std::string getDescription(int32_t lookDistance) const = 0;
 
 	Cylinder* getParent() {return parent;};
 	const Cylinder* getParent() const {return parent;};
