@@ -36,10 +36,12 @@ typedef unsigned long long uint64_t;
 
 #define EWOULDBLOCK WSAEWOULDBLOCK
 
+#ifndef __GNUC__
 typedef unsigned long uint32_t;
 typedef signed long int32_t;
 typedef unsigned short uint16_t;
 typedef unsigned char uint8_t;
+#endif
 
 #pragma warning(disable:4786) // msvc too long debug names in stl
 #pragma warning(disable:4250) // 'class1' : inherits 'class2::member' via dominance

@@ -126,7 +126,7 @@ public:
 
 	void addContainer(uint32_t containerid, Container *container);
 	void closeContainer(uint32_t containerid);
-	uint32_t getContainerID(const Container* container) const;
+	int32_t getContainerID(const Container* container) const;
 	Container* getContainer(uint32_t cid);
 	
 	void addStorageValue(const unsigned long key, const long value);

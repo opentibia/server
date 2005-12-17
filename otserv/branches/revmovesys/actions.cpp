@@ -223,7 +223,7 @@ bool Actions::UseItem(Player* player, const Position &pos,const unsigned char st
 		return false;
 	}
 	
-	Item *item = dynamic_cast<Item*>(game->internalGetThing(player, pos, stack));
+	Item *item = game->internalGetThing(player, pos, stack)->getItem();
 
 	if(!item){
 		#ifdef __DEBUG__
@@ -255,7 +255,7 @@ bool Actions::UseItem(Player* player, const Position &pos,const unsigned char st
 	}
 	
 	//if it is a container try to open it
-	if(Container* container = dynamic_cast<Container*>(item)){
+	if(Container* container = item->getContainer()){
 		if(openContainer(player, container, index))
 			return true;
 	}
@@ -268,7 +268,7 @@ bool Actions::UseItem(Player* player, const Position &pos,const unsigned char st
 bool Actions::openContainer(Player* player,Container* container, const unsigned char index)
 {
 	//if(container->depotId == 0){ //normal container
-		uint32_t oldcid = player->getContainerID(container);
+		int32_t oldcid = player->getContainerID(container);
 		if(oldcid != -1) {
 			player->onCloseContainer(container);
 			player->closeContainer(oldcid);
@@ -304,7 +304,7 @@ bool Actions::UseItemEx(Player* player, const Position &from_pos,
 		return false;
 	}
 	
-	Item *item = dynamic_cast<Item*>(game->internalGetThing(player, from_pos, from_stack));
+	Item *item = game->internalGetThing(player, from_pos, from_stack)->getItem();
 	if(!item)
 		return false;
 	
@@ -477,7 +477,7 @@ void ActionScript::ClearMap()
 }
 
 void ActionScript::AddThingToMapUnique(Thing *thing){
-	Item *item = dynamic_cast<Item*>(thing);
+	Item *item = thing->getItem();
 	if(item && item->getUniqueId() != 0 ){
 		unsigned short uid = item->getUniqueId();
 		KnownThing *tmp = uniqueIdMap[uid];
@@ -502,7 +502,7 @@ void ActionScript::UpdateThingPos(int uid, PositionEx &pos){
 
 unsigned int ActionScript::AddThingToMap(Thing *thing,PositionEx &pos)
 {
-	Item *item = dynamic_cast<Item*>(thing);
+	Item *item = thing->getItem();
 	//if(item && item->pos.x != 0xFFFF && item->getUniqueId()){
 	if(item && item->getTile() == item->getParent() && item->getUniqueId()){
 		unsigned short uid = item->getUniqueId();
@@ -529,14 +529,16 @@ unsigned int ActionScript::AddThingToMap(Thing *thing,PositionEx &pos)
 	tmp->thing = thing;
 	tmp->pos = pos;
 	
-	if(dynamic_cast<Item*>(thing))
+	if(thing->getItem())
 		tmp->type = thingTypeItem;
-	else if(dynamic_cast<Player*>(thing))
-		tmp->type = thingTypePlayer;
-	else if(dynamic_cast<Monster*>(thing))
-		tmp->type = thingTypeMonster;
-	else if(dynamic_cast<Npc*>(thing))
-		tmp->type = thingTypeNpc;	
+	else if(Creature *c = thing->getCreature()){
+		if(c->getPlayer())
+			tmp->type = thingTypePlayer;
+		else if(c->getMonster())
+			tmp->type = thingTypeMonster;
+		else if(c->getNpc())
+			tmp->type = thingTypeNpc;	
+	}
 	else
 		tmp->type = thingTypeUnknown;
 	
@@ -715,21 +717,22 @@ ActionScript* ActionScript::getActionScript(lua_State *L){
 void ActionScript::internalAddThing(lua_State *L, const Thing* thing, const unsigned int thingid)
 {	
 	lua_newtable(L);
-	if(dynamic_cast<const Item*>(thing)){	
-		const Item *item = dynamic_cast<const Item*>(thing);
+	if(thing && thing->getItem()){	
+		const Item *item = thing->getItem();
 		setField(L,"uid", thingid);
 		setField(L,"itemid", item->getID());
 		setField(L,"type", item->getItemCountOrSubtype());
 		setField(L,"actionid", item->getActionId());
 	}
-	else if(dynamic_cast<const Creature*>(thing)){
+	else if(thing && thing->getCreature()){
+		const Creature* c = thing->getCreature();
 		setField(L,"uid", thingid);
 		setField(L,"itemid", 1);
 		char type;
-		if(dynamic_cast<const Player*>(thing)){
+		if(c->getPlayer()){
 			type = 1;
 		}
-		else if(dynamic_cast<const Monster*>(thing)){
+		else if(c->getMonster()){
 			type = 2;
 		}
 		else{//npc
@@ -1096,7 +1099,7 @@ int ActionScript::luaActionDoSendMagicEffect(lua_State *L)
 	action->game->getSpectators(Range(cylinderMapPos, true), list);
 
 	for(it = list.begin(); it != list.end(); ++it) {
-		Player *p = dynamic_cast<Player*>(*it);
+		Player *p = (*it)->getPlayer();
 		if(p)
 			p->sendMagicEffect(cylinderMapPos,type);
 	}	
@@ -1184,7 +1187,7 @@ int ActionScript::luaActionDoPlayerAddHealth(lua_State *L)
 
 		action->game->getSpectators(Range(player->getPosition(), true), list);
 		for(it = list.begin(); it != list.end(); ++it) {
-			Player* p = dynamic_cast<Player*>(*it);
+			Player* p = (*it)->getPlayer();
 			if(p)
 				p->sendCreatureHealth(player);
 		}
@@ -1304,7 +1307,7 @@ int ActionScript::luaActionDoSendAnimatedText(lua_State *L)
 	action->game->getSpectators(Range(cylinderMapPos, true), list);
 
 	for(it = list.begin(); it != list.end(); ++it) {
-		Player *p = dynamic_cast<Player*>(*it);
+		Player *p = (*it)->getPlayer();
 		if(p)
 			p->sendAnimatedText(cylinderMapPos, color, text);
 	}

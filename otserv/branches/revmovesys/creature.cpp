@@ -87,7 +87,7 @@ Creature::~Creature()
 		(*cit)->setMaster(NULL);
 		(*cit)->releaseThing2();
 	}
-	
+	//std::cout << "Creature destructor " << this->getID() << std::endl;
 	summons.clear();
 }
 

@@ -56,7 +56,7 @@ double Container::getWeight() const
 		stack.pop_front();
 
 		for (it = container->getItems(); it != container->getEnd(); ++it) {
-			Container* container = dynamic_cast<Container*>(*it);
+			Container* container = (*it)->getContainer();
 			if(container) {
 				stack.push_back(container);
 				weight += items[container->getID()].weight;
@@ -106,7 +106,7 @@ uint32_t Container::getItemHoldingCount() const
 		stack.pop_front();
 
 		for(it = container->getItems(); it != container->getEnd(); ++it) {
-			Container* container = dynamic_cast<Container*>(*it);
+			Container* container = (*it)->getContainer();
 			if(container) {
 				stack.push_back(container);
 			}
@@ -134,7 +134,7 @@ bool Container::isHoldingItem(const Item* item) const
 				return true;
 			}
 
-			Container* containerIt = dynamic_cast<Container*>(*it);
+			Container* containerIt = (*it)->getContainer();
 			if(containerIt){
 				stack.push_back(containerIt);
 			}
@@ -169,7 +169,6 @@ ReturnValue Container::__queryAdd(int32_t index, const Thing* thing, uint32_t co
 		if(cylinder == thing){
 			return RET_THISISIMPOSSIBLE;
 		}
-
 		cylinder = cylinder->getParent();
 	}
 	
@@ -480,7 +479,7 @@ void Container::__internalAddThing(uint32_t index, Thing* thing)
 	std::cout << "[Container::__internalAddThing] index: " << index << std::endl;
 #endif
 
-	Item* item = dynamic_cast<Item*>(thing);
+	Item* item = thing->getItem();
 	if(item == NULL){
 #ifdef __DEBUG__
 		std::cout << "Failure: [Container::__internalAddThing] item == NULL" << std::endl;

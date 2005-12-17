@@ -98,7 +98,7 @@ public:
 
 private:
 	Cylinder* parent;
-	uint32_t useCount;
+	int32_t useCount;
 };
 
 

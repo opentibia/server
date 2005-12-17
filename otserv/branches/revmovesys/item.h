@@ -34,6 +34,7 @@
 
 class Creature;
 class Container;
+class Teleport;
 
 enum ITEMPROPERTY{
  BLOCKSOLID,
@@ -57,6 +58,8 @@ public:
 	virtual const Item* getItem()const {return this;};
 	virtual Container* getContainer() {return NULL;};
 	virtual const Container* getContainer() const {return NULL;};
+	virtual Teleport* getTeleport() {return NULL;};
+	virtual const Teleport* getTeleport() const {return NULL;};
 
 	//Factory member to create item of right type based on type
 	static Item* CreateItem(const unsigned short _type, unsigned short _count = 0);
@@ -155,6 +158,9 @@ class Teleport : public Item
 public:
 	Teleport(const unsigned short _type);
 	virtual ~Teleport();
+	
+	virtual Teleport* getTeleport() {return this;};
+	virtual const Teleport* getTeleport() const {return this;};
 	
 	void setDestPos(const Position &pos) {destPos = pos;};
 	const Position& getDestPos() const {return destPos;};

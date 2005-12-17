@@ -2913,8 +2913,8 @@ bool Game::playerLookInTrade(Player* player, bool lookAtCounterOffer, int index)
 	if(!tradeItem)
 		return false;
 
-	uint32_t lookDistance = std::sqrt(std::pow(std::abs(player->getPosition().x - tradeItem->getPosition().x), 2) +
-		std::pow(std::abs(player->getPosition().y - tradeItem->getPosition().y), 2));
+	uint32_t lookDistance = std::abs(player->getPosition().x - tradeItem->getPosition().x) + 
+		std::abs(player->getPosition().y - tradeItem->getPosition().y);
 
 	if(index == 0){
 		stringstream ss;
@@ -3007,7 +3007,7 @@ bool Game::playerLookAt(Player* player, const Position& pos, uint16_t itemId, ui
 
 	uint32_t lookDistance = 0;
 	if(thing == player)
-		lookDistance = -1;
+		lookDistance = 0;
 	else{
 		const Position& LookPos = player->getPosition();
 		const Position& thingMapPos = thing->getPosition();
@@ -3015,8 +3015,8 @@ bool Game::playerLookAt(Player* player, const Position& pos, uint16_t itemId, ui
 		if(LookPos.z != thingMapPos.z)
 			lookDistance = std::abs(LookPos.z - thingMapPos.z) * 2;
 		else
-			lookDistance = std::sqrt( std::pow(std::abs(LookPos.x - thingMapPos.x), 2) +
-			std::pow(std::abs(LookPos.y - thingMapPos.y), 2));
+			lookDistance = std::abs(LookPos.x - thingMapPos.x) +
+				std::abs(LookPos.y - thingMapPos.y);
 	}
 
 	std::stringstream ss;

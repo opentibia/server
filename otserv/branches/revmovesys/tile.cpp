@@ -172,7 +172,7 @@ Teleport* Tile::getTeleportItem() const
 {
 	Teleport* teleport = NULL;
 	for (ItemVector::const_iterator iit = topItems.begin(); iit != topItems.end(); ++iit){
-		teleport = dynamic_cast<Teleport*>(*iit);
+		teleport = (*iit)->getTeleport();
 		if(teleport)
 			return teleport;
 	}
@@ -266,14 +266,14 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 {
 	Thing* iithing = NULL;
 
-	if(dynamic_cast<const Creature*>(thing)){
+	if(thing->getCreature()){
 		if(!creatures.empty())
 			return RET_NOTPOSSIBLE;
 
 		for(uint32_t i = 0; i < getThingCount(); ++i){
 			iithing = __getThing(i);
 
-			if(const Item* iitem = dynamic_cast<const Item*>(iithing)){
+			if(const Item* iitem = iithing->getItem()){
 				const ItemType& iiType = Item::items[iitem->getID()];
 
 				if(iiType.blockSolid)
@@ -293,7 +293,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 		for(uint32_t i = 0; i < getThingCount(); ++i){
 			iithing = __getThing(i);
 
-			if(const Item* iitem = dynamic_cast<const Item*>(iithing)){
+			if(const Item* iitem = iithing->getItem()){
 				const ItemType& iiType = Item::items[iitem->getID()];
 
 				if(item->isPickupable()){
@@ -641,7 +641,7 @@ void Tile::__updateThing(uint32_t index, Thing* thing)
 
 void Tile::__removeThing(Thing* thing, uint32_t count)
 {
-	Creature* creature = dynamic_cast<Creature*>(thing);
+	Creature* creature = thing->getCreature();
 	if(creature){
 		CreatureVector::iterator it = std::find(creatures.begin(), creatures.end(), thing);
 
@@ -796,7 +796,7 @@ void Tile::postAddNotification(const Thing* thing, bool hasOwnership /*= true*/)
 	g_game.getSpectators(Range(cylinderMapPos, true), list);
 
 	for(it = list.begin(); it != list.end(); ++it){
-		if(Player* player = dynamic_cast<Player*>(*it)){
+		if(Player* player = (*it)->getPlayer()){
 			player->postAddNotification(thing, false);
 		}
 	}
@@ -818,7 +818,7 @@ void Tile::postRemoveNotification(const Thing* thing, bool hadOwnership /*= true
 	}
 
 	for(it = list.begin(); it != list.end(); ++it){
-		if(Player* player = dynamic_cast<Player*>(*it)){
+		if(Player* player = (*it)->getPlayer()){
 			player->postRemoveNotification(thing, false);
 		}
 	}
@@ -833,12 +833,12 @@ void Tile::__internalAddThing(uint32_t index, Thing* thing)
 {
 	thing->setParent(this);
 
-	Creature* creature = dynamic_cast<Creature*>(thing);
+	Creature* creature = thing->getCreature();
 	if(creature){
 		creatures.insert(creatures.begin(), creature);
 	}
 	else{
-		Item* item = dynamic_cast<Item*>(thing);
+		Item* item = thing->getItem();
 
 		if(item == NULL)
 			return;

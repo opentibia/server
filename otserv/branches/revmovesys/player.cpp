@@ -152,7 +152,7 @@ Player::~Player()
 		it->second->releaseThing2();
 	}
 	//std::cout << "Player destructor " << this->getID() << std::endl;
-  delete client;
+	delete client;
 }
 
 bool Player::isPushable() const
@@ -983,7 +983,7 @@ Container* Player::getContainer(uint32_t cid)
 	return NULL;
 }
 
-uint32_t Player::getContainerID(const Container* container) const
+int32_t Player::getContainerID(const Container* container) const
 {
   for(ContainerVector::const_iterator cl = containerVec.begin(); cl != containerVec.end(); ++cl){
 	  if(cl->second == container)

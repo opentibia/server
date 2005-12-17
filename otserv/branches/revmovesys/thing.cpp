@@ -16,6 +16,7 @@ Thing::Thing()
 Thing::~Thing()
 {
 	//
+	//std::cout << "thing destructor " << this << std::endl;
 }
 
 void Thing::useThing2()
