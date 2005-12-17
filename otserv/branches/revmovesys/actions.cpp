@@ -1250,24 +1250,6 @@ int ActionScript::luaActionDoPlayerAddItem(lua_State *L)
 			}
 		}
 
-		/*
-		if(!player->addItem(newitem)){
-			//add item on the ground
-			action->game->addThing(NULL, action->_player->getPosition(), newitem);
-			Tile* tile = newitem->getTile();
-			if(tile){
-				pos.stackpos = tile->getThingStackPos(newitem);
-			}
-			else{
-				pos.stackpos = 1;
-			}
-		}
-		
-		pos.x = newitem->pos.x;
-		pos.y = newitem->pos.y;
-		pos.z = newitem->pos.z;
-		*/
-
 		uid = action->AddThingToMap((Thing*)newitem,pos);
 	}
 	else{

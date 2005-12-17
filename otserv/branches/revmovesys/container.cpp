@@ -446,19 +446,6 @@ int32_t Container::__getIndexOfThing(const Thing* thing) const
 	return -1;
 }
 
-Thing* Container::__getThing(uint32_t index)
-{
-	int count = 0;
-	for(ItemList::const_iterator cit = itemlist.begin(); cit != itemlist.end(); ++cit){
-		if(count == index)
-			return *cit;
-		else
-			++count;
-	}
-
-	return NULL;
-}
-
 Thing* Container::__getThing(uint32_t index) const
 {
 	int count = 0;

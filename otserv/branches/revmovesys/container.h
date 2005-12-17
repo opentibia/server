@@ -33,11 +33,11 @@ public:
 	Container(const uint16_t _type);
 	virtual ~Container();
 
-	//virtual Item* getItem() {return Item::getItem();};
-	//virtual const Item* getItem()const {return Item::getItem();};
 	virtual Container* getContainer() {return this;};
 	virtual const Container* getContainer() const {return this;};
 
+	//virtual Item* getItem() {return Item::getItem();};
+	//virtual const Item* getItem()const {return Item::getItem();};
 	//virtual int getThrowRange() const {return Item::getThrowRange();};
 	//virtual bool isPushable() const {return Item::isPushable();};
 	//virtual std::string getDescription(uint32_t lookDistance) const {return Item::getDescription(lookDistance);};
@@ -71,7 +71,6 @@ public:
 	virtual void __removeThing(Thing* thing, uint32_t count);
 
 	virtual int32_t __getIndexOfThing(const Thing* thing) const;
-	Thing* __getThing(uint32_t index);
 	virtual Thing* __getThing(uint32_t index) const;
 
 	virtual void postAddNotification(const Thing* thing, bool hasOwnership = true);

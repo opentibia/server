@@ -1402,7 +1402,7 @@ void Player::onRemoveTileItem(const Position& pos, uint32_t stackpos, const Item
 	checkTradeState(item);
 
 	if(tradeItem){
-		const Container* container = dynamic_cast<const Container*>(item);
+		const Container* container = item->getContainer();
 		if(container && container->isHoldingItem(tradeItem)){
 			g_game.playerCloseTrade(this);
 		}
@@ -1549,7 +1549,7 @@ void Player::onRemoveInventoryItem(slots_t slot, const Item* item)
 	checkTradeState(item);
 
 	if(tradeItem){
-		const Container* container = dynamic_cast<const Container*>(item);
+		const Container* container = item->getContainer();
 		if(container && container->isHoldingItem(tradeItem)){
 			g_game.playerCloseTrade(this);
 		}
@@ -2319,14 +2319,6 @@ int32_t Player::__getIndexOfThing(const Thing* thing) const
 	}
 
 	return -1;
-}
-
-Thing* Player::__getThing(uint32_t index)
-{
-	if(index > SLOT_FIRST && index < SLOT_LAST)
-		return items[index];
-
-	return NULL;
 }
 
 Thing* Player::__getThing(uint32_t index) const

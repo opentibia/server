@@ -312,7 +312,6 @@ protected:
 	virtual void __removeThing(Thing* thing, uint32_t count);
 
 	virtual int32_t __getIndexOfThing(const Thing* thing) const;
-	virtual Thing* __getThing(uint32_t index);
 	virtual Thing* __getThing(uint32_t index) const;
 
 	virtual void __internalAddThing(Thing* thing);

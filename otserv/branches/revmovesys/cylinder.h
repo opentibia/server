@@ -129,7 +129,7 @@ public:
 	  * Gets the object based on index
 	  * \returns the object, returns NULL if not found
 	  */
-	virtual Thing* __getThing(uint32_t index) = 0;
+	//virtual Thing* __getThing(uint32_t index) = 0;
 
 	/**
 	  * Gets the object based on index

@@ -787,30 +787,6 @@ Thing* Tile::__getThing(uint32_t index) const
 	return NULL;
 }
 
-Thing* Tile::__getThing(uint32_t index)
-{
-	if(index == 0)
-		return ground;
-
-	--index;
-
-	if((unsigned) index < topItems.size())
-		return topItems[index];
-
-	index -= (uint32_t)topItems.size();
-
-	if((unsigned) index < creatures.size())
-		return creatures[index];
-
-	index -= (uint32_t)creatures.size();
-
-	if((unsigned) index < downItems.size())
-		return downItems[index];
-
-	return NULL;
-}
-
-
 void Tile::postAddNotification(const Thing* thing, bool hasOwnership /*= true*/)
 {
 	const Position& cylinderMapPos = getPosition();
