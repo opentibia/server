@@ -166,11 +166,10 @@ bool IOMapXML::loadMap(Map* map, std::string identifier){
 				myitem->pos.y = py;
 				myitem->pos.z = pz;		
 			
-      			if (myitem->isAlwaysOnTop())
+				if(myitem->isAlwaysOnTop())
 					t->topItems.push_back(myitem);
 				else
 					t->downItems.push_back(myitem);
-				
 			}
 			p = p->next;
 		}

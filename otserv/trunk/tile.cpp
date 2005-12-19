@@ -472,8 +472,8 @@ Item* Tile::getTopDownItem()
 
 Item* Tile::getTopTopItem()
 {
-	if(topItems.begin() != topItems.end()) {
-		return *(topItems.begin());
+	if(!topItems.empty()){
+		return topItems.back();
 	}
 
 	return NULL;
@@ -540,7 +540,8 @@ void Tile::addThing(Thing *thing) {
 	}
     else if (item->isAlwaysOnTop())
     {
-      topItems.insert(topItems.begin(), item);
+      //topItems.insert(topItems.begin(), item);
+			topItems.push_back(item);
     }
     else
     {
