@@ -137,7 +137,7 @@ public:
   }
   
 	void setWorldType(enum_world_type type);
-  enum_world_type getWorldType() const {return worldType;}
+	enum_world_type getWorldType() const {return worldType;}
 	const std::string& getSpawnFile() {return map->spawnfile;}
 
 	Cylinder* internalGetCylinder(Player* player, const Position& pos);
@@ -215,9 +215,9 @@ public:
 
 	bool playerWhisper(Player* player, const std::string& text);
 	bool playerYell(Player* player, std::string& text);
-  bool playerSpeakTo(Player* player, SpeakClasses type, const std::string& receiver, const std::string& text);
+	bool playerSpeakTo(Player* player, SpeakClasses type, const std::string& receiver, const std::string& text);
 	bool playerBroadcastMessage(Player* player, const std::string& text);
-  bool playerTalkToChannel(Player *player, SpeakClasses type, std::string &text, unsigned short channelId);
+	bool playerTalkToChannel(Player *player, SpeakClasses type, std::string &text, unsigned short channelId);
 	void creatureMonsterYell(Monster* monster, const std::string& text);
 	void creatureChangeOutfit(Creature *creature);
 
@@ -243,19 +243,19 @@ public:
 	
 	void playerSetAttackedCreature(Player* player, unsigned long creatureid);
 
-  void changeOutfitAfter(unsigned long id, int looktype, long time);
-  void changeSpeed(unsigned long id, unsigned short speed);
+	void changeOutfitAfter(unsigned long id, int looktype, long time);
+	void changeSpeed(unsigned long id, unsigned short speed);
 	unsigned long addEvent(SchedulerTask*);
 	bool stopEvent(unsigned long eventid);
 
-	void teleport(Thing *thing, const Position& newPos);
+	bool teleport(Thing *thing, const Position& newPos);
       
-  std::vector<Player*> BufferedPlayers;   
-  void flushSendBuffers();
-  void addPlayerBuffer(Player* p);
+	std::vector<Player*> BufferedPlayers;   
+	void flushSendBuffers();
+	void addPlayerBuffer(Player* p);
   
-  std::vector<Thing*> ToReleaseThings;   
-  void FreeThing(Thing* thing);
+	std::vector<Thing*> ToReleaseThings;   
+	void FreeThing(Thing* thing);
 		
 	Creature* getCreatureByID(unsigned long id);
 	Player* getPlayerByID(unsigned long id);
@@ -271,7 +271,7 @@ public:
 	bool requestAddVip(Player* player, const std::string &vip_name);
 
 	/** Lockvar for Game. */
-  OTSYS_THREAD_LOCKVAR gameLock; 
+	OTSYS_THREAD_LOCKVAR gameLock; 
   
 
 protected:
