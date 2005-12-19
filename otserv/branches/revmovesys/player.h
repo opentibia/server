@@ -24,6 +24,7 @@
 #include "definitions.h"
 #include "creature.h"
 #include "container.h"
+#include "depot.h"
 #include "cylinder.h"
 
 #include <vector>
@@ -93,7 +94,7 @@ enum trade_state {
 
 typedef std::pair<unsigned long, Container*> containervector_pair;
 typedef std::vector<containervector_pair> ContainerVector;
-typedef std::map<unsigned long, Container*> DepotMap;
+typedef std::map<unsigned long, Depot*> DepotMap;
 typedef std::map<unsigned long,long> StorageMap;
 typedef std::set<unsigned long> VIPListSet;
 
@@ -200,12 +201,12 @@ public:
 	void preSave();
 
 	unsigned long getIP() const;
-	Container* getDepot(unsigned long depotId);
-	bool addDepot(Container* depot,unsigned long depotIs);
+	Depot* getDepot(uint32_t depotId);
+	bool addDepot(Depot* depot, uint32_t depotId);
 
 	//depots	
 	DepotMap depots;
-	long max_depot_items;
+	//long max_depot_items;
 	
 	//virtual void removeDistItem();
 	fight_t getFightType();
@@ -261,9 +262,7 @@ public:
 	
 	virtual void onCreatureAppear(const Creature* creature, bool isLogin);
 	virtual void onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout);
-
-	virtual void onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos);
-	virtual void onTeleport(const Creature* creature, const Position& oldPos, uint32_t oldStackPos);
+	virtual void onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport);
 
 	virtual void onCreatureTurn(const Creature *creature, uint32_t stackpos);
 	virtual void onCreatureSay(const Creature *creature, SpeakClasses type, const std::string &text);
@@ -283,8 +282,8 @@ public:
 	void onUpdateInventoryItem(slots_t slot, const Item* oldItem, const Item* newItem);
 	void onRemoveInventoryItem(slots_t slot, const Item* item);
 
-	virtual void postAddNotification(const Thing* thing, bool hasOwnership = true);
-	virtual void postRemoveNotification(const Thing* thing, bool hadOwnership = true);
+	virtual void postAddNotification(Thing* thing, bool hasOwnership = true);
+	virtual void postRemoveNotification(Thing* thing, bool hadOwnership = true);
 
 protected:
 	void checkTradeState(const Item* item);
@@ -295,7 +294,7 @@ protected:
 
 	bool hasCapacity(const Item* item, uint32_t count) const;
 
-	//
+	//cylinder implementations
 	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,
 		bool childIsOwner = false) const;
 	virtual ReturnValue __queryMaxCount(int32_t index, const Thing* thing, uint32_t count,

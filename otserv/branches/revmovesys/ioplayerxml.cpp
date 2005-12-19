@@ -146,13 +146,13 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name){
 		else
 			isLoaded = false;
 
-		nodeValue = (char*)xmlGetProp(root, (const xmlChar *) "maxdepotitems");
+		/*nodeValue = (char*)xmlGe tProp(root, (const xmlChar *) "maxdepotitems");
 		if(nodeValue) {
 			player->max_depot_items = atoi(nodeValue);
 			xmlFreeOTSERV(nodeValue);
 		}
 		else
-			isLoaded = false;
+			isLoaded = false;*/
 
 		player->setNormalSpeed();
 		
@@ -436,15 +436,6 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name){
 						if(container){							
 							LoadContainer(slot->children, container);
 						}
-
-						//we dont want to sendinventory before login
-						/*
-						player->addItemInventory(myitem, sl_id, true);
-						Container* default_container = dynamic_cast<Container*>(myitem);
-						if(default_container){							
-							LoadContainer(slot->children,default_container);
-						}
-						*/
 					}
 					slot=slot->next;
 				}
@@ -456,12 +447,12 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name){
 				{
 					if (strcmp((const char*)slot->name, "depot") == 0)
 					{
-						int dp_id = 0;
+						int depotId = 0;
 						unsigned int id = 0;
 						
 						nodeValue = (char*)xmlGetProp(slot, (const xmlChar *)"depotid");
 						if(nodeValue) {
-							dp_id = atoi(nodeValue);
+							depotId = atoi(nodeValue);
 							xmlFreeOTSERV(nodeValue);
 						}
 						else
@@ -475,16 +466,12 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name){
 						else
 							isLoaded = false;
 
-						Item* myitem = Item::CreateItem(id);
-						myitem->unserialize(slot->children);
-						Container* default_container = dynamic_cast<Container*>(myitem);
-						if(default_container){							
-							player->addDepot(default_container , dp_id);
-							LoadContainer(slot->children,default_container);
-						}
-						else{
-							delete myitem;
-						}							
+						Depot* myDepot = new Depot(id);
+						myDepot->useThing2();
+						myDepot->unserialize(slot->children);
+
+						player->addDepot(myDepot, depotId);
+						LoadContainer(slot->children, myDepot);
 					}
 				slot=slot->next;
 				}

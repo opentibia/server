@@ -24,11 +24,10 @@
 
 extern Game g_game;
 
-Container::Container(const uint16_t _type) : Item(_type)
+Container::Container(uint16_t _type) : Item(_type)
 {
 	//std::cout << "Container constructor " << this << std::endl;
 	maxSize = items[this->getID()].maxItems;
-	depotId = 0;
 }
 
 Container::~Container()
@@ -461,12 +460,12 @@ Thing* Container::__getThing(uint32_t index) const
 	return NULL;
 }
 
-void Container::postAddNotification(const Thing* thing, bool hasOwnership /*= true*/)
+void Container::postAddNotification(Thing* thing, bool hasOwnership /*= true*/)
 {
 	getParent()->postAddNotification(thing, hasOwnership);
 }
 
-void Container::postRemoveNotification(const Thing* thing, bool hadOwnership /*= true*/)
+void Container::postRemoveNotification(Thing* thing, bool hadOwnership /*= true*/)
 {
 	getParent()->postRemoveNotification(thing, hadOwnership);
 }

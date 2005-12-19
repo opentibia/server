@@ -132,7 +132,7 @@ Creature()
  	HPGain[3]   = 10;
  	HPGain[4]   = 15;  
  	*/
- 	max_depot_items = 1000;
+ 	//max_depot_items = 1000;
  	
  	manaTick = 0;
  	healthTick = 0;
@@ -1227,7 +1227,7 @@ void Player::setAcceptTrade(bool b)
 	}
 }
 
-Container* Player::getDepot(unsigned long depotId)
+Depot* Player::getDepot(uint32_t depotId)
 {	
 	DepotMap::iterator it = depots.find(depotId);
 	if(it != depots.end()){	
@@ -1236,8 +1236,16 @@ Container* Player::getDepot(unsigned long depotId)
 	return NULL;
 }
 
-bool Player::addDepot(Container* depot,unsigned long depotId)
+bool Player::addDepot(Depot* depot, uint32_t depotId)
 {
+	Depot* depot2 = getDepot(depotId);
+	if(depot2){
+		return false;
+	}
+	
+	depots[depotId] = depot;
+	return true;
+
 	/*
 	Container *bdep = getDepot(depotId);
 	if(bdep)
@@ -1449,9 +1457,9 @@ void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bo
 	}
 }
 
-void Player::onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos)
+void Player::onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport)
 {
-	client->sendMoveCreature(creature, oldPos, oldStackPos);
+	client->sendMoveCreature(creature, oldPos, oldStackPos, teleport);
 
 	if((creature == this && attackedCreature2) || attackedCreature2 == creature){
 		if((std::abs(getPosition().x - attackedCreature2->getPosition().x) > 7) ||
@@ -1614,11 +1622,6 @@ int Player::onThink(int& newThinkTicks)
 {
 	newThinkTicks = 1000;
 	return 1000;
-}
-
-void Player::onTeleport(const Creature* creature, const Position& oldPos, uint32_t oldStackPos)
-{ 
-  //client->sendThingMove(creature, creature,oldPos, oldstackpos, true, 1, 1);
 }
 
 void Player::addManaSpent(unsigned long spent)
@@ -2329,7 +2332,7 @@ Thing* Player::__getThing(uint32_t index) const
 	return NULL;
 }
 
-void Player::postAddNotification(const Thing* thing, bool hasOwnership /*= true*/)
+void Player::postAddNotification(Thing* thing, bool hasOwnership /*= true*/)
 {
 	if(hasOwnership){
 		updateInventoryWeigth();
@@ -2357,13 +2360,13 @@ void Player::postAddNotification(const Thing* thing, bool hasOwnership /*= true*
 				autoCloseContainers(*it);
 			}
 		}
-		else{
-			//check target lost
-		}
+		//else{
+		//	//check target lost
+		//}
 	}
 }
 
-void Player::postRemoveNotification(const Thing* thing, bool hadOwnership /*= true*/)
+void Player::postRemoveNotification(Thing* thing, bool hadOwnership /*= true*/)
 {
 	if(hadOwnership){
 		updateInventoryWeigth();

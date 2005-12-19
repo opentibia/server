@@ -1470,58 +1470,65 @@ void Protocol75::sendRemoveCreature(const Creature* creature, const Position& po
 	}
 }
 
-void Protocol75::sendMoveCreature(const Creature* creature, const Position& oldPos, uint32_t oldStackPos)
+void Protocol75::sendMoveCreature(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport)
 {
 	const Position& newPos = creature->getPosition();
 
 	if(creature == player){
 		NetworkMessage msg;
 
-		if(oldPos.z == 7 && newPos.z >= 8){
+		if(teleport){
 			RemoveTileItem(msg, oldPos, oldStackPos);
+			AddMapDescription(msg, player->getPosition());
+			AddMagicEffect(msg, player->getPosition(), NM_ME_ENERGY_AREA);
 		}
 		else{
-			if(oldStackPos < 10){
-				msg.AddByte(0x6D);
-				msg.AddPosition(oldPos);
-				msg.AddByte(oldStackPos);
-				msg.AddPosition(creature->getPosition());
+			if(oldPos.z == 7 && newPos.z >= 8){
+				RemoveTileItem(msg, oldPos, oldStackPos);
 			}
-		}
+			else{
+				if(oldStackPos < 10){
+					msg.AddByte(0x6D);
+					msg.AddPosition(oldPos);
+					msg.AddByte(oldStackPos);
+					msg.AddPosition(creature->getPosition());
+				}
+			}
 
-		//floor change down
-		if(newPos.z > oldPos.z){
-			MoveDownCreature(msg, creature, newPos, oldPos, oldStackPos);
-		}
-		//floor change up
-		else if(newPos.z < oldPos.z){
-			MoveUpCreature(msg, creature, newPos, oldPos, oldStackPos);
-		}
+			//floor change down
+			if(newPos.z > oldPos.z){
+				MoveDownCreature(msg, creature, newPos, oldPos, oldStackPos);
+			}
+			//floor change up
+			else if(newPos.z < oldPos.z){
+				MoveUpCreature(msg, creature, newPos, oldPos, oldStackPos);
+			}
 
-		if(oldPos.y > newPos.y){ // north, for old x
-			msg.AddByte(0x65);
-			GetMapDescription(oldPos.x - 8, newPos.y - 6, newPos.z, 18, 1, msg);
-		}
-		else if(oldPos.y < newPos.y){ // south, for old x
-			msg.AddByte(0x67);
-			GetMapDescription(oldPos.x - 8, newPos.y + 7, newPos.z, 18, 1, msg);
-		}
+			if(oldPos.y > newPos.y){ // north, for old x
+				msg.AddByte(0x65);
+				GetMapDescription(oldPos.x - 8, newPos.y - 6, newPos.z, 18, 1, msg);
+			}
+			else if(oldPos.y < newPos.y){ // south, for old x
+				msg.AddByte(0x67);
+				GetMapDescription(oldPos.x - 8, newPos.y + 7, newPos.z, 18, 1, msg);
+			}
 
-		if(oldPos.x < newPos.x){ // east, [with new y]
-			msg.AddByte(0x66);
-			GetMapDescription(newPos.x + 9, newPos.y - 6, newPos.z, 1, 14, msg);
-		}
-		else if(oldPos.x > newPos.x){ // west, [with new y]
-			msg.AddByte(0x68);
-			GetMapDescription(newPos.x - 8, newPos.y - 6, newPos.z, 1, 14, msg);
+			if(oldPos.x < newPos.x){ // east, [with new y]
+				msg.AddByte(0x66);
+				GetMapDescription(newPos.x + 9, newPos.y - 6, newPos.z, 1, 14, msg);
+			}
+			else if(oldPos.x > newPos.x){ // west, [with new y]
+				msg.AddByte(0x68);
+				GetMapDescription(newPos.x - 8, newPos.y - 6, newPos.z, 1, 14, msg);
+			}
 		}
 
 		WriteBuffer(msg);
 	}
 	else if(CanSee(oldPos) && CanSee(creature->getPosition())){
-		if(oldPos.z == 7 && newPos.z >= 8){
+		if(teleport || (oldPos.z == 7 && newPos.z >= 8)){
 			sendRemoveCreature(creature, oldPos, oldStackPos, false);
-			sendAddCreature(creature, false);
+			sendAddCreature(creature, teleport);
 		}
 		else{
 			if(oldStackPos < 10){

@@ -26,6 +26,8 @@
 #include "npc.h"
 #include "game.h"
 #include "item.h"
+#include "container.h"
+#include "depot.h"
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h> 
@@ -223,7 +225,13 @@ bool Actions::UseItem(Player* player, const Position &pos,const unsigned char st
 		return false;
 	}
 	
-	Item *item = game->internalGetThing(player, pos, stack)->getItem();
+	Thing* thing = game->internalGetThing(player, pos, stack);
+	if(!thing){
+		player->sendCancel("Sorry not possible.");
+		return false;
+	}
+
+	Item *item = thing->getItem();
 
 	if(!item){
 		#ifdef __DEBUG__
@@ -267,7 +275,18 @@ bool Actions::UseItem(Player* player, const Position &pos,const unsigned char st
 
 bool Actions::openContainer(Player* player,Container* container, const unsigned char index)
 {
-	//if(container->depotId == 0){ //normal container
+	//depot container
+	if(Depot* depot = container->getDepot()){
+		Depot* myDepot = player->getDepot(depot->getDepotId());
+		if(myDepot){
+			myDepot->setParent(depot->getParent());
+			player->addContainer(index, myDepot);
+			player->onSendContainer(myDepot);
+			return true;
+		}
+	}
+	//normal container
+	else{
 		int32_t oldcid = player->getContainerID(container);
 		if(oldcid != -1) {
 			player->onCloseContainer(container);
@@ -277,22 +296,10 @@ bool Actions::openContainer(Player* player,Container* container, const unsigned 
 			player->addContainer(index, container);
 			player->onSendContainer(container);
 		}
-	//}
-
-	/*
-	else{// depot container
-		Container *container2 = player->getDepot(container->depotId);
-		if(container2){
-			//update depot coordinates					
-			//container2->pos = container->pos;
-			player->sendContainer(index, container2);
-		}
-		else{
-			return false;
-		}
+		return true;
 	}
-	*/
-	return true;
+
+	return false;
 }
 
 bool Actions::UseItemEx(Player* player, const Position &from_pos,

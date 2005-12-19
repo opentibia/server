@@ -261,6 +261,44 @@ void Tile::setPz()
 	pz = true;
 }
 
+void Tile::moveCreature(Creature* creature, Cylinder* toCylinder, bool teleport /* = false*/)
+{
+	int32_t oldStackPos = __getIndexOfThing(creature);
+
+	//remove the creature
+	__removeThing(creature, 0);
+
+	//add the creature
+	toCylinder->__addThing(creature);
+
+	Position fromPos = getPosition();
+	Position toPos = toCylinder->getPosition();
+
+	if(!teleport){
+		if(fromPos.y > toPos.y)
+			creature->setDirection(NORTH);
+		else if(fromPos.y < toPos.y)
+			creature->setDirection(SOUTH);
+		if(fromPos.x < toPos.x)
+			creature->setDirection(EAST);
+		else if(fromPos.x > toPos.x)
+			creature->setDirection(WEST);
+	}
+
+	SpectatorVec list;
+	SpectatorVec::iterator it;
+	g_game.getSpectators(Range(fromPos, true), list);
+	g_game.getSpectators(Range(toPos, true), list);
+
+	//send change to client
+	for(it = list.begin(); it != list.end(); ++it) {
+		(*it)->onCreatureMove(creature, fromPos, oldStackPos, teleport);
+	}
+
+	toCylinder->postAddNotification(creature);
+	postRemoveNotification(creature);
+}
+
 ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 	bool childIsOwner /*= false*/) const
 {
@@ -343,76 +381,66 @@ ReturnValue Tile::__queryRemove(const Thing* thing, uint32_t count) const
 
 Cylinder* Tile::__queryDestination(int32_t& index, const Thing* thing, Item** destItem)
 {
-	Teleport* teleport = getTeleportItem();
-
 	Tile* destTile = this;
 	*destItem = NULL;
 
-	if(teleport){
-		destTile = g_game.getTile(teleport->getDestPos().x, teleport->getDestPos().y, teleport->getDestPos().z);
-		if(destTile == NULL){
-			destTile = this;
+	if(destTile->floorChange()){
+		if(destTile->floorChange(NORTH) && destTile->floorChange(EAST)){
+			destTile = g_game.getTile(getTilePosition().x + 1, getTilePosition().y - 1, getTilePosition().z - 1);
 		}
+		else if(destTile->floorChange(NORTH) && destTile->floorChange(WEST)){
+			destTile = g_game.getTile(getTilePosition().x - 1, getTilePosition().y - 1, getTilePosition().z - 1);
+		}
+		else if(destTile->floorChange(SOUTH) && destTile->floorChange(EAST)){
+			destTile = g_game.getTile(getTilePosition().x + 1, getTilePosition().y + 1, getTilePosition().z - 1);
+		}
+		else if(destTile->floorChange(SOUTH) && destTile->floorChange(WEST)){
+			destTile = g_game.getTile(getTilePosition().x - 1, getTilePosition().y + 1, getTilePosition().z - 1);
+		}
+		else if(destTile->floorChange(NORTH)){
+			destTile = g_game.getTile(getTilePosition().x, getTilePosition().y - 1, getTilePosition().z - 1);
+		}
+		else if(destTile->floorChange(SOUTH)){
+			destTile = g_game.getTile(getTilePosition().x, getTilePosition().y + 1, getTilePosition().z - 1);
+		}
+		else if(destTile->floorChange(EAST)){
+			destTile = g_game.getTile(getTilePosition().x + 1, getTilePosition().y, getTilePosition().z - 1);
+		}
+		else if(destTile->floorChange(WEST)){
+			destTile = g_game.getTile(getTilePosition().x - 1, getTilePosition().y, getTilePosition().z - 1);
+		}                                      
 	}
-	else{
-		if(destTile->floorChange()){
-			if(destTile->floorChange(NORTH) && destTile->floorChange(EAST)){
-				destTile = g_game.getTile(getTilePosition().x + 1, getTilePosition().y - 1, getTilePosition().z - 1);
-			}
-			else if(destTile->floorChange(NORTH) && destTile->floorChange(WEST)){
-				destTile = g_game.getTile(getTilePosition().x - 1, getTilePosition().y - 1, getTilePosition().z - 1);
-			}
-			else if(destTile->floorChange(SOUTH) && destTile->floorChange(EAST)){
-				destTile = g_game.getTile(getTilePosition().x + 1, getTilePosition().y + 1, getTilePosition().z - 1);
-			}
-			else if(destTile->floorChange(SOUTH) && destTile->floorChange(WEST)){
-				destTile = g_game.getTile(getTilePosition().x - 1, getTilePosition().y + 1, getTilePosition().z - 1);
-			}
-			else if(destTile->floorChange(NORTH)){
-				destTile = g_game.getTile(getTilePosition().x, getTilePosition().y - 1, getTilePosition().z - 1);
-			}
-			else if(destTile->floorChange(SOUTH)){
-				destTile = g_game.getTile(getTilePosition().x, getTilePosition().y + 1, getTilePosition().z - 1);
-			}
-			else if(destTile->floorChange(EAST)){
-				destTile = g_game.getTile(getTilePosition().x + 1, getTilePosition().y, getTilePosition().z - 1);
-			}
-			else if(destTile->floorChange(WEST)){
-				destTile = g_game.getTile(getTilePosition().x - 1, getTilePosition().y, getTilePosition().z - 1);
-			}                                      
+
+	if(destTile->floorChangeDown()){
+		destTile = g_game.getTile(getTilePosition().x, getTilePosition().y, getTilePosition().z + 1);
+
+		if(destTile == NULL){
+			return this;
 		}
 
-		if(destTile->floorChangeDown()){
-			destTile = g_game.getTile(getTilePosition().x, getTilePosition().y, getTilePosition().z + 1);
-
-			if(destTile == NULL){
-				return this;
-			}
-
-			if(destTile->floorChange(NORTH) && destTile->floorChange(EAST)){
-				destTile = g_game.getTile(getTilePosition().x - 2, getTilePosition().y + 2, getTilePosition().z + 1);
-			}
-			else if(destTile->floorChange(NORTH) && destTile->floorChange(WEST)){
-				destTile = g_game.getTile(getTilePosition().x + 2, getTilePosition().y + 2, getTilePosition().z + 1);
-			}
-			else if(destTile->floorChange(SOUTH) && destTile->floorChange(EAST)){
-				destTile = g_game.getTile(getTilePosition().x - 2, getTilePosition().y - 2, getTilePosition().z + 1);
-			}
-			else if(destTile->floorChange(SOUTH) && destTile->floorChange(WEST)){
-				destTile = g_game.getTile(getTilePosition().x + 2, getTilePosition().y - 2, getTilePosition().z + 1);
-			}
-			else if(destTile->floorChange(NORTH)){
-				destTile = g_game.getTile(getTilePosition().x, getTilePosition().y + 1, getTilePosition().z + 1);
-			}
-			else if(destTile->floorChange(SOUTH)){
-				destTile = g_game.getTile(getTilePosition().x, getTilePosition().y - 1, getTilePosition().z + 1);
-			}
-			else if(destTile->floorChange(EAST)){
-				destTile = g_game.getTile(getTilePosition().x - 1, getTilePosition().y, getTilePosition().z + 1);
-			}
-			else if(destTile->floorChange(WEST)){
-				destTile = g_game.getTile(getTilePosition().x + 1, getTilePosition().y, getTilePosition().z + 1);
-			}
+		if(destTile->floorChange(NORTH) && destTile->floorChange(EAST)){
+			destTile = g_game.getTile(getTilePosition().x - 2, getTilePosition().y + 2, getTilePosition().z + 1);
+		}
+		else if(destTile->floorChange(NORTH) && destTile->floorChange(WEST)){
+			destTile = g_game.getTile(getTilePosition().x + 2, getTilePosition().y + 2, getTilePosition().z + 1);
+		}
+		else if(destTile->floorChange(SOUTH) && destTile->floorChange(EAST)){
+			destTile = g_game.getTile(getTilePosition().x - 2, getTilePosition().y - 2, getTilePosition().z + 1);
+		}
+		else if(destTile->floorChange(SOUTH) && destTile->floorChange(WEST)){
+			destTile = g_game.getTile(getTilePosition().x + 2, getTilePosition().y - 2, getTilePosition().z + 1);
+		}
+		else if(destTile->floorChange(NORTH)){
+			destTile = g_game.getTile(getTilePosition().x, getTilePosition().y + 1, getTilePosition().z + 1);
+		}
+		else if(destTile->floorChange(SOUTH)){
+			destTile = g_game.getTile(getTilePosition().x, getTilePosition().y - 1, getTilePosition().z + 1);
+		}
+		else if(destTile->floorChange(EAST)){
+			destTile = g_game.getTile(getTilePosition().x - 1, getTilePosition().y, getTilePosition().z + 1);
+		}
+		else if(destTile->floorChange(WEST)){
+			destTile = g_game.getTile(getTilePosition().x + 1, getTilePosition().y, getTilePosition().z + 1);
 		}
 	}
 
@@ -649,7 +677,7 @@ void Tile::__removeThing(Thing* thing, uint32_t count)
 #ifdef __DEBUG__
 		std::cout << "Failure: [Tile::__removeThing] creature not found" << std::endl;
 #endif
-		return /*RET_NOTPOSSIBLE*/;
+		return; //RET_NOTPOSSIBLE;
 		}
 
 		creatures.erase(it);
@@ -787,7 +815,7 @@ Thing* Tile::__getThing(uint32_t index) const
 	return NULL;
 }
 
-void Tile::postAddNotification(const Thing* thing, bool hasOwnership /*= true*/)
+void Tile::postAddNotification(Thing* thing, bool hasOwnership /*= true*/)
 {
 	const Position& cylinderMapPos = getPosition();
 
@@ -800,9 +828,15 @@ void Tile::postAddNotification(const Thing* thing, bool hasOwnership /*= true*/)
 			player->postAddNotification(thing, false);
 		}
 	}
+
+	//do action(s)
+	Teleport* teleport = getTeleportItem();
+	if(teleport){
+		teleport->__addThing(thing);
+	}
 }
 
-void Tile::postRemoveNotification(const Thing* thing, bool hadOwnership /*= true*/)
+void Tile::postRemoveNotification(Thing* thing, bool hadOwnership /*= true*/)
 {
 	const Position& cylinderMapPos = getPosition();
 

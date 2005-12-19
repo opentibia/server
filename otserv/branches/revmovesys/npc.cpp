@@ -254,12 +254,7 @@ void Npc::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool 
 	script->onCreatureDisappear(creature->getID());
 }
 
-void Npc::onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos)
-{
-	//not implemented yet
-}
-
-void Npc::onTeleport(const Creature* creature, const Position& oldPos, uint32_t oldStackPos)
+void Npc::onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport)
 {
 	//not implemented yet
 }

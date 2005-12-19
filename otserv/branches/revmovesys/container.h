@@ -27,20 +27,18 @@
 
 typedef std::list<Item *> ItemList;
 
+class Depot;
+
 class Container : public Item, public Cylinder
 {
 public:
-	Container(const uint16_t _type);
+	Container(uint16_t _type);
 	virtual ~Container();
 
 	virtual Container* getContainer() {return this;};
 	virtual const Container* getContainer() const {return this;};
-
-	//virtual Item* getItem() {return Item::getItem();};
-	//virtual const Item* getItem()const {return Item::getItem();};
-	//virtual int getThrowRange() const {return Item::getThrowRange();};
-	//virtual bool isPushable() const {return Item::isPushable();};
-	//virtual std::string getDescription(int32_t lookDistance) const {return Item::getDescription(lookDistance);};
+	virtual Depot* getDepot() {return NULL;};
+	virtual const Depot* getDepot() const {return NULL;};
 
 	uint32_t size() const {return (uint32_t)itemlist.size();};
 	uint32_t capacity() const {return maxSize;};
@@ -54,7 +52,7 @@ public:
 	uint32_t getItemHoldingCount() const;
 	virtual double getWeight() const;
 
-	//
+	//cylinder implementations
 	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,
 		bool childIsOwner = false) const;
 	virtual ReturnValue __queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
@@ -73,14 +71,14 @@ public:
 	virtual int32_t __getIndexOfThing(const Thing* thing) const;
 	virtual Thing* __getThing(uint32_t index) const;
 
-	virtual void postAddNotification(const Thing* thing, bool hasOwnership = true);
-	virtual void postRemoveNotification(const Thing* thing, bool hadOwnership = true);
+	virtual void postAddNotification(Thing* thing, bool hasOwnership = true);
+	virtual void postRemoveNotification(Thing* thing, bool hadOwnership = true);
 
 	virtual void __internalAddThing(Thing* thing);
 	virtual void __internalAddThing(uint32_t index, Thing* thing);
 
-private:
-	uint32_t depotId;
+protected:
+	//uint32_t depotId;
 	uint32_t maxSize; //number of max items in container  
 
 	ItemList itemlist;

@@ -19,8 +19,8 @@
 //////////////////////////////////////////////////////////////////////
 
 
-#ifndef __actions_h_
-#define __actions_h_
+#ifndef __ACTIONS_H__
+#define __ACTIONS_H__
 
 #include "position.h"
 
@@ -41,7 +41,10 @@ extern "C"
 class Player;
 class Npc;
 class Monster;
+class Thing;
 class Item;
+class Container;
+class Depot;
 class Game;
 class ActionScript;
 class Action;
@@ -231,4 +234,4 @@ protected:
 	
 };
 
-#endif // __actions_h_
+#endif

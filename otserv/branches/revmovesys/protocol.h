@@ -58,7 +58,8 @@ public:
 
 	virtual void sendAddCreature(const Creature* creature, bool isLogin) = 0;
 	virtual void sendRemoveCreature(const Creature* creature, const Position& pos, uint32_t stackpos, bool isLogout) = 0;
-	virtual void sendMoveCreature(const Creature* creature, const Position& oldPos, uint32_t oldStackPos) = 0;
+	virtual void sendMoveCreature(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport) = 0;
+	//virtual void sendTeleportCreature(const Creature* creature, const Position& oldPos, uint32_t oldStackPos) = 0;
 
 	//container
 	virtual void sendAddContainerItem(uint8_t cid, const Item* item) = 0;

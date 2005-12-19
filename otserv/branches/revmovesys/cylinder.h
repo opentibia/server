@@ -108,7 +108,7 @@ public:
 	  * \param hasOwnership if this value is true the cylinder (or its children) has added the object to itself
 		* otherwise another cylinder (like Tile class and wish to inform this change) has sent the message.
 	  */
-	virtual void postAddNotification(const Thing* thing, bool hasOwnership = true) = 0;
+	virtual void postAddNotification(Thing* thing, bool hasOwnership = true) = 0;
 
 	/**
 	  * Is sent after an operation (move/remove) to update internal values
@@ -116,7 +116,7 @@ public:
 	  * \param hadOwnership if this value is true the cylinder (or its children) has removed the object from itself
 		* otherwise another cylinder (like Tile class and wish to inform this change) has sent the message.
 	  */
-	virtual void postRemoveNotification(const Thing* thing, bool hadOwnership = true) = 0;
+	virtual void postRemoveNotification(Thing* thing, bool hadOwnership = true) = 0;
 
 	/**
 	  * Gets the index of an object

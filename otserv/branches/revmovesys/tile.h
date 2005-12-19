@@ -26,6 +26,7 @@
 
 #include "item.h"
 #include "cylinder.h"
+#include "teleport.h"
 #include "magic.h"
 
 #include "definitions.h"
@@ -89,7 +90,9 @@ public:
   
   virtual std::string getDescription(int32_t lookDistance) const;
 
-	//
+	void moveCreature(Creature* creature, Cylinder* toCylinder, bool teleport = false);
+
+	//cylinder implementations
 	virtual ReturnValue __queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
 		uint32_t& maxQueryCount) const;
 	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,
@@ -108,8 +111,8 @@ public:
 	virtual int32_t __getIndexOfThing(const Thing* thing) const;
 	virtual Thing* __getThing(uint32_t index) const;
 
-	virtual void postAddNotification(const Thing* thing, bool hasOwnership = true);
-	virtual void postRemoveNotification(const Thing* thing, bool hadOwnership = true);
+	virtual void postAddNotification(Thing* thing, bool hasOwnership = true);
+	virtual void postRemoveNotification(Thing* thing, bool hadOwnership = true);
 
 	virtual void __internalAddThing(Thing* thing);
 	virtual void __internalAddThing(uint32_t index, Thing* thing);

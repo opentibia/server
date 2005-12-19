@@ -690,7 +690,7 @@ void Monster::onCreatureDisappear(const Creature* creature, uint32_t stackpos, b
 	creatureLeave(creature);
 }
 
-void Monster::onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos)
+void Monster::onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport)
 {
 	if(creature != this) {
 		creatureMove(creature, oldPos);
@@ -699,6 +699,7 @@ void Monster::onCreatureMove(const Creature* creature, const Position& oldPos, u
 		reThink();
 }
 
+/*
 void Monster::onTeleport(const Creature* creature, const Position& oldPos, uint32_t oldStackPos)
 {
 	if(creature == this) {
@@ -713,6 +714,7 @@ void Monster::onTeleport(const Creature* creature, const Position& oldPos, uint3
 		creatureMove(creature, oldPos);
 	}
 }
+*/
 
 void Monster::creatureMove(const Creature* creature, const Position& oldPos)
 {

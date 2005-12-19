@@ -156,7 +156,8 @@ private:
 
 	virtual void sendAddCreature(const Creature* creature, bool isLogin);
 	virtual void sendRemoveCreature(const Creature* creature, const Position& pos, uint32_t stackpos, bool isLogout);
-	virtual void sendMoveCreature(const Creature* creature, const Position& oldPos, uint32_t oldStackPos);
+	virtual void sendMoveCreature(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport);
+	//virtual void sendTeleportCreature(const Creature* creature, const Position& oldPos, uint32_t oldStackPos);
 
 	//containers
 	void sendAddContainerItem(uint8_t cid, const Item* item);

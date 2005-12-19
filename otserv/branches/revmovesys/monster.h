@@ -134,9 +134,7 @@ protected:
 
 	virtual void onCreatureAppear(const Creature* creature, bool isLogin);
 	virtual void onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout);
-	
-	virtual void onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos);
-	virtual void onTeleport(const Creature* creature, const Position& oldPos, uint32_t oldStackPos);
+	virtual void onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport);
 
 	virtual bool isAttackable() const { return true; };
 	

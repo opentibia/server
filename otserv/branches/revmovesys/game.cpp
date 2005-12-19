@@ -917,9 +917,10 @@ void Game::moveCreature(Player* player, Cylinder* fromCylinder, Cylinder* toCyli
 		ret = RET_NOTPOSSIBLE;
 	}
 
-	if(!moveCreature->isPushable()){
+	if(!moveCreature->isPushable() && player->access < moveCreature->access){
 		ret = RET_NOTMOVEABLE;
 	}
+
 	if(player->getPosition().z != fromCylinder->getPosition().z){
 		ret = RET_NOTPOSSIBLE;
 	}
@@ -1015,74 +1016,13 @@ ReturnValue Game::internalCreatureMove(Creature* creature, Cylinder* fromCylinde
 		return ret;
 	}
 
-	int32_t oldStackPos = fromCylinder->__getIndexOfThing(creature);
-
-	//remove the creature
-	fromCylinder->__removeThing(creature, 0);
-
-	//add the creature
-	toCylinder->__addThing(creature);
-
-	Position fromPos = fromCylinder->getPosition();
-	Position toPos = toCylinder->getPosition();
-
-	SpectatorVec list;
-	SpectatorVec::iterator it;
-	getSpectators(Range(fromPos, true), list);
-	getSpectators(Range(toPos, true), list);
-
-	//send change to client
-	for(it = list.begin(); it != list.end(); ++it) {
-		(*it)->onCreatureMove(creature, fromPos, oldStackPos);
-	}
-
-	toCylinder->postAddNotification(creature);
-	fromCylinder->postRemoveNotification(creature);
-
-	if(fromPos.y > toPos.y)
-		creature->setDirection(NORTH);
-	else if(fromPos.y < toPos.y)
-		creature->setDirection(SOUTH);
-	if(fromPos.x < toPos.x)
-		creature->setDirection(EAST);
-	else if(fromPos.x > toPos.x)
-		creature->setDirection(WEST);
+	fromCylinder->getTile()->moveCreature(creature, toCylinder);
 
 	int32_t index = 0;
 	Item* toItem = NULL;
 	Cylinder* subCylinder = NULL;
 	while((subCylinder = toCylinder->__queryDestination(index, creature, &toItem)) != toCylinder){
-		fromPos = toCylinder->getPosition();
-		toPos = subCylinder->getPosition();
-
-		//remove the creature
-		uint32_t oldStackPos = toCylinder->__getIndexOfThing(creature);
-		toCylinder->__removeThing(creature, 0);
-
-		//add the creature
-		subCylinder->__addThing(creature);
-
-		if(fromPos.y > toPos.y)
-			creature->setDirection(NORTH);
-		else if(fromPos.y < toPos.y)
-			creature->setDirection(SOUTH);
-		if(fromPos.x < toPos.x)
-			creature->setDirection(EAST);
-		else if(fromPos.x > toPos.x)
-			creature->setDirection(WEST);
-
-		list.clear();
-		getSpectators(Range(toCylinder->getPosition(), true), list);
-		getSpectators(Range(subCylinder->getPosition(), true), list);
-
-		//send change to client
-		for(it = list.begin(); it != list.end(); ++it) {
-			(*it)->onCreatureMove(creature, fromPos, oldStackPos);
-		}
-
-		toCylinder->postRemoveNotification(creature);
-		subCylinder->postAddNotification(creature);
-
+		toCylinder->getTile()->moveCreature(creature, subCylinder);
 		toCylinder = subCylinder;
 	}
 
@@ -1213,8 +1153,10 @@ ReturnValue Game::internalMoveItem(Cylinder* fromCylinder, Cylinder* toCylinder,
 	}
 	
 	fromCylinder->postRemoveNotification(item);
-	toCylinder->postAddNotification(item);
-	//get/close container
+	if(moveItem)
+		toCylinder->postAddNotification(moveItem);
+	else
+		toCylinder->postAddNotification(item);
 
 	//we could not move all, inform the player
 	if(item->isStackable() && maxQueryCount < count){
@@ -1408,7 +1350,7 @@ void Game::playerSendErrorMessage(Player* player, ReturnValue message)
 			break;
 		
 		case RET_CONTAINERNOTENOUGHROOM:
-			player->sendCancel("There is not enough room in the container.");
+			player->sendCancel("You cannot put more objects in this container.");
 			break;
 
 		case RET_NOTENOUGHROOM:
@@ -1429,6 +1371,10 @@ void Game::playerSendErrorMessage(Player* player, ReturnValue message)
 		
 		case RET_THISISIMPOSSIBLE:
 			player->sendCancel("This is impossible.");
+			break;
+
+		case RET_DEPOTISFULL:
+			player->sendCancel("You cannot put more items in this depot.");
 			break;
 
 		case RET_NOTPOSSIBLE:
@@ -1510,103 +1456,27 @@ void Game::creatureSay(Creature* creature, SpeakClasses type, const std::string&
 	}
 }
 
-void Game::teleport(Thing* thing, const Position& newPos)
+bool Game::teleport(Thing* thing, const Position& newPos)
 {
-	/*
-	if(newPos == thing->getPosition())  
-		return; 
-	
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::teleport()");
-	
-	//Tile *toTile = getTile( newPos.x, newPos.y, newPos.z );
-	Tile *toTile = map->getTile(newPos);
+
+	if(newPos == thing->getPosition())
+		return true; 
+
+	Tile* toTile = getTile(newPos.x, newPos.y, newPos.z);
 	if(toTile){
-		Creature *creature = dynamic_cast<Creature*>(thing); 
-		if(creature){
-			//Tile *fromTile = getTile( thing->pos.x, thing->pos.y, thing->pos.z );
-			Tile *fromTile = map->getTile(thing->getPosition());
-			if(!fromTile)
-				return;
-			
-			int osp = fromTile->getThingStackPos(thing);  
-			if(!fromTile->removeThing(thing))
-				return;
-			
-			toTile->addThing(thing);
-			Position oldPos = thing->getPosition();
-			
-			SpectatorVec list;
-			SpectatorVec::iterator it;
-
-			getSpectators(Range(oldPos, true), list);
-			
-			//players
-			for(it = list.begin(); it != list.end(); ++it) {
-				if(Player* p = dynamic_cast<Player*>(*it)) {
-          if(p->attackedCreature == creature->getID()) {
-            autoCloseAttack(p, creature);
-          }
-
-					(*it)->onThingDisappear(creature, osp, true);
-				}
-			}
-			
-			//none-players
-			for(it = list.begin(); it != list.end(); ++it) {
-				if(!dynamic_cast<Player*>(*it)) {
-					(*it)->onCreatureDisappear(creature, osp, true);
-				}
-			}
-
-			if(newPos.y < oldPos.y)
-				creature->direction = NORTH;
-			if(newPos.y > oldPos.y)
-				creature->direction = SOUTH;
-			if(newPos.x > oldPos.x && (std::abs(newPos.x - oldPos.x) >= std::abs(newPos.y - oldPos.y)) )
-				creature->direction = EAST;
-			if(newPos.x < oldPos.x && (std::abs(newPos.x - oldPos.x) >= std::abs(newPos.y - oldPos.y)))
-				creature->direction = WEST;
-			
-			//thing->pos = newPos;
-
-			Player *player = dynamic_cast<Player*>(creature);
-			if(player && player->attackedCreature != 0){
-				Creature* attackedCreature = getCreatureByID(player->attackedCreature);
-				if(attackedCreature){
-          autoCloseAttack(player, attackedCreature);
-				}
-			}
-			
-			list.clear();
-			getSpectators(Range(newPos, true), list);
-
-			//players
-			for(it = list.begin(); it != list.end(); ++it)
-			{
-				if(Player* p = dynamic_cast<Player*>(*it)) {
-          if(p->attackedCreature == creature->getID()) {
-            autoCloseAttack(p, creature);
-          }
-
-					(*it)->onTeleport(creature, &oldPos, osp);
-				}
-			}
-
-			//none-players
-			for(it = list.begin(); it != list.end(); ++it)
-			{
-				if(!dynamic_cast<Player*>(*it)) {
-					(*it)->onTeleport(creature, &oldPos, osp);
-				}
-			}
+		if(Creature* creature = thing->getCreature()){
+			creature->getTile()->moveCreature(creature, toTile, true);
+			return true;
 		}
-		else{
-			if(removeThing(NULL, thing->getPosition(), thing, false)){
-				addThing(NULL, newPos, thing);
-			}
+		else if(Item* item = thing->getItem()){
+			ReturnValue ret = internalMoveItem(item->getParent(), toTile, 0, item, item->getItemCountOrSubtype());
+			if(ret == RET_NOERROR)
+				return true;
 		}
-	}//if(toTile)
-	*/
+	}
+
+	return false;
 }
 
 void Game::creatureChangeOutfit(Creature* creature)

@@ -34,6 +34,7 @@
 
 class Creature;
 class Container;
+class Depot;
 class Teleport;
 
 enum ITEMPROPERTY{
@@ -151,24 +152,6 @@ protected:
 	unsigned short uniqueId;
 	std::string *specialDescription;
 	std::string *text;	//text written
-};
-
-class Teleport : public Item
-{
-public:
-	Teleport(const unsigned short _type);
-	virtual ~Teleport();
-	
-	virtual Teleport* getTeleport() {return this;};
-	virtual const Teleport* getTeleport() const {return this;};
-	
-	void setDestPos(const Position &pos) {destPos = pos;};
-	const Position& getDestPos() const {return destPos;};
-
-private:
-	virtual int unserialize(xmlNodePtr p);
-	virtual xmlNodePtr serialize();
-	Position destPos;
 };
 
 #endif

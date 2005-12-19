@@ -21,31 +21,35 @@
 // include header file
 
 #include "definitions.h"
+#include "item.h"
 #include "container.h"
-#include "magic.h"
-#include "player.h"
-#include "tile.h"
+#include "depot.h"
+#include "teleport.h"
 #include "actions.h"
+#include "magic.h"
 
 #include <iostream>
 #include <sstream>
 #include <iomanip>
 
-
 Item* Item::CreateItem(const unsigned short _type, unsigned short _count /*= 0*/)
 {
-	Item *newItem;
-	if(items[_type].isContainer()){
-		newItem = new Container(_type);		
+	Item* newItem = NULL;
+
+	if(_type == 2589 || _type == 2590 || _type == 2591 || _type == 2592){
+		newItem = new Depot(_type);
+	}
+	else if(items[_type].isContainer()){
+		newItem = new Container(_type);
 	}
 	else if(items[_type].isTeleport()){		
 		newItem = new Teleport(_type);
 	}
 	else if(items[_type].isMagicField()){	
-		newItem =  new Item(_type, _count);
+		newItem = new Item(_type, _count);
 	}	
 	else{
-		newItem =  new Item(_type, _count);
+		newItem = new Item(_type, _count);
 	}
 	
 	newItem->useThing2();
@@ -627,62 +631,6 @@ bool Item::canDecay(){
 		return false;
 
 	return items[id].canDecay;	
-}
-
-//Teleport class
-Teleport::Teleport(const unsigned short _type) : Item(_type)
-{
-	destPos.x = 0;
-	destPos.y = 0;
-	destPos.z = 0;
-}
-
-Teleport::~Teleport()
-{
-}
-
-int Teleport::unserialize(xmlNodePtr p)
-{
-	Item::unserialize(p);
-	char *tmp = (char*)xmlGetProp(p, (const xmlChar *) "destx");
-	if(tmp){
-		destPos.x = atoi(tmp);
-		xmlFreeOTSERV(tmp);
-	}
-	tmp = (char*)xmlGetProp(p, (const xmlChar *) "desty");
-	if(tmp){
-		destPos.y = atoi(tmp);
-		xmlFreeOTSERV(tmp);
-	}
-	tmp = (char*)xmlGetProp(p, (const xmlChar *) "destz");
-	if(tmp){
-		destPos.z = atoi(tmp);
-		xmlFreeOTSERV(tmp);
-	}
-	
-
-	return 0;
-}
-
-xmlNodePtr Teleport::serialize()
-{
-	xmlNodePtr xmlptr = Item::serialize();
-
-	std::stringstream s;
-
-	s.str(""); //empty the stringstream
-	s << (int) destPos.x;
-	xmlSetProp(xmlptr, (const xmlChar*)"destx", (const xmlChar*)s.str().c_str());
-
-	s.str(""); //empty the stringstream
-	s << (int) destPos.y;
-	xmlSetProp(xmlptr, (const xmlChar*)"desty", (const xmlChar*)s.str().c_str());
-
-	s.str(""); //empty the stringstream
-	s << (int)destPos.z;
-	xmlSetProp(xmlptr, (const xmlChar*)"destz", (const xmlChar*)s.str().c_str());
-
-	return xmlptr;
 }
 
 int Item::getWorth() const
