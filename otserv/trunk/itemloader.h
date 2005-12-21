@@ -127,6 +127,25 @@ enum slotsOTB_t{
 	OTB_SLOT_HAND,
 };
 
+enum subfightOTB_t {
+	OTB_DIST_NONE          = 0,
+	OTB_DIST_BOLT          = 1,
+	OTB_DIST_ARROW         = 2,
+	OTB_DIST_FIRE          = 3,
+	OTB_DIST_ENERGY        = 4,
+	OTB_DIST_POISONARROW   = 5,
+	OTB_DIST_BURSTARROW    = 6,
+	OTB_DIST_THROWINGSTAR  = 7,
+	OTB_DIST_THROWINGKNIFE = 8,
+	OTB_DIST_SMALLSTONE    = 9,
+	OTB_DIST_SUDDENDEATH   = 10,
+	OTB_DIST_LARGEROCK     = 11,
+	OTB_DIST_SNOWBALL      = 12,
+	OTB_DIST_POWERBOLT     = 13,
+	OTB_DIST_SPEAR         = 14,
+	OTB_DIST_POISONFIELD   = 15
+};
+
 #pragma pack(8)
 struct decayBlock{
 	unsigned short decayTo;

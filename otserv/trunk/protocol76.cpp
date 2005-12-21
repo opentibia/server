@@ -2355,6 +2355,7 @@ void Protocol76::sendTextWindow(Item* item,const unsigned short maxlen, const bo
 		msg.AddString(item->getText());									
 		readItem = NULL;		
 	}
+	msg.AddString("unknown");
 	
 	WriteBuffer(msg);
 }

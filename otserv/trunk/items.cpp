@@ -152,6 +152,61 @@ Items::~Items()
 		delete it->second;
 }
 
+inline subfight_t translateOTBsubfight_t(subfightOTB_t sf)
+{
+	switch(sf){
+	case OTB_DIST_NONE:
+		return DIST_NONE;
+		break;
+	case OTB_DIST_BOLT:
+		return DIST_BOLT;
+		break;
+	case OTB_DIST_ARROW:
+		return DIST_ARROW;
+		break;
+	case OTB_DIST_FIRE:
+		return DIST_FIRE;
+		break;
+	case OTB_DIST_ENERGY:
+		return DIST_ENERGY;
+		break;
+	case OTB_DIST_POISONARROW:
+		return DIST_POISONARROW;
+		break;
+	case OTB_DIST_BURSTARROW:
+		return DIST_BURSTARROW;
+		break;
+	case OTB_DIST_THROWINGSTAR:
+		return DIST_THROWINGSTAR;
+		break;
+	case OTB_DIST_THROWINGKNIFE:
+		return DIST_THROWINGKNIFE;
+		break;
+	case OTB_DIST_SMALLSTONE:
+		return DIST_SMALLSTONE;
+		break;
+	case OTB_DIST_SUDDENDEATH:
+		return DIST_SUDDENDEATH;
+		break;
+	case OTB_DIST_LARGEROCK:
+		return DIST_LARGEROCK;
+		break;
+	case OTB_DIST_SNOWBALL:
+		return DIST_SNOWBALL;
+		break;
+	case OTB_DIST_POWERBOLT:
+		return DIST_POWERBOLT;
+		break;
+	case OTB_DIST_SPEAR:
+		return DIST_SPEAR;
+		break;
+	case OTB_DIST_POISONFIELD:
+		return DIST_POISONFIELD;
+		break;
+	}
+	return DIST_NONE;
+}
+
 int Items::loadFromOtb(std::string file)
 {
 	ItemLoader f;
@@ -388,7 +443,7 @@ int Items::loadFromOtb(std::string file)
 								memcpy(&iType->weight, p, sizeof(double));
 								break;
 							}
-							case ITEM_ATTR_WEAPON:
+							/*case ITEM_ATTR_WEAPON:
 							{
 								if(datalen != sizeof(weaponBlock))
 									return ERROR_INVALID_FORMAT;
@@ -429,7 +484,7 @@ int Items::loadFromOtb(std::string file)
 								//iType->slot_position = ab.slot_position;
 
 								break;
-							}
+							}*/
 							case ITEM_ATTR_MAGLEVEL:
 							{
 								if(datalen != sizeof(unsigned short))
@@ -448,7 +503,7 @@ int Items::loadFromOtb(std::string file)
 
 								break;
 							}
-							case ITEM_ATTR_WRITEABLE:
+							/*case ITEM_ATTR_WRITEABLE:
 							{
 								if(datalen != sizeof(writeableBlock))
 									return ERROR_INVALID_FORMAT;
@@ -459,7 +514,7 @@ int Items::loadFromOtb(std::string file)
 								iType->readOnlyId = wb.readOnlyId;
 
 								break;
-							}
+							}*/
 							case ITEM_ATTR_ROTATETO:
 							{
 								if(datalen != sizeof(unsigned short))
@@ -469,7 +524,7 @@ int Items::loadFromOtb(std::string file)
 								
 								break;
 							}
-							case ITEM_ATTR_DECAY:
+							/*case ITEM_ATTR_DECAY:
 							{
 								if(datalen != sizeof(decayBlock))
 									return ERROR_INVALID_FORMAT;
@@ -479,8 +534,7 @@ int Items::loadFromOtb(std::string file)
 								iType->decayTime = db.decayTime;
 								iType->decayTo = db.decayTo;
 								break;
-							}
-
+							}*/
 							case ITEM_ATTR_SPRITEHASH:
 							{
 								if(datalen != 16)
@@ -494,7 +548,6 @@ int Items::loadFromOtb(std::string file)
 									return ERROR_INVALID_FORMAT;
 								break;
 							}
-
 							case ITEM_ATTR_07:
 							{
 								if(datalen != sizeof(unsigned short))
@@ -508,8 +561,7 @@ int Items::loadFromOtb(std::string file)
 									return ERROR_INVALID_FORMAT;
 								break;
 							}
-
-							case ITEM_ATTR_LIGHT:
+							/*case ITEM_ATTR_LIGHT:
 							{
 								if(datalen != sizeof(lightBlock))
 									return ERROR_INVALID_FORMAT;
@@ -519,8 +571,7 @@ int Items::loadFromOtb(std::string file)
 								iType->lightLevel = lb.lightLevel;
 								iType->lightColor = lb.lightColor;
 								break;
-							}
-
+							}*/
 							case ITEM_ATTR_DECAY2:
 							{
 								if(datalen != sizeof(decayBlock2))
@@ -532,7 +583,6 @@ int Items::loadFromOtb(std::string file)
 								iType->decayTo = db2.decayTo;
 								break;
 							}
-
 							case ITEM_ATTR_WEAPON2:
 							{
 								if(datalen != sizeof(weaponBlock2))
@@ -541,13 +591,12 @@ int Items::loadFromOtb(std::string file)
 								weaponBlock2 wb2;
 								memcpy(&wb2, p, sizeof(weaponBlock2));
 								iType->weaponType = (WeaponType)wb2.weaponType;
-								iType->shootType = (subfight_t)wb2.shootType;
+								iType->shootType = translateOTBsubfight_t((subfightOTB_t)wb2.shootType);
 								iType->amuType = (amu_t)wb2.amuType;
 								iType->attack = wb2.attack;
 								iType->defence = wb2.defence;
 								break;
 							}
-
 							case ITEM_ATTR_AMU2:
 							{
 								if(datalen != sizeof(amuBlock2))
@@ -556,12 +605,11 @@ int Items::loadFromOtb(std::string file)
 								amuBlock2 ab2;
 								memcpy(&ab2, p, sizeof(amuBlock2));
 								iType->weaponType = AMO;
-								iType->shootType = (subfight_t)ab2.shootType;
+								iType->shootType = translateOTBsubfight_t((subfightOTB_t)ab2.shootType);
 								iType->amuType = (amu_t)ab2.amuType;
 								iType->attack = ab2.attack;
 								break;
 							}
-
 							case ITEM_ATTR_ARMOR2:
 							{
 								if(datalen != sizeof(armorBlock2))
@@ -576,7 +624,6 @@ int Items::loadFromOtb(std::string file)
 
 								break;
 							}
-
 							case ITEM_ATTR_WRITEABLE2:
 							{
 								if(datalen != sizeof(writeableBlock2))
@@ -588,7 +635,6 @@ int Items::loadFromOtb(std::string file)
 
 								break;
 							}
-
 							case ITEM_ATTR_LIGHT2:
 							{
 								if(datalen != sizeof(lightBlock2))
@@ -600,7 +646,6 @@ int Items::loadFromOtb(std::string file)
 								iType->lightColor = lb2.lightColor;
 								break;
 							}
-
 							default:
 								//ignore unknown attributes
 								//delete iType;
