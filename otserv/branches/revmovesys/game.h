@@ -142,6 +142,7 @@ public:
 
 	Cylinder* internalGetCylinder(Player* player, const Position& pos);
 	Thing* internalGetThing(Player* player, const Position& pos, int32_t index);
+	const Position& internalGetPosition(Player* player, const Position& pos);
 
 	/**
 	  * Get a single tile of the map.
@@ -241,6 +242,10 @@ public:
 	void playerCloseTrade(Player* player);
 	bool playerLookAt(Player* player, const Position& pos, uint16_t itemId, uint8_t stackpos);
 	
+	//battle system
+	bool creatureMakeMagic(Creature *creature, const Position& centerpos, const MagicEffectClass* me);
+	//battle system
+
 	void playerSetAttackedCreature(Player* player, unsigned long creatureid);
 
 	void changeOutfitAfter(unsigned long id, int looktype, long time);
@@ -282,7 +287,6 @@ protected:
 	void changeOutfit(unsigned long id, int looktype);
 
 	//battle system
-	bool creatureMakeMagic(Creature *creature, const Position& centerpos, const MagicEffectClass* me);
 	void creatureApplyDamage(Creature *creature, int damage, int &outDamage, int &outManaDamage);
 	bool creatureOnPrepareAttack(Creature *creature, Position pos);
 	bool creatureOnPrepareMagicAttack(Creature *creature, Position pos, const MagicEffectClass* me);

@@ -1258,13 +1258,6 @@ bool Monster::monsterMoveItem(Item* item, int radius)
 	Position centerPos = item->getPosition();
 	Position tryPos;
 
-	int itemCount;
-	if(item->isStackable()){
-		itemCount = item->getItemCountOrSubtype();
-	}
-	else{
-		itemCount = 1;
-	}
 	//try random position in radius
 	tryPos.z = item->getPosition().z;
 	for(int i = 0; i < 4 * radius; i++){
@@ -1272,7 +1265,7 @@ bool Monster::monsterMoveItem(Item* item, int radius)
 		tryPos.y = item->getPosition().y + rand() % radius;
 		if(game->map->canThrowObjectTo(item->getPosition(), tryPos)){
 			Tile* toTile = game->getTile(tryPos.x, tryPos.y, tryPos.z);
-			if(game->internalMoveItem(item->getParent(), toTile, 0, item, item->getItemCountOrSubtype()) == RET_NOERROR){
+			if(game->internalMoveItem(item->getParent(), toTile, 0, item, item->getItemCount()) == RET_NOERROR){
 				return true;
 			}
 		}

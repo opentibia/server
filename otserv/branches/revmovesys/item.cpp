@@ -45,7 +45,7 @@ Item* Item::CreateItem(const unsigned short _type, unsigned short _count /*= 0*/
 	else if(items[_type].isTeleport()){		
 		newItem = new Teleport(_type);
 	}
-	else if(items[_type].isMagicField()){	
+	else if(items[_type].isMagicField()){
 		newItem = new Item(_type, _count);
 	}	
 	else{
@@ -55,6 +55,78 @@ Item* Item::CreateItem(const unsigned short _type, unsigned short _count /*= 0*/
 	newItem->useThing2();
 	return newItem;
 }
+
+Item::Item(const unsigned short _type, unsigned short _count)
+{
+	//std::cout << "Item constructor2 " << this << std::endl;
+	id = _type;
+	count = 1;
+	chargecount = 0;
+	fluid = 0;
+	actionId = 0;
+	uniqueId = 0;
+	isDecaying = false;
+	specialDescription = NULL;
+	text = NULL;
+	setItemCountOrSubtype(_count);
+}
+
+Item::Item()
+{
+	//std::cout << "Item constructor3 " << this << std::endl;
+	id = 0;
+	count = 1;
+	chargecount = 0;
+	isDecaying  = false;
+	actionId = 0;
+	uniqueId = 0;
+	specialDescription = NULL;
+	text = NULL;
+}
+Item::Item(const unsigned short _type) {
+	//std::cout << "Item constructor1 " << this << std::endl;
+	id = _type;
+	count = 1;	
+	chargecount = 0;
+	fluid = 0;
+	actionId = 0;
+	uniqueId = 0;
+	isDecaying = false;
+	specialDescription = NULL;
+	text = NULL;
+}
+
+Item::Item(const Item &i){
+	//std::cout << "Item copy constructor " << this << std::endl;
+	id = i.id;
+	count = i.count;
+	chargecount = i.chargecount;
+	isDecaying  = false;
+	actionId = i.actionId;
+	uniqueId = i.uniqueId;
+	if(i.specialDescription != NULL){
+		specialDescription = new std::string(*(i.specialDescription));
+	}
+	else{
+		specialDescription = NULL;
+	}
+	if(i.text != NULL){
+		text = new std::string(*(i.text));
+	}
+	else{
+		text = NULL;
+	}	
+}
+
+Item::~Item()
+{
+	//std::cout << "Item destructor " << this << std::endl;
+	if(specialDescription)
+		delete specialDescription;
+	if(text)
+		delete text;
+}
+
 
 //////////////////////////////////////////////////
 // returns the ID of this item's ItemType
@@ -66,6 +138,18 @@ unsigned short Item::getID() const {
 // sets the ID of this item's ItemType
 void Item::setID(unsigned short newid) {
 	id = newid;
+}
+
+unsigned short Item::getItemCount() const
+{
+	return count;
+
+	/*if(isStackable()){
+		return count;
+	}
+	else
+		return 1;
+	*/
 }
 
 //////////////////////////////////////////////////
@@ -86,9 +170,6 @@ unsigned short Item::getItemCountOrSubtype() const {
 void Item::setItemCountOrSubtype(unsigned char n)
 {
 	if(isStackable()){
-		/*if(n == 0){
-			count = 1;
-		}*/
 		if(n > 100){
 			count = 100;
 		}
@@ -103,8 +184,8 @@ void Item::setItemCountOrSubtype(unsigned char n)
 };
 
 void Item::setActionId(unsigned short n){
-	 if(n < 100)
-	 	n = 100;
+	if(n < 100)
+		n = 100;
 	actionId = n;
 }
 
@@ -126,77 +207,6 @@ unsigned short Item::getUniqueId() const{
 	return uniqueId;
 }
 
-Item::Item(const unsigned short _type) {
-	//std::cout << "Item constructor1 " << this << std::endl;
-	id = _type;
-	count = 0;	
-	chargecount = 0;
-	fluid = 0;
-	actionId = 0;
-	uniqueId = 0;
-	isDecaying  = 0;
-	specialDescription = NULL;
-	text = NULL;
-}
-
-Item::Item(const Item &i){
-	//std::cout << "Item copy constructor " << this << std::endl;
-	id = i.id;
-	count = i.count;
-	chargecount = i.chargecount;
-	isDecaying  = 0;
-	actionId = i.actionId;
-	uniqueId = i.uniqueId;
-	if(i.specialDescription != NULL){
-		specialDescription = new std::string(*(i.specialDescription));
-	}
-	else{
-		specialDescription = NULL;
-	}
-	if(i.text != NULL){
-		text = new std::string(*(i.text));
-	}
-	else{
-		text = NULL;
-	}	
-}
-
-Item* Item::decay()
-{
-	unsigned short decayTo = Item::items[getID()].decayTo;
-	
-	if(decayTo == 0) {
-		return NULL;
-	}
-	
-	if(dynamic_cast<Container*>(this)){
-		if(items[decayTo].isContainer()){
-			//container -> container			
-			setID(decayTo);
-			return this;
-		}
-		else{
-			//container -> no container			
-			Item *item = Item::CreateItem(decayTo,getItemCountOrSubtype());
-			//item->pos = this->pos;
-			return item;
-		}
-	}
-	else{
-		if(items[decayTo].isContainer()){
-			//no container -> container
-			Item *item = Item::CreateItem(decayTo,getItemCountOrSubtype());
-			//item->pos = this->pos;
-			return item;
-		}
-		else{
-			//no contaier -> no container
-			setID(decayTo);
-			return this;
-		}
-	}
-}
-
 long Item::getDecayTime(){
 	return items[id].decayTime*1000;
 }
@@ -208,63 +218,6 @@ bool Item::rotate()
 		return true;
 	}
 	return false;
-}
-
-Item::Item(const unsigned short _type, unsigned short _count)
-{
-	//std::cout << "Item constructor2 " << this << std::endl;
-	id = _type;
-	count = 0;
-	chargecount = 0;
-	fluid = 0;
-	actionId = 0;
-	uniqueId = 0;
-	isDecaying  = 0;
-	specialDescription = NULL;
-	text = NULL;
-	setItemCountOrSubtype(_count);
-	/*
-	if(isStackable()){
-		if(_count == 0){
-			count = 1;
-		}
-		else if(_count > 100){
-			count = 100;
-		}
-		else{
-			count = _count;
-		}
-	}
-	else if(isFluidContainer() || isMultiType() )
-		fluid = _count;
-	else
-		chargecount = _count;
-	*/
-	
-	//throwRange = 6;
-}
-
-Item::Item()
-{
-	//std::cout << "Item constructor3 " << this << std::endl;
-	id = 0;
-	count = 0;
-	chargecount = 0;
-	//throwRange = 6;
-	isDecaying  = 0;
-	actionId = 0;
-	uniqueId = 0;
-	specialDescription = NULL;
-	text = NULL;
-}
-
-Item::~Item()
-{
-	//std::cout << "Item destructor " << this << std::endl;
-	if(specialDescription)
-		delete specialDescription;
-	if(text)
-		delete text;
 }
 
 int Item::unserialize(xmlNodePtr p)
@@ -405,6 +358,10 @@ bool Item::isGroundTile() const {
 
 bool Item::isSplash() const{
 	return items[id].isSplash();
+}
+
+bool Item::isMagicField() const{
+	return items[id].isMagicField();
 }
 
 bool Item::isPickupable() const {
@@ -637,11 +594,11 @@ int Item::getWorth() const
 {
 	switch(getID()){
 	case ITEM_COINS_GOLD:
-		return getItemCountOrSubtype();
+		return getItemCount();
 	case ITEM_COINS_PLATINUM:
-		return getItemCountOrSubtype() * 100;
+		return getItemCount() * 100;
 	case ITEM_COINS_CRYSTAL:
-		return getItemCountOrSubtype() * 10000;
+		return getItemCount() * 10000;
 	default:
 		return 0;
 	}

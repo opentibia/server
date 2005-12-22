@@ -235,7 +235,8 @@ public:
 
 	virtual int getDamage(Creature *target, const Creature *attacker = NULL) const;
 
-	virtual Item* decay();
+	//virtual Item* decay();
+	virtual void setID(unsigned short newid);
 	bool transform(const MagicEffectItem *rhs);
 	long getDecayTime();
 	

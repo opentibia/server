@@ -72,7 +72,7 @@ public:
 	virtual std::string getDescription(int32_t lookDistance) const;
 
 	unsigned short getID() const;    // ID as in ItemType
-	void setID(unsigned short newid);
+	virtual void setID(unsigned short newid);
 		    
 	WeaponType getWeaponType() const;
 	amu_t	getAmuType() const;
@@ -93,6 +93,7 @@ public:
 	bool isAlwaysOnTop() const;
 	bool isGroundTile() const;
 	bool isSplash() const;
+	bool isMagicField() const;
 	bool isNotMoveable() const;
 	bool isPickupable() const;
 	bool isWeapon() const;
@@ -116,6 +117,7 @@ public:
 	virtual xmlNodePtr serialize();
 
   // get the number of items
+	unsigned short getItemCount() const;
 	unsigned short getItemCountOrSubtype() const;
 	void setItemCountOrSubtype(unsigned char n);
 
@@ -134,11 +136,7 @@ public:
 	virtual long getDecayTime();
 	bool canDecay();
 
-	/**
-	 * Called when the item is about to decay/transform to the next step.
-	 * \returns The item to decay to.
-	 */
-	virtual Item* decay();
+	//virtual Item* decay();
 	bool isDecaying;
 
 	bool rotate();

@@ -42,7 +42,7 @@ ReturnValue Depot::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 
 	int addCount = 0;
 
-	if((item->isStackable() && item->getItemCountOrSubtype() != count)){
+	if((item->isStackable() && item->getItemCount() != count)){
 		addCount = 1;
 	}
 

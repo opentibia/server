@@ -174,12 +174,12 @@ bool Map::placeCreature(const Position &pos, Creature* creature)
 {
 	Tile* tile = getTile(pos.x, pos.y, pos.z);
 
-	bool success = (tile && tile->__queryAdd(0, creature, 0) == RET_NOERROR);
+	bool success = (tile && !tile->getTeleportItem() && !tile->floorChange() && tile->__queryAdd(0, creature, 0) == RET_NOERROR);
 	if(!success){
 		for(int cx = pos.x - 1; cx <= pos.x + 1 && !success; cx++){
 			for(int cy = pos.y - 1; cy <= pos.y + 1 && !success; cy++){
 				tile = getTile(cx, cy, pos.z);
-				success = (tile && tile->__queryAdd(0, creature, 0) == RET_NOERROR);
+				success = success = (tile && !tile->getTeleportItem() && !tile->floorChange() && tile->__queryAdd(0, creature, 0) == RET_NOERROR);
 				if(success){
 					break;
 				}

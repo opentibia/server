@@ -637,7 +637,7 @@ bool Player::removeItemTypeCount(uint16_t itemId, uint32_t count)
 		if(items[i]){
 			if(items[i]->getID() == itemId){
 				if(items[i]->isStackable()){
-					if(items[i]->getItemCountOrSubtype() > count){
+					if(items[i]->getItemCount() > count){
 						g_game.internalRemoveItem(items[i], count);
 						count = 0;
 					}
@@ -663,12 +663,12 @@ bool Player::removeItemTypeCount(uint16_t itemId, uint32_t count)
 			Item* item = container->getItem(i);
 			if(item->getID() == itemId){
 				if(item->isStackable()){
-					if(item->getItemCountOrSubtype() > count){
+					if(item->getItemCount() > count){
 						g_game.internalRemoveItem(item, count);
 						count = 0;
 					}
 					else{
-						count = count - item->getItemCountOrSubtype();
+						count = count - item->getItemCount();
 						g_game.internalRemoveItem(item);
 					}
 				}
@@ -698,7 +698,7 @@ uint32_t Player::getItemTypeCount(uint16_t itemId)
 		if(items[i]){
 			if(items[i]->getID() == itemId){
 				if(items[i]->isStackable()){
-					counter = counter + items[i]->getItemCountOrSubtype();
+					counter = counter + items[i]->getItemCount();
 				}
 				else{
 					++counter;
@@ -717,7 +717,7 @@ uint32_t Player::getItemTypeCount(uint16_t itemId)
 		for(cit = container->getItems(); cit != container->getEnd(); ++cit){
 			if((*cit)->getID() == itemId){
 				if((*cit)->isStackable()){
-					counter = counter + (*cit)->getItemCountOrSubtype();
+					counter = counter + (*cit)->getItemCount();
 				}
 				else{
 					++counter;
@@ -1094,7 +1094,7 @@ void Player::removeDistItem(){
 			g_game.playerCloseTrade(this);
 			
 		//remove one dist item
-		unsigned char n = DistItem->getItemCountOrSubtype();
+		unsigned char n = DistItem->getItemCount();
 		if(DistItem == items[SLOT_RIGHT]){
 			sl_id = SLOT_RIGHT;
 		}
@@ -2085,7 +2085,7 @@ ReturnValue Player::__queryMaxCount(int32_t index, const Thing* thing, uint32_t 
 
 	if(destItem){
 		if(destItem->isStackable() && item->getID() == destItem->getID()){
-			maxQueryCount = 100 - destItem->getItemCountOrSubtype();
+			maxQueryCount = 100 - destItem->getItemCount();
 		}
 		else
 			maxQueryCount = 0;
@@ -2142,7 +2142,7 @@ Cylinder* Player::__queryDestination(int32_t& index, const Thing* thing, Item** 
 		//find a appropiate slot
 		for(int i = SLOT_FIRST; i < SLOT_LAST; ++i){
 			if(items[i] == NULL){
-				if(__queryAdd(i, item, (item->isStackable() ? item->getItemCountOrSubtype() : 0)) == RET_NOERROR){
+				if(__queryAdd(i, item, item->getItemCount()) == RET_NOERROR){
 					index = i;
 					return this;
 				}
@@ -2152,7 +2152,7 @@ Cylinder* Player::__queryDestination(int32_t& index, const Thing* thing, Item** 
 		//try containers
 		for(int i = SLOT_FIRST; i < SLOT_LAST; ++i){
 			if(Container* subContainer = dynamic_cast<Container*>(items[i])){
-				if(subContainer != tradeItem && subContainer->__queryAdd(i, item, (item->isStackable() ? item->getItemCountOrSubtype() : 0)) == RET_NOERROR){
+				if(subContainer != tradeItem && subContainer->__queryAdd(i, item, item->getItemCount()) == RET_NOERROR){
 					index = -1;
 					*destItem = NULL;
 					return subContainer;
@@ -2288,10 +2288,7 @@ void Player::__removeThing(Thing* thing, uint32_t count)
 	}
 
 	if(item->isStackable()){
-		//if(count == 0 || count > item->getItemCountOrSubtype())
-		//	return RET_NOTPOSSIBLE;
-
-		if(count == item->getItemCountOrSubtype()){
+		if(count == item->getItemCount()){
 			//send change to client
 			onRemoveInventoryItem((slots_t)index, item);
 
@@ -2299,7 +2296,7 @@ void Player::__removeThing(Thing* thing, uint32_t count)
 			items[index] = NULL;
 		}
 		else{
-			item->setItemCountOrSubtype(item->getItemCountOrSubtype() - count);
+			item->setItemCountOrSubtype(item->getItemCount() - count);
 
 			//send change to client
 			onUpdateInventoryItem((slots_t)index, item, item);

@@ -199,7 +199,7 @@ ReturnValue Container::__queryMaxCount(int32_t index, const Thing* thing, uint32
 				destItem = destThing->getItem();
 
 			if(destItem && destItem->getID() == item->getID()){
-				n = 100 - destItem->getItemCountOrSubtype();
+				n = 100 - destItem->getItemCount();
 			}
 		}
 
@@ -228,7 +228,7 @@ ReturnValue Container::__queryRemove(const Thing* thing, uint32_t count) const
 		return RET_NOTPOSSIBLE;
 	}
 
-	if(count == 0 || (item->isStackable() && count > item->getItemCountOrSubtype())){
+	if(count == 0 || (item->isStackable() && count > item->getItemCount())){
 		return RET_NOTPOSSIBLE;
 	}
 
@@ -409,8 +409,8 @@ void Container::__removeThing(Thing* thing, uint32_t count)
 	SpectatorVec::iterator it;
 	g_game.getSpectators(Range(cylinderMapPos, 2, 2, 2, 2, false), list);
 
-	if(item->isStackable() && count != item->getItemCountOrSubtype()){
-		item->setItemCountOrSubtype(item->getItemCountOrSubtype() - count);
+	if(item->isStackable() && count != item->getItemCount()){
+		item->setItemCountOrSubtype(item->getItemCount() - count);
 
 		//send change to client
 		for(it = list.begin(); it != list.end(); ++it) {

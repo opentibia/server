@@ -496,6 +496,7 @@ int SpellScript::luaActionDoTargetGroundSpell(lua_State *L)
 	internalLoadTransformVec(L, transformMap);
 	
 	MagicEffectItem* fieldItem = new MagicEffectItem(transformMap);
+	fieldItem->useThing2();
 	MagicEffectTargetGroundClass magicGround(fieldItem);
 
 	magicGround.offensive = (bool)(lua_toboolean(L, -1) > 0);
@@ -626,6 +627,7 @@ int SpellScript::luaActionDoAreaGroundSpell(lua_State *L)
 	internalLoadTransformVec(L, transformMap);
 
 	MagicEffectItem* fieldItem = new MagicEffectItem(/*md,*/ transformMap);
+	fieldItem->useThing2();
 	MagicEffectAreaGroundClass magicGroundEx(fieldItem);
 
 	internalGetMagicEffect(L, magicGroundEx);

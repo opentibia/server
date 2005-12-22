@@ -119,7 +119,7 @@ void Teleport::__addThing(int32_t index, Thing* thing)
 			getTile()->moveCreature(creature, destTile, true);
 		}
 		else if(Item* item = thing->getItem()){
-			g_game.internalMoveItem(getTile(), destTile, 0, item, item->getItemCountOrSubtype());
+			g_game.internalMoveItem(getTile(), destTile, 0, item, item->getItemCount());
 		}
 	}
 }

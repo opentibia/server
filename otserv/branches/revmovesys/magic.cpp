@@ -479,22 +479,10 @@ long MagicEffectItem::getDecayTime()
 	return 0;
 }
 
-Item* MagicEffectItem::decay()
+void MagicEffectItem::setID(unsigned short newid)
 {
-	TransformMap::iterator dm = transformMap.find(getID());
-	if(dm != transformMap.end()) {
-
-		//get next id to transform to
-		dm++;
-
-		if(dm != transformMap.end()) {
-			setID(dm->first);
-			buildCondition();
-			return this;
-		}
-	}
-
-	return NULL;
+	Item::setID(newid);
+	buildCondition();
 }
 
 void MagicEffectItem::buildCondition()

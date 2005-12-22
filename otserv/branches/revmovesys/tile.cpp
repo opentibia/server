@@ -368,7 +368,7 @@ ReturnValue Tile::__queryRemove(const Thing* thing, uint32_t count) const
 		return RET_NOTPOSSIBLE;
 	}
 
-	if(count == 0 || (item->isStackable() && count > item->getItemCountOrSubtype())){
+	if(count == 0 || (item->isStackable() && count > item->getItemCount())){
 		return RET_NOTPOSSIBLE;
 	}
 
@@ -497,7 +497,7 @@ void Tile::__addThing(int32_t index, Thing* thing)
 
 			ground = item;
 		}
-		else if(item->isSplash()){
+		/*else if(item->isSplash()){
 			//remove old splash if exists
 			ItemVector::iterator iit;
 			for(iit = topItems.begin(); iit != topItems.end(); ++iit){
@@ -529,8 +529,23 @@ void Tile::__addThing(int32_t index, Thing* thing)
 			for(it = list.begin(); it != list.end(); ++it) {
 				(*it)->onAddTileItem(cylinderMapPos, item);
 			}
-		}
+		}*/
 		else if(item->isAlwaysOnTop()){
+			if(item->isSplash()){
+				//remove old splash if exists
+				ItemVector::iterator iit;
+				for(iit = topItems.begin(); iit != topItems.end(); ++iit){
+					if((*iit)->isSplash()){
+						Item* oldSplash = *iit;
+						__removeThing(oldSplash, 0);
+
+						oldSplash->setParent(NULL);
+						g_game.FreeThing(oldSplash);
+						break;
+					}
+				}
+			}
+
 			bool isInserted = false;
 			ItemVector::iterator iit;
 			for(iit = topItems.begin(); iit != topItems.end(); ++iit){
@@ -551,6 +566,21 @@ void Tile::__addThing(int32_t index, Thing* thing)
 			}
 		}
 		else{
+			if(item->isMagicField()){
+				//remove old field item if exists
+				ItemVector::iterator iit;
+				for(iit = topItems.begin(); iit != topItems.end(); ++iit){
+					if((*iit)->isMagicField()){
+						Item* oldField = *iit;
+						__removeThing(oldField, 0);
+
+						oldField->setParent(NULL);
+						g_game.FreeThing(oldField);
+						break;
+					}
+				}
+			}
+
 			downItems.insert(downItems.begin(), item);
 
 			//send to client
@@ -706,7 +736,6 @@ void Tile::__removeThing(Thing* thing, uint32_t count)
 		g_game.getSpectators(Range(cylinderMapPos, true), list);
 
 		if(item == ground){
-
 			//send to client
 			for(it = list.begin(); it != list.end(); ++it) {
 				(*it)->onRemoveTileItem(cylinderMapPos, index, item);
@@ -735,8 +764,8 @@ void Tile::__removeThing(Thing* thing, uint32_t count)
 		else{
 			for (iit = downItems.begin(); iit != downItems.end(); ++iit)
 				if(*iit == item){
-					if(item->isStackable() && count != item->getItemCountOrSubtype()){							
-						item->setItemCountOrSubtype(item->getItemCountOrSubtype() - count);
+					if(item->isStackable() && count != item->getItemCount()){							
+						item->setItemCountOrSubtype(item->getItemCount() - count);
 
 						//send to client
 						for(it = list.begin(); it != list.end(); ++it) {
@@ -830,6 +859,24 @@ void Tile::postAddNotification(Thing* thing, bool hasOwnership /*= true*/)
 	}
 
 	//do action(s)
+	if(Creature* creature = thing->getCreature()){
+		const MagicEffectItem* fieldItem = getFieldItem();
+		if(fieldItem){
+			const MagicEffectTargetCreatureCondition* magicTargetCondition = fieldItem->getCondition();
+
+			if(!(g_game.getWorldType() == WORLD_TYPE_NO_PVP && creature && magicTargetCondition && magicTargetCondition->getOwnerID() != 0)){
+				fieldItem->getDamage(creature);
+			}
+			
+			if(magicTargetCondition && ((magicTargetCondition->attackType == ATTACK_FIRE) || 
+					(magicTargetCondition->attackType == ATTACK_POISON) ||
+					(magicTargetCondition->attackType == ATTACK_ENERGY))){	
+				Creature* attacker = g_game.getCreatureByID(magicTargetCondition->getOwnerID());
+				g_game.creatureMakeMagic(attacker, creature->getPosition(), magicTargetCondition);
+			}
+		}
+	}
+
 	Teleport* teleport = getTeleportItem();
 	if(teleport){
 		teleport->__addThing(thing);

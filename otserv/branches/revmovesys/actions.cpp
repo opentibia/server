@@ -721,6 +721,16 @@ ActionScript* ActionScript::getActionScript(lua_State *L){
 	return myaction;
 }
 
+const Position& ActionScript::internalGetRealPosition(ActionScript *action, Player *player, const Position &pos)
+{
+	if(action)
+		return action->game->internalGetPosition(player, pos);
+	else {
+		static const Position dummyPos(0,0,0);
+		return dummyPos;
+	}
+}
+
 void ActionScript::internalAddThing(lua_State *L, const Thing* thing, const unsigned int thingid)
 {	
 	lua_newtable(L);
@@ -1099,7 +1109,7 @@ int ActionScript::luaActionDoSendMagicEffect(lua_State *L)
 	
 	ActionScript *action = getActionScript(L);
 	
-	Position cylinderMapPos(0, 0, 0); //internalGetRealPosition(action, action->_player,(Position&)pos);
+	const Position& cylinderMapPos = internalGetRealPosition(action, action->_player,(Position&)pos);
 	SpectatorVec list;
 	SpectatorVec::iterator it;
 
@@ -1307,7 +1317,7 @@ int ActionScript::luaActionDoSendAnimatedText(lua_State *L)
 	
 	ActionScript *action = getActionScript(L);
 	
-	Position cylinderMapPos(0, 0, 0); //internalGetRealPosition(action, action->_player,(Position&)pos);
+	const Position& cylinderMapPos = internalGetRealPosition(action, action->_player,(Position&)pos);
 	SpectatorVec list;
 	SpectatorVec::iterator it;
 
