@@ -74,8 +74,7 @@ access(0)
 	eventCheck = 0;
 	eventCheckAttacking = 0;
 	
-	//attackedCreature = 0;
-	attackedCreature2 = NULL;
+	attackedCreature = NULL;
 	speed = 220;
 }
 
@@ -109,12 +108,10 @@ void Creature::setAttackedCreature(const Creature* creature)
 	}
 	
 	if(creature){
-		//attackedCreature = creature->getID();
-		attackedCreature2 = const_cast<Creature*>(creature);
+		attackedCreature = const_cast<Creature*>(creature);
 	}
 	else{
-		//attackedCreature = 0;
-		attackedCreature2 = NULL;
+		attackedCreature = NULL;
 	}
 }
 

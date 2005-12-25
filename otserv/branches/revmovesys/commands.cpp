@@ -396,7 +396,7 @@ bool Commands::banPlayer(Creature* c, const std::string &cmd, const std::string 
 
 bool Commands::teleportMasterPos(Creature* c, const std::string &cmd, const std::string &param)
 {
-	game->teleport(c, c->masterPos);
+	game->internalTeleport(c, c->masterPos);
 	return true;
 }
 
@@ -404,7 +404,7 @@ bool Commands::teleportHere(Creature* c, const std::string &cmd, const std::stri
 {
 	Creature* creature = game->getCreatureByName(param);
 	if(creature) {
-		game->teleport(creature, c->getPosition());
+		game->internalTeleport(creature, c->getPosition());
 	}
 	return true;
 }
@@ -510,7 +510,7 @@ bool Commands::testCommand(Creature* c, const std::string &cmd, const std::strin
 bool Commands::teleportTo(Creature* c, const std::string &cmd, const std::string &param){
 	Creature* creature = game->getCreatureByName(param);
 	if(creature) {
-		game->teleport(c, creature->getPosition());
+		game->internalTeleport(c, creature->getPosition());
 	}
 	return true;	
 }
@@ -636,7 +636,9 @@ bool Commands::teleportNTiles(Creature* c, const std::string &cmd, const std::st
 			newPos.x = newPos.x - ntiles;
 			break;
 		}
-		game->teleport(c, newPos);
+
+		game->internalTeleport(c, newPos);
 	}
+
 	return true;
 }

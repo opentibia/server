@@ -1035,7 +1035,7 @@ int ActionScript::luaActionDoTeleportThing(lua_State *L)
 		}
 	}
 	
-	action->game->teleport(tmpthing,(Position&)pos);
+	action->game->internalTeleport(tmpthing,(Position&)pos);
 	Tile* tile = action->game->map->getTile(pos);
 	if(tile){
 		pos.stackpos = tile->__getIndexOfThing(tmpthing);

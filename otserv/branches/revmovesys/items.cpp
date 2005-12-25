@@ -80,27 +80,12 @@ ItemType::ItemType()
 	decayTime     = 60;
 	canDecay      =	true;
 
+	isVertical		= false;
+	isHorizontal	= false;
+	isHangable		= false;
+
 	lightLevel    = 0;
 	lightColor    = 0;
-
-	//readable        = false;
-	//ismagicfield    = false;
-	//iskey           = false;
-	//issplash		    = false;
-
-	//damage	      =	0;
-	//groundtile      = false;
-	//iscontainer     = false;
-	//fluidcontainer	= false;		
-	//multitype       = false;
-	//isteleport = false;
-	//notMoveable   = false;
-	//canWalkThrough = false;
-	//blocking      = false; // people can walk on it
-	//blockingProjectile = false;
-	//blockpickupable = true;
-	//isDoor = false;
-	//isDoorWithLock = false;
 }
 
 ItemType::~ItemType()
@@ -142,9 +127,9 @@ bool ItemType::isFluidContainer() const
 	return (group == ITEM_GROUP_FLUID);
 }
 
-
 Items::Items()
 {
+	//
 }
 
 Items::~Items()
@@ -245,6 +230,10 @@ int Items::loadFromOtb(std::string file)
 							iType->floorChangeWest = ((flags & FLAG_FLOORCHANGEWEST) == FLAG_FLOORCHANGEWEST);
 							iType->alwaysOnTop = ((flags & FLAG_ALWAYSONTOP) == FLAG_ALWAYSONTOP);
 							iType->canDecay = !((flags & FLAG_CANNOTDECAY) == FLAG_CANNOTDECAY);
+
+							iType->isVertical = ((flags & FLAG_VERTICAL) == FLAG_VERTICAL);
+							iType->isHorizontal = ((flags & FLAG_HORIZONTAL) == FLAG_HORIZONTAL);
+							iType->isHangable = ((flags & FLAG_HANGABLE) == FLAG_HANGABLE);
 							
 							if(type == ITEM_GROUP_WRITEABLE) {
 								iType->RWInfo |= CAN_BE_WRITTEN;

@@ -180,7 +180,6 @@ public:
 	void updateInventoryWeigth();
 	
 	Item* getInventoryItem(slots_t slot) const;
-	//Item* GetDistWeapon() const;
 	
 	void addManaSpent(unsigned long spent);
 	void addExperience(unsigned long exp);
@@ -196,6 +195,12 @@ public:
 		
 	unsigned long eventAutoWalk;
 	
+	//battle functions
+	Item* GetDistWeapon() const;
+	void removeDistItem();
+	fight_t getFightType();
+	subfight_t getSubFightType();
+
 	//items
 	ContainerVector containerVec;
 	void preSave();
@@ -207,10 +212,6 @@ public:
 	//depots	
 	DepotMap depots;
 	//long max_depot_items;
-	
-	//virtual void removeDistItem();
-	fight_t getFightType();
-	subfight_t getSubFightType();
 	
 	bool CanSee(const Position& pos) const;
 	bool CanSee(int x, int y, int z) const;
@@ -361,7 +362,8 @@ protected:
 	unsigned char maglevel_percent;
 
 	//trade variables
-	unsigned long tradePartner;
+	//unsigned long tradePartner;
+	Player* tradePartner;
 	trade_state tradeState;
 	Item* tradeItem;
 	

@@ -98,6 +98,7 @@ public:
 	bool isPickupable() const;
 	bool isWeapon() const;
 	bool isUseable() const;
+	bool isHangable() const;
 
 	bool floorChangeDown() const;
 	bool floorChangeNorth() const;

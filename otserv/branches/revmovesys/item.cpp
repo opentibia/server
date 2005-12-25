@@ -60,7 +60,6 @@ Item::Item(const unsigned short _type, unsigned short _count)
 {
 	//std::cout << "Item constructor2 " << this << std::endl;
 	id = _type;
-	count = 1;
 	chargecount = 0;
 	fluid = 0;
 	actionId = 0;
@@ -69,6 +68,7 @@ Item::Item(const unsigned short _type, unsigned short _count)
 	specialDescription = NULL;
 	text = NULL;
 	setItemCountOrSubtype(_count);
+	count = std::max((unsigned char)1, count);
 }
 
 Item::Item()
@@ -143,13 +143,6 @@ void Item::setID(unsigned short newid) {
 unsigned short Item::getItemCount() const
 {
 	return count;
-
-	/*if(isStackable()){
-		return count;
-	}
-	else
-		return 1;
-	*/
 }
 
 //////////////////////////////////////////////////
@@ -169,18 +162,18 @@ unsigned short Item::getItemCountOrSubtype() const {
 
 void Item::setItemCountOrSubtype(unsigned char n)
 {
-	if(isStackable()){
-		if(n > 100){
-			count = 100;
-		}
-		else{
-			count = n;
-		}
-	}
-	else if(isFluidContainer() || isSplash())
+	if(isFluidContainer() || isSplash())
 		fluid = n;
 	else if(items[id].runeMagLevel != -1)
 		chargecount = n;
+	else{
+		if(n > 100)
+			count = 100;
+		else if(n < 0)
+			count = 0;
+		else
+			count = n;
+	}
 };
 
 void Item::setActionId(unsigned short n){
@@ -372,6 +365,10 @@ bool Item::isUseable() const{
 	return items[id].useable;
 }
 
+bool Item::isHangable() const{
+	return items[id].isHangable;
+}
+
 bool Item::floorChangeDown() const {
 	return items[id].floorChangeDown;
 }
@@ -391,7 +388,7 @@ bool Item::floorChangeWest() const {
 
 bool Item::isWeapon() const
 { 
-  //now also returns true on SHIELDS!!! Check back with getWeponType!
+  //now also returns true on SHIELDS!!! Check back with getWeaponType!
   //old: return (items[id].weaponType != NONE && items[id].weaponType != SHIELD && items[id].weaponType != AMO);
   return (items[id].weaponType != NONE && items[id].weaponType != AMO);
 }

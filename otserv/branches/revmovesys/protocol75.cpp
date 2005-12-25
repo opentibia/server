@@ -1027,7 +1027,7 @@ void Protocol75::parseAddVip(NetworkMessage& msg)
 	if(vip_name.size() > 32)
 		return;
 
-	game->requestAddVip(player, vip_name);
+	game->playerRequestAddVip(player, vip_name);
 }
 
 void Protocol75::parseRemVip(NetworkMessage& msg)

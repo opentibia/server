@@ -253,13 +253,12 @@ void Map::getSpectators(const Range& range, SpectatorVec& list)
 	}	
 }
 
-
 bool Map::canThrowObjectTo(const Position& fromPos, const Position& toPos)
 {
 	Position start = fromPos;
 	Position end = toPos;
 
-	bool steep = std::abs(end.y - start.y) > abs(end.x - start.x);
+	bool steep = std::abs(end.y - start.y) > std::abs(end.x - start.x);
 
 	if(steep){
 		swap(start.x, start.y);
@@ -271,27 +270,20 @@ bool Map::canThrowObjectTo(const Position& fromPos, const Position& toPos)
 	int error = 0;
 	int deltaerr = deltay;
 	int y = start.y;
-	Tile* t = NULL;
+	Tile* tile = NULL;
 	int xstep = ((start.x < end.x) ? 1 : -1);
 	int ystep = ((start.y < end.y) ? 1 : -1);
 
-	//for(int x = start.x; x != end.x; x += xstep) {
 	for(int x = start.x; x != end.x + xstep; x += xstep){
 		int rx = (steep ? y : x);
 		int ry = (steep ? x : y);
 
-		if(toPos.x == rx && toPos.y == ry){
-			break;
-		}
-		
-		if(fromPos.x == rx && fromPos.y == ry){
-			continue;
-		}
-
-		t = getTile(rx, ry, start.z);
-		if(t){
-			if(t->hasProperty(BLOCKPROJECTILE))
-				return false;
+		if(!(toPos.x == rx && toPos.y == ry) && !(fromPos.x == rx && fromPos.y == ry)){
+			tile = getTile(rx, ry, start.z);
+			if(tile){
+				if(tile->hasProperty(BLOCKPROJECTILE))
+					return false;
+			}
 		}
 
 		error += deltaerr;

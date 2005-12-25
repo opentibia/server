@@ -304,9 +304,15 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 {
 	Thing* iithing = NULL;
 
-	if(thing->getCreature()){
+	if(const Creature* creature = thing->getCreature()){
 		if(!creatures.empty())
 			return RET_NOTPOSSIBLE;
+		
+		if(const Player* player = creature->getPlayer()){
+			if(isPz() && player->pzLocked){
+				return RET_PLAYERISPZLOCKED;
+			}
+		}
 
 		for(uint32_t i = 0; i < getThingCount(); ++i){
 			iithing = __getThing(i);
@@ -335,7 +341,15 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 				const ItemType& iiType = Item::items[iitem->getID()];
 
 				if(item->isPickupable()){
-					if(iiType.blockSolid && (!iiType.hasHeight || iiType.pickupable))
+					//experimental
+					/*if((iiType.isVertical || iiType.isHorizontal) && item->isHangable()){
+						ItemVector::const_iterator iit;
+						for(iit = downItems.begin(); iit != downItems.end(); ++iit){
+							if((*iit)->isHangable())
+								return RET_NOTENOUGHROOM;
+						}
+					}
+					else*/ if(iiType.blockSolid && (!iiType.hasHeight || iiType.pickupable))
 						return RET_NOTENOUGHROOM;
 				}
 
@@ -497,39 +511,6 @@ void Tile::__addThing(int32_t index, Thing* thing)
 
 			ground = item;
 		}
-		/*else if(item->isSplash()){
-			//remove old splash if exists
-			ItemVector::iterator iit;
-			for(iit = topItems.begin(); iit != topItems.end(); ++iit){
-				if((*iit)->isSplash()){
-					Item* oldSplash = *iit;
-					__removeThing(oldSplash, 0);
-
-					oldSplash->setParent(NULL);
-					g_game.FreeThing(oldSplash);
-					break;
-				}
-			}
-
-			bool isInserted = false;
-			//insert the new one according to its top order
-			for(iit = topItems.begin(); iit != topItems.end(); ++iit){
-				if(Item::items[item->getID()].alwaysOnTopOrder <= Item::items[(*iit)->getID()].alwaysOnTopOrder){
-					topItems.insert(iit, item);
-					isInserted = true;
-					break;
-				}
-			}
-
-			if(!isInserted){
-				topItems.push_back(item);
-			}
-
-			//send to client
-			for(it = list.begin(); it != list.end(); ++it) {
-				(*it)->onAddTileItem(cylinderMapPos, item);
-			}
-		}*/
 		else if(item->isAlwaysOnTop()){
 			if(item->isSplash()){
 				//remove old splash if exists
@@ -765,7 +746,8 @@ void Tile::__removeThing(Thing* thing, uint32_t count)
 			for (iit = downItems.begin(); iit != downItems.end(); ++iit)
 				if(*iit == item){
 					if(item->isStackable() && count != item->getItemCount()){							
-						item->setItemCountOrSubtype(item->getItemCount() - count);
+						int newCount = std::max(0, (int)(item->getItemCount() - count));
+						item->setItemCountOrSubtype(newCount);
 
 						//send to client
 						for(it = list.begin(); it != list.end(); ++it) {

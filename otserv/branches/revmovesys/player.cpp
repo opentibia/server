@@ -80,7 +80,8 @@ Creature()
 	internal_ping = 0;
 	fightMode = followMode = 0;
 
-	tradePartner = 0;
+	//tradePartner = 0;
+	tradePartner = NULL;
 	tradeState = TRADE_NONE;
 	tradeItem = NULL;
 
@@ -223,7 +224,6 @@ Item* Player::getInventoryItem(slots_t slot) const
 
 int Player::getWeaponDamage() const
 {
-	/*
 	double damagemax = 0;
 	//TODO:what happens with 2 weapons?
   for (int slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++)
@@ -231,7 +231,7 @@ int Player::getWeaponDamage() const
 			if ((items[slot]->isWeapon())){
 				// check which kind of skill we use...
 				// and calculate the damage dealt
-				Item *distitem;
+				Item* distitem = NULL;
 				switch (items[slot]->getWeaponType()){
 					case SWORD:
 						//damagemax = 3*skills[SKILL_SWORD][SKILL_LEVEL] + 2*Item::items[items[slot]->getID()].attack;
@@ -286,9 +286,6 @@ int Player::getWeaponDamage() const
 
 	// return it
 	return 1+(int)(damagemax*rand()/(RAND_MAX+1.0));
-	*/
-
-	return 0;
 }
 
 int Player::getArmor() const
@@ -422,18 +419,6 @@ bool Player::substractMoney(uint32_t money)
 		Item *item = it2->second->item;
 		g_game.internalRemoveItem(item);
 
-		/*
-		if(it2->second->location == SLOT_TYPE_INVENTORY){
-			removeItemInventory(it2->second->slot);
-		}
-		else if(it2->second->location == SLOT_TYPE_CONTAINER){
-			Container *container = it2->second->parent;
-			unsigned char slot = container->getIndexOfThing(item);
-			onItemRemoveContainer(container,slot);
-			container->removeItem(item);
-		}
-		*/
-
 		if(it2->first <= money){
 			money = money - it2->first;
 		}
@@ -442,8 +427,6 @@ bool Player::substractMoney(uint32_t money)
 			money = 0;
 		}
 
-		//g_game.FreeThing(item);
-		//item = NULL;
 		delete it2->second;
 		it2->second = NULL;
 	}
@@ -817,15 +800,15 @@ unsigned int Player::getReqSkillTries(int skill, int level, playervoc_t voc)
 
 void Player::addSkillTry(int skilltry)
 {
-	/*
 	int skill;
 	bool foundSkill;
 	foundSkill = false;
 	std::string skillname;
 	
-	for (int slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++) {
-		if (items[slot]) {
-			if (items[slot]->isWeapon()) {
+	for(int slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++){
+		if(items[slot]){
+			if(items[slot]->isWeapon()) {
+				
 				switch (items[slot]->getWeaponType()) {
 					case SWORD: skill = 2; break;
 					case CLUB: skill = 1; break;
@@ -839,7 +822,8 @@ void Player::addSkillTry(int skilltry)
 					case SHIELD: continue; break;
 					case MAGIC: return; break;//TODO: should add skill try?
 					default: skill = 0; break;
-			 	}//switch
+			 	}
+
 			 	addSkillTryInternal(skilltry,skill);
 			 	foundSkill = true;
 			 	break;
@@ -848,8 +832,7 @@ void Player::addSkillTry(int skilltry)
 	}
 	
 	if(foundSkill == false)
-		addSkillTryInternal(skilltry,0);//add fist try
-	*/
+		addSkillTryInternal(skilltry,0); //add fist try
 }
 
 void Player::addSkillShieldTry(int skilltry)
@@ -1052,139 +1035,102 @@ void Player::dropLoot(Container *corpse)
 
 fight_t Player::getFightType()
 {
-	/*
-  for (int slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++)
-  {
-    if (items[slot])
-    {
-		if ((items[slot]->isWeapon())) {
-			Item *DistItem;
-			switch (items[slot]->getWeaponType()){
-			case DIST:
-				DistItem = GetDistWeapon();
-				if(DistItem){
-					return FIGHT_DIST;
+  for(int slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++){
+    if(items[slot]){
+			if((items[slot]->isWeapon())){
+				Item* distItem = NULL;
+				switch(items[slot]->getWeaponType()){
+					case DIST:
+						distItem = GetDistWeapon();
+						if(distItem){
+							return FIGHT_DIST;
+						}
+						else{
+							return FIGHT_MELEE;
+						}
+					break;
+
+					case MAGIC:
+						return FIGHT_MAGICDIST;
+				
+					default:
+						break;
 				}
-				else{
-					return FIGHT_MELEE;
-				}
-				break;
-			case MAGIC:
-				return FIGHT_MAGICDIST;
-			default:
-				break;
 			}
-		}
     }
   }
-	*/
 
 	return FIGHT_MELEE;
 }
 
-/*
-void Player::removeDistItem(){
-	Item *DistItem = GetDistWeapon();
-	unsigned char sl_id;
-	if(DistItem){
-		if(DistItem->isStackable() == false)
-			return;
-		
-		if(DistItem == getTradeItem())
-			g_game.playerCloseTrade(this);
-			
-		//remove one dist item
-		unsigned char n = DistItem->getItemCount();
-		if(DistItem == items[SLOT_RIGHT]){
-			sl_id = SLOT_RIGHT;
-		}
-		else if(DistItem == items[SLOT_LEFT]){
-			sl_id = SLOT_LEFT;
-		}
-		else if(DistItem == items[SLOT_AMMO]){
-			sl_id = SLOT_AMMO;
-		}
-		
-		if(n > 1){
-			DistItem->setItemCountOrSubtype(n-1);
-		}
-		else{
-			//remove the item			
-			items[sl_id] = NULL;
-			DistItem->releaseThing();
-			//delete DistItem;
-		}
+void Player::removeDistItem()
+{
+	Item* distItem = GetDistWeapon();
 
-		updateInventoryWeigth();
-		client->sendStats();
-
-		//update inventory
-		client->sendInventory(sl_id);
+	if(distItem && distItem->isStackable()){
+		g_game.internalRemoveItem(distItem, 1);
 	}
-	return;
 }
-*/
 
 subfight_t Player::getSubFightType()
 {
-	/*
 	fight_t type = getFightType();
-	if(type == FIGHT_DIST) {
+	if(type == FIGHT_DIST){
 		Item *DistItem = GetDistWeapon();
 		if(DistItem){
 			return DistItem->getSubfightType();
 		}
 	}
-    if(type == FIGHT_MAGICDIST) {
-		Item *DistItem = GetDistWeapon();
-		if(DistItem){
-			return DistItem->getSubfightType();
+
+	if(type == FIGHT_MAGICDIST) {
+	Item* distItem = GetDistWeapon();
+		if(distItem){
+			return distItem->getSubfightType();
 		}	
 	}
-	*/
 
 	return DIST_NONE;
 }
 
-/*
 Item* Player::GetDistWeapon() const
 {
-	for (int slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++){
-	    if (items[slot]){
-			if ((items[slot]->isWeapon())) {
-				switch (items[slot]->getWeaponType()){
-				case DIST:
-					//find ammunition
-					if(items[slot]->getAmuType() == AMU_NONE){
-						return items[slot];
-					}
-					if(items[SLOT_AMMO]){
-						//compare ammo types
-						if(items[SLOT_AMMO]->getWeaponType() == AMO && 
-							items[slot]->getAmuType() == items[SLOT_AMMO]->getAmuType()){
-								return items[SLOT_AMMO];
+	for(int slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++){
+	    if(items[slot]){
+				if((items[slot]->isWeapon())) {
+					switch (items[slot]->getWeaponType()){
+					case DIST:
+						//find ammunition
+						if(items[slot]->getAmuType() == AMU_NONE){
+							return items[slot];
+						}
+
+						if(items[SLOT_AMMO]){
+							//compare ammo types
+							if(items[SLOT_AMMO]->getWeaponType() == AMO && 
+								items[slot]->getAmuType() == items[SLOT_AMMO]->getAmuType()){
+									return items[SLOT_AMMO];
+							}
+							else{
+								return NULL;
+							}
+							
 						}
 						else{
 							return NULL;
 						}
-						
-					}
-					else{
-						return NULL;
-					}
-				break;
 
-				case MAGIC:
-					return items[slot];
-				default:
 					break;
-				}//switch
-			}//isweapon
-    	}//item[slot]
-  	}//for
+
+					case MAGIC:
+						return items[slot];
+					default:
+						break;
+					}
+				}
+			}
+  	}
   	return NULL;
 }
-*/
 
 void Player::addStorageValue(const unsigned long key, const long value)
 {
@@ -1222,7 +1168,8 @@ void Player::setAcceptTrade(bool b)
 	}
 	else {
 		tradeItem = NULL;
-		tradePartner = 0;
+		//tradePartner = 0;
+		tradePartner = NULL;
 		tradeState = TRADE_NONE;
 	}
 }
@@ -1245,20 +1192,6 @@ bool Player::addDepot(Depot* depot, uint32_t depotId)
 	
 	depots[depotId] = depot;
 	return true;
-
-	/*
-	Container *bdep = getDepot(depotId);
-	if(bdep)
-		return false;
-		
-	//depot->pos.x = 0xFFFF;
-	depot->depotId = depotId;
-	
-	depots[depotId] = depot;
-	return true;
-	*/
-
-	return false;
 }
 
 void Player::sendCancel(const char *msg) const
@@ -1279,8 +1212,7 @@ void Player::sendToChannel(Creature *creature, SpeakClasses type,
 
 void Player::sendCancelAttacking()
 {
-  //attackedCreature = 0;
-  attackedCreature2 = NULL;
+  attackedCreature = NULL;
   client->sendCancelAttacking();
 }
 
@@ -1431,16 +1363,14 @@ void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bo
 {
 	client->sendRemoveCreature(creature, creature->getPosition(), stackpos, isLogout);
 
-	//if(attackedCreature == creature->getID()){
-	if(attackedCreature2 == creature){
+	if(attackedCreature == creature){
 		sendTextMessage(MSG_SMALLINFO, "Target lost.");
 		sendCancelAttacking();
-		//attackedCreature = 0;
-		attackedCreature2 = NULL;
+		attackedCreature = NULL;
 	}
 
 	if(creature == this){
-		if(tradeItem){
+		if(tradePartner){
 			g_game.playerCloseTrade(this);
 		}
 
@@ -1461,21 +1391,31 @@ void Player::onCreatureMove(const Creature* creature, const Position& oldPos, ui
 {
 	client->sendMoveCreature(creature, oldPos, oldStackPos, teleport);
 
-	if((creature == this && attackedCreature2) || attackedCreature2 == creature){
-		if((std::abs(getPosition().x - attackedCreature2->getPosition().x) > 7) ||
-		(std::abs(getPosition().y - attackedCreature2->getPosition().y) > 5) || (getPosition().z != attackedCreature2->getPosition().z)){
+	if((creature == this && attackedCreature) || attackedCreature == creature){
+		if((std::abs(getPosition().x - attackedCreature->getPosition().x) > 7) ||
+		(std::abs(getPosition().y - attackedCreature->getPosition().y) > 5) || (getPosition().z != attackedCreature->getPosition().z)){
 			sendTextMessage(MSG_SMALLINFO, "Target lost.");
 			sendCancelAttacking();
-			attackedCreature2 = NULL;
+			attackedCreature = NULL;
 		} 
 	}
 
-	if(creature == this && tradeItem){
-		if((std::abs(getPosition().x - tradeItem->getPosition().x) > 1) ||
-			(std::abs(getPosition().y - tradeItem->getPosition().y) > 1) ||
-		  (getPosition().z != tradeItem->getPosition().z)){
+	if(creature == this){
+		if(tradeItem){
+			if((std::abs(getPosition().x - tradeItem->getPosition().x) > 1) ||
+				(std::abs(getPosition().y - tradeItem->getPosition().y) > 1) ||
+				(getPosition().z != tradeItem->getPosition().z)){
+					g_game.playerCloseTrade(this);
+			}
+		}
+
+		if(tradePartner){
+			if((std::abs(tradePartner->getPosition().x - getPosition().x) > 2) ||
+			(std::abs(tradePartner->getPosition().y - getPosition().y) > 2) ||
+			(tradePartner->getPosition().z != getPosition().z)){
 				g_game.playerCloseTrade(this);
 			}
+		}
 	}
 }
 
@@ -1961,7 +1901,23 @@ ReturnValue Player::__queryAdd(int32_t index, const Thing* thing, uint32_t count
 			return RET_CANNOTPICKUP;
 		}
 		
-		ReturnValue ret = RET_CANNOTBEDRESSED;
+		ReturnValue ret = RET_NOERROR;
+		
+		if((item->getSlotPosition() & SLOTP_HEAD) ||
+			(item->getSlotPosition() & SLOTP_NECKLACE) ||
+			(item->getSlotPosition() & SLOTP_BACKPACK) ||
+			(item->getSlotPosition() & SLOTP_ARMOR) ||
+			(item->getSlotPosition() & SLOTP_LEGS) ||
+			(item->getSlotPosition() & SLOTP_FEET) ||
+			(item->getSlotPosition() & SLOTP_RING)){
+			ret = RET_CANNOTBEDRESSED;
+		}
+		else if((item->getSlotPosition() & SLOTP_RIGHT) || (item->getSlotPosition() & SLOTP_LEFT)){
+			ret = RET_PUTTHISOBJECTINYOURHAND;
+		}
+		else if(item->getSlotPosition() & SLOTP_TWO_HAND){
+			ret = RET_PUTTHISOBJECTINBOTHHANDS;
+		}
 
 		//check if we can dress this object
 		switch(index){
@@ -1983,17 +1939,26 @@ ReturnValue Player::__queryAdd(int32_t index, const Thing* thing, uint32_t count
 				break;
 			case SLOT_RIGHT:
 				if(item->getSlotPosition() & SLOTP_RIGHT){
+					//check if we already carry an item in the other hand
 					if(item->getSlotPosition() & SLOTP_TWO_HAND){
 						if(items[SLOT_LEFT] && items[SLOT_LEFT] != item){
-							ret = RET_DROPTWOHANDEDITEM;
+							ret = RET_BOTHHANDSNEEDTOBEFREE;
 						}
 						else
 						ret = RET_NOERROR;
 					}
 					else{
+						//check if we already carry a double-handed item
 						if(items[SLOT_LEFT]){
 							if(items[SLOT_LEFT]->getSlotPosition() & SLOTP_TWO_HAND){
 								ret = RET_DROPTWOHANDEDITEM;
+							}
+							//check if weapon, can only carry one weapon
+							else if(item != items[SLOT_LEFT] && items[SLOT_LEFT]->isWeapon() &&
+								(items[SLOT_LEFT]->getWeaponType() != SHIELD) &&
+								(items[SLOT_LEFT]->getWeaponType() != AMO) &&
+								item->isWeapon() && (item->getWeaponType() != SHIELD) && (item->getWeaponType() != AMO)){
+									ret = RET_CANONLYUSEONEWEAPON;
 							}
 							else
 								ret = RET_NOERROR;
@@ -2005,17 +1970,26 @@ ReturnValue Player::__queryAdd(int32_t index, const Thing* thing, uint32_t count
 				break;
 			case SLOT_LEFT:
 				if(item->getSlotPosition() & SLOTP_LEFT){
+					//check if we already carry an item in the other hand
 					if(item->getSlotPosition() & SLOTP_TWO_HAND){
 						if(items[SLOT_RIGHT] && items[SLOT_RIGHT] != item){
-							ret = RET_DROPTWOHANDEDITEM;
+							ret = RET_BOTHHANDSNEEDTOBEFREE;
 						}
 						else
 							ret = RET_NOERROR;
 					}
 					else{
+						//check if we already carry a double-handed item
 						if(items[SLOT_RIGHT]){
 							if(items[SLOT_RIGHT]->getSlotPosition() & SLOTP_TWO_HAND){
 								ret = RET_DROPTWOHANDEDITEM;
+							}
+							//check if weapon, can only carry one weapon
+							else if(item != items[SLOT_RIGHT] && items[SLOT_RIGHT]->isWeapon() &&
+								(items[SLOT_RIGHT]->getWeaponType() != SHIELD) &&
+								(items[SLOT_RIGHT]->getWeaponType() != AMO) &&
+								item->isWeapon() && (item->getWeaponType() != SHIELD) && (item->getWeaponType() != AMO)){
+									ret = RET_CANONLYUSEONEWEAPON;
 							}
 							else
 								ret = RET_NOERROR;
@@ -2050,17 +2024,17 @@ ReturnValue Player::__queryAdd(int32_t index, const Thing* thing, uint32_t count
 				break;
 		}
 
-		if(ret == RET_NOERROR){
+		if(ret == RET_NOERROR || ret == RET_NOTENOUGHROOM){
 			//need an exchange with source?
-			if(items[index] != NULL){
-				if(!items[index]->isStackable() || items[index]->getID() != item->getID()){
-					ret = RET_NEEDEXCHANGE;
+			if(getInventoryItem((slots_t)index) != NULL){
+				if(!getInventoryItem((slots_t)index)->isStackable() || getInventoryItem((slots_t)index)->getID() != item->getID()){
+					return RET_NEEDEXCHANGE;
 				}
 			}
 
 			//check if enough capacity
 			if(hasCapacity(item, count))
-				return RET_NOERROR;
+				return ret;
 			else
 				return RET_NOTENOUGHCAPACITY;
 		}
@@ -2246,7 +2220,7 @@ void Player::__updateThing(uint32_t index, Thing* thing)
 		return /*RET_NOTPOSSIBLE*/;
 	}
 	
-	Item* oldItem = items[index];
+	Item* oldItem = getInventoryItem((slots_t)index);
 	if(!oldItem){
 #ifdef __DEBUG__
 		std::cout << "Failure: [Player::__updateThing] !oldItem" << std::endl;
@@ -2296,7 +2270,8 @@ void Player::__removeThing(Thing* thing, uint32_t count)
 			items[index] = NULL;
 		}
 		else{
-			item->setItemCountOrSubtype(item->getItemCount() - count);
+			int newCount = std::max(0, (int)(item->getItemCount() - count));
+			item->setItemCountOrSubtype(newCount);
 
 			//send change to client
 			onUpdateInventoryItem((slots_t)index, item, item);
@@ -2357,9 +2332,6 @@ void Player::postAddNotification(Thing* thing, bool hasOwnership /*= true*/)
 				autoCloseContainers(*it);
 			}
 		}
-		//else{
-		//	//check target lost
-		//}
 	}
 }
 
@@ -2406,7 +2378,7 @@ void Player::__internalAddThing(uint32_t index, Thing* thing)
 	//index == 0 means we should equip this item at the most appropiate slot
 	if(index == 0){
 #ifdef __DEBUG__
-		std::cout << "Failure: [Player::__internalAddThing] index == 0 not implemented" << std::endl;
+		std::cout << "Failure: [Player::__internalAddThing] index == 0" << std::endl;
 #endif
 		return;
 	}

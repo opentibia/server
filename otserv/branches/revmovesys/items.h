@@ -79,6 +79,9 @@ public:
   unsigned short	decayTo;
   unsigned short	decayTime;
   bool						canDecay;
+	bool						isVertical;
+	bool						isHorizontal;
+	bool						isHangable;
 
 	uint16_t speed;
 

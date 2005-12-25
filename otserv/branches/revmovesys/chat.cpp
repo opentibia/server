@@ -27,7 +27,7 @@ ChatChannel::ChatChannel(unsigned short channelId, std::string channelName)
 	m_name = channelName;
 }
 	
-bool ChatChannel::addUser(Player *player)
+bool ChatChannel::addUser(Player* player)
 {
 	UsersMap::iterator it = m_users.find(player->getID());
 	if(it != m_users.end())
@@ -36,8 +36,8 @@ bool ChatChannel::addUser(Player *player)
 	m_users[player->getID()] = player;
 	return true;
 }
-	
-bool ChatChannel::removeUser(Player *player)
+
+bool ChatChannel::removeUser(Player* player)
 {
 	UsersMap::iterator it = m_users.find(player->getID());
 	if(it == m_users.end())
@@ -46,8 +46,8 @@ bool ChatChannel::removeUser(Player *player)
 	m_users.erase(it);
 	return true;
 }
-	
-bool ChatChannel::talk(Player *fromPlayer, SpeakClasses type, std::string &text, unsigned short channelId)
+
+bool ChatChannel::talk(Player* fromPlayer, SpeakClasses type, const std::string& text, unsigned short channelId)
 {
 	bool success = false;
 	UsersMap::iterator it;
@@ -84,7 +84,7 @@ Chat::Chat()
 		m_normalChannels[0x07] = newChannel;
 }
 
-ChatChannel *Chat::createChannel(Player *player, unsigned short channelId)
+ChatChannel* Chat::createChannel(Player* player, unsigned short channelId)
 {
 	if(getChannel(player, channelId))
 		return NULL;
@@ -101,7 +101,7 @@ ChatChannel *Chat::createChannel(Player *player, unsigned short channelId)
 	return NULL;
 }
 
-bool Chat::deleteChannel(Player *player, unsigned short channelId)
+bool Chat::deleteChannel(Player* player, unsigned short channelId)
 {
 	if(channelId == 0x00){
 		GuildChannelMap::iterator it = m_guildChannels.find(player->getGuildId());
@@ -115,8 +115,8 @@ bool Chat::deleteChannel(Player *player, unsigned short channelId)
 		
 	return false;
 }
-	
-bool Chat::addUserToChannel(Player *player, unsigned short channelId)
+
+bool Chat::addUserToChannel(Player* player, unsigned short channelId)
 {
 	ChatChannel *channel = getChannel(player, channelId);
 	if(!channel)
@@ -128,7 +128,7 @@ bool Chat::addUserToChannel(Player *player, unsigned short channelId)
 		return false;
 }
 
-bool Chat::removeUserFromChannel(Player *player, unsigned short channelId)
+bool Chat::removeUserFromChannel(Player* player, unsigned short channelId)
 {
 	ChatChannel *channel = getChannel(player, channelId);
 	if(!channel)
@@ -139,8 +139,8 @@ bool Chat::removeUserFromChannel(Player *player, unsigned short channelId)
 	else
 		return false;	
 }
-	
-void Chat::removeUserFromAllChannels(Player *player)
+
+void Chat::removeUserFromAllChannels(Player* player)
 {
 	ChannelList list = getChannelList(player);
 	while(list.size()){
@@ -150,8 +150,8 @@ void Chat::removeUserFromAllChannels(Player *player)
 		channel->removeUser(player);
 	}
 }
-	
-bool Chat::talkToChannel(Player *player, SpeakClasses type, std::string &text, unsigned short channelId)
+
+bool Chat::talkToChannel(Player* player, SpeakClasses type, const std::string& text, unsigned short channelId)
 {
 	ChatChannel *channel = getChannel(player, channelId);
 	if(!channel)
@@ -162,8 +162,8 @@ bool Chat::talkToChannel(Player *player, SpeakClasses type, std::string &text, u
 	else
 		return false;
 }
-	
-std::string Chat::getChannelName(Player *player, unsigned short channelId)
+
+std::string Chat::getChannelName(Player* player, unsigned short channelId)
 {	
 	ChatChannel *channel = getChannel(player, channelId);
 	if(channel)
@@ -171,8 +171,8 @@ std::string Chat::getChannelName(Player *player, unsigned short channelId)
 	else
 		return "";
 }
-	
-ChannelList Chat::getChannelList(Player *player)
+
+ChannelList Chat::getChannelList(Player* player)
 {
 	ChannelList list;
 	NormalChannelMap::iterator itn;
@@ -194,7 +194,7 @@ ChannelList Chat::getChannelList(Player *player)
 	return list;
 }
 
-ChatChannel *Chat::getChannel(Player *player, unsigned short channelId)
+ChatChannel* Chat::getChannel(Player* player, unsigned short channelId)
 {
 	if(channelId == 0x00){	
 		GuildChannelMap::iterator it = m_guildChannels.find(player->getGuildId());

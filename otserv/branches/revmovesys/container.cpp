@@ -410,7 +410,8 @@ void Container::__removeThing(Thing* thing, uint32_t count)
 	g_game.getSpectators(Range(cylinderMapPos, 2, 2, 2, 2, false), list);
 
 	if(item->isStackable() && count != item->getItemCount()){
-		item->setItemCountOrSubtype(item->getItemCount() - count);
+		int newCount = std::max(0, (int)(item->getItemCount() - count));
+		item->setItemCountOrSubtype(newCount);
 
 		//send change to client
 		for(it = list.begin(); it != list.end(); ++it) {
