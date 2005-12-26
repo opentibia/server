@@ -3950,22 +3950,6 @@ void Game::playerAcceptTrade(Player* player)
 		Item *tradeItem1 = player->tradeItem;
 		Item *tradeItem2 = tradePartner->tradeItem;
 
-		std::map<Item*, unsigned long>::iterator it;
-
-		it = tradeItems.find(tradeItem1);
-		if(it != tradeItems.end()) {
-			FreeThing(it->first);
-			tradeItems.erase(it);
-		}
-
-		it = tradeItems.find(tradeItem2);
-		if(it != tradeItems.end()) {
-			FreeThing(it->first);
-			tradeItems.erase(it);
-		}
-		
-		player->setAcceptTrade(false);
-		tradePartner->setAcceptTrade(false);
 		player->sendCloseTrade();
 		tradePartner->sendCloseTrade();
 		
@@ -3985,6 +3969,23 @@ void Game::playerAcceptTrade(Player* player)
 			player->sendTextMessage(MSG_SMALLINFO, "Sorry not possible.");
 			tradePartner->sendTextMessage(MSG_SMALLINFO, "Sorry not possible.");
 		}
+		
+		std::map<Item*, unsigned long>::iterator it;
+		
+		it = tradeItems.find(tradeItem1);
+		if(it != tradeItems.end()) {
+			FreeThing(it->first);
+			tradeItems.erase(it);
+		}
+		
+		it = tradeItems.find(tradeItem2);
+		if(it != tradeItems.end()) {
+			FreeThing(it->first);
+			tradeItems.erase(it);
+		}
+		
+		player->setAcceptTrade(false);
+		tradePartner->setAcceptTrade(false);
 	}
 }
 

@@ -682,32 +682,31 @@ bool Player::addItem(Item *item, bool test /*=false*/){
 	unsigned char slot;
 	
 	switch(getFreeSlot(&container,slot, item)){
-		case SLOT_TYPE_NONE:
+	case SLOT_TYPE_NONE:
+		return false;
+		break;
+	case SLOT_TYPE_INVENTORY:
+		if(!test){
+			addItemInventory(item,slot);
+		}
+		return true;
+		break;
+	case SLOT_TYPE_CONTAINER:
+		if(container->isHoldingItem(item) == true){
 			return false;
-		case SLOT_TYPE_INVENTORY:
-			if(!test){
-				addItemInventory(item,slot);
-			}
-			return true;
-		case SLOT_TYPE_CONTAINER:
-			if(container->isHoldingItem(item) == true){
-				return false;
-			}
+		}
+		if(!test){
+			//add the item
+			container->addItem(item);
+			updateInventoryWeigth();
+			client->sendStats();
 
-			if(!test){
-				//add the item
-				container->addItem(item);
-
-				updateInventoryWeigth();
-				client->sendStats();
-
-				//update container
-				client->sendItemAddContainer(container,item);
-			}
-
-			return true;
+			//update container
+			client->sendItemAddContainer(container,item);
+		}
+		return true;
+		break;
 	}
-
 	return false;
 }
 
@@ -752,14 +751,17 @@ freeslot_t Player::getFreeSlot(Container **container,unsigned char &slot, const 
 
 Container* Player::getFreeContainerSlot(Container *parent)
 {
+	if(parent == getTradeItem()){
+		return NULL;
+	}
 	//check if it is full
-	if(parent->size() < parent->capacity() && parent != getTradeItem()){
+	if(parent->size() < parent->capacity()){
 		return parent;
 	}
 	else{ //look for more containers inside
 		for(ContainerList::const_iterator cit = parent->getItems(); cit != parent->getEnd(); ++cit){
 			Container * temp_container = dynamic_cast<Container*>(*cit);
-			if(temp_container && temp_container != getTradeItem()){
+			if(temp_container){
 				return getFreeContainerSlot(temp_container);
 			}
 		}
