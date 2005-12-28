@@ -65,7 +65,7 @@ game(igame),
 loaded(false)
 {
 	//setup command map
-	for(int i = 0;i< sizeof(defined_commands)/sizeof(defined_commands[0]); i++){
+	for(int i = 0; i < sizeof(defined_commands) / sizeof(defined_commands[0]); i++){
 		Command *tmp = new Command;
 		tmp->loaded = false;
 		tmp->accesslevel = 1;
@@ -75,8 +75,8 @@ loaded(false)
 	}
 }
 
-bool Commands::loadXml(const std::string &_datadir){
-	
+bool Commands::loadXml(const std::string& _datadir)
+{	
 	datadir = _datadir;
 	
 	std::string filename = datadir + "commands.xml";
@@ -145,7 +145,8 @@ bool Commands::loadXml(const std::string &_datadir){
 	return this->loaded;
 }
 
-bool Commands::reload(){
+bool Commands::reload()
+{
 	this->loaded = false;
 	for(CommandMap::iterator it = commandMap.begin(); it != commandMap.end(); ++it){
 		it->second->accesslevel = 1;
@@ -156,8 +157,8 @@ bool Commands::reload(){
 	return true;
 }
 
-bool Commands::exeCommand(Creature *creature, const std::string &cmd){
-	
+bool Commands::exeCommand(Creature* creature, const std::string& cmd)
+{	
 	std::string str_command;
 	std::string str_param;
 	
@@ -195,9 +196,8 @@ bool Commands::exeCommand(Creature *creature, const std::string &cmd){
 
 	return true;
 }
-	
 
-bool Commands::placeNpc(Creature* creature, const std::string &cmd, const std::string &param)
+bool Commands::placeNpc(Creature* creature, const std::string& cmd, const std::string& param)
 {
 	Npc* npc = new Npc(param, game);
 	if(!npc->isLoaded()){
@@ -233,6 +233,7 @@ bool Commands::placeNpc(Creature* creature, const std::string &cmd, const std::s
 
 	// Place the npc
 	if(game->placeCreature(creature->getPosition(), npc)){
+		game->AddMagicEffectAt(creature->getPosition(), NM_ME_MAGIC_BLOOD);
 		return true;
 	}
 	else{
@@ -248,7 +249,7 @@ bool Commands::placeNpc(Creature* creature, const std::string &cmd, const std::s
 	return false;
 }
 
-bool Commands::placeMonster(Creature* creature, const std::string &cmd, const std::string &param)
+bool Commands::placeMonster(Creature* creature, const std::string& cmd, const std::string& param)
 {
 	Monster* monster = Monster::createMonster(param, game);
 	if(!monster){
@@ -285,21 +286,22 @@ bool Commands::placeMonster(Creature* creature, const std::string &cmd, const st
 
 	// Place the monster
 	if(game->placeCreature(creature->getPosition(), monster)){
+		game->AddMagicEffectAt(creature->getPosition(), NM_ME_MAGIC_BLOOD);
 		return true;
 	}
 	else{
 		delete monster;
 		Player* player = dynamic_cast<Player*>(creature);
 		if(player) {
+			game->playerSendErrorMessage(player, RET_NOTENOUGHROOM);
 			player->sendMagicEffect(player->getPosition(), NM_ME_PUFF);
-			player->sendCancel("Sorry not enough room.");
 		}
 	}
 
 	return false;
 }
 
-bool Commands::placeSummon(Creature* creature, const std::string &cmd, const std::string &param)
+bool Commands::placeSummon(Creature* creature, const std::string& cmd, const std::string& param)
 {
 	Monster* monster = Monster::createMonster(param, game);
 	if(!monster){
@@ -343,8 +345,7 @@ bool Commands::placeSummon(Creature* creature, const std::string &cmd, const std
 	else{
 		delete monster;
 
-		Player* player = dynamic_cast<Player*>(creature);
-		if(player) {
+		if(Player* player = creature->getPlayer()) {
 			player->sendMagicEffect(player->getPosition(), NM_ME_PUFF);
 			player->sendCancel("Sorry not enough room.");
 		}
@@ -353,13 +354,17 @@ bool Commands::placeSummon(Creature* creature, const std::string &cmd, const std
 	return false;
 }
 
-bool Commands::broadcastMessage(Creature* c, const std::string &cmd, const std::string &param)
+bool Commands::broadcastMessage(Creature* creature, const std::string& cmd, const std::string& param)
 {
-	//game->creatureBroadcastMessage(c, param);
+	Player* player = creature->getPlayer();
+	if(!player)
+		return false;
+
+	game->playerBroadcastMessage(player, param);
 	return true;
 }
 
-bool Commands::banPlayer(Creature* c, const std::string &cmd, const std::string &param)
+bool Commands::banPlayer(Creature* creature, const std::string& cmd, const std::string& param)
 {	
 	Player* playerBan = game->getPlayerByName(param);
 	if(playerBan) {
@@ -373,7 +378,7 @@ bool Commands::banPlayer(Creature* c, const std::string &cmd, const std::string 
 
 		game->creatureMakeMagic(NULL, playerBan->getPosition(), &me);
 
-		Player* player = dynamic_cast<Player*>(c);
+		Player* player = creature->getPlayer();
 		if(player && player->access <= playerBan->access){
 			player->sendTextMessage(MSG_BLUE_TEXT,"You cannot ban this player.");
 			return true;
@@ -394,32 +399,32 @@ bool Commands::banPlayer(Creature* c, const std::string &cmd, const std::string 
 	return false;
 }
 
-bool Commands::teleportMasterPos(Creature* c, const std::string &cmd, const std::string &param)
+bool Commands::teleportMasterPos(Creature* creature, const std::string& cmd, const std::string& param)
 {
-	game->internalTeleport(c, c->masterPos);
+	game->internalTeleport(creature, creature->masterPos);
 	return true;
 }
 
-bool Commands::teleportHere(Creature* c, const std::string &cmd, const std::string &param)
+bool Commands::teleportHere(Creature* creature, const std::string& cmd, const std::string& param)
 {
-	Creature* creature = game->getCreatureByName(param);
+	Creature* creaturereature = game->getCreatureByName(param);
 	if(creature) {
-		game->internalTeleport(creature, c->getPosition());
+		game->internalTeleport(creature, creature->getPosition());
 	}
 	return true;
 }
 
-bool Commands::createItems(Creature* c, const std::string &cmd, const std::string &param)
+bool Commands::createItems(Creature* creature, const std::string& cmd, const std::string& param)
 {
-	Player* player = dynamic_cast<Player *>(c);
+	Player* player = creature->getPlayer();
 	if(!player)
-		return true;
+		return false;
 
 	std::string tmp = param;
 	
 	std::string::size_type pos = tmp.find(' ', 0);
 	if(pos == std::string::npos)
-		return true;
+		return false;
 	
 	int type = atoi(tmp.substr(0, pos).c_str());
 	tmp.erase(0, pos+1);
@@ -427,7 +432,7 @@ bool Commands::createItems(Creature* c, const std::string &cmd, const std::strin
 				
 	Item* newItem = Item::CreateItem(type, count);
 	if(!newItem)
-		return true;
+		return false;
 
 	ReturnValue ret = game->internalAddItem(player, newItem);
 	
@@ -436,47 +441,45 @@ bool Commands::createItems(Creature* c, const std::string &cmd, const std::strin
 
 		if(ret != RET_NOERROR){
 			delete newItem;
+			return false;
 		}
 	}
-
+	
+	game->AddMagicEffectAt(player->getPosition(), NM_ME_MAGIC_POISEN);
 	return true;
 }
 
-bool Commands::substract_contMoney(Creature* c, const std::string &cmd, const std::string &param)
+bool Commands::substract_contMoney(Creature* creature, const std::string& cmd, const std::string& param)
 {
-	/*	
-	Player *player = dynamic_cast<Player *>(c);
+	Player* player = creature->getPlayer();
 	if(!player)
-		return true;
+		return false;
 				
 	int count = atoi(param.c_str());
 	unsigned long money = player->getMoney();
-	if(!count)
-	{
+	if(!count){
 		std::stringstream info;
 		info << "You have " << money << " of money.";
 		player->sendCancel(info.str().c_str());
 		return true;
 	}
-	else if(count > money)
-	{
+	else if(count > money){
 		std::stringstream info;
 		info << "You have " << money << " of money and is not suficient.";
 		player->sendCancel(info.str().c_str());
 		return true;
 	}
+
 	if(player->substractMoney(count) != true){
 		std::stringstream info;
 		info << "Can not substract money!";
 		player->sendCancel(info.str().c_str());
 	}
-	return true;
-	*/
 
-	return false;
+	return true;
 }
 
-bool Commands::reloadInfo(Creature* c, const std::string &cmd, const std::string &param)
+bool Commands::reloadInfo(Creature* creature, const std::string& cmd, const std::string& param)
 {	
 	if(param == "actions"){
 		actions.reload();
@@ -488,7 +491,7 @@ bool Commands::reloadInfo(Creature* c, const std::string &cmd, const std::string
 		g_monsters.reload();
 	}
 	else{
-		Player *player = dynamic_cast<Player*>(c);
+		Player *player = creature->getPlayer();
 		if(player)
 			player->sendCancel("Option not found.");
 	}
@@ -496,10 +499,10 @@ bool Commands::reloadInfo(Creature* c, const std::string &cmd, const std::string
 	return true;
 }
 
-bool Commands::testCommand(Creature* c, const std::string &cmd, const std::string &param)
+bool Commands::testCommand(Creature* creature, const std::string& cmd, const std::string& param)
 {
 	int color = atoi(param.c_str());
-	Player *player = dynamic_cast<Player*>(c);
+	Player* player = creature->getPlayer();
 	if(player) {
 		player->sendMagicEffect(player->getPosition(), color);
 	}
@@ -507,16 +510,20 @@ bool Commands::testCommand(Creature* c, const std::string &cmd, const std::strin
 	return true;
 }
 
-bool Commands::teleportTo(Creature* c, const std::string &cmd, const std::string &param){
-	Creature* creature = game->getCreatureByName(param);
-	if(creature) {
-		game->internalTeleport(c, creature->getPosition());
+bool Commands::teleportTo(Creature* creature, const std::string& cmd, const std::string& param)
+{
+	Creature* paramCreature = game->getCreatureByName(param);
+	if(paramCreature){
+		game->internalTeleport(creature, paramCreature->getPosition());
+		return true;
 	}
-	return true;	
+	
+	return false;
 }
 
-bool Commands::getInfo(Creature* c, const std::string &cmd, const std::string &param){
-	Player *player = dynamic_cast<Player*>(c);
+bool Commands::getInfo(Creature* creature, const std::string& cmd, const std::string& param)
+{
+	Player* player = creature->getPlayer();
 	if(!player)
 		return true;
 	
@@ -547,7 +554,7 @@ bool Commands::getInfo(Creature* c, const std::string &cmd, const std::string &p
 }
 
 
-bool Commands::closeServer(Creature* c, const std::string &cmd, const std::string &param)
+bool Commands::closeServer(Creature* creature, const std::string& cmd, const std::string& param)
 {
 	game->setGameState(GAME_STATE_CLOSED);
 	//kick players with access = 0
@@ -566,20 +573,21 @@ bool Commands::closeServer(Creature* c, const std::string &cmd, const std::strin
 	return true;
 }
 
-bool Commands::openServer(Creature* c, const std::string &cmd, const std::string &param)
+bool Commands::openServer(Creature* creature, const std::string& cmd, const std::string& param)
 {
 	game->setGameState(GAME_STATE_NORMAL);
 	return true;
 }
 
-bool Commands::onlineList(Creature* c, const std::string &cmd, const std::string &param)
+bool Commands::onlineList(Creature* creature, const std::string& cmd, const std::string& param)
 {
-	Player* player = dynamic_cast<Player*>(c);
-	unsigned long alevelmin = 0;
-	unsigned long alevelmax = 10000;
-	int i,n;
+	Player* player = creature->getPlayer();
 	if(!player)
 		return false;
+
+	unsigned long alevelmin = 0;
+	unsigned long alevelmax = 10000;
+	int i, n;
 	
 	if(param == "gm")
 		alevelmin = 1;
@@ -616,13 +624,13 @@ bool Commands::onlineList(Creature* c, const std::string &cmd, const std::string
 	return true;
 }
 
-bool Commands::teleportNTiles(Creature* c, const std::string &cmd, const std::string &param){
-				
+bool Commands::teleportNTiles(Creature* creature, const std::string& cmd, const std::string& param)
+{				
 	int ntiles = atoi(param.c_str());
 	if(ntiles != 0)
 	{
-		Position newPos = c->getPosition();
-		switch(c->direction){
+		Position newPos = creature->getPosition();
+		switch(creature->getDirection()){
 		case NORTH:
 			newPos.y = newPos.y - ntiles;
 			break;
@@ -637,7 +645,7 @@ bool Commands::teleportNTiles(Creature* c, const std::string &cmd, const std::st
 			break;
 		}
 
-		game->internalTeleport(c, newPos);
+		game->internalTeleport(creature, newPos);
 	}
 
 	return true;

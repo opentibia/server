@@ -892,8 +892,8 @@ void Game::moveCreature(Player* player, Cylinder* fromCylinder, Cylinder* toCyli
 	if(player->getPosition().z != fromCylinder->getPosition().z){
 		ret = RET_NOTPOSSIBLE;
 	}
-	else if((std::abs(player->getPosition().x - fromCylinder->getPosition().x) > 1) ||
-		(std::abs(player->getPosition().y - fromCylinder->getPosition().y) > 1)) {
+	else if((std::abs(player->getPosition().x - moveCreature->getPosition().x) > 1) ||
+		(std::abs(player->getPosition().y - moveCreature->getPosition().y) > 1)){
 		ret = RET_TOFARAWAY;
 	}
 
@@ -901,9 +901,9 @@ void Game::moveCreature(Player* player, Cylinder* fromCylinder, Cylinder* toCyli
 	const Position& toPos = toCylinder->getPosition();
 
 	//check throw distance
-	if( (std::abs(fromPos.x - toPos.x) > moveCreature->getThrowRange()) ||
-			(std::abs(fromPos.y - toPos.y) > moveCreature->getThrowRange()) ||
-			(std::abs(fromPos.z - toPos.z) * 2 > moveCreature->getThrowRange()) ) {
+	if( (std::abs(moveCreature->getPosition().x - toPos.x) > moveCreature->getThrowRange()) ||
+			(std::abs(moveCreature->getPosition().y - toPos.y) > moveCreature->getThrowRange()) ||
+			(std::abs(moveCreature->getPosition().z - toPos.z) * 4 > moveCreature->getThrowRange()) ) {
 		ret = RET_DESTINATIONOUTOFREACH;
 	}
 
@@ -1507,7 +1507,7 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 	//Filter out the tiles we actually can work on
 	for(MagicAreaVec::iterator maIt = tmpMagicAreaVec.begin(); maIt != tmpMagicAreaVec.end(); ++maIt) {
 		Tile *t = map->getTile(maIt->x, maIt->y, maIt->z);
-		if(t && (!creature || (creature->access != 0 || !me->offensive || !t->hasProperty(BLOCKPZ)) ) ) {
+		if(t && (!creature || (creature->access != 0 || !me->offensive || !t->hasProperty(PROTECTIONZONE)) ) ) {
 			if(!t->hasProperty(BLOCKPROJECTILE) && (me->isIndirect() ||
 				(map->canThrowObjectTo(centerpos, *maIt) && !t->floorChange()))) {
 				
@@ -2859,13 +2859,27 @@ void Game::changeSpeed(unsigned long id, unsigned short speed)
 
 		getSpectators(Range(creature->getPosition()), list);
 
-		//for(unsigned int i = 0; i < list.size(); i++)
 		for(it = list.begin(); it != list.end(); ++it) {
 			Player* p = dynamic_cast<Player*>(*it);
 			if(p)
 				p->sendChangeSpeed(creature);
 		}
 	}	
+}
+
+void Game::AddMagicEffectAt(const Position& pos, uint8_t color)
+{
+	SpectatorVec list;
+	SpectatorVec::iterator it;
+
+	getSpectators(Range(pos), list);
+
+	Player* player;
+	for(it = list.begin(); it != list.end(); ++it){
+		if(player = (*it)->getPlayer()){
+			player->sendMagicEffect(pos, color);
+		}
+	}
 }
 
 void Game::checkDecay(int t)

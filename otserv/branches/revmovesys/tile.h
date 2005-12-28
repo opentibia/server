@@ -62,7 +62,7 @@ public:
 	virtual bool isPushable() const {return false;};
 
   Item*          ground;
-  Item*          splash;
+  //Item*          splash;
   ItemVector     topItems;
   CreatureVector creatures;
   ItemVector     downItems;

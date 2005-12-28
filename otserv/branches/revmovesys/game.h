@@ -297,6 +297,7 @@ public:
 	std::list<Position> getPathTo(Creature *creature, Position start, Position to, bool creaturesBlock=true);
 	void changeOutfitAfter(unsigned long id, int looktype, long time);
 	void changeSpeed(unsigned long id, unsigned short speed);
+	void AddMagicEffectAt(const Position& pos, uint8_t color);
 	
 	enum_game_state getGameState();
 	void setGameState(enum_game_state newstate){game_state = newstate;}

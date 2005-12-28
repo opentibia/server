@@ -306,6 +306,11 @@ bool Item::hasProperty(enum ITEMPROPERTY prop) const
 				return true;
 		break;
 
+		case NOTMOVEABLEBLOCKSOLID:
+			if(it.blockSolid && !it.moveable)
+				return true;
+		break;
+
 		case BLOCKPROJECTILE:
 			if(it.blockProjectile)
 				return true;

@@ -82,6 +82,7 @@ private:
 	Position targetPos;
 	Position moveToPos;
 	bool hasLostMaster;
+	bool isYielding;
 	MonsterType *mType;
 	
 	void doMoveTo(int dx, int dy);

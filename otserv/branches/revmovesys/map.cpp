@@ -306,10 +306,17 @@ bool Map::isPathValid(Creature *creature, const std::list<Position>& path, int p
 
 		Tile* tile = getTile(iit->x, iit->y, iit->z);
 		if(tile){
-			if(tile->hasProperty(BLOCKSOLID) ||
-				 tile->hasProperty(BLOCKPATHFIND) ||
-				 (!tile->creatures.empty() && creature->getTile() != tile))
-				 return false;
+			if(!tile->creatures.empty() && creature->getTile() != tile)
+				continue;
+
+			if(ignoreMoveableBlockingItems){
+				if(tile->hasProperty(NOTMOVEABLEBLOCKSOLID))
+					continue;
+			}
+			else{
+				if(tile->hasProperty(BLOCKSOLID) || tile->hasProperty(BLOCKPATHFIND))
+					continue;
+			}
 		}
 		else
 			return false;
@@ -349,10 +356,17 @@ std::list<Position> Map::getPathTo(Creature *creature, Position start, Position 
 
 					Tile* tile = getTile(x, y, z);
 					if(tile){
-						if(tile->hasProperty(BLOCKSOLID) ||
-							tile->hasProperty(BLOCKPATHFIND) ||
-							(!tile->creatures.empty() && creature->getTile() != tile))
+						if(!tile->creatures.empty() && creature->getTile() != tile)
 							continue;
+
+						if(ignoreMoveableBlockingItems){
+							if(tile->hasProperty(NOTMOVEABLEBLOCKSOLID))
+								continue;
+						}
+						else{
+							if(tile->hasProperty(BLOCKSOLID) || tile->hasProperty(BLOCKPATHFIND))
+								continue;
+						}
 					}
 					else
 						continue;

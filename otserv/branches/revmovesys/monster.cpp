@@ -60,6 +60,7 @@ Creature()
 	this->maglevel = 0;
 	curPhysicalAttack = NULL;
 	hasLostMaster = false;
+	isYielding = true;
 	
 	lookhead = mType->lookhead;
 	lookbody = mType->lookbody;
@@ -234,6 +235,7 @@ int Monster::onThink(int& newThinkTicks)
 		this->lastmove = OTSYS_TIME();
 	}
 	
+	isYielding = false;
 	reThink(false);
 
 	//check/update/calc route
@@ -287,14 +289,17 @@ int Monster::onThink(int& newThinkTicks)
 		newThinkTicks = getStepDuration();
 		int ret = oldThinkTicks;
 		oldThinkTicks = newThinkTicks;
+		isYielding = true;
 		return ret;
 	}
 
 	eventCheck = 0;
 	stopThink();
 	newThinkTicks = 0;
+	isYielding = true;
 	return oldThinkTicks;
 }
+
 
 int Monster::getTargetDistance()
 {
@@ -308,6 +313,9 @@ int Monster::getCurrentDistanceToTarget(const Position& target)
 
 void Monster::updateLookDirection()
 {
+	if(isYielding)
+		return;
+
 	if(isSummon() && state == STATE_IDLESUMMON) {
 		return;
 	}
@@ -650,11 +658,9 @@ void Monster::onAddTileItem(const Position& pos, const Item* item)
 
 void Monster::onUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* oldItem, const Item* newItem)
 {
-	const Item* item = dynamic_cast<const Item*>(newItem);
-	if(item && item->isSplash())
-		return;
-
-	reThink();
+	if(oldItem->isBlocking() && !newItem->isBlocking()){
+		reThink();
+	}
 }
 
 void Monster::onRemoveTileItem(const Position& pos, uint32_t stackpos, const Item* item)
@@ -681,12 +687,11 @@ void Monster::onCreatureAppear(const Creature* creature, bool isLogin)
 
 void Monster::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout)
 {
-	if(creature == this) {
+	if(creature == this){
 		stopThink();
-		return;
 	}
-
-	creatureLeave(creature);
+	else
+		creatureLeave(creature);
 }
 
 void Monster::onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport)
@@ -1094,6 +1099,9 @@ void Monster::dropLoot(Container *corpse)
 
 bool Monster::doAttacks(Creature* attackedCreature, monstermode_t mode /*= MODE_NORMAL*/)
 {
+	if(isYielding)
+		return false;
+
 	int modeProb = 0;
 	switch(mode) {
 		case MODE_NORMAL: modeProb = 0; break;
@@ -1173,6 +1181,7 @@ bool Monster::doAttacks(Creature* attackedCreature, monstermode_t mode /*= MODE_
 void Monster::onAttack()
 {
 	if(attackedCreature && !(isSummon() && hasLostMaster)) {
+		isYielding = false;
 		this->eventCheckAttacking = game->addEvent(makeTask(500, std::bind2nd(std::mem_fun(&Game::checkCreatureAttacking), getID())));
 
 		exhaustedTicks -= 500;
@@ -1187,6 +1196,8 @@ void Monster::onAttack()
 		}
 		else
 			setAttackedCreature(NULL);
+
+		isYielding = true;
 	}
 }
 
@@ -1203,11 +1214,13 @@ void Monster::doMoveTo(int dx, int dy)
 					if(!monsterMoveItem(blockItem, 3)){
 						//destroy it
 						game->internalRemoveItem(blockItem);
+						game->AddMagicEffectAt(blockItem->getPosition(), NM_ME_PUFF);
 					}
 				}
 				else{
 					//destroy items directly
 					game->internalRemoveItem(blockItem);
+					game->AddMagicEffectAt(blockItem->getPosition(), NM_ME_PUFF);
 				}
 
 				countItems++;
@@ -1261,7 +1274,20 @@ bool Monster::canMoveTo(unsigned short x, unsigned short y, unsigned char z)
 {
 	Tile* tile = game->map->getTile(x, y, getPosition().z);
 	if(tile){
-		return (!tile->hasProperty(BLOCKPZ) && !tile->hasProperty(BLOCKPATHFIND) && (tile->__queryAdd(0, this, 0) == RET_NOERROR));
+		if(tile->hasProperty(PROTECTIONZONE))
+			return false;
+
+		if(!tile->creatures.empty() && this->getTile() != tile)
+			return false;
+
+		if(mType->canPushItems){
+			if(tile->hasProperty(NOTMOVEABLEBLOCKSOLID))
+				return false;
+		}
+		else if(tile->hasProperty(BLOCKSOLID) || tile->hasProperty(BLOCKPATHFIND))
+			return false;
+
+		return true;
 	}
 
 	return false;

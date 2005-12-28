@@ -342,18 +342,18 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 
 				if(item->isPickupable()){
 					//experimental
-					/*if((iiType.isVertical || iiType.isHorizontal) && item->isHangable()){
-						ItemVector::const_iterator iit;
-						for(iit = downItems.begin(); iit != downItems.end(); ++iit){
-							if((*iit)->isHangable())
-								return RET_NOTENOUGHROOM;
-						}
-					}
-					else*/ if(iiType.blockSolid && (!iiType.hasHeight || iiType.pickupable))
+					//if((iiType.isVertical || iiType.isHorizontal) && item->isHangable()){
+					//	ItemVector::const_iterator iit;
+					//	for(iit = downItems.begin(); iit != downItems.end(); ++iit){
+					//		if((*iit)->isHangable())
+					//			return RET_NOTENOUGHROOM;
+					//	}
+					//}
+					//else
+					if(iiType.blockSolid && (!iiType.hasHeight || iiType.pickupable))
 						return RET_NOTENOUGHROOM;
 				}
-
-				if(item->isBlocking() && iiType.blockSolid)
+				else if(iiType.blockSolid)
 					return RET_NOTENOUGHROOM;
 			}
 		}
