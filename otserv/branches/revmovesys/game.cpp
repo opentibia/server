@@ -60,9 +60,6 @@ using namespace std;
 extern OTSYS_THREAD_LOCKVAR maploadlock;
 #endif
 
-#define EVENT_CHECKCREATURE          123
-#define EVENT_CHECKCREATUREATTACKING 124
-
 extern LuaScript g_config;
 extern Spells spells;
 extern Actions actions;
@@ -770,12 +767,12 @@ bool Game::placeCreature(const Position &pos, Creature* creature, bool isLogin /
 			
 			if(player){
 				creature->eventCheck = addEvent(makeTask(1000, std::bind2nd(std::mem_fun(&Game::checkCreature), creature->getID())));
+				creature->eventCheckAttacking = addEvent(makeTask(2000, boost::bind(&Game::checkCreatureAttacking, this, creature->getID(), 2000)));
 			}
 			else{
 				creature->eventCheck = addEvent(makeTask(500, std::bind2nd(std::mem_fun(&Game::checkCreature), creature->getID())));
+				creature->eventCheckAttacking = addEvent(makeTask(500, boost::bind(&Game::checkCreatureAttacking, this, creature->getID(), 500)));
 			}
-
-			creature->eventCheckAttacking = addEvent(makeTask(2000, std::bind2nd(std::mem_fun(&Game::checkCreatureAttacking), creature->getID())));
 		}
 	}
 	else {
@@ -805,7 +802,7 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 
 	getSpectators(Range(cylinder->getPosition(), true), list);
 
-	for(it = list.begin(); it != list.end(); ++it) {
+	for(it = list.begin(); it != list.end(); ++it){
 		(*it)->onCreatureDisappear(creature, index, isLogout);
 	}
 	
@@ -815,7 +812,7 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 	listCreature.removeList(creature->getID());
 	creature->removeList();
 	
-	for(std::list<Creature*>::iterator cit = creature->summons.begin(); cit != creature->summons.end(); ++cit) {
+	for(std::list<Creature*>::iterator cit = creature->summons.begin(); cit != creature->summons.end(); ++cit){
 		removeCreature(*cit);
 	}
 		
@@ -1973,14 +1970,14 @@ bool Game::creatureThrowRune(Creature *creature, const Position& centerpos, cons
 		return creatureMakeMagic(creature, centerpos, &me);
 }
 
-void Game::checkCreatureAttacking(unsigned long id)
+void Game::checkCreatureAttacking(unsigned long creatureid, unsigned long time)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::checkCreatureAttacking()");
 
-	Creature* creature = getCreatureByID(id);
-	if(creature != NULL && !creature->isRemoved())
+	Creature* creature = getCreatureByID(creatureid);
+	if(creature != NULL && !creature->isRemoved() && creature->attackedCreature != NULL)
 	{
-		creature->eventCheckAttacking = 0;
+		//TEST creature->eventCheckAttacking = 0;
 		Monster* monster = dynamic_cast<Monster*>(creature);
 		if(monster) {
 			monster->onAttack();
@@ -2003,12 +2000,15 @@ void Game::checkCreatureAttacking(unsigned long id)
 					}
 				}
 
-				creature->eventCheckAttacking = addEvent(makeTask(2000, std::bind2nd(std::mem_fun(&Game::checkCreatureAttacking), id)));
+				//creature->eventCheckAttacking = addEvent(makeTask(time, std::bind2nd(std::mem_fun(&Game::checkCreatureAttacking), id)));
 			}
 		}
 
+		//creature->eventCheckAttacking = addEvent(makeTask(time, std::bind2nd(std::mem_fun(&Game::checkCreatureAttacking), creatureid, time)));
 		flushSendBuffers();
 	}	
+
+	creature->eventCheckAttacking = addEvent(makeTask(time, boost::bind(&Game::checkCreatureAttacking, this, creature->getID(), time)));
 }
 
 //Implementation of player invoked events
@@ -2557,13 +2557,13 @@ bool Game::playerSetAttackedCreature(Player* player, unsigned long creatureid)
 
 		player->sendCancelAttacking();
 		player->setAttackedCreature(NULL);
-		stopEvent(player->eventCheckAttacking);
-		player->eventCheckAttacking = 0;
+		//TEST stopEvent(player->eventCheckAttacking);
+		//TEST player->eventCheckAttacking = 0;
 	}
 	else if(attackedCreature) {
 		player->setAttackedCreature(attackedCreature);
-		stopEvent(player->eventCheckAttacking);
-		player->eventCheckAttacking = addEvent(makeTask(2000, std::bind2nd(std::mem_fun(&Game::checkCreatureAttacking), player->getID())));
+		//stopEvent(player->eventCheckAttacking);
+		//player->eventCheckAttacking = addEvent(makeTask(2000, std::bind2nd(std::mem_fun(&Game::checkCreatureAttacking), player->getID())));
 	}
 	
 	return true;
@@ -2710,18 +2710,18 @@ void Game::checkPlayerWalk(unsigned long id)
 		player->eventAutoWalk = 0;
 }
 
-void Game::checkCreature(unsigned long id)
+void Game::checkCreature(unsigned long creatureid)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::checkCreature()");
 
-	Creature *creature = getCreatureByID(id);
+	Creature *creature = getCreatureByID(creatureid);
 
 	if(creature && !creature->isRemoved()){
 		int thinkTicks = 0;
 		int oldThinkTicks = creature->onThink(thinkTicks);
 		
 		if(thinkTicks > 0) {
-			creature->eventCheck = addEvent(makeTask(thinkTicks, std::bind2nd(std::mem_fun(&Game::checkCreature), id)));
+			creature->eventCheck = addEvent(makeTask(thinkTicks, std::bind2nd(std::mem_fun(&Game::checkCreature), creatureid)));
 		}
 		else
 			creature->eventCheck = 0;
@@ -2736,11 +2736,9 @@ void Game::checkCreature(unsigned long id)
 				
 			if(!tile->isPz()){
 				if(player->food > 1000){
-					//player->mana += min(5, player->manamax - player->mana);
 					player->gainManaTick();
 					player->food -= thinkTicks;
 					if(player->healthmax - player->health > 0){
-						//player->health += min(5, player->healthmax - player->health);
 						if(player->gainHealthTick()){
 							SpectatorVec list;
 							SpectatorVec::iterator it;
@@ -2755,7 +2753,7 @@ void Game::checkCreature(unsigned long id)
 				}				
 			}
 
-			//send stast only if have changed
+			//send stats only if have changed
 			if(player->NeedUpdateStats()){
 				player->sendStats();
 			}

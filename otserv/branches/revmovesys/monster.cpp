@@ -993,11 +993,13 @@ void Monster::startThink()
 		eventCheck = game->addEvent(makeTask(500, std::bind2nd(std::mem_fun(&Game::checkCreature), getID())));
 	}
 
+	/*TEST
 	if(attackedCreature != NULL && !(isSummon() && hasLostMaster)) {
 		if(!eventCheckAttacking){
 			eventCheckAttacking = game->addEvent(makeTask(500, std::bind2nd(std::mem_fun(&Game::checkCreatureAttacking), getID())));
 		}
 	}
+	TEST*/
 }
 
 void Monster::stopThink()
@@ -1026,8 +1028,8 @@ void Monster::stopThink()
 		eventCheck = 0;
 	}
 
-	game->stopEvent(eventCheckAttacking);
-	eventCheckAttacking = 0;
+	//TEST game->stopEvent(eventCheckAttacking);
+	//TEST eventCheckAttacking = 0;
 }
 
 void Monster::setMaster(Creature* creature)
@@ -1182,7 +1184,7 @@ void Monster::onAttack()
 {
 	if(attackedCreature && !(isSummon() && hasLostMaster)) {
 		isYielding = false;
-		this->eventCheckAttacking = game->addEvent(makeTask(500, std::bind2nd(std::mem_fun(&Game::checkCreatureAttacking), getID())));
+		//this->eventCheckAttacking = game->addEvent(makeTask(500, std::bind2nd(std::mem_fun(&Game::checkCreatureAttacking), getID())));
 
 		exhaustedTicks -= 500;
 
@@ -1274,6 +1276,9 @@ bool Monster::canMoveTo(unsigned short x, unsigned short y, unsigned char z)
 {
 	Tile* tile = game->map->getTile(x, y, getPosition().z);
 	if(tile){
+		if(tile->getTeleportItem() || tile->floorChange())
+			return false;
+
 		if(tile->hasProperty(PROTECTIONZONE))
 			return false;
 

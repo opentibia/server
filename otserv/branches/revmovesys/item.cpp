@@ -320,6 +320,11 @@ bool Item::hasProperty(enum ITEMPROPERTY prop) const
 			if(it.blockPathFind)
 				return true;
 		break;
+
+		case NOTMOVEABLEBLOCKPATHFIND:
+			if(it.blockPathFind && !it.moveable)
+				return true;
+		break;
 	}
 
 	return false;

@@ -342,8 +342,8 @@ protected:
 	};
 
 	void checkPlayerWalk(unsigned long id);
-	void checkCreature(unsigned long id);
-	void checkCreatureAttacking(unsigned long id);
+	void checkCreature(unsigned long creatureid);
+	void checkCreatureAttacking(unsigned long creatureid, unsigned long time);
 	void checkDecay(int t);
 	void checkSpawns(int t);
 

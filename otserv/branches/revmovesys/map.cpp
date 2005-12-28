@@ -310,7 +310,7 @@ bool Map::isPathValid(Creature *creature, const std::list<Position>& path, int p
 				continue;
 
 			if(ignoreMoveableBlockingItems){
-				if(tile->hasProperty(NOTMOVEABLEBLOCKSOLID))
+				if(tile->hasProperty(NOTMOVEABLEBLOCKSOLID) || tile->hasProperty(NOTMOVEABLEBLOCKPATHFIND))
 					continue;
 			}
 			else{
@@ -360,7 +360,7 @@ std::list<Position> Map::getPathTo(Creature *creature, Position start, Position 
 							continue;
 
 						if(ignoreMoveableBlockingItems){
-							if(tile->hasProperty(NOTMOVEABLEBLOCKSOLID))
+							if(tile->hasProperty(NOTMOVEABLEBLOCKSOLID) || tile->hasProperty(NOTMOVEABLEBLOCKPATHFIND))
 								continue;
 						}
 						else{

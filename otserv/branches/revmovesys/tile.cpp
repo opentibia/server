@@ -34,6 +34,9 @@ extern Game g_game;
 
 bool Tile::hasProperty(enum ITEMPROPERTY prop) const
 {
+	if(prop == PROTECTIONZONE && isPz())
+		return true;
+
 	if(ground && ground->hasProperty(prop)){
 		return true;
 	}
