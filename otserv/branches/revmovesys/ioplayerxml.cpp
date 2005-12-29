@@ -146,13 +146,13 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name){
 		else
 			isLoaded = false;
 
-		/*nodeValue = (char*)xmlGe tProp(root, (const xmlChar *) "maxdepotitems");
+		nodeValue = (char*)xmlGetProp(root, (const xmlChar *) "maxdepotitems");
 		if(nodeValue) {
-			player->max_depot_items = atoi(nodeValue);
+			player->maxDepotLimit = atoi(nodeValue);
 			xmlFreeOTSERV(nodeValue);
 		}
 		else
-			isLoaded = false;*/
+			isLoaded = false;
 
 		player->setNormalSpeed();
 		

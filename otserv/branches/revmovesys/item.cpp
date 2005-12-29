@@ -169,8 +169,6 @@ void Item::setItemCountOrSubtype(unsigned char n)
 	else{
 		if(n > 100)
 			count = 100;
-		else if(n < 0)
-			count = 0;
 		else
 			count = n;
 	}

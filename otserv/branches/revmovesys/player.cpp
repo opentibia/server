@@ -133,8 +133,9 @@ Creature()
  	HPGain[3]   = 10;
  	HPGain[4]   = 15;  
  	*/
- 	//max_depot_items = 1000;
- 	
+
+	maxDepotLimit = 1000;
+
  	manaTick = 0;
  	healthTick = 0;
 } 
@@ -142,8 +143,8 @@ Creature()
 
 Player::~Player()
 {
-	for (int i = 0; i < 11; i++) {
-		if (items[i]) {
+	for(int i = 0; i < 11; i++){
+		if(items[i]){
 			items[i]->releaseThing2();
 		}
 	}
@@ -1191,6 +1192,7 @@ bool Player::addDepot(Depot* depot, uint32_t depotId)
 	}
 	
 	depots[depotId] = depot;
+	depot->setMaxDepotLimit(maxDepotLimit);
 	return true;
 }
 

@@ -211,7 +211,7 @@ public:
 
 	//depots	
 	DepotMap depots;
-	//long max_depot_items;
+	uint32_t maxDepotLimit;
 	
 	bool CanSee(const Position& pos) const;
 	bool CanSee(int x, int y, int z) const;

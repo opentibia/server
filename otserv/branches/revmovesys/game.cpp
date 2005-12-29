@@ -905,6 +905,11 @@ void Game::moveCreature(Player* player, Cylinder* fromCylinder, Cylinder* toCyli
 	}
 
 	if(player != moveCreature){
+		//if(toCylinder->getTile()->hasProperty(BLOCKPATHFIND))
+		//	ret = RET_NOTENOUGHROOM;
+		//if(fromCylinder->getTile()->hasProperty(PROTECTIONZONE) && !toCylinder->getTile()->hasProperty(PROTECTIONZONE))
+		//	ret = RET_NOTPOSSIBLE;
+
 		if(toCylinder->getTile()->getTeleportItem() ||
 			 toCylinder->getTile()->getFieldItem() ||
 			 toCylinder->getTile()->floorChange()){

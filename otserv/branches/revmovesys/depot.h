@@ -28,6 +28,7 @@ public:
 	~Depot();
 
 	uint32_t getDepotId() {return depotId;};
+	void setMaxDepotLimit(uint32_t maxitems) {maxDepotLimit = maxitems;};
 	void setDepotId(uint32_t id) {depotId = id;};
 	virtual Depot* getDepot() {return this;};
 	virtual const Depot* getDepot() const {return this;};
@@ -36,6 +37,7 @@ public:
 		bool childIsOwner = false) const;
 
 private:
+	uint32_t maxDepotLimit;
 	uint32_t depotId;
 };
 

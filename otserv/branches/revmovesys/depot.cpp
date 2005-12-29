@@ -24,7 +24,8 @@ Depot::Depot(uint16_t _type) :
 Container(_type)
 {
 	depotId = 0;
-	maxSize = 5;
+	maxSize = 30;
+	maxDepotLimit = 1500;
 }
 
 Depot::~Depot()
@@ -54,7 +55,7 @@ ReturnValue Depot::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			addCount = 1;
 	}
 
-	if(getItemHoldingCount() + addCount >= maxSize){
+	if(getItemHoldingCount() + addCount >= maxDepotLimit){
 		return RET_DEPOTISFULL;
 	}
 
