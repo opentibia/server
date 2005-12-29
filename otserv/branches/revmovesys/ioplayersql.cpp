@@ -198,8 +198,15 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 						player->__internalAddThing(slotid, myItem);
 					}
 					else{
-						if(myItem->getContainer()){
-							player->addDepot(myItem->getContainer(), slotid - 100);
+						if(Container* container = myItem->getContainer()){
+							if(Depot* depot = container->getDepot()){
+								player->addDepot(depot, slotid - 100);
+							}
+							else{
+								std::cout << "Error loading depot "<< slotid << " for player " << 
+									player->getGUID() << std::endl;
+								delete myItem;
+							}
 						}
 						else{
 							std::cout << "Error loading depot "<< slotid << " for player " << 
