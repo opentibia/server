@@ -310,6 +310,9 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 	if(const Creature* creature = thing->getCreature()){
 		if(!creatures.empty())
 			return RET_NOTPOSSIBLE;
+
+		if(ground == NULL)
+			return RET_NOTPOSSIBLE;
 		
 		if(const Player* player = creature->getPlayer()){
 			if(isPz() && player->pzLocked){
@@ -333,6 +336,9 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 		if(thing->getParent() == NULL){
 			return RET_NOERROR;
 		}
+
+		if(ground == NULL)
+			return RET_NOTPOSSIBLE;
 
 		if(!creatures.empty() && item->isBlocking())
 			return RET_NOTENOUGHROOM;
