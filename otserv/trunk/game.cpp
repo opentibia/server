@@ -787,7 +787,9 @@ bool Game::removeCreature(Creature* c)
 			stopEvent(player->eventAutoWalk);
 
 		g_chat.removeUserFromAllChannels(player);
-		IOPlayer::instance()->savePlayer(player);
+		if(!IOPlayer::instance()->savePlayer(player)){
+			std::cout << "Error while saving player: " << player->getName() << std::endl;
+		}
 		#ifdef __DEBUG_PLAYERS__
 		std::cout << (uint32_t)getPlayersOnline() << " players online." << std::endl;
 		#endif
