@@ -738,7 +738,12 @@ void ActionScript::internalAddThing(lua_State *L, const Thing* thing, const unsi
 		const Item *item = thing->getItem();
 		setField(L,"uid", thingid);
 		setField(L,"itemid", item->getID());
-		setField(L,"type", item->getItemCountOrSubtype());
+
+		if(item->hasSubType())
+			setField(L,"type", item->getItemCountOrSubtype());
+		else
+			setField(L,"type", 0);
+
 		setField(L,"actionid", item->getActionId());
 	}
 	else if(thing && thing->getCreature()){

@@ -32,7 +32,7 @@
 #include <sstream>
 #include <iomanip>
 
-Item* Item::CreateItem(const unsigned short _type, unsigned short _count /*= 0*/)
+Item* Item::CreateItem(const unsigned short _type, unsigned short _count /*= 1*/)
 {
 	Item* newItem = NULL;
 
@@ -145,19 +145,21 @@ unsigned short Item::getItemCount() const
 	return count;
 }
 
-//////////////////////////////////////////////////
-// return how many items are stacked or 0 if non stackable
-unsigned short Item::getItemCountOrSubtype() const {
-	if(isStackable()) {
+void Item::setItemCount(uint8_t n)
+{
+	count = n;
+}
+
+unsigned short Item::getItemCountOrSubtype() const
+{
+	/*if(isStackable())
 		return count;
-	}
-	else if(isFluidContainer() || isSplash())
+	else*/ if(isFluidContainer() || isSplash())
 		return fluid;
-	//else if(chargecount != 0)
 	else if(items[id].runeMagLevel != -1)
 		return chargecount;
 	else
-		return 0;
+		return count;
 }
 
 void Item::setItemCountOrSubtype(unsigned char n)
@@ -172,19 +174,28 @@ void Item::setItemCountOrSubtype(unsigned char n)
 		else
 			count = n;
 	}
-};
+}
 
-void Item::setActionId(unsigned short n){
+bool Item::hasSubType() const
+{
+	const ItemType& it = items[id];
+	return (it.isFluidContainer() || it.isSplash() || it.stackable || it.runeMagLevel != -1);
+}
+
+void Item::setActionId(unsigned short n)
+{
 	if(n < 100)
 		n = 100;
 	actionId = n;
 }
 
-unsigned short Item::getActionId() const{
+unsigned short Item::getActionId() const
+{
 	return actionId;
 }
 
-void Item::setUniqueId(unsigned short n){
+void Item::setUniqueId(unsigned short n)
+{
 	//uniqueId only can be set 1 time
 	if(uniqueId != 0)
 		return;
@@ -194,7 +205,8 @@ void Item::setUniqueId(unsigned short n){
 	ActionScript::AddThingToMapUnique(this);
 }
 
-unsigned short Item::getUniqueId() const{
+unsigned short Item::getUniqueId() const
+{
 	return uniqueId;
 }
 
@@ -275,7 +287,7 @@ xmlNodePtr Item::serialize()
 	}
 
 	s.str(""); //empty the stringstream
-	if(getItemCountOrSubtype() != 0){
+	if(hasSubType()){
 		s << getItemCountOrSubtype();
 		xmlSetProp(ret, (const xmlChar*)"count", (const xmlChar*)s.str().c_str());
 	}

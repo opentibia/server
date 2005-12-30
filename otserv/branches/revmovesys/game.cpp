@@ -1262,8 +1262,10 @@ Item* Game::transformItem(Item* item, uint16_t newtype, int32_t count /*= -1*/)
 	if(Container* container = item->getContainer()){
 		//container to container
 		if(Item::items[newtype].isContainer()){
+			cylinder->postRemoveNotification(item);
 			item->setID(newtype);
-			cylinder->__updateThing(item, 0);
+			cylinder->__updateThing(item, item->getItemCount());
+			cylinder->postAddNotification(item);
 			return item;
 		}
 		//container to none-container
@@ -1276,11 +1278,13 @@ Item* Game::transformItem(Item* item, uint16_t newtype, int32_t count /*= -1*/)
 				return item;
 			}
 
-			Item* newItem = Item::CreateItem(newtype, (count == -1 ? 0 : count));
+			cylinder->postRemoveNotification(item);
+
+			Item* newItem = Item::CreateItem(newtype, (count == -1 ? 1 : count));
 			cylinder->__updateThing(index, newItem);
 			item->setParent(NULL);
 
-			cylinder->postRemoveNotification(item);
+			cylinder->postAddNotification(newItem);
 			FreeThing(item);
 
 			return newItem;
@@ -1297,21 +1301,46 @@ Item* Game::transformItem(Item* item, uint16_t newtype, int32_t count /*= -1*/)
 				return item;
 			}
 
-			Item* newItem = Item::CreateItem(newtype, 0);
-			cylinder->__updateThing(index, newItem);
+			cylinder->postRemoveNotification(item);
 
+			Item* newItem = Item::CreateItem(newtype);
+			cylinder->__updateThing(index, newItem);
 			item->setParent(NULL);
+
+			cylinder->postAddNotification(newItem);
 			FreeThing(item);
 		}
 		else{
-			//should we do a remove operation?
-			if(item->getID() == newtype && count <= 0 && (item->isStackable() || item->isRune())){
-				internalRemoveItem(item);
-				return NULL;
+			//same type, update count variable only
+			if(item->getID() == newtype){
+				if(item->isStackable()){
+					if(count <= 0){
+						internalRemoveItem(item);
+					}
+					else
+						internalRemoveItem(item, item->getItemCount() - count);
+				}
+				else if(item->isRune()){
+					if(count <= 0){
+						internalRemoveItem(item);
+					}
+					else
+						cylinder->__updateThing(item, (count == -1 ? item->getItemCharge() : count));
+				}
 			}
 			else{
+				cylinder->postRemoveNotification(item);
 				item->setID(newtype);
-				cylinder->__updateThing(item, (count == -1 ? item->getItemCountOrSubtype() : count));
+
+				if(item->hasSubType()){
+					if(count != -1)
+						item->setItemCountOrSubtype(count);
+				}
+				else
+					item->setItemCount(1);
+
+				cylinder->__updateThing(item, item->getItemCountOrSubtype());
+				cylinder->postAddNotification(item);
 				return item;
 			}
 		}
@@ -1980,40 +2009,39 @@ void Game::checkCreatureAttacking(unsigned long creatureid, unsigned long time)
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::checkCreatureAttacking()");
 
 	Creature* creature = getCreatureByID(creatureid);
-	if(creature != NULL && !creature->isRemoved() && creature->attackedCreature != NULL)
+	if(creature != NULL && !creature->isRemoved())
 	{
-		//TEST creature->eventCheckAttacking = 0;
-		Monster* monster = dynamic_cast<Monster*>(creature);
-		if(monster) {
-			monster->onAttack();
-		}
-		else{
-			if(creature->attackedCreature){
-				Creature* attackedCreature = creature->attackedCreature;
-				Tile* tile = creature->getTile();
-				if(!attackedCreature->isAttackable() == 0 && tile->isPz() && creature->access == 0){
-					Player* player = dynamic_cast<Player*>(creature);
-					if(player){
-						player->sendTextMessage(MSG_SMALLINFO, "You may not attack a person in a protection zone.");
-						playerSetAttackedCreature(player, 0);
-						return;
-					}
-				}
-				else{
-					if(attackedCreature != NULL && !attackedCreature->isRemoved()){
-						creatureMakeDamage(creature, attackedCreature, creature->getFightType());
-					}
-				}
-
-				//creature->eventCheckAttacking = addEvent(makeTask(time, std::bind2nd(std::mem_fun(&Game::checkCreatureAttacking), id)));
+		if(creature->attackedCreature != NULL){
+			//TEST creature->eventCheckAttacking = 0;
+			Monster* monster = dynamic_cast<Monster*>(creature);
+			if(monster) {
+				monster->onAttack();
 			}
+			else{
+				if(creature->attackedCreature){
+					Creature* attackedCreature = creature->attackedCreature;
+					Tile* tile = creature->getTile();
+					if(!attackedCreature->isAttackable() == 0 && tile->isPz() && creature->access == 0){
+						Player* player = dynamic_cast<Player*>(creature);
+						if(player){
+							player->sendTextMessage(MSG_SMALLINFO, "You may not attack a person in a protection zone.");
+							playerSetAttackedCreature(player, 0);
+							return;
+						}
+					}
+					else{
+						if(attackedCreature != NULL && !attackedCreature->isRemoved()){
+							creatureMakeDamage(creature, attackedCreature, creature->getFightType());
+						}
+					}
+				}
+			}
+
+			flushSendBuffers();
 		}
 
-		//creature->eventCheckAttacking = addEvent(makeTask(time, std::bind2nd(std::mem_fun(&Game::checkCreatureAttacking), creatureid, time)));
-		flushSendBuffers();
+		creature->eventCheckAttacking = addEvent(makeTask(time, boost::bind(&Game::checkCreatureAttacking, this, creature->getID(), time)));
 	}	
-
-	creature->eventCheckAttacking = addEvent(makeTask(time, boost::bind(&Game::checkCreatureAttacking, this, creature->getID(), time)));
 }
 
 //Implementation of player invoked events

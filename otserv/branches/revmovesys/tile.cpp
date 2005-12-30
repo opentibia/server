@@ -621,12 +621,23 @@ void Tile::__updateThing(uint32_t index, Thing* thing)
 
 	Item* oldItem = NULL;
 
+	if(ground){
+		if(pos == 0){
+			oldItem = ground;
+			ground = item;
+		}
+
+		--pos;
+	}
+
+	/*
 	if(pos == 0 && ground){
 		oldItem = ground;
 		ground = item;
 	}
 
 	--pos;
+	*/
 
 	if(pos >= 0 && pos < topItems.size()){
 		ItemVector::iterator it = topItems.begin();
@@ -750,7 +761,7 @@ void Tile::__removeThing(Thing* thing, uint32_t count)
 				if(*iit == item){
 					if(item->isStackable() && count != item->getItemCount()){							
 						int newCount = std::max(0, (int)(item->getItemCount() - count));
-						item->setItemCountOrSubtype(newCount);
+						item->setItemCount(newCount);
 
 						//send to client
 						for(it = list.begin(); it != list.end(); ++it) {
@@ -808,10 +819,20 @@ int32_t Tile::__getIndexOfThing(const Thing* thing) const
 
 Thing* Tile::__getThing(uint32_t index) const
 {
-	if(index == 0)
+	if(ground){
+		if(index == 0){
+			return ground;
+		}
+
+		--index;
+	}
+
+	/*if(index == 0){
 		return ground;
+	}
 
 	--index;
+	*/
 
 	if((unsigned) index < topItems.size())
 		return topItems[index];

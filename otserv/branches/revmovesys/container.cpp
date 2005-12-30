@@ -411,7 +411,7 @@ void Container::__removeThing(Thing* thing, uint32_t count)
 
 	if(item->isStackable() && count != item->getItemCount()){
 		int newCount = std::max(0, (int)(item->getItemCount() - count));
-		item->setItemCountOrSubtype(newCount);
+		item->setItemCount(newCount);
 
 		//send change to client
 		for(it = list.begin(); it != list.end(); ++it) {

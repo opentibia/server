@@ -1914,11 +1914,11 @@ ReturnValue Player::__queryAdd(int32_t index, const Thing* thing, uint32_t count
 			(item->getSlotPosition() & SLOTP_RING)){
 			ret = RET_CANNOTBEDRESSED;
 		}
-		else if((item->getSlotPosition() & SLOTP_RIGHT) || (item->getSlotPosition() & SLOTP_LEFT)){
-			ret = RET_PUTTHISOBJECTINYOURHAND;
-		}
 		else if(item->getSlotPosition() & SLOTP_TWO_HAND){
 			ret = RET_PUTTHISOBJECTINBOTHHANDS;
+		}
+		else if((item->getSlotPosition() & SLOTP_RIGHT) || (item->getSlotPosition() & SLOTP_LEFT)){
+			ret = RET_PUTTHISOBJECTINYOURHAND;
 		}
 
 		//check if we can dress this object
@@ -2094,7 +2094,7 @@ ReturnValue Player::__queryRemove(const Thing* thing, uint32_t count) const
 		return RET_NOTPOSSIBLE;
 	}
 
-	if(count == 0 || (item->isStackable() && count > item->getItemCountOrSubtype())){
+	if(count == 0 || (item->isStackable() && count > item->getItemCount())){
 		return RET_NOTPOSSIBLE;
 	}
 
@@ -2273,7 +2273,7 @@ void Player::__removeThing(Thing* thing, uint32_t count)
 		}
 		else{
 			int newCount = std::max(0, (int)(item->getItemCount() - count));
-			item->setItemCountOrSubtype(newCount);
+			item->setItemCount(newCount);
 
 			//send change to client
 			onUpdateInventoryItem((slots_t)index, item, item);

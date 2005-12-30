@@ -65,7 +65,7 @@ public:
 	virtual const Teleport* getTeleport() const {return NULL;};
 
 	//Factory member to create item of right type based on type
-	static Item* CreateItem(const unsigned short _type, unsigned short _count = 0);
+	static Item* CreateItem(const unsigned short _type, unsigned short _count = 1);
 	static Items items;
 	
 	virtual bool isPushable() const {return !isNotMoveable();};
@@ -121,8 +121,11 @@ public:
 
   // get the number of items
 	unsigned short getItemCount() const;
+	void setItemCount(uint8_t n);
+
 	unsigned short getItemCountOrSubtype() const;
 	void setItemCountOrSubtype(unsigned char n);
+	bool hasSubType() const;
 
 	unsigned char getItemCharge() const {return chargecount;};
 	void setItemCharge(unsigned char n) {chargecount = n;};
