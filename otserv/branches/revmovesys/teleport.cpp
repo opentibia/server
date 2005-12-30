@@ -117,6 +117,7 @@ void Teleport::__addThing(int32_t index, Thing* thing)
 	if(destTile){
 		if(Creature* creature = thing->getCreature()){
 			getTile()->moveCreature(creature, destTile, true);
+			g_game.AddMagicEffectAt(creature->getPosition(), NM_ME_ENERGY_AREA);
 		}
 		else if(Item* item = thing->getItem()){
 			g_game.internalMoveItem(getTile(), destTile, 0, item, item->getItemCount());
