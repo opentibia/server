@@ -1480,7 +1480,7 @@ void Protocol75::sendMoveCreature(const Creature* creature, const Position& oldP
 		if(teleport){
 			RemoveTileItem(msg, oldPos, oldStackPos);
 			AddMapDescription(msg, player->getPosition());
-			AddMagicEffect(msg, player->getPosition(), NM_ME_ENERGY_AREA);
+			//AddMagicEffect(msg, player->getPosition(), NM_ME_ENERGY_AREA);
 		}
 		else{
 			if(oldPos.z == 7 && newPos.z >= 8){
@@ -1528,7 +1528,7 @@ void Protocol75::sendMoveCreature(const Creature* creature, const Position& oldP
 	else if(CanSee(oldPos) && CanSee(creature->getPosition())){
 		if(teleport || (oldPos.z == 7 && newPos.z >= 8)){
 			sendRemoveCreature(creature, oldPos, oldStackPos, false);
-			sendAddCreature(creature, teleport);
+			sendAddCreature(creature, false);
 		}
 		else{
 			if(oldStackPos < 10){

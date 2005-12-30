@@ -402,14 +402,16 @@ bool Commands::banPlayer(Creature* creature, const std::string& cmd, const std::
 bool Commands::teleportMasterPos(Creature* creature, const std::string& cmd, const std::string& param)
 {
 	game->internalTeleport(creature, creature->masterPos);
+	game->AddMagicEffectAt(creature->getPosition(), NM_ME_ENERGY_AREA);
 	return true;
 }
 
 bool Commands::teleportHere(Creature* creature, const std::string& cmd, const std::string& param)
 {
-	Creature* creaturereature = game->getCreatureByName(param);
+	Creature* paramCreature = game->getCreatureByName(param);
 	if(creature) {
-		game->internalTeleport(creature, creature->getPosition());
+		game->internalTeleport(paramCreature, creature->getPosition());
+		game->AddMagicEffectAt(paramCreature->getPosition(), NM_ME_ENERGY_AREA);
 	}
 	return true;
 }
@@ -515,6 +517,7 @@ bool Commands::teleportTo(Creature* creature, const std::string& cmd, const std:
 	Creature* paramCreature = game->getCreatureByName(param);
 	if(paramCreature){
 		game->internalTeleport(creature, paramCreature->getPosition());
+		game->AddMagicEffectAt(creature->getPosition(), NM_ME_ENERGY_AREA);
 		return true;
 	}
 	
@@ -646,6 +649,7 @@ bool Commands::teleportNTiles(Creature* creature, const std::string& cmd, const 
 		}
 
 		game->internalTeleport(creature, newPos);
+		game->AddMagicEffectAt(creature->getPosition(), NM_ME_ENERGY_AREA);
 	}
 
 	return true;

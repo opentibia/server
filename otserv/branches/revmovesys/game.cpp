@@ -2898,7 +2898,7 @@ void Game::changeSpeed(unsigned long id, unsigned short speed)
 	}	
 }
 
-void Game::AddMagicEffectAt(const Position& pos, uint8_t color)
+void Game::AddMagicEffectAt(const Position& pos, uint8_t type)
 {
 	SpectatorVec list;
 	SpectatorVec::iterator it;
@@ -2908,7 +2908,7 @@ void Game::AddMagicEffectAt(const Position& pos, uint8_t color)
 	Player* player;
 	for(it = list.begin(); it != list.end(); ++it){
 		if(player = (*it)->getPlayer()){
-			player->sendMagicEffect(pos, color);
+			player->sendMagicEffect(pos, type);
 		}
 	}
 }
