@@ -279,7 +279,7 @@ bool Map::canThrowObjectTo(const Position& fromPos, const Position& toPos)
 		int ry = (steep ? x : y);
 
 		if(!(toPos.x == rx && toPos.y == ry) && !(fromPos.x == rx && fromPos.y == ry)){
-			tile = getTile(rx, ry, start.z);
+			tile = getTile(rx, ry, end.z);
 			if(tile){
 				if(tile->hasProperty(BLOCKPROJECTILE))
 					return false;

@@ -1480,7 +1480,6 @@ void Protocol75::sendMoveCreature(const Creature* creature, const Position& oldP
 		if(teleport){
 			RemoveTileItem(msg, oldPos, oldStackPos);
 			AddMapDescription(msg, player->getPosition());
-			//AddMagicEffect(msg, player->getPosition(), NM_ME_ENERGY_AREA);
 		}
 		else{
 			if(oldPos.z == 7 && newPos.z >= 8){
@@ -1872,7 +1871,7 @@ void Protocol75::MoveUpCreature(NetworkMessage& msg, const Creature* creature,
 		//underground, going one floor up (still underground)
 		else if(newPos.z > 7){
 			int skip = -1;
-			GetFloorDescription(msg, oldPos.x - 8, oldPos.y - 6, oldPos.z - 2, 18, 14, 3, skip);
+			GetFloorDescription(msg, oldPos.x - 8, oldPos.y - 6, oldPos.z - 3, 18, 14, 3, skip);
 
 			if(skip >= 0){
 				msg.AddByte(skip);
@@ -1881,17 +1880,13 @@ void Protocol75::MoveUpCreature(NetworkMessage& msg, const Creature* creature,
 		}
 
 		//moving up a floor up makes us out of sync
-		//if(oldPos.x + 1 > newPos.x){ // west, [with new y]
-			//west
-			msg.AddByte(0x68);
-			GetMapDescription(oldPos.x - 8, oldPos.y + 1 - 6, newPos.z, 1, 14, msg);
-		//}
+		//west
+		msg.AddByte(0x68);
+		GetMapDescription(oldPos.x - 8, oldPos.y + 1 - 6, newPos.z, 1, 14, msg);
 
-		//if(oldPos.y + 1 > newPos.y){ // north, for old x
-			//north
-			msg.AddByte(0x65);
-			GetMapDescription(oldPos.x - 8, oldPos.y - 6, newPos.z, 18, 1, msg);
-		//}
+		//north
+		msg.AddByte(0x65);
+		GetMapDescription(oldPos.x - 8, oldPos.y - 6, newPos.z, 18, 1, msg);
 	}
 }
 
@@ -1927,17 +1922,13 @@ const Position& newPos, const Position& oldPos, uint32_t oldStackPos)
 		}
 
 		//moving down a floor makes us out of sync
-		//if(oldPos.x - 1 < newPos.x){ // east, [with new y]
-			//east
-			msg.AddByte(0x66);
-			GetMapDescription(oldPos.x + 9, oldPos.y - 1 - 6, newPos.z, 1, 14, msg);
-		//}
+		//east
+		msg.AddByte(0x66);
+		GetMapDescription(oldPos.x + 9, oldPos.y - 1 - 6, newPos.z, 1, 14, msg);
 
-		//if(oldPos.y - 1 < newPos.y){ // south, for old x
-			//south
-			msg.AddByte(0x67);
-			GetMapDescription(oldPos.x - 8, oldPos.y + 7, newPos.z, 18, 1, msg);
-		//}
+		//south
+		msg.AddByte(0x67);
+		GetMapDescription(oldPos.x - 8, oldPos.y + 7, newPos.z, 18, 1, msg);
 	}
 }
 
