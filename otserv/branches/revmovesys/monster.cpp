@@ -1207,7 +1207,7 @@ void Monster::doMoveTo(int dx, int dy)
 {
 	if(mType->canPushItems){
 		//move/destroy blocking moveable items
-		Tile *tile =game->getTile(getPosition().x + dx ,getPosition().y + dy ,getPosition().z);
+		Tile* tile = game->getTile(getPosition().x + dx ,getPosition().y + dy ,getPosition().z);
 		if(tile){
 			int countItems = 0;
 			countItems = 0;
@@ -1216,7 +1216,7 @@ void Monster::doMoveTo(int dx, int dy)
 					if(!monsterMoveItem(blockItem, 3)){
 						//destroy it
 						if(game->internalRemoveItem(blockItem) == RET_NOERROR){
-							game->AddMagicEffectAt(blockItem->getPosition(), NM_ME_PUFF);
+							game->AddMagicEffectAt(tile->getPosition(), NM_ME_PUFF);
 						}
 						else
 							break;
@@ -1225,7 +1225,7 @@ void Monster::doMoveTo(int dx, int dy)
 				else{
 					//destroy items directly
 					if(game->internalRemoveItem(blockItem) == RET_NOERROR){
-						game->AddMagicEffectAt(blockItem->getPosition(), NM_ME_PUFF);
+						game->AddMagicEffectAt(tile->getPosition(), NM_ME_PUFF);
 					}
 					else
 						break;
