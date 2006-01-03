@@ -60,6 +60,7 @@ Item::Item(const unsigned short _type, unsigned short _count)
 {
 	//std::cout << "Item constructor2 " << this << std::endl;
 	id = _type;
+	count = 0;
 	chargecount = 0;
 	fluid = 0;
 	actionId = 0;
@@ -68,7 +69,9 @@ Item::Item(const unsigned short _type, unsigned short _count)
 	specialDescription = NULL;
 	text = NULL;
 	setItemCountOrSubtype(_count);
-	count = std::max((unsigned char)1, count);
+
+	if(count == 0)
+		count = 1;
 }
 
 Item::Item()
@@ -83,7 +86,9 @@ Item::Item()
 	specialDescription = NULL;
 	text = NULL;
 }
-Item::Item(const unsigned short _type) {
+
+Item::Item(const unsigned short _type)
+{
 	//std::cout << "Item constructor1 " << this << std::endl;
 	id = _type;
 	count = 1;	
@@ -96,7 +101,8 @@ Item::Item(const unsigned short _type) {
 	text = NULL;
 }
 
-Item::Item(const Item &i){
+Item::Item(const Item &i)
+{
 	//std::cout << "Item copy constructor " << this << std::endl;
 	id = i.id;
 	count = i.count;
@@ -127,16 +133,13 @@ Item::~Item()
 		delete text;
 }
 
-
-//////////////////////////////////////////////////
-// returns the ID of this item's ItemType
-unsigned short Item::getID() const {
+unsigned short Item::getID() const
+{
 	return id;
 }
 
-//////////////////////////////////////////////////
-// sets the ID of this item's ItemType
-void Item::setID(unsigned short newid) {
+void Item::setID(unsigned short newid)
+{
 	id = newid;
 }
 
@@ -152,9 +155,7 @@ void Item::setItemCount(uint8_t n)
 
 unsigned short Item::getItemCountOrSubtype() const
 {
-	/*if(isStackable())
-		return count;
-	else*/ if(isFluidContainer() || isSplash())
+	if(isFluidContainer() || isSplash())
 		return fluid;
 	else if(items[id].runeMagLevel != -1)
 		return chargecount;
@@ -169,10 +170,7 @@ void Item::setItemCountOrSubtype(unsigned char n)
 	else if(items[id].runeMagLevel != -1)
 		chargecount = n;
 	else{
-		if(n > 100)
-			count = 100;
-		else
-			count = n;
+		count = n;
 	}
 }
 

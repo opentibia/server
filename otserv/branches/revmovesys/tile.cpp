@@ -254,14 +254,24 @@ Item* Tile::getMoveableBlockingItem()
 	return NULL;
 }
 
+bool Tile::hasFlag(tileflags_t flag) const
+{
+	return ((flags & flag) == flag);
+}
+
+void Tile::setFlag(tileflags_t flag)
+{
+	flags |= flag;
+}
+
 bool Tile::isPz() const
 {
-	return pz;
+	return hasFlag(TILESTATE_PROTECTIONZONE);
 }
 
 void Tile::setPz()
 {
-	pz = true;
+	setFlag(TILESTATE_PROTECTIONZONE);
 }
 
 void Tile::moveCreature(Creature* creature, Cylinder* toCylinder, bool teleport /* = false*/)
@@ -315,7 +325,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			return RET_NOTPOSSIBLE;
 		
 		if(const Player* player = creature->getPlayer()){
-			if(isPz() && player->pzLocked){
+			if(hasFlag(TILESTATE_PROTECTIONZONE) && player->pzLocked){
 				return RET_PLAYERISPZLOCKED;
 			}
 		}
@@ -742,6 +752,7 @@ void Tile::__removeThing(Thing* thing, uint32_t count)
 				(*it)->onRemoveTileItem(cylinderMapPos, index, item);
 			}
 
+			ground->setItemCount(0);
 			ground->setParent(NULL);
 			ground = NULL;
 			return /*RET_NOERROR*/;
@@ -756,6 +767,7 @@ void Tile::__removeThing(Thing* thing, uint32_t count)
 						(*it)->onRemoveTileItem(cylinderMapPos, index, item);
 					}
 
+					(*iit)->setItemCount(0);
 					(*iit)->setParent(NULL);
 					topItems.erase(iit);
 					return /*RET_NOERROR*/;
@@ -780,6 +792,7 @@ void Tile::__removeThing(Thing* thing, uint32_t count)
 							(*it)->onRemoveTileItem(cylinderMapPos, index, item);
 						}
 
+						(*iit)->setItemCount(0);
 						(*iit)->setParent(NULL);
 						downItems.erase(iit);
 					}

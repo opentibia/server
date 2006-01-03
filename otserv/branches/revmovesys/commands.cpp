@@ -409,7 +409,7 @@ bool Commands::teleportMasterPos(Creature* creature, const std::string& cmd, con
 bool Commands::teleportHere(Creature* creature, const std::string& cmd, const std::string& param)
 {
 	Creature* paramCreature = game->getCreatureByName(param);
-	if(creature) {
+	if(paramCreature){
 		game->internalTeleport(paramCreature, creature->getPosition());
 		game->AddMagicEffectAt(paramCreature->getPosition(), NM_ME_ENERGY_AREA);
 	}

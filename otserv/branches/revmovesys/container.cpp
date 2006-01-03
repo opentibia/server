@@ -146,7 +146,11 @@ bool Container::isHoldingItem(const Item* item) const
 ReturnValue Container::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 	bool childIsOwner /*= false*/) const
 {
-	if(index >= ((int32_t)capacity())){
+	if(index == -1){
+		if(size() >= capacity())
+			return RET_CONTAINERNOTENOUGHROOM;
+	}
+	else if(index >= ((int32_t)capacity())){
 		return RET_CONTAINERNOTENOUGHROOM;
 	}
 
@@ -241,19 +245,21 @@ ReturnValue Container::__queryRemove(const Thing* thing, uint32_t count) const
 
 Cylinder* Container::__queryDestination(int32_t& index, const Thing* thing, Item** destItem)
 {
-	Thing* destThing = dynamic_cast<Item*>(__getThing(index));
-	if(destThing)
-		*destItem = destThing->getItem();
+	if(index != -1){
+		Thing* destThing = dynamic_cast<Item*>(__getThing(index));
+		if(destThing)
+			*destItem = destThing->getItem();
 
-	Cylinder* subCylinder = dynamic_cast<Cylinder*>(*destItem);
+		Cylinder* subCylinder = dynamic_cast<Cylinder*>(*destItem);
 
-	if(subCylinder){
-		index = -1;
-		*destItem = NULL;
-		return subCylinder;
+		if(subCylinder){
+			index = -1;
+			*destItem = NULL;
+			return subCylinder;
+		}
 	}
-	else
-		return this;
+	
+	return this;
 }
 
 void Container::__addThing(Thing* thing)
@@ -390,7 +396,7 @@ void Container::__removeThing(Thing* thing, uint32_t count)
 	int32_t index = __getIndexOfThing(thing);
 	if(index == -1){
 #ifdef __DEBUG__
-		std::cout << "Failure: [Container::__removeThing] item == NULL" << std::endl;
+		std::cout << "Failure: [Container::__removeThing] index == -1" << std::endl;
 #endif
 		return /*RET_NOTPOSSIBLE*/;
 	}
@@ -431,6 +437,7 @@ void Container::__removeThing(Thing* thing, uint32_t count)
 		}
 
 		item->setParent(NULL);
+		item->setItemCount(0);
 		itemlist.erase(cit);
 	}
 }
@@ -450,6 +457,9 @@ int32_t Container::__getIndexOfThing(const Thing* thing) const
 
 Thing* Container::__getThing(uint32_t index) const
 {
+	if(index < 0 || index > size())
+		return NULL;
+
 	int count = 0;
 	for(ItemList::const_iterator cit = itemlist.begin(); cit != itemlist.end(); ++cit) {
 		if(count == index)
@@ -490,12 +500,14 @@ void Container::__internalAddThing(uint32_t index, Thing* thing)
 		return;
 	}
 
+	/*
 	if(index < 0 || index >= capacity()){
 #ifdef __DEBUG__
 		std::cout << "Failure: [Container::__internalAddThing] - index is out of range" << std::endl;
 #endif
 		return;
 	}
+	*/
 
 	itemlist.push_front(item);
 	item->setParent(this);

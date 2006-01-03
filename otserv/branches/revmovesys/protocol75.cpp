@@ -1891,7 +1891,7 @@ void Protocol75::MoveUpCreature(NetworkMessage& msg, const Creature* creature,
 }
 
 void Protocol75::MoveDownCreature(NetworkMessage& msg, const Creature* creature,
-const Position& newPos, const Position& oldPos, uint32_t oldStackPos)
+	const Position& newPos, const Position& oldPos, uint32_t oldStackPos)
 {
 	if(creature == player){
 		//floor change down

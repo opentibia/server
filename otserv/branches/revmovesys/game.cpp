@@ -820,7 +820,7 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 	stopEvent(creature->eventCheckAttacking);
 
 	FreeThing(creature);
-	creature->setParent(NULL);
+	creature->setParent(NULL /*, true*/);
 
 	return true;
 }
@@ -1143,7 +1143,9 @@ ReturnValue Game::internalMoveItem(Cylinder* fromCylinder, Cylinder* toCylinder,
 			moveItem = NULL;
 		}
 
-		if(item->getParent() == NULL){
+		//if(item->getParent() == NULL){
+		//if(item->getItemCount() == 0){
+		if(item->isRemoved()){
 			FreeThing(item);
 		}
 	}
@@ -1238,8 +1240,8 @@ ReturnValue Game::internalRemoveItem(Item* item, int32_t count /*= -1*/,  bool t
 		//remove the item
 		cylinder->__removeThing(item, count);
 
-		if(item->getItemCount() == 0){
-			item->setParent(NULL);
+		if(item->isRemoved()){
+			//item->setParent(NULL /*, true*/);
 			FreeThing(item);
 		}
 
@@ -1278,15 +1280,15 @@ Item* Game::transformItem(Item* item, uint16_t newtype, int32_t count /*= -1*/)
 				return item;
 			}
 
+			item->setParent(NULL /*, true*/);
 			cylinder->postRemoveNotification(item);
+			FreeThing(item);
 
 			Item* newItem = Item::CreateItem(newtype, (count == -1 ? 1 : count));
 			cylinder->__updateThing(index, newItem);
-			item->setParent(NULL);
+			//item->setParent(NULL);
 
 			cylinder->postAddNotification(newItem);
-			FreeThing(item);
-
 			return newItem;
 		}
 	}
@@ -1301,14 +1303,15 @@ Item* Game::transformItem(Item* item, uint16_t newtype, int32_t count /*= -1*/)
 				return item;
 			}
 
+			item->setParent(NULL /*, true*/);
 			cylinder->postRemoveNotification(item);
+			FreeThing(item);
 
 			Item* newItem = Item::CreateItem(newtype);
 			cylinder->__updateThing(index, newItem);
-			item->setParent(NULL);
+			//item->setParent(NULL);
 
 			cylinder->postAddNotification(newItem);
-			FreeThing(item);
 		}
 		else{
 			//same type, update count variable only
@@ -1447,6 +1450,10 @@ void Game::playerSendErrorMessage(Player* player, ReturnValue message)
 
 		case RET_PLAYERISPZLOCKED:
 			player->sendCancel("You can not enter a protection zone after attacking another player.");
+			break;
+
+		case RET_PLAYERISNOTINVITED:
+			player->sendCancel("You are not invited.");
 			break;
 
 		case RET_DEPOTISFULL:

@@ -100,3 +100,15 @@ const Position& Thing::getPosition() const
 {
 	return getTile()->getTilePosition();
 }
+
+bool Thing::isRemoved() const
+{
+	if(parent == NULL)
+		return true;
+
+	const Cylinder* aux = getParent();
+	if(aux->isRemoved())
+		return true;
+
+	return false;
+}

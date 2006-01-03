@@ -32,6 +32,7 @@ public:
 	/**
 	  * Query if the cylinder can add an object
 	  * \param index points to the destination index (inventory slot/container position)
+		* -1 is a internal value and means add to a empty position, with no destItem
 	  * \param thing the object to move/add
 	  * \param count is the amount that we want to move/add
 	  * \param childIsOwner if set to true the query is from a child-cylinder
@@ -43,6 +44,7 @@ public:
 	/**
 	  * Query the cylinder how much it can accept
 	  * \param index points to the destination index (inventory slot/container position)
+		* -1 is a internal value and means add to a empty position, with no destItem
 	  * \param item the object to move/add
 	  * \param count is the amount that we want to move/add
 	  * \param maxQueryCount is the max amount that the cylinder can accept
@@ -62,6 +64,7 @@ public:
 	/**
 	  * Query the destination cylinder
 	  * \param index points to the destination index (inventory slot/container position),
+		* -1 is a internal value and means add to a empty position, with no destItem
 		* this method can change the index to point to the new cylinder index
 	  * \destItem is the destination object
 	  * \returns Cylinder returns the destination cylinder
@@ -124,12 +127,6 @@ public:
 	  * \returns the index of the object, returns -1 if not found
 	  */
 	virtual int32_t __getIndexOfThing(const Thing* thing) const = 0;
-
-	/**
-	  * Gets the object based on index
-	  * \returns the object, returns NULL if not found
-	  */
-	//virtual Thing* __getThing(uint32_t index) = 0;
 
 	/**
 	  * Gets the object based on index

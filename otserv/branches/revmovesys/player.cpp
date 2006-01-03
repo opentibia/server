@@ -1852,7 +1852,7 @@ void Player::autoCloseContainers(const Container* container)
 	for(ContainerVector::iterator it = containerVec.begin(); it != containerVec.end(); ++it){
 		Container* tmpcontainer = it->second;
 		while(tmpcontainer != NULL){
-			if(tmpcontainer == container){
+			if(tmpcontainer->isRemoved() || tmpcontainer == container){
 				closeList.push_back(it->first);
 				break;
 			}
@@ -2107,7 +2107,7 @@ ReturnValue Player::__queryRemove(const Thing* thing, uint32_t count) const
 
 Cylinder* Player::__queryDestination(int32_t& index, const Thing* thing, Item** destItem)
 {
-	if(index == 0){
+	if(index == 0 || index == -1){
 		*destItem = NULL;
 
 		const Item* item = thing->getItem();
@@ -2128,7 +2128,7 @@ Cylinder* Player::__queryDestination(int32_t& index, const Thing* thing, Item** 
 		//try containers
 		for(int i = SLOT_FIRST; i < SLOT_LAST; ++i){
 			if(Container* subContainer = dynamic_cast<Container*>(items[i])){
-				if(subContainer != tradeItem && subContainer->__queryAdd(i, item, item->getItemCount()) == RET_NOERROR){
+				if(subContainer != tradeItem && subContainer->__queryAdd(-1, item, item->getItemCount()) == RET_NOERROR){
 					index = -1;
 					*destItem = NULL;
 					return subContainer;
@@ -2268,6 +2268,7 @@ void Player::__removeThing(Thing* thing, uint32_t count)
 			//send change to client
 			onRemoveInventoryItem((slots_t)index, item);
 
+			item->setItemCount(0);
 			item->setParent(NULL);
 			items[index] = NULL;
 		}
@@ -2283,6 +2284,7 @@ void Player::__removeThing(Thing* thing, uint32_t count)
 		//send change to client
 		onRemoveInventoryItem((slots_t)index, item);
 
+		item->setItemCount(0);
 		item->setParent(NULL);
 		items[index] = NULL;
 	}

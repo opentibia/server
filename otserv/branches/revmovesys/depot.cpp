@@ -47,7 +47,7 @@ ReturnValue Depot::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 		addCount = 1;
 	}
 
-	if(item->getTopParent() != this){	
+	if(item->getTopParent() != this){
 		if(const Container* container = item->getContainer()){
 			addCount = container->getItemHoldingCount() + 1;
 		}

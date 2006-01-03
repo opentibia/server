@@ -23,7 +23,6 @@
 #ifndef __TILE_H__
 #define __TILE_H__
 
-
 #include "item.h"
 #include "cylinder.h"
 #include "teleport.h"
@@ -38,23 +37,22 @@ class Creature;
 typedef std::vector<Item*> ItemVector;
 typedef std::vector<Creature*> CreatureVector;
 
+enum tileflags_t{
+	TILESTATE_NONE = 0,
+	TILESTATE_PROTECTIONZONE = 1,
+	TILESTATE_HOUSE = 2
+};
+
 class Tile : public Cylinder
 {
 public:
-  Creature* getCreature() const{
-		if(creatures.size())
-			return creatures[0];
-		else
-			return NULL;
-  }
-
   Tile(int x, int y, int z)
   {
 		tilePos.x = x;
 		tilePos.y = y;
 		tilePos.z = z;
 
-    pz = false;
+    flags = 0;
 		ground = NULL;
   }
 
@@ -62,7 +60,6 @@ public:
 	virtual bool isPushable() const {return false;};
 
   Item*          ground;
-  //Item*          splash;
   ItemVector     topItems;
   CreatureVector creatures;
   ItemVector     downItems;
@@ -81,6 +78,8 @@ public:
 
 	bool hasProperty(enum ITEMPROPERTY prop) const;
 
+	bool hasFlag(tileflags_t flag) const;
+	void setFlag(tileflags_t flag);
   bool isPz() const;
   void setPz();
   
@@ -119,9 +118,11 @@ public:
 
 	const Position& getTilePosition() const {return tilePos;};
 
+	virtual bool isRemoved() const {return false;};
+
 protected:
 	Position tilePos;
-  bool pz;
+	uint32_t flags;
 };
 
 

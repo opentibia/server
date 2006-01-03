@@ -25,12 +25,11 @@
 #include "position.h"
 
 enum ReturnValue{
-	//RET_PROTECTIONZONE,
-	//RET_NOTILE,
 	RET_NOERROR,
 	RET_NOTPOSSIBLE,
 	RET_NOTENOUGHROOM,
 	RET_PLAYERISPZLOCKED,
+	RET_PLAYERISNOTINVITED,
 	RET_CANNOTTHROW,
 	RET_THEREISNOWAY,
 	RET_DESTINATIONOUTOFREACH,
@@ -71,7 +70,7 @@ public:
 	Cylinder* getParent() {return parent;};
 	const Cylinder* getParent() const {return parent;};
 
-	void setParent(Cylinder* cylinder) {parent = cylinder;};
+	virtual void setParent(Cylinder* cylinder) {parent = cylinder;};
 
 	Cylinder* getTopParent(); //returns Tile/Container or a Player
 	const Cylinder* getTopParent() const;
@@ -88,7 +87,7 @@ public:
 	virtual Creature* getCreature() {return NULL;};
 	virtual const Creature* getCreature() const {return NULL;};
 
-	bool isRemoved() const {return parent == NULL;};
+	virtual bool isRemoved() const;
 
 private:
 	Cylinder* parent;
