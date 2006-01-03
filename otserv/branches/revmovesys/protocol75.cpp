@@ -1371,78 +1371,76 @@ void Protocol75::sendAddCreature(const Creature* creature, bool isLogin)
 		NetworkMessage msg;
 
 		if(creature == player){
-				msg.AddByte(0x0A);
-				msg.AddU32(player->getID());
+			msg.AddByte(0x0A);
+			msg.AddU32(player->getID());
 					
-				msg.AddByte(0x32);
-				msg.AddByte(0x00);
+			msg.AddByte(0x32);
+			msg.AddByte(0x00);
 					
-				msg.AddByte(0x00); //can report bugs 0,1
+			msg.AddByte(0x00); //can report bugs 0,1
 						
-				//msg.AddByte(0x0B);//TODO?. GM actions
-				//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-				//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-				//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-				//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-				//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-				//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-				//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
-				//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+			//msg.AddByte(0x0B);//TODO?. GM actions
+			//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+			//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+			//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+			//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+			//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+			//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+			//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
+			//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
 
-				AddMapDescription(msg, player->getPosition());
+			AddMapDescription(msg, player->getPosition());
 
-				if(isLogin){
-					AddMagicEffect(msg, player->getPosition(), NM_ME_ENERGY_AREA);
+			if(isLogin){
+				AddMagicEffect(msg, player->getPosition(), NM_ME_ENERGY_AREA);
+			}
+			
+			AddInventoryItem(msg, SLOT_HEAD, player->getInventoryItem(SLOT_HEAD));
+			AddInventoryItem(msg, SLOT_NECKLACE, player->getInventoryItem(SLOT_NECKLACE));
+			AddInventoryItem(msg, SLOT_BACKPACK, player->getInventoryItem(SLOT_BACKPACK));
+			AddInventoryItem(msg, SLOT_ARMOR, player->getInventoryItem(SLOT_ARMOR));
+			AddInventoryItem(msg, SLOT_RIGHT, player->getInventoryItem(SLOT_RIGHT));
+			AddInventoryItem(msg, SLOT_LEFT, player->getInventoryItem(SLOT_LEFT));
+			AddInventoryItem(msg, SLOT_LEGS, player->getInventoryItem(SLOT_LEGS));
+			AddInventoryItem(msg, SLOT_FEET, player->getInventoryItem(SLOT_FEET));
+			AddInventoryItem(msg, SLOT_RING, player->getInventoryItem(SLOT_RING));
+			AddInventoryItem(msg, SLOT_AMMO, player->getInventoryItem(SLOT_AMMO));
+			
+			AddPlayerStats(msg);
+			AddPlayerSkills(msg);
+			
+			//gameworld light-settings
+			msg.AddByte(0x82);
+			msg.AddByte(0x6F); //level
+			msg.AddByte(0xD7);//color
+			
+			//player light level
+			//msg.AddByte(0x8d);//8d
+			//msg.AddU32(player->getID());
+			//msg->AddByte(0x6F); //level
+			//msg->AddByte(0xDF); //color
+						
+			AddTextMessage(msg,MSG_EVENT, g_config.getGlobalString("loginmsg", "Welcome.").c_str());
+			std::string tempstring;
+			tempstring = "Your last visit was on ";
+			time_t lastlogin = player->getLastLoginSaved();
+			tempstring += ctime(&lastlogin);
+			tempstring.erase(tempstring.length() -1);
+			tempstring += ".";
+			AddTextMessage(msg,MSG_EVENT, tempstring.c_str());
+			WriteBuffer(msg);
+					
+			for(VIPListSet::iterator it = player->VIPList.begin(); it != player->VIPList.end(); it++){
+				bool online;
+				std::string vip_name;
+				if(IOPlayer::instance()->getNameByGuid((*it), vip_name)){
+					online = (game->getPlayerByName(vip_name) != NULL);
+					sendVIP((*it), vip_name, online);
 				}
-					
-				AddInventoryItem(msg, SLOT_HEAD, player->getInventoryItem(SLOT_HEAD));
-				AddInventoryItem(msg, SLOT_NECKLACE, player->getInventoryItem(SLOT_NECKLACE));
-				AddInventoryItem(msg, SLOT_BACKPACK, player->getInventoryItem(SLOT_BACKPACK));
-				AddInventoryItem(msg, SLOT_ARMOR, player->getInventoryItem(SLOT_ARMOR));
-				AddInventoryItem(msg, SLOT_RIGHT, player->getInventoryItem(SLOT_RIGHT));
-				AddInventoryItem(msg, SLOT_LEFT, player->getInventoryItem(SLOT_LEFT));
-				AddInventoryItem(msg, SLOT_LEGS, player->getInventoryItem(SLOT_LEGS));
-				AddInventoryItem(msg, SLOT_FEET, player->getInventoryItem(SLOT_FEET));
-				AddInventoryItem(msg, SLOT_RING, player->getInventoryItem(SLOT_RING));
-				AddInventoryItem(msg, SLOT_AMMO, player->getInventoryItem(SLOT_AMMO));
-
-				AddPlayerStats(msg);	
-
-				//gameworld light-settings
-				msg.AddByte(0x82);
-				msg.AddByte(0x6F); //level
-				msg.AddByte(0xD7);//color
-
-				//player light level
-				//msg.AddByte(0x8d);//8d
-				//msg.AddU32(player->getID());
-				//msg->AddByte(0x6F); //level
-				//msg->AddByte(0xDF); //color
-
-				AddPlayerSkills(msg);
-					
-				for(VIPListSet::iterator it = player->VIPList.begin(); it != player->VIPList.end(); it++){
-					bool online;
-					std::string vip_name;
-					
-					if(IOPlayer::instance()->getNameByGuid((*it), vip_name)){
-						online = (game->getPlayerByName(vip_name) != NULL);
-						sendVIP((*it), vip_name, online);
-					}
-				}
-
-				AddTextMessage(msg,MSG_EVENT, g_config.getGlobalString("loginmsg", "Welcome.").c_str());
-				std::string tempstring;
-				tempstring = "Your last visit was on ";
-				time_t lastlogin = player->getLastLoginSaved();
-				tempstring += ctime(&lastlogin);
-				tempstring.erase(tempstring.length() -1);
-				tempstring += ".";
-				AddTextMessage(msg,MSG_EVENT, tempstring.c_str());
-				WriteBuffer(msg);
-					
-				//force flush
-				flushOutputBuffer();
+			}
+							
+			//force flush
+			flushOutputBuffer();
 		}
 		else{
 			AddTileCreature(msg, creature->getPosition(), creature);
@@ -1450,9 +1448,9 @@ void Protocol75::sendAddCreature(const Creature* creature, bool isLogin)
 			if(isLogin){
 				AddMagicEffect(msg, creature->getPosition(), NM_ME_ENERGY_AREA);
 			}
+			
+			WriteBuffer(msg);
 		}
-		
-		WriteBuffer(msg);
 	}
 }
 
@@ -1635,12 +1633,10 @@ void Protocol75::sendVIPLogOut(unsigned long guid)
 void Protocol75::sendVIP(unsigned long guid, const std::string &name, bool isOnline)
 {
 	NetworkMessage msg;
-	
 	msg.AddByte(0xD2);
 	msg.AddU32(guid);
 	msg.AddString(name);
 	msg.AddByte(isOnline == true ? 1 : 0);
-	
 	WriteBuffer(msg);
 }
 
