@@ -112,12 +112,6 @@ enum ePlayerInfo{
 	PlayerInfoGuildId,
 };
 
-struct KnownThing{
-	Thing *thing;
-	tThingType type;
-	PositionEx pos;	
-};
-
 class Action
 {
 public:
@@ -147,12 +141,11 @@ public:
 	
 	void ClearMap();
 	static void AddThingToMapUnique(Thing *thing);
-	void UpdateThingPos(int uid, PositionEx &pos);
-	unsigned int AddThingToMap(Thing *thing,PositionEx &pos);
-	const KnownThing* GetThingByUID(int uid);
-	const KnownThing* GetItemByUID(int uid);
-	const KnownThing* GetCreatureByUID(int uid);
-	const KnownThing* GetPlayerByUID(int uid);
+	unsigned int AddThingToMap(Thing *thing);
+	Thing* GetThingByUID(int uid);
+	Item* GetItemByUID(int uid);
+	Creature* GetCreatureByUID(int uid);
+	Player* GetPlayerByUID(int uid);
 	
 	//lua functions
 	static int luaActionDoRemoveItem(lua_State *L);
@@ -215,8 +208,8 @@ protected:
 	
 	friend class Action;
 	
-	std::map<unsigned int,KnownThing*> ThingMap;
-	static std::map<unsigned int,KnownThing*> uniqueIdMap;
+	std::map<unsigned int,Thing*> ThingMap;
+	static std::map<unsigned int,Thing*> uniqueIdMap;
 	
 	//lua related functions
 	int registerFunctions();
