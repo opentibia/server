@@ -752,7 +752,6 @@ void Tile::__removeThing(Thing* thing, uint32_t count)
 				(*it)->onRemoveTileItem(cylinderMapPos, index, item);
 			}
 
-			ground->setItemCount(0);
 			ground->setParent(NULL);
 			ground = NULL;
 			return /*RET_NOERROR*/;
@@ -767,7 +766,6 @@ void Tile::__removeThing(Thing* thing, uint32_t count)
 						(*it)->onRemoveTileItem(cylinderMapPos, index, item);
 					}
 
-					(*iit)->setItemCount(0);
 					(*iit)->setParent(NULL);
 					topItems.erase(iit);
 					return /*RET_NOERROR*/;
@@ -792,7 +790,6 @@ void Tile::__removeThing(Thing* thing, uint32_t count)
 							(*it)->onRemoveTileItem(cylinderMapPos, index, item);
 						}
 
-						(*iit)->setItemCount(0);
 						(*iit)->setParent(NULL);
 						downItems.erase(iit);
 					}

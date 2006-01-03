@@ -1215,14 +1215,20 @@ void Monster::doMoveTo(int dx, int dy)
 				if(countItems < 2){
 					if(!monsterMoveItem(blockItem, 3)){
 						//destroy it
-						game->internalRemoveItem(blockItem);
-						game->AddMagicEffectAt(blockItem->getPosition(), NM_ME_PUFF);
+						if(game->internalRemoveItem(blockItem) == RET_NOERROR){
+							game->AddMagicEffectAt(blockItem->getPosition(), NM_ME_PUFF);
+						}
+						else
+							break;
 					}
 				}
 				else{
 					//destroy items directly
-					game->internalRemoveItem(blockItem);
-					game->AddMagicEffectAt(blockItem->getPosition(), NM_ME_PUFF);
+					if(game->internalRemoveItem(blockItem) == RET_NOERROR){
+						game->AddMagicEffectAt(blockItem->getPosition(), NM_ME_PUFF);
+					}
+					else
+						break;
 				}
 
 				countItems++;

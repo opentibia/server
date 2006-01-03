@@ -820,7 +820,7 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 	stopEvent(creature->eventCheckAttacking);
 
 	FreeThing(creature);
-	creature->setParent(NULL /*, true*/);
+	creature->setParent(NULL);
 
 	return true;
 }
@@ -1143,8 +1143,6 @@ ReturnValue Game::internalMoveItem(Cylinder* fromCylinder, Cylinder* toCylinder,
 			moveItem = NULL;
 		}
 
-		//if(item->getParent() == NULL){
-		//if(item->getItemCount() == 0){
 		if(item->isRemoved()){
 			FreeThing(item);
 		}
@@ -1241,7 +1239,6 @@ ReturnValue Game::internalRemoveItem(Item* item, int32_t count /*= -1*/,  bool t
 		cylinder->__removeThing(item, count);
 
 		if(item->isRemoved()){
-			//item->setParent(NULL /*, true*/);
 			FreeThing(item);
 		}
 
@@ -1280,13 +1277,12 @@ Item* Game::transformItem(Item* item, uint16_t newtype, int32_t count /*= -1*/)
 				return item;
 			}
 
-			item->setParent(NULL /*, true*/);
+			item->setParent(NULL);
 			cylinder->postRemoveNotification(item);
 			FreeThing(item);
 
 			Item* newItem = Item::CreateItem(newtype, (count == -1 ? 1 : count));
 			cylinder->__updateThing(index, newItem);
-			//item->setParent(NULL);
 
 			cylinder->postAddNotification(newItem);
 			return newItem;
@@ -1303,13 +1299,12 @@ Item* Game::transformItem(Item* item, uint16_t newtype, int32_t count /*= -1*/)
 				return item;
 			}
 
-			item->setParent(NULL /*, true*/);
+			item->setParent(NULL);
 			cylinder->postRemoveNotification(item);
 			FreeThing(item);
 
 			Item* newItem = Item::CreateItem(newtype);
 			cylinder->__updateThing(index, newItem);
-			//item->setParent(NULL);
 
 			cylinder->postAddNotification(newItem);
 		}

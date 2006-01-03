@@ -437,7 +437,6 @@ void Container::__removeThing(Thing* thing, uint32_t count)
 		}
 
 		item->setParent(NULL);
-		item->setItemCount(0);
 		itemlist.erase(cit);
 	}
 }
