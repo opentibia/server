@@ -1617,6 +1617,7 @@ unsigned long Player::getIP() const
 
 void Player::die()
 {
+	lastLoginPosition = masterPos;
 	lastPosition = getPosition();
 
 	//Magic Level downgrade

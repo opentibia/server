@@ -601,18 +601,19 @@ Thing* Game::internalGetThing(Player* player, const Position& pos, int32_t index
 		Tile* tile = getTile(pos.x, pos.y, pos.z);
 
 		if(tile){
-			if(index == 0)
+			/*if(index == 0){
 				return tile->getTopThing();
-			else{
+			}
+			else{*/
 				Thing* thing = tile->getTopDownItem();
 
-				if(thing == NULL){
-					thing = tile->getTopThing();
-				}
-				
-				return thing;
+				if(thing)
+					return thing;
+				else
+					return tile->getTopThing();
+
 				//return tile->getThingByStackPos(index);
-			}
+			//}
 		}
 	}
 	else{
@@ -845,7 +846,7 @@ void Game::thingMove(Player* player, const Position& fromPos, uint16_t itemId, u
 	else
 		fromIndex = fromStackpos;
 
-	Thing* thing = internalGetThing(player, fromPos, fromIndex);
+	Thing* thing = internalGetThing(player, fromPos, 0 /*fromIndex*/);
 
 	Cylinder* toCylinder = internalGetCylinder(player, toPos);
 	uint8_t toIndex = 0;
@@ -1308,6 +1309,7 @@ Item* Game::transformItem(Item* item, uint16_t newtype, int32_t count /*= -1*/)
 			cylinder->__updateThing(index, newItem);
 
 			cylinder->postAddNotification(newItem);
+			return newItem;
 		}
 		else{
 			//same type, update count variable only
@@ -1316,15 +1318,23 @@ Item* Game::transformItem(Item* item, uint16_t newtype, int32_t count /*= -1*/)
 					if(count <= 0){
 						internalRemoveItem(item);
 					}
-					else
+					else{
 						internalRemoveItem(item, item->getItemCount() - count);
+						return item;
+					}
 				}
 				else if(item->isRune()){
 					if(count <= 0){
 						internalRemoveItem(item);
 					}
-					else
+					else{
 						cylinder->__updateThing(item, (count == -1 ? item->getItemCharge() : count));
+						return item;
+					}
+				}
+				else{
+					cylinder->__updateThing(item, count);
+					return item;
 				}
 			}
 			else{

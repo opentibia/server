@@ -311,7 +311,11 @@ bool Actions::UseItemEx(Player* player, const Position &from_pos,
 		return false;
 	}
 	
-	Item *item = game->internalGetThing(player, from_pos, from_stack)->getItem();
+	Thing* thing = game->internalGetThing(player, from_pos, from_stack);
+	if(!thing)
+		return false;
+
+	Item* item = thing->getItem();
 	if(!item)
 		return false;
 	

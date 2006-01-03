@@ -359,21 +359,25 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			if(const Item* iitem = iithing->getItem()){
 				const ItemType& iiType = Item::items[iitem->getID()];
 
-				if(item->isPickupable()){
-					//experimental
-					//if((iiType.isVertical || iiType.isHorizontal) && item->isHangable()){
-					//	ItemVector::const_iterator iit;
-					//	for(iit = downItems.begin(); iit != downItems.end(); ++iit){
-					//		if((*iit)->isHangable())
-					//			return RET_NOTENOUGHROOM;
-					//	}
-					//}
-					//else
-					if(iiType.blockSolid && (!iiType.hasHeight || iiType.pickupable))
+				if(iiType.blockSolid){
+					if(item->isPickupable()){
+						//experimental
+						//if((iiType.isVertical || iiType.isHorizontal) && item->isHangable()){
+						//	ItemVector::const_iterator iit;
+						//	for(iit = downItems.begin(); iit != downItems.end(); ++iit){
+						//		if((*iit)->isHangable())
+						//			return RET_NOTENOUGHROOM;
+						//	}
+						//}
+						//else
+						if(!iiType.hasHeight /*|| !iiType.moveable*/)
+							return RET_NOTENOUGHROOM;
+						else if(iiType.pickupable)
+							return RET_NOTENOUGHROOM;
+					}
+					else
 						return RET_NOTENOUGHROOM;
 				}
-				else if(iiType.blockSolid)
-					return RET_NOTENOUGHROOM;
 			}
 		}
 	}
@@ -414,34 +418,38 @@ ReturnValue Tile::__queryRemove(const Thing* thing, uint32_t count) const
 
 Cylinder* Tile::__queryDestination(int32_t& index, const Thing* thing, Item** destItem)
 {
-	Tile* destTile = this;
+	Tile* destTile = NULL;
 	*destItem = NULL;
 
-	if(destTile->floorChange()){
-		if(destTile->floorChange(NORTH) && destTile->floorChange(EAST)){
+	if(floorChange()){
+		if(floorChange(NORTH) && floorChange(EAST)){
 			destTile = g_game.getTile(getTilePosition().x + 1, getTilePosition().y - 1, getTilePosition().z - 1);
 		}
-		else if(destTile->floorChange(NORTH) && destTile->floorChange(WEST)){
+		else if(floorChange(NORTH) && floorChange(WEST)){
 			destTile = g_game.getTile(getTilePosition().x - 1, getTilePosition().y - 1, getTilePosition().z - 1);
 		}
-		else if(destTile->floorChange(SOUTH) && destTile->floorChange(EAST)){
+		else if(floorChange(SOUTH) && floorChange(EAST)){
 			destTile = g_game.getTile(getTilePosition().x + 1, getTilePosition().y + 1, getTilePosition().z - 1);
 		}
-		else if(destTile->floorChange(SOUTH) && destTile->floorChange(WEST)){
+		else if(floorChange(SOUTH) && floorChange(WEST)){
 			destTile = g_game.getTile(getTilePosition().x - 1, getTilePosition().y + 1, getTilePosition().z - 1);
 		}
-		else if(destTile->floorChange(NORTH)){
+		else if(floorChange(NORTH)){
 			destTile = g_game.getTile(getTilePosition().x, getTilePosition().y - 1, getTilePosition().z - 1);
 		}
-		else if(destTile->floorChange(SOUTH)){
+		else if(floorChange(SOUTH)){
 			destTile = g_game.getTile(getTilePosition().x, getTilePosition().y + 1, getTilePosition().z - 1);
 		}
-		else if(destTile->floorChange(EAST)){
+		else if(floorChange(EAST)){
 			destTile = g_game.getTile(getTilePosition().x + 1, getTilePosition().y, getTilePosition().z - 1);
 		}
-		else if(destTile->floorChange(WEST)){
+		else if(floorChange(WEST)){
 			destTile = g_game.getTile(getTilePosition().x - 1, getTilePosition().y, getTilePosition().z - 1);
-		}                                      
+		}
+	}
+
+	if(destTile == NULL){
+		destTile = this;
 	}
 
 	if(destTile->floorChangeDown()){
@@ -450,8 +458,7 @@ Cylinder* Tile::__queryDestination(int32_t& index, const Thing* thing, Item** de
 		if(destTile == NULL){
 			return this;
 		}
-
-		if(destTile->floorChange(NORTH) && destTile->floorChange(EAST)){
+		else if(destTile->floorChange(NORTH) && destTile->floorChange(EAST)){
 			destTile = g_game.getTile(getTilePosition().x - 1, getTilePosition().y + 1, getTilePosition().z + 1);
 		}
 		else if(destTile->floorChange(NORTH) && destTile->floorChange(WEST)){
@@ -802,12 +809,14 @@ void Tile::__removeThing(Thing* thing, uint32_t count)
 
 int32_t Tile::__getIndexOfThing(const Thing* thing) const
 {
-	int n = 0;
+	int n = -1;
 
 	if(ground){
 		if(ground == thing){
 			return 0;
 		}
+
+		++n;
 	}
 
 	ItemVector::const_iterator iit;
@@ -843,12 +852,8 @@ Thing* Tile::__getThing(uint32_t index) const
 		--index;
 	}
 
-	/*if(index == 0){
-		return ground;
-	}
-
-	--index;
-	*/
+	//test
+	//--index;
 
 	if((unsigned) index < topItems.size())
 		return topItems[index];
