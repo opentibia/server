@@ -907,7 +907,8 @@ void Game::moveCreature(Player* player, Cylinder* fromCylinder, Cylinder* toCyli
 	if(player != moveCreature){
 		//if(toCylinder->getTile()->hasProperty(BLOCKPATHFIND))
 		//	ret = RET_NOTENOUGHROOM;
-		//if(fromCylinder->getTile()->hasProperty(PROTECTIONZONE) && !toCylinder->getTile()->hasProperty(PROTECTIONZONE))
+		//if(fromCylinder->getTile()->hasProperty(PROTECTIONZONE) &&
+		//!toCylinder->getTile()->hasProperty(PROTECTIONZONE))
 		//	ret = RET_NOTPOSSIBLE;
 
 		if(toCylinder->getTile()->getTeleportItem() ||
@@ -1036,8 +1037,8 @@ void Game::moveItem(Player* player, Cylinder* fromCylinder, Cylinder* toCylinder
 	}
 
 	//check throw distance
-	if((std::abs(fromPos.x - toPos.x) > item->getThrowRange()) ||
-			(std::abs(fromPos.y - toPos.y) > item->getThrowRange()) ||
+	if((std::abs(player->getPosition().x - toPos.x) > item->getThrowRange()) ||
+			(std::abs(player->getPosition().y - toPos.y) > item->getThrowRange()) ||
 			(std::abs(fromPos.z - toPos.z) * 2 > item->getThrowRange()) ){
 		ret = RET_DESTINATIONOUTOFREACH;
 	}
