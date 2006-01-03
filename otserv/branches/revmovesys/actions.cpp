@@ -1503,33 +1503,35 @@ int ActionScript::luaActionDoCreateItem(lua_State *L)
 	int type = (int)internalGetNumber(L);
 	int itemid = (int)internalGetNumber(L);
 	
-	ActionScript *action = getActionScript(L);
-	
-	Item* newItem = Item::CreateItem(itemid, type);
-	ReturnValue ret = action->game->internalAddItem(action->_player, newItem);
+	ActionScript* action = getActionScript(L);
+
+	Cylinder* cylinder = action->game->internalGetCylinder(action->_player, pos);
+	ReturnValue ret = RET_NOTPOSSIBLE;
 	pos.stackpos = 1;
 
-	if(ret != RET_NOERROR){
-		Tile* tile = action->game->map->getTile(pos);
+	if(cylinder){
+		Item* newItem = Item::CreateItem(itemid, type);
+		ReturnValue ret = action->game->internalAddItem(cylinder, newItem);
 
-		if(tile){
-			ret = action->game->internalAddItem(tile, newItem);
-
-			if(ret != RET_NOERROR){
-				delete newItem;
-
-				lua_pushnumber(L, 0);
-				return 0;	
+		if(ret == RET_NOERROR){
+			Tile* tile = action->game->map->getTile(pos);
+			if(tile){
+				pos.stackpos = tile->__getIndexOfThing(newItem);
 			}
+			else
+				pos.stackpos = 1;
 
-			pos.stackpos = tile->__getIndexOfThing(newItem);
+			unsigned int uid = action->AddThingToMap((Thing*)newItem, pos);
+			
+			lua_pushnumber(L, uid);
+			return 1;	
 		}
+		else
+			delete newItem;
 	}
-	
-	unsigned int uid = action->AddThingToMap((Thing*)newItem, pos);
-	
-	lua_pushnumber(L, uid);
-	return 1;	
+
+	lua_pushnumber(L, 0);
+	return 0;	
 }
 
 int ActionScript::luaActionGetPlayerStorageValue(lua_State *L)
