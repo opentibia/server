@@ -2269,7 +2269,6 @@ void Player::__removeThing(Thing* thing, uint32_t count)
 			//send change to client
 			onRemoveInventoryItem((slots_t)index, item);
 
-			item->setItemCount(0);
 			item->setParent(NULL);
 			items[index] = NULL;
 		}
@@ -2285,7 +2284,6 @@ void Player::__removeThing(Thing* thing, uint32_t count)
 		//send change to client
 		onRemoveInventoryItem((slots_t)index, item);
 
-		item->setItemCount(0);
 		item->setParent(NULL);
 		items[index] = NULL;
 	}
@@ -2303,7 +2301,7 @@ int32_t Player::__getIndexOfThing(const Thing* thing) const
 
 Thing* Player::__getThing(uint32_t index) const
 {
-	if(index > SLOT_FIRST && index < SLOT_LAST)
+	if(index >= SLOT_FIRST && index < SLOT_LAST)
 		return items[index];
 
 	return NULL;

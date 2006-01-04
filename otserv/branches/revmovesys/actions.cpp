@@ -1284,20 +1284,14 @@ int ActionScript::luaActionDoPlayerAddItem(lua_State *L)
 	
 	ActionScript *action = getActionScript(L);
 	unsigned int uid;
-	//const KnownThing* tmp = action->GetPlayerByUID(cid);
 	Player* player = action->GetPlayerByUID(cid);
 	if(player){
-		//Player *player = tmp->thing->getCreature()->getPlayer();
-		Item *newitem = Item::CreateItem(itemid,type);
-
-		//PositionEx pos = player->getPosition();
-		//pos.stackpos = 1;
+		Item* newitem = Item::CreateItem(itemid, type);
 
 		ReturnValue ret = action->game->internalAddItem(player, newitem);
 		if(ret != RET_NOERROR){
 			Tile* tile = player->getTile();
 			ret = action->game->internalAddItem(tile, newitem);
-			//pos.stackpos = tile->__getIndexOfThing(newitem);
 			if(ret != RET_NOERROR){
 				delete newitem;
 			}

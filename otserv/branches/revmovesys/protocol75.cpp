@@ -1373,12 +1373,12 @@ void Protocol75::sendAddCreature(const Creature* creature, bool isLogin)
 		if(creature == player){
 			msg.AddByte(0x0A);
 			msg.AddU32(player->getID());
-					
+
 			msg.AddByte(0x32);
 			msg.AddByte(0x00);
-					
+
 			msg.AddByte(0x00); //can report bugs 0,1
-						
+
 			//msg.AddByte(0x0B);//TODO?. GM actions
 			//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
 			//msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);msg.AddByte(0xFF);
@@ -1405,21 +1405,21 @@ void Protocol75::sendAddCreature(const Creature* creature, bool isLogin)
 			AddInventoryItem(msg, SLOT_FEET, player->getInventoryItem(SLOT_FEET));
 			AddInventoryItem(msg, SLOT_RING, player->getInventoryItem(SLOT_RING));
 			AddInventoryItem(msg, SLOT_AMMO, player->getInventoryItem(SLOT_AMMO));
-			
+
 			AddPlayerStats(msg);
 			AddPlayerSkills(msg);
-			
+
 			//gameworld light-settings
 			msg.AddByte(0x82);
 			msg.AddByte(0x6F); //level
 			msg.AddByte(0xD7);//color
-			
+
 			//player light level
 			//msg.AddByte(0x8d);//8d
 			//msg.AddU32(player->getID());
 			//msg->AddByte(0x6F); //level
 			//msg->AddByte(0xDF); //color
-						
+
 			AddTextMessage(msg,MSG_EVENT, g_config.getGlobalString("loginmsg", "Welcome.").c_str());
 			std::string tempstring;
 			tempstring = "Your last visit was on ";
@@ -1429,7 +1429,7 @@ void Protocol75::sendAddCreature(const Creature* creature, bool isLogin)
 			tempstring += ".";
 			AddTextMessage(msg,MSG_EVENT, tempstring.c_str());
 			WriteBuffer(msg);
-					
+
 			for(VIPListSet::iterator it = player->VIPList.begin(); it != player->VIPList.end(); it++){
 				bool online;
 				std::string vip_name;
@@ -1438,7 +1438,7 @@ void Protocol75::sendAddCreature(const Creature* creature, bool isLogin)
 					sendVIP((*it), vip_name, online);
 				}
 			}
-							
+
 			//force flush
 			flushOutputBuffer();
 		}

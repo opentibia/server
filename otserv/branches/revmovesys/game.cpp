@@ -601,19 +601,17 @@ Thing* Game::internalGetThing(Player* player, const Position& pos, int32_t index
 		Tile* tile = getTile(pos.x, pos.y, pos.z);
 
 		if(tile){
-			/*if(index == 0){
-				return tile->getTopThing();
-			}
-			else{*/
+			if(index == 0){
 				Thing* thing = tile->getTopDownItem();
 
 				if(thing)
 					return thing;
 				else
 					return tile->getTopThing();
-
-				//return tile->getThingByStackPos(index);
-			//}
+			}
+			else{
+				return tile->__getThing(index);
+			}
 		}
 	}
 	else{
@@ -1017,7 +1015,8 @@ void Game::moveItem(Player* player, Cylinder* fromCylinder, Cylinder* toCylinder
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::moveItem()");
 
 	if(fromCylinder == NULL || toCylinder == NULL || item == NULL || item->getID() != itemId){
-		player->sendCancel("Sorry, not possible.");
+		playerSendErrorMessage(player, RET_NOTPOSSIBLE);
+		return;
 	}
 
 	const Position& fromPos = fromCylinder->getPosition();
@@ -1036,15 +1035,13 @@ void Game::moveItem(Player* player, Cylinder* fromCylinder, Cylinder* toCylinder
 	else if((std::abs(player->getPosition().x - fromPos.x) > 1) || (std::abs(player->getPosition().y - fromPos.y) > 1)) {
 		ret = RET_TOFARAWAY;
 	}
-
 	//check throw distance
-	if((std::abs(player->getPosition().x - toPos.x) > item->getThrowRange()) ||
+	else if((std::abs(player->getPosition().x - toPos.x) > item->getThrowRange()) ||
 			(std::abs(player->getPosition().y - toPos.y) > item->getThrowRange()) ||
 			(std::abs(fromPos.z - toPos.z) * 2 > item->getThrowRange()) ){
 		ret = RET_DESTINATIONOUTOFREACH;
 	}
-
-	if(!map->canThrowObjectTo(fromPos, toPos)){
+	else if(!map->canThrowObjectTo(fromPos, toPos)){
 		ret = RET_CANNOTTHROW;
 	}
 
@@ -1178,8 +1175,8 @@ ReturnValue Game::internalAddItem(Cylinder* toCylinder, Item* item, bool test /*
 		return RET_NOTPOSSIBLE;
 	}
 
-	int32_t index = 0;
 	Item* toItem = NULL;
+	int32_t index = -1;
 	Cylinder* subCylinder = toCylinder->__queryDestination(index, item, &toItem);
 	if(subCylinder != toCylinder){
 		toCylinder = subCylinder;
@@ -1194,6 +1191,7 @@ ReturnValue Game::internalAddItem(Cylinder* toCylinder, Item* item, bool test /*
 	//check how much we can move
 	uint32_t maxQueryCount = 0;
 	ret = toCylinder->__queryMaxCount(index, item, item->getItemCount(), maxQueryCount);
+
 	if(ret != RET_NOERROR){
 		return ret;
 	}
@@ -1207,13 +1205,33 @@ ReturnValue Game::internalAddItem(Cylinder* toCylinder, Item* item, bool test /*
 	else
 		m = maxQueryCount;
 
-	if(m == 0){
-		return RET_NOTENOUGHROOM;
-	}
-
 	if(!test){
-		toCylinder->__addThing(index, item);
-		toCylinder->postAddNotification(item);
+		Item* moveItem = item;
+
+		//update item(s)
+		if(item->isStackable()) {
+			if(toItem && toItem->getID() == item->getID()){
+				n = std::min((uint32_t)100 - toItem->getItemCount(), m);
+				toCylinder->__updateThing(toItem, toItem->getItemCount() + n);
+			}
+			
+			if(m - n > 0){
+				moveItem = Item::CreateItem(item->getID(), m - n);
+			}
+			else{
+				moveItem = NULL;
+				FreeThing(item);
+			}
+		}
+
+		if(moveItem){
+			if(index == -1)
+				toCylinder->__addThing(0, moveItem);
+			else
+				toCylinder->__addThing(index, moveItem);
+		}
+		else
+			toCylinder->postAddNotification(item);
 	}
 
 	return RET_NOERROR;
@@ -2237,7 +2255,7 @@ bool Game::playerUseBattleWindow(Player* player, const Position& fromPos, uint8_
 		creature->getPosition().z != player->getPosition().z)
 		return false;
 
-	Item* item = dynamic_cast<Item*>(internalGetThing(player, fromPos, fromStackPos));
+	Item* item = dynamic_cast<Item*>(internalGetThing(player, fromPos, 0 /*fromStackPos*/));
 
 	if(item){
 		if((std::abs(item->getPosition().x - player->getPosition().x) > 1) ||
@@ -2278,7 +2296,7 @@ bool Game::playerRotateItem(Player* player, const Position& pos, uint8_t stackpo
 	if(player->isRemoved())
 		return false;
 
-	Item* item = dynamic_cast<Item*>(internalGetThing(player, pos, 0));
+	Item* item = dynamic_cast<Item*>(internalGetThing(player, pos, 0 /*stackpos*/));
 	if(item == NULL || itemId != item->getID() || !item->rotate()){
 		playerSendErrorMessage(player, RET_NOTPOSSIBLE);
 		return false;
@@ -2331,7 +2349,7 @@ bool Game::playerRequestTrade(Player* player, const Position& pos, uint8_t stack
 		return false;
 	}
 
-	Item* tradeItem = dynamic_cast<Item*>(internalGetThing(player, pos, 0));
+	Item* tradeItem = dynamic_cast<Item*>(internalGetThing(player, pos, 0 /*stackpos*/));
 	if(!tradeItem || tradeItem->getID() != itemId || !tradeItem->isPickupable()) {
 		playerSendErrorMessage(player, RET_NOTPOSSIBLE);
 		return false;
@@ -2553,7 +2571,7 @@ bool Game::playerLookAt(Player* player, const Position& pos, uint16_t itemId, ui
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerCloseTrade()");
 
-	Thing* thing = internalGetThing(player, pos, 0);
+	Thing* thing = internalGetThing(player, pos, 0 /*stackpos*/);
 	if(!thing){
 		playerSendErrorMessage(player, RET_NOTPOSSIBLE);
 		return false;
