@@ -60,8 +60,9 @@ access(0)
 	
 	health     = 1000;//150;
 	healthmax  = 1000;//150;
-	//experience = 100000;
-	lastmove=0;
+	mana = 0;
+	manamax = 0;
+	lastmove = 0;
 	
 	inFightTicks = 0;
 	inFightTicks = 0;

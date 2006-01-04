@@ -237,7 +237,7 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 			int32_t stackpos = tile->__getIndexOfThing(attackedCreature);		
 			
 			//Add blood?
-			if(drawBlood){
+			if(drawBlood || attackedPlayer){
 				Item* splash = Item::CreateItem(2016, FLUID_BLOOD);
 				game->internalAddItem(attackTile, splash);
 				game->startDecay(splash);
@@ -258,16 +258,13 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 				attackedPlayer->die(); //handles exp/skills/maglevel loss/reset spawn position
 			}
 
-			//remove creature
-			game->removeCreature(attackedCreature, false);
-
 			if(attackedPlayer){
 				std::stringstream ss;
 				ss << corpseItem->getDescription(1);
 
-				ss << "You recognize " << attackedPlayer->getName() << ". ";
+				ss << "You recognize " << attackedPlayer->getName();
 				if(attacker){
-					ss << (attackedPlayer->getSex() == PLAYERSEX_FEMALE ? "She" : "He") << " was killed by ";
+					ss << ". " << (attackedPlayer->getSex() == PLAYERSEX_FEMALE ? "She" : "He") << " was killed by ";
 
 					Player* attackerPlayer = dynamic_cast<Player*>(attacker);
 					if(attackerPlayer) {
@@ -337,10 +334,13 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 			if(attackedCreature && attackedCreature->getMaster() != NULL) {
 				attackedCreature->getMaster()->removeSummon(attackedCreature);
 			}
+
+			//remove creature
+			game->removeCreature(attackedCreature, false);
 		}
 
 		//Add blood?
-		if(drawBlood && damage > 0){
+		else if(drawBlood && damage > 0){
 			Item* splash = Item::CreateItem(2019, FLUID_BLOOD);
 			game->internalAddItem(attackTile, splash);
 			game->startDecay(splash);
@@ -695,8 +695,9 @@ Creature* Game::getCreatureByID(unsigned long id)
 		return NULL;
 	
 	AutoList<Creature>::listiterator it = listCreature.list.find(id);
-	if(it != listCreature.list.end()) {
-		return (*it).second;
+	if(it != listCreature.list.end()){
+		if(!(*it).second->isRemoved())
+			return (*it).second;
 	}
 
 	return NULL; //just in case the player doesnt exist
@@ -709,7 +710,8 @@ Player* Game::getPlayerByID(unsigned long id)
 
 	AutoList<Player>::listiterator it = Player::listPlayer.list.find(id);
 	if(it != Player::listPlayer.list.end()) {
-		return (*it).second;
+		if(!(*it).second->isRemoved())
+			return (*it).second;
 	}
 
 	return NULL; //just in case the player doesnt exist
@@ -722,10 +724,12 @@ Creature* Game::getCreatureByName(const std::string &s)
 	std::string txt1 = s;
 	std::transform(txt1.begin(), txt1.end(), txt1.begin(), upchar);
 	for(AutoList<Creature>::listiterator it = listCreature.list.begin(); it != listCreature.list.end(); ++it){
-		std::string txt2 = (*it).second->getName();
-		std::transform(txt2.begin(), txt2.end(), txt2.begin(), upchar);
-		if(txt1 == txt2)
-			return it->second;
+		if(!(*it).second->isRemoved()){
+			std::string txt2 = (*it).second->getName();
+			std::transform(txt2.begin(), txt2.end(), txt2.begin(), upchar);
+			if(txt1 == txt2)
+				return it->second;
+		}
 	}
 
 	return NULL; //just in case the creature doesnt exist
@@ -738,10 +742,12 @@ Player* Game::getPlayerByName(const std::string &s)
 	std::string txt1 = s;
 	std::transform(txt1.begin(), txt1.end(), txt1.begin(), upchar);
 	for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin(); it != Player::listPlayer.list.end(); ++it){
-		std::string txt2 = (*it).second->getName();
-		std::transform(txt2.begin(), txt2.end(), txt2.begin(), upchar);
-		if(txt1 == txt2)
-			return it->second;
+		if(!(*it).second->isRemoved()){
+			std::string txt2 = (*it).second->getName();
+			std::transform(txt2.begin(), txt2.end(), txt2.begin(), upchar);
+			if(txt1 == txt2)
+				return it->second;
+		}
 	}
 
 	return NULL; //just in case the player doesnt exist
@@ -893,47 +899,45 @@ void Game::moveCreature(Player* player, Cylinder* fromCylinder, Cylinder* toCyli
 	if(fromCylinder == NULL || toCylinder == NULL || moveCreature == NULL){
 		ret = RET_NOTPOSSIBLE;
 	}
-
-	if(toCylinder != toCylinder->getTile()){
+	else if(toCylinder != toCylinder->getTile()){
 		ret = RET_NOTPOSSIBLE;
 	}
-
-	if(!moveCreature->isPushable() && player->access < moveCreature->access){
+	else if(!moveCreature->isPushable() && player->access < moveCreature->access){
 		ret = RET_NOTMOVEABLE;
 	}
-
-	if(player->getPosition().z != fromCylinder->getPosition().z){
+	else if(player->getPosition().z != fromCylinder->getPosition().z){
 		ret = RET_NOTPOSSIBLE;
 	}
 	else if((std::abs(player->getPosition().x - moveCreature->getPosition().x) > 1) ||
 		(std::abs(player->getPosition().y - moveCreature->getPosition().y) > 1)){
 		ret = RET_TOFARAWAY;
 	}
+	else{
+		const Position& fromPos = fromCylinder->getPosition();
+		const Position& toPos = toCylinder->getPosition();
 
-	const Position& fromPos = fromCylinder->getPosition();
-	const Position& toPos = toCylinder->getPosition();
-
-	//check throw distance
-	if( (std::abs(moveCreature->getPosition().x - toPos.x) > moveCreature->getThrowRange()) ||
-			(std::abs(moveCreature->getPosition().y - toPos.y) > moveCreature->getThrowRange()) ||
-			(std::abs(moveCreature->getPosition().z - toPos.z) * 4 > moveCreature->getThrowRange()) ) {
-		ret = RET_DESTINATIONOUTOFREACH;
-	}
-
-	if(player != moveCreature){
-		//if(toCylinder->getTile()->hasProperty(BLOCKPATHFIND))
-		//	ret = RET_NOTENOUGHROOM;
-		//if(fromCylinder->getTile()->hasProperty(PROTECTIONZONE) &&
-		//!toCylinder->getTile()->hasProperty(PROTECTIONZONE))
-		//	ret = RET_NOTPOSSIBLE;
-
-		if(toCylinder->getTile()->getTeleportItem() ||
-			 toCylinder->getTile()->getFieldItem() ||
-			 toCylinder->getTile()->floorChange()){
-			ret = RET_NOTENOUGHROOM;
+		//check throw distance
+		if( (std::abs(moveCreature->getPosition().x - toPos.x) > moveCreature->getThrowRange()) ||
+				(std::abs(moveCreature->getPosition().y - toPos.y) > moveCreature->getThrowRange()) ||
+				(std::abs(moveCreature->getPosition().z - toPos.z) * 4 > moveCreature->getThrowRange()) ) {
+			ret = RET_DESTINATIONOUTOFREACH;
 		}
-		else if(fromCylinder->getTile()->isPz() && !toCylinder->getTile()->isPz())
-			ret = RET_NOTPOSSIBLE;
+		else if(player != moveCreature && player->access < moveCreature->access){
+			if(toCylinder->getTile()->hasProperty(BLOCKPATHFIND))
+				ret = RET_NOTENOUGHROOM;
+			if(fromCylinder->getTile()->hasProperty(PROTECTIONZONE) &&
+			!toCylinder->getTile()->hasProperty(PROTECTIONZONE))
+				ret = RET_NOTPOSSIBLE;
+
+			/*if(toCylinder->getTile()->getTeleportItem() ||
+				toCylinder->getTile()->getFieldItem() ||
+				toCylinder->getTile()->floorChange()){
+				ret = RET_NOTENOUGHROOM;
+			}
+			else if(fromCylinder->getTile()->isPz() && !toCylinder->getTile()->isPz())
+				ret = RET_NOTPOSSIBLE;
+			*/
+		}
 	}
 
 	if(ret == RET_NOERROR){
@@ -1397,7 +1401,9 @@ Item* Game::transformItem(Item* item, uint16_t newtype, int32_t count /*= -1*/)
 ReturnValue Game::internalTeleport(Thing* thing, const Position& newPos)
 {
 	if(newPos == thing->getPosition())
-		return RET_NOERROR; 
+		return RET_NOERROR;
+	else if(thing->isRemoved())
+		return RET_NOTPOSSIBLE;
 
 	Tile* toTile = getTile(newPos.x, newPos.y, newPos.z);
 	if(toTile){
@@ -2795,17 +2801,45 @@ void Game::checkCreature(unsigned long creatureid)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::checkCreature()");
 
-	Creature *creature = getCreatureByID(creatureid);
+	Creature* creature = getCreatureByID(creatureid);
 
 	if(creature && !creature->isRemoved()){
 		int thinkTicks = 0;
 		int oldThinkTicks = creature->onThink(thinkTicks);
+
+		Conditions& conditions = creature->getConditions();
+		for(Conditions::iterator condIt = conditions.begin(); condIt != conditions.end(); ++condIt) {
+			if(condIt->first == ATTACK_FIRE || condIt->first == ATTACK_ENERGY || condIt->first == ATTACK_POISON) {
+				ConditionVec &condVec = condIt->second;
+
+				if(condVec.empty())
+					continue;
+
+				CreatureCondition& condition = condVec[0];
+
+				if(condition.onTick(oldThinkTicks)){
+					const MagicEffectTargetCreatureCondition* magicTargetCondition = condition.getCondition();
+					Creature* c = getCreatureByID(magicTargetCondition->getOwnerID());
+					creatureMakeMagic(c, creature->getPosition(), magicTargetCondition);
+
+					if(condition.getCount() <= 0){
+						condVec.erase(condVec.begin());
+					}
+				}
+			}
+		}
 		
+		if(creature->health <= 0){
+			if(creature->health > 0)
+				exit(1);
+		}
+
 		if(thinkTicks > 0) {
 			creature->eventCheck = addEvent(makeTask(thinkTicks, std::bind2nd(std::mem_fun(&Game::checkCreature), creatureid)));
 		}
 		else
-			creature->eventCheck = 0;
+			creature->eventCheck = addEvent(makeTask(oldThinkTicks, std::bind2nd(std::mem_fun(&Game::checkCreature), creatureid)));
+			//creature->eventCheck = 0;
 
 		Player* player = dynamic_cast<Player*>(creature);
 		if(player){
@@ -2867,7 +2901,7 @@ void Game::checkCreature(unsigned long creatureid)
 				player->hasteTicks -= thinkTicks;
 			}	
 		}
-		else {
+		else{
 			if(creature->manaShieldTicks >=1000){
 				creature->manaShieldTicks -= thinkTicks;
 			}
@@ -2876,29 +2910,6 @@ void Game::checkCreature(unsigned long creatureid)
 				creature->hasteTicks -= thinkTicks;
 			}
 		}
-
-		Conditions& conditions = creature->getConditions();
-		for(Conditions::iterator condIt = conditions.begin(); condIt != conditions.end(); ++condIt) {
-			if(condIt->first == ATTACK_FIRE || condIt->first == ATTACK_ENERGY || condIt->first == ATTACK_POISON) {
-				ConditionVec &condVec = condIt->second;
-
-				if(condVec.empty())
-					continue;
-
-				CreatureCondition& condition = condVec[0];
-
-				if(condition.onTick(oldThinkTicks)) {
-					const MagicEffectTargetCreatureCondition* magicTargetCondition =  condition.getCondition();
-					Creature* c = getCreatureByID(magicTargetCondition->getOwnerID());
-					creatureMakeMagic(c, creature->getPosition(), magicTargetCondition);
-
-					if(condition.getCount() <= 0) {
-						condVec.erase(condVec.begin());
-					}
-				}
-			}
-		}
-
 		flushSendBuffers();
 	}
 }

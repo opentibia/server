@@ -939,7 +939,7 @@ int ActionScript::luaActionDoRemoveItem(lua_State *L)
 	//const KnownThing* tmp = action->GetItemByUID(itemid);
 	Item* item = action->GetItemByUID(itemid);
 	//Item *tmpitem = NULL;
-	PositionEx tmppos;
+	/*PositionEx tmppos;
 	if(item){
 		//tmpitem = dynamic_cast<Item*>(tmp->thing);
 		tmppos = item->getPosition();//tmp->pos;
@@ -953,7 +953,7 @@ int ActionScript::luaActionDoRemoveItem(lua_State *L)
 		lua_pushnumber(L, -1);
 		std::cout << "luaDoRemoveItem: item not found" << std::endl;
 		return 1;
-	}
+	}*/
 	
 	action->game->internalRemoveItem(item, n);
 	
@@ -1055,6 +1055,8 @@ int ActionScript::luaActionDoTeleportThing(lua_State *L)
 		std::cout << "luaTeleport: thing not found" << std::endl;
 		return 1;
 	}
+
+	/*
 	//std::cout << "new pos: " << (Position&)pos << std::endl;
 	if(Item* item = tmp->getItem()){
 		//avoid teleport notMoveable items
@@ -1065,17 +1067,9 @@ int ActionScript::luaActionDoTeleportThing(lua_State *L)
 			return 1;
 		}
 	}
+	*/
 	
 	action->game->internalTeleport(tmp,(Position&)pos);
-	/*Tile* tile = action->game->map->getTile(pos);
-	if(tile){
-		pos.stackpos = tile->__getIndexOfThing(tmpthing);
-	}
-	else{
-		pos.stackpos = 1;
-	}
-	action->UpdateThingPos(id,pos);
-	*/
 	
 	lua_pushnumber(L, 0);
 	return 1;

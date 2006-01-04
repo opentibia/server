@@ -293,7 +293,7 @@ int Monster::onThink(int& newThinkTicks)
 		return ret;
 	}
 
-	eventCheck = 0;
+	//TEST eventCheck = 0;
 	stopThink();
 	newThinkTicks = 0;
 	isYielding = true;
@@ -989,17 +989,16 @@ void Monster::startThink()
 	//Update move	position
 	setUpdateMovePos();
 
-	if(!eventCheck){
-		eventCheck = game->addEvent(makeTask(500, std::bind2nd(std::mem_fun(&Game::checkCreature), getID())));
-	}
+	////TEST 
+	//TEST if(!eventCheck){
+	//TEST	eventCheck = game->addEvent(makeTask(500, std::bind2nd(std::mem_fun(&Game::checkCreature), getID())));
+	//TEST }
 
-	/*TEST
-	if(attackedCreature != NULL && !(isSummon() && hasLostMaster)) {
-		if(!eventCheckAttacking){
-			eventCheckAttacking = game->addEvent(makeTask(500, std::bind2nd(std::mem_fun(&Game::checkCreatureAttacking), getID())));
-		}
-	}
-	TEST*/
+	//TEST if(attackedCreature != NULL && !(isSummon() && hasLostMaster)) {
+	//TEST 	if(!eventCheckAttacking){
+	//TEST 		eventCheckAttacking = game->addEvent(makeTask(500, std::bind2nd(std::mem_fun(&Game::checkCreatureAttacking), getID())));
+	//TEST 	}
+	//TEST }
 }
 
 void Monster::stopThink()
@@ -1023,10 +1022,10 @@ void Monster::stopThink()
 	targetPos.y = 0;
 	targetPos.z = 0;
 
-	if(state == STATE_IDLE) {
-		game->stopEvent(eventCheck);
-		eventCheck = 0;
-	}
+	//TEST if(state == STATE_IDLE) {
+	//TEST game->stopEvent(eventCheck);
+	//TEST 	eventCheck = 0;
+	//TEST }
 
 	//TEST game->stopEvent(eventCheckAttacking);
 	//TEST eventCheckAttacking = 0;
