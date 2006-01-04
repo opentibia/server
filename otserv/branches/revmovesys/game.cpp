@@ -2803,7 +2803,7 @@ void Game::checkCreature(unsigned long creatureid)
 
 	Creature* creature = getCreatureByID(creatureid);
 
-	if(creature && !creature->isRemoved()){
+	if(creature){
 		int thinkTicks = 0;
 		int oldThinkTicks = creature->onThink(thinkTicks);
 
@@ -2828,18 +2828,13 @@ void Game::checkCreature(unsigned long creatureid)
 				}
 			}
 		}
-		
-		if(creature->health <= 0){
-			if(creature->health > 0)
-				exit(1);
-		}
 
 		if(thinkTicks > 0) {
 			creature->eventCheck = addEvent(makeTask(thinkTicks, std::bind2nd(std::mem_fun(&Game::checkCreature), creatureid)));
 		}
 		else
-			creature->eventCheck = addEvent(makeTask(oldThinkTicks, std::bind2nd(std::mem_fun(&Game::checkCreature), creatureid)));
-			//creature->eventCheck = 0;
+			creature->eventCheck = 0;
+			//creature->eventCheck = addEvent(makeTask(oldThinkTicks, std::bind2nd(std::mem_fun(&Game::checkCreature), creatureid)));
 
 		Player* player = dynamic_cast<Player*>(creature);
 		if(player){
