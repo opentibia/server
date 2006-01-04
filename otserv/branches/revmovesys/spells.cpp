@@ -34,9 +34,10 @@
 
 #include "spells.h"
 
-Spells::Spells(Game* igame): game(igame){
-                   
-                   }
+Spells::Spells(Game* igame): game(igame)
+{
+	//
+}
 
 bool Spells::loadFromXml(const std::string &datadir)
 {
@@ -667,8 +668,9 @@ int SpellScript::luaActionDoAreaGroundSpell(lua_State *L)
 	return 1;
 }
 
-int SpellScript::luaActionChangeOutfit(lua_State *L){
-    int looktype = (int)lua_tonumber(L, -1);
+int SpellScript::luaActionChangeOutfit(lua_State *L)
+{
+	int looktype = (int)lua_tonumber(L, -1);
 	lua_pop(L,1);
 	long time = (long)lua_tonumber(L, -1)*1000;
 	lua_pop(L,1);
@@ -732,7 +734,8 @@ void SpellScript::internalLoadTransformVec(lua_State *L, TransformMap& transform
 	}
 }
 
-int SpellScript::luaActionManaShield(lua_State *L){
+int SpellScript::luaActionManaShield(lua_State *L)
+{
 	long time = (long)lua_tonumber(L, -1)*1000;
 	lua_pop(L,1);
 	
@@ -747,7 +750,8 @@ int SpellScript::luaActionManaShield(lua_State *L){
 	return 0;
 }
 
-int SpellScript::luaActionChangeSpeed(lua_State *L){
+int SpellScript::luaActionChangeSpeed(lua_State *L)
+{
 	long time = (long)lua_tonumber(L, -1)*1000;
 	lua_pop(L,1);
 	
@@ -761,14 +765,16 @@ int SpellScript::luaActionChangeSpeed(lua_State *L){
 	spell->game->addEvent(makeTask(time, boost::bind(&Game::changeSpeed, spell->game,creature->getID(), creature->getNormalSpeed()) ) );
 	Player* p = dynamic_cast<Player*>(creature);
 	if(p){
-         spell->game->changeSpeed(creature->getID(), creature->getNormalSpeed()+speed); 
-	     p->sendIcons();
-      }
-    creature->hasteTicks = time;  
+		spell->game->changeSpeed(creature->getID(), creature->getNormalSpeed()+speed);
+		p->sendIcons();
+	}
+	
+	creature->hasteTicks = time;
 	return 0;
 }
 
-int SpellScript::luaActionChangeSpeedMonster(lua_State *L){
+int SpellScript::luaActionChangeSpeedMonster(lua_State *L)
+{
 	long time = (long)lua_tonumber(L, -1)*1000;
 	lua_pop(L,1);
 	
@@ -787,8 +793,8 @@ int SpellScript::luaActionChangeSpeedMonster(lua_State *L){
 	return 0;
 }
 
-
-int SpellScript::luaActionGetSpeed(lua_State *L){
+int SpellScript::luaActionGetSpeed(lua_State *L)
+{
 	Spell* spell = getSpell(L);
 	Creature* creature = spell->game->getCreatureByID((unsigned long)lua_tonumber(L, -1));
 	lua_pop(L,1);
@@ -797,44 +803,47 @@ int SpellScript::luaActionGetSpeed(lua_State *L){
 	return 1;
 }
 
-int SpellScript::luaActionGetPos(lua_State *L){
+int SpellScript::luaActionGetPos(lua_State *L)
+{
 	const char* s = lua_tostring(L, -1);
 	lua_pop(L,1);
 	Spell* spell = getSpell(L);
 	Creature* c = spell->game->getCreatureByName(std::string(s));
 	Player* p = dynamic_cast<Player*>(c);
 	if(!c || !p){
-      lua_newtable(L);
-      lua_pushstring(L, "x");
-      lua_pushnil(L);
-      lua_settable(L, -3);
-      
-      lua_pushstring(L, "y");
-      lua_pushnil(L);
-      lua_settable(L, -3);
-      
-      lua_pushstring(L, "z");
-      lua_pushnil(L);
-      lua_settable(L, -3);
+		lua_newtable(L);
+		lua_pushstring(L, "x");
+		lua_pushnil(L);
+		lua_settable(L, -3);
+
+		lua_pushstring(L, "y");
+		lua_pushnil(L);
+		lua_settable(L, -3);
+
+		lua_pushstring(L, "z");
+		lua_pushnil(L);
+		lua_settable(L, -3);
 	}
 	else{
-			lua_newtable(L);
-      lua_pushstring(L, "x");
-      lua_pushnumber(L, c->getPosition().x);
-      lua_settable(L, -3);
-      
-      lua_pushstring(L, "y");
-      lua_pushnumber(L, c->getPosition().y);
-      lua_settable(L, -3);
-      
-      lua_pushstring(L, "z");
-      lua_pushnumber(L, c->getPosition().z);
-      lua_settable(L, -3);
+		lua_newtable(L);
+		lua_pushstring(L, "x");
+		lua_pushnumber(L, c->getPosition().x);
+		lua_settable(L, -3);
+
+		lua_pushstring(L, "y");
+		lua_pushnumber(L, c->getPosition().y);
+		lua_settable(L, -3);
+
+		lua_pushstring(L, "z");
+		lua_pushnumber(L, c->getPosition().z);
+		lua_settable(L, -3);
 	}
+
 	return 1;
 }
 
-int SpellScript::luaActionMakeRune(lua_State *L){
+int SpellScript::luaActionMakeRune(lua_State *L)
+{
 	unsigned char charges = (unsigned char)lua_tonumber(L, -1);
 	lua_pop(L,1);
 	
@@ -861,12 +870,12 @@ int SpellScript::luaActionMakeRune(lua_State *L){
 
 		//try to create rune 1
 		a = internalMakeRune(player,SLOT_RIGHT,spell,type,charges);
-		if(a == 1) {
+		if(a == 1){
 			magicTarget.manaCost = spell->getMana();
 		}
 
 		//check if we got enough mana for the left hand
-		if(player->getMana() - magicTarget.manaCost >= magicTarget.manaCost) {
+		if(player->getMana() - magicTarget.manaCost >= magicTarget.manaCost){
 			//try to create rune 2
 			b = internalMakeRune(player,SLOT_LEFT,spell,type,charges);
 			if(b == 1) {
@@ -907,15 +916,17 @@ int SpellScript::luaActionMakeRune(lua_State *L){
 }
 
 //create new runes and delete blank ones
-int SpellScript::internalMakeRune(Player *p,unsigned short sl_id,Spell *S,unsigned short id, unsigned char charges){
-	/*
+int SpellScript::internalMakeRune(Player* player, unsigned short sl_id, Spell* spell,
+	unsigned short id, unsigned char charges)
+{
 	//check mana
-	if(p->mana < S->getMana() || p->exhaustedTicks >= 1000)
+	if(player->mana < spell->getMana() || player->exhaustedTicks >= 1000)
 		return -1;
-	Item *item = p->getItem(sl_id);
+
+	Item* item = player->getInventoryItem((slots_t)sl_id);
 	if(item){
 		if(item->getID() == ITEM_RUNE_BLANK){
-			p->addItemInventory(Item::CreateItem(id, charges ),sl_id);
+			spell->game->transformItem(item, id, charges);
 			return 1;
 		}
 		else{
@@ -925,9 +936,6 @@ int SpellScript::internalMakeRune(Player *p,unsigned short sl_id,Spell *S,unsign
 	else{
 		return 0;
 	}
-	*/
-
-	return 0;
 }
 
 int SpellScript::luaActionMakeArrows(lua_State *L)
@@ -962,16 +970,20 @@ int SpellScript::luaActionMakeArrows(lua_State *L)
 			magicTarget.damageEffect = 12; //NM_ME_MAGIC_ENERGIE = 12
  		}
  		
-		/*
 		bool isSuccess = spell->game->creatureThrowRune(player, player->getPosition(), magicTarget);
 
-		if(isSuccess) {
-			Item* new_item = Item::CreateItem(id,count);
-			if(!player->addItem(new_item)){
-				spell->game->addThing(NULL, player->getPosition(), new_item);
+		if(isSuccess){
+			Item* newItem = Item::CreateItem(id, count);
+
+			ReturnValue ret = spell->game->internalAddItem(player, newItem);
+			if(ret != RET_NOERROR){
+				Tile* tile = player->getTile();
+				ret = spell->game->internalAddItem(tile, newItem);
+				if(ret != RET_NOERROR){
+					delete newItem;
+				}
 			}
 		}
-		*/
 		
  		lua_pushnumber(L, 1);
  		return 1;
@@ -980,7 +992,8 @@ int SpellScript::luaActionMakeArrows(lua_State *L)
 	return 1;
 }
 
-int SpellScript::luaActionMakeFood(lua_State *L){
+int SpellScript::luaActionMakeFood(lua_State *L)
+{
 	unsigned char count = (unsigned char)lua_tonumber(L, -1);
 	lua_pop(L,1);
 	
@@ -1012,7 +1025,7 @@ int SpellScript::luaActionMakeFood(lua_State *L){
 
 		if(isSuccess) {
 			int r,foodtype;
-			r = rand()%7;
+			r = rand() % 7;
 			if(r == 0) foodtype = ITEM_MEAT;
 			if(r == 1) foodtype = ITEM_HAM;
 			if(r == 2) foodtype = ITEM_GRAPE;
@@ -1022,13 +1035,16 @@ int SpellScript::luaActionMakeFood(lua_State *L){
 			if(r == 6) foodtype = ITEM_ROLL;
     	if(r == 7) foodtype = ITEM_BREAD;
   		
-  		/*
-			Item* new_item = Item::CreateItem(foodtype,count);
-			if(!player->addItem(new_item)){
-				//add item on the ground
-				spell->game->addThing(NULL, player->getPosition(), new_item);
+			Item* newItem = Item::CreateItem(foodtype, count);
+
+			ReturnValue ret = spell->game->internalAddItem(player, newItem);
+			if(ret != RET_NOERROR){
+				Tile* tile = player->getTile();
+				ret = spell->game->internalAddItem(tile, newItem);
+				if(ret != RET_NOERROR){
+					delete newItem;
+				}
 			}
-			*/
 		}
   
 		lua_pushnumber(L, 1);

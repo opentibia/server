@@ -174,7 +174,7 @@ public:
 	}
 	
 	time_t getLastLoginSaved() const { return lastLoginSaved; };
-	const Position& getLastLoginPosition() {return lastLoginPosition;};
+	const Position& getLoginPosition() {return loginPosition;};
 	const Position& getLastPosition() {return lastPosition;};
 	
 	void updateInventoryWeigth();
@@ -339,7 +339,7 @@ protected:
 	std::string password;
 	time_t lastlogin;
 	time_t lastLoginSaved;
-	Position lastLoginPosition;
+	Position loginPosition;
 	Position lastPosition; //tmp fix until new battle system
 	unsigned long lastip;
 	

@@ -119,9 +119,9 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 		tokenizer tokens(pos, sep);
 	
 		tokenizer::iterator spawnit = tokens.begin();
-		player->lastLoginPosition.x = atoi(spawnit->c_str()); spawnit++;
-		player->lastLoginPosition.y = atoi(spawnit->c_str()); spawnit++;
-		player->lastLoginPosition.z = atoi(spawnit->c_str());
+		player->loginPosition.x = atoi(spawnit->c_str()); spawnit++;
+		player->loginPosition.y = atoi(spawnit->c_str()); spawnit++;
+		player->loginPosition.z = atoi(spawnit->c_str());
 		
 		//there is no "fuck" in the sources, but every major programm got
 		//one and i think here is a good place to add one
@@ -335,7 +335,8 @@ bool IOPlayerSQL::savePlayer(Player* player)
 		query << "`manamax` = " << player->manamax << ", ";
 		query << "`manaspent` = " << player->manaspent << ", ";
 		query << "`masterpos` = '" << player->masterPos.x<<";"<< player->masterPos.y<<";"<< player->masterPos.z << "', ";
-		query << "`pos` = '" << player->getPosition().x<<";"<< player->getPosition().y<<";"<< player->getPosition().z << "', ";
+		query << "`pos` = '" << player->getLoginPosition().x<<";"<< player->getLoginPosition().y<<";"<< player->getLoginPosition().z << "', ";
+		//query << "`pos` = '" << player->getPosition().x<<";"<< player->getPosition().y<<";"<< player->getPosition().z << "', ";
 		query << "`speed` = " << player->speed << ", ";
 		//query << "`cap` = " << player->cap << ", ";
 		query << "`cap` = " << player->getCapacity() << ", ";

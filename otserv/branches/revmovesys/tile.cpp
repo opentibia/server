@@ -154,18 +154,27 @@ Thing* Tile::getTopMoveableThing()
 	if(ground && !ground->isNotMoveable())
 		return ground;
 
-	for(int i = 0; i < topItems.size(); i++){
+	/*for(int i = 0; i < topItems.size(); i++){
 		if(topItems[i] && !topItems[i]->isNotMoveable())
 			return topItems[i];
 	}
 
 	for(int i = 0; i < creatures.size(); i++){
 		return creatures[i];
-	}
+	}*/
 
 	for(int i = 0; i < downItems.size(); i++){
 		if(downItems[i] && !downItems[i]->isNotMoveable())
 			return downItems[i];
+	}
+
+	for(int i = 0; i < creatures.size(); i++){
+		return creatures[i];
+	}
+
+	for(int i = 0; i < topItems.size(); i++){
+		if(topItems[i] && !topItems[i]->isNotMoveable())
+			return topItems[i];
 	}
 
 	return NULL;

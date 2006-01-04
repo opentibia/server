@@ -299,7 +299,7 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name){
 				else
 					isLoaded = false;
 
-				player->lastLoginPosition = spawnPos;
+				player->loginPosition = spawnPos;
 			}
 			else if(str=="temple")
 			{
@@ -615,9 +615,9 @@ bool IOPlayerXML::savePlayer(Player* player)
 	sb << player->lastlogin;	        xmlSetProp(root, (const xmlChar*) "lastlogin", (const xmlChar*)sb.str().c_str());  sb.str("");
 
 	pn = xmlNewNode(NULL,(const xmlChar*)"spawn");
-	sb << player->getPosition().x;    xmlSetProp(pn, (const xmlChar*) "x", (const xmlChar*)sb.str().c_str());        sb.str("");
-	sb << player->getPosition().y;  	xmlSetProp(pn, (const xmlChar*) "y", (const xmlChar*)sb.str().c_str());        sb.str("");
-	sb << player->getPosition().z; 	xmlSetProp(pn, (const xmlChar*) "z", (const xmlChar*)sb.str().c_str());	       sb.str("");
+	sb << player->getLoginPosition().x;    xmlSetProp(pn, (const xmlChar*) "x", (const xmlChar*)sb.str().c_str());        sb.str("");
+	sb << player->getLoginPosition().y;  	xmlSetProp(pn, (const xmlChar*) "y", (const xmlChar*)sb.str().c_str());        sb.str("");
+	sb << player->getLoginPosition().z; 	xmlSetProp(pn, (const xmlChar*) "z", (const xmlChar*)sb.str().c_str());	       sb.str("");
 	xmlAddChild(root, pn);
 	
 	pn = xmlNewNode(NULL,(const xmlChar*)"temple");

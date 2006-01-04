@@ -79,7 +79,7 @@ bool Protocol75::ConnectPlayer()
 	if(!stat->hasSlot() && player->access == 0)
 		return false;
 	else                    
-		return game->placeCreature(player->getLastLoginPosition(), player);
+		return game->placeCreature(player->getLoginPosition(), player);
 }
 
 

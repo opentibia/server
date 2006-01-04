@@ -254,8 +254,6 @@ bool Actions::UseItem(Player* player, const Position &pos,const unsigned char st
 	
 	//if found execute it
 	if(action){
-		//Position itempos = game->getThingMapPos(player, pos);
-		//game->autoCloseTrade(item);
 		PositionEx posEx(pos, stack);
 		if(action->executeUse(player, item, posEx, posEx)){
 			return true;
@@ -343,8 +341,6 @@ bool Actions::UseItemEx(Player* player, const Position &from_pos,
 			return false;
 		}
 		
-		//Position itempos = game->getThingMapPos(player, from_pos);
-		//game->autoCloseTrade(item);
 		PositionEx posFromEx(from_pos, from_stack);
 		PositionEx posToEx(to_pos, to_stack);
 		if(action->executeUse(player,item, posFromEx, posToEx))
@@ -1282,22 +1278,35 @@ int ActionScript::luaActionDoPlayerAddItem(lua_State *L)
 	int itemid = (int)internalGetNumber(L);
 	unsigned int cid = (unsigned int)internalGetNumber(L);	
 	
-	ActionScript *action = getActionScript(L);
+	ActionScript* action = getActionScript(L);
 	unsigned int uid;
 	Player* player = action->GetPlayerByUID(cid);
 	if(player){
-		Item* newitem = Item::CreateItem(itemid, type);
+		Item* newItem = Item::CreateItem(itemid, type);
 
-		ReturnValue ret = action->game->internalAddItem(player, newitem);
+		ReturnValue ret = action->game->internalAddItem(player, newItem);
 		if(ret != RET_NOERROR){
 			Tile* tile = player->getTile();
-			ret = action->game->internalAddItem(tile, newitem);
+			ret = action->game->internalAddItem(tile, newItem);
 			if(ret != RET_NOERROR){
-				delete newitem;
+				delete newItem;
+
+				lua_pushnumber(L, -1);
+#ifdef __DEBUG__
+				std::cout << "luaDoPlayerAddItem: could not add item" << std::endl;
+#endif
+				return 1;
 			}
 		}
-
-		uid = action->AddThingToMap((Thing*)newitem/*,pos*/);
+		
+		if(newItem->getParent()){
+			uid = action->AddThingToMap((Thing*)newItem);
+		}
+		else{
+			//stackable item stacked with existing object, newItem will be released
+			lua_pushnumber(L, -1);
+			return 1;
+		}
 	}
 	else{
 		lua_pushnumber(L, -1);
@@ -1306,7 +1315,6 @@ int ActionScript::luaActionDoPlayerAddItem(lua_State *L)
 	}		
 
 	lua_pushnumber(L, uid);
-
 	return 1;
 }
 
@@ -1533,10 +1541,16 @@ int ActionScript::luaActionDoCreateItem(lua_State *L)
 		return 0;
 	}
 	
-	unsigned int uid = action->AddThingToMap((Thing*)newItem);
-	
-	lua_pushnumber(L, uid);
-	return 1;	
+	if(newItem->getParent()){
+		unsigned int uid = action->AddThingToMap((Thing*)newItem);
+		lua_pushnumber(L, uid);
+		return 1;	
+	}
+	else{
+		//stackable item stacked with existing object, newItem will be released
+		lua_pushnumber(L, -1);
+		return 1;
+	}
 }
 
 int ActionScript::luaActionGetPlayerStorageValue(lua_State *L)

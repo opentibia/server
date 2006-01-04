@@ -253,14 +253,14 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 			if(lootContainer) {
 				attackedCreature->dropLoot(lootContainer);
 			}
-			
+
 			if(attackedPlayer){
-				attackedPlayer->die(); //handles exp/skills/maglevel loss
+				attackedPlayer->die(); //handles exp/skills/maglevel loss/reset spawn position
 			}
 
 			//remove creature
 			game->removeCreature(attackedCreature, false);
-			
+
 			if(attackedPlayer){
 				std::stringstream ss;
 				ss << corpseItem->getDescription(1);
@@ -338,12 +338,13 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 				attackedCreature->getMaster()->removeSummon(attackedCreature);
 			}
 		}
-	}
-	//Add blood?
-	else if(drawBlood && damage > 0){
-		Item* splash = Item::CreateItem(2019, FLUID_BLOOD);
-		game->internalAddItem(attackTile, splash);
-		game->startDecay(splash);
+
+		//Add blood?
+		if(drawBlood && damage > 0){
+			Item* splash = Item::CreateItem(2019, FLUID_BLOOD);
+			game->internalAddItem(attackTile, splash);
+			game->startDecay(splash);
+		}
 	}
 }
 
@@ -601,13 +602,29 @@ Thing* Game::internalGetThing(Player* player, const Position& pos, int32_t index
 		Tile* tile = getTile(pos.x, pos.y, pos.z);
 
 		if(tile){
-			if(index == 0){
-				Thing* thing = tile->getTopDownItem();
+			/*for move operations*/
+			if(index == -1){
+				return tile->getTopMoveableThing(); //tile->getTopDownItem();
 
+				/*
 				if(thing)
 					return thing;
 				else
 					return tile->getTopThing();
+				*/
+			}
+			/*look at*/
+			else if(index == -2){
+				return tile->getTopThing();
+
+				/*
+				Thing* thing = tile->getTopThing();
+
+				if(thing)
+					return thing;
+				else
+					return tile->getTopDownItem();
+				*/
 			}
 			else{
 				return tile->__getThing(index);
@@ -844,7 +861,7 @@ void Game::thingMove(Player* player, const Position& fromPos, uint16_t itemId, u
 	else
 		fromIndex = fromStackpos;
 
-	Thing* thing = internalGetThing(player, fromPos, 0 /*fromIndex*/);
+	Thing* thing = internalGetThing(player, fromPos, -1 /*fromIndex*/);
 
 	Cylinder* toCylinder = internalGetCylinder(player, toPos);
 	uint8_t toIndex = 0;
@@ -2255,7 +2272,7 @@ bool Game::playerUseBattleWindow(Player* player, const Position& fromPos, uint8_
 		creature->getPosition().z != player->getPosition().z)
 		return false;
 
-	Item* item = dynamic_cast<Item*>(internalGetThing(player, fromPos, 0 /*fromStackPos*/));
+	Item* item = dynamic_cast<Item*>(internalGetThing(player, fromPos, -2 /*fromStackPos*/));
 
 	if(item){
 		if((std::abs(item->getPosition().x - player->getPosition().x) > 1) ||
@@ -2296,7 +2313,7 @@ bool Game::playerRotateItem(Player* player, const Position& pos, uint8_t stackpo
 	if(player->isRemoved())
 		return false;
 
-	Item* item = dynamic_cast<Item*>(internalGetThing(player, pos, 0 /*stackpos*/));
+	Item* item = dynamic_cast<Item*>(internalGetThing(player, pos, stackpos));
 	if(item == NULL || itemId != item->getID() || !item->rotate()){
 		playerSendErrorMessage(player, RET_NOTPOSSIBLE);
 		return false;
@@ -2349,7 +2366,7 @@ bool Game::playerRequestTrade(Player* player, const Position& pos, uint8_t stack
 		return false;
 	}
 
-	Item* tradeItem = dynamic_cast<Item*>(internalGetThing(player, pos, 0 /*stackpos*/));
+	Item* tradeItem = dynamic_cast<Item*>(internalGetThing(player, pos, -2 /*stackpos*/));
 	if(!tradeItem || tradeItem->getID() != itemId || !tradeItem->isPickupable()) {
 		playerSendErrorMessage(player, RET_NOTPOSSIBLE);
 		return false;
@@ -2571,7 +2588,7 @@ bool Game::playerLookAt(Player* player, const Position& pos, uint16_t itemId, ui
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerCloseTrade()");
 
-	Thing* thing = internalGetThing(player, pos, 0 /*stackpos*/);
+	Thing* thing = internalGetThing(player, pos, -2 /*stackpos*/);
 	if(!thing){
 		playerSendErrorMessage(player, RET_NOTPOSSIBLE);
 		return false;

@@ -1372,6 +1372,10 @@ void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bo
 	}
 
 	if(creature == this){
+		if(isLogout){
+			loginPosition = getPosition();
+		}
+
 		if(tradePartner){
 			g_game.playerCloseTrade(this);
 		}
@@ -1617,7 +1621,7 @@ unsigned long Player::getIP() const
 
 void Player::die()
 {
-	lastLoginPosition = masterPos;
+	loginPosition = masterPos;
 	lastPosition = getPosition();
 
 	//Magic Level downgrade
@@ -1682,28 +1686,20 @@ void Player::die()
 			break;
 	}
 	
-	if(newLevel != level)
-	{
+	if(newLevel != level){
 		std::stringstream lvMsg;
 		lvMsg << "You were downgraded from level " << level << " to level " << newLevel << ".";
-		client->sendTextMessage(MSG_ADVANCE, lvMsg.str().c_str());	
-		
+		client->sendTextMessage(MSG_ADVANCE, lvMsg.str().c_str());
 	}
 }
 
 void Player::preSave()
-{  
-	if (health <= 0)
-	{
+{
+	if(health <= 0){
 		health = healthmax;
-		//pos.x = masterPos.x;
-		//pos.y = masterPos.y;
-		//pos.z = masterPos.z;
-		
 		experience -= getLostExperience();
 				
-		while(experience < getExpForLv(level))
-		{
+		while(experience < getExpForLv(level)){
 			if(level > 1)                               
 				level--;
 			else
@@ -1712,7 +1708,7 @@ void Player::preSave()
 			// This checks (but not the downgrade sentences) aren't really necesary cause if the
 			// player has a "normal" hp,mana,etc when he gets level 1 he will not lose more
 			// hp,mana,etc... but here they are :P 
-			if ((healthmax -= HPGain[(int)vocation]) < 0) //This could be avoided with a proper use of unsigend int
+			if((healthmax -= HPGain[(int)vocation]) < 0) //This could be avoided with a proper use of unsigend int
 				healthmax = 0;
 			
 			health = healthmax;
