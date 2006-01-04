@@ -150,9 +150,9 @@ ReturnValue Container::__queryAdd(int32_t index, const Thing* thing, uint32_t co
 		if(size() >= capacity())
 			return RET_CONTAINERNOTENOUGHROOM;
 	}
-	else if(index >= ((int32_t)capacity())){
-		return RET_CONTAINERNOTENOUGHROOM;
-	}
+	//else if(index >= ((int32_t)capacity())){
+	//	return RET_CONTAINERNOTENOUGHROOM;
+	//}
 
 	const Item* item = thing->getItem();
 	if(item == NULL){
@@ -245,7 +245,22 @@ ReturnValue Container::__queryRemove(const Thing* thing, uint32_t count) const
 
 Cylinder* Container::__queryDestination(int32_t& index, const Thing* thing, Item** destItem)
 {
-	if(index != -1){
+	if(index == 254 /*move up*/){
+		index = -1;
+		*destItem = NULL;
+		
+		Container* parentContainer = dynamic_cast<Container*>(getParent());
+		if(parentContainer)
+			return parentContainer;
+		else
+			return this;
+	}
+	else if(index == 255 /*add wherever*/){
+		index = -1;
+		*destItem = NULL;
+		return this;
+	}
+	else if(index != -1){
 		Thing* destThing = dynamic_cast<Item*>(__getThing(index));
 		if(destThing)
 			*destItem = destThing->getItem();
