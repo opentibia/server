@@ -168,13 +168,11 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 	SOCKET s = *(SOCKET*)dat;
     
 	NetworkMessage msg;
-	if (msg.ReadFromSocket(s))
-	{
+	if(msg.ReadFromSocket(s)){
 		unsigned short protId = msg.GetU16();
 		
 		// login server connection
-		if (protId == 0x0201)
-		{
+		if (protId == 0x0201){
 			msg.SkipBytes(15);
 			unsigned int accnumber = msg.GetU32();
 			std::string  password  = msg.GetString();
@@ -183,12 +181,10 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 			
 			sockaddr_in sain;
 			socklen_t salen = sizeof(sockaddr_in);
-			if (getpeername(s, (sockaddr*)&sain, &salen) == 0)
-			{
+			if(getpeername(s, (sockaddr*)&sain, &salen) == 0){
 				unsigned long clientip = *(unsigned long*)&sain.sin_addr;
-				for (unsigned int i = 0; i < serverIPs.size(); i++)
-					if ((serverIPs[i].first & serverIPs[i].second) == (clientip & serverIPs[i].second))
-					{
+				for(unsigned int i = 0; i < serverIPs.size(); i++)
+					if((serverIPs[i].first & serverIPs[i].second) == (clientip & serverIPs[i].second)){
 						serverip = serverIPs[i].first;
 						break;
 					}
@@ -196,17 +192,19 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 			
 			msg.Reset();
 			
-			if(isclientBanished(s)) {
+			if(isclientBanished(s)){
 				msg.AddByte(0x0A);
 				msg.AddString("Your IP is banished!");
 			}
-			else {
+			else{
 				//char accstring[16];
 				//sprintf(accstring, "%i", accnumber);
 				
 				Account account = IOAccount::instance()->loadAccount(accnumber);
-				if (account.accnumber == accnumber && passwordTest(password,account.password)) // seems to be a successful load
-				{
+				if(accnumber != 0 && account.accnumber == accnumber &&
+					passwordTest(password,account.password)){
+					// seems to be a successful load
+
 					msg.AddByte(0x14);
 					std::stringstream motd;
 					motd << g_config.getGlobalString("motdnum");
@@ -218,8 +216,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 					msg.AddByte((uint8_t)account.charList.size());
 					
 					std::list<std::string>::iterator it;
-					for (it = account.charList.begin(); it != account.charList.end(); it++)
-					{
+					for(it = account.charList.begin(); it != account.charList.end(); it++){
 						msg.AddString((*it));
 						msg.AddString("OpenTibia");
 						msg.AddU32(serverip);
@@ -228,8 +225,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 					
 					msg.AddU16(account.premDays);
 				}
-				else
-				{
+				else{
 					msg.AddByte(0x0A);
 					msg.AddString("Please enter a valid account number and password.");
 				}
@@ -238,8 +234,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 			msg.WriteToSocket(s);
 		}
 		// gameworld connection tibia 7.55
-		else if (protId == 0x020A)
-		{
+		else if(protId == 0x020A){
 			unsigned char  clientos = msg.GetByte();
 			unsigned short version  = msg.GetU16();
 			unsigned char  unknown = msg.GetByte();
