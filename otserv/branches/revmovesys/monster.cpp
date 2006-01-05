@@ -286,7 +286,11 @@ int Monster::onThink(int& newThinkTicks)
 			updateLookDirection();
 		}
 
-		newThinkTicks = getStepDuration();
+		if(!isRemoved())
+			newThinkTicks = getStepDuration();
+		else 
+			newThinkTicks = 0;
+
 		int ret = oldThinkTicks;
 		oldThinkTicks = newThinkTicks;
 		isYielding = true;

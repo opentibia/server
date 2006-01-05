@@ -78,8 +78,7 @@ GameState::GameState(Game *game, const Range &range)
 
 void GameState::onAttack(Creature* attacker, const Position& pos, const MagicEffectClass* me)
 {
-	//Tile *tile = game->map->getTile(pos.x, pos.y, pos.z);
-	Tile *tile = game->map->getTile(pos);
+	Tile* tile = game->map->getTile(pos);
 
 	if(!tile)
 		return;
@@ -338,7 +337,6 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 			//remove creature
 			game->removeCreature(attackedCreature, false);
 		}
-
 		//Add blood?
 		else if(drawBlood && damage > 0){
 			Item* splash = Item::CreateItem(2019, FLUID_BLOOD);
@@ -2829,6 +2827,10 @@ void Game::checkCreature(unsigned long creatureid)
 			}
 		}
 
+		//creature could have been removed due to death...
+		if(creature->isRemoved())
+			return;
+
 		if(thinkTicks > 0) {
 			creature->eventCheck = addEvent(makeTask(thinkTicks, std::bind2nd(std::mem_fun(&Game::checkCreature), creatureid)));
 		}
@@ -2836,14 +2838,8 @@ void Game::checkCreature(unsigned long creatureid)
 			creature->eventCheck = 0;
 			//creature->eventCheck = addEvent(makeTask(oldThinkTicks, std::bind2nd(std::mem_fun(&Game::checkCreature), creatureid)));
 
-		Player* player = dynamic_cast<Player*>(creature);
-		if(player){
+		if(Player* player = creature->getPlayer()){
 			Tile* tile = player->getTile();
-			if(tile == NULL){
-				std::cout << "CheckPlayer NULL tile: " << player->getName() << std::endl;
-				return;
-			}
-				
 			if(!tile->isPz()){
 				if(player->food > 1000){
 					player->gainManaTick();
@@ -2905,6 +2901,7 @@ void Game::checkCreature(unsigned long creatureid)
 				creature->hasteTicks -= thinkTicks;
 			}
 		}
+
 		flushSendBuffers();
 	}
 }
