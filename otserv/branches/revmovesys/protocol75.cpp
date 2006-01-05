@@ -1233,8 +1233,9 @@ void Protocol75::sendCreatureTurn(const Creature* creature, unsigned char stackP
 		msg.AddPosition(creature->getPosition());
 		msg.AddByte(stackPos); 
 		
-		msg.AddByte(0x63);
-		msg.AddByte(0x00);
+		//msg.AddByte(0x63);
+		//msg.AddByte(0x00);
+		msg.AddU16(0x63);
 		msg.AddU32(creature->getID());
 		msg.AddByte(creature->getDirection());
 		WriteBuffer(msg);
@@ -1687,23 +1688,22 @@ void Protocol75::AddDistanceShoot(NetworkMessage &msg,const Position &from, cons
 
 void Protocol75::AddCreature(NetworkMessage &msg,const Creature *creature, bool known, unsigned int remove)
 {
-	if (known)
-	{
-		msg.AddByte(0x62);
-		msg.AddByte(0x00);
+	if(known){
+		//msg.AddByte(0x62);
+		//msg.AddByte(0x00);
+		msg.AddU16(0x62);
 		msg.AddU32(creature->getID());
 	}
-	else
-	{
-		msg.AddByte(0x61);
-		msg.AddByte(0x00);
-		//AddU32(0);
-		msg.AddU32(remove);
+	else{
+		//msg.AddByte(0x61);
+		//msg.AddByte(0x00);
+		msg.AddU16(0x61);
+		msg.AddU32(remove); //AddU32(0);
 		msg.AddU32(creature->getID());
 		msg.AddString(creature->getName());
 	}
 	
-	msg.AddByte(creature->health*100/creature->healthmax);
+	msg.AddByte(creature->health * 100 / std::max(1, creature->healthmax));
 	msg.AddByte((unsigned char)creature->getDirection());
 	
 	msg.AddByte(creature->looktype);

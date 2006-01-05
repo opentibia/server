@@ -2715,7 +2715,7 @@ bool Game::playerChangeOutfit(Player* player)
 
 bool Game::playerSaySpell(Player* player, const std::string& text)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::creatureSaySpell()");
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerSaySpell()");
 	if(player->isRemoved())
 		return false;
 
@@ -2847,101 +2847,106 @@ void Game::checkCreature(unsigned long creatureid)
 		int thinkTicks = 0;
 		int oldThinkTicks = creature->onThink(thinkTicks);
 
-		Conditions& conditions = creature->getConditions();
-		for(Conditions::iterator condIt = conditions.begin(); condIt != conditions.end(); ++condIt) {
-			if(condIt->first == ATTACK_FIRE || condIt->first == ATTACK_ENERGY || condIt->first == ATTACK_POISON) {
-				ConditionVec &condVec = condIt->second;
+		if(!creature->isRemoved()){
 
-				if(condVec.empty())
-					continue;
+			Conditions& conditions = creature->getConditions();
+			for(Conditions::iterator condIt = conditions.begin(); condIt != conditions.end(); ++condIt) {
+				if(creature->isRemoved())
+					break;
 
-				CreatureCondition& condition = condVec[0];
+				if(condIt->first == ATTACK_FIRE || condIt->first == ATTACK_ENERGY || condIt->first == ATTACK_POISON) {
+					ConditionVec &condVec = condIt->second;
 
-				if(condition.onTick(oldThinkTicks)){
-					const MagicEffectTargetCreatureCondition* magicTargetCondition = condition.getCondition();
-					Creature* c = getCreatureByID(magicTargetCondition->getOwnerID());
-					creatureMakeMagic(c, creature->getPosition(), magicTargetCondition);
+					if(condVec.empty())
+						continue;
 
-					if(condition.getCount() <= 0){
-						condVec.erase(condVec.begin());
+					CreatureCondition& condition = condVec[0];
+
+					if(condition.onTick(oldThinkTicks)){
+						const MagicEffectTargetCreatureCondition* magicTargetCondition = condition.getCondition();
+						Creature* c = getCreatureByID(magicTargetCondition->getOwnerID());
+						creatureMakeMagic(c, creature->getPosition(), magicTargetCondition);
+
+						if(condition.getCount() <= 0){
+							condVec.erase(condVec.begin());
+						}
 					}
 				}
 			}
-		}
 
-		//creature could have been removed due to death...
-		if(creature->isRemoved())
-			return;
+			if(!creature->isRemoved()){
+				if(thinkTicks > 0) {
+					creature->eventCheck = addEvent(makeTask(thinkTicks, std::bind2nd(std::mem_fun(&Game::checkCreature), creatureid)));
+				}
+				else
+					creature->eventCheck = 0;
+					//creature->eventCheck = addEvent(makeTask(oldThinkTicks, std::bind2nd(std::mem_fun(&Game::checkCreature), creatureid)));
 
-		if(thinkTicks > 0) {
-			creature->eventCheck = addEvent(makeTask(thinkTicks, std::bind2nd(std::mem_fun(&Game::checkCreature), creatureid)));
-		}
-		else
-			creature->eventCheck = 0;
-			//creature->eventCheck = addEvent(makeTask(oldThinkTicks, std::bind2nd(std::mem_fun(&Game::checkCreature), creatureid)));
-
-		if(Player* player = creature->getPlayer()){
-			Tile* tile = player->getTile();
-			if(!tile->isPz()){
-				if(player->food > 1000){
-					player->gainManaTick();
-					player->food -= thinkTicks;
-					if(player->healthmax - player->health > 0){
-						if(player->gainHealthTick()){
-							SpectatorVec list;
-							SpectatorVec::iterator it;
-							getSpectators(Range(creature->getPosition()), list);
-							for(it = list.begin(); it != list.end(); ++it) {
-								Player* p = dynamic_cast<Player*>(*it);
-								if(p)
-									p->sendCreatureHealth(player);
+				if(Player* player = creature->getPlayer()){
+					Tile* tile = player->getTile();
+					if(!tile->isPz()){
+						if(player->food > 1000){
+							player->gainManaTick();
+							player->food -= thinkTicks;
+							if(player->healthmax - player->health > 0){
+								if(player->gainHealthTick()){
+									SpectatorVec list;
+									SpectatorVec::iterator it;
+									getSpectators(Range(creature->getPosition()), list);
+									for(it = list.begin(); it != list.end(); ++it) {
+										Player* p = dynamic_cast<Player*>(*it);
+										if(p)
+											p->sendCreatureHealth(player);
+									}
+								}
 							}
-						}
+						}				
 					}
-				}				
+
+					//send stats only if have changed
+					if(player->NeedUpdateStats()){
+						player->sendStats();
+					}
+					
+					player->sendPing();
+
+					if(player->inFightTicks >= 1000) {
+						player->inFightTicks -= thinkTicks;
+						
+						if(player->inFightTicks < 1000)
+							player->pzLocked = false;
+							player->sendIcons(); 
+					}
+					
+					if(player->exhaustedTicks >= 1000){
+						player->exhaustedTicks -= thinkTicks;
+
+						if(player->exhaustedTicks < 0)
+							player->exhaustedTicks = 0;
+					}
+					
+					if(player->manaShieldTicks >=1000){
+						player->manaShieldTicks -= thinkTicks;
+						
+						if(player->manaShieldTicks  < 1000)
+							player->sendIcons();
+					}
+					
+					if(player->hasteTicks >=1000){
+						player->hasteTicks -= thinkTicks;
+					}	
+				}
+				else{
+					if(creature->manaShieldTicks >=1000){
+						creature->manaShieldTicks -= thinkTicks;
+					}
+						
+					if(creature->hasteTicks >=1000){
+						creature->hasteTicks -= thinkTicks;
+					}
+				}
 			}
 
-			//send stats only if have changed
-			if(player->NeedUpdateStats()){
-				player->sendStats();
-			}
-			
-			player->sendPing();
-
-			if(player->inFightTicks >= 1000) {
-				player->inFightTicks -= thinkTicks;
-				
-				if(player->inFightTicks < 1000)
-					player->pzLocked = false;
-					player->sendIcons(); 
-			}
-			
-			if(player->exhaustedTicks >= 1000){
-				player->exhaustedTicks -= thinkTicks;
-
-				if(player->exhaustedTicks < 0)
-					player->exhaustedTicks = 0;
-			}
-			
-			if(player->manaShieldTicks >=1000){
-				player->manaShieldTicks -= thinkTicks;
-				
-				if(player->manaShieldTicks  < 1000)
-					player->sendIcons();
-			}
-			
-			if(player->hasteTicks >=1000){
-				player->hasteTicks -= thinkTicks;
-			}	
-		}
-		else{
-			if(creature->manaShieldTicks >=1000){
-				creature->manaShieldTicks -= thinkTicks;
-			}
-				
-			if(creature->hasteTicks >=1000){
-				creature->hasteTicks -= thinkTicks;
-			}
 		}
 
 		flushSendBuffers();
