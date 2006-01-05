@@ -60,6 +60,7 @@ access(0)
 	
 	health     = 1000;//150;
 	healthmax  = 1000;//150;
+	level = 0;
 	mana = 0;
 	manamax = 0;
 	lastmove = 0;
@@ -87,6 +88,12 @@ Creature::~Creature()
 		(*cit)->setMaster(NULL);
 		(*cit)->releaseThing2();
 	}
+
+	if(attackedCreature){
+		attackedCreature->releaseThing2();
+		attackedCreature = NULL;
+	}
+
 	//std::cout << "Creature destructor " << this->getID() << std::endl;
 	summons.clear();
 }
@@ -109,10 +116,19 @@ void Creature::setAttackedCreature(const Creature* creature)
 	}
 	
 	if(creature){
-		attackedCreature = const_cast<Creature*>(creature);
+		if(attackedCreature != creature){
+			if(attackedCreature)
+				attackedCreature->releaseThing2();
+
+			attackedCreature = const_cast<Creature*>(creature);
+			attackedCreature->useThing2();
+		}
 	}
 	else{
-		attackedCreature = NULL;
+		if(attackedCreature){
+			attackedCreature->releaseThing2();
+			attackedCreature = NULL;
+		}
 	}
 }
 

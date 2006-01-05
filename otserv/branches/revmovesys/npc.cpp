@@ -288,8 +288,8 @@ int Npc::onThink(int& newThinkTicks)
 
 void Npc::doSay(std::string msg)
 {
-	if(!game->creatureSaySpell(this, msg))
-		this->game->creatureSay(this, SPEAK_SAY, msg);
+	if(!game->internalCreatureSaySpell(this, msg))
+		this->game->internalCreatureSay(this, SPEAK_SAY, msg);
 }
 
 void Npc::doMove(int direction)

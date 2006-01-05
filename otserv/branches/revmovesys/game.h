@@ -245,7 +245,7 @@ public:
 		* \param creature Creature pointer
 		* \param dir Direction to turn to
 		*/
-	void creatureTurn(Creature* creature, Direction dir);
+	bool internalCreatureTurn(Creature* creature, Direction dir);
 
 	/**
 	  * Creature wants to say something.
@@ -254,17 +254,17 @@ public:
 	  * \todo document types
 	  * \param text The text to say
 	  */
-	void creatureSay(Creature*creature, SpeakClasses type, const std::string& text);
+	bool internalCreatureSay(Creature* creature, SpeakClasses type, const std::string& text);
 
-	void creatureMonsterYell(Monster* monster, const std::string& text);
-	void creatureChangeOutfit(Creature *creature);
+	bool internalCreatureChangeOutfit(Creature* creature);
+
+	bool internalMonsterYell(Monster* monster, const std::string& text);
 	
 	//battle system
-	bool creatureSaySpell(Creature *creature, const std::string &text);
+	bool internalCreatureSaySpell(Creature *creature, const std::string &text);
 	bool creatureMakeMagic(Creature *creature, const Position& centerpos, const MagicEffectClass* me);
 	bool creatureThrowRune(Creature *creature, const Position& centerpos, const MagicEffectClass& me);
-	bool creatureCastSpell(Creature *creature, const Position& centerpos, const MagicEffectClass& me);
-	bool playerSetAttackedCreature(Player* player, unsigned long creatureid);
+	//bool creatureCastSpell(Creature *creature, const Position& centerpos, const MagicEffectClass& me);
 	//battle system
 
 	//Implementation of player invoked events
@@ -273,7 +273,7 @@ public:
 	bool playerSpeakTo(Player* player, SpeakClasses type, const std::string& receiver, const std::string& text);
 	bool playerBroadcastMessage(Player* player, const std::string& text);
 	bool playerTalkToChannel(Player* player, SpeakClasses type, const std::string& text, unsigned short channelId);
-	void playerAutoWalk(Player* player, std::list<Direction>& path);
+	bool playerAutoWalk(Player* player, std::list<Direction>& path);
 
 	bool playerUseItemEx(Player* player, const Position& fromPos, uint8_t fromStackPos, uint16_t fromItemId,
 		const Position& toPos, uint8_t toStackPos, uint16_t toItemId);
@@ -287,8 +287,13 @@ public:
 	bool playerAcceptTrade(Player* player);
 	bool playerLookInTrade(Player* player, bool lookAtCounterOffer, int index);
 	bool playerCloseTrade(Player* player);
+	bool playerSetAttackedCreature(Player* player, unsigned long creatureid);
 	bool playerLookAt(Player* player, const Position& pos, uint16_t itemId, uint8_t stackpos);
 	bool playerRequestAddVip(Player* player, const std::string& vip_name);
+	bool playerTurn(Player* player, Direction dir);
+	bool playerSay(Player* player, SpeakClasses type, const std::string& text);
+	bool playerChangeOutfit(Player* player);
+	bool playerSaySpell(Player *player, const std::string& text);
 
 	void flushSendBuffers();
 	void addPlayerBuffer(Player* p);

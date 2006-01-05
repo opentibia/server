@@ -1111,7 +1111,7 @@ int ActionScript::luaActionDoPlayerSay(lua_State *L)
 	Player* player = action->GetPlayerByUID(cid);
 	if(player){
 		//Player *player = dynamic_cast<Player*>(tmp->thing);
-		action->game->creatureSay(player,(SpeakClasses)type,std::string(text));
+		action->game->internalCreatureSay(player,(SpeakClasses)type,std::string(text));
 	}
 	else{
 		lua_pushnumber(L, -1);

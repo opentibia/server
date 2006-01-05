@@ -738,22 +738,22 @@ void Protocol75::parseMoveNorthWest(NetworkMessage& msg)
 
 void Protocol75::parseTurnNorth(NetworkMessage& msg)
 {
-	game->creatureTurn(player, NORTH);
+	game->playerTurn(player, NORTH);
 }
 
 void Protocol75::parseTurnEast(NetworkMessage& msg)
 {
-	game->creatureTurn(player, EAST);
+	game->playerTurn(player, EAST);
 }
 
 void Protocol75::parseTurnSouth(NetworkMessage& msg)
 {
-	game->creatureTurn(player, SOUTH);
+	game->playerTurn(player, SOUTH);
 }
 
 void Protocol75::parseTurnWest(NetworkMessage& msg)
 {
-	game->creatureTurn(player, WEST);
+	game->playerTurn(player, WEST);
 }
 
 void Protocol75::parseRequestOutfit(NetworkMessage& msg)
@@ -793,14 +793,14 @@ void Protocol75::parseSetOutfit(NetworkMessage& msg)
 	if ( (player->getSex() == PLAYERSEX_FEMALE && temp >= PLAYER_FEMALE_1 && temp <= PLAYER_FEMALE_7) ||
 		(player->getSex() == PLAYERSEX_MALE && temp >= PLAYER_MALE_1 && temp <= PLAYER_MALE_7))
 	{
-		player->looktype= temp;
+		player->looktype = temp;
 		player->lookmaster = player->looktype;
-		player->lookhead=msg.GetByte();
-		player->lookbody=msg.GetByte();
-		player->looklegs=msg.GetByte();
-		player->lookfeet=msg.GetByte();
+		player->lookhead = msg.GetByte();
+		player->lookbody = msg.GetByte();
+		player->looklegs = msg.GetByte();
+		player->lookfeet = msg.GetByte();
 		
-		game->creatureChangeOutfit(player);
+		game->playerChangeOutfit(player);
 	}
 }
 
@@ -937,13 +937,13 @@ void Protocol75::parseSay(NetworkMessage& msg)
 		channelId = msg.GetU16();
 	std::string text = msg.GetString();
 	
-	if(game->creatureSaySpell(player, text))
+	if(game->playerSaySpell(player, text))
 		type = SPEAK_SAY;
 	
 	switch (type)
 	{
 	case SPEAK_SAY:
-		game->creatureSay(player, type, text);
+		game->playerSay(player, type, text);
 		break;
 	case SPEAK_WHISPER:
 		game->playerWhisper(player, text);

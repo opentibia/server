@@ -525,6 +525,7 @@ int SpellScript::luaActionDoTargetGroundSpell(lua_State *L)
 int SpellScript::luaActionDoAreaSpell(lua_State *L)
 {
 	MagicEffectAreaClass magicArea;
+
 	internalGetMagicEffect(L, magicArea);
 
 	internalGetArea(L, magicArea);
@@ -559,9 +560,10 @@ int SpellScript::luaActionDoAreaSpell(lua_State *L)
     RuneSpell* runeSpell = dynamic_cast<RuneSpell*>(spell);
     bool isSuccess;
     if(runeSpell)
-    isSuccess = spell->game->creatureThrowRune(creature, centerpos, magicArea);
+			isSuccess = spell->game->creatureThrowRune(creature, centerpos, magicArea);
     else
-	isSuccess = spell->game->creatureCastSpell(creature, centerpos, magicArea);
+			isSuccess = spell->game->creatureMakeMagic(creature, centerpos, &magicArea);
+
 	lua_pushboolean(L, isSuccess);
 	return 1;
 }
@@ -614,9 +616,9 @@ int SpellScript::luaActionDoAreaExSpell(lua_State *L)
     RuneSpell* runeSpell = dynamic_cast<RuneSpell*>(spell);
     bool isSuccess;
     if(runeSpell)
-    isSuccess = spell->game->creatureThrowRune(creature, centerpos, magicAreaEx);
+			isSuccess = spell->game->creatureThrowRune(creature, centerpos, magicAreaEx);
     else
-	isSuccess = spell->game->creatureCastSpell(creature, centerpos, magicAreaEx);
+			isSuccess = spell->game->creatureMakeMagic(creature, centerpos, &magicAreaEx);
 	
 	lua_pushboolean(L, isSuccess);
 	return 1;
@@ -680,7 +682,7 @@ int SpellScript::luaActionChangeOutfit(lua_State *L)
 	lua_pop(L,1);
 	
 	creature->looktype = looktype;
-	spell->game->creatureChangeOutfit(creature);
+	spell->game->internalCreatureChangeOutfit(creature);
 	
   spell->game->changeOutfitAfter(creature->getID(), creature->lookmaster, time);
 	return 0;

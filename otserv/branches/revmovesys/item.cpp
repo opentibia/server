@@ -450,11 +450,9 @@ double Item::getWeight() const {
 std::string Item::getDescription(int32_t lookDistance) const
 {
 	std::stringstream s;
-	std::string str;
-	const Container* container;
 	const ItemType& it = items[id];
 
-	if(specialDescription){
+	/*if(specialDescription){
 		s << (*specialDescription) << ".";
 
 		if(lookDistance <= 1) {
@@ -462,15 +460,16 @@ std::string Item::getDescription(int32_t lookDistance) const
 				s << std::endl << "It weighs " << std::fixed << std::setprecision(1) << it.weight << " oz.";
 		}
 	}
-	else if (it.name.length()) {
-		if(isStackable() && count > 1) {
+	else*/
+	if (it.name.length()) {
+		if(isStackable() && count > 1){
 			s << (int)count << " " << it.name << "s.";
 
 			if(lookDistance <= 1) {
 				s << std::endl << "They weight " << std::fixed << std::setprecision(1) << ((double) count * it.weight) << " oz.";
 			}
 		}		
-		else {
+		else{
 			if(items[id].runeMagLevel != -1)
 			{
 				s << "a spell rune for level " << it.runeMagLevel << "." << std::endl;
@@ -486,8 +485,7 @@ std::string Item::getDescription(int32_t lookDistance) const
 			{
 				s << "a " << it.name << " (Atk:" << (int)getAttack() << " Def:" << (int)getDefense() << ")";
 			}
-			else if(getArmor())
-			{
+			else if(getArmor()){
 				s << "a " << it.name << " (Arm:"<< (int)getArmor() << ")";
 			}
 			else if(isFluidContainer()){
@@ -511,34 +509,34 @@ std::string Item::getDescription(int32_t lookDistance) const
 			else if(it.isKey()){
 				s << "a " << it.name << " (Key:" << actionId << ")";
 			}
-			else if(it.isGroundTile()) //groundtile
-			{
+			else if(it.isGroundTile()){
 				s << it.name;
 			}
-			else if(it.isContainer() && (container = dynamic_cast<const Container*>(this))) {
-				s << "a " << it.name << " (Vol:" << container->capacity() << ")";
+			else if(it.isContainer()){
+				s << "a " << it.name << " (Vol:" << getContainer()->capacity() << ")";
 			}
-			else {
+			else{
 				s << "a " << it.name;
 			}
+
 			s << ".";
-			if(lookDistance <= 1) {
+			if(lookDistance <= 1){
 				double weight = getWeight();
 				if(weight > 0)
 					s << std::endl << "It weighs " << std::fixed << std::setprecision(1) << weight << " oz.";
 				
-				if(items[id].description.length())
-				{
-					s << std::endl << items[id].description;
+				if(specialDescription)
+					s << std::endl << specialDescription->c_str();
+				else if(it.description.length()){
+					s << std::endl << it.description;
 				}
 			}
 		}
 	}
 	else
-		s<<"an item of type " << id <<".";
+		s << "an item of type " << id <<".";
 	
-	str = s.str();
-	return str;
+	return s.str();
 }
 
 std::string Item::getName() const

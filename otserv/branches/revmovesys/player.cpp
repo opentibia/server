@@ -140,7 +140,6 @@ Creature()
  	healthTick = 0;
 } 
 
-
 Player::~Player()
 {
 	for(int i = 0; i < 11; i++){
@@ -1214,7 +1213,7 @@ void Player::sendToChannel(Creature *creature, SpeakClasses type,
 
 void Player::sendCancelAttacking()
 {
-  attackedCreature = NULL;
+  //attackedCreature = NULL;
   client->sendCancelAttacking();
 }
 
@@ -1366,9 +1365,13 @@ void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bo
 	client->sendRemoveCreature(creature, creature->getPosition(), stackpos, isLogout);
 
 	if(attackedCreature == creature){
+		//attackedCreature->releaseThing2();
+		//attackedCreature = NULL;
+
+		setAttackedCreature(NULL);
+
 		sendTextMessage(MSG_SMALLINFO, "Target lost.");
 		sendCancelAttacking();
-		attackedCreature = NULL;
 	}
 
 	if(creature == this){
@@ -1400,9 +1403,13 @@ void Player::onCreatureMove(const Creature* creature, const Position& oldPos, ui
 	if((creature == this && attackedCreature) || attackedCreature == creature){
 		if((std::abs(getPosition().x - attackedCreature->getPosition().x) > 7) ||
 		(std::abs(getPosition().y - attackedCreature->getPosition().y) > 5) || (getPosition().z != attackedCreature->getPosition().z)){
+			setAttackedCreature(NULL);
+
+			//attackedCreature->releaseThing2();
+			//attackedCreature = NULL;
+
 			sendTextMessage(MSG_SMALLINFO, "Target lost.");
 			sendCancelAttacking();
-			attackedCreature = NULL;
 		} 
 	}
 

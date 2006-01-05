@@ -56,8 +56,8 @@ Creature()
 	updateMovePos = false;
 	this->game = game;
 	this->speed = 220;
-	this->level = 8;
-	this->maglevel = 0;
+	this->level = mType->level;
+	this->maglevel = mType->maglevel;
 	curPhysicalAttack = NULL;
 	hasLostMaster = false;
 	isYielding = true;
@@ -213,11 +213,14 @@ Creature* Monster::findTarget(long range, bool &canReach, const Creature *ignore
 
 int Monster::onThink(int& newThinkTicks)
 {
+	if(attackedCreature && attackedCreature->isRemoved())
+		setAttackedCreature(NULL);
+
 	bool yelled = false;
 	for(YellingSentences::iterator ysIt = mType->yellingSentences.begin(); ysIt != mType->yellingSentences.end(); ++ysIt) {
 		if(ysIt->second.onTick(oldThinkTicks) && !yelled) {
 			yelled = true;
-			game->creatureMonsterYell(this, ysIt->first);
+			game->internalMonsterYell(this, ysIt->first);
 		}
 	}
 
@@ -392,7 +395,7 @@ void Monster::updateLookDirection()
 			newdir = WEST;
 
 		if(newdir != this->getDirection()) {
-			game->creatureTurn(this, newdir);
+			game->internalCreatureTurn(this, newdir);
 		}
 	}
 }
@@ -1019,7 +1022,10 @@ void Monster::stopThink()
 	}
 
 	setUpdateMovePos();
-	attackedCreature = NULL;
+	if(attackedCreature){
+		attackedCreature->releaseThing2();
+		attackedCreature = NULL;
+	}
 
 	targetPos.x = 0;
 	targetPos.y = 0;
@@ -1130,26 +1136,31 @@ bool Monster::doAttacks(Creature* attackedCreature, monstermode_t mode /*= MODE_
 		if(timeprobsystem.onTick(500) || (random_range(1, 100) <= modeProb)) {
 			if(!hasmelee || (hasmelee && paIt->first->fighttype == FIGHT_MELEE)) {
 				curPhysicalAttack = paIt->first;
-				game->creatureMakeDamage(this, attackedCreature, getFightType());
+				if(attackedCreature && !attackedCreature->isRemoved()){
+					game->creatureMakeDamage(this, attackedCreature, getFightType());
+				}
 			}
 		}
 	}
 
 	if(exhaustedTicks <= 0) {
+
 		for(RuneAttackSpells::iterator raIt = mType->runeSpells.begin(); raIt != mType->runeSpells.end(); ++raIt) {
 			for(TimeProbabilityClassVec::iterator asIt = raIt->second.begin(); asIt != raIt->second.end(); ++asIt) {
 				TimeProbabilityClass& timeprobsystem = *asIt;
 				if(timeprobsystem.onTick(500) || (random_range(1, 100) <= modeProb)) {
 
-					std::map<unsigned short, Spell*>::iterator rit = spells.getAllRuneSpells()->find(raIt->first);
-					if(rit != spells.getAllRuneSpells()->end()) {
-						bool success = rit->second->getSpellScript()->castSpell(this, attackedCreature->getPosition(), "");
+					if(attackedCreature && !attackedCreature->isRemoved()){
+						std::map<unsigned short, Spell*>::iterator rit = spells.getAllRuneSpells()->find(raIt->first);
+						if(rit != spells.getAllRuneSpells()->end()) {
+							bool success = rit->second->getSpellScript()->castSpell(this, attackedCreature->getPosition(), "");
 
-						if(success) {
-							ret = true;
-							exhaustedTicks = timeprobsystem.getExhaustion();
-							if(exhaustedTicks > 0) {
-								return true;
+							if(success){
+								ret = true;
+								exhaustedTicks = timeprobsystem.getExhaustion();
+								if(exhaustedTicks > 0) {
+									return true;
+								}
 							}
 						}
 					}
@@ -1162,15 +1173,17 @@ bool Monster::doAttacks(Creature* attackedCreature, monstermode_t mode /*= MODE_
 				TimeProbabilityClass& timeprobsystem = *asIt;
 				if(timeprobsystem.onTick(500) || (random_range(1, 100) <= modeProb)) {
 
-					std::map<std::string, Spell*>::iterator rit = spells.getAllSpells()->find(iaIt->first);
-					if(rit != spells.getAllSpells()->end()) {
-						bool success = rit->second->getSpellScript()->castSpell(this, getPosition(), "");
+					if(attackedCreature && !attackedCreature->isRemoved()){
+						std::map<std::string, Spell*>::iterator rit = spells.getAllSpells()->find(iaIt->first);
+						if(rit != spells.getAllSpells()->end()) {
+							bool success = rit->second->getSpellScript()->castSpell(this, getPosition(), "");
 
-						if(success) {
-							ret = true;
-							exhaustedTicks = timeprobsystem.getExhaustion();
-							if(exhaustedTicks > 0) {
-								return true;
+							if(success) {
+								ret = true;
+								exhaustedTicks = timeprobsystem.getExhaustion();
+								if(exhaustedTicks > 0) {
+									return true;
+								}
 							}
 						}
 					}
@@ -1184,7 +1197,9 @@ bool Monster::doAttacks(Creature* attackedCreature, monstermode_t mode /*= MODE_
 
 void Monster::onAttack()
 {
-	if(attackedCreature && !(isSummon() && hasLostMaster)) {
+	if(attackedCreature && attackedCreature->isRemoved())
+		setAttackedCreature(NULL);
+	else if(attackedCreature && !(isSummon() && hasLostMaster)) {
 		isYielding = false;
 		//this->eventCheckAttacking = game->addEvent(makeTask(500, std::bind2nd(std::mem_fun(&Game::checkCreatureAttacking), getID())));
 
