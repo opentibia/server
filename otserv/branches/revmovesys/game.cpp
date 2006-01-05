@@ -2642,6 +2642,7 @@ bool Game::playerSetAttackedCreature(Player* player, unsigned long creatureid)
 		return false;
 
 	if(player->attackedCreature && creatureid == 0){
+		player->setAttackedCreature(NULL);
 		player->sendCancelAttacking();
 	}
 

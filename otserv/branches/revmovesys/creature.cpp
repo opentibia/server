@@ -108,6 +108,14 @@ void Creature::drainMana(int damage)
 	mana -= min(mana, damage);
 }
 
+Creature* Creature::getAttackedCreature()
+{
+	if(attackedCreature && !attackedCreature->isRemoved())
+		return attackedCreature;
+	else
+		return NULL;
+}
+
 void Creature::setAttackedCreature(const Creature* creature)
 {
 	std::list<Creature*>::iterator cit;

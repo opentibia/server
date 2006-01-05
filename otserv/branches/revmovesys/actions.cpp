@@ -592,11 +592,12 @@ Thing* ActionScript::GetThingByUID(int uid)
 Item* ActionScript::GetItemByUID(int uid)
 {
 	//const KnownThing *tmp = GetThingByUID(uid);
-	Thing *tmp = GetThingByUID(uid);
-	if(tmp){
+	Thing* tmp = GetThingByUID(uid);
+	if(tmp && !tmp->isRemoved()){
 		if(Item *item = tmp->getItem())
 			return item;
 	}
+
 	return NULL;
 }
 
@@ -604,9 +605,9 @@ Item* ActionScript::GetItemByUID(int uid)
 Creature* ActionScript::GetCreatureByUID(int uid)
 {
 	//const KnownThing *tmp = GetThingByUID(uid);
-	Thing *tmp = GetThingByUID(uid);
-	if(tmp){
-		if(Creature *creature = tmp->getCreature()) /*type == thingTypePlayer || tmp->type == thingTypeMonster
+	Thing* tmp = GetThingByUID(uid);
+	if(tmp && !tmp->isRemoved()){
+		if(Creature* creature = tmp->getCreature()) /*type == thingTypePlayer || tmp->type == thingTypeMonster
 			|| tmp->type == thingTypeNpc )*/
 			return creature;
 	}
@@ -616,7 +617,7 @@ Creature* ActionScript::GetCreatureByUID(int uid)
 //const KnownThing* ActionScript::GetPlayerByUID(int uid)
 Player* ActionScript::GetPlayerByUID(int uid)
 {
-	Thing *tmp = GetThingByUID(uid);
+	Thing* tmp = GetThingByUID(uid);
 	if(tmp){
 		if(Creature* creature = tmp->getCreature()){ 
 			if(Player* player = creature->getPlayer()/* == thingTypePlayer*/){
@@ -938,6 +939,21 @@ int ActionScript::luaActionDoRemoveItem(lua_State *L)
 	
 	//const KnownThing* tmp = action->GetItemByUID(itemid);
 	Item* item = action->GetItemByUID(itemid);
+	if(item){
+		action->game->internalRemoveItem(item, n);
+		
+		lua_pushnumber(L, 0);
+		return 1;
+	}
+	else{
+#ifdef __DEBUG__
+		std::cout << "luaDoRemoveItem: item not found" << std::endl;
+#endif
+
+		lua_pushnumber(L, -1);
+		return 1;
+	}
+
 	//Item *tmpitem = NULL;
 	/*PositionEx tmppos;
 	if(item){
@@ -954,11 +970,6 @@ int ActionScript::luaActionDoRemoveItem(lua_State *L)
 		std::cout << "luaDoRemoveItem: item not found" << std::endl;
 		return 1;
 	}*/
-	
-	action->game->internalRemoveItem(item, n);
-	
-	lua_pushnumber(L, 0);
-	return 1;
 }
 
 int ActionScript::luaActionDoPlayerRemoveItem(lua_State *L)
@@ -1086,16 +1097,20 @@ int ActionScript::luaActionDoTransformItem(lua_State *L)
 	
 	//const KnownThing* tmp = action->GetItemByUID(itemid);	
 	Item* item = action->GetItemByUID(itemid);
-	if(!item){
-		lua_pushnumber(L, -1);
-		std::cout << "luaDoTransform: Item not found" << std::endl;
+	if(item){
+		action->game->transformItem(item, toId);
+		
+		lua_pushnumber(L, 0);
 		return 1;
 	}
-	
-	action->game->transformItem(item, toId);
-	
-	lua_pushnumber(L, 0);
-	return 1;
+	else{
+#ifdef __DEBUG__
+		std::cout << "luaDoTransform: Item not found" << std::endl;
+#endif
+
+		lua_pushnumber(L, -1);
+		return 1;
+	}
 }
 
 int ActionScript::luaActionDoPlayerSay(lua_State *L)
@@ -1158,16 +1173,20 @@ int ActionScript::luaActionDoChangeTypeItem(lua_State *L)
 	
 	//const KnownThing* tmp = action->GetItemByUID(itemid);
 	Item* item = action->GetItemByUID(itemid);
-	if(!item){
-		lua_pushnumber(L, -1);
+	if(item){
+		action->game->transformItem(item, item->getID(), subtype);
+		
+		lua_pushnumber(L, 0);
+		return 1;		
+	}
+	else{
+#ifdef __DEBUG__
 		std::cout << "luaDoChangeTypeItem: Item not found" << std::endl;
+#endif
+
+		lua_pushnumber(L, -1);
 		return 1;
 	}
-	
-	action->game->transformItem(item, item->getID(), subtype);
-	
-	lua_pushnumber(L, 0);
-	return 1;		
 }
 
 
@@ -1403,16 +1422,20 @@ int ActionScript::luaActionDoShowTextWindow(lua_State *L)
 	
 	//const KnownThing* tmp = action->GetItemByUID(uid);
 	Item* item = action->GetItemByUID(uid);
-	if(!item){
-		lua_pushnumber(L, -1);
-		std::cout << "luadoShowTextWindow: Item not found" << std::endl;
+	if(item){
+		action->_player->sendTextWindow(item, maxlen, canWrite);
+		
+		lua_pushnumber(L, 0);
 		return 1;
 	}
-	
-	action->_player->sendTextWindow(item, maxlen, canWrite);
-	
-	lua_pushnumber(L, 0);
-	return 1;
+	else{
+#ifdef __DEBUG__
+		std::cout << "luadoShowTextWindow: Item not found" << std::endl;
+#endif
+
+		lua_pushnumber(L, -1);
+		return 1;
+	}
 }
 
 int ActionScript::luaActionGetItemRWInfo(lua_State *L)
@@ -1425,15 +1448,18 @@ int ActionScript::luaActionGetItemRWInfo(lua_State *L)
 	//const KnownThing* tmp = action->GetItemByUID(uid);
 	Item* item = action->GetItemByUID(uid);
 	//Item *tmpitem = NULL;
-	if(!item){
-		lua_pushnumber(L, -1);
-		std::cout << "luagetItemRWInfo: Item not found" << std::endl;
+	if(item){
+		lua_pushnumber(L, (int)(item->getRWInfo()));		
 		return 1;
 	}
-	
-	lua_pushnumber(L, (int)(item->getRWInfo()));
-	
-	return 1;
+	else{
+#ifdef __DEBUG__
+		std::cout << "luagetItemRWInfo: Item not found" << std::endl;
+#endif
+
+		lua_pushnumber(L, -1);
+		return 1;
+	}
 }
 
 int ActionScript::luaActionDoDecayItem(lua_State *L)
@@ -1446,16 +1472,20 @@ int ActionScript::luaActionDoDecayItem(lua_State *L)
 	
 	//const KnownThing* tmp = action->GetItemByUID(uid);
 	Item* item = action->GetItemByUID(uid);
-	if(!item){
-		lua_pushnumber(L, -1);
-		std::cout << "luadoDecayItem: Item not found" << std::endl;
+	if(item){
+		action->game->startDecay(item);
+		
+		lua_pushnumber(L, 0);
 		return 1;
 	}
-	
-	action->game->startDecay(item);
-	
-	lua_pushnumber(L, 0);
-	return 1;
+	else{
+#ifdef __DEBUG__
+		std::cout << "luadoDecayItem: Item not found" << std::endl;
+#endif
+
+		lua_pushnumber(L, -1);
+		return 1;
+	}
 }
 
 int ActionScript::luaActionGetThingfromPos(lua_State *L)
@@ -1610,16 +1640,20 @@ int ActionScript::luaActionDoSetItemActionId(lua_State *L)
 	//const KnownThing* tmp = action->GetItemByUID(itemid);	
 	Item* item = action->GetItemByUID(itemid);	
 	//Item *tmpitem = NULL;
-	if(!item){
-		lua_pushnumber(L, -1);
-		std::cout << "luaDoSetActionId: Item not found" << std::endl;
+	if(item){
+		item->setActionId(actionid);
+		
+		lua_pushnumber(L, 0);
 		return 1;
 	}
-	
-	item->setActionId(actionid);
-	
-	lua_pushnumber(L, 0);
-	return 1;
+	else{
+#ifdef __DEBUG__
+		std::cout << "luaDoSetActionId: Item not found" << std::endl;
+#endif
+
+		lua_pushnumber(L, -1);
+		return 1;
+	}
 }
 
 int ActionScript::luaActionDoSetItemText(lua_State *L)
@@ -1633,16 +1667,20 @@ int ActionScript::luaActionDoSetItemText(lua_State *L)
 	//const KnownThing* tmp = action->GetItemByUID(itemid);
 	//Item *tmpitem = NULL;
 	Item* item = action->GetItemByUID(itemid);
-	if(!item){
-		lua_pushnumber(L, -1);
-		std::cout << "luaDoSetText: Item not found" << std::endl;
+	if(item){
+		item->setText(text);
+		
+		lua_pushnumber(L, 0);
 		return 1;
 	}
-	
-	item->setText(text);
-	
-	lua_pushnumber(L, 0);
-	return 1;
+	else{
+#ifdef __DEBUG__
+		std::cout << "luaDoSetText: Item not found" << std::endl;
+#endif
+
+		lua_pushnumber(L, -1);
+		return 1;
+	}
 }
 
 int ActionScript::luaActionDoSetItemSpecialDescription(lua_State *L)
@@ -1655,16 +1693,20 @@ int ActionScript::luaActionDoSetItemSpecialDescription(lua_State *L)
 	
 	//const KnownThing* tmp = action->GetItemByUID(itemid);
 	Item* item = action->GetItemByUID(itemid);
-	if(!item){
-		lua_pushnumber(L, -1);
-		std::cout << "luaDoSetSpecialDescription: Item not found" << std::endl;
+	if(item){
+		item->setSpecialDescription(desc);
+		
+		lua_pushnumber(L, 0);
 		return 1;
 	}
-	
-	item->setSpecialDescription(desc);
-	
-	lua_pushnumber(L, 0);
-	return 1;
+	else{
+#ifdef __DEBUG__
+		std::cout << "luaDoSetSpecialDescription: Item not found" << std::endl;
+#endif
+
+		lua_pushnumber(L, -1);
+		return 1;
+	}
 }
 
 int ActionScript::luaActionGetTilePzInfo(lua_State *L)

@@ -227,7 +227,7 @@ int Monster::onThink(int& newThinkTicks)
 	long long delay;
 	delay = getSleepTicks();
 	
-	if(state == STATE_TARGETNOTREACHABLE || attackedCreature != NULL) {
+	if(state == STATE_TARGETNOTREACHABLE || getAttackedCreature() != NULL) {
 		if(delay > 0) {
 			newThinkTicks = (int)delay;
 			int ret = oldThinkTicks;
@@ -736,7 +736,7 @@ void Monster::creatureMove(const Creature* creature, const Position& oldPos)
 	}
 	else if(isInRange(creature->getPosition()) && isInRange(oldPos)) {
 		//Creature just moving around in-range
-		if(attackedCreature == creature){
+		if(getAttackedCreature() == creature){
 			if(state == STATE_ATTACKING && !isCreatureReachable(creature)) {
 
 				if(isSummon()){
@@ -789,7 +789,7 @@ void Monster::creatureEnter(const Creature* creature, bool canReach /* = true*/)
 			startThink();
 		}
 		//target enters
-		else if(attackedCreature == creature){
+		else if(getAttackedCreature() == creature){
 			startThink();
 		}
 		else
@@ -814,14 +814,14 @@ void Monster::creatureLeave(const Creature *creature)
 			stopThink();
 		}
 		//target lost
-		else if(attackedCreature == creature) {
+		else if(getAttackedCreature() == creature) {
 			stopThink();
 		}
 		else
 			reThink();
 	}
 	else {
-		if(creature && attackedCreature == creature) {
+		if(creature && getAttackedCreature() == creature) {
 			//try find a new target
 			bool canReach;
 			Creature *target = findTarget(0, canReach, creature);
@@ -851,9 +851,9 @@ void Monster::selectTarget(const Creature* creature, bool canReach /* = true*/)
 
 		updateLookDirection();
 
-		if(attackedCreature) {
-			if(validateDistanceAttack(attackedCreature)){
-				doAttacks(attackedCreature, (getMaster() ? MODE_NORMAL : MODE_AGGRESSIVE));
+		if(getAttackedCreature()) {
+			if(validateDistanceAttack(getAttackedCreature())){
+				doAttacks(getAttackedCreature(), (getMaster() ? MODE_NORMAL : MODE_AGGRESSIVE));
 			}
 		}
 	}
@@ -880,7 +880,7 @@ void Monster::reThink(bool updateOnlyState /* = true*/)
 		}
 
 		if(state == STATE_ATTACKING) {
-			if (!attackedCreature || !isCreatureReachable(attackedCreature)) {
+			if (!getAttackedCreature() || !isCreatureReachable(getAttackedCreature())) {
 				state = STATE_TARGETNOTREACHABLE;
 				route.clear();
 			}
@@ -905,7 +905,7 @@ void Monster::reThink(bool updateOnlyState /* = true*/)
 			if(mType->changeTargetChance > rand()*10000/(RAND_MAX+1)){
 				bool canReach;
 				Creature *newtarget = findTarget(3, canReach);
-				if(newtarget && (canReach || state == STATE_TARGETNOTREACHABLE) && newtarget != attackedCreature){
+				if(newtarget && (canReach || state == STATE_TARGETNOTREACHABLE) && newtarget != getAttackedCreature()){
 					selectTarget(newtarget, canReach);
 				}
 			}
@@ -932,7 +932,7 @@ void Monster::reThink(bool updateOnlyState /* = true*/)
 		}
 
 		if(state == STATE_ATTACKING) {
-			if (!attackedCreature || !isCreatureReachable(attackedCreature)) {
+			if (!getAttackedCreature() || !isCreatureReachable(getAttackedCreature())) {
 				state = STATE_TARGETNOTREACHABLE;
 				route.clear();
 			}
@@ -980,7 +980,7 @@ void Monster::reThink(bool updateOnlyState /* = true*/)
 			bool canReach;
 			Creature* target = findTarget(0, canReach);
 			if(target) {
-				if(canReach || target != attackedCreature) {
+				if(canReach || target != getAttackedCreature()) {
 					selectTarget(target, canReach);
 				}
 			}
@@ -1045,9 +1045,9 @@ void Monster::setMaster(Creature* creature)
 	Creature::setMaster(creature);
 
 	if(creature) {
-		if(creature->attackedCreature) {
-			bool canReach = isCreatureReachable(creature->attackedCreature);
-			selectTarget(creature->attackedCreature, canReach);
+		if(creature->getAttackedCreature()) {
+			bool canReach = isCreatureReachable(creature->getAttackedCreature());
+			selectTarget(creature->getAttackedCreature(), canReach);
 		}
 		else {
 			state = STATE_IDLESUMMON;
@@ -1107,7 +1107,7 @@ void Monster::dropLoot(Container *corpse)
 	mType->createLoot(corpse);
 }
 
-bool Monster::doAttacks(Creature* attackedCreature, monstermode_t mode /*= MODE_NORMAL*/)
+bool Monster::doAttacks(Creature* target, monstermode_t mode /*= MODE_NORMAL*/)
 {
 	if(isYielding)
 		return false;
@@ -1136,8 +1136,8 @@ bool Monster::doAttacks(Creature* attackedCreature, monstermode_t mode /*= MODE_
 		if(timeprobsystem.onTick(500) || (random_range(1, 100) <= modeProb)) {
 			if(!hasmelee || (hasmelee && paIt->first->fighttype == FIGHT_MELEE)) {
 				curPhysicalAttack = paIt->first;
-				if(attackedCreature && !attackedCreature->isRemoved()){
-					game->creatureMakeDamage(this, attackedCreature, getFightType());
+				if(target && !target->isRemoved()){
+					game->creatureMakeDamage(this, target, getFightType());
 				}
 			}
 		}
@@ -1150,10 +1150,10 @@ bool Monster::doAttacks(Creature* attackedCreature, monstermode_t mode /*= MODE_
 				TimeProbabilityClass& timeprobsystem = *asIt;
 				if(timeprobsystem.onTick(500) || (random_range(1, 100) <= modeProb)) {
 
-					if(attackedCreature && !attackedCreature->isRemoved()){
+					if(target && !target->isRemoved()){
 						std::map<unsigned short, Spell*>::iterator rit = spells.getAllRuneSpells()->find(raIt->first);
 						if(rit != spells.getAllRuneSpells()->end()) {
-							bool success = rit->second->getSpellScript()->castSpell(this, attackedCreature->getPosition(), "");
+							bool success = rit->second->getSpellScript()->castSpell(this, target->getPosition(), "");
 
 							if(success){
 								ret = true;
@@ -1173,7 +1173,7 @@ bool Monster::doAttacks(Creature* attackedCreature, monstermode_t mode /*= MODE_
 				TimeProbabilityClass& timeprobsystem = *asIt;
 				if(timeprobsystem.onTick(500) || (random_range(1, 100) <= modeProb)) {
 
-					if(attackedCreature && !attackedCreature->isRemoved()){
+					if(target && !target->isRemoved()){
 						std::map<std::string, Spell*>::iterator rit = spells.getAllSpells()->find(iaIt->first);
 						if(rit != spells.getAllSpells()->end()) {
 							bool success = rit->second->getSpellScript()->castSpell(this, getPosition(), "");
@@ -1199,7 +1199,7 @@ void Monster::onAttack()
 {
 	if(attackedCreature && attackedCreature->isRemoved())
 		setAttackedCreature(NULL);
-	else if(attackedCreature && !(isSummon() && hasLostMaster)) {
+	else if(getAttackedCreature() && !(isSummon() && hasLostMaster)) {
 		isYielding = false;
 		//this->eventCheckAttacking = game->addEvent(makeTask(500, std::bind2nd(std::mem_fun(&Game::checkCreatureAttacking), getID())));
 
@@ -1208,9 +1208,9 @@ void Monster::onAttack()
 		if(exhaustedTicks < 0)
 			exhaustedTicks = 0;
 
-		if(attackedCreature && attackedCreature->isAttackable()) {
-			if(validateDistanceAttack(attackedCreature)){
-				doAttacks(attackedCreature);
+		if(getAttackedCreature() && getAttackedCreature()->isAttackable()) {
+			if(validateDistanceAttack(getAttackedCreature())){
+				doAttacks(getAttackedCreature());
 			}
 		}
 		else

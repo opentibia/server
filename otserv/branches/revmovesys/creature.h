@@ -155,6 +155,7 @@ public:
 	virtual void die(){};
 
 	virtual std::string getDescription(int32_t lookDistance) const;
+	Creature* getAttackedCreature();
 	virtual void setAttackedCreature(const Creature* creature);
 	
 	virtual void setMaster(Creature* creature);
