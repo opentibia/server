@@ -248,11 +248,14 @@ EXCEPTION_DISPOSITION
 	
 	stackstart = esp;
 	next_ret = (unsigned long*)(ContextRecord->Ebp);
-	while(esp<stacklimit){
+	unsigned long frame_param_counter;
+	frame_param_counter = 0;
+	while(esp < stacklimit){
 		stack_val = *esp;
 		if(foundRetAddress)
 			nparameters++;
-		if(esp - stackstart < 20 || nparameters < 10 || std::abs(esp - next_ret) < 10){
+		
+		if(esp - stackstart < 20 || nparameters < 10 || std::abs(esp - next_ret) < 10 || frame_param_counter < 8){
 			*outdriver  << (unsigned long)esp << " | ";
 			printPointer(outdriver,stack_val);
 			if(esp == next_ret){
@@ -261,9 +264,11 @@ EXCEPTION_DISPOSITION
 			else if(esp - next_ret == 1){
 				*outdriver << " <-- ret" ;
 			}
-			else if(esp - next_ret == 9){
-				next_ret = (unsigned long*)*(esp - 9);
+			else if(esp - next_ret == 2){
+				next_ret = (unsigned long*)*(esp - 2);
+				frame_param_counter = 0;
 			}
+			frame_param_counter++;
 			*outdriver<< std::endl;
 		}
 		if(stack_val >= min_off && stack_val <= max_off){
