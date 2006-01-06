@@ -923,7 +923,7 @@ void Game::moveCreature(Player* player, Cylinder* fromCylinder, Cylinder* toCyli
 				(std::abs(moveCreature->getPosition().z - toPos.z) * 4 > moveCreature->getThrowRange()) ) {
 			ret = RET_DESTINATIONOUTOFREACH;
 		}
-		else if(player != moveCreature && player->access < moveCreature->access){
+		else if(player != moveCreature && (player->access == 0 || player->access < moveCreature->access)){
 			if(toCylinder->getTile()->hasProperty(BLOCKPATHFIND))
 				ret = RET_NOTENOUGHROOM;
 			if(fromCylinder->getTile()->hasProperty(PROTECTIONZONE) &&
@@ -1003,7 +1003,7 @@ ReturnValue Game::moveCreature(Creature* creature, Direction direction)
 	}
 
 	if(ret != RET_NOERROR){
-		if(Player* player = dynamic_cast<Player*>(creature)){
+		if(Player* player = creature->getPlayer()){
 			playerSendErrorMessage(player, ret);
 			player->sendCancelWalk();
 		}
