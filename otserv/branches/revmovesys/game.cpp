@@ -1657,7 +1657,7 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 	SpectatorVec::iterator it;
 
 	for(it = spectatorlist.begin(); it != spectatorlist.end(); ++it) {
-		Player* spectator = dynamic_cast<Player*>(*it);
+		Player* spectator = (*it)->getPlayer();
 		
 		if(!spectator)
 			continue;

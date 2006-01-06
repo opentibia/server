@@ -476,7 +476,7 @@ long MagicEffectItem::getDecayTime()
 		return dm->second.first;
 	}
 	
-	return 0;
+	return Item::getDecayTime();
 }
 
 void MagicEffectItem::setID(unsigned short newid)

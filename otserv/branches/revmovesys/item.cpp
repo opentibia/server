@@ -208,7 +208,8 @@ unsigned short Item::getUniqueId() const
 	return uniqueId;
 }
 
-long Item::getDecayTime(){
+long Item::getDecayTime()
+{
 	return items[id].decayTime*1000;
 }
 
