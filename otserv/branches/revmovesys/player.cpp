@@ -1716,7 +1716,7 @@ void Player::preSave()
 			// player has a "normal" hp,mana,etc when he gets level 1 he will not lose more
 			// hp,mana,etc... but here they are :P 
 			if((healthmax -= HPGain[(int)vocation]) < 0) //This could be avoided with a proper use of unsigend int
-				healthmax = 0;
+				healthmax = 10;
 			
 			health = healthmax;
 			

@@ -1653,13 +1653,19 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 		}
 	}
 
+	bool isAttackerRemoved = false;
+	if(creature && creature->isRemoved()){
+		creature->setParent(getTile(frompos.x, frompos.y, frompos.z));
+		isAttackerRemoved = true;
+	}
+
 	SpectatorVec spectatorlist = gamestate.getSpectators();
 	SpectatorVec::iterator it;
-
+	
 	for(it = spectatorlist.begin(); it != spectatorlist.end(); ++it) {
 		Player* spectator = (*it)->getPlayer();
 		
-		if(!spectator)
+		if(!spectator || spectator->isRemoved())
 			continue;
 
 		if(bSuccess) {
@@ -1676,13 +1682,19 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 				}
 				else {
 					for(CreatureStateVec::const_iterator csIt = creatureStateVec.begin(); csIt != creatureStateVec.end(); ++csIt) {
-						Creature *target = csIt->first;
+						Creature* target = csIt->first;
 						const CreatureState& creatureState = csIt->second;
+
+						bool isTargetRemoved = false;
+						if(target->isRemoved()){
+							target->setParent(tile);
+							isTargetRemoved = true;
+						}
 
 						me->getMagicEffect(spectator, creature, target, creatureState.pos, creatureState.damage, tile->isPz(), false);
 
 						//could be death due to a magic damage with no owner (fire/poison/energy)
-						if(creature && target->isRemoved()){
+						if(creature && isTargetRemoved /*target->isRemoved()*/){
 
 							for(std::vector<Creature*>::const_iterator cit = creatureState.attackerlist.begin(); cit != creatureState.attackerlist.end(); ++cit) {
 								Creature* gainExpCreature = *cit;
@@ -1713,13 +1725,21 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 								spectator->sendAnimatedText(creatureState.pos, 2, manaDmg.str());
 							}
 
-							if(target->health > 0)
+							if(target->health > 0 && !isTargetRemoved)
 								spectator->sendCreatureHealth(target);
 
 							if(spectator == target){
 								CreateManaDamageUpdate(target, creature, creatureState.manaDamage);
 								CreateDamageUpdate(target, creature, creatureState.damage);
+
+								if(isTargetRemoved){
+									spectator->sendTextMessage(MSG_ADVANCE, "You are dead.");	
+								}
 							}
+						}
+
+						if(isTargetRemoved){
+							target->setParent(NULL);
 						}
 					}
 				}
@@ -1731,6 +1751,10 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 
 	}
 	
+	if(isAttackerRemoved){
+		creature->setParent(NULL);
+	}
+
 	return bSuccess;
 }
 
@@ -1901,12 +1925,25 @@ void Game::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fi
 		return;
 	}
 
-	const Position& attackPosition = attackedCreature->getPosition();
+	const Position creaturePos = creature->getPosition();
+	const Position attackPosition = attackedCreature->getPosition();
 
 	//We do all changes against a GameState to keep track of the changes,
 	//need some more work to work for all situations...
 	GameState gamestate(this, Range(creature->getPosition(), attackedCreature->getPosition()));
 	gamestate.onAttack(creature, attackedCreature->getPosition(), attackedCreature);
+
+	bool isTargetRemoved = false;
+	if(attackedCreature && attackedCreature->isRemoved()){
+		attackedCreature->setParent(getTile(attackPosition.x, attackPosition.y, attackPosition.z));
+		isTargetRemoved = true;
+	}
+
+	bool isAttackerRemoved = false;
+	if(creature && creature->isRemoved()){
+		creature->setParent(getTile(creaturePos.x, creaturePos.y, creaturePos.z));
+		isAttackerRemoved = true;
+	}
 
 	const CreatureStateVec& creatureStateVec = gamestate.getCreatureStateList(targettile);
 	const CreatureState& creatureState = creatureStateVec[0].second;
@@ -1922,7 +1959,7 @@ void Game::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fi
 
 	for(it = spectatorlist.begin(); it != spectatorlist.end(); ++it) {
 		Player* spectator = dynamic_cast<Player*>(*it);
-		if(!spectator)
+		if(!spectator || spectator->isRemoved())
 			continue;
 
 		if(damagetype != FIGHT_MELEE){
@@ -1965,12 +2002,16 @@ void Game::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fi
 					spectator->sendAnimatedText(attackPosition, 2, manaDmg.str());
 				}
 
-				if (attackedCreature->health > 0)
+				if (attackedCreature->health > 0 && !isTargetRemoved)
 					spectator->sendCreatureHealth(attackedCreature);
 
 				if (spectator == attackedCreature) {
 					CreateManaDamageUpdate(attackedCreature, creature, creatureState.manaDamage);
 					CreateDamageUpdate(attackedCreature, creature, creatureState.damage);
+
+					if(isTargetRemoved){
+						spectator->sendTextMessage(MSG_ADVANCE, "You are dead.");	
+					}
 				}
 			}
 		}
@@ -1978,6 +2019,14 @@ void Game::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fi
 
 	if(damagetype != FIGHT_MELEE && player) {
 		player->removeDistItem();
+	}
+
+	if(isTargetRemoved){
+		attackedCreature->setParent(NULL);
+	}
+
+	if(isAttackerRemoved){
+		creature->setParent(NULL);
 	}
 }
 void Game::CreateDamageUpdate(Creature* creature, Creature* attackCreature, int damage)
@@ -3033,7 +3082,11 @@ void Game::checkDecay(int t)
 						startDecay(newItem);
 					}
 					else{
-						internalRemoveItem(item);
+						ReturnValue ret = internalRemoveItem(item);
+
+						if(ret != RET_NOERROR){
+							std::cout << "DEBUG, checkDecay failed, error code: " << (int) ret << "item id: " << item->getID() << std::endl;
+						}
 					}
 				}
 
