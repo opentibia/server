@@ -256,6 +256,21 @@ public:
 	VIPListSet VIPList;
 
 	//tile
+	//send methods
+	void sendAddTileItem(const Position& pos, const Item* item);
+	void sendUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* olditem, const Item* newitem);
+	void sendRemoveTileItem(const Position& pos, uint32_t stackpos, const Item* item);
+	void sendUpdateTile(const Position& pos);
+
+	void sendCreatureAppear(const Creature* creature, bool isLogin);
+	void sendCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout);
+	void sendCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport);
+
+	void sendCreatureTurn(const Creature* creature, uint32_t stackpos);
+	void sendCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text);
+	void sendCreatureChangeOutfit(const Creature* creature);
+
+	//event methods
 	virtual void onAddTileItem(const Position& pos, const Item* item);
 	virtual void onUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* olditem, const Item* newitem);
 	virtual void onRemoveTileItem(const Position& pos, uint32_t stackpos, const Item* item);
@@ -265,8 +280,8 @@ public:
 	virtual void onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout);
 	virtual void onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport);
 
-	virtual void onCreatureTurn(const Creature *creature, uint32_t stackpos);
-	virtual void onCreatureSay(const Creature *creature, SpeakClasses type, const std::string &text);
+	virtual void onCreatureTurn(const Creature* creature, uint32_t stackpos);
+	virtual void onCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text);
 	virtual void onCreatureChangeOutfit(const Creature* creature);
 
 	//container

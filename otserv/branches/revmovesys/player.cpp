@@ -1323,15 +1323,65 @@ void Player::sendTextWindow(Item* item, const unsigned short maxlen, const bool 
 }
 
 //tile
-void Player::onAddTileItem(const Position& pos, const Item* item)
+//send methods
+void Player::sendAddTileItem(const Position& pos, const Item* item)
 {
 	client->sendAddTileItem(pos, item);
 }
 
-void Player::onUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* olditem, const Item* newitem)
+void Player::sendUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* olditem, const Item* newitem)
 {
 	client->sendUpdateTileItem(pos, stackpos, newitem);
+}
 
+void Player::sendRemoveTileItem(const Position& pos, uint32_t stackpos, const Item* item)
+{
+	client->sendRemoveTileItem(pos, stackpos);
+}
+
+void Player::sendUpdateTile(const Position& pos)
+{
+	client->UpdateTile(pos);
+}
+
+void Player::sendCreatureAppear(const Creature* creature, bool isLogin)
+{
+	client->sendAddCreature(creature, isLogin);
+}
+
+void Player::sendCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout)
+{
+	client->sendRemoveCreature(creature, creature->getPosition(), stackpos, isLogout);
+}
+
+void Player::sendCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport)
+{
+	client->sendMoveCreature(creature, oldPos, oldStackPos, teleport);
+}
+
+void Player::sendCreatureTurn(const Creature* creature, uint32_t stackPos)
+{
+  client->sendCreatureTurn(creature, stackPos);
+}
+
+void Player::sendCreatureChangeOutfit(const Creature* creature)
+{
+	client->sendSetOutfit(creature);
+}
+
+void Player::sendCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text)
+{
+  client->sendCreatureSay(creature, type, text);
+}
+
+
+void Player::onAddTileItem(const Position& pos, const Item* item)
+{
+	//
+}
+
+void Player::onUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* olditem, const Item* newitem)
+{
 	if(tradeItem && olditem == tradeItem){
 		g_game.playerCloseTrade(this);
 	}
@@ -1339,7 +1389,6 @@ void Player::onUpdateTileItem(const Position& pos, uint32_t stackpos, const Item
 
 void Player::onRemoveTileItem(const Position& pos, uint32_t stackpos, const Item* item)
 {
-	client->sendRemoveTileItem(pos, stackpos);
 	checkTradeState(item);
 
 	if(tradeItem){
@@ -1352,18 +1401,16 @@ void Player::onRemoveTileItem(const Position& pos, uint32_t stackpos, const Item
 
 void Player::onUpdateTile(const Position& pos)
 {
-	client->UpdateTile(pos);
+	//
 }
 
 void Player::onCreatureAppear(const Creature* creature, bool isLogin)
 {
-	client->sendAddCreature(creature, isLogin);
+	//
 }
 
 void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout)
 {
-	client->sendRemoveCreature(creature, creature->getPosition(), stackpos, isLogout);
-
 	if(attackedCreature == creature){
 		//attackedCreature->releaseThing2();
 		//attackedCreature = NULL;
@@ -1398,8 +1445,6 @@ void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bo
 
 void Player::onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport)
 {
-	client->sendMoveCreature(creature, oldPos, oldStackPos, teleport);
-
 	if((creature == this && attackedCreature) || attackedCreature == creature){
 		if((std::abs(getPosition().x - attackedCreature->getPosition().x) > 7) ||
 		(std::abs(getPosition().y - attackedCreature->getPosition().y) > 5) || (getPosition().z != attackedCreature->getPosition().z)){
@@ -1430,6 +1475,21 @@ void Player::onCreatureMove(const Creature* creature, const Position& oldPos, ui
 			}
 		}
 	}
+}
+
+void Player::onCreatureTurn(const Creature* creature, uint32_t stackPos)
+{
+  //
+}
+
+void Player::onCreatureChangeOutfit(const Creature* creature)
+{
+	//
+}
+
+void Player::onCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text)
+{
+  //
 }
 
 //container
@@ -1554,21 +1614,6 @@ bool Player::NeedUpdateStats()
 	else{
 		return false;
 	}
-}
-
-void Player::onCreatureTurn(const Creature *creature, uint32_t stackPos)
-{
-  client->sendCreatureTurn(creature, stackPos);
-}
-
-void Player::onCreatureSay(const Creature *creature, SpeakClasses type, const std::string &text)
-{
-  client->sendCreatureSay(creature, type, text);
-}
-
-void Player::onCreatureChangeOutfit(const Creature* creature)
-{
-	client->sendSetOutfit(creature);
 }
 
 int Player::onThink(int& newThinkTicks)

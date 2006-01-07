@@ -773,7 +773,19 @@ bool Game::placeCreature(const Position &pos, Creature* creature, bool isLogin /
 
 			getSpectators(Range(creature->getPosition(), true), list);
 
+			//send to client
+			Player* player = NULL;
 			for(it = list.begin(); it != list.end(); ++it) {
+				if(player = (*it)->getPlayer()){
+					player->sendCreatureAppear(creature, isLogin);
+				}
+			}
+			
+			//event method
+			for(it = list.begin(); it != list.end(); ++it) {
+				if((*it)->isRemoved())
+					continue;
+
 				(*it)->onCreatureAppear(creature, isLogin);
 			}
 
@@ -822,7 +834,19 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 
 	getSpectators(Range(cylinder->getPosition(), true), list);
 
+	//send to client
+	Player* player = NULL;
 	for(it = list.begin(); it != list.end(); ++it){
+		if(player = (*it)->getPlayer()){
+			player->sendCreatureDisappear(creature, index, isLogout);
+		}
+	}
+
+	//event method
+	for(it = list.begin(); it != list.end(); ++it){
+		if((*it)->isRemoved())
+			continue;
+
 		(*it)->onCreatureDisappear(creature, index, isLogout);
 	}
 	
@@ -835,7 +859,7 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 	for(std::list<Creature*>::iterator cit = creature->summons.begin(); cit != creature->summons.end(); ++cit){
 		removeCreature(*cit);
 	}
-		
+
 	stopEvent(creature->eventCheck);
 	stopEvent(creature->eventCheckAttacking);
 
@@ -2169,8 +2193,12 @@ bool Game::playerWhisper(Player* player, const std::string& text)
 	SpectatorVec::iterator it;
 
 	getSpectators(Range(player->getPosition()), list);
-
+	
+	//event method
 	for(it = list.begin(); it != list.end(); ++it) {
+		if((*it)->isRemoved())
+			continue;
+
 		if(std::abs(player->getPosition().x - (*it)->getPosition().x) > 1 ||
 			std::abs(player->getPosition().y - (*it)->getPosition().y) > 1)
 			(*it)->onCreatureSay(player, SPEAK_WHISPER, std::string("pspsps"));
@@ -2789,7 +2817,19 @@ bool Game::internalCreatureTurn(Creature* creature, Direction dir)
 		SpectatorVec::iterator it;
 		map->getSpectators(Range(creature->getPosition(), true), list);
 
+		//send to client
+		Player* player = NULL;
 		for(it = list.begin(); it != list.end(); ++it) {
+			if(player = (*it)->getPlayer()){
+				player->sendCreatureTurn(creature, stackpos);
+			}
+		}
+		
+		//event method
+		for(it = list.begin(); it != list.end(); ++it) {
+			if((*it)->isRemoved())
+				continue;
+
 			(*it)->onCreatureTurn(creature, stackpos);
 		}
 
@@ -2827,7 +2867,19 @@ bool Game::internalCreatureChangeOutfit(Creature* creature)
 
 	getSpectators(Range(creature->getPosition(), true), list);
 
+	//send to client
+	Player* player = NULL;
 	for(it = list.begin(); it != list.end(); ++it) {
+		if(player = (*it)->getPlayer()){
+			player->sendCreatureChangeOutfit(creature);
+		}
+	}
+
+	//event method
+	for(it = list.begin(); it != list.end(); ++it) {
+		if((*it)->isRemoved())
+			continue;
+
 		(*it)->onCreatureChangeOutfit(creature);
 	}
 

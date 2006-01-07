@@ -283,6 +283,106 @@ void Tile::setPz()
 	setFlag(TILESTATE_PROTECTIONZONE);
 }
 
+void Tile::onAddTileItem(Item* item)
+{
+	const Position& cylinderMapPos = getPosition();
+
+	SpectatorVec list;
+	SpectatorVec::iterator it;
+	g_game.getSpectators(Range(cylinderMapPos, true), list);
+
+	//send to client
+	Player* player = NULL;
+	for(it = list.begin(); it != list.end(); ++it){
+		if(player = (*it)->getPlayer()){
+			player->sendAddTileItem(cylinderMapPos, item);
+		}
+	}
+
+	//event methods
+	for(it = list.begin(); it != list.end(); ++it){
+		if((*it)->isRemoved())
+			continue;
+
+		(*it)->onAddTileItem(cylinderMapPos, item);
+	}
+}
+
+void Tile::onUpdateTileItem(uint32_t index, Item* olditem, Item* newitem)
+{
+	const Position& cylinderMapPos = getPosition();
+
+	SpectatorVec list;
+	SpectatorVec::iterator it;
+	g_game.getSpectators(Range(cylinderMapPos, true), list);
+
+	//send to client
+	Player* player = NULL;
+	for(it = list.begin(); it != list.end(); ++it){
+		if(player = (*it)->getPlayer()){
+			player->sendUpdateTileItem(cylinderMapPos, index, olditem, newitem);
+		}
+	}
+
+	//event methods
+	for(it = list.begin(); it != list.end(); ++it){
+		if((*it)->isRemoved())
+			continue;
+
+		(*it)->onUpdateTileItem(cylinderMapPos, index, olditem, newitem);
+	}
+}
+
+void Tile::onRemoveTileItem(uint32_t index, Item* item)
+{
+	const Position& cylinderMapPos = getPosition();
+
+	SpectatorVec list;
+	SpectatorVec::iterator it;
+	g_game.getSpectators(Range(cylinderMapPos, true), list);
+
+	//send to client
+	Player* player = NULL;
+	for(it = list.begin(); it != list.end(); ++it){
+		if(player = (*it)->getPlayer()){
+			player->sendRemoveTileItem(cylinderMapPos, index, item);
+		}
+	}
+
+	//event methods
+	for(it = list.begin(); it != list.end(); ++it){
+		if((*it)->isRemoved())
+			continue;
+
+		(*it)->onRemoveTileItem(cylinderMapPos, index, item);
+	}
+}
+
+void Tile::onUpdateTile()
+{
+	const Position& cylinderMapPos = getPosition();
+
+	SpectatorVec list;
+	SpectatorVec::iterator it;
+	g_game.getSpectators(Range(cylinderMapPos, true), list);
+
+	//send to client
+	Player* player = NULL;
+	for(it = list.begin(); it != list.end(); ++it){
+		if(player = (*it)->getPlayer()){
+			player->sendUpdateTile(cylinderMapPos);
+		}
+	}
+
+	//event methods
+	for(it = list.begin(); it != list.end(); ++it){
+		if((*it)->isRemoved())
+			continue;
+
+		(*it)->onUpdateTile(cylinderMapPos);
+	}
+}
+
 void Tile::moveCreature(Creature* creature, Cylinder* toCylinder, bool teleport /* = false*/)
 {
 	int32_t oldStackPos = __getIndexOfThing(creature);
@@ -312,8 +412,19 @@ void Tile::moveCreature(Creature* creature, Cylinder* toCylinder, bool teleport 
 	g_game.getSpectators(Range(fromPos, true), list);
 	g_game.getSpectators(Range(toPos, true), list);
 
-	//send change to client
+	//send to client
+	Player* player = NULL;
 	for(it = list.begin(); it != list.end(); ++it) {
+		if(player = (*it)->getPlayer()){
+			player->sendCreatureMove(creature, fromPos, oldStackPos, teleport);
+		}
+	}
+
+	//event method
+	for(it = list.begin(); it != list.end(); ++it) {
+		if((*it)->isRemoved())
+			continue;
+
 		(*it)->onCreatureMove(creature, fromPos, oldStackPos, teleport);
 	}
 
@@ -522,26 +633,33 @@ void Tile::__addThing(int32_t index, Thing* thing)
 			return /*RET_NOTPOSSIBLE*/;
 		}
 
-		const Position& cylinderMapPos = getPosition();
+		/*const Position& cylinderMapPos = getPosition();
 
 		SpectatorVec list;
 		SpectatorVec::iterator it;
-		g_game.getSpectators(Range(cylinderMapPos, true), list);
+		g_game.getSpectators(Range(cylinderMapPos, true), list);*/
 
 		if(item->isGroundTile()){
 			if(ground == NULL){
-				//send to client
+				onAddTileItem(item);
+
+				/*//send to client
 				for(it = list.begin(); it != list.end(); ++it) {
 					(*it)->onAddTileItem(cylinderMapPos, item);
 				}
+				*/
 			}
 			else{
-				uint32_t index = __getIndexOfThing(ground);
+				uint32_t index = __getIndexOfThing(ground);				
+				onUpdateTileItem(index, ground, item);
 
-				//send to client
+				//TODO: free memory of old ground?
+
+				/*//send to client
 				for(it = list.begin(); it != list.end(); ++it) {
 					(*it)->onUpdateTileItem(cylinderMapPos, index, ground, item);
 				}
+				*/
 			}
 
 			ground = item;
@@ -576,10 +694,13 @@ void Tile::__addThing(int32_t index, Thing* thing)
 				topItems.push_back(item);
 			}
 
-			//send to client
+			onAddTileItem(item);
+
+			/*//send to client
 			for(it = list.begin(); it != list.end(); ++it) {
 				(*it)->onAddTileItem(cylinderMapPos, item);
 			}
+			*/
 		}
 		else{
 			if(item->isMagicField()){
@@ -599,10 +720,14 @@ void Tile::__addThing(int32_t index, Thing* thing)
 
 			downItems.insert(downItems.begin(), item);
 
-			//send to client
+			onAddTileItem(item);
+
+			/*//send to client
 			for(it = list.begin(); it != list.end(); ++it) {
 				(*it)->onAddTileItem(cylinderMapPos, item);
 			}
+			*/
+
 		}
 	}
 }
@@ -627,16 +752,19 @@ void Tile::__updateThing(Thing* thing, uint32_t count)
 
 	item->setItemCountOrSubtype(count);
 
-	const Position& cylinderMapPos = getPosition();
+	/*const Position& cylinderMapPos = getPosition();
 
 	SpectatorVec list;
 	SpectatorVec::iterator it;
-	g_game.getSpectators(Range(cylinderMapPos, true), list);
+	g_game.getSpectators(Range(cylinderMapPos, true), list);*/
 
-	//send to client
+	onUpdateTileItem(index, item, item);
+
+	/*//send to client
 	for(it = list.begin(); it != list.end(); ++it) {
 		(*it)->onUpdateTileItem(cylinderMapPos, index, item, item);
 	}
+	*/
 }
 
 void Tile::__updateThing(uint32_t index, Thing* thing)
@@ -661,15 +789,6 @@ void Tile::__updateThing(uint32_t index, Thing* thing)
 
 		--pos;
 	}
-
-	/*
-	if(pos == 0 && ground){
-		oldItem = ground;
-		ground = item;
-	}
-
-	--pos;
-	*/
 
 	if(pos >= 0 && pos < topItems.size()){
 		ItemVector::iterator it = topItems.begin();
@@ -705,16 +824,19 @@ void Tile::__updateThing(uint32_t index, Thing* thing)
 	if(pos == 0){
 		item->setParent(this);
 
-		const Position& cylinderMapPos = getPosition();
+		/*const Position& cylinderMapPos = getPosition();
 
 		SpectatorVec list;
 		SpectatorVec::iterator it;
-		g_game.getSpectators(Range(cylinderMapPos, true), list);
+		g_game.getSpectators(Range(cylinderMapPos, true), list);*/
 
-		//send to client
+		/*//send to client
 		for(it = list.begin(); it != list.end(); ++it) {
 			(*it)->onUpdateTileItem(cylinderMapPos, index, oldItem, item);
 		}
+		*/
+
+		onUpdateTileItem(index, oldItem, item);
 
 		return /*RET_NOERROR*/;
 	}
@@ -756,17 +878,20 @@ void Tile::__removeThing(Thing* thing, uint32_t count)
 			return /*RET_NOTPOSSIBLE*/;
 		}
 
-		const Position& cylinderMapPos = getPosition();
+		/*const Position& cylinderMapPos = getPosition();
 
 		SpectatorVec list;
 		SpectatorVec::iterator it;
-		g_game.getSpectators(Range(cylinderMapPos, true), list);
+		g_game.getSpectators(Range(cylinderMapPos, true), list);*/
 
 		if(item == ground){
-			//send to client
+			/*//send to client
 			for(it = list.begin(); it != list.end(); ++it) {
 				(*it)->onRemoveTileItem(cylinderMapPos, index, item);
 			}
+			*/
+
+			onRemoveTileItem(index, item);
 
 			ground->setParent(NULL);
 			ground = NULL;
@@ -777,10 +902,13 @@ void Tile::__removeThing(Thing* thing, uint32_t count)
 		if(item->isAlwaysOnTop()){
 			for(iit = topItems.begin(); iit != topItems.end(); ++iit){
 				if(*iit == item){
-					//send to client
+					/*//send to client
 					for(it = list.begin(); it != list.end(); ++it) {
 						(*it)->onRemoveTileItem(cylinderMapPos, index, item);
 					}
+					*/
+
+					onRemoveTileItem(index, item);
 
 					(*iit)->setParent(NULL);
 					topItems.erase(iit);
@@ -795,16 +923,22 @@ void Tile::__removeThing(Thing* thing, uint32_t count)
 						int newCount = std::max(0, (int)(item->getItemCount() - count));
 						item->setItemCount(newCount);
 
-						//send to client
+						/*//send to client
 						for(it = list.begin(); it != list.end(); ++it) {
 							(*it)->onUpdateTileItem(cylinderMapPos, index, item, item);
 						}
+						*/
+
+						onUpdateTileItem(index, item, item);
 					}
 					else {
-						//send to client
+						/*//send to client
 						for(it = list.begin(); it != list.end(); ++it) {
 							(*it)->onRemoveTileItem(cylinderMapPos, index, item);
 						}
+						*/
+
+						onRemoveTileItem(index, item);
 
 						(*iit)->setParent(NULL);
 						downItems.erase(iit);
@@ -928,10 +1062,13 @@ void Tile::postRemoveNotification(Thing* thing, bool hadOwnership /*= true*/)
 	g_game.getSpectators(Range(cylinderMapPos, true), list);
 
 	if(getThingCount() > 8){
-		//send to client
+		onUpdateTile();
+
+		/*//send to client
 		for(it = list.begin(); it != list.end(); ++it){
 			(*it)->onUpdateTile(cylinderMapPos);
 		}
+		*/
 	}
 
 	for(it = list.begin(); it != list.end(); ++it){

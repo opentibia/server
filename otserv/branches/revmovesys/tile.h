@@ -91,6 +91,11 @@ public:
 
 	void moveCreature(Creature* creature, Cylinder* toCylinder, bool teleport = false);
 
+	void onAddTileItem(Item* item);
+	void onUpdateTileItem(uint32_t index, Item* olditem, Item* newitem);
+	void onRemoveTileItem(uint32_t index, Item* item);
+	void onUpdateTile();
+
 	//cylinder implementations
 	virtual ReturnValue __queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
 		uint32_t& maxQueryCount) const;
