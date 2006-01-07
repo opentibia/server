@@ -778,10 +778,10 @@ bool Game::placeCreature(const Position &pos, Creature* creature, bool isLogin /
 			getSpectators(Range(creature->getPosition(), true), list);
 
 			//send to client
-			Player* player = NULL;
+			Player* tmpPlayer = NULL;
 			for(it = list.begin(); it != list.end(); ++it) {
-				if(player = (*it)->getPlayer()){
-					player->sendCreatureAppear(creature, isLogin);
+				if(tmpPlayer = (*it)->getPlayer()){
+					tmpPlayer->sendCreatureAppear(creature, isLogin);
 				}
 			}
 			
@@ -794,14 +794,12 @@ bool Game::placeCreature(const Position &pos, Creature* creature, bool isLogin /
 			}
 
 			creature->getParent()->postAddNotification(creature);
-
+			
 			if(player){
 				#ifdef __DEBUG_PLAYERS__
 				std::cout << (uint32_t)getPlayersOnline() << " players online." << std::endl;
 				#endif
-			}
-			
-			if(player){
+
 				creature->eventCheck = addEvent(makeTask(1000, std::bind2nd(std::mem_fun(&Game::checkCreature), creature->getID())));
 				creature->eventCheckAttacking = addEvent(makeTask(2000, boost::bind(&Game::checkCreatureAttacking, this, creature->getID(), 2000)));
 			}
