@@ -3162,10 +3162,11 @@ void Game::startDecay(Item* item)
 		return; //dont add 2 times the same item
 
 	//get decay time
-	item->isDecaying = true;
 	unsigned long dtime = item->getDecayTime();
 	if(dtime == 0)
 		return;
+
+	item->isDecaying = true;
 
 	//round time
 	if(dtime < DECAY_INTERVAL)
