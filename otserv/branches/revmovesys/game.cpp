@@ -222,15 +222,16 @@ void GameState::addCreatureState(Tile* tile, Creature* attackedCreature, int dam
 void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* attackedCreature, int damage, bool drawBlood)
 {
 	Player* attackedPlayer = dynamic_cast<Player*>(attackedCreature);
-	Tile* attackTile = attackedCreature->getTile();
 	
 	attackedCreature->addInflictedDamage(attacker, damage);
 	
-	if(attackedPlayer){
+	if(attackedPlayer && !attackedPlayer->isRemoved()){
 		attackedPlayer->sendStats();
 	}
 
 	if(!attackedCreature->isRemoved()){
+		Tile* attackTile = attackedCreature->getTile();
+
 		//Remove player?
 		if(attackedCreature->health <= 0){
 			int32_t stackpos = tile->__getIndexOfThing(attackedCreature);		

@@ -119,35 +119,46 @@ Tile* Map::getTile(unsigned short _x, unsigned short _y, unsigned char _z)
 		// _x & 0x7F  is like _x % 128
 		//TileMap *tm = &tileMaps[_x & 0x1F][_y & 0x1F][_z];
 		//TileMap *tm = &tileMaps[_x & 0xFF][_y & 0xFF];
-    	TileMap *tm = &tileMaps[_x & 0x7F][_y & 0x7F];
+		TileMap* tm = &tileMaps[_x & 0x7F][_y & 0x7F];
 		if(!tm)
 			return NULL;
 	
-    	// search in the stl map for the requested tile
-    	//TileMap::iterator it = tm->find((_x << 16) | _y);
-    	//TileMap::iterator it = tm->find(_x & 0xFF00) << 8 | (_y & 0xFF00) | _z);
-    	TileMap::iterator it = tm->find((_x & 0xFF80) << 16 | (_y & 0xFF80) << 1 | _z);
+    // search in the stl map for the requested tile
+    //TileMap::iterator it = tm->find((_x << 16) | _y);
+    //TileMap::iterator it = tm->find(_x & 0xFF00) << 8 | (_y & 0xFF00) | _z);
+    TileMap::iterator it = tm->find((_x & 0xFF80) << 16 | (_y & 0xFF80) << 1 | _z);
 
-    	// ... found
-    	if(it != tm->end())
-      		return it->second;
-  	}
+    // ... found
+    if(it != tm->end())
+      	return it->second;
+	}
 	
 	// or not
 	return NULL;
 }
 
-Tile* Map::getTile(const Position &pos)
-{
+Tile* Map::getTile(const Position& pos)
+{ 
 	return getTile(pos.x, pos.y, pos.z);
+}
+
+void Map::setTile(uint16_t _x, uint16_t _y, uint8_t _z, Tile* newtile)
+{
+	Tile* tile = getTile(_x, _y, _z);
+
+	if(!tile){
+		tileMaps[_x & 0x7F][_y & 0x7F][ (_x & 0xFF80) << 16 | (_y & 0xFF80) << 1 | _z] = newtile;
+	}
+	else{
+		std::cout << "Error: Map::setTile() already exists." << std::endl;
+	}
 }
 
 void Map::setTile(unsigned short _x, unsigned short _y, unsigned char _z, unsigned short groundId)
 {
-  Tile *tile = getTile(_x, _y, _z);
+  Tile* tile = getTile(_x, _y, _z);
 
-  if (tile != NULL)
-  {
+  if(tile != NULL){
 		if(tile->ground)
 			//delete tile->ground;
 			tile->ground->releaseThing2();
@@ -155,11 +166,10 @@ void Map::setTile(unsigned short _x, unsigned short _y, unsigned char _z, unsign
 		tile->ground = Item::CreateItem(groundId);
 		tile->ground->setParent(tile);
   }
-  else
-  {
+  else{
     tile = new Tile(_x, _y, _z);
 
-		if(groundId != 0 && Item::items[groundId].isGroundTile()) {
+		if(groundId != 0 && Item::items[groundId].isGroundTile()){
 			tile->ground = Item::CreateItem(groundId);
 			tile->ground->setParent(tile);
 		}

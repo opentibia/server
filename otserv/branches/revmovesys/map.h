@@ -19,9 +19,8 @@
 //////////////////////////////////////////////////////////////////////
 
 
-#ifndef __OTSERV_MAP_H
-#define __OTSERV_MAP_H
-
+#ifndef __MAP_H__
+#define __MAP_H__
 
 #include <queue>
 #include <bitset>
@@ -179,11 +178,12 @@ private:
 	unsigned long curNode;
 };
 
-template<class T> class lessPointer : public std::binary_function<T*, T*, bool> {
-		  public:
-		  bool operator()(T*& t1, T*& t2) {
-				return *t1 < *t2;
-		  }
+template<class T> class lessPointer : public std::binary_function<T*, T*, bool>
+{
+public:
+	bool operator()(T*& t1, T*& t2) {
+		return *t1 < *t2;
+	}
 };
 
 typedef std::list<Creature*> SpectatorVec;
@@ -193,89 +193,88 @@ typedef std::list<Creature*> SpectatorVec;
   * Holds all the actual map-data
   */
 
-class Map {
-  public:
-    Map();
-    ~Map();
+class Map
+{
+public:
+	Map();
+	~Map();
     
 	/**
-	  * Load a map.
-	  * \param filename Mapfile to load
-	  * \param filekind Kind of the map, BIN SQL or TXT
-	  * \returns Int SPAWN_BUILTIN built-in spawns, SPAWN_XML needs xml spawns, SPAWN_SQL needs sql spawns, MAP_LOADER_ERROR if got error
-	  */
-    int loadMap(std::string filename, std::string filekind);
+	* Load a map.
+	* \param filename Mapfile to load
+	* \param filekind Kind of the map, BIN SQL or TXT
+	* \returns Int SPAWN_BUILTIN built-in spawns, SPAWN_XML needs xml spawns, SPAWN_SQL needs sql spawns, MAP_LOADER_ERROR if got error
+	*/
+	int loadMap(std::string filename, std::string filekind);
 
 	/**
-	  * Get a single tile.
-	  * \returns A pointer to that tile.
-	  */
-    Tile* getTile(unsigned short _x, unsigned short _y, unsigned char _z);
-    Tile* getTile(const Position &pos);
+	* Get a single tile.
+	* \returns A pointer to that tile.
+	*/
+	Tile* getTile(unsigned short _x, unsigned short _y, unsigned char _z);
+	Tile* getTile(const Position &pos);
     
-	/**
-	  * Set a single tile.
-	  * \param groundId Ground kind (ID)
-	  * \returns Nothing =]
-	  */
-    void setTile(unsigned short _x, unsigned short _y, unsigned char _z, unsigned short groundId);
+	void setTile(uint16_t _x, uint16_t _y, uint8_t _z, Tile* newtile);
 
 	/**
-	  * Place a creature on the map
-	  * \param pos The position to place the creature
-	  * \param c Creature pointer to the creature to place
-	  */
-    bool placeCreature(const Position &pos, Creature* c);
+	* Set a single tile.
+	* \param groundId Ground kind (ID)
+	* \returns Nothing =]
+	*/
+	void setTile(unsigned short _x, unsigned short _y, unsigned char _z, unsigned short groundId);
+
+	/**
+	* Place a creature on the map
+	* \param pos The position to place the creature
+	* \param c Creature pointer to the creature to place
+	*/
+	bool placeCreature(const Position &pos, Creature* c);
 	
 	/**
-	  * Remove a creature from the map.
-	  * \param c Creature pointer to the creature to remove
-	  */
-    bool removeCreature(Creature* c);
+	* Remove a creature from the map.
+	* \param c Creature pointer to the creature to remove
+	*/
+	bool removeCreature(Creature* c);
 
 	/**
-	 * Checks if you can throw an object to that position
-	 *	\param fromPos from Source point
-	 *	\param toPos Destination point
-	 *	\returns The result if you can throw there or not
-	 */
-		bool canThrowObjectTo(const Position& fromPos, const Position& toPos);
+	* Checks if you can throw an object to that position
+	*	\param fromPos from Source point
+	*	\param toPos Destination point
+	*	\returns The result if you can throw there or not
+	*/
+	bool canThrowObjectTo(const Position& fromPos, const Position& toPos);
 
-		bool isPathValid(Creature *creature, const std::list<Position>& path, int pathSize,
-			bool ignoreMoveableBlockingItems = false);
+	bool isPathValid(Creature *creature, const std::list<Position>& path, int pathSize,
+		bool ignoreMoveableBlockingItems = false);
 
 	/**
-	  * Get the path to a specific position on the map.
-	  * \param creature The creature that wants a route
-	  * \param start The start position of the path
-	  * \param to The destination position
-	  * \param creaturesBlock Wether a Creature is an obstacle or not
-	  * \returns A list of all positions you have to traverse to reacg the destination
-	  */
+	* Get the path to a specific position on the map.
+	* \param creature The creature that wants a route
+	* \param start The start position of the path
+	* \param to The destination position
+	* \param creaturesBlock Wether a Creature is an obstacle or not
+	* \returns A list of all positions you have to traverse to reacg the destination
+	*/
 	std::list<Position> getPathTo(Creature* creature, Position start, Position to,
 		bool creaturesBlock = true, bool ignoreMoveableBlockingItems = false, int maxNodSize = 100);
 
-	
 	/* Map Width and Height - for Info purposes */
 	int mapwidth, mapheight;
 	
-  protected:    
-    /**
-	  * Get the Creatures within a specific Range */
+protected:    
+	/**
+	* Get the Creatures within a specific Range */
 	void getSpectators(const Range& range, SpectatorVec& list);
     
-    typedef std::map<unsigned long, Tile*> TileMap;
-	//TileMap tileMaps[32][32][MAP_LAYER];	
-	//TileMap tileMaps[256][256];
+	typedef std::map<unsigned long, Tile*> TileMap;
 	TileMap tileMaps[128][128];
 
 	friend class Game;
-	//FIXME friend for derived classes?
 	friend class IOMapXML;
 	friend class IOMap;
 
 private:
 	std::string spawnfile;
-
 };
+
 #endif

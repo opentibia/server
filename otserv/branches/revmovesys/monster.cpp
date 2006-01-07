@@ -659,12 +659,18 @@ bool Monster::isInRange(const Position &p)
 
 void Monster::onAddTileItem(const Position& pos, const Item* item)
 {
+	if(isRemoved())
+		return;
+
 	reThink();
 	setUpdateMovePos();
 }
 
 void Monster::onUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* oldItem, const Item* newItem)
 {
+	if(isRemoved())
+		return;
+
 	if(oldItem->isBlocking() && !newItem->isBlocking()){
 		reThink();
 	}
@@ -672,6 +678,9 @@ void Monster::onUpdateTileItem(const Position& pos, uint32_t stackpos, const Ite
 
 void Monster::onRemoveTileItem(const Position& pos, uint32_t stackpos, const Item* item)
 {
+	if(isRemoved())
+		return;
+
 	reThink();
 }
 
@@ -682,6 +691,9 @@ void Monster::onUpdateTile(const Position& pos)
 
 void Monster::onCreatureAppear(const Creature* creature, bool isLogin)
 {
+	if(isRemoved())
+		return;
+
 	if(creature == this){
 		return;
 	}
@@ -694,6 +706,9 @@ void Monster::onCreatureAppear(const Creature* creature, bool isLogin)
 
 void Monster::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout)
 {
+	if(isRemoved())
+		return;
+
 	if(creature == this){
 		stopThink();
 	}
@@ -703,6 +718,9 @@ void Monster::onCreatureDisappear(const Creature* creature, uint32_t stackpos, b
 
 void Monster::onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport)
 {
+	if(isRemoved())
+		return;
+
 	if(creature != this) {
 		creatureMove(creature, oldPos);
 	}
