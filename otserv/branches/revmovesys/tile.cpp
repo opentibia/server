@@ -1030,8 +1030,13 @@ void Tile::postAddNotification(Thing* thing, bool hasOwnership /*= true*/)
 
 	//do action(s)
 	if(Creature* creature = thing->getCreature()){
-		const MagicEffectItem* fieldItem = getFieldItem();
+		MagicEffectItem* fieldItem = getFieldItem();
 		if(fieldItem){
+			//remove magic walls/wild growth
+			if(fieldItem->isBlocking()){
+				g_game.internalRemoveItem(fieldItem, 1);
+			}
+
 			const MagicEffectTargetCreatureCondition* magicTargetCondition = fieldItem->getCondition();
 
 			if(!(g_game.getWorldType() == WORLD_TYPE_NO_PVP && creature && magicTargetCondition && magicTargetCondition->getOwnerID() != 0)){
@@ -1046,7 +1051,7 @@ void Tile::postAddNotification(Thing* thing, bool hasOwnership /*= true*/)
 			}
 		}
 	}
-
+	
 	Teleport* teleport = getTeleportItem();
 	if(teleport){
 		teleport->__addThing(thing);

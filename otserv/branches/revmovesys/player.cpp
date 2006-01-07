@@ -1374,7 +1374,6 @@ void Player::sendCreatureSay(const Creature* creature, SpeakClasses type, const 
   client->sendCreatureSay(creature, type, text);
 }
 
-
 void Player::onAddTileItem(const Position& pos, const Item* item)
 {
 	//
@@ -1489,7 +1488,7 @@ void Player::onCreatureChangeOutfit(const Creature* creature)
 
 void Player::onCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text)
 {
-  //
+  sendCreatureSay(creature, type, text);
 }
 
 //container
