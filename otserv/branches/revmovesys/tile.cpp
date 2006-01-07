@@ -706,7 +706,7 @@ void Tile::__addThing(int32_t index, Thing* thing)
 			if(item->isMagicField()){
 				//remove old field item if exists
 				ItemVector::iterator iit;
-				for(iit = topItems.begin(); iit != topItems.end(); ++iit){
+				for(iit = downItems.begin(); iit != downItems.end(); ++iit){
 					if((*iit)->isMagicField()){
 						Item* oldField = *iit;
 						__removeThing(oldField, 0);

@@ -662,8 +662,13 @@ void Monster::onAddTileItem(const Position& pos, const Item* item)
 	if(isRemoved())
 		return;
 
+	bool oldVal = isYielding;
+	isYielding = true;
+
 	reThink();
 	setUpdateMovePos();
+
+	isYielding = oldVal;
 }
 
 void Monster::onUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* oldItem, const Item* newItem)
@@ -671,9 +676,14 @@ void Monster::onUpdateTileItem(const Position& pos, uint32_t stackpos, const Ite
 	if(isRemoved())
 		return;
 
+	bool oldVal = isYielding;
+	isYielding = true;
+
 	if(oldItem->isBlocking() && !newItem->isBlocking()){
 		reThink();
 	}
+
+	isYielding = oldVal;
 }
 
 void Monster::onRemoveTileItem(const Position& pos, uint32_t stackpos, const Item* item)
@@ -681,7 +691,12 @@ void Monster::onRemoveTileItem(const Position& pos, uint32_t stackpos, const Ite
 	if(isRemoved())
 		return;
 
+	bool oldVal = isYielding;
+	isYielding = true;
+
 	reThink();
+
+	isYielding = oldVal;
 }
 
 void Monster::onUpdateTile(const Position& pos)
@@ -698,10 +713,15 @@ void Monster::onCreatureAppear(const Creature* creature, bool isLogin)
 		return;
 	}
 
+	bool oldVal = isYielding;
+	isYielding = true;
+
 	if(isInRange(creature->getPosition())){
 		bool canReach = isCreatureReachable(creature);
 		creatureEnter(creature, canReach);
 	}
+
+	isYielding = oldVal;
 }
 
 void Monster::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout)
@@ -709,11 +729,18 @@ void Monster::onCreatureDisappear(const Creature* creature, uint32_t stackpos, b
 	if(isRemoved())
 		return;
 
+	bool oldVal = isYielding;
+	isYielding = true;
+
 	if(creature == this){
 		stopThink();
 	}
-	else
-		creatureLeave(creature);
+	else{
+		//if(!isYielding)
+			creatureLeave(creature);
+	}
+	
+	isYielding = oldVal;
 }
 
 void Monster::onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport)
@@ -721,11 +748,16 @@ void Monster::onCreatureMove(const Creature* creature, const Position& oldPos, u
 	if(isRemoved())
 		return;
 
+	bool oldVal = isYielding;
+	isYielding = true;
+
 	if(creature != this) {
 		creatureMove(creature, oldPos);
 	}
 	else
 		reThink();
+
+	isYielding = false;
 }
 
 /*
