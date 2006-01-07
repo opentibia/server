@@ -225,6 +225,9 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 	
 	attackedCreature->addInflictedDamage(attacker, damage);
 	
+	if(attacker && attacker->isRemoved() || attackedCreature->isRemoved())
+		return;
+
 	if(attackedPlayer && !attackedPlayer->isRemoved()){
 		attackedPlayer->sendStats();
 	}
@@ -299,7 +302,7 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 				//Add experience
 				for(std::vector<long>::const_iterator iit = creaturelist.begin(); iit != creaturelist.end(); ++iit) {
 					Creature* gainExpCreature = game->getCreatureByID(*iit);
-					if(gainExpCreature) {
+					if(gainExpCreature && !gainExpCreature->isRemoved()) {
 						int gainedExperience = attackedCreature->getGainedExperience(gainExpCreature);
 						if(gainedExperience <= 0)
 							continue;
@@ -1690,11 +1693,12 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 	for(it = spectatorlist.begin(); it != spectatorlist.end(); ++it) {
 		Player* spectator = (*it)->getPlayer();
 		
-		if(!spectator || spectator->isRemoved())
+		if(!spectator /*|| spectator->isRemoved()*/)
 			continue;
 
-		if(bSuccess) {
-			me->getDistanceShoot(spectator, creature, centerpos, hasTarget);
+		if(bSuccess){
+			if(!spectator->isRemoved())
+				me->getDistanceShoot(spectator, creature, centerpos, hasTarget);
 
 			std::vector<Position>::const_iterator tlIt;
 			for(tlIt = poslist.begin(); tlIt != poslist.end(); ++tlIt) {
@@ -1703,7 +1707,8 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 				const CreatureStateVec& creatureStateVec = gamestate.getCreatureStateList(tile);
 					
 				if(creatureStateVec.empty()) { //no targets
-					me->getMagicEffect(spectator, creature, NULL, pos, 0, targettile->isPz(), isBlocking);
+					if(!spectator->isRemoved())
+						me->getMagicEffect(spectator, creature, NULL, pos, 0, targettile->isPz(), isBlocking);
 				}
 				else {
 					for(CreatureStateVec::const_iterator csIt = creatureStateVec.begin(); csIt != creatureStateVec.end(); ++csIt) {
@@ -1716,13 +1721,17 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 							isTargetRemoved = true;
 						}
 
-						me->getMagicEffect(spectator, creature, target, creatureState.pos, creatureState.damage, tile->isPz(), false);
+						if(!spectator->isRemoved())
+							me->getMagicEffect(spectator, creature, target, creatureState.pos, creatureState.damage, tile->isPz(), false);
 
 						//could be death due to a magic damage with no owner (fire/poison/energy)
 						if(creature && isTargetRemoved /*target->isRemoved()*/){
 
 							for(std::vector<Creature*>::const_iterator cit = creatureState.attackerlist.begin(); cit != creatureState.attackerlist.end(); ++cit) {
 								Creature* gainExpCreature = *cit;
+								if(gainExpCreature->isRemoved())
+									continue;
+
 								if(dynamic_cast<Player*>(gainExpCreature))
 									dynamic_cast<Player*>(gainExpCreature)->sendStats();
 								
