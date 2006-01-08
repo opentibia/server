@@ -144,8 +144,8 @@ Player::~Player()
 {
 	for(int i = 0; i < 11; i++){
 		if(items[i]){
-			items[i]->releaseThing2();
 			items[i]->setParent(NULL);
+			items[i]->releaseThing2();
 			items[i] = NULL;
 		}
 	}
