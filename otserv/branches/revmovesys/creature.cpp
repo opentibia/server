@@ -76,7 +76,8 @@ access(0)
 	eventCheck = 0;
 	eventCheckAttacking = 0;
 	
-	attackedCreature = NULL;
+	//attackedCreature = NULL;
+	attackedCreature2 = 0;
 	speed = 220;
 }
 
@@ -89,10 +90,12 @@ Creature::~Creature()
 		(*cit)->releaseThing2();
 	}
 
-	if(attackedCreature){
+	/*if(attackedCreature){
 		attackedCreature->releaseThing2();
 		attackedCreature = NULL;
-	}
+	}*/
+
+	attackedCreature2 = 0;
 
 	//std::cout << "Creature destructor " << this->getID() << std::endl;
 	summons.clear();
@@ -110,10 +113,16 @@ void Creature::drainMana(int damage)
 
 Creature* Creature::getAttackedCreature()
 {
+	if(attackedCreature2 != 0){
+		return g_game.getCreatureByID(attackedCreature2);
+	}
+
+	/*
 	if(attackedCreature && !attackedCreature->isRemoved())
 		return attackedCreature;
 	else
 		return NULL;
+	*/
 }
 
 void Creature::setAttackedCreature(const Creature* creature)
@@ -123,6 +132,14 @@ void Creature::setAttackedCreature(const Creature* creature)
 		(*cit)->setAttackedCreature(creature);
 	}
 	
+	if(creature){
+		attackedCreature2 = creature->getID();
+	}
+	else{
+		attackedCreature2 = 0;
+	}
+
+	/*
 	if(creature){
 		if(attackedCreature != creature){
 			if(attackedCreature)
@@ -138,6 +155,7 @@ void Creature::setAttackedCreature(const Creature* creature)
 			attackedCreature = NULL;
 		}
 	}
+	*/
 }
 
 void Creature::setMaster(Creature* creature)

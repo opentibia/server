@@ -229,8 +229,8 @@ public:
 	int level;		// level
 	long inFightTicks, exhaustedTicks;
 	bool pzLocked;
-	//unsigned long attackedCreature;
-	Creature* attackedCreature;
+	unsigned long attackedCreature2;
+	//Creature* attackedCreature;
 	int lookhead, lookbody, looklegs, lookfeet, looktype, lookcorpse, lookmaster;
 	long manaShieldTicks, hasteTicks, paralyzeTicks;
 	Position masterPos;

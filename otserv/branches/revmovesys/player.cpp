@@ -1412,10 +1412,7 @@ void Player::onCreatureAppear(const Creature* creature, bool isLogin)
 
 void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout)
 {
-	if(attackedCreature == creature){
-		//attackedCreature->releaseThing2();
-		//attackedCreature = NULL;
-
+	if(attackedCreature2 == creature->getID()){
 		setAttackedCreature(NULL);
 
 		sendTextMessage(MSG_SMALLINFO, "Target lost.");
@@ -1446,14 +1443,11 @@ void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bo
 
 void Player::onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport)
 {
-	if((creature == this && attackedCreature) || attackedCreature == creature){
-		if((std::abs(getPosition().x - attackedCreature->getPosition().x) > 7) ||
-		(std::abs(getPosition().y - attackedCreature->getPosition().y) > 5) || (getPosition().z != attackedCreature->getPosition().z)){
+	Creature* targetCreature = getAttackedCreature();
+	if((creature == this && targetCreature) || targetCreature == creature){
+		if((std::abs(getPosition().x - targetCreature->getPosition().x) > 7) ||
+		(std::abs(getPosition().y - targetCreature->getPosition().y) > 5) || (getPosition().z != targetCreature->getPosition().z)){
 			setAttackedCreature(NULL);
-
-			//attackedCreature->releaseThing2();
-			//attackedCreature = NULL;
-
 			sendTextMessage(MSG_SMALLINFO, "Target lost.");
 			sendCancelAttacking();
 		} 

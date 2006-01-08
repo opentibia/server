@@ -2161,38 +2161,25 @@ void Game::checkCreatureAttacking(unsigned long creatureid, unsigned long time)
 
 	Creature* creature = getCreatureByID(creatureid);
 	if(creature){
-		
-		/*sfsdfsdf
-		if attackedCreature is removed, let the creature release the attackedCreature to release the memory
-		sdfsf
-		fdgdfg*/
+		Creature* attackedCreature = creature->getAttackedCreature();
 
-		if(creature->attackedCreature){
-			if(!creature->attackedCreature->isRemoved()){
-				//TEST creature->eventCheckAttacking = 0;
-				if(Monster* monster = creature->getMonster()){
-					monster->onAttack();
-				}
-				else{
-					Tile* tile = creature->getTile();
-					if(!creature->attackedCreature->isAttackable() == 0 && tile->isPz() && creature->access == 0){
-						if(Player* player = creature->getPlayer()){
-							player->sendTextMessage(MSG_SMALLINFO, "You may not attack a person in a protection zone.");
-							playerSetAttackedCreature(player, 0);
-							return;
-						}
-					}
-					else{
-						creatureMakeDamage(creature, creature->attackedCreature, creature->getFightType());
-					}
-				}
+		if(attackedCreature){
+			//TEST creature->eventCheckAttacking = 0;
+			if(Monster* monster = creature->getMonster()){
+				monster->onAttack();
 			}
 			else{
-				if(Player* player = creature->getPlayer()){
-					playerSetAttackedCreature(player, 0);
+				Tile* tile = creature->getTile();
+				if(!attackedCreature->isAttackable() == 0 && tile->isPz() && creature->access == 0){
+					if(Player* player = creature->getPlayer()){
+						player->sendTextMessage(MSG_SMALLINFO, "You may not attack a person in a protection zone.");
+						playerSetAttackedCreature(player, 0);
+						return;
+					}
 				}
-				else
-					creature->setAttackedCreature(NULL);
+				else{
+					creatureMakeDamage(creature, attackedCreature, creature->getFightType());
+				}
 			}
 
 			flushSendBuffers();
@@ -2738,7 +2725,7 @@ bool Game::playerSetAttackedCreature(Player* player, unsigned long creatureid)
 	if(player->isRemoved())
 		return false;
 
-	if(player->attackedCreature && creatureid == 0){
+	if(player->attackedCreature2 != 0 && creatureid == 0){
 		player->setAttackedCreature(NULL);
 		player->sendCancelAttacking();
 	}

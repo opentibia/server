@@ -213,8 +213,8 @@ Creature* Monster::findTarget(long range, bool &canReach, const Creature *ignore
 
 int Monster::onThink(int& newThinkTicks)
 {
-	if(attackedCreature && attackedCreature->isRemoved())
-		setAttackedCreature(NULL);
+	//if(attackedCreature && attackedCreature->isRemoved())
+	//	setAttackedCreature(NULL);
 
 	bool yelled = false;
 	for(YellingSentences::iterator ysIt = mType->yellingSentences.begin(); ysIt != mType->yellingSentences.end(); ++ysIt) {
@@ -1072,10 +1072,14 @@ void Monster::stopThink()
 	}
 
 	setUpdateMovePos();
-	if(attackedCreature){
+
+	/*if(attackedCreature){
 		attackedCreature->releaseThing2();
 		attackedCreature = NULL;
 	}
+	*/
+
+	attackedCreature2 = 0;
 
 	targetPos.x = 0;
 	targetPos.y = 0;
@@ -1247,9 +1251,10 @@ bool Monster::doAttacks(Creature* target, monstermode_t mode /*= MODE_NORMAL*/)
 
 void Monster::onAttack()
 {
-	if(attackedCreature && attackedCreature->isRemoved())
-		setAttackedCreature(NULL);
-	else if(getAttackedCreature() && !(isSummon() && hasLostMaster)) {
+	//if(attackedCreature && attackedCreature->isRemoved())
+	//	setAttackedCreature(NULL);
+
+	if(getAttackedCreature() && !(isSummon() && hasLostMaster)) {
 		isYielding = false;
 		//this->eventCheckAttacking = game->addEvent(makeTask(500, std::bind2nd(std::mem_fun(&Game::checkCreatureAttacking), getID())));
 
