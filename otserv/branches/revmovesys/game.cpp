@@ -845,6 +845,8 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 
 	getSpectators(Range(cylinder->getPosition(), true), list);
 
+	cylinder->__removeThing(creature, 0);
+
 	//send to client
 	Player* player = NULL;
 	for(it = list.begin(); it != list.end(); ++it){
@@ -861,9 +863,7 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 		(*it)->onCreatureDisappear(creature, index, isLogout);
 	}
 	
-	cylinder->__removeThing(creature, 0);
 	creature->getParent()->postRemoveNotification(creature);
-
 	listCreature.removeList(creature->getID());
 	creature->removeList();
 	
