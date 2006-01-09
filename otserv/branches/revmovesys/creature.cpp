@@ -117,6 +117,8 @@ Creature* Creature::getAttackedCreature()
 		return g_game.getCreatureByID(attackedCreature2);
 	}
 
+	return NULL;
+
 	/*
 	if(attackedCreature && !attackedCreature->isRemoved())
 		return attackedCreature;
