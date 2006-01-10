@@ -917,7 +917,7 @@ void Player::addSkillTryInternal(int skilltry,int skill)
 	//int reqTries = (int) ( SkillBases[skill] * pow((float) VocMultipliers[skill][voc], (float) ( skills[skill][SKILL_LEVEL] - 10) ) );			 
 #if __DEBUG__
 	//for debug
-	cout << Creature::getName() << ", has the vocation: " << (int)vocation << " and is training his " << getSkillName(skill) << "(" << skill << "). Tries: " << skills[skill][SKILL_TRIES] << "(" << getReqSkillTries(skill, (skills[skill][SKILL_LEVEL] + 1), vocation) << ")" << std::endl;
+	cout << getName() << ", has the vocation: " << (int)vocation << " and is training his " << getSkillName(skill) << "(" << skill << "). Tries: " << skills[skill][SKILL_TRIES] << "(" << getReqSkillTries(skill, (skills[skill][SKILL_LEVEL] + 1), vocation) << ")" << std::endl;
 	cout << "Current skill: " << skills[skill][SKILL_LEVEL] << std::endl;
 #endif			 
 	//Need skill up?
@@ -981,7 +981,7 @@ int32_t Player::getContainerID(const Container* container) const
 void Player::addContainer(uint32_t cid, Container* container)
 {
 #ifdef __DEBUG__
-	cout << Creature::getName() << ", addContainer: " << (int)cid << std::endl;
+	cout << getName() << ", addContainer: " << (int)cid << std::endl;
 #endif
 	if(cid > 0xF)
 		return;
@@ -1011,7 +1011,7 @@ void Player::closeContainer(uint32_t cid)
 	}
 
 #ifdef __DEBUG__
-	cout << Creature::getName() << ", closeContainer: " << (int)cid << std::endl;
+	cout << getName() << ", closeContainer: " << (int)cid << std::endl;
 #endif
 }
 

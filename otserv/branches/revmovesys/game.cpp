@@ -801,9 +801,6 @@ bool Game::placeCreature(const Position &pos, Creature* creature, bool isLogin /
 
 			//event method
 			for(it = list.begin(); it != list.end(); ++it) {
-				if((*it)->isRemoved())
-					continue;
-
 				(*it)->onCreatureAppear(creature, isLogin);
 			}
 
@@ -871,9 +868,6 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 
 	//event method
 	for(it = list.begin(); it != list.end(); ++it){
-		if((*it)->isRemoved())
-			continue;
-
 		(*it)->onCreatureDisappear(creature, index, isLogout);
 	}
 
@@ -2190,8 +2184,8 @@ void Game::checkCreatureAttacking(unsigned long creatureid, unsigned long time)
 		Creature* attackedCreature = creature->getAttackedCreature();
 
 		if(attackedCreature){
-			//TEST creature->eventCheckAttacking = 0;
 			if(Monster* monster = creature->getMonster()){
+				monster->eventCheckAttacking = 0;
 				monster->onAttack();
 			}
 			else{
@@ -2206,12 +2200,12 @@ void Game::checkCreatureAttacking(unsigned long creatureid, unsigned long time)
 				else{
 					creatureMakeDamage(creature, attackedCreature, creature->getFightType());
 				}
+
+				creature->eventCheckAttacking = addEvent(makeTask(time, boost::bind(&Game::checkCreatureAttacking, this, creature->getID(), time)));
 			}
 
 			flushSendBuffers();
 		}
-
-		creature->eventCheckAttacking = addEvent(makeTask(time, boost::bind(&Game::checkCreatureAttacking, this, creature->getID(), time)));
 	}
 }
 
@@ -2229,9 +2223,6 @@ bool Game::playerWhisper(Player* player, const std::string& text)
 	
 	//event method
 	for(it = list.begin(); it != list.end(); ++it) {
-		if((*it)->isRemoved())
-			continue;
-
 		if(std::abs(player->getPosition().x - (*it)->getPosition().x) > 1 ||
 			std::abs(player->getPosition().y - (*it)->getPosition().y) > 1)
 			(*it)->onCreatureSay(player, SPEAK_WHISPER, std::string("pspsps"));
@@ -2765,6 +2756,7 @@ bool Game::playerSetAttackedCreature(Player* player, unsigned long creatureid)
 
 		player->sendTextMessage(MSG_SMALLINFO, "You may not attack this player.");
 		player->sendCancelAttacking();
+
 		//TEST stopEvent(player->eventCheckAttacking);
 		//TEST player->eventCheckAttacking = 0;
 	}
@@ -2860,9 +2852,6 @@ bool Game::internalCreatureTurn(Creature* creature, Direction dir)
 		
 		//event method
 		for(it = list.begin(); it != list.end(); ++it) {
-			if((*it)->isRemoved())
-				continue;
-
 			(*it)->onCreatureTurn(creature, stackpos);
 		}
 
@@ -2910,9 +2899,6 @@ bool Game::internalCreatureChangeOutfit(Creature* creature)
 
 	//event method
 	for(it = list.begin(); it != list.end(); ++it) {
-		if((*it)->isRemoved())
-			continue;
-
 		(*it)->onCreatureChangeOutfit(creature);
 	}
 
@@ -2941,8 +2927,10 @@ void Game::checkPlayerWalk(unsigned long id)
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::checkPlayerWalk");
 
 	Player* player = getPlayerByID(id);
-	if(!player)
+	if(!player){
+		player->eventAutoWalk = 0;
 		return;
+	}
 
 	Position pos = player->getPosition();
 	Direction dir = player->pathlist.front();

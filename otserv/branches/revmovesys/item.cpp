@@ -525,12 +525,12 @@ std::string Item::getDescription(int32_t lookDistance) const
 				double weight = getWeight();
 				if(weight > 0)
 					s << std::endl << "It weighs " << std::fixed << std::setprecision(1) << weight << " oz.";
-				
-				if(specialDescription)
-					s << std::endl << specialDescription->c_str();
-				else if(it.description.length()){
-					s << std::endl << it.description;
-				}
+			}
+
+			if(specialDescription)
+				s << std::endl << specialDescription->c_str();
+			else if(lookDistance <= 1 && it.description.length()){
+				s << std::endl << it.description;
 			}
 		}
 	}

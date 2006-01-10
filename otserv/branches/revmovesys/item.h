@@ -69,7 +69,7 @@ public:
 	static Items items;
 	
 	virtual bool isPushable() const {return !isNotMoveable();};
-	virtual int getThrowRange() const {return (isPickupable() ? 15 : 1);};
+	virtual int getThrowRange() const {return (isPickupable() ? 15 : 2);};
 
 	virtual std::string getDescription(int32_t lookDistance) const;
 

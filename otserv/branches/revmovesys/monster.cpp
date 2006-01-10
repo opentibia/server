@@ -995,11 +995,11 @@ void Monster::startThink()
 		eventCheck = game->addEvent(makeTask(500, std::bind2nd(std::mem_fun(&Game::checkCreature), getID())));
 	}
 
-	//TEST if(attackedCreature != NULL && !(isSummon() && hasLostMaster)) {
-	//TEST 	if(!eventCheckAttacking){
-	//TEST 		eventCheckAttacking = game->addEvent(makeTask(500, std::bind2nd(std::mem_fun(&Game::checkCreatureAttacking), getID())));
-	//TEST 	}
-	//TEST }
+	if(attackedCreature2 != 0 && !(isSummon() && hasLostMaster)) {
+		if(!eventCheckAttacking){
+			eventCheckAttacking = game->addEvent(makeTask(500, boost::bind(&Game::checkCreatureAttacking, game, getID(), 500)));
+		}
+	}
 }
 
 void Monster::stopThink()
@@ -1035,8 +1035,8 @@ void Monster::stopThink()
 		eventCheck = 0;
 	}
 
-	//TEST game->stopEvent(eventCheckAttacking);
-	//TEST eventCheckAttacking = 0;
+	game->stopEvent(eventCheckAttacking);
+	eventCheckAttacking = 0;
 }
 
 void Monster::setMaster(Creature* creature)

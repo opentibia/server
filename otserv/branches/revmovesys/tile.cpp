@@ -428,9 +428,6 @@ void Tile::moveCreature(Creature* creature, Cylinder* toCylinder, bool teleport 
 
 	//event method
 	for(it = list.begin(); it != list.end(); ++it) {
-		if((*it)->isRemoved())
-			continue;
-
 		(*it)->onCreatureMove(creature, fromPos, oldStackPos, teleport);
 	}
 
