@@ -635,7 +635,7 @@ void Tile::__addThing(int32_t index, Thing* thing)
 	else{
 		Item* item = thing->getItem();
 		if(item == NULL){
-#ifdef __DEBUG__
+#ifdef __DEBUG__MOVESYS__
 			std::cout << "Failure: [Tile::__addThing] item == NULL" << std::endl;
 #endif
 			return /*RET_NOTPOSSIBLE*/;
@@ -744,7 +744,7 @@ void Tile::__updateThing(Thing* thing, uint32_t count)
 {
 	int32_t index = __getIndexOfThing(thing);
 	if(index == -1){
-#ifdef __DEBUG__
+#ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Tile::__updateThing] index == -1" << std::endl;
 #endif
 		return /*RET_NOTPOSSIBLE*/;
@@ -752,7 +752,7 @@ void Tile::__updateThing(Thing* thing, uint32_t count)
 
 	Item* item = thing->getItem();
 	if(item == NULL){
-#ifdef __DEBUG__
+#ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Tile::__updateThing] item == NULL" << std::endl;
 #endif
 		return /*RET_NOTPOSSIBLE*/;
@@ -781,7 +781,7 @@ void Tile::__updateThing(uint32_t index, Thing* thing)
 
 	Item* item = thing->getItem();
 	if(item == NULL){
-#ifdef __DEBUG__
+#ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Tile::__updateThing] item == NULL" << std::endl;
 #endif
 		return /*RET_NOTPOSSIBLE*/;
@@ -811,7 +811,7 @@ void Tile::__updateThing(uint32_t index, Thing* thing)
 	pos -= (uint32_t)topItems.size();
 
 	if(pos >= 0 && pos < creatures.size()){
-#ifdef __DEBUG__
+#ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Tile::__updateThing] Update object is a creature" << std::endl;
 #endif
 		return /*RET_NOTPOSSIBLE*/;
@@ -849,7 +849,7 @@ void Tile::__updateThing(uint32_t index, Thing* thing)
 		return /*RET_NOERROR*/;
 	}
 
-#ifdef __DEBUG__
+#ifdef __DEBUG__MOVESYS__
 	std::cout << "Failure: [Tile::__updateThing] Update object not found" << std::endl;
 #endif
 }
@@ -861,18 +861,19 @@ void Tile::__removeThing(Thing* thing, uint32_t count)
 		CreatureVector::iterator it = std::find(creatures.begin(), creatures.end(), thing);
 
 		if(it == creatures.end()){
-#ifdef __DEBUG__
+#ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Tile::__removeThing] creature not found" << std::endl;
 #endif
 		return; //RET_NOTPOSSIBLE;
 		}
 
 		creatures.erase(it);
+		return;
 	}
 	else{
 		Item* item = thing->getItem();
 		if(item == NULL){
-#ifdef __DEBUG__
+#ifdef __DEBUG__MOVESYS__
 			std::cout << "Failure: [Tile::__removeThing] item == NULL" << std::endl;
 #endif
 			return /*RET_NOTPOSSIBLE*/;
@@ -880,25 +881,14 @@ void Tile::__removeThing(Thing* thing, uint32_t count)
 
 		uint32_t index = __getIndexOfThing(item);
 		if(index == -1){
-#ifdef __DEBUG__
+#ifdef __DEBUG__MOVESYS__
 			std::cout << "Failure: [Tile::__removeThing] index == -1" << std::endl;
 #endif
 			return /*RET_NOTPOSSIBLE*/;
 		}
 
-		/*const Position& cylinderMapPos = getPosition();
-
-		SpectatorVec list;
-		SpectatorVec::iterator it;
-		g_game.getSpectators(Range(cylinderMapPos, true), list);*/
-
 		if(item == ground){
-			/*//send to client
-			for(it = list.begin(); it != list.end(); ++it) {
-				(*it)->onRemoveTileItem(cylinderMapPos, index, item);
-			}
-			*/
-
+			
 			onRemoveTileItem(index, item);
 
 			ground->setParent(NULL);
@@ -910,11 +900,6 @@ void Tile::__removeThing(Thing* thing, uint32_t count)
 		if(item->isAlwaysOnTop()){
 			for(iit = topItems.begin(); iit != topItems.end(); ++iit){
 				if(*iit == item){
-					/*//send to client
-					for(it = list.begin(); it != list.end(); ++it) {
-						(*it)->onRemoveTileItem(cylinderMapPos, index, item);
-					}
-					*/
 
 					onRemoveTileItem(index, item);
 
@@ -925,27 +910,16 @@ void Tile::__removeThing(Thing* thing, uint32_t count)
 			}
 		}
 		else{
-			for (iit = downItems.begin(); iit != downItems.end(); ++iit)
+			for (iit = downItems.begin(); iit != downItems.end(); ++iit){
 				if(*iit == item){
 					if(item->isStackable() && count != item->getItemCount()){							
 						int newCount = std::max(0, (int)(item->getItemCount() - count));
 						item->setItemCount(newCount);
 
-						/*//send to client
-						for(it = list.begin(); it != list.end(); ++it) {
-							(*it)->onUpdateTileItem(cylinderMapPos, index, item, item);
-						}
-						*/
-
 						onUpdateTileItem(index, item, item);
 					}
 					else {
-						/*//send to client
-						for(it = list.begin(); it != list.end(); ++it) {
-							(*it)->onRemoveTileItem(cylinderMapPos, index, item);
-						}
-						*/
-
+						
 						onRemoveTileItem(index, item);
 
 						(*iit)->setParent(NULL);
@@ -954,8 +928,12 @@ void Tile::__removeThing(Thing* thing, uint32_t count)
 
 					return /*RET_NOERROR*/;
 				}
+			}
 		}
 	}
+#ifdef __DEBUG__MOVESYS__
+	std::cout << "Failure: [Tile::__removeThing] thing not found" << std::endl;
+#endif
 }
 
 int32_t Tile::__getIndexOfThing(const Thing* thing) const

@@ -2207,25 +2207,26 @@ void Player::__addThing(Thing* thing)
 void Player::__addThing(int32_t index, Thing* thing)
 {
 	if(index < 0 || index > 11){
-#ifdef __DEBUG__
+#ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Player::__addThing] index < 0 || index > 11" << std::endl;
 #endif
 		return /*RET_NOTPOSSIBLE*/;
 	}
 
 	if(index == 0){
-#ifdef __DEBUG__
+#ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Player::__addThing] index == 0" << std::endl;
 #endif
 		return /*RET_NOTENOUGHROOM*/;
 	}
 
 	Item* item = thing->getItem();
-	if(item == NULL)
-#ifdef __DEBUG__
+	if(item == NULL){
+#ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Player::__addThing] item == NULL" << std::endl;
 #endif
 		return /*RET_NOTPOSSIBLE*/;
+	}
 
 	item->setParent(this);
 	items[index] = item;
@@ -2238,7 +2239,7 @@ void Player::__updateThing(Thing* thing, uint32_t count)
 {
 	int32_t index = __getIndexOfThing(thing);
 	if(index == -1){
-#ifdef __DEBUG__
+#ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Player::__updateThing] index == -1" << std::endl;
 #endif
 		return /*RET_NOTPOSSIBLE*/;
@@ -2246,7 +2247,7 @@ void Player::__updateThing(Thing* thing, uint32_t count)
 
 	Item* item = thing->getItem();
 	if(item == NULL){
-#ifdef __DEBUG__
+#ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Player::__updateThing] item == NULL" << std::endl;
 #endif
 		return /*RET_NOTPOSSIBLE*/;
@@ -2260,7 +2261,7 @@ void Player::__updateThing(Thing* thing, uint32_t count)
 void Player::__updateThing(uint32_t index, Thing* thing)
 {
 	if(index < 0 || index > 11){
-#ifdef __DEBUG__
+#ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Player::__updateThing] index < 0 || index > 11" << std::endl;
 #endif
 		return /*RET_NOTPOSSIBLE*/;
@@ -2268,7 +2269,7 @@ void Player::__updateThing(uint32_t index, Thing* thing)
 	
 	Item* oldItem = getInventoryItem((slots_t)index);
 	if(!oldItem){
-#ifdef __DEBUG__
+#ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Player::__updateThing] !oldItem" << std::endl;
 #endif
 		return /*RET_NOTPOSSIBLE*/;
@@ -2276,7 +2277,7 @@ void Player::__updateThing(uint32_t index, Thing* thing)
 
 	Item* item = thing->getItem();
 	if(item == NULL){
-#ifdef __DEBUG__
+#ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Player::__updateThing] item == NULL" << std::endl;
 #endif
 		return /*RET_NOTPOSSIBLE*/;
@@ -2293,7 +2294,7 @@ void Player::__removeThing(Thing* thing, uint32_t count)
 {
 	Item* item = thing->getItem();
 	if(item == NULL){
-#ifdef __DEBUG__
+#ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Player::__removeThing] item == NULL" << std::endl;
 #endif
 		return /*RET_NOTPOSSIBLE*/;
@@ -2301,7 +2302,7 @@ void Player::__removeThing(Thing* thing, uint32_t count)
 
 	int32_t index = __getIndexOfThing(thing);
 	if(index == -1){
-#ifdef __DEBUG__
+#ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Player::__removeThing] index == -1" << std::endl;
 #endif
 		return /*RET_NOTPOSSIBLE*/;
@@ -2409,13 +2410,13 @@ void Player::__internalAddThing(Thing* thing)
 
 void Player::__internalAddThing(uint32_t index, Thing* thing)
 {
-#ifdef __DEBUG__
+#ifdef __DEBUG__MOVESYS__NOTICE
 	std::cout << "[Player::__internalAddThing] index: " << index << std::endl;
 #endif
 
 	Item* item = thing->getItem();
 	if(item == NULL){
-#ifdef __DEBUG__
+#ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Player::__internalAddThing] item == NULL" << std::endl;
 #endif
 		return;
@@ -2423,7 +2424,7 @@ void Player::__internalAddThing(uint32_t index, Thing* thing)
 		
 	//index == 0 means we should equip this item at the most appropiate slot
 	if(index == 0){
-#ifdef __DEBUG__
+#ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Player::__internalAddThing] index == 0" << std::endl;
 #endif
 		return;
@@ -2431,7 +2432,7 @@ void Player::__internalAddThing(uint32_t index, Thing* thing)
 
 	if(index > 0 && index < 11){
 		if(items[index]){
-#ifdef __DEBUG__
+#ifdef __DEBUG__MOVESYS__
 			std::cout << "Failure: [Player::__internalAddThing] items[index] is not empty" << std::endl;
 #endif
 			return;
