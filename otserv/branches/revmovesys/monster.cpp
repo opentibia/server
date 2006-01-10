@@ -60,7 +60,6 @@ Creature()
 	this->maglevel = mType->maglevel;
 	curPhysicalAttack = NULL;
 	hasLostMaster = false;
-	isYielding = true;
 	
 	lookhead = mType->lookhead;
 	lookbody = mType->lookbody;
@@ -184,6 +183,9 @@ Creature* Monster::findTarget(long range, bool &canReach, const Creature *ignore
 		if(ignoreCreature == *cit || (*cit)->access > 0)
 			continue;
 
+		if((*cit)->isRemoved())
+			continue;
+
 		if(!isCreatureAttackable(*cit))
 			continue;
 
@@ -238,72 +240,71 @@ int Monster::onThink(int& newThinkTicks)
 		this->lastmove = OTSYS_TIME();
 	}
 	
-	isYielding = false;
 	reThink(false);
 
-	//check/update/calc route
-	if(state != STATE_IDLE && state != STATE_TARGETNOTREACHABLE && !(isSummon() && hasLostMaster))
-	{
-		if(updateMovePos || !game->map->isPathValid(this, route, mType->canPushItems))
+	if(!isRemoved()){
+		//check/update/calc route
+		if(state != STATE_IDLE && state != STATE_TARGETNOTREACHABLE && !(isSummon() && hasLostMaster))
 		{
-			updateMovePos = false;
+			if(updateMovePos || !game->map->isPathValid(this, route, mType->canPushItems))
+			{
+				updateMovePos = false;
 
-			if(calcMovePosition()) {
-				route = game->map->getPathTo(this, getPosition(), moveToPos, true, mType->canPushItems);
+				if(calcMovePosition()) {
+					route = game->map->getPathTo(this, getPosition(), moveToPos, true, mType->canPushItems);
 
-				if(route.empty() && !(state == STATE_IDLESUMMON) && (!mType->hasDistanceAttack || !validateDistanceAttack(targetPos))) {
-					state = STATE_TARGETNOTREACHABLE;
-				}
+					if(route.empty() && !(state == STATE_IDLESUMMON) && (!mType->hasDistanceAttack || !validateDistanceAttack(targetPos))) {
+						state = STATE_TARGETNOTREACHABLE;
+					}
 
-				if(!route.empty() && route.front() == getPosition()) {
-					route.pop_front();
+					if(!route.empty() && route.front() == getPosition()) {
+						route.pop_front();
+					}
 				}
 			}
 		}
-	}
 
-	//process movement
-	if(state != STATE_IDLE && !(state == STATE_IDLESUMMON && hasLostMaster)) {
-		if(state == STATE_TARGETNOTREACHABLE) {
-			Position newMovePos;
-			if(getRandomPosition(targetPos, newMovePos)) {
-				int dx = newMovePos.x - getPosition().x;
-				int dy = newMovePos.y - getPosition().y;
+		//process movement
+		if(state != STATE_IDLE && !(state == STATE_IDLESUMMON && hasLostMaster)) {
+			if(state == STATE_TARGETNOTREACHABLE) {
+				Position newMovePos;
+				if(getRandomPosition(targetPos, newMovePos)) {
+					int dx = newMovePos.x - getPosition().x;
+					int dy = newMovePos.y - getPosition().y;
+
+					doMoveTo(dx, dy);
+				}
+				else {
+					updateLookDirection();
+				}
+			}
+			else if(!route.empty()){
+				Position nextStep = route.front();
+				route.pop_front();
+
+				int dx = nextStep.x - getPosition().x;
+				int dy = nextStep.y - getPosition().y;
 
 				doMoveTo(dx, dy);
 			}
 			else {
 				updateLookDirection();
 			}
+
+			if(!isRemoved())
+				newThinkTicks = getStepDuration();
+			else 
+				newThinkTicks = 0;
+
+			int ret = oldThinkTicks;
+			oldThinkTicks = newThinkTicks;
+			return ret;
 		}
-		else if(!route.empty()){
-			Position nextStep = route.front();
-			route.pop_front();
-
-			int dx = nextStep.x - getPosition().x;
-			int dy = nextStep.y - getPosition().y;
-
-			doMoveTo(dx, dy);
-		}
-		else {
-			updateLookDirection();
-		}
-
-		if(!isRemoved())
-			newThinkTicks = getStepDuration();
-		else 
-			newThinkTicks = 0;
-
-		int ret = oldThinkTicks;
-		oldThinkTicks = newThinkTicks;
-		isYielding = true;
-		return ret;
 	}
 
 	eventCheck = 0;
 	stopThink();
 	newThinkTicks = 0;
-	isYielding = true;
 	return oldThinkTicks;
 }
 
@@ -320,7 +321,7 @@ int Monster::getCurrentDistanceToTarget(const Position& target)
 
 void Monster::updateLookDirection()
 {
-	if(isYielding)
+	if(game->isExecutingEvents)
 		return;
 
 	if(isSummon() && state == STATE_IDLESUMMON) {
@@ -659,44 +660,20 @@ bool Monster::isInRange(const Position &p)
 
 void Monster::onAddTileItem(const Position& pos, const Item* item)
 {
-	if(isRemoved())
-		return;
-
-	bool oldVal = isYielding;
-	isYielding = true;
-
 	reThink();
 	setUpdateMovePos();
-
-	isYielding = oldVal;
 }
 
 void Monster::onUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* oldItem, const Item* newItem)
 {
-	if(isRemoved())
-		return;
-
-	bool oldVal = isYielding;
-	isYielding = true;
-
 	if(oldItem->isBlocking() && !newItem->isBlocking()){
 		reThink();
 	}
-
-	isYielding = oldVal;
 }
 
 void Monster::onRemoveTileItem(const Position& pos, uint32_t stackpos, const Item* item)
 {
-	if(isRemoved())
-		return;
-
-	bool oldVal = isYielding;
-	isYielding = true;
-
 	reThink();
-
-	isYielding = oldVal;
 }
 
 void Monster::onUpdateTile(const Position& pos)
@@ -706,76 +683,34 @@ void Monster::onUpdateTile(const Position& pos)
 
 void Monster::onCreatureAppear(const Creature* creature, bool isLogin)
 {
-	if(isRemoved())
-		return;
-
 	if(creature == this){
 		return;
 	}
-
-	bool oldVal = isYielding;
-	isYielding = true;
 
 	if(isInRange(creature->getPosition())){
 		bool canReach = isCreatureReachable(creature);
 		creatureEnter(creature, canReach);
 	}
-
-	isYielding = oldVal;
 }
 
 void Monster::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout)
 {
-	if(isRemoved())
-		return;
-
-	bool oldVal = isYielding;
-	isYielding = true;
-
 	if(creature == this){
 		stopThink();
 	}
 	else{
-		//if(!isYielding)
-			creatureLeave(creature);
+		creatureLeave(creature);
 	}
-	
-	isYielding = oldVal;
 }
 
 void Monster::onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport)
 {
-	if(isRemoved())
-		return;
-
-	bool oldVal = isYielding;
-	isYielding = true;
-
 	if(creature != this) {
 		creatureMove(creature, oldPos);
 	}
 	else
 		reThink();
-
-	isYielding = false;
 }
-
-/*
-void Monster::onTeleport(const Creature* creature, const Position& oldPos, uint32_t oldStackPos)
-{
-	if(creature == this) {
-		//Creature* attackedCreature = game->getCreatureByID(this->attackedCreature);
-		if(!attackedCreature || !isCreatureReachable(attackedCreature)) {
-			state = STATE_TARGETNOTREACHABLE;
-		}
-
-		reThink();
-	}
-	else {
-		creatureMove(creature, oldPos);
-	}
-}
-*/
 
 void Monster::creatureMove(const Creature* creature, const Position& oldPos)
 {
@@ -990,20 +925,30 @@ void Monster::reThink(bool updateOnlyState /* = true*/)
 
 		if(state == STATE_ATTACKING) {
 			//summons
-			if(summons.size() < mType->maxSummons) {
-				SummonSpells::const_iterator it;
-				for(it = mType->summonSpells.begin(); it != mType->summonSpells.end(); ++it) {
-					if(getRandom() < (*it).summonChance) {
-						//new Monster((*it).name, game);
-						Monster *summon = createMonster((*it).name, game);
-						if(summon){
-							Position summonPos = getPosition();
+			if(!game->isExecutingEvents){
+				if(summons.size() < mType->maxSummons) {
+					SummonSpells::const_iterator it;
+					for(it = mType->summonSpells.begin(); it != mType->summonSpells.end(); ++it) {
+						if(getRandom() < (*it).summonChance) {
+							//new Monster((*it).name, game);
+							Monster *summon = createMonster((*it).name, game);
+							if(summon){
+								Position summonPos = getPosition();
 
-							if(!game->placeCreature(summonPos, summon)){
-								delete summon;
-							}
-							else{
-								addSummon(summon);
+								if(!game->placeCreature(summonPos, summon)){
+									delete summon;
+								}
+								else{
+									addSummon(summon);
+								}
+
+								//HACK, place a summon here can make us removed from the map.. no idea how
+								//monster class need to be redone from the beginning...
+								if(isRemoved()){
+									return;
+								}
+								//HACK, place a summon here can make us removed from the map.. no idea how
+								//monster class need to be redone from the beginning...
 							}
 						}
 					}
@@ -1163,7 +1108,7 @@ void Monster::dropLoot(Container *corpse)
 
 bool Monster::doAttacks(Creature* target, monstermode_t mode /*= MODE_NORMAL*/)
 {
-	if(isYielding)
+	if(game->isExecutingEvents)
 		return false;
 
 	int modeProb = 0;
@@ -1251,11 +1196,7 @@ bool Monster::doAttacks(Creature* target, monstermode_t mode /*= MODE_NORMAL*/)
 
 void Monster::onAttack()
 {
-	//if(attackedCreature && attackedCreature->isRemoved())
-	//	setAttackedCreature(NULL);
-
 	if(getAttackedCreature() && !(isSummon() && hasLostMaster)) {
-		isYielding = false;
 		//this->eventCheckAttacking = game->addEvent(makeTask(500, std::bind2nd(std::mem_fun(&Game::checkCreatureAttacking), getID())));
 
 		exhaustedTicks -= 500;
@@ -1270,8 +1211,6 @@ void Monster::onAttack()
 		}
 		else
 			setAttackedCreature(NULL);
-
-		isYielding = true;
 	}
 }
 

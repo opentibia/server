@@ -315,6 +315,7 @@ public:
 
 	/** Lockvar for Game. */
 	OTSYS_THREAD_LOCKVAR gameLock;   
+	bool isExecutingEvents;
 
 protected:
 	std::vector<Player*> BufferedPlayers;

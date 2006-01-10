@@ -244,8 +244,15 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 
 		//Remove player?
 		if(attackedCreature->health <= 0){
-			int32_t stackpos = tile->__getIndexOfThing(attackedCreature);		
+			if(attackedCreature && attackedCreature->getMaster() != NULL) {
+				attackedCreature->getMaster()->removeSummon(attackedCreature);
+			}
 			
+			removedList.push_back(attackedCreature);
+			//remove creature
+			game->removeCreature(attackedCreature, false);
+			attackedCreature->setParent(attackTile);
+
 			//Add blood?
 			if(drawBlood || attackedPlayer){
 				Item* splash = Item::CreateItem(2016, FLUID_BLOOD);
@@ -340,15 +347,6 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 			if(player){
 				player->sendStats();
 			}
-			
-			if(attackedCreature && attackedCreature->getMaster() != NULL) {
-				attackedCreature->getMaster()->removeSummon(attackedCreature);
-			}
-
-			removedList.push_back(attackedCreature);
-			//remove creature
-			game->removeCreature(attackedCreature, false);
-			attackedCreature->setParent(attackTile);
 		}
 		//Add blood?
 		else if(drawBlood && damage > 0){
@@ -362,6 +360,7 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 Game::Game()
 {
 	eventIdCount = 1000;
+	isExecutingEvents = false;
 	this->game_state = GAME_STATE_NORMAL;
 	this->map = NULL;
 	this->worldType = WORLD_TYPE_PVP;
@@ -768,6 +767,10 @@ bool Game::placeCreature(const Position &pos, Creature* creature, bool isLogin /
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::placeCreature()");
 
+	/*if(isExecutingEvents){
+		return false;
+	}*/
+
 	bool success = false;
 	Player* player = creature->getPlayer();
 
@@ -794,6 +797,8 @@ bool Game::placeCreature(const Position &pos, Creature* creature, bool isLogin /
 				}
 			}
 			
+			this->isExecutingEvents = true;
+
 			//event method
 			for(it = list.begin(); it != list.end(); ++it) {
 				if((*it)->isRemoved())
@@ -803,7 +808,9 @@ bool Game::placeCreature(const Position &pos, Creature* creature, bool isLogin /
 			}
 
 			creature->getParent()->postAddNotification(creature);
-			
+
+			this->isExecutingEvents = false;
+
 			if(player){
 				#ifdef __DEBUG_PLAYERS__
 				std::cout << (uint32_t)getPlayersOnline() << " players online." << std::endl;
@@ -831,11 +838,16 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 	if(creature->isRemoved())
 		return false;
 
+	/*if(isExecutingEvents){
+		return false;
+	}*/
+
 #ifdef __DEBUG__
 	std::cout << "removing creature "<< std::endl;
 #endif
 
 	Cylinder* cylinder = creature->getTile();
+
 	//std::cout << "remove: " << creature << " " << creature->getID() << std::endl;
 
 	uint32_t index = cylinder->__getIndexOfThing(creature);
@@ -855,6 +867,8 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 		}
 	}
 
+	this->isExecutingEvents = true;
+
 	//event method
 	for(it = list.begin(); it != list.end(); ++it){
 		if((*it)->isRemoved())
@@ -862,20 +876,22 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 
 		(*it)->onCreatureDisappear(creature, index, isLogout);
 	}
-	
+
 	creature->getParent()->postRemoveNotification(creature);
 	listCreature.removeList(creature->getID());
 	creature->removeList();
-	
-	for(std::list<Creature*>::iterator cit = creature->summons.begin(); cit != creature->summons.end(); ++cit){
-		removeCreature(*cit);
-	}
 
 	stopEvent(creature->eventCheck);
 	stopEvent(creature->eventCheckAttacking);
 
 	FreeThing(creature);
 	creature->setParent(NULL);
+
+	this->isExecutingEvents = false;
+
+	for(std::list<Creature*>::iterator cit = creature->summons.begin(); cit != creature->summons.end(); ++cit){
+		removeCreature(*cit);
+	}
 
 	return true;
 }
@@ -938,7 +954,7 @@ void Game::moveCreature(Player* player, Cylinder* fromCylinder, Cylinder* toCyli
 	else if(toCylinder != toCylinder->getTile()){
 		ret = RET_NOTPOSSIBLE;
 	}
-	else if(!moveCreature->isPushable() && player->access < moveCreature->access){
+	else if(!moveCreature->isPushable() && player->access == 0){
 		ret = RET_NOTMOVEABLE;
 	}
 	else if(player->getPosition().z != fromCylinder->getPosition().z){
@@ -958,7 +974,7 @@ void Game::moveCreature(Player* player, Cylinder* fromCylinder, Cylinder* toCyli
 				(std::abs(moveCreature->getPosition().z - toPos.z) * 4 > moveCreature->getThrowRange()) ) {
 			ret = RET_DESTINATIONOUTOFREACH;
 		}
-		else if(player != moveCreature && (player->access == 0 || player->access < moveCreature->access)){
+		else if(player != moveCreature && player->access == 0){
 			if(toCylinder->getTile()->hasProperty(BLOCKPATHFIND))
 				ret = RET_NOTENOUGHROOM;
 			if(fromCylinder->getTile()->hasProperty(PROTECTIONZONE) &&
@@ -1603,9 +1619,14 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::creatureMakeMagic()");
 	
-#ifdef __DEBUG__
-	cout << "creatureMakeMagic: " << (creature ? creature->getName() : "No name") << ", x: " << centerpos.x << ", y: " << centerpos.y << ", z: " << centerpos.z << std::endl;
-#endif
+	if(this->isExecutingEvents){
+		this->isExecutingEvents = true;
+		return false;
+	}
+
+	//#ifdef __DEBUG__
+//	cout << "creatureMakeMagic: " << (creature ? creature->getName() : "No name") << ", x: " << centerpos.x << ", y: " << centerpos.y << ", z: " << centerpos.z << std::endl;
+//#endif
 
 	Position frompos;
 
@@ -1659,10 +1680,10 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
     return false;
 	}
 
-#ifdef __DEBUG__	
-	printf("top left %d %d %d\n", topLeft.x, topLeft.y, topLeft.z);
-	printf("bottom right %d %d %d\n", bottomRight.x, bottomRight.y, bottomRight.z);
-#endif
+//#ifdef __DEBUG__	
+//	printf("top left %d %d %d\n", topLeft.x, topLeft.y, topLeft.z);
+//	printf("bottom right %d %d %d\n", bottomRight.x, bottomRight.y, bottomRight.z);
+//#endif
 
 	//We do all changes against a GameState to keep track of the changes,
 	//need some more work to work for all situations...
@@ -1907,6 +1928,11 @@ bool Game::creatureOnPrepareMagicAttack(Creature *creature, Position pos, const 
 }
 void Game::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fight_t damagetype)
 {
+	if(this->isExecutingEvents){
+		this->isExecutingEvents = true;
+		return;
+	}
+
 	if(!creatureOnPrepareAttack(creature, attackedCreature->getPosition()))
 		return;
 	
