@@ -180,8 +180,46 @@ void Map::setTile(unsigned short _x, unsigned short _y, unsigned char _z, unsign
   } 
 }
 
-bool Map::placeCreature(const Position &pos, Creature* creature)
+bool Map::placeCreature(const Position& pos, Creature* creature)
 {
+	Tile* tile = getTile(pos.x, pos.y, pos.z);
+
+	if(tile && !tile->hasProperty(BLOCKPATHFIND)){
+		ReturnValue ret = tile->__queryAdd(0, creature, 0);
+
+		if(ret == RET_NOERROR){
+			tile->__internalAddThing(creature);
+			return true;
+		}
+		else if(tile->hasFlag(TILESTATE_HOUSE) && ret == RET_PLAYERISNOTINVITED){
+			int32_t index = 0;
+			Item* toItem = NULL;
+			Cylinder* cylinder = tile->__queryDestination(index, creature, &toItem);
+			cylinder->__internalAddThing(creature);
+			return true;
+		}
+	}
+
+	for(int cx = pos.x - 1; cx <= pos.x + 1; cx++){
+		for(int cy = pos.y - 1; cy <= pos.y + 1; cy++){
+			tile = getTile(cx, cy, pos.z);
+
+			//isSuccess= (tile && !tile->getTeleportItem() && !tile->floorChange() && tile->__queryAdd(0, creature, 0) == RET_NOERROR);
+
+			if(tile && !tile->hasProperty(BLOCKPATHFIND) && tile->__queryAdd(0, creature, 0) == RET_NOERROR){
+				tile->__internalAddThing(creature);
+				return true;
+			}
+		}
+	}
+
+#ifdef __DEBUG__
+	std::cout << "Failed to place creature onto map!" << std::endl;
+#endif
+
+	return false;
+
+	/*
 	Tile* tile = getTile(pos.x, pos.y, pos.z);
 
 	bool success = (tile && !tile->getTeleportItem() && !tile->floorChange() && tile->__queryAdd(0, creature, 0) == RET_NOERROR);
@@ -207,6 +245,7 @@ bool Map::placeCreature(const Position &pos, Creature* creature)
 #endif
 
 	return false;
+	*/
 }
 
 bool Map::removeCreature(Creature* creature)

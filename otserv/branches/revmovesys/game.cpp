@@ -247,11 +247,6 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 			if(attackedCreature && attackedCreature->getMaster() != NULL) {
 				attackedCreature->getMaster()->removeSummon(attackedCreature);
 			}
-			
-			removedList.push_back(attackedCreature);
-			//remove creature
-			game->removeCreature(attackedCreature, false);
-			attackedCreature->setParent(attackTile);
 
 			//Add blood?
 			if(drawBlood || attackedPlayer){
@@ -347,6 +342,11 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 			if(player){
 				player->sendStats();
 			}
+
+			removedList.push_back(attackedCreature);
+			//remove creature
+			game->removeCreature(attackedCreature, false);
+			attackedCreature->setParent(attackTile);
 		}
 		//Add blood?
 		else if(drawBlood && damage > 0){
@@ -996,7 +996,7 @@ void Game::moveCreature(Player* player, Cylinder* fromCylinder, Cylinder* toCyli
 		ret = internalCreatureMove(moveCreature, fromCylinder, toCylinder);
 	}
 	
-	if(player == moveCreature && ret != RET_NOERROR){
+	if((player == moveCreature || ret == RET_NOTMOVEABLE) && ret != RET_NOERROR){
 		playerSendErrorMessage(player, ret);
 		player->sendCancelWalk();
 	}
@@ -2959,7 +2959,7 @@ void Game::checkPlayerWalk(unsigned long id)
 
 	flushSendBuffers();
 
-	if(!player->pathlist.empty()) {
+	if(!player->isRemoved() && !player->pathlist.empty()) {
 		int ticks = (int)player->getSleepTicks();
 /*
 #ifdef __DEBUG__
