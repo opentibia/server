@@ -298,14 +298,15 @@ void Tile::onAddTileItem(Item* item)
 			player->sendAddTileItem(cylinderMapPos, item);
 		}
 	}
+	
+	g_game.isExecutingEvents = true;
 
 	//event methods
 	for(it = list.begin(); it != list.end(); ++it){
-		if((*it)->isRemoved())
-			continue;
-
 		(*it)->onAddTileItem(cylinderMapPos, item);
 	}
+
+	g_game.isExecutingEvents = false;
 }
 
 void Tile::onUpdateTileItem(uint32_t index, Item* olditem, Item* newitem)
@@ -324,13 +325,14 @@ void Tile::onUpdateTileItem(uint32_t index, Item* olditem, Item* newitem)
 		}
 	}
 
+	g_game.isExecutingEvents = true;
+
 	//event methods
 	for(it = list.begin(); it != list.end(); ++it){
-		if((*it)->isRemoved())
-			continue;
-
 		(*it)->onUpdateTileItem(cylinderMapPos, index, olditem, newitem);
 	}
+
+	g_game.isExecutingEvents = false;
 }
 
 void Tile::onRemoveTileItem(uint32_t index, Item* item)
@@ -349,13 +351,14 @@ void Tile::onRemoveTileItem(uint32_t index, Item* item)
 		}
 	}
 
+	g_game.isExecutingEvents = true;
+
 	//event methods
 	for(it = list.begin(); it != list.end(); ++it){
-		if((*it)->isRemoved())
-			continue;
-
 		(*it)->onRemoveTileItem(cylinderMapPos, index, item);
 	}
+
+	g_game.isExecutingEvents = false;
 }
 
 void Tile::onUpdateTile()
@@ -374,13 +377,14 @@ void Tile::onUpdateTile()
 		}
 	}
 
+	g_game.isExecutingEvents = true;
+
 	//event methods
 	for(it = list.begin(); it != list.end(); ++it){
-		if((*it)->isRemoved())
-			continue;
-
 		(*it)->onUpdateTile(cylinderMapPos);
 	}
+
+	g_game.isExecutingEvents = false;
 }
 
 void Tile::moveCreature(Creature* creature, Cylinder* toCylinder, bool teleport /* = false*/)
@@ -420,6 +424,8 @@ void Tile::moveCreature(Creature* creature, Cylinder* toCylinder, bool teleport 
 		}
 	}
 
+	g_game.isExecutingEvents = true;
+
 	//event method
 	for(it = list.begin(); it != list.end(); ++it) {
 		if((*it)->isRemoved())
@@ -427,6 +433,8 @@ void Tile::moveCreature(Creature* creature, Cylinder* toCylinder, bool teleport 
 
 		(*it)->onCreatureMove(creature, fromPos, oldStackPos, teleport);
 	}
+
+	g_game.isExecutingEvents = false;
 
 	toCylinder->postAddNotification(creature);
 	postRemoveNotification(creature);
@@ -671,7 +679,7 @@ void Tile::__addThing(int32_t index, Thing* thing)
 				for(iit = topItems.begin(); iit != topItems.end(); ++iit){
 					if((*iit)->isSplash()){
 						Item* oldSplash = *iit;
-						__removeThing(oldSplash, 0);
+						__removeThing(oldSplash, 1);
 
 						oldSplash->setParent(NULL);
 						g_game.FreeThing(oldSplash);
@@ -709,7 +717,7 @@ void Tile::__addThing(int32_t index, Thing* thing)
 				for(iit = downItems.begin(); iit != downItems.end(); ++iit){
 					if((*iit)->isMagicField()){
 						Item* oldField = *iit;
-						__removeThing(oldField, 0);
+						__removeThing(oldField, 1);
 
 						oldField->setParent(NULL);
 						g_game.FreeThing(oldField);
