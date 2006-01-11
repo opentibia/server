@@ -192,7 +192,7 @@ Teleport* Tile::getTeleportItem() const
 	return NULL;
 }
 
-MagicEffectItem* Tile::getFieldItem()
+MagicEffectItem* Tile::getFieldItem() const
 {
 	MagicEffectItem* fieldItem = NULL;
 	for(ItemVector::const_iterator iit = downItems.begin(); iit != downItems.end(); ++iit){
@@ -449,7 +449,41 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 		if(ground == NULL)
 			return RET_NOTPOSSIBLE;
 		
-		if(const Player* player = creature->getPlayer()){
+		if(const Monster* monster = creature->getMonster()){
+			if(hasFlag(TILESTATE_PROTECTIONZONE))
+				return RET_NOTPOSSIBLE;
+
+			if(const MagicEffectItem* fieldItem = getFieldItem()){
+				const MagicEffectTargetCreatureCondition* magicTargetCondition = fieldItem->getCondition();
+
+				if(magicTargetCondition){
+					if((monster->getImmunities() & magicTargetCondition->attackType) != magicTargetCondition->attackType){
+						return RET_NOTPOSSIBLE;
+					}
+				}
+			}
+
+			if(floorChange() || getTeleportItem()){
+				return RET_NOTPOSSIBLE;
+			}
+
+			for(uint32_t i = 0; i < getThingCount(); ++i){
+				iithing = __getThing(i);
+
+				if(const Item* iitem = iithing->getItem()){
+					const ItemType& iiType = Item::items[iitem->getID()];
+
+					if(iiType.blockSolid){
+						if(!monster->canPushItems() || !iiType.moveable){
+							return RET_NOTPOSSIBLE;
+						}
+					}
+				}
+			}
+
+			return RET_NOERROR;
+		}
+		else if(const Player* player = creature->getPlayer()){
 			if(hasFlag(TILESTATE_PROTECTIONZONE) && player->pzLocked){
 				return RET_PLAYERISPZLOCKED;
 			}

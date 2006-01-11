@@ -1703,11 +1703,11 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 		}
 	}
 
-	/*bool isAttackerRemoved = false;
+	bool isAttackerRemoved = false;
 	if(creature && creature->isRemoved()){
 		creature->setParent(getTile(frompos.x, frompos.y, frompos.z));
 		isAttackerRemoved = true;
-	}*/
+	}
 
 	SpectatorVec spectatorlist = gamestate.getSpectators();
 	SpectatorVec::iterator it;
@@ -1807,9 +1807,9 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 
 	}
 	
-	/*if(isAttackerRemoved){
+	if(isAttackerRemoved){
 		creature->setParent(NULL);
-	}*/
+	}
 
 	return bSuccess;
 }
@@ -2181,30 +2181,30 @@ void Game::checkCreatureAttacking(unsigned long creatureid, unsigned long time)
 
 	Creature* creature = getCreatureByID(creatureid);
 	if(creature){
-		Creature* attackedCreature = creature->getAttackedCreature();
+		if(Monster* monster = creature->getMonster()){
+			monster->eventCheckAttacking = 0;
+			monster->onAttack();
 
-		if(attackedCreature){
-			if(Monster* monster = creature->getMonster()){
-				monster->eventCheckAttacking = 0;
-				monster->onAttack();
-			}
-			else{
+			flushSendBuffers();
+		}
+		else{
+			Creature* attackedCreature = creature->getAttackedCreature();
+
+			if(attackedCreature){
 				Tile* tile = creature->getTile();
 				if(!attackedCreature->isAttackable() == 0 && tile->isPz() && creature->access == 0){
 					if(Player* player = creature->getPlayer()){
 						player->sendTextMessage(MSG_SMALLINFO, "You may not attack a person in a protection zone.");
 						playerSetAttackedCreature(player, 0);
-						return;
 					}
 				}
 				else{
 					creatureMakeDamage(creature, attackedCreature, creature->getFightType());
 				}
 
-				creature->eventCheckAttacking = addEvent(makeTask(time, boost::bind(&Game::checkCreatureAttacking, this, creature->getID(), time)));
+				flushSendBuffers();
 			}
-
-			flushSendBuffers();
+			creature->eventCheckAttacking = addEvent(makeTask(time, boost::bind(&Game::checkCreatureAttacking, this, creature->getID(), time)));
 		}
 	}
 }

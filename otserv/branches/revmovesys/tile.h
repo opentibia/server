@@ -64,7 +64,7 @@ public:
   CreatureVector creatures;
   ItemVector     downItems;
 
-	MagicEffectItem* getFieldItem();
+	MagicEffectItem* getFieldItem() const;
 	Teleport* getTeleportItem() const;
 
 	Thing* getTopMoveableThing();

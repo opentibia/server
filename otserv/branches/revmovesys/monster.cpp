@@ -1140,6 +1140,8 @@ bool Monster::doAttacks(Creature* target, monstermode_t mode /*= MODE_NORMAL*/)
 				curPhysicalAttack = paIt->first;
 				if(target && !target->isRemoved()){
 					game->creatureMakeDamage(this, target, getFightType());
+					if(isRemoved())
+						return true;
 				}
 			}
 		}
@@ -1156,6 +1158,9 @@ bool Monster::doAttacks(Creature* target, monstermode_t mode /*= MODE_NORMAL*/)
 						std::map<unsigned short, Spell*>::iterator rit = spells.getAllRuneSpells()->find(raIt->first);
 						if(rit != spells.getAllRuneSpells()->end()) {
 							bool success = rit->second->getSpellScript()->castSpell(this, target->getPosition(), "");
+
+							if(isRemoved())
+								return true;
 
 							if(success){
 								ret = true;
@@ -1180,6 +1185,9 @@ bool Monster::doAttacks(Creature* target, monstermode_t mode /*= MODE_NORMAL*/)
 						if(rit != spells.getAllSpells()->end()) {
 							bool success = rit->second->getSpellScript()->castSpell(this, getPosition(), "");
 
+							if(isRemoved())
+								return true;
+
 							if(success) {
 								ret = true;
 								exhaustedTicks = timeprobsystem.getExhaustion();
@@ -1199,7 +1207,8 @@ bool Monster::doAttacks(Creature* target, monstermode_t mode /*= MODE_NORMAL*/)
 
 void Monster::onAttack()
 {
-	if(getAttackedCreature() && !(isSummon() && hasLostMaster)) {
+	Creature* attackCreature = getAttackedCreature();
+	if(attackCreature && !(isSummon() && hasLostMaster)) {
 		//this->eventCheckAttacking = game->addEvent(makeTask(500, std::bind2nd(std::mem_fun(&Game::checkCreatureAttacking), getID())));
 
 		exhaustedTicks -= 500;
@@ -1207,13 +1216,17 @@ void Monster::onAttack()
 		if(exhaustedTicks < 0)
 			exhaustedTicks = 0;
 
-		if(getAttackedCreature() && getAttackedCreature()->isAttackable()) {
-			if(validateDistanceAttack(getAttackedCreature())){
-				doAttacks(getAttackedCreature());
+		if(attackCreature->isAttackable()) {
+			if(validateDistanceAttack(attackCreature)){
+				doAttacks(attackCreature);
 			}
 		}
 		else
 			setAttackedCreature(NULL);
+	}
+
+	if(eventCheck != 0 && eventCheckAttacking == 0){
+		eventCheckAttacking = game->addEvent(makeTask(500, boost::bind(&Game::checkCreatureAttacking, game, getID(), 500)));
 	}
 }
 
@@ -1296,6 +1309,15 @@ bool Monster::canMoveTo(unsigned short x, unsigned short y, unsigned char z)
 {
 	Tile* tile = game->map->getTile(x, y, getPosition().z);
 	if(tile){
+		if(getTile() == tile)
+			return true;
+
+			ReturnValue ret = tile->__queryAdd(0, this, 1);
+
+			if(ret == RET_NOERROR)
+				return true;
+
+		/*
 		if(tile->getTeleportItem() || tile->floorChange())
 			return false;
 
@@ -1311,8 +1333,8 @@ bool Monster::canMoveTo(unsigned short x, unsigned short y, unsigned char z)
 		}
 		else if(tile->hasProperty(BLOCKSOLID) || tile->hasProperty(BLOCKPATHFIND))
 			return false;
-
 		return true;
+		*/
 	}
 
 	return false;

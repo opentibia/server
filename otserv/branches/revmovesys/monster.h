@@ -70,7 +70,8 @@ public:
 	virtual void setMaster(Creature* creature);
 	bool isSummon() {return (getMaster() != NULL);}
 	virtual void onAttack();
-	
+	bool canPushItems() const {return mType->canPushItems;};
+
 	static unsigned long getRandom();
 	
 private:

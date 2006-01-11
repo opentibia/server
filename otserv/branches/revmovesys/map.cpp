@@ -90,12 +90,12 @@ int Map::loadMap(std::string filename, std::string filekind)
 		loader = new IOMapXML();
 		ret = SPAWN_XML;
 	}
-	#ifdef ENABLESQLMAPSUPPORT	
+#ifdef ENABLESQLMAPSUPPORT	
 	else if(filekind == "SQL"){
 		loader = new IOMapSQL();
 		ret = SPAWN_SQL;
 	}
-	#endif	
+#endif	
 	else{
  		std::cout << "FATAL: couldnt determine the map format! exiting" << std::endl;
 		exit(1);
@@ -105,12 +105,14 @@ int Map::loadMap(std::string filename, std::string filekind)
 	bool success = loader->loadMap(this, filename);
 	delete loader;
 	
+	///*
 	if(success){
 		return ret;
 	}
 	else{
 		return MAP_LOADER_ERROR;
 	}
+	//*/
 }
 
 Tile* Map::getTile(unsigned short _x, unsigned short _y, unsigned char _z)
@@ -346,7 +348,7 @@ bool Map::canThrowObjectTo(const Position& fromPos, const Position& toPos)
 	return true;
 }
 
-bool Map::isPathValid(Creature *creature, const std::list<Position>& path, int pathSize,
+bool Map::isPathValid(Creature* creature, const std::list<Position>& path, int pathSize,
 	bool ignoreMoveableBlockingItems /*= false)*/)
 {
 	int pathCount = 0;
@@ -355,6 +357,14 @@ bool Map::isPathValid(Creature *creature, const std::list<Position>& path, int p
 
 		Tile* tile = getTile(iit->x, iit->y, iit->z);
 		if(tile){
+			if(creature->getTile() != tile){
+				ReturnValue ret = tile->__queryAdd(0, creature, 1);
+
+				if(ret != RET_NOERROR)
+					continue;
+			}
+
+			/*
 			if(!tile->creatures.empty() && creature->getTile() != tile)
 				continue;
 
@@ -366,6 +376,7 @@ bool Map::isPathValid(Creature *creature, const std::list<Position>& path, int p
 				if(tile->hasProperty(BLOCKSOLID) || tile->hasProperty(BLOCKPATHFIND))
 					continue;
 			}
+			*/
 		}
 		else
 			return false;
@@ -377,7 +388,7 @@ bool Map::isPathValid(Creature *creature, const std::list<Position>& path, int p
 	return true;
 }
 
-std::list<Position> Map::getPathTo(Creature *creature, Position start, Position to,
+std::list<Position> Map::getPathTo(Creature* creature, Position start, Position to,
 	bool creaturesBlock /*=true*/, bool ignoreMoveableBlockingItems /*= false*/, int maxNodSize /*= 100*/)
 {
 	std::list<Position> path;
@@ -405,6 +416,14 @@ std::list<Position> Map::getPathTo(Creature *creature, Position start, Position 
 
 					Tile* tile = getTile(x, y, z);
 					if(tile){
+						if(creature->getTile() != tile){
+							ReturnValue ret = tile->__queryAdd(0, creature, 1);
+
+							if(ret != RET_NOERROR)
+								continue;
+						}
+
+						/*
 						if(!tile->creatures.empty() && creature->getTile() != tile)
 							continue;
 
@@ -416,6 +435,7 @@ std::list<Position> Map::getPathTo(Creature *creature, Position start, Position 
 							if(tile->hasProperty(BLOCKSOLID) || tile->hasProperty(BLOCKPATHFIND))
 								continue;
 						}
+						*/
 					}
 					else
 						continue;
