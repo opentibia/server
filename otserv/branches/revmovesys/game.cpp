@@ -1128,6 +1128,10 @@ void Game::moveItem(Player* player, Cylinder* fromCylinder, Cylinder* toCylinder
 ReturnValue Game::internalMoveItem(Cylinder* fromCylinder, Cylinder* toCylinder, int32_t index,
 	Item* item, uint32_t count)
 {
+	if(!toCylinder){
+		return RET_NOTPOSSIBLE;
+	}
+
 	Item* toItem = NULL;
 	Cylinder* subCylinder = toCylinder->__queryDestination(index, item, &toItem);
 	toCylinder = subCylinder;

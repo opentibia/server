@@ -1297,11 +1297,14 @@ bool Monster::monsterMoveItem(Item* item, int radius)
 		tryPos.y = item->getPosition().y + rand() % radius;
 		if(game->map->canThrowObjectTo(item->getPosition(), tryPos)){
 			Tile* toTile = game->getTile(tryPos.x, tryPos.y, tryPos.z);
-			if(game->internalMoveItem(item->getParent(), toTile, 0, item, item->getItemCount()) == RET_NOERROR){
-				return true;
+			if(toTile){
+				if(game->internalMoveItem(item->getParent(), toTile, 0, item, item->getItemCount()) == RET_NOERROR){
+					return true;
+				}
 			}
 		}
 	}
+
 	return false;
 }
 
