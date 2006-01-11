@@ -638,33 +638,15 @@ void Tile::__addThing(int32_t index, Thing* thing)
 			return /*RET_NOTPOSSIBLE*/;
 		}
 
-		/*const Position& cylinderMapPos = getPosition();
-
-		SpectatorVec list;
-		SpectatorVec::iterator it;
-		g_game.getSpectators(Range(cylinderMapPos, true), list);*/
-
 		if(item->isGroundTile()){
 			if(ground == NULL){
 				onAddTileItem(item);
-
-				/*//send to client
-				for(it = list.begin(); it != list.end(); ++it) {
-					(*it)->onAddTileItem(cylinderMapPos, item);
-				}
-				*/
 			}
 			else{
 				uint32_t index = __getIndexOfThing(ground);				
 				onUpdateTileItem(index, ground, item);
 
 				//TODO: free memory of old ground?
-
-				/*//send to client
-				for(it = list.begin(); it != list.end(); ++it) {
-					(*it)->onUpdateTileItem(cylinderMapPos, index, ground, item);
-				}
-				*/
 			}
 
 			ground = item;
@@ -688,7 +670,7 @@ void Tile::__addThing(int32_t index, Thing* thing)
 			bool isInserted = false;
 			ItemVector::iterator iit;
 			for(iit = topItems.begin(); iit != topItems.end(); ++iit){
-				if(Item::items[item->getID()].alwaysOnTopOrder <= Item::items[(*iit)->getID()].alwaysOnTopOrder){
+				if(Item::items[(*iit)->getID()].alwaysOnTopOrder > Item::items[item->getID()].alwaysOnTopOrder){
 					topItems.insert(iit, item);
 					isInserted = true;
 					break;
@@ -700,12 +682,6 @@ void Tile::__addThing(int32_t index, Thing* thing)
 			}
 
 			onAddTileItem(item);
-
-			/*//send to client
-			for(it = list.begin(); it != list.end(); ++it) {
-				(*it)->onAddTileItem(cylinderMapPos, item);
-			}
-			*/
 		}
 		else{
 			if(item->isMagicField()){
@@ -724,15 +700,7 @@ void Tile::__addThing(int32_t index, Thing* thing)
 			}
 
 			downItems.insert(downItems.begin(), item);
-
 			onAddTileItem(item);
-
-			/*//send to client
-			for(it = list.begin(); it != list.end(); ++it) {
-				(*it)->onAddTileItem(cylinderMapPos, item);
-			}
-			*/
-
 		}
 	}
 }
@@ -756,20 +724,7 @@ void Tile::__updateThing(Thing* thing, uint32_t count)
 	}
 
 	item->setItemCountOrSubtype(count);
-
-	/*const Position& cylinderMapPos = getPosition();
-
-	SpectatorVec list;
-	SpectatorVec::iterator it;
-	g_game.getSpectators(Range(cylinderMapPos, true), list);*/
-
 	onUpdateTileItem(index, item, item);
-
-	/*//send to client
-	for(it = list.begin(); it != list.end(); ++it) {
-		(*it)->onUpdateTileItem(cylinderMapPos, index, item, item);
-	}
-	*/
 }
 
 void Tile::__updateThing(uint32_t index, Thing* thing)
@@ -828,19 +783,6 @@ void Tile::__updateThing(uint32_t index, Thing* thing)
 
 	if(pos == 0){
 		item->setParent(this);
-
-		/*const Position& cylinderMapPos = getPosition();
-
-		SpectatorVec list;
-		SpectatorVec::iterator it;
-		g_game.getSpectators(Range(cylinderMapPos, true), list);*/
-
-		/*//send to client
-		for(it = list.begin(); it != list.end(); ++it) {
-			(*it)->onUpdateTileItem(cylinderMapPos, index, oldItem, item);
-		}
-		*/
-
 		onUpdateTileItem(index, oldItem, item);
 
 		return /*RET_NOERROR*/;
@@ -978,9 +920,6 @@ Thing* Tile::__getThing(uint32_t index) const
 		--index;
 	}
 
-	//test
-	//--index;
-
 	if((unsigned) index < topItems.size())
 		return topItems[index];
 
@@ -1094,7 +1033,7 @@ void Tile::__internalAddThing(uint32_t index, Thing* thing)
 			bool isInserted = false;
 			ItemVector::iterator iit;
 			for(iit = topItems.begin(); iit != topItems.end(); ++iit){
-				if(Item::items[item->getID()].alwaysOnTopOrder <= Item::items[(*iit)->getID()].alwaysOnTopOrder){
+				if(Item::items[(*iit)->getID()].alwaysOnTopOrder > Item::items[item->getID()].alwaysOnTopOrder){
 					topItems.insert(iit, item);
 					isInserted = true;
 					break;
