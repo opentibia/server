@@ -186,7 +186,7 @@ bool Map::placeCreature(const Position& pos, Creature* creature)
 {
 	Tile* tile = getTile(pos.x, pos.y, pos.z);
 
-	if(tile && !tile->hasProperty(BLOCKPATHFIND)){
+	if(tile){
 		ReturnValue ret = tile->__queryAdd(0, creature, 0);
 
 		if(ret == RET_NOERROR){
@@ -208,7 +208,7 @@ bool Map::placeCreature(const Position& pos, Creature* creature)
 
 			//isSuccess= (tile && !tile->getTeleportItem() && !tile->floorChange() && tile->__queryAdd(0, creature, 0) == RET_NOERROR);
 
-			if(tile && !tile->hasProperty(BLOCKPATHFIND) && tile->__queryAdd(0, creature, 0) == RET_NOERROR){
+			if(tile && tile->__queryAdd(0, creature, 0) == RET_NOERROR){
 				tile->__internalAddThing(creature);
 				return true;
 			}

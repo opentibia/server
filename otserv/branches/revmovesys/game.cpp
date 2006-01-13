@@ -1128,6 +1128,15 @@ void Game::moveItem(Player* player, Cylinder* fromCylinder, Cylinder* toCylinder
 ReturnValue Game::internalMoveItem(Cylinder* fromCylinder, Cylinder* toCylinder, int32_t index,
 	Item* item, uint32_t count)
 {
+	/*
+#ifdef __DEBUG__MOVESYS__
+	if(isExecutingEvents){
+		std::cout << "Error: [Game::internalMoveItem] - isExecutingEvents" << std::endl;
+		int *a = NULL; *a = 1;
+	}
+#endif
+	*/
+
 	if(!toCylinder){
 		return RET_NOTPOSSIBLE;
 	}
@@ -1245,6 +1254,15 @@ ReturnValue Game::internalMoveItem(Cylinder* fromCylinder, Cylinder* toCylinder,
 
 ReturnValue Game::internalAddItem(Cylinder* toCylinder, Item* item, bool test /*= false*/)
 {
+	/*
+#ifdef __DEBUG__MOVESYS__
+	if(isExecutingEvents){
+		std::cout << "Error: [Game::internalAddItem] - isExecutingEvents" << std::endl;
+		int *a = NULL; *a = 1;
+	}
+#endif
+	*/
+
 	if(toCylinder == NULL || item == NULL){
 		return RET_NOTPOSSIBLE;
 	}
@@ -1310,6 +1328,15 @@ ReturnValue Game::internalAddItem(Cylinder* toCylinder, Item* item, bool test /*
 
 ReturnValue Game::internalRemoveItem(Item* item, int32_t count /*= -1*/,  bool test /*= false*/)
 {
+	/*
+#ifdef __DEBUG__MOVESYS__
+	if(isExecutingEvents){
+		std::cout << "Error: [Game::internalRemoveItem] - isExecutingEvents" << std::endl;
+		int *a = NULL; *a = 1;
+	}
+#endif
+	*/
+
 	Cylinder* cylinder = item->getParent();
 	if(cylinder == NULL){
 		return RET_NOTPOSSIBLE;
@@ -1341,6 +1368,15 @@ ReturnValue Game::internalRemoveItem(Item* item, int32_t count /*= -1*/,  bool t
 
 Item* Game::transformItem(Item* item, uint16_t newtype, int32_t count /*= -1*/)
 {
+	/*
+#ifdef __DEBUG__MOVESYS__
+	if(isExecutingEvents){
+		std::cout << "Error: [Game::transformItem] - isExecutingEvents" << std::endl;
+		int *a = NULL; *a = 1;
+	}
+#endif
+	*/
+
 	if(item->getID() == newtype && count == -1)
 		return item;
 

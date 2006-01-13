@@ -386,7 +386,15 @@ void Container::__updateThing(uint32_t index, Thing* thing)
 		return /*RET_NOTPOSSIBLE*/;
 	}
 
-	ItemList::iterator cit = std::find(itemlist.begin(), itemlist.end(), thing);
+	uint32_t count = 0;
+	ItemList::iterator cit = itemlist.end();
+	for(cit = itemlist.begin(); cit != itemlist.end(); ++cit){
+		if(count == index)
+			break;
+		else
+			++count;
+	}
+
 	if(cit == itemlist.end()){
 #ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Container::__updateThing] item not found" << std::endl;

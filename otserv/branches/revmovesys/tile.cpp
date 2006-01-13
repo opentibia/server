@@ -657,10 +657,9 @@ void Tile::__addThing(Thing* thing)
 
 void Tile::__addThing(int32_t index, Thing* thing)
 {
-	thing->setParent(this);
-
 	Creature* creature = thing->getCreature();
 	if(creature){
+		creature->setParent(this);
 		creatures.insert(creatures.begin(), creature);
 	}
 	else{
@@ -672,6 +671,8 @@ void Tile::__addThing(int32_t index, Thing* thing)
 #endif
 			return /*RET_NOTPOSSIBLE*/;
 		}
+		
+		item->setParent(this);
 
 		if(item->isGroundTile()){
 			if(ground == NULL){
@@ -823,6 +824,7 @@ void Tile::__updateThing(uint32_t index, Thing* thing)
 	}
 
 	if(pos == 0){
+		oldItem->setParent(NULL);
 		item->setParent(this);
 		onUpdateTileItem(index, oldItem, item);
 
