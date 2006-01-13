@@ -668,6 +668,7 @@ void Tile::__addThing(int32_t index, Thing* thing)
 		if(item == NULL){
 #ifdef __DEBUG__MOVESYS__
 			std::cout << "Failure: [Tile::__addThing] item == NULL" << std::endl;
+			int *a = NULL; *a = 1;
 #endif
 			return /*RET_NOTPOSSIBLE*/;
 		}
@@ -680,7 +681,9 @@ void Tile::__addThing(int32_t index, Thing* thing)
 				uint32_t index = __getIndexOfThing(ground);				
 				onUpdateTileItem(index, ground, item);
 
-				//TODO: free memory of old ground?
+				ground->setParent(NULL);
+				g_game.FreeThing(ground);
+				ground = NULL;
 			}
 
 			ground = item;
@@ -745,6 +748,7 @@ void Tile::__updateThing(Thing* thing, uint32_t count)
 	if(index == -1){
 #ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Tile::__updateThing] index == -1" << std::endl;
+		int *a = NULL; *a = 1;
 #endif
 		return /*RET_NOTPOSSIBLE*/;
 	}
@@ -753,6 +757,7 @@ void Tile::__updateThing(Thing* thing, uint32_t count)
 	if(item == NULL){
 #ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Tile::__updateThing] item == NULL" << std::endl;
+		int *a = NULL; *a = 1;
 #endif
 		return /*RET_NOTPOSSIBLE*/;
 	}
@@ -769,6 +774,7 @@ void Tile::__updateThing(uint32_t index, Thing* thing)
 	if(item == NULL){
 #ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Tile::__updateThing] item == NULL" << std::endl;
+		int *a = NULL; *a = 1;
 #endif
 		return /*RET_NOTPOSSIBLE*/;
 	}
@@ -799,6 +805,7 @@ void Tile::__updateThing(uint32_t index, Thing* thing)
 	if(pos >= 0 && pos < creatures.size()){
 #ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Tile::__updateThing] Update object is a creature" << std::endl;
+		int *a = NULL; *a = 1;
 #endif
 		return /*RET_NOTPOSSIBLE*/;
 	}
@@ -824,6 +831,7 @@ void Tile::__updateThing(uint32_t index, Thing* thing)
 
 #ifdef __DEBUG__MOVESYS__
 	std::cout << "Failure: [Tile::__updateThing] Update object not found" << std::endl;
+	int *a = NULL; *a = 1;
 #endif
 }
 
@@ -836,6 +844,7 @@ void Tile::__removeThing(Thing* thing, uint32_t count)
 		if(it == creatures.end()){
 #ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Tile::__removeThing] creature not found" << std::endl;
+		int *a = NULL; *a = 1;
 #endif
 		return; //RET_NOTPOSSIBLE;
 		}
@@ -848,6 +857,7 @@ void Tile::__removeThing(Thing* thing, uint32_t count)
 		if(item == NULL){
 #ifdef __DEBUG__MOVESYS__
 			std::cout << "Failure: [Tile::__removeThing] item == NULL" << std::endl;
+			int *a = NULL; *a = 1;
 #endif
 			return /*RET_NOTPOSSIBLE*/;
 		}
@@ -856,6 +866,7 @@ void Tile::__removeThing(Thing* thing, uint32_t count)
 		if(index == -1){
 #ifdef __DEBUG__MOVESYS__
 			std::cout << "Failure: [Tile::__removeThing] index == -1" << std::endl;
+			int *a = NULL; *a = 1;
 #endif
 			return /*RET_NOTPOSSIBLE*/;
 		}
@@ -906,6 +917,7 @@ void Tile::__removeThing(Thing* thing, uint32_t count)
 	}
 #ifdef __DEBUG__MOVESYS__
 	std::cout << "Failure: [Tile::__removeThing] thing not found" << std::endl;
+	int *a = NULL; *a = 1;
 #endif
 }
 

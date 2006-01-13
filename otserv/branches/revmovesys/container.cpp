@@ -260,17 +260,28 @@ Cylinder* Container::__queryDestination(int32_t& index, const Thing* thing, Item
 		*destItem = NULL;
 		return this;
 	}
-	else if(index != -1){
-		Thing* destThing = dynamic_cast<Item*>(__getThing(index));
-		if(destThing)
-			*destItem = destThing->getItem();
+	else{
+		if(index >= (int32_t)capacity()){
+		#ifdef __DEBUG__MOVESYS__
+			std::cout << "Failure: [Container::__queryDestination], index: " << index << ", index >= capacity()" << std::endl;
+			int *a = NULL; *a = 1;
+		#endif
 
-		Cylinder* subCylinder = dynamic_cast<Cylinder*>(*destItem);
-
-		if(subCylinder){
 			index = -1;
-			*destItem = NULL;
-			return subCylinder;
+		}
+
+		if(index != -1){
+			Thing* destThing = dynamic_cast<Item*>(__getThing(index));
+			if(destThing)
+				*destItem = destThing->getItem();
+
+			Cylinder* subCylinder = dynamic_cast<Cylinder*>(*destItem);
+
+			if(subCylinder){
+				index = -1;
+				*destItem = NULL;
+				return subCylinder;
+			}
 		}
 	}
 	
@@ -286,7 +297,8 @@ void Container::__addThing(int32_t index, Thing* thing)
 {
 	if(index >= (int32_t)capacity()){
 #ifdef __DEBUG__MOVESYS__
-		std::cout << "Failure: [Container::__addThing] index < 0 || index >= capacity()" << std::endl;
+		std::cout << "Failure: [Container::__addThing], index:" << index << ", index >= capacity()" << std::endl;
+		int *a = NULL; *a = 1;
 #endif
 		return /*RET_NOTPOSSIBLE*/;
 	}
@@ -295,13 +307,15 @@ void Container::__addThing(int32_t index, Thing* thing)
 	if(item == NULL){
 #ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Container::__addThing] item == NULL" << std::endl;
+		int *a = NULL; *a = 1;
 #endif
 		return /*RET_NOTPOSSIBLE*/;
 	}
 
 	if(size() >= capacity()){
 #ifdef __DEBUG__MOVESYS__
-		std::cout << "Failure: [Container::__addThing] itemlist.size() >= capacity()" << std::endl;
+		std::cout << "Failure: [Container::__addThing] size() >= capacity()" << std::endl;
+		int *a = NULL; *a = 1;
 #endif
 		return /*RET_CONTAINERNOTENOUGHROOM*/;
 	}
@@ -330,6 +344,7 @@ void Container::__updateThing(Thing* thing, uint32_t count)
 	if(index == -1){
 #ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Container::__updateThing] index == -1" << std::endl;
+		int *a = NULL; *a = 1;
 #endif
 		return /*RET_NOTPOSSIBLE*/;
 	}
@@ -338,6 +353,7 @@ void Container::__updateThing(Thing* thing, uint32_t count)
 	if(item == NULL){
 #ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Container::__updateThing] item == NULL" << std::endl;
+		int *a = NULL; *a = 1;
 #endif
 		return /*RET_NOTPOSSIBLE*/;
 	}
@@ -365,6 +381,7 @@ void Container::__updateThing(uint32_t index, Thing* thing)
 	if(item == NULL){
 #ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Container::__updateThing] item == NULL" << std::endl;
+		int *a = NULL; *a = 1;
 #endif
 		return /*RET_NOTPOSSIBLE*/;
 	}
@@ -372,7 +389,8 @@ void Container::__updateThing(uint32_t index, Thing* thing)
 	ItemList::iterator cit = std::find(itemlist.begin(), itemlist.end(), thing);
 	if(cit == itemlist.end()){
 #ifdef __DEBUG__MOVESYS__
-		std::cout << "Failure: [Container::__updateThing] cit == itemlist.end()" << std::endl;
+		std::cout << "Failure: [Container::__updateThing] item not found" << std::endl;
+		int *a = NULL; *a = 1;
 #endif
 		return /*RET_NOTPOSSIBLE*/;
 	}
@@ -404,6 +422,7 @@ void Container::__removeThing(Thing* thing, uint32_t count)
 	if(item == NULL){
 #ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Container::__removeThing] item == NULL" << std::endl;
+		int *a = NULL; *a = 1;
 #endif
 		return /*RET_NOTPOSSIBLE*/;
 	}
@@ -412,6 +431,7 @@ void Container::__removeThing(Thing* thing, uint32_t count)
 	if(index == -1){
 #ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Container::__removeThing] index == -1" << std::endl;
+		int *a = NULL; *a = 1;
 #endif
 		return /*RET_NOTPOSSIBLE*/;
 	}
@@ -420,6 +440,7 @@ void Container::__removeThing(Thing* thing, uint32_t count)
 	if(cit == itemlist.end()){
 #ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Container::__removeThing] item not found" << std::endl;
+		int *a = NULL; *a = 1;
 #endif
 		return /*RET_NOTPOSSIBLE*/;
 	}

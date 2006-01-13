@@ -1133,8 +1133,7 @@ ReturnValue Game::internalMoveItem(Cylinder* fromCylinder, Cylinder* toCylinder,
 	}
 
 	Item* toItem = NULL;
-	Cylinder* subCylinder = toCylinder->__queryDestination(index, item, &toItem);
-	toCylinder = subCylinder;
+	toCylinder = toCylinder->__queryDestination(index, item, &toItem);
 
 	//destination is the same as the source?
 	if(item == toItem){ 
@@ -1252,10 +1251,7 @@ ReturnValue Game::internalAddItem(Cylinder* toCylinder, Item* item, bool test /*
 
 	Item* toItem = NULL;
 	int32_t index = -1;
-	Cylinder* subCylinder = toCylinder->__queryDestination(index, item, &toItem);
-	if(subCylinder != toCylinder){
-		toCylinder = subCylinder;
-	}
+	toCylinder = toCylinder->__queryDestination(index, item, &toItem);
 
 	//check if we can add this item
 	ReturnValue ret = toCylinder->__queryAdd(index, item, item->getItemCount());
