@@ -41,7 +41,6 @@ AutoID::list_type AutoID::list;
 
 extern Game g_game;
 
-//Creature::Creature(const std::string& name) :
 Creature::Creature() :
 access(0)
 {
@@ -285,15 +284,21 @@ std::string Creature::getDescription(int32_t lookDistance) const
 
 int Creature::getStepDuration() const
 {
+	OTSYS_THREAD_LOCK_CLASS lockClass(g_game.gameLock, "Creature::getStepDuration()");
+
 	int duration = 500;
-	Tile* tile = g_game.getTile(getPosition().x, getPosition().y, getPosition().z);
-	if(tile && tile->ground){
-		int groundid = tile->ground->getID();
-		uint16_t stepspeed = Item::items[groundid].speed;
-		if(stepspeed != 0) {
-			duration =  (1000 * stepspeed) / (getSpeed() != 0 ? getSpeed() : 220);
+
+	if(!isRemoved()){
+		Tile* tile = g_game.getTile(getPosition().x, getPosition().y, getPosition().z);
+		if(tile && tile->ground){
+			int groundid = tile->ground->getID();
+			uint16_t stepspeed = Item::items[groundid].speed;
+			if(stepspeed != 0) {
+				duration =  (1000 * stepspeed) / (getSpeed() != 0 ? getSpeed() : 220);
+			}
 		}
 	}
+
 	return duration;
 };
 
