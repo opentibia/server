@@ -130,7 +130,7 @@ void Teleport::__updateThing(Thing* thing, uint32_t count)
 	//
 }
 
-void Teleport::__updateThing(uint32_t index, Thing* thing)
+void Teleport::__replaceThing(uint32_t index, Thing* thing)
 {
 	//
 }

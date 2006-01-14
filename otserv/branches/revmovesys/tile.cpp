@@ -708,7 +708,8 @@ void Tile::__addThing(int32_t index, Thing* thing)
 			bool isInserted = false;
 			ItemVector::iterator iit;
 			for(iit = topItems.begin(); iit != topItems.end(); ++iit){
-				if(Item::items[(*iit)->getID()].alwaysOnTopOrder > Item::items[item->getID()].alwaysOnTopOrder){
+				//Note: this is different from internalAddThing
+				if(Item::items[item->getID()].alwaysOnTopOrder <= Item::items[(*iit)->getID()].alwaysOnTopOrder){
 					topItems.insert(iit, item);
 					isInserted = true;
 					break;
@@ -767,7 +768,7 @@ void Tile::__updateThing(Thing* thing, uint32_t count)
 	onUpdateTileItem(index, item, item);
 }
 
-void Tile::__updateThing(uint32_t index, Thing* thing)
+void Tile::__replaceThing(uint32_t index, Thing* thing)
 {
 	int32_t pos = index;
 

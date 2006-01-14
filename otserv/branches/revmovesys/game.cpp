@@ -1409,7 +1409,7 @@ Item* Game::transformItem(Item* item, uint16_t newtype, int32_t count /*= -1*/)
 			FreeThing(item);
 
 			Item* newItem = Item::CreateItem(newtype, (count == -1 ? 1 : count));
-			cylinder->__updateThing(index, newItem);
+			cylinder->__replaceThing(index, newItem);
 
 			cylinder->postAddNotification(newItem);
 			return newItem;
@@ -1431,7 +1431,7 @@ Item* Game::transformItem(Item* item, uint16_t newtype, int32_t count /*= -1*/)
 			FreeThing(item);
 
 			Item* newItem = Item::CreateItem(newtype);
-			cylinder->__updateThing(index, newItem);
+			cylinder->__replaceThing(index, newItem);
 
 			cylinder->postAddNotification(newItem);
 			return newItem;

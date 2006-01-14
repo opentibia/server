@@ -262,10 +262,17 @@ Cylinder* Container::__queryDestination(int32_t& index, const Thing* thing, Item
 	}
 	else{
 		if(index >= (int32_t)capacity()){
-		#ifdef __DEBUG__MOVESYS__
-			std::cout << "Failure: [Container::__queryDestination], index: " << index << ", index >= capacity()" << std::endl;
-			int *a = NULL; *a = 1;
-		#endif
+			/*
+			if you have a container, maximize it to show all 20 slots
+			then you open a bag that is inside the container you will have a bag with 8 slots
+			and a "grey" area where the other 12 slots where from the container
+			if you drop the item on that grey area
+			the client calculates the slot position as if the bag has 20 slots
+			
+			#ifdef __DEBUG__MOVESYS__
+				std::cout << "Warning: [Container::__queryDestination], index: " << index << ", index >= capacity()" << std::endl;
+			#endif
+			*/
 
 			index = -1;
 		}
@@ -375,12 +382,12 @@ void Container::__updateThing(Thing* thing, uint32_t count)
 	}
 }
 
-void Container::__updateThing(uint32_t index, Thing* thing)
+void Container::__replaceThing(uint32_t index, Thing* thing)
 {
 	Item* item = thing->getItem();
 	if(item == NULL){
 #ifdef __DEBUG__MOVESYS__
-		std::cout << "Failure: [Container::__updateThing] item == NULL" << std::endl;
+		std::cout << "Failure: [Container::__replaceThing] item == NULL" << std::endl;
 		int *a = NULL; *a = 1;
 #endif
 		return /*RET_NOTPOSSIBLE*/;

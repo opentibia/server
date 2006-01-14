@@ -96,7 +96,7 @@ public:
 	  * \param index is the position to change (inventory slot/container position)
 	  * \param thing is the object to update
 	  */
-	virtual void __updateThing(uint32_t index, Thing* thing) = 0;
+	virtual void __replaceThing(uint32_t index, Thing* thing) = 0;
 
 	/**
 	  * Remove an object

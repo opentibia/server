@@ -2263,11 +2263,11 @@ void Player::__updateThing(Thing* thing, uint32_t count)
 	onUpdateInventoryItem((slots_t)index, item, item);
 }
 
-void Player::__updateThing(uint32_t index, Thing* thing)
+void Player::__replaceThing(uint32_t index, Thing* thing)
 {
 	if(index < 0 || index > 11){
 #ifdef __DEBUG__MOVESYS__
-		std::cout << "Failure: [Player::__updateThing], " << "player: " << getName() << ", index: " << index << ",  index < 0 || index > 11" << std::endl;
+		std::cout << "Failure: [Player::__replaceThing], " << "player: " << getName() << ", index: " << index << ",  index < 0 || index > 11" << std::endl;
 		int *a = NULL; *a = 1;
 #endif
 		return /*RET_NOTPOSSIBLE*/;
