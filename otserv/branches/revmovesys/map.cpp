@@ -308,43 +308,114 @@ bool Map::canThrowObjectTo(const Position& fromPos, const Position& toPos)
 {
 	Position start = fromPos;
 	Position end = toPos;
-
-	bool steep = std::abs(end.y - start.y) > std::abs(end.x - start.x);
-
-	if(steep){
-		swap(start.x, start.y);
-		swap(end.x, end.y);
+	
+	//z checks
+	//underground 8->15
+	//ground level and above 7->0
+	if((start.z >= 8 && end.z < 8) || (end.z >= 8 && start.z < 8))
+		return false;
+	
+	if(start.z - end.z > 3)
+		return false;
+	
+	int deltax, deltay, deltaz;
+	deltax = abs(start.x - end.x);
+	deltay = abs(start.y - end.y);
+	deltaz = abs(start.z - end.z);
+    
+	//distance checks
+	if(deltax - deltaz > 8 || deltay - deltaz > 6){
+		return false;
+	}
+    
+	int max = deltax, dir = 0;
+	if(deltay > max){
+		max = deltay; 
+		dir = 1;
+	}
+	if(deltaz > max){
+		max = deltaz; 
+		dir = 2;
 	}
 	
-	int deltax = abs(end.x - start.x);
-	int deltay = abs(end.y - start.y);
-	int error = 0;
-	int deltaerr = deltay;
-	int y = start.y;
-	Tile* tile = NULL;
-	int xstep = ((start.x < end.x) ? 1 : -1);
-	int ystep = ((start.y < end.y) ? 1 : -1);
+	switch(dir){
+	case 0:
+		//x -> x
+		//y -> y
+		//z -> z
+		break;
+	case 1:	
+		//x -> y
+		//y -> x
+		//z -> z
+		swap(start.x, start.y);
+		swap(end.x, end.y);
+		swap(deltax, deltay);
+		break;
+	case 2:
+		//x -> z
+		//y -> y
+		//z -> x
+		swap(start.x, start.z);
+		swap(end.x, end.z);
+		swap(deltax, deltaz);
+		break;
+	}
 
-	for(int x = start.x; x != end.x + xstep; x += xstep){
-		int rx = (steep ? y : x);
-		int ry = (steep ? x : y);
+	int steepx, steepy, steepz;
+	int stepx = ((start.x < end.x) ? 1 : -1);
+	int stepy = ((start.y < end.y) ? 1 : -1);
+	int stepz = ((start.z < end.z) ? 1 : -1);
+	
+	int x, y, z;
+	int errory = 0, errorz = 0;
+	x = start.x;
+	y = start.y;
+	z = start.z;
+	
+	int lastrx = x, lastry = y, lastrz = z;
+	
+	for( ; x != end.x + stepx; x += stepx){
+		int rx, ry, rz;
+		switch(dir){
+		case 0:
+			rx = x; ry = y; rz = z;
+			break;
+		case 1:
+			rx = y; ry = x; rz = z;
+			break;
+		case 2:
+			rx = z; ry = y; rz = x;
+			break;
+		}
 
-		if(!(toPos.x == rx && toPos.y == ry) && !(fromPos.x == rx && fromPos.y == ry)){
-			tile = getTile(rx, ry, end.z);
+		if(!(toPos.x == rx && toPos.y == ry && toPos.z == rz) && 
+		  !(fromPos.x == rx && fromPos.y == ry && fromPos.z == rz)){
+			if(lastrz != rz){
+				if(getTile(lastrx, lastry, std::min(lastrz, rz))){
+					return false;
+				}
+			}
+			lastrx = rx; lastry = ry; lastrz = rz;
+			
+			Tile *tile = getTile(rx, ry, rz);
 			if(tile){
 				if(tile->hasProperty(BLOCKPROJECTILE))
 					return false;
 			}
 		}
 
-		error += deltaerr;
-
-		if(2 * error >= deltax){
-			y += ystep;
-			error -= deltax;
+		errory += deltay;
+		errorz += deltaz;
+		if(2*errory >= deltax){
+			y += stepy;
+			errory -= deltax;
+		}
+		if(2*errorz >= deltax){
+			z += stepz;
+			errorz -= deltax;
 		}
 	}
-
 	return true;
 }
 
