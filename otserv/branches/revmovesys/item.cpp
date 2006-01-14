@@ -213,15 +213,6 @@ long Item::getDecayTime()
 	return items[id].decayTime*1000;
 }
 
-bool Item::rotate()
-{
-	if(items[id].rotable && items[id].rotateTo){
-		id = items[id].rotateTo;
-		return true;
-	}
-	return false;
-}
-
 int Item::unserialize(xmlNodePtr p)
 {
 	char *tmp;
@@ -339,32 +330,32 @@ bool Item::hasProperty(enum ITEMPROPERTY prop) const
 	return false;
 }
 
-bool Item::isBlocking() const {
+bool Item::isBlocking() const{
 	const ItemType& it = items[id];
 	return it.blockSolid;
 }
 
-bool Item::isStackable() const {
+bool Item::isStackable() const{
 	return items[id].stackable;
 }
 
-bool Item::isRune() const {
+bool Item::isRune() const{
 	return (items[id].group == ITEM_GROUP_RUNE);
 }
 
-bool Item::isFluidContainer() const {
+bool Item::isFluidContainer() const{
 	return (items[id].isFluidContainer());
 }
 
-bool Item::isAlwaysOnTop() const {
+bool Item::isAlwaysOnTop() const{
 	return items[id].alwaysOnTop;
 }
 
-bool Item::isNotMoveable() const {
+bool Item::isNotMoveable() const{
 	return !items[id].moveable;
 }
 
-bool Item::isGroundTile() const {
+bool Item::isGroundTile() const{
 	return items[id].isGroundTile();
 }
 
@@ -376,7 +367,7 @@ bool Item::isMagicField() const{
 	return items[id].isMagicField();
 }
 
-bool Item::isPickupable() const {
+bool Item::isPickupable() const{
 	return items[id].pickupable;
 }
 
@@ -388,25 +379,29 @@ bool Item::isHangable() const{
 	return items[id].isHangable;
 }
 
-bool Item::floorChangeDown() const {
+bool Item::isRoteable() const{
+	const ItemType& it = items[id];
+	return it.rotable && it.rotateTo;
+}
+
+bool Item::floorChangeDown() const{
 	return items[id].floorChangeDown;
 }
 
-bool Item::floorChangeNorth() const {
+bool Item::floorChangeNorth() const{
 	return items[id].floorChangeNorth;
 }
-bool Item::floorChangeSouth() const {
+bool Item::floorChangeSouth() const{
 	return items[id].floorChangeSouth;
 }
-bool Item::floorChangeEast() const {
+bool Item::floorChangeEast() const{
 	return items[id].floorChangeEast;
 }
-bool Item::floorChangeWest() const {
+bool Item::floorChangeWest() const{
 	return items[id].floorChangeWest;
 }
 
-bool Item::isWeapon() const
-{ 
+bool Item::isWeapon() const{
   //now also returns true on SHIELDS!!! Check back with getWeaponType!
   //old: return (items[id].weaponType != NONE && items[id].weaponType != SHIELD && items[id].weaponType != AMO);
   return (items[id].weaponType != NONE && items[id].weaponType != AMO);

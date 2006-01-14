@@ -2471,7 +2471,7 @@ bool Game::playerRotateItem(Player* player, const Position& pos, uint8_t stackpo
 		return false;
 
 	Item* item = dynamic_cast<Item*>(internalGetThing(player, pos, stackpos));
-	if(item == NULL || itemId != item->getID() || !item->rotate()){
+	if(item == NULL || itemId != item->getID() || !item->isRoteable()){
 		playerSendErrorMessage(player, RET_NOTPOSSIBLE);
 		return false;
 	}

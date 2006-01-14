@@ -101,6 +101,7 @@ public:
 	bool isWeapon() const;
 	bool isUseable() const;
 	bool isHangable() const;
+	bool isRoteable() const;
 
 	bool floorChangeDown() const;
 	bool floorChangeNorth() const;
@@ -141,11 +142,7 @@ public:
 	
 	virtual long getDecayTime();
 	bool canDecay();
-
-	//virtual Item* decay();
 	bool isDecaying;
-
-	bool rotate();
 
 protected:
 	unsigned short id;  // the same id as in ItemType
