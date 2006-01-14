@@ -27,11 +27,19 @@
 #include "game.h"
 
 #include <string>
-
 #include "player.h"
 
+enum connectResult_t{
+	CONNECT_SUCCESS = 1,
+	CONNECT_TOMANYPLAYERS = 2,
+	CONNECT_MASTERPOSERROR = 3,
+	CONNECT_INTERNALERROR = 4
+};
+
 class NetworkMessage;
-// base class to represent different protokolls...
+
+
+// base class to represent different protocols...
 class Protocol
 {
 public:
@@ -59,7 +67,6 @@ public:
 	virtual void sendAddCreature(const Creature* creature, bool isLogin) = 0;
 	virtual void sendRemoveCreature(const Creature* creature, const Position& pos, uint32_t stackpos, bool isLogout) = 0;
 	virtual void sendMoveCreature(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport) = 0;
-	//virtual void sendTeleportCreature(const Creature* creature, const Position& oldPos, uint32_t oldStackPos) = 0;
 
 	//container
 	virtual void sendAddContainerItem(uint8_t cid, const Item* item) = 0;
@@ -112,4 +119,4 @@ protected:
 };
 
 
-#endif  // #ifndef __PROTOCOL_H__
+#endif

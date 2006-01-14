@@ -73,13 +73,25 @@ void Protocol75::reinitializeProtocol()
 	knownPlayers.clear();
 }
 
-bool Protocol75::ConnectPlayer()
+connectResult_t Protocol75::ConnectPlayer()
 {	
 	Status* stat = Status::instance();
 	if(!stat->hasSlot() && player->access == 0)
-		return false;
-	else                    
-		return game->placeCreature(player->getLoginPosition(), player);
+		return CONNECT_TOMANYPLAYERS;
+	else{
+		//last login position
+		if(game->placeCreature(player->getLoginPosition(), player)){
+			return CONNECT_SUCCESS;
+		}
+		//temple
+		else if(game->placeCreature(player->masterPos, player)){
+			return CONNECT_SUCCESS;
+		}
+		else
+			return CONNECT_MASTERPOSERROR;
+	}
+
+	return CONNECT_INTERNALERROR;
 }
 
 
@@ -812,7 +824,7 @@ void Protocol75::parseUseItem(NetworkMessage& msg)
 	uint8_t index = msg.GetByte();
 	
 #ifdef __DEBUG__
-	std::cout << "parseUseItem: " << "x: " << pos.x << ", y: " << (int)pos.y <<  ", z: " << (int)pos.z << ", item: " << (int)item << ", stack: " << (int)stack << ", index: " << (int)index << std::endl;
+	std::cout << "parseUseItem: " << "x: " << pos.x << ", y: " << (int)pos.y <<  ", z: " << (int)pos.z << ", item: " << (int)itemId << ", stack: " << (int)stackpos << ", index: " << (int)index << std::endl;
 #endif
 	
 	game->playerUseItem(player, pos,stackpos, index, itemId);

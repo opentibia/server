@@ -287,7 +287,8 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 						player->useThing2();
 						player->setID();
 						IOPlayer::instance()->loadPlayer(player, name);	
-					
+						connectResult_t connectRes = CONNECT_INTERNALERROR;
+
 						if(playerexist && !g_config.getGlobalNumber("allowclones", 0)){
 							#ifdef __DEBUG_PLAYERS__
 							std::cout << "reject player..." << std::endl;
@@ -306,14 +307,29 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 							msg.AddString("Server temporarly closed.");
 							msg.WriteToSocket(s);
 						}
-						else if(!protocol->ConnectPlayer()){
+						else if((connectRes = protocol->ConnectPlayer()) != CONNECT_SUCCESS){
 							#ifdef __DEBUG_PLAYERS__
 							std::cout << "reject player..." << std::endl;
 							#endif
 							msg.Reset();
-							msg.AddByte(0x16);
-							msg.AddString("Too many Players online.");
-							msg.AddByte(45);
+							switch(connectRes){
+								case CONNECT_TOMANYPLAYERS:
+									msg.AddByte(0x16);
+									msg.AddString("Too many players online.");
+									msg.AddByte(45); //number of seconds before retry
+									break;
+
+								case CONNECT_MASTERPOSERROR:
+									msg.AddByte(0x14);
+									msg.AddString("Temple position is wrong. Contact the admininistrator.");
+									break;
+
+								default:
+									msg.AddByte(0x14);
+									msg.AddString("Internal error.");
+								break;
+							}
+
 							msg.WriteToSocket(s);
 						} 
 						else{
@@ -394,23 +410,24 @@ int main(int argc, char *argv[])
 #ifdef __OTSERV_ALLOCATOR_STATS__
 	OTSYS_CREATE_THREAD(allocatorStatsThread, NULL);
 #endif
+
 #if defined __EXCEPTION_TRACER__
 	ExceptionHandler mainExceptionHandler;	
 	mainExceptionHandler.InstallHandler();
 #endif
+
 #ifdef __WIN_LOW_FRAG_HEAP__
 	ULONG  HeapFragValue = 2;
 
-    if(HeapSetInformation(GetProcessHeap(),HeapCompatibilityInformation,&HeapFragValue,sizeof(HeapFragValue))){
+	if(HeapSetInformation(GetProcessHeap(),HeapCompatibilityInformation,&HeapFragValue,sizeof(HeapFragValue))){
 		std::cout << "Heap Success" << std::endl;
 	}
-    else{
+	else{
 		std::cout << "Heap Error" << std::endl;
 	}
 #endif
 
 	std::cout << ":: OTServ Development-Version 0.5.0 - CVS Preview" << std::endl;
-	//std::cout << ":: OTServ Version 0.4.1" << std::endl;
 	std::cout << ":: ====================" << std::endl;
 	std::cout << "::" << std::endl;
 	
@@ -436,13 +453,12 @@ int main(int argc, char *argv[])
 	
 	// random numbers generator
 	std::cout << ":: Initializing the random numbers... ";
-	srand ( time(NULL) );
+	srand(time(NULL));
 	std::cout << "[done]" << std::endl;
 	
 	// read global config
 	std::cout << ":: Loading lua script config.lua... ";
-	if (!g_config.OpenFile("config.lua"))
-	{
+	if (!g_config.OpenFile("config.lua")){
 		ErrorMessage("Unable to load config.lua!");
 		return -1;
 	}
@@ -450,8 +466,7 @@ int main(int argc, char *argv[])
 	
 	//load spells data
 	std::cout << ":: Loading spells spells.xml... ";
-	if(!spells.loadFromXml(g_config.getGlobalString("datadir")))
-	{
+	if(!spells.loadFromXml(g_config.getGlobalString("datadir"))){
 		ErrorMessage("Unable to load spells.xml!");
 		return -1;
 	}
@@ -459,17 +474,15 @@ int main(int argc, char *argv[])
 	
 	//load actions data
 	std::cout << ":: Loading actions actions.xml... ";
-	if(!actions.loadFromXml(g_config.getGlobalString("datadir")))
-	{
+	if(!actions.loadFromXml(g_config.getGlobalString("datadir"))){
 		ErrorMessage("Unable to load actions.xml!");
 		return -1;
 	}
 	std::cout << "[done]" << std::endl;
 	
-	//load commands data
+	//load commands
 	std::cout << ":: Loading commands commands.xml... ";
-	if(!commands.loadXml(g_config.getGlobalString("datadir")))
-	{
+	if(!commands.loadXml(g_config.getGlobalString("datadir"))){
 		ErrorMessage("Unable to load commands.xml!");
 		return -1;
 	}
@@ -477,17 +490,15 @@ int main(int argc, char *argv[])
 	
 	// load item data
 	std::cout << ":: Loadding " << g_config.getGlobalString("datadir") << "items/items.otb ... ";
-	if (Item::items.loadFromOtb(g_config.getGlobalString("datadir") + "items/items.otb"))
-	{
+	if (Item::items.loadFromOtb(g_config.getGlobalString("datadir") + "items/items.otb")){
 		ErrorMessage("Could not load items.otb!");
 		return -1;
 	}
 	std::cout << "[done]" << std::endl;
 	
-	// load monster data
+	// load monsters
 	std::cout << ":: Loadding monsters monters/monsters.xml ... ";
-	if(!g_monsters.loadFromXml(g_config.getGlobalString("datadir")))
-	{
+	if(!g_monsters.loadFromXml(g_config.getGlobalString("datadir"))){
 		ErrorMessage("Could not load monsters/monsters.xml!");
 		return -1;
 	}
@@ -515,6 +526,7 @@ int main(int argc, char *argv[])
 		passwordType = PASSWORD_TYPE_PLAIN;
 	}
 
+	///*
 	// loads the map and, if needed, an extra-file spawns
 	switch(g_game.loadMap(g_config.getGlobalString("map"), g_config.getGlobalString("mapkind"))){
 	case MAP_LOADER_ERROR:
@@ -534,21 +546,20 @@ int main(int argc, char *argv[])
 		break;
 	#endif
 	}
+	//*/
 	
-  	// Call to WSA Startup on Windows Systems...
+	// Call to WSA Startup on Windows Systems...
 #ifdef WIN32
 	WORD wVersionRequested; 
 	WSADATA wsaData; 
 	wVersionRequested = MAKEWORD( 1, 1 );
 	
-	if (WSAStartup(wVersionRequested, &wsaData) != 0)
-	{
+	if(WSAStartup(wVersionRequested, &wsaData) != 0){
 		ErrorMessage("Winsock startup failed!!");
 		return -1;
 	} 
 	
-	if ((LOBYTE(wsaData.wVersion) != 1) || (HIBYTE(wsaData.wVersion) != 1)) 
-	{ 
+	if((LOBYTE(wsaData.wVersion) != 1) || (HIBYTE(wsaData.wVersion) != 1)) { 
 		WSACleanup( ); 
 		ErrorMessage("No Winsock 1.1 found!");
 		return -1;
@@ -562,34 +573,31 @@ int main(int argc, char *argv[])
 	serverIPs.push_back(IpNetMask);
 	
 	char szHostName[128];
-	if (gethostname(szHostName, 128) == 0)
-	{
+	if(gethostname(szHostName, 128) == 0){
 		std::cout << "::" << std::endl << ":: Running on host " << szHostName << std::endl;
 	
 		hostent *he = gethostbyname(szHostName);
 		
-		if (he)
-		{
+		if(he){
 			std::cout << ":: Local IP address(es):  ";
 			unsigned char** addr = (unsigned char**)he->h_addr_list;
 	
-			while (addr[0] != NULL)
-			{
+			while (addr[0] != NULL){
 				std::cout << (unsigned int)(addr[0][0]) << "."
 				<< (unsigned int)(addr[0][1]) << "."
 				<< (unsigned int)(addr[0][2]) << "."
 				<< (unsigned int)(addr[0][3]) << "  ";
-		
-			IpNetMask.first  = *(unsigned long*)(*addr);
-			IpNetMask.second = 0x0000FFFF;
-			serverIPs.push_back(IpNetMask);
-		
-			addr++;
+
+				IpNetMask.first  = *(unsigned long*)(*addr);
+				IpNetMask.second = 0x0000FFFF;
+				serverIPs.push_back(IpNetMask);
+
+				addr++;
 			}
 
-		std::cout << std::endl;
-    		}
-  	}
+			std::cout << std::endl;
+		}
+	}
   
 	std::cout << ":: Global IP address:     ";
 	std::string ip;
@@ -626,7 +634,7 @@ int main(int argc, char *argv[])
 	
 		if(listen_socket <= 0){
 #ifdef WIN32
-	    		WSACleanup(); 
+			WSACleanup();
 #endif
 			ErrorMessage("Unable to create server socket (1)!");
 			return -1;
@@ -644,7 +652,7 @@ int main(int argc, char *argv[])
 		// bind socket on port
 		if(bind(listen_socket, (struct sockaddr*)&local_adress, sizeof(struct sockaddr_in)) < 0){
 #ifdef WIN32
-	    		WSACleanup();    
+			WSACleanup();
 #endif
 			ErrorMessage("Unable to create server socket (2)!");
 			return -1;
@@ -653,9 +661,9 @@ int main(int argc, char *argv[])
 		// now we start listen on the new socket
 		if(listen(listen_socket, 10) == SOCKET_ERROR){
 #ifdef WIN32
-    			WSACleanup();
+			WSACleanup();
 #endif
-    			ErrorMessage("Listen on server socket not possible!");
+			ErrorMessage("Listen on server socket not possible!");
 			return -1;
 		} // if (listen(*listen_socket, 10) == -1)
 
@@ -693,15 +701,18 @@ int main(int argc, char *argv[])
 					accept_errors++;
 			}
 		}
+
 		closesocket(listen_socket);
 		listen_errors++;
-  	}
+	}
+
 #ifdef WIN32
-  	WSACleanup();
+  WSACleanup();
 #endif
 
 #if defined __EXCEPTION_TRACER__	
-  	mainExceptionHandler.RemoveHandler();
+	mainExceptionHandler.RemoveHandler();
 #endif
+
 	return 0;
 }

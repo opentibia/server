@@ -21,16 +21,14 @@
 //////////////////////////////////////////////////////////////////////
 
 
-#ifndef tprot75_h
-#define tprot75_h
+#ifndef __PROTOCOL75_H__
+#define __PROTOCOL75_H__
 
-#include "protocol.h"
-#include "creature.h"
-#include "item.h"
-#include "container.h"
 #include <string>
+#include "protocol.h"
 
 class NetworkMessage;
+class Creature;
 
 class Protocol75 : public Protocol
 {
@@ -38,7 +36,7 @@ public:
 	Protocol75(SOCKET s);
 	virtual ~Protocol75();
 	
-	bool ConnectPlayer();
+	connectResult_t ConnectPlayer();
 	void ReceiveLoop();  
 	void WriteBuffer(NetworkMessage &add);
 	virtual void reinitializeProtocol();

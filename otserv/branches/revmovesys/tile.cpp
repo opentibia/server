@@ -495,8 +495,16 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			if(const Item* iitem = iithing->getItem()){
 				const ItemType& iiType = Item::items[iitem->getID()];
 
-				if(iiType.blockSolid)
-					return RET_NOTPOSSIBLE;
+				if(iiType.blockSolid){
+					//check if this a creature that just is about to login/spawn
+					//those can be placed here if the blocking item is moveable
+					if(!creature->getParent()){
+						if(!iiType.moveable)
+							return RET_NOTPOSSIBLE;
+					}
+					else
+						return RET_NOTPOSSIBLE;
+				}
 			}
 		}
 	}
