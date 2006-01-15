@@ -2444,8 +2444,8 @@ void Player::__internalAddThing(uint32_t index, Thing* thing)
 	if(index > 0 && index < 11){
 		if(items[index]){
 #ifdef __DEBUG__MOVESYS__
-			std::cout << "Failure: [Player::__internalAddThing], player: " << getName() << ", items[index] is not empty" << std::endl;
-			int *a = NULL; *a = 1;
+			std::cout << "Warning: [Player::__internalAddThing], player: " << getName() << ", items[index] is not empty." << std::endl;
+			//int *a = NULL; *a = 1;
 #endif
 			return;
 		}
