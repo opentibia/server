@@ -41,10 +41,9 @@ public:
 
 	bool exeCommand(Creature* creature, const std::string& cmd);
 	
-	
 protected:
 	bool loaded;
-	Game *game;
+	Game* game;
 	std::string datadir;
 
 	//commands
@@ -65,6 +64,8 @@ protected:
 	bool openServer(Creature* creature, const std::string& cmd, const std::string& param);
 	bool onlineList(Creature* creature, const std::string& cmd, const std::string& param);
 	bool teleportNTiles(Creature* creature, const std::string& cmd, const std::string& param);
+	//bool invitePlayer(Creature* creature, const std::string& cmd, const std::string& param);
+	//bool uninvitePlayer(Creature* creature, const std::string& cmd, const std::string& param);
 	
 	//table of commands
 	static s_defcommands defined_commands[];
