@@ -11,8 +11,8 @@ otserv_SOURCES = account.cpp container.cpp creature.cpp game.cpp ioaccount.cpp \
 	item.cpp items.cpp luascript.cpp magic.cpp map.cpp monster.cpp networkmessage.cpp npc.cpp \
 	otserv.cpp player.cpp position.cpp protocol.cpp protocol76.cpp spells.cpp \
 	status.cpp thing.cpp tile.cpp tools.cpp account.h bootstrap.sh config.h const76.h \
-	container.h creature.h definitions.h game.h ioaccount.h  \
-	iomap.h iomapxml.h ioplayer.h item.h items.h \
+	container.h creature.h definitions.h game.h ioaccount.h depot.cpp depot.h \
+	iomap.h iomapxml.h ioplayer.h item.h items.h teleport.cpp teleport.h \
 	luascript.h magic.h map.h monster.h networkmessage.h npc.h otsystem.h player.h \
 	position.h protocol.h protocol76.h scheduler.h spells.h stamp-h status.h \
 	tasks.h templates.h texcept.h thing.h tile.h tools.h spawn.cpp spawn.h \
@@ -30,7 +30,7 @@ otserv_SOURCES = account.cpp container.cpp creature.cpp game.cpp ioaccount.cpp \
 	luascript.h magic.h map.h monster.h networkmessage.h npc.h otsystem.h player.h \
 	position.h protocol.h protocol76.h scheduler.h spells.h stamp-h status.h \
 	tasks.h templates.h texcept.h thing.h tile.h tools.h spawn.cpp spawn.h \
-	actions.h actions.cpp scheduler.cpp commands.cpp commands.h  \
+	actions.h actions.cpp scheduler.cpp commands.cpp commands.h depot.cpp depot.h \
 	md5.cpp md5.h fileloader.cpp fileloader.h chat.cpp chat.h logger.cpp logger.h \
-	iomapotbm.h iomapotbm.cpp monsters.h monsters.cpp
+	iomapotbm.h iomapotbm.cpp monsters.h monsters.cpp teleport.cpp teleport.h
 endif
