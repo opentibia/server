@@ -86,6 +86,7 @@ public:
   bool floorChange() const;
   bool floorChangeDown() const;
   bool floorChange(Direction direction) const;
+	uint32_t getHeight() const;
   
   virtual std::string getDescription(int32_t lookDistance) const;
 

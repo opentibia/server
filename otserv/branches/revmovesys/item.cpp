@@ -306,8 +306,8 @@ bool Item::hasProperty(enum ITEMPROPERTY prop) const
 				return true;
 		break;
 
-		case NOTMOVEABLEBLOCKSOLID:
-			if(it.blockSolid && !it.moveable)
+		case HASHEIGHT:
+			if(it.hasHeight)
 				return true;
 		break;
 
@@ -321,10 +321,15 @@ bool Item::hasProperty(enum ITEMPROPERTY prop) const
 				return true;
 		break;
 
-		case NOTMOVEABLEBLOCKPATHFIND:
+		/*case NOTMOVEABLEBLOCKSOLID:
+			if(it.blockSolid && !it.moveable)
+				return true;
+		break;*/
+
+		/*case NOTMOVEABLEBLOCKPATHFIND:
 			if(it.blockPathFind && !it.moveable)
 				return true;
-		break;
+		break;*/
 	}
 
 	return false;

@@ -1002,49 +1002,79 @@ ReturnValue Game::moveCreature(Creature* creature, Direction direction)
 	if(creature->isRemoved())
 		return RET_NOERROR;
 
-	Cylinder* fromCylinder = creature->getTile();
-	Cylinder* toCylinder = NULL;
+	Cylinder* fromTile = creature->getTile();
+	Cylinder* toTile = NULL;
+
+	const Position& currentPos = creature->getPosition();
+	Position destPos = currentPos;
 
 	switch(direction){
 		case NORTH:
-			toCylinder = getTile(creature->getPosition().x, creature->getPosition().y - 1, creature->getPosition().z);
+			destPos.y -= 1;
 		break;
 
 		case SOUTH:
-			toCylinder = getTile(creature->getPosition().x, creature->getPosition().y + 1, creature->getPosition().z);
+			destPos.y += 1;
 		break;
 		
 		case WEST:
-			toCylinder = getTile(creature->getPosition().x - 1, creature->getPosition().y, creature->getPosition().z);
+			destPos.x -= 1;
 		break;
 
 		case EAST:
-			toCylinder = getTile(creature->getPosition().x + 1, creature->getPosition().y, creature->getPosition().z);
+			destPos.x += 1;
 		break;
 
 		case SOUTHWEST:
-			toCylinder = getTile(creature->getPosition().x - 1, creature->getPosition().y + 1, creature->getPosition().z);
+			destPos.x -= 1;
+			destPos.y += 1;
 		break;
 
 		case NORTHWEST:
-			toCylinder = getTile(creature->getPosition().x - 1, creature->getPosition().y - 1, creature->getPosition().z);
+			destPos.x -= 1;
+			destPos.y -= 1;
 		break;
 
 		case NORTHEAST:
-			toCylinder = getTile(creature->getPosition().x + 1, creature->getPosition().y - 1, creature->getPosition().z);
+			destPos.x += 1;
+			destPos.y -= 1;
 		break;
 
 		case SOUTHEAST:
-			toCylinder = getTile(creature->getPosition().x + 1, creature->getPosition().y + 1, creature->getPosition().z);
+			destPos.x += 1;
+			destPos.y += 1;
 		break;
 	}
+	
+	if(creature->getPlayer()){
+		//try go up
+		if(currentPos.z != 8 && creature->getTile()->hasProperty(HASHEIGHT) && creature->getTile()->getHeight() >= 3){
+			Tile* tmpTile = map->getTile(currentPos.x, currentPos.y, currentPos.z - 1);
+			if(tmpTile == NULL || tmpTile->ground == NULL){
+				tmpTile = map->getTile(destPos.x, destPos.y, destPos.z - 1);
+				if(tmpTile && tmpTile->ground){
+					destPos.z -= 1;
+				}
+			}
+		}
+		else{
+			//try go down
+			Tile* tmpTile = map->getTile(destPos);
+			if(creature->getPosition().z != 7 && (tmpTile == NULL || tmpTile->ground == NULL)){
+				tmpTile = map->getTile(destPos.x, destPos.y, destPos.z + 1);
 
-	ReturnValue ret = RET_NOERROR;
-	if(toCylinder == NULL){
-		ret = RET_NOTPOSSIBLE;
+				if(tmpTile && tmpTile->getHeight() >= 3){
+					destPos.z += 1;
+				}
+			}
+		}
 	}
-	else{	
-		ret = internalCreatureMove(creature, fromCylinder, toCylinder);
+
+	toTile = map->getTile(destPos);
+
+	ReturnValue ret = RET_NOTPOSSIBLE;
+	if(toTile != NULL){
+		ret = internalCreatureMove(creature, fromTile, toTile);
 	}
 
 	if(ret != RET_NOERROR){
@@ -1109,7 +1139,7 @@ void Game::moveItem(Player* player, Cylinder* fromCylinder, Cylinder* toCylinder
 	//check throw distance
 	else if((std::abs(player->getPosition().x - toPos.x) > item->getThrowRange()) ||
 			(std::abs(player->getPosition().y - toPos.y) > item->getThrowRange()) ||
-			(std::abs(fromPos.z - toPos.z) * 2 > item->getThrowRange()) ){
+			(std::abs(fromPos.z - toPos.z) * 4 > item->getThrowRange()) ){
 		ret = RET_DESTINATIONOUTOFREACH;
 	}
 	else if(!map->canThrowObjectTo(fromPos, toPos)){
@@ -1356,11 +1386,13 @@ ReturnValue Game::internalRemoveItem(Item* item, int32_t count /*= -1*/,  bool t
 		//remove the item
 		cylinder->__removeThing(item, count);
 
+		//if(isRemove){
 		if(item->isRemoved()){
 			FreeThing(item);
 		}
 
 		cylinder->postRemoveNotification(item);
+		//}
 	}
 	
 	return RET_NOERROR;
@@ -1891,6 +1923,7 @@ void Game::creatureApplyDamage(Creature *creature, int damage, int &outDamage, i
 		outManaDamage = 0;
 	}
 }
+
 bool Game::creatureOnPrepareAttack(Creature *creature, Position pos)
 {
   if(creature){ 
@@ -1925,6 +1958,7 @@ bool Game::creatureOnPrepareAttack(Creature *creature, Position pos)
 	
 	return false;
 }
+
 bool Game::creatureOnPrepareMagicAttack(Creature *creature, Position pos, const MagicEffectClass* me)
 {
 	if(!me->offensive || me->isIndirect() || creatureOnPrepareAttack(creature, pos)) {
@@ -1956,6 +1990,7 @@ bool Game::creatureOnPrepareMagicAttack(Creature *creature, Position pos, const 
 
 	return false;
 }
+
 void Game::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fight_t damagetype)
 {
 	if(this->isExecutingEvents){
@@ -2164,6 +2199,7 @@ void Game::CreateDamageUpdate(Creature* creature, Creature* attackCreature, int 
 		player->sendTextMessage(MSG_ADVANCE, "You are dead.");	
 	}
 }
+
 void Game::CreateManaDamageUpdate(Creature* creature, Creature* attackCreature, int damage)
 {
 	Player* player = dynamic_cast<Player*>(creature);
@@ -2183,14 +2219,6 @@ void Game::CreateManaDamageUpdate(Creature* creature, Creature* attackCreature, 
 		//msg.AddTextMessage(MSG_EVENT, dmgmesg.str().c_str());
 	}
 }
-
-/*
-bool Game::creatureCastSpell(Creature *creature, const Position& centerpos, const MagicEffectClass& me)
-{	
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::creatureCastSpell()");
-	return creatureMakeMagic(creature, centerpos, &me);
-}
-*/
 
 bool Game::creatureThrowRune(Creature *creature, const Position& centerpos, const MagicEffectClass& me)
 {	

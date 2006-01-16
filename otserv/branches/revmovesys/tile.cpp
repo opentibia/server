@@ -137,6 +137,19 @@ bool Tile::floorChange(Direction direction) const
 	return false;
 }
 
+uint32_t Tile::getHeight() const
+{
+	uint32_t height = 0;
+	Item* iiItem = NULL;
+	for(uint32_t i = 0; i < getThingCount(); ++i){
+		iiItem = __getThing(i)->getItem();
+
+		if(iiItem && iiItem->hasProperty(HASHEIGHT))
+			++height;
+	}
+
+	return height;
+}
 
 int Tile::getThingCount() const
 {
@@ -153,15 +166,6 @@ Thing* Tile::getTopMoveableThing()
 {	
 	if(ground && !ground->isNotMoveable())
 		return ground;
-
-	/*for(int i = 0; i < topItems.size(); i++){
-		if(topItems[i] && !topItems[i]->isNotMoveable())
-			return topItems[i];
-	}
-
-	for(int i = 0; i < creatures.size(); i++){
-		return creatures[i];
-	}*/
 
 	for(int i = 0; i < downItems.size(); i++){
 		if(downItems[i] && !downItems[i]->isNotMoveable())
