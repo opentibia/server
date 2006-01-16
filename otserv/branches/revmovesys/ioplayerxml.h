@@ -33,21 +33,26 @@
 
 /** Baseclass for all Player-Loaders */
 class IOPlayerXML : protected IOPlayer{
-  public:
+public:
 	/** Get a textual description of what source is used
-	  * \returns Name of the source*/
+	* \returns Name of the source*/
 	virtual char* getSourceDescription(){return "Player source: XML";};
 	virtual bool loadPlayer(Player* player, std::string name);
+	
 	/** Save a player
-	  * \returns Wheter the player was successfully saved
-	  * \param player the player to save
-	  */
+	* \returns Wheter the player was successfully saved
+	* \param player the player to save
+	*/
 	bool savePlayer(Player* player);
+
+	bool getGuidByName(unsigned long &guid, unsigned long &alvl, std::string &name);
+
 	IOPlayerXML();
 	virtual ~IOPlayerXML(){};
-  private:
-	  bool LoadContainer(xmlNodePtr item,Container* container);
-  	  bool SaveContainer(xmlNodePtr item,Container* container);  	  
+
+private:
+	bool LoadContainer(xmlNodePtr item,Container* container);
+	bool SaveContainer(xmlNodePtr item,Container* container);  	  
 };
 
 #endif
