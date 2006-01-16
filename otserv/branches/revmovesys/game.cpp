@@ -250,7 +250,7 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 
 			//Add blood?
 			if(drawBlood || attackedPlayer){
-				Item* splash = Item::CreateItem(2016, FLUID_BLOOD);
+				Item* splash = Item::CreateItem(ITEM_FULLSPLASH, FLUID_BLOOD);
 				game->internalAddItem(attackTile, splash);
 				game->startDecay(splash);
 			}
@@ -350,7 +350,7 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 		}
 		//Add blood?
 		else if(drawBlood && damage > 0){
-			Item* splash = Item::CreateItem(2019, FLUID_BLOOD);
+			Item* splash = Item::CreateItem(ITEM_SMALLSPLASH, FLUID_BLOOD);
 			game->internalAddItem(attackTile, splash);
 			game->startDecay(splash);
 		}

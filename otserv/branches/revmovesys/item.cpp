@@ -36,7 +36,7 @@ Item* Item::CreateItem(const unsigned short _type, unsigned short _count /*= 1*/
 {
 	Item* newItem = NULL;
 
-	if(_type == 2589 || _type == 2590 || _type == 2591 || _type == 2592){
+	if(_type == ITEM_LOCKER1 || _type == ITEM_LOCKER2 || _type == ITEM_LOCKER3 || _type == ITEM_LOCKER4){
 		newItem = new Depot(_type);
 	}
 	else if(items[_type].isContainer()){
