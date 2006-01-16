@@ -19,8 +19,8 @@
 //////////////////////////////////////////////////////////////////////
 
 
-#ifndef __monster_h_
-#define __monster_h_
+#ifndef __MONSTER_H__
+#define __MONSTER_H__
 
 #include "creature.h"
 #include "game.h"
@@ -30,7 +30,7 @@
 
 class Creature;
 
-enum monsterstate_t {
+enum monsterstate_t{
 	STATE_IDLE,
 	STATE_IDLESUMMON,
 	STATE_TARGETNOTREACHABLE,
@@ -38,7 +38,7 @@ enum monsterstate_t {
 	STATE_FLEEING,
 };
 
-enum monstermode_t {
+enum monstermode_t{
 	MODE_NORMAL,
 	MODE_AGGRESSIVE
 };
@@ -52,31 +52,26 @@ public:
 
 	virtual ~Monster();
 	//const Monster& operator=(const Monster& rhs);
+
+	virtual Monster* getMonster() {return this;};
+	virtual const Monster* getMonster() const {return this;};
+
+	virtual const std::string& getName() const;
+	virtual bool isPushable() const;
+
 	virtual unsigned long idRange(){ return 0x40000000;}
 	static AutoList<Monster> listMonster;
 	void removeList() {listMonster.removeList(getID());}
 	void addList() {listMonster.addList(this);}
 	
-	virtual void useThing() {
-		//std::cout << "Monster: useThing() " << this << std::endl;
-		useCount++;
-	};
-	
-	virtual void releaseThing() {
-		//std::cout << "Monster: releaseThing() " << this << std::endl;
-		useCount--;
-		if (useCount == 0)
-			delete this;
-	};
-	
 	virtual int getArmor() const;
 	virtual int getDefense() const;
-	virtual const std::string& getName() const;
 	
 	virtual void setMaster(Creature* creature);
 	bool isSummon() {return (getMaster() != NULL);}
 	virtual void onAttack();
-	
+	bool canPushItems() const {return mType->canPushItems;};
+
 	static unsigned long getRandom();
 	
 private:
@@ -111,8 +106,8 @@ private:
 	void reThink(bool updateOnlyState = true);
 	
 	void selectTarget(const Creature* creature, bool canReach /* = true*/);
+
 protected:
-	int useCount;
 	PhysicalAttackClass	*curPhysicalAttack;
 		
 	bool doAttacks(Creature* attackedCreature, monstermode_t mode = MODE_NORMAL);
@@ -121,9 +116,9 @@ protected:
 	virtual subfight_t getSubFightType()  {return curPhysicalAttack->disttype;}
 	virtual int getWeaponDamage() const;
 	
-	void onCreatureEnter(const Creature *creature, bool canReach = true);
-	void onCreatureLeave(const Creature *creature);
-	void onCreatureMove(const Creature *creature, const Position *oldPos);
+	void creatureEnter(const Creature *creature, bool canReach = true);
+	void creatureLeave(const Creature *creature);
+	void creatureMove(const Creature *creature, const Position& oldPos);
 	
 	bool validateDistanceAttack(const Creature *creature);
 	bool validateDistanceAttack(const Position &pos);
@@ -133,23 +128,21 @@ protected:
 	virtual int getLostExperience();
 	virtual void dropLoot(Container *corpse);
 	
-	virtual void onThingMove(const Creature *creature, const Thing *thing, const Position *oldPos,
-		unsigned char oldstackpos, unsigned char oldcount, unsigned char count);
-	
-	virtual void onCreatureAppear(const Creature *creature);
-	virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos, bool tele);
-	virtual void onThingDisappear(const Thing* thing, unsigned char stackPos);
-	virtual void onThingTransform(const Thing* thing,int stackpos);
-	virtual void onThingAppear(const Thing* thing);
-	virtual void onTeleport(const Creature *creature, const Position *oldPos, unsigned char oldstackpos);
-	
+	virtual void onAddTileItem(const Position& pos, const Item* item);
+	virtual void onUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* oldItem, const Item* newItem);
+	virtual void onRemoveTileItem(const Position& pos, uint32_t stackpos, const Item* item);
+	virtual void onUpdateTile(const Position& pos);
+
+	virtual void onCreatureAppear(const Creature* creature, bool isLogin);
+	virtual void onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout);
+	virtual void onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport);
+
 	virtual bool isAttackable() const { return true; };
-	virtual bool isPushable() const;
 	
 	virtual int onThink(int& newThinkTicks);
 	virtual void setAttackedCreature(const Creature* creature);
 	
-	std::string getDescription(bool self) const;
+	virtual std::string getDescription(int32_t lookDistance) const;
 };
 
-#endif // __monster_h_
+#endif

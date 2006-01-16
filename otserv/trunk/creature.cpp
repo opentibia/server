@@ -27,6 +27,9 @@
 
 #include "game.h"
 #include "creature.h"
+#include "npc.h"
+#include "player.h"
+#include "monster.h"
 #include "tile.h"
 #include "otsystem.h"
 
@@ -38,14 +41,11 @@ AutoID::list_type AutoID::list;
 
 extern Game g_game;
 
-//Creature::Creature(const std::string& name) :
 Creature::Creature() :
 access(0)
 {
 	direction  = NORTH;
 	master = NULL;
-	
-	//this->name = name;
 	
 	lookhead   = 0;
 	lookbody   = 0;
@@ -59,8 +59,10 @@ access(0)
 	
 	health     = 1000;//150;
 	healthmax  = 1000;//150;
-	//experience = 100000;
-	lastmove=0;
+	level = 0;
+	mana = 0;
+	manamax = 0;
+	lastmove = 0;
 	
 	inFightTicks = 0;
 	inFightTicks = 0;
@@ -73,7 +75,8 @@ access(0)
 	eventCheck = 0;
 	eventCheckAttacking = 0;
 	
-	attackedCreature = 0;
+	//attackedCreature = NULL;
+	attackedCreature2 = 0;
 	speed = 220;
 }
 
@@ -83,9 +86,17 @@ Creature::~Creature()
 	for(cit = summons.begin(); cit != summons.end(); ++cit) {
 		(*cit)->setAttackedCreature(NULL);
 		(*cit)->setMaster(NULL);
-		(*cit)->releaseThing();
+		(*cit)->releaseThing2();
 	}
-	
+
+	/*if(attackedCreature){
+		attackedCreature->releaseThing2();
+		attackedCreature = NULL;
+	}*/
+
+	attackedCreature2 = 0;
+
+	//std::cout << "Creature destructor " << this->getID() << std::endl;
 	summons.clear();
 }
 
@@ -99,7 +110,22 @@ void Creature::drainMana(int damage)
 	mana -= min(mana, damage);
 }
 
-//void Creature::setAttackedCreature(unsigned long id)
+Creature* Creature::getAttackedCreature()
+{
+	if(attackedCreature2 != 0){
+		return g_game.getCreatureByID(attackedCreature2);
+	}
+
+	return NULL;
+
+	/*
+	if(attackedCreature && !attackedCreature->isRemoved())
+		return attackedCreature;
+	else
+		return NULL;
+	*/
+}
+
 void Creature::setAttackedCreature(const Creature* creature)
 {
 	std::list<Creature*>::iterator cit;
@@ -107,11 +133,30 @@ void Creature::setAttackedCreature(const Creature* creature)
 		(*cit)->setAttackedCreature(creature);
 	}
 	
-	if(creature) {
-		attackedCreature = creature->getID();
+	if(creature){
+		attackedCreature2 = creature->getID();
 	}
-	else
-		attackedCreature = 0;
+	else{
+		attackedCreature2 = 0;
+	}
+
+	/*
+	if(creature){
+		if(attackedCreature != creature){
+			if(attackedCreature)
+				attackedCreature->releaseThing2();
+
+			attackedCreature = const_cast<Creature*>(creature);
+			attackedCreature->useThing2();
+		}
+	}
+	else{
+		if(attackedCreature){
+			attackedCreature->releaseThing2();
+			attackedCreature = NULL;
+		}
+	}
+	*/
 }
 
 void Creature::setMaster(Creature* creature)
@@ -124,7 +169,7 @@ void Creature::addSummon(Creature *creature)
 {
 	//std::cout << "addSummon: " << this << " summon=" << creature << std::endl;
 	creature->setMaster(this);
-	creature->useThing();
+	creature->useThing2();
 	summons.push_back(creature);
 	
 }
@@ -135,7 +180,7 @@ void Creature::removeSummon(Creature *creature)
 	std::list<Creature*>::iterator cit = std::find(summons.begin(), summons.end(), creature);
 	if(cit != summons.end()) {
 		(*cit)->setMaster(NULL);
-		(*cit)->releaseThing();
+		(*cit)->releaseThing2();
 		summons.erase(cit);
 	}
 }
@@ -231,35 +276,29 @@ std::vector<long> Creature::getInflicatedDamageCreatureList()
 	return damagelist;
 }
 
-bool Creature::canMovedTo(const Tile *tile) const
+std::string Creature::getDescription(int32_t lookDistance) const
 {
-	if(tile) {
-		return (tile->isBlocking(BLOCK_SOLID) == RET_NOERROR);
-	}
-
-	return false;
-}
-
-std::string Creature::getDescription(bool self) const
-{
-	std::stringstream s;
-	std::string str;	
-	s << "a creature.";
-	str = s.str();
+	std::string str = "a creature";
 	return str;
 }
 
 int Creature::getStepDuration() const
 {
+	OTSYS_THREAD_LOCK_CLASS lockClass(g_game.gameLock, "Creature::getStepDuration()");
+
 	int duration = 500;
-	Tile *tile = g_game.getTile(pos.x, pos.y, pos.z);
-	if(tile && tile->ground){
-		int groundid = tile->ground->getID();
-		uint16_t stepspeed = Item::items[groundid].speed;
-		if(stepspeed != 0) {
-			duration =  (1000 * stepspeed) / (getSpeed() != 0 ? getSpeed() : 220);
+
+	if(!isRemoved()){
+		Tile* tile = g_game.getTile(getPosition().x, getPosition().y, getPosition().z);
+		if(tile && tile->ground){
+			int groundid = tile->ground->getID();
+			uint16_t stepspeed = Item::items[groundid].speed;
+			if(stepspeed != 0) {
+				duration =  (1000 * stepspeed) / (getSpeed() != 0 ? getSpeed() : 220);
+			}
 		}
 	}
+
 	return duration;
 };
 

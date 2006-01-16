@@ -87,7 +87,7 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 		player->level = result.getDataInt("level");
 		player->level_percent  = (unsigned char)(100*(player->experience-player->getExpForLv(player->level))/(1.*player->getExpForLv(player->level+1)-player->getExpForLv(player->level)));
 		player->capacity = result.getDataInt("cap");
-		player->max_depot_items = result.getDataInt("maxdepotitems");
+		player->maxDepotLimit = result.getDataInt("maxdepotitems");
 		player->lastLoginSaved = result.getDataInt("lastlogin");
 	
 		player->vocation = (playervoc_t)result.getDataInt("vocation");
@@ -119,9 +119,9 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 		tokenizer tokens(pos, sep);
 	
 		tokenizer::iterator spawnit = tokens.begin();
-		player->pos.x = atoi(spawnit->c_str()); spawnit++;
-		player->pos.y = atoi(spawnit->c_str()); spawnit++;
-		player->pos.z = atoi(spawnit->c_str());
+		player->loginPosition.x = atoi(spawnit->c_str()); spawnit++;
+		player->loginPosition.y = atoi(spawnit->c_str()); spawnit++;
+		player->loginPosition.z = atoi(spawnit->c_str());
 		
 		//there is no "fuck" in the sources, but every major programm got
 		//one and i think here is a good place to add one
@@ -195,11 +195,18 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 				if(int slotid = result.getDataInt("slot",i))
 				{
 					if(slotid > 0 && slotid <= 10){
-						player->addItemInventory(myItem, slotid, true);
+						player->__internalAddThing(slotid, myItem);
 					}
 					else{
-						if(dynamic_cast<Container*>(myItem)){
-							player->addDepot(dynamic_cast<Container*>(myItem), slotid - 100);
+						if(Container* container = myItem->getContainer()){
+							if(Depot* depot = container->getDepot()){
+								player->addDepot(depot, slotid - 100);
+							}
+							else{
+								std::cout << "Error loading depot "<< slotid << " for player " << 
+									player->getGUID() << std::endl;
+								delete myItem;
+							}
 						}
 						else{
 							std::cout << "Error loading depot "<< slotid << " for player " << 
@@ -224,8 +231,8 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 				continue;
 	
 			if(int p=(*it).second.second) {
-				if(Container* c = dynamic_cast<Container*>(itemmap[p].first)) {
-					c->addItem((*it).second.first);
+				if(Container* c = itemmap[p].first->getContainer()) {
+					c->__internalAddThing((*it).second.first);
 				}
 			}
 		}
@@ -328,9 +335,8 @@ bool IOPlayerSQL::savePlayer(Player* player)
 		query << "`manamax` = " << player->manamax << ", ";
 		query << "`manaspent` = " << player->manaspent << ", ";
 		query << "`masterpos` = '" << player->masterPos.x<<";"<< player->masterPos.y<<";"<< player->masterPos.z << "', ";
-		query << "`pos` = '" << player->pos.x<<";"<< player->pos.y<<";"<< player->pos.z << "', ";
+		query << "`pos` = '" << player->getLoginPosition().x<<";"<< player->getLoginPosition().y<<";"<< player->getLoginPosition().z << "', ";
 		query << "`speed` = " << player->speed << ", ";
-		//query << "`cap` = " << player->cap << ", ";
 		query << "`cap` = " << player->getCapacity() << ", ";
 		query << "`food` = " << player->food << ", ";
 		query << "`sex` = " << player->sex << ", ";
@@ -361,7 +367,7 @@ bool IOPlayerSQL::savePlayer(Player* player)
 
 		typedef std::pair<Container*, int> containerStackPair;
 		std::list<containerStackPair> stack;
-		ContainerList::const_iterator it;
+		//ContainerList::const_iterator it;
 		Item* item = NULL;
 		Container* container = NULL;
 		Container* topcontainer = NULL;
@@ -379,7 +385,7 @@ bool IOPlayerSQL::savePlayer(Player* player)
 			streamitems << "(" << player->getGUID() <<"," << slotid << ","<< runningID <<","<< parentid <<"," << item->getID()<<","<< (int)item->getItemCountOrSubtype() << "," << 
 				(int)item->getActionId()<<",'"<< Database::escapeString(item->getText()) <<"','" << Database::escapeString(item->getSpecialDescription()) <<"'),";
 
-			topcontainer = dynamic_cast<Container*>(item);
+			topcontainer = item->getContainer();
 			if(topcontainer) {
 				stack.push_back(containerStackPair(topcontainer, runningID));
 			}
@@ -413,15 +419,15 @@ bool IOPlayerSQL::savePlayer(Player* player)
 			parentid = csPair.second;
 			stack.pop_front();
 
-			for (it = container->getItems(); it != container->getEnd(); ++it) {
+			for(int i = 0; i < container->size(); i++){
 				++runningID;
-				Container *container = dynamic_cast<Container*>(*it);
-				if(container) {
+				Item* item = container->getItem(i);
+				Container* container = item->getContainer();
+				if(container){
 					stack.push_back(containerStackPair(container, runningID));
 				}
-
-				streamitems << "(" << player->getGUID() <<"," << 0 /*slotid*/ << ","<< runningID <<","<< parentid <<"," << (*it)->getID()<<","<< (int)(*it)->getItemCountOrSubtype() << "," << 
-				(int)(*it)->getActionId()<<",'"<< Database::escapeString((*it)->getText()) <<"','" << Database::escapeString((*it)->getSpecialDescription()) <<"'),";
+				streamitems << "(" << player->getGUID() <<"," << 0 /*slotid*/ << ","<< runningID <<","<< parentid <<"," << item->getID()<<","<< (int)item->getItemCountOrSubtype() << "," << 
+				(int)item->getActionId()<<",'"<< Database::escapeString(item->getText()) <<"','" << Database::escapeString(item->getSpecialDescription()) <<"'),";
 			}
 		}
 
@@ -435,8 +441,8 @@ bool IOPlayerSQL::savePlayer(Player* player)
 			streamitems << "(" << player->getGUID() <<"," << dit->first + 100 << ","<< runningID <<","<< parentid <<"," << item->getID()<<","<< (int)item->getItemCountOrSubtype() << "," << 
 				(int)item->getActionId()<<",'"<< Database::escapeString(item->getText()) <<"','" << Database::escapeString(item->getSpecialDescription()) <<"'),";
 
-			topcontainer = dynamic_cast<Container*>(item);
-			if(topcontainer) {				
+			topcontainer = item->getContainer();
+			if(topcontainer){
 				stack.push_back(containerStackPair(topcontainer, runningID));
 			}
 
@@ -466,15 +472,16 @@ bool IOPlayerSQL::savePlayer(Player* player)
 			parentid = csPair.second;
 			stack.pop_front();
 
-			for (it = container->getItems(); it != container->getEnd(); ++it) {
+			for(int i = 0; i < container->size(); i++){
 				++runningID;
-				Container *container = dynamic_cast<Container*>(*it);
+				Item* item = container->getItem(i);	
+				Container* container = item->getContainer();
 				if(container) {
 					stack.push_back(containerStackPair(container, runningID));
 				}
 
-				streamitems << "(" << player->getGUID() <<"," << 0 /*slotid*/ << ","<< runningID <<","<< parentid <<"," << (*it)->getID()<<","<< (int)(*it)->getItemCountOrSubtype() << "," << 
-				(int)(*it)->getActionId()<<",'"<< Database::escapeString((*it)->getText()) <<"','" << Database::escapeString((*it)->getSpecialDescription()) <<"'),";
+				streamitems << "(" << player->getGUID() <<"," << 0 /*slotid*/ << ","<< runningID <<","<< parentid <<"," << item->getID()<<","<< (int)item->getItemCountOrSubtype() << "," << 
+				(int)item->getActionId()<<",'"<< Database::escapeString(item->getText()) <<"','" << Database::escapeString(item->getSpecialDescription()) <<"'),";
 			}
 		}
 		
@@ -577,12 +584,13 @@ std::string IOPlayerSQL::getItems(Item* i, int &startid, int slot, int player,in
 	(int)i->getActionId()<<",'"<< Database::escapeString(i->getText()) <<"','" << Database::escapeString(i->getSpecialDescription()) <<"'),";
 
 	//std::cout << "i";
-	if(Container* c = dynamic_cast<Container*>(i)){
+	if(Container* c = i->getContainer()){
 		//std::cout << "c";	
 		int pid = startid;
-		for(ContainerList::const_iterator it = c->getItems(); it != c->getEnd(); it++){
+		for(int i = 0; i < c->size(); i++){
+			Item* item = c->getItem(i);
 			//std::cout << "s";
-			ss << getItems(*it, startid, 0, player, pid);
+			ss << getItems(item, startid, 0, player, pid);
 			//std::cout << "r";
 		}
 	}

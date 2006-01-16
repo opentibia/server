@@ -1,49 +1,98 @@
-
-
+//////////////////////////////////////////////////////////////////////
+// OpenTibia - an opensource roleplaying game
+//////////////////////////////////////////////////////////////////////
+// 
+//////////////////////////////////////////////////////////////////////
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software Foundation,
+// Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+//////////////////////////////////////////////////////////////////////
 
 #ifndef __THING_H__
 #define __THING_H__
 
 #include "definitions.h"
-
 #include "position.h"
 
-
-enum BlockState {
- BLOCK_SOLID = 1,
- BLOCK_PROJECTILE = 2, 
- BLOCK_PATHFIND =  4, 
- BLOCK_PICKUPABLE = 8,
- BLOCK_PZ = 16
-};
-
-enum ReturnValue {
+enum ReturnValue{
 	RET_NOERROR,
+	RET_NOTPOSSIBLE,
 	RET_NOTENOUGHROOM,
-	RET_PROTECTIONZONE,
+	RET_PLAYERISPZLOCKED,
+	RET_PLAYERISNOTINVITED,
 	RET_CANNOTTHROW,
 	RET_THEREISNOWAY,
-	RET_NOTILE,
-	RET_CREATUREBLOCK
+	RET_DESTINATIONOUTOFREACH,
+	RET_CREATUREBLOCK,
+	RET_NOTMOVEABLE,
+	RET_DROPTWOHANDEDITEM,
+	RET_BOTHHANDSNEEDTOBEFREE,
+	RET_CANONLYUSEONEWEAPON,
+	RET_NEEDEXCHANGE,
+	RET_CANNOTBEDRESSED,
+	RET_PUTTHISOBJECTINYOURHAND,
+	RET_PUTTHISOBJECTINBOTHHANDS,
+	RET_TOFARAWAY,
+	RET_FIRSTGODOWNSTAIRS,
+	RET_FIRSTGOUPSTAIRS,
+	RET_CONTAINERNOTENOUGHROOM,
+	RET_NOTENOUGHCAPACITY,
+	RET_CANNOTPICKUP,
+	RET_THISISIMPOSSIBLE,
+	RET_DEPOTISFULL
 };
 
 class Tile;
-
+class Cylinder;
+class Item;
+class Creature;
 
 class Thing {
 public:
 	Thing();
 	virtual ~Thing();
 
-	virtual bool canMovedTo(const Tile* tile) const;
-	virtual void useThing() = 0;
-	virtual void releaseThing() = 0;
+	void useThing2();
+	void releaseThing2();
+	
+	virtual std::string getDescription(int32_t lookDistance) const = 0;
 
-	int throwRange;
-	bool isRemoved;
+	Cylinder* getParent() {return parent;};
+	const Cylinder* getParent() const {return parent;};
 
-	Position pos;
+	virtual void setParent(Cylinder* cylinder) {parent = cylinder;};
+
+	Cylinder* getTopParent(); //returns Tile/Container or a Player
+	const Cylinder* getTopParent() const;
+
+	Tile* getTile();
+	const Tile* getTile() const;
+
+	const Position& getPosition() const;
+	virtual int getThrowRange() const = 0;
+	virtual bool isPushable() const = 0;
+
+	virtual Item* getItem() {return NULL;};
+	virtual const Item* getItem() const {return NULL;};
+	virtual Creature* getCreature() {return NULL;};
+	virtual const Creature* getCreature() const {return NULL;};
+
+	virtual bool isRemoved() const;
+
+private:
+	Cylinder* parent;
+	int32_t useCount;
 };
 
 
-#endif // #ifndef __THING_H__
+#endif //__THING_H__

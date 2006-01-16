@@ -111,8 +111,9 @@ void MagicEffectClass::getDistanceShoot(Player* spectator, const Creature* attac
 			bool hasTarget) const
 {
 	if(animationEffect > 0) {
-		if(spectator->CanSee(attacker->pos.x, attacker->pos.y, attacker->pos.z) || spectator->CanSee(to.x, to.y, to.z)) {
-			spectator->sendDistanceShoot(attacker->pos, to, animationEffect);
+		if(spectator->CanSee(attacker->getPosition().x, attacker->getPosition().y, attacker->getPosition().z) ||
+			spectator->CanSee(to.x, to.y, to.z)) {
+			spectator->sendDistanceShoot(attacker->getPosition(), to, animationEffect);
 		}
 	}
 }
@@ -139,7 +140,7 @@ void MagicEffectClass::FailedToCast(Player* spectator, const Creature* attacker,
 		if(attacker == spectator) {
 			spectator->sendTextMessage(MSG_SMALLINFO, "You can only use this rune on creatures.");
 		}
-		spectator->sendMagicEffect(attacker->pos, NM_ME_PUFF);
+		spectator->sendMagicEffect(attacker->getPosition(), NM_ME_PUFF);
 	}
 }
 
@@ -157,8 +158,8 @@ void MagicEffectTargetClass::getMagicEffect(Player* spectator, const Creature* a
 	}
 	else {
 		if(attacker) {
-			if(spectator->CanSee(attacker->pos.x, attacker->pos.y, attacker->pos.z)) {
-				spectator->sendMagicEffect(attacker->pos, NM_ME_PUFF);
+			if(spectator->CanSee(attacker->getPosition().x, attacker->getPosition().y, attacker->getPosition().z)) {
+				spectator->sendMagicEffect(attacker->getPosition(), NM_ME_PUFF);
 			}
 		}
 	}
@@ -168,8 +169,8 @@ void MagicEffectTargetClass::getDistanceShoot(Player* spectator, const Creature*
 			bool hasTarget) const
 {
 	if(animationEffect > 0 && hasTarget) {
-		if(spectator->CanSee(attacker->pos.x, attacker->pos.y, attacker->pos.z) || spectator->CanSee(to.x, to.y, to.z)) {
-			spectator->sendDistanceShoot(attacker->pos, to, animationEffect);
+		if(spectator->CanSee(attacker->getPosition().x, attacker->getPosition().y, attacker->getPosition().z) || spectator->CanSee(to.x, to.y, to.z)) {
+			spectator->sendDistanceShoot(attacker->getPosition(), to, animationEffect);
 		}
 	}
 }
@@ -262,7 +263,7 @@ MagicEffectTargetGroundClass::MagicEffectTargetGroundClass(MagicEffectItem* item
 MagicEffectTargetGroundClass::~MagicEffectTargetGroundClass()
 {
 	if(magicItem) {
-		magicItem->releaseThing();
+		magicItem->releaseThing2();
 		magicItem = NULL;
 	}
 }
@@ -297,7 +298,7 @@ void MagicEffectTargetGroundClass::FailedToCast(Player* spectator, const Creatur
 			if(player && player == spectator) {
 				spectator->sendTextMessage(MSG_SMALLINFO, "There is not enough room.");
 			}
-			spectator->sendMagicEffect(player->pos, NM_ME_PUFF);
+			spectator->sendMagicEffect(player->getPosition(), NM_ME_PUFF);
 		}
 		else if(player && player == spectator) {
 			spectator->sendTextMessage(MSG_SMALLINFO, "You cannot throw there.");
@@ -315,8 +316,8 @@ void MagicEffectTargetGroundClass::getDistanceShoot(Player* spectator, const Cre
 			bool hasTarget) const
 {
 	if(!hasTarget && animationEffect > 0) {
-		if(spectator->CanSee(attacker->pos.x, attacker->pos.y, attacker->pos.z) || spectator->CanSee(to.x, to.y, to.z)) {
-			spectator->sendDistanceShoot(attacker->pos, to, animationEffect);
+		if(spectator->CanSee(attacker->getPosition().x, attacker->getPosition().y, attacker->getPosition().z) || spectator->CanSee(to.x, to.y, to.z)) {
+			spectator->sendDistanceShoot(attacker->getPosition(), to, animationEffect);
 		}
 	}
 }
@@ -416,7 +417,7 @@ MagicEffectAreaGroundClass::~MagicEffectAreaGroundClass()
 {
 	if(magicItem) {
 		//delete magicItem;
-		magicItem->releaseThing();
+		magicItem->releaseThing2();
 		magicItem = NULL;
 	}
 }
@@ -450,7 +451,6 @@ MagicEffectItem* MagicEffectAreaGroundClass::getMagicItem(const Creature* attack
 MagicEffectItem::MagicEffectItem(const TransformMap& transformMap)
 {
 	this->transformMap = transformMap;
-	useCount = 0;
 	unsigned short type = 0;
 	TransformMap::const_iterator dm = transformMap.begin();
 	if(dm != transformMap.end()) {
@@ -476,25 +476,13 @@ long MagicEffectItem::getDecayTime()
 		return dm->second.first;
 	}
 	
-	return 0;
+	return Item::getDecayTime();
 }
 
-Item* MagicEffectItem::decay()
+void MagicEffectItem::setID(unsigned short newid)
 {
-	TransformMap::iterator dm = transformMap.find(getID());
-	if(dm != transformMap.end()) {
-
-		//get next id to transform to
-		dm++;
-
-		if(dm != transformMap.end()) {
-			setID(dm->first);
-			buildCondition();
-			return this;
-		}
-	}
-
-	return NULL;
+	Item::setID(newid);
+	buildCondition();
 }
 
 void MagicEffectItem::buildCondition()

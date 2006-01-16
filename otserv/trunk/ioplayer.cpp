@@ -21,9 +21,10 @@
 #include "ioplayer.h"
 
 #ifdef __USE_MYSQL__
-	#include "ioplayersql.h"
-#endif
+#include "ioplayersql.h"
+#else
 #include "ioplayerxml.h"
+#endif
 
 #ifdef __USE_MYSQL__
 #include "luascript.h"
@@ -35,12 +36,10 @@ IOPlayer* IOPlayer::_instance = NULL;
 IOPlayer* IOPlayer::instance(){
 	if(!_instance){
 #ifdef __USE_MYSQL__
-        if(g_config.getGlobalString("sourcedata") == "SQL") 
 		_instance = (IOPlayer*)new IOPlayerSQL;
-		else // if(g_config.getGlobalString("sourcedata") == "XML") //fallback to xml
-#endif
+#else
 		_instance = (IOPlayer*)new IOPlayerXML;
-
+#endif
 	}
     #ifdef __DEBUG__
 	printf("%s \n", _instance->getSourceDescription());

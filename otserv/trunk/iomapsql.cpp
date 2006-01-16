@@ -19,8 +19,7 @@
 typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 extern LuaScript g_config;
 
-
-
+/*
 bool IOMapSQL::loadMap(Map* map, std::string identifier){
   	std::string host = g_config.getGlobalString("map_host");
 	std::string user = g_config.getGlobalString("map_user");
@@ -123,35 +122,32 @@ try{
           pz = row.lookup_by_name("pz");
           save = row.lookup_by_name("save");
           if(std::string(row.lookup_by_name("house")) != ""){house = std::string(row.lookup_by_name("house"));}
-/*
-#ifdef __DEBUG__
-			if(gid == 0) {std::cout << "No ground tile! x: " << x << ", y: " << y << " z: " << z << std::endl;}
-#endif
-*/
+
+//#ifdef __DEBUG__
+//			if(gid == 0) {std::cout << "No ground tile! x: " << x << ", y: " << y << " z: " << z << std::endl;}
+//#endif
+
           map->setTile(x,y,z,gid);
           Tile *t;
           t = map->getTile(x,y,z);
-          /*
-					switch(save){
-						case 1:
-             t->setSave();
-            break;
-            
-            default:
-            break;
-          }//Switch
-					*/
+
+					//switch(save){
+					//	case 1:
+          //  t->setSave();
+          //  break;
+          //  
+          //  default:
+          //  break;
+          //}//Switch
           
           switch(pz){
             case 1:
              t->setPz();
             break;
             
-            /*
-						case 2:
-             t->setPzR();
-            break;
-						*/
+						//case 2:
+            // t->setPzR();
+            //break;
             
             default:
             break;
@@ -211,7 +207,7 @@ try{
 	       if(t){
               Container *container = dynamic_cast<Container*>(myItem);
               if(depot != 0){
-                 container->depot = depot;
+                 container->depotId = depot;
               }
               myItem->pos.x = x;
 		      myItem->pos.y = y;
@@ -258,7 +254,7 @@ catch(mysqlpp::BadQuery e){
 //Save Items starting SID @ 1 + SID Size
 //Not Yet Implemented!
 bool IOMapSQL::SaveMap(Map* map, std::string identifier, int x, int y, int z){
-/*  Tile *t;
+  Tile *t;
    t = map->getTile(x,y,z);
     std::stringstream pos;
        pos << x << ";" << y << ";" << z;
@@ -330,12 +326,13 @@ std::string IOMapSQL::getItems(Item* i, int &startid, int slot, int player,int p
 	if(Container* c = dynamic_cast<Container*>(i)){
 		//std::cout << "c";	
 		int pid = startid;
-		for(ContainerList::const_iterator it = c->getItems(); it != c->getEnd(); it++){
+		for(ItemList::const_iterator it = c->getItems(); it != c->getEnd(); it++){
 			//std::cout << "s";
 			ss << getItems(*it, startid, 0, player, pid);
 			//std::cout << "r";
 		}
 	}
-	return ss.str();*/
+	return ss.str();
 	return 0;
 }
+*/

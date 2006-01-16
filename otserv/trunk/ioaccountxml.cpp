@@ -28,13 +28,15 @@
 extern xmlMutexPtr xmlmutex;
 extern LuaScript g_config; 
 
-IOAccountXML::IOAccountXML(){
+IOAccountXML::IOAccountXML()
+{
 	if(xmlmutex == NULL){
 		xmlmutex = xmlNewMutex();
 	}
 }
 
-Account IOAccountXML::loadAccount(unsigned long accno){
+Account IOAccountXML::loadAccount(unsigned long accno)
+{
 	Account acc;
 
 	std::stringstream accsstr;
@@ -44,13 +46,12 @@ Account IOAccountXML::loadAccount(unsigned long accno){
 	std::transform(filename.begin(), filename.end(), filename.begin(), tolower);
 	xmlMutexLock(xmlmutex);
 	xmlDocPtr doc = xmlParseFile(filename.c_str());
-	if (doc)
-	{
+
+	if(doc){
 		xmlNodePtr root, p, tmp;
 		root = xmlDocGetRootElement(doc);
 
-		if (xmlStrcmp(root->name,(const xmlChar*) "account"))
-		{
+		if(xmlStrcmp(root->name,(const xmlChar*) "account")){
 			xmlFreeDoc(doc);			
 			xmlMutexUnlock(xmlmutex);
 			return acc;
@@ -73,18 +74,15 @@ Account IOAccountXML::loadAccount(unsigned long accno){
 		xmlFreeOTSERV(nodeValue);
 
 		// now load in characters.
-		while (p)
-		{
+		while(p){
 			const char* str = (char*)p->name;
 
-			if (strcmp(str, "characters") == 0)
-			{
+			if(strcmp(str, "characters") == 0){
 				tmp = p->children;
-				while(tmp)
-				{
+				while(tmp){
 					nodeValue = (char*)xmlGetProp(tmp, (xmlChar*)"name");
 
-					if(nodeValue) {
+					if(nodeValue){
 						if(strcmp((const char*)tmp->name, "character") == 0) {
 							acc.charList.push_back(std::string(nodeValue));
 						}
@@ -104,6 +102,7 @@ Account IOAccountXML::loadAccount(unsigned long accno){
 		acc.charList.sort();
 		acc.accnumber = accno;
 	}	
+
 	xmlMutexUnlock(xmlmutex);
 	return acc;
 }
@@ -121,13 +120,11 @@ bool IOAccountXML::getPassword(unsigned long accno, const std::string &name, std
 	
 	xmlMutexLock(xmlmutex);
 	xmlDocPtr doc = xmlParseFile(filename.c_str());
-	if (doc)
-	{
+	if(doc){
 		xmlNodePtr root, p, tmp;
 		root = xmlDocGetRootElement(doc);
 
-		if (xmlStrcmp(root->name,(const xmlChar*) "account"))
-		{
+		if(xmlStrcmp(root->name,(const xmlChar*) "account")){
 			xmlFreeDoc(doc);			
 			xmlMutexUnlock(xmlmutex);
 			return false;
@@ -141,19 +138,16 @@ bool IOAccountXML::getPassword(unsigned long accno, const std::string &name, std
 		xmlFreeOTSERV(nodeValue);
 
 		// now load in characters.
-		while (p)
-		{
+		while(p){
 			const char* str = (char*)p->name;
 
-			if (strcmp(str, "characters") == 0)
-			{
+			if(strcmp(str, "characters") == 0){
 				tmp = p->children;
-				while(tmp)
-				{
+				while(tmp){
 					nodeValue = (char*)xmlGetProp(tmp, (xmlChar*)"name");
 
-					if(nodeValue) {
-						if(strcmp((const char*)tmp->name, "character") == 0) {
+					if(nodeValue){
+						if(strcmp((const char*)tmp->name, "character") == 0){
 							if(nodeValue == name){
 								password = acc_password;
 								xmlFreeOTSERV(nodeValue);
@@ -172,7 +166,8 @@ bool IOAccountXML::getPassword(unsigned long accno, const std::string &name, std
 		}
 		
 		xmlFreeDoc(doc);
-	}	
+	}
+
 	xmlMutexUnlock(xmlmutex);
 	return false;
 }

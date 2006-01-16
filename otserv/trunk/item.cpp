@@ -21,130 +21,93 @@
 // include header file
 
 #include "definitions.h"
+#include "item.h"
 #include "container.h"
-#include "magic.h"
-#include "player.h"
-#include "tile.h"
+#include "depot.h"
+#include "teleport.h"
 #include "actions.h"
+#include "magic.h"
 
 #include <iostream>
 #include <sstream>
 #include <iomanip>
 
-
-Item* Item::CreateItem(const unsigned short _type, unsigned short _count /*= 0*/)
+Item* Item::CreateItem(const unsigned short _type, unsigned short _count /*= 1*/)
 {
-	Item *newItem;
-	if(items[_type].isContainer()){
-		newItem = new Container(_type);		
+	Item* newItem = NULL;
+
+	if(_type == ITEM_LOCKER1 || _type == ITEM_LOCKER2 || _type == ITEM_LOCKER3 || _type == ITEM_LOCKER4){
+		newItem = new Depot(_type);
+	}
+	else if(items[_type].isContainer()){
+		newItem = new Container(_type);
 	}
 	else if(items[_type].isTeleport()){		
 		newItem = new Teleport(_type);
 	}
-	else if(items[_type].isMagicField()){	
-		newItem =  new Item(_type, _count);
+	else if(items[_type].isMagicField()){
+		newItem = new Item(_type, _count);
 	}	
 	else{
-		newItem =  new Item(_type, _count);
+		newItem = new Item(_type, _count);
 	}
-	newItem->isRemoved = false;
-	newItem->useThing();
+	
+	newItem->useThing2();
 	return newItem;
 }
 
-//////////////////////////////////////////////////
-// returns the ID of this item's ItemType
-unsigned short Item::getID() const {
-	return id;
-}
-
-//////////////////////////////////////////////////
-// sets the ID of this item's ItemType
-void Item::setID(unsigned short newid) {
-	id = newid;
-}
-
-//////////////////////////////////////////////////
-// return how many items are stacked or 0 if non stackable
-unsigned short Item::getItemCountOrSubtype() const {
-	if(isStackable()) {
-		return count;
-	}
-	else if(isFluidContainer() || isSplash())
-		return fluid;
-	//else if(chargecount != 0)
-	else if(items[id].runeMagLevel != -1)
-		return chargecount;
-	else
-		return 0;
-}
-
-void Item::setItemCountOrSubtype(unsigned char n)
+Item::Item(const unsigned short _type, unsigned short _count)
 {
-	if(isStackable()){
-		/*if(n == 0){
-			count = 1;
-		}*/
-		if(n > 100){
-			count = 100;
-		}
-		else{
-			count = n;
-		}
-	}
-	else if(isFluidContainer() || isSplash())
-		fluid = n;
-	else if(items[id].runeMagLevel != -1)
-		chargecount = n;
-};
-
-void Item::setActionId(unsigned short n){
-	 if(n < 100)
-	 	n = 100;
-	actionId = n;
-}
-
-unsigned short Item::getActionId() const{
-	return actionId;
-}
-
-void Item::setUniqueId(unsigned short n){
-	//uniqueId only can be set 1 time
-	if(uniqueId != 0)
-		return;
-	 if(n < 1000)
-	 	n = 1000;
-	uniqueId = n;
-	ActionScript::AddThingToMapUnique(this);
-}
-
-unsigned short Item::getUniqueId() const{
-	return uniqueId;
-}
-
-Item::Item(const unsigned short _type) {
-	//std::cout << "Item constructor1 " << this << std::endl;
+	//std::cout << "Item constructor2 " << this << std::endl;
 	id = _type;
-	count = 0;	
+	count = 0;
 	chargecount = 0;
 	fluid = 0;
 	actionId = 0;
 	uniqueId = 0;
-	throwRange = 6;
-	useCount = 0;
-	isDecaying  = 0;
+	isDecaying = false;
+	specialDescription = NULL;
+	text = NULL;
+	setItemCountOrSubtype(_count);
+
+	if(count == 0)
+		count = 1;
+}
+
+Item::Item()
+{
+	//std::cout << "Item constructor3 " << this << std::endl;
+	id = 0;
+	count = 1;
+	chargecount = 0;
+	isDecaying  = false;
+	actionId = 0;
+	uniqueId = 0;
 	specialDescription = NULL;
 	text = NULL;
 }
 
-Item::Item(const Item &i){
+Item::Item(const unsigned short _type)
+{
+	//std::cout << "Item constructor1 " << this << std::endl;
+	id = _type;
+	count = 1;	
+	chargecount = 0;
+	fluid = 0;
+	actionId = 0;
+	uniqueId = 0;
+	isDecaying = false;
+	specialDescription = NULL;
+	text = NULL;
+}
+
+Item::Item(const Item &i)
+{
 	//std::cout << "Item copy constructor " << this << std::endl;
 	id = i.id;
 	count = i.count;
 	chargecount = i.chargecount;
-	throwRange = i.throwRange;
-	useCount = 0;
-	isDecaying  = 0;
+	isDecaying  = false;
 	actionId = i.actionId;
 	uniqueId = i.uniqueId;
 	if(i.specialDescription != NULL){
@@ -161,103 +124,6 @@ Item::Item(const Item &i){
 	}	
 }
 
-Item* Item::decay()
-{
-	unsigned short decayTo   = Item::items[getID()].decayTo;
-	
-	if(decayTo == 0) {
-		return NULL;
-	}
-	
-	if(dynamic_cast<Container*>(this)){
-		if(items[decayTo].isContainer()){
-			//container -> container			
-			setID(decayTo);
-			return this;
-		}
-		else{
-			//container -> no container			
-			Item *item = Item::CreateItem(decayTo,getItemCountOrSubtype());
-			item->pos = this->pos;
-			return item;
-		}
-	}
-	else{
-		if(items[decayTo].isContainer()){
-			//no container -> container
-			Item *item = Item::CreateItem(decayTo,getItemCountOrSubtype());
-			item->pos = this->pos;
-			return item;
-		}
-		else{
-			//no contaier -> no container
-			setID(decayTo);
-			return this;
-		}
-	}
-}
-
-long Item::getDecayTime(){
-	return items[id].decayTime*1000;
-}
-
-bool Item::rotate()
-{
-	if(items[id].rotable && items[id].rotateTo){
-		id = items[id].rotateTo;
-		return true;
-	}
-	return false;
-}
-
-Item::Item(const unsigned short _type, unsigned short _count) {
-	//std::cout << "Item constructor2 " << this << std::endl;
-	id = _type;
-	count = 0;
-	chargecount = 0;
-	fluid = 0;
-	actionId = 0;
-	uniqueId = 0;
-	useCount = 0;
-	isDecaying  = 0;
-	specialDescription = NULL;
-	text = NULL;
-	setItemCountOrSubtype(_count);
-	/*
-	if(isStackable()){
-		if(_count == 0){
-			count = 1;
-		}
-		else if(_count > 100){
-			count = 100;
-		}
-		else{
-			count = _count;
-		}
-	}
-	else if(isFluidContainer() || isMultiType() )
-		fluid = _count;
-	else
-		chargecount = _count;
-	*/
-	throwRange = 6;
-}
-
-Item::Item()
-{
-	//std::cout << "Item constructor3 " << this << std::endl;
-	id = 0;
-	count = 0;
-	chargecount = 0;
-	throwRange = 6;
-	useCount = 0;
-	isDecaying  = 0;
-	actionId = 0;
-	uniqueId = 0;
-	specialDescription = NULL;
-	text = NULL;
-}
-
 Item::~Item()
 {
 	//std::cout << "Item destructor " << this << std::endl;
@@ -267,26 +133,88 @@ Item::~Item()
 		delete text;
 }
 
-bool Item::canMovedTo(const Tile *tile) const
+unsigned short Item::getID() const
 {
-	if(tile) {
-		int objectstate = 0;
-
-		if(isPickupable() || !isNotMoveable()) {
-			objectstate |= BLOCK_PICKUPABLE;
-		}
-
-		if(isBlocking()) {
-			objectstate |= BLOCK_SOLID;
-		}
-
-		return (tile->isBlocking(objectstate) == RET_NOERROR);
-	}
-
-	return false;
+	return id;
 }
 
-int Item::unserialize(xmlNodePtr p){
+void Item::setID(unsigned short newid)
+{
+	id = newid;
+}
+
+unsigned short Item::getItemCount() const
+{
+	return count;
+}
+
+void Item::setItemCount(uint8_t n)
+{
+	count = n;
+}
+
+unsigned short Item::getItemCountOrSubtype() const
+{
+	if(isFluidContainer() || isSplash())
+		return fluid;
+	else if(items[id].runeMagLevel != -1)
+		return chargecount;
+	else
+		return count;
+}
+
+void Item::setItemCountOrSubtype(unsigned char n)
+{
+	if(isFluidContainer() || isSplash())
+		fluid = n;
+	else if(items[id].runeMagLevel != -1)
+		chargecount = n;
+	else{
+		count = n;
+	}
+}
+
+bool Item::hasSubType() const
+{
+	const ItemType& it = items[id];
+	return (it.isFluidContainer() || it.isSplash() || it.stackable || it.runeMagLevel != -1);
+}
+
+void Item::setActionId(unsigned short n)
+{
+	if(n < 100)
+		n = 100;
+	actionId = n;
+}
+
+unsigned short Item::getActionId() const
+{
+	return actionId;
+}
+
+void Item::setUniqueId(unsigned short n)
+{
+	//uniqueId only can be set 1 time
+	if(uniqueId != 0)
+		return;
+	 if(n < 1000)
+	 	n = 1000;
+	uniqueId = n;
+	ActionScript::AddThingToMapUnique(this);
+}
+
+unsigned short Item::getUniqueId() const
+{
+	return uniqueId;
+}
+
+long Item::getDecayTime()
+{
+	return items[id].decayTime*1000;
+}
+
+int Item::unserialize(xmlNodePtr p)
+{
 	char *tmp;
 	tmp = (char*)xmlGetProp(p, (const xmlChar *) "id");
 	if(tmp){
@@ -327,7 +255,8 @@ int Item::unserialize(xmlNodePtr p){
 	return 0;
 }
 
-xmlNodePtr Item::serialize(){
+xmlNodePtr Item::serialize()
+{
 	std::stringstream s;
 	xmlNodePtr ret;
 	ret = xmlNewNode(NULL,(const xmlChar*)"item");
@@ -348,7 +277,7 @@ xmlNodePtr Item::serialize(){
 	}
 
 	s.str(""); //empty the stringstream
-	if(getItemCountOrSubtype() != 0){
+	if(hasSubType()){
 		s << getItemCountOrSubtype();
 		xmlSetProp(ret, (const xmlChar*)"count", (const xmlChar*)s.str().c_str());
 	}
@@ -367,35 +296,71 @@ xmlNodePtr Item::serialize(){
 	return ret;
 }
 
-bool Item::isBlocking() const {
+bool Item::hasProperty(enum ITEMPROPERTY prop) const
+{
+	const ItemType& it = items[id];
+
+	switch(prop){
+		case BLOCKSOLID:
+			if(it.blockSolid)
+				return true;
+		break;
+
+		case HASHEIGHT:
+			if(it.hasHeight)
+				return true;
+		break;
+
+		case BLOCKPROJECTILE:
+			if(it.blockProjectile)
+				return true;
+		break;
+
+		case BLOCKPATHFIND:
+			if(it.blockPathFind)
+				return true;
+		break;
+
+		/*case NOTMOVEABLEBLOCKSOLID:
+			if(it.blockSolid && !it.moveable)
+				return true;
+		break;*/
+
+		/*case NOTMOVEABLEBLOCKPATHFIND:
+			if(it.blockPathFind && !it.moveable)
+				return true;
+		break;*/
+	}
+
+	return false;
+}
+
+bool Item::isBlocking() const{
 	const ItemType& it = items[id];
 	return it.blockSolid;
 }
 
-bool Item::isStackable() const {
+bool Item::isStackable() const{
 	return items[id].stackable;
 }
 
-/*
-bool Item::isMultiType() const {
-	//return items[id].multitype;
-	return (items[id].group == ITEM_GROUP_SPLASH);
+bool Item::isRune() const{
+	return (items[id].group == ITEM_GROUP_RUNE);
 }
-*/
 
-bool Item::isFluidContainer() const {
+bool Item::isFluidContainer() const{
 	return (items[id].isFluidContainer());
 }
 
-bool Item::isAlwaysOnTop() const {
+bool Item::isAlwaysOnTop() const{
 	return items[id].alwaysOnTop;
 }
 
-bool Item::isNotMoveable() const {
+bool Item::isNotMoveable() const{
 	return !items[id].moveable;
 }
 
-bool Item::isGroundTile() const {
+bool Item::isGroundTile() const{
 	return items[id].isGroundTile();
 }
 
@@ -403,7 +368,11 @@ bool Item::isSplash() const{
 	return items[id].isSplash();
 }
 
-bool Item::isPickupable() const {
+bool Item::isMagicField() const{
+	return items[id].isMagicField();
+}
+
+bool Item::isPickupable() const{
 	return items[id].pickupable;
 }
 
@@ -411,26 +380,34 @@ bool Item::isUseable() const{
 	return items[id].useable;
 }
 
-bool Item::floorChangeDown() const {
+bool Item::isHangable() const{
+	return items[id].isHangable;
+}
+
+bool Item::isRoteable() const{
+	const ItemType& it = items[id];
+	return it.rotable && it.rotateTo;
+}
+
+bool Item::floorChangeDown() const{
 	return items[id].floorChangeDown;
 }
 
-bool Item::floorChangeNorth() const {
+bool Item::floorChangeNorth() const{
 	return items[id].floorChangeNorth;
 }
-bool Item::floorChangeSouth() const {
+bool Item::floorChangeSouth() const{
 	return items[id].floorChangeSouth;
 }
-bool Item::floorChangeEast() const {
+bool Item::floorChangeEast() const{
 	return items[id].floorChangeEast;
 }
-bool Item::floorChangeWest() const {
+bool Item::floorChangeWest() const{
 	return items[id].floorChangeWest;
 }
 
-bool Item::isWeapon() const
-{ 
-  //now also returns true on SHIELDS!!! Check back with getWeponType!
+bool Item::isWeapon() const{
+  //now also returns true on SHIELDS!!! Check back with getWeaponType!
   //old: return (items[id].weaponType != NONE && items[id].weaponType != SHIELD && items[id].weaponType != AMO);
   return (items[id].weaponType != NONE && items[id].weaponType != AMO);
 }
@@ -471,30 +448,29 @@ double Item::getWeight() const {
 	return items[id].weight;
 }
 
-std::string Item::getDescription(bool fullDescription) const
+std::string Item::getDescription(int32_t lookDistance) const
 {
 	std::stringstream s;
-	std::string str;
-	const Container* container;
 	const ItemType& it = items[id];
 
-	if(specialDescription){
+	/*if(specialDescription){
 		s << (*specialDescription) << ".";
 
-		if(fullDescription) {
+		if(lookDistance <= 1) {
 			if(it.weight > 0)
 				s << std::endl << "It weighs " << std::fixed << std::setprecision(1) << it.weight << " oz.";
 		}
 	}
-	else if (it.name.length()) {
-		if(isStackable() && count > 1) {
+	else*/
+	if (it.name.length()) {
+		if(isStackable() && count > 1){
 			s << (int)count << " " << it.name << "s.";
 
-			if(fullDescription) {
+			if(lookDistance <= 1) {
 				s << std::endl << "They weight " << std::fixed << std::setprecision(1) << ((double) count * it.weight) << " oz.";
 			}
 		}		
-		else {
+		else{
 			if(items[id].runeMagLevel != -1)
 			{
 				s << "a spell rune for level " << it.runeMagLevel << "." << std::endl;
@@ -510,8 +486,7 @@ std::string Item::getDescription(bool fullDescription) const
 			{
 				s << "a " << it.name << " (Atk:" << (int)getAttack() << " Def:" << (int)getDefense() << ")";
 			}
-			else if(getArmor())
-			{
+			else if(getArmor()){
 				s << "a " << it.name << " (Arm:"<< (int)getArmor() << ")";
 			}
 			else if(isFluidContainer()){
@@ -535,34 +510,34 @@ std::string Item::getDescription(bool fullDescription) const
 			else if(it.isKey()){
 				s << "a " << it.name << " (Key:" << actionId << ")";
 			}
-			else if(it.isGroundTile()) //groundtile
-			{
+			else if(it.isGroundTile()){
 				s << it.name;
 			}
-			else if(it.isContainer() && (container = dynamic_cast<const Container*>(this))) {
-				s << "a " << it.name << " (Vol:" << container->capacity() << ")";
+			else if(it.isContainer()){
+				s << "a " << it.name << " (Vol:" << getContainer()->capacity() << ")";
 			}
-			else {
+			else{
 				s << "a " << it.name;
 			}
+
 			s << ".";
-			if(fullDescription) {
+			if(lookDistance <= 1){
 				double weight = getWeight();
 				if(weight > 0)
 					s << std::endl << "It weighs " << std::fixed << std::setprecision(1) << weight << " oz.";
-				
-				if(items[id].description.length())
-				{
-					s << std::endl << items[id].description;
-				}
+			}
+
+			if(specialDescription)
+				s << std::endl << specialDescription->c_str();
+			else if(lookDistance <= 1 && it.description.length()){
+				s << std::endl << it.description;
 			}
 		}
 	}
 	else
-		s<<"an item of type " << id <<".";
+		s << "an item of type " << id <<".";
 	
-	str = s.str();
-	return str;
+	return s.str();
 }
 
 std::string Item::getName() const
@@ -623,76 +598,21 @@ int Item::getRWInfo() const {
 }
 
 bool Item::canDecay(){
-	if(isRemoved)
+	if(isRemoved())
 		return false;
+
 	return items[id].canDecay;	
-}	
-//Teleport class
-Teleport::Teleport(const unsigned short _type) : Item(_type)
-{
-	useCount = 0;	
-	destPos.x = 0;
-	destPos.y = 0;
-	destPos.z = 0;
-}
-
-Teleport::~Teleport()
-{
-}
-
-int Teleport::unserialize(xmlNodePtr p)
-{
-	Item::unserialize(p);
-	char *tmp = (char*)xmlGetProp(p, (const xmlChar *) "destx");
-	if(tmp){
-		destPos.x = atoi(tmp);
-		xmlFreeOTSERV(tmp);
-	}
-	tmp = (char*)xmlGetProp(p, (const xmlChar *) "desty");
-	if(tmp){
-		destPos.y = atoi(tmp);
-		xmlFreeOTSERV(tmp);
-	}
-	tmp = (char*)xmlGetProp(p, (const xmlChar *) "destz");
-	if(tmp){
-		destPos.z = atoi(tmp);
-		xmlFreeOTSERV(tmp);
-	}
-	
-
-	return 0;
-}
-
-xmlNodePtr Teleport::serialize()
-{
-	xmlNodePtr xmlptr = Item::serialize();
-
-	std::stringstream s;
-
-	s.str(""); //empty the stringstream
-	s << (int) destPos.x;
-	xmlSetProp(xmlptr, (const xmlChar*)"destx", (const xmlChar*)s.str().c_str());
-
-	s.str(""); //empty the stringstream
-	s << (int) destPos.y;
-	xmlSetProp(xmlptr, (const xmlChar*)"desty", (const xmlChar*)s.str().c_str());
-
-	s.str(""); //empty the stringstream
-	s << (int)destPos.z;
-	xmlSetProp(xmlptr, (const xmlChar*)"destz", (const xmlChar*)s.str().c_str());
-
-	return xmlptr;
 }
 
 int Item::getWorth() const
 {
 	switch(getID()){
 	case ITEM_COINS_GOLD:
-		return getItemCountOrSubtype();
+		return getItemCount();
 	case ITEM_COINS_PLATINUM:
-		return getItemCountOrSubtype() * 100;
+		return getItemCount() * 100;
 	case ITEM_COINS_CRYSTAL:
-		return getItemCountOrSubtype() * 10000;
+		return getItemCount() * 10000;
 	default:
 		return 0;
 	}

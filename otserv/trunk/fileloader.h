@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////
-// OpenTibia - an opensource roleplaying game
+// OTItemEditor
 //////////////////////////////////////////////////////////////////////
 // 
 //////////////////////////////////////////////////////////////////////
@@ -81,13 +81,13 @@ public:
 			unsigned char c = *(((unsigned char*)data) + i);
 			if(unescape && (c == NODE_START || c == NODE_END || c == ESCAPE_CHAR)) {
 				unsigned char escape = ESCAPE_CHAR;
-				int value = fwrite(&escape, 1, 1, m_file);
+				size_t value = fwrite(&escape, 1, 1, m_file);
 				if(value != 1) {
 					m_lastError = ERROR_COULDNOTWRITE;
 					return false;
 				}
 			}
-			int value = fwrite(&c, 1, 1, m_file);
+			size_t value = fwrite(&c, 1, 1, m_file);
 			if(value != 1) {
 				m_lastError = ERROR_COULDNOTWRITE;
 				return false;
@@ -117,7 +117,6 @@ protected:
 	inline long getCacheBlock(unsigned long pos);
 	long loadCacheBlock(unsigned long pos);
 };
-
 
 class PropStream{
 public:
@@ -187,6 +186,5 @@ protected:
 	char* p;
 	char* end;
 };
-
 
 #endif

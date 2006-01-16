@@ -31,13 +31,14 @@ class Database;
 class IOPlayerSQL : protected IOPlayer{
 public:
 	/** Get a textual description of what source is used
-	  * \returns Name of the source*/
+	* \returns Name of the source*/
 	char* getSourceDescription(){return "Player source: SQL";};
 	bool loadPlayer(Player* player, std::string name);
-		/** Save a player
-	  * \returns Wheter the player was successfully saved
-	  * \param player the player to save
-	  */
+
+	/** Save a player
+	* \returns Wheter the player was successfully saved
+	* \param player the player to save
+	*/
 	bool savePlayer(Player* player);
 	
 	bool getGuidByName(unsigned long &guid, unsigned long &alvl, std::string &name);
@@ -45,6 +46,7 @@ public:
 	
 	IOPlayerSQL();
 	~IOPlayerSQL(){};
+
 protected:
 	std::string getItems(Item* i, int &startid, int startslot, int player, int parentid);
 	bool storeNameByGuid(Database &mysql, unsigned long guid);

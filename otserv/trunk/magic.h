@@ -226,19 +226,6 @@ class MagicEffectItem : public Item, public MagicEffectClass
 {
 public:
 	MagicEffectItem(const TransformMap& transformMap);
-
-	virtual void useThing() {
-		//std::cout << "Magic: useThing() " << this << std::endl;
-		useCount++;
-	};
-	
-	virtual void releaseThing() {
-		//std::cout << "Magic: releaseThing() " << this << std::endl;
-		useCount--;
-		//if (useCount == 0)
-		if (useCount <= 0)
-			delete this;
-	};
 	
 	const MagicEffectTargetCreatureCondition* getCondition() const;
 
@@ -249,12 +236,12 @@ public:
 
 	virtual int getDamage(Creature *target, const Creature *attacker = NULL) const;
 
-	virtual Item* decay();
+	//virtual Item* decay();
+	virtual void setID(unsigned short newid);
 	bool transform(const MagicEffectItem *rhs);
 	long getDecayTime();
 	
 protected:
-	int useCount;
 	void buildCondition();
 	TransformMap transformMap;
 	ConditionVec condition;

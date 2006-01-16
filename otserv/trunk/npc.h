@@ -19,12 +19,11 @@
 //////////////////////////////////////////////////////////////////////
 
 
-#ifndef __npc_h_
-#define __npc_h_
+#ifndef __NPC_H__
+#define __NPC_H__
 
 
 #include "creature.h"
-#include "game.h"
 #include "luascript.h"
 #include "templates.h"
 
@@ -43,21 +42,17 @@ class NpcScript : protected LuaScript{
 public:
 	NpcScript(std::string name, Npc* npc);
 	virtual ~NpcScript(){}
-	//	virtual void onThingMove(const Player *player, const Thing *thing, const Position *oldPos,
-	//	unsigned char oldstackpos, unsigned char oldcount, unsigned char count);
 	virtual void onCreatureAppear(unsigned long cid);
-	virtual void onCreatureDisappear(int cid);	
-	//	virtual void onCreatureTurn(const Creature *creature, unsigned char stackpos);
+	virtual void onCreatureDisappear(int cid);
+
 	virtual void onCreatureSay(int cid, SpeakClasses, const std::string &text);
 	virtual void onThink();
-	//	virtual void onCreatureChangeOutfit(const Creature* creature);
 	static Npc* getNpc(lua_State *L);
 	static int luaActionSay(lua_State *L);
 	static int luaActionMove(lua_State *L);
 	static int luaActionMoveTo(lua_State *L);
 	static int luaCreatureGetName(lua_State *L);
 	static int luaCreatureGetName2(lua_State *L);
-	static int luaActionAttackCreature(lua_State *L);
 	static int luaCreatureGetPos(lua_State *L);
 	static int luaSelfGetPos(lua_State *L);
 	
@@ -73,17 +68,11 @@ class Npc : public Creature
 public:
 	Npc(const std::string& name, Game* game);
 	virtual ~Npc();
-	virtual void useThing() {
-		//std::cout << "Npc: useThing() " << this << std::endl;
-		useCount++;
-	};
-	
-	virtual void releaseThing() {
-		//std::cout << "Npc: releaseThing() " << this << std::endl;
-		useCount--;
-		if (useCount == 0)
-			delete this;
-	};
+
+	virtual Npc* getNpc() {return this;};
+	virtual const Npc* getNpc() const {return this;};
+
+	virtual bool isPushable() const { return true;};
 	
 	virtual unsigned long idRange(){ return 0x30000000;}
 	static AutoList<Npc> listNpc;
@@ -92,41 +81,31 @@ public:
 	
 	void speak(const std::string &text){};
 	const std::string& getName() const {return name;};
-	fight_t getFightType(){return fighttype;};
-	
-	int mana, manamax;
-	
-	//damage per hit
-	int damage;
-	
-	fight_t fighttype;
 	
 	Game* game;
 	
 	void doSay(std::string msg);
 	void doMove(int dir);
 	void doMoveTo(Position pos);
-	void doAttack(int id);
 	bool isLoaded(){return loaded;}
 	
 protected:
-	int useCount;
-	virtual void onThingMove(const Player *player, const Thing *thing, const Position *oldPos,
-		unsigned char oldstackpos, unsigned char oldcount, unsigned char count);
-	virtual void onCreatureAppear(const Creature *creature);
-	virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos, bool tele);
-	virtual void onThingDisappear(const Thing* thing, unsigned char stackPos);
-	virtual void onThingTransform(const Thing* thing,int stackpos){};
-	virtual void onThingAppear(const Thing* thing);
-	virtual void onCreatureTurn(const Creature *creature, unsigned char stackpos);
+	virtual void onAddTileItem(const Position& pos, const Item* item);
+	virtual void onUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* oldItem, const Item* newItem);
+	virtual void onRemoveTileItem(const Position& pos, uint32_t stackpos, const Item* item);
+	virtual void onUpdateTile(const Position& pos);
+
+	virtual void onCreatureAppear(const Creature* creature, bool isLogin);
+	virtual void onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout);
+	virtual void onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport);
+
+	virtual void onCreatureTurn(const Creature *creature, uint32_t stackpos);
 	virtual void onCreatureSay(const Creature *creature, SpeakClasses type, const std::string &text);
 	virtual void onCreatureChangeOutfit(const Creature* creature);
 	virtual int onThink(int& newThinkTicks);
-	//virtual void setAttackedCreature(unsigned long id);
-	virtual std::string getDescription(bool self = false) const;
+	virtual std::string getDescription(int32_t lookDistance) const;
 	
 	virtual bool isAttackable() const { return false; };
-	virtual bool isPushable() const { return true; };
 	
 	std::string name;
 	std::string scriptname;
@@ -135,4 +114,4 @@ protected:
 	bool loaded;
 };
 
-#endif // __npc_h_
+#endif

@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// various definitions needed by most files
+//
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -17,47 +17,29 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
+#ifndef __DEPOT_H__
+#define __DEPOT_H__
 
+#include "container.h"
 
-#ifndef __DEFINITIONS_H__
-#define __DEFINITIONS_H__
+class Depot : public Container{
+public:
+	Depot(uint16_t _type);
+	~Depot();
 
-typedef unsigned long long uint64_t;
+	uint32_t getDepotId() {return depotId;};
+	void setMaxDepotLimit(uint32_t maxitems) {maxDepotLimit = maxitems;};
+	void setDepotId(uint32_t id) {depotId = id;};
+	virtual Depot* getDepot() {return this;};
+	virtual const Depot* getDepot() const {return this;};
 
-#ifdef XML_GCC_FREE
-#define xmlFreeOTSERV(s)	free(s)
-#else
-#define xmlFreeOTSERV(s)	xmlFree(s)
-#endif
+	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,
+		bool childIsOwner = false) const;
 
-#if defined __WINDOWS__ || defined WIN32
-
-#define OTSYS_THREAD_RETURN  void
-
-#define EWOULDBLOCK WSAEWOULDBLOCK
-
-#ifndef __GNUC__
-typedef unsigned long uint32_t;
-typedef signed long int32_t;
-typedef unsigned short uint16_t;
-typedef unsigned char uint8_t;
-#endif
-
-#pragma warning(disable:4786) // msvc too long debug names in stl
-#pragma warning(disable:4250) // 'class1' : inherits 'class2::member' via dominance
-
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
-
-#else
-
-#define OTSYS_THREAD_RETURN void*
-
-#include <stdint.h>
-typedef int64_t __int64;
+private:
+	uint32_t maxDepotLimit;
+	uint32_t depotId;
+};
 
 #endif
 
-
-#endif // __DEFINITIONS_H__

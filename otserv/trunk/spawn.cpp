@@ -464,7 +464,7 @@ Monster* Spawn::respawn(unsigned long spawnid, Position &pos, std::string &name,
 		monster->masterPos = centerPos;
 
 		if(game->placeCreature(pos, monster)) {
-			monster->useThing();
+			monster->useThing2();
 			spawnedmap.insert(spawned_pair(spawnid, monster));
 			spawnmap[spawnid].lastspawn = OTSYS_TIME();
 			return monster;
@@ -490,15 +490,15 @@ void Spawn::idle(int t)
 {
 	SpawnedMap::iterator it;
 	for(it = spawnedmap.begin(); it != spawnedmap.end();) {
-		if (it->second->isRemoved == true /*it->second->health <= 0*/) {
+		if (it->second->isRemoved()) {
 			if(it->first != 0) {
 				spawnmap[it->first].lastspawn = OTSYS_TIME();
 			}
-			it->second->releaseThing();
+			it->second->releaseThing2();
 			//delete it->second;
 			spawnedmap.erase(it++);
 		}
-		else if(!isInSpawnRange(it->second->pos) && it->first != 0) {
+		else if(!isInSpawnRange(it->second->getPosition()) && it->first != 0) {
 			spawnedmap.insert(spawned_pair(0, it->second));
 			spawnedmap.erase(it++);
 		}

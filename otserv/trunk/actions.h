@@ -19,8 +19,8 @@
 //////////////////////////////////////////////////////////////////////
 
 
-#ifndef __actions_h_
-#define __actions_h_
+#ifndef __ACTIONS_H__
+#define __ACTIONS_H__
 
 #include "position.h"
 
@@ -41,7 +41,10 @@ extern "C"
 class Player;
 class Npc;
 class Monster;
+class Thing;
 class Item;
+class Container;
+class Depot;
 class Game;
 class ActionScript;
 class Action;
@@ -49,7 +52,7 @@ class Action;
 enum tCanUseRet{
 	CAN_USE,
 	TOO_FAR,
-	CAN_NOT_THTOW,
+	CAN_NOT_THROW,
 };
 
 class Actions
@@ -109,12 +112,6 @@ enum ePlayerInfo{
 	PlayerInfoGuildId,
 };
 
-struct KnownThing{
-	Thing *thing;
-	tThingType type;
-	PositionEx pos;	
-};
-
 class Action
 {
 public:
@@ -144,12 +141,11 @@ public:
 	
 	void ClearMap();
 	static void AddThingToMapUnique(Thing *thing);
-	void UpdateThingPos(int uid, PositionEx &pos);
-	unsigned int AddThingToMap(Thing *thing,PositionEx &pos);
-	const KnownThing* GetThingByUID(int uid);
-	const KnownThing* GetItemByUID(int uid);
-	const KnownThing* GetCreatureByUID(int uid);
-	const KnownThing* GetPlayerByUID(int uid);
+	unsigned int AddThingToMap(Thing *thing);
+	Thing* GetThingByUID(int uid);
+	Item* GetItemByUID(int uid);
+	Creature* GetCreatureByUID(int uid);
+	Player* GetPlayerByUID(int uid);
 	
 	//lua functions
 	static int luaActionDoRemoveItem(lua_State *L);
@@ -212,8 +208,8 @@ protected:
 	
 	friend class Action;
 	
-	std::map<unsigned int,KnownThing*> ThingMap;
-	static std::map<unsigned int,KnownThing*> uniqueIdMap;
+	std::map<unsigned int,Thing*> ThingMap;
+	static std::map<unsigned int,Thing*> uniqueIdMap;
 	
 	//lua related functions
 	int registerFunctions();
@@ -226,9 +222,9 @@ protected:
 	static const char* internalGetString(lua_State *L);
 	static void internalAddThing(lua_State *L, const Thing *thing, const unsigned int thingid);
 	
-	static Position internalGetRealPosition(ActionScript *action, Player *player, const Position &pos);
+	static const Position& internalGetRealPosition(ActionScript *action, Player *player, const Position &pos);
 	static int internalGetPlayerInfo(lua_State *L, ePlayerInfo info);
 	
 };
 
-#endif // __actions_h_
+#endif

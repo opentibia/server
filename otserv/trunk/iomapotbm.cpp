@@ -23,6 +23,7 @@
 #include "tile.h"
 #include "item.h"
 #include "container.h"
+#include "depot.h"
 #include "fileloader.h"
 
 typedef unsigned char attribute_t;
@@ -219,10 +220,7 @@ bool IOMapOTBM::loadMap(Map* map, std::string identifier)
 								
 								item  = unserializaItemAttr(propStream);
 								if(item){
-									item->pos.x = px;
-									item->pos.y = py;
-									item->pos.z = pz;
-									tile->addThing(item);
+									tile->__internalAddThing(item);
 								}
 								else{
 									return false;
@@ -239,10 +237,7 @@ bool IOMapOTBM::loadMap(Map* map, std::string identifier)
 						if(type == OTBM_ITEM){
 							Item* item = unserializaItemNode(&f, item_node);
 							if(item){
-								item->pos.x = px;
-								item->pos.y = py;
-								item->pos.z = pz;
-								tile->addThing(item);
+								tile->__internalAddThing(item);
 							}
 							else{
 								return false;
@@ -362,8 +357,8 @@ Item* IOMapOTBM::unserializaItemNode(FileLoader* f, NODE node)
 					delete item;
 					return NULL;
 				}
-				if(Container* container = dynamic_cast<Container*>(item)){
-					container->depot = tmp_short;
+				if(Depot* depot = dynamic_cast<Depot*>(item)){
+					depot->setDepotId(tmp_short);
 				}
 				else{
 					delete item;
@@ -398,7 +393,7 @@ Item* IOMapOTBM::unserializaItemNode(FileLoader* f, NODE node)
 				if(type == OTBM_ITEM){
 					Item* item = unserializaItemNode(f, item_node);
 					if(item){
-						container->addItem(item);
+						container->__internalAddThing(item);
 					}
 					else{
 						return false;

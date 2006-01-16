@@ -23,9 +23,9 @@
 #ifndef __TILE_H__
 #define __TILE_H__
 
-
 #include "item.h"
-#include "container.h"
+#include "cylinder.h"
+#include "teleport.h"
 #include "magic.h"
 
 #include "definitions.h"
@@ -37,33 +37,34 @@ class Creature;
 typedef std::vector<Item*> ItemVector;
 typedef std::vector<Creature*> CreatureVector;
 
-class Tile
+enum tileflags_t{
+	TILESTATE_NONE = 0,
+	TILESTATE_PROTECTIONZONE = 1,
+	TILESTATE_HOUSE = 2
+};
+
+class Tile : public Cylinder
 {
 public:
-  Creature* getCreature() const{
-		if(creatures.size())
-			return creatures[0];
-		else
-			return NULL;
-  }
-
-  Tile()
+  Tile(int x, int y, int z)
   {
-    pz     = false;
-    splash = NULL;
+		tilePos.x = x;
+		tilePos.y = y;
+		tilePos.z = z;
+
+    flags = 0;
 		ground = NULL;
   }
 
+	virtual int getThrowRange() const {return 0;};
+	virtual bool isPushable() const {return false;};
+
   Item*          ground;
-  Item*          splash;
   ItemVector     topItems;
   CreatureVector creatures;
   ItemVector     downItems;
 
-  bool removeThing(Thing *thing);
-  void addThing(Thing *thing);
-	bool insertThing(Thing *thing, int stackpos);
-	MagicEffectItem* getFieldItem();
+	MagicEffectItem* getFieldItem() const;
 	Teleport* getTeleportItem() const;
 
 	Thing* getTopMoveableThing();
@@ -71,29 +72,63 @@ public:
 	Item* getTopTopItem();
 	Item* getTopDownItem();
 	Item* getMoveableBlockingItem();
+  Thing* getTopThing();
 	
-  int getCreatureStackPos(Creature *c) const;
-  int getThingStackPos(const Thing *thing) const;
 	int getThingCount() const;
 
-  Thing* getTopThing();
-	Thing* getThingByStackPos(int pos);
+	bool hasProperty(enum ITEMPROPERTY prop) const;
 
-  //bool isBlockingProjectile() const;
-	//bool isBlocking(bool ispickupable = false, bool ignoreMoveableBlocking = false) const;
-	ReturnValue isBlocking(int objectstate, bool ignoreCreature = false, bool ignoreMoveableBlocking = false) const;
-
+	bool hasFlag(tileflags_t flag) const;
+	void setFlag(tileflags_t flag);
   bool isPz() const;
   void setPz();
   
   bool floorChange() const;
   bool floorChangeDown() const;
   bool floorChange(Direction direction) const;
+	uint32_t getHeight() const;
   
-  std::string getDescription() const;
+  virtual std::string getDescription(int32_t lookDistance) const;
+
+	void moveCreature(Creature* creature, Cylinder* toCylinder, bool teleport = false);
+
+	void onAddTileItem(Item* item);
+	void onUpdateTileItem(uint32_t index, Item* olditem, Item* newitem);
+	void onRemoveTileItem(uint32_t index, Item* item);
+	void onUpdateTile();
+
+	//cylinder implementations
+	virtual ReturnValue __queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
+		uint32_t& maxQueryCount) const;
+	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,
+		bool childIsOwner = false) const;
+	virtual ReturnValue __queryRemove(const Thing* thing, uint32_t count) const;
+	virtual Cylinder* __queryDestination(int32_t& index, const Thing* thing, Item** destItem);
+
+	virtual void __addThing(Thing* thing);
+	virtual void __addThing(int32_t index, Thing* thing);
+
+	virtual void __updateThing(Thing* thing, uint32_t count);
+	virtual void __replaceThing(uint32_t index, Thing* thing);
+
+	virtual void __removeThing(Thing* thing, uint32_t count);
+
+	virtual int32_t __getIndexOfThing(const Thing* thing) const;
+	virtual Thing* __getThing(uint32_t index) const;
+
+	virtual void postAddNotification(Thing* thing, bool hasOwnership = true);
+	virtual void postRemoveNotification(Thing* thing, bool hadOwnership = true);
+
+	virtual void __internalAddThing(Thing* thing);
+	virtual void __internalAddThing(uint32_t index, Thing* thing);
+
+	const Position& getTilePosition() const {return tilePos;};
+
+	virtual bool isRemoved() const {return false;};
 
 protected:
-  bool pz;
+	Position tilePos;
+	uint32_t flags;
 };
 
 

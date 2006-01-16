@@ -18,59 +18,71 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __OTSERV_CONTAINER_H
-#define __OTSERV_CONTAINER_H
+#ifndef __CONTAINER_H__
+#define __CONTAINER_H__
 
+#include "definitions.h"
+#include "cylinder.h"
 #include "item.h"
 
-typedef std::list<Item *> ContainerList;
+typedef std::list<Item *> ItemList;
 
-class Container : public Item
+class Depot;
+
+class Container : public Item, public Cylinder
 {
-	private:
-		int useCount;
-		Container *parent;
-		unsigned short maxitems; //number of max items in container  
-		unsigned short actualitems; // number of items in container
-		ContainerList lcontained;
+public:
+	Container(uint16_t _type);
+	virtual ~Container();
 
-	public:
-		Container(const unsigned short _type);
-		virtual ~Container();
-		virtual void useThing() {
-			//std::cout << "Container: useThing() " << this << std::endl;
-			useCount++;
-		};
-	
-		virtual void releaseThing() {
-			useCount--;
-			//std::cout << "Container: releaseThing() " << this << std::endl;
-			//if (useCount == 0)
-			if (useCount <= 0)
-				delete this;
-		};
+	virtual Container* getContainer() {return this;};
+	virtual const Container* getContainer() const {return this;};
+	virtual Depot* getDepot() {return NULL;};
+	virtual const Depot* getDepot() const {return NULL;};
 
-		unsigned long depot;
-		int size() const {return actualitems;};
-		int capacity() const {return maxitems;};
-		void setParent(Container* container) {parent = container;};
-		Container *getParent() {return parent;}
-		Container *getParent() const {return parent;}
-		Container *getTopParent();
-		const Container *getTopParent() const;
+	uint32_t size() const {return (uint32_t)itemlist.size();};
+	uint32_t capacity() const {return maxSize;};
 
-		ContainerList::const_iterator getItems() const;     // begin();
-		ContainerList::const_iterator getEnd() const;       // iterator beyond the last element
-		bool addItem(Item* newitem);     // add an item to the container
-		bool removeItem(Item* item); //remove an item from the container
-		void moveItem(unsigned char from_slot, unsigned char to_slot);
-		Item* getItem(unsigned long slot_num);
-		const Item* getItem(unsigned long slot_num) const;
-		unsigned char getSlotNumberByItem(const Item* item) const;
-		bool isHoldingItem(const Item* item) const;
-		long getItemHoldingCount() const;
-		virtual double getWeight() const;
+	ItemList::const_iterator getItems() const;
+	ItemList::const_iterator getEnd() const;
+
+	Item* getItem(uint32_t index);
+	bool isHoldingItem(const Item* item) const;
+
+	uint32_t getItemHoldingCount() const;
+	virtual double getWeight() const;
+
+	//cylinder implementations
+	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,
+		bool childIsOwner = false) const;
+	virtual ReturnValue __queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
+		uint32_t& maxQueryCount) const;
+	virtual ReturnValue __queryRemove(const Thing* thing, uint32_t count) const;
+	virtual Cylinder* __queryDestination(int32_t& index, const Thing* thing, Item** destItem);
+
+	virtual void __addThing(Thing* thing);
+	virtual void __addThing(int32_t index, Thing* thing);
+
+	virtual void __updateThing(Thing* thing, uint32_t count);
+	virtual void __replaceThing(uint32_t index, Thing* thing);
+
+	virtual void __removeThing(Thing* thing, uint32_t count);
+
+	virtual int32_t __getIndexOfThing(const Thing* thing) const;
+	virtual Thing* __getThing(uint32_t index) const;
+
+	virtual void postAddNotification(Thing* thing, bool hasOwnership = true);
+	virtual void postRemoveNotification(Thing* thing, bool hadOwnership = true);
+
+	virtual void __internalAddThing(Thing* thing);
+	virtual void __internalAddThing(uint32_t index, Thing* thing);
+
+protected:
+	//uint32_t depotId;
+	uint32_t maxSize; //number of max items in container  
+
+	ItemList itemlist;
 };
 
-#endif //__OTSERV_CONTAINER_H
+#endif //__CONTAINER_H__
 

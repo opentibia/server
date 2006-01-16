@@ -19,8 +19,8 @@
 //////////////////////////////////////////////////////////////////////
 
 
-#ifndef __commands_h_
-#define __commands_h_
+#ifndef __COMMANDS_H__
+#define __COMMANDS_H__
 
 #include <string>
 #include <map>
@@ -35,37 +35,38 @@ public:
 	Commands():game(NULL),loaded(false){};
 	Commands(Game* igame);
 
-	bool loadXml(const std::string &_datadir);	
+	bool loadXml(const std::string& _datadir);	
 	bool isLoaded(){return loaded;}
 	bool reload();
 
-	bool exeCommand(Creature *creature, const std::string &cmd);
-	
+	bool exeCommand(Creature* creature, const std::string& cmd);
 	
 protected:
 	bool loaded;
-	Game *game;
+	Game* game;
 	std::string datadir;
 
 	//commands
-	bool placeNpc(Creature* c, const std::string &cmd, const std::string &param);
-	bool placeMonster(Creature* c, const std::string &cmd, const std::string &param);
-	bool placeSummon(Creature* c, const std::string &cmd, const std::string &param);
-	bool broadcastMessage(Creature* c, const std::string &cmd, const std::string &param);
-	bool banPlayer(Creature* c, const std::string &cmd, const std::string &param);
-	bool teleportMasterPos(Creature* c, const std::string &cmd, const std::string &param);
-	bool teleportHere(Creature* c, const std::string &cmd, const std::string &param);
-	bool teleportTo(Creature* c, const std::string &cmd, const std::string &param);
-	bool createItems(Creature* c, const std::string &cmd, const std::string &param);
-	bool substract_contMoney(Creature* c, const std::string &cmd, const std::string &param);
-	bool reloadInfo(Creature* c, const std::string &cmd, const std::string &param);
-	bool testCommand(Creature* c, const std::string &cmd, const std::string &param);
-	bool getInfo(Creature* c, const std::string &cmd, const std::string &param);
-	bool closeServer(Creature* c, const std::string &cmd, const std::string &param);
-	bool openServer(Creature* c, const std::string &cmd, const std::string &param);
-	bool onlineList(Creature* c, const std::string &cmd, const std::string &param);
-	bool teleportNTiles(Creature* c, const std::string &cmd, const std::string &param);
-	bool kickPlayer(Creature* c, const std::string &cmd, const std::string &param);
+	bool placeNpc(Creature* creature, const std::string& cmd, const std::string& param);
+	bool placeMonster(Creature* creature, const std::string& cmd, const std::string& param);
+	bool placeSummon(Creature* creature, const std::string& cmd, const std::string& param);
+	bool broadcastMessage(Creature* creature, const std::string& cmd, const std::string& param);
+	bool banPlayer(Creature* creature, const std::string& cmd, const std::string& param);
+	bool teleportMasterPos(Creature* creature, const std::string& cmd, const std::string& param);
+	bool teleportHere(Creature* creature, const std::string& cmd, const std::string& param);
+	bool teleportTo(Creature* creature, const std::string& cmd, const std::string& param);
+	bool createItems(Creature* creature, const std::string& cmd, const std::string& param);
+	bool substract_contMoney(Creature* creature, const std::string& cmd, const std::string& param);
+	bool reloadInfo(Creature* creature, const std::string& cmd, const std::string& param);
+	bool testCommand(Creature* creature, const std::string& cmd, const std::string& param);
+	bool getInfo(Creature* creature, const std::string& cmd, const std::string& param);
+	bool closeServer(Creature* creature, const std::string& cmd, const std::string& param);
+	bool openServer(Creature* creature, const std::string& cmd, const std::string& param);
+	bool onlineList(Creature* creature, const std::string& cmd, const std::string& param);
+	bool teleportNTiles(Creature* creature, const std::string& cmd, const std::string& param);
+	bool kickPlayer(Creature* creature, const std::string &cmd, const std::string &param);
+	//bool invitePlayer(Creature* creature, const std::string& cmd, const std::string& param);
+	//bool uninvitePlayer(Creature* creature, const std::string& cmd, const std::string& param);
 	
 	//table of commands
 	static s_defcommands defined_commands[];
@@ -87,4 +88,4 @@ struct s_defcommands{
 	CommandFunc f;
 };
 
-#endif //__commands_h_
+#endif

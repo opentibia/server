@@ -19,6 +19,7 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "iomapxml.h"
+#include "depot.h"
 #include "definitions.h"
 #include <iostream>
 
@@ -65,38 +66,33 @@ bool IOMapXML::loadMap(Map* map, std::string identifier){
 	int px,py,pz;
   	Tile *t;
 
-  	while(tile){ 
-      	tmp = (char*)xmlGetProp(tile, (const xmlChar *) "x");
+	while(tile){
+		tmp = (char*)xmlGetProp(tile, (const xmlChar *) "x");
 		if(!tmp){
 			tile = tile->next;
 			continue;
 		}
-      	px = atoi(tmp);
-      	xmlFreeOTSERV(tmp);
-      	
-      	tmp = (char*)xmlGetProp(tile, (const xmlChar *) "y");
-      	if(!tmp){
-			tile = tile->next;
-			continue;
-		}
-      	py = atoi(tmp);
-      	xmlFreeOTSERV(tmp);
 
-      	tmp = (char*)xmlGetProp(tile, (const xmlChar *) "z");
-      	if(!tmp){
+		px = atoi(tmp);
+		xmlFreeOTSERV(tmp);
+
+		tmp = (char*)xmlGetProp(tile, (const xmlChar *) "y");
+		if(!tmp){
 			tile = tile->next;
 			continue;
 		}
-      	pz = atoi(tmp);
-      	xmlFreeOTSERV(tmp);
-      
-/*
-#ifdef __DEBUG__
-			if(tmp == NULL) {
-				std::cout << "No ground tile! x: " << px << ", y: " << py << " z: " << pz << std::endl;
-			}
-#endif
-*/
+
+		py = atoi(tmp);
+    xmlFreeOTSERV(tmp);
+
+    tmp = (char*)xmlGetProp(tile, (const xmlChar *) "z");
+    if(!tmp){
+			tile = tile->next;
+			continue;
+		}
+
+		pz = atoi(tmp);
+    xmlFreeOTSERV(tmp);
 
 		tmp = (char*)xmlGetProp(tile, (const xmlChar *) "ground");
 		unsigned short ground = 0;
@@ -105,18 +101,18 @@ bool IOMapXML::loadMap(Map* map, std::string identifier){
 			xmlFreeOTSERV(tmp);
 		}
 
-      	map->setTile(px,py,pz,ground);
-      	t = map->getTile(px,py,pz);
-      
-      	tmp = (char*)xmlGetProp(tile, (const xmlChar *) "pz");
-      	if(tmp && (strcmp(tmp, "1") == 0)){ 
+		map->setTile(px,py,pz,ground);
+		t = map->getTile(px,py,pz);
+
+		tmp = (char*)xmlGetProp(tile, (const xmlChar *) "pz");
+		if(tmp && (strcmp(tmp, "1") == 0)){ 
 			t->setPz();
 			xmlFreeOTSERV(tmp);
 		}
        
-      	p = tile->children;
-      	while(p){  
-        	if(xmlStrcmp(p->name,(const xmlChar*) "item")==0){          
+    p = tile->children;
+    while(p){
+      if(xmlStrcmp(p->name,(const xmlChar*) "item")==0){          
 				tmp = (char*)xmlGetProp(p, (const xmlChar *) "id");
 				unsigned int id;
 				if(tmp){
@@ -125,18 +121,21 @@ bool IOMapXML::loadMap(Map* map, std::string identifier){
 				}
 				else
 					id = 0;
-				
+		
 				Item* myitem = Item::CreateItem(id);
 				myitem->unserialize(p);
-				Container *container = dynamic_cast<Container*>(myitem);
+				Container* container = dynamic_cast<Container*>(myitem);
 				if(container){
-					//is depot?					
-					tmp = (char*)xmlGetProp(p, (const xmlChar *) "depot");
-					if(tmp){					
-						int depotnumber = atoi(tmp);					
-						container->depot = depotnumber;
-						xmlFreeOTSERV(tmp);
+					//is depot?
+					if(Depot* depot = container->getDepot()){
+						tmp = (char*)xmlGetProp(p, (const xmlChar *) "depot");
+						if(tmp){
+							int depotId = atoi(tmp);					
+							depot->setDepotId(depotId);
+							xmlFreeOTSERV(tmp);
+						}
 					}
+
 					if(p->children && strcmp((const char*)p->children->name, "inside") == 0){
 						tmpNode = p->children->children;
 						while(tmpNode){
@@ -151,7 +150,7 @@ bool IOMapXML::loadMap(Map* map, std::string identifier){
 						
 							Item* myitem = Item::CreateItem(id);
 							myitem->unserialize(tmpNode);
-							container->addItem(myitem);
+							container->__internalAddThing(myitem);
 			
 							Container* in_container = dynamic_cast<Container*>(myitem);
 							if(in_container){
@@ -162,21 +161,16 @@ bool IOMapXML::loadMap(Map* map, std::string identifier){
 					}
 				}//loadContainer
 
-				myitem->pos.x = px;
-				myitem->pos.y = py;
-				myitem->pos.z = pz;		
-			
-				if(myitem->isAlwaysOnTop())
-					t->topItems.push_back(myitem);
-				else
-					t->downItems.push_back(myitem);
+				t->__internalAddThing(myitem);
 			}
+			
 			p = p->next;
 		}
-    	tile = tile->next;
-   	}
-  	xmlFreeDoc(doc);
-	
+
+		tile = tile->next;
+	}
+
+ 	xmlFreeDoc(doc);
 	return true;
 }
 
@@ -205,7 +199,7 @@ bool IOMapXML::LoadContainer(xmlNodePtr nodeitem,Container* ccontainer)
 			}
 			Item* myitem = Item::CreateItem(id);
 			myitem->unserialize(p);			
-			ccontainer->addItem(myitem);
+			ccontainer->__internalAddThing(myitem);
 			
 			Container* in_container = dynamic_cast<Container*>(myitem);
 			if(in_container){

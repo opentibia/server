@@ -233,9 +233,9 @@ void IOMapBin::loadOTM(Map* map)
 										}                             
 									} while (op3 < 0xFF);
 									
-									item->pos.x = x;
-									item->pos.y = y;
-									item->pos.z = z;
+									//item->pos.x = x;
+									//item->pos.y = y;
+									//item->pos.z = z;
 
 									if (item->isAlwaysOnTop())
 										t->topItems.push_back(item);

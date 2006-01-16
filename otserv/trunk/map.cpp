@@ -63,7 +63,7 @@ using namespace std;
 
 extern LuaScript g_config;
 extern Spells spells;
-//extern std::map<long, Creature*> channel;
+
 
 Map::Map() :
 spawnfile(""),
@@ -78,7 +78,8 @@ Map::~Map()
 }
 
 
-int Map::loadMap(std::string filename, std::string filekind) {
+int Map::loadMap(std::string filename, std::string filekind)
+{
 	int ret;
 	IOMap* loader;
 	
@@ -95,12 +96,12 @@ int Map::loadMap(std::string filename, std::string filekind) {
 		//ret = SPAWN_BUILTIN;
 		ret = SPAWN_XML;
 	}
-	#ifdef ENABLESQLMAPSUPPORT	
+	#ifdef ENABLESQLMAPSUPPORT
 	else if(filekind == "SQL"){
 		loader = new IOMapSQL();
 		ret = SPAWN_SQL;
 	}
-	#endif	
+#endif	
 	else{
  		std::cout << "FATAL: couldnt determine the map format! exiting1" << std::endl;
 		exit(1);
@@ -110,12 +111,14 @@ int Map::loadMap(std::string filename, std::string filekind) {
 	bool success = loader->loadMap(this, filename);
 	delete loader;
 	
+	///*
 	if(success){
 		return ret;
 	}
 	else{
 		return MAP_LOADER_ERROR;
 	}
+	//*/
 }
 
 Tile* Map::getTile(unsigned short _x, unsigned short _y, unsigned char _z)
@@ -124,42 +127,62 @@ Tile* Map::getTile(unsigned short _x, unsigned short _y, unsigned char _z)
 		// _x & 0x7F  is like _x % 128
 		//TileMap *tm = &tileMaps[_x & 0x1F][_y & 0x1F][_z];
 		//TileMap *tm = &tileMaps[_x & 0xFF][_y & 0xFF];
-    	TileMap *tm = &tileMaps[_x & 0x7F][_y & 0x7F];
+		TileMap* tm = &tileMaps[_x & 0x7F][_y & 0x7F];
 		if(!tm)
 			return NULL;
 	
-    	// search in the stl map for the requested tile
-    	//TileMap::iterator it = tm->find((_x << 16) | _y);
-    	//TileMap::iterator it = tm->find(_x & 0xFF00) << 8 | (_y & 0xFF00) | _z);
-    	TileMap::iterator it = tm->find((_x & 0xFF80) << 16 | (_y & 0xFF80) << 1 | _z);
+    // search in the stl map for the requested tile
+    //TileMap::iterator it = tm->find((_x << 16) | _y);
+    //TileMap::iterator it = tm->find(_x & 0xFF00) << 8 | (_y & 0xFF00) | _z);
+    TileMap::iterator it = tm->find((_x & 0xFF80) << 16 | (_y & 0xFF80) << 1 | _z);
 
-    	// ... found
-    	if(it != tm->end())
-      		return it->second;
-  	}
+    // ... found
+    if(it != tm->end())
+      	return it->second;
+	}
 	
 	// or not
 	return NULL;
 }
 
-Tile* Map::getTile(const Position &pos)
-{
+Tile* Map::getTile(const Position& pos)
+{ 
 	return getTile(pos.x, pos.y, pos.z);
+}
+
+void Map::setTile(uint16_t _x, uint16_t _y, uint8_t _z, Tile* newtile)
+{
+	Tile* tile = getTile(_x, _y, _z);
+
+	if(!tile){
+		tileMaps[_x & 0x7F][_y & 0x7F][ (_x & 0xFF80) << 16 | (_y & 0xFF80) << 1 | _z] = newtile;
+	}
+	else{
+		std::cout << "Error: Map::setTile() already exists." << std::endl;
+	}
 }
 
 void Map::setTile(unsigned short _x, unsigned short _y, unsigned char _z, unsigned short groundId)
 {
-	Tile* tile = setTile(_x, _y, _z);
-	
-	if(tile->ground)
-		//delete tile->ground;
-		tile->ground->releaseThing();
+  Tile* tile = getTile(_x, _y, _z);
 
-	if(groundId != 0 && Item::items[groundId].isGroundTile()){
-		tile->ground = Item::CreateItem(groundId);
-		tile->ground->pos.x = _x;
-		tile->ground->pos.y = _y;
-		tile->ground->pos.z = _z;
+	if(tile != NULL){
+		if(tile->ground)
+			//delete tile->ground;
+			tile->ground->releaseThing2();
+
+		if(groundId != 0 && Item::items[groundId].isGroundTile()){
+			tile->ground = Item::CreateItem(groundId);
+			tile->ground->setParent(tile);
+		}
+		else{
+			tile = new Tile(_x, _y, _z);
+
+			if(groundId != 0 && Item::items[groundId].isGroundTile()){
+				tile->ground = Item::CreateItem(groundId);
+				tile->ground->setParent(tile);
+			}
+		}
 	}
 }
 
@@ -168,7 +191,7 @@ Tile* Map::setTile(unsigned short _x, unsigned short _y, unsigned char _z)
 	Tile *tile = getTile(_x, _y, _z);
 	
 	if(!tile){
-    	tile = new Tile();
+    	tile = new Tile(_x, _y,_z);
 		//tileMaps[_x & 0x1F][_y & 0x1F][_z][(_x << 16) | _y] = tile;
 		//tileMaps[_x & 0xFF][_y & 0xFF][ _x & 0xFF00) << 8 | (_y & 0xFF00) | _z] = tile;
 		tileMaps[_x & 0x7F][_y & 0x7F][ (_x & 0xFF80) << 16 | (_y & 0xFF80) << 1 | _z] = tile;
@@ -176,68 +199,83 @@ Tile* Map::setTile(unsigned short _x, unsigned short _y, unsigned char _z)
   	return tile;
 }
 
-bool Map::placeCreature(Position &pos, Creature* c)
+bool Map::placeCreature(const Position& pos, Creature* creature)
 {
 	Tile* tile = getTile(pos.x, pos.y, pos.z);
-	bool success = tile && !tile->floorChange() && !tile->getTeleportItem() && c->canMovedTo(tile);
-	if(!success)
-	{   
-		for(int cx =pos.x - 1; cx <= pos.x + 1 && !success; cx++) {
-			for(int cy = pos.y - 1; cy <= pos.y + 1 && !success; cy++){
-#ifdef __DEBUG__
-				std::cout << "search pos x: " << cx <<" y: "<< cy << std::endl;
-#endif
 
-				tile = getTile(cx, cy, pos.z);
-				success = tile && !tile->floorChange() && !tile->getTeleportItem() && c->canMovedTo(tile);
+	if(tile){
+		ReturnValue ret = tile->__queryAdd(0, creature, 0);
 
-				if(success) {
-					pos.x = cx;
-					pos.y = cy;
-				}
-			}
+		if(ret == RET_NOERROR){
+			tile->__internalAddThing(creature);
+			return true;
 		}
-
-		if(!success){
-			Player *player = dynamic_cast<Player*>(c);
-			if(player) {
-				pos.x = c->masterPos.x;
-				pos.y = c->masterPos.y;
-				pos.z = c->masterPos.z;
-
-				tile = getTile(pos.x, pos.y, pos.z);
-				success = tile && !tile->floorChange() && !tile->getTeleportItem() && player->canMovedTo(tile);
-			}
-		}    
-
+		else if(tile->hasFlag(TILESTATE_HOUSE) && ret == RET_PLAYERISNOTINVITED){
+			int32_t index = 0;
+			Item* toItem = NULL;
+			Cylinder* cylinder = tile->__queryDestination(index, creature, &toItem);
+			cylinder->__internalAddThing(creature);
+			return true;
+		}
 	}
 
-	if(!success || !tile) {
+	for(int cx = pos.x - 1; cx <= pos.x + 1; cx++){
+		for(int cy = pos.y - 1; cy <= pos.y + 1; cy++){
+			tile = getTile(cx, cy, pos.z);
+
+			//isSuccess= (tile && !tile->getTeleportItem() && !tile->floorChange() && tile->__queryAdd(0, creature, 0) == RET_NOERROR);
+
+			if(tile && tile->__queryAdd(0, creature, 0) == RET_NOERROR){
+				tile->__internalAddThing(creature);
+				return true;
+			}
+		}
+	}
+
 #ifdef __DEBUG__
 	std::cout << "Failed to place creature onto map!" << std::endl;
 #endif
-		return false;
-	}
-    #ifdef __DEBUG__
-	std::cout << "POS: " << c->pos << std::endl;
-	#endif
-	tile->addThing(c);
-	c->pos = pos;
 
-	return true;
+	return false;
+
+	/*
+	Tile* tile = getTile(pos.x, pos.y, pos.z);
+
+	bool success = (tile && !tile->getTeleportItem() && !tile->floorChange() && tile->__queryAdd(0, creature, 0) == RET_NOERROR);
+	if(!success){
+		for(int cx = pos.x - 1; cx <= pos.x + 1 && !success; cx++){
+			for(int cy = pos.y - 1; cy <= pos.y + 1 && !success; cy++){
+				tile = getTile(cx, cy, pos.z);
+				success = success = (tile && !tile->getTeleportItem() && !tile->floorChange() && tile->__queryAdd(0, creature, 0) == RET_NOERROR);
+				if(success){
+					break;
+				}
+			}
+		}
+	}
+
+	if(success){
+		tile->__internalAddThing(creature);
+		return true;
+	}
+
+#ifdef __DEBUG__
+	std::cout << "Failed to place creature onto map!" << std::endl;
+#endif
+
+	return false;
+	*/
 }
 
-bool Map::removeCreature(Creature* c)
+bool Map::removeCreature(Creature* creature)
 {
-	//OTSYS_THREAD_LOCK(mapLock)
-	bool ret = true;
+	Tile* tile = creature->getTile();
+	if(tile){
+		tile->__removeThing(creature, 0);
+		return true;
+	}
 
-	Tile *tile = getTile(c->pos.x, c->pos.y, c->pos.z);
-	if(!tile || !tile->removeThing(c))
-		return false;
-
-	//OTSYS_THREAD_UNLOCK(mapLock)
-	return true;
+	return false;
 }
 
 void Map::getSpectators(const Range& range, SpectatorVec& list)
@@ -260,24 +298,22 @@ void Map::getSpectators(const Range& range, SpectatorVec& list)
 	CreatureVector::iterator cit;
 	Tile *tile;
 
-	for(int nz = range.minRange.z; nz != range.maxRange.z + range.zstep; nz += range.zstep) {
+	//for(int nz = range.minRange.z; nz != range.maxRange.z + range.zstep; nz++) {
+	for(int nz = range.minRange.z; nz != range.maxRange.z + range.zstep; nz += range.zstep){
 		offsetz = range.centerpos.z - nz;
-		//negative offset means that the player is on a lower floor than ourself
-
-		for (int nx = range.minRange.x + offsetz; nx <= range.maxRange.x + offsetz; ++nx)
-		{
-			for (int ny = range.minRange.y + offsetz; ny <= range.maxRange.y + offsetz; ++ny)
-			{
+		for(int nx = range.minRange.x + offsetz; nx <= range.maxRange.x + offsetz; ++nx){
+			for(int ny = range.minRange.y + offsetz; ny <= range.maxRange.y + offsetz; ++ny){
 				tile = getTile(nx + range.centerpos.x, ny + range.centerpos.y, nz);
-				if (tile)
-				{
-					for (cit = tile->creatures.begin(); cit != tile->creatures.end(); ++cit) {
+				if(tile){
+					for(cit = tile->creatures.begin(); cit != tile->creatures.end(); ++cit){
 /*
 #ifdef __DEBUG__
 						std::cout << "Found " << (*cit)->getName() << " at x: " << (*cit)->pos.x << ", y: " << (*cit)->pos.y << ", z: " << (*cit)->pos.z << ", offset: " << offsetz << std::endl;
 #endif
-*/
-						list.push_back((*cit));
+*/					
+						if(std::find(list.begin(), list.end(), *cit) == list.end()){
+							list.push_back(*cit);
+						}
 					}
 				}
 			}
@@ -285,104 +321,164 @@ void Map::getSpectators(const Range& range, SpectatorVec& list)
 	}	
 }
 
-//bool Map::canThrowItemTo(Position from, Position to, bool creaturesBlock /* = true*/, bool isProjectile /*= false*/)
-ReturnValue Map::canThrowObjectTo(Position from, Position to, int objectstate /*= BLOCK_PROJECTILE*/)
+bool Map::canThrowObjectTo(const Position& fromPos, const Position& toPos)
 {
-	Position start = from;
-	Position end = to;
-
-	/*if(start.x > end.x) {
-		swap(start.x, end.x);
-		swap(start.y, end.y);
-	}*/
-
-	bool steep = std::abs(end.y - start.y) > abs(end.x - start.x);
-
-	if(steep) {
-		swap(start.x, start.y);
-		swap(end.x, end.y);
+	Position start = fromPos;
+	Position end = toPos;
+	
+	//z checks
+	//underground 8->15
+	//ground level and above 7->0
+	if((start.z >= 8 && end.z < 8) || (end.z >= 8 && start.z < 8))
+		return false;
+	
+	if(start.z - end.z > 3)
+		return false;
+	
+	int deltax, deltay, deltaz;
+	deltax = abs(start.x - end.x);
+	deltay = abs(start.y - end.y);
+	deltaz = abs(start.z - end.z);
+    
+	//distance checks
+	if(deltax - deltaz > 8 || deltay - deltaz > 6){
+		return false;
+	}
+    
+	int max = deltax, dir = 0;
+	if(deltay > max){
+		max = deltay; 
+		dir = 1;
+	}
+	if(deltaz > max){
+		max = deltaz; 
+		dir = 2;
 	}
 	
-	int deltax = abs(end.x - start.x);
-	int deltay = abs(end.y - start.y);
-	int error = 0;
-	int deltaerr = deltay;
-	int y = start.y;
-	Tile *t = NULL;
-	int xstep = ((start.x < end.x) ? 1 : -1);
-	int ystep = ((start.y < end.y) ? 1 : -1);
-
-	//for(int x = start.x; x != end.x; x += xstep) {
-	for(int x = start.x; x != end.x + xstep; x += xstep) {
-		int rx = (steep ? y : x);
-		int ry = (steep ? x : y);
-
-		if(!(from.x == rx && from.y == ry)) {
-
-			t = getTile(rx, ry, start.z);
-			ReturnValue ret = RET_NOERROR;
-
-			if(t) {
-				if((to.x == rx && to.y == ry)) {
-					ret = t->isBlocking(objectstate);
-				}
-				else {
-					ret = t->isBlocking(BLOCK_PROJECTILE);
-				}
-			}
-
-			if(ret != RET_NOERROR)
-				return ret;
-		}
-
-		error += deltaerr;
-
-		if(2 * error >= deltax) {
-			y += ystep;
-			error -= deltax;
-		}
+	switch(dir){
+	case 0:
+		//x -> x
+		//y -> y
+		//z -> z
+		break;
+	case 1:	
+		//x -> y
+		//y -> x
+		//z -> z
+		swap(start.x, start.y);
+		swap(end.x, end.y);
+		swap(deltax, deltay);
+		break;
+	case 2:
+		//x -> z
+		//y -> y
+		//z -> x
+		swap(start.x, start.z);
+		swap(end.x, end.z);
+		swap(deltax, deltaz);
+		break;
 	}
 
-	return RET_NOERROR;
-	//return true;
+	int stepx = ((start.x < end.x) ? 1 : -1);
+	int stepy = ((start.y < end.y) ? 1 : -1);
+	int stepz = ((start.z < end.z) ? 1 : -1);
+	
+	int x, y, z;
+	int errory = 0, errorz = 0;
+	x = start.x;
+	y = start.y;
+	z = start.z;
+	
+	int lastrx = x, lastry = y, lastrz = z;
+	
+	for( ; x != end.x + stepx; x += stepx){
+		int rx, ry, rz;
+		switch(dir){
+		case 0:
+			rx = x; ry = y; rz = z;
+			break;
+		case 1:
+			rx = y; ry = x; rz = z;
+			break;
+		case 2:
+			rx = z; ry = y; rz = x;
+			break;
+		}
+
+		if(!(toPos.x == rx && toPos.y == ry && toPos.z == rz) && 
+		  !(fromPos.x == rx && fromPos.y == ry && fromPos.z == rz)){
+			if(lastrz != rz){
+				if(getTile(lastrx, lastry, std::min(lastrz, rz))){
+					return false;
+				}
+			}
+			lastrx = rx; lastry = ry; lastrz = rz;
+			
+			Tile *tile = getTile(rx, ry, rz);
+			if(tile){
+				if(tile->hasProperty(BLOCKPROJECTILE))
+					return false;
+			}
+		}
+
+		errory += deltay;
+		errorz += deltaz;
+		if(2*errory >= deltax){
+			y += stepy;
+			errory -= deltax;
+		}
+		if(2*errorz >= deltax){
+			z += stepz;
+			errorz -= deltax;
+		}
+	}
+	return true;
 }
 
-ReturnValue Map::isPathValid(Creature *creature, const std::list<Position>& path, int pathSize,
+bool Map::isPathValid(Creature* creature, const std::list<Position>& path, int pathSize,
 	bool ignoreMoveableBlockingItems /*= false)*/)
 {
 	int pathCount = 0;
 	std::list<Position>::const_iterator iit;
 	for(iit = path.begin(); iit != path.end(); ++iit) {
 
-		Tile *t = getTile(iit->x, iit->y, iit->z);
-		if(t) {
-			ReturnValue ret = t->isBlocking(BLOCK_SOLID | BLOCK_PATHFIND, false, ignoreMoveableBlockingItems);
-			if(ret == RET_CREATUREBLOCK && t->getCreature() == creature && t->creatures.size() == 1)
-				ret = RET_NOERROR;
+		Tile* tile = getTile(iit->x, iit->y, iit->z);
+		if(tile){
+			if(creature->getTile() != tile){
+				ReturnValue ret = tile->__queryAdd(0, creature, 1);
 
-			if(ret != RET_NOERROR) {
-				//std::cout << "isPathValid - false: " << (int) ret << std::endl;
-				return ret;
+				if(ret != RET_NOERROR)
+					continue;
 			}
+
+			/*
+			if(!tile->creatures.empty() && creature->getTile() != tile)
+				continue;
+
+			if(ignoreMoveableBlockingItems){
+				if(tile->hasProperty(NOTMOVEABLEBLOCKSOLID) || tile->hasProperty(NOTMOVEABLEBLOCKPATHFIND))
+					continue;
+			}
+			else{
+				if(tile->hasProperty(BLOCKSOLID) || tile->hasProperty(BLOCKPATHFIND))
+					continue;
+			}
+			*/
 		}
 		else
-			return RET_NOTILE;
-			//return false;
+			return false;
 
 		if(pathCount++ >= pathSize)
 			return RET_NOERROR;
 	}
 
-	return RET_NOERROR;
-	//return true;
+	return true;
 }
 
-std::list<Position> Map::getPathTo(Creature *creature, Position start, Position to,
-	bool creaturesBlock /*=true*/, bool ignoreMoveableBlockingItems /*= false*/, int maxNodSize /*= 100*/){
+std::list<Position> Map::getPathTo(Creature* creature, Position start, Position to,
+	bool creaturesBlock /*=true*/, bool ignoreMoveableBlockingItems /*= false*/, int maxNodSize /*= 100*/)
+{
 	std::list<Position> path;
-/*	if(start.z != to.z)
-		return path;
-*/
 	AStarNodes nodes;
 	AStarNode* found = NULL;
 	int z = start.z;
@@ -405,15 +501,28 @@ std::list<Position> Map::getPathTo(Creature *creature, Position start, Position 
 					int x = current->x + dx;
 					int y = current->y + dy;
 
-					Tile *t = getTile(x, y, z);
-					if(t) {
-						ReturnValue ret = t->isBlocking(BLOCK_SOLID | BLOCK_PATHFIND, !creaturesBlock, ignoreMoveableBlockingItems);
-						if(ret == RET_CREATUREBLOCK && t->getCreature() == creature && t->creatures.size() == 1)
-							ret = RET_NOERROR;
+					Tile* tile = getTile(x, y, z);
+					if(tile){
+						if(creature->getTile() != tile){
+							ReturnValue ret = tile->__queryAdd(0, creature, 1);
 
-						if(ret != RET_NOERROR) {
-							continue;
+							if(ret != RET_NOERROR)
+								continue;
 						}
+
+						/*
+						if(!tile->creatures.empty() && creature->getTile() != tile)
+							continue;
+
+						if(ignoreMoveableBlockingItems){
+							if(tile->hasProperty(NOTMOVEABLEBLOCKSOLID) || tile->hasProperty(NOTMOVEABLEBLOCKPATHFIND))
+								continue;
+						}
+						else{
+							if(tile->hasProperty(BLOCKSOLID) || tile->hasProperty(BLOCKPATHFIND))
+								continue;
+						}
+						*/
 					}
 					else
 						continue;

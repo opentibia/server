@@ -35,11 +35,10 @@ IOAccount* IOAccount::_instance = NULL;
 IOAccount* IOAccount::instance(){
 	if(!_instance){
 #ifdef __USE_MYSQL__
-    if(g_config.getGlobalString("sourcedata") == "SQL")   
-	_instance = (IOAccount*)new IOAccountSQL;
-	else //if(g_config.getGlobalString("sourcedata") == "XML") //fallback to xml
+		_instance = (IOAccount*)new IOAccountSQL;
+#else
+		_instance = (IOAccount*)new IOAccountXML;
 #endif
-	_instance = (IOAccount*)new IOAccountXML;
 	}
 	#ifdef __DEBUG__
 	printf("%s \n", _instance->getSourceDescription());

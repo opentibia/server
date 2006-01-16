@@ -18,12 +18,14 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __player_h_
-#define __player_h_
+#ifndef __PLAYER_H__
+#define __PLAYER_H__
 
 #include "definitions.h"
 #include "creature.h"
 #include "container.h"
+#include "depot.h"
+#include "cylinder.h"
 
 #include <vector>
 #include <ctime>
@@ -90,20 +92,28 @@ enum trade_state {
 };
 
 
-typedef std::pair<unsigned char, Container*> containerItem;
-typedef std::vector<containerItem> containerLayout;
-typedef std::map<unsigned long, Container*> DepotMap;
+typedef std::pair<unsigned long, Container*> containervector_pair;
+typedef std::vector<containervector_pair> ContainerVector;
+typedef std::map<unsigned long, Depot*> DepotMap;
 typedef std::map<unsigned long,long> StorageMap;
 typedef std::set<unsigned long> VIPListSet;
 
 //////////////////////////////////////////////////////////////////////
 // Defines a player...
 
-class Player : public Creature
+class Player : public Creature, public Cylinder
 {
 public:
 	Player(const std::string& name, Protocol* p);
 	virtual ~Player();
+	
+	virtual Player* getPlayer() {return this;};
+	virtual const Player* getPlayer() const {return this;};
+
+	const std::string& getName() const {return name;};
+	virtual bool isPushable() const;
+	virtual int getThrowRange() const {return 1;};
+
 	void setGUID(unsigned long _guid) {guid = _guid;};
 	unsigned long getGUID() const { return guid;};
 	virtual unsigned long idRange(){ return 0x10000000;}
@@ -112,28 +122,13 @@ public:
 	void addList();
 	void kickPlayer();
 	
-	bool addItem(Item* item, bool test = false);
-	bool internalAddItemContainer(Container *container,Item* item);
-	
-	freeslot_t getFreeSlot(Container **container,unsigned char &slot, const Item* item);
-	Container* getFreeContainerSlot(Container *parent);
-	
-	bool removeItem(unsigned short id,long count);
-	bool removeItem(Item* item, bool test = false);
-	bool internalRemoveItemContainer(Container *parent, Item* item, bool test = false);
-	int getItemCount(unsigned short id);
-	
-	int removeItemInventory(int pos, bool internal = false);
-	int addItemInventory(Item* item, int pos, bool internal = false);
-	
-	containerLayout::const_iterator getContainers() const { return vcontainers.begin();}
-	containerLayout::const_iterator getEndContainer() const { return vcontainers.end();}
-	
-	Container* getContainer(unsigned char containerid);
-	unsigned char getContainerID(const Container* container) const;
-	bool isHoldingContainer(const Container* container) const;
-	void addContainer(unsigned char containerid, Container *container);
-	void closeContainer(unsigned char containerid);
+	const std::string& getGuildName() const {return guildName;};
+	unsigned long getGuildId() const {return guildId;};
+
+	void addContainer(uint32_t containerid, Container *container);
+	void closeContainer(uint32_t containerid);
+	int32_t getContainerID(const Container* container) const;
+	Container* getContainer(uint32_t cid);
 	
 	void addStorageValue(const unsigned long key, const long value);
 	bool getStorageValue(const unsigned long key, long &value) const;
@@ -148,17 +143,16 @@ public:
 	bool gainManaTick();
 	bool gainHealthTick();
 	
-	const std::string& getName() const {return name;};
-	const std::string& getGuildName() const {return guildName;};
-	unsigned long getGuildId() const {return guildId;};
-	
 	int getPlayerInfo(playerinfo_t playerinfo) const;
 	int getSkill(skills_t skilltype, skillsid_t skillinfo) const;
 	std::string getSkillName(int skillid);
 	void addSkillTry(int skilltry);
 	void addSkillShieldTry(int skilltry);
 	
-	unsigned long getExperience() const {return experience;};
+	unsigned long getExperience() const {
+		return experience;
+	}
+
 	double getCapacity() const {
 		if(access == 0) {
 			return capacity;
@@ -180,64 +174,57 @@ public:
 	}
 	
 	time_t getLastLoginSaved() const { return lastLoginSaved; };
+	const Position& getLoginPosition() {return loginPosition;};
+	const Position& getLastPosition() {return lastPosition;};
 	
 	void updateInventoryWeigth();
 	
-	Item* getItem(int pos) const;
-	Item* GetDistWeapon() const;
+	Item* getInventoryItem(slots_t slot) const;
 	
 	void addManaSpent(unsigned long spent);
-	void addExp(unsigned long exp);
+	void addExperience(unsigned long exp);
 	virtual int getWeaponDamage() const;
 	virtual int getArmor() const;
 	virtual int getDefense() const;
 	unsigned long getMoney();
-	bool substractMoney(unsigned long money);
-	bool substractMoneyItem(Item *item, unsigned long money);
-	
-	
+
+	bool substractMoney(uint32_t money);
+	bool substractMoneyItem(Item* item, uint32_t money);
+	bool removeItemTypeCount(uint16_t itemId, uint32_t count);
+	uint32_t getItemTypeCount(uint16_t itemId);
+		
 	unsigned long eventAutoWalk;
 	
-	//items
-	containerLayout vcontainers;
-	void preSave();
-    virtual void useThing() {
-		//std::cout << "Player: useThing() " << this << std::endl;
-		useCount++;
-	};
-	
-	virtual void releaseThing() {
-		useCount--;
-		//std::cout << "Player: releaseThing() " << this << std::endl;
-		if (useCount == 0)
-			delete this;
-	};
-	
-	unsigned long getIP() const;
-	Container* getDepot(unsigned long depotId);
-	bool addDepot(Container* depot,unsigned long depotIs);
-	//depots	
-	DepotMap depots;
-	long max_depot_items;
-	
-	virtual void removeDistItem();
+	//battle functions
+	Item* GetDistWeapon() const;
+	void removeDistItem();
 	fight_t getFightType();
 	subfight_t getSubFightType();
+
+	//items
+	ContainerVector containerVec;
+	void preSave();
+
+	unsigned long getIP() const;
+	Depot* getDepot(uint32_t depotId);
+	bool addDepot(Depot* depot, uint32_t depotId);
+
+	//depots	
+	DepotMap depots;
+	uint32_t maxDepotLimit;
 	
+	bool CanSee(const Position& pos) const;
 	bool CanSee(int x, int y, int z) const;
 	
 	void sendIcons();  
 	void sendChangeSpeed(Creature* creature);
 	void sendToChannel(Creature *creature, SpeakClasses type, const std::string &text, unsigned short channelId);
-	virtual void sendCancel(const char *msg) const;
-	virtual void sendCancelWalk() const;
-	int sendInventory(unsigned char sl_id);
+	void sendCancel(const char *msg) const;
+	void sendCancelWalk() const;
 	void sendStats();
 	void sendTextMessage(MessageClasses mclass, const char* message) const;
 	void sendTextMessage(MessageClasses mclass, const char* message,const Position &pos, unsigned char type) const;
 	void sendPing();
-	void sendCloseContainer(unsigned char containerid);
-	void sendContainer(unsigned char index, Container *container);
 	void sendTextWindow(Item* item,const unsigned short maxlen, const bool canWrite);  
 	void sendDistanceShoot(const Position &from, const Position &to, unsigned char type);
 	void sendMagicEffect(const Position &pos, unsigned char type);
@@ -250,30 +237,12 @@ public:
 	
 	void die();      //player loses exp/skills/maglevel on death
 	
-	//virtual void setAttackedCreature(unsigned long id);
 	virtual bool isAttackable() const { return (access == 0); };
-	virtual bool isPushable() const;
 	virtual void dropLoot(Container *corpse);
 	virtual int getLookCorpse();
 	bool NeedUpdateStats();
 	
-	virtual std::string getDescription(bool self = false) const;
-	
-	//ground	
-	void onThingAppear(const Thing* thing);  
-	void onThingTransform(const Thing* thing,int stackpos);
-	void onThingDisappear(const Thing* thing, unsigned char stackPos);
-	void onThingRemove(const Thing* thing); //auto-close containers
-	
-	//container
-	void onItemAddContainer(const Container* container,const Item* item);
-	void onItemRemoveContainer(const Container* container,const unsigned char slot);
-	void onItemUpdateContainer(const Container* container,const Item* item,const unsigned char slot);
-	
-	//inventory - for this use int sendInventory(unsigned char sl_id)
-	//void onItemAddInvnetory(const unsigned char sl_id);
-	//void onItemRemoveInvnetory(const unsigned char sl_id);
-	//void onItemUpdateInvnetory(const unsigned char sl_id);
+	virtual std::string getDescription(int32_t lookDistance) const;
 	
 	void setAcceptTrade(bool b);
 	bool getAcceptTrade() {return (tradeState == TRADE_ACCEPT);};
@@ -285,60 +254,86 @@ public:
 	bool addVIP(unsigned long guid, std::string &name, bool isOnline, bool interal = false);
 	
 	VIPListSet VIPList;
+
+	//tile
+	//send methods
+	void sendAddTileItem(const Position& pos, const Item* item);
+	void sendUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* olditem, const Item* newitem);
+	void sendRemoveTileItem(const Position& pos, uint32_t stackpos, const Item* item);
+	void sendUpdateTile(const Position& pos);
+
+	void sendCreatureAppear(const Creature* creature, bool isLogin);
+	void sendCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout);
+	void sendCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport);
+
+	void sendCreatureTurn(const Creature* creature, uint32_t stackpos);
+	void sendCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text);
+	void sendCreatureChangeOutfit(const Creature* creature);
+
+	//event methods
+	virtual void onAddTileItem(const Position& pos, const Item* item);
+	virtual void onUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* olditem, const Item* newitem);
+	virtual void onRemoveTileItem(const Position& pos, uint32_t stackpos, const Item* item);
+	virtual void onUpdateTile(const Position& pos);
 	
+	virtual void onCreatureAppear(const Creature* creature, bool isLogin);
+	virtual void onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout);
+	virtual void onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport);
+
+	virtual void onCreatureTurn(const Creature* creature, uint32_t stackpos);
+	virtual void onCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text);
+	virtual void onCreatureChangeOutfit(const Creature* creature);
+
+	//container
+	void onAddContainerItem(const Container* container, const Item* item);
+	void onUpdateContainerItem(const Container* container, uint8_t slot, const Item* oldItem, const Item* newItem);
+	void onRemoveContainerItem(const Container* container, uint8_t slot, const Item* item);
+	
+	void onCloseContainer(const Container* container);
+	void onSendContainer(const Container* container);
+	void autoCloseContainers(const Container* container);
+
+	//inventory
+	void onAddInventoryItem(slots_t slot, const Item* item);
+	void onUpdateInventoryItem(slots_t slot, const Item* oldItem, const Item* newItem);
+	void onRemoveInventoryItem(slots_t slot, const Item* item);
+
+	virtual void postAddNotification(Thing* thing, bool hasOwnership = true);
+	virtual void postRemoveNotification(Thing* thing, bool hadOwnership = true);
+
 protected:
+	void checkTradeState(const Item* item);
 	void sendCancelAttacking();
 	void addSkillTryInternal(int skilltry,int skill);
-	virtual void onCreatureAppear(const Creature *creature);
-	virtual void onCreatureDisappear(const Creature *creature, unsigned char stackPos, bool tele);
-	virtual void onCreatureTurn(const Creature *creature, unsigned char stackpos);
-	virtual void onCreatureSay(const Creature *creature, SpeakClasses type, const std::string &text);
-	virtual void onCreatureChangeOutfit(const Creature* creature);
-	virtual void onTeleport(const Creature *creature, const Position *oldPos, unsigned char oldstackpos); 
+
 	virtual int onThink(int& newThinkTicks);
-	
-	virtual void onTileUpdated(const Position &pos);
-	
-	//container to container
-	virtual void onThingMove(const Creature *creature, const Container *fromContainer, unsigned char from_slotid,
-		const Item* fromItem, int oldFromCount, Container *toContainer, unsigned char to_slotid,
-		const Item *toItem, int oldToCount, int count);
-	
-	//inventory to container
-	virtual void onThingMove(const Creature *creature, slots_t fromSlot, const Item* fromItem,
-		int oldFromCount, const Container *toContainer, unsigned char to_slotid, const Item *toItem, int oldToCount, int count);
-	
-	//inventory to inventory
-	virtual void onThingMove(const Creature *creature, slots_t fromSlot, const Item* fromItem,
-		int oldFromCount, slots_t toSlot, const Item* toItem, int oldToCount, int count);
-	
-	//container to inventory
-	virtual void onThingMove(const Creature *creature, const Container *fromContainer, unsigned char from_slotid,
-		const Item* fromItem, int oldFromCount, slots_t toSlot, const Item *toItem, int oldToCount, int count);
-	
-	//container to ground
-	virtual void onThingMove(const Creature *creature, const Container *fromContainer, unsigned char from_slotid,
-		const Item* fromItem, int oldFromCount, const Position &toPos, const Item *toItem, int oldToCount, int count);
-	
-	//inventory to ground
-	virtual void onThingMove(const Creature *creature, slots_t fromSlot,
-		const Item* fromItem, int oldFromCount, const Position &toPos, const Item *toItem, int oldToCount, int count);
-	
-	//ground to container
-	virtual void onThingMove(const Creature *creature, const Position &fromPos, int stackpos, const Item* fromItem,
-		int oldFromCount, const Container *toContainer, unsigned char to_slotid, const Item *toItem, int oldToCount, int count);
-	
-	//ground to inventory
-	virtual void onThingMove(const Creature *creature, const Position &fromPos, int stackpos, const Item* fromItem,
-		int oldFromCount, slots_t toSlot, const Item *toItem, int oldToCount, int count);
-	
-	//ground to ground
-	virtual void onThingMove(const Creature *creature, const Thing *thing, const Position *oldPos,
-		unsigned char oldstackpos, unsigned char oldcount, unsigned char count);
-	
+
+	bool hasCapacity(const Item* item, uint32_t count) const;
+
+	//cylinder implementations
+	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,
+		bool childIsOwner = false) const;
+	virtual ReturnValue __queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
+		uint32_t& maxQueryCount) const;
+	virtual ReturnValue __queryRemove(const Thing* thing, uint32_t count) const;
+	virtual Cylinder* __queryDestination(int32_t& index, const Thing* thing, Item** destItem);
+
+	virtual void __addThing(Thing* thing);
+	virtual void __addThing(int32_t index, Thing* thing);
+
+	virtual void __updateThing(Thing* thing, uint32_t count);
+	virtual void __replaceThing(uint32_t index, Thing* thing);
+
+	virtual void __removeThing(Thing* thing, uint32_t count);
+
+	virtual int32_t __getIndexOfThing(const Thing* thing) const;
+	virtual Thing* __getThing(uint32_t index) const;
+
+	virtual void __internalAddThing(Thing* thing);
+	virtual void __internalAddThing(uint32_t index, Thing* thing);
+
 protected:
-	Protocol *client;
-	int useCount;
+	Protocol* client;
 	unsigned long experience;
 	
 	playervoc_t vocation;
@@ -359,6 +354,8 @@ protected:
 	std::string password;
 	time_t lastlogin;
 	time_t lastLoginSaved;
+	Position loginPosition;
+	Position lastPosition; //tmp fix until new battle system
 	unsigned long lastip;
 	
 	//inventory variables
@@ -378,11 +375,12 @@ protected:
 	
 	unsigned char level_percent;
 	unsigned char maglevel_percent;
+
 	//trade variables
-	unsigned long tradePartner;
+	//unsigned long tradePartner;
+	Player* tradePartner;
 	trade_state tradeState;
-	//bool acceptTrade;
-	Item *tradeItem;
+	Item* tradeItem;
 	
 	//autowalking
 	std::list<Direction> pathlist;
@@ -391,7 +389,6 @@ protected:
 	struct SkillCache{
 		unsigned int tries;
 		int level;
-		//int voc;
 		playervoc_t vocation;
 	};
 	
@@ -402,7 +399,6 @@ protected:
 		unsigned long experience;
 		int level;
 		double freeCapacity;
-		//int cap;
 		int mana;
 		int manamax;
 		int manaspent;
@@ -410,10 +406,11 @@ protected:
 	};
 	
 	SentStats lastSentStats;
-	// we need our name
+
 	std::string name;	
 	unsigned long guid;
 	
+	//guild variables
 	unsigned long guildId;
 	std::string guildName;
 	std::string guildRank;
@@ -427,9 +424,9 @@ protected:
 		int slot;
 		Container *parent;
 	};
+
 	typedef std::multimap<int, struct MoneyItem*, std::less<int> > MoneyMap;
 	typedef MoneyMap::value_type moneymap_pair;
-	
 	
 	//for skill advances
 	unsigned int getReqSkillTries (int skill, int level, playervoc_t voc);
@@ -448,4 +445,4 @@ protected:
 };
 
 
-#endif // __player_h_
+#endif // __PLAYER_H__

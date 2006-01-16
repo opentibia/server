@@ -45,6 +45,7 @@ ItemType::ItemType()
 	useable	        = false;
 	moveable        = true;
 	alwaysOnTop     = false;
+	alwaysOnTopOrder = 0;
 	pickupable      = false;
 	rotable         = false;
 	rotateTo		= 0;
@@ -79,27 +80,12 @@ ItemType::ItemType()
 	decayTime     = 60;
 	canDecay      =	true;
 
+	isVertical		= false;
+	isHorizontal	= false;
+	isHangable		= false;
+
 	lightLevel    = 0;
 	lightColor    = 0;
-
-	//readable        = false;
-	//ismagicfield    = false;
-	//iskey           = false;
-	//issplash		    = false;
-
-	//damage	      =	0;
-	//groundtile      = false;
-	//iscontainer     = false;
-	//fluidcontainer	= false;		
-	//multitype       = false;
-	//isteleport = false;
-	//notMoveable   = false;
-	//canWalkThrough = false;
-	//blocking      = false; // people can walk on it
-	//blockingProjectile = false;
-	//blockpickupable = true;
-	//isDoor = false;
-	//isDoorWithLock = false;
 }
 
 ItemType::~ItemType()
@@ -141,9 +127,9 @@ bool ItemType::isFluidContainer() const
 	return (group == ITEM_GROUP_FLUID);
 }
 
-
 Items::Items()
 {
+	//
 }
 
 Items::~Items()
@@ -303,6 +289,10 @@ int Items::loadFromOtb(std::string file)
 							iType->floorChangeWest = ((flags & FLAG_FLOORCHANGEWEST) == FLAG_FLOORCHANGEWEST);
 							iType->alwaysOnTop = ((flags & FLAG_ALWAYSONTOP) == FLAG_ALWAYSONTOP);
 							iType->canDecay = !((flags & FLAG_CANNOTDECAY) == FLAG_CANNOTDECAY);
+
+							iType->isVertical = ((flags & FLAG_VERTICAL) == FLAG_VERTICAL);
+							iType->isHorizontal = ((flags & FLAG_HORIZONTAL) == FLAG_HORIZONTAL);
+							iType->isHangable = ((flags & FLAG_HANGABLE) == FLAG_HANGABLE);
 							
 							if(type == ITEM_GROUP_WRITEABLE) {
 								iType->RWInfo |= CAN_BE_WRITTEN;
@@ -443,48 +433,6 @@ int Items::loadFromOtb(std::string file)
 								memcpy(&iType->weight, p, sizeof(double));
 								break;
 							}
-							/*case ITEM_ATTR_WEAPON:
-							{
-								if(datalen != sizeof(weaponBlock))
-									return ERROR_INVALID_FORMAT;
-
-								weaponBlock wb;
-								memcpy(&wb, p, sizeof(weaponBlock));
-								iType->weaponType = (WeaponType)wb.weaponType;
-								iType->shootType = (subfight_t)wb.shootType;
-								iType->amuType = (amu_t)wb.amuType;
-								iType->attack = wb.attack;
-								iType->defence = wb.defence;
-								break;
-							}
-							case ITEM_ATTR_AMU:
-							{
-								if(datalen != sizeof(amuBlock))
-									return ERROR_INVALID_FORMAT;
-
-								amuBlock ab;
-								memcpy(&ab, p, sizeof(amuBlock));
-								iType->weaponType = AMO;
-								iType->shootType = (subfight_t)ab.shootType;
-								iType->amuType = (amu_t)ab.amuType;
-								iType->attack = ab.attack;
-								break;
-							}
-							case ITEM_ATTR_ARMOR:
-							{
-								if(datalen != sizeof(armorBlock))
-									return ERROR_INVALID_FORMAT;
-
-								armorBlock ab;
-								memcpy(&ab, p, sizeof(armorBlock));
-									
-								iType->armor = ab.armor;
-								iType->weight = ab.weight;
-								//ignore this value
-								//iType->slot_position = ab.slot_position;
-
-								break;
-							}*/
 							case ITEM_ATTR_MAGLEVEL:
 							{
 								if(datalen != sizeof(unsigned short))
@@ -503,18 +451,6 @@ int Items::loadFromOtb(std::string file)
 
 								break;
 							}
-							/*case ITEM_ATTR_WRITEABLE:
-							{
-								if(datalen != sizeof(writeableBlock))
-									return ERROR_INVALID_FORMAT;
-
-								struct writeableBlock wb;
-								memcpy(&wb, p, sizeof(writeableBlock));
-
-								iType->readOnlyId = wb.readOnlyId;
-
-								break;
-							}*/
 							case ITEM_ATTR_ROTATETO:
 							{
 								if(datalen != sizeof(unsigned short))
@@ -524,17 +460,6 @@ int Items::loadFromOtb(std::string file)
 								
 								break;
 							}
-							/*case ITEM_ATTR_DECAY:
-							{
-								if(datalen != sizeof(decayBlock))
-									return ERROR_INVALID_FORMAT;
-
-								decayBlock db;
-								memcpy(&db, p, sizeof(decayBlock));
-								iType->decayTime = db.decayTime;
-								iType->decayTo = db.decayTo;
-								break;
-							}*/
 							case ITEM_ATTR_SPRITEHASH:
 							{
 								if(datalen != 16)
@@ -561,17 +486,6 @@ int Items::loadFromOtb(std::string file)
 									return ERROR_INVALID_FORMAT;
 								break;
 							}
-							/*case ITEM_ATTR_LIGHT:
-							{
-								if(datalen != sizeof(lightBlock))
-									return ERROR_INVALID_FORMAT;
-
-								lightBlock lb;
-								memcpy(&lb, p, sizeof(lightBlock));
-								iType->lightLevel = lb.lightLevel;
-								iType->lightColor = lb.lightColor;
-								break;
-							}*/
 							case ITEM_ATTR_DECAY2:
 							{
 								if(datalen != sizeof(decayBlock2))
@@ -644,6 +558,14 @@ int Items::loadFromOtb(std::string file)
 								memcpy(&lb2, p, sizeof(lightBlock2));
 								iType->lightLevel = lb2.lightLevel;
 								iType->lightColor = lb2.lightColor;
+								break;
+							}
+							case ITEM_ATTR_TOPORDER:
+							{
+								if(datalen != sizeof(unsigned char))
+									return ERROR_INVALID_FORMAT;
+
+								memcpy(&iType->alwaysOnTopOrder, p, sizeof(unsigned char));
 								break;
 							}
 							default:

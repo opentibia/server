@@ -19,8 +19,8 @@
 //////////////////////////////////////////////////////////////////////
 
 
-#ifndef __OTSERV_ITEM_H
-#define __OTSERV_ITEM_H
+#ifndef __ITEM_H__
+#define __ITEM_H__
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
@@ -33,28 +33,49 @@
 #include "items.h"
 
 class Creature;
-class Player;
+class Container;
+class Depot;
+class Teleport;
 
-class Item : public Thing
+enum ITEMPROPERTY{
+ BLOCKSOLID,
+ HASHEIGHT,
+ BLOCKPROJECTILE,
+ BLOCKPATHFIND,
+ PROTECTIONZONE
+ //NOTMOVEABLEBLOCKSOLID,
+ //NOTMOVEABLEBLOCKPATHFIND,
+};
+
+class Item : virtual public Thing
 {
-protected:
-	unsigned short id;  // the same id as in ItemType
-	unsigned char count; // number of stacked items
-	unsigned char chargecount; //number of charges on the item
-	unsigned char fluid;
-	unsigned short actionId;
-	unsigned short uniqueId;
-	std::string *specialDescription;
-	std::string *text;	//text written
-private:
-	int useCount;
-	
 public:
-	static Item* CreateItem(const unsigned short _type, unsigned short _count = 0); //Factory member to create item of right type based on type
+  // Constructor for items
+	Item(const unsigned short _type);
+	Item(const unsigned short _type, unsigned short _count);
+	Item();
+	Item(const Item &i);
+
+	virtual ~Item();
+
+	virtual Item* getItem() {return this;};
+	virtual const Item* getItem()const {return this;};
+	virtual Container* getContainer() {return NULL;};
+	virtual const Container* getContainer() const {return NULL;};
+	virtual Teleport* getTeleport() {return NULL;};
+	virtual const Teleport* getTeleport() const {return NULL;};
+
+	//Factory member to create item of right type based on type
+	static Item* CreateItem(const unsigned short _type, unsigned short _count = 1);
 	static Items items;
+	
+	virtual bool isPushable() const {return !isNotMoveable();};
+	virtual int getThrowRange() const {return (isPickupable() ? 15 : 2);};
+
+	virtual std::string getDescription(int32_t lookDistance) const;
 
 	unsigned short getID() const;    // ID as in ItemType
-	void setID(unsigned short newid);
+	virtual void setID(unsigned short newid);
 		    
 	WeaponType getWeaponType() const;
 	amu_t	getAmuType() const;
@@ -67,17 +88,21 @@ public:
 	int getRWInfo() const;
 	int getWorth() const;
 		
+	bool hasProperty(enum ITEMPROPERTY prop) const;
 	bool isBlocking() const;
 	bool isStackable() const;
+	bool isRune() const;
 	bool isFluidContainer() const;
-	//bool isMultiType() const;
 	bool isAlwaysOnTop() const;
 	bool isGroundTile() const;
 	bool isSplash() const;
+	bool isMagicField() const;
 	bool isNotMoveable() const;
 	bool isPickupable() const;
 	bool isWeapon() const;
 	bool isUseable() const;
+	bool isHangable() const;
+	bool isRoteable() const;
 
 	bool floorChangeDown() const;
 	bool floorChangeNorth() const;
@@ -85,7 +110,6 @@ public:
 	bool floorChangeEast() const;
 	bool floorChangeWest() const;
 
-	virtual std::string getDescription(bool fullDescription) const;
 	std::string getName() const ;
 	void setSpecialDescription(std::string desc);
 	std::string getSpecialDescription();
@@ -98,8 +122,12 @@ public:
 	virtual xmlNodePtr serialize();
 
   // get the number of items
+	unsigned short getItemCount() const;
+	void setItemCount(uint8_t n);
+
 	unsigned short getItemCountOrSubtype() const;
 	void setItemCountOrSubtype(unsigned char n);
+	bool hasSubType() const;
 
 	unsigned char getItemCharge() const {return chargecount;};
 	void setItemCharge(unsigned char n) {chargecount = n;};
@@ -115,64 +143,17 @@ public:
 	
 	virtual long getDecayTime();
 	bool canDecay();
-
-	/**
-	 * Called when the item is about to decay/transform to the next step.
-	 * \returns The item to decay to.
-	 */
-	virtual Item* decay();
 	bool isDecaying;
 
-	bool rotate();
-
-  // Constructor for items
-	Item(const unsigned short _type);
-	Item(const unsigned short _type, unsigned short _count);
-	Item();
-	Item(const Item &i);
-
-	virtual ~Item();
-	virtual void useThing() {
-		//std::cout << "Item: useThing() " << this << std::endl;
-		useCount++;
-	};
-	
-	virtual void releaseThing() {
-		useCount--;
-		//std::cout << "Item: releaseThing() " << this << std::endl;
-		//if (useCount == 0)
-		if (useCount <= 0)
-			delete this;
-	};
-	
-	virtual bool canMovedTo(const Tile *tile) const;
-};
-
-class Teleport : public Item
-{
-public:
-	Teleport(const unsigned short _type);
-	virtual ~Teleport();
-	virtual void useThing() {
-		//std::cout << "Teleport: useThing() " << this << std::endl;
-		useCount++;
-	};
-	
-	virtual void releaseThing() {
-		useCount--;
-		//std::cout << "Teleport: releaseThing() " << this << std::endl;
-		//if (useCount == 0)
-		if (useCount <= 0)
-			delete this;
-	};
-	
-	void setDestPos(const Position &pos) {destPos = pos;};
-	const Position& getDestPos() const {return destPos;};
-private:
-	int useCount;
-	virtual int unserialize(xmlNodePtr p);
-	virtual xmlNodePtr serialize();
-	Position destPos;
+protected:
+	unsigned short id;  // the same id as in ItemType
+	unsigned char count; // number of stacked items
+	unsigned char chargecount; //number of charges on the item
+	unsigned char fluid;
+	unsigned short actionId;
+	unsigned short uniqueId;
+	std::string *specialDescription;
+	std::string *text;	//text written
 };
 
 #endif
