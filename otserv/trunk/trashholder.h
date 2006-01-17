@@ -1,8 +1,7 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// a Tile represents a single field on the map.
-// it is a list of Items
+// 
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -19,91 +18,27 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-
-#ifndef __TILE_H__
-#define __TILE_H__
+#ifndef __TRASHHOLDER_H__
+#define __TRASHHOLDER_H__
 
 #include "item.h"
 #include "cylinder.h"
-#include "magic.h"
+#include "const76.h"
 
-#include "definitions.h"
-#include "templates.h"
-#include "scheduler.h"
-
-class Creature;
-class Teleport;
-class TrashHolder;
-
-typedef std::vector<Item*> ItemVector;
-typedef std::vector<Creature*> CreatureVector;
-
-enum tileflags_t{
-	TILESTATE_NONE = 0,
-	TILESTATE_PROTECTIONZONE = 1,
-	TILESTATE_HOUSE = 2
-};
-
-class Tile : public Cylinder
+class TrashHolder : public Item, public Cylinder
 {
 public:
-  Tile(int x, int y, int z)
-  {
-		tilePos.x = x;
-		tilePos.y = y;
-		tilePos.z = z;
-
-    flags = 0;
-		ground = NULL;
-  }
-
-	virtual int getThrowRange() const {return 0;};
-	virtual bool isPushable() const {return false;};
-
-  Item*          ground;
-  ItemVector     topItems;
-  CreatureVector creatures;
-  ItemVector     downItems;
-
-	MagicEffectItem* getFieldItem() const;
-	Teleport* getTeleportItem() const;
-	TrashHolder* getTrashHolder() const;
-
-	Thing* getTopMoveableThing();
-	Creature* getTopCreature();
-	Item* getTopTopItem();
-	Item* getTopDownItem();
-	Item* getMoveableBlockingItem();
-  Thing* getTopThing();
+	TrashHolder(uint16_t _type, MagicEffectClasses _effect = NM_ME_PUFF);
+	~TrashHolder();
 	
-	int getThingCount() const;
-
-	bool hasProperty(enum ITEMPROPERTY prop) const;
-
-	bool hasFlag(tileflags_t flag) const;
-	void setFlag(tileflags_t flag);
-  bool isPz() const;
-  void setPz();
-  
-  bool floorChange() const;
-  bool floorChangeDown() const;
-  bool floorChange(Direction direction) const;
-	uint32_t getHeight() const;
-  
-  virtual std::string getDescription(int32_t lookDistance) const;
-
-	void moveCreature(Creature* creature, Cylinder* toCylinder, bool teleport = false);
-
-	void onAddTileItem(Item* item);
-	void onUpdateTileItem(uint32_t index, Item* olditem, Item* newitem);
-	void onRemoveTileItem(uint32_t index, Item* item);
-	void onUpdateTile();
+	virtual TrashHolder* getTrashHolder() {return this;};
+	virtual const TrashHolder* getTrashHolder() const {return this;};
 
 	//cylinder implementations
-	virtual ReturnValue __queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
-		uint32_t& maxQueryCount) const;
 	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,
 		bool childIsOwner = false) const;
+	virtual ReturnValue __queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
+		uint32_t& maxQueryCount) const;
 	virtual ReturnValue __queryRemove(const Thing* thing, uint32_t count) const;
 	virtual Cylinder* __queryDestination(int32_t& index, const Thing* thing, Item** destItem);
 
@@ -124,15 +59,8 @@ public:
 	virtual void __internalAddThing(Thing* thing);
 	virtual void __internalAddThing(uint32_t index, Thing* thing);
 
-	const Position& getTilePosition() const {return tilePos;};
-
-	virtual bool isRemoved() const {return false;};
-
-protected:
-	Position tilePos;
-	uint32_t flags;
+private:
+	MagicEffectClasses effect;
 };
 
-
-#endif // #ifndef __TILE_H__
-
+#endif

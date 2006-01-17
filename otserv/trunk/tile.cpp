@@ -29,6 +29,8 @@
 #include "game.h"
 #include "player.h"
 #include "creature.h"
+#include "teleport.h"
+#include "trashholder.h"
 
 extern Game g_game;
 
@@ -187,7 +189,7 @@ Thing* Tile::getTopMoveableThing()
 Teleport* Tile::getTeleportItem() const
 {
 	Teleport* teleport = NULL;
-	for (ItemVector::const_iterator iit = topItems.begin(); iit != topItems.end(); ++iit){
+	for(ItemVector::const_iterator iit = topItems.begin(); iit != topItems.end(); ++iit){
 		teleport = (*iit)->getTeleport();
 		if(teleport)
 			return teleport;
@@ -203,6 +205,19 @@ MagicEffectItem* Tile::getFieldItem() const
 		fieldItem = dynamic_cast<MagicEffectItem*>(*iit);
 		if(fieldItem)
 			return fieldItem;
+	}
+
+	return NULL;
+}
+
+TrashHolder* Tile::getTrashHolder() const
+{
+	TrashHolder* trashholder = NULL;
+	Item* iiItem = NULL;
+	for(uint32_t i = 0; i < getThingCount(); ++i){
+		iiItem = __getThing(i)->getItem();
+		if(iiItem && (trashholder = iiItem->getTrashHolder()))
+			return trashholder;
 	}
 
 	return NULL;
@@ -530,6 +545,10 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			if(const Item* iitem = iithing->getItem()){
 				const ItemType& iiType = Item::items[iitem->getID()];
 
+				/*TODO: query script interface*/
+				if(iitem->getID() == ITEM_DUSTBIN)
+					continue;
+
 				if(iiType.blockSolid){
 					if(item->isPickupable()){
 						//experimental
@@ -541,7 +560,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 						//	}
 						//}
 						//else
-						if(!iiType.hasHeight /*|| !iiType.moveable*/)
+						if(!iiType.hasHeight)
 							return RET_NOTENOUGHROOM;
 						else if(iiType.pickupable)
 							return RET_NOTENOUGHROOM;
@@ -592,7 +611,44 @@ Cylinder* Tile::__queryDestination(int32_t& index, const Thing* thing, Item** de
 	Tile* destTile = NULL;
 	*destItem = NULL;
 
-	if(floorChange()){
+	if(const Item* item = thing->getItem()){
+		/*TODO: query script interface*/
+		if(TrashHolder* trashHolder = getTrashHolder()){
+			return trashHolder;
+		}
+	}
+
+	if(floorChangeDown()){
+		Tile* downTile = g_game.getTile(getTilePosition().x, getTilePosition().y, getTilePosition().z + 1);
+
+		if(downTile){
+			if(downTile->floorChange(NORTH) && downTile->floorChange(EAST)){
+				destTile = g_game.getTile(getTilePosition().x - 1, getTilePosition().y + 1, getTilePosition().z + 1);
+			}
+			else if(downTile->floorChange(NORTH) && downTile->floorChange(WEST)){
+				destTile = g_game.getTile(getTilePosition().x + 1, getTilePosition().y + 1, getTilePosition().z + 1);
+			}
+			else if(downTile->floorChange(SOUTH) && downTile->floorChange(EAST)){
+				destTile = g_game.getTile(getTilePosition().x - 1, getTilePosition().y - 1, getTilePosition().z + 1);
+			}
+			else if(downTile->floorChange(SOUTH) && downTile->floorChange(WEST)){
+				destTile = g_game.getTile(getTilePosition().x + 1, getTilePosition().y - 1, getTilePosition().z + 1);
+			}
+			else if(downTile->floorChange(NORTH)){
+				destTile = g_game.getTile(getTilePosition().x, getTilePosition().y + 1, getTilePosition().z + 1);
+			}
+			else if(downTile->floorChange(SOUTH)){
+				destTile = g_game.getTile(getTilePosition().x, getTilePosition().y - 1, getTilePosition().z + 1);
+			}
+			else if(downTile->floorChange(EAST)){
+				destTile = g_game.getTile(getTilePosition().x - 1, getTilePosition().y, getTilePosition().z + 1);
+			}
+			else if(downTile->floorChange(WEST)){
+				destTile = g_game.getTile(getTilePosition().x + 1, getTilePosition().y, getTilePosition().z + 1);
+			}
+		}
+	}
+	else if(floorChange()){
 		if(floorChange(NORTH) && floorChange(EAST)){
 			destTile = g_game.getTile(getTilePosition().x + 1, getTilePosition().y - 1, getTilePosition().z - 1);
 		}
@@ -619,45 +675,16 @@ Cylinder* Tile::__queryDestination(int32_t& index, const Thing* thing, Item** de
 		}
 	}
 
+
 	if(destTile == NULL){
 		destTile = this;
 	}
 
-	if(destTile->floorChangeDown()){
-		destTile = g_game.getTile(getTilePosition().x, getTilePosition().y, getTilePosition().z + 1);
-
-		if(destTile == NULL){
-			return this;
-		}
-		else if(destTile->floorChange(NORTH) && destTile->floorChange(EAST)){
-			destTile = g_game.getTile(getTilePosition().x - 1, getTilePosition().y + 1, getTilePosition().z + 1);
-		}
-		else if(destTile->floorChange(NORTH) && destTile->floorChange(WEST)){
-			destTile = g_game.getTile(getTilePosition().x + 1, getTilePosition().y + 1, getTilePosition().z + 1);
-		}
-		else if(destTile->floorChange(SOUTH) && destTile->floorChange(EAST)){
-			destTile = g_game.getTile(getTilePosition().x - 1, getTilePosition().y - 1, getTilePosition().z + 1);
-		}
-		else if(destTile->floorChange(SOUTH) && destTile->floorChange(WEST)){
-			destTile = g_game.getTile(getTilePosition().x + 1, getTilePosition().y - 1, getTilePosition().z + 1);
-		}
-		else if(destTile->floorChange(NORTH)){
-			destTile = g_game.getTile(getTilePosition().x, getTilePosition().y + 1, getTilePosition().z + 1);
-		}
-		else if(destTile->floorChange(SOUTH)){
-			destTile = g_game.getTile(getTilePosition().x, getTilePosition().y - 1, getTilePosition().z + 1);
-		}
-		else if(destTile->floorChange(EAST)){
-			destTile = g_game.getTile(getTilePosition().x - 1, getTilePosition().y, getTilePosition().z + 1);
-		}
-		else if(destTile->floorChange(WEST)){
-			destTile = g_game.getTile(getTilePosition().x + 1, getTilePosition().y, getTilePosition().z + 1);
-		}
+	if(destTile){
+		Thing* destThing = destTile->getTopDownItem();
+		if(destThing)
+			*destItem = destThing->getItem();
 	}
-
-	Thing* destThing = destTile->getTopDownItem();
-	if(destThing)
-		*destItem = destThing->getItem();
 
 	return destTile;
 }
@@ -1035,8 +1062,7 @@ void Tile::postAddNotification(Thing* thing, bool hasOwnership /*= true*/)
 		}
 	}
 	
-	Teleport* teleport = getTeleportItem();
-	if(teleport){
+	if(Teleport* teleport = getTeleportItem()){
 		teleport->__addThing(thing);
 	}
 }

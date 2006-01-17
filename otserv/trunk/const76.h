@@ -49,6 +49,9 @@ enum MagicEffectClasses {
 	NM_ME_SOUND_PURPLE     = 0x16, //22
 	NM_ME_SOUND_BLUE       = 0x17, //23
 	NM_ME_SOUND_WHITE      = 0x18, //24
+
+	//for internal use, dont send to client
+	NM_ME_NONE             = 0xFF
 };
 
 #define NM_ANI_BOLT              1

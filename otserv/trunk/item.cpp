@@ -25,6 +25,8 @@
 #include "container.h"
 #include "depot.h"
 #include "teleport.h"
+#include "trashholder.h"
+
 #include "actions.h"
 #include "magic.h"
 
@@ -48,6 +50,9 @@ Item* Item::CreateItem(const unsigned short _type, unsigned short _count /*= 1*/
 	else if(items[_type].isMagicField()){
 		newItem = new Item(_type, _count);
 	}	
+	else if(_type == ITEM_DUSTBIN){
+		newItem = new TrashHolder(_type);
+	}
 	else{
 		newItem = new Item(_type, _count);
 	}
