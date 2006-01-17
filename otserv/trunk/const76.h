@@ -212,6 +212,7 @@ enum item_t {
 	ITEM_LOCKER2          = 2590,
 	ITEM_LOCKER3          = 2591,
 	ITEM_LOCKER4          = 2592,
+	ITEM_DUSTBIN          = 1777,
 };
 
 
