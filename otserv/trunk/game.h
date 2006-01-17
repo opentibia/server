@@ -121,7 +121,7 @@ enum enum_game_state{
 class Game {
 public:
 	Game();
-  ~Game();
+	~Game();
 	
 	/**
 	  * Load a map.
@@ -129,7 +129,7 @@ public:
 	  * \param filekind Kind of the map, BIN SQL or TXT
 	  * \returns Int 0 built-in spawns, 1 needs xml spawns, 2 needs sql spawns, -1 if got error
 	  */
-    int loadMap(std::string filename, std::string filekind);
+	int loadMap(std::string filename, std::string filekind);
 	
 	/**
 	  * Get the map size - info purpose only
@@ -137,10 +137,10 @@ public:
 	  * \param b the referenced height var
 	  */
 	void getMapDimensions(int& a, int& b) {
-     a = map->mapwidth;  
-     b = map->mapheight;  
-     return;
-  }
+		a = map->mapwidth;  
+		b = map->mapheight;  
+		return;
+	}
   
 	void setWorldType(enum_world_type type);
 	enum_world_type getWorldType() const {return worldType;}
