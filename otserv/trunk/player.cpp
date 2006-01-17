@@ -1625,18 +1625,17 @@ void Player::addManaSpent(unsigned long spent)
 	if(spent == 0)
 		return;
 
-	this->manaspent += spent;
-	//Magic Level Advance
-	int reqMana = this->getReqMana(this->maglevel+1, this->vocation);
-	if (this->access == 0 && this->manaspent >= reqMana) {
-		this->manaspent -= reqMana;
-		this->maglevel++;
+	manaspent += spent;
+	int reqMana = getReqMana(maglevel + 1, vocation);
+	if(access == 0 && manaspent >= reqMana){
+		manaspent -= reqMana;
+		maglevel++;
+		
 		std::stringstream MaglvMsg;
-		MaglvMsg << "You advanced from magic level " << (this->maglevel - 1) << " to magic level " << this->maglevel << ".";
-		this->sendTextMessage(MSG_ADVANCE, MaglvMsg.str().c_str());
-		this->sendStats();
+		MaglvMsg << "You advanced to magic level " << maglevel << ".";
+		sendTextMessage(MSG_ADVANCE, MaglvMsg.str().c_str());
+		sendStats();
 	}
-	//End Magic Level Advance*/
 }
 
 void Player::addExperience(unsigned long exp)
