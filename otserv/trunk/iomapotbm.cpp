@@ -24,6 +24,7 @@
 #include "item.h"
 #include "container.h"
 #include "depot.h"
+#include "teleport.h"
 #include "fileloader.h"
 
 typedef unsigned char attribute_t;

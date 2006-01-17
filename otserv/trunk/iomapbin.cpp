@@ -1,5 +1,6 @@
 #include "iomapbin.h"
 #include "spawn.h"
+#include "teleport.h"
 
 #include <iostream>
 #include <stdlib.h>

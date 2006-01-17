@@ -25,7 +25,7 @@
 
 bool IOMapXML::loadMap(Map* map, std::string identifier){
 	xmlDocPtr doc;
-	xmlNodePtr root, tile, p, tmpNode;
+	xmlNodePtr root, tileNode, p, tmpNode;
 	char* tmp;
 
 	xmlLineNumbersDefault(1);
@@ -61,56 +61,60 @@ bool IOMapXML::loadMap(Map* map, std::string identifier){
 		xmlFreeOTSERV(tmp);
 	}
 
-	tile=root->children;
+	tileNode = root->children;
 
 	int px,py,pz;
-  	Tile *t;
+	Tile* tile;
 
-	while(tile){
-		tmp = (char*)xmlGetProp(tile, (const xmlChar *) "x");
+	while(tileNode){
+		tmp = (char*)xmlGetProp(tileNode, (const xmlChar *) "x");
 		if(!tmp){
-			tile = tile->next;
+			tileNode = tileNode->next;
 			continue;
 		}
 
 		px = atoi(tmp);
 		xmlFreeOTSERV(tmp);
 
-		tmp = (char*)xmlGetProp(tile, (const xmlChar *) "y");
+		tmp = (char*)xmlGetProp(tileNode, (const xmlChar *) "y");
 		if(!tmp){
-			tile = tile->next;
+			tileNode = tileNode->next;
 			continue;
 		}
 
 		py = atoi(tmp);
     xmlFreeOTSERV(tmp);
 
-    tmp = (char*)xmlGetProp(tile, (const xmlChar *) "z");
+    tmp = (char*)xmlGetProp(tileNode, (const xmlChar *) "z");
     if(!tmp){
-			tile = tile->next;
+			tileNode = tileNode->next;
 			continue;
 		}
 
 		pz = atoi(tmp);
     xmlFreeOTSERV(tmp);
 
-		tmp = (char*)xmlGetProp(tile, (const xmlChar *) "ground");
+		tile = map->setTile(px, py, pz);
+
+		tmp = (char*)xmlGetProp(tileNode, (const xmlChar *) "ground");
 		unsigned short ground = 0;
 		if(tmp){
 			ground = atoi(tmp);
 			xmlFreeOTSERV(tmp);
 		}
 
-		map->setTile(px,py,pz,ground);
-		t = map->getTile(px,py,pz);
+		if(ground != 0){
+			Item* myGround = Item::CreateItem(ground);
+			tile->__internalAddThing(myGround);
+		}
 
-		tmp = (char*)xmlGetProp(tile, (const xmlChar *) "pz");
+		tmp = (char*)xmlGetProp(tileNode, (const xmlChar *) "pz");
 		if(tmp && (strcmp(tmp, "1") == 0)){ 
-			t->setPz();
+			tile->setFlag(TILESTATE_PROTECTIONZONE);
 			xmlFreeOTSERV(tmp);
 		}
        
-    p = tile->children;
+    p = tileNode->children;
     while(p){
       if(xmlStrcmp(p->name,(const xmlChar*) "item")==0){          
 				tmp = (char*)xmlGetProp(p, (const xmlChar *) "id");
@@ -161,13 +165,13 @@ bool IOMapXML::loadMap(Map* map, std::string identifier){
 					}
 				}//loadContainer
 
-				t->__internalAddThing(myitem);
+				tile->__internalAddThing(myitem);
 			}
 			
 			p = p->next;
 		}
 
-		tile = tile->next;
+		tileNode = tileNode->next;
 	}
 
  	xmlFreeDoc(doc);
