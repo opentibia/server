@@ -51,7 +51,7 @@ Item* Item::CreateItem(const unsigned short _type, unsigned short _count /*= 1*/
 		newItem = new Item(_type, _count);
 	}	
 	else if(_type == ITEM_DUSTBIN){
-		newItem = new TrashHolder(_type);
+		newItem = new TrashHolder(_type, NM_ME_MAGIC_BLOOD);
 	}
 	else{
 		newItem = new Item(_type, _count);

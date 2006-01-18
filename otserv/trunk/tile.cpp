@@ -545,7 +545,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			if(const Item* iitem = iithing->getItem()){
 				const ItemType& iiType = Item::items[iitem->getID()];
 
-				/*TODO: query script interface*/
+				//TODO: query script interface
 				if(iitem->getID() == ITEM_DUSTBIN)
 					continue;
 
@@ -610,13 +610,6 @@ Cylinder* Tile::__queryDestination(int32_t& index, const Thing* thing, Item** de
 {
 	Tile* destTile = NULL;
 	*destItem = NULL;
-
-	if(const Item* item = thing->getItem()){
-		/*TODO: query script interface*/
-		if(TrashHolder* trashHolder = getTrashHolder()){
-			return trashHolder;
-		}
-	}
 
 	if(floorChangeDown()){
 		Tile* downTile = g_game.getTile(getTilePosition().x, getTilePosition().y, getTilePosition().z + 1);
@@ -1066,6 +1059,10 @@ void Tile::postAddNotification(Thing* thing, bool hasOwnership /*= true*/)
 	
 	if(Teleport* teleport = getTeleportItem()){
 		teleport->__addThing(thing);
+	}
+	else if(TrashHolder* trashHolder = getTrashHolder()){
+		//TODO: query script interface
+		trashHolder->__addThing(thing);
 	}
 }
 
