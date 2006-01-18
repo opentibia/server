@@ -40,8 +40,16 @@ void DBResult::addRow(MYSQL_ROW r, unsigned int num_fields)
 	char **row = new char*[num_fields];
 	for(unsigned int i=0; i < num_fields; ++i)
 	{
+		if(r[i] == NULL)
+		{
+			row[i] = NULL;
+			continue;
+		}
+		std::cout << "1 - r=" << r[i] << std::endl;
 		row[i] = new char[strlen(r[i])+1];
+		std::cout << "2 - r=" << r[i] << ", row=" << row[i] << ",strlen=" << strlen(r[i]) <<std::endl;
 		memcpy(row[i], r[i], strlen(r[i])+1);
+		std::cout << "3 - r=" << r[i] << ", row=" << row[i] << ",strlen=" << strlen(r[i]) <<std::endl;
 	}
 	
 	m_listRows[m_numRows] = row;
@@ -76,7 +84,8 @@ void DBResult::clear()
 	for(it = m_listRows.begin(); it != m_listRows.end();)
 	{
 		for(unsigned int i = 0; i < m_numFields; ++i)
-			delete[] it->second[i];
+			if(it->second[i] != NULL)
+				delete[] it->second[i];
 		
 		delete[] it->second;
 		m_listRows.erase(it++);
@@ -94,7 +103,10 @@ int DBResult::getDataInt(const std::string &s, unsigned int nrow)
 		std::map<unsigned int, char **>::iterator it2=m_listRows.find(nrow);
 		if(it2 != m_listRows.end())
 		{
-			return atoi(it2->second[it->second]);
+			if(it2->second[it->second] == NULL) 
+				return 0;
+			else
+				return atoi(it2->second[it->second]);
 		}
 	}
 	
@@ -111,7 +123,10 @@ long DBResult::getDataLong(const std::string &s, unsigned int nrow)
 		std::map<unsigned int, char **>::iterator it2=m_listRows.find(nrow);
 		if(it2 != m_listRows.end())
 		{
-			return atol(it2->second[it->second]);
+			if(it2->second[it->second] == NULL) 
+				return 0;
+			else
+				return atol(it2->second[it->second]);
 		}
 	}
 	
@@ -129,7 +144,10 @@ std::string DBResult::getDataString(const std::string &s, unsigned int nrow)
 		std::map<unsigned int, char **>::iterator it2=m_listRows.find(nrow);
 		if(it2 != m_listRows.end())
 		{
-			return std::string(it2->second[it->second]);
+			if(it2->second[it->second] == NULL) 
+				return std::string("");
+			else
+				return std::string(it2->second[it->second]);
 		}
 	}
 	
