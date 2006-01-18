@@ -45,11 +45,8 @@ void DBResult::addRow(MYSQL_ROW r, unsigned int num_fields)
 			row[i] = NULL;
 			continue;
 		}
-		std::cout << "1 - r=" << r[i] << std::endl;
 		row[i] = new char[strlen(r[i])+1];
-		std::cout << "2 - r=" << r[i] << ", row=" << row[i] << ",strlen=" << strlen(r[i]) <<std::endl;
 		memcpy(row[i], r[i], strlen(r[i])+1);
-		std::cout << "3 - r=" << r[i] << ", row=" << row[i] << ",strlen=" << strlen(r[i]) <<std::endl;
 	}
 	
 	m_listRows[m_numRows] = row;
