@@ -1349,6 +1349,8 @@ ReturnValue Game::internalAddItem(Cylinder* toCylinder, Item* item, bool test /*
 				toCylinder->__addThing(0, moveItem);
 			else
 				toCylinder->__addThing(index, moveItem);
+
+			toCylinder->postAddNotification(moveItem);
 		}
 		else
 			toCylinder->postAddNotification(item);
