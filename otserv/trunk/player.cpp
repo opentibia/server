@@ -1416,7 +1416,10 @@ void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bo
 	if(attackedCreature2 == creature->getID()){
 		setAttackedCreature(NULL);
 
-		sendTextMessage(MSG_SMALLINFO, "Target lost.");
+		if(isLogout){
+			sendTextMessage(MSG_SMALLINFO, "Target lost.");
+		}
+
 		sendCancelAttacking();
 	}
 

@@ -2640,6 +2640,9 @@ bool Game::playerAcceptTrade(Player* player)
 				Cylinder* cylinder1 = tradeItem1->getParent();
 				Cylinder* cylinder2 = tradeItem2->getParent();
 
+				player->setAcceptTrade(false); //reset tradeItem
+				tradePartner->setAcceptTrade(false); ////reset tradeItem
+
 				internalMoveItem(cylinder1, tradePartner, 0, tradeItem1, tradeItem1->getItemCount());
 				internalMoveItem(cylinder2, player, 0, tradeItem2, tradeItem2->getItemCount());
 
