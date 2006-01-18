@@ -60,6 +60,8 @@ void MonsterType::reset()
 	lookcorpse = 1000;
 	lookmaster = 10;
 	immunities = 0;
+	lightLevel = 0;
+	lightColor = 0;
 	
 	for(std::map<PhysicalAttackClass*, TimeProbabilityClass>::iterator it = physicalAttacks.begin(); it != physicalAttacks.end(); ++it) {
 		delete it->first;
@@ -314,6 +316,18 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 		nodeValue = (char*)xmlGetProp(root, (const xmlChar *)"changetarget"); //0	never, 10000 always
 		if(nodeValue){
 			mType->changeTargetChance = atoi(nodeValue);
+			xmlFreeOTSERV(nodeValue);
+		}
+		
+		nodeValue = (char*)xmlGetProp(root, (const xmlChar *)"lightlevel");
+		if(nodeValue){
+			mType->lightLevel = atoi(nodeValue);
+			xmlFreeOTSERV(nodeValue);
+		}
+
+		nodeValue = (char*)xmlGetProp(root, (const xmlChar *)"lightcolor");
+		if(nodeValue){
+			mType->lightColor = atoi(nodeValue);
 			xmlFreeOTSERV(nodeValue);
 		}
 

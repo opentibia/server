@@ -113,6 +113,13 @@ enum enum_game_state{
 	GAME_STATE_SHUTDOWN
 };
 
+enum eLightState{
+	LIGHT_STATE_DAY,
+	LIGHT_STATE_NIGHT,
+	LIGHT_STATE_SUNSET,
+	LIGHT_STATE_SUNRISE,
+};
+
 /**
   * Main Game class.
   * This class is responsible to controll everything that happens
@@ -221,6 +228,8 @@ public:
 	uint32_t getNpcsOnline();
 	uint32_t getCreaturesOnline();
 
+	void getWorldLightInfo(LightInfo& lightInfo);
+
 	void getSpectators(const Range& range, SpectatorVec& list);
 
 	void thingMove(Player* player, const Position& fromPos, uint16_t itemId, uint8_t fromStackpos,
@@ -308,6 +317,7 @@ public:
 	std::list<Position> getPathTo(Creature *creature, Position start, Position to, bool creaturesBlock=true);
 	void changeOutfitAfter(unsigned long id, int looktype, long time);
 	void changeSpeed(unsigned long id, unsigned short speed);
+	void changeLight(const Creature* creature);
 	void AddMagicEffectAt(const Position& pos, uint8_t type);
 	
 	enum_game_state getGameState();
@@ -358,15 +368,24 @@ protected:
 	void checkCreatureAttacking(unsigned long creatureid, unsigned long time);
 	void checkDecay(int t);
 	void checkSpawns(int t);
-
+	void checkLight(int t);
+	
 	#define DECAY_INTERVAL  10000
 	void startDecay(Item* item);
 	struct decayBlock{
 		long decayTime;
 		std::list<Item*> decayItems;
 	};
-
 	std::list<decayBlock*> decayVector;
+	
+	static const int LIGHT_LEVEL_DAY = 250;
+	static const int LIGHT_LEVEL_NIGHT = 40;
+	static const int SUNSET = 1305;
+	static const int SUNRISE = 430;
+	int lightlevel;
+	eLightState light_state;
+	int light_hour;
+	int light_hour_delta;
 	
 	std::priority_queue<SchedulerTask*, std::vector<SchedulerTask*>, lessSchedTask > eventList;
 	std::map<unsigned long, SchedulerTask*> eventIdMap;

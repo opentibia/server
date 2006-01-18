@@ -48,6 +48,15 @@ enum ITEMPROPERTY{
  //NOTMOVEABLEBLOCKPATHFIND,
 };
 
+struct LightInfo{
+	long level;
+	long color;
+	LightInfo(){
+		level = 0;
+		color = 0;
+	};
+};
+
 class Item : virtual public Thing
 {
 public:
@@ -90,6 +99,7 @@ public:
 	int getSlotPosition() const;
 	int getRWInfo() const;
 	int getWorth() const;
+	void getLight(LightInfo& lightInfo);
 		
 	bool hasProperty(enum ITEMPROPERTY prop) const;
 	bool isBlocking() const;

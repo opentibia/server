@@ -107,7 +107,9 @@ public:
 	virtual void sendOpenPriv(const std::string& receiver) =0;
 	virtual void sendVIPLogIn(unsigned long guid) = 0;
 	virtual void sendVIPLogOut(unsigned long guid) = 0;
-	virtual void sendVIP(unsigned long guid, const std::string &name, bool isOnline) = 0;	
+	virtual void sendVIP(unsigned long guid, const std::string &name, bool isOnline) = 0;
+	virtual void sendCreatureLight(const Creature* creature) = 0;
+	virtual void sendWorldLight(const LightInfo& lightInfo) = 0;
 	
 protected:
 	

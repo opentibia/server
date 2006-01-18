@@ -897,25 +897,6 @@ void Protocol76::parseThrow(NetworkMessage& msg)
 		return;
 
 	game->thingMove(player, fromPos, itemId, fromStackpos, toPos, count);
-
-	/*
-	//ground to ground
-	else if(from_x != 0xFFFF && to_x != 0xFFFF) {
-		Tile *fromTile = game->getTile(from_x, from_y, from_z);
-		if(!fromTile)
-			return;
-		Creature *movingCreature = dynamic_cast<Creature*>(fromTile->getThingByStackPos(from_stack));
-		
-		if(movingCreature) {
-			Player *movingPlayer = dynamic_cast<Player*>(movingCreature);
-			if(player == movingPlayer) {
-				this->sleepTillMove();
-			}
-		}
-		
-		game->thingMove(player, from_x, from_y, from_z, from_stack, itemid, to_x, to_y, to_z, count);
-	}
-	*/
 }
 
 void Protocol76::parseLookAt(NetworkMessage& msg)
@@ -1079,6 +1060,22 @@ void Protocol76::sendSetOutfit(const Creature* creature)
 		newmsg.AddByte(creature->lookfeet);
 		WriteBuffer(newmsg);
 	}
+}
+
+void Protocol76::sendCreatureLight(const Creature* creature)
+{
+	if(CanSee(creature)){
+		NetworkMessage msg;
+		AddCreatureLight(msg, creature);
+		WriteBuffer(msg);
+	}
+}
+
+void Protocol76::sendWorldLight(const LightInfo& lightInfo)
+{
+	NetworkMessage msg; 
+	AddWorldLight(msg, lightInfo);
+	WriteBuffer(msg);
 }
 
 void Protocol76::sendStats()
@@ -1423,15 +1420,12 @@ void Protocol76::sendAddCreature(const Creature* creature, bool isLogin)
 			AddPlayerSkills(msg);
 
 			//gameworld light-settings
-			msg.AddByte(0x82);
-			msg.AddByte(0x6F); //level
-			msg.AddByte(0xD7);//color
+			LightInfo lightInfo;
+			game->getWorldLightInfo(lightInfo);
+			AddWorldLight(msg, lightInfo);
 
 			//player light level
-			//msg.AddByte(0x8d);//8d
-			//msg.AddU32(player->getID());
-			//msg->AddByte(0x6F); //level
-			//msg->AddByte(0xDF); //color
+			AddCreatureLight(msg, creature);
 
 			AddTextMessage(msg,MSG_EVENT, g_config.getGlobalString("loginmsg", "Welcome.").c_str());
 			std::string tempstring;
@@ -1701,14 +1695,10 @@ void Protocol76::AddDistanceShoot(NetworkMessage &msg,const Position &from, cons
 void Protocol76::AddCreature(NetworkMessage &msg,const Creature *creature, bool known, unsigned int remove)
 {
 	if(known){
-		//msg.AddByte(0x62);
-		//msg.AddByte(0x00);
 		msg.AddU16(0x62);
 		msg.AddU32(creature->getID());
 	}
 	else{
-		//msg.AddByte(0x61);
-		//msg.AddByte(0x00);
 		msg.AddU16(0x61);
 		msg.AddU32(remove); //AddU32(0);
 		msg.AddU32(creature->getID());
@@ -1725,8 +1715,10 @@ void Protocol76::AddCreature(NetworkMessage &msg,const Creature *creature, bool 
 	msg.AddByte(creature->looklegs);
 	msg.AddByte(creature->lookfeet);
 	
-	msg.AddByte(0x00); // light level
-	msg.AddByte(0xDC); // light color
+	LightInfo lightInfo;
+	creature->getCreatureLight(lightInfo);
+	msg.AddByte(lightInfo.level);
+	msg.AddByte(lightInfo.color);
 	
 	msg.AddU16(creature->getSpeed());
 	
@@ -1798,6 +1790,23 @@ void Protocol76::AddCreatureHealth(NetworkMessage &msg,const Creature *creature)
 	msg.AddByte(0x8C);
 	msg.AddU32(creature->getID());
 	msg.AddByte(std::max(creature->health,0)*100/creature->healthmax);
+}
+
+void Protocol76::AddWorldLight(NetworkMessage &msg, const LightInfo& lightInfo)
+{
+	msg.AddByte(0x82);
+	msg.AddByte(lightInfo.level);
+	msg.AddByte(lightInfo.color);
+}
+
+void Protocol76::AddCreatureLight(NetworkMessage &msg, const Creature* creature)
+{
+	LightInfo lightInfo;
+	creature->getCreatureLight(lightInfo);
+	msg.AddByte(0x8D);
+	msg.AddU32(creature->getID());
+	msg.AddByte(lightInfo.level);
+	msg.AddByte(lightInfo.color);
 }
 
 //tile

@@ -524,8 +524,12 @@ bool Commands::testCommand(Creature* creature, const std::string& cmd, const std
 			houseTile->getHouse()->setHouseOwner(player->getGUID());
 		}
 		*/
-
-		player->sendMagicEffect(player->getPosition(), color);
+		//player->sendMagicEffect(player->getPosition(), color);
+		LightInfo lightInfo;
+		lightInfo.level = color / 0x100;
+		lightInfo.color = color & 0xFF;
+		player->setCreatureLight(lightInfo);
+		game->changeLight(player);
 	}
 
 	return true;

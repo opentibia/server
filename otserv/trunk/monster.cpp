@@ -1342,3 +1342,9 @@ bool Monster::canMoveTo(unsigned short x, unsigned short y, unsigned char z)
 
 	return false;
 }
+
+void Monster::setNormalCreatureLight()
+{
+	internalLight.level = mType->lightLevel;
+	internalLight.color = mType->lightColor;
+}

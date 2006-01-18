@@ -313,3 +313,19 @@ long long Creature::getSleepTicks() const
 	
 	return delay;
 }
+
+void Creature::getCreatureLight(LightInfo& light) const
+{
+	light = internalLight;
+}
+
+void Creature::setNormalCreatureLight()
+{
+	internalLight.level = 0;
+	internalLight.color = 0;
+}
+
+void Creature::setCreatureLight(LightInfo& light)
+{
+	internalLight = light;
+}

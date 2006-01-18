@@ -138,6 +138,7 @@ Creature()
 
  	manaTick = 0;
  	healthTick = 0;
+ 	
 } 
 
 Player::~Player()
@@ -1251,6 +1252,16 @@ void Player::sendStats()
 void Player::sendTextMessage(MessageClasses mclass, const char* message) const
 {
 	client->sendTextMessage(mclass,message);
+}
+
+void Player::sendCreatureLight(const Creature* creature)
+{
+	client->sendCreatureLight(creature);
+}
+
+void Player::sendWorldLight(LightInfo& lightInfo)
+{
+	client->sendWorldLight(lightInfo);
 }
 
 void Player::flushMsg()
@@ -2369,6 +2380,7 @@ Thing* Player::__getThing(uint32_t index) const
 void Player::postAddNotification(Thing* thing, bool hasOwnership /*= true*/)
 {
 	if(hasOwnership){
+		updateItemsLight();
 		updateInventoryWeigth();
 		client->sendStats();
 	}
@@ -2400,6 +2412,7 @@ void Player::postAddNotification(Thing* thing, bool hasOwnership /*= true*/)
 void Player::postRemoveNotification(Thing* thing, bool hadOwnership /*= true*/)
 {
 	if(hadOwnership){
+		updateItemsLight();
 		updateInventoryWeigth();
 		client->sendStats();
 	}
@@ -2458,4 +2471,35 @@ void Player::__internalAddThing(uint32_t index, Thing* thing)
 		items[index] = item;
 		item->setParent(this);
   }
+}
+
+void Player::getCreatureLight(LightInfo& light) const
+{
+	if(internalLight.level > itemsLight.level){
+		light = internalLight;
+	}
+	else{
+		light = itemsLight;
+	}
+}
+
+void Player::updateItemsLight(bool internal /*=false*/)
+{
+	LightInfo maxLight;
+	LightInfo curLight;
+	for(int i = SLOT_FIRST; i < SLOT_LAST; ++i){
+		Item* item = getInventoryItem((slots_t)i);
+		if(item){
+			item->getLight(curLight);
+			if(curLight.level > maxLight.level){
+				maxLight = curLight;
+			}
+		}
+	}
+	if(itemsLight.level != maxLight.level || itemsLight.color != maxLight.color){
+		itemsLight = maxLight;
+		if(!internal){
+			g_game.changeLight(this);
+		}
+	}
 }

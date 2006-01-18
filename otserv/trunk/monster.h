@@ -71,6 +71,8 @@ public:
 	bool isSummon() {return (getMaster() != NULL);}
 	virtual void onAttack();
 	bool canPushItems() const {return mType->canPushItems;};
+	
+	virtual void setNormalCreatureLight();
 
 	static unsigned long getRandom();
 	

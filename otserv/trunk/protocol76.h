@@ -140,11 +140,14 @@ private:
 	virtual void sendTradeItemRequest(const Player* player, const Item* item, bool ack);
 	virtual void sendCloseTrade();
 	
-	void sendTextWindow(Item* item,const unsigned short maxlen, const bool canWrite);
+	virtual void sendTextWindow(Item* item,const unsigned short maxlen, const bool canWrite);
 	
 	virtual void sendVIPLogIn(unsigned long guid);
 	virtual void sendVIPLogOut(unsigned long guid);
 	virtual void sendVIP(unsigned long guid, const std::string &name, bool isOnline);
+	
+	virtual void sendCreatureLight(const Creature* creature);
+	virtual void sendWorldLight(const LightInfo& lightInfo);
 	
 	//tiles
 	virtual void sendAddTileItem(const Position& pos, const Item* item);
@@ -193,6 +196,8 @@ private:
 	void AddCreatureSpeak(NetworkMessage &msg,const Creature *creature, SpeakClasses type, std::string text, unsigned short channelId);
 	void AddCreatureHealth(NetworkMessage &msg,const Creature *creature);
 	void AddPlayerSkills(NetworkMessage &msg);
+	void AddWorldLight(NetworkMessage &msg, const LightInfo& lightInfo);
+	void AddCreatureLight(NetworkMessage &msg, const Creature* creature);
 
 	//tiles
 	void AddTileItem(NetworkMessage& msg, const Position& pos, const Item* item);

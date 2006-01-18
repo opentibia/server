@@ -157,7 +157,10 @@ public:
 	int health;
 	int health_max;
 	int lookhead, lookbody, looklegs, lookfeet, looktype, lookcorpse, lookmaster;
-	int immunities;	
+	int immunities;
+	
+	int lightLevel;
+	int lightColor;
 	
 	InstantAttackSpells instantSpells;
 	RuneAttackSpells runeSpells;

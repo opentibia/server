@@ -101,7 +101,6 @@ public:
 	}
 };
 
-
 //////////////////////////////////////////////////////////////////////
 // Defines the Base class for all creatures and base functions which 
 // every creature has
@@ -206,6 +205,10 @@ public:
 	virtual int getTotalInflictedDamage();
 	virtual int getInflicatedDamage(unsigned long id);
 	
+	virtual void getCreatureLight(LightInfo& light) const;
+	virtual void setNormalCreatureLight();
+	void setCreatureLight(LightInfo& light);
+	
 	virtual int onThink(int& newThinkTicks){newThinkTicks = 300; return 300;};
 
 	virtual void onAddTileItem(const Position& pos, const Item* item) {};
@@ -253,6 +256,8 @@ protected:
 	typedef std::vector< std::pair<uint64_t, long> > DamageList;
 	typedef std::map<long, DamageList > TotalDamageList;
 	TotalDamageList totaldamagelist;
+	
+	LightInfo internalLight;
 
 	friend class Game;
 	friend class Map;

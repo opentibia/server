@@ -622,3 +622,10 @@ int Item::getWorth() const
 		return 0;
 	}
 }
+
+void Item::getLight(LightInfo& lightInfo)
+{
+	const ItemType& it = items[id];
+	lightInfo.color = it.lightColor;
+	lightInfo.level = it.lightLevel;
+}

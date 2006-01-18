@@ -254,6 +254,10 @@ public:
 	bool addVIP(unsigned long guid, std::string &name, bool isOnline, bool interal = false);
 	
 	VIPListSet VIPList;
+	
+	virtual void getCreatureLight(LightInfo& light) const;
+	
+	void updateItemsLight(bool internal = false);
 
 	//tile
 	//send methods
@@ -269,6 +273,8 @@ public:
 	void sendCreatureTurn(const Creature* creature, uint32_t stackpos);
 	void sendCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text);
 	void sendCreatureChangeOutfit(const Creature* creature);
+	void sendCreatureLight(const Creature* creature);
+	void sendWorldLight(LightInfo& lightInfo);
 
 	//event methods
 	virtual void onAddTileItem(const Position& pos, const Item* item);
@@ -427,6 +433,8 @@ protected:
 
 	typedef std::multimap<int, struct MoneyItem*, std::less<int> > MoneyMap;
 	typedef MoneyMap::value_type moneymap_pair;
+	
+	LightInfo itemsLight;
 	
 	//for skill advances
 	unsigned int getReqSkillTries (int skill, int level, playervoc_t voc);

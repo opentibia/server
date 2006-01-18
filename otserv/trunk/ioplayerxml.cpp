@@ -498,6 +498,7 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 		}
 
 		player->updateInventoryWeigth();
+		player->updateItemsLight(true);
 
 		std::cout << "loaded " << filename << std::endl;
 		xmlFreeDoc(doc);

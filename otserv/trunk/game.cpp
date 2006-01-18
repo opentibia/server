@@ -379,6 +379,17 @@ Game::Game()
 #endif
 
 	addEvent(makeTask(DECAY_INTERVAL, boost::bind(&Game::checkDecay,this,DECAY_INTERVAL)));	
+	
+	int daycycle = 3600;
+	//(1440 minutes/day)/(3600 seconds/day)*10 seconds event interval
+	light_hour_delta = 1440*10/daycycle;
+	/*light_hour = 0;
+	lightlevel = LIGHT_LEVEL_NIGHT;
+	light_state = LIGHT_STATE_NIGHT;*/
+	light_hour = SUNRISE + (SUNSET - SUNRISE)/2;
+	lightlevel = LIGHT_LEVEL_DAY;
+	light_state = LIGHT_STATE_DAY;
+	addEvent(makeTask(10000, boost::bind(&Game::checkLight, this, 10000)));
 }
 
 
@@ -3189,6 +3200,22 @@ void Game::changeSpeed(unsigned long id, unsigned short speed)
 	}	
 }
 
+void Game::changeLight(const Creature* creature)
+{
+	SpectatorVec list;
+	SpectatorVec::iterator it;
+
+	getSpectators(Range(creature->getPosition(), true), list);
+
+	Player* player;
+	for(it = list.begin(); it != list.end(); ++it){
+		if(player = (*it)->getPlayer()){
+			player->sendCreatureLight(creature);
+		}
+	}
+}
+
+
 void Game::AddMagicEffectAt(const Position& pos, uint8_t type)
 {
 	SpectatorVec list;
@@ -3203,6 +3230,7 @@ void Game::AddMagicEffectAt(const Position& pos, uint8_t type)
 		}
 	}
 }
+
 
 void Game::checkDecay(int t)
 {
@@ -3288,6 +3316,64 @@ void Game::checkSpawns(int t)
 	
 	SpawnManager::instance()->checkSpawns(t);
 	this->addEvent(makeTask(t, std::bind2nd(std::mem_fun(&Game::checkSpawns), t)));
+}
+
+void Game::checkLight(int t)
+{
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::checkLight()");
+	
+	addEvent(makeTask(10000, boost::bind(&Game::checkLight, this, 10000)));
+	
+	light_hour = light_hour + light_hour_delta;
+	if(light_hour > 1440)
+		light_hour = light_hour - 1440;
+	
+	if(std::abs(light_hour - SUNRISE) < 2*light_hour_delta){
+		light_state = LIGHT_STATE_SUNRISE;
+	}
+	else if(std::abs(light_hour - SUNSET) < 2*light_hour_delta){
+		light_state = LIGHT_STATE_SUNSET;
+	}
+	
+	int newlightlevel = lightlevel;
+	bool lightChange = false;
+	switch(light_state){
+	case LIGHT_STATE_SUNRISE:
+		newlightlevel += (LIGHT_LEVEL_DAY - LIGHT_LEVEL_NIGHT)/30;
+		lightChange = true;
+		break;
+	case LIGHT_STATE_SUNSET:
+		newlightlevel -= (LIGHT_LEVEL_DAY - LIGHT_LEVEL_NIGHT)/30;
+		lightChange = true;
+		break;
+	}
+	
+	if(newlightlevel <= LIGHT_LEVEL_NIGHT){
+		lightlevel = LIGHT_LEVEL_NIGHT;
+		light_state = LIGHT_STATE_NIGHT;
+	}
+	else if(newlightlevel >= LIGHT_LEVEL_DAY){
+		lightlevel = LIGHT_LEVEL_DAY;
+		light_state = LIGHT_STATE_DAY;
+	}
+	else{
+		lightlevel = newlightlevel;
+	}
+	
+	if(lightChange){
+		LightInfo lightInfo;
+		lightInfo.level = lightlevel;
+		lightInfo.color = 0xD7;
+		for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin(); it != Player::listPlayer.list.end(); ++it){
+			(*it).second->sendWorldLight(lightInfo);
+		}
+	}
+}
+
+void Game::getWorldLightInfo(LightInfo& lightInfo)
+{
+	lightInfo.level = lightlevel;
+	lightInfo.color = 0xD7;
 }
 
 void Game::addCommandTag(std::string tag)

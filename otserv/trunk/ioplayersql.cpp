@@ -238,6 +238,7 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 		}
 		
 		player->updateInventoryWeigth();
+		player->updateItemsLight(true);
 
 		//load storage map
 		query << "SELECT * FROM playerstorage WHERE player='" << player->getGUID() << "'";
