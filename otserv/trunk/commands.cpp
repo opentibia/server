@@ -406,9 +406,12 @@ bool Commands::banPlayer(Creature* creature, const std::string& cmd, const std::
 bool Commands::teleportMasterPos(Creature* creature, const std::string& cmd, const std::string& param)
 {
 	Position destPos = creature->getPosition();
-	game->internalTeleport(creature, creature->masterPos);
-	game->AddMagicEffectAt(destPos, NM_ME_ENERGY_AREA);
-	return true;
+	if(game->internalTeleport(creature, creature->masterPos) == RET_NOERROR){
+		game->AddMagicEffectAt(destPos, NM_ME_ENERGY_AREA);
+		return true;
+	}
+
+	return false;
 }
 
 bool Commands::teleportHere(Creature* creature, const std::string& cmd, const std::string& param)
@@ -416,10 +419,13 @@ bool Commands::teleportHere(Creature* creature, const std::string& cmd, const st
 	Creature* paramCreature = game->getCreatureByName(param);
 	if(paramCreature){
 		Position destPos = paramCreature->getPosition();
-		game->internalTeleport(paramCreature, creature->getPosition());
-		game->AddMagicEffectAt(destPos, NM_ME_ENERGY_AREA);
+		if(game->internalTeleport(paramCreature, creature->getPosition()) == RET_NOERROR){
+			game->AddMagicEffectAt(destPos, NM_ME_ENERGY_AREA);
+			return true;
+		}
 	}
-	return true;
+
+	return false;
 }
 
 bool Commands::createItems(Creature* creature, const std::string& cmd, const std::string& param)
@@ -513,12 +519,12 @@ bool Commands::testCommand(Creature* creature, const std::string& cmd, const std
 	Player* player = creature->getPlayer();
 	if(player) {
 		/*
-		HouseTile* houseTile = dynamic_cast<HouseTile*>(player->getTile());
-		if(houseTile){
-			houseTile->getHouse()->setEntryPos(Position(32, 42, 7));
+		if(player->getTile()->hasFlag(TILESTATE_HOUSE)){
+			HouseTile* houseTile = dynamic_cast<HouseTile*>(player->getTile());
 			houseTile->getHouse()->setHouseOwner(player->getGUID());
 		}
 		*/
+
 		player->sendMagicEffect(player->getPosition(), color);
 	}
 
@@ -530,9 +536,10 @@ bool Commands::teleportTo(Creature* creature, const std::string& cmd, const std:
 	Creature* paramCreature = game->getCreatureByName(param);
 	if(paramCreature){
 		Position destPos = creature->getPosition();
-		game->internalTeleport(creature, paramCreature->getPosition());
-		game->AddMagicEffectAt(destPos, NM_ME_ENERGY_AREA);
-		return true;
+		if(game->internalTeleport(creature, paramCreature->getPosition()) == RET_NOERROR){
+			game->AddMagicEffectAt(destPos, NM_ME_ENERGY_AREA);
+			return true;
+		}
 	}
 	
 	return false;
@@ -662,8 +669,9 @@ bool Commands::teleportNTiles(Creature* creature, const std::string& cmd, const 
 			break;
 		}
 
-		game->internalTeleport(creature, newPos);
-		game->AddMagicEffectAt(newPos, NM_ME_ENERGY_AREA);
+		if(game->internalTeleport(creature, newPos) == RET_NOERROR){
+			game->AddMagicEffectAt(newPos, NM_ME_ENERGY_AREA);
+		}
 	}
 
 	return true;
@@ -691,9 +699,8 @@ bool Commands::invitePlayer(Creature* creature, const std::string& cmd, const st
 	if(!player)
 		return false;
 
-	HouseTile* houseTile = dynamic_cast<HouseTile*>(player->getTile());
-
-	if(houseTile){
+	if(player->getTile()->hasFlag(TILESTATE_HOUSE)){
+		HouseTile* houseTile = dynamic_cast<HouseTile*>(player->getTile());
 		House* house = houseTile->getHouse();
 
 		if(house->getHouseOwner() == player->getGUID()){
@@ -713,9 +720,8 @@ bool Commands::uninvitePlayer(Creature* creature, const std::string& cmd, const 
 	if(!player)
 		return false;
 
-	HouseTile* houseTile = dynamic_cast<HouseTile*>(player->getTile());
-
-	if(houseTile){
+	if(player->getTile()->hasFlag(TILESTATE_HOUSE)){
+		HouseTile* houseTile = dynamic_cast<HouseTile*>(player->getTile());
 		House* house = houseTile->getHouse();
 
 		if(house->getHouseOwner() == player->getGUID()){

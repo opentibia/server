@@ -843,17 +843,18 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 	std::cout << "removing creature "<< std::endl;
 #endif
 
-	Cylinder* cylinder = creature->getTile();
-
 	//std::cout << "remove: " << creature << " " << creature->getID() << std::endl;
 
-	uint32_t index = cylinder->__getIndexOfThing(creature);
+	listCreature.removeList(creature->getID());
+	creature->removeList();
 
 	SpectatorVec list;
 	SpectatorVec::iterator it;
 
+	Cylinder* cylinder = creature->getTile();
 	getSpectators(Range(cylinder->getPosition(), true), list);
 
+	uint32_t index = cylinder->__getIndexOfThing(creature);
 	cylinder->__removeThing(creature, 0);
 
 	//send to client
@@ -872,8 +873,8 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 	}
 
 	creature->getParent()->postRemoveNotification(creature);
-	listCreature.removeList(creature->getID());
-	creature->removeList();
+	//listCreature.removeList(creature->getID());
+	//creature->removeList();
 
 	stopEvent(creature->eventCheck);
 	stopEvent(creature->eventCheckAttacking);

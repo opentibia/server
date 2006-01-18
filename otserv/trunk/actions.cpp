@@ -1080,9 +1080,13 @@ int ActionScript::luaActionDoTeleportThing(lua_State *L)
 	}
 	*/
 	
-	action->game->internalTeleport(tmp,(Position&)pos);
+	if(action->game->internalTeleport(tmp,(Position&)pos) == RET_NOERROR){
+		lua_pushnumber(L, 0);
+		return 1;
+	}
 	
-	lua_pushnumber(L, 0);
+	std::cout << "luaTeleport: item is not moveable" << std::endl;
+	lua_pushnumber(L, -1);
 	return 1;
 }
 

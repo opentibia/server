@@ -646,6 +646,8 @@ Cylinder* Tile::__queryDestination(int32_t& index, const Thing* thing, Item** de
 			else if(downTile->floorChange(WEST)){
 				destTile = g_game.getTile(getTilePosition().x + 1, getTilePosition().y, getTilePosition().z + 1);
 			}
+			else
+				destTile = downTile;
 		}
 	}
 	else if(floorChange()){
