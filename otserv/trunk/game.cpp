@@ -2428,7 +2428,14 @@ bool Game::playerUseItemEx(Player* player, const Position& fromPos, uint8_t from
 	if(item){
 		//Runes
 		std::map<unsigned short, Spell*>::iterator sit = spells.getAllRuneSpells()->find(item->getID());
-		if(sit != spells.getAllRuneSpells()->end()) {
+		if(sit != spells.getAllRuneSpells()->end()){
+			if((std::abs(item->getPosition().x - player->getPosition().x) > 1) ||
+				 (std::abs(item->getPosition().y - player->getPosition().y) > 1) ||
+				 (item->getPosition().z != player->getPosition().z)){
+				playerSendErrorMessage(player, RET_TOFARAWAY);
+				return false;
+			}
+
 			std::string var = std::string("");
 			if(player->access != 0 || sit->second->getMagLv() <= player->maglevel)
 			{
