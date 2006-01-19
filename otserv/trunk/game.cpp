@@ -23,7 +23,6 @@
 
 #include <string>
 #include <sstream>
-
 #include <map>
 
 #ifdef __DEBUG_CRITICALSECTION__
@@ -34,9 +33,6 @@
 #include <boost/config.hpp>
 #include <boost/bind.hpp>
 
-using namespace std;
-
-#include <stdio.h>
 #include "otsystem.h"
 #include "items.h"
 #include "commands.h"
@@ -51,9 +47,7 @@ using namespace std;
 #include "actions.h"
 #include "ioplayer.h"
 #include "chat.h"
-
 #include "luascript.h"
-#include <ctype.h>
 
 #if defined __EXCEPTION_TRACER__
 #include "exception.h"
@@ -66,7 +60,7 @@ extern Actions actions;
 extern Commands commands;
 extern Chat g_chat;
 
-extern std::vector< std::pair<unsigned long, unsigned long> > bannedIPs;
+extern IPList bannedIPs;
 
 //
 
@@ -223,7 +217,7 @@ void GameState::addCreatureState(Tile* tile, Creature* attackedCreature, int dam
 	cs.manaDamage = manaDamage;
 	cs.drawBlood = drawBlood;
 
-	creaturestates[tile].push_back( make_pair(attackedCreature, cs) );
+	creaturestates[tile].push_back(std::make_pair(attackedCreature, cs) );
 }
 
 void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* attackedCreature, int damage, bool drawBlood)
@@ -1657,7 +1651,7 @@ bool Game::internalCreatureSaySpell(Creature *creature, const std::string &text)
 	Player* player = dynamic_cast<Player*>(creature);
 	std::string temp, var;
 	unsigned int loc = (uint32_t)text.find( "\"", 0 );
-	if( loc != string::npos && loc >= 0){
+	if(loc != std::string::npos && loc >= 0){
 		temp = std::string(text, 0, loc-1);
 		var = std::string(text, (loc+1), text.size()-loc-1);
 	}
@@ -2624,6 +2618,10 @@ bool Game::playerAcceptTrade(Player* player)
 		Item* tradeItem1 = player->tradeItem;
 		Item* tradeItem2 = tradePartner->tradeItem;
 
+		//reset trade status
+		player->setAcceptTrade(false);
+		tradePartner->setAcceptTrade(false);
+
 		std::map<Item*, unsigned long>::iterator it;
 
 		it = tradeItems.find(tradeItem1);
@@ -2651,9 +2649,6 @@ bool Game::playerAcceptTrade(Player* player)
 				Cylinder* cylinder1 = tradeItem1->getParent();
 				Cylinder* cylinder2 = tradeItem2->getParent();
 
-				player->setAcceptTrade(false); //reset tradeItem
-				tradePartner->setAcceptTrade(false); ////reset tradeItem
-
 				internalMoveItem(cylinder1, tradePartner, 0, tradeItem1, tradeItem1->getItemCount());
 				internalMoveItem(cylinder2, player, 0, tradeItem2, tradeItem2->getItemCount());
 
@@ -2661,15 +2656,13 @@ bool Game::playerAcceptTrade(Player* player)
 			}
 		}
 
-		player->setAcceptTrade(false);
-		tradePartner->setAcceptTrade(false);
-		player->sendCloseTrade();
-		tradePartner->sendCloseTrade();
-
 		if(!isSuccess){
 			player->sendTextMessage(MSG_SMALLINFO, "Sorry not possible.");
 			tradePartner->sendTextMessage(MSG_SMALLINFO, "Sorry not possible.");
 		}
+
+		player->sendCloseTrade();
+		tradePartner->sendCloseTrade();
 
 		return isSuccess;
 	}
@@ -2702,7 +2695,7 @@ bool Game::playerLookInTrade(Player* player, bool lookAtCounterOffer, int index)
 		std::abs(player->getPosition().y - tradeItem->getPosition().y));
 
 	if(index == 0){
-		stringstream ss;
+		std::stringstream ss;
 		ss << "You see " << tradeItem->getDescription(lookDistance);
 		player->sendTextMessage(MSG_INFO, ss.str().c_str());
 		return false;
@@ -2738,7 +2731,7 @@ bool Game::playerLookInTrade(Player* player, bool lookAtCounterOffer, int index)
 	}
 	
 	if(foundItem){
-		stringstream ss;
+		std::stringstream ss;
 		ss << "You see " << tradeItem->getDescription(lookDistance);
 		player->sendTextMessage(MSG_INFO, ss.str().c_str());
 	}
@@ -3237,11 +3230,11 @@ void Game::checkDecay(int t)
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::checkDecay()");
 	addEvent(makeTask(DECAY_INTERVAL, boost::bind(&Game::checkDecay, this, DECAY_INTERVAL)));
 
-	list<decayBlock*>::iterator it;
-	for(it = decayVector.begin();it != decayVector.end();){
+	std::list<decayBlock*>::iterator it;
+	for(it = decayVector.begin(); it != decayVector.end();){
 		(*it)->decayTime -= t;
 		if((*it)->decayTime <= 0){
-			list<Item*>::iterator it2;
+			std::list<Item*>::iterator it2;
 			for(it2 = (*it)->decayItems.begin(); it2 != (*it)->decayItems.end(); it2++){
 				Item* item = *it2;
 				item->isDecaying = false;
@@ -3294,7 +3287,7 @@ void Game::startDecay(Item* item)
 	item->useThing2();
 
 	//search if there are any block with this time
-	list<decayBlock*>::iterator it;
+	std::list<decayBlock*>::iterator it;
 	for(it = decayVector.begin();it != decayVector.end();it++){
 		if((*it)->decayTime == dtime){			
 			(*it)->decayItems.push_back(item);

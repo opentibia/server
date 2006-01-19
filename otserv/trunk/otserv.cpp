@@ -76,8 +76,8 @@
 OTSYS_THREAD_LOCK_CLASS::LogList OTSYS_THREAD_LOCK_CLASS::loglist;
 #endif
 
-std::vector< std::pair<unsigned long, unsigned long> > serverIPs;
-std::vector< std::pair<unsigned long, unsigned long> > bannedIPs;
+IPList serverIPs;
+IPList bannedIPs;
 
 LuaScript g_config;
 

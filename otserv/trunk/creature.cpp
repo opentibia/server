@@ -25,15 +25,14 @@
 #include <sstream>
 #include <algorithm>
 
-#include "game.h"
 #include "creature.h"
+#include "otsystem.h"
+#include "tile.h"
+
 #include "npc.h"
 #include "player.h"
 #include "monster.h"
-#include "tile.h"
-#include "otsystem.h"
-
-using namespace std;
+#include "game.h"
 
 OTSYS_THREAD_LOCKVAR AutoID::autoIDLock;
 unsigned long AutoID::count = 1000;
@@ -102,12 +101,12 @@ Creature::~Creature()
 
 void Creature::drainHealth(int damage)
 {
-	health -= min(health, damage);
+	health -= std::min(health, damage);
 }
 
 void Creature::drainMana(int damage)
 {
-	mana -= min(mana, damage);
+	mana -= std::min(mana, damage);
 }
 
 Creature* Creature::getAttackedCreature()
@@ -209,7 +208,7 @@ void Creature::addInflictedDamage(Creature* attacker, int damage)
 		id = attacker->getID();
 	}
 	
-	totaldamagelist[id].push_back(make_pair(OTSYS_TIME(), damage));
+	totaldamagelist[id].push_back(std::make_pair(OTSYS_TIME(), damage));
 }
 
 int Creature::getLostExperience() {

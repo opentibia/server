@@ -33,7 +33,7 @@
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 
-extern std::vector< std::pair<unsigned long, unsigned long> > bannedIPs;
+extern IPList bannedIPs;
 extern Actions actions;
 extern Monsters g_monsters;
 

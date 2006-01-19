@@ -26,6 +26,8 @@
 #include <map>
 #include "creature.h"
 
+typedef std::vector< std::pair<unsigned long, unsigned long> > IPList;
+
 class Game;
 struct Command;
 struct s_defcommands;

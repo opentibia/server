@@ -271,33 +271,54 @@ bool Actions::UseItem(Player* player, const Position &pos,const unsigned char st
   return false;	
 }
 
-bool Actions::openContainer(Player* player,Container* container, const unsigned char index)
+bool Actions::openContainer(Player* player, Container* container, const unsigned char index)
 {
+	Container* openContainer = NULL;
+
 	//depot container
 	if(Depot* depot = container->getDepot()){
 		Depot* myDepot = player->getDepot(depot->getDepotId());
-		if(myDepot){
-			myDepot->setParent(depot->getParent());
-			player->addContainer(index, myDepot);
-			player->onSendContainer(myDepot);
-			return true;
+
+		//depot does not yet exist?
+		if(myDepot == NULL){
+			//create a new depot
+			Item* tmpDepot = Item::CreateItem(depot->getID());
+			if(tmpDepot->getContainer()){
+				if(myDepot = tmpDepot->getContainer()->getDepot()){
+					tmpDepot = NULL;
+					Item* depotChest = Item::CreateItem(ITEM_DEPOT);
+					myDepot->__internalAddThing(depotChest);
+
+					player->addDepot(myDepot, depot->getDepotId());
+				}
+			}
+
+			if(tmpDepot){
+				game->FreeThing(tmpDepot);
+				std::cout << "Failure: Creating a new depot with id: "<< depot->getDepotId() <<
+					", for player: " << player->getName() << std::endl;
+			}
 		}
+
+		myDepot->setParent(depot->getParent());
+		openContainer = myDepot;
 	}
-	//normal container
 	else{
-		int32_t oldcid = player->getContainerID(container);
-		if(oldcid != -1) {
-			player->onCloseContainer(container);
-			player->closeContainer(oldcid);
-		}
-		else{
-			player->addContainer(index, container);
-			player->onSendContainer(container);
-		}
-		return true;
+		openContainer = container;
 	}
 
-	return false;
+	//open/close container
+	int32_t oldcid = player->getContainerID(openContainer);
+	if(oldcid != -1){
+		player->onCloseContainer(openContainer);
+		player->closeContainer(oldcid);
+	}
+	else{
+		player->addContainer(index, openContainer);
+		player->onSendContainer(openContainer);
+	}
+
+	return true;
 }
 
 bool Actions::UseItemEx(Player* player, const Position &from_pos,

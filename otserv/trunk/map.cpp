@@ -23,14 +23,11 @@
 
 #include <string>
 #include <sstream>
-
 #include <map>
 #include <algorithm>
 
 #include <boost/config.hpp>
 #include <boost/bind.hpp>
-
-using namespace std;
 
 #include "iomap.h"
 
@@ -49,32 +46,28 @@ using namespace std;
 #include "tile.h"
 
 #include "player.h"
-#include "tools.h"
-
-#include "npc.h"
-#include "spells.h"
-
-
 #include "luascript.h"
-#include <ctype.h>
+//#include "spells.h"
 
 #define EVENT_CHECKPLAYER          123
 #define EVENT_CHECKPLAYERATTACKING 124
 
 extern LuaScript g_config;
-extern Spells spells;
+//extern Spells spells;
 
 
 Map::Map() :
-spawnfile(""),
-mapwidth(0),
-mapheight(0)
+	spawnfile(""),
+	mapwidth(0),
+	mapheight(0)
 {
+	//
 }
 
 
 Map::~Map()
 {
+	//
 }
 
 
@@ -365,17 +358,17 @@ bool Map::canThrowObjectTo(const Position& fromPos, const Position& toPos)
 		//x -> y
 		//y -> x
 		//z -> z
-		swap(start.x, start.y);
-		swap(end.x, end.y);
-		swap(deltax, deltay);
+		std::swap(start.x, start.y);
+		std::swap(end.x, end.y);
+		std::swap(deltax, deltay);
 		break;
 	case 2:
 		//x -> z
 		//y -> y
 		//z -> x
-		swap(start.x, start.z);
-		swap(end.x, end.z);
-		swap(deltax, deltaz);
+		std::swap(start.x, start.z);
+		std::swap(end.x, end.z);
+		std::swap(deltax, deltaz);
 		break;
 	}
 
