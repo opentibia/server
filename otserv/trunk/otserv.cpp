@@ -478,42 +478,62 @@ int main(int argc, char *argv[])
 	std::cout << "[done]" << std::endl;
 	
 	//load spells data
-	std::cout << ":: Loading spells spells.xml... ";
+	std::stringstream filename;
+	filename.str("");
+	filename << g_config.getGlobalString("datadir") << "spells/spells.xml";
+	std::cout << ":: Loading " << filename.str() << "... ";
 	if(!spells.loadFromXml(g_config.getGlobalString("datadir"))){
-		ErrorMessage("Unable to load spells.xml!");
+		std::stringstream errormsg;
+		errormsg << "Unable to load " << filename.str() << "!";
+		ErrorMessage(errormsg.str().c_str());
 		return -1;
 	}
 	std::cout << "[done]" << std::endl;
 	
 	//load actions data
-	std::cout << ":: Loading actions actions.xml... ";
+	filename.str("");
+	filename << g_config.getGlobalString("datadir") << "actions/actions.xml";
+	std::cout << ":: Loading " << filename.str() << "... ";
 	if(!actions.loadFromXml(g_config.getGlobalString("datadir"))){
-		ErrorMessage("Unable to load actions.xml!");
+		std::stringstream errormsg;
+		errormsg << "Unable to load " << filename.str() << "!";
+		ErrorMessage(errormsg.str().c_str());
 		return -1;
 	}
 	std::cout << "[done]" << std::endl;
 	
 	//load commands
-	std::cout << ":: Loading commands commands.xml... ";
+	filename.str("");
+	filename << g_config.getGlobalString("datadir") << "commands.xml";
+	std::cout << ":: Loading " << filename.str() << "... ";
 	if(!commands.loadXml(g_config.getGlobalString("datadir"))){
-		ErrorMessage("Unable to load commands.xml!");
+		std::stringstream errormsg;
+		errormsg << "Unable to load " << filename.str() << "!";
+		ErrorMessage(errormsg.str().c_str());
 		return -1;
 	}
 	std::cout << "[done]" << std::endl;
 	
 	// load item data
-	std::cout << ":: Loadding " << g_config.getGlobalString("datadir") << "items/items.otb ... ";
-	if (Item::items.loadFromOtb(g_config.getGlobalString("datadir") + "items/items.otb")){
-		ErrorMessage("Could not load items.otb!");
+	filename.str("");
+	filename << g_config.getGlobalString("datadir") << "items/items.otb";
+	std::cout << ":: Loading " << filename.str() << "... ";
+	if(Item::items.loadFromOtb(filename.str())){
+		std::stringstream errormsg;
+		errormsg << "Unable to load " << filename.str() << "!";
+		ErrorMessage(errormsg.str().c_str());
 		return -1;
 	}
 	std::cout << "[done]" << std::endl;
 	
 	// load monster data
-	std::cout << ":: Loadding monsters monsters/monsters.xml ... ";
-	if(!g_monsters.loadFromXml(g_config.getGlobalString("datadir")))
-	{
-		ErrorMessage("Could not load monsters/monsters.xml!");
+	filename.str("");
+	filename << g_config.getGlobalString("datadir") << "monsters/monsters.xml";
+	std::cout << ":: Loading " << filename.str() << "... ";
+	if(!g_monsters.loadFromXml(g_config.getGlobalString("datadir"))){
+		std::stringstream errormsg;
+		errormsg << "Unable to load " << filename.str() << "!";
+		ErrorMessage(errormsg.str().c_str());
 		return -1;
 	}
 	std::cout << "[done]" << std::endl;

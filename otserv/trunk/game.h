@@ -50,6 +50,9 @@ class lessSchedTask;
 #define MAP_HEIGHT   512
 #define MAP_LAYER     16
 
+#define STACKPOS_MOVE -1
+#define STACKPOS_LOOK -2
+#define STACKPOS_USE -3
 
 /** State of a creature at a given time
   * Keeps track of all the changes to be able to send to the client

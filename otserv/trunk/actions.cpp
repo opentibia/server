@@ -899,7 +899,7 @@ int ActionScript::internalGetPlayerInfo(lua_State *L, ePlayerInfo info)
 			value = player->guildId;
 			break;
 		default:
-			std::cout << "GetPlayerInfo: Unkown player info " << info << std::endl;
+			std::cout << "GetPlayerInfo: Unknown player info " << info << std::endl;
 			value = 0;
 			break;		
 		}

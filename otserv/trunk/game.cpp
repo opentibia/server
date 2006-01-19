@@ -617,33 +617,40 @@ Thing* Game::internalGetThing(Player* player, const Position& pos, int32_t index
 		Tile* tile = getTile(pos.x, pos.y, pos.z);
 
 		if(tile){
-			/*for move operations*/
-			if(index == -1){
-				return tile->getTopMoveableThing(); //tile->getTopDownItem();
-
-				/*
-				if(thing)
-					return thing;
-				else
-					return tile->getTopThing();
-				*/
-			}
 			/*look at*/
-			else if(index == -2){
+			if(index == STACKPOS_LOOK){
 				return tile->getTopThing();
+			}
 
-				/*
-				Thing* thing = tile->getTopThing();
+			Thing* thing = NULL;
 
-				if(thing)
-					return thing;
-				else
-					return tile->getTopDownItem();
-				*/
+			/*for move operations*/
+			if(index == STACKPOS_MOVE){
+				thing = tile->getTopMoveableThing(); //tile->getTopDownItem();
+			}
+			/*use item*/
+			else if(index == STACKPOS_USE){
+				thing = tile->getTopMoveableThing(); //tile->getTopDownItem();
 			}
 			else{
-				return tile->__getThing(index);
+				thing = tile->__getThing(index);
 			}
+
+			//do extra checks here if the thing is accessable
+			if(thing && thing->getItem()){
+				if(tile->hasProperty(ISVERTICAL)){
+					if(player->getPosition().x + 1 == tile->getPosition().x){
+						thing = NULL;
+					}
+				}
+				else if(tile->hasProperty(ISHORIZONTAL)){
+					if(player->getPosition().y + 1 == tile->getPosition().y){
+						thing = NULL;
+					}
+				}
+			}
+
+			return thing;
 		}
 	}
 	else{
@@ -917,7 +924,7 @@ void Game::thingMove(Player* player, const Position& fromPos, uint16_t itemId, u
 	else
 		fromIndex = fromStackpos;
 
-	Thing* thing = internalGetThing(player, fromPos, -1 /*fromIndex*/);
+	Thing* thing = internalGetThing(player, fromPos, STACKPOS_MOVE /*fromIndex*/);
 
 	Cylinder* toCylinder = internalGetCylinder(player, toPos);
 	uint8_t toIndex = 0;
@@ -931,12 +938,16 @@ void Game::thingMove(Player* player, const Position& fromPos, uint16_t itemId, u
 		}
 	}
 
-	if(Creature* movingCreature = dynamic_cast<Creature*>(thing)){
-		moveCreature(player, fromCylinder, toCylinder, movingCreature);
+	if(thing){
+		if(Creature* movingCreature = thing->getCreature()){
+			moveCreature(player, fromCylinder, toCylinder, movingCreature);
+		}
+		else if(Item* movingItem = thing->getItem()){
+			moveItem(player, fromCylinder, toCylinder, toIndex, movingItem, count, itemId);
+		}
 	}
-	else if(Item* movingItem = dynamic_cast<Item*>(thing)){
-		moveItem(player, fromCylinder, toCylinder, toIndex, movingItem, count, itemId);
-	}
+	else
+		playerSendErrorMessage(player, RET_NOTPOSSIBLE);
 }
 
 void Game::moveCreature(Player* player, Cylinder* fromCylinder, Cylinder* toCylinder,
@@ -2466,7 +2477,7 @@ bool Game::playerUseBattleWindow(Player* player, const Position& fromPos, uint8_
 		creature->getPosition().z != player->getPosition().z)
 		return false;
 
-	Item* item = dynamic_cast<Item*>(internalGetThing(player, fromPos, -2 /*fromStackPos*/));
+	Item* item = dynamic_cast<Item*>(internalGetThing(player, fromPos, STACKPOS_USE /*fromStackPos*/));
 
 	if(item){
 		if((std::abs(item->getPosition().x - player->getPosition().x) > 1) ||
@@ -2558,7 +2569,7 @@ bool Game::playerRequestTrade(Player* player, const Position& pos, uint8_t stack
 		return false;
 	}
 
-	Item* tradeItem = dynamic_cast<Item*>(internalGetThing(player, pos, -2 /*stackpos*/));
+	Item* tradeItem = dynamic_cast<Item*>(internalGetThing(player, pos, STACKPOS_USE /*stackpos*/));
 	if(!tradeItem || tradeItem->getID() != itemId || !tradeItem->isPickupable()) {
 		playerSendErrorMessage(player, RET_NOTPOSSIBLE);
 		return false;
@@ -2783,7 +2794,7 @@ bool Game::playerLookAt(Player* player, const Position& pos, uint16_t itemId, ui
 	if(player->isRemoved())
 		return false;
 
-	Thing* thing = internalGetThing(player, pos, -2 /*stackpos*/);
+	Thing* thing = internalGetThing(player, pos, STACKPOS_LOOK /*stackpos*/);
 	if(!thing){
 		playerSendErrorMessage(player, RET_NOTPOSSIBLE);
 		return false;
