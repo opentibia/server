@@ -246,12 +246,12 @@ int Monster::onThink(int& newThinkTicks)
 		//check/update/calc route
 		if(state != STATE_IDLE && state != STATE_TARGETNOTREACHABLE && !(isSummon() && hasLostMaster))
 		{
-			if(updateMovePos || !game->map->isPathValid(this, route, mType->canPushItems))
+			if(updateMovePos || !game->map->isPathValid(this, route))
 			{
 				updateMovePos = false;
 
 				if(calcMovePosition()) {
-					route = game->map->getPathTo(this, getPosition(), moveToPos, true, mType->canPushItems);
+					route = game->map->getPathTo(this, getPosition(), moveToPos);
 
 					if(route.empty() && !(state == STATE_IDLESUMMON) && (!mType->hasDistanceAttack || !validateDistanceAttack(targetPos))) {
 						state = STATE_TARGETNOTREACHABLE;
