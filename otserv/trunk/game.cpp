@@ -706,11 +706,6 @@ Tile* Game::getTile(unsigned short _x, unsigned short _y, unsigned char _z)
 	return map->getTile(_x, _y, _z);
 }
 
-void Game::setTile(unsigned short _x, unsigned short _y, unsigned char _z, unsigned short groundId)
-{
-	map->setTile(_x, _y, _z, groundId);	
-}
-
 Creature* Game::getCreatureByID(unsigned long id)
 {
 	if(id == 0)
@@ -2921,9 +2916,9 @@ bool Game::playerSaySpell(Player* player, const std::string& text)
 }
 
 //--
-std::list<Position> Game::getPathTo(Creature *creature, Position start, Position to, bool creaturesBlock)
+std::list<Position> Game::getPathTo(Creature *creature, Position start, Position to)
 {
-	return map->getPathTo(creature, start, to, creaturesBlock);
+	return map->getPathTo(creature, start, to);
 }
 
 bool Game::internalCreatureTurn(Creature* creature, Direction dir)

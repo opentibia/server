@@ -170,7 +170,7 @@ public:
 	  * Set a Tile to a specific ground id
 	  * \param groundId ID of the ground to set
 	  */
-	void setTile(unsigned short _x, unsigned short _y, unsigned char _z, unsigned short groundId);
+	//void setTile(unsigned short _x, unsigned short _y, unsigned char _z, unsigned short groundId);
 
 	/**
 	  * Returns a creature based on the unique creature identifier
@@ -317,7 +317,7 @@ public:
 	void addPlayerBuffer(Player* p);
 	void FreeThing(Thing* thing);
 
-	std::list<Position> getPathTo(Creature *creature, Position start, Position to, bool creaturesBlock=true);
+	std::list<Position> getPathTo(Creature* creature, Position start, Position to);
 	void changeOutfitAfter(unsigned long id, int looktype, long time);
 	void changeSpeed(unsigned long id, unsigned short speed);
 	void changeLight(const Creature* creature);
