@@ -196,7 +196,8 @@ int Actions::canUseFar(const Player *player,const Position &to_pos, const bool b
 	return CAN_USE;
 }
 
-Action *Actions::getAction(const Item *item){
+Action *Actions::getAction(const Item *item)
+{
 	if(item->getUniqueId() != 0){
 		ActionUseMap::iterator it = uniqueItemMap.find(item->getUniqueId());
     	if (it != uniqueItemMap.end()){
@@ -217,10 +218,17 @@ Action *Actions::getAction(const Item *item){
 	return NULL;
 }
 
-bool Actions::UseItem(Player* player, const Position &pos,const unsigned char stack, 
+bool Actions::UseItem(Player* player, const Position& pos, const unsigned char stack, 
 	const unsigned short itemid, const unsigned char index)
 {	
 	if(canUse(player,pos)== TOO_FAR){
+		/*
+		bool Game::playerUseItem(Player* player, const Position& pos, uint8_t stackpos, uint8_t index, uint16_t itemId)
+
+		boost::function1<void, Game*> _f = boost::bind(&Game::playerUseItem, game,
+			player, pos, stack, index, itemid);
+		*/
+
 		player->sendCancel("Too far away.");
 		return false;
 	}
@@ -326,6 +334,14 @@ bool Actions::UseItemEx(Player* player, const Position &from_pos,
 	const unsigned char to_stack,const unsigned short itemid)
 {
 	if(canUse(player,from_pos) == TOO_FAR){
+		/*
+		bool Game::playerUseItemEx(Player* player, const Position& fromPos, uint8_t fromStackPos, uint16_t fromItemId,
+			const Position& toPos, uint8_t toStackPos, uint16_t toItemId)
+
+		boost::function1<void, Game*> _f = boost::bind(&Game::playerUseItemEx, this,
+			player, fromPos, fromStackPos, fromItemId, toPos, toStackPos, toItemId);
+		*/
+
 		player->sendCancel("Too far away.");
 		return false;
 	}
@@ -507,7 +523,8 @@ void ActionScript::ClearMap()
 	lastuid = 0;
 }
 
-void ActionScript::AddThingToMapUnique(Thing *thing){
+void ActionScript::AddThingToMapUnique(Thing *thing)
+{
 	Item *item = thing->getItem();
 	if(item && item->getUniqueId() != 0 ){
 		unsigned short uid = item->getUniqueId();
@@ -754,7 +771,8 @@ int ActionScript::registerFunctions()
 	return true;
 }
 
-ActionScript* ActionScript::getActionScript(lua_State *L){
+ActionScript* ActionScript::getActionScript(lua_State *L)
+{
 	lua_getglobal(L, "addressOfActionScript");
 	int val = (int)internalGetNumber(L);
 
