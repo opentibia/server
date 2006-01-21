@@ -133,8 +133,12 @@ void IOMapBin::loadOTM(Map* map)
 					id += fgetc(fh) << 8; 
 			        total += 1;
 			        
-					map->setTile(x, y, z, id);
-					t = map->getTile(x, y, z);
+					t = new Tile(x, y, z);
+					if(id != 0){
+						t->__internalAddThing(Item::CreateItem(id));
+					}
+
+					map->setTile(x, y, z, t);
 					
 					// check if the tile is pz
 					if (fgetc(fh) == 1)

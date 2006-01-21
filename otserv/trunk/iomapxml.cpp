@@ -94,7 +94,8 @@ bool IOMapXML::loadMap(Map* map, std::string identifier){
 		pz = atoi(tmp);
     xmlFreeOTSERV(tmp);
 
-		tile = map->setTile(px, py, pz);
+		tile = new Tile(px, py, pz);
+		map->setTile(px, py, pz, tile);
 
 		tmp = (char*)xmlGetProp(tileNode, (const xmlChar *) "ground");
 		unsigned short ground = 0;

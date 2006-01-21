@@ -114,7 +114,7 @@ int Map::loadMap(std::string filename, std::string filekind)
 	//*/
 }
 
-Tile* Map::getTile(unsigned short _x, unsigned short _y, unsigned char _z)
+Tile* Map::getTile(uint16_t _x, uint16_t _y, uint8_t _z)
 {
 	if(_z < MAP_LAYER){
 		// _x & 0x7F  is like _x % 128
@@ -155,43 +155,6 @@ void Map::setTile(uint16_t _x, uint16_t _y, uint8_t _z, Tile* newtile)
 	}
 }
 
-void Map::setTile(unsigned short _x, unsigned short _y, unsigned char _z, unsigned short groundId)
-{
-  Tile* tile = getTile(_x, _y, _z);
-
-	if(tile != NULL){
-		if(tile->ground)
-			//delete tile->ground;
-			tile->ground->releaseThing2();
-
-		if(groundId != 0 && Item::items[groundId].isGroundTile()){
-			tile->ground = Item::CreateItem(groundId);
-			tile->ground->setParent(tile);
-		}
-		else{
-			tile = new Tile(_x, _y, _z);
-
-			if(groundId != 0 && Item::items[groundId].isGroundTile()){
-				tile->ground = Item::CreateItem(groundId);
-				tile->ground->setParent(tile);
-			}
-		}
-	}
-}
-
-Tile* Map::setTile(unsigned short _x, unsigned short _y, unsigned char _z)
-{
-	Tile *tile = getTile(_x, _y, _z);
-	
-	if(!tile){
-    	tile = new Tile(_x, _y,_z);
-		//tileMaps[_x & 0x1F][_y & 0x1F][_z][(_x << 16) | _y] = tile;
-		//tileMaps[_x & 0xFF][_y & 0xFF][ _x & 0xFF00) << 8 | (_y & 0xFF00) | _z] = tile;
-		tileMaps[_x & 0x7F][_y & 0x7F][ (_x & 0xFF80) << 16 | (_y & 0xFF80) << 1 | _z] = tile;
-  	} 
-  	return tile;
-}
-
 bool Map::placeCreature(const Position& pos, Creature* creature)
 {
 	Tile* tile = getTile(pos.x, pos.y, pos.z);
@@ -230,34 +193,6 @@ bool Map::placeCreature(const Position& pos, Creature* creature)
 #endif
 
 	return false;
-
-	/*
-	Tile* tile = getTile(pos.x, pos.y, pos.z);
-
-	bool success = (tile && !tile->getTeleportItem() && !tile->floorChange() && tile->__queryAdd(0, creature, 0) == RET_NOERROR);
-	if(!success){
-		for(int cx = pos.x - 1; cx <= pos.x + 1 && !success; cx++){
-			for(int cy = pos.y - 1; cy <= pos.y + 1 && !success; cy++){
-				tile = getTile(cx, cy, pos.z);
-				success = success = (tile && !tile->getTeleportItem() && !tile->floorChange() && tile->__queryAdd(0, creature, 0) == RET_NOERROR);
-				if(success){
-					break;
-				}
-			}
-		}
-	}
-
-	if(success){
-		tile->__internalAddThing(creature);
-		return true;
-	}
-
-#ifdef __DEBUG__
-	std::cout << "Failed to place creature onto map!" << std::endl;
-#endif
-
-	return false;
-	*/
 }
 
 bool Map::removeCreature(Creature* creature)
@@ -428,9 +363,11 @@ bool Map::canThrowObjectTo(const Position& fromPos, const Position& toPos)
 	return true;
 }
 
-bool Map::isPathValid(Creature* creature, const std::list<Position>& path, int pathSize,
-	bool ignoreMoveableBlockingItems /*= false)*/)
+bool Map::isPathValid(Creature* creature, const std::list<Position>& path, int pathSize /* = -1*/)
 {
+	if(pathSize == -1)
+		pathSize = path.size();
+
 	int pathCount = 0;
 	std::list<Position>::const_iterator iit;
 	for(iit = path.begin(); iit != path.end(); ++iit) {
@@ -443,20 +380,6 @@ bool Map::isPathValid(Creature* creature, const std::list<Position>& path, int p
 				if(ret != RET_NOERROR)
 					continue;
 			}
-
-			/*
-			if(!tile->creatures.empty() && creature->getTile() != tile)
-				continue;
-
-			if(ignoreMoveableBlockingItems){
-				if(tile->hasProperty(NOTMOVEABLEBLOCKSOLID) || tile->hasProperty(NOTMOVEABLEBLOCKPATHFIND))
-					continue;
-			}
-			else{
-				if(tile->hasProperty(BLOCKSOLID) || tile->hasProperty(BLOCKPATHFIND))
-					continue;
-			}
-			*/
 		}
 		else
 			return false;
@@ -468,8 +391,7 @@ bool Map::isPathValid(Creature* creature, const std::list<Position>& path, int p
 	return true;
 }
 
-std::list<Position> Map::getPathTo(Creature* creature, Position start, Position to,
-	bool creaturesBlock /*=true*/, bool ignoreMoveableBlockingItems /*= false*/, int maxNodSize /*= 100*/)
+std::list<Position> Map::getPathTo(Creature* creature, Position start, Position to, int maxNodeSize /*= 100*/)
 {
 	std::list<Position> path;
 	AStarNodes nodes;
@@ -481,7 +403,7 @@ std::list<Position> Map::getPathTo(Creature* creature, Position start, Position 
 	startNode->x = start.x;
 	startNode->y = start.y;
 	
-	while(!found && nodes.countClosedNodes() < maxNodSize){		
+	while(!found && nodes.countClosedNodes() < maxNodeSize){		
 		AStarNode* current = nodes.getBestNode();
 		if(!current)
 			return path; //no path
@@ -502,20 +424,6 @@ std::list<Position> Map::getPathTo(Creature* creature, Position start, Position 
 							if(ret != RET_NOERROR)
 								continue;
 						}
-
-						/*
-						if(!tile->creatures.empty() && creature->getTile() != tile)
-							continue;
-
-						if(ignoreMoveableBlockingItems){
-							if(tile->hasProperty(NOTMOVEABLEBLOCKSOLID) || tile->hasProperty(NOTMOVEABLEBLOCKPATHFIND))
-								continue;
-						}
-						else{
-							if(tile->hasProperty(BLOCKSOLID) || tile->hasProperty(BLOCKPATHFIND))
-								continue;
-						}
-						*/
 					}
 					else
 						continue;

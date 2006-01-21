@@ -211,9 +211,13 @@ public:
 	* Get a single tile.
 	* \returns A pointer to that tile.
 	*/
-	Tile* getTile(unsigned short _x, unsigned short _y, unsigned char _z);
+	Tile* getTile(uint16_t _x, uint16_t _y, uint8_t _z);
 	Tile* getTile(const Position &pos);
     
+	/**
+	* Set a single tile.
+	* \param a tile to set for the 
+	*/
 	void setTile(uint16_t _x, uint16_t _y, uint8_t _z, Tile* newtile);
 
 	/**
@@ -221,9 +225,9 @@ public:
 	* \param groundId Ground kind (ID)
 	* \returns Nothing =]
 	*/
-	void setTile(unsigned short _x, unsigned short _y, unsigned char _z, unsigned short groundId);
+	//void setTile(unsigned short _x, unsigned short _y, unsigned char _z, unsigned short groundId);
 
-	Tile* setTile(unsigned short _x, unsigned short _y, unsigned char _z);
+	//Tile* setTile(unsigned short _x, unsigned short _y, unsigned char _z);
 
 	/**
 	* Place a creature on the map
@@ -246,19 +250,16 @@ public:
 	*/
 	bool canThrowObjectTo(const Position& fromPos, const Position& toPos);
 
-	bool isPathValid(Creature *creature, const std::list<Position>& path, int pathSize,
-		bool ignoreMoveableBlockingItems = false);
+	bool isPathValid(Creature* creature, const std::list<Position>& path, int pathSize = -1);
 
 	/**
 	* Get the path to a specific position on the map.
 	* \param creature The creature that wants a route
 	* \param start The start position of the path
 	* \param to The destination position
-	* \param creaturesBlock Wether a Creature is an obstacle or not
-	* \returns A list of all positions you have to traverse to reacg the destination
+	* \returns A list of all positions you have to traverse to reach the destination
 	*/
-	std::list<Position> getPathTo(Creature* creature, Position start, Position to,
-		bool creaturesBlock = true, bool ignoreMoveableBlockingItems = false, int maxNodSize = 100);
+	std::list<Position> getPathTo(Creature* creature, Position start, Position to, int maxNodeSize = 100);
 
 	/* Map Width and Height - for Info purposes */
 	int mapwidth, mapheight;

@@ -160,6 +160,8 @@ bool IOMapOTBM::loadMap(Map* map, std::string identifier)
 		
 	std::cout << "Map description: " << map_description << std::endl;
 	
+	Tile* tile = NULL;
+
 	NODE tile_area = f.getChildNode(map_data, type);
 	while(tile_area != NO_NODE){
 		if(f.getError() != ERROR_NONE){
@@ -200,7 +202,10 @@ bool IOMapOTBM::loadMap(Map* map, std::string identifier)
 					px = base_x + tile_coord->_x;
 					py = base_y + tile_coord->_y;
 					pz = base_z;
-					Tile* tile = map->setTile(px, py, pz);
+
+					tile = new Tile(px, py, pz);
+					map->setTile(px, py, pz, tile);
+
 					if(tile){
 						//read tile attributes
 						unsigned char attribute;
