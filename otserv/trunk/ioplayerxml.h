@@ -43,9 +43,10 @@ public:
 	* \returns Wheter the player was successfully saved
 	* \param player the player to save
 	*/
-	bool savePlayer(Player* player);
+	virtual bool savePlayer(Player* player);
 
-	bool getGuidByName(unsigned long &guid, unsigned long &alvl, std::string &name);
+	virtual bool getGuidByName(unsigned long &guid, unsigned long &alvl, std::string &name);
+	virtual bool playerExists(std::string name);
 
 	IOPlayerXML();
 	virtual ~IOPlayerXML(){};

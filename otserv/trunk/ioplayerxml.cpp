@@ -20,6 +20,8 @@
 
 #include <sstream>
 
+#include <boost/filesystem/operations.hpp>
+
 #include "ioplayer.h"
 #include "ioplayerxml.h"
 #include "ioaccount.h"
@@ -30,7 +32,8 @@ xmlMutexPtr xmlmutex;
 
 extern LuaScript g_config;
 
-IOPlayerXML::IOPlayerXML(){
+IOPlayerXML::IOPlayerXML()
+{
 	if(xmlmutex == NULL){
 		xmlmutex = xmlNewMutex();
 	}
@@ -778,4 +781,13 @@ bool IOPlayerXML::getGuidByName(unsigned long &guid, unsigned long &alvl, std::s
 
 	xmlMutexUnlock(xmlmutex);	
 	return isSuccess;
+}
+
+bool IOPlayerXML::playerExists(std::string name)
+{
+	std::string datadir = g_config.getGlobalString("datadir");
+	std::string filename = datadir + "players/" + name + ".xml";
+	std::transform(filename.begin(), filename.end(), filename.begin(), tolower);
+
+	return boost::filesystem::exists(filename);
 }

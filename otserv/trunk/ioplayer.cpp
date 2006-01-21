@@ -33,7 +33,8 @@ extern LuaScript g_config;
 
 IOPlayer* IOPlayer::_instance = NULL;
 
-IOPlayer* IOPlayer::instance(){
+IOPlayer* IOPlayer::instance()
+{
 	if(!_instance){
 #ifdef __USE_MYSQL__
 		_instance = (IOPlayer*)new IOPlayerSQL;
@@ -47,11 +48,13 @@ IOPlayer* IOPlayer::instance(){
 	return _instance;
 }
 
-bool IOPlayer::loadPlayer(Player* player, std::string name){
+bool IOPlayer::loadPlayer(Player* player, std::string name)
+{
 	return false;
 }
 
-bool IOPlayer::savePlayer(Player* player){
+bool IOPlayer::savePlayer(Player* player)
+{
 	return false;
 }
 
@@ -61,6 +64,11 @@ bool IOPlayer::getGuidByName(unsigned long &guid, unsigned long &alvl, std::stri
 }
 
 bool IOPlayer::getNameByGuid(unsigned long guid, std::string &name)
+{
+	return false;
+}
+
+bool IOPlayer::playerExists(std::string name)
 {
 	return false;
 }

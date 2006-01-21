@@ -646,3 +646,18 @@ bool IOPlayerSQL::getGuidByName(unsigned long &guid, unsigned long &alvl, std::s
 	return true;
 }
 
+bool IOPlayerSQL::playerExists(std::string name)
+{
+	Database mysql;
+	DBQuery query;
+	DBResult result;
+	
+	mysql.connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str());	
+	
+	query << "SELECT name FROM players WHERE name='" << Database::escapeString(name) << "'";
+	
+	if(!mysql.storeQuery(query, result) || result.getNumRows() != 1)
+		return false;
+
+	return true;
+}

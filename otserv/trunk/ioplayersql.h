@@ -32,18 +32,19 @@ class IOPlayerSQL : protected IOPlayer{
 public:
 	/** Get a textual description of what source is used
 	* \returns Name of the source*/
-	char* getSourceDescription(){return "Player source: SQL";};
-	bool loadPlayer(Player* player, std::string name);
+	virtual char* getSourceDescription(){return "Player source: SQL";};
+	virtual bool loadPlayer(Player* player, std::string name);
 
 	/** Save a player
 	* \returns Wheter the player was successfully saved
 	* \param player the player to save
 	*/
-	bool savePlayer(Player* player);
+	virtual bool savePlayer(Player* player);
 	
-	bool getGuidByName(unsigned long &guid, unsigned long &alvl, std::string &name);
-	bool getNameByGuid(unsigned long guid, std::string &name);
-	
+	virtual bool getGuidByName(unsigned long &guid, unsigned long &alvl, std::string &name);
+	virtual bool getNameByGuid(unsigned long guid, std::string &name);
+	virtual bool playerExists(std::string name);
+
 	IOPlayerSQL();
 	~IOPlayerSQL(){};
 
