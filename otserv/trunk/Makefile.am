@@ -19,7 +19,7 @@ otserv_SOURCES = account.cpp container.cpp creature.cpp game.cpp ioaccount.cpp \
 	actions.h actions.cpp scheduler.cpp ioplayersql.cpp ioplayersql.h ioaccountsql.cpp ioaccountsql.h \
 	commands.cpp commands.h database.cpp database.h md5.cpp md5.h fileloader.cpp fileloader.h \
 	chat.cpp chat.h logger.h logger.cpp iomapotbm.h iomapotbm.cpp monsters.h monsters.cpp \
-	trashholder.cpp trashholder.h
+	trashholder.cpp trashholder.h mailbox.cpp mailbox.h
 else
 otserv_SOURCES = account.cpp container.cpp creature.cpp game.cpp ioaccount.cpp \
 	ioaccountxml.cpp iomapxml.cpp ioplayer.cpp ioplayerxml.cpp \
@@ -34,5 +34,5 @@ otserv_SOURCES = account.cpp container.cpp creature.cpp game.cpp ioaccount.cpp \
 	actions.h actions.cpp scheduler.cpp commands.cpp commands.h depot.cpp depot.h \
 	md5.cpp md5.h fileloader.cpp fileloader.h chat.cpp chat.h logger.cpp logger.h \
 	iomapotbm.h iomapotbm.cpp monsters.h monsters.cpp teleport.cpp teleport.h \
-	trashholder.cpp trashholder.h
+	trashholder.cpp trashholder.h mailbox.cpp mailbox.h
 endif
