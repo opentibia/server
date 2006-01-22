@@ -23,7 +23,7 @@
 #define __OTSERV_TOOLS_H
 
 
-bool fileExists(char* filename);
+bool fileExists(const char* filename);
 int random_range(int lowest_number, int highest_number);
 void hexdump(unsigned char *_data, int _len);
 char upchar(char c);
