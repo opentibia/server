@@ -54,8 +54,10 @@ const int Player::HPGain[5] = {5, 5, 5, 10, 15};
 Player::Player(const std::string& name, Protocol *p) :
 Creature()
 {	
-	client     = p;
+	if(p){
+    client     = p;
 	client->setPlayer(this);
+    }
 	looktype   = PLAYER_MALE_1;
 	vocation   = VOCATION_NONE;
 	capacity = 300.00;
