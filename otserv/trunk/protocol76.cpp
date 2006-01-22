@@ -1689,7 +1689,7 @@ void Protocol76::AddCreature(NetworkMessage &msg,const Creature *creature, bool 
 	}
 	else{
 		msg.AddU16(0x61);
-		msg.AddU32(remove); //AddU32(0);
+		msg.AddU32(remove);
 		msg.AddU32(creature->getID());
 		msg.AddString(creature->getName());
 	}
@@ -1778,7 +1778,7 @@ void Protocol76::AddCreatureHealth(NetworkMessage &msg,const Creature *creature)
 {
 	msg.AddByte(0x8C);
 	msg.AddU32(creature->getID());
-	msg.AddByte(std::max(creature->health,0)*100/creature->healthmax);
+	msg.AddByte(std::max(1, creature->health*100/std::max(creature->healthmax,1)));
 }
 
 void Protocol76::AddWorldLight(NetworkMessage &msg, const LightInfo& lightInfo)
