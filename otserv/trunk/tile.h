@@ -47,23 +47,24 @@ enum tileflags_t{
 class Tile : public Cylinder
 {
 public:
-  Tile(int x, int y, int z)
-  {
+	static Tile null_tile;
+	Tile(int x, int y, int z)
+	{
 		tilePos.x = x;
 		tilePos.y = y;
 		tilePos.z = z;
 
-    flags = 0;
+		flags = 0;
 		ground = NULL;
-  }
+	}
 
 	virtual int getThrowRange() const {return 0;};
 	virtual bool isPushable() const {return false;};
 
-  Item*          ground;
-  ItemVector     topItems;
-  CreatureVector creatures;
-  ItemVector     downItems;
+	Item*          ground;
+	ItemVector     topItems;
+	CreatureVector creatures;
+	ItemVector     downItems;
 
 	MagicEffectItem* getFieldItem() const;
 	Teleport* getTeleportItem() const;
@@ -74,7 +75,7 @@ public:
 	Item* getTopTopItem();
 	Item* getTopDownItem();
 	Item* getMoveableBlockingItem();
-  Thing* getTopThing();
+	Thing* getTopThing();
 	
 	int getThingCount() const;
 
@@ -82,15 +83,15 @@ public:
 
 	bool hasFlag(tileflags_t flag) const;
 	void setFlag(tileflags_t flag);
-  bool isPz() const;
-  void setPz();
+	bool isPz() const;
+	void setPz();
   
-  bool floorChange() const;
-  bool floorChangeDown() const;
-  bool floorChange(Direction direction) const;
+	bool floorChange() const;
+	bool floorChangeDown() const;
+	bool floorChange(Direction direction) const;
 	uint32_t getHeight() const;
   
-  virtual std::string getDescription(int32_t lookDistance) const;
+	virtual std::string getDescription(int32_t lookDistance) const;
 
 	void moveCreature(Creature* creature, Cylinder* toCylinder, bool teleport = false);
 

@@ -394,12 +394,12 @@ Game::~Game()
 	}
 }
 
-void Game::setWorldType(enum_world_type type)
+void Game::setWorldType(world_type_t type)
 {
 	this->worldType = type;
 }
 
-enum_game_state Game::getGameState()
+game_state_t Game::getGameState()
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::getGameState()");
 	return game_state;
@@ -966,9 +966,10 @@ void Game::moveCreature(Player* player, Cylinder* fromCylinder, Cylinder* toCyli
 	else if(player->getPosition().z != fromCylinder->getPosition().z){
 		ret = RET_NOTPOSSIBLE;
 	}
-	else if((std::abs(player->getPosition().x - moveCreature->getPosition().x) > 1) ||
-		(std::abs(player->getPosition().y - moveCreature->getPosition().y) > 1)){
-		ret = RET_TOFARAWAY;
+	else if(!Position::areInRange<1,1,0>(moveCreature->getPosition(), player->getPosition())){
+		//(std::abs(player->getPosition().x - moveCreature->getPosition().x) > 1) ||
+		//(std::abs(player->getPosition().y - moveCreature->getPosition().y) > 1))
+		ret = RET_TOOFARAWAY;
 	}
 	else{
 		const Position& fromPos = fromCylinder->getPosition();
@@ -1145,8 +1146,10 @@ void Game::moveItem(Player* player, Cylinder* fromCylinder, Cylinder* toCylinder
 	else if(player->getPosition().z < fromPos.z){
 		ret = RET_FIRSTGODOWNSTAIRS;
 	}
-	else if((std::abs(player->getPosition().x - fromPos.x) > 1) || (std::abs(player->getPosition().y - fromPos.y) > 1)) {
-		ret = RET_TOFARAWAY;
+	else if(!Position::areInRange<1,1,0>(player->getPosition(), fromPos)){
+		//(std::abs(player->getPosition().x - fromPos.x) > 1) || 
+		//(std::abs(player->getPosition().y - fromPos.y) > 1))
+		ret = RET_TOOFARAWAY;
 	}
 	//check throw distance
 	else if((std::abs(player->getPosition().x - toPos.x) > item->getThrowRange()) ||
@@ -1586,8 +1589,8 @@ void Game::playerSendErrorMessage(Player* player, ReturnValue message)
 			player->sendCancel("You may only use one weapon.");
 			break;
 
-		case RET_TOFARAWAY:
-			player->sendCancel("To far away.");
+		case RET_TOOFARAWAY:
+			player->sendCancel("Too far away.");
 			break;
 
 		case RET_FIRSTGODOWNSTAIRS:
@@ -2028,25 +2031,27 @@ void Game::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fi
 
 	switch(damagetype){
 		case FIGHT_MELEE:
-			if((std::abs(creature->getPosition().x - attackedCreature->getPosition().x) <= 1) &&
-				(std::abs(creature->getPosition().y - attackedCreature->getPosition().y) <= 1) &&
-				(creature->getPosition().z == attackedCreature->getPosition().z))
+			if(Position::areInRange<1,1,0>(creature->getPosition(), attackedCreature->getPosition())){
+				//(std::abs(creature->getPosition().x - attackedCreature->getPosition().x) <= 1) &&
+				//(std::abs(creature->getPosition().y - attackedCreature->getPosition().y) <= 1) &&
+				//(creature->getPosition().z == attackedCreature->getPosition().z))
 					inReach = true;
+			}
 		break;
 		case FIGHT_DIST:
-			if((std::abs(creature->getPosition().x - attackedCreature->getPosition().x) <= 8) &&
-				(std::abs(creature->getPosition().y - attackedCreature->getPosition().y) <= 5) &&
-				(creature->getPosition().z == attackedCreature->getPosition().z)) {
-
+			if(Position::areInRange<8,5,0>(creature->getPosition(), attackedCreature->getPosition())){
+				//(std::abs(creature->getPosition().x - attackedCreature->getPosition().x) <= 8) &&
+				//(std::abs(creature->getPosition().y - attackedCreature->getPosition().y) <= 5) &&
+				//(creature->getPosition().z == attackedCreature->getPosition().z))
 					if(map->canThrowObjectTo(creature->getPosition(), attackedCreature->getPosition()))
 						inReach = true;
 				}
 		break;
 		case FIGHT_MAGICDIST:
-			if((std::abs(creature->getPosition().x-attackedCreature->getPosition().x) <= 8) &&
-				(std::abs(creature->getPosition().y - attackedCreature->getPosition().y) <= 5) &&
-				(creature->getPosition().z == attackedCreature->getPosition().z)) {
-
+			if(Position::areInRange<8,5,0>(creature->getPosition(), attackedCreature->getPosition())){
+				//(std::abs(creature->getPosition().x-attackedCreature->getPosition().x) <= 8) &&
+				//(std::abs(creature->getPosition().y - attackedCreature->getPosition().y) <= 5) &&
+				//(creature->getPosition().z == attackedCreature->getPosition().z))
 					if(map->canThrowObjectTo(creature->getPosition(), attackedCreature->getPosition()))
 						inReach = true;
 				}	
@@ -2063,9 +2068,9 @@ void Game::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fi
 	}
 
 	if(attackedPlayer && attackedPlayer->access ==0){
-	 attackedPlayer->inFightTicks = (long)g_config.getGlobalNumber("pzlocked", 0);
-	 attackedPlayer->sendIcons();
-  }
+		attackedPlayer->inFightTicks = (long)g_config.getGlobalNumber("pzlocked", 0);
+		attackedPlayer->sendIcons();
+	}
 	
 	if(!inReach){
 		return;
@@ -2301,11 +2306,14 @@ bool Game::playerWhisper(Player* player, const std::string& text)
 	
 	//event method
 	for(it = list.begin(); it != list.end(); ++it) {
-		if(std::abs(player->getPosition().x - (*it)->getPosition().x) > 1 ||
-			std::abs(player->getPosition().y - (*it)->getPosition().y) > 1)
+		if(!Position::areInRange<1,1,0>(player->getPosition(), (*it)->getPosition())){
+			//std::abs(player->getPosition().x - (*it)->getPosition().x) > 1 ||
+			//std::abs(player->getPosition().y - (*it)->getPosition().y) > 1)
 			(*it)->onCreatureSay(player, SPEAK_WHISPER, std::string("pspsps"));
-		else
+		}
+		else{
 			(*it)->onCreatureSay(player, SPEAK_WHISPER, text);
+		}
 	}
 
 	return true;
@@ -2424,10 +2432,11 @@ bool Game::playerUseItemEx(Player* player, const Position& fromPos, uint8_t from
 		//Runes
 		std::map<unsigned short, Spell*>::iterator sit = spells.getAllRuneSpells()->find(item->getID());
 		if(sit != spells.getAllRuneSpells()->end()){
-			if((std::abs(item->getPosition().x - player->getPosition().x) > 1) ||
-				 (std::abs(item->getPosition().y - player->getPosition().y) > 1) ||
-				 (item->getPosition().z != player->getPosition().z)){
-				playerSendErrorMessage(player, RET_TOFARAWAY);
+			if(!Position::areInRange<1,1,0>(item->getPosition(), player->getPosition())){
+				//(std::abs(item->getPosition().x - player->getPosition().x) > 1) ||
+				//(std::abs(item->getPosition().y - player->getPosition().y) > 1) ||
+				//(item->getPosition().z != player->getPosition().z))
+				playerSendErrorMessage(player, RET_TOOFARAWAY);
 				return false;
 			}
 
@@ -2474,18 +2483,21 @@ bool Game::playerUseBattleWindow(Player* player, const Position& fromPos, uint8_
 	if(!creature || dynamic_cast<Player*>(creature))
 		return false;
 
-	if(std::abs(creature->getPosition().x - player->getPosition().x) > 7 ||
-		std::abs(creature->getPosition().y - player->getPosition().y) > 5 ||
-		creature->getPosition().z != player->getPosition().z)
+	if(!Position::areInRange<7,5,0>(creature->getPosition(), player->getPosition())){
+		//std::abs(creature->getPosition().x - player->getPosition().x) > 7 ||
+		//std::abs(creature->getPosition().y - player->getPosition().y) > 5 ||
+		//creature->getPosition().z != player->getPosition().z)
 		return false;
+	}
 
 	Item* item = dynamic_cast<Item*>(internalGetThing(player, fromPos, STACKPOS_USE /*fromStackPos*/));
 
 	if(item){
-		if((std::abs(item->getPosition().x - player->getPosition().x) > 1) ||
-			(std::abs(item->getPosition().y - player->getPosition().y) > 1) ||
-			item->getPosition().z != player->getPosition().z){
-			playerSendErrorMessage(player, RET_TOFARAWAY);
+		if(!Position::areInRange<1,1,0>(item->getPosition(), player->getPosition())){
+			//(std::abs(item->getPosition().x - player->getPosition().x) > 1) ||
+			//(std::abs(item->getPosition().y - player->getPosition().y) > 1) ||
+			//item->getPosition().z != player->getPosition().z)
+			playerSendErrorMessage(player, RET_TOOFARAWAY);
 			return false;
 		}
 
@@ -2528,10 +2540,11 @@ bool Game::playerRotateItem(Player* player, const Position& pos, uint8_t stackpo
 		return false;
 	}
 	
-	if((std::abs(player->getPosition().x - item->getPosition().x) > 1) ||
-		 (std::abs(player->getPosition().y - item->getPosition().y) > 1) ||
-		 (player->getPosition().z != item->getPosition().z)){
-		playerSendErrorMessage(player, RET_TOFARAWAY);
+	if(!Position::areInRange<1,1,0>(item->getPosition(), player->getPosition())){
+		//(std::abs(player->getPosition().x - item->getPosition().x) > 1) ||
+		//(std::abs(player->getPosition().y - item->getPosition().y) > 1) ||
+		//(player->getPosition().z != item->getPosition().z))
+		playerSendErrorMessage(player, RET_TOOFARAWAY);
 		return false;
 	}
 
@@ -2540,6 +2553,38 @@ bool Game::playerRotateItem(Player* player, const Position& pos, uint8_t stackpo
 		transformItem(item, newtype);
 	}
 
+	return true;
+}
+
+bool Game::playerWriteItem(Player* player, Item* item, const std::string& text)
+{
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerWriteItem()");
+	
+	if(player->isRemoved())
+		return false;
+	
+	Cylinder* item_parent = item->getTopParent();
+	if(!item_parent){
+		playerSendErrorMessage(player, RET_NOTPOSSIBLE);
+		return false;
+	}
+	Player* owner = dynamic_cast<Player*>(item_parent);
+	if(owner && owner != player){
+		playerSendErrorMessage(player, RET_NOTPOSSIBLE);
+		return false;
+	}	
+	if(!Position::areInRange<1,1,0>(item->getPosition(), player->getPosition())){
+		playerSendErrorMessage(player, RET_NOTPOSSIBLE);
+		return false;
+	}
+	item->setText(text);
+	/*TODO: transform item
+	uint16_t newtype = Item::items[item->getID()].???;
+	if(newtype != 0){
+		transformItem(item, newtype);
+	}
+	*/
+	//TODO: set last written by
 	return true;
 }
 
@@ -2556,9 +2601,10 @@ bool Game::playerRequestTrade(Player* player, const Position& pos, uint8_t stack
 		return false;
 	}
 
-	if(std::abs(tradePartner->getPosition().x - player->getPosition().x) > 2 ||
-		std::abs(tradePartner->getPosition().y - player->getPosition().y) > 2 ||
-		tradePartner->getPosition().z != player->getPosition().z){
+	if(!Position::areInRange<2,2,0>(tradePartner->getPosition(), player->getPosition())){
+		//std::abs(tradePartner->getPosition().x - player->getPosition().x) > 2 ||
+		//std::abs(tradePartner->getPosition().y - player->getPosition().y) > 2 ||
+		//tradePartner->getPosition().z != player->getPosition().z)
 		std::stringstream ss;
 		ss << tradePartner->getName() << " tells you to move closer.";
 		player->sendTextMessage(MSG_INFO, ss.str().c_str());

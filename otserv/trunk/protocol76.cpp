@@ -970,17 +970,7 @@ void Protocol76::parseTextWindow(NetworkMessage& msg)
 	unsigned long id = msg.GetU32();
 	std::string new_text = msg.GetString();
 	if(readItem && windowTextID == id){	
-		sendTextMessage(MSG_SMALLINFO, "Write not working yet.");
-		//move to Game, and use gameLock
-		/*//TODO: check that the item is in
-		//an accesible place for the player
-		unsigned short itemid = readItem->getID();
-		readItem->setText(new_text);
-		if(readItem->getID() != id){
-		//TODO:update the item in the clients. 
-		//Can be done when find a method to get 
-		// items position its pointer.
-	}*/
+		game->playerWriteItem(player, readItem, new_text);
 		readItem->releaseThing2();
 		readItem = NULL;
 	}
@@ -1604,7 +1594,6 @@ void Protocol76::sendTextWindow(Item* item,const unsigned short maxlen, const bo
 	msg.AddByte(0x96);
 	windowTextID++;
 	msg.AddU32(windowTextID);
-	//msg.AddU16(item->getID());
 	msg.AddItemId(item);
 	if(canWrite){
 		msg.AddU16(maxlen);		

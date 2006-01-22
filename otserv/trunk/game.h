@@ -104,19 +104,19 @@ protected:
 	std::list<Creature*> removedList;
 };
 
-enum enum_world_type{
+enum world_type_t{
 	WORLD_TYPE_NO_PVP,
 	WORLD_TYPE_PVP,
 	WORLD_TYPE_PVP_ENFORCED
 };
 
-enum enum_game_state{
+enum game_state_t{
 	GAME_STATE_NORMAL,
 	GAME_STATE_CLOSED,
 	GAME_STATE_SHUTDOWN
 };
 
-enum eLightState{
+enum lightState_t{
 	LIGHT_STATE_DAY,
 	LIGHT_STATE_NIGHT,
 	LIGHT_STATE_SUNSET,
@@ -152,8 +152,8 @@ public:
 		return;
 	}
   
-	void setWorldType(enum_world_type type);
-	enum_world_type getWorldType() const {return worldType;}
+	void setWorldType(world_type_t type);
+	world_type_t getWorldType() const {return worldType;}
 	const std::string& getSpawnFile() {return map->spawnfile;}
 
 	Cylinder* internalGetCylinder(Player* player, const Position& pos);
@@ -299,6 +299,7 @@ public:
 	bool playerUseBattleWindow(Player* player, const Position& fromPos, uint8_t fromStackPos,
 		uint32_t creatureId, uint16_t itemId);
 	bool playerRotateItem(Player* player, const Position& pos, uint8_t stackpos, const uint16_t itemId);
+	bool playerWriteItem(Player* player, Item* item, const std::string& text);
 
 	bool playerRequestTrade(Player* player, const Position& pos, uint8_t stackpos,
 		uint32_t playerId, uint16_t itemId);
@@ -323,8 +324,8 @@ public:
 	void changeLight(const Creature* creature);
 	void AddMagicEffectAt(const Position& pos, uint8_t type);
 	
-	enum_game_state getGameState();
-	void setGameState(enum_game_state newstate){game_state = newstate;}
+	game_state_t getGameState();
+	void setGameState(game_state_t newstate){game_state = newstate;}
 
 	/** Lockvar for Game. */
 	OTSYS_THREAD_LOCKVAR gameLock;   
@@ -386,7 +387,7 @@ protected:
 	static const int SUNSET = 1305;
 	static const int SUNRISE = 430;
 	int lightlevel;
-	eLightState light_state;
+	lightState_t light_state;
 	int light_hour;
 	int light_hour_delta;
 	
@@ -395,7 +396,7 @@ protected:
 	unsigned long eventIdCount;
 
 	uint32_t max_players;
-	enum_world_type worldType;
+	world_type_t worldType;
 
 	Map* map;
 	
@@ -403,7 +404,7 @@ protected:
 	void addCommandTag(std::string tag);
 	void resetCommandTag();
 	
-	enum_game_state game_state;
+	game_state_t game_state;
 
 	friend class Commands;
 	friend class Monster;

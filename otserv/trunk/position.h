@@ -1,3 +1,23 @@
+//////////////////////////////////////////////////////////////////////
+// OpenTibia - an opensource roleplaying game
+//////////////////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////////////////////////
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software Foundation,
+// Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+//////////////////////////////////////////////////////////////////////
+
 #ifndef __OTSERV_POS_H
 #define __OTSERV_POS_H
 //////////////////////////////////////////////////
@@ -19,13 +39,23 @@ enum Direction {
 	NORTHEAST = 7,
 };
 
-class Position {
+class Position{
 public:
 
-  // for now we just initialise the position to a startpoint
-  //Position() : x(247), y(218), z(7) { };
-  Position() : x(31), y(31), z(7) { };
+	// for now we just initialise the position to a startpoint
+	//Position() : x(247), y(218), z(7) { };
+  	Position() : x(31), y(31), z(7) { };
 	~Position() {};
+
+	template<int deltax, int deltay, int deltaz>
+	inline static bool areInRange(const Position& p1, const Position& p2){
+		if(std::abs(p1.x - p2.x) > deltax ||
+			std::abs(p1.y - p2.y) > deltay ||
+			std::abs(p1.z - p2.z) > deltaz){
+			return false;
+		}
+		return true;
+	}
 
 	Position(int _x, int _y, int _z)
 	: x(_x), y(_y), z(_z) {};

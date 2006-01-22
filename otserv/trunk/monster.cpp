@@ -654,8 +654,9 @@ bool Monster::getRandomPosition(const Position &target, Position &dest)
 
 bool Monster::isInRange(const Position &p)
 {
-	return ((std::abs(p.x - getPosition().x) <= 9) && (std::abs(p.y - getPosition().y) <= 7) &&
-		(p.z == getPosition().z));
+	return Position::areInRange<9,7,0>(p, getPosition());
+	//((std::abs(p.x - getPosition().x) <= 9) && (std::abs(p.y - getPosition().y) <= 7) &&
+	//	(p.z == getPosition().z));
 }
 
 void Monster::onAddTileItem(const Position& pos, const Item* item)

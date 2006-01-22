@@ -98,7 +98,16 @@ const Tile* Thing::getTile() const
 
 const Position& Thing::getPosition() const
 {
-	return getTile()->getTilePosition();
+	const Tile* tile = getTile();
+	if(tile){
+		return tile->getTilePosition();
+	}
+	else{
+		#ifdef __DEBUG__MOVESYS__
+		std::cout << "Failure: [Thing::getPosition],  NULL tile" << std::endl;
+		#endif
+		return Tile::null_tile.getTilePosition();
+	}
 }
 
 bool Thing::isRemoved() const

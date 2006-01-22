@@ -1462,8 +1462,10 @@ void Player::onCreatureMove(const Creature* creature, const Position& oldPos, ui
 {
 	Creature* targetCreature = getAttackedCreature();
 	if((creature == this && targetCreature) || targetCreature == creature){
-		if((std::abs(getPosition().x - targetCreature->getPosition().x) > 7) ||
-		(std::abs(getPosition().y - targetCreature->getPosition().y) > 5) || (getPosition().z != targetCreature->getPosition().z)){
+		if(!Position::areInRange<7,5,0>(targetCreature->getPosition(), getPosition())){
+			//(std::abs(getPosition().x - targetCreature->getPosition().x) > 7) ||
+			//(std::abs(getPosition().y - targetCreature->getPosition().y) > 5) || 
+			//(getPosition().z != targetCreature->getPosition().z))
 			setAttackedCreature(NULL);
 			sendTextMessage(MSG_SMALLINFO, "Target lost.");
 			sendCancelAttacking();
@@ -1472,17 +1474,19 @@ void Player::onCreatureMove(const Creature* creature, const Position& oldPos, ui
 
 	if(creature == this){
 		if(tradeItem){
-			if((std::abs(getPosition().x - tradeItem->getPosition().x) > 1) ||
-				(std::abs(getPosition().y - tradeItem->getPosition().y) > 1) ||
-				(getPosition().z != tradeItem->getPosition().z)){
+			if(!Position::areInRange<1,1,0>(tradeItem->getPosition(), getPosition())){
+				//(std::abs(getPosition().x - tradeItem->getPosition().x) > 1) ||
+				//(std::abs(getPosition().y - tradeItem->getPosition().y) > 1) ||
+				//(getPosition().z != tradeItem->getPosition().z))
 					g_game.playerCloseTrade(this);
 			}
 		}
 
 		if(tradePartner){
-			if((std::abs(tradePartner->getPosition().x - getPosition().x) > 2) ||
-			(std::abs(tradePartner->getPosition().y - getPosition().y) > 2) ||
-			(tradePartner->getPosition().z != getPosition().z)){
+			if(!Position::areInRange<2,2,0>(tradePartner->getPosition(), getPosition())){
+				//(std::abs(tradePartner->getPosition().x - getPosition().x) > 2) ||
+				//(std::abs(tradePartner->getPosition().y - getPosition().y) > 2) ||
+				//(tradePartner->getPosition().z != getPosition().z))
 				g_game.playerCloseTrade(this);
 			}
 		}
@@ -2395,9 +2399,10 @@ void Player::postAddNotification(Thing* thing, bool hasOwnership /*= true*/)
 			//check containers
 			std::vector<Container*> containers;
 			for(ContainerVector::iterator it = containerVec.begin(); it != containerVec.end(); ++it){
-				if((std::abs(it->second->getPosition().x - getPosition().x) > 1) ||
-					(std::abs(it->second->getPosition().y - getPosition().y) > 1) ||
-					(std::abs(it->second->getPosition().z != getPosition().z))){
+				if(!Position::areInRange<1,1,0>(it->second->getPosition(), getPosition())){
+					//(std::abs(it->second->getPosition().x - getPosition().x) > 1) ||
+					//(std::abs(it->second->getPosition().y - getPosition().y) > 1) ||
+					//(std::abs(it->second->getPosition().z != getPosition().z)))
 						containers.push_back(it->second);
 					}
 			}
@@ -2421,12 +2426,15 @@ void Player::postRemoveNotification(Thing* thing, bool hadOwnership /*= true*/)
 		if(const Container* container = item->getContainer()){
 			if(!container->isRemoved() &&
 				(container->getTopParent() == this || (dynamic_cast<const Container*>(container->getTopParent()))) &&
-				(std::abs(container->getPosition().x - getPosition().x) <= 1) &&
-				(std::abs(container->getPosition().y - getPosition().y) <= 1) &&
-				(std::abs(container->getPosition().z == getPosition().z)))
+				Position::areInRange<1,1,0>(getPosition(), container->getPosition())){
+				//(std::abs(container->getPosition().x - getPosition().x) <= 1) &&
+				//(std::abs(container->getPosition().y - getPosition().y) <= 1) &&
+				//(std::abs(container->getPosition().z == getPosition().z)))
 				onSendContainer(container);
-			else
+			}
+			else{
 				autoCloseContainers(container);
+			}
 		}
 	}
 }

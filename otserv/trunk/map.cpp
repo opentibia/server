@@ -260,7 +260,7 @@ bool Map::canThrowObjectTo(const Position& fromPos, const Position& toPos)
 	if((start.z >= 8 && end.z < 8) || (end.z >= 8 && start.z < 8))
 		return false;
 	
-	if(start.z - end.z > 3)
+	if(start.z - end.z > 2)
 		return false;
 	
 	int deltax, deltay, deltaz;
