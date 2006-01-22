@@ -60,10 +60,8 @@ public:
 	virtual void __internalAddThing(Thing* thing);
 	virtual void __internalAddThing(uint32_t index, Thing* thing);
 	
-	void getReciver(Item* item, std::string& name, uint32_t& dpnum);
-    void sendItem(Item* item);
-private:
-	MagicEffectClasses effect;
+	bool getReciver(Item* item, std::string& name, uint32_t& dpnum);
+	bool sendItem(Item* item);
 };
 
 #endif
