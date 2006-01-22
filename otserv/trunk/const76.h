@@ -216,6 +216,13 @@ enum item_t {
 	ITEM_LOCKER3          = 2591,
 	ITEM_LOCKER4          = 2592,
 	ITEM_DUSTBIN          = 1777,
+	
+	ITEM_PARCEL           = 2595,
+	ITEM_PARCEL_STAMPED   = 2596,
+	ITEM_LETTER           = 2597,
+	ITEM_LETTER_STAMPED   = 2598,
+	ITEM_LABEL            = 2599,
+	ITEM_MAILBOX          = 2334,
 };
 
 
