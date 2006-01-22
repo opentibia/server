@@ -77,7 +77,7 @@ void Mailbox::__addThing(Thing* thing)
 void Mailbox::__addThing(int32_t index, Thing* thing)
 {
 	if(Item* item = thing->getItem()){
-		if(item != this && (item->getID() == ITEM_PARCEL || item->getID() == ITEM_LETTER)){
+		if(item->getID() == ITEM_PARCEL || item->getID() == ITEM_LETTER){
 			sendItem(item);
 		}
 	}
@@ -140,30 +140,30 @@ bool Mailbox::sendItem(Item* item)
 	}
      
 	if(Player* player = g_game.getPlayerByName(reciever)){ 
-			Depot* depot = player->getDepot(dp);
-                
-			if(depot){
-					item->setID(item->getID() + 1); /**Change it to stamped!**/
-					g_game.internalMoveItem(item->getParent(), depot, -1, item, item->getItemCount());
-					
-					return true;
-			}
-     }
+		Depot* depot = player->getDepot(dp);
+              
+		if(depot){
+			item->setID(item->getID() + 1); /**Change it to stamped!**/
+			g_game.internalMoveItem(item->getParent(), depot, -1, item, item->getItemCount());
+				
+			return true;
+		}
+	}
 	else if(IOPlayer::instance()->playerExists(reciever)){
-			Player* player = new Player(reciever, NULL);
-			IOPlayer::instance()->loadPlayer(player, reciever);
-			Depot* depot = player->getDepot(dp);
-			if(depot){
-				item->setID(item->getID() + 1);
-				g_game.internalMoveItem(item->getParent(), depot, -1, item, item->getItemCount());
-				IOPlayer::instance()->savePlayer(player); 
-				
-				delete player;
-				
-				return true;
-			}
-                                                          
-			delete player;  
+		Player* player = new Player(reciever, NULL);
+		IOPlayer::instance()->loadPlayer(player, reciever);
+		Depot* depot = player->getDepot(dp);
+		if(depot){
+			item->setID(item->getID() + 1);
+			g_game.internalMoveItem(item->getParent(), depot, -1, item, item->getItemCount());
+			IOPlayer::instance()->savePlayer(player); 
+			
+			delete player;
+			
+			return true;
+		}
+
+		delete player;  
 	}
 	
 	return false;
