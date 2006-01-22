@@ -37,6 +37,7 @@ class Container;
 class Depot;
 class Teleport;
 class TrashHolder;
+class Mailbox;
 
 enum ITEMPROPERTY{
  BLOCKSOLID,
@@ -79,6 +80,9 @@ public:
 	virtual TrashHolder* getTrashHolder() {return NULL;};
 	virtual const TrashHolder* getTrashHolder() const {return NULL;};
 
+	virtual Mailbox* getMailbox() {return NULL;};
+	virtual const Mailbox* getMailbox() const {return NULL;};
+	
 	//Factory member to create item of right type based on type
 	static Item* CreateItem(const unsigned short _type, unsigned short _count = 1);
 	static Items items;

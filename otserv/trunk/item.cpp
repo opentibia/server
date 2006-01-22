@@ -26,6 +26,7 @@
 #include "depot.h"
 #include "teleport.h"
 #include "trashholder.h"
+#include "mailbox.h"
 
 #include "actions.h"
 #include "magic.h"
@@ -51,8 +52,11 @@ Item* Item::CreateItem(const unsigned short _type, unsigned short _count /*= 1*/
 		newItem = new Item(_type, _count);
 	}	
 	else if(_type == ITEM_DUSTBIN){
-		newItem = new TrashHolder(_type, NM_ME_MAGIC_BLOOD);
+		newItem = new TrashHolder(_type/*, NM_ME_MAGIC_BLOOD*/);
 	}
+	else if(_type == ITEM_MAILBOX){
+        newItem = new Mailbox(_type);
+    }
 	else{
 		newItem = new Item(_type, _count);
 	}

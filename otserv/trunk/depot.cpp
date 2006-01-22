@@ -61,3 +61,17 @@ ReturnValue Depot::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 
 	return Container::__queryAdd(index, thing, count, childIsOwner);
 }
+
+void Depot::postAddNotification(Thing* thing, bool hasOwnership /*= true*/)
+{
+	if(getParent() != NULL){
+	getParent()->postAddNotification(thing, hasOwnership);
+	}
+}
+
+void Depot::postRemoveNotification(Thing* thing, bool hadOwnership /*= true*/)
+{
+	if(getParent() != NULL){
+	getParent()->postRemoveNotification(thing, hadOwnership);
+	}
+}

@@ -1416,9 +1416,11 @@ void Protocol76::sendAddCreature(const Creature* creature, bool isLogin)
 
 			//player light level
 			AddCreatureLight(msg, creature);
-
-			AddTextMessage(msg,MSG_EVENT, g_config.getGlobalString("loginmsg", "Welcome.").c_str());
-			std::string tempstring;
+			
+			std::string tempstring = g_config.getGlobalString("loginmsg", "Welcome.").c_str();
+			if(tempstring.size() > 0)
+			AddTextMessage(msg,MSG_EVENT, tempstring.c_str());
+			
 			tempstring = "Your last visit was on ";
 			time_t lastlogin = player->getLastLoginSaved();
 			tempstring += ctime(&lastlogin);

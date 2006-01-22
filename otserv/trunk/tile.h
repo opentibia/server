@@ -34,6 +34,7 @@
 class Creature;
 class Teleport;
 class TrashHolder;
+class Mailbox;
 
 typedef std::vector<Item*> ItemVector;
 typedef std::vector<Creature*> CreatureVector;
@@ -69,7 +70,8 @@ public:
 	MagicEffectItem* getFieldItem() const;
 	Teleport* getTeleportItem() const;
 	TrashHolder* getTrashHolder() const;
-
+	Mailbox* getMailbox() const;
+    
 	Thing* getTopMoveableThing();
 	Creature* getTopCreature();
 	Item* getTopTopItem();

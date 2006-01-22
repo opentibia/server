@@ -31,6 +31,7 @@
 #include "creature.h"
 #include "teleport.h"
 #include "trashholder.h"
+#include "mailbox.h"
 
 extern Game g_game;
 
@@ -220,6 +221,19 @@ TrashHolder* Tile::getTrashHolder() const
 		iiItem = __getThing(i)->getItem();
 		if(iiItem && (trashholder = iiItem->getTrashHolder()))
 			return trashholder;
+	}
+
+	return NULL;
+}
+
+Mailbox* Tile::getMailbox() const
+{
+	Mailbox* mailbox = NULL;
+	Item* iiItem = NULL;
+	for(uint32_t i = 0; i < getThingCount(); ++i){
+		iiItem = __getThing(i)->getItem();
+		if(iiItem && (mailbox = iiItem->getMailbox()))
+			return mailbox;
 	}
 
 	return NULL;
@@ -1066,6 +1080,9 @@ void Tile::postAddNotification(Thing* thing, bool hasOwnership /*= true*/)
 		//TODO: query script interface
 		trashHolder->__addThing(thing);
 	}
+	else if(Mailbox* mailbox = getMailbox()){
+		mailbox->__addThing(thing);
+    }
 }
 
 void Tile::postRemoveNotification(Thing* thing, bool hadOwnership /*= true*/)

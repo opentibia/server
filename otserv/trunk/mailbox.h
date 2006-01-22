@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-//
+// 
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -17,31 +17,53 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
-#ifndef __DEPOT_H__
-#define __DEPOT_H__
 
-#include "container.h"
+#ifndef __Mailbox_H__
+#define __Mailbox_H__
 
-class Depot : public Container{
+#include "item.h"
+#include "cylinder.h"
+#include "const76.h"
+
+
+class Mailbox : public Item, public Cylinder
+{
 public:
-	Depot(uint16_t _type);
-	~Depot();
+	Mailbox(uint16_t _type);
+	~Mailbox();
+	
+	virtual Mailbox* getMailbox() {return this;};
+	virtual const Mailbox* getMailbox() const {return this;};
 
-	uint32_t getDepotId() {return depotId;};
-	void setMaxDepotLimit(uint32_t maxitems) {maxDepotLimit = maxitems;};
-	void setDepotId(uint32_t id) {depotId = id;};
-	virtual Depot* getDepot() {return this;};
-	virtual const Depot* getDepot() const {return this;};
-
+	//cylinder implementations
 	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,
 		bool childIsOwner = false) const;
-		
+	virtual ReturnValue __queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
+		uint32_t& maxQueryCount) const;
+	virtual ReturnValue __queryRemove(const Thing* thing, uint32_t count) const;
+	virtual Cylinder* __queryDestination(int32_t& index, const Thing* thing, Item** destItem);
+
+	virtual void __addThing(Thing* thing);
+	virtual void __addThing(int32_t index, Thing* thing);
+
+	virtual void __updateThing(Thing* thing, uint32_t count);
+	virtual void __replaceThing(uint32_t index, Thing* thing);
+
+	virtual void __removeThing(Thing* thing, uint32_t count);
+
+	virtual int32_t __getIndexOfThing(const Thing* thing) const;
+	virtual Thing* __getThing(uint32_t index) const;
+
 	virtual void postAddNotification(Thing* thing, bool hasOwnership = true);
 	virtual void postRemoveNotification(Thing* thing, bool hadOwnership = true);
+
+	virtual void __internalAddThing(Thing* thing);
+	virtual void __internalAddThing(uint32_t index, Thing* thing);
+	
+	void getReciver(Item* item, std::string& name, uint32_t& dpnum);
+    void sendItem(Item* item);
 private:
-	uint32_t maxDepotLimit;
-	uint32_t depotId;
+	MagicEffectClasses effect;
 };
 
 #endif
-

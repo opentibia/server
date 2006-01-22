@@ -2515,7 +2515,7 @@ bool Game::playerUseBattleWindow(Player* player, const Position& fromPos, uint8_
 				}
 				else{
 				return false;
-                }
+				}
 			}
 			else{
 				player->sendCancel("You don't have the required magic level to use that rune.");
