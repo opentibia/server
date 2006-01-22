@@ -20,13 +20,12 @@
 
 #include <sstream>
 
-#include <boost/filesystem/operations.hpp>
-
 #include "ioplayer.h"
 #include "ioplayerxml.h"
 #include "ioaccount.h"
 #include "item.h"
 #include "luascript.h"
+#include "tools.h"
 
 xmlMutexPtr xmlmutex;
 
@@ -789,5 +788,5 @@ bool IOPlayerXML::playerExists(std::string name)
 	std::string filename = datadir + "players/" + name + ".xml";
 	std::transform(filename.begin(), filename.end(), filename.begin(), tolower);
 
-	return boost::filesystem::exists(filename);
+	return fileExists(filename.c_str());
 }
