@@ -100,12 +100,12 @@ Thing* TrashHolder::__getThing(uint32_t index) const
 
 void TrashHolder::postAddNotification(Thing* thing, bool hasOwnership /*= true*/)
 {
-	getParent()->postAddNotification(thing, hasOwnership);
+	getParent()->postAddNotification(thing, false /*hasOwnership*/);
 }
 
 void TrashHolder::postRemoveNotification(Thing* thing, bool hadOwnership /*= true*/)
 {
-	getParent()->postRemoveNotification(thing, hadOwnership);
+	getParent()->postRemoveNotification(thing, false /*hadOwnership*/);
 }
 
 void TrashHolder::__internalAddThing(Thing* thing)

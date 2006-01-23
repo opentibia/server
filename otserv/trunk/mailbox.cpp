@@ -110,12 +110,12 @@ Thing* Mailbox::__getThing(uint32_t index) const
 
 void Mailbox::postAddNotification(Thing* thing, bool hasOwnership /*= true*/)
 {
-	getParent()->postAddNotification(thing, hasOwnership);
+	getParent()->postAddNotification(thing, false /*hasOwnership*/);
 }
 
 void Mailbox::postRemoveNotification(Thing* thing, bool hadOwnership /*= true*/)
 {
-	getParent()->postRemoveNotification(thing, hadOwnership);
+	getParent()->postRemoveNotification(thing, false /*hadOwnership*/);
 }
 
 void Mailbox::__internalAddThing(Thing* thing)

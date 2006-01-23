@@ -561,6 +561,21 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			if(const Item* iitem = iithing->getItem()){
 				const ItemType& iiType = Item::items[iitem->getID()];
 
+				if(iiType.blockSolid){
+					if(item->isPickupable()){
+
+						//TODO: query script interface
+						if(iitem->getID() == ITEM_DUSTBIN)
+							continue;
+
+						if(!iiType.hasHeight || iiType.pickupable)
+							return RET_NOTENOUGHROOM;
+					}
+					else
+						return RET_NOTENOUGHROOM;
+				}
+
+				/*
 				//TODO: query script interface
 				if(iitem->getID() == ITEM_DUSTBIN)
 					continue;
@@ -576,14 +591,13 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 						//	}
 						//}
 						//else
-						if(!iiType.hasHeight)
-							return RET_NOTENOUGHROOM;
-						else if(iiType.pickupable)
+						if(!iiType.hasHeight || iiType.pickupable)
 							return RET_NOTENOUGHROOM;
 					}
 					else
 						return RET_NOTENOUGHROOM;
 				}
+				*/
 			}
 		}
 	}
@@ -1049,40 +1063,43 @@ void Tile::postAddNotification(Thing* thing, bool hasOwnership /*= true*/)
 		}
 	}
 
-	//do action(s)
-	if(Creature* creature = thing->getCreature()){
-		MagicEffectItem* fieldItem = getFieldItem();
-		if(fieldItem){
-			//remove magic walls/wild growth
-			if(fieldItem->isBlocking()){
-				g_game.internalRemoveItem(fieldItem, 1);
-			}
 
-			const MagicEffectTargetCreatureCondition* magicTargetCondition = fieldItem->getCondition();
+	if(hasOwnership){
+		//do action(s)
+		if(Creature* creature = thing->getCreature()){
+			MagicEffectItem* fieldItem = getFieldItem();
+			if(fieldItem){
+				//remove magic walls/wild growth
+				if(fieldItem->isBlocking()){
+					g_game.internalRemoveItem(fieldItem, 1);
+				}
 
-			if(!(g_game.getWorldType() == WORLD_TYPE_NO_PVP && creature && magicTargetCondition && magicTargetCondition->getOwnerID() != 0)){
-				fieldItem->getDamage(creature);
-			}
-			
-			if(magicTargetCondition && ((magicTargetCondition->attackType == ATTACK_FIRE) || 
-					(magicTargetCondition->attackType == ATTACK_POISON) ||
-					(magicTargetCondition->attackType == ATTACK_ENERGY))){	
-				Creature* attacker = g_game.getCreatureByID(magicTargetCondition->getOwnerID());
-				g_game.creatureMakeMagic(attacker, creature->getPosition(), magicTargetCondition);
+				const MagicEffectTargetCreatureCondition* magicTargetCondition = fieldItem->getCondition();
+
+				if(!(g_game.getWorldType() == WORLD_TYPE_NO_PVP && creature && magicTargetCondition && magicTargetCondition->getOwnerID() != 0)){
+					fieldItem->getDamage(creature);
+				}
+				
+				if(magicTargetCondition && ((magicTargetCondition->attackType == ATTACK_FIRE) || 
+						(magicTargetCondition->attackType == ATTACK_POISON) ||
+						(magicTargetCondition->attackType == ATTACK_ENERGY))){	
+					Creature* attacker = g_game.getCreatureByID(magicTargetCondition->getOwnerID());
+					g_game.creatureMakeMagic(attacker, creature->getPosition(), magicTargetCondition);
+				}
 			}
 		}
+		
+		if(Teleport* teleport = getTeleportItem()){
+			teleport->__addThing(thing);
+		}
+		else if(TrashHolder* trashHolder = getTrashHolder()){
+			//TODO: query script interface
+			trashHolder->__addThing(thing);
+		}
+		else if(Mailbox* mailbox = getMailbox()){
+			mailbox->__addThing(thing);
+		}
 	}
-	
-	if(Teleport* teleport = getTeleportItem()){
-		teleport->__addThing(thing);
-	}
-	else if(TrashHolder* trashHolder = getTrashHolder()){
-		//TODO: query script interface
-		trashHolder->__addThing(thing);
-	}
-	else if(Mailbox* mailbox = getMailbox()){
-		mailbox->__addThing(thing);
-    }
 }
 
 void Tile::postRemoveNotification(Thing* thing, bool hadOwnership /*= true*/)
