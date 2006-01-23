@@ -176,18 +176,21 @@ std::string Player::getDescription(int32_t lookDistance) const
 
 		if(vocation != VOCATION_NONE)
 			s << " You are " << g_config.getGlobalStringField("vocations", (int)vocation) << ".";
+		else
+			s << " You have no vocation.";
 	}
 	else {	
 		s << name << " (Level " << level <<").";
 	
-		if(vocation != VOCATION_NONE){
-			if(sex == PLAYERSEX_FEMALE)
-				s << " She";
-			else
-				s << " He";
-
-				s << " is "<< g_config.getGlobalStringField("vocations", (int)vocation) << ".";
-		}
+		if(sex == PLAYERSEX_FEMALE)
+			s << " She";
+		else
+			s << " He";	
+			
+		if(vocation != VOCATION_NONE)
+			s << " is "<< g_config.getGlobalStringField("vocations", (int)vocation) << ".";
+		else
+			s << " has no vocation.";
 	}
 	
 	if(guildId)

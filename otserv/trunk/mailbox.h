@@ -62,6 +62,7 @@ public:
 	
 	bool getReciver(Item* item, std::string& name, uint32_t& dpnum);
 	bool sendItem(Item* item);
+	bool canSend(const Item* item) const;
 };
 
 #endif

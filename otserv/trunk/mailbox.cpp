@@ -44,7 +44,7 @@ ReturnValue Mailbox::__queryAdd(int32_t index, const Thing* thing, uint32_t coun
 	bool childIsOwner /*= false*/) const
 {
 	if(const Item* item = thing->getItem()){
-		if(item->getID() == ITEM_PARCEL || item->getID() == ITEM_LETTER){
+		if(canSend(item)){
 			return RET_NOERROR;
 		}
 	}
@@ -77,7 +77,7 @@ void Mailbox::__addThing(Thing* thing)
 void Mailbox::__addThing(int32_t index, Thing* thing)
 {
 	if(Item* item = thing->getItem()){
-		if(item->getID() == ITEM_PARCEL || item->getID() == ITEM_LETTER){
+		if(canSend(item)){
 			sendItem(item);
 		}
 	}
@@ -143,9 +143,8 @@ bool Mailbox::sendItem(Item* item)
 		Depot* depot = player->getDepot(dp);
               
 		if(depot){
-			item->setID(item->getID() + 1); /**Change it to stamped!**/
 			g_game.internalMoveItem(item->getParent(), depot, -1, item, item->getItemCount());
-				
+			g_game.transformItem(item, item->getID()+1); /**Change it to stamped!**/	
 			return true;
 		}
 	}
@@ -154,8 +153,8 @@ bool Mailbox::sendItem(Item* item)
 		IOPlayer::instance()->loadPlayer(player, reciever);
 		Depot* depot = player->getDepot(dp);
 		if(depot){
-			item->setID(item->getID() + 1);
 			g_game.internalMoveItem(item->getParent(), depot, -1, item, item->getItemCount());
+			g_game.transformItem(item, item->getID()+1);
 			IOPlayer::instance()->savePlayer(player); 
 			
 			delete player;
@@ -178,10 +177,13 @@ bool Mailbox::getReciver(Item* item, std::string& name, uint32_t& dp)
 	if(item->getID() == ITEM_PARCEL){ /**We need to get the text from the label incase its a parcel**/
 		Container* parcel = item->getContainer();
           
-		for(ItemList::const_iterator cit = parcel->getItems(); cit != parcel->getEnd(); cit++) {
+		for(ItemList::reverse_iterator cit = parcel->itemlist.rbegin(); cit != parcel->itemlist.rend(); cit++) {
 			if((*cit)->getID() == ITEM_LABEL){
 				item = (*cit);           
-				break;  
+				
+				if(item->getText() != ""){
+					break;	
+				}  
 			} 
 		}
 	}
@@ -211,6 +213,19 @@ bool Mailbox::getReciver(Item* item, std::string& name, uint32_t& dp)
 	Lets make it the depot number until we got a sollution**/
 	name = line[0];
 	dp = atoi(line[1].c_str());
+	
+	return true;
+}
+
+bool Mailbox::canSend(const Item* item) const
+{
+	if(item->getID() != ITEM_PARCEL && item->getID() != ITEM_LETTER){
+		return false;	
+	}
+	
+	if(item->getTile()->getThingCount() > 3){ /**Something on the mailbox! (Ground (1), mailbox(2), the item that we want to send(3))**/
+		return false;	
+	}
 	
 	return true;
 }
