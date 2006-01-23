@@ -238,15 +238,17 @@ bool Commands::placeMonster(Creature* creature, const std::string& cmd, const st
 	if(game->placeCreature(creature->getPosition(), monster)){
 		game->AddMagicEffectAt(creature->getPosition(), NM_ME_MAGIC_BLOOD);
 		
+		/*
 		SpectatorVec list;
 		SpectatorVec::iterator it;
 
 		game->getSpectators(Range(creature->getPosition(), false), list);
-		/**makes monster attack if someone is nearby**/
+		//makes monster attack if someone is nearby//
 		for(it = list.begin(); it != list.end(); ++it) {
 				monster->onCreatureAppear((*it), false);
 		}
-			
+		*/
+
 		return true;
 	}
 	else{
