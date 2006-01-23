@@ -75,7 +75,16 @@ public:
 	virtual void setNormalCreatureLight();
 
 	static unsigned long getRandom();
-	
+
+	virtual void onAddTileItem(const Position& pos, const Item* item);
+	virtual void onUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* oldItem, const Item* newItem);
+	virtual void onRemoveTileItem(const Position& pos, uint32_t stackpos, const Item* item);
+	virtual void onUpdateTile(const Position& pos);
+
+	virtual void onCreatureAppear(const Creature* creature, bool isLogin);
+	virtual void onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout);
+	virtual void onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport);
+
 private:
 	Game* game;
 	std::list<Position> route;
@@ -129,15 +138,6 @@ protected:
 	
 	virtual int getLostExperience();
 	virtual void dropLoot(Container *corpse);
-	
-	virtual void onAddTileItem(const Position& pos, const Item* item);
-	virtual void onUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* oldItem, const Item* newItem);
-	virtual void onRemoveTileItem(const Position& pos, uint32_t stackpos, const Item* item);
-	virtual void onUpdateTile(const Position& pos);
-
-	virtual void onCreatureAppear(const Creature* creature, bool isLogin);
-	virtual void onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout);
-	virtual void onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport);
 
 	virtual bool isAttackable() const { return true; };
 	
