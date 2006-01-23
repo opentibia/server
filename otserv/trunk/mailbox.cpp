@@ -210,7 +210,7 @@ bool Mailbox::getReciver(Item* item, std::string& name, uint32_t& dp)
 	}
           
 	/**Now to the problem, how to do with the city names? 
-	Lets make it the depot number until we got a sollution**/
+	Lets make it the depot number until we got a solution**/
 	name = line[0];
 	dp = atoi(line[1].c_str());
 	
@@ -219,13 +219,9 @@ bool Mailbox::getReciver(Item* item, std::string& name, uint32_t& dp)
 
 bool Mailbox::canSend(const Item* item) const
 {
-	if(item->getID() != ITEM_PARCEL && item->getID() != ITEM_LETTER){
-		return false;	
+	if(item->getID() == ITEM_PARCEL || item->getID() == ITEM_LETTER){
+		return true;
 	}
 	
-	if(item->getTile()->getThingCount() > 3){ /**Something on the mailbox! (Ground (1), mailbox(2), the item that we want to send(3))**/
-		return false;	
-	}
-	
-	return true;
+	return false;
 }
