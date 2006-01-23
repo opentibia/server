@@ -528,8 +528,14 @@ void Container::postAddNotification(Thing* thing, bool hasOwnership /*= true*/)
 	if(topParent->getCreature()){
 		topParent->postAddNotification(thing, true /*hasOwnership*/);
 	}
-	else
-		topParent->postAddNotification(thing, false /*hasOwnership*/);
+	else{
+		if(topParent == this){
+			//let the tile class notify surrounding players
+			topParent->getParent()->postAddNotification(thing, false /*hasOwnership*/);
+		}
+		else
+			topParent->postAddNotification(thing, false /*hasOwnership*/);
+	}
 
 	//getParent()->postAddNotification(thing, true /*hasOwnership*/);
 }
@@ -539,10 +545,16 @@ void Container::postRemoveNotification(Thing* thing, bool hadOwnership /*= true*
 	Cylinder* topParent = getTopParent();
 
 	if(topParent->getCreature()){
-		topParent->postAddNotification(thing, true /*hasOwnership*/);
+		topParent->postRemoveNotification(thing, true /*hasOwnership*/);
 	}
-	else
-		topParent->postAddNotification(thing, false /*hasOwnership*/);
+	else{
+		if(topParent == this){
+			//let the tile class notify surrounding players
+			topParent->getParent()->postRemoveNotification(thing, false /*hasOwnership*/);
+		}
+		else
+			topParent->postRemoveNotification(thing, false /*hasOwnership*/);
+	}
 
 	//getParent()->postRemoveNotification(thing, false /*hadOwnership*/);
 }
