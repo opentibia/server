@@ -206,7 +206,11 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 			else if(str=="health"){
 				nodeValue = (char*)xmlGetProp(p, (const xmlChar *) "now");
 				if(nodeValue){
-					player->health=atoi(nodeValue);
+					player->health = atoi(nodeValue);
+
+					if(player->health <= 0)
+						player->health = 100;
+
 					xmlFreeOTSERV(nodeValue);
 				}
 				else
@@ -215,6 +219,10 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 				nodeValue = (char*)xmlGetProp(p, (const xmlChar *) "max");
 				if(nodeValue){
 					player->healthmax = atoi(nodeValue);
+
+					if(player->healthmax <= 0)
+						player->healthmax = 100;
+
 					xmlFreeOTSERV(nodeValue);
 				}
 				else

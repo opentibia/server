@@ -101,7 +101,13 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 		player->maglevel_percent  = (unsigned char)(100*(player->manaspent/(1.*player->getReqMana(player->maglevel+1, player->vocation))));
 
 		player->health = result.getDataInt("health");
+		if(player->health <= 0)
+			player->health = 100;
+
 		player->healthmax = result.getDataInt("healthmax");
+		if(player->healthmax <= 0)
+			player->healthmax = 100;
+
 		player->food = result.getDataInt("food");
 	
 		player->looktype = result.getDataInt("looktype");
