@@ -103,7 +103,7 @@ public:
 	int getArmor() const;
 	int getDefense() const;
 	int getSlotPosition() const;
-	int getRWInfo() const;
+	int getRWInfo(int& maxlen) const;
 	int getWorth() const;
 	void getLight(LightInfo& lightInfo);
 		

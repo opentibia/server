@@ -272,6 +272,19 @@ bool Actions::UseItem(Player* player, const Position& pos, const unsigned char s
 		}
 	}
 	
+	//can we read it?
+	int maxlen;
+	int RWInfo = item->getRWInfo(maxlen);
+	if(RWInfo & CAN_BE_READ){
+		if(RWInfo & CAN_BE_WRITTEN){
+			player->sendTextWindow(item, maxlen, true);
+		}
+		else{
+			player->sendTextWindow(item, 0, false);
+		}
+		return true;
+	}
+	
 	//if it is a container try to open it
 	if(Container* container = item->getContainer()){
 		if(openContainer(player, container, index))
@@ -1496,7 +1509,8 @@ int ActionScript::luaActionGetItemRWInfo(lua_State *L)
 	Item* item = action->GetItemByUID(uid);
 	//Item *tmpitem = NULL;
 	if(item){
-		lua_pushnumber(L, (int)(item->getRWInfo()));		
+		int maxlen;
+		lua_pushnumber(L, (int)(item->getRWInfo(maxlen)));
 		return 1;
 	}
 	else{

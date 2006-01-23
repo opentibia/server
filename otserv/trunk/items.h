@@ -94,6 +94,7 @@ public:
 	int             magicfieldtype;
 	int             RWInfo;
 	unsigned short  readOnlyId;
+	unsigned short  maxTextLen;
 	bool            stackable;
 	bool            useable;
 	bool            moveable;

@@ -2563,8 +2563,13 @@ bool Game::playerWriteItem(Player* player, Item* item, const std::string& text)
 	if(player->isRemoved())
 		return false;
 	
-	Cylinder* item_parent = item->getTopParent();
+	/*Cylinder* item_parent = item->getTopParent();
 	if(!item_parent){
+		playerSendErrorMessage(player, RET_NOTPOSSIBLE);
+		return false;
+	}
+	*/
+	if(item->isRemoved()){
 		playerSendErrorMessage(player, RET_NOTPOSSIBLE);
 		return false;
 	}
@@ -2578,12 +2583,12 @@ bool Game::playerWriteItem(Player* player, Item* item, const std::string& text)
 		return false;
 	}
 	item->setText(text);
-	/*TODO: transform item
-	uint16_t newtype = Item::items[item->getID()].???;
+	
+	uint16_t newtype = Item::items[item->getID()].readOnlyId;
 	if(newtype != 0){
 		transformItem(item, newtype);
 	}
-	*/
+	
 	//TODO: set last written by
 	return true;
 }

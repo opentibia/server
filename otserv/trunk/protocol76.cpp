@@ -56,6 +56,7 @@ Protocol76::Protocol76(SOCKET s)
 	OTSYS_THREAD_LOCKVARINIT(bufferLock);
 	windowTextID = 0;
 	readItem = NULL;
+	maxTextLenght = 0;
 	this->s = s;
 }
 
@@ -69,6 +70,7 @@ void Protocol76::reinitializeProtocol()
 {
 	windowTextID = 0;
 	readItem = NULL;
+	maxTextLenght = 0;
 	OutputBuffer.Reset();
 	knownPlayers.clear();
 }
@@ -969,7 +971,10 @@ void Protocol76::parseTextWindow(NetworkMessage& msg)
 {
 	unsigned long id = msg.GetU32();
 	std::string new_text = msg.GetString();
-	if(readItem && windowTextID == id){	
+	if(new_text.length() > maxTextLenght)
+		return;
+	
+	if(readItem && windowTextID == id){
 		game->playerWriteItem(player, readItem, new_text);
 		readItem->releaseThing2();
 		readItem = NULL;
@@ -1419,7 +1424,7 @@ void Protocol76::sendAddCreature(const Creature* creature, bool isLogin)
 			
 			std::string tempstring = g_config.getGlobalString("loginmsg", "Welcome.").c_str();
 			if(tempstring.size() > 0)
-			AddTextMessage(msg,MSG_EVENT, tempstring.c_str());
+				AddTextMessage(msg,MSG_EVENT, tempstring.c_str());
 			
 			tempstring = "Your last visit was on ";
 			time_t lastlogin = player->getLastLoginSaved();
@@ -1593,20 +1598,25 @@ void Protocol76::sendRemoveContainerItem(uint8_t cid, uint8_t slot)
 void Protocol76::sendTextWindow(Item* item,const unsigned short maxlen, const bool canWrite)
 {
 	NetworkMessage msg;
-	msg.AddByte(0x96);
+	if(readItem){
+		readItem->releaseThing2();
+	}
 	windowTextID++;
+	msg.AddByte(0x96);
 	msg.AddU32(windowTextID);
 	msg.AddItemId(item);
 	if(canWrite){
-		msg.AddU16(maxlen);		
+		msg.AddU16(maxlen);
 		msg.AddString(item->getText());		
 		item->useThing2();
 		readItem = item;
+		maxTextLenght = maxlen;
 	}
 	else{		
 		msg.AddU16(item->getText().size());
 		msg.AddString(item->getText());									
-		readItem = NULL;		
+		readItem = NULL;
+		maxTextLenght = 0;
 	}
 	msg.AddString("unknown");
 	WriteBuffer(msg);

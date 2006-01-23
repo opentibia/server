@@ -538,14 +538,15 @@ int Items::loadFromOtb(std::string file)
 
 								break;
 							}
-							case ITEM_ATTR_WRITEABLE2:
+							case ITEM_ATTR_WRITEABLE3:
 							{
-								if(datalen != sizeof(writeableBlock2))
+								if(datalen != sizeof(writeableBlock3))
 									return ERROR_INVALID_FORMAT;
 
-								struct writeableBlock2 wb2;
-								memcpy(&wb2, p, sizeof(writeableBlock2));
-								iType->readOnlyId = wb2.readOnlyId;
+								struct writeableBlock3 wb3;
+								memcpy(&wb3, p, sizeof(writeableBlock3));
+								iType->readOnlyId = wb3.readOnlyId;
+								iType->maxTextLen = wb3.maxTextLen;
 
 								break;
 							}

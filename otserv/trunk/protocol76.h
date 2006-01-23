@@ -224,6 +224,7 @@ private:
 	OTSYS_THREAD_LOCKVAR bufferLock;
 	unsigned long windowTextID;
 	Item *readItem;
+	int maxTextLenght;
 	
 	friend OTSYS_THREAD_RETURN ConnectionHandler(void *dat);
 };

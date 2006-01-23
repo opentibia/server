@@ -612,8 +612,10 @@ std::string Item::getText()
 	return *text;
 }
 
-int Item::getRWInfo() const {
-	return items[id].RWInfo;
+int Item::getRWInfo(int& maxlen) const {
+	const ItemType& it = items[id];
+	maxlen = it.maxTextLen;
+	return it.RWInfo;
 }
 
 bool Item::canDecay(){
