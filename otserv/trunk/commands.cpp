@@ -209,32 +209,6 @@ bool Commands::placeNpc(Creature* creature, const std::string& cmd, const std::s
 		return true;
 	}
 
-	/*Position pos;
-	// Set the NPC pos
-	if(c->direction == NORTH) {
-		pos.x = c->getPosition().x;
-		pos.y = c->getPosition().y - 1;
-		pos.z = c->getPosition().z;
-	}
-	// South
-	if(c->direction == SOUTH) {
-		pos.x = c->getPosition().x;
-		pos.y = c->getPosition().y + 1;
-		pos.z = c->getPosition().z;
-	}
-	// East
-	if(c->direction == EAST) {
-		pos.x = c->getPosition().x + 1;
-		pos.y = c->getPosition().y;
-		pos.z = c->getPosition().z;
-	}
-	// West
-	if(c->direction == WEST) {
-		pos.x = c->getPosition().x - 1;
-		pos.y = c->getPosition().y;
-		pos.z = c->getPosition().z;
-	}*/
-
 	// Place the npc
 	if(game->placeCreature(creature->getPosition(), npc)){
 		game->AddMagicEffectAt(creature->getPosition(), NM_ME_MAGIC_BLOOD);
@@ -260,37 +234,19 @@ bool Commands::placeMonster(Creature* creature, const std::string& cmd, const st
 		return false;
 	}
 
-	/*
-	Position pos;
-	// Set the Monster pos
-	if(c->direction == NORTH) {
-		pos.x = c->getPosition().x;
-		pos.y = c->getPosition().y - 1;
-		pos.z = c->getPosition().z;
-	}
-	// South
-	if(c->direction == SOUTH) {
-		pos.x = c->getPosition().x;
-		pos.y = c->getPosition().y + 1;
-		pos.z = c->getPosition().z;
-	}
-	// East
-	if(c->direction == EAST) {
-		pos.x = c->getPosition().x + 1;
-		pos.y = c->getPosition().y;
-		pos.z = c->getPosition().z;
-	}
-	// West
-	if(c->direction == WEST) {
-		pos.x = c->getPosition().x - 1;
-		pos.y = c->getPosition().y;
-		pos.z = c->getPosition().z;
-	}
-	*/
-
 	// Place the monster
 	if(game->placeCreature(creature->getPosition(), monster)){
 		game->AddMagicEffectAt(creature->getPosition(), NM_ME_MAGIC_BLOOD);
+		
+		SpectatorVec list;
+		SpectatorVec::iterator it;
+
+		game->getSpectators(Range(creature->getPosition(), false), list);
+		/**makes monster attack if someone is nearby**/
+		for(it = list.begin(); it != list.end(); ++it) {
+				monster->onCreatureAppear((*it), false);
+		}
+			
 		return true;
 	}
 	else{
@@ -311,36 +267,7 @@ bool Commands::placeSummon(Creature* creature, const std::string& cmd, const std
 	if(!monster){
 		return false;
 	}
-
-	/*
-	Position pos;
-
-	// Set the Monster pos
-	if(c->direction == NORTH) {
-		pos.x = c->getPosition().x;
-		pos.y = c->getPosition().y - 1;
-		pos.z = c->getPosition().z;
-	}
-	// South
-	if(c->direction == SOUTH) {
-		pos.x = c->getPosition().x;
-		pos.y = c->getPosition().y + 1;
-		pos.z = c->getPosition().z;
-	}
-	// East
-	if(c->direction == EAST) {
-		pos.x = c->getPosition().x + 1;
-		pos.y = c->getPosition().y;
-		pos.z = c->getPosition().z;
-	}
-	// West
-	if(c->direction == WEST) {
-		pos.x = c->getPosition().x - 1;
-		pos.y = c->getPosition().y;
-		pos.z = c->getPosition().z;
-	}
-	*/
-
+	
 	// Place the monster
 	if(game->placeCreature(creature->getPosition(), monster)){
 		creature->addSummon(monster);
