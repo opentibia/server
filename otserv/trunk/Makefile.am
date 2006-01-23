@@ -3,7 +3,7 @@ AUTOMAKE_OPTIONS = foreign
 noinst_PROGRAMS = otserv
 
 
-AM_CXXFLAGS = $(XML_CPPFLAGS) $(OTSERV_FLAGS) $(LUA50_CFLAGS) $(MYSQL_FLAGS) -D_THREAD_SAFE -D_REENTRANT -Werror
+AM_CXXFLAGS = $(XML_CPPFLAGS) $(OTSERV_FLAGS) $(LUA50_CFLAGS) $(MYSQL_FLAGS) $(PROFILER_FLAGS) -D_THREAD_SAFE -D_REENTRANT -Werror
 otserv_LDADD = $(XML_LIBS) $(LUA50_LIBS) $(BOOST_LIBS) -ldl
 if USE_MYSQL
 otserv_SOURCES = account.cpp container.cpp creature.cpp game.cpp ioaccount.cpp \
