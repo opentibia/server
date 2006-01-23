@@ -523,12 +523,12 @@ Thing* Container::__getThing(uint32_t index) const
 
 void Container::postAddNotification(Thing* thing, bool hasOwnership /*= true*/)
 {
-	getParent()->postAddNotification(thing, hasOwnership);
+	getParent()->postAddNotification(thing, false /*hasOwnership*/);
 }
 
 void Container::postRemoveNotification(Thing* thing, bool hadOwnership /*= true*/)
 {
-	getParent()->postRemoveNotification(thing, hadOwnership);
+	getParent()->postRemoveNotification(thing, false /*hadOwnership*/);
 }
 
 void Container::__internalAddThing(Thing* thing)
