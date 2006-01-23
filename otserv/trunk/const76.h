@@ -222,7 +222,9 @@ enum item_t {
 	ITEM_LETTER           = 2597,
 	ITEM_LETTER_STAMPED   = 2598,
 	ITEM_LABEL            = 2599,
-	ITEM_MAILBOX          = 2334,
+	ITEM_MAILBOX1         = 2334,
+	ITEM_MAILBOX2         = 2593,
+	ITEM_MAILBOX3         = 3981,
 };
 
 

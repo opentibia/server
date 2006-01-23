@@ -54,7 +54,7 @@ Item* Item::CreateItem(const unsigned short _type, unsigned short _count /*= 1*/
 	else if(_type == ITEM_DUSTBIN){
 		newItem = new TrashHolder(_type /*, NM_ME_PUFF*/);
 	}
-	else if(_type == ITEM_MAILBOX){
+	else if(_type == ITEM_MAILBOX1 || _type == ITEM_MAILBOX2 || _type == ITEM_MAILBOX3){
 		newItem = new Mailbox(_type);
 	}
 	else{
