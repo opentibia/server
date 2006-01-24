@@ -586,29 +586,35 @@ void Item::clearSpecialDescription(){
 	specialDescription = NULL;
 }
 
-void Item::setText(std::string desc){
+void Item::setText(std::string desc)
+{
 	if(text){
 		delete text;
 		text = NULL;
 	}
+
 	if(desc.length() > 1){
 		text = new std::string(desc);	
-		if(items[id].readOnlyId != 0){//write 1 time
-			id = items[id].readOnlyId;
-		}
+
+		//if(items[id].readOnlyId != 0){//write 1 time
+		//	id = items[id].readOnlyId;
+		//}
 	}
 }
 
-void Item::clearText(){
-	if(text)
+void Item::clearText()
+{
+	if(text){
 		delete text;
-	text = NULL;
+		text = NULL;
+	}
 }
 
 std::string Item::getText()
 {
 	if(!text)
 		return std::string("");
+
 	return *text;
 }
 

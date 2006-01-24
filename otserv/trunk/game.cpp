@@ -2479,9 +2479,9 @@ bool Game::playerWriteItem(Player* player, Item* item, const std::string& text)
 		return false;
 	}
 
-	Cylinder* parent = item->getParent();
+	Cylinder* topParent = item->getTopParent();
 
-	Player* owner = dynamic_cast<Player*>(parent);
+	Player* owner = dynamic_cast<Player*>(topParent);
 	if(owner && owner != player){
 		player->sendCancelMessage(RET_NOTPOSSIBLE);
 		return false;
