@@ -143,6 +143,57 @@ bool Container::isHoldingItem(const Item* item) const
 	return false;
 }
 
+void Container::onAddContainerItem(Item* item)
+{
+	const Position& cylinderMapPos = getPosition();
+
+	SpectatorVec list;
+	SpectatorVec::iterator it;
+	g_game.getSpectators(Range(cylinderMapPos, 2, 2, 2, 2, false), list);
+
+	//send to client
+	Player* player = NULL;
+	for(it = list.begin(); it != list.end(); ++it) {
+		if(player = (*it)->getPlayer()){
+			player->onAddContainerItem(this, item);
+		}
+	}
+}
+
+void Container::onUpdateContainerItem(uint32_t index, Item* olditem, Item* newitem)
+{
+	const Position& cylinderMapPos = getPosition();
+
+	SpectatorVec list;
+	SpectatorVec::iterator it;
+	g_game.getSpectators(Range(cylinderMapPos, 2, 2, 2, 2, false), list);
+
+	//send to client
+	Player* player = NULL;
+	for(it = list.begin(); it != list.end(); ++it) {
+		if(player = (*it)->getPlayer()){
+			player->onUpdateContainerItem(this, index, olditem, newitem);
+		}
+	}
+}
+
+void Container::onRemoveContainerItem(uint32_t index, Item* item)
+{
+	const Position& cylinderMapPos = getPosition();
+
+	SpectatorVec list;
+	SpectatorVec::iterator it;
+	g_game.getSpectators(Range(cylinderMapPos, 2, 2, 2, 2, false), list);
+
+	//send change to client
+	Player* player = NULL;
+	for(it = list.begin(); it != list.end(); ++it) {
+		if(player = (*it)->getPlayer()){
+			player->onRemoveContainerItem(this, index, item);
+		}
+	}
+}
+
 ReturnValue Container::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 	bool childIsOwner /*= false*/) const
 {
@@ -330,18 +381,9 @@ void Container::__addThing(int32_t index, Thing* thing)
 	item->setParent(this);
 	itemlist.push_front(item);
 
-	const Position& cylinderMapPos = getPosition();
-
-	SpectatorVec list;
-	SpectatorVec::iterator it;
-	g_game.getSpectators(Range(cylinderMapPos, 2, 2, 2, 2, false), list);
-
-	//send to client
-	for(it = list.begin(); it != list.end(); ++it) {
-		Player* spectator = dynamic_cast<Player*>(*it);
-		if(spectator){
-			spectator->onAddContainerItem(this, item);
-		}
+	//send change to client
+	if(getParent()){
+		onAddContainerItem(item);
 	}
 }
 
@@ -367,6 +409,12 @@ void Container::__updateThing(Thing* thing, uint32_t count)
 
 	item->setItemCountOrSubtype(count);
 
+	//send change to client
+	if(getParent()){
+		onUpdateContainerItem(index, item, item);
+	}
+
+	/*
 	const Position& cylinderMapPos = getPosition();
 
 	SpectatorVec list;
@@ -380,6 +428,7 @@ void Container::__updateThing(Thing* thing, uint32_t count)
 			spectator->onUpdateContainerItem(this, index, item, item);
 		}
 	}
+	*/
 }
 
 void Container::__replaceThing(uint32_t index, Thing* thing)
@@ -413,6 +462,12 @@ void Container::__replaceThing(uint32_t index, Thing* thing)
 	itemlist.insert(cit, item);
 	item->setParent(this);
 
+	//send change to client
+	if(getParent()){
+		onUpdateContainerItem(index, *cit, item);
+	}
+
+	/*
 	const Position& cylinderMapPos = getPosition();
 
 	SpectatorVec list;
@@ -426,6 +481,7 @@ void Container::__replaceThing(uint32_t index, Thing* thing)
 			spectator->onUpdateContainerItem(this, index, (*cit), item);
 		}
 	}
+	*/
 
 	(*cit)->setParent(NULL);
 	itemlist.erase(cit);
@@ -460,6 +516,45 @@ void Container::__removeThing(Thing* thing, uint32_t count)
 		return /*RET_NOTPOSSIBLE*/;
 	}
 
+	if(item->isStackable() && count != item->getItemCount()){
+		int newCount = std::max(0, (int)(item->getItemCount() - count));
+		item->setItemCount(newCount);
+
+		//send change to client
+		if(getParent()){
+			onUpdateContainerItem(index, item, item);
+		}
+
+		/*
+		for(it = list.begin(); it != list.end(); ++it) {
+			Player* spectator = dynamic_cast<Player*>(*it);
+			if(spectator){
+				spectator->onUpdateContainerItem(this, index, item, item);
+			}
+		}
+		*/
+	}
+	else{
+		//send change to client
+		if(getParent()){
+			onRemoveContainerItem(index, item);
+		}
+
+		/*
+		//send change to client
+		for(it = list.begin(); it != list.end(); ++it) {
+			Player* spectator = dynamic_cast<Player*>(*it);
+			if(spectator){
+				spectator->onRemoveContainerItem(this, index, item);
+			}
+		}
+		*/
+
+		item->setParent(NULL);
+		itemlist.erase(cit);
+	}
+	
+	/*
 	const Position& cylinderMapPos = getPosition();
 
 	SpectatorVec list;
@@ -490,6 +585,7 @@ void Container::__removeThing(Thing* thing, uint32_t count)
 		item->setParent(NULL);
 		itemlist.erase(cit);
 	}
+	*/
 }
 
 int32_t Container::__getIndexOfThing(const Thing* thing) const

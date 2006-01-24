@@ -77,6 +77,11 @@ public:
 	virtual void __internalAddThing(Thing* thing);
 	virtual void __internalAddThing(uint32_t index, Thing* thing);
 
+private:
+	void onAddContainerItem(Item* item);
+	void onUpdateContainerItem(uint32_t index, Item* olditem, Item* newitem);
+	void onRemoveContainerItem(uint32_t index, Item* item);
+
 protected:
 	//uint32_t depotId;
 	uint32_t maxSize; //number of max items in container  
