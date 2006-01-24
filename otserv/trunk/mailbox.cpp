@@ -177,7 +177,7 @@ bool Mailbox::getReciver(Item* item, std::string& name, uint32_t& dp)
 	if(item->getID() == ITEM_PARCEL){ /**We need to get the text from the label incase its a parcel**/
 		Container* parcel = item->getContainer();
           
-		for(ItemList::reverse_iterator cit = parcel->itemlist.rbegin(); cit != parcel->itemlist.rend(); cit++) {
+		for(ItemList::const_iterator cit = parcel->getItems(); cit != parcel->getEnd(); cit++){
 			if((*cit)->getID() == ITEM_LABEL){
 				item = (*cit);           
 				
