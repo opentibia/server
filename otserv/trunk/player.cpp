@@ -158,7 +158,9 @@ Player::~Player()
 		it->second->releaseThing2();
 	}
 	//std::cout << "Player destructor " << this->getID() << std::endl;
+	if(client){
 	delete client;
+	}
 }
 
 bool Player::isPushable() const
