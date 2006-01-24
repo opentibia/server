@@ -2558,30 +2558,28 @@ bool Game::playerRotateItem(Player* player, const Position& pos, uint8_t stackpo
 
 bool Game::playerWriteItem(Player* player, Item* item, const std::string& text)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerWriteItem()");
-	
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerWriteItem()");	
 	if(player->isRemoved())
 		return false;
-	
-	/*Cylinder* item_parent = item->getTopParent();
-	if(!item_parent){
-		playerSendErrorMessage(player, RET_NOTPOSSIBLE);
-		return false;
-	}
-	*/
+
 	if(item->isRemoved()){
 		playerSendErrorMessage(player, RET_NOTPOSSIBLE);
 		return false;
 	}
-	Player* owner = dynamic_cast<Player*>(item_parent);
+
+	Cylinder* parent = item->getParent();
+
+	Player* owner = dynamic_cast<Player*>(parent);
 	if(owner && owner != player){
 		playerSendErrorMessage(player, RET_NOTPOSSIBLE);
 		return false;
-	}	
+	}
+
 	if(!Position::areInRange<1,1,0>(item->getPosition(), player->getPosition())){
 		playerSendErrorMessage(player, RET_NOTPOSSIBLE);
 		return false;
 	}
+
 	item->setText(text);
 	
 	uint16_t newtype = Item::items[item->getID()].readOnlyId;
