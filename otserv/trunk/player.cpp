@@ -56,7 +56,7 @@ Creature()
 {	
 	client = p;
 
-	if(p){
+	if(client){
 		client->setPlayer(this);
 	}
 
@@ -159,9 +159,10 @@ Player::~Player()
 	for(it = depots.begin();it != depots.end(); it++){
 		it->second->releaseThing2();
 	}
+
 	//std::cout << "Player destructor " << this->getID() << std::endl;
 	if(client){
-	delete client;
+		delete client;
 	}
 }
 
