@@ -116,7 +116,7 @@ int Map::loadMap(std::string filename, std::string filekind)
 
 Tile* Map::getTile(uint16_t _x, uint16_t _y, uint8_t _z)
 {
-	if(_z < MAP_LAYER){
+	if(_z < MAP_MAX_LAYERS){
 		// _x & 0x7F  is like _x % 128
 		//TileMap *tm = &tileMaps[_x & 0x1F][_y & 0x1F][_z];
 		//TileMap *tm = &tileMaps[_x & 0xFF][_y & 0xFF];

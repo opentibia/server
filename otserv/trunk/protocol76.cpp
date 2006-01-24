@@ -362,7 +362,7 @@ void Protocol76::GetMapDescription(unsigned short x, unsigned short y, unsigned 
 
 	if (z > 7) {
 		startz = z - 2;
-		endz = std::min(MAP_LAYER - 1, z + 2);
+		endz = std::min(MAP_MAX_LAYERS - 1, z + 2);
 		zstep = 1;
 	}
 	else {
@@ -474,7 +474,7 @@ bool Protocol76::CanSee(const Position& pos) const
 bool Protocol76::CanSee(int x, int y, int z) const
 {
 #ifdef __DEBUG__
-	if(z < 0 || z >= MAP_LAYER) {
+	if(z < 0 || z >= MAP_MAX_LAYERS) {
 		std::cout << "WARNING! Protocol76::CanSee() Z-value is out of range!" << std::endl;
 	}
 #endif
@@ -555,7 +555,7 @@ void Protocol76::autoCloseContainers(const Container *container, NetworkMessage 
 void Protocol76::parseLogout(NetworkMessage& msg)
 {
 	if(player->inFightTicks >=1000 && !player->isRemoved()){
-		sendCancel("You may not logout during or immediately after a fight!");
+		player->sendCancelMessage(RET_YOUMAYNOTLOGOUTDURINGAFIGHT);
 		return;
 	}
 	else{

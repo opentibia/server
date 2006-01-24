@@ -46,10 +46,6 @@ class Commands;
 class SchedulerTask;
 class lessSchedTask;
 
-#define MAP_WIDTH    512
-#define MAP_HEIGHT   512
-#define MAP_LAYER     16
-
 #define STACKPOS_MOVE -1
 #define STACKPOS_LOOK -2
 #define STACKPOS_USE -3
@@ -167,12 +163,6 @@ public:
 	Tile* getTile(unsigned short _x, unsigned short _y, unsigned char _z);
 
 	/**
-	  * Set a Tile to a specific ground id
-	  * \param groundId ID of the ground to set
-	  */
-	//void setTile(unsigned short _x, unsigned short _y, unsigned char _z, unsigned short groundId);
-
-	/**
 	  * Returns a creature based on the unique creature identifier
 	  * \param id is the unique creature id to get a creature pointer to
 	  * \returns A Creature pointer to the creature
@@ -255,8 +245,6 @@ public:
 
 	Item* transformItem(Item* item, uint16_t newtype, int32_t count = -1);
 	ReturnValue internalTeleport(Thing *thing, const Position& newPos);
-
-	void playerSendErrorMessage(Player* player, ReturnValue message);
 
 	/**
 		* Creature wants to turn.

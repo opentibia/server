@@ -37,21 +37,7 @@ class Creature;   // see creature.h
 class Player;
 class Game;
 
-#ifdef _M1K_
- #define MAP_WIDTH    1024
- #define MAP_HEIGHT   1024
-#elif _M2K_
- #define MAP_WIDTH    2048
- #define MAP_HEIGHT   2048
-#elif _M4K_
- #define MAP_WIDTH    4096
- #define MAP_HEIGHT   4096
-#else       
- #define MAP_WIDTH    512
- #define MAP_HEIGHT   512
-#endif   
-
-#define MAP_LAYER     16
+#define MAP_MAX_LAYERS 16
 
 enum SpawnLoadingType_t{
 	MAP_LOADER_ERROR,
@@ -124,7 +110,7 @@ private:
 		if(multilevel){
 			if(isUnderground()){
 				//8->15
-				minRange.z = std::min(centerpos.z + 2, MAP_LAYER - 1);
+				minRange.z = std::min(centerpos.z + 2, MAP_MAX_LAYERS - 1);
 				maxRange.z = std::max(centerpos.z - 2, 8);
 
 				zstep = -1;

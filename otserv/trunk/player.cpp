@@ -1204,7 +1204,122 @@ bool Player::addDepot(Depot* depot, uint32_t depotId)
 	return true;
 }
 
-void Player::sendCancel(const char *msg) const
+void Player::sendCancelMessage(ReturnValue message) const
+{
+	switch(message){
+		case RET_DESTINATIONOUTOFREACH:
+			sendCancel("Destination is out of reach.");
+		break;
+
+		case RET_NOTMOVEABLE:
+			sendCancel("You cannot move this item.");
+		break;
+
+		case RET_DROPTWOHANDEDITEM:
+			sendCancel("Drop the double-handed object first.");
+		break;
+
+		case RET_BOTHHANDSNEEDTOBEFREE:
+			sendCancel("Both hands needs to be free.");
+		break;
+
+		case RET_CANNOTBEDRESSED:
+			sendCancel("You cannot dress this object there.");
+		break;
+
+		case RET_PUTTHISOBJECTINYOURHAND:
+			sendCancel("Put this object in your hand.");
+		break;
+
+		case RET_PUTTHISOBJECTINBOTHHANDS:
+			sendCancel("Put this object in both hands.");
+		break;
+
+		case RET_CANONLYUSEONEWEAPON:
+			sendCancel("You may only use one weapon.");
+		break;
+
+		case RET_TOOFARAWAY:
+			sendCancel("Too far away.");
+		break;
+
+		case RET_FIRSTGODOWNSTAIRS:
+			sendCancel("First go downstairs.");
+		break;
+
+		case RET_FIRSTGOUPSTAIRS:
+			sendCancel("First go upstairs.");
+		break;
+
+		case RET_NOTENOUGHCAPACITY:
+			sendCancel("This object is to heavy.");
+		break;
+		
+		case RET_CONTAINERNOTENOUGHROOM:
+			sendCancel("You cannot put more objects in this container.");
+		break;
+
+		case RET_NEEDEXCHANGE:
+		case RET_NOTENOUGHROOM:
+			sendCancel("There is not enough room.");
+		break;
+
+		case RET_CANNOTPICKUP:
+			sendCancel("You cannot pickup this object.");
+		break;
+
+		case RET_CANNOTTHROW:
+			sendCancel("You cannot throw there.");
+		break;
+
+		case RET_THEREISNOWAY:
+			sendCancel("There is no way.");
+		break;
+		
+		case RET_THISISIMPOSSIBLE:
+			sendCancel("This is impossible.");
+		break;
+
+		case RET_PLAYERISPZLOCKED:
+			sendCancel("You can not enter a protection zone after attacking another player.");
+		break;
+
+		case RET_PLAYERISNOTINVITED:
+			sendCancel("You are not invited.");
+		break;
+
+		case RET_DEPOTISFULL:
+			sendCancel("You cannot put more items in this depot.");
+		break;
+
+		case RET_CANNOTUSETHISOBJECT:
+			sendCancel("You can not use this object.");
+		break;
+
+		case RET_NOTREQUIREDLEVELTOUSERUNE:
+			sendCancel("You do not have the required magic level to use this rune.");
+		break;
+		
+		case RET_YOUAREALREADYTRADING:
+			sendCancel("You are already trading.");
+		break;
+
+		case RET_THISPLAYERISALREADYTRADING:
+			sendCancel("This player is already trading.");
+		break;
+
+		case RET_YOUMAYNOTLOGOUTDURINGAFIGHT:
+			sendCancel("You may not logout during or immediately after a fight!");
+		break;
+
+		case RET_NOTPOSSIBLE:
+		default:
+			sendCancel("Sorry, not possible.");
+		break;
+	}
+}
+
+void Player::sendCancel(const char* msg) const
 {
   client->sendCancel(msg);
 }

@@ -233,13 +233,13 @@ bool Actions::UseItem(Player* player, const Position& pos, const unsigned char s
 			player, pos, stack, index, itemid);
 		*/
 
-		game->playerSendErrorMessage(player, RET_TOOFARAWAY);
+		player->sendCancelMessage(RET_TOOFARAWAY);
 		return false;
 	}
 	
 	Thing* thing = game->internalGetThing(player, pos, stack);
 	if(!thing){
-		player->sendCancel("Sorry not possible.");
+		player->sendCancelMessage(RET_NOTPOSSIBLE);
 		return false;
 	}
 
@@ -249,7 +249,7 @@ bool Actions::UseItem(Player* player, const Position& pos, const unsigned char s
 		#ifdef __DEBUG__
 		std::cout << "no item" << std::endl;
 		#endif
-		player->sendCancel("You can not use this object.");
+		player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
 		return false;
 	}
 	
@@ -257,7 +257,7 @@ bool Actions::UseItem(Player* player, const Position& pos, const unsigned char s
 		#ifdef __DEBUG__
 		std::cout << "no id" << std::endl;
 		#endif
-		player->sendCancel("You can not use this object.");
+		player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
 		return false;
 	} 
 	
@@ -292,7 +292,7 @@ bool Actions::UseItem(Player* player, const Position& pos, const unsigned char s
 	}
     
   //we dont know what to do with this item
-  player->sendCancel("You can not use this object.");
+	player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
   return false;	
 }
 
@@ -359,7 +359,7 @@ bool Actions::UseItemEx(Player* player, const Position &from_pos,
 			player, fromPos, fromStackPos, fromItemId, toPos, toStackPos, toItemId);
 		*/
 
-		game->playerSendErrorMessage(player, RET_TOOFARAWAY);
+		player->sendCancelMessage(RET_TOOFARAWAY);
 		return false;
 	}
 	
@@ -382,16 +382,16 @@ bool Actions::UseItemEx(Player* player, const Position &from_pos,
 	if(action){
 		if(action->allowFarUse() == false){
 			if(canUse(player,to_pos) == TOO_FAR){
-				game->playerSendErrorMessage(player, RET_TOOFARAWAY);
+				player->sendCancelMessage(RET_TOOFARAWAY);
 				return false;
 			}
 		}
 		else if(canUseFar(player, to_pos, action->blockWalls()) == TOO_FAR){
-			game->playerSendErrorMessage(player, RET_TOOFARAWAY);
+			player->sendCancelMessage(RET_TOOFARAWAY);
 			return false;
 		}
 		else if(canUseFar(player, to_pos, action->blockWalls()) == CAN_NOT_THROW){
-			player->sendCancel("You cannot throw there.");
+			player->sendCancelMessage(RET_CANNOTTHROW);
 			return false;
 		}
 		
@@ -402,7 +402,7 @@ bool Actions::UseItemEx(Player* player, const Position &from_pos,
 	}
 	
 	//not found
-	player->sendCancel("You can not use this object.");
+	player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
 	return false;
 }
 

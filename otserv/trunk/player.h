@@ -192,6 +192,7 @@ public:
 	bool substractMoneyItem(Item* item, uint32_t money);
 	bool removeItemTypeCount(uint16_t itemId, uint32_t count);
 	uint32_t getItemTypeCount(uint16_t itemId);
+
 		
 	unsigned long eventAutoWalk;
 	
@@ -219,7 +220,8 @@ public:
 	void sendIcons();  
 	void sendChangeSpeed(Creature* creature);
 	void sendToChannel(Creature *creature, SpeakClasses type, const std::string &text, unsigned short channelId);
-	void sendCancel(const char *msg) const;
+	void sendCancelMessage(ReturnValue message) const;
+	void sendCancel(const char* msg) const;
 	void sendCancelWalk() const;
 	void sendStats();
 	void sendTextMessage(MessageClasses mclass, const char* message) const;

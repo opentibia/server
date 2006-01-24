@@ -942,7 +942,7 @@ void Game::thingMove(Player* player, const Position& fromPos, uint16_t itemId, u
 		}
 	}
 	else
-		playerSendErrorMessage(player, RET_NOTPOSSIBLE);
+		player->sendCancelMessage(RET_NOTPOSSIBLE);
 }
 
 void Game::moveCreature(Player* player, Cylinder* fromCylinder, Cylinder* toCylinder,
@@ -1004,7 +1004,7 @@ void Game::moveCreature(Player* player, Cylinder* fromCylinder, Cylinder* toCyli
 	}
 	
 	if((player == moveCreature || ret == RET_NOTMOVEABLE) && ret != RET_NOERROR){
-		playerSendErrorMessage(player, ret);
+		player->sendCancelMessage(ret);
 		player->sendCancelWalk();
 	}
 }
@@ -1092,7 +1092,7 @@ ReturnValue Game::moveCreature(Creature* creature, Direction direction)
 
 	if(ret != RET_NOERROR){
 		if(Player* player = creature->getPlayer()){
-			playerSendErrorMessage(player, ret);
+			player->sendCancelMessage(ret);
 			player->sendCancelWalk();
 		}
 	}
@@ -1113,9 +1113,15 @@ ReturnValue Game::internalCreatureMove(Creature* creature, Cylinder* fromCylinde
 	int32_t index = 0;
 	Item* toItem = NULL;
 	Cylinder* subCylinder = NULL;
+
+	uint32_t n = 0;
 	while((subCylinder = toCylinder->__queryDestination(index, creature, &toItem)) != toCylinder){
 		toCylinder->getTile()->moveCreature(creature, subCylinder);
 		toCylinder = subCylinder;
+
+		//to prevent infinate loop
+		if(++n >= MAP_MAX_LAYERS)
+			break;
 	}
 
 	return RET_NOERROR;
@@ -1129,7 +1135,7 @@ void Game::moveItem(Player* player, Cylinder* fromCylinder, Cylinder* toCylinder
 		return;
 
 	if(fromCylinder == NULL || toCylinder == NULL || item == NULL || item->getID() != itemId){
-		playerSendErrorMessage(player, RET_NOTPOSSIBLE);
+		player->sendCancelMessage(RET_NOTPOSSIBLE);
 		return;
 	}
 
@@ -1166,7 +1172,7 @@ void Game::moveItem(Player* player, Cylinder* fromCylinder, Cylinder* toCylinder
 	}
 
 	if(ret != RET_NOERROR){
-		playerSendErrorMessage(player, ret);
+		player->sendCancelMessage(ret);
 	}
 }
 
@@ -1552,101 +1558,6 @@ ReturnValue Game::internalTeleport(Thing* thing, const Position& newPos)
 	}
 
 	return RET_NOTPOSSIBLE;
-}
-
-void Game::playerSendErrorMessage(Player* player, ReturnValue message)
-{
-	switch(message){
-		case RET_DESTINATIONOUTOFREACH:
-			player->sendCancel("Destination is out of reach.");
-			break;
-
-		case RET_NOTMOVEABLE:
-			player->sendCancel("You cannot move this item.");
-			break;
-
-		case RET_DROPTWOHANDEDITEM:
-			player->sendCancel("Drop the double-handed object first.");
-			break;
-
-		case RET_BOTHHANDSNEEDTOBEFREE:
-			player->sendCancel("Both hands needs to be free.");
-			break;
-
-		case RET_CANNOTBEDRESSED:
-			player->sendCancel("You cannot dress this object there.");
-			break;
-
-		case RET_PUTTHISOBJECTINYOURHAND:
-			player->sendCancel("Put this object in your hand.");
-			break;
-
-		case RET_PUTTHISOBJECTINBOTHHANDS:
-			player->sendCancel("Put this object in both hands.");
-			break;
-
-		case RET_CANONLYUSEONEWEAPON:
-			player->sendCancel("You may only use one weapon.");
-			break;
-
-		case RET_TOOFARAWAY:
-			player->sendCancel("Too far away.");
-			break;
-
-		case RET_FIRSTGODOWNSTAIRS:
-			player->sendCancel("First go downstairs.");
-			break;
-
-		case RET_FIRSTGOUPSTAIRS:
-			player->sendCancel("First go upstairs.");
-			break;
-
-		case RET_NOTENOUGHCAPACITY:
-			player->sendCancel("This object is to heavy.");
-			break;
-		
-		case RET_CONTAINERNOTENOUGHROOM:
-			player->sendCancel("You cannot put more objects in this container.");
-			break;
-
-		case RET_NEEDEXCHANGE:
-		case RET_NOTENOUGHROOM:
-			player->sendCancel("There is not enough room.");
-			break;
-
-		case RET_CANNOTPICKUP:
-			player->sendCancel("You cannot pickup this object.");
-			break;
-
-		case RET_CANNOTTHROW:
-			player->sendCancel("You cannot throw there.");
-			break;
-
-		case RET_THEREISNOWAY:
-			player->sendCancel("There is no way.");
-			break;
-		
-		case RET_THISISIMPOSSIBLE:
-			player->sendCancel("This is impossible.");
-			break;
-
-		case RET_PLAYERISPZLOCKED:
-			player->sendCancel("You can not enter a protection zone after attacking another player.");
-			break;
-
-		case RET_PLAYERISNOTINVITED:
-			player->sendCancel("You are not invited.");
-			break;
-
-		case RET_DEPOTISFULL:
-			player->sendCancel("You cannot put more items in this depot.");
-			break;
-
-		case RET_NOTPOSSIBLE:
-		default:
-			player->sendCancel("Sorry, not possible.");
-			break;
-	}
 }
 
 void Game::getSpectators(const Range& range, SpectatorVec& list)
@@ -2251,7 +2162,7 @@ bool Game::creatureThrowRune(Creature *creature, const Position& centerpos, cons
 	}
 	else if(!map->canThrowObjectTo(creature->getPosition(), centerpos)){
 		if(player)
-			player->sendCancel("You cannot throw there.");
+			player->sendCancelMessage(RET_CANNOTTHROW);
 		return false;
 	}
 	else
@@ -2436,7 +2347,7 @@ bool Game::playerUseItemEx(Player* player, const Position& fromPos, uint8_t from
 				//(std::abs(item->getPosition().x - player->getPosition().x) > 1) ||
 				//(std::abs(item->getPosition().y - player->getPosition().y) > 1) ||
 				//(item->getPosition().z != player->getPosition().z))
-				playerSendErrorMessage(player, RET_TOOFARAWAY);
+				player->sendCancelMessage(RET_TOOFARAWAY);
 				return false;
 			}
 
@@ -2450,7 +2361,8 @@ bool Game::playerUseItemEx(Player* player, const Position& fromPos, uint8_t from
 				}
 			}
 			else{
-				player->sendCancel("You don't have the required magic level to use that rune.");
+				player->sendCancelMessage(RET_NOTREQUIREDLEVELTOUSERUNE);
+				return false;
 			}
 		}
 		else{
@@ -2497,7 +2409,7 @@ bool Game::playerUseBattleWindow(Player* player, const Position& fromPos, uint8_
 			//(std::abs(item->getPosition().x - player->getPosition().x) > 1) ||
 			//(std::abs(item->getPosition().y - player->getPosition().y) > 1) ||
 			//item->getPosition().z != player->getPosition().z)
-			playerSendErrorMessage(player, RET_TOOFARAWAY);
+			player->sendCancelMessage(RET_TOOFARAWAY);
 			return false;
 		}
 
@@ -2518,13 +2430,13 @@ bool Game::playerUseBattleWindow(Player* player, const Position& fromPos, uint8_
 				}
 			}
 			else{
-				player->sendCancel("You don't have the required magic level to use that rune.");
+				player->sendCancelMessage(RET_NOTREQUIREDLEVELTOUSERUNE);
 				return false;
 			}
 		}
 	}
 
-	player->sendCancel("You cannot use this object.");
+	player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
 	return false;
 }
 
@@ -2536,7 +2448,7 @@ bool Game::playerRotateItem(Player* player, const Position& pos, uint8_t stackpo
 
 	Item* item = dynamic_cast<Item*>(internalGetThing(player, pos, stackpos));
 	if(item == NULL || itemId != item->getID() || !item->isRoteable()){
-		playerSendErrorMessage(player, RET_NOTPOSSIBLE);
+		player->sendCancelMessage(RET_NOTPOSSIBLE);
 		return false;
 	}
 	
@@ -2544,7 +2456,7 @@ bool Game::playerRotateItem(Player* player, const Position& pos, uint8_t stackpo
 		//(std::abs(player->getPosition().x - item->getPosition().x) > 1) ||
 		//(std::abs(player->getPosition().y - item->getPosition().y) > 1) ||
 		//(player->getPosition().z != item->getPosition().z))
-		playerSendErrorMessage(player, RET_TOOFARAWAY);
+		player->sendCancelMessage(RET_TOOFARAWAY);
 		return false;
 	}
 
@@ -2563,7 +2475,7 @@ bool Game::playerWriteItem(Player* player, Item* item, const std::string& text)
 		return false;
 
 	if(item->isRemoved()){
-		playerSendErrorMessage(player, RET_NOTPOSSIBLE);
+		player->sendCancelMessage(RET_NOTPOSSIBLE);
 		return false;
 	}
 
@@ -2571,12 +2483,12 @@ bool Game::playerWriteItem(Player* player, Item* item, const std::string& text)
 
 	Player* owner = dynamic_cast<Player*>(parent);
 	if(owner && owner != player){
-		playerSendErrorMessage(player, RET_NOTPOSSIBLE);
+		player->sendCancelMessage(RET_NOTPOSSIBLE);
 		return false;
 	}
 
 	if(!Position::areInRange<1,1,0>(item->getPosition(), player->getPosition())){
-		playerSendErrorMessage(player, RET_NOTPOSSIBLE);
+		player->sendCancelMessage(RET_NOTPOSSIBLE);
 		return false;
 	}
 
@@ -2615,17 +2527,17 @@ bool Game::playerRequestTrade(Player* player, const Position& pos, uint8_t stack
 	}
 
 	if(player->tradeState != TRADE_NONE && !(player->tradeState == TRADE_ACKNOWLEDGE && player->tradePartner == tradePartner)) {
-		player->sendCancel("You are already trading.");
+		player->sendCancelMessage(RET_YOUAREALREADYTRADING);
 		return false;
 	}
 	else if(tradePartner->tradeState != TRADE_NONE && tradePartner->tradePartner != player) {
-		player->sendCancel("This player is already trading.");
+		player->sendCancelMessage(RET_THISPLAYERISALREADYTRADING);
 		return false;
 	}
 
 	Item* tradeItem = dynamic_cast<Item*>(internalGetThing(player, pos, STACKPOS_USE /*stackpos*/));
 	if(!tradeItem || tradeItem->getID() != itemId || !tradeItem->isPickupable()) {
-		playerSendErrorMessage(player, RET_NOTPOSSIBLE);
+		player->sendCancelMessage(RET_NOTPOSSIBLE);
 		return false;
 	}
 	
@@ -2850,7 +2762,7 @@ bool Game::playerLookAt(Player* player, const Position& pos, uint16_t itemId, ui
 
 	Thing* thing = internalGetThing(player, pos, STACKPOS_LOOK /*stackpos*/);
 	if(!thing){
-		playerSendErrorMessage(player, RET_NOTPOSSIBLE);
+		player->sendCancelMessage(RET_NOTPOSSIBLE);
 		return false;
 	}
 

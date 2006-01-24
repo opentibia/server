@@ -219,7 +219,7 @@ bool Commands::placeNpc(Creature* creature, const std::string& cmd, const std::s
 		Player* player = dynamic_cast<Player*>(creature);
 		if(player) {
 			player->sendMagicEffect(player->getPosition(), NM_ME_PUFF);
-			player->sendCancel("Sorry not enough room.");
+			player->sendCancelMessage(RET_NOTENOUGHROOM);
 		}
 		return true;
 	}
@@ -253,7 +253,7 @@ bool Commands::placeMonster(Creature* creature, const std::string& cmd, const st
 		delete monster;
 		Player* player = dynamic_cast<Player*>(creature);
 		if(player) {
-			game->playerSendErrorMessage(player, RET_NOTENOUGHROOM);
+			player->sendCancelMessage(RET_NOTENOUGHROOM);
 			player->sendMagicEffect(player->getPosition(), NM_ME_PUFF);
 		}
 	}
@@ -278,7 +278,7 @@ bool Commands::placeSummon(Creature* creature, const std::string& cmd, const std
 
 		if(Player* player = creature->getPlayer()) {
 			player->sendMagicEffect(player->getPosition(), NM_ME_PUFF);
-			player->sendCancel("Sorry not enough room.");
+			player->sendCancelMessage(RET_NOTENOUGHROOM);
 		}
 	}
 
