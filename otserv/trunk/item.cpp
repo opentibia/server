@@ -564,7 +564,7 @@ std::string Item::getName() const
 	return items[id].name;
 }
 
-void Item::setSpecialDescription(std::string desc){
+void Item::setSpecialDescription(std::string& desc){
 	if(specialDescription){
 		delete specialDescription;
 		specialDescription = NULL;
@@ -586,7 +586,7 @@ void Item::clearSpecialDescription(){
 	specialDescription = NULL;
 }
 
-void Item::setText(std::string desc)
+void Item::setText(std::string& desc)
 {
 	if(text){
 		delete text;
@@ -594,11 +594,7 @@ void Item::setText(std::string desc)
 	}
 
 	if(desc.length() > 1){
-		text = new std::string(desc);	
-
-		//if(items[id].readOnlyId != 0){//write 1 time
-		//	id = items[id].readOnlyId;
-		//}
+		text = new std::string(desc);
 	}
 }
 

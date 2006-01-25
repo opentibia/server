@@ -73,6 +73,8 @@ Creature()
 	speed = mType->base_speed;
 	level = mType->level;
 	maglevel = mType->maglevel;
+	internalLight.level = mType->lightLevel;
+	internalLight.color = mType->lightColor;
 }
 
 unsigned long Monster::getRandom(){
