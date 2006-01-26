@@ -70,23 +70,24 @@ public:
 	unsigned short id;
 	unsigned short clientId;
 
-  unsigned short maxItems;   // maximum size if this is a container
-	double weight;						 // weight of the item, e.g. throwing distance depends on it
-	std::string			name;			 // the name of the item
-	std::string			description;	 // additional description... as in "The blade is a magic flame." for fireswords
-  WeaponType			weaponType;
-  amu_t						amuType;
-  subfight_t			shootType;
-  int							attack;
-  int							defence;
-  int							armor;
+	unsigned short maxItems;	 // maximum size if this is a container
+	double			weight;		 // weight of the item, e.g. throwing distance depends on it
+	std::string		name;		 // the name of the item
+	std::string		description; // additional description... as in "The blade is a magic flame." for fireswords
+	WeaponType		weaponType;
+	amu_t			amuType;
+	subfight_t		shootType;
+	int				attack;
+	int				defence;
+	int				armor;
 	unsigned short	slot_position;
-  unsigned short	decayTo;
-  unsigned short	decayTime;
-  bool						canDecay;
-	bool						isVertical;
-	bool						isHorizontal;
-	bool						isHangable;
+	unsigned short	decayTo;
+	unsigned short	decayTime;
+	bool			canDecay;
+	bool			isVertical;
+	bool			isHorizontal;
+	bool			isHangable;
+	bool 			allowDistRead;
 
 	uint16_t speed;
 
@@ -103,17 +104,17 @@ public:
 	int             runeMagLevel;
 	bool            pickupable;
 	bool            rotable;
-	int 			      rotateTo;
+	int				rotateTo;
 
-	int             lightLevel;
-	int             lightColor;
+	int lightLevel;
+	int lightColor;
 
-	bool						floorChangeDown;
-	bool						floorChangeNorth;
-	bool						floorChangeSouth;
-	bool						floorChangeEast;
-	bool						floorChangeWest;
-	bool            hasHeight;
+	bool floorChangeDown;
+	bool floorChangeNorth;
+	bool floorChangeSouth;
+	bool floorChangeEast;
+	bool floorChangeWest;
+	bool hasHeight;
 
 	bool blockSolid;
 	bool blockPickupable;

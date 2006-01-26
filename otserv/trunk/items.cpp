@@ -79,6 +79,7 @@ ItemType::ItemType()
 	decayTo       = 0;
 	decayTime     = 60;
 	canDecay      =	true;
+	allowDistRead = false;
 
 	isVertical		= false;
 	isHorizontal	= false;
@@ -269,6 +270,7 @@ int Items::loadFromOtb(std::string file)
 					case ITEM_GROUP_KEY:
 					case ITEM_GROUP_SPLASH:
 					case ITEM_GROUP_FLUID:
+					case ITEM_GROUP_DOOR:
 					{
 						if(!loadedFlags) {
 							//read 4 byte flags
@@ -289,10 +291,11 @@ int Items::loadFromOtb(std::string file)
 							iType->floorChangeWest = ((flags & FLAG_FLOORCHANGEWEST) == FLAG_FLOORCHANGEWEST);
 							iType->alwaysOnTop = ((flags & FLAG_ALWAYSONTOP) == FLAG_ALWAYSONTOP);
 							iType->canDecay = !((flags & FLAG_CANNOTDECAY) == FLAG_CANNOTDECAY);
-
 							iType->isVertical = ((flags & FLAG_VERTICAL) == FLAG_VERTICAL);
 							iType->isHorizontal = ((flags & FLAG_HORIZONTAL) == FLAG_HORIZONTAL);
 							iType->isHangable = ((flags & FLAG_HANGABLE) == FLAG_HANGABLE);
+							iType->allowDistRead = ((flags & FLAG_ALLOWDISTREAD) == FLAG_ALLOWDISTREAD);
+							
 							
 							if(type == ITEM_GROUP_WRITEABLE) {
 								iType->RWInfo |= CAN_BE_WRITTEN;
