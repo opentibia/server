@@ -564,7 +564,7 @@ std::string Item::getName() const
 	return items[id].name;
 }
 
-void Item::setSpecialDescription(std::string& desc){
+void Item::setSpecialDescription(const std::string& desc){
 	if(specialDescription){
 		delete specialDescription;
 		specialDescription = NULL;
@@ -586,7 +586,7 @@ void Item::clearSpecialDescription(){
 	specialDescription = NULL;
 }
 
-void Item::setText(std::string& desc)
+void Item::setText(const std::string& desc)
 {
 	if(text){
 		delete text;

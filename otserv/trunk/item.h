@@ -130,10 +130,10 @@ public:
 	bool floorChangeWest() const;
 
 	std::string getName() const ;
-	void setSpecialDescription(std::string& desc);
+	void setSpecialDescription(const std::string& desc);
 	std::string getSpecialDescription();
 	void clearSpecialDescription();
-	void setText(std::string& desc);
+	void setText(const std::string& desc);
 	void clearText();
 	std::string Item::getText();
 	
