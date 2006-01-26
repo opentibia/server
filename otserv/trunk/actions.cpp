@@ -1729,7 +1729,7 @@ int ActionScript::luaActionDoSetItemText(lua_State *L)
 	//Item *tmpitem = NULL;
 	Item* item = action->GetItemByUID(itemid);
 	if(item){
-		item->setText(text);
+		item->setText(std::string(text));
 		
 		lua_pushnumber(L, 0);
 		return 1;
@@ -1755,7 +1755,7 @@ int ActionScript::luaActionDoSetItemSpecialDescription(lua_State *L)
 	//const KnownThing* tmp = action->GetItemByUID(itemid);
 	Item* item = action->GetItemByUID(itemid);
 	if(item){
-		item->setSpecialDescription(desc);
+		item->setSpecialDescription(std::string(desc));
 		
 		lua_pushnumber(L, 0);
 		return 1;
