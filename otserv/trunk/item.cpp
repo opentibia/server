@@ -535,6 +535,19 @@ std::string Item::getDescription(int32_t lookDistance) const
 			else if(it.isContainer()){
 				s << "a " << it.name << " (Vol:" << getContainer()->capacity() << ")";
 			}
+			else if(it.allowDistRead){
+				s << it.name << "." << std::endl;
+
+				if(lookDistance <= 6){
+					if(text && text->length() > 0){
+						s << *text;
+					}
+					else
+						s << "Nothing is written on it";
+				}
+				else
+					s << "You are to far away";
+			}
 			else{
 				s << "a " << it.name;
 			}
