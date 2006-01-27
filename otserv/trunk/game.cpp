@@ -2759,7 +2759,30 @@ bool Game::playerLookAt(Player* player, const Position& pos, uint16_t itemId, ui
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerCloseTrade()");
 	if(player->isRemoved())
 		return false;
-
+	
+	Position playerPos = player->getPosition();
+	
+	if(playerPos.z >= 8){
+		//player is underground
+		if(pos.z < 8){
+			return false;
+		}	
+		if(!Position::areInRange<9,6,5>(playerPos, pos)){
+			return false;
+		}
+	}
+	else{
+		//player is ground level or above
+		if(pos.z >= 8){
+			//trying to look underground
+			return false;
+		}
+		if(!Position::areInRange<9,6,7>(playerPos, pos)){
+			return false;
+		}
+	}
+	
+	
 	Thing* thing = internalGetThing(player, pos, STACKPOS_LOOK /*stackpos*/);
 	if(!thing){
 		player->sendCancelMessage(RET_NOTPOSSIBLE);
@@ -2770,13 +2793,9 @@ bool Game::playerLookAt(Player* player, const Position& pos, uint16_t itemId, ui
 	if(thing == player)
 		lookDistance = -1;
 	else{
-		const Position& LookPos = player->getPosition();
-		const Position& thingMapPos = thing->getPosition();
-		
-		if(LookPos.z != thingMapPos.z)
-			lookDistance = std::abs(LookPos.z - thingMapPos.z) * 2;
-		else
-			lookDistance = std::max(std::abs(LookPos.x - thingMapPos.x), std::abs(LookPos.y - thingMapPos.y));
+		lookDistance = std::max(std::abs(playerPos.x - pos.x), std::abs(playerPos.y - pos.y));
+		if(playerPos.z != pos.z)
+			lookDistance = lookDistance + 9 + 6;
 	}
 
 	std::stringstream ss;
@@ -2784,7 +2803,6 @@ bool Game::playerLookAt(Player* player, const Position& pos, uint16_t itemId, ui
 	player->sendTextMessage(MSG_INFO, ss.str().c_str());
 
 	return true;
-
 }
 
 bool Game::playerSetAttackedCreature(Player* player, unsigned long creatureid)

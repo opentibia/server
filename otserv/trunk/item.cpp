@@ -546,7 +546,7 @@ std::string Item::getDescription(int32_t lookDistance) const
 						s << "Nothing is written on it";
 				}
 				else
-					s << "You are to far away";
+					s << "You are too far away";
 			}
 			else{
 				s << "a " << it.name;

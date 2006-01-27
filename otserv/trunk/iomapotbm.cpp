@@ -33,6 +33,22 @@ typedef unsigned long flags_t;
 enum tile_flags_t{
 	TILE_PZ = 1,
 };
+/*
+	OTBM_ROOTV1
+	|
+	|--- OTBM_MAP_DATA
+	|	|
+	|	|--- OTBM_TILE_AREA
+	|	|	|--- OTBM_TILE
+	|	|	|--- OTBM_TILE_SQUARE (not implemented)
+	|	|	|--- OTBM_TILE_REF (not implemented)
+	|	|
+	|	|--- OTBM_SPAWNS (not implemented)
+	|		|--- OTBM_SPAWN_AREA (not implemented)
+	|		|--- OTBM_MONSTER (not implemented)
+	|
+	|--- OTBM_ITEM_DEF (not implemented)
+*/
 
 enum OTBM_NodeTypes_t{
 	OTBM_ROOTV1 = 1,
@@ -130,6 +146,10 @@ bool IOMapOTBM::loadMap(Map* map, std::string identifier)
 	std::cout << "Map size: " << root_header->width << "x" << root_header->height << std::endl;
 
 	NODE map_data = f.getChildNode(root, type);
+	
+	if(type != OTBM_MAP_DATA){
+		return false;
+	}
 
 	if(!f.getProps(map_data, propStream)){
 		return false;
