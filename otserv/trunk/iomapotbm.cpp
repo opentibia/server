@@ -26,6 +26,7 @@
 #include "depot.h"
 #include "teleport.h"
 #include "fileloader.h"
+#include "town.h"
 
 typedef unsigned char attribute_t;
 typedef unsigned long flags_t;
@@ -62,6 +63,8 @@ enum OTBM_NodeTypes_t{
 	OTBM_SPAWNS = 9,
 	OTBM_SPAWN_AREA = 10,
 	OTBM_MONSTER = 11,
+	OTBM_TOWNS = 12,
+	OTBM_TOWN = 13
 };
 
 enum OTBM_AttrTypes_t{
@@ -105,6 +108,12 @@ struct OTBM_Tile_area_coords{
 struct OTBM_Tile_coords{
 	unsigned char _x;
 	unsigned char _y;
+};
+
+struct OTBM_TownTemple_coords{
+	unsigned short _x;
+	unsigned short _y;
+	unsigned char _z;
 };
 
 #pragma pack()
@@ -274,6 +283,55 @@ bool IOMapOTBM::loadMap(Map* map, std::string identifier)
 				}
 				tile_node = f.getNextNode(tile_node, type);
 			}
+		}
+		else if(type == OTBM_TOWNS){
+			NODE childtownnode = f.getChildNode(tile_area, type);
+			while(childtownnode != NO_NODE){
+				if(f.getProps(childtownnode, propStream)){
+					unsigned long townid = 0;
+					if(!propStream.GET_ULONG(townid)){
+						return FALSE;
+					}
+
+					Town* town = Towns::getInstance().getTown(townid);
+					if(!town){
+						town = new Town(townid);
+						Towns::getInstance().addTown(townid, town);
+					}
+
+					std::string townName = "";
+
+					if(!propStream.GET_STRING(townName)){
+						return FALSE;
+					}
+
+					town->setName(townName);
+
+					OTBM_TownTemple_coords town_coords;
+
+					if(!propStream.GET_USHORT(town_coords._x)){
+						return FALSE;
+					}
+
+					if(!propStream.GET_USHORT(town_coords._y)){
+						return FALSE;
+					}
+
+					if(!propStream.GET_UCHAR(town_coords._z)){
+						return FALSE;
+					}
+
+					Position pos;
+					pos.x = town_coords._x;
+					pos.y = town_coords._y;
+					pos.z = town_coords._z;
+
+					town->setTemplePos(pos);
+				}
+
+				childtownnode = f.getNextNode(childtownnode, type);
+			}
+			break;
 		}
 		tile_area = f.getNextNode(tile_area, type);
 	}

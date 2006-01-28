@@ -23,6 +23,7 @@
 #include "player.h"
 #include "ioplayer.h"
 #include "depot.h"
+#include "town.h"
 
 #include <sstream>
 
@@ -209,10 +210,14 @@ bool Mailbox::getReciver(Item* item, std::string& name, uint32_t& dp)
 		i++;
 	}
           
-	/**Now to the problem, how to do with the city names? 
-	Lets make it the depot number until we got a solution**/
 	name = line[0];
-	dp = atoi(line[1].c_str());
+
+	Town* town = Towns::getInstance().getTown(line[1]);
+	if(town){
+		dp = town->getTownID();
+	}
+	else
+		dp = atoi(line[1].c_str());
 	
 	return true;
 }

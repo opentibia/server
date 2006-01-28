@@ -19,13 +19,17 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "iomapxml.h"
-#include "depot.h"
 #include "definitions.h"
+
+#include "depot.h"
+#include "house.h"
+#include "housetile.h"
+#include "town.h"
 #include <iostream>
 
 bool IOMapXML::loadMap(Map* map, std::string identifier){
 	xmlDocPtr doc;
-	xmlNodePtr root, tileNode, p, tmpNode;
+	xmlNodePtr root, rootChildren, p, tmpNode;
 	char* tmp;
 
 	xmlLineNumbersDefault(1);
@@ -61,118 +65,237 @@ bool IOMapXML::loadMap(Map* map, std::string identifier){
 		xmlFreeOTSERV(tmp);
 	}
 
-	tileNode = root->children;
+	rootChildren = root->children;
 
 	int px,py,pz;
+	int houseid = 0;
 	Tile* tile;
 
-	while(tileNode){
-		tmp = (char*)xmlGetProp(tileNode, (const xmlChar *) "x");
-		if(!tmp){
-			tileNode = tileNode->next;
-			continue;
-		}
+	while(rootChildren){
+		if(xmlStrcmp(rootChildren->name, (const xmlChar*)"tile") == 0){
+			tmp = (char*)xmlGetProp(rootChildren, (const xmlChar *) "x");
+			if(!tmp){
+				rootChildren = rootChildren->next;
+				continue;
+			}
 
-		px = atoi(tmp);
-		xmlFreeOTSERV(tmp);
-
-		tmp = (char*)xmlGetProp(tileNode, (const xmlChar *) "y");
-		if(!tmp){
-			tileNode = tileNode->next;
-			continue;
-		}
-
-		py = atoi(tmp);
-    xmlFreeOTSERV(tmp);
-
-    tmp = (char*)xmlGetProp(tileNode, (const xmlChar *) "z");
-    if(!tmp){
-			tileNode = tileNode->next;
-			continue;
-		}
-
-		pz = atoi(tmp);
-    xmlFreeOTSERV(tmp);
-
-		tile = new Tile(px, py, pz);
-		map->setTile(px, py, pz, tile);
-
-		tmp = (char*)xmlGetProp(tileNode, (const xmlChar *) "ground");
-		unsigned short ground = 0;
-		if(tmp){
-			ground = atoi(tmp);
+			px = atoi(tmp);
 			xmlFreeOTSERV(tmp);
-		}
 
-		if(ground != 0){
-			Item* myGround = Item::CreateItem(ground);
-			tile->__internalAddThing(myGround);
-		}
+			tmp = (char*)xmlGetProp(rootChildren, (const xmlChar *) "y");
+			if(!tmp){
+				rootChildren = rootChildren->next;
+				continue;
+			}
 
-		tmp = (char*)xmlGetProp(tileNode, (const xmlChar *) "pz");
-		if(tmp && (strcmp(tmp, "1") == 0)){ 
-			tile->setFlag(TILESTATE_PROTECTIONZONE);
+			py = atoi(tmp);
 			xmlFreeOTSERV(tmp);
-		}
-       
-    p = tileNode->children;
-    while(p){
-      if(xmlStrcmp(p->name,(const xmlChar*) "item")==0){          
-				tmp = (char*)xmlGetProp(p, (const xmlChar *) "id");
-				unsigned int id;
-				if(tmp){
-					id = atoi(tmp);
-					xmlFreeOTSERV(tmp);
-				}
-				else
-					id = 0;
-		
-				Item* myitem = Item::CreateItem(id);
-				myitem->unserialize(p);
-				Container* container = dynamic_cast<Container*>(myitem);
-				if(container){
-					//is depot?
-					if(Depot* depot = container->getDepot()){
-						tmp = (char*)xmlGetProp(p, (const xmlChar *) "depot");
-						if(tmp){
-							int depotId = atoi(tmp);					
-							depot->setDepotId(depotId);
-							xmlFreeOTSERV(tmp);
-						}
+
+			tmp = (char*)xmlGetProp(rootChildren, (const xmlChar *) "z");
+			if(!tmp){
+				rootChildren = rootChildren->next;
+				continue;
+			}
+
+			pz = atoi(tmp);
+			xmlFreeOTSERV(tmp);
+
+			tmp = (char*)xmlGetProp(rootChildren, (const xmlChar *) "houseid");
+
+			if(tmp){
+				houseid = atoi(tmp);
+				xmlFreeOTSERV(tmp);
+			}
+			else
+				houseid = 0;
+
+			//tile = new Tile(px, py, pz);
+			//map->setTile(px, py, pz, tile);
+
+			tmp = (char*)xmlGetProp(rootChildren, (const xmlChar *) "ground");
+			unsigned short ground = 0;
+			if(tmp){
+				ground = atoi(tmp);
+				xmlFreeOTSERV(tmp);
+			}
+
+			if(houseid == 0){
+				tile = new Tile(px, py, pz);
+			}
+			else{
+				House* house = Houses::getInstance().getHouse(houseid);
+				HouseTile* houseTile = new HouseTile(px, py, pz, house);
+				house->addTile(houseTile);
+				tile = houseTile;
+			}
+
+			map->setTile(px, py, pz, tile);
+
+			if(ground != 0){
+				Item* myGround = Item::CreateItem(ground);
+				tile->__internalAddThing(myGround);
+			}
+
+			tmp = (char*)xmlGetProp(rootChildren, (const xmlChar *) "pz");
+			if(tmp && (strcmp(tmp, "1") == 0)){ 
+				tile->setFlag(TILESTATE_PROTECTIONZONE);
+				xmlFreeOTSERV(tmp);
+			}
+	       
+			p = rootChildren->children;
+			while(p){
+				if(xmlStrcmp(p->name,(const xmlChar*) "item")==0){          
+					tmp = (char*)xmlGetProp(p, (const xmlChar *) "id");
+					unsigned int id;
+					if(tmp){
+						id = atoi(tmp);
+						xmlFreeOTSERV(tmp);
 					}
-
-					if(p->children && strcmp((const char*)p->children->name, "inside") == 0){
-						tmpNode = p->children->children;
-						while(tmpNode){
-							tmp = (char*)xmlGetProp(tmpNode, (const xmlChar *) "id");
-							unsigned int id;
+					else
+						id = 0;
+			
+					Item* myitem = Item::CreateItem(id);
+					myitem->unserialize(p);
+					Container* container = dynamic_cast<Container*>(myitem);
+					if(container){
+						//is depot?
+						if(Depot* depot = container->getDepot()){
+							tmp = (char*)xmlGetProp(p, (const xmlChar *) "depot");
 							if(tmp){
-								id = atoi(tmp);
+								int depotId = atoi(tmp);					
+								depot->setDepotId(depotId);
 								xmlFreeOTSERV(tmp);
 							}
-							else
-								id = 0;
-						
-							Item* myitem = Item::CreateItem(id);
-							myitem->unserialize(tmpNode);
-							container->__internalAddThing(myitem);
-			
-							Container* in_container = dynamic_cast<Container*>(myitem);
-							if(in_container){
-								LoadContainer(tmpNode,in_container);
-							}
-							tmpNode = tmpNode->next;
 						}
-					}
-				}//loadContainer
 
-				tile->__internalAddThing(myitem);
+						if(p->children && strcmp((const char*)p->children->name, "inside") == 0){
+							tmpNode = p->children->children;
+							while(tmpNode){
+								tmp = (char*)xmlGetProp(tmpNode, (const xmlChar *) "id");
+								unsigned int id;
+								if(tmp){
+									id = atoi(tmp);
+									xmlFreeOTSERV(tmp);
+								}
+								else
+									id = 0;
+							
+								Item* myitem = Item::CreateItem(id);
+								myitem->unserialize(tmpNode);
+								container->__internalAddThing(myitem);
+				
+								Container* in_container = dynamic_cast<Container*>(myitem);
+								if(in_container){
+									LoadContainer(tmpNode,in_container);
+								}
+								tmpNode = tmpNode->next;
+							}
+						}
+					}//loadContainer
+
+					tile->__internalAddThing(myitem);
+				}
+				
+				p = p->next;
 			}
-			
-			p = p->next;
 		}
+		else if(xmlStrcmp(rootChildren->name, (const xmlChar*)"towns") == 0){
+			p = rootChildren->children;
 
-		tileNode = tileNode->next;
+			while(p){
+				Position templePos;
+				uint32_t townid = 0;
+
+				tmp = (char*)xmlGetProp(p, (const xmlChar *) "townid");
+
+				if(!tmp){
+					p = p->next;
+					continue;
+				}
+
+				townid = atoi(tmp);
+				xmlFreeOTSERV(tmp);
+		
+				Town* town = Towns::getInstance().getTown(townid);
+
+				tmp = (char*)xmlGetProp(p, (const xmlChar *) "name");
+				if(tmp){
+					town->setName(tmp);
+					xmlFreeOTSERV(tmp);
+				}
+
+				tmp = (char*)xmlGetProp(p, (const xmlChar *) "templex");
+				if(tmp){
+					templePos.x = atoi(tmp);
+					xmlFreeOTSERV(tmp);
+				}
+
+				tmp = (char*)xmlGetProp(p, (const xmlChar *) "templey");
+				if(tmp){
+					templePos.y = atoi(tmp);
+					xmlFreeOTSERV(tmp);
+				}
+
+				tmp = (char*)xmlGetProp(p, (const xmlChar *) "templez");
+				if(tmp){
+					templePos.z = atoi(tmp);
+					xmlFreeOTSERV(tmp);
+				}
+				
+				town->setTemplePos(templePos);
+
+				p = p->next;
+			}
+		}
+		/*else if(xmlStrcmp(rootChildren->name, (const xmlChar*)"houses") == 0){
+			p = rootChildren->children;
+
+			while(p){
+				Position entryPos;
+
+				tmp = (char*)xmlGetProp(p, (const xmlChar *) "houseid");
+
+				if(!tmp){
+					p = p->next;
+					continue;
+				}
+
+				houseid = atoi(tmp);
+				xmlFreeOTSERV(tmp);
+		
+				House* house = Houses::getInstance().getHouse(houseid);
+
+				tmp = (char*)xmlGetProp(p, (const xmlChar *) "name");
+				if(tmp){
+					house->setName(tmp);
+					xmlFreeOTSERV(tmp);
+				}
+
+				tmp = (char*)xmlGetProp(p, (const xmlChar *) "entryx");
+				if(tmp){
+					entryPos.x = atoi(tmp);
+					xmlFreeOTSERV(tmp);
+				}
+
+				tmp = (char*)xmlGetProp(p, (const xmlChar *) "entryy");
+				if(tmp){
+					entryPos.y = atoi(tmp);
+					xmlFreeOTSERV(tmp);
+				}
+
+				tmp = (char*)xmlGetProp(p, (const xmlChar *) "entryz");
+				if(tmp){
+					entryPos.z = atoi(tmp);
+					xmlFreeOTSERV(tmp);
+				}
+				
+				house->setEntryPos(entryPos);
+				house->setHouseOwner(0);
+				p = p->next;
+			}
+		}*/
+
+		rootChildren = rootChildren->next;
 	}
 
  	xmlFreeDoc(doc);
