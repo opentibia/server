@@ -2760,41 +2760,26 @@ bool Game::playerLookAt(Player* player, const Position& pos, uint16_t itemId, ui
 	if(player->isRemoved())
 		return false;
 	
-	Position playerPos = player->getPosition();
-	
-	if(playerPos.z >= 8){
-		//player is underground
-		if(pos.z < 8){
-			return false;
-		}	
-		if(!Position::areInRange<9,6,5>(playerPos, pos)){
-			return false;
-		}
-	}
-	else{
-		//player is ground level or above
-		if(pos.z >= 8){
-			//trying to look underground
-			return false;
-		}
-		if(!Position::areInRange<9,6,7>(playerPos, pos)){
-			return false;
-		}
-	}
-	
-	
 	Thing* thing = internalGetThing(player, pos, STACKPOS_LOOK /*stackpos*/);
 	if(!thing){
 		player->sendCancelMessage(RET_NOTPOSSIBLE);
 		return false;
 	}
-
+	
+	Position thingPos = thing->getPosition();
+	if(!player->CanSee(thingPos)){
+		player->sendCancelMessage(RET_NOTPOSSIBLE);
+		return false;
+	}
+	
+	Position playerPos = player->getPosition();
+	
 	int32_t lookDistance = 0;
 	if(thing == player)
 		lookDistance = -1;
 	else{
-		lookDistance = std::max(std::abs(playerPos.x - pos.x), std::abs(playerPos.y - pos.y));
-		if(playerPos.z != pos.z)
+		lookDistance = std::max(std::abs(playerPos.x - thingPos.x), std::abs(playerPos.y - thingPos.y));
+		if(playerPos.z != thingPos.z)
 			lookDistance = lookDistance + 9 + 6;
 	}
 

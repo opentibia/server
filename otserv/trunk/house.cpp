@@ -86,8 +86,8 @@ ReturnValue House::addGuest(const Player* player)
 
 ReturnValue House::addGuest(const std::string& name)
 {
-	uint32_t guid = 0;
-	uint32_t access = 0;
+	unsigned long guid = 0;
+	unsigned long access = 0;
 	std::string dbName = name;
 
 	if(IOPlayer::instance()->getGuidByName(guid, access, dbName)){
@@ -102,8 +102,8 @@ ReturnValue House::addGuest(const std::string& name)
 
 ReturnValue House::removeGuest(const std::string& name)
 {
-	uint32_t guid = 0;
-	uint32_t access = 0;
+	unsigned long guid = 0;
+	unsigned long access = 0;
 	std::string dbName = name;
 
 	if(IOPlayer::instance()->getGuidByName(guid, access, dbName)){
