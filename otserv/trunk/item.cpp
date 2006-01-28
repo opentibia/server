@@ -408,6 +408,12 @@ bool Item::isRoteable() const{
 	return it.rotable && it.rotateTo;
 }
 
+bool Item::isDoor() const
+{
+	const ItemType& it = items[id];
+	return it.isDoor();
+}
+
 bool Item::floorChangeDown() const{
 	return items[id].floorChangeDown;
 }

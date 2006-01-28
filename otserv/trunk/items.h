@@ -61,6 +61,7 @@ public:
 
 	bool isGroundTile() const;
 	bool isContainer() const;
+	bool isDoor() const;
 	bool isTeleport() const;
 	bool isMagicField() const;
 	bool isKey() const;

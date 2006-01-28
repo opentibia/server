@@ -122,6 +122,7 @@ public:
 	bool isUseable() const;
 	bool isHangable() const;
 	bool isRoteable() const;
+	bool isDoor() const;
 
 	bool floorChangeDown() const;
 	bool floorChangeNorth() const;

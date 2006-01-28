@@ -103,6 +103,11 @@ bool ItemType::isContainer() const
 	return (group == ITEM_GROUP_CONTAINER);
 }
 
+bool ItemType::isDoor() const
+{
+	return (group == ITEM_GROUP_DOOR);
+}
+
 bool ItemType::isTeleport() const
 {
 	return (group == ITEM_GROUP_TELEPORT);
