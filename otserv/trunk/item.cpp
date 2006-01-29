@@ -513,10 +513,10 @@ std::string Item::getDescription(int32_t lookDistance) const
 			}
 			else if(isWeapon() && getDefense()) //Shields
 			{
-				s << "a " << it.name << " (Def: " << (int)getDefense() << ")";	
+				s << "a " << it.name << " (Def:" << (int)getDefense() << ")";	
 			}
 			else if(getArmor()){
-				s << "a " << it.name << " (Arm:"<< (int)getArmor() << ")";
+				s << "a " << it.name << " (Arm:" << (int)getArmor() << ")";
 			}
 			else if(isFluidContainer()){
 				s << "a " << it.name;
