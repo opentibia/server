@@ -45,8 +45,11 @@ enum tile_flags_t{
 	|	|	|--- OTBM_TILE_REF (not implemented)
 	|	|
 	|	|--- OTBM_SPAWNS (not implemented)
-	|		|--- OTBM_SPAWN_AREA (not implemented)
-	|		|--- OTBM_MONSTER (not implemented)
+	|	|	|--- OTBM_SPAWN_AREA (not implemented)
+	|	|	|--- OTBM_MONSTER (not implemented)
+	|	|
+	|	|--- OTBM_TOWNS
+	|		|--- OTBM_TOWN
 	|
 	|--- OTBM_ITEM_DEF (not implemented)
 */
@@ -64,7 +67,7 @@ enum OTBM_NodeTypes_t{
 	OTBM_SPAWN_AREA = 10,
 	OTBM_MONSTER = 11,
 	OTBM_TOWNS = 12,
-	OTBM_TOWN = 13
+	OTBM_TOWN = 13,
 };
 
 enum OTBM_AttrTypes_t{
@@ -79,7 +82,7 @@ enum OTBM_AttrTypes_t{
 	OTBM_ATTR_ITEM = 9,
 	OTBM_ATTR_DEPOT_ID = 10,
 	OTBM_ATTR_EXT_SPAWN_FILE = 11,
-	OTBM_ATTR_RUNE_CHARGES = 12
+	OTBM_ATTR_RUNE_CHARGES = 12,
 };
 
 #pragma pack(1)
@@ -118,6 +121,7 @@ struct OTBM_TownTemple_coords{
 
 #pragma pack()
 
+#define OTBM_UNK_NODE_MSG std::cout << "Warning: OTBM loader unknown node type" << std::endl;
 
 bool IOMapOTBM::loadMap(Map* map, std::string identifier)
 {
@@ -278,8 +282,14 @@ bool IOMapOTBM::loadMap(Map* map, std::string identifier)
 								return false;
 							}
 						}
+						else{
+							OTBM_UNK_NODE_MSG
+						}
 						item_node = f.getNextNode(item_node, type);
 					}
+				}
+				else{
+					OTBM_UNK_NODE_MSG
 				}
 				tile_node = f.getNextNode(tile_node, type);
 			}
@@ -287,12 +297,15 @@ bool IOMapOTBM::loadMap(Map* map, std::string identifier)
 		else if(type == OTBM_TOWNS){
 			NODE childtownnode = f.getChildNode(tile_area, type);
 			while(childtownnode != NO_NODE){
-				if(f.getProps(childtownnode, propStream)){
+				if(type == OTBM_TOWN){
+					if(!f.getProps(childtownnode, propStream)){
+						return false;
+					}
+					
 					unsigned long townid = 0;
 					if(!propStream.GET_ULONG(townid)){
-						return FALSE;
+						return false;
 					}
-
 					Town* town = Towns::getInstance().getTown(townid);
 					if(!town){
 						town = new Town(townid);
@@ -300,38 +313,36 @@ bool IOMapOTBM::loadMap(Map* map, std::string identifier)
 					}
 
 					std::string townName = "";
-
 					if(!propStream.GET_STRING(townName)){
-						return FALSE;
+						return false;
 					}
-
 					town->setName(townName);
 
 					OTBM_TownTemple_coords town_coords;
-
 					if(!propStream.GET_USHORT(town_coords._x)){
-						return FALSE;
+						return false;
 					}
-
 					if(!propStream.GET_USHORT(town_coords._y)){
-						return FALSE;
+						return false;
 					}
-
 					if(!propStream.GET_UCHAR(town_coords._z)){
-						return FALSE;
+						return false;
 					}
 
 					Position pos;
 					pos.x = town_coords._x;
 					pos.y = town_coords._y;
 					pos.z = town_coords._z;
-
 					town->setTemplePos(pos);
 				}
-
+				else{
+					OTBM_UNK_NODE_MSG
+				}
 				childtownnode = f.getNextNode(childtownnode, type);
 			}
-			break;
+		}
+		else{
+			OTBM_UNK_NODE_MSG
 		}
 		tile_area = f.getNextNode(tile_area, type);
 	}
@@ -482,6 +493,9 @@ Item* IOMapOTBM::unserializaItemNode(FileLoader* f, NODE node)
 					else{
 						return false;
 					}
+				}
+				else{
+					OTBM_UNK_NODE_MSG
 				}
 				item_node = f->getNextNode(item_node, type);
 			}

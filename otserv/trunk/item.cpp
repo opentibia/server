@@ -544,7 +544,7 @@ std::string Item::getDescription(int32_t lookDistance) const
 			else if(it.allowDistRead){
 				s << it.name << "." << std::endl;
 
-				if(lookDistance <= 6){
+				if(lookDistance <= 4){
 					if(text && text->length() > 0){
 						s << *text;
 					}
