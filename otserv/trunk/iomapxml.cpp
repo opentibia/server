@@ -217,6 +217,10 @@ bool IOMapXML::loadMap(Map* map, std::string identifier){
 				xmlFreeOTSERV(tmp);
 		
 				Town* town = Towns::getInstance().getTown(townid);
+				if(!town){
+					town = new Town(townid);
+					Towns::getInstance().addTown(townid, town);
+				}
 
 				tmp = (char*)xmlGetProp(p, (const xmlChar *) "name");
 				if(tmp){
