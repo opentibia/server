@@ -288,7 +288,9 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 						player = new Player(name, protocol);
 						player->useThing2();
 						player->setID();
-						IOPlayer::instance()->loadPlayer(player, name);	
+						IOPlayer::instance()->loadPlayer(player, name);
+						IOPlayer::instance()->initPlayer(player);
+
 						connectResult_t connectRes = CONNECT_INTERNALERROR;
 
 						if(playerexist && !g_config.getGlobalNumber("allowclones", 0)){

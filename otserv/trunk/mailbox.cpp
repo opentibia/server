@@ -152,6 +152,8 @@ bool Mailbox::sendItem(Item* item)
 	else if(IOPlayer::instance()->playerExists(reciever)){
 		Player* player = new Player(reciever, NULL);
 		IOPlayer::instance()->loadPlayer(player, reciever);
+		IOPlayer::instance()->initPlayer(player);
+
 		Depot* depot = player->getDepot(dp);
 		if(depot){
 			g_game.internalMoveItem(item->getParent(), depot, -1, item, item->getItemCount());

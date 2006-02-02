@@ -19,6 +19,7 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "ioplayer.h"
+#include "town.h"
 
 #ifdef __USE_MYSQL__
 #include "ioplayersql.h"
@@ -71,4 +72,35 @@ bool IOPlayer::getNameByGuid(unsigned long guid, std::string &name)
 bool IOPlayer::playerExists(std::string name)
 {
 	return false;
+}
+
+void IOPlayer::initPlayer(Player* player)
+{
+	//create depots that does not exist in the player
+	Depot* depot = NULL;
+	for(TownMap::const_iterator it = Towns::getInstance().getTownBegin(); it != Towns::getInstance().getTownEnd(); ++it){
+		depot = player->getDepot(it->second->getTownID());
+
+		//depot does not yet exist?
+		if(depot == NULL){
+			//create a new depot
+			Item* tmpDepot = Item::CreateItem(ITEM_LOCKER1);
+			if(tmpDepot->getContainer()){
+				if(depot = tmpDepot->getContainer()->getDepot()){
+					tmpDepot = NULL;
+					Item* depotChest = Item::CreateItem(ITEM_DEPOT);
+					depot->__internalAddThing(depotChest);
+
+					player->addDepot(depot, it->second->getTownID());
+				}
+			}
+
+			if(tmpDepot){
+				std::cout << "Failure: Creating a new depot with id: "<< depot->getDepotId() <<
+					", for player: " << player->getName() << std::endl;
+
+				tmpDepot->releaseThing2();
+			}
+		}
+	}
 }
