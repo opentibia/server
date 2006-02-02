@@ -31,7 +31,7 @@
 class Town
 {
 public:
-	Town(unsigned long _townid)
+	Town(uint32_t _townid)
 	{
 		townid = _townid;
 	}
@@ -43,15 +43,15 @@ public:
 
 	void setTemplePos(const Position& pos) {posTemple = pos;};
 	void setName(std::string _townName) {townName = _townName;};
-	unsigned long getTownID() const {return townid;};
+	uint32_t getTownID() const {return townid;};
 
 private:
-	unsigned long townid;
+	uint32_t townid;
 	std::string townName;
 	Position posTemple;
 };
 
-typedef std::map<unsigned long, Town*> TownMap;
+typedef std::map<uint32_t, Town*> TownMap;
 
 class Towns
 {
@@ -62,7 +62,7 @@ public:
 		return instance;
 	}
 
-	bool addTown(unsigned long _townid, Town* town)
+	bool addTown(uint32_t _townid, Town* town)
 	{
 		TownMap::iterator it = townMap.find(_townid);
 		
@@ -85,7 +85,7 @@ public:
 		return NULL;
 	}
 
-	Town* getTown(unsigned long _townid)
+	Town* getTown(uint32_t _townid)
 	{
 		TownMap::iterator it = townMap.find(_townid);
 		
