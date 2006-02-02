@@ -30,6 +30,12 @@ typedef unsigned long long uint64_t;
 #define xmlFreeOTSERV(s)	xmlFree(s)
 #endif
 
+#ifdef __DEBUG_EXCEPTION_REPORT__
+#define DEBUG_REPORT int *a = NULL; *a = 1;
+#else
+#define DEBUG_REPORT
+#endif
+
 #if defined __WINDOWS__ || defined WIN32
 
 #define OTSYS_THREAD_RETURN  void

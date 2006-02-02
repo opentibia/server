@@ -1183,7 +1183,7 @@ ReturnValue Game::internalMoveItem(Cylinder* fromCylinder, Cylinder* toCylinder,
 #ifdef __DEBUG__MOVESYS__
 	if(isExecutingEvents){
 		std::cout << "Error: [Game::internalMoveItem] - isExecutingEvents" << std::endl;
-		int *a = NULL; *a = 1;
+		DEBUG_REPORT
 	}
 #endif
 	*/
@@ -1309,7 +1309,7 @@ ReturnValue Game::internalAddItem(Cylinder* toCylinder, Item* item, bool test /*
 #ifdef __DEBUG__MOVESYS__
 	if(isExecutingEvents){
 		std::cout << "Error: [Game::internalAddItem] - isExecutingEvents" << std::endl;
-		int *a = NULL; *a = 1;
+		DEBUG_REPORT
 	}
 #endif
 	*/
@@ -1385,7 +1385,7 @@ ReturnValue Game::internalRemoveItem(Item* item, int32_t count /*= -1*/,  bool t
 #ifdef __DEBUG__MOVESYS__
 	if(isExecutingEvents){
 		std::cout << "Error: [Game::internalRemoveItem] - isExecutingEvents" << std::endl;
-		int *a = NULL; *a = 1;
+		DEBUG_REPORT
 	}
 #endif
 	*/
@@ -1427,7 +1427,7 @@ Item* Game::transformItem(Item* item, uint16_t newtype, int32_t count /*= -1*/)
 #ifdef __DEBUG__MOVESYS__
 	if(isExecutingEvents){
 		std::cout << "Error: [Game::transformItem] - isExecutingEvents" << std::endl;
-		int *a = NULL; *a = 1;
+		DEBUG_REPORT
 	}
 #endif
 	*/

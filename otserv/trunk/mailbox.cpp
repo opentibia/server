@@ -134,7 +134,9 @@ bool Mailbox::sendItem(Item* item)
 	std::string reciever = std::string("");
 	uint32_t dp = 0;
      
-	getReciver(item, reciever, dp);
+	if(!getReciver(item, reciever, dp)){
+		return false;
+	}
      
 	if(reciever == "" || dp == 0){ /**No need to continue if its still empty**/
 		return false;            
@@ -218,8 +220,9 @@ bool Mailbox::getReciver(Item* item, std::string& name, uint32_t& dp)
 	if(town){
 		dp = town->getTownID();
 	}
-	else
-		dp = atoi(line[1].c_str());
+	else{
+		return false;
+	}
 	
 	return true;
 }

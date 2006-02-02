@@ -356,7 +356,7 @@ void Container::__addThing(int32_t index, Thing* thing)
 	if(index >= (int32_t)capacity()){
 #ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Container::__addThing], index:" << index << ", index >= capacity()" << std::endl;
-		int *a = NULL; *a = 1;
+		DEBUG_REPORT
 #endif
 		return /*RET_NOTPOSSIBLE*/;
 	}
@@ -365,7 +365,7 @@ void Container::__addThing(int32_t index, Thing* thing)
 	if(item == NULL){
 #ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Container::__addThing] item == NULL" << std::endl;
-		int *a = NULL; *a = 1;
+		DEBUG_REPORT
 #endif
 		return /*RET_NOTPOSSIBLE*/;
 	}
@@ -373,7 +373,7 @@ void Container::__addThing(int32_t index, Thing* thing)
 	if(size() >= capacity()){
 #ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Container::__addThing] size() >= capacity()" << std::endl;
-		int *a = NULL; *a = 1;
+		DEBUG_REPORT
 #endif
 		return /*RET_CONTAINERNOTENOUGHROOM*/;
 	}
@@ -393,7 +393,7 @@ void Container::__updateThing(Thing* thing, uint32_t count)
 	if(index == -1){
 #ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Container::__updateThing] index == -1" << std::endl;
-		int *a = NULL; *a = 1;
+		DEBUG_REPORT
 #endif
 		return /*RET_NOTPOSSIBLE*/;
 	}
@@ -402,7 +402,7 @@ void Container::__updateThing(Thing* thing, uint32_t count)
 	if(item == NULL){
 #ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Container::__updateThing] item == NULL" << std::endl;
-		int *a = NULL; *a = 1;
+		DEBUG_REPORT
 #endif
 		return /*RET_NOTPOSSIBLE*/;
 	}
@@ -437,7 +437,7 @@ void Container::__replaceThing(uint32_t index, Thing* thing)
 	if(item == NULL){
 #ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Container::__replaceThing] item == NULL" << std::endl;
-		int *a = NULL; *a = 1;
+		DEBUG_REPORT
 #endif
 		return /*RET_NOTPOSSIBLE*/;
 	}
@@ -454,7 +454,7 @@ void Container::__replaceThing(uint32_t index, Thing* thing)
 	if(cit == itemlist.end()){
 #ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Container::__updateThing] item not found" << std::endl;
-		int *a = NULL; *a = 1;
+		DEBUG_REPORT
 #endif
 		return /*RET_NOTPOSSIBLE*/;
 	}
@@ -493,7 +493,7 @@ void Container::__removeThing(Thing* thing, uint32_t count)
 	if(item == NULL){
 #ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Container::__removeThing] item == NULL" << std::endl;
-		int *a = NULL; *a = 1;
+		DEBUG_REPORT
 #endif
 		return /*RET_NOTPOSSIBLE*/;
 	}
@@ -502,7 +502,7 @@ void Container::__removeThing(Thing* thing, uint32_t count)
 	if(index == -1){
 #ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Container::__removeThing] index == -1" << std::endl;
-		int *a = NULL; *a = 1;
+		DEBUG_REPORT
 #endif
 		return /*RET_NOTPOSSIBLE*/;
 	}
@@ -511,7 +511,7 @@ void Container::__removeThing(Thing* thing, uint32_t count)
 	if(cit == itemlist.end()){
 #ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Container::__removeThing] item not found" << std::endl;
-		int *a = NULL; *a = 1;
+		DEBUG_REPORT
 #endif
 		return /*RET_NOTPOSSIBLE*/;
 	}

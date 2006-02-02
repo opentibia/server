@@ -2354,7 +2354,7 @@ void Player::__addThing(int32_t index, Thing* thing)
 	if(index < 0 || index > 11){
 #ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Player::__addThing], " << "player: " << getName() << ", index: " << index << ", index < 0 || index > 11" << std::endl;
-		int *a = NULL; *a = 1;
+		DEBUG_REPORT
 #endif
 		return /*RET_NOTPOSSIBLE*/;
 	}
@@ -2362,7 +2362,7 @@ void Player::__addThing(int32_t index, Thing* thing)
 	if(index == 0){
 #ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Player::__addThing], " << "player: " << getName() << ", index == 0" << std::endl;
-		int *a = NULL; *a = 1;
+		DEBUG_REPORT
 #endif
 		return /*RET_NOTENOUGHROOM*/;
 	}
@@ -2371,7 +2371,7 @@ void Player::__addThing(int32_t index, Thing* thing)
 	if(item == NULL){
 #ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Player::__addThing], " << "player: " << getName() << ", item == NULL" << std::endl;
-		int *a = NULL; *a = 1;
+		DEBUG_REPORT
 #endif
 		return /*RET_NOTPOSSIBLE*/;
 	}
@@ -2389,7 +2389,7 @@ void Player::__updateThing(Thing* thing, uint32_t count)
 	if(index == -1){
 #ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Player::__updateThing], " << "player: " << getName() << ", index == -1" << std::endl;
-		int *a = NULL; *a = 1;
+		DEBUG_REPORT
 #endif
 		return /*RET_NOTPOSSIBLE*/;
 	}
@@ -2398,7 +2398,7 @@ void Player::__updateThing(Thing* thing, uint32_t count)
 	if(item == NULL){
 #ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Player::__updateThing], " << "player: " << getName() << ", item == NULL" << std::endl;
-		int *a = NULL; *a = 1;
+		DEBUG_REPORT
 #endif
 		return /*RET_NOTPOSSIBLE*/;
 	}
@@ -2413,7 +2413,7 @@ void Player::__replaceThing(uint32_t index, Thing* thing)
 	if(index < 0 || index > 11){
 #ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Player::__replaceThing], " << "player: " << getName() << ", index: " << index << ",  index < 0 || index > 11" << std::endl;
-		int *a = NULL; *a = 1;
+		DEBUG_REPORT
 #endif
 		return /*RET_NOTPOSSIBLE*/;
 	}
@@ -2422,7 +2422,7 @@ void Player::__replaceThing(uint32_t index, Thing* thing)
 	if(!oldItem){
 #ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Player::__updateThing], " << "player: " << getName() << ", oldItem == NULL" << std::endl;
-		int *a = NULL; *a = 1;
+		DEBUG_REPORT
 #endif
 		return /*RET_NOTPOSSIBLE*/;
 	}
@@ -2431,7 +2431,7 @@ void Player::__replaceThing(uint32_t index, Thing* thing)
 	if(item == NULL){
 #ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Player::__updateThing], " << "player: " << getName() << ", item == NULL" << std::endl;
-		int *a = NULL; *a = 1;
+		DEBUG_REPORT
 #endif
 		return /*RET_NOTPOSSIBLE*/;
 	}
@@ -2449,7 +2449,7 @@ void Player::__removeThing(Thing* thing, uint32_t count)
 	if(item == NULL){
 #ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Player::__removeThing], " << "player: " << getName() << ", item == NULL" << std::endl;
-		int *a = NULL; *a = 1;
+		DEBUG_REPORT
 #endif
 		return /*RET_NOTPOSSIBLE*/;
 	}
@@ -2458,7 +2458,7 @@ void Player::__removeThing(Thing* thing, uint32_t count)
 	if(index == -1){
 #ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Player::__removeThing], " << "player: " << getName() << ", index == -1" << std::endl;
-		int *a = NULL; *a = 1;
+		DEBUG_REPORT
 #endif
 		return /*RET_NOTPOSSIBLE*/;
 	}
@@ -2587,7 +2587,7 @@ void Player::__internalAddThing(uint32_t index, Thing* thing)
 	if(index == 0){
 #ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Player::__internalAddThing] index == 0" << std::endl;
-		int *a = NULL; *a = 1;
+		DEBUG_REPORT
 #endif
 		return;
 	}
@@ -2596,7 +2596,7 @@ void Player::__internalAddThing(uint32_t index, Thing* thing)
 		if(items[index]){
 #ifdef __DEBUG__MOVESYS__
 			std::cout << "Warning: [Player::__internalAddThing], player: " << getName() << ", items[index] is not empty." << std::endl;
-			//int *a = NULL; *a = 1;
+			//DEBUG_REPORT
 #endif
 			return;
 		}
