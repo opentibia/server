@@ -96,6 +96,9 @@ public:
 		return NULL;
 	}
 
+	TownMap::const_iterator getTownBegin() const{return townMap.begin();}
+	TownMap::const_iterator getTownEnd() const{return townMap.end();}
+
 private:
 	TownMap townMap;
 };
