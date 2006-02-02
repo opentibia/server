@@ -687,10 +687,22 @@ void Monster::onUpdateTile(const Position& pos)
 void Monster::onCreatureAppear(const Creature* creature, bool isLogin)
 {
 	if(creature == this){
-		return;
-	}
+		bool oldExecEvents = game->isExecutingEvents;
+		game->isExecutingEvents = true;
 
-	if(isInRange(creature->getPosition())){
+		SpectatorVec list;
+		SpectatorVec::iterator it;
+
+		game->getSpectators(Range(getPosition(), false), list);
+		for(it = list.begin(); it != list.end(); ++it) {
+			if(*it != this){
+				onCreatureAppear(*it, false);
+			}
+		}
+
+		game->isExecutingEvents = oldExecEvents;
+	}
+	else if(isInRange(creature->getPosition())){
 		bool canReach = isCreatureReachable(creature);
 		creatureEnter(creature, canReach);
 	}
