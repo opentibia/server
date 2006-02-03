@@ -950,12 +950,19 @@ void Monster::reThink(bool updateOnlyState /* = true*/)
 							if(summon){
 								Position summonPos = getPosition();
 
+								addSummon(summon);
 								if(!game->placeCreature(summonPos, summon)){
+									removeSummon(summon);
+									delete summon;
+								}
+							
+								/*if(!game->placeCreature(summonPos, summon)){
 									delete summon;
 								}
 								else{
 									addSummon(summon);
 								}
+								*/
 
 								//HACK, place a summon here can make us removed from the map.. no idea how
 								//monster class need to be redone from the beginning...

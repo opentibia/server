@@ -269,11 +269,12 @@ bool Commands::placeSummon(Creature* creature, const std::string& cmd, const std
 	}
 	
 	// Place the monster
+	creature->addSummon(monster);
 	if(game->placeCreature(creature->getPosition(), monster)){
-		creature->addSummon(monster);
 		return true;
 	}
 	else{
+		creature->removeSummon(monster);
 		delete monster;
 
 		if(Player* player = creature->getPlayer()) {
@@ -612,7 +613,7 @@ bool Commands::kickPlayer(Creature* c, const std::string &cmd, const std::string
 {
 	Player* playerKick = game->getPlayerByName(param);
 	if(playerKick){
-		Player* player = dynamic_cast<Player*>(c);
+		Player* player = c->getPlayer();
 		if(player && player->access <= playerKick->access){
 			player->sendTextMessage(MSG_BLUE_TEXT,"You cannot kick this player.");
 			return true;
