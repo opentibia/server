@@ -143,7 +143,7 @@ bool Mailbox::sendItem(Item* item)
 	}
      
 	if(Player* player = g_game.getPlayerByName(reciever)){ 
-		Depot* depot = player->getDepot(dp);
+		Depot* depot = player->getDepot(dp, true);
               
 		if(depot){
 			g_game.internalMoveItem(item->getParent(), depot, -1, item, item->getItemCount());
@@ -154,9 +154,8 @@ bool Mailbox::sendItem(Item* item)
 	else if(IOPlayer::instance()->playerExists(reciever)){
 		Player* player = new Player(reciever, NULL);
 		IOPlayer::instance()->loadPlayer(player, reciever);
-		IOPlayer::instance()->initPlayer(player);
 
-		Depot* depot = player->getDepot(dp);
+		Depot* depot = player->getDepot(dp, true);
 		if(depot){
 			g_game.internalMoveItem(item->getParent(), depot, -1, item, item->getItemCount());
 			g_game.transformItem(item, item->getID()+1);

@@ -1188,18 +1188,39 @@ void Player::setAcceptTrade(bool b)
 	}
 }
 
-Depot* Player::getDepot(uint32_t depotId)
+Depot* Player::getDepot(uint32_t depotId, bool autoCreateDepot)
 {	
 	DepotMap::iterator it = depots.find(depotId);
 	if(it != depots.end()){	
 		return it->second;
 	}
+
+	//depot does not yet exist
+
+	//create a new depot?
+	if(autoCreateDepot){
+		Depot* depot = NULL;
+		Item* tmpDepot = Item::CreateItem(ITEM_LOCKER1);
+		if(tmpDepot->getContainer() && (depot = tmpDepot->getContainer()->getDepot())){
+			Item* depotChest = Item::CreateItem(ITEM_DEPOT);
+			depot->__internalAddThing(depotChest);
+
+			addDepot(depot, depotId);
+			return depot;
+		}
+		else{
+			g_game.FreeThing(tmpDepot);
+			std::cout << "Failure: Creating a new depot with id: "<< depot->getDepotId() <<
+				", for player: " << getName() << std::endl;
+		}
+	}
+
 	return NULL;
 }
 
 bool Player::addDepot(Depot* depot, uint32_t depotId)
 {
-	Depot* depot2 = getDepot(depotId);
+	Depot* depot2 = getDepot(depotId, false);
 	if(depot2){
 		return false;
 	}

@@ -302,29 +302,7 @@ bool Actions::openContainer(Player* player, Container* container, const unsigned
 
 	//depot container
 	if(Depot* depot = container->getDepot()){
-		Depot* myDepot = player->getDepot(depot->getDepotId());
-
-		//depot does not yet exist?
-		if(myDepot == NULL){
-			//create a new depot
-			Item* tmpDepot = Item::CreateItem(depot->getID());
-			if(tmpDepot->getContainer()){
-				if(myDepot = tmpDepot->getContainer()->getDepot()){
-					tmpDepot = NULL;
-					Item* depotChest = Item::CreateItem(ITEM_DEPOT);
-					myDepot->__internalAddThing(depotChest);
-
-					player->addDepot(myDepot, depot->getDepotId());
-				}
-			}
-
-			if(tmpDepot){
-				game->FreeThing(tmpDepot);
-				std::cout << "Failure: Creating a new depot with id: "<< depot->getDepotId() <<
-					", for player: " << player->getName() << std::endl;
-			}
-		}
-
+		Depot* myDepot = player->getDepot(depot->getDepotId(), true);
 		myDepot->setParent(depot->getParent());
 		openContainer = myDepot;
 	}

@@ -207,7 +207,7 @@ public:
 	void preSave();
 
 	unsigned long getIP() const;
-	Depot* getDepot(uint32_t depotId);
+	Depot* getDepot(uint32_t depotId, bool autoCreateDepot);
 	bool addDepot(Depot* depot, uint32_t depotId);
 
 	//depots	
