@@ -123,8 +123,11 @@ public:
 	virtual const std::string& getName() const = 0;
 	virtual int getThrowRange() const {return 1;};
 	virtual bool isPushable() const {return true;};
+	virtual bool isRemoved() const {return isInternalRemoved;};
 	
 	void setID(){this->id = auto_id | this->idRange();}
+	void setRemoved();
+
 	virtual unsigned long idRange() = 0;
 	unsigned long getID() const { return id; }
 	virtual void removeList() = 0;
@@ -265,6 +268,7 @@ protected:
 	friend class GameState;
 	
 	unsigned long id;
+	bool isInternalRemoved;
 };
 
 

@@ -41,7 +41,8 @@ AutoID::list_type AutoID::list;
 extern Game g_game;
 
 Creature::Creature() :
-access(0)
+	access(0)
+	,isInternalRemoved(false)
 {
 	direction  = NORTH;
 	master = NULL;
@@ -97,6 +98,11 @@ Creature::~Creature()
 
 	//std::cout << "Creature destructor " << this->getID() << std::endl;
 	summons.clear();
+}
+
+void Creature::setRemoved()
+{
+	isInternalRemoved = true;
 }
 
 void Creature::drainHealth(int damage)

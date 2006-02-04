@@ -953,7 +953,6 @@ void Monster::reThink(bool updateOnlyState /* = true*/)
 								addSummon(summon);
 								if(!game->placeCreature(summonPos, summon)){
 									removeSummon(summon);
-									delete summon;
 								}
 							
 								/*if(!game->placeCreature(summonPos, summon)){
@@ -1068,18 +1067,20 @@ void Monster::setMaster(Creature* creature)
 {
 	Creature::setMaster(creature);
 
-	if(creature) {
-		if(creature->getAttackedCreature()) {
-			bool canReach = isCreatureReachable(creature->getAttackedCreature());
-			selectTarget(creature->getAttackedCreature(), canReach);
+	if(getParent()){
+		if(creature){
+			if(creature->getAttackedCreature()) {
+				bool canReach = isCreatureReachable(creature->getAttackedCreature());
+				selectTarget(creature->getAttackedCreature(), canReach);
+			}
+			else {
+				state = STATE_IDLESUMMON;
+				startThink();
+			}
 		}
-		else {
-			state = STATE_IDLESUMMON;
-			startThink();
-		}
+		else
+			state = STATE_IDLE;
 	}
-	else
-		state = STATE_IDLE;
 }
 
 void Monster::setAttackedCreature(const Creature* creature)

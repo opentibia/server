@@ -85,11 +85,12 @@ public:
 	const CreatureStateVec& getCreatureStateList(Tile* tile) {return creaturestates[tile];};
 	const SpectatorVec& getSpectators() {return spectatorlist;}
 
-	bool isRemoved(Creature* creature)
+	/*bool isRemoved(Creature* creature)
 	{
 		std::list<Creature*>::iterator it = std::find(removedList.begin(), removedList.end(), creature);
 		return (it != removedList.end());
 	}
+	*/
 protected:
 	void addCreatureState(Tile* tile, Creature* attackedCreature, int damage, int manaDamage, bool drawBlood);
 	void onAttackedCreature(Tile* tile, Creature* attacker, Creature* attackedCreature, int damage, bool drawBlood);
@@ -97,7 +98,7 @@ protected:
 
 	SpectatorVec spectatorlist;
 	CreatureStates creaturestates;
-	std::list<Creature*> removedList;
+	//std::list<Creature*> removedList;
 };
 
 enum world_type_t{

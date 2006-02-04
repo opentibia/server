@@ -175,7 +175,7 @@ public:
 	
 	time_t getLastLoginSaved() const { return lastLoginSaved; };
 	const Position& getLoginPosition() {return loginPosition;};
-	const Position& getLastPosition() {return lastPosition;};
+	//const Position& getLastPosition() {return lastPosition;};
 	
 	void updateInventoryWeigth();
 	
@@ -363,7 +363,7 @@ protected:
 	time_t lastlogin;
 	time_t lastLoginSaved;
 	Position loginPosition;
-	Position lastPosition; //tmp fix until new battle system
+	//Position lastPosition; //tmp fix until new battle system
 	unsigned long lastip;
 	
 	//inventory variables

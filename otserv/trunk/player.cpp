@@ -1816,8 +1816,7 @@ void Player::addExperience(unsigned long exp)
 		this->capacity += this->CapGain[(int)vocation];
 	}
 
-	if(lastLv != this->level)
-	{
+	if(lastLv != this->level){
 		this->setNormalSpeed();
 		g_game.changeSpeed(this->getID(), this->getSpeed());
 		std::stringstream lvMsg;
@@ -1835,17 +1834,17 @@ unsigned long Player::getIP() const
 void Player::die()
 {
 	loginPosition = masterPos;
-	lastPosition = getPosition();
+	//lastPosition = getPosition();
 
-	//Magic Level downgrade
+	//Magic level loss
 	unsigned long sumMana = 0;
 	long lostMana = 0;
 	for (int i = 1; i <= maglevel; i++) {              //sum up all the mana
 		sumMana += getReqMana(i, vocation);
 	}
-                
+
 	sumMana += manaspent;
-                
+
 	lostMana = (long)(sumMana * 0.1);   //player loses 10% of all spent mana when he dies
     
 	while(lostMana > manaspent){
@@ -1855,21 +1854,20 @@ void Player::die()
 	}
 
 	manaspent -= lostMana;
-	//End Magic Level downgrade
-                
+	//
+
 	//Skill loss
 	long lostSkillTries;
 	unsigned long sumSkillTries;
-	for (int i = 0; i <= 6; i++) {  //for each skill
+	for(int i = 0; i <= 6; i++){  //for each skill
 		lostSkillTries = 0;         //reset to 0
 		sumSkillTries = 0;
-                    
-		for (unsigned c = 11; c <= skills[i][SKILL_LEVEL]; c++) { //sum up all required tries for all skill levels
+
+		for(unsigned c = 11; c <= skills[i][SKILL_LEVEL]; c++) { //sum up all required tries for all skill levels
 			sumSkillTries += getReqSkillTries(i, c, vocation);
 		}
-                    
+
 		sumSkillTries += skills[i][SKILL_TRIES];
-                    
 		lostSkillTries = (long) (sumSkillTries * 0.1);           //player loses 10% of his skill tries
 
 		while(lostSkillTries > skills[i][SKILL_TRIES]){
@@ -1887,18 +1885,17 @@ void Player::die()
 		}
 		skills[i][SKILL_TRIES] -= lostSkillTries;
 	}               
-	//End Skill loss
-        
-	//Level Downgrade
+	//
+
+	//Level loss
 	long newLevel = level;
-	while((unsigned long)(experience - getLostExperience()) < getExpForLv(newLevel)) //0.1f is also used in die().. maybe we make a little function for exp-loss?
-	{
+	while((unsigned long)(experience - getLostExperience()) < getExpForLv(newLevel)){
 		if(newLevel > 1)
 			newLevel--;
 		else
 			break;
 	}
-	
+
 	if(newLevel != level){
 		std::stringstream lvMsg;
 		lvMsg << "You were downgraded from level " << level << " to level " << newLevel << ".";
@@ -1926,12 +1923,12 @@ void Player::preSave()
 			
 			health = healthmax;
 			
-			if ((manamax -= ManaGain[(int)vocation]) < 0) //This could be avoided with a proper use of unsigend int
+			if((manamax -= ManaGain[(int)vocation]) < 0) //This could be avoided with a proper use of unsigend int
 				manamax = 0;
 			
 			mana = manamax;
 			
-			if ((capacity -= CapGain[(int)vocation]) < 0) //This could be avoided with a proper use of unsigend int
+			if((capacity -= CapGain[(int)vocation]) < 0) //This could be avoided with a proper use of unsigend int
 				capacity = 0.0;         
 		}
 	}

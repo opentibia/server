@@ -72,9 +72,11 @@ GameState::GameState(Game *game, const Range &range)
 
 GameState::~GameState()
 {
+	/*
 	for(std::list<Creature*>::iterator it = removedList.begin(); it != removedList.end(); ++it){
 		(*it)->setParent(NULL);
 	}
+	*/
 }
 
 void GameState::onAttack(Creature* attacker, const Position& pos, const MagicEffectClass* me)
@@ -226,10 +228,10 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 	
 	attackedCreature->addInflictedDamage(attacker, damage);
 	
-	if(attacker && attacker->isRemoved() || attackedCreature->isRemoved())
-		return;
+	//if(attacker && attacker->isRemoved() || attackedCreature->isRemoved())
+	//	return;
 
-	if(attackedPlayer && !attackedPlayer->isRemoved()){
+	if(attackedPlayer /*&& !attackedPlayer->isRemoved()*/){
 		attackedPlayer->sendStats();
 	}
 
@@ -305,7 +307,7 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 				//Add experience
 				for(std::vector<long>::const_iterator iit = creaturelist.begin(); iit != creaturelist.end(); ++iit) {
 					Creature* gainExpCreature = game->getCreatureByID(*iit);
-					if(gainExpCreature && !gainExpCreature->isRemoved()) {
+					if(gainExpCreature /*&& !gainExpCreature->isRemoved()*/) {
 						int gainedExperience = attackedCreature->getGainedExperience(gainExpCreature);
 						if(gainedExperience <= 0)
 							continue;
@@ -337,10 +339,10 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 				player->sendStats();
 			}
 
-			removedList.push_back(attackedCreature);
+			//removedList.push_back(attackedCreature);
 			//remove creature
 			game->removeCreature(attackedCreature, false);
-			attackedCreature->setParent(attackTile);
+			//attackedCreature->setParent(attackTile);
 		}
 		//Add blood?
 		else if(drawBlood && damage > 0){
@@ -852,8 +854,12 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 
 	//std::cout << "remove: " << creature << " " << creature->getID() << std::endl;
 
+	stopEvent(creature->eventCheck);
+	stopEvent(creature->eventCheckAttacking);
+
 	listCreature.removeList(creature->getID());
 	creature->removeList();
+	creature->setRemoved();
 
 	SpectatorVec list;
 	SpectatorVec::iterator it;
@@ -880,14 +886,11 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 	}
 
 	creature->getParent()->postRemoveNotification(creature);
-	//listCreature.removeList(creature->getID());
-	//creature->removeList();
+	//stopEvent(creature->eventCheck);
+	//stopEvent(creature->eventCheckAttacking);
 
-	stopEvent(creature->eventCheck);
-	stopEvent(creature->eventCheckAttacking);
-
-	FreeThing(creature);
-	creature->setParent(NULL);
+	//FreeThing(creature);
+	//creature->setParent(NULL);
 
 	this->isExecutingEvents = false;
 
@@ -1409,13 +1412,11 @@ ReturnValue Game::internalRemoveItem(Item* item, int32_t count /*= -1*/,  bool t
 		//remove the item
 		cylinder->__removeThing(item, count);
 
-		//if(isRemove){
 		if(item->isRemoved()){
 			FreeThing(item);
 		}
 
 		cylinder->postRemoveNotification(item);
-		//}
 	}
 	
 	return RET_NOERROR;
@@ -1699,11 +1700,12 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 		}
 	}
 
-	bool isAttackerRemoved = false;
+	/*bool isAttackerRemoved = false;
 	if(creature && creature->isRemoved()){
 		creature->setParent(getTile(frompos.x, frompos.y, frompos.z));
 		isAttackerRemoved = true;
 	}
+	*/
 
 	SpectatorVec spectatorlist = gamestate.getSpectators();
 	SpectatorVec::iterator it;
@@ -1715,7 +1717,7 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 			continue;
 
 		if(bSuccess){
-			if(!spectator->isRemoved())
+			//if(!spectator->isRemoved())
 				me->getDistanceShoot(spectator, creature, centerpos, hasTarget);
 
 			std::vector<Position>::const_iterator tlIt;
@@ -1725,7 +1727,7 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 				const CreatureStateVec& creatureStateVec = gamestate.getCreatureStateList(tile);
 					
 				if(creatureStateVec.empty()) { //no targets
-					if(!spectator->isRemoved())
+					//if(!spectator->isRemoved())
 						me->getMagicEffect(spectator, creature, NULL, pos, 0, targettile->isPz(), isBlocking);
 				}
 				else {
@@ -1733,17 +1735,11 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 						Creature* target = csIt->first;
 						const CreatureState& creatureState = csIt->second;
 
-						/*bool isTargetRemoved = false;
-						if(target->isRemoved()){
-							target->setParent(tile);
-							isTargetRemoved = true;
-						}*/
-
-						if(!spectator->isRemoved())
+						//if(!spectator->isRemoved())
 							me->getMagicEffect(spectator, creature, target, creatureState.pos, creatureState.damage, tile->isPz(), false);
 
 						//could be death due to a magic damage with no owner (fire/poison/energy)
-						if(creature && gamestate.isRemoved(target) /*target->isRemoved()*/){
+						if(creature && target->isRemoved() /*gamestate.isRemoved(target)*/){
 
 							for(std::vector<Creature*>::const_iterator cit = creatureState.attackerlist.begin(); cit != creatureState.attackerlist.end(); ++cit) {
 								Creature* gainExpCreature = *cit;
@@ -1777,16 +1773,16 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 								spectator->sendAnimatedText(creatureState.pos, 2, manaDmg.str());
 							}
 
-							if(target->health > 0 && !gamestate.isRemoved(target))
+							if(target->health > 0 && !target->isRemoved() /*!gamestate.isRemoved(target)*/)
 								spectator->sendCreatureHealth(target);
 
 							if(spectator == target){
 								CreateManaDamageUpdate(target, creature, creatureState.manaDamage);
 								CreateDamageUpdate(target, creature, creatureState.damage);
 
-								if(gamestate.isRemoved(target)){
+								/*if(target->isRemoved()){ //gamestate.isRemoved(target)
 									spectator->sendTextMessage(MSG_ADVANCE, "You are dead.");	
-								}
+								}*/
 							}
 						}
 
@@ -1803,9 +1799,9 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 
 	}
 	
-	if(isAttackerRemoved){
+	/*if(isAttackerRemoved){
 		creature->setParent(NULL);
-	}
+	}*/
 
 	return bSuccess;
 }
@@ -2021,7 +2017,7 @@ void Game::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fi
 
 	for(it = spectatorlist.begin(); it != spectatorlist.end(); ++it) {
 		Player* spectator = dynamic_cast<Player*>(*it);
-		if(!spectator || spectator->isRemoved())
+		if(!spectator /*|| spectator->isRemoved()*/)
 			continue;
 
 		if(damagetype != FIGHT_MELEE){
@@ -2067,16 +2063,17 @@ void Game::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fi
 					spectator->sendAnimatedText(attackPosition, 2, manaDmg.str());
 				}
 
-				if (attackedCreature->health > 0 && !gamestate.isRemoved(attackedCreature))
+				if (attackedCreature->health > 0 && !attackedCreature->isRemoved() /*!gamestate.isRemoved(attackedCreature)*/)
 					spectator->sendCreatureHealth(attackedCreature);
 
 				if (spectator == attackedCreature) {
 					CreateManaDamageUpdate(attackedCreature, creature, creatureState.manaDamage);
 					CreateDamageUpdate(attackedCreature, creature, creatureState.damage);
 
-					if(gamestate.isRemoved(attackedCreature)){
+					/*if(attackedCreature->isRemoved()){ //gamestate.isRemoved(attackedCreature)
 						spectator->sendTextMessage(MSG_ADVANCE, "You are dead.");	
 					}
+					*/
 				}
 			}
 		}
@@ -3377,21 +3374,23 @@ void Game::flushSendBuffers()
 		(*it)->flushMsg();
 		(*it)->SendBuffer = false;
 		(*it)->releaseThing2();
-/*
-#ifdef __DEBUG__
-		std::cout << "flushSendBuffers() - releaseThing()" << std::endl;
-#endif
-*/
-		}	
+
+		/*
+		#ifdef __DEBUG__
+				std::cout << "flushSendBuffers() - releaseThing()" << std::endl;
+		#endif
+		*/
+	}
+
 	BufferedPlayers.clear();
 	
 	//free memory
 	for(std::vector<Thing*>::iterator it = ToReleaseThings.begin(); it != ToReleaseThings.end(); ++it){
 		(*it)->releaseThing2();
 	}
+
 	ToReleaseThings.clear();
-	
-	
+		
 	return;
 }
 

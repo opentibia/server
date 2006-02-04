@@ -479,11 +479,15 @@ bool Protocol76::CanSee(int x, int y, int z) const
 	}
 #endif
 	
+	/*
 	//temporary fix until new battle system
 	Position myPos = player->getLastPosition();
 	if(player->getParent()){
 		myPos = player->getPosition();
 	}
+	*/
+
+	const Position& myPos = player->getPosition();
 
 	/*underground 8->15*/
 	if(myPos.z > 7 && z < 6 /*8 - 2*/) {
