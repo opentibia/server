@@ -275,7 +275,7 @@ bool Commands::placeSummon(Creature* creature, const std::string& cmd, const std
 	}
 	else{
 		creature->removeSummon(monster);
-		delete monster;
+		//delete monster;
 
 		if(Player* player = creature->getPlayer()) {
 			player->sendMagicEffect(player->getPosition(), NM_ME_PUFF);
