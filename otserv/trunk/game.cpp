@@ -2979,7 +2979,6 @@ void Game::checkPlayerWalk(unsigned long id)
 
 	Player* player = getPlayerByID(id);
 	if(!player){
-		player->eventAutoWalk = 0;
 		return;
 	}
 
