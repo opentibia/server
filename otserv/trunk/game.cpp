@@ -240,10 +240,6 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 
 		//Remove player?
 		if(attackedCreature->health <= 0){
-			if(attackedCreature && attackedCreature->getMaster() != NULL) {
-				attackedCreature->getMaster()->removeSummon(attackedCreature);
-			}
-
 			//Add blood?
 			if(drawBlood || attackedPlayer){
 				Item* splash = Item::CreateItem(ITEM_FULLSPLASH, FLUID_BLOOD);
@@ -262,11 +258,13 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 				attackedCreature->dropLoot(lootContainer);
 			}
 
-			if(attackedPlayer){
-				attackedPlayer->die(); //handles exp/skills/maglevel loss/reset spawn position
+			if(attackedCreature && attackedCreature->getMaster() != NULL) {
+				attackedCreature->getMaster()->removeSummon(attackedCreature);
 			}
 
 			if(attackedPlayer){
+				attackedPlayer->die(); //handles exp/skills/maglevel loss/reset spawn position
+				
 				std::stringstream ss;
 				//ss << corpseItem->getDescription(1);
 
