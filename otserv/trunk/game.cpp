@@ -341,6 +341,10 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 			//remove creature
 			game->removeCreature(attackedCreature, false);
 			//attackedCreature->setParent(attackTile);
+
+			if(attackedCreature && attackedCreature->getMaster() != NULL) {
+				attackedCreature->getMaster()->removeSummon(attackedCreature);
+			}
 		}
 		//Add blood?
 		else if(drawBlood && damage > 0){
