@@ -122,7 +122,7 @@ void GameState::onAttack(Creature* attacker, const Position& pos, const MagicEff
 
 	//Solid ground items/Magic items (fire/poison/energy)
 	MagicEffectItem* newmagicItem = me->getMagicItem(attacker, tile->isPz(),
-		tile->hasProperty(BLOCKSOLID) || tile->getTeleportItem() || tile->floorChange());
+		tile->hasProperty(BLOCKSOLID) || (tile->ground == NULL) || tile->getTeleportItem() || tile->floorChange());
 
 	if(newmagicItem){
 		//game->internalAddItem(tile, newmagicItem);
@@ -825,7 +825,7 @@ bool Game::placeCreature(const Position &pos, Creature* creature, bool isLogin /
 				#endif
 
 				creature->eventCheck = addEvent(makeTask(1000, std::bind2nd(std::mem_fun(&Game::checkCreature), creature->getID())));
-				creature->eventCheckAttacking = addEvent(makeTask(2000, boost::bind(&Game::checkCreatureAttacking, this, creature->getID(), 2000)));
+				creature->eventCheckAttacking = addEvent(makeTask(1500, boost::bind(&Game::checkCreatureAttacking, this, creature->getID(), 1500)));
 			}
 			else{
 				creature->eventCheck = addEvent(makeTask(500, std::bind2nd(std::mem_fun(&Game::checkCreature), creature->getID())));
