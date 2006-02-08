@@ -175,7 +175,7 @@ public:
 		memcpy(str, p, str_len);
 		str[str_len] = 0;
 		ret = str;
-		delete str;
+		delete[] str;
 		p = p + str_len;
 		return true;
 	}
