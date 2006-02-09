@@ -124,14 +124,14 @@ Tile* Map::getTile(uint16_t _x, uint16_t _y, uint8_t _z)
 		if(!tm)
 			return NULL;
 	
-    // search in the stl map for the requested tile
-    //TileMap::iterator it = tm->find((_x << 16) | _y);
-    //TileMap::iterator it = tm->find(_x & 0xFF00) << 8 | (_y & 0xFF00) | _z);
-    TileMap::iterator it = tm->find((_x & 0xFF80) << 16 | (_y & 0xFF80) << 1 | _z);
+		// search in the stl map for the requested tile
+		//TileMap::iterator it = tm->find((_x << 16) | _y);
+		//TileMap::iterator it = tm->find(_x & 0xFF00) << 8 | (_y & 0xFF00) | _z);
+		TileMap::iterator it = tm->find((_x & 0xFF80) << 16 | (_y & 0xFF80) << 1 | _z);
 
-    // ... found
-    if(it != tm->end())
-      	return it->second;
+		// ... found
+		if(it != tm->end())
+			return it->second;
 	}
 	
 	// or not

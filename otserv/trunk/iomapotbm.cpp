@@ -27,6 +27,7 @@
 #include "teleport.h"
 #include "fileloader.h"
 #include "town.h"
+#include "house.h"
 
 typedef unsigned char attribute_t;
 typedef unsigned long flags_t;
@@ -43,6 +44,7 @@ enum tile_flags_t{
 	|	|	|--- OTBM_TILE
 	|	|	|--- OTBM_TILE_SQUARE (not implemented)
 	|	|	|--- OTBM_TILE_REF (not implemented)
+	|	|	|--- OTBM_HOUSETILE
 	|	|
 	|	|--- OTBM_SPAWNS (not implemented)
 	|	|	|--- OTBM_SPAWN_AREA (not implemented)
@@ -68,6 +70,7 @@ enum OTBM_NodeTypes_t{
 	OTBM_MONSTER = 11,
 	OTBM_TOWNS = 12,
 	OTBM_TOWN = 13,
+	OTBM_HOUSETILE = 14,
 };
 
 enum OTBM_AttrTypes_t{
@@ -119,9 +122,15 @@ struct OTBM_TownTemple_coords{
 	unsigned char _z;
 };
 
+struct OTBM_HouseTile_coords{
+	unsigned char _x;
+	unsigned char _y;
+	unsigned long _houseid;
+};
+
 #pragma pack()
 
-#define OTBM_UNK_NODE_MSG std::cout << "Warning: OTBM loader unknown node type" << std::endl;
+#define OTBM_UNK_NODE_MSG std::cout << "Warning: OTBM loader unknown node type." << std::endl;
 
 bool IOMapOTBM::loadMap(Map* map, std::string identifier)
 {
@@ -222,21 +231,35 @@ bool IOMapOTBM::loadMap(Map* map, std::string identifier)
 					return false;
 				}
 				
-				if(type == OTBM_TILE){
+				if(type == OTBM_TILE || type == OTBM_HOUSETILE){
 					if(!f.getProps(tile_node, propStream)){
 						return false;
 					}
 					
+					unsigned short px, py, pz;
 					OTBM_Tile_coords* tile_coord;
 					if(!propStream.GET_STRUCT(tile_coord)){
 						return false;
 					}
-					unsigned short px, py, pz;
 					px = base_x + tile_coord->_x;
 					py = base_y + tile_coord->_y;
 					pz = base_z;
-
-					tile = new Tile(px, py, pz);
+					
+					if(type == OTBM_TILE){
+						tile = new Tile(px, py, pz);
+					}
+					else if(type == OTBM_HOUSETILE){
+						unsigned long houseid;
+						if(!propStream.GET_ULONG(houseid)){
+							return false;
+						}
+						House* house = Houses::getInstance().getHouse(houseid);
+						tile = new HouseTile(px, py, pz, house);
+					}
+					else{
+						return false;
+					}
+					
 					map->setTile(px, py, pz, tile);
 
 					if(tile){
@@ -318,21 +341,15 @@ bool IOMapOTBM::loadMap(Map* map, std::string identifier)
 					}
 					town->setName(townName);
 
-					OTBM_TownTemple_coords town_coords;
-					if(!propStream.GET_USHORT(town_coords._x)){
-						return false;
-					}
-					if(!propStream.GET_USHORT(town_coords._y)){
-						return false;
-					}
-					if(!propStream.GET_UCHAR(town_coords._z)){
+					OTBM_TownTemple_coords *town_coords;
+					if(!propStream.GET_STRUCT(town_coords)){
 						return false;
 					}
 
 					Position pos;
-					pos.x = town_coords._x;
-					pos.y = town_coords._y;
-					pos.z = town_coords._z;
+					pos.x = town_coords->_x;
+					pos.y = town_coords->_y;
+					pos.z = town_coords->_z;
 					town->setTemplePos(pos);
 				}
 				else{

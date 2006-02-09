@@ -110,6 +110,9 @@ public:
 	virtual void sendVIP(unsigned long guid, const std::string &name, bool isOnline) = 0;
 	virtual void sendCreatureLight(const Creature* creature) = 0;
 	virtual void sendWorldLight(const LightInfo& lightInfo) = 0;
+	virtual void sendCreatureSkull(const Creature* creature) = 0;
+	virtual void sendCreatureShield(const Creature* creature) = 0;
+	virtual void sendCreatureSquare(const Creature* creature, unsigned char color) = 0;
 	
 protected:
 	

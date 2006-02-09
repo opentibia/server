@@ -135,181 +135,184 @@ void Protocol76::parsePacket(NetworkMessage &msg)
 	
 	uint8_t recvbyte = msg.GetByte();
 	//a dead player can not performs actions
-	if(player->isRemoved() && recvbyte != 0x14) {
+	if(player->isRemoved() && recvbyte != 0x14){
 		OTSYS_SLEEP(10);
 		return;
 	}	
     
-	switch(recvbyte)
-	{
-    case 0x14: // logout
-			parseLogout(msg);
+	switch(recvbyte){
+	case 0x14: // logout
+		parseLogout(msg);
 		break;
 		
-		case 0x64: // client moving with steps
-			parseMoveByMouse(msg);
+	case 0x1E: // keep alive / ping response
+		player->receivePing();
 		break;
 		
-    case 0x65: // move north
-			parseMoveNorth(msg);
+	case 0x64: // client moving with steps
+		parseMoveByMouse(msg);
+		break;
+
+	case 0x65: // move north
+		parseMoveNorth(msg);
 		break;
 		
-    case 0x66: // move east
-			parseMoveEast(msg);
+	case 0x66: // move east
+		parseMoveEast(msg);
 		break;
-		
-    case 0x67: // move south
-			parseMoveSouth(msg);
+
+	case 0x67: // move south
+		parseMoveSouth(msg);
 		break;
-		
-    case 0x68: // move west
-			parseMoveWest(msg);
-		break;
-		
-    case 0x6A:
-			parseMoveNorthEast(msg);
-		break;
-		
-    case 0x6B:
-			parseMoveSouthEast(msg);
-		break;
-		
-    case 0x6C:
-			parseMoveSouthWest(msg);
-		break;
-		
-    case 0x6D:
-			parseMoveNorthWest(msg);
-		break;
-		
-		case 0x6F: // turn north
-			parseTurnNorth(msg);
-		break;
-		
-		case 0x70: // turn east
-			parseTurnEast(msg);
-		break;
-		
-    case 0x71: // turn south
-			parseTurnSouth(msg);
-		break;
-		
-    case 0x72: // turn west
-			parseTurnWest(msg);
-		break;
-		
-		case 0x7D: // Request trade
-			parseRequestTrade(msg);
-		break;
-		
-		case 0x7E: // Look at an item in trade
-			parseLookInTrade(msg);
-		break;
-		
-		case 0x7F: // Accept trade
-			parseAcceptTrade(msg);
-		break;
-		
-		case 0x80: // Close/cancel trade
-			parseCloseTrade();
-		break;
-		
-    case 0x78: // throw item
-			parseThrow(msg);
-		break;
-		
-    case 0x82: // use item
-			parseUseItem(msg);
-		break;
-		
-    case 0x83: // use item
-			parseUseItemEx(msg);
-		break;
-		
-		case 0x84: // battle window
-			parseBattleWindow(msg);
+
+	case 0x68: // move west
+		parseMoveWest(msg);
 		break;
 	
-    case 0x85:	//rotate item
-			parseRotateItem(msg);
-		break;
-		
-    case 0x87: // close container
-			parseCloseContainer(msg);
-		break;
-		
-		case 0x88: //"up-arrow" - container
-			parseUpArrowContainer(msg);	
-		break;
-		
-		case 0x89:
-			parseTextWindow(msg);
-		break;
-		
-    case 0x8C: // throw item
-			parseLookAt(msg);
-		break;
-		
-    case 0x96:  // say something
-			parseSay(msg);
-		break;
-		
-    case 0xA1: // attack
-			parseAttack(msg);
-		break;
-		
-    case 0xD2: // request Outfit
-			parseRequestOutfit(msg);
-		break;
-		
-    case 0xD3: // set outfit
-			parseSetOutfit(msg);
-		break;
-		
-    case 0x97: // request Channels
-			parseGetChannels(msg);
-		break;
-		
-    case 0x98: // open Channel
-			parseOpenChannel(msg);
-		break;
-		
-    case 0x99: // close Channel
-			parseCloseChannel(msg);
-		break;
-		
-    case 0x9A: // open priv
-			parseOpenPriv(msg);
-		break;
-		
-    case 0xBE: // cancel move
-			parseCancelMove(msg);
-		break;
-		
-    case 0xA0: // set attack and follow mode
-			parseModes(msg);
-		break;
-	
-		case 0xDC:
-			parseAddVip(msg);
-		break;
-		
-		case 0xDD:
-			parseRemVip(msg);
-		break;
-		
-    case 0x69: // client quit without logout <- wrong
-		if(game->stopEvent(player->eventAutoWalk)) {
+	case 0x69: // client quit without logout <- wrong
+		if(game->stopEvent(player->eventAutoWalk)){
 			sendCancelWalk();
 		}
 		break;
-		
-    case 0x1E: // keep alive / ping response
-			player->receivePing();
+	
+	case 0x6A:
+		parseMoveNorthEast(msg);
 		break;
 		
-    case 0xC9: // change position
-			// update position 
+	case 0x6B:
+		parseMoveSouthEast(msg);
+		break;
+		
+	case 0x6C:
+		parseMoveSouthWest(msg);
+		break;
+		
+	case 0x6D:
+		parseMoveNorthWest(msg);
+		break;
+		
+	case 0x6F: // turn north
+		parseTurnNorth(msg);
+		break;
+		
+	case 0x70: // turn east
+		parseTurnEast(msg);
+		break;
+		
+	case 0x71: // turn south
+		parseTurnSouth(msg);
+		break;
+		
+	case 0x72: // turn west
+		parseTurnWest(msg);
+		break;
+		
+	case 0x78: // throw item
+		parseThrow(msg);
+		break;	
+	
+	case 0x7D: // Request trade
+		parseRequestTrade(msg);
+		break;
+		
+	case 0x7E: // Look at an item in trade
+		parseLookInTrade(msg);
+		break;
+		
+	case 0x7F: // Accept trade
+		parseAcceptTrade(msg);
+		break;
+		
+	case 0x80: // Close/cancel trade
+		parseCloseTrade();
+		break;
+		
+	case 0x82: // use item
+			parseUseItem(msg);
+		break;
+		
+	case 0x83: // use item
+		parseUseItemEx(msg);
+		break;
+		
+	case 0x84: // battle window
+		parseBattleWindow(msg);
+		break;
+	
+	case 0x85:	//rotate item
+		parseRotateItem(msg);
+		break;
+		
+	case 0x87: // close container
+		parseCloseContainer(msg);
+		break;
+		
+	case 0x88: //"up-arrow" - container
+		parseUpArrowContainer(msg);	
+		break;
+		
+	case 0x89:
+		parseTextWindow(msg);
+		break;
+		
+	case 0x8C: // throw item
+		parseLookAt(msg);
+		break;
+		
+	case 0x96:  // say something
+		parseSay(msg);
+		break;
+	
+	case 0x97: // request Channels
+		parseGetChannels(msg);
+		break;
+		
+	case 0x98: // open Channel
+		parseOpenChannel(msg);
+		break;
+		
+	case 0x99: // close Channel
+		parseCloseChannel(msg);
+		break;
+		
+	case 0x9A: // open priv
+		parseOpenPriv(msg);
+		break;
+	
+	case 0xA0: // set attack and follow mode
+		parseModes(msg);
+		break;	
+	
+	case 0xA1: // attack
+		parseAttack(msg);
+		break;
+	
+	case 0xA2: //follow
+		parseFollow(msg);
+		break;
+	
+	case 0xBE: // cancel move
+		parseCancelMove(msg);
+		break;
+	
+	case 0xC9: // change position
+		// update position 
+		break;
+	
+	case 0xD2: // request Outfit
+		parseRequestOutfit(msg);
+		break;
+		
+	case 0xD3: // set outfit
+		parseSetOutfit(msg);
+		break;
+	
+	case 0xDC:
+		parseAddVip(msg);
+		break;
+		
+	case 0xDD:
+		parseRemVip(msg);
 		break;
 		
     default:
@@ -593,6 +596,9 @@ void Protocol76::parseCancelMove(NetworkMessage& msg)
 
 void Protocol76::parseModes(NetworkMessage& msg)
 {
+	long fightMode = msg.GetByte();
+	long followMode = msg.GetByte();
+	//std::cout << "fight " << fithgMode << ". follow " << followMode << std::endl;
 	//player->fightMode = msg.GetByte();
 	//player->followMode = msg.GetByte();
 }
@@ -955,6 +961,12 @@ void Protocol76::parseAttack(NetworkMessage& msg)
 	game->playerSetAttackedCreature(player, creatureid);
 }
 
+void Protocol76::parseFollow(NetworkMessage& msg)
+{
+	unsigned long creatureid = msg.GetU32();
+	//std::cout << "follow " << creatureid << std::endl;
+}
+
 void Protocol76::parseTextWindow(NetworkMessage& msg)
 {
 	unsigned long id = msg.GetU32();
@@ -1059,6 +1071,38 @@ void Protocol76::sendWorldLight(const LightInfo& lightInfo)
 	NetworkMessage msg; 
 	AddWorldLight(msg, lightInfo);
 	WriteBuffer(msg);
+}
+
+void Protocol76::sendCreatureSkull(const Creature* creature)
+{
+	if(CanSee(creature)){
+		NetworkMessage msg;
+		msg.AddByte(0x90);
+		msg.AddByte(creature->getID());
+		msg.AddByte(0);	//no skull
+		WriteBuffer(msg);
+	}
+}
+
+void Protocol76::sendCreatureShield(const Creature* creature)
+{
+	if(CanSee(creature)){
+		NetworkMessage msg;
+		msg.AddByte(0x91);
+		msg.AddByte(creature->getID());
+		msg.AddByte(0);	//no shield
+		WriteBuffer(msg);
+	}
+}
+
+void Protocol76::sendCreatureSquare(const Creature* creature, unsigned char color)
+{
+	if(CanSee(creature)){
+		NetworkMessage msg;
+		msg.AddByte(0x86);
+		msg.AddByte(color);
+		WriteBuffer(msg);
+	}
 }
 
 void Protocol76::sendStats()

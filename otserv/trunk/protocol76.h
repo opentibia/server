@@ -82,6 +82,7 @@ private:
 	void parseSay(NetworkMessage &msg);	
 	void parseLookAt(NetworkMessage &msg);	
 	void parseAttack(NetworkMessage &msg);
+	void parseFollow(NetworkMessage &msg);
 	
 	void parseThrow(NetworkMessage &msg);
 	void parseUseItemEx(NetworkMessage &msg);
@@ -148,6 +149,10 @@ private:
 	
 	virtual void sendCreatureLight(const Creature* creature);
 	virtual void sendWorldLight(const LightInfo& lightInfo);
+	
+	virtual void sendCreatureSkull(const Creature* creature);
+	virtual void sendCreatureShield(const Creature* creature);
+	virtual void sendCreatureSquare(const Creature* creature, unsigned char color);
 	
 	//tiles
 	virtual void sendAddTileItem(const Position& pos, const Item* item);

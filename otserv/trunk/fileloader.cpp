@@ -53,7 +53,7 @@ FileLoader::~FileLoader()
 
 	for(int i = 0; i < CACHE_BLOCKS; i++){
 		if(m_cached_data[i].data)
-			delete m_cached_data[i].data;
+			delete[] m_cached_data[i].data;
 	}
 }
 
@@ -135,7 +135,7 @@ const unsigned char* FileLoader::getProps(const NODE node, unsigned long &size)
 			unsigned char *tmp = new unsigned char[m_buffer_size+1024];
 			memcpy(tmp, m_buffer, m_buffer_size);
 			m_buffer_size = m_buffer_size + 1024;
-			delete m_buffer;
+			delete[] m_buffer;
 			m_buffer = tmp;
 		}
 		m_buffer[position] = byte;
