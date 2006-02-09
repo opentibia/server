@@ -143,159 +143,159 @@ void Protocol76::parsePacket(NetworkMessage &msg)
 	switch(recvbyte)
 	{
     case 0x14: // logout
-		parseLogout(msg);
+			parseLogout(msg);
 		break;
 		
-	case 0x64: // client moving with steps
-		parseMoveByMouse(msg);
+		case 0x64: // client moving with steps
+			parseMoveByMouse(msg);
 		break;
 		
     case 0x65: // move north
-		parseMoveNorth(msg);
+			parseMoveNorth(msg);
 		break;
 		
     case 0x66: // move east
-		parseMoveEast(msg);
+			parseMoveEast(msg);
 		break;
 		
     case 0x67: // move south
-		parseMoveSouth(msg);
+			parseMoveSouth(msg);
 		break;
 		
     case 0x68: // move west
-		parseMoveWest(msg);
+			parseMoveWest(msg);
 		break;
 		
     case 0x6A:
-		parseMoveNorthEast(msg);
+			parseMoveNorthEast(msg);
 		break;
 		
     case 0x6B:
-		parseMoveSouthEast(msg);
+			parseMoveSouthEast(msg);
 		break;
 		
     case 0x6C:
-		parseMoveSouthWest(msg);
+			parseMoveSouthWest(msg);
 		break;
 		
     case 0x6D:
-		parseMoveNorthWest(msg);
+			parseMoveNorthWest(msg);
 		break;
 		
-	case 0x6F: // turn north
-		parseTurnNorth(msg);
+		case 0x6F: // turn north
+			parseTurnNorth(msg);
 		break;
 		
-	case 0x70: // turn east
-		parseTurnEast(msg);
+		case 0x70: // turn east
+			parseTurnEast(msg);
 		break;
 		
     case 0x71: // turn south
-		parseTurnSouth(msg);
+			parseTurnSouth(msg);
 		break;
 		
     case 0x72: // turn west
-		parseTurnWest(msg);
+			parseTurnWest(msg);
 		break;
 		
-	case 0x7D: // Request trade
-		parseRequestTrade(msg);
+		case 0x7D: // Request trade
+			parseRequestTrade(msg);
 		break;
 		
-	case 0x7E: // Look at an item in trade
-		parseLookInTrade(msg);
+		case 0x7E: // Look at an item in trade
+			parseLookInTrade(msg);
 		break;
 		
-	case 0x7F: // Accept trade
-		parseAcceptTrade(msg);
+		case 0x7F: // Accept trade
+			parseAcceptTrade(msg);
 		break;
 		
-	case 0x80: // Close/cancel trade
-		parseCloseTrade();
+		case 0x80: // Close/cancel trade
+			parseCloseTrade();
 		break;
 		
     case 0x78: // throw item
-		parseThrow(msg);
+			parseThrow(msg);
 		break;
 		
     case 0x82: // use item
-		parseUseItem(msg);
+			parseUseItem(msg);
 		break;
 		
     case 0x83: // use item
-		parseUseItemEx(msg);
+			parseUseItemEx(msg);
 		break;
 		
-	case 0x84: // battle window
-		parseBattleWindow(msg);
+		case 0x84: // battle window
+			parseBattleWindow(msg);
 		break;
 	
     case 0x85:	//rotate item
-		parseRotateItem(msg);
+			parseRotateItem(msg);
 		break;
 		
     case 0x87: // close container
-		parseCloseContainer(msg);
+			parseCloseContainer(msg);
 		break;
 		
-	case 0x88: //"up-arrow" - container
-		parseUpArrowContainer(msg);	
+		case 0x88: //"up-arrow" - container
+			parseUpArrowContainer(msg);	
 		break;
 		
-	case 0x89:
-		parseTextWindow(msg);
+		case 0x89:
+			parseTextWindow(msg);
 		break;
 		
     case 0x8C: // throw item
-		parseLookAt(msg);
+			parseLookAt(msg);
 		break;
 		
     case 0x96:  // say something
-		parseSay(msg);
+			parseSay(msg);
 		break;
 		
     case 0xA1: // attack
-		parseAttack(msg);
+			parseAttack(msg);
 		break;
 		
     case 0xD2: // request Outfit
-		parseRequestOutfit(msg);
+			parseRequestOutfit(msg);
 		break;
 		
     case 0xD3: // set outfit
-		parseSetOutfit(msg);
+			parseSetOutfit(msg);
 		break;
 		
     case 0x97: // request Channels
-		parseGetChannels(msg);
+			parseGetChannels(msg);
 		break;
 		
     case 0x98: // open Channel
-		parseOpenChannel(msg);
+			parseOpenChannel(msg);
 		break;
 		
     case 0x99: // close Channel
-		parseCloseChannel(msg);
+			parseCloseChannel(msg);
 		break;
 		
     case 0x9A: // open priv
-		parseOpenPriv(msg);
+			parseOpenPriv(msg);
 		break;
 		
     case 0xBE: // cancel move
-		parseCancelMove(msg);
+			parseCancelMove(msg);
 		break;
 		
     case 0xA0: // set attack and follow mode
-		parseModes(msg);
+			parseModes(msg);
 		break;
 	
-	case 0xDC:
-		parseAddVip(msg);
+		case 0xDC:
+			parseAddVip(msg);
 		break;
 		
-	case 0xDD:
-		parseRemVip(msg);
+		case 0xDD:
+			parseRemVip(msg);
 		break;
 		
     case 0x69: // client quit without logout <- wrong
@@ -305,11 +305,11 @@ void Protocol76::parsePacket(NetworkMessage &msg)
 		break;
 		
     case 0x1E: // keep alive / ping response
-		player->receivePing();
+			player->receivePing();
 		break;
 		
     case 0xC9: // change position
-		// update position 
+			// update position 
 		break;
 		
     default:
@@ -478,25 +478,34 @@ bool Protocol76::CanSee(int x, int y, int z) const
 		std::cout << "WARNING! Protocol76::CanSee() Z-value is out of range!" << std::endl;
 	}
 #endif
-	
-	/*
-	//temporary fix until new battle system
-	Position myPos = player->getLastPosition();
-	if(player->getParent()){
-		myPos = player->getPosition();
-	}
-	*/
 
 	const Position& myPos = player->getPosition();
 
-	/*underground 8->15*/
-	if(myPos.z > 7 && z < 6 /*8 - 2*/) {
+	//we are on ground level or above (7 -> 0)
+	if(myPos.z <= 7){
+		//view is from 7 -> 0
+		if(z > 7){
+			return false;
+		}
+	}
+	//we are underground (8 -> 15)
+	else if(myPos.z >= 8){
+		//view is +/- 2 from the floor we stand on
+		if(std::abs(myPos.z - z) > 2){
+			return false;
+		}
+	}
+
+	/*
+	//underground 8->15
+	if(myPos.z > 7 && z < 6){
 		return false;
 	}
-	/*ground level and above 7->0*/
+	//ground level and above 7->0
 	else if(myPos.z <= 7 && z > 7){
 		return false;
 	}
+	*/
 	
 	//negative offset means that the action taken place is on a lower floor than ourself
 	int offsetz = myPos.z - z;
@@ -529,31 +538,6 @@ void Protocol76::logout()
 		pendingLogout = true;
 	}
 }
-
-/*
-//close container and its child containers
-void Protocol76::autoCloseContainers(const Container *container, NetworkMessage &msg)
-{
-	std::vector<unsigned char> ItemList;
-	for(ContainerVector::const_iterator cit = player->getContainers(); cit != player->getEndContainer(); ++cit) {
-		Container *tmpcontainer = cit->second;
-		while(tmpcontainer != NULL) {
-			if(tmpcontainer == container) {
-				ItemList.push_back(cit->first);
-				break;
-			}
-			
-			tmpcontainer = dynamic_cast<Container*>(tmpcontainer->getParent());
-		}
-	}
-	
-	for(std::vector<unsigned char>::iterator it = ItemList.begin(); it != ItemList.end(); ++it) {
-		player->closeContainer(*it);
-		msg.AddByte(0x6F);
-		msg.AddByte(*it);
-	}						
-}
-*/
 
 // Parse methods
 void Protocol76::parseLogout(NetworkMessage& msg)

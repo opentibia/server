@@ -224,7 +224,7 @@ void Map::getSpectators(const Range& range, SpectatorVec& list)
 
 	int offsetz;
 	CreatureVector::iterator cit;
-	Tile *tile;
+	Tile* tile;
 
 	//for(int nz = range.minRange.z; nz != range.maxRange.z + range.zstep; nz++) {
 	for(int nz = range.minRange.z; nz != range.maxRange.z + range.zstep; nz += range.zstep){

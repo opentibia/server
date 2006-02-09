@@ -111,13 +111,21 @@ private:
 			if(isUnderground()){
 				//8->15
 				minRange.z = std::min(centerpos.z + 2, MAP_MAX_LAYERS - 1);
-				maxRange.z = std::max(centerpos.z - 2, 8);
+				maxRange.z = std::max(centerpos.z - 2, 0);
+
+				//minRange.z = std::min(centerpos.z + 2, MAP_MAX_LAYERS - 1);
+				//maxRange.z = std::max(centerpos.z - 2, 8);
 
 				zstep = -1;
 			}
 			else{
-				minRange.z = 8; //people on floor 8 can see floor 7 too
+				minRange.z = 7;
 				maxRange.z = 0;
+
+				if(centerpos.z == 7)
+					minRange.z = 9;
+				else if(centerpos.z == 6)
+					minRange.z = 8;
 
 				zstep = -1;
 			}
