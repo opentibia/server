@@ -91,12 +91,12 @@ Creature()
 
 	for(int i = 0; i < 7; i++)
 	{
-		skills[i][SKILL_LEVEL] = 1;
+		skills[i][SKILL_LEVEL] = 10;
 		skills[i][SKILL_TRIES] = 0;
 		skills[i][SKILL_PERCENT] = 0;
 	
 		for(int j = 0; j < 2; j++){
-			SkillAdvanceCache[i][j].level = 0;
+			SkillAdvanceCache[i][j].level = 10;
 			SkillAdvanceCache[i][j].vocation = VOCATION_NONE;
 			SkillAdvanceCache[i][j].tries = 0;
 		}

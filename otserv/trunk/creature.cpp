@@ -65,7 +65,6 @@ Creature::Creature() :
 	lastmove = 0;
 	
 	inFightTicks = 0;
-	inFightTicks = 0;
 	manaShieldTicks = 0;
 	hasteTicks = 0;
 	paralyzeTicks = 0;
