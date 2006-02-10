@@ -859,10 +859,6 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 	stopEvent(creature->eventCheck);
 	stopEvent(creature->eventCheckAttacking);
 
-	listCreature.removeList(creature->getID());
-	creature->removeList();
-	creature->setRemoved();
-
 	SpectatorVec list;
 	SpectatorVec::iterator it;
 
@@ -888,8 +884,10 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 	}
 
 	creature->getParent()->postRemoveNotification(creature);
-	//stopEvent(creature->eventCheck);
-	//stopEvent(creature->eventCheckAttacking);
+
+	listCreature.removeList(creature->getID());
+	creature->removeList();
+	creature->setRemoved();
 
 	//FreeThing(creature);
 	//creature->setParent(NULL);
