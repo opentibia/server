@@ -188,6 +188,14 @@ enum magicfield_t {
 	MAGIC_FIELD_ENERGY,	
 };
 
+enum skulls_t{
+	SKULL_NONE = 0,
+	SKULL_YELLOW = 1,
+	SKULL_GREEN = 2,
+	SKULL_WHITE = 3,
+	SKULL_RED = 4,
+};
+
 enum item_t {
 	ITEM_FISHING_ROD      = 2580,
 	ITEM_SHOVEL           = 2554,

@@ -142,7 +142,9 @@ Creature()
 
  	manaTick = 0;
  	healthTick = 0;
- 	
+
+	redSkullTicks = 0;
+	skull = SKULL_NONE;
 } 
 
 Player::~Player()
@@ -1039,7 +1041,11 @@ void Player::dropLoot(Container *corpse)
 {
 	for(int i = SLOT_FIRST; i < SLOT_LAST; ++i){
 		Item* item = items[i];		
-		if(item && ((dynamic_cast<Container*>(item)) || random_range(1, 100) <= 10)) {
+		#ifdef __SKULLSYSTEM__
+		if(item && ((dynamic_cast<Container*>(item)) || random_range(1, 100) <= 10 || getSkull() == SKULL_RED)){
+		#else
+		if(item && ((dynamic_cast<Container*>(item)) || random_range(1, 100) <= 10)){
+		#endif
 			corpse->__internalAddThing(item);
 			onRemoveInventoryItem((slots_t)i, item);
 			items[i] = NULL;
@@ -2654,3 +2660,97 @@ void Player::updateItemsLight(bool internal /*=false*/)
 		}
 	}
 }
+
+#ifdef __SKULLSYSTEM__
+skulls_t Player::getSkull() const
+{
+	if(access != 0)
+		return SKULL_NONE;
+		
+	return skull;
+}
+
+skulls_t Player::getSkullClient(const Player* player) const
+{
+	skulls_t skull;
+	skull = player->getSkull();
+	if(skull == SKULL_NONE){
+		if(player->hasAttacked(this)){
+			skull = SKULL_YELLOW;
+		}
+	}
+	return skull;
+}
+
+bool Player::hasAttacked(const Player* attacked) const
+{
+	if(access != 0)
+		return false;
+	if(!attacked)
+		return false;
+	
+	AttackedSet::const_iterator it;
+	unsigned long attacked_id = attacked->getID();
+	it = attackedSet.find(attacked_id);
+	if(it != attackedSet.end()){
+		return true;
+	}
+	else{
+		return false;
+	}
+}
+
+void Player::addAttacked(const Player* attacked)
+{
+	if(access != 0)
+		return;
+	
+	if(!attacked || attacked == this)
+		return;
+	AttackedSet::iterator it;
+	unsigned long attacked_id = attacked->getID();
+	it = attackedSet.find(attacked_id);
+	if(it == attackedSet.end()){
+		attackedSet.insert(attacked_id);
+	}
+}
+
+void Player::clearAttacked()
+{
+	attackedSet.clear();
+}
+
+void Player::addUnjustifiedDead(const Player* attacked)
+{
+	if(access != 0)
+		return;
+		
+	std::stringstream Msg;
+	Msg << "Warning! The murder of " << attacked->getName() << " was not justified.";
+	client->sendTextMessage(MSG_INFO, Msg.str().c_str());
+	redSkullTicks = redSkullTicks + 12*3600*1000;
+	if(redSkullTicks > 3*24*3600*1000){
+		g_game.changeSkull(this, SKULL_RED);
+	}
+}
+
+void Player::setSkull(skulls_t new_skull)
+{
+	skull = new_skull;
+}
+
+void Player::sendCreatureSkull(const Creature* creature) const
+{
+	client->sendCreatureSkull(creature);
+}
+
+void Player::checkRedSkullTicks(long ticks)
+{
+	if(redSkullTicks - ticks > 0)
+		redSkullTicks = redSkullTicks - ticks;
+	
+	if(redSkullTicks < 1000 && inFightTicks < 1000 && skull != SKULL_NONE){
+		g_game.changeSkull(this, SKULL_NONE);
+	}
+}
+#endif

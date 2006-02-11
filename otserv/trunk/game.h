@@ -311,6 +311,9 @@ public:
 	void changeOutfitAfter(unsigned long id, int looktype, long time);
 	void changeSpeed(unsigned long id, unsigned short speed);
 	void changeLight(const Creature* creature);
+	#ifdef __SKULLSYSTEM__
+	void changeSkull(Player* creature, skulls_t new_skull);
+	#endif
 	void AddMagicEffectAt(const Position& pos, uint8_t type);
 	
 	game_state_t getGameState();

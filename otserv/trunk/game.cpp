@@ -99,8 +99,26 @@ void GameState::onAttack(Creature* attacker, const Position& pos, const MagicEff
 		
 		if (damage > 0) {
 			if(attackPlayer && attackPlayer->access == 0) {
-				if(targetPlayer && targetPlayer != attackPlayer && game->getWorldType() != WORLD_TYPE_NO_PVP)
+				if(targetPlayer && targetPlayer != attackPlayer && game->getWorldType() != WORLD_TYPE_NO_PVP){
 					attackPlayer->pzLocked = true;
+					#ifdef __SKULLSYSTEM__
+					if(!targetPlayer->hasAttacked(attackPlayer)){
+						if(targetPlayer->getSkull() == SKULL_NONE && attackPlayer->getSkull() == SKULL_NONE){
+							//add a white skull
+							game->changeSkull(attackPlayer, SKULL_WHITE);
+						}
+						bool sendYellowSkull = false;
+						if(!attackPlayer->hasAttacked(targetPlayer) && attackPlayer->getSkull() == SKULL_NONE){
+							//show yellow skull
+							sendYellowSkull = true;
+						}
+						attackPlayer->addAttacked(targetPlayer);
+						if(sendYellowSkull){
+							targetPlayer->sendCreatureSkull(attackPlayer);
+						}
+					}
+					#endif
+				}
 			}
 
 			if(targetCreature->access == 0 && targetPlayer && game->getWorldType() != WORLD_TYPE_NO_PVP) {
@@ -254,7 +272,7 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 			
 			//Add eventual loot
 			Container* lootContainer = dynamic_cast<Container*>(corpseItem);
-			if(lootContainer) {
+			if(lootContainer){
 				attackedCreature->dropLoot(lootContainer);
 			}
 
@@ -285,6 +303,13 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 
 				//set body special description
 				corpseItem->setSpecialDescription(ss.str());
+				
+				#ifdef __SKULLS__
+				Player* attackerPlayer = dynamic_cast<Player*>(attacker);
+				if(!attackedPlayer->hasAttacked(attackerPlayer) || attackedPlayer->getSkull() == SKULL_NONE){
+					attackerPlayer->addUnjustifiedDead(attackedPlayer);
+				}
+				#endif
 			}
 			
 			//Get all creatures that will gain xp from this kill..
@@ -1970,8 +1995,26 @@ void Game::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fi
 		player->inFightTicks = (long)g_config.getGlobalNumber("pzlocked", 0);
 		player->sendIcons();
 		
-		if(attackedPlayer)
-			player->pzLocked = true;	    
+		if(attackedPlayer){
+			player->pzLocked = true;
+			#ifdef __SKULLSYSTEM__
+			if(!attackedPlayer->hasAttacked(player)){
+				if(attackedPlayer->getSkull() == SKULL_NONE && player->getSkull() == SKULL_NONE){
+					//add a white skull
+					changeSkull(player, SKULL_WHITE);
+				}
+				bool sendYellowSkull = false;
+				if(!player->hasAttacked(attackedPlayer) && player->getSkull() == SKULL_NONE){
+					//show yellow skull
+					sendYellowSkull = true;
+				}
+				player->addAttacked(attackedPlayer);
+				if(sendYellowSkull){
+					attackedPlayer->sendCreatureSkull(player);
+				}
+			}
+			#endif
+		}
 	}
 
 	if(attackedPlayer && attackedPlayer->access ==0){
@@ -3082,13 +3125,23 @@ void Game::checkCreature(unsigned long creatureid)
 					}
 					
 					player->sendPing();
-
+					#ifdef __SKULLSYSTEM__
+					player->checkRedSkullTicks(thinkTicks);
+					#endif
+					
 					if(player->inFightTicks >= 1000) {
 						player->inFightTicks -= thinkTicks;
 						
-						if(player->inFightTicks < 1000)
+						if(player->inFightTicks < 1000){
 							player->pzLocked = false;
-							player->sendIcons(); 
+							player->sendIcons();
+							#ifdef __SKULLSYSTEM__
+							if(player->getSkull() != SKULL_RED){
+								player->clearAttacked();
+								changeSkull(player, SKULL_NONE);
+							}
+							#endif
+						}
 					}
 					
 					if(player->exhaustedTicks >= 1000){
@@ -3107,7 +3160,8 @@ void Game::checkCreature(unsigned long creatureid)
 					
 					if(player->hasteTicks >=1000){
 						player->hasteTicks -= thinkTicks;
-					}	
+					}
+					
 				}
 				else{
 					if(creature->manaShieldTicks >=1000){
@@ -3184,6 +3238,23 @@ void Game::changeLight(const Creature* creature)
 	}
 }
 
+#ifdef __SKULLSYSTEM__
+void Game::changeSkull(Player* player, skulls_t new_skull)
+{
+	SpectatorVec list;
+	SpectatorVec::iterator it;
+
+	player->setSkull(new_skull);
+	getSpectators(Range(player->getPosition(), true), list);
+
+	Player* spectator;
+	for(it = list.begin(); it != list.end(); ++it){
+		if(spectator = (*it)->getPlayer()){
+			spectator->sendCreatureSkull(player);
+		}
+	}
+}
+#endif
 
 void Game::AddMagicEffectAt(const Position& pos, uint8_t type)
 {

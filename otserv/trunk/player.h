@@ -260,7 +260,19 @@ public:
 	virtual void getCreatureLight(LightInfo& light) const;
 	
 	void updateItemsLight(bool internal = false);
-
+	
+	#ifdef __SKULLSYSTEM__
+	skulls_t getSkull() const;
+	skulls_t getSkullClient(const Player* player) const;
+	bool hasAttacked(const Player* attacked) const;
+	void addAttacked(const Player* attacked);
+	void clearAttacked();
+	void addUnjustifiedDead(const Player* attacked);
+	void setSkull(skulls_t new_skull);
+	void sendCreatureSkull(const Creature* creature) const;
+	void checkRedSkullTicks(long ticks);
+	#endif
+	
 	//tile
 	//send methods
 	void sendAddTileItem(const Position& pos, const Item* item);
@@ -437,6 +449,13 @@ protected:
 	typedef MoneyMap::value_type moneymap_pair;
 	
 	LightInfo itemsLight;
+	
+	#ifdef __SKULLSYSTEM__
+	long redSkullTicks;
+	skulls_t skull;
+	typedef std::set<long> AttackedSet;
+	AttackedSet attackedSet;
+	#endif
 	
 	//for skill advances
 	unsigned int getReqSkillTries (int skill, int level, playervoc_t voc);
