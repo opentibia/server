@@ -304,7 +304,7 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 				//set body special description
 				corpseItem->setSpecialDescription(ss.str());
 				
-				#ifdef __SKULLS__
+				#ifdef __SKULLSYSTEM__
 				Player* attackerPlayer = dynamic_cast<Player*>(attacker);
 				if(!attackedPlayer->hasAttacked(attackerPlayer) || attackedPlayer->getSkull() == SKULL_NONE){
 					attackerPlayer->addUnjustifiedDead(attackedPlayer);
@@ -2588,7 +2588,7 @@ bool Game::playerRequestTrade(Player* player, const Position& pos, uint8_t stack
 			((container = dynamic_cast<const Container*>(tradeItem)) && container->isHoldingItem(it->first)) ||
 			((container = dynamic_cast<const Container*>(it->first)) && container->isHoldingItem(tradeItem)))
 		{
-			player->sendTextMessage(MSG_INFO, "This item is already beeing traded.");
+			player->sendTextMessage(MSG_INFO, "This item is already being traded.");
 			return false;
 		}
 	}

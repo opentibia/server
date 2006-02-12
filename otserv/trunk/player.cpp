@@ -143,8 +143,10 @@ Creature()
  	manaTick = 0;
  	healthTick = 0;
 
+#ifdef __SKULLSYSTEM__
 	redSkullTicks = 0;
 	skull = SKULL_NONE;
+#endif
 } 
 
 Player::~Player()
