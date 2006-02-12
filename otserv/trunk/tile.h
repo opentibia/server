@@ -72,7 +72,6 @@ public:
 	TrashHolder* getTrashHolder() const;
 	Mailbox* getMailbox() const;
     
-	Thing* getTopMoveableThing();
 	Creature* getTopCreature();
 	Item* getTopTopItem();
 	Item* getTopDownItem();
