@@ -687,6 +687,9 @@ void Monster::onUpdateTile(const Position& pos)
 void Monster::onCreatureAppear(const Creature* creature, bool isLogin)
 {
 	if(creature == this){
+		reThink(false);
+
+		/*
 		bool oldExecEvents = game->isExecutingEvents;
 		game->isExecutingEvents = true;
 
@@ -701,6 +704,7 @@ void Monster::onCreatureAppear(const Creature* creature, bool isLogin)
 		}
 
 		game->isExecutingEvents = oldExecEvents;
+		*/
 	}
 	else if(isInRange(creature->getPosition())){
 		bool canReach = isCreatureReachable(creature);
@@ -900,6 +904,23 @@ void Monster::reThink(bool updateOnlyState /* = true*/)
 		}
 	}
 	else {
+		if(state == STATE_IDLE){
+			//bool oldExecEvents = game->isExecutingEvents;
+			//game->isExecutingEvents = true;
+
+			SpectatorVec list;
+			SpectatorVec::iterator it;
+
+			game->getSpectators(Range(getPosition(), false), list);
+			for(it = list.begin(); it != list.end(); ++it){
+				if(*it != this){
+					onCreatureAppear(*it, false);
+				}
+			}
+
+			//game->isExecutingEvents = oldExecEvents;
+		}
+
 		//change target
 		if(state != STATE_IDLE) {
 			if(mType->changeTargetChance > rand()*10000/(RAND_MAX+1)){

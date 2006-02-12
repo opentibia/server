@@ -245,11 +245,8 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 	Player* attackedPlayer = dynamic_cast<Player*>(attackedCreature);
 	
 	attackedCreature->addInflictedDamage(attacker, damage);
-	
-	//if(attacker && attacker->isRemoved() || attackedCreature->isRemoved())
-	//	return;
 
-	if(attackedPlayer /*&& !attackedPlayer->isRemoved()*/){
+	if(attackedPlayer){
 		attackedPlayer->sendStats();
 	}
 
@@ -306,7 +303,7 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 				
 				#ifdef __SKULLSYSTEM__
 				Player* attackerPlayer = dynamic_cast<Player*>(attacker);
-				if(!attackedPlayer->hasAttacked(attackerPlayer) || attackedPlayer->getSkull() == SKULL_NONE){
+				if(!attackedPlayer->hasAttacked(attackerPlayer) && attackedPlayer->getSkull() == SKULL_NONE){
 					attackerPlayer->addUnjustifiedDead(attackedPlayer);
 				}
 				#endif
@@ -655,26 +652,35 @@ Thing* Game::internalGetThing(Player* player, const Position& pos, int32_t index
 
 			/*for move operations*/
 			if(index == STACKPOS_MOVE){
-				thing = tile->getTopMoveableThing(); //tile->getTopDownItem();
+				//thing = tile->getTopMoveableThing(); //tile->getTopDownItem();
+
+				Item* item = tile->getTopDownItem();
+				if(item && !item->isNotMoveable())
+					thing = item;
+				else
+					thing = tile->getTopCreature();
 			}
 			/*use item*/
 			else if(index == STACKPOS_USE){
-				thing = tile->getTopMoveableThing(); //tile->getTopDownItem();
+				//thing = tile->getTopMoveableThing(); //tile->getTopDownItem();
+				thing = tile->getTopDownItem();
 			}
 			else{
 				thing = tile->__getThing(index);
 			}
 
-			//do extra checks here if the thing is accessable
-			if(thing && thing->getItem()){
-				if(tile->hasProperty(ISVERTICAL)){
-					if(player->getPosition().x + 1 == tile->getPosition().x){
-						thing = NULL;
+			if(player){
+				//do extra checks here if the thing is accessable
+				if(thing && thing->getItem()){
+					if(tile->hasProperty(ISVERTICAL)){
+						if(player->getPosition().x + 1 == tile->getPosition().x){
+							thing = NULL;
+						}
 					}
-				}
-				else if(tile->hasProperty(ISHORIZONTAL)){
-					if(player->getPosition().y + 1 == tile->getPosition().y){
-						thing = NULL;
+					else if(tile->hasProperty(ISHORIZONTAL)){
+						if(player->getPosition().y + 1 == tile->getPosition().y){
+							thing = NULL;
+						}
 					}
 				}
 			}
@@ -912,10 +918,8 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 
 	listCreature.removeList(creature->getID());
 	creature->removeList();
-	creature->setRemoved();
-
-	//FreeThing(creature);
-	//creature->setParent(NULL);
+	creature->setRemoved(); //creature->setParent(NULL);
+	FreeThing(creature);
 
 	this->isExecutingEvents = false;
 
