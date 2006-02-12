@@ -1246,7 +1246,7 @@ void Player::sendCancelMessage(ReturnValue message) const
 		break;
 
 		case RET_NOTMOVEABLE:
-			sendCancel("You cannot move this item.");
+			sendCancel("You cannot move this object.");
 		break;
 
 		case RET_DROPTWOHANDEDITEM:

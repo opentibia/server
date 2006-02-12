@@ -320,12 +320,12 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 									msg.AddByte(0x16);
 									msg.AddString("Too many players online.");
 									msg.AddByte(45); //number of seconds before retry
-									break;
+								break;
 
 								case CONNECT_MASTERPOSERROR:
 									msg.AddByte(0x14);
-									msg.AddString("Temple position is wrong. Contact the admininistrator.");
-									break;
+									msg.AddString("Temple position is wrong. Contact the administrator.");
+								break;
 
 								default:
 									msg.AddByte(0x14);
