@@ -89,6 +89,16 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 		player->capacity = result.getDataInt("cap");
 		player->maxDepotLimit = result.getDataInt("maxdepotitems");
 		player->lastLoginSaved = result.getDataInt("lastlogin");
+		#ifdef __SKULLSYSTEM__
+		long redSkullSeconds = result.getDataInt("redskulltime") - std::time(NULL);
+		if(redSkullSeconds > 0){
+			//ensure that we round up the number of ticks
+			player->redSkullTicks = (redSkullSeconds + 2)*1000;
+			if(result.getDataInt("redskull") == 1){
+				player->skull = SKULL_RED;
+			}
+		}
+		#endif
 	
 		player->vocation = (playervoc_t)result.getDataInt("vocation");
 		player->access = result.getDataInt("access");
@@ -349,6 +359,18 @@ bool IOPlayerSQL::savePlayer(Player* player)
 		query << "`sex` = " << player->sex << ", ";
 		query << "`lastlogin` = " << player->lastlogin << ", ";
 		query << "`lastip` = " << player->lastip << " ";
+		#ifdef __SKULLSYSTEM__
+		long redSkullTime = 0;
+		if(player->redSkullTicks > 0){
+			redSkullTime = std::time(NULL) + player->redSkullTicks/1000;
+		}
+		query << ", `redskulltime` = " << redSkullTime << ", ";
+		long redSkull = 0;
+		if(player->skull == SKULL_RED){
+			redSkull = 1;
+		}
+		query << "`redskull` = " << redSkull << " ";
+		#endif
 		query << " WHERE `id` = "<< player->getGUID() <<" LIMIT 1";
 		
 		if(!mysql.executeQuery(query))

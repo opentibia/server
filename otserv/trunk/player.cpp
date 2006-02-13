@@ -2724,14 +2724,14 @@ void Player::clearAttacked()
 
 void Player::addUnjustifiedDead(const Player* attacked)
 {
-	if(access != 0)
+	if(access != 0 || attacked == this)
 		return;
 		
 	std::stringstream Msg;
 	Msg << "Warning! The murder of " << attacked->getName() << " was not justified.";
 	client->sendTextMessage(MSG_INFO, Msg.str().c_str());
 	redSkullTicks = redSkullTicks + 12*3600*1000;
-	if(redSkullTicks > 3*24*3600*1000){
+	if(redSkullTicks >= 3*24*3600*1000){
 		g_game.changeSkull(this, SKULL_RED);
 	}
 }

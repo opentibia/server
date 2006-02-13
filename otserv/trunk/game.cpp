@@ -176,8 +176,10 @@ void GameState::onAttack(Creature* attacker, const Position& pos, const MagicEff
 			attackPlayer->exhaustedTicks = (long)g_config.getGlobalNumber("exhausted", 0);
 		
 		//Fight symbol
-		if(me->offensive)
+		if(me->offensive){
 			attackPlayer->inFightTicks = (long)g_config.getGlobalNumber("pzlocked", 0);
+			attackPlayer->sendIcons();
+		}
 	}
 }
 
