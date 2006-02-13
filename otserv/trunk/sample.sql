@@ -1,4 +1,4 @@
--- MySQL dump 10.9
+
 --
 -- Host: localhost    Database: otserv
 -- ------------------------------------------------------
@@ -128,7 +128,7 @@ CREATE TABLE `players` (
   `lastip` int(11) unsigned NOT NULL default '0',
   `save` int(11) unsigned NOT NULL default '1',
   `redskulltime` int(11) unsigned NOT NULL default '0',
-  `save` tinyint(1) unsigned NOT NULL default '0',
+  `redskull` tinyint(1) unsigned NOT NULL default '0',
   UNIQUE KEY `id` (`id`),
   KEY `name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
