@@ -275,10 +275,6 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 				attackedCreature->dropLoot(lootContainer);
 			}
 
-			if(attackedCreature && attackedCreature->getMaster() != NULL) {
-				attackedCreature->getMaster()->removeSummon(attackedCreature);
-			}
-
 			if(attackedPlayer){
 				attackedPlayer->die(); //handles exp/skills/maglevel loss/reset spawn position
 				
@@ -305,7 +301,7 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 				
 				#ifdef __SKULLSYSTEM__
 				Player* attackerPlayer = dynamic_cast<Player*>(attacker);
-				if(!attackedPlayer->hasAttacked(attackerPlayer) && attackedPlayer->getSkull() == SKULL_NONE){
+				if(attackerPlayer && !attackedPlayer->hasAttacked(attackerPlayer) && attackedPlayer->getSkull() == SKULL_NONE){
 					attackerPlayer->addUnjustifiedDead(attackedPlayer);
 				}
 				#endif
