@@ -86,6 +86,9 @@ enum OTBM_AttrTypes_t{
 	OTBM_ATTR_DEPOT_ID = 10,
 	OTBM_ATTR_EXT_SPAWN_FILE = 11,
 	OTBM_ATTR_RUNE_CHARGES = 12,
+	OTBM_ATTR_EXT_HOUSE_FILE = 13,
+	OTBM_ATTR_HOUSEDOORID = 14,
+	OTBM_ATTR_MAPEDITORDESCRIPTION = 15
 };
 
 #pragma pack(1)
@@ -178,14 +181,16 @@ bool IOMapOTBM::loadMap(Map* map, std::string identifier)
 	}
 
 	unsigned char attribute;
+	std::string mapDescription;
 	std::string tmp;
-	std::string map_description;
 	while(propStream.GET_UCHAR(attribute)){
 		switch(attribute){
 		case OTBM_ATTR_DESCRIPTION:
-			if(!propStream.GET_STRING(map_description)){
+			if(!propStream.GET_STRING(mapDescription)){
 				return false;
 			}
+			
+			std::cout << "Map description: " << mapDescription << std::endl;
 			break;
 		case OTBM_ATTR_EXT_SPAWN_FILE:
 			if(!propStream.GET_STRING(tmp)){
@@ -194,13 +199,28 @@ bool IOMapOTBM::loadMap(Map* map, std::string identifier)
 			map->spawnfile = identifier.substr(0, identifier.rfind('/') + 1);
 			map->spawnfile += tmp;
 			break;
+		case OTBM_ATTR_EXT_HOUSE_FILE:
+			if(!propStream.GET_STRING(tmp)){
+				return false;
+			}
+
+			//map->housefile = identifier.substr(0, identifier.rfind('/') + 1);
+			//map->housefile += tmp;
+			break;
+
+		case OTBM_ATTR_MAPEDITORDESCRIPTION:
+			if(!propStream.GET_STRING(mapDescription)){
+				return false;
+			}
+
+			std::cout << "MapEditor description: " << mapDescription << std::endl;
+			break;
+
 		default:
 			return false;
 			break;
 		}
 	}
-		
-	std::cout << "Map description: " << map_description << std::endl;
 	
 	Tile* tile = NULL;
 
@@ -487,6 +507,18 @@ Item* IOMapOTBM::unserializaItemNode(FileLoader* f, NODE node)
 				}
 
 				item->setItemCharge(_charges);
+				break;
+			}
+
+			case OTBM_ATTR_HOUSEDOORID:
+			{
+				unsigned char _doorid = 0;
+				if(!propStream.GET_UCHAR(_doorid)){
+					delete item;
+					return NULL;
+				}
+
+				item->setItemCountOrSubtype(_doorid);
 				break;
 			}
 
