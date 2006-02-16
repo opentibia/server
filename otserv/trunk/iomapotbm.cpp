@@ -87,8 +87,7 @@ enum OTBM_AttrTypes_t{
 	OTBM_ATTR_EXT_SPAWN_FILE = 11,
 	OTBM_ATTR_RUNE_CHARGES = 12,
 	OTBM_ATTR_EXT_HOUSE_FILE = 13,
-	OTBM_ATTR_HOUSEDOORID = 14,
-	OTBM_ATTR_MAPEDITORDESCRIPTION = 15
+	OTBM_ATTR_HOUSEDOORID = 14
 };
 
 #pragma pack(1)
@@ -206,14 +205,6 @@ bool IOMapOTBM::loadMap(Map* map, std::string identifier)
 
 			//map->housefile = identifier.substr(0, identifier.rfind('/') + 1);
 			//map->housefile += tmp;
-			break;
-
-		case OTBM_ATTR_MAPEDITORDESCRIPTION:
-			if(!propStream.GET_STRING(mapDescription)){
-				return false;
-			}
-
-			std::cout << "MapEditor description: " << mapDescription << std::endl;
 			break;
 
 		default:
