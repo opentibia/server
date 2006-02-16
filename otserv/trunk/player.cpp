@@ -35,6 +35,7 @@ using namespace std;
 #include "ioplayer.h"
 #include "luascript.h"
 #include "chat.h"
+#include "house.h"
 
 extern LuaScript g_config;
 extern Game g_game;
@@ -1488,6 +1489,14 @@ void Player::sendCloseTrade()
 void Player::sendTextWindow(Item* item, const unsigned short maxlen, const bool canWrite)
 {
 	client->sendTextWindow(item,maxlen,canWrite);
+}
+
+void Player::sendHouseWindow(House* _house, unsigned long _listid)
+{
+	std::string text;
+	if(_house->getAccessList(_listid, text)){
+		client->sendHouseWindow(_house, _listid, text);
+	}
 }
 
 //tile

@@ -42,6 +42,7 @@
 #include "npc.h"
 #include "game.h"
 #include "tile.h"
+#include "house.h"
 
 #include "spells.h"
 #include "actions.h"
@@ -1609,7 +1610,35 @@ bool Game::internalCreatureSaySpell(Creature *creature, const std::string &text)
 	}
 
 	std::transform(temp.begin(), temp.end(), temp.begin(), (int(*)(int))tolower);
-
+	
+	//temporary place of house spells
+	if(player){
+		HouseTile* houseTile = dynamic_cast<HouseTile*>(player->getTile());
+		if(houseTile){
+			House* house = houseTile->getHouse();
+			if(house){
+				if(temp == "aleta sio"){ //edit guest list
+					if(house->canEditAccessList(GUEST_LIST, player)){
+						player->sendHouseWindow(house, GUEST_LIST);
+					}
+				}
+				else if(temp == "aleta som"){ //edit subowner list
+					if(house->canEditAccessList(SUBOWNER_LIST, player)){
+						player->sendHouseWindow(house, SUBOWNER_LIST);
+					}
+				}
+				else if(temp == "aleta grav"){ //edit door list
+					//TODO
+				}
+				else if(temp == "alana sio"){ //kick player
+					house->kickPlayer(player, var);
+				}
+				return true;
+			}
+		}
+	}
+	// end of house spells
+	
 	if(creature->access != 0 || !player){
 		std::map<std::string, Spell*>::iterator sit = spells.getAllSpells()->find(temp);
 		if( sit != spells.getAllSpells()->end() ) {

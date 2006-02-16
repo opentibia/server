@@ -32,6 +32,7 @@
 #include <algorithm>
 #include "templates.h"
 
+class House;
 class Protocol;
 
 enum skills_t {
@@ -234,6 +235,7 @@ public:
 	void sendCreatureHealth(const Creature *creature);
 	void sendTradeItemRequest(const Player* player, const Item* item, bool ack);
 	void sendCloseTrade();
+	void sendHouseWindow(House* _house, unsigned long _listid);
 	void receivePing();
 	void flushMsg();
 	

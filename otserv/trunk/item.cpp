@@ -27,6 +27,7 @@
 #include "teleport.h"
 #include "trashholder.h"
 #include "mailbox.h"
+#include "house.h"
 
 #include "actions.h"
 #include "magic.h"
@@ -45,12 +46,15 @@ Item* Item::CreateItem(const unsigned short _type, unsigned short _count /*= 1*/
 	else if(items[_type].isContainer()){
 		newItem = new Container(_type);
 	}
-	else if(items[_type].isTeleport()){		
+	else if(items[_type].isTeleport()){
 		newItem = new Teleport(_type);
 	}
 	else if(items[_type].isMagicField()){
 		newItem = new Item(_type, _count);
-	}	
+	}
+	else if(items[_type].isDoor()){
+		newItem = new Door(_type);
+	}
 	else if(_type == ITEM_DUSTBIN){
 		newItem = new TrashHolder(_type /*, NM_ME_PUFF*/);
 	}

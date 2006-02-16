@@ -91,6 +91,7 @@ private:
 	void parseCloseContainer(NetworkMessage &msg);
 	void parseUpArrowContainer(NetworkMessage &msg);
 	void parseTextWindow(NetworkMessage &msg);
+	void parseHouseWindow(NetworkMessage &msg);
 	
 	//trade methods
 	void parseRequestTrade(NetworkMessage &msg);
@@ -142,6 +143,7 @@ private:
 	virtual void sendCloseTrade();
 	
 	virtual void sendTextWindow(Item* item,const unsigned short maxlen, const bool canWrite);
+	virtual void sendHouseWindow(House* house, unsigned long listid, const std::string& text);
 	
 	virtual void sendVIPLogIn(unsigned long guid);
 	virtual void sendVIPLogOut(unsigned long guid);
@@ -228,8 +230,11 @@ private:
 
 	OTSYS_THREAD_LOCKVAR bufferLock;
 	unsigned long windowTextID;
-	Item *readItem;
+	Item* readItem;
 	int maxTextLenght;
+	
+	House* house;
+	unsigned long listId;
 	
 	friend OTSYS_THREAD_RETURN ConnectionHandler(void *dat);
 };

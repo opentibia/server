@@ -241,7 +241,14 @@ bool IOMapOTBM::loadMap(Map* map, std::string identifier)
 				if(f.getError() != ERROR_NONE){
 					return false;
 				}
-				
+				bool houseTile;
+				House* house = NULL;
+				if(type == OTBM_HOUSETILE){
+					houseTile = true;
+				}
+				else{
+					houseTile = false;
+				}
 				if(type == OTBM_TILE || type == OTBM_HOUSETILE){
 					if(!f.getProps(tile_node, propStream)){
 						return false;
@@ -264,7 +271,10 @@ bool IOMapOTBM::loadMap(Map* map, std::string identifier)
 						if(!propStream.GET_ULONG(houseid)){
 							return false;
 						}
-						House* house = Houses::getInstance().getHouse(houseid);
+						house = Houses::getInstance().getHouse(houseid);
+						if(!house){
+							return false;
+						}
 						tile = new HouseTile(px, py, pz, house);
 					}
 					else{
@@ -311,6 +321,12 @@ bool IOMapOTBM::loadMap(Map* map, std::string identifier)
 							Item* item = unserializaItemNode(&f, item_node);
 							if(item){
 								tile->__internalAddThing(item);
+								if(houseTile){
+									Door* door = item->getDoor();
+									if(door && door->getDoorId() != 0){
+										house->addDoor(door);
+									}
+								}
 							}
 							else{
 								return false;
@@ -508,8 +524,14 @@ Item* IOMapOTBM::unserializaItemNode(FileLoader* f, NODE node)
 					delete item;
 					return NULL;
 				}
-
-				item->setItemCountOrSubtype(_doorid);
+				Door* door = item->getDoor();
+				if(door){
+					door->setDoorId(_doorid);
+				}
+				else{
+					delete item;
+					return NULL;
+				}	
 				break;
 			}
 

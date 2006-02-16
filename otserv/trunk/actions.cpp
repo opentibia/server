@@ -28,6 +28,7 @@
 #include "item.h"
 #include "container.h"
 #include "depot.h"
+#include "house.h"
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h> 
@@ -260,6 +261,14 @@ bool Actions::UseItem(Player* player, const Position& pos, const unsigned char s
 		player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
 		return false;
 	} 
+	
+	//check if it is a house door
+	if(Door* door = item->getDoor()){
+		if(door->canUse(player) == false){
+			player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
+			return false;
+		}
+	}
 	
 	//look for the item in action maps	
 	Action *action = getAction(item);

@@ -41,7 +41,7 @@ ReturnValue HouseTile::__queryAdd(int32_t index, const Thing* thing, uint32_t co
 {
 	if(const Creature* creature = thing->getCreature()){
 		if(const Player* player = creature->getPlayer()){
-			if(player->access < 3 && !house->isInvited(player->getGUID()))
+			if(player->access < 3 && !house->isInvited(player))
 				return RET_PLAYERISNOTINVITED;
 		}
 	}
@@ -53,7 +53,7 @@ Cylinder* HouseTile::__queryDestination(int32_t& index, const Thing* thing, Item
 {
 	if(const Creature* creature = thing->getCreature()){
 		if(const Player* player = creature->getPlayer()){
-			if(player->access < 3 && !house->isInvited(player->getGUID())){
+			if(!house->isInvited(player)){
 				const Position& EntryPos = house->getEntryPosition();
 				Tile* destTile = g_game.getTile(EntryPos.x, EntryPos.y, EntryPos.z);
 				assert(destTile != NULL);

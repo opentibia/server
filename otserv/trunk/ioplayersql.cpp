@@ -652,6 +652,20 @@ bool IOPlayerSQL::getNameByGuid(unsigned long guid, std::string &name)
 		name = it->second;
 		return true;
 	}
+	
+	Database mysql;
+	DBQuery query;
+	DBResult result;
+	
+	mysql.connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str());
+	query << "SELECT name FROM players WHERE id='" << guid << "'";
+	
+	if(!mysql.storeQuery(query, result) || result.getNumRows() != 1)
+		return false;
+	
+	name = result.getDataString("name");
+	nameCacheMap[guid] = name;
+	
 	return false;
 }
 
@@ -661,7 +675,7 @@ bool IOPlayerSQL::getGuidByName(unsigned long &guid, unsigned long &alvl, std::s
 	DBQuery query;
 	DBResult result;
 	
-	mysql.connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str());	
+	mysql.connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str());
 	
 	query << "SELECT name,id,access FROM players WHERE name='" << Database::escapeString(name) << "'";
 	
@@ -673,6 +687,23 @@ bool IOPlayerSQL::getGuidByName(unsigned long &guid, unsigned long &alvl, std::s
 	alvl = result.getDataInt("access");
 	return true;
 }
+
+bool IOPlayerSQL::getGuilIdByName(unsigned long &guildId, const std::string& guildName)
+{
+	Database mysql;
+	DBQuery query;
+	DBResult result;
+	
+	mysql.connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str());
+	
+	query << "SELECT guildid FROM guilds WHERE guildname='" << Database::escapeString(guildName) << "'";
+	if(!mysql.storeQuery(query, result) || result.getNumRows() != 1)
+		return false;
+		
+	guildId = result.getDataInt("guildid");
+	return true;
+}
+
 
 bool IOPlayerSQL::playerExists(std::string name)
 {

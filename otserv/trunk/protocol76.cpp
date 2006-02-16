@@ -46,6 +46,7 @@
 #include "actions.h"
 #include "game.h"
 #include "ioplayer.h"
+#include "house.h"
 
 extern LuaScript g_config;
 extern Actions actions;
@@ -228,7 +229,7 @@ void Protocol76::parsePacket(NetworkMessage &msg)
 		break;
 		
 	case 0x82: // use item
-			parseUseItem(msg);
+		parseUseItem(msg);
 		break;
 		
 	case 0x83: // use item
@@ -254,7 +255,11 @@ void Protocol76::parsePacket(NetworkMessage &msg)
 	case 0x89:
 		parseTextWindow(msg);
 		break;
-		
+	
+	case 0x8A:
+		parseHouseWindow(msg);
+		break;
+	
 	case 0x8C: // throw item
 		parseLookAt(msg);
 		break;
@@ -293,10 +298,6 @@ void Protocol76::parsePacket(NetworkMessage &msg)
 	
 	case 0xBE: // cancel move
 		parseCancelMove(msg);
-		break;
-	
-	case 0xC9: // change position
-		// update position 
 		break;
 	
 	case 0xD2: // request Outfit
@@ -981,6 +982,19 @@ void Protocol76::parseTextWindow(NetworkMessage& msg)
 	}
 }
 
+void Protocol76::parseHouseWindow(NetworkMessage &msg)
+{
+	unsigned char _listid = msg.GetByte();
+	unsigned long id = msg.GetU32();
+	std::string new_list = msg.GetString();
+	
+	if(house && windowTextID == id && _listid == 0){
+		house->setAccessList(listId, new_list);
+		house = NULL;
+		listId = 0;
+	}
+}
+
 void Protocol76::parseRequestTrade(NetworkMessage& msg)
 {
 	Position pos = msg.GetPosition();
@@ -1662,6 +1676,19 @@ void Protocol76::sendTextWindow(Item* item,const unsigned short maxlen, const bo
 		maxTextLenght = 0;
 	}
 	msg.AddString("unknown");
+	WriteBuffer(msg);
+}
+
+void Protocol76::sendHouseWindow(House* _house, unsigned long _listid, const std::string& text)
+{
+	NetworkMessage msg;
+	windowTextID++;
+	house = _house;
+	listId = _listid;
+	msg.AddByte(0x97);
+	msg.AddByte(0);
+	msg.AddU32(windowTextID);
+	msg.AddString(text);
 	WriteBuffer(msg);
 }
 
