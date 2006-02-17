@@ -20,14 +20,21 @@
 
 #include "iomapxml.h"
 #include "definitions.h"
+#include "game.h"
+#include "map.h"
 
 #include "depot.h"
 #include "house.h"
 #include "housetile.h"
 #include "town.h"
+#include "spawn.h"
+
 #include <iostream>
 
-bool IOMapXML::loadMap(Map* map, std::string identifier){
+extern Game g_game;
+
+bool IOMapXML::loadMap(Map* map, const std::string& identifier)
+{
 	xmlDocPtr doc;
 	xmlNodePtr root, rootChildren, p, tmpNode;
 	char* tmp;
@@ -35,15 +42,22 @@ bool IOMapXML::loadMap(Map* map, std::string identifier){
 	xmlLineNumbersDefault(1);
 	std::cout << ":: Loaded map " << identifier << std::endl;
 	doc=xmlParseFile(identifier.c_str());
-	if (!doc) {
-		std::cout << "FATAL: couldnt load map. exiting" << std::endl;
-		exit(1);
+	if(!doc){
+		setLastError(LOADMAPERROR_CANNOTOPENFILE);
+		return false;
+
+		//std::cout << "FATAL: couldnt load map. exiting" << std::endl;
+		//exit(1);
 	}
-	root=xmlDocGetRootElement(doc);
+
+	root = xmlDocGetRootElement(doc);
 	if(xmlStrcmp(root->name,(const xmlChar*) "map")){
 		xmlFreeDoc(doc);
-		std::cout << "FATAL: couldnt load map. exiting" << std::endl;
-		exit(1);
+		setLastError(LOADMAPERROR_GETROOTHEADERFAILED);
+		return false;
+		
+		//std::cout << "FATAL: couldnt load map. exiting" << std::endl;
+		//exit(1);
 	}
 
 	tmp = (char*)xmlGetProp(root, (const xmlChar *) "width");
@@ -51,17 +65,25 @@ bool IOMapXML::loadMap(Map* map, std::string identifier){
 		map->mapwidth = atoi(tmp);
 		xmlFreeOTSERV(tmp);
 	}
+
 	tmp = (char*)xmlGetProp(root, (const xmlChar *) "height");
 	if(tmp){
 		map->mapheight = atoi(tmp);
 		xmlFreeOTSERV(tmp);
 	}
 	std::cout << ":: W: " << map->mapwidth << "  H: " << map->mapheight << std::endl;
-
-	std::string spawnfile = "";
+	
 	if(tmp = (char*)xmlGetProp(root, (const xmlChar *) "spawnfile")){
-		map->spawnfile = identifier.substr(0, identifier.rfind('/') + 1);
-		map->spawnfile += tmp;
+		spawnfile = identifier.substr(0, identifier.rfind('/') + 1);
+		spawnfile += tmp;
+
+		xmlFreeOTSERV(tmp);
+	}
+
+	if(tmp = (char*)xmlGetProp(root, (const xmlChar *) "housefile")){
+		housefile = identifier.substr(0, identifier.rfind('/') + 1);
+		housefile += tmp;
+
 		xmlFreeOTSERV(tmp);
 	}
 
@@ -75,8 +97,11 @@ bool IOMapXML::loadMap(Map* map, std::string identifier){
 		if(xmlStrcmp(rootChildren->name, (const xmlChar*)"tile") == 0){
 			tmp = (char*)xmlGetProp(rootChildren, (const xmlChar *) "x");
 			if(!tmp){
-				rootChildren = rootChildren->next;
-				continue;
+				setLastError(LOADMAPERROR_GETPROPFAILED, rootChildren->line);
+				return false;
+
+				//rootChildren = rootChildren->next;
+				//continue;
 			}
 
 			px = atoi(tmp);
@@ -84,8 +109,11 @@ bool IOMapXML::loadMap(Map* map, std::string identifier){
 
 			tmp = (char*)xmlGetProp(rootChildren, (const xmlChar *) "y");
 			if(!tmp){
-				rootChildren = rootChildren->next;
-				continue;
+				setLastError(LOADMAPERROR_GETPROPFAILED, rootChildren->line);
+				return false;
+
+				//rootChildren = rootChildren->next;
+				//continue;
 			}
 
 			py = atoi(tmp);
@@ -93,8 +121,11 @@ bool IOMapXML::loadMap(Map* map, std::string identifier){
 
 			tmp = (char*)xmlGetProp(rootChildren, (const xmlChar *) "z");
 			if(!tmp){
-				rootChildren = rootChildren->next;
-				continue;
+				setLastError(LOADMAPERROR_GETPROPFAILED, rootChildren->line);
+				return false;
+
+				//rootChildren = rootChildren->next;
+				//continue;
 			}
 
 			pz = atoi(tmp);
@@ -109,8 +140,8 @@ bool IOMapXML::loadMap(Map* map, std::string identifier){
 			else
 				houseid = 0;
 
-			//tile = new Tile(px, py, pz);
-			//map->setTile(px, py, pz, tile);
+			bool isHouseTile = false;
+			House* house = NULL;
 
 			tmp = (char*)xmlGetProp(rootChildren, (const xmlChar *) "ground");
 			unsigned short ground = 0;
@@ -123,10 +154,16 @@ bool IOMapXML::loadMap(Map* map, std::string identifier){
 				tile = new Tile(px, py, pz);
 			}
 			else{
-				House* house = Houses::getInstance().getHouse(houseid);
+				house = Houses::getInstance().getHouse(houseid);
+				if(!house){
+					setLastError(LOADMAPERROR_FAILEDTOCREATEITEM, rootChildren->line);
+					return false;
+				}
+
 				HouseTile* houseTile = new HouseTile(px, py, pz, house);
 				house->addTile(houseTile);
 				tile = houseTile;
+				isHouseTile = true;
 			}
 
 			map->setTile(px, py, pz, tile);
@@ -154,9 +191,18 @@ bool IOMapXML::loadMap(Map* map, std::string identifier){
 					else
 						id = 0;
 			
-					Item* myitem = Item::CreateItem(id);
-					myitem->unserialize(p);
-					Container* container = dynamic_cast<Container*>(myitem);
+					Item* item;
+					
+					item = Item::CreateItem(id);
+
+					if(!item){
+						setLastError(LOADMAPERROR_FAILEDTOCREATEITEM, rootChildren->line);
+						return false;
+					}
+
+					item->unserialize(p);
+					Container* container = dynamic_cast<Container*>(item);
+
 					if(container){
 						//is depot?
 						if(Depot* depot = container->getDepot()){
@@ -193,7 +239,14 @@ bool IOMapXML::loadMap(Map* map, std::string identifier){
 						}
 					}//loadContainer
 
-					tile->__internalAddThing(myitem);
+					tile->__internalAddThing(item);
+
+					if(isHouseTile){
+						Door* door = item->getDoor();
+						if(door && door->getDoorId() != 0){
+							house->addDoor(door);
+						}
+					}
 				}
 				
 				p = p->next;
@@ -202,15 +255,17 @@ bool IOMapXML::loadMap(Map* map, std::string identifier){
 		else if(xmlStrcmp(rootChildren->name, (const xmlChar*)"towns") == 0){
 			p = rootChildren->children;
 
-			while(p){
+			if(xmlStrcmp(p->name,(const xmlChar*) "town") == 0){
 				Position templePos;
 				uint32_t townid = 0;
 
 				tmp = (char*)xmlGetProp(p, (const xmlChar *) "townid");
 
 				if(!tmp){
-					p = p->next;
-					continue;
+					setLastError(LOADMAPERROR_GETPROPFAILED, rootChildren->line);
+					return false;
+					//p = p->next;
+					//continue;
 				}
 
 				townid = atoi(tmp);
@@ -251,58 +306,13 @@ bool IOMapXML::loadMap(Map* map, std::string identifier){
 				p = p->next;
 			}
 		}
-		/*else if(xmlStrcmp(rootChildren->name, (const xmlChar*)"houses") == 0){
-			p = rootChildren->children;
-
-			while(p){
-				Position entryPos;
-
-				tmp = (char*)xmlGetProp(p, (const xmlChar *) "houseid");
-
-				if(!tmp){
-					p = p->next;
-					continue;
-				}
-
-				houseid = atoi(tmp);
-				xmlFreeOTSERV(tmp);
-		
-				House* house = Houses::getInstance().getHouse(houseid);
-
-				tmp = (char*)xmlGetProp(p, (const xmlChar *) "name");
-				if(tmp){
-					house->setName(tmp);
-					xmlFreeOTSERV(tmp);
-				}
-
-				tmp = (char*)xmlGetProp(p, (const xmlChar *) "entryx");
-				if(tmp){
-					entryPos.x = atoi(tmp);
-					xmlFreeOTSERV(tmp);
-				}
-
-				tmp = (char*)xmlGetProp(p, (const xmlChar *) "entryy");
-				if(tmp){
-					entryPos.y = atoi(tmp);
-					xmlFreeOTSERV(tmp);
-				}
-
-				tmp = (char*)xmlGetProp(p, (const xmlChar *) "entryz");
-				if(tmp){
-					entryPos.z = atoi(tmp);
-					xmlFreeOTSERV(tmp);
-				}
-				
-				house->setEntryPos(entryPos);
-				house->setHouseOwner(0);
-				p = p->next;
-			}
-		}*/
 
 		rootChildren = rootChildren->next;
 	}
 
  	xmlFreeDoc(doc);
+
+	setLastError(LOADMAPERROR_NONE);
 	return true;
 }
 
@@ -344,4 +354,25 @@ bool IOMapXML::LoadContainer(xmlNodePtr nodeitem,Container* ccontainer)
 	}
 
 	return false;
+}
+
+
+bool IOMapXML::loadSpawns()
+{
+	if(!spawnfile.empty()){
+		SpawnManager::initialize(&g_game);
+		SpawnManager::instance()->loadSpawnsXML(spawnfile);
+		SpawnManager::instance()->startup();
+	}
+	
+	return true;
+}
+
+bool IOMapXML::loadHouses()
+{
+	if(!housefile.empty()){
+		return Houses::getInstance().loadHousesXML(housefile);
+	}
+
+	return true;
 }

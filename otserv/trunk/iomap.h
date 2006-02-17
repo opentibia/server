@@ -23,21 +23,53 @@
 #define __IOMAP_H
 
 #include <string>
-#include "tile.h"
-#include "item.h"
 
 #include "map.h"
-//class Map;
 
-/** Baseclass for all Player-Loaders */
-class IOMap {
-  public:
+enum LoadMapError_t{
+	LOADMAPERROR_NONE,
+	LOADMAPERROR_CANNOTOPENFILE,
+	LOADMAPERROR_GETPROPFAILED,
+	LOADMAPERROR_OUTDATEDHEADER,
+	LOADMAPERROR_GETROOTHEADERFAILED,
+	LOADMAPERROR_FAILEDTOCREATEITEM,
+	LOADMAPERROR_FAILEDUNSERIALIZEITEM,
+	LOADMAPERROR_FAILEDTOREADCHILD,
+	LOADMAPERROR_UNKNOWNNODETYPE
+};
+
+class IOMap{
+public:
 	IOMap(){};
 	virtual ~IOMap(){};
-	virtual char* getSourceDescription()=0;
+
 	/** Get a textual description of what source is used
-	  * \returns Name of the source*/
-	virtual bool loadMap(Map* map, std::string identifier)=0;
+	* \returns Name of the source
+	*/
+	virtual char* getSourceDescription() = 0;
+
+	/** Load the map from an OTBM file
+	  * \param map pointer to the Map class
+	  * \param identifier is the mapfile/database to open
+	  * \returns Returns true if the map was loaded successfully
+	*/
+	virtual bool loadMap(Map* map, const std::string& identifier) = 0;
+
+	virtual bool loadSpawns() = 0;
+	virtual bool loadHouses() = 0;
+
+	LoadMapError_t getLastError() {return lasterrortype;}
+	int getErrorCode() {return lasterrorcode;}
+
+	void setLastError(LoadMapError_t errtype, unsigned long _code = 0)
+	{
+		lasterrorcode = _code;
+		lasterrortype = errtype;
+	}
+
+private:
+	LoadMapError_t lasterrortype;
+	unsigned long lasterrorcode;
 };
 
 #endif

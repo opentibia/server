@@ -27,13 +27,16 @@ class IOMapOTBM : public IOMap{
 public:
 	IOMapOTBM(){};
 	~IOMapOTBM(){};
-	virtual char* getSourceDescription(){ return "OTBM"; };
-	/** Load the map from an OTBM file
-	  * \param map Pointer to the Map
-	  * \param identifier Name of the OTBM-File to load
-	  * \returns Whether map load was successful*/
-	bool loadMap(Map* map, std::string identifier);
+
+	virtual char* getSourceDescription(){ return "OTBM";};
+	virtual bool loadMap(Map* map, const std::string& identifier);
+	virtual bool loadSpawns();
+	virtual bool loadHouses();
+
 private:
+	std::string spawnfile;
+	std::string housefile;
+
 	Item* unserializaItemAttr(PropStream &propStream);
 	Item* unserializaItemNode(FileLoader* f, NODE node);
 };

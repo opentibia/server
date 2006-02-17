@@ -19,7 +19,9 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "iomapotbm.h"
+#include "game.h"
 #include "map.h"
+
 #include "tile.h"
 #include "item.h"
 #include "container.h"
@@ -31,6 +33,8 @@
 
 typedef unsigned char attribute_t;
 typedef unsigned long flags_t;
+
+extern Game g_game;
 
 enum tile_flags_t{
 	TILE_PZ = 1,
@@ -134,10 +138,11 @@ struct OTBM_HouseTile_coords{
 
 #define OTBM_UNK_NODE_MSG std::cout << "Warning: OTBM loader unknown node type." << std::endl;
 
-bool IOMapOTBM::loadMap(Map* map, std::string identifier)
+bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 {
 	FileLoader f;
 	if(!f.openFile(identifier.c_str(), false, true)){
+		setLastError(LOADMAPERROR_CANNOTOPENFILE);
 		return false;
 	}
 	
@@ -147,24 +152,28 @@ bool IOMapOTBM::loadMap(Map* map, std::string identifier)
 	NODE root = f.getChildNode((NODE)NULL, type);
 
 	if(!f.getProps(root, propStream)){
+		setLastError(LOADMAPERROR_GETPROPFAILED, root);
 		return false;
 	}
 
 	OTBM_root_header* root_header;
 	if(!propStream.GET_STRUCT(root_header)){
+		setLastError(LOADMAPERROR_GETROOTHEADERFAILED, root);
 		return false;
 	}
 	
 	if(root_header->version != 0){
+		setLastError(LOADMAPERROR_OUTDATEDHEADER, root);
 		return false;
 	}
 	
 	if(root_header->majorVersionItems > Items::dwMajorVersion){
+		setLastError(LOADMAPERROR_OUTDATEDHEADER, root);
 		return false;
 	}
 
 	if(root_header->minorVersionItems > Items::dwMinorVersion){
-		std::cout << "Warning: This map needs an updated items OTB file." <<std::endl;
+		std::cout << "WARNING: This map needs an updated items OTB file." <<std::endl;
 	}
 
 	std::cout << "Map size: " << root_header->width << "x" << root_header->height << std::endl;
@@ -172,10 +181,12 @@ bool IOMapOTBM::loadMap(Map* map, std::string identifier)
 	NODE map_data = f.getChildNode(root, type);
 	
 	if(type != OTBM_MAP_DATA){
+		setLastError(LOADMAPERROR_UNKNOWNNODETYPE, map_data);
 		return false;
 	}
 
 	if(!f.getProps(map_data, propStream)){
+		setLastError(LOADMAPERROR_GETPROPFAILED, map_data);
 		return false;
 	}
 
@@ -186,6 +197,7 @@ bool IOMapOTBM::loadMap(Map* map, std::string identifier)
 		switch(attribute){
 		case OTBM_ATTR_DESCRIPTION:
 			if(!propStream.GET_STRING(mapDescription)){
+				setLastError(LOADMAPERROR_GETPROPFAILED, map_data);
 				return false;
 			}
 			
@@ -193,21 +205,25 @@ bool IOMapOTBM::loadMap(Map* map, std::string identifier)
 			break;
 		case OTBM_ATTR_EXT_SPAWN_FILE:
 			if(!propStream.GET_STRING(tmp)){
+				setLastError(LOADMAPERROR_GETPROPFAILED, map_data);
 				return false;
 			}
-			map->spawnfile = identifier.substr(0, identifier.rfind('/') + 1);
-			map->spawnfile += tmp;
+			spawnfile = identifier.substr(0, identifier.rfind('/') + 1);
+			spawnfile += tmp;
+
 			break;
 		case OTBM_ATTR_EXT_HOUSE_FILE:
 			if(!propStream.GET_STRING(tmp)){
+				setLastError(LOADMAPERROR_GETPROPFAILED, map_data);
 				return false;
 			}
 
-			//map->housefile = identifier.substr(0, identifier.rfind('/') + 1);
-			//map->housefile += tmp;
+			housefile = identifier.substr(0, identifier.rfind('/') + 1);
+			housefile += tmp;
 			break;
 
 		default:
+			setLastError(LOADMAPERROR_UNKNOWNNODETYPE, map_data);
 			return false;
 			break;
 		}
@@ -218,16 +234,19 @@ bool IOMapOTBM::loadMap(Map* map, std::string identifier)
 	NODE tile_area = f.getChildNode(map_data, type);
 	while(tile_area != NO_NODE){
 		if(f.getError() != ERROR_NONE){
+			setLastError(LOADMAPERROR_FAILEDTOREADCHILD, tile_area);
 			return false;
 		}
 
 		if(type == OTBM_TILE_AREA){
 			if(!f.getProps(tile_area, propStream)){
+				setLastError(LOADMAPERROR_GETPROPFAILED, tile_area);
 				return false;
 			}
 			
 			OTBM_Tile_area_coords* area_coord;
 			if(!propStream.GET_STRUCT(area_coord)){
+				setLastError(LOADMAPERROR_GETPROPFAILED, tile_area);
 				return false;
 			}
 			
@@ -239,8 +258,10 @@ bool IOMapOTBM::loadMap(Map* map, std::string identifier)
 			NODE tile_node = f.getChildNode(tile_area, type);
 			while(tile_node != NO_NODE){
 				if(f.getError() != ERROR_NONE){
+					setLastError(LOADMAPERROR_FAILEDTOREADCHILD, tile_area);
 					return false;
 				}
+				/*
 				bool houseTile;
 				House* house = NULL;
 				if(type == OTBM_HOUSETILE){
@@ -249,35 +270,48 @@ bool IOMapOTBM::loadMap(Map* map, std::string identifier)
 				else{
 					houseTile = false;
 				}
+				*/
 				if(type == OTBM_TILE || type == OTBM_HOUSETILE){
 					if(!f.getProps(tile_node, propStream)){
+						setLastError(LOADMAPERROR_GETPROPFAILED, tile_area);
 						return false;
 					}
 					
 					unsigned short px, py, pz;
 					OTBM_Tile_coords* tile_coord;
 					if(!propStream.GET_STRUCT(tile_coord)){
+						setLastError(LOADMAPERROR_GETPROPFAILED, tile_node);
 						return false;
 					}
+
 					px = base_x + tile_coord->_x;
 					py = base_y + tile_coord->_y;
 					pz = base_z;
 					
+					bool isHouseTile = false;
+					House* house = NULL;
+
 					if(type == OTBM_TILE){
 						tile = new Tile(px, py, pz);
 					}
 					else if(type == OTBM_HOUSETILE){
 						unsigned long houseid;
 						if(!propStream.GET_ULONG(houseid)){
+							setLastError(LOADMAPERROR_GETPROPFAILED, tile_node);
 							return false;
 						}
+
 						house = Houses::getInstance().getHouse(houseid);
 						if(!house){
+							setLastError(LOADMAPERROR_FAILEDTOCREATEITEM, tile_node);
 							return false;
 						}
+
 						tile = new HouseTile(px, py, pz, house);
+						isHouseTile = true;
 					}
 					else{
+						setLastError(LOADMAPERROR_UNKNOWNNODETYPE, tile_node);
 						return false;
 					}
 					
@@ -291,6 +325,7 @@ bool IOMapOTBM::loadMap(Map* map, std::string identifier)
 							case OTBM_ATTR_TILE_FLAGS:
 								unsigned long flags;
 								if(!propStream.GET_ULONG(flags)){
+									setLastError(LOADMAPERROR_GETPROPFAILED, tile_node);
 									return false;
 								}
 								
@@ -306,10 +341,13 @@ bool IOMapOTBM::loadMap(Map* map, std::string identifier)
 									tile->__internalAddThing(item);
 								}
 								else{
+									setLastError(LOADMAPERROR_FAILEDUNSERIALIZEITEM, tile_node);
 									return false;
 								}
 								break;
+
 							default:
+								setLastError(LOADMAPERROR_UNKNOWNNODETYPE, tile_node);
 								return false;
 								break;
 							}
@@ -321,7 +359,7 @@ bool IOMapOTBM::loadMap(Map* map, std::string identifier)
 							Item* item = unserializaItemNode(&f, item_node);
 							if(item){
 								tile->__internalAddThing(item);
-								if(houseTile){
+								if(isHouseTile){
 									Door* door = item->getDoor();
 									if(door && door->getDoorId() != 0){
 										house->addDoor(door);
@@ -329,17 +367,20 @@ bool IOMapOTBM::loadMap(Map* map, std::string identifier)
 								}
 							}
 							else{
+								setLastError(LOADMAPERROR_FAILEDUNSERIALIZEITEM, item_node);
 								return false;
 							}
 						}
 						else{
-							OTBM_UNK_NODE_MSG
+							setLastError(LOADMAPERROR_UNKNOWNNODETYPE, item_node);
+							//OTBM_UNK_NODE_MSG
 						}
 						item_node = f.getNextNode(item_node, type);
 					}
 				}
 				else{
-					OTBM_UNK_NODE_MSG
+					setLastError(LOADMAPERROR_UNKNOWNNODETYPE, tile_node);
+					//OTBM_UNK_NODE_MSG
 				}
 				tile_node = f.getNextNode(tile_node, type);
 			}
@@ -349,13 +390,16 @@ bool IOMapOTBM::loadMap(Map* map, std::string identifier)
 			while(childtownnode != NO_NODE){
 				if(type == OTBM_TOWN){
 					if(!f.getProps(childtownnode, propStream)){
+						setLastError(LOADMAPERROR_UNKNOWNNODETYPE, childtownnode);
 						return false;
 					}
 					
 					unsigned long townid = 0;
 					if(!propStream.GET_ULONG(townid)){
+						setLastError(LOADMAPERROR_GETPROPFAILED, childtownnode);
 						return false;
 					}
+
 					Town* town = Towns::getInstance().getTown(townid);
 					if(!town){
 						town = new Town(townid);
@@ -364,12 +408,15 @@ bool IOMapOTBM::loadMap(Map* map, std::string identifier)
 
 					std::string townName = "";
 					if(!propStream.GET_STRING(townName)){
+						setLastError(LOADMAPERROR_GETPROPFAILED, childtownnode);
 						return false;
 					}
+
 					town->setName(townName);
 
 					OTBM_TownTemple_coords *town_coords;
 					if(!propStream.GET_STRUCT(town_coords)){
+						setLastError(LOADMAPERROR_GETPROPFAILED, childtownnode);
 						return false;
 					}
 
@@ -380,21 +427,27 @@ bool IOMapOTBM::loadMap(Map* map, std::string identifier)
 					town->setTemplePos(pos);
 				}
 				else{
-					OTBM_UNK_NODE_MSG
+					setLastError(LOADMAPERROR_UNKNOWNNODETYPE, childtownnode);
+					//OTBM_UNK_NODE_MSG
 				}
+
 				childtownnode = f.getNextNode(childtownnode, type);
 			}
 		}
 		else{
-			OTBM_UNK_NODE_MSG
+			setLastError(LOADMAPERROR_UNKNOWNNODETYPE, tile_area);
+			//OTBM_UNK_NODE_MSG
 		}
+
 		tile_area = f.getNextNode(tile_area, type);
 	}
 	
 	if(f.getError() != ERROR_NONE){
+		setLastError(LOADMAPERROR_FAILEDTOREADCHILD);
 		return false;
 	}
 
+	setLastError(LOADMAPERROR_NONE);
 	return true;
 }
 
@@ -567,4 +620,25 @@ Item* IOMapOTBM::unserializaItemNode(FileLoader* f, NODE node)
 		return NULL;
 	}
 	return item;
+}
+
+
+bool IOMapOTBM::loadSpawns()
+{
+	if(!spawnfile.empty()){
+		SpawnManager::initialize(&g_game);
+		SpawnManager::instance()->loadSpawnsXML(spawnfile);
+		SpawnManager::instance()->startup();
+	}
+	
+	return true;
+}
+
+bool IOMapOTBM::loadHouses()
+{
+	if(!housefile.empty()){
+		return Houses::getInstance().loadHousesXML(housefile);
+	}
+
+	return true;
 }
