@@ -1620,22 +1620,51 @@ bool Game::internalCreatureSaySpell(Creature *creature, const std::string &text)
 				if(temp == "aleta sio"){ //edit guest list
 					if(house->canEditAccessList(GUEST_LIST, player)){
 						player->sendHouseWindow(house, GUEST_LIST);
+						return true;
 					}
 				}
 				else if(temp == "aleta som"){ //edit subowner list
 					if(house->canEditAccessList(SUBOWNER_LIST, player)){
 						player->sendHouseWindow(house, SUBOWNER_LIST);
+						return true;
 					}
 				}
 				else if(temp == "aleta grav"){ //edit door list
-					//TODO
+					Position pos = player->getPosition();
+
+					switch(player->getDirection()){
+						case NORTH:
+							pos.y -= 1;
+							break;
+						case SOUTH:
+							pos.y += 1;
+							break;
+						case WEST:
+							pos.x -= 1;
+							break;
+						case EAST:
+							pos.x += 1;
+							break;
+					}
+
+					Door* door = house->getDoorByPosition(pos);
+					if(door){
+						if(house->canEditAccessList(door->getDoorId(), player)){
+							player->sendHouseWindow(house, door->getDoorId());
+							return true;
+						}
+					}
 				}
 				else if(temp == "alana sio"){ //kick player
 					house->kickPlayer(player, var);
+					return true;
 				}
-				return true;
 			}
 		}
+		
+		player->sendCancelMessage(RET_NOTPOSSIBLE);
+		player->sendMagicEffect(player->getPosition(), NM_ME_PUFF);
+		return false;
 	}
 	// end of house spells
 	

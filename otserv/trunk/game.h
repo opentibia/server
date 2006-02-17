@@ -151,7 +151,7 @@ public:
   
 	void setWorldType(world_type_t type);
 	world_type_t getWorldType() const {return worldType;}
-	const std::string& getSpawnFile() {return map->spawnfile;}
+	//const std::string& getSpawnFile() {return map->spawnfile;}
 
 	Cylinder* internalGetCylinder(Player* player, const Position& pos);
 	Thing* internalGetThing(Player* player, const Position& pos, int32_t index);
