@@ -25,6 +25,12 @@
 #include <list>
 #include <map>
 
+#ifdef __GNUC__
+#include <ext/hash_set>
+#else
+#include <hash_set>
+#endif
+
 #include "definitions.h"
 #include "position.h"
 #include "housetile.h"
@@ -48,8 +54,13 @@ public:
 	void getList(std::string& _list);
 	
 private:
-	typedef std::list<uint32_t> PlayerList;
-	typedef std::list<uint32_t> GuildList; //TODO: include ranks
+	#ifdef __GNUC__
+	typedef __gnu_cxx::hash_set<uint32_t> PlayerList;
+	typedef __gnu_cxx::hash_set<uint32_t> GuildList; //TODO: include ranks
+	#else
+	typedef stdext::hash_set<uint32_t> PlayerList;
+	typedef stdext::hash_set<uint32_t> GuildList; //TODO: include ranks
+	#endif
 	typedef std::list<std::string> ExpressionList;
 	std::string list;
 	PlayerList playerList;

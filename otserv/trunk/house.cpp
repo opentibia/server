@@ -64,15 +64,10 @@ void House::setHouseOwner(uint32_t guid)
 	}
 	
 	houseDescription << " owns this house." << std::endl;
-
-	for(HouseTileList::iterator it = houseTiles.begin(); it != houseTiles.end(); ++it){
-		for(uint32_t i = 0; i < (*it)->getThingCount(); ++i){
-			iiItem = (*it)->__getThing(i)->getItem();
-
-			if(iiItem && iiItem->isDoor()){
-				iiItem->setSpecialDescription(houseDescription.str());
-			}
-		}
+	
+	HouseDoorList::iterator it;
+	for(it = doorList.begin(); it != doorList.end(); ++it){
+		(*it)->setSpecialDescription(houseDescription.str());
 	}
 }
 /*
@@ -187,7 +182,11 @@ void House::setAccessList(unsigned long listId, const std::string& textlist)
 			return;
 		}
 	}
-	//TODO: iterate every house tile and kick no invited players
+	HouseTileList::iterator it;
+	for(it = houseTiles.begin();it != houseTiles.end(); ++it){
+	
+	}
+		
 }
 
 bool House::getAccessList(unsigned long listId, std::string& list)
@@ -234,8 +233,7 @@ void House::addDoor(Door* door)
 Door* House::getDoorByNumber(unsigned long doorId)
 {
 	HouseDoorList::iterator it;
-	it = doorList.begin();
-	while(it != doorList.end()){
+	for(it = doorList.begin(); it != doorList.end(); ++it){
 		if((*it)->getDoorId() == doorId){
 			return *it;
 		}
@@ -294,9 +292,10 @@ bool AccessList::addPlayer(const std::string& name)
 	unsigned long access;
 	unsigned long guid;
 	if(IOPlayer::instance()->getGuidByName(guid, access, name)){
-		//TODO: find duplicate
-		playerList.push_back(guid);
-		return true;
+		if(playerList.find(guid) == playerList.end()){
+			playerList.insert(guid);
+			return true;
+		}
 	}
 	return false;
 }
@@ -305,27 +304,33 @@ bool AccessList::addGuild(const std::string& guildName, const std::string& rank)
 {
 	unsigned long guildId;
 	if(IOPlayer::instance()->getGuilIdByName(guildId, guildName)){
-		//TODO: find duplicate
-		guildList.push_back(guildId);
-		return true;
+		if(guildId != 0 && guildList.find(guildId) == guildList.end()){
+			guildList.insert(guildId);
+			return true;
+		}
 	}
 	return false;
 }
 
 bool AccessList::addExpression(const std::string& expression)
 {
-	//TODO: find duplicate?
+	ExpressionList::iterator it;
+	for(it = expressionList.begin(); it != expressionList.end(); ++it){
+		if((*it) == expression){
+			return false;
+		}
+	}
 	expressionList.push_back(expression);
 	return true;
 }
 
 bool AccessList::isInList(const Player* player)
 {
-	PlayerList::iterator playerIt = std::find(playerList.begin(), playerList.end(), player->getGUID());
+	PlayerList::iterator playerIt = playerList.find(player->getGUID());
 	if(playerIt != playerList.end())
 		return true;
 
-	GuildList::iterator guildIt = std::find(guildList.begin(), guildList.end(), player->getGuildId());
+	GuildList::iterator guildIt = guildList.find(player->getGuildId());
 	if(guildIt != guildList.end())
 		return true;
 	
