@@ -59,7 +59,6 @@ int Teleport::unserialize(xmlNodePtr p)
 		xmlFreeOTSERV(tmp);
 	}
 	
-
 	return 0;
 }
 
