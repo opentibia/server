@@ -24,6 +24,8 @@
 
 #include <queue>
 #include <bitset>
+#include <map>
+#include <limits>
 
 #include "position.h"
 #include "item.h"
@@ -39,19 +41,11 @@ class Game;
 
 #define MAP_MAX_LAYERS 16
 
-enum SpawnLoadingType_t{
-	MAP_LOADER_ERROR,
-	SPAWN_BUILTIN,
-	SPAWN_XML,
-	SPAWN_SQL,
-};
-
 class Tile;
 class Map;
 
-class Range {
+class Range{
 public:
-	
 	Range(Position centerpos, bool multilevel = false){
 		setRange(centerpos, multilevel);
 	}
@@ -81,6 +75,7 @@ public:
 		maxRange.x = maxRangeX;
 		maxRange.y = maxRangeY;
 	}
+
 
 	Position centerpos;
 	Position minRange;
@@ -137,9 +132,6 @@ private:
 	}
 };
 
-/**
-  * A Node inside the A*-Algorithm
-  */
 struct AStarNode{
 	/** Current position */
 	int x,y;
@@ -181,6 +173,7 @@ public:
 };
 
 typedef std::list<Creature*> SpectatorVec;
+typedef std::list<Player*> PlayerList;
 
 /**
   * Map class.
@@ -196,10 +189,10 @@ public:
 	/**
 	* Load a map.
 	* \param filename Mapfile to load
-	* \param filekind Kind of the map, BIN SQL or TXT
-	* \returns Int SPAWN_BUILTIN built-in spawns, SPAWN_XML needs xml spawns, SPAWN_SQL needs sql spawns, MAP_LOADER_ERROR if got error
+	* \param filetype type of the map, "OTBM", "OTX"
+	* \returns true if the map loaded successfully
 	*/
-	int loadMap(std::string filename, std::string filekind);
+	bool loadMap(std::string filename, std::string filetype);
 
 	/**
 	* Get a single tile.
@@ -274,7 +267,8 @@ protected:
 	friend class IOMap;
 
 private:
-	std::string spawnfile;
+	//std::string spawnfile;
+	//std::string housefile;
 };
 
 #endif

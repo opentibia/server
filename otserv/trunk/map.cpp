@@ -57,7 +57,8 @@ extern LuaScript g_config;
 
 
 Map::Map() :
-	spawnfile(""),
+	//spawnfile(""),
+	//housefile(""),
 	mapwidth(0),
 	mapheight(0)
 {
@@ -71,9 +72,8 @@ Map::~Map()
 }
 
 
-int Map::loadMap(std::string filename, std::string filekind)
+bool Map::loadMap(std::string filename, std::string filekind)
 {
-	int ret;
 	IOMap* loader;
 	
 	/*if(filekind == "BIN"){
@@ -82,36 +82,90 @@ int Map::loadMap(std::string filename, std::string filekind)
 	}
 	else */if(filekind == "XML"){
 		loader = new IOMapXML();
-		ret = SPAWN_XML;
+		//ret = SPAWN_XML;
 	}
 	else if(filekind == "OTBM"){
 		loader = new IOMapOTBM();
-		//ret = SPAWN_BUILTIN;
-		ret = SPAWN_XML;
+		//ret = SPAWN_XML;
 	}
 	#ifdef ENABLESQLMAPSUPPORT
 	else if(filekind == "SQL"){
 		loader = new IOMapSQL();
-		ret = SPAWN_SQL;
+		//ret = SPAWN_SQL;
 	}
-#endif	
+#endif
 	else{
- 		std::cout << "FATAL: couldnt determine the map format! exiting1" << std::endl;
-		exit(1);
+		std::cout << "FATAL: Could not determine the filetype!" << std::endl;
+		return false;
 	}
 
+	std::cout << ":: Loading map from: " << loader->getSourceDescription() << std::endl;
+
+	bool loadMapSuccess = loader->loadMap(this, filename);
+
+	if(!loadMapSuccess){
+		//std::cout << "FATAL: could not parse the map!" << std::endl;
+
+		switch(loader->getLastError()){
+			case LOADMAPERROR_CANNOTOPENFILE:
+				std::cout << "FATAL: Could not open the map stream." << std::endl;
+				break;
+			case LOADMAPERROR_GETPROPFAILED:
+				//std::cout << "Could not open the map stream." << std::endl;
+				std::cout << "FATAL: Failed to read stream properties. Code: " << loader->getErrorCode() << std::endl;
+				break;
+			case LOADMAPERROR_OUTDATEDHEADER:
+				std::cout << "FATAL: Header information is outdated. Code: " << loader->getErrorCode() << std::endl;
+				break;
+			case LOADMAPERROR_GETROOTHEADERFAILED:
+				std::cout << "FATAL: Failed to read header information. Code: " << loader->getErrorCode() << std::endl;
+				break;
+			case LOADMAPERROR_FAILEDTOCREATEITEM:
+				std::cout << "FATAL: Failed to create an object. Code: " << loader->getErrorCode() << std::endl;
+				break;
+			case LOADMAPERROR_FAILEDUNSERIALIZEITEM:
+				std::cout << "FATAL: Failed to unserialize an object. Code: " << loader->getErrorCode() << std::endl;
+				break;
+			case LOADMAPERROR_FAILEDTOREADCHILD:
+				std::cout << "FATAL: Failed to read child stream. Code: " << loader->getErrorCode() << std::endl;
+				break;
+			case LOADMAPERROR_UNKNOWNNODETYPE:
+				std::cout << "FATAL: Unknown stream node found. Code: " << loader->getErrorCode() << std::endl;
+				break;
+
+			default:
+				std::cout << "FATAL: Unknown error!" << std::endl;
+			break;
+		}
+
+		std::cin.get();
+		return false;
+	}
+	
+	if(!loader->loadSpawns()){
+		std::cout << "WARNING: could not load spawn data." << std::endl;
+	}
+
+	if(!loader->loadHouses()){
+		std::cout << "WARNING: could not load house data." << std::endl;
+	}
+
+	delete loader;
+
+	return true;
+
+	/*
 	std::cout << ":: Loading map from: " << loader->getSourceDescription() << std::endl;
 	bool success = loader->loadMap(this, filename);
 	delete loader;
 	
-	///*
 	if(success){
 		return ret;
 	}
 	else{
 		return MAP_LOADER_ERROR;
 	}
-	//*/
+	*/
 }
 
 Tile* Map::getTile(uint16_t _x, uint16_t _y, uint8_t _z)
@@ -206,6 +260,7 @@ bool Map::removeCreature(Creature* creature)
 	return false;
 }
 
+
 void Map::getSpectators(const Range& range, SpectatorVec& list)
 {
 /*
@@ -226,7 +281,6 @@ void Map::getSpectators(const Range& range, SpectatorVec& list)
 	CreatureVector::iterator cit;
 	Tile* tile;
 
-	//for(int nz = range.minRange.z; nz != range.maxRange.z + range.zstep; nz++) {
 	for(int nz = range.minRange.z; nz != range.maxRange.z + range.zstep; nz += range.zstep){
 		offsetz = range.centerpos.z - nz;
 		for(int nx = range.minRange.x + offsetz; nx <= range.maxRange.x + offsetz; ++nx){
