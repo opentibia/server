@@ -1622,11 +1622,19 @@ bool Game::internalCreatureSaySpell(Creature *creature, const std::string &text)
 						player->sendHouseWindow(house, GUEST_LIST);
 						return true;
 					}
+					else{
+						player->sendCancelMessage(RET_NOTPOSSIBLE);
+						player->sendMagicEffect(player->getPosition(), NM_ME_PUFF);
+					}
 				}
 				else if(temp == "aleta som"){ //edit subowner list
 					if(house->canEditAccessList(SUBOWNER_LIST, player)){
 						player->sendHouseWindow(house, SUBOWNER_LIST);
 						return true;
+					}
+					else{
+						player->sendCancelMessage(RET_NOTPOSSIBLE);
+						player->sendMagicEffect(player->getPosition(), NM_ME_PUFF);
 					}
 				}
 				else if(temp == "aleta grav"){ //edit door list
@@ -1648,11 +1656,13 @@ bool Game::internalCreatureSaySpell(Creature *creature, const std::string &text)
 					}
 
 					Door* door = house->getDoorByPosition(pos);
-					if(door){
-						if(house->canEditAccessList(door->getDoorId(), player)){
-							player->sendHouseWindow(house, door->getDoorId());
-							return true;
-						}
+					if(door && house->canEditAccessList(door->getDoorId(), player)){
+						player->sendHouseWindow(house, door->getDoorId());
+						return true;
+					}
+					else{
+						player->sendCancelMessage(RET_NOTPOSSIBLE);
+						player->sendMagicEffect(player->getPosition(), NM_ME_PUFF);
 					}
 				}
 				else if(temp == "alana sio"){ //kick player
@@ -1661,10 +1671,6 @@ bool Game::internalCreatureSaySpell(Creature *creature, const std::string &text)
 				}
 			}
 		}
-		
-		player->sendCancelMessage(RET_NOTPOSSIBLE);
-		player->sendMagicEffect(player->getPosition(), NM_ME_PUFF);
-		return false;
 	}
 	// end of house spells
 	
