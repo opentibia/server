@@ -804,7 +804,7 @@ Player* Game::getPlayerByName(const std::string &s)
 	return NULL; //just in case the player doesnt exist
 }
 
-bool Game::placeCreature(const Position &pos, Creature* creature, bool isLogin /*= true*/)
+bool Game::placeCreature(const Position &pos, Creature* creature, bool isLogin /*= true*/, bool forceLogin /*= false*/)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::placeCreature()");
 
@@ -816,8 +816,8 @@ bool Game::placeCreature(const Position &pos, Creature* creature, bool isLogin /
 	Player* player = creature->getPlayer();
 
 	if(!player || player->access != 0 || getPlayersOnline() < max_players){
-		success = map->placeCreature(pos, creature);		
-		if(success){			
+		success = map->placeCreature(pos, creature, forceLogin);		
+		if(success){
 			//std::cout << "place: " << creature << " " << creature->getID() << std::endl;
 
 			creature->useThing2();

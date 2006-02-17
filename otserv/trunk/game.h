@@ -206,9 +206,11 @@ public:
 	/**
 	  * Place Creature on the map.
 	  * Adds the Creature to playersOnline and to the map
-	  * \param c Creature to add
+	  * \param creature Creature to place on the map
+	  * \param isLogin Is true if the player is logging into the game
+	  * \param forceLogin If true, placing the creature will not fail becase of obstacles (creatures/chests)
 	  */
-	bool placeCreature(const Position &pos, Creature* c, bool isLogin = true);
+	bool placeCreature(const Position &pos, Creature* creature, bool isLogin = true, bool forceLogin = false);
 
 	/**
 		* Remove Creature from the map.

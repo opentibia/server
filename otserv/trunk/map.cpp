@@ -104,14 +104,11 @@ bool Map::loadMap(std::string filename, std::string filekind)
 	bool loadMapSuccess = loader->loadMap(this, filename);
 
 	if(!loadMapSuccess){
-		//std::cout << "FATAL: could not parse the map!" << std::endl;
-
 		switch(loader->getLastError()){
 			case LOADMAPERROR_CANNOTOPENFILE:
 				std::cout << "FATAL: Could not open the map stream." << std::endl;
 				break;
 			case LOADMAPERROR_GETPROPFAILED:
-				//std::cout << "Could not open the map stream." << std::endl;
 				std::cout << "FATAL: Failed to read stream properties. Code: " << loader->getErrorCode() << std::endl;
 				break;
 			case LOADMAPERROR_OUTDATEDHEADER:
@@ -209,14 +206,16 @@ void Map::setTile(uint16_t _x, uint16_t _y, uint8_t _z, Tile* newtile)
 	}
 }
 
-bool Map::placeCreature(const Position& pos, Creature* creature)
+bool Map::placeCreature(const Position& pos, Creature* creature, bool forceLogin /*=false*/)
 {
 	Tile* tile = getTile(pos.x, pos.y, pos.z);
-
+	
+	bool shouldPlaceInPz = false;
 	if(tile){
+		shouldPlaceInPz = tile->isPz();
 		ReturnValue ret = tile->__queryAdd(0, creature, 0);
 
-		if(ret == RET_NOERROR){
+		if(forceLogin || ret == RET_NOERROR){
 			tile->__internalAddThing(creature);
 			return true;
 		}
@@ -233,9 +232,7 @@ bool Map::placeCreature(const Position& pos, Creature* creature)
 		for(int cy = pos.y - 1; cy <= pos.y + 1; cy++){
 			tile = getTile(cx, cy, pos.z);
 
-			//isSuccess= (tile && !tile->getTeleportItem() && !tile->floorChange() && tile->__queryAdd(0, creature, 0) == RET_NOERROR);
-
-			if(tile && tile->__queryAdd(0, creature, 0) == RET_NOERROR){
+			if(tile && (shouldPlaceInPz && tile->isPz()) && tile->__queryAdd(0, creature, 0) == RET_NOERROR){
 				tile->__internalAddThing(creature);
 				return true;
 			}

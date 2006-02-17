@@ -208,20 +208,12 @@ public:
 	void setTile(uint16_t _x, uint16_t _y, uint8_t _z, Tile* newtile);
 
 	/**
-	* Set a single tile.
-	* \param groundId Ground kind (ID)
-	* \returns Nothing =]
-	*/
-	//void setTile(unsigned short _x, unsigned short _y, unsigned char _z, unsigned short groundId);
-
-	//Tile* setTile(unsigned short _x, unsigned short _y, unsigned char _z);
-
-	/**
 	* Place a creature on the map
 	* \param pos The position to place the creature
-	* \param c Creature pointer to the creature to place
+  * \param creature Creature to place on the map
+  * \param forceLogin If true, placing the creature will not fail becase of obstacles (creatures/chests)
 	*/
-	bool placeCreature(const Position &pos, Creature* c);
+	bool placeCreature(const Position &pos, Creature* creature, bool forceLogin = false);
 	
 	/**
 	* Remove a creature from the map.

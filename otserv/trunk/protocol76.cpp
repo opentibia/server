@@ -87,7 +87,7 @@ connectResult_t Protocol76::ConnectPlayer()
 			return CONNECT_SUCCESS;
 		}
 		//temple
-		else if(game->placeCreature(player->masterPos, player)){
+		else if(game->placeCreature(player->masterPos, player, true)){
 			return CONNECT_SUCCESS;
 		}
 		else
