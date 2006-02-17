@@ -242,6 +242,17 @@ Door* House::getDoorByNumber(unsigned long doorId)
 	return NULL;
 }
 
+Door* House::getDoorByPosition(const Position& pos)
+{
+	for(HouseDoorList::iterator it = doorList.begin(); it != doorList.end(); ++it){
+		if((*it)->getPosition() == pos){
+			return *it;
+		}
+	}
+
+	return NULL;
+}
+
 bool House::canEditAccessList(unsigned long listId, const Player* player)
 {
 	switch(getHouseAccessLevel(player)){
@@ -340,6 +351,19 @@ Door::~Door()
 		delete accessList;
 }
 
+int Door::unserialize(xmlNodePtr p)
+{
+	Item::unserialize(p);
+
+	char* tmp = (char*)xmlGetProp(p, (const xmlChar *) "doorId");
+	if(tmp){
+		setDoorId(atoi(tmp));
+		xmlFreeOTSERV(tmp);
+	}
+	
+	return 0;
+}
+
 void Door::setHouse(House* _house)
 {
 	if(house != NULL){
@@ -384,4 +408,76 @@ bool Door::getAccessList(std::string& list)
 	}
 	accessList->getList(list);
 	return true;
+}
+
+
+bool Houses::loadHousesXML(std::string filename)
+{
+	std::transform(filename.begin(), filename.end(), filename.begin(), tolower);
+	xmlDocPtr doc = xmlParseFile(filename.c_str());
+
+	if(doc){
+		xmlNodePtr root, houseNode;
+		char* nodeValue = NULL;
+		root = xmlDocGetRootElement(doc);
+		
+		if(xmlStrcmp(root->name,(const xmlChar*) "houses") != 0){
+			xmlFreeDoc(doc);
+			return false;
+		}
+
+		houseNode = root->children;
+		while(houseNode){
+			if(xmlStrcmp(houseNode->name,(const xmlChar*) "house") == 0){
+				int _houseid = 0;
+				Position entryPos;
+
+				nodeValue = (char*)xmlGetProp(houseNode, (const xmlChar *) "houseid");
+
+				if(!nodeValue){
+					houseNode = houseNode->next;
+					return false;
+				}
+
+				_houseid = atoi(nodeValue);
+				House* house = Houses::getInstance().getHouse(_houseid);
+				if(!house){
+					return false;
+				}
+
+				nodeValue = (char*)xmlGetProp(houseNode, (const xmlChar *) "name");
+				if(nodeValue){
+					house->setName(nodeValue);
+					xmlFreeOTSERV(nodeValue);
+				}
+
+				nodeValue = (char*)xmlGetProp(houseNode, (const xmlChar *) "entryx");
+				if(nodeValue){
+					entryPos.x = atoi(nodeValue);
+					xmlFreeOTSERV(nodeValue);
+				}
+
+				nodeValue = (char*)xmlGetProp(houseNode, (const xmlChar *) "entryy");
+				if(nodeValue){
+					entryPos.y = atoi(nodeValue);
+					xmlFreeOTSERV(nodeValue);
+				}
+
+				nodeValue = (char*)xmlGetProp(houseNode, (const xmlChar *) "entryz");
+				if(nodeValue){
+					entryPos.z = atoi(nodeValue);
+					xmlFreeOTSERV(nodeValue);
+				}
+				
+				house->setEntryPos(entryPos);
+				house->setHouseOwner(0);
+			}
+
+			houseNode = houseNode->next;
+		}
+
+		return true;
+	}
+
+	return false;
 }

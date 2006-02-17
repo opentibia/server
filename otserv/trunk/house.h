@@ -76,6 +76,8 @@ public:
 	void setAccessList(const std::string& textlist);
 	bool getAccessList(std::string& list);
 	
+	int unserialize(xmlNodePtr p);
+
 protected:
 	void setHouse(House* _house);
 	
@@ -134,6 +136,8 @@ public:
 	void addDoor(Door* door);
 	Door* getDoorByNumber(unsigned long doorId);
 
+	Door* getDoorByPosition(const Position& pos);
+
 private:
 	
 	typedef std::list<HouseTile*> HouseTileList;
@@ -170,6 +174,8 @@ public:
 		houseMap[houseid] = house;
 		return house;
 	}
+
+	bool loadHousesXML(std::string filename);
 
 private:
 	HouseMap houseMap;
