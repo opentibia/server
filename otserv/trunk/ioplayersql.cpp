@@ -666,7 +666,7 @@ bool IOPlayerSQL::getNameByGuid(unsigned long guid, std::string &name)
 	name = result.getDataString("name");
 	nameCacheMap[guid] = name;
 	
-	return false;
+	return true;
 }
 
 bool IOPlayerSQL::getGuidByName(unsigned long &guid, unsigned long &alvl, std::string &name)
