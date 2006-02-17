@@ -175,8 +175,7 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 		//level percent
 		player->level_percent  = (unsigned char)(100*(player->experience-player->getExpForLv(player->level))/(1.*player->getExpForLv(player->level+1)-player->getExpForLv(player->level)));
 		while(p){
-			std::string str=(char*)p->name;
-			if(str=="mana"){
+			if(xmlStrcmp(p->name, (const xmlChar*) "mana") == 0){
 				nodeValue = (char*)xmlGetProp(p, (const xmlChar *) "now");
 				if(nodeValue){
 					player->mana=atoi(nodeValue);
@@ -203,7 +202,7 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 
 				player->maglevel_percent  = (unsigned char)(100*(player->manaspent/(1.*player->getReqMana(player->maglevel+1, player->vocation))));
 			}
-			else if(str=="health"){
+			else if(xmlStrcmp(p->name, (const xmlChar*) "health") == 0){
 				nodeValue = (char*)xmlGetProp(p, (const xmlChar *) "now");
 				if(nodeValue){
 					player->health = atoi(nodeValue);
@@ -236,7 +235,7 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 				else
 					isLoaded = false;
 			}
-			else if(str=="look"){
+			else if(xmlStrcmp(p->name, (const xmlChar*) "look") == 0){
 				nodeValue = (char*)xmlGetProp(p, (const xmlChar *) "type");
 				if(nodeValue){
 					player->looktype=atoi(nodeValue);
@@ -279,7 +278,7 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 				else
 					isLoaded = false;
 			}
-			else if(str=="spawn"){
+			else if(xmlStrcmp(p->name, (const xmlChar*) "spawn") == 0){
 				Position spawnPos;
 				spawnPos.x = 0;
 				spawnPos.y = 0;
@@ -311,7 +310,7 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 
 				player->loginPosition = spawnPos;
 			}
-			else if(str=="temple"){
+			else if(xmlStrcmp(p->name, (const xmlChar*) "temple") == 0){
 				nodeValue = (char*)xmlGetProp(p, (const xmlChar *) "x");
 				if(nodeValue) {
 					player->masterPos.x=atoi(nodeValue);
@@ -336,7 +335,7 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 				else
 					isLoaded = false;
 			}
-			else if(str=="guild"){
+			else if(xmlStrcmp(p->name, (const xmlChar*) "guild") == 0){
 				nodeValue = (char*)xmlGetProp(p, (const xmlChar *) "name");
 				if(nodeValue) {
 					player->guildName=nodeValue;
@@ -369,7 +368,7 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 				else
 					isLoaded = false;
 			}
-			else if(str=="skills"){
+			else if(xmlStrcmp(p->name, (const xmlChar*) "skills") == 0){
 				tmp=p->children;
 				while(tmp){
 					int s_id = 0;
@@ -407,7 +406,7 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 					tmp=tmp->next;
 				}
 			}
-			else if(str=="inventory"){
+			else if(xmlStrcmp(p->name, (const xmlChar*) "inventory") == 0){
 				slot=p->children;
 				while(slot){
 					if(strcmp((const char*)slot->name, "slot") == 0){
@@ -442,7 +441,7 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 					slot=slot->next;
 				}
 			}
-			else if(str=="depots"){
+			else if(xmlStrcmp(p->name, (const xmlChar*) "depots") == 0){
 				slot=p->children;
 				while (slot){
 					if(strcmp((const char*)slot->name, "depot") == 0){
@@ -476,7 +475,7 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 					slot=slot->next;
 				}
 			}
-			else if(str == "storage"){
+			else if(xmlStrcmp(p->name, (const xmlChar*) "storage") == 0){
 				slot = p->children;
 				while(slot){
 					if (strcmp((const char*)slot->name, "data") == 0){

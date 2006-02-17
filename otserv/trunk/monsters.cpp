@@ -181,8 +181,7 @@ bool Monsters::loadFromXml(const std::string &_datadir,bool reloading /*= false*
 		p = root->children;
         
 		while (p){
-			const char* str = (char*)p->name;
-			if(strcmp(str, "monster") == 0){
+			if(xmlStrcmp(p->name, (const xmlChar*) "monster") == 0){
 				char* monsterfile = (char*)xmlGetProp(p, (const xmlChar *)"file");
 				char* name = (char*)xmlGetProp(p, (const xmlChar *)"name");
 								
@@ -332,9 +331,7 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 		}
 
 		while(p){
-			const char* str = (char*)p->name;
-
-			if(strcmp(str, "health") == 0) {
+			if(xmlStrcmp(p->name, (const xmlChar*) "health") == 0){
 				nodeValue = (char*)xmlGetProp(p, (const xmlChar *)"now");
 				if(nodeValue){
 					mType->health = atoi(nodeValue);
@@ -351,7 +348,7 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 				else
 					monsterLoad = false;
 			}
-			if(strcmp(str, "combat") == 0){
+			else if(xmlStrcmp(p->name, (const xmlChar*) "combat") == 0){
 				nodeValue = (char*)xmlGetProp(p, (const xmlChar *)"targetdistance");
 				if(nodeValue){
 					mType->targetDistance = std::max(1, atoi(nodeValue));
@@ -364,7 +361,7 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 					xmlFreeOTSERV(nodeValue);
 				}
 			}
-			else if (strcmp(str, "look") == 0) {
+			else if(xmlStrcmp(p->name, (const xmlChar*) "look") == 0){
 				nodeValue = (char*)xmlGetProp(p, (const xmlChar *)"type");
 				if(nodeValue) {
 					mType->looktype = atoi(nodeValue);
@@ -402,7 +399,7 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 					xmlFreeOTSERV(nodeValue);
 				}
 			}
-			else if (strcmp(str, "attacks") == 0){
+			else if(xmlStrcmp(p->name, (const xmlChar*) "attacks") == 0){
 				tmp=p->children;
 				while(tmp){
 					if(strcmp((const char*)tmp->name, "attack") == 0){
@@ -541,7 +538,7 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 					tmp = tmp->next;
 				}
 			}
-			else if (strcmp(str, "defenses") == 0){
+			else if(xmlStrcmp(p->name, (const xmlChar*) "defenses") == 0){
 				tmp = p->children;
 				while(tmp){
 					if (strcmp((const char*)tmp->name, "defense") == 0) {
@@ -572,7 +569,7 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 					tmp = tmp->next;
 				}
 			}
-			else if (strcmp(str, "voices") == 0){
+			else if(xmlStrcmp(p->name, (const xmlChar*) "voices") == 0){
 				tmp = p->children;
 				while(tmp){
 					if (strcmp((const char*)tmp->name, "voice") == 0) {
@@ -616,7 +613,7 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 					tmp = tmp->next;
 				}
 			}
-			else if (strcmp(str, "loot") == 0){
+			else if(xmlStrcmp(p->name, (const xmlChar*) "loot") == 0){
 				tmp = p->children;
 				while(tmp){
 					LootBlock lootBlock;
@@ -626,7 +623,7 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 					tmp = tmp->next;
 				}
 			}
-			else if (strcmp(str, "summons") == 0){
+			else if(xmlStrcmp(p->name, (const xmlChar*) "summons") == 0){
 				nodeValue = (char*)xmlGetProp(p, (const xmlChar *)"maxSummons");
 				if(nodeValue){
 					mType->maxSummons = std::min(atoi(nodeValue), 100);

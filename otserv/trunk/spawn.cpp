@@ -73,29 +73,27 @@ bool SpawnManager::loadSpawnsXML(std::string filename)
 	std::transform(filename.begin(), filename.end(), filename.begin(), tolower);
 	xmlDocPtr doc = xmlParseFile(filename.c_str());
 
-	if (doc){
-		xmlNodePtr root, p;
+	if(doc){
+		xmlNodePtr root, spawnNode;
 		char* nodeValue = NULL;
 		root = xmlDocGetRootElement(doc);
 		
 		root = xmlDocGetRootElement(doc);
 		
-		if (xmlStrcmp(root->name,(const xmlChar*) "spawns")){			
+		if(xmlStrcmp(root->name,(const xmlChar*) "spawns")){
 			xmlFreeDoc(doc);
 			return false;
 		}
 
-		p = root->children;
+		spawnNode = root->children;
             
-		while (p) {
-			const char* str = (char*)p->name;
-			
-			if (strcmp(str, "spawn") == 0) {
+		while(spawnNode){
+			if(xmlStrcmp(spawnNode->name, (const xmlChar*) "spawn") == 0){
 				Position centerpos;
 				int radius;
 
-				nodeValue = (char*)xmlGetProp(p, (const xmlChar *)"centerx");
-				if(nodeValue) {
+				nodeValue = (char*)xmlGetProp(spawnNode, (const xmlChar *)"centerx");
+				if(nodeValue){
 					centerpos.x = atoi(nodeValue);
 					xmlFreeOTSERV(nodeValue);
 				}
@@ -104,40 +102,40 @@ bool SpawnManager::loadSpawnsXML(std::string filename)
 					return false;
 				}
 
-				nodeValue = (char*)xmlGetProp(p, (const xmlChar *)"centery");
+				nodeValue = (char*)xmlGetProp(spawnNode, (const xmlChar *)"centery");
 				if(nodeValue) {
 					centerpos.y = atoi(nodeValue);
 					xmlFreeOTSERV(nodeValue);
 				}
-				else {
+				else{
 					xmlFreeOTSERV(nodeValue);
 					xmlFreeDoc(doc);
 					return false;
 				}
 
-				nodeValue = (char*)xmlGetProp(p, (const xmlChar *)"centerz");
-				if(nodeValue) {
+				nodeValue = (char*)xmlGetProp(spawnNode, (const xmlChar *)"centerz");
+				if(nodeValue){
 					centerpos.z = atoi(nodeValue);
 					xmlFreeOTSERV(nodeValue);
 				}
-				else {
+				else{
 					xmlFreeOTSERV(nodeValue);
 					xmlFreeDoc(doc);
 					return false;
 				}
 
-				nodeValue = (char*)xmlGetProp(p, (const xmlChar *)"radius");
-				if(nodeValue) {
+				nodeValue = (char*)xmlGetProp(spawnNode, (const xmlChar *)"radius");
+				if(nodeValue){
 					radius = atoi(nodeValue);
 					xmlFreeOTSERV(nodeValue);
 				}
-				else {
+				else{
 					xmlFreeOTSERV(nodeValue);
 					xmlFreeDoc(doc);
 					return false;
 				}
 
-				Spawn *spawn = new Spawn(game, centerpos, radius);
+				Spawn* spawn = new Spawn(game, centerpos, radius);
 				spawns.push_back(spawn);
 
 				std::string name;
@@ -145,16 +143,15 @@ bool SpawnManager::loadSpawnsXML(std::string filename)
 				Direction direction = NORTH;
 				int rawdir = 0; //NORTH
 
-				xmlNodePtr tmp = p->children;
-				while (tmp) {
-					str = (char*)tmp->name;
-					if (strcmp(str, "monster") == 0) {
+				xmlNodePtr tmp = spawnNode->children;
+				while(tmp){
+					if(xmlStrcmp(tmp->name, (const xmlChar*) "monster") == 0){
 						nodeValue = (char*)xmlGetProp(tmp, (const xmlChar *)"name");
 						if(nodeValue) {
 							name = nodeValue;
 							xmlFreeOTSERV(nodeValue);
 						}
-						else {
+						else{
 							tmp = tmp->next;
 							break;
 						}
@@ -166,21 +163,21 @@ bool SpawnManager::loadSpawnsXML(std::string filename)
 						}
 
 						nodeValue = (char*)xmlGetProp(tmp, (const xmlChar *)"x");
-						if(nodeValue) {
+						if(nodeValue){
 							x = atoi(nodeValue);
 							xmlFreeOTSERV(nodeValue);
 						}
-						else {
+						else{
 							tmp = tmp->next;
 							break;
 						}
 
 						nodeValue = (char*)xmlGetProp(tmp, (const xmlChar *)"y");
-						if(nodeValue) {
+						if(nodeValue){
 							y = atoi(nodeValue);
 							xmlFreeOTSERV(nodeValue);
 						}
-						else {
+						else{
 							tmp = tmp->next;
 							break;
 						}
@@ -190,12 +187,12 @@ bool SpawnManager::loadSpawnsXML(std::string filename)
 							spawntime = atoi(nodeValue);
 							xmlFreeOTSERV(nodeValue);
 						}
-						else {
+						else{
 							tmp = tmp->next;
 							break;
 						}
 
-						switch(rawdir) {
+						switch(rawdir){
 							case 0: direction = NORTH; break;
 							case 1: direction = EAST; break;
 							case 2: direction = SOUTH; break;
@@ -213,7 +210,7 @@ bool SpawnManager::loadSpawnsXML(std::string filename)
 				}
 			}
 
-			p = p->next;
+			spawnNode = spawnNode->next;
 		}
 
 		xmlFreeDoc(doc);

@@ -105,10 +105,8 @@ Npc::Npc(const std::string& name, Game* game) :
 			maglevel = 1;
 		}
 		
-		while (p)
-		{
-			const char* str = (char*)p->name;
-			if(strcmp(str, "health") == 0){
+		while(p){
+			if(xmlStrcmp(p->name, (const xmlChar*) "health") == 0){
 				if(tmp = (char*)xmlGetProp(p, (const xmlChar *)"now")) {
 					this->health = atoi(tmp);
 					xmlFreeOTSERV(tmp);
@@ -124,7 +122,7 @@ Npc::Npc(const std::string& name, Game* game) :
 					this->healthmax = 100;
 				}
 			}
-			if(strcmp(str, "look") == 0){
+			if(xmlStrcmp(p->name, (const xmlChar*) "look") == 0){
 				if(tmp = (char*)xmlGetProp(p, (const xmlChar *)"type")) {
 					this->looktype = atoi(tmp);
 					xmlFreeOTSERV(tmp);

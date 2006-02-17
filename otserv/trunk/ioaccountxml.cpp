@@ -75,9 +75,7 @@ Account IOAccountXML::loadAccount(unsigned long accno)
 
 		// now load in characters.
 		while(p){
-			const char* str = (char*)p->name;
-
-			if(strcmp(str, "characters") == 0){
+			if(xmlStrcmp(p->name, (const xmlChar*) "characters") == 0){
 				tmp = p->children;
 				while(tmp){
 					nodeValue = (char*)xmlGetProp(tmp, (xmlChar*)"name");
@@ -139,9 +137,7 @@ bool IOAccountXML::getPassword(unsigned long accno, const std::string &name, std
 
 		// now load in characters.
 		while(p){
-			const char* str = (char*)p->name;
-
-			if(strcmp(str, "characters") == 0){
+			if(xmlStrcmp(p->name, (const xmlChar*) "characters") == 0){
 				tmp = p->children;
 				while(tmp){
 					nodeValue = (char*)xmlGetProp(tmp, (xmlChar*)"name");

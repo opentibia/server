@@ -561,7 +561,11 @@ int main(int argc, char *argv[])
 		passwordType = PASSWORD_TYPE_PLAIN;
 	}
 
-	///*
+	if(!g_game.loadMap(g_config.getGlobalString("map"), g_config.getGlobalString("mapkind"))){
+		return -1;
+	}
+
+	/*
 	// loads the map and, if needed, an extra-file spawns
 	switch(g_game.loadMap(g_config.getGlobalString("map"), g_config.getGlobalString("mapkind"))){
 	case SPAWN_BUILTIN:
@@ -583,7 +587,7 @@ int main(int argc, char *argv[])
 		break;
 	#endif
 	}
-	//*/
+	*/
 	
 	// Call to WSA Startup on Windows Systems...
 #ifdef WIN32

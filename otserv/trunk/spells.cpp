@@ -74,11 +74,8 @@ bool Spells::loadFromXml(const std::string &datadir)
 		
 		p = root->children;
             
-		while (p)
-		{
-			const char* str = (char*)p->name;
-			
-			if (strcmp(str, "spell") == 0){
+		while(p){
+			if(xmlStrcmp(p->name, (const xmlChar*) "spell") == 0){
 				nodeValue = (char*)xmlGetProp(p, (const xmlChar *)"enabled");
 				if(nodeValue) {
 					enabled = (bool)(atoi(nodeValue) > 0);
@@ -133,7 +130,7 @@ bool Spells::loadFromXml(const std::string &datadir)
 					allSpells[words] = spell;
 				}
 			}
-			else if (strcmp(str, "rune") == 0){
+			if(xmlStrcmp(p->name, (const xmlChar*) "rune") == 0){
 				nodeValue = (char*)xmlGetProp(p, (const xmlChar *)"enabled");
 				if(nodeValue) {
 					enabled = (bool)(atoi(nodeValue) > 0);

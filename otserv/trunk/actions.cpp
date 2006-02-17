@@ -89,22 +89,20 @@ bool Actions::loadFromXml(const std::string &_datadir)
 	std::transform(filename.begin(), filename.end(), filename.begin(), tolower);
 	xmlDocPtr doc = xmlParseFile(filename.c_str());
 
-	if (doc){
+	if(doc){
 		this->loaded=true;
 		xmlNodePtr root, p;
 		root = xmlDocGetRootElement(doc);
 		
-		if (xmlStrcmp(root->name,(const xmlChar*) "actions")){
+		if(xmlStrcmp(root->name,(const xmlChar*) "actions") != 0){
 			xmlFreeDoc(doc);
 			return false;
 		}
+
 		p = root->children;
         
-		while (p)
-		{
-			const char* str = (char*)p->name;
-			
-			if (strcmp(str, "action") == 0){
+		while (p){
+			if(xmlStrcmp(p->name, (const xmlChar*) "action") == 0){
 				int itemid,uniqueid,actionid;
 				if(readXMLInteger(p,"itemid",itemid)){
 					action = loadAction(p);
