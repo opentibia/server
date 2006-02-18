@@ -36,9 +36,9 @@
 #include <map>
 
 enum eLogType {
-	EVENT,
-	WARNING,
-	ERROR
+	LOGTYPE_EVENT,
+	LOGTYPE_WARNING,
+	LOGTYPE_ERROR
 
 };
 
