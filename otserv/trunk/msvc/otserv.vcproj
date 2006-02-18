@@ -18,12 +18,11 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="-DUSE_SQL"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;_CONSOLE;"
+				PreprocessorDefinitions="WIN32;_CONSOLE;__MYSQL_ALT_INCLUDE__;NOMINMAX"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="1"
+				RuntimeLibrary="3"
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -33,7 +32,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="libxml2.lib liblua.lib liblualib.lib wsock32.lib /NODEFAULTLIB:libcmtd.lib  mysql++.lib mysqlclient.lib zlib.lib"
+				AdditionalOptions="libxml2.lib lualibD.lib luaD.lib wsock32.lib /NODEFAULTLIB:libcmtd.lib"
 				OutputFile="$(OutDir)/otserv.exe"
 				LinkIncremental="2"
 				GenerateDebugInformation="TRUE"
@@ -70,8 +69,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/D &quot;_X86_&quot; /c "
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
-				RuntimeLibrary="0"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;__MYSQL_ALT_INCLUDE__;NOMINMAX"
+				RuntimeLibrary="2"
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -122,22 +121,58 @@
 				RelativePath="..\account.cpp">
 			</File>
 			<File
+				RelativePath="..\actions.cpp">
+			</File>
+			<File
+				RelativePath="..\allocator.cpp">
+			</File>
+			<File
+				RelativePath="..\chat.cpp">
+			</File>
+			<File
+				RelativePath="..\commands.cpp">
+			</File>
+			<File
 				RelativePath="..\container.cpp">
 			</File>
 			<File
 				RelativePath="..\creature.cpp">
 			</File>
 			<File
+				RelativePath="..\cylinder.cpp">
+			</File>
+			<File
+				RelativePath="..\database.cpp">
+			</File>
+			<File
+				RelativePath="..\depot.cpp">
+			</File>
+			<File
+				RelativePath="..\fileloader.cpp">
+			</File>
+			<File
 				RelativePath="..\game.cpp">
+			</File>
+			<File
+				RelativePath="..\house.cpp">
+			</File>
+			<File
+				RelativePath="..\housetile.cpp">
 			</File>
 			<File
 				RelativePath="..\ioaccount.cpp">
 			</File>
 			<File
-				RelativePath="..\ioaccountsql.cpp">
+				RelativePath="..\ioaccountxml.cpp">
 			</File>
 			<File
-				RelativePath="..\ioaccountxml.cpp">
+				RelativePath="..\iomapbin.cpp">
+			</File>
+			<File
+				RelativePath="..\iomapotbm.cpp">
+			</File>
+			<File
+				RelativePath="..\iomapsql.cpp">
 			</File>
 			<File
 				RelativePath="..\iomapxml.cpp">
@@ -146,16 +181,19 @@
 				RelativePath="..\ioplayer.cpp">
 			</File>
 			<File
-				RelativePath="..\ioplayersql.cpp">
-			</File>
-			<File
 				RelativePath="..\ioplayerxml.cpp">
 			</File>
 			<File
 				RelativePath="..\item.cpp">
 			</File>
 			<File
+				RelativePath="..\itemloader.cpp">
+			</File>
+			<File
 				RelativePath="..\items.cpp">
+			</File>
+			<File
+				RelativePath="..\logger.cpp">
 			</File>
 			<File
 				RelativePath="..\luascript.cpp">
@@ -164,10 +202,19 @@
 				RelativePath="..\magic.cpp">
 			</File>
 			<File
+				RelativePath="..\mailbox.cpp">
+			</File>
+			<File
 				RelativePath="..\map.cpp">
 			</File>
 			<File
+				RelativePath="..\md5.cpp">
+			</File>
+			<File
 				RelativePath="..\monster.cpp">
+			</File>
+			<File
+				RelativePath="..\monsters.cpp">
 			</File>
 			<File
 				RelativePath="..\networkmessage.cpp">
@@ -188,13 +235,22 @@
 				RelativePath="..\protocol.cpp">
 			</File>
 			<File
-				RelativePath="..\protocol74.cpp">
+				RelativePath="..\protocol76.cpp">
+			</File>
+			<File
+				RelativePath="..\scheduler.cpp">
+			</File>
+			<File
+				RelativePath="..\spawn.cpp">
 			</File>
 			<File
 				RelativePath="..\spells.cpp">
 			</File>
 			<File
 				RelativePath="..\status.cpp">
+			</File>
+			<File
+				RelativePath="..\teleport.cpp">
 			</File>
 			<File
 				RelativePath="..\thing.cpp">
@@ -205,6 +261,9 @@
 			<File
 				RelativePath="..\tools.cpp">
 			</File>
+			<File
+				RelativePath="..\trashholder.cpp">
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -214,16 +273,43 @@
 				RelativePath="..\account.h">
 			</File>
 			<File
+				RelativePath="..\actions.h">
+			</File>
+			<File
+				RelativePath="..\allocator.h">
+			</File>
+			<File
+				RelativePath="..\commands.h">
+			</File>
+			<File
 				RelativePath="..\container.h">
 			</File>
 			<File
 				RelativePath="..\creature.h">
 			</File>
 			<File
+				RelativePath="..\cylinder.h">
+			</File>
+			<File
+				RelativePath="..\database.h">
+			</File>
+			<File
 				RelativePath="..\definitions.h">
 			</File>
 			<File
+				RelativePath="..\depot.h">
+			</File>
+			<File
+				RelativePath="..\fileloader.h">
+			</File>
+			<File
 				RelativePath="..\game.h">
+			</File>
+			<File
+				RelativePath="..\house.h">
+			</File>
+			<File
+				RelativePath="..\housetile.h">
 			</File>
 			<File
 				RelativePath="..\ioaccount.h">
@@ -236,6 +322,15 @@
 			</File>
 			<File
 				RelativePath="..\iomap.h">
+			</File>
+			<File
+				RelativePath="..\iomapbin.h">
+			</File>
+			<File
+				RelativePath="..\iomapotbm.h">
+			</File>
+			<File
+				RelativePath="..\iomapsql.h">
 			</File>
 			<File
 				RelativePath="..\iomapxml.h">
@@ -253,6 +348,9 @@
 				RelativePath="..\item.h">
 			</File>
 			<File
+				RelativePath="..\itemloader.h">
+			</File>
+			<File
 				RelativePath="..\items.h">
 			</File>
 			<File
@@ -262,10 +360,19 @@
 				RelativePath="..\magic.h">
 			</File>
 			<File
+				RelativePath="..\mailbox.h">
+			</File>
+			<File
 				RelativePath="..\map.h">
 			</File>
 			<File
+				RelativePath="..\md5.h">
+			</File>
+			<File
 				RelativePath="..\monster.h">
+			</File>
+			<File
+				RelativePath="..\monsters.h">
 			</File>
 			<File
 				RelativePath="..\networkmessage.h">
@@ -286,13 +393,16 @@
 				RelativePath="..\protocol.h">
 			</File>
 			<File
-				RelativePath="..\protocol74.h">
+				RelativePath="..\protocol76.h">
 			</File>
 			<File
 				RelativePath=".\resource.h">
 			</File>
 			<File
 				RelativePath="..\scheduler.h">
+			</File>
+			<File
+				RelativePath="..\spawn.h">
 			</File>
 			<File
 				RelativePath="..\spells.h">
@@ -304,10 +414,10 @@
 				RelativePath="..\tasks.h">
 			</File>
 			<File
-				RelativePath="..\templates.h">
+				RelativePath="..\teleport.h">
 			</File>
 			<File
-				RelativePath="..\texcept.h">
+				RelativePath="..\templates.h">
 			</File>
 			<File
 				RelativePath="..\thing.h">
@@ -317,6 +427,12 @@
 			</File>
 			<File
 				RelativePath="..\tools.h">
+			</File>
+			<File
+				RelativePath="..\town.h">
+			</File>
+			<File
+				RelativePath="..\trashholder.h">
 			</File>
 		</Filter>
 		<Filter
