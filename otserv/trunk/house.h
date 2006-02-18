@@ -25,11 +25,15 @@
 #include <list>
 #include <map>
 
+
 #ifdef __GNUC__
 #include <ext/hash_set>
 #else
 #include <hash_set>
 #endif
+
+//#include "pcrecpp.h"
+#include "boost/regex.hpp"
 
 #include "definitions.h"
 #include "position.h"
@@ -62,10 +66,12 @@ private:
 	typedef stdext::hash_set<uint32_t> GuildList; //TODO: include ranks
 	#endif
 	typedef std::list<std::string> ExpressionList;
+	typedef std::list<std::pair<boost::regex, bool> > RegExList;
 	std::string list;
 	PlayerList playerList;
 	GuildList guildList;
 	ExpressionList expressionList;
+	RegExList regExList;
 };
 
 class Door : public Item

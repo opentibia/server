@@ -283,7 +283,29 @@ AccessList::~AccessList()
 
 bool AccessList::parseList(const std::string& _list)
 {
-	//TODO: parse it...
+	playerList.clear();
+	guildList.clear();
+	expressionList.clear();
+	regExList.clear();
+	
+	std::stringstream listStream(list);
+	std::string line;
+	while(getline(listStream, line)){
+		std::transform(line.begin(), line.end(), line.begin(), tolower);
+		if(line.substr(1,1) == "#")
+			continue;
+		
+		//TODO. strip spaces, validate input,...
+		if(line.find("!") || line.find("*") || line.find("?")){
+			addExpression(line);
+		}
+		else if(std::string::size_type pos = line.find("@")){
+			addGuild(line.substr(pos + 1), "");
+		}
+		else{
+			addPlayer(line);
+		}
+	}
 	return false;
 }
 
@@ -321,6 +343,12 @@ bool AccessList::addExpression(const std::string& expression)
 		}
 	}
 	expressionList.push_back(expression);
+	if(expression.substr(1,1) == "!"){
+		regExList.push_back(std::make_pair(boost::regex(expression.substr(2)), false));
+	}
+	else{
+		regExList.push_back(std::make_pair(boost::regex(expression), true));
+	}
 	return true;
 }
 
@@ -334,7 +362,18 @@ bool AccessList::isInList(const Player* player)
 	if(guildIt != guildList.end())
 		return true;
 	
-	//TODO: match expressions
+	RegExList::iterator it;
+	std::string name = player->getName();
+	for(it = regExList.begin(); it != regExList.end(); ++it){
+		if(boost::regex_match(name, it->first , boost::match_default) != 0){
+			if(it->second){
+				return true;
+			}
+			else{
+				return false;
+			}
+		}
+	}
 	return false;
 }
 	
