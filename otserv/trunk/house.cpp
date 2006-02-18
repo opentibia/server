@@ -317,7 +317,8 @@ bool AccessList::addPlayer(const std::string& name)
 {
 	unsigned long access;
 	unsigned long guid;
-	if(IOPlayer::instance()->getGuidByName(guid, access, name)){
+	std::string dbName = name;
+	if(IOPlayer::instance()->getGuidByName(guid, access, dbName)){
 		if(playerList.find(guid) == playerList.end()){
 			playerList.insert(guid);
 			return true;
