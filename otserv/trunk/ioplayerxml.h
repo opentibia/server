@@ -45,7 +45,7 @@ public:
 	*/
 	virtual bool savePlayer(Player* player);
 
-	virtual bool getGuidByName(unsigned long &guid, unsigned long &alvl, std::string &name);
+	virtual bool getGuidByName(unsigned long& guid, unsigned long& alvl, const std::string& name);
 	virtual bool playerExists(std::string name);
 
 	IOPlayerXML();

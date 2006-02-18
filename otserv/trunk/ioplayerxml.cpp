@@ -744,8 +744,7 @@ bool IOPlayerXML::savePlayer(Player* player)
 	}
 }
 
-
-bool IOPlayerXML::getGuidByName(unsigned long &guid, unsigned long &alvl, std::string &name)
+bool IOPlayerXML::getGuidByName(unsigned long& guid, unsigned long& alvl, const std::string& name)
 {
 	std::string datadir = g_config.getGlobalString("datadir");
 	std::string filename = datadir + "players/" + name + ".xml";
@@ -763,12 +762,6 @@ bool IOPlayerXML::getGuidByName(unsigned long &guid, unsigned long &alvl, std::s
 			isSuccess = false;
 		}
 		else{
-			nodeValue = (char*)xmlGetProp(root, (const xmlChar *) "name");
-			if(nodeValue){
-				name = nodeValue;
-				xmlFreeOTSERV(nodeValue);
-			}
-
 			nodeValue = (char*)xmlGetProp(root, (const xmlChar *) "access");
 			if(nodeValue){
 				alvl = atoi(nodeValue);

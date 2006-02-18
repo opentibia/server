@@ -182,6 +182,8 @@ void House::setAccessList(unsigned long listId, const std::string& textlist)
 			return;
 		}
 	}
+
+	//kick uninvited players
 	HouseTileList::iterator it;
 	for(it = houseTiles.begin();it != houseTiles.end(); ++it){
 	
@@ -287,6 +289,7 @@ bool AccessList::parseList(const std::string& _list)
 	guildList.clear();
 	expressionList.clear();
 	regExList.clear();
+	list = _list;
 	
 	std::stringstream listStream(list);
 	std::string line;
@@ -296,10 +299,11 @@ bool AccessList::parseList(const std::string& _list)
 			continue;
 		
 		//TODO. strip spaces, validate input,...
-		if(line.find("!") || line.find("*") || line.find("?")){
+		std::string::size_type pos = std::string::npos;
+		if(line.find("!") != std::string::npos || line.find("*") != std::string::npos || line.find("?") != std::string::npos){
 			addExpression(line);
 		}
-		else if(std::string::size_type pos = line.find("@")){
+		else if((pos = line.find("@") != std::string::npos)){
 			addGuild(line.substr(pos + 1), "");
 		}
 		else{
