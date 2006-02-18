@@ -49,7 +49,7 @@ void Logger::logMessage(std::string channel, eLogType type, int level,
 	std::cout << "Channel: " << channel << std::endl;
 	std::cout << "Type: " << sType << std::endl;
 	std::cout << "Level: " << level << std::endl;
-	std::cout << "Messafe: " << message << std::endl;
+	std::cout << "Message: " << message << std::endl;
 	std::cout << "Func: " << func << std::endl; 
 	std::cout << "Line: " << line << std::endl; 
 	std::cout << "File: " << file << std::endl; 

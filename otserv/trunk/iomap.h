@@ -48,7 +48,7 @@ public:
 	*/
 	virtual char* getSourceDescription() = 0;
 
-	/** Load the map from an OTBM file
+	/** Load the map from a file/database
 	  * \param map pointer to the Map class
 	  * \param identifier is the mapfile/database to open
 	  * \returns Returns true if the map was loaded successfully
