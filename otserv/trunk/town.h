@@ -27,6 +27,7 @@
 #include <map>
 
 #include "position.h"
+#include "tools.h"
 
 class Town
 {
@@ -77,7 +78,7 @@ public:
 	Town* getTown(std::string townname)
 	{
 		for(TownMap::iterator it = townMap.begin(); it != townMap.end(); ++it){
-			if(stricmp(it->second->getName().c_str(), townname.c_str()) == 0){
+			if(compareNoCase(it->second->getName(), townname) == 0){
 				return it->second;
 			}
 		}
