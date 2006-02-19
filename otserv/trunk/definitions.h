@@ -41,13 +41,13 @@ typedef unsigned long long uint64_t;
 #define OTSYS_THREAD_RETURN  void
 #define EWOULDBLOCK WSAEWOULDBLOCK
 
+#ifndef __GNUC__
 #include <cstring>
 inline int strcasecmp(const char *s1, const char *s2)
 {
 	return ::_stricmp(s1, s2);
 }
 
-#ifndef __GNUC__
 typedef unsigned long uint32_t;
 typedef signed long int32_t;
 typedef unsigned short uint16_t;
