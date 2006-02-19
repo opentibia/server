@@ -51,7 +51,7 @@ WaitinglistIterator Waitlist::findClient(int acc, unsigned long ip)
 	for(it = waitList.begin(); it != waitList.end();) {
 		if((*it)->acc == acc && (*it)->ip == ip){
 			(*it)->slot = slot; //update slot
-			(*it)->timeout = clock(); //update timeout
+			(*it)->timeout = OTSYS_TIME(); //update timeout
 			return it;
 		}
 		else{
@@ -65,8 +65,6 @@ WaitinglistIterator Waitlist::findClient(int acc, unsigned long ip)
 
 void Waitlist::addClient(int acc, unsigned long ip)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(waitListLock, "Waitlist::addClient()");
-
 	WaitinglistIterator it = findClient(acc, ip);
 	
 	if(it == waitList.end()){
@@ -95,24 +93,31 @@ int Waitlist::getClientSlot(int acc, unsigned long ip)
 bool Waitlist::clientLogin(int acc, unsigned long ip)
 {		
 	OTSYS_THREAD_LOCK_CLASS lockClass(waitListLock, "Waitlist::clientLogin()");
-	
-	cleanUpList();
-	
+
 	Status* stat = Status::instance();	
-	WaitinglistIterator it = findClient(acc, ip);
-	/**
-	For exampel: Client is in slot 3, maximum is 50 and its 48 online, 
-	then its not this clients turn to sign in...
-	But if its 47 online, let it sign in!
-	**/
-	if(it != waitList.end()){
-		if(((*it)->slot + stat->getPlayersOnline()) <= stat->getMaxPlayersOnline()){ 
-			waitList.erase(it); //Should be able to sign in now, so lets erase it
+	
+	if(!stat->hasSlot()){
+		addClient(acc, ip);
+		return false;
+	}
+	else{
+		cleanUpList();
+		/**
+		For example: Client is in slot 3, maximum is 50 and its 48 online, 
+		then its not this clients turn to sign in...
+		But if its 47 online, let it sign in!
+		**/
+		WaitinglistIterator it = findClient(acc, ip);
+		
+		if(it != waitList.end()){
+			if(((*it)->slot + stat->getPlayersOnline()) <= stat->getMaxPlayersOnline()){ 
+				waitList.erase(it); //Should be able to sign in now, so lets erase it
+				return true;	
+			}
+		}
+		else{ //Not in queue
 			return true;	
 		}
-	}
-	else{ //Not in queue, maybe a premium acc? Lets say yes to sign in!
-		return true;	
 	}
 	
 	return false;
@@ -136,9 +141,12 @@ void Waitlist::createMessage(NetworkMessage& msg, int acc, unsigned long ip)
 
 void Waitlist::cleanUpList()
 {
-	for(WaitinglistIterator it = waitList.begin(); it != waitList.end(); it++){	
-		if((clock() - (*it)->timeout)/(CLK_TCK/1000) > getTime((*it)->slot)*2*1000){
+	for(WaitinglistIterator it = waitList.begin(); it != waitList.end();){
+		if((OTSYS_TIME() - (*it)->timeout) > getTime((*it)->slot)*1.5*1000){
+			delete *it;
 			waitList.erase(it++);
 		}
+		else
+			++it;
 	}	
 }

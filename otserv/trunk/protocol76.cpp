@@ -79,19 +79,14 @@ void Protocol76::reinitializeProtocol()
 
 connectResult_t Protocol76::ConnectPlayer()
 {	
-	Status* stat = Status::instance();
 	Waitlist* wait = Waitlist::instance();
-	
-	if(!stat->hasSlot() && player->access == 0){
-		wait->addClient(player->getAccount(), player->getIP());
+
+	if(player->access == 0 && !wait->clientLogin(player->getAccount(), player->getIP())){	
 		return CONNECT_TOMANYPLAYERS;
 	}
 	else{
-		if(!wait->clientLogin(player->getAccount(), player->getIP())){
-			return CONNECT_TOMANYPLAYERS;
-		}
 		//last login position
-		else if(game->placeCreature(player->getLoginPosition(), player)){
+		if(game->placeCreature(player->getLoginPosition(), player)){
 			return CONNECT_SUCCESS;
 		}
 		//temple

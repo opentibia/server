@@ -28,13 +28,13 @@ struct Wait{
 	int acc;
 	unsigned long ip;
 	
-	clock_t timeout;
+	 __int64 timeout;
 	int slot;
 		
 	Wait(int account, unsigned long ipnum, int place){
 		acc = account;
 		ip = ipnum;
-		timeout = clock();
+		timeout = OTSYS_TIME();
 		slot = place;
 	};
 };
@@ -50,8 +50,6 @@ public:
 	
 	static Waitlist* instance();
 	
-	void addClient(int acc, unsigned long ip);
-	
 	void createMessage(NetworkMessage& msg, int acc, unsigned long ip);
 	bool clientLogin(int acc, unsigned long ip);
 	
@@ -60,10 +58,10 @@ protected:
 	Waitinglist waitList;
 	
 	WaitinglistIterator findClient(int acc, unsigned long ip);
+	void addClient(int acc, unsigned long ip);
 	int getClientSlot(int acc, unsigned long ip);
 	
 	void cleanUpList();
-	
 	int getTime(int slot){return 20;}
 private:
 	static Waitlist* _Wait;	
