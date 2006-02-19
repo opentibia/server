@@ -70,62 +70,6 @@ void House::setHouseOwner(uint32_t guid)
 		(*it)->setSpecialDescription(houseDescription.str());
 	}
 }
-/*
-ReturnValue House::addGuest(const Player* player)
-{
-	if(!isInvited(player->getGUID())){
-		guestList.push_back(player->getGUID());
-		return RET_NOERROR;
-	}
-
-	return RET_NOTPOSSIBLE;
-}
-
-ReturnValue House::addGuest(const std::string& name)
-{
-	unsigned long guid = 0;
-	unsigned long access = 0;
-	std::string dbName = name;
-
-	if(IOPlayer::instance()->getGuidByName(guid, access, dbName)){
-		if(!isInvited(guid)){
-			guestList.push_back(guid);
-			return RET_NOERROR;
-		}
-	}
-
-	return RET_NOTPOSSIBLE;
-}
-
-ReturnValue House::removeGuest(const std::string& name)
-{
-	unsigned long guid = 0;
-	unsigned long access = 0;
-	std::string dbName = name;
-
-	if(IOPlayer::instance()->getGuidByName(guid, access, dbName)){
-		if(isInvited(guid)){
-			InviteList::iterator it = std::find(guestList.begin(), guestList.end(), guid);
-			guestList.erase(it);
-
-			Player* uninvitedPlayer = g_game.getPlayerByName(dbName);
-			if(uninvitedPlayer){
-				HouseTile* houseTile = dynamic_cast<HouseTile*>(uninvitedPlayer->getTile());
-
-				if(houseTile && houseTile->getHouse() == this){
-					if(g_game.internalTeleport(uninvitedPlayer, getEntryPosition()) == RET_NOERROR){
-						g_game.AddMagicEffectAt(getEntryPosition(), NM_ME_ENERGY_AREA);
-					}
-				}
-			}
-
-			return RET_NOERROR;
-		}
-	}
-
-	return RET_NOTPOSSIBLE;
-}
-*/
 
 AccessHouseLevel_t House::getHouseAccessLevel(const Player* player)
 {
@@ -179,16 +123,33 @@ void House::setAccessList(unsigned long listId, const std::string& textlist)
 			#ifdef __DEBUG_HOUSES__
 			std::cout << "Failure: [House::setAccessList] door == NULL, listId = " << listId <<std::endl;
 			#endif
-			return;
+		}
+		//We dont have kick anyone
+		return;
+	}
+	
+	//kick uninvited players
+	typedef std::list<Player*> KickPlayerList;
+	KickPlayerList kickList;
+	HouseTileList::iterator it;
+	for(it = houseTiles.begin(); it != houseTiles.end(); ++it){
+		HouseTile* hTile = *it;
+		if(hTile->creatures.size() > 0){
+			CreatureVector::iterator creatureit;
+			for(creatureit = hTile->creatures.begin(); creatureit != hTile->creatures.end(); ++creatureit){
+				Player* player = (*creatureit)->getPlayer();
+				if(player && isInvited(player) == false){
+					kickList.push_back(player);
+				}
+			}
 		}
 	}
-
-	//kick uninvited players
-	HouseTileList::iterator it;
-	for(it = houseTiles.begin();it != houseTiles.end(); ++it){
-	
+	KickPlayerList::iterator itkick;
+	for(itkick = kickList.begin(); itkick != kickList.end(); ++itkick){
+		if(g_game.internalTeleport(*itkick, getEntryPosition()) == RET_NOERROR){
+			g_game.AddMagicEffectAt(getEntryPosition(), NM_ME_ENERGY_AREA);
+		}
 	}
-		
 }
 
 bool House::getAccessList(unsigned long listId, std::string& list)
@@ -288,32 +249,32 @@ bool AccessList::parseList(const std::string& _list)
 	playerList.clear();
 	guildList.clear();
 	expressionList.clear();
-	regExList.clear();
+	//regExList.clear();
 	list = _list;
 	
-	std::stringstream listStream(list);
+	std::stringstream listStream(_list);
 	std::string line;
 	while(getline(listStream, line)){
 		std::transform(line.begin(), line.end(), line.begin(), tolower);
-		if(line.substr(1,1) == "#")
+		if(line.substr(0,1) == "#")
 			continue;
-		
 		//TODO. strip spaces, validate input,...
-		std::string::size_type pos = std::string::npos;
-		if(line.find("!") != std::string::npos || line.find("*") != std::string::npos || line.find("?") != std::string::npos){
-			addExpression(line);
-		}
-		else if((pos = line.find("@") != std::string::npos)){
+		
+		if(line.find("@") != std::string::npos){
+			std::string::size_type pos = line.find("@");
 			addGuild(line.substr(pos + 1), "");
+		}
+		else if(line.find("!") != std::string::npos || line.find("*") != std::string::npos || line.find("?") != std::string::npos){
+			addExpression(line);
 		}
 		else{
 			addPlayer(line);
 		}
 	}
-	return false;
+	return true;
 }
 
-bool AccessList::addPlayer(const std::string& name)
+bool AccessList::addPlayer(std::string& name)
 {
 	unsigned long access;
 	unsigned long guid;
@@ -348,11 +309,25 @@ bool AccessList::addExpression(const std::string& expression)
 		}
 	}
 	expressionList.push_back(expression);
-	if(expression.substr(1,1) == "!"){
-		regExList.push_back(std::make_pair(boost::regex(expression.substr(2)), false));
+	if(expression.substr(0,1) == "!"){
+		/*
+		try{
+			regExList.push_back(std::make_pair(boost::regex(expression.substr(1)), false));
+		}
+		catch(const std::exception& e){
+			return false;
+		}
+		*/
 	}
 	else{
-		regExList.push_back(std::make_pair(boost::regex(expression), true));
+		/*
+		try{
+			regExList.push_back(std::make_pair(boost::regex(expression), true));
+		}
+		catch(const std::exception& e){
+			return false;
+		}
+		*/
 	}
 	return true;
 }
@@ -366,11 +341,12 @@ bool AccessList::isInList(const Player* player)
 	GuildList::iterator guildIt = guildList.find(player->getGuildId());
 	if(guildIt != guildList.end())
 		return true;
-	
+	/*
 	RegExList::iterator it;
 	std::string name = player->getName();
+	std::transform(name.begin(), name.end(), name.begin(), tolower);
 	for(it = regExList.begin(); it != regExList.end(); ++it){
-		if(boost::regex_match(name, it->first , boost::match_default) != 0){
+		/f(boost::regex_match(name, it->first , boost::match_default) != 0){
 			if(it->second){
 				return true;
 			}
@@ -379,6 +355,7 @@ bool AccessList::isInList(const Player* player)
 			}
 		}
 	}
+	*/
 	return false;
 }
 	

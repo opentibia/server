@@ -23,7 +23,7 @@
 #include <algorithm>
 #include <stdio.h>
 #include <stdlib.h>
-
+/*
 int compareNoCase(std::string s1, std::string s2)
 {
 	std::transform(s1.begin(), s1.end(), s1.begin(), tolower);
@@ -31,7 +31,7 @@ int compareNoCase(std::string s1, std::string s2)
 
 	return strcmp(s1.c_str(), s2.c_str());
 }
-
+*/
 bool fileExists(const char* filename)
 {
 	FILE* f = fopen(filename, "rb");

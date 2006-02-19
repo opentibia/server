@@ -32,8 +32,7 @@
 #include <hash_set>
 #endif
 
-//#include "pcrecpp.h"
-#include "boost/regex.hpp"
+//#include "boost/regex.hpp"
 
 #include "definitions.h"
 #include "position.h"
@@ -49,7 +48,7 @@ public:
 	~AccessList();
 	
 	bool parseList(const std::string& _list);
-	bool addPlayer(const std::string& name);
+	bool addPlayer(std::string& name);
 	bool addGuild(const std::string& guildName, const std::string& rank);
 	bool addExpression(const std::string& expression);
 	
@@ -66,12 +65,12 @@ private:
 	typedef stdext::hash_set<uint32_t> GuildList; //TODO: include ranks
 	#endif
 	typedef std::list<std::string> ExpressionList;
-	typedef std::list<std::pair<boost::regex, bool> > RegExList;
+	//typedef std::list<std::pair<boost::regex, bool> > RegExList;
 	std::string list;
 	PlayerList playerList;
 	GuildList guildList;
 	ExpressionList expressionList;
-	RegExList regExList;
+	//RegExList regExList;
 };
 
 class Door : public Item

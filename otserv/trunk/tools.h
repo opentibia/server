@@ -22,7 +22,7 @@
 #ifndef __OTSERV_TOOLS_H
 #define __OTSERV_TOOLS_H
 
-int compareNoCase(std::string s1, std::string s2);
+//int compareNoCase(std::string s1, std::string s2);
 bool fileExists(const char* filename);
 int random_range(int lowest_number, int highest_number);
 void hexdump(unsigned char *_data, int _len);

@@ -140,6 +140,7 @@ struct OTBM_HouseTile_coords{
 
 bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 {
+	setLastError(LOADMAPERROR_NONE);
 	FileLoader f;
 	if(!f.openFile(identifier.c_str(), false, true)){
 		setLastError(LOADMAPERROR_CANNOTOPENFILE);
@@ -261,16 +262,7 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 					setLastError(LOADMAPERROR_FAILEDTOREADCHILD, tile_area);
 					return false;
 				}
-				/*
-				bool houseTile;
-				House* house = NULL;
-				if(type == OTBM_HOUSETILE){
-					houseTile = true;
-				}
-				else{
-					houseTile = false;
-				}
-				*/
+
 				if(type == OTBM_TILE || type == OTBM_HOUSETILE){
 					if(!f.getProps(tile_node, propStream)){
 						setLastError(LOADMAPERROR_GETPROPFAILED, tile_area);
@@ -308,6 +300,7 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 						}
 
 						tile = new HouseTile(px, py, pz, house);
+						house->addTile(static_cast<HouseTile*>(tile));
 						isHouseTile = true;
 					}
 					else{
@@ -317,40 +310,38 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 					
 					map->setTile(px, py, pz, tile);
 
-					if(tile){
-						//read tile attributes
-						unsigned char attribute;
-						while(propStream.GET_UCHAR(attribute)){
-							switch(attribute){
-							case OTBM_ATTR_TILE_FLAGS:
-								unsigned long flags;
-								if(!propStream.GET_ULONG(flags)){
-									setLastError(LOADMAPERROR_GETPROPFAILED, tile_node);
-									return false;
-								}
-								
-								if(flags & TILE_PZ)
-									tile->setPz();;
-								
-								break;
-							case OTBM_ATTR_ITEM:
-								Item* item;
-								
-								item  = unserializaItemAttr(propStream);
-								if(item){
-									tile->__internalAddThing(item);
-								}
-								else{
-									setLastError(LOADMAPERROR_FAILEDUNSERIALIZEITEM, tile_node);
-									return false;
-								}
-								break;
-
-							default:
-								setLastError(LOADMAPERROR_UNKNOWNNODETYPE, tile_node);
+					//read tile attributes
+					unsigned char attribute;
+					while(propStream.GET_UCHAR(attribute)){
+						switch(attribute){
+						case OTBM_ATTR_TILE_FLAGS:
+							unsigned long flags;
+							if(!propStream.GET_ULONG(flags)){
+								setLastError(LOADMAPERROR_GETPROPFAILED, tile_node);
 								return false;
-								break;
 							}
+								
+							if(flags & TILE_PZ)
+								tile->setPz();;
+								
+							break;
+						case OTBM_ATTR_ITEM:
+							Item* item;
+							
+							item  = unserializaItemAttr(propStream);
+							if(item){
+								tile->__internalAddThing(item);
+							}
+							else{
+								setLastError(LOADMAPERROR_FAILEDUNSERIALIZEITEM, tile_node);
+								return false;
+							}
+							break;
+
+						default:
+							setLastError(LOADMAPERROR_UNKNOWNNODETYPE, tile_node);
+							return false;
+							break;
 						}
 					}
 					NODE item_node = f.getChildNode(tile_node, type);
@@ -447,7 +438,7 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 		return false;
 	}
 
-	setLastError(LOADMAPERROR_NONE);
+	return (getLastError() == LOADMAPERROR_NONE);
 	return true;
 }
 

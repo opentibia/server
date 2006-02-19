@@ -36,6 +36,10 @@ typedef unsigned long long uint64_t;
 #define DEBUG_REPORT
 #endif
 
+#ifndef strcasecmp
+#define strcasecmp stricmp
+#endif
+
 #if defined __WINDOWS__ || defined WIN32
 
 #define OTSYS_THREAD_RETURN  void
