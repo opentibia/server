@@ -22,7 +22,7 @@
 #include <algorithm>
 #include <functional>
 #include <sstream>
-#include <string.h>
+//#include <string.h>
 #include "luascript.h"
 
 extern xmlMutexPtr xmlmutex;

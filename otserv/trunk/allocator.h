@@ -24,12 +24,13 @@
 #ifdef __OTSERV_ALLOCATOR__
 
 #include <memory>
-#include <limits>
 #include <cstdlib>
 #include <map>
 #include <fstream>
 #include <ctime>
 #include <boost/pool/pool.hpp>
+
+#include "definitions.h"
 
 template<typename T>
 class dummyallocator {

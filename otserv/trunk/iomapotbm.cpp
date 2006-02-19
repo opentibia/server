@@ -141,6 +141,7 @@ struct OTBM_HouseTile_coords{
 bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 {
 	setLastError(LOADMAPERROR_NONE);
+
 	FileLoader f;
 	if(!f.openFile(identifier.c_str(), false, true)){
 		setLastError(LOADMAPERROR_CANNOTOPENFILE);
@@ -439,7 +440,6 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 	}
 
 	return (getLastError() == LOADMAPERROR_NONE);
-	return true;
 }
 
 Item* IOMapOTBM::unserializaItemAttr(PropStream &propStream)

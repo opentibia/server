@@ -329,6 +329,7 @@ bool AccessList::addExpression(const std::string& expression)
 		}
 		*/
 	}
+
 	return true;
 }
 
@@ -462,7 +463,7 @@ bool Houses::loadHousesXML(std::string filename)
 				nodeValue = (char*)xmlGetProp(houseNode, (const xmlChar *) "houseid");
 
 				if(!nodeValue){
-					houseNode = houseNode->next;
+					xmlFreeOTSERV(nodeValue);
 					return false;
 				}
 

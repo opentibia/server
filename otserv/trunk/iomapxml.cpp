@@ -35,6 +35,8 @@ extern Game g_game;
 
 bool IOMapXML::loadMap(Map* map, const std::string& identifier)
 {
+	setLastError(LOADMAPERROR_NONE);
+
 	xmlDocPtr doc;
 	xmlNodePtr root, rootChildren, p, tmpNode;
 	char* tmp;
@@ -97,7 +99,7 @@ bool IOMapXML::loadMap(Map* map, const std::string& identifier)
 		if(xmlStrcmp(rootChildren->name, (const xmlChar*)"tile") == 0){
 			tmp = (char*)xmlGetProp(rootChildren, (const xmlChar *) "x");
 			if(!tmp){
-				setLastError(LOADMAPERROR_GETPROPFAILED, rootChildren->line);
+				setLastError(LOADMAPERROR_GETPROPFAILED);
 				return false;
 
 				//rootChildren = rootChildren->next;
@@ -109,7 +111,7 @@ bool IOMapXML::loadMap(Map* map, const std::string& identifier)
 
 			tmp = (char*)xmlGetProp(rootChildren, (const xmlChar *) "y");
 			if(!tmp){
-				setLastError(LOADMAPERROR_GETPROPFAILED, rootChildren->line);
+				setLastError(LOADMAPERROR_GETPROPFAILED);
 				return false;
 
 				//rootChildren = rootChildren->next;
@@ -121,7 +123,7 @@ bool IOMapXML::loadMap(Map* map, const std::string& identifier)
 
 			tmp = (char*)xmlGetProp(rootChildren, (const xmlChar *) "z");
 			if(!tmp){
-				setLastError(LOADMAPERROR_GETPROPFAILED, rootChildren->line);
+				setLastError(LOADMAPERROR_GETPROPFAILED);
 				return false;
 
 				//rootChildren = rootChildren->next;
@@ -156,7 +158,7 @@ bool IOMapXML::loadMap(Map* map, const std::string& identifier)
 			else{
 				house = Houses::getInstance().getHouse(houseid);
 				if(!house){
-					setLastError(LOADMAPERROR_FAILEDTOCREATEITEM, rootChildren->line);
+					setLastError(LOADMAPERROR_FAILEDTOCREATEITEM);
 					return false;
 				}
 
@@ -196,7 +198,7 @@ bool IOMapXML::loadMap(Map* map, const std::string& identifier)
 					item = Item::CreateItem(id);
 
 					if(!item){
-						setLastError(LOADMAPERROR_FAILEDTOCREATEITEM, rootChildren->line);
+						setLastError(LOADMAPERROR_FAILEDTOCREATEITEM);
 						return false;
 					}
 
@@ -262,7 +264,7 @@ bool IOMapXML::loadMap(Map* map, const std::string& identifier)
 				tmp = (char*)xmlGetProp(p, (const xmlChar *) "townid");
 
 				if(!tmp){
-					setLastError(LOADMAPERROR_GETPROPFAILED, rootChildren->line);
+					setLastError(LOADMAPERROR_GETPROPFAILED);
 					return false;
 					//p = p->next;
 					//continue;
@@ -312,8 +314,7 @@ bool IOMapXML::loadMap(Map* map, const std::string& identifier)
 
  	xmlFreeDoc(doc);
 
-	setLastError(LOADMAPERROR_NONE);
-	return true;
+	return (getLastError() == LOADMAPERROR_NONE);
 }
 
 bool IOMapXML::LoadContainer(xmlNodePtr nodeitem,Container* ccontainer)

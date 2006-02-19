@@ -36,15 +36,16 @@ typedef unsigned long long uint64_t;
 #define DEBUG_REPORT
 #endif
 
-#ifndef strcasecmp
-#define strcasecmp stricmp
-#endif
-
 #if defined __WINDOWS__ || defined WIN32
 
 #define OTSYS_THREAD_RETURN  void
-
 #define EWOULDBLOCK WSAEWOULDBLOCK
+
+#include <cstring>
+inline int strcasecmp(const char *s1, const char *s2)
+{
+	return ::_stricmp(s1, s2);
+}
 
 #ifndef __GNUC__
 typedef unsigned long uint32_t;
@@ -65,6 +66,8 @@ typedef unsigned char uint8_t;
 #define OTSYS_THREAD_RETURN void*
 
 #include <stdint.h>
+#include <string.h>
+
 typedef int64_t __int64;
 
 #endif

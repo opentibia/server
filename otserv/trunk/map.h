@@ -25,8 +25,8 @@
 #include <queue>
 #include <bitset>
 #include <map>
-#include <limits>
 
+#include "definitions.h"
 #include "position.h"
 #include "item.h"
 #include "creature.h"
