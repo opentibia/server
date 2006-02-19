@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// Status-Singleton for OTServ
+// 
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,44 +18,54 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __OTSERV_STATUS_H
-#define __OTSERV_STATUS_H
+#ifndef __WAITLIST_H__
+#define __WAITLIST_H__
 
-#include <string>
-#include "otsystem.h"
-#include "definitions.h"
+#include "game.h"
 #include "networkmessage.h"
 
-
-class Status{
-  public:
-  // procs       
-	void addPlayer();
-	void removePlayer();
-	static Status* instance();
-	std::string getStatusString();
-	void getInfo(NetworkMessage &nm);
-	bool hasSlot();
+struct Wait{
+	int acc;
+	unsigned long ip;
 	
-	int getPlayersOnline(){return playersonline;}
-	int getMaxPlayersOnline(){return playersmax;}
-	
-	// vars
-	int playersonline, playersmax, playerspeak;
-	std::string ownername, owneremail;
-	std::string motd;
-	std::string mapname, mapauthor;
-	int mapsizex, mapsizey;
-	std::string servername, location, url;
-	std::string version;
-	uint64_t start;
-
-
-  private:
-	Status();
-	static Status* _Status;
-
-	// the stats of our server
+	clock_t timeout;
+	int slot;
+		
+	Wait(int account, unsigned long ipnum, int place){
+		acc = account;
+		ip = ipnum;
+		timeout = clock();
+		slot = place;
+	};
 };
 
+typedef std::list<Wait*> Waitinglist;
+typedef Waitinglist::iterator WaitinglistIterator;	
+
+class Waitlist
+{
+public:
+	Waitlist();
+	virtual ~Waitlist();
+	
+	static Waitlist* instance();
+	
+	void addClient(int acc, unsigned long ip);
+	
+	void createMessage(NetworkMessage& msg, int acc, unsigned long ip);
+	bool clientLogin(int acc, unsigned long ip);
+	
+	OTSYS_THREAD_LOCKVAR waitListLock;   
+protected:
+	Waitinglist waitList;
+	
+	WaitinglistIterator findClient(int acc, unsigned long ip);
+	int getClientSlot(int acc, unsigned long ip);
+	
+	void cleanUpList();
+	
+	int getTime(int slot){return 20;}
+private:
+	static Waitlist* _Wait;	
+};
 #endif

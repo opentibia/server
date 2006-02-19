@@ -136,6 +136,7 @@ public:
 	inline StorageMap::const_iterator getStorageIteratorBegin() const {return storageMap.begin();}
 	inline StorageMap::const_iterator getStorageIteratorEnd() const {return storageMap.end();}
 	
+	int getAccount() const {return accountNumber;}
 	int getLevel() const {return level;}
 	int getHealth() const {return health;}
 	int getMana() const {return mana;}

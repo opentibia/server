@@ -47,6 +47,7 @@
 #include "game.h"
 #include "ioplayer.h"
 #include "house.h"
+#include "waitlist.h"
 
 extern LuaScript g_config;
 extern Actions actions;
@@ -79,11 +80,18 @@ void Protocol76::reinitializeProtocol()
 connectResult_t Protocol76::ConnectPlayer()
 {	
 	Status* stat = Status::instance();
-	if(!stat->hasSlot() && player->access == 0)
+	Waitlist* wait = Waitlist::instance();
+	
+	if(!stat->hasSlot() && player->access == 0){
+		wait->addClient(player->getAccount(), player->getIP());
 		return CONNECT_TOMANYPLAYERS;
+	}
 	else{
+		if(!wait->clientLogin(player->getAccount(), player->getIP())){
+			return CONNECT_TOMANYPLAYERS;
+		}
 		//last login position
-		if(game->placeCreature(player->getLoginPosition(), player)){
+		else if(game->placeCreature(player->getLoginPosition(), player)){
 			return CONNECT_SUCCESS;
 		}
 		//temple

@@ -49,6 +49,7 @@
 
 #include "tools.h"
 #include "md5.h"
+#include "waitlist.h"
 
 #ifdef __OTSERV_ALLOCATOR__
 #include "allocator.h"
@@ -317,9 +318,10 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 							msg.Reset();
 							switch(connectRes){
 								case CONNECT_TOMANYPLAYERS:
-									msg.AddByte(0x16);
-									msg.AddString("Too many players online.");
-									msg.AddByte(45); //number of seconds before retry
+								{
+									Waitlist* wait = Waitlist::instance();
+									wait->createMessage(msg, accnumber, player->getIP());
+								}
 								break;
 
 								case CONNECT_MASTERPOSERROR:
