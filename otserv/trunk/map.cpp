@@ -231,8 +231,10 @@ bool Map::placeCreature(const Position& pos, Creature* creature, bool forceLogin
 	for(int cx = pos.x - 1; cx <= pos.x + 1; cx++){
 		for(int cy = pos.y - 1; cy <= pos.y + 1; cy++){
 			tile = getTile(cx, cy, pos.z);
+			if(!tile || (shouldPlaceInPz && !tile->isPz()))
+				continue;
 
-			if(tile && (shouldPlaceInPz && tile->isPz()) && tile->__queryAdd(0, creature, 0) == RET_NOERROR){
+			if(tile->__queryAdd(0, creature, 0) == RET_NOERROR){
 				tile->__internalAddThing(creature);
 				return true;
 			}
