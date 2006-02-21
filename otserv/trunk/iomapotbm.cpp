@@ -617,9 +617,8 @@ Item* IOMapOTBM::unserializaItemNode(FileLoader* f, NODE node)
 bool IOMapOTBM::loadSpawns()
 {
 	if(!spawnfile.empty()){
-		SpawnManager::initialize(&g_game);
-		SpawnManager::instance()->loadSpawnsXML(spawnfile);
-		SpawnManager::instance()->startup();
+		SpawnManager::getInstance().loadSpawnsXML(spawnfile);
+		SpawnManager::getInstance().startup();
 	}
 	
 	return true;

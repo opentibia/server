@@ -19,6 +19,7 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "definitions.h"
+#include "game.h"
 #include "creature.h"
 #include "monster.h"
 #include "player.h"

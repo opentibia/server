@@ -361,9 +361,8 @@ bool IOMapXML::LoadContainer(xmlNodePtr nodeitem,Container* ccontainer)
 bool IOMapXML::loadSpawns()
 {
 	if(!spawnfile.empty()){
-		SpawnManager::initialize(&g_game);
-		SpawnManager::instance()->loadSpawnsXML(spawnfile);
-		SpawnManager::instance()->startup();
+		SpawnManager::getInstance().loadSpawnsXML(spawnfile);
+		SpawnManager::getInstance().startup();
 	}
 	
 	return true;

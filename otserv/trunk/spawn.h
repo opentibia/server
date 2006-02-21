@@ -36,7 +36,7 @@ typedef std::list<Spawn*> spawnsList;
 
 class Spawn /*: public Event*/ {
 public:
-	Spawn(Game *igame, Position pos, int _radius);
+	Spawn(Position pos, int _radius);
 	void idle(int t);
 	bool addMonster(std::string name, Direction dir, int x, int y, int spawntime);
 
@@ -49,7 +49,6 @@ public:
 	*/
 
 private:
-	Game *game;
 	Position centerPos;
 	int radius;
 
@@ -74,25 +73,32 @@ private:
 	SpawnedMap spawnedmap;
 };
 
-class SpawnManager {
+class SpawnManager{
 public:
-	SpawnManager();
-	~SpawnManager();
-	
-	static SpawnManager* instance();
-	static bool initialize(Game *igame);
-	static bool addSpawn(Spawn* spawn);
-	static bool loadSpawnsXML(std::string filename);
+	static SpawnManager& getInstance(){
+		static SpawnManager instance;
+		return instance;
+	}
+
+	//static SpawnManager* instance();
+	//static bool initialize(Game *igame);
+
+	bool addSpawn(Spawn* spawn);
+	bool loadSpawnsXML(std::string filename);
 #ifdef __USE_MYSQL__
-	static bool loadSpawnsSQL(std::string identifier);
+	bool loadSpawnsSQL(std::string identifier);
 #endif
-	static bool startup();
+	bool startup();
 
 	void checkSpawns(int t);
+
 protected:
-	static SpawnManager* _instance;
-	static spawnsList spawns;
-	static Game *game;
+	SpawnManager();
+	~SpawnManager();
+
+	SpawnManager* _instance;
+	spawnsList spawns;
+	Game *game;
 };
 
 #endif

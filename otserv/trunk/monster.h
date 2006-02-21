@@ -22,13 +22,12 @@
 #ifndef __MONSTER_H__
 #define __MONSTER_H__
 
-#include "creature.h"
-#include "game.h"
 #include "tile.h"
 #include "templates.h"
 #include "monsters.h"
 
 class Creature;
+class Game;
 
 enum monsterstate_t{
 	STATE_IDLE,
@@ -46,12 +45,13 @@ enum monstermode_t{
 class Monster : public Creature
 {
 private:
-	Monster(MonsterType *mtype, Game* game);
-public:
-	static Monster* createMonster(const std::string& name, Game* game);
+	Monster(MonsterType* mtype);
 
-	virtual ~Monster();
 	//const Monster& operator=(const Monster& rhs);
+
+public:
+	static Monster* createMonster(const std::string& name);
+	virtual ~Monster();
 
 	virtual Monster* getMonster() {return this;};
 	virtual const Monster* getMonster() const {return this;};
@@ -86,7 +86,6 @@ public:
 	virtual void onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport);
 
 private:
-	Game* game;
 	std::list<Position> route;
 	monsterstate_t state;
 	bool updateMovePos;

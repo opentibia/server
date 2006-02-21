@@ -566,30 +566,6 @@ int main(int argc, char *argv[])
 	if(!g_game.loadMap(g_config.getGlobalString("map"), g_config.getGlobalString("mapkind"))){
 		return -1;
 	}
-
-	/*
-	// loads the map and, if needed, an extra-file spawns
-	switch(g_game.loadMap(g_config.getGlobalString("map"), g_config.getGlobalString("mapkind"))){
-	case SPAWN_BUILTIN:
-		break;
-	case MAP_LOADER_ERROR:
-		std::cout << "FATAL: couldnt determine the map format! exiting2" << std::endl;
-		exit(1); 
-		break;
-	case SPAWN_XML:
-		SpawnManager::initialize(&g_game);
-		SpawnManager::instance()->loadSpawnsXML(g_game.getSpawnFile());
-		SpawnManager::instance()->startup();
-		break;
-	#ifdef ENABLESQLMAPSUPPORT	
-	case SPAWN_SQL:
-		SpawnManager::initialize(&g_game);
-		SpawnManager::instance()->loadSpawnsSQL(g_config.getGlobalString("map"));
-		SpawnManager::instance()->startup();
-		break;
-	#endif
-	}
-	*/
 	
 	// Call to WSA Startup on Windows Systems...
 #ifdef WIN32

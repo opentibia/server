@@ -33,10 +33,7 @@ typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 #include <libxml/parser.h> 
 
 extern LuaScript g_config;
-
-SpawnManager* SpawnManager::_instance = NULL;
-Game* SpawnManager::game = NULL;
-spawnsList SpawnManager::spawns;
+extern Game g_game;
 
 SpawnManager::SpawnManager()
 {
@@ -49,17 +46,6 @@ SpawnManager::~SpawnManager()
 		delete *it;
 
 	spawns.clear();
-}
-
-bool SpawnManager::initialize(Game *igame)
-{
-	game = igame;
-	_instance = new SpawnManager();
-	return (_instance != NULL);
-}
-
-SpawnManager* SpawnManager::instance() {
-	return _instance;
 }
 
 bool SpawnManager::addSpawn(Spawn* spawn)
@@ -135,7 +121,7 @@ bool SpawnManager::loadSpawnsXML(std::string filename)
 					return false;
 				}
 
-				Spawn* spawn = new Spawn(game, centerpos, radius);
+				Spawn* spawn = new Spawn(centerpos, radius);
 				spawns.push_back(spawn);
 
 				std::string name;
@@ -291,7 +277,7 @@ bool SpawnManager::loadSpawnsSQL(std::string identifier)
           if(std::string(row.lookup_by_name("name")) != ""){name = std::string(row.lookup_by_name("name"));}
           int time = row.lookup_by_name("time");
 
-          Spawn *spawn = new Spawn(game, spawnpos, 1);
+          Spawn* spawn = new Spawn(game, spawnpos, 1);
 					spawns.push_back(spawn);
           spawn->addMonster(name, NORTH, 0, 0, time * 1000);
         }//End For Loop
@@ -348,7 +334,8 @@ bool SpawnManager::loadSpawnsSQL(std::string identifier)
 					std::string name;
           if(std::string(row.lookup_by_name("name")) != ""){name = std::string(row.lookup_by_name("name"));}
           int dir = row.lookup_by_name("dir");
-          Npc* npc = new Npc(name, game);
+
+					Npc* npc = new Npc(name, game);
           
           npc->pos = npcpos;
           switch(dir){
@@ -397,7 +384,7 @@ bool SpawnManager::startup()
 	}
 
 	if(!spawns.empty()) {
-		game->addEvent(makeTask(20000, std::bind2nd(std::mem_fun(&Game::checkSpawns), 20000)));
+		g_game.addEvent(makeTask(20000, std::bind2nd(std::mem_fun(&Game::checkSpawns), 20000)));
 	}
 
 	return true;
@@ -410,9 +397,8 @@ void SpawnManager::checkSpawns(int t)
 	}
 }
 
-Spawn::Spawn(Game *igame, Position pos, int _radius)
+Spawn::Spawn(Position pos, int _radius)
 {
-	game = igame;
 	centerPos = pos;
 	radius = _radius;
 }
@@ -453,30 +439,29 @@ bool Spawn::addMonster(std::string name, Direction dir, int x, int y, int spawnt
 
 Monster* Spawn::respawn(unsigned long spawnid, Position &pos, std::string &name, Direction dir)
 {
-	//Monster *monster = new Monster(name, game);
-	Monster* monster = Monster::createMonster(name, game);
+	Monster* monster = Monster::createMonster(name);
 	if(monster){
-		//if(monster->isLoaded()) {
 		monster->setDirection(dir);
 		monster->masterPos = centerPos;
 
-		if(game->placeCreature(pos, monster)) {
+		if(g_game.placeCreature(pos, monster)) {
 			monster->useThing2();
 			spawnedmap.insert(spawned_pair(spawnid, monster));
 			spawnmap[spawnid].lastspawn = OTSYS_TIME();
 			return monster;
 		}
-		//}
+
 		//not loaded, or could not place it on the map
 		delete monster;
 		monster = NULL;
 	}
+
 	return NULL;
 }
 
 bool Spawn::isInSpawnRange(const Position &p)
 {
-	if ((p.x >= centerPos.x - radius) && (p.x <= centerPos.x + radius) &&
+	if((p.x >= centerPos.x - radius) && (p.x <= centerPos.x + radius) &&
       (p.y >= centerPos.y - radius) && (p.y <= centerPos.y + radius))
     return true;
 
@@ -491,8 +476,8 @@ void Spawn::idle(int t)
 			if(it->first != 0) {
 				spawnmap[it->first].lastspawn = OTSYS_TIME();
 			}
+
 			it->second->releaseThing2();
-			//delete it->second;
 			spawnedmap.erase(it++);
 		}
 		else if(!isInSpawnRange(it->second->getPosition()) && it->first != 0) {
@@ -511,18 +496,19 @@ void Spawn::idle(int t)
 				SpectatorVec list;
 				SpectatorVec::iterator it;
 
-				game->getSpectators(Range(sit->second.pos, true), list);
+				g_game.getSpectators(Range(sit->second.pos, true), list);
 
 				bool playerFound = false;
+				Player* player = NULL;
+
 				for(it = list.begin(); it != list.end(); ++it) {
-					Player *player = dynamic_cast<Player*>(*it);
-					if(player && player->access == 0) {
+					if((player = (*it)->getPlayer()) && player->access == 0){
 						playerFound = true;
 						break;
 					}
 				}
 				
-				if(playerFound) {
+				if(playerFound){
 					sit->second.lastspawn = OTSYS_TIME();
 					continue;
 				}

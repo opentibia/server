@@ -264,7 +264,6 @@ void IOMapBin::loadOTM(Map* map)
 			} break;
 			case 0x50: // Spawns
 			{
-				SpawnManager::initialize(&g_game);
 				Position pos;
 				int cx, cy, radius, total=0;
 				long int secs;
@@ -291,8 +290,8 @@ void IOMapBin::loadOTM(Map* map)
 					total += count;
 					secs = fgetc(fh); secs += fgetc(fh) << 8;
 			             
-					Spawn *spawn = new Spawn(&g_game, pos, radius);
-					SpawnManager::instance()->addSpawn(spawn);
+					Spawn *spawn = new Spawn(pos, radius);
+					SpawnManager::getInstance().addSpawn(spawn);
 		             
 					for (int j = 0; j < count; j++)
 					{
@@ -305,7 +304,7 @@ void IOMapBin::loadOTM(Map* map)
 				}
 		           
 				std::cout << ":: Loaded spawns: " << total << std::endl;
-				SpawnManager::instance()->startup();
+				SpawnManager::getInstance().startup();
 			} break;
 			case 0xF0:
 				end = true;
