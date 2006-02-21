@@ -1096,7 +1096,7 @@ ReturnValue Game::moveCreature(Creature* creature, Direction direction)
 			Tile* tmpTile = map->getTile(currentPos.x, currentPos.y, currentPos.z - 1);
 			if(tmpTile == NULL || (tmpTile->ground == NULL && !tmpTile->hasProperty(BLOCKSOLID))){
 				tmpTile = map->getTile(destPos.x, destPos.y, destPos.z - 1);
-				if(tmpTile && tmpTile->ground){
+				if(tmpTile && tmpTile->ground && !tmpTile->hasProperty(BLOCKSOLID)){
 					destPos.z -= 1;
 				}
 			}
@@ -3420,7 +3420,7 @@ void Game::checkSpawns(int t)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::checkSpawns()");
 	
-	SpawnManager::instance()->checkSpawns(t);
+	SpawnManager::getInstance().checkSpawns(t);
 	this->addEvent(makeTask(t, std::bind2nd(std::mem_fun(&Game::checkSpawns), t)));
 }
 
