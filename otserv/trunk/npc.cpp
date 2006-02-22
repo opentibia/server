@@ -36,10 +36,11 @@
 #include "luascript.h"
 
 extern LuaScript g_config;
+extern Game g_game;
 
 AutoList<Npc> Npc::listNpc;
 
-Npc::Npc(const std::string& name, Game* game) :
+Npc::Npc(const std::string& name) :
  Creature()
 {
 	char *tmp;
@@ -49,14 +50,15 @@ Npc::Npc(const std::string& name, Game* game) :
 	std::string filename = datadir + "npc/" + std::string(name) + ".xml";
 	std::transform(filename.begin(), filename.end(), filename.begin(), tolower);
 	xmlDocPtr doc = xmlParseFile(filename.c_str());
+
 	if(doc){
 		this->loaded=true;
 		xmlNodePtr root, p;
 		root = xmlDocGetRootElement(doc);
 
 		if (xmlStrcmp(root->name,(const xmlChar*) "npc")){
-		//TODO: use exceptions here
-		std::cerr << "Malformed XML" << std::endl;
+			//TODO: use exceptions here
+			std::cerr << "Malformed XML" << std::endl;
 		}
 
 		p = root->children;
@@ -202,17 +204,18 @@ Npc::Npc(const std::string& name, Game* game) :
 
 		xmlFreeDoc(doc);
 	}
+
 	//now try to load the script
-	this->script = new NpcScript(this->scriptname, this);
-	if(!this->script->isLoaded())
-		this->loaded=false;
-	this->game=game;
+	script = new NpcScript(scriptname, this);
+
+	if(!script->isLoaded())
+		loaded = false;
 }
 
 
 Npc::~Npc()
 {
-	delete this->script;
+	delete script;
 }
 
 std::string Npc::getDescription(int32_t lookDistance) const
@@ -279,31 +282,32 @@ void Npc::onCreatureChangeOutfit(const Creature* creature)
 
 int Npc::onThink(int& newThinkTicks)
 {
-	this->script->onThink();
+	script->onThink();
 	return Creature::onThink(newThinkTicks);
 }
 
 
 void Npc::doSay(std::string msg)
 {
-	if(!game->internalCreatureSaySpell(this, msg))
-		this->game->internalCreatureSay(this, SPEAK_SAY, msg);
+	if(!g_game.internalCreatureSaySpell(this, msg)){
+		g_game.internalCreatureSay(this, SPEAK_SAY, msg);
+	}
 }
 
 void Npc::doMove(int direction)
 {
 	switch(direction){
 		case 0:
-			game->moveCreature(this, SOUTH);
+			g_game.moveCreature(this, SOUTH);
 		break;
 		case 1:
-			game->moveCreature(this, EAST);
+			g_game.moveCreature(this, EAST);
 		break;
 		case 2:
-			game->moveCreature(this, NORTH);
+			g_game.moveCreature(this, NORTH);
 		break;
 		case 3:
-			game->moveCreature(this, WEST);
+			g_game.moveCreature(this, WEST);
 		break;
 	}
 }
@@ -311,27 +315,49 @@ void Npc::doMove(int direction)
 void Npc::doMoveTo(Position target)
 {
 	if(route.size() == 0 || route.back() != target || route.front() != getPosition()){
-		route = this->game->getPathTo(this, getPosition(), target);
+		route = g_game.getPathTo(this, getPosition(), target);
 	}
-	if(route.size()==0){
+
+	if(route.size() == 0){
 		//still no route, means there is none
 		return;
 	}
-	else route.pop_front();
+	else
+		route.pop_front();
+
 	Position nextStep = route.front();
 	route.pop_front();
 	int dx = nextStep.x - getPosition().x;
 	int dy = nextStep.y - getPosition().y;
 
-	//this->game->thingMove(this, this, getPosition().x + dx, getPosition().y + dy, getPosition().z, 1);
-	//game->moveCreature(this, 
+	Direction dir;
+
+	if(dx == -1 && dy == -1)
+		dir = NORTHWEST;
+	else if(dx == 1 && dy == -1)
+		dir = NORTHEAST;
+	else if(dx == -1 && dy == 1)
+		dir = SOUTHWEST;
+	else if(dx == 1 && dy == 1)
+		dir = SOUTHEAST;
+	else if(dx == -1)
+		dir = WEST;
+	else if(dx == 1)
+		dir = EAST;
+	else if(dy == -1)
+		dir = NORTH;
+	else
+		dir = SOUTH;
+
+	g_game.moveCreature(this, dir);
 }
 
-NpcScript::NpcScript(std::string scriptname, Npc* npc)
+NpcScript::NpcScript(std::string scriptname, Npc* _npc)
 {
-	this->loaded = false;
+	loaded = false;
 	if(scriptname == "")
 		return;
+
 	luaState = lua_open();
 	luaopen_loadlib(luaState);
 	luaopen_base(luaState);
@@ -347,11 +373,12 @@ NpcScript::NpcScript(std::string scriptname, Npc* npc)
 		return;
 	else
 		fclose(in);
+
 	lua_dofile(luaState, scriptname.c_str());
-	this->loaded=true;
-	this->npc=npc;
-	this->setGlobalNumber("addressOfNpc", (int) npc);
-	this->registerFunctions();
+	loaded = true;
+	npc = _npc;
+	setGlobalNumber("addressOfNpc", (int) npc);
+	registerFunctions();
 }
 
 void NpcScript::onThink()
@@ -382,6 +409,7 @@ void NpcScript::onCreatureAppear(unsigned long cid)
 			std::cerr << "Backtrace: " << std::endl;
 			lua_Debug* d = NULL;
 			int i = 0;
+
 			while(lua_getstack(luaState, i++, d)){
 				std::cerr << "    " << d->name << " @ " << d->currentline << std::endl;
 			}
@@ -458,7 +486,7 @@ int NpcScript::luaCreatureGetName2(lua_State *L)
 	const char* s = lua_tostring(L, -1);
 	lua_pop(L,1);
 	Npc* mynpc = getNpc(L);
-	Creature *c = mynpc->game->getCreatureByName(std::string(s));
+	Creature *c = g_game.getCreatureByName(std::string(s));
 	
 	if(c && c->access == 0) {
 		lua_pushnumber(L, c->getID());
@@ -474,7 +502,7 @@ int NpcScript::luaCreatureGetName(lua_State *L)
 	int id = (int)lua_tonumber(L, -1);
 	lua_pop(L,1);
 	Npc* mynpc = getNpc(L);
-	lua_pushstring(L, mynpc->game->getCreatureByID(id)->getName().c_str());
+	lua_pushstring(L, g_game.getCreatureByID(id)->getName().c_str());
 	return 1;
 }
 
@@ -483,7 +511,7 @@ int NpcScript::luaCreatureGetPos(lua_State *L)
 	int id = (int)lua_tonumber(L, -1);
 	lua_pop(L,1);
 	Npc* mynpc = getNpc(L);
-	Creature* c = mynpc->game->getCreatureByID(id);
+	Creature* c = g_game.getCreatureByID(id);
 	
 	if(!c){
 		lua_pushnil(L);

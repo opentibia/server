@@ -191,6 +191,33 @@ bool SpawnManager::loadSpawnsXML(std::string filename)
 
 						spawn->addMonster(name, direction, x, y, spawntime * 1000);
 					}
+					else if(xmlStrcmp(tmp->name, (const xmlChar*) "npc") == 0){
+						nodeValue = (char*)xmlGetProp(tmp, (const xmlChar *)"name");
+						if(nodeValue) {
+							name = nodeValue;
+							xmlFreeOTSERV(nodeValue);
+						}
+						else{
+							tmp = tmp->next;
+							break;
+						}
+
+						Npc* npc = new Npc(name);
+						if(!npc->isLoaded()){
+							delete npc;
+
+							tmp = tmp->next;
+							break;
+						}
+						
+						// Place the npc
+						if(!g_game.placeCreature(centerpos, npc)){
+							delete npc;
+
+							tmp = tmp->next;
+							break;
+						}
+					}
 
 					tmp = tmp->next;
 				}

@@ -28,7 +28,7 @@
 #include "monsters.h"
 #include "game.h"
 #include "actions.h"
-//#include "house.h"
+#include "house.h"
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
@@ -59,6 +59,7 @@ s_defcommands Commands::defined_commands[] = {
 	{"/getonline",&Commands::onlineList},
 	{"/a",&Commands::teleportNTiles},
 	{"/kick",&Commands::kickPlayer},
+	{"/exiva",&Commands::exivaPlayer},
 	//{"/invite",&Commands::invitePlayer},
 	//{"/uninvite",&Commands::uninvitePlayer},
 };
@@ -87,22 +88,20 @@ bool Commands::loadXml(const std::string& _datadir)
 	std::transform(filename.begin(), filename.end(), filename.begin(), tolower);
 	xmlDocPtr doc = xmlParseFile(filename.c_str());
 
-	if (doc){
+	if(doc){
 		this->loaded = true;
 		xmlNodePtr root, p;
 		root = xmlDocGetRootElement(doc);
 		
-		if (xmlStrcmp(root->name,(const xmlChar*) "commands")){
+		if(xmlStrcmp(root->name,(const xmlChar*) "commands")){
 			xmlFreeDoc(doc);
 			return false;
 		}
+
 		p = root->children;
         
-		while (p)
-		{
-			const char* str = (char*)p->name;
-			
-			if (strcmp(str, "command") == 0){
+		while (p){
+			if(xmlStrcmp(p->name, (const xmlChar*) "command") == 0){
 				char *tmp = (char*)xmlGetProp(p, (const xmlChar *) "cmd");
 				if(tmp){
 					CommandMap::iterator it = commandMap.find(tmp);
@@ -203,7 +202,7 @@ bool Commands::exeCommand(Creature* creature, const std::string& cmd)
 
 bool Commands::placeNpc(Creature* creature, const std::string& cmd, const std::string& param)
 {
-	Npc* npc = new Npc(param, game);
+	Npc* npc = new Npc(param);
 	if(!npc->isLoaded()){
 		delete npc;
 		return true;
@@ -229,7 +228,7 @@ bool Commands::placeNpc(Creature* creature, const std::string& cmd, const std::s
 
 bool Commands::placeMonster(Creature* creature, const std::string& cmd, const std::string& param)
 {
-	Monster* monster = Monster::createMonster(param, game);
+	Monster* monster = Monster::createMonster(param);
 	if(!monster){
 		return false;
 	}
@@ -263,7 +262,7 @@ bool Commands::placeMonster(Creature* creature, const std::string& cmd, const st
 
 bool Commands::placeSummon(Creature* creature, const std::string& cmd, const std::string& param)
 {
-	Monster* monster = Monster::createMonster(param, game);
+	Monster* monster = Monster::createMonster(param);
 	if(!monster){
 		return false;
 	}
@@ -619,6 +618,41 @@ bool Commands::kickPlayer(Creature* c, const std::string &cmd, const std::string
 			return true;
 		}
 		playerKick->kickPlayer();
+		return true;
+	}
+	return false;
+}
+
+bool Commands::exivaPlayer(Creature* c, const std::string &cmd, const std::string &param)
+{
+	Player* playerExiva = game->getPlayerByName(param);
+	if(playerExiva){
+		const Position lookPos = c->getPosition();
+		const Position searchPos = playerExiva->getPosition();
+
+		if(Position::areInRange<4, 4, 0>(lookPos, searchPos)){
+			//a. From 1 to 4 sq's [Person] is standing next to you.
+		}
+		else if(Position::areInRange<100, 100, 0>(lookPos, searchPos)){
+			//b. From 5 to 100 sq's [Person] is to the south, north, east, west.
+		}
+		else if(Position::areInRange<274, 274, 0>(lookPos, searchPos)){
+			//c. From 101 to 274 sq's [Person] is far to the south, north, east, west.
+		}
+		else{
+			//d. From 275 to infinite sq's [Person] is very far to the south, north, east, west.
+		}
+
+		/*
+		So we have the next results:
+
+		There are another three possible phrases to inform you which are:
+
+		e. South-west, s-e, n-w, n-e (corner coordinates): this phrase appears if the player you're looking for has moved five squares in any direction from the south, north, east or west.
+		f. Lower level to the (direction): this phrase applies if the person you're looking for is from 1-25 squares up/down the actual floor you're in.
+		g. Higher level to the (direction): this phrase applies if the person you're looking for is from 1-25 squares up/down the actual floor you're in.
+		*/
+
 		return true;
 	}
 	return false;

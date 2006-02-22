@@ -57,6 +57,7 @@ public:
 	static int luaSelfGetPos(lua_State *L);
 	
 	bool isLoaded(){return loaded;}
+
 protected:
 	int registerFunctions();
 	Npc* npc;
@@ -66,7 +67,7 @@ protected:
 class Npc : public Creature
 {
 public:
-	Npc(const std::string& name, Game* game);
+	Npc(const std::string& name);
 	virtual ~Npc();
 
 	virtual Npc* getNpc() {return this;};
@@ -81,8 +82,6 @@ public:
 	
 	void speak(const std::string &text){};
 	const std::string& getName() const {return name;};
-	
-	Game* game;
 	
 	void doSay(std::string msg);
 	void doMove(int dir);

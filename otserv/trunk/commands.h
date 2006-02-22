@@ -67,6 +67,7 @@ protected:
 	bool onlineList(Creature* creature, const std::string& cmd, const std::string& param);
 	bool teleportNTiles(Creature* creature, const std::string& cmd, const std::string& param);
 	bool kickPlayer(Creature* creature, const std::string &cmd, const std::string &param);
+	bool exivaPlayer(Creature* creature, const std::string &cmd, const std::string &param);
 	//bool invitePlayer(Creature* creature, const std::string& cmd, const std::string& param);
 	//bool uninvitePlayer(Creature* creature, const std::string& cmd, const std::string& param);
 	
