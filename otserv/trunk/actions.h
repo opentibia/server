@@ -182,6 +182,7 @@ public:
 	
 	//get tile info
 	static int luaActionGetTilePzInfo(lua_State *L);
+	static int luaActionGetTileHouseInfo(lua_State *L);
 	
 	//get player info functions
 	static int luaActionGetPlayerFood(lua_State *L);

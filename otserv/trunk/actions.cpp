@@ -706,6 +706,8 @@ int ActionScript::registerFunctions()
 	
 	//getTilePzInfo(pos) 1 is pz. 0 no pz.
 	lua_register(luaState, "getTilePzInfo", ActionScript::luaActionGetTilePzInfo);
+	//getTileHouseInfo(pos) 1 is houser. 0 no house.
+	lua_register(luaState, "getTileHouseInfo", ActionScript::luaActionGetTileHouseInfo);
 	
 	//getItemRWInfo(uid)
 	lua_register(luaState, "getItemRWInfo", ActionScript::luaActionGetItemRWInfo);
@@ -1789,6 +1791,32 @@ int ActionScript::luaActionGetTilePzInfo(lua_State *L)
 	}
 	return 1;
 }
+
+int ActionScript::luaActionGetTileHouseInfo(lua_State *L)
+{
+	//getTileHouseInfo(pos)
+	PositionEx pos;
+	internalGetPositionEx(L,pos);
+	
+	ActionScript *action = getActionScript(L);
+	
+	Tile *tile = action->game->map->getTile(pos);
+	if(tile){
+		if(HouseTile* houseTile = dynamic_cast<HouseTile*>(tile)){
+			House* house = houseTile->getHouse();
+			lua_pushnumber(L, 1);
+		}
+		else{
+			lua_pushnumber(L, 0);
+		}
+	}
+	else{
+		std::cout << "luagetTileHouseInfo: Tile not found" << std::endl;
+		lua_pushnumber(L, -1);
+	}
+	return 1;
+}
+
 
 int ActionScript::luaActionDoSummonCreature(lua_State *L){
 	//doSummonCreature(name, position)
