@@ -32,7 +32,7 @@
 #include <hash_set>
 #endif
 
-//#include "boost/regex.hpp"
+#include "boost/regex.hpp"
 
 #include "definitions.h"
 #include "position.h"
@@ -65,12 +65,12 @@ private:
 	typedef stdext::hash_set<uint32_t> GuildList; //TODO: include ranks
 	#endif
 	typedef std::list<std::string> ExpressionList;
-	//typedef std::list<std::pair<boost::regex, bool> > RegExList;
+	typedef std::list<std::pair<boost::regex, bool> > RegExList;
 	std::string list;
 	PlayerList playerList;
 	GuildList guildList;
 	ExpressionList expressionList;
-	//RegExList regExList;
+	RegExList regExList;
 };
 
 class Door : public Item
@@ -124,9 +124,6 @@ public:
 	~House();
 	
 	void addTile(HouseTile* tile);
-	//ReturnValue addGuest(const Player* player);
-	//ReturnValue addGuest(const std::string& name);
-	//ReturnValue removeGuest(const std::string& name);
 	
 	bool canEditAccessList(unsigned long listId, const Player* player);
 	// listId special values:

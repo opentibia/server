@@ -28,8 +28,8 @@
 
 bool fileExists(const char* filename);
 void replaceString(std::string& str, const std::string sought, const std::string replacement);
-inline void trim_right(std::string &source, const std::string &t);
-inline void trim_left(std::string &source, const std::string &t);
+void trim_right(std::string &source, const std::string &t);
+void trim_left(std::string &source, const std::string &t);
 int random_range(int lowest_number, int highest_number);
 void hexdump(unsigned char *_data, int _len);
 char upchar(char c);
