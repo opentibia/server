@@ -18,20 +18,8 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
+#include "tools.h"
 
-#include <string>
-#include <algorithm>
-#include <stdio.h>
-#include <stdlib.h>
-/*
-int compareNoCase(std::string s1, std::string s2)
-{
-	std::transform(s1.begin(), s1.end(), s1.begin(), tolower);
-	std::transform(s2.begin(), s2.end(), s2.begin(), tolower);
-
-	return strcmp(s1.c_str(), s2.c_str());
-}
-*/
 bool fileExists(const char* filename)
 {
 	FILE* f = fopen(filename, "rb");
@@ -40,6 +28,28 @@ bool fileExists(const char* filename)
 		fclose(f);
 
 	return exists;
+}
+
+void replaceString(std::string& str, const std::string sought, const std::string replacement)
+{
+	int pos = 0;
+	int start = 0;
+	int soughtLen = sought.length();
+	int replaceLen = replacement.length();
+	while((pos = str.find(sought, start)) != std::string::npos){
+		str = str.substr(0, pos) + replacement + str.substr(pos + soughtLen);
+		start = pos + replaceLen;
+	}
+}
+
+inline void trim_right(std::string &source, const std::string &t)
+{
+	source.erase(source.find_last_not_of(t)+1);
+}
+
+inline void trim_left(std::string &source, const std::string &t)
+{
+	source.erase(0, source.find_first_not_of(t));
 }
 
 //////////////////////////////////////////////////

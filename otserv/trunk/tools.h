@@ -18,12 +18,18 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-
 #ifndef __OTSERV_TOOLS_H
 #define __OTSERV_TOOLS_H
 
-//int compareNoCase(std::string s1, std::string s2);
+#include <string>
+#include <algorithm>
+#include <stdio.h>
+#include <stdlib.h>
+
 bool fileExists(const char* filename);
+void replaceString(std::string& str, const std::string sought, const std::string replacement);
+inline void trim_right(std::string &source, const std::string &t);
+inline void trim_left(std::string &source, const std::string &t);
 int random_range(int lowest_number, int highest_number);
 void hexdump(unsigned char *_data, int _len);
 char upchar(char c);
