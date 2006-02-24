@@ -906,9 +906,6 @@ void Monster::reThink(bool updateOnlyState /* = true*/)
 	}
 	else {
 		if(state == STATE_IDLE){
-			//bool oldExecEvents = g_game.isExecutingEvents;
-			//game->isExecutingEvents = true;
-
 			SpectatorVec list;
 			SpectatorVec::iterator it;
 
@@ -918,8 +915,6 @@ void Monster::reThink(bool updateOnlyState /* = true*/)
 					onCreatureAppear(*it, false);
 				}
 			}
-
-			//g_game.isExecutingEvents = oldExecEvents;
 		}
 
 		//change target
@@ -971,20 +966,10 @@ void Monster::reThink(bool updateOnlyState /* = true*/)
 							Monster *summon = createMonster((*it).name);
 							if(summon){
 								Position summonPos = getPosition();
-
-								addSummon(summon);
-								if(!g_game.placeCreature(summonPos, summon)){
-									removeSummon(summon);
+								
+								if(g_game.placeCreature(summonPos, summon)){
+									addSummon(summon);
 								}
-							
-
-								//HACK, place a summon here can make us removed from the map.. no idea how
-								//monster class need to be redone from the beginning...
-								if(isRemoved()){
-									return;
-								}
-								//HACK, place a summon here can make us removed from the map.. no idea how
-								//monster class need to be redone from the beginning...
 							}
 						}
 					}
