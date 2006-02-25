@@ -454,7 +454,7 @@ protected:
 	LightInfo itemsLight;
 	
 	#ifdef __SKULLSYSTEM__
-	uint64_t redSkullTicks;
+	int64_t redSkullTicks;
 	skulls_t skull;
 	typedef std::set<long> AttackedSet;
 	AttackedSet attackedSet;
