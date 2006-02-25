@@ -22,6 +22,8 @@
 #ifndef __DEFINITIONS_H__
 #define __DEFINITIONS_H__
 
+#include "exception.h"
+
 typedef unsigned long long uint64_t;
 
 #ifdef XML_GCC_FREE
@@ -33,7 +35,11 @@ typedef unsigned long long uint64_t;
 #ifdef __DEBUG_EXCEPTION_REPORT__
 #define DEBUG_REPORT int *a = NULL; *a = 1;
 #else
-#define DEBUG_REPORT
+	#ifdef __EXCEPTION_TRACER__
+	#define DEBUG_REPORT ExceptionHandler::dumpStack();
+	#else
+	#define DEBUG_REPORT
+	#endif
 #endif
 
 #if defined __WINDOWS__ || defined WIN32

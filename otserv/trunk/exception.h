@@ -22,16 +22,6 @@
 #ifndef __EXCEPTION_H__
 #define __EXCEPTION_H__
 
-#include <map>
-#include <string>
-
-typedef std::map<unsigned long, std::string> FunctionMap;
-
-struct SEHChain{
-	SEHChain *prev;
-	void *SEHfunction;
-};
-
 class ExceptionHandler
 {
 public:
@@ -39,7 +29,12 @@ public:
 	~ExceptionHandler();
 	bool InstallHandler();
 	bool RemoveHandler();
+	static void dumpStack();
 private:
+	struct SEHChain{
+		SEHChain *prev;
+		void *SEHfunction;
+	};
 	bool LoadMap();
 	bool installed;
 	SEHChain chain;

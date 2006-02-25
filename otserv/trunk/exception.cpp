@@ -29,6 +29,12 @@
 #include "otsystem.h"
 #include "exception.h"
 
+#include <map>
+#include <string>
+
+typedef std::map<unsigned long, std::string> FunctionMap;
+
+
 #if defined WIN32 || defined __WINDOWS__
 #include "excpt.h"
 #include "tlhelp32.h"
@@ -351,9 +357,7 @@ bool ExceptionHandler::LoadMap(){
 				std::string::size_type pos2 = line.find_first_not_of(space,pos+10);
 				if(line[pos2] == '0' && line[pos2+1] == 'x')
 					continue;
-				std::string *savestring = new std::string;
-				*savestring = line.substr(pos2,line.size() - pos2);
-				functionMap[offset] = *savestring;
+				functionMap[offset] = line.substr(pos2,line.size() - pos2);
 				if(offset > max_off)
 					max_off = offset;
 				if(offset < min_off)
@@ -373,3 +377,89 @@ bool ExceptionHandler::LoadMap(){
 	return true;
 };
 #endif //__GNUC__
+
+void ExceptionHandler::dumpStack()
+{
+	#ifndef __GNUC__
+	return;
+	#endif
+	
+	unsigned long *esp;
+	unsigned long *next_ret;
+	unsigned long stack_val;
+	unsigned long *stacklimit;
+	unsigned long *stackstart;
+	unsigned long nparameters = 0;
+	unsigned long foundRetAddress = 0;
+	_MEMORY_BASIC_INFORMATION mbi;
+	
+	std::cout << "Error: generating report file..." << std::endl;
+	std::ofstream output("report.txt",std::ios_base::app);	
+	output.flags(std::ios::hex | std::ios::showbase);
+	time_t rawtime;
+	time(&rawtime);
+	output << "*****************************************************" << std::endl;
+	output << "Stack dump - " << std::ctime(&rawtime) << std::endl;
+	output << "Compiler info - " << COMPILER_STRING << std::endl;
+	output << "Compilation Date - " << COMPILATION_DATE << std::endl << std::endl;
+
+	#ifdef __GNUC__
+	__asm__ ("movl %%esp, %0;":"=r"(esp)::);
+	#else
+	//
+	#endif
+	
+	VirtualQuery(esp, &mbi, sizeof(mbi));
+	stacklimit = (unsigned long*)((unsigned long)(mbi.BaseAddress) + mbi.RegionSize);
+	
+	output << "---Stack Trace---" << std::endl;
+	output << "From: " << (unsigned long)esp <<
+		" to: " << (unsigned long)stacklimit << std::endl;
+	
+	stackstart = esp;
+	#ifdef __GNUC__
+	__asm__ ("movl %%ebp, %0;":"=r"(next_ret)::);
+	#else
+	//
+	#endif
+	unsigned long frame_param_counter;
+	frame_param_counter = 0;
+	while(esp < stacklimit){
+		stack_val = *esp;
+		if(foundRetAddress)
+			nparameters++;
+		
+		if(esp - stackstart < 20 || nparameters < 10 || std::abs(esp - next_ret) < 10 || frame_param_counter < 8){
+			output  << (unsigned long)esp << " | ";
+			printPointer(&output, stack_val);
+			if(esp == next_ret){
+				output << " \\\\\\\\\\\\ stack frame //////";
+			}
+			else if(esp - next_ret == 1){
+				output << " <-- ret" ;
+			}
+			else if(esp - next_ret == 2){
+				next_ret = (unsigned long*)*(esp - 2);
+				frame_param_counter = 0;
+			}
+			frame_param_counter++;
+			output << std::endl;
+		}
+		if(stack_val >= min_off && stack_val <= max_off){
+			foundRetAddress++;
+			//
+			FunctionMap::iterator functions;
+			for(functions = functionMap.begin(); functions != functionMap.end(); ++functions) {
+				if(functions->first > stack_val && functions != functionMap.begin()) {
+					functions--;
+					output << (unsigned long)esp << "  " << 
+					functions->second <<"("  << stack_val <<")" << std::endl;
+					break;
+				}
+			}
+		}
+		esp++;
+	}
+	output << "*****************************************************" << std::endl;
+	output.close();
+}
