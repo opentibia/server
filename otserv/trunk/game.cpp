@@ -63,8 +63,6 @@ extern Chat g_chat;
 
 extern IPList bannedIPs;
 
-//
-
 GameState::GameState(Game *game, const Range &range)
 {
 	this->game = game;
@@ -73,11 +71,7 @@ GameState::GameState(Game *game, const Range &range)
 
 GameState::~GameState()
 {
-	/*
-	for(std::list<Creature*>::iterator it = removedList.begin(); it != removedList.end(); ++it){
-		(*it)->setParent(NULL);
-	}
-	*/
+	//
 }
 
 void GameState::onAttack(Creature* attacker, const Position& pos, const MagicEffectClass* me)
@@ -2695,15 +2689,11 @@ bool Game::playerAcceptTrade(Player* player)
 	if(player->isRemoved())
 		return false;
 
-	player->setAcceptTrade(true);
+	player->setTradeState(TRADE_ACCEPT);
 	Player* tradePartner = player->tradePartner;
-	if(tradePartner && tradePartner->getAcceptTrade()){
+	if(tradePartner && tradePartner->getTradeState() == TRADE_ACCEPT){
 		Item* tradeItem1 = player->tradeItem;
 		Item* tradeItem2 = tradePartner->tradeItem;
-
-		//reset trade status
-		player->setAcceptTrade(false);
-		tradePartner->setAcceptTrade(false);
 
 		std::map<Item*, unsigned long>::iterator it;
 
@@ -2732,6 +2722,9 @@ bool Game::playerAcceptTrade(Player* player)
 				Cylinder* cylinder1 = tradeItem1->getParent();
 				Cylinder* cylinder2 = tradeItem2->getParent();
 
+				player->setTradeState(TRADE_TRANSFER);
+				tradePartner->setTradeState(TRADE_TRANSFER);
+
 				internalMoveItem(cylinder1, tradePartner, 0, tradeItem1, tradeItem1->getItemCount());
 				internalMoveItem(cylinder2, player, 0, tradeItem2, tradeItem2->getItemCount());
 
@@ -2744,7 +2737,14 @@ bool Game::playerAcceptTrade(Player* player)
 			tradePartner->sendTextMessage(MSG_SMALLINFO, "Sorry not possible.");
 		}
 
+		player->setTradeState(TRADE_NONE);
+		player->tradeItem = NULL;
+		player->tradePartner = NULL;
 		player->sendCloseTrade();
+
+		tradePartner->setTradeState(TRADE_NONE);
+		tradePartner->tradeItem = NULL;
+		tradePartner->tradePartner = NULL;
 		tradePartner->sendCloseTrade();
 
 		return isSuccess;
@@ -2839,7 +2839,10 @@ bool Game::playerCloseTrade(Player* player)
 		}
 	}
 
-	player->setAcceptTrade(false);
+	player->setTradeState(TRADE_NONE);
+	player->tradeItem = NULL;
+	player->tradePartner = NULL;
+
 	player->sendTextMessage(MSG_SMALLINFO, "Trade cancelled.");
 	player->sendCloseTrade();
 
@@ -2852,7 +2855,10 @@ bool Game::playerCloseTrade(Player* player)
 			}
 		}
 
-		tradePartner->setAcceptTrade(false);
+		tradePartner->setTradeState(TRADE_NONE);
+		tradePartner->tradeItem = NULL;
+		tradePartner->tradePartner = NULL;
+
 		tradePartner->sendTextMessage(MSG_SMALLINFO, "Trade cancelled.");
 		tradePartner->sendCloseTrade();
 	}

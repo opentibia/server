@@ -79,17 +79,18 @@ enum playervoc_t {
 	VOCATION_KNIGHT = 4
 };
 
-enum freeslot_t{
+enum freeslot_t {
 	SLOT_TYPE_NONE,
 	SLOT_TYPE_INVENTORY,
 	SLOT_TYPE_CONTAINER
 };
 
-enum trade_state {
+enum tradestate_t {
 	TRADE_NONE,
 	TRADE_INITIATED,
 	TRADE_ACCEPT,
-	TRADE_ACKNOWLEDGE
+	TRADE_ACKNOWLEDGE,
+	TRADE_TRANSFER
 };
 
 
@@ -249,8 +250,8 @@ public:
 	
 	virtual std::string getDescription(int32_t lookDistance) const;
 	
-	void setAcceptTrade(bool b);
-	bool getAcceptTrade() {return (tradeState == TRADE_ACCEPT);};
+	void setTradeState(tradestate_t state) {tradeState = state;};
+	tradestate_t getTradeState() {return tradeState;};
 	Item* getTradeItem() {return tradeItem;};
 	
 	void notifyLogIn(Player* player);
@@ -402,7 +403,7 @@ protected:
 	//trade variables
 	//unsigned long tradePartner;
 	Player* tradePartner;
-	trade_state tradeState;
+	tradestate_t tradeState;
 	Item* tradeItem;
 	
 	//autowalking

@@ -1184,19 +1184,6 @@ bool Player::CanSee(int x, int y, int z) const
   return client->CanSee(x, y, z);
 }
 
-void Player::setAcceptTrade(bool b)
-{
-	if(b) {
-		tradeState = TRADE_ACCEPT;
-	}
-	else {
-		tradeItem = NULL;
-		//tradePartner = 0;
-		tradePartner = NULL;
-		tradeState = TRADE_NONE;
-	}
-}
-
 Depot* Player::getDepot(uint32_t depotId, bool autoCreateDepot)
 {	
 	DepotMap::iterator it = depots.find(depotId);
@@ -1558,7 +1545,7 @@ void Player::onAddTileItem(const Position& pos, const Item* item)
 
 void Player::onUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* olditem, const Item* newitem)
 {
-	if(tradeItem && olditem == tradeItem){
+	if(tradeItem && olditem == tradeItem && tradeState != TRADE_TRANSFER){
 		g_game.playerCloseTrade(this);
 	}
 }
@@ -1567,7 +1554,7 @@ void Player::onRemoveTileItem(const Position& pos, uint32_t stackpos, const Item
 {
 	checkTradeState(item);
 
-	if(tradeItem){
+	if(tradeItem && tradeState != TRADE_TRANSFER){
 		const Container* container = item->getContainer();
 		if(container && container->isHoldingItem(tradeItem)){
 			g_game.playerCloseTrade(this);
@@ -1626,9 +1613,6 @@ void Player::onCreatureMove(const Creature* creature, const Position& oldPos, ui
 	Creature* targetCreature = getAttackedCreature();
 	if((creature == this && targetCreature) || targetCreature == creature){
 		if(!Position::areInRange<7,5,0>(targetCreature->getPosition(), getPosition())){
-			//(std::abs(getPosition().x - targetCreature->getPosition().x) > 7) ||
-			//(std::abs(getPosition().y - targetCreature->getPosition().y) > 5) || 
-			//(getPosition().z != targetCreature->getPosition().z))
 			setAttackedCreature(NULL);
 			sendTextMessage(MSG_SMALLINFO, "Target lost.");
 			sendCancelAttacking();
@@ -1638,18 +1622,12 @@ void Player::onCreatureMove(const Creature* creature, const Position& oldPos, ui
 	if(creature == this){
 		if(tradeItem){
 			if(!Position::areInRange<1,1,0>(tradeItem->getPosition(), getPosition())){
-				//(std::abs(getPosition().x - tradeItem->getPosition().x) > 1) ||
-				//(std::abs(getPosition().y - tradeItem->getPosition().y) > 1) ||
-				//(getPosition().z != tradeItem->getPosition().z))
-					g_game.playerCloseTrade(this);
+				g_game.playerCloseTrade(this);
 			}
 		}
 
 		if(tradePartner){
 			if(!Position::areInRange<2,2,0>(tradePartner->getPosition(), getPosition())){
-				//(std::abs(tradePartner->getPosition().x - getPosition().x) > 2) ||
-				//(std::abs(tradePartner->getPosition().y - getPosition().y) > 2) ||
-				//(tradePartner->getPosition().z != getPosition().z))
 				g_game.playerCloseTrade(this);
 			}
 		}
@@ -1704,7 +1682,7 @@ void Player::onRemoveContainerItem(const Container* container, uint8_t slot, con
 
 	checkTradeState(item);
 	
-	if(tradeItem){
+	if(tradeItem && tradeState != TRADE_TRANSFER){
 		if(tradeItem->getParent() != container && container->isHoldingItem(tradeItem)){
 			g_game.playerCloseTrade(this);
 		}
@@ -1748,7 +1726,7 @@ void Player::onRemoveInventoryItem(slots_t slot, const Item* item)
 	client->sendRemoveInventoryItem(slot);
 	checkTradeState(item);
 
-	if(tradeItem){
+	if(tradeItem && tradeState != TRADE_TRANSFER){
 		const Container* container = item->getContainer();
 		if(container && container->isHoldingItem(tradeItem)){
 			g_game.playerCloseTrade(this);
@@ -1758,7 +1736,7 @@ void Player::onRemoveInventoryItem(slots_t slot, const Item* item)
 
 void Player::checkTradeState(const Item* item)
 {
-	if(tradeItem){
+	if(tradeItem && tradeState != TRADE_TRANSFER){
 		if(tradeItem == item){
 			g_game.playerCloseTrade(this);
 		}
