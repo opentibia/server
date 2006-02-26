@@ -992,8 +992,6 @@ void Game::moveCreature(Player* player, Cylinder* fromCylinder, Cylinder* toCyli
 		ret = RET_NOTPOSSIBLE;
 	}
 	else if(!Position::areInRange<1,1,0>(moveCreature->getPosition(), player->getPosition())){
-		//(std::abs(player->getPosition().x - moveCreature->getPosition().x) > 1) ||
-		//(std::abs(player->getPosition().y - moveCreature->getPosition().y) > 1))
 		ret = RET_TOOFARAWAY;
 	}
 	else{
@@ -1178,8 +1176,6 @@ void Game::moveItem(Player* player, Cylinder* fromCylinder, Cylinder* toCylinder
 		ret = RET_FIRSTGODOWNSTAIRS;
 	}
 	else if(!Position::areInRange<1,1,0>(player->getPosition(), fromPos)){
-		//(std::abs(player->getPosition().x - fromPos.x) > 1) || 
-		//(std::abs(player->getPosition().y - fromPos.y) > 1))
 		ret = RET_TOOFARAWAY;
 	}
 	//check throw distance
@@ -2617,9 +2613,6 @@ bool Game::playerRequestTrade(Player* player, const Position& pos, uint8_t stack
 	}
 
 	if(!Position::areInRange<2,2,0>(tradePartner->getPosition(), player->getPosition())){
-		//std::abs(tradePartner->getPosition().x - player->getPosition().x) > 2 ||
-		//std::abs(tradePartner->getPosition().y - player->getPosition().y) > 2 ||
-		//tradePartner->getPosition().z != player->getPosition().z)
 		std::stringstream ss;
 		ss << tradePartner->getName() << " tells you to move closer.";
 		player->sendTextMessage(MSG_INFO, ss.str().c_str());
@@ -2640,7 +2633,19 @@ bool Game::playerRequestTrade(Player* player, const Position& pos, uint8_t stack
 		player->sendCancelMessage(RET_NOTPOSSIBLE);
 		return false;
 	}
-	
+	else if(player->getPosition().z > tradeItem->getPosition().z){
+		player->sendCancelMessage(RET_FIRSTGOUPSTAIRS);
+		return false;
+	}
+	else if(player->getPosition().z < tradeItem->getPosition().z){
+		player->sendCancelMessage(RET_FIRSTGODOWNSTAIRS);
+		return false;
+	}
+	else if(!Position::areInRange<1,1,0>(tradeItem->getPosition(), player->getPosition())){
+		player->sendCancelMessage(RET_TOOFARAWAY);
+		return false;
+	}
+
 	std::map<Item*, unsigned long>::const_iterator it;
 	const Container* container = NULL;
 	for(it = tradeItems.begin(); it != tradeItems.end(); it++) {
