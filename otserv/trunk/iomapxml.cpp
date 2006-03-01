@@ -325,6 +325,7 @@ bool IOMapXML::LoadContainer(xmlNodePtr nodeitem,Container* ccontainer)
 	if(nodeitem == NULL){
 		return false;
 	}
+
 	tmp = nodeitem->children;
 	if(tmp == NULL){
 		return false;

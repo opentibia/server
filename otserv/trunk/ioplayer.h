@@ -28,20 +28,23 @@
 
 /** Baseclass for all Player-Loaders */
 class IOPlayer {
-  public:
+public:
 	static IOPlayer* instance();
+
 	/** Get a textual description of what source is used
 	  * \returns Name of the source*/
 	virtual char* getSourceDescription(){return "Player source: NULL";};
+
 	/** Load a player
-	  * \returns Wheter the player was successfully loaded
 	  * \param player Player structure to load to
 	  * \param name Name of the player
+	  * \returns returns true if the player was successfully loaded
 	  */
 	virtual bool loadPlayer(Player* player, std::string name);
+
 	/** Save a player
-	  * \returns Wheter the player was successfully saved
 	  * \param player the player to save
+	  * \returns true if the player was successfully saved
 	  */
 	virtual bool savePlayer(Player* player);
 	

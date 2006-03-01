@@ -9,14 +9,14 @@ class Map;
 
 /** Map-Loader implementation based on SQL format */
 class IOMapSQL : public IOMap {
-  public:
+public:
 	IOMapSQL(){};
 	~IOMapSQL(){};
-	std::string house;
-	virtual char* getSourceDescription(){ return "SQL (SQL based Map)"; };
-	bool loadMap(Map* map, std::string identifier);
-    bool SaveMap(Map* map, std::string identifier, int x, int y, int z);
-  //private:
+
+	virtual char* getSourceDescription(){ return "SQL"; };
+	virtual bool loadMap(Map* map, const std::string& identifier);
+	virtual bool loadSpawns();
+	virtual bool loadHouses();
 };
 
 #endif

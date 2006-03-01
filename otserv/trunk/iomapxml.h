@@ -32,7 +32,7 @@ class Map;
 
 /** Map-Loader implementation based on XML-Files */
 class IOMapXML : public IOMap {
-  public:
+public:
 	IOMapXML(){};
 	~IOMapXML(){};
 
@@ -40,12 +40,12 @@ class IOMapXML : public IOMap {
 	virtual bool loadMap(Map* map, const std::string& identifier);
 	virtual bool loadSpawns();
 	virtual bool loadHouses();
-
+	
 private:
 	std::string spawnfile;
 	std::string housefile;
 
-	bool LoadContainer(xmlNodePtr nodeitem,Container* ccontainer);
+	bool LoadContainer(xmlNodePtr nodeitem, Container* ccontainer);
 };
 
 #endif
