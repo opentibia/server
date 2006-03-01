@@ -802,17 +802,13 @@ bool Game::placeCreature(const Position &pos, Creature* creature, bool isLogin /
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::placeCreature()");
 
-	/*if(isExecutingEvents){
-		return false;
-	}*/
-
-	bool success = false;
+	bool isSuccess = false;
 	Player* player = creature->getPlayer();
 
 	if(!player || player->access != 0 || getPlayersOnline() < max_players){
-		success = map->placeCreature(pos, creature, forceLogin);		
-		if(success){
-			//std::cout << "place: " << creature << " " << creature->getID() << std::endl;
+		isSuccess = map->placeCreature(pos, creature, forceLogin);		
+		if(isSuccess){
+			//std::cout << "placeCreature: " << creature << " " << creature->getID() << std::endl;
 
 			creature->useThing2();
 			creature->setID();
@@ -857,11 +853,8 @@ bool Game::placeCreature(const Position &pos, Creature* creature, bool isLogin /
 			}
 		}
 	}
-	else {
-		//we cant add the player, server is full	
-		success = false;
-	}
-  return success;
+
+	return isSuccess;
 }
 
 bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
@@ -869,10 +862,6 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::removeCreature()");
 	if(creature->isRemoved())
 		return false;
-
-	/*if(isExecutingEvents){
-		return false;
-	}*/
 
 #ifdef __DEBUG__
 	std::cout << "removing creature "<< std::endl;
@@ -1200,15 +1189,6 @@ void Game::moveItem(Player* player, Cylinder* fromCylinder, Cylinder* toCylinder
 ReturnValue Game::internalMoveItem(Cylinder* fromCylinder, Cylinder* toCylinder, int32_t index,
 	Item* item, uint32_t count)
 {
-	/*
-#ifdef __DEBUG__MOVESYS__
-	if(isExecutingEvents){
-		std::cout << "Error: [Game::internalMoveItem] - isExecutingEvents" << std::endl;
-		DEBUG_REPORT
-	}
-#endif
-	*/
-
 	if(!toCylinder){
 		return RET_NOTPOSSIBLE;
 	}
@@ -1326,15 +1306,6 @@ ReturnValue Game::internalMoveItem(Cylinder* fromCylinder, Cylinder* toCylinder,
 
 ReturnValue Game::internalAddItem(Cylinder* toCylinder, Item* item, bool test /*= false*/)
 {
-	/*
-#ifdef __DEBUG__MOVESYS__
-	if(isExecutingEvents){
-		std::cout << "Error: [Game::internalAddItem] - isExecutingEvents" << std::endl;
-		DEBUG_REPORT
-	}
-#endif
-	*/
-
 	if(toCylinder == NULL || item == NULL){
 		return RET_NOTPOSSIBLE;
 	}
@@ -1402,15 +1373,6 @@ ReturnValue Game::internalAddItem(Cylinder* toCylinder, Item* item, bool test /*
 
 ReturnValue Game::internalRemoveItem(Item* item, int32_t count /*= -1*/,  bool test /*= false*/)
 {
-	/*
-#ifdef __DEBUG__MOVESYS__
-	if(isExecutingEvents){
-		std::cout << "Error: [Game::internalRemoveItem] - isExecutingEvents" << std::endl;
-		DEBUG_REPORT
-	}
-#endif
-	*/
-
 	Cylinder* cylinder = item->getParent();
 	if(cylinder == NULL){
 		return RET_NOTPOSSIBLE;
@@ -1442,15 +1404,6 @@ ReturnValue Game::internalRemoveItem(Item* item, int32_t count /*= -1*/,  bool t
 
 Item* Game::transformItem(Item* item, uint16_t newtype, int32_t count /*= -1*/)
 {
-	/*
-#ifdef __DEBUG__MOVESYS__
-	if(isExecutingEvents){
-		std::cout << "Error: [Game::transformItem] - isExecutingEvents" << std::endl;
-		DEBUG_REPORT
-	}
-#endif
-	*/
-
 	if(item->getID() == newtype && count == -1)
 		return item;
 
@@ -1690,11 +1643,13 @@ bool Game::internalCreatureSaySpell(Creature *creature, const std::string &text)
 bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, const MagicEffectClass* me)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::creatureMakeMagic()");
-	
+
+	/*
 	if(this->isExecutingEvents){
 		this->isExecutingEvents = true;
 		return false;
 	}
+	*/
 
 	//#ifdef __DEBUG__
 //	cout << "creatureMakeMagic: " << (creature ? creature->getName() : "No name") << ", x: " << centerpos.x << ", y: " << centerpos.y << ", z: " << centerpos.z << std::endl;
@@ -1998,10 +1953,12 @@ bool Game::creatureOnPrepareMagicAttack(Creature *creature, Position pos, const 
 
 void Game::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fight_t damagetype)
 {
+	/*
 	if(this->isExecutingEvents){
 		this->isExecutingEvents = true;
 		return;
 	}
+	*/
 
 	if(!creatureOnPrepareAttack(creature, attackedCreature->getPosition()))
 		return;
