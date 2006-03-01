@@ -27,18 +27,18 @@
 typedef unsigned long long uint64_t;
 
 #ifdef XML_GCC_FREE
-#define xmlFreeOTSERV(s)	free(s)
+	#define xmlFreeOTSERV(s)	free(s)
 #else
-#define xmlFreeOTSERV(s)	xmlFree(s)
+	#define xmlFreeOTSERV(s)	xmlFree(s)
 #endif
 
 #ifdef __DEBUG_EXCEPTION_REPORT__
-#define DEBUG_REPORT int *a = NULL; *a = 1;
+	#define DEBUG_REPORT int *a = NULL; *a = 1;
 #else
 	#ifdef __EXCEPTION_TRACER__
-	#define DEBUG_REPORT ExceptionHandler::dumpStack();
+		#define DEBUG_REPORT ExceptionHandler::dumpStack();
 	#else
-	#define DEBUG_REPORT
+		#define DEBUG_REPORT
 	#endif
 #endif
 
@@ -47,36 +47,40 @@ typedef unsigned long long uint64_t;
 #define OTSYS_THREAD_RETURN  void
 #define EWOULDBLOCK WSAEWOULDBLOCK
 
-#ifndef __GNUC__
-#include <cstring>
-inline int strcasecmp(const char *s1, const char *s2)
-{
-	return ::_stricmp(s1, s2);
-}
-
-typedef unsigned long uint32_t;
-typedef signed long int32_t;
-typedef unsigned short uint16_t;
-typedef unsigned char uint8_t;
-#endif
-
-#pragma warning(disable:4786) // msvc too long debug names in stl
-#pragma warning(disable:4250) // 'class1' : inherits 'class2::member' via dominance
-
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
+#ifdef __GNUC__
+	#include <ext/hash_map>
+	#define OTSERV_HASH_MAP __gnu_cxx::hash_map
 
 #else
+	#include <hash_map>
+	#define OTSERV_HASH_MAP stdext::hash_map
 
-#define OTSYS_THREAD_RETURN void*
+	#include <cstring>
+	inline int strcasecmp(const char *s1, const char *s2)
+	{
+		return ::_stricmp(s1, s2);
+	}
 
-#include <stdint.h>
-#include <string.h>
+	typedef unsigned long uint32_t;
+	typedef signed long int32_t;
+	typedef unsigned short uint16_t;
+	typedef unsigned char uint8_t;
 
-typedef int64_t __int64;
-
+	#pragma warning(disable:4786) // msvc too long debug names in stl
+	#pragma warning(disable:4250) // 'class1' : inherits 'class2::member' via dominance
 #endif
 
+//none-windows systems
+#else
+	#define OTSYS_THREAD_RETURN void*
+
+	#include <stdint.h>
+	#include <string.h>
+	#include <ext/hash_map>
+
+	#define OTSERV_HASH_MAP __gnu_cxx::hash_map
+	typedef int64_t __int64;
+
+#endif
 
 #endif // __DEFINITIONS_H__
