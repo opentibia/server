@@ -26,7 +26,7 @@
 
 #include "map.h"
 
-enum LoadMapError_t{
+enum MapError_t{
 	LOADMAPERROR_NONE,
 	LOADMAPERROR_CANNOTOPENFILE,
 	LOADMAPERROR_GETPROPFAILED,
@@ -55,20 +55,27 @@ public:
 	*/
 	virtual bool loadMap(Map* map, const std::string& identifier) = 0;
 
+	/** Load the spawns
+	  * \returns Returns true if the spawns was loaded successfully
+	*/
 	virtual bool loadSpawns() = 0;
+
+	/** Load the houses (not house tile-data)
+	  * \returns Returns true if the houses was loaded successfully
+	*/
 	virtual bool loadHouses() = 0;
 
-	LoadMapError_t getLastError() {return lasterrortype;}
+	MapError_t getLastError() {return lasterrortype;}
 	int getErrorCode() {return lasterrorcode;}
 
-	void setLastError(LoadMapError_t errtype, unsigned long _code = 0)
+	void setLastError(MapError_t errtype, unsigned long _code = 0)
 	{
 		lasterrorcode = _code;
 		lasterrortype = errtype;
 	}
 
-private:
-	LoadMapError_t lasterrortype;
+protected:
+	MapError_t lasterrortype;
 	unsigned long lasterrorcode;
 };
 
