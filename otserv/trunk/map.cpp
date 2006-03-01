@@ -56,43 +56,37 @@ extern LuaScript g_config;
 
 Map::Map()
 {
-	loader = NULL;
 	mapwidth = 0;
 	mapheight = 0;
 }
 
-
 Map::~Map()
 {
-	if(loader){
-		delete loader;
-		loader = NULL;
-	}
+	//
 }
-
 
 bool Map::loadMap(const std::string& identifier, const std::string& type)
 {
-	if(!loader){
-		/*if(type == "BIN"){
-			loader = new IOMapBin();
-			ret = SPAWN_BUILTIN;
-		}
-		else */if(type == "XML"){
-			loader = new IOMapXML();
-		}
-		else if(type == "OTBM"){
-			loader = new IOMapOTBM();
-		}
-		#ifdef ENABLESQLMAPSUPPORT
-		else if(type == "SQL"){
-			loader = new IOMapSQL();
-		}
-	#endif
-		else{
-			std::cout << "FATAL: Could not determine the map format!" << std::endl;
-			return false;
-		}
+	IOMap* loader;
+
+	/*if(type == "BIN"){
+		loader = new IOMapBin();
+		ret = SPAWN_BUILTIN;
+	}
+	else */if(type == "XML"){
+		loader = new IOMapXML();
+	}
+	else if(type == "OTBM"){
+		loader = new IOMapOTBM();
+	}
+	#ifdef ENABLESQLMAPSUPPORT
+	else if(type == "SQL"){
+		loader = new IOMapSQL();
+	}
+#endif
+	else{
+		std::cout << "FATAL: Could not determine the map format!" << std::endl;
+		return false;
 	}
 
 	std::cout << ":: Loading map from: " << loader->getSourceDescription() << std::endl;

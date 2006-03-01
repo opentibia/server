@@ -252,8 +252,6 @@ public:
 	int mapwidth, mapheight;
 	
 protected:    
-	IOMap* loader;
-
 	/**
 	* Get the Creatures within a specific Range */
 	void getSpectators(const Range& range, SpectatorVec& list);
