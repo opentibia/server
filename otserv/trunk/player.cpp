@@ -220,7 +220,7 @@ std::string Player::getDescription(int32_t lookDistance) const
 		else
 			s << "a member";
 		
-		s << " of " << guildName;
+		s << " of the " << guildName;
 		
 		if(guildNick.length())
 			s << " (" << guildNick << ")";
