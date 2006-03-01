@@ -37,6 +37,7 @@
 //#include "iomapbin.h"
 #include "iomapxml.h"
 #include "iomapotbm.h"
+#include "iomapserialize.h"
 
 #include "otsystem.h"
 #include <stdio.h>
@@ -47,61 +48,56 @@
 
 #include "player.h"
 #include "luascript.h"
-//#include "spells.h"
 
 #define EVENT_CHECKPLAYER          123
 #define EVENT_CHECKPLAYERATTACKING 124
 
 extern LuaScript g_config;
-//extern Spells spells;
 
-
-Map::Map() :
-	//spawnfile(""),
-	//housefile(""),
-	mapwidth(0),
-	mapheight(0)
+Map::Map()
 {
-	//
+	loader = NULL;
+	mapwidth = 0;
+	mapheight = 0;
 }
 
 
 Map::~Map()
 {
-	//
+	if(loader){
+		delete loader;
+		loader = NULL;
+	}
 }
 
 
-bool Map::loadMap(std::string filename, std::string filekind)
+bool Map::loadMap(const std::string& identifier, const std::string& type)
 {
-	IOMap* loader;
-	
-	/*if(filekind == "BIN"){
-		loader = new IOMapBin();
-		ret = SPAWN_BUILTIN;
-	}
-	else */if(filekind == "XML"){
-		loader = new IOMapXML();
-		//ret = SPAWN_XML;
-	}
-	else if(filekind == "OTBM"){
-		loader = new IOMapOTBM();
-		//ret = SPAWN_XML;
-	}
-	#ifdef ENABLESQLMAPSUPPORT
-	else if(filekind == "SQL"){
-		loader = new IOMapSQL();
-		//ret = SPAWN_SQL;
-	}
-#endif
-	else{
-		std::cout << "FATAL: Could not determine the filetype!" << std::endl;
-		return false;
+	if(!loader){
+		/*if(type == "BIN"){
+			loader = new IOMapBin();
+			ret = SPAWN_BUILTIN;
+		}
+		else */if(type == "XML"){
+			loader = new IOMapXML();
+		}
+		else if(type == "OTBM"){
+			loader = new IOMapOTBM();
+		}
+		#ifdef ENABLESQLMAPSUPPORT
+		else if(type == "SQL"){
+			loader = new IOMapSQL();
+		}
+	#endif
+		else{
+			std::cout << "FATAL: Could not determine the map format!" << std::endl;
+			return false;
+		}
 	}
 
 	std::cout << ":: Loading map from: " << loader->getSourceDescription() << std::endl;
 
-	bool loadMapSuccess = loader->loadMap(this, filename);
+	bool loadMapSuccess = loader->loadMap(this, identifier);
 
 	if(!loadMapSuccess){
 		switch(loader->getLastError()){
@@ -150,19 +146,12 @@ bool Map::loadMap(std::string filename, std::string filekind)
 	delete loader;
 
 	return true;
+}
 
-	/*
-	std::cout << ":: Loading map from: " << loader->getSourceDescription() << std::endl;
-	bool success = loader->loadMap(this, filename);
-	delete loader;
-	
-	if(success){
-		return ret;
-	}
-	else{
-		return MAP_LOADER_ERROR;
-	}
-	*/
+
+bool Map::saveMap(const std::string& identifier)
+{
+	return IOMapSerialize::getInstance()->saveMap(this, identifier);
 }
 
 Tile* Map::getTile(uint16_t _x, uint16_t _y, uint8_t _z)

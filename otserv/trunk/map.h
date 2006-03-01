@@ -43,6 +43,7 @@ class Game;
 
 class Tile;
 class Map;
+class IOMap;
 
 class Range{
 public:
@@ -188,11 +189,18 @@ public:
     
 	/**
 	* Load a map.
-	* \param filename Mapfile to load
-	* \param filetype type of the map, "OTBM", "OTX"
-	* \returns true if the map loaded successfully
+	* \param identifier file/database to load
+	* \param type map type "OTBM", "XML"
+	* \returns true if the map was loaded successfully
 	*/
-	bool loadMap(std::string filename, std::string filetype);
+	bool loadMap(const std::string& identifier, const std::string& type);
+
+	/**
+	* Save a map.
+	* \param identifier file/database to save to
+	* \returns true if the map was saved successfully
+	*/
+	bool saveMap(const std::string& identifier);
 
 	/**
 	* Get a single tile.
@@ -244,6 +252,8 @@ public:
 	int mapwidth, mapheight;
 	
 protected:    
+	IOMap* loader;
+
 	/**
 	* Get the Creatures within a specific Range */
 	void getSpectators(const Range& range, SpectatorVec& list);
@@ -253,14 +263,9 @@ protected:
 
 	friend class Game;
 
-	//FIXME friend for derived classes?
 	friend class IOMapOTBM;
 	friend class IOMapXML;
 	friend class IOMap;
-
-private:
-	//std::string spawnfile;
-	//std::string housefile;
 };
 
 #endif
