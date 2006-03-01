@@ -60,7 +60,7 @@ PKG_CHECK_MODULES(LUA50, lualib50 >= 5.0.0, , AC_MSG_ERROR([you need lua and lua
 AC_SUBST(LUA50_CFLAGS)
 AC_SUBST(LUA50_LIBS)
 
-AC_CHECK_HEADERS([boost/config.hpp boost/bind.hpp],[BOOST_LIBS="-lboost_thread-gcc-mt -lboost_filesystem-gcc-mt"],[AC_MSG_ERROR("boost headers are missing.")])
+AC_CHECK_HEADERS([boost/config.hpp boost/bind.hpp],[BOOST_LIBS="-lboost_thread-gcc-mt -lboost_regex-gcc-mt"],[AC_MSG_ERROR("boost headers are missing.")])
 AC_SUBST(BOOST_LIBS)
 
 if test -n "$MYSQL_FLAGS"; then 
