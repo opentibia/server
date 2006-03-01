@@ -55,7 +55,7 @@ public:
 	bool isInList(const Player* player);
 	
 	void getList(std::string& _list);
-	
+
 private:
 	#ifdef __GNUC__
 	typedef __gnu_cxx::hash_set<uint32_t> PlayerList;
@@ -116,6 +116,8 @@ enum AccessHouseLevel_t{
 	HOUSE_OWNER = 3,
 };
 
+typedef std::list<HouseTile*> HouseTileList;
+typedef std::list<Door*> HouseDoorList;
 
 class House
 {
@@ -148,14 +150,12 @@ public:
 
 	void addDoor(Door* door);
 	Door* getDoorByNumber(unsigned long doorId);
-
 	Door* getDoorByPosition(const Position& pos);
 
+	HouseTileList::iterator getHouseTileBegin() {return houseTiles.begin();}
+	HouseTileList::iterator getHouseTileEnd() {return houseTiles.end();}
+
 private:
-	
-	typedef std::list<HouseTile*> HouseTileList;
-	typedef std::list<Door*> HouseDoorList;
-	
 	uint32_t houseOwner;
 	HouseTileList houseTiles;
 	HouseDoorList doorList;
@@ -189,6 +189,9 @@ public:
 	}
 
 	bool loadHousesXML(std::string filename);
+
+	HouseMap::iterator getHouseBegin() {return houseMap.begin();}
+	HouseMap::iterator getHouseEnd() {return houseMap.end();}
 
 private:
 	HouseMap houseMap;
