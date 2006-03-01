@@ -141,7 +141,12 @@ bool Mailbox::sendItem(Item* item)
 	if(reciever == "" || dp == 0){ /**No need to continue if its still empty**/
 		return false;            
 	}
-     
+	
+	unsigned long guid,access;
+	if(!IOPlayer::instance()->getGuidByName(guid, access, reciever)){
+		return false;
+	}
+	
 	if(Player* player = g_game.getPlayerByName(reciever)){ 
 		Depot* depot = player->getDepot(dp, true);
               
@@ -153,7 +158,23 @@ bool Mailbox::sendItem(Item* item)
 	}
 	else if(IOPlayer::instance()->playerExists(reciever)){
 		Player* player = new Player(reciever, NULL);
-		IOPlayer::instance()->loadPlayer(player, reciever);
+		
+		if(!IOPlayer::instance()->loadPlayer(player, reciever)){
+			#ifdef __DEBUG_MAILBOX__
+			std::cout << "Failure: [Mailbox::sendItem], can not load player: " << reciever << std::endl;
+			#endif
+			delete player;
+			return false;
+		}
+		
+		#ifdef __DEBUG_MAILBOX__
+		std::string playerName = player->getName();
+		if(g_game.getPlayerByName(playerName)){
+			std::cout << "Failure: [Mailbox::sendItem], reciever is online: " << reciever << "," << playerName << std::endl;
+			delete player;
+			return false;
+		}
+		#endif
 
 		Depot* depot = player->getDepot(dp, true);
 		if(depot){
