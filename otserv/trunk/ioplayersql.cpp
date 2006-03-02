@@ -607,7 +607,7 @@ bool IOPlayerSQL::getGuidByName(unsigned long &guid, unsigned long &alvl, std::s
 	
 	mysql.connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str());
 	
-	query << "SELECeT name,id,access FROM players WHERE name='" << Database::escapeString(name) << "'";
+	query << "SELECT name,id,access FROM players WHERE name='" << Database::escapeString(name) << "'";
 	
 	if(!mysql.storeQuery(query, result) || result.getNumRows() != 1)
 		return false;
