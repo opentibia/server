@@ -30,7 +30,7 @@ IOMapSerializeSQL::IOMapSerializeSQL()
 	m_host = g_config.getGlobalString("sql_host");
 	m_user = g_config.getGlobalString("sql_user");
 	m_pass = g_config.getGlobalString("sql_pass");
-	//m_db   = g_config.getGlobalString("sql_db");
+	m_db   = g_config.getGlobalString("sql_db");
 }
 
 IOMapSerializeSQL::~IOMapSerializeSQL()
@@ -75,7 +75,7 @@ bool IOMapSerializeSQL::saveMap(Map* map, const std::string& identifier)
 	DBQuery query;
 	DBResult result;
 
-	db.connect(identifier.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str());
+	db.connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str());
 	
 	for(HouseMap::iterator it = Houses::getInstance().getHouseBegin(); it != Houses::getInstance().getHouseEnd(); ++it){
 		DBQuery query;

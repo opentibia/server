@@ -19,33 +19,23 @@
 //////////////////////////////////////////////////////////////////////
 
 
-#ifndef __IOMAPSERIALIZESQL_H__
-#define __IOMAPSERIALIZESQL_H__
+#ifndef __IOMAPSERIALIZEXML_H__
+#define __IOMAPSERIALIZEXML_H__
 
 #include "iomapserialize.h"
 #include "map.h"
 
 #include <string>
 
-class Database;
-class DBQuery;
-
-class IOMapSerializeSQL : public IOMapSerialize{
+class IOMapSerializeXML : public IOMapSerialize{
 public:
-	IOMapSerializeSQL();
-	virtual ~IOMapSerializeSQL();
+	IOMapSerializeXML();
+	virtual ~IOMapSerializeXML();
 
 	virtual bool loadMap(Map* map, const std::string& identifier);
 	virtual bool saveMap(Map* map, const std::string& identifier);
 
 protected:
-	std::string m_host;
-	std::string m_user;
-	std::string m_pass;
-	std::string m_db;
-
-	bool saveTile(Database& db, DBQuery& query, const Tile* tile);
-	bool loadTile(Database& db, DBQuery& query, Tile* tile);
 };
 
 #endif

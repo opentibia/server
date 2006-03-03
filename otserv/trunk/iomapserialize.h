@@ -43,25 +43,11 @@ public:
 	*/
 	virtual bool saveMap(Map* map, const std::string& identifier) = 0;
 
-	/*
-	MapError_t getLastError() {return lasterrortype;}
-	int getErrorCode() {return lasterrorcode;}
-
-	void setLastError(MapError_t errtype, unsigned long _code = 0)
-	{
-		lasterrorcode = _code;
-		lasterrortype = errtype;
-	}
-	*/
-
 protected:
 	static IOMapSerialize* _instance;
 
 	IOMapSerialize(){};
 	virtual ~IOMapSerialize(){};
-
-	//MapError_t lasterrortype;
-	//unsigned long lasterrorcode;
 };
 
 #endif

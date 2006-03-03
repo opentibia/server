@@ -26,11 +26,6 @@
 #include "ioplayerxml.h"
 #endif
 
-#ifdef __USE_MYSQL__
-#include "luascript.h"
-extern LuaScript g_config;
-#endif
-
 IOPlayer* IOPlayer::_instance = NULL;
 
 IOPlayer* IOPlayer::instance()

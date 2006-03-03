@@ -18,34 +18,25 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
+#include "iomapserializexml.h"
+#include "house.h"
 
-#ifndef __IOMAPSERIALIZESQL_H__
-#define __IOMAPSERIALIZESQL_H__
+IOMapSerializeXML::IOMapSerializeXML()
+{
+	//
+}
 
-#include "iomapserialize.h"
-#include "map.h"
+IOMapSerializeXML::~IOMapSerializeXML()
+{
+	//
+}
 
-#include <string>
+bool IOMapSerializeXML::loadMap(Map* map, const std::string& identifier)
+{
+	return false;
+}
 
-class Database;
-class DBQuery;
-
-class IOMapSerializeSQL : public IOMapSerialize{
-public:
-	IOMapSerializeSQL();
-	virtual ~IOMapSerializeSQL();
-
-	virtual bool loadMap(Map* map, const std::string& identifier);
-	virtual bool saveMap(Map* map, const std::string& identifier);
-
-protected:
-	std::string m_host;
-	std::string m_user;
-	std::string m_pass;
-	std::string m_db;
-
-	bool saveTile(Database& db, DBQuery& query, const Tile* tile);
-	bool loadTile(Database& db, DBQuery& query, Tile* tile);
-};
-
-#endif
+bool IOMapSerializeXML::saveMap(Map* map, const std::string& identifier)
+{
+	return false;
+}

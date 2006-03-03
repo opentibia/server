@@ -20,6 +20,12 @@
 
 #include "iomapserialize.h"
 
+#ifdef __USE_MYSQL__
+#include "iomapserializesql.h"
+#else
+#include "iomapserializexml.h"
+#endif
+
 IOMapSerialize* IOMapSerialize::_instance = NULL;
 
 IOMapSerialize* IOMapSerialize::getInstance()
