@@ -20,7 +20,8 @@ otserv_SOURCES = account.cpp container.cpp creature.cpp game.cpp ioaccount.cpp \
 	commands.cpp commands.h database.cpp database.h md5.cpp md5.h fileloader.cpp fileloader.h \
 	chat.cpp chat.h logger.h logger.cpp iomapotbm.h iomapotbm.cpp monsters.h monsters.cpp \
 	trashholder.cpp trashholder.h mailbox.cpp mailbox.h waitlist.cpp waitlist.h \
-	house.cpp house.h housetile.cpp housetile.h
+	house.cpp house.h housetile.cpp housetile.h iomapserialize.cpp iomapserialize.h \
+	iomapserializesql.cpp iomapserializesql.h iomapserializexml.cpp iomapserializexml.h
 else
 otserv_SOURCES = account.cpp container.cpp creature.cpp game.cpp ioaccount.cpp \
 	ioaccountxml.cpp iomapxml.cpp ioplayer.cpp ioplayerxml.cpp \
@@ -36,5 +37,6 @@ otserv_SOURCES = account.cpp container.cpp creature.cpp game.cpp ioaccount.cpp \
 	md5.cpp md5.h fileloader.cpp fileloader.h chat.cpp chat.h logger.cpp logger.h \
 	iomapotbm.h iomapotbm.cpp monsters.h monsters.cpp teleport.cpp teleport.h \
 	trashholder.cpp trashholder.h mailbox.cpp mailbox.h waitlist.cpp waitlist.h \
-	house.cpp house.h housetile.cpp housetile.h
+	house.cpp house.h housetile.cpp housetile.h iomapserialize.cpp iomapserialize.h \
+	iomapserializexml.cpp iomapserializexml.h
 endif
