@@ -34,7 +34,7 @@ IOMapSerialize* IOMapSerialize::getInstance()
 #ifdef __USE_MYSQL__
 		_instance = new IOMapSerializeSQL;
 #else
-		//_instance = new IOMapSerializeXML;
+		_instance = new IOMapSerializeXML;
 #endif
 	}
 

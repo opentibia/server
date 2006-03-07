@@ -743,9 +743,10 @@ int SpellScript::luaActionManaShield(lua_State *L)
 	lua_pop(L,1);
 	creature->manaShieldTicks = time;
 	
-	Player* p = dynamic_cast<Player*>(creature);
-	if(p)
-	     p->sendIcons();
+	if(Player* player = creature->getPlayer()){
+		player->sendIcons();
+	}
+
 	return 0;
 }
 
@@ -762,10 +763,10 @@ int SpellScript::luaActionChangeSpeed(lua_State *L)
 	lua_pop(L,1);
 	
 	spell->game->addEvent(makeTask(time, boost::bind(&Game::changeSpeed, spell->game,creature->getID(), creature->getNormalSpeed()) ) );
-	Player* p = dynamic_cast<Player*>(creature);
-	if(p){
-		spell->game->changeSpeed(creature->getID(), creature->getNormalSpeed()+speed);
-		p->sendIcons();
+
+	if(Player* player = creature->getPlayer()){
+		spell->game->changeSpeed(creature->getID(), creature->getNormalSpeed() + speed);
+		player->sendIcons();
 	}
 	
 	creature->hasteTicks = time;
@@ -853,7 +854,7 @@ int SpellScript::luaActionMakeRune(lua_State *L)
 	Creature* creature = spell->game->getCreatureByID((unsigned long)lua_tonumber(L, -1));
 	lua_pop(L,1);
 		
-	Player* player = dynamic_cast<Player*>(creature);
+	Player* player = creature->getPlayer();
 	if(player){
 		MagicEffectTargetClass magicTarget;
 
@@ -946,10 +947,9 @@ int SpellScript::luaActionMakeArrows(lua_State *L)
 	lua_pop(L,1);
 
 	Spell* spell = getSpell(L);
-	Creature* creature = spell->game->getCreatureByID((unsigned long)lua_tonumber(L, -1));
+	Player* player = spell->game->getPlayerByID((unsigned long)lua_tonumber(L, -1));
 	lua_pop(L,1);
  
-	Player* player = dynamic_cast<Player*>(creature);
 	if(player){
  		MagicEffectTargetClass magicTarget;
 

@@ -170,11 +170,6 @@ int Actions::canUse(const Player *player,const Position &pos) const
 		if(!Position::areInRange<1,1,0>(pos, player->getPosition())){
 			return TOO_FAR;
 		}
-		//int dist_x = std::abs(pos.x - player->getPosition().x);
-		//int dist_y = std::abs(pos.y - player->getPosition().y);
-		//if(dist_x > 1 || dist_y > 1 || (pos.z != player->getPosition().z)){
-		//	return TOO_FAR;
-		//}
 	}
 	return CAN_USE;
 }
@@ -185,8 +180,6 @@ int Actions::canUseFar(const Player *player,const Position &to_pos, const bool b
 		return CAN_USE;
 	}
 	if(!Position::areInRange<7,5,0>(to_pos, player->getPosition())){
-		//std::abs(player->getPosition().x - to_pos.x) > 7 || std::abs(player->getPosition().y - to_pos.y) > 5 ||
-		//player->getPosition().z != to_pos.z)
 		return TOO_FAR;
 	}
 	
@@ -872,12 +865,10 @@ int ActionScript::internalGetPlayerInfo(lua_State *L, ePlayerInfo info)
 	ActionScript *action = getActionScript(L);
 	int value;	
 	
-	//const KnownThing* tmp = action->GetPlayerByUID(cid);
 	const Player* player = action->GetPlayerByUID(cid);
 	if(player){
 		PositionEx pos;
 		const Tile *tile;
-		//Player *player = dynamic_cast<Player*>(tmp->thing);
 		switch(info){
 		case PlayerInfoAccess:
 			value = player->access;
@@ -980,7 +971,6 @@ int ActionScript::luaActionDoRemoveItem(lua_State *L)
 						
 	ActionScript *action = getActionScript(L);
 	
-	//const KnownThing* tmp = action->GetItemByUID(itemid);
 	Item* item = action->GetItemByUID(itemid);
 	if(item){
 		action->game->internalRemoveItem(item, n);
@@ -996,23 +986,6 @@ int ActionScript::luaActionDoRemoveItem(lua_State *L)
 		lua_pushnumber(L, -1);
 		return 1;
 	}
-
-	//Item *tmpitem = NULL;
-	/*PositionEx tmppos;
-	if(item){
-		//tmpitem = dynamic_cast<Item*>(tmp->thing);
-		tmppos = item->getPosition();//tmp->pos;
-		if(item->isSplash()){
-			lua_pushnumber(L, -1);
-			std::cout << "luaDoRemoveItem: can not remove a splash" << std::endl;
-			return 1;
-		}
-	}
-	else{
-		lua_pushnumber(L, -1);
-		std::cout << "luaDoRemoveItem: item not found" << std::endl;
-		return 1;
-	}*/
 }
 
 int ActionScript::luaActionDoPlayerRemoveItem(lua_State *L)
@@ -1024,10 +997,8 @@ int ActionScript::luaActionDoPlayerRemoveItem(lua_State *L)
 	
 	ActionScript *action = getActionScript(L);
 	
-	//const KnownThing* tmp = action->GetPlayerByUID(cid);
 	Player* player = action->GetPlayerByUID(cid);
 	if(player){
-		//Player *player = dynamic_cast<Player*>(tmp->thing);
 		if(player->removeItemTypeCount(itemId, count)){
 			lua_pushnumber(L, 1);
 		}
@@ -1052,10 +1023,8 @@ int ActionScript::luaActionDoFeedPlayer(lua_State *L)
 	
 	ActionScript *action = getActionScript(L);
 	
-	//const KnownThing* tmp = action->GetPlayerByUID(cid);
 	Player* player = action->GetPlayerByUID(cid);
 	if(player){
-		//Player *player = dynamic_cast<Player*>(tmp->thing);
 		player->food += food*1000;
 	}
 	else{
@@ -1076,10 +1045,8 @@ int ActionScript::luaActionDoSendCancel(lua_State *L)
 	
 	ActionScript *action = getActionScript(L);
 	
-	//const KnownThing* tmp = action->GetPlayerByUID(cid);
 	const Player* player = action->GetPlayerByUID(cid);
 	if(player){
-		//Player *player = dynamic_cast<Player*>(tmp->thing);
 		player->sendCancel(text);
 	}
 	else{
@@ -1109,19 +1076,6 @@ int ActionScript::luaActionDoTeleportThing(lua_State *L)
 		std::cout << "luaTeleport: thing not found" << std::endl;
 		return 1;
 	}
-
-	/*
-	//std::cout << "new pos: " << (Position&)pos << std::endl;
-	if(Item* item = tmp->getItem()){
-		//avoid teleport notMoveable items
-		//if((dynamic_cast<Item*>(tmp->thing))->isNotMoveable()){
-		if(item->isNotMoveable()){
-			lua_pushnumber(L, -1);
-			std::cout << "luaTeleport: item is not moveable" << std::endl;
-			return 1;
-		}
-	}
-	*/
 	
 	if(action->game->internalTeleport(tmp,(Position&)pos) == RET_NOERROR){
 		lua_pushnumber(L, 0);
@@ -1169,10 +1123,8 @@ int ActionScript::luaActionDoPlayerSay(lua_State *L)
 					
 	ActionScript *action = getActionScript(L);
 	
-	//const KnownThing* tmp = action->GetPlayerByUID(cid);
 	Player* player = action->GetPlayerByUID(cid);
 	if(player){
-		//Player *player = dynamic_cast<Player*>(tmp->thing);
 		action->game->internalCreatureSay(player,(SpeakClasses)type,std::string(text));
 	}
 	else{
@@ -1248,7 +1200,6 @@ int ActionScript::luaActionDoPlayerAddSkillTry(lua_State *L)
 	
 	Player* player = action->GetPlayerByUID(cid);
 	if(player){
-		//Player *player = dynamic_cast<Player*>(tmp->thing);
 		player->addSkillTryInternal(n,skillid);
 	}
 	else{
@@ -1270,10 +1221,8 @@ int ActionScript::luaActionDoPlayerAddHealth(lua_State *L)
 					
 	ActionScript *action = getActionScript(L);
 	
-	//const KnownThing* tmp = action->GetPlayerByUID(cid);
 	Player* player = action->GetPlayerByUID(cid);
 	if(player){
-		//Player *player = dynamic_cast<Player*>(tmp->thing);
 		int tmp = player->health + addhealth;
 		if(tmp <= 0){
 			player->health = 1;
@@ -1314,10 +1263,8 @@ int ActionScript::luaActionDoPlayerAddMana(lua_State *L)
 					
 	ActionScript *action = getActionScript(L);
 	
-	//const KnownThing* tmp = action->GetPlayerByUID(cid);
 	Player* player = action->GetPlayerByUID(cid);
 	if(player){
-		//Player *player = dynamic_cast<Player*>(tmp->thing);
 		player->mana = std::min(player->manamax,player->mana+addmana);
 		player->sendStats();
 	}
@@ -1388,10 +1335,8 @@ int ActionScript::luaActionDoPlayerSendTextMessage(lua_State *L)
 	
 	ActionScript *action = getActionScript(L);
 	
-	//const KnownThing* tmp = action->GetPlayerByUID(cid);
 	Player* player = action->GetPlayerByUID(cid);
 	if(player){
-		//Player *player = dynamic_cast<Player*>(tmp->thing);
 		player->sendTextMessage((MessageClasses)messageClass,text);;
 	}
 	else{
@@ -1437,8 +1382,6 @@ int ActionScript::luaActionGetPlayerSkill(lua_State *L)
 	
 	ActionScript *action = getActionScript(L);
 	
-	//const KnownThing* tmp = action->GetPlayerByUID(cid);
-	//if(tmp){
 	Player* player = action->GetPlayerByUID(cid);
 	if(player){
 		if(skillid > 6){
@@ -1446,7 +1389,7 @@ int ActionScript::luaActionGetPlayerSkill(lua_State *L)
 			std::cout << "GetPlayerSkill: invalid skillid" << std::endl;
 			return 1;
 		}
-		//Player *player = dynamic_cast<Player*>(tmp->thing);
+
 		int value = player->skills[skillid][SKILL_LEVEL];
 		lua_pushnumber(L,value);
 		return 1;
@@ -1640,10 +1583,8 @@ int ActionScript::luaActionGetPlayerStorageValue(lua_State *L)
 	
 	ActionScript *action = getActionScript(L);
 	
-	//const KnownThing* tmp = action->GetPlayerByUID(cid);
 	Player* player = action->GetPlayerByUID(cid);
 	if(player){
-		//Player *player = dynamic_cast<Player*>(tmp->thing);
 		long value;
 		if(player->getStorageValue(key,value)){
 			lua_pushnumber(L,value);
@@ -1669,10 +1610,8 @@ int ActionScript::luaActionSetPlayerStorageValue(lua_State *L)
 	
 	ActionScript *action = getActionScript(L);
 	
-	//const KnownThing* tmp = action->GetPlayerByUID(cid);
 	Player* player = action->GetPlayerByUID(cid);
 	if(player){
-		//Player *player = dynamic_cast<Player*>(tmp->thing);
 		player->addStorageValue(key,value);
 	}
 	else{
@@ -1884,10 +1823,8 @@ int ActionScript::luaActionDoPlayerSetMasterPos(lua_State *L)
 	
 	ActionScript *action = getActionScript(L);
 	
-	//const KnownThing* tmp = action->GetPlayerByUID(cid);
 	Player* player = action->GetPlayerByUID(cid);
 	if(player){
-		//Player *player = dynamic_cast<Player*>(tmp->thing);
 		player->masterPos = pos;
 	}
 	else{
@@ -1907,10 +1844,8 @@ int ActionScript::luaActionDoPlayerSetVocation(lua_State *L)
 					
 	ActionScript *action = getActionScript(L);
 	
-	//const KnownThing* tmp = action->GetPlayerByUID(cid);
 	Player* player = action->GetPlayerByUID(cid);
 	if(player){
-		//Player *player = dynamic_cast<Player*>(tmp->thing);
 		player->vocation = (playervoc_t)voc;
 	}
 	else{

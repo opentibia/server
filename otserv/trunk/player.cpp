@@ -360,7 +360,7 @@ unsigned long Player::getMoney()
 	ItemList::const_iterator cit;
 	for(int i=0; i< 11;i++){
 		if(items[i]){
-			if(Container *tmpcontainer = dynamic_cast<Container*>(items[i])){
+			if(Container* tmpcontainer = items[i]->getContainer()){
 				stack.push_back(tmpcontainer);
 			}
 			else{
@@ -370,12 +370,11 @@ unsigned long Player::getMoney()
 	}
 	
 	while(stack.size() > 0) {
-		const Container *container = stack.front();
+		const Container* container = stack.front();
 		stack.pop_front();
 		for(cit = container->getItems(); cit != container->getEnd(); ++cit) {
 			money = money + (*cit)->getWorth();
-			Container *container = dynamic_cast<Container*>(*cit);
-			if(container) {
+			if(Container* container = (*cit)->getContainer()){
 				stack.push_back(container);
 			}
 		}
@@ -412,7 +411,7 @@ bool Player::substractMoney(uint32_t money)
 	}
 	
 	while(stack.size() > 0 && money > 0){
-		Container *container = stack.front();
+		Container* container = stack.front();
 		stack.pop_front();
 		for(int i = 0; i < container->size() && money > 0; i++){	
 			Item *item = container->getItem(i);
@@ -504,128 +503,6 @@ bool Player::substractMoneyItem(Item *item, uint32_t money)
 	return true;
 }
 
-/*
-bool Player::substractMoney(unsigned long money)
-{
-	if(getMoney() < money)
-		return false;
-	
-	std::list<Container*> stack;
-	MoneyMap moneyMap;
-	MoneyItem* tmp;
-	
-	ItemList::iterator it;
-	for(int i = 0; i < 11 && money > 0 ;i++){	
-		if(items[i]){
-			if(Container *tmpcontainer = dynamic_cast<Container*>(items[i])){
-				stack.push_back(tmpcontainer);
-			}
-			else{
-				if(items[i]->getWorth() != 0){
-					tmp = new MoneyItem;
-					tmp->item = items[i];
-					tmp->slot = i;
-					tmp->location = SLOT_TYPE_INVENTORY;
-					tmp->parent = NULL;
-					moneyMap.insert(moneymap_pair(items[i]->getWorth(),tmp));
-				}
-			}
-		}
-	}
-	
-	while(stack.size() > 0 && money > 0){
-		Container *container = stack.front();
-		stack.pop_front();
-		for(int i = 0; i < container->size() && money > 0; i++){	
-			Item *item = container->getItem(i);
-			if(item && item->getWorth() != 0){
-				tmp = new MoneyItem;
-				tmp->item = item;
-				tmp->slot = 0;
-				tmp->location = SLOT_TYPE_CONTAINER;
-				tmp->parent = container;
-				moneyMap.insert(moneymap_pair(item->getWorth(),tmp));
-			}
-			Container *containerItem = dynamic_cast<Container*>(item);
-			if(containerItem){
-				stack.push_back(containerItem);
-			}
-		}
-	}
-	
-	MoneyMap::iterator it2;
-	for(it2 = moneyMap.begin(); it2 != moneyMap.end() && money > 0; it2++){
-		Item *item = it2->second->item;
-		
-		if(it2->second->location == SLOT_TYPE_INVENTORY){
-			removeItemInventory(it2->second->slot);
-		}
-		else if(it2->second->location == SLOT_TYPE_CONTAINER){
-			Container *container = it2->second->parent;
-			unsigned char slot = container->getIndexOfThing(item);
-			onItemRemoveContainer(container,slot);
-			container->removeItem(item);
-		}
-		
-		if(it2->first <= money){
-			money = money - it2->first;
-		}
-		else{
-			substractMoneyItem(item, money);
-			money = 0;
-		}
-		g_game.FreeThing(item);
-		item = NULL;
-		delete it2->second;
-		it2->second = NULL;
-	}
-	for(; it2 != moneyMap.end(); it2++){
-		delete it2->second;
-		it2->second = NULL;
-	}
-	
-	moneyMap.clear();
-	
-	if(money != 0)
-		return false;
-	
-	return true;
-}
-
-bool Player::substractMoneyItem(Item *item, unsigned long money)
-{
-	if(money >= item->getWorth())
-		return false;
-	
-	int remaind = item->getWorth() - money;
-	int crys = remaind / 10000;
-	remaind = remaind - crys * 10000;
-	int plat = remaind / 100;
-	remaind = remaind - plat * 100;
-	int gold = remaind;
-	if(crys != 0){
-		Item *remaindItem = Item::CreateItem(ITEM_COINS_CRYSTAL, crys);
-		if(!this->addItem(remaindItem))
-			g_game.addThing(NULL,this->getPosition(),remaindItem);
-			
-	}
-	
-	if(plat != 0){
-		Item *remaindItem = Item::CreateItem(ITEM_COINS_PLATINUM, plat);
-		if(!this->addItem(remaindItem))
-			g_game.addThing(NULL,this->getPosition(),remaindItem);
-	}
-	
-	if(gold != 0){
-		Item *remaindItem = Item::CreateItem(ITEM_COINS_GOLD, gold);
-		if(!this->addItem(remaindItem))
-			g_game.addThing(NULL,this->getPosition(),remaindItem);
-	}
-	
-	return true;
-}
-*/
-
 bool Player::removeItemTypeCount(uint16_t itemId, uint32_t count)
 {
 	if(getItemTypeCount(itemId) < count)
@@ -706,8 +583,10 @@ uint32_t Player::getItemTypeCount(uint16_t itemId)
 				}
 			}
 
-			if(Container* tmpcontainer = dynamic_cast<Container*>(items[i])){
-				stack.push_back(tmpcontainer);
+			if(items[i]){
+				if(Container* tmpcontainer = items[i]->getContainer()){
+					stack.push_back(tmpcontainer);
+				}
 			}
 		}
 	}
@@ -725,8 +604,7 @@ uint32_t Player::getItemTypeCount(uint16_t itemId)
 				}
 			}
 
-			Container *container = dynamic_cast<Container*>(*cit);
-			if(container){
+			if(Container *container = (*cit)->getContainer()){
 				stack.push_back(container);
 			}
 		}
@@ -1045,9 +923,9 @@ void Player::dropLoot(Container *corpse)
 	for(int i = SLOT_FIRST; i < SLOT_LAST; ++i){
 		Item* item = items[i];		
 		#ifdef __SKULLSYSTEM__
-		if(item && ((dynamic_cast<Container*>(item)) || random_range(1, 100) <= 10 || getSkull() == SKULL_RED)){
+		if(item && ((item->getContainer()) || random_range(1, 100) <= 10 || getSkull() == SKULL_RED)){
 		#else
-		if(item && ((dynamic_cast<Container*>(item)) || random_range(1, 100) <= 10)){
+		if(item && ((item->getContainer()) || random_range(1, 100) <= 10)){
 		#endif
 			corpse->__internalAddThing(item);
 			onRemoveInventoryItem((slots_t)i, item);
@@ -2538,9 +2416,6 @@ void Player::postAddNotification(Thing* thing, bool hasOwnership /*= true*/)
 			std::vector<Container*> containers;
 			for(ContainerVector::iterator it = containerVec.begin(); it != containerVec.end(); ++it){
 				if(!Position::areInRange<1,1,0>(it->second->getPosition(), getPosition())){
-					//(std::abs(it->second->getPosition().x - getPosition().x) > 1) ||
-					//(std::abs(it->second->getPosition().y - getPosition().y) > 1) ||
-					//(std::abs(it->second->getPosition().z != getPosition().z)))
 						containers.push_back(it->second);
 					}
 			}
@@ -2563,11 +2438,8 @@ void Player::postRemoveNotification(Thing* thing, bool hadOwnership /*= true*/)
 	if(const Item* item = thing->getItem()){
 		if(const Container* container = item->getContainer()){
 			if(!container->isRemoved() &&
-				(container->getTopParent() == this || (dynamic_cast<const Container*>(container->getTopParent()))) &&
-				Position::areInRange<1,1,0>(getPosition(), container->getPosition())){
-				//(std::abs(container->getPosition().x - getPosition().x) <= 1) &&
-				//(std::abs(container->getPosition().y - getPosition().y) <= 1) &&
-				//(std::abs(container->getPosition().z == getPosition().z)))
+					(container->getTopParent() == this || (dynamic_cast<const Container*>(container->getTopParent()))) &&
+					Position::areInRange<1,1,0>(getPosition(), container->getPosition())){
 				onSendContainer(container);
 			}
 			else{

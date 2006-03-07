@@ -27,6 +27,9 @@
 class Item;
 class Creature;
 
+#define INDEX_WHEREEVER -1
+#define INDEX_NOLIMIT -2
+
 class Cylinder : virtual public Thing{
 public:	
 	/**

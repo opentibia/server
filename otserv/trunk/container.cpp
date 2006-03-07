@@ -197,13 +197,10 @@ void Container::onRemoveContainerItem(uint32_t index, Item* item)
 ReturnValue Container::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 	bool childIsOwner /*= false*/) const
 {
-	if(index == -1){
+	if(index == -1 && !childIsOwner){
 		if(size() >= capacity())
 			return RET_CONTAINERNOTENOUGHROOM;
 	}
-	//else if(index >= ((int32_t)capacity())){
-	//	return RET_CONTAINERNOTENOUGHROOM;
-	//}
 
 	const Item* item = thing->getItem();
 	if(item == NULL){
@@ -259,15 +256,20 @@ ReturnValue Container::__queryMaxCount(int32_t index, const Thing* thing, uint32
 		}
 
 		maxQueryCount = freeSlots * 100 + n;
+
+		if(maxQueryCount < count){
+			return RET_CONTAINERNOTENOUGHROOM;
+		}
 	}
-	else
+	else{
 		maxQueryCount = freeSlots;
 
-	//if(maxQueryCount == 0)
-	if(maxQueryCount < count)
-		return RET_CONTAINERNOTENOUGHROOM;
-	else 
-		return RET_NOERROR;
+		if(maxQueryCount == 0){
+			return RET_CONTAINERNOTENOUGHROOM;
+		}
+	}
+
+	return RET_NOERROR;
 }
 
 ReturnValue Container::__queryRemove(const Thing* thing, uint32_t count) const
@@ -319,10 +321,6 @@ Cylinder* Container::__queryDestination(int32_t& index, const Thing* thing, Item
 			and a "grey" area where the other 12 slots where from the container
 			if you drop the item on that grey area
 			the client calculates the slot position as if the bag has 20 slots
-			
-			#ifdef __DEBUG__MOVESYS__
-				std::cout << "Warning: [Container::__queryDestination], index: " << index << ", index >= capacity()" << std::endl;
-			#endif
 			*/
 
 			index = -1;
@@ -413,22 +411,6 @@ void Container::__updateThing(Thing* thing, uint32_t count)
 	if(getParent()){
 		onUpdateContainerItem(index, item, item);
 	}
-
-	/*
-	const Position& cylinderMapPos = getPosition();
-
-	SpectatorVec list;
-	SpectatorVec::iterator it;
-	g_game.getSpectators(Range(cylinderMapPos, 2, 2, 2, 2, false), list);
-
-	//send to client
-	for(it = list.begin(); it != list.end(); ++it) {
-		Player* spectator = dynamic_cast<Player*>(*it);
-		if(spectator){
-			spectator->onUpdateContainerItem(this, index, item, item);
-		}
-	}
-	*/
 }
 
 void Container::__replaceThing(uint32_t index, Thing* thing)
@@ -466,22 +448,6 @@ void Container::__replaceThing(uint32_t index, Thing* thing)
 	if(getParent()){
 		onUpdateContainerItem(index, *cit, item);
 	}
-
-	/*
-	const Position& cylinderMapPos = getPosition();
-
-	SpectatorVec list;
-	SpectatorVec::iterator it;
-	g_game.getSpectators(Range(cylinderMapPos, 2, 2, 2, 2, false), list);
-
-	//send to client
-	for(it = list.begin(); it != list.end(); ++it) {
-		Player* spectator = dynamic_cast<Player*>(*it);
-		if(spectator){
-			spectator->onUpdateContainerItem(this, index, (*cit), item);
-		}
-	}
-	*/
 
 	(*cit)->setParent(NULL);
 	itemlist.erase(cit);
@@ -524,15 +490,6 @@ void Container::__removeThing(Thing* thing, uint32_t count)
 		if(getParent()){
 			onUpdateContainerItem(index, item, item);
 		}
-
-		/*
-		for(it = list.begin(); it != list.end(); ++it) {
-			Player* spectator = dynamic_cast<Player*>(*it);
-			if(spectator){
-				spectator->onUpdateContainerItem(this, index, item, item);
-			}
-		}
-		*/
 	}
 	else{
 		//send change to client
@@ -540,52 +497,9 @@ void Container::__removeThing(Thing* thing, uint32_t count)
 			onRemoveContainerItem(index, item);
 		}
 
-		/*
-		//send change to client
-		for(it = list.begin(); it != list.end(); ++it) {
-			Player* spectator = dynamic_cast<Player*>(*it);
-			if(spectator){
-				spectator->onRemoveContainerItem(this, index, item);
-			}
-		}
-		*/
-
 		item->setParent(NULL);
 		itemlist.erase(cit);
 	}
-	
-	/*
-	const Position& cylinderMapPos = getPosition();
-
-	SpectatorVec list;
-	SpectatorVec::iterator it;
-	g_game.getSpectators(Range(cylinderMapPos, 2, 2, 2, 2, false), list);
-
-	if(item->isStackable() && count != item->getItemCount()){
-		int newCount = std::max(0, (int)(item->getItemCount() - count));
-		item->setItemCount(newCount);
-
-		//send change to client
-		for(it = list.begin(); it != list.end(); ++it) {
-			Player* spectator = dynamic_cast<Player*>(*it);
-			if(spectator){
-				spectator->onUpdateContainerItem(this, index, item, item);
-			}
-		}
-	}
-	else{
-		//send change to client
-		for(it = list.begin(); it != list.end(); ++it) {
-			Player* spectator = dynamic_cast<Player*>(*it);
-			if(spectator){
-				spectator->onRemoveContainerItem(this, index, item);
-			}
-		}
-
-		item->setParent(NULL);
-		itemlist.erase(cit);
-	}
-	*/
 }
 
 int32_t Container::__getIndexOfThing(const Thing* thing) const

@@ -53,7 +53,7 @@ bool ChatChannel::talk(Player* fromPlayer, SpeakClasses type, const std::string&
 	UsersMap::iterator it;
 	
 	for(it = m_users.begin(); it != m_users.end(); ++it){
-		Player *toPlayer = dynamic_cast<Player*>(it->second);
+		Player* toPlayer = it->second->getPlayer();
 		if(toPlayer){
 			toPlayer->sendToChannel(fromPlayer, type, text, channelId);
 			success = true;

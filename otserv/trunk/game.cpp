@@ -986,11 +986,12 @@ void Game::moveCreature(Player* player, Cylinder* fromCylinder, Cylinder* toCyli
 	else{
 		const Position& fromPos = fromCylinder->getPosition();
 		const Position& toPos = toCylinder->getPosition();
+		const Position& moveCreaturePos = moveCreature->getPosition();
 
 		//check throw distance
-		if( (std::abs(moveCreature->getPosition().x - toPos.x) > moveCreature->getThrowRange()) ||
-				(std::abs(moveCreature->getPosition().y - toPos.y) > moveCreature->getThrowRange()) ||
-				(std::abs(moveCreature->getPosition().z - toPos.z) * 4 > moveCreature->getThrowRange()) ) {
+		if( (std::abs(moveCreaturePos.x - toPos.x) > moveCreature->getThrowRange()) ||
+				(std::abs(moveCreaturePos.y - toPos.y) > moveCreature->getThrowRange()) ||
+				(std::abs(moveCreaturePos.z - toPos.z) * 4 > moveCreature->getThrowRange()) ) {
 			ret = RET_DESTINATIONOUTOFREACH;
 		}
 		else if(player != moveCreature && player->access == 0){
@@ -1153,23 +1154,24 @@ void Game::moveItem(Player* player, Cylinder* fromCylinder, Cylinder* toCylinder
 
 	const Position& fromPos = fromCylinder->getPosition();
 	const Position& toPos = toCylinder->getPosition();
+	const Position& playerPos = player->getPosition();
 
 	ReturnValue ret = RET_NOERROR;
 	if(!item->isPushable() || item->getUniqueId() != 0){
 		ret = RET_NOTMOVEABLE;
 	}
-	else if(player->getPosition().z > fromPos.z){
+	else if(playerPos.z > fromPos.z){
 		ret = RET_FIRSTGOUPSTAIRS;
 	}
-	else if(player->getPosition().z < fromPos.z){
+	else if(playerPos.z < fromPos.z){
 		ret = RET_FIRSTGODOWNSTAIRS;
 	}
-	else if(!Position::areInRange<1,1,0>(player->getPosition(), fromPos)){
+	else if(!Position::areInRange<1,1,0>(playerPos, fromPos)){
 		ret = RET_TOOFARAWAY;
 	}
 	//check throw distance
-	else if((std::abs(player->getPosition().x - toPos.x) > item->getThrowRange()) ||
-			(std::abs(player->getPosition().y - toPos.y) > item->getThrowRange()) ||
+	else if((std::abs(playerPos.x - toPos.x) > item->getThrowRange()) ||
+			(std::abs(playerPos.y - toPos.y) > item->getThrowRange()) ||
 			(std::abs(fromPos.z - toPos.z) * 4 > item->getThrowRange()) ){
 		ret = RET_DESTINATIONOUTOFREACH;
 	}
@@ -1785,7 +1787,8 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 								if(dynamic_cast<Player*>(gainExpCreature))
 									dynamic_cast<Player*>(gainExpCreature)->sendStats();
 								
-								if(spectator->CanSee(gainExpCreature->getPosition().x, gainExpCreature->getPosition().y, gainExpCreature->getPosition().z)) {
+								const Position& gainExpCreaturePos = gainExpCreature->getPosition();
+								if(spectator->CanSee(gainExpCreaturePos.x, gainExpCreaturePos.y, gainExpCreaturePos.z)){
 									std::stringstream exp;
 									exp << target->getGainedExperience(gainExpCreature);
 									spectator->sendAnimatedText(gainExpCreature->getPosition(), 983, exp.str());
@@ -1977,26 +1980,17 @@ void Game::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fi
 	switch(damagetype){
 		case FIGHT_MELEE:
 			if(Position::areInRange<1,1,0>(creature->getPosition(), attackedCreature->getPosition())){
-				//(std::abs(creature->getPosition().x - attackedCreature->getPosition().x) <= 1) &&
-				//(std::abs(creature->getPosition().y - attackedCreature->getPosition().y) <= 1) &&
-				//(creature->getPosition().z == attackedCreature->getPosition().z))
 					inReach = true;
 			}
 		break;
 		case FIGHT_DIST:
 			if(Position::areInRange<8,5,0>(creature->getPosition(), attackedCreature->getPosition())){
-				//(std::abs(creature->getPosition().x - attackedCreature->getPosition().x) <= 8) &&
-				//(std::abs(creature->getPosition().y - attackedCreature->getPosition().y) <= 5) &&
-				//(creature->getPosition().z == attackedCreature->getPosition().z))
 					if(map->canThrowObjectTo(creature->getPosition(), attackedCreature->getPosition()))
 						inReach = true;
 				}
 		break;
 		case FIGHT_MAGICDIST:
 			if(Position::areInRange<8,5,0>(creature->getPosition(), attackedCreature->getPosition())){
-				//(std::abs(creature->getPosition().x-attackedCreature->getPosition().x) <= 8) &&
-				//(std::abs(creature->getPosition().y - attackedCreature->getPosition().y) <= 5) &&
-				//(creature->getPosition().z == attackedCreature->getPosition().z))
 					if(map->canThrowObjectTo(creature->getPosition(), attackedCreature->getPosition()))
 						inReach = true;
 				}	
@@ -2271,8 +2265,6 @@ bool Game::playerWhisper(Player* player, const std::string& text)
 	//event method
 	for(it = list.begin(); it != list.end(); ++it) {
 		if(!Position::areInRange<1,1,0>(player->getPosition(), (*it)->getPosition())){
-			//std::abs(player->getPosition().x - (*it)->getPosition().x) > 1 ||
-			//std::abs(player->getPosition().y - (*it)->getPosition().y) > 1)
 			(*it)->onCreatureSay(player, SPEAK_WHISPER, std::string("pspsps"));
 		}
 		else{
@@ -2397,9 +2389,6 @@ bool Game::playerUseItemEx(Player* player, const Position& fromPos, uint8_t from
 		std::map<unsigned short, Spell*>::iterator sit = spells.getAllRuneSpells()->find(item->getID());
 		if(sit != spells.getAllRuneSpells()->end()){
 			if(!Position::areInRange<1,1,0>(item->getPosition(), player->getPosition())){
-				//(std::abs(item->getPosition().x - player->getPosition().x) > 1) ||
-				//(std::abs(item->getPosition().y - player->getPosition().y) > 1) ||
-				//(item->getPosition().z != player->getPosition().z))
 				player->sendCancelMessage(RET_TOOFARAWAY);
 				return false;
 			}
@@ -2449,9 +2438,6 @@ bool Game::playerUseBattleWindow(Player* player, const Position& fromPos, uint8_
 		return false;
 
 	if(!Position::areInRange<7,5,0>(creature->getPosition(), player->getPosition())){
-		//std::abs(creature->getPosition().x - player->getPosition().x) > 7 ||
-		//std::abs(creature->getPosition().y - player->getPosition().y) > 5 ||
-		//creature->getPosition().z != player->getPosition().z)
 		return false;
 	}
 
@@ -2459,9 +2445,6 @@ bool Game::playerUseBattleWindow(Player* player, const Position& fromPos, uint8_
 
 	if(item){
 		if(!Position::areInRange<1,1,0>(item->getPosition(), player->getPosition())){
-			//(std::abs(item->getPosition().x - player->getPosition().x) > 1) ||
-			//(std::abs(item->getPosition().y - player->getPosition().y) > 1) ||
-			//item->getPosition().z != player->getPosition().z)
 			player->sendCancelMessage(RET_TOOFARAWAY);
 			return false;
 		}
@@ -2506,9 +2489,6 @@ bool Game::playerRotateItem(Player* player, const Position& pos, uint8_t stackpo
 	}
 	
 	if(!Position::areInRange<1,1,0>(item->getPosition(), player->getPosition())){
-		//(std::abs(player->getPosition().x - item->getPosition().x) > 1) ||
-		//(std::abs(player->getPosition().y - item->getPosition().y) > 1) ||
-		//(player->getPosition().z != item->getPosition().z))
 		player->sendCancelMessage(RET_TOOFARAWAY);
 		return false;
 	}
@@ -2721,7 +2701,6 @@ bool Game::playerLookInTrade(Player* player, bool lookAtCounterOffer, int index)
 	if(player->isRemoved())
 		return false;
 
-	//Player* tradePartner = getPlayerByID(player->tradePartner);
 	Player* tradePartner = player->tradePartner;
 	if(!tradePartner)
 		return false;
@@ -2746,7 +2725,7 @@ bool Game::playerLookInTrade(Player* player, bool lookAtCounterOffer, int index)
 		return false;
 	}
 
-	Container* tradeContainer = dynamic_cast<Container*>(tradeItem);
+	Container* tradeContainer = tradeItem->getContainer();
 	if(!tradeContainer || index > tradeContainer->getItemHoldingCount())
 		return false;
 
@@ -2761,8 +2740,7 @@ bool Game::playerLookInTrade(Player* player, bool lookAtCounterOffer, int index)
 		stack.pop_front();
 
 		for(it = container->getItems(); it != container->getEnd(); ++it){
-			Container *container = dynamic_cast<Container*>(*it);
-			if(container){
+			if(Container* container = (*it)->getContainer()){
 				stack.push_back(container);
 			}
 

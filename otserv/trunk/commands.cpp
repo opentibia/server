@@ -59,7 +59,7 @@ s_defcommands Commands::defined_commands[] = {
 	{"/getonline",&Commands::onlineList},
 	{"/a",&Commands::teleportNTiles},
 	{"/kick",&Commands::kickPlayer},
-	{"/exiva",&Commands::exivaPlayer},
+	//{"/exiva",&Commands::exivaPlayer},
 	//{"/invite",&Commands::invitePlayer},
 	//{"/uninvite",&Commands::uninvitePlayer},
 };
@@ -180,11 +180,14 @@ bool Commands::exeCommand(Creature* creature, const std::string& cmd)
 	if(it == commandMap.end()){
 		return false;
 	}
-	Player *player = dynamic_cast<Player*>(creature);
+
+	Player* player = creature->getPlayer();
 	//check access for this command
 	if(creature->access < it->second->accesslevel){
 		if(creature->access > 0){
-			player->sendTextMessage(MSG_SMALLINFO,"You can not execute this command.");
+			if(player)
+				player->sendTextMessage(MSG_SMALLINFO,"You can not execute this command.");
+
 			return true;
 		}
 		else{
@@ -215,8 +218,8 @@ bool Commands::placeNpc(Creature* creature, const std::string& cmd, const std::s
 	}
 	else{
 		delete npc;
-		Player* player = dynamic_cast<Player*>(creature);
-		if(player) {
+		Player* player = creature->getPlayer();
+		if(player){
 			player->sendMagicEffect(player->getPosition(), NM_ME_PUFF);
 			player->sendCancelMessage(RET_NOTENOUGHROOM);
 		}
@@ -236,22 +239,12 @@ bool Commands::placeMonster(Creature* creature, const std::string& cmd, const st
 	// Place the monster
 	if(game->placeCreature(creature->getPosition(), monster)){
 		game->AddMagicEffectAt(creature->getPosition(), NM_ME_MAGIC_BLOOD);
-		/*
-		SpectatorVec list;
-		SpectatorVec::iterator it;
-
-		game->getSpectators(Range(monster->getPosition(), false), list);
-		for(it = list.begin(); it != list.end(); ++it) {
-			monster->onCreatureAppear(*it, false);
-		}
-		*/
-
 		return true;
 	}
 	else{
 		delete monster;
-		Player* player = dynamic_cast<Player*>(creature);
-		if(player) {
+		Player* player = creature->getPlayer();
+		if(player){
 			player->sendCancelMessage(RET_NOTENOUGHROOM);
 			player->sendMagicEffect(player->getPosition(), NM_ME_PUFF);
 		}

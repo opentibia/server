@@ -197,10 +197,11 @@ bool IOMapSerializeSQL::loadTile(Database& db, DBQuery& query, Tile* tile)
 	typedef OTSERV_HASH_MAP<int,std::pair<Item*,int> > ItemMap;
 	ItemMap itemMap;
 
+	const Position& tilePos = tile->getPosition();
 	DBResult result;
-	query << "SELECT * FROM tileitems WHERE x='" << tile->getPosition().x
-		<< "' AND y='" << tile->getPosition().y
-		<< "' AND z='" << tile->getPosition().z
+	query << "SELECT * FROM tileitems WHERE x='" << tilePos.x
+		<< "' AND y='" << tilePos.y
+		<< "' AND z='" << tilePos.z
 		<< "' ORDER BY sid ASC";
 
 	if(!db.storeQuery(query, result) || result.getNumRows() != 1)
