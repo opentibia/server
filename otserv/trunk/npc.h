@@ -84,7 +84,7 @@ public:
 	const std::string& getName() const {return name;};
 	
 	void doSay(std::string msg);
-	void doMove(int dir);
+	void doMove(Direction dir);
 	void doMoveTo(Position pos);
 	bool isLoaded(){return loaded;}
 	

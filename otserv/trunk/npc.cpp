@@ -294,22 +294,9 @@ void Npc::doSay(std::string msg)
 	}
 }
 
-void Npc::doMove(int direction)
+void Npc::doMove(Direction dir)
 {
-	switch(direction){
-		case 0:
-			g_game.moveCreature(this, SOUTH);
-		break;
-		case 1:
-			g_game.moveCreature(this, EAST);
-		break;
-		case 2:
-			g_game.moveCreature(this, NORTH);
-		break;
-		case 3:
-			g_game.moveCreature(this, WEST);
-		break;
-	}
+	g_game.moveCreature(this, dir);
 }
 
 void Npc::doMoveTo(Position target)
@@ -463,7 +450,6 @@ int NpcScript::registerFunctions()
 	lua_register(luaState, "creatureGetName", NpcScript::luaCreatureGetName);
 	lua_register(luaState, "creatureGetName2", NpcScript::luaCreatureGetName2);
 	lua_register(luaState, "creatureGetPosition", NpcScript::luaCreatureGetPos);
-	lua_register(luaState, "selfGetPosition", NpcScript::luaSelfGetPos);
 	
 	return true;
 }
@@ -552,11 +538,14 @@ int NpcScript::luaActionSay(lua_State* L)
 
 int NpcScript::luaActionMove(lua_State* L)
 {
-	int dir=(int)lua_tonumber(L, -1);
+	Direction dir = (Direction)(int)lua_tonumber(L, -1);
+
 	lua_pop(L,1);
-	Npc* mynpc=getNpc(L);
+	Npc* mynpc = getNpc(L);
+
 	if(mynpc)
 		mynpc->doMove(dir);
+
 	return 0;
 }
 
