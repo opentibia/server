@@ -21,7 +21,6 @@
 #include "iomapserializesql.h"
 #include "house.h"
 #include "luascript.h"
-#include "database.h"
 
 extern LuaScript g_config;
 
@@ -40,42 +39,7 @@ IOMapSerializeSQL::~IOMapSerializeSQL()
 
 bool IOMapSerializeSQL::loadMap(Map* map, const std::string& identifier)
 {
-	Database db;
-	DBQuery query;
-	DBResult result;
-
 	db.connect(identifier.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str());
-	
-	for(HouseMap::iterator it = Houses::getInstance().getHouseBegin(); it != Houses::getInstance().getHouseEnd(); ++it){
-		DBQuery query;
-
-		//query << "DELETE FROM tileitems WHERE tilex='"<< x << "'" AND tiley='"<< y << "'" AND tilez='"<< z << "'";
-		
-		if(!db.executeQuery(query))
-			return false;
-
-		//load tile
-		House* house = it->second;
-		for(HouseTileList::iterator it = house->getHouseTileBegin(); it != house->getHouseTileEnd(); ++it){
-			loadTile(db, query, *it);
-		}
-
-		//End the transaction
-		query.reset();
-		query << "COMMIT;";
-
-		if(!db.executeQuery(query))
-			return false;
-	}
-}
-
-bool IOMapSerializeSQL::saveMap(Map* map, const std::string& identifier)
-{
-	Database db;
-	DBQuery query;
-	DBResult result;
-
-	db.connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str());
 	
 	for(HouseMap::iterator it = Houses::getInstance().getHouseBegin(); it != Houses::getInstance().getHouseEnd(); ++it){
 		DBQuery query;
@@ -85,18 +49,10 @@ bool IOMapSerializeSQL::saveMap(Map* map, const std::string& identifier)
 		if(!db.executeQuery(query))
 			return false;
 
-		//save house items
+		//load tile
 		House* house = it->second;
 		for(HouseTileList::iterator it = house->getHouseTileBegin(); it != house->getHouseTileEnd(); ++it){
-			//clear old tile data
-			query << "DELETE FROM tileitems WHERE x='"<< (*it)->getPosition().x
-				<< "' AND y='"<< (*it)->getPosition().y
-				<< "' AND z='"<< (*it)->getPosition().z << "'";
-			
-			if(!db.executeQuery(query))
-				return false;
-
-			saveTile(db, query, *it);
+			loadTile(*it);
 		}
 
 		//End the transaction
@@ -110,9 +66,53 @@ bool IOMapSerializeSQL::saveMap(Map* map, const std::string& identifier)
 	return true;
 }
 
-bool IOMapSerializeSQL::saveTile(Database& db, DBQuery& query, const Tile* tile)
+bool IOMapSerializeSQL::saveMap(Map* map, const std::string& identifier)
 {
-	query << "INSERT INTO `tileitems` (`x`, `y` , `z` , `sid` , `pid` , `type` , `number` , `actionid` , `text` , `specialdesc` ) VALUES";
+	DBQuery query;
+	db.connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str());
+
+	//clear old tile data
+	query.reset();
+	query << "DELETE FROM tileitems;";
+	if(!db.executeQuery(query))
+		return false;
+
+	query.reset();
+	query << "DELETE FROM tilelist;";
+	if(!db.executeQuery(query))
+		return false;
+
+	uint32_t tileId = 0;
+
+	for(HouseMap::iterator it = Houses::getInstance().getHouseBegin(); it != Houses::getInstance().getHouseEnd(); ++it){
+		//Start the transaction	
+		query << "BEGIN;";
+		query.reset();
+		if(!db.executeQuery(query))
+			return false;
+
+		//save house items
+		House* house = it->second;
+		for(HouseTileList::iterator it = house->getHouseTileBegin(); it != house->getHouseTileEnd(); ++it){
+			saveTile(tileId, *it);
+			++tileId;
+		}
+
+		//End the transaction
+		query.reset();
+		query << "COMMIT;";
+
+		if(!db.executeQuery(query))
+			return false;
+	}
+
+	return true;
+}
+
+bool IOMapSerializeSQL::saveTile(uint32_t tileId, const Tile* tile)
+{
+	DBQuery query;
+	query << "INSERT INTO `tileitems` (`tileid`, `sid` , `pid` , `type` , `attributes` ) VALUES";
 
 	typedef std::list<std::pair<Container*, int> > ContainerStackList;
 	typedef ContainerStackList::value_type ContainerStackList_Pair;
@@ -128,15 +128,18 @@ bool IOMapSerializeSQL::saveTile(Database& db, DBQuery& query, const Tile* tile)
 
 	for(int i = 0; i < tile->getThingCount(); ++i){
 		item = tile->__getThing(i)->getItem();
-		if(!item || item->isNotMoveable())
-			continue;
 
 		++runningID;
 
-		streamitems << "(" << tile->getPosition().x << "," << tile->getPosition().y << "," << tile->getPosition().z << ","
-			<< runningID << "," << parentid << ","
-			<< item->getID() << "," << (int)item->getItemCountOrSubtype() << "," << (int)item->getActionId() << ",'"
-			<< Database::escapeString(item->getText()) << "','" << Database::escapeString(item->getSpecialDescription()) << "'),";
+		streamitems << "(" << tileId << "," << runningID << "," << parentid << "," << item->getID() << ","
+		//attributes
+		<< 0x00 <<"')'";
+
+		/*
+		<< (int)item->getItemCountOrSubtype() << "," << (int)item->getActionId() << ",'"
+		<< Database::escapeString(item->getText()) << "','"
+		<< Database::escapeString(item->getSpecialDescription()) << "'),";
+		*/
 
 		if(item->getContainer()){
 			containerStackList.push_back(ContainerStackList_Pair(item->getContainer(), runningID));
@@ -172,10 +175,9 @@ bool IOMapSerializeSQL::saveTile(Database& db, DBQuery& query, const Tile* tile)
 				containerStackList.push_back(ContainerStackList_Pair(item->getContainer(), runningID));
 			}
 
-			streamitems << "(" << tile->getPosition().x << "," << tile->getPosition().y << "," << tile->getPosition().z << ","
-				<< runningID << "," << parentid << ","
-				<< item->getID() << "," << (int)item->getItemCountOrSubtype() << "," << (int)item->getActionId() << ",'"
-				<< Database::escapeString(item->getText()) << "','" << Database::escapeString(item->getSpecialDescription()) << "'),";
+			streamitems << "(" << tileId << "," << runningID << "," << parentid << "," << item->getID() << ","
+			//attributes
+			<< 0x00 <<"')'";
 		}
 	}
 
@@ -190,26 +192,45 @@ bool IOMapSerializeSQL::saveTile(Database& db, DBQuery& query, const Tile* tile)
 		streamitems.str("");
 		itemsstring = "";
 	}
+
+	return true;
 }
 
-bool IOMapSerializeSQL::loadTile(Database& db, DBQuery& query, Tile* tile)
+bool IOMapSerializeSQL::loadTile(Tile* tile)
 {
 	typedef OTSERV_HASH_MAP<int,std::pair<Item*,int> > ItemMap;
 	ItemMap itemMap;
 
 	const Position& tilePos = tile->getPosition();
-	DBResult result;
-	query << "SELECT * FROM tileitems WHERE x='" << tilePos.x
+
+	DBQuery query;
+	query << "SELECT tilelist.tileid FROM tilelist WHERE x='" << tilePos.x
 		<< "' AND y='" << tilePos.y
 		<< "' AND z='" << tilePos.z
-		<< "' ORDER BY sid ASC";
+		<< "'";
 
+	DBResult result;
 	if(!db.storeQuery(query, result) || result.getNumRows() != 1)
 		return false;
 
+	int tileId = result.getDataInt("tileid");
+
+	query.reset();
+	query << "SELECT * FROM tileitems WHERE tileid='" << tileId <<"'";
 	if(db.storeQuery(query, result) && (result.getNumRows() > 0)){	
 		for(int i=0; i < result.getNumRows(); ++i){
+			int sid = result.getDataInt("sid", i);
+			int pid = result.getDataInt("pid", i);
 			int type = result.getDataInt("type", i);
+
+			if(Item::items[type].moveable){
+				//create a new item
+			}
+			else{
+				//find this type in the tile
+			}
+
+			/*
 			int count = result.getDataInt("number", i);
 			Item* item = Item::CreateItem(type, count);
 			if(result.getDataInt("actionid", i) >= 100)
@@ -221,6 +242,7 @@ bool IOMapSerializeSQL::loadTile(Database& db, DBQuery& query, Tile* tile)
 			itemMap[result.getDataInt("sid", i)] = myPair;
 			
 			tile->__internalAddThing(item);
+			*/
 		}
 	}
 
@@ -237,4 +259,6 @@ bool IOMapSerializeSQL::loadTile(Database& db, DBQuery& query, Tile* tile)
 			}
 		}
 	}
+
+	return true;
 }

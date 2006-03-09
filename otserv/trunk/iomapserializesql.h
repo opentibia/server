@@ -23,12 +23,10 @@
 #define __IOMAPSERIALIZESQL_H__
 
 #include "iomapserialize.h"
+#include "database.h"
 #include "map.h"
 
 #include <string>
-
-class Database;
-class DBQuery;
 
 class IOMapSerializeSQL : public IOMapSerialize{
 public:
@@ -39,13 +37,15 @@ public:
 	virtual bool saveMap(Map* map, const std::string& identifier);
 
 protected:
+	Database db;
+
 	std::string m_host;
 	std::string m_user;
 	std::string m_pass;
 	std::string m_db;
 
-	bool saveTile(Database& db, DBQuery& query, const Tile* tile);
-	bool loadTile(Database& db, DBQuery& query, Tile* tile);
+	bool saveTile(uint32_t tileId, const Tile* tile);
+	bool loadTile(Tile* tile);
 };
 
 #endif
