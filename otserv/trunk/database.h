@@ -48,11 +48,11 @@ enum db_error_t {
 class DBQuery : public std::stringstream
 {
 public:
-	DBQuery(){};
+	DBQuery(){first = true;};
 	~DBQuery(){};
 	
 	/** Reset the actual query */
-	void reset(){ this->str(""); };
+	void reset(){ this->str(""); first = true;};
 	
 	/** Get the text of the query
 	*\returns The text of the actual query
@@ -63,6 +63,18 @@ public:
 	*\returns The size of the query text
 	*/
 	int getSize(){ return (int)this->str().length(); };
+	
+	std::string getSeparator(){
+		if(first){
+			first = false;
+			return "";
+		}
+		else{
+			return ",";
+		}
+	}
+protected:
+	bool first;
 };
 
 class DBResult

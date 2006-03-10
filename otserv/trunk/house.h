@@ -54,7 +54,7 @@ public:
 	
 	bool isInList(const Player* player);
 	
-	void getList(std::string& _list);
+	void getList(std::string& _list) const;
 
 private:
 	#ifdef __GNUC__
@@ -90,7 +90,7 @@ public:
 	bool canUse(const Player* player);
 	
 	void setAccessList(const std::string& textlist);
-	bool getAccessList(std::string& list);
+	bool getAccessList(std::string& list) const;
 	
 	int unserialize(xmlNodePtr p);
 
@@ -122,7 +122,7 @@ typedef std::list<Door*> HouseDoorList;
 class House
 {
 public:
-	House();
+	House(uint32_t _houseid);
 	~House();
 	
 	void addTile(HouseTile* tile);
@@ -148,6 +148,17 @@ public:
 	void setHouseOwner(uint32_t guid);
 	uint32_t getHouseOwner() const {return houseOwner;};
 
+	void setPaidUntil(uint32_t paid){paidUntil = paid;};
+	uint32_t getPaidUntil() const {return paidUntil;};
+
+	void setRent(uint32_t _rent){rent = _rent;};
+	uint32_t getRent() const {return rent;};
+	
+	void setTownId(uint32_t _town){townid = _town;};
+	uint32_t getTownId() const {return townid;};
+
+	uint32_t getHouseId() const {return houseid;};
+
 	void addDoor(Door* door);
 	Door* getDoorByNumber(unsigned long doorId);
 	Door* getDoorByPosition(const Position& pos);
@@ -155,7 +166,11 @@ public:
 	HouseTileList::iterator getHouseTileBegin() {return houseTiles.begin();}
 	HouseTileList::iterator getHouseTileEnd() {return houseTiles.end();}
 
+	HouseDoorList::iterator getHouseDoorBegin() {return doorList.begin();}
+	HouseDoorList::iterator getHouseDoorEnd() {return doorList.end();}
+
 private:
+	uint32_t houseid;
 	uint32_t houseOwner;
 	HouseTileList houseTiles;
 	HouseDoorList doorList;
@@ -163,6 +178,9 @@ private:
 	AccessList subOwnerList;
 	std::string houseName;
 	Position posEntry;
+	uint32_t paidUntil;
+	uint32_t rent;
+	uint32_t townid;
 };
 
 typedef std::map<uint32_t, House*> HouseMap;
@@ -175,20 +193,27 @@ public:
 		return instance;
 	}
 
-	House* getHouse(uint32_t houseid)
+	House* getHouse(uint32_t houseid, bool add = false)
 	{
 		HouseMap::iterator it = houseMap.find(houseid);
 		
 		if(it != houseMap.end()){
 			return it->second;
 		}
-
-		House* house = new House();
-		houseMap[houseid] = house;
-		return house;
+		if(add){
+			House* house = new House(houseid);
+			houseMap[houseid] = house;
+			return house;
+		}
+		else{
+			return NULL;
+		}
+		
 	}
 
 	bool loadHousesXML(std::string filename);
+	
+	bool payHouses();
 
 	HouseMap::iterator getHouseBegin() {return houseMap.begin();}
 	HouseMap::iterator getHouseEnd() {return houseMap.end();}

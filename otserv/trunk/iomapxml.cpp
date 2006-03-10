@@ -156,7 +156,7 @@ bool IOMapXML::loadMap(Map* map, const std::string& identifier)
 				tile = new Tile(px, py, pz);
 			}
 			else{
-				house = Houses::getInstance().getHouse(houseid);
+				house = Houses::getInstance().getHouse(houseid, true);
 				if(!house){
 					setLastError(LOADMAPERROR_FAILEDTOCREATEITEM);
 					return false;

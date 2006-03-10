@@ -294,7 +294,7 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 							return false;
 						}
 
-						house = Houses::getInstance().getHouse(houseid);
+						house = Houses::getInstance().getHouse(houseid, true);
 						if(!house){
 							setLastError(LOADMAPERROR_FAILEDTOCREATEITEM, tile_node);
 							return false;

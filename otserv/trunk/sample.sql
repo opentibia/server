@@ -204,6 +204,21 @@ CREATE TABLE `viplist` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
+CREATE TABLE `houses` (
+  `houseid` int(10) unsigned NOT NULL default '0',
+  `owner` int(10) unsigned default '0',
+  `paid` int(10) unsigned default '0',
+  PRIMARY KEY  (`houseid`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+CREATE TABLE `houseaccess` (
+  `houseid` int(10) unsigned NOT NULL default '0',
+  `listid` int(10) unsigned default '0',
+  `list` text,
+  KEY `houseid` TYPE BTREE (`houseid`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;

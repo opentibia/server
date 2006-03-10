@@ -43,6 +43,9 @@ public:
 	*/
 	virtual bool saveMap(Map* map, const std::string& identifier) = 0;
 
+	virtual bool loadHouseInfo(Map* map, const std::string& identifier) = 0;
+	virtual bool saveHouseInfo(Map* map, const std::string& identifier) = 0;
+
 protected:
 	static IOMapSerialize* _instance;
 

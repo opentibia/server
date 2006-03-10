@@ -59,6 +59,7 @@ s_defcommands Commands::defined_commands[] = {
 	{"/getonline",&Commands::onlineList},
 	{"/a",&Commands::teleportNTiles},
 	{"/kick",&Commands::kickPlayer},
+	{"/owner",&Commands::setHouseOwner},
 	//{"/exiva",&Commands::exivaPlayer},
 	//{"/invite",&Commands::invitePlayer},
 	//{"/uninvite",&Commands::uninvitePlayer},
@@ -517,7 +518,9 @@ bool Commands::closeServer(Creature* creature, const std::string& cmd, const std
 			++it;
 		}
 	}
-
+	
+	game->map->saveMap("");
+	
 	return true;
 }
 
@@ -650,6 +653,28 @@ bool Commands::exivaPlayer(Creature* c, const std::string &cmd, const std::strin
 	}
 	return false;
 }
+
+bool Commands::setHouseOwner(Creature* creature, const std::string& cmd, const std::string& param)
+{
+	Player* player = creature->getPlayer();
+	if(player){
+		if(player->getTile()->hasFlag(TILESTATE_HOUSE)){
+			HouseTile* houseTile = dynamic_cast<HouseTile*>(player->getTile());
+			if(houseTile){
+				Player* paramPlayer = game->getPlayerByName(param);
+				if(paramPlayer){
+					houseTile->getHouse()->setHouseOwner(paramPlayer->getGUID());
+				}
+				else if(param == "none"){
+					houseTile->getHouse()->setHouseOwner(0);
+				}
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
 
 /*
 bool Commands::invitePlayer(Creature* creature, const std::string& cmd, const std::string& param)

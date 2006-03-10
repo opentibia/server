@@ -24,16 +24,21 @@
 #include "house.h"
 #include "ioplayer.h"
 #include "game.h"
+#include "town.h"
 
 extern Game g_game;
 
-House::House()
+House::House(uint32_t _houseid)
 {
 	houseName = "OTServ headquarter (Flat 1, Area 42)";
 	houseOwner = 0;
 	posEntry.x = 0;
 	posEntry.y = 0;
 	posEntry.z = 0;
+	paidUntil = 0;
+	houseid = _houseid;
+	rent = 0;
+	townid = 0;
 }
 
 House::~House()
@@ -49,20 +54,36 @@ void House::addTile(HouseTile* tile)
 
 void House::setHouseOwner(uint32_t guid)
 {
-	houseOwner = guid;
-	Item* iiItem = NULL;
+	if(houseOwner == guid)
+		return;
 	
+	if(houseOwner){
+		//send items to depot
+		//...TODO...
+		//TODO: remove players from beds
+		//clean access lists
+		guestList.parseList("");
+		subOwnerList.parseList("");
+		HouseDoorList::iterator it;
+		for(it = doorList.begin(); it != doorList.end(); ++it){
+			(*it)->setAccessList("");
+		}
+		//reset paid date
+		houseOwner = 0;
+		paidUntil = 0;
+	}
+		
 	std::stringstream houseDescription;
 	houseDescription << "It belongs to house '" << houseName << "'. " << std::endl;
 
 	std::string name;
 	if(guid != 0 && IOPlayer::instance()->getNameByGuid(guid, name)){
+		houseOwner = guid;
 		houseDescription << name;
 	}
 	else{
 		houseDescription << "Nobody";
 	}
-	
 	houseDescription << " owns this house." << std::endl;
 	
 	HouseDoorList::iterator it;
@@ -253,6 +274,9 @@ bool AccessList::parseList(const std::string& _list)
 	regExList.clear();
 	list = _list;
 	
+	if(_list == "")
+		return true;
+	
 	std::stringstream listStream(_list);
 	std::string line;
 	while(getline(listStream, line)){
@@ -375,7 +399,7 @@ bool AccessList::isInList(const Player* player)
 	return false;
 }
 	
-void AccessList::getList(std::string& _list)
+void AccessList::getList(std::string& _list) const
 {
 	_list = list;
 }
@@ -441,7 +465,7 @@ void Door::setAccessList(const std::string& textlist)
 	accessList->parseList(textlist);
 }
 
-bool Door::getAccessList(std::string& list)
+bool Door::getAccessList(std::string& list) const
 {
 	if(!house){
 		#ifdef __DEBUG_HOUSES__
@@ -485,7 +509,8 @@ bool Houses::loadHousesXML(std::string filename)
 				_houseid = atoi(nodeValue);
 				House* house = Houses::getInstance().getHouse(_houseid);
 				if(!house){
-					return false;
+					std::cout << "Error: [Houses::loadHousesXML] Unknown house, id = " << _houseid << std::endl;
+					return false;;
 				}
 
 				nodeValue = (char*)xmlGetProp(houseNode, (const xmlChar *) "name");
@@ -513,6 +538,19 @@ bool Houses::loadHousesXML(std::string filename)
 				}
 				
 				house->setEntryPos(entryPos);
+				
+				nodeValue = (char*)xmlGetProp(houseNode, (const xmlChar *) "rent");
+				if(nodeValue){
+					house->setRent(atoi(nodeValue));
+					xmlFreeOTSERV(nodeValue);
+				}
+				
+				nodeValue = (char*)xmlGetProp(houseNode, (const xmlChar *) "townid");
+				if(nodeValue){
+					house->setTownId(atoi(nodeValue));
+					xmlFreeOTSERV(nodeValue);
+				}
+				
 				house->setHouseOwner(0);
 			}
 
@@ -523,4 +561,54 @@ bool Houses::loadHousesXML(std::string filename)
 	}
 
 	return false;
+}
+
+bool Houses::payHouses()
+{
+	uint32_t currentTime;
+	currentTime = 0; //TODO: month*12 + year
+	for(HouseMap::iterator it = houseMap.begin(); it != houseMap.end(); ++it){
+		House* house = it->second;
+		if(house->getHouseOwner() != 0 && house->getPaidUntil() < currentTime &&
+			 house->getRent() != 0){
+			
+			uint32_t ownerid = house->getHouseOwner();
+			Town* town = Towns::getInstance().getTown(house->getTownId());
+			if(!town){
+				#ifdef __DEBUG_HOUSES__
+				std::cout << "Warning: [Houses::payHouses] town = NULL, townid = " << 
+					house->getTownId() << ", houseid = " << house->getHouseId() << std::endl;
+				#endif
+				continue;
+			}
+			
+			std::string name;
+			if(IOPlayer::instance()->getNameByGuid(ownerid, name)){
+				Player* player = new Player(name, NULL);
+				if(!IOPlayer::instance()->loadPlayer(player, name)){
+					#ifdef __DEBUG_HOUSES__
+					std::cout << "Warning: [Houses::payHouses], can not load player: " << name << std::endl;
+					#endif
+					delete player;
+					continue;
+				}
+				Depot* depot = player->getDepot(town->getTownID(), true);
+				if(depot){
+					//TODO
+					//get money from depot
+					//if not posible 
+					//	house->setHouseOwner(0);
+					//else
+					//	house->setPaidUntil(currentTime);
+				}
+				IOPlayer::instance()->savePlayer(player);
+				delete player; 
+			}
+			else{
+				//player doesnt exist, remove it as house owner?
+				//house->setHouseOwner(0);
+			}
+		}
+	}
+	return true;
 }

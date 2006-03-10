@@ -435,10 +435,20 @@ int main(int argc, char *argv[])
 	std::cout << ":: OTServ Development-Version 0.5.0 - CVS Preview" << std::endl;
 	std::cout << ":: ====================" << std::endl;
 	std::cout << "::" << std::endl;
-#ifdef __DEBUG__MOVESYS__
-	std::cout << ":: Debugging MOVESYS" << std::endl;
+#if defined __DEBUG__MOVESYS__ || defined __DEBUG_HOUSES__ || defined __DEBUG_MAILBOX__
+	std::cout << ":: Debugging:";
+	#ifdef __DEBUG__MOVESYS__
+	std::cout << " MOVESYS";
+	#endif
+	#ifdef __DEBUG_MAILBOX__
+	std::cout << " MAILBOX";
+	#endif
+	#ifdef __DEBUG_HOUSES__
+	std::cout << " HOUSES";
+	#endif
+	std::cout << std::endl;
 #endif
-	
+
 #ifdef _NO_ROOT_PERMISSION_
 	if( getuid() == 0 || geteuid() == 0 )
 	{
@@ -554,6 +564,10 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 	std::cout << ":: World Type: " << worldtype << std::endl;
+	
+	#ifdef __SKULLSYSTEM__
+	std::cout << ":: Skulls enabled" << std::endl;
+	#endif
 
 	if(g_config.getGlobalString("md5passwords") == "yes"){
 		passwordType = PASSWORD_TYPE_MD5;

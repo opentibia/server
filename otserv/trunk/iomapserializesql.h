@@ -35,6 +35,8 @@ public:
 
 	virtual bool loadMap(Map* map, const std::string& identifier);
 	virtual bool saveMap(Map* map, const std::string& identifier);
+	virtual bool loadHouseInfo(Map* map, const std::string& identifier);
+	virtual bool saveHouseInfo(Map* map, const std::string& identifier);
 
 protected:
 	Database db;

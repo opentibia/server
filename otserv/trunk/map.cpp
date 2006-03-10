@@ -95,33 +95,33 @@ bool Map::loadMap(const std::string& identifier, const std::string& type)
 
 	if(!loadMapSuccess){
 		switch(loader->getLastError()){
-			case LOADMAPERROR_CANNOTOPENFILE:
-				std::cout << "FATAL: Could not open the map stream." << std::endl;
-				break;
-			case LOADMAPERROR_GETPROPFAILED:
-				std::cout << "FATAL: Failed to read stream properties. Code: " << loader->getErrorCode() << std::endl;
-				break;
-			case LOADMAPERROR_OUTDATEDHEADER:
-				std::cout << "FATAL: Header information is outdated. Code: " << loader->getErrorCode() << std::endl;
-				break;
-			case LOADMAPERROR_GETROOTHEADERFAILED:
-				std::cout << "FATAL: Failed to read header information. Code: " << loader->getErrorCode() << std::endl;
-				break;
-			case LOADMAPERROR_FAILEDTOCREATEITEM:
-				std::cout << "FATAL: Failed to create an object. Code: " << loader->getErrorCode() << std::endl;
-				break;
-			case LOADMAPERROR_FAILEDUNSERIALIZEITEM:
-				std::cout << "FATAL: Failed to unserialize an object. Code: " << loader->getErrorCode() << std::endl;
-				break;
-			case LOADMAPERROR_FAILEDTOREADCHILD:
-				std::cout << "FATAL: Failed to read child stream. Code: " << loader->getErrorCode() << std::endl;
-				break;
-			case LOADMAPERROR_UNKNOWNNODETYPE:
-				std::cout << "FATAL: Unknown stream node found. Code: " << loader->getErrorCode() << std::endl;
-				break;
-
-			default:
-				std::cout << "FATAL: Unknown error!" << std::endl;
+		case LOADMAPERROR_CANNOTOPENFILE:
+			std::cout << "FATAL: Could not open the map stream." << std::endl;
+			break;
+		case LOADMAPERROR_GETPROPFAILED:
+			std::cout << "FATAL: Failed to read stream properties. Code: " << loader->getErrorCode() << std::endl;
+			break;
+		case LOADMAPERROR_OUTDATEDHEADER:
+			std::cout << "FATAL: Header information is outdated. Code: " << loader->getErrorCode() << std::endl;
+			break;
+		case LOADMAPERROR_GETROOTHEADERFAILED:
+			std::cout << "FATAL: Failed to read header information. Code: " << loader->getErrorCode() << std::endl;
+			break;
+		case LOADMAPERROR_FAILEDTOCREATEITEM:
+			std::cout << "FATAL: Failed to create an object. Code: " << loader->getErrorCode() << std::endl;
+			break;
+		case LOADMAPERROR_FAILEDUNSERIALIZEITEM:
+			std::cout << "FATAL: Failed to unserialize an object. Code: " << loader->getErrorCode() << std::endl;
+			break;
+		case LOADMAPERROR_FAILEDTOREADCHILD:
+			std::cout << "FATAL: Failed to read child stream. Code: " << loader->getErrorCode() << std::endl;
+			break;
+		case LOADMAPERROR_UNKNOWNNODETYPE:
+			std::cout << "FATAL: Unknown stream node found. Code: " << loader->getErrorCode() << std::endl;
+			break;
+		
+		default:
+			std::cout << "FATAL: Unknown error!" << std::endl;
 			break;
 		}
 
@@ -138,14 +138,18 @@ bool Map::loadMap(const std::string& identifier, const std::string& type)
 	}
 
 	delete loader;
-
+	
+	IOMapSerialize::getInstance()->loadHouseInfo(this, "");
 	return true;
 }
 
 
 bool Map::saveMap(const std::string& identifier)
 {
-	return IOMapSerialize::getInstance()->saveMap(this, identifier);
+	IOMapSerialize* IOMap = IOMapSerialize::getInstance();
+	//IOMap->saveMap(this, identifier);
+	IOMap->saveHouseInfo(this, "");
+	return true;
 }
 
 Tile* Map::getTile(uint16_t _x, uint16_t _y, uint8_t _z)
