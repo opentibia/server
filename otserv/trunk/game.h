@@ -19,9 +19,8 @@
 //////////////////////////////////////////////////////////////////////
 
 
-#ifndef __OTSERV_GAME_H
-#define __OTSERV_GAME_H
-
+#ifndef __OTSERV_GAME_H__
+#define __OTSERV_GAME_H__
 
 #include <queue>
 #include <vector>
@@ -37,14 +36,15 @@
 #include "magic.h"
 #include "map.h"
 #include "templates.h"
+#include "scheduler.h"
 
 class Creature;   // see creature.h
 class Player;
 class Monster;
 class Npc;
 class Commands;
-class SchedulerTask;
 class lessSchedTask;
+class SchedulerTask;
 
 #define STACKPOS_MOVE -1
 #define STACKPOS_LOOK -2
@@ -241,9 +241,10 @@ public:
 		Item* item, uint32_t count, uint16_t itemId);
 	
 	ReturnValue internalMoveItem(Cylinder* fromCylinder, Cylinder* toCylinder, int32_t index,
-		Item* item, uint32_t count);
+		Item* item, uint32_t count, uint32_t flags = 0);
 
-	ReturnValue internalAddItem(Cylinder* toCylinder, Item* item, bool test = false);
+	ReturnValue internalAddItem(Cylinder* toCylinder, Item* item, int32_t index = INDEX_WHEREEVER,
+		uint32_t flags = 0, bool test = false);
 	ReturnValue internalRemoveItem(Item* item, int32_t count = -1,  bool test = false);
 
 	Item* transformItem(Item* item, uint16_t newtype, int32_t count = -1);
@@ -408,41 +409,5 @@ protected:
 	friend class ActionScript;
 	friend class Actions;
 };
-
-template<class ArgType>
-class TCallList : public SchedulerTask {
-public:
-	TCallList(boost::function<int(Game*, ArgType)> f1, boost::function<bool(Game*)> f2, std::list<ArgType>& call_list, __int64 interval) :
-	_f1(f1), _f2(f2), _list(call_list), _interval(interval) {
-	}
-	
-	void operator()(Game* arg) {
-		if(_eventid != 0 && !_f2(arg)) {
-			int ret = _f1(arg, _list.front());
-			_list.pop_front();
-			if (ret && !_list.empty()) {
-				SchedulerTask* newTask = new TCallList(_f1, _f2, _list, _interval);
-				newTask->setTicks(_interval);
-				newTask->setEventId(this->getEventId());
-				arg->addEvent(newTask);
-			}
-		}
-
-		return;
-	}
-
-private:
-	boost::function<int(Game*, ArgType)> _f1;
-	boost::function<bool(Game*)>_f2;
-	std::list<ArgType> _list;
-	__int64 _interval;
-};
-
-template<class ArgType>
-SchedulerTask* makeTask(__int64 ticks, boost::function<int(Game*, ArgType)> f1, std::list<ArgType>& call_list, __int64 interval, boost::function<bool(Game*)> f2) {
-	TCallList<ArgType> *t = new TCallList<ArgType>(f1, f2, call_list, interval);
-	t->setTicks(ticks);
-	return t;
-}
 
 #endif

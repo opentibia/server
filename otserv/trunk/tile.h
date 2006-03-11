@@ -20,16 +20,12 @@
 //////////////////////////////////////////////////////////////////////
 
 
-#ifndef __TILE_H__
-#define __TILE_H__
+#ifndef __OTSERV_TILE_H__
+#define __OTSERV_TILE_H__
 
-#include "item.h"
 #include "cylinder.h"
+#include "item.h"
 #include "magic.h"
-
-#include "definitions.h"
-#include "templates.h"
-#include "scheduler.h"
 
 class Creature;
 class Teleport;
@@ -97,12 +93,13 @@ public:
 	void moveCreature(Creature* creature, Cylinder* toCylinder, bool teleport = false);
 
 	//cylinder implementations
-	virtual ReturnValue __queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
-		uint32_t& maxQueryCount) const;
 	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,
-		bool childIsOwner = false) const;
+		uint32_t flags) const;
+	virtual ReturnValue __queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
+		uint32_t& maxQueryCount, uint32_t flags) const;
 	virtual ReturnValue __queryRemove(const Thing* thing, uint32_t count) const;
-	virtual Cylinder* __queryDestination(int32_t& index, const Thing* thing, Item** destItem);
+	virtual Cylinder* __queryDestination(int32_t& index, const Thing* thing, Item** destItem,
+		uint32_t& flags);
 
 	virtual void __addThing(Thing* thing);
 	virtual void __addThing(int32_t index, Thing* thing);
@@ -116,7 +113,7 @@ public:
 	virtual Thing* __getThing(uint32_t index) const;
 
 	virtual void postAddNotification(Thing* thing, bool hasOwnership = true);
-	virtual void postRemoveNotification(Thing* thing, bool hadOwnership = true);
+	virtual void postRemoveNotification(Thing* thing, bool isCompleteRemoval, bool hadOwnership = true);
 
 	virtual void __internalAddThing(Thing* thing);
 	virtual void __internalAddThing(uint32_t index, Thing* thing);

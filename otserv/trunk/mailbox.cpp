@@ -42,7 +42,7 @@ Mailbox::~Mailbox()
 }
 
 ReturnValue Mailbox::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
-	bool childIsOwner /*= false*/) const
+	uint32_t flags) const
 {
 	if(const Item* item = thing->getItem()){
 		if(canSend(item)){
@@ -53,8 +53,8 @@ ReturnValue Mailbox::__queryAdd(int32_t index, const Thing* thing, uint32_t coun
 	return RET_NOTPOSSIBLE;	
 }
 
-ReturnValue Mailbox::__queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
-	uint32_t& maxQueryCount) const
+ReturnValue Mailbox::__queryMaxCount(int32_t index, const Thing* thing, uint32_t count, uint32_t& maxQueryCount,
+	uint32_t flags) const
 {
 	maxQueryCount = std::max((uint32_t)1, count);
 	return RET_NOERROR;
@@ -65,7 +65,8 @@ ReturnValue Mailbox::__queryRemove(const Thing* thing, uint32_t count) const
 	return RET_NOTPOSSIBLE;
 }
 
-Cylinder* Mailbox::__queryDestination(int32_t& index, const Thing* thing, Item** destItem)
+Cylinder* Mailbox::__queryDestination(int32_t& index, const Thing* thing, Item** destItem,
+	uint32_t& flags)
 {
 	return this;
 }
@@ -114,9 +115,9 @@ void Mailbox::postAddNotification(Thing* thing, bool hasOwnership /*= true*/)
 	getParent()->postAddNotification(thing, false /*hasOwnership*/);
 }
 
-void Mailbox::postRemoveNotification(Thing* thing, bool hadOwnership /*= true*/)
+void Mailbox::postRemoveNotification(Thing* thing, bool isCompleteRemoval, bool hadOwnership /*= true*/)
 {
-	getParent()->postRemoveNotification(thing, false /*hadOwnership*/);
+	getParent()->postRemoveNotification(thing, isCompleteRemoval, false /*hadOwnership*/);
 }
 
 void Mailbox::__internalAddThing(Thing* thing)
@@ -134,7 +135,7 @@ bool Mailbox::sendItem(Item* item)
 	std::string reciever = std::string("");
 	uint32_t dp = 0;
      
-	if(!getReciver(item, reciever, dp)){
+	if(!getReceiver(item, reciever, dp)){
 		return false;
 	}
      
@@ -151,8 +152,9 @@ bool Mailbox::sendItem(Item* item)
 		Depot* depot = player->getDepot(dp, true);
               
 		if(depot){
-			g_game.internalMoveItem(item->getParent(), depot, -1, item, item->getItemCount());
-			g_game.transformItem(item, item->getID()+1); /**Change it to stamped!**/	
+			if(g_game.internalMoveItem(item->getParent(), depot, INDEX_WHEREEVER, item, item->getItemCount(), FLAG_NOLIMIT) == RET_NOERROR){
+				g_game.transformItem(item, item->getID() + 1); /**Change it to stamped!**/	
+			}
 			return true;
 		}
 	}
@@ -178,22 +180,23 @@ bool Mailbox::sendItem(Item* item)
 
 		Depot* depot = player->getDepot(dp, true);
 		if(depot){
-			g_game.internalMoveItem(item->getParent(), depot, -1, item, item->getItemCount());
-			g_game.transformItem(item, item->getID()+1);
+			if(g_game.internalMoveItem(item->getParent(), depot, INDEX_WHEREEVER, item, item->getItemCount(), FLAG_NOLIMIT) == RET_NOERROR){
+				g_game.transformItem(item, item->getID() + 1);
+			}
+
 			IOPlayer::instance()->savePlayer(player); 
 			
-			delete player;
-			
+			delete player;			
 			return true;
 		}
 
-		delete player;  
+		delete player;
 	}
 	
 	return false;
 }
 
-bool Mailbox::getReciver(Item* item, std::string& name, uint32_t& dp)
+bool Mailbox::getReceiver(Item* item, std::string& name, uint32_t& dp)
 {
 	if(!item){
 		return false;

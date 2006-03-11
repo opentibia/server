@@ -34,13 +34,13 @@ TrashHolder::~TrashHolder()
 }
 
 ReturnValue TrashHolder::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
-	bool childIsOwner /*= false*/) const
+	uint32_t flags) const
 {
 	return RET_NOERROR;
 }
 
 ReturnValue TrashHolder::__queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
-	uint32_t& maxQueryCount) const
+	uint32_t& maxQueryCount, uint32_t flags) const
 {
 	maxQueryCount = std::max((uint32_t)1, count);
 	return RET_NOERROR;
@@ -51,7 +51,8 @@ ReturnValue TrashHolder::__queryRemove(const Thing* thing, uint32_t count) const
 	return RET_NOTPOSSIBLE;
 }
 
-Cylinder* TrashHolder::__queryDestination(int32_t& index, const Thing* thing, Item** destItem)
+Cylinder* TrashHolder::__queryDestination(int32_t& index, const Thing* thing, Item** destItem,
+	uint32_t& flags)
 {
 	return this;
 }
@@ -103,9 +104,9 @@ void TrashHolder::postAddNotification(Thing* thing, bool hasOwnership /*= true*/
 	getParent()->postAddNotification(thing, false /*hasOwnership*/);
 }
 
-void TrashHolder::postRemoveNotification(Thing* thing, bool hadOwnership /*= true*/)
+void TrashHolder::postRemoveNotification(Thing* thing, bool isCompleteRemoval, bool hadOwnership /*= true*/)
 {
-	getParent()->postRemoveNotification(thing, false /*hadOwnership*/);
+	getParent()->postRemoveNotification(thing, isCompleteRemoval, false /*hadOwnership*/);
 }
 
 void TrashHolder::__internalAddThing(Thing* thing)

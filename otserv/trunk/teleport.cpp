@@ -84,13 +84,13 @@ xmlNodePtr Teleport::serialize()
 }
 
 ReturnValue Teleport::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
-	bool childIsOwner /*= false*/) const
+	uint32_t flags) const
 {
 	return RET_NOTPOSSIBLE;
 }
 
 ReturnValue Teleport::__queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
-	uint32_t& maxQueryCount) const
+	uint32_t& maxQueryCount, uint32_t flags) const
 {
 	return RET_NOTPOSSIBLE;
 }
@@ -100,7 +100,8 @@ ReturnValue Teleport::__queryRemove(const Thing* thing, uint32_t count) const
 	return RET_NOERROR;
 }
 
-Cylinder* Teleport::__queryDestination(int32_t& index, const Thing* thing, Item** destItem)
+Cylinder* Teleport::__queryDestination(int32_t& index, const Thing* thing, Item** destItem,
+	uint32_t& flags)
 {
 	return this;
 }
@@ -119,7 +120,7 @@ void Teleport::__addThing(int32_t index, Thing* thing)
 			g_game.AddMagicEffectAt(destTile->getPosition(), NM_ME_ENERGY_AREA);
 		}
 		else if(Item* item = thing->getItem()){
-			g_game.internalMoveItem(getTile(), destTile, 0, item, item->getItemCount());
+			g_game.internalMoveItem(getTile(), destTile, INDEX_WHEREEVER, item, item->getItemCount());
 		}
 	}
 }
@@ -154,9 +155,9 @@ void Teleport::postAddNotification(Thing* thing, bool hasOwnership /*= true*/)
 	getParent()->postAddNotification(thing, false /*hasOwnership*/);
 }
 
-void Teleport::postRemoveNotification(Thing* thing, bool hadOwnership /*= true*/)
+void Teleport::postRemoveNotification(Thing* thing, bool isCompleteRemoval, bool hadOwnership /*= true*/)
 {
-	getParent()->postRemoveNotification(thing, false /*hadOwnership*/);
+	getParent()->postRemoveNotification(thing, isCompleteRemoval, false /*hadOwnership*/);
 }
 
 void Teleport::__internalAddThing(Thing* thing)

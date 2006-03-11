@@ -69,9 +69,9 @@ void Depot::postAddNotification(Thing* thing, bool hasOwnership /*= true*/)
 	}
 }
 
-void Depot::postRemoveNotification(Thing* thing, bool hadOwnership /*= true*/)
+void Depot::postRemoveNotification(Thing* thing, bool isCompleteRemoval, bool hadOwnership /*= true*/)
 {
 	if(getParent() != NULL){
-		getParent()->postRemoveNotification(thing, false /*hadOwnership*/);
+		getParent()->postRemoveNotification(thing, isCompleteRemoval, false /*hadOwnership*/);
 	}
 }

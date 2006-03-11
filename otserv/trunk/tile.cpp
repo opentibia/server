@@ -25,6 +25,7 @@
 #include <string>
 #include <iostream>
 
+#include "definitions.h"
 #include "tile.h"
 #include "game.h"
 #include "player.h"
@@ -447,11 +448,11 @@ void Tile::moveCreature(Creature* creature, Cylinder* toCylinder, bool teleport 
 	g_game.isExecutingEvents = false;
 
 	toCylinder->postAddNotification(creature);
-	postRemoveNotification(creature);
+	postRemoveNotification(creature, true);
 }
 
 ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
-	bool childIsOwner /*= false*/) const
+	uint32_t flags) const
 {
 	Thing* iithing = NULL;
 
@@ -522,8 +523,8 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 		}
 	}
 	else if(const Item* item = thing->getItem()){
-		//If its a new (summoned item) always accept it
-		if(thing->getParent() == NULL){
+		//If its a new (summoned item) always accept it, or FLAG_NOLIMIT is set
+		if(thing->getParent() == NULL || ((flags & FLAG_NOLIMIT) == FLAG_NOLIMIT) ){
 			return RET_NOERROR;
 		}
 
@@ -583,8 +584,8 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 	return RET_NOERROR;
 }
 
-ReturnValue Tile::__queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
-	uint32_t& maxQueryCount) const
+ReturnValue Tile::__queryMaxCount(int32_t index, const Thing* thing, uint32_t count, uint32_t& maxQueryCount,
+	uint32_t flags) const
 {
 	maxQueryCount = std::max((uint32_t)1, count);
 	return RET_NOERROR;
@@ -614,7 +615,8 @@ ReturnValue Tile::__queryRemove(const Thing* thing, uint32_t count) const
 	return RET_NOERROR;
 }
 
-Cylinder* Tile::__queryDestination(int32_t& index, const Thing* thing, Item** destItem)
+Cylinder* Tile::__queryDestination(int32_t& index, const Thing* thing, Item** destItem,
+	uint32_t& flags)
 {
 	Tile* destTile = NULL;
 	*destItem = NULL;
@@ -681,6 +683,9 @@ Cylinder* Tile::__queryDestination(int32_t& index, const Thing* thing, Item** de
 
 	if(destTile == NULL){
 		destTile = this;
+	}
+	else{
+		flags |= FLAG_NOLIMIT; //Will ignore that there is blocking items/creatures
 	}
 
 	if(destTile){
@@ -1080,7 +1085,7 @@ void Tile::postAddNotification(Thing* thing, bool hasOwnership /*= true*/)
 	}
 }
 
-void Tile::postRemoveNotification(Thing* thing, bool hadOwnership /*= true*/)
+void Tile::postRemoveNotification(Thing* thing, bool isCompleteRemoval, bool hadOwnership /*= true*/)
 {
 	const Position& cylinderMapPos = getPosition();
 
@@ -1100,7 +1105,7 @@ void Tile::postRemoveNotification(Thing* thing, bool hadOwnership /*= true*/)
 
 	for(it = list.begin(); it != list.end(); ++it){
 		if(Player* player = (*it)->getPlayer()){
-			player->postRemoveNotification(thing, false);
+			player->postRemoveNotification(thing, isCompleteRemoval, false);
 		}
 	}
 }

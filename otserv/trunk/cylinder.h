@@ -18,8 +18,8 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __CYLINDER_H__
-#define __CYLINDER_H__
+#ifndef __OTSERV_CYLINDER_H__
+#define __OTSERV_CYLINDER_H__
 
 #include "definitions.h"
 #include "thing.h"
@@ -28,7 +28,11 @@ class Item;
 class Creature;
 
 #define INDEX_WHEREEVER -1
-#define INDEX_NOLIMIT -2
+
+enum cylinderflags_t {
+	FLAG_NOLIMIT = 1,
+	FLAG_CHILDISOWNER = 2
+};
 
 class Cylinder : virtual public Thing{
 public:	
@@ -38,11 +42,12 @@ public:
 		* -1 is a internal value and means add to a empty position, with no destItem
 	  * \param thing the object to move/add
 	  * \param count is the amount that we want to move/add
-	  * \param childIsOwner if set to true the query is from a child-cylinder
+	  * \param flags if FLAG_CHILDISOWNER if set the query is from a child-cylinder (check cap etc.)
+		* if FLAG_NOLIMIT is set blocking items/container limits is ignored
 	  * \returns ReturnValue holds the return value
 	  */
 	virtual ReturnValue __queryAdd(int32_t index, const Thing* Item, uint32_t count,
-		bool childIsOwner = false) const = 0;
+		uint32_t flags) const = 0;
 
 	/**
 	  * Query the cylinder how much it can accept
@@ -51,10 +56,11 @@ public:
 	  * \param item the object to move/add
 	  * \param count is the amount that we want to move/add
 	  * \param maxQueryCount is the max amount that the cylinder can accept
+	  * \param flags optional flags to modifiy the default behaviour
 	  * \returns ReturnValue holds the return value
 	  */
-	virtual ReturnValue __queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
-		uint32_t& maxQueryCount) const = 0;
+	virtual ReturnValue __queryMaxCount(int32_t index, const Thing* thing, uint32_t count, uint32_t& maxQueryCount,
+		uint32_t flags) const = 0;
 
 	/**
 	  * Query if the cylinder can remove an object
@@ -69,10 +75,13 @@ public:
 	  * \param index points to the destination index (inventory slot/container position),
 		* -1 is a internal value and means add to a empty position, with no destItem
 		* this method can change the index to point to the new cylinder index
-	  * \destItem is the destination object
+	  * \param destItem is the destination object
+	  * \param flags optional flags to modifiy the default behaviour
+		* this method can modifiy the flags
 	  * \returns Cylinder returns the destination cylinder
 	  */
-	virtual Cylinder* __queryDestination(int32_t& index, const Thing* thing, Item** destItem) = 0;
+	virtual Cylinder* __queryDestination(int32_t& index, const Thing* thing, Item** destItem,
+		uint32_t& flags) = 0;
 
 	/**
 	  * Add the object to the cylinder
@@ -119,10 +128,11 @@ public:
 	/**
 	  * Is sent after an operation (move/remove) to update internal values
 	  * \param thing is the object that has been removed
+	  * \param isCompleteRemoval indicates if the item was completely removed or just partially (stackables)
 	  * \param hadOwnership if this value is true the cylinder (or its children) has removed the object from itself
 		* otherwise another cylinder (like Tile class and wish to inform this change) has sent the message.
 	  */
-	virtual void postRemoveNotification(Thing* thing, bool hadOwnership = true) = 0;
+	virtual void postRemoveNotification(Thing* thing, bool isCompleteRemoval, bool hadOwnership = true) = 0;
 
 	/**
 	  * Gets the index of an object

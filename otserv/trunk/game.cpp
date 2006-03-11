@@ -896,7 +896,7 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 		(*it)->onCreatureDisappear(creature, index, isLogout);
 	}
 
-	creature->getParent()->postRemoveNotification(creature);
+	creature->getParent()->postRemoveNotification(creature, true);
 
 	listCreature.removeList(creature->getID());
 	creature->removeList();
@@ -1116,7 +1116,8 @@ ReturnValue Game::moveCreature(Creature* creature, Direction direction)
 ReturnValue Game::internalCreatureMove(Creature* creature, Cylinder* fromCylinder, Cylinder* toCylinder)
 {
 	//check if we can move the creature to the destination
-	ReturnValue ret = toCylinder->__queryAdd(0, creature, 0);
+	uint32_t flags = 0;
+	ReturnValue ret = toCylinder->__queryAdd(0, creature, 1, flags);
 	if(ret != RET_NOERROR){
 		return ret;
 	}
@@ -1128,9 +1129,10 @@ ReturnValue Game::internalCreatureMove(Creature* creature, Cylinder* fromCylinde
 	Cylinder* subCylinder = NULL;
 
 	uint32_t n = 0;
-	while((subCylinder = toCylinder->__queryDestination(index, creature, &toItem)) != toCylinder){
+	while((subCylinder = toCylinder->__queryDestination(index, creature, &toItem, flags)) != toCylinder){
 		toCylinder->getTile()->moveCreature(creature, subCylinder);
 		toCylinder = subCylinder;
+		flags = 0;
 
 		//to prevent infinate loop
 		if(++n >= MAP_MAX_LAYERS)
@@ -1189,14 +1191,14 @@ void Game::moveItem(Player* player, Cylinder* fromCylinder, Cylinder* toCylinder
 }
 
 ReturnValue Game::internalMoveItem(Cylinder* fromCylinder, Cylinder* toCylinder, int32_t index,
-	Item* item, uint32_t count)
+	Item* item, uint32_t count, uint32_t flags /*= 0*/)
 {
 	if(!toCylinder){
 		return RET_NOTPOSSIBLE;
 	}
 
 	Item* toItem = NULL;
-	toCylinder = toCylinder->__queryDestination(index, item, &toItem);
+	toCylinder = toCylinder->__queryDestination(index, item, &toItem, flags);
 
 	//destination is the same as the source?
 	if(item == toItem){ 
@@ -1204,16 +1206,16 @@ ReturnValue Game::internalMoveItem(Cylinder* fromCylinder, Cylinder* toCylinder,
 	}
 
 	//check if we can add this item
-	ReturnValue ret = toCylinder->__queryAdd(index, item, count);
+	ReturnValue ret = toCylinder->__queryAdd(index, item, count, flags);
 	if(ret == RET_NEEDEXCHANGE){
 		//check if we can add it to source cylinder
 		int32_t fromIndex = fromCylinder->__getIndexOfThing(item);
 
-		ret = fromCylinder->__queryAdd(fromIndex, toItem, toItem->getItemCount());
+		ret = fromCylinder->__queryAdd(fromIndex, toItem, toItem->getItemCount(), 0);
 		if(ret == RET_NOERROR){
 			//check how much we can move
 			uint32_t maxExchangeQueryCount = 0;
-			ReturnValue retExchangeMaxCount = fromCylinder->__queryMaxCount(-1, toItem, toItem->getItemCount(), maxExchangeQueryCount);
+			ReturnValue retExchangeMaxCount = fromCylinder->__queryMaxCount(-1, toItem, toItem->getItemCount(), maxExchangeQueryCount, 0);
 
 			if(retExchangeMaxCount != RET_NOERROR && maxExchangeQueryCount == 0){
 				return retExchangeMaxCount;
@@ -1224,10 +1226,10 @@ ReturnValue Game::internalMoveItem(Cylinder* fromCylinder, Cylinder* toCylinder,
 				toCylinder->__removeThing(toItem, toItem->getItemCount());
 				fromCylinder->__addThing(toItem);
 
-				toCylinder->postRemoveNotification(toItem);
+				toCylinder->postRemoveNotification(toItem, true);
 				fromCylinder->postAddNotification(toItem);
 
-				ret = toCylinder->__queryAdd(index, item, count);
+				ret = toCylinder->__queryAdd(index, item, count, flags);
 				toItem = NULL;
 			}
 		}
@@ -1239,7 +1241,7 @@ ReturnValue Game::internalMoveItem(Cylinder* fromCylinder, Cylinder* toCylinder,
 
 	//check how much we can move
 	uint32_t maxQueryCount = 0;
-	ReturnValue retMaxCount = toCylinder->__queryMaxCount(index, item, count, maxQueryCount);
+	ReturnValue retMaxCount = toCylinder->__queryMaxCount(index, item, count, maxQueryCount, flags);
 
 	if(retMaxCount != RET_NOERROR && maxQueryCount == 0){
 		return retMaxCount;
@@ -1264,6 +1266,7 @@ ReturnValue Game::internalMoveItem(Cylinder* fromCylinder, Cylinder* toCylinder,
 
 	//remove the item
 	fromCylinder->__removeThing(item, m);
+	bool isCompleteRemoval = item->isRemoved();
 
 	//update item(s)
 	if(item->isStackable()) {
@@ -1286,13 +1289,10 @@ ReturnValue Game::internalMoveItem(Cylinder* fromCylinder, Cylinder* toCylinder,
 	
 	//add item
 	if(moveItem /*m - n > 0*/){
-		if(index == -1)
-			toCylinder->__addThing(0, moveItem);
-		else
-			toCylinder->__addThing(index, moveItem);
+		toCylinder->__addThing(index, moveItem);
 	}
-	
-	fromCylinder->postRemoveNotification(item);
+
+	fromCylinder->postRemoveNotification(item, isCompleteRemoval);
 	if(moveItem)
 		toCylinder->postAddNotification(moveItem);
 	else
@@ -1306,25 +1306,25 @@ ReturnValue Game::internalMoveItem(Cylinder* fromCylinder, Cylinder* toCylinder,
 	return ret;
 }
 
-ReturnValue Game::internalAddItem(Cylinder* toCylinder, Item* item, bool test /*= false*/)
+ReturnValue Game::internalAddItem(Cylinder* toCylinder, Item* item, int32_t index /*= INDEX_WHEREEVER*/,
+	uint32_t flags /*= 0*/, bool test /*= false*/)
 {
 	if(toCylinder == NULL || item == NULL){
 		return RET_NOTPOSSIBLE;
 	}
 
 	Item* toItem = NULL;
-	int32_t index = -1;
-	toCylinder = toCylinder->__queryDestination(index, item, &toItem);
+	toCylinder = toCylinder->__queryDestination(index, item, &toItem, flags);
 
 	//check if we can add this item
-	ReturnValue ret = toCylinder->__queryAdd(index, item, item->getItemCount());
+	ReturnValue ret = toCylinder->__queryAdd(index, item, item->getItemCount(), flags);
 	if(ret != RET_NOERROR){
 		return ret;
 	}
 
 	//check how much we can move
 	uint32_t maxQueryCount = 0;
-	ret = toCylinder->__queryMaxCount(index, item, item->getItemCount(), maxQueryCount);
+	ret = toCylinder->__queryMaxCount(index, item, item->getItemCount(), maxQueryCount, flags);
 
 	if(ret != RET_NOERROR){
 		return ret;
@@ -1359,11 +1359,7 @@ ReturnValue Game::internalAddItem(Cylinder* toCylinder, Item* item, bool test /*
 		}
 
 		if(moveItem){
-			if(index == -1)
-				toCylinder->__addThing(0, moveItem);
-			else
-				toCylinder->__addThing(index, moveItem);
-
+			toCylinder->__addThing(index, moveItem);
 			toCylinder->postAddNotification(moveItem);
 		}
 		else
@@ -1393,12 +1389,14 @@ ReturnValue Game::internalRemoveItem(Item* item, int32_t count /*= -1*/,  bool t
 	if(!test){
 		//remove the item
 		cylinder->__removeThing(item, count);
+		bool isCompleteRemoval = false;
 
 		if(item->isRemoved()){
+			isCompleteRemoval = true;
 			FreeThing(item);
 		}
 
-		cylinder->postRemoveNotification(item);
+		cylinder->postRemoveNotification(item, isCompleteRemoval);
 	}
 	
 	return RET_NOERROR;
@@ -1417,7 +1415,7 @@ Item* Game::transformItem(Item* item, uint16_t newtype, int32_t count /*= -1*/)
 	if(Container* container = item->getContainer()){
 		//container to container
 		if(Item::items[newtype].isContainer()){
-			cylinder->postRemoveNotification(item);
+			cylinder->postRemoveNotification(item, true);
 			item->setID(newtype);
 			cylinder->__updateThing(item, item->getItemCount());
 			cylinder->postAddNotification(item);
@@ -1434,7 +1432,7 @@ Item* Game::transformItem(Item* item, uint16_t newtype, int32_t count /*= -1*/)
 			}
 
 			item->setParent(NULL);
-			cylinder->postRemoveNotification(item);
+			cylinder->postRemoveNotification(item, true);
 			FreeThing(item);
 
 			Item* newItem = Item::CreateItem(newtype, (count == -1 ? 1 : count));
@@ -1456,7 +1454,7 @@ Item* Game::transformItem(Item* item, uint16_t newtype, int32_t count /*= -1*/)
 			}
 
 			item->setParent(NULL);
-			cylinder->postRemoveNotification(item);
+			cylinder->postRemoveNotification(item, true);
 			FreeThing(item);
 
 			Item* newItem = Item::CreateItem(newtype);
@@ -1492,7 +1490,7 @@ Item* Game::transformItem(Item* item, uint16_t newtype, int32_t count /*= -1*/)
 				}
 			}
 			else{
-				cylinder->postRemoveNotification(item);
+				cylinder->postRemoveNotification(item, true);
 				item->setID(newtype);
 
 				if(item->hasSubType()){
@@ -1527,7 +1525,7 @@ ReturnValue Game::internalTeleport(Thing* thing, const Position& newPos)
 			return RET_NOERROR;
 		}
 		else if(Item* item = thing->getItem()){
-			return internalMoveItem(item->getParent(), toTile, 0, item, item->getItemCount());
+			return internalMoveItem(item->getParent(), toTile, INDEX_WHEREEVER, item, item->getItemCount());
 		}
 	}
 
@@ -2653,8 +2651,8 @@ bool Game::playerAcceptTrade(Player* player)
 		
 		bool isSuccess = false;
 
-		ReturnValue ret1 = internalAddItem(tradePartner, tradeItem1, true);
-		ReturnValue ret2 = internalAddItem(player, tradeItem2, true);
+		ReturnValue ret1 = internalAddItem(tradePartner, tradeItem1, INDEX_WHEREEVER, 0, true);
+		ReturnValue ret2 = internalAddItem(player, tradeItem2, INDEX_WHEREEVER, 0, true);
 
 		if(ret1 == RET_NOERROR && ret2 == RET_NOERROR){
 			ret1 = internalRemoveItem(tradeItem1, tradeItem1->getItemCount(), true);
@@ -2667,8 +2665,8 @@ bool Game::playerAcceptTrade(Player* player)
 				player->setTradeState(TRADE_TRANSFER);
 				tradePartner->setTradeState(TRADE_TRANSFER);
 
-				internalMoveItem(cylinder1, tradePartner, 0, tradeItem1, tradeItem1->getItemCount());
-				internalMoveItem(cylinder2, player, 0, tradeItem2, tradeItem2->getItemCount());
+				internalMoveItem(cylinder1, tradePartner, INDEX_WHEREEVER, tradeItem1, tradeItem1->getItemCount());
+				internalMoveItem(cylinder2, player, INDEX_WHEREEVER, tradeItem2, tradeItem2->getItemCount());
 
 				isSuccess = true;
 			}

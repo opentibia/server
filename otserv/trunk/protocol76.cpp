@@ -1222,17 +1222,17 @@ void Protocol76::sendContainer(uint32_t cid, const Container* container, bool ha
 void Protocol76::sendTradeItemRequest(const Player* player, const Item* item, bool ack)
 {
 	NetworkMessage msg;
-	if(ack) {
+	if(ack){
 		msg.AddByte(0x7D);
 	}
-	else {
+	else{
 		msg.AddByte(0x7E);
 	}
 	
 	msg.AddString(player->getName());
 	
-	const Container *tradeContainer = dynamic_cast<const Container*>(item);
-	if(tradeContainer) {
+	const Container* tradeContainer = item->getContainer();
+	if(tradeContainer){
 		
 		std::list<const Container*> stack;
 		stack.push_back(tradeContainer);
@@ -1297,9 +1297,7 @@ void Protocol76::sendCreatureTurn(const Creature* creature, unsigned char stackP
 		msg.AddPosition(creature->getPosition());
 		msg.AddByte(stackPos); 
 		
-		//msg.AddByte(0x63);
-		//msg.AddByte(0x00);
-		msg.AddU16(0x63);
+		msg.AddU16(0x63); /*99*/
 		msg.AddU32(creature->getID());
 		msg.AddByte(creature->getDirection());
 		WriteBuffer(msg);

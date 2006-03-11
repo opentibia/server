@@ -37,7 +37,7 @@ public:
 		bool childIsOwner = false) const;
 		
 	virtual void postAddNotification(Thing* thing, bool hasOwnership = true);
-	virtual void postRemoveNotification(Thing* thing, bool hadOwnership = true);
+	virtual void postRemoveNotification(Thing* thing, bool isCompleteRemoval, bool hadOwnership = true);
 private:
 	uint32_t maxDepotLimit;
 	uint32_t depotId;

@@ -33,9 +33,10 @@ public:
 
 	//cylinder implementations
 	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,
-		bool childIsOwner = false) const;
+		uint32_t flags) const;
 	
-	virtual Cylinder* __queryDestination(int32_t& index, const Thing* thing, Item** destItem);
+	virtual Cylinder* __queryDestination(int32_t& index, const Thing* thing, Item** destItem,
+		uint32_t& flags);
 
 	House* getHouse() {return house;};
 private:

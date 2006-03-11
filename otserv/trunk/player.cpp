@@ -1707,7 +1707,6 @@ unsigned long Player::getIP() const
 void Player::die()
 {
 	loginPosition = masterPos;
-	//lastPosition = getPosition();
 
 	//Magic level loss
 	unsigned long sumMana = 0;
@@ -1965,168 +1964,171 @@ bool Player::hasCapacity(const Item* item, uint32_t count) const
 }
 
 ReturnValue Player::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
-	bool childIsOwner /*= false*/) const
+	uint32_t flags) const
 {
 	const Item* item = thing->getItem();
 	if(item == NULL){
 		return RET_NOTPOSSIBLE;
 	}
 
+	bool childIsOwner = ((flags & FLAG_CHILDISOWNER) == FLAG_CHILDISOWNER);
+	bool noLimit = ((flags & FLAG_NOLIMIT) == FLAG_NOLIMIT);
+
 	if(childIsOwner){
-		if(hasCapacity(item, count))
+		//a child container is querying the player, just check if enough capacity
+		if(noLimit || hasCapacity(item, count))
 			return RET_NOERROR;
 		else
 			return RET_NOTENOUGHCAPACITY;
 	}
-	else{
-		if(!item->isPickupable()){
-			return RET_CANNOTPICKUP;
-		}
-		
-		ReturnValue ret = RET_NOERROR;
-		
-		if((item->getSlotPosition() & SLOTP_HEAD) ||
-			(item->getSlotPosition() & SLOTP_NECKLACE) ||
-			(item->getSlotPosition() & SLOTP_BACKPACK) ||
-			(item->getSlotPosition() & SLOTP_ARMOR) ||
-			(item->getSlotPosition() & SLOTP_LEGS) ||
-			(item->getSlotPosition() & SLOTP_FEET) ||
-			(item->getSlotPosition() & SLOTP_RING)){
-			ret = RET_CANNOTBEDRESSED;
-		}
-		else if(item->getSlotPosition() & SLOTP_TWO_HAND){
-			ret = RET_PUTTHISOBJECTINBOTHHANDS;
-		}
-		else if((item->getSlotPosition() & SLOTP_RIGHT) || (item->getSlotPosition() & SLOTP_LEFT)){
-			ret = RET_PUTTHISOBJECTINYOURHAND;
-		}
 
-		//check if we can dress this object
-		switch(index){
-			case SLOT_HEAD:
-				if(item->getSlotPosition() & SLOTP_HEAD)
+	if(!item->isPickupable()){
+		return RET_CANNOTPICKUP;
+	}
+	
+	ReturnValue ret = RET_NOERROR;
+	
+	if((item->getSlotPosition() & SLOTP_HEAD) ||
+		(item->getSlotPosition() & SLOTP_NECKLACE) ||
+		(item->getSlotPosition() & SLOTP_BACKPACK) ||
+		(item->getSlotPosition() & SLOTP_ARMOR) ||
+		(item->getSlotPosition() & SLOTP_LEGS) ||
+		(item->getSlotPosition() & SLOTP_FEET) ||
+		(item->getSlotPosition() & SLOTP_RING)){
+		ret = RET_CANNOTBEDRESSED;
+	}
+	else if(item->getSlotPosition() & SLOTP_TWO_HAND){
+		ret = RET_PUTTHISOBJECTINBOTHHANDS;
+	}
+	else if((item->getSlotPosition() & SLOTP_RIGHT) || (item->getSlotPosition() & SLOTP_LEFT)){
+		ret = RET_PUTTHISOBJECTINYOURHAND;
+	}
+
+	//check if we can dress this object
+	switch(index){
+		case SLOT_HEAD:
+			if(item->getSlotPosition() & SLOTP_HEAD)
+				ret = RET_NOERROR;
+			break;
+		case SLOT_NECKLACE:
+			if(item->getSlotPosition() & SLOTP_NECKLACE)
+				ret = RET_NOERROR;
+			break;
+		case SLOT_BACKPACK:
+			if(item->getSlotPosition() & SLOTP_BACKPACK)
+				ret = RET_NOERROR;
+			break;
+		case SLOT_ARMOR:
+			if(item->getSlotPosition() & SLOTP_ARMOR)
+				ret = RET_NOERROR;
+			break;
+		case SLOT_RIGHT:
+			if(item->getSlotPosition() & SLOTP_RIGHT){
+				//check if we already carry an item in the other hand
+				if(item->getSlotPosition() & SLOTP_TWO_HAND){
+					if(items[SLOT_LEFT] && items[SLOT_LEFT] != item){
+						ret = RET_BOTHHANDSNEEDTOBEFREE;
+					}
+					else
 					ret = RET_NOERROR;
-				break;
-			case SLOT_NECKLACE:
-				if(item->getSlotPosition() & SLOTP_NECKLACE)
-					ret = RET_NOERROR;
-				break;
-			case SLOT_BACKPACK:
-				if(item->getSlotPosition() & SLOTP_BACKPACK)
-					ret = RET_NOERROR;
-				break;
-			case SLOT_ARMOR:
-				if(item->getSlotPosition() & SLOTP_ARMOR)
-					ret = RET_NOERROR;
-				break;
-			case SLOT_RIGHT:
-				if(item->getSlotPosition() & SLOTP_RIGHT){
-					//check if we already carry an item in the other hand
-					if(item->getSlotPosition() & SLOTP_TWO_HAND){
-						if(items[SLOT_LEFT] && items[SLOT_LEFT] != item){
-							ret = RET_BOTHHANDSNEEDTOBEFREE;
+				}
+				else{
+					//check if we already carry a double-handed item
+					if(items[SLOT_LEFT]){
+						if(items[SLOT_LEFT]->getSlotPosition() & SLOTP_TWO_HAND){
+							ret = RET_DROPTWOHANDEDITEM;
+						}
+						//check if weapon, can only carry one weapon
+						else if(item != items[SLOT_LEFT] && items[SLOT_LEFT]->isWeapon() &&
+							(items[SLOT_LEFT]->getWeaponType() != SHIELD) &&
+							(items[SLOT_LEFT]->getWeaponType() != AMO) &&
+							item->isWeapon() && (item->getWeaponType() != SHIELD) && (item->getWeaponType() != AMO)){
+								ret = RET_CANONLYUSEONEWEAPON;
 						}
 						else
+							ret = RET_NOERROR;
+					}
+					else
 						ret = RET_NOERROR;
-					}
-					else{
-						//check if we already carry a double-handed item
-						if(items[SLOT_LEFT]){
-							if(items[SLOT_LEFT]->getSlotPosition() & SLOTP_TWO_HAND){
-								ret = RET_DROPTWOHANDEDITEM;
-							}
-							//check if weapon, can only carry one weapon
-							else if(item != items[SLOT_LEFT] && items[SLOT_LEFT]->isWeapon() &&
-								(items[SLOT_LEFT]->getWeaponType() != SHIELD) &&
-								(items[SLOT_LEFT]->getWeaponType() != AMO) &&
-								item->isWeapon() && (item->getWeaponType() != SHIELD) && (item->getWeaponType() != AMO)){
-									ret = RET_CANONLYUSEONEWEAPON;
-							}
-							else
-								ret = RET_NOERROR;
-						}
-						else
-							ret = RET_NOERROR;
-					}
-				}
-				break;
-			case SLOT_LEFT:
-				if(item->getSlotPosition() & SLOTP_LEFT){
-					//check if we already carry an item in the other hand
-					if(item->getSlotPosition() & SLOTP_TWO_HAND){
-						if(items[SLOT_RIGHT] && items[SLOT_RIGHT] != item){
-							ret = RET_BOTHHANDSNEEDTOBEFREE;
-						}
-						else
-							ret = RET_NOERROR;
-					}
-					else{
-						//check if we already carry a double-handed item
-						if(items[SLOT_RIGHT]){
-							if(items[SLOT_RIGHT]->getSlotPosition() & SLOTP_TWO_HAND){
-								ret = RET_DROPTWOHANDEDITEM;
-							}
-							//check if weapon, can only carry one weapon
-							else if(item != items[SLOT_RIGHT] && items[SLOT_RIGHT]->isWeapon() &&
-								(items[SLOT_RIGHT]->getWeaponType() != SHIELD) &&
-								(items[SLOT_RIGHT]->getWeaponType() != AMO) &&
-								item->isWeapon() && (item->getWeaponType() != SHIELD) && (item->getWeaponType() != AMO)){
-									ret = RET_CANONLYUSEONEWEAPON;
-							}
-							else
-								ret = RET_NOERROR;
-						}
-						else
-							ret = RET_NOERROR;
-					}
-				}
-				break;
-			case SLOT_LEGS:
-				if(item->getSlotPosition() & SLOTP_LEGS)
-					ret = RET_NOERROR;
-				break;
-			case SLOT_FEET:
-				if(item->getSlotPosition() & SLOTP_FEET)
-					ret = RET_NOERROR;
-				break;
-			case SLOT_RING:
-				if(item->getSlotPosition() & SLOTP_RING)
-					ret = RET_NOERROR;
-				break;
-			case SLOT_AMMO:
-				if(item->getSlotPosition() & SLOTP_AMMO)
-					ret = RET_NOERROR;
-				break;
-			case SLOT_WHEREEVER:
-				ret = RET_NOTENOUGHROOM;
-				break;
-
-			default:
-				ret = RET_NOTPOSSIBLE;
-				break;
-		}
-
-		if(ret == RET_NOERROR || ret == RET_NOTENOUGHROOM){
-			//need an exchange with source?
-			if(getInventoryItem((slots_t)index) != NULL){
-				if(!getInventoryItem((slots_t)index)->isStackable() || getInventoryItem((slots_t)index)->getID() != item->getID()){
-					return RET_NEEDEXCHANGE;
 				}
 			}
+			break;
+		case SLOT_LEFT:
+			if(item->getSlotPosition() & SLOTP_LEFT){
+				//check if we already carry an item in the other hand
+				if(item->getSlotPosition() & SLOTP_TWO_HAND){
+					if(items[SLOT_RIGHT] && items[SLOT_RIGHT] != item){
+						ret = RET_BOTHHANDSNEEDTOBEFREE;
+					}
+					else
+						ret = RET_NOERROR;
+				}
+				else{
+					//check if we already carry a double-handed item
+					if(items[SLOT_RIGHT]){
+						if(items[SLOT_RIGHT]->getSlotPosition() & SLOTP_TWO_HAND){
+							ret = RET_DROPTWOHANDEDITEM;
+						}
+						//check if weapon, can only carry one weapon
+						else if(item != items[SLOT_RIGHT] && items[SLOT_RIGHT]->isWeapon() &&
+							(items[SLOT_RIGHT]->getWeaponType() != SHIELD) &&
+							(items[SLOT_RIGHT]->getWeaponType() != AMO) &&
+							item->isWeapon() && (item->getWeaponType() != SHIELD) && (item->getWeaponType() != AMO)){
+								ret = RET_CANONLYUSEONEWEAPON;
+						}
+						else
+							ret = RET_NOERROR;
+					}
+					else
+						ret = RET_NOERROR;
+				}
+			}
+			break;
+		case SLOT_LEGS:
+			if(item->getSlotPosition() & SLOTP_LEGS)
+				ret = RET_NOERROR;
+			break;
+		case SLOT_FEET:
+			if(item->getSlotPosition() & SLOTP_FEET)
+				ret = RET_NOERROR;
+			break;
+		case SLOT_RING:
+			if(item->getSlotPosition() & SLOTP_RING)
+				ret = RET_NOERROR;
+			break;
+		case SLOT_AMMO:
+			if(item->getSlotPosition() & SLOTP_AMMO)
+				ret = RET_NOERROR;
+			break;
+		case SLOT_WHEREEVER:
+			ret = RET_NOTENOUGHROOM;
+			break;
 
-			//check if enough capacity
-			if(hasCapacity(item, count))
-				return ret;
-			else
-				return RET_NOTENOUGHCAPACITY;
+		default:
+			ret = RET_NOTPOSSIBLE;
+			break;
+	}
+
+	if(ret == RET_NOERROR || ret == RET_NOTENOUGHROOM){
+		//need an exchange with source?
+		if(getInventoryItem((slots_t)index) != NULL){
+			if(!getInventoryItem((slots_t)index)->isStackable() || getInventoryItem((slots_t)index)->getID() != item->getID()){
+				return RET_NEEDEXCHANGE;
+			}
 		}
 
-		return ret;
+		//check if enough capacity
+		if(hasCapacity(item, count))
+			return ret;
+		else
+			return RET_NOTENOUGHCAPACITY;
 	}
+
+	return ret;
 }
 
-ReturnValue Player::__queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
-	uint32_t& maxQueryCount) const
+ReturnValue Player::__queryMaxCount(int32_t index, const Thing* thing, uint32_t count, uint32_t& maxQueryCount,
+	uint32_t flags) const
 {
 	const Item* item = thing->getItem();
 	if(item == NULL){
@@ -2185,9 +2187,10 @@ ReturnValue Player::__queryRemove(const Thing* thing, uint32_t count) const
 	return RET_NOERROR;
 }
 
-Cylinder* Player::__queryDestination(int32_t& index, const Thing* thing, Item** destItem)
+Cylinder* Player::__queryDestination(int32_t& index, const Thing* thing, Item** destItem,
+	uint32_t& flags)
 {
-	if(index == 0 || index == -1){
+	if(index == 0 /*drop to capacity window*/ || index == INDEX_WHEREEVER){
 		*destItem = NULL;
 
 		const Item* item = thing->getItem();
@@ -2198,7 +2201,7 @@ Cylinder* Player::__queryDestination(int32_t& index, const Thing* thing, Item** 
 		//find a appropiate slot
 		for(int i = SLOT_FIRST; i < SLOT_LAST; ++i){
 			if(items[i] == NULL){
-				if(__queryAdd(i, item, item->getItemCount()) == RET_NOERROR){
+				if(__queryAdd(i, item, item->getItemCount(), 0) == RET_NOERROR){
 					index = i;
 					return this;
 				}
@@ -2208,8 +2211,8 @@ Cylinder* Player::__queryDestination(int32_t& index, const Thing* thing, Item** 
 		//try containers
 		for(int i = SLOT_FIRST; i < SLOT_LAST; ++i){
 			if(Container* subContainer = dynamic_cast<Container*>(items[i])){
-				if(subContainer != tradeItem && subContainer->__queryAdd(-1, item, item->getItemCount()) == RET_NOERROR){
-					index = -1;
+				if(subContainer != tradeItem && subContainer->__queryAdd(-1, item, item->getItemCount(), 0) == RET_NOERROR){
+					index = INDEX_WHEREEVER;
 					*destItem = NULL;
 					return subContainer;
 				}
@@ -2227,7 +2230,7 @@ Cylinder* Player::__queryDestination(int32_t& index, const Thing* thing, Item** 
 	Cylinder* subCylinder = dynamic_cast<Cylinder*>(destThing);
 
 	if(subCylinder){
-		index = -1;
+		index = INDEX_WHEREEVER;
 		*destItem = NULL;
 		return subCylinder;
 	}
@@ -2416,8 +2419,8 @@ void Player::postAddNotification(Thing* thing, bool hasOwnership /*= true*/)
 			std::vector<Container*> containers;
 			for(ContainerVector::iterator it = containerVec.begin(); it != containerVec.end(); ++it){
 				if(!Position::areInRange<1,1,0>(it->second->getPosition(), getPosition())){
-						containers.push_back(it->second);
-					}
+					containers.push_back(it->second);
+				}
 			}
 
 			for(std::vector<Container*>::const_iterator it = containers.begin(); it != containers.end(); ++it){
@@ -2427,7 +2430,7 @@ void Player::postAddNotification(Thing* thing, bool hasOwnership /*= true*/)
 	}
 }
 
-void Player::postRemoveNotification(Thing* thing, bool hadOwnership /*= true*/)
+void Player::postRemoveNotification(Thing* thing, bool isCompleteRemoval, bool hadOwnership /*= true*/)
 {
 	if(hadOwnership){
 		updateItemsLight();

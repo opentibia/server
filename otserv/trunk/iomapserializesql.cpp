@@ -42,25 +42,11 @@ bool IOMapSerializeSQL::loadMap(Map* map, const std::string& identifier)
 	db.connect(identifier.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str());
 	
 	for(HouseMap::iterator it = Houses::getInstance().getHouseBegin(); it != Houses::getInstance().getHouseEnd(); ++it){
-		DBQuery query;
-
-		//Start the transaction	
-		query << "BEGIN;";
-		if(!db.executeQuery(query))
-			return false;
-
 		//load tile
 		House* house = it->second;
 		for(HouseTileList::iterator it = house->getHouseTileBegin(); it != house->getHouseTileEnd(); ++it){
 			loadTile(*it);
 		}
-
-		//End the transaction
-		query.reset();
-		query << "COMMIT;";
-
-		if(!db.executeQuery(query))
-			return false;
 	}
 
 	return true;

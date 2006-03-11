@@ -37,7 +37,7 @@ HouseTile::~HouseTile()
 }
 
 ReturnValue HouseTile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
-	bool childIsOwner /*= false*/) const
+	uint32_t flags) const
 {
 	if(const Creature* creature = thing->getCreature()){
 		if(const Player* player = creature->getPlayer()){
@@ -46,10 +46,11 @@ ReturnValue HouseTile::__queryAdd(int32_t index, const Thing* thing, uint32_t co
 		}
 	}
 
-	return Tile::__queryAdd(index, thing, count, childIsOwner);
+	return Tile::__queryAdd(index, thing, count, flags);
 }
 
-Cylinder* HouseTile::__queryDestination(int32_t& index, const Thing* thing, Item** destItem)
+Cylinder* HouseTile::__queryDestination(int32_t& index, const Thing* thing, Item** destItem,
+	uint32_t& flags)
 {
 	if(const Creature* creature = thing->getCreature()){
 		if(const Player* player = creature->getPlayer()){
@@ -65,5 +66,5 @@ Cylinder* HouseTile::__queryDestination(int32_t& index, const Thing* thing, Item
 		}
 	}
 
-	return Tile::__queryDestination(index, thing, destItem);
+	return Tile::__queryDestination(index, thing, destItem, flags);
 }

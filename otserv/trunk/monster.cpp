@@ -1321,7 +1321,7 @@ bool Monster::monsterMoveItem(Item* item, int radius)
 		if(g_game.map->canThrowObjectTo(item->getPosition(), tryPos)){
 			Tile* toTile = g_game.getTile(tryPos.x, tryPos.y, tryPos.z);
 			if(toTile){
-				if(g_game.internalMoveItem(item->getParent(), toTile, 0, item, item->getItemCount()) == RET_NOERROR){
+				if(g_game.internalMoveItem(item->getParent(), toTile, INDEX_WHEREEVER, item, item->getItemCount()) == RET_NOERROR){
 					return true;
 				}
 			}
@@ -1338,29 +1338,10 @@ bool Monster::canMoveTo(unsigned short x, unsigned short y, unsigned char z)
 		if(getTile() == tile)
 			return true;
 
-			ReturnValue ret = tile->__queryAdd(0, this, 1);
+		ReturnValue ret = tile->__queryAdd(0, this, 1, 0);
 
-			if(ret == RET_NOERROR)
-				return true;
-
-		/*
-		if(tile->getTeleportItem() || tile->floorChange())
-			return false;
-
-		if(tile->hasProperty(PROTECTIONZONE))
-			return false;
-
-		if(!tile->creatures.empty() && this->getTile() != tile)
-			return false;
-
-		if(mType->canPushItems){
-			if(tile->hasProperty(NOTMOVEABLEBLOCKSOLID))
-				return false;
-		}
-		else if(tile->hasProperty(BLOCKSOLID) || tile->hasProperty(BLOCKPATHFIND))
-			return false;
-		return true;
-		*/
+		if(ret == RET_NOERROR)
+			return true;
 	}
 
 	return false;

@@ -200,7 +200,7 @@ bool Map::placeCreature(const Position& pos, Creature* creature, bool forceLogin
 	bool shouldPlaceInPz = false;
 	if(tile){
 		shouldPlaceInPz = tile->isPz();
-		ReturnValue ret = tile->__queryAdd(0, creature, 0);
+		ReturnValue ret = tile->__queryAdd(0, creature, 1, 0);
 
 		if(forceLogin || ret == RET_NOERROR){
 			tile->__internalAddThing(creature);
@@ -209,7 +209,8 @@ bool Map::placeCreature(const Position& pos, Creature* creature, bool forceLogin
 		else if(tile->hasFlag(TILESTATE_HOUSE) && ret == RET_PLAYERISNOTINVITED){
 			int32_t index = 0;
 			Item* toItem = NULL;
-			Cylinder* cylinder = tile->__queryDestination(index, creature, &toItem);
+			uint32_t flags = 0;
+			Cylinder* cylinder = tile->__queryDestination(index, creature, &toItem, flags);
 			cylinder->__internalAddThing(creature);
 			return true;
 		}
@@ -221,7 +222,7 @@ bool Map::placeCreature(const Position& pos, Creature* creature, bool forceLogin
 			if(!tile || (shouldPlaceInPz && !tile->isPz()))
 				continue;
 
-			if(tile->__queryAdd(0, creature, 0) == RET_NOERROR){
+			if(tile->__queryAdd(0, creature, 1, 0) == RET_NOERROR){
 				tile->__internalAddThing(creature);
 				return true;
 			}
@@ -415,7 +416,7 @@ bool Map::isPathValid(Creature* creature, const std::list<Position>& path, int p
 		Tile* tile = getTile(iit->x, iit->y, iit->z);
 		if(tile){
 			if(creature->getTile() != tile){
-				ReturnValue ret = tile->__queryAdd(0, creature, 1);
+				ReturnValue ret = tile->__queryAdd(0, creature, 1, 0);
 
 				if(ret != RET_NOERROR)
 					continue;
@@ -459,7 +460,7 @@ std::list<Position> Map::getPathTo(Creature* creature, Position start, Position 
 					Tile* tile = getTile(x, y, z);
 					if(tile){
 						if(creature->getTile() != tile){
-							ReturnValue ret = tile->__queryAdd(0, creature, 1);
+							ReturnValue ret = tile->__queryAdd(0, creature, 1, 0);
 
 							if(ret != RET_NOERROR)
 								continue;

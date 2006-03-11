@@ -18,8 +18,8 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __Mailbox_H__
-#define __Mailbox_H__
+#ifndef __OTSERV_MAILBOX_H__
+#define __OTSERV_MAILBOX_H__
 
 #include "item.h"
 #include "cylinder.h"
@@ -37,11 +37,12 @@ public:
 
 	//cylinder implementations
 	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,
-		bool childIsOwner = false) const;
+		uint32_t flags) const;
 	virtual ReturnValue __queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
-		uint32_t& maxQueryCount) const;
+		uint32_t& maxQueryCount, uint32_t flags) const;
 	virtual ReturnValue __queryRemove(const Thing* thing, uint32_t count) const;
-	virtual Cylinder* __queryDestination(int32_t& index, const Thing* thing, Item** destItem);
+	virtual Cylinder* __queryDestination(int32_t& index, const Thing* thing, Item** destItem,
+		uint32_t& flags);
 
 	virtual void __addThing(Thing* thing);
 	virtual void __addThing(int32_t index, Thing* thing);
@@ -55,12 +56,12 @@ public:
 	virtual Thing* __getThing(uint32_t index) const;
 
 	virtual void postAddNotification(Thing* thing, bool hasOwnership = true);
-	virtual void postRemoveNotification(Thing* thing, bool hadOwnership = true);
+	virtual void postRemoveNotification(Thing* thing, bool isCompleteRemoval, bool hadOwnership = true);
 
 	virtual void __internalAddThing(Thing* thing);
 	virtual void __internalAddThing(uint32_t index, Thing* thing);
 	
-	bool getReciver(Item* item, std::string& name, uint32_t& dpnum);
+	bool getReceiver(Item* item, std::string& name, uint32_t& dpnum);
 	bool sendItem(Item* item);
 	bool canSend(const Item* item) const;
 };

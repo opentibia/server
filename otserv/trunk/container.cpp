@@ -195,11 +195,13 @@ void Container::onRemoveContainerItem(uint32_t index, Item* item)
 }
 
 ReturnValue Container::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
-	bool childIsOwner /*= false*/) const
+	uint32_t flags) const
 {
-	if(index == -1 && !childIsOwner){
-		if(size() >= capacity())
-			return RET_CONTAINERNOTENOUGHROOM;
+	bool childIsOwner = ((flags & FLAG_CHILDISOWNER) == FLAG_CHILDISOWNER);
+	if(childIsOwner){
+		//a child container is querying, since we are the top container (not carried by a player)
+		//just return with no error.
+		return RET_NOERROR;
 	}
 
 	const Item* item = thing->getItem();
@@ -223,15 +225,23 @@ ReturnValue Container::__queryAdd(int32_t index, const Thing* thing, uint32_t co
 		cylinder = cylinder->getParent();
 	}
 	
+	bool skipLimit = ((flags & FLAG_NOLIMIT) == FLAG_NOLIMIT);
+
+	if(index == INDEX_WHEREEVER && !skipLimit){
+		if(size() >= capacity())
+			return RET_CONTAINERNOTENOUGHROOM;
+	}
+
 	const Cylinder* topParent = getTopParent();
-	if(topParent != this)
-		return topParent->__queryAdd(-1, item, count, true);
+	if(topParent != this){
+		return topParent->__queryAdd(INDEX_WHEREEVER, item, count, flags | FLAG_CHILDISOWNER);
+	}
 	else
 		return RET_NOERROR;
 }
 
 ReturnValue Container::__queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
-	uint32_t& maxQueryCount) const
+	uint32_t& maxQueryCount, uint32_t flags) const
 {
 	const Item* item = thing->getItem();
 	if(item == NULL){
@@ -239,12 +249,17 @@ ReturnValue Container::__queryMaxCount(int32_t index, const Thing* thing, uint32
 		return RET_NOTPOSSIBLE;
 	}
 
+	if( ((flags & FLAG_NOLIMIT) == FLAG_NOLIMIT) ){
+		maxQueryCount = std::max((uint32_t)1, count);
+		return RET_NOERROR;
+	}
+
 	uint32_t freeSlots = (capacity() - size());
 
 	if(item->isStackable()){
 		uint32_t n = 0;
 		
-		if(index != -1){
+		if(index != INDEX_WHEREEVER){
 			const Thing* destThing = __getThing(index);
 			const Item* destItem = NULL;
 			if(destThing)
@@ -296,10 +311,11 @@ ReturnValue Container::__queryRemove(const Thing* thing, uint32_t count) const
 	return RET_NOERROR;
 }
 
-Cylinder* Container::__queryDestination(int32_t& index, const Thing* thing, Item** destItem)
+Cylinder* Container::__queryDestination(int32_t& index, const Thing* thing, Item** destItem,
+	uint32_t& flags)
 {
 	if(index == 254 /*move up*/){
-		index = -1;
+		index = INDEX_WHEREEVER;
 		*destItem = NULL;
 		
 		Container* parentContainer = dynamic_cast<Container*>(getParent());
@@ -309,7 +325,7 @@ Cylinder* Container::__queryDestination(int32_t& index, const Thing* thing, Item
 			return this;
 	}
 	else if(index == 255 /*add wherever*/){
-		index = -1;
+		index = INDEX_WHEREEVER;
 		*destItem = NULL;
 		return this;
 	}
@@ -323,18 +339,18 @@ Cylinder* Container::__queryDestination(int32_t& index, const Thing* thing, Item
 			the client calculates the slot position as if the bag has 20 slots
 			*/
 
-			index = -1;
+			index = INDEX_WHEREEVER;
 		}
 
-		if(index != -1){
-			Thing* destThing = dynamic_cast<Item*>(__getThing(index));
+		if(index != INDEX_WHEREEVER){
+			Thing* destThing = __getThing(index);
 			if(destThing)
 				*destItem = destThing->getItem();
 
 			Cylinder* subCylinder = dynamic_cast<Cylinder*>(*destItem);
 
 			if(subCylinder){
-				index = -1;
+				index = INDEX_WHEREEVER;
 				*destItem = NULL;
 				return subCylinder;
 			}
@@ -368,13 +384,15 @@ void Container::__addThing(int32_t index, Thing* thing)
 		return /*RET_NOTPOSSIBLE*/;
 	}
 
-	if(size() >= capacity()){
 #ifdef __DEBUG__MOVESYS__
-		std::cout << "Failure: [Container::__addThing] size() >= capacity()" << std::endl;
-		DEBUG_REPORT
-#endif
-		return /*RET_CONTAINERNOTENOUGHROOM*/;
+	if(index != INDEX_WHEREEVER)
+		if(size() >= capacity()){
+			std::cout << "Failure: [Container::__addThing] size() >= capacity()" << std::endl;
+			DEBUG_REPORT
+			return /*RET_CONTAINERNOTENOUGHROOM*/;
+		}
 	}
+#endif
 
 	item->setParent(this);
 	itemlist.push_front(item);
@@ -550,23 +568,23 @@ void Container::postAddNotification(Thing* thing, bool hasOwnership /*= true*/)
 	//getParent()->postAddNotification(thing, true /*hasOwnership*/);
 }
 
-void Container::postRemoveNotification(Thing* thing, bool hadOwnership /*= true*/)
+void Container::postRemoveNotification(Thing* thing, bool isCompleteRemoval, bool hadOwnership /*= true*/)
 {
 	Cylinder* topParent = getTopParent();
 
 	if(topParent->getCreature()){
-		topParent->postRemoveNotification(thing, true /*hasOwnership*/);
+		topParent->postRemoveNotification(thing, isCompleteRemoval, true /*hasOwnership*/);
 	}
 	else{
 		if(topParent == this){
 			//let the tile class notify surrounding players
-			topParent->getParent()->postRemoveNotification(thing, false /*hasOwnership*/);
+			topParent->getParent()->postRemoveNotification(thing, isCompleteRemoval, false /*hasOwnership*/);
 		}
 		else
-			topParent->postRemoveNotification(thing, false /*hasOwnership*/);
+			topParent->postRemoveNotification(thing, isCompleteRemoval, false /*hasOwnership*/);
 	}
 
-	//getParent()->postRemoveNotification(thing, false /*hadOwnership*/);
+	//getParent()->postRemoveNotification(thing, isCompleteRemoval, false /*hadOwnership*/);
 }
 
 void Container::__internalAddThing(Thing* thing)

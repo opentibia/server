@@ -85,12 +85,48 @@ protected:
 SchedulerTask* makeTask(boost::function1<void, Game*> f);
 SchedulerTask* makeTask(__int64 ticks, boost::function1<void, Game*> f);
 
-
 class lessSchedTask : public std::binary_function<SchedulerTask*, SchedulerTask*, bool> {
 public:
 	bool operator()(SchedulerTask*& t1, SchedulerTask*& t2) {
 		return *t1 < *t2;
 	}
 };
+
+
+template<class ArgType>
+class TCallList : public SchedulerTask {
+public:
+	TCallList(boost::function<int(Game*, ArgType)> f1, boost::function<bool(Game*)> f2, std::list<ArgType>& call_list, __int64 interval) :
+	_f1(f1), _f2(f2), _list(call_list), _interval(interval) {
+	}
+	
+	void operator()(Game* arg) {
+		if(_eventid != 0 && !_f2(arg)) {
+			int ret = _f1(arg, _list.front());
+			_list.pop_front();
+			if (ret && !_list.empty()) {
+				SchedulerTask* newTask = new TCallList(_f1, _f2, _list, _interval);
+				newTask->setTicks(_interval);
+				newTask->setEventId(this->getEventId());
+				arg->addEvent(newTask);
+			}
+		}
+
+		return;
+	}
+
+private:
+	boost::function<int(Game*, ArgType)> _f1;
+	boost::function<bool(Game*)>_f2;
+	std::list<ArgType> _list;
+	__int64 _interval;
+};
+
+template<class ArgType>
+SchedulerTask* makeTask(__int64 ticks, boost::function<int(Game*, ArgType)> f1, std::list<ArgType>& call_list, __int64 interval, boost::function<bool(Game*)> f2) {
+	TCallList<ArgType> *t = new TCallList<ArgType>(f1, f2, call_list, interval);
+	t->setTicks(ticks);
+	return t;
+}
 
 #endif
