@@ -45,6 +45,11 @@ enum db_error_t {
 	DB_ERROR_BUFFER_EXCEEDED,
 };
 
+struct RowData{
+	char** row;
+	unsigned long** length;
+};
+
 class DBQuery : public std::stringstream
 {
 public:
@@ -104,6 +109,13 @@ public:
 	*/
 	std::string getDataString(const std::string &s, unsigned int nrow=0);
 	
+	/** Get the blob of a field in database
+	*\returns a PropStream that is initiated with the blob data field, if not exist it returns NULL.
+	*\param s The name of the field
+	*\param nrow The number of the row
+	*/
+	const char* getDataBlob(const std::string &s, unsigned int nrow=0, unsigned long& size);
+
 	/** Get the number of rows
 	*\returns The number of rows
 	*/
@@ -116,7 +128,7 @@ public:
 	
 private:
 	friend class Database;
-	void addRow(MYSQL_ROW r, unsigned int num_fields);
+	void addRow(MYSQL_ROW r, unsigned long* lengths, unsigned int num_fields);
 	void clear();
 	//void clearRows();
 	//void clearFieldNames();
@@ -130,7 +142,9 @@ private:
 	unsigned int m_numRows;
 	typedef std::map<const std::string, unsigned int> listNames_type;
 	listNames_type m_listNames;
-	std::map<unsigned int, char **> m_listRows;
+	//typedef std::map<unsigned int, char **> RowDataMap;
+	typedef std::map<unsigned int, RowData* > RowDataMap;
+	RowDataMap m_listRows;	
 };
 
 class DBError

@@ -23,7 +23,9 @@
 
 DBResult::~DBResult()
 {
-	std::map<unsigned int, char **>::iterator it;
+	clear();
+	/*
+	RowDataMap::iterator it;
 	for(it = m_listRows.begin(); it != m_listRows.end();)
 	{
 		for(unsigned int i=0; i < m_numFields; ++i)
@@ -32,24 +34,39 @@ DBResult::~DBResult()
 		delete[] it->second;
 		m_listRows.erase(it++);
 	}
+
 	m_numRows = 0;
+	*/
 }
 
-void DBResult::addRow(MYSQL_ROW r, unsigned int num_fields)
+void DBResult::addRow(MYSQL_ROW r, unsigned long* lengths, unsigned int num_fields)
 {
-	char **row = new char*[num_fields];
+	RowData* rd = new RowData;
+	rd->row = new char*[num_fields];
+	rd->length = new unsigned long*[num_fields];
+
 	for(unsigned int i=0; i < num_fields; ++i)
 	{
 		if(r[i] == NULL)
 		{
-			row[i] = NULL;
+			rd->row[i] = NULL;
+			rd->length[i] = NULL;
 			continue;
 		}
-		row[i] = new char[strlen(r[i])+1];
-		memcpy(row[i], r[i], strlen(r[i])+1);
+		
+		//row[i] = new char[strlen(r[i])+1];
+		//memcpy(row[i], r[i], strlen(r[i])+1);
+
+		unsigned long colLen = lengths[i];
+		rd->row[i] = new char[colLen + 1];
+		rd->length[i] = new unsigned long;
+
+		memcpy(rd->row[i], r[i], colLen + 1);
+		memcpy(rd->length[i], &lengths[i], sizeof(unsigned long));
 	}
 	
-	m_listRows[m_numRows] = row;
+	m_listRows[m_numRows] = rd;	
+	//m_listRows[m_numRows] = row;
 	m_numRows++;
 }
 /*
@@ -77,6 +94,22 @@ void DBResult::clearFieldNames()
 
 void DBResult::clear()
 {
+	RowDataMap::iterator it;
+	for(it = m_listRows.begin(); it != m_listRows.end();)
+	{
+		for(unsigned int i = 0; i < m_numFields; ++i){
+			if(it->second->row[i] != NULL)
+				delete[] it->second->row[i];
+		
+			if(it->second->length[i] != NULL)
+				delete[] it->second->length[i];
+		}
+
+		delete[] it->second;
+		m_listRows.erase(it++);
+	}
+
+	/*
 	std::map<unsigned int, char **>::iterator it;
 	for(it = m_listRows.begin(); it != m_listRows.end();)
 	{
@@ -87,6 +120,8 @@ void DBResult::clear()
 		delete[] it->second;
 		m_listRows.erase(it++);
 	}
+	*/
+
 	m_numRows = 0;
 	m_listNames.clear();
 	m_numFields = 0;
@@ -97,13 +132,13 @@ int DBResult::getDataInt(const std::string &s, unsigned int nrow)
 	listNames_type::iterator it=m_listNames.find(s);
 	if(it != m_listNames.end())
 	{
-		std::map<unsigned int, char **>::iterator it2=m_listRows.find(nrow);
+		RowDataMap::iterator it2=m_listRows.find(nrow);
 		if(it2 != m_listRows.end())
 		{
-			if(it2->second[it->second] == NULL) 
+			if(it2->second->row[it->second] == NULL) 
 				return 0;
 			else
-				return atoi(it2->second[it->second]);
+				return atoi(it2->second->row[it->second]);
 		}
 	}
 	
@@ -117,13 +152,13 @@ long DBResult::getDataLong(const std::string &s, unsigned int nrow)
 	listNames_type::iterator it=m_listNames.find(s);
 	if(it != m_listNames.end())
 	{
-		std::map<unsigned int, char **>::iterator it2=m_listRows.find(nrow);
+		RowDataMap::iterator it2=m_listRows.find(nrow);
 		if(it2 != m_listRows.end())
 		{
-			if(it2->second[it->second] == NULL) 
+			if(it2->second->row[it->second] == NULL) 
 				return 0;
 			else
-				return atol(it2->second[it->second]);
+				return atol(it2->second->row[it->second]);
 		}
 	}
 	
@@ -138,19 +173,44 @@ std::string DBResult::getDataString(const std::string &s, unsigned int nrow)
 	listNames_type::iterator it=m_listNames.find(s);
 	if(it != m_listNames.end())
 	{
-		std::map<unsigned int, char **>::iterator it2=m_listRows.find(nrow);
+		RowDataMap::iterator it2=m_listRows.find(nrow);
 		if(it2 != m_listRows.end())
 		{
-			if(it2->second[it->second] == NULL) 
+			if(it2->second->row[it->second] == NULL) 
 				return std::string("");
 			else
-				return std::string(it2->second[it->second]);
+				return std::string(it2->second->row[it->second]);
 		}
 	}
 	
 	//throw DBError("DBResult::GetDataString()", DB_ERROR_DATA_NOT_FOUND);
 	std::cout << "MYSQL ERROR DBResult::GetDataString()" << std::endl;
 	return std::string(""); // Failed
+}
+
+const char* DBResult::getDataBlob(const std::string &s, unsigned int nrow, unsigned long& size)
+{
+	listNames_type::iterator it=m_listNames.find(s);
+	if(it != m_listNames.end())
+	{
+		RowDataMap::iterator it2=m_listRows.find(nrow);
+		if(it2 != m_listRows.end())
+		{
+			if(it2->second->row[it->second] == NULL){
+				size = 0;
+				return NULL;
+			}
+			else{
+				size = it2->second->length[it->second];
+				return it2->second->row[it->second];
+			}
+		}
+	}
+	
+	//throw DBError("DBResult::getDataBlob()", DB_ERROR_DATA_NOT_FOUND);
+	std::cout << "MYSQL ERROR DBResult::getDataBlob()" << std::endl;
+	size = 0;
+	return NULL;
 }
 
 Database::Database()
@@ -233,7 +293,6 @@ bool Database::storeQuery(DBQuery &q, DBResult &dbres)
 	if(!this->executeQuery(q))
 		return false;
 	
-	
 	// Getting results from the query
 	r = mysql_store_result(&m_handle);
 	if(!r)
@@ -255,11 +314,16 @@ bool Database::storeQuery(DBQuery &q, DBResult &dbres)
 		dbres.setFieldName(std::string(fields[i].name), i);
 	}
 	
+	// Getting the field lengths	
+	unsigned long* lengths = mysql_fetch_lengths(r);
+	unsigned long n = 0;
+
 	// Adding the rows to a list
 	//dbres.clearRows();
 	while(row = mysql_fetch_row(r))
 	{
-		dbres.addRow(row, num_fields);
+		dbres.addRow(row, lengths, num_fields);
+		++n;
 	}
 	
 	// Free query result
