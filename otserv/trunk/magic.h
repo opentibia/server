@@ -203,7 +203,7 @@ private:
 typedef std::vector<CreatureCondition> ConditionVec;
 
 //<duration, ConditionVec>
-typedef std::pair<long, ConditionVec> TransformItem;;
+typedef std::pair<long, ConditionVec> TransformItem;
 
 //<type, <duration, <<delayTicks, conditionCount>, MagicEffectTargetCreatureCondition>> >
 typedef std::map<unsigned short, TransformItem> TransformMap;

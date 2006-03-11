@@ -1337,7 +1337,7 @@ int ActionScript::luaActionDoPlayerSendTextMessage(lua_State *L)
 	
 	Player* player = action->GetPlayerByUID(cid);
 	if(player){
-		player->sendTextMessage((MessageClasses)messageClass,text);;
+		player->sendTextMessage((MessageClasses)messageClass,text);
 	}
 	else{
 		lua_pushnumber(L, -1);

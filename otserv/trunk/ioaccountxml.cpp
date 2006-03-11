@@ -41,7 +41,7 @@ Account IOAccountXML::loadAccount(unsigned long accno)
 
 	std::stringstream accsstr;
 	std::string datadir = g_config.getGlobalString("datadir");
-	accsstr << datadir + "accounts/" << accno << ".xml";;
+	accsstr << datadir + "accounts/" << accno << ".xml";
 	std::string filename = accsstr.str();
 	std::transform(filename.begin(), filename.end(), filename.begin(), tolower);
 	xmlMutexLock(xmlmutex);
@@ -112,7 +112,7 @@ bool IOAccountXML::getPassword(unsigned long accno, const std::string &name, std
 	
 	std::stringstream accsstr;
 	std::string datadir = g_config.getGlobalString("datadir");
-	accsstr << datadir + "accounts/" << accno << ".xml";;
+	accsstr << datadir + "accounts/" << accno << ".xml";
 	std::string filename = accsstr.str();
 	std::transform(filename.begin(), filename.end(), filename.begin(), tolower);
 	

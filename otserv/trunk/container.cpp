@@ -374,8 +374,8 @@ void Container::__addThing(int32_t index, Thing* thing)
 #endif
 		return /*RET_NOTPOSSIBLE*/;
 	}
-
 	Item* item = thing->getItem();
+	
 	if(item == NULL){
 #ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Container::__addThing] item == NULL" << std::endl;
@@ -385,7 +385,7 @@ void Container::__addThing(int32_t index, Thing* thing)
 	}
 
 #ifdef __DEBUG__MOVESYS__
-	if(index != INDEX_WHEREEVER)
+	if(index != INDEX_WHEREEVER){
 		if(size() >= capacity()){
 			std::cout << "Failure: [Container::__addThing] size() >= capacity()" << std::endl;
 			DEBUG_REPORT

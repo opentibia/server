@@ -323,7 +323,7 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 							}
 								
 							if(flags & TILE_PZ)
-								tile->setPz();;
+								tile->setPz();
 								
 							break;
 						case OTBM_ATTR_ITEM:

@@ -77,7 +77,7 @@ int Waitlist::getClientSlot(int acc, unsigned long ip)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(waitListLock, "Waitlist::getClientSlot()");
 	
-	WaitinglistIterator it = findClient(acc, ip);;
+	WaitinglistIterator it = findClient(acc, ip);
 	if(it != waitList.end()){
 		return (*it)->slot;
 	}

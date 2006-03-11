@@ -510,7 +510,7 @@ bool Houses::loadHousesXML(std::string filename)
 				House* house = Houses::getInstance().getHouse(_houseid);
 				if(!house){
 					std::cout << "Error: [Houses::loadHousesXML] Unknown house, id = " << _houseid << std::endl;
-					return false;;
+					return false;
 				}
 
 				nodeValue = (char*)xmlGetProp(houseNode, (const xmlChar *) "name");
