@@ -40,3 +40,13 @@ bool IOMapSerializeXML::saveMap(Map* map, const std::string& identifier)
 {
 	return false;
 }
+
+bool IOMapSerializeXML::loadHouseInfo(Map* map, const std::string& identifier)
+{
+	return false;
+}
+
+bool IOMapSerializeXML::saveHouseInfo(Map* map, const std::string& identifier)
+{
+	return false;
+}
