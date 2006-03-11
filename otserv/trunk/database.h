@@ -114,7 +114,7 @@ public:
 	*\param s The name of the field
 	*\param nrow The number of the row
 	*/
-	const char* getDataBlob(const std::string &s, unsigned int nrow=0, unsigned long& size);
+	const char* getDataBlob(const std::string &s, unsigned long& size, unsigned int nrow=0);
 
 	/** Get the number of rows
 	*\returns The number of rows

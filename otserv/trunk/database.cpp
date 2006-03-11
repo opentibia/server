@@ -188,7 +188,7 @@ std::string DBResult::getDataString(const std::string &s, unsigned int nrow)
 	return std::string(""); // Failed
 }
 
-const char* DBResult::getDataBlob(const std::string &s, unsigned int nrow, unsigned long& size)
+const char* DBResult::getDataBlob(const std::string &s, unsigned long& size, unsigned int nrow)
 {
 	listNames_type::iterator it=m_listNames.find(s);
 	if(it != m_listNames.end())
@@ -201,7 +201,7 @@ const char* DBResult::getDataBlob(const std::string &s, unsigned int nrow, unsig
 				return NULL;
 			}
 			else{
-				size = it2->second->length[it->second];
+				size = *it2->second->length[it->second];
 				return it2->second->row[it->second];
 			}
 		}
