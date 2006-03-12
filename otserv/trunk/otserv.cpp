@@ -77,6 +77,15 @@
 OTSYS_THREAD_LOCK_CLASS::LogList OTSYS_THREAD_LOCK_CLASS::loglist;
 #endif
 
+
+#ifdef BOOST_NO_EXCEPTIONS
+	#include <exception>
+	void boost::throw_exception(std::exception const & e){
+		std::cout << "Boost exception: " << e.what() << std::endl;
+	}
+#endif
+
+
 IPList serverIPs;
 IPList bannedIPs;
 
