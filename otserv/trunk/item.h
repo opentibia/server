@@ -19,8 +19,8 @@
 //////////////////////////////////////////////////////////////////////
 
 
-#ifndef __ITEM_H__
-#define __ITEM_H__
+#ifndef __OTSERV_ITEM_H__
+#define __OTSERV_ITEM_H__
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
@@ -48,8 +48,6 @@ enum ITEMPROPERTY{
  PROTECTIONZONE,
  ISVERTICAL,
  ISHORIZONTAL,
- //NOTMOVEABLEBLOCKSOLID,
- //NOTMOVEABLEBLOCKPATHFIND,
 };
 
 struct LightInfo{
@@ -59,6 +57,24 @@ struct LightInfo{
 		level = 0;
 		color = 0;
 	};
+};
+
+enum AttrTypes_t{
+	ATTR_DESCRIPTION = 1,
+	ATTR_EXT_FILE = 2,
+	ATTR_TILE_FLAGS = 3,
+	ATTR_ACTION_ID = 4,
+	ATTR_UNIQUE_ID = 5,
+	ATTR_TEXT = 6,
+	ATTR_DESC = 7,
+	ATTR_TELE_DEST = 8,
+	ATTR_ITEM = 9,
+	ATTR_DEPOT_ID = 10,
+	ATTR_EXT_SPAWN_FILE = 11,
+	ATTR_RUNE_CHARGES = 12,
+	ATTR_EXT_HOUSE_FILE = 13,
+	ATTR_HOUSEDOORID = 14,
+	ATTR_COUNT = 15
 };
 
 class Item : virtual public Thing
@@ -142,6 +158,10 @@ public:
 	
 	virtual int unserialize(xmlNodePtr p);
 	virtual xmlNodePtr serialize();
+
+	virtual bool readAttr(AttrTypes_t attr, PropStream& propStream);
+	virtual bool unserializeAttr(PropStream& propStream);
+	virtual bool serializeAttr(PropWriteStream& propWriteStream);
 
   // get the number of items
 	unsigned short getItemCount() const;

@@ -1093,14 +1093,8 @@ void Tile::postRemoveNotification(Thing* thing, bool isCompleteRemoval, bool had
 	SpectatorVec::iterator it;
 	g_game.getSpectators(Range(cylinderMapPos, true), list);
 
-	if(getThingCount() > 8){
+	if(/*isCompleteRemoval &&*/ getThingCount() > 8){
 		onUpdateTile();
-
-		/*//send to client
-		for(it = list.begin(); it != list.end(); ++it){
-			(*it)->onUpdateTile(cylinderMapPos);
-		}
-		*/
 	}
 
 	for(it = list.begin(); it != list.end(); ++it){

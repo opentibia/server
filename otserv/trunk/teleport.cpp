@@ -83,6 +83,38 @@ xmlNodePtr Teleport::serialize()
 	return xmlptr;
 }
 
+bool Teleport::readAttr(AttrTypes_t attr, PropStream& propStream)
+{
+	if(ATTR_TELE_DEST == attr){
+		TeleportDest* tele_dest;
+		if(!propStream.GET_STRUCT(tele_dest)){
+			return false;
+		}
+
+		setDestPos(Position(tele_dest->_x, tele_dest->_y, tele_dest->_z));
+		return true;
+	}
+	else
+		return Item::readAttr(attr, propStream);
+}
+
+bool Teleport::serializeAttr(PropWriteStream& propWriteStream)
+{
+	bool ret = Item::serializeAttr(propWriteStream);
+
+	propWriteStream.ADD_UCHAR(ATTR_TELE_DEST);
+
+	TeleportDest tele_dest;
+	
+	tele_dest._x = destPos.x;
+	tele_dest._y = destPos.y;
+	tele_dest._z = destPos.z;
+
+	propWriteStream.ADD_VALUE(tele_dest);
+	
+	return ret;
+}
+
 ReturnValue Teleport::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 	uint32_t flags) const
 {

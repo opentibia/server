@@ -309,6 +309,138 @@ xmlNodePtr Item::serialize()
 	return ret;
 }
 
+bool Item::readAttr(AttrTypes_t attr, PropStream& propStream)
+{
+	switch(attr){
+		case ATTR_COUNT:
+		{
+			unsigned char _count = 0;
+			if(!propStream.GET_UCHAR(_count)){
+				return false;
+			}
+
+			setItemCountOrSubtype(_count);
+			break;
+		}
+
+		case ATTR_ACTION_ID:
+		{
+			unsigned short _actionid = 0;
+			if(!propStream.GET_USHORT(_actionid)){
+				return false;
+			}
+
+			setActionId(_actionid);
+			break;
+		}
+
+		case ATTR_UNIQUE_ID:
+		{
+			unsigned short _uniqueid;
+			if(!propStream.GET_USHORT(_uniqueid)){
+				return false;
+			}
+			
+			setUniqueId(_uniqueid);
+			break;
+		}
+
+		case ATTR_TEXT:
+		{
+			std::string _text;
+			if(!propStream.GET_STRING(_text)){
+				return false;
+			}
+
+			setText(_text);
+			break;
+		}
+
+		case ATTR_DESC:
+		{
+			std::string _text;
+			if(!propStream.GET_STRING(_text)){
+				return false;
+			}
+
+			setSpecialDescription(_text);
+			break;
+		}
+
+		case ATTR_RUNE_CHARGES:
+		{
+			unsigned char _charges = 1;
+			if(!propStream.GET_UCHAR(_charges)){
+				return false;
+			}
+
+			setItemCountOrSubtype(_charges);
+			break;
+		}
+		
+		default:
+			return false;
+		break;
+	}
+
+	return true;
+}
+
+bool Item::unserializeAttr(PropStream& propStream)
+{
+	unsigned char attr_type;
+	while(propStream.GET_UCHAR(attr_type)){
+
+		if(!readAttr((AttrTypes_t)attr_type, propStream)){
+			return false;
+			break;
+		}
+	}
+
+	return true;
+}
+
+bool Item::serializeAttr(PropWriteStream& propWriteStream)
+{
+	if(isStackable() || isSplash() || isFluidContainer()){
+		unsigned char _count = getItemCount();
+		propWriteStream.ADD_UCHAR(ATTR_COUNT);
+		propWriteStream.ADD_UCHAR(_count);
+	}
+
+	if(isRune()){
+		unsigned char _count = getItemCharge();
+		propWriteStream.ADD_UCHAR(ATTR_RUNE_CHARGES);
+		propWriteStream.ADD_UCHAR(_count);
+	}
+
+	if(actionId){
+		unsigned short _actionId = getActionId();
+		propWriteStream.ADD_UCHAR(ATTR_ACTION_ID);
+		propWriteStream.ADD_USHORT(_actionId);
+	}
+
+	if(uniqueId){
+		unsigned short _uniqueId = getUniqueId();
+		propWriteStream.ADD_UCHAR(ATTR_UNIQUE_ID);
+		propWriteStream.ADD_USHORT(_uniqueId);
+	}
+
+	const std::string& _text = getText();
+	if(_text.length() > 0){
+		propWriteStream.ADD_UCHAR(ATTR_TEXT);
+		propWriteStream.ADD_STRING(_text);
+	}
+
+	const std::string& _specialDesc = getSpecialDescription();
+	if(_specialDesc.length() > 0){
+		propWriteStream.ADD_UCHAR(ATTR_DESC);
+		propWriteStream.ADD_STRING(_specialDesc);
+	}
+
+	return true;
+}
+
 bool Item::hasProperty(enum ITEMPROPERTY prop) const
 {
 	const ItemType& it = items[id];

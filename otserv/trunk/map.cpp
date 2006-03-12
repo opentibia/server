@@ -140,6 +140,8 @@ bool Map::loadMap(const std::string& identifier, const std::string& type)
 	delete loader;
 	
 	IOMapSerialize::getInstance()->loadHouseInfo(this, "");
+	IOMapSerialize::getInstance()->loadMap(this, "");
+
 	return true;
 }
 
@@ -147,7 +149,7 @@ bool Map::loadMap(const std::string& identifier, const std::string& type)
 bool Map::saveMap(const std::string& identifier)
 {
 	IOMapSerialize* IOMap = IOMapSerialize::getInstance();
-	//IOMap->saveMap(this, identifier);
+	IOMap->saveMap(this, "");
 	IOMap->saveHouseInfo(this, "");
 	return true;
 }

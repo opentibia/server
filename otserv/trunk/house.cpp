@@ -431,6 +431,34 @@ int Door::unserialize(xmlNodePtr p)
 	return 0;
 }
 
+bool Door::readAttr(AttrTypes_t attr, PropStream& propStream)
+{
+	if(ATTR_HOUSEDOORID == attr){
+		unsigned char _doorId = 0;
+		if(!propStream.GET_UCHAR(_doorId)){
+			return false;
+		}
+
+		setDoorId(_doorId);
+		return true;
+	}
+	else
+		return Item::readAttr(attr, propStream);
+}
+
+bool Door::serializeAttr(PropWriteStream& propWriteStream)
+{
+	bool ret = Item::serializeAttr(propWriteStream);
+
+	if(house){
+		unsigned char _doorId = getDoorId();
+		propWriteStream.ADD_UCHAR(ATTR_HOUSEDOORID);
+		propWriteStream.ADD_UCHAR(_doorId);
+	}
+
+	return ret;
+}
+
 void Door::setHouse(House* _house)
 {
 	if(house != NULL){

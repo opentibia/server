@@ -18,10 +18,16 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __TELEPORT_H__
-#define __TELEPORT_H__
+#ifndef __OTSERV_TELEPORT_H__
+#define __OTSERV_TELEPORT_H__
 
 #include "tile.h"
+
+struct TeleportDest{
+	unsigned short _x;
+	unsigned short _y;
+	unsigned char	_z;
+};
 
 class Teleport : public Item, public Cylinder
 {
@@ -32,6 +38,12 @@ public:
 	virtual Teleport* getTeleport() {return this;};
 	virtual const Teleport* getTeleport() const {return this;};
 	
+	virtual int unserialize(xmlNodePtr p);
+	virtual xmlNodePtr serialize();
+
+	virtual bool readAttr(AttrTypes_t attr, PropStream& propStream);
+	virtual bool serializeAttr(PropWriteStream& propWriteStream);
+
 	void setDestPos(const Position &pos) {destPos = pos;};
 	const Position& getDestPos() const {return destPos;};
 
@@ -62,8 +74,6 @@ public:
 	virtual void __internalAddThing(uint32_t index, Thing* thing);
 
 private:
-	virtual int unserialize(xmlNodePtr p);
-	virtual xmlNodePtr serialize();
 	Position destPos;
 };
 

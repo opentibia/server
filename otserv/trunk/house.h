@@ -84,6 +84,11 @@ public:
 	
 	House* getHouse(){return house;};
 	
+	virtual int unserialize(xmlNodePtr p);
+
+	virtual bool readAttr(AttrTypes_t attr, PropStream& propStream);
+	virtual bool serializeAttr(PropWriteStream& propWriteStream);
+
 	void setDoorId(unsigned long _doorId){ doorId = _doorId;};
 	unsigned long getDoorId() const{ return doorId;};
 	
@@ -91,8 +96,6 @@ public:
 	
 	void setAccessList(const std::string& textlist);
 	bool getAccessList(std::string& list) const;
-	
-	int unserialize(xmlNodePtr p);
 
 protected:
 	void setHouse(House* _house);
