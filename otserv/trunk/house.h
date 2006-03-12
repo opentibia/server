@@ -173,6 +173,7 @@ public:
 	HouseDoorList::iterator getHouseDoorEnd() {return doorList.end();}
 
 private:
+	bool isInitiated;
 	uint32_t houseid;
 	uint32_t houseOwner;
 	HouseTileList houseTiles;

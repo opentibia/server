@@ -30,6 +30,7 @@ extern Game g_game;
 
 House::House(uint32_t _houseid)
 {
+	isInitiated = false;
 	houseName = "OTServ headquarter (Flat 1, Area 42)";
 	houseOwner = 0;
 	posEntry.x = 0;
@@ -54,9 +55,11 @@ void House::addTile(HouseTile* tile)
 
 void House::setHouseOwner(uint32_t guid)
 {
-	if(houseOwner == guid)
+	if(isInitiated && houseOwner == guid)
 		return;
 	
+	isInitiated = true;
+
 	if(houseOwner){
 		//send items to depot
 		//...TODO...
