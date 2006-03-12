@@ -288,6 +288,8 @@ bool IOMapSerializeSQL::loadHouseInfo(Map* map, const std::string& identifier)
 			}
 		}
 	}
+
+	return true;
 }
 
 bool IOMapSerializeSQL::saveHouseInfo(Map* map, const std::string& identifier)
@@ -349,5 +351,6 @@ bool IOMapSerializeSQL::saveHouseInfo(Map* map, const std::string& identifier)
 	query << "COMMIT;";	
 	if(!db.executeQuery(query))
 		return false;	
-	
+
+	return true;
 }
