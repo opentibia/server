@@ -329,7 +329,7 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 						case OTBM_ATTR_ITEM:
 							Item* item;
 							
-							item  = unserializaItemAttr(propStream);
+							item  = unserializeItemAttr(propStream);
 							if(item){
 								tile->__internalAddThing(item);
 							}
@@ -348,7 +348,7 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 					NODE item_node = f.getChildNode(tile_node, type);
 					while(item_node){
 						if(type == OTBM_ITEM){
-							Item* item = unserializaItemNode(&f, item_node);
+							Item* item = unserializeItemNode(&f, item_node);
 							if(item){
 								tile->__internalAddThing(item);
 								if(isHouseTile){
@@ -442,7 +442,7 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 	return (getLastError() == LOADMAPERROR_NONE);
 }
 
-Item* IOMapOTBM::unserializaItemAttr(PropStream &propStream)
+Item* IOMapOTBM::unserializeItemAttr(PropStream &propStream)
 {
 	unsigned short _id;
 	unsigned char _count;
@@ -461,7 +461,7 @@ Item* IOMapOTBM::unserializaItemAttr(PropStream &propStream)
 	return item;
 }
 
-Item* IOMapOTBM::unserializaItemNode(FileLoader* f, NODE node)
+Item* IOMapOTBM::unserializeItemNode(FileLoader* f, NODE node)
 {
 	PropStream propStream;
 	f->getProps(node, propStream);
@@ -526,7 +526,7 @@ Item* IOMapOTBM::unserializaItemNode(FileLoader* f, NODE node)
 					return NULL;
 				}
 
-				if(Teleport* tele = dynamic_cast<Teleport*>(item)){
+				if(Teleport* tele = item->getTeleport()){
 					tele->setDestPos(Position(tele_dest->_x, tele_dest->_y, tele_dest->_z));
 				}
 				else{
@@ -587,12 +587,12 @@ Item* IOMapOTBM::unserializaItemNode(FileLoader* f, NODE node)
 		}
 		
 		Container* container;
-		if(container = dynamic_cast<Container*>(item)){
+		if(container = item->getContainer()){
 			unsigned long type;
 			NODE item_node = f->getChildNode(node, type);
 			while(item_node){
 				if(type == OTBM_ITEM){
-					Item* item = unserializaItemNode(f, item_node);
+					Item* item = unserializeItemNode(f, item_node);
 					if(item){
 						container->__internalAddThing(item);
 					}

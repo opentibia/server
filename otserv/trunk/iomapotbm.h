@@ -37,8 +37,8 @@ private:
 	std::string spawnfile;
 	std::string housefile;
 
-	Item* unserializaItemAttr(PropStream &propStream);
-	Item* unserializaItemNode(FileLoader* f, NODE node);
+	Item* unserializeItemAttr(PropStream &propStream);
+	Item* unserializeItemNode(FileLoader* f, NODE node);
 };
 
 
