@@ -313,17 +313,14 @@ bool Database::storeQuery(DBQuery &q, DBResult &dbres)
 	{
 		dbres.setFieldName(std::string(fields[i].name), i);
 	}
-	
-	// Getting the field lengths	
-	unsigned long* lengths = mysql_fetch_lengths(r);
-	unsigned long n = 0;
 
 	// Adding the rows to a list
 	//dbres.clearRows();
 	while(row = mysql_fetch_row(r))
 	{
+		//get column sizes
+		unsigned long* lengths = mysql_fetch_lengths(r);
 		dbres.addRow(row, lengths, num_fields);
-		++n;
 	}
 	
 	// Free query result
