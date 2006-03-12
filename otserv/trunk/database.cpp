@@ -336,12 +336,17 @@ bool Database::storeQuery(DBQuery &q, DBResult &dbres)
 
 std::string Database::escapeString(const std::string &s)
 {
-	if(s.size() == 0)
+	return escapeString(s.c_str(), s.size());
+}
+
+std::string Database::escapeString(const char* s, unsigned long size)
+{
+	if(s == NULL)
 		return std::string("");
 	
-	char* output = new char[s.size() * 2 + 1];
+	char* output = new char[size * 2 + 1];
 	
-	mysql_escape_string(output, s.c_str(), s.size());
+	mysql_escape_string(output, s, size);
 	std::string r = std::string(output);
 	delete[] output;
 	return r;

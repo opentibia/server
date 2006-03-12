@@ -18,8 +18,8 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __DATABASE_H
-#define __DATABASE_H
+#ifndef __OTSERV_DATABASE_H__
+#define __OTSERV_DATABASE_H__
 
 #ifdef WIN32
 //#include <winsock2.h>
@@ -212,6 +212,12 @@ public:
 	*/
 	static std::string escapeString(const std::string &s);
 	
+	/** Escape the special characters in a string for no problems with the query
+	*\returns The string modified
+	*\param s The source string
+	*/
+	static std::string escapeString(const char* s, unsigned long size);
+
 private:
 	bool m_initialized;
 	bool m_connected;

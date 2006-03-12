@@ -123,7 +123,7 @@ public:
 	PropStream(){end = NULL; p = NULL;}
 	~PropStream(){};
 
-	void init(char* a, unsigned long size){
+	void init(const char* a, unsigned long size){
 		p = a;
 		end = a + size;
 	}
@@ -183,8 +183,81 @@ public:
 	
 protected:
 	long size(){return end - p;};
-	char* p;
-	char* end;
+	const char* p;
+	const char* end;
 };
+
+class PropWriteStream{
+public:
+	PropWriteStream(){buffer = (char*)malloc(32*sizeof(char)); buffer_size = 32; size = 0;}
+	~PropWriteStream(){free(buffer);};
+
+	char* getStream(unsigned long& _size) const{
+		_size = size;
+		return buffer;
+	}
+
+	template <typename T>
+	inline bool ADD_TYPE(T* add){
+		if((buffer_size - size) < sizeof(T)){
+			buffer_size = buffer_size + ((sizeof(T) + 0x1F) & 0xFFFFFFE0);
+			buffer = (char*)realloc(buffer, buffer_size);
+		}
+
+		memcpy(&buffer[size], (char*)add, sizeof(T));
+		size = size + sizeof(T);
+
+		return true;
+	}
+	
+	template <typename T>
+	inline bool ADD_VALUE(T add){
+		if((buffer_size - size) < sizeof(T)){
+			buffer_size = buffer_size + ((sizeof(T) + 0x1F) & 0xFFFFFFE0);
+			buffer = (char*)realloc(buffer,buffer_size);
+		}
+		
+		memcpy(&buffer[size], &add, sizeof(T));
+		size = size + sizeof(T);
+		
+		return true;
+	}
+	
+	inline bool ADD_ULONG(unsigned long ret){
+		return ADD_VALUE(ret);
+	}
+	
+	inline bool ADD_USHORT(unsigned short ret){
+		return ADD_VALUE(ret);
+	}
+	
+	inline bool ADD_UCHAR(unsigned char ret){
+		return ADD_VALUE(ret);
+	}
+	
+	inline bool ADD_STRING(const std::string& add){
+		unsigned short str_len = add.size();
+		
+		if(!ADD_USHORT(str_len)){
+			return false;
+		}
+		if((buffer_size - size) < str_len){
+			buffer_size = buffer_size + ((str_len + 0x1F) & 0xFFFFFFE0);
+			buffer = (char*)realloc(buffer, buffer_size);
+		}
+		memcpy(&buffer[size], add.c_str(), str_len);
+		size = size + str_len;
+		return true;
+	}
+	
+	
+protected:
+	char* buffer;
+	unsigned long buffer_size;
+	unsigned long size;
+};
+
+
+
 
 #endif
