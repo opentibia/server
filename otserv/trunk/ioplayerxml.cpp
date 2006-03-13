@@ -616,6 +616,9 @@ bool IOPlayerXML::savePlayer(Player* player)
 			sb.str("");
           
 			nn = player->items[i]->serialize();
+			if(nn == NULL){
+				exit(1);
+			}
 
 			xmlAddChild(pn, nn);
 			xmlAddChild(sn, pn);
@@ -633,6 +636,9 @@ bool IOPlayerXML::savePlayer(Player* player)
 		sb.str("");
           
 		nn = (it->second)->serialize();
+		if(nn == NULL){
+			exit(1);
+		}
 
 		xmlAddChild(pn, nn);
 		xmlAddChild(sn, pn);

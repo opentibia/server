@@ -219,8 +219,7 @@ bool IOMapSerializeXML::saveMap(Map* map, const std::string& identifier)
 	xmlSaveFormatFileEnc(identifier.c_str(), doc, "UTF-8", 1);
 
 	xmlFreeDoc(doc);
-	xmlCleanupParser();
-
+	
 	return true;
 }
 
@@ -229,7 +228,8 @@ bool IOMapSerializeXML::saveTile(xmlNodePtr nodeMap, const Tile* tile)
 	Item* item;
 	xmlNodePtr nodeTile = NULL;
 
-	for(int i = 0; i < tile->getThingCount(); ++i){
+	//for(int i = 0; i < tile->getThingCount(); ++i){
+	for(int i = tile->getThingCount() - 1; i >= 0; --i){
 		item = tile->__getThing(i)->getItem();
 
 		if(!item)
