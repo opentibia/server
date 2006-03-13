@@ -19,6 +19,7 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "depot.h"
+#include <sstream>
 
 Depot::Depot(uint16_t _type) :
 Container(_type)
@@ -31,6 +32,32 @@ Container(_type)
 Depot::~Depot()
 {
 	//
+}
+
+bool Depot::unserialize(xmlNodePtr nodeItem)
+{
+	bool ret = Container::unserialize(nodeItem);
+
+	char* nodeValue;
+	nodeValue = (char*)xmlGetProp(nodeItem, (const xmlChar *) "depot");
+	if(nodeValue){
+		setDepotId(atoi(nodeValue));
+		xmlFreeOTSERV(nodeValue);
+	}
+	
+	return ret;
+}
+
+xmlNodePtr Depot::serialize()
+{
+	xmlNodePtr xmlptr = Container::serialize();
+
+	std::stringstream ss;
+	ss.str("");
+	ss << (int) depotId;
+	xmlSetProp(xmlptr, (const xmlChar*)"depot", (const xmlChar*)ss.str().c_str());
+
+	return xmlptr;
 }
 
 ReturnValue Depot::__queryAdd(int32_t index, const Thing* thing, uint32_t count,

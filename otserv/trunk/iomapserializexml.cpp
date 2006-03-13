@@ -347,50 +347,6 @@ bool IOMapSerializeXML::loadTile(Map* map, xmlNodePtr nodeTile, Tile* tile)
 					}
 				}
 			}
-
-			if(item){
-				if(Container* container = item->getContainer()){
-					//container
-
-					//is depot?
-					if(Depot* depot = container->getDepot()){
-						if(nodeValue = (char*)xmlGetProp(nodeItem, (const xmlChar *) "depot")){
-							int depotId = atoi(nodeValue);					
-							depot->setDepotId(depotId);
-							xmlFreeOTSERV(nodeValue);
-						}
-					}
-
-					if(nodeItem->children && strcmp((const char*)nodeItem->children->name, "inside") == 0){
-						nodeItem = nodeItem->children->children;
-						while(nodeItem){
-							unsigned int id;
-							if(nodeValue = (char*)xmlGetProp(nodeItem, (const xmlChar *) "id")){
-								id = atoi(nodeValue);
-								xmlFreeOTSERV(nodeValue);
-							}
-							else
-								id = 0;
-						
-							Item* item = Item::CreateItem(id);
-							if(!item){
-								map->setLastError(LOADMAPERROR_FAILEDTOCREATEITEM);
-								return false;
-							}
-
-							if(!item->unserialize(nodeItem)){
-								map->setLastError(LOADMAPERROR_FAILEDUNSERIALIZEITEM);
-								return false;
-							}
-
-							container->__internalAddThing(item);
-
-							nodeItem = nodeItem->next;
-						}
-					}
-					//container
-				}
-			}
 		}
 		
 		nodeItem = nodeItem->next;

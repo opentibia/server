@@ -17,8 +17,8 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
-#ifndef __DEPOT_H__
-#define __DEPOT_H__
+#ifndef __OTSERV_DEPOT_H__
+#define __OTSERV_DEPOT_H__
 
 #include "container.h"
 
@@ -26,6 +26,9 @@ class Depot : public Container{
 public:
 	Depot(uint16_t _type);
 	~Depot();
+
+	virtual bool unserialize(xmlNodePtr p);
+	virtual xmlNodePtr serialize();
 
 	uint32_t getDepotId() {return depotId;};
 	void setMaxDepotLimit(uint32_t maxitems) {maxDepotLimit = maxitems;};
