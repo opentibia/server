@@ -12,8 +12,6 @@
 #include <hash_map>
 #endif
 
-#include <mysql++.h>
-
 #include "luascript.h"
 #include <boost/tokenizer.hpp>
 typedef boost::tokenizer<boost::char_separator<char> > tokenizer;

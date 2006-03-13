@@ -52,6 +52,10 @@ typedef unsigned long long uint64_t;
 	#define OTSERV_HASH_MAP __gnu_cxx::hash_map
 
 #else
+	#ifndef NOMINMAX
+		#define NOMINMAX
+	#endif
+
 	#include <hash_map>
 	#define OTSERV_HASH_MAP stdext::hash_map
 

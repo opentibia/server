@@ -204,6 +204,26 @@ CREATE TABLE `viplist` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
+CREATE TABLE `tilelist` (
+  `tileid` int(11) unsigned NOT NULL,
+  `x` int(11) unsigned NOT NULL,
+  `y` int(11) unsigned NOT NULL,
+  `z` int(11) unsigned NOT NULL,
+  PRIMARY KEY (tileid),
+  UNIQUE (`x`,`y`,`z`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+CREATE TABLE `tileitems` (
+  `tileid` int(11) NOT NULL default '0',
+  `sid` int(11) NOT NULL default '0',
+  `pid` int(11) NOT NULL default '0',
+  `type` int(11) NOT NULL default '0',
+  `attributes` blob,
+  KEY (tileid)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
 CREATE TABLE `houses` (
   `houseid` int(10) unsigned NOT NULL default '0',
   `owner` int(10) unsigned default '0',
