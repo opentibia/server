@@ -45,7 +45,8 @@ bool IOMapSerializeXML::loadMap(Map* map, const std::string& identifier)
 	xmlNodePtr nodeChild;
 	char* nodeValue;
 
-	xmlLineNumbersDefault(1);
+	//xmlLineNumbersDefault(1);
+	xmlSubstituteEntitiesDefault(1);
 	xmlDocPtr doc = xmlParseFile(identifier.c_str());
 	if(!doc){
 		map->setLastError(LOADMAPERROR_CANNOTOPENFILE);
@@ -228,7 +229,6 @@ bool IOMapSerializeXML::saveTile(xmlNodePtr nodeMap, const Tile* tile)
 	Item* item;
 	xmlNodePtr nodeTile = NULL;
 
-	//for(int i = 0; i < tile->getThingCount(); ++i){
 	for(int i = tile->getThingCount() - 1; i >= 0; --i){
 		item = tile->__getThing(i)->getItem();
 

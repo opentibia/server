@@ -240,7 +240,6 @@ bool Item::unserialize(xmlNodePtr nodeItem)
 	nodeValue = (char*)xmlGetProp(nodeItem, (const xmlChar *) "special_description");
 	if(nodeValue){
 		specialDescription = new std::string(nodeValue);
-		replaceString(*specialDescription, "&#10;", "\n");
 		xmlFreeOTSERV(nodeValue);
 	}
 		
