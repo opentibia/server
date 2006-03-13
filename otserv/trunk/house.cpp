@@ -421,17 +421,30 @@ Door::~Door()
 		delete accessList;
 }
 
-int Door::unserialize(xmlNodePtr p)
+bool Door::unserialize(xmlNodePtr nodeItem)
 {
-	Item::unserialize(p);
+	bool ret = Item::unserialize(nodeItem);
 
-	char* tmp = (char*)xmlGetProp(p, (const xmlChar *) "doorId");
-	if(tmp){
-		setDoorId(atoi(tmp));
-		xmlFreeOTSERV(tmp);
+	char* nodeValue;
+	nodeValue = (char*)xmlGetProp(nodeItem, (const xmlChar *) "doorId");
+	if(nodeValue){
+		setDoorId(atoi(nodeValue));
+		xmlFreeOTSERV(nodeValue);
 	}
 	
-	return 0;
+	return ret;
+}
+
+xmlNodePtr Door::serialize()
+{
+	xmlNodePtr xmlptr = Item::serialize();
+
+	std::stringstream ss;
+	ss.str("");
+	ss << (int) doorId;
+	xmlSetProp(xmlptr, (const xmlChar*)"doorId", (const xmlChar*)ss.str().c_str());
+
+	return xmlptr;
 }
 
 bool Door::readAttr(AttrTypes_t attr, PropStream& propStream)

@@ -42,6 +42,95 @@ Container::~Container()
 	itemlist.clear();
 }
 
+bool Container::unserialize(xmlNodePtr nodeItem)
+{
+	bool ret = Item::unserialize(nodeItem);
+
+	if(ret) {
+		return loadContainer(nodeItem, this);
+	}
+
+	return false;
+}
+
+bool Container::loadContainer(xmlNodePtr nodeItem, Container* container)
+{
+	if(nodeItem == NULL){
+		return false;
+	}
+
+	xmlNodePtr nodeContainer = nodeItem->children;
+	if(nodeContainer == NULL){
+		return true; //empty
+	}
+  
+	char* nodeValue;
+
+	while(nodeContainer){
+		if(xmlStrcmp(nodeContainer->name, (const xmlChar*)"inside") == 0){
+
+			//load items
+			xmlNodePtr nodeContainerItem;
+			nodeContainerItem = nodeContainer->children;
+			while(nodeContainerItem){
+				if(xmlStrcmp(nodeContainerItem->name, (const xmlChar*)"item") == 0){
+					unsigned int id = 0;
+					if(nodeValue = (char*)xmlGetProp(nodeContainerItem, (const xmlChar *) "id")){
+						id = atoi(nodeValue);
+						xmlFreeOTSERV(nodeValue);
+					}
+					else
+						return false;
+
+					Item* item = Item::CreateItem(id);
+					if(!item){
+						return false;
+					}
+
+					if(!item->unserialize(nodeContainerItem)){
+						return false;
+					}
+					
+					container->__internalAddThing(item);
+				}
+
+				nodeContainerItem = nodeContainerItem->next;
+			}
+		}
+
+		nodeContainer = nodeContainer->next;
+	}
+
+	return true;
+}
+
+bool Container::saveContainer(xmlNodePtr nodeItem, Container* container)
+{
+	xmlNodePtr newContainerNode;
+
+	if(container->size() != 0){
+		newContainerNode = xmlNewNode(NULL, (const xmlChar*)"inside");
+		for(int i = container->size() - 1; i >= 0; --i){
+			Item* item = container->getItem(i);
+
+			xmlNodePtr newItemNode = item->serialize();
+			xmlAddChild(newContainerNode, newItemNode);
+		}
+
+		xmlAddChild(nodeItem, newContainerNode);
+	}
+
+	return true;
+}
+
+xmlNodePtr Container::serialize()
+{
+	xmlNodePtr xmlptr = Item::serialize();
+	saveContainer(xmlptr, this);
+
+	return xmlptr;
+}
+
 double Container::getWeight() const
 {
 	double weight = items[id].weight;

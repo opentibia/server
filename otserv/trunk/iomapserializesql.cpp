@@ -242,7 +242,7 @@ bool IOMapSerializeSQL::loadTile(Tile* tile)
 			if(Item::items[type].moveable){
 				//create a new item
 				item = Item::CreateItem(type);
-
+				
 				if(item){
 					if(!item->unserializeAttr(propStream)){
 						std::cout << "WARNING: Serialize error in IOMapSerializeSQL::loadTile()" << std::endl;

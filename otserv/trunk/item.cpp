@@ -223,90 +223,94 @@ unsigned short Item::getUniqueId() const
 
 long Item::getDecayTime()
 {
-	return items[id].decayTime*1000;
+	return items[id].decayTime * 1000;
 }
 
-int Item::unserialize(xmlNodePtr p)
+bool Item::unserialize(xmlNodePtr nodeItem)
 {
-	char *tmp;
-	tmp = (char*)xmlGetProp(p, (const xmlChar *) "id");
-	if(tmp){
-		id = atoi(tmp);
-		xmlFreeOTSERV(tmp);
+	char* nodeValue;
+	nodeValue = (char*)xmlGetProp(nodeItem, (const xmlChar *) "id");
+	if(nodeValue){
+		id = atoi(nodeValue);
+		xmlFreeOTSERV(nodeValue);
 	}
+	else
+		return false;
 	
-	tmp = (char*)xmlGetProp(p, (const xmlChar *) "special_description");
-	if(tmp){
-		specialDescription = new std::string(tmp);
-		xmlFreeOTSERV(tmp);
+	nodeValue = (char*)xmlGetProp(nodeItem, (const xmlChar *) "special_description");
+	if(nodeValue){
+		specialDescription = new std::string(nodeValue);
+		replaceString(*specialDescription, "&#10;", "\n");
+		xmlFreeOTSERV(nodeValue);
 	}
 		
-	tmp = (char*)xmlGetProp(p, (const xmlChar *) "text");
-	if(tmp){
-		text = new std::string(tmp);
-		xmlFreeOTSERV(tmp);
+	nodeValue = (char*)xmlGetProp(nodeItem, (const xmlChar *) "text");
+	if(nodeValue){
+		text = new std::string(nodeValue);
+		xmlFreeOTSERV(nodeValue);
 	}
 	
-	tmp = (char*)xmlGetProp(p, (const xmlChar *) "count");
-	if(tmp){
-		setItemCountOrSubtype(atoi(tmp));
-		xmlFreeOTSERV(tmp);
+	nodeValue = (char*)xmlGetProp(nodeItem, (const xmlChar *) "count");
+	if(nodeValue){
+		setItemCountOrSubtype(atoi(nodeValue));
+		xmlFreeOTSERV(nodeValue);
 	}
 		
-	tmp = (char*)xmlGetProp(p, (const xmlChar *) "actionId");
-	if(tmp){
-		setActionId(atoi(tmp));
-		xmlFreeOTSERV(tmp);
+	nodeValue = (char*)xmlGetProp(nodeItem, (const xmlChar *) "actionId");
+	if(nodeValue){
+		setActionId(atoi(nodeValue));
+		xmlFreeOTSERV(nodeValue);
 	}
 	
-	tmp = (char*)xmlGetProp(p, (const xmlChar *) "uniqueId");
-	if(tmp){
-		setUniqueId(atoi(tmp));
-		xmlFreeOTSERV(tmp);
+	nodeValue = (char*)xmlGetProp(nodeItem, (const xmlChar *) "uniqueId");
+	if(nodeValue){
+		setUniqueId(atoi(nodeValue));
+		xmlFreeOTSERV(nodeValue);
 	}
 	
-	return 0;
+	return true;
 }
 
 xmlNodePtr Item::serialize()
 {
-	std::stringstream s;
-	xmlNodePtr ret;
-	ret = xmlNewNode(NULL,(const xmlChar*)"item");
-	s.str(""); //empty the stringstream
-	s << getID();
-	xmlSetProp(ret, (const xmlChar*)"id", (const xmlChar*)s.str().c_str());
+	xmlNodePtr xmlptr = xmlNewNode(NULL,(const xmlChar*)"item");
+
+	std::stringstream ss;
+	ss.str(""); //empty the stringstream
+	ss << getID();
+	xmlSetProp(xmlptr, (const xmlChar*)"id", (const xmlChar*)ss.str().c_str());
 	
 	if(specialDescription){
-		s.str(""); //empty the stringstream
-		s << *specialDescription;
-		xmlSetProp(ret, (const xmlChar*)"special_description", (const xmlChar*)s.str().c_str());
+		ss.str(""); //empty the stringstream
+		ss << getSpecialDescription();
+		xmlSetProp(xmlptr, (const xmlChar*)"special_description", (const xmlChar*)ss.str().c_str());
 	}
 	
 	if(text){
-		s.str(""); //empty the stringstream
-		s << *text;
-		xmlSetProp(ret, (const xmlChar*)"text", (const xmlChar*)s.str().c_str());
+		ss.str("");
+		ss << getText();
+		xmlSetProp(xmlptr, (const xmlChar*)"text", (const xmlChar*)ss.str().c_str());
 	}
 
-	s.str(""); //empty the stringstream
 	if(hasSubType()){
-		s << getItemCountOrSubtype();
-		xmlSetProp(ret, (const xmlChar*)"count", (const xmlChar*)s.str().c_str());
+		ss.str("");
+		ss << getItemCountOrSubtype();
+		xmlSetProp(xmlptr, (const xmlChar*)"count", (const xmlChar*)ss.str().c_str());
 	}
 	
-	s.str("");
 	if(actionId != 0){
-		s << actionId;
-		xmlSetProp(ret, (const xmlChar*)"actionId", (const xmlChar*)s.str().c_str());
+		ss.str("");
+		ss << actionId;
+		xmlSetProp(xmlptr, (const xmlChar*)"actionId", (const xmlChar*)ss.str().c_str());
 	}
 	
-	s.str("");	
 	if(uniqueId != 0){
-		s << uniqueId;
-		xmlSetProp(ret, (const xmlChar*)"uniqueId", (const xmlChar*)s.str().c_str());
+		ss.str("");	
+		ss << uniqueId;
+		xmlSetProp(xmlptr, (const xmlChar*)"uniqueId", (const xmlChar*)ss.str().c_str());
 	}
-	return ret;
+
+	return xmlptr;
 }
 
 bool Item::readAttr(AttrTypes_t attr, PropStream& propStream)

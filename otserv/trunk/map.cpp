@@ -49,15 +49,16 @@
 #include "player.h"
 #include "luascript.h"
 
-#define EVENT_CHECKPLAYER          123
-#define EVENT_CHECKPLAYERATTACKING 124
-
 extern LuaScript g_config;
 
 Map::Map()
 {
+	defaultMapLoaded = false;
 	mapwidth = 0;
 	mapheight = 0;
+
+	mapStoreIdentifier = g_config.getGlobalString("mapstore");
+	houseStoreIdentifier = g_config.getGlobalString("housestore");
 }
 
 Map::~Map()
@@ -92,32 +93,33 @@ bool Map::loadMap(const std::string& identifier, const std::string& type)
 	std::cout << ":: Loading map from: " << loader->getSourceDescription() << std::endl;
 
 	bool loadMapSuccess = loader->loadMap(this, identifier);
+	defaultMapLoaded = true;
 
 	if(!loadMapSuccess){
-		switch(loader->getLastError()){
+		switch(getLastError()){
 		case LOADMAPERROR_CANNOTOPENFILE:
 			std::cout << "FATAL: Could not open the map stream." << std::endl;
 			break;
 		case LOADMAPERROR_GETPROPFAILED:
-			std::cout << "FATAL: Failed to read stream properties. Code: " << loader->getErrorCode() << std::endl;
+			std::cout << "FATAL: Failed to read stream properties. Code: " << getErrorCode() << std::endl;
 			break;
 		case LOADMAPERROR_OUTDATEDHEADER:
-			std::cout << "FATAL: Header information is outdated. Code: " << loader->getErrorCode() << std::endl;
+			std::cout << "FATAL: Header information is outdated. Code: " << getErrorCode() << std::endl;
 			break;
 		case LOADMAPERROR_GETROOTHEADERFAILED:
-			std::cout << "FATAL: Failed to read header information. Code: " << loader->getErrorCode() << std::endl;
+			std::cout << "FATAL: Failed to read header information. Code: " << getErrorCode() << std::endl;
 			break;
 		case LOADMAPERROR_FAILEDTOCREATEITEM:
-			std::cout << "FATAL: Failed to create an object. Code: " << loader->getErrorCode() << std::endl;
+			std::cout << "FATAL: Failed to create an object. Code: " << getErrorCode() << std::endl;
 			break;
 		case LOADMAPERROR_FAILEDUNSERIALIZEITEM:
-			std::cout << "FATAL: Failed to unserialize an object. Code: " << loader->getErrorCode() << std::endl;
+			std::cout << "FATAL: Failed to unserialize an object. Code: " << getErrorCode() << std::endl;
 			break;
 		case LOADMAPERROR_FAILEDTOREADCHILD:
-			std::cout << "FATAL: Failed to read child stream. Code: " << loader->getErrorCode() << std::endl;
+			std::cout << "FATAL: Failed to read child stream. Code: " << getErrorCode() << std::endl;
 			break;
 		case LOADMAPERROR_UNKNOWNNODETYPE:
-			std::cout << "FATAL: Unknown stream node found. Code: " << loader->getErrorCode() << std::endl;
+			std::cout << "FATAL: Unknown stream node found. Code: " << getErrorCode() << std::endl;
 			break;
 		
 		default:
@@ -129,18 +131,19 @@ bool Map::loadMap(const std::string& identifier, const std::string& type)
 		return false;
 	}
 	
-	if(!loader->loadSpawns()){
+	if(!loader->loadSpawns(this)){
 		std::cout << "WARNING: could not load spawn data." << std::endl;
 	}
 
-	if(!loader->loadHouses()){
+	if(!loader->loadHouses(this)){
 		std::cout << "WARNING: could not load house data." << std::endl;
 	}
 
 	delete loader;
 	
-	IOMapSerialize::getInstance()->loadHouseInfo(this, "");
-	IOMapSerialize::getInstance()->loadMap(this, "");
+	IOMapSerialize* IOMapSerialize = IOMapSerialize::getInstance();
+	IOMapSerialize->loadHouseInfo(this, houseStoreIdentifier);
+	IOMapSerialize->loadMap(this, mapStoreIdentifier);
 
 	return true;
 }
@@ -148,9 +151,9 @@ bool Map::loadMap(const std::string& identifier, const std::string& type)
 
 bool Map::saveMap(const std::string& identifier)
 {
-	IOMapSerialize* IOMap = IOMapSerialize::getInstance();
-	IOMap->saveMap(this, "");
-	IOMap->saveHouseInfo(this, "");
+	IOMapSerialize* IOMapSerialize = IOMapSerialize::getInstance();
+	IOMapSerialize->saveMap(this, mapStoreIdentifier);
+	IOMapSerialize->saveHouseInfo(this, houseStoreIdentifier);
 	return true;
 }
 

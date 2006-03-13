@@ -15,8 +15,8 @@ public:
 
 	virtual char* getSourceDescription(){ return "SQL"; };
 	virtual bool loadMap(Map* map, const std::string& identifier);
-	virtual bool loadSpawns();
-	virtual bool loadHouses();
+	virtual bool loadSpawns(Map* map);
+	virtual bool loadHouses(Map* map);
 };
 
 #endif

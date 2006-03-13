@@ -31,6 +31,7 @@
 #include "item.h"
 #include "creature.h"
 #include "magic.h"
+#include "iomapserialize.h"
 
 #include "tools.h"
 #include "tile.h"
@@ -251,7 +252,24 @@ public:
 	/* Map Width and Height - for Info purposes */
 	int mapwidth, mapheight;
 	
-protected:    
+	MapError_t getLastError() {return lasterrortype;}
+	int getErrorCode() {return lasterrorcode;}
+
+	void setLastError(MapError_t errtype, unsigned long _code = 0)
+	{
+		lasterrorcode = _code;
+		lasterrortype = errtype;
+	}
+
+protected:
+	bool defaultMapLoaded;
+	MapError_t lasterrortype;
+	unsigned long lasterrorcode;
+	std::string spawnfile;
+	std::string housefile;
+	std::string mapStoreIdentifier;
+	std::string houseStoreIdentifier;
+
 	/**
 	* Get the Creatures within a specific Range */
 	void getSpectators(const Range& range, SpectatorVec& list);
@@ -264,6 +282,11 @@ protected:
 	friend class IOMapOTBM;
 	friend class IOMapXML;
 	friend class IOMap;
+	friend class IOMapSerializeXML;
+
+#ifdef __USE_MYSQL__
+	friend class IOMapSerializeSQL;
+#endif
 };
 
 #endif

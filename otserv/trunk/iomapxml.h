@@ -22,15 +22,11 @@
 #ifndef __IOMAPXML_H
 #define __IOMAPXML_H
 
-#include <string>
-#include <libxml/xmlmemory.h>
-#include <libxml/parser.h>
-
 #include "iomap.h"
 
 class Map;
 
-/** Map-Loader implementation based on XML-Files */
+/** Map-Loader implementation based on XML-files */
 class IOMapXML : public IOMap {
 public:
 	IOMapXML(){};
@@ -38,14 +34,8 @@ public:
 
 	virtual char* getSourceDescription(){ return "OTX"; };
 	virtual bool loadMap(Map* map, const std::string& identifier);
-	virtual bool loadSpawns();
-	virtual bool loadHouses();
-	
-private:
-	std::string spawnfile;
-	std::string housefile;
-
-	bool LoadContainer(xmlNodePtr nodeitem, Container* ccontainer);
+	virtual bool loadSpawns(Map* map);
+	virtual bool loadHouses(Map* map);
 };
 
 #endif

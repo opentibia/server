@@ -18,8 +18,8 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __CONTAINER_H__
-#define __CONTAINER_H__
+#ifndef __OTSERV_CONTAINER_H__
+#define __OTSERV_CONTAINER_H__
 
 #include "definitions.h"
 #include "cylinder.h"
@@ -39,6 +39,9 @@ public:
 	virtual const Container* getContainer() const {return this;};
 	virtual Depot* getDepot() {return NULL;};
 	virtual const Depot* getDepot() const {return NULL;};
+
+	virtual bool unserialize(xmlNodePtr p);
+	virtual xmlNodePtr serialize();
 
 	uint32_t size() const {return (uint32_t)itemlist.size();};
 	uint32_t capacity() const {return maxSize;};
@@ -83,12 +86,13 @@ private:
 	void onUpdateContainerItem(uint32_t index, Item* olditem, Item* newitem);
 	void onRemoveContainerItem(uint32_t index, Item* item);
 
-protected:
-	//uint32_t depotId;
-	uint32_t maxSize; //number of max items in container  
+	bool loadContainer(xmlNodePtr nodeItem, Container* container);
+	bool saveContainer(xmlNodePtr nodeItem, Container* container);
 
+protected:
+	uint32_t maxSize;
 	ItemList itemlist;
 };
 
-#endif //__CONTAINER_H__
+#endif
 

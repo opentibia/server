@@ -40,45 +40,49 @@ Teleport::~Teleport()
 	//
 }
 
-int Teleport::unserialize(xmlNodePtr p)
+bool Teleport::unserialize(xmlNodePtr nodeItem)
 {
-	Item::unserialize(p);
-	char *tmp = (char*)xmlGetProp(p, (const xmlChar *) "destx");
-	if(tmp){
-		destPos.x = atoi(tmp);
-		xmlFreeOTSERV(tmp);
+	bool ret = Item::unserialize(nodeItem);
+
+	char* nodeValue;	
+	nodeValue = (char*)xmlGetProp(nodeItem, (const xmlChar *) "destx");
+	if(nodeValue){
+		destPos.x = atoi(nodeValue);
+		xmlFreeOTSERV(nodeValue);
 	}
-	tmp = (char*)xmlGetProp(p, (const xmlChar *) "desty");
-	if(tmp){
-		destPos.y = atoi(tmp);
-		xmlFreeOTSERV(tmp);
-	}
-	tmp = (char*)xmlGetProp(p, (const xmlChar *) "destz");
-	if(tmp){
-		destPos.z = atoi(tmp);
-		xmlFreeOTSERV(tmp);
+
+	nodeValue = (char*)xmlGetProp(nodeItem, (const xmlChar *) "desty");
+	if(nodeValue){
+		destPos.y = atoi(nodeValue);
+		xmlFreeOTSERV(nodeValue);
 	}
 	
-	return 0;
+	nodeValue = (char*)xmlGetProp(nodeItem, (const xmlChar *) "destz");
+	if(nodeValue){
+		destPos.z = atoi(nodeValue);
+		xmlFreeOTSERV(nodeValue);
+	}
+	
+	return ret;
 }
 
 xmlNodePtr Teleport::serialize()
 {
 	xmlNodePtr xmlptr = Item::serialize();
 
-	std::stringstream s;
+	std::stringstream ss;
 
-	s.str(""); //empty the stringstream
-	s << (int) destPos.x;
-	xmlSetProp(xmlptr, (const xmlChar*)"destx", (const xmlChar*)s.str().c_str());
+	ss.str("");
+	ss << (int) destPos.x;
+	xmlSetProp(xmlptr, (const xmlChar*)"destx", (const xmlChar*)ss.str().c_str());
 
-	s.str(""); //empty the stringstream
-	s << (int) destPos.y;
-	xmlSetProp(xmlptr, (const xmlChar*)"desty", (const xmlChar*)s.str().c_str());
+	ss.str("");
+	ss << (int) destPos.y;
+	xmlSetProp(xmlptr, (const xmlChar*)"desty", (const xmlChar*)ss.str().c_str());
 
-	s.str(""); //empty the stringstream
-	s << (int)destPos.z;
-	xmlSetProp(xmlptr, (const xmlChar*)"destz", (const xmlChar*)s.str().c_str());
+	ss.str("");
+	ss << (int)destPos.z;
+	xmlSetProp(xmlptr, (const xmlChar*)"destz", (const xmlChar*)ss.str().c_str());
 
 	return xmlptr;
 }

@@ -19,11 +19,24 @@
 //////////////////////////////////////////////////////////////////////
 
 
-#ifndef __IOMAPSERIALIZE_H__
-#define __IOMAPSERIALIZE_H__
+#ifndef __OTSERV_IOMAPSERIALIZE_H__
+#define __OTSERV_IOMAPSERIALIZE_H__
 
 #include <string>
-#include "map.h"
+
+enum MapError_t{
+	LOADMAPERROR_NONE,
+	LOADMAPERROR_CANNOTOPENFILE,
+	LOADMAPERROR_GETPROPFAILED,
+	LOADMAPERROR_OUTDATEDHEADER,
+	LOADMAPERROR_GETROOTHEADERFAILED,
+	LOADMAPERROR_FAILEDTOCREATEITEM,
+	LOADMAPERROR_FAILEDUNSERIALIZEITEM,
+	LOADMAPERROR_FAILEDTOREADCHILD,
+	LOADMAPERROR_UNKNOWNNODETYPE
+};
+
+class Map;
 
 class IOMapSerialize{
 public:
@@ -43,7 +56,18 @@ public:
 	*/
 	virtual bool saveMap(Map* map, const std::string& identifier) = 0;
 
+	/** Load the house access list to a file/database
+	  * \param map pointer to the Map class
+	  * \param identifier is the house access file/database to open
+	  * \returns Returns true if the house access list was opened successfully
+	*/
 	virtual bool loadHouseInfo(Map* map, const std::string& identifier) = 0;
+
+	/** Save the house access list to a file/database
+	  * \param map pointer to the Map class
+	  * \param identifier is the house access file/database to open
+	  * \returns Returns true if the house access list was saved successfully
+	*/
 	virtual bool saveHouseInfo(Map* map, const std::string& identifier) = 0;
 
 protected:

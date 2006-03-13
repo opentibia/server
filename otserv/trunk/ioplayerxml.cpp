@@ -26,6 +26,10 @@
 #include "item.h"
 #include "luascript.h"
 #include "tools.h"
+#include "player.h"
+
+#include <libxml/xmlmemory.h>
+#include <libxml/parser.h>
 
 xmlMutexPtr xmlmutex;
 
@@ -428,16 +432,13 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 						else
 							isLoaded = false;
 
-						Item* myitem = Item::CreateItem(id);
-						myitem->unserialize(slot->children);
-						
-						player->__internalAddThing(sl_id, myitem);
-						Container* container = dynamic_cast<Container*>(myitem);
-
-						if(container){							
-							LoadContainer(slot->children, container);
+						Item* item = Item::CreateItem(id);
+						if(item){
+							item->unserialize(slot->children);
+							player->__internalAddThing(sl_id, item);
 						}
 					}
+
 					slot=slot->next;
 				}
 			}
@@ -469,7 +470,6 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 						myDepot->unserialize(slot->children);
 
 						player->addDepot(myDepot, depotId);
-						LoadContainer(slot->children, myDepot);
 					}
 
 					slot=slot->next;
@@ -517,68 +517,6 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 
 	xmlMutexUnlock(xmlmutex);	
 	return false;
-}
-
-bool IOPlayerXML::LoadContainer(xmlNodePtr nodeitem,Container* ccontainer)
-{
-	xmlNodePtr tmp,p;
-	if(nodeitem==NULL){
-		return false;
-	}
-	tmp=nodeitem->children;
-	if(tmp==NULL){
-		return false;
-	}
-                  
-	if(strcmp((const char*)tmp->name, "inside") == 0){
-		char* nodeValue = NULL;
-		//load items
-		p=tmp->children;
-		while(p){
-			unsigned int id = 0;
-
-			nodeValue = (char*)xmlGetProp(p, (const xmlChar *) "id");
-			if(nodeValue) {
-				id = atoi(nodeValue);
-				xmlFreeOTSERV(nodeValue);
-			}
-
-			Item* myitem = Item::CreateItem(id);
-			myitem->unserialize(p);			
-			ccontainer->__internalAddThing(myitem);
-			
-			Container* in_container = dynamic_cast<Container*>(myitem);
-			if(in_container){
-				LoadContainer(p,in_container);
-			}
-			p=p->next;
-		}
-
-		return true;
-	}
-
-	return false;
-}
-
-bool IOPlayerXML::SaveContainer(xmlNodePtr nodeitem,Container* ccontainer)
-{
-	xmlNodePtr pn,nn;
-	std::stringstream sb;
-	if(ccontainer->size() != 0){
-		pn = xmlNewNode(NULL,(const xmlChar*)"inside");
-		for(int i=ccontainer->size()-1;i>=0;i--){
-			Item * citem = ccontainer->getItem(i);
-			nn = citem->serialize();
-			Container* in_container = dynamic_cast<Container*>(citem);
-			if(in_container){
-				SaveContainer(nn,in_container);
-			}
-			xmlAddChild(pn, nn);
-		}
-		xmlAddChild(nodeitem, pn);
-	}
-
-	return true;
 }
 
 bool IOPlayerXML::savePlayer(Player* player)
@@ -678,13 +616,7 @@ bool IOPlayerXML::savePlayer(Player* player)
 			sb.str("");
           
 			nn = player->items[i]->serialize();
-			Container* is_container = dynamic_cast<Container*>(player->items[i]);
-			if(is_container){
-				SaveContainer(nn,is_container);
-			}
-          
-	    xmlAddChild(pn, nn);
-	    xmlAddChild(sn, pn);
+			xmlAddChild(sn, pn);
 		}
 	}
 	
@@ -699,12 +631,6 @@ bool IOPlayerXML::savePlayer(Player* player)
 		sb.str("");
           
 		nn = (it->second)->serialize();
-		Container* is_container = dynamic_cast<Container*>(it->second);
-		if(is_container){
-			SaveContainer(nn,is_container);
-		}
-          
-		xmlAddChild(pn, nn);
 		xmlAddChild(sn, pn);
 	}
       

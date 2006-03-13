@@ -30,13 +30,10 @@ public:
 
 	virtual char* getSourceDescription(){ return "OTBM";};
 	virtual bool loadMap(Map* map, const std::string& identifier);
-	virtual bool loadSpawns();
-	virtual bool loadHouses();
+	virtual bool loadSpawns(Map* map);
+	virtual bool loadHouses(Map* map);
 
 private:
-	std::string spawnfile;
-	std::string housefile;
-
 	Item* unserializeItemAttr(PropStream &propStream);
 	Item* unserializeItemNode(FileLoader* f, NODE node);
 };

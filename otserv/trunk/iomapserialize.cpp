@@ -26,6 +26,8 @@
 #include "iomapserializexml.h"
 #endif
 
+#include "iomapserializexml.h"
+
 IOMapSerialize* IOMapSerialize::_instance = NULL;
 
 IOMapSerialize* IOMapSerialize::getInstance()

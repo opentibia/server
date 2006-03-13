@@ -19,28 +19,24 @@
 //////////////////////////////////////////////////////////////////////
 
 
-#ifndef __IOPLAYERXML_H
-#define __IOPLAYERXML_H
+#ifndef __OTSERV_IOPLAYERXML_H__
+#define __OTSERV_IOPLAYERXML_H__
 
-#include <string>
-
-#include "ioplayer.h"
-#include "player.h"
-
-#include <libxml/xmlmemory.h>
-#include <libxml/parser.h>
-
+class Player;
 
 /** Baseclass for all Player-Loaders */
 class IOPlayerXML : protected IOPlayer{
 public:
+	IOPlayerXML();
+	virtual ~IOPlayerXML(){};
+
 	/** Get a textual description of what source is used
 	* \returns Name of the source*/
 	virtual char* getSourceDescription(){return "Player source: XML";};
 	virtual bool loadPlayer(Player* player, std::string name);
 	
 	/** Save a player
-	* \returns Wheter the player was successfully saved
+	* \returns true if the player was successfully saved
 	* \param player the player to save
 	*/
 	virtual bool savePlayer(Player* player);
@@ -48,12 +44,6 @@ public:
 	virtual bool getGuidByName(unsigned long& guid, unsigned long& alvl, std::string& name);
 	virtual bool playerExists(std::string name);
 
-	IOPlayerXML();
-	virtual ~IOPlayerXML(){};
-
-private:
-	bool LoadContainer(xmlNodePtr item,Container* container);
-	bool SaveContainer(xmlNodePtr item,Container* container);  	  
 };
 
 #endif

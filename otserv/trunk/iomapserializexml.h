@@ -37,7 +37,9 @@ public:
 	virtual bool loadHouseInfo(Map* map, const std::string& identifier);
 	virtual bool saveHouseInfo(Map* map, const std::string& identifier);
 
-protected:
+private:
+	bool saveTile(xmlNodePtr nodeTile, const Tile* tile);
+	bool loadTile(Map* map, xmlNodePtr nodeTile, Tile* tile);
 };
 
 #endif

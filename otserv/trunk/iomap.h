@@ -25,18 +25,7 @@
 #include <string>
 
 #include "map.h"
-
-enum MapError_t{
-	LOADMAPERROR_NONE,
-	LOADMAPERROR_CANNOTOPENFILE,
-	LOADMAPERROR_GETPROPFAILED,
-	LOADMAPERROR_OUTDATEDHEADER,
-	LOADMAPERROR_GETROOTHEADERFAILED,
-	LOADMAPERROR_FAILEDTOCREATEITEM,
-	LOADMAPERROR_FAILEDUNSERIALIZEITEM,
-	LOADMAPERROR_FAILEDTOREADCHILD,
-	LOADMAPERROR_UNKNOWNNODETYPE
-};
+#include "iomapserialize.h"
 
 class IOMap{
 public:
@@ -58,25 +47,12 @@ public:
 	/** Load the spawns
 	  * \returns Returns true if the spawns was loaded successfully
 	*/
-	virtual bool loadSpawns() = 0;
+	virtual bool loadSpawns(Map* map) = 0;
 
 	/** Load the houses (not house tile-data)
 	  * \returns Returns true if the houses was loaded successfully
 	*/
-	virtual bool loadHouses() = 0;
-
-	MapError_t getLastError() {return lasterrortype;}
-	int getErrorCode() {return lasterrorcode;}
-
-	void setLastError(MapError_t errtype, unsigned long _code = 0)
-	{
-		lasterrorcode = _code;
-		lasterrortype = errtype;
-	}
-
-protected:
-	MapError_t lasterrortype;
-	unsigned long lasterrorcode;
+	virtual bool loadHouses(Map* map) = 0;
 };
 
 #endif
