@@ -625,21 +625,12 @@ std::string Item::getDescription(int32_t lookDistance) const
 	std::stringstream s;
 	const ItemType& it = items[id];
 
-	/*if(specialDescription){
-		s << (*specialDescription) << ".";
-
-		if(lookDistance <= 1) {
-			if(it.weight > 0)
-				s << std::endl << "It weighs " << std::fixed << std::setprecision(1) << it.weight << " oz.";
-		}
-	}
-	else*/
 	if (it.name.length()) {
 		if(isStackable() && count > 1){
 			s << (int)count << " " << it.name << "s.";
 
 			if(lookDistance <= 1) {
-				s << std::endl << "They weight " << std::fixed << std::setprecision(1) << ((double) count * it.weight) << " oz.";
+				s << std::endl << "They weight " << std::fixed << std::setprecision(2) << ((double) count * it.weight) << " oz.";
 			}
 		}		
 		else{
@@ -652,65 +643,65 @@ std::string Item::getDescription(int32_t lookDistance) const
 					s << (int)getItemCharge();
 				else
 					s << "1";
-				s << "x)";
+
+				s << "x).";
 			}
 			else if(isWeapon() && (getAttack() || getDefense()))
 			{
 				if(getAttack()){
-					s << "a " << it.name << " (Atk:" << (int)getAttack() << " Def:" << (int)getDefense() << ")";
+					s << "a " << it.name << " (Atk:" << (int)getAttack() << " Def:" << (int)getDefense() << ").";
 				}
 				else{
-					s << "a " << it.name << " (Def:" << (int)getDefense() << ")";	
+					s << "a " << it.name << " (Def:" << (int)getDefense() << ").";	
 				}
 			}
 			else if(getArmor()){
-				s << "a " << it.name << " (Arm:" << (int)getArmor() << ")";
+				s << "a " << it.name << " (Arm:" << (int)getArmor() << ").";
 			}
 			else if(isFluidContainer()){
 				s << "a " << it.name;
 				if(fluid == 0){
-					s << ". It is empty";
+					s << ". It is empty.";
 				}
 				else{
-					s << " of " << items[fluid].name;
+					s << " of " << items[fluid].name << ".";
 				}
 			}
-			else if(isSplash()){				
+			else if(isSplash()){
 				s << "a " << it.name << " of ";
 				if(fluid == 0){
-					s << items[1].name;
+					s << items[1].name << ".";
 				}
 				else{
-					s << items[fluid].name;
+					s << items[fluid].name << ".";
 				}
 			}
 			else if(it.isKey()){
-				s << "a " << it.name << " (Key:" << actionId << ")";
+				s << "a " << it.name << " (Key:" << actionId << ").";
 			}
 			else if(it.isGroundTile()){
-				s << it.name;
+				s << it.name << ".";
 			}
 			else if(it.isContainer()){
-				s << "a " << it.name << " (Vol:" << getContainer()->capacity() << ")";
+				s << "a " << it.name << " (Vol:" << getContainer()->capacity() << ").";
 			}
 			else if(it.allowDistRead){
 				s << it.name << "." << std::endl;
 
 				if(lookDistance <= 4){
 					if(text && text->length() > 0){
-						s << *text;
+						s << "You read: " << *text;
 					}
 					else
-						s << "Nothing is written on it";
+						s << "Nothing is written on it.";
 				}
 				else
-					s << "You are too far away to read it";
+					s << "You are too far away to read it.";
 			}
 			else{
-				s << "a " << it.name;
+				s << "a " << it.name << ".";
 			}
 
-			s << ".";
 			if(lookDistance <= 1){
 				double weight = getWeight();
 				if(weight > 0)
