@@ -234,7 +234,7 @@ bool IOMapSerializeSQL::loadTile(Tile* tile)
 			int type = result.getDataInt("type", i);
 			item = NULL;
 
-			uint32_t attrSize = 0;
+			unsigned long attrSize = 0;
 			const char* attr = result.getDataBlob("attributes", attrSize, i);
 			PropStream propStream;
 			propStream.init(attr, attrSize);
