@@ -237,6 +237,12 @@ bool Item::unserialize(xmlNodePtr nodeItem)
 	else
 		return false;
 	
+	nodeValue = (char*)xmlGetProp(nodeItem, (const xmlChar *) "count");
+	if(nodeValue){
+		setItemCountOrSubtype(atoi(nodeValue));
+		xmlFreeOTSERV(nodeValue);
+	}
+
 	nodeValue = (char*)xmlGetProp(nodeItem, (const xmlChar *) "special_description");
 	if(nodeValue){
 		specialDescription = new std::string(nodeValue);
@@ -246,12 +252,6 @@ bool Item::unserialize(xmlNodePtr nodeItem)
 	nodeValue = (char*)xmlGetProp(nodeItem, (const xmlChar *) "text");
 	if(nodeValue){
 		text = new std::string(nodeValue);
-		xmlFreeOTSERV(nodeValue);
-	}
-	
-	nodeValue = (char*)xmlGetProp(nodeItem, (const xmlChar *) "count");
-	if(nodeValue){
-		setItemCountOrSubtype(atoi(nodeValue));
 		xmlFreeOTSERV(nodeValue);
 	}
 		
@@ -279,6 +279,12 @@ xmlNodePtr Item::serialize()
 	ss << getID();
 	xmlSetProp(xmlptr, (const xmlChar*)"id", (const xmlChar*)ss.str().c_str());
 	
+	if(hasSubType()){
+		ss.str("");
+		ss << getItemCountOrSubtype();
+		xmlSetProp(xmlptr, (const xmlChar*)"count", (const xmlChar*)ss.str().c_str());
+	}
+
 	if(specialDescription){
 		ss.str(""); //empty the stringstream
 		ss << getSpecialDescription();
@@ -289,12 +295,6 @@ xmlNodePtr Item::serialize()
 		ss.str("");
 		ss << getText();
 		xmlSetProp(xmlptr, (const xmlChar*)"text", (const xmlChar*)ss.str().c_str());
-	}
-
-	if(hasSubType()){
-		ss.str("");
-		ss << getItemCountOrSubtype();
-		xmlSetProp(xmlptr, (const xmlChar*)"count", (const xmlChar*)ss.str().c_str());
 	}
 	
 	if(!isNotMoveable() /*moveable*/){
@@ -410,7 +410,7 @@ bool Item::unserializeAttr(PropStream& propStream)
 bool Item::serializeAttr(PropWriteStream& propWriteStream)
 {
 	if(isStackable() || isSplash() || isFluidContainer()){
-		unsigned char _count = getItemCount();
+		unsigned char _count = getItemCountOrSubtype();
 		propWriteStream.ADD_UCHAR(ATTR_COUNT);
 		propWriteStream.ADD_UCHAR(_count);
 	}
