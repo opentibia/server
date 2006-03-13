@@ -330,6 +330,8 @@ bool IOMapSerializeXML::loadTile(Map* map, xmlNodePtr nodeTile, Tile* tile)
 				}
 			}
 			else{
+				bool isDoor = Item::items[id].isDoor();
+
 				//find this type in the tile
 				for(int i = 0; i < tile->getThingCount(); ++i){
 					Item* findItem = tile->__getThing(i)->getItem();
@@ -344,6 +346,10 @@ bool IOMapSerializeXML::loadTile(Map* map, xmlNodePtr nodeTile, Tile* tile)
 						}
 
 						break;
+					}
+					else if(isDoor && findItem->getDoor()){
+						item = findItem;
+						item->setID(id);
 					}
 				}
 			}

@@ -74,7 +74,7 @@ protected:
 	inline bool checks(const NODE node);
 	inline bool safeSeek(unsigned long pos);
 	inline bool safeTell(long &pos);
-	//inline bool writeData(void* data, int size, bool unescape);
+
 public:
 	inline bool FileLoader::writeData(const void* data, int size, bool unescape){
 		for(int i = 0; i < size; ++i) {
@@ -198,7 +198,7 @@ public:
 	}
 
 	template <typename T>
-	inline bool ADD_TYPE(T* add){
+	inline void ADD_TYPE(T* add){
 		if((buffer_size - size) < sizeof(T)){
 			buffer_size = buffer_size + ((sizeof(T) + 0x1F) & 0xFFFFFFE0);
 			buffer = (char*)realloc(buffer, buffer_size);
@@ -206,12 +206,10 @@ public:
 
 		memcpy(&buffer[size], (char*)add, sizeof(T));
 		size = size + sizeof(T);
-
-		return true;
 	}
 	
 	template <typename T>
-	inline bool ADD_VALUE(T add){
+	inline void ADD_VALUE(T add){
 		if((buffer_size - size) < sizeof(T)){
 			buffer_size = buffer_size + ((sizeof(T) + 0x1F) & 0xFFFFFFE0);
 			buffer = (char*)realloc(buffer,buffer_size);
@@ -219,35 +217,32 @@ public:
 		
 		memcpy(&buffer[size], &add, sizeof(T));
 		size = size + sizeof(T);
-		
-		return true;
 	}
 	
-	inline bool ADD_ULONG(unsigned long ret){
-		return ADD_VALUE(ret);
+	inline void ADD_ULONG(unsigned long ret){
+		ADD_VALUE(ret);
 	}
 	
-	inline bool ADD_USHORT(unsigned short ret){
-		return ADD_VALUE(ret);
+	inline void ADD_USHORT(unsigned short ret){
+		ADD_VALUE(ret);
 	}
 	
-	inline bool ADD_UCHAR(unsigned char ret){
-		return ADD_VALUE(ret);
+	inline void ADD_UCHAR(unsigned char ret){
+		ADD_VALUE(ret);
 	}
 	
-	inline bool ADD_STRING(const std::string& add){
+	inline void ADD_STRING(const std::string& add){
 		unsigned short str_len = add.size();
 		
-		if(!ADD_USHORT(str_len)){
-			return false;
-		}
+		ADD_USHORT(str_len);
+
 		if((buffer_size - size) < str_len){
 			buffer_size = buffer_size + ((str_len + 0x1F) & 0xFFFFFFE0);
 			buffer = (char*)realloc(buffer, buffer_size);
 		}
+		
 		memcpy(&buffer[size], add.c_str(), str_len);
 		size = size + str_len;
-		return true;
 	}
 	
 	

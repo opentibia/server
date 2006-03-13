@@ -437,12 +437,19 @@ bool Door::unserialize(xmlNodePtr nodeItem)
 
 xmlNodePtr Door::serialize()
 {
-	xmlNodePtr xmlptr = Item::serialize();
+	//dont call Item::serialize()
+	xmlNodePtr xmlptr = xmlNewNode(NULL,(const xmlChar*)"item");
 
 	std::stringstream ss;
+	ss.str(""); //empty the stringstream
+	ss << getID();
+	xmlSetProp(xmlptr, (const xmlChar*)"id", (const xmlChar*)ss.str().c_str());
+
+	/*
 	ss.str("");
 	ss << (int) doorId;
 	xmlSetProp(xmlptr, (const xmlChar*)"doorId", (const xmlChar*)ss.str().c_str());
+	*/
 
 	return xmlptr;
 }
@@ -464,15 +471,17 @@ bool Door::readAttr(AttrTypes_t attr, PropStream& propStream)
 
 bool Door::serializeAttr(PropWriteStream& propWriteStream)
 {
-	bool ret = Item::serializeAttr(propWriteStream);
+	//dont call Item::serializeAttr(propWriteStream);
 
+	/*
 	if(house){
 		unsigned char _doorId = getDoorId();
 		propWriteStream.ADD_UCHAR(ATTR_HOUSEDOORID);
 		propWriteStream.ADD_UCHAR(_doorId);
 	}
+	*/
 
-	return ret;
+	return true;
 }
 
 void Door::setHouse(House* _house)

@@ -97,19 +97,11 @@ bool IOMapSerializeSQL::saveMap(Map* map, const std::string& identifier)
 
 bool IOMapSerializeSQL::saveTile(uint32_t tileId, const Tile* tile)
 {
-	DBQuery query;
-
-	const Position& tilePos = tile->getPosition();
-	query << "INSERT INTO `tilelist` (`tileid`, `x` , `y` , `z` ) VALUES";
-	query << "(" << tileId << "," << tilePos.x << "," << tilePos.y << "," << tilePos.z << ")";
-
-	if(!db.executeQuery(query))
-		return false;
-
 	typedef std::list<std::pair<Container*, int> > ContainerStackList;
 	typedef ContainerStackList::value_type ContainerStackList_Pair;
 	ContainerStackList containerStackList;
 
+	bool isTileListStored = false;
 	int runningID = 0;
 	Item* item = NULL;
 	Container* container = NULL;
@@ -118,7 +110,7 @@ bool IOMapSerializeSQL::saveTile(uint32_t tileId, const Tile* tile)
 	std::stringstream streamitems;
 	std::string itemsstring;
 
-	query.reset();
+	DBQuery query;
 	query << "INSERT INTO `tileitems` (`tileid`, `sid` , `pid` , `type` , `attributes` ) VALUES";
 
 	for(int i = 0; i < tile->getThingCount(); ++i){
@@ -131,7 +123,19 @@ bool IOMapSerializeSQL::saveTile(uint32_t tileId, const Tile* tile)
 			continue;
 
 		++runningID;
-		
+
+		if(!isTileListStored){
+			isTileListStored = true;
+
+			DBQuery tileListQuery;
+			const Position& tilePos = tile->getPosition();
+			tileListQuery << "INSERT INTO `tilelist` (`tileid`, `x` , `y` , `z` ) VALUES";
+			tileListQuery << "(" << tileId << "," << tilePos.x << "," << tilePos.y << "," << tilePos.z << ")";
+
+			if(!db.executeQuery(tileListQuery))
+				return false;
+		}
+
 		const char* attributes = NULL;
 		unsigned long attribSize = 0;
 
@@ -256,6 +260,8 @@ bool IOMapSerializeSQL::loadTile(Tile* tile)
 					continue;
 			}
 			else{
+				bool isDoor = Item::items[type].isDoor();
+
 				//find this type in the tile
 				for(int i = 0; i < tile->getThingCount(); ++i){
 					Item* findItem = tile->__getThing(i)->getItem();
@@ -270,6 +276,10 @@ bool IOMapSerializeSQL::loadTile(Tile* tile)
 						}
 
 						break;
+					}
+					else if(isDoor && findItem->getDoor()){
+						item = findItem;
+						item->setID(type);
 					}
 				}
 			}

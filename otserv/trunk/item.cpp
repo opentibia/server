@@ -297,17 +297,21 @@ xmlNodePtr Item::serialize()
 		xmlSetProp(xmlptr, (const xmlChar*)"count", (const xmlChar*)ss.str().c_str());
 	}
 	
-	if(actionId != 0){
-		ss.str("");
-		ss << actionId;
-		xmlSetProp(xmlptr, (const xmlChar*)"actionId", (const xmlChar*)ss.str().c_str());
+	if(!isNotMoveable() /*moveable*/){
+		if(actionId != 0){
+			ss.str("");
+			ss << actionId;
+			xmlSetProp(xmlptr, (const xmlChar*)"actionId", (const xmlChar*)ss.str().c_str());
+		}
 	}
 	
+	/*we are not saving unique ids
 	if(uniqueId != 0){
 		ss.str("");	
 		ss << uniqueId;
 		xmlSetProp(xmlptr, (const xmlChar*)"uniqueId", (const xmlChar*)ss.str().c_str());
 	}
+	*/
 
 	return xmlptr;
 }
@@ -417,17 +421,21 @@ bool Item::serializeAttr(PropWriteStream& propWriteStream)
 		propWriteStream.ADD_UCHAR(_count);
 	}
 
-	if(actionId){
-		unsigned short _actionId = getActionId();
-		propWriteStream.ADD_UCHAR(ATTR_ACTION_ID);
-		propWriteStream.ADD_USHORT(_actionId);
+	if(!isNotMoveable() /*moveable*/){
+		if(actionId){
+			unsigned short _actionId = getActionId();
+			propWriteStream.ADD_UCHAR(ATTR_ACTION_ID);
+			propWriteStream.ADD_USHORT(_actionId);
+		}
 	}
 
+	/*we are not saving unique ids
 	if(uniqueId){
 		unsigned short _uniqueId = getUniqueId();
 		propWriteStream.ADD_UCHAR(ATTR_UNIQUE_ID);
 		propWriteStream.ADD_USHORT(_uniqueId);
 	}
+	*/
 
 	const std::string& _text = getText();
 	if(_text.length() > 0){
