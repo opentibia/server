@@ -71,24 +71,24 @@ public:
 	unsigned short id;
 	unsigned short clientId;
 
-	unsigned short maxItems;	 // maximum size if this is a container
-	double			weight;		 // weight of the item, e.g. throwing distance depends on it
-	std::string		name;		 // the name of the item
-	std::string		description; // additional description... as in "The blade is a magic flame." for fireswords
-	WeaponType		weaponType;
-	amu_t			amuType;
-	subfight_t		shootType;
-	int				attack;
-	int				defence;
-	int				armor;
-	unsigned short	slot_position;
-	unsigned short	decayTo;
-	unsigned short	decayTime;
-	bool			canDecay;
-	bool			isVertical;
-	bool			isHorizontal;
-	bool			isHangable;
-	bool 			allowDistRead;
+	unsigned short maxItems;    // maximum size if this is a container
+	double         weight;      // weight of the item, e.g. throwing distance depends on it
+	std::string    name;        // the name of the item
+	std::string    description; // additional description... as in "The blade is a magic flame." for fireswords
+	WeaponType     weaponType;
+	amu_t          amuType;
+	subfight_t     shootType;
+	int            attack;
+	int            defence;
+	int            armor;
+	unsigned short slot_position;
+	unsigned short decayTo;
+	unsigned short decayTime;
+	bool           canDecay;
+	bool           isVertical;
+	bool           isHorizontal;
+	bool           isHangable;
+	bool           allowDistRead;
 
 	uint16_t speed;
 

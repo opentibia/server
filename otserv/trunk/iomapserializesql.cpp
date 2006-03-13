@@ -101,7 +101,7 @@ bool IOMapSerializeSQL::saveTile(uint32_t tileId, const Tile* tile)
 	typedef ContainerStackList::value_type ContainerStackList_Pair;
 	ContainerStackList containerStackList;
 
-	bool isTileListStored = false;
+	bool storeTile = false;
 	int runningID = 0;
 	Item* item = NULL;
 	Container* container = NULL;
@@ -109,6 +109,7 @@ bool IOMapSerializeSQL::saveTile(uint32_t tileId, const Tile* tile)
 	int parentid = 0;
 	std::stringstream streamitems;
 	std::string itemsstring;
+	int n = 0;
 
 	DBQuery query;
 	query << "INSERT INTO `tileitems` (`tileid`, `sid` , `pid` , `type` , `attributes` ) VALUES";
@@ -119,22 +120,15 @@ bool IOMapSerializeSQL::saveTile(uint32_t tileId, const Tile* tile)
 		if(!item)
 			continue;
 
-		if(!(!item->isNotMoveable() || item->isDoor() || item->getContainer() /*|| item->isBed()*/))
+		if(!(!item->isNotMoveable() ||
+			item->isDoor() ||
+			item->getContainer() ||
+			(item->getRWInfo(n) & CAN_BE_WRITTEN)
+			/*item->isBed()*/))
 			continue;
 
+		storeTile = true;
 		++runningID;
-
-		if(!isTileListStored){
-			isTileListStored = true;
-
-			DBQuery tileListQuery;
-			const Position& tilePos = tile->getPosition();
-			tileListQuery << "INSERT INTO `tilelist` (`tileid`, `x` , `y` , `z` ) VALUES";
-			tileListQuery << "(" << tileId << "," << tilePos.x << "," << tilePos.y << "," << tilePos.z << ")";
-
-			if(!db.executeQuery(tileListQuery))
-				return false;
-		}
 
 		const char* attributes = NULL;
 		unsigned long attribSize = 0;
@@ -150,7 +144,17 @@ bool IOMapSerializeSQL::saveTile(uint32_t tileId, const Tile* tile)
 			containerStackList.push_back(ContainerStackList_Pair(item->getContainer(), runningID));
 		}
 	}
-		
+
+	if(storeTile){
+		DBQuery tileListQuery;
+		const Position& tilePos = tile->getPosition();
+		tileListQuery << "INSERT INTO `tilelist` (`tileid`, `x` , `y` , `z` ) VALUES";
+		tileListQuery << "(" << tileId << "," << tilePos.x << "," << tilePos.y << "," << tilePos.z << ")";
+
+		if(!db.executeQuery(tileListQuery))
+			return false;
+	}
+
 	while(containerStackList.size() > 0){
 		//split into sub-queries
 		if(streamitems.str().length() > 8192){
@@ -243,7 +247,8 @@ bool IOMapSerializeSQL::loadTile(Tile* tile)
 			PropStream propStream;
 			propStream.init(attr, attrSize);
 			
-			if(Item::items[type].moveable){
+			const ItemType& iType = Item::items[type];
+			if(iType.moveable){
 				//create a new item
 				item = Item::CreateItem(type);
 				
@@ -260,7 +265,7 @@ bool IOMapSerializeSQL::loadTile(Tile* tile)
 					continue;
 			}
 			else{
-				bool isDoor = Item::items[type].isDoor();
+				bool isDoor = iType.isDoor();
 
 				//find this type in the tile
 				for(int i = 0; i < tile->getThingCount(); ++i){

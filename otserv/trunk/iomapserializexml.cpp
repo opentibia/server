@@ -228,6 +228,7 @@ bool IOMapSerializeXML::saveTile(xmlNodePtr nodeMap, const Tile* tile)
 {
 	Item* item;
 	xmlNodePtr nodeTile = NULL;
+	int n = 0;
 
 	for(int i = tile->getThingCount() - 1; i >= 0; --i){
 		item = tile->__getThing(i)->getItem();
@@ -235,7 +236,11 @@ bool IOMapSerializeXML::saveTile(xmlNodePtr nodeMap, const Tile* tile)
 		if(!item)
 			continue;
 
-		if(!(!item->isNotMoveable() || item->isDoor() || item->getContainer() /*|| item->isBed()*/))
+		if(!(!item->isNotMoveable() ||
+			item->isDoor() ||
+			item->getContainer() ||
+			(item->getRWInfo(n) & CAN_BE_WRITTEN)
+			/*item->isBed()*/))
 			continue;
 
 		if(!nodeTile){
@@ -300,7 +305,8 @@ bool IOMapSerializeXML::loadTile(Map* map, xmlNodePtr nodeTile, Tile* tile)
 				xmlFreeOTSERV(nodeValue);
 			}
 			
-			if(!map->defaultMapLoaded || Item::items[id].moveable){
+			const ItemType& iType = Item::items[id];
+			if(!map->defaultMapLoaded || iType.moveable){
 				//create a new item
 				item = Item::CreateItem(id);
 
@@ -330,7 +336,7 @@ bool IOMapSerializeXML::loadTile(Map* map, xmlNodePtr nodeTile, Tile* tile)
 				}
 			}
 			else{
-				bool isDoor = Item::items[id].isDoor();
+				bool isDoor = iType.isDoor();
 
 				//find this type in the tile
 				for(int i = 0; i < tile->getThingCount(); ++i){

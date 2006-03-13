@@ -785,17 +785,19 @@ std::string Item::getText()
 	return *text;
 }
 
-int Item::getRWInfo(int& maxlen) const {
+int Item::getRWInfo(int& maxlen) const
+{
 	const ItemType& it = items[id];
 	maxlen = it.maxTextLen;
 	return it.RWInfo;
 }
 
-bool Item::canDecay(){
+bool Item::canDecay()
+{
 	if(isRemoved())
 		return false;
 
-	return items[id].canDecay;	
+	return items[id].canDecay;
 }
 
 int Item::getWorth() const
