@@ -84,6 +84,7 @@ public:
 	
 	House* getHouse(){return house;};
 	
+	//serialization
 	virtual bool unserialize(xmlNodePtr p);
 	virtual xmlNodePtr serialize();
 

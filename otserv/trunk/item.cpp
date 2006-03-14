@@ -166,7 +166,7 @@ void Item::setItemCount(uint8_t n)
 	count = n;
 }
 
-unsigned short Item::getItemCountOrSubtype() const
+unsigned char Item::getItemCountOrSubtype() const
 {
 	if(isFluidContainer() || isSplash())
 		return fluid;
@@ -272,36 +272,36 @@ bool Item::unserialize(xmlNodePtr nodeItem)
 
 xmlNodePtr Item::serialize()
 {
-	xmlNodePtr xmlptr = xmlNewNode(NULL,(const xmlChar*)"item");
+	xmlNodePtr nodeItem = xmlNewNode(NULL,(const xmlChar*)"item");
 
 	std::stringstream ss;
-	ss.str(""); //empty the stringstream
+	ss.str("");
 	ss << getID();
-	xmlSetProp(xmlptr, (const xmlChar*)"id", (const xmlChar*)ss.str().c_str());
+	xmlSetProp(nodeItem, (const xmlChar*)"id", (const xmlChar*)ss.str().c_str());
 	
 	if(hasSubType()){
 		ss.str("");
 		ss << getItemCountOrSubtype();
-		xmlSetProp(xmlptr, (const xmlChar*)"count", (const xmlChar*)ss.str().c_str());
+		xmlSetProp(nodeItem, (const xmlChar*)"count", (const xmlChar*)ss.str().c_str());
 	}
 
 	if(specialDescription){
-		ss.str(""); //empty the stringstream
+		ss.str("");
 		ss << getSpecialDescription();
-		xmlSetProp(xmlptr, (const xmlChar*)"special_description", (const xmlChar*)ss.str().c_str());
+		xmlSetProp(nodeItem, (const xmlChar*)"special_description", (const xmlChar*)ss.str().c_str());
 	}
 	
 	if(text){
 		ss.str("");
 		ss << getText();
-		xmlSetProp(xmlptr, (const xmlChar*)"text", (const xmlChar*)ss.str().c_str());
+		xmlSetProp(nodeItem, (const xmlChar*)"text", (const xmlChar*)ss.str().c_str());
 	}
 	
 	if(!isNotMoveable() /*moveable*/){
 		if(actionId != 0){
 			ss.str("");
 			ss << actionId;
-			xmlSetProp(xmlptr, (const xmlChar*)"actionId", (const xmlChar*)ss.str().c_str());
+			xmlSetProp(nodeItem, (const xmlChar*)"actionId", (const xmlChar*)ss.str().c_str());
 		}
 	}
 	
@@ -309,11 +309,11 @@ xmlNodePtr Item::serialize()
 	if(uniqueId != 0){
 		ss.str("");	
 		ss << uniqueId;
-		xmlSetProp(xmlptr, (const xmlChar*)"uniqueId", (const xmlChar*)ss.str().c_str());
+		xmlSetProp(nodeItem, (const xmlChar*)"uniqueId", (const xmlChar*)ss.str().c_str());
 	}
 	*/
 
-	return xmlptr;
+	return nodeItem;
 }
 
 bool Item::readAttr(AttrTypes_t attr, PropStream& propStream)
@@ -384,7 +384,44 @@ bool Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 			setItemCountOrSubtype(_charges);
 			break;
 		}
-		
+
+		//these should be handled through derived classes
+		//If these are called then something has changed in the items.otb since the map was saved
+		//just read the values
+
+		//Depot class
+		case ATTR_DEPOT_ID:
+		{
+			unsigned short _depotId;
+			if(!propStream.GET_USHORT(_depotId)){
+				return false;
+			}
+			
+			return true;
+		}
+
+		//Door class
+		case ATTR_HOUSEDOORID:
+		{
+			unsigned char _doorId;
+			if(!propStream.GET_UCHAR(_doorId)){
+				return false;
+			}
+			
+			return true;
+		}
+	
+		//Teleport class
+		case ATTR_TELE_DEST:
+		{
+			TeleportDest* tele_dest;
+			if(!propStream.GET_STRUCT(tele_dest)){
+				return false;
+			}
+
+			return true;
+		}
+
 		default:
 			return false;
 		break;
@@ -402,6 +439,26 @@ bool Item::unserializeAttr(PropStream& propStream)
 			return false;
 			break;
 		}
+	}
+
+	return true;
+}
+
+bool Item::unserializeItemNode(FileLoader& f, NODE node, PropStream& propStream)
+{
+	ItemType iType = Item::items[id];
+	unsigned char _count = 0;
+
+	if(true /*f.getVersion() == 0*/){
+		if(iType.stackable || iType.isSplash() || iType.isFluidContainer()){
+			if(!propStream.GET_UCHAR(_count)){
+				return false;
+			}
+		}
+	}
+
+	if(!unserializeAttr(propStream)){
+		return false;
 	}
 
 	return true;

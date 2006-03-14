@@ -297,7 +297,7 @@ void NetworkMessage::AddItem(const Item *item)
 	AddU16(it.clientId);
 
 	if(it.stackable || it.isSplash() || it.isFluidContainer())
-    AddByte((unsigned char)item->getItemCountOrSubtype());
+    AddByte(item->getItemCountOrSubtype());
 }
 
 void NetworkMessage::AddItemId(const Item *item)

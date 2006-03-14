@@ -60,6 +60,21 @@ xmlNodePtr Depot::serialize()
 	return xmlptr;
 }
 
+bool Depot::readAttr(AttrTypes_t attr, PropStream& propStream)
+{
+	if(ATTR_DEPOT_ID == attr){
+		unsigned short _depotId;
+		if(!propStream.GET_USHORT(_depotId)){
+			return false;
+		}
+		
+		setDepotId(_depotId);
+		return true;
+	}
+	else
+		return Item::readAttr(attr, propStream);
+}
+
 ReturnValue Depot::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 	bool childIsOwner /*= false*/) const
 {

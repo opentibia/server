@@ -23,12 +23,6 @@
 
 #include "tile.h"
 
-struct TeleportDest{
-	unsigned short _x;
-	unsigned short _y;
-	unsigned char	_z;
-};
-
 class Teleport : public Item, public Cylinder
 {
 public:
@@ -38,6 +32,7 @@ public:
 	virtual Teleport* getTeleport() {return this;};
 	virtual const Teleport* getTeleport() const {return this;};
 	
+	//serialization
 	virtual bool unserialize(xmlNodePtr p);
 	virtual xmlNodePtr serialize();
 

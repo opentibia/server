@@ -40,8 +40,11 @@ public:
 	virtual Depot* getDepot() {return NULL;};
 	virtual const Depot* getDepot() const {return NULL;};
 
+	//serialization
 	virtual bool unserialize(xmlNodePtr p);
 	virtual xmlNodePtr serialize();
+	
+	bool unserializeItemNode(FileLoader& f, NODE node, PropStream& propStream);
 
 	uint32_t size() const {return (uint32_t)itemlist.size();};
 	uint32_t capacity() const {return maxSize;};
@@ -85,9 +88,6 @@ private:
 	void onAddContainerItem(Item* item);
 	void onUpdateContainerItem(uint32_t index, Item* olditem, Item* newitem);
 	void onRemoveContainerItem(uint32_t index, Item* item);
-
-	bool loadContainer(xmlNodePtr nodeItem, Container* container);
-	bool saveContainer(xmlNodePtr nodeItem, Container* container);
 
 protected:
 	uint32_t maxSize;

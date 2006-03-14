@@ -59,9 +59,18 @@ struct LightInfo{
 	};
 };
 
+/*from iomapotbm.h*/
+#pragma pack(1)
+struct TeleportDest{
+	unsigned short _x;
+	unsigned short _y;
+	unsigned char	_z;
+};
+#pragma pack()
+
 enum AttrTypes_t{
-	ATTR_DESCRIPTION = 1,
-	ATTR_EXT_FILE = 2,
+	//ATTR_DESCRIPTION = 1,
+	//ATTR_EXT_FILE = 2,
 	ATTR_TILE_FLAGS = 3,
 	ATTR_ACTION_ID = 4,
 	ATTR_UNIQUE_ID = 5,
@@ -70,9 +79,9 @@ enum AttrTypes_t{
 	ATTR_TELE_DEST = 8,
 	ATTR_ITEM = 9,
 	ATTR_DEPOT_ID = 10,
-	ATTR_EXT_SPAWN_FILE = 11,
+	//ATTR_EXT_SPAWN_FILE = 11,
 	ATTR_RUNE_CHARGES = 12,
-	ATTR_EXT_HOUSE_FILE = 13,
+	//ATTR_EXT_HOUSE_FILE = 13,
 	ATTR_HOUSEDOORID = 14,
 	ATTR_COUNT = 15
 };
@@ -80,6 +89,10 @@ enum AttrTypes_t{
 class Item : virtual public Thing
 {
 public:
+	//Factory member to create item of right type based on type
+	static Item* CreateItem(const unsigned short _type, unsigned short _count = 1);
+	static Items items;
+
   // Constructor for items
 	Item(const unsigned short _type);
 	Item(const unsigned short _type, unsigned short _count);
@@ -101,9 +114,16 @@ public:
 	virtual Door* getDoor() {return NULL;};
 	virtual const Door* getDoor() const {return NULL;};
 	
-	//Factory member to create item of right type based on type
-	static Item* CreateItem(const unsigned short _type, unsigned short _count = 1);
-	static Items items;
+	//serialization
+	virtual bool unserialize(xmlNodePtr p);
+	virtual xmlNodePtr serialize();
+
+	virtual bool readAttr(AttrTypes_t attr, PropStream& propStream);
+	virtual bool unserializeAttr(PropStream& propStream);
+	virtual bool unserializeItemNode(FileLoader& f, NODE node, PropStream& propStream);
+	//virtual bool serializeItemNode();
+
+	virtual bool serializeAttr(PropWriteStream& propWriteStream);
 	
 	virtual bool isPushable() const {return !isNotMoveable();};
 	virtual int getThrowRange() const {return (isPickupable() ? 15 : 2);};
@@ -155,19 +175,12 @@ public:
 	void setText(const std::string& desc);
 	void clearText();
 	std::string Item::getText();
-	
-	virtual bool unserialize(xmlNodePtr p);
-	virtual xmlNodePtr serialize();
-
-	virtual bool readAttr(AttrTypes_t attr, PropStream& propStream);
-	virtual bool unserializeAttr(PropStream& propStream);
-	virtual bool serializeAttr(PropWriteStream& propWriteStream);
 
   // get the number of items
 	unsigned short getItemCount() const;
 	void setItemCount(uint8_t n);
 
-	unsigned short getItemCountOrSubtype() const;
+	unsigned char getItemCountOrSubtype() const;
 	void setItemCountOrSubtype(unsigned char n);
 	bool hasSubType() const;
 

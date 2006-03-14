@@ -27,14 +27,18 @@ public:
 	Depot(uint16_t _type);
 	~Depot();
 
+	virtual Depot* getDepot() {return this;};
+	virtual const Depot* getDepot() const {return this;};
+
+	//serialization
 	virtual bool unserialize(xmlNodePtr p);
 	virtual xmlNodePtr serialize();
+
+	virtual bool readAttr(AttrTypes_t attr, PropStream& propStream);
 
 	uint32_t getDepotId() {return depotId;};
 	void setMaxDepotLimit(uint32_t maxitems) {maxDepotLimit = maxitems;};
 	void setDepotId(uint32_t id) {depotId = id;};
-	virtual Depot* getDepot() {return this;};
-	virtual const Depot* getDepot() const {return this;};
 
 	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,
 		bool childIsOwner = false) const;

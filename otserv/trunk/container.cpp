@@ -19,6 +19,7 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "container.h"
+#include "iomapotbm.h"
 #include "game.h"
 #include "player.h"
 
@@ -47,71 +48,62 @@ bool Container::unserialize(xmlNodePtr nodeItem)
 	bool ret = Item::unserialize(nodeItem);
 
 	if(ret) {
-		return loadContainer(nodeItem, this);
+		xmlNodePtr nodeContainer = nodeItem->children;
+		if(nodeContainer == NULL){
+			return true; //container is empty
+		}
+	  
+		char* nodeValue;
+
+		while(nodeContainer){
+			//load container items
+			if(xmlStrcmp(nodeContainer->name, (const xmlChar*)"inside") == 0){
+				xmlNodePtr nodeContainerItem = nodeContainer->children;
+				while(nodeContainerItem){
+					if(xmlStrcmp(nodeContainerItem->name, (const xmlChar*)"item") == 0){
+						unsigned int id = 0;
+						if(nodeValue = (char*)xmlGetProp(nodeContainerItem, (const xmlChar *) "id")){
+							id = atoi(nodeValue);
+							xmlFreeOTSERV(nodeValue);
+						}
+						else
+							return false;
+
+						Item* item = Item::CreateItem(id);
+						if(!item){
+							return false;
+						}
+
+						if(!item->unserialize(nodeContainerItem)){
+							return false;
+						}
+						
+						__internalAddThing(item);
+					}
+
+					nodeContainerItem = nodeContainerItem->next;
+				}
+			}
+
+			nodeContainer = nodeContainer->next;
+		}
+
+		return true;
 	}
 
 	return false;
 }
 
-bool Container::loadContainer(xmlNodePtr nodeItem, Container* container)
+xmlNodePtr Container::serialize()
 {
-	if(nodeItem == NULL){
-		return false;
-	}
+	xmlNodePtr nodeItem = Item::serialize();
 
-	xmlNodePtr nodeContainer = nodeItem->children;
-	if(nodeContainer == NULL){
-		return true; //empty
-	}
-  
-	char* nodeValue;
-
-	while(nodeContainer){
-		if(xmlStrcmp(nodeContainer->name, (const xmlChar*)"inside") == 0){
-
-			//load items
-			xmlNodePtr nodeContainerItem;
-			nodeContainerItem = nodeContainer->children;
-			while(nodeContainerItem){
-				if(xmlStrcmp(nodeContainerItem->name, (const xmlChar*)"item") == 0){
-					unsigned int id = 0;
-					if(nodeValue = (char*)xmlGetProp(nodeContainerItem, (const xmlChar *) "id")){
-						id = atoi(nodeValue);
-						xmlFreeOTSERV(nodeValue);
-					}
-					else
-						return false;
-
-					Item* item = Item::CreateItem(id);
-					if(!item){
-						return false;
-					}
-
-					if(!item->unserialize(nodeContainerItem)){
-						return false;
-					}
-					
-					container->__internalAddThing(item);
-				}
-
-				nodeContainerItem = nodeContainerItem->next;
-			}
-		}
-
-		nodeContainer = nodeContainer->next;
-	}
-
-	return true;
-}
-
-bool Container::saveContainer(xmlNodePtr nodeItem, Container* container)
-{
 	xmlNodePtr newContainerNode;
 
-	if(container->size() != 0){
+	if(size() > 0){
 		newContainerNode = xmlNewNode(NULL, (const xmlChar*)"inside");
-		for(int i = container->size() - 1; i >= 0; --i){
-			Item* item = container->getItem(i);
+		for(int i = size() - 1; i >= 0; --i){
+			Item* item = getItem(i);
 
 			xmlNodePtr newItemNode = item->serialize();
 			xmlAddChild(newContainerNode, newItemNode);
@@ -120,15 +112,48 @@ bool Container::saveContainer(xmlNodePtr nodeItem, Container* container)
 		xmlAddChild(nodeItem, newContainerNode);
 	}
 
-	return true;
+	return nodeItem;
 }
 
-xmlNodePtr Container::serialize()
+bool Container::unserializeItemNode(FileLoader& f, NODE node, PropStream& propStream)
 {
-	xmlNodePtr xmlptr = Item::serialize();
-	saveContainer(xmlptr, this);
+	bool ret = Item::unserializeItemNode(f, node, propStream);
 
-	return xmlptr;
+	if(ret){
+		unsigned long type;
+		NODE nodeItem = f.getChildNode(node, type);
+		while(nodeItem){
+			//load container items
+			if(type == OTBM_ITEM){
+				PropStream itemPropStream;
+				f.getProps(node, itemPropStream);
+
+				unsigned short _id = 0;
+				if(!itemPropStream.GET_USHORT(_id)){
+					return false;
+				}
+				
+				Item* item = Item::CreateItem(id);
+				if(!item){
+					return false;
+				}
+
+				if(!item->unserializeItemNode(f, nodeItem, itemPropStream)){
+					return false;
+				}
+				
+				__internalAddThing(item);
+			}
+			else /*unknown type*/
+				return false;
+
+			nodeItem = f.getNextNode(nodeItem, type);
+		}
+		
+		return true;
+	}
+
+	return false;
 }
 
 double Container::getWeight() const
