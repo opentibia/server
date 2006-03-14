@@ -57,6 +57,7 @@ typedef unsigned long long uint64_t;
 	#endif
 
 	#include <hash_map>
+	#include <limits>
 	#define OTSERV_HASH_MAP stdext::hash_map
 
 	#include <cstring>

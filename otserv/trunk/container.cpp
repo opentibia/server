@@ -128,12 +128,8 @@ bool Container::unserializeItemNode(FileLoader& f, NODE node, PropStream& propSt
 				PropStream itemPropStream;
 				f.getProps(node, itemPropStream);
 
-				unsigned short _id = 0;
-				if(!itemPropStream.GET_USHORT(_id)){
-					return false;
-				}
-				
-				Item* item = Item::CreateItem(id);
+				Item* item = Item::CreateItem(itemPropStream);
+
 				if(!item){
 					return false;
 				}

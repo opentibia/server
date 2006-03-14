@@ -91,6 +91,7 @@ class Item : virtual public Thing
 public:
 	//Factory member to create item of right type based on type
 	static Item* CreateItem(const unsigned short _type, unsigned short _count = 1);
+	static Item* CreateItem(PropStream& propStream);
 	static Items items;
 
   // Constructor for items

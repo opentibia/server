@@ -239,6 +239,7 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 					while(propStream.GET_UCHAR(attribute)){
 						switch(attribute){
 						case OTBM_ATTR_TILE_FLAGS:
+						{
 							unsigned long flags;
 							if(!propStream.GET_ULONG(flags)){
 								map->setLastError(LOADMAPERROR_GETPROPFAILED, nodeTile);
@@ -249,23 +250,13 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 								tile->setPz();
 								
 							break;
+						}
+
 						case OTBM_ATTR_ITEM:
 						{
-							//Item* item  = unserializeItemAttr(propStream);
+							Item* item = Item::CreateItem(propStream);
 
-							unsigned short _id;
-							if(!propStream.GET_USHORT(_id)){
-								return NULL;
-							}
-
-							Item* item = Item::CreateItem(_id);
-
-							if(!item){
-								map->setLastError(LOADMAPERROR_FAILEDTOCREATEITEM, nodeTile);
-								return false;
-							}
-
-							if(item->unserializeItemNode(f, nodeTile, propStream)){
+							if(item){
 								tile->__internalAddThing(item);
 							}
 							else{
@@ -286,17 +277,10 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 					NODE nodeItem = f.getChildNode(nodeTile, type);
 					while(nodeItem){
 						if(type == OTBM_ITEM){
-							//Item* item = unserializeItemNode(&f, nodeItem);
-
 							PropStream propStream;
 							f.getProps(nodeItem, propStream);
 
-							unsigned short _id;
-							if(!propStream.GET_USHORT(_id)){
-								return NULL;
-							}
-
-							Item* item = Item::CreateItem(_id);
+							Item* item = Item::CreateItem(propStream);
 
 							if(!item){
 								map->setLastError(LOADMAPERROR_FAILEDTOCREATEITEM, nodeItem);
