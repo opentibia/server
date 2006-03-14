@@ -62,7 +62,6 @@ enum tile_flags_t{
 
 bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 {
-	__int64 start = OTSYS_TIME();
 	map->setLastError(LOADMAPERROR_NONE);
 
 	FileLoader f;
@@ -385,8 +384,6 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 		map->setLastError(LOADMAPERROR_FAILEDTOREADCHILD);
 		return false;
 	}
-	
-	std::cout << "Notice: [OTBM Loader] Loading time : " << (OTSYS_TIME() - start)/(1000.) << " s" << std::endl;
 	
 	return (map->getLastError() == LOADMAPERROR_NONE);
 }
