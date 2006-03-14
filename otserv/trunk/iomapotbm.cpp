@@ -62,6 +62,7 @@ enum tile_flags_t{
 
 bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 {
+	__int64 start = OTSYS_TIME();
 	map->setLastError(LOADMAPERROR_NONE);
 
 	FileLoader f;
@@ -97,7 +98,7 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 	}
 
 	if(root_header->minorVersionItems > Items::dwMinorVersion){
-		std::cout << "WARNING: This map needs an updated items OTB file." <<std::endl;
+		std::cout << "Warning: [OTBM loader] This map needs an updated items OTB file." <<std::endl;
 	}
 
 	std::cout << "Map size: " << root_header->width << "x" << root_header->height << std::endl;
@@ -254,14 +255,18 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 
 						case OTBM_ATTR_ITEM:
 						{
+							//Item* item  = unserializeItemAttr(propStream);
 							Item* item = Item::CreateItem(propStream);
+							if(!item){
+								map->setLastError(LOADMAPERROR_FAILEDTOCREATEITEM, nodeTile);
+								return false;
+							}
 
-							if(item){
-								tile->__internalAddThing(item);
+							if(isHouseTile && !item->isNotMoveable()){
+								std::cout << "Warning: [OTBM loader] Moveable item in house id = " << house->getHouseId() << " Item type = " << item->getID() << std::endl;
 							}
 							else{
-								map->setLastError(LOADMAPERROR_FAILEDUNSERIALIZEITEM, nodeTile);
-								return false;
+								tile->__internalAddThing(item);
 							}
 							
 							break;
@@ -277,22 +282,27 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 					NODE nodeItem = f.getChildNode(nodeTile, type);
 					while(nodeItem){
 						if(type == OTBM_ITEM){
+
 							PropStream propStream;
 							f.getProps(nodeItem, propStream);
-
+							
 							Item* item = Item::CreateItem(propStream);
-
 							if(!item){
 								map->setLastError(LOADMAPERROR_FAILEDTOCREATEITEM, nodeItem);
 								return false;
 							}
 
 							if(item->unserializeItemNode(f, nodeItem, propStream)){
-								tile->__internalAddThing(item);
-								if(isHouseTile){
-									Door* door = item->getDoor();
-									if(door && door->getDoorId() != 0){
-										house->addDoor(door);
+								if(isHouseTile && !item->isNotMoveable()){
+									std::cout << "Warning: [OTBM loader] Moveable item in house id = " << house->getHouseId() << " Item type = " << item->getID() << std::endl;
+								}
+								else{
+									tile->__internalAddThing(item);
+									if(isHouseTile){
+										Door* door = item->getDoor();
+										if(door && door->getDoorId() != 0){
+											house->addDoor(door);
+										}
 									}
 								}
 							}
@@ -375,7 +385,9 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 		map->setLastError(LOADMAPERROR_FAILEDTOREADCHILD);
 		return false;
 	}
-
+	
+	std::cout << "Notice: [OTBM Loader] Loading time : " << (OTSYS_TIME() - start)/(1000.) << " s" << std::endl;
+	
 	return (map->getLastError() == LOADMAPERROR_NONE);
 }
 

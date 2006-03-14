@@ -122,7 +122,7 @@ bool IOMapSerializeSQL::saveTile(uint32_t tileId, const Tile* tile)
 
 		if(!(!item->isNotMoveable() ||
 			item->isDoor() ||
-			item->getContainer() ||
+			(item->getContainer() && item->getContainer()->size() != 0)||
 			(item->getRWInfo(n) & CAN_BE_WRITTEN)
 			/*item->isBed()*/))
 			continue;
@@ -386,27 +386,33 @@ bool IOMapSerializeSQL::saveHouseInfo(Map* map, const std::string& identifier)
 	
 	
 	for(HouseMap::iterator it = Houses::getInstance().getHouseBegin(); it != Houses::getInstance().getHouseEnd(); ++it){
+		bool save_lists = false;
 		query.reset();
 		query << "INSERT INTO `houseaccess` (`houseid` , `listid` , `list`) VALUES ";
 		House* house = it->second;
 		
 		std::string listText;
-		if(house->getAccessList(GUEST_LIST, listText)){
+		if(house->getAccessList(GUEST_LIST, listText) && listText != ""){
 			query << query.getSeparator() << "(" << house->getHouseId() << "," << GUEST_LIST << ",'" << Database::escapeString(listText) << "')";
+			save_lists = true;
 		}
-		if(house->getAccessList(SUBOWNER_LIST, listText)){
+		if(house->getAccessList(SUBOWNER_LIST, listText) && listText != ""){
 			query << query.getSeparator()<< "(" << house->getHouseId() << "," << SUBOWNER_LIST << ",'" << Database::escapeString(listText) << "')";
+			save_lists = true;
 		}
 		
 		for(HouseDoorList::iterator it = house->getHouseDoorBegin(); it != house->getHouseDoorEnd(); ++it){
 			const Door* door = *it;
-			if(door->getAccessList(listText)){
+			if(door->getAccessList(listText) && listText != ""){
 				query << query.getSeparator() << "(" << house->getHouseId() << "," << door->getDoorId() << ",'" << Database::escapeString(listText) << "')";
+				save_lists = true;
 			}
 		}
 		
-		if(!db.executeQuery(query))
-			return false;
+		if(save_lists){
+			if(!db.executeQuery(query))
+				return false;
+		}
 	}
 	
 	query.reset();

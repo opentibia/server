@@ -29,6 +29,7 @@
 #include "game.h"
 #include "actions.h"
 #include "house.h"
+#include "ioplayer.h"
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
@@ -661,12 +662,18 @@ bool Commands::setHouseOwner(Creature* creature, const std::string& cmd, const s
 		if(player->getTile()->hasFlag(TILESTATE_HOUSE)){
 			HouseTile* houseTile = dynamic_cast<HouseTile*>(player->getTile());
 			if(houseTile){
-				Player* paramPlayer = game->getPlayerByName(param);
-				if(paramPlayer){
-					houseTile->getHouse()->setHouseOwner(paramPlayer->getGUID());
+				
+				std::string real_name = param;
+				unsigned long guid;
+				unsigned long access_lvl;
+				if(IOPlayer::instance()->getGuidByName(guid, access_lvl, real_name)){
+					houseTile->getHouse()->setHouseOwner(guid);
 				}
 				else if(param == "none"){
 					houseTile->getHouse()->setHouseOwner(0);
+				}
+				else{
+					player->sendTextMessage(MSG_BLUE_TEXT,"Player not found.");
 				}
 				return true;
 			}
@@ -674,48 +681,3 @@ bool Commands::setHouseOwner(Creature* creature, const std::string& cmd, const s
 	}
 	return false;
 }
-
-
-/*
-bool Commands::invitePlayer(Creature* creature, const std::string& cmd, const std::string& param)
-{
-	Player* player = creature->getPlayer();
-	if(!player)
-		return false;
-
-	if(player->getTile()->hasFlag(TILESTATE_HOUSE)){
-		HouseTile* houseTile = dynamic_cast<HouseTile*>(player->getTile());
-		House* house = houseTile->getHouse();
-
-		if(house->getHouseOwner() == player->getGUID()){
-			if(house->addGuest(param) != RET_NOERROR){
-				player->sendCancel("Player could not be invited.");
-				return false;
-			}
-		}
-	}
-
-	return true;
-}
-
-bool Commands::uninvitePlayer(Creature* creature, const std::string& cmd, const std::string& param)
-{
-	Player* player = creature->getPlayer();
-	if(!player)
-		return false;
-
-	if(player->getTile()->hasFlag(TILESTATE_HOUSE)){
-		HouseTile* houseTile = dynamic_cast<HouseTile*>(player->getTile());
-		House* house = houseTile->getHouse();
-
-		if(house->getHouseOwner() == player->getGUID()){
-			if(house->removeGuest(param) != RET_NOERROR){
-				player->sendCancel("Player is not invited.");
-				return false;
-			}
-		}
-	}
-
-	return true;
-}
-*/

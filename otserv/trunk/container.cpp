@@ -127,9 +127,8 @@ bool Container::unserializeItemNode(FileLoader& f, NODE node, PropStream& propSt
 			if(type == OTBM_ITEM){
 				PropStream itemPropStream;
 				f.getProps(node, itemPropStream);
-
+				
 				Item* item = Item::CreateItem(itemPropStream);
-
 				if(!item){
 					return false;
 				}

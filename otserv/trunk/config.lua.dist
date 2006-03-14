@@ -14,10 +14,6 @@ map = "data/world/map.otx"
 -- OTBM for binary, SQL for SQL map, XML for OTX maps
 mapkind = "XML"
 
--- sourcedata
--- SQL for acc/player info from SQL, XML for acc/player info from XML
-sourcedata = "XML"
-
 -- loginmsg
 -- the message the player gets when he logs in
 loginmsg = "Welcome to OTServ. For help visit http://www.otfans.net"

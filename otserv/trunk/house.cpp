@@ -119,7 +119,7 @@ bool House::kickPlayer(Player* player, const std::string& name)
 		HouseTile* houseTile = dynamic_cast<HouseTile*>(kickingPlayer->getTile());
 		
 		if(houseTile && houseTile->getHouse() == this){
-			if(getHouseAccessLevel(player) >= getHouseAccessLevel(kickingPlayer)){
+			if(getHouseAccessLevel(player) >= getHouseAccessLevel(kickingPlayer) && player->access >= kickingPlayer->access){
 				if(g_game.internalTeleport(kickingPlayer, getEntryPosition()) == RET_NOERROR){
 					g_game.AddMagicEffectAt(getEntryPosition(), NM_ME_ENERGY_AREA);
 				}

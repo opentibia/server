@@ -209,12 +209,14 @@ private:
 	
 	PoolManager() {
 		OTSYS_THREAD_LOCKVARINIT(poolLock);
-		addPool(32, 16384);
-		addPool(64, 16384);
-		addPool(128, 4096);
+		addPool(32, 32768);
+		addPool(48, 32768);
+		//addPool(64, 16384);
+		addPool(96, 16384);
+		//addPool(128, 4096);
 		addPool(256, 256);
 		addPool(512, 256);
-		addPool(768, 256);
+		addPool(800, 256);
 		addPool(2048, 128);
 		addPool(4096, 128);
 		addPool(8192, 128);
