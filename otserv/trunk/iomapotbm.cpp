@@ -263,6 +263,8 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 
 							if(isHouseTile && !item->isNotMoveable()){
 								std::cout << "Warning: [OTBM loader] Moveable item in house id = " << house->getHouseId() << " Item type = " << item->getID() << std::endl;
+								delete item;
+								item = NULL;
 							}
 							else{
 								tile->__internalAddThing(item);
