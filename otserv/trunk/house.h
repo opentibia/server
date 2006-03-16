@@ -18,19 +18,12 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __HOUSE_H__
-#define __HOUSE_H__
+#ifndef __OTSERV_HOUSE_H__
+#define __OTSERV_HOUSE_H__
 
 #include <string>
 #include <list>
 #include <map>
-
-
-#ifdef __GNUC__
-#include <ext/hash_set>
-#else
-#include <hash_set>
-#endif
 
 #include "boost/regex.hpp"
 
@@ -57,13 +50,9 @@ public:
 	void getList(std::string& _list) const;
 
 private:
-	#ifdef __GNUC__
-	typedef __gnu_cxx::hash_set<uint32_t> PlayerList;
-	typedef __gnu_cxx::hash_set<uint32_t> GuildList; //TODO: include ranks
-	#else
-	typedef stdext::hash_set<uint32_t> PlayerList;
-	typedef stdext::hash_set<uint32_t> GuildList; //TODO: include ranks
-	#endif
+	typedef OTSERV_HASH_SET<uint32_t> PlayerList;
+	typedef OTSERV_HASH_SET<uint32_t> GuildList; //TODO: include ranks
+
 	typedef std::list<std::string> ExpressionList;
 	typedef std::list<std::pair<boost::regex, bool> > RegExList;
 	std::string list;
@@ -175,7 +164,9 @@ public:
 	HouseDoorList::iterator getHouseDoorEnd() {return doorList.end();}
 
 private:
-	bool isInitiated;
+	bool transferToDepot();
+
+	bool isLoaded;
 	uint32_t houseid;
 	uint32_t houseOwner;
 	HouseTileList houseTiles;

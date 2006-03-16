@@ -30,7 +30,7 @@ extern Game g_game;
 
 House::House(uint32_t _houseid)
 {
-	isInitiated = false;
+	isLoaded = false;
 	houseName = "OTServ headquarter (Flat 1, Area 42)";
 	houseOwner = 0;
 	posEntry.x = 0;
@@ -55,15 +55,18 @@ void House::addTile(HouseTile* tile)
 
 void House::setHouseOwner(uint32_t guid)
 {
-	if(isInitiated && houseOwner == guid)
+	if(isLoaded && houseOwner == guid)
 		return;
 	
-	isInitiated = true;
+	isLoaded = true;
 
 	if(houseOwner){
 		//send items to depot
+		transferToDepot();
+
 		//...TODO...
 		//TODO: remove players from beds
+
 		//clean access lists
 		guestList.parseList("");
 		subOwnerList.parseList("");
@@ -175,6 +178,70 @@ void House::setAccessList(unsigned long listId, const std::string& textlist)
 			g_game.AddMagicEffectAt(getEntryPosition(), NM_ME_ENERGY_AREA);
 		}
 	}
+}
+
+bool House::transferToDepot()
+{
+	if(townid == 0 || houseOwner == 0){
+		return false;
+	}
+
+	std::string ownerName;
+	if(!IOPlayer::instance()->getNameByGuid(houseOwner, ownerName)){
+		return false;
+	}
+
+	bool unloadPlayer = false;
+	Player* player = g_game.getPlayerByName(ownerName);
+	
+	if(!player){
+		unloadPlayer = true;
+		player = new Player(ownerName, NULL);
+
+		if(!IOPlayer::instance()->loadPlayer(player, ownerName)){
+#ifdef __DEBUG__
+			std::cout << "Failure: [House::transferToDepot], can not load player: " << ownerName << std::endl;
+#endif
+
+			delete player;
+			return false;
+		}
+	}
+
+	Depot* depot = player->getDepot(townid, true);
+
+	std::list<Item*> moveItemList;
+	Container* tmpContainer = NULL;
+	Item* item = NULL;
+
+	for(HouseTileList::iterator it = houseTiles.begin(); it != houseTiles.end(); ++it){
+		for(int i = 0; i < (*it)->getThingCount(); ++i){
+			item = (*it)->__getThing(i)->getItem();
+
+			if(!item)
+				continue;
+
+			if(item->isPickupable()){
+				moveItemList.push_back(item);
+			}
+			else if(tmpContainer = item->getContainer()){
+				for(ItemList::const_iterator it = tmpContainer->getItems(); it != tmpContainer->getEnd(); ++it){
+					moveItemList.push_back(*it);
+				}
+			}
+		}
+	}
+
+	for(std::list<Item*>::iterator it = moveItemList.begin(); it != moveItemList.end(); ++it){
+		g_game.internalMoveItem((*it)->getParent(), depot, INDEX_WHEREEVER, (*it), (*it)->getItemCount(), FLAG_NOLIMIT);
+	}
+
+	if(unloadPlayer){
+		IOPlayer::instance()->savePlayer(player); 
+		delete player;
+	}
+
+	return true;
 }
 
 bool House::getAccessList(unsigned long listId, std::string& list)

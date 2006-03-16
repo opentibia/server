@@ -49,7 +49,9 @@ typedef unsigned long long uint64_t;
 
 #ifdef __GNUC__
 	#include <ext/hash_map>
+	#include <ext/hash_set>
 	#define OTSERV_HASH_MAP __gnu_cxx::hash_map
+	#define OTSERV_HASH_SET __gnu_cxx::hash_set
 
 #else
 	#ifndef NOMINMAX
@@ -57,8 +59,10 @@ typedef unsigned long long uint64_t;
 	#endif
 
 	#include <hash_map>
+	#include <hash_set>
 	#include <limits>
 	#define OTSERV_HASH_MAP stdext::hash_map
+	#define OTSERV_HASH_SET stdext::hash_set
 
 	#include <cstring>
 	inline int strcasecmp(const char *s1, const char *s2)
