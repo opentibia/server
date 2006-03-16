@@ -58,7 +58,7 @@ protected:
 	bool teleportHere(Creature* creature, const std::string& cmd, const std::string& param);
 	bool teleportTo(Creature* creature, const std::string& cmd, const std::string& param);
 	bool createItems(Creature* creature, const std::string& cmd, const std::string& param);
-	bool substract_contMoney(Creature* creature, const std::string& cmd, const std::string& param);
+	bool subtractMoney(Creature* creature, const std::string& cmd, const std::string& param);
 	bool reloadInfo(Creature* creature, const std::string& cmd, const std::string& param);
 	bool testCommand(Creature* creature, const std::string& cmd, const std::string& param);
 	bool getInfo(Creature* creature, const std::string& cmd, const std::string& param);

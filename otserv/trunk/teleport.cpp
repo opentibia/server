@@ -181,6 +181,21 @@ int32_t Teleport::__getIndexOfThing(const Thing* thing) const
 	return -1;
 }
 
+int32_t Teleport::__getFirstIndex() const
+{
+	return -1;
+}
+
+int32_t Teleport::__getLastIndex() const
+{
+	return -1;
+}
+
+uint32_t Teleport::__getItemTypeCount(uint16_t itemId) const
+{
+	return 0;
+}
+
 Thing* Teleport::__getThing(uint32_t index) const
 {
 	return NULL;

@@ -353,266 +353,6 @@ int Player::getDefense() const
 	//return defense;
 }
 
-unsigned long Player::getMoney()
-{
-	unsigned long money = 0;
-	std::list<const Container*> stack;
-	ItemList::const_iterator cit;
-	for(int i=0; i< 11;i++){
-		if(items[i]){
-			if(Container* tmpcontainer = items[i]->getContainer()){
-				stack.push_back(tmpcontainer);
-			}
-			else{
-				money = money + items[i]->getWorth();
-			}
-		}
-	}
-	
-	while(stack.size() > 0) {
-		const Container* container = stack.front();
-		stack.pop_front();
-		for(cit = container->getItems(); cit != container->getEnd(); ++cit) {
-			money = money + (*cit)->getWorth();
-			if(Container* container = (*cit)->getContainer()){
-				stack.push_back(container);
-			}
-		}
-	}
-	return money;
-}
-
-bool Player::substractMoney(uint32_t money)
-{
-	if(getMoney() < money)
-		return false;
-	
-	std::list<Container*> stack;
-	MoneyMap moneyMap;
-	MoneyItem* tmp;
-	
-	ItemList::iterator it;
-	for(int i = SLOT_FIRST; i < SLOT_LAST && money > 0 ;++i){	
-		if(items[i]){
-			if(Container* tmpcontainer = items[i]->getContainer()){
-				stack.push_back(tmpcontainer);
-			}
-			else{
-				if(items[i]->getWorth() != 0){
-					tmp = new MoneyItem;
-					tmp->item = items[i];
-					tmp->slot = i;
-					tmp->location = SLOT_TYPE_INVENTORY;
-					tmp->parent = NULL;
-					moneyMap.insert(moneymap_pair(items[i]->getWorth(),tmp));
-				}
-			}
-		}
-	}
-	
-	while(stack.size() > 0 && money > 0){
-		Container* container = stack.front();
-		stack.pop_front();
-		for(int i = 0; i < container->size() && money > 0; i++){	
-			Item *item = container->getItem(i);
-			if(item && item->getWorth() != 0){
-				tmp = new MoneyItem;
-				tmp->item = item;
-				tmp->slot = 0;
-				tmp->location = SLOT_TYPE_CONTAINER;
-				tmp->parent = container;
-				moneyMap.insert(moneymap_pair(item->getWorth(), tmp));
-			}
-
-			Container* containerItem = item->getContainer();
-			if(containerItem){
-				stack.push_back(containerItem);
-			}
-		}
-	}
-	
-	MoneyMap::iterator it2;
-	for(it2 = moneyMap.begin(); it2 != moneyMap.end() && money > 0; it2++){
-		Item *item = it2->second->item;
-		g_game.internalRemoveItem(item);
-
-		if(it2->first <= money){
-			money = money - it2->first;
-		}
-		else{
-			substractMoneyItem(item, money);
-			money = 0;
-		}
-
-		delete it2->second;
-		it2->second = NULL;
-	}
-
-	for(; it2 != moneyMap.end(); it2++){
-		delete it2->second;
-		it2->second = NULL;
-	}
-	
-	moneyMap.clear();
-	
-	if(money != 0)
-		return false;
-	
-	return true;
-}
-
-bool Player::substractMoneyItem(Item *item, uint32_t money)
-{
-	if(money >= item->getWorth())
-		return false;
-	
-	int remaind = item->getWorth() - money;
-	int crys = remaind / 10000;
-	remaind = remaind - crys * 10000;
-	int plat = remaind / 100;
-	remaind = remaind - plat * 100;
-	int gold = remaind;
-
-	if(crys != 0){
-		Item* remaindItem = Item::CreateItem(ITEM_COINS_CRYSTAL, crys);
-
-		ReturnValue ret = g_game.internalAddItem(this, remaindItem);
-		if(ret != RET_NOERROR){
-			g_game.internalAddItem(getTile(), remaindItem);
-		}
-	}
-	
-	if(plat != 0){
-		Item* remaindItem = Item::CreateItem(ITEM_COINS_PLATINUM, plat);
-
-		ReturnValue ret = g_game.internalAddItem(this, remaindItem);
-		if(ret != RET_NOERROR){
-			g_game.internalAddItem(getTile(), remaindItem);
-		}
-	}
-	
-	if(gold != 0){
-		Item* remaindItem = Item::CreateItem(ITEM_COINS_GOLD, gold);
-
-		ReturnValue ret = g_game.internalAddItem(this, remaindItem);
-		if(ret != RET_NOERROR){
-			g_game.internalAddItem(getTile(), remaindItem);
-		}
-	}
-	
-	return true;
-}
-
-bool Player::removeItemTypeCount(uint16_t itemId, uint32_t count)
-{
-	if(getItemTypeCount(itemId) < count)
-		return false;
-	
-	std::list<Container*> stack;
-	
-	ItemList::iterator it;
-	for(int i = SLOT_FIRST; i < SLOT_LAST && count > 0; ++i){
-		if(items[i]){
-			if(items[i]->getID() == itemId){
-				if(items[i]->isStackable()){
-					if(items[i]->getItemCount() > count){
-						g_game.internalRemoveItem(items[i], count);
-						count = 0;
-					}
-					else{
-						g_game.internalRemoveItem(items[i], count);
-					}
-				}
-				else{
-					count--;
-					g_game.internalRemoveItem(items[i]);
-				}
-			}
-			else if(Container* tmpcontainer = dynamic_cast<Container*>(items[i])){
-				stack.push_back(tmpcontainer);
-			}
-		}
-	}
-	
-	while(stack.size() > 0 && count > 0){
-		Container* container = stack.front();
-		stack.pop_front();
-		for(int i = 0; i < container->size() && count > 0; i++){	
-			Item* item = container->getItem(i);
-			if(item->getID() == itemId){
-				if(item->isStackable()){
-					if(item->getItemCount() > count){
-						g_game.internalRemoveItem(item, count);
-						count = 0;
-					}
-					else{
-						count = count - item->getItemCount();
-						g_game.internalRemoveItem(item);
-					}
-				}
-				else{
-					count--;				
-					g_game.internalRemoveItem(item);
-				}
-			}
-			else if(dynamic_cast<Container*>(item)){
-				stack.push_back(dynamic_cast<Container*>(item));
-			}
-		}
-	}
-
-	if(count == 0)
-		return true;
-
-	return false;
-}
-
-uint32_t Player::getItemTypeCount(uint16_t itemId)
-{
-	uint32_t counter = 0;
-	std::list<const Container*> stack;
-	ItemList::const_iterator cit;
-	for(int i = SLOT_FIRST; i < SLOT_LAST; i++){
-		if(items[i]){
-			if(items[i]->getID() == itemId){
-				if(items[i]->isStackable()){
-					counter = counter + items[i]->getItemCount();
-				}
-				else{
-					++counter;
-				}
-			}
-
-			if(items[i]){
-				if(Container* tmpcontainer = items[i]->getContainer()){
-					stack.push_back(tmpcontainer);
-				}
-			}
-		}
-	}
-	
-	while(stack.size() > 0){
-		const Container* container = stack.front();
-		stack.pop_front();
-		for(cit = container->getItems(); cit != container->getEnd(); ++cit){
-			if((*cit)->getID() == itemId){
-				if((*cit)->isStackable()){
-					counter = counter + (*cit)->getItemCount();
-				}
-				else{
-					++counter;
-				}
-			}
-
-			if(Container *container = (*cit)->getContainer()){
-				stack.push_back(container);
-			}
-		}
-	}
-
-	return counter;
-}
-
 void Player::sendIcons()
 {
 	int icons = 0;
@@ -2390,6 +2130,58 @@ int32_t Player::__getIndexOfThing(const Thing* thing) const
 	}
 
 	return -1;
+}
+
+int32_t Player::__getFirstIndex() const
+{
+	return SLOT_FIRST;
+}
+
+int32_t Player::__getLastIndex() const
+{
+	return SLOT_LAST;
+}
+
+uint32_t Player::__getItemTypeCount(uint16_t itemId) const
+{
+	uint32_t count = 0;
+
+	std::list<const Container*> listContainer;
+	ItemList::const_iterator cit;
+	Container* tmpContainer = NULL;
+	Item* item = NULL;
+
+	for(int i = SLOT_FIRST; i < SLOT_LAST; i++){
+		if(item = items[i]){
+			if(item->getID() == itemId){
+				if(item->isStackable()){
+					count+= item->getItemCount();
+				}
+				else{
+					++count;
+				}
+
+				if(tmpContainer = item->getContainer()){
+					listContainer.push_back(tmpContainer);
+				}
+			}
+		}
+	}
+	
+	while(listContainer.size() > 0){
+		const Container* container = listContainer.front();
+		listContainer.pop_front();
+		
+		count+= container->__getItemTypeCount(itemId);
+
+		for(cit = container->getItems(); cit != container->getEnd(); ++cit){
+			if(tmpContainer = (*cit)->getContainer()){
+				listContainer.push_back(tmpContainer);
+			}
+		}
+	}
+
+	return count;
 }
 
 Thing* Player::__getThing(uint32_t index) const

@@ -50,7 +50,7 @@ s_defcommands Commands::defined_commands[] = {
 	{"/t",&Commands::teleportMasterPos},
 	{"/c",&Commands::teleportHere},
 	{"/i",&Commands::createItems},
-	{"/q",&Commands::substract_contMoney},
+	{"/q",&Commands::subtractMoney},
 	{"/reload",&Commands::reloadInfo},
 	{"/z",&Commands::testCommand},
 	{"/goto",&Commands::teleportTo},
@@ -385,30 +385,30 @@ bool Commands::createItems(Creature* creature, const std::string& cmd, const std
 	return true;
 }
 
-bool Commands::substract_contMoney(Creature* creature, const std::string& cmd, const std::string& param)
+bool Commands::subtractMoney(Creature* creature, const std::string& cmd, const std::string& param)
 {
 	Player* player = creature->getPlayer();
 	if(!player)
 		return false;
 				
 	int count = atoi(param.c_str());
-	unsigned long money = player->getMoney();
+	uint32_t money = game->getMoney(player);
 	if(!count){
 		std::stringstream info;
-		info << "You have " << money << " of money.";
+		info << "You have " << money << " gold.";
 		player->sendCancel(info.str().c_str());
 		return true;
 	}
 	else if(count > money){
 		std::stringstream info;
-		info << "You have " << money << " of money and is not suficient.";
+		info << "You have " << money << " gold and is not sufficient.";
 		player->sendCancel(info.str().c_str());
 		return true;
 	}
 
-	if(player->substractMoney(count) != true){
+	if(!game->removeMoney(player, count)){
 		std::stringstream info;
-		info << "Can not substract money!";
+		info << "Can not subtract money!";
 		player->sendCancel(info.str().c_str());
 	}
 
@@ -440,12 +440,6 @@ bool Commands::testCommand(Creature* creature, const std::string& cmd, const std
 	int color = atoi(param.c_str());
 	Player* player = creature->getPlayer();
 	if(player) {
-		/*
-		if(player->getTile()->hasFlag(TILESTATE_HOUSE)){
-			HouseTile* houseTile = dynamic_cast<HouseTile*>(player->getTile());
-			houseTile->getHouse()->setHouseOwner(player->getGUID());
-		}
-		*/
 		//player->sendMagicEffect(player->getPosition(), color);
 		LightInfo lightInfo;
 		lightInfo.level = color / 0x100;
@@ -622,12 +616,22 @@ bool Commands::kickPlayer(Creature* c, const std::string &cmd, const std::string
 
 bool Commands::exivaPlayer(Creature* c, const std::string &cmd, const std::string &param)
 {
+	enum distance_t{
+		DISTANCE_BESIDE,
+		DISTANCE_CLOSE,
+		DISTANCE_FAR,
+		DISTANCE_VERYFAR
+	};
+
 	Player* playerExiva = game->getPlayerByName(param);
 	if(playerExiva){
+		distance_t distx = DISTANCE_BESIDE;
+		distance_t disty = DISTANCE_BESIDE;
+
 		const Position lookPos = c->getPosition();
 		const Position searchPos = playerExiva->getPosition();
 
-		if(Position::areInRange<4, 4, 0>(lookPos, searchPos)){
+		/*if(Position::areInRange<4, 4, 0>(lookPos, searchPos)){
 			//a. From 1 to 4 sq's [Person] is standing next to you.
 		}
 		else if(Position::areInRange<100, 100, 0>(lookPos, searchPos)){
@@ -639,6 +643,7 @@ bool Commands::exivaPlayer(Creature* c, const std::string &cmd, const std::strin
 		else{
 			//d. From 275 to infinite sq's [Person] is very far to the south, north, east, west.
 		}
+		*/
 
 		/*
 		So we have the next results:
@@ -652,6 +657,7 @@ bool Commands::exivaPlayer(Creature* c, const std::string &cmd, const std::strin
 
 		return true;
 	}
+
 	return false;
 }
 

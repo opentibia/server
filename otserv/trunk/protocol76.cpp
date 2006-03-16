@@ -1231,35 +1231,34 @@ void Protocol76::sendTradeItemRequest(const Player* player, const Item* item, bo
 	
 	msg.AddString(player->getName());
 	
-	const Container* tradeContainer = item->getContainer();
-	if(tradeContainer){
+	if(const Container* tradeContainer = item->getContainer()){
 		
-		std::list<const Container*> stack;
-		stack.push_back(tradeContainer);
-		
-		std::list<const Item*> itemstack;
-		itemstack.push_back(tradeContainer);
-		
+		std::list<const Container*> listContainer;
 		ItemList::const_iterator it;
+		Container* tmpContainer = NULL;
+
+		listContainer.push_back(tradeContainer);
 		
-		while(stack.size() > 0) {
-			const Container *container = stack.front();
-			stack.pop_front();
+		std::list<const Item*> listItem;
+		listItem.push_back(tradeContainer);
+		
+		while(listContainer.size() > 0) {
+			const Container* container = listContainer.front();
+			listContainer.pop_front();
 			
-			for (it = container->getItems(); it != container->getEnd(); ++it) {
-				Container *container = dynamic_cast<Container*>(*it);
-				if(container) {
-					stack.push_back(container);
+			for(it = container->getItems(); it != container->getEnd(); ++it){
+				if(tmpContainer = (*it)->getContainer()){
+					listContainer.push_back(tmpContainer);
 				}
 				
-				itemstack.push_back(*it);
+				listItem.push_back(*it);
 			}
 		}
 		
-		msg.AddByte(itemstack.size());
-		while(itemstack.size() > 0) {
-			const Item* item = itemstack.front();
-			itemstack.pop_front();
+		msg.AddByte(listItem.size());
+		while(listItem.size() > 0) {
+			const Item* item = listItem.front();
+			listItem.pop_front();
 			msg.AddItem(item);
 		}
 	}

@@ -995,11 +995,12 @@ int ActionScript::luaActionDoPlayerRemoveItem(lua_State *L)
 	unsigned short itemId = (unsigned short)internalGetNumber(L);
 	unsigned int cid = (unsigned int)internalGetNumber(L);						
 	
-	ActionScript *action = getActionScript(L);
+	ActionScript* action = getActionScript(L);
 	
 	Player* player = action->GetPlayerByUID(cid);
 	if(player){
-		if(player->removeItemTypeCount(itemId, count)){
+		//if(player->removeItemTypeCount(itemId, count)){
+		if(action->game->removeItemOfType(player, itemId, count)){
 			lua_pushnumber(L, 1);
 		}
 		else{
@@ -1793,12 +1794,11 @@ int ActionScript::luaActionDoPlayerRemoveMoney(lua_State *L)
 	int money = (int)internalGetNumber(L);
 	unsigned int cid = (unsigned int)internalGetNumber(L);	
 					
-	ActionScript *action = getActionScript(L);
+	ActionScript* action = getActionScript(L);
 	
 	Player* player = action->GetPlayerByUID(cid);
 	if(player){
-		//Player *player = tmp->thing->getCreature()->getPlayer();
-		if(player->substractMoney(money)){
+		if(action->game->removeMoney(player, money)){
 			lua_pushnumber(L, 1);
 		}
 		else{

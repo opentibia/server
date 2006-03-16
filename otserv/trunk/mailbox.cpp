@@ -105,6 +105,21 @@ int32_t Mailbox::__getIndexOfThing(const Thing* thing) const
 	return -1;
 }
 
+int32_t Mailbox::__getFirstIndex() const
+{
+	return -1;
+}
+
+int32_t Mailbox::__getLastIndex() const
+{
+	return -1;
+}
+
+uint32_t Mailbox::__getItemTypeCount(uint16_t itemId) const
+{
+	return 0;
+}
+
 Thing* Mailbox::__getThing(uint32_t index) const
 {
 	return NULL;

@@ -154,23 +154,23 @@ bool Container::unserializeItemNode(FileLoader& f, NODE node, PropStream& propSt
 double Container::getWeight() const
 {
 	double weight = items[id].weight;
-	std::list<const Container*> stack;
+	std::list<const Container*> listContainer;
+	ItemList::const_iterator cit;
+	Container* tmpContainer = NULL;
 
-	ItemList::const_iterator it;
-	stack.push_back(this);
+	listContainer.push_back(this);
 	
-	while(stack.size() > 0) {
-		const Container* container = stack.front();
-		stack.pop_front();
+	while(listContainer.size() > 0) {
+		const Container* container = listContainer.front();
+		listContainer.pop_front();
 
-		for (it = container->getItems(); it != container->getEnd(); ++it) {
-			Container* container = (*it)->getContainer();
-			if(container) {
-				stack.push_back(container);
-				weight += items[container->getID()].weight;
+		for(cit = container->getItems(); cit != container->getEnd(); ++cit) {
+			if(tmpContainer = (*cit)->getContainer()){
+				listContainer.push_back(tmpContainer);
+				weight += items[tmpContainer->getID()].weight;
 			}
 			else
-				weight += (*it)->getWeight();
+				weight += (*cit)->getWeight();
 		}
 	}
 
@@ -204,19 +204,18 @@ uint32_t Container::getItemHoldingCount() const
 {
 	uint32_t counter = 0;
 
-	std::list<const Container*> stack;
-	stack.push_back(this);
-	
-	ItemList::const_iterator it;
+	std::list<const Container*> listContainer;
+	ItemList::const_iterator cit;
+	listContainer.push_back(this);
 
-	while(stack.size() > 0){
-		const Container* container = stack.front();
-		stack.pop_front();
+	while(listContainer.size() > 0){
+		const Container* container = listContainer.front();
+		listContainer.pop_front();
 
-		for(it = container->getItems(); it != container->getEnd(); ++it) {
-			Container* container = (*it)->getContainer();
-			if(container) {
-				stack.push_back(container);
+		for(cit = container->getItems(); cit != container->getEnd(); ++cit) {
+			Container* container = (*cit)->getContainer();
+			if(container){
+				listContainer.push_back(container);
 			}
 
 			++counter;
@@ -228,23 +227,23 @@ uint32_t Container::getItemHoldingCount() const
 
 bool Container::isHoldingItem(const Item* item) const
 {
-	std::list<const Container*> stack;
-	stack.push_back(this);
-	
-	ItemList::const_iterator it;
+	std::list<const Container*> listContainer;
+	ItemList::const_iterator cit;
+	const Container* tmpContainer = NULL;
 
-	while(stack.size() > 0){
-		const Container* container = stack.front();
-		stack.pop_front();
+	listContainer.push_back(this);
 
-		for(it = container->getItems(); it != container->getEnd(); ++it){
-			if(*it == item){
+	while(listContainer.size() > 0){
+		const Container* container = listContainer.front();
+		listContainer.pop_front();
+
+		for(cit = container->getItems(); cit != container->getEnd(); ++cit){
+			if(*cit == item){
 				return true;
 			}
 
-			Container* containerIt = (*it)->getContainer();
-			if(containerIt){
-				stack.push_back(containerIt);
+			if(tmpContainer = (*cit)->getContainer()){
+				listContainer.push_back(tmpContainer);
 			}
 		}
 	}
@@ -642,13 +641,41 @@ int32_t Container::__getIndexOfThing(const Thing* thing) const
 	return -1;
 }
 
+int32_t Container::__getFirstIndex() const
+{
+	return 0;
+}
+
+int32_t Container::__getLastIndex() const
+{
+	return size();
+}
+
+uint32_t Container::__getItemTypeCount(uint16_t itemId) const
+{
+	uint32_t count = 0;
+
+	for(ItemList::const_iterator cit = itemlist.begin(); cit != itemlist.end(); ++cit){
+		if((*cit)->getID() == itemId){
+			if((*cit)->isStackable()){
+				count+= (*cit)->getItemCount();
+			}
+			else{
+				++count;
+			}
+		}
+	}
+
+	return count;
+}
+
 Thing* Container::__getThing(uint32_t index) const
 {
 	if(index < 0 || index > size())
 		return NULL;
 
 	int count = 0;
-	for(ItemList::const_iterator cit = itemlist.begin(); cit != itemlist.end(); ++cit) {
+	for(ItemList::const_iterator cit = itemlist.begin(); cit != itemlist.end(); ++cit){
 		if(count == index)
 			return *cit;
 		else

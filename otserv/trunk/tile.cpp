@@ -1006,6 +1006,38 @@ int32_t Tile::__getIndexOfThing(const Thing* thing) const
 	return -1;
 }
 
+int32_t Tile::__getFirstIndex() const
+{
+	return 0;
+}
+
+int32_t Tile::__getLastIndex() const
+{
+	return getThingCount();
+}
+
+uint32_t Tile::__getItemTypeCount(uint16_t itemId) const
+{
+	uint32_t count = 0;
+	Thing* thing = NULL;
+	for(uint32_t i = 0; i < getThingCount(); ++i){
+		thing = __getThing(i);
+
+		if(const Item* item = thing->getItem()){
+			if(item->getID() == itemId){
+				if(item->isStackable()){
+					count+= item->getItemCount();
+				}
+				else{
+					++count;
+				}
+			}
+		}
+	}
+
+	return count;
+}
+
 Thing* Tile::__getThing(uint32_t index) const
 {
 	if(ground){

@@ -255,7 +255,6 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 
 						case OTBM_ATTR_ITEM:
 						{
-							//Item* item  = unserializeItemAttr(propStream);
 							Item* item = Item::CreateItem(propStream);
 							if(!item){
 								map->setLastError(LOADMAPERROR_FAILEDTOCREATEITEM, nodeTile);

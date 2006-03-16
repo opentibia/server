@@ -142,11 +142,30 @@ public:
 	virtual int32_t __getIndexOfThing(const Thing* thing) const = 0;
 
 	/**
+	  * Returns the first index
+	  * \returns the first index, if not implemented -1 is returned
+	  */
+	virtual int32_t __getFirstIndex() const = 0;
+
+	/**
+	  * Returns the last index
+	  * \returns the last index, if not implemented -1 is returned
+	  */
+	virtual int32_t __getLastIndex() const = 0;
+
+	/**
 	  * Gets the object based on index
 	  * \returns the object, returns NULL if not found
 	  */
 	virtual Thing* __getThing(uint32_t index) const = 0;
 	
+	/**
+	  * Get the amount of items of a certain type
+	  * \param itemId is the item type to the get the count of
+	  * \param returns the amount of items of the asked item type
+	  */
+	virtual uint32_t __getItemTypeCount(uint16_t itemId) const = 0;
+
 	/**
 	  * Adds an object to the cylinder without sending to the client(s)
 	  * \param thing is the object to add

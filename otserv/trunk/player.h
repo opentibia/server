@@ -18,8 +18,8 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __PLAYER_H__
-#define __PLAYER_H__
+#ifndef __OTSERV_PLAYER_H__
+#define __OTSERV_PLAYER_H__
 
 #include "definitions.h"
 #include "creature.h"
@@ -188,13 +188,6 @@ public:
 	virtual int getWeaponDamage() const;
 	virtual int getArmor() const;
 	virtual int getDefense() const;
-	unsigned long getMoney();
-
-	bool substractMoney(uint32_t money);
-	bool substractMoneyItem(Item* item, uint32_t money);
-	bool removeItemTypeCount(uint16_t itemId, uint32_t count);
-	uint32_t getItemTypeCount(uint16_t itemId);
-
 		
 	unsigned long eventAutoWalk;
 	
@@ -351,6 +344,9 @@ protected:
 	virtual void __removeThing(Thing* thing, uint32_t count);
 
 	virtual int32_t __getIndexOfThing(const Thing* thing) const;
+	virtual int32_t __getFirstIndex() const;
+	virtual int32_t __getLastIndex() const;
+	virtual uint32_t __getItemTypeCount(uint16_t itemId) const;
 	virtual Thing* __getThing(uint32_t index) const;
 
 	virtual void __internalAddThing(Thing* thing);
@@ -400,7 +396,6 @@ protected:
 	unsigned char maglevel_percent;
 
 	//trade variables
-	//unsigned long tradePartner;
 	Player* tradePartner;
 	tradestate_t tradeState;
 	Item* tradeItem;
@@ -440,17 +435,6 @@ protected:
 	std::string guildNick;
 	
 	StorageMap storageMap;
-	
-	struct MoneyItem{
-		Item* item;
-		freeslot_t location;
-		int slot;
-		Container *parent;
-	};
-
-	typedef std::multimap<int, struct MoneyItem*, std::less<int> > MoneyMap;
-	typedef MoneyMap::value_type moneymap_pair;
-	
 	LightInfo itemsLight;
 	
 	#ifdef __SKULLSYSTEM__

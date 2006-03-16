@@ -76,6 +76,9 @@ public:
 	virtual void __removeThing(Thing* thing, uint32_t count);
 
 	virtual int32_t __getIndexOfThing(const Thing* thing) const;
+	virtual int32_t __getFirstIndex() const;
+	virtual int32_t __getLastIndex() const;
+	virtual uint32_t __getItemTypeCount(uint16_t itemId) const;
 	virtual Thing* __getThing(uint32_t index) const;
 
 	virtual void postAddNotification(Thing* thing, bool hasOwnership = true);

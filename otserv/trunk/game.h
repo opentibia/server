@@ -85,12 +85,6 @@ public:
 	const CreatureStateVec& getCreatureStateList(Tile* tile) {return creaturestates[tile];};
 	const SpectatorVec& getSpectators() {return spectatorlist;}
 
-	/*bool isRemoved(Creature* creature)
-	{
-		std::list<Creature*>::iterator it = std::find(removedList.begin(), removedList.end(), creature);
-		return (it != removedList.end());
-	}
-	*/
 protected:
 	void addCreatureState(Tile* tile, Creature* attackedCreature, int damage, int manaDamage, bool drawBlood);
 	void onAttackedCreature(Tile* tile, Creature* attacker, Creature* attackedCreature, int damage, bool drawBlood);
@@ -98,7 +92,6 @@ protected:
 
 	SpectatorVec spectatorlist;
 	CreatureStates creaturestates;
-	//std::list<Creature*> removedList;
 };
 
 enum world_type_t{
@@ -247,12 +240,50 @@ public:
 		uint32_t flags = 0, bool test = false);
 	ReturnValue internalRemoveItem(Item* item, int32_t count = -1,  bool test = false);
 
-	Item* transformItem(Item* item, uint16_t newtype, int32_t count = -1);
-	ReturnValue internalTeleport(Thing *thing, const Position& newPos);
+	/**
+	  * Remove item(s) of a certain type
+	  * \param cylinder to remove the item(s) from
+	  * \param itemId is the item type to remove
+	  * \param count is the amount to remove
+	  * \returns true if the removal was successful
+	  */
+	bool removeItemOfType(Cylinder* cylinder, uint16_t itemId, uint32_t count);
 
 	/**
-		* Creature wants to turn.
-		* \param creature Creature pointer
+	  * Get the amount of money in a a cylinder
+	  * \returns the amount of money found
+	  */
+	uint32_t getMoney(Cylinder* cylinder);
+
+	/**
+	  * Remove item(s) with a monetary value
+	  * \param cylinder to remove the money from
+	  * \param money is the amount to remove
+	  * \param flags optional flags to modifiy the default behaviour
+	  * \returns true if the removal was successful
+	  */
+	bool removeMoney(Cylinder* cylinder, uint32_t money, uint32_t flags = 0);
+
+	/**
+	  * Transform one item to another type/count
+	  * \param item is the item to transform
+	  * \param newtype is the new type
+	  * \param count is the new count value, use default value (-1) to not change it
+	  * \returns true if the tranformation was successful
+	  */
+	Item* transformItem(Item* item, uint16_t newtype, int32_t count = -1);
+
+	/**
+	  * Teleports an object to another position
+	  * \param thing is the object to teleport
+	  * \param newPos is the new position
+	  * \returns true if the teleportation was successful
+	  */
+	ReturnValue internalTeleport(Thing* thing, const Position& newPos);
+
+	/**
+		* Turn a creature to a different direction.
+		* \param creature Creature to change the direction
 		* \param dir Direction to turn to
 		*/
 	bool internalCreatureTurn(Creature* creature, Direction dir);
@@ -261,7 +292,6 @@ public:
 	  * Creature wants to say something.
 	  * \param creature Creature pointer
 	  * \param type Type of message
-	  * \todo document types
 	  * \param text The text to say
 	  */
 	bool internalCreatureSay(Creature* creature, SpeakClasses type, const std::string& text);
