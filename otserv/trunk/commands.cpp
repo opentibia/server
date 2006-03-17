@@ -61,6 +61,7 @@ s_defcommands Commands::defined_commands[] = {
 	{"/a",&Commands::teleportNTiles},
 	{"/kick",&Commands::kickPlayer},
 	{"/owner",&Commands::setHouseOwner},
+	{"/sellhouse",&Commands::sellHouse},
 	//{"/exiva",&Commands::exivaPlayer},
 	//{"/invite",&Commands::invitePlayer},
 	//{"/uninvite",&Commands::uninvitePlayer},
@@ -683,6 +684,47 @@ bool Commands::setHouseOwner(Creature* creature, const std::string& cmd, const s
 				}
 				return true;
 			}
+		}
+	}
+	return false;
+}
+
+bool Commands::sellHouse(Creature* creature, const std::string& cmd, const std::string& param)
+{
+	Player* player = creature->getPlayer();
+	if(player){
+		if(player->getTile()->hasFlag(TILESTATE_HOUSE)){
+			HouseTile* houseTile = dynamic_cast<HouseTile*>(player->getTile());
+			if(houseTile){
+				House* house = houseTile->getHouse();
+				if(house && house->getHouseOwner() == player->getGUID()){
+					Player* tradePartner = game->getPlayerByName(param);
+					if(tradePartner && tradePartner != player){
+						if(Position::areInRange<2,2,0>(tradePartner->getPosition(), player->getPosition())){
+							Item* transferItem = house->getTransferItem();
+							if(transferItem){
+								transferItem->getParent()->setParent(player);
+								game->internalStartTrade(player, tradePartner, transferItem);
+							}
+							else{
+								player->sendCancel("You can not trade this house.");
+							}
+						}
+						else{
+							player->sendCancel("Trade player is too far away.");
+						}
+					}
+					else{
+						player->sendCancel("Trade player not found.");
+					}
+				}
+				else{
+					player->sendCancel("You are not owner of this house.");
+				}
+			}
+		}
+		else{
+			player->sendCancel("You are not in a house");
 		}
 	}
 	return false;

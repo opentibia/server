@@ -2780,20 +2780,11 @@ bool Game::playerRequestTrade(Player* player, const Position& pos, uint8_t stack
 		player->sendTextMessage(MSG_INFO, "Sorry, not possible.");
 		return false;
 	}
-
+	
 	if(!Position::areInRange<2,2,0>(tradePartner->getPosition(), player->getPosition())){
 		std::stringstream ss;
 		ss << tradePartner->getName() << " tells you to move closer.";
 		player->sendTextMessage(MSG_INFO, ss.str().c_str());
-		return false;
-	}
-
-	if(player->tradeState != TRADE_NONE && !(player->tradeState == TRADE_ACKNOWLEDGE && player->tradePartner == tradePartner)) {
-		player->sendCancelMessage(RET_YOUAREALREADYTRADING);
-		return false;
-	}
-	else if(tradePartner->tradeState != TRADE_NONE && tradePartner->tradePartner != player) {
-		player->sendCancelMessage(RET_THISPLAYERISALREADYTRADING);
 		return false;
 	}
 
@@ -2833,6 +2824,20 @@ bool Game::playerRequestTrade(Player* player, const Position& pos, uint8_t stack
 		return false;
 	}
 
+	return internalStartTrade(player, tradePartner, tradeItem);
+}
+
+bool Game::internalStartTrade(Player* player, Player* tradePartner, Item* tradeItem)
+{
+	if(player->tradeState != TRADE_NONE && !(player->tradeState == TRADE_ACKNOWLEDGE && player->tradePartner == tradePartner)) {
+		player->sendCancelMessage(RET_YOUAREALREADYTRADING);
+		return false;
+	}
+	else if(tradePartner->tradeState != TRADE_NONE && tradePartner->tradePartner != player) {
+		player->sendCancelMessage(RET_THISPLAYERISALREADYTRADING);
+		return false;
+	}
+	
 	player->tradePartner = tradePartner;
 	player->tradeItem = tradeItem;
 	player->tradeState = TRADE_INITIATED;
@@ -2848,13 +2853,14 @@ bool Game::playerRequestTrade(Player* player, const Position& pos, uint8_t stack
 		tradePartner->tradeState = TRADE_ACKNOWLEDGE;
 		tradePartner->tradePartner = player;
 	}
-	else {
+	else{
 		Item* counterOfferItem = tradePartner->tradeItem;
 		player->sendTradeItemRequest(tradePartner, counterOfferItem, false);
 		tradePartner->sendTradeItemRequest(player, tradeItem, false);
 	}
 
 	return true;
+
 }
 
 bool Game::playerAcceptTrade(Player* player)
@@ -2884,24 +2890,27 @@ bool Game::playerAcceptTrade(Player* player)
 		}
 		
 		bool isSuccess = false;
-
+		
 		ReturnValue ret1 = internalAddItem(tradePartner, tradeItem1, INDEX_WHEREEVER, 0, true);
 		ReturnValue ret2 = internalAddItem(player, tradeItem2, INDEX_WHEREEVER, 0, true);
-
+		
 		if(ret1 == RET_NOERROR && ret2 == RET_NOERROR){
 			ret1 = internalRemoveItem(tradeItem1, tradeItem1->getItemCount(), true);
 			ret2 = internalRemoveItem(tradeItem2, tradeItem2->getItemCount(), true);
-	
+			
 			if(ret1 == RET_NOERROR && ret2 == RET_NOERROR){
 				Cylinder* cylinder1 = tradeItem1->getParent();
 				Cylinder* cylinder2 = tradeItem2->getParent();
 
 				player->setTradeState(TRADE_TRANSFER);
 				tradePartner->setTradeState(TRADE_TRANSFER);
-
+				
 				internalMoveItem(cylinder1, tradePartner, INDEX_WHEREEVER, tradeItem1, tradeItem1->getItemCount());
 				internalMoveItem(cylinder2, player, INDEX_WHEREEVER, tradeItem2, tradeItem2->getItemCount());
-
+				
+				tradeItem1->onTradeEvent(ON_TRADE_TRANSFER, tradePartner);
+				tradeItem2->onTradeEvent(ON_TRADE_TRANSFER, player);
+								
 				isSuccess = true;
 			}
 		}
@@ -2909,6 +2918,8 @@ bool Game::playerAcceptTrade(Player* player)
 		if(!isSuccess){
 			player->sendTextMessage(MSG_SMALLINFO, "Sorry not possible.");
 			tradePartner->sendTextMessage(MSG_SMALLINFO, "Sorry not possible.");
+			player->tradeItem->onTradeEvent(ON_TRADE_CANCEL, player);
+			tradePartner->tradeItem->onTradeEvent(ON_TRADE_CANCEL, tradePartner);
 		}
 
 		player->setTradeState(TRADE_NONE);
@@ -3002,6 +3013,13 @@ bool Game::playerCloseTrade(Player* player)
 		return false;
 
 	Player* tradePartner = player->tradePartner;
+	if((tradePartner && tradePartner->getTradeState() == TRADE_TRANSFER) || 
+		  player->getTradeState() == TRADE_TRANSFER){
+  		std::cout << "Warning: [Game::playerCloseTrade] TradeState == TRADE_TRANSFER. " << 
+		  	player->getName() << " " << player->getTradeState() << " , " << 
+		  	tradePartner->getName() << " " << tradePartner->getTradeState() << std::endl;
+		return true;
+	}
 
 	std::vector<Item*>::iterator it;
 	if(player->getTradeItem()){
@@ -3011,7 +3029,8 @@ bool Game::playerCloseTrade(Player* player)
 			tradeItems.erase(it);
 		}
 	}
-
+	
+	player->tradeItem->onTradeEvent(ON_TRADE_CANCEL, player);
 	player->setTradeState(TRADE_NONE);
 	player->tradeItem = NULL;
 	player->tradePartner = NULL;
@@ -3028,7 +3047,8 @@ bool Game::playerCloseTrade(Player* player)
 			}
 		}
 
-		tradePartner->setTradeState(TRADE_NONE);
+		tradePartner->tradeItem->onTradeEvent(ON_TRADE_CANCEL, tradePartner);
+		tradePartner->setTradeState(TRADE_NONE);		
 		tradePartner->tradeItem = NULL;
 		tradePartner->tradePartner = NULL;
 

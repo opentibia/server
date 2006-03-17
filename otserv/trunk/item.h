@@ -33,6 +33,7 @@
 #include "items.h"
 
 class Creature;
+class Player;
 class Container;
 class Depot;
 class Teleport;
@@ -48,6 +49,11 @@ enum ITEMPROPERTY{
  PROTECTIONZONE,
  ISVERTICAL,
  ISHORIZONTAL,
+};
+
+enum TradeEvents_t{
+	ON_TRADE_TRANSFER,
+	ON_TRADE_CANCEL,
 };
 
 struct LightInfo{
@@ -200,6 +206,8 @@ public:
 	virtual long getDecayTime();
 	bool canDecay();
 	bool isDecaying;
+	
+	virtual bool onTradeEvent(TradeEvents_t event, Player* owner){return true;};
 
 protected:
 	unsigned short id;  // the same id as in ItemType

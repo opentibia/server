@@ -69,8 +69,7 @@ protected:
 	bool kickPlayer(Creature* creature, const std::string &cmd, const std::string &param);
 	bool exivaPlayer(Creature* creature, const std::string &cmd, const std::string &param);
 	bool setHouseOwner(Creature* creature, const std::string& cmd, const std::string& param);
-	//bool invitePlayer(Creature* creature, const std::string& cmd, const std::string& param);
-	//bool uninvitePlayer(Creature* creature, const std::string& cmd, const std::string& param);
+	bool sellHouse(Creature* creature, const std::string& cmd, const std::string& param);
 	
 	//table of commands
 	static s_defcommands defined_commands[];

@@ -113,6 +113,23 @@ enum AccessHouseLevel_t{
 typedef std::list<HouseTile*> HouseTileList;
 typedef std::list<Door*> HouseDoorList;
 
+
+class HouseTransferItem : public Item
+{
+public:
+	static HouseTransferItem* createHouseTransferItem(House* house);
+	
+	HouseTransferItem(House* _house){house = _house;};
+	~HouseTransferItem(){};
+	
+	virtual bool onTradeEvent(TradeEvents_t event, Player* owner);
+
+	House* getHouse(){return house;};
+	
+protected:
+	House* house;
+};
+
 class House
 {
 public:
@@ -156,7 +173,11 @@ public:
 	void addDoor(Door* door);
 	Door* getDoorByNumber(unsigned long doorId);
 	Door* getDoorByPosition(const Position& pos);
-
+	
+	HouseTransferItem* getTransferItem();
+	void resetTransferItem();
+	bool executeTransfer(HouseTransferItem* item, Player* player);
+	
 	HouseTileList::iterator getHouseTileBegin() {return houseTiles.begin();}
 	HouseTileList::iterator getHouseTileEnd() {return houseTiles.end();}
 
@@ -178,6 +199,9 @@ private:
 	uint32_t paidUntil;
 	uint32_t rent;
 	uint32_t townid;
+	
+	HouseTransferItem* transferItem;
+	Container transfer_container;
 };
 
 typedef std::map<uint32_t, House*> HouseMap;

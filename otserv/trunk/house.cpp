@@ -28,7 +28,8 @@
 
 extern Game g_game;
 
-House::House(uint32_t _houseid)
+House::House(uint32_t _houseid) :
+transfer_container(ITEM_LOCKER1)
 {
 	isLoaded = false;
 	houseName = "OTServ headquarter (Flat 1, Area 42)";
@@ -40,6 +41,7 @@ House::House(uint32_t _houseid)
 	houseid = _houseid;
 	rent = 0;
 	townid = 0;
+	transferItem = NULL;
 }
 
 House::~House()
@@ -68,14 +70,18 @@ void House::setHouseOwner(uint32_t guid)
 		//TODO: remove players from beds
 
 		//clean access lists
+		houseOwner = 0;
+		setAccessList(SUBOWNER_LIST, "");
+		setAccessList(GUEST_LIST, "");
+		/*
 		guestList.parseList("");
 		subOwnerList.parseList("");
+		*/
 		HouseDoorList::iterator it;
 		for(it = doorList.begin(); it != doorList.end(); ++it){
 			(*it)->setAccessList("");
 		}
 		//reset paid date
-		houseOwner = 0;
 		paidUntil = 0;
 	}
 		
@@ -324,6 +330,69 @@ bool House::canEditAccessList(unsigned long listId, const Player* player)
 	default:
 		return false;	
 	}
+}
+
+HouseTransferItem* House::getTransferItem()
+{
+	if(transferItem != NULL)
+		return NULL;
+	
+	transferItem =  HouseTransferItem::createHouseTransferItem(this);
+	transfer_container.__addThing(transferItem);
+	return transferItem;
+}
+
+void House::resetTransferItem()
+{
+	if(transferItem){
+		transferItem->releaseThing2();
+		transferItem = NULL;
+	}
+}
+
+HouseTransferItem* HouseTransferItem::createHouseTransferItem(House* house)
+{
+	HouseTransferItem* transferItem = new HouseTransferItem(house);
+	transferItem->useThing2();
+	transferItem->setID(ITEM_DOCUMENT_RO);
+	transferItem->setItemCountOrSubtype(1);
+	std::stringstream stream;
+	stream << " It is a transfer document of house " << house->getName() << ".";
+	transferItem->setSpecialDescription(stream.str());
+	return transferItem;
+}
+
+bool HouseTransferItem::onTradeEvent(TradeEvents_t event, Player* owner)
+{
+	House* house;
+	switch(event){
+	case ON_TRADE_TRANSFER:
+		house = getHouse();
+		if(house){
+			house->executeTransfer(this, owner);
+			house->resetTransferItem();
+		}
+		g_game.internalRemoveItem(this, 1);
+		break;
+	case ON_TRADE_CANCEL:
+		house = getHouse();
+		if(house){
+			house->resetTransferItem();
+		}
+		break;
+	default:
+		break;
+	}
+	return true;
+}
+
+bool House::executeTransfer(HouseTransferItem* item, Player* newOwner)
+{
+	if(transferItem != item){
+		return false;
+	}
+	setHouseOwner(newOwner->getGUID());
+	return true;
 }
 
 AccessList::AccessList()

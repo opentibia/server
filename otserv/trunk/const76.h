@@ -233,6 +233,8 @@ enum item_t {
 	ITEM_MAILBOX1         = 2334,
 	ITEM_MAILBOX2         = 2593,
 	ITEM_MAILBOX3         = 3981,
+	
+	ITEM_DOCUMENT_RO      = 1968, //read-only
 };
 
 

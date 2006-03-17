@@ -328,6 +328,7 @@ public:
 	bool playerAcceptTrade(Player* player);
 	bool playerLookInTrade(Player* player, bool lookAtCounterOffer, int index);
 	bool playerCloseTrade(Player* player);
+	bool internalStartTrade(Player* player, Player* partner, Item* tradeItem);
 	bool playerSetAttackedCreature(Player* player, unsigned long creatureid);
 	bool playerLookAt(Player* player, const Position& pos, uint16_t itemId, uint8_t stackpos);
 	bool playerRequestAddVip(Player* player, const std::string& vip_name);
