@@ -83,25 +83,27 @@ ReturnValue Depot::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 		return RET_NOTPOSSIBLE;
 	}
 
-	int addCount = 0;
+	bool skipLimit = ((flags & FLAG_NOLIMIT) == FLAG_NOLIMIT);
+	
+	if(!skipLimit){
+		int addCount = 0;
 
-	if((item->isStackable() && item->getItemCount() != count)){
-		addCount = 1;
-	}
-
-	if(item->getTopParent() != this){
-		if(const Container* container = item->getContainer()){
-			addCount = container->getItemHoldingCount() + 1;
-		}
-		else{
+		if((item->isStackable() && item->getItemCount() != count)){
 			addCount = 1;
 		}
-	}
 
-	bool skipLimit = ((flags & FLAG_NOLIMIT) == FLAG_NOLIMIT);
+		if(item->getTopParent() != this){
+			if(const Container* container = item->getContainer()){
+				addCount = container->getItemHoldingCount() + 1;
+			}
+			else{
+				addCount = 1;
+			}
+		}
 
-	if(!skipLimit && getItemHoldingCount() + addCount >= maxDepotLimit){
-		return RET_DEPOTISFULL;
+		if(getItemHoldingCount() + addCount >= maxDepotLimit){
+			return RET_DEPOTISFULL;
+		}
 	}
 
 	return Container::__queryAdd(index, thing, count, flags);
