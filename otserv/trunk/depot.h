@@ -40,8 +40,9 @@ public:
 	void setMaxDepotLimit(uint32_t maxitems) {maxDepotLimit = maxitems;};
 	void setDepotId(uint32_t id) {depotId = id;};
 
+	//cylinder implementations
 	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,
-		bool childIsOwner = false) const;
+		uint32_t flags) const;
 		
 	virtual void postAddNotification(Thing* thing, bool hasOwnership = true);
 	virtual void postRemoveNotification(Thing* thing, bool isCompleteRemoval, bool hadOwnership = true);

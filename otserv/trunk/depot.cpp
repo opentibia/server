@@ -76,7 +76,7 @@ bool Depot::readAttr(AttrTypes_t attr, PropStream& propStream)
 }
 
 ReturnValue Depot::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
-	bool childIsOwner /*= false*/) const
+	uint32_t flags) const
 {
 	const Item* item = thing->getItem();
 	if(item == NULL){
@@ -93,15 +93,18 @@ ReturnValue Depot::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 		if(const Container* container = item->getContainer()){
 			addCount = container->getItemHoldingCount() + 1;
 		}
-		else
+		else{
 			addCount = 1;
+		}
 	}
 
-	if(getItemHoldingCount() + addCount >= maxDepotLimit){
+	bool skipLimit = ((flags & FLAG_NOLIMIT) == FLAG_NOLIMIT);
+
+	if(!skipLimit && getItemHoldingCount() + addCount >= maxDepotLimit){
 		return RET_DEPOTISFULL;
 	}
 
-	return Container::__queryAdd(index, thing, count, childIsOwner);
+	return Container::__queryAdd(index, thing, count, flags);
 }
 
 void Depot::postAddNotification(Thing* thing, bool hasOwnership /*= true*/)

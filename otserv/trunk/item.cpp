@@ -69,6 +69,25 @@ Item* Item::CreateItem(const unsigned short _type, unsigned short _count /*= 1*/
 	return newItem;
 }
 
+Item* Item::CreateItem(PropStream& propStream)
+{
+	unsigned short _id;
+	if(!propStream.GET_USHORT(_id)){
+		return NULL;
+	}
+
+	ItemType iType = Item::items[_id];
+	unsigned char _count = 1;
+
+	if(iType.stackable || iType.isSplash() || iType.isFluidContainer()){
+		if(!propStream.GET_UCHAR(_count)){
+			return false;
+		}
+	}
+
+	return Item::CreateItem(_id, _count);
+}
+
 Item::Item(const unsigned short _type, unsigned short _count)
 {
 	//std::cout << "Item constructor2 " << this << std::endl;
@@ -446,25 +465,6 @@ bool Item::unserializeAttr(PropStream& propStream)
 bool Item::unserializeItemNode(FileLoader& f, NODE node, PropStream& propStream)
 {
 	return unserializeAttr(propStream);
-}
-
-Item* Item::CreateItem(PropStream& propStream)
-{
-	unsigned short _id;
-	if(!propStream.GET_USHORT(_id)){
-		return NULL;
-	}
-
-	ItemType iType = Item::items[_id];
-	unsigned char _count = 1;
-
-	if(iType.stackable || iType.isSplash() || iType.isFluidContainer()){
-		if(!propStream.GET_UCHAR(_count)){
-			return false;
-		}
-	}
-
-	return Item::CreateItem(_id, _count);
 }
 
 bool Item::serializeAttr(PropWriteStream& propWriteStream)
