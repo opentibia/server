@@ -3028,11 +3028,12 @@ bool Game::playerCloseTrade(Player* player)
 			FreeThing(it->first);
 			tradeItems.erase(it);
 		}
+	
+		player->tradeItem->onTradeEvent(ON_TRADE_CANCEL, player);
+		player->tradeItem = NULL;
 	}
 	
-	player->tradeItem->onTradeEvent(ON_TRADE_CANCEL, player);
 	player->setTradeState(TRADE_NONE);
-	player->tradeItem = NULL;
 	player->tradePartner = NULL;
 
 	player->sendTextMessage(MSG_SMALLINFO, "Trade cancelled.");
@@ -3045,11 +3046,12 @@ bool Game::playerCloseTrade(Player* player)
 				FreeThing(it->first);
 				tradeItems.erase(it);
 			}
+
+			tradePartner->tradeItem->onTradeEvent(ON_TRADE_CANCEL, tradePartner);
+			tradePartner->tradeItem = NULL;
 		}
 
-		tradePartner->tradeItem->onTradeEvent(ON_TRADE_CANCEL, tradePartner);
 		tradePartner->setTradeState(TRADE_NONE);		
-		tradePartner->tradeItem = NULL;
 		tradePartner->tradePartner = NULL;
 
 		tradePartner->sendTextMessage(MSG_SMALLINFO, "Trade cancelled.");

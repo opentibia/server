@@ -120,7 +120,7 @@ public:
 	static HouseTransferItem* createHouseTransferItem(House* house);
 	
 	HouseTransferItem(House* _house){house = _house;};
-	~HouseTransferItem(){};
+	virtual ~HouseTransferItem(){};
 	
 	virtual bool onTradeEvent(TradeEvents_t event, Player* owner);
 

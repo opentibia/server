@@ -357,7 +357,7 @@ HouseTransferItem* HouseTransferItem::createHouseTransferItem(House* house)
 	transferItem->setID(ITEM_DOCUMENT_RO);
 	transferItem->setItemCountOrSubtype(1);
 	std::stringstream stream;
-	stream << " It is a transfer document of house " << house->getName() << ".";
+	stream << " It is a house transfer document for '" << house->getName() << "'.";
 	transferItem->setSpecialDescription(stream.str());
 	return transferItem;
 }
@@ -370,10 +370,11 @@ bool HouseTransferItem::onTradeEvent(TradeEvents_t event, Player* owner)
 		house = getHouse();
 		if(house){
 			house->executeTransfer(this, owner);
-			house->resetTransferItem();
 		}
+
 		g_game.internalRemoveItem(this, 1);
 		break;
+
 	case ON_TRADE_CANCEL:
 		house = getHouse();
 		if(house){
@@ -391,7 +392,9 @@ bool House::executeTransfer(HouseTransferItem* item, Player* newOwner)
 	if(transferItem != item){
 		return false;
 	}
+
 	setHouseOwner(newOwner->getGUID());
+	transferItem = NULL;
 	return true;
 }
 
