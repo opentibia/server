@@ -1238,15 +1238,19 @@ void Player::onCreatureMove(const Creature* creature, const Position& oldPos, ui
 	}
 
 	if(creature == this){
-		if(tradeItem){
-			if(!Position::areInRange<1,1,0>(tradeItem->getPosition(), getPosition())){
-				g_game.playerCloseTrade(this);
-			}
-		}
 
-		if(tradePartner){
-			if(!Position::areInRange<2,2,0>(tradePartner->getPosition(), getPosition())){
-				g_game.playerCloseTrade(this);
+		if(tradeState != TRADE_TRANSFER){
+			//check if we should close trade
+			if(tradeItem){
+				if(!Position::areInRange<1,1,0>(tradeItem->getPosition(), getPosition())){
+					g_game.playerCloseTrade(this);
+				}
+			}
+
+			if(tradePartner){
+				if(!Position::areInRange<2,2,0>(tradePartner->getPosition(), getPosition())){
+					g_game.playerCloseTrade(this);
+				}
 			}
 		}
 	}
