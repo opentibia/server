@@ -303,6 +303,10 @@ void Protocol76::parsePacket(NetworkMessage &msg)
 		parseCancelMove(msg);
 		break;
 	
+	case 0xCA: //client request to resend the container (happens when you store more than container maxsize)
+		parseUpdateContainer(msg);
+		break;
+
 	case 0xD2: // request Outfit
 		parseRequestOutfit(msg);
 		break;
@@ -319,7 +323,7 @@ void Protocol76::parsePacket(NetworkMessage &msg)
 		parseRemVip(msg);
 		break;
 		
-    default:
+	default:
 #ifdef __DEBUG__
 		printf("unknown packet header: %x \n", recvbyte);
 		parseDebug(msg);
@@ -875,6 +879,18 @@ void Protocol76::parseUpArrowContainer(NetworkMessage& msg)
 		player->addContainer(cid, parentcontainer);
 		sendContainer(cid, parentcontainer, hasParent);
 	}
+}
+
+void Protocol76::parseUpdateContainer(NetworkMessage& msg)
+{
+	uint32_t cid = msg.GetByte();
+	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol76::parseUpdateContainer()");
+	Container* container = player->getContainer(cid);
+	if(!container)
+		return;	
+
+	bool hasParent = (dynamic_cast<const Container*>(container->getParent()) != NULL);
+	sendContainer(cid, container, hasParent);
 }
 
 void Protocol76::parseThrow(NetworkMessage& msg)

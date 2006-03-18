@@ -21,8 +21,8 @@
 //////////////////////////////////////////////////////////////////////
 
 
-#ifndef __PROTOCOL76_H__
-#define __PROTOCOL76_H__
+#ifndef __OTSERV_PROTOCOL76_H__
+#define __OTSERV_PROTOCOL76_H__
 
 #include <string>
 #include "protocol.h"
@@ -52,66 +52,67 @@ private:
 	virtual void logout();
 	
 	void flushOutputBuffer();
-	void WriteMsg(NetworkMessage &msg);
+	void WriteMsg(NetworkMessage& msg);
 
 	// we have all the parse methods
-	void parsePacket(NetworkMessage &msg);
+	void parsePacket(NetworkMessage& msg);
 	
 	//Parse methods
-	void parseLogout(NetworkMessage &msg);	
-	void parseCancelMove(NetworkMessage &msg);
-	void parseModes(NetworkMessage &msg);	
+	void parseLogout(NetworkMessage& msg);	
+	void parseCancelMove(NetworkMessage& msg);
+	void parseModes(NetworkMessage& msg);	
 
-	void parseMoveByMouse(NetworkMessage &msg);	
-	void parseMoveNorth(NetworkMessage &msg);
-	void parseMoveEast(NetworkMessage &msg);
-	void parseMoveSouth(NetworkMessage &msg);
-	void parseMoveWest(NetworkMessage &msg);
-	void parseMoveNorthEast(NetworkMessage &msg);
-	void parseMoveSouthEast(NetworkMessage &msg);
-	void parseMoveSouthWest(NetworkMessage &msg);
-	void parseMoveNorthWest(NetworkMessage &msg);
+	void parseMoveByMouse(NetworkMessage& msg);	
+	void parseMoveNorth(NetworkMessage& msg);
+	void parseMoveEast(NetworkMessage& msg);
+	void parseMoveSouth(NetworkMessage& msg);
+	void parseMoveWest(NetworkMessage& msg);
+	void parseMoveNorthEast(NetworkMessage& msg);
+	void parseMoveSouthEast(NetworkMessage& msg);
+	void parseMoveSouthWest(NetworkMessage& msg);
+	void parseMoveNorthWest(NetworkMessage& msg);
 	
-	void parseTurnNorth(NetworkMessage &msg);
-	void parseTurnEast(NetworkMessage &msg);
-	void parseTurnSouth(NetworkMessage &msg);
-	void parseTurnWest(NetworkMessage &msg);
+	void parseTurnNorth(NetworkMessage& msg);
+	void parseTurnEast(NetworkMessage& msg);
+	void parseTurnSouth(NetworkMessage& msg);
+	void parseTurnWest(NetworkMessage& msg);
 	
-	void parseRequestOutfit(NetworkMessage &msg);
-	void parseSetOutfit(NetworkMessage &msg);
-	void parseSay(NetworkMessage &msg);	
-	void parseLookAt(NetworkMessage &msg);	
-	void parseAttack(NetworkMessage &msg);
-	void parseFollow(NetworkMessage &msg);
+	void parseRequestOutfit(NetworkMessage& msg);
+	void parseSetOutfit(NetworkMessage& msg);
+	void parseSay(NetworkMessage& msg);	
+	void parseLookAt(NetworkMessage& msg);	
+	void parseAttack(NetworkMessage& msg);
+	void parseFollow(NetworkMessage& msg);
 	
-	void parseThrow(NetworkMessage &msg);
-	void parseUseItemEx(NetworkMessage &msg);
-	void parseBattleWindow(NetworkMessage &msg);
-	void parseUseItem(NetworkMessage &msg);
-	void parseCloseContainer(NetworkMessage &msg);
-	void parseUpArrowContainer(NetworkMessage &msg);
-	void parseTextWindow(NetworkMessage &msg);
-	void parseHouseWindow(NetworkMessage &msg);
+	void parseThrow(NetworkMessage& msg);
+	void parseUseItemEx(NetworkMessage& msg);
+	void parseBattleWindow(NetworkMessage& msg);
+	void parseUseItem(NetworkMessage& msg);
+	void parseCloseContainer(NetworkMessage& msg);
+	void parseUpArrowContainer(NetworkMessage& msg);
+	void parseUpdateContainer(NetworkMessage& msg);
+	void parseTextWindow(NetworkMessage& msg);
+	void parseHouseWindow(NetworkMessage& msg);
 	
 	//trade methods
-	void parseRequestTrade(NetworkMessage &msg);
-	void parseLookInTrade(NetworkMessage &msg);
-	void parseAcceptTrade(NetworkMessage &msg);
+	void parseRequestTrade(NetworkMessage& msg);
+	void parseLookInTrade(NetworkMessage& msg);
+	void parseAcceptTrade(NetworkMessage& msg);
 	void parseCloseTrade();
 	
 	//VIP methods
-	void parseAddVip(NetworkMessage &msg);
-	void parseRemVip(NetworkMessage &msg);
+	void parseAddVip(NetworkMessage& msg);
+	void parseRemVip(NetworkMessage& msg);
 
-	void parseRotateItem(NetworkMessage &msg);
+	void parseRotateItem(NetworkMessage& msg);
 		
 	//Channel tabs
-	void parseGetChannels(NetworkMessage &msg);
-	void parseOpenChannel(NetworkMessage &msg);
-	void parseOpenPriv(NetworkMessage &msg);
-	void parseCloseChannel(NetworkMessage &msg);
+	void parseGetChannels(NetworkMessage& msg);
+	void parseOpenChannel(NetworkMessage& msg);
+	void parseOpenPriv(NetworkMessage& msg);
+	void parseCloseChannel(NetworkMessage& msg);
 
-	void parseDebug(NetworkMessage &msg);
+	void parseDebug(NetworkMessage& msg);
 
 	//Send functions
 	virtual void sendChannelsDialog();

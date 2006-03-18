@@ -18,10 +18,8 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-
-#ifndef __PROTOCOL_H__
-#define __PROTOCOL_H__
-
+#ifndef __OTSERV_PROTOCOL_H__
+#define __OTSERV_PROTOCOL_H__
 
 #include "definitions.h"
 #include "game.h"
@@ -123,6 +121,5 @@ protected:
 	SOCKET s;
 	friend OTSYS_THREAD_RETURN ConnectionHandler(void *dat);
 };
-
 
 #endif
