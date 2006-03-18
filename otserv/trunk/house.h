@@ -159,12 +159,15 @@ public:
 	void setHouseOwner(uint32_t guid);
 	uint32_t getHouseOwner() const {return houseOwner;};
 
-	void setPaidUntil(uint32_t paid){paidUntil = paid;};
-	uint32_t getPaidUntil() const {return paidUntil;};
+	void setPaidUntil(uint64_t paid){paidUntil = paid;};
+	uint64_t getPaidUntil() const {return paidUntil;};
 
 	void setRent(uint32_t _rent){rent = _rent;};
 	uint32_t getRent() const {return rent;};
 	
+	void setPayRentWarnings(uint32_t warnings) {rentWarnings = warnings;};
+	uint32_t getPayRentWarnings() const {return rentWarnings;};
+
 	void setTownId(uint32_t _town){townid = _town;};
 	uint32_t getTownId() const {return townid;};
 
@@ -196,7 +199,9 @@ private:
 	AccessList subOwnerList;
 	std::string houseName;
 	Position posEntry;
-	uint32_t paidUntil;
+	uint64_t paidUntil;
+	//uint64_t lastWarning;
+	uint32_t rentWarnings;
 	uint32_t rent;
 	uint32_t townid;
 	
@@ -206,8 +211,18 @@ private:
 
 typedef std::map<uint32_t, House*> HouseMap;
 
+enum RentPerioid_t{
+	RENTPERIOD_DAILY,
+	RENTPERIOD_WEEKLY,
+	RENTPERIOD_MONTHLY,
+	RENTPERIOD_YEARLY,
+};
+
 class Houses
 {
+	Houses();
+	~Houses();
+
 public:
 	static Houses& getInstance(){
 		static Houses instance;
@@ -240,6 +255,7 @@ public:
 	HouseMap::iterator getHouseEnd() {return houseMap.end();}
 
 private:
+	RentPerioid_t rentPeriod;
 	HouseMap houseMap;
 };
 

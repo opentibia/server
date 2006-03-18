@@ -154,6 +154,7 @@ bool Map::saveMap(const std::string& identifier)
 	IOMapSerialize* IOMapSerialize = IOMapSerialize::getInstance();
 	IOMapSerialize->saveMap(this, mapStoreIdentifier);
 	IOMapSerialize->saveHouseInfo(this, houseStoreIdentifier);
+
 	return true;
 }
 

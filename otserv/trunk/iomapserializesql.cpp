@@ -331,8 +331,11 @@ bool IOMapSerializeSQL::loadHouseInfo(Map* map, const std::string& identifier)
 		if(house){
 			int ownerid = result.getDataInt("owner", i);
 			int paid = result.getDataInt("paid", i);
+			int payRentWarnings = result.getDataInt("warnings", i);
+
 			house->setHouseOwner(ownerid);
 			house->setPaidUntil(paid);
+			house->setPayRentWarnings(payRentWarnings);
 		}
 	}
 
@@ -376,15 +379,15 @@ bool IOMapSerializeSQL::saveHouseInfo(Map* map, const std::string& identifier)
 	if(!db.executeQuery(query))
 		return false;
 
-	query << "INSERT INTO `houses` (`houseid` , `owner` , `paid`) VALUES ";
+	query << "INSERT INTO `houses` (`houseid` , `owner` , `paid`, `warnings`) VALUES ";
 	for(HouseMap::iterator it = Houses::getInstance().getHouseBegin(); it != Houses::getInstance().getHouseEnd(); ++it){
 		House* house = it->second;
-		query << query.getSeparator() << "(" << house->getHouseId() << "," << house->getHouseOwner() << "," << house->getPaidUntil() << ")";
+		query << query.getSeparator() << "(" << house->getHouseId() << "," << house->getHouseOwner() << "," << house->getPaidUntil() << "," << house->getPayRentWarnings() << ")";
 	}
+
 	if(!db.executeQuery(query))
 		return false;
-	
-	
+		
 	for(HouseMap::iterator it = Houses::getInstance().getHouseBegin(); it != Houses::getInstance().getHouseEnd(); ++it){
 		bool save_lists = false;
 		query.reset();

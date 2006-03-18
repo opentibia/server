@@ -515,8 +515,9 @@ bool Commands::closeServer(Creature* creature, const std::string& cmd, const std
 		}
 	}
 	
+	Houses::getInstance().payHouses();
 	game->map->saveMap("");
-	
+
 	return true;
 }
 

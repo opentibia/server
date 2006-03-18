@@ -25,7 +25,9 @@
 #include "ioplayer.h"
 #include "game.h"
 #include "town.h"
+#include "luascript.h"
 
+extern LuaScript g_config;
 extern Game g_game;
 
 House::House(uint32_t _houseid) :
@@ -39,6 +41,8 @@ transfer_container(ITEM_LOCKER1)
 	posEntry.z = 0;
 	paidUntil = 0;
 	houseid = _houseid;
+	//lastWarning = 0;
+	rentWarnings = 0;
 	rent = 0;
 	townid = 0;
 	transferItem = NULL;
@@ -81,8 +85,11 @@ void House::setHouseOwner(uint32_t guid)
 		for(it = doorList.begin(); it != doorList.end(); ++it){
 			(*it)->setAccessList("");
 		}
+
 		//reset paid date
 		paidUntil = 0;
+		rentWarnings = 0;
+		//lastWarning = 0;
 	}
 		
 	std::stringstream houseDescription;
@@ -669,6 +676,27 @@ bool Door::getAccessList(std::string& list) const
 	return true;
 }
 
+Houses::Houses()
+{
+	std::string strRentPerioid = g_config.getGlobalString("houserentperiod", "monthly");
+
+	rentPeriod = RENTPERIOD_MONTHLY;
+
+	if(strRentPerioid == "yearly"){
+		rentPeriod = RENTPERIOD_YEARLY;
+	}
+	else if(strRentPerioid == "weekly"){
+		rentPeriod = RENTPERIOD_WEEKLY;
+	}
+	else if(strRentPerioid == "daily"){
+		rentPeriod = RENTPERIOD_DAILY;
+	}
+}
+
+Houses::~Houses()
+{
+	//
+}
 
 bool Houses::loadHousesXML(std::string filename)
 {
@@ -757,10 +785,11 @@ bool Houses::loadHousesXML(std::string filename)
 
 bool Houses::payHouses()
 {
-	uint32_t currentTime;
-	currentTime = 0; //TODO: month*12 + year
+	uint64_t currentTime = OTSYS_TIME();
+
 	for(HouseMap::iterator it = houseMap.begin(); it != houseMap.end(); ++it){
 		House* house = it->second;
+
 		if(house->getHouseOwner() != 0 && house->getPaidUntil() < currentTime &&
 			 house->getRent() != 0){
 			
@@ -784,15 +813,75 @@ bool Houses::payHouses()
 					delete player;
 					continue;
 				}
+
 				Depot* depot = player->getDepot(town->getTownID(), true);
 				if(depot){
-					//TODO
 					//get money from depot
-					//if not posible 
-					//	house->setHouseOwner(0);
-					//else
-					//	house->setPaidUntil(currentTime);
+					if(g_game.removeMoney(depot, house->getRent(), FLAG_NOLIMIT)){
+
+						__int64 paidUntil = currentTime;
+						switch(rentPeriod){
+							case RENTPERIOD_DAILY:
+								paidUntil += 24 * 60 * 60;
+							break;
+
+							case RENTPERIOD_WEEKLY:
+								paidUntil += 24 * 60 * 60 * 7;
+							break;
+
+							case RENTPERIOD_MONTHLY:
+								paidUntil += 24 * 60 * 60 * 30;
+							break;
+
+							case RENTPERIOD_YEARLY:
+								paidUntil += 24 * 60 * 60 * 365;
+							break;
+						}
+
+						house->setPaidUntil(paidUntil);
+					}
+					else{
+						if(house->getPayRentWarnings() >= 7){
+							house->setHouseOwner(0);
+						}
+						else{
+							int daysLeft = 7 - house->getPayRentWarnings();
+
+							Item* letter = Item::CreateItem(ITEM_LETTER_STAMPED);
+							std::string period = "";
+
+							switch(rentPeriod){
+								case RENTPERIOD_DAILY:
+									period = "daily";
+								break;
+
+								case RENTPERIOD_WEEKLY:
+									period = "weekly";
+								break;
+
+								case RENTPERIOD_MONTHLY:
+									period = "monthly";
+								break;
+
+								case RENTPERIOD_YEARLY:
+									period = "yearly";
+								break;
+							}
+
+							std::stringstream warningText;
+							warningText << "Warning! \n" <<
+								"The " << period << " rent of " << house->getRent() << " gold for your house \""
+								<< house->getName() << "\" is payable. Have it available within " << daysLeft <<
+								", or you will lose this house.";
+								
+							letter->setText(warningText.str());
+							g_game.internalAddItem(depot, letter, INDEX_WHEREEVER, FLAG_NOLIMIT);
+
+							house->setPayRentWarnings(house->getPayRentWarnings() + 1);
+						}
+					}
 				}
+
 				IOPlayer::instance()->savePlayer(player);
 				delete player; 
 			}
