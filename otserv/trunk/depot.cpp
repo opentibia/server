@@ -101,12 +101,18 @@ ReturnValue Depot::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			}
 		}
 
-		if(getItemHoldingCount() + addCount >= maxDepotLimit){
+		if(getItemHoldingCount() + addCount > maxDepotLimit){
 			return RET_DEPOTISFULL;
 		}
 	}
 
 	return Container::__queryAdd(index, thing, count, flags);
+}
+
+ReturnValue Depot::__queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
+	uint32_t& maxQueryCount, uint32_t flags) const
+{
+	return Container::__queryMaxCount(index, thing, count, maxQueryCount, flags);
 }
 
 void Depot::postAddNotification(Thing* thing, bool hasOwnership /*= true*/)

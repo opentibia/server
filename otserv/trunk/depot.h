@@ -17,6 +17,7 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
+
 #ifndef __OTSERV_DEPOT_H__
 #define __OTSERV_DEPOT_H__
 
@@ -44,6 +45,9 @@ public:
 	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,
 		uint32_t flags) const;
 		
+	virtual ReturnValue __queryMaxCount(int32_t index, const Thing* thing, uint32_t count,
+		uint32_t& maxQueryCount, uint32_t flags) const;
+
 	virtual void postAddNotification(Thing* thing, bool hasOwnership = true);
 	virtual void postRemoveNotification(Thing* thing, bool isCompleteRemoval, bool hadOwnership = true);
 private:

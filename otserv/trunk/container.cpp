@@ -362,7 +362,7 @@ ReturnValue Container::__queryMaxCount(int32_t index, const Thing* thing, uint32
 		return RET_NOERROR;
 	}
 
-	uint32_t freeSlots = (capacity() - size());
+	int32_t freeSlots = std::max((int32_t)(capacity() - size()), (int32_t)0);
 
 	if(item->isStackable()){
 		uint32_t n = 0;

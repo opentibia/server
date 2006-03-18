@@ -228,6 +228,7 @@ CREATE TABLE `houses` (
   `houseid` int(10) unsigned NOT NULL default '0',
   `owner` int(10) unsigned default '0',
   `paid` int(10) unsigned default '0',
+  `warnings` int(10) unsigned default '0',
   PRIMARY KEY  (`houseid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
