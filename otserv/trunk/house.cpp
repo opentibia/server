@@ -41,7 +41,6 @@ transfer_container(ITEM_LOCKER1)
 	posEntry.z = 0;
 	paidUntil = 0;
 	houseid = _houseid;
-	//lastWarning = 0;
 	rentWarnings = 0;
 	rent = 0;
 	townid = 0;
@@ -89,7 +88,6 @@ void House::setHouseOwner(uint32_t guid)
 		//reset paid date
 		paidUntil = 0;
 		rentWarnings = 0;
-		//lastWarning = 0;
 	}
 		
 	std::stringstream houseDescription;
@@ -204,20 +202,17 @@ bool House::transferToDepot()
 		return false;
 	}
 
-	bool unloadPlayer = false;
 	Player* player = g_game.getPlayerByName(ownerName);
 	
 	if(!player){
-		unloadPlayer = true;
 		player = new Player(ownerName, NULL);
 
 		if(!IOPlayer::instance()->loadPlayer(player, ownerName)){
 #ifdef __DEBUG__
 			std::cout << "Failure: [House::transferToDepot], can not load player: " << ownerName << std::endl;
 #endif
-
 			delete player;
-			return false;
+			return NULL;
 		}
 	}
 
@@ -249,8 +244,8 @@ bool House::transferToDepot()
 		g_game.internalMoveItem((*it)->getParent(), depot, INDEX_WHEREEVER, (*it), (*it)->getItemCount(), FLAG_NOLIMIT);
 	}
 
-	if(unloadPlayer){
-		IOPlayer::instance()->savePlayer(player); 
+	if(!player->isOnline()){
+		IOPlayer::instance()->savePlayer(player);
 		delete player;
 	}
 
@@ -792,7 +787,6 @@ bool Houses::payHouses()
 
 		if(house->getHouseOwner() != 0 && house->getPaidUntil() < currentTime &&
 			 house->getRent() != 0){
-			
 			uint32_t ownerid = house->getHouseOwner();
 			Town* town = Towns::getInstance().getTown(house->getTownId());
 			if(!town){
@@ -804,92 +798,100 @@ bool Houses::payHouses()
 			}
 			
 			std::string name;
-			if(IOPlayer::instance()->getNameByGuid(ownerid, name)){
-				Player* player = new Player(name, NULL);
+			if(!IOPlayer::instance()->getNameByGuid(ownerid, name)){
+				//player doesnt exist, remove it as house owner?
+				//house->setHouseOwner(0);
+				continue;
+			}
+
+			Player* player = g_game.getPlayerByName(name);
+			
+			if(!player){
+				player = new Player(name, NULL);
+
 				if(!IOPlayer::instance()->loadPlayer(player, name)){
-					#ifdef __DEBUG_HOUSES__
-					std::cout << "Warning: [Houses::payHouses], can not load player: " << name << std::endl;
-					#endif
+		#ifdef __DEBUG__
+					std::cout << "Failure: [House::transferToDepot], can not load player: " << name << std::endl;
+		#endif
 					delete player;
 					continue;
 				}
+			}
 
-				Depot* depot = player->getDepot(town->getTownID(), true);
-				if(depot){
-					//get money from depot
-					if(g_game.removeMoney(depot, house->getRent(), FLAG_NOLIMIT)){
+			Depot* depot = player->getDepot(town->getTownID(), true);
+			if(depot){
+				//get money from depot
+				if(g_game.removeMoney(depot, house->getRent(), FLAG_NOLIMIT)){
 
-						__int64 paidUntil = currentTime;
+					__int64 paidUntil = currentTime;
+					switch(rentPeriod){
+						case RENTPERIOD_DAILY:
+							paidUntil += 24 * 60 * 60;
+						break;
+
+						case RENTPERIOD_WEEKLY:
+							paidUntil += 24 * 60 * 60 * 7;
+						break;
+
+						case RENTPERIOD_MONTHLY:
+							paidUntil += 24 * 60 * 60 * 30;
+						break;
+
+						case RENTPERIOD_YEARLY:
+							paidUntil += 24 * 60 * 60 * 365;
+						break;
+					}
+
+					house->setPaidUntil(paidUntil);
+				}
+				else{
+					if(house->getPayRentWarnings() >= 7){
+						house->setHouseOwner(0);
+					}
+					else{
+						int daysLeft = 7 - house->getPayRentWarnings();
+
+						Item* letter = Item::CreateItem(ITEM_LETTER_STAMPED);
+						std::string period = "";
+
 						switch(rentPeriod){
 							case RENTPERIOD_DAILY:
-								paidUntil += 24 * 60 * 60;
+								period = "daily";
 							break;
 
 							case RENTPERIOD_WEEKLY:
-								paidUntil += 24 * 60 * 60 * 7;
+								period = "weekly";
 							break;
 
 							case RENTPERIOD_MONTHLY:
-								paidUntil += 24 * 60 * 60 * 30;
+								period = "monthly";
 							break;
 
 							case RENTPERIOD_YEARLY:
-								paidUntil += 24 * 60 * 60 * 365;
+								period = "yearly";
 							break;
 						}
 
-						house->setPaidUntil(paidUntil);
-					}
-					else{
-						if(house->getPayRentWarnings() >= 7){
-							house->setHouseOwner(0);
-						}
-						else{
-							int daysLeft = 7 - house->getPayRentWarnings();
+						std::stringstream warningText;
+						warningText << "Warning! \n" <<
+							"The " << period << " rent of " << house->getRent() << " gold for your house \""
+							<< house->getName() << "\" is payable. Have it available within " << daysLeft <<
+							" days, or you will lose this house.";
+							
+						letter->setText(warningText.str());
+						g_game.internalAddItem(depot, letter, INDEX_WHEREEVER, FLAG_NOLIMIT);
 
-							Item* letter = Item::CreateItem(ITEM_LETTER_STAMPED);
-							std::string period = "";
-
-							switch(rentPeriod){
-								case RENTPERIOD_DAILY:
-									period = "daily";
-								break;
-
-								case RENTPERIOD_WEEKLY:
-									period = "weekly";
-								break;
-
-								case RENTPERIOD_MONTHLY:
-									period = "monthly";
-								break;
-
-								case RENTPERIOD_YEARLY:
-									period = "yearly";
-								break;
-							}
-
-							std::stringstream warningText;
-							warningText << "Warning! \n" <<
-								"The " << period << " rent of " << house->getRent() << " gold for your house \""
-								<< house->getName() << "\" is payable. Have it available within " << daysLeft <<
-								", or you will lose this house.";
-								
-							letter->setText(warningText.str());
-							g_game.internalAddItem(depot, letter, INDEX_WHEREEVER, FLAG_NOLIMIT);
-
-							house->setPayRentWarnings(house->getPayRentWarnings() + 1);
-						}
+						house->setPayRentWarnings(house->getPayRentWarnings() + 1);
 					}
 				}
-
-				IOPlayer::instance()->savePlayer(player);
-				delete player; 
 			}
-			else{
-				//player doesnt exist, remove it as house owner?
-				//house->setHouseOwner(0);
+
+			if(!player->isOnline()){
+				IOPlayer::instance()->savePlayer(player);
+				delete player;
 			}
 		}
 	}
+
 	return true;
 }

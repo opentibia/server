@@ -200,7 +200,6 @@ private:
 	std::string houseName;
 	Position posEntry;
 	uint64_t paidUntil;
-	//uint64_t lastWarning;
 	uint32_t rentWarnings;
 	uint32_t rent;
 	uint32_t townid;

@@ -126,6 +126,7 @@ public:
 	
 	const std::string& getGuildName() const {return guildName;};
 	unsigned long getGuildId() const {return guildId;};
+	bool isOnline() {return (client != NULL);};
 
 	void addContainer(uint32_t containerid, Container *container);
 	void closeContainer(uint32_t containerid);
