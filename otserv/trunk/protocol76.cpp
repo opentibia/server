@@ -303,6 +303,10 @@ void Protocol76::parsePacket(NetworkMessage &msg)
 		parseCancelMove(msg);
 		break;
 	
+	case 0xC9: //client sends its position, unknown usage
+		msg.GetPosition();
+		break;
+
 	case 0xCA: //client request to resend the container (happens when you store more than container maxsize)
 		parseUpdateContainer(msg);
 		break;
