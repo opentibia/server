@@ -62,6 +62,7 @@ s_defcommands Commands::defined_commands[] = {
 	{"/kick",&Commands::kickPlayer},
 	{"/owner",&Commands::setHouseOwner},
 	{"/sellhouse",&Commands::sellHouse},
+	{"/gethouse",&Commands::getHouse},
 	//{"/exiva",&Commands::exivaPlayer},
 	//{"/invite",&Commands::invitePlayer},
 	//{"/uninvite",&Commands::uninvitePlayer},
@@ -141,7 +142,7 @@ bool Commands::loadXml(const std::string& _datadir)
 	//
 	for(CommandMap::iterator it = commandMap.begin(); it != commandMap.end(); ++it){
 		if(it->second->loaded == false){
-			std::cout << "Warning: Missing access level for command" << it->first << std::endl;
+			std::cout << "Warning: Missing access level for command " << it->first << std::endl;
 		}
 		//register command tag in game
 		game->addCommandTag(it->first.substr(0,1));
@@ -515,7 +516,9 @@ bool Commands::closeServer(Creature* creature, const std::string& cmd, const std
 		}
 	}
 	
-	Houses::getInstance().payHouses();
+	if(param == "serversave"){
+		Houses::getInstance().payHouses();
+	}
 	game->map->saveMap("");
 
 	return true;
@@ -694,39 +697,71 @@ bool Commands::sellHouse(Creature* creature, const std::string& cmd, const std::
 {
 	Player* player = creature->getPlayer();
 	if(player){
-		if(player->getTile()->hasFlag(TILESTATE_HOUSE)){
-			HouseTile* houseTile = dynamic_cast<HouseTile*>(player->getTile());
-			if(houseTile){
-				House* house = houseTile->getHouse();
-				if(house && house->getHouseOwner() == player->getGUID()){
-					Player* tradePartner = game->getPlayerByName(param);
-					if(tradePartner && tradePartner != player){
-						if(Position::areInRange<2,2,0>(tradePartner->getPosition(), player->getPosition())){
-							Item* transferItem = house->getTransferItem();
-							if(transferItem){
-								transferItem->getParent()->setParent(player);
-								game->internalStartTrade(player, tradePartner, transferItem);
-							}
-							else{
-								player->sendCancel("You can not trade this house.");
-							}
-						}
-						else{
-							player->sendCancel("Trade player is too far away.");
-						}
-					}
-					else{
-						player->sendCancel("Trade player not found.");
-					}
-				}
-				else{
-					player->sendCancel("You are not owner of this house.");
-				}
-			}
+		if(!player->getTile()->hasFlag(TILESTATE_HOUSE)){
+			player->sendCancel("You are not in a house");	
+			return false;
+		}
+		
+		HouseTile* houseTile = dynamic_cast<HouseTile*>(player->getTile());
+		if(!houseTile){
+			return false;
+		}
+		
+		House* house = houseTile->getHouse();
+		if(!(house && house->getHouseOwner() == player->getGUID())){
+			player->sendCancel("You are not owner of this house.");
+			return false;
+		}
+		
+		Player* tradePartner = game->getPlayerByName(param);
+		if(!(tradePartner && tradePartner != player)){
+			player->sendCancel("Trade player not found.");
+			return false;
+		}
+		
+		if(Houses::getInstance().getHouseByPlayerId(tradePartner->getGUID())){
+			player->sendCancel("Trade player already owns a house.");
+			return false;
+		}
+		
+		if(!Position::areInRange<2,2,0>(tradePartner->getPosition(), player->getPosition())){
+			player->sendCancel("Trade player is too far away.");
+			return false;
+		}
+		
+		Item* transferItem = house->getTransferItem();
+		if(!transferItem){
+			player->sendCancel("You can not trade this house.");
+			return false;
+		}
+		
+		transferItem->getParent()->setParent(player);
+		game->internalStartTrade(player, tradePartner, transferItem);
+		return true;
+	}
+	return false;
+}
+
+bool Commands::getHouse(Creature* creature, const std::string& cmd, const std::string& param)
+{
+	Player* player = creature->getPlayer();
+	if(!player)
+		return false;
+	
+	std::string real_name = param;
+	unsigned long guid;
+	unsigned long access_lvl;
+	if(IOPlayer::instance()->getGuidByName(guid, access_lvl, real_name)){
+		House* house = Houses::getInstance().getHouseByPlayerId(guid);
+		std::stringstream str;
+		str << real_name;
+		if(house){
+			str << " owns house: " << house->getName() << ".";
 		}
 		else{
-			player->sendCancel("You are not in a house");
+			str << " does not own any house.";
 		}
+		player->sendTextMessage(MSG_BLUE_TEXT, str.str().c_str());
 	}
 	return false;
 }

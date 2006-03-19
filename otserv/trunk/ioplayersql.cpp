@@ -618,7 +618,7 @@ bool IOPlayerSQL::getGuidByName(unsigned long &guid, unsigned long &alvl, std::s
 	return true;
 }
 
-bool IOPlayerSQL::getGuilIdByName(unsigned long &guildId, const std::string& guildName)
+bool IOPlayerSQL::getGuildIdByName(unsigned long &guildId, const std::string& guildName)
 {
 	Database mysql;
 	DBQuery query;

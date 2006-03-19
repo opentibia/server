@@ -471,7 +471,7 @@ bool AccessList::addPlayer(std::string& name)
 bool AccessList::addGuild(const std::string& guildName, const std::string& rank)
 {
 	unsigned long guildId;
-	if(IOPlayer::instance()->getGuilIdByName(guildId, guildName)){
+	if(IOPlayer::instance()->getGuildIdByName(guildId, guildName)){
 		if(guildId != 0 && guildList.find(guildId) == guildList.end()){
 			guildList.insert(guildId);
 			return true;
@@ -691,6 +691,17 @@ Houses::Houses()
 Houses::~Houses()
 {
 	//
+}
+
+House* Houses::getHouseByPlayerId(unsigned long playerId)
+{
+	for(HouseMap::iterator it = houseMap.begin(); it != houseMap.end(); ++it){
+		House* house = it->second;
+		if(house->getHouseOwner() == playerId){
+			return house;
+		}
+	}
+	return NULL;
 }
 
 bool Houses::loadHousesXML(std::string filename)

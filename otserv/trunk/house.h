@@ -245,6 +245,8 @@ public:
 		}
 		
 	}
+	
+	House* getHouseByPlayerId(unsigned long playerId);
 
 	bool loadHousesXML(std::string filename);
 	

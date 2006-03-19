@@ -70,7 +70,7 @@ bool IOPlayer::playerExists(std::string name)
 	return false;
 }
 
-bool IOPlayer::getGuilIdByName(unsigned long &guid, const std::string &name)
+bool IOPlayer::getGuildIdByName(unsigned long &guid, const std::string &name)
 {
 	return false;
 }
