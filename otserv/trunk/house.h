@@ -210,7 +210,7 @@ private:
 
 typedef std::map<uint32_t, House*> HouseMap;
 
-enum RentPerioid_t{
+enum RentPeriod_t{
 	RENTPERIOD_DAILY,
 	RENTPERIOD_WEEKLY,
 	RENTPERIOD_MONTHLY,
@@ -256,7 +256,7 @@ public:
 	HouseMap::iterator getHouseEnd() {return houseMap.end();}
 
 private:
-	RentPerioid_t rentPeriod;
+	RentPeriod_t rentPeriod;
 	HouseMap houseMap;
 };
 
