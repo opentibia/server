@@ -1012,7 +1012,9 @@ void Protocol76::parseHouseWindow(NetworkMessage &msg)
 	std::string new_list = msg.GetString();
 	
 	if(house && windowTextID == id && _listid == 0){
+		OTSYS_THREAD_LOCK(game->gameLock, "Protocol76::parseHouseWindow()")
 		house->setAccessList(listId, new_list);
+		OTSYS_THREAD_UNLOCK(game->gameLock, "Protocol76::parseHouseWindow()")
 		house = NULL;
 		listId = 0;
 	}

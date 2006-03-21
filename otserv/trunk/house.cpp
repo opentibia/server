@@ -212,7 +212,7 @@ bool House::transferToDepot()
 			std::cout << "Failure: [House::transferToDepot], can not load player: " << ownerName << std::endl;
 #endif
 			delete player;
-			return NULL;
+			return false;
 		}
 	}
 
