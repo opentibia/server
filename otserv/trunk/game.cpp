@@ -762,7 +762,7 @@ Player* Game::getPlayerByID(unsigned long id)
 	return NULL; //just in case the player doesnt exist
 }
 
-Creature* Game::getCreatureByName(const std::string &s)
+Creature* Game::getCreatureByName(const std::string& s)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::getCreatureByName()");
 
@@ -780,7 +780,7 @@ Creature* Game::getCreatureByName(const std::string &s)
 	return NULL; //just in case the creature doesnt exist
 }
 
-Player* Game::getPlayerByName(const std::string &s)
+Player* Game::getPlayerByName(const std::string& s)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::getPlayerByName()");
 
@@ -1409,7 +1409,6 @@ bool Game::removeItemOfType(Cylinder* cylinder, uint16_t itemId, uint32_t count)
 	}
 	
 	std::list<Container*> listContainer;
-	ItemList::const_iterator it;
 	Container* tmpContainer = NULL;
 	Thing* thing = NULL;
 	Item* item = NULL;
@@ -1445,8 +1444,8 @@ bool Game::removeItemOfType(Cylinder* cylinder, uint16_t itemId, uint32_t count)
 		Container* container = listContainer.front();
 		listContainer.pop_front();
 		
-		for(it = container->getItems(); it != container->getEnd() && count > 0; ++it){
-			Item* item = *it;
+		for(int i = 0; i < container->size() && count > 0; i++){
+			Item* item = container->getItem(i);
 			if(item->getID() == itemId){
 				if(item->isStackable()){
 					if(item->getItemCount() > count){
@@ -1530,7 +1529,6 @@ bool Game::removeMoney(Cylinder* cylinder, uint32_t money, uint32_t flags /*= 0*
 	}
 
 	std::list<Container*> listContainer;
-	ItemList::const_iterator it;
 	Container* tmpContainer = NULL;
 
 	typedef std::multimap<int, Item*, std::less<int> > MoneyMap;
@@ -1563,8 +1561,8 @@ bool Game::removeMoney(Cylinder* cylinder, uint32_t money, uint32_t flags /*= 0*
 		Container* container = listContainer.front();
 		listContainer.pop_front();
 
-		for(it = container->getItems(); it != container->getEnd() && money > 0; ++it){
-			Item* item = *it;
+		for(int i = 0; i < container->size() && money > 0; i++){
+			Item* item = container->getItem(i);
 
 			if(tmpContainer = item->getContainer()){
 				listContainer.push_back(tmpContainer);
