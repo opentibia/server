@@ -2164,10 +2164,10 @@ uint32_t Player::__getItemTypeCount(uint16_t itemId) const
 				else{
 					++count;
 				}
+			}
 
-				if(tmpContainer = item->getContainer()){
-					listContainer.push_back(tmpContainer);
-				}
+			if(tmpContainer = item->getContainer()){
+				listContainer.push_back(tmpContainer);
 			}
 		}
 	}
