@@ -1387,6 +1387,10 @@ ReturnValue Game::internalRemoveItem(Item* item, int32_t count /*= -1*/,  bool t
 		return ret;
 	}
 
+	if(!item->canRemove()){
+		return RET_NOTPOSSIBLE;
+	}
+
 	if(!test){
 		//remove the item
 		cylinder->__removeThing(item, count);
@@ -1742,7 +1746,6 @@ Item* Game::transformItem(Item* item, uint16_t newtype, int32_t count /*= -1*/)
 
 	return NULL;
 }
-
 
 ReturnValue Game::internalTeleport(Thing* thing, const Position& newPos)
 {

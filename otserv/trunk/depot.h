@@ -50,6 +50,10 @@ public:
 
 	virtual void postAddNotification(Thing* thing, bool hasOwnership = true);
 	virtual void postRemoveNotification(Thing* thing, bool isCompleteRemoval, bool hadOwnership = true);
+
+	//overrides
+	virtual bool canRemove() const {return false;}
+
 private:
 	uint32_t maxDepotLimit;
 	uint32_t depotId;

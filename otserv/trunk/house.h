@@ -88,6 +88,9 @@ public:
 	void setAccessList(const std::string& textlist);
 	bool getAccessList(std::string& list) const;
 
+	//overrides
+	virtual bool canRemove() const {return (house == NULL);}
+
 protected:
 	void setHouse(House* _house);
 	

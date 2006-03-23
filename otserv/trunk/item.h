@@ -22,15 +22,15 @@
 #ifndef __OTSERV_ITEM_H__
 #define __OTSERV_ITEM_H__
 
-#include <libxml/xmlmemory.h>
-#include <libxml/parser.h>
+#include "thing.h"
+#include "items.h"
 
 #include <iostream>
 #include <list>
 #include <vector>
 
-#include "thing.h"
-#include "items.h"
+#include <libxml/xmlmemory.h>
+#include <libxml/parser.h>
 
 class Creature;
 class Player;
@@ -207,6 +207,7 @@ public:
 	bool canDecay();
 	bool isDecaying;
 	
+	virtual bool canRemove() const {return true;}
 	virtual bool onTradeEvent(TradeEvents_t event, Player* owner){return true;};
 
 protected:
