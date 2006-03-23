@@ -110,7 +110,7 @@ public:
 	virtual void sendWorldLight(const LightInfo& lightInfo) = 0;
 	virtual void sendCreatureSkull(const Creature* creature) = 0;
 	virtual void sendCreatureShield(const Creature* creature) = 0;
-	virtual void sendCreatureSquare(const Creature* creature, unsigned char color) = 0;
+	virtual void sendCreatureSquare(const Creature* creature, SquareColor color) = 0;
 	virtual void sendHouseWindow(House* house, unsigned long listid, const std::string& text) = 0;
 	
 protected:

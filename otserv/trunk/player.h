@@ -85,6 +85,11 @@ enum freeslot_t {
 	SLOT_TYPE_CONTAINER
 };
 
+enum chaseMode_t {
+	CHASEMODE_STANDSTILL,
+	CHASEMODE_FOLLOW,
+};
+
 enum tradestate_t {
 	TRADE_NONE,
 	TRADE_INITIATED,
@@ -92,7 +97,6 @@ enum tradestate_t {
 	TRADE_ACKNOWLEDGE,
 	TRADE_TRANSFER
 };
-
 
 typedef std::pair<unsigned long, Container*> containervector_pair;
 typedef std::vector<containervector_pair> ContainerVector;
@@ -219,6 +223,7 @@ public:
 	void sendCancelMessage(ReturnValue message) const;
 	void sendCancel(const char* msg) const;
 	void sendCancelWalk() const;
+	void sendCancelAttacking();
 	void sendStats();
 	void sendTextMessage(MessageClasses mclass, const char* message) const;
 	void sendTextMessage(MessageClasses mclass, const char* message,const Position &pos, unsigned char type) const;
@@ -258,7 +263,11 @@ public:
 	
 	void updateItemsLight(bool internal = false);
 	
-	#ifdef __SKULLSYSTEM__
+	void setAttackedCreature(const Creature* creature);
+	void setFollowCreature(Creature* creature);
+	void setChaseMode(uint8_t mode);
+
+#ifdef __SKULLSYSTEM__
 	skulls_t getSkull() const;
 	skulls_t getSkullClient(const Player* player) const;
 	bool hasAttacked(const Player* attacked) const;
@@ -283,6 +292,7 @@ public:
 
 	void sendCreatureTurn(const Creature* creature, uint32_t stackpos);
 	void sendCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text);
+	void sendCreatureSquare(const Creature* creature, SquareColor color);
 	void sendCreatureChangeOutfit(const Creature* creature);
 	void sendCreatureLight(const Creature* creature);
 	void sendWorldLight(LightInfo& lightInfo);
@@ -320,7 +330,6 @@ public:
 
 protected:
 	void checkTradeState(const Item* item);
-	void sendCancelAttacking();
 	void addSkillTryInternal(int skilltry,int skill);
 
 	virtual int onThink(int& newThinkTicks);
@@ -368,7 +377,8 @@ protected:
 	long internal_ping;
 	long npings;
 	
-	char fightMode, followMode;
+	Creature* followCreature;
+	chaseMode_t chaseMode;
 	
 	//account variables
 	int accountNumber;

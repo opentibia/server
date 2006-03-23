@@ -288,7 +288,7 @@ void Protocol76::parsePacket(NetworkMessage &msg)
 		break;
 	
 	case 0xA0: // set attack and follow mode
-		parseModes(msg);
+		parseFightModes(msg);
 		break;	
 	
 	case 0xA1: // attack
@@ -600,19 +600,13 @@ void Protocol76::parseOpenPriv(NetworkMessage& msg)
 
 void Protocol76::parseCancelMove(NetworkMessage& msg)
 {
+	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol76::parseCancelMove()");
+
 	game->playerSetAttackedCreature(player, 0);
 	
 	game->stopEvent(player->eventAutoWalk);
+	player->eventAutoWalk = 0;
 	player->sendCancelWalk();
-}
-
-void Protocol76::parseModes(NetworkMessage& msg)
-{
-	long fightMode = msg.GetByte();
-	long followMode = msg.GetByte();
-	//std::cout << "fight " << fithgMode << ". follow " << followMode << std::endl;
-	//player->fightMode = msg.GetByte();
-	//player->followMode = msg.GetByte();
 }
 
 void Protocol76::parseDebug(NetworkMessage& msg)
@@ -979,6 +973,14 @@ void Protocol76::parseSay(NetworkMessage& msg)
 	}
 }
 
+void Protocol76::parseFightModes(NetworkMessage& msg)
+{
+	uint8_t fightMode = msg.GetByte(); //1 - offensive, 2 - balanced, 3 - defensive
+	uint8_t chaseMode = msg.GetByte(); // 0 - stand while fightning, 1 - chase opponent
+
+	game->playerSetFightModes(player, fightMode, chaseMode);
+}
+
 void Protocol76::parseAttack(NetworkMessage& msg)
 {
 	unsigned long creatureid = msg.GetU32();
@@ -987,8 +989,8 @@ void Protocol76::parseAttack(NetworkMessage& msg)
 
 void Protocol76::parseFollow(NetworkMessage& msg)
 {
-	unsigned long creatureid = msg.GetU32();
-	//std::cout << "follow " << creatureid << std::endl;
+	unsigned long creatureId = msg.GetU32();
+	game->playerFollowCreature(player, creatureId);
 }
 
 void Protocol76::parseTextWindow(NetworkMessage& msg)
@@ -1144,13 +1146,13 @@ void Protocol76::sendCreatureShield(const Creature* creature)
 	}
 }
 
-void Protocol76::sendCreatureSquare(const Creature* creature, unsigned char color)
+void Protocol76::sendCreatureSquare(const Creature* creature, SquareColor color)
 {
 	if(CanSee(creature)){
 		NetworkMessage msg;
 		msg.AddByte(0x86);
 		msg.AddU32(creature->getID());
-		msg.AddByte(color);
+		msg.AddByte((unsigned char)color);
 		WriteBuffer(msg);
 	}
 }

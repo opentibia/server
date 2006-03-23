@@ -26,9 +26,6 @@
 #include <vector>
 #include <set>
 
-#include <libxml/xmlmemory.h>
-#include <libxml/parser.h>
-
 #include "spawn.h"
 #include "position.h"
 #include "item.h"
@@ -38,11 +35,12 @@
 #include "templates.h"
 #include "scheduler.h"
 
-class Creature;   // see creature.h
+class Creature;
 class Player;
 class Monster;
 class Npc;
 class Commands;
+class Task;
 class lessSchedTask;
 class SchedulerTask;
 
@@ -313,7 +311,7 @@ public:
 	bool playerSpeakTo(Player* player, SpeakClasses type, const std::string& receiver, const std::string& text);
 	bool playerBroadcastMessage(Player* player, const std::string& text);
 	bool playerTalkToChannel(Player* player, SpeakClasses type, const std::string& text, unsigned short channelId);
-	bool playerAutoWalk(Player* player, std::list<Direction>& path);
+	bool playerAutoWalk(Player* player, std::list<Direction>& listDir);
 
 	bool playerUseItemEx(Player* player, const Position& fromPos, uint8_t fromStackPos, uint16_t fromItemId,
 		const Position& toPos, uint8_t toStackPos, uint16_t toItemId);
@@ -330,6 +328,8 @@ public:
 	bool playerCloseTrade(Player* player);
 	bool internalStartTrade(Player* player, Player* partner, Item* tradeItem);
 	bool playerSetAttackedCreature(Player* player, unsigned long creatureid);
+	bool playerFollowCreature(Player* player, unsigned long creatureId);
+	bool playerSetFightModes(Player* player, uint8_t fightMode, uint8_t chaseMode);
 	bool playerLookAt(Player* player, const Position& pos, uint16_t itemId, uint8_t stackpos);
 	bool playerRequestAddVip(Player* player, const std::string& vip_name);
 	bool playerTurn(Player* player, Direction dir);
@@ -393,7 +393,7 @@ protected:
 		void*    data;
 	};
 
-	void checkPlayerWalk(unsigned long id);
+	void checkAutoWalkPlayer(unsigned long id);
 	void checkCreature(unsigned long creatureid);
 	void checkCreatureAttacking(unsigned long creatureid, unsigned long time);
 	void checkDecay(int t);
@@ -441,42 +441,62 @@ protected:
 	friend class Actions;
 };
 
-
 template<class ArgType>
-class TCallList : public SchedulerTask {
+class TCallList : public SchedulerTask{
 public:
-	TCallList(boost::function<int(Game*, ArgType)> f1, boost::function<bool(Game*)> f2, std::list<ArgType>& call_list, __int64 interval) :
-	_f1(f1), _f2(f2), _list(call_list), _interval(interval) {
+	TCallList(
+		boost::function<bool(Game*, ArgType)> f1,
+		Task* f2,
+		std::list<ArgType>& call_list,
+		__int64 interval) :
+			_f1(f1), _f2(f2), _list(call_list), _interval(interval)
+	{
+		//
 	}
 	
-	void operator()(Game* arg) {
-		if(_eventid != 0 && !_f2(arg)) {
-			int ret = _f1(arg, _list.front());
+	virtual void operator()(Game* arg)
+	{
+		if(_eventid != 0){
+			bool ret = _f1(arg, _list.front());
 			_list.pop_front();
-			if (ret && !_list.empty()) {
-				SchedulerTask* newTask = new TCallList(_f1, _f2, _list, _interval);
-				newTask->setTicks(_interval);
-				newTask->setEventId(this->getEventId());
-				arg->addEvent(newTask);
+
+			if(ret){
+				if(_list.empty()){
+					//callback function
+					if(_f2){
+						(*_f2)(arg);
+						delete _f2;
+					}
+				}
+				else{
+					//fire next task
+					SchedulerTask* newTask = new TCallList(_f1, _f2, _list, _interval);
+					newTask->setTicks(_interval);
+					newTask->setEventId(this->getEventId());
+					arg->addEvent(newTask);
+				}
 			}
 		}
-
-		return;
 	}
 
 private:
-	boost::function<int(Game*, ArgType)> _f1;
-	boost::function<bool(Game*)>_f2;
+	boost::function<bool(Game*, ArgType)> _f1;
+	Task* _f2;
+
 	std::list<ArgType> _list;
 	__int64 _interval;
 };
 
 template<class ArgType>
-SchedulerTask* makeTask(__int64 ticks, boost::function<int(Game*, ArgType)> f1, std::list<ArgType>& call_list, __int64 interval, boost::function<bool(Game*)> f2) {
-	TCallList<ArgType> *t = new TCallList<ArgType>(f1, f2, call_list, interval);
+SchedulerTask* makeTask(__int64 ticks,
+	boost::function<bool(Game*, ArgType)>* f1,
+	std::list<ArgType>& call_list,
+	__int64 interval,
+	Task* f2)
+{
+	TCallList<ArgType>* t = new TCallList<ArgType>(f1, f2, call_list, interval);
 	t->setTicks(ticks);
 	return t;
 };
-
 
 #endif

@@ -83,9 +83,11 @@ Creature()
 	SendBuffer = false;
 	npings = 0;
 	internal_ping = 0;
-	fightMode = followMode = 0;
 
-	//tradePartner = 0;
+	chaseMode = CHASEMODE_STANDSTILL;
+	//fightMode = FIGHTMODE_NONE;
+
+	followCreature = NULL;
 	tradePartner = NULL;
 	tradeState = TRADE_NONE;
 	tradeItem = NULL;
@@ -977,7 +979,6 @@ void Player::sendToChannel(Creature *creature, SpeakClasses type,
 
 void Player::sendCancelAttacking()
 {
-  //attackedCreature = NULL;
   client->sendCancelAttacking();
 }
 
@@ -1156,6 +1157,11 @@ void Player::sendCreatureSay(const Creature* creature, SpeakClasses type, const 
   client->sendCreatureSay(creature, type, text);
 }
 
+void Player::sendCreatureSquare(const Creature* creature, SquareColor color)
+{
+	client->sendCreatureSquare(creature, color);
+}
+
 void Player::onAddTileItem(const Position& pos, const Item* item)
 {
 	//
@@ -1202,9 +1208,20 @@ void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bo
 		sendCancelAttacking();
 	}
 
+	if(followCreature && followCreature == creature){
+		setFollowCreature(NULL);
+		sendTextMessage(MSG_SMALLINFO, "Target lost.");
+		g_game.playerFollowCreature(this, 0);
+	}
+
 	if(creature == this){
 		if(isLogout){
 			loginPosition = getPosition();
+		}
+
+		if(followCreature){
+			setFollowCreature(NULL);
+			g_game.playerFollowCreature(this, 0);
 		}
 
 		if(tradePartner){
@@ -1236,9 +1253,19 @@ void Player::onCreatureMove(const Creature* creature, const Position& oldPos, ui
 			sendCancelAttacking();
 		} 
 	}
+	
+	if(followCreature && followCreature == creature){
+		if(Position::areInRange<7,5,0>(followCreature->getPosition(), getPosition())){
+			g_game.playerFollowCreature(this, followCreature->getID());
+		}
+		else{
+			setFollowCreature(NULL);
+			sendTextMessage(MSG_SMALLINFO, "Target lost.");
+			g_game.playerFollowCreature(this, 0);
+		}
+	}
 
 	if(creature == this){
-
 		if(tradeState != TRADE_TRANSFER){
 			//check if we should close trade
 			if(tradeItem){
@@ -2288,6 +2315,44 @@ void Player::__internalAddThing(uint32_t index, Thing* thing)
 		items[index] = item;
 		item->setParent(this);
   }
+}
+
+void Player::setAttackedCreature(const Creature* creature)
+{
+	Creature::setAttackedCreature(creature);
+
+	if(chaseMode == CHASEMODE_FOLLOW){
+		g_game.playerFollowCreature(this, (creature ? creature->getID() : 0));
+	}
+	else
+		g_game.playerFollowCreature(this, 0);
+}
+
+void Player::setFollowCreature(Creature* creature)
+{
+	followCreature = creature;
+}
+
+void Player::setChaseMode(uint8_t mode)
+{
+	chaseMode_t prevChaseMode = chaseMode;
+
+	if(mode == 1){
+		chaseMode = CHASEMODE_FOLLOW;
+	}
+	else{
+		chaseMode = CHASEMODE_STANDSTILL;
+	}
+	
+	if(prevChaseMode != chaseMode){
+		if(chaseMode == CHASEMODE_FOLLOW){
+			/*chase opponent*/
+			g_game.playerFollowCreature(this, attackedCreature2);
+		}
+		else{
+			g_game.playerFollowCreature(this, 0);
+		}
+	}
 }
 
 void Player::getCreatureLight(LightInfo& light) const

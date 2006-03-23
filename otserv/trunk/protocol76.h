@@ -60,7 +60,6 @@ private:
 	//Parse methods
 	void parseLogout(NetworkMessage& msg);	
 	void parseCancelMove(NetworkMessage& msg);
-	void parseModes(NetworkMessage& msg);	
 
 	void parseMoveByMouse(NetworkMessage& msg);	
 	void parseMoveNorth(NetworkMessage& msg);
@@ -79,8 +78,9 @@ private:
 	
 	void parseRequestOutfit(NetworkMessage& msg);
 	void parseSetOutfit(NetworkMessage& msg);
-	void parseSay(NetworkMessage& msg);	
-	void parseLookAt(NetworkMessage& msg);	
+	void parseSay(NetworkMessage& msg);
+	void parseLookAt(NetworkMessage& msg);
+	void parseFightModes(NetworkMessage& msg);
 	void parseAttack(NetworkMessage& msg);
 	void parseFollow(NetworkMessage& msg);
 	
@@ -155,7 +155,7 @@ private:
 	
 	virtual void sendCreatureSkull(const Creature* creature);
 	virtual void sendCreatureShield(const Creature* creature);
-	virtual void sendCreatureSquare(const Creature* creature, unsigned char color);
+	virtual void sendCreatureSquare(const Creature* creature, SquareColor color);
 	
 	//tiles
 	virtual void sendAddTileItem(const Position& pos, const Item* item);

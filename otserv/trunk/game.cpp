@@ -34,6 +34,7 @@
 #include <boost/bind.hpp>
 
 #include "otsystem.h"
+#include "tasks.h"
 #include "items.h"
 #include "commands.h"
 #include "creature.h"
@@ -2585,23 +2586,21 @@ bool Game::playerBroadcastMessage(Player* player, const std::string& text)
 	return true;
 }
 
-bool Game::playerAutoWalk(Player* player, std::list<Direction>& path)
+bool Game::playerAutoWalk(Player* player, std::list<Direction>& listDir)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerAutoWalk()");
 	if(player->isRemoved())
 		return false;
 
 	stopEvent(player->eventAutoWalk);
+	player->eventAutoWalk = 0;
 
-	player->pathlist = path;
+	player->listWalkDir = listDir;
+	player->lastmove = OTSYS_TIME();
 	int ticks = (int)player->getSleepTicks();
-/*
-#ifdef __DEBUG__
-	std::cout << "playerAutoWalk - " << ticks << std::endl;
-#endif
-*/
 
-	player->eventAutoWalk = addEvent(makeTask(ticks, std::bind2nd(std::mem_fun(&Game::checkPlayerWalk), player->getID())));
+	//std::cout << "playerAutoWalk - " << (int)ticks << std::endl;
+	player->eventAutoWalk = addEvent(makeTask(0, std::bind2nd(std::mem_fun(&Game::checkAutoWalkPlayer), player->getID())));
 	return true;
 }
 
@@ -3115,22 +3114,66 @@ bool Game::playerSetAttackedCreature(Player* player, unsigned long creatureid)
 
 		player->sendTextMessage(MSG_SMALLINFO, "You may not attack this player.");
 		player->sendCancelAttacking();
-
-		//TEST stopEvent(player->eventCheckAttacking);
-		//TEST player->eventCheckAttacking = 0;
 	}
 	else{
 		player->setAttackedCreature(attackedCreature);
-		//stopEvent(player->eventCheckAttacking);
-		//player->eventCheckAttacking = addEvent(makeTask(2000, std::bind2nd(std::mem_fun(&Game::checkCreatureAttacking), player->getID())));
 	}
 	
+	return true;
+}
+
+bool Game::playerFollowCreature(Player* player, unsigned long creatureId)
+{
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerFollowCreature");
+	if(player->isRemoved())
+		return false;
+
+	player->setFollowCreature(NULL);
+	stopEvent(player->eventAutoWalk);
+	player->eventAutoWalk = 0;
+
+	if(creatureId == 0){
+		return true;
+	}
+
+	Creature* followCreature = getCreatureByID(creatureId);
+	if(!followCreature){
+		player->sendCancelMessage(RET_NOTPOSSIBLE);
+		player->sendCancelWalk();
+		return false;
+	}
+
+	std::list<Direction> listDir;
+
+	if(!Position::areInRange<1,1,0>(player->getPosition(), followCreature->getPosition())){
+		if(!map->getPathTo(player, followCreature->getPosition(), listDir)){
+			player->sendCancelMessage(RET_THEREISNOWAY);
+			player->sendCancelWalk();
+			return false;
+		}
+	}
+
+	player->setFollowCreature(followCreature);
+	return playerAutoWalk(player, listDir);
+}
+
+bool Game::playerSetFightModes(Player* player, uint8_t fightMode, uint8_t chaseMode)
+{
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerSetFightModes");
+	if(player->isRemoved())
+		return false;
+
+	//player->setFightMode(fightMode);
+	player->setChaseMode(chaseMode);
 	return true;
 }
 
 bool Game::playerRequestAddVip(Player* player, const std::string& vip_name)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::requestAddVip");
+	if(player->isRemoved())
+		return false;
+
 	std::string real_name;
 	real_name = vip_name;
 	unsigned long guid;
@@ -3281,41 +3324,35 @@ bool Game::internalMonsterYell(Monster* monster, const std::string& text)
 	return true;
 }
 
-void Game::checkPlayerWalk(unsigned long id)
+void Game::checkAutoWalkPlayer(unsigned long id)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::checkPlayerWalk");
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::checkAutoWalkPlayer");
 
 	Player* player = getPlayerByID(id);
-	if(!player){
-		return;
+	if(player){
+
+		Position pos = player->getPosition();
+		Direction dir = player->listWalkDir.front();
+		player->listWalkDir.pop_front();
+
+	/*
+	#ifdef __DEBUG__
+		std::cout << "move to: " << dir << std::endl;
+	#endif
+	*/
+
+		player->lastmove = OTSYS_TIME();
+		moveCreature(player, dir);
+
+		flushSendBuffers();
+
+		if(!player->isRemoved() && !player->listWalkDir.empty()) {
+			int ticks = (int)player->getSleepTicks();
+			player->eventAutoWalk = addEvent(makeTask(ticks, std::bind2nd(std::mem_fun(&Game::checkAutoWalkPlayer), id)));
+		}
+		else
+			player->eventAutoWalk = 0;
 	}
-
-	Position pos = player->getPosition();
-	Direction dir = player->pathlist.front();
-	player->pathlist.pop_front();
-
-/*
-#ifdef __DEBUG__
-	std::cout << "move to: " << dir << std::endl;
-#endif
-*/
-
-	player->lastmove = OTSYS_TIME();
-	moveCreature(player, dir);
-
-	flushSendBuffers();
-
-	if(!player->isRemoved() && !player->pathlist.empty()) {
-		int ticks = (int)player->getSleepTicks();
-/*
-#ifdef __DEBUG__
-		std::cout << "checkPlayerWalk - " << ticks << std::endl;
-#endif
-*/
-		player->eventAutoWalk = addEvent(makeTask(ticks, std::bind2nd(std::mem_fun(&Game::checkPlayerWalk), id)));
-	}
-	else
-		player->eventAutoWalk = 0;
 }
 
 void Game::checkCreature(unsigned long creatureid)

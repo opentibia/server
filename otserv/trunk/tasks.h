@@ -20,113 +20,76 @@
 //////////////////////////////////////////////////////////////////////
 
 
-#ifndef __OTSERV_TASKS_H
-#define __OTSERV_TASKS_H
+#ifndef __OTSERV_TASKS_H__
+#define __OTSERV_TASKS_H__
 
-#include "scheduler.h"
-#include "position.h"
+#include <boost/function.hpp>
+#include <functional>
+
 #include "player.h"
 #include "game.h"
+#include "position.h"
 
-/*
-class MovePlayer : public std::binary_function<Game*, Direction, int> {
+//class MovePlayer : public std::binary_function<Game*, Direction, int>{
+class MovePlayerTask : public boost::function<bool(Game*, Direction)>{
 public:
-	MovePlayer(unsigned long playerid) : _pid(playerid) {}
-
-	virtual result_type operator()(const first_argument_type& game, const second_argument_type& dir) const
+	MovePlayerTask(Player* player, Game* game, Direction dir) :
+		//boost::function2<bool, Game*, Direction>(game, dir),
+		_player(player)
 	{
-		OTSYS_THREAD_LOCK(game->gameLock)
-		// get the player we want to move...
-		Creature* creature = game->getCreatureByID(_pid);
-
-		Player* player = dynamic_cast<Player*>(creature);
-		if (!player) { // player is not available anymore it seems...
-			OTSYS_THREAD_UNLOCK(game->gameLock)
-			return 0;
-		}
-
-		if(player->cancelMove) {
-	    OTSYS_THREAD_UNLOCK(game->gameLock)
-		  return 1;
-    }
-		       
-		Position pos = player->pos;
-		switch (dir) {
-			case NORTH:
-					pos.y--;
-					break;
-			case EAST:
-					pos.x++;
-					break;
-			case SOUTH:
-					pos.y++;
-					break;
-			case WEST:
-					pos.x--;
-					break;
-			case NORTHEAST:
-					pos.x++;
-					pos.y--;
-				break;
-			case NORTHWEST:
-					pos.x--;
-					pos.y--;
-				break;
-			case SOUTHWEST:
-					pos.x--;
-					pos.y++;
-				break;
-			case SOUTHEAST:
-					pos.x++;
-					pos.y++;
-				break;
-		}
-
-#ifdef __DEBUG__
-		std::cout << "move to: " << dir << std::endl;
-#endif
-
-		game->thingMove(player, player, pos.x, pos.y, pos.z, 1);
-
-		game->flushSendBuffers();
-		OTSYS_THREAD_UNLOCK(game->gameLock)
-
-		if(player->pos != pos) {
-			return 0;
-		}
-		else
-			return 1;
+		_player->useThing2();
 	}
 
-protected:
-	unsigned long _pid;
-};
+	virtual ~MovePlayerTask()
+	{
+		_player->releaseThing2();
+	}
 
-class StopMovePlayer : public std::unary_function<Game*, bool> {
-public:
-		StopMovePlayer(unsigned long playerid) : _pid(playerid) { }
-		
-		virtual result_type operator()(const argument_type& game) const {
-			// get the player we want to move...
-			Creature* creature = game->getCreatureByID(_pid);
-			Player* player = dynamic_cast<Player*>(creature);
-			if (!player) { // player is not available anymore it seems...
-				return false;
-			}
-			else {
-				if(player->cancelMove) {
-					player->cancelMove = false;
-					player->sendCancelWalk("");
-					return true;
-				}
-			}
+	//virtual bool operator()(Game* game, Direction dir)
+	result_type operator()(const first_argument_type& game, const second_argument_type& dir) const
+	{
+		OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "MovePlayerTask");
 
+		if(_player->isRemoved()){
 			return false;
 		}
 
-protected:
-	unsigned long _pid;
+#ifdef __DEBUG__
+		std::cout << "MovePlayerTask: " << dir << std::endl;
+#endif
 
+		_player->lastmove = OTSYS_TIME();
+		ReturnValue ret = game->moveCreature(_player, dir);
+
+		game->flushSendBuffers();
+
+		return (ret == RET_NOERROR);
+	}
+
+private:
+	Player* _player;
 };
-*/
+
+class Task{
+public:
+	Task(boost::function1<bool, Game*> f) :
+		_f(f)
+	{
+		//
+	}
+
+	virtual ~Task()
+	{
+		//
+	}
+
+	virtual void operator()(Game* arg)
+	{
+		_f(arg);
+	}
+
+protected:
+	boost::function1<bool, Game*> _f;
+};
+
 #endif
