@@ -412,7 +412,7 @@ protected:
 	Item* tradeItem;
 	
 	//autowalking
-	std::list<Direction> pathlist;
+	std::list<Direction> listWalkDir;
 	
 	//cache some data
 	struct SkillCache{
