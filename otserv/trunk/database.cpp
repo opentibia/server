@@ -21,22 +21,16 @@
 #include <iostream>
 #include "database.h"
 
+DBResult::DBResult()
+{
+	m_numFields = 0;
+	m_numRows = 0;
+	/*m_lastNumFields = 0;*/
+}
+
 DBResult::~DBResult()
 {
 	clear();
-	/*
-	RowDataMap::iterator it;
-	for(it = m_listRows.begin(); it != m_listRows.end();)
-	{
-		for(unsigned int i=0; i < m_numFields; ++i)
-			delete[] it->second[i];
-		
-		delete[] it->second;
-		m_listRows.erase(it++);
-	}
-
-	m_numRows = 0;
-	*/
 }
 
 void DBResult::addRow(MYSQL_ROW r, unsigned long* lengths, unsigned int num_fields)
@@ -53,9 +47,6 @@ void DBResult::addRow(MYSQL_ROW r, unsigned long* lengths, unsigned int num_fiel
 			rd->length[i] = NULL;
 			continue;
 		}
-		
-		//row[i] = new char[strlen(r[i])+1];
-		//memcpy(row[i], r[i], strlen(r[i])+1);
 
 		unsigned long colLen = lengths[i];
 		rd->row[i] = new char[colLen + 1];
@@ -66,9 +57,9 @@ void DBResult::addRow(MYSQL_ROW r, unsigned long* lengths, unsigned int num_fiel
 	}
 	
 	m_listRows[m_numRows] = rd;	
-	//m_listRows[m_numRows] = row;
 	m_numRows++;
 }
+
 /*
 void DBResult::clearRows()
 {
@@ -108,19 +99,6 @@ void DBResult::clear()
 		delete[] it->second;
 		m_listRows.erase(it++);
 	}
-
-	/*
-	std::map<unsigned int, char **>::iterator it;
-	for(it = m_listRows.begin(); it != m_listRows.end();)
-	{
-		for(unsigned int i = 0; i < m_numFields; ++i)
-			if(it->second[i] != NULL)
-				delete[] it->second[i];
-		
-		delete[] it->second;
-		m_listRows.erase(it++);
-	}
-	*/
 
 	m_numRows = 0;
 	m_listNames.clear();
@@ -215,6 +193,16 @@ const char* DBResult::getDataBlob(const std::string &s, unsigned long& size, uns
 
 Database::Database()
 {
+	init();
+}
+
+Database::~Database()
+{
+	disconnect();
+}
+
+bool Database::init()
+{
 	m_initialized = false;
 	m_connected = false;
 	
@@ -225,21 +213,15 @@ Database::Database()
 	}
 	else
 		m_initialized = true;
-}
 
-Database::~Database()
-{
-	if(m_initialized)
-	{
-		mysql_close(&m_handle);
-		m_initialized = false;
-	}
+	return m_initialized;
 }
 
 bool Database::connect(const char *db_name, const char *db_host, const char *db_user, const char *db_pass)
 {
-	if(!m_initialized)
+	if(!m_initialized && !init()){
 		return false;
+	}
 	
 	// Connect to the database host
 	if(!mysql_real_connect(&m_handle, db_host, db_user, db_pass, NULL, 0, NULL, 0))
@@ -259,6 +241,17 @@ bool Database::connect(const char *db_name, const char *db_host, const char *db_
 	
 	m_connected = true;
 	return true;
+}
+
+bool Database::disconnect()
+{
+	if(m_initialized){
+		mysql_close(&m_handle);
+		m_initialized = false;
+		return true;
+	}
+
+	return false;
 }
 
 bool Database::executeQuery(DBQuery &q)

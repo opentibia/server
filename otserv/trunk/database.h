@@ -85,7 +85,7 @@ protected:
 class DBResult
 {
 public:
-	DBResult(){ m_numFields=0; m_numRows=0; /*m_lastNumFields=0;*/ };
+	DBResult();
 	~DBResult();
 	
 	/** Get the Integer value of a field in database
@@ -177,7 +177,7 @@ class Database
 public:
 	Database();
 	~Database();
-	
+
 	/** Connect to a mysql database
 	*\returns
 	* 	TRUE if the connection is ok
@@ -188,6 +188,13 @@ public:
 	*\param db_pass The "password" of the username used
 	*/ 
 	bool connect(const char *db_name, const char *db_host, const char *db_user, const char *db_pass);
+
+	/** Disconnects from the connected database
+	*\returns
+	* 	TRUE if the database was disconnected
+	* 	FALSE if the database was not disconnected or no database selected
+	*/ 
+	bool disconnect();
 	
 	/** Execute a query which don't get any information of the database (for ex.: INSERT, UPDATE, etc)
 	*\returns
@@ -219,6 +226,14 @@ public:
 	static std::string escapeString(const char* s, unsigned long size);
 
 private:
+
+	/** initialize the database
+	*\returns
+	* 	TRUE if the database was successfully initialized
+	* 	FALSE if the database was not successfully initialized
+	*/ 
+	bool init();
+
 	bool m_initialized;
 	bool m_connected;
 	MYSQL m_handle;

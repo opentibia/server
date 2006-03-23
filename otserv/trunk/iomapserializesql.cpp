@@ -39,7 +39,9 @@ IOMapSerializeSQL::~IOMapSerializeSQL()
 
 bool IOMapSerializeSQL::loadMap(Map* map, const std::string& identifier)
 {
-	db.connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str());
+	if(!db.connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str())){
+		return false;
+	}
 	
 	for(HouseMap::iterator it = Houses::getInstance().getHouseBegin(); it != Houses::getInstance().getHouseEnd(); ++it){
 		//load tile
@@ -48,25 +50,33 @@ bool IOMapSerializeSQL::loadMap(Map* map, const std::string& identifier)
 			loadTile(*it);
 		}
 	}
-
+	
+	db.disconnect();
 	return true;
 }
 
 bool IOMapSerializeSQL::saveMap(Map* map, const std::string& identifier)
 {
+	if(!db.connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str())){
+		return false;
+	}
+
 	DBQuery query;
-	db.connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str());
 
 	//clear old tile data
 	query.reset();
 	query << "DELETE FROM tileitems;";
-	if(!db.executeQuery(query))
+	if(!db.executeQuery(query)){
+		db.disconnect();
 		return false;
+	}
 
 	query.reset();
 	query << "DELETE FROM tilelist;";
-	if(!db.executeQuery(query))
+	if(!db.executeQuery(query)){
+		db.disconnect();
 		return false;
+	}
 
 	uint32_t tileId = 0;
 
@@ -74,8 +84,10 @@ bool IOMapSerializeSQL::saveMap(Map* map, const std::string& identifier)
 		//Start the transaction	
 		query.reset();
 		query << "BEGIN;";
-		if(!db.executeQuery(query))
+		if(!db.executeQuery(query)){
+			db.disconnect();
 			return false;
+		}
 
 		//save house items
 		House* house = it->second;
@@ -88,10 +100,13 @@ bool IOMapSerializeSQL::saveMap(Map* map, const std::string& identifier)
 		query.reset();
 		query << "COMMIT;";
 
-		if(!db.executeQuery(query))
+		if(!db.executeQuery(query)){
+			db.disconnect();
 			return false;
+		}
 	}
 
+	db.disconnect();
 	return true;
 }
 
