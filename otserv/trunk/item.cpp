@@ -546,16 +546,6 @@ bool Item::hasProperty(enum ITEMPROPERTY prop) const
 			if(it.isHorizontal)
 				return true;
 		break;
-
-		/*case NOTMOVEABLEBLOCKSOLID:
-			if(it.blockSolid && !it.moveable)
-				return true;
-		break;*/
-
-		/*case NOTMOVEABLEBLOCKPATHFIND:
-			if(it.blockPathFind && !it.moveable)
-				return true;
-		break;*/
 	}
 
 	return false;
