@@ -2594,13 +2594,28 @@ bool Game::playerAutoWalk(Player* player, std::list<Direction>& listDir)
 
 	stopEvent(player->eventAutoWalk);
 	player->eventAutoWalk = 0;
+	
+	if(listDir.empty()){
+		player->listWalkDir.clear();
+		return false;
+	}
 
 	player->listWalkDir = listDir;
+
 	player->lastmove = OTSYS_TIME();
 	int ticks = (int)player->getSleepTicks();
+	if(ticks <= 0){
+		//std::cout << player->getName() << " playerAutoWalk - " << (int)ticks << std::endl;
 
-	//std::cout << "playerAutoWalk - " << (int)ticks << std::endl;
-	player->eventAutoWalk = addEvent(makeTask(0, std::bind2nd(std::mem_fun(&Game::checkAutoWalkPlayer), player->getID())));
+		//trigger first, put others in an event
+		checkAutoWalkPlayer(player->getID());
+	}
+	
+	if(!listDir.empty()){
+		//std::cout << player->getName() << " playerAutoWalk - " << (int)ticks << std::endl;
+		player->eventAutoWalk = addEvent(makeTask(player->getSleepTicks(), std::bind2nd(std::mem_fun(&Game::checkAutoWalkPlayer), player->getID())));
+	}
+
 	return true;
 }
 
@@ -3140,6 +3155,7 @@ bool Game::playerFollowCreature(Player* player, unsigned long creatureId)
 	if(!followCreature){
 		player->sendCancelMessage(RET_NOTPOSSIBLE);
 		player->sendCancelWalk();
+		player->sendCancelAttacking();
 		return false;
 	}
 
@@ -3149,8 +3165,11 @@ bool Game::playerFollowCreature(Player* player, unsigned long creatureId)
 		if(!map->getPathTo(player, followCreature->getPosition(), listDir)){
 			player->sendCancelMessage(RET_THEREISNOWAY);
 			player->sendCancelWalk();
+			player->sendCancelAttacking();
 			return false;
 		}
+
+		listDir.pop_back();
 	}
 
 	player->setFollowCreature(followCreature);
@@ -3335,19 +3354,15 @@ void Game::checkAutoWalkPlayer(unsigned long id)
 		Direction dir = player->listWalkDir.front();
 		player->listWalkDir.pop_front();
 
-	/*
-	#ifdef __DEBUG__
-		std::cout << "move to: " << dir << std::endl;
-	#endif
-	*/
-
-		player->lastmove = OTSYS_TIME();
+		//player->lastmove = OTSYS_TIME();
 		moveCreature(player, dir);
+		player->lastmove = OTSYS_TIME();
 
 		flushSendBuffers();
 
 		if(!player->isRemoved() && !player->listWalkDir.empty()) {
 			int ticks = (int)player->getSleepTicks();
+			//std::cout << player->getName() << " checkAutoWalkPlayer - " << (int)ticks << std::endl;
 			player->eventAutoWalk = addEvent(makeTask(ticks, std::bind2nd(std::mem_fun(&Game::checkAutoWalkPlayer), id)));
 		}
 		else

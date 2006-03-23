@@ -1210,8 +1210,10 @@ void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bo
 
 	if(followCreature && followCreature == creature){
 		setFollowCreature(NULL);
-		sendTextMessage(MSG_SMALLINFO, "Target lost.");
 		g_game.playerFollowCreature(this, 0);
+		sendTextMessage(MSG_SMALLINFO, "Target lost.");
+		sendCancelWalk();
+		sendCancelAttacking();
 	}
 
 	if(creature == this){
@@ -1260,8 +1262,10 @@ void Player::onCreatureMove(const Creature* creature, const Position& oldPos, ui
 		}
 		else{
 			setFollowCreature(NULL);
-			sendTextMessage(MSG_SMALLINFO, "Target lost.");
 			g_game.playerFollowCreature(this, 0);
+			sendTextMessage(MSG_SMALLINFO, "Target lost.");
+			sendCancelWalk();
+			sendCancelAttacking();
 		}
 	}
 
@@ -2344,7 +2348,7 @@ void Player::setChaseMode(uint8_t mode)
 		chaseMode = CHASEMODE_STANDSTILL;
 	}
 	
-	if(prevChaseMode != chaseMode){
+	if(attackedCreature2 && prevChaseMode != chaseMode){
 		if(chaseMode == CHASEMODE_FOLLOW){
 			/*chase opponent*/
 			g_game.playerFollowCreature(this, attackedCreature2);
