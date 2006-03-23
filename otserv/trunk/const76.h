@@ -18,8 +18,8 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __CONST76_H__
-#define __CONST76_H__
+#ifndef __OTSERV_CONST76_H__
+#define __OTSERV_CONST76_H__
 
 #define NETWORKMESSAGE_MAXSIZE 16768
 
@@ -132,6 +132,10 @@ enum e_fluids {
 	FLUID_WINE = FLUID_PURPLE+8,
 };
 
+enum SquareColor {
+	SQ_COLOR_NONE = 256,
+	SQ_COLOR_BLACK = 0,
+};
 
 enum Icons {
 	ICON_POISON = 1,
