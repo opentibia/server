@@ -18,7 +18,6 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-
 #include "definitions.h"
 #include "const76.h"
 #include "player.h"
@@ -29,9 +28,12 @@
 #include "container.h"
 #include "depot.h"
 #include "house.h"
+#include "tasks.h"
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h> 
+
+#include <boost/bind.hpp>
 
 #include "actions.h"
 
@@ -215,27 +217,15 @@ Action *Actions::getAction(const Item *item)
 }
 
 bool Actions::UseItem(Player* player, const Position& pos, const unsigned char stack, 
-	const unsigned short itemid, const unsigned char index)
+	const unsigned short itemId, const unsigned char index)
 {	
-	if(canUse(player,pos)== TOO_FAR){
-		/*
-		bool Game::playerUseItem(Player* player, const Position& pos, uint8_t stackpos, uint8_t index, uint16_t itemId)
-
-		boost::function1<void, Game*> _f = boost::bind(&Game::playerUseItem, game,
-			player, pos, stack, index, itemid);
-		*/
-
-		player->sendCancelMessage(RET_TOOFARAWAY);
-		return false;
-	}
-	
 	Thing* thing = game->internalGetThing(player, pos, stack);
 	if(!thing){
 		player->sendCancelMessage(RET_NOTPOSSIBLE);
 		return false;
 	}
 
-	Item *item = thing->getItem();
+	Item* item = thing->getItem();
 
 	if(!item){
 		#ifdef __DEBUG__
@@ -245,7 +235,7 @@ bool Actions::UseItem(Player* player, const Position& pos, const unsigned char s
 		return false;
 	}
 	
-	if(item->getID() != itemid){
+	if(item->getID() != itemId){
 		#ifdef __DEBUG__
 		std::cout << "no id" << std::endl;
 		#endif
@@ -253,6 +243,22 @@ bool Actions::UseItem(Player* player, const Position& pos, const unsigned char s
 		return false;
 	} 
 	
+	if(canUse(player, pos) == TOO_FAR){
+		player->sendCancelMessage(RET_TOOFARAWAY);
+		return false;
+
+		/*
+		Task* task = new Task( boost::bind(&Game::playerUseItem, game,
+			player, pos, stack, index, itemId) );
+
+		ReturnValue ret = game->internalPlayerTryReach(player, item->getPosition(), task);
+		if(ret != RET_NOERROR){
+			player->sendCancelMessage(ret);
+			return false;
+		}
+		*/
+	}
+
 	//check if it is a house door
 	if(Door* door = item->getDoor()){
 		if(door->canUse(player) == false){
@@ -262,7 +268,7 @@ bool Actions::UseItem(Player* player, const Position& pos, const unsigned char s
 	}
 	
 	//look for the item in action maps	
-	Action *action = getAction(item);
+	Action* action = getAction(item);
 	
 	//if found execute it
 	if(action){
