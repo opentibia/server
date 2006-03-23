@@ -249,6 +249,8 @@ public:
 	*/
 	std::list<Position> getPathTo(Creature* creature, Position start, Position to, int maxNodeSize = 100);
 
+	bool getPathTo(Creature* creature, Position toPosition, std::list<Direction>& listDir);
+
 	/* Map Width and Height - for Info purposes */
 	int mapwidth, mapheight;
 	

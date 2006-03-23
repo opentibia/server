@@ -203,9 +203,9 @@ bool Map::placeCreature(const Position& pos, Creature* creature, bool forceLogin
 {
 	Tile* tile = getTile(pos.x, pos.y, pos.z);
 	
-	bool shouldPlaceInPz = false;
+	bool placeInPZ = false;
 	if(tile){
-		shouldPlaceInPz = tile->isPz();
+		placeInPZ = tile->isPz();
 		ReturnValue ret = tile->__queryAdd(0, creature, 1, 0);
 
 		if(forceLogin || ret == RET_NOERROR){
@@ -225,7 +225,7 @@ bool Map::placeCreature(const Position& pos, Creature* creature, bool forceLogin
 	for(int cx = pos.x - 1; cx <= pos.x + 1; cx++){
 		for(int cy = pos.y - 1; cy <= pos.y + 1; cy++){
 			tile = getTile(cx, cy, pos.z);
-			if(!tile || (shouldPlaceInPz && !tile->isPz()))
+			if(!tile || (placeInPZ && !tile->isPz()))
 				continue;
 
 			if(tile->__queryAdd(0, creature, 1, 0) == RET_NOERROR){
@@ -444,6 +444,7 @@ std::list<Position> Map::getPathTo(Creature* creature, Position start, Position 
 	AStarNodes nodes;
 	AStarNode* found = NULL;
 	int z = start.z;
+
 	AStarNode* startNode = nodes.createOpenNode();
 	startNode->parent = NULL;
 	startNode->h = 0;
@@ -480,14 +481,15 @@ std::list<Position> Map::getPathTo(Creature* creature, Position start, Position 
 						if(n){
 							n->x = x;
 							n->y = y;
-							n->h = abs(n->x - to.x)*abs(n->x - to.x) + abs(n->y - to.y)*abs(n->y - to.y);
+							n->h = std::abs(n->x - to.x) * std::abs(n->x - to.x) + std::abs(n->y - to.y) * std::abs(n->y - to.y);
 							n->parent = current;
+
 							if(x == to.x && y == to.y){
 								found = n;
 							}
 						}
 					}
-/*					else{
+					/*else{
 						if(current->g + 1 < child->g)
 							child->parent = current;
 							child->g=current->g+1;
@@ -509,6 +511,123 @@ std::list<Position> Map::getPathTo(Creature* creature, Position start, Position 
 	return path;
 }
 
+bool Map::getPathTo(Creature* creature, Position toPosition, std::list<Direction>& listDir)
+{
+	AStarNodes nodes;
+	AStarNode* found = NULL;
+
+	Position startPos = creature->getPosition();
+
+	AStarNode* startNode = nodes.createOpenNode();
+	startNode->parent = NULL;
+	startNode->h = 0;
+	startNode->x = toPosition.x;
+	startNode->y = toPosition.y;
+
+	int x, y = 0;
+	int z = toPosition.z;
+	
+	while(!found && nodes.countClosedNodes() < 100){		
+		AStarNode* current = nodes.getBestNode();
+		if(!current){
+			listDir.clear();
+			return false; //no path found
+		}
+		
+		nodes.closeNode(current);
+		
+		for(int dx = -1; dx <= 1; dx++){
+			for(int dy = -1; dy <= 1; dy++){
+				if(std::abs(dx) != std::abs(dy)){
+					x = current->x + dx;
+					y = current->y + dy;
+
+					if(!(x == startPos.x && y == startPos.y)){
+						Tile* tile = getTile(x, y, z);
+						if(!tile || tile->hasProperty(BLOCKPATHFIND) || tile->__queryAdd(0, creature, 1, 0) != RET_NOERROR){
+							continue;
+						}
+					}
+
+					/*
+					Tile* tile = getTile(x, y, z);
+					if(tile){
+						if(creature->getTile() != tile){
+							ReturnValue ret = tile->__queryAdd(0, creature, 1, 0);
+
+							if(ret != RET_NOERROR)
+								continue;
+						}
+					}
+					else
+						continue;
+					*/
+					
+					if(!nodes.isInList(x,y)){
+						AStarNode* n = nodes.createOpenNode();
+						if(n){
+							n->x = x;
+							n->y = y;
+							n->h = std::abs(n->x - startPos.x) * std::abs(n->x - startPos.x) + std::abs(n->y - startPos.y) * std::abs(n->y - startPos.y);
+							n->parent = current;
+
+							if(x == startPos.x && y == startPos.y){
+								found = n;
+							}
+						}
+					}
+					/*else{
+						if(current->g + 1 < child->g)
+							child->parent = current;
+							child->g=current->g+1;
+					}*/
+				}
+			}
+		}
+	}
+
+	Position prevPos = startPos;
+	Direction dir;
+
+	//cleanup the mess
+	while(found){
+		Position p;
+		p.x = found->x;
+		p.y = found->y;
+		p.z = z;
+
+		int dx = p.x - prevPos.x;
+		int dy = p.y - prevPos.y;
+
+		prevPos = p;
+
+		if(dx == -1 && dy == -1)
+			dir = NORTHWEST;
+		else if(dx == 1 && dy == -1)
+			dir = NORTHEAST;
+		else if(dx == -1 && dy == 1)
+			dir = SOUTHWEST;
+		else if(dx == 1 && dy == 1)
+			dir = SOUTHEAST;
+		else if(dx == -1)
+			dir = WEST;
+		else if(dx == 1)
+			dir = EAST;
+		else if(dy == -1)
+			dir = NORTH;
+		else if(dy == 1)
+			dir = SOUTH;
+		else{
+			found = found->parent;
+			continue;
+		}
+
+		listDir.push_back(dir);
+		found = found->parent;
+	}
+
+	return true;
+}
 
 AStarNodes::AStarNodes()
 {
