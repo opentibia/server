@@ -719,6 +719,11 @@ bool Commands::sellHouse(Creature* creature, const std::string& cmd, const std::
 			return false;
 		}
 		
+		if(tradePartner->getPlayerInfo(PLAYERINFO_LEVEL) < 1){
+			player->sendCancel("Trade player level is too low.");
+			return false;
+		}
+		
 		if(Houses::getInstance().getHouseByPlayerId(tradePartner->getGUID())){
 			player->sendCancel("Trade player already owns a house.");
 			return false;
@@ -736,8 +741,12 @@ bool Commands::sellHouse(Creature* creature, const std::string& cmd, const std::
 		}
 		
 		transferItem->getParent()->setParent(player);
-		game->internalStartTrade(player, tradePartner, transferItem);
-		return true;
+		if(game->internalStartTrade(player, tradePartner, transferItem)){
+			return true;
+		}
+		else{
+			house->resetTransferItem();
+		}
 	}
 	return false;
 }

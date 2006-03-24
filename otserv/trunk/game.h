@@ -464,7 +464,7 @@ public:
 				if(_list.empty()){
 					//callback function
 					if(_f2){
-						(*_f2)(arg);
+						(_f2)(arg);
 						delete _f2;
 					}
 				}

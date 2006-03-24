@@ -289,6 +289,7 @@ bool House::isInvited(const Player* player)
 
 void House::addDoor(Door* door)
 {
+	door->useThing2();
 	doorList.push_back(door);
 	door->setHouse(this);
 }
