@@ -29,6 +29,7 @@
 #include "depot.h"
 #include "house.h"
 #include "tasks.h"
+#include "tools.h"
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h> 
@@ -36,8 +37,6 @@
 #include <boost/bind.hpp>
 
 #include "actions.h"
-
-bool readXMLInteger(xmlNodePtr p, const char *tag, int &value);
 
 Actions::Actions(Game* igame)
 :game(igame)
@@ -391,20 +390,6 @@ bool Actions::UseItemEx(Player* player, const Position &from_pos,
 }
 
 //
-
-bool readXMLInteger(xmlNodePtr p, const char *tag, int &value)
-{
-	char* sinteger = (char*)xmlGetProp(p, (xmlChar*)tag);
-	if(!sinteger)
-		return false;
-	else{
-		unsigned short integer = atoi(sinteger);
-		value = integer;
-		xmlFreeOTSERV(sinteger);
-		return true;
-	}
-}
-
 
 Action::Action(Game* igame,const std::string &datadir, const std::string &scriptname)
 {

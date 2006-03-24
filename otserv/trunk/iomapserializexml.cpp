@@ -22,6 +22,7 @@
 
 #include "house.h"
 #include "town.h"
+#include "tools.h"
 
 #include <sstream>
 #include <libxml/xmlmemory.h>
@@ -45,7 +46,6 @@ bool IOMapSerializeXML::loadMap(Map* map, const std::string& identifier)
 	xmlNodePtr nodeChild;
 	char* nodeValue;
 
-	//xmlLineNumbersDefault(1);
 	xmlSubstituteEntitiesDefault(1);
 	xmlDocPtr doc = xmlParseFile(identifier.c_str());
 	if(!doc){
@@ -218,7 +218,6 @@ bool IOMapSerializeXML::saveMap(Map* map, const std::string& identifier)
 	}
 	
 	xmlSaveFormatFileEnc(identifier.c_str(), doc, "UTF-8", 1);
-
 	xmlFreeDoc(doc);
 	
 	return true;
@@ -237,10 +236,10 @@ bool IOMapSerializeXML::saveTile(xmlNodePtr nodeMap, const Tile* tile)
 			continue;
 
 		if(!(!item->isNotMoveable() ||
-			item->isDoor() ||
+			item->getDoor() ||
 			item->getContainer() ||
 			(item->getRWInfo(n) & CAN_BE_WRITTEN)
-			/*item->isBed()*/))
+			/*item->getBed()*/))
 			continue;
 
 		if(!nodeTile){
@@ -369,12 +368,153 @@ bool IOMapSerializeXML::loadTile(Map* map, xmlNodePtr nodeTile, Tile* tile)
 
 bool IOMapSerializeXML::loadHouseInfo(Map* map, const std::string& identifier)
 {
-	return false;
+	xmlSubstituteEntitiesDefault(1);
+	xmlDocPtr doc = xmlParseFile(identifier.c_str());
+	if(!doc){
+		map->setLastError(LOADMAPERROR_CANNOTOPENFILE);
+		return false;
+	}
+
+	xmlNodePtr root = xmlDocGetRootElement(doc);
+	if(xmlStrcmp(root->name, (const xmlChar*) "houses") != 0){
+		xmlFreeDoc(doc);
+		map->setLastError(LOADMAPERROR_GETROOTHEADERFAILED);
+		return false;
+	}
+
+	xmlNodePtr nodeHouse = root->children;
+	int value = 0;
+
+	while(nodeHouse){
+		if(xmlStrcmp(nodeHouse->name, (const xmlChar*)"house") == 0){
+			int houseid = 0;
+			if(readXMLInteger(nodeHouse, "houseid", value)){
+				houseid = value;
+			}
+			else{
+				map->setLastError(LOADMAPERROR_GETPROPFAILED);
+				return false;
+			}
+
+			House* house = Houses::getInstance().getHouse(houseid);
+			if(house){
+				if(readXMLInteger(nodeHouse, "owner", value)){
+					house->setHouseOwner(value);
+				}
+				else{
+					map->setLastError(LOADMAPERROR_GETPROPFAILED);
+					return false;
+				}
+
+				if(readXMLInteger(nodeHouse, "paid", value)){
+					house->setPaidUntil(value);
+				}
+				else{
+					map->setLastError(LOADMAPERROR_GETPROPFAILED);
+					return false;
+				}
+
+				if(readXMLInteger(nodeHouse, "warnings", value)){
+					house->setHouseOwner(value);
+				}
+				else{
+					map->setLastError(LOADMAPERROR_GETPROPFAILED);
+					return false;
+				}
+
+				if(readXMLInteger(nodeHouse, "warnings", value)){
+					house->setPayRentWarnings(value);
+				}
+				else{
+					map->setLastError(LOADMAPERROR_GETPROPFAILED);
+					return false;
+				}
+
+				xmlNodePtr nodeHouseAccessList = nodeHouse->children;
+				while(nodeHouseAccessList){
+					if(xmlStrcmp(nodeHouseAccessList->name,(const xmlChar*) "accesslist")==0){
+						int listId = 0;
+						if(readXMLInteger(nodeHouseAccessList, "listid", listId)){
+							std::string text;
+							if(readXMLString(nodeHouseAccessList, "text", text)){
+								house->setAccessList(listId, text);
+							}
+						}
+					}
+
+					nodeHouseAccessList = nodeHouseAccessList->next;
+				}
+			}
+		}
+
+		nodeHouse = nodeHouse->next;
+	}
+
+	return (map->getLastError() == LOADMAPERROR_NONE);
 }
 
 bool IOMapSerializeXML::saveHouseInfo(Map* map, const std::string& identifier)
 {
-	return false;
+	xmlDocPtr doc = xmlNewDoc((xmlChar*) "1.0");
+  xmlNodePtr nodeHouses = xmlNewNode(NULL, (xmlChar*) "houses");
+  xmlDocSetRootElement(doc, nodeHouses);
+
+	std::stringstream ss;
+
+	for(HouseMap::iterator it = Houses::getInstance().getHouseBegin(); it != Houses::getInstance().getHouseEnd(); ++it){
+		House* house = it->second;
+		
+		xmlNodePtr nodeHouse = xmlNewChild(nodeHouses, NULL, (xmlChar*) "house", NULL);
+
+		ss.str("");
+		ss << house->getHouseId();
+		xmlNewProp(nodeHouse, (xmlChar*) "houseid", (xmlChar*) ss.str().c_str());
+
+		ss.str("");
+		ss << house->getHouseOwner();
+		xmlNewProp(nodeHouse, (xmlChar*) "owner", (xmlChar*) ss.str().c_str());
+
+		ss.str("");
+		ss << house->getPaidUntil();
+		xmlNewProp(nodeHouse, (xmlChar*) "paid", (xmlChar*) ss.str().c_str());
+		
+		ss.str("");
+		ss << house->getPayRentWarnings();
+		xmlNewProp(nodeHouse, (xmlChar*) "warnings", (xmlChar*) ss.str().c_str());
+		
+		xmlNodePtr nodeHouseAccessList = xmlNewChild(nodeHouse, NULL, (xmlChar*) "accesslist", NULL);
+
+		std::string listText;
+		if(house->getAccessList(GUEST_LIST, listText) && listText != ""){
+			saveAccessList(nodeHouseAccessList, GUEST_LIST, listText);
+		}
+
+		if(house->getAccessList(SUBOWNER_LIST, listText) && listText != ""){
+			saveAccessList(nodeHouseAccessList, SUBOWNER_LIST, listText);
+		}
+		
+		for(HouseDoorList::iterator it = house->getHouseDoorBegin(); it != house->getHouseDoorEnd(); ++it){
+			const Door* door = *it;
+			if(door->getAccessList(listText) && listText != ""){
+				saveAccessList(nodeHouseAccessList, door->getDoorId(), listText);
+			}
+		}
+	}
+
+	xmlSaveFormatFileEnc(identifier.c_str(), doc, "UTF-8", 1);
+	xmlFreeDoc(doc);
+
+	return true;
 }
 
+void IOMapSerializeXML::saveAccessList(xmlNodePtr nodeHouseAccessList, unsigned long listId, const std::string& listText)
+{
+	std::stringstream ss;
 
+	ss << listId;
+	xmlNewProp(nodeHouseAccessList, (xmlChar*) "listid", (xmlChar*) ss.str().c_str());
+
+	ss.str("");
+	ss << listText;
+	xmlNewProp(nodeHouseAccessList, (xmlChar*) "text", (xmlChar*) ss.str().c_str());
+}

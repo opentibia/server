@@ -52,6 +52,30 @@ void trim_left(std::string &source, const std::string &t)
 	source.erase(0, source.find_first_not_of(t));
 }
 
+bool readXMLInteger(xmlNodePtr node, const char* tag, int& value)
+{
+	char* nodeValue = (char*)xmlGetProp(node, (xmlChar*)tag);
+	if(nodeValue){
+		value = atoi(nodeValue);
+		xmlFreeOTSERV(nodeValue);
+		return true;
+	}
+
+	return false;
+}
+
+bool readXMLString(xmlNodePtr node, const char* tag, std::string& value)
+{
+	char* nodeValue = (char*)xmlGetProp(node, (xmlChar*)tag);
+	if(nodeValue){
+		value = nodeValue;
+		xmlFreeOTSERV(nodeValue);
+		return true;
+	}
+
+	return false;
+}
+
 //////////////////////////////////////////////////
 // get a random value between lowest_number and highest_number
 int random_range(int lowest_number, int highest_number)

@@ -18,18 +18,26 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __OTSERV_TOOLS_H
-#define __OTSERV_TOOLS_H
+#ifndef __OTSERV_TOOLS_H__
+#define __OTSERV_TOOLS_H__
+
+#include "definitions.h"
 
 #include <string>
 #include <algorithm>
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <libxml/parser.h>
+
 bool fileExists(const char* filename);
 void replaceString(std::string& str, const std::string sought, const std::string replacement);
 void trim_right(std::string &source, const std::string &t);
 void trim_left(std::string &source, const std::string &t);
+
+bool readXMLInteger(xmlNodePtr node, const char* tag, int& value);
+bool readXMLString(xmlNodePtr node, const char* tag, std::string& value);
+
 int random_range(int lowest_number, int highest_number);
 void hexdump(unsigned char *_data, int _len);
 char upchar(char c);
