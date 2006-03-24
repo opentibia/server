@@ -59,7 +59,7 @@ public:
 #endif
 
 		_player->lastmove = OTSYS_TIME();
-		ReturnValue ret = game->moveCreature(_player, dir);
+		ReturnValue ret = game->internalMoveCreature(_player, dir);
 
 		game->flushSendBuffers();
 
