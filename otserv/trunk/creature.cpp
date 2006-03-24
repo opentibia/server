@@ -307,16 +307,27 @@ int Creature::getStepDuration() const
 	return duration;
 };
 
-long long Creature::getSleepTicks() const
+__int64 Creature::getSleepTicks() const
 {
-	long long delay = 0;
+	__int64 delay = 0;
 	int stepDuration = getStepDuration();
 	
 	if(lastmove != 0) {
-		delay = (((long long)(lastmove)) + ((long long)(stepDuration))) - ((long long)(OTSYS_TIME()));
+		delay = (((__int64)(lastmove)) + ((__int64)(stepDuration))) - ((__int64)(OTSYS_TIME()));
 	}
 	
 	return delay;
+}
+
+__int64 Creature::getEventStepTicks() const
+{
+	__int64 ret = getSleepTicks();
+
+	if(ret <=0){
+		ret = getStepDuration();
+	}
+
+	return ret;
 }
 
 void Creature::getCreatureLight(LightInfo& light) const

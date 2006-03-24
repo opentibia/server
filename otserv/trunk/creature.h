@@ -178,7 +178,8 @@ public:
 	void addCondition(const CreatureCondition& condition, bool refresh);
 	Conditions& getConditions() {return conditions;};
 	
-	long long getSleepTicks() const;
+	__int64 getSleepTicks() const;
+	__int64 getEventStepTicks() const;
 	int getStepDuration() const;
 	
 	unsigned short getSpeed() const {return speed;};
