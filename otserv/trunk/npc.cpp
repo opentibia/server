@@ -296,13 +296,13 @@ void Npc::doSay(std::string msg)
 
 void Npc::doMove(Direction dir)
 {
-	g_game.moveCreature(this, dir);
+	g_game.internalMoveCreature(this, dir);
 }
 
 void Npc::doMoveTo(Position target)
 {
 	if(route.size() == 0 || route.back() != target || route.front() != getPosition()){
-		route = g_game.getPathTo(this, getPosition(), target);
+		route = g_game.map->getPathTo(this, getPosition(), target);
 	}
 
 	if(route.size() == 0){
@@ -336,7 +336,7 @@ void Npc::doMoveTo(Position target)
 	else
 		dir = SOUTH;
 
-	g_game.moveCreature(this, dir);
+	g_game.internalMoveCreature(this, dir);
 }
 
 NpcScript::NpcScript(std::string scriptname, Npc* _npc)

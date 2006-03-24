@@ -52,7 +52,7 @@ const int Player::CapGain[5] = {10, 10, 10, 20, 25};
 const int Player::ManaGain[5] = {5, 30, 30, 15, 5};
 const int Player::HPGain[5] = {5, 5, 5, 10, 15};
 
-Player::Player(const std::string& name, Protocol *p) :
+Player::Player(const std::string& _name, Protocol *p) :
 Creature()
 {	
 	client = p;
@@ -61,22 +61,21 @@ Creature()
 		client->setPlayer(this);
 	}
 
+	name       = _name;
 	looktype   = PLAYER_MALE_1;
 	vocation   = VOCATION_NONE;
-	capacity = 300.00;
+	capacity   = 300.00;
 	mana       = 0;
 	manamax    = 0;
 	manaspent  = 0;
-	this->name = name;
 	food       = 0;
 	guildId    = 0;
 
 	eventAutoWalk = 0;
+
 	level      = 1;
 	experience = 180;
-
 	maglevel   = 20;
-
 	access     = 0;
 	lastlogin  = 0;
 	lastLoginSaved = 0;
@@ -1208,13 +1207,7 @@ void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bo
 		sendCancelAttacking();
 	}
 
-	if(followCreature && followCreature == creature){
-		setFollowCreature(NULL);
-		g_game.playerFollowCreature(this, 0);
-		sendTextMessage(MSG_SMALLINFO, "Target lost.");
-		sendCancelWalk();
-		sendCancelAttacking();
-	}
+	checkFollowCreature(creature, true);
 
 	if(creature == this){
 		if(isLogout){
@@ -1222,8 +1215,7 @@ void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bo
 		}
 
 		if(followCreature){
-			setFollowCreature(NULL);
-			g_game.playerFollowCreature(this, 0);
+			stopAutoWalk();
 		}
 
 		if(tradePartner){
@@ -1231,7 +1223,7 @@ void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bo
 		}
 
 		if(eventAutoWalk != 0){
-			g_game.stopEvent(eventAutoWalk);
+			stopAutoWalk();
 		}
 
 		g_chat.removeUserFromAllChannels(this);
@@ -1256,18 +1248,7 @@ void Player::onCreatureMove(const Creature* creature, const Position& oldPos, ui
 		} 
 	}
 	
-	if(followCreature && followCreature == creature){
-		if(Position::areInRange<7,5,0>(followCreature->getPosition(), getPosition())){
-			g_game.playerFollowCreature(this, followCreature->getID());
-		}
-		else{
-			setFollowCreature(NULL);
-			g_game.playerFollowCreature(this, 0);
-			sendTextMessage(MSG_SMALLINFO, "Target lost.");
-			sendCancelWalk();
-			sendCancelAttacking();
-		}
-	}
+	checkFollowCreature(creature);
 
 	if(creature == this){
 		if(tradeState != TRADE_TRANSFER){
@@ -1383,6 +1364,37 @@ void Player::onRemoveInventoryItem(slots_t slot, const Item* item)
 		const Container* container = item->getContainer();
 		if(container && container->isHoldingItem(tradeItem)){
 			g_game.playerCloseTrade(this);
+		}
+	}
+}
+
+void Player::checkFollowCreature(const Creature* creature, bool creatureDisappear /*= false*/)
+{
+	if(followCreature && creature == followCreature){
+		bool continueFollow = true;
+
+		/*check if we still can follow this creature*/
+		std::list<Direction> listDir;
+		if(creatureDisappear && followCreature == creature){
+			continueFollow = false;
+		}
+		else if(!g_game.getPathTo(this, followCreature->getPosition(), listDir)){
+			continueFollow = false;
+		}
+
+		if(continueFollow){
+			if(followCreature == creature){
+				if(Position::areInRange<7,5,0>(followCreature->getPosition(), getPosition())){
+					g_game.playerFollowCreature(this, followCreature->getID());
+				}
+			}
+			else if(!Position::areInRange<1,1,0>(getPosition(), followCreature->getPosition())){
+				g_game.playerFollowCreature(this, followCreature->getID());
+			}
+		}
+		else{
+			stopAutoWalk();
+			sendTextMessage(MSG_SMALLINFO, "Target lost.");
 		}
 	}
 }
@@ -2357,6 +2369,55 @@ void Player::setChaseMode(uint8_t mode)
 			g_game.playerFollowCreature(this, 0);
 		}
 	}
+}
+
+bool Player::startAutoWalk(std::list<Direction>& listDir)
+{
+	if(listDir.empty()){
+		stopAutoWalk();
+		return false;
+	}
+
+	if(eventAutoWalk == 0){
+		/*start a new event*/
+		listWalkDir = listDir;
+		return addEventAutoWalk();
+	}
+	else{
+		/*event already running*/
+		listWalkDir = listDir;
+	}
+
+	return true;
+}
+
+bool Player::addEventAutoWalk()
+{
+	if(isRemoved()){
+		eventAutoWalk = 0;
+		return false;
+	}
+
+	int ticks = getEventStepTicks();
+	eventAutoWalk = g_game.addEvent(makeTask(ticks, std::bind2nd(std::mem_fun(&Game::checkAutoWalkPlayer), getID())));
+	return true;
+}
+
+bool Player::stopAutoWalk()
+{
+	if(eventAutoWalk != 0){
+		g_game.stopEvent(eventAutoWalk);
+		eventAutoWalk = 0;
+
+		listWalkDir.clear();
+
+		setFollowCreature(NULL);
+		sendCancelWalk();
+		sendCancelAttacking();
+		return true;
+	}
+	
+	return false;
 }
 
 void Player::getCreatureLight(LightInfo& light) const

@@ -174,9 +174,7 @@ void Protocol76::parsePacket(NetworkMessage &msg)
 		break;
 	
 	case 0x69: // client quit without logout <- wrong
-		if(game->stopEvent(player->eventAutoWalk)){
-			sendCancelWalk();
-		}
+		player->stopAutoWalk();
 		break;
 	
 	case 0x6A:
@@ -603,10 +601,7 @@ void Protocol76::parseCancelMove(NetworkMessage& msg)
 	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol76::parseCancelMove()");
 
 	game->playerSetAttackedCreature(player, 0);
-	
-	game->stopEvent(player->eventAutoWalk);
-	player->eventAutoWalk = 0;
-	player->sendCancelWalk();
+	player->stopAutoWalk();
 }
 
 void Protocol76::parseDebug(NetworkMessage& msg)
@@ -652,6 +647,7 @@ void Protocol76::parseMoveByMouse(NetworkMessage& msg)
 		std::cout << "Walk by mouse: Direction: " << dir << std::endl;
 		#endif
 		*/
+
 		path.push_back(dir);
 	}
 	
@@ -660,94 +656,62 @@ void Protocol76::parseMoveByMouse(NetworkMessage& msg)
 
 void Protocol76::parseMoveNorth(NetworkMessage& msg)
 {
-	if(game->stopEvent(player->eventAutoWalk)) {
-		player->sendCancelWalk();
-	}
+	sleepTillMove();
 	
-	this->sleepTillMove();
-	
-	game->moveCreature(player, NORTH);
+	game->movePlayer(player, NORTH);
 }
 
 void Protocol76::parseMoveEast(NetworkMessage& msg)
 {
-	if(game->stopEvent(player->eventAutoWalk)) {
-		player->sendCancelWalk();
-	}
-	
-	this->sleepTillMove();
-	
-	game->moveCreature(player, EAST);
+	sleepTillMove();
+
+	game->movePlayer(player, EAST);
 }
 
 void Protocol76::parseMoveSouth(NetworkMessage& msg)
 {
-	if(game->stopEvent(player->eventAutoWalk)) {
-		player->sendCancelWalk();
-	}
-	
-	this->sleepTillMove();
-	
-	game->moveCreature(player, SOUTH);
+	sleepTillMove();
+
+	game->movePlayer(player, SOUTH);
 }
 
 void Protocol76::parseMoveWest(NetworkMessage& msg)
 {
-	if(game->stopEvent(player->eventAutoWalk)) {
-		player->sendCancelWalk();
-	}
-	
-	this->sleepTillMove();
+	sleepTillMove();
 
-	game->moveCreature(player, WEST);
+	game->movePlayer(player, WEST);
 }
 
 void Protocol76::parseMoveNorthEast(NetworkMessage& msg)
 {
-	if(game->stopEvent(player->eventAutoWalk)) {
-		player->sendCancelWalk();
-	}
+	sleepTillMove();
+	sleepTillMove();
 	
-	this->sleepTillMove();
-	this->sleepTillMove();
-	
-	game->moveCreature(player, NORTHEAST);
+	game->movePlayer(player, NORTHEAST);
 }
 
 void Protocol76::parseMoveSouthEast(NetworkMessage& msg)
 {
-	if(game->stopEvent(player->eventAutoWalk)) {
-		player->sendCancelWalk();
-	}
+	sleepTillMove();
+	sleepTillMove();
 	
-	this->sleepTillMove();
-	this->sleepTillMove();
-	
-	game->moveCreature(player, SOUTHEAST);
+	game->movePlayer(player, SOUTHEAST);
 }
 
 void Protocol76::parseMoveSouthWest(NetworkMessage& msg)
 {
-	if(game->stopEvent(player->eventAutoWalk)) {
-		player->sendCancelWalk();
-	}
+	sleepTillMove();
+	sleepTillMove();
 	
-	this->sleepTillMove();
-	this->sleepTillMove();
-	
-	game->moveCreature(player, SOUTHWEST);
+	game->movePlayer(player, SOUTHWEST);
 }
 
 void Protocol76::parseMoveNorthWest(NetworkMessage& msg)
 {
-	if(game->stopEvent(player->eventAutoWalk)) {
-		player->sendCancelWalk();
-	}
+	sleepTillMove();
+	sleepTillMove();
 	
-	this->sleepTillMove();
-	this->sleepTillMove();
-	
-	game->moveCreature(player, NORTHWEST);
+	game->movePlayer(player, NORTHWEST);
 }
 
 void Protocol76::parseTurnNorth(NetworkMessage& msg)

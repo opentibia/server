@@ -18,10 +18,8 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-
-#ifndef __NPC_H__
-#define __NPC_H__
-
+#ifndef __OTSERV_NPC_H__
+#define __OTSERV_NPC_H__
 
 #include "creature.h"
 #include "luascript.h"

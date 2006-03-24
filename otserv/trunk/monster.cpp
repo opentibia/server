@@ -1300,7 +1300,7 @@ void Monster::doMoveTo(int dx, int dy)
 	else
 		dir = SOUTH;
 
-	if(g_game.moveCreature(this, dir) != RET_NOERROR) {
+	if(g_game.internalMoveCreature(this, dir) != RET_NOERROR) {
 		setUpdateMovePos();
 	}
 	else if(state == STATE_ATTACKING && getPosition() == moveToPos) {

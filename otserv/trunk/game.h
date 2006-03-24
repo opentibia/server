@@ -224,9 +224,9 @@ public:
 
 	void moveCreature(Player* player, Cylinder* fromCylinder, Cylinder* toCylinder,
 	Creature* moveCreature);
-	ReturnValue moveCreature(Creature* creature, Direction direction);
 
-	ReturnValue internalCreatureMove(Creature* creature, Cylinder* fromCylinder, Cylinder* toCylinder);
+	ReturnValue internalMoveCreature(Creature* creature, Direction direction);
+	ReturnValue internalMoveCreature(Creature* creature, Cylinder* fromCylinder, Cylinder* toCylinder);
 
 	void moveItem(Player* player, Cylinder* fromCylinder, Cylinder* toCylinder, int32_t index,
 		Item* item, uint32_t count, uint16_t itemId);
@@ -306,6 +306,7 @@ public:
 	//battle system
 
 	//Implementation of player invoked events
+	bool movePlayer(Player* player, Direction direction);
 	bool playerWhisper(Player* player, const std::string& text);
 	bool playerYell(Player* player, std::string& text);
 	bool playerSpeakTo(Player* player, SpeakClasses type, const std::string& receiver, const std::string& text);
@@ -341,7 +342,7 @@ public:
 	void addPlayerBuffer(Player* p);
 	void FreeThing(Thing* thing);
 
-	std::list<Position> getPathTo(Creature* creature, Position start, Position to);
+	bool getPathTo(Creature* creature, Position toPosition, std::list<Direction>& listDir);
 	void changeOutfitAfter(unsigned long id, int looktype, long time);
 	void changeSpeed(unsigned long id, unsigned short speed);
 	void changeLight(const Creature* creature);
@@ -353,9 +354,17 @@ public:
 	game_state_t getGameState();
 	void setGameState(game_state_t newstate){game_state = newstate;}
 
-	/** Lockvar for Game. */
+	//Lock variable for Game class
 	OTSYS_THREAD_LOCKVAR gameLock;   
 	bool isExecutingEvents;
+
+	//Events
+	void checkAutoWalkPlayer(unsigned long id);
+	void checkCreature(unsigned long creatureid);
+	void checkCreatureAttacking(unsigned long creatureid, unsigned long time);
+	void checkDecay(int t);
+	void checkSpawns(int t);
+	void checkLight(int t);
 
 protected:
 	std::vector<Player*> BufferedPlayers;
@@ -392,13 +401,6 @@ protected:
 		int      type;
 		void*    data;
 	};
-
-	void checkAutoWalkPlayer(unsigned long id);
-	void checkCreature(unsigned long creatureid);
-	void checkCreatureAttacking(unsigned long creatureid, unsigned long time);
-	void checkDecay(int t);
-	void checkSpawns(int t);
-	void checkLight(int t);
 	
 	#define DECAY_INTERVAL  10000
 	void startDecay(Item* item);
@@ -434,6 +436,7 @@ protected:
 
 	friend class Commands;
 	friend class Monster;
+	friend class Npc;
 	friend class GameState;
 	friend class Spawn;
 	friend class SpawnManager;

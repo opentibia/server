@@ -353,10 +353,8 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 				player->sendStats();
 			}
 
-			//removedList.push_back(attackedCreature);
 			//remove creature
 			game->removeCreature(attackedCreature, false);
-			//attackedCreature->setParent(attackTile);
 
 			if(attackedCreature && attackedCreature->getMaster() != NULL) {
 				attackedCreature->getMaster()->removeSummon(attackedCreature);
@@ -416,7 +414,7 @@ Game::~Game()
 
 void Game::setWorldType(world_type_t type)
 {
-	this->worldType = type;
+	worldType = type;
 }
 
 game_state_t Game::getGameState()
@@ -427,8 +425,10 @@ game_state_t Game::getGameState()
 
 int Game::loadMap(std::string filename, std::string filekind)
 {
-	if(!map)
+	if(!map){
 		map = new Map;
+	}
+
 	max_players = atoi(g_config.getGlobalString("maxplayers").c_str());	
 	return map->loadMap(filename, filekind);
 }
@@ -1014,7 +1014,7 @@ void Game::moveCreature(Player* player, Cylinder* fromCylinder, Cylinder* toCyli
 	}
 
 	if(ret == RET_NOERROR){
-		ret = internalCreatureMove(moveCreature, fromCylinder, toCylinder);
+		ret = internalMoveCreature(moveCreature, fromCylinder, toCylinder);
 	}
 	
 	if((player == moveCreature || ret == RET_NOTMOVEABLE) && ret != RET_NOERROR){
@@ -1023,12 +1023,8 @@ void Game::moveCreature(Player* player, Cylinder* fromCylinder, Cylinder* toCyli
 	}
 }
 
-ReturnValue Game::moveCreature(Creature* creature, Direction direction)
+ReturnValue Game::internalMoveCreature(Creature* creature, Direction direction)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::creatureMove()");
-	if(creature->isRemoved())
-		return RET_NOERROR;
-
 	Cylinder* fromTile = creature->getTile();
 	Cylinder* toTile = NULL;
 
@@ -1101,7 +1097,7 @@ ReturnValue Game::moveCreature(Creature* creature, Direction direction)
 
 	ReturnValue ret = RET_NOTPOSSIBLE;
 	if(toTile != NULL){
-		ret = internalCreatureMove(creature, fromTile, toTile);
+		ret = internalMoveCreature(creature, fromTile, toTile);
 	}
 
 	if(ret != RET_NOERROR){
@@ -1114,7 +1110,7 @@ ReturnValue Game::moveCreature(Creature* creature, Direction direction)
 	return ret;
 }
 
-ReturnValue Game::internalCreatureMove(Creature* creature, Cylinder* fromCylinder, Cylinder* toCylinder)
+ReturnValue Game::internalMoveCreature(Creature* creature, Cylinder* fromCylinder, Cylinder* toCylinder)
 {
 	//check if we can move the creature to the destination
 	uint32_t flags = 0;
@@ -1140,6 +1136,7 @@ ReturnValue Game::internalCreatureMove(Creature* creature, Cylinder* fromCylinde
 			break;
 	}
 
+	creature->lastmove = OTSYS_TIME();
 	return RET_NOERROR;
 }
 
@@ -2485,6 +2482,16 @@ void Game::checkCreatureAttacking(unsigned long creatureid, unsigned long time)
 }
 
 //Implementation of player invoked events
+bool Game::movePlayer(Player* player, Direction direction)
+{
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::movePlayer()");
+	if(player->isRemoved())
+		return false;
+
+	player->stopAutoWalk();
+	return (internalMoveCreature(player, direction) == RET_NOERROR);
+}
+
 bool Game::playerWhisper(Player* player, const std::string& text)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerWhisper()");
@@ -2595,31 +2602,7 @@ bool Game::playerAutoWalk(Player* player, std::list<Direction>& listDir)
 	if(player->isRemoved())
 		return false;
 
-	stopEvent(player->eventAutoWalk);
-	player->eventAutoWalk = 0;
-	
-	if(listDir.empty()){
-		player->listWalkDir.clear();
-		return false;
-	}
-
-	player->listWalkDir = listDir;
-
-	player->lastmove = OTSYS_TIME();
-	int ticks = (int)player->getSleepTicks();
-	if(ticks <= 0){
-		//std::cout << player->getName() << " playerAutoWalk - " << (int)ticks << std::endl;
-
-		//trigger first, put others in an event
-		checkAutoWalkPlayer(player->getID());
-	}
-	
-	if(!listDir.empty()){
-		//std::cout << player->getName() << " playerAutoWalk - " << (int)ticks << std::endl;
-		player->eventAutoWalk = addEvent(makeTask(player->getSleepTicks(), std::bind2nd(std::mem_fun(&Game::checkAutoWalkPlayer), player->getID())));
-	}
-
-	return true;
+	return player->startAutoWalk(listDir);
 }
 
 bool Game::playerUseItemEx(Player* player, const Position& fromPos, uint8_t fromStackPos, uint16_t fromItemId,
@@ -3146,19 +3129,15 @@ bool Game::playerFollowCreature(Player* player, unsigned long creatureId)
 	if(player->isRemoved())
 		return false;
 
-	player->setFollowCreature(NULL);
-	stopEvent(player->eventAutoWalk);
-	player->eventAutoWalk = 0;
-
 	if(creatureId == 0){
+		player->stopAutoWalk();
 		return true;
 	}
 
 	Creature* followCreature = getCreatureByID(creatureId);
 	if(!followCreature){
+		player->stopAutoWalk();
 		player->sendCancelMessage(RET_NOTPOSSIBLE);
-		player->sendCancelWalk();
-		player->sendCancelAttacking();
 		return false;
 	}
 
@@ -3166,9 +3145,8 @@ bool Game::playerFollowCreature(Player* player, unsigned long creatureId)
 
 	if(!Position::areInRange<1,1,0>(player->getPosition(), followCreature->getPosition())){
 		if(!map->getPathTo(player, followCreature->getPosition(), listDir)){
+			player->stopAutoWalk();
 			player->sendCancelMessage(RET_THEREISNOWAY);
-			player->sendCancelWalk();
-			player->sendCancelAttacking();
 			return false;
 		}
 
@@ -3250,9 +3228,9 @@ bool Game::playerSaySpell(Player* player, const std::string& text)
 }
 
 //--
-std::list<Position> Game::getPathTo(Creature *creature, Position start, Position to)
+bool Game::getPathTo(Creature* creature, Position toPosition, std::list<Direction>& listDir)
 {
-	return map->getPathTo(creature, start, to);
+	return map->getPathTo(creature, toPosition, listDir);
 }
 
 bool Game::internalCreatureTurn(Creature* creature, Direction dir)
@@ -3352,24 +3330,23 @@ void Game::checkAutoWalkPlayer(unsigned long id)
 
 	Player* player = getPlayerByID(id);
 	if(player){
+		bool stopWalking = false;
+		if(!player->listWalkDir.empty()){
+			Position pos = player->getPosition();
+			Direction dir = player->listWalkDir.front();
+			player->listWalkDir.pop_front();
 
-		Position pos = player->getPosition();
-		Direction dir = player->listWalkDir.front();
-		player->listWalkDir.pop_front();
+			if(internalMoveCreature(player, dir) != RET_NOERROR){
+				player->stopAutoWalk();
+				stopWalking = true;
+			}
 
-		//player->lastmove = OTSYS_TIME();
-		moveCreature(player, dir);
-		player->lastmove = OTSYS_TIME();
-
-		flushSendBuffers();
-
-		if(!player->isRemoved() && !player->listWalkDir.empty()) {
-			int ticks = (int)player->getSleepTicks();
-			//std::cout << player->getName() << " checkAutoWalkPlayer - " << (int)ticks << std::endl;
-			player->eventAutoWalk = addEvent(makeTask(ticks, std::bind2nd(std::mem_fun(&Game::checkAutoWalkPlayer), id)));
+			flushSendBuffers();
 		}
-		else
-			player->eventAutoWalk = 0;
+		
+		if(!stopWalking){
+			player->addEventAutoWalk();
+		}
 	}
 }
 

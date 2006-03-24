@@ -267,6 +267,10 @@ public:
 	void setFollowCreature(Creature* creature);
 	void setChaseMode(uint8_t mode);
 
+	bool startAutoWalk(std::list<Direction>& listDir);
+	bool addEventAutoWalk();
+	bool stopAutoWalk();
+
 #ifdef __SKULLSYSTEM__
 	skulls_t getSkull() const;
 	skulls_t getSkullClient(const Player* player) const;
@@ -329,6 +333,7 @@ public:
 	virtual void postRemoveNotification(Thing* thing, bool isCompleteRemoval, bool hadOwnership = true);
 
 protected:
+	void checkFollowCreature(const Creature* creature, bool creatureDisappear = false);
 	void checkTradeState(const Item* item);
 	void addSkillTryInternal(int skilltry,int skill);
 
