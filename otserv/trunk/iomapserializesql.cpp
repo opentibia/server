@@ -39,6 +39,7 @@ IOMapSerializeSQL::~IOMapSerializeSQL()
 
 bool IOMapSerializeSQL::loadMap(Map* map, const std::string& identifier)
 {
+	Database db;
 	if(!db.connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str())){
 		return false;
 	}
@@ -47,16 +48,16 @@ bool IOMapSerializeSQL::loadMap(Map* map, const std::string& identifier)
 		//load tile
 		House* house = it->second;
 		for(HouseTileList::iterator it = house->getHouseTileBegin(); it != house->getHouseTileEnd(); ++it){
-			loadTile(*it);
+			loadTile(db, *it);
 		}
 	}
 	
-	db.disconnect();
 	return true;
 }
 
 bool IOMapSerializeSQL::saveMap(Map* map, const std::string& identifier)
 {
+	Database db;
 	if(!db.connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str())){
 		return false;
 	}
@@ -67,14 +68,12 @@ bool IOMapSerializeSQL::saveMap(Map* map, const std::string& identifier)
 	query.reset();
 	query << "DELETE FROM tileitems;";
 	if(!db.executeQuery(query)){
-		db.disconnect();
 		return false;
 	}
 
 	query.reset();
 	query << "DELETE FROM tilelist;";
 	if(!db.executeQuery(query)){
-		db.disconnect();
 		return false;
 	}
 
@@ -85,7 +84,6 @@ bool IOMapSerializeSQL::saveMap(Map* map, const std::string& identifier)
 		query.reset();
 		query << "BEGIN;";
 		if(!db.executeQuery(query)){
-			db.disconnect();
 			return false;
 		}
 
@@ -93,7 +91,7 @@ bool IOMapSerializeSQL::saveMap(Map* map, const std::string& identifier)
 		House* house = it->second;
 		for(HouseTileList::iterator it = house->getHouseTileBegin(); it != house->getHouseTileEnd(); ++it){
 			++tileId;
-			saveTile(tileId, *it);
+			saveTile(db, tileId, *it);
 		}
 
 		//End the transaction
@@ -101,16 +99,14 @@ bool IOMapSerializeSQL::saveMap(Map* map, const std::string& identifier)
 		query << "COMMIT;";
 
 		if(!db.executeQuery(query)){
-			db.disconnect();
 			return false;
 		}
 	}
 
-	db.disconnect();
 	return true;
 }
 
-bool IOMapSerializeSQL::saveTile(uint32_t tileId, const Tile* tile)
+bool IOMapSerializeSQL::saveTile(Database& db, uint32_t tileId, const Tile* tile)
 {
 	typedef std::list<std::pair<Container*, int> > ContainerStackList;
 	typedef ContainerStackList::value_type ContainerStackList_Pair;
@@ -136,10 +132,10 @@ bool IOMapSerializeSQL::saveTile(uint32_t tileId, const Tile* tile)
 			continue;
 
 		if(!(!item->isNotMoveable() ||
-			item->isDoor() ||
+			item->getDoor() ||
 			(item->getContainer() && item->getContainer()->size() != 0)||
 			(item->getRWInfo(n) & CAN_BE_WRITTEN)
-			/*item->isBed()*/))
+			/*item->getBed()*/))
 			continue;
 
 		storeTile = true;
@@ -226,7 +222,7 @@ bool IOMapSerializeSQL::saveTile(uint32_t tileId, const Tile* tile)
 	return true;
 }
 
-bool IOMapSerializeSQL::loadTile(Tile* tile)
+bool IOMapSerializeSQL::loadTile(Database& db, Tile* tile)
 {
 	typedef OTSERV_HASH_MAP<int,std::pair<Item*,int> > ItemMap;
 	ItemMap itemMap;
