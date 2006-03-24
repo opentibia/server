@@ -18,8 +18,6 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-// include header file
-
 #include "definitions.h"
 #include "item.h"
 #include "container.h"
@@ -81,7 +79,7 @@ Item* Item::CreateItem(PropStream& propStream)
 
 	if(iType.stackable || iType.isSplash() || iType.isFluidContainer()){
 		if(!propStream.GET_UCHAR(_count)){
-			return false;
+			return NULL;
 		}
 	}
 
