@@ -548,20 +548,6 @@ bool Map::getPathTo(Creature* creature, Position toPosition, std::list<Direction
 							continue;
 						}
 					}
-
-					/*
-					Tile* tile = getTile(x, y, z);
-					if(tile){
-						if(creature->getTile() != tile){
-							ReturnValue ret = tile->__queryAdd(0, creature, 1, 0);
-
-							if(ret != RET_NOERROR)
-								continue;
-						}
-					}
-					else
-						continue;
-					*/
 					
 					if(!nodes.isInList(x,y)){
 						AStarNode* n = nodes.createOpenNode();
