@@ -19,8 +19,8 @@
 //////////////////////////////////////////////////////////////////////
 
 
-#ifndef __DEFINITIONS_H__
-#define __DEFINITIONS_H__
+#ifndef __OTSERV_DEFINITIONS_H__
+#define __OTSERV_DEFINITIONS_H__
 
 #include "exception.h"
 
@@ -79,17 +79,19 @@ typedef unsigned long long uint64_t;
 	#pragma warning(disable:4250) // 'class1' : inherits 'class2::member' via dominance
 #endif
 
-//none-windows systems
+//*nix systems
 #else
 	#define OTSYS_THREAD_RETURN void*
 
 	#include <stdint.h>
 	#include <string.h>
 	#include <ext/hash_map>
+	#include <ext/hash_set>
 
 	#define OTSERV_HASH_MAP __gnu_cxx::hash_map
+	#define OTSERV_HASH_SET __gnu_cxx::hash_set
 	typedef int64_t __int64;
 
 #endif
 
-#endif // __DEFINITIONS_H__
+#endif
