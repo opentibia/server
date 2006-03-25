@@ -9,6 +9,8 @@ datadir = "data/"
 -- map
 -- sets what map to load, if sql, determines the sql map
 map = "data/world/map.otx"
+mapstore = "data/world/map-mapstore.xml"
+housestore = "data/world/map-housestore.xml"
 
 -- mapkind
 -- OTBM for binary, SQL for SQL map, XML for OTX maps
@@ -48,7 +50,6 @@ ip = "127.0.0.1"
 
 -- motd
 -- The messagebox you sometimes get before you choose characters
--- not working yet
 motd = "Welcome to OpenTibia Pre-Release"
 motdnum="1"
 
