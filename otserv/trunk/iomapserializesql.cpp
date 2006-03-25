@@ -61,9 +61,15 @@ bool IOMapSerializeSQL::saveMap(Map* map, const std::string& identifier)
 	if(!db.connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str())){
 		return false;
 	}
-
 	DBQuery query;
 
+	//Start the transaction	
+	query.reset();
+	query << "BEGIN;";
+	if(!db.executeQuery(query)){
+		return false;
+	}
+	
 	//clear old tile data
 	query.reset();
 	query << "DELETE FROM tileitems;";
@@ -80,12 +86,6 @@ bool IOMapSerializeSQL::saveMap(Map* map, const std::string& identifier)
 	uint32_t tileId = 0;
 
 	for(HouseMap::iterator it = Houses::getInstance().getHouseBegin(); it != Houses::getInstance().getHouseEnd(); ++it){
-		//Start the transaction	
-		query.reset();
-		query << "BEGIN;";
-		if(!db.executeQuery(query)){
-			return false;
-		}
 
 		//save house items
 		House* house = it->second;
@@ -93,14 +93,13 @@ bool IOMapSerializeSQL::saveMap(Map* map, const std::string& identifier)
 			++tileId;
 			saveTile(db, tileId, *it);
 		}
-
-		//End the transaction
-		query.reset();
-		query << "COMMIT;";
-
-		if(!db.executeQuery(query)){
-			return false;
-		}
+	}
+	
+	//End the transaction
+	query.reset();
+	query << "COMMIT;";
+	if(!db.executeQuery(query)){
+		return false;
 	}
 
 	return true;
