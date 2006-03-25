@@ -1367,16 +1367,18 @@ void Player::onRemoveInventoryItem(slots_t slot, const Item* item)
 
 void Player::checkFollowCreature(const Creature* creature, bool creatureDisappear /*= false*/)
 {
-	if(followCreature && creature == followCreature){
+	if(followCreature && (creature == followCreature || (creature == this && listWalkDir.empty()))){
 		bool continueFollow = true;
 
 		/*check if we still can follow this creature*/
-		std::list<Direction> listDir;
 		if(creatureDisappear && followCreature == creature){
 			continueFollow = false;
 		}
-		else if(!g_game.getPathTo(this, followCreature->getPosition(), listDir)){
-			continueFollow = false;
+		else if(!Position::areInRange<1,1,0>(followCreature->getPosition(), getPosition())){
+			std::list<Direction> listDir;
+			if(!g_game.getPathTo(this, followCreature->getPosition(), listDir)){
+				continueFollow = false;
+			}
 		}
 
 		if(continueFollow){
