@@ -349,8 +349,11 @@ HouseTransferItem* House::getTransferItem()
 void House::resetTransferItem()
 {
 	if(transferItem){
-		transferItem->releaseThing2();
+		Item* tmpItem = transferItem;
 		transferItem = NULL;
+
+		transfer_container.__removeThing(tmpItem, tmpItem->getItemCount());
+		g_game.FreeThing(tmpItem);
 	}
 }
 
@@ -370,24 +373,31 @@ bool HouseTransferItem::onTradeEvent(TradeEvents_t event, Player* owner)
 {
 	House* house;
 	switch(event){
-	case ON_TRADE_TRANSFER:
-		house = getHouse();
-		if(house){
-			house->executeTransfer(this, owner);
+		case ON_TRADE_TRANSFER:
+		{
+			house = getHouse();
+			if(house){
+				house->executeTransfer(this, owner);
+			}
+
+			g_game.internalRemoveItem(this, 1);
+			break;
 		}
 
-		g_game.internalRemoveItem(this, 1);
-		break;
-
-	case ON_TRADE_CANCEL:
-		house = getHouse();
-		if(house){
-			house->resetTransferItem();
+		case ON_TRADE_CANCEL:
+		{
+			house = getHouse();
+			if(house){
+				house->resetTransferItem();
+			}
+			
+			break;
 		}
-		break;
-	default:
-		break;
+
+		default:
+			break;
 	}
+
 	return true;
 }
 
