@@ -229,8 +229,7 @@ int Monster::onThink(int& newThinkTicks)
 		}
 	}
 
-	long long delay;
-	delay = getSleepTicks();
+	__int64 delay = getSleepTicks();
 	
 	if(state == STATE_TARGETNOTREACHABLE || getAttackedCreature() != NULL) {
 		if(delay > 0) {
