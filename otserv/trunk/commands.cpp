@@ -190,7 +190,7 @@ bool Commands::exeCommand(Creature* creature, const std::string& cmd)
 	if(creature->access < it->second->accesslevel){
 		if(creature->access > 0){
 			if(player)
-				player->sendTextMessage(MSG_SMALLINFO,"You can not execute this command.");
+				player->sendTextMessage(MSG_STATUS_SMALL, "You can not execute this command.");
 
 			return true;
 		}
@@ -202,7 +202,7 @@ bool Commands::exeCommand(Creature* creature, const std::string& cmd)
 	CommandFunc cfunc = it->second->f;
 	(this->*cfunc)(creature, str_command, str_param);
 	if(player)
-		player->sendTextMessage(MSG_RED_TEXT,cmd.c_str());
+		player->sendTextMessage(MSG_STATUS_CONSOLE_RED, cmd.c_str());
 
 	return true;
 }
@@ -308,11 +308,11 @@ bool Commands::banPlayer(Creature* creature, const std::string& cmd, const std::
 
 		Player* player = creature->getPlayer();
 		if(player && player->access <= playerBan->access){
-			player->sendTextMessage(MSG_BLUE_TEXT,"You cannot ban this player.");
+			player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "You cannot ban this player.");
 			return true;
 		}
 
-		playerBan->sendTextMessage(MSG_RED_TEXT,"You have been banned.");
+		playerBan->sendTextMessage(MSG_STATUS_CONSOLE_RED, "You have been banned.");
 		std::pair<unsigned long, unsigned long> IpNetMask;
 		IpNetMask.first = playerBan->lastip;
 		IpNetMask.second = 0xFFFFFFFF;
@@ -478,7 +478,7 @@ bool Commands::getInfo(Creature* creature, const std::string& cmd, const std::st
 		std::stringstream info;
 		unsigned char ip[4];
 		if(paramPlayer->access >= player->access && player != paramPlayer){
-			player->sendTextMessage(MSG_BLUE_TEXT,"You can not get info about this player.");
+			player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "You can not get info about this player.");
 			return true;
 		}
 		*(unsigned long*)&ip = paramPlayer->lastip;
@@ -490,10 +490,10 @@ bool Commands::getInfo(Creature* creature, const std::string& cmd, const std::st
 		        "position " << paramPlayer->getPosition() << std::endl << 
 				"ip: " << (unsigned int)ip[0] << "." << (unsigned int)ip[1] << 
 				   "." << (unsigned int)ip[2] << "." << (unsigned int)ip[3];
-		player->sendTextMessage(MSG_BLUE_TEXT,info.str().c_str());
+		player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, info.str().c_str());
 	}
 	else{
-		player->sendTextMessage(MSG_BLUE_TEXT,"Player not found.");
+		player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Player not found.");
 	}
 
 	return true;
@@ -561,17 +561,17 @@ bool Commands::onlineList(Creature* creature, const std::string& cmd, const std:
 			i++;
 		}
 		if(i == 10){
-			player->sendTextMessage(MSG_BLUE_TEXT,players.str().c_str());
+			player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, players.str().c_str());
 			players.str("");
 			i = 0;
 		}
 	}
 	if(i != 0)
-		player->sendTextMessage(MSG_BLUE_TEXT,players.str().c_str());
+		player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, players.str().c_str());
 	
 	players.str("");
 	players << "Total: " << n << " player(s)" << std::endl;
-	player->sendTextMessage(MSG_BLUE_TEXT,players.str().c_str());
+	player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, players.str().c_str());
 	return true;
 }
 
@@ -610,7 +610,7 @@ bool Commands::kickPlayer(Creature* c, const std::string &cmd, const std::string
 	if(playerKick){
 		Player* player = c->getPlayer();
 		if(player && player->access <= playerKick->access){
-			player->sendTextMessage(MSG_BLUE_TEXT,"You cannot kick this player.");
+			player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "You cannot kick this player.");
 			return true;
 		}
 		playerKick->kickPlayer();
@@ -684,7 +684,7 @@ bool Commands::setHouseOwner(Creature* creature, const std::string& cmd, const s
 					houseTile->getHouse()->setHouseOwner(0);
 				}
 				else{
-					player->sendTextMessage(MSG_BLUE_TEXT,"Player not found.");
+					player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Player not found.");
 				}
 				return true;
 			}
@@ -770,7 +770,8 @@ bool Commands::getHouse(Creature* creature, const std::string& cmd, const std::s
 		else{
 			str << " does not own any house.";
 		}
-		player->sendTextMessage(MSG_BLUE_TEXT, str.str().c_str());
+
+		player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, str.str().c_str());
 	}
 	return false;
 }

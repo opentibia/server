@@ -883,12 +883,11 @@ void Protocol76::parseLookAt(NetworkMessage& msg)
 	uint16_t itemId = msg.GetItemId();
 	uint8_t stackpos = msg.GetByte();
 	
-	/*
-	#ifdef __DEBUG__
+/*
+#ifdef __DEBUG__
 	ss << "You look at x: " << x <<", y: " << y << ", z: " << z << " and see Item # " << itemId << ".";
-	AddTextMessage(newmsg,MSG_INFO, ss.str().c_str());
-	#endif
-	*/
+#endif
+*/
 
 	game->playerLookAt(player, pos, itemId, stackpos);
 }
@@ -1307,7 +1306,7 @@ void Protocol76::sendToChannel(const Creature * creature, SpeakClasses type, con
 void Protocol76::sendCancel(const char *msg)
 {
 	NetworkMessage netmsg;
-	AddTextMessage(netmsg,MSG_SMALLINFO, msg);
+	AddTextMessage(netmsg, MSG_STATUS_SMALL, msg);
 	WriteBuffer(netmsg);
 }
 
@@ -1468,15 +1467,16 @@ void Protocol76::sendAddCreature(const Creature* creature, bool isLogin)
 			AddCreatureLight(msg, creature);
 			
 			std::string tempstring = g_config.getGlobalString("loginmsg", "Welcome.").c_str();
-			if(tempstring.size() > 0)
-				AddTextMessage(msg,MSG_EVENT, tempstring.c_str());
+			if(tempstring.size() > 0){
+				AddTextMessage(msg, MSG_STATUS_DEFAULT, tempstring.c_str());
+			}
 			
 			tempstring = "Your last visit was on ";
 			time_t lastlogin = player->getLastLoginSaved();
 			tempstring += ctime(&lastlogin);
 			tempstring.erase(tempstring.length() -1);
 			tempstring += ".";
-			AddTextMessage(msg,MSG_EVENT, tempstring.c_str());
+			AddTextMessage(msg, MSG_STATUS_DEFAULT, tempstring.c_str());
 			WriteBuffer(msg);
 
 			for(VIPListSet::iterator it = player->VIPList.begin(); it != player->VIPList.end(); it++){

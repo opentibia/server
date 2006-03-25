@@ -139,7 +139,7 @@ void MagicEffectClass::FailedToCast(Player* spectator, const Creature* attacker,
 {
 	if(!hasTarget && attacker) {
 		if(attacker == spectator) {
-			spectator->sendTextMessage(MSG_SMALLINFO, "You can only use this rune on creatures.");
+			spectator->sendTextMessage(MSG_STATUS_SMALL, "You can only use this rune on creatures.");
 		}
 		spectator->sendMagicEffect(attacker->getPosition(), NM_ME_PUFF);
 	}
@@ -297,12 +297,12 @@ void MagicEffectTargetGroundClass::FailedToCast(Player* spectator, const Creatur
 	if(isBlocking || hasTarget) {
 		if(hasTarget) {
 			if(player && player == spectator) {
-				spectator->sendTextMessage(MSG_SMALLINFO, "There is not enough room.");
+				spectator->sendTextMessage(MSG_STATUS_SMALL, "There is not enough room.");
 			}
 			spectator->sendMagicEffect(player->getPosition(), NM_ME_PUFF);
 		}
 		else if(player && player == spectator) {
-			spectator->sendTextMessage(MSG_SMALLINFO, "You cannot throw there.");
+			spectator->sendTextMessage(MSG_STATUS_SMALL, "You cannot throw there.");
 		}
 	}
 }

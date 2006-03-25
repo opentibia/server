@@ -2049,16 +2049,8 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 							if(spectator == target){
 								CreateManaDamageUpdate(target, creature, creatureState.manaDamage);
 								CreateDamageUpdate(target, creature, creatureState.damage);
-
-								/*if(target->isRemoved()){ //gamestate.isRemoved(target)
-									spectator->sendTextMessage(MSG_ADVANCE, "You are dead.");	
-								}*/
 							}
 						}
-
-						/*if(gamestate.isRemoved(target)){
-							target->setParent(NULL);
-						}*/
 					}
 				}
 			}
@@ -2131,7 +2123,7 @@ bool Game::creatureOnPrepareAttack(Creature *creature, Position pos)
 		if(creature->access == 0) {
 			if(tile && tile->isPz()) {
 				if(player) {					
-					player->sendTextMessage(MSG_SMALLINFO, "You may not attack a person while your in a protection zone.");	
+					player->sendTextMessage(MSG_STATUS_SMALL, "You may not attack a person while your in a protection zone.");	
 					playerSetAttackedCreature(player, 0);
 				}
 
@@ -2139,7 +2131,7 @@ bool Game::creatureOnPrepareAttack(Creature *creature, Position pos)
 			}
 			else if(targettile && targettile->isPz()) {
 				if(player) {					
-					player->sendTextMessage(MSG_SMALLINFO, "You may not attack a person in a protection zone.");
+					player->sendTextMessage(MSG_STATUS_SMALL, "You may not attack a person in a protection zone.");
 					playerSetAttackedCreature(player, 0);
 				}
 
@@ -2162,14 +2154,14 @@ bool Game::creatureOnPrepareMagicAttack(Creature *creature, Position pos, const 
 			if(player->access == 0) {
 				if(player->exhaustedTicks >= 1000 && me->causeExhaustion(true)) {
 					if(me->offensive) {
-						player->sendTextMessage(MSG_SMALLINFO, "You are exhausted.",player->getPosition(), NM_ME_PUFF);
+						player->sendTextMessage(MSG_STATUS_SMALL, "You are exhausted.",player->getPosition(), NM_ME_PUFF);
 						player->exhaustedTicks += (long)g_config.getGlobalNumber("exhaustedadd", 0);
 					}
 
 					return false;
 				}
 				else if(player->mana < me->manaCost) {															
-					player->sendTextMessage(MSG_SMALLINFO, "You do not have enough mana.",player->getPosition(), NM_ME_PUFF);					
+					player->sendTextMessage(MSG_STATUS_SMALL, "You do not have enough mana.",player->getPosition(), NM_ME_PUFF);					
 					return false;
 				}
 				else
@@ -2350,11 +2342,6 @@ void Game::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fi
 				if (spectator == attackedCreature) {
 					CreateManaDamageUpdate(attackedCreature, creature, creatureState.manaDamage);
 					CreateDamageUpdate(attackedCreature, creature, creatureState.damage);
-
-					/*if(attackedCreature->isRemoved()){ //gamestate.isRemoved(attackedCreature)
-						spectator->sendTextMessage(MSG_ADVANCE, "You are dead.");	
-					}
-					*/
 				}
 			}
 		}
@@ -2399,12 +2386,11 @@ void Game::CreateDamageUpdate(Creature* creature, Creature* attackCreature, int 
 		}
 		dmgmesg <<".";
 
-		player->sendTextMessage(MSG_EVENT, dmgmesg.str().c_str());
-		//msg.AddTextMessage(MSG_EVENT, dmgmesg.str().c_str());
+		player->sendTextMessage(MSG_EVENT_DEFAULT, dmgmesg.str().c_str());
 	}
 
 	if(player->isRemoved()){
-		player->sendTextMessage(MSG_ADVANCE, "You are dead.");	
+		player->sendTextMessage(MSG_EVENT_ADVANCE, "You are dead.");	
 	}
 }
 
@@ -2423,8 +2409,7 @@ void Game::CreateManaDamageUpdate(Creature* creature, Creature* attackCreature, 
 		}
 		dmgmesg <<".";
 
-		player->sendTextMessage(MSG_EVENT, dmgmesg.str().c_str());
-		//msg.AddTextMessage(MSG_EVENT, dmgmesg.str().c_str());
+		player->sendTextMessage(MSG_EVENT_DEFAULT, dmgmesg.str().c_str());
 	}
 }
 
@@ -2466,7 +2451,7 @@ void Game::checkCreatureAttacking(unsigned long creatureid, unsigned long time)
 				Tile* tile = creature->getTile();
 				if(!attackedCreature->isAttackable() == 0 && tile->isPz() && creature->access == 0){
 					if(Player* player = creature->getPlayer()){
-						player->sendTextMessage(MSG_SMALLINFO, "You may not attack a person in a protection zone.");
+						player->sendTextMessage(MSG_STATUS_SMALL, "You may not attack a person in a protection zone.");
 						playerSetAttackedCreature(player, 0);
 					}
 				}
@@ -2524,7 +2509,7 @@ bool Game::playerYell(Player* player, std::string &text)
 
 	if(player->access == 0 && player->exhaustedTicks >=1000){
 		player->exhaustedTicks += (long)g_config.getGlobalNumber("exhaustedadd", 0);		
-		player->sendTextMessage(MSG_SMALLINFO, "You are exhausted.");
+		player->sendTextMessage(MSG_STATUS_SMALL, "You are exhausted.");
 		return false;
 	}
 	else{
@@ -2553,7 +2538,7 @@ bool Game::playerSpeakTo(Player* player, SpeakClasses type, const std::string& r
 	
 	Player* toPlayer = getPlayerByName(receiver);
 	if(!toPlayer) {
-		player->sendTextMessage(MSG_SMALLINFO, "A player with this name is not online.");
+		player->sendTextMessage(MSG_STATUS_SMALL, "A player with this name is not online.");
 		return false;
 	}
 
@@ -2565,7 +2550,7 @@ bool Game::playerSpeakTo(Player* player, SpeakClasses type, const std::string& r
 
 	std::stringstream ss;
 	ss << "Message sent to " << toPlayer->getName() << ".";
-	player->sendTextMessage(MSG_SMALLINFO, ss.str().c_str());
+	player->sendTextMessage(MSG_STATUS_SMALL, ss.str().c_str());
 	return true;
 }
 
@@ -2775,14 +2760,14 @@ bool Game::playerRequestTrade(Player* player, const Position& pos, uint8_t stack
 
 	Player* tradePartner = getPlayerByID(playerId);
 	if(!tradePartner || tradePartner == player) {
-		player->sendTextMessage(MSG_INFO, "Sorry, not possible.");
+		player->sendTextMessage(MSG_INFO_DESCR, "Sorry, not possible.");
 		return false;
 	}
 	
 	if(!Position::areInRange<2,2,0>(tradePartner->getPosition(), player->getPosition())){
 		std::stringstream ss;
 		ss << tradePartner->getName() << " tells you to move closer.";
-		player->sendTextMessage(MSG_INFO, ss.str().c_str());
+		player->sendTextMessage(MSG_INFO_DESCR, ss.str().c_str());
 		return false;
 	}
 
@@ -2811,14 +2796,14 @@ bool Game::playerRequestTrade(Player* player, const Position& pos, uint8_t stack
 			((container = dynamic_cast<const Container*>(tradeItem)) && container->isHoldingItem(it->first)) ||
 			((container = dynamic_cast<const Container*>(it->first)) && container->isHoldingItem(tradeItem)))
 		{
-			player->sendTextMessage(MSG_INFO, "This item is already being traded.");
+			player->sendTextMessage(MSG_INFO_DESCR, "This item is already being traded.");
 			return false;
 		}
 	}
 
 	Container* tradeContainer = dynamic_cast<Container*>(tradeItem);
 	if(tradeContainer && tradeContainer->getItemHoldingCount() + 1 > 100){
-		player->sendTextMessage(MSG_INFO, "You can not trade more than 100 items.");
+		player->sendTextMessage(MSG_INFO_DESCR, "You can not trade more than 100 items.");
 		return false;
 	}
 
@@ -2847,7 +2832,7 @@ bool Game::internalStartTrade(Player* player, Player* tradePartner, Item* tradeI
 	if(tradePartner->tradeState == TRADE_NONE){
 		std::stringstream trademsg;
 		trademsg << player->getName() <<" wants to trade with you.";
-		tradePartner->sendTextMessage(MSG_INFO, trademsg.str().c_str());
+		tradePartner->sendTextMessage(MSG_INFO_DESCR, trademsg.str().c_str());
 		tradePartner->tradeState = TRADE_ACKNOWLEDGE;
 		tradePartner->tradePartner = player;
 	}
@@ -2908,16 +2893,37 @@ bool Game::playerAcceptTrade(Player* player)
 				
 				tradeItem1->onTradeEvent(ON_TRADE_TRANSFER, tradePartner);
 				tradeItem2->onTradeEvent(ON_TRADE_TRANSFER, player);
-								
+
 				isSuccess = true;
 			}
 		}
 
 		if(!isSuccess){
-			player->sendTextMessage(MSG_SMALLINFO, "Sorry not possible.");
-			tradePartner->sendTextMessage(MSG_SMALLINFO, "Sorry not possible.");
-			player->tradeItem->onTradeEvent(ON_TRADE_CANCEL, player);
+			std::stringstream ss;
+			if(ret1 == RET_NOTENOUGHCAPACITY){
+				ss << "You do not have enough capacity to carry this object." << std::endl << tradeItem1->getWeightDescription();
+			}
+			else if(ret1 == RET_NOTENOUGHROOM || ret2 == RET_CONTAINERNOTENOUGHROOM){
+				ss << "You do not have enough room to carry this object.";
+			}
+			else
+				ss << "Trade could not be completed.";
+
+			tradePartner->sendTextMessage(MSG_INFO_DESCR, ss.str().c_str());
 			tradePartner->tradeItem->onTradeEvent(ON_TRADE_CANCEL, tradePartner);
+			
+			ss.str("");
+			if(ret2 == RET_NOTENOUGHCAPACITY){
+				ss << "You do not have enough capacity to carry this object." << std::endl << tradeItem2->getWeightDescription();
+			}
+			else if(ret2 == RET_NOTENOUGHROOM || ret2 == RET_CONTAINERNOTENOUGHROOM){
+				ss << "You do not have enough room to carry this object.";
+			}
+			else
+				ss << "Trade could not be completed.";
+
+			player->sendTextMessage(MSG_INFO_DESCR, ss.str().c_str());
+			player->tradeItem->onTradeEvent(ON_TRADE_CANCEL, player);
 		}
 
 		player->setTradeState(TRADE_NONE);
@@ -2962,7 +2968,7 @@ bool Game::playerLookInTrade(Player* player, bool lookAtCounterOffer, int index)
 	if(index == 0){
 		std::stringstream ss;
 		ss << "You see " << tradeItem->getDescription(lookDistance);
-		player->sendTextMessage(MSG_INFO, ss.str().c_str());
+		player->sendTextMessage(MSG_INFO_DESCR, ss.str().c_str());
 		return false;
 	}
 
@@ -2998,7 +3004,7 @@ bool Game::playerLookInTrade(Player* player, bool lookAtCounterOffer, int index)
 	if(foundItem){
 		std::stringstream ss;
 		ss << "You see " << tradeItem->getDescription(lookDistance);
-		player->sendTextMessage(MSG_INFO, ss.str().c_str());
+		player->sendTextMessage(MSG_INFO_DESCR, ss.str().c_str());
 	}
 
 	return foundItem;
@@ -3034,7 +3040,7 @@ bool Game::playerCloseTrade(Player* player)
 	player->setTradeState(TRADE_NONE);
 	player->tradePartner = NULL;
 
-	player->sendTextMessage(MSG_SMALLINFO, "Trade cancelled.");
+	player->sendTextMessage(MSG_STATUS_SMALL, "Trade cancelled.");
 	player->sendCloseTrade();
 
 	if(tradePartner){
@@ -3052,7 +3058,7 @@ bool Game::playerCloseTrade(Player* player)
 		tradePartner->setTradeState(TRADE_NONE);		
 		tradePartner->tradePartner = NULL;
 
-		tradePartner->sendTextMessage(MSG_SMALLINFO, "Trade cancelled.");
+		tradePartner->sendTextMessage(MSG_STATUS_SMALL, "Trade cancelled.");
 		tradePartner->sendCloseTrade();
 	}
 
@@ -3090,7 +3096,7 @@ bool Game::playerLookAt(Player* player, const Position& pos, uint16_t itemId, ui
 
 	std::stringstream ss;
 	ss << "You see " << thing->getDescription(lookDistance);
-	player->sendTextMessage(MSG_INFO, ss.str().c_str());
+	player->sendTextMessage(MSG_INFO_DESCR, ss.str().c_str());
 
 	return true;
 }
@@ -3113,7 +3119,7 @@ bool Game::playerSetAttackedCreature(Player* player, unsigned long creatureid)
 	if(attackedCreature->access != 0 || (getWorldType() == WORLD_TYPE_NO_PVP && player->access == 0 && attackedCreature->getPlayer())) {
 		player->setAttackedCreature(NULL);
 
-		player->sendTextMessage(MSG_SMALLINFO, "You may not attack this player.");
+		player->sendTextMessage(MSG_STATUS_SMALL, "You may not attack this player.");
 		player->sendCancelAttacking();
 	}
 	else{
@@ -3180,11 +3186,11 @@ bool Game::playerRequestAddVip(Player* player, const std::string& vip_name)
 	unsigned long access_lvl;
 	
 	if(!IOPlayer::instance()->getGuidByName(guid, access_lvl, real_name)){
-		player->sendTextMessage(MSG_SMALLINFO, "A player with that name doesn't exist.");
+		player->sendTextMessage(MSG_STATUS_SMALL, "A player with that name doesn't exist.");
 		return false;
 	}
 	if(access_lvl > player->access){
-		player->sendTextMessage(MSG_SMALLINFO, "You can not add this player.");
+		player->sendTextMessage(MSG_STATUS_SMALL, "You can not add this player.");
 		return false;
 	}
 	bool online = (getPlayerByName(real_name) != NULL);

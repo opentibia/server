@@ -136,6 +136,7 @@ public:
 	virtual int getThrowRange() const {return (isPickupable() ? 15 : 2);};
 
 	virtual std::string getDescription(int32_t lookDistance) const;
+	std::string Item::getWeightDescription() const;
 
 	unsigned short getID() const;    // ID as in ItemType
 	virtual void setID(unsigned short newid);

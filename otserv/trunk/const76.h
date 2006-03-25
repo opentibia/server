@@ -97,16 +97,15 @@ enum SpeakClasses {
 };
 
 enum MessageClasses {
-	MSG_RED_INFO  = 0x12,
-	MSG_ADVANCE   = 0x13,
-	MSG_EVENT     = 0x14,
-	/*MSG_EVENT     = 0x15,	*/
-	MSG_INFO      = 0x16,
-	MSG_SMALLINFO = 0x17,
-	MSG_BLUE_TEXT = 0x18,
-	MSG_RED_TEXT  = 0x19,
+	MSG_STATUS_WARNING      = 0x12, /*Red message in game window and in the console*/
+	MSG_EVENT_ADVANCE       = 0x13, /*White message in game window and in the console*/
+	MSG_EVENT_DEFAULT       = 0x14, /*White message at the bottom of the game window and in the console*/
+	MSG_STATUS_DEFAULT      = 0x15, /*White message at the bottom of the game window and in the console*/
+	MSG_INFO_DESCR          = 0x16, /*Green message in game window and in the console*/
+	MSG_STATUS_SMALL        = 0x17, /*White message at the bottom of the game window"*/
+	MSG_STATUS_CONSOLE_BLUE = 0x18, /*Blue message in the console*/
+	MSG_STATUS_CONSOLE_RED  = 0x19, /*Red message in the console*/
 };
-
 
 enum FluidClasses {
 	FLUID_EMPTY = 0x00,	//note: class = fluid_number mod 8

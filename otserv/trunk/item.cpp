@@ -753,7 +753,7 @@ std::string Item::getDescription(int32_t lookDistance) const
 			if(lookDistance <= 1){
 				double weight = getWeight();
 				if(weight > 0)
-					s << std::endl << "It weighs " << std::fixed << std::setprecision(1) << weight << " oz.";
+					s << std::endl << "It weighs " << std::fixed << std::setprecision(2) << weight << " oz.";
 			}
 
 			if(specialDescription)
@@ -767,6 +767,18 @@ std::string Item::getDescription(int32_t lookDistance) const
 		s << "an item of type " << id <<".";
 	
 	return s.str();
+}
+
+std::string Item::getWeightDescription() const
+{
+	double weight = getWeight();
+
+	std::stringstream ss;
+	if(weight > 0){
+		ss << " It weighs " << std::fixed << std::setprecision(2) << weight << " oz.";
+	}
+
+	return ss.str();
 }
 
 std::string Item::getName() const

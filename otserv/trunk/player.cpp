@@ -563,7 +563,7 @@ void Player::addSkillTryInternal(int skilltry,int skill)
 		skills[skill][SKILL_PERCENT] = 0;				 
 		std::stringstream advMsg;
 		advMsg << "You advanced in " << getSkillName(skill) << ".";
-		client->sendTextMessage(MSG_ADVANCE, advMsg.str().c_str());
+		client->sendTextMessage(MSG_EVENT_ADVANCE, advMsg.str().c_str());
 		client->sendSkills();
 	}
 	else{
@@ -1201,7 +1201,7 @@ void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bo
 		setAttackedCreature(NULL);
 
 		if(isLogout){
-			sendTextMessage(MSG_SMALLINFO, "Target lost.");
+			sendTextMessage(MSG_STATUS_SMALL, "Target lost.");
 		}
 
 		sendCancelAttacking();
@@ -1243,7 +1243,7 @@ void Player::onCreatureMove(const Creature* creature, const Position& oldPos, ui
 	if((creature == this && targetCreature) || targetCreature == creature){
 		if(!Position::areInRange<7,5,0>(targetCreature->getPosition(), getPosition())){
 			setAttackedCreature(NULL);
-			sendTextMessage(MSG_SMALLINFO, "Target lost.");
+			sendTextMessage(MSG_STATUS_SMALL, "Target lost.");
 			sendCancelAttacking();
 		} 
 	}
@@ -1394,7 +1394,7 @@ void Player::checkFollowCreature(const Creature* creature, bool creatureDisappea
 		}
 		else{
 			stopAutoWalk();
-			sendTextMessage(MSG_SMALLINFO, "Target lost.");
+			sendTextMessage(MSG_STATUS_SMALL, "Target lost.");
 		}
 	}
 }
@@ -1457,32 +1457,33 @@ void Player::addManaSpent(unsigned long spent)
 		
 		std::stringstream MaglvMsg;
 		MaglvMsg << "You advanced to magic level " << maglevel << ".";
-		sendTextMessage(MSG_ADVANCE, MaglvMsg.str().c_str());
+		sendTextMessage(MSG_EVENT_ADVANCE, MaglvMsg.str().c_str());
 		sendStats();
 	}
 }
 
 void Player::addExperience(unsigned long exp)
 {
-	this->experience += exp;
-	int lastLv = this->level;
+	experience += exp;
+	int lastLevel = level;
 
-	while (this->experience >= this->getExpForLv(this->level+1)) {
-		this->level++;
-		this->healthmax += this->HPGain[(int)vocation];
-		this->health += this->HPGain[(int)vocation];
-		this->manamax += this->ManaGain[(int)vocation];
-		this->mana += this->ManaGain[(int)vocation];
-		this->capacity += this->CapGain[(int)vocation];
+	while(experience >= getExpForLv(level + 1)){
+		++level;
+		healthmax += HPGain[(int)vocation];
+		health += HPGain[(int)vocation];
+		manamax += ManaGain[(int)vocation];
+		mana += ManaGain[(int)vocation];
+		capacity += CapGain[(int)vocation];
 	}
 
-	if(lastLv != this->level){
-		this->setNormalSpeed();
-		g_game.changeSpeed(this->getID(), this->getSpeed());
-		std::stringstream lvMsg;
-		lvMsg << "You advanced from level " << lastLv << " to level " << level << ".";
-		this->sendTextMessage(MSG_ADVANCE,lvMsg.str().c_str());
-		this->sendStats();
+	if(lastLevel != level){
+		setNormalSpeed();
+		g_game.changeSpeed(getID(), getSpeed());
+
+		std::stringstream levelMsg;
+		levelMsg << "You advanced from level " << lastLevel << " to level " << level << ".";
+		sendTextMessage(MSG_EVENT_ADVANCE, levelMsg.str().c_str());
+		sendStats();
 	}
 }
 
@@ -1558,7 +1559,7 @@ void Player::die()
 	if(newLevel != level){
 		std::stringstream lvMsg;
 		lvMsg << "You were downgraded from level " << level << " to level " << newLevel << ".";
-		client->sendTextMessage(MSG_ADVANCE, lvMsg.str().c_str());
+		client->sendTextMessage(MSG_EVENT_ADVANCE, lvMsg.str().c_str());
 	}
 }
 
@@ -1657,7 +1658,7 @@ void Player::notifyLogIn(Player* login_player)
 	VIPListSet::iterator it = VIPList.find(login_player->getGUID());
 	if(it != VIPList.end()){
 		client->sendVIPLogIn(login_player->getGUID());
-		sendTextMessage(MSG_SMALLINFO, (login_player->getName() + " has logged in.").c_str());
+		sendTextMessage(MSG_STATUS_SMALL, (login_player->getName() + " has logged in.").c_str());
 	}
 }
 
@@ -1666,7 +1667,7 @@ void Player::notifyLogOut(Player* logout_player)
 	VIPListSet::iterator it = VIPList.find(logout_player->getGUID());
 	if(it != VIPList.end()){
 		client->sendVIPLogOut(logout_player->getGUID());
-		sendTextMessage(MSG_SMALLINFO, (logout_player->getName() + " has logged out.").c_str());
+		sendTextMessage(MSG_STATUS_SMALL, (logout_player->getName() + " has logged out.").c_str());
 	}
 }
 
@@ -1684,20 +1685,20 @@ bool Player::addVIP(unsigned long _guid, std::string &name, bool isOnline, bool 
 {
 	if(guid == _guid){
 		if(!internal)
-			sendTextMessage(MSG_SMALLINFO, "You cannot add yourself.");
+			sendTextMessage(MSG_STATUS_SMALL, "You cannot add yourself.");
 		return false;
 	}
 	
 	if(VIPList.size() > 50){
 		if(!internal)
-			sendTextMessage(MSG_SMALLINFO, "You cannot add more players.");
+			sendTextMessage(MSG_STATUS_SMALL, "You cannot add more players.");
 		return false;
 	}
 	
 	VIPListSet::iterator it = VIPList.find(_guid);
 	if(it != VIPList.end()){
 		if(!internal)
-			sendTextMessage(MSG_SMALLINFO, "You have already added this player.");
+			sendTextMessage(MSG_STATUS_SMALL, "You have already added this player.");
 		return false;
 	}
 	
@@ -1888,6 +1889,9 @@ ReturnValue Player::__queryAdd(int32_t index, const Thing* thing, uint32_t count
 				ret = RET_NOERROR;
 			break;
 		case SLOT_WHEREEVER:
+			ret = RET_NOTENOUGHROOM;
+			break;
+		case -1:
 			ret = RET_NOTENOUGHROOM;
 			break;
 
@@ -2518,7 +2522,7 @@ void Player::addUnjustifiedDead(const Player* attacked)
 	std::stringstream Msg;
 	Msg << "Warning! The murder of " << attacked->getName() << " was not justified.";
 	client->sendTextMessage(MSG_RED_INFO, Msg.str().c_str());
-	redSkullTicks = redSkullTicks + 12*3600*1000;
+	redSkullTicks = redSkullTicks + 12 * 3600 * 1000;
 	if(redSkullTicks >= 3*24*3600*1000){
 		g_game.changeSkull(this, SKULL_RED);
 	}
