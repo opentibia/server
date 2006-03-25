@@ -265,7 +265,12 @@ public:
 	
 	void setAttackedCreature(const Creature* creature);
 	void setFollowCreature(Creature* creature);
+	Creature* getFollowCreature() {return followCreature;}
 	void setChaseMode(uint8_t mode);
+
+	//bool startAttack(Creature* creature);
+	//bool addEventAttack();
+	bool stopAttack();
 
 	bool startAutoWalk(std::list<Direction>& listDir);
 	bool addEventAutoWalk();

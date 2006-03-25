@@ -3108,19 +3108,17 @@ bool Game::playerSetAttackedCreature(Player* player, unsigned long creatureid)
 		return false;
 
 	if(player->attackedCreature2 != 0 && creatureid == 0){
-		player->setAttackedCreature(NULL);
-		player->sendCancelAttacking();
+		player->stopAttack();
 	}
 
 	Creature* attackedCreature = getCreatureByID(creatureid);
-	if(!attackedCreature)
+	if(!attackedCreature){
 		return false;
+	}
 
 	if(attackedCreature->access != 0 || (getWorldType() == WORLD_TYPE_NO_PVP && player->access == 0 && attackedCreature->getPlayer())) {
-		player->setAttackedCreature(NULL);
-
+		player->stopAttack();
 		player->sendTextMessage(MSG_STATUS_SMALL, "You may not attack this player.");
-		player->sendCancelAttacking();
 	}
 	else{
 		player->setAttackedCreature(attackedCreature);
@@ -3342,12 +3340,16 @@ void Game::checkAutoWalkPlayer(unsigned long id)
 			Direction dir = player->listWalkDir.front();
 			player->listWalkDir.pop_front();
 
-			if(internalMoveCreature(player, dir) != RET_NOERROR){
+			if(internalMoveCreature(player, dir) != RET_NOERROR && !player->getFollowCreature()){
 				player->stopAutoWalk();
 				stopWalking = true;
 			}
 
 			flushSendBuffers();
+		}
+		else if(!player->getFollowCreature()){
+			/*not following and no path*/
+			stopWalking = true;
 		}
 		
 		if(!stopWalking){

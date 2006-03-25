@@ -1198,13 +1198,11 @@ void Player::onCreatureAppear(const Creature* creature, bool isLogin)
 void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout)
 {
 	if(attackedCreature2 == creature->getID()){
-		setAttackedCreature(NULL);
+		stopAttack();
 
 		if(isLogout){
 			sendTextMessage(MSG_STATUS_SMALL, "Target lost.");
 		}
-
-		sendCancelAttacking();
 	}
 
 	checkFollowCreature(creature, true);
@@ -1242,9 +1240,8 @@ void Player::onCreatureMove(const Creature* creature, const Position& oldPos, ui
 	Creature* targetCreature = getAttackedCreature();
 	if((creature == this && targetCreature) || targetCreature == creature){
 		if(!Position::areInRange<7,5,0>(targetCreature->getPosition(), getPosition())){
-			setAttackedCreature(NULL);
+			stopAttack();
 			sendTextMessage(MSG_STATUS_SMALL, "Target lost.");
-			sendCancelAttacking();
 		} 
 	}
 	
@@ -2375,13 +2372,36 @@ void Player::setChaseMode(uint8_t mode)
 	}
 }
 
-bool Player::startAutoWalk(std::list<Direction>& listDir)
+/*
+bool Player::startAttack(Creature* creature)
 {
-	if(listDir.empty()){
-		stopAutoWalk();
+	setAttackedCreature(creature);
+}
+*/
+
+/*
+bool Player::addEventAttack()
+{
+	if(isRemoved()){
+		eventCheckAttacking = 0;
 		return false;
 	}
 
+	int ticks = getAttackTicks();
+	eventCheckAttacking = g_game.addEvent(makeTask(ticks,
+		std::bind2nd(std::mem_fun(&Game::checkAutoWalkPlayer), getID(), ticks));
+}
+*/
+
+bool Player::stopAttack()
+{
+	setAttackedCreature(NULL);
+	sendCancelAttacking();
+	return true;
+}
+
+bool Player::startAutoWalk(std::list<Direction>& listDir)
+{
 	if(eventAutoWalk == 0){
 		/*start a new event*/
 		listWalkDir = listDir;
@@ -2414,10 +2434,10 @@ bool Player::stopAutoWalk()
 		eventAutoWalk = 0;
 
 		listWalkDir.clear();
-
 		setFollowCreature(NULL);
 		sendCancelWalk();
-		sendCancelAttacking();
+		
+		stopAttack();
 		return true;
 	}
 	

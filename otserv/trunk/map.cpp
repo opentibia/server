@@ -612,7 +612,7 @@ bool Map::getPathTo(Creature* creature, Position toPosition, std::list<Direction
 		found = found->parent;
 	}
 
-	return true;
+	return !listDir.empty();
 }
 
 AStarNodes::AStarNodes()
