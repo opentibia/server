@@ -150,11 +150,11 @@ void Protocol76::parsePacket(NetworkMessage &msg)
 		break;
 		
 	case 0x1E: // keep alive / ping response
-		player->receivePing();
+		parseRecievePing(msg);
 		break;
 		
-	case 0x64: // client moving with steps
-		parseMoveByMouse(msg);
+	case 0x64: // move with steps
+		parseAutoWalk(msg);
 		break;
 
 	case 0x65: // move north
@@ -173,8 +173,8 @@ void Protocol76::parsePacket(NetworkMessage &msg)
 		parseMoveWest(msg);
 		break;
 	
-	case 0x69: // client quit without logout <- wrong
-		player->stopAutoWalk();
+	case 0x69: // stop-autowalk
+		parseStopAutoWalk(msg);
 		break;
 	
 	case 0x6A:
@@ -575,14 +575,23 @@ void Protocol76::parseOpenChannel(NetworkMessage& msg)
 {
 	unsigned short channelId = msg.GetU16();
 	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol76::parseOpenChannel()");
-	if(g_chat.addUserToChannel(player, channelId))
+	if(player->isRemoved()){
+		return;
+	}
+
+	if(g_chat.addUserToChannel(player, channelId)){
 		sendChannel(channelId, g_chat.getChannelName(player, channelId));
+	}
 }
 
 void Protocol76::parseCloseChannel(NetworkMessage &msg)
 {
 	unsigned short channelId = msg.GetU16();
 	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol76::parseCloseChannel()");
+	if(player->isRemoved()){
+		return;
+	}
+
 	g_chat.removeUserFromChannel(player, channelId);
 }
 
@@ -591,17 +600,20 @@ void Protocol76::parseOpenPriv(NetworkMessage& msg)
 	std::string receiver; 
 	receiver = msg.GetString();
 	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol76::parseOpenPriv()");
-	Player* player = game->getPlayerByName(receiver);
-	if(player)
-		sendOpenPriv(player->getName());
+	if(player->isRemoved()){
+		return;
+	}
+
+	Player* playerPriv = game->getPlayerByName(receiver);
+	if(playerPriv){
+		sendOpenPriv(playerPriv->getName());
+	}
 }
 
 void Protocol76::parseCancelMove(NetworkMessage& msg)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol76::parseCancelMove()");
-
 	game->playerSetAttackedCreature(player, 0);
-	player->stopAutoWalk();
+	game->playerFollowCreature(player, 0);
 }
 
 void Protocol76::parseDebug(NetworkMessage& msg)
@@ -619,7 +631,18 @@ void Protocol76::parseDebug(NetworkMessage& msg)
 	}
 }
 
-void Protocol76::parseMoveByMouse(NetworkMessage& msg)
+
+void Protocol76::parseRecievePing(NetworkMessage& msg)
+{
+	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol76::parseRecievePing()");
+	if(player->isRemoved()){
+		return;
+	}
+
+	player->receivePing();
+}
+
+void Protocol76::parseAutoWalk(NetworkMessage& msg)
 {
 	// first we get all directions...
 	std::list<Direction> path;
@@ -652,6 +675,11 @@ void Protocol76::parseMoveByMouse(NetworkMessage& msg)
 	}
 	
 	game->playerAutoWalk(player, path);
+}
+
+void Protocol76::parseStopAutoWalk(NetworkMessage& msg)
+{
+	game->playerStopAutoWalk(player);
 }
 
 void Protocol76::parseMoveNorth(NetworkMessage& msg)
@@ -823,6 +851,10 @@ void Protocol76::parseCloseContainer(NetworkMessage& msg)
 	unsigned char containerid = msg.GetByte();
 
 	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol76::parseCloseContainer()");
+	if(player->isRemoved()){
+		return;
+	}
+
 	player->closeContainer(containerid);
 	sendCloseContainer(containerid);
 }
@@ -831,6 +863,10 @@ void Protocol76::parseUpArrowContainer(NetworkMessage& msg)
 {
 	uint32_t cid = msg.GetByte();
 	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol76::parseUpArrowContainer()");
+	if(player->isRemoved()){
+		return;
+	}
+
 	Container* container = player->getContainer(cid);
 	if(!container)
 		return;
@@ -847,6 +883,10 @@ void Protocol76::parseUpdateContainer(NetworkMessage& msg)
 {
 	uint32_t cid = msg.GetByte();
 	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol76::parseUpdateContainer()");
+	if(player->isRemoved()){
+		return;
+	}
+
 	Container* container = player->getContainer(cid);
 	if(!container)
 		return;	
@@ -976,10 +1016,13 @@ void Protocol76::parseHouseWindow(NetworkMessage &msg)
 	unsigned long id = msg.GetU32();
 	std::string new_list = msg.GetString();
 	
+	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol76::parseHouseWindow()");
+	if(player->isRemoved()){
+		return;
+	}
+
 	if(house && windowTextID == id && _listid == 0){
-		OTSYS_THREAD_LOCK(game->gameLock, "Protocol76::parseHouseWindow()")
 		house->setAccessList(listId, new_list);
-		OTSYS_THREAD_UNLOCK(game->gameLock, "Protocol76::parseHouseWindow()")
 		house = NULL;
 		listId = 0;
 	}
@@ -1310,7 +1353,7 @@ void Protocol76::sendCancel(const char *msg)
 	WriteBuffer(netmsg);
 }
 
-void Protocol76::sendCancelAttacking()
+void Protocol76::sendCancelTarget()
 {
 	NetworkMessage netmsg;
 	netmsg.AddByte(0xa3);

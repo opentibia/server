@@ -96,7 +96,7 @@ public:
 	virtual void sendCancelWalk() = 0;
 	virtual void sendStats() = 0;
 	virtual void sendChangeSpeed(const Creature* creature) = 0;
-	virtual void sendCancelAttacking() = 0;
+	virtual void sendCancelTarget() = 0;
 	virtual void sendTextMessage(MessageClasses mclass, const char* message) = 0;
 	virtual void sendTextMessage(MessageClasses mclass, const char* message,const Position &pos, unsigned char type) = 0;
 	virtual void sendChannelsDialog() = 0;

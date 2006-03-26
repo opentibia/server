@@ -61,7 +61,9 @@ private:
 	void parseLogout(NetworkMessage& msg);	
 	void parseCancelMove(NetworkMessage& msg);
 
-	void parseMoveByMouse(NetworkMessage& msg);	
+	void parseRecievePing(NetworkMessage& msg);
+	void parseAutoWalk(NetworkMessage& msg);
+	void parseStopAutoWalk(NetworkMessage& msg);	
 	void parseMoveNorth(NetworkMessage& msg);
 	void parseMoveEast(NetworkMessage& msg);
 	void parseMoveSouth(NetworkMessage& msg);
@@ -134,7 +136,7 @@ private:
 	virtual void sendCancel(const char *msg);
 	virtual void sendCancelWalk();
 	virtual void sendChangeSpeed(const Creature* creature);
-	virtual void sendCancelAttacking();
+	virtual void sendCancelTarget();
 	virtual void sendSetOutfit(const Creature* creature);
 	virtual void sendStats();
 	virtual void sendTextMessage(MessageClasses mclass, const char* message);
