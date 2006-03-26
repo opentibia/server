@@ -1225,7 +1225,14 @@ void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bo
 		}
 
 		g_chat.removeUserFromAllChannels(this);
-		if(!IOPlayer::instance()->savePlayer(this)){
+		bool saved = false;
+		for(long tries = 0; tries < 3; tries++){
+			if(IOPlayer::instance()->savePlayer(this)){
+				saved = true;
+				break;
+			}
+		}
+		if(!saved){
 			std::cout << "Error while saving player: " << getName() << std::endl;
 		}
 

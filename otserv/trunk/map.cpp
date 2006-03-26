@@ -152,10 +152,25 @@ bool Map::loadMap(const std::string& identifier, const std::string& type)
 bool Map::saveMap(const std::string& identifier)
 {
 	IOMapSerialize* IOMapSerialize = IOMapSerialize::getInstance();
-	IOMapSerialize->saveMap(this, mapStoreIdentifier);
-	IOMapSerialize->saveHouseInfo(this, houseStoreIdentifier);
-
-	return true;
+	bool saved = false;
+	for(long tries = 0;tries < 3;tries++){
+		if(IOMapSerialize->saveMap(this, mapStoreIdentifier)){
+			saved = true;
+			break;
+		}
+	}
+	
+	if(!saved)
+		return false;
+	
+	saved = false;
+	for(long tries = 0;tries < 3;tries++){
+		if(IOMapSerialize->saveHouseInfo(this, houseStoreIdentifier)){
+			saved = true;
+			break;
+		}
+	}
+	return saved;
 }
 
 Tile* Map::getTile(uint16_t _x, uint16_t _y, uint8_t _z)
