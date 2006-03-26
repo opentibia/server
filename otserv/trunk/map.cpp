@@ -528,6 +528,10 @@ std::list<Position> Map::getPathTo(Creature* creature, Position start, Position 
 
 bool Map::getPathTo(Creature* creature, Position toPosition, std::list<Direction>& listDir)
 {
+	if(creature->getPosition().z != toPosition.z){
+		return false;
+	}
+
 	AStarNodes nodes;
 	AStarNode* found = NULL;
 
