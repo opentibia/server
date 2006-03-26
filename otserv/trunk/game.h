@@ -26,12 +26,14 @@
 #include <vector>
 #include <set>
 
-#include "spawn.h"
+
+#include "map.h"
 #include "position.h"
 #include "item.h"
 #include "container.h"
+#include "player.h"
 #include "magic.h"
-#include "map.h"
+#include "spawn.h"
 #include "templates.h"
 #include "scheduler.h"
 
@@ -142,7 +144,6 @@ public:
   
 	void setWorldType(world_type_t type);
 	world_type_t getWorldType() const {return worldType;}
-	//const std::string& getSpawnFile() {return map->spawnfile;}
 
 	Cylinder* internalGetCylinder(Player* player, const Position& pos);
 	Thing* internalGetThing(Player* player, const Position& pos, int32_t index);
@@ -297,6 +298,8 @@ public:
 	bool internalCreatureChangeOutfit(Creature* creature);
 
 	bool internalMonsterYell(Monster* monster, const std::string& text);
+
+	bool internalFollowCreature(Player* player, const Creature* followCreature);
 	
 	//battle system
 	bool internalCreatureSaySpell(Creature *creature, const std::string &text);
@@ -313,7 +316,7 @@ public:
 	bool playerBroadcastMessage(Player* player, const std::string& text);
 	bool playerTalkToChannel(Player* player, SpeakClasses type, const std::string& text, unsigned short channelId);
 	bool playerAutoWalk(Player* player, std::list<Direction>& listDir);
-
+	bool playerStopAutoWalk(Player* player);
 	bool playerUseItemEx(Player* player, const Position& fromPos, uint8_t fromStackPos, uint16_t fromItemId,
 		const Position& toPos, uint8_t toStackPos, uint16_t toItemId);
 	bool playerUseItem(Player* player, const Position& pos, uint8_t stackpos, uint8_t index, uint16_t itemId);

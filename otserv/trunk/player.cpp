@@ -91,8 +91,7 @@ Creature()
 	tradeState = TRADE_NONE;
 	tradeItem = NULL;
 
-	for(int i = 0; i < 7; i++)
-	{
+	for(int i = 0; i < 7; i++){
 		skills[i][SKILL_LEVEL] = 10;
 		skills[i][SKILL_TRIES] = 0;
 		skills[i][SKILL_PERCENT] = 0;
@@ -117,8 +116,9 @@ Creature()
 	maglevel_percent = 0;
 
   //set item pointers to NULL
-	for(int i = 0; i < 11; i++)
+	for(int i = 0; i < 11; i++){
 		items[i] = NULL;
+	}
 
 	/*
  	CapGain[0]  = 10;     //for level advances
@@ -970,15 +970,15 @@ void Player::sendChangeSpeed(Creature* creature)
 	client->sendChangeSpeed(creature);
 }
 
-void Player::sendToChannel(Creature *creature, SpeakClasses type,
+void Player::sendToChannel(Creature* creature, SpeakClasses type,
 	const std::string &text, unsigned short channelId)
 {
 	client->sendToChannel(creature, type, text, channelId);
 }
 
-void Player::sendCancelAttacking()
+void Player::sendCancelTarget()
 {
-  client->sendCancelAttacking();
+	client->sendCancelTarget();
 }
 
 void Player::sendCancelWalk() const
@@ -1198,30 +1198,34 @@ void Player::onCreatureAppear(const Creature* creature, bool isLogin)
 void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout)
 {
 	if(attackedCreature2 == creature->getID()){
-		stopAttack();
+		setAttackedCreature(NULL);
+		sendCancelTarget();
 
 		if(isLogout){
 			sendTextMessage(MSG_STATUS_SMALL, "Target lost.");
 		}
 	}
 
-	checkFollowCreature(creature, true);
+	if(followCreature == creature){
+		setFollowCreature(NULL);
+		sendCancelTarget();
+
+		if(isLogout){
+			sendTextMessage(MSG_STATUS_SMALL, "Target lost.");
+		}
+	}
 
 	if(creature == this){
 		if(isLogout){
 			loginPosition = getPosition();
 		}
 
-		if(followCreature){
-			stopAutoWalk();
+		if(eventAutoWalk != 0){
+			setFollowCreature(NULL);
 		}
 
 		if(tradePartner){
 			g_game.playerCloseTrade(this);
-		}
-
-		if(eventAutoWalk != 0){
-			stopAutoWalk();
 		}
 
 		g_chat.removeUserFromAllChannels(this);
@@ -1244,15 +1248,22 @@ void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bo
 
 void Player::onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport)
 {
+	if(followCreature && (creature == followCreature || creature == this)){
+		if(!Position::areInRange<7,5,0>(followCreature->getPosition(), getPosition())){
+			setFollowCreature(NULL);
+			sendCancelTarget();
+			sendTextMessage(MSG_STATUS_SMALL, "Target lost.");
+		}
+	}
+
 	Creature* targetCreature = getAttackedCreature();
 	if((creature == this && targetCreature) || targetCreature == creature){
 		if(!Position::areInRange<7,5,0>(targetCreature->getPosition(), getPosition())){
-			stopAttack();
+			setAttackedCreature(NULL);
+			sendCancelTarget();
 			sendTextMessage(MSG_STATUS_SMALL, "Target lost.");
 		} 
 	}
-	
-	checkFollowCreature(creature);
 
 	if(creature == this){
 		if(tradeState != TRADE_TRANSFER){
@@ -1368,39 +1379,6 @@ void Player::onRemoveInventoryItem(slots_t slot, const Item* item)
 		const Container* container = item->getContainer();
 		if(container && container->isHoldingItem(tradeItem)){
 			g_game.playerCloseTrade(this);
-		}
-	}
-}
-
-void Player::checkFollowCreature(const Creature* creature, bool creatureDisappear /*= false*/)
-{
-	if(followCreature && (creature == followCreature || (creature == this && listWalkDir.empty()))){
-		bool continueFollow = true;
-
-		/*check if we still can follow this creature*/
-		if(creatureDisappear && followCreature == creature){
-			continueFollow = false;
-		}
-		else if(!Position::areInRange<1,1,0>(followCreature->getPosition(), getPosition())){
-			std::list<Direction> listDir;
-			if(!g_game.getPathTo(this, followCreature->getPosition(), listDir)){
-				continueFollow = false;
-			}
-		}
-
-		if(continueFollow){
-			if(followCreature == creature){
-				if(Position::areInRange<7,5,0>(followCreature->getPosition(), getPosition())){
-					g_game.playerFollowCreature(this, followCreature->getID());
-				}
-			}
-			else if(!Position::areInRange<1,1,0>(getPosition(), followCreature->getPosition())){
-				g_game.playerFollowCreature(this, followCreature->getID());
-			}
-		}
-		else{
-			stopAutoWalk();
-			sendTextMessage(MSG_STATUS_SMALL, "Target lost.");
 		}
 	}
 }
@@ -2347,16 +2325,26 @@ void Player::setAttackedCreature(const Creature* creature)
 {
 	Creature::setAttackedCreature(creature);
 
-	if(chaseMode == CHASEMODE_FOLLOW){
-		g_game.playerFollowCreature(this, (creature ? creature->getID() : 0));
+	if(chaseMode == CHASEMODE_FOLLOW && creature){
+		if(followCreature != creature){
+			//chase opponent
+			g_game.internalFollowCreature(this, creature);
+		}
 	}
-	else
-		g_game.playerFollowCreature(this, 0);
+	else{
+		setFollowCreature(NULL);
+	}
 }
 
-void Player::setFollowCreature(Creature* creature)
+void Player::setFollowCreature(const Creature* creature)
 {
-	followCreature = creature;
+	if(followCreature != creature){
+		followCreature = creature;
+
+		if(!followCreature){
+			stopAutoWalk();
+		}
+	}
 }
 
 void Player::setChaseMode(uint8_t mode)
@@ -2370,43 +2358,18 @@ void Player::setChaseMode(uint8_t mode)
 		chaseMode = CHASEMODE_STANDSTILL;
 	}
 	
-	if(attackedCreature2 && prevChaseMode != chaseMode){
+	if(prevChaseMode != chaseMode){
 		if(chaseMode == CHASEMODE_FOLLOW){
-			/*chase opponent*/
-			g_game.playerFollowCreature(this, attackedCreature2);
+			if(!followCreature && getAttackedCreature()){
+				//chase opponent
+				g_game.internalFollowCreature(this, getAttackedCreature());
+			}
 		}
-		else{
-			g_game.playerFollowCreature(this, 0);
+		else if(getAttackedCreature()){
+			setFollowCreature(NULL);
+			stopAutoWalk();
 		}
 	}
-}
-
-/*
-bool Player::startAttack(Creature* creature)
-{
-	setAttackedCreature(creature);
-}
-*/
-
-/*
-bool Player::addEventAttack()
-{
-	if(isRemoved()){
-		eventCheckAttacking = 0;
-		return false;
-	}
-
-	int ticks = getAttackTicks();
-	eventCheckAttacking = g_game.addEvent(makeTask(ticks,
-		std::bind2nd(std::mem_fun(&Game::checkAutoWalkPlayer), getID(), ticks));
-}
-*/
-
-bool Player::stopAttack()
-{
-	setAttackedCreature(NULL);
-	sendCancelAttacking();
-	return true;
 }
 
 bool Player::startAutoWalk(std::list<Direction>& listDir)
@@ -2443,14 +2406,30 @@ bool Player::stopAutoWalk()
 		eventAutoWalk = 0;
 
 		listWalkDir.clear();
-		setFollowCreature(NULL);
 		sendCancelWalk();
-		
-		stopAttack();
-		return true;
 	}
-	
-	return false;
+
+	return true;
+}
+
+bool Player::checkStopAutoWalk(bool pathInvalid /*= false*/)
+{
+	if(followCreature){
+		if(pathInvalid){
+			if(g_game.internalFollowCreature(this, followCreature)){
+				return false;
+			}
+		}
+		else if(chaseMode == CHASEMODE_FOLLOW){
+			if(g_game.internalFollowCreature(this, followCreature)){
+				return false;
+			}
+		}
+	}
+
+	setFollowCreature(NULL);
+	stopAutoWalk();
+	return true;
 }
 
 void Player::getCreatureLight(LightInfo& light) const

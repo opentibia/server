@@ -223,7 +223,7 @@ public:
 	void sendCancelMessage(ReturnValue message) const;
 	void sendCancel(const char* msg) const;
 	void sendCancelWalk() const;
-	void sendCancelAttacking();
+	void sendCancelTarget();
 	void sendStats();
 	void sendTextMessage(MessageClasses mclass, const char* message) const;
 	void sendTextMessage(MessageClasses mclass, const char* message,const Position &pos, unsigned char type) const;
@@ -264,16 +264,13 @@ public:
 	void updateItemsLight(bool internal = false);
 	
 	void setAttackedCreature(const Creature* creature);
-	void setFollowCreature(Creature* creature);
-	Creature* getFollowCreature() {return followCreature;}
+	void setFollowCreature(const Creature* creature);
+	const Creature* getFollowCreature() {return followCreature;};
 	void setChaseMode(uint8_t mode);
-
-	//bool startAttack(Creature* creature);
-	//bool addEventAttack();
-	bool stopAttack();
 
 	bool startAutoWalk(std::list<Direction>& listDir);
 	bool addEventAutoWalk();
+	bool checkStopAutoWalk(bool pathInvalid = false);
 	bool stopAutoWalk();
 
 #ifdef __SKULLSYSTEM__
@@ -338,7 +335,6 @@ public:
 	virtual void postRemoveNotification(Thing* thing, bool isCompleteRemoval, bool hadOwnership = true);
 
 protected:
-	void checkFollowCreature(const Creature* creature, bool creatureDisappear = false);
 	void checkTradeState(const Item* item);
 	void addSkillTryInternal(int skilltry,int skill);
 
@@ -387,7 +383,7 @@ protected:
 	long internal_ping;
 	long npings;
 	
-	Creature* followCreature;
+	const Creature* followCreature;
 	chaseMode_t chaseMode;
 	
 	//account variables

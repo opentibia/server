@@ -2112,25 +2112,23 @@ void Game::creatureApplyDamage(Creature *creature, int damage, int &outDamage, i
 
 bool Game::creatureOnPrepareAttack(Creature *creature, Position pos)
 {
-  if(creature){ 
+  if(creature){
 		Player* player = dynamic_cast<Player*>(creature);
 
-		//Tile* tile = (Tile*)getTile(creature->pos.x, creature->pos.y, creature->pos.z);
 		Tile* tile = map->getTile(creature->getPosition());
-		//Tile* targettile = getTile(pos.x, pos.y, pos.z);
 		Tile* targettile = map->getTile(pos);
 
-		if(creature->access == 0) {
-			if(tile && tile->isPz()) {
-				if(player) {					
-					player->sendTextMessage(MSG_STATUS_SMALL, "You may not attack a person while your in a protection zone.");	
+		if(creature->access == 0){
+			if(tile && tile->isPz()){
+				if(player){					
+					player->sendTextMessage(MSG_STATUS_SMALL, "You may not attack a person while you are in a protection zone.");	
 					playerSetAttackedCreature(player, 0);
 				}
 
 				return false;
 			}
-			else if(targettile && targettile->isPz()) {
-				if(player) {					
+			else if(targettile && targettile->isPz()){
+				if(player){
 					player->sendTextMessage(MSG_STATUS_SMALL, "You may not attack a person in a protection zone.");
 					playerSetAttackedCreature(player, 0);
 				}
@@ -2473,7 +2471,7 @@ bool Game::movePlayer(Player* player, Direction direction)
 	if(player->isRemoved())
 		return false;
 
-	player->stopAutoWalk();
+	player->checkStopAutoWalk();
 	return (internalMoveCreature(player, direction) == RET_NOERROR);
 }
 
@@ -2590,6 +2588,15 @@ bool Game::playerAutoWalk(Player* player, std::list<Direction>& listDir)
 	return player->startAutoWalk(listDir);
 }
 
+bool Game::playerStopAutoWalk(Player* player)
+{
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerStopAutoWalk()");
+	if(player->isRemoved())
+		return false;
+
+	return player->stopAutoWalk();
+}
+
 bool Game::playerUseItemEx(Player* player, const Position& fromPos, uint8_t fromStackPos, uint16_t fromItemId,
 	const Position& toPos, uint8_t toStackPos, uint16_t toItemId)
 {
@@ -2649,7 +2656,7 @@ bool Game::playerUseBattleWindow(Player* player, const Position& fromPos, uint8_
 		return false;
 
 	Creature* creature = getCreatureByID(creatureId);
-	if(!creature || dynamic_cast<Player*>(creature))
+	if(!creature || creature->getPlayer())
 		return false;
 
 	if(!Position::areInRange<7,5,0>(creature->getPosition(), player->getPosition())){
@@ -3108,7 +3115,8 @@ bool Game::playerSetAttackedCreature(Player* player, unsigned long creatureid)
 		return false;
 
 	if(player->attackedCreature2 != 0 && creatureid == 0){
-		player->stopAttack();
+		player->setAttackedCreature(NULL);
+		player->sendCancelTarget();
 	}
 
 	Creature* attackedCreature = getCreatureByID(creatureid);
@@ -3117,7 +3125,8 @@ bool Game::playerSetAttackedCreature(Player* player, unsigned long creatureid)
 	}
 
 	if(attackedCreature->access != 0 || (getWorldType() == WORLD_TYPE_NO_PVP && player->access == 0 && attackedCreature->getPlayer())) {
-		player->stopAttack();
+		player->setAttackedCreature(NULL);
+		player->sendCancelTarget();
 		player->sendTextMessage(MSG_STATUS_SMALL, "You may not attack this player.");
 	}
 	else{
@@ -3133,32 +3142,15 @@ bool Game::playerFollowCreature(Player* player, unsigned long creatureId)
 	if(player->isRemoved())
 		return false;
 
+	player->setAttackedCreature(NULL);
+
 	if(creatureId == 0){
-		player->stopAutoWalk();
+		player->setFollowCreature(NULL);
 		return true;
 	}
 
 	Creature* followCreature = getCreatureByID(creatureId);
-	if(!followCreature){
-		player->stopAutoWalk();
-		player->sendCancelMessage(RET_NOTPOSSIBLE);
-		return false;
-	}
-
-	std::list<Direction> listDir;
-
-	if(!Position::areInRange<1,1,0>(player->getPosition(), followCreature->getPosition())){
-		if(!map->getPathTo(player, followCreature->getPosition(), listDir)){
-			player->stopAutoWalk();
-			player->sendCancelMessage(RET_THEREISNOWAY);
-			return false;
-		}
-
-		listDir.pop_back();
-	}
-
-	player->setFollowCreature(followCreature);
-	return playerAutoWalk(player, listDir);
+	return internalFollowCreature(player, followCreature);
 }
 
 bool Game::playerSetFightModes(Player* player, uint8_t fightMode, uint8_t chaseMode)
@@ -3328,32 +3320,63 @@ bool Game::internalMonsterYell(Monster* monster, const std::string& text)
 	return true;
 }
 
+bool Game::internalFollowCreature(Player* player, const Creature* followCreature)
+{
+	if(!followCreature || !Position::areInRange<7,5,0>(player->getPosition(), followCreature->getPosition())){
+		player->setFollowCreature(NULL);
+		player->setAttackedCreature(NULL);
+
+		player->sendCancelTarget();
+		player->sendCancelMessage(RET_NOTPOSSIBLE);
+		return false;
+	}
+
+	std::list<Direction> listDir;
+	if(!Position::areInRange<1,1,0>(player->getPosition(), followCreature->getPosition())){
+		if(!map->getPathTo(player, followCreature->getPosition(), listDir)){
+			player->setFollowCreature(NULL);
+			player->setAttackedCreature(NULL);
+
+			player->sendCancelTarget();
+			player->sendCancelMessage(RET_THEREISNOWAY);
+			return false;
+		}
+
+		listDir.pop_back(); //remove the followCreature position
+	}
+
+	player->setFollowCreature(followCreature);
+	return playerAutoWalk(player, listDir);
+}
+
 void Game::checkAutoWalkPlayer(unsigned long id)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::checkAutoWalkPlayer");
 
 	Player* player = getPlayerByID(id);
 	if(player){
-		bool stopWalking = false;
-		if(!player->listWalkDir.empty()){
-			Position pos = player->getPosition();
-			Direction dir = player->listWalkDir.front();
-			player->listWalkDir.pop_front();
+		bool continueWalk = true;
 
-			if(internalMoveCreature(player, dir) != RET_NOERROR && !player->getFollowCreature()){
-				player->stopAutoWalk();
-				stopWalking = true;
+		if(player->listWalkDir.empty()){
+			if(player->checkStopAutoWalk(true)){
+				continueWalk = false;
 			}
-
-			flushSendBuffers();
-		}
-		else if(!player->getFollowCreature()){
-			/*not following and no path*/
-			stopWalking = true;
 		}
 		
-		if(!stopWalking){
-			player->addEventAutoWalk();
+		if(continueWalk){
+			if(!player->listWalkDir.empty()){
+				Position pos = player->getPosition();
+				Direction dir = player->listWalkDir.front();
+				player->listWalkDir.pop_front();
+
+				if(internalMoveCreature(player, dir) == RET_NOERROR || !player->checkStopAutoWalk(true)){
+					player->addEventAutoWalk();
+				}
+
+				flushSendBuffers();
+			}
+			else
+				player->addEventAutoWalk();
 		}
 	}
 }
