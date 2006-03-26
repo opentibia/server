@@ -677,11 +677,11 @@ bool Commands::setHouseOwner(Creature* creature, const std::string& cmd, const s
 				std::string real_name = param;
 				unsigned long guid;
 				unsigned long access_lvl;
-				if(IOPlayer::instance()->getGuidByName(guid, access_lvl, real_name)){
-					houseTile->getHouse()->setHouseOwner(guid);
-				}
-				else if(param == "none"){
+				if(param == "none"){
 					houseTile->getHouse()->setHouseOwner(0);
+				}
+				else if(IOPlayer::instance()->getGuidByName(guid, access_lvl, real_name)){
+					houseTile->getHouse()->setHouseOwner(guid);
 				}
 				else{
 					player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Player not found.");
