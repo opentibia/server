@@ -19,8 +19,8 @@
 //////////////////////////////////////////////////////////////////////
 
 
-#ifndef __CREATURE_H__
-#define __CREATURE_H__
+#ifndef __OTSERV_CREATURE_H__
+#define __OTSERV_CREATURE_H__
 
 #include <vector>
 
@@ -141,8 +141,7 @@ public:
 	
 	virtual fight_t getFightType(){return FIGHT_MELEE;};
 	virtual subfight_t getSubFightType() {return DIST_NONE;}
-	//virtual Item* getDistItem() {return NULL;};
-	//virtual void removeDistItem(){return;}
+
 	virtual int getImmunities() const
 	{
 		if(access != 0) 
@@ -187,18 +186,19 @@ public:
 	void setNormalSpeed()
 	{
 		if(access != 0){
-			speed = 900;     
+			speed = 900;
 		}
-		else		
-			speed = 220 + (2* (level - 1)); 
+		else
+			speed = 220 + (2* (level - 1));
 	}
 	
 	int getNormalSpeed()
 	{
-		if(access!=0){     
-			return 900;    
+		if(access != 0){
+			return 900;
 		}
-		return 220 + (2* (level - 1)); 
+
+		return 220 + (2* (level - 1));
 	}
 	
 	virtual void addInflictedDamage(Creature* attacker, int damage);
@@ -236,8 +236,10 @@ public:
 	int level;		// level
 	long inFightTicks, exhaustedTicks;
 	bool pzLocked;
+
 	unsigned long attackedCreature2;
 	//Creature* attackedCreature;
+
 	int lookhead, lookbody, looklegs, lookfeet, looktype, lookcorpse, lookmaster;
 	long manaShieldTicks, hasteTicks, paralyzeTicks;
 	Position masterPos;
