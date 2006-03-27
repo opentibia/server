@@ -685,17 +685,17 @@ bool Door::getAccessList(std::string& list) const
 
 Houses::Houses()
 {
-	std::string strRentPerioid = g_config.getGlobalString("houserentperiod", "monthly");
+	std::string strRentPeriod = g_config.getGlobalString("houserentperiod", "monthly");
 
 	rentPeriod = RENTPERIOD_MONTHLY;
 
-	if(strRentPerioid == "yearly"){
+	if(strRentPeriod == "yearly"){
 		rentPeriod = RENTPERIOD_YEARLY;
 	}
-	else if(strRentPerioid == "weekly"){
+	else if(strRentPeriod == "weekly"){
 		rentPeriod = RENTPERIOD_WEEKLY;
 	}
-	else if(strRentPerioid == "daily"){
+	else if(strRentPeriod == "daily"){
 		rentPeriod = RENTPERIOD_DAILY;
 	}
 }

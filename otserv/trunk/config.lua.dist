@@ -11,6 +11,7 @@ datadir = "data/"
 map = "data/world/map.otx"
 mapstore = "data/world/map-mapstore.xml"
 housestore = "data/world/map-housestore.xml"
+houserentperiod = "monthly"
 
 -- mapkind
 -- OTBM for binary, SQL for SQL map, XML for OTX maps
