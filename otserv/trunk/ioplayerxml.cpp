@@ -46,7 +46,7 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 {
 	std::string datadir = g_config.getGlobalString("datadir");
 	std::string filename = datadir + "players/" + name + ".xml";
-	std::transform(filename.begin(),filename.end(), filename.begin(), tolower);
+	toLowerCaseString(filename); //all players are saved as lowercase
 
 	xmlMutexLock(xmlmutex);
 	xmlDocPtr doc = xmlParseFile(filename.c_str());
@@ -57,7 +57,7 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 
 		root = xmlDocGetRootElement(doc);
 
-		if(xmlStrcmp(root->name,(const xmlChar*)"player")){
+		if(xmlStrcmp(root->name,(const xmlChar*)"player") != 0){
 			std::cout << "Error while loading " << name << std::endl;
 		}
 
@@ -86,8 +86,11 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 		  return false;
 		}
 
-		if(readXMLInteger(root, "id", intValue)){
-			player->setGUID(intValue);
+		unsigned long _guid = 0;
+		unsigned long _alvl = 0;
+		std::string _name = player->getName();
+		if(getGuidByName(_guid, _alvl, _name)){
+			player->setGUID(_guid);
 		}
 
 		player->accountNumber = account;
@@ -440,6 +443,8 @@ bool IOPlayerXML::savePlayer(Player* player)
 {
 	std::string datadir = g_config.getGlobalString("datadir");
 	std::string filename = datadir + "players/" + player->getName() + ".xml";
+	toLowerCaseString(filename); //store all player files in lowercase
+
 	std::stringstream sb;
     
 	xmlMutexLock(xmlmutex);    
@@ -591,12 +596,93 @@ bool IOPlayerXML::savePlayer(Player* player)
 
 bool IOPlayerXML::getGuidByName(unsigned long& guid, unsigned long& alvl, std::string& name)
 {
+	//load players.xml to get guid
 	std::string datadir = g_config.getGlobalString("datadir");
-	std::string filename = datadir + "players/" + name + ".xml";
-	std::transform (filename.begin(),filename.end(), filename.begin(), tolower);
-	xmlDocPtr doc;	
-	xmlMutexLock(xmlmutex);
-	doc = xmlParseFile(filename.c_str());
+	std::string playersfile = datadir + "players/" + "players.xml";
+
+	xmlDocPtr doc = xmlParseFile(playersfile.c_str());
+
+	bool isSuccess = false;
+
+	if(doc){
+		int intValue;
+		std::string strValue;
+
+		xmlNodePtr root = xmlDocGetRootElement(doc);
+
+		if(xmlStrcmp(root->name,(const xmlChar*)"players") != 0){
+			xmlFreeDoc(doc);
+			return false;
+		}
+
+		xmlNodePtr playerNode = root->children;
+		while(playerNode){
+			if(xmlStrcmp(playerNode->name,(const xmlChar*)"player") == 0){
+				if(readXMLString(playerNode, "name", strValue)){
+
+					if(stricmp(strValue.c_str(), name.c_str()) == 0){
+
+						if(readXMLInteger(playerNode, "guid", intValue)){
+							guid = intValue;
+							isSuccess = true;
+
+							break;
+						}
+					}
+				}
+			}
+
+			playerNode = playerNode->next;
+		}
+	}
+
+	xmlFreeDoc(doc);
+
+	if(!isSuccess){
+		return false;
+	}
+
+	//load player file to get "real" name, access level etc.
+	std::string playerfile = datadir + "players/" + name + ".xml";
+	toLowerCaseString(playerfile);
+
+	doc = xmlParseFile(playerfile.c_str());
+
+	if(doc){
+		int intValue;
+		std::string strValue;
+
+		xmlNodePtr root = xmlDocGetRootElement(doc);
+
+		if(xmlStrcmp(root->name,(const xmlChar*)"player") != 0){
+			xmlFreeDoc(doc);
+			return false;
+		}
+
+		if(readXMLString(root, "name", strValue)){
+			name = strValue;
+		}
+		else
+			isSuccess = false;
+
+		if(readXMLInteger(root, "access", intValue)){
+			alvl = intValue;
+		}
+		else
+			isSuccess = false;
+	}
+
+	xmlFreeDoc(doc);
+
+	return isSuccess;
+}
+
+bool IOPlayerXML::getNameByGuid(unsigned long guid, std::string &name)
+{
+	std::string datadir = g_config.getGlobalString("datadir");
+	std::string filename = datadir + "players/" + "players.xml";
+
+	xmlDocPtr doc = xmlParseFile(filename.c_str());
 
 	bool isSuccess = false;
 
@@ -608,42 +694,47 @@ bool IOPlayerXML::getGuidByName(unsigned long& guid, unsigned long& alvl, std::s
 
 		xmlNodePtr root = xmlDocGetRootElement(doc);
 
-		if(xmlStrcmp(root->name,(const xmlChar*)"player")){
-			isSuccess = false;
+		if(xmlStrcmp(root->name,(const xmlChar*)"players") != 0){
+			xmlFreeDoc(doc);
+			return false;
 		}
-		else{
-			if(readXMLString(root, "name", strValue)){
-				name = strValue;
-			}
-			else
-				isSuccess = false;
 
-			if(readXMLInteger(root, "access", intValue)){
-				alvl = intValue;
-			}
-			else
-				isSuccess = false;
+		xmlNodePtr playerNode = root->children;
+		while(playerNode){
+			if(xmlStrcmp(playerNode->name,(const xmlChar*)"player") == 0){
+				if(readXMLInteger(playerNode, "guid", intValue)){
 
-			if(readXMLInteger(root, "id", intValue)){
-				guid = intValue;
-				isSuccess = true;
+					if(intValue == guid){
+
+						if(readXMLString(playerNode, "name", strValue)){
+
+							name = strValue;
+							isSuccess = true;
+							break;
+						}
+					}
+				}
 			}
-			else
-				isSuccess = false;
+
+			playerNode = playerNode->next;
 		}
 	}
 
 	xmlFreeDoc(doc);
-	xmlMutexUnlock(xmlmutex);	
 
 	return isSuccess;
+}
+
+bool IOPlayerXML::getGuildIdByName(unsigned long& guildId, const std::string& guildName)
+{
+	return false;
 }
 
 bool IOPlayerXML::playerExists(std::string name)
 {
 	std::string datadir = g_config.getGlobalString("datadir");
 	std::string filename = datadir + "players/" + name + ".xml";
-	//std::transform(filename.begin(), filename.end(), filename.begin(), tolower);
+	std::transform(filename.begin(), filename.end(), filename.begin(), tolower);
 
 	return fileExists(filename.c_str());
 }

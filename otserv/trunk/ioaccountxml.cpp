@@ -52,7 +52,7 @@ Account IOAccountXML::loadAccount(unsigned long accno)
 		xmlNodePtr root, p;
 		root = xmlDocGetRootElement(doc);
 
-		if(xmlStrcmp(root->name,(const xmlChar*)"account")){
+		if(xmlStrcmp(root->name,(const xmlChar*)"account") != 0){
 			xmlFreeDoc(doc);			
 			xmlMutexUnlock(xmlmutex);
 			return acc;
@@ -119,7 +119,7 @@ bool IOAccountXML::getPassword(unsigned long accno, const std::string &name, std
 		xmlNodePtr root, p;
 		root = xmlDocGetRootElement(doc);
 
-		if(xmlStrcmp(root->name,(const xmlChar*)"account")){
+		if(xmlStrcmp(root->name,(const xmlChar*)"account") != 0){
 			xmlFreeDoc(doc);			
 			xmlMutexUnlock(xmlmutex);
 			return false;
