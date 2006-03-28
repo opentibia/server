@@ -19,10 +19,12 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "ioaccountxml.h"
+#include "tools.h"
+
 #include <algorithm>
 #include <functional>
 #include <sstream>
-//#include <string.h>
+
 #include "luascript.h"
 
 extern xmlMutexPtr xmlmutex;
@@ -43,15 +45,14 @@ Account IOAccountXML::loadAccount(unsigned long accno)
 	std::string datadir = g_config.getGlobalString("datadir");
 	accsstr << datadir + "accounts/" << accno << ".xml";
 	std::string filename = accsstr.str();
-	std::transform(filename.begin(), filename.end(), filename.begin(), tolower);
 	xmlMutexLock(xmlmutex);
-	xmlDocPtr doc = xmlParseFile(filename.c_str());
 
+	xmlDocPtr doc = xmlParseFile(filename.c_str());
 	if(doc){
-		xmlNodePtr root, p, tmp;
+		xmlNodePtr root, p;
 		root = xmlDocGetRootElement(doc);
 
-		if(xmlStrcmp(root->name,(const xmlChar*) "account")){
+		if(xmlStrcmp(root->name,(const xmlChar*)"account")){
 			xmlFreeDoc(doc);			
 			xmlMutexUnlock(xmlmutex);
 			return acc;
@@ -59,36 +60,33 @@ Account IOAccountXML::loadAccount(unsigned long accno)
 
 		p = root->children;
 
-		// perhaps verify name
-		char* nodeValue = NULL;
-		nodeValue = (char*)xmlGetProp(root, (const xmlChar *)"pass");
-		acc.password  = nodeValue;
-		xmlFreeOTSERV(nodeValue);
+		std::string strValue;
+		int intValue;
 
-		nodeValue = (char*)xmlGetProp(root, (xmlChar*)"type");
-		acc.accType  = atoi(nodeValue);
-		xmlFreeOTSERV(nodeValue);
+		if(readXMLString(root, "pass", strValue)){
+			acc.password = strValue;
+		}
 
-		nodeValue = (char*)xmlGetProp(root, (xmlChar*)"premDays");
-		acc.premDays  = atoi(nodeValue);
-		xmlFreeOTSERV(nodeValue);
+		if(readXMLInteger(root, "type", intValue)){
+			acc.accType = intValue;
+		}
+
+		if(readXMLInteger(root, "premDays", intValue)){
+			acc.premDays = intValue;
+		}
 
 		// now load in characters.
 		while(p){
-			if(xmlStrcmp(p->name, (const xmlChar*) "characters") == 0){
-				tmp = p->children;
-				while(tmp){
-					nodeValue = (char*)xmlGetProp(tmp, (xmlChar*)"name");
-
-					if(nodeValue){
-						if(strcmp((const char*)tmp->name, "character") == 0) {
-							acc.charList.push_back(std::string(nodeValue));
+			if(xmlStrcmp(p->name, (const xmlChar*)"characters") == 0){
+				xmlNodePtr tmpNode = p->children;
+				while(tmpNode){
+					if(readXMLString(tmpNode, "name", strValue)){
+						if(xmlStrcmp(tmpNode->name, (const xmlChar*)"character") == 0){
+							acc.charList.push_back(strValue);
 						}
-
-						xmlFreeOTSERV(nodeValue);
 					}
 
-					tmp = tmp->next;
+					tmpNode = tmpNode->next;
 				}
 			}
 			p = p->next;
@@ -105,7 +103,6 @@ Account IOAccountXML::loadAccount(unsigned long accno)
 	return acc;
 }
 
-
 bool IOAccountXML::getPassword(unsigned long accno, const std::string &name, std::string &password)
 {
 	std::string acc_password;
@@ -114,48 +111,43 @@ bool IOAccountXML::getPassword(unsigned long accno, const std::string &name, std
 	std::string datadir = g_config.getGlobalString("datadir");
 	accsstr << datadir + "accounts/" << accno << ".xml";
 	std::string filename = accsstr.str();
-	std::transform(filename.begin(), filename.end(), filename.begin(), tolower);
 	
 	xmlMutexLock(xmlmutex);
 	xmlDocPtr doc = xmlParseFile(filename.c_str());
+
 	if(doc){
-		xmlNodePtr root, p, tmp;
+		xmlNodePtr root, p;
 		root = xmlDocGetRootElement(doc);
 
-		if(xmlStrcmp(root->name,(const xmlChar*) "account")){
+		if(xmlStrcmp(root->name,(const xmlChar*)"account")){
 			xmlFreeDoc(doc);			
 			xmlMutexUnlock(xmlmutex);
 			return false;
 		}
 
 		p = root->children;
-
-		char* nodeValue = NULL;
-		nodeValue = (char*)xmlGetProp(root, (const xmlChar *)"pass");
-		acc_password  = nodeValue;
-		xmlFreeOTSERV(nodeValue);
+		
+		std::string strValue;
+		if(readXMLString(root, "pass", strValue)){
+			acc_password = strValue;
+		}
 
 		// now load in characters.
 		while(p){
-			if(xmlStrcmp(p->name, (const xmlChar*) "characters") == 0){
-				tmp = p->children;
-				while(tmp){
-					nodeValue = (char*)xmlGetProp(tmp, (xmlChar*)"name");
-
-					if(nodeValue){
-						if(strcmp((const char*)tmp->name, "character") == 0){
-							if(nodeValue == name){
+			if(xmlStrcmp(p->name, (const xmlChar*)"characters") == 0){
+				xmlNodePtr tmpNode = p->children;
+				while(tmpNode){
+					if(readXMLString(tmpNode, "name", strValue)){
+						if(xmlStrcmp(tmpNode->name, (const xmlChar*)"character") == 0){
+							if(strValue == name){
 								password = acc_password;
-								xmlFreeOTSERV(nodeValue);
 								xmlFreeDoc(doc);
 								xmlMutexUnlock(xmlmutex);
 								return true;
 							}
 						}
-						xmlFreeOTSERV(nodeValue);
 					}
-
-					tmp = tmp->next;
+					tmpNode = tmpNode->next;
 				}
 			}
 			p = p->next;
