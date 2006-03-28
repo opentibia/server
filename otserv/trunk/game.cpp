@@ -1415,7 +1415,7 @@ bool Game::removeItemOfType(Cylinder* cylinder, uint16_t itemId, uint32_t count)
 	Thing* thing = NULL;
 	Item* item = NULL;
 	
-	for(int i = cylinder->__getFirstIndex(); i < cylinder->__getLastIndex(); ++i){
+	for(int i = cylinder->__getFirstIndex(); i < cylinder->__getLastIndex() && count > 0; ++i){
 		if(!(thing = cylinder->__getThing(i)))
 			continue;
 
@@ -1429,6 +1429,7 @@ bool Game::removeItemOfType(Cylinder* cylinder, uint16_t itemId, uint32_t count)
 					count = 0;
 				}
 				else{
+					count-= item->getItemCount();
 					internalRemoveItem(item, count);
 				}
 			}
@@ -1541,7 +1542,7 @@ bool Game::removeMoney(Cylinder* cylinder, uint32_t money, uint32_t flags /*= 0*
 	
 	uint32_t moneyCount = 0;
 
-	for(int i = cylinder->__getFirstIndex(); i < cylinder->__getLastIndex(); ++i){
+	for(int i = cylinder->__getFirstIndex(); i < cylinder->__getLastIndex() && money > 0; ++i){
 		if(!(thing = cylinder->__getThing(i)))
 			continue;
 
