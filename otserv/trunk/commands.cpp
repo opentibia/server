@@ -96,7 +96,7 @@ bool Commands::loadXml(const std::string& _datadir)
 		xmlNodePtr root, p;
 		root = xmlDocGetRootElement(doc);
 		
-		if(xmlStrcmp(root->name,(const xmlChar*)"commands")){
+		if(xmlStrcmp(root->name,(const xmlChar*)"commands") != 0){
 			xmlFreeDoc(doc);
 			return false;
 		}

@@ -54,7 +54,7 @@ bool Spells::loadFromXml(const std::string& _datadir)
 		xmlNodePtr root, p;
 		root = xmlDocGetRootElement(doc);
 		
-		if(xmlStrcmp(root->name,(const xmlChar*)"spells")){
+		if(xmlStrcmp(root->name,(const xmlChar*)"spells") != 0){
 			//TODO: use exceptions here
 			std::cerr << "Malformed XML" << std::endl;
 		}

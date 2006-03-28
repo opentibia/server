@@ -295,7 +295,7 @@ bool IOMapSerializeXML::loadTile(Map* map, xmlNodePtr nodeTile, Tile* tile)
 		  
 	nodeItem = nodeTile->children;
 	while(nodeItem){
-		if(xmlStrcmp(nodeItem->name,(const xmlChar*) "item")==0){          
+		if(xmlStrcmp(nodeItem->name,(const xmlChar*) "item") == 0){          
 			unsigned int id = 0;
 			item = NULL;
 
@@ -432,7 +432,7 @@ bool IOMapSerializeXML::loadHouseInfo(Map* map, const std::string& identifier)
 
 				xmlNodePtr nodeHouseAccessList = nodeHouse->children;
 				while(nodeHouseAccessList){
-					if(xmlStrcmp(nodeHouseAccessList->name,(const xmlChar*) "accesslist")==0){
+					if(xmlStrcmp(nodeHouseAccessList->name,(const xmlChar*) "accesslist") == 0){
 						int listId = 0;
 						if(readXMLInteger(nodeHouseAccessList, "listid", listId)){
 							std::string text;

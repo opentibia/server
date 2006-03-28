@@ -63,7 +63,7 @@ bool SpawnManager::loadSpawnsXML(std::string filename)
 		xmlNodePtr root, spawnNode;		
 		root = xmlDocGetRootElement(doc);
 		
-		if(xmlStrcmp(root->name,(const xmlChar*)"spawns")){
+		if(xmlStrcmp(root->name,(const xmlChar*)"spawns") != 0){
 			xmlFreeDoc(doc);
 			return false;
 		}

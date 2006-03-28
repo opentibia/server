@@ -56,7 +56,7 @@ Npc::Npc(const std::string& _name) :
 		xmlNodePtr root, p;
 		root = xmlDocGetRootElement(doc);
 
-		if(xmlStrcmp(root->name,(const xmlChar*)"npc")){
+		if(xmlStrcmp(root->name,(const xmlChar*)"npc") != 0){
 			//TODO: use exceptions here
 			std::cerr << "Malformed XML" << std::endl;
 		}

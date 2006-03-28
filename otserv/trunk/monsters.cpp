@@ -239,7 +239,7 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 		xmlNodePtr root, p;
 		root = xmlDocGetRootElement(doc);
 
-		if(xmlStrcmp(root->name,(const xmlChar*)"monster")){
+		if(xmlStrcmp(root->name,(const xmlChar*)"monster") != 0){
 			std::cerr << "Malformed XML: " << file << std::endl;
 		}
 
