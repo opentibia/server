@@ -298,7 +298,7 @@ xmlNodePtr Item::serialize()
 	
 	if(hasSubType()){
 		ss.str("");
-		ss << getItemCountOrSubtype();
+		ss << (int)getItemCountOrSubtype();
 		xmlSetProp(nodeItem, (const xmlChar*)"count", (const xmlChar*)ss.str().c_str());
 	}
 
