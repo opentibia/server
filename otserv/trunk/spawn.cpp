@@ -22,6 +22,7 @@
 #include "game.h"
 #include "player.h"
 #include "npc.h"
+#include "tools.h"
 
 #ifdef ENABLESQLMAPSUPPORT
 #include <mysql++.h>
@@ -56,67 +57,54 @@ bool SpawnManager::addSpawn(Spawn* spawn)
 
 bool SpawnManager::loadSpawnsXML(std::string filename)
 {
-	std::transform(filename.begin(), filename.end(), filename.begin(), tolower);
 	xmlDocPtr doc = xmlParseFile(filename.c_str());
 
 	if(doc){
-		xmlNodePtr root, spawnNode;
-		char* nodeValue = NULL;
+		xmlNodePtr root, spawnNode;		
 		root = xmlDocGetRootElement(doc);
 		
-		root = xmlDocGetRootElement(doc);
-		
-		if(xmlStrcmp(root->name,(const xmlChar*) "spawns")){
+		if(xmlStrcmp(root->name,(const xmlChar*)"spawns")){
 			xmlFreeDoc(doc);
 			return false;
 		}
 
+		int intValue;
+		std::string strValue;
+
 		spawnNode = root->children;
-            
 		while(spawnNode){
-			if(xmlStrcmp(spawnNode->name, (const xmlChar*) "spawn") == 0){
+			if(xmlStrcmp(spawnNode->name, (const xmlChar*)"spawn") == 0){
 				Position centerpos;
 				int radius;
 
-				nodeValue = (char*)xmlGetProp(spawnNode, (const xmlChar *)"centerx");
-				if(nodeValue){
-					centerpos.x = atoi(nodeValue);
-					xmlFreeOTSERV(nodeValue);
-				}
-				else {
-					xmlFreeOTSERV(nodeValue);
-					return false;
-				}
-
-				nodeValue = (char*)xmlGetProp(spawnNode, (const xmlChar *)"centery");
-				if(nodeValue) {
-					centerpos.y = atoi(nodeValue);
-					xmlFreeOTSERV(nodeValue);
+				if(readXMLInteger(spawnNode, "centerx", intValue)){
+					centerpos.x = intValue;
 				}
 				else{
-					xmlFreeOTSERV(nodeValue);
 					xmlFreeDoc(doc);
 					return false;
 				}
 
-				nodeValue = (char*)xmlGetProp(spawnNode, (const xmlChar *)"centerz");
-				if(nodeValue){
-					centerpos.z = atoi(nodeValue);
-					xmlFreeOTSERV(nodeValue);
+				if(readXMLInteger(spawnNode, "centery", intValue)){
+					centerpos.y = intValue;
 				}
 				else{
-					xmlFreeOTSERV(nodeValue);
 					xmlFreeDoc(doc);
 					return false;
 				}
 
-				nodeValue = (char*)xmlGetProp(spawnNode, (const xmlChar *)"radius");
-				if(nodeValue){
-					radius = atoi(nodeValue);
-					xmlFreeOTSERV(nodeValue);
+				if(readXMLInteger(spawnNode, "centerz", intValue)){
+					centerpos.z = intValue;
 				}
 				else{
-					xmlFreeOTSERV(nodeValue);
+					xmlFreeDoc(doc);
+					return false;
+				}
+
+				if(readXMLInteger(spawnNode, "radius", intValue)){
+					radius = intValue;
+				}
+				else{
 					xmlFreeDoc(doc);
 					return false;
 				}
@@ -129,53 +117,44 @@ bool SpawnManager::loadSpawnsXML(std::string filename)
 				Direction direction = NORTH;
 				int rawdir = 0; //NORTH
 
-				xmlNodePtr tmp = spawnNode->children;
-				while(tmp){
-					if(xmlStrcmp(tmp->name, (const xmlChar*) "monster") == 0){
-						nodeValue = (char*)xmlGetProp(tmp, (const xmlChar *)"name");
-						if(nodeValue) {
-							name = nodeValue;
-							xmlFreeOTSERV(nodeValue);
+				xmlNodePtr tmpNode = spawnNode->children;
+				while(tmpNode){
+					if(xmlStrcmp(tmpNode->name, (const xmlChar*)"monster") == 0){
+
+						if(readXMLString(tmpNode, "name", strValue)){
+							name = strValue;
 						}
 						else{
-							tmp = tmp->next;
-							break;
+							tmpNode = tmpNode->next;
+							continue;
 						}
 
-						nodeValue = (char*)xmlGetProp(tmp, (const xmlChar *)"direction");
-						if(nodeValue) {
-							rawdir = atoi(nodeValue);
-							xmlFreeOTSERV(nodeValue);
+						if(readXMLInteger(tmpNode, "direction", intValue)){
+							rawdir = intValue;
 						}
 
-						nodeValue = (char*)xmlGetProp(tmp, (const xmlChar *)"x");
-						if(nodeValue){
-							x = atoi(nodeValue);
-							xmlFreeOTSERV(nodeValue);
+						if(readXMLInteger(tmpNode, "x", intValue)){
+							x = intValue;
 						}
 						else{
-							tmp = tmp->next;
-							break;
+							tmpNode = tmpNode->next;
+							continue;
 						}
 
-						nodeValue = (char*)xmlGetProp(tmp, (const xmlChar *)"y");
-						if(nodeValue){
-							y = atoi(nodeValue);
-							xmlFreeOTSERV(nodeValue);
+						if(readXMLInteger(tmpNode, "y", intValue)){
+							y = intValue;
 						}
 						else{
-							tmp = tmp->next;
-							break;
+							tmpNode = tmpNode->next;
+							continue;
 						}
 
-						nodeValue = (char*)xmlGetProp(tmp, (const xmlChar *)"spawntime");
-						if(nodeValue) {
-							spawntime = atoi(nodeValue);
-							xmlFreeOTSERV(nodeValue);
+						if(readXMLInteger(tmpNode, "spawntime", intValue)){
+							spawntime = intValue;
 						}
 						else{
-							tmp = tmp->next;
-							break;
+							tmpNode = tmpNode->next;
+							continue;
 						}
 
 						switch(rawdir){
@@ -191,35 +170,34 @@ bool SpawnManager::loadSpawnsXML(std::string filename)
 
 						spawn->addMonster(name, direction, x, y, spawntime * 1000);
 					}
-					else if(xmlStrcmp(tmp->name, (const xmlChar*) "npc") == 0){
-						nodeValue = (char*)xmlGetProp(tmp, (const xmlChar *)"name");
-						if(nodeValue) {
-							name = nodeValue;
-							xmlFreeOTSERV(nodeValue);
+					else if(xmlStrcmp(tmpNode->name, (const xmlChar*)"npc") == 0){
+
+						if(readXMLString(tmpNode, "name", strValue)){
+							name = strValue;
 						}
 						else{
-							tmp = tmp->next;
-							break;
+							tmpNode = tmpNode->next;
+							continue;
 						}
 
 						Npc* npc = new Npc(name);
 						if(!npc->isLoaded()){
 							delete npc;
 
-							tmp = tmp->next;
-							break;
+							tmpNode = tmpNode->next;
+							continue;
 						}
 						
 						// Place the npc
 						if(!g_game.placeCreature(centerpos, npc)){
 							delete npc;
 
-							tmp = tmp->next;
-							break;
+							tmpNode = tmpNode->next;
+							continue;
 						}
 					}
 
-					tmp = tmp->next;
+					tmpNode = tmpNode->next;
 				}
 			}
 

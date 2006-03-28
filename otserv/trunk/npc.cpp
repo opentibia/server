@@ -20,6 +20,9 @@
 
 
 #include "definitions.h"
+#include "npc.h"
+#include "game.h"
+#include "tools.h"
 
 #include <algorithm>
 #include <functional>
@@ -30,9 +33,6 @@
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 
-#include "npc.h"
-#include "game.h"
-
 #include "luascript.h"
 
 extern LuaScript g_config;
@@ -40,165 +40,120 @@ extern Game g_game;
 
 AutoList<Npc> Npc::listNpc;
 
-Npc::Npc(const std::string& name) :
+Npc::Npc(const std::string& _name) :
  Creature()
 {
-	char *tmp;
-	this->loaded = false;
-	this->name = name;
+	loaded = false;
+	name = _name;
+
 	std::string datadir = g_config.getGlobalString("datadir");
 	std::string filename = datadir + "npc/" + std::string(name) + ".xml";
-	std::transform(filename.begin(), filename.end(), filename.begin(), tolower);
+
 	xmlDocPtr doc = xmlParseFile(filename.c_str());
 
 	if(doc){
-		this->loaded=true;
+		loaded = true;
 		xmlNodePtr root, p;
 		root = xmlDocGetRootElement(doc);
 
-		if (xmlStrcmp(root->name,(const xmlChar*) "npc")){
+		if(xmlStrcmp(root->name,(const xmlChar*)"npc")){
 			//TODO: use exceptions here
 			std::cerr << "Malformed XML" << std::endl;
 		}
 
+		int intValue;
+		std::string strValue;
+
 		p = root->children;
 		
-		tmp = (char*)xmlGetProp(root, (const xmlChar *)"script");
-		if(tmp){
-			this->scriptname = tmp;
-			xmlFreeOTSERV(tmp);
+		if(readXMLString(root, "script", strValue)){
+			scriptname = strValue;
 		}
-		else{
-			this->scriptname = "";
-		}
+		else
+			scriptname = "";
 		
-		if(tmp = (char*)xmlGetProp(root, (const xmlChar *)"name")) {
-			this->name = tmp;
-			xmlFreeOTSERV(tmp);
+		if(readXMLString(root, "script", strValue)){
+			name = strValue;
 		}
-		else{
-			this->name = "";
+		else
+			name = "";
+
+		if(readXMLInteger(root, "access", intValue)){
+			access = intValue;
 		}
-		
-		if(tmp = (char*)xmlGetProp(root, (const xmlChar *)"access")) {
-			access = atoi(tmp);
-			xmlFreeOTSERV(tmp);
-		}
-		else{
+		else
 			access = 0;
-		}
 		
-		if(tmp = (char*)xmlGetProp(root, (const xmlChar *)"level")) {
-			level = atoi(tmp);
-			xmlFreeOTSERV(tmp);
-			setNormalSpeed();
-			//std::cout << level << std::endl;
+		if(readXMLInteger(root, "level", intValue)){
+			level = intValue;
 		}
-		else{
+		else
 			level = 1;
-		}
+
+		setNormalSpeed();
 		
-		if(tmp = (char*)xmlGetProp(root, (const xmlChar *)"maglevel")) {
-			maglevel = atoi(tmp);
-			xmlFreeOTSERV(tmp);
-			//std::cout << maglevel << std::endl;
+		if(readXMLInteger(root, "maglevel", intValue)){
+			maglevel = intValue;
 		}
-		else{
+		else
 			maglevel = 1;
-		}
 		
 		while(p){
-			if(xmlStrcmp(p->name, (const xmlChar*) "health") == 0){
-				if(tmp = (char*)xmlGetProp(p, (const xmlChar *)"now")) {
-					this->health = atoi(tmp);
-					xmlFreeOTSERV(tmp);
+			if(xmlStrcmp(p->name, (const xmlChar*)"health") == 0){
+
+				if(readXMLInteger(p, "now", intValue)){
+					health = intValue;
 				}
-				else{
-					this->health = 100;
+				else
+					health = 100;
+
+				if(readXMLInteger(p, "max", intValue)){
+					healthmax = intValue;
 				}
-				if(tmp = (char*)xmlGetProp(p, (const xmlChar *)"max")) {
-					this->healthmax = atoi(tmp);
-					xmlFreeOTSERV(tmp);
-				}
-				else{
-					this->healthmax = 100;
-				}
+				else
+					healthmax = 100;
 			}
-			if(xmlStrcmp(p->name, (const xmlChar*) "look") == 0){
-				if(tmp = (char*)xmlGetProp(p, (const xmlChar *)"type")) {
-					this->looktype = atoi(tmp);
-					xmlFreeOTSERV(tmp);
+			if(xmlStrcmp(p->name, (const xmlChar*)"look") == 0){
+
+				if(readXMLInteger(p, "type", intValue)){
+					looktype = intValue;
 				}
-				else{
-					this->looktype = 20;
+				else
+					looktype = 20;
+
+				lookmaster = looktype;
+
+				if(readXMLInteger(p, "head", intValue)){
+					lookhead = intValue;
 				}
-				this->lookmaster = this->looktype;
-				if(tmp = (char*)xmlGetProp(p, (const xmlChar *)"head")) {
-					this->lookhead = atoi(tmp);
-					xmlFreeOTSERV(tmp);
+				else
+					lookhead = 10;
+
+				if(readXMLInteger(p, "body", intValue)){
+					lookbody = intValue;
 				}
-				else{
-					this->lookhead = 10;
+				else
+					lookbody = 20;
+
+				if(readXMLInteger(p, "legs", intValue)){
+					looklegs = intValue;
 				}
+				else
+					looklegs = 30;
 				
-				if(tmp = (char*)xmlGetProp(p, (const xmlChar *)"body")) {
-					this->lookbody = atoi(tmp);
-					xmlFreeOTSERV(tmp);
+				if(readXMLInteger(p, "feet", intValue)){
+					lookfeet = intValue;
 				}
-				else{
-					this->lookbody = 20;
+				else
+					lookfeet = 40;
+
+				if(readXMLInteger(p, "corpse", intValue)){
+					lookcorpse = intValue;
 				}
-				
-				if(tmp = (char*)xmlGetProp(p, (const xmlChar *)"legs")) {
-					this->looklegs = atoi(tmp);
-					xmlFreeOTSERV(tmp);
-				}
-				else{
-					this->looklegs = 30;
-				}
-				
-				if(tmp = (char*)xmlGetProp(p, (const xmlChar *)"feet")) {
-					this->lookfeet = atoi(tmp);
-					xmlFreeOTSERV(tmp);
-				}
-				else{
-					this->lookfeet = 40;
-				}
-				if(tmp = (char*)xmlGetProp(p, (const xmlChar *)"corpse")) {
-					this->lookcorpse = atoi(tmp);
-					xmlFreeOTSERV(tmp);
-				}
-				else{
-					this->lookcorpse = 100;
-				}
-				
+				else
+					lookcorpse = 100;
 			}
-			/*
-			if(strcmp(str, "attack") == 0){
-				if(tmp = (char*)xmlGetProp(p, (const xmlChar *)"type")){
-					std::string attacktype = tmp;
-					xmlFreeOTSERV(tmp);
-					if(attacktype == "melee")
-						this->fighttype = FIGHT_MELEE;
-					tmp = (char*)xmlGetProp(p, (const xmlChar *)"damage");
-					if(tmp){
-						this->damage = atoi(tmp);
-						xmlFreeOTSERV(tmp);
-					}
-					else{
-						this->damage = 5;
-					}
-				}
-				else{
-					this->fighttype = FIGHT_MELEE;
-					this->damage = 0;
-				}
-			}
-			if(strcmp(str, "loot") == 0){
-				//TODO implement loot
-			}
-			*/
-				
+
 			p = p->next;
 		}
 

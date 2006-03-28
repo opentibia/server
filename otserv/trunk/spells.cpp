@@ -20,6 +20,8 @@
 
 
 #include "definitions.h"
+#include "spells.h"
+#include "tools.h"
 
 #include <algorithm>
 #include <functional>
@@ -32,42 +34,39 @@
 #include <boost/config.hpp>
 #include <boost/bind.hpp>
 
-#include "spells.h"
-
 Spells::Spells(Game* igame): game(igame)
 {
 	//
 }
 
-bool Spells::loadFromXml(const std::string &datadir)
+bool Spells::loadFromXml(const std::string& _datadir)
 {
 	std::string name, words;
-  bool enabled = false;
-  int vocId, maglv = 0, mana = 0, id = 0, charges = 0;
-  this->loaded = false;
+	bool enabled = false;
+	int vocId, maglv = 0, mana = 0, id = 0, charges = 0;
+	loaded = false;
 
-	std::string filename = datadir + "spells/spells.xml";
-	std::transform(filename.begin(), filename.end(), filename.begin(), tolower);
-  xmlDocPtr doc = xmlParseFile(filename.c_str());
+	std::string filename = _datadir + "spells/spells.xml";
 
-  if (doc){
-		this->loaded=true;
-		xmlNodePtr root, p, tmp;
-		char* nodeValue = NULL;
+	xmlDocPtr doc = xmlParseFile(filename.c_str());
+	if(doc){
+		loaded = true;
+		xmlNodePtr root, p;
 		root = xmlDocGetRootElement(doc);
 		
-		if (xmlStrcmp(root->name,(const xmlChar*) "spells")){
+		if(xmlStrcmp(root->name,(const xmlChar*)"spells")){
 			//TODO: use exceptions here
 			std::cerr << "Malformed XML" << std::endl;
 		}
 		
-		nodeValue = (char*)xmlGetProp(root, (const xmlChar *)"maxVoc");
-		if(nodeValue) {
-			maxVoc = atoi(nodeValue);
-			xmlFreeOTSERV(nodeValue);
+		int intValue;
+		std::string strValue;
+
+		if(readXMLInteger(root, "maxVoc", intValue)){
+			maxVoc = intValue;
 		}
-		
-		for(int i =0; i<=this->maxVoc; i++){
+
+		for(int i =0; i<= maxVoc; i++){
 			std::map<std::string, Spell*> voc;
 			vocationSpells.push_back(voc);
 		}
@@ -75,117 +74,97 @@ bool Spells::loadFromXml(const std::string &datadir)
 		p = root->children;
             
 		while(p){
-			if(xmlStrcmp(p->name, (const xmlChar*) "spell") == 0){
-				nodeValue = (char*)xmlGetProp(p, (const xmlChar *)"enabled");
-				if(nodeValue) {
-					enabled = (bool)(atoi(nodeValue) > 0);
-					xmlFreeOTSERV(nodeValue);
+			if(xmlStrcmp(p->name, (const xmlChar*)"spell") == 0){
+
+				if(readXMLInteger(p, "enabled", intValue)){
+					enabled = (intValue != 0);
 				}
-				
-				if (enabled){
-					nodeValue = (char*)xmlGetProp(p, (const xmlChar *)"name");
-					if(nodeValue) {
-						name = nodeValue;
-						xmlFreeOTSERV(nodeValue);
-						std::transform(name.begin(), name.end(), name.begin(), tolower);
+
+				if(enabled){
+
+					if(readXMLString(p, "name", strValue)){
+						name = strValue;
+						toLowerCaseString(name);
 					}
+
+					if(readXMLString(p, "words", strValue)){
+						words = strValue;
+					}
+
+					if(readXMLInteger(p, "maglv", intValue)){
+						maglv = intValue;
+					}
+
+					if(readXMLInteger(p, "mana", intValue)){
+						mana = intValue;
+					}
+
+					Spell* spell = new InstantSpell(_datadir, name, words, maglv, mana, game);
 					
-					nodeValue = (char*)xmlGetProp(p, (const xmlChar *)"words");
-					if(nodeValue) {
-						words = nodeValue;
-						xmlFreeOTSERV(nodeValue);
-					}
+					xmlNodePtr tmpNode = p->children;
+					while(tmpNode){
+						if(xmlStrcmp(tmpNode->name, (const xmlChar*)"vocation") == 0){
+							
+							if(readXMLInteger(tmpNode, "id", intValue)){
+								vocId = intValue;
 
-					nodeValue = (char*)xmlGetProp(p, (const xmlChar *)"maglv");
-					if(nodeValue) {
-						maglv = atoi(nodeValue);
-						xmlFreeOTSERV(nodeValue);
-					}
-
-					nodeValue = (char*)xmlGetProp(p, (const xmlChar *)"mana");
-					if(nodeValue) {
-						mana = atoi(nodeValue);
-						xmlFreeOTSERV(nodeValue);
-					}
-
-					Spell* spell = new InstantSpell(datadir, name, words, maglv, mana, game);
-					
-					tmp=p->children;
-					while (tmp){
-						if (strcmp((const char*)tmp->name, "vocation") == 0){
-							nodeValue = (char*)xmlGetProp(tmp, (const xmlChar *)"id");
-							if(nodeValue) {
-								vocId = atoi(nodeValue);
-								xmlFreeOTSERV(nodeValue);
-
-								if (vocId<=this->maxVoc){                                                                           
+								if(vocId <= maxVoc){
 									(vocationSpells.at(vocId))[words] = spell;
 								}
 							}
 						}
 						
-						tmp = tmp->next;
+						tmpNode = tmpNode->next;
 					}
 					
 					allSpells[words] = spell;
 				}
 			}
-			if(xmlStrcmp(p->name, (const xmlChar*) "rune") == 0){
-				nodeValue = (char*)xmlGetProp(p, (const xmlChar *)"enabled");
-				if(nodeValue) {
-					enabled = (bool)(atoi(nodeValue) > 0);
-					xmlFreeOTSERV(nodeValue);
-				}
+			if(xmlStrcmp(p->name, (const xmlChar*)"rune") == 0){
 				
-				if (enabled){
-					nodeValue = (char*)xmlGetProp(p, (const xmlChar *)"name");
-					if(nodeValue) {
-						name = nodeValue;
-						xmlFreeOTSERV(nodeValue);
-						std::transform(name.begin(), name.end(), name.begin(), tolower);
+				if(readXMLInteger(p, "enabled", intValue)){
+					enabled = (intValue != 0);
+				}
+
+				if(enabled){
+
+					if(readXMLString(p, "name", strValue)){
+						name = strValue;
+						toLowerCaseString(name);
 					}
 
-					nodeValue = (char*)xmlGetProp(p, (const xmlChar *)"id");
-					if(nodeValue) {
-						id = atoi(nodeValue);
-						xmlFreeOTSERV(nodeValue);
+					if(readXMLInteger(p, "id", intValue)){
+						id = intValue;
 					}
 
-					nodeValue = (char*)xmlGetProp(p, (const xmlChar *)"charges");
-					if(nodeValue) {
-						charges = atoi(nodeValue);
-						xmlFreeOTSERV(nodeValue);
+					if(readXMLInteger(p, "charges", intValue)){
+						charges = intValue;
 					}
 
-					nodeValue = (char*)xmlGetProp(p, (const xmlChar *)"maglv");
-					if(nodeValue) {
-						maglv = atoi(nodeValue);
-						xmlFreeOTSERV(nodeValue);
+					if(readXMLInteger(p, "maglv", intValue)){
+						maglv = intValue;
 					}
 					
-					nodeValue = (char*)xmlGetProp(p, (const xmlChar *)"mana");
-					if(nodeValue) {
-						mana = atoi(nodeValue);
-						xmlFreeOTSERV(nodeValue);
+					if(readXMLInteger(p, "mana", intValue)){
+						mana = intValue;
 					}
 
-					Spell* spell = new RuneSpell(datadir, name, id, charges, maglv, mana, game);
+					Spell* spell = new RuneSpell(_datadir, name, id, charges, maglv, mana, game);
 					
-					tmp=p->children;
-					while (tmp){
-						if (strcmp((const char*)tmp->name, "vocation") == 0){
-							nodeValue = (char*)xmlGetProp(tmp, (const xmlChar *)"id");
-							if(nodeValue) {
-								vocId = atoi(nodeValue);
-								xmlFreeOTSERV(nodeValue);
+					xmlNodePtr tmpNode = p->children;
+					while(tmpNode){
+						if(xmlStrcmp(tmpNode->name, (const xmlChar*)"vocation") == 0){
 
-								if (vocId<=this->maxVoc){                                                                           
+							if(readXMLInteger(tmpNode, "id", intValue)){
+								vocId = intValue;
+
+								if(vocId <= maxVoc){
 									(vocationRuneSpells.at(vocId))[id] = spell;
 								}
 							}
 						}
 						
-						tmp = tmp->next;
+						tmpNode = tmpNode->next;
 					}
 					
 					allRuneSpells[id] = spell;
@@ -198,8 +177,9 @@ bool Spells::loadFromXml(const std::string &datadir)
 		xmlFreeDoc(doc);
 	}
 
-  return this->loaded;
+  return loaded;
 }
+
 Spells::~Spells(){
 	std::map<std::string, Spell*>::iterator it = allSpells.begin();
 
