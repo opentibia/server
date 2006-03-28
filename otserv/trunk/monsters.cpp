@@ -20,6 +20,7 @@
 
 #include "monsters.h"
 #include "spells.h"
+#include "tools.h"
 #include "luascript.h"
 
 extern Spells spells;
@@ -159,42 +160,40 @@ Monsters::Monsters()
 
 bool Monsters::loadFromXml(const std::string &_datadir,bool reloading /*= false*/)
 {	
-	this->loaded = false;
-	
+	loaded = false;	
 	datadir = _datadir;
 	
 	std::string filename = datadir + "monster/monsters.xml";
-	std::transform(filename.begin(), filename.end(), filename.begin(), tolower);
+
 	xmlDocPtr doc = xmlParseFile(filename.c_str());
-	
 	if(doc){
-		this->loaded = true;
+		loaded = true;
 		xmlNodePtr root, p;
 		unsigned long id = 0;
 		root = xmlDocGetRootElement(doc);
 
-		if(xmlStrcmp(root->name,(const xmlChar*) "monsters")){
+		if(xmlStrcmp(root->name,(const xmlChar*)"monsters") != 0){
 			xmlFreeDoc(doc);
-			this->loaded = false;
+			loaded = false;
 			return false;
 		}
+
 		p = root->children;
-        
-		while (p){
-			if(xmlStrcmp(p->name, (const xmlChar*) "monster") == 0){
-				char* monsterfile = (char*)xmlGetProp(p, (const xmlChar *)"file");
-				char* name = (char*)xmlGetProp(p, (const xmlChar *)"name");
-								
-				if(monsterfile && name){
-					std::string file = datadir + "monster/" + monsterfile;
-					std::transform(file.begin(), file.end(), file.begin(), tolower);
-					std::string monster_name = name;
-						std::transform(monster_name.begin(), monster_name.end(), monster_name.begin(), tolower);
+		while(p){
+			if(xmlStrcmp(p->name, (const xmlChar*)"monster") == 0){
+				std::string file;
+				std::string name;
+
+				if(readXMLString(p, "file", file) && readXMLString(p, "name", name)){
+					file = datadir + "monster/" + file;
+					
+					std::string lowername = name;
+					toLowerCaseString(lowername);
 						
-					MonsterType* mType = loadMonster(file,name,reloading);
+					MonsterType* mType = loadMonster(file, name, reloading);
 					if(mType){
 						id++;
-						monsterNames[monster_name] = id;
+						monsterNames[lowername] = id;
 						monsters[id] = mType;
 					}
 				}
@@ -204,7 +203,8 @@ bool Monsters::loadFromXml(const std::string &_datadir,bool reloading /*= false*
 		
 		xmlFreeDoc(doc);
 	}
-	return this->loaded;
+
+	return loaded;
 }
 
 bool Monsters::reload()
@@ -234,204 +234,157 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 	
 	monsterLoad = true;
 	xmlDocPtr doc = xmlParseFile(file.c_str());
+
 	if(doc){
-		xmlNodePtr root, p, tmp;
-		char* nodeValue = NULL;
+		xmlNodePtr root, p;
 		root = xmlDocGetRootElement(doc);
 
-		if(xmlStrcmp(root->name,(const xmlChar*) "monster")){
+		if(xmlStrcmp(root->name,(const xmlChar*)"monster")){
 			std::cerr << "Malformed XML: " << file << std::endl;
 		}
 
+		int intValue;
+		std::string strValue;
+
 		p = root->children;
 
-		nodeValue = (char*)xmlGetProp(root, (const xmlChar *)"name");
-		if(nodeValue){
-			mType->name = nodeValue;
-			xmlFreeOTSERV(nodeValue);
+		if(readXMLString(root, "name", strValue)){
+			mType->name = strValue;
 		}
 		else
 			monsterLoad = false;
 
-		nodeValue = (char*)xmlGetProp(root, (const xmlChar *)"experience");
-		if(nodeValue){
-			mType->experience = atoi(nodeValue);
-			xmlFreeOTSERV(nodeValue);
+		if(readXMLInteger(root, "experience", intValue)){
+			mType->experience = intValue;
 		}
 
-		nodeValue = (char*)xmlGetProp(root, (const xmlChar *)"pushable");
-		if(nodeValue){
-			mType->pushable = (atoi(nodeValue) != 0);
-			xmlFreeOTSERV(nodeValue);
+		if(readXMLInteger(root, "pushable", intValue)){
+			mType->pushable = (intValue != 0);
 		}
 
-		nodeValue = (char*)xmlGetProp(root, (const xmlChar *)"level");
-		if(nodeValue){
-			mType->level = atoi(nodeValue);
-			xmlFreeOTSERV(nodeValue);
+		if(readXMLInteger(root, "level", intValue)){
+			mType->level = intValue;
 		}
 
-		nodeValue = (char*)xmlGetProp(root, (const xmlChar *)"speed");
-		if(nodeValue){
-			mType->base_speed = atoi(nodeValue);
-			xmlFreeOTSERV(nodeValue);
+		if(readXMLInteger(root, "speed", intValue)){
+			mType->base_speed = intValue;
 		}
 
-		nodeValue = (char*)xmlGetProp(root, (const xmlChar *)"maglevel");
-		if(nodeValue){
-			mType->maglevel = atoi(nodeValue);
-			xmlFreeOTSERV(nodeValue);
+		if(readXMLInteger(root, "maglevel", intValue)){
+			mType->maglevel = intValue;
 		}
 
-		nodeValue = (char*)xmlGetProp(root, (const xmlChar *)"defense");
-		if(nodeValue){
-			mType->defense = atoi(nodeValue);
-			xmlFreeOTSERV(nodeValue);
+		if(readXMLInteger(root, "defense", intValue)){
+			mType->defense = intValue;
 		}
 
-		nodeValue = (char*)xmlGetProp(root, (const xmlChar *)"armor");
-		if(nodeValue){
-			mType->armor = atoi(nodeValue);
-			xmlFreeOTSERV(nodeValue);
+		if(readXMLInteger(root, "armor", intValue)){
+			mType->armor = intValue;
 		}
 
-		nodeValue = (char*)xmlGetProp(root, (const xmlChar *)"canpushitems");
-		if(nodeValue){
-			mType->canPushItems = (atoi(nodeValue) != 0);
-			xmlFreeOTSERV(nodeValue);
+		if(readXMLInteger(root, "canpushitems", intValue)){
+			mType->canPushItems = (intValue != 0);
 		}
 
-		nodeValue = (char*)xmlGetProp(root, (const xmlChar *)"staticattack");
-		if(nodeValue){
-			mType->staticAttack = atoi(nodeValue);
-			xmlFreeOTSERV(nodeValue);
-
-			if(mType->staticAttack == 0)
+		if(readXMLInteger(root, "staticattack", intValue)){
+			if(intValue == 0)
 				mType->staticAttack = 1;
-			else if(mType->staticAttack >= RAND_MAX)
+			else if(intValue >= RAND_MAX)
 				mType->staticAttack = RAND_MAX;
+			else
+				mType->staticAttack = intValue;
 		}
 
-		nodeValue = (char*)xmlGetProp(root, (const xmlChar *)"changetarget"); //0	never, 10000 always
-		if(nodeValue){
-			mType->changeTargetChance = atoi(nodeValue);
-			xmlFreeOTSERV(nodeValue);
-		}
-		
-		nodeValue = (char*)xmlGetProp(root, (const xmlChar *)"lightlevel");
-		if(nodeValue){
-			mType->lightLevel = atoi(nodeValue);
-			xmlFreeOTSERV(nodeValue);
+		if(readXMLInteger(root, "changetarget", intValue)){
+			//0	never, 10000 always
+			mType->changeTargetChance = intValue;
 		}
 
-		nodeValue = (char*)xmlGetProp(root, (const xmlChar *)"lightcolor");
-		if(nodeValue){
-			mType->lightColor = atoi(nodeValue);
-			xmlFreeOTSERV(nodeValue);
+		if(readXMLInteger(root, "lightlevel", intValue)){
+			mType->lightLevel = intValue;
+		}
+
+		if(readXMLInteger(root, "lightcolor", intValue)){
+			mType->lightColor = intValue;
 		}
 
 		while(p){
-			if(xmlStrcmp(p->name, (const xmlChar*) "health") == 0){
-				nodeValue = (char*)xmlGetProp(p, (const xmlChar *)"now");
-				if(nodeValue){
-					mType->health = atoi(nodeValue);
-					xmlFreeOTSERV(nodeValue);
+			if(xmlStrcmp(p->name, (const xmlChar*)"health") == 0){
+
+				if(readXMLInteger(p, "now", intValue)){
+					mType->health = intValue;
 				}
 				else
 					monsterLoad = false;
 
-				nodeValue = (char*)xmlGetProp(p, (const xmlChar *)"max");
-				if(nodeValue){
-					mType->health_max = atoi(nodeValue);
-					xmlFreeOTSERV(nodeValue);
+				if(readXMLInteger(p, "max", intValue)){
+					mType->health_max = intValue;
 				}
 				else
 					monsterLoad = false;
 			}
-			else if(xmlStrcmp(p->name, (const xmlChar*) "combat") == 0){
-				nodeValue = (char*)xmlGetProp(p, (const xmlChar *)"targetdistance");
-				if(nodeValue){
-					mType->targetDistance = std::max(1, atoi(nodeValue));
-					xmlFreeOTSERV(nodeValue);
+			else if(xmlStrcmp(p->name, (const xmlChar*)"combat") == 0){
+
+				if(readXMLInteger(p, "targetdistance", intValue)){
+					mType->targetDistance = std::max(1, intValue);
 				}
 
-				nodeValue = (char*)xmlGetProp(p, (const xmlChar *)"runonhealth");
-				if(nodeValue){
-					mType->runAwayHealth = atoi(nodeValue);
-					xmlFreeOTSERV(nodeValue);
+				if(readXMLInteger(p, "runonhealth", intValue)){
+					mType->runAwayHealth = intValue;
 				}
 			}
-			else if(xmlStrcmp(p->name, (const xmlChar*) "look") == 0){
-				nodeValue = (char*)xmlGetProp(p, (const xmlChar *)"type");
-				if(nodeValue) {
-					mType->looktype = atoi(nodeValue);
+			else if(xmlStrcmp(p->name, (const xmlChar*)"look") == 0){
+
+				if(readXMLInteger(p, "type", intValue)){
+					mType->looktype = intValue;
 					mType->lookmaster = mType->looktype;
-					xmlFreeOTSERV(nodeValue);
 				}
 
-				nodeValue = (char*)xmlGetProp(p, (const xmlChar *)"head");
-				if(nodeValue) {
-					mType->lookhead = atoi(nodeValue);
-					xmlFreeOTSERV(nodeValue);
+				if(readXMLInteger(p, "head", intValue)){
+					mType->lookhead = intValue;
 				}
 
-				nodeValue = (char*)xmlGetProp(p, (const xmlChar *)"body");
-				if(nodeValue) {
-					mType->lookbody = atoi(nodeValue);
-					xmlFreeOTSERV(nodeValue);
+				if(readXMLInteger(p, "body", intValue)){
+					mType->lookbody = intValue;
 				}
 
-				nodeValue = (char*)xmlGetProp(p, (const xmlChar *)"legs");
-				if(nodeValue) {
-					mType->looklegs = atoi(nodeValue);
-					xmlFreeOTSERV(nodeValue);
+				if(readXMLInteger(p, "legs", intValue)){
+					mType->looklegs = intValue;
 				}
 
-				nodeValue = (char*)xmlGetProp(p, (const xmlChar *)"feet");
-				if(nodeValue) {
-					mType->lookfeet = atoi(nodeValue);
-					xmlFreeOTSERV(nodeValue);
+				if(readXMLInteger(p, "feet", intValue)){
+					mType->lookfeet = intValue;
 				}
 
-				nodeValue = (char*)xmlGetProp(p, (const xmlChar *)"corpse");
-				if(nodeValue) {
-					mType->lookcorpse = atoi(nodeValue);
-					xmlFreeOTSERV(nodeValue);
+				if(readXMLInteger(p, "corpse", intValue)){
+					mType->lookcorpse = intValue;
 				}
 			}
-			else if(xmlStrcmp(p->name, (const xmlChar*) "attacks") == 0){
-				tmp=p->children;
-				while(tmp){
-					if(strcmp((const char*)tmp->name, "attack") == 0){
+			else if(xmlStrcmp(p->name, (const xmlChar*)"attacks") == 0){
+				xmlNodePtr tmpNode = p->children;
+				while(tmpNode){
+					if(xmlStrcmp(tmpNode->name, (const xmlChar*)"attack") == 0){
 						int cycleTicks = -1;
 						int probability = -1;
 						int exhaustionTicks = -1;
 
-						nodeValue = (char*)xmlGetProp(tmp, (const xmlChar *)"exhaustion");
-						if(nodeValue) {
-							exhaustionTicks = atoi(nodeValue);
-							xmlFreeOTSERV(nodeValue);
+						if(readXMLInteger(tmpNode, "exhaustion", intValue)){
+							exhaustionTicks = intValue;
 						}
 
-						nodeValue = (char*)xmlGetProp(tmp, (const xmlChar *)"cycleticks");
-						if(nodeValue){
-							cycleTicks = atoi(nodeValue);
-							xmlFreeOTSERV(nodeValue);
+						if(readXMLInteger(tmpNode, "cycleticks", intValue)){
+							cycleTicks = intValue;
 						}
 
-						nodeValue = (char*)xmlGetProp(tmp, (const xmlChar *)"probability");
-						if(nodeValue){
-							probability = atoi(nodeValue);
-							xmlFreeOTSERV(nodeValue);
+						if(readXMLInteger(tmpNode, "probability", intValue)){
+							probability = intValue;
 						}
 
 						TimeProbabilityClass timeprobsystem(cycleTicks, probability, exhaustionTicks);
 
-						nodeValue = (char*)xmlGetProp(tmp, (const xmlChar *)"type");
 						std::string	attacktype = "";
-						if(nodeValue){
-							attacktype = nodeValue;
-							xmlFreeOTSERV(nodeValue);
+						if(readXMLString(tmpNode, "type", strValue)){
+							attacktype = strValue;
 						}
 
 						if(strcmp(attacktype.c_str(), "melee") == 0){
@@ -439,16 +392,12 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 
 							physicalattack->fighttype = FIGHT_MELEE;
 
-							nodeValue = (char*)xmlGetProp(tmp, (const xmlChar *)"mindamage");
-							if(nodeValue) {
-								physicalattack->minWeapondamage = atoi(nodeValue);
-								xmlFreeOTSERV(nodeValue);
+							if(readXMLInteger(tmpNode, "mindamage", intValue)){
+								physicalattack->minWeapondamage = intValue;
 							}
 
-							nodeValue = (char*)xmlGetProp(tmp, (const xmlChar *)"maxdamage");
-							if(nodeValue) {
-								physicalattack->maxWeapondamage = atoi(nodeValue);
-								xmlFreeOTSERV(nodeValue);
+							if(readXMLInteger(tmpNode, "maxdamage", intValue)){
+								physicalattack->maxWeapondamage = intValue;
 							}
 
 							mType->physicalAttacks[physicalattack] = TimeProbabilityClass(cycleTicks, probability, exhaustionTicks);
@@ -460,10 +409,8 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 							physicalattack->fighttype = FIGHT_DIST;
 							std::string subattacktype = "";
 
-							nodeValue = (char*)xmlGetProp(tmp, (const xmlChar *)"name");
-							if(nodeValue) {
-								subattacktype = nodeValue;
-								xmlFreeOTSERV(nodeValue);
+							if(readXMLString(tmpNode, "name", strValue)){
+								subattacktype = strValue;
 							}
 
 							if(strcmp(subattacktype.c_str(), "bolt") == 0)
@@ -485,16 +432,12 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 							else if(strcmp(subattacktype.c_str(), "poisonfield") == 0)
 								physicalattack->disttype = DIST_POISONFIELD;
 
-							nodeValue = (char*)xmlGetProp(tmp, (const xmlChar *)"mindamage");
-							if(nodeValue) {
-								physicalattack->minWeapondamage = atoi(nodeValue);
-								xmlFreeOTSERV(nodeValue);
+							if(readXMLInteger(tmpNode, "mindamage", intValue)){
+								physicalattack->minWeapondamage = intValue;
 							}
 
-							nodeValue = (char*)xmlGetProp(tmp, (const xmlChar *)"maxdamage");
-							if(nodeValue) {
-								physicalattack->maxWeapondamage = atoi(nodeValue);
-								xmlFreeOTSERV(nodeValue);
+							if(readXMLInteger(tmpNode, "maxdamage", intValue)){
+								physicalattack->maxWeapondamage = intValue;
 							}
 
 							mType->physicalAttacks[physicalattack] = TimeProbabilityClass(cycleTicks, probability, exhaustionTicks);
@@ -503,10 +446,8 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 							mType->hasDistanceAttack = true;
 							std::string spellname = "";
 
-							nodeValue = (char*)xmlGetProp(tmp, (const xmlChar *)"name");
-							if(nodeValue) {
-								spellname = nodeValue;
-								xmlFreeOTSERV(nodeValue);
+							if(readXMLString(tmpNode, "name", strValue)){
+								spellname = strValue;
 							}
 
 							if(spells.getAllSpells()->find(spellname) != spells.getAllSpells()->end()){
@@ -517,10 +458,8 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 							mType->hasDistanceAttack = true;
 							std::string spellname = "";
 
-							nodeValue = (char*)xmlGetProp(tmp, (const xmlChar *)"name");
-							if(nodeValue) {
-								spellname = nodeValue;
-								xmlFreeOTSERV(nodeValue);
+							if(readXMLString(tmpNode, "name", strValue)){
+								spellname = strValue;
 							}
 
 							std::transform(spellname.begin(), spellname.end(), spellname.begin(), tolower);
@@ -535,19 +474,17 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 						}
 					}
 
-					tmp = tmp->next;
+					tmpNode = tmpNode->next;
 				}
 			}
-			else if(xmlStrcmp(p->name, (const xmlChar*) "defenses") == 0){
-				tmp = p->children;
-				while(tmp){
-					if (strcmp((const char*)tmp->name, "defense") == 0) {
+			else if(xmlStrcmp(p->name, (const xmlChar*)"defenses") == 0){
+				xmlNodePtr tmpNode = p->children;
+				while(tmpNode){
+					if(xmlStrcmp(tmpNode->name, (const xmlChar*)"defense") == 0){
 						std::string immunity = "";
 
-						nodeValue = (char*)xmlGetProp(tmp, (const xmlChar *)"immunity");
-						if(nodeValue) {
-							immunity = nodeValue;
-							xmlFreeOTSERV(nodeValue);
+						if(readXMLString(tmpNode, "immunity", strValue)){
+							immunity = strValue;
 						}
 
 						if(strcmp(immunity.c_str(), "energy") == 0)
@@ -566,108 +503,98 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 							mType->immunities |= ATTACK_DRUNKNESS;
 					}
 
-					tmp = tmp->next;
+					tmpNode = tmpNode->next;
 				}
 			}
-			else if(xmlStrcmp(p->name, (const xmlChar*) "voices") == 0){
-				tmp = p->children;
-				while(tmp){
-					if (strcmp((const char*)tmp->name, "voice") == 0) {
+			else if(xmlStrcmp(p->name, (const xmlChar*)"voices") == 0){
+				xmlNodePtr tmpNode = p->children;
+				while(tmpNode){
+					if(xmlStrcmp(tmpNode->name, (const xmlChar*)"voice") == 0) {
 						int cycleTicks, probability, exhaustionTicks;
 
-						nodeValue = (char*)xmlGetProp(tmp, (const xmlChar *)"exhaustion");
-						if(nodeValue) {
-							exhaustionTicks = atoi(nodeValue);
-							xmlFreeOTSERV(nodeValue);
+						if(readXMLInteger(tmpNode, "exhaustion", intValue)){
+							exhaustionTicks = intValue;
 						}
 						else
 							exhaustionTicks = 0;
 
-						nodeValue = (char*)xmlGetProp(tmp, (const xmlChar *)"cycleticks");
-						if(nodeValue) {
-							cycleTicks = atoi(nodeValue);
-							xmlFreeOTSERV(nodeValue);
+						if(readXMLInteger(tmpNode, "cycleticks", intValue)){
+							cycleTicks = intValue;
 						}
 						else
 							cycleTicks = 30000;
 
-						nodeValue = (char*)xmlGetProp(tmp, (const xmlChar *)"probability");
-						if(nodeValue) {
-							probability = atoi(nodeValue);
-							xmlFreeOTSERV(nodeValue);
+						if(readXMLInteger(tmpNode, "probability", intValue)){
+							probability = intValue;
 						}
 						else
 							probability = 30;
 
 						std::string sentence = "";
-						nodeValue = (char*)xmlGetProp(tmp, (const xmlChar *)"sentence");
-						if(nodeValue) {
-							sentence = nodeValue;
-							xmlFreeOTSERV(nodeValue);
+						if(readXMLString(tmpNode, "sentence", strValue)){
+							sentence = strValue;
 						}
 
 						if(sentence.length() > 0) {
 							mType->yellingSentences.push_back(make_pair(sentence, TimeProbabilityClass(cycleTicks, probability, exhaustionTicks)));
 						}
 					}
-					tmp = tmp->next;
+
+					tmpNode = tmpNode->next;
 				}
 			}
-			else if(xmlStrcmp(p->name, (const xmlChar*) "loot") == 0){
-				tmp = p->children;
-				while(tmp){
+			else if(xmlStrcmp(p->name, (const xmlChar*)"loot") == 0){
+				xmlNodePtr tmpNode = p->children;
+				while(tmpNode){
 					LootBlock lootBlock;
-					if(loadLootItem(tmp, lootBlock)){
+					if(loadLootItem(tmpNode, lootBlock)){
 						mType->lootItems.push_back(lootBlock);
 					}
-					tmp = tmp->next;
+
+					tmpNode = tmpNode->next;
 				}
 			}
-			else if(xmlStrcmp(p->name, (const xmlChar*) "summons") == 0){
-				nodeValue = (char*)xmlGetProp(p, (const xmlChar *)"maxSummons");
-				if(nodeValue){
-					mType->maxSummons = std::min(atoi(nodeValue), 100);
-					xmlFreeOTSERV(nodeValue);
+			else if(xmlStrcmp(p->name, (const xmlChar*)"summons") == 0){
+
+				if(readXMLInteger(p, "maxSummons", intValue)){
+					mType->maxSummons = std::min(intValue, 100);
 				}
 
-				tmp = p->children;
-				while(tmp){
-					if (strcmp((const char*)tmp->name, "summon") == 0) {
+				xmlNodePtr tmpNode = p->children;
+				while(tmpNode){
 
+					if(xmlStrcmp(tmpNode->name, (const xmlChar*)"summon") == 0){
 						summonBlock sb;
 						sb.name = "";
 						sb.summonChance = CHANCE_MAX;
 
-						nodeValue = (char*)xmlGetProp(tmp, (const xmlChar *)"name");
-						if(nodeValue) {
-							sb.name = nodeValue;
-							xmlFreeOTSERV(nodeValue);
+						if(readXMLString(tmpNode, "name", strValue)){
+							sb.name = strValue;
 						}
 						else
 							continue;
 
-						nodeValue = (char*)xmlGetProp(tmp, (const xmlChar *)"chance");
-						if(nodeValue) {
-							sb.summonChance = std::max(atoi(nodeValue), 100);
+						if(readXMLInteger(tmpNode, "chance", intValue)){
+							sb.summonChance = std::max(intValue, 100);
 							if(sb.summonChance > CHANCE_MAX)
 								sb.summonChance = CHANCE_MAX;
-
-							xmlFreeOTSERV(nodeValue);
 						}
 
 						mType->summonSpells.push_back(sb);
 					}
 
-					tmp = tmp->next;
+					tmpNode = tmpNode->next;
 				}
 			}
 			p = p->next;
 		}
+
 		xmlFreeDoc(doc);
 	}
 	else{
 		monsterLoad = false;
 	}
+
 	if(monsterLoad){
 		return mType;
 	}
@@ -679,10 +606,9 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 
 bool Monsters::loadLootItem(xmlNodePtr node, LootBlock& lootBlock)
 {
-	char* nodeValue = (char*)xmlGetProp(node, (const xmlChar *)"id");
-	if(nodeValue){
-		lootBlock.id = atoi(nodeValue);
-		xmlFreeOTSERV(nodeValue);
+	int intValue;
+	if(readXMLInteger(node, "id", intValue)){
+		lootBlock.id = intValue;
 	}
 	
 	if(lootBlock.id == 0){
@@ -690,11 +616,9 @@ bool Monsters::loadLootItem(xmlNodePtr node, LootBlock& lootBlock)
 	}
 	
 	if(Item::items[lootBlock.id].stackable == true){
-		char* nodeValue = (char*)xmlGetProp(node, (const xmlChar *) "countmax");
-		if(nodeValue){
-			lootBlock.countmax = atoi(nodeValue);
-			xmlFreeOTSERV(nodeValue);
-				
+		if(readXMLInteger(node, "countmax", intValue)){
+			lootBlock.countmax = intValue;
+
 			if(lootBlock.countmax > 100){
 				lootBlock.countmax = 100;
 			}
@@ -704,11 +628,9 @@ bool Monsters::loadLootItem(xmlNodePtr node, LootBlock& lootBlock)
 			lootBlock.countmax = 1;
 		}
 			
-		nodeValue = (char*)xmlGetProp(node, (xmlChar*)"chancemax");
-		if(nodeValue){
-			lootBlock.chancemax = atoi(nodeValue);
-			xmlFreeOTSERV(nodeValue);
-				
+		if(readXMLInteger(node, "chancemax", intValue)){
+			lootBlock.chancemax = intValue;
+
 			if(lootBlock.chancemax > CHANCE_MAX){
 				lootBlock.chancemax = 0;
 			}
@@ -718,11 +640,9 @@ bool Monsters::loadLootItem(xmlNodePtr node, LootBlock& lootBlock)
 			lootBlock.chancemax = 0;
 		}
 
-		nodeValue = (char*)xmlGetProp(node, (xmlChar*)"chance1");
-		if(nodeValue){
-			lootBlock.chance1 = atoi(nodeValue);
-			xmlFreeOTSERV(nodeValue);
-							
+		if(readXMLInteger(node, "chance1", intValue)){
+			lootBlock.chance1 = intValue;
+
 			if(lootBlock.chance1 > CHANCE_MAX){
 				lootBlock.chance1 = CHANCE_MAX;
 			}
@@ -738,11 +658,9 @@ bool Monsters::loadLootItem(xmlNodePtr node, LootBlock& lootBlock)
 		}
 	}
 	else{
-		char* nodeValue = (char*)xmlGetProp(node, (xmlChar*)"chance");
-		if(nodeValue){
-			lootBlock.chance1 = atoi(nodeValue);
-			xmlFreeOTSERV(nodeValue);
-			
+		if(readXMLInteger(node, "chance", intValue)){
+			lootBlock.chance1 = intValue;
+
 			if(lootBlock.chance1 > CHANCE_MAX){
 				lootBlock.chance1 = CHANCE_MAX;
 			}
@@ -751,30 +669,31 @@ bool Monsters::loadLootItem(xmlNodePtr node, LootBlock& lootBlock)
 			std::cout << "missing chance for loot id = "<< lootBlock.id << std::endl;
 			lootBlock.chance1 = CHANCE_MAX;
 		}
-	}	
+	}
 
-	
 	if(Item::items[lootBlock.id].isContainer()){
 		loadLootContainer(node, lootBlock);
 	}
+	
 	return true;
 }
 
 bool Monsters::loadLootContainer(xmlNodePtr node, LootBlock& lBlock)
 {
-	xmlNodePtr tmp,p;
-	char* nodeValue = NULL;
-	
 	if(node == NULL){
 		return false;
 	}
-	tmp = node->children;
-	if(tmp == NULL){
+	
+	xmlNodePtr tmpNode = node->children;
+	xmlNodePtr p;
+
+	if(tmpNode == NULL){
 		return false;
 	}
-	while(tmp){
-		if(strcmp((const char*)tmp->name, "inside") == 0){
-			p = tmp->children;
+
+	while(tmpNode){
+		if(xmlStrcmp(tmpNode->name, (const xmlChar*)"inside") == 0){
+			p = tmpNode->children;
 			while(p){
 				LootBlock lootBlock;
 				if(loadLootItem(p, lootBlock)){
@@ -784,8 +703,10 @@ bool Monsters::loadLootContainer(xmlNodePtr node, LootBlock& lBlock)
 			}
 			return true;
 		}//inside
-		tmp = tmp->next;
+
+		tmpNode = tmpNode->next;
 	}
+
 	return false;	
 }
 
