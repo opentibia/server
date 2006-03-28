@@ -561,7 +561,7 @@ int main(int argc, char *argv[])
 	std::cout << "[done]" << std::endl;
 		
 	std::string worldtype = g_config.getGlobalString("worldtype");
-	std::transform(worldtype.begin(), worldtype.end(), worldtype.begin(), toupper);
+	std::transform(worldtype.begin(), worldtype.end(), worldtype.begin(), upchar);
 	if(worldtype == "PVP")
 		g_game.setWorldType(WORLD_TYPE_PVP);
 	else if(worldtype == "NO-PVP")
