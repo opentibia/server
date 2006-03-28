@@ -34,15 +34,15 @@ bool fileExists(const char* filename);
 void replaceString(std::string& str, const std::string sought, const std::string replacement);
 void trim_right(std::string &source, const std::string &t);
 void trim_left(std::string &source, const std::string &t);
+void toLowerCaseString(std::string& source);
 
 bool readXMLInteger(xmlNodePtr node, const char* tag, int& value);
 bool readXMLString(xmlNodePtr node, const char* tag, std::string& value);
 
 int random_range(int lowest_number, int highest_number);
+
 void hexdump(unsigned char *_data, int _len);
 char upchar(char c);
-void upper(char *upstr, char *str);
-void upper(char *upstr, char *str, int n);
 
 #endif
 

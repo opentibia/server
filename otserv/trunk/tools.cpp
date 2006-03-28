@@ -52,6 +52,11 @@ void trim_left(std::string &source, const std::string &t)
 	source.erase(0, source.find_first_not_of(t));
 }
 
+void toLowerCaseString(std::string& source)
+{
+	std::transform(source.begin(), source.end(), source.begin(), tolower);
+}
+
 bool readXMLInteger(xmlNodePtr node, const char* tag, int& value)
 {
 	char* nodeValue = (char*)xmlGetProp(node, (xmlChar*)tag);
@@ -76,8 +81,6 @@ bool readXMLString(xmlNodePtr node, const char* tag, std::string& value)
 	return false;
 }
 
-//////////////////////////////////////////////////
-// get a random value between lowest_number and highest_number
 int random_range(int lowest_number, int highest_number)
 {
 	if(lowest_number > highest_number){
@@ -90,7 +93,6 @@ int random_range(int lowest_number, int highest_number)
 	return lowest_number + int(range * rand()/(RAND_MAX + 1.0));
 }
 
-//////////////////////////////////////////////////
 // dump a part of the memory to stderr.
 void hexdump(unsigned char *_data, int _len) {
 	int i;
@@ -108,25 +110,6 @@ void hexdump(unsigned char *_data, int _len) {
 	}
 }
 
-#if 0
-//////////////////////////////////////////////////
-// Enable asynchronous function calls.
-// This function does not wait for return of the called function;
-// instead, this function returns immediately.
-// The called function must be of type void *fn(void *).
-// You can use the pointer to the function for anything you want to.
-// Return: a thread handle.
-pthread_t *detach(void *(*_fn)(void *), void *_arg)
-{
-	pthread_t *thread = new pthread_t();
-	if(pthread_create(thread, NULL, _fn, _arg))
-		perror("pthread");
-
-	return thread;
-}
-#endif
-
-//////////////////////////////////////////////////
 // Upcase a char.
 char upchar(char c) {
   if (c >= 'a' && c <= 'z')
@@ -195,25 +178,4 @@ char upchar(char c) {
       return 'ß';
   else
       return c;
-}
-
-//////////////////////////////////////////////////
-// Upcase a 0-terminated string.
-void upper(char *upstr, char *str)
-{
-	for(; *str; str++, upstr++)
-		*upstr = upchar(*str);
-
-	*upstr = '\0';
-}
-
-
-//////////////////////////////////////////////////
-// Upcase a 0-terminated string, but at most n chars.
-void upper(char *upstr, char *str, int n)
-{
-	for (; *str && n; str++, upstr++, n--)
-		*upstr = upchar(*str);
-	
-	if (n) *upstr = '\0';
 }
