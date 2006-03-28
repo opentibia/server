@@ -258,7 +258,7 @@ bool IOMapSerializeSQL::loadTile(Database& db, Tile* tile)
 			propStream.init(attr, attrSize);
 			
 			const ItemType& iType = Item::items[type];
-			if(iType.moveable){
+			if(iType.moveable || /* or object in a container*/ pid != 0){
 				//create a new item
 				item = Item::CreateItem(type);
 				
@@ -299,20 +299,25 @@ bool IOMapSerializeSQL::loadTile(Database& db, Tile* tile)
 				}
 			}
 
-			std::pair<Item*, int> myPair(item, pid);
-			itemMap[sid] = myPair;
+			if(item){
+				std::pair<Item*, int> myPair(item, pid);
+				itemMap[sid] = myPair;
+			}
 		}
 	}
 
 	ItemMap::iterator it;
-
 	for(int i = (int)itemMap.size(); i > 0; --i){
 		it = itemMap.find(i);
 		if(it == itemMap.end())
 			continue;
 
-		if(int p=(*it).second.second){
-			if(Container* container = itemMap[p].first->getContainer()){
+		if(int p = (*it).second.second){
+			ItemMap::iterator pit = itemMap.find(p); //parent container
+			if(pit == itemMap.end())
+				continue;
+			
+			if(Container* container = (*pit).second.first->getContainer()){
 				container->__internalAddThing((*it).second.first);
 			}
 		}
@@ -323,7 +328,6 @@ bool IOMapSerializeSQL::loadTile(Database& db, Tile* tile)
 
 bool IOMapSerializeSQL::loadHouseInfo(Map* map, const std::string& identifier)
 {
-	
 	Database db;
 	DBQuery query;
 	DBResult result;
@@ -369,7 +373,6 @@ bool IOMapSerializeSQL::loadHouseInfo(Map* map, const std::string& identifier)
 
 bool IOMapSerializeSQL::saveHouseInfo(Map* map, const std::string& identifier)
 {
-	
 	Database db;
 	DBQuery query;
 	DBResult result;
