@@ -30,6 +30,7 @@
 #include "actions.h"
 #include "house.h"
 #include "ioplayer.h"
+#include "tools.h"
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
@@ -75,40 +76,39 @@ loaded(false)
 {
 	//setup command map
 	for(int i = 0; i < sizeof(defined_commands) / sizeof(defined_commands[0]); i++){
-		Command *tmp = new Command;
-		tmp->loaded = false;
-		tmp->accesslevel = 1;
-		tmp->f = defined_commands[i].f;
+		Command* cmd = new Command;
+		cmd->loaded = false;
+		cmd->accesslevel = 1;
+		cmd->f = defined_commands[i].f;
 		std::string key = defined_commands[i].name;
-		commandMap[key] = tmp;
+		commandMap[key] = cmd;
 	}
 }
 
 bool Commands::loadXml(const std::string& _datadir)
 {	
 	datadir = _datadir;
-	
 	std::string filename = datadir + "commands.xml";
-	std::transform(filename.begin(), filename.end(), filename.begin(), tolower);
-	xmlDocPtr doc = xmlParseFile(filename.c_str());
 
+	xmlDocPtr doc = xmlParseFile(filename.c_str());
 	if(doc){
-		this->loaded = true;
+		loaded = true;
 		xmlNodePtr root, p;
 		root = xmlDocGetRootElement(doc);
 		
-		if(xmlStrcmp(root->name,(const xmlChar*) "commands")){
+		if(xmlStrcmp(root->name,(const xmlChar*)"commands")){
 			xmlFreeDoc(doc);
 			return false;
 		}
+	
+		std::string strCmd;
 
 		p = root->children;
         
 		while (p){
-			if(xmlStrcmp(p->name, (const xmlChar*) "command") == 0){
-				char *tmp = (char*)xmlGetProp(p, (const xmlChar *) "cmd");
-				if(tmp){
-					CommandMap::iterator it = commandMap.find(tmp);
+			if(xmlStrcmp(p->name, (const xmlChar*)"command") == 0){
+				if(readXMLString(p, "cmd", strCmd)){
+					CommandMap::iterator it = commandMap.find(strCmd);
 					int alevel;
 					if(it != commandMap.end()){
 						if(readXMLInteger(p,"access",alevel)){
@@ -117,18 +117,17 @@ bool Commands::loadXml(const std::string& _datadir)
 								it->second->loaded = true;
 							}
 							else{
-								std::cout << "Duplicated command " << tmp << std::endl;
+								std::cout << "Duplicated command " << strCmd << std::endl;
 							}
 						}
 						else{
-							std::cout << "missing access tag for " << tmp << std::endl;
+							std::cout << "missing access tag for " << strCmd << std::endl;
 						}
 					}
 					else{
 						//error
-						std::cout << "Unknown command " << tmp << std::endl;
+						std::cout << "Unknown command " << strCmd << std::endl;
 					}
-					xmlFreeOTSERV(tmp);
 				}
 				else{
 					std::cout << "missing cmd." << std::endl;
@@ -608,23 +607,29 @@ bool Commands::teleportNTiles(Creature* creature, const std::string& cmd, const 
 	return true;
 }
 
-bool Commands::kickPlayer(Creature* c, const std::string &cmd, const std::string &param)
+bool Commands::kickPlayer(Creature* creature, const std::string &cmd, const std::string &param)
 {
 	Player* playerKick = game->getPlayerByName(param);
 	if(playerKick){
-		Player* player = c->getPlayer();
+		Player* player = creature->getPlayer();
 		if(player && player->access <= playerKick->access){
 			player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "You cannot kick this player.");
 			return true;
 		}
+
 		playerKick->kickPlayer();
 		return true;
 	}
 	return false;
 }
 
-bool Commands::exivaPlayer(Creature* c, const std::string &cmd, const std::string &param)
+bool Commands::exivaPlayer(Creature* creature, const std::string &cmd, const std::string &param)
 {
+	Player* player = creature->getPlayer();
+	if(!player){
+		return false;
+	}
+
 	enum distance_t{
 		DISTANCE_BESIDE,
 		DISTANCE_CLOSE,
@@ -634,11 +639,85 @@ bool Commands::exivaPlayer(Creature* c, const std::string &cmd, const std::strin
 
 	Player* playerExiva = game->getPlayerByName(param);
 	if(playerExiva){
-		distance_t distx = DISTANCE_BESIDE;
-		distance_t disty = DISTANCE_BESIDE;
-
-		const Position lookPos = c->getPosition();
+		const Position lookPos = player->getPosition();
 		const Position searchPos = playerExiva->getPosition();
+		
+		/*
+		e. South-west, s-e, n-w, n-e (corner coordinates): this phrase appears if the player you're looking for has moved five squares in any direction from the south, north, east or west.
+		f. Lower level to the (direction): this phrase applies if the person you're looking for is from 1-25 squares up/down the actual floor you're in.
+		g. Higher level to the (direction): this phrase applies if the person you're looking for is from 1-25 squares up/down the actual floor you're in.
+		*/
+
+		distance_t distx;
+		distance_t disty;
+
+		/*
+		Direction dirx;
+		Direction diry;
+
+		if(dx == -1 && dy == -1)
+			dir = NORTHWEST;
+		else if(dx == 1 && dy == -1)
+			dir = NORTHEAST;
+		else if(dx == -1 && dy == 1)
+			dir = SOUTHWEST;
+		else if(dx == 1 && dy == 1)
+			dir = SOUTHEAST;
+		else if(dx == -1)
+			dir = WEST;
+		else if(dx == 1)
+			dir = EAST;
+		else if(dy == -1)
+			dir = NORTH;
+		else
+			dir = SOUTH;
+		*/
+
+		std::stringstream ss;
+		ss << playerExiva->getName() << " ";
+
+		if(lookPos.z != searchPos.z && Position::areInRange<25,25,0>(lookPos, searchPos)){
+			if(lookPos.z > searchPos.z){
+				//ss << "is on a lower level to the 
+				//player->sendTextMessage(MSG_INFO_DESCR, "Lower level to the
+			}
+		}
+
+		//x
+		if(Position::areInRange<4,0,0>(lookPos, searchPos)){
+			//a. From 1 to 4 sq's [Person] is standing next to you.
+			distx = DISTANCE_BESIDE;
+		}
+		else if(Position::areInRange<100,0,0>(lookPos, searchPos)){
+			//b. From 5 to 100 sq's [Person] is to the south, north, east, west.
+			distx = DISTANCE_CLOSE;
+		}
+		else if(Position::areInRange<0,274,0>(lookPos, searchPos)){
+			//c. From 101 to 274 sq's [Person] is far to the south, north, east, west.
+			distx = DISTANCE_FAR;
+		}
+		else{
+			//d. From 275 to infinite sq's [Person] is very far to the south, north, east, west.
+			distx = DISTANCE_VERYFAR;
+		}
+
+		//y
+		if(Position::areInRange<0,4,0>(lookPos, searchPos)){
+			//a. From 1 to 4 sq's [Person] is standing next to you.
+			disty = DISTANCE_BESIDE;
+		}
+		else if(Position::areInRange<0,100,0>(lookPos, searchPos)){
+			//b. From 5 to 100 sq's [Person] is to the south, north, east, west.
+			disty = DISTANCE_CLOSE;
+		}
+		else if(Position::areInRange<0,274,0>(lookPos, searchPos)){
+			//c. From 101 to 274 sq's [Person] is far to the south, north, east, west.
+			disty = DISTANCE_FAR;
+		}
+		else{
+			//d. From 275 to infinite sq's [Person] is very far to the south, north, east, west.
+			disty = DISTANCE_VERYFAR;
+		}
 
 		/*if(Position::areInRange<4, 4, 0>(lookPos, searchPos)){
 			//a. From 1 to 4 sq's [Person] is standing next to you.
