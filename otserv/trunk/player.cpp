@@ -115,9 +115,14 @@ Creature()
 	level_percent = 0;
 	maglevel_percent = 0;
 
-  //set item pointers to NULL
 	for(int i = 0; i < 11; i++){
 		items[i] = NULL;
+	}
+
+	for(int i = SKILL_FIRST; i < SKILL_LAST; ++i){
+		skills[i][SKILL_LEVEL]= 10;
+		skills[i][SKILL_TRIES]= 0;
+		skills[i][SKILL_PERCENT] = 0;
 	}
 
 	/*

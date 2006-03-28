@@ -36,13 +36,15 @@ class House;
 class Protocol;
 
 enum skills_t {
-	SKILL_FIST=0,
-	SKILL_CLUB=1,
-	SKILL_SWORD=2,
-	SKILL_AXE=3,
-	SKILL_DIST=4,
-	SKILL_SHIELD=5,
-	SKILL_FISH=6
+	SKILL_FIRST = 0,
+	SKILL_FIST = SKILL_FIRST,
+	SKILL_CLUB = 1,
+	SKILL_SWORD = 2,
+	SKILL_AXE = 3,
+	SKILL_DIST = 4,
+	SKILL_SHIELD = 5,
+	SKILL_FISH = 6,
+	SKILL_LAST = SKILL_FISH
 };
 
 enum skillsid_t {
