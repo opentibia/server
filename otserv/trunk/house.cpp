@@ -26,6 +26,7 @@
 #include "game.h"
 #include "town.h"
 #include "luascript.h"
+#include "tools.h"
 
 extern LuaScript g_config;
 extern Game g_game;
@@ -515,12 +516,23 @@ bool AccessList::addExpression(const std::string& expression)
 	replaceString(outExp, "*", ".*");
 	replaceString(outExp, "?", ".?");
 
-	expressionList.push_back(outExp);
-	if(outExp.substr(0,1) == "!"){
-		regExList.push_back(std::make_pair(boost::regex(outExp.substr(1)), false));
+	try{
+		if(outExp.length() > 0){
+			expressionList.push_back(outExp);
+
+			if(outExp.substr(0,1) == "!"){
+				if(outExp.length() > 1){
+					//push 'NOT' expressions upfront so they are checked first
+					regExList.push_front(std::make_pair(boost::regex(outExp.substr(1)), false));
+				}
+			}
+			else{
+				regExList.push_back(std::make_pair(boost::regex(outExp), true));
+			}
+		}
 	}
-	else{
-		regExList.push_back(std::make_pair(boost::regex(outExp), true));
+	catch(...){
+		//
 	}
 
 	return true;
@@ -718,75 +730,59 @@ House* Houses::getHouseByPlayerId(unsigned long playerId)
 
 bool Houses::loadHousesXML(std::string filename)
 {
-	std::transform(filename.begin(), filename.end(), filename.begin(), tolower);
 	xmlDocPtr doc = xmlParseFile(filename.c_str());
-
 	if(doc){
 		xmlNodePtr root, houseNode;
-		char* nodeValue = NULL;
 		root = xmlDocGetRootElement(doc);
 		
-		if(xmlStrcmp(root->name,(const xmlChar*) "houses") != 0){
+		if(xmlStrcmp(root->name,(const xmlChar*)"houses") != 0){
 			xmlFreeDoc(doc);
 			return false;
 		}
 
+		int intValue;
+		std::string strValue;
+
 		houseNode = root->children;
 		while(houseNode){
-			if(xmlStrcmp(houseNode->name,(const xmlChar*) "house") == 0){
+			if(xmlStrcmp(houseNode->name,(const xmlChar*)"house") == 0){
 				int _houseid = 0;
 				Position entryPos;
 
-				nodeValue = (char*)xmlGetProp(houseNode, (const xmlChar *) "houseid");
-
-				if(!nodeValue){
-					xmlFreeOTSERV(nodeValue);
+				if(!readXMLInteger(houseNode, "houseid", _houseid)){
 					return false;
 				}
 
-				_houseid = atoi(nodeValue);
 				House* house = Houses::getInstance().getHouse(_houseid);
 				if(!house){
 					std::cout << "Error: [Houses::loadHousesXML] Unknown house, id = " << _houseid << std::endl;
 					return false;
 				}
 
-				nodeValue = (char*)xmlGetProp(houseNode, (const xmlChar *) "name");
-				if(nodeValue){
-					house->setName(nodeValue);
-					xmlFreeOTSERV(nodeValue);
+				if(readXMLString(houseNode, "name", strValue)){
+					house->setName(strValue);
 				}
 
-				nodeValue = (char*)xmlGetProp(houseNode, (const xmlChar *) "entryx");
-				if(nodeValue){
-					entryPos.x = atoi(nodeValue);
-					xmlFreeOTSERV(nodeValue);
+				if(readXMLInteger(houseNode, "entryx", intValue)){
+					entryPos.x = intValue;
 				}
 
-				nodeValue = (char*)xmlGetProp(houseNode, (const xmlChar *) "entryy");
-				if(nodeValue){
-					entryPos.y = atoi(nodeValue);
-					xmlFreeOTSERV(nodeValue);
+				if(readXMLInteger(houseNode, "entryy", intValue)){
+					entryPos.y = intValue;
 				}
 
-				nodeValue = (char*)xmlGetProp(houseNode, (const xmlChar *) "entryz");
-				if(nodeValue){
-					entryPos.z = atoi(nodeValue);
-					xmlFreeOTSERV(nodeValue);
+				if(readXMLInteger(houseNode, "entryz", intValue)){
+					entryPos.z = intValue;
 				}
 				
 				house->setEntryPos(entryPos);
 				
-				nodeValue = (char*)xmlGetProp(houseNode, (const xmlChar *) "rent");
-				if(nodeValue){
-					house->setRent(atoi(nodeValue));
-					xmlFreeOTSERV(nodeValue);
+				if(readXMLInteger(houseNode, "rent", intValue)){
+					house->setRent(intValue);
 				}
-				
-				nodeValue = (char*)xmlGetProp(houseNode, (const xmlChar *) "townid");
-				if(nodeValue){
-					house->setTownId(atoi(nodeValue));
-					xmlFreeOTSERV(nodeValue);
+
+				if(readXMLInteger(houseNode, "townid", intValue)){
+					house->setTownId(intValue);
 				}
 				
 				house->setHouseOwner(0);
