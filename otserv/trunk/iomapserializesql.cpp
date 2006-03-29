@@ -303,6 +303,9 @@ bool IOMapSerializeSQL::loadTile(Database& db, Tile* tile)
 				std::pair<Item*, int> myPair(item, pid);
 				itemMap[sid] = myPair;
 			}
+			else{
+				std::cout << "WARNING: IOMapSerializeSQL::loadTile(). NULL item at " << tile->getPosition() << ". type = " << type << ", sid = " << sid << ", pid = " << pid << std::endl;
+			}
 		}
 	}
 
