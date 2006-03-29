@@ -383,13 +383,13 @@ bool IOMapSerializeXML::loadHouseInfo(Map* map, const std::string& identifier)
 	}
 
 	xmlNodePtr nodeHouse = root->children;
-	int value = 0;
+	int intValue = 0;
 
 	while(nodeHouse){
 		if(xmlStrcmp(nodeHouse->name, (const xmlChar*)"house") == 0){
 			int houseid = 0;
-			if(readXMLInteger(nodeHouse, "houseid", value)){
-				houseid = value;
+			if(readXMLInteger(nodeHouse, "houseid", intValue)){
+				houseid = intValue;
 			}
 			else{
 				map->setLastError(LOADMAPERROR_GETPROPFAILED);
@@ -398,32 +398,24 @@ bool IOMapSerializeXML::loadHouseInfo(Map* map, const std::string& identifier)
 
 			House* house = Houses::getInstance().getHouse(houseid);
 			if(house){
-				if(readXMLInteger(nodeHouse, "owner", value)){
-					house->setHouseOwner(value);
+				if(readXMLInteger(nodeHouse, "owner", intValue)){
+					house->setHouseOwner(intValue);
 				}
 				else{
 					map->setLastError(LOADMAPERROR_GETPROPFAILED);
 					return false;
 				}
 
-				if(readXMLInteger(nodeHouse, "paid", value)){
-					house->setPaidUntil(value);
+				if(readXMLInteger(nodeHouse, "paid", intValue)){
+					house->setPaidUntil(intValue);
 				}
 				else{
 					map->setLastError(LOADMAPERROR_GETPROPFAILED);
 					return false;
 				}
 
-				if(readXMLInteger(nodeHouse, "warnings", value)){
-					house->setHouseOwner(value);
-				}
-				else{
-					map->setLastError(LOADMAPERROR_GETPROPFAILED);
-					return false;
-				}
-
-				if(readXMLInteger(nodeHouse, "warnings", value)){
-					house->setPayRentWarnings(value);
+				if(readXMLInteger(nodeHouse, "warnings", intValue)){
+					house->setPayRentWarnings(intValue);
 				}
 				else{
 					map->setLastError(LOADMAPERROR_GETPROPFAILED);
