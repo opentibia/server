@@ -274,15 +274,15 @@ bool IOMapSerializeXML::loadTile(Map* map, xmlNodePtr nodeTile, Tile* tile)
 	char* nodeValue;
 	Item* item = NULL;
 
-	unsigned short ground = 0;
+	unsigned int groundId = 0;
 	if(nodeValue = (char*)xmlGetProp(nodeTile, (const xmlChar *) "ground")){
-		ground = atoi(nodeValue);
+		groundId = atoi(nodeValue);
 		xmlFreeOTSERV(nodeValue);
 	}
 
-	if(ground != 0){
-		Item* myGround = Item::CreateItem(ground);
-		tile->__internalAddThing(myGround);
+	if(groundId != 0){
+		Item* ground = Item::CreateItem(groundId);
+		tile->__internalAddThing(ground);
 	}
 
 	if(nodeValue = (char*)xmlGetProp(nodeTile, (const xmlChar *) "pz")){ 
