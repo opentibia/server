@@ -139,45 +139,45 @@ public:
 	  * \param thing the object to get the index value from
 	  * \returns the index of the object, returns -1 if not found
 	  */
-	virtual int32_t __getIndexOfThing(const Thing* thing) const = 0;
+	virtual int32_t __getIndexOfThing(const Thing* thing) const;
 
 	/**
 	  * Returns the first index
 	  * \returns the first index, if not implemented -1 is returned
 	  */
-	virtual int32_t __getFirstIndex() const = 0;
+	virtual int32_t __getFirstIndex() const;
 
 	/**
 	  * Returns the last index
 	  * \returns the last index, if not implemented -1 is returned
 	  */
-	virtual int32_t __getLastIndex() const = 0;
+	virtual int32_t __getLastIndex() const;
 
 	/**
 	  * Gets the object based on index
 	  * \returns the object, returns NULL if not found
 	  */
-	virtual Thing* __getThing(uint32_t index) const = 0;
+	virtual Thing* __getThing(uint32_t index) const;
 	
 	/**
 	  * Get the amount of items of a certain type
 	  * \param itemId is the item type to the get the count of
 	  * \param returns the amount of items of the asked item type
 	  */
-	virtual uint32_t __getItemTypeCount(uint16_t itemId) const = 0;
+	virtual uint32_t __getItemTypeCount(uint16_t itemId) const;
 
 	/**
 	  * Adds an object to the cylinder without sending to the client(s)
 	  * \param thing is the object to add
 	  */
-	virtual void __internalAddThing(Thing* thing) = 0;
+	virtual void __internalAddThing(Thing* thing);
 
 	/**
 	  * Adds an object to the cylinder without sending to the client(s)
 	  * \param thing is the object to add
 	  * \param index points to the destination index (inventory slot/container position)
 	  */
-	virtual void __internalAddThing(uint32_t index, Thing* thing) = 0;
+	virtual void __internalAddThing(uint32_t index, Thing* thing);
 };
 
 #endif

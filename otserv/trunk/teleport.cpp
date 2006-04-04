@@ -176,31 +176,6 @@ void Teleport::__removeThing(Thing* thing, uint32_t count)
 	//
 }
 
-int32_t Teleport::__getIndexOfThing(const Thing* thing) const
-{
-	return -1;
-}
-
-int32_t Teleport::__getFirstIndex() const
-{
-	return -1;
-}
-
-int32_t Teleport::__getLastIndex() const
-{
-	return -1;
-}
-
-uint32_t Teleport::__getItemTypeCount(uint16_t itemId) const
-{
-	return 0;
-}
-
-Thing* Teleport::__getThing(uint32_t index) const
-{
-	return NULL;
-}
-
 void Teleport::postAddNotification(Thing* thing, bool hasOwnership /*= true*/)
 {
 	getParent()->postAddNotification(thing, false /*hasOwnership*/);
@@ -209,14 +184,4 @@ void Teleport::postAddNotification(Thing* thing, bool hasOwnership /*= true*/)
 void Teleport::postRemoveNotification(Thing* thing, bool isCompleteRemoval, bool hadOwnership /*= true*/)
 {
 	getParent()->postRemoveNotification(thing, isCompleteRemoval, false /*hadOwnership*/);
-}
-
-void Teleport::__internalAddThing(Thing* thing)
-{
-	//
-}
-
-void Teleport::__internalAddThing(uint32_t index, Thing* thing)
-{
-	//
 }

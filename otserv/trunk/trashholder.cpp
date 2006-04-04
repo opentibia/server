@@ -89,31 +89,6 @@ void TrashHolder::__removeThing(Thing* thing, uint32_t count)
 	//
 }
 
-int32_t TrashHolder::__getIndexOfThing(const Thing* thing) const
-{
-	return -1;
-}
-
-int32_t TrashHolder::__getFirstIndex() const
-{
-	return -1;
-}
-
-int32_t TrashHolder::__getLastIndex() const
-{
-	return -1;
-}
-
-uint32_t TrashHolder::__getItemTypeCount(uint16_t itemId) const
-{
-	return 0;
-}
-
-Thing* TrashHolder::__getThing(uint32_t index) const
-{
-	return NULL;
-}
-
 void TrashHolder::postAddNotification(Thing* thing, bool hasOwnership /*= true*/)
 {
 	getParent()->postAddNotification(thing, false /*hasOwnership*/);
@@ -122,14 +97,4 @@ void TrashHolder::postAddNotification(Thing* thing, bool hasOwnership /*= true*/
 void TrashHolder::postRemoveNotification(Thing* thing, bool isCompleteRemoval, bool hadOwnership /*= true*/)
 {
 	getParent()->postRemoveNotification(thing, isCompleteRemoval, false /*hadOwnership*/);
-}
-
-void TrashHolder::__internalAddThing(Thing* thing)
-{
-	//
-}
-
-void TrashHolder::__internalAddThing(uint32_t index, Thing* thing)
-{
-	//
 }
