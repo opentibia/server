@@ -72,7 +72,7 @@ Npc::Npc(const std::string& _name) :
 		else
 			scriptname = "";
 		
-		if(readXMLString(root, "script", strValue)){
+		if(readXMLString(root, "name", strValue)){
 			name = strValue;
 		}
 		else
