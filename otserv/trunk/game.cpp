@@ -1430,7 +1430,7 @@ bool Game::removeItemOfType(Cylinder* cylinder, uint16_t itemId, uint32_t count)
 				}
 				else{
 					count-= item->getItemCount();
-					internalRemoveItem(item, count);
+					internalRemoveItem(item);
 				}
 			}
 			else{
@@ -1666,14 +1666,15 @@ Item* Game::transformItem(Item* item, uint16_t newtype, int32_t count /*= -1*/)
 				return item;
 			}
 
-			item->setParent(NULL);
-			cylinder->postRemoveNotification(item, true);
-			FreeThing(item);
-
 			Item* newItem = Item::CreateItem(newtype, (count == -1 ? 1 : count));
 			cylinder->__replaceThing(index, newItem);
 
 			cylinder->postAddNotification(newItem);
+
+			item->setParent(NULL);
+			cylinder->postRemoveNotification(item, true);
+			FreeThing(item);
+
 			return newItem;
 		}
 	}
@@ -1688,14 +1689,15 @@ Item* Game::transformItem(Item* item, uint16_t newtype, int32_t count /*= -1*/)
 				return item;
 			}
 
-			item->setParent(NULL);
-			cylinder->postRemoveNotification(item, true);
-			FreeThing(item);
-
 			Item* newItem = Item::CreateItem(newtype);
 			cylinder->__replaceThing(index, newItem);
 
 			cylinder->postAddNotification(newItem);
+
+			item->setParent(NULL);
+			cylinder->postRemoveNotification(item, true);
+			FreeThing(item);
+
 			return newItem;
 		}
 		else{
@@ -1970,13 +1972,6 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 		}
 	}
 
-	/*bool isAttackerRemoved = false;
-	if(creature && creature->isRemoved()){
-		creature->setParent(getTile(frompos.x, frompos.y, frompos.z));
-		isAttackerRemoved = true;
-	}
-	*/
-
 	SpectatorVec spectatorlist = gamestate.getSpectators();
 	SpectatorVec::iterator it;
 	
@@ -2061,10 +2056,6 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 		}
 
 	}
-	
-	/*if(isAttackerRemoved){
-		creature->setParent(NULL);
-	}*/
 
 	return bSuccess;
 }
@@ -2349,15 +2340,8 @@ void Game::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fi
 	if(damagetype != FIGHT_MELEE && player) {
 		player->removeDistItem();
 	}
-
-	/*if(isTargetRemoved){
-		attackedCreature->setParent(NULL);
-	}
-
-	if(isAttackerRemoved){
-		creature->setParent(NULL);
-	}*/
 }
+
 void Game::CreateDamageUpdate(Creature* creature, Creature* attackCreature, int damage)
 {
 	Player* player = dynamic_cast<Player*>(creature);
@@ -2809,7 +2793,7 @@ bool Game::playerRequestTrade(Player* player, const Position& pos, uint8_t stack
 		}
 	}
 
-	Container* tradeContainer = dynamic_cast<Container*>(tradeItem);
+	Container* tradeContainer = tradeItem->getContainer();
 	if(tradeContainer && tradeContainer->getItemHoldingCount() + 1 > 100){
 		player->sendTextMessage(MSG_INFO_DESCR, "You can not trade more than 100 items.");
 		return false;
@@ -3075,7 +3059,7 @@ bool Game::playerCloseTrade(Player* player)
 
 bool Game::playerLookAt(Player* player, const Position& pos, uint16_t itemId, uint8_t stackpos)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerCloseTrade()");
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerLookAt()");
 	if(player->isRemoved())
 		return false;
 	
