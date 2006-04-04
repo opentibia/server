@@ -61,9 +61,9 @@ bool IOMapSerializeSQL::saveMap(Map* map, const std::string& identifier)
 	if(!db.connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str())){
 		return false;
 	}
-	DBQuery query;
 
 	//Start the transaction	
+	DBQuery query;
 	query.reset();
 	query << "BEGIN;";
 	if(!db.executeQuery(query)){
@@ -332,13 +332,14 @@ bool IOMapSerializeSQL::loadTile(Database& db, Tile* tile)
 bool IOMapSerializeSQL::loadHouseInfo(Map* map, const std::string& identifier)
 {
 	Database db;
+	if(!db.connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str())){
+		return false;
+	}
+	
 	DBQuery query;
 	DBResult result;
 
-	db.connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str());
-	
 	query << "SELECT * FROM houses";
-
 	if(!db.storeQuery(query, result) || result.getNumRows() == 0)
 		return false;
 	
@@ -377,11 +378,13 @@ bool IOMapSerializeSQL::loadHouseInfo(Map* map, const std::string& identifier)
 bool IOMapSerializeSQL::saveHouseInfo(Map* map, const std::string& identifier)
 {
 	Database db;
+	if(!db.connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str())){
+		return false;
+	}
+	
 	DBQuery query;
 	DBResult result;
 
-	db.connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str());
-	
 	query << "BEGIN;";
 	if(!db.executeQuery(query))
 		return false;

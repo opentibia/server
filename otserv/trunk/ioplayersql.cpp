@@ -55,13 +55,14 @@ IOPlayerSQL::IOPlayerSQL()
 bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 {
 	Database mysql;
+	if(!mysql.connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str())){
+		return false;
+	}
+
 	DBQuery query;
 	DBResult result;
 
-	mysql.connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str());
-
 	query << "SELECT * FROM players WHERE name='" << Database::escapeString(name) << "'";
-	//std::cout << query.GetText() << std::endl;
 	if(!mysql.storeQuery(query, result) || result.getNumRows() != 1)
 		return false;
 	
@@ -278,11 +279,13 @@ bool IOPlayerSQL::savePlayer(Player* player)
 	player->preSave();
 		
 	Database mysql;
+	if(!mysql.connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str())){
+		return false;
+	}
+	
 	DBQuery query;
 	DBResult result;
-	
-	mysql.connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str());
-	
+
 	//check if the player have to be saved or not
 	query << "SELECT save FROM players WHERE id='" << player->getGUID() << "'";
 	if(!mysql.storeQuery(query,result) || (result.getNumRows() != 1) )
@@ -583,13 +586,15 @@ bool IOPlayerSQL::getNameByGuid(unsigned long guid, std::string &name)
 		return true;
 	}
 	
-	Database mysql;
+	Database mysql;	
+	if(!mysql.connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str())){
+		return false;
+	}
+
 	DBQuery query;
 	DBResult result;
-	
-	mysql.connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str());
+
 	query << "SELECT name FROM players WHERE id='" << guid << "'";
-	
 	if(!mysql.storeQuery(query, result) || result.getNumRows() != 1)
 		return false;
 	
@@ -602,13 +607,14 @@ bool IOPlayerSQL::getNameByGuid(unsigned long guid, std::string &name)
 bool IOPlayerSQL::getGuidByName(unsigned long &guid, unsigned long &alvl, std::string &name)
 {
 	Database mysql;
+	if(!mysql.connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str())){
+		return false;
+	}
+	
 	DBQuery query;
 	DBResult result;
-	
-	mysql.connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str());
-	
-	query << "SELECT name,id,access FROM players WHERE name='" << Database::escapeString(name) << "'";
-	
+
+	query << "SELECT name,id,access FROM players WHERE name='" << Database::escapeString(name) << "'";	
 	if(!mysql.storeQuery(query, result) || result.getNumRows() != 1)
 		return false;
 	
@@ -621,11 +627,13 @@ bool IOPlayerSQL::getGuidByName(unsigned long &guid, unsigned long &alvl, std::s
 bool IOPlayerSQL::getGuildIdByName(unsigned long &guildId, const std::string& guildName)
 {
 	Database mysql;
+	if(!mysql.connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str())){
+		return false;
+	}
+	
 	DBQuery query;
 	DBResult result;
-	
-	mysql.connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str());
-	
+
 	query << "SELECT guildid FROM guilds WHERE guildname='" << Database::escapeString(guildName) << "'";
 	if(!mysql.storeQuery(query, result) || result.getNumRows() != 1)
 		return false;
@@ -637,13 +645,14 @@ bool IOPlayerSQL::getGuildIdByName(unsigned long &guildId, const std::string& gu
 bool IOPlayerSQL::playerExists(std::string name)
 {
 	Database mysql;
+	if(!mysql.connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str())){
+		return false;
+	}
+	
 	DBQuery query;
 	DBResult result;
-	
-	mysql.connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str());	
-	
-	query << "SELECT name FROM players WHERE name='" << Database::escapeString(name) << "'";
-	
+
+	query << "SELECT name FROM players WHERE name='" << Database::escapeString(name) << "'";	
 	if(!mysql.storeQuery(query, result) || result.getNumRows() != 1)
 		return false;
 

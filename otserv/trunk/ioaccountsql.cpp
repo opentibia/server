@@ -38,17 +38,20 @@ IOAccountSQL::IOAccountSQL()
 	m_db   = g_config.getGlobalString("sql_db");
 }
 
-Account IOAccountSQL::loadAccount(unsigned long accno){
+Account IOAccountSQL::loadAccount(unsigned long accno)
+{
 	Account acc;
-
-	Database mysql;
-	DBQuery query;
-	DBResult result;
 	
 //	try
 //	{
-		mysql.connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str());
+		Database mysql;
+		if(!mysql.connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str())){
+			return acc;
+		}
 	
+		DBQuery query;
+		DBResult result;
+
 		query << "SELECT * FROM accounts WHERE accno='" << accno << "'";
 		if(!mysql.storeQuery(query, result))
 			return acc;
@@ -63,8 +66,7 @@ Account IOAccountSQL::loadAccount(unsigned long accno){
 		if(!mysql.storeQuery(query, result))
 			return acc;
 		
-		for(int i=0; i < result.getNumRows(); ++i)
-		{
+		for(int i=0; i < result.getNumRows(); ++i){
 			std::string ss = result.getDataString("name", i);
 			acc.charList.push_back(ss.c_str());
 		}
@@ -98,13 +100,14 @@ Account IOAccountSQL::loadAccount(unsigned long accno){
 
 bool IOAccountSQL::getPassword(unsigned long accno, const std::string &name, std::string &password)
 {
-	
 	Database mysql;
+	if(!mysql.connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str())){
+		return false;
+	}
+	
 	DBQuery query;
 	DBResult result;
-	
-	mysql.connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str());
-	
+
 	query << "SELECT password FROM accounts WHERE accno='" << accno << "'";
 	if(!mysql.storeQuery(query, result))
 		return false;
