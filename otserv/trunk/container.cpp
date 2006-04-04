@@ -126,7 +126,7 @@ bool Container::unserializeItemNode(FileLoader& f, NODE node, PropStream& propSt
 			//load container items
 			if(type == OTBM_ITEM){
 				PropStream itemPropStream;
-				f.getProps(node, itemPropStream);
+				f.getProps(nodeItem, itemPropStream);
 				
 				Item* item = Item::CreateItem(itemPropStream);
 				if(!item){
@@ -263,12 +263,19 @@ void Container::onAddContainerItem(Item* item)
 	Player* player = NULL;
 	for(it = list.begin(); it != list.end(); ++it) {
 		if(player = (*it)->getPlayer()){
+			player->sendAddContainerItem(this, item);
+		}
+	}
+
+	//event methods
+	for(it = list.begin(); it != list.end(); ++it) {
+		if(player = (*it)->getPlayer()){
 			player->onAddContainerItem(this, item);
 		}
 	}
 }
 
-void Container::onUpdateContainerItem(uint32_t index, Item* olditem, Item* newitem)
+void Container::onUpdateContainerItem(uint32_t index, Item* oldItem, Item* newItem)
 {
 	const Position& cylinderMapPos = getPosition();
 
@@ -280,7 +287,14 @@ void Container::onUpdateContainerItem(uint32_t index, Item* olditem, Item* newit
 	Player* player = NULL;
 	for(it = list.begin(); it != list.end(); ++it) {
 		if(player = (*it)->getPlayer()){
-			player->onUpdateContainerItem(this, index, olditem, newitem);
+			player->sendUpdateContainerItem(this, index, oldItem, newItem);
+		}
+	}
+
+	//event methods
+	for(it = list.begin(); it != list.end(); ++it) {
+		if(player = (*it)->getPlayer()){
+			player->onUpdateContainerItem(this, index, oldItem, newItem);
 		}
 	}
 }
@@ -295,6 +309,13 @@ void Container::onRemoveContainerItem(uint32_t index, Item* item)
 
 	//send change to client
 	Player* player = NULL;
+	for(it = list.begin(); it != list.end(); ++it) {
+		if(player = (*it)->getPlayer()){
+			player->sendRemoveContainerItem(this, index, item);
+		}
+	}
+
+	//event methods
 	for(it = list.begin(); it != list.end(); ++it) {
 		if(player = (*it)->getPlayer()){
 			player->onRemoveContainerItem(this, index, item);

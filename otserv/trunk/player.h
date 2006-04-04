@@ -305,9 +305,19 @@ public:
 	void sendCreatureLight(const Creature* creature);
 	void sendWorldLight(LightInfo& lightInfo);
 
+	//container
+	void sendAddContainerItem(const Container* container, const Item* item);
+	void sendUpdateContainerItem(const Container* container, uint8_t slot, const Item* oldItem, const Item* newItem);
+	void sendRemoveContainerItem(const Container* container, uint8_t slot, const Item* item);
+
+	//inventory
+	void sendAddInventoryItem(slots_t slot, const Item* item);
+	void sendUpdateInventoryItem(slots_t slot, const Item* oldItem, const Item* newItem);
+	void sendRemoveInventoryItem(slots_t slot, const Item* item);
+
 	//event methods
 	virtual void onAddTileItem(const Position& pos, const Item* item);
-	virtual void onUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* olditem, const Item* newitem);
+	virtual void onUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* oldItem, const Item* newItem);
 	virtual void onRemoveTileItem(const Position& pos, uint32_t stackpos, const Item* item);
 	virtual void onUpdateTile(const Position& pos);
 	

@@ -127,7 +127,7 @@ public:
 
 private:
 	void onAddTileItem(Item* item);
-	void onUpdateTileItem(uint32_t index, Item* olditem, Item* newitem);
+	void onUpdateTileItem(uint32_t index, Item* oldItem, Item* newItem);
 	void onRemoveTileItem(uint32_t index, Item* item);
 	void onUpdateTile();
 

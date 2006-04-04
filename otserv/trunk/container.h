@@ -89,7 +89,7 @@ public:
 
 private:
 	void onAddContainerItem(Item* item);
-	void onUpdateContainerItem(uint32_t index, Item* olditem, Item* newitem);
+	void onUpdateContainerItem(uint32_t index, Item* oldItem, Item* newItem);
 	void onRemoveContainerItem(uint32_t index, Item* item);
 
 protected:

@@ -323,7 +323,7 @@ void Tile::onAddTileItem(Item* item)
 	g_game.isExecutingEvents = false;
 }
 
-void Tile::onUpdateTileItem(uint32_t index, Item* olditem, Item* newitem)
+void Tile::onUpdateTileItem(uint32_t index, Item* oldItem, Item* newItem)
 {
 	const Position& cylinderMapPos = getPosition();
 
@@ -335,7 +335,7 @@ void Tile::onUpdateTileItem(uint32_t index, Item* olditem, Item* newitem)
 	Player* player = NULL;
 	for(it = list.begin(); it != list.end(); ++it){
 		if(player = (*it)->getPlayer()){
-			player->sendUpdateTileItem(cylinderMapPos, index, olditem, newitem);
+			player->sendUpdateTileItem(cylinderMapPos, index, oldItem, newItem);
 		}
 	}
 
@@ -343,7 +343,7 @@ void Tile::onUpdateTileItem(uint32_t index, Item* olditem, Item* newitem)
 
 	//event methods
 	for(it = list.begin(); it != list.end(); ++it){
-		(*it)->onUpdateTileItem(cylinderMapPos, index, olditem, newitem);
+		(*it)->onUpdateTileItem(cylinderMapPos, index, oldItem, newItem);
 	}
 
 	g_game.isExecutingEvents = false;
@@ -872,10 +872,10 @@ void Tile::__replaceThing(uint32_t index, Thing* thing)
 	}
 
 	if(pos == 0){
-		oldItem->setParent(NULL);
 		item->setParent(this);
 		onUpdateTileItem(index, oldItem, item);
 
+		oldItem->setParent(NULL);
 		return /*RET_NOERROR*/;
 	}
 

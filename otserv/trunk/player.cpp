@@ -674,6 +674,7 @@ void Player::dropLoot(Container *corpse)
 		if(item && ((item->getContainer()) || random_range(1, 100) <= 10)){
 		#endif
 			corpse->__internalAddThing(item);
+			sendRemoveInventoryItem((slots_t)i, item);
 			onRemoveInventoryItem((slots_t)i, item);
 			items[i] = NULL;
 		}
@@ -1166,26 +1167,77 @@ void Player::sendCreatureSquare(const Creature* creature, SquareColor color)
 	client->sendCreatureSquare(creature, color);
 }
 
+void Player::sendAddContainerItem(const Container* container, const Item* item)
+{
+  for(ContainerVector::const_iterator cl = containerVec.begin(); cl != containerVec.end(); ++cl){
+		if(cl->second == container){
+			client->sendAddContainerItem(cl->first, item);
+		}
+	}
+}
+
+void Player::sendUpdateContainerItem(const Container* container, uint8_t slot, const Item* oldItem, const Item* newItem)
+{
+  for(ContainerVector::const_iterator cl = containerVec.begin(); cl != containerVec.end(); ++cl){
+		if(cl->second == container){
+			client->sendUpdateContainerItem(cl->first, slot, newItem);
+		}
+	}
+}
+
+void Player::sendRemoveContainerItem(const Container* container, uint8_t slot, const Item* item)
+{
+  for(ContainerVector::const_iterator cl = containerVec.begin(); cl != containerVec.end(); ++cl){
+		if(cl->second == container){
+			client->sendRemoveContainerItem(cl->first, slot);
+		}
+	}
+}
+
+//inventory
+void Player::sendAddInventoryItem(slots_t slot, const Item* item)
+{
+	client->sendAddInventoryItem(slot, item);
+}
+
+void Player::sendUpdateInventoryItem(slots_t slot, const Item* oldItem, const Item* newItem)
+{
+	client->sendUpdateInventoryItem(slot, newItem);
+}
+
+void Player::sendRemoveInventoryItem(slots_t slot, const Item* item)
+{
+	client->sendRemoveInventoryItem(slot);
+}
+
 void Player::onAddTileItem(const Position& pos, const Item* item)
 {
 	//
 }
 
-void Player::onUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* olditem, const Item* newitem)
+void Player::onUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* oldItem, const Item* newItem)
 {
-	if(tradeItem && olditem == tradeItem && tradeState != TRADE_TRANSFER){
-		g_game.playerCloseTrade(this);
+	if(oldItem != newItem){
+		onRemoveTileItem(pos, stackpos, oldItem);
+	}
+
+	if(tradeState != TRADE_TRANSFER){
+		if(tradeItem && oldItem == tradeItem){
+			g_game.playerCloseTrade(this);
+		}
 	}
 }
 
 void Player::onRemoveTileItem(const Position& pos, uint32_t stackpos, const Item* item)
 {
-	checkTradeState(item);
+	if(tradeState != TRADE_TRANSFER){
+		checkTradeState(item);
 
-	if(tradeItem && tradeState != TRADE_TRANSFER){
-		const Container* container = item->getContainer();
-		if(container && container->isHoldingItem(tradeItem)){
-			g_game.playerCloseTrade(this);
+		if(tradeItem){
+			const Container* container = item->getContainer();
+			if(container && container->isHoldingItem(tradeItem)){
+				g_game.playerCloseTrade(this);
+			}
 		}
 	}
 }
@@ -1306,39 +1358,29 @@ void Player::onCreatureSay(const Creature* creature, SpeakClasses type, const st
 //container
 void Player::onAddContainerItem(const Container* container, const Item* item)
 {
-  for(ContainerVector::const_iterator cl = containerVec.begin(); cl != containerVec.end(); ++cl){
-		if(cl->second == container){
-			client->sendAddContainerItem(cl->first, item);
-		}
-	}
-
 	checkTradeState(item);
 }
 
 void Player::onUpdateContainerItem(const Container* container, uint8_t slot, const Item* oldItem, const Item* newItem)
 {
-  for(ContainerVector::const_iterator cl = containerVec.begin(); cl != containerVec.end(); ++cl){
-		if(cl->second == container){
-			client->sendUpdateContainerItem(cl->first, slot, newItem);
-		}
+	if(oldItem != newItem){
+		onRemoveContainerItem(container, slot, oldItem);
 	}
 
-	checkTradeState(oldItem);
+	if(tradeState != TRADE_TRANSFER){
+		checkTradeState(oldItem);
+	}
 }
 
 void Player::onRemoveContainerItem(const Container* container, uint8_t slot, const Item* item)
 {
-  for(ContainerVector::const_iterator cl = containerVec.begin(); cl != containerVec.end(); ++cl){
-		if(cl->second == container){
-			client->sendRemoveContainerItem(cl->first, slot);
-		}
-	}
-
-	checkTradeState(item);
-	
-	if(tradeItem && tradeState != TRADE_TRANSFER){
-		if(tradeItem->getParent() != container && container->isHoldingItem(tradeItem)){
-			g_game.playerCloseTrade(this);
+	if(tradeState != TRADE_TRANSFER){
+		checkTradeState(item);
+		
+		if(tradeItem){
+			if(tradeItem->getParent() != container && container->isHoldingItem(tradeItem)){
+				g_game.playerCloseTrade(this);
+			}
 		}
 	}
 }
@@ -1366,24 +1408,30 @@ void Player::onSendContainer(const Container* container)
 //inventory
 void Player::onAddInventoryItem(slots_t slot, const Item* item)
 {
-	client->sendAddInventoryItem(slot, item);
+	//
 }
 
 void Player::onUpdateInventoryItem(slots_t slot, const Item* oldItem, const Item* newItem)
 {
-	client->sendUpdateInventoryItem(slot, newItem);
-	checkTradeState(oldItem);
+	if(oldItem != newItem){
+		onRemoveInventoryItem(slot, oldItem);
+	}
+
+	if(tradeState != TRADE_TRANSFER){
+		checkTradeState(oldItem);
+	}
 }
 
 void Player::onRemoveInventoryItem(slots_t slot, const Item* item)
 {
-	client->sendRemoveInventoryItem(slot);
-	checkTradeState(item);
+	if(tradeState != TRADE_TRANSFER){
+		checkTradeState(item);
 
-	if(tradeItem && tradeState != TRADE_TRANSFER){
-		const Container* container = item->getContainer();
-		if(container && container->isHoldingItem(tradeItem)){
-			g_game.playerCloseTrade(this);
+		if(tradeItem){
+			const Container* container = item->getContainer();
+			if(container && container->isHoldingItem(tradeItem)){
+				g_game.playerCloseTrade(this);
+			}
 		}
 	}
 }
@@ -2054,6 +2102,9 @@ void Player::__addThing(int32_t index, Thing* thing)
 	items[index] = item;
 
 	//send to client
+	sendAddInventoryItem((slots_t)index, item);
+
+	//event methods
 	onAddInventoryItem((slots_t)index, item);
 }
 
@@ -2079,6 +2130,10 @@ void Player::__updateThing(Thing* thing, uint32_t count)
 
 	item->setItemCountOrSubtype(count);
 
+	//send to client
+	sendUpdateInventoryItem((slots_t)index, item, item);
+
+	//event methods
 	onUpdateInventoryItem((slots_t)index, item, item);
 }
 
@@ -2111,6 +2166,9 @@ void Player::__replaceThing(uint32_t index, Thing* thing)
 	}
 
 	//send to client
+	sendUpdateInventoryItem((slots_t)index, oldItem, item);
+	
+	//event methods
 	onUpdateInventoryItem((slots_t)index, oldItem, item);
 
 	item->setParent(this);
@@ -2140,6 +2198,9 @@ void Player::__removeThing(Thing* thing, uint32_t count)
 	if(item->isStackable()){
 		if(count == item->getItemCount()){
 			//send change to client
+			sendRemoveInventoryItem((slots_t)index, item);
+
+			//event methods
 			onRemoveInventoryItem((slots_t)index, item);
 
 			item->setParent(NULL);
@@ -2150,11 +2211,17 @@ void Player::__removeThing(Thing* thing, uint32_t count)
 			item->setItemCount(newCount);
 
 			//send change to client
+			sendUpdateInventoryItem((slots_t)index, item, item);
+
+			//event methods
 			onUpdateInventoryItem((slots_t)index, item, item);
 		}
 	}
 	else{
 		//send change to client
+		sendRemoveInventoryItem((slots_t)index, item);
+	
+		//event methods
 		onRemoveInventoryItem((slots_t)index, item);
 
 		item->setParent(NULL);
