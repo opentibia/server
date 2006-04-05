@@ -180,6 +180,29 @@ public:
 		return true;
 	}
 	
+	inline bool GET_NSTRING(unsigned short str_len, std::string &ret){
+		char* str;
+		
+		if(size() < str_len){
+			return false;
+		}
+		str = new char[str_len+1];
+		memcpy(str, p, str_len);
+		str[str_len] = 0;
+		ret = str;
+		delete[] str;
+		p = p + str_len;
+		return true;
+	}
+	
+	inline bool SKIP_N(unsigned short n){
+		if(size() < n){
+			return false;
+		}
+		p = p + n;
+		return true;
+	}
+	
 	
 protected:
 	long size(){return end - p;};
