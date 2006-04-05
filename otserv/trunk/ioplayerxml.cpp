@@ -620,7 +620,7 @@ bool IOPlayerXML::getGuidByName(unsigned long& guid, unsigned long& alvl, std::s
 			if(xmlStrcmp(playerNode->name,(const xmlChar*)"player") == 0){
 				if(readXMLString(playerNode, "name", strValue)){
 
-					if(stricmp(strValue.c_str(), name.c_str()) == 0){
+					if(strcasecmp(strValue.c_str(), name.c_str()) == 0){
 
 						if(readXMLInteger(playerNode, "guid", intValue)){
 							guid = intValue;
