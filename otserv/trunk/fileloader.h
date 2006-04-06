@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////
 // OTItemEditor
 //////////////////////////////////////////////////////////////////////
-// 
+//
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -76,7 +76,7 @@ protected:
 	inline bool safeTell(long &pos);
 
 public:
-	inline bool FileLoader::writeData(const void* data, int size, bool unescape){
+	inline bool writeData(const void* data, int size, bool unescape){
 		for(int i = 0; i < size; ++i) {
 			unsigned char c = *(((unsigned char*)data) + i);
 			if(unescape && (c == NODE_START || c == NODE_END || c == ESCAPE_CHAR)) {
@@ -138,7 +138,7 @@ public:
 		p = p + sizeof(T);
 		return true;
 	}
-	
+
 	template <typename T>
 	inline bool GET_VALUE(T &ret){
 		if(size() < sizeof(T)){
@@ -148,23 +148,23 @@ public:
 		p = p + sizeof(T);
 		return true;
 	}
-	
+
 	inline bool GET_ULONG(unsigned long &ret){
 		return GET_VALUE(ret);
 	}
-	
+
 	inline bool GET_USHORT(unsigned short &ret){
 		return GET_VALUE(ret);
 	}
-	
+
 	inline bool GET_UCHAR(unsigned char &ret){
 		return GET_VALUE(ret);
 	}
-	
+
 	inline bool GET_STRING(std::string &ret){
 		char* str;
 		unsigned short str_len;
-		
+
 		if(!GET_USHORT(str_len)){
 			return false;
 		}
@@ -179,10 +179,10 @@ public:
 		p = p + str_len;
 		return true;
 	}
-	
+
 	inline bool GET_NSTRING(unsigned short str_len, std::string &ret){
 		char* str;
-		
+
 		if(size() < str_len){
 			return false;
 		}
@@ -194,7 +194,7 @@ public:
 		p = p + str_len;
 		return true;
 	}
-	
+
 	inline bool SKIP_N(unsigned short n){
 		if(size() < n){
 			return false;
@@ -202,8 +202,8 @@ public:
 		p = p + n;
 		return true;
 	}
-	
-	
+
+
 protected:
 	long size(){return end - p;};
 	const char* p;
@@ -230,45 +230,45 @@ public:
 		memcpy(&buffer[size], (char*)add, sizeof(T));
 		size = size + sizeof(T);
 	}
-	
+
 	template <typename T>
 	inline void ADD_VALUE(T add){
 		if((buffer_size - size) < sizeof(T)){
 			buffer_size = buffer_size + ((sizeof(T) + 0x1F) & 0xFFFFFFE0);
 			buffer = (char*)realloc(buffer,buffer_size);
 		}
-		
+
 		memcpy(&buffer[size], &add, sizeof(T));
 		size = size + sizeof(T);
 	}
-	
+
 	inline void ADD_ULONG(unsigned long ret){
 		ADD_VALUE(ret);
 	}
-	
+
 	inline void ADD_USHORT(unsigned short ret){
 		ADD_VALUE(ret);
 	}
-	
+
 	inline void ADD_UCHAR(unsigned char ret){
 		ADD_VALUE(ret);
 	}
-	
+
 	inline void ADD_STRING(const std::string& add){
 		unsigned short str_len = add.size();
-		
+
 		ADD_USHORT(str_len);
 
 		if((buffer_size - size) < str_len){
 			buffer_size = buffer_size + ((str_len + 0x1F) & 0xFFFFFFE0);
 			buffer = (char*)realloc(buffer, buffer_size);
 		}
-		
+
 		memcpy(&buffer[size], add.c_str(), str_len);
 		size = size + str_len;
 	}
-	
-	
+
+
 protected:
 	char* buffer;
 	unsigned long buffer_size;

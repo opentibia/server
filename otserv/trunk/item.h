@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -120,7 +120,7 @@ public:
 	virtual const Mailbox* getMailbox() const {return NULL;};
 	virtual Door* getDoor() {return NULL;};
 	virtual const Door* getDoor() const {return NULL;};
-	
+
 	//serialization
 	virtual bool unserialize(xmlNodePtr p);
 	virtual xmlNodePtr serialize();
@@ -131,16 +131,16 @@ public:
 	//virtual bool serializeItemNode();
 
 	virtual bool serializeAttr(PropWriteStream& propWriteStream);
-	
+
 	virtual bool isPushable() const {return !isNotMoveable();};
 	virtual int getThrowRange() const {return (isPickupable() ? 15 : 2);};
 
 	virtual std::string getDescription(int32_t lookDistance) const;
-	std::string Item::getWeightDescription() const;
+	std::string getWeightDescription() const;
 
 	unsigned short getID() const;    // ID as in ItemType
 	virtual void setID(unsigned short newid);
-		    
+
 	WeaponType getWeaponType() const;
 	amu_t	getAmuType() const;
 	subfight_t getSubfightType() const;
@@ -152,7 +152,7 @@ public:
 	int getRWInfo(int& maxlen) const;
 	int getWorth() const;
 	void getLight(LightInfo& lightInfo);
-		
+
 	bool hasProperty(enum ITEMPROPERTY prop) const;
 	bool isBlocking() const;
 	bool isStackable() const;
@@ -182,7 +182,7 @@ public:
 	void clearSpecialDescription();
 	void setText(const std::string& desc);
 	void clearText();
-	std::string Item::getText();
+	std::string getText();
 
   // get the number of items
 	unsigned short getItemCount() const;
@@ -197,17 +197,17 @@ public:
 
 	unsigned char getFluidType() const {return fluid;};
 	void setFluidType(unsigned char n) {fluid = n;};
-	
+
 	void setActionId(unsigned short n);
 	unsigned short getActionId() const;
-	
+
 	void setUniqueId(unsigned short n);
 	unsigned short getUniqueId() const;
-	
+
 	virtual long getDecayTime();
 	bool canDecay();
 	bool isDecaying;
-	
+
 	virtual bool canRemove() const {return true;}
 	virtual bool onTradeEvent(TradeEvents_t event, Player* owner){return true;};
 
