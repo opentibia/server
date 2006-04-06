@@ -78,6 +78,14 @@ Tile* Thing::getTile()
 {
 	Cylinder* cylinder = getTopParent();
 
+	#ifdef __DEBUG__MOVESYS__
+	if(!cylinder){
+		std::cout << "Failure: [Thing::getTile()],  NULL tile" << std::endl;
+		DEBUG_REPORT
+		return &(Tile::null_tile);
+	}
+	#endif
+
 	//get root cylinder
 	if(cylinder->getParent())
 		cylinder = cylinder->getParent();
@@ -88,6 +96,14 @@ Tile* Thing::getTile()
 const Tile* Thing::getTile() const
 {
 	const Cylinder* cylinder = getTopParent();
+
+	#ifdef __DEBUG__MOVESYS__
+	if(!cylinder){
+		std::cout << "Failure: [Thing::getTile() const],  NULL tile" << std::endl;
+		DEBUG_REPORT
+		return &(Tile::null_tile);
+	}
+	#endif
 
 	//get root cylinder
 	if(cylinder->getParent())
@@ -105,6 +121,7 @@ const Position& Thing::getPosition() const
 	else{
 		#ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Thing::getPosition],  NULL tile" << std::endl;
+		DEBUG_REPORT
 		#endif
 		return Tile::null_tile.getTilePosition();
 	}

@@ -206,8 +206,7 @@ int Items::loadFromOtb(std::string file)
 		return f.getError();
 	}
 	
-	unsigned long type,len;
-	const unsigned char* data;
+	unsigned long type;
 	NODE node = f.getChildNode(NO_NODE, type);
 	
 	PropStream props;
@@ -220,11 +219,11 @@ int Items::loadFromOtb(std::string file)
 			return ERROR_INVALID_FORMAT;
 		}
 		attribute_t attr;
-		datasize_t datalen = 0;
 		if(!props.GET_VALUE(attr)){
 			return ERROR_INVALID_FORMAT;
 		}
 		if(attr == ROOT_ATTR_VERSION){
+			datasize_t datalen = 0;
 			if(!props.GET_VALUE(datalen)){
 				return ERROR_INVALID_FORMAT;
 			}
@@ -235,11 +234,17 @@ int Items::loadFromOtb(std::string file)
 			if(!props.GET_STRUCT(vi)){
 				return ERROR_INVALID_FORMAT;
 			}
-			Items::dwMajorVersion = vi->dwMajorVersion;
-			Items::dwMinorVersion = vi->dwMinorVersion;
-			Items::dwBuildNumber = vi->dwBuildNumber;
+			Items::dwMajorVersion = vi->dwMajorVersion;	//items otb format file version
+			Items::dwMinorVersion = vi->dwMinorVersion; //client version
+			Items::dwBuildNumber = vi->dwBuildNumber;	//revision
 		}
 	}
+	
+	if(Items::dwMajorVersion != 1){
+		std::cout << "Not supported items.otb version." << std::endl;
+		return ERROR_INVALID_FORMAT;
+	}
+	
 	if(Items::dwMinorVersion != CLIENT_VERSION_760){
 		std::cout << "Not supported items.otb client version." << std::endl;
 		return ERROR_INVALID_FORMAT;
@@ -255,7 +260,6 @@ int Items::loadFromOtb(std::string file)
 			
 		flags_t flags;
 		ItemType* iType = new ItemType();
-		bool loadedFlags = false;
 		iType->group = (itemgroup_t)type;
 
 		switch(type){
