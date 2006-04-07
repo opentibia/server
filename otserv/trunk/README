@@ -1,5 +1,5 @@
 ============================================
-========== OpenTibia Server 0.4.1 ==========
+========== OpenTibia Server 0.5.0 ==========
 ============================================
 ===== www.otserv.org	www.otfans.net =====
 ============================================
@@ -12,9 +12,9 @@ What is this?
 
 How does it work?
 	In the past Otserv could be played on Tibia 7.1, 7.11 and then 7.4.
-	Otserv is now played using Tibia 7.5.
+	Otserv is now played using Tibia 7.6.
 	To play it you can either download the IP changer (works with
-	only Tibia 7.5) or change the shortcut to Tibia.
+	only Tibia 7.6) or change the shortcut to Tibia.
 	If you are making a shortcut to it, open the properties of the shortcut
 	and you should see a box marked "Target:" and should look roughly
 	like this: "C:/tibia directory/Tibia.exe".
@@ -41,15 +41,14 @@ How does it work?
 
 	
 Whats New?	
-	- 7.5 Protocol
+	- 7.6 Protocol
 	- OTB (You now dont have to convert your map, change any ID, 7.5 ID's are just stacked on top of older ID's!)
 	- VIP List (SQL Only)
+	- Houses
 	- Guild support
 	- Logger added
 	- Rotatable items
-	- Monsters smarter
-	- Loads of glitches and bugs fixed
-	
+	- Smarter monsters	
 
 Features?
 	- Full rearranged protocol and game system
@@ -57,8 +56,8 @@ Features?
 	- SQL databases (for accounts and players)
 	- Crash tracking
 	- Monsters
-	- 7.5 Protocol
-	- OTB (You now dont have to convert your map, change any ID, 7.5 ID's are just stacked on top of older ID's!)
+	- 7.6 Protocol
+	- OTB (You now dont have to convert your map, change any ID, new ID's are just stacked on top of older ID's!)
 	- VIP List (SQL Only)
 	- Guild support
 	- Spawns (and Respawn)
@@ -117,10 +116,6 @@ Credits?
 	Acrimon - Initial project developer
 	Tliff - Developer, some kind of project leader
 	Yorick - Fansite / Forum administrator
-	Reebow - Developer (special protocol support), not more a member of the team
-	Haktivex - Developer, not more a member of the team
-	Fandoras - Developer, not more a member of the team
-	Decar - Fansiter, not more a member of the team
 	Pekay - README Documentation, Actions Command Console Developer, DS-IRC Client Developer
 	SimOne - Developer and Map Editor, OTB
 	j4K3xBl4sT3r - Developer and Map Editor
@@ -128,10 +123,16 @@ Credits?
 	Snack - Developer
 	Spin - Developer, OTB
 	Primer - Developer, SQL
-	TiMMit - Developer (still member?)
-	Matkus - Developer (still member?)
-	Privateer - Documentation on the protocol (still member?)
-	Torvik - Item list (still member?)
+	*Inactive*
+	Reebow - Developer (special protocol support)
+        Aire - Developer
+	Haktivex - Developer
+	Fandoras - Developer
+	TiMMit - Developer
+	Decar - Fansiter
+	Matkus - Developer
+	Privateer - Documentation on the protocol
+	Torvik - Item list
 
 Forum Credits (OtFans.net):
 	Yorick - Admin
