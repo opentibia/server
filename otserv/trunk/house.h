@@ -162,8 +162,8 @@ public:
 	void setHouseOwner(uint32_t guid);
 	uint32_t getHouseOwner() const {return houseOwner;};
 
-	void setPaidUntil(uint64_t paid){paidUntil = paid;};
-	uint64_t getPaidUntil() const {return paidUntil;};
+	void setPaidUntil(uint32_t paid){paidUntil = paid;};
+	uint32_t getPaidUntil() const {return paidUntil;};
 
 	void setRent(uint32_t _rent){rent = _rent;};
 	uint32_t getRent() const {return rent;};
@@ -202,7 +202,7 @@ private:
 	AccessList subOwnerList;
 	std::string houseName;
 	Position posEntry;
-	uint64_t paidUntil;
+	uint32_t paidUntil;
 	uint32_t rentWarnings;
 	uint32_t rent;
 	uint32_t townid;

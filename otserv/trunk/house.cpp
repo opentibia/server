@@ -799,7 +799,7 @@ bool Houses::loadHousesXML(std::string filename)
 
 bool Houses::payHouses()
 {
-	uint64_t currentTime = OTSYS_TIME();
+	uint32_t currentTime = std::time(NULL);
 
 	for(HouseMap::iterator it = houseMap.begin(); it != houseMap.end(); ++it){
 		House* house = it->second;
@@ -841,23 +841,20 @@ bool Houses::payHouses()
 			if(depot){
 				//get money from depot
 				if(g_game.removeMoney(depot, house->getRent(), FLAG_NOLIMIT)){
-
-					__int64 paidUntil = currentTime;
+					
+					uint32_t paidUntil = currentTime;
 					switch(rentPeriod){
-						case RENTPERIOD_DAILY:
-							paidUntil += 24 * 60 * 60;
+					case RENTPERIOD_DAILY:
+						paidUntil += 24 * 60 * 60;
 						break;
-
-						case RENTPERIOD_WEEKLY:
-							paidUntil += 24 * 60 * 60 * 7;
+					case RENTPERIOD_WEEKLY:
+						paidUntil += 24 * 60 * 60 * 7;
 						break;
-
-						case RENTPERIOD_MONTHLY:
-							paidUntil += 24 * 60 * 60 * 30;
+					case RENTPERIOD_MONTHLY:
+						paidUntil += 24 * 60 * 60 * 30;
 						break;
-
-						case RENTPERIOD_YEARLY:
-							paidUntil += 24 * 60 * 60 * 365;
+					case RENTPERIOD_YEARLY:
+						paidUntil += 24 * 60 * 60 * 365;
 						break;
 					}
 
