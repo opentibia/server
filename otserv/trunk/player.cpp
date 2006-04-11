@@ -72,6 +72,7 @@ Creature()
 	guildId    = 0;
 
 	eventAutoWalk = 0;
+	followCreature = NULL;
 
 	level      = 1;
 	experience = 180;
@@ -86,7 +87,6 @@ Creature()
 	chaseMode = CHASEMODE_STANDSTILL;
 	//fightMode = FIGHTMODE_NONE;
 
-	followCreature = NULL;
 	tradePartner = NULL;
 	tradeState = TRADE_NONE;
 	tradeItem = NULL;
@@ -2477,8 +2477,10 @@ bool Player::stopAutoWalk()
 		g_game.stopEvent(eventAutoWalk);
 		eventAutoWalk = 0;
 
-		listWalkDir.clear();
-		sendCancelWalk();
+		if(!listWalkDir.empty()){
+			listWalkDir.clear();
+			sendCancelWalk();
+		}
 	}
 
 	return true;
@@ -2487,12 +2489,7 @@ bool Player::stopAutoWalk()
 bool Player::checkStopAutoWalk(bool pathInvalid /*= false*/)
 {
 	if(followCreature){
-		if(pathInvalid){
-			if(g_game.internalFollowCreature(this, followCreature)){
-				return false;
-			}
-		}
-		else if(chaseMode == CHASEMODE_FOLLOW){
+		if(pathInvalid || chaseMode == CHASEMODE_FOLLOW){
 			if(g_game.internalFollowCreature(this, followCreature)){
 				return false;
 			}

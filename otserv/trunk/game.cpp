@@ -260,38 +260,39 @@ void GameState::onAttackedCreature(Tile* tile, Creature *attacker, Creature* att
 
 			//Prepare body
 			Item* corpseItem = Item::CreateItem(attackedCreature->getLookCorpse());
-			tile->__addThing(corpseItem);
-			game->startDecay(corpseItem);
-			
-			//Add eventual loot
-			Container* lootContainer = dynamic_cast<Container*>(corpseItem);
-			if(lootContainer){
-				attackedCreature->dropLoot(lootContainer);
+			if(corpseItem){
+				tile->__addThing(corpseItem);
+				game->startDecay(corpseItem);
+				
+				//Add eventual loot
+				if(Container* corpseContainer = corpseItem->getContainer()){
+					attackedCreature->dropLoot(corpseContainer);
+				}
+
+				if(attackedPlayer){
+					std::stringstream ss;
+					ss << "You recognize " << attackedPlayer->getName() << ".";
+					if(attacker){
+						ss << " " << (attackedPlayer->getSex() == PLAYERSEX_FEMALE ? "She" : "He") << " was killed by ";
+
+						Player* attackerPlayer = dynamic_cast<Player*>(attacker);
+						if(attackerPlayer) {
+							ss << attackerPlayer->getName() << ".";
+						}
+						else {
+							std::string creaturename = attacker->getName();
+							std::transform(creaturename.begin(), creaturename.end(), creaturename.begin(), (int(*)(int))tolower);
+							ss << "a " << creaturename << ".";
+						}
+					}
+
+					//set body special description
+					corpseItem->setSpecialDescription(ss.str());
+				}
 			}
 
 			if(attackedPlayer){
 				attackedPlayer->die(); //handles exp/skills/maglevel loss/reset spawn position
-				
-				std::stringstream ss;
-				//ss << corpseItem->getDescription(1);
-
-				ss << "You recognize " << attackedPlayer->getName() << ".";
-				if(attacker){
-					ss << " " << (attackedPlayer->getSex() == PLAYERSEX_FEMALE ? "She" : "He") << " was killed by ";
-
-					Player* attackerPlayer = dynamic_cast<Player*>(attacker);
-					if(attackerPlayer) {
-						ss << attackerPlayer->getName() << ".";
-					}
-					else {
-						std::string creaturename = attacker->getName();
-						std::transform(creaturename.begin(), creaturename.end(), creaturename.begin(), (int(*)(int))tolower);
-						ss << "a " << creaturename << ".";
-					}
-				}
-
-				//set body special description
-				corpseItem->setSpecialDescription(ss.str());
 				
 				#ifdef __SKULLSYSTEM__
 				Player* attackerPlayer = dynamic_cast<Player*>(attacker);
@@ -1776,7 +1777,7 @@ bool Game::internalCreatureSaySpell(Creature *creature, const std::string &text)
 {
 	Player* player = dynamic_cast<Player*>(creature);
 	std::string temp, var;
-	unsigned int loc = (uint32_t)text.find( "\"", 0 );
+	std::string::size_type loc = (uint32_t)text.find("\"", 0);
 	if(loc != std::string::npos && loc >= 0){
 		temp = std::string(text, 0, loc-1);
 		var = std::string(text, (loc+1), text.size()-loc-1);
@@ -1786,7 +1787,7 @@ bool Game::internalCreatureSaySpell(Creature *creature, const std::string &text)
 		var = std::string(""); 
 	}
 
-	std::transform(temp.begin(), temp.end(), temp.begin(), (int(*)(int))tolower);
+	toLowerCaseString(temp);
 	
 	//temporary place of house spells
 	if(player){
@@ -3126,13 +3127,12 @@ bool Game::playerFollowCreature(Player* player, unsigned long creatureId)
 		return false;
 
 	player->setAttackedCreature(NULL);
-
-	if(creatureId == 0){
-		player->setFollowCreature(NULL);
-		return true;
+	Creature* followCreature = NULL;
+	
+	if(creatureId != 0){
+		followCreature = getCreatureByID(creatureId);
 	}
 
-	Creature* followCreature = getCreatureByID(creatureId);
 	return internalFollowCreature(player, followCreature);
 }
 
@@ -3310,7 +3310,11 @@ bool Game::internalFollowCreature(Player* player, const Creature* followCreature
 		player->setAttackedCreature(NULL);
 
 		player->sendCancelTarget();
-		player->sendCancelMessage(RET_NOTPOSSIBLE);
+		if(followCreature){
+			player->sendCancelMessage(RET_NOTPOSSIBLE);
+		}
+
+		player->stopAutoWalk();
 		return false;
 	}
 
