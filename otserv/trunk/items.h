@@ -19,16 +19,11 @@
 //////////////////////////////////////////////////////////////////////
 
 
-#ifndef __OTSERV_ITEMS_H
-#define __OTSERV_ITEMS_H
+#ifndef __OTSERV_ITEMS_H__
+#define __OTSERV_ITEMS_H__
 
 
-#ifdef __GNUC__
-#include <ext/hash_map>
-#else
-#include <hash_map>
-#endif
-#include <string>
+#include "definitions.h"
 #include "const76.h"
 #include "itemloader.h"
 
@@ -137,20 +132,17 @@ public:
 	int loadFromOtb(std::string);
 	
 	const ItemType& operator[](int id);
-	
-	static unsigned long reverseLookUp(unsigned long id);
+
+	int getItemIdByName(const std::string& name);
+	int reverseLookUp(int id);
 	
 	static long dwMajorVersion;
 	static long dwMinorVersion;
 	static long dwBuildNumber;
 	
 protected:
-	#ifdef __GNUC__
-	typedef __gnu_cxx::hash_map<unsigned short, ItemType*> ItemMap;
-	#else
-	typedef stdext::hash_map<unsigned short, ItemType*> ItemMap;
-	#endif
-	
+	typedef OTSERV_HASH_MAP<unsigned short, ItemType*> ItemMap;
+
 	ItemMap items;
 	static ReverseItemMap revItems;
 
@@ -158,12 +150,3 @@ protected:
 };
 
 #endif
-
-
-
-
-
-
-
-
-

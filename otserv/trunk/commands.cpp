@@ -56,7 +56,8 @@ s_defcommands Commands::defined_commands[] = {
 	{"/b",&Commands::banPlayer},
 	{"/t",&Commands::teleportMasterPos},
 	{"/c",&Commands::teleportHere},
-	{"/i",&Commands::createItems},
+	{"/i",&Commands::createItemById},
+	{"/n",&Commands::createItemByName},
 	{"/q",&Commands::subtractMoney},
 	{"/reload",&Commands::reloadInfo},
 	{"/z",&Commands::testCommand},
@@ -354,7 +355,7 @@ bool Commands::teleportHere(Creature* creature, const std::string& cmd, const st
 	return false;
 }
 
-bool Commands::createItems(Creature* creature, const std::string& cmd, const std::string& param)
+bool Commands::createItemById(Creature* creature, const std::string& cmd, const std::string& param)
 {
 	Player* player = creature->getPlayer();
 	if(!player)
@@ -371,6 +372,57 @@ bool Commands::createItems(Creature* creature, const std::string& cmd, const std
 	int count = std::min(atoi(tmp.c_str()), 100);
 				
 	Item* newItem = Item::CreateItem(type, count);
+	if(!newItem)
+		return false;
+
+	ReturnValue ret = game->internalAddItem(player, newItem);
+	
+	if(ret != RET_NOERROR){
+		ret = game->internalAddItem(player->getTile(), newItem);
+
+		if(ret != RET_NOERROR){
+			delete newItem;
+			return false;
+		}
+	}
+	
+	game->AddMagicEffectAt(player->getPosition(), NM_ME_MAGIC_POISEN);
+	return true;
+}
+
+bool Commands::createItemByName(Creature* creature, const std::string& cmd, const std::string& param)
+{
+	Player* player = creature->getPlayer();
+	if(!player)
+		return false;
+
+	std::string::size_type pos1 = param.find("\"");
+	pos1 = (std::string::npos == pos1 ? 0 : pos1 + 1);
+
+	std::string::size_type pos2 = param.rfind("\"");
+	if(pos2 == pos1 || pos2 == std::string::npos){
+		pos2 = param.rfind(' ');
+
+		if(pos2 == std::string::npos){
+			pos2 = param.size();
+		}
+	}
+	
+	std::string itemName = param.substr(pos1, pos2 - pos1);
+
+	int count = 1;
+	if(pos2 < param.size()){
+		std::string itemCount = param.substr(pos2 + 1, param.size() - (pos2 + 1));
+		count = std::min(atoi(itemCount.c_str()), 100);
+	}
+
+	int itemId = Item::items.getItemIdByName(itemName);
+	if(itemId == -1){
+		player->sendTextMessage(MSG_STATUS_CONSOLE_RED, "Item could not be summoned.");
+		return false;
+	}
+				
+	Item* newItem = Item::CreateItem(itemId, count);
 	if(!newItem)
 		return false;
 

@@ -19,15 +19,14 @@
 //////////////////////////////////////////////////////////////////////
 
 
-#include "definitions.h"
 #include "items.h"
-
 #include "spells.h"
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 
 #include <iostream>
+#include <string>
 
 extern Spells spells;
 
@@ -622,7 +621,20 @@ const ItemType& Items::operator[](int id)
 	return dummyItemType;
 }
 
-unsigned long Items::reverseLookUp(unsigned long id)
+int Items::getItemIdByName(const std::string& name)
+{
+	if(!name.empty()){
+		for(ItemMap::iterator it = items.begin(); it != items.end(); ++it){
+			if(strcasecmp(name.c_str(), it->second->name.c_str()) == 0){
+				return it->first;
+			}
+		}
+	}
+
+	return -1;
+}
+
+int Items::reverseLookUp(int id)
 {
 	ReverseItemMap::iterator it = revItems.find(id);
 	if(it != revItems.end()){

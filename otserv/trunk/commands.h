@@ -19,8 +19,8 @@
 //////////////////////////////////////////////////////////////////////
 
 
-#ifndef __COMMANDS_H__
-#define __COMMANDS_H__
+#ifndef __OTSERV_COMMANDS_H__
+#define __OTSERV_COMMANDS_H__
 
 #include <string>
 #include <map>
@@ -55,7 +55,8 @@ protected:
 	bool teleportMasterPos(Creature* creature, const std::string& cmd, const std::string& param);
 	bool teleportHere(Creature* creature, const std::string& cmd, const std::string& param);
 	bool teleportTo(Creature* creature, const std::string& cmd, const std::string& param);
-	bool createItems(Creature* creature, const std::string& cmd, const std::string& param);
+	bool createItemById(Creature* creature, const std::string& cmd, const std::string& param);
+	bool createItemByName(Creature* creature, const std::string& cmd, const std::string& param);
 	bool subtractMoney(Creature* creature, const std::string& cmd, const std::string& param);
 	bool reloadInfo(Creature* creature, const std::string& cmd, const std::string& param);
 	bool testCommand(Creature* creature, const std::string& cmd, const std::string& param);
