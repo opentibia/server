@@ -87,9 +87,8 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 		}
 
 		unsigned long _guid = 0;
-		unsigned long _alvl = 0;
 		std::string _name = player->getName();
-		if(getGuidByName(_guid, _alvl, _name)){
+		if(getGuidByName(_guid, _name)){
 			player->setGUID(_guid);
 		}
 
@@ -594,7 +593,13 @@ bool IOPlayerXML::savePlayer(Player* player)
 	}
 }
 
-bool IOPlayerXML::getGuidByName(unsigned long& guid, unsigned long& alvl, std::string& name)
+bool IOPlayerXML::getGuidByName(unsigned long& guid, std::string& name)
+{
+	unsigned long a;
+	return getGuidByNameEx(guid, a, name);
+}
+
+bool IOPlayerXML::getGuidByNameEx(unsigned long& guid, unsigned long& alvl, std::string& name)
 {
 	//load players.xml to get guid
 	std::string datadir = g_config.getGlobalString("datadir");

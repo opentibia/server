@@ -62,8 +62,6 @@ extern Actions actions;
 extern Commands commands;
 extern Chat g_chat;
 
-extern IPList bannedIPs;
-
 GameState::GameState(Game *game, const Range &range)
 {
 	this->game = game;
@@ -3160,7 +3158,7 @@ bool Game::playerRequestAddVip(Player* player, const std::string& vip_name)
 	unsigned long guid;
 	unsigned long access_lvl;
 	
-	if(!IOPlayer::instance()->getGuidByName(guid, access_lvl, real_name)){
+	if(!IOPlayer::instance()->getGuidByNameEx(guid, access_lvl, real_name)){
 		player->sendTextMessage(MSG_STATUS_SMALL, "A player with that name doesn't exist.");
 		return false;
 	}

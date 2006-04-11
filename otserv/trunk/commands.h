@@ -26,8 +26,6 @@
 #include <map>
 #include "creature.h"
 
-typedef std::vector< std::pair<unsigned long, unsigned long> > IPList;
-
 class Game;
 struct Command;
 struct s_defcommands;
@@ -71,6 +69,7 @@ protected:
 	bool setHouseOwner(Creature* creature, const std::string& cmd, const std::string& param);
 	bool sellHouse(Creature* creature, const std::string& cmd, const std::string& param);
 	bool getHouse(Creature* creature, const std::string& cmd, const std::string& param);
+	bool bansManager(Creature* creature, const std::string& cmd, const std::string& param);
 	
 	//table of commands
 	static s_defcommands defined_commands[];

@@ -50,6 +50,7 @@
 #include "tools.h"
 #include "md5.h"
 #include "waitlist.h"
+#include "ban.h"
 
 #ifdef __OTSERV_ALLOCATOR__
 #include "allocator.h"
@@ -82,8 +83,8 @@ OTSYS_THREAD_LOCK_CLASS::LogList OTSYS_THREAD_LOCK_CLASS::loglist;
 #endif
 
 
+typedef std::vector< std::pair<unsigned long, unsigned long> > IPList;
 IPList serverIPs;
-IPList bannedIPs;
 
 LuaScript g_config;
 
@@ -94,6 +95,7 @@ Spells spells(&g_game);
 Actions actions(&g_game);
 Commands commands(&g_game);
 Monsters g_monsters;
+Ban g_bans;
 
 #if defined __EXCEPTION_TRACER__
 #include "exception.h"
@@ -145,24 +147,6 @@ bool passwordTest(std::string &plain, std::string &hash)
 	
 }
 
-bool isclientBanished(SOCKET s)
-{
-	sockaddr_in sain;
-	socklen_t salen = sizeof(sockaddr_in);
-
-	if (getpeername(s, (sockaddr*)&sain, &salen) == 0)
-	{
-		unsigned long clientip = *(unsigned long*)&sain.sin_addr;
-
-		for (size_t i = 0; i < bannedIPs.size(); ++i) {
-      if ((bannedIPs[i].first & bannedIPs[i].second) == (clientip & bannedIPs[i].second))
-				return true;
-		}
-	}
-
-	return false;
-}
-
 OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 {
 #if defined __EXCEPTION_TRACER__
@@ -199,7 +183,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 			
 			msg.Reset();
 			
-			if(isclientBanished(s)){
+			if(g_bans.isIpBanished(s)){
 				msg.AddByte(0x0A);
 				msg.AddString("Your IP is banished!");
 			}
@@ -211,7 +195,6 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 				if(accnumber != 0 && account.accnumber == accnumber &&
 					passwordTest(password,account.password)){
 					// seems to be a successful load
-
 					msg.AddByte(0x14);
 					std::stringstream motd;
 					motd << g_config.getGlobalString("motdnum");
@@ -256,7 +239,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 				msg.AddString("Only clients with protocol 7.6 allowed!");
 				msg.WriteToSocket(s);
 			}
-			else if(isclientBanished(s)){
+			else if(g_bans.isIpBanished(s)){
 				msg.Reset();
 				msg.AddByte(0x14);
 				msg.AddString("Your IP is banished!");
@@ -281,13 +264,10 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 							player->lastip = player->getIP();
 							s = 0;
 						}
-
 						//guess not...
 						player = NULL;
 					}
-					
-					//OTSYS_THREAD_UNLOCK(g_game.gameLock, "ConnectionHandler()")
-					
+				
 					if(s){
 						Protocol76* protocol;
 						protocol = new Protocol76(s);
@@ -295,10 +275,22 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 						player->useThing2();
 						player->setID();
 						IOPlayer::instance()->loadPlayer(player, name);
-
+						
 						connectResult_t connectRes = CONNECT_INTERNALERROR;
-
-						if(playerexist && !g_config.getGlobalNumber("allowclones", 0)){
+						
+						if(g_bans.isPlayerBanished(name) && player->access == 0){
+							msg.Reset();
+							msg.AddByte(0x14);
+							msg.AddString("Your character is banished!");
+							msg.WriteToSocket(s);
+						}
+						else if(g_bans.isAccountBanished(accnumber) && player->access == 0){
+							msg.Reset();
+							msg.AddByte(0x14);
+							msg.AddString("Your account is banished!");
+							msg.WriteToSocket(s);
+						}
+						else if(playerexist && !g_config.getGlobalNumber("allowclones", 0)){
 							#ifdef __DEBUG_PLAYERS__
 							std::cout << "reject player..." << std::endl;
 							#endif
@@ -328,8 +320,8 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 									wait->createMessage(msg, accnumber, player->getIP());
 								}
 								break;
-
 								case CONNECT_MASTERPOSERROR:
+									
 									msg.AddByte(0x14);
 									msg.AddString("Temple position is wrong. Contact the administrator.");
 								break;
@@ -348,10 +340,10 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 							player->lastlogin = std::time(NULL);
 							player->lastip = player->getIP();
 							s = 0;            // protocol/player will close socket
-							
+						
 							OTSYS_THREAD_UNLOCK(g_game.gameLock, "ConnectionHandler()")
 							isLocked = false;
-							
+						
 							protocol->ReceiveLoop();
 							stat->removePlayer();
 						}
@@ -360,7 +352,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 							g_game.FreeThing(player);
 						}
 					}
-
+					
 					if(isLocked){
 						OTSYS_THREAD_UNLOCK(g_game.gameLock, "ConnectionHandler()")
 					}
@@ -491,6 +483,15 @@ int main(int argc, char *argv[])
 #endif
 	{
 		ErrorMessage("Unable to load config.lua!");
+		return -1;
+	}
+	std::cout << "[done]" << std::endl;
+	
+	
+	//load bans
+	std::cout << ":: Loading bans... ";
+	if(!g_bans.loadBans("")){
+		ErrorMessage("Unable to load bans!");
 		return -1;
 	}
 	std::cout << "[done]" << std::endl;

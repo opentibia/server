@@ -22,6 +22,9 @@
 #include <sstream>
 #include <utility>
 
+#include <boost/tokenizer.hpp>
+typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
+
 #include "commands.h"
 #include "player.h"
 #include "npc.h"
@@ -31,15 +34,18 @@
 #include "house.h"
 #include "ioplayer.h"
 #include "tools.h"
+#include "ban.h"
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 
-extern IPList bannedIPs;
 extern Actions actions;
 extern Monsters g_monsters;
+extern Ban g_bans;
 
 extern bool readXMLInteger(xmlNodePtr p, const char *tag, int &value);
+
+#define ipText(a) (unsigned int)a[0] << "." << (unsigned int)a[1] << "." << (unsigned int)a[2] << "." << (unsigned int)a[3]
 
 //table of commands
 s_defcommands Commands::defined_commands[] = { 
@@ -64,9 +70,8 @@ s_defcommands Commands::defined_commands[] = {
 	{"/owner",&Commands::setHouseOwner},
 	{"/sellhouse",&Commands::sellHouse},
 	{"/gethouse",&Commands::getHouse},
+	{"/bans",&Commands::bansManager},
 	//{"/exiva",&Commands::exivaPlayer},
-	//{"/invite",&Commands::invitePlayer},
-	//{"/uninvite",&Commands::uninvitePlayer},
 };
 
 
@@ -312,11 +317,9 @@ bool Commands::banPlayer(Creature* creature, const std::string& cmd, const std::
 		}
 
 		playerBan->sendTextMessage(MSG_STATUS_CONSOLE_RED, "You have been banned.");
-		std::pair<unsigned long, unsigned long> IpNetMask;
-		IpNetMask.first = playerBan->lastip;
-		IpNetMask.second = 0xFFFFFFFF;
-		if(IpNetMask.first > 0) {
-			bannedIPs.push_back(IpNetMask);
+		unsigned long ip = playerBan->lastip;
+		if(ip > 0) {
+			g_bans.addIpBan(ip, 0xFFFFFFFF, 0);
 		}
 
 		playerBan->kickPlayer();
@@ -475,11 +478,11 @@ bool Commands::getInfo(Creature* creature, const std::string& cmd, const std::st
 	Player* paramPlayer = game->getPlayerByName(param);
 	if(paramPlayer) {
 		std::stringstream info;
-		unsigned char ip[4];
 		if(paramPlayer->access >= player->access && player != paramPlayer){
 			player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "You can not get info about this player.");
 			return true;
 		}
+		unsigned char ip[4];
 		*(unsigned long*)&ip = paramPlayer->lastip;
 		info << "name:   " << paramPlayer->getName() << std::endl <<
 		        "access: " << paramPlayer->access << std::endl <<
@@ -487,8 +490,7 @@ bool Commands::getInfo(Creature* creature, const std::string& cmd, const std::st
 		        "maglvl: " << paramPlayer->getPlayerInfo(PLAYERINFO_MAGICLEVEL) << std::endl <<
 		        "speed:  " <<  paramPlayer->speed <<std::endl <<
 		        "position " << paramPlayer->getPosition() << std::endl << 
-				"ip: " << (unsigned int)ip[0] << "." << (unsigned int)ip[1] << 
-				   "." << (unsigned int)ip[2] << "." << (unsigned int)ip[3];
+				"ip: " << ipText(ip);
 		player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, info.str().c_str());
 	}
 	else{
@@ -514,6 +516,8 @@ bool Commands::closeServer(Creature* creature, const std::string& cmd, const std
 			++it;
 		}
 	}
+	
+	g_bans.saveBans("");
 	
 	if(param == "serversave"){
 		Houses::getInstance().payHouses();
@@ -759,11 +763,10 @@ bool Commands::setHouseOwner(Creature* creature, const std::string& cmd, const s
 				
 				std::string real_name = param;
 				unsigned long guid;
-				unsigned long access_lvl;
 				if(param == "none"){
 					houseTile->getHouse()->setHouseOwner(0);
 				}
-				else if(IOPlayer::instance()->getGuidByName(guid, access_lvl, real_name)){
+				else if(IOPlayer::instance()->getGuidByName(guid, real_name)){
 					houseTile->getHouse()->setHouseOwner(guid);
 				}
 				else{
@@ -842,8 +845,7 @@ bool Commands::getHouse(Creature* creature, const std::string& cmd, const std::s
 	
 	std::string real_name = param;
 	unsigned long guid;
-	unsigned long access_lvl;
-	if(IOPlayer::instance()->getGuidByName(guid, access_lvl, real_name)){
+	if(IOPlayer::instance()->getGuidByName(guid, real_name)){
 		House* house = Houses::getInstance().getHouseByPlayerId(guid);
 		std::stringstream str;
 		str << real_name;
@@ -857,4 +859,276 @@ bool Commands::getHouse(Creature* creature, const std::string& cmd, const std::s
 		player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, str.str().c_str());
 	}
 	return false;
+}
+
+void showTime(std::stringstream& str, unsigned long time){
+	if(time == 0xFFFFFFFF){
+		str << "permanent";
+	}
+	else if(time == 0){
+		str << "shutdown";
+	}
+	else{
+		time_t tmp = time;
+		const tm* tms = localtime(&tmp);
+		if(tms){
+			str << tms->tm_hour << ":" << tms->tm_min << ":" << tms->tm_sec << "  " << 
+				tms->tm_mday << "/" << tms->tm_mon << "/" << tms->tm_year + 1900;
+		}
+		else{
+			str << "UNIX Time : " <<  time;
+		}
+	}
+}
+
+unsigned long parseTime(const std::string& time){
+	if(time == ""){
+		return 0;
+	}
+	if(time == "permanent"){
+		return 0xFFFFFFFF;
+	}
+	else{
+		boost::char_separator<char> sep("+");
+		tokenizer timetoken(time, sep);
+		tokenizer::iterator timeit = timetoken.begin();
+		if(timeit == timetoken.end()){
+			return 0;
+		}
+		unsigned long number = atoi(timeit->c_str());
+		unsigned long multiplier = 0;
+		++timeit;
+		if(timeit == timetoken.end()){
+			return 0;
+		}
+		if(*timeit == "m") //minute
+			multiplier = 60;
+		if(*timeit == "h") //hour
+			multiplier = 60*60;
+		if(*timeit == "d") //day
+			multiplier = 60*60*24;
+		if(*timeit == "w") //week
+			multiplier = 60*60*24*7;
+		if(*timeit == "o") //month
+			multiplier = 60*60*24*30;
+		if(*timeit == "y") //year
+			multiplier = 60*60*24*365;
+			
+		uint32_t currentTime = std::time(NULL);
+		return currentTime + number*multiplier;
+	}
+}
+
+std::string parseParams(tokenizer::iterator &it, tokenizer::iterator end)
+{
+	std::string tmp;
+	if(it == end){
+		return "";
+	}
+	else{
+		tmp = *it;
+		++it;
+		if(tmp[0] == '"'){
+			tmp.erase(0,1);
+			while(it != end && tmp[tmp.length() - 1] != '"'){
+				tmp += " " + *it;
+				++it;
+			}
+			tmp.erase(tmp.length() - 1);
+		}
+		return tmp;
+	}
+}
+
+bool Commands::bansManager(Creature* creature, const std::string& cmd, const std::string& param)
+{
+	std::stringstream str;
+	Player* player = creature->getPlayer();
+	if(!player)
+		return false;
+
+	boost::char_separator<char> sep(" ");
+	tokenizer cmdtokens(param, sep);
+	tokenizer::iterator cmdit = cmdtokens.begin();
+	
+	if(cmdit != cmdtokens.end() && *cmdit == "add"){
+		unsigned char type;
+		++cmdit;
+		if(cmdit == cmdtokens.end()){
+			str << "Parse error.";
+			player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, str.str().c_str());
+			return true;
+		}
+		type = cmdit->c_str()[0];
+		++cmdit;
+		if(cmdit == cmdtokens.end()){
+			str << "Parse error.";
+			player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, str.str().c_str());
+			return true;
+		}
+		std::string param1;
+		std::string param2;
+		std::string param3;
+		param1 = parseParams(cmdit, cmdtokens.end());
+		param2 = parseParams(cmdit, cmdtokens.end());
+		param3 = parseParams(cmdit, cmdtokens.end());
+		long time = 0;
+		switch(type){
+		case 'i':
+			{
+			str << "Add ip ban not implemented.";
+			break;
+			}
+		case 'p':
+			{
+			std::string playername = param1;
+			unsigned long guid;
+			if(!IOPlayer::instance()->getGuidByName(guid, playername)){
+				str << "Player not found.";
+				break;
+			}
+			time = parseTime(param2);
+			g_bans.addPlayerBan(guid, time);
+			str << playername <<  " banished.";
+			break;
+			}
+		case 'a':
+			{
+			long account = atoi(param1.c_str());
+			time = parseTime(param2);
+			if(account != 0){
+				g_bans.addAccountBan(account, time);
+				str << "Account " << account << " banished.";
+			}
+			else{
+				str << "Not valid account.";
+			}
+			break;
+			}
+		case 'b':
+			{
+			Player* playerBan = game->getPlayerByName(param1);
+			if(!playerBan){
+				str << "Player not online.";
+			}
+			time = parseTime(param2);
+			long account = playerBan->getAccount();
+			if(account){
+				g_bans.addAccountBan(account, time);
+				str << "Account banished.";
+			}
+			else{
+				str << "Not valid account.";
+			}
+			break;
+			}
+		default:
+			str << "Unkwon ban type.";
+			break;
+		}
+	}
+	else if(cmdit != cmdtokens.end() && *cmdit == "rem"){
+		unsigned char type;
+		++cmdit;
+		if(cmdit == cmdtokens.end()){
+			str << "Parse error.";
+			player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, str.str().c_str());
+			return true;
+		}
+		type = cmdit->c_str()[0];
+		++cmdit;
+		if(cmdit == cmdtokens.end()){
+			str << "Parse error.";
+			player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, str.str().c_str());
+			return true;
+		}
+		unsigned long number = atoi(cmdit->c_str());
+		bool ret = false;
+		switch(type){
+		case 'i':
+			ret = g_bans.removeIpBan(number);
+			break;
+		case 'p':
+			ret = g_bans.removePlayerBan(number);
+			break;
+		case 'a':
+			ret = g_bans.removeAccountBan(number);
+			break;
+		default:
+			str << "Unkwon ban type.";
+			ret = true;
+			break;
+		}
+		if(!ret){
+			str << "Error while removing ban "<<  number <<".";
+		}
+		else{
+			str << "Ban removed.";
+		}
+	}
+	else{
+		uint32_t currentTime = std::time(NULL);
+		//ip bans
+		{
+			str << "IP bans: " << std::endl;
+			const IpBanList ipBanList = g_bans.getIpBans();
+			IpBanList::const_iterator it;
+			unsigned char ip[4];
+			unsigned char mask[4];
+			unsigned long n = 0;
+			for(it = ipBanList.begin(); it != ipBanList.end(); ++it){
+				n++;
+				if(it->time != 0 && it->time < currentTime){
+					str << "*";
+				}
+				str << n << " : ";
+				*(unsigned long*)&ip = it->ip;
+				*(unsigned long*)&mask = it->mask;
+				str << ipText(ip) << " " << ipText(mask) << " ";
+				showTime(str, it->time);
+				str << std::endl;
+			}
+		}
+		//player bans
+		{
+			str << "Player bans: " << std::endl;
+			const PlayerBanList playerBanList = g_bans.getPlayerBans();
+			PlayerBanList::const_iterator it;
+			unsigned long n = 0;
+			for(it = playerBanList.begin(); it != playerBanList.end(); ++it){
+				n++;
+				if(it->time != 0 && it->time < currentTime){
+					str << "*";
+				}
+				str << n << " : ";
+				std::string name;
+				if(IOPlayer::instance()->getNameByGuid(it->id, name)){
+					str << name << " ";
+					showTime(str, it->time);
+				}
+				str << std::endl;
+			}
+		}
+		//account bans
+		{
+			str << "Account bans: " << std::endl;
+			const AccountBanList accountBanList = g_bans.getAccountBans();
+			AccountBanList::const_iterator it;
+			unsigned long n = 0;
+			for(it = accountBanList.begin(); it != accountBanList.end(); ++it){
+				n++;
+				if(it->time != 0 && it->time < currentTime){
+					str << "*";
+				}
+				str << n << " : ";
+				str << it->id << " ";
+				showTime(str, it->time);
+				str << std::endl;
+			}
+		}
+	}
+	if(str.str().size() > 0){
+		player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, str.str().c_str());
+	}
+	return true;
 }

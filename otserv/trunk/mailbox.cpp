@@ -123,8 +123,8 @@ bool Mailbox::sendItem(Item* item)
 		return false;            
 	}
 	
-	unsigned long guid,access;
-	if(!IOPlayer::instance()->getGuidByName(guid, access, reciever)){
+	unsigned long guid;
+	if(!IOPlayer::instance()->getGuidByName(guid, reciever)){
 		return false;
 	}
 	

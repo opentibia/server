@@ -469,10 +469,9 @@ bool AccessList::parseList(const std::string& _list)
 
 bool AccessList::addPlayer(std::string& name)
 {
-	unsigned long access;
 	unsigned long guid;
 	std::string dbName = name;
-	if(IOPlayer::instance()->getGuidByName(guid, access, dbName)){
+	if(IOPlayer::instance()->getGuidByName(guid, dbName)){
 		if(playerList.find(guid) == playerList.end()){
 			playerList.insert(guid);
 			return true;

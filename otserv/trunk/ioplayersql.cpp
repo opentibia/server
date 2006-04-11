@@ -25,6 +25,7 @@
 #include "item.h"
 #include "luascript.h"
 #include "database.h"
+#include "tools.h"
 
 #include <boost/tokenizer.hpp>
 #include <iostream>
@@ -604,7 +605,38 @@ bool IOPlayerSQL::getNameByGuid(unsigned long guid, std::string &name)
 	return true;
 }
 
-bool IOPlayerSQL::getGuidByName(unsigned long &guid, unsigned long &alvl, std::string &name)
+bool IOPlayerSQL::getGuidByName(unsigned long &guid, std::string &name)
+{
+	toLowerCaseString(name);
+	GuidCacheMap::iterator it = guidCacheMap.find(name);
+	if(it != guidCacheMap.end()){
+		name = it->second.first;
+		guid = it->second.second;
+		return true;
+	}
+	
+	Database mysql;
+	if(!mysql.connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str())){
+		return false;
+	}
+	
+	DBQuery query;
+	DBResult result;
+
+	query << "SELECT name,id FROM players WHERE name='" << Database::escapeString(name) << "'";	
+	if(!mysql.storeQuery(query, result) || result.getNumRows() != 1)
+		return false;
+	
+	name = result.getDataString("name");
+	guid = result.getDataInt("id");
+	std::string lowerName = name;
+	toLowerCaseString(lowerName);
+	guidCacheMap[lowerName] = std::make_pair(name, guid);
+	return true;
+}
+
+
+bool IOPlayerSQL::getGuidByNameEx(unsigned long &guid, unsigned long &alvl, std::string &name)
 {
 	Database mysql;
 	if(!mysql.connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str())){
