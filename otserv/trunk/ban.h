@@ -49,6 +49,12 @@ typedef std::list< IpBanStruct > IpBanList;
 typedef std::list< PlayerBanStruct > PlayerBanList;
 typedef std::list< AccountBanStruct > AccountBanList;
 
+enum BanType_t{
+  BAN_IPADDRESS = 1,
+  BAN_PLAYER = 2,
+  BAN_ACCOUNT = 3
+};
+
 class Ban{
 public:	
 	Ban(){};
@@ -111,11 +117,12 @@ protected:
 	std::string m_pass;
 	std::string m_db;
 };
+
 #else
-//TODO: implement it
+
 class IOBanXML : public IOBan {
 public:
-	IOBanXML(){};
+	IOBanXML();
 	virtual ~IOBanXML(){};
 
 	virtual bool loadBans(const std::string& identifier,Ban& banclass);

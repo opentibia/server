@@ -22,6 +22,7 @@
 #include "ban.h"
 #include "ioplayer.h"
 #include "luascript.h"
+#include <sstream>
 
 #ifdef __USE_MYSQL__
 #include "database.h"
@@ -222,24 +223,26 @@ bool IOBanSQL::loadBans(const std::string& identifier, Ban& banclass)
 		int time = result.getDataInt("time", i);
 		if(time > currentTime){
 			switch(banType){
-			case 1: //ip ban
+				case BAN_IPADDRESS:
 				{
-				int ip = result.getDataInt("ip", i);
-				int mask = result.getDataInt("mask", i);
-				banclass.addIpBan(ip, mask, time);
-				break;
+					int ip = result.getDataInt("ip", i);
+					int mask = result.getDataInt("mask", i);
+					banclass.addIpBan(ip, mask, time);
+					break;
 				}
-			case 2: //player ban
+				
+				case BAN_PLAYER:
 				{
-				int player = result.getDataInt("player", i);
-				banclass.addPlayerBan(player, time);
-				break;
+					int player = result.getDataInt("player", i);
+					banclass.addPlayerBan(player, time);
+					break;
 				}
-			case 3: //account ban
+				
+				case BAN_ACCOUNT:
 				{
-				int account = result.getDataInt("account", i);
-				banclass.addAccountBan(account, time);
-				break;
+					int account = result.getDataInt("account", i);
+					banclass.addAccountBan(account, time);
+					break;
 				}
 			}
 		}
@@ -277,10 +280,12 @@ bool IOBanSQL::saveBans(const std::string& identifier, const Ban& banclass)
 				"," << it->time << ")";
 		}
 	}
+
 	if(executeQuery){
 		if(!db.executeQuery(query))
 			return false;
 	}
+
 	//save player bans
 	executeQuery = false;
 	query.reset();
@@ -291,10 +296,12 @@ bool IOBanSQL::saveBans(const std::string& identifier, const Ban& banclass)
 			query << query.getSeparator() << "(2," << it->id << "," << it->time << ")";
 		}
 	}
+
 	if(executeQuery){
 		if(!db.executeQuery(query))
 			return false;
 	}
+
 	//save account bans
 	executeQuery = false;
 	query.reset();
@@ -305,6 +312,7 @@ bool IOBanSQL::saveBans(const std::string& identifier, const Ban& banclass)
 			query << query.getSeparator() << "(3," << it->id << "," << it->time << ")";
 		}
 	}
+
 	if(executeQuery){
 		if(!db.executeQuery(query))
 			return false;
@@ -320,15 +328,156 @@ bool IOBanSQL::saveBans(const std::string& identifier, const Ban& banclass)
 
 #else
 
-bool IOBanXML::loadBans(const std::string& identifier,Ban& banclass)
+IOBanXML::IOBanXML()
 {
-	std::cout << "IOBanXML::loadBans not implemented" << std::endl;
+	//
+}
+
+bool IOBanXML::loadBans(const std::string& identifier, Ban& banclass)
+{
+	xmlDocPtr doc = xmlParseFile(identifier.c_str());
+	if(doc){
+		xmlNodePtr root;
+		root = xmlDocGetRootElement(doc);
+		
+		if(xmlStrcmp(root->name,(const xmlChar*)"bans") != 0){
+			xmlFreeDoc(doc);
+			return false;
+		}
+
+		xmlNodePtr banNode = root->children;
+		while(banNode){
+			if(xmlStrcmp(banNode->name,(const xmlChar*)"ban") == 0){
+
+				int banType;
+				if(readXMLInteger(banNode, "type", banType) && banType >= BAN_IPADDRESS && banType <= BAN_ACCOUNT){
+					int time = 0;
+					readXMLInteger(banNode, "time", time);
+
+					switch(banType){
+						case BAN_IPADDRESS:
+						{
+							int ip = 0;
+							int mask = 0;
+
+							if(readXMLInteger(banNode, "ip", ip)){
+
+								readXMLInteger(banNode, "mask", ip);
+								banclass.addIpBan(ip, mask, time);
+							}
+
+							break;
+						}
+
+						case BAN_PLAYER:
+						{
+							int playerguid = 0;
+							if(readXMLInteger(banNode, "player", playerguid)){
+								banclass.addPlayerBan(playerguid, time);
+							}
+
+							break;
+						}
+						
+						case BAN_ACCOUNT:
+						{
+							int account = 0;
+							if(readXMLInteger(banNode, "account", account)){
+								banclass.addAccountBan(account, time);
+							}
+
+							break;
+						}
+					}
+				}
+				else{
+					std::cout << "Warning: [IOBanXML::loadBans] could not load ban" << std::endl;
+				}
+			}
+
+			banNode = banNode->next;
+		}
+	}
+
 	return true;
 }
 
 bool IOBanXML::saveBans(const std::string& identifier, const Ban& banclass)
 {
-	std::cout << "IOBanXML::saveBans not implemented" << std::endl;
+	xmlDocPtr doc = xmlNewDoc((xmlChar*) "1.0");
+  xmlNodePtr nodeBans = xmlNewNode(NULL, (xmlChar*) "bans");
+  xmlDocSetRootElement(doc, nodeBans);
+
+	uint32_t currentTime = std::time(NULL);
+
+	//save ip bans
+	for(IpBanList::const_iterator it = banclass.ipBanList.begin(); it !=  banclass.ipBanList.end(); ++it){
+		if(it->time > currentTime){
+			
+			xmlNodePtr nodeBan = xmlNewChild(nodeBans, NULL, (xmlChar*) "ban", NULL);
+
+			std::stringstream ss;
+			ss.str("");
+			ss << (int) BAN_IPADDRESS;
+			xmlNewProp(nodeBan, (xmlChar*) "type", (xmlChar*) ss.str().c_str());
+
+			ss.str("");
+			ss << (int) it->ip;
+			xmlNewProp(nodeBan, (xmlChar*) "ip", (xmlChar*) ss.str().c_str());
+
+			ss.str("");
+			ss << (int) it->mask;
+			xmlNewProp(nodeBan, (xmlChar*) "mask", (xmlChar*) ss.str().c_str());
+
+			ss.str("");
+			ss << (int) it->time;
+			xmlNewProp(nodeBan, (xmlChar*) "time", (xmlChar*) ss.str().c_str());
+		}
+	}
+
+	//save player bans
+	for(PlayerBanList::const_iterator it = banclass.playerBanList.begin(); it !=  banclass.playerBanList.end(); ++it){
+		if(it->time > currentTime){
+
+			xmlNodePtr nodeBan = xmlNewChild(nodeBans, NULL, (xmlChar*) "ban", NULL);
+
+			std::stringstream ss;
+			ss.str("");
+			ss << (int) BAN_PLAYER;
+			xmlNewProp(nodeBan, (xmlChar*) "type", (xmlChar*) ss.str().c_str());
+
+			ss.str("");
+			ss << (int) it->id;
+			xmlNewProp(nodeBan, (xmlChar*) "player", (xmlChar*) ss.str().c_str());
+
+			ss.str("");
+			ss << (int) it->time;
+			xmlNewProp(nodeBan, (xmlChar*) "time", (xmlChar*) ss.str().c_str());
+		}
+	}
+
+	for(AccountBanList::const_iterator it = banclass.accountBanList.begin(); it != banclass.accountBanList.end(); ++it){
+		if(it->time > currentTime){
+			xmlNodePtr nodeBan = xmlNewChild(nodeBans, NULL, (xmlChar*) "ban", NULL);
+
+			std::stringstream ss;
+			ss.str("");
+			ss << (int) BAN_ACCOUNT;
+			xmlNewProp(nodeBan, (xmlChar*) "type", (xmlChar*) ss.str().c_str());
+
+			ss.str("");
+			ss << (int) it->id;
+			xmlNewProp(nodeBan, (xmlChar*) "account", (xmlChar*) ss.str().c_str());
+
+			ss.str("");
+			ss << (int) it->time;
+			xmlNewProp(nodeBan, (xmlChar*) "time", (xmlChar*) ss.str().c_str());
+		}
+	}
+
+	xmlSaveFormatFileEnc(identifier.c_str(), doc, "UTF-8", 1);
+	xmlFreeDoc(doc);
+	
 	return true;
 }
 
