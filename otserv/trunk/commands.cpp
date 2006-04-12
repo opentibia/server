@@ -35,10 +35,12 @@ typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 #include "ioplayer.h"
 #include "tools.h"
 #include "ban.h"
+#include "luascript.h"
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 
+extern LuaScript g_config;
 extern Actions actions;
 extern Monsters g_monsters;
 extern Ban g_bans;
@@ -552,7 +554,6 @@ bool Commands::getInfo(Creature* creature, const std::string& cmd, const std::st
 	return true;
 }
 
-
 bool Commands::closeServer(Creature* creature, const std::string& cmd, const std::string& param)
 {
 	game->setGameState(GAME_STATE_CLOSED);
@@ -569,7 +570,7 @@ bool Commands::closeServer(Creature* creature, const std::string& cmd, const std
 		}
 	}
 	
-	g_bans.saveBans("");
+	g_bans.saveBans(g_config.getGlobalString("banIdentifier"));
 	
 	if(param == "serversave"){
 		Houses::getInstance().payHouses();
@@ -970,7 +971,8 @@ bool Commands::getHouse(Creature* creature, const std::string& cmd, const std::s
 	return false;
 }
 
-void showTime(std::stringstream& str, unsigned long time){
+void showTime(std::stringstream& str, unsigned long time)
+{
 	if(time == 0xFFFFFFFF){
 		str << "permanent";
 	}
@@ -990,7 +992,8 @@ void showTime(std::stringstream& str, unsigned long time){
 	}
 }
 
-unsigned long parseTime(const std::string& time){
+unsigned long parseTime(const std::string& time)
+{
 	if(time == ""){
 		return 0;
 	}
@@ -1084,12 +1087,13 @@ bool Commands::bansManager(Creature* creature, const std::string& cmd, const std
 		long time = 0;
 		switch(type){
 		case 'i':
-			{
-			str << "Add ip ban not implemented.";
+		{
+			str << "Add ip-ban is not implemented.";
 			break;
-			}
+		}
+		
 		case 'p':
-			{
+		{
 			std::string playername = param1;
 			unsigned long guid;
 			if(!IOPlayer::instance()->getGuidByName(guid, playername)){
@@ -1100,9 +1104,10 @@ bool Commands::bansManager(Creature* creature, const std::string& cmd, const std
 			g_bans.addPlayerBan(guid, time);
 			str << playername <<  " banished.";
 			break;
-			}
+		}
+		
 		case 'a':
-			{
+		{
 			long account = atoi(param1.c_str());
 			time = parseTime(param2);
 			if(account != 0){
@@ -1110,15 +1115,16 @@ bool Commands::bansManager(Creature* creature, const std::string& cmd, const std
 				str << "Account " << account << " banished.";
 			}
 			else{
-				str << "Not valid account.";
+				str << "Not a valid account.";
 			}
 			break;
-			}
+		}
+		
 		case 'b':
-			{
+		{
 			Player* playerBan = game->getPlayerByName(param1);
 			if(!playerBan){
-				str << "Player not online.";
+				str << "Player is not online.";
 			}
 			time = parseTime(param2);
 			long account = playerBan->getAccount();
@@ -1127,12 +1133,13 @@ bool Commands::bansManager(Creature* creature, const std::string& cmd, const std
 				str << "Account banished.";
 			}
 			else{
-				str << "Not valid account.";
+				str << "Not a valid account.";
 			}
 			break;
-			}
+		}
+
 		default:
-			str << "Unkwon ban type.";
+			str << "Unknown ban type.";
 			break;
 		}
 	}
@@ -1164,7 +1171,7 @@ bool Commands::bansManager(Creature* creature, const std::string& cmd, const std
 			ret = g_bans.removeAccountBan(number);
 			break;
 		default:
-			str << "Unkwon ban type.";
+			str << "Unknown ban type.";
 			ret = true;
 			break;
 		}

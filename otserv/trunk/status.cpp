@@ -79,7 +79,7 @@ std::string Status::getStatusString(){
 	xmlSetProp(p, (const xmlChar*) "location", (const xmlChar*)g_config.getGlobalString("location", "").c_str());
 	xmlSetProp(p, (const xmlChar*) "url", (const xmlChar*)g_config.getGlobalString("url", "").c_str());
 	xmlSetProp(p, (const xmlChar*) "server", (const xmlChar*)"otserv");
-	xmlSetProp(p, (const xmlChar*) "version", (const xmlChar*)"0.5.0_CVS");
+	xmlSetProp(p, (const xmlChar*) "version", (const xmlChar*)"0.5.0");
 	xmlSetProp(p, (const xmlChar*) "client", (const xmlChar*)"7.6");
 	xmlAddChild(root, p);
 

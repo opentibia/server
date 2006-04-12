@@ -151,10 +151,15 @@ bool Map::loadMap(const std::string& identifier, const std::string& type)
 
 bool Map::saveMap(const std::string& identifier)
 {
+	std::string storeIdentifier = identifier;
+	if(storeIdentifier.empty()){
+		storeIdentifier = mapStoreIdentifier;
+	}
+
 	IOMapSerialize* IOMapSerialize = IOMapSerialize::getInstance();
 	bool saved = false;
 	for(long tries = 0;tries < 3;tries++){
-		if(IOMapSerialize->saveMap(this, mapStoreIdentifier)){
+		if(IOMapSerialize->saveMap(this, storeIdentifier)){
 			saved = true;
 			break;
 		}

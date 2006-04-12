@@ -17,6 +17,9 @@ houserentperiod = "monthly"
 -- OTBM for binary, SQL for SQL map, XML for OTX maps
 mapkind = "XML"
 
+-- bans
+banIdentifier = "data/bans.xml"
+
 -- loginmsg
 -- the message the player gets when he logs in
 loginmsg = "Welcome to OTServ. For help visit http://www.otfans.net"
@@ -51,7 +54,7 @@ ip = "127.0.0.1"
 
 -- motd
 -- The messagebox you sometimes get before you choose characters
-motd = "Welcome to OpenTibia Pre-Release"
+motd = "Welcome to OpenTibia 0.5.0"
 motdnum="1"
 
 -- use md5 passwords for accounts, yes/no
@@ -61,13 +64,13 @@ md5passwords = "no"
 worldtype = "pvp"
 
 -- max number of players allowed
-maxplayers = "10000"
+maxplayers = "1000"
 
 -- exhausted time in ms (1000 = 1sec)
-exhausted = 2*1000
+exhausted = 1000
 
 -- how many ms to add if the player is already exhausted and tries to cast a spell (1000 = 1sec)
-exhaustedadd = 2*1000
+exhaustedadd = 200
 
 -- how long does the player has to stay out of fight to get pz unlocked in ms (1000 = 1sec)
 pzlocked = 5*60*1000

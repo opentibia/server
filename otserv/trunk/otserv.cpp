@@ -429,7 +429,7 @@ int main(int argc, char *argv[])
 	}
 #endif
 
-	std::cout << ":: OTServ Development-Version 0.5.0 - CVS Preview" << std::endl;
+	std::cout << ":: OTServ - 0.5.0" << std::endl;
 	std::cout << ":: ====================" << std::endl;
 	std::cout << "::" << std::endl;
 #if defined __DEBUG__MOVESYS__ || defined __DEBUG_HOUSES__ || defined __DEBUG_MAILBOX__
@@ -485,12 +485,11 @@ int main(int argc, char *argv[])
 		ErrorMessage("Unable to load config.lua!");
 		return -1;
 	}
-	std::cout << "[done]" << std::endl;
-	
+	std::cout << "[done]" << std::endl;	
 	
 	//load bans
 	std::cout << ":: Loading bans... ";
-	if(!g_bans.loadBans("")){
+	if(!g_bans.loadBans(g_config.getGlobalString("banIdentifier"))){
 		ErrorMessage("Unable to load bans!");
 		return -1;
 	}
@@ -557,19 +556,20 @@ int main(int argc, char *argv[])
 	}
 	std::cout << "[done]" << std::endl;
 		
-	std::string worldtype = g_config.getGlobalString("worldtype");
-	std::transform(worldtype.begin(), worldtype.end(), worldtype.begin(), upchar);
-	if(worldtype == "PVP")
+	std::string worldType = g_config.getGlobalString("worldtype");
+	std::transform(worldType.begin(), worldType.end(), worldType.begin(), upchar);
+
+	if(worldType == "PVP")
 		g_game.setWorldType(WORLD_TYPE_PVP);
-	else if(worldtype == "NO-PVP")
+	else if(worldType == "NO-PVP")
 		g_game.setWorldType(WORLD_TYPE_NO_PVP);
-	else if(worldtype == "PVP-ENFORCED")
+	else if(worldType == "PVP-ENFORCED")
 		g_game.setWorldType(WORLD_TYPE_PVP_ENFORCED);
 	else{
 		ErrorMessage("Unknown world type!");
 		return -1;
 	}
-	std::cout << ":: World Type: " << worldtype << std::endl;
+	std::cout << ":: Worldtype: " << worldType << std::endl;
 	
 	#ifdef __SKULLSYSTEM__
 	std::cout << ":: Skulls enabled" << std::endl;
