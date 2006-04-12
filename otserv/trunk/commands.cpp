@@ -1177,7 +1177,7 @@ bool Commands::bansManager(Creature* creature, const std::string& cmd, const std
 			break;
 		}
 
-		if(!typeFound){
+		if(typeFound){
 			if(!ret){
 				str << "Error while removing ban "<<  number <<".";
 			}
