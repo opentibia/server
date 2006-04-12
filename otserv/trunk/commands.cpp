@@ -1088,7 +1088,7 @@ bool Commands::bansManager(Creature* creature, const std::string& cmd, const std
 		switch(type){
 		case 'i':
 		{
-			str << "Add ip-ban is not implemented.";
+			str << "Add IP-ban is not implemented.";
 			break;
 		}
 		
@@ -1160,6 +1160,7 @@ bool Commands::bansManager(Creature* creature, const std::string& cmd, const std
 		}
 		unsigned long number = atoi(cmdit->c_str());
 		bool ret = false;
+		bool typeFound = true;
 		switch(type){
 		case 'i':
 			ret = g_bans.removeIpBan(number);
@@ -1172,14 +1173,17 @@ bool Commands::bansManager(Creature* creature, const std::string& cmd, const std
 			break;
 		default:
 			str << "Unknown ban type.";
-			ret = true;
+			typeFound = false;
 			break;
 		}
-		if(!ret){
-			str << "Error while removing ban "<<  number <<".";
-		}
-		else{
-			str << "Ban removed.";
+
+		if(!typeFound){
+			if(!ret){
+				str << "Error while removing ban "<<  number <<".";
+			}
+			else{
+				str << "Ban removed.";
+			}
 		}
 	}
 	else{
