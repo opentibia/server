@@ -127,6 +127,9 @@
 				RelativePath="..\allocator.cpp">
 			</File>
 			<File
+				RelativePath="..\ban.cpp">
+			</File>
+			<File
 				RelativePath="..\chat.cpp">
 			</File>
 			<File
@@ -170,6 +173,12 @@
 			</File>
 			<File
 				RelativePath="..\iomapotbm.cpp">
+			</File>
+			<File
+				RelativePath="..\iomapserialize.cpp">
+			</File>
+			<File
+				RelativePath="..\iomapserializexml.cpp">
 			</File>
 			<File
 				RelativePath="..\iomapsql.cpp">
@@ -264,6 +273,9 @@
 			<File
 				RelativePath="..\trashholder.cpp">
 			</File>
+			<File
+				RelativePath="..\waitlist.cpp">
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -279,7 +291,13 @@
 				RelativePath="..\allocator.h">
 			</File>
 			<File
+				RelativePath="..\ban.h">
+			</File>
+			<File
 				RelativePath="..\commands.h">
+			</File>
+			<File
+				RelativePath="..\const76.h">
 			</File>
 			<File
 				RelativePath="..\container.h">
@@ -328,6 +346,12 @@
 			</File>
 			<File
 				RelativePath="..\iomapotbm.h">
+			</File>
+			<File
+				RelativePath="..\iomapserialize.h">
+			</File>
+			<File
+				RelativePath="..\iomapserializexml.h">
 			</File>
 			<File
 				RelativePath="..\iomapsql.h">
@@ -433,6 +457,9 @@
 			</File>
 			<File
 				RelativePath="..\trashholder.h">
+			</File>
+			<File
+				RelativePath="..\waitlist.h">
 			</File>
 		</Filter>
 		<Filter
