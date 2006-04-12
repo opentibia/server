@@ -72,7 +72,7 @@ s_defcommands Commands::defined_commands[] = {
 	{"/sellhouse",&Commands::sellHouse},
 	{"/gethouse",&Commands::getHouse},
 	{"/bans",&Commands::bansManager},
-	//{"/exiva",&Commands::exivaPlayer},
+	{"/exiva",&Commands::exivaPlayer},
 };
 
 
@@ -681,16 +681,35 @@ bool Commands::kickPlayer(Creature* creature, const std::string &cmd, const std:
 
 bool Commands::exivaPlayer(Creature* creature, const std::string &cmd, const std::string &param)
 {
+	//a. From 1 to 4 sq's [Person] is standing next to you.
+	//b. From 5 to 100 sq's [Person] is to the south, north, east, west.
+	//c. From 101 to 274 sq's [Person] is far to the south, north, east, west.
+	//d. From 275 to infinite sq's [Person] is very far to the south, north, east, west.
+	//e. South-west, s-e, n-w, n-e (corner coordinates): this phrase appears if the player you're looking for has moved five squares in any direction from the south, north, east or west.
+	//f. Lower level to the (direction): this phrase applies if the person you're looking for is from 1-25 squares up/down the actual floor you're in.
+	//g. Higher level to the (direction): this phrase applies if the person you're looking for is from 1-25 squares up/down the actual floor you're in.
+
 	Player* player = creature->getPlayer();
 	if(!player){
 		return false;
 	}
-
 	enum distance_t{
 		DISTANCE_BESIDE,
-		DISTANCE_CLOSE,
+		DISTANCE_CLOSE_1,
+		DISTANCE_CLOSE_2,
 		DISTANCE_FAR,
-		DISTANCE_VERYFAR
+		DISTANCE_VERYFAR,
+	};
+	
+	enum direction_t{
+		DIR_N, DIR_S, DIR_E, DIR_W,
+		DIR_NE, DIR_NW, DIR_SE, DIR_SW,
+	};
+	
+	enum level_t{
+		LEVEL_HIGHER,
+		LEVEL_LOWER,
+		LEVEL_SAME,
 	};
 
 	Player* playerExiva = game->getPlayerByName(param);
@@ -698,107 +717,145 @@ bool Commands::exivaPlayer(Creature* creature, const std::string &cmd, const std
 		const Position lookPos = player->getPosition();
 		const Position searchPos = playerExiva->getPosition();
 		
-		/*
-		e. South-west, s-e, n-w, n-e (corner coordinates): this phrase appears if the player you're looking for has moved five squares in any direction from the south, north, east or west.
-		f. Lower level to the (direction): this phrase applies if the person you're looking for is from 1-25 squares up/down the actual floor you're in.
-		g. Higher level to the (direction): this phrase applies if the person you're looking for is from 1-25 squares up/down the actual floor you're in.
-		*/
-
-		distance_t distx;
-		distance_t disty;
-
-		/*
-		Direction dirx;
-		Direction diry;
-
-		if(dx == -1 && dy == -1)
-			dir = NORTHWEST;
-		else if(dx == 1 && dy == -1)
-			dir = NORTHEAST;
-		else if(dx == -1 && dy == 1)
-			dir = SOUTHWEST;
-		else if(dx == 1 && dy == 1)
-			dir = SOUTHEAST;
-		else if(dx == -1)
-			dir = WEST;
-		else if(dx == 1)
-			dir = EAST;
-		else if(dy == -1)
-			dir = NORTH;
-		else
-			dir = SOUTH;
-		*/
-
-		std::stringstream ss;
-		ss << playerExiva->getName() << " ";
-
-		if(lookPos.z != searchPos.z && Position::areInRange<25,25,0>(lookPos, searchPos)){
-			if(lookPos.z > searchPos.z){
-				//ss << "is on a lower level to the 
-				//player->sendTextMessage(MSG_INFO_DESCR, "Lower level to the
+		long dx = lookPos.x - searchPos.x;
+		long dy = lookPos.y - searchPos.y;
+		long dz = lookPos.z - searchPos.z;
+		
+		distance_t distance;
+		direction_t direction;
+		level_t level;
+		//getting floor
+		if(dz > 0){
+			level = LEVEL_HIGHER;
+		}
+		else if(dz < 0){
+			level = LEVEL_LOWER;
+		}
+		else{
+			level = LEVEL_SAME;
+		}
+		//getting distance
+		if(std::abs(dx) < 4 && std::abs(dy) <4){
+			distance = DISTANCE_BESIDE;
+		}
+		else{
+			long distance2 = dx*dx + dy*dy;
+			if(distance2 < 625){
+				distance = DISTANCE_CLOSE_1;
+			}
+			else if(distance2 < 10000){
+				distance = DISTANCE_CLOSE_2;
+			}
+			else if(distance2 < 75076){
+				distance = DISTANCE_FAR;
+			}
+			else{
+				distance = DISTANCE_VERYFAR;
 			}
 		}
-
-		//x
-		if(Position::areInRange<4,0,0>(lookPos, searchPos)){
-			//a. From 1 to 4 sq's [Person] is standing next to you.
-			distx = DISTANCE_BESIDE;
-		}
-		else if(Position::areInRange<100,0,0>(lookPos, searchPos)){
-			//b. From 5 to 100 sq's [Person] is to the south, north, east, west.
-			distx = DISTANCE_CLOSE;
-		}
-		else if(Position::areInRange<0,274,0>(lookPos, searchPos)){
-			//c. From 101 to 274 sq's [Person] is far to the south, north, east, west.
-			distx = DISTANCE_FAR;
+		//getting direction
+		float tan;
+		if(dx != 0){
+			tan = (float)dy/(float)dx;
 		}
 		else{
-			//d. From 275 to infinite sq's [Person] is very far to the south, north, east, west.
-			distx = DISTANCE_VERYFAR;
+			tan = 10.;
 		}
-
-		//y
-		if(Position::areInRange<0,4,0>(lookPos, searchPos)){
-			//a. From 1 to 4 sq's [Person] is standing next to you.
-			disty = DISTANCE_BESIDE;
+		if(std::abs(tan) < 0.4142){
+			if(dx > 0){
+				direction = DIR_W;
+			}
+			else{
+				direction = DIR_E;
+			}			
 		}
-		else if(Position::areInRange<0,100,0>(lookPos, searchPos)){
-			//b. From 5 to 100 sq's [Person] is to the south, north, east, west.
-			disty = DISTANCE_CLOSE;
-		}
-		else if(Position::areInRange<0,274,0>(lookPos, searchPos)){
-			//c. From 101 to 274 sq's [Person] is far to the south, north, east, west.
-			disty = DISTANCE_FAR;
-		}
-		else{
-			//d. From 275 to infinite sq's [Person] is very far to the south, north, east, west.
-			disty = DISTANCE_VERYFAR;
-		}
-
-		/*if(Position::areInRange<4, 4, 0>(lookPos, searchPos)){
-			//a. From 1 to 4 sq's [Person] is standing next to you.
-		}
-		else if(Position::areInRange<100, 100, 0>(lookPos, searchPos)){
-			//b. From 5 to 100 sq's [Person] is to the south, north, east, west.
-		}
-		else if(Position::areInRange<274, 274, 0>(lookPos, searchPos)){
-			//c. From 101 to 274 sq's [Person] is far to the south, north, east, west.
+		else if(std::abs(tan) < 2.4142){
+			if(tan > 0){
+				if(dy > 0){
+					direction = DIR_NW;
+				}
+				else{
+					direction = DIR_SE;
+				}
+			}
+			else{ //tan < 0
+				if(dx > 0){
+					direction = DIR_SW;
+				}
+				else{
+					direction = DIR_NE;
+				}
+			}
 		}
 		else{
-			//d. From 275 to infinite sq's [Person] is very far to the south, north, east, west.
+			if(dy > 0){
+				direction = DIR_N;
+			}
+			else{
+				direction = DIR_S;
+			}
 		}
-		*/
-
-		/*
-		So we have the next results:
-
-		There are another three possible phrases to inform you which are:
-
-		e. South-west, s-e, n-w, n-e (corner coordinates): this phrase appears if the player you're looking for has moved five squares in any direction from the south, north, east or west.
-		f. Lower level to the (direction): this phrase applies if the person you're looking for is from 1-25 squares up/down the actual floor you're in.
-		g. Higher level to the (direction): this phrase applies if the person you're looking for is from 1-25 squares up/down the actual floor you're in.
-		*/
-
+		
+		std::stringstream ss;
+		ss << playerExiva->getName() << " ";
+		
+		if(distance == DISTANCE_BESIDE && level == LEVEL_SAME){
+			ss << "is standing next to you";
+		}
+		else{
+			switch(distance){
+			case DISTANCE_BESIDE:
+			case DISTANCE_CLOSE_1:
+				if(level == LEVEL_SAME){
+					ss << "is to the";
+				}
+				else if(level == LEVEL_HIGHER){
+					ss << "is on a higher level to the";
+				}
+				else if(level == LEVEL_LOWER){
+					ss << "is on a lower level to the";
+				}
+				break;
+			case DISTANCE_CLOSE_2:
+				ss << "is to the";
+				break;
+			case DISTANCE_FAR:
+				ss << "is far to the";
+				break;
+			case DISTANCE_VERYFAR:
+				ss << "is very far to the";
+				break;
+			}
+			ss << " ";
+			switch(direction){
+			case DIR_N:
+				ss << "north";
+				break;
+			case DIR_S:
+				ss << "south";
+				break;
+			case DIR_E:
+				ss << "east";
+				break;
+			case DIR_W:
+				ss << "west";
+				break;
+			case DIR_NE:
+				ss << "north-east";
+				break;
+			case DIR_NW:
+				ss << "north-west";
+				break;
+			case DIR_SE:
+				ss << "south-east";
+				break;
+			case DIR_SW:
+				ss << "shouth-west";
+				break;
+			}
+		}
+		ss << ".";
+		player->sendTextMessage(MSG_INFO_DESCR, ss.str().c_str());		
 		return true;
 	}
 
