@@ -240,6 +240,17 @@ CREATE TABLE `houseaccess` (
   KEY `houseid` TYPE BTREE (`houseid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+
+CREATE TABLE `bans` (
+  `type` int(10) unsigned NOT NULL default '0',
+  `ip` int(10) unsigned NOT NULL default '0',
+  `mask` int(10) unsigned NOT NULL default '0',
+  `player` int(10) unsigned NOT NULL default '0',
+  `account` int(10) unsigned NOT NULL default '0',
+  `time` int(10) unsigned NOT NULL default '0'
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
