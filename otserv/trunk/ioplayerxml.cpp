@@ -30,6 +30,7 @@
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
+#include <libxml/threads.h>
 
 xmlMutexPtr xmlmutex;
 

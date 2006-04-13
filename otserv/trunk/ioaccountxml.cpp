@@ -25,6 +25,10 @@
 #include <functional>
 #include <sstream>
 
+#include <libxml/xmlmemory.h>
+#include <libxml/parser.h>
+#include <libxml/threads.h>
+
 #include "luascript.h"
 
 extern xmlMutexPtr xmlmutex;

@@ -19,14 +19,10 @@
 //////////////////////////////////////////////////////////////////////
 
 
-#ifndef __IOACCOUNTXML_H
-#define __IOACCOUNTXML_H
+#ifndef __OTSERV_IOACCOUNTXML_H__
+#define __OTSERV_IOACCOUNTXML_H__
 
 #include <string>
-
-#include <libxml/xmlmemory.h>
-#include <libxml/parser.h>
-
 #include "definitions.h"
 #include "ioaccount.h"
 
