@@ -54,8 +54,19 @@ protected:
 	std::string getItems(Item* i, int &startid, int startslot, int player, int parentid);
 	bool storeNameByGuid(Database &mysql, unsigned long guid);
 
+	struct StringCompareCase{
+		bool operator()(const std::string& l, const std::string& r) const{
+			if(strcasecmp(l.c_str(), r.c_str()) < 0){
+				return true;
+			}
+			else{
+				return false;
+			}
+		}
+	};
+
 	typedef std::map<unsigned long, std::string> NameCacheMap;
-	typedef std::map< std::string, std::pair<std::string, unsigned long> > GuidCacheMap;
+	typedef std::map<std::string, unsigned long, StringCompareCase> GuidCacheMap;
 	
 	NameCacheMap nameCacheMap;
 	GuidCacheMap guidCacheMap;

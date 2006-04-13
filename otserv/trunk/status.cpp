@@ -79,6 +79,7 @@ std::string Status::getStatusString(){
 	xmlSetProp(p, (const xmlChar*) "location", (const xmlChar*)g_config.getGlobalString("location", "").c_str());
 	xmlSetProp(p, (const xmlChar*) "url", (const xmlChar*)g_config.getGlobalString("url", "").c_str());
 	xmlSetProp(p, (const xmlChar*) "server", (const xmlChar*)"otserv");
+	//xmlSetProp(p, (const xmlChar*) "version", (const xmlChar*)"0.5.0_CVS");
 	xmlSetProp(p, (const xmlChar*) "version", (const xmlChar*)"0.5.0");
 	xmlSetProp(p, (const xmlChar*) "client", (const xmlChar*)"7.6");
 	xmlAddChild(root, p);
@@ -167,8 +168,8 @@ void Status::getInfo(NetworkMessage &nm) {
     nm.AddString(g_config.getGlobalString("url", "").c_str());
     nm.AddU32((uint32_t)(running >> 32)); // this method prevents a big number parsing
     nm.AddU32((uint32_t)(running));       // since servers can be online for months ;)
-    nm.AddString("0.5.0_CVS");
-    //nm.AddString("0.4.1");
+    //nm.AddString("0.5.0_CVS");
+    nm.AddString("0.5.0");
   }  
 
   if (bplayersinfo) {

@@ -428,8 +428,8 @@ int main(int argc, char *argv[])
 		std::cout << "Heap Error" << std::endl;
 	}
 #endif
-
-	std::cout << ":: OTServ - 0.5.0" << std::endl;
+	//std::cout << ":: OTServ Development-Version 0.5.0 - CVS Preview" << std::endl;
+	std::cout << ":: OTServ Version 0.5.0" << std::endl;
 	std::cout << ":: ====================" << std::endl;
 	std::cout << "::" << std::endl;
 #if defined __DEBUG__MOVESYS__ || defined __DEBUG_HOUSES__ || defined __DEBUG_MAILBOX__

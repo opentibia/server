@@ -607,11 +607,10 @@ bool IOPlayerSQL::getNameByGuid(unsigned long guid, std::string &name)
 
 bool IOPlayerSQL::getGuidByName(unsigned long &guid, std::string &name)
 {
-	toLowerCaseString(name);
 	GuidCacheMap::iterator it = guidCacheMap.find(name);
 	if(it != guidCacheMap.end()){
-		name = it->second.first;
-		guid = it->second.second;
+		name = it->first;
+		guid = it->second;
 		return true;
 	}
 	
@@ -629,9 +628,8 @@ bool IOPlayerSQL::getGuidByName(unsigned long &guid, std::string &name)
 	
 	name = result.getDataString("name");
 	guid = result.getDataInt("id");
-	std::string lowerName = name;
-	toLowerCaseString(lowerName);
-	guidCacheMap[lowerName] = std::make_pair(name, guid);
+	
+	guidCacheMap[name] = guid;
 	return true;
 }
 
