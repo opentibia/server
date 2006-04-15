@@ -1125,6 +1125,7 @@ bool Commands::bansManager(Creature* creature, const std::string& cmd, const std
 			Player* playerBan = game->getPlayerByName(param1);
 			if(!playerBan){
 				str << "Player is not online.";
+				break;
 			}
 			time = parseTime(param2);
 			long account = playerBan->getAccount();
