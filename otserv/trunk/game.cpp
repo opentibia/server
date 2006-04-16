@@ -3159,13 +3159,14 @@ bool Game::playerRequestAddVip(Player* player, const std::string& vip_name)
 	unsigned long access_lvl;
 	
 	if(!IOPlayer::instance()->getGuidByNameEx(guid, access_lvl, real_name)){
-		player->sendTextMessage(MSG_STATUS_SMALL, "A player with that name doesn't exist.");
+		player->sendTextMessage(MSG_STATUS_SMALL, "A player with that name does not exist.");
 		return false;
 	}
 	if(access_lvl > player->access){
 		player->sendTextMessage(MSG_STATUS_SMALL, "You can not add this player.");
 		return false;
 	}
+
 	bool online = (getPlayerByName(real_name) != NULL);
 	return player->addVIP(guid, real_name, online);
 }

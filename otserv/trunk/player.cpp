@@ -1518,7 +1518,7 @@ void Player::addExperience(unsigned long exp)
 		g_game.changeSpeed(getID(), getSpeed());
 
 		std::stringstream levelMsg;
-		levelMsg << "You advanced from level " << lastLevel << " to level " << level << ".";
+		levelMsg << "You advanced from Level " << lastLevel << " to Level " << level << ".";
 		sendTextMessage(MSG_EVENT_ADVANCE, levelMsg.str().c_str());
 		sendStats();
 	}
@@ -1728,14 +1728,14 @@ bool Player::addVIP(unsigned long _guid, std::string &name, bool isOnline, bool 
 	
 	if(VIPList.size() > 50){
 		if(!internal)
-			sendTextMessage(MSG_STATUS_SMALL, "You cannot add more players.");
+			sendTextMessage(MSG_STATUS_SMALL, "You cannot add more buddies.");
 		return false;
 	}
 	
 	VIPListSet::iterator it = VIPList.find(_guid);
 	if(it != VIPList.end()){
 		if(!internal)
-			sendTextMessage(MSG_STATUS_SMALL, "You have already added this player.");
+			sendTextMessage(MSG_STATUS_SMALL, "This player is already in your list.");
 		return false;
 	}
 	
