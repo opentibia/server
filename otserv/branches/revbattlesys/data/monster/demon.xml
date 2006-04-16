@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<monster name="Demon" level="50" maglevel="60" experience="6000" pushable="0">
+	<health now="8200" max="8200"/>
+	<look type="35" head="20" body="30" legs="40" feet="50" corpse="2916"/>
+	<combat targetdistance="1" runonhealth="0"/>
+<attacks>
+	<attack type="melee" maxdamage="500" cycleticks="2000" probability="100"/>
+	<attack type="distance" name="throwingstar" mindamage="10" maxdamage="500" cycleticks="2000" probability="100"/> 
+	<attack type="instant" name="exura" cycleticks="5000" probability="20"/>
+	<attack type="instant" name="exevo gran vis lux" exhaustion="500" cycleticks="20000" probability="40"/>
+	<attack type="rune" name="great fireball" exhaustion="500" cycleticks="4000" probability="40"/>
+	<attack type="instant" name="exevo gran vis lux" exhaustion="500" cycleticks="50000" probability="70"/>
+	<attack type="rune" name="great fireball" exhaustion="500" cycleticks="10000" probability="70"/>
+</attacks>
+
+<defenses>
+	<defense immunity="energy"/>
+	<defense immunity="fire"/>
+	<defense immunity="poison"/>
+	<defense immunity="paralyze"/>
+	<defense immunity="drunk"/>
+</defenses>
+
+<voices>
+	<voice sentence="Your soul will be mine!"/>
+	<voice sentence="MWA HA HA HA HA!"/>
+</voices>
+
+<loot>
+</loot>
+</monster>

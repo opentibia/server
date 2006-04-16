@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<spawns>
+<spawn centerx="25" centery="31" centerz="7" radius="2">
+<monster name="demon" direction="0" spawntime="600" x="0" y="2"/>
+<monster name="demon" direction="0" spawntime="120" x="0" y="-2"/>
+<monster name="demon" direction="1" spawntime="300" x="0" y="0"/>
+</spawn>
+<spawn centerx="38" centery="32" centerz="7" radius="3">
+<monster name="minotaur archer" direction="2" spawntime="60" x="-2" y="-1"/>
+<monster name="minotaur archer" direction="2" spawntime="200" x="-2" y="1"/>
+<monster name="minotaur archer" direction="2" spawntime="60" x="1" y="-1"/>
+<monster name="minotaur archer" direction="2" spawntime="400" x="1" y="1"/>
+<monster name="minotaur archer" direction="2" spawntime="200" x="0" y="-1"/>
+<monster name="minotaur archer" direction="2" spawntime="60" x="0" y="2"/>
+</spawn>
+<spawn centerx="25" centery="45" centerz="7" radius="2">
+<monster name="giant spider" direction="2" spawntime="200" x="0" y="0"/>
+</spawn>
+</spawns>

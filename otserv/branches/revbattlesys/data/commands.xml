@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+
+<commands>
+<command cmd="/B" access="1" />
+<command cmd="/b" access="1" />
+<command cmd="/c" access="1" />
+<command cmd="/i" access="1" />
+<command cmd="/n" access="1" />
+<command cmd="/m" access="1" />
+<command cmd="/summon" access="1" />
+<command cmd="/q" access="1" />
+<command cmd="/reload" access="1" />
+<command cmd="/s" access="1" />
+<command cmd="/t" access="1" />
+<command cmd="/z" access="1" />
+<command cmd="/goto" access="1" />
+<command cmd="/info" access="1" />
+<command cmd="/closeserver" access="1" />
+<command cmd="/openserver" access="1" />
+<command cmd="/getonline" access="1" />
+<command cmd="/a" access="1" />
+<command cmd="/kick" access="1" />
+</commands>
