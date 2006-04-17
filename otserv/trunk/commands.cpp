@@ -498,12 +498,14 @@ bool Commands::testCommand(Creature* creature, const std::string& cmd, const std
 	int color = atoi(param.c_str());
 	Player* player = creature->getPlayer();
 	if(player) {
-		//player->sendMagicEffect(player->getPosition(), color);
+		player->sendMagicEffect(player->getPosition(), color);
+		/*
 		LightInfo lightInfo;
 		lightInfo.level = color / 0x100;
 		lightInfo.color = color & 0xFF;
 		player->setCreatureLight(lightInfo);
 		game->changeLight(player);
+		*/
 	}
 
 	return true;
@@ -851,7 +853,7 @@ bool Commands::exivaPlayer(Creature* creature, const std::string &cmd, const std
 				ss << "south-east";
 				break;
 			case DIR_SW:
-				ss << "shouth-west";
+				ss << "south-west";
 				break;
 			}
 		}
