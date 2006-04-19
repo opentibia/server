@@ -1530,16 +1530,28 @@ void Player::drainHealth(Creature* attacker, DamageType_t damageType, int32_t da
 		internalAddSkillTry = false;
 	}
 
+	sendStats();
+
+	std::stringstream ss;
+	if(damage == 1) {
+		ss << "You lose 1 hitpoint";
+	}
+	else
+		ss << "You lose " << damage << " hitpoints";
+
 	if(attacker){
-		sendTextMessage(MSG_EVENT_DEFAULT, "You lose %d hitpoints due to an attack by %s.");
+		ss << " due to an attack by " << attacker->getNameDescription() << ".";
 		sendCreatureSquare(attacker, SQ_COLOR_BLACK);
 	}
+
+	sendTextMessage(MSG_EVENT_DEFAULT, ss.str().c_str());
 }
 
 void Player::drainMana(Creature* attacker, int32_t manaLoss)
 {
 	Creature::drainMana(attacker, manaLoss);
 	
+	sendStats();
 	sendTextMessage(MSG_EVENT_DEFAULT, "You lose %d mana.");
 }
 

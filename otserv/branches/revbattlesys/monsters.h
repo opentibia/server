@@ -143,6 +143,7 @@ public:
 	void reset();
 	
 	std::string name;
+	std::string nameDescription;
 	int experience;
 	int armor;
 	int defense;

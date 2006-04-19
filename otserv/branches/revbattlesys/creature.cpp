@@ -68,34 +68,18 @@ Creature::Creature() :
 	eventCheck = 0;
 	eventCheckAttacking = 0;
 	attackedCreature = NULL;
-	
-	//pzLocked = false;
-	//inFightTicks = 0;
-	//manaShieldTicks = 0;
-	//hasteTicks = 0;
-	//paralyzeTicks = 0;
-	//exhaustedTicks  = 0;
-	//pzLocked = false;
-
-	//attackedCreature = NULL;
-	//attackedCreature2 = 0;
 }
 
 Creature::~Creature()
 {
 	std::list<Creature*>::iterator cit;
 	for(cit = summons.begin(); cit != summons.end(); ++cit) {
-		//(*cit)->setAttackedCreature(NULL);
+		(*cit)->setAttackedCreature(NULL);
 		(*cit)->setMaster(NULL);
 		(*cit)->releaseThing2();
 	}
 
-	/*if(attackedCreature){
-		attackedCreature->releaseThing2();
-		attackedCreature = NULL;
-	}*/
-
-	//attackedCreature2 = 0;
+	attackedCreature = NULL;
 
 	//std::cout << "Creature destructor " << this->getID() << std::endl;
 	summons.clear();

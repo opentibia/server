@@ -80,22 +80,6 @@ class Player;
 class Monster;
 class Npc;
 
-/*
-class Conditions : public std::map<attacktype_t, ConditionVec>
-{
-public:
-	bool hasCondition(attacktype_t type)
-	{
-		Conditions::iterator condIt = this->find(type);
-		if(condIt != this->end() && !condIt->second.empty()) {
-			return true;
-		}
-		
-		return false;
-	}
-};
-*/
-
 //////////////////////////////////////////////////////////////////////
 // Defines the Base class for all creatures and base functions which 
 // every creature has
@@ -116,6 +100,7 @@ public:
 	virtual const Monster* getMonster() const {return NULL;};
 
 	virtual const std::string& getName() const = 0;
+	virtual const std::string& getNameDescription() const = 0;
 	virtual int getThrowRange() const {return 1;};
 	virtual bool isPushable() const {return true;};
 	virtual bool isRemoved() const {return isInternalRemoved;};
@@ -145,6 +130,7 @@ public:
 
 	virtual void die(){};
 
+	virtual RaceType_t getRace() const {return RACE_NONE;}
 	virtual std::string getDescription(int32_t lookDistance) const;
 	
 	virtual void setMaster(Creature* creature);
@@ -205,37 +191,6 @@ public:
 
 	Creature* getAttackedCreature();
 	virtual void setAttackedCreature(Creature* creature);
-
-	/*
-	virtual fight_t getFightType(){return FIGHT_MELEE;};
-	virtual subfight_t getSubFightType() {return DIST_NONE;}
-
-	virtual int getImmunities() const
-	{
-		if(access != 0) 
-			return  ATTACK_ENERGY | ATTACK_BURST | ATTACK_FIRE |
-			ATTACK_PHYSICAL | ATTACK_POISON | ATTACK_PARALYZE | ATTACK_DRUNKNESS;
-		else
-			return immunities;
-	};
-	*/
-	/*
-	void addCondition(const CreatureCondition& condition, bool refresh);
-	Conditions& getConditions() {return conditions;};
-	*/
-
-	//virtual int getWeaponDamage() const {return 1+(int)(10.0*rand()/(RAND_MAX+1.0));}
-	//Creature* getAttackedCreature();
-
-	/*
-	virtual void addInflictedDamage(Creature* attacker, int damage);
-	virtual int getGainedExperience(Creature* attacker);
-	virtual std::vector<long> getInflicatedDamageCreatureList();
-	virtual int getLostExperience();
-	virtual int getInflicatedDamage(Creature* attacker);
-	virtual int getTotalInflictedDamage();
-	virtual int getInflicatedDamage(unsigned long id);
-	*/
 	
 	virtual void getCreatureLight(LightInfo& light) const;
 	virtual void setNormalCreatureLight();
@@ -265,10 +220,6 @@ protected:
 	int32_t magLevel;
 
 	Creature* attackedCreature;
-	//uint32_t exhaustedTicks;
-	//bool pzLocked;
-
-	//unsigned long attackedCreature;
 
 	int lookType, lookHead, lookBody, lookLegs, lookFeet, lookCorpse, lookMaster;
 	//long manaShieldTicks, hasteTicks, paralyzeTicks, inFightTicks;
@@ -288,13 +239,6 @@ protected:
 	
 	typedef std::list<Condition*> ConditionList;
 	ConditionList conditions;
-
-	/*
-	Conditions conditions;
-	typedef std::vector< std::pair<uint64_t, long> > DamageList;
-	typedef std::map<long, DamageList > TotalDamageList;
-	TotalDamageList totaldamagelist;
-	*/
 	
 	LightInfo internalLight;
 

@@ -44,8 +44,8 @@
 #include "game.h"
 #include "tile.h"
 #include "house.h"
-
 #include "actions.h"
+#include "combat.h"
 #include "ioplayer.h"
 #include "chat.h"
 #include "luascript.h"
@@ -1616,6 +1616,13 @@ bool Game::playerUseItemEx(Player* player, const Position& fromPos, uint8_t from
 	Item* item = dynamic_cast<Item*>(internalGetThing(player, fromPos, fromStackPos));
 
 	if(item){
+		Combat combat;
+
+		combat.setCombatType(COMBAT_HITPOINTS, DAMAGE_PHYSICAL);
+		combat.setEffects(0xFF, NM_ME_MORT_AREA);
+
+		combat.doCombat(player, toPos, -100);
+
 		/*
 		//Runes
 		std::map<unsigned short, Spell*>::iterator sit = spells.getAllRuneSpells()->find(item->getID());

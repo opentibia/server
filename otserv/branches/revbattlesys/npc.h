@@ -79,7 +79,8 @@ public:
 	void addList() {listNpc.addList(this);}
 	
 	void speak(const std::string &text){};
-	const std::string& getName() const {return name;};
+	virtual const std::string& getName() const {return name;};
+	virtual const std::string& getNameDescription() const {return name;};
 	
 	void doSay(std::string msg);
 	void doMove(Direction dir);

@@ -63,6 +63,7 @@ public:
 	void addList() {listMonster.addList(this);}
 	
 	virtual const std::string& getName() const {return mType->name;}
+	virtual const std::string& getNameDescription() const {return mType->nameDescription;}
 	virtual std::string getDescription(int32_t lookDistance) const;
 
 	virtual int getArmor() const {return mType->armor;}

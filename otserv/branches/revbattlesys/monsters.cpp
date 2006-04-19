@@ -24,8 +24,6 @@
 #include "tools.h"
 #include "luascript.h"
 
-//extern Spells spells;
-
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 
@@ -266,6 +264,14 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 		}
 		else
 			monsterLoad = false;
+
+		if(readXMLString(root, "nameDescription", strValue)){
+			mType->nameDescription = strValue;
+		}
+		else{
+			mType->nameDescription = "a " + mType->name;
+			toLowerCaseString(mType->nameDescription);
+		}
 
 		if(readXMLInteger(root, "experience", intValue)){
 			mType->experience = intValue;

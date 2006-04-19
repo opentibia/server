@@ -110,7 +110,8 @@ public:
 	virtual Player* getPlayer() {return this;};
 	virtual const Player* getPlayer() const {return this;};
 
-	const std::string& getName() const {return name;};
+	virtual const std::string& getName() const {return name;};
+	virtual const std::string& getNameDescription() const {return name;};
 	virtual bool isPushable() const;
 	virtual int getThrowRange() const {return 1;};
 
@@ -240,6 +241,7 @@ public:
 	virtual int getLookCorpse();
 	bool NeedUpdateStats();
 	
+	virtual RaceType_t getRace() const {return RACE_BLOOD;}
 	virtual std::string getDescription(int32_t lookDistance) const;
 	
 	void setTradeState(tradestate_t state) {tradeState = state;};
@@ -459,6 +461,7 @@ protected:
 	SentStats lastSentStats;
 
 	std::string name;	
+	std::string nameDescription;
 	unsigned long guid;
 	
 	//guild variables
