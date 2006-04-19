@@ -32,10 +32,10 @@
 #include "item.h"
 #include "container.h"
 #include "player.h"
-#include "magic.h"
 #include "spawn.h"
 #include "templates.h"
 #include "scheduler.h"
+//#include "magic.h"
 
 class Creature;
 class Player;
@@ -50,63 +50,19 @@ class SchedulerTask;
 #define STACKPOS_LOOK -2
 #define STACKPOS_USE -3
 
-/** State of a creature at a given time
-  * Keeps track of all the changes to be able to send to the client
-	*/
-
-class CreatureState {
-public:
-	CreatureState() {};
-	~CreatureState() {};
-
-	Position pos;
-	int damage;
-	int manaDamage;
-	bool drawBlood;
-	std::vector<Creature*> attackerlist;
-};
-
-typedef std::vector< std::pair<Creature*, CreatureState> > CreatureStateVec;
-typedef std::map<Tile*, CreatureStateVec> CreatureStates;
-
-/** State of the game at a given time
-  * Keeps track of all the changes to be able to send to the client
-	*/
-
-class Game;
-
-class GameState {
-public:
-	GameState(Game *game, const Range &range);
-	~GameState();
-
-	void onAttack(Creature* attacker, const Position& pos, const MagicEffectClass* me);
-	void onAttack(Creature* attacker, const Position& pos, Creature* attackedCreature);
-	const CreatureStateVec& getCreatureStateList(Tile* tile) {return creaturestates[tile];};
-	const SpectatorVec& getSpectators() {return spectatorlist;}
-
-protected:
-	void addCreatureState(Tile* tile, Creature* attackedCreature, int damage, int manaDamage, bool drawBlood);
-	void onAttackedCreature(Tile* tile, Creature* attacker, Creature* attackedCreature, int damage, bool drawBlood);
-	Game *game;
-
-	SpectatorVec spectatorlist;
-	CreatureStates creaturestates;
-};
-
-enum world_type_t{
+enum WorldType_t {
 	WORLD_TYPE_NO_PVP,
 	WORLD_TYPE_PVP,
 	WORLD_TYPE_PVP_ENFORCED
 };
 
-enum game_state_t{
+enum GameState_t {
 	GAME_STATE_NORMAL,
 	GAME_STATE_CLOSED,
 	GAME_STATE_SHUTDOWN
 };
 
-enum lightState_t{
+enum lightState_t {
 	LIGHT_STATE_DAY,
 	LIGHT_STATE_NIGHT,
 	LIGHT_STATE_SUNSET,
@@ -118,9 +74,10 @@ enum lightState_t{
   * This class is responsible to controll everything that happens
   */
 
-class Game {
+class Game
+{
 public:
-	Game();
+  Game();
 	~Game();
 	
 	/**
@@ -142,8 +99,8 @@ public:
 		return;
 	}
   
-	void setWorldType(world_type_t type);
-	world_type_t getWorldType() const {return worldType;}
+	void setWorldType(WorldType_t type);
+	WorldType_t getWorldType() const {return worldType;}
 
 	Cylinder* internalGetCylinder(Player* player, const Position& pos);
 	Thing* internalGetThing(Player* player, const Position& pos, int32_t index);
@@ -300,13 +257,6 @@ public:
 	bool internalMonsterYell(Monster* monster, const std::string& text);
 
 	bool internalFollowCreature(Player* player, const Creature* followCreature);
-	
-	//battle system
-	bool internalCreatureSaySpell(Creature *creature, const std::string &text);
-	bool creatureMakeMagic(Creature *creature, const Position& centerpos, const MagicEffectClass* me);
-	bool creatureThrowRune(Creature *creature, const Position& centerpos, const MagicEffectClass& me);
-	//bool creatureCastSpell(Creature *creature, const Position& centerpos, const MagicEffectClass& me);
-	//battle system
 
 	//Implementation of player invoked events
 	bool movePlayer(Player* player, Direction direction);
@@ -338,7 +288,8 @@ public:
 	bool playerRequestAddVip(Player* player, const std::string& vip_name);
 	bool playerTurn(Player* player, Direction dir);
 	bool playerSay(Player* player, SpeakClasses type, const std::string& text);
-	bool playerChangeOutfit(Player* player);
+	bool playerChangeOutfit(Player* player, uint8_t lookType, uint8_t lookHead,
+	uint8_t lookBody, uint8_t lookLegs, uint8_t lookFeet);
 	bool playerSaySpell(Player *player, const std::string& text);
 
 	void flushSendBuffers();
@@ -346,20 +297,24 @@ public:
 	void FreeThing(Thing* thing);
 
 	bool getPathTo(Creature* creature, Position toPosition, std::list<Direction>& listDir);
-	void changeOutfitAfter(unsigned long id, int looktype, long time);
-	void changeSpeed(unsigned long id, unsigned short speed);
+	void changeSpeed(const Creature* creature);
 	void changeLight(const Creature* creature);
-	#ifdef __SKULLSYSTEM__
+
+	//void changeOutfitAfter(unsigned long id, int looktype, long time);
+	//void changeSpeed(unsigned long id, unsigned short speed);
+	//void changeOutfit(unsigned long id, int looktype);
+
+#ifdef __SKULLSYSTEM__
 	void changeSkull(Player* creature, skulls_t new_skull);
-	#endif
+#endif
+	
 	void AddMagicEffectAt(const Position& pos, uint8_t type);
 	
-	game_state_t getGameState();
-	void setGameState(game_state_t newstate){game_state = newstate;}
+	GameState_t getGameState();
+	void setGameState(GameState_t newstate){gameState = newstate;}
 
 	//Lock variable for Game class
 	OTSYS_THREAD_LOCKVAR gameLock;   
-	bool isExecutingEvents;
 
 	//Events
 	void checkAutoWalkPlayer(unsigned long id);
@@ -378,16 +333,14 @@ protected:
 	
 	AutoList<Creature> listCreature;
 
-	void changeOutfit(unsigned long id, int looktype);
-
-	//battle system
+	/*//battle system
 	void creatureApplyDamage(Creature *creature, int damage, int &outDamage, int &outManaDamage);
 	bool creatureOnPrepareAttack(Creature *creature, Position pos);
 	bool creatureOnPrepareMagicAttack(Creature *creature, Position pos, const MagicEffectClass* me);
 	void creatureMakeDamage(Creature *creature, Creature *attackedCreature, fight_t damagetype);
 	void CreateDamageUpdate(Creature* player, Creature* attackCreature, int damage);
 	void CreateManaDamageUpdate(Creature* player, Creature* attackCreature, int damage);
-	//battle system
+	//battle system*/
 
 	OTSYS_THREAD_LOCKVAR eventLock;
 	OTSYS_THREAD_SIGNALVAR eventSignal;
@@ -426,16 +379,16 @@ protected:
 	std::map<unsigned long, SchedulerTask*> eventIdMap;
 	unsigned long eventIdCount;
 
-	uint32_t max_players;
-	world_type_t worldType;
+	uint32_t maxPlayers;
+
+	GameState_t gameState;
+	WorldType_t worldType;
 
 	Map* map;
 	
 	std::vector<std::string> commandTags;
 	void addCommandTag(std::string tag);
 	void resetCommandTag();
-	
-	game_state_t game_state;
 
 	friend class Commands;
 	friend class Monster;

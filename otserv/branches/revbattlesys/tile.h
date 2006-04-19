@@ -25,12 +25,12 @@
 
 #include "cylinder.h"
 #include "item.h"
-#include "magic.h"
 
 class Creature;
 class Teleport;
 class TrashHolder;
 class Mailbox;
+class MagicField;
 
 typedef std::vector<Item*> ItemVector;
 typedef std::vector<Creature*> CreatureVector;
@@ -63,7 +63,7 @@ public:
 	CreatureVector creatures;
 	ItemVector     downItems;
 
-	MagicEffectItem* getFieldItem() const;
+	MagicField* getFieldItem() const;
 	Teleport* getTeleportItem() const;
 	TrashHolder* getTrashHolder() const;
 	Mailbox* getMailbox() const;
@@ -136,6 +136,4 @@ protected:
 	uint32_t flags;
 };
 
-
-#endif // #ifndef __TILE_H__
-
+#endif

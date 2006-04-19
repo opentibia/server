@@ -18,21 +18,22 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
+#include "creature.h"
 
-#include "definitions.h"
+#include "game.h"
+#include "otsystem.h"
+#include "player.h"
+#include "npc.h"
+#include "monster.h"
+#include "tile.h"
+#include "container.h"
+#include "condition.h"
+#include "combat.h"
 
 #include <string>
 #include <sstream>
 #include <algorithm>
-
-#include "creature.h"
-#include "otsystem.h"
-#include "tile.h"
-
-#include "npc.h"
-#include "player.h"
-#include "monster.h"
-#include "game.h"
+#include <vector>
 
 OTSYS_THREAD_LOCKVAR AutoID::autoIDLock;
 unsigned long AutoID::count = 1000;
@@ -41,49 +42,50 @@ AutoID::list_type AutoID::list;
 extern Game g_game;
 
 Creature::Creature() :
-	access(0)
-	,isInternalRemoved(false)
+  isInternalRemoved(false)
 {
+	lookHead   = 0;
+	lookBody   = 0;
+	lookLegs   = 0;
+	lookFeet   = 0;
+	lookMaster = 0;
+	lookType   = PLAYER_MALE_1;	
+	lookCorpse = 3128;
+	
 	direction  = NORTH;
 	master = NULL;
-	
-	lookhead   = 0;
-	lookbody   = 0;
-	looklegs   = 0;
-	lookfeet   = 0;
-	lookmaster = 0;
-	looktype   = PLAYER_MALE_1;
-	pzLocked = false;
-	
-	lookcorpse = 3128;
-	
-	health     = 1000;//150;
-	healthmax  = 1000;//150;
+
+	health     = 1000;
+	healthMax  = 1000;
+
 	level = 0;
 	mana = 0;
-	manamax = 0;
+	manaMax = 0;
 	lastmove = 0;
-	
-	inFightTicks = 0;
-	manaShieldTicks = 0;
-	hasteTicks = 0;
-	paralyzeTicks = 0;
-	exhaustedTicks  = 0;
-	pzLocked = false;
+	speed = 220;
+
 	immunities = 0;
 	eventCheck = 0;
 	eventCheckAttacking = 0;
+	attackedCreature = NULL;
 	
+	//pzLocked = false;
+	//inFightTicks = 0;
+	//manaShieldTicks = 0;
+	//hasteTicks = 0;
+	//paralyzeTicks = 0;
+	//exhaustedTicks  = 0;
+	//pzLocked = false;
+
 	//attackedCreature = NULL;
-	attackedCreature2 = 0;
-	speed = 220;
+	//attackedCreature2 = 0;
 }
 
 Creature::~Creature()
 {
 	std::list<Creature*>::iterator cit;
 	for(cit = summons.begin(); cit != summons.end(); ++cit) {
-		(*cit)->setAttackedCreature(NULL);
+		//(*cit)->setAttackedCreature(NULL);
 		(*cit)->setMaster(NULL);
 		(*cit)->releaseThing2();
 	}
@@ -93,7 +95,7 @@ Creature::~Creature()
 		attackedCreature = NULL;
 	}*/
 
-	attackedCreature2 = 0;
+	//attackedCreature2 = 0;
 
 	//std::cout << "Creature destructor " << this->getID() << std::endl;
 	summons.clear();
@@ -104,16 +106,41 @@ void Creature::setRemoved()
 	isInternalRemoved = true;
 }
 
-void Creature::drainHealth(int damage)
+void Creature::getOutfit(uint8_t& _lookType, uint8_t& _lookHead,
+	uint8_t& _lookBody, uint8_t& _lookLegs, uint8_t& _lookFeet) const
+{
+	_lookType = lookType;
+	_lookHead = lookHead;
+	_lookBody = lookBody;
+	_lookLegs = lookLegs;
+	_lookFeet = lookFeet;
+}
+
+void Creature::drainHealth(Creature* attacker, DamageType_t damageType, int32_t damage)
 {
 	health -= std::min(health, damage);
+
+	/*
+	uint32_t attackerId = 0;
+	if(attacker){
+		attackerId = 0;
+	}
+
+	damageMap[attackerId].push_back(damage);
+	*/
 }
 
-void Creature::drainMana(int damage)
+void Creature::drainMana(Creature* attacker, int32_t manaLoss)
 {
-	mana -= std::min(mana, damage);
+	useMana(manaLoss);
 }
 
+void Creature::useMana(int32_t manaLoss)
+{
+	mana -= std::min(mana, manaLoss);
+}
+
+/*
 Creature* Creature::getAttackedCreature()
 {
 	if(attackedCreature2 != 0){
@@ -121,15 +148,10 @@ Creature* Creature::getAttackedCreature()
 	}
 
 	return NULL;
-
-	/*
-	if(attackedCreature && !attackedCreature->isRemoved())
-		return attackedCreature;
-	else
-		return NULL;
-	*/
 }
+*/
 
+/*
 void Creature::setAttackedCreature(const Creature* creature)
 {
 	std::list<Creature*>::iterator cit;
@@ -143,24 +165,17 @@ void Creature::setAttackedCreature(const Creature* creature)
 	else{
 		attackedCreature2 = 0;
 	}
+}
+*/
 
-	/*
-	if(creature){
-		if(attackedCreature != creature){
-			if(attackedCreature)
-				attackedCreature->releaseThing2();
+void Creature::setAttackedCreature(Creature* creature)
+{
+	attackedCreature = creature;
 
-			attackedCreature = const_cast<Creature*>(creature);
-			attackedCreature->useThing2();
-		}
+	std::list<Creature*>::iterator cit;
+	for(cit = summons.begin(); cit != summons.end(); ++cit) {
+		(*cit)->setAttackedCreature(creature);
 	}
-	else{
-		if(attackedCreature){
-			attackedCreature->releaseThing2();
-			attackedCreature = NULL;
-		}
-	}
-	*/
 }
 
 void Creature::setMaster(Creature* creature)
@@ -178,7 +193,7 @@ void Creature::addSummon(Creature *creature)
 	
 }
 
-void Creature::removeSummon(Creature *creature)
+void Creature::removeSummon(Creature* creature)
 {
 	//std::cout << "removeSummon: " << this << " summon=" << creature << std::endl;
 	std::list<Creature*>::iterator cit = std::find(summons.begin(), summons.end(), creature);
@@ -189,6 +204,85 @@ void Creature::removeSummon(Creature *creature)
 	}
 }
 
+bool Creature::addCondition(Condition* condition)
+{
+	if(!condition){
+		return false;
+	}
+
+	Condition* prevCond = getCondition(condition->getType());
+
+	if(prevCond){
+		prevCond->addCondition(condition);
+		delete condition;
+	}
+	else{
+		if(condition->startCondition(this)){
+			conditions.push_back(condition);
+		}
+	}
+
+	return true;
+}
+
+void Creature::removeCondition(ConditionType_t type)
+{
+	ConditionList::iterator it;
+	for(it = conditions.begin(); it != conditions.end(); ++it){
+		if((*it)->getType() == type){
+			(*it)->endCondition(REASON_ABORT);
+			delete *it;
+			conditions.erase(it);
+		}
+	}
+}
+
+void Creature::executeConditions(int32_t newticks)
+{
+	ConditionList::iterator it;
+	for(it = conditions.begin(); it != conditions.end();){
+		(*it)->ticks -= newticks;
+		if((*it)->ticks <= 0){
+			(*it)->endCondition(REASON_ENDTICKS);
+			delete *it;
+			it = conditions.erase(it);
+		}
+		else{
+			(*it)->executeCondition(newticks);
+			++it;
+		}
+	}
+}
+
+Condition* Creature::getCondition(ConditionType_t type)
+{
+	if(conditions.empty())
+		return NULL;
+	
+	for(ConditionList::iterator it = conditions.begin(); it != conditions.end(); ++it){
+		if((*it)->getType() == type)
+			return *it;
+	}
+
+	return NULL;
+}
+
+bool Creature::hasCondition(ConditionType_t type) const
+{
+	for(ConditionList::const_iterator it = conditions.begin(); it != conditions.end(); ++it){
+		if((*it)->getType() == type)
+			return true;
+	}
+
+	return false;
+}
+
+bool Creature::isImmune(DamageType_t type)
+{
+	return ((immunities & type) == type);
+}
+
+/*
 void Creature::addCondition(const CreatureCondition& condition, bool refresh)
 {
 	if(condition.getCondition()->attackType == ATTACK_NONE)
@@ -279,6 +373,7 @@ std::vector<long> Creature::getInflicatedDamageCreatureList()
 	
 	return damagelist;
 }
+*/
 
 std::string Creature::getDescription(int32_t lookDistance) const
 {

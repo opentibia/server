@@ -22,6 +22,8 @@
 #include "ban.h"
 #include "ioplayer.h"
 #include "luascript.h"
+#include "tools.h"
+
 #include <sstream>
 
 #ifdef __USE_MYSQL__

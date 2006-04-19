@@ -119,20 +119,20 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 		else
 			isLoaded = false;
 
-		if(readXMLInteger(root, "maglevel", intValue)){
-			player->maglevel = intValue;
+		if(readXMLInteger(root, "magLevel", intValue)){
+			player->magLevel = intValue;
 		}
 		else
 			isLoaded = false;
 
 		if(readXMLInteger(root, "voc", intValue)){
-			player->vocation = (playervoc_t)intValue;
+			player->vocation = (Vocation_t)intValue;
 		}
 		else
 			isLoaded = false;
 
 		if(readXMLInteger(root, "access", intValue)){
-			player->access = intValue;
+			player->accessLevel = intValue;
 		}
 		else
 			isLoaded = false;
@@ -173,18 +173,18 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 					isLoaded = false;
 
 				if(readXMLInteger(p, "max", intValue)){
-					player->manamax = intValue;
+					player->manaMax = intValue;
 				}
 				else
 					isLoaded = false;
 
 				if(readXMLInteger(p, "spent", intValue)){
-					player->manaspent = intValue;
+					player->manaSpent = intValue;
 				}
 				else
 					isLoaded = false;
 
-				player->maglevel_percent  = (unsigned char)(100*(player->manaspent/(1.*player->getReqMana(player->maglevel+1, player->vocation))));
+				player->maglevel_percent  = (unsigned char)(100*(player->manaSpent/(1.*player->getReqMana(player->magLevel+1, player->vocation))));
 			}
 			else if(xmlStrcmp(p->name, (const xmlChar*)"health") == 0){
 				
@@ -198,7 +198,7 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 					isLoaded = false;
 				
 				if(readXMLInteger(p, "max", intValue)){
-					player->healthmax = intValue;
+					player->healthMax = intValue;
 				}
 				else
 					isLoaded = false;
@@ -212,33 +212,33 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 			else if(xmlStrcmp(p->name, (const xmlChar*)"look") == 0){
 
 				if(readXMLInteger(p, "type", intValue)){
-					player->looktype = intValue;
+					player->lookType = intValue;
 				}
 				else
 					isLoaded = false;
 
-				player->lookmaster = player->looktype;
+				player->lookMaster = player->lookType;
 				
 				if(readXMLInteger(p, "head", intValue)){
-					player->lookhead = intValue;
+					player->lookHead = intValue;
 				}
 				else
 					isLoaded = false;
 
 				if(readXMLInteger(p, "body", intValue)){
-					player->lookbody = intValue;
+					player->lookBody = intValue;
 				}
 				else
 					isLoaded = false;
 
 				if(readXMLInteger(p, "legs", intValue)){
-					player->looklegs = intValue;
+					player->lookLegs = intValue;
 				}
 				else
 					isLoaded = false;
 
 				if(readXMLInteger(p, "feet", intValue)){
-					player->lookfeet = intValue;
+					player->lookFeet = intValue;
 				}
 				else
 					isLoaded = false;
@@ -471,9 +471,9 @@ bool IOPlayerXML::savePlayer(Player* player)
 	sb << player->experience;         xmlSetProp(root, (const xmlChar*)"exp", (const xmlChar*)sb.str().c_str());       sb.str("");	
 	sb << (int)player->vocation;      xmlSetProp(root, (const xmlChar*)"voc", (const xmlChar*)sb.str().c_str());       sb.str("");
 	sb << player->level;              xmlSetProp(root, (const xmlChar*)"level", (const xmlChar*)sb.str().c_str());     sb.str("");	
-	sb << player->access;             xmlSetProp(root, (const xmlChar*)"access", (const xmlChar*)sb.str().c_str());	sb.str("");	
+	sb << player->accessLevel;             xmlSetProp(root, (const xmlChar*)"access", (const xmlChar*)sb.str().c_str());	sb.str("");	
 	sb << player->getCapacity();      xmlSetProp(root, (const xmlChar*)"cap", (const xmlChar*)sb.str().c_str());       sb.str("");
-	sb << player->maglevel;	          xmlSetProp(root, (const xmlChar*)"maglevel", (const xmlChar*)sb.str().c_str());  sb.str("");
+	sb << player->magLevel;	          xmlSetProp(root, (const xmlChar*)"magLevel", (const xmlChar*)sb.str().c_str());  sb.str("");
 	sb << player->lastlogin;	        xmlSetProp(root, (const xmlChar*)"lastlogin", (const xmlChar*)sb.str().c_str());  sb.str("");
 
 	pn = xmlNewNode(NULL,(const xmlChar*)"spawn");
@@ -490,23 +490,23 @@ bool IOPlayerXML::savePlayer(Player* player)
 	
 	pn = xmlNewNode(NULL,(const xmlChar*)"health");
 	sb << player->health;     xmlSetProp(pn, (const xmlChar*)"now", (const xmlChar*)sb.str().c_str());        sb.str("");
-	sb << player->healthmax;  xmlSetProp(pn, (const xmlChar*)"max", (const xmlChar*)sb.str().c_str());        sb.str("");
+	sb << player->healthMax;  xmlSetProp(pn, (const xmlChar*)"max", (const xmlChar*)sb.str().c_str());        sb.str("");
 	sb << player->food;  	    xmlSetProp(pn, (const xmlChar*)"food", (const xmlChar*)sb.str().c_str());       sb.str("");
 	                     
 	xmlAddChild(root, pn);
 	
 	pn = xmlNewNode(NULL,(const xmlChar*)"mana");
 	sb << player->mana;      xmlSetProp(pn, (const xmlChar*)"now", (const xmlChar*)sb.str().c_str());        sb.str("");
-	sb << player->manamax;   xmlSetProp(pn, (const xmlChar*)"max", (const xmlChar*)sb.str().c_str());        sb.str("");
-	sb << player->manaspent; xmlSetProp(pn, (const xmlChar*)"spent", (const xmlChar*)sb.str().c_str());      sb.str("");
+	sb << player->manaMax;   xmlSetProp(pn, (const xmlChar*)"max", (const xmlChar*)sb.str().c_str());        sb.str("");
+	sb << player->manaSpent; xmlSetProp(pn, (const xmlChar*)"spent", (const xmlChar*)sb.str().c_str());      sb.str("");
 	xmlAddChild(root, pn);
     	               
 	pn = xmlNewNode(NULL,(const xmlChar*)"look");
-	sb << player->lookmaster;  xmlSetProp(pn, (const xmlChar*)"type", (const xmlChar*)sb.str().c_str());        sb.str("");
-	sb << player->lookhead;    xmlSetProp(pn, (const xmlChar*)"head", (const xmlChar*)sb.str().c_str());        sb.str("");
-	sb << player->lookbody;    xmlSetProp(pn, (const xmlChar*)"body", (const xmlChar*)sb.str().c_str());        sb.str("");
-	sb << player->looklegs;    xmlSetProp(pn, (const xmlChar*)"legs", (const xmlChar*)sb.str().c_str());        sb.str("");
-	sb << player->lookfeet;    xmlSetProp(pn, (const xmlChar*)"feet", (const xmlChar*)sb.str().c_str());        sb.str("");
+	sb << player->lookMaster;  xmlSetProp(pn, (const xmlChar*)"type", (const xmlChar*)sb.str().c_str());        sb.str("");
+	sb << player->lookHead;    xmlSetProp(pn, (const xmlChar*)"head", (const xmlChar*)sb.str().c_str());        sb.str("");
+	sb << player->lookBody;    xmlSetProp(pn, (const xmlChar*)"body", (const xmlChar*)sb.str().c_str());        sb.str("");
+	sb << player->lookLegs;    xmlSetProp(pn, (const xmlChar*)"legs", (const xmlChar*)sb.str().c_str());        sb.str("");
+	sb << player->lookFeet;    xmlSetProp(pn, (const xmlChar*)"feet", (const xmlChar*)sb.str().c_str());        sb.str("");
 	xmlAddChild(root, pn);
     
 	pn = xmlNewNode(NULL,(const xmlChar*)"guild");

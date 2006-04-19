@@ -447,7 +447,7 @@ Monster* Spawn::respawn(unsigned long spawnid, Position &pos, std::string &name,
 	Monster* monster = Monster::createMonster(name);
 	if(monster){
 		monster->setDirection(dir);
-		monster->masterPos = centerPos;
+		monster->setMasterPos(centerPos);
 
 		if(g_game.placeCreature(pos, monster)) {
 			monster->useThing2();
@@ -507,7 +507,7 @@ void Spawn::idle(int t)
 				Player* player = NULL;
 
 				for(it = list.begin(); it != list.end(); ++it) {
-					if((player = (*it)->getPlayer()) && player->access == 0){
+					if((player = (*it)->getPlayer()) && player->getAccessLevel() == 0){
 						playerFound = true;
 						break;
 					}

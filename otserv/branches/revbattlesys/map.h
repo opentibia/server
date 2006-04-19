@@ -30,7 +30,7 @@
 #include "position.h"
 #include "item.h"
 #include "creature.h"
-#include "magic.h"
+//#include "magic.h"
 #include "iomapserialize.h"
 
 #include "tools.h"

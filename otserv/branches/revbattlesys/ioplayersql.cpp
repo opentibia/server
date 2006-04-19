@@ -99,32 +99,32 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 	}
 	#endif
 
-	player->vocation = (playervoc_t)result.getDataInt("vocation");
-	player->access = result.getDataInt("access");
+	player->vocation = (Vocation_t)result.getDataInt("vocation");
+	player->accessLevel = result.getDataInt("access");
 	player->setNormalSpeed();
 	
 	player->mana = result.getDataInt("mana");
-	player->manamax = result.getDataInt("manamax");
-	player->manaspent = result.getDataInt("manaspent");
-	player->maglevel = result.getDataInt("maglevel");
-	player->maglevel_percent  = (unsigned char)(100*(player->manaspent/(1.*player->getReqMana(player->maglevel+1, player->vocation))));
+	player->manaMax = result.getDataInt("manaMax");
+	player->manaSpent = result.getDataInt("manaspent");
+	player->magLevel = result.getDataInt("magLevel");
+	player->maglevel_percent  = (unsigned char)(100*(player->manaSpent / (1.*player->getReqMana(player->magLevel+1, player->vocation))));
 
 	player->health = result.getDataInt("health");
 	if(player->health <= 0)
 		player->health = 100;
 
-	player->healthmax = result.getDataInt("healthmax");
-	if(player->healthmax <= 0)
-		player->healthmax = 100;
+	player->healthMax = result.getDataInt("healthMax");
+	if(player->healthMax <= 0)
+		player->healthMax = 100;
 
 	player->food = result.getDataInt("food");
 
-	player->looktype = result.getDataInt("looktype");
-	player->lookmaster = player->looktype;
-	player->lookhead = result.getDataInt("lookhead");
-	player->lookbody = result.getDataInt("lookbody");
-	player->looklegs = result.getDataInt("looklegs");
-	player->lookfeet = result.getDataInt("lookfeet");
+	player->lookType = result.getDataInt("looktype");
+	player->lookMaster = player->lookType;
+	player->lookHead = result.getDataInt("lookhead");
+	player->lookBody = result.getDataInt("lookbody");
+	player->lookLegs = result.getDataInt("looklegs");
+	player->lookFeet = result.getDataInt("lookfeet");
 
 	boost::char_separator<char> sep(";");
 
@@ -305,18 +305,18 @@ bool IOPlayerSQL::savePlayer(Player* player)
 	query << "`level` = " << player->level << ", ";
 	query << "`vocation` = " << (int)player->vocation << ", ";
 	query << "`health` = " << player->health << ", ";
-	query << "`healthmax` = " << player->healthmax << ", ";
+	query << "`healthmax` = " << player->healthMax << ", ";
 	query << "`direction` = " << (int)player->getDirection() << ", ";
 	query << "`experience` = " << player->experience << ", ";
-	query << "`lookbody` = " << player->lookbody << ", ";
-	query << "`lookfeet` = " << player->lookfeet << ", ";
-	query << "`lookhead` = " << player->lookhead << ", ";
-	query << "`looklegs` = " << player->looklegs << ", ";
-	query << "`looktype` = " << player->looktype << ", ";
-	query << "`maglevel` = " << player->maglevel << ", ";
+	query << "`lookbody` = " << player->lookBody << ", ";
+	query << "`lookfeet` = " << player->lookFeet << ", ";
+	query << "`lookhead` = " << player->lookHead << ", ";
+	query << "`looklegs` = " << player->lookLegs << ", ";
+	query << "`looktype` = " << player->lookType << ", ";
+	query << "`magLevel` = " << player->magLevel << ", ";
 	query << "`mana` = " << player->mana << ", ";
-	query << "`manamax` = " << player->manamax << ", ";
-	query << "`manaspent` = " << player->manaspent << ", ";
+	query << "`manamax` = " << player->manaMax << ", ";
+	query << "`manaspent` = " << player->manaSpent << ", ";
 	query << "`masterpos` = '" << player->masterPos.x<<";"<< player->masterPos.y<<";"<< player->masterPos.z << "', ";
 	query << "`pos` = '" << player->getLoginPosition().x<<";"<< player->getLoginPosition().y<<";"<< player->getLoginPosition().z << "', ";
 	query << "`speed` = " << player->speed << ", ";

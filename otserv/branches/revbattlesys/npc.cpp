@@ -77,12 +77,6 @@ Npc::Npc(const std::string& _name) :
 		}
 		else
 			name = "";
-
-		if(readXMLInteger(root, "access", intValue)){
-			access = intValue;
-		}
-		else
-			access = 0;
 		
 		if(readXMLInteger(root, "level", intValue)){
 			level = intValue;
@@ -92,11 +86,11 @@ Npc::Npc(const std::string& _name) :
 
 		setNormalSpeed();
 		
-		if(readXMLInteger(root, "maglevel", intValue)){
-			maglevel = intValue;
+		if(readXMLInteger(root, "magLevel", intValue)){
+			magLevel = intValue;
 		}
 		else
-			maglevel = 1;
+			magLevel = 1;
 		
 		while(p){
 			if(xmlStrcmp(p->name, (const xmlChar*)"health") == 0){
@@ -108,50 +102,50 @@ Npc::Npc(const std::string& _name) :
 					health = 100;
 
 				if(readXMLInteger(p, "max", intValue)){
-					healthmax = intValue;
+					healthMax = intValue;
 				}
 				else
-					healthmax = 100;
+					healthMax = 100;
 			}
 			if(xmlStrcmp(p->name, (const xmlChar*)"look") == 0){
 
 				if(readXMLInteger(p, "type", intValue)){
-					looktype = intValue;
+					lookType = intValue;
 				}
 				else
-					looktype = 20;
+					lookType = 20;
 
-				lookmaster = looktype;
+				lookMaster = lookType;
 
 				if(readXMLInteger(p, "head", intValue)){
-					lookhead = intValue;
+					lookHead = intValue;
 				}
 				else
-					lookhead = 10;
+					lookHead = 10;
 
 				if(readXMLInteger(p, "body", intValue)){
-					lookbody = intValue;
+					lookBody = intValue;
 				}
 				else
-					lookbody = 20;
+					lookBody = 20;
 
 				if(readXMLInteger(p, "legs", intValue)){
-					looklegs = intValue;
+					lookLegs = intValue;
 				}
 				else
-					looklegs = 30;
+					lookLegs = 30;
 				
 				if(readXMLInteger(p, "feet", intValue)){
-					lookfeet = intValue;
+					lookFeet = intValue;
 				}
 				else
-					lookfeet = 40;
+					lookFeet = 40;
 
 				if(readXMLInteger(p, "corpse", intValue)){
-					lookcorpse = intValue;
+					lookCorpse = intValue;
 				}
 				else
-					lookcorpse = 100;
+					lookCorpse = 100;
 			}
 
 			p = p->next;
@@ -244,9 +238,13 @@ int Npc::onThink(int& newThinkTicks)
 
 void Npc::doSay(std::string msg)
 {
+	g_game.internalCreatureSay(this, SPEAK_SAY, msg);
+
+	/*
 	if(!g_game.internalCreatureSaySpell(this, msg)){
 		g_game.internalCreatureSay(this, SPEAK_SAY, msg);
 	}
+	*/
 }
 
 void Npc::doMove(Direction dir)
@@ -426,11 +424,12 @@ int NpcScript::luaCreatureGetName2(lua_State *L)
 {
 	const char* s = lua_tostring(L, -1);
 	lua_pop(L,1);
+
 	Npc* mynpc = getNpc(L);
-	Creature *c = g_game.getCreatureByName(std::string(s));
+	Creature* creature = g_game.getCreatureByName(std::string(s));
 	
-	if(c && c->access == 0) {
-		lua_pushnumber(L, c->getID());
+	if(creature){
+		lua_pushnumber(L, creature->getID());
 	}
 	else
 		lua_pushnumber(L, 0);

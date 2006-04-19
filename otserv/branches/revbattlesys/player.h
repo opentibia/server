@@ -26,11 +26,12 @@
 #include "container.h"
 #include "depot.h"
 #include "cylinder.h"
+#include "enums.h"
 
 #include <vector>
 #include <ctime>
 #include <algorithm>
-#include "templates.h"
+//#include "templates.h"
 
 class House;
 class Protocol;
@@ -70,15 +71,6 @@ enum playersex_t {
 	PLAYERSEX_FEMALE = 0,
 	PLAYERSEX_MALE = 1,
 	PLAYERSEX_OLDMALE = 2
-};
-
-//0 = None, 1 = Sorcerer, 2 = Druid, 3 = Paladin, 4 = Knight
-enum playervoc_t {
-	VOCATION_NONE = 0,
-	VOCATION_SORCERER = 1,
-	VOCATION_DRUID = 2,
-	VOCATION_PALADIN = 3,
-	VOCATION_KNIGHT = 4
 };
 
 enum freeslot_t {
@@ -144,11 +136,11 @@ public:
 	inline StorageMap::const_iterator getStorageIteratorBegin() const {return storageMap.begin();}
 	inline StorageMap::const_iterator getStorageIteratorEnd() const {return storageMap.end();}
 	
-	int getAccount() const {return accountNumber;}
-	int getLevel() const {return level;}
-	int getHealth() const {return health;}
-	int getMana() const {return mana;}
-	int getMagicLevel() const {return maglevel;}
+	int32_t getAccount() const {return accountNumber;}
+	int32_t getLevel() const {return level;}
+	int32_t getMagicLevel() const {return magLevel;}
+	int32_t getAccessLevel() const {return accessLevel;}
+
 	playersex_t getSex() {return sex;}
 	bool gainManaTick();
 	bool gainHealthTick();
@@ -159,24 +151,20 @@ public:
 	void addSkillTry(int skilltry);
 	void addSkillShieldTry(int skilltry);
 	
-	unsigned long getExperience() const {
-		return experience;
-	}
+	unsigned long getExperience() const {return experience;}
 
 	double getCapacity() const {
-		if(access == 0) {
+		if(accessLevel == 0) {
 			return capacity;
 		}
 		else
 			return 0.00;
 	}
 	
-	virtual int getLostExperience() {
-		return (int)std::floor(((double)experience * 0.1));
-	}
+	virtual int getLostExperience() { return (int)std::floor(((double)experience * 0.1));}
 	
 	double getFreeCapacity() const {
-		if(access == 0) {
+		if(accessLevel == 0) {
 			return std::max(0.00, capacity - inventoryWeight);
 		}
 		else
@@ -185,24 +173,28 @@ public:
 	
 	time_t getLastLoginSaved() const { return lastLoginSaved; };
 	const Position& getLoginPosition() {return loginPosition;};
+	const Position& getTemplePosition() {return masterPos;};
 	
 	void updateInventoryWeigth();
 	
 	Item* getInventoryItem(slots_t slot) const;
 	
-	void addManaSpent(unsigned long spent);
 	void addExperience(unsigned long exp);
+	virtual void drainHealth(Creature* attacker, DamageType_t damageType, int32_t damage);
+	virtual void drainMana(Creature* attacker, int32_t manaLoss);
+	virtual void useMana(int32_t manaLoss);
+
 	virtual int getWeaponDamage() const;
 	virtual int getArmor() const;
 	virtual int getDefense() const;
-		
+
 	unsigned long eventAutoWalk;
 	
-	//battle functions
-	Item* GetDistWeapon() const;
+	/*//battle functions
 	void removeDistItem();
 	fight_t getFightType();
 	subfight_t getSubFightType();
+	*/
 
 	//items
 	ContainerVector containerVec;
@@ -220,8 +212,8 @@ public:
 	bool CanSee(int x, int y, int z) const;
 	
 	void sendIcons();  
-	void sendChangeSpeed(Creature* creature);
-	void sendToChannel(Creature *creature, SpeakClasses type, const std::string &text, unsigned short channelId);
+	void sendChangeSpeed(const Creature* creature);
+	void sendToChannel(Creature* creature, SpeakClasses type, const std::string &text, unsigned short channelId);
 	void sendCancelMessage(ReturnValue message) const;
 	void sendCancel(const char* msg) const;
 	void sendCancelWalk() const;
@@ -241,9 +233,9 @@ public:
 	void receivePing();
 	void flushMsg();
 	
-	void die();      //player loses exp/skills/maglevel on death
+	void die();      //player loses exp/skills/magLevel on death
 	
-	virtual bool isAttackable() const { return (access == 0); };
+	virtual bool isAttackable() const { return (accessLevel == 0); };
 	virtual void dropLoot(Container *corpse);
 	virtual int getLookCorpse();
 	bool NeedUpdateStats();
@@ -264,8 +256,8 @@ public:
 	virtual void getCreatureLight(LightInfo& light) const;
 	
 	void updateItemsLight(bool internal = false);
-	
-	void setAttackedCreature(const Creature* creature);
+
+	//void setAttackedCreature(const Creature* creature);
 	void setFollowCreature(const Creature* creature);
 	const Creature* getFollowCreature() {return followCreature;};
 	void setChaseMode(uint8_t mode);
@@ -274,6 +266,9 @@ public:
 	bool addEventAutoWalk();
 	bool checkStopAutoWalk(bool pathInvalid = false);
 	bool stopAutoWalk();
+
+	//combat functions
+	bool isImmune(DamageType_t type);
 
 #ifdef __SKULLSYSTEM__
 	skulls_t getSkull() const;
@@ -354,6 +349,9 @@ protected:
 
 	bool hasCapacity(const Item* item, uint32_t count) const;
 
+	//combat help functions
+	Item* GetDistWeapon() const;
+
 	//cylinder implementations
 	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,
 		uint32_t flags) const;
@@ -382,9 +380,11 @@ protected:
 
 protected:
 	Protocol* client;
+
+	int32_t accessLevel;
 	unsigned long experience;
-	
-	playervoc_t vocation;
+	int32_t manaSpent;
+	Vocation_t vocation;
 	playersex_t sex;
 	int food;
 	
@@ -394,10 +394,14 @@ protected:
 	bool SendBuffer;
 	long internal_ping;
 	long npings;
+
+	bool internalAddSkillTry;
 	
 	const Creature* followCreature;
 	chaseMode_t chaseMode;
 	
+	uint32_t exhaustedTicks;
+
 	//account variables
 	int accountNumber;
 	std::string password;
@@ -413,7 +417,7 @@ protected:
 	unsigned int skills[7][3];
 	
 	//reminder: 0 = None, 1 = Sorcerer, 2 = Druid, 3 = Paladin, 4 = Knight
-	static const int CapGain[5];          //for level advances
+	static const int CapGain[5];
 	static const int ManaGain[5];
 	static const int HPGain[5];
 	static const int gainManaVector[5][2];
@@ -436,20 +440,20 @@ protected:
 	struct SkillCache{
 		unsigned int tries;
 		int level;
-		playervoc_t vocation;
+		Vocation_t vocation;
 	};
 	
 	SkillCache SkillAdvanceCache[7][2];
 	struct SentStats{
 		int health;
-		int healthmax;
+		int healthMax;
 		unsigned long experience;
 		int level;
 		double freeCapacity;
 		int mana;
-		int manamax;
-		int manaspent;
-		int maglevel;
+		int manaMax;
+		int manaSpent;
+		int magLevel;
 	};
 	
 	SentStats lastSentStats;
@@ -474,10 +478,10 @@ protected:
 	#endif
 	
 	//for skill advances
-	unsigned int getReqSkillTries (int skill, int level, playervoc_t voc);
+	unsigned int getReqSkillTries (int skill, int level, Vocation_t voc);
 	
 	//for magic level advances
-	unsigned int getReqMana(int maglevel, playervoc_t voc); 
+	unsigned int getReqMana(int magLevel, Vocation_t voc); 
 	
 	friend OTSYS_THREAD_RETURN ConnectionHandler(void *dat);
 	
@@ -489,5 +493,4 @@ protected:
 	friend class IOPlayerSQL;
 };
 
-
-#endif // __PLAYER_H__
+#endif

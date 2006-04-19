@@ -28,7 +28,7 @@
 #include "house.h"
 
 #include "actions.h"
-#include "magic.h"
+//#include "magic.h"
 
 #include <iostream>
 #include <sstream>

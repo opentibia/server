@@ -26,6 +26,7 @@
 #include "game.h"
 #include "item.h"
 #include "container.h"
+#include "combat.h"
 #include "depot.h"
 #include "house.h"
 #include "tasks.h"
@@ -798,13 +799,13 @@ int ActionScript::internalGetPlayerInfo(lua_State *L, ePlayerInfo info)
 		const Tile *tile;
 		switch(info){
 		case PlayerInfoAccess:
-			value = player->access;
+			value = player->getAccessLevel();
 			break;		
 		case PlayerInfoLevel:
 			value = player->level;
 			break;		
 		case PlayerInfoMagLevel:
-			value = player->maglevel;
+			value = player->magLevel;
 			break;
 		case PlayerInfoMana:
 			value = player->mana;
@@ -1150,8 +1151,8 @@ int ActionScript::luaActionDoPlayerAddHealth(lua_State *L)
 		if(tmp <= 0){
 			player->health = 1;
 		}
-		else if(tmp > player->healthmax){
-			player->health = player->healthmax;
+		else if(tmp > player->healthMax){
+			player->health = player->healthMax;
 		}
 		else{
 			player->health = tmp;
@@ -1188,7 +1189,7 @@ int ActionScript::luaActionDoPlayerAddMana(lua_State *L)
 	
 	Player* player = action->GetPlayerByUID(cid);
 	if(player){
-		player->mana = std::min(player->manamax,player->mana+addmana);
+		player->mana = std::min(player->manaMax,player->mana+addmana);
 		player->sendStats();
 	}
 	else{
@@ -1755,7 +1756,7 @@ int ActionScript::luaActionDoPlayerSetVocation(lua_State *L)
 	
 	Player* player = action->GetPlayerByUID(cid);
 	if(player){
-		player->vocation = (playervoc_t)voc;
+		player->vocation = (Vocation_t)voc;
 	}
 	else{
 		lua_pushnumber(L, -1);

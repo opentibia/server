@@ -50,7 +50,8 @@ public:
 	Game* game;
 
   bool isLoaded(){return loaded;}
-  std::map<std::string, Spell*>* getVocSpells(playervoc_t voc){
+  std::map<std::string, Spell*>* getVocSpells(Vocation_t voc)
+	{
 		if((int)voc > maxVoc || voc < 0){
 			return 0;
 		}

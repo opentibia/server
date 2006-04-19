@@ -205,6 +205,7 @@ private:
 	void AddPlayerStats(NetworkMessage &msg);
 	void AddCreatureSpeak(NetworkMessage &msg,const Creature *creature, SpeakClasses type, std::string text, unsigned short channelId);
 	void AddCreatureHealth(NetworkMessage &msg,const Creature *creature);
+	void AddCreatureOutfit(NetworkMessage &msg, const Creature* creature);
 	void AddPlayerSkills(NetworkMessage &msg);
 	void AddWorldLight(NetworkMessage &msg, const LightInfo& lightInfo);
 	void AddCreatureLight(NetworkMessage &msg, const Creature* creature);
@@ -234,7 +235,7 @@ private:
 	OTSYS_THREAD_LOCKVAR bufferLock;
 	unsigned long windowTextID;
 	Item* readItem;
-	int maxTextLenght;
+	int maxTextLength;
 	
 	House* house;
 	unsigned long listId;

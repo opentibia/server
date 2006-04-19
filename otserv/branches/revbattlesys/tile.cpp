@@ -33,6 +33,7 @@
 #include "teleport.h"
 #include "trashholder.h"
 #include "mailbox.h"
+#include "combat.h"
 
 extern Game g_game;
 
@@ -180,14 +181,16 @@ Teleport* Tile::getTeleportItem() const
 	return NULL;
 }
 
-MagicEffectItem* Tile::getFieldItem() const
+MagicField* Tile::getFieldItem() const
 {
+	/*
 	MagicEffectItem* fieldItem = NULL;
 	for(ItemVector::const_iterator iit = downItems.begin(); iit != downItems.end(); ++iit){
 		fieldItem = dynamic_cast<MagicEffectItem*>(*iit);
 		if(fieldItem)
 			return fieldItem;
 	}
+	*/
 
 	return NULL;
 }
@@ -313,14 +316,10 @@ void Tile::onAddTileItem(Item* item)
 		}
 	}
 	
-	g_game.isExecutingEvents = true;
-
 	//event methods
 	for(it = list.begin(); it != list.end(); ++it){
 		(*it)->onAddTileItem(cylinderMapPos, item);
 	}
-
-	g_game.isExecutingEvents = false;
 }
 
 void Tile::onUpdateTileItem(uint32_t index, Item* oldItem, Item* newItem)
@@ -339,14 +338,10 @@ void Tile::onUpdateTileItem(uint32_t index, Item* oldItem, Item* newItem)
 		}
 	}
 
-	g_game.isExecutingEvents = true;
-
 	//event methods
 	for(it = list.begin(); it != list.end(); ++it){
 		(*it)->onUpdateTileItem(cylinderMapPos, index, oldItem, newItem);
 	}
-
-	g_game.isExecutingEvents = false;
 }
 
 void Tile::onRemoveTileItem(uint32_t index, Item* item)
@@ -365,14 +360,10 @@ void Tile::onRemoveTileItem(uint32_t index, Item* item)
 		}
 	}
 
-	g_game.isExecutingEvents = true;
-
 	//event methods
 	for(it = list.begin(); it != list.end(); ++it){
 		(*it)->onRemoveTileItem(cylinderMapPos, index, item);
 	}
-
-	g_game.isExecutingEvents = false;
 }
 
 void Tile::onUpdateTile()
@@ -391,14 +382,10 @@ void Tile::onUpdateTile()
 		}
 	}
 
-	g_game.isExecutingEvents = true;
-
 	//event methods
 	for(it = list.begin(); it != list.end(); ++it){
 		(*it)->onUpdateTile(cylinderMapPos);
 	}
-
-	g_game.isExecutingEvents = false;
 }
 
 void Tile::moveCreature(Creature* creature, Cylinder* toCylinder, bool teleport /* = false*/)
@@ -438,14 +425,10 @@ void Tile::moveCreature(Creature* creature, Cylinder* toCylinder, bool teleport 
 		}
 	}
 
-	g_game.isExecutingEvents = true;
-
 	//event method
 	for(it = list.begin(); it != list.end(); ++it) {
 		(*it)->onCreatureMove(creature, fromPos, oldStackPos, teleport);
 	}
-
-	g_game.isExecutingEvents = false;
 
 	toCylinder->postAddNotification(creature);
 	postRemoveNotification(creature, true);
@@ -467,6 +450,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			if(hasFlag(TILESTATE_PROTECTIONZONE))
 				return RET_NOTPOSSIBLE;
 
+			/*
 			if(const MagicEffectItem* fieldItem = getFieldItem()){
 				const MagicEffectTargetCreatureCondition* magicTargetCondition = fieldItem->getCondition();
 
@@ -476,6 +460,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 					}
 				}
 			}
+			*/
 
 			if(floorChange() || getTeleportItem()){
 				return RET_NOTPOSSIBLE;
@@ -498,7 +483,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			return RET_NOERROR;
 		}
 		else if(const Player* player = creature->getPlayer()){
-			if(hasFlag(TILESTATE_PROTECTIONZONE) && player->pzLocked){
+			if(hasFlag(TILESTATE_PROTECTIONZONE) && player->hasCondition(CONDITION_PZLOCK)){
 				return RET_PLAYERISPZLOCKED;
 			}
 		}
@@ -1081,8 +1066,8 @@ void Tile::postAddNotification(Thing* thing, bool hasOwnership /*= true*/)
 
 	if(hasOwnership){
 		//do action(s)
-		if(Creature* creature = thing->getCreature()){
-			MagicEffectItem* fieldItem = getFieldItem();
+		/*if(Creature* creature = thing->getCreature()){
+			MagicField* fieldItem = getFieldItem();
 			if(fieldItem){
 				//remove magic walls/wild growth
 				if(fieldItem->isBlocking()){
@@ -1102,7 +1087,7 @@ void Tile::postAddNotification(Thing* thing, bool hasOwnership /*= true*/)
 					g_game.creatureMakeMagic(attacker, creature->getPosition(), magicTargetCondition);
 				}
 			}
-		}
+		}*/
 		
 		if(Teleport* teleport = getTeleportItem()){
 			teleport->__addThing(thing);

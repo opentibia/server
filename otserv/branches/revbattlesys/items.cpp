@@ -20,15 +20,12 @@
 
 
 #include "items.h"
-#include "spells.h"
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 
 #include <iostream>
 #include <string>
-
-extern Spells spells;
 
 long Items::dwMajorVersion = 0;
 long Items::dwMinorVersion = 0;
@@ -590,14 +587,17 @@ int Items::loadFromOtb(std::string file)
 		
 		//get rune mag level from spells.xml
 		if(iType->group == ITEM_GROUP_RUNE){
+			/*
 			std::map<unsigned short, Spell*>::iterator it = spells.getAllRuneSpells()->find(iType->id);
 			if(it != spells.getAllRuneSpells()->end()){
 				iType->runeMagLevel = it->second->getMagLv();
 			}
 			else{
 				iType->runeMagLevel = 0;
-			}	
+			}
+			*/
 		}
+
 		// store the found item	 
 		items[iType->id] = iType;
 		revItems[iType->clientId] = iType->id;

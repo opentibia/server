@@ -19,16 +19,17 @@
 //////////////////////////////////////////////////////////////////////
 
 
-#ifndef __MONSTER_H__
-#define __MONSTER_H__
+#ifndef __OTSERV_MONSTER_H__
+#define __OTSERV_MONSTER_H__
 
 #include "tile.h"
-#include "templates.h"
 #include "monsters.h"
+//#include "templates.h"
 
 class Creature;
 class Game;
 
+/*
 enum monsterstate_t{
 	STATE_IDLE,
 	STATE_IDLESUMMON,
@@ -41,12 +42,12 @@ enum monstermode_t{
 	MODE_NORMAL,
 	MODE_AGGRESSIVE
 };
+*/
 
 class Monster : public Creature
 {
 private:
 	Monster(MonsterType* mtype);
-
 	//const Monster& operator=(const Monster& rhs);
 
 public:
@@ -56,25 +57,21 @@ public:
 	virtual Monster* getMonster() {return this;};
 	virtual const Monster* getMonster() const {return this;};
 
-	virtual const std::string& getName() const;
-	virtual bool isPushable() const;
-
 	virtual unsigned long idRange(){ return 0x40000000;}
 	static AutoList<Monster> listMonster;
 	void removeList() {listMonster.removeList(getID());}
 	void addList() {listMonster.addList(this);}
 	
-	virtual int getArmor() const;
-	virtual int getDefense() const;
-	
-	virtual void setMaster(Creature* creature);
-	bool isSummon() {return (getMaster() != NULL);}
-	virtual void onAttack();
-	bool canPushItems() const {return mType->canPushItems;};
-	
-	virtual void setNormalCreatureLight();
+	virtual const std::string& getName() const {return mType->name;}
+	virtual std::string getDescription(int32_t lookDistance) const;
 
-	static unsigned long getRandom();
+	virtual int getArmor() const {return mType->armor;}
+	virtual int getDefense() const {return mType->defense;}
+	virtual int getLostExperience() {return (getMaster() ? 0 : mType->experience);}
+	virtual bool isPushable() const {return mType->pushable;}
+
+	virtual void setNormalCreatureLight();
+	virtual void dropLoot(Container *corpse);
 
 	virtual void onAddTileItem(const Position& pos, const Item* item);
 	virtual void onUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* oldItem, const Item* newItem);
@@ -85,65 +82,22 @@ public:
 	virtual void onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout);
 	virtual void onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport);
 
+	virtual int onThink(int& newThinkTicks);
+
+	bool canPushItems() const {return mType->canPushItems;};
+
 private:
-	std::list<Position> route;
-	monsterstate_t state;
-	bool updateMovePos;
-	int oldThinkTicks;
-	Position targetPos;
-	Position moveToPos;
-	bool hasLostMaster;
-	MonsterType *mType;
-	
-	void doMoveTo(int dx, int dy);
-	
-	int getCurrentDistanceToTarget(const Position &target);
-	int getTargetDistance();
-	void setUpdateMovePos();
-	bool calcMovePosition();
-	void updateLookDirection();
-	
-	bool getRandomPosition(const Position &target, Position &dest);
-	bool getDistancePosition(const Position &target, const int& maxTryDist, bool fullPathSearch, Position &dest);
-	bool getCloseCombatPosition(const Position &target, Position &dest);
-	bool canMoveTo(unsigned short x, unsigned short y, unsigned char z);
-	bool isInRange(const Position &pos);
-	bool isCreatureReachable(const  Creature* creature);
-	Creature* findTarget(long range, bool &canReach, const Creature *ignoreCreature = NULL);
-	void stopAttack();
+	//int oldThinkTicks;
+	std::string strDescription;
+
+	typedef std::list<Creature*> TargetList;
+	Creature* targetCreature;
+	TargetList targetList;
+	MonsterType* mType;
+
 	void startThink();
 	void stopThink();
-	void reThink(bool updateOnlyState = true);
-	
-	void selectTarget(const Creature* creature, bool canReach /* = true*/);
-
-protected:
-	PhysicalAttackClass	*curPhysicalAttack;
-		
-	bool doAttacks(Creature* attackedCreature, monstermode_t mode = MODE_NORMAL);
-		
-	virtual fight_t getFightType() {return curPhysicalAttack->fighttype;};
-	virtual subfight_t getSubFightType()  {return curPhysicalAttack->disttype;}
-	virtual int getWeaponDamage() const;
-	
-	void creatureEnter(const Creature *creature, bool canReach = true);
-	void creatureLeave(const Creature *creature);
-	void creatureMove(const Creature *creature, const Position& oldPos);
-	
-	bool validateDistanceAttack(const Creature *creature);
-	bool validateDistanceAttack(const Position &pos);
-	bool monsterMoveItem(Item* item, int radius);
-	bool isCreatureAttackable(const Creature* creature);
-	
-	virtual int getLostExperience();
-	virtual void dropLoot(Container *corpse);
-
-	virtual bool isAttackable() const { return true; };
-	
-	virtual int onThink(int& newThinkTicks);
-	virtual void setAttackedCreature(const Creature* creature);
-	
-	virtual std::string getDescription(int32_t lookDistance) const;
+	int getTargetDistance() {return mType->targetDistance;}
 };
 
 #endif

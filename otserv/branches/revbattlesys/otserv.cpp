@@ -39,7 +39,6 @@
 #include "ioplayer.h"
 
 #include "status.h"
-#include "spells.h"
 #include "monsters.h"
 #include "actions.h"
 #include "commands.h"
@@ -90,8 +89,8 @@ LuaScript g_config;
 
 Items Item::items;
 ReverseItemMap Items::revItems;
+
 Game g_game;
-Spells spells(&g_game);
 Actions actions(&g_game);
 Commands commands(&g_game);
 Monsters g_monsters;
@@ -278,13 +277,13 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 						
 						connectResult_t connectRes = CONNECT_INTERNALERROR;
 						
-						if(g_bans.isPlayerBanished(name) && player->access == 0){
+						if(g_bans.isPlayerBanished(name) && player->getAccessLevel() == 0){
 							msg.Reset();
 							msg.AddByte(0x14);
 							msg.AddString("Your character is banished!");
 							msg.WriteToSocket(s);
 						}
-						else if(g_bans.isAccountBanished(accnumber) && player->access == 0){
+						else if(g_bans.isAccountBanished(accnumber) && player->getAccessLevel() == 0){
 							msg.Reset();
 							msg.AddByte(0x14);
 							msg.AddString("Your account is banished!");
@@ -302,7 +301,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 						else if(g_game.getGameState() == GAME_STATE_SHUTDOWN){
 							//nothing to do
 						}
-						else if(g_game.getGameState() == GAME_STATE_CLOSED && player->access == 0){
+						else if(g_game.getGameState() == GAME_STATE_CLOSED && player->getAccessLevel() == 0){
 							msg.Reset();
 							msg.AddByte(0x14);
 							msg.AddString("Server temporarly closed.");
@@ -497,6 +496,8 @@ int main(int argc, char *argv[])
 	
 	//load spells data
 	std::stringstream filename;
+
+	/*
 	filename.str("");
 	filename << g_config.getGlobalString("datadir") << "spells/spells.xml";
 	std::cout << ":: Loading " << filename.str() << "... ";
@@ -507,6 +508,7 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 	std::cout << "[done]" << std::endl;
+	*/
 	
 	//load actions data
 	filename.str("");

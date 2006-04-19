@@ -58,7 +58,7 @@ Protocol76::Protocol76(SOCKET s)
 	OTSYS_THREAD_LOCKVARINIT(bufferLock);
 	windowTextID = 0;
 	readItem = NULL;
-	maxTextLenght = 0;
+	maxTextLength = 0;
 	this->s = s;
 }
 
@@ -72,7 +72,7 @@ void Protocol76::reinitializeProtocol()
 {
 	windowTextID = 0;
 	readItem = NULL;
-	maxTextLenght = 0;
+	maxTextLength = 0;
 	OutputBuffer.Reset();
 	knownPlayers.clear();
 }
@@ -81,7 +81,7 @@ connectResult_t Protocol76::ConnectPlayer()
 {	
 	Waitlist* wait = Waitlist::instance();
 
-	if(player->access == 0 && !wait->clientLogin(player->getAccount(), player->getIP())){	
+	if(player->getAccessLevel() == 0 && !wait->clientLogin(player->getAccount(), player->getIP())){	
 		return CONNECT_TOMANYPLAYERS;
 	}
 	else{
@@ -90,7 +90,7 @@ connectResult_t Protocol76::ConnectPlayer()
 			return CONNECT_SUCCESS;
 		}
 		//temple
-		else if(game->placeCreature(player->masterPos, player, true)){
+		else if(game->placeCreature(player->getTemplePosition(), player, true)){
 			return CONNECT_SUCCESS;
 		}
 		else
@@ -116,7 +116,8 @@ void Protocol76::ReceiveLoop()
 		// logout by disconnect?  -> kick
 		if(pendingLogout == false){
 			game->playerSetAttackedCreature(player, 0);
-			while(player->inFightTicks >= 1000 && !player->isRemoved() && s == 0){
+			
+			while(player->hasCondition(CONDITION_INFIGHT) && !player->isRemoved() && s == 0){
 				OTSYS_SLEEP(250);
 			}
 
@@ -555,7 +556,7 @@ void Protocol76::logout()
 // Parse methods
 void Protocol76::parseLogout(NetworkMessage& msg)
 {
-	if(player->inFightTicks >=1000 && !player->isRemoved()){
+	if(player->hasCondition(CONDITION_INFIGHT) && !player->isRemoved()){
 		player->sendCancelMessage(RET_YOUMAYNOTLOGOUTDURINGAFIGHT);
 		return;
 	}
@@ -767,11 +768,8 @@ void Protocol76::parseRequestOutfit(NetworkMessage& msg)
 	msg.Reset();
 	
 	msg.AddByte(0xC8);
-	msg.AddByte(player->looktype);
-	msg.AddByte(player->lookhead);
-	msg.AddByte(player->lookbody);
-	msg.AddByte(player->looklegs);
-	msg.AddByte(player->lookfeet);
+	AddCreatureOutfit(msg, player);
+
 	switch (player->getSex()) {
 	case PLAYERSEX_FEMALE:
 		msg.AddByte(PLAYER_FEMALE_1);
@@ -795,18 +793,16 @@ void Protocol76::parseRequestOutfit(NetworkMessage& msg)
 
 void Protocol76::parseSetOutfit(NetworkMessage& msg)
 {
-	int temp = msg.GetByte();
-	if ( (player->getSex() == PLAYERSEX_FEMALE && temp >= PLAYER_FEMALE_1 && temp <= PLAYER_FEMALE_7) ||
-		(player->getSex() == PLAYERSEX_MALE && temp >= PLAYER_MALE_1 && temp <= PLAYER_MALE_7))
+	uint8_t lookType = msg.GetByte();
+	if ( (player->getSex() == PLAYERSEX_FEMALE && lookType >= PLAYER_FEMALE_1 && lookType <= PLAYER_FEMALE_7) ||
+		(player->getSex() == PLAYERSEX_MALE && lookType >= PLAYER_MALE_1 && lookType <= PLAYER_MALE_7))
 	{
-		player->looktype = temp;
-		player->lookmaster = player->looktype;
-		player->lookhead = msg.GetByte();
-		player->lookbody = msg.GetByte();
-		player->looklegs = msg.GetByte();
-		player->lookfeet = msg.GetByte();
-		
-		game->playerChangeOutfit(player);
+		uint8_t lookHead = msg.GetByte();
+		uint8_t lookBody = msg.GetByte();
+		uint8_t lookLegs = msg.GetByte();
+		uint8_t lookFeet = msg.GetByte();
+	
+		game->playerChangeOutfit(player, lookType, lookHead, lookBody, lookLegs, lookFeet); 
 	}
 }
 
@@ -1000,7 +996,7 @@ void Protocol76::parseTextWindow(NetworkMessage& msg)
 {
 	unsigned long id = msg.GetU32();
 	std::string new_text = msg.GetString();
-	if(new_text.length() > maxTextLenght)
+	if(new_text.length() > maxTextLength)
 		return;
 	
 	if(readItem && windowTextID == id){
@@ -1092,15 +1088,11 @@ void Protocol76::sendOpenPriv(const std::string& receiver)
 void Protocol76::sendSetOutfit(const Creature* creature)
 {
 	if(CanSee(creature)){
-		NetworkMessage newmsg;
-		newmsg.AddByte(0x8E);
-		newmsg.AddU32(creature->getID());
-		newmsg.AddByte(creature->looktype);
-		newmsg.AddByte(creature->lookhead);
-		newmsg.AddByte(creature->lookbody);
-		newmsg.AddByte(creature->looklegs);
-		newmsg.AddByte(creature->lookfeet);
-		WriteBuffer(newmsg);
+		NetworkMessage msg;
+		msg.AddByte(0x8E);
+		msg.AddU32(creature->getID());
+		AddCreatureOutfit(msg, creature);
+		WriteBuffer(msg);
 	}
 }
 
@@ -1698,13 +1690,13 @@ void Protocol76::sendTextWindow(Item* item,const unsigned short maxlen, const bo
 		msg.AddString(item->getText());		
 		item->useThing2();
 		readItem = item;
-		maxTextLenght = maxlen;
+		maxTextLength = maxlen;
 	}
 	else{		
 		msg.AddU16(item->getText().size());
 		msg.AddString(item->getText());									
 		readItem = NULL;
-		maxTextLenght = 0;
+		maxTextLength = 0;
 	}
 	msg.AddString("unknown");
 	WriteBuffer(msg);
@@ -1807,15 +1799,11 @@ void Protocol76::AddCreature(NetworkMessage &msg,const Creature *creature, bool 
 		msg.AddString(creature->getName());
 	}
 	
-	msg.AddByte(std::max(1, creature->health*100/std::max(creature->healthmax,1)));
+	msg.AddByte(std::max((int32_t)1, creature->getHealth() * 100 / std::max(creature->getMaxHealth(), (int32_t)1) ));
 	
 	msg.AddByte((unsigned char)creature->getDirection());
 	
-	msg.AddByte(creature->looktype);
-	msg.AddByte(creature->lookhead);
-	msg.AddByte(creature->lookbody);
-	msg.AddByte(creature->looklegs);
-	msg.AddByte(creature->lookfeet);
+	AddCreatureOutfit(msg, creature);
 	
 	LightInfo lightInfo;
 	creature->getCreatureLight(lightInfo);
@@ -1838,7 +1826,7 @@ void Protocol76::AddCreature(NetworkMessage &msg,const Creature *creature, bool 
 }
 
 
-void Protocol76::AddPlayerStats(NetworkMessage &msg)
+void Protocol76::AddPlayerStats(NetworkMessage& msg)
 {
 	msg.AddByte(0xA0);
 	msg.AddU16(player->getHealth());
@@ -1874,7 +1862,7 @@ void Protocol76::AddPlayerSkills(NetworkMessage& msg)
 	msg.AddByte(player->getSkill(SKILL_FISH,   SKILL_PERCENT));
 }
 
-void Protocol76::AddCreatureSpeak(NetworkMessage &msg,const Creature *creature, SpeakClasses  type, std::string text, unsigned short channelId)
+void Protocol76::AddCreatureSpeak(NetworkMessage& msg,const Creature* creature, SpeakClasses  type, std::string text, unsigned short channelId)
 {
 	msg.AddByte(0xAA);
 	msg.AddString(creature->getName());
@@ -1896,21 +1884,38 @@ void Protocol76::AddCreatureSpeak(NetworkMessage &msg,const Creature *creature, 
 	msg.AddString(text);
 }
 
-void Protocol76::AddCreatureHealth(NetworkMessage &msg,const Creature *creature)
+void Protocol76::AddCreatureHealth(NetworkMessage& msg,const Creature* creature)
 {
 	msg.AddByte(0x8C);
 	msg.AddU32(creature->getID());
-	msg.AddByte(std::max(1, creature->health*100/std::max(creature->healthmax,1)));
+	msg.AddByte(std::max((int32_t)1, creature->getHealth() * 100 / std::max(creature->getMaxHealth(), (int32_t)1) ));
 }
 
-void Protocol76::AddWorldLight(NetworkMessage &msg, const LightInfo& lightInfo)
+void Protocol76::AddCreatureOutfit(NetworkMessage &msg, const Creature* creature)
+{
+	uint8_t lookType = 0;
+	uint8_t lookHead = 0;
+	uint8_t lookBody = 0;
+	uint8_t lookLegs = 0;
+	uint8_t lookFeet = 0;
+
+	creature->getOutfit(lookType, lookHead, lookBody, lookLegs, lookFeet);
+
+	msg.AddByte(lookType);
+	msg.AddByte(lookHead);
+	msg.AddByte(lookBody);
+	msg.AddByte(lookLegs);
+	msg.AddByte(lookFeet);
+}
+
+void Protocol76::AddWorldLight(NetworkMessage& msg, const LightInfo& lightInfo)
 {
 	msg.AddByte(0x82);
 	msg.AddByte(lightInfo.level);
 	msg.AddByte(lightInfo.color);
 }
 
-void Protocol76::AddCreatureLight(NetworkMessage &msg, const Creature* creature)
+void Protocol76::AddCreatureLight(NetworkMessage& msg, const Creature* creature)
 {
 	LightInfo lightInfo;
 	creature->getCreatureLight(lightInfo);

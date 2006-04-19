@@ -22,13 +22,15 @@
 #ifndef __OTSERV_CREATURE_H__
 #define __OTSERV_CREATURE_H__
 
-#include <vector>
+#include "definitions.h"
 
 #include "templates.h"
 #include "thing.h"
+#include "item.h"
 #include "position.h"
-#include "container.h"
-#include "magic.h"
+#include "condition.h"
+#include "const76.h"
+#include "enums.h"
 
 enum slots_t {
 	SLOT_WHEREEVER = 0,
@@ -53,13 +55,6 @@ enum fight_t {
 	FIGHT_MAGICDIST
 };
 
-// Macros
-#define CREATURE_SET_OUTFIT(c, type, head, body, legs, feet) c->looktype = type; \
-	c->lookhead = head; \
-	c->lookbody = body; \
-	c->looklegs = legs; \
-c->lookfeet = feet;
-
 enum playerLooks
 {
 	PLAYER_MALE_1=0x80,
@@ -78,15 +73,14 @@ enum playerLooks
 	PLAYER_FEMALE_7=0x8E,
 };
 
-
 class Map;
-
 class Thing;
-class Item;
+class Container;
 class Player;
 class Monster;
 class Npc;
 
+/*
 class Conditions : public std::map<attacktype_t, ConditionVec>
 {
 public:
@@ -100,6 +94,7 @@ public:
 		return false;
 	}
 };
+*/
 
 //////////////////////////////////////////////////////////////////////
 // Defines the Base class for all creatures and base functions which 
@@ -133,12 +128,85 @@ public:
 	virtual void removeList() = 0;
 	virtual void addList() = 0;
 
-	unsigned long getExpForLv(const int& lv) const { 
+	unsigned long getExpForLv(const int& lv) const
+	{ 
 		return (int)((50*lv*lv*lv)/3 - 100 * lv * lv + (850*lv) / 3 - 200);
 	}
-	Direction getDirection() const { return direction; }
-	void setDirection(Direction dir) { direction = dir; }
+
+	Direction getDirection() const { return direction;}
+	void setDirection(Direction dir) { direction = dir;}
+
+	const Position& getMasterPos() const { return masterPos;}
+	void setMasterPos(const Position& pos) { masterPos = pos;}
+
+	virtual void drainHealth(Creature* attacker, DamageType_t damageType, int32_t damage);
+	virtual void drainMana(Creature* attacker, int32_t manaLoss);
+	virtual void useMana(int32_t manaLoss);
+
+	virtual void die(){};
+
+	virtual std::string getDescription(int32_t lookDistance) const;
 	
+	virtual void setMaster(Creature* creature);
+	virtual Creature* getMaster() {return master;}
+	
+	virtual void addSummon(Creature *creature);
+	virtual void removeSummon(Creature *creature);
+	
+	int32_t getHealth() const {return health;}
+	int32_t getMaxHealth() const {return healthMax;}
+	int32_t getMana() const {return mana;}
+
+	virtual int getArmor() const {return 0;}
+	virtual int getDefense() const {return 0;}
+	
+	virtual bool isAttackable() const { return true;};
+	virtual void dropLoot(Container *corpse) {return;};
+	virtual int getLookCorpse() {return lookCorpse;};
+
+	void getOutfit(uint8_t& _lookType, uint8_t& _lookHead,
+		uint8_t& _lookBody, uint8_t& _lookLegs, uint8_t& _lookFeet) const;
+		
+	__int64 getSleepTicks() const;
+	__int64 getEventStepTicks() const;
+	int getStepDuration() const;
+	
+	unsigned short getSpeed() const {return speed;};
+	
+	void setNormalSpeed()
+	{
+		/*
+		if(access != 0){
+			speed = 900;
+		}
+		else*/
+			speed = 220 + (2* (level - 1));
+	}
+	
+	int getNormalSpeed()
+	{
+		/*
+		if(access != 0){
+			return 900;
+		}
+		*/
+
+		return 220 + (2* (level - 1));
+	}
+	
+	bool addCondition(Condition* condition);
+	void removeCondition(ConditionType_t type);
+	void executeConditions(int32_t newticks);
+	Condition* getCondition(ConditionType_t type);
+	bool hasCondition(ConditionType_t type) const;
+
+	//combat functions
+	virtual bool isImmune(DamageType_t type);
+
+	Creature* getAttackedCreature();
+	virtual void setAttackedCreature(Creature* creature);
+
+	/*
 	virtual fight_t getFightType(){return FIGHT_MELEE;};
 	virtual subfight_t getSubFightType() {return DIST_NONE;}
 
@@ -150,57 +218,16 @@ public:
 		else
 			return immunities;
 	};
-
-	virtual void drainHealth(int);
-	virtual void drainMana(int);
-	virtual void die(){};
-
-	virtual std::string getDescription(int32_t lookDistance) const;
-	Creature* getAttackedCreature();
-	virtual void setAttackedCreature(const Creature* creature);
-	
-	virtual void setMaster(Creature* creature);
-	virtual Creature* getMaster() {return master;}
-	
-	virtual void addSummon(Creature *creature);
-	virtual void removeSummon(Creature *creature);
-	
-	virtual int getWeaponDamage() const {return 1+(int)(10.0*rand()/(RAND_MAX+1.0));}
-	virtual int getArmor() const {return 0;}
-	virtual int getDefense() const {return 0;}
-	
-	virtual bool isAttackable() const { return true;};
-	virtual void dropLoot(Container *corpse) {return;};
-	virtual int getLookCorpse() {return lookcorpse;};
-
-	virtual Direction getDirection(){return direction;}
+	*/
+	/*
 	void addCondition(const CreatureCondition& condition, bool refresh);
 	Conditions& getConditions() {return conditions;};
-	
-	__int64 getSleepTicks() const;
-	__int64 getEventStepTicks() const;
-	int getStepDuration() const;
-	
-	unsigned short getSpeed() const {return speed;};
-	
-	void setNormalSpeed()
-	{
-		if(access != 0){
-			speed = 900;
-		}
-		else
-			speed = 220 + (2* (level - 1));
-	}
-	
-	int getNormalSpeed()
-	{
-		if(access != 0){
-			return 900;
-		}
+	*/
 
-		return 220 + (2* (level - 1));
-	}
-	
+	//virtual int getWeaponDamage() const {return 1+(int)(10.0*rand()/(RAND_MAX+1.0));}
+	//Creature* getAttackedCreature();
+
+	/*
 	virtual void addInflictedDamage(Creature* attacker, int damage);
 	virtual int getGainedExperience(Creature* attacker);
 	virtual std::vector<long> getInflicatedDamageCreatureList();
@@ -208,6 +235,7 @@ public:
 	virtual int getInflicatedDamage(Creature* attacker);
 	virtual int getTotalInflictedDamage();
 	virtual int getInflicatedDamage(unsigned long id);
+	*/
 	
 	virtual void getCreatureLight(LightInfo& light) const;
 	virtual void setNormalCreatureLight();
@@ -224,30 +252,30 @@ public:
 	virtual void onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout) {};
 	virtual void onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport) {};
 
-	virtual void onCreatureTurn(const Creature *creature, uint32_t stackPos) { };
-	virtual void onCreatureSay(const Creature *creature, SpeakClasses type, const std::string &text) { };
+	virtual void onCreatureTurn(const Creature* creature, uint32_t stackPos) { };
+	virtual void onCreatureSay(const Creature* creature, SpeakClasses type, const std::string &text) { };
 	
 	virtual void onCreatureChangeOutfit(const Creature* creature) { };
 
-	int health, healthmax;
-	int mana, manamax, manaspent;
-	int access;		//access level
-	int maglevel;	// magic level
-	int level;		// level
-	long inFightTicks, exhaustedTicks;
-	bool pzLocked;
+protected:	
+	
+	int32_t health, healthMax;
+	int32_t mana, manaMax;
+	int32_t level;
+	int32_t magLevel;
 
-	unsigned long attackedCreature2;
-	//Creature* attackedCreature;
+	Creature* attackedCreature;
+	//uint32_t exhaustedTicks;
+	//bool pzLocked;
 
-	int lookhead, lookbody, looklegs, lookfeet, looktype, lookcorpse, lookmaster;
-	long manaShieldTicks, hasteTicks, paralyzeTicks;
+	//unsigned long attackedCreature;
+
+	int lookType, lookHead, lookBody, lookLegs, lookFeet, lookCorpse, lookMaster;
+	//long manaShieldTicks, hasteTicks, paralyzeTicks, inFightTicks;
 	Position masterPos;
 	uint64_t lastmove;
 
-protected:	
-	
-	int immunities;
+	int32_t immunities;
 	int speed;
 
 	Direction direction;
@@ -258,10 +286,15 @@ protected:
 	Creature* master;
 	std::list<Creature*> summons;
 	
+	typedef std::list<Condition*> ConditionList;
+	ConditionList conditions;
+
+	/*
 	Conditions conditions;
 	typedef std::vector< std::pair<uint64_t, long> > DamageList;
 	typedef std::map<long, DamageList > TotalDamageList;
 	TotalDamageList totaldamagelist;
+	*/
 	
 	LightInfo internalLight;
 

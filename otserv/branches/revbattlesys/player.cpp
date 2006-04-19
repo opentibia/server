@@ -62,12 +62,12 @@ Creature()
 	}
 
 	name       = _name;
-	looktype   = PLAYER_MALE_1;
+	lookType   = PLAYER_MALE_1;
 	vocation   = VOCATION_NONE;
 	capacity   = 300.00;
 	mana       = 0;
-	manamax    = 0;
-	manaspent  = 0;
+	manaMax    = 0;
+	manaSpent  = 0;
 	food       = 0;
 	guildId    = 0;
 
@@ -76,13 +76,15 @@ Creature()
 
 	level      = 1;
 	experience = 180;
-	maglevel   = 20;
-	access     = 0;
+	magLevel   = 20;
+	accessLevel = 0;
 	lastlogin  = 0;
 	lastLoginSaved = 0;
 	SendBuffer = false;
 	npings = 0;
 	internal_ping = 0;
+	internalAddSkillTry = false;
+	exhaustedTicks = 0;
 
 	chaseMode = CHASEMODE_STANDSTILL;
 	//fightMode = FIGHTMODE_NONE;
@@ -104,14 +106,14 @@ Creature()
 	}
 
 	lastSentStats.health = 0;
-	lastSentStats.healthmax = 0;
+	lastSentStats.healthMax = 0;
 	lastSentStats.freeCapacity = 0;
 	lastSentStats.experience = 0;
 	lastSentStats.level = 0;
 	lastSentStats.mana = 0;
-	lastSentStats.manamax = 0;
-	lastSentStats.manaspent = 0;
-	lastSentStats.maglevel = 0;
+	lastSentStats.manaMax = 0;
+	lastSentStats.manaSpent = 0;
+	lastSentStats.magLevel = 0;
 	level_percent = 0;
 	maglevel_percent = 0;
 
@@ -179,7 +181,7 @@ Player::~Player()
 
 bool Player::isPushable() const
 {
-	return ((getSleepTicks() <= 0) && access == 0);
+	return ((getSleepTicks() <= 0) && getAccessLevel() == 0);
 }
 
 std::string Player::getDescription(int32_t lookDistance) const
@@ -249,64 +251,81 @@ Item* Player::getInventoryItem(slots_t slot) const
 int Player::getWeaponDamage() const
 {
 	double damagemax = 0;
-	//TODO:what happens with 2 weapons?
-  for (int slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++)
-	  if (items[slot]){
-			if ((items[slot]->isWeapon())){
+  for(int slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++)
+		if(Item* item = items[slot]){
+			if(item->isWeapon()){
 				// check which kind of skill we use...
 				// and calculate the damage dealt
-				Item* distitem = NULL;
-				switch (items[slot]->getWeaponType()){
+				switch(item->getWeaponType()){
 					case SWORD:
-						//damagemax = 3*skills[SKILL_SWORD][SKILL_LEVEL] + 2*Item::items[items[slot]->getID()].attack;
-						damagemax = skills[SKILL_SWORD][SKILL_LEVEL]*Item::items[items[slot]->getID()].attack/20 + Item::items[items[slot]->getID()].attack;
+					{
+						damagemax = skills[SKILL_SWORD][SKILL_LEVEL] * Item::items[item->getID()].attack / 20 +
+							Item::items[item->getID()].attack;
 						break;
+					}
+
 					case CLUB:
-						//damagemax = 3*skills[SKILL_CLUB][SKILL_LEVEL] + 2*Item::items[items[slot]->getID()].attack;
-						damagemax = skills[SKILL_CLUB][SKILL_LEVEL]*Item::items[items[slot]->getID()].attack/20 + Item::items[items[slot]->getID()].attack;
+					{
+						damagemax = skills[SKILL_CLUB][SKILL_LEVEL]*Item::items[item->getID()].attack / 20 +
+							Item::items[item->getID()].attack;
 						break;
+					}
+
 					case AXE:
-						//damagemax = 3*skills[SKILL_AXE][SKILL_LEVEL] + 2*Item::items[items[slot]->getID()].attack;
-						damagemax = skills[SKILL_AXE][SKILL_LEVEL]*Item::items[items[slot]->getID()].attack/20 + Item::items[items[slot]->getID()].attack; 
+					{
+						damagemax = skills[SKILL_AXE][SKILL_LEVEL]*Item::items[item->getID()].attack / 20 +
+							Item::items[item->getID()].attack; 
 						break;
+					}
+
 					case DIST:
-						distitem = GetDistWeapon();
-						if(distitem){
-							//damagemax = 3*skills[SKILL_DIST][SKILL_LEVEL]+ 2*Item::items[distitem->getID()].attack;
-							damagemax = skills[SKILL_DIST][SKILL_LEVEL]*Item::items[distitem->getID()].attack/20 + Item::items[distitem->getID()].attack; 
+					{
+						Item* distItem = GetDistWeapon();
+						if(distItem){
+							damagemax = skills[SKILL_DIST][SKILL_LEVEL] * Item::items[distItem->getID()].attack / 20 +
+								Item::items[distItem->getID()].attack;
+
 							//hit or miss
-							int hitchance;
-							if(distitem->getWeaponType() == AMO){//projectile
-								hitchance = 90;
+							int hitChance;
+							if(distItem->getWeaponType() == AMO){
+								hitChance = 90;
 							}
 							else{//thrown weapons
-								hitchance = 50;
+								hitChance = 50;
 							}
-							if(rand()%100 < hitchance){ //hit
-								return 1+(int)(damagemax*rand()/(RAND_MAX+1.0));
+
+							if(rand()%100 < hitChance){ //hit
+								return 1 + (int)(damagemax * rand()/(RAND_MAX+1.0));
 							}
 							else{	//miss
 								return 0;
 							}
 						}
 						break;
-					case MAGIC:
-						damagemax = (level*2+maglevel*3) * 1.25;
-						break;
+					}
+
+					/*case MAGIC:
+						damagemax = (level * 2 + magLevel * 3) * 1.25;
+						break;*/
+
 					case AMO:
 					case NONE:
 					case SHIELD:
+					{
 						// nothing to do
 						break;
+					}
 			  }
 		  }
-		  if(damagemax != 0)
+
+			if(damagemax != 0)
 		  	break;
     }
 
 	// no weapon found -> fist fighting
-	if (damagemax == 0)
+	if(damagemax == 0){
 		damagemax = 2*skills[SKILL_FIST][SKILL_LEVEL] + 5;
+	}
 
 	// return it
 	return 1+(int)(damagemax*rand()/(RAND_MAX+1.0));
@@ -362,26 +381,43 @@ int Player::getDefense() const
 void Player::sendIcons()
 {
 	int icons = 0;
+
+	/*
 	if(inFightTicks >= 6000 || inFightTicks ==4000 || inFightTicks == 2000){
 		icons |= ICON_SWORDS;
 	}
-	if(manaShieldTicks >= 1000){
+	*/
+
+	if(hasCondition(CONDITION_INFIGHT)){
+		icons |= ICON_SWORDS;
+	}
+
+	if(hasCondition(CONDITION_MANASHIELD)){
 		icons |= ICON_MANASHIELD;
 	}
-	if(speed > getNormalSpeed()){
+
+	if(hasCondition(CONDITION_HASTE)){
 		icons |= ICON_HASTE;
 	}
-	if(conditions.hasCondition(ATTACK_FIRE) /*burningTicks >= 1000*/){
-		icons |= ICON_BURN | ICON_SWORDS;
+
+	if(hasCondition(CONDITION_PARALYZE)){
+		icons |= ICON_PARALYZE;
 	}
-	if(conditions.hasCondition(ATTACK_ENERGY) /*energizedTicks >= 1000*/){
-		icons |= ICON_ENERGY | ICON_SWORDS;
+
+	if(hasCondition(CONDITION_FIRE)){
+		icons |= ICON_BURN;
 	}
-	if(conditions.hasCondition(ATTACK_POISON)/*poisonedTicks >= 1000*/){
-		icons |= ICON_POISON | ICON_SWORDS;
+
+	if(hasCondition(CONDITION_ENERGY)){
+		icons |= ICON_ENERGY;
 	}
-	if(conditions.hasCondition(ATTACK_PARALYZE) /*speed < getNormalSpeed()*/ /*paralyzeTicks >= 1000*/) {
-		icons |= ICON_PARALYZE | ICON_SWORDS;
+
+	if(hasCondition(CONDITION_POISON)){
+		icons |= ICON_POISON;
+	}
+
+	if(hasCondition(CONDITION_DRUNK)){
+		icons |= ICON_DRUNK;
 	}
 
 	client->sendIcons(icons);             
@@ -391,7 +427,7 @@ void Player::updateInventoryWeigth()
 {
 	inventoryWeight = 0.00;
 	
-	if(access == 0){
+	if(getAccessLevel() == 0){
 		for(int i = SLOT_FIRST; i < SLOT_LAST; ++i){
 			Item* item = getInventoryItem((slots_t)i);
 			if(item){
@@ -401,7 +437,7 @@ void Player::updateInventoryWeigth()
 	}
 }
 
-unsigned int Player::getReqSkillTries(int skill, int level, playervoc_t voc)
+unsigned int Player::getReqSkillTries(int skill, int level, Vocation_t voc)
 {
 	//first find on cache
 	for(int i=0;i<2;i++){
@@ -499,12 +535,12 @@ int Player::getPlayerInfo(playerinfo_t playerinfo) const
 	switch(playerinfo) {
 		case PLAYERINFO_LEVEL: return level; break;
 		case PLAYERINFO_LEVELPERCENT: return level_percent; break;
-		case PLAYERINFO_MAGICLEVEL: return maglevel; break;
+		case PLAYERINFO_MAGICLEVEL: return magLevel; break;
 		case PLAYERINFO_MAGICLEVELPERCENT: return maglevel_percent; break;
 		case PLAYERINFO_HEALTH: return health; break;
-		case PLAYERINFO_MAXHEALTH: return healthmax; break;
+		case PLAYERINFO_MAXHEALTH: return healthMax; break;
 		case PLAYERINFO_MANA: return mana; break;
-		case PLAYERINFO_MAXMANA: return manamax; break;
+		case PLAYERINFO_MAXMANA: return manaMax; break;
 		case PLAYERINFO_MANAPERCENT: return maglevel_percent; break;
 		case PLAYERINFO_SOUL: return 100; break;
 		default:
@@ -583,13 +619,13 @@ void Player::addSkillTryInternal(int skilltry,int skill)
 }
 
 
-unsigned int Player::getReqMana(int maglevel, playervoc_t voc)
+unsigned int Player::getReqMana(int magLevel, Vocation_t voc)
 {
   //ATTENTION: MAKE SURE THAT CHARS HAVE REASONABLE MAGIC LEVELS. ESPECIALY KNIGHTS!!!!!!!!!!!
   float ManaMultiplier[5] = { 1.0f, 1.1f, 1.1f, 1.4f, 3};
 
 	//will calculate required mana for a magic level
-  unsigned int reqMana = (unsigned int) ( 400 * pow(ManaMultiplier[(int)voc], maglevel-1) );
+  unsigned int reqMana = (unsigned int) ( 400 * pow(ManaMultiplier[(int)voc], magLevel-1) );
 
 	if (reqMana % 20 < 10) //CIP must have been bored when they invented this odd rounding
     reqMana = reqMana - (reqMana % 20);
@@ -681,6 +717,7 @@ void Player::dropLoot(Container *corpse)
 	}
 }
 
+/*
 fight_t Player::getFightType()
 {
   for(int slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++){
@@ -739,6 +776,7 @@ subfight_t Player::getSubFightType()
 
 	return DIST_NONE;
 }
+*/
 
 Item* Player::GetDistWeapon() const
 {
@@ -747,6 +785,7 @@ Item* Player::GetDistWeapon() const
 				if((items[slot]->isWeapon())) {
 					switch (items[slot]->getWeaponType()){
 					case DIST:
+					{
 						//find ammunition
 						if(items[slot]->getAmuType() == AMU_NONE){
 							return items[slot];
@@ -758,19 +797,16 @@ Item* Player::GetDistWeapon() const
 								items[slot]->getAmuType() == items[SLOT_AMMO]->getAmuType()){
 									return items[SLOT_AMMO];
 							}
-							else{
-								return NULL;
-							}
-							
-						}
-						else{
+
 							return NULL;
 						}
 
-					break;
+						break;
+					}
 
 					case MAGIC:
 						return items[slot];
+
 					default:
 						break;
 					}
@@ -971,7 +1007,7 @@ void Player::sendCancel(const char* msg) const
   client->sendCancel(msg);
 }
 
-void Player::sendChangeSpeed(Creature* creature)
+void Player::sendChangeSpeed(const Creature* creature)
 {
 	client->sendChangeSpeed(creature);
 }
@@ -994,23 +1030,23 @@ void Player::sendCancelWalk() const
 
 void Player::sendStats()
 {
-	//update level and maglevel percents
-	if(lastSentStats.experience != this->experience || lastSentStats.level != this->level)
+	//update level and magLevel percents
+	if(lastSentStats.experience != getExperience() || lastSentStats.level != level)
 		level_percent  = (unsigned char)(100*(experience-getExpForLv(level))/(1.*getExpForLv(level+1)-getExpForLv(level)));
 			
-	if(lastSentStats.manaspent != this->manaspent || lastSentStats.maglevel != this->maglevel)
-		maglevel_percent  = (unsigned char)(100*(manaspent/(1.*getReqMana(maglevel+1,vocation))));
+	if(lastSentStats.manaSpent != this->manaSpent || lastSentStats.magLevel != magLevel)
+		maglevel_percent  = (unsigned char)(100*(manaSpent/(1.*getReqMana(magLevel+1,vocation))));
 			
 	//save current stats 
 	lastSentStats.health = this->health;
-	lastSentStats.healthmax = this->healthmax;
+	lastSentStats.healthMax = this->healthMax;
 	lastSentStats.freeCapacity = this->getFreeCapacity();
 	lastSentStats.experience = this->experience;
 	lastSentStats.level = this->level;
 	lastSentStats.mana = this->mana;
-	lastSentStats.manamax = this->manamax;
-	lastSentStats.manaspent = this->manaspent;
-	lastSentStats.maglevel = this->maglevel;
+	lastSentStats.manaMax = this->manaMax;
+	lastSentStats.manaSpent = this->manaSpent;
+	lastSentStats.magLevel = this->magLevel;
 	
 	client->sendStats();
 }
@@ -1051,7 +1087,7 @@ void Player::sendPing()
 	}
 	if(npings >= 6){
 		//std::cout << "logout" << std::endl;
-		if(inFightTicks >=1000 && health >0) {
+		if(hasCondition(CONDITION_INFIGHT) && health > 0){
 			//logout?
 			//client->logout();
 		}
@@ -1254,6 +1290,7 @@ void Player::onCreatureAppear(const Creature* creature, bool isLogin)
 
 void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout)
 {
+	/*
 	if(attackedCreature2 == creature->getID()){
 		setAttackedCreature(NULL);
 		sendCancelTarget();
@@ -1262,6 +1299,7 @@ void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bo
 			sendTextMessage(MSG_STATUS_SMALL, "Target lost.");
 		}
 	}
+	*/
 
 	if(followCreature == creature){
 		setFollowCreature(NULL);
@@ -1313,6 +1351,7 @@ void Player::onCreatureMove(const Creature* creature, const Position& oldPos, ui
 		}
 	}
 
+	/*
 	Creature* targetCreature = getAttackedCreature();
 	if((creature == this && targetCreature) || targetCreature == creature){
 		if(!Position::areInRange<7,5,0>(targetCreature->getPosition(), getPosition())){
@@ -1321,6 +1360,7 @@ void Player::onCreatureMove(const Creature* creature, const Position& oldPos, ui
 			sendTextMessage(MSG_STATUS_SMALL, "Target lost.");
 		} 
 	}
+	*/
 
 	if(creature == this){
 		if(tradeState != TRADE_TRANSFER){
@@ -1459,15 +1499,15 @@ void Player::checkTradeState(const Item* item)
 
 bool Player::NeedUpdateStats()
 {
-	if(lastSentStats.health != this->health ||
-		 lastSentStats.healthmax != this->healthmax ||
-		 (int)lastSentStats.freeCapacity != (int)this->getFreeCapacity() ||
-		 lastSentStats.experience != this->experience ||
-		 lastSentStats.level != this->level ||
-		 lastSentStats.mana != this->mana ||
-		 lastSentStats.manamax != this->manamax ||
-		 lastSentStats.manaspent != this->manaspent ||
-		 lastSentStats.maglevel != this->maglevel){
+	if(lastSentStats.health != getHealth() ||
+		 lastSentStats.healthMax != healthMax ||
+		 (int)lastSentStats.freeCapacity != (int)getFreeCapacity() ||
+		 lastSentStats.experience != getExperience() ||
+		 lastSentStats.level != getLevel() ||
+		 lastSentStats.mana != getMana() ||
+		 lastSentStats.manaMax != manaMax ||
+		 lastSentStats.manaSpent != manaSpent ||
+		 lastSentStats.magLevel != magLevel){
 		return true;
 	}
 	else{
@@ -1481,21 +1521,45 @@ int Player::onThink(int& newThinkTicks)
 	return 1000;
 }
 
-void Player::addManaSpent(unsigned long spent)
+void Player::drainHealth(Creature* attacker, DamageType_t damageType, int32_t damage)
 {
-	if(spent == 0)
-		return;
+	Creature::drainHealth(attacker, damageType, damage);
 
-	manaspent += spent;
-	int reqMana = getReqMana(maglevel + 1, vocation);
-	if(access == 0 && manaspent >= reqMana){
-		manaspent -= reqMana;
-		maglevel++;
-		
-		std::stringstream MaglvMsg;
-		MaglvMsg << "You advanced to magic level " << maglevel << ".";
-		sendTextMessage(MSG_EVENT_ADVANCE, MaglvMsg.str().c_str());
-		sendStats();
+	if(damageType == DAMAGE_PHYSICAL && internalAddSkillTry){
+		addSkillShieldTry(1);
+		internalAddSkillTry = false;
+	}
+
+	if(attacker){
+		sendTextMessage(MSG_EVENT_DEFAULT, "You lose %d hitpoints due to an attack by %s.");
+		sendCreatureSquare(attacker, SQ_COLOR_BLACK);
+	}
+}
+
+void Player::drainMana(Creature* attacker, int32_t manaLoss)
+{
+	Creature::drainMana(attacker, manaLoss);
+	
+	sendTextMessage(MSG_EVENT_DEFAULT, "You lose %d mana.");
+}
+
+void Player::useMana(int32_t manaLoss)
+{
+	Creature::useMana(manaLoss);
+
+	if(manaLoss != 0 && getAccessLevel() == 0){
+		manaSpent += manaLoss;
+		int reqMana = getReqMana(magLevel + 1, vocation);
+
+		if(manaSpent >= reqMana){
+			manaSpent -= reqMana;
+			magLevel++;
+			
+			std::stringstream MaglvMsg;
+			MaglvMsg << "You advanced to magic level " << magLevel << ".";
+			sendTextMessage(MSG_EVENT_ADVANCE, MaglvMsg.str().c_str());
+			sendStats();
+		}
 	}
 }
 
@@ -1506,16 +1570,16 @@ void Player::addExperience(unsigned long exp)
 
 	while(experience >= getExpForLv(level + 1)){
 		++level;
-		healthmax += HPGain[(int)vocation];
+		healthMax += HPGain[(int)vocation];
 		health += HPGain[(int)vocation];
-		manamax += ManaGain[(int)vocation];
+		manaMax += ManaGain[(int)vocation];
 		mana += ManaGain[(int)vocation];
 		capacity += CapGain[(int)vocation];
 	}
 
 	if(lastLevel != level){
 		setNormalSpeed();
-		g_game.changeSpeed(getID(), getSpeed());
+		g_game.changeSpeed(this);
 
 		std::stringstream levelMsg;
 		levelMsg << "You advanced from Level " << lastLevel << " to Level " << level << ".";
@@ -1536,21 +1600,21 @@ void Player::die()
 	//Magic level loss
 	unsigned long sumMana = 0;
 	long lostMana = 0;
-	for (int i = 1; i <= maglevel; i++) {              //sum up all the mana
+	for (int i = 1; i <= magLevel; i++) {              //sum up all the mana
 		sumMana += getReqMana(i, vocation);
 	}
 
-	sumMana += manaspent;
+	sumMana += manaSpent;
 
 	lostMana = (long)(sumMana * 0.1);   //player loses 10% of all spent mana when he dies
     
-	while(lostMana > manaspent){
-		lostMana -= manaspent;
-		manaspent = getReqMana(maglevel, vocation);
-		maglevel--;
+	while(lostMana > manaSpent){
+		lostMana -= manaSpent;
+		manaSpent = getReqMana(magLevel, vocation);
+		magLevel--;
 	}
 
-	manaspent -= lostMana;
+	manaSpent -= lostMana;
 	//
 
 	//Skill loss
@@ -1580,6 +1644,7 @@ void Player::die()
 				break;
 			}
 		}
+
 		skills[i][SKILL_TRIES] -= lostSkillTries;
 	}               
 	//
@@ -1603,7 +1668,7 @@ void Player::die()
 void Player::preSave()
 {
 	if(health <= 0){
-		health = healthmax;
+		health = healthMax;
 		experience -= getLostExperience();
 				
 		while(experience < getExpForLv(level)){
@@ -1615,15 +1680,15 @@ void Player::preSave()
 			// This checks (but not the downgrade sentences) aren't really necesary cause if the
 			// player has a "normal" hp,mana,etc when he gets level 1 he will not lose more
 			// hp,mana,etc... but here they are :P 
-			if((healthmax -= HPGain[(int)vocation]) < 0) //This could be avoided with a proper use of unsigend int
-				healthmax = 10;
+			if((healthMax -= HPGain[(int)vocation]) < 0) //This could be avoided with a proper use of unsigend int
+				healthMax = 10;
 			
-			health = healthmax;
+			health = healthMax;
 			
-			if((manamax -= ManaGain[(int)vocation]) < 0) //This could be avoided with a proper use of unsigend int
-				manamax = 0;
+			if((manaMax -= ManaGain[(int)vocation]) < 0) //This could be avoided with a proper use of unsigend int
+				manaMax = 0;
 			
-			mana = manamax;
+			mana = manaMax;
 			
 			if((capacity -= CapGain[(int)vocation]) < 0) //This could be avoided with a proper use of unsigend int
 				capacity = 0.0;         
@@ -1638,35 +1703,41 @@ void Player::kickPlayer()
 
 bool Player::gainManaTick()
 {
-	int add;
+	int32_t manaGain = 0;
+
 	manaTick++;
 	if(vocation >= 0 && vocation < 5){
 		if(manaTick < gainManaVector[vocation][0])
 			return false;
+
 		manaTick = 0;
-		add = gainManaVector[vocation][1];
+		manaGain = gainManaVector[vocation][1];
 	}
 	else{
-		add = 5;
+		manaGain = 5;
 	}
-	mana += min(add, manamax - mana);
+
+	mana += std::min(manaGain, manaMax - mana);
 	return true;
 }
 
 bool Player::gainHealthTick()
 {
-	int add;
+	int32_t healthGain = 0;
+
 	healthTick++;
 	if(vocation >= 0 && vocation < 5){
 		if(healthTick < gainHealthVector[vocation][0])
 			return false;
+
 		healthTick = 0;
-		add = gainHealthVector[vocation][1];
+		healthGain = gainHealthVector[vocation][1];
 	}
 	else{
-		add = 5;
+		healthGain = 5;
 	}
-	health += min(add, healthmax - health);
+
+	health += std::min(healthGain, healthMax - health);
 	return true;
 }
 
@@ -1773,7 +1844,7 @@ void Player::autoCloseContainers(const Container* container)
 
 bool Player::hasCapacity(const Item* item, uint32_t count) const
 {
-	if(access == 0 && item->getTopParent() != this){
+	if(getAccessLevel() == 0 && item->getTopParent() != this){
 		double itemWeight = 0;
 
 		if(item->isStackable()){
@@ -2393,6 +2464,7 @@ void Player::__internalAddThing(uint32_t index, Thing* thing)
   }
 }
 
+/*
 void Player::setAttackedCreature(const Creature* creature)
 {
 	Creature::setAttackedCreature(creature);
@@ -2407,6 +2479,7 @@ void Player::setAttackedCreature(const Creature* creature)
 		setFollowCreature(NULL);
 	}
 }
+*/
 
 void Player::setFollowCreature(const Creature* creature)
 {
@@ -2430,6 +2503,7 @@ void Player::setChaseMode(uint8_t mode)
 		chaseMode = CHASEMODE_STANDSTILL;
 	}
 	
+	/*
 	if(prevChaseMode != chaseMode){
 		if(chaseMode == CHASEMODE_FOLLOW){
 			if(!followCreature && getAttackedCreature()){
@@ -2442,6 +2516,7 @@ void Player::setChaseMode(uint8_t mode)
 			stopAutoWalk();
 		}
 	}
+	*/
 }
 
 bool Player::startAutoWalk(std::list<Direction>& listDir)
@@ -2532,10 +2607,19 @@ void Player::updateItemsLight(bool internal /*=false*/)
 	}
 }
 
+bool Player::isImmune(DamageType_t type)
+{
+	if(getAccessLevel() != 0){
+		return true;
+	}
+
+	return Creature::isImmune(type);
+}
+
 #ifdef __SKULLSYSTEM__
 skulls_t Player::getSkull() const
 {
-	if(access != 0)
+	if(getAccessLevel() != 0)
 		return SKULL_NONE;
 		
 	return skull;
@@ -2555,8 +2639,9 @@ skulls_t Player::getSkullClient(const Player* player) const
 
 bool Player::hasAttacked(const Player* attacked) const
 {
-	if(access != 0)
+	if(getAccessLevel() != 0)
 		return false;
+
 	if(!attacked)
 		return false;
 	
@@ -2573,11 +2658,12 @@ bool Player::hasAttacked(const Player* attacked) const
 
 void Player::addAttacked(const Player* attacked)
 {
-	if(access != 0)
+	if(getAccessLevel() != 0)
 		return;
 	
 	if(!attacked || attacked == this)
 		return;
+
 	AttackedSet::iterator it;
 	unsigned long attacked_id = attacked->getID();
 	it = attackedSet.find(attacked_id);
@@ -2593,7 +2679,7 @@ void Player::clearAttacked()
 
 void Player::addUnjustifiedDead(const Player* attacked)
 {
-	if(access != 0 || attacked == this)
+	if(getAccessLevel() != 0 || attacked == this)
 		return;
 		
 	std::stringstream Msg;

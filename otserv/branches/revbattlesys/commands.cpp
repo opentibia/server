@@ -194,17 +194,11 @@ bool Commands::exeCommand(Creature* creature, const std::string& cmd)
 
 	Player* player = creature->getPlayer();
 	//check access for this command
-	if(creature->access < it->second->accesslevel){
-		if(creature->access > 0){
-			if(player)
-				player->sendTextMessage(MSG_STATUS_SMALL, "You can not execute this command.");
-
-			return true;
-		}
-		else{
-			return false;
-		}
+	if(player && player->getAccessLevel() < it->second->accesslevel){
+		player->sendTextMessage(MSG_STATUS_SMALL, "You can not execute this command.");
+		return false;
 	}
+
 	//execute command
 	CommandFunc cfunc = it->second->f;
 	(this->*cfunc)(creature, str_command, str_param);
@@ -303,6 +297,7 @@ bool Commands::banPlayer(Creature* creature, const std::string& cmd, const std::
 {	
 	Player* playerBan = game->getPlayerByName(param);
 	if(playerBan) {
+		/*
 		MagicEffectClass me;
 		
 		me.animationColor = 0xB4;
@@ -312,9 +307,10 @@ bool Commands::banPlayer(Creature* creature, const std::string& cmd, const std::
 		me.offensive = true;
 
 		game->creatureMakeMagic(NULL, playerBan->getPosition(), &me);
+		*/
 
 		Player* player = creature->getPlayer();
-		if(player && player->access <= playerBan->access){
+		if(player && player->getAccessLevel() <= playerBan->getAccessLevel()){
 			player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "You cannot ban this player.");
 			return true;
 		}
@@ -532,14 +528,14 @@ bool Commands::getInfo(Creature* creature, const std::string& cmd, const std::st
 	Player* paramPlayer = game->getPlayerByName(param);
 	if(paramPlayer) {
 		std::stringstream info;
-		if(paramPlayer->access >= player->access && player != paramPlayer){
+		if(paramPlayer->getAccessLevel() >= player->getAccessLevel() && player != paramPlayer){
 			player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "You can not get info about this player.");
 			return true;
 		}
 		unsigned char ip[4];
 		*(unsigned long*)&ip = paramPlayer->lastip;
 		info << "name:   " << paramPlayer->getName() << std::endl <<
-		        "access: " << paramPlayer->access << std::endl <<
+		        "access: " << paramPlayer->getAccessLevel() << std::endl <<
 		        "level:  " << paramPlayer->getPlayerInfo(PLAYERINFO_LEVEL) << std::endl <<
 		        "maglvl: " << paramPlayer->getPlayerInfo(PLAYERINFO_MAGICLEVEL) << std::endl <<
 		        "speed:  " <<  paramPlayer->speed <<std::endl <<
@@ -561,7 +557,7 @@ bool Commands::closeServer(Creature* creature, const std::string& cmd, const std
 	AutoList<Player>::listiterator it = Player::listPlayer.list.begin();
 	while(it != Player::listPlayer.list.end())
 	{
-		if((*it).second->access == 0){
+		if((*it).second->getAccessLevel() == 0){
 			(*it).second->kickPlayer();
 			it = Player::listPlayer.list.begin();
 		}
@@ -613,7 +609,7 @@ bool Commands::onlineList(Creature* creature, const std::string& cmd, const std:
 	AutoList<Player>::listiterator it = Player::listPlayer.list.begin();
 	for(;it != Player::listPlayer.list.end();++it)
 	{
-		if((*it).second->access >= alevelmin && (*it).second->access <= alevelmax){
+		if((*it).second->getAccessLevel() >= alevelmin && (*it).second->getAccessLevel() <= alevelmax){
 			players << (*it).second->getName() << "   " << 
 				(*it).second->getPlayerInfo(PLAYERINFO_LEVEL) << "    " <<
 				(*it).second->getPlayerInfo(PLAYERINFO_MAGICLEVEL) << std::endl;
@@ -669,7 +665,7 @@ bool Commands::kickPlayer(Creature* creature, const std::string &cmd, const std:
 	Player* playerKick = game->getPlayerByName(param);
 	if(playerKick){
 		Player* player = creature->getPlayer();
-		if(player && player->access <= playerKick->access){
+		if(player && player->getAccessLevel() <= playerKick->getAccessLevel()){
 			player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "You cannot kick this player.");
 			return true;
 		}

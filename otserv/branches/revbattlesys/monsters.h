@@ -18,13 +18,14 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __monsters_h_
-#define __monsters_h_
+#ifndef __OTSERV_MONSTERS_H__
+#define __OTSERV_MONSTERS_H__
 
 #include <string>
 
 #include "creature.h"
 
+/*
 class TimeProbabilityClass{
 public:
 	TimeProbabilityClass()
@@ -101,6 +102,7 @@ public:
 	int minWeapondamage;
 	int maxWeapondamage;
 };
+*/
 
 #define CHANCE_MAX  100000
 struct LootBlock{
@@ -124,11 +126,13 @@ struct summonBlock{
 };
 
 typedef std::list<LootBlock> LootItems;
+/*
 typedef std::vector<TimeProbabilityClass> TimeProbabilityClassVec;	
 typedef std::map<std::string, TimeProbabilityClassVec> InstantAttackSpells;
 typedef std::map<unsigned short, TimeProbabilityClassVec> RuneAttackSpells;
 typedef std::map<PhysicalAttackClass*, TimeProbabilityClass> PhysicalAttacks;
 typedef std::vector<std::pair<std::string, TimeProbabilityClass> > YellingSentences;
+*/
 typedef std::list<summonBlock> SummonSpells;
 
 class MonsterType{
@@ -153,7 +157,7 @@ public:
 	bool pushable;
 	int base_speed;
 	int level;
-	int maglevel;
+	int magLevel;
 	int health;
 	int health_max;
 	int lookhead, lookbody, looklegs, lookfeet, looktype, lookcorpse, lookmaster;
@@ -162,10 +166,13 @@ public:
 	int lightLevel;
 	int lightColor;
 	
+	/*
 	InstantAttackSpells instantSpells;
 	RuneAttackSpells runeSpells;
 	PhysicalAttacks physicalAttacks;
 	YellingSentences yellingSentences;
+	*/
+
 	SummonSpells summonSpells; 
 
 	LootItems lootItems;
@@ -186,9 +193,12 @@ public:
 	
 	MonsterType* getMonsterType(unsigned long mid);
 	unsigned long getIdByName(const std::string& name);
+
+	static unsigned long getRandom();
 	
 private:
 	MonsterType* loadMonster(const std::string& file, const std::string& monster_name, bool reloading = false);
+
 	bool loadLootContainer(xmlNodePtr, LootBlock&);
 	bool loadLootItem(xmlNodePtr, LootBlock&);
 

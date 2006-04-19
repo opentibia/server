@@ -19,11 +19,12 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "monsters.h"
-#include "spells.h"
+#include "monster.h"
+#include "container.h"
 #include "tools.h"
 #include "luascript.h"
 
-extern Spells spells;
+//extern Spells spells;
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
@@ -49,7 +50,7 @@ void MonsterType::reset()
 	pushable = true;
 	base_speed = 200;
 	level = 1;
-	maglevel = 1;
+	magLevel = 1;
 	
 	health = 100;
 	health_max = 100;
@@ -64,23 +65,35 @@ void MonsterType::reset()
 	lightLevel = 0;
 	lightColor = 0;
 	
+	/*
 	for(std::map<PhysicalAttackClass*, TimeProbabilityClass>::iterator it = physicalAttacks.begin(); it != physicalAttacks.end(); ++it) {
 		delete it->first;
 	}
 	physicalAttacks.clear();
 	instantSpells.clear();
 	runeSpells.clear();
+
 	yellingSentences.clear();
+	*/
+
 	summonSpells.clear();
 	lootItems.clear();
 }
 
 MonsterType::~MonsterType()
 {
+	/*
 	for(std::map<PhysicalAttackClass*, TimeProbabilityClass>::iterator it = physicalAttacks.begin(); it != physicalAttacks.end(); ++it) {
 		delete it->first;
 	}
+
 	physicalAttacks.clear();
+	*/
+}
+
+unsigned long Monsters::getRandom()
+{
+	return (unsigned long)((rand()<< 16 | rand()) % CHANCE_MAX);
 }
 
 void MonsterType::createLoot(Container* corpse)
@@ -110,7 +123,7 @@ Item* MonsterType::createLootItem(const LootBlock& lootBlock)
 {
 	Item* tmpItem = NULL;
 	if(Item::items[lootBlock.id].stackable == true){
-		unsigned long randvalue = Monster::getRandom();
+		unsigned long randvalue = Monsters::getRandom();
 		unsigned long n = 1;
 		if(randvalue < lootBlock.chance1){
 			if(randvalue < lootBlock.chancemax){
@@ -124,7 +137,7 @@ Item* MonsterType::createLootItem(const LootBlock& lootBlock)
 		}
 	}
 	else{
-		if(Monster::getRandom() < lootBlock.chance1){
+		if(Monsters::getRandom() < lootBlock.chance1){
 			tmpItem = Item::CreateItem(lootBlock.id);
 		}
 	}
@@ -270,8 +283,8 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 			mType->base_speed = intValue;
 		}
 
-		if(readXMLInteger(root, "maglevel", intValue)){
-			mType->maglevel = intValue;
+		if(readXMLInteger(root, "magLevel", intValue)){
+			mType->magLevel = intValue;
 		}
 
 		if(readXMLInteger(root, "defense", intValue)){
@@ -360,7 +373,7 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 					mType->lookcorpse = intValue;
 				}
 			}
-			else if(xmlStrcmp(p->name, (const xmlChar*)"attacks") == 0){
+			/*else if(xmlStrcmp(p->name, (const xmlChar*)"attacks") == 0){
 				xmlNodePtr tmpNode = p->children;
 				while(tmpNode){
 					if(xmlStrcmp(tmpNode->name, (const xmlChar*)"attack") == 0){
@@ -542,7 +555,7 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 
 					tmpNode = tmpNode->next;
 				}
-			}
+			}*/
 			else if(xmlStrcmp(p->name, (const xmlChar*)"loot") == 0){
 				xmlNodePtr tmpNode = p->children;
 				while(tmpNode){

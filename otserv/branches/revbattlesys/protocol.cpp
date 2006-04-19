@@ -85,5 +85,5 @@ void Protocol::sleepTillMove()
 		OTSYS_SLEEP((uint32_t)delay);
 	}
 
-	player->lastmove = OTSYS_TIME();
+	//player->lastmove = OTSYS_TIME();
 }
