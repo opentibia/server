@@ -494,7 +494,7 @@ Player* Game::getPlayerByName(const std::string& s)
 	return NULL; //just in case the player doesnt exist
 }
 
-bool Game::placeCreature(const Position &pos, Creature* creature, bool isLogin /*= true*/, bool forceLogin /*= false*/)
+bool Game::placeCreature(const Position& pos, Creature* creature, bool isLogin /*= true*/, bool forceLogin /*= false*/)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::placeCreature()");
 
@@ -1557,7 +1557,7 @@ bool Game::playerSpeakTo(Player* player, SpeakClasses type, const std::string& r
 
 	std::stringstream ss;
 	ss << "Message sent to " << toPlayer->getName() << ".";
-	player->sendTextMessage(MSG_STATUS_SMALL, ss.str().c_str());
+	player->sendTextMessage(MSG_STATUS_SMALL, ss.str());
 	return true;
 }
 
@@ -1616,10 +1616,28 @@ bool Game::playerUseItemEx(Player* player, const Position& fromPos, uint8_t from
 	Item* item = dynamic_cast<Item*>(internalGetThing(player, fromPos, fromStackPos));
 
 	if(item){
+		/*
 		Combat combat;
 
-		combat.setCombatType(COMBAT_HITPOINTS, DAMAGE_PHYSICAL);
-		combat.setEffects(0xFF, NM_ME_MORT_AREA);
+		//combat.setCombatType(COMBAT_HITPOINTS, DAMAGE_PHYSICAL);
+		//combat.setEffects(NM_ANI_NONE, NM_ME_MORT_AREA);
+
+		combat.setCombatType(COMBAT_HITPOINTS, DAMAGE_MAGIC_FIRE);
+		combat.setEffects(NM_ANI_FIRE, NM_ME_FIRE_AREA);
+
+		combat.doCombat(player, toPos, -100);
+		*/
+
+		AreaCombat combat(false);
+
+		uint8_t arr[] = {0, 0, 1, 1, 1, 0, 0};
+		std::vector<uint8_t> row(arr, arr + sizeof(arr) / sizeof(uint8_t));
+		combat.setRow(0, row);
+		combat.setRow(1, row);
+		combat.setRow(2, row);
+
+		combat.setCombatType(COMBAT_HITPOINTS, DAMAGE_MAGIC_FIRE);
+		combat.setEffects(NM_ANI_FIRE, NM_ME_FIRE_AREA);
 
 		combat.doCombat(player, toPos, -100);
 
@@ -1795,7 +1813,7 @@ bool Game::playerRequestTrade(Player* player, const Position& pos, uint8_t stack
 	if(!Position::areInRange<2,2,0>(tradePartner->getPosition(), player->getPosition())){
 		std::stringstream ss;
 		ss << tradePartner->getName() << " tells you to move closer.";
-		player->sendTextMessage(MSG_INFO_DESCR, ss.str().c_str());
+		player->sendTextMessage(MSG_INFO_DESCR, ss.str());
 		return false;
 	}
 
@@ -1860,7 +1878,7 @@ bool Game::internalStartTrade(Player* player, Player* tradePartner, Item* tradeI
 	if(tradePartner->tradeState == TRADE_NONE){
 		std::stringstream trademsg;
 		trademsg << player->getName() <<" wants to trade with you.";
-		tradePartner->sendTextMessage(MSG_INFO_DESCR, trademsg.str().c_str());
+		tradePartner->sendTextMessage(MSG_INFO_DESCR, trademsg.str());
 		tradePartner->tradeState = TRADE_ACKNOWLEDGE;
 		tradePartner->tradePartner = player;
 	}
@@ -1937,7 +1955,7 @@ bool Game::playerAcceptTrade(Player* player)
 			else
 				ss << "Trade could not be completed.";
 
-			tradePartner->sendTextMessage(MSG_INFO_DESCR, ss.str().c_str());
+			tradePartner->sendTextMessage(MSG_INFO_DESCR, ss.str());
 			tradePartner->tradeItem->onTradeEvent(ON_TRADE_CANCEL, tradePartner);
 			
 			ss.str("");
@@ -1950,7 +1968,7 @@ bool Game::playerAcceptTrade(Player* player)
 			else
 				ss << "Trade could not be completed.";
 
-			player->sendTextMessage(MSG_INFO_DESCR, ss.str().c_str());
+			player->sendTextMessage(MSG_INFO_DESCR, ss.str());
 			player->tradeItem->onTradeEvent(ON_TRADE_CANCEL, player);
 		}
 
@@ -1996,7 +2014,7 @@ bool Game::playerLookInTrade(Player* player, bool lookAtCounterOffer, int index)
 	if(index == 0){
 		std::stringstream ss;
 		ss << "You see " << tradeItem->getDescription(lookDistance);
-		player->sendTextMessage(MSG_INFO_DESCR, ss.str().c_str());
+		player->sendTextMessage(MSG_INFO_DESCR, ss.str());
 		return false;
 	}
 
@@ -2032,7 +2050,7 @@ bool Game::playerLookInTrade(Player* player, bool lookAtCounterOffer, int index)
 	if(foundItem){
 		std::stringstream ss;
 		ss << "You see " << tradeItem->getDescription(lookDistance);
-		player->sendTextMessage(MSG_INFO_DESCR, ss.str().c_str());
+		player->sendTextMessage(MSG_INFO_DESCR, ss.str());
 	}
 
 	return foundItem;
@@ -2124,7 +2142,7 @@ bool Game::playerLookAt(Player* player, const Position& pos, uint16_t itemId, ui
 
 	std::stringstream ss;
 	ss << "You see " << thing->getDescription(lookDistance);
-	player->sendTextMessage(MSG_INFO_DESCR, ss.str().c_str());
+	player->sendTextMessage(MSG_INFO_DESCR, ss.str());
 
 	return true;
 }

@@ -64,13 +64,13 @@ public:
 	virtual ~Actions();
 	void clear();
 	
-	bool UseItem(Player* player, const Position &pos,const unsigned char stack, 
+	bool UseItem(Player* player, const Position& pos,const unsigned char stack, 
 		const unsigned short itemid, const unsigned char index);
-	bool UseItemEx(Player* player, const Position &from_pos,
-		const unsigned char from_stack,const Position &to_pos,
-		const unsigned char to_stack,const unsigned short itemid);
+	bool UseItemEx(Player* player, const Position& from_pos,
+		const unsigned char from_stack, const Position& to_pos,
+		const unsigned char to_stack, const unsigned short itemid);
 	
-	bool openContainer(Player *player,Container *container, const unsigned char index);
+	bool openContainer(Player* player,Container *container, const unsigned char index);
 	
 	Game* game;
 	bool loaded;
@@ -84,9 +84,9 @@ protected:
 	ActionUseMap useItemMap;
 	ActionUseMap uniqueItemMap;
 	ActionUseMap actionItemMap;
-	int canUse(const Player *player,const Position &pos) const;
-	int canUseFar(const Player *player,const Position &to_pos, const bool blockWalls) const;
-	Action *getAction(const Item *item);
+	int canUse(const Player* player,const Position& pos) const;
+	int canUseFar(const Player* player,const Position& to_pos, const bool blockWalls) const;
+	Action *getAction(const Item* item);
 	Action *loadAction(xmlNodePtr xmlaction);
 };
 
@@ -122,10 +122,10 @@ public:
 	bool blockWalls() const {return blockwalls;};
 	void setAllowFarUse(bool v){allowfaruse = v;};
 	void setBlockWalls(bool v){blockwalls = v;};
-	bool executeUse(Player *player,Item* item, PositionEx &posFrom, PositionEx &posTo);
+	bool executeUse(Player* player,Item* item, PositionEx &posFrom, PositionEx &posTo);
 	
 protected:
-	ActionScript *script;
+	ActionScript* script;
 	bool loaded;
 	bool allowfaruse;
 	bool blockwalls;
@@ -223,7 +223,7 @@ protected:
 	static const char* internalGetString(lua_State *L);
 	static void internalAddThing(lua_State *L, const Thing *thing, const unsigned int thingid);
 	
-	static const Position& internalGetRealPosition(ActionScript *action, Player *player, const Position &pos);
+	static const Position& internalGetRealPosition(ActionScript* action, Player* player, const Position& pos);
 	static int internalGetPlayerInfo(lua_State *L, ePlayerInfo info);
 	
 };

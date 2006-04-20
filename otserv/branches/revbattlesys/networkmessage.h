@@ -73,11 +73,11 @@ public:
 
 
   // write functions for complex types
-  void AddPosition(const Position &pos);
+  void AddPosition(const Position& pos);
 	void AddItem(unsigned short id, unsigned char count);
-	void AddItem(const Item *item);
-	void AddItemId(const Item *item);
-  void AddCreature(const Creature *creature, bool known, unsigned int remove);
+	void AddItem(const Item* item);
+	void AddItemId(const Item* item);
+  void AddCreature(const Creature* creature, bool known, unsigned int remove);
 
   int getMessageLength(){
       return m_MsgSize;

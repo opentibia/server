@@ -604,7 +604,7 @@ void Player::addSkillTryInternal(int skilltry,int skill)
 		skills[skill][SKILL_PERCENT] = 0;				 
 		std::stringstream advMsg;
 		advMsg << "You advanced in " << getSkillName(skill) << ".";
-		client->sendTextMessage(MSG_EVENT_ADVANCE, advMsg.str().c_str());
+		client->sendTextMessage(MSG_EVENT_ADVANCE, advMsg.str());
 		client->sendSkills();
 	}
 	else{
@@ -1034,26 +1034,32 @@ void Player::sendStats()
 	if(lastSentStats.experience != getExperience() || lastSentStats.level != level)
 		level_percent  = (unsigned char)(100*(experience-getExpForLv(level))/(1.*getExpForLv(level+1)-getExpForLv(level)));
 			
-	if(lastSentStats.manaSpent != this->manaSpent || lastSentStats.magLevel != magLevel)
+	if(lastSentStats.manaSpent != manaSpent || lastSentStats.magLevel != magLevel)
 		maglevel_percent  = (unsigned char)(100*(manaSpent/(1.*getReqMana(magLevel+1,vocation))));
 			
 	//save current stats 
-	lastSentStats.health = this->health;
-	lastSentStats.healthMax = this->healthMax;
-	lastSentStats.freeCapacity = this->getFreeCapacity();
-	lastSentStats.experience = this->experience;
-	lastSentStats.level = this->level;
-	lastSentStats.mana = this->mana;
-	lastSentStats.manaMax = this->manaMax;
-	lastSentStats.manaSpent = this->manaSpent;
-	lastSentStats.magLevel = this->magLevel;
+	lastSentStats.health = getHealth();
+	lastSentStats.healthMax = getMaxHealth();
+	lastSentStats.freeCapacity = getFreeCapacity();
+	lastSentStats.experience = getExperience();
+	lastSentStats.level = getLevel();
+	lastSentStats.mana = getMana();
+	lastSentStats.manaMax = getPlayerInfo(PLAYERINFO_MAXMANA);
+	lastSentStats.magLevel = getMagicLevel();
+	lastSentStats.manaSpent = manaSpent;
 	
 	client->sendStats();
 }
 
-void Player::sendTextMessage(MessageClasses mclass, const char* message) const
+void Player::sendTextMessage(MessageClasses mclass, const std::string& message) const
 {
-	client->sendTextMessage(mclass,message);
+	client->sendTextMessage(mclass, message);
+}
+
+void Player::sendTextMessage(MessageClasses mclass, const std::string& message,
+	const Position& pos, unsigned char type) const
+{
+	client->sendTextMessage(mclass, message, pos, type);
 }
 
 void Player::sendCreatureLight(const Creature* creature)
@@ -1069,12 +1075,6 @@ void Player::sendWorldLight(LightInfo& lightInfo)
 void Player::flushMsg()
 {
 	client->flushOutputBuffer();
-}
-
-void Player::sendTextMessage(MessageClasses mclass, const char* message,
-	const Position &pos, unsigned char type) const
-{
-	client->sendTextMessage(mclass,message,pos,type);
 }
 
 void Player::sendPing()
@@ -1103,22 +1103,22 @@ void Player::receivePing()
 		npings--;
 }
 
-void Player::sendDistanceShoot(const Position &from, const Position &to, unsigned char type)
+void Player::sendDistanceShoot(const Position& from, const Position& to, unsigned char type)
 {
 	client->sendDistanceShoot(from, to,type);
 }
 
-void Player::sendMagicEffect(const Position &pos, unsigned char type)
+void Player::sendMagicEffect(const Position& pos, unsigned char type)
 {
 	client->sendMagicEffect(pos,type);
 }
 
-void Player::sendAnimatedText(const Position &pos, unsigned char color, std::string text)
+void Player::sendAnimatedText(const Position& pos, unsigned char color, std::string text)
 {
 	client->sendAnimatedText(pos,color,text);
 }
 
-void Player::sendCreatureHealth(const Creature *creature)
+void Player::sendCreatureHealth(const Creature* creature)
 {
 	client->sendCreatureHealth(creature);
 }
@@ -1544,7 +1544,7 @@ void Player::drainHealth(Creature* attacker, DamageType_t damageType, int32_t da
 		sendCreatureSquare(attacker, SQ_COLOR_BLACK);
 	}
 
-	sendTextMessage(MSG_EVENT_DEFAULT, ss.str().c_str());
+	sendTextMessage(MSG_EVENT_DEFAULT, ss.str());
 }
 
 void Player::drainMana(Creature* attacker, int32_t manaLoss)
@@ -1552,15 +1552,16 @@ void Player::drainMana(Creature* attacker, int32_t manaLoss)
 	Creature::drainMana(attacker, manaLoss);
 	
 	sendStats();
-	sendTextMessage(MSG_EVENT_DEFAULT, "You lose %d mana.");
+
+	std::stringstream ss;
+	ss << "You lose " << manaLoss << " mana.";
+	sendTextMessage(MSG_EVENT_DEFAULT, ss.str());
 }
 
-void Player::useMana(int32_t manaLoss)
+void Player::addManaSpent(uint32_t amount)
 {
-	Creature::useMana(manaLoss);
-
-	if(manaLoss != 0 && getAccessLevel() == 0){
-		manaSpent += manaLoss;
+	if(amount != 0 && getAccessLevel() == 0){
+		manaSpent += amount;
 		int reqMana = getReqMana(magLevel + 1, vocation);
 
 		if(manaSpent >= reqMana){
@@ -1569,7 +1570,7 @@ void Player::useMana(int32_t manaLoss)
 			
 			std::stringstream MaglvMsg;
 			MaglvMsg << "You advanced to magic level " << magLevel << ".";
-			sendTextMessage(MSG_EVENT_ADVANCE, MaglvMsg.str().c_str());
+			sendTextMessage(MSG_EVENT_ADVANCE, MaglvMsg.str());
 			sendStats();
 		}
 	}
@@ -1595,7 +1596,7 @@ void Player::addExperience(unsigned long exp)
 
 		std::stringstream levelMsg;
 		levelMsg << "You advanced from Level " << lastLevel << " to Level " << level << ".";
-		sendTextMessage(MSG_EVENT_ADVANCE, levelMsg.str().c_str());
+		sendTextMessage(MSG_EVENT_ADVANCE, levelMsg.str());
 		sendStats();
 	}
 }
@@ -1673,7 +1674,7 @@ void Player::die()
 	if(newLevel != level){
 		std::stringstream lvMsg;
 		lvMsg << "You were downgraded from level " << level << " to level " << newLevel << ".";
-		client->sendTextMessage(MSG_EVENT_ADVANCE, lvMsg.str().c_str());
+		client->sendTextMessage(MSG_EVENT_ADVANCE, lvMsg.str());
 	}
 }
 
@@ -1778,7 +1779,7 @@ void Player::notifyLogIn(Player* login_player)
 	VIPListSet::iterator it = VIPList.find(login_player->getGUID());
 	if(it != VIPList.end()){
 		client->sendVIPLogIn(login_player->getGUID());
-		sendTextMessage(MSG_STATUS_SMALL, (login_player->getName() + " has logged in.").c_str());
+		sendTextMessage(MSG_STATUS_SMALL, (login_player->getName() + " has logged in."));
 	}
 }
 
@@ -1787,7 +1788,7 @@ void Player::notifyLogOut(Player* logout_player)
 	VIPListSet::iterator it = VIPList.find(logout_player->getGUID());
 	if(it != VIPList.end()){
 		client->sendVIPLogOut(logout_player->getGUID());
-		sendTextMessage(MSG_STATUS_SMALL, (logout_player->getName() + " has logged out.").c_str());
+		sendTextMessage(MSG_STATUS_SMALL, (logout_player->getName() + " has logged out."));
 	}
 }
 
@@ -2696,7 +2697,7 @@ void Player::addUnjustifiedDead(const Player* attacked)
 		
 	std::stringstream Msg;
 	Msg << "Warning! The murder of " << attacked->getName() << " was not justified.";
-	client->sendTextMessage(MSG_STATUS_WARNING, Msg.str().c_str());
+	client->sendTextMessage(MSG_STATUS_WARNING, Msg.str());
 	redSkullTicks = redSkullTicks + 12 * 3600 * 1000;
 	if(redSkullTicks >= 3*24*3600*1000){
 		g_game.changeSkull(this, SKULL_RED);

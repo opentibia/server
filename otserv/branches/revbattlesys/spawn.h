@@ -44,16 +44,16 @@ public:
 	bool startup();
 
 	/*
-	virtual void onCreatureEnter(const Creature *creature, const Position &pos);
-	virtual void onCreatureLeave(const Creature *creature, const Position &pos);
+	virtual void onCreatureEnter(const Creature* creature, const Position& pos);
+	virtual void onCreatureLeave(const Creature* creature, const Position& pos);
 	*/
 
 private:
 	Position centerPos;
 	int radius;
 
-	bool isInSpawnRange(const Position &pos);
-	Monster* respawn(unsigned long spawnid, Position &pos, std::string &name, Direction dir);
+	bool isInSpawnRange(const Position& pos);
+	Monster* respawn(unsigned long spawnid, Position& pos, std::string &name, Direction dir);
 
 	struct spawninfo {
 		Position pos;

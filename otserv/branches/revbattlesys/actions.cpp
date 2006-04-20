@@ -169,7 +169,7 @@ Action *Actions::loadAction(xmlNodePtr xmlaction)
 	return action;
 }
 
-int Actions::canUse(const Player *player,const Position &pos) const
+int Actions::canUse(const Player* player, const Position& pos) const
 {
 	if(pos.x != 0xFFFF){
 		if(!Position::areInRange<1,1,0>(pos, player->getPosition())){
@@ -179,7 +179,7 @@ int Actions::canUse(const Player *player,const Position &pos) const
 	return CAN_USE;
 }
 
-int Actions::canUseFar(const Player *player,const Position &to_pos, const bool blockWalls) const
+int Actions::canUseFar(const Player* player, const Position& to_pos, const bool blockWalls) const
 {
 	if(to_pos.x == 0xFFFF){
 		return CAN_USE;
@@ -197,7 +197,7 @@ int Actions::canUseFar(const Player *player,const Position &to_pos, const bool b
 	return CAN_USE;
 }
 
-Action *Actions::getAction(const Item *item)
+Action *Actions::getAction(const Item* item)
 {
 	if(item->getUniqueId() != 0){
 		ActionUseMap::iterator it = uniqueItemMap.find(item->getUniqueId());
@@ -333,9 +333,9 @@ bool Actions::openContainer(Player* player, Container* container, const unsigned
 	return true;
 }
 
-bool Actions::UseItemEx(Player* player, const Position &from_pos,
-	const unsigned char from_stack,const Position &to_pos,
-	const unsigned char to_stack,const unsigned short itemid)
+bool Actions::UseItemEx(Player* player, const Position& from_pos,
+	const unsigned char from_stack, const Position& to_pos,
+	const unsigned char to_stack, const unsigned short itemid)
 {
 	if(canUse(player,from_pos) == TOO_FAR){
 		/*
@@ -413,7 +413,7 @@ Action::~Action()
 	}
 }
 
-bool Action::executeUse(Player *player,Item* item, PositionEx &posFrom, PositionEx &posTo)
+bool Action::executeUse(Player* player,Item* item, PositionEx &posFrom, PositionEx &posTo)
 {
 	//onUse(uidplayer, item1,position1,item2,position2)
 	script->ClearMap();
@@ -495,7 +495,7 @@ void ActionScript::ClearMap()
 
 void ActionScript::AddThingToMapUnique(Thing *thing)
 {
-	Item *item = thing->getItem();
+	Item* item = thing->getItem();
 	if(item && item->getUniqueId() != 0 ){
 		unsigned short uid = item->getUniqueId();
 
@@ -559,7 +559,7 @@ Item* ActionScript::GetItemByUID(int uid)
 {
 	Thing* tmp = GetThingByUID(uid);
 	if(tmp && !tmp->isRemoved()){
-		if(Item *item = tmp->getItem())
+		if(Item* item = tmp->getItem())
 			return item;
 	}
 
@@ -708,7 +708,7 @@ ActionScript* ActionScript::getActionScript(lua_State *L)
 	return myaction;
 }
 
-const Position& ActionScript::internalGetRealPosition(ActionScript *action, Player *player, const Position &pos)
+const Position& ActionScript::internalGetRealPosition(ActionScript* action, Player* player, const Position& pos)
 {
 	if(action)
 		return action->game->internalGetPosition(player, pos);
@@ -722,7 +722,7 @@ void ActionScript::internalAddThing(lua_State *L, const Thing* thing, const unsi
 {	
 	lua_newtable(L);
 	if(thing && thing->getItem()){	
-		const Item *item = thing->getItem();
+		const Item* item = thing->getItem();
 		setField(L,"uid", thingid);
 		setField(L,"itemid", item->getID());
 
@@ -790,7 +790,7 @@ const char* ActionScript::internalGetString(lua_State *L)
 int ActionScript::internalGetPlayerInfo(lua_State *L, ePlayerInfo info)
 {
 	unsigned int cid = (unsigned int)internalGetNumber(L);
-	ActionScript *action = getActionScript(L);
+	ActionScript* action = getActionScript(L);
 	int value;	
 	
 	const Player* player = action->GetPlayerByUID(cid);
@@ -897,7 +897,7 @@ int ActionScript::luaActionDoRemoveItem(lua_State *L)
 	char n = (unsigned char)internalGetNumber(L);	
 	unsigned short itemid = (unsigned short)internalGetNumber(L);
 						
-	ActionScript *action = getActionScript(L);
+	ActionScript* action = getActionScript(L);
 	
 	Item* item = action->GetItemByUID(itemid);
 	if(item){
@@ -949,7 +949,7 @@ int ActionScript::luaActionDoFeedPlayer(lua_State *L)
 	int food = (int)internalGetNumber(L);
 	unsigned int cid = (unsigned int)internalGetNumber(L);
 	
-	ActionScript *action = getActionScript(L);
+	ActionScript* action = getActionScript(L);
 	
 	Player* player = action->GetPlayerByUID(cid);
 	if(player){
@@ -971,7 +971,7 @@ int ActionScript::luaActionDoSendCancel(lua_State *L)
 	const char * text = internalGetString(L);
 	unsigned int cid = (unsigned int)internalGetNumber(L);	
 	
-	ActionScript *action = getActionScript(L);
+	ActionScript* action = getActionScript(L);
 	
 	const Player* player = action->GetPlayerByUID(cid);
 	if(player){
@@ -994,7 +994,7 @@ int ActionScript::luaActionDoTeleportThing(lua_State *L)
 	internalGetPositionEx(L,pos);
 	unsigned int id = (unsigned int)internalGetNumber(L);	
 	
-	ActionScript *action = getActionScript(L);
+	ActionScript* action = getActionScript(L);
 	
 	Thing* tmp = action->GetThingByUID(id);
 	if(!tmp){
@@ -1020,7 +1020,7 @@ int ActionScript::luaActionDoTransformItem(lua_State *L)
 	unsigned int toId = (unsigned int)internalGetNumber(L);	
 	unsigned int itemid = (unsigned int)internalGetNumber(L);	
 	
-	ActionScript *action = getActionScript(L);
+	ActionScript* action = getActionScript(L);
 	
 	Item* item = action->GetItemByUID(itemid);
 	if(item){
@@ -1046,7 +1046,7 @@ int ActionScript::luaActionDoPlayerSay(lua_State *L)
 	const char * text = internalGetString(L);
 	unsigned int cid = (unsigned int)internalGetNumber(L);	
 					
-	ActionScript *action = getActionScript(L);
+	ActionScript* action = getActionScript(L);
 	
 	Player* player = action->GetPlayerByUID(cid);
 	if(player){
@@ -1069,7 +1069,7 @@ int ActionScript::luaActionDoSendMagicEffect(lua_State *L)
 	PositionEx pos;
 	internalGetPositionEx(L,pos);
 	
-	ActionScript *action = getActionScript(L);
+	ActionScript* action = getActionScript(L);
 	
 	const Position& cylinderMapPos = internalGetRealPosition(action, action->_player,(Position&)pos);
 	SpectatorVec list;
@@ -1093,7 +1093,7 @@ int ActionScript::luaActionDoChangeTypeItem(lua_State *L)
 	unsigned int subtype = (unsigned int)internalGetNumber(L);	
 	unsigned int itemid = (unsigned int)internalGetNumber(L);
 	
-	ActionScript *action = getActionScript(L);
+	ActionScript* action = getActionScript(L);
 	
 	Item* item = action->GetItemByUID(itemid);
 	if(item){
@@ -1120,7 +1120,7 @@ int ActionScript::luaActionDoPlayerAddSkillTry(lua_State *L)
 	int skillid = (int)internalGetNumber(L);
 	unsigned int cid = (unsigned int)internalGetNumber(L);	
 					
-	ActionScript *action = getActionScript(L);
+	ActionScript* action = getActionScript(L);
 	
 	Player* player = action->GetPlayerByUID(cid);
 	if(player){
@@ -1143,7 +1143,7 @@ int ActionScript::luaActionDoPlayerAddHealth(lua_State *L)
 	int addhealth = (int)internalGetNumber(L);
 	unsigned int cid = (unsigned int)internalGetNumber(L);	
 					
-	ActionScript *action = getActionScript(L);
+	ActionScript* action = getActionScript(L);
 	
 	Player* player = action->GetPlayerByUID(cid);
 	if(player){
@@ -1185,7 +1185,7 @@ int ActionScript::luaActionDoPlayerAddMana(lua_State *L)
 	int addmana = (int)internalGetNumber(L);
 	unsigned int cid = (unsigned int)internalGetNumber(L);	
 					
-	ActionScript *action = getActionScript(L);
+	ActionScript* action = getActionScript(L);
 	
 	Player* player = action->GetPlayerByUID(cid);
 	if(player){
@@ -1257,7 +1257,7 @@ int ActionScript::luaActionDoPlayerSendTextMessage(lua_State *L)
 	unsigned char messageClass = (unsigned char)internalGetNumber(L);	
 	unsigned int cid = (unsigned int)internalGetNumber(L);	
 	
-	ActionScript *action = getActionScript(L);
+	ActionScript* action = getActionScript(L);
 	
 	Player* player = action->GetPlayerByUID(cid);
 	if(player){
@@ -1280,7 +1280,7 @@ int ActionScript::luaActionDoSendAnimatedText(lua_State *L)
 	PositionEx pos;
 	internalGetPositionEx(L,pos);
 	
-	ActionScript *action = getActionScript(L);
+	ActionScript* action = getActionScript(L);
 	
 	const Position& cylinderMapPos = internalGetRealPosition(action, action->_player,(Position&)pos);
 	SpectatorVec list;
@@ -1304,7 +1304,7 @@ int ActionScript::luaActionGetPlayerSkill(lua_State *L)
 	unsigned char skillid = (unsigned int)internalGetNumber(L);
 	unsigned int cid = (unsigned int)internalGetNumber(L);
 	
-	ActionScript *action = getActionScript(L);
+	ActionScript* action = getActionScript(L);
 	
 	Player* player = action->GetPlayerByUID(cid);
 	if(player){
@@ -1332,7 +1332,7 @@ int ActionScript::luaActionDoShowTextWindow(lua_State *L)
 	unsigned short maxlen = (unsigned short)internalGetNumber(L);
 	unsigned int uid = (unsigned int)internalGetNumber(L);
 	
-	ActionScript *action = getActionScript(L);
+	ActionScript* action = getActionScript(L);
 	
 	Item* item = action->GetItemByUID(uid);
 	if(item){
@@ -1356,7 +1356,7 @@ int ActionScript::luaActionGetItemRWInfo(lua_State *L)
 	//getItemRWInfo(uid)
 	unsigned int uid = (unsigned int)internalGetNumber(L);
 	
-	ActionScript *action = getActionScript(L);
+	ActionScript* action = getActionScript(L);
 	
 	Item* item = action->GetItemByUID(uid);
 	if(item){
@@ -1380,7 +1380,7 @@ int ActionScript::luaActionDoDecayItem(lua_State *L)
 	//Note: to stop decay set decayTo = 0 in items.xml
 	unsigned int uid = (unsigned int)internalGetNumber(L);	
 	
-	ActionScript *action = getActionScript(L);
+	ActionScript* action = getActionScript(L);
 	
 	Item* item = action->GetItemByUID(uid);
 	if(item){
@@ -1410,7 +1410,7 @@ int ActionScript::luaActionGetThingfromPos(lua_State *L)
 	PositionEx pos;
 	internalGetPositionEx(L,pos);
 	
-	ActionScript *action = getActionScript(L);
+	ActionScript* action = getActionScript(L);
 	
 	Tile* tile = action->game->map->getTile(pos);	
 	Thing *thing = NULL;
@@ -1463,7 +1463,7 @@ int ActionScript::luaActionDoCreateItem(lua_State *L)
 	int type = (int)internalGetNumber(L);
 	int itemid = (int)internalGetNumber(L);
 	
-	ActionScript *action = getActionScript(L);
+	ActionScript* action = getActionScript(L);
 	
 	Tile* tile = action->game->map->getTile(pos);
 	if(!tile){
@@ -1498,7 +1498,7 @@ int ActionScript::luaActionGetPlayerStorageValue(lua_State *L)
 	unsigned long key = (unsigned int)internalGetNumber(L);
 	unsigned int cid = (unsigned int)internalGetNumber(L);
 	
-	ActionScript *action = getActionScript(L);
+	ActionScript* action = getActionScript(L);
 	
 	Player* player = action->GetPlayerByUID(cid);
 	if(player){
@@ -1525,7 +1525,7 @@ int ActionScript::luaActionSetPlayerStorageValue(lua_State *L)
 	unsigned long key = (unsigned int)internalGetNumber(L);
 	unsigned int cid = (unsigned int)internalGetNumber(L);
 	
-	ActionScript *action = getActionScript(L);
+	ActionScript* action = getActionScript(L);
 	
 	Player* player = action->GetPlayerByUID(cid);
 	if(player){
@@ -1546,7 +1546,7 @@ int ActionScript::luaActionDoSetItemActionId(lua_State *L)
 	unsigned int actionid = (unsigned int)internalGetNumber(L);	
 	unsigned int itemid = (unsigned int)internalGetNumber(L);
 	
-	ActionScript *action = getActionScript(L);
+	ActionScript* action = getActionScript(L);
 	
 	Item* item = action->GetItemByUID(itemid);	
 	if(item){
@@ -1571,7 +1571,7 @@ int ActionScript::luaActionDoSetItemText(lua_State *L)
 	const char *text = internalGetString(L);
 	unsigned int itemid = (unsigned int)internalGetNumber(L);	
 	
-	ActionScript *action = getActionScript(L);
+	ActionScript* action = getActionScript(L);
 	
 	Item* item = action->GetItemByUID(itemid);
 	if(item){
@@ -1597,7 +1597,7 @@ int ActionScript::luaActionDoSetItemSpecialDescription(lua_State *L)
 	const char *desc = internalGetString(L);
 	unsigned int itemid = (unsigned int)internalGetNumber(L);
 	
-	ActionScript *action = getActionScript(L);
+	ActionScript* action = getActionScript(L);
 	
 	Item* item = action->GetItemByUID(itemid);
 	if(item){
@@ -1623,7 +1623,7 @@ int ActionScript::luaActionGetTilePzInfo(lua_State *L)
 	PositionEx pos;
 	internalGetPositionEx(L,pos);
 	
-	ActionScript *action = getActionScript(L);
+	ActionScript* action = getActionScript(L);
 	
 	Tile *tile = action->game->map->getTile(pos);
 	
@@ -1648,7 +1648,7 @@ int ActionScript::luaActionGetTileHouseInfo(lua_State *L)
 	PositionEx pos;
 	internalGetPositionEx(L,pos);
 	
-	ActionScript *action = getActionScript(L);
+	ActionScript* action = getActionScript(L);
 	
 	Tile *tile = action->game->map->getTile(pos);
 	if(tile){
@@ -1674,7 +1674,7 @@ int ActionScript::luaActionDoSummonCreature(lua_State *L){
 	internalGetPositionEx(L,pos);
 	const char *name = internalGetString(L);
 	
-	ActionScript *action = getActionScript(L);
+	ActionScript* action = getActionScript(L);
 	
 	Monster* monster = Monster::createMonster(name);
 
@@ -1731,7 +1731,7 @@ int ActionScript::luaActionDoPlayerSetMasterPos(lua_State *L)
 	internalGetPositionEx(L,pos);
 	unsigned int cid = (unsigned int)internalGetNumber(L);	
 	
-	ActionScript *action = getActionScript(L);
+	ActionScript* action = getActionScript(L);
 	
 	Player* player = action->GetPlayerByUID(cid);
 	if(player){
@@ -1752,7 +1752,7 @@ int ActionScript::luaActionDoPlayerSetVocation(lua_State *L)
 	int voc = (int)internalGetNumber(L);
 	unsigned int cid = (unsigned int)internalGetNumber(L);	
 					
-	ActionScript *action = getActionScript(L);
+	ActionScript* action = getActionScript(L);
 	
 	Player* player = action->GetPlayerByUID(cid);
 	if(player){

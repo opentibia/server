@@ -272,7 +272,7 @@ void NetworkMessage::AddString(const char* value)
 /******************************************************************************/
 
 
-void NetworkMessage::AddPosition(const Position &pos)
+void NetworkMessage::AddPosition(const Position& pos)
 {
   AddU16(pos.x);
   AddU16(pos.y);
@@ -290,7 +290,7 @@ void NetworkMessage::AddItem(unsigned short id, unsigned char count)
 		AddByte(count);
 }
 
-void NetworkMessage::AddItem(const Item *item)
+void NetworkMessage::AddItem(const Item* item)
 {
 	const ItemType &it = Item::items[item->getID()];
 
@@ -300,7 +300,7 @@ void NetworkMessage::AddItem(const Item *item)
     AddByte(item->getItemCountOrSubtype());
 }
 
-void NetworkMessage::AddItemId(const Item *item)
+void NetworkMessage::AddItemId(const Item* item)
 {
 	const ItemType &it = Item::items[item->getID()];
 

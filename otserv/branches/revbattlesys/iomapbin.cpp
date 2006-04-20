@@ -177,7 +177,7 @@ void IOMapBin::loadOTM(Map* map)
 									int itemid = fgetc(fh) + 100;
 									itemid += fgetc(fh) << 8;
 									
-									Item *item = Item::CreateItem(itemid);
+									Item* item = Item::CreateItem(itemid);
 									int op3;
 									do
 									{

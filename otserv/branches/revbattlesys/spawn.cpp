@@ -442,7 +442,7 @@ bool Spawn::addMonster(std::string name, Direction dir, int x, int y, int spawnt
 	return true;
 }
 
-Monster* Spawn::respawn(unsigned long spawnid, Position &pos, std::string &name, Direction dir)
+Monster* Spawn::respawn(unsigned long spawnid, Position& pos, std::string &name, Direction dir)
 {
 	Monster* monster = Monster::createMonster(name);
 	if(monster){
@@ -464,7 +464,7 @@ Monster* Spawn::respawn(unsigned long spawnid, Position &pos, std::string &name,
 	return NULL;
 }
 
-bool Spawn::isInSpawnRange(const Position &p)
+bool Spawn::isInSpawnRange(const Position& p)
 {
 	if((p.x >= centerPos.x - radius) && (p.x <= centerPos.x + radius) &&
       (p.y >= centerPos.y - radius) && (p.y <= centerPos.y + radius))

@@ -124,9 +124,11 @@ public:
 	const Position& getMasterPos() const { return masterPos;}
 	void setMasterPos(const Position& pos) { masterPos = pos;}
 
+	virtual void changeHealth(int32_t healthChange);
+	virtual void changeMana(int32_t manaChange);
+
 	virtual void drainHealth(Creature* attacker, DamageType_t damageType, int32_t damage);
 	virtual void drainMana(Creature* attacker, int32_t manaLoss);
-	virtual void useMana(int32_t manaLoss);
 
 	virtual void die(){};
 
@@ -136,8 +138,8 @@ public:
 	virtual void setMaster(Creature* creature);
 	virtual Creature* getMaster() {return master;}
 	
-	virtual void addSummon(Creature *creature);
-	virtual void removeSummon(Creature *creature);
+	virtual void addSummon(Creature* creature);
+	virtual void removeSummon(Creature* creature);
 	
 	int32_t getHealth() const {return health;}
 	int32_t getMaxHealth() const {return healthMax;}

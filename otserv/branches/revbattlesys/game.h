@@ -159,7 +159,7 @@ public:
 	  * \param isLogin Is true if the player is logging into the game
 	  * \param forceLogin If true, placing the creature will not fail becase of obstacles (creatures/chests)
 	  */
-	bool placeCreature(const Position &pos, Creature* creature, bool isLogin = true, bool forceLogin = false);
+	bool placeCreature(const Position& pos, Creature* creature, bool isLogin = true, bool forceLogin = false);
 
 	/**
 		* Remove Creature from the map.
@@ -290,7 +290,7 @@ public:
 	bool playerSay(Player* player, SpeakClasses type, const std::string& text);
 	bool playerChangeOutfit(Player* player, uint8_t lookType, uint8_t lookHead,
 	uint8_t lookBody, uint8_t lookLegs, uint8_t lookFeet);
-	bool playerSaySpell(Player *player, const std::string& text);
+	bool playerSaySpell(Player* player, const std::string& text);
 
 	void flushSendBuffers();
 	void addPlayerBuffer(Player* p);
@@ -334,10 +334,10 @@ protected:
 	AutoList<Creature> listCreature;
 
 	/*//battle system
-	void creatureApplyDamage(Creature *creature, int damage, int &outDamage, int &outManaDamage);
-	bool creatureOnPrepareAttack(Creature *creature, Position pos);
-	bool creatureOnPrepareMagicAttack(Creature *creature, Position pos, const MagicEffectClass* me);
-	void creatureMakeDamage(Creature *creature, Creature *attackedCreature, fight_t damagetype);
+	void creatureApplyDamage(Creature* creature, int damage, int &outDamage, int &outManaDamage);
+	bool creatureOnPrepareAttack(Creature* creature, Position pos);
+	bool creatureOnPrepareMagicAttack(Creature* creature, Position pos, const MagicEffectClass* me);
+	void creatureMakeDamage(Creature* creature, Creature *attackedCreature, fight_t damagetype);
 	void CreateDamageUpdate(Creature* player, Creature* attackCreature, int damage);
 	void CreateManaDamageUpdate(Creature* player, Creature* attackCreature, int damage);
 	//battle system*/

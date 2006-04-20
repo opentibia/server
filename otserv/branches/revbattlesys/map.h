@@ -19,8 +19,8 @@
 //////////////////////////////////////////////////////////////////////
 
 
-#ifndef __MAP_H__
-#define __MAP_H__
+#ifndef __OTSERV_MAP_H__
+#define __OTSERV_MAP_H__
 
 #include <queue>
 #include <bitset>
@@ -30,13 +30,12 @@
 #include "position.h"
 #include "item.h"
 #include "creature.h"
-//#include "magic.h"
 #include "iomapserialize.h"
 
 #include "tools.h"
 #include "tile.h"
 
-class Creature;   // see creature.h
+class Creature;
 class Player;
 class Game;
 
@@ -50,21 +49,6 @@ class Range{
 public:
 	Range(Position centerpos, bool multilevel = false){
 		setRange(centerpos, multilevel);
-	}
-	
-	//Creates a union of 2 positions
-	//Should only be used when a player makes a move.
-	Range(const Position& pos1, const Position& pos2)
-	{
-		Position topleft(std::min(pos1.x, pos2.x), std::min(pos1.y, pos2.y), pos1.z);
-		Position bottomright(std::max(pos1.x, pos2.x), std::max(pos1.y, pos2.y), pos1.z);
-
-		setRange(topleft, true);
-
-		minRange.x = -9;
-		minRange.y = -7;
-		maxRange.x = std::max(topleft.x + 9, bottomright.x + 9) - topleft.x;
-		maxRange.y = std::max(topleft.y + 7, bottomright.y + 7) - topleft.y;
 	}
 
 	Range(Position centerpos, int minRangeX, int maxRangeX, int minRangeY, int maxRangeY, bool multilevel = true)
@@ -208,7 +192,7 @@ public:
 	* \returns A pointer to that tile.
 	*/
 	Tile* getTile(uint16_t _x, uint16_t _y, uint8_t _z);
-	Tile* getTile(const Position &pos);
+	Tile* getTile(const Position& pos);
     
 	/**
 	* Set a single tile.
@@ -222,7 +206,7 @@ public:
   * \param creature Creature to place on the map
   * \param forceLogin If true, placing the creature will not fail becase of obstacles (creatures/chests)
 	*/
-	bool placeCreature(const Position &pos, Creature* creature, bool forceLogin = false);
+	bool placeCreature(const Position& pos, Creature* creature, bool forceLogin = false);
 	
 	/**
 	* Remove a creature from the map.

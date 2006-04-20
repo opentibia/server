@@ -214,7 +214,7 @@ void Npc::onCreatureTurn(const Creature* creature, uint32_t stackpos)
 	//not implemented yet, do we need it?
 }
 
-void Npc::onCreatureSay(const Creature *creature, SpeakClasses type, const std::string &text)
+void Npc::onCreatureSay(const Creature* creature, SpeakClasses type, const std::string &text)
 {
 	if(creature->getID() == this->getID())
 		return;

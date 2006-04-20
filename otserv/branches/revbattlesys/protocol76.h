@@ -120,27 +120,28 @@ private:
 	virtual void sendChannelsDialog();
 	virtual void sendChannel(unsigned short channelId, std::string channelName);
 	virtual void sendOpenPriv(const std::string& receiver);
-	virtual void sendToChannel(const Creature *creature, SpeakClasses type, const std::string &text, unsigned short channelId);
+	virtual void sendToChannel(const Creature* creature, SpeakClasses type, const std::string &text, unsigned short channelId);
 	
 	virtual void sendIcons(int icons);
 
-	virtual void sendDistanceShoot(const Position &from, const Position &to, unsigned char type);
-	virtual void sendMagicEffect(const Position &pos, unsigned char type);
-	virtual void sendAnimatedText(const Position &pos, unsigned char color, std::string text);
-	virtual void sendCreatureHealth(const Creature *creature);
+	virtual void sendDistanceShoot(const Position& from, const Position& to, unsigned char type);
+	virtual void sendMagicEffect(const Position& pos, unsigned char type);
+	virtual void sendAnimatedText(const Position& pos, unsigned char color, std::string text);
+	virtual void sendCreatureHealth(const Creature* creature);
 	virtual void sendSkills();
 	virtual void sendPing();
-	virtual void sendCreatureTurn(const Creature *creature, unsigned char stackpos);
-	virtual void sendCreatureSay(const Creature *creature, SpeakClasses type, const std::string &text);
+	virtual void sendCreatureTurn(const Creature* creature, unsigned char stackpos);
+	virtual void sendCreatureSay(const Creature* creature, SpeakClasses type, const std::string &text);
 	
-	virtual void sendCancel(const char *msg);
+	virtual void sendCancel(const std::string& message);
 	virtual void sendCancelWalk();
 	virtual void sendChangeSpeed(const Creature* creature);
 	virtual void sendCancelTarget();
 	virtual void sendSetOutfit(const Creature* creature);
 	virtual void sendStats();
-	virtual void sendTextMessage(MessageClasses mclass, const char* message);
-	virtual void sendTextMessage(MessageClasses mclass, const char* message,const Position &pos, unsigned char type);
+	virtual void sendTextMessage(MessageClasses mclass, const std::string& message);
+	virtual void sendTextMessage(MessageClasses mclass, const std::string& message, const Position& pos,
+		unsigned char type);
 	
 	virtual void sendTradeItemRequest(const Player* player, const Item* item, bool ack);
 	virtual void sendCloseTrade();
@@ -197,14 +198,14 @@ private:
 		NetworkMessage &msg);
 
 	void AddMapDescription(NetworkMessage& msg, const Position& pos);
-	void AddTextMessage(NetworkMessage &msg,MessageClasses mclass, const char* message);
-	void AddAnimatedText(NetworkMessage &msg,const Position &pos, unsigned char color, std::string text);
-	void AddMagicEffect(NetworkMessage &msg,const Position &pos, unsigned char type);
-	void AddDistanceShoot(NetworkMessage &msg,const Position &from, const Position &to, unsigned char type);
-	void AddCreature(NetworkMessage &msg,const Creature *creature, bool known, unsigned int remove);
+	void AddTextMessage(NetworkMessage &msg,MessageClasses mclass, const std::string& message);
+	void AddAnimatedText(NetworkMessage &msg,const Position& pos, unsigned char color, const std::string& text);
+	void AddMagicEffect(NetworkMessage &msg,const Position& pos, unsigned char type);
+	void AddDistanceShoot(NetworkMessage &msg,const Position& from, const Position& to, unsigned char type);
+	void AddCreature(NetworkMessage &msg,const Creature* creature, bool known, unsigned int remove);
 	void AddPlayerStats(NetworkMessage &msg);
-	void AddCreatureSpeak(NetworkMessage &msg,const Creature *creature, SpeakClasses type, std::string text, unsigned short channelId);
-	void AddCreatureHealth(NetworkMessage &msg,const Creature *creature);
+	void AddCreatureSpeak(NetworkMessage &msg,const Creature* creature, SpeakClasses type, std::string text, unsigned short channelId);
+	void AddCreatureHealth(NetworkMessage &msg,const Creature* creature);
 	void AddCreatureOutfit(NetworkMessage &msg, const Creature* creature);
 	void AddPlayerSkills(NetworkMessage &msg);
 	void AddWorldLight(NetworkMessage &msg, const LightInfo& lightInfo);
@@ -223,7 +224,7 @@ private:
 		const Position& newPos, const Position& oldPos, uint32_t oldStackPos);
 
 	//container
-	void AddContainerItem(NetworkMessage& msg, uint8_t cid, const Item *item);
+	void AddContainerItem(NetworkMessage& msg, uint8_t cid, const Item* item);
 	void UpdateContainerItem(NetworkMessage& msg, uint8_t cid, uint8_t slot, const Item* item);
 	void RemoveContainerItem(NetworkMessage& msg, uint8_t cid, uint8_t slot);
 	

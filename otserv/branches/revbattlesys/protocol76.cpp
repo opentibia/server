@@ -509,17 +509,6 @@ bool Protocol76::CanSee(int x, int y, int z) const
 			return false;
 		}
 	}
-
-	/*
-	//underground 8->15
-	if(myPos.z > 7 && z < 6){
-		return false;
-	}
-	//ground level and above 7->0
-	else if(myPos.z <= 7 && z > 7){
-		return false;
-	}
-	*/
 	
 	//negative offset means that the action taken place is on a lower floor than ourself
 	int offsetz = myPos.z - z;
@@ -1162,15 +1151,15 @@ void Protocol76::sendStats()
 	WriteBuffer(msg);
 }
 
-void Protocol76::sendTextMessage(MessageClasses mclass, const char* message)
+void Protocol76::sendTextMessage(MessageClasses mclass, const std::string& message)
 {
 	NetworkMessage msg;
 	AddTextMessage(msg,mclass, message);
 	WriteBuffer(msg);
 }
 
-void Protocol76::sendTextMessage(MessageClasses mclass, const char* message,
-	const Position &pos, unsigned char type)
+void Protocol76::sendTextMessage(MessageClasses mclass, const std::string& message,
+	const Position& pos, unsigned char type)
 {
 	NetworkMessage msg;
 	AddMagicEffect(msg,pos,type);
@@ -1325,7 +1314,7 @@ void Protocol76::sendCreatureTurn(const Creature* creature, unsigned char stackP
 	}
 }
 
-void Protocol76::sendCreatureSay(const Creature *creature, SpeakClasses type, const std::string &text)
+void Protocol76::sendCreatureSay(const Creature* creature, SpeakClasses type, const std::string &text)
 {
 	NetworkMessage msg;
 	AddCreatureSpeak(msg,creature, type, text, 0);
@@ -1338,10 +1327,10 @@ void Protocol76::sendToChannel(const Creature * creature, SpeakClasses type, con
 	WriteBuffer(msg);
 }
 
-void Protocol76::sendCancel(const char *msg)
+void Protocol76::sendCancel(const std::string& message)
 {
 	NetworkMessage netmsg;
-	AddTextMessage(netmsg, MSG_STATUS_SMALL, msg);
+	AddTextMessage(netmsg, MSG_STATUS_SMALL, message);
 	WriteBuffer(netmsg);
 }
 
@@ -1352,7 +1341,7 @@ void Protocol76::sendCancelTarget()
 	WriteBuffer(netmsg);
 }
 
-void Protocol76::sendChangeSpeed(const Creature *creature)
+void Protocol76::sendChangeSpeed(const Creature* creature)
 {
 	NetworkMessage netmsg;
 	netmsg.AddByte(0x8F);
@@ -1384,28 +1373,28 @@ void Protocol76::sendPing()
 	WriteBuffer(msg);
 }
 
-void Protocol76::sendDistanceShoot(const Position &from, const Position &to, unsigned char type)
+void Protocol76::sendDistanceShoot(const Position& from, const Position& to, unsigned char type)
 {
 	NetworkMessage msg;
 	AddDistanceShoot(msg,from, to,type );
 	WriteBuffer(msg);
 }
 
-void Protocol76::sendMagicEffect(const Position &pos, unsigned char type)
+void Protocol76::sendMagicEffect(const Position& pos, unsigned char type)
 {
 	NetworkMessage msg;
 	AddMagicEffect(msg, pos, type);
 	WriteBuffer(msg);
 }
 
-void Protocol76::sendAnimatedText(const Position &pos, unsigned char color, std::string text)
+void Protocol76::sendAnimatedText(const Position& pos, unsigned char color, std::string text)
 {
 	NetworkMessage msg;
 	AddAnimatedText(msg, pos, color, text);
 	WriteBuffer(msg);
 }
 
-void Protocol76::sendCreatureHealth(const Creature *creature)
+void Protocol76::sendCreatureHealth(const Creature* creature)
 {
 	NetworkMessage msg;
 	AddCreatureHealth(msg,creature);
@@ -1501,9 +1490,9 @@ void Protocol76::sendAddCreature(const Creature* creature, bool isLogin)
 			//player light level
 			AddCreatureLight(msg, creature);
 			
-			std::string tempstring = g_config.getGlobalString("loginmsg", "Welcome.").c_str();
+			std::string tempstring = g_config.getGlobalString("loginmsg", "Welcome.");
 			if(tempstring.size() > 0){
-				AddTextMessage(msg, MSG_STATUS_DEFAULT, tempstring.c_str());
+				AddTextMessage(msg, MSG_STATUS_DEFAULT, tempstring);
 			}
 			
 			tempstring = "Your last visit was on ";
@@ -1511,7 +1500,7 @@ void Protocol76::sendAddCreature(const Creature* creature, bool isLogin)
 			tempstring += ctime(&lastlogin);
 			tempstring.erase(tempstring.length() -1);
 			tempstring += ".";
-			AddTextMessage(msg, MSG_STATUS_DEFAULT, tempstring.c_str());
+			AddTextMessage(msg, MSG_STATUS_DEFAULT, tempstring);
 			WriteBuffer(msg);
 
 			for(VIPListSet::iterator it = player->VIPList.begin(); it != player->VIPList.end(); it++){
@@ -1749,28 +1738,23 @@ void Protocol76::AddMapDescription(NetworkMessage& msg, const Position& pos)
 	GetMapDescription(pos.x - 8, pos.y - 6, pos.z, 18, 14, msg);
 }
 
-void Protocol76::AddTextMessage(NetworkMessage &msg,MessageClasses mclass, const char* message)
+void Protocol76::AddTextMessage(NetworkMessage& msg, MessageClasses mclass, const std::string& message)
 {
 	msg.AddByte(0xB4);
 	msg.AddByte(mclass);
 	msg.AddString(message);
 }
 
-void Protocol76::AddAnimatedText(NetworkMessage &msg,const Position &pos, unsigned char color, std::string text)
+void Protocol76::AddAnimatedText(NetworkMessage& msg, const Position& pos,
+	unsigned char color, const std::string& text)
 {
-#ifdef __DEBUG__
-	if(text.length() == 0) {
-		std::cout << "Warning: 0-Length string in AddAnimatedText()" << std::endl;
-	}
-#endif
-	
-	msg.AddByte(0x84); 
+	msg.AddByte(0x84);
 	msg.AddPosition(pos);
 	msg.AddByte(color);
 	msg.AddString(text);
 }
 
-void Protocol76::AddMagicEffect(NetworkMessage &msg,const Position &pos, unsigned char type)
+void Protocol76::AddMagicEffect(NetworkMessage& msg,const Position& pos, unsigned char type)
 {
 	msg.AddByte(0x83);
 	msg.AddPosition(pos);
@@ -1778,7 +1762,8 @@ void Protocol76::AddMagicEffect(NetworkMessage &msg,const Position &pos, unsigne
 }
 
 
-void Protocol76::AddDistanceShoot(NetworkMessage &msg,const Position &from, const Position &to, unsigned char type)
+void Protocol76::AddDistanceShoot(NetworkMessage& msg, const Position& from, const Position& to,
+	unsigned char type)
 {
 	msg.AddByte(0x85); 
 	msg.AddPosition(from);
@@ -1786,7 +1771,7 @@ void Protocol76::AddDistanceShoot(NetworkMessage &msg,const Position &from, cons
 	msg.AddByte(type + 1);
 }
 
-void Protocol76::AddCreature(NetworkMessage &msg,const Creature *creature, bool known, unsigned int remove)
+void Protocol76::AddCreature(NetworkMessage &msg,const Creature* creature, bool known, unsigned int remove)
 {
 	if(known){
 		msg.AddU16(0x62);
@@ -2101,7 +2086,7 @@ void Protocol76::RemoveInventoryItem(NetworkMessage& msg, slots_t slot)
 }
 
 //containers
-void Protocol76::AddContainerItem(NetworkMessage& msg, uint8_t cid, const Item *item)
+void Protocol76::AddContainerItem(NetworkMessage& msg, uint8_t cid, const Item* item)
 {
 	msg.AddByte(0x70);
 	msg.AddByte(cid);

@@ -79,33 +79,34 @@ public:
 	virtual void sendUpdateInventoryItem(slots_t slot, const Item* item) = 0;
 	virtual void sendRemoveInventoryItem(slots_t slot) = 0;
 
-	virtual void sendDistanceShoot(const Position &from, const Position &to, unsigned char type) = 0;
-	virtual void sendMagicEffect(const Position &pos, unsigned char type) = 0;
-	virtual void sendAnimatedText(const Position &pos, unsigned char color, std::string text) = 0;
-	virtual void sendCreatureHealth(const Creature *creature) = 0;
+	virtual void sendDistanceShoot(const Position& from, const Position& to, unsigned char type) = 0;
+	virtual void sendMagicEffect(const Position& pos, unsigned char type) = 0;
+	virtual void sendAnimatedText(const Position& pos, unsigned char color, std::string text) = 0;
+	virtual void sendCreatureHealth(const Creature* creature) = 0;
 	virtual void sendSkills() = 0;
 	virtual void sendPing() = 0;
 	virtual void sendTradeItemRequest(const Player* player, const Item* item, bool ack) = 0;
 	virtual void sendCloseTrade() = 0;
 	virtual void sendTextWindow(Item* item,const unsigned short maxlen, const bool canWrite) = 0;
-	virtual void sendCreatureTurn(const Creature *creature, unsigned char stackPos) = 0;
-	virtual void sendCreatureSay(const Creature *creature, SpeakClasses type, const std::string &text) = 0;
+	virtual void sendCreatureTurn(const Creature* creature, unsigned char stackPos) = 0;
+	virtual void sendCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text) = 0;
 	virtual void sendSetOutfit(const Creature* creature) = 0;
 	virtual void sendIcons(int icons) = 0;
-	virtual void sendCancel(const char *msg) = 0;
+	virtual void sendCancel(const std::string& message) = 0;
 	virtual void sendCancelWalk() = 0;
 	virtual void sendStats() = 0;
 	virtual void sendChangeSpeed(const Creature* creature) = 0;
 	virtual void sendCancelTarget() = 0;
-	virtual void sendTextMessage(MessageClasses mclass, const char* message) = 0;
-	virtual void sendTextMessage(MessageClasses mclass, const char* message,const Position &pos, unsigned char type) = 0;
+	virtual void sendTextMessage(MessageClasses mclass, const std::string& message) = 0;
+	virtual void sendTextMessage(MessageClasses mclass, const std::string& message, const Position& pos,
+		unsigned char type) = 0;
 	virtual void sendChannelsDialog() = 0;
 	virtual void sendChannel(unsigned short channelId, std::string channelName) = 0;
-	virtual void sendToChannel(const Creature * creature, SpeakClasses type, const std::string &text, unsigned short channelId) = 0;
+	virtual void sendToChannel(const Creature* creature, SpeakClasses type, const std::string &text, unsigned short channelId) = 0;
 	virtual void sendOpenPriv(const std::string& receiver) =0;
 	virtual void sendVIPLogIn(unsigned long guid) = 0;
 	virtual void sendVIPLogOut(unsigned long guid) = 0;
-	virtual void sendVIP(unsigned long guid, const std::string &name, bool isOnline) = 0;
+	virtual void sendVIP(unsigned long guid, const std::string& name, bool isOnline) = 0;
 	virtual void sendCreatureLight(const Creature* creature) = 0;
 	virtual void sendWorldLight(const LightInfo& lightInfo) = 0;
 	virtual void sendCreatureSkull(const Creature* creature) = 0;
@@ -117,7 +118,7 @@ protected:
 	
 	bool pendingLogout;
 	Game   *game;
-	Player *player;
+	Player* player;
 	SOCKET s;
 	friend OTSYS_THREAD_RETURN ConnectionHandler(void *dat);
 };

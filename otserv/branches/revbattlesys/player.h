@@ -183,19 +183,14 @@ public:
 	void addExperience(unsigned long exp);
 	virtual void drainHealth(Creature* attacker, DamageType_t damageType, int32_t damage);
 	virtual void drainMana(Creature* attacker, int32_t manaLoss);
-	virtual void useMana(int32_t manaLoss);
+	
+	void addManaSpent(uint32_t amount);
 
 	virtual int getWeaponDamage() const;
 	virtual int getArmor() const;
 	virtual int getDefense() const;
 
 	unsigned long eventAutoWalk;
-	
-	/*//battle functions
-	void removeDistItem();
-	fight_t getFightType();
-	subfight_t getSubFightType();
-	*/
 
 	//items
 	ContainerVector containerVec;
@@ -214,20 +209,21 @@ public:
 	
 	void sendIcons();  
 	void sendChangeSpeed(const Creature* creature);
-	void sendToChannel(Creature* creature, SpeakClasses type, const std::string &text, unsigned short channelId);
+	void sendToChannel(Creature* creature, SpeakClasses type, const std::string& text, unsigned short channelId);
 	void sendCancelMessage(ReturnValue message) const;
 	void sendCancel(const char* msg) const;
 	void sendCancelWalk() const;
 	void sendCancelTarget();
 	void sendStats();
-	void sendTextMessage(MessageClasses mclass, const char* message) const;
-	void sendTextMessage(MessageClasses mclass, const char* message,const Position &pos, unsigned char type) const;
+	void sendTextMessage(MessageClasses mclass, const std::string& message) const;
+	void sendTextMessage(MessageClasses mclass, const std::string& message, const Position& pos,
+		unsigned char type) const;
 	void sendPing();
 	void sendTextWindow(Item* item,const unsigned short maxlen, const bool canWrite);  
-	void sendDistanceShoot(const Position &from, const Position &to, unsigned char type);
-	void sendMagicEffect(const Position &pos, unsigned char type);
-	void sendAnimatedText(const Position &pos, unsigned char color, std::string text);
-	void sendCreatureHealth(const Creature *creature);
+	void sendDistanceShoot(const Position& from, const Position& to, unsigned char type);
+	void sendMagicEffect(const Position& pos, unsigned char type);
+	void sendAnimatedText(const Position& pos, unsigned char color, std::string text);
+	void sendCreatureHealth(const Creature* creature);
 	void sendTradeItemRequest(const Player* player, const Item* item, bool ack);
 	void sendCloseTrade();
 	void sendHouseWindow(House* _house, unsigned long _listid);

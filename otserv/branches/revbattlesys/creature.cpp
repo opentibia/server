@@ -100,9 +100,19 @@ void Creature::getOutfit(uint8_t& _lookType, uint8_t& _lookHead,
 	_lookFeet = lookFeet;
 }
 
+void Creature::changeHealth(int32_t healthChange)
+{
+	health += std::min(healthChange, healthMax - health);
+}
+
+void Creature::changeMana(int32_t manaChange)
+{
+	mana += std::min(manaChange, manaMax - mana);
+}
+
 void Creature::drainHealth(Creature* attacker, DamageType_t damageType, int32_t damage)
 {
-	health -= std::min(health, damage);
+	changeHealth(-damage);
 
 	/*
 	uint32_t attackerId = 0;
@@ -116,12 +126,7 @@ void Creature::drainHealth(Creature* attacker, DamageType_t damageType, int32_t 
 
 void Creature::drainMana(Creature* attacker, int32_t manaLoss)
 {
-	useMana(manaLoss);
-}
-
-void Creature::useMana(int32_t manaLoss)
-{
-	mana -= std::min(mana, manaLoss);
+	changeMana(-manaLoss);
 }
 
 /*
@@ -168,7 +173,7 @@ void Creature::setMaster(Creature* creature)
 	master = creature;
 }
 
-void Creature::addSummon(Creature *creature)
+void Creature::addSummon(Creature* creature)
 {
 	//std::cout << "addSummon: " << this << " summon=" << creature << std::endl;
 	creature->setMaster(this);

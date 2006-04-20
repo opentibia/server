@@ -481,7 +481,7 @@ bool Commands::reloadInfo(Creature* creature, const std::string& cmd, const std:
 		g_monsters.reload();
 	}
 	else{
-		Player *player = creature->getPlayer();
+		Player* player = creature->getPlayer();
 		if(player)
 			player->sendCancel("Option not found.");
 	}
