@@ -70,6 +70,7 @@ typedef unsigned long long uint64_t;
 		return ::_stricmp(s1, s2);
 	}
 
+	typedef signed long long int64_t;
 	typedef unsigned long uint32_t;
 	typedef signed long int32_t;
 	typedef unsigned short uint16_t;
@@ -90,7 +91,7 @@ typedef unsigned long long uint64_t;
 
 	#define OTSERV_HASH_MAP __gnu_cxx::hash_map
 	#define OTSERV_HASH_SET __gnu_cxx::hash_set
-	typedef int64_t __int64;
+	typedef int64_t int64_t;
 
 #endif
 

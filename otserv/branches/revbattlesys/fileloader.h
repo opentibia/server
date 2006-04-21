@@ -161,7 +161,7 @@ public:
 		return GET_VALUE(ret);
 	}
 
-	inline bool GET_STRING(std::string &ret){
+	inline bool GET_STRING(std::string& ret){
 		char* str;
 		unsigned short str_len;
 
@@ -180,7 +180,7 @@ public:
 		return true;
 	}
 
-	inline bool GET_NSTRING(unsigned short str_len, std::string &ret){
+	inline bool GET_NSTRING(unsigned short str_len, std::string& ret){
 		char* str;
 
 		if(size() < str_len){

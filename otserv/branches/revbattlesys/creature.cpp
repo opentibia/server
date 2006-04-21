@@ -79,15 +79,65 @@ Creature::~Creature()
 		(*cit)->releaseThing2();
 	}
 
+	summons.clear();
+
+	for(ConditionList::iterator it = conditions.begin(); it != conditions.end(); ++it){
+		(*it)->endCondition(this, REASON_ABORT);
+		delete *it;
+	}
+
+	conditions.clear();
+
 	attackedCreature = NULL;
 
 	//std::cout << "Creature destructor " << this->getID() << std::endl;
-	summons.clear();
 }
 
 void Creature::setRemoved()
 {
 	isInternalRemoved = true;
+}
+
+void Creature::onThink(uint32_t interval)
+{
+	//
+}
+
+void Creature::die()
+{
+	/*
+	int lostExperience = getLostExperience();
+	int32_t totalDamage = 0;
+
+	typedef std::map<uint32_t, int32_t> AttackMap;
+	AttackMap attackMap;
+
+	for(DamageList::const_iterator it = damageList.begin(); it != damageList.end(); ++it){
+		totalDamage += (*it).second;
+
+		attackMap[(*it).first] = (*it).second;
+	}
+
+	for(attackMap::iterator it = attackMap.begin(); it != attackMap.end(); ++it){
+		uint32_t gainExperience = (int)std::floor(((double)(*it).second / totalDamage) * lostExperience);		
+
+		//onCreatureGainExperience()
+	}
+	*/
+}
+
+Item* Creature::getCorpse()
+{
+	Item* corpse = Item::CreateItem(getLookCorpse());
+
+	if(corpse){
+		//Add eventual loot
+		if(Container* corpseContainer = corpse->getContainer()){
+			dropLoot(corpseContainer);
+		}
+	}
+
+	return corpse;
 }
 
 void Creature::getOutfit(uint8_t& _lookType, uint8_t& _lookHead,
@@ -102,60 +152,41 @@ void Creature::getOutfit(uint8_t& _lookType, uint8_t& _lookHead,
 
 void Creature::changeHealth(int32_t healthChange)
 {
-	health += std::min(healthChange, healthMax - health);
+	if(healthChange > 0){
+		health += std::min(healthChange, healthMax - health);
+	}
+	else{
+		health = std::max((int32_t)0, health + healthChange);
+	}
 }
 
 void Creature::changeMana(int32_t manaChange)
 {
-	mana += std::min(manaChange, manaMax - mana);
+	if(manaChange > 0){
+		mana += std::min(manaChange, manaMax - mana);
+	}
+	else{
+		mana = std::max((int32_t)0, mana + manaChange);
+	}
 }
 
 void Creature::drainHealth(Creature* attacker, DamageType_t damageType, int32_t damage)
 {
 	changeHealth(-damage);
 
-	/*
 	uint32_t attackerId = 0;
 	if(attacker){
-		attackerId = 0;
+		attackerId = attacker->getID();
 	}
 
-	damageMap[attackerId].push_back(damage);
-	*/
+	damageList.push_back(DamageObject(attackerId, damage));
+	//damageMap.insert(damageMapPair(attackerId, DamageObject(OTSYS_TIME(), damage)));
 }
 
 void Creature::drainMana(Creature* attacker, int32_t manaLoss)
 {
 	changeMana(-manaLoss);
 }
-
-/*
-Creature* Creature::getAttackedCreature()
-{
-	if(attackedCreature2 != 0){
-		return g_game.getCreatureByID(attackedCreature2);
-	}
-
-	return NULL;
-}
-*/
-
-/*
-void Creature::setAttackedCreature(const Creature* creature)
-{
-	std::list<Creature*>::iterator cit;
-	for(cit = summons.begin(); cit != summons.end(); ++cit) {
-		(*cit)->setAttackedCreature(creature);
-	}
-	
-	if(creature){
-		attackedCreature2 = creature->getID();
-	}
-	else{
-		attackedCreature2 = 0;
-	}
-}
-*/
 
 void Creature::setAttackedCreature(Creature* creature)
 {
@@ -195,20 +226,22 @@ void Creature::removeSummon(Creature* creature)
 
 bool Creature::addCondition(Condition* condition)
 {
-	if(!condition){
+	if(condition == NULL){
 		return false;
 	}
-
+	
 	Condition* prevCond = getCondition(condition->getType());
 
 	if(prevCond){
-		prevCond->addCondition(condition);
+		prevCond->addCondition(this, condition);
 		delete condition;
 	}
 	else{
 		if(condition->startCondition(this)){
 			conditions.push_back(condition);
 		}
+
+		onAddCondition(condition->getType());
 	}
 
 	return true;
@@ -216,28 +249,33 @@ bool Creature::addCondition(Condition* condition)
 
 void Creature::removeCondition(ConditionType_t type)
 {
-	ConditionList::iterator it;
-	for(it = conditions.begin(); it != conditions.end(); ++it){
+	for(ConditionList::iterator it = conditions.begin(); it != conditions.end(); ++it){
 		if((*it)->getType() == type){
-			(*it)->endCondition(REASON_ABORT);
+			(*it)->endCondition(this, REASON_ABORT);
 			delete *it;
 			conditions.erase(it);
+
+			onEndCondition(type);
+			break;
 		}
 	}
 }
 
 void Creature::executeConditions(int32_t newticks)
 {
-	ConditionList::iterator it;
-	for(it = conditions.begin(); it != conditions.end();){
-		(*it)->ticks -= newticks;
-		if((*it)->ticks <= 0){
-			(*it)->endCondition(REASON_ENDTICKS);
+	for(ConditionList::iterator it = conditions.begin(); it != conditions.end();){
+		(*it)->setTicks((*it)->getTicks() - newticks);
+		if((*it)->getTicks() <= 0){
+			ConditionType_t type = (*it)->getType();
+
+			(*it)->endCondition(this, REASON_ENDTICKS);
 			delete *it;
 			it = conditions.erase(it);
+
+			onEndCondition(type);
 		}
 		else{
-			(*it)->executeCondition(newticks);
+			(*it)->executeCondition(this, newticks);
 			++it;
 		}
 	}
@@ -266,103 +304,10 @@ bool Creature::hasCondition(ConditionType_t type) const
 	return false;
 }
 
-bool Creature::isImmune(DamageType_t type)
+bool Creature::isImmune(DamageType_t type) const
 {
 	return ((immunities & type) == type);
 }
-
-/*
-void Creature::addCondition(const CreatureCondition& condition, bool refresh)
-{
-	if(condition.getCondition()->attackType == ATTACK_NONE)
-		return;
-	
-	ConditionVec &condVec = conditions[condition.getCondition()->attackType];
-	
-	if(refresh) {
-		condVec.clear();
-	}
-	
-	condVec.push_back(condition);
-}
-
-void Creature::addInflictedDamage(Creature* attacker, int damage)
-{
-	if(damage <= 0)
-		return;
-	
-	unsigned long id = 0;
-	if(attacker) {
-		id = attacker->getID();
-	}
-	
-	totaldamagelist[id].push_back(std::make_pair(OTSYS_TIME(), damage));
-}
-
-int Creature::getLostExperience() {
-	//return (int)std::floor(((double)experience * 0.1));
-	return 0;
-}
-
-int Creature::getInflicatedDamage(unsigned long id)
-{
-	int ret = 0;
-	std::map<long, DamageList >::const_iterator tdIt = totaldamagelist.find(id);
-	if(tdIt != totaldamagelist.end()) {
-		for(DamageList::const_iterator dlIt = tdIt->second.begin(); dlIt != tdIt->second.end(); ++dlIt) {
-			ret += dlIt->second;
-		}
-	}
-	
-	return ret;
-}
-
-int Creature::getInflicatedDamage(Creature* attacker)
-{
-	unsigned long id = 0;
-	if(attacker) {
-		id = attacker->getID();
-	}
-	
-	return getInflicatedDamage(id);
-}
-
-int Creature::getTotalInflictedDamage()
-{
-	int ret = 0;
-	std::map<long, DamageList >::const_iterator tdIt;
-	for(tdIt = totaldamagelist.begin(); tdIt != totaldamagelist.end(); ++tdIt) {
-		ret += getInflicatedDamage(tdIt->first);
-	}
-	
-	return ret;
-}
-
-int Creature::getGainedExperience(Creature* attacker)
-{
-	int totaldamage = getTotalInflictedDamage();
-	int attackerdamage = getInflicatedDamage(attacker);
-	int lostexperience = getLostExperience();
-	int gainexperience = 0;
-	
-	if(attackerdamage > 0 && totaldamage > 0) {
-		gainexperience = (int)std::floor(((double)attackerdamage / totaldamage) * lostexperience);
-	}
-	
-	return gainexperience;
-}
-
-std::vector<long> Creature::getInflicatedDamageCreatureList()
-{
-	std::vector<long> damagelist;	
-	std::map<long, DamageList >::const_iterator tdIt;
-	for(tdIt = totaldamagelist.begin(); tdIt != totaldamagelist.end(); ++tdIt) {
-		damagelist.push_back(tdIt->first);
-	}
-	
-	return damagelist;
-}
-*/
 
 std::string Creature::getDescription(int32_t lookDistance) const
 {
@@ -391,21 +336,21 @@ int Creature::getStepDuration() const
 	return duration;
 };
 
-__int64 Creature::getSleepTicks() const
+int64_t Creature::getSleepTicks() const
 {
-	__int64 delay = 0;
+	int64_t delay = 0;
 	int stepDuration = getStepDuration();
 	
 	if(lastmove != 0) {
-		delay = (((__int64)(lastmove)) + ((__int64)(stepDuration))) - ((__int64)(OTSYS_TIME()));
+		delay = (((int64_t)(lastmove)) + ((int64_t)(stepDuration))) - ((int64_t)(OTSYS_TIME()));
 	}
 	
 	return delay;
 }
 
-__int64 Creature::getEventStepTicks() const
+int64_t Creature::getEventStepTicks() const
 {
-	__int64 ret = getSleepTicks();
+	int64_t ret = getSleepTicks();
 
 	if(ret <=0){
 		ret = getStepDuration();

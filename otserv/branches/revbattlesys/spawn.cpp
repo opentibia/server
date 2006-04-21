@@ -442,7 +442,7 @@ bool Spawn::addMonster(std::string name, Direction dir, int x, int y, int spawnt
 	return true;
 }
 
-Monster* Spawn::respawn(unsigned long spawnid, Position& pos, std::string &name, Direction dir)
+Monster* Spawn::respawn(unsigned long spawnid, Position& pos, std::string& name, Direction dir)
 {
 	Monster* monster = Monster::createMonster(name);
 	if(monster){

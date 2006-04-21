@@ -48,7 +48,7 @@ int LuaScript::OpenFile(const char *filename)
 }
 
 
-std::string LuaScript::getGlobalString(std::string var, const std::string &defString)
+std::string LuaScript::getGlobalString(std::string var, const std::string& defString)
 {
 	lua_getglobal(luaState, var.c_str());
 
@@ -87,7 +87,7 @@ int LuaScript::setGlobalNumber(std::string var, int val){
 	return true;
 }
 
-std::string LuaScript::getGlobalStringField (std::string var, const int key, const std::string &defString) {
+std::string LuaScript::getGlobalStringField (std::string var, const int key, const std::string& defString) {
       lua_getglobal(luaState, var.c_str());
 
       lua_pushnumber(luaState, key);

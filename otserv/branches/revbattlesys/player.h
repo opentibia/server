@@ -127,7 +127,7 @@ public:
 	unsigned long getGuildId() const {return guildId;};
 	bool isOnline() {return (client != NULL);};
 
-	void addContainer(uint32_t containerid, Container *container);
+	void addContainer(uint32_t containerid, Container* container);
 	void closeContainer(uint32_t containerid);
 	int32_t getContainerID(const Container* container) const;
 	Container* getContainer(uint32_t cid);
@@ -230,11 +230,7 @@ public:
 	void receivePing();
 	void flushMsg();
 	
-	void die();      //player loses exp/skills/magLevel on death
-	
 	virtual bool isAttackable() const { return (accessLevel == 0); };
-	virtual void dropLoot(Container *corpse);
-	virtual int getLookCorpse();
 	bool NeedUpdateStats();
 	
 	virtual RaceType_t getRace() const {return RACE_BLOOD;}
@@ -247,7 +243,7 @@ public:
 	void notifyLogIn(Player* player);
 	void notifyLogOut(Player* player);
 	bool removeVIP(unsigned long guid);
-	bool addVIP(unsigned long guid, std::string &name, bool isOnline, bool interal = false);
+	bool addVIP(unsigned long guid, std::string& name, bool isOnline, bool interal = false);
 	
 	VIPListSet VIPList;
 	
@@ -255,7 +251,7 @@ public:
 	
 	void updateItemsLight(bool internal = false);
 
-	//void setAttackedCreature(const Creature* creature);
+	void setAttackedCreature(Creature* creature);
 	void setFollowCreature(const Creature* creature);
 	const Creature* getFollowCreature() {return followCreature;};
 	void setChaseMode(uint8_t mode);
@@ -265,8 +261,12 @@ public:
 	bool checkStopAutoWalk(bool pathInvalid = false);
 	bool stopAutoWalk();
 
-	//combat functions
-	bool isImmune(DamageType_t type);
+	//combat event functions
+	virtual void onAddCondition(ConditionType_t type);
+	virtual void onEndCondition(ConditionType_t type);
+	virtual void onAttackedCreature(Creature* creature);
+
+	bool isImmune(DamageType_t type) const;
 
 #ifdef __SKULLSYSTEM__
 	skulls_t getSkull() const;
@@ -278,7 +278,7 @@ public:
 	void setSkull(skulls_t new_skull);
 	void sendCreatureSkull(const Creature* creature) const;
 	void checkRedSkullTicks(long ticks);
-	#endif
+#endif
 	
 	//tile
 	//send methods
@@ -293,7 +293,7 @@ public:
 
 	void sendCreatureTurn(const Creature* creature, uint32_t stackpos);
 	void sendCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text);
-	void sendCreatureSquare(const Creature* creature, SquareColor color);
+	void sendCreatureSquare(const Creature* creature, SquareColor_t color);
 	void sendCreatureChangeOutfit(const Creature* creature);
 	void sendCreatureLight(const Creature* creature);
 	void sendWorldLight(LightInfo& lightInfo);
@@ -343,7 +343,10 @@ protected:
 	void checkTradeState(const Item* item);
 	void addSkillTryInternal(int skilltry,int skill);
 
-	virtual int onThink(int& newThinkTicks);
+	virtual void onThink(uint32_t interval);
+
+	virtual void die();
+	virtual Item* Player::getCorpse();
 
 	bool hasCapacity(const Item* item, uint32_t count) const;
 
@@ -469,12 +472,12 @@ protected:
 	StorageMap storageMap;
 	LightInfo itemsLight;
 	
-	#ifdef __SKULLSYSTEM__
+#ifdef __SKULLSYSTEM__
 	int64_t redSkullTicks;
 	skulls_t skull;
 	typedef std::set<long> AttackedSet;
 	AttackedSet attackedSet;
-	#endif
+#endif
 	
 	//for skill advances
 	unsigned int getReqSkillTries (int skill, int level, Vocation_t voc);
@@ -482,6 +485,9 @@ protected:
 	//for magic level advances
 	unsigned int getReqMana(int magLevel, Vocation_t voc); 
 	
+	virtual void dropLoot(Container* corpse);
+	virtual int getLookCorpse();
+
 	friend OTSYS_THREAD_RETURN ConnectionHandler(void *dat);
 	
 	friend class Game;

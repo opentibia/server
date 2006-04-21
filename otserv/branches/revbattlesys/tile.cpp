@@ -450,17 +450,11 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			if(hasFlag(TILESTATE_PROTECTIONZONE))
 				return RET_NOTPOSSIBLE;
 
-			/*
-			if(const MagicEffectItem* fieldItem = getFieldItem()){
-				const MagicEffectTargetCreatureCondition* magicTargetCondition = fieldItem->getCondition();
-
-				if(magicTargetCondition){
-					if((monster->getImmunities() & magicTargetCondition->attackType) != magicTargetCondition->attackType){
-						return RET_NOTPOSSIBLE;
-					}
+			if(const MagicField* fieldItem = getFieldItem()){
+				if(!monster->isImmune(fieldItem->getDamageType())){
+					return RET_NOTPOSSIBLE;
 				}
 			}
-			*/
 
 			if(floorChange() || getTeleportItem()){
 				return RET_NOTPOSSIBLE;
@@ -1066,28 +1060,24 @@ void Tile::postAddNotification(Thing* thing, bool hasOwnership /*= true*/)
 
 	if(hasOwnership){
 		//do action(s)
-		/*if(Creature* creature = thing->getCreature()){
+		if(Creature* creature = thing->getCreature()){
 			MagicField* fieldItem = getFieldItem();
 			if(fieldItem){
+
 				//remove magic walls/wild growth
 				if(fieldItem->isBlocking()){
 					g_game.internalRemoveItem(fieldItem, 1);
 				}
+				else{
+					/*add condition*/
+					const Condition* condition = fieldItem->getCondition();
 
-				const MagicEffectTargetCreatureCondition* magicTargetCondition = fieldItem->getCondition();
-
-				if(!(g_game.getWorldType() == WORLD_TYPE_NO_PVP && creature && magicTargetCondition && magicTargetCondition->getOwnerID() != 0)){
-					fieldItem->getDamage(creature);
-				}
-				
-				if(magicTargetCondition && ((magicTargetCondition->attackType == ATTACK_FIRE) || 
-						(magicTargetCondition->attackType == ATTACK_POISON) ||
-						(magicTargetCondition->attackType == ATTACK_ENERGY))){	
-					Creature* attacker = g_game.getCreatureByID(magicTargetCondition->getOwnerID());
-					g_game.creatureMakeMagic(attacker, creature->getPosition(), magicTargetCondition);
+					if(condition){
+						creature->addCondition(condition->clone());
+					}
 				}
 			}
-		}*/
+		}
 		
 		if(Teleport* teleport = getTeleportItem()){
 			teleport->__addThing(thing);

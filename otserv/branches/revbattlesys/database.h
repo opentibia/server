@@ -93,28 +93,28 @@ public:
 	*\param s The name of the field
 	*\param nrow The number of the row
 	*/ 
-	int getDataInt(const std::string &s, unsigned int nrow=0);
+	int getDataInt(const std::string& s, unsigned int nrow=0);
 	
 	/** Get the Long value of a field in database
 	*\returns The Long value of the selected field and row
 	*\param s The name of the field
 	*\param nrow The number of the row
 	*/
-	long getDataLong(const std::string &s, unsigned int nrow=0);
+	long getDataLong(const std::string& s, unsigned int nrow=0);
 	
 	/** Get the String of a field in database
 	*\returns The String of the selected field and row
 	*\param s The name of the field
 	*\param nrow The number of the row
 	*/
-	std::string getDataString(const std::string &s, unsigned int nrow=0);
+	std::string getDataString(const std::string& s, unsigned int nrow=0);
 	
 	/** Get the blob of a field in database
 	*\returns a PropStream that is initiated with the blob data field, if not exist it returns NULL.
 	*\param s The name of the field
 	*\param nrow The number of the row
 	*/
-	const char* getDataBlob(const std::string &s, unsigned long& size, unsigned int nrow=0);
+	const char* getDataBlob(const std::string& s, unsigned long& size, unsigned int nrow=0);
 
 	/** Get the number of rows
 	*\returns The number of rows
@@ -132,7 +132,7 @@ private:
 	void clear();
 	//void clearRows();
 	//void clearFieldNames();
-	void setFieldName(const std::string &s, unsigned int n){
+	void setFieldName(const std::string& s, unsigned int n){
 		m_listNames[s] = n; 
 		m_numFields++;
 	};
@@ -217,7 +217,7 @@ public:
 	*\returns The string modified
 	*\param s The source string
 	*/
-	static std::string escapeString(const std::string &s);
+	static std::string escapeString(const std::string& s);
 	
 	/** Escape the special characters in a string for no problems with the query
 	*\returns The string modified

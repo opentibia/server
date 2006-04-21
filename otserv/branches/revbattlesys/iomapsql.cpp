@@ -203,7 +203,7 @@ try{
 	       z=atoi(posit->c_str());
 	       t = map->getTile(x,y,z);
 	       if(t){
-              Container *container = dynamic_cast<Container*>(myItem);
+              Container* container = dynamic_cast<Container*>(myItem);
               if(depot != 0){
                  container->depotId = depot;
               }

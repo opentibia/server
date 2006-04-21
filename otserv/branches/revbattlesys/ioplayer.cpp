@@ -65,7 +65,7 @@ bool IOPlayer::getGuidByName(unsigned long& guid, std::string& name)
 	return false;
 }
 
-bool IOPlayer::getNameByGuid(unsigned long guid, std::string &name)
+bool IOPlayer::getNameByGuid(unsigned long guid, std::string& name)
 {
 	return false;
 }
@@ -75,7 +75,7 @@ bool IOPlayer::playerExists(std::string name)
 	return false;
 }
 
-bool IOPlayer::getGuildIdByName(unsigned long &guid, const std::string &name)
+bool IOPlayer::getGuildIdByName(unsigned long &guid, const std::string& name)
 {
 	return false;
 }

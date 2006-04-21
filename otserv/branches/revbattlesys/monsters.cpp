@@ -169,7 +169,7 @@ Monsters::Monsters()
 	loaded = false;
 }
 
-bool Monsters::loadFromXml(const std::string &_datadir,bool reloading /*= false*/)
+bool Monsters::loadFromXml(const std::string& _datadir,bool reloading /*= false*/)
 {	
 	loaded = false;	
 	datadir = _datadir;

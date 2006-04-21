@@ -98,7 +98,7 @@ Account IOAccountSQL::loadAccount(unsigned long accno)
 }
 
 
-bool IOAccountSQL::getPassword(unsigned long accno, const std::string &name, std::string &password)
+bool IOAccountSQL::getPassword(unsigned long accno, const std::string& name, std::string& password)
 {
 	Database mysql;
 	if(!mysql.connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str())){

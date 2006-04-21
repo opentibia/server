@@ -42,12 +42,12 @@ void replaceString(std::string& str, const std::string sought, const std::string
 	}
 }
 
-void trim_right(std::string &source, const std::string &t)
+void trim_right(std::string& source, const std::string& t)
 {
 	source.erase(source.find_last_not_of(t)+1);
 }
 
-void trim_left(std::string &source, const std::string &t)
+void trim_left(std::string& source, const std::string& t)
 {
 	source.erase(0, source.find_first_not_of(t));
 }

@@ -84,7 +84,7 @@ bool Actions::reload(){
 	return loadFromXml(datadir);
 }
 
-bool Actions::loadFromXml(const std::string &_datadir)
+bool Actions::loadFromXml(const std::string& _datadir)
 {
 	loaded = false;
 	Action* action = NULL;
@@ -395,7 +395,7 @@ bool Actions::UseItemEx(Player* player, const Position& from_pos,
 
 //
 
-Action::Action(Game* igame,const std::string &datadir, const std::string &scriptname)
+Action::Action(Game* igame,const std::string& datadir, const std::string& scriptname)
 {
 	loaded = false;
 	allowfaruse = false;
@@ -452,7 +452,7 @@ bool Action::executeUse(Player* player,Item* item, PositionEx &posFrom, Position
 
 std::map<unsigned int,Thing*> ActionScript::uniqueIdMap;
 
-ActionScript::ActionScript(Game *igame,const std::string &datadir,const std::string &scriptname):
+ActionScript::ActionScript(Game* igame,const std::string& datadir,const std::string& scriptname):
 game(igame),
 _player(NULL)
 {

@@ -134,9 +134,18 @@ enum e_fluids {
 	FLUID_WINE = FLUID_PURPLE+8,
 };
 
-enum SquareColor {
+enum SquareColor_t {
 	SQ_COLOR_NONE = 256,
 	SQ_COLOR_BLACK = 0,
+};
+
+enum TextColor_t {
+	TEXTCOLOR_NONE      = 255,
+	TEXTCOLOR_WHITE_EXP = 215,
+	TEXTCOLOR_WHITE     = 208,
+	TEXTCOLOR_BLUE      = 2,
+	TEXTCOLOR_RED       = 180,
+	TEXTCOLOR_GREEN     = 50,
 };
 
 enum Icons {

@@ -683,7 +683,7 @@ bool IOPlayerXML::getGuidByNameEx(unsigned long& guid, unsigned long& alvl, std:
 	return isSuccess;
 }
 
-bool IOPlayerXML::getNameByGuid(unsigned long guid, std::string &name)
+bool IOPlayerXML::getNameByGuid(unsigned long guid, std::string& name)
 {
 	std::string datadir = g_config.getGlobalString("datadir");
 	std::string filename = datadir + "players/" + "players.xml";

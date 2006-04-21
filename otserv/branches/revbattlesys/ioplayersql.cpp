@@ -579,7 +579,7 @@ bool IOPlayerSQL::storeNameByGuid(Database &mysql, unsigned long guid)
 	return true;
 }
 
-bool IOPlayerSQL::getNameByGuid(unsigned long guid, std::string &name)
+bool IOPlayerSQL::getNameByGuid(unsigned long guid, std::string& name)
 {
 	NameCacheMap::iterator it = nameCacheMap.find(guid);
 	if(it != nameCacheMap.end()){
@@ -605,7 +605,7 @@ bool IOPlayerSQL::getNameByGuid(unsigned long guid, std::string &name)
 	return true;
 }
 
-bool IOPlayerSQL::getGuidByName(unsigned long &guid, std::string &name)
+bool IOPlayerSQL::getGuidByName(unsigned long &guid, std::string& name)
 {
 	GuidCacheMap::iterator it = guidCacheMap.find(name);
 	if(it != guidCacheMap.end()){
@@ -634,7 +634,7 @@ bool IOPlayerSQL::getGuidByName(unsigned long &guid, std::string &name)
 }
 
 
-bool IOPlayerSQL::getGuidByNameEx(unsigned long &guid, unsigned long &alvl, std::string &name)
+bool IOPlayerSQL::getGuidByNameEx(unsigned long &guid, unsigned long &alvl, std::string& name)
 {
 	Database mysql;
 	if(!mysql.connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str())){

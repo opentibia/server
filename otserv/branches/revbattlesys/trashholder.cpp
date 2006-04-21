@@ -68,7 +68,7 @@ void TrashHolder::__addThing(int32_t index, Thing* thing)
 		if(item != this){
 			g_game.internalRemoveItem(item);
 			if(effect != NM_ME_NONE){
-				g_game.AddMagicEffectAt(getPosition(), effect);
+				g_game.addMagicEffect(getPosition(), effect);
 			}
 		}
 	}

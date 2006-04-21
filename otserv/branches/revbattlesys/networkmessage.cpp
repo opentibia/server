@@ -251,7 +251,7 @@ void NetworkMessage::AddU32(unsigned int value)
 }
 
 
-void NetworkMessage::AddString(const std::string &value)
+void NetworkMessage::AddString(const std::string& value)
 {
   AddString(value.c_str());
 }

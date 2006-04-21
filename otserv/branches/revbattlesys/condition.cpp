@@ -18,15 +18,16 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#include "creature.h"
-#include "player.h"
 #include "condition.h"
+
+#include "game.h"
+#include "creature.h"
 #include <utility>
+
+extern Game g_game;
 
 Condition::Condition() :
   ticks(0),
-  //creature(NULL),
-  //player(NULL),
   conditionType(CONDITION_NONE)
 {
 	//
@@ -45,8 +46,7 @@ Condition* Condition::createCondition(ConditionType_t _type, int32_t _ticks, int
 		case CONDITION_FIRE:
 		case CONDITION_ENERGY:
 		{
-			//return new ConditionDamage(_type, _ticks, param);
-			return NULL;
+			return new ConditionDamage(_type, _ticks, param);
 			break;
 		}
 
@@ -110,49 +110,38 @@ ConditionGeneric::ConditionGeneric(ConditionType_t _type, int32_t _ticks)
 
 bool ConditionGeneric::startCondition(Creature* creature)
 {
-	/*
-	if(player = creature->getPlayer()){
-		if(conditionType == CONDITION_PZLOCK){
-			player->sendIcons();
-		}
+	return true;
 
-		return true;
+	/*
+	if(conditionType != CONDITION_EXHAUSTED){
+		return false;
 	}
 	else{
-		if(conditionType != CONDITION_EXHAUSTED){
-			return false;
-		}
-		else{
-			return true;
-		}
+		return true;
 	}
 	*/
-
-	return false;
 }
 
-void ConditionGeneric::executeCondition(int32_t interval)
+void ConditionGeneric::executeCondition(Creature* creature, int32_t interval)
 {
 	//nothing
 }
 
-void ConditionGeneric::endCondition(EndCondition_t reason)
+void ConditionGeneric::endCondition(Creature* creature, EndCondition_t reason)
 {
-	if(conditionType == CONDITION_PZLOCK){
-		//player->pzLocked = false;
-	}
+	//
 }
 
-void ConditionGeneric::addCondition(Condition* addCondition)
+void ConditionGeneric::addCondition(Creature* creature, const Condition* addCondition)
 {
 	if(addCondition->getType() == conditionType){
-		if(addCondition->ticks > ticks){
-			ticks = addCondition->ticks;
+		if(addCondition->getTicks() > ticks){
+			ticks = addCondition->getTicks();
 		}
 	}
 }
 
-uint8_t ConditionGeneric::getIcons()
+uint8_t ConditionGeneric::getIcons() const
 {
 	switch(conditionType){
 		case CONDITION_MANASHIELD:
@@ -175,6 +164,98 @@ uint8_t ConditionGeneric::getIcons()
 	return 0;
 }
 
+ConditionDamage::ConditionDamage(ConditionType_t _type, int32_t _ticks, int32_t _owner)
+{
+	conditionType = _type;
+	owner = _owner;
+	ticks = _ticks;
+
+	damageList.push_back(DamagePair(1000, -200));
+	damageList.push_back(DamagePair(5000, -100));
+	damageList.push_back(DamagePair(4000, -90));
+	damageList.push_back(DamagePair(3000, -80));
+	damageList.push_back(DamagePair(2000, -70));
+	damageList.push_back(DamagePair(1000, -60));
+}
+
+bool ConditionDamage::startCondition(Creature* creature)
+{
+	return true;
+}
+
+void ConditionDamage::executeCondition(Creature* creature, int32_t interval)
+{
+	if(!damageList.empty()){
+
+		DamagePair& damagePair = damageList.front();
+		damagePair.first -= interval;
+
+		if(damagePair.first <= 0){
+			damageList.pop_front();
+
+			DamageType_t damageType = DAMAGE_NONE;
+
+			switch(conditionType){
+				case CONDITION_FIRE:
+					damageType = DAMAGE_FIRE;
+					break;
+
+				case CONDITION_ENERGY:
+					damageType = DAMAGE_ENERGY;
+					break;
+
+				case CONDITION_POISON:
+					damageType = DAMAGE_POISON;
+					break;
+			}
+
+			Creature* attacker = g_game.getCreatureByID(owner);
+			g_game.combatChangeHealth(damageType, attacker, creature, damagePair.second);
+		}
+	}
+}
+
+void ConditionDamage::endCondition(Creature* creature, EndCondition_t reason)
+{
+	//
+}
+
+void ConditionDamage::addCondition(Creature* creature, const Condition* addCondition)
+{
+	if(addCondition->getType() == conditionType){
+		if(addCondition->getTicks() > ticks){
+			ticks = addCondition->getTicks();
+		}
+		
+		ConditionDamage conditionDamage = static_cast<const ConditionDamage&>(*addCondition);
+
+		owner = conditionDamage.owner;
+		damageList.clear();
+		damageList = conditionDamage.damageList;
+
+		executeCondition(creature, 0);
+	}
+}
+
+uint8_t ConditionDamage::getIcons() const
+{
+	switch(conditionType){
+		case CONDITION_FIRE:
+			return ICON_BURN;
+			break;
+
+		case CONDITION_ENERGY:
+			return ICON_ENERGY;
+			break;
+
+		case CONDITION_POISON:
+			return ICON_POISON;
+			break;
+	}
+
+	return 0;
+}
+
 ConditionSpeed::ConditionSpeed(ConditionType_t _type, int32_t _ticks, int32_t changeSpeed)
 {
 	conditionType = _type;
@@ -184,40 +265,36 @@ ConditionSpeed::ConditionSpeed(ConditionType_t _type, int32_t _ticks, int32_t ch
 
 bool ConditionSpeed::startCondition(Creature* creature)
 {
-	/*
-	creature = c;
-	creature->setSpeed(creature->getSpeed() + speed_delta);
-	*/
-
+	g_game.changeSpeed(creature, speedDelta);
 	return true;
 }
 
-void ConditionSpeed::executeCondition(int32_t interval)
+void ConditionSpeed::executeCondition(Creature* creature, int32_t interval)
 {
 	//
 }
 
-void ConditionSpeed::endCondition(EndCondition_t reason)
+void ConditionSpeed::endCondition(Creature* creature, EndCondition_t reason)
 {
-	//creature->setSpeed(creature->getSpeed() - speedDelta);
+	g_game.changeSpeed(creature, -speedDelta);
 }
 
-void ConditionSpeed::addCondition(Condition* addCondition)
+void ConditionSpeed::addCondition(Creature* creature, const Condition* addCondition)
 {
 	if(addCondition->getType() == conditionType){
-		if(addCondition->ticks > ticks){
-			ticks = addCondition->ticks;
+		if(addCondition->getTicks() > ticks){
+			ticks = addCondition->getTicks();
 		}
 
-		ConditionSpeed conditionSpeed = static_cast<ConditionSpeed&>(*addCondition);
+		ConditionSpeed conditionSpeed = static_cast<const ConditionSpeed&>(*addCondition);
 		int32_t oldSpeedDelta = speedDelta;
 		speedDelta = conditionSpeed.speedDelta;
 		
-		//creature->setSpeed(creature->getSpeed() + speedDelta - oldSpeedDelta);
+		g_game.changeSpeed(creature, + speedDelta - oldSpeedDelta);
 	}
 }
 
-uint8_t ConditionSpeed::getIcons()
+uint8_t ConditionSpeed::getIcons() const
 {
 	switch(conditionType){
 		case CONDITION_HASTE:

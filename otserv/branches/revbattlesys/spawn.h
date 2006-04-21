@@ -53,7 +53,7 @@ private:
 	int radius;
 
 	bool isInSpawnRange(const Position& pos);
-	Monster* respawn(unsigned long spawnid, Position& pos, std::string &name, Direction dir);
+	Monster* respawn(unsigned long spawnid, Position& pos, std::string& name, Direction dir);
 
 	struct spawninfo {
 		Position pos;
@@ -81,7 +81,7 @@ public:
 	}
 
 	//static SpawnManager* instance();
-	//static bool initialize(Game *igame);
+	//static bool initialize(Game* igame);
 
 	bool addSpawn(Spawn* spawn);
 	bool loadSpawnsXML(std::string filename);
@@ -98,7 +98,7 @@ protected:
 
 	SpawnManager* _instance;
 	spawnsList spawns;
-	Game *game;
+	Game* game;
 };
 
 #endif

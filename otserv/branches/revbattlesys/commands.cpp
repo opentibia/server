@@ -218,7 +218,7 @@ bool Commands::placeNpc(Creature* creature, const std::string& cmd, const std::s
 
 	// Place the npc
 	if(game->placeCreature(creature->getPosition(), npc)){
-		game->AddMagicEffectAt(creature->getPosition(), NM_ME_MAGIC_BLOOD);
+		game->addMagicEffect(creature->getPosition(), NM_ME_MAGIC_BLOOD);
 		return true;
 	}
 	else{
@@ -243,7 +243,7 @@ bool Commands::placeMonster(Creature* creature, const std::string& cmd, const st
 
 	// Place the monster
 	if(game->placeCreature(creature->getPosition(), monster)){
-		game->AddMagicEffectAt(creature->getPosition(), NM_ME_MAGIC_BLOOD);
+		game->addMagicEffect(creature->getPosition(), NM_ME_MAGIC_BLOOD);
 		return true;
 	}
 	else{
@@ -332,7 +332,7 @@ bool Commands::teleportMasterPos(Creature* creature, const std::string& cmd, con
 {
 	Position destPos = creature->getPosition();
 	if(game->internalTeleport(creature, creature->masterPos) == RET_NOERROR){
-		game->AddMagicEffectAt(destPos, NM_ME_ENERGY_AREA);
+		game->addMagicEffect(destPos, NM_ME_ENERGY_AREA);
 		return true;
 	}
 
@@ -345,7 +345,7 @@ bool Commands::teleportHere(Creature* creature, const std::string& cmd, const st
 	if(paramCreature){
 		Position destPos = paramCreature->getPosition();
 		if(game->internalTeleport(paramCreature, creature->getPosition()) == RET_NOERROR){
-			game->AddMagicEffectAt(destPos, NM_ME_ENERGY_AREA);
+			game->addMagicEffect(destPos, NM_ME_ENERGY_AREA);
 			return true;
 		}
 	}
@@ -384,7 +384,7 @@ bool Commands::createItemById(Creature* creature, const std::string& cmd, const 
 		}
 	}
 	
-	game->AddMagicEffectAt(player->getPosition(), NM_ME_MAGIC_POISEN);
+	game->addMagicEffect(player->getPosition(), NM_ME_MAGIC_POISEN);
 	return true;
 }
 
@@ -435,7 +435,7 @@ bool Commands::createItemByName(Creature* creature, const std::string& cmd, cons
 		}
 	}
 	
-	game->AddMagicEffectAt(player->getPosition(), NM_ME_MAGIC_POISEN);
+	game->addMagicEffect(player->getPosition(), NM_ME_MAGIC_POISEN);
 	return true;
 }
 
@@ -511,7 +511,7 @@ bool Commands::teleportTo(Creature* creature, const std::string& cmd, const std:
 	if(paramCreature){
 		Position destPos = creature->getPosition();
 		if(game->internalTeleport(creature, paramCreature->getPosition()) == RET_NOERROR){
-			game->AddMagicEffectAt(destPos, NM_ME_ENERGY_AREA);
+			game->addMagicEffect(destPos, NM_ME_ENERGY_AREA);
 			return true;
 		}
 	}
@@ -653,14 +653,14 @@ bool Commands::teleportNTiles(Creature* creature, const std::string& cmd, const 
 		}
 
 		if(game->internalTeleport(creature, newPos) == RET_NOERROR){
-			game->AddMagicEffectAt(newPos, NM_ME_ENERGY_AREA);
+			game->addMagicEffect(newPos, NM_ME_ENERGY_AREA);
 		}
 	}
 
 	return true;
 }
 
-bool Commands::kickPlayer(Creature* creature, const std::string &cmd, const std::string &param)
+bool Commands::kickPlayer(Creature* creature, const std::string& cmd, const std::string& param)
 {
 	Player* playerKick = game->getPlayerByName(param);
 	if(playerKick){
@@ -676,7 +676,7 @@ bool Commands::kickPlayer(Creature* creature, const std::string &cmd, const std:
 	return false;
 }
 
-bool Commands::exivaPlayer(Creature* creature, const std::string &cmd, const std::string &param)
+bool Commands::exivaPlayer(Creature* creature, const std::string& cmd, const std::string& param)
 {
 	//a. From 1 to 4 sq's [Person] is standing next to you.
 	//b. From 5 to 100 sq's [Person] is to the south, north, east, west.

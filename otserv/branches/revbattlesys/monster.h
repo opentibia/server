@@ -24,7 +24,6 @@
 
 #include "tile.h"
 #include "monsters.h"
-//#include "templates.h"
 
 class Creature;
 class Game;
@@ -72,7 +71,7 @@ public:
 	virtual bool isPushable() const {return mType->pushable;}
 
 	virtual void setNormalCreatureLight();
-	virtual void dropLoot(Container *corpse);
+	virtual void dropLoot(Container* corpse);
 
 	virtual void onAddTileItem(const Position& pos, const Item* item);
 	virtual void onUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* oldItem, const Item* newItem);
@@ -83,7 +82,7 @@ public:
 	virtual void onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout);
 	virtual void onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport);
 
-	virtual int onThink(int& newThinkTicks);
+	virtual void onThink(uint32_t interval);
 
 	bool canPushItems() const {return mType->canPushItems;};
 

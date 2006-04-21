@@ -273,6 +273,21 @@ bool Map::removeCreature(Creature* creature)
 	return false;
 }
 
+/*
+void Map::getSpectators(const Position& pos, SpectatorList& list)
+{
+	//twice the client viewport
+	int32_t xRange = 9 * 2;
+	int32_t yRange = 7 * 2;
+
+	for(int32_t z = 0; z < MAP_MAX_LAYERS; ++z){
+		for(int32_t x = pos.x - xRange; x <= pos.x + xRange; ++x){
+			for(int32_t y = pos.y - yRange; y <= pos.y + yRange; ++y){
+				//
+			}
+		}
+}
+*/
 
 void Map::getSpectators(const Range& range, SpectatorVec& list)
 {

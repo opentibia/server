@@ -60,7 +60,7 @@ class Actions
 public:
 	Actions(){};
 	Actions(Game* igame);
-	bool loadFromXml(const std::string &datadir);
+	bool loadFromXml(const std::string& datadir);
 	virtual ~Actions();
 	void clear();
 	
@@ -70,7 +70,7 @@ public:
 		const unsigned char from_stack, const Position& to_pos,
 		const unsigned char to_stack, const unsigned short itemid);
 	
-	bool openContainer(Player* player,Container *container, const unsigned char index);
+	bool openContainer(Player* player,Container* container, const unsigned char index);
 	
 	Game* game;
 	bool loaded;
@@ -115,7 +115,7 @@ enum ePlayerInfo{
 class Action
 {
 public:
-	Action(Game* igame,const std::string &datadir, const std::string &scriptname);
+	Action(Game* igame,const std::string& datadir, const std::string& scriptname);
 	virtual ~Action();
 	bool isLoaded() const {return loaded;}
 	bool allowFarUse() const {return allowfaruse;};
@@ -133,7 +133,7 @@ protected:
 
 class ActionScript : protected LuaScript{
 public:
-	ActionScript(Game* igame,const std::string &datadir, const std::string &scriptname);
+	ActionScript(Game* igame,const std::string& datadir, const std::string& scriptname);
 	virtual ~ActionScript();
 	bool isLoaded()const {return loaded;}
 	
@@ -203,7 +203,7 @@ public:
 	
 protected:			
 	
-	Game *game;
+	Game* game;
 	Player *_player;
 	unsigned int lastuid;
 	

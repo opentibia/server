@@ -146,7 +146,8 @@ void Monster::onCreatureMove(const Creature* creature, const Position& oldPos, u
 void Monster::startThink()
 {
 	if(!eventCheck){
-		eventCheck = g_game.addEvent(makeTask(500, std::bind2nd(std::mem_fun(&Game::checkCreature), getID())));
+		//eventCheck = g_game.addEvent(makeTask(500, std::bind2nd(std::mem_fun(&Game::checkCreature), getID())));
+		onThink(1000);
 	}
 
 	if(!eventCheckAttacking){
@@ -172,17 +173,16 @@ void Monster::stopThink()
 	eventAutoWalk = 0;*/
 }
 
-int Monster::onThink(int& newThinkTicks)
+void Monster::onThink(uint32_t interval)
 {
-	return 100;
-
-	//check target
+	eventCheck = g_game.addEvent(makeTask(interval, boost::bind(&Game::checkCreature, &g_game, getID(), interval)));
+	//do some thinking here
 }
 
 /*
 int Monster::onWalk()
 {
-	__int64 delay = getSleepTicks();
+	int64_t delay = getSleepTicks();
 	
 	if(delay > 0){
 		return delay;
@@ -202,7 +202,7 @@ std::string Monster::getDescription(int32_t lookDistance) const
 	return strDescription;
 }
 
-void Monster::dropLoot(Container *corpse)
+void Monster::dropLoot(Container* corpse)
 {
 	if(!getMaster()){
 		mType->createLoot(corpse);

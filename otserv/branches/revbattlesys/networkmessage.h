@@ -68,7 +68,7 @@ public:
   void AddU16 (unsigned short value);
   void AddU32 (unsigned int   value);
 
-  void AddString(const std::string &value);
+  void AddString(const std::string& value);
   void AddString(const char* value);
 
 

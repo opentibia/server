@@ -120,7 +120,7 @@ private:
 	virtual void sendChannelsDialog();
 	virtual void sendChannel(unsigned short channelId, std::string channelName);
 	virtual void sendOpenPriv(const std::string& receiver);
-	virtual void sendToChannel(const Creature* creature, SpeakClasses type, const std::string &text, unsigned short channelId);
+	virtual void sendToChannel(const Creature* creature, SpeakClasses type, const std::string& text, unsigned short channelId);
 	
 	virtual void sendIcons(int icons);
 
@@ -131,7 +131,7 @@ private:
 	virtual void sendSkills();
 	virtual void sendPing();
 	virtual void sendCreatureTurn(const Creature* creature, unsigned char stackpos);
-	virtual void sendCreatureSay(const Creature* creature, SpeakClasses type, const std::string &text);
+	virtual void sendCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text);
 	
 	virtual void sendCancel(const std::string& message);
 	virtual void sendCancelWalk();
@@ -151,14 +151,14 @@ private:
 	
 	virtual void sendVIPLogIn(unsigned long guid);
 	virtual void sendVIPLogOut(unsigned long guid);
-	virtual void sendVIP(unsigned long guid, const std::string &name, bool isOnline);
+	virtual void sendVIP(unsigned long guid, const std::string& name, bool isOnline);
 	
 	virtual void sendCreatureLight(const Creature* creature);
 	virtual void sendWorldLight(const LightInfo& lightInfo);
 	
 	virtual void sendCreatureSkull(const Creature* creature);
 	virtual void sendCreatureShield(const Creature* creature);
-	virtual void sendCreatureSquare(const Creature* creature, SquareColor color);
+	virtual void sendCreatureSquare(const Creature* creature, SquareColor_t color);
 	
 	//tiles
 	virtual void sendAddTileItem(const Position& pos, const Item* item);

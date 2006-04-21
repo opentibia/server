@@ -43,7 +43,7 @@ public:
 	virtual void onCreatureAppear(unsigned long cid);
 	virtual void onCreatureDisappear(int cid);
 
-	virtual void onCreatureSay(int cid, SpeakClasses, const std::string &text);
+	virtual void onCreatureSay(int cid, SpeakClasses, const std::string& text);
 	virtual void onThink();
 	static Npc* getNpc(lua_State *L);
 	static int luaActionSay(lua_State *L);
@@ -78,7 +78,7 @@ public:
 	void removeList() {listNpc.removeList(getID());}
 	void addList() {listNpc.addList(this);}
 	
-	void speak(const std::string &text){};
+	void speak(const std::string& text){};
 	virtual const std::string& getName() const {return name;};
 	virtual const std::string& getNameDescription() const {return name;};
 	
@@ -98,9 +98,9 @@ protected:
 	virtual void onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport);
 
 	virtual void onCreatureTurn(const Creature* creature, uint32_t stackpos);
-	virtual void onCreatureSay(const Creature* creature, SpeakClasses type, const std::string &text);
+	virtual void onCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text);
 	virtual void onCreatureChangeOutfit(const Creature* creature);
-	virtual int onThink(int& newThinkTicks);
+	virtual void onThink(uint32_t interval);
 	virtual std::string getDescription(int32_t lookDistance) const;
 	
 	virtual bool isAttackable() const { return false; };

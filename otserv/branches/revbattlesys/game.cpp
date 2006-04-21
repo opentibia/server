@@ -531,6 +531,10 @@ bool Game::placeCreature(const Position& pos, Creature* creature, bool isLogin /
 
 			creature->getParent()->postAddNotification(creature);
 
+			creature->eventCheck = addEvent(makeTask(1000, boost::bind(&Game::checkCreature, this, creature->getID(), 1000)));
+			creature->eventCheckAttacking = addEvent(makeTask(1500, boost::bind(&Game::checkCreatureAttacking, this, creature->getID(), 1500)));
+
+			/*
 			if(player){
 				#ifdef __DEBUG_PLAYERS__
 				std::cout << (uint32_t)getPlayersOnline() << " players online." << std::endl;
@@ -543,6 +547,7 @@ bool Game::placeCreature(const Position& pos, Creature* creature, bool isLogin /
 				creature->eventCheck = addEvent(makeTask(500, std::bind2nd(std::mem_fun(&Game::checkCreature), creature->getID())));
 				creature->eventCheckAttacking = addEvent(makeTask(500, boost::bind(&Game::checkCreatureAttacking, this, creature->getID(), 500)));
 			}
+			*/
 		}
 	}
 
@@ -1461,15 +1466,15 @@ void Game::getSpectators(const Range& range, SpectatorVec& list)
 }
 
 //battle system
-void Game::checkCreatureAttacking(unsigned long creatureid, unsigned long time)
+void Game::checkCreatureAttacking(uint32_t creatureId, uint32_t interval)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::checkCreatureAttacking()");
 
-	Creature* creature = getCreatureByID(creatureid);
+	Creature* creature = getCreatureByID(creatureId);
 	if(creature){
 		//do attack
 
-		creature->eventCheckAttacking = addEvent(makeTask(time, boost::bind(&Game::checkCreatureAttacking, this, creature->getID(), time)));
+		creature->eventCheckAttacking = addEvent(makeTask(interval, boost::bind(&Game::checkCreatureAttacking, this, creature->getID(), interval)));
 	}
 }
 
@@ -1508,7 +1513,7 @@ bool Game::playerWhisper(Player* player, const std::string& text)
 	return true;
 }
 
-bool Game::playerYell(Player* player, std::string &text)
+bool Game::playerYell(Player* player, std::string& text)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerYell()");
 	if(player->isRemoved())
@@ -1616,30 +1621,30 @@ bool Game::playerUseItemEx(Player* player, const Position& fromPos, uint8_t from
 	Item* item = dynamic_cast<Item*>(internalGetThing(player, fromPos, fromStackPos));
 
 	if(item){
-		/*
 		Combat combat;
 
-		//combat.setCombatType(COMBAT_HITPOINTS, DAMAGE_PHYSICAL);
-		//combat.setEffects(NM_ANI_NONE, NM_ME_MORT_AREA);
+		combat.setCombatType(COMBAT_HITPOINTS, DAMAGE_PHYSICAL);
+		combat.setEffects(NM_ANI_SUDDENDEATH, NM_ME_MORT_AREA);
 
-		combat.setCombatType(COMBAT_HITPOINTS, DAMAGE_MAGIC_FIRE);
-		combat.setEffects(NM_ANI_FIRE, NM_ME_FIRE_AREA);
+		combat.doCombat(player, toPos, random_range(-100, -200));
 
-		combat.doCombat(player, toPos, -100);
-		*/
-
+		/*
 		AreaCombat combat(false);
 
-		uint8_t arr[] = {0, 0, 1, 1, 1, 0, 0};
+		uint8_t arr[] = {1, 1, 1, 1, 1, 1, 1};
 		std::vector<uint8_t> row(arr, arr + sizeof(arr) / sizeof(uint8_t));
 		combat.setRow(0, row);
 		combat.setRow(1, row);
 		combat.setRow(2, row);
 
-		combat.setCombatType(COMBAT_HITPOINTS, DAMAGE_MAGIC_FIRE);
+		combat.setCombatType(COMBAT_ADDCONDITION, DAMAGE_FIRE);
 		combat.setEffects(NM_ANI_FIRE, NM_ME_FIRE_AREA);
 
-		combat.doCombat(player, toPos, -100);
+		Condition* condition = Condition::createCondition(CONDITION_FIRE, 20000, player->getID());
+		combat.setCondition(condition);
+
+		combat.doCombat(player, toPos, 0);
+		*/
 
 		/*
 		//Runes
@@ -2437,130 +2442,50 @@ void Game::checkAutoWalkPlayer(unsigned long id)
 	}
 }
 
-void Game::checkCreature(unsigned long creatureid)
+void Game::checkCreature(uint32_t creatureId, uint32_t interval)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::checkCreature()");
 
-	Creature* creature = getCreatureByID(creatureid);
+	Creature* creature = getCreatureByID(creatureId);
 
 	if(creature){
-		/*
-		int thinkTicks = 0;
-		int oldThinkTicks = creature->onThink(thinkTicks);
-
-		if(!creature->isRemoved()){
-
-			Conditions& conditions = creature->getConditions();
-			for(Conditions::iterator condIt = conditions.begin(); condIt != conditions.end(); ++condIt) {
-				if(creature->isRemoved())
+		if(creature->getHealth() > 0){
+			creature->onThink(interval);
+			creature->executeConditions(interval);
+		}
+		else{
+			Item* splash = NULL;
+			switch(creature->getRace()){
+				case RACE_VENOM:
+					splash = Item::CreateItem(ITEM_FULLSPLASH, FLUID_GREEN);
 					break;
 
-				if(condIt->first == ATTACK_FIRE || condIt->first == ATTACK_ENERGY || condIt->first == ATTACK_POISON) {
-					ConditionVec &condVec = condIt->second;
+				case RACE_BLOOD:
+					splash = Item::CreateItem(ITEM_FULLSPLASH, FLUID_BLOOD);
+					break;
 
-					if(condVec.empty())
-						continue;
+				case RACE_UNDEAD:
+					break;
 
-					CreatureCondition& condition = condVec[0];
-
-					if(condition.onTick(oldThinkTicks)){
-						const MagicEffectTargetCreatureCondition* magicTargetCondition = condition.getCondition();
-						Creature* c = getCreatureByID(magicTargetCondition->getOwnerID());
-						creatureMakeMagic(c, creature->getPosition(), magicTargetCondition);
-
-						if(condition.getCount() <= 0){
-							condVec.erase(condVec.begin());
-						}
-					}
-				}
+				default:
+					break;
 			}
 
-			if(!creature->isRemoved()){
-				if(thinkTicks > 0) {
-					creature->eventCheck = addEvent(makeTask(thinkTicks, std::bind2nd(std::mem_fun(&Game::checkCreature), creatureid)));
-				}
-				else
-					creature->eventCheck = 0;
-					//creature->eventCheck = addEvent(makeTask(oldThinkTicks, std::bind2nd(std::mem_fun(&Game::checkCreature), creatureid)));
-
-				if(Player* player = creature->getPlayer()){
-					Tile* tile = player->getTile();
-					if(!tile->isPz()){
-						if(player->food > 1000){
-							player->gainManaTick();
-							player->food -= thinkTicks;
-							if(player->healthMax - player->health > 0){
-								if(player->gainHealthTick()){
-									SpectatorVec list;
-									SpectatorVec::iterator it;
-									getSpectators(Range(creature->getPosition()), list);
-									for(it = list.begin(); it != list.end(); ++it) {
-										Player* p = dynamic_cast<Player*>(*it);
-										if(p)
-											p->sendCreatureHealth(player);
-									}
-								}
-							}
-						}				
-					}
-
-					//send stats only if have changed
-					if(player->NeedUpdateStats()){
-						player->sendStats();
-					}
-					
-					player->sendPing();
-					#ifdef __SKULLSYSTEM__
-					player->checkRedSkullTicks(thinkTicks);
-					#endif
-					
-					if(player->inFightTicks >= 1000) {
-						player->inFightTicks -= thinkTicks;
-						
-						if(player->inFightTicks < 1000){
-							player->pzLocked = false;
-							player->sendIcons();
-							#ifdef __SKULLSYSTEM__
-							if(player->getSkull() != SKULL_RED){
-								player->clearAttacked();
-								changeSkull(player, SKULL_NONE);
-							}
-							#endif
-						}
-					}
-					
-					if(player->exhaustedTicks >= 1000){
-						player->exhaustedTicks -= thinkTicks;
-
-						if(player->exhaustedTicks < 0)
-							player->exhaustedTicks = 0;
-					}
-					
-					if(player->manaShieldTicks >=1000){
-						player->manaShieldTicks -= thinkTicks;
-						
-						if(player->manaShieldTicks  < 1000)
-							player->sendIcons();
-					}
-					
-					if(player->hasteTicks >=1000){
-						player->hasteTicks -= thinkTicks;
-					}
-					
-				}
-				else{
-					if(creature->manaShieldTicks >=1000){
-						creature->manaShieldTicks -= thinkTicks;
-					}
-						
-					if(creature->hasteTicks >=1000){
-						creature->hasteTicks -= thinkTicks;
-					}
-				}
+			Tile* tile = creature->getTile();
+			if(splash){
+				internalAddItem(tile, splash);
+				startDecay(splash);
 			}
 
+			Item* corpse = creature->getCorpse();
+			if(corpse){
+				internalAddItem(tile, corpse);
+				startDecay(corpse);
+			}
+
+			creature->die();
+			removeCreature(creature);
 		}
-		*/
 
 		flushSendBuffers();
 	}
@@ -2611,8 +2536,10 @@ void Game::changeSpeed(unsigned long id, unsigned short speed)
 }
 */
 
-void Game::changeSpeed(const Creature* creature)
+void Game::changeSpeed(Creature* creature, int32_t speedDelta)
 {
+	creature->setSpeed(creature->getSpeed() + speedDelta);
+
 	SpectatorVec list;
 	SpectatorVec::iterator it;
 
@@ -2641,8 +2568,214 @@ void Game::changeLight(const Creature* creature)
 	}
 }
 
+void Game::combatChangeHealth(DamageType_t damageType, Creature* attacker, Creature* target,
+	int32_t healthChange)
+{
+	const Position& targetPos = target->getPosition();
+
+	SpectatorVec list;
+	getSpectators(Range(targetPos, true), list);
+
+	if(healthChange > 0){
+		target->changeHealth(healthChange);
+		addCreatureHealth(list, target);
+	}
+	else{
+		bool isImmune = target->isImmune(damageType);
+
+		if(!isImmune){
+			//TODO: reduce damage based on shield/skill/armor
+
+			//uint32_t reducedDamage = target->getReducedDamage(getDamageType(), -healthChange);
+			int32_t reducedDamage = -healthChange;
+
+			Condition* condition = Condition::createCondition(CONDITION_INFIGHT, 60 * 1000, 0);
+			target->addCondition(condition);
+
+			if(attacker){
+				attacker->onAttackedCreature(target);
+			}
+
+			if(target->hasCondition(CONDITION_MANASHIELD)){
+				int32_t manaDamage = 0;
+				
+				if(reducedDamage < target->getMana()){
+					manaDamage = reducedDamage;
+					reducedDamage = 0;
+				}
+				else if(reducedDamage > target->getMana()){
+					manaDamage = target->getMana();
+					reducedDamage -= manaDamage;
+				}
+				else if(reducedDamage > (target->getHealth() + target->getMana()) ){
+					reducedDamage = target->getHealth();
+					manaDamage = target->getMana();
+				}
+
+				target->drainMana(attacker, manaDamage);
+
+				std::stringstream ss;
+				ss << manaDamage;
+				addAnimatedText(list, targetPos, 10, ss.str());
+				addMagicEffect(list, targetPos, NM_ME_LOOSE_ENERGY);
+			}
+
+			reducedDamage = std::min(target->getHealth(), reducedDamage);
+			if(reducedDamage > 0){
+				target->drainHealth(attacker, damageType, reducedDamage);
+				addCreatureHealth(list, target);
+
+				TextColor_t textColor = TEXTCOLOR_NONE;
+				uint8_t hitEffect = 0;
+
+				switch(damageType){
+					case DAMAGE_PHYSICAL:
+					{
+						Item* splash = NULL;
+						switch(target->getRace()){
+							case RACE_VENOM:
+								textColor = TEXTCOLOR_GREEN;
+								hitEffect = NM_ME_POISEN;
+								splash = Item::CreateItem(ITEM_SMALLSPLASH, FLUID_GREEN);
+								break;
+
+							case RACE_BLOOD:
+								textColor = TEXTCOLOR_RED;
+								hitEffect = NM_ME_DRAW_BLOOD;
+								splash = Item::CreateItem(ITEM_SMALLSPLASH, FLUID_BLOOD);
+								break;
+
+							case RACE_UNDEAD:
+								textColor = TEXTCOLOR_WHITE;
+								hitEffect = NM_ME_HIT_AREA;
+								break;
+
+							default:
+								break;
+						}
+
+						if(splash){
+							internalAddItem(target->getTile(), splash);
+							startDecay(splash);
+						}
+
+						break;
+					}
+
+					case DAMAGE_ENERGY:
+					{
+						textColor = TEXTCOLOR_BLUE;
+						hitEffect = NM_ME_ENERGY_DAMAGE;
+						break;
+					}
+
+					case DAMAGE_POISON:
+					{
+						textColor = TEXTCOLOR_GREEN;
+						hitEffect = NM_ME_POISEN;
+						break;
+					}
+
+					case DAMAGE_FIRE:
+					{
+						textColor = TEXTCOLOR_RED;
+						hitEffect = NM_ME_HITBY_FIRE;
+						break;
+					}
+				}
+
+				if(textColor != TEXTCOLOR_NONE){
+					std::stringstream ss;
+					ss << reducedDamage;
+					addAnimatedText(list, targetPos, textColor, ss.str());
+					addMagicEffect(list, targetPos, hitEffect);
+				}
+			}
+		}
+	}
+}
+
+void Game::combatChangeMana(Creature* attacker, Creature* target, int32_t manaChange)
+{
+	if(manaChange > 0){
+		target->changeMana(manaChange);
+	}
+	else{
+		target->drainMana(attacker, -manaChange);
+
+		const Position& targetPos = target->getPosition();
+
+		std::stringstream ss;
+		ss << manaChange;
+		addAnimatedText(targetPos, TEXTCOLOR_BLUE, ss.str());
+	}
+}
+
+void Game::addCreatureHealth(const SpectatorVec& list, const Creature* target)
+{
+	Player* player = NULL;
+	for(SpectatorVec::const_iterator it = list.begin(); it != list.end(); ++it){
+		if(player = (*it)->getPlayer()){
+			player->sendCreatureHealth(target);
+		}
+	}
+}
+
+void Game::addAnimatedText(const Position& pos, uint8_t textColor,
+	const std::string& text)
+{
+	SpectatorVec list;
+	getSpectators(Range(pos, true), list);
+
+	addAnimatedText(list, pos, textColor, text);
+}
+
+void Game::addAnimatedText(const SpectatorVec& list, const Position& pos, uint8_t textColor,
+	const std::string& text)
+{
+	Player* player = NULL;
+	for(SpectatorVec::const_iterator it = list.begin(); it != list.end(); ++it){
+		if(player = (*it)->getPlayer()){
+			player->sendAnimatedText(pos, textColor, text);
+		}
+	}
+}
+
+void Game::addMagicEffect(const Position& pos, uint8_t effect)
+{
+	SpectatorVec list;
+	getSpectators(Range(pos, true), list);
+
+	addMagicEffect(list, pos, effect);
+}
+
+void Game::addMagicEffect(const SpectatorVec& list, const Position& pos, uint8_t effect)
+{
+	Player* player = NULL;
+	for(SpectatorVec::const_iterator it = list.begin(); it != list.end(); ++it){
+		if(player = (*it)->getPlayer()){
+			player->sendMagicEffect(pos, effect);
+		}
+	}
+}
+
+void Game::addDistanceEffect(const Position& fromPos, const Position& toPos,
+	uint8_t effect)
+{
+	SpectatorVec list;
+	getSpectators(Range(fromPos, true), list);
+	getSpectators(Range(toPos, true), list);
+
+	Player* player = NULL;
+	for(SpectatorVec::const_iterator it = list.begin(); it != list.end(); ++it){
+		if(player = (*it)->getPlayer()){
+			player->sendDistanceShoot(fromPos, toPos, effect);
+		}
+	}
+}
+
 #ifdef __SKULLSYSTEM__
-void Game::changeSkull(Player* player, skulls_t new_skull)
+void Game::changeSkull(Player* player, skulls_t newSkull)
 {
 	SpectatorVec list;
 	SpectatorVec::iterator it;
@@ -2658,22 +2791,6 @@ void Game::changeSkull(Player* player, skulls_t new_skull)
 	}
 }
 #endif
-
-void Game::AddMagicEffectAt(const Position& pos, uint8_t type)
-{
-	SpectatorVec list;
-	SpectatorVec::iterator it;
-
-	getSpectators(Range(pos), list);
-
-	Player* player;
-	for(it = list.begin(); it != list.end(); ++it){
-		if(player = (*it)->getPlayer()){
-			player->sendMagicEffect(pos, type);
-		}
-	}
-}
-
 
 void Game::checkDecay(int t)
 {

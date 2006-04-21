@@ -26,7 +26,6 @@
 #include <vector>
 #include <set>
 
-
 #include "map.h"
 #include "position.h"
 #include "item.h"
@@ -35,12 +34,12 @@
 #include "spawn.h"
 #include "templates.h"
 #include "scheduler.h"
-//#include "magic.h"
 
 class Creature;
 class Player;
 class Monster;
 class Npc;
+class CombatInfo;
 class Commands;
 class Task;
 class lessSchedTask;
@@ -297,18 +296,12 @@ public:
 	void FreeThing(Thing* thing);
 
 	bool getPathTo(Creature* creature, Position toPosition, std::list<Direction>& listDir);
-	void changeSpeed(const Creature* creature);
+	void changeSpeed(Creature* creature, int32_t speedDelta);
 	void changeLight(const Creature* creature);
 
-	//void changeOutfitAfter(unsigned long id, int looktype, long time);
-	//void changeSpeed(unsigned long id, unsigned short speed);
-	//void changeOutfit(unsigned long id, int looktype);
-
 #ifdef __SKULLSYSTEM__
-	void changeSkull(Player* creature, skulls_t new_skull);
+	void changeSkull(Player* player, skulls_t newSkull);
 #endif
-	
-	void AddMagicEffectAt(const Position& pos, uint8_t type);
 	
 	GameState_t getGameState();
 	void setGameState(GameState_t newstate){gameState = newstate;}
@@ -317,12 +310,26 @@ public:
 	OTSYS_THREAD_LOCKVAR gameLock;   
 
 	//Events
-	void checkAutoWalkPlayer(unsigned long id);
-	void checkCreature(unsigned long creatureid);
-	void checkCreatureAttacking(unsigned long creatureid, unsigned long time);
+	void checkAutoWalkPlayer(unsigned long creatureId);
+	void checkCreature(uint32_t creatureId, uint32_t interval);
+	void checkCreatureAttacking(uint32_t creatureId, uint32_t interval);
 	void checkDecay(int t);
 	void checkSpawns(int t);
 	void checkLight(int t);
+	
+	void combatChangeHealth(DamageType_t damageType, Creature* attacker, Creature* target, int32_t healthChange);
+	void combatChangeMana(Creature* attacker, Creature* target, int32_t manaChange);
+
+	//animation help functions
+	void addCreatureHealth(const SpectatorVec& list, const Creature* target);
+	void addAnimatedText(const Position& pos, uint8_t textColor,
+		const std::string& text);
+	void addAnimatedText(const SpectatorVec& list, const Position& pos, uint8_t textColor,
+		const std::string& text);
+	void addMagicEffect(const Position& pos, uint8_t effect);
+	void addMagicEffect(const SpectatorVec& list, const Position& pos, uint8_t effect);
+	void addDistanceEffect(const Position& fromPos, const Position& toPos,
+	uint8_t effect);
 
 protected:
 	std::vector<Player*> BufferedPlayers;
@@ -332,15 +339,6 @@ protected:
 	std::map<Item*, unsigned long> tradeItems;
 	
 	AutoList<Creature> listCreature;
-
-	/*//battle system
-	void creatureApplyDamage(Creature* creature, int damage, int &outDamage, int &outManaDamage);
-	bool creatureOnPrepareAttack(Creature* creature, Position pos);
-	bool creatureOnPrepareMagicAttack(Creature* creature, Position pos, const MagicEffectClass* me);
-	void creatureMakeDamage(Creature* creature, Creature *attackedCreature, fight_t damagetype);
-	void CreateDamageUpdate(Creature* player, Creature* attackCreature, int damage);
-	void CreateManaDamageUpdate(Creature* player, Creature* attackCreature, int damage);
-	//battle system*/
 
 	OTSYS_THREAD_LOCKVAR eventLock;
 	OTSYS_THREAD_SIGNALVAR eventSignal;
@@ -353,7 +351,7 @@ protected:
 
 	struct GameEvent
 	{
-		__int64  tick;
+		int64_t  tick;
 		int      type;
 		void*    data;
 	};
@@ -398,6 +396,8 @@ protected:
 	friend class SpawnManager;
 	friend class ActionScript;
 	friend class Actions;
+	friend class Combat;
+	friend class AreaCombat;
 };
 
 template<class ArgType>
@@ -407,7 +407,7 @@ public:
 		boost::function<bool(Game*, ArgType)> f1,
 		Task* f2,
 		std::list<ArgType>& call_list,
-		__int64 interval) :
+		int64_t interval) :
 			_f1(f1), _f2(f2), _list(call_list), _interval(interval)
 	{
 		//
@@ -443,14 +443,14 @@ private:
 	Task* _f2;
 
 	std::list<ArgType> _list;
-	__int64 _interval;
+	int64_t _interval;
 };
 
 template<class ArgType>
-SchedulerTask* makeTask(__int64 ticks,
+SchedulerTask* makeTask(int64_t ticks,
 	boost::function<bool(Game*, ArgType)>* f1,
 	std::list<ArgType>& call_list,
-	__int64 interval,
+	int64_t interval,
 	Task* f2)
 {
 	TCallList<ArgType>* t = new TCallList<ArgType>(f1, f2, call_list, interval);

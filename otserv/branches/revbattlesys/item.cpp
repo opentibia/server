@@ -28,7 +28,7 @@
 #include "house.h"
 
 #include "actions.h"
-//#include "magic.h"
+#include "combat.h"
 
 #include <iostream>
 #include <sstream>
@@ -48,7 +48,7 @@ Item* Item::CreateItem(const unsigned short _type, unsigned short _count /*= 1*/
 		newItem = new Teleport(_type);
 	}
 	else if(items[_type].isMagicField()){
-		newItem = new Item(_type, _count);
+		newItem = new MagicField(_type);
 	}
 	else if(items[_type].isDoor()){
 		newItem = new Door(_type);

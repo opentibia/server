@@ -188,7 +188,7 @@ public:
 	Monsters();
 	~Monsters();
 	
-	bool loadFromXml(const std::string &_datadir, bool reloading = false);
+	bool loadFromXml(const std::string& _datadir, bool reloading = false);
 	bool isLoaded(){return loaded;}	
 	bool reload();
 	

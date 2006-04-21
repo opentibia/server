@@ -21,8 +21,10 @@
 #ifndef __OTSERV_CONDITION_H__
 #define __OTSERV_CONDITION_H__
 
+#include "definitions.h"
+#include "enums.h"
+
 #include <list>
-#include <string>
 
 class Creature;
 class Player;
@@ -41,7 +43,7 @@ enum ConditionType_t {
 	CONDITION_INFIGHT,		 //Generic -- Player only
 	CONDITION_DRUNK,		   //Generic -- Player only
 	CONDITION_EXHAUSTED,	 //Generic
-	CONDITION_FOOD,			   //Generic -- Player only -- NOT IMPLEMENTED YET
+	CONDITION_FOOD,			   //Generic -- Player only
 };
 
 enum EndCondition_t {
@@ -53,28 +55,24 @@ class Condition{
 public:
 	Condition();
 	virtual ~Condition(){};
-
-	virtual std::string serialize(){return std::string();}
-	virtual bool unserialize(std::string ){return true;}
 	
 	virtual bool startCondition(Creature* creature) = 0;
-	virtual void executeCondition(int32_t interval) = 0;
-	virtual void endCondition(EndCondition_t reason) = 0;
-	
-	virtual void addCondition(Condition* condition) = 0;
-	
-	virtual uint8_t getIcons() = 0;
-	ConditionType_t getType(){ return conditionType;}
-	
-	int ticks;
-	
-	static Condition* createCondition(ConditionType_t _type, int32_t ticks, int32_t param);
-	
-protected:	
-	ConditionType_t conditionType;
+	virtual void executeCondition(Creature* creature, int32_t interval) = 0;
+	virtual void endCondition(Creature* creature, EndCondition_t reason) = 0;	
+	virtual void addCondition(Creature* creature, const Condition* condition) = 0;
+	virtual uint8_t getIcons() const = 0;
 
-	//Creature* creature;
-	//Player* player;
+	virtual Condition* clone() const = 0;
+
+	ConditionType_t getType() const { return conditionType;}
+	int32_t getTicks() const { return ticks; }
+	void setTicks(int32_t newTicks) { ticks = newTicks; }
+
+	static Condition* createCondition(ConditionType_t _type, int32_t ticks, int32_t param);
+
+protected:
+	int32_t ticks;
+	ConditionType_t conditionType;
 };
 
 class ConditionGeneric: public Condition
@@ -84,12 +82,12 @@ public:
 	virtual ~ConditionGeneric(){};
 	
 	virtual bool startCondition(Creature* creature);
-	virtual void executeCondition(int32_t interval);
-	virtual void endCondition(EndCondition_t reason);
+	virtual void executeCondition(Creature* creature, int32_t interval);
+	virtual void endCondition(Creature* creature, EndCondition_t reason);
+	virtual void addCondition(Creature* creature, const Condition* condition);
+	virtual uint8_t getIcons() const;
 	
-	virtual void addCondition(Condition *condition);
-	
-	virtual uint8_t getIcons();
+	virtual ConditionGeneric* clone()  const { return new ConditionGeneric(*this); }
 };
 
 class ConditionDamage: public Condition
@@ -99,12 +97,17 @@ public:
 	virtual ~ConditionDamage(){};
 	
 	virtual bool startCondition(Creature* creature);
-	virtual void executeCondition(int32_t interval);
-	virtual void endCondition(EndCondition_t reason);
-	
-	virtual void addCondition(Condition* condition);
-	
-	virtual uint8_t getIcons();	
+	virtual void executeCondition(Creature* creature, int32_t interval);
+	virtual void endCondition(Creature* creature, EndCondition_t reason);	
+	virtual void addCondition(Creature* creature, const Condition* condition);	
+	virtual uint8_t getIcons() const;	
+
+	virtual ConditionDamage* clone()  const { return new ConditionDamage(*this); }
+
+protected:
+	uint32_t owner;
+	typedef std::pair<int32_t, int32_t> DamagePair;
+	std::list<DamagePair> damageList;
 };
 
 class ConditionSpeed: public Condition
@@ -114,12 +117,12 @@ public:
 	virtual ~ConditionSpeed(){};
 	
 	virtual bool startCondition(Creature* creature);
-	virtual void executeCondition(int32_t interval);
-	virtual void endCondition(EndCondition_t reason);
-	
-	virtual void addCondition(Condition* condition);
-	
-	virtual uint8_t getIcons();
+	virtual void executeCondition(Creature* creature, int32_t interval);
+	virtual void endCondition(Creature* creature, EndCondition_t reason);	
+	virtual void addCondition(Creature* creature, const Condition* condition);	
+	virtual uint8_t getIcons() const;
+
+	virtual ConditionSpeed* clone()  const { return new ConditionSpeed(*this); }
 	
 protected:
 	int32_t speedDelta;
@@ -132,12 +135,12 @@ public:
 	virtual ~ConditionOutfit(){};
 	
 	virtual bool startCondition(Creature* creature);
-	virtual void executeCondition(int32_t interval);
-	virtual void endCondition(EndCondition_t reason);
-	
-	virtual void addCondition(Condition* condition);
-	
-	virtual uint8_t getIcons();
+	virtual void executeCondition(Creature* creature, int32_t interval);
+	virtual void endCondition(Creature* creature, EndCondition_t reason);	
+	virtual void addCondition(Creature* creature, const Condition* condition);	
+	virtual uint8_t getIcons() const;
+
+	virtual ConditionOutfit* clone()  const { return new ConditionOutfit(*this); }
 };
 
 class ConditionLight: public Condition
@@ -147,12 +150,12 @@ public:
 	virtual ~ConditionLight(){};
 	
 	virtual bool startCondition(Creature* creature);
-	virtual void executeCondition(int32_t interval);
-	virtual void endCondition(EndCondition_t reason);
-	
-	virtual void addCondition(Condition *condition);
-	
-	virtual uint8_t getIcons();
+	virtual void executeCondition(Creature* creature, int32_t interval);
+	virtual void endCondition(Creature* creature, EndCondition_t reason);	
+	virtual void addCondition(Creature* creature, const Condition* condition);	
+	virtual uint8_t getIcons() const;
+
+	virtual ConditionLight* clone()  const { return new ConditionLight(*this); }
 };
 
 

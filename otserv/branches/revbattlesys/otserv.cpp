@@ -108,7 +108,7 @@ enum passwordType_t{
 
 passwordType_t passwordType;
 
-bool passwordTest(std::string &plain, std::string &hash)
+bool passwordTest(std::string& plain, std::string& hash)
 {
 	if(passwordType == PASSWORD_TYPE_MD5){
 		MD5_CTX m_md5;

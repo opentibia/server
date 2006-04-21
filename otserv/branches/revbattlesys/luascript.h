@@ -46,9 +46,9 @@ public:
   static int getField (lua_State *L , const char *key);
   static void setField (lua_State *L, const char *index, int val);
   // get a global string
-  std::string getGlobalString(std::string var, const std::string &defString = "");
+  std::string getGlobalString(std::string var, const std::string& defString = "");
   int getGlobalNumber(std::string var, const int defNum = 0);
-  std::string getGlobalStringField (std::string var, const int key, const std::string &defString = "");
+  std::string getGlobalStringField (std::string var, const int key, const std::string& defString = "");
   // set a var to a val
   int setGlobalString(std::string var, std::string val);
   int setGlobalNumber(std::string var, int val);

@@ -105,7 +105,7 @@ void DBResult::clear()
 	m_numFields = 0;
 }
 
-int DBResult::getDataInt(const std::string &s, unsigned int nrow)
+int DBResult::getDataInt(const std::string& s, unsigned int nrow)
 {
 	listNames_type::iterator it=m_listNames.find(s);
 	if(it != m_listNames.end())
@@ -125,7 +125,7 @@ int DBResult::getDataInt(const std::string &s, unsigned int nrow)
 	return 0; // Failed
 }
 
-long DBResult::getDataLong(const std::string &s, unsigned int nrow)
+long DBResult::getDataLong(const std::string& s, unsigned int nrow)
 {
 	listNames_type::iterator it=m_listNames.find(s);
 	if(it != m_listNames.end())
@@ -146,7 +146,7 @@ long DBResult::getDataLong(const std::string &s, unsigned int nrow)
 }
 
 
-std::string DBResult::getDataString(const std::string &s, unsigned int nrow)
+std::string DBResult::getDataString(const std::string& s, unsigned int nrow)
 {
 	listNames_type::iterator it=m_listNames.find(s);
 	if(it != m_listNames.end())
@@ -166,7 +166,7 @@ std::string DBResult::getDataString(const std::string &s, unsigned int nrow)
 	return std::string(""); // Failed
 }
 
-const char* DBResult::getDataBlob(const std::string &s, unsigned long& size, unsigned int nrow)
+const char* DBResult::getDataBlob(const std::string& s, unsigned long& size, unsigned int nrow)
 {
 	listNames_type::iterator it=m_listNames.find(s);
 	if(it != m_listNames.end())
@@ -327,7 +327,7 @@ bool Database::storeQuery(DBQuery &q, DBResult &dbres)
 		return false;
 }
 
-std::string Database::escapeString(const std::string &s)
+std::string Database::escapeString(const std::string& s)
 {
 	return escapeString(s.c_str(), s.size());
 }

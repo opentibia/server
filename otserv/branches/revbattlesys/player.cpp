@@ -26,8 +26,6 @@
 #include <iostream>
 #include <algorithm>
 
-using namespace std;
-
 #include <stdlib.h>
 
 #include "protocol.h"
@@ -382,42 +380,9 @@ void Player::sendIcons()
 {
 	int icons = 0;
 
-	/*
-	if(inFightTicks >= 6000 || inFightTicks ==4000 || inFightTicks == 2000){
-		icons |= ICON_SWORDS;
-	}
-	*/
-
-	if(hasCondition(CONDITION_INFIGHT)){
-		icons |= ICON_SWORDS;
-	}
-
-	if(hasCondition(CONDITION_MANASHIELD)){
-		icons |= ICON_MANASHIELD;
-	}
-
-	if(hasCondition(CONDITION_HASTE)){
-		icons |= ICON_HASTE;
-	}
-
-	if(hasCondition(CONDITION_PARALYZE)){
-		icons |= ICON_PARALYZE;
-	}
-
-	if(hasCondition(CONDITION_FIRE)){
-		icons |= ICON_BURN;
-	}
-
-	if(hasCondition(CONDITION_ENERGY)){
-		icons |= ICON_ENERGY;
-	}
-
-	if(hasCondition(CONDITION_POISON)){
-		icons |= ICON_POISON;
-	}
-
-	if(hasCondition(CONDITION_DRUNK)){
-		icons |= ICON_DRUNK;
+	ConditionList::iterator it;
+	for(it = conditions.begin(); it != conditions.end(); ++it){
+		icons |= (*it)->getIcons();
 	}
 
 	client->sendIcons(icons);             
@@ -700,7 +665,7 @@ int Player::getLookCorpse()
 		return ITEM_FEMALE_CORPSE;
 }
 
-void Player::dropLoot(Container *corpse)
+void Player::dropLoot(Container* corpse)
 {
 	for(int i = SLOT_FIRST; i < SLOT_LAST; ++i){
 		Item* item = items[i];		
@@ -1013,7 +978,7 @@ void Player::sendChangeSpeed(const Creature* creature)
 }
 
 void Player::sendToChannel(Creature* creature, SpeakClasses type,
-	const std::string &text, unsigned short channelId)
+	const std::string& text, unsigned short channelId)
 {
 	client->sendToChannel(creature, type, text, channelId);
 }
@@ -1198,7 +1163,7 @@ void Player::sendCreatureSay(const Creature* creature, SpeakClasses type, const 
   client->sendCreatureSay(creature, type, text);
 }
 
-void Player::sendCreatureSquare(const Creature* creature, SquareColor color)
+void Player::sendCreatureSquare(const Creature* creature, SquareColor_t color)
 {
 	client->sendCreatureSquare(creature, color);
 }
@@ -1515,10 +1480,30 @@ bool Player::NeedUpdateStats()
 	}
 }
 
-int Player::onThink(int& newThinkTicks)
+void Player::onThink(uint32_t interval)
 {
-	newThinkTicks = 1000;
-	return 1000;
+	eventCheck = g_game.addEvent(makeTask(interval, boost::bind(&Game::checkCreature, &g_game, getID(), interval)));
+
+	Tile* tile = getTile();
+
+	if(!tile->isPz()){
+		if(food > 1000){
+			gainManaTick();
+			food -= interval;
+
+			gainHealthTick();
+		}
+	}
+
+	if(NeedUpdateStats()){
+		sendStats();
+	}
+
+	sendPing();
+
+#ifdef __SKULLSYSTEM__
+	checkRedSkullTicks(1000);
+#endif
 }
 
 void Player::drainHealth(Creature* attacker, DamageType_t damageType, int32_t damage)
@@ -1579,10 +1564,11 @@ void Player::addManaSpent(uint32_t amount)
 void Player::addExperience(unsigned long exp)
 {
 	experience += exp;
-	int lastLevel = level;
+	int prevLevel = getLevel();
+	int newLevel = getLevel();
 
-	while(experience >= getExpForLv(level + 1)){
-		++level;
+	while(experience >= getExpForLv(newLevel + 1)){
+		++newLevel;
 		healthMax += HPGain[(int)vocation];
 		health += HPGain[(int)vocation];
 		manaMax += ManaGain[(int)vocation];
@@ -1590,12 +1576,16 @@ void Player::addExperience(unsigned long exp)
 		capacity += CapGain[(int)vocation];
 	}
 
-	if(lastLevel != level){
-		setNormalSpeed();
-		g_game.changeSpeed(this);
+	if(prevLevel != newLevel){
+		int32_t oldSpeed = getSpeed();		
+		level = newLevel;
+		int32_t newSpeed = getSpeed();
+
+		int32_t speedDelta = (newSpeed - oldSpeed);
+		g_game.changeSpeed(this, speedDelta);
 
 		std::stringstream levelMsg;
-		levelMsg << "You advanced from Level " << lastLevel << " to Level " << level << ".";
+		levelMsg << "You advanced from Level " << prevLevel << " to Level " << newLevel << ".";
 		sendTextMessage(MSG_EVENT_ADVANCE, levelMsg.str());
 		sendStats();
 	}
@@ -1608,6 +1598,19 @@ unsigned long Player::getIP() const
 
 void Player::die()
 {
+	sendTextMessage(MSG_EVENT_ADVANCE, "You are dead.");
+
+	/*
+	if(!damageList.empty()){
+		DamageObject damageObject = damageList.back();
+		Player* attacker = g_game.getPlayerByID(damageObject.owner);
+
+		//x min pz-lock who did most damage or last hit
+		Condition* condition = Condition::createCondition(CONDITION_PZLOCK, 60 * 1000 * 15, 0);
+		attacker->addCondition(condition);
+	}
+	*/
+
 	loginPosition = masterPos;
 
 	//Magic level loss
@@ -1676,6 +1679,27 @@ void Player::die()
 		lvMsg << "You were downgraded from level " << level << " to level " << newLevel << ".";
 		client->sendTextMessage(MSG_EVENT_ADVANCE, lvMsg.str());
 	}
+
+	Creature::die();
+}
+
+Item* Player::getCorpse()
+{
+	Item* corpse = Creature::getCorpse();
+	if(corpse){
+		Creature* attacker = NULL;
+
+		std::stringstream ss;
+		ss << "You recognize " << getName() << ".";
+		if(attacker){
+			ss << " " << (getSex() == PLAYERSEX_FEMALE ? "She" : "He") << " was killed by " << attacker->getNameDescription();
+		}
+
+		//set body special description
+		corpse->setSpecialDescription(ss.str());
+	}
+
+	return corpse;
 }
 
 void Player::preSave()
@@ -1736,21 +1760,25 @@ bool Player::gainManaTick()
 
 bool Player::gainHealthTick()
 {
-	int32_t healthGain = 0;
+	if(healthMax - health > 0){
+		int32_t healthGain = 0;
 
-	healthTick++;
-	if(vocation >= 0 && vocation < 5){
-		if(healthTick < gainHealthVector[vocation][0])
-			return false;
+		healthTick++;
+		if(vocation >= 0 && vocation < 5){
+			if(healthTick < gainHealthVector[vocation][0])
+				return false;
 
-		healthTick = 0;
-		healthGain = gainHealthVector[vocation][1];
+			healthTick = 0;
+			healthGain = gainHealthVector[vocation][1];
+		}
+		else{
+			healthGain = 5;
+		}
+
+		//health += std::min(healthGain, healthMax - health);
+		//g_game.changeCreatureHealth(creature, healthGain);
 	}
-	else{
-		healthGain = 5;
-	}
 
-	health += std::min(healthGain, healthMax - health);
 	return true;
 }
 
@@ -1802,7 +1830,7 @@ bool Player::removeVIP(unsigned long _guid)
 	return false;
 }
 
-bool Player::addVIP(unsigned long _guid, std::string &name, bool isOnline, bool internal /*=false*/)
+bool Player::addVIP(unsigned long _guid, std::string& name, bool isOnline, bool internal /*=false*/)
 {
 	if(guid == _guid){
 		if(!internal)
@@ -2477,11 +2505,11 @@ void Player::__internalAddThing(uint32_t index, Thing* thing)
   }
 }
 
-/*
-void Player::setAttackedCreature(const Creature* creature)
+void Player::setAttackedCreature(Creature* creature)
 {
 	Creature::setAttackedCreature(creature);
 
+	/*
 	if(chaseMode == CHASEMODE_FOLLOW && creature){
 		if(followCreature != creature){
 			//chase opponent
@@ -2491,8 +2519,8 @@ void Player::setAttackedCreature(const Creature* creature)
 	else{
 		setFollowCreature(NULL);
 	}
+	*/
 }
-*/
 
 void Player::setFollowCreature(const Creature* creature)
 {
@@ -2554,7 +2582,7 @@ bool Player::addEventAutoWalk()
 		return false;
 	}
 
-	int ticks = getEventStepTicks();
+	int64_t ticks = getEventStepTicks();
 	eventAutoWalk = g_game.addEvent(makeTask(ticks, std::bind2nd(std::mem_fun(&Game::checkAutoWalkPlayer), getID())));
 	return true;
 }
@@ -2620,7 +2648,54 @@ void Player::updateItemsLight(bool internal /*=false*/)
 	}
 }
 
-bool Player::isImmune(DamageType_t type)
+void Player::onAddCondition(ConditionType_t type)
+{
+	sendIcons();
+}
+
+void Player::onEndCondition(ConditionType_t type)
+{
+	sendIcons();
+
+#ifdef __SKULLSYSTEM__
+	if(type == CONDITION_INFIGHT){
+		if(getSkull() != SKULL_RED){
+			clearAttacked();
+			changeSkull(this, SKULL_NONE);
+		}
+	}
+#endif
+}
+
+void Player::onAttackedCreature(Creature* creature)
+{
+	if(getAccessLevel() == 0 && creature != this){
+#ifdef __SKULLSYSTEM__
+		if(const Player* targetPlayer = creature->getPlayer()){
+
+			if(!targetPlayer->hasAttacked(this)){
+				if(targetPlayer->getSkull() == SKULL_NONE && getSkull() == SKULL_NONE){
+					//add a white skull
+					g_game.changeSkull(this, SKULL_WHITE);
+				}
+
+				bool sendYellowSkull = false;
+				if(!hasAttacked(targetPlayer) && getSkull() == SKULL_NONE){
+					//show yellow skull
+					targetPlayer->sendCreatureSkull(this);
+				}
+
+				addAttacked(targetPlayer);
+			}
+		}
+#endif
+
+		Condition* condition = Condition::createCondition(CONDITION_PZLOCK, 60 * 1000, 0);
+		addCondition(condition);
+	}
+}
+
+bool Player::isImmune(DamageType_t type) const
 {
 	if(getAccessLevel() != 0){
 		return true;

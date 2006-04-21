@@ -32,6 +32,8 @@
 #include "const76.h"
 #include "enums.h"
 
+#include <list>
+
 enum slots_t {
 	SLOT_WHEREEVER = 0,
 	SLOT_FIRST = 1,
@@ -130,8 +132,6 @@ public:
 	virtual void drainHealth(Creature* attacker, DamageType_t damageType, int32_t damage);
 	virtual void drainMana(Creature* attacker, int32_t manaLoss);
 
-	virtual void die(){};
-
 	virtual RaceType_t getRace() const {return RACE_NONE;}
 	virtual std::string getDescription(int32_t lookDistance) const;
 	
@@ -149,17 +149,16 @@ public:
 	virtual int getDefense() const {return 0;}
 	
 	virtual bool isAttackable() const { return true;};
-	virtual void dropLoot(Container *corpse) {return;};
-	virtual int getLookCorpse() {return lookCorpse;};
 
 	void getOutfit(uint8_t& _lookType, uint8_t& _lookHead,
 		uint8_t& _lookBody, uint8_t& _lookLegs, uint8_t& _lookFeet) const;
 		
-	__int64 getSleepTicks() const;
-	__int64 getEventStepTicks() const;
+	int64_t getSleepTicks() const;
+	int64_t getEventStepTicks() const;
 	int getStepDuration() const;
 	
-	unsigned short getSpeed() const {return speed;};
+	uint32_t getSpeed() const {return speed;};
+	void setSpeed(uint32_t newSpeed){ speed = newSpeed; }
 	
 	void setNormalSpeed()
 	{
@@ -182,14 +181,19 @@ public:
 		return 220 + (2* (level - 1));
 	}
 	
+	//combat functions
 	bool addCondition(Condition* condition);
 	void removeCondition(ConditionType_t type);
 	void executeConditions(int32_t newticks);
 	Condition* getCondition(ConditionType_t type);
 	bool hasCondition(ConditionType_t type) const;
 
-	//combat functions
-	virtual bool isImmune(DamageType_t type);
+	//combat event functions
+	virtual void onAddCondition(ConditionType_t type) {};
+	virtual void onEndCondition(ConditionType_t type) {};
+	virtual void onAttackedCreature(Creature* creature) {};
+
+	virtual bool isImmune(DamageType_t type) const;
 
 	Creature* getAttackedCreature();
 	virtual void setAttackedCreature(Creature* creature);
@@ -198,7 +202,9 @@ public:
 	virtual void setNormalCreatureLight();
 	void setCreatureLight(LightInfo& light);
 	
-	virtual int onThink(int& newThinkTicks){newThinkTicks = 300; return 300;};
+	virtual void onThink(uint32_t interval);
+	virtual void die();
+	virtual Item* getCorpse();
 
 	virtual void onAddTileItem(const Position& pos, const Item* item) {};
 	virtual void onUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* oldItem, const Item* newItem) {};
@@ -210,7 +216,7 @@ public:
 	virtual void onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport) {};
 
 	virtual void onCreatureTurn(const Creature* creature, uint32_t stackPos) { };
-	virtual void onCreatureSay(const Creature* creature, SpeakClasses type, const std::string &text) { };
+	virtual void onCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text) { };
 	
 	virtual void onCreatureChangeOutfit(const Creature* creature) { };
 
@@ -224,12 +230,11 @@ protected:
 	Creature* attackedCreature;
 
 	int lookType, lookHead, lookBody, lookLegs, lookFeet, lookCorpse, lookMaster;
-	//long manaShieldTicks, hasteTicks, paralyzeTicks, inFightTicks;
 	Position masterPos;
 	uint64_t lastmove;
 
 	int32_t immunities;
-	int speed;
+	int32_t speed;
 
 	Direction direction;
 
@@ -242,7 +247,14 @@ protected:
 	typedef std::list<Condition*> ConditionList;
 	ConditionList conditions;
 	
+	typedef std::pair<uint32_t, int32_t> DamageObject;
+	typedef std::list<DamageObject > DamageList;
+	DamageList damageList;
+
 	LightInfo internalLight;
+
+	virtual void dropLoot(Container* corpse) {return;};
+	virtual int getLookCorpse() {return lookCorpse;};
 
 	friend class Game;
 	friend class Map;

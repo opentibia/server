@@ -102,7 +102,7 @@ public:
 		unsigned char type) = 0;
 	virtual void sendChannelsDialog() = 0;
 	virtual void sendChannel(unsigned short channelId, std::string channelName) = 0;
-	virtual void sendToChannel(const Creature* creature, SpeakClasses type, const std::string &text, unsigned short channelId) = 0;
+	virtual void sendToChannel(const Creature* creature, SpeakClasses type, const std::string& text, unsigned short channelId) = 0;
 	virtual void sendOpenPriv(const std::string& receiver) =0;
 	virtual void sendVIPLogIn(unsigned long guid) = 0;
 	virtual void sendVIPLogOut(unsigned long guid) = 0;
@@ -111,7 +111,7 @@ public:
 	virtual void sendWorldLight(const LightInfo& lightInfo) = 0;
 	virtual void sendCreatureSkull(const Creature* creature) = 0;
 	virtual void sendCreatureShield(const Creature* creature) = 0;
-	virtual void sendCreatureSquare(const Creature* creature, SquareColor color) = 0;
+	virtual void sendCreatureSquare(const Creature* creature, SquareColor_t color) = 0;
 	virtual void sendHouseWindow(House* house, unsigned long listid, const std::string& text) = 0;
 	
 protected:

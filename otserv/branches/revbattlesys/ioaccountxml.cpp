@@ -107,7 +107,7 @@ Account IOAccountXML::loadAccount(unsigned long accno)
 	return acc;
 }
 
-bool IOAccountXML::getPassword(unsigned long accno, const std::string &name, std::string &password)
+bool IOAccountXML::getPassword(unsigned long accno, const std::string& name, std::string& password)
 {
 	std::string acc_password;
 	

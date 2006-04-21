@@ -1133,7 +1133,7 @@ void Protocol76::sendCreatureShield(const Creature* creature)
 	}
 }
 
-void Protocol76::sendCreatureSquare(const Creature* creature, SquareColor color)
+void Protocol76::sendCreatureSquare(const Creature* creature, SquareColor_t color)
 {
 	if(CanSee(creature)){
 		NetworkMessage msg;
@@ -1314,14 +1314,14 @@ void Protocol76::sendCreatureTurn(const Creature* creature, unsigned char stackP
 	}
 }
 
-void Protocol76::sendCreatureSay(const Creature* creature, SpeakClasses type, const std::string &text)
+void Protocol76::sendCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text)
 {
 	NetworkMessage msg;
 	AddCreatureSpeak(msg,creature, type, text, 0);
 	WriteBuffer(msg);
 }
 
-void Protocol76::sendToChannel(const Creature * creature, SpeakClasses type, const std::string &text, unsigned short channelId){
+void Protocol76::sendToChannel(const Creature * creature, SpeakClasses type, const std::string& text, unsigned short channelId){
 	NetworkMessage msg;
 	AddCreatureSpeak(msg,creature, type, text, channelId);
 	WriteBuffer(msg);
@@ -1720,7 +1720,7 @@ void Protocol76::sendVIPLogOut(unsigned long guid)
 	WriteBuffer(msg);
 }
 
-void Protocol76::sendVIP(unsigned long guid, const std::string &name, bool isOnline)
+void Protocol76::sendVIP(unsigned long guid, const std::string& name, bool isOnline)
 {
 	NetworkMessage msg;
 	msg.AddByte(0xD2);
