@@ -231,7 +231,6 @@ void Npc::onCreatureChangeOutfit(const Creature* creature)
 
 void Npc::onThink(uint32_t interval)
 {
-	eventCheck = g_game.addEvent(makeTask(interval, boost::bind(&Game::checkCreature, &g_game, getID(), interval)));
 	script->onThink();
 }
 

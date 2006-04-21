@@ -108,6 +108,9 @@ protected:
 	uint32_t owner;
 	typedef std::pair<int32_t, int32_t> DamagePair;
 	std::list<DamagePair> damageList;
+
+	bool getNextDamage(int32_t& damage);
+	void doDamage(Creature* creature, int32_t damage);
 };
 
 class ConditionSpeed: public Condition

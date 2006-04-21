@@ -180,39 +180,66 @@ ConditionDamage::ConditionDamage(ConditionType_t _type, int32_t _ticks, int32_t 
 
 bool ConditionDamage::startCondition(Creature* creature)
 {
+	int32_t damage = 0;
+	if(getNextDamage(damage)){
+		doDamage(creature, damage);
+	}
+
+	if(Player* player = creature->getPlayer()){
+		if(player->getAccessLevel() != 0){
+			return false;
+		}
+	}
+
 	return true;
 }
 
 void ConditionDamage::executeCondition(Creature* creature, int32_t interval)
 {
 	if(!damageList.empty()){
-
 		DamagePair& damagePair = damageList.front();
 		damagePair.first -= interval;
 
 		if(damagePair.first <= 0){
 			damageList.pop_front();
-
-			DamageType_t damageType = DAMAGE_NONE;
-
-			switch(conditionType){
-				case CONDITION_FIRE:
-					damageType = DAMAGE_FIRE;
-					break;
-
-				case CONDITION_ENERGY:
-					damageType = DAMAGE_ENERGY;
-					break;
-
-				case CONDITION_POISON:
-					damageType = DAMAGE_POISON;
-					break;
-			}
-
-			Creature* attacker = g_game.getCreatureByID(owner);
-			g_game.combatChangeHealth(damageType, attacker, creature, damagePair.second);
+			doDamage(creature, damagePair.second);
 		}
 	}
+}
+
+bool ConditionDamage::getNextDamage(int32_t& damage)
+{
+	if(!damageList.empty()){
+		DamagePair& damagePair = damageList.front();
+		damage = damagePair.second;
+		damageList.pop_front();
+
+		return true;
+	}
+
+	return false;
+}
+
+void ConditionDamage::doDamage(Creature* creature, int32_t damage)
+{
+	DamageType_t damageType = DAMAGE_NONE;
+
+	switch(conditionType){
+		case CONDITION_FIRE:
+			damageType = DAMAGE_FIRE;
+			break;
+
+		case CONDITION_ENERGY:
+			damageType = DAMAGE_ENERGY;
+			break;
+
+		case CONDITION_POISON:
+			damageType = DAMAGE_POISON;
+			break;
+	}
+
+	Creature* attacker = g_game.getCreatureByID(owner);
+	g_game.combatChangeHealth(damageType, attacker, creature, damage);
 }
 
 void ConditionDamage::endCondition(Creature* creature, EndCondition_t reason)
@@ -233,7 +260,10 @@ void ConditionDamage::addCondition(Creature* creature, const Condition* addCondi
 		damageList.clear();
 		damageList = conditionDamage.damageList;
 
-		executeCondition(creature, 0);
+		int32_t damage = 0;
+		if(getNextDamage(damage)){
+			doDamage(creature, damage);
+		}
 	}
 }
 

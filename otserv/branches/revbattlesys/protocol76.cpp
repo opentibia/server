@@ -140,7 +140,7 @@ void Protocol76::parsePacket(NetworkMessage &msg)
 	
 	uint8_t recvbyte = msg.GetByte();
 	//a dead player can not performs actions
-	if(player->isRemoved() && recvbyte != 0x14){
+	if((player->isRemoved() || player->getHealth() <= 0) && recvbyte != 0x14){
 		OTSYS_SLEEP(10);
 		return;
 	}	

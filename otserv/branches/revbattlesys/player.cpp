@@ -1482,8 +1482,6 @@ bool Player::NeedUpdateStats()
 
 void Player::onThink(uint32_t interval)
 {
-	eventCheck = g_game.addEvent(makeTask(interval, boost::bind(&Game::checkCreature, &g_game, getID(), interval)));
-
 	Tile* tile = getTile();
 
 	if(!tile->isPz()){
@@ -1502,7 +1500,7 @@ void Player::onThink(uint32_t interval)
 	sendPing();
 
 #ifdef __SKULLSYSTEM__
-	checkRedSkullTicks(1000);
+	checkRedSkullTicks(interval);
 #endif
 }
 

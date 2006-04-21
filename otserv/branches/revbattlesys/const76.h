@@ -24,10 +24,10 @@
 #define NETWORKMESSAGE_MAXSIZE 16768
 
 enum MagicEffectClasses {
-	NM_ME_DRAW_BLOOD  	= 0x00,
-	NM_ME_LOOSE_ENERGY	= 0x01, //fishing?
-	NM_ME_PUFF			= 0x02,
-	NM_ME_BLOCKHIT		= 0x03,
+	NM_ME_DRAW_BLOOD  	   = 0x00,
+	NM_ME_LOOSE_ENERGY	   = 0x01, //fishing?
+	NM_ME_PUFF			       = 0x02,
+	NM_ME_BLOCKHIT		     = 0x03,
 	NM_ME_EXPLOSION_AREA   = 0x04,
 	NM_ME_EXPLOSION_DAMAGE = 0x05,
 	NM_ME_FIRE_AREA        = 0x06,
@@ -111,14 +111,14 @@ enum MessageClasses {
 };
 
 enum FluidClasses {
-	FLUID_EMPTY = 0x00,	//note: class = fluid_number mod 8
-	FLUID_BLUE	= 0x01,
-	FLUID_RED	= 0x02,
-	FLUID_BROWN = 0x03,
-	FLUID_GREEN = 0x04,
-	FLUID_YELLOW= 0x05,
-	FLUID_WHITE = 0x06,
-	FLUID_PURPLE= 0x07,
+	FLUID_EMPTY   = 0x00,	//note: class = fluid_number mod 8
+	FLUID_BLUE	  = 0x01,
+	FLUID_RED	    = 0x02,
+	FLUID_BROWN   = 0x03,
+	FLUID_GREEN   = 0x04,
+	FLUID_YELLOW  = 0x05,
+	FLUID_WHITE   = 0x06,
+	FLUID_PURPLE  = 0x07
 };
 
 enum e_fluids {	
@@ -140,12 +140,14 @@ enum SquareColor_t {
 };
 
 enum TextColor_t {
-	TEXTCOLOR_NONE      = 255,
-	TEXTCOLOR_WHITE_EXP = 215,
-	TEXTCOLOR_WHITE     = 208,
-	TEXTCOLOR_BLUE      = 2,
-	TEXTCOLOR_RED       = 180,
-	TEXTCOLOR_GREEN     = 50,
+	TEXTCOLOR_BLUE        = 5,
+	TEXTCOLOR_LIGHTBLUE   = 35,
+	TEXTCOLOR_LIGHTGREEN  = 30,
+	TEXTCOLOR_RED         = 180,
+	TEXTCOLOR_ORANGE      = 198,
+	TEXTCOLOR_WHITE       = 208,
+	TEXTCOLOR_WHITE_EXP   = 215,
+	TEXTCOLOR_NONE        = 255
 };
 
 enum Icons {

@@ -86,7 +86,7 @@ Game::Game()
 #endif
 
 	addEvent(makeTask(DECAY_INTERVAL, boost::bind(&Game::checkDecay, this, DECAY_INTERVAL)));	
-	
+
 	int daycycle = 3600;
 	//(1440 minutes/day)/(3600 seconds/day)*10 seconds event interval
 	light_hour_delta = 1440*10/daycycle;
@@ -1621,15 +1621,16 @@ bool Game::playerUseItemEx(Player* player, const Position& fromPos, uint8_t from
 	Item* item = dynamic_cast<Item*>(internalGetThing(player, fromPos, fromStackPos));
 
 	if(item){
+		/*
 		Combat combat;
 
 		combat.setCombatType(COMBAT_HITPOINTS, DAMAGE_PHYSICAL);
 		combat.setEffects(NM_ANI_SUDDENDEATH, NM_ME_MORT_AREA);
 
 		combat.doCombat(player, toPos, random_range(-100, -200));
+		*/
 
-		/*
-		AreaCombat combat(false);
+		AreaCombat combat;
 
 		uint8_t arr[] = {1, 1, 1, 1, 1, 1, 1};
 		std::vector<uint8_t> row(arr, arr + sizeof(arr) / sizeof(uint8_t));
@@ -1637,14 +1638,13 @@ bool Game::playerUseItemEx(Player* player, const Position& fromPos, uint8_t from
 		combat.setRow(1, row);
 		combat.setRow(2, row);
 
-		combat.setCombatType(COMBAT_ADDCONDITION, DAMAGE_FIRE);
-		combat.setEffects(NM_ANI_FIRE, NM_ME_FIRE_AREA);
+		combat.setCombatType(COMBAT_ADDCONDITION, DAMAGE_POISON);
+		combat.setEffects(NM_ANI_FLYPOISONFIELD, NM_ME_POISEN_RINGS);
 
-		Condition* condition = Condition::createCondition(CONDITION_FIRE, 20000, player->getID());
+		Condition* condition = Condition::createCondition(CONDITION_POISON, 20000, player->getID());
 		combat.setCondition(condition);
 
 		combat.doCombat(player, toPos, 0);
-		*/
 
 		/*
 		//Runes
@@ -2452,6 +2452,9 @@ void Game::checkCreature(uint32_t creatureId, uint32_t interval)
 		if(creature->getHealth() > 0){
 			creature->onThink(interval);
 			creature->executeConditions(interval);
+
+			creature->eventCheck = addEvent(makeTask(interval, boost::bind(&Game::checkCreature,
+				this, creature->getID(), interval)));
 		}
 		else{
 			Item* splash = NULL;
@@ -2483,8 +2486,8 @@ void Game::checkCreature(uint32_t creatureId, uint32_t interval)
 				startDecay(corpse);
 			}
 
+			removeCreature(creature, false);
 			creature->die();
-			removeCreature(creature);
 		}
 
 		flushSendBuffers();
@@ -2581,9 +2584,39 @@ void Game::combatChangeHealth(DamageType_t damageType, Creature* attacker, Creat
 		addCreatureHealth(list, target);
 	}
 	else{
-		bool isImmune = target->isImmune(damageType);
+		if(!target->isAttackable()){
+			addMagicEffect(list, targetPos, NM_ME_PUFF);
+		}
+		else if(target->isImmune(damageType)){
+			uint8_t hitEffect = 0;
 
-		if(!isImmune){
+			switch(damageType){
+				case DAMAGE_ENERGY:
+				{
+					hitEffect = NM_ME_BLOCKHIT;
+					break;
+				}
+
+				case DAMAGE_POISON:
+				{
+					hitEffect = NM_ME_POISEN_RINGS;
+					break;
+				}
+
+				case DAMAGE_FIRE:
+				{
+					hitEffect = NM_ME_BLOCKHIT;
+					break;
+				}
+
+				default:
+					hitEffect = NM_ME_PUFF;
+					break;
+			}
+
+			addMagicEffect(list, targetPos, hitEffect);
+		}
+		else{
 			//TODO: reduce damage based on shield/skill/armor
 
 			//uint32_t reducedDamage = target->getReducedDamage(getDamageType(), -healthChange);
@@ -2616,8 +2649,8 @@ void Game::combatChangeHealth(DamageType_t damageType, Creature* attacker, Creat
 
 				std::stringstream ss;
 				ss << manaDamage;
-				addAnimatedText(list, targetPos, 10, ss.str());
 				addMagicEffect(list, targetPos, NM_ME_LOOSE_ENERGY);
+				addAnimatedText(list, targetPos, TEXTCOLOR_BLUE, ss.str());
 			}
 
 			reducedDamage = std::min(target->getHealth(), reducedDamage);
@@ -2634,7 +2667,7 @@ void Game::combatChangeHealth(DamageType_t damageType, Creature* attacker, Creat
 						Item* splash = NULL;
 						switch(target->getRace()){
 							case RACE_VENOM:
-								textColor = TEXTCOLOR_GREEN;
+								textColor = TEXTCOLOR_LIGHTGREEN;
 								hitEffect = NM_ME_POISEN;
 								splash = Item::CreateItem(ITEM_SMALLSPLASH, FLUID_GREEN);
 								break;
@@ -2664,21 +2697,21 @@ void Game::combatChangeHealth(DamageType_t damageType, Creature* attacker, Creat
 
 					case DAMAGE_ENERGY:
 					{
-						textColor = TEXTCOLOR_BLUE;
+						textColor = TEXTCOLOR_LIGHTBLUE;
 						hitEffect = NM_ME_ENERGY_DAMAGE;
 						break;
 					}
 
 					case DAMAGE_POISON:
 					{
-						textColor = TEXTCOLOR_GREEN;
-						hitEffect = NM_ME_POISEN;
+						textColor = TEXTCOLOR_LIGHTGREEN;
+						hitEffect = NM_ME_POISEN_RINGS;
 						break;
 					}
 
 					case DAMAGE_FIRE:
 					{
-						textColor = TEXTCOLOR_RED;
+						textColor = TEXTCOLOR_ORANGE;
 						hitEffect = NM_ME_HITBY_FIRE;
 						break;
 					}
@@ -2687,8 +2720,8 @@ void Game::combatChangeHealth(DamageType_t damageType, Creature* attacker, Creat
 				if(textColor != TEXTCOLOR_NONE){
 					std::stringstream ss;
 					ss << reducedDamage;
-					addAnimatedText(list, targetPos, textColor, ss.str());
 					addMagicEffect(list, targetPos, hitEffect);
+					addAnimatedText(list, targetPos, textColor, ss.str());
 				}
 			}
 		}

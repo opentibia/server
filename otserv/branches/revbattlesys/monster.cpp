@@ -175,7 +175,6 @@ void Monster::stopThink()
 
 void Monster::onThink(uint32_t interval)
 {
-	eventCheck = g_game.addEvent(makeTask(interval, boost::bind(&Game::checkCreature, &g_game, getID(), interval)));
 	//do some thinking here
 }
 
