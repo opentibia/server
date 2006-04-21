@@ -2843,11 +2843,19 @@ bool Game::playerAcceptTrade(Player* player)
 	if(player->isRemoved())
 		return false;
 
+	if(!(player->getTradeState() == TRADE_ACKNOWLEDGE || player->getTradeState() == TRADE_INITIATED)){
+		return false;
+	}
+
 	player->setTradeState(TRADE_ACCEPT);
 	Player* tradePartner = player->tradePartner;
 	if(tradePartner && tradePartner->getTradeState() == TRADE_ACCEPT){
+
 		Item* tradeItem1 = player->tradeItem;
 		Item* tradeItem2 = tradePartner->tradeItem;
+
+		player->setTradeState(TRADE_TRANSFER);
+		tradePartner->setTradeState(TRADE_TRANSFER);
 
 		std::map<Item*, unsigned long>::iterator it;
 
@@ -2864,7 +2872,7 @@ bool Game::playerAcceptTrade(Player* player)
 		}
 		
 		bool isSuccess = false;
-		
+
 		ReturnValue ret1 = internalAddItem(tradePartner, tradeItem1, INDEX_WHEREEVER, 0, true);
 		ReturnValue ret2 = internalAddItem(player, tradeItem2, INDEX_WHEREEVER, 0, true);
 		
@@ -2875,9 +2883,6 @@ bool Game::playerAcceptTrade(Player* player)
 			if(ret1 == RET_NOERROR && ret2 == RET_NOERROR){
 				Cylinder* cylinder1 = tradeItem1->getParent();
 				Cylinder* cylinder2 = tradeItem2->getParent();
-
-				player->setTradeState(TRADE_TRANSFER);
-				tradePartner->setTradeState(TRADE_TRANSFER);
 				
 				internalMoveItem(cylinder1, tradePartner, INDEX_WHEREEVER, tradeItem1, tradeItem1->getItemCount());
 				internalMoveItem(cylinder2, player, INDEX_WHEREEVER, tradeItem2, tradeItem2->getItemCount());
