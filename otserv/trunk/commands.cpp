@@ -801,62 +801,78 @@ bool Commands::exivaPlayer(Creature* creature, const std::string &cmd, const std
 		
 		std::stringstream ss;
 		ss << playerExiva->getName() << " ";
-		
-		if(distance == DISTANCE_BESIDE && level == LEVEL_SAME){
-			ss << "is standing next to you";
-		}
+
+		if(distance == DISTANCE_BESIDE){
+			if(level == LEVEL_SAME)
+				ss << "is standing next to you";
+			else if(level == LEVEL_HIGHER)
+				ss << "is above you";
+			else if(level == LEVEL_LOWER)
+				ss << "is below you";
+			}
 		else{
 			switch(distance){
-			case DISTANCE_BESIDE:
-			case DISTANCE_CLOSE_1:
-				if(level == LEVEL_SAME){
+				case DISTANCE_CLOSE_1:
+					if(level == LEVEL_SAME){
+						ss << "is to the";
+					}
+					else if(level == LEVEL_HIGHER){
+						ss << "is on a higher level to the";
+					}
+					else if(level == LEVEL_LOWER){
+						ss << "is on a lower level to the";
+					}
+					break;
+
+				case DISTANCE_CLOSE_2:
 					ss << "is to the";
-				}
-				else if(level == LEVEL_HIGHER){
-					ss << "is on a higher level to the";
-				}
-				else if(level == LEVEL_LOWER){
-					ss << "is on a lower level to the";
-				}
-				break;
-			case DISTANCE_CLOSE_2:
-				ss << "is to the";
-				break;
-			case DISTANCE_FAR:
-				ss << "is far to the";
-				break;
-			case DISTANCE_VERYFAR:
-				ss << "is very far to the";
-				break;
+					break;
+
+				case DISTANCE_FAR:
+					ss << "is far to the";
+					break;
+
+				case DISTANCE_VERYFAR:
+					ss << "is very far to the";
+					break;
 			}
+
 			ss << " ";
 			switch(direction){
-			case DIR_N:
-				ss << "north";
-				break;
-			case DIR_S:
-				ss << "south";
-				break;
-			case DIR_E:
-				ss << "east";
-				break;
-			case DIR_W:
-				ss << "west";
-				break;
-			case DIR_NE:
-				ss << "north-east";
-				break;
-			case DIR_NW:
-				ss << "north-west";
-				break;
-			case DIR_SE:
-				ss << "south-east";
-				break;
-			case DIR_SW:
-				ss << "south-west";
-				break;
+				case DIR_N:
+					ss << "north";
+					break;
+
+				case DIR_S:
+					ss << "south";
+					break;
+				case DIR_E:
+
+					ss << "east";
+					break;
+
+				case DIR_W:
+					ss << "west";
+					break;
+
+				case DIR_NE:
+					ss << "north-east";
+					break;
+
+				case DIR_NW:
+					ss << "north-west";
+					break;
+
+				case DIR_SE:
+					ss << "south-east";
+					break;
+
+				case DIR_SW:
+					ss << "south-west";
+					break;
 			}
 		}
+
 		ss << ".";
 		player->sendTextMessage(MSG_INFO_DESCR, ss.str().c_str());		
 		return true;
