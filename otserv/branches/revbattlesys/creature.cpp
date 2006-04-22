@@ -68,6 +68,7 @@ Creature::Creature() :
 	eventCheck = 0;
 	eventCheckAttacking = 0;
 	attackedCreature = NULL;
+	lastHitCreature = 0;
 }
 
 Creature::~Creature()
@@ -105,25 +106,38 @@ void Creature::onThink(uint32_t interval)
 
 void Creature::die()
 {
-	/*
-	int lostExperience = getLostExperience();
-	int32_t totalDamage = 0;
+	Creature* lastHitCreature = NULL;
+	Creature* mostDamageCreature = NULL;
 
-	typedef std::map<uint32_t, int32_t> AttackMap;
-	AttackMap attackMap;
+	if(getKillers(&lastHitCreature, &mostDamageCreature)){
+		if(lastHitCreature){
+			lastHitCreature->onKilledCreature(this);
+		}
 
-	for(DamageList::const_iterator it = damageList.begin(); it != damageList.end(); ++it){
-		totalDamage += (*it).second;
-
-		attackMap[(*it).first] = (*it).second;
+		if(mostDamageCreature){
+			mostDamageCreature->onKilledCreature(this);
+		}
 	}
 
-	for(attackMap::iterator it = attackMap.begin(); it != attackMap.end(); ++it){
-		uint32_t gainExperience = (int)std::floor(((double)(*it).second / totalDamage) * lostExperience);		
-
-		//onCreatureGainExperience()
+	for(DamageMap::iterator it = damageMap.begin(); it != damageMap.end(); ++it){
+		if(Creature* attacker = g_game.getCreatureByID((*it).first)){
+			attacker->onAttackedCreatureKilled(this);
+		}
 	}
-	*/
+}
+
+bool Creature::getKillers(Creature** _lastHitCreature, Creature** _mostDamageCreature)
+{
+	*_lastHitCreature = g_game.getCreatureByID(lastHitCreature);
+
+	int32_t mostDamage = 0;
+	for(DamageMap::iterator it = damageMap.begin(); it != damageMap.end(); ++it){
+		if(*_mostDamageCreature = g_game.getCreatureByID((*it).first)){
+			mostDamage = (*it).second;
+		}
+	}
+
+	return (*_lastHitCreature || *_mostDamageCreature);
 }
 
 Item* Creature::getCorpse()
@@ -131,7 +145,6 @@ Item* Creature::getCorpse()
 	Item* corpse = Item::CreateItem(getLookCorpse());
 
 	if(corpse){
-		//Add eventual loot
 		if(Container* corpseContainer = corpse->getContainer()){
 			dropLoot(corpseContainer);
 		}
@@ -174,13 +187,9 @@ void Creature::drainHealth(Creature* attacker, DamageType_t damageType, int32_t 
 {
 	changeHealth(-damage);
 
-	uint32_t attackerId = 0;
 	if(attacker){
-		attackerId = attacker->getID();
+		attacker->onAttackedCreature(this, damage);
 	}
-
-	damageList.push_back(DamageObject(attackerId, damage));
-	//damageMap.insert(damageMapPair(attackerId, DamageObject(OTSYS_TIME(), damage)));
 }
 
 void Creature::drainMana(Creature* attacker, int32_t manaLoss)
@@ -195,6 +204,66 @@ void Creature::setAttackedCreature(Creature* creature)
 	std::list<Creature*>::iterator cit;
 	for(cit = summons.begin(); cit != summons.end(); ++cit) {
 		(*cit)->setAttackedCreature(creature);
+	}
+}
+
+double Creature::getDamageRatio(Creature* attacker) const
+{
+	int32_t totalDamage = 0;
+	int32_t attackerDamage = 0;
+
+	for(DamageMap::const_iterator it = damageMap.begin(); it != damageMap.end(); ++it){
+		totalDamage += (*it).second;
+
+		if((*it).first == attacker->getID()){
+			attackerDamage += (*it).second;
+		}
+	}
+
+	return ((double)attackerDamage / totalDamage);
+}
+
+int32_t Creature::getGainedExperience(Creature* attacker) const
+{
+	int32_t lostExperience = getLostExperience();
+	return (int32_t)std::floor(getDamageRatio(attacker) * lostExperience);
+}
+
+bool Creature::addDamagePoints(Creature* attacker, int32_t damagePoints)
+{
+	uint32_t attackerId = (attacker ? attacker->getID() : 0);
+
+	damageMap[attackerId] += damagePoints;
+	lastHitCreature = attackerId;
+
+	return true;
+}
+
+void Creature::onAttackedCreature(Creature* target, int32_t damagePoints)
+{
+	target->addDamagePoints(this, damagePoints);
+}
+
+void Creature::onAttackedCreatureKilled(Creature* target)
+{
+	if(target != this){
+		int32_t gainedExperience = target->getGainedExperience(this);
+		onGainExperience(gainedExperience);
+	}
+}
+
+void Creature::onKilledCreature(Creature* target)
+{
+	//
+}
+
+void Creature::onGainExperience(int32_t gainExperience)
+{
+	if(gainExperience > 0){
+		std::stringstream strExp;
+		strExp << gainExperience;
+
+		g_game.addAnimatedText(getPosition(), TEXTCOLOR_WHITE_EXP, strExp.str());
 	}
 }
 

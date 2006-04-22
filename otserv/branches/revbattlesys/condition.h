@@ -39,7 +39,7 @@ enum ConditionType_t {
 	CONDITION_OUTFIT,		   //Outfit
 	CONDITION_LIGHT,		   //Light   -- Player only
 	CONDITION_MANASHIELD,  //Generic -- Player only
-	CONDITION_PZLOCK,		   //Generic -- Player only
+	//CONDITION_PZLOCK,		   //Generic -- Player only
 	CONDITION_INFIGHT,		 //Generic -- Player only
 	CONDITION_DRUNK,		   //Generic -- Player only
 	CONDITION_EXHAUSTED,	 //Generic

@@ -112,8 +112,7 @@ public:
 
 	virtual const std::string& getName() const {return name;};
 	virtual const std::string& getNameDescription() const {return name;};
-	virtual bool isPushable() const;
-	virtual int getThrowRange() const {return 1;};
+	virtual std::string getDescription(int32_t lookDistance) const;
 
 	void setGUID(unsigned long _guid) {guid = _guid;};
 	unsigned long getGUID() const { return guid;};
@@ -126,6 +125,7 @@ public:
 	const std::string& getGuildName() const {return guildName;};
 	unsigned long getGuildId() const {return guildId;};
 	bool isOnline() {return (client != NULL);};
+	unsigned long getIP() const;
 
 	void addContainer(uint32_t containerid, Container* container);
 	void closeContainer(uint32_t containerid);
@@ -142,27 +142,24 @@ public:
 	int32_t getMagicLevel() const {return magLevel;}
 	int32_t getAccessLevel() const {return accessLevel;}
 
-	playersex_t getSex() {return sex;}
-	bool gainManaTick();
-	bool gainHealthTick();
-	
-	int getPlayerInfo(playerinfo_t playerinfo) const;
-	int getSkill(skills_t skilltype, skillsid_t skillinfo) const;
-	std::string getSkillName(int skillid);
-	void addSkillTry(int skilltry);
-	void addSkillShieldTry(int skilltry);
-	
+	playersex_t getSex() {return sex;}	
+	int getPlayerInfo(playerinfo_t playerinfo) const;	
 	unsigned long getExperience() const {return experience;}
 
+	time_t getLastLoginSaved() const { return lastLoginSaved; };
+	const Position& getLoginPosition() { return loginPosition; };
+	const Position& getTemplePosition() { return masterPos; };
+
+	virtual bool isPushable() const;
+	virtual int getThrowRange() const {return 1;};
+
 	double getCapacity() const {
-		if(accessLevel == 0) {
+		if(getAccessLevel() == 0) {
 			return capacity;
 		}
 		else
 			return 0.00;
 	}
-	
-	virtual int getLostExperience() { return (int)std::floor(((double)experience * 0.1));}
 	
 	double getFreeCapacity() const {
 		if(accessLevel == 0) {
@@ -172,86 +169,28 @@ public:
 			return 0.00;
 	}
 	
-	time_t getLastLoginSaved() const { return lastLoginSaved; };
-	const Position& getLoginPosition() {return loginPosition;};
-	const Position& getTemplePosition() {return masterPos;};
-	
-	void updateInventoryWeigth();
-	
 	Item* getInventoryItem(slots_t slot) const;
-	
-	void addExperience(unsigned long exp);
-	virtual void drainHealth(Creature* attacker, DamageType_t damageType, int32_t damage);
-	virtual void drainMana(Creature* attacker, int32_t manaLoss);
-	
-	void addManaSpent(uint32_t amount);
 
-	virtual int getWeaponDamage() const;
-	virtual int getArmor() const;
-	virtual int getDefense() const;
-
-	unsigned long eventAutoWalk;
-
-	//items
-	ContainerVector containerVec;
-	void preSave();
-
-	unsigned long getIP() const;
 	Depot* getDepot(uint32_t depotId, bool autoCreateDepot);
 	bool addDepot(Depot* depot, uint32_t depotId);
-
-	//depots	
-	DepotMap depots;
-	uint32_t maxDepotLimit;
 	
 	bool CanSee(const Position& pos) const;
 	bool CanSee(int x, int y, int z) const;
 	
-	void sendIcons();  
-	void sendChangeSpeed(const Creature* creature);
-	void sendToChannel(Creature* creature, SpeakClasses type, const std::string& text, unsigned short channelId);
-	void sendCancelMessage(ReturnValue message) const;
-	void sendCancel(const char* msg) const;
-	void sendCancelWalk() const;
-	void sendCancelTarget();
-	void sendStats();
-	void sendTextMessage(MessageClasses mclass, const std::string& message) const;
-	void sendTextMessage(MessageClasses mclass, const std::string& message, const Position& pos,
-		unsigned char type) const;
-	void sendPing();
-	void sendTextWindow(Item* item,const unsigned short maxlen, const bool canWrite);  
-	void sendDistanceShoot(const Position& from, const Position& to, unsigned char type);
-	void sendMagicEffect(const Position& pos, unsigned char type);
-	void sendAnimatedText(const Position& pos, unsigned char color, std::string text);
-	void sendCreatureHealth(const Creature* creature);
-	void sendTradeItemRequest(const Player* player, const Item* item, bool ack);
-	void sendCloseTrade();
-	void sendHouseWindow(House* _house, unsigned long _listid);
-	void receivePing();
-	void flushMsg();
-	
-	virtual bool isAttackable() const { return (accessLevel == 0); };
-	bool NeedUpdateStats();
-	
 	virtual RaceType_t getRace() const {return RACE_BLOOD;}
-	virtual std::string getDescription(int32_t lookDistance) const;
-	
+
+	//safe-trade functions
 	void setTradeState(tradestate_t state) {tradeState = state;};
 	tradestate_t getTradeState() {return tradeState;};
 	Item* getTradeItem() {return tradeItem;};
 	
+	//V.I.P. functions
 	void notifyLogIn(Player* player);
 	void notifyLogOut(Player* player);
 	bool removeVIP(unsigned long guid);
 	bool addVIP(unsigned long guid, std::string& name, bool isOnline, bool interal = false);
-	
-	VIPListSet VIPList;
-	
-	virtual void getCreatureLight(LightInfo& light) const;
-	
-	void updateItemsLight(bool internal = false);
 
-	void setAttackedCreature(Creature* creature);
+	//follow functions
 	void setFollowCreature(const Creature* creature);
 	const Creature* getFollowCreature() {return followCreature;};
 	void setChaseMode(uint8_t mode);
@@ -261,12 +200,33 @@ public:
 	bool checkStopAutoWalk(bool pathInvalid = false);
 	bool stopAutoWalk();
 
+	//combat functions
+	virtual void setAttackedCreature(Creature* creature);
+	bool isImmune(DamageType_t type) const;
+	virtual bool isAttackable() const { return (accessLevel == 0); };
+	bool isPzLocked() const { return pzLocked; }
+
+	int getSkill(skills_t skilltype, skillsid_t skillinfo) const;
+
+	virtual void drainHealth(Creature* attacker, DamageType_t damageType, int32_t damage);
+	virtual void drainMana(Creature* attacker, int32_t manaLoss);	
+	void addManaSpent(uint32_t amount);
+
+	virtual int getArmor() const;
+	virtual int getDefense() const;
+
+	virtual void die();
+	virtual Item* getCorpse();
+	virtual int32_t getGainedExperience(Creature* attacker) const;
+
 	//combat event functions
 	virtual void onAddCondition(ConditionType_t type);
 	virtual void onEndCondition(ConditionType_t type);
-	virtual void onAttackedCreature(Creature* creature);
+	virtual void onAttackedCreature(Creature* target, int32_t damagePoints);
+	virtual void onKilledCreature(Creature* target);
+	virtual void onGainExperience(int32_t gainExperience);
 
-	bool isImmune(DamageType_t type) const;
+	virtual void getCreatureLight(LightInfo& light) const;
 
 #ifdef __SKULLSYSTEM__
 	skulls_t getSkull() const;
@@ -336,22 +296,65 @@ public:
 	void onUpdateInventoryItem(slots_t slot, const Item* oldItem, const Item* newItem);
 	void onRemoveInventoryItem(slots_t slot, const Item* item);
 
-	virtual void postAddNotification(Thing* thing, bool hasOwnership = true);
-	virtual void postRemoveNotification(Thing* thing, bool isCompleteRemoval, bool hadOwnership = true);
-
-protected:
-	void checkTradeState(const Item* item);
-	void addSkillTryInternal(int skilltry,int skill);
+	void sendIcons();  
+	void sendChangeSpeed(const Creature* creature);
+	void sendToChannel(Creature* creature, SpeakClasses type, const std::string& text, unsigned short channelId);
+	void sendCancelMessage(ReturnValue message) const;
+	void sendCancel(const char* msg) const;
+	void sendCancelWalk() const;
+	void sendCancelTarget();
+	void sendStats();
+	void sendTextMessage(MessageClasses mclass, const std::string& message) const;
+	void sendTextMessage(MessageClasses mclass, const std::string& message, const Position& pos,
+		unsigned char type) const;
+	void sendPing();
+	void sendTextWindow(Item* item,const unsigned short maxlen, const bool canWrite);  
+	void sendDistanceShoot(const Position& from, const Position& to, unsigned char type);
+	void sendMagicEffect(const Position& pos, unsigned char type);
+	void sendAnimatedText(const Position& pos, unsigned char color, std::string text);
+	void sendCreatureHealth(const Creature* creature);
+	void sendTradeItemRequest(const Player* player, const Item* item, bool ack);
+	void sendCloseTrade();
+	void sendHouseWindow(House* _house, unsigned long _listid);
+	void receivePing();
+	void flushMsg();
 
 	virtual void onThink(uint32_t interval);
 
-	virtual void die();
-	virtual Item* Player::getCorpse();
+	virtual void postAddNotification(Thing* thing, bool hasOwnership = true);
+	virtual void postRemoveNotification(Thing* thing, bool isCompleteRemoval, bool hadOwnership = true);
+
+	VIPListSet VIPList;
+
+	//items
+	ContainerVector containerVec;
+	void preSave();
+
+	//depots	
+	DepotMap depots;
+	uint32_t maxDepotLimit;
+
+protected:
+	bool gainManaTick();
+	bool gainHealthTick();
+
+	void checkTradeState(const Item* item);
+	void addSkillTryInternal(int skilltry,int skill);
 
 	bool hasCapacity(const Item* item, uint32_t count) const;
 
 	//combat help functions
+	//virtual int getWeaponDamage() const;
 	Item* GetDistWeapon() const;
+
+	std::string getSkillName(int skillid);
+	void addSkillTry(int skilltry);
+	void addSkillShieldTry(int skilltry);
+
+	void addExperience(unsigned long exp);
+
+	bool NeedUpdateStats();
+	void updateInventoryWeigth();
 
 	//cylinder implementations
 	virtual ReturnValue __queryAdd(int32_t index, const Thing* thing, uint32_t count,
@@ -396,12 +399,13 @@ protected:
 	long internal_ping;
 	long npings;
 
+	bool pzLocked;
 	bool internalAddSkillTry;
 	
 	const Creature* followCreature;
 	chaseMode_t chaseMode;
 	
-	uint32_t exhaustedTicks;
+	unsigned long eventAutoWalk;
 
 	//account variables
 	int accountNumber;
@@ -480,11 +484,14 @@ protected:
 #endif
 	
 	//for skill advances
-	unsigned int getReqSkillTries (int skill, int level, Vocation_t voc);
+	unsigned int getReqSkillTries(int skill, int level, Vocation_t voc);
 	
 	//for magic level advances
 	unsigned int getReqMana(int magLevel, Vocation_t voc); 
 	
+	void updateItemsLight(bool internal = false);
+
+	virtual int32_t getLostExperience() const { return (int32_t)std::floor(((double)experience * 0.1));}	
 	virtual void dropLoot(Container* corpse);
 	virtual int getLookCorpse();
 

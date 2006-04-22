@@ -85,7 +85,7 @@ Condition* Condition::createCondition(ConditionType_t _type, int32_t _ticks, int
 		}
 
 		case CONDITION_MANASHIELD:
-		case CONDITION_PZLOCK:
+		//case CONDITION_PZLOCK:
 		case CONDITION_INFIGHT:
 		case CONDITION_DRUNK:
 		case CONDITION_EXHAUSTED:
@@ -156,7 +156,7 @@ uint8_t ConditionGeneric::getIcons() const
 			return ICON_DRUNK;
 			break;
 		
-		case CONDITION_PZLOCK:
+		//case CONDITION_PZLOCK:
 		case CONDITION_EXHAUSTED:
 			break;
 	}

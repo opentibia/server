@@ -81,8 +81,9 @@ Creature()
 	SendBuffer = false;
 	npings = 0;
 	internal_ping = 0;
+
+	pzLocked = false;
 	internalAddSkillTry = false;
-	exhaustedTicks = 0;
 
 	chaseMode = CHASEMODE_STANDSTILL;
 	//fightMode = FIGHTMODE_NONE;
@@ -246,6 +247,7 @@ Item* Player::getInventoryItem(slots_t slot) const
 	return NULL;
 }
 
+/*
 int Player::getWeaponDamage() const
 {
 	double damagemax = 0;
@@ -302,9 +304,9 @@ int Player::getWeaponDamage() const
 						break;
 					}
 
-					/*case MAGIC:
+					case MAGIC:
 						damagemax = (level * 2 + magLevel * 3) * 1.25;
-						break;*/
+						break;
 
 					case AMO:
 					case NONE:
@@ -328,6 +330,7 @@ int Player::getWeaponDamage() const
 	// return it
 	return 1+(int)(damagemax*rand()/(RAND_MAX+1.0));
 }
+*/
 
 int Player::getArmor() const
 {
@@ -1513,6 +1516,9 @@ void Player::drainHealth(Creature* attacker, DamageType_t damageType, int32_t da
 		internalAddSkillTry = false;
 	}
 
+	Condition* condition = Condition::createCondition(CONDITION_INFIGHT, 60 * 1000, 0);
+	addCondition(condition);
+
 	sendStats();
 
 	std::stringstream ss;
@@ -1596,18 +1602,9 @@ unsigned long Player::getIP() const
 
 void Player::die()
 {
+	Creature::die();
+
 	sendTextMessage(MSG_EVENT_ADVANCE, "You are dead.");
-
-	/*
-	if(!damageList.empty()){
-		DamageObject damageObject = damageList.back();
-		Player* attacker = g_game.getPlayerByID(damageObject.owner);
-
-		//x min pz-lock who did most damage or last hit
-		Condition* condition = Condition::createCondition(CONDITION_PZLOCK, 60 * 1000 * 15, 0);
-		attacker->addCondition(condition);
-	}
-	*/
 
 	loginPosition = masterPos;
 
@@ -1684,16 +1681,19 @@ void Player::die()
 Item* Player::getCorpse()
 {
 	Item* corpse = Creature::getCorpse();
-	if(corpse){
-		Creature* attacker = NULL;
-
+	if(corpse && corpse->getContainer()){
 		std::stringstream ss;
-		ss << "You recognize " << getName() << ".";
-		if(attacker){
-			ss << " " << (getSex() == PLAYERSEX_FEMALE ? "She" : "He") << " was killed by " << attacker->getNameDescription();
+
+		ss << "You recognize " << getNameDescription() << ".";
+
+		Creature* lastHitCreature = NULL;
+		Creature* mostDamageCreature = NULL;
+
+		if(getKillers(&lastHitCreature, &mostDamageCreature) && lastHitCreature){
+			ss << " " << (getSex() == PLAYERSEX_FEMALE ? "She" : "He") << " was killed by "
+				<< lastHitCreature->getNameDescription();
 		}
 
-		//set body special description
 		corpse->setSpecialDescription(ss.str());
 	}
 
@@ -2520,6 +2520,31 @@ void Player::setAttackedCreature(Creature* creature)
 	*/
 }
 
+int32_t Player::getGainedExperience(Creature* attacker) const
+{
+	if(g_game.getWorldType() == WORLD_TYPE_PVP_ENFORCED){
+		Player* attackerPlayer = attacker->getPlayer();
+		if(attackerPlayer && attackerPlayer != this){
+				/*Formula
+				a = attackers level * 0.9
+				b = victims level
+				c = victims experience
+
+				y = (1 - (a / b)) * 0.05 * c
+				*/
+
+				int32_t a = std::floor(attackerPlayer->getLevel() * 0.9);
+				int32_t b = getLevel();
+				int32_t c = getExperience();
+				
+				int32_t result = std::max((int32_t)0, (int32_t)std::floor( getDamageRatio(attacker) * ((double)(1 - (((double)a / b)))) * 0.05 * c ) );
+				return result;
+		}
+	}
+
+	return 0;
+}
+
 void Player::setFollowCreature(const Creature* creature)
 {
 	if(followCreature != creature){
@@ -2655,41 +2680,78 @@ void Player::onEndCondition(ConditionType_t type)
 {
 	sendIcons();
 
-#ifdef __SKULLSYSTEM__
 	if(type == CONDITION_INFIGHT){
+		pzLocked = false;
+
+#ifdef __SKULLSYSTEM__
 		if(getSkull() != SKULL_RED){
 			clearAttacked();
 			changeSkull(this, SKULL_NONE);
 		}
-	}
 #endif
+	}
 }
 
-void Player::onAttackedCreature(Creature* creature)
+void Player::onAttackedCreature(Creature* target, int32_t damagePoints)
 {
-	if(getAccessLevel() == 0 && creature != this){
-#ifdef __SKULLSYSTEM__
-		if(const Player* targetPlayer = creature->getPlayer()){
+	//TODO: Share damage points with team (share exp)
+	//target->addDamagePoints(this, damagePoints);
+	Creature::onAttackedCreature(target, damagePoints);
 
-			if(!targetPlayer->hasAttacked(this)){
-				if(targetPlayer->getSkull() == SKULL_NONE && getSkull() == SKULL_NONE){
-					//add a white skull
-					g_game.changeSkull(this, SKULL_WHITE);
+	if(target != this){
+		if(getAccessLevel() == 0){
+			if(const Player* targetPlayer = target->getPlayer()){
+				pzLocked = true;
+
+	#ifdef __SKULLSYSTEM__
+				if(!targetPlayer->hasAttacked(this)){
+					if(targetPlayer->getSkull() == SKULL_NONE && getSkull() == SKULL_NONE){
+						//add a white skull
+						g_game.changeSkull(this, SKULL_WHITE);
+					}
+
+					if(!hasAttacked(targetPlayer) && getSkull() == SKULL_NONE){
+						//show yellow skull
+						targetPlayer->sendCreatureSkull(this);
+					}
+
+					addAttacked(targetPlayer);
 				}
-
-				bool sendYellowSkull = false;
-				if(!hasAttacked(targetPlayer) && getSkull() == SKULL_NONE){
-					//show yellow skull
-					targetPlayer->sendCreatureSkull(this);
-				}
-
-				addAttacked(targetPlayer);
+	#endif
 			}
+
+			Condition* condition = Condition::createCondition(CONDITION_INFIGHT, 60 * 1000, 0);
+			addCondition(condition);
 		}
+	}
+}
+
+void Player::onKilledCreature(Creature* target)
+{
+	Creature::onKilledCreature(target);
+
+	if(getAccessLevel() == 0){
+		if(Player* targetPlayer = target->getPlayer()){
+#ifdef __SKULLSYSTEM__
+			if(!targetPlayer->hasAttacked(this) && targetPlayer->getSkull() == SKULL_NONE){
+				addUnjustifiedDead(targetPlayer);
+			}
 #endif
 
-		Condition* condition = Condition::createCondition(CONDITION_PZLOCK, 60 * 1000, 0);
-		addCondition(condition);
+			pzLocked = true;
+			Condition* condition = Condition::createCondition(CONDITION_INFIGHT, 60 * 1000 * 15, 0);
+			addCondition(condition);
+		}
+
+	}
+}
+
+void Player::onGainExperience(int32_t gainExperience)
+{
+	Creature::onGainExperience(gainExperience);
+
+	if(gainExperience > 0 && getAccessLevel() == 0){
+		addExperience(gainExperience);
 	}
 }
 

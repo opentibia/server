@@ -531,7 +531,7 @@ bool Game::placeCreature(const Position& pos, Creature* creature, bool isLogin /
 
 			creature->getParent()->postAddNotification(creature);
 
-			creature->eventCheck = addEvent(makeTask(1000, boost::bind(&Game::checkCreature, this, creature->getID(), 1000)));
+			creature->eventCheck = addEvent(makeTask(500, boost::bind(&Game::checkCreature, this, creature->getID(), 500)));
 			creature->eventCheckAttacking = addEvent(makeTask(1500, boost::bind(&Game::checkCreatureAttacking, this, creature->getID(), 1500)));
 
 			/*
@@ -1519,13 +1519,12 @@ bool Game::playerYell(Player* player, std::string& text)
 	if(player->isRemoved())
 		return false;
 
-	if(player->getAccessLevel() == 0 && player->exhaustedTicks >=1000){
-		player->exhaustedTicks += (long)g_config.getGlobalNumber("exhaustedadd", 0);		
-		player->sendTextMessage(MSG_STATUS_SMALL, "You are exhausted.");
-		return false;
-	}
-	else{
-		player->exhaustedTicks = (long)g_config.getGlobalNumber("exhausted", 0);
+	int32_t addExhaustion = 0;
+	bool isExhausted = false;
+
+	if(!player->hasCondition(CONDITION_EXHAUSTED)){
+		addExhaustion = g_config.getGlobalNumber("exhausted", 0);
+
 		std::transform(text.begin(), text.end(), text.begin(), upchar);
 
 		SpectatorVec list;
@@ -1537,8 +1536,18 @@ bool Game::playerYell(Player* player, std::string& text)
 			(*it)->onCreatureSay(player, SPEAK_YELL, text);
 		}
 	}
+	else{
+		isExhausted = true;
+		addExhaustion = g_config.getGlobalNumber("exhaustedadd", 0);
+		player->sendTextMessage(MSG_STATUS_SMALL, "You are exhausted.");
+	}
 
-	return true;
+	if(addExhaustion > 0){
+		Condition* condition = Condition::createCondition(CONDITION_EXHAUSTED, addExhaustion, 0);
+		player->addCondition(condition);
+	}
+
+	return !isExhausted;
 }
 
 bool Game::playerSpeakTo(Player* player, SpeakClasses type, const std::string& receiver,
@@ -1644,7 +1653,11 @@ bool Game::playerUseItemEx(Player* player, const Position& fromPos, uint8_t from
 		Condition* condition = Condition::createCondition(CONDITION_POISON, 20000, player->getID());
 		combat.setCondition(condition);
 
-		combat.doCombat(player, toPos, 0);
+		if(combat.doCombat(player, toPos, 0) == RET_NOERROR){			
+			Condition* condition = Condition::createCondition(CONDITION_INFIGHT, 60 * 1000, 0);
+			player->addCondition(condition);
+			return true;
+		}
 
 		/*
 		//Runes
@@ -2486,58 +2499,13 @@ void Game::checkCreature(uint32_t creatureId, uint32_t interval)
 				startDecay(corpse);
 			}
 
-			removeCreature(creature, false);
 			creature->die();
+			removeCreature(creature, false);
 		}
 
 		flushSendBuffers();
 	}
 }
-
-/*
-void Game::changeOutfit(unsigned long id, int looktype)
-{     
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::changeOutfit()");
-
-	Creature* creature = getCreatureByID(id);
-	if(creature){
-		creature->looktype = looktype;
-		internalCreatureChangeOutfit(creature);
-	}
-}
-
-void Game::changeOutfitAfter(unsigned long id, int looktype, long time)
-{
-	addEvent(makeTask(time, boost::bind(&Game::changeOutfit, this,id, looktype)));
-}
-
-void Game::changeSpeed(unsigned long id, unsigned short speed)
-{
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::changeSpeed()");
-
-	Creature* creature = getCreatureByID(id);
-	if(creature && creature->hasteTicks < 1000 && creature->speed != speed)
-	{
-		creature->speed = speed;
-		Player* player = dynamic_cast<Player*>(creature);
-		if(player){
-			player->sendChangeSpeed(creature);
-			player->sendIcons();
-		}
-
-		SpectatorVec list;
-		SpectatorVec::iterator it;
-
-		getSpectators(Range(creature->getPosition()), list);
-
-		for(it = list.begin(); it != list.end(); ++it) {
-			Player* p = dynamic_cast<Player*>(*it);
-			if(p)
-				p->sendChangeSpeed(creature);
-		}
-	}	
-}
-*/
 
 void Game::changeSpeed(Creature* creature, int32_t speedDelta)
 {
@@ -2619,31 +2587,24 @@ void Game::combatChangeHealth(DamageType_t damageType, Creature* attacker, Creat
 		else{
 			//TODO: reduce damage based on shield/skill/armor
 
-			//uint32_t reducedDamage = target->getReducedDamage(getDamageType(), -healthChange);
-			int32_t reducedDamage = -healthChange;
+			//uint32_t damage = target->getReducedDamage(getDamageType(), -healthChange);
+			int32_t damage = -healthChange;
 
+			/*
+			//target->onCreatureAttacked()
 			Condition* condition = Condition::createCondition(CONDITION_INFIGHT, 60 * 1000, 0);
 			target->addCondition(condition);
+			*/
 
+			/*
 			if(attacker){
 				attacker->onAttackedCreature(target);
 			}
+			*/
 
 			if(target->hasCondition(CONDITION_MANASHIELD)){
-				int32_t manaDamage = 0;
-				
-				if(reducedDamage < target->getMana()){
-					manaDamage = reducedDamage;
-					reducedDamage = 0;
-				}
-				else if(reducedDamage > target->getMana()){
-					manaDamage = target->getMana();
-					reducedDamage -= manaDamage;
-				}
-				else if(reducedDamage > (target->getHealth() + target->getMana()) ){
-					reducedDamage = target->getHealth();
-					manaDamage = target->getMana();
-				}
+				int32_t manaDamage = std::min(target->getMana(), damage);
+				damage = std::min((int32_t)0, damage - manaDamage);
 
 				target->drainMana(attacker, manaDamage);
 
@@ -2653,9 +2614,9 @@ void Game::combatChangeHealth(DamageType_t damageType, Creature* attacker, Creat
 				addAnimatedText(list, targetPos, TEXTCOLOR_BLUE, ss.str());
 			}
 
-			reducedDamage = std::min(target->getHealth(), reducedDamage);
-			if(reducedDamage > 0){
-				target->drainHealth(attacker, damageType, reducedDamage);
+			damage = std::min(target->getHealth(), damage);
+			if(damage > 0){
+				target->drainHealth(attacker, damageType, damage);
 				addCreatureHealth(list, target);
 
 				TextColor_t textColor = TEXTCOLOR_NONE;
@@ -2719,7 +2680,7 @@ void Game::combatChangeHealth(DamageType_t damageType, Creature* attacker, Creat
 
 				if(textColor != TEXTCOLOR_NONE){
 					std::stringstream ss;
-					ss << reducedDamage;
+					ss << damage;
 					addMagicEffect(list, targetPos, hitEffect);
 					addAnimatedText(list, targetPos, textColor, ss.str());
 				}

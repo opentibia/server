@@ -477,7 +477,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			return RET_NOERROR;
 		}
 		else if(const Player* player = creature->getPlayer()){
-			if(hasFlag(TILESTATE_PROTECTIONZONE) && player->hasCondition(CONDITION_PZLOCK)){
+			if(hasFlag(TILESTATE_PROTECTIONZONE) && player->isPzLocked()){
 				return RET_PLAYERISPZLOCKED;
 			}
 		}

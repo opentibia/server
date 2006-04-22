@@ -67,11 +67,9 @@ public:
 
 	virtual int getArmor() const {return mType->armor;}
 	virtual int getDefense() const {return mType->defense;}
-	virtual int getLostExperience() {return (getMaster() ? 0 : mType->experience);}
 	virtual bool isPushable() const {return mType->pushable;}
 
 	virtual void setNormalCreatureLight();
-	virtual void dropLoot(Container* corpse);
 
 	virtual void onAddTileItem(const Position& pos, const Item* item);
 	virtual void onUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* oldItem, const Item* newItem);
@@ -84,10 +82,10 @@ public:
 
 	virtual void onThink(uint32_t interval);
 
-	bool canPushItems() const {return mType->canPushItems;};
+	bool canPushItems() const {return mType->canPushItems;}
+	bool isSummon() const { return isSummon; }
 
 private:
-	//int oldThinkTicks;
 	std::string strDescription;
 
 	typedef std::list<Creature*> TargetList;
@@ -98,6 +96,9 @@ private:
 	void startThink();
 	void stopThink();
 	int getTargetDistance() {return mType->targetDistance;}
+
+	virtual int32_t getLostExperience() const {return (isSummon() ? 0 : mType->experience);}
+	virtual void dropLoot(Container* corpse);
 };
 
 #endif
