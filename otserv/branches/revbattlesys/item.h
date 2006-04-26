@@ -40,6 +40,7 @@ class Teleport;
 class TrashHolder;
 class Mailbox;
 class Door;
+class MagicField;
 
 enum ITEMPROPERTY{
  BLOCKSOLID,
@@ -120,6 +121,8 @@ public:
 	virtual const Mailbox* getMailbox() const {return NULL;};
 	virtual Door* getDoor() {return NULL;};
 	virtual const Door* getDoor() const {return NULL;};
+	virtual MagicField* getMagicField() {return NULL;};
+	virtual const MagicField* getMagicField() const {return NULL;};
 
 	//serialization
 	virtual bool unserialize(xmlNodePtr p);
@@ -141,9 +144,10 @@ public:
 	unsigned short getID() const;    // ID as in ItemType
 	virtual void setID(unsigned short newid);
 
-	WeaponType getWeaponType() const;
-	amu_t	getAmuType() const;
-	subfight_t getSubfightType() const;
+	WeaponType_t getWeaponType() const;
+	Ammo_t	getAmuType() const;
+	//subfight_t getSubfightType() const;
+
 	virtual double getWeight() const;
 	int getAttack() const;
 	int getArmor() const;

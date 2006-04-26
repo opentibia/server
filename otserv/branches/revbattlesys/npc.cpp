@@ -167,6 +167,11 @@ Npc::~Npc()
 	delete script;
 }
 
+bool Npc::canSee(const Position& pos) const
+{
+	return Position::areInRange<7,5,0>(pos, getPosition());
+}
+
 std::string Npc::getDescription(int32_t lookDistance) const
 {
 	std::stringstream s;

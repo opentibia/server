@@ -183,14 +183,12 @@ Teleport* Tile::getTeleportItem() const
 
 MagicField* Tile::getFieldItem() const
 {
-	/*
-	MagicEffectItem* fieldItem = NULL;
+	MagicField* field = NULL;
 	for(ItemVector::const_iterator iit = downItems.begin(); iit != downItems.end(); ++iit){
-		fieldItem = dynamic_cast<MagicEffectItem*>(*iit);
-		if(fieldItem)
-			return fieldItem;
+		field = (*iit)->getMagicField();
+		if(field)
+			return field;
 	}
-	*/
 
 	return NULL;
 }
@@ -1061,16 +1059,16 @@ void Tile::postAddNotification(Thing* thing, bool hasOwnership /*= true*/)
 	if(hasOwnership){
 		//do action(s)
 		if(Creature* creature = thing->getCreature()){
-			MagicField* fieldItem = getFieldItem();
-			if(fieldItem){
+			MagicField* field = getFieldItem();
+			if(field){
 
 				//remove magic walls/wild growth
-				if(fieldItem->isBlocking()){
-					g_game.internalRemoveItem(fieldItem, 1);
+				if(field->isBlocking()){
+					g_game.internalRemoveItem(field, 1);
 				}
 				else{
 					/*add condition*/
-					const Condition* condition = fieldItem->getCondition();
+					const Condition* condition = field->getCondition();
 
 					if(condition){
 						creature->addCondition(condition->clone());
@@ -1078,7 +1076,17 @@ void Tile::postAddNotification(Thing* thing, bool hasOwnership /*= true*/)
 				}
 			}
 		}
-		
+
+		if(const MagicField* field = dynamic_cast<MagicField*>(thing->getItem())){
+			const Condition* condition = field->getCondition();
+
+			if(condition){
+				for(CreatureVector::iterator cit = creatures.begin(); cit != creatures.end(); ++cit){
+					(*cit)->addCondition(condition->clone());
+				}
+			}
+		}
+
 		if(Teleport* teleport = getTeleportItem()){
 			teleport->__addThing(thing);
 		}

@@ -109,7 +109,7 @@ public:
 	virtual void sendVIP(unsigned long guid, const std::string& name, bool isOnline) = 0;
 	virtual void sendCreatureLight(const Creature* creature) = 0;
 	virtual void sendWorldLight(const LightInfo& lightInfo) = 0;
-	virtual void sendCreatureSkull(const Creature* creature) = 0;
+	virtual void sendCreatureSkull(const Creature* creature, Skulls_t skull) = 0;
 	virtual void sendCreatureShield(const Creature* creature) = 0;
 	virtual void sendCreatureSquare(const Creature* creature, SquareColor_t color) = 0;
 	virtual void sendHouseWindow(House* house, unsigned long listid, const std::string& text) = 0;

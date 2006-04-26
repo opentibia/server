@@ -28,21 +28,6 @@
 class Creature;
 class Game;
 
-/*
-enum monsterstate_t{
-	STATE_IDLE,
-	STATE_IDLESUMMON,
-	STATE_TARGETNOTREACHABLE,
-	STATE_ATTACKING,
-	STATE_FLEEING,
-};
-
-enum monstermode_t{
-	MODE_NORMAL,
-	MODE_AGGRESSIVE
-};
-*/
-
 class Monster : public Creature
 {
 private:
@@ -65,9 +50,12 @@ public:
 	virtual const std::string& getNameDescription() const {return mType->nameDescription;}
 	virtual std::string getDescription(int32_t lookDistance) const;
 
+	bool canSee(const Position& pos) const;
+
 	virtual int getArmor() const {return mType->armor;}
 	virtual int getDefense() const {return mType->defense;}
 	virtual bool isPushable() const {return mType->pushable;}
+	virtual bool isAttackable() const;
 
 	virtual void setNormalCreatureLight();
 

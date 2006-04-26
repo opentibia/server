@@ -51,12 +51,6 @@ Monster::Monster(MonsterType* _mtype) :
 Creature()
 {
 	mType = _mtype;
-
-	//oldThinkTicks = 0;
-	//state = STATE_IDLE;
-	//updateMovePos = false;	
-	//curPhysicalAttack = NULL;
-	//hasLostMaster = false;
 	
 	lookHead = mType->lookhead;
 	lookBody = mType->lookbody;
@@ -72,25 +66,21 @@ Creature()
 	speed = mType->base_speed;
 	level = mType->level;
 	magLevel = mType->magLevel;
-	//strDescription = mType->strDescription;
 	internalLight.level = mType->lightLevel;
 	internalLight.color = mType->lightColor;
 
 	strDescription = "a " + getName() + ".";
 	toLowerCaseString(strDescription);
-
-	/*
-	std::stringstream ss;
-	std::transform(str.begin(), str.end(), str.begin(), tolower);
-
-	ss << "a " << str << ".";
-	strDescription = ss.str();
-	*/
 }
 
 Monster::~Monster()
 {
 	//
+}
+
+bool Monster::canSee(const Position& pos) const
+{
+	return Position::areInRange<7,5,0>(pos, getPosition());
 }
 
 void Monster::onAddTileItem(const Position& pos, const Item* item)
@@ -168,14 +158,13 @@ void Monster::stopThink()
 	g_game.stopEvent(eventCheckAttacking);
 	eventCheckAttacking = 0;
 
-	
-	/*g_game.stopEvent(eventAutoWalk);
-	eventAutoWalk = 0;*/
+	/*g_game.stopEvent(eventWalk);
+	eventWalk = 0;*/
 }
 
 void Monster::onThink(uint32_t interval)
 {
-	//do some thinking here
+	Creature::onThink(interval);
 }
 
 /*
@@ -212,4 +201,9 @@ void Monster::setNormalCreatureLight()
 {
 	internalLight.level = mType->lightLevel;
 	internalLight.color = mType->lightColor;
+}
+
+bool Monster::isAttackable() const
+{
+	return true;
 }

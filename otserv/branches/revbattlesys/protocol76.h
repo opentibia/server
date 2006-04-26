@@ -156,7 +156,7 @@ private:
 	virtual void sendCreatureLight(const Creature* creature);
 	virtual void sendWorldLight(const LightInfo& lightInfo);
 	
-	virtual void sendCreatureSkull(const Creature* creature);
+	virtual void sendCreatureSkull(const Creature* creature, Skulls_t skull);
 	virtual void sendCreatureShield(const Creature* creature);
 	virtual void sendCreatureSquare(const Creature* creature, SquareColor_t color);
 	

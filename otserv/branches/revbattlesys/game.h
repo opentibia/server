@@ -280,7 +280,7 @@ public:
 	bool playerLookInTrade(Player* player, bool lookAtCounterOffer, int index);
 	bool playerCloseTrade(Player* player);
 	bool internalStartTrade(Player* player, Player* partner, Item* tradeItem);
-	bool playerSetAttackedCreature(Player* player, unsigned long creatureid);
+	bool playerSetAttackedCreature(Player* player, unsigned long creatureId);
 	bool playerFollowCreature(Player* player, unsigned long creatureId);
 	bool playerSetFightModes(Player* player, uint8_t fightMode, uint8_t chaseMode);
 	bool playerLookAt(Player* player, const Position& pos, uint16_t itemId, uint8_t stackpos);
@@ -300,7 +300,7 @@ public:
 	void changeLight(const Creature* creature);
 
 #ifdef __SKULLSYSTEM__
-	void changeSkull(Player* player, skulls_t newSkull);
+	void changeSkull(Player* player, Skulls_t newSkull);
 #endif
 	
 	GameState_t getGameState();
@@ -317,10 +317,11 @@ public:
 	void checkSpawns(int t);
 	void checkLight(int t);
 	
-	void combatChangeHealth(DamageType_t damageType, Creature* attacker, Creature* target, int32_t healthChange);
-	void combatChangeMana(Creature* attacker, Creature* target, int32_t manaChange);
+	bool combatChangeHealth(DamageType_t damageType, Creature* attacker, Creature* target, int32_t healthChange);
+	bool combatChangeMana(Creature* attacker, Creature* target, int32_t manaChange);
 
 	//animation help functions
+	void addCreatureHealth(const Creature* target);
 	void addCreatureHealth(const SpectatorVec& list, const Creature* target);
 	void addAnimatedText(const Position& pos, uint8_t textColor,
 		const std::string& text);

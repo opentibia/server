@@ -34,6 +34,7 @@
 #include "luascript.h"
 #include "chat.h"
 #include "house.h"
+#include "combat.h"
 
 extern LuaScript g_config;
 extern Game g_game;
@@ -69,8 +70,8 @@ Creature()
 	food       = 0;
 	guildId    = 0;
 
-	eventAutoWalk = 0;
-	followCreature = NULL;
+	//eventAutoWalk = 0;
+	//followCreature = NULL;
 
 	level      = 1;
 	experience = 180;
@@ -247,6 +248,49 @@ Item* Player::getInventoryItem(slots_t slot) const
 	return NULL;
 }
 
+const Item* Player::getWeapon() const
+{
+	const Item* weapon = NULL;
+	for(int slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++){
+		if((weapon = getInventoryItem((slots_t)slot)) && weapon->isWeapon()){
+			switch(weapon->getWeaponType()){
+				case WEAPON_SWORD:
+				case WEAPON_CLUB:
+				case WEAPON_AXE:
+				case WEAPON_WAND:
+					return weapon;
+
+				default:
+					break;
+			}
+		}
+	}
+
+	return NULL;
+}
+
+/*
+WeaponType_t Player::getWeaponType() const
+{
+	for(int slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++){
+		if((weapon = getInventoryItem((slots_t)slot)) && weapon->isWeapon()){
+			switch(weapon->getWeaponType()){
+				case WEAPON_SWORD:
+				case WEAPON_CLUB:
+				case WEAPON_AXE:
+				case WEAPON_WAND:
+					return weapon;
+
+				default:
+					break;
+			}
+		}
+	}
+
+	return WEAPON_NONE;
+}
+*/
+
 /*
 int Player::getWeaponDamage() const
 {
@@ -357,26 +401,25 @@ int Player::getDefense() const
 	int defense = 0;
 	
 	if(items[SLOT_LEFT]){		
-		if(items[SLOT_LEFT]->getWeaponType() == SHIELD)
+		if(items[SLOT_LEFT]->getWeaponType() == WEAPON_SHIELD)
 			defense += skills[SKILL_SHIELD][SKILL_LEVEL] + items[SLOT_LEFT]->getDefense();
 		else
 			defense += items[SLOT_LEFT]->getDefense();
 	}
+
 	if(items[SLOT_RIGHT]){
-		if(items[SLOT_RIGHT]->getWeaponType() == SHIELD)
+		if(items[SLOT_RIGHT]->getWeaponType() == WEAPON_SHIELD)
 			defense += skills[SKILL_SHIELD][SKILL_LEVEL] + items[SLOT_RIGHT]->getDefense();
 		else
 			defense += items[SLOT_RIGHT]->getDefense();		
 	}
-	//////////
+
 	if(defense == 0) 
 		defense = (int)random_range(0,(int)skills[SKILL_SHIELD][SKILL_LEVEL]);
 	else 
 		defense += (int)random_range(0,(int)skills[SKILL_SHIELD][SKILL_LEVEL]);
 
-  	return random_range(int(defense*0.25), int(1+(int)(defense*rand())/(RAND_MAX+1.0)));
-  	///////////
-	//return defense;
+	return random_range(int(defense*0.25), int(1+(int)(defense*rand())/(RAND_MAX+1.0)));
 }
 
 void Player::sendIcons()
@@ -445,6 +488,7 @@ unsigned int Player::getReqSkillTries(int skill, int level, Vocation_t voc)
     return SkillAdvanceCache[skill][j].tries;
 }
 
+/*
 void Player::addSkillTry(int skilltry)
 {
 	int skill;
@@ -497,6 +541,7 @@ void Player::addSkillShieldTry(int skilltry)
 		}
 	}	
 }
+*/
 
 int Player::getPlayerInfo(playerinfo_t playerinfo) const
 {
@@ -672,11 +717,11 @@ void Player::dropLoot(Container* corpse)
 {
 	for(int i = SLOT_FIRST; i < SLOT_LAST; ++i){
 		Item* item = items[i];		
-		#ifdef __SKULLSYSTEM__
+#ifdef __SKULLSYSTEM__
 		if(item && ((item->getContainer()) || random_range(1, 100) <= 10 || getSkull() == SKULL_RED)){
-		#else
+#else
 		if(item && ((item->getContainer()) || random_range(1, 100) <= 10)){
-		#endif
+#endif
 			corpse->__internalAddThing(item);
 			sendRemoveInventoryItem((slots_t)i, item);
 			onRemoveInventoryItem((slots_t)i, item);
@@ -746,6 +791,7 @@ subfight_t Player::getSubFightType()
 }
 */
 
+/*
 Item* Player::GetDistWeapon() const
 {
 	for(int slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++){
@@ -783,6 +829,7 @@ Item* Player::GetDistWeapon() const
   	}
   	return NULL;
 }
+*/
 
 void Player::addStorageValue(const unsigned long key, const long value)
 {
@@ -803,15 +850,17 @@ bool Player::getStorageValue(unsigned long key, long &value) const
 	}
 }
 
-bool Player::CanSee(const Position& pos) const
+bool Player::canSee(const Position& pos) const
 {
 	return client->CanSee(pos);
 }
 
+/*
 bool Player::CanSee(int x, int y, int z) const
 {
   return client->CanSee(x, y, z);
 }
+*/
 
 Depot* Player::getDepot(uint32_t depotId, bool autoCreateDepot)
 {	
@@ -1258,8 +1307,10 @@ void Player::onCreatureAppear(const Creature* creature, bool isLogin)
 
 void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout)
 {
+	Creature::onCreatureDisappear(creature, stackpos, isLogout);
+
 	/*
-	if(attackedCreature2 == creature->getID()){
+	if(attackedCreature == creature){
 		setAttackedCreature(NULL);
 		sendCancelTarget();
 
@@ -1267,7 +1318,7 @@ void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bo
 			sendTextMessage(MSG_STATUS_SMALL, "Target lost.");
 		}
 	}
-	*/
+
 
 	if(followCreature == creature){
 		setFollowCreature(NULL);
@@ -1277,13 +1328,14 @@ void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bo
 			sendTextMessage(MSG_STATUS_SMALL, "Target lost.");
 		}
 	}
+	*/
 
 	if(creature == this){
 		if(isLogout){
 			loginPosition = getPosition();
 		}
 
-		if(eventAutoWalk != 0){
+		if(eventWalk != 0){
 			setFollowCreature(NULL);
 		}
 
@@ -1311,6 +1363,9 @@ void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bo
 
 void Player::onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport)
 {
+	Creature::onCreatureMove(creature, oldPos, oldStackPos, teleport);
+
+	/*
 	if(followCreature && (creature == followCreature || creature == this)){
 		if(!Position::areInRange<7,5,0>(followCreature->getPosition(), getPosition())){
 			setFollowCreature(NULL);
@@ -1318,6 +1373,16 @@ void Player::onCreatureMove(const Creature* creature, const Position& oldPos, ui
 			sendTextMessage(MSG_STATUS_SMALL, "Target lost.");
 		}
 	}
+
+	if(attackedCreature && (creature == attackedCreature || creature == this)){
+		CanSee(creature->getPosition()
+		//if(!Position::areInRange<7,5,0>(followCreature->getPosition(), getPosition())){
+			setFollowCreature(NULL);
+			sendCancelTarget();
+			sendTextMessage(MSG_STATUS_SMALL, "Target lost.");
+		}
+	}
+	*/
 
 	/*
 	Creature* targetCreature = getAttackedCreature();
@@ -1485,6 +1550,8 @@ bool Player::NeedUpdateStats()
 
 void Player::onThink(uint32_t interval)
 {
+	Creature::onThink(interval);
+
 	Tile* tile = getTile();
 
 	if(!tile->isPz()){
@@ -1510,11 +1577,6 @@ void Player::onThink(uint32_t interval)
 void Player::drainHealth(Creature* attacker, DamageType_t damageType, int32_t damage)
 {
 	Creature::drainHealth(attacker, damageType, damage);
-
-	if(damageType == DAMAGE_PHYSICAL && internalAddSkillTry){
-		addSkillShieldTry(1);
-		internalAddSkillTry = false;
-	}
 
 	Condition* condition = Condition::createCondition(CONDITION_INFIGHT, 60 * 1000, 0);
 	addCondition(condition);
@@ -1587,12 +1649,25 @@ void Player::addExperience(unsigned long exp)
 
 		int32_t speedDelta = (newSpeed - oldSpeed);
 		g_game.changeSpeed(this, speedDelta);
+		g_game.addCreatureHealth(this);
 
 		std::stringstream levelMsg;
 		levelMsg << "You advanced from Level " << prevLevel << " to Level " << newLevel << ".";
 		sendTextMessage(MSG_EVENT_ADVANCE, levelMsg.str());
 		sendStats();
 	}
+}
+
+BlockType_t Player::blockHit(Creature* attacker, DamageType_t damageType, int32_t& damage)
+{
+	BlockType_t blockType = blockHit(attacker, damageType, damage);
+
+	if(blockType == BLOCK_DEFENSE && damageType == DAMAGE_PHYSICAL){
+		//addSkillShieldTry(1);
+		internalDefense = false;
+	}
+
+	return blockType;
 }
 
 unsigned long Player::getIP() const
@@ -1674,8 +1749,6 @@ void Player::die()
 		lvMsg << "You were downgraded from level " << level << " to level " << newLevel << ".";
 		client->sendTextMessage(MSG_EVENT_ADVANCE, lvMsg.str());
 	}
-
-	Creature::die();
 }
 
 Item* Player::getCorpse()
@@ -1975,9 +2048,9 @@ ReturnValue Player::__queryAdd(int32_t index, const Thing* thing, uint32_t count
 						}
 						//check if weapon, can only carry one weapon
 						else if(item != items[SLOT_LEFT] && items[SLOT_LEFT]->isWeapon() &&
-							(items[SLOT_LEFT]->getWeaponType() != SHIELD) &&
-							(items[SLOT_LEFT]->getWeaponType() != AMO) &&
-							item->isWeapon() && (item->getWeaponType() != SHIELD) && (item->getWeaponType() != AMO)){
+							(items[SLOT_LEFT]->getWeaponType() != WEAPON_SHIELD) &&
+							(items[SLOT_LEFT]->getWeaponType() != WEAPON_AMMO) &&
+							item->isWeapon() && (item->getWeaponType() != WEAPON_SHIELD) && (item->getWeaponType() != WEAPON_AMMO)){
 								ret = RET_CANONLYUSEONEWEAPON;
 						}
 						else
@@ -2006,9 +2079,9 @@ ReturnValue Player::__queryAdd(int32_t index, const Thing* thing, uint32_t count
 						}
 						//check if weapon, can only carry one weapon
 						else if(item != items[SLOT_RIGHT] && items[SLOT_RIGHT]->isWeapon() &&
-							(items[SLOT_RIGHT]->getWeaponType() != SHIELD) &&
-							(items[SLOT_RIGHT]->getWeaponType() != AMO) &&
-							item->isWeapon() && (item->getWeaponType() != SHIELD) && (item->getWeaponType() != AMO)){
+							(items[SLOT_RIGHT]->getWeaponType() != WEAPON_SHIELD) &&
+							(items[SLOT_RIGHT]->getWeaponType() != WEAPON_AMMO) &&
+							item->isWeapon() && (item->getWeaponType() != WEAPON_SHIELD) && (item->getWeaponType() != WEAPON_AMMO)){
 								ret = RET_CANONLYUSEONEWEAPON;
 						}
 						else
@@ -2507,7 +2580,6 @@ void Player::setAttackedCreature(Creature* creature)
 {
 	Creature::setAttackedCreature(creature);
 
-	/*
 	if(chaseMode == CHASEMODE_FOLLOW && creature){
 		if(followCreature != creature){
 			//chase opponent
@@ -2517,7 +2589,82 @@ void Player::setAttackedCreature(Creature* creature)
 	else{
 		setFollowCreature(NULL);
 	}
-	*/
+}
+
+void Player::doAttacking()
+{
+	if(attackedCreature){
+		WeaponType_t weaponType = WEAPON_NONE;
+		const Item* item = getWeapon();
+		int32_t damage = 0;
+
+		if(item){
+			weaponType = item->getWeaponType();
+		}
+
+		switch(weaponType){
+			case WEAPON_SWORD:
+			case WEAPON_CLUB:
+			case WEAPON_AXE:
+			{
+				damage = skills[SKILL_SWORD][SKILL_LEVEL] * Item::items[item->getID()].attack / 20 +
+					Item::items[item->getID()].attack;
+
+				Combat combat;
+				combat.setCombatType(COMBAT_HITPOINTS, DAMAGE_PHYSICAL);
+				combat.doCombat(this, attackedCreature, -damage);
+				break;
+			}
+
+			case WEAPON_DIST:
+			{
+				/*
+				Item* distItem = GetDistWeapon();
+				if(distItem){
+					damagemax = skills[SKILL_DIST][SKILL_LEVEL] * Item::items[distItem->getID()].attack / 20 +
+						Item::items[distItem->getID()].attack;
+
+					//hit or miss
+					int hitChance;
+					if(distItem->getWeaponType() == AMO){
+						hitChance = 90;
+					}
+					else{//thrown weapons
+						hitChance = 50;
+					}
+
+					if(rand()%100 < hitChance){ //hit
+						return 1 + (int)(damagemax * rand()/(RAND_MAX+1.0));
+					}
+					else{	//miss
+						return 0;
+					}
+				}
+				*/
+
+				break;
+			}
+
+			case WEAPON_WAND:
+			{
+				damage = (level * 2 + magLevel * 3) * 1.25;
+				break;
+			}
+
+			case WEAPON_NONE:
+			{
+				//fist
+
+				damage = 2 * skills[SKILL_FIST][SKILL_LEVEL] + 5;
+
+				Combat combat;
+				combat.setCombatType(COMBAT_HITPOINTS, DAMAGE_PHYSICAL);
+				combat.doCombat(this, attackedCreature, -damage);
+
+				break;
+			}
+		}
+	}
 }
 
 int32_t Player::getGainedExperience(Creature* attacker) const
@@ -2548,6 +2695,18 @@ int32_t Player::getGainedExperience(Creature* attacker) const
 void Player::setFollowCreature(const Creature* creature)
 {
 	if(followCreature != creature){
+		Creature::setFollowCreature(creature);
+
+		if(!followCreature){
+			stopAutoWalk();
+		}
+	}
+}
+
+/*
+void Player::setFollowCreature(const Creature* creature)
+{
+	if(followCreature != creature){
 		followCreature = creature;
 
 		if(!followCreature){
@@ -2555,6 +2714,7 @@ void Player::setFollowCreature(const Creature* creature)
 		}
 	}
 }
+*/
 
 void Player::setChaseMode(uint8_t mode)
 {
@@ -2567,54 +2727,52 @@ void Player::setChaseMode(uint8_t mode)
 		chaseMode = CHASEMODE_STANDSTILL;
 	}
 	
-	/*
 	if(prevChaseMode != chaseMode){
 		if(chaseMode == CHASEMODE_FOLLOW){
-			if(!followCreature && getAttackedCreature()){
+			if(!followCreature && attackedCreature){
 				//chase opponent
-				g_game.internalFollowCreature(this, getAttackedCreature());
+				g_game.internalFollowCreature(this, attackedCreature);
 			}
 		}
-		else if(getAttackedCreature()){
+		else if(attackedCreature){
 			setFollowCreature(NULL);
 			stopAutoWalk();
 		}
 	}
-	*/
 }
 
 bool Player::startAutoWalk(std::list<Direction>& listDir)
 {
-	if(eventAutoWalk == 0){
-		/*start a new event*/
+	if(eventWalk == 0){
+		//start a new event
 		listWalkDir = listDir;
-		return addEventAutoWalk();
+		return addEventWalk();
 	}
 	else{
-		/*event already running*/
+		//event already running
 		listWalkDir = listDir;
 	}
 
 	return true;
 }
 
-bool Player::addEventAutoWalk()
+bool Player::addEventWalk()
 {
 	if(isRemoved()){
-		eventAutoWalk = 0;
+		eventWalk = 0;
 		return false;
 	}
 
 	int64_t ticks = getEventStepTicks();
-	eventAutoWalk = g_game.addEvent(makeTask(ticks, std::bind2nd(std::mem_fun(&Game::checkAutoWalkPlayer), getID())));
+	eventWalk = g_game.addEvent(makeTask(ticks, std::bind2nd(std::mem_fun(&Game::checkAutoWalkPlayer), getID())));
 	return true;
 }
 
 bool Player::stopAutoWalk()
 {
-	if(eventAutoWalk != 0){
-		g_game.stopEvent(eventAutoWalk);
-		eventAutoWalk = 0;
+	if(eventWalk != 0){
+		g_game.stopEvent(eventWalk);
+		eventWalk = 0;
 
 		if(!listWalkDir.empty()){
 			listWalkDir.clear();
@@ -2625,7 +2783,7 @@ bool Player::stopAutoWalk()
 	return true;
 }
 
-bool Player::checkStopAutoWalk(bool pathInvalid /*= false*/)
+bool Player::checkStopAutoWalk(bool pathInvalid)
 {
 	if(followCreature){
 		if(pathInvalid || chaseMode == CHASEMODE_FOLLOW){
@@ -2686,17 +2844,15 @@ void Player::onEndCondition(ConditionType_t type)
 #ifdef __SKULLSYSTEM__
 		if(getSkull() != SKULL_RED){
 			clearAttacked();
-			changeSkull(this, SKULL_NONE);
+			g_game.changeSkull(this, SKULL_NONE);
 		}
 #endif
 	}
 }
 
-void Player::onAttackedCreature(Creature* target, int32_t damagePoints)
+void Player::onAttackedCreature(Creature* target)
 {
-	//TODO: Share damage points with team (share exp)
-	//target->addDamagePoints(this, damagePoints);
-	Creature::onAttackedCreature(target, damagePoints);
+	Creature::onAttackedCreature(target);
 
 	if(target != this){
 		if(getAccessLevel() == 0){
@@ -2712,7 +2868,7 @@ void Player::onAttackedCreature(Creature* target, int32_t damagePoints)
 
 					if(!hasAttacked(targetPlayer) && getSkull() == SKULL_NONE){
 						//show yellow skull
-						targetPlayer->sendCreatureSkull(this);
+						targetPlayer->sendCreatureSkull(this, SKULL_YELLOW);
 					}
 
 					addAttacked(targetPlayer);
@@ -2724,6 +2880,12 @@ void Player::onAttackedCreature(Creature* target, int32_t damagePoints)
 			addCondition(condition);
 		}
 	}
+}
+
+void Player::onAttackedCreatureDrainHealth(Creature* target, int32_t points)
+{
+	//TODO: Share damage points with team (share exp)
+	Creature::onAttackedCreatureDrainHealth(target, points);
 }
 
 void Player::onKilledCreature(Creature* target)
@@ -2742,7 +2904,6 @@ void Player::onKilledCreature(Creature* target)
 			Condition* condition = Condition::createCondition(CONDITION_INFIGHT, 60 * 1000 * 15, 0);
 			addCondition(condition);
 		}
-
 	}
 }
 
@@ -2755,6 +2916,14 @@ void Player::onGainExperience(int32_t gainExperience)
 	}
 }
 
+void Player::onTargetCreatureDisappear()
+{
+	Creature::onTargetCreatureDisappear();
+
+	sendCancelTarget();
+	sendTextMessage(MSG_STATUS_SMALL, "Target lost.");
+}
+
 bool Player::isImmune(DamageType_t type) const
 {
 	if(getAccessLevel() != 0){
@@ -2764,8 +2933,17 @@ bool Player::isImmune(DamageType_t type) const
 	return Creature::isImmune(type);
 }
 
+bool Player::isAttackable() const
+{
+	if(getAccessLevel() != 0){
+		return false;
+	}
+
+	return true;
+}
+
 #ifdef __SKULLSYSTEM__
-skulls_t Player::getSkull() const
+Skulls_t Player::getSkull() const
 {
 	if(getAccessLevel() != 0)
 		return SKULL_NONE;
@@ -2773,9 +2951,17 @@ skulls_t Player::getSkull() const
 	return skull;
 }
 
-skulls_t Player::getSkullClient(const Player* player) const
+Skulls_t Player::getSkullClient(const Player* player) const
 {
-	skulls_t skull;
+#ifdef __SKULLSYSTEM__
+	return SKULL_NONE;
+#endif
+
+	if(!player){
+		return SKULL_NONE;
+	}
+
+	Skulls_t skull;
 	skull = player->getSkull();
 	if(skull == SKULL_NONE){
 		if(player->hasAttacked(this)){
@@ -2839,14 +3025,14 @@ void Player::addUnjustifiedDead(const Player* attacked)
 	}
 }
 
-void Player::setSkull(skulls_t new_skull)
+void Player::setSkull(Skulls_t newSkull)
 {
-	skull = new_skull;
+	skull = newSkull;
 }
 
-void Player::sendCreatureSkull(const Creature* creature) const
+void Player::sendCreatureSkull(const Creature* creature, Skulls_t skull) const
 {
-	client->sendCreatureSkull(creature);
+	client->sendCreatureSkull(creature, skull);
 }
 
 void Player::checkRedSkullTicks(long ticks)
@@ -2854,7 +3040,7 @@ void Player::checkRedSkullTicks(long ticks)
 	if(redSkullTicks - ticks > 0)
 		redSkullTicks = redSkullTicks - ticks;
 	
-	if(redSkullTicks < 1000 && inFightTicks < 1000 && skull != SKULL_NONE){
+	if(redSkullTicks < 1000 && !hasCondition(CONDITION_INFIGHT) && skull != SKULL_NONE){
 		g_game.changeSkull(this, SKULL_NONE);
 	}
 }

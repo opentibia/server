@@ -31,7 +31,6 @@
 #include <vector>
 #include <ctime>
 #include <algorithm>
-//#include "templates.h"
 
 class House;
 class Protocol;
@@ -174,8 +173,8 @@ public:
 	Depot* getDepot(uint32_t depotId, bool autoCreateDepot);
 	bool addDepot(Depot* depot, uint32_t depotId);
 	
-	bool CanSee(const Position& pos) const;
-	bool CanSee(int x, int y, int z) const;
+	bool canSee(const Position& pos) const;
+	//bool CanSee(int x, int y, int z) const;
 	
 	virtual RaceType_t getRace() const {return RACE_BLOOD;}
 
@@ -191,20 +190,22 @@ public:
 	bool addVIP(unsigned long guid, std::string& name, bool isOnline, bool interal = false);
 
 	//follow functions
-	void setFollowCreature(const Creature* creature);
-	const Creature* getFollowCreature() {return followCreature;};
+	//const Creature* getFollowCreature() {return followCreature;};
+	virtual void setFollowCreature(const Creature* creature);
 	void setChaseMode(uint8_t mode);
 
 	bool startAutoWalk(std::list<Direction>& listDir);
-	bool addEventAutoWalk();
+	bool addEventWalk();
 	bool checkStopAutoWalk(bool pathInvalid = false);
 	bool stopAutoWalk();
 
 	//combat functions
 	virtual void setAttackedCreature(Creature* creature);
 	bool isImmune(DamageType_t type) const;
-	virtual bool isAttackable() const { return (accessLevel == 0); };
+	virtual bool isAttackable() const;
 	bool isPzLocked() const { return pzLocked; }
+	virtual BlockType_t blockHit(Creature* attacker, DamageType_t damageType, int32_t& damage);
+	void doAttacking();
 
 	int getSkill(skills_t skilltype, skillsid_t skillinfo) const;
 
@@ -222,21 +223,23 @@ public:
 	//combat event functions
 	virtual void onAddCondition(ConditionType_t type);
 	virtual void onEndCondition(ConditionType_t type);
-	virtual void onAttackedCreature(Creature* target, int32_t damagePoints);
+	virtual void onAttackedCreature(Creature* target);
+	virtual void onAttackedCreatureDrainHealth(Creature* target, int32_t points);
 	virtual void onKilledCreature(Creature* target);
 	virtual void onGainExperience(int32_t gainExperience);
+	virtual void onTargetCreatureDisappear();
 
 	virtual void getCreatureLight(LightInfo& light) const;
 
 #ifdef __SKULLSYSTEM__
-	skulls_t getSkull() const;
-	skulls_t getSkullClient(const Player* player) const;
+	Skulls_t getSkull() const;
+	Skulls_t getSkullClient(const Player* player) const;
 	bool hasAttacked(const Player* attacked) const;
 	void addAttacked(const Player* attacked);
 	void clearAttacked();
 	void addUnjustifiedDead(const Player* attacked);
-	void setSkull(skulls_t new_skull);
-	void sendCreatureSkull(const Creature* creature) const;
+	void setSkull(Skulls_t new_skull);
+	void sendCreatureSkull(const Creature* creature, Skulls_t skull) const;
 	void checkRedSkullTicks(long ticks);
 #endif
 	
@@ -344,12 +347,14 @@ protected:
 	bool hasCapacity(const Item* item, uint32_t count) const;
 
 	//combat help functions
+	const Item* getWeapon() const;
+	//WeaponType_t getWeaponType() const;
 	//virtual int getWeaponDamage() const;
-	Item* GetDistWeapon() const;
+	//Item* GetDistWeapon() const;
+	//void addSkillTry(int skilltry);
+	//void addSkillShieldTry(int skilltry);
 
 	std::string getSkillName(int skillid);
-	void addSkillTry(int skilltry);
-	void addSkillShieldTry(int skilltry);
 
 	void addExperience(unsigned long exp);
 
@@ -402,10 +407,7 @@ protected:
 	bool pzLocked;
 	bool internalAddSkillTry;
 	
-	const Creature* followCreature;
 	chaseMode_t chaseMode;
-	
-	unsigned long eventAutoWalk;
 
 	//account variables
 	int accountNumber;
@@ -437,9 +439,6 @@ protected:
 	Player* tradePartner;
 	tradestate_t tradeState;
 	Item* tradeItem;
-	
-	//autowalking
-	std::list<Direction> listWalkDir;
 	
 	//cache some data
 	struct SkillCache{
@@ -478,7 +477,7 @@ protected:
 	
 #ifdef __SKULLSYSTEM__
 	int64_t redSkullTicks;
-	skulls_t skull;
+	Skulls_t skull;
 	typedef std::set<long> AttackedSet;
 	AttackedSet attackedSet;
 #endif

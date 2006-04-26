@@ -828,7 +828,7 @@ ReturnValue Game::internalMoveCreature(Creature* creature, Cylinder* fromCylinde
 			break;
 	}
 
-	creature->lastmove = OTSYS_TIME();
+	creature->lastMove = OTSYS_TIME();
 	return RET_NOERROR;
 }
 
@@ -1473,7 +1473,7 @@ void Game::checkCreatureAttacking(uint32_t creatureId, uint32_t interval)
 	Creature* creature = getCreatureByID(creatureId);
 	if(creature){
 		//do attack
-
+		creature->doAttacking();
 		creature->eventCheckAttacking = addEvent(makeTask(interval, boost::bind(&Game::checkCreatureAttacking, this, creature->getID(), interval)));
 	}
 }
@@ -1630,15 +1630,18 @@ bool Game::playerUseItemEx(Player* player, const Position& fromPos, uint8_t from
 	Item* item = dynamic_cast<Item*>(internalGetThing(player, fromPos, fromStackPos));
 
 	if(item){
-		/*
+
 		Combat combat;
+		combat.setCombatType(COMBAT_CREATEFIELD, DAMAGE_FIRE);
+		combat.setEffects(NM_ANI_FIRE, NM_ME_EXPLOSION_DAMAGE);
 
-		combat.setCombatType(COMBAT_HITPOINTS, DAMAGE_PHYSICAL);
-		combat.setEffects(NM_ANI_SUDDENDEATH, NM_ME_MORT_AREA);
+		Condition* condition = Condition::createCondition(CONDITION_FIRE, 15000, player->getID());
+		combat.setCondition(condition);
+		combat.doCombat(player, toPos, 1492);
 
-		combat.doCombat(player, toPos, random_range(-100, -200));
-		*/
+		//combat.doCombat(player, toPos, random_range(-100, -200));
 
+		/*
 		AreaCombat combat;
 
 		uint8_t arr[] = {1, 1, 1, 1, 1, 1, 1};
@@ -1658,6 +1661,7 @@ bool Game::playerUseItemEx(Player* player, const Position& fromPos, uint8_t from
 			player->addCondition(condition);
 			return true;
 		}
+		*/
 
 		/*
 		//Runes
@@ -2142,7 +2146,7 @@ bool Game::playerLookAt(Player* player, const Position& pos, uint16_t itemId, ui
 	}
 	
 	Position thingPos = thing->getPosition();
-	if(!player->CanSee(thingPos)){
+	if(!player->canSee(thingPos)){
 		player->sendCancelMessage(RET_NOTPOSSIBLE);
 		return false;
 	}
@@ -2165,36 +2169,39 @@ bool Game::playerLookAt(Player* player, const Position& pos, uint16_t itemId, ui
 	return true;
 }
 
-bool Game::playerSetAttackedCreature(Player* player, unsigned long creatureid)
+bool Game::playerSetAttackedCreature(Player* player, unsigned long creatureId)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerSetAttackedCreature()");
 	if(player->isRemoved())
 		return false;
 
-	/*
-	if(player->attackedCreature2 != 0 && creatureid == 0){
+	if(player->getAttackedCreature() && creatureId == 0){
 		player->setAttackedCreature(NULL);
 		player->sendCancelTarget();
 	}
 
-	Creature* attackedCreature = getCreatureByID(creatureid);
-	if(!attackedCreature){
+	Creature* attackCreature = getCreatureByID(creatureId);
+	if(!attackCreature){
+		player->sendCancelTarget();
 		return false;
 	}
 
-	if(attackedCreature->access != 0 || (getWorldType() == WORLD_TYPE_NO_PVP && player->access == 0 && attackedCreature->getPlayer())) {
-		player->setAttackedCreature(NULL);
-		player->sendCancelTarget();
+	if(!attackCreature->isAttackable()){
 		player->sendTextMessage(MSG_STATUS_SMALL, "You may not attack this player.");
+		player->sendCancelTarget();
+		return false;
 	}
-	else{
-		player->setAttackedCreature(attackedCreature);
+
+	if(Player* attackPlayer = attackCreature->getPlayer()){
+		if(getWorldType() == WORLD_TYPE_NO_PVP || attackPlayer->getAccessLevel() > player->getAccessLevel()){
+			player->sendTextMessage(MSG_STATUS_SMALL, "You may not attack this player.");
+			player->sendCancelTarget();
+			return false;
+		}
 	}
-	
+
+	player->setAttackedCreature(attackCreature);	
 	return true;
-	*/
-	
-	return false;
 }
 
 bool Game::playerFollowCreature(Player* player, unsigned long creatureId)
@@ -2444,13 +2451,13 @@ void Game::checkAutoWalkPlayer(unsigned long id)
 				player->listWalkDir.pop_front();
 
 				if(internalMoveCreature(player, dir) == RET_NOERROR || !player->checkStopAutoWalk(true)){
-					player->addEventAutoWalk();
+					player->addEventWalk();
 				}
 
 				flushSendBuffers();
 			}
 			else
-				player->addEventAutoWalk();
+				player->addEventWalk();
 		}
 	}
 }
@@ -2539,7 +2546,7 @@ void Game::changeLight(const Creature* creature)
 	}
 }
 
-void Game::combatChangeHealth(DamageType_t damageType, Creature* attacker, Creature* target,
+bool Game::combatChangeHealth(DamageType_t damageType, Creature* attacker, Creature* target,
 	int32_t healthChange)
 {
 	const Position& targetPos = target->getPosition();
@@ -2552,10 +2559,31 @@ void Game::combatChangeHealth(DamageType_t damageType, Creature* attacker, Creat
 		addCreatureHealth(list, target);
 	}
 	else{
+		int32_t damage = -healthChange;
+
 		if(!target->isAttackable()){
 			addMagicEffect(list, targetPos, NM_ME_PUFF);
+			return false;
 		}
-		else if(target->isImmune(damageType)){
+		
+		if(getWorldType() == WORLD_TYPE_NO_PVP){
+			if(attacker && (attacker->getPlayer() && target->getPlayer())){
+				return false;
+			}
+
+			if(target->getMaster() && target->getMaster()->getPlayer()){
+				return false;
+			}
+		}
+
+		BlockType_t blockType = target->blockHit(attacker, damageType, damage);
+
+		if(blockType == BLOCK_DEFENSE){
+			addMagicEffect(list, targetPos, NM_ME_PUFF);
+			return false;
+		}
+
+		if(blockType == BLOCK_ARMOR || blockType == BLOCK_IMMUNITY){
 			uint8_t hitEffect = 0;
 
 			switch(damageType){
@@ -2583,25 +2611,11 @@ void Game::combatChangeHealth(DamageType_t damageType, Creature* attacker, Creat
 			}
 
 			addMagicEffect(list, targetPos, hitEffect);
+
+			return false;
 		}
-		else{
-			//TODO: reduce damage based on shield/skill/armor
 
-			//uint32_t damage = target->getReducedDamage(getDamageType(), -healthChange);
-			int32_t damage = -healthChange;
-
-			/*
-			//target->onCreatureAttacked()
-			Condition* condition = Condition::createCondition(CONDITION_INFIGHT, 60 * 1000, 0);
-			target->addCondition(condition);
-			*/
-
-			/*
-			if(attacker){
-				attacker->onAttackedCreature(target);
-			}
-			*/
-
+		if(damage != 0){
 			if(target->hasCondition(CONDITION_MANASHIELD)){
 				int32_t manaDamage = std::min(target->getMana(), damage);
 				damage = std::min((int32_t)0, damage - manaDamage);
@@ -2624,6 +2638,8 @@ void Game::combatChangeHealth(DamageType_t damageType, Creature* attacker, Creat
 
 				switch(damageType){
 					case DAMAGE_PHYSICAL:
+					case DAMAGE_SUDDENDEATH:
+					case DAMAGE_PHYSICALPROJECTILE:
 					{
 						Item* splash = NULL;
 						switch(target->getRace()){
@@ -2687,9 +2703,11 @@ void Game::combatChangeHealth(DamageType_t damageType, Creature* attacker, Creat
 			}
 		}
 	}
+
+	return true;
 }
 
-void Game::combatChangeMana(Creature* attacker, Creature* target, int32_t manaChange)
+bool Game::combatChangeMana(Creature* attacker, Creature* target, int32_t manaChange)
 {
 	if(manaChange > 0){
 		target->changeMana(manaChange);
@@ -2703,6 +2721,16 @@ void Game::combatChangeMana(Creature* attacker, Creature* target, int32_t manaCh
 		ss << manaChange;
 		addAnimatedText(targetPos, TEXTCOLOR_BLUE, ss.str());
 	}
+
+	return true;
+}
+
+void Game::addCreatureHealth(const Creature* target)
+{
+	SpectatorVec list;
+	getSpectators(Range(target->getPosition(), true), list);
+
+	addCreatureHealth(list, target);
 }
 
 void Game::addCreatureHealth(const SpectatorVec& list, const Creature* target)
@@ -2769,18 +2797,18 @@ void Game::addDistanceEffect(const Position& fromPos, const Position& toPos,
 }
 
 #ifdef __SKULLSYSTEM__
-void Game::changeSkull(Player* player, skulls_t newSkull)
+void Game::changeSkull(Player* player, Skulls_t newSkull)
 {
 	SpectatorVec list;
 	SpectatorVec::iterator it;
 
-	player->setSkull(new_skull);
+	player->setSkull(newSkull);
 	getSpectators(Range(player->getPosition(), true), list);
 
 	Player* spectator;
 	for(it = list.begin(); it != list.end(); ++it){
 		if(spectator = (*it)->getPlayer()){
-			spectator->sendCreatureSkull(player);
+			spectator->sendCreatureSkull(player, newSkull);
 		}
 	}
 }

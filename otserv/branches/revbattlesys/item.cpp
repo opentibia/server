@@ -627,36 +627,36 @@ bool Item::floorChangeWest() const{
 }
 
 bool Item::isWeapon() const{
-  //now also returns true on SHIELDS!!! Check back with getWeaponType!
-  //old: return (items[id].weaponType != NONE && items[id].weaponType != SHIELD && items[id].weaponType != AMO);
-  return (items[id].weaponType != NONE && items[id].weaponType != AMO);
+  return (items[id].weaponType != WEAPON_NONE && items[id].weaponType != WEAPON_AMMO);
 }
 
-WeaponType Item::getWeaponType() const {
-	  return items[id].weaponType;
+WeaponType_t Item::getWeaponType() const{
+	return items[id].weaponType;
 }
 
-amu_t Item::getAmuType() const{
-	 return items[id].amuType;
+Ammo_t Item::getAmuType() const{
+	return items[id].amuType;
 }
 
-subfight_t Item::getSubfightType() const {
+/*
+subfight_t Item::getSubfightType() const{
 	return items[id].shootType;
 }
+*/
 
-int Item::getAttack() const {
-	  return items[id].attack;
+int Item::getAttack() const{
+	return items[id].attack;
 }
 
-int Item::getArmor() const {
-	  return items[id].armor;
+int Item::getArmor() const{
+	return items[id].armor;
 }
 
-int Item::getDefense() const {
-	  return items[id].defence;
+int Item::getDefense() const{
+	return items[id].defence;
 }
 
-int Item::getSlotPosition() const {
+int Item::getSlotPosition() const{
 	return items[id].slot_position;
 }
 

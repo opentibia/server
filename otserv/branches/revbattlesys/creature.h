@@ -113,6 +113,8 @@ public:
 	virtual void removeList() = 0;
 	virtual void addList() = 0;
 
+	virtual bool canSee(const Position& pos) const = 0;
+
 	unsigned long getExpForLv(const int& lv) const
 	{ 
 		return (int)((50*lv*lv*lv)/3 - 100 * lv * lv + (850*lv) / 3 - 200);
@@ -164,12 +166,27 @@ public:
 	int32_t getMaxHealth() const {return healthMax;}
 	int32_t getMana() const {return mana;}
 
-	//combat functions
-	Creature* getAttackedCreature();
-	virtual void setAttackedCreature(Creature* creature);
+	//walk functions
+	/*
+	bool startWalk(std::list<Direction>& listDir);
+	bool addEventWalk();
+	bool checkStopWalk(bool pathInvalid = false);
+	bool stopAutoWalk();
+	*/
 
-	virtual void setMaster(Creature* creature);
-	virtual Creature* getMaster() {return master;}
+	//follow functions
+	virtual const Creature* getFollowCreature() { return followCreature; };
+	virtual void setFollowCreature(const Creature* creature);
+
+	//combat functions
+	Creature* getAttackedCreature() { return attackedCreature; }
+	virtual void setAttackedCreature(Creature* creature);
+	virtual BlockType_t blockHit(Creature* attacker, DamageType_t damageType, int32_t& damage);
+	virtual void doAttacking() {};
+
+	void setMaster(Creature* creature);
+	Creature* getMaster() {return master;}
+	const Creature* getMaster() const {return master;}
 	
 	virtual void addSummon(Creature* creature);
 	virtual void removeSummon(Creature* creature);
@@ -199,10 +216,12 @@ public:
 	//combat event functions
 	virtual void onAddCondition(ConditionType_t type) {};
 	virtual void onEndCondition(ConditionType_t type) {};
-	virtual void onAttackedCreature(Creature* target, int32_t damagePoints);
+	virtual void onAttackedCreature(Creature* target);
+	virtual void onAttackedCreatureDrainHealth(Creature* target, int32_t points);
 	virtual void onAttackedCreatureKilled(Creature* target);
 	virtual void onKilledCreature(Creature* target);
 	virtual void onGainExperience(int32_t gainExperience);
+	virtual void onTargetCreatureDisappear();
 	
 	virtual void getCreatureLight(LightInfo& light) const;
 	virtual void setNormalCreatureLight();
@@ -215,9 +234,9 @@ public:
 	virtual void onRemoveTileItem(const Position& pos, uint32_t stackpos, const Item* item) {};
 	virtual void onUpdateTile(const Position& pos) {};
 
-	virtual void onCreatureAppear(const Creature* creature, bool isLogin) {};
-	virtual void onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout) {};
-	virtual void onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport) {};
+	virtual void onCreatureAppear(const Creature* creature, bool isLogin);
+	virtual void onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout);
+	virtual void onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport);
 
 	virtual void onCreatureTurn(const Creature* creature, uint32_t stackPos) { };
 	virtual void onCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text) { };
@@ -231,11 +250,9 @@ protected:
 	int32_t level;
 	int32_t magLevel;
 
-	Creature* attackedCreature;
-
 	int lookType, lookHead, lookBody, lookLegs, lookFeet, lookCorpse, lookMaster;
 	Position masterPos;
-	uint64_t lastmove;
+	uint64_t lastMove;
 
 	int32_t immunities;
 	int32_t speed;
@@ -251,9 +268,18 @@ protected:
 	typedef std::list<Condition*> ConditionList;
 	ConditionList conditions;
 
+	//follow variables
+	const Creature* followCreature;
+	unsigned long eventWalk;
+	std::list<Direction> listWalkDir;
+
+	//combat variables
+	Creature* attackedCreature;
 	typedef std::map<uint32_t, int32_t> DamageMap;
 	DamageMap damageMap;
 	uint32_t lastHitCreature;
+	bool internalDefense;
+	bool internalArmor;
 
 	LightInfo internalLight;
 

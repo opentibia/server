@@ -78,6 +78,8 @@ public:
 	void removeList() {listNpc.removeList(getID());}
 	void addList() {listNpc.addList(this);}
 	
+	bool canSee(const Position& pos) const;
+	
 	void speak(const std::string& text){};
 	virtual const std::string& getName() const {return name;};
 	virtual const std::string& getNameDescription() const {return name;};

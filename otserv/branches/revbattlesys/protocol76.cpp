@@ -1101,23 +1101,13 @@ void Protocol76::sendWorldLight(const LightInfo& lightInfo)
 	WriteBuffer(msg);
 }
 
-void Protocol76::sendCreatureSkull(const Creature* creature)
+void Protocol76::sendCreatureSkull(const Creature* creature, Skulls_t skull)
 {
 	if(CanSee(creature)){
 		NetworkMessage msg;
 		msg.AddByte(0x90);
 		msg.AddU32(creature->getID());
-		#ifdef __SKULLSYSTEM__
-		if(const Player* playerSkull = creature->getPlayer()){
-			msg.AddByte(player->getSkullClient(playerSkull));
-		}
-		else{
-			msg.AddByte(0);	//no skull
-		}
-		#else
-		msg.AddByte(0);	//no skull
-		#endif
-		
+		msg.AddByte(skull);
 		WriteBuffer(msg);
 	}
 }
@@ -1796,17 +1786,7 @@ void Protocol76::AddCreature(NetworkMessage &msg,const Creature* creature, bool 
 	msg.AddByte(lightInfo.color);
 	
 	msg.AddU16(creature->getSpeed());
-	
-	#ifdef __SKULLSYSTEM__
-	if(const Player* playerSkull = creature->getPlayer()){
-		msg.AddByte(player->getSkullClient(playerSkull));
-	}
-	else{
-		msg.AddByte(0);	//no skull
-	}
-	#else
-	msg.AddByte(0);	//no skull
-	#endif
+	msg.AddByte(player->getSkullClient(creature->getPlayer()));
 	msg.AddByte(0x00); // shield
 }
 

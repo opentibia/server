@@ -85,7 +85,6 @@ Condition* Condition::createCondition(ConditionType_t _type, int32_t _ticks, int
 		}
 
 		case CONDITION_MANASHIELD:
-		//case CONDITION_PZLOCK:
 		case CONDITION_INFIGHT:
 		case CONDITION_DRUNK:
 		case CONDITION_EXHAUSTED:
@@ -156,7 +155,6 @@ uint8_t ConditionGeneric::getIcons() const
 			return ICON_DRUNK;
 			break;
 		
-		//case CONDITION_PZLOCK:
 		case CONDITION_EXHAUSTED:
 			break;
 	}
@@ -182,9 +180,12 @@ bool ConditionDamage::startCondition(Creature* creature)
 {
 	int32_t damage = 0;
 	if(getNextDamage(damage)){
-		doDamage(creature, damage);
+		return doDamage(creature, damage);
 	}
 
+	return false;
+
+	/*
 	if(Player* player = creature->getPlayer()){
 		if(player->getAccessLevel() != 0){
 			return false;
@@ -192,6 +193,7 @@ bool ConditionDamage::startCondition(Creature* creature)
 	}
 
 	return true;
+	*/
 }
 
 void ConditionDamage::executeCondition(Creature* creature, int32_t interval)
@@ -220,7 +222,7 @@ bool ConditionDamage::getNextDamage(int32_t& damage)
 	return false;
 }
 
-void ConditionDamage::doDamage(Creature* creature, int32_t damage)
+bool ConditionDamage::doDamage(Creature* creature, int32_t damage)
 {
 	DamageType_t damageType = DAMAGE_NONE;
 
@@ -239,7 +241,7 @@ void ConditionDamage::doDamage(Creature* creature, int32_t damage)
 	}
 
 	Creature* attacker = g_game.getCreatureByID(owner);
-	g_game.combatChangeHealth(damageType, attacker, creature, damage);
+	return g_game.combatChangeHealth(damageType, attacker, creature, damage);
 }
 
 void ConditionDamage::endCondition(Creature* creature, EndCondition_t reason)

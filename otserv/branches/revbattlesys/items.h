@@ -66,13 +66,13 @@ public:
 	unsigned short id;
 	unsigned short clientId;
 
-	unsigned short maxItems;    // maximum size if this is a container
-	double         weight;      // weight of the item, e.g. throwing distance depends on it
-	std::string    name;        // the name of the item
-	std::string    description; // additional description... as in "The blade is a magic flame." for fireswords
-	WeaponType     weaponType;
-	amu_t          amuType;
-	subfight_t     shootType;
+	std::string    name;
+	std::string    description;
+	unsigned short maxItems;    // capacity (containers)
+	double         weight;
+	WeaponType_t   weaponType;
+	Ammo_t         amuType;
+	ShootType_t    shootType;
 	int            attack;
 	int            defence;
 	int            armor;

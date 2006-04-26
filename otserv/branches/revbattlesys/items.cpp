@@ -65,10 +65,10 @@ ItemType::ItemType()
 	clientId      = 0;
 	maxItems      = 8;  // maximum size if this is a container
 	weight        = 0;  // weight of the item, e.g. throwing distance depends on it
-	weaponType    = NONE;
+	weaponType    = WEAPON_NONE;
 	slot_position = SLOTP_RIGHT | SLOTP_LEFT | SLOTP_AMMO;
-	amuType       = AMU_NONE;
-	shootType     = DIST_NONE;
+	amuType       = AMMO_NONE;
+	shootType     = SHOOT_NONE;
 	attack        = 0;
 	defence       = 0;
 	armor         = 0;
@@ -140,59 +140,60 @@ Items::~Items()
 		delete it->second;
 }
 
-inline subfight_t translateOTBsubfight_t(subfightOTB_t sf)
+inline ShootType_t translateOTBShootType(ShootTypeOtb_t sf)
 {
 	switch(sf){
-	case OTB_DIST_NONE:
-		return DIST_NONE;
+	case OTB_SHOOT_NONE:
+		return SHOOT_NONE;
 		break;
-	case OTB_DIST_BOLT:
-		return DIST_BOLT;
+	case OTB_SHOOT_BOLT:
+		return SHOOT_BOLT;
 		break;
-	case OTB_DIST_ARROW:
-		return DIST_ARROW;
+	case OTB_SHOOT_ARROW:
+		return SHOOT_ARROW;
 		break;
-	case OTB_DIST_FIRE:
-		return DIST_FIRE;
+	case OTB_SHOOT_FIRE:
+		return SHOOT_FIRE;
 		break;
-	case OTB_DIST_ENERGY:
-		return DIST_ENERGY;
+	case OTB_SHOOT_ENERGY:
+		return SHOOT_ENERGY;
 		break;
-	case OTB_DIST_POISONARROW:
-		return DIST_POISONARROW;
+	case OTB_SHOOT_POISONARROW:
+		return SHOOT_POISONARROW;
 		break;
-	case OTB_DIST_BURSTARROW:
-		return DIST_BURSTARROW;
+	case OTB_SHOOT_BURSTARROW:
+		return SHOOT_BURSTARROW;
 		break;
-	case OTB_DIST_THROWINGSTAR:
-		return DIST_THROWINGSTAR;
+	case OTB_SHOOT_THROWINGSTAR:
+		return SHOOT_THROWINGSTAR;
 		break;
-	case OTB_DIST_THROWINGKNIFE:
-		return DIST_THROWINGKNIFE;
+	case OTB_SHOOT_THROWINGKNIFE:
+		return SHOOT_THROWINGKNIFE;
 		break;
-	case OTB_DIST_SMALLSTONE:
-		return DIST_SMALLSTONE;
+	case OTB_SHOOT_SMALLSTONE:
+		return SHOOT_SMALLSTONE;
 		break;
-	case OTB_DIST_SUDDENDEATH:
-		return DIST_SUDDENDEATH;
+	case OTB_SHOOT_SUDDENDEATH:
+		return SHOOT_SUDDENDEATH;
 		break;
-	case OTB_DIST_LARGEROCK:
-		return DIST_LARGEROCK;
+	case OTB_SHOOT_LARGEROCK:
+		return SHOOT_LARGEROCK;
 		break;
-	case OTB_DIST_SNOWBALL:
-		return DIST_SNOWBALL;
+	case OTB_SHOOT_SNOWBALL:
+		return SHOOT_SNOWBALL;
 		break;
-	case OTB_DIST_POWERBOLT:
-		return DIST_POWERBOLT;
+	case OTB_SHOOT_POWERBOLT:
+		return SHOOT_POWERBOLT;
 		break;
-	case OTB_DIST_SPEAR:
-		return DIST_SPEAR;
+	case OTB_SHOOT_SPEAR:
+		return SHOOT_SPEAR;
 		break;
-	case OTB_DIST_POISONFIELD:
-		return DIST_POISONFIELD;
+	case OTB_SHOOT_POISONFIELD:
+		return SHOOT_POISONFIELD;
 		break;
 	}
-	return DIST_NONE;
+
+	return SHOOT_NONE;
 }
 
 int Items::loadFromOtb(std::string file)
@@ -503,9 +504,9 @@ int Items::loadFromOtb(std::string file)
 				if(!props.GET_STRUCT(wb2))
 					return ERROR_INVALID_FORMAT;
 				
-				iType->weaponType = (WeaponType)wb2->weaponType;
-				iType->shootType = translateOTBsubfight_t((subfightOTB_t)wb2->shootType);
-				iType->amuType = (amu_t)wb2->amuType;
+				iType->weaponType = (WeaponType_t)wb2->weaponType;
+				iType->shootType = translateOTBShootType((ShootTypeOtb_t)wb2->shootType);
+				iType->amuType = (Ammo_t)wb2->amuType;
 				iType->attack = wb2->attack;
 				iType->defence = wb2->defence;
 				break;
@@ -519,9 +520,9 @@ int Items::loadFromOtb(std::string file)
 				if(!props.GET_STRUCT(ab2))
 					return ERROR_INVALID_FORMAT;
 					
-				iType->weaponType = AMO;
-				iType->shootType = translateOTBsubfight_t((subfightOTB_t)ab2->shootType);
-				iType->amuType = (amu_t)ab2->amuType;
+				iType->weaponType = WEAPON_AMMO;
+				iType->shootType = translateOTBShootType((ShootTypeOtb_t)ab2->shootType);
+				iType->amuType = (Ammo_t)ab2->amuType;
 				iType->attack = ab2->attack;
 				break;
 			}

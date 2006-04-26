@@ -61,14 +61,19 @@ Creature::Creature() :
 	level = 0;
 	mana = 0;
 	manaMax = 0;
-	lastmove = 0;
+	lastMove = 0;
 	speed = 220;
+
+	followCreature = NULL;
+	eventWalk = 0;
 
 	immunities = 0;
 	eventCheck = 0;
 	eventCheckAttacking = 0;
 	attackedCreature = NULL;
 	lastHitCreature = 0;
+	internalDefense = true;
+	internalArmor = true;
 }
 
 Creature::~Creature()
@@ -101,7 +106,27 @@ void Creature::setRemoved()
 
 void Creature::onThink(uint32_t interval)
 {
+	internalDefense = true;
+	internalArmor = true;
+}
+
+void Creature::onCreatureAppear(const Creature* creature, bool isLogin)
+{
 	//
+}
+
+void Creature::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout)
+{
+	if(attackedCreature == creature || followCreature == creature){
+		onTargetCreatureDisappear();
+	}
+}
+
+void Creature::onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport)
+{
+	if((attackedCreature == creature || followCreature == creature) && !canSee(creature->getPosition())){
+		onTargetCreatureDisappear();
+	}
 }
 
 void Creature::die()
@@ -114,7 +139,7 @@ void Creature::die()
 			lastHitCreature->onKilledCreature(this);
 		}
 
-		if(mostDamageCreature){
+		if(mostDamageCreature && mostDamageCreature != lastHitCreature){
 			mostDamageCreature->onKilledCreature(this);
 		}
 	}
@@ -132,8 +157,10 @@ bool Creature::getKillers(Creature** _lastHitCreature, Creature** _mostDamageCre
 
 	int32_t mostDamage = 0;
 	for(DamageMap::iterator it = damageMap.begin(); it != damageMap.end(); ++it){
-		if(*_mostDamageCreature = g_game.getCreatureByID((*it).first)){
-			mostDamage = (*it).second;
+		if((*it).second > mostDamage){
+			if(*_mostDamageCreature = g_game.getCreatureByID((*it).first)){
+				mostDamage = (*it).second;
+			}
 		}
 	}
 
@@ -188,7 +215,7 @@ void Creature::drainHealth(Creature* attacker, DamageType_t damageType, int32_t 
 	changeHealth(-damage);
 
 	if(attacker){
-		attacker->onAttackedCreature(this, damage);
+		attacker->onAttackedCreatureDrainHealth(this, damage);
 	}
 }
 
@@ -201,9 +228,66 @@ void Creature::setAttackedCreature(Creature* creature)
 {
 	attackedCreature = creature;
 
+	if(attackedCreature){
+		onAttackedCreature(creature);
+	}
+
 	std::list<Creature*>::iterator cit;
 	for(cit = summons.begin(); cit != summons.end(); ++cit) {
 		(*cit)->setAttackedCreature(creature);
+	}
+}
+
+BlockType_t Creature::blockHit(Creature* attacker, DamageType_t damageType, int32_t& damage)
+{
+	if(attacker){
+		attacker->onAttackedCreature(this);
+	}
+
+	if(!isAttackable()){
+		damage = 0;
+		return BLOCK_DEFENSE;
+	}
+
+	if(isImmune(damageType)){
+		damage = 0;
+		return BLOCK_IMMUNITY;
+	}
+
+	if(internalDefense && damageType == DAMAGE_PHYSICAL){
+		internalDefense = false;
+		int32_t defense = getDefense();
+
+		//TODO: change formulas
+		int32_t probability = rand() % 100;
+		if(probability < defense){
+			damage = 0;
+			return BLOCK_DEFENSE;
+		}
+	}
+	
+	if(internalArmor && (damageType == DAMAGE_PHYSICAL || damageType == DAMAGE_PHYSICALPROJECTILE)){
+		internalArmor = false;
+		int32_t armor = getArmor();
+
+		int32_t probability = rand() % 100;
+		int32_t reduceDamage = (probability * armor * damage) / 3000;
+		if(reduceDamage >= damage){
+			damage = 0;
+			return BLOCK_ARMOR;
+		}
+		else{
+			damage -= reduceDamage;
+		}
+	}
+
+	return BLOCK_NONE;
+}
+
+void Creature::setFollowCreature(const Creature* creature)
+{
+	if(followCreature != creature){
+		followCreature = creature;
 	}
 }
 
@@ -231,17 +315,24 @@ int32_t Creature::getGainedExperience(Creature* attacker) const
 
 bool Creature::addDamagePoints(Creature* attacker, int32_t damagePoints)
 {
-	uint32_t attackerId = (attacker ? attacker->getID() : 0);
+	if(damagePoints > 0){
+		uint32_t attackerId = (attacker ? attacker->getID() : 0);
 
-	damageMap[attackerId] += damagePoints;
-	lastHitCreature = attackerId;
+		damageMap[attackerId] += damagePoints;
+		lastHitCreature = attackerId;
+	}
 
 	return true;
 }
 
-void Creature::onAttackedCreature(Creature* target, int32_t damagePoints)
+void Creature::onAttackedCreature(Creature* target)
 {
-	target->addDamagePoints(this, damagePoints);
+	//
+}
+
+void Creature::onAttackedCreatureDrainHealth(Creature* target, int32_t points)
+{
+	target->addDamagePoints(this, points);
 }
 
 void Creature::onAttackedCreatureKilled(Creature* target)
@@ -265,6 +356,12 @@ void Creature::onGainExperience(int32_t gainExperience)
 
 		g_game.addAnimatedText(getPosition(), TEXTCOLOR_WHITE_EXP, strExp.str());
 	}
+}
+
+void Creature::onTargetCreatureDisappear()
+{
+	setAttackedCreature(NULL);
+	setFollowCreature(NULL);
 }
 
 void Creature::setMaster(Creature* creature)
@@ -410,8 +507,8 @@ int64_t Creature::getSleepTicks() const
 	int64_t delay = 0;
 	int stepDuration = getStepDuration();
 	
-	if(lastmove != 0) {
-		delay = (((int64_t)(lastmove)) + ((int64_t)(stepDuration))) - ((int64_t)(OTSYS_TIME()));
+	if(lastMove != 0) {
+		delay = (((int64_t)(lastMove)) + ((int64_t)(stepDuration))) - ((int64_t)(OTSYS_TIME()));
 	}
 	
 	return delay;
@@ -427,6 +524,65 @@ int64_t Creature::getEventStepTicks() const
 
 	return ret;
 }
+
+/*
+bool Creature::startWalk(std::list<Direction>& listDir)
+{
+	if(eventWalk == 0){
+		//start a new event
+		listWalkDir = listDir;
+		return addEventAutoWalk();
+	}
+	else{
+		//event already running
+		listWalkDir = listDir;
+	}
+
+	return true;
+}
+
+bool Creature::addEventWalk()
+{
+	if(isRemoved()){
+		eventWalk = 0;
+		return false;
+	}
+
+	int64_t ticks = getEventStepTicks();
+	eventWalk = g_game.addEvent(makeTask(ticks, std::bind2nd(std::mem_fun(&Game::checkAutoWalkPlayer), getID())));
+	return true;
+}
+
+bool Creature::stopWalk()
+{
+	if(eventWalk != 0){
+		g_game.stopEvent(eventWalk);
+		eventAutoWalk = 0;
+
+		if(!listWalkDir.empty()){
+			listWalkDir.clear();
+			//sendCancelWalk();
+		}
+	}
+
+	return true;
+}
+
+bool Creature::checkStopWalk(bool pathInvalid = false)
+{
+	if(followCreature){
+		if(pathInvalid || chaseMode == CHASEMODE_FOLLOW){
+			if(g_game.internalFollowCreature(this, followCreature)){
+				return false;
+			}
+		}
+	}
+
+	setFollowCreature(NULL);
+	stopAutoWalk();
+	return true;
+}
+*/
 
 void Creature::getCreatureLight(LightInfo& light) const
 {
