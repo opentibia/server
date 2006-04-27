@@ -26,6 +26,7 @@
 #include "game.h"
 #include "luascript.h"
 #include "player.h"
+#include "actions.h"
 
 extern "C"
 {
@@ -34,12 +35,107 @@ extern "C"
 #include <lualib.h>
 }
 
+class RuneSpell;
+class InstantSpell;
+
+class Spells
+{
+public:
+	Spells();
+	~Spells();
+	
+	bool reload();
+	void clear();
+	
+	bool loadFromXml(const std::string& datadir);
+	
+	RuneSpell* getRuneSpell(Item* item);
+	RuneSpell* getRuneSpell(const std::string& name);
+	
+	InstantSpell* getInstantSpell(const std::string& words);
+	InstantSpell* getInstantSpellByName(const std::string& name);
+		
+protected:
+	bool loaded;
+	std::string datadir;
+	typedef std::map<uint32_t, RuneSpell*> RunesMap;
+	typedef std::map<std::string, InstantSpell*> InstantsMap ;
+	RunesMap runes;
+	InstantsMap instants;
+};
+
+
+enum TargetType_t{
+	TARGET_NONE,
+	TARGET_CREATURE,
+	TARGET_POSITION,
+};
+
+class Spell
+{
+public:
+	Spell();
+	virtual ~Spell(){};
+	
+	bool configureSpell(xmlNodePtr xmlspell);
+	
+protected:
+	bool spellPlayerChecks(Player* player);
+	bool causeExhaustion(){return exhaustion;};
+	
+	TargetType_t targetType;
+
+private:
+	std::string name;
+	
+	uint32_t level;
+	uint32_t magLevel;
+	uint32_t mana;
+	uint32_t soul;
+	bool exhaustion;
+	bool premium;
+	bool enabled;
+	uint32_t vocationBits;
+};
+
+class InstantSpell : public Spell//, public Cast
+{
+public:
+	InstantSpell();
+	virtual ~InstantSpell();
+	
+	bool configureSpell(xmlNodePtr xmlspell);
+	//bool loadScript(Game* igame,const std::string& datadir, const std::strinf& script);
+	bool castInstant(Creature* creature, const std::string& param);
+	
+	std::string getWords(){return words;};
+protected:
+	//LuaScript* script; in Cast class
+	std::string words;
+	bool hasParam;
+};
+
+class RuneSpell : public Action, public Spell
+{
+public:
+	RuneSpell();
+	virtual ~RuneSpell();
+	
+	bool configureSpell(xmlNodePtr xmlspell);
+	
+	bool executeUseRune(Creature* creature, Item* item, const Position& posFrom, const Position& posTo, Creature* target);
+	
+	uint32_t getRuneItemId(){return runeId;};
+	
+protected:
+	bool hasCharges;
+	uint32_t runeId;
+};
 
 //////////////////////////////////////////////////////////////////////
 // Defines a Spell...
-class Spell;
+/*class Spell;
 class SpellScript;
-
 class Spells
 {
 public:
@@ -86,8 +182,8 @@ protected:
   bool loaded;
   int maxVoc;
 };
-
-
+*/
+/*
 class Spell
 {
 public:
@@ -166,4 +262,5 @@ protected:
 	Spell* spell;
 	bool loaded;
 };
+*/
 #endif // __spells_h_

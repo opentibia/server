@@ -52,7 +52,8 @@ public:
   // simply read functions for incoming message
   unsigned char  GetByte();
   unsigned short GetU16();
-  unsigned short GetItemId();
+  //unsigned short GetItemId();
+  unsigned short GetSpriteId();
   unsigned int   GetU32();
   std::string    GetString();
   std::string	 GetRaw();

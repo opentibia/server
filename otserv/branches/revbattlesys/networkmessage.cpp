@@ -165,11 +165,17 @@ unsigned short NetworkMessage::GetU16()
   m_ReadPos += 2;
   return v;
 }
-
+/*
 unsigned short NetworkMessage::GetItemId()
 {
 	unsigned short v = this->GetU16();
 	return Item::items.reverseLookUp(v);
+}
+*/
+unsigned short NetworkMessage::GetSpriteId()
+{
+	unsigned short v = this->GetU16();
+	return v;
 }
 
 unsigned int NetworkMessage::GetU32()

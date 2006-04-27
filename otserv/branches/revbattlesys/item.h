@@ -142,6 +142,7 @@ public:
 	std::string getWeightDescription() const;
 
 	unsigned short getID() const;    // ID as in ItemType
+	unsigned short getClientID() const;
 	virtual void setID(unsigned short newid);
 
 	WeaponType_t getWeaponType() const;

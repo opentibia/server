@@ -26,18 +26,18 @@
 
 LuaScript::LuaScript()
 {
-  luaState = NULL;
+	luaState = NULL;
 }
 
 
 LuaScript::~LuaScript()
 {
-  if (luaState)
-	  lua_close(luaState);
+	if(luaState)
+		lua_close(luaState);
 }
 
 
-int LuaScript::OpenFile(const char *filename)
+int LuaScript::openFile(const char *filename)
 {
 	luaState = lua_open();
 
@@ -52,8 +52,8 @@ std::string LuaScript::getGlobalString(std::string var, const std::string& defSt
 {
 	lua_getglobal(luaState, var.c_str());
 
-  if(!lua_isstring(luaState, -1))
-  	  return defString;
+	if(!lua_isstring(luaState, -1))
+		return defString;
 
 	int len = (int)lua_strlen(luaState, -1);
 	std::string ret(lua_tostring(luaState, -1), len);
@@ -66,7 +66,7 @@ int LuaScript::getGlobalNumber(std::string var, const int defNum)
 {
 	lua_getglobal(luaState, var.c_str());
 
-  if(!lua_isnumber(luaState, -1))
+	if(!lua_isnumber(luaState, -1))
   	  return defNum;
 
 	int val = (int)lua_tonumber(luaState, -1);
@@ -87,45 +87,51 @@ int LuaScript::setGlobalNumber(std::string var, int val){
 	return true;
 }
 
-std::string LuaScript::getGlobalStringField (std::string var, const int key, const std::string& defString) {
-      lua_getglobal(luaState, var.c_str());
+std::string LuaScript::getGlobalStringField (std::string var, const int key, const std::string& defString)
+{
+	lua_getglobal(luaState, var.c_str());
 
-      lua_pushnumber(luaState, key);
-      lua_gettable(luaState, -2);  /* get table[key] */
-      if(!lua_isstring(luaState, -1))
-  	  return defString;
-      std::string result = lua_tostring(luaState, -1);
-      lua_pop(luaState, 2);  /* remove number and key*/
-      return result;
+	lua_pushnumber(luaState, key);
+	lua_gettable(luaState, -2);  /* get table[key] */
+	if(!lua_isstring(luaState, -1))
+		return defString;
+	
+	std::string result = lua_tostring(luaState, -1);
+	lua_pop(luaState, 2);  /* remove number and key*/
+	return result;
 }
 
-int LuaScript::getField (const char *key) {
-      int result;
-      lua_pushstring(luaState, key);
-      lua_gettable(luaState, -2);  /* get table[key] */
-      result = (int)lua_tonumber(luaState, -1);
-      lua_pop(luaState, 1);  /* remove number and key*/
-      return result;
+int LuaScript::getField (const char *key)
+{
+	int result;
+	lua_pushstring(luaState, key);
+	lua_gettable(luaState, -2);  /* get table[key] */
+	result = (int)lua_tonumber(luaState, -1);
+	lua_pop(luaState, 1);  /* remove number and key*/
+	return result;
 }
 
-void LuaScript::setField (const char *index, int val) {
-      lua_pushstring(luaState, index);
-      lua_pushnumber(luaState, (double)val);
-      lua_settable(luaState, -3);
-    }
-
-
-int LuaScript::getField (lua_State *L , const char *key) {
-      int result;
-      lua_pushstring(L, key);
-      lua_gettable(L, -2);  /* get table[key] */
-      result = (int)lua_tonumber(L, -1);
-      lua_pop(L, 1);  /* remove number and key*/
-      return result;
+void LuaScript::setField (const char *index, int val)
+{
+	lua_pushstring(luaState, index);
+	lua_pushnumber(luaState, (double)val);
+	lua_settable(luaState, -3);
 }
 
-void LuaScript::setField (lua_State *L, const char *index, int val) {
-      lua_pushstring(L, index);
-      lua_pushnumber(L, (double)val);
-      lua_settable(L, -3);
-    }
+
+int LuaScript::getField (lua_State *L , const char *key)
+{
+	int result;
+	lua_pushstring(L, key);
+	lua_gettable(L, -2);  /* get table[key] */
+	result = (int)lua_tonumber(L, -1);
+	lua_pop(L, 1);  /* remove number and key*/
+	return result;
+}
+
+void LuaScript::setField (lua_State *L, const char *index, int val)
+{
+	lua_pushstring(L, index);
+	lua_pushnumber(L, (double)val);
+	lua_settable(L, -3);
+}

@@ -52,7 +52,7 @@ Actions::~Actions()
 
 void Actions::clear()
 {
-	ActionUseMap::iterator it = useItemMap.begin();
+	/*ActionUseMap::iterator it = useItemMap.begin();
 	while(it != useItemMap.end()){
 		delete it->second;
 		useItemMap.erase(it);
@@ -71,7 +71,7 @@ void Actions::clear()
 		delete it->second;
 		actionItemMap.erase(it);
 		it = actionItemMap.begin();
-	}
+	}*/
 }
 
 bool Actions::reload(){
@@ -87,7 +87,7 @@ bool Actions::reload(){
 bool Actions::loadFromXml(const std::string& _datadir)
 {
 	loaded = false;
-	Action* action = NULL;
+	//Action* action = NULL;
 	
 	datadir = _datadir;
 	std::string filename = datadir + "actions/actions.xml";
@@ -105,7 +105,7 @@ bool Actions::loadFromXml(const std::string& _datadir)
 		}
 
 		p = root->children;
-		while (p){
+		/*while (p){
 			if(xmlStrcmp(p->name, (const xmlChar*)"action") == 0){
 				int itemid,uniqueid,actionid;
 				if(readXMLInteger(p,"itemid",itemid)){
@@ -128,13 +128,13 @@ bool Actions::loadFromXml(const std::string& _datadir)
 				}
 			}
 			p = p->next;
-		}
+		}*/
 		
 		xmlFreeDoc(doc);
 	}
 	return this->loaded;
 }
-
+/*
 Action *Actions::loadAction(xmlNodePtr xmlaction)
 {
 	Action* action = NULL;
@@ -168,7 +168,7 @@ Action *Actions::loadAction(xmlNodePtr xmlaction)
 
 	return action;
 }
-
+*/
 int Actions::canUse(const Player* player, const Position& pos) const
 {
 	if(pos.x != 0xFFFF){
@@ -196,7 +196,7 @@ int Actions::canUseFar(const Player* player, const Position& to_pos, const bool 
 
 	return CAN_USE;
 }
-
+/*
 Action *Actions::getAction(const Item* item)
 {
 	if(item->getUniqueId() != 0){
@@ -218,50 +218,9 @@ Action *Actions::getAction(const Item* item)
 	
 	return NULL;
 }
-
-bool Actions::UseItem(Player* player, const Position& pos, const unsigned char stack, 
-	const unsigned short itemId, const unsigned char index)
+*/
+bool Actions::UseItem(Player* player, const Position& pos, uint8_t index, Item* item)
 {	
-	Thing* thing = game->internalGetThing(player, pos, stack);
-	if(!thing){
-		player->sendCancelMessage(RET_NOTPOSSIBLE);
-		return false;
-	}
-
-	Item* item = thing->getItem();
-
-	if(!item){
-		#ifdef __DEBUG__
-		std::cout << "no item" << std::endl;
-		#endif
-		player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
-		return false;
-	}
-	
-	if(item->getID() != itemId){
-		#ifdef __DEBUG__
-		std::cout << "no id" << std::endl;
-		#endif
-		player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
-		return false;
-	} 
-	
-	if(canUse(player, pos) == TOO_FAR){
-		player->sendCancelMessage(RET_TOOFARAWAY);
-		return false;
-
-		/*
-		Task* task = new Task( boost::bind(&Game::playerUseItem, game,
-			player, pos, stack, index, itemId) );
-
-		ReturnValue ret = game->internalPlayerTryReach(player, item->getPosition(), task);
-		if(ret != RET_NOERROR){
-			player->sendCancelMessage(ret);
-			return false;
-		}
-		*/
-	}
-
 	//check if it is a house door
 	if(Door* door = item->getDoor()){
 		if(door->canUse(player) == false){
@@ -271,16 +230,17 @@ bool Actions::UseItem(Player* player, const Position& pos, const unsigned char s
 	}
 	
 	//look for the item in action maps	
-	Action* action = getAction(item);
+	//Action* action = getAction(item);
 	
 	//if found execute it
-	if(action){
+	/*
+	if(action){	
 		PositionEx posEx(pos, stack);
 		if(action->executeUse(player, item, posEx, posEx)){
 			return true;
 		}
 	}
-	
+	*/
 	//can we read it?
 	int maxlen;
 	int RWInfo = item->getRWInfo(maxlen);
@@ -300,9 +260,9 @@ bool Actions::UseItem(Player* player, const Position& pos, const unsigned char s
 			return true;
 	}
     
-  //we dont know what to do with this item
+	//we dont know what to do with this item
 	player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
-  return false;	
+	return false;	
 }
 
 bool Actions::openContainer(Player* player, Container* container, const unsigned char index)
@@ -334,36 +294,9 @@ bool Actions::openContainer(Player* player, Container* container, const unsigned
 }
 
 bool Actions::UseItemEx(Player* player, const Position& from_pos,
-	const unsigned char from_stack, const Position& to_pos,
-	const unsigned char to_stack, const unsigned short itemid)
+	const Position& to_pos, const unsigned char to_stack, Item* item)
 {
-	if(canUse(player,from_pos) == TOO_FAR){
-		/*
-		bool Game::playerUseItemEx(Player* player, const Position& fromPos, uint8_t fromStackPos, uint16_t fromItemId,
-			const Position& toPos, uint8_t toStackPos, uint16_t toItemId)
-
-		boost::function1<void, Game*> _f = boost::bind(&Game::playerUseItemEx, this,
-			player, fromPos, fromStackPos, fromItemId, toPos, toStackPos, toItemId);
-		*/
-
-		player->sendCancelMessage(RET_TOOFARAWAY);
-		return false;
-	}
-	
-	Thing* thing = game->internalGetThing(player, from_pos, from_stack);
-	if(!thing)
-		return false;
-
-	Item* item = thing->getItem();
-	if(!item)
-		return false;
-	
-	if(item->getID() != itemid)
-		return false;
-		
-	if(!item->isUseable())
-		return false;
-	
+	/*
 	Action* action = getAction(item);
 	
 	if(action){
@@ -387,14 +320,86 @@ bool Actions::UseItemEx(Player* player, const Position& from_pos,
 		if(action->executeUse(player,item, posFromEx, posToEx))
 			return true;
 	}
+	*/
+	
+	/*
+	//Runes
+	std::map<unsigned short, Spell*>::iterator sit = spells.getAllRuneSpells()->find(item->getID());
+	if(sit != spells.getAllRuneSpells()->end()){
+		if(!Position::areInRange<1,1,0>(item->getPosition(), player->getPosition())){
+			player->sendCancelMessage(RET_TOOFARAWAY);
+			return false;
+		}
+		
+		std::string var = std::string("");
+		if(player->access != 0 || sit->second->getMagLv() <= player->magLevel)
+		{
+			bool success = sit->second->getSpellScript()->castSpell(player, toPos, var);
+			if(success){
+				int32_t newCharge = std::max(0, item->getItemCharge() - 1);
+				transformItem(item, item->getID(), newCharge);
+			}
+		}
+		else{
+			player->sendCancelMessage(RET_NOTREQUIREDLEVELTOUSERUNE);
+			return false;
+		}
+	}
+	else{
+		actions.UseItemEx(player, fromPos, fromStackPos, toPos, toStackPos, fromItemId);
+		return true;
+	}
+	*/
+	
 	
 	//not found
 	player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
 	return false;
 }
 
-//
 
+Action::Action()
+{
+	loaded = false;
+	allowfaruse = false;
+	blockwalls = true;
+}
+
+Action::~Action()
+{
+	if(script){
+		delete script;
+		script = NULL;
+	}
+}
+
+bool Action::configureAction(xmlNodePtr p)
+{
+	int intValue;
+	if(readXMLInteger(p, "allowfaruse", intValue)){
+		if(intValue != 0){
+			setAllowFarUse(true);
+		}
+	}
+	if(readXMLInteger(p, "blockwalls", intValue)){
+		if(intValue == 0){
+			setBlockWalls(false);
+		}
+	}
+	return true;
+}
+//TODO
+bool Action::loadScript(Game* igame,const std::string& datadir, const std::string& script)
+{
+	return false;
+}
+
+bool Action::executeUse(Player* player, Item* item, const Position& posFrom, const Position& posTo)
+{
+	return false;
+}
+
+/*
 Action::Action(Game* igame,const std::string& datadir, const std::string& scriptname)
 {
 	loaded = false;
@@ -448,8 +453,8 @@ bool Action::executeUse(Player* player,Item* item, PositionEx &posFrom, Position
 	
 	return ret;
 }
-
-
+*/
+/*
 std::map<unsigned int,Thing*> ActionScript::uniqueIdMap;
 
 ActionScript::ActionScript(Game* igame,const std::string& datadir,const std::string& scriptname):
@@ -1438,7 +1443,7 @@ int ActionScript::luaActionGetThingfromPos(lua_State *L)
 		if(thing){
 			/*if(pos.stackpos > 250){
 				pos.stackpos = tile->__getIndexOfThing(thing);
-			}*/
+			}
 			unsigned int thingid = action->AddThingToMap(thing);
 			internalAddThing(L,thing,thingid);
 		}
@@ -1691,7 +1696,7 @@ int ActionScript::luaActionDoSummonCreature(lua_State *L){
 		return 1;
 	}
 	
-	unsigned int cid = action->AddThingToMap((Thing*)monster/*,pos*/);
+	unsigned int cid = action->AddThingToMap((Thing*)monster/*,pos);
 	
 	lua_pushnumber(L, cid);
 	return 1;	
@@ -1767,3 +1772,4 @@ int ActionScript::luaActionDoPlayerSetVocation(lua_State *L)
 	lua_pushnumber(L, 0);
 	return 1;
 }
+*/

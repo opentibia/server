@@ -23,6 +23,316 @@
 #include "spells.h"
 #include "tools.h"
 
+#include <libxml/xmlmemory.h>
+#include <libxml/parser.h>
+
+Spells::Spells()
+{
+	loaded = false;
+}
+
+Spells::~Spells()
+{
+	clear();
+}
+
+void Spells::clear()
+{
+	RunesMap::iterator it;
+	for(it = runes.begin(); it != runes.end(); ++it){
+		delete it->second;
+	}
+	runes.clear();
+	
+	InstantsMap::iterator it2;
+	for(it2 = instants.begin(); it2 != instants.end(); ++it2){
+		delete it2->second;
+	}
+	instants.clear();
+	loaded = false;
+}	
+
+bool Spells::reload()
+{
+	if(!loaded){
+		std::cout << "Error: [Spells::reload] loaded == false" << std::endl;
+		return false;
+	}
+	clear();
+	return loadFromXml(datadir);
+}
+
+bool Spells::loadFromXml(const std::string& _datadir)
+{
+	if(loaded){
+		std::cout << "Error: [Spells::loadFromXml] loaded == true" << std::endl;
+		return false;
+	}
+	datadir = _datadir;
+	
+	std::string filename = datadir + "spells/spells.xml";
+
+	xmlDocPtr doc = xmlParseFile(filename.c_str());
+
+	if(doc){
+		loaded = true;
+		xmlNodePtr root, p;
+		root = xmlDocGetRootElement(doc);
+		
+		if(xmlStrcmp(root->name,(const xmlChar*)"spells") != 0){
+			xmlFreeDoc(doc);
+			return false;
+		}
+		
+		p = root->children;
+		while(p){
+			Spell* spell = NULL;
+			if(xmlStrcmp(p->name, (const xmlChar*)"rune") == 0){
+				spell = new RuneSpell();
+			}
+			else if(xmlStrcmp(p->name, (const xmlChar*)"instant") == 0){
+				spell = new InstantSpell();
+			}
+			
+			if(spell){
+				if(spell->configureSpell(p)){
+					/*TODO: load script
+					std::string scriptfile;
+					if(readXMLString(p, "script", scriptfile)){
+						.....
+					}
+					else{
+						.....
+					}
+					*/
+					if(RuneSpell* rune = dynamic_cast<RuneSpell*>(spell)){
+						runes[rune->getRuneItemId()] = rune;
+					}
+					else if(InstantSpell* instant = dynamic_cast<InstantSpell*>(spell)){
+						instants[instant->getWords()] = instant;
+					}
+					else{
+						std::cout << "Warning: [Spells::loadFromXml] Unk spell class" << std::endl;
+						delete spell;
+					}
+				}
+				else{
+					std::cout << "Warning: [Spells::loadFromXml] Can not configure spell" << std::endl;
+					delete spell;
+				}
+			}
+			else{
+				std::cout << "Warning: [Spells::loadFromXml] Unk spell type: " << p->name << std::endl;
+			}			
+			p = p->next;
+		}
+		xmlFreeDoc(doc);
+	}
+	return this->loaded;
+}
+
+RuneSpell* Spells::getRuneSpell(Item* item)
+{
+	uint32_t id = item->getID();
+	RunesMap::iterator it = runes.find(id);
+	if(it != runes.end()){
+		return it->second;
+	}
+	else{
+		return NULL;
+	}
+}
+
+//TODO
+RuneSpell* Spells::getRuneSpell(const std::string& name)
+{
+	return NULL;
+}
+	
+InstantSpell* Spells::getInstantSpell(const std::string& words)
+{
+	return NULL;
+}
+
+InstantSpell* Spells::getInstantSpellByName(const std::string& name)
+{
+	return NULL;
+}
+
+Spell::Spell()
+{
+	targetType = TARGET_NONE;
+	level = 0;
+	magLevel = 0;
+	mana = 0;
+	soul = 0;
+	exhaustion = false;
+	premium = false;
+	enabled = true;
+	vocationBits = 0;
+}
+	
+bool Spell::configureSpell(xmlNodePtr p)
+{
+	int intValue;
+	std::string str;
+	if(readXMLString(p, "name", str)){
+		name = str;
+	}
+	else{
+		std::cout << "Error: [Spell::configureSpell] Spell without name." << std::endl;
+		return false;
+	}
+	if(readXMLInteger(p, "lvl", intValue)){
+	 	level = intValue;
+	}
+	if(readXMLInteger(p, "maglv", intValue)){
+	 	magLevel = intValue;
+	}
+	if(readXMLInteger(p, "mana", intValue)){
+	 	mana = intValue;
+	}
+	if(readXMLInteger(p, "soul", intValue)){
+	 	soul = intValue;
+	}
+	if(readXMLInteger(p, "exhaustion", intValue)){
+		if(intValue == 1)
+	 		exhaustion = true;
+	 	else
+	 		exhaustion = false;
+	}
+	if(readXMLInteger(p, "prem", intValue)){
+		if(intValue == 1)
+	 		premium = true;
+	 	else
+	 		premium = false;
+	}
+	if(readXMLInteger(p, "enabled", intValue)){
+		if(intValue == 1)
+	 		enabled = true;
+		else
+			enabled = false;
+	}
+	vocationBits = 0xFFFFFFFF;
+	//TODO
+	//get vocations
+}
+	
+bool Spell::spellPlayerChecks(Player* player)
+{
+	if(player->getAccessLevel() > 3)
+		return true;
+	
+	if(!enabled)
+		return false;
+	
+	//TODO changes messages
+	if(player->getLevel() < level){
+		player->sendTextMessage(MSG_STATUS_SMALL, "You do not have enough level.",player->getPosition(), NM_ME_PUFF);
+		return false;
+	}
+	if(player->getMagicLevel() < magLevel){
+		player->sendTextMessage(MSG_STATUS_SMALL, "You do not have enough magic level.",player->getPosition(), NM_ME_PUFF);
+		return false;
+	}
+	if(player->getPlayerInfo(PLAYERINFO_MANA) < mana){
+		player->sendTextMessage(MSG_STATUS_SMALL, "You do not have enough mana.",player->getPosition(), NM_ME_PUFF);
+		return false;
+	}
+	if(player->getPlayerInfo(PLAYERINFO_SOUL) < soul){
+		player->sendTextMessage(MSG_STATUS_SMALL, "You do not have enough soul.",player->getPosition(), NM_ME_PUFF);
+		return false;
+	}
+	//TODO: check vocs
+	/*
+	if(premium && !player->getPremium()){
+		return false;
+	}
+	*/
+	return true;
+}
+
+InstantSpell::InstantSpell()
+{
+	hasParam = false;
+}
+
+InstantSpell::~InstantSpell()
+{
+}
+	
+bool InstantSpell::configureSpell(xmlNodePtr p)
+{
+	std::string str;
+	int intValue;
+	if(readXMLString(p, "words", str)){
+		words = str;
+	}
+	else{
+		std::cout << "Error: [InstantSpell::configureSpell] Instant spell without words." << std::endl;
+		return false;
+	}
+	if(readXMLInteger(p, "params", intValue)){
+		if(intValue == 1)
+	 		hasParam = true;
+	}
+	return Spell::configureSpell(p);
+}
+
+bool InstantSpell::castInstant(Creature* creature, const std::string& param)
+{
+	if(creature){
+		Player* player = creature->getPlayer();
+		if(player && !spellPlayerChecks(player)){
+			return false;
+		}
+	}
+	return false;
+}
+
+
+RuneSpell::RuneSpell()
+{
+	hasCharges = true;
+	runeId = 0;
+}
+
+RuneSpell::~RuneSpell()
+{
+}
+	
+bool RuneSpell::configureSpell(xmlNodePtr p)
+{
+	int intValue;
+	if(readXMLInteger(p, "id", intValue)){
+		runeId = intValue;
+	}
+	else{
+		std::cout << "Error: [RuneSpell::configureSpell] Rune spell without id." << std::endl;
+		return false;
+	}
+	if(readXMLInteger(p, "hascharges", intValue)){
+		if(intValue == 0)
+	 		hasCharges = false;
+	}
+	if(!Spell::configureSpell(p)){
+		return false;
+	}
+	return Action::configureAction(p);
+}
+	
+bool RuneSpell::executeUseRune(Creature* creature, Item* item, const Position& posFrom, const Position& posTo, Creature* target)
+{
+	if(creature){
+		Player* player = creature->getPlayer();
+		if(player && !spellPlayerChecks(player)){
+			return false;
+		}
+	}
+	return false;
+}
+
+/*
 #include <algorithm>
 #include <functional>
 #include <string>
@@ -312,7 +622,7 @@ void SpellScript::internalGetArea(lua_State *L, MagicEffectAreaClass &magicArea)
 	std::vector<unsigned char> col;
 
 	int i=0, j = 0;
-	lua_pushnil(L);  /* first key */
+	lua_pushnil(L);  /* first key //
 
 	while (lua_next(L, -2) != 0) {
 		lua_pushnil(L);
@@ -320,14 +630,14 @@ void SpellScript::internalGetArea(lua_State *L, MagicEffectAreaClass &magicArea)
     while (lua_next(L, -2) != 0) {
 			col.push_back((unsigned char)lua_tonumber(L, -1));
 			
-			lua_pop(L, 1);  /* removes `value'; keeps `key' for next iteration */
+			lua_pop(L, 1);  /* removes `value'; keeps `key' for next iteration //
 			j++;
 		}
 
 		magicArea.areaVec.push_back(col);
 		
 		j=0;
-		lua_pop(L, 1);  /* removes `value'; keeps `key' for next iteration */
+		lua_pop(L, 1);  /* removes `value'; keeps `key' for next iteration //
 		i++;
 	}
 	
@@ -447,7 +757,7 @@ int SpellScript::luaActionDoTargetExSpell(lua_State *L)
 	ConditionVec condvec;
 	internalLoadDamageVec(L, condvec);
 
-	MagicEffectTargetExClass magicTargetEx(/*md,*/ condvec);
+	MagicEffectTargetExClass magicTargetEx(/*md,// condvec);
 
 	internalGetMagicEffect(L, magicTargetEx);
 
@@ -556,7 +866,7 @@ int SpellScript::luaActionDoAreaExSpell(lua_State *L)
 		internalLoadDamageVec(L, condvec);
 	}
 
-	MagicEffectAreaExClass magicAreaEx(/*md,*/ condvec);
+	MagicEffectAreaExClass magicAreaEx(/*md,// condvec);
 
 	internalGetMagicEffect(L, magicAreaEx);
     
@@ -606,7 +916,7 @@ int SpellScript::luaActionDoAreaGroundSpell(lua_State *L)
 	TransformMap transformMap;
 	internalLoadTransformVec(L, transformMap);
 
-	MagicEffectItem* fieldItem = new MagicEffectItem(/*md,*/ transformMap);
+	MagicEffectItem* fieldItem = new MagicEffectItem(/*md,// transformMap);
 	fieldItem->useThing2();
 	MagicEffectAreaGroundClass magicGroundEx(fieldItem);
 
@@ -884,7 +1194,7 @@ int SpellScript::luaActionMakeRune(lua_State *L)
 			else{	//only create 1 rune
 				magicTarget.manaCost = 0; 
 			}
-		}*/
+		}//
 
 		bool isSuccess = spell->game->creatureThrowRune(player, player->getPosition(), magicTarget);
 
@@ -1032,3 +1342,4 @@ int SpellScript::luaActionMakeFood(lua_State *L)
 	lua_pushnumber(L, 0);
 	return 1;
 }
+*/

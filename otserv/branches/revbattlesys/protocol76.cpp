@@ -798,7 +798,7 @@ void Protocol76::parseSetOutfit(NetworkMessage& msg)
 void Protocol76::parseUseItem(NetworkMessage& msg)
 {
 	Position pos = msg.GetPosition();
-	uint16_t itemId = msg.GetItemId();
+	uint16_t spriteId = msg.GetSpriteId();
 	uint8_t stackpos = msg.GetByte();
 	uint8_t index = msg.GetByte();
 /*	
@@ -806,29 +806,29 @@ void Protocol76::parseUseItem(NetworkMessage& msg)
 	std::cout << "parseUseItem: " << "x: " << pos.x << ", y: " << (int)pos.y <<  ", z: " << (int)pos.z << ", item: " << (int)itemId << ", stack: " << (int)stackpos << ", index: " << (int)index << std::endl;
 #endif
 */
-	game->playerUseItem(player, pos,stackpos, index, itemId);
+	game->playerUseItem(player, pos, stackpos, index, spriteId);
 }
 
 void Protocol76::parseUseItemEx(NetworkMessage& msg)
 {
 	Position fromPos = msg.GetPosition();
-	uint16_t fromItemId = msg.GetItemId();
+	uint16_t fromSpriteId = msg.GetSpriteId();
 	uint8_t fromStackpos = msg.GetByte();
 	Position toPos = msg.GetPosition();
-	uint16_t toItemId = msg.GetU16();
+	uint16_t toSpriteId = msg.GetU16();
 	uint8_t toStackpos = msg.GetByte();
 	
-	game->playerUseItemEx(player, fromPos, fromStackpos, fromItemId, toPos, toStackpos, toItemId);
+	game->playerUseItemEx(player, fromPos, fromStackpos, fromSpriteId, toPos, toStackpos, toSpriteId);
 }
 
 void Protocol76::parseBattleWindow(NetworkMessage &msg)
 {
 	Position fromPos = msg.GetPosition();
-	uint16_t itemId = msg.GetItemId();
+	uint16_t spriteId = msg.GetSpriteId();
 	uint8_t fromStackPos = msg.GetByte();
 	uint32_t creatureId = msg.GetU32();
 
-	game->playerUseBattleWindow(player, fromPos, fromStackPos, creatureId, itemId);
+	game->playerUseBattleWindow(player, fromPos, fromStackPos, creatureId, spriteId);
 }
 
 void Protocol76::parseCloseContainer(NetworkMessage& msg)
@@ -883,7 +883,7 @@ void Protocol76::parseUpdateContainer(NetworkMessage& msg)
 void Protocol76::parseThrow(NetworkMessage& msg)
 {
 	Position fromPos = msg.GetPosition();
-	uint16_t itemId = msg.GetItemId();
+	uint16_t spriteId = msg.GetSpriteId();
 	uint8_t fromStackpos = msg.GetByte();
 	Position toPos = msg.GetPosition();
 	uint8_t count = msg.GetByte();
@@ -899,13 +899,13 @@ void Protocol76::parseThrow(NetworkMessage& msg)
 	if(toPos == fromPos)
 		return;
 
-	game->thingMove(player, fromPos, itemId, fromStackpos, toPos, count);
+	game->thingMove(player, fromPos, spriteId, fromStackpos, toPos, count);
 }
 
 void Protocol76::parseLookAt(NetworkMessage& msg)
 {
 	Position pos = msg.GetPosition();
-	uint16_t itemId = msg.GetItemId();
+	uint16_t spriteId = msg.GetSpriteId();
 	uint8_t stackpos = msg.GetByte();
 	
 /*
@@ -914,7 +914,7 @@ void Protocol76::parseLookAt(NetworkMessage& msg)
 #endif
 */
 
-	game->playerLookAt(player, pos, itemId, stackpos);
+	game->playerLookAt(player, pos, spriteId, stackpos);
 }
 
 void Protocol76::parseSay(NetworkMessage& msg)
@@ -1016,11 +1016,11 @@ void Protocol76::parseHouseWindow(NetworkMessage &msg)
 void Protocol76::parseRequestTrade(NetworkMessage& msg)
 {
 	Position pos = msg.GetPosition();
-	uint16_t itemId = msg.GetItemId();
+	uint16_t spriteId = msg.GetSpriteId();
 	uint8_t stackpos = msg.GetByte();
 	uint32_t playerId = msg.GetU32();
 	
-	game->playerRequestTrade(player, pos, stackpos, playerId, itemId);
+	game->playerRequestTrade(player, pos, stackpos, playerId, spriteId);
 }
 
 void Protocol76::parseAcceptTrade(NetworkMessage& msg)
@@ -1059,10 +1059,10 @@ void Protocol76::parseRemVip(NetworkMessage& msg)
 void Protocol76::parseRotateItem(NetworkMessage& msg)
 {
 	Position pos = msg.GetPosition();
-	uint16_t itemId = msg.GetItemId();
+	uint16_t spriteId = msg.GetSpriteId();
 	uint8_t stackpos = msg.GetByte();
 	
-	game->playerRotateItem(player, pos, stackpos, itemId);
+	game->playerRotateItem(player, pos, stackpos, spriteId);
 }
 
 // Send methods

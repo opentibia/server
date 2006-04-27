@@ -605,7 +605,7 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 	return true;
 }
 
-void Game::thingMove(Player* player, const Position& fromPos, uint16_t itemId, uint8_t fromStackpos,
+void Game::thingMove(Player* player, const Position& fromPos, uint16_t spriteId, uint8_t fromStackpos,
 	const Position& toPos, uint8_t count)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::thingMove()");
@@ -645,7 +645,7 @@ void Game::thingMove(Player* player, const Position& fromPos, uint16_t itemId, u
 			moveCreature(player, fromCylinder, toCylinder, movingCreature);
 		}
 		else if(Item* movingItem = thing->getItem()){
-			moveItem(player, fromCylinder, toCylinder, toIndex, movingItem, count, itemId);
+			moveItem(player, fromCylinder, toCylinder, toIndex, movingItem, count, spriteId);
 		}
 	}
 	else
@@ -833,13 +833,13 @@ ReturnValue Game::internalMoveCreature(Creature* creature, Cylinder* fromCylinde
 }
 
 void Game::moveItem(Player* player, Cylinder* fromCylinder, Cylinder* toCylinder, int32_t index,
-	Item* item, uint32_t count, uint16_t itemId)
+	Item* item, uint32_t count, uint16_t spriteId)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::moveItem()");
 	if(player->isRemoved())
 		return;
 
-	if(fromCylinder == NULL || toCylinder == NULL || item == NULL || item->getID() != itemId){
+	if(fromCylinder == NULL || toCylinder == NULL || item == NULL || item->getClientID() != spriteId){
 		player->sendCancelMessage(RET_NOTPOSSIBLE);
 		return;
 	}
@@ -1620,153 +1620,159 @@ bool Game::playerStopAutoWalk(Player* player)
 	return player->stopAutoWalk();
 }
 
-bool Game::playerUseItemEx(Player* player, const Position& fromPos, uint8_t fromStackPos, uint16_t fromItemId,
-	const Position& toPos, uint8_t toStackPos, uint16_t toItemId)
+bool Game::playerUseItemEx(Player* player, const Position& fromPos, uint8_t fromStackPos, uint16_t fromSpriteId,
+	const Position& toPos, uint8_t toStackPos, uint16_t toSpriteId)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerUseItemEx()");
 	if(player->isRemoved())
 		return false;
 
-	Item* item = dynamic_cast<Item*>(internalGetThing(player, fromPos, fromStackPos));
-
-	if(item){
-
-		Combat combat;
-		combat.setCombatType(COMBAT_CREATEFIELD, DAMAGE_FIRE);
-		combat.setEffects(NM_ANI_FIRE, NM_ME_EXPLOSION_DAMAGE);
-
-		Condition* condition = Condition::createCondition(CONDITION_FIRE, 15000, player->getID());
-		combat.setCondition(condition);
-		combat.doCombat(player, toPos, 1492);
-
-		//combat.doCombat(player, toPos, random_range(-100, -200));
-
-		/*
-		AreaCombat combat;
-
-		uint8_t arr[] = {1, 1, 1, 1, 1, 1, 1};
-		std::vector<uint8_t> row(arr, arr + sizeof(arr) / sizeof(uint8_t));
-		combat.setRow(0, row);
-		combat.setRow(1, row);
-		combat.setRow(2, row);
-
-		combat.setCombatType(COMBAT_ADDCONDITION, DAMAGE_POISON);
-		combat.setEffects(NM_ANI_FLYPOISONFIELD, NM_ME_POISEN_RINGS);
-
-		Condition* condition = Condition::createCondition(CONDITION_POISON, 20000, player->getID());
-		combat.setCondition(condition);
-
-		if(combat.doCombat(player, toPos, 0) == RET_NOERROR){			
-			Condition* condition = Condition::createCondition(CONDITION_INFIGHT, 60 * 1000, 0);
-			player->addCondition(condition);
-			return true;
-		}
-		*/
-
-		/*
-		//Runes
-		std::map<unsigned short, Spell*>::iterator sit = spells.getAllRuneSpells()->find(item->getID());
-		if(sit != spells.getAllRuneSpells()->end()){
-			if(!Position::areInRange<1,1,0>(item->getPosition(), player->getPosition())){
-				player->sendCancelMessage(RET_TOOFARAWAY);
-				return false;
-			}
-
-			std::string var = std::string("");
-			if(player->access != 0 || sit->second->getMagLv() <= player->magLevel)
-			{
-				bool success = sit->second->getSpellScript()->castSpell(player, toPos, var);
-				if(success){
-					int32_t newCharge = std::max(0, item->getItemCharge() - 1);
-					transformItem(item, item->getID(), newCharge);
-				}
-			}
-			else{
-				player->sendCancelMessage(RET_NOTREQUIREDLEVELTOUSERUNE);
-				return false;
-			}
-		}
-		else{
-			actions.UseItemEx(player, fromPos, fromStackPos, toPos, toStackPos, fromItemId);
-			return true;
-		}
-		*/
+	if(actions.canUse(player, fromPos) == TOO_FAR){
+		player->sendCancelMessage(RET_TOOFARAWAY);
+		return false;
 	}
 	
-	actions.UseItemEx(player, fromPos, fromStackPos, toPos, toStackPos, fromItemId);
+	Thing* thing = internalGetThing(player, fromPos, fromStackPos);
+	if(!thing){
+		player->sendCancelMessage(RET_NOTPOSSIBLE);
+		return false;
+	}
+	
+	Item* item = thing->getItem();
+	if(!item || item->getClientID() != fromSpriteId || !item->isUseable()){
+		player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
+		return false;
+	}
+
+	return internalUseItemEx(player, fromPos, item, toPos, toStackPos, toSpriteId);
+}
+
+bool Game::internalUseItemEx(Player* player, const Position& fromPos, Item* item, const Position& toPos, uint8_t toStackPos, uint16_t toSpriteId)
+{
+	Combat combat;
+	combat.setCombatType(COMBAT_CREATEFIELD, DAMAGE_FIRE);
+	combat.setEffects(NM_ANI_FIRE, NM_ME_EXPLOSION_DAMAGE);
+
+	Condition* condition = Condition::createCondition(CONDITION_FIRE, 15000, player->getID());
+	combat.setCondition(condition);
+	combat.doCombat(player, toPos, 1492);
+
+	//combat.doCombat(player, toPos, random_range(-100, -200));
+
+	/*
+	AreaCombat combat;
+	
+	uint8_t arr[] = {1, 1, 1, 1, 1, 1, 1};
+	std::vector<uint8_t> row(arr, arr + sizeof(arr) / sizeof(uint8_t));
+	combat.setRow(0, row);
+	combat.setRow(1, row);
+	combat.setRow(2, row);
+
+	combat.setCombatType(COMBAT_ADDCONDITION, DAMAGE_POISON);
+	combat.setEffects(NM_ANI_FLYPOISONFIELD, NM_ME_POISEN_RINGS);
+
+	Condition* condition = Condition::createCondition(CONDITION_POISON, 20000, player->getID());
+	combat.setCondition(condition);
+
+	if(combat.doCombat(player, toPos, 0) == RET_NOERROR){			
+		Condition* condition = Condition::createCondition(CONDITION_INFIGHT, 60 * 1000, 0);
+		player->addCondition(condition);
+		return true;
+	}
+	*/
+	
+	actions.UseItemEx(player, fromPos, toPos, toStackPos, item);
 	return true;
 }
 
-bool Game::playerUseItem(Player* player, const Position& pos, uint8_t stackpos, uint8_t index, uint16_t itemId)
+bool Game::playerUseItem(Player* player, const Position& pos, uint8_t stackpos, uint8_t index, uint16_t spriteId)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerUseItem()");
 	if(player->isRemoved())
 		return false;
 
-	actions.UseItem(player, pos, stackpos, itemId, index);
+	if(actions.canUse(player, pos) == TOO_FAR){
+		player->sendCancelMessage(RET_TOOFARAWAY);
+		return false;
+		/*
+		Task* task = new Task( boost::bind(&Game::playerUseItem, game,
+			player, pos, stack, index, itemId) );
+
+		ReturnValue ret = game->internalPlayerTryReach(player, item->getPosition(), task);
+		if(ret != RET_NOERROR){
+			player->sendCancelMessage(ret);
+			return false;
+		}
+		*/
+	}
+
+	Thing* thing = internalGetThing(player, pos, stackpos);
+	if(!thing){
+		player->sendCancelMessage(RET_NOTPOSSIBLE);
+		return false;
+	}
+	
+	Item* item = thing->getItem();
+	if(!item || item->getClientID() != spriteId){
+		player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
+		return false;
+	}
+
+	actions.UseItem(player, pos, index, item);
 	return true;
 }
 
 bool Game::playerUseBattleWindow(Player* player, const Position& fromPos, uint8_t fromStackPos,
-	uint32_t creatureId, uint16_t itemId)
+	uint32_t creatureId, uint16_t spriteId)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerUseBattleWindow");
 	if(player->isRemoved())
 		return false;
 
 	Creature* creature = getCreatureByID(creatureId);
-	if(!creature || creature->getPlayer())
+	if(!creature){	
 		return false;
-
+	}
+	
 	if(!Position::areInRange<7,5,0>(creature->getPosition(), player->getPosition())){
 		return false;
 	}
-
-	Item* item = dynamic_cast<Item*>(internalGetThing(player, fromPos, STACKPOS_USE /*fromStackPos*/));
-
-	if(item){
-		if(!Position::areInRange<1,1,0>(item->getPosition(), player->getPosition())){
-			player->sendCancelMessage(RET_TOOFARAWAY);
-			return false;
-		}
-
-		/*
-		//Runes
-		std::map<unsigned short, Spell*>::iterator sit = spells.getAllRuneSpells()->find(item->getID());
-		if(sit != spells.getAllRuneSpells()->end()) {
-			std::string var = std::string("");
-			if(player->access != 0 || sit->second->getMagLv() <= player->magLevel)
-			{
-				bool success = sit->second->getSpellScript()->castSpell(player, creature->getPosition(), var);
-				if(success){
-					int32_t newCharge = std::max(0, item->getItemCharge() - 1);
-					transformItem(item, item->getID(), newCharge);
-					return true;
-				}
-				else{
-				return false;
-				}
-			}
-			else{
-				player->sendCancelMessage(RET_NOTREQUIREDLEVELTOUSERUNE);
-				return false;
-			}
-		}
-		*/
+	
+	if(creature->getPlayer()){
+		player->sendCancelMessage(RET_DIRECTPLAYERSHOOT);
+		return false;
 	}
 
-	player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
-	return false;
+	if(actions.canUse(player, fromPos) == TOO_FAR){
+		player->sendCancelMessage(RET_TOOFARAWAY);
+		return false;
+	}
+
+	Thing* thing = internalGetThing(player, fromPos, STACKPOS_USE);
+	if(!thing){
+		return false;
+	}
+	Item* item = thing->getItem();
+	if(!item){
+		player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
+		return false;
+	}
+	return internalUseItemEx(player, fromPos, item, creature->getPosition(), 0, 0);
 }
 
-bool Game::playerRotateItem(Player* player, const Position& pos, uint8_t stackpos, const uint16_t itemId)
+bool Game::playerRotateItem(Player* player, const Position& pos, uint8_t stackpos, const uint16_t spriteId)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerRotateItem()");
 	if(player->isRemoved())
 		return false;
+	
+	Thing* thing = internalGetThing(player, pos, stackpos);
+	if(!thing){
+		return false;
+	}
+	Item* item = thing->getItem();
 
-	Item* item = dynamic_cast<Item*>(internalGetThing(player, pos, stackpos));
-	if(item == NULL || itemId != item->getID() || !item->isRoteable()){
+	if(item == NULL || spriteId != item->getClientID() || !item->isRoteable()){
 		player->sendCancelMessage(RET_NOTPOSSIBLE);
 		return false;
 	}
@@ -1820,7 +1826,7 @@ bool Game::playerWriteItem(Player* player, Item* item, const std::string& text)
 }
 
 bool Game::playerRequestTrade(Player* player, const Position& pos, uint8_t stackpos,
-	uint32_t playerId, uint16_t itemId)
+	uint32_t playerId, uint16_t spriteId)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerRequestTrade()");
 	if(player->isRemoved())
@@ -1840,7 +1846,7 @@ bool Game::playerRequestTrade(Player* player, const Position& pos, uint8_t stack
 	}
 
 	Item* tradeItem = dynamic_cast<Item*>(internalGetThing(player, pos, STACKPOS_USE /*stackpos*/));
-	if(!tradeItem || tradeItem->getID() != itemId || !tradeItem->isPickupable()) {
+	if(!tradeItem || tradeItem->getClientID() != spriteId || !tradeItem->isPickupable()) {
 		player->sendCancelMessage(RET_NOTPOSSIBLE);
 		return false;
 	}
@@ -2133,7 +2139,7 @@ bool Game::playerCloseTrade(Player* player)
 	return true;
 }
 
-bool Game::playerLookAt(Player* player, const Position& pos, uint16_t itemId, uint8_t stackpos)
+bool Game::playerLookAt(Player* player, const Position& pos, uint16_t spriteId, uint8_t stackpos)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerLookAt()");
 	if(player->isRemoved())

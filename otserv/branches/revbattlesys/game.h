@@ -176,7 +176,7 @@ public:
 
 	void getSpectators(const Range& range, SpectatorVec& list);
 
-	void thingMove(Player* player, const Position& fromPos, uint16_t itemId, uint8_t fromStackpos,
+	void thingMove(Player* player, const Position& fromPos, uint16_t spriteId, uint8_t fromStackpos,
 		const Position& toPos, uint8_t count);
 
 	void moveCreature(Player* player, Cylinder* fromCylinder, Cylinder* toCylinder,
@@ -186,7 +186,7 @@ public:
 	ReturnValue internalMoveCreature(Creature* creature, Cylinder* fromCylinder, Cylinder* toCylinder);
 
 	void moveItem(Player* player, Cylinder* fromCylinder, Cylinder* toCylinder, int32_t index,
-		Item* item, uint32_t count, uint16_t itemId);
+		Item* item, uint32_t count, uint16_t spriteId);
 	
 	ReturnValue internalMoveItem(Cylinder* fromCylinder, Cylinder* toCylinder, int32_t index,
 		Item* item, uint32_t count, uint32_t flags = 0);
@@ -198,11 +198,11 @@ public:
 	/**
 	  * Remove item(s) of a certain type
 	  * \param cylinder to remove the item(s) from
-	  * \param itemId is the item type to remove
+	  * \param spriteId is the item sprite to remove
 	  * \param count is the amount to remove
 	  * \returns true if the removal was successful
 	  */
-	bool removeItemOfType(Cylinder* cylinder, uint16_t itemId, uint32_t count);
+	bool removeItemOfType(Cylinder* cylinder, uint16_t spriteId, uint32_t count);
 
 	/**
 	  * Get the amount of money in a a cylinder
@@ -266,16 +266,17 @@ public:
 	bool playerTalkToChannel(Player* player, SpeakClasses type, const std::string& text, unsigned short channelId);
 	bool playerAutoWalk(Player* player, std::list<Direction>& listDir);
 	bool playerStopAutoWalk(Player* player);
-	bool playerUseItemEx(Player* player, const Position& fromPos, uint8_t fromStackPos, uint16_t fromItemId,
-		const Position& toPos, uint8_t toStackPos, uint16_t toItemId);
-	bool playerUseItem(Player* player, const Position& pos, uint8_t stackpos, uint8_t index, uint16_t itemId);
+	bool playerUseItemEx(Player* player, const Position& fromPos, uint8_t fromStackPos, uint16_t fromSpriteId,
+		const Position& toPos, uint8_t toStackPos, uint16_t toSpriteId);
+	bool internalUseItemEx(Player* player, const Position& fromPos, Item* item, const Position& toPos, uint8_t toStackPos, uint16_t toSpriteId);
+	bool playerUseItem(Player* player, const Position& pos, uint8_t stackpos, uint8_t index, uint16_t spriteId);
 	bool playerUseBattleWindow(Player* player, const Position& fromPos, uint8_t fromStackPos,
-		uint32_t creatureId, uint16_t itemId);
-	bool playerRotateItem(Player* player, const Position& pos, uint8_t stackpos, const uint16_t itemId);
+		uint32_t creatureId, uint16_t spriteId);
+	bool playerRotateItem(Player* player, const Position& pos, uint8_t stackpos, const uint16_t spriteId);
 	bool playerWriteItem(Player* player, Item* item, const std::string& text);
 
 	bool playerRequestTrade(Player* player, const Position& pos, uint8_t stackpos,
-		uint32_t playerId, uint16_t itemId);
+		uint32_t playerId, uint16_t spriteId);
 	bool playerAcceptTrade(Player* player);
 	bool playerLookInTrade(Player* player, bool lookAtCounterOffer, int index);
 	bool playerCloseTrade(Player* player);
@@ -283,7 +284,7 @@ public:
 	bool playerSetAttackedCreature(Player* player, unsigned long creatureId);
 	bool playerFollowCreature(Player* player, unsigned long creatureId);
 	bool playerSetFightModes(Player* player, uint8_t fightMode, uint8_t chaseMode);
-	bool playerLookAt(Player* player, const Position& pos, uint16_t itemId, uint8_t stackpos);
+	bool playerLookAt(Player* player, const Position& pos, uint16_t spriteId, uint8_t stackpos);
 	bool playerRequestAddVip(Player* player, const std::string& vip_name);
 	bool playerTurn(Player* player, Direction dir);
 	bool playerSay(Player* player, SpeakClasses type, const std::string& text);

@@ -24,8 +24,8 @@
 
 #include "position.h"
 
-#include <libxml/xmlmemory.h>
-#include <libxml/parser.h>
+//#include <libxml/xmlmemory.h>
+//#include <libxml/parser.h>
 
 #include <map>
 
@@ -46,7 +46,7 @@ class Item;
 class Container;
 class Depot;
 class Game;
-class ActionScript;
+
 class Action;
 
 enum tCanUseRet{
@@ -61,16 +61,18 @@ public:
 	Actions(){};
 	Actions(Game* igame);
 	bool loadFromXml(const std::string& datadir);
-	virtual ~Actions();
+	~Actions();
 	void clear();
 	
-	bool UseItem(Player* player, const Position& pos,const unsigned char stack, 
-		const unsigned short itemid, const unsigned char index);
+	bool UseItem(Player* player, const Position& pos, uint8_t index, Item* item);
 	bool UseItemEx(Player* player, const Position& from_pos,
-		const unsigned char from_stack, const Position& to_pos,
-		const unsigned char to_stack, const unsigned short itemid);
+		const Position& to_pos, const unsigned char to_stack, Item* item);
 	
 	bool openContainer(Player* player,Container* container, const unsigned char index);
+	
+	
+	int canUse(const Player* player,const Position& pos) const;
+	int canUseFar(const Player* player,const Position& to_pos, const bool blockWalls) const;
 	
 	Game* game;
 	bool loaded;
@@ -80,16 +82,37 @@ public:
   
 protected:
 	std::string datadir;
-	typedef std::map<unsigned short, Action*> ActionUseMap;
-	ActionUseMap useItemMap;
-	ActionUseMap uniqueItemMap;
-	ActionUseMap actionItemMap;
-	int canUse(const Player* player,const Position& pos) const;
-	int canUseFar(const Player* player,const Position& to_pos, const bool blockWalls) const;
-	Action *getAction(const Item* item);
-	Action *loadAction(xmlNodePtr xmlaction);
+	//typedef std::map<unsigned short, Action*> ActionUseMap;
+	//ActionUseMap useItemMap;
+	//ActionUseMap uniqueItemMap;
+	//ActionUseMap actionItemMap;
+	//Action *getAction(const Item* item);
+	//Action *loadAction(xmlNodePtr xmlaction);
 };
 
+class Action
+{
+public:
+	Action();
+	virtual ~Action();
+	
+	bool configureAction(xmlNodePtr p);
+	
+	bool loadScript(Game* igame,const std::string& datadir, const std::string& script);
+	bool isLoaded() const {return loaded;}
+	bool allowFarUse() const {return allowfaruse;};
+	bool blockWalls() const {return blockwalls;};
+	void setAllowFarUse(bool v){allowfaruse = v;};
+	void setBlockWalls(bool v){blockwalls = v;};
+	bool executeUse(Player* player, Item* item, const Position& posFrom, const Position& posTo);
+	
+protected:
+	LuaScript* script;
+	bool loaded;
+	bool allowfaruse;
+	bool blockwalls;
+};
+/*
 enum tThingType{
 	thingTypeItem,
 	thingTypePlayer,
@@ -227,5 +250,5 @@ protected:
 	static int internalGetPlayerInfo(lua_State *L, ePlayerInfo info);
 	
 };
-
+*/
 #endif

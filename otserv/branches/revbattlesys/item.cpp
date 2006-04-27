@@ -168,6 +168,11 @@ unsigned short Item::getID() const
 	return id;
 }
 
+unsigned short Item::getClientID() const
+{
+	return items[id].clientId;
+}
+
 void Item::setID(unsigned short newid)
 {
 	id = newid;
@@ -230,7 +235,7 @@ void Item::setUniqueId(unsigned short n)
 	 if(n < 1000)
 	 	n = 1000;
 	uniqueId = n;
-	ActionScript::AddThingToMapUnique(this);
+	//ActionScript::AddThingToMapUnique(this);
 }
 
 unsigned short Item::getUniqueId() const

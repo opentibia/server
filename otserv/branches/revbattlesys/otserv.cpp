@@ -476,9 +476,9 @@ int main(int argc, char *argv[])
 	std::string configpath;
 	configpath = getenv("HOME");
 	configpath += "/.otserv/config.lua";
-	if (!g_config.OpenFile(configpath.c_str()))
+	if (!g_config.openFile(configpath.c_str()))
 #else
-	if (!g_config.OpenFile("config.lua"))
+	if (!g_config.openFile("config.lua"))
 #endif
 	{
 		ErrorMessage("Unable to load config.lua!");

@@ -120,7 +120,7 @@ public:
 std::ostream& operator<<(std::ostream&, const Position&);
 std::ostream& operator<<(std::ostream&, const Direction&);
 
-
+/*
 class PositionEx : public Position{
 public:  
 	PositionEx(){ };
@@ -155,6 +155,6 @@ public:
 	}
 
 };
-
+*/
 
 #endif

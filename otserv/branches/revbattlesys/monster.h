@@ -71,7 +71,8 @@ public:
 	virtual void onThink(uint32_t interval);
 
 	bool canPushItems() const {return mType->canPushItems;}
-	bool isSummon() const { return isSummon; }
+	bool isSummon() const //{ return isSummon; }
+		{ return false; }
 
 private:
 	std::string strDescription;
@@ -85,7 +86,8 @@ private:
 	void stopThink();
 	int getTargetDistance() {return mType->targetDistance;}
 
-	virtual int32_t getLostExperience() const {return (isSummon() ? 0 : mType->experience);}
+	virtual int32_t getLostExperience() const //{return (isSummon() ? 0 : mType->experience);}
+	{return mType->experience;}
 	virtual void dropLoot(Container* corpse);
 };
 
