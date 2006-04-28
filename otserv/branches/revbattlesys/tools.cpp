@@ -69,6 +69,18 @@ bool readXMLInteger(xmlNodePtr node, const char* tag, int& value)
 	return false;
 }
 
+bool readXMLFloat(xmlNodePtr node, const char* tag, float& value)
+{
+	char* nodeValue = (char*)xmlGetProp(node, (xmlChar*)tag);
+	if(nodeValue){
+		value = atof(nodeValue);
+		xmlFreeOTSERV(nodeValue);
+		return true;
+	}
+
+	return false;
+}
+
 bool readXMLString(xmlNodePtr node, const char* tag, std::string& value)
 {
 	char* nodeValue = (char*)xmlGetProp(node, (xmlChar*)tag);

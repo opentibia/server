@@ -134,7 +134,7 @@ public:
 	const ItemType& operator[](int id);
 
 	int getItemIdByName(const std::string& name);
-	int reverseLookUp(int id);
+	//int reverseLookUp(int id);
 	
 	static long dwMajorVersion;
 	static long dwMinorVersion;
@@ -144,7 +144,7 @@ protected:
 	typedef OTSERV_HASH_MAP<unsigned short, ItemType*> ItemMap;
 
 	ItemMap items;
-	static ReverseItemMap revItems;
+	//static ReverseItemMap revItems;
 
 	ItemType dummyItemType; // use this for invalid ids
 };

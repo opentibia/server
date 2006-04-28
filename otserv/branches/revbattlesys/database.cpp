@@ -121,7 +121,7 @@ int DBResult::getDataInt(const std::string& s, unsigned int nrow)
 	}
 	
 	//throw DBError("DBResult::GetDataInt()", DB_ERROR_DATA_NOT_FOUND);
-	std::cout << "MYSQL ERROR DBResult::GetDataInt()" << std::endl;
+	std::cout << "MYSQL ERROR DBResult::GetDataInt() " << s << std::endl;
 	return 0; // Failed
 }
 
@@ -141,7 +141,7 @@ long DBResult::getDataLong(const std::string& s, unsigned int nrow)
 	}
 	
 	//throw DBError("DBResult::GetDataLong()", DB_ERROR_DATA_NOT_FOUND);
-	std::cout << "MYSQL ERROR DBResult::GetDataLong()" << std::endl;
+	std::cout << "MYSQL ERROR DBResult::GetDataLong() " << s << std::endl;
 	return 0; // Failed
 }
 
@@ -162,7 +162,7 @@ std::string DBResult::getDataString(const std::string& s, unsigned int nrow)
 	}
 	
 	//throw DBError("DBResult::GetDataString()", DB_ERROR_DATA_NOT_FOUND);
-	std::cout << "MYSQL ERROR DBResult::GetDataString()" << std::endl;
+	std::cout << "MYSQL ERROR DBResult::GetDataString() " << s << std::endl;
 	return std::string(""); // Failed
 }
 
@@ -186,7 +186,7 @@ const char* DBResult::getDataBlob(const std::string& s, unsigned long& size, uns
 	}
 	
 	//throw DBError("DBResult::getDataBlob()", DB_ERROR_DATA_NOT_FOUND);
-	std::cout << "MYSQL ERROR DBResult::getDataBlob()" << std::endl;
+	std::cout << "MYSQL ERROR DBResult::getDataBlob() " << s << std::endl;
 	size = 0;
 	return NULL;
 }

@@ -601,7 +601,7 @@ int Items::loadFromOtb(std::string file)
 
 		// store the found item	 
 		items[iType->id] = iType;
-		revItems[iType->clientId] = iType->id;
+		//revItems[iType->clientId] = iType->id;
 		
 		node = f.getNextNode(node, type);
 	}
@@ -634,7 +634,7 @@ int Items::getItemIdByName(const std::string& name)
 
 	return -1;
 }
-
+/*
 int Items::reverseLookUp(int id)
 {
 	ReverseItemMap::iterator it = revItems.find(id);
@@ -645,3 +645,4 @@ int Items::reverseLookUp(int id)
 		return 0;
 	}
 }
+*/

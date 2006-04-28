@@ -39,6 +39,8 @@
 
 #include "actions.h"
 
+extern Game g_game;
+
 Actions::Actions(Game* igame)
 :game(igame)
 {
@@ -169,29 +171,29 @@ Action *Actions::loadAction(xmlNodePtr xmlaction)
 	return action;
 }
 */
-int Actions::canUse(const Player* player, const Position& pos) const
+int Actions::canUse(const Creature* creature, const Position& pos)
 {
 	if(pos.x != 0xFFFF){
-		if(!Position::areInRange<1,1,0>(pos, player->getPosition())){
+		if(!Position::areInRange<1,1,0>(pos, creature->getPosition())){
 			return TOO_FAR;
 		}
 	}
 	return CAN_USE;
 }
 
-int Actions::canUseFar(const Player* player, const Position& to_pos, const bool blockWalls) const
+int Actions::canUseFar(const Creature* creature, const Position& to_pos, const bool blockWalls)
 {
 	if(to_pos.x == 0xFFFF){
 		return CAN_USE;
 	}
-	if(!Position::areInRange<7,5,0>(to_pos, player->getPosition())){
+	Position creature_pos = creature->getPosition();
+	if(!Position::areInRange<7,5,0>(to_pos, creature_pos)){
 		return TOO_FAR;
 	}
 	
-	if(canUse(player,to_pos) == TOO_FAR){
-		if(blockWalls && (!game->map->canThrowObjectTo(player->getPosition(), to_pos))){
-			return CAN_NOT_THROW;
-		}
+	if(blockWalls && canUse(creature, to_pos) == TOO_FAR && 
+		!g_game.map->canThrowObjectTo(creature_pos, to_pos)){
+		return CAN_NOT_THROW;
 	}
 
 	return CAN_USE;

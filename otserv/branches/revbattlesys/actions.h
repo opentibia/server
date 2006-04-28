@@ -70,9 +70,8 @@ public:
 	
 	bool openContainer(Player* player,Container* container, const unsigned char index);
 	
-	
-	int canUse(const Player* player,const Position& pos) const;
-	int canUseFar(const Player* player,const Position& to_pos, const bool blockWalls) const;
+	static int canUse(const Creature* creature ,const Position& pos);
+	static int canUseFar(const Creature* creature ,const Position& to_pos, const bool blockWalls);
 	
 	Game* game;
 	bool loaded;

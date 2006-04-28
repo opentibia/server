@@ -50,6 +50,7 @@
 #include "md5.h"
 #include "waitlist.h"
 #include "ban.h"
+#include "vocation.h"
 
 #ifdef __OTSERV_ALLOCATOR__
 #include "allocator.h"
@@ -88,13 +89,14 @@ IPList serverIPs;
 LuaScript g_config;
 
 Items Item::items;
-ReverseItemMap Items::revItems;
+//ReverseItemMap Items::revItems;
 
 Game g_game;
 Actions actions(&g_game);
 Commands commands(&g_game);
 Monsters g_monsters;
 Ban g_bans;
+Vocations g_vocations;
 
 #if defined __EXCEPTION_TRACER__
 #include "exception.h"
@@ -494,30 +496,14 @@ int main(int argc, char *argv[])
 	}
 	std::cout << "[done]" << std::endl;
 	
-	//load spells data
 	std::stringstream filename;
-
-	/*
-	filename.str("");
-	filename << g_config.getGlobalString("datadir") << "spells/spells.xml";
-	std::cout << ":: Loading " << filename.str() << "... ";
-	if(!spells.loadFromXml(g_config.getGlobalString("datadir"))){
-		std::stringstream errormsg;
-		errormsg << "Unable to load " << filename.str() << "!";
-		ErrorMessage(errormsg.str().c_str());
-		return -1;
-	}
-	std::cout << "[done]" << std::endl;
-	*/
 	
-	//load actions data
+	//load vocations
 	filename.str("");
-	filename << g_config.getGlobalString("datadir") << "actions/actions.xml";
+	filename << g_config.getGlobalString("datadir") << "vocations.xml";
 	std::cout << ":: Loading " << filename.str() << "... ";
-	if(!actions.loadFromXml(g_config.getGlobalString("datadir"))){
-		std::stringstream errormsg;
-		errormsg << "Unable to load " << filename.str() << "!";
-		ErrorMessage(errormsg.str().c_str());
+	if(!g_vocations.loadFromXml(g_config.getGlobalString("datadir"))){
+		ErrorMessage("Unable to load vocations!");
 		return -1;
 	}
 	std::cout << "[done]" << std::endl;
@@ -539,6 +525,33 @@ int main(int argc, char *argv[])
 	filename << g_config.getGlobalString("datadir") << "items/items.otb";
 	std::cout << ":: Loading " << filename.str() << "... ";
 	if(Item::items.loadFromOtb(filename.str())){
+		std::stringstream errormsg;
+		errormsg << "Unable to load " << filename.str() << "!";
+		ErrorMessage(errormsg.str().c_str());
+		return -1;
+	}
+	std::cout << "[done]" << std::endl;
+	
+	//load spells data
+
+	/*
+	filename.str("");
+	filename << g_config.getGlobalString("datadir") << "spells/spells.xml";
+	std::cout << ":: Loading " << filename.str() << "... ";
+	if(!spells.loadFromXml(g_config.getGlobalString("datadir"))){
+		std::stringstream errormsg;
+		errormsg << "Unable to load " << filename.str() << "!";
+		ErrorMessage(errormsg.str().c_str());
+		return -1;
+	}
+	std::cout << "[done]" << std::endl;
+	*/
+	
+	//load actions data
+	filename.str("");
+	filename << g_config.getGlobalString("datadir") << "actions/actions.xml";
+	std::cout << ":: Loading " << filename.str() << "... ";
+	if(!actions.loadFromXml(g_config.getGlobalString("datadir"))){
 		std::stringstream errormsg;
 		errormsg << "Unable to load " << filename.str() << "!";
 		ErrorMessage(errormsg.str().c_str());

@@ -400,6 +400,7 @@ protected:
 	friend class Actions;
 	friend class Combat;
 	friend class AreaCombat;
+	friend class Action;
 };
 
 template<class ArgType>

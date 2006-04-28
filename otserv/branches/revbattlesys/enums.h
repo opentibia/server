@@ -18,32 +18,61 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __OTSERV_TOOLS_H__
-#define __OTSERV_TOOLS_H__
+#ifndef __OTSERV_ENUMS_H__
+#define __OTSERV_ENUMS_H__
 
-#include "definitions.h"
+enum RaceType_t {
+	RACE_NONE = 0,
+	RACE_VENOM,
+	RACE_BLOOD,
+	RACE_UNDEAD
+};
 
-#include <string>
-#include <algorithm>
-#include <stdio.h>
-#include <stdlib.h>
+enum CombatType_t {
+	COMBAT_NONE = 0,
+	COMBAT_HITPOINTS,
+	COMBAT_MANAPOINTS,
+	COMBAT_ADDHITPOINTS,
+	COMBAT_ADDCONDITION,
+	COMBAT_REMOVECONDITION,
+	COMBAT_CREATEFIELD
+};
 
-#include <libxml/parser.h>
+enum DamageType_t {
+	DAMAGE_NONE = 0,
+	DAMAGE_PHYSICAL,
+	DAMAGE_ENERGY,
+	DAMAGE_POISON,
+	DAMAGE_FIRE,
+	DAMAGE_PHYSICALPROJECTILE,
+	DAMAGE_SUDDENDEATH,
+};
 
-bool fileExists(const char* filename);
-void replaceString(std::string& str, const std::string sought, const std::string replacement);
-void trim_right(std::string& source, const std::string& t);
-void trim_left(std::string& source, const std::string& t);
-void toLowerCaseString(std::string& source);
+enum BlockType_t {
+	BLOCK_NONE = 0,
+	BLOCK_DEFENSE,
+	BLOCK_ARMOR,
+	BLOCK_IMMUNITY
+};
 
-bool readXMLInteger(xmlNodePtr node, const char* tag, int& value);
-bool readXMLFloat(xmlNodePtr node, const char* tag, float& value);
-bool readXMLString(xmlNodePtr node, const char* tag, std::string& value);
+enum Vocation_t {
+	VOCATION_NONE = 0,
+	VOCATION_SORCERER = 1,
+	VOCATION_DRUID = 2,
+	VOCATION_PALADIN = 3,
+	VOCATION_KNIGHT = 4
+};
 
-int random_range(int lowest_number, int highest_number);
-
-void hexdump(unsigned char *_data, int _len);
-char upchar(char c);
+enum skills_t {
+	SKILL_FIRST = 0,
+	SKILL_FIST = SKILL_FIRST,
+	SKILL_CLUB = 1,
+	SKILL_SWORD = 2,
+	SKILL_AXE = 3,
+	SKILL_DIST = 4,
+	SKILL_SHIELD = 5,
+	SKILL_FISH = 6,
+	SKILL_LAST = SKILL_FISH
+};
 
 #endif
-

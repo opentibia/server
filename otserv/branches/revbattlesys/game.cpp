@@ -1627,7 +1627,7 @@ bool Game::playerUseItemEx(Player* player, const Position& fromPos, uint8_t from
 	if(player->isRemoved())
 		return false;
 
-	if(actions.canUse(player, fromPos) == TOO_FAR){
+	if(Actions::canUse(player, fromPos) == TOO_FAR){
 		player->sendCancelMessage(RET_TOOFARAWAY);
 		return false;
 	}
@@ -1691,7 +1691,7 @@ bool Game::playerUseItem(Player* player, const Position& pos, uint8_t stackpos, 
 	if(player->isRemoved())
 		return false;
 
-	if(actions.canUse(player, pos) == TOO_FAR){
+	if(Actions::canUse(player, pos) == TOO_FAR){
 		player->sendCancelMessage(RET_TOOFARAWAY);
 		return false;
 		/*
@@ -1743,7 +1743,7 @@ bool Game::playerUseBattleWindow(Player* player, const Position& fromPos, uint8_
 		return false;
 	}
 
-	if(actions.canUse(player, fromPos) == TOO_FAR){
+	if(Actions::canUse(player, fromPos) == TOO_FAR){
 		player->sendCancelMessage(RET_TOOFARAWAY);
 		return false;
 	}

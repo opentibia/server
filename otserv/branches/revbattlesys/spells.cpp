@@ -26,6 +26,8 @@
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 
+extern Game g_game;
+
 Spells::Spells()
 {
 	loaded = false;
@@ -170,6 +172,9 @@ Spell::Spell()
 	premium = false;
 	enabled = true;
 	vocationBits = 0;
+	
+	scripted = false;
+	hardcodedAction = 0;
 }
 	
 bool Spell::configureSpell(xmlNodePtr p)
@@ -243,6 +248,7 @@ bool Spell::spellPlayerChecks(Player* player)
 		player->sendTextMessage(MSG_STATUS_SMALL, "You do not have enough soul.",player->getPosition(), NM_ME_PUFF);
 		return false;
 	}
+	//TODO: check if the player knows the spell
 	//TODO: check vocs
 	/*
 	if(premium && !player->getPremium()){
@@ -250,6 +256,22 @@ bool Spell::spellPlayerChecks(Player* player)
 	}
 	*/
 	return true;
+}
+
+void Spell::addSpellEffects(Player* player)
+{
+	if(mana > 0){
+		player->changeMana(-mana);
+	}
+	//TODO
+	/*
+	if(soul > 0){
+		player->changeSoul(-soul);
+	}
+	if(exhaustion){
+		
+	}
+	*/
 }
 
 InstantSpell::InstantSpell()
@@ -276,7 +298,12 @@ bool InstantSpell::configureSpell(xmlNodePtr p)
 		if(intValue == 1)
 	 		hasParam = true;
 	}
-	return Spell::configureSpell(p);
+	if(Spell::configureSpell(p)){
+		return true;
+	}
+	else{
+		return false;
+	}
 }
 
 bool InstantSpell::castInstant(Creature* creature, const std::string& param)
@@ -315,18 +342,56 @@ bool RuneSpell::configureSpell(xmlNodePtr p)
 		if(intValue == 0)
 	 		hasCharges = false;
 	}
-	if(!Spell::configureSpell(p)){
+	if(Spell::configureSpell(p) && Action::configureAction(p)){
+		return true;
+	}
+	else{
 		return false;
 	}
-	return Action::configureAction(p);
 }
 	
 bool RuneSpell::executeUseRune(Creature* creature, Item* item, const Position& posFrom, const Position& posTo, Creature* target)
 {
+	Player* player = NULL;
 	if(creature){
-		Player* player = creature->getPlayer();
+		player = creature->getPlayer();
 		if(player && !spellPlayerChecks(player)){
 			return false;
+		}
+		if(allowFarUse() == false){
+			if(Actions::canUse(creature, posTo) == TOO_FAR){
+				if(player)
+					player->sendCancelMessage(RET_TOOFARAWAY);
+				return false;
+			}
+		}
+		else if(Actions::canUseFar(creature, posTo, blockWalls()) == TOO_FAR){
+			if(player)
+				player->sendCancelMessage(RET_TOOFARAWAY);
+			return false;
+		}
+		else if(Actions::canUseFar(creature, posTo, blockWalls()) == CAN_NOT_THROW){
+			if(player)
+				player->sendCancelMessage(RET_CANNOTTHROW);
+			return false;
+		}
+	}
+	bool success;
+	if(scripted){
+		//call lua script
+		success = false;
+	}
+	else{
+		//call hardcodedAction
+		success = false;
+	}
+	if(success){
+		if(player){
+			Spell::addSpellEffects(player);
+		}
+		if(hasCharges && item){
+			int32_t newCharge = std::max(0, item->getItemCharge() - 1);
+			g_game.transformItem(item, item->getID(), newCharge);
 		}
 	}
 	return false;

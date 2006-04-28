@@ -27,6 +27,7 @@
 #include "depot.h"
 #include "cylinder.h"
 #include "enums.h"
+#include "vocation.h"
 
 #include <vector>
 #include <ctime>
@@ -34,18 +35,6 @@
 
 class House;
 class Protocol;
-
-enum skills_t {
-	SKILL_FIRST = 0,
-	SKILL_FIST = SKILL_FIRST,
-	SKILL_CLUB = 1,
-	SKILL_SWORD = 2,
-	SKILL_AXE = 3,
-	SKILL_DIST = 4,
-	SKILL_SHIELD = 5,
-	SKILL_FISH = 6,
-	SKILL_LAST = SKILL_FISH
-};
 
 enum skillsid_t {
 	SKILL_LEVEL=0,
@@ -140,6 +129,11 @@ public:
 	int32_t getLevel() const {return level;}
 	int32_t getMagicLevel() const {return magLevel;}
 	int32_t getAccessLevel() const {return accessLevel;}
+
+	void setVocation(uint32_t vocId);
+	uint32_t getVocationId() const;
+
+	void setSkillsPercents();
 
 	playersex_t getSex() {return sex;}	
 	int getPlayerInfo(playerinfo_t playerinfo) const;	
@@ -393,7 +387,8 @@ protected:
 	int32_t accessLevel;
 	unsigned long experience;
 	int32_t manaSpent;
-	Vocation_t vocation;
+	Vocation_t vocation_id;
+	Vocation* vocation;
 	playersex_t sex;
 	int food;
 	
@@ -439,7 +434,7 @@ protected:
 	Player* tradePartner;
 	tradestate_t tradeState;
 	Item* tradeItem;
-	
+	/*
 	//cache some data
 	struct SkillCache{
 		unsigned int tries;
@@ -448,6 +443,7 @@ protected:
 	};
 	
 	SkillCache SkillAdvanceCache[7][2];
+	*/
 	struct SentStats{
 		int health;
 		int healthMax;
@@ -483,10 +479,10 @@ protected:
 #endif
 	
 	//for skill advances
-	unsigned int getReqSkillTries(int skill, int level, Vocation_t voc);
+	//unsigned int getReqSkillTries(int skill, int level, Vocation_t voc);
 	
 	//for magic level advances
-	unsigned int getReqMana(int magLevel, Vocation_t voc); 
+	//unsigned int getReqMana(int magLevel, Vocation_t voc); 
 	
 	void updateItemsLight(bool internal = false);
 

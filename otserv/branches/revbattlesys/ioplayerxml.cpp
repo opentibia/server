@@ -126,7 +126,7 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 			isLoaded = false;
 
 		if(readXMLInteger(root, "voc", intValue)){
-			player->vocation = (Vocation_t)intValue;
+			player->setVocation(intValue);
 		}
 		else
 			isLoaded = false;
@@ -183,8 +183,7 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 				}
 				else
 					isLoaded = false;
-
-				player->maglevel_percent  = (unsigned char)(100*(player->manaSpent/(1.*player->getReqMana(player->magLevel+1, player->vocation))));
+					
 			}
 			else if(xmlStrcmp(p->name, (const xmlChar*)"health") == 0){
 				
@@ -337,7 +336,6 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 
 						player->skills[s_id][SKILL_LEVEL]=s_lvl;
 						player->skills[s_id][SKILL_TRIES]=s_tries;
-						player->skills[s_id][SKILL_PERCENT] = (unsigned int)(100*(player->skills[s_id][SKILL_TRIES])/(1.*player->getReqSkillTries (s_id, (player->skills[s_id][SKILL_LEVEL]+1), player->vocation)));
 					}
 
 					tmpNode = tmpNode->next;
@@ -428,6 +426,7 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 
 		player->updateInventoryWeigth();
 		player->updateItemsLight(true);
+		player->setSkillsPercents();
 
 		std::cout << "loaded " << filename << std::endl;
 		xmlFreeDoc(doc);
@@ -469,7 +468,7 @@ bool IOPlayerXML::savePlayer(Player* player)
 	xmlSetProp(root, (const xmlChar*)"lookdir", (const xmlChar*)sb.str().c_str());  sb.str("");
 
 	sb << player->experience;         xmlSetProp(root, (const xmlChar*)"exp", (const xmlChar*)sb.str().c_str());       sb.str("");	
-	sb << (int)player->vocation;      xmlSetProp(root, (const xmlChar*)"voc", (const xmlChar*)sb.str().c_str());       sb.str("");
+	sb << (int)player->getVocationId();      xmlSetProp(root, (const xmlChar*)"voc", (const xmlChar*)sb.str().c_str());       sb.str("");
 	sb << player->level;              xmlSetProp(root, (const xmlChar*)"level", (const xmlChar*)sb.str().c_str());     sb.str("");	
 	sb << player->accessLevel;             xmlSetProp(root, (const xmlChar*)"access", (const xmlChar*)sb.str().c_str());	sb.str("");	
 	sb << player->getCapacity();      xmlSetProp(root, (const xmlChar*)"cap", (const xmlChar*)sb.str().c_str());       sb.str("");

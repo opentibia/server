@@ -83,19 +83,24 @@ protected:
 	bool spellPlayerChecks(Player* player);
 	bool causeExhaustion(){return exhaustion;};
 	
+	void addSpellEffects(Player* player);
+	
 	TargetType_t targetType;
+	bool scripted;
+	uint32_t hardcodedAction;
 
 private:
 	std::string name;
 	
+	bool enabled;
+	bool premium;
 	uint32_t level;
 	uint32_t magLevel;
+	uint32_t vocationBits;
+	
 	uint32_t mana;
 	uint32_t soul;
 	bool exhaustion;
-	bool premium;
-	bool enabled;
-	uint32_t vocationBits;
 };
 
 class InstantSpell : public Spell//, public Cast

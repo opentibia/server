@@ -99,21 +99,20 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 	}
 	#endif
 
-	player->vocation = (Vocation_t)result.getDataInt("vocation");
+	player->setVocation(result.getDataInt("vocation"));
 	player->accessLevel = result.getDataInt("access");
 	player->setNormalSpeed();
 	
 	player->mana = result.getDataInt("mana");
-	player->manaMax = result.getDataInt("manaMax");
+	player->manaMax = result.getDataInt("manamax");
 	player->manaSpent = result.getDataInt("manaspent");
-	player->magLevel = result.getDataInt("magLevel");
-	player->maglevel_percent  = (unsigned char)(100*(player->manaSpent / (1.*player->getReqMana(player->magLevel+1, player->vocation))));
+	player->magLevel = result.getDataInt("maglevel");
 
 	player->health = result.getDataInt("health");
 	if(player->health <= 0)
 		player->health = 100;
 
-	player->healthMax = result.getDataInt("healthMax");
+	player->healthMax = result.getDataInt("healthmax");
 	if(player->healthMax <= 0)
 		player->healthMax = 100;
 
@@ -178,7 +177,6 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 			int skillid = result.getDataInt("id",i);
 			player->skills[skillid][SKILL_LEVEL] = result.getDataInt("skill",i);
 			player->skills[skillid][SKILL_TRIES] = result.getDataInt("tries",i);
-			player->skills[skillid][SKILL_PERCENT] = (unsigned int)(100*(player->skills[skillid][SKILL_TRIES])/(1.*player->getReqSkillTries(skillid, (player->skills[skillid][SKILL_LEVEL]+1), player->vocation)));
 		}
 	}
 	
@@ -248,6 +246,7 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 	
 	player->updateInventoryWeigth();
 	player->updateItemsLight(true);
+	player->setSkillsPercents();
 
 	//load storage map
 	query << "SELECT * FROM playerstorage WHERE player='" << player->getGUID() << "'";
@@ -303,7 +302,7 @@ bool IOPlayerSQL::savePlayer(Player* player)
 	//First, an UPDATE query to write the player itself
 	query << "UPDATE `players` SET ";
 	query << "`level` = " << player->level << ", ";
-	query << "`vocation` = " << (int)player->vocation << ", ";
+	query << "`vocation` = " << (int)player->getVocationId() << ", ";
 	query << "`health` = " << player->health << ", ";
 	query << "`healthmax` = " << player->healthMax << ", ";
 	query << "`direction` = " << (int)player->getDirection() << ", ";
