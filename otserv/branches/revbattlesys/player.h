@@ -199,7 +199,7 @@ public:
 	virtual bool isAttackable() const;
 	bool isPzLocked() const { return pzLocked; }
 	virtual BlockType_t blockHit(Creature* attacker, DamageType_t damageType, int32_t& damage);
-	void doAttacking();
+	virtual void doAttacking();
 
 	int getSkill(skills_t skilltype, skillsid_t skillinfo) const;
 

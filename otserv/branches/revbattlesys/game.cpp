@@ -1649,38 +1649,40 @@ bool Game::playerUseItemEx(Player* player, const Position& fromPos, uint8_t from
 
 bool Game::internalUseItemEx(Player* player, const Position& fromPos, Item* item, const Position& toPos, uint8_t toStackPos, uint16_t toSpriteId)
 {
-	Combat combat;
-	combat.setCombatType(COMBAT_CREATEFIELD, DAMAGE_FIRE);
-	combat.setEffects(NM_ANI_FIRE, NM_ME_EXPLOSION_DAMAGE);
+	if(item->getID() == 2304){
+		CombatHealth combat(DAMAGE_FIRE, -100, -200, NM_ME_SOUND_GREEN);
 
-	Condition* condition = Condition::createCondition(CONDITION_FIRE, 15000, player->getID());
-	combat.setCondition(condition);
-	combat.doCombat(player, toPos, 1492);
+		AreaCombat area;
+		uint8_t arr[] = {1, 1, 1, 1, 1, 1, 1};
+		std::vector<uint8_t> row(arr, arr + sizeof(arr) / sizeof(uint8_t));
+		area.setRow(0, row);
+		area.setRow(1, row);
+		area.setRow(2, row);
 
-	//combat.doCombat(player, toPos, random_range(-100, -200));
-
-	/*
-	AreaCombat combat;
-	
-	uint8_t arr[] = {1, 1, 1, 1, 1, 1, 1};
-	std::vector<uint8_t> row(arr, arr + sizeof(arr) / sizeof(uint8_t));
-	combat.setRow(0, row);
-	combat.setRow(1, row);
-	combat.setRow(2, row);
-
-	combat.setCombatType(COMBAT_ADDCONDITION, DAMAGE_POISON);
-	combat.setEffects(NM_ANI_FLYPOISONFIELD, NM_ME_POISEN_RINGS);
-
-	Condition* condition = Condition::createCondition(CONDITION_POISON, 20000, player->getID());
-	combat.setCondition(condition);
-
-	if(combat.doCombat(player, toPos, 0) == RET_NOERROR){			
-		Condition* condition = Condition::createCondition(CONDITION_INFIGHT, 60 * 1000, 0);
-		player->addCondition(condition);
-		return true;
+		area.doCombat(player, toPos, combat);
 	}
-	*/
-	
+	else if(item->getID() == 2305){
+		MagicField* field = new MagicField(1487);
+		Condition* condition = Condition::createCondition(CONDITION_FIRE, 15000, player->getID());
+		field->setCondition(condition);
+		CombatField combat(field);
+
+		AreaCombat area;
+		uint8_t arr[] = {1, 1, 1, 1, 1, 1, 1};
+		std::vector<uint8_t> row(arr, arr + sizeof(arr) / sizeof(uint8_t));
+		area.setRow(0, row);
+		area.setRow(1, row);
+		area.setRow(2, row);
+
+		area.doCombat(player, toPos, combat);
+	}
+	else if(item->getID() == 2268){
+		CombatHealth combat(DAMAGE_SUDDENDEATH, -100, -200, NM_ME_MORT_AREA);
+		combat.execute(player, toPos);
+	}
+
+	return true;
+
 	actions.UseItemEx(player, fromPos, toPos, toStackPos, item);
 	return true;
 }
@@ -2436,6 +2438,17 @@ bool Game::internalFollowCreature(Player* player, const Creature* followCreature
 	return playerAutoWalk(player, listDir);
 }
 
+void Game::checkWalk(unsigned long creatureId)
+{
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::checkWalk");
+
+	Creature* creature = getCreatureByID(creatureId);
+	if(creature){
+		creature->onWalk();
+		flushSendBuffers();
+	}
+}
+
 void Game::checkAutoWalkPlayer(unsigned long id)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::checkAutoWalkPlayer");
@@ -2478,9 +2491,6 @@ void Game::checkCreature(uint32_t creatureId, uint32_t interval)
 		if(creature->getHealth() > 0){
 			creature->onThink(interval);
 			creature->executeConditions(interval);
-
-			creature->eventCheck = addEvent(makeTask(interval, boost::bind(&Game::checkCreature,
-				this, creature->getID(), interval)));
 		}
 		else{
 			Item* splash = NULL;
@@ -2719,13 +2729,17 @@ bool Game::combatChangeMana(Creature* attacker, Creature* target, int32_t manaCh
 		target->changeMana(manaChange);
 	}
 	else{
-		target->drainMana(attacker, -manaChange);
+		int32_t manaLoss = std::min(target->getMana(), -manaChange);
 
-		const Position& targetPos = target->getPosition();
+		if(manaLoss > 0){
+			target->drainMana(attacker, manaLoss);
 
-		std::stringstream ss;
-		ss << manaChange;
-		addAnimatedText(targetPos, TEXTCOLOR_BLUE, ss.str());
+			const Position& targetPos = target->getPosition();
+
+			std::stringstream ss;
+			ss << manaLoss;
+			addAnimatedText(targetPos, TEXTCOLOR_BLUE, ss.str());
+		}
 	}
 
 	return true;

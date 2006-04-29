@@ -167,23 +167,20 @@ void Monster::onThink(uint32_t interval)
 	Creature::onThink(interval);
 }
 
-/*
-int Monster::onWalk()
+void Monster::onWalk()
 {
-	int64_t delay = getSleepTicks();
-	
-	if(delay > 0){
-		return delay;
-	}
-
-	//walk
+	Creature::onWalk();
 }
 
-int Monster::onAttack()
+bool Monster::getNextStep(Direction& dir)
+{
+	return Creature::getNextStep(dir);
+}
+
+void Monster::doAttacking()
 {
 	//attack
 }
-*/
 
 std::string Monster::getDescription(int32_t lookDistance) const
 {

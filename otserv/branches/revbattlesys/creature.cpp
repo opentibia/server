@@ -106,8 +106,36 @@ void Creature::setRemoved()
 
 void Creature::onThink(uint32_t interval)
 {
+	eventCheck = g_game.addEvent(makeTask(interval, boost::bind(&Game::checkCreature,
+		&g_game, getID(), interval)));
+
 	internalDefense = true;
 	internalArmor = true;
+}
+
+void Creature::onWalk()
+{
+	Direction dir;
+
+	if(getNextStep(dir)){
+		g_game.internalMoveCreature(this, dir);
+	}
+
+	int64_t ticks = getEventStepTicks();
+	eventWalk = g_game.addEvent(makeTask(ticks, boost::bind(&Game::checkWalk,
+		&g_game, getID())));
+}
+
+bool Creature::getNextStep(Direction& dir)
+{
+	if(!listWalkDir.empty()){
+		Position pos = getPosition();
+		dir = listWalkDir.front();
+		listWalkDir.pop_front();
+		return true;
+	}
+
+	return false;
 }
 
 void Creature::onCreatureAppear(const Creature* creature, bool isLogin)
@@ -242,11 +270,6 @@ BlockType_t Creature::blockHit(Creature* attacker, DamageType_t damageType, int3
 {
 	if(attacker){
 		attacker->onAttackedCreature(this);
-	}
-
-	if(!isAttackable()){
-		damage = 0;
-		return BLOCK_DEFENSE;
 	}
 
 	if(isImmune(damageType)){

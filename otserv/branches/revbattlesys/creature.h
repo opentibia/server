@@ -228,6 +228,8 @@ public:
 	void setCreatureLight(LightInfo& light);
 	
 	virtual void onThink(uint32_t interval);
+	virtual void onWalk();
+	virtual bool getNextStep(Direction& dir);
 
 	virtual void onAddTileItem(const Position& pos, const Item* item) {};
 	virtual void onUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* oldItem, const Item* newItem) {};

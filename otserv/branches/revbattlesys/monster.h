@@ -56,6 +56,7 @@ public:
 	virtual int getDefense() const {return mType->defense;}
 	virtual bool isPushable() const {return mType->pushable;}
 	virtual bool isAttackable() const;
+	virtual void doAttacking();
 
 	virtual void setNormalCreatureLight();
 
@@ -69,6 +70,8 @@ public:
 	virtual void onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport);
 
 	virtual void onThink(uint32_t interval);
+	virtual void onWalk();
+	virtual bool getNextStep(Direction& dir);
 
 	bool canPushItems() const {return mType->canPushItems;}
 	bool isSummon() const //{ return isSummon; }

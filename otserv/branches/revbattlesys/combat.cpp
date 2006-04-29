@@ -30,12 +30,8 @@
 
 extern Game g_game;
 
-Combat::Combat() :
-	combatType(COMBAT_NONE),
-	damageType(DAMAGE_NONE),
-	distanceEffect(NM_ANI_NONE),
-	impactEffect(NM_ME_NONE),
-	condition(NULL)
+Combat::Combat(uint8_t _impactEffect) : 
+	impactEffect(_impactEffect)
 {
 	//
 }
@@ -45,160 +41,141 @@ Combat::~Combat()
 	//
 }
 
-void Combat::setCombatType(CombatType_t _combatType, uint32_t param)
+bool Combat::execute(Creature* attacker, Creature* target) const
 {
-	combatType = _combatType;
-	
-	if(getCombatType() == COMBAT_HITPOINTS || getCombatType() == COMBAT_ADDCONDITION){
-		damageType = (DamageType_t)param;
-	}
-}
-
-void Combat::setEffects(uint8_t _distanceEffect, uint8_t _impactEffect)
-{
-	distanceEffect = _distanceEffect;
-	impactEffect = _impactEffect;
-}
-
-void Combat::setCondition(Condition* _condition)
-{
-	condition = _condition;
-}
-
-//melee/arrow/spear etc.
-ReturnValue Combat::doCombat(Creature* attacker, Creature* target, int32_t param) const
-{
-	if(distanceEffect != NM_ANI_NONE){
-		g_game.addDistanceEffect(attacker->getPosition(), target->getPosition(), distanceEffect);
-	}
-
-	return internalCombat(attacker, target, param);
-}
-
-//sudden death/heavy magic missile etc.
-ReturnValue Combat::doCombat(Creature* attacker, const Position& pos, int32_t param) const
-{
-	Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
-	if(!tile){
-		return RET_NOTPOSSIBLE;
-	}
-
-	if(tile->creatures.empty()){
-		return RET_NOTPOSSIBLE;
-	}
-
-	if(distanceEffect != NM_ANI_NONE){
-		g_game.addDistanceEffect(attacker->getPosition(), pos, distanceEffect);
-	}
-
-	for(CreatureVector::iterator it = tile->creatures.begin(); it != tile->creatures.end(); ++it){
-		internalCombat(attacker, *it, param);
-	}
-
-	return RET_NOERROR;
-}
-
-ReturnValue Combat::internalCombat(Creature* attacker, Creature* target, int32_t param) const
-{
-	CombatType_t combatType = getCombatType();
-
-	switch(combatType){
-		case COMBAT_HITPOINTS:
-			doChangeHealth(attacker, target, param);
-			break;
-
-		case COMBAT_MANAPOINTS:
-			doChangeMana(attacker, target, param);
-			break;
-
-		case COMBAT_CREATEFIELD:
-			doCreateField(attacker, target, param);
-			break;
-
-		case COMBAT_ADDCONDITION:
-			break;
-
-		case COMBAT_NONE:
-			break;
-
-		/*
-		case COMBAT_ADDCONDITION:
-			//doAddCondition(attacker, target, param);
-			break;
-		
-		case COMBAT_REMOVECONDITION:
-			doRemoveCondition(attacker, target, param);
-			break;
-		*/
-
-		default:
-			return RET_NOTPOSSIBLE;
-			break;
-	}
-
-	if(condition){
-		doAddCondition(attacker, target, param);
-	}
-
 	if(impactEffect != NM_ME_NONE){
 		g_game.addMagicEffect(target->getPosition(), impactEffect);
 	}
 
-	return RET_NOERROR;
+	return true;
 }
 
-bool Combat::doChangeHealth(Creature* attacker, Creature* target, int32_t healthChange) const
+bool Combat::execute(Creature* attacker, const Position& pos) const
 {
-	if(healthChange > 0){
-		if(target == attacker || (target->getTile()->getTopCreature() == target &&
-			target->getTile() != attacker->getTile()) ){
-			return g_game.combatChangeHealth(damageType, attacker, target, healthChange);
+	Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
+
+	if(tile){
+		if(!tile->creatures.empty()){
+			for(CreatureVector::const_iterator it = tile->creatures.begin(); it != tile->creatures.end(); ++it){
+				execute(attacker, *it);
+			}
 		}
 	}
-	else {
-		if(attacker != target){
-			return g_game.combatChangeHealth(damageType, attacker, target, healthChange);
+
+	if(impactEffect != NM_ME_NONE){
+		g_game.addMagicEffect(pos, impactEffect);
+	}
+
+	return true;
+}
+
+/*
+bool Combat::execute(Creature* attacker, const Tile& tile) const
+{
+	if(!tile.creatures.empty()){
+		for(CreatureVector::const_iterator it = tile.creatures.begin(); it != tile.creatures.end(); ++it){
+			execute(attacker, *it);
 		}
 	}
 
-	return false;
-}
-
-bool Combat::doChangeMana(Creature* attacker, Creature* target, int32_t manaChange) const
-{
-	return g_game.combatChangeMana(attacker, target, manaChange);
-}
-
-bool Combat::doCreateField(Creature* attacker, Creature* target, int32_t param) const
-{
-	MagicField* field = dynamic_cast<MagicField*>(Item::CreateItem(param));
-
-	if(field){
-		field->setCondition(condition);
-		return (g_game.internalAddItem(target->getTile(), field) == RET_NOERROR);
+	if(impactEffect != NM_ME_NONE){
+		g_game.addMagicEffect(pos, impactEffect);
 	}
-
-	return false;
 }
+*/
 
-void Combat::doAddCondition(Creature* attacker, Creature* target, int32_t param) const
-{
-	Condition* addCondition = condition->clone();
-	target->addCondition(addCondition);
-}
 
-void Combat::doRemoveCondition(Creature* attacker, Creature* target, int32_t param) const
-{
-	//
-}
-AreaCombat::AreaCombat(bool _needDirection /*= false*/) :
-	needDirection(_needDirection)
+CombatHealth::CombatHealth(DamageType_t _damageType, uint32_t _minChange, uint32_t _maxChange, uint8_t _impactEffect) :
+	Combat(_impactEffect),
+	damageType(_damageType),
+	minChange(_minChange),
+	maxChange(_maxChange)
 {
 	//
 }
 
-//explosion/great fireball/ultimate explosion
-ReturnValue AreaCombat::doCombat(Creature* attacker, const Position& pos, int32_t param) const
+CombatHealth::~CombatHealth()
+{
+	//
+}
+
+bool CombatHealth::execute(Creature* attacker, Creature* target) const
+{
+	return g_game.combatChangeHealth(damageType, attacker, target, maxChange);
+	Combat::execute(attacker, target);
+}
+
+bool CombatHealth::execute(Creature* attacker, const Position& pos) const
+{
+	return Combat::execute(attacker, pos);
+}
+
+CombatMana::CombatMana(uint32_t _minChange, uint32_t _maxChange, uint8_t _impactEffect) :
+	Combat(_impactEffect),
+	minChange(_minChange),
+	maxChange(_maxChange)
+{
+	//
+}
+
+CombatMana::~CombatMana()
+{
+	//
+}
+
+bool CombatMana::execute(Creature* attacker, Creature* target) const
+{
+	g_game.combatChangeMana(attacker, target, maxChange);
+	return Combat::execute(attacker, target);
+}
+
+bool CombatMana::execute(Creature* attacker, const Position& pos) const
+{
+	return Combat::execute(attacker, pos);
+}
+
+
+CombatField::CombatField(MagicField* _field) :
+	field(_field)
+{
+	//
+}
+
+CombatField::~CombatField()
+{
+	//
+}
+
+bool CombatField::execute(Creature* attacker, Creature* target) const
+{
+	return true;
+}
+
+bool CombatField::execute(Creature* attacker, const Position& pos) const
+{
+	Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
+	if(tile){
+		if(field && g_game.internalAddItem(tile, field, INDEX_WHEREEVER, 0, true) == RET_NOERROR){
+			MagicField* newField = new MagicField(*field);
+			return (g_game.internalAddItem(tile, newField) == RET_NOERROR);
+		}
+	}
+
+	return Combat::execute(attacker, pos);
+}
+
+AreaCombat::AreaCombat() : 
+	needDirection(false)
+{
+	//
+}
+
+AreaCombat::~AreaCombat() 
+{
+	//
+}
+
+ReturnValue AreaCombat::doCombat(Creature* attacker, const Position& pos, const Combat& combat) const
 {
 	Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
 
@@ -225,18 +202,10 @@ ReturnValue AreaCombat::doCombat(Creature* attacker, const Position& pos, int32_
 
 					if(tile){
 						if(!tile->hasProperty(PROTECTIONZONE) &&
-							 !tile->hasProperty(BLOCKPROJECTILE))
+							!tile->hasProperty(BLOCKSOLID) &&
+							!tile->hasProperty(BLOCKPROJECTILE))
 						{
-							if(!tile->creatures.empty()){
-								for(CreatureVector::iterator it = tile->creatures.begin(); it != tile->creatures.end(); ++it){
-									internalCombat(attacker, *it, param);
-								}
-							}
-							else{
-								SpectatorVec list;
-								g_game.getSpectators(Range(tmpPos, true), list);
-								g_game.addMagicEffect(list, tmpPos, impactEffect);
-							}
+							combat.execute(attacker, tmpPos);
 						}
 					}
 				}
@@ -250,12 +219,6 @@ ReturnValue AreaCombat::doCombat(Creature* attacker, const Position& pos, int32_
 	}
 
 	return RET_NOTPOSSIBLE;
-}
-
-//burst arrow
-ReturnValue AreaCombat::doCombat(Creature* attacker, Creature* target, int32_t param) const
-{
-	return doCombat(attacker, target->getPosition(), param);
 }
 
 void AreaCombat::setRow(int row, std::vector<uint8_t> data)

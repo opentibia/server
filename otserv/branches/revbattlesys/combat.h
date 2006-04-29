@@ -35,37 +35,58 @@ class Item;
 
 class Combat{
 public:
-	Combat();
-	virtual ~Combat();
+	Combat(uint8_t _impactEffect = NM_ME_NONE);
+	virtual ~Combat() = 0;
 
-	ReturnValue doCombat(Creature* attacker, Creature* target, int32_t param) const;
-	ReturnValue doCombat(Creature* attacker, const Position& pos, int32_t param) const;
-	CombatType_t getCombatType() const {return combatType;}
-	DamageType_t getDamageType() const {return damageType;}
-
-	void setCombatType(CombatType_t _combatType, uint32_t param);
-	void setEffects(uint8_t _distanceEffect, uint8_t _impactEffect);
-	void setCondition(Condition* _condition);
+	virtual bool execute(Creature* attacker, Creature* target) const;
+	virtual bool execute(Creature* attacker, const Position& pos) const;
 
 protected:
-	CombatType_t combatType;
+	//configureable
+	uint8_t impactEffect;
+};
+
+class CombatHealth : public Combat{
+public:
+	CombatHealth(DamageType_t _damageType, uint32_t _minChange, uint32_t _maxChange, uint8_t _impactEffect);
+	~CombatHealth();
+
+	virtual bool execute(Creature* attacker, Creature* target) const;
+	virtual bool execute(Creature* attacker, const Position& pos) const;
+
+protected:
 	DamageType_t damageType;
 
-	//Effects
-	uint8_t distanceEffect;
-	uint8_t impactEffect;
+	//configureable
+	uint32_t minChange;
+	uint32_t maxChange;
+};
 
-	//Condition
-	Condition* condition;
+class CombatMana : public Combat{
+public:
+	CombatMana(uint32_t _minChange, uint32_t _maxChange, uint8_t _impactEffect);
+	~CombatMana();
 
-	bool doChangeHealth(Creature* attacker, Creature* target, int32_t healthChange) const;
-	bool doChangeMana(Creature* attacker, Creature* target, int32_t manaChange) const;
-	bool doCreateField(Creature* attacker, Creature* target, int32_t param) const;
-	void doAddCondition(Creature* attacker, Creature* target, int32_t param) const;
-	void doRemoveCondition(Creature* attacker, Creature* target, int32_t param) const;
+	virtual bool execute(Creature* attacker, Creature* target) const;
+	virtual bool execute(Creature* attacker, const Position& pos) const;
 
 protected:
-	ReturnValue internalCombat(Creature* attacker, Creature* target, int32_t param) const;
+	uint32_t minChange;
+	uint32_t maxChange;
+};
+
+class MagicField;
+
+class CombatField : public Combat{
+public:
+	CombatField(MagicField* _field);
+	~CombatField();
+
+	virtual bool execute(Creature* attacker, Creature* target) const;
+	virtual bool execute(Creature* attacker, const Position& pos) const;
+
+protected:
+	MagicField* field;
 };
 
 template <typename T>
@@ -98,14 +119,13 @@ private:
   std::vector<std::vector<T> > data_; 
 };
 
-class AreaCombat : public Combat{
+class AreaCombat{
 public:
-	AreaCombat(bool _needDirection = false);
+	AreaCombat();
+	~AreaCombat();
 
+	ReturnValue doCombat(Creature* attacker, const Position& pos, const Combat& combat) const;
 	void setRow(int row, std::vector<uint8_t> data);
-
-	ReturnValue doCombat(Creature* attacker, const Position& pos, int32_t param) const;
-	ReturnValue doCombat(Creature* attacker, Creature* target, int32_t param) const;
 
 protected:
 	Matrix<uint8_t> area;

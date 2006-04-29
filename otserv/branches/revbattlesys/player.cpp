@@ -1675,7 +1675,7 @@ void Player::addExperience(unsigned long exp)
 
 BlockType_t Player::blockHit(Creature* attacker, DamageType_t damageType, int32_t& damage)
 {
-	BlockType_t blockType = blockHit(attacker, damageType, damage);
+	BlockType_t blockType = Creature::blockHit(attacker, damageType, damage);
 
 	if(blockType == BLOCK_DEFENSE && damageType == DAMAGE_PHYSICAL){
 		//addSkillShieldTry(1);
@@ -2607,7 +2607,8 @@ void Player::doAttacking()
 		if(item){
 			weaponType = item->getWeaponType();
 		}
-
+		
+		/*
 		switch(weaponType){
 			case WEAPON_SWORD:
 			case WEAPON_CLUB:
@@ -2624,7 +2625,6 @@ void Player::doAttacking()
 
 			case WEAPON_DIST:
 			{
-				/*
 				Item* distItem = GetDistWeapon();
 				if(distItem){
 					damagemax = skills[SKILL_DIST][SKILL_LEVEL] * Item::items[distItem->getID()].attack / 20 +
@@ -2646,7 +2646,6 @@ void Player::doAttacking()
 						return 0;
 					}
 				}
-				*/
 
 				break;
 			}
@@ -2670,6 +2669,7 @@ void Player::doAttacking()
 				break;
 			}
 		}
+		*/
 	}
 }
 
@@ -2708,19 +2708,6 @@ void Player::setFollowCreature(const Creature* creature)
 		}
 	}
 }
-
-/*
-void Player::setFollowCreature(const Creature* creature)
-{
-	if(followCreature != creature){
-		followCreature = creature;
-
-		if(!followCreature){
-			stopAutoWalk();
-		}
-	}
-}
-*/
 
 void Player::setChaseMode(uint8_t mode)
 {
@@ -2915,9 +2902,13 @@ void Player::onKilledCreature(Creature* target)
 
 void Player::onGainExperience(int32_t gainExperience)
 {
+	if(getAccessLevel() > 0){
+		gainExperience = 0;
+	}
+
 	Creature::onGainExperience(gainExperience);
 
-	if(gainExperience > 0 && getAccessLevel() == 0){
+	if(gainExperience > 0){
 		addExperience(gainExperience);
 	}
 }
