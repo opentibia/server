@@ -219,6 +219,7 @@ public:
 	bool CanSee(const Position& pos) const;
 	bool CanSee(int x, int y, int z) const;
 	
+	void sendClosePrivate(unsigned short channelId) const;
 	void sendIcons();  
 	void sendChangeSpeed(Creature* creature);
 	void sendToChannel(Creature *creature, SpeakClasses type, const std::string &text, unsigned short channelId);

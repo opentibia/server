@@ -99,6 +99,7 @@ public:
 	virtual void sendCancelTarget() = 0;
 	virtual void sendTextMessage(MessageClasses mclass, const char* message) = 0;
 	virtual void sendTextMessage(MessageClasses mclass, const char* message,const Position &pos, unsigned char type) = 0;
+	virtual void sendClosePrivate(unsigned short channelId) = 0;
 	virtual void sendChannelsDialog() = 0;
 	virtual void sendChannel(unsigned short channelId, std::string channelName) = 0;
 	virtual void sendToChannel(const Creature * creature, SpeakClasses type, const std::string &text, unsigned short channelId) = 0;

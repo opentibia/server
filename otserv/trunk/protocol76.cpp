@@ -128,6 +128,7 @@ void Protocol76::ReceiveLoop()
 			
 			OTSYS_THREAD_UNLOCK(game->gameLock, "Protocol76::ReceiveLoop()")
 		}
+		
 	}while(s != 0 && !player->isRemoved());
 }
 
@@ -297,6 +298,18 @@ void Protocol76::parsePacket(NetworkMessage &msg)
 		parseFollow(msg);
 		break;
 	
+	case 0xAA:
+		parseCreatePrivateChannel(msg);
+		break;
+		
+	case 0xAB:
+		parseChannelInvite(msg);
+		break;
+        
+	case 0xAC:
+		parseChannelExclude(msg);
+		break;
+		
 	case 0xBE: // cancel move
 		parseCancelMove(msg);
 		break;
@@ -564,7 +577,47 @@ void Protocol76::parseLogout(NetworkMessage& msg)
 	}
 }
 
+void Protocol76::parseCreatePrivateChannel(NetworkMessage& msg)
+{
+	ChatChannel* channel = g_chat.createChannel(player, 0xFFFF);
+	if(!channel){
+		return;	
+	}
+	if(channel->addUser(player)){	
+		NetworkMessage msg;
+		msg.AddByte(0xB2);
+		msg.AddU16(channel->getId());
+		msg.AddString(channel->getName());
+		
+		WriteBuffer(msg);
+	}
+}
 
+void Protocol76::parseChannelInvite(NetworkMessage& msg)
+{
+	std::string name = msg.GetString();
+		
+	PrivateChatChannel* channel = g_chat.getPrivateChannel(player);
+	Player* p = game->getPlayerByName(name);
+	
+	if(!channel || !p)
+		return;
+	
+	channel->invitePlayer(player, p);
+}
+
+void Protocol76::parseChannelExclude(NetworkMessage& msg)
+{
+	std::string name = msg.GetString();
+
+	PrivateChatChannel* channel = g_chat.getPrivateChannel(player);
+	Player* p = game->getPlayerByName(name);
+	
+	if(!channel || !p)
+		return;
+	
+	channel->excludePlayer(player, p);
+}
 
 void Protocol76::parseGetChannels(NetworkMessage& msg)
 {
@@ -1186,11 +1239,21 @@ void Protocol76::sendTextMessage(MessageClasses mclass, const char* message,
 	WriteBuffer(msg);
 }
 
+void Protocol76::sendClosePrivate(unsigned short channelId)
+{
+	NetworkMessage msg;
+
+	msg.AddByte(0xB3);
+	msg.AddU16(channelId);
+		
+	WriteBuffer(msg);
+}
+
 void Protocol76::sendChannelsDialog()
 {
 	NetworkMessage newmsg;
 	ChannelList list;
-	
+
 	list = g_chat.getChannelList(player);
 	
 	newmsg.AddByte(0xAB);
@@ -1205,14 +1268,14 @@ void Protocol76::sendChannelsDialog()
 		newmsg.AddU16(channel->getId());
 		newmsg.AddString(channel->getName());
 	}
-
+		
 	WriteBuffer(newmsg);
 }
 
 void Protocol76::sendChannel(unsigned short channelId, std::string channelName)
 {
 	NetworkMessage newmsg;
-	
+
 	newmsg.AddByte(0xAC);
 	newmsg.AddU16(channelId);
 	newmsg.AddString(channelName);

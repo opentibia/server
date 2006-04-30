@@ -42,11 +42,36 @@ public:
 	
 	const std::string& getName(){ return m_name; };
 	const unsigned short getId(){ return m_id; };
+	
+	virtual const unsigned long getOwner(){};
 private:
 	typedef std::map<long, Player*> UsersMap;
 	UsersMap m_users;
 	std::string m_name;
 	unsigned short m_id;
+};
+
+class PrivateChatChannel : public ChatChannel
+{
+public:	
+	PrivateChatChannel(unsigned short channelId, std::string channelName);
+	~PrivateChatChannel(){};
+		
+	const unsigned long getOwner(){return m_owner;};
+	void setOwner(unsigned long id){m_owner = id;};
+		
+	bool isInvited(const Player* player);
+	
+	void invitePlayer(Player* player, Player* p);
+	void excludePlayer(Player* player, Player* p);
+	
+	bool addInvited(Player* player);
+	bool removeInvited(Player* player);
+protected:	
+	typedef std::map<long, Player*> InvitedMap;
+	InvitedMap m_invites;
+	
+	unsigned long m_owner;
 };
 
 typedef std::list<ChatChannel*> ChannelList;
@@ -70,11 +95,18 @@ public:
 	
 private:
 	ChatChannel* getChannel(Player* player, unsigned short channelId);
+	PrivateChatChannel* getPrivateChannel(Player* player);
 	
 	typedef std::map<unsigned short, ChatChannel*> NormalChannelMap;
 	typedef std::map<unsigned long, ChatChannel*> GuildChannelMap;
 	NormalChannelMap m_normalChannels;
 	GuildChannelMap m_guildChannels;
+
+	typedef std::map<unsigned short, PrivateChatChannel*> PrivateChannelMap;
+	PrivateChannelMap m_privateChannels;
+	
+	ChatChannel* dummyPrivate;
 };
+
 
 #endif

@@ -109,6 +109,10 @@ private:
 	void parseRotateItem(NetworkMessage& msg);
 		
 	//Channel tabs
+	void parseCreatePrivateChannel(NetworkMessage& msg);
+	void parseChannelInvite(NetworkMessage& msg);
+	void parseChannelExclude(NetworkMessage& msg);
+	
 	void parseGetChannels(NetworkMessage& msg);
 	void parseOpenChannel(NetworkMessage& msg);
 	void parseOpenPriv(NetworkMessage& msg);
@@ -117,6 +121,7 @@ private:
 	void parseDebug(NetworkMessage& msg);
 
 	//Send functions
+	virtual void sendClosePrivate(unsigned short channelId);
 	virtual void sendChannelsDialog();
 	virtual void sendChannel(unsigned short channelId, std::string channelName);
 	virtual void sendOpenPriv(const std::string& receiver);

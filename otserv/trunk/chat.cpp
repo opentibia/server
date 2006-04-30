@@ -21,6 +21,76 @@
 #include "chat.h"
 #include "player.h"
 
+PrivateChatChannel::PrivateChatChannel(unsigned short channelId, std::string channelName) : 
+ChatChannel(channelId, channelName)
+{
+	m_owner = 0;
+}
+
+bool PrivateChatChannel::isInvited(const Player* player)
+{
+	if(!player)
+		return false;
+		
+	if(player->getGUID() == getOwner())
+		return true;
+			
+	InvitedMap::iterator it = m_invites.find(player->getGUID());
+	if(it != m_invites.end())
+		return true;
+	
+	return false;
+}
+
+bool PrivateChatChannel::addInvited(Player* player)
+{
+	InvitedMap::iterator it = m_invites.find(player->getGUID());
+	if(it != m_invites.end())
+		return false;
+	
+	m_invites[player->getGUID()] = player;
+	
+	return true;
+}
+
+bool PrivateChatChannel::removeInvited(Player* player)
+{
+	InvitedMap::iterator it = m_invites.find(player->getGUID());
+	if(it == m_invites.end())
+		return false;
+		
+	m_invites.erase(it);
+	return true;
+}
+
+void PrivateChatChannel::invitePlayer(Player* player, Player* p)
+{
+	if(addInvited(p)){		
+		std::string msg;
+		msg = player->getName();
+		msg += " invites you to ";
+		msg += (player->getSex() == PLAYERSEX_FEMALE ? "her" : "his");
+		msg += " private chat channel.";
+		p->sendTextMessage(MSG_INFO_DESCR, msg.c_str());
+		
+		msg = p->getName();
+		msg += " has been invited.";
+		player->sendTextMessage(MSG_INFO_DESCR, msg.c_str());
+	}
+}
+
+void PrivateChatChannel::excludePlayer(Player* player, Player* p)
+{
+	if(removeInvited(p)){
+		std::string msg;
+		msg = p->getName();
+		msg += "has been excluded.";
+		player->sendTextMessage(MSG_INFO_DESCR, msg.c_str());
+		
+		p->sendClosePrivate(this->getId());
+	}
+}
+
 ChatChannel::ChatChannel(unsigned short channelId, std::string channelName)
 {
 	m_id = channelId;
@@ -82,6 +152,10 @@ Chat::Chat()
 	newChannel = new ChatChannel(0x07, "Help");
 	if(newChannel)
 		m_normalChannels[0x07] = newChannel;
+		
+	newChannel = new PrivateChatChannel(0xFFFF, "Private Chat Channel");
+	if(newChannel)
+		dummyPrivate = newChannel;
 }
 
 ChatChannel* Chat::createChannel(Player* player, unsigned short channelId)
@@ -97,6 +171,20 @@ ChatChannel* Chat::createChannel(Player* player, unsigned short channelId)
 		m_guildChannels[player->getGuildId()] = newChannel;
 		return newChannel;
 	}
+	else if(channelId == 0xFFFF){
+		for(int i = 10; i < 10000; ++i){			
+			if(!getChannel(player, i)){
+				PrivateChatChannel* newChannel = new PrivateChatChannel(i, player->getName() + "'s Channel");
+				if(!newChannel)
+					return NULL;
+				
+				newChannel->setOwner(player->getGUID());
+
+				m_privateChannels[i] = newChannel;
+				return newChannel;	
+			}
+		}	
+	}
 		
 	return NULL;
 }
@@ -111,6 +199,23 @@ bool Chat::deleteChannel(Player* player, unsigned short channelId)
 		delete it->second;
 		m_guildChannels.erase(it);
 		return true;
+	}
+	else{
+		PrivateChannelMap::iterator it = m_privateChannels.find(channelId);
+		if(it == m_privateChannels.end())
+			return false;
+			
+		ChatChannel::UsersMap::iterator cit;
+		for(cit = it->second->m_users.begin(); cit != it->second->m_users.end(); ++cit){
+			Player* toPlayer = cit->second->getPlayer();
+			if(toPlayer){
+				toPlayer->sendClosePrivate(channelId);
+			}
+		}	
+			
+		delete it->second;
+		m_privateChannels.erase(it);
+		return true;	
 	}
 		
 	return false;
@@ -134,8 +239,12 @@ bool Chat::removeUserFromChannel(Player* player, unsigned short channelId)
 	if(!channel)
 		return false;
 		
-	if(channel->removeUser(player))
+	if(channel->removeUser(player)){
+		if(channel->getOwner() == player->getGUID())
+			deleteChannel(player, channelId);
+			
 		return true;
+	}
 	else
 		return false;	
 }
@@ -148,6 +257,9 @@ void Chat::removeUserFromAllChannels(Player* player)
 		list.pop_front();
 			
 		channel->removeUser(player);
+		
+		if(channel->getOwner() == player->getGUID())
+			deleteChannel(player, channel->getId());
 	}
 }
 
@@ -176,6 +288,8 @@ ChannelList Chat::getChannelList(Player* player)
 {
 	ChannelList list;
 	NormalChannelMap::iterator itn;
+	PrivateChannelMap::iterator it;	
+	bool gotPrivate = false;
 		
 	// If has guild
 	if(player->getGuildId() && player->getGuildName().length()){
@@ -185,12 +299,28 @@ ChannelList Chat::getChannelList(Player* player)
 		else if(channel = createChannel(player, 0x00))
 			list.push_back(channel);
 	}
-		
+				
 	for(itn = m_normalChannels.begin(); itn != m_normalChannels.end(); ++itn){
 		//TODO: Permisions for channels and checks
 		ChatChannel *channel = itn->second;
 		list.push_back(channel);
 	}
+	
+	for(it = m_privateChannels.begin(); it != m_privateChannels.end(); ++it){
+		PrivateChatChannel* channel = it->second;
+		
+		if(channel){
+			if(channel->isInvited(player))
+				list.push_back(channel);
+				
+			if(channel->getOwner() == player->getGUID())
+				gotPrivate = true;
+		}
+	}
+	
+	if(!gotPrivate)
+		list.push_front(dummyPrivate);	
+	
 	return list;
 }
 
@@ -205,9 +335,28 @@ ChatChannel* Chat::getChannel(Player* player, unsigned short channelId)
 	}
 	else{
 		NormalChannelMap::iterator it = m_normalChannels.find(channelId);
-		if(it == m_normalChannels.end())
-			return NULL;
-				
-		return it->second;
+		if(it != m_normalChannels.end()){
+			return it->second;
+		}
+		else{
+			PrivateChannelMap::iterator it = m_privateChannels.find(channelId);
+			if(it == m_privateChannels.end())
+				return NULL;
+			
+			return it->second;	
+		}
 	}
+}
+
+PrivateChatChannel* Chat::getPrivateChannel(Player* player)
+{
+	for(PrivateChannelMap::iterator it = m_privateChannels.begin(); it != m_privateChannels.end(); ++it){
+		if(PrivateChatChannel* channel = it->second){
+			if(channel->getOwner() == player->getGUID()){
+					return channel;	
+			}
+		}		
+	}
+		
+	return NULL;
 }
