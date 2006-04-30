@@ -50,6 +50,7 @@ Creature::Creature() :
 	lookFeet   = 0;
 	lookMaster = 0;
 	lookType   = PLAYER_MALE_1;	
+	lookTypeEx = 0;
 	lookCorpse = 3128;
 	
 	direction  = NORTH;
@@ -208,16 +209,6 @@ Item* Creature::getCorpse()
 	return corpse;
 }
 
-void Creature::getOutfit(uint8_t& _lookType, uint8_t& _lookHead,
-	uint8_t& _lookBody, uint8_t& _lookLegs, uint8_t& _lookFeet) const
-{
-	_lookType = lookType;
-	_lookHead = lookHead;
-	_lookBody = lookBody;
-	_lookLegs = lookLegs;
-	_lookFeet = lookFeet;
-}
-
 void Creature::changeHealth(int32_t healthChange)
 {
 	if(healthChange > 0){
@@ -346,6 +337,18 @@ bool Creature::addDamagePoints(Creature* attacker, int32_t damagePoints)
 	}
 
 	return true;
+}
+
+void Creature::onAddCondition(ConditionType_t type)
+{
+	if(type == CONDITION_PARALYZE && hasCondition(CONDITION_HASTE)){
+		removeCondition(CONDITION_HASTE);
+	}
+}
+
+void Creature::onEndCondition(ConditionType_t type)
+{
+	//
 }
 
 void Creature::onAttackedCreature(Creature* target)

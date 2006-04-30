@@ -1620,7 +1620,13 @@ void Player::drainMana(Creature* attacker, int32_t manaLoss)
 	sendStats();
 
 	std::stringstream ss;
-	ss << "You lose " << manaLoss << " mana.";
+	if(attacker){
+		ss << "You lose " << manaLoss << " mana blocking an attack by " << attacker->getNameDescription() << ".";
+	}
+	else{
+		ss << "You lose " << manaLoss << " mana.";
+	}
+
 	sendTextMessage(MSG_EVENT_DEFAULT, ss.str());
 }
 

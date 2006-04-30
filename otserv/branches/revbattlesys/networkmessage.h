@@ -77,6 +77,7 @@ public:
   void AddPosition(const Position& pos);
 	void AddItem(unsigned short id, unsigned char count);
 	void AddItem(const Item* item);
+	void AddItemId(uint16_t itemId);
 	void AddItemId(const Item* item);
   void AddCreature(const Creature* creature, bool known, unsigned int remove);
 

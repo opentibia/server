@@ -1858,19 +1858,17 @@ void Protocol76::AddCreatureHealth(NetworkMessage& msg,const Creature* creature)
 
 void Protocol76::AddCreatureOutfit(NetworkMessage &msg, const Creature* creature)
 {
-	uint8_t lookType = 0;
-	uint8_t lookHead = 0;
-	uint8_t lookBody = 0;
-	uint8_t lookLegs = 0;
-	uint8_t lookFeet = 0;
+	msg.AddByte(creature->getLookType());
 
-	creature->getOutfit(lookType, lookHead, lookBody, lookLegs, lookFeet);
-
-	msg.AddByte(lookType);
-	msg.AddByte(lookHead);
-	msg.AddByte(lookBody);
-	msg.AddByte(lookLegs);
-	msg.AddByte(lookFeet);
+	if(creature->getLookType() != 0){
+		msg.AddByte(creature->getLookHead());
+		msg.AddByte(creature->getLookBody());
+		msg.AddByte(creature->getLookLegs());
+		msg.AddByte(creature->getLookFeet());
+	}
+	else{
+		msg.AddItemId(creature->getLookTypeEx());
+	}
 }
 
 void Protocol76::AddWorldLight(NetworkMessage& msg, const LightInfo& lightInfo)

@@ -221,6 +221,8 @@ bool Spell::configureSpell(xmlNodePtr p)
 	vocationBits = 0xFFFFFFFF;
 	//TODO
 	//get vocations
+
+	return true;
 }
 	
 bool Spell::spellPlayerChecks(Player* player)
@@ -261,7 +263,7 @@ bool Spell::spellPlayerChecks(Player* player)
 void Spell::addSpellEffects(Player* player)
 {
 	if(mana > 0){
-		player->changeMana(-mana);
+		player->changeMana(-((int32_t)mana));
 	}
 	//TODO
 	/*

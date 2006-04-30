@@ -306,6 +306,12 @@ void NetworkMessage::AddItem(const Item* item)
     AddByte(item->getItemCountOrSubtype());
 }
 
+void NetworkMessage::AddItemId(uint16_t itemId)
+{
+	const ItemType &it = Item::items[itemId];
+	AddU16(it.clientId);
+}
+
 void NetworkMessage::AddItemId(const Item* item)
 {
 	const ItemType &it = Item::items[item->getID()];
@@ -313,7 +319,8 @@ void NetworkMessage::AddItemId(const Item* item)
 	AddU16(it.clientId);
 }
 
-void NetworkMessage::JoinMessages(NetworkMessage &add){
+void NetworkMessage::JoinMessages(NetworkMessage &add)
+{
 	if(!canAdd(add.m_MsgSize))
       return;
 	memcpy(&m_MsgBuf[m_ReadPos],&(add.m_MsgBuf[2]),add.m_MsgSize);

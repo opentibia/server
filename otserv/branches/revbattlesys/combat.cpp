@@ -134,6 +134,43 @@ bool CombatMana::execute(Creature* attacker, const Position& pos) const
 	return Combat::execute(attacker, pos);
 }
 
+CombatCondition::CombatCondition(Condition* _condition, uint8_t _impactEffect) :
+	Combat(_impactEffect),
+	condition(_condition),
+	removeType(CONDITION_NONE)
+{
+	//
+}
+
+CombatCondition::CombatCondition(ConditionType_t _removeType, uint8_t _impactEffect) :
+	Combat(_impactEffect),
+	condition(NULL),
+	removeType(_removeType)
+{
+	//
+}
+
+CombatCondition::~CombatCondition()
+{
+	delete condition;
+}
+
+bool CombatCondition::execute(Creature* attacker, Creature* target) const
+{
+	if(condition){
+		target->addCondition(condition->clone());
+	}
+	else{
+		target->removeCondition(removeType);
+	}
+
+	return true;
+}
+
+bool CombatCondition::execute(Creature* attacker, const Position& pos) const
+{
+	return Combat::execute(attacker, pos);
+}
 
 CombatField::CombatField(MagicField* _field) :
 	field(_field)
@@ -143,7 +180,7 @@ CombatField::CombatField(MagicField* _field) :
 
 CombatField::~CombatField()
 {
-	//
+	delete field;
 }
 
 bool CombatField::execute(Creature* attacker, Creature* target) const
@@ -154,7 +191,7 @@ bool CombatField::execute(Creature* attacker, Creature* target) const
 bool CombatField::execute(Creature* attacker, const Position& pos) const
 {
 	Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
-	if(tile){
+	if(tile && !tile->hasProperty(BLOCKSOLID)){
 		if(field && g_game.internalAddItem(tile, field, INDEX_WHEREEVER, 0, true) == RET_NOERROR){
 			MagicField* newField = new MagicField(*field);
 			return (g_game.internalAddItem(tile, newField) == RET_NOERROR);
@@ -201,8 +238,7 @@ ReturnValue AreaCombat::doCombat(Creature* attacker, const Position& pos, const 
 					tile = g_game.getTile(tmpPos.x, tmpPos.y, tmpPos.z);
 
 					if(tile){
-						if(!tile->hasProperty(PROTECTIONZONE) &&
-							!tile->hasProperty(BLOCKSOLID) &&
+						if(!tile->hasProperty(PROTECTIONZONE) &&						
 							!tile->hasProperty(BLOCKPROJECTILE))
 						{
 							combat.execute(attacker, tmpPos);

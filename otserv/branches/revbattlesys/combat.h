@@ -75,6 +75,20 @@ protected:
 	uint32_t maxChange;
 };
 
+class CombatCondition : public Combat{
+public:
+	CombatCondition(Condition* _condition, uint8_t _impactEffect);
+	CombatCondition(ConditionType_t _removeType, uint8_t _impactEffect);
+	~CombatCondition();
+
+	virtual bool execute(Creature* attacker, Creature* target) const;
+	virtual bool execute(Creature* attacker, const Position& pos) const;
+
+protected:
+	Condition* condition;
+	ConditionType_t removeType;
+};
+
 class MagicField;
 
 class CombatField : public Combat{
@@ -150,3 +164,4 @@ protected:
 };
 
 #endif
+

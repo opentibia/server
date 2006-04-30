@@ -72,9 +72,7 @@ Condition* Condition::createCondition(ConditionType_t _type, int32_t _ticks, int
 			//if param = 0 -> invisble
 			//elseif param <= 110 -> looktype = param
 			//else -> looktype = 0, looktype_ex = param >> 8
-			//return new ConditionOutfit(_ticks,param);
-			return NULL;
-			break;
+			return new ConditionOutfit(_ticks, PLAYER_MALE_1, 0);
 		}
 
 		case CONDITION_LIGHT:
@@ -110,15 +108,6 @@ ConditionGeneric::ConditionGeneric(ConditionType_t _type, int32_t _ticks)
 bool ConditionGeneric::startCondition(Creature* creature)
 {
 	return true;
-
-	/*
-	if(conditionType != CONDITION_EXHAUSTED){
-		return false;
-	}
-	else{
-		return true;
-	}
-	*/
 }
 
 void ConditionGeneric::executeCondition(Creature* creature, int32_t interval)
@@ -184,16 +173,6 @@ bool ConditionDamage::startCondition(Creature* creature)
 	}
 
 	return false;
-
-	/*
-	if(Player* player = creature->getPlayer()){
-		if(player->getAccessLevel() != 0){
-			return false;
-		}
-	}
-
-	return true;
-	*/
 }
 
 void ConditionDamage::executeCondition(Creature* creature, int32_t interval)
@@ -291,8 +270,8 @@ uint8_t ConditionDamage::getIcons() const
 ConditionSpeed::ConditionSpeed(ConditionType_t _type, int32_t _ticks, int32_t changeSpeed)
 {
 	conditionType = _type;
-	speedDelta = changeSpeed;
 	ticks = _ticks;
+	speedDelta = changeSpeed;
 }
 
 bool ConditionSpeed::startCondition(Creature* creature)
@@ -340,3 +319,63 @@ uint8_t ConditionSpeed::getIcons() const
 
 	return 0;
 }
+
+ConditionOutfit::ConditionOutfit(int32_t _ticks, uint8_t _lookType, uint16_t _lookTypeEx,
+	uint8_t _lookHead /*= 0*/, uint8_t _lookBody /*= 0*/, uint8_t _lookLegs /*= 0*/, uint8_t _lookFeet /*= 0*/)
+{
+	conditionType = CONDITION_OUTFIT;
+	ticks = _ticks;
+	lookType = _lookType;
+	lookTypeEx = _lookTypeEx;
+
+	lookHead = _lookHead;
+	lookBody = _lookBody;
+	lookLegs = _lookLegs;
+	lookFeet = _lookFeet;
+}
+
+bool ConditionOutfit::startCondition(Creature* creature)
+{
+	prevLookType = creature->getLookType();
+	prevLookTypeEx = creature->getLookTypeEx();
+	prevLookHead = creature->getLookHead();
+	prevLookBody = creature->getLookBody();
+	prevLookLegs = creature->getLookLegs();
+	prevLookFeet = creature->getLookFeet();
+
+	g_game.changeOutfit(creature, lookType, lookTypeEx, lookHead, lookBody, lookLegs, lookFeet);
+	return true;
+}
+
+void ConditionOutfit::executeCondition(Creature* creature, int32_t interval)
+{
+	//
+}
+
+void ConditionOutfit::endCondition(Creature* creature, EndCondition_t reason)
+{
+	g_game.changeOutfit(creature, prevLookType, prevLookTypeEx, prevLookHead, prevLookBody, prevLookLegs, prevLookFeet);
+}
+
+void ConditionOutfit::addCondition(Creature* creature, const Condition* addCondition)
+{
+	if(addCondition->getType() == conditionType){
+		if(addCondition->getTicks() > ticks){
+			ticks = addCondition->getTicks();
+		}
+
+		ConditionOutfit conditionOutfit = static_cast<const ConditionOutfit&>(*addCondition);
+		if(conditionOutfit.lookType != lookType){
+			lookType = conditionOutfit.lookType;
+			lookTypeEx = conditionOutfit.lookTypeEx;
+			
+			g_game.changeOutfit(creature, lookType, lookTypeEx);
+		}
+	}
+}
+
+uint8_t ConditionOutfit::getIcons() const
+{
+	return 0;
+}
+

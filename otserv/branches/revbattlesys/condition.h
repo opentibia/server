@@ -133,7 +133,8 @@ protected:
 class ConditionOutfit: public Condition
 {
 public:
-	ConditionOutfit(int32_t _ticks, int32_t new_outfit);
+	ConditionOutfit(int32_t _ticks, uint8_t _lookType, uint16_t _lookTypeEx,
+		uint8_t _lookHead = 0, uint8_t _lookBody = 0, uint8_t _lookLegs = 0, uint8_t _lookFeet = 0);
 	virtual ~ConditionOutfit(){};
 	
 	virtual bool startCondition(Creature* creature);
@@ -143,6 +144,21 @@ public:
 	virtual uint8_t getIcons() const;
 
 	virtual ConditionOutfit* clone()  const { return new ConditionOutfit(*this); }
+
+protected:
+	uint8_t lookType;
+	uint16_t lookTypeEx;
+	uint8_t lookHead;
+	uint8_t lookBody;
+	uint8_t lookLegs;
+	uint8_t lookFeet;
+
+	uint8_t prevLookType;
+	uint16_t prevLookTypeEx;
+	uint8_t prevLookHead;
+	uint8_t prevLookBody;
+	uint8_t prevLookLegs;
+	uint8_t prevLookFeet;
 };
 
 class ConditionLight: public Condition

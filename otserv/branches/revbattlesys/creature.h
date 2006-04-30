@@ -130,9 +130,6 @@ public:
 	virtual int getThrowRange() const {return 1;};
 	virtual bool isPushable() const {return true;};
 	virtual bool isRemoved() const {return isInternalRemoved;};
-
-	void getOutfit(uint8_t& _lookType, uint8_t& _lookHead,
-		uint8_t& _lookBody, uint8_t& _lookLegs, uint8_t& _lookFeet) const;
 		
 	int64_t getSleepTicks() const;
 	int64_t getEventStepTicks() const;
@@ -165,6 +162,13 @@ public:
 	int32_t getHealth() const {return health;}
 	int32_t getMaxHealth() const {return healthMax;}
 	int32_t getMana() const {return mana;}
+
+	uint8_t getLookType() const { return lookType; }
+	uint16_t getLookTypeEx() const { return lookTypeEx; }
+	uint8_t getLookHead() const { return lookHead; }
+	uint8_t getLookBody() const { return lookBody; }
+	uint8_t getLookLegs() const { return lookLegs; }
+	uint8_t getLookFeet() const { return lookFeet; }
 
 	//walk functions
 	/*
@@ -214,8 +218,8 @@ public:
 	virtual bool addDamagePoints(Creature* attacker, int32_t damagePoints);
 
 	//combat event functions
-	virtual void onAddCondition(ConditionType_t type) {};
-	virtual void onEndCondition(ConditionType_t type) {};
+	virtual void onAddCondition(ConditionType_t type);
+	virtual void onEndCondition(ConditionType_t type);
 	virtual void onAttackedCreature(Creature* target);
 	virtual void onAttackedCreatureDrainHealth(Creature* target, int32_t points);
 	virtual void onAttackedCreatureKilled(Creature* target);
@@ -252,7 +256,9 @@ protected:
 	int32_t level;
 	int32_t magLevel;
 
-	int lookType, lookHead, lookBody, lookLegs, lookFeet, lookCorpse, lookMaster;
+	uint8_t lookType, lookHead, lookBody, lookLegs, lookFeet, lookCorpse, lookMaster;
+	uint16_t lookTypeEx;
+
 	Position masterPos;
 	uint64_t lastMove;
 

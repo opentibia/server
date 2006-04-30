@@ -1649,30 +1649,24 @@ bool Game::playerUseItemEx(Player* player, const Position& fromPos, uint8_t from
 
 bool Game::internalUseItemEx(Player* player, const Position& fromPos, Item* item, const Position& toPos, uint8_t toStackPos, uint16_t toSpriteId)
 {
+	AreaCombat area;
+	uint8_t arr[] = {1, 1, 1, 1};
+	std::vector<uint8_t> row(arr, arr + sizeof(arr) / sizeof(uint8_t));
+	area.setRow(0, row);
+	area.setRow(1, row);
+	area.setRow(2, row);
+
 	if(item->getID() == 2304){
-		CombatHealth combat(DAMAGE_FIRE, -100, -200, NM_ME_SOUND_GREEN);
-
-		AreaCombat area;
-		uint8_t arr[] = {1, 1, 1, 1, 1, 1, 1};
-		std::vector<uint8_t> row(arr, arr + sizeof(arr) / sizeof(uint8_t));
-		area.setRow(0, row);
-		area.setRow(1, row);
-		area.setRow(2, row);
-
+		CombatHealth combat(DAMAGE_POISON, -100, -200, NM_ME_SOUND_GREEN);
 		area.doCombat(player, toPos, combat);
 	}
 	else if(item->getID() == 2305){
 		MagicField* field = new MagicField(1487);
+		field->useThing2();
+
 		Condition* condition = Condition::createCondition(CONDITION_FIRE, 15000, player->getID());
 		field->setCondition(condition);
 		CombatField combat(field);
-
-		AreaCombat area;
-		uint8_t arr[] = {1, 1, 1, 1, 1, 1, 1};
-		std::vector<uint8_t> row(arr, arr + sizeof(arr) / sizeof(uint8_t));
-		area.setRow(0, row);
-		area.setRow(1, row);
-		area.setRow(2, row);
 
 		area.doCombat(player, toPos, combat);
 	}
@@ -1680,8 +1674,37 @@ bool Game::internalUseItemEx(Player* player, const Position& fromPos, Item* item
 		CombatHealth combat(DAMAGE_SUDDENDEATH, -100, -200, NM_ME_MORT_AREA);
 		combat.execute(player, toPos);
 	}
-
-	return true;
+	else if(item->getID() == 2311){
+		CombatMana combat(-100, -200, NM_ME_YELLOW_RINGS);
+		combat.execute(player, toPos);
+	}
+	else if(item->getID() == 2312){
+		Condition* condition = Condition::createCondition(CONDITION_MANASHIELD, 15000, 0);
+		CombatCondition combat(condition, NM_ME_LOOSE_ENERGY);
+		area.doCombat(player, toPos, combat);
+	}
+	else if(item->getID() == 2313){
+		CombatCondition combat(CONDITION_MANASHIELD, NM_ME_MAGIC_BLOOD);
+		area.doCombat(player, toPos, combat);
+	}
+	else if(item->getID() == 2314){
+		Condition* condition = Condition::createCondition(CONDITION_PARALYZE, 15000, -200);
+		CombatCondition combat(condition, NM_ME_MAGIC_ENERGIE);
+		area.doCombat(player, toPos, combat);
+	}
+	else if(item->getID() == 2315){
+		CombatCondition combat(CONDITION_PARALYZE, NM_ME_MAGIC_BLOOD);
+		area.doCombat(player, toPos, combat);
+	}
+	else if(item->getID() == 2316){
+		ConditionOutfit* condition = new ConditionOutfit(15000, 0, 0);
+		CombatCondition combat(condition, NM_ME_SOUND_BLUE);
+		area.doCombat(player, toPos, combat);
+	}
+	else if(item->getID() == 2306){
+		CombatCondition combat(CONDITION_OUTFIT, NM_ME_SOUND_BLUE);
+		area.doCombat(player, toPos, combat);
+	}
 
 	actions.UseItemEx(player, fromPos, toPos, toStackPos, item);
 	return true;
@@ -2288,14 +2311,8 @@ bool Game::playerChangeOutfit(Player* player, uint8_t lookType, uint8_t lookHead
 	if(player->isRemoved())
 		return false;
 
-	player->lookType = lookType;
-	player->lookMaster = lookType;
-	player->lookHead = lookHead;
-	player->lookBody = lookBody;
-	player->lookLegs = lookLegs;
-	player->lookFeet = lookFeet;
-
-	return internalCreatureChangeOutfit(player);
+	changeOutfit(player, lookType, 0, lookHead, lookBody, lookLegs, lookFeet);
+	return true;
 }
 
 bool Game::playerSaySpell(Player* player, const std::string& text)
@@ -2360,29 +2377,6 @@ bool Game::internalCreatureSay(Creature* creature, SpeakClasses type, const std:
 
 	for(it = list.begin(); it != list.end(); ++it) {
 		(*it)->onCreatureSay(creature, type, text);
-	}
-
-	return true;
-}
-
-bool Game::internalCreatureChangeOutfit(Creature* creature)
-{
-	SpectatorVec list;
-	SpectatorVec::iterator it;
-
-	getSpectators(Range(creature->getPosition(), true), list);
-
-	//send to client
-	Player* player = NULL;
-	for(it = list.begin(); it != list.end(); ++it) {
-		if(player = (*it)->getPlayer()){
-			player->sendCreatureChangeOutfit(creature);
-		}
-	}
-
-	//event method
-	for(it = list.begin(); it != list.end(); ++it) {
-		(*it)->onCreatureChangeOutfit(creature);
 	}
 
 	return true;
@@ -2547,6 +2541,40 @@ void Game::changeSpeed(Creature* creature, int32_t speedDelta)
 	}
 }
 
+void Game::changeOutfit(Creature* creature, uint8_t lookType, uint16_t lookTypeEx /*= 0*/,
+	uint8_t lookHead /*= 0*/, uint8_t lookBody /*= 0*/, uint8_t lookLegs /*= 0*/, uint8_t lookFeet /*= 0*/)
+{
+	creature->lookType = lookType;
+	creature->lookMaster = lookType;
+	if(lookType != 0){
+		creature->lookHead = lookHead;
+		creature->lookBody = lookBody;
+		creature->lookLegs = lookLegs;
+		creature->lookFeet = lookFeet;
+	}
+	else{
+		creature->lookTypeEx = lookTypeEx;
+	}
+	
+	SpectatorVec list;
+	SpectatorVec::iterator it;
+
+	getSpectators(Range(creature->getPosition(), true), list);
+
+	//send to client
+	Player* player = NULL;
+	for(it = list.begin(); it != list.end(); ++it) {
+		if(player = (*it)->getPlayer()){
+			player->sendCreatureChangeOutfit(creature);
+		}
+	}
+
+	//event method
+	for(it = list.begin(); it != list.end(); ++it) {
+		(*it)->onCreatureChangeOutfit(creature);
+	}
+}
+
 void Game::changeLight(const Creature* creature)
 {
 	SpectatorVec list;
@@ -2634,10 +2662,10 @@ bool Game::combatChangeHealth(DamageType_t damageType, Creature* attacker, Creat
 		if(damage != 0){
 			if(target->hasCondition(CONDITION_MANASHIELD)){
 				int32_t manaDamage = std::min(target->getMana(), damage);
-				damage = std::min((int32_t)0, damage - manaDamage);
+				damage = std::max((int32_t)0, damage - manaDamage);
 
 				target->drainMana(attacker, manaDamage);
-
+				
 				std::stringstream ss;
 				ss << manaDamage;
 				addMagicEffect(list, targetPos, NM_ME_LOOSE_ENERGY);
