@@ -342,6 +342,7 @@ HouseTransferItem* House::getTransferItem()
 	if(transferItem != NULL)
 		return NULL;
 	
+	transfer_container.setParent(NULL);
 	transferItem =  HouseTransferItem::createHouseTransferItem(this);
 	transfer_container.__addThing(transferItem);
 	return transferItem;
@@ -352,6 +353,7 @@ void House::resetTransferItem()
 	if(transferItem){
 		Item* tmpItem = transferItem;
 		transferItem = NULL;
+		transfer_container.setParent(NULL);
 
 		transfer_container.__removeThing(tmpItem, tmpItem->getItemCount());
 		g_game.FreeThing(tmpItem);
