@@ -422,6 +422,19 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 					tmpNode = tmpNode->next;
 				}
 			}
+			else if(xmlStrcmp(p->name, (const xmlChar*)"viplist") == 0){
+				xmlNodePtr tmpNode = p->children;
+				while(tmpNode){
+					if(xmlStrcmp(tmpNode->name, (const xmlChar*)"vip") == 0){
+						if(readXMLInteger(tmpNode, "playerguid", intValue)){
+							std::string dummy_str;
+							player->addVIP(intValue, dummy_str, false, true);
+						}
+					}
+
+					tmpNode = tmpNode->next;
+				}
+			}
 
 			p = p->next;
 		}
@@ -576,6 +589,16 @@ bool IOPlayerXML::savePlayer(Player* player)
 	
 	xmlAddChild(root, sn);
 	
+	sn = xmlNewNode(NULL,(const xmlChar*)"viplist");
+	for(VIPListSet::iterator it = player->VIPList.begin(); it != player->VIPList.end(); it++){
+		pn = xmlNewNode(NULL,(const xmlChar*)"vip");
+		sb << *it;
+		xmlSetProp(pn, (const xmlChar*)"playerguid", (const xmlChar*)sb.str().c_str());
+		sb.str("");
+	}
+
+	xmlAddChild(root, sn);
+
 	//Save the character
 	if(xmlSaveFile(filename.c_str(), doc)){
 		#ifdef __DEBUG__
