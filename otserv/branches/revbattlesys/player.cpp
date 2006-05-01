@@ -2830,11 +2830,14 @@ void Player::updateItemsLight(bool internal /*=false*/)
 
 void Player::onAddCondition(ConditionType_t type)
 {
+	Creature::onAddCondition(type);
 	sendIcons();
 }
 
 void Player::onEndCondition(ConditionType_t type)
 {
+	Creature::onEndCondition(type);
+
 	sendIcons();
 
 	if(type == CONDITION_INFIGHT){
@@ -2858,7 +2861,7 @@ void Player::onAttackedCreature(Creature* target)
 			if(const Player* targetPlayer = target->getPlayer()){
 				pzLocked = true;
 
-	#ifdef __SKULLSYSTEM__
+#ifdef __SKULLSYSTEM__
 				if(!targetPlayer->hasAttacked(this)){
 					if(targetPlayer->getSkull() == SKULL_NONE && getSkull() == SKULL_NONE){
 						//add a white skull
@@ -2872,7 +2875,7 @@ void Player::onAttackedCreature(Creature* target)
 
 					addAttacked(targetPlayer);
 				}
-	#endif
+#endif
 			}
 
 			Condition* condition = Condition::createCondition(CONDITION_INFIGHT, 60 * 1000, 0);

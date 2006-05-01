@@ -48,7 +48,7 @@ protected:
 
 class CombatHealth : public Combat{
 public:
-	CombatHealth(DamageType_t _damageType, uint32_t _minChange, uint32_t _maxChange, uint8_t _impactEffect);
+	CombatHealth(DamageType_t _damageType, int32_t _minChange, int32_t _maxChange, uint8_t _impactEffect);
 	~CombatHealth();
 
 	virtual bool execute(Creature* attacker, Creature* target) const;
@@ -58,21 +58,21 @@ protected:
 	DamageType_t damageType;
 
 	//configureable
-	uint32_t minChange;
-	uint32_t maxChange;
+	int32_t minChange;
+	int32_t maxChange;
 };
 
 class CombatMana : public Combat{
 public:
-	CombatMana(uint32_t _minChange, uint32_t _maxChange, uint8_t _impactEffect);
+	CombatMana(int32_t _minChange, int32_t _maxChange, uint8_t _impactEffect);
 	~CombatMana();
 
 	virtual bool execute(Creature* attacker, Creature* target) const;
 	virtual bool execute(Creature* attacker, const Position& pos) const;
 
 protected:
-	uint32_t minChange;
-	uint32_t maxChange;
+	int32_t minChange;
+	int32_t maxChange;
 };
 
 class CombatCondition : public Combat{

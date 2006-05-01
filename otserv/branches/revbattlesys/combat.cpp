@@ -85,7 +85,7 @@ bool Combat::execute(Creature* attacker, const Tile& tile) const
 */
 
 
-CombatHealth::CombatHealth(DamageType_t _damageType, uint32_t _minChange, uint32_t _maxChange, uint8_t _impactEffect) :
+CombatHealth::CombatHealth(DamageType_t _damageType, int32_t _minChange, int32_t _maxChange, uint8_t _impactEffect) :
 	Combat(_impactEffect),
 	damageType(_damageType),
 	minChange(_minChange),
@@ -110,7 +110,7 @@ bool CombatHealth::execute(Creature* attacker, const Position& pos) const
 	return Combat::execute(attacker, pos);
 }
 
-CombatMana::CombatMana(uint32_t _minChange, uint32_t _maxChange, uint8_t _impactEffect) :
+CombatMana::CombatMana(int32_t _minChange, int32_t _maxChange, uint8_t _impactEffect) :
 	Combat(_impactEffect),
 	minChange(_minChange),
 	maxChange(_maxChange)
