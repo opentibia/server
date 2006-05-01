@@ -43,8 +43,9 @@ public:
 	const std::string& getName(){ return m_name; };
 	const unsigned short getId(){ return m_id; };
 	
-	virtual const unsigned long getOwner(){};
-private:
+	virtual const unsigned long getOwner(){ return 0; };
+
+protected:
 	typedef std::map<long, Player*> UsersMap;
 	UsersMap m_users;
 	std::string m_name;
@@ -62,11 +63,14 @@ public:
 		
 	bool isInvited(const Player* player);
 	
-	void invitePlayer(Player* player, Player* p);
-	void excludePlayer(Player* player, Player* p);
+	void invitePlayer(Player* player, Player* invitePlayer);
+	void excludePlayer(Player* player, Player* excludePlayer);
 	
 	bool addInvited(Player* player);
 	bool removeInvited(Player* player);
+
+	void closeChannel();
+
 protected:	
 	typedef std::map<long, Player*> InvitedMap;
 	InvitedMap m_invites;
@@ -92,10 +96,11 @@ public:
 	
 	std::string getChannelName(Player* player, unsigned short channelId);	
 	ChannelList getChannelList(Player* player);
-	
-private:
+
 	ChatChannel* getChannel(Player* player, unsigned short channelId);
 	PrivateChatChannel* getPrivateChannel(Player* player);
+	
+private:
 	
 	typedef std::map<unsigned short, ChatChannel*> NormalChannelMap;
 	typedef std::map<unsigned long, ChatChannel*> GuildChannelMap;

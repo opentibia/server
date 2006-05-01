@@ -63,32 +63,45 @@ bool PrivateChatChannel::removeInvited(Player* player)
 	return true;
 }
 
-void PrivateChatChannel::invitePlayer(Player* player, Player* p)
+void PrivateChatChannel::invitePlayer(Player* player, Player* invitePlayer)
 {
-	if(addInvited(p)){		
+	if(player != invitePlayer && addInvited(invitePlayer)){
 		std::string msg;
 		msg = player->getName();
 		msg += " invites you to ";
 		msg += (player->getSex() == PLAYERSEX_FEMALE ? "her" : "his");
 		msg += " private chat channel.";
-		p->sendTextMessage(MSG_INFO_DESCR, msg.c_str());
+		invitePlayer->sendTextMessage(MSG_INFO_DESCR, msg.c_str());
 		
-		msg = p->getName();
+		msg = invitePlayer->getName();
 		msg += " has been invited.";
 		player->sendTextMessage(MSG_INFO_DESCR, msg.c_str());
 	}
 }
 
-void PrivateChatChannel::excludePlayer(Player* player, Player* p)
+void PrivateChatChannel::excludePlayer(Player* player, Player* excludePlayer)
 {
-	if(removeInvited(p)){
+	if(player != excludePlayer && removeInvited(excludePlayer)){
+		removeUser(excludePlayer);
+
 		std::string msg;
-		msg = p->getName();
-		msg += "has been excluded.";
+		msg = excludePlayer->getName();
+		msg += " has been excluded.";
 		player->sendTextMessage(MSG_INFO_DESCR, msg.c_str());
 		
-		p->sendClosePrivate(this->getId());
+		excludePlayer->sendClosePrivate(getId());
 	}
+}
+
+void PrivateChatChannel::closeChannel()
+{
+	ChatChannel::UsersMap::iterator cit;
+	for(cit = m_users.begin(); cit != m_users.end(); ++cit){
+		Player* toPlayer = cit->second->getPlayer();
+		if(toPlayer){
+			toPlayer->sendClosePrivate(getId());
+		}
+	}	
 }
 
 ChatChannel::ChatChannel(unsigned short channelId, std::string channelName)
@@ -204,14 +217,8 @@ bool Chat::deleteChannel(Player* player, unsigned short channelId)
 		PrivateChannelMap::iterator it = m_privateChannels.find(channelId);
 		if(it == m_privateChannels.end())
 			return false;
-			
-		ChatChannel::UsersMap::iterator cit;
-		for(cit = it->second->m_users.begin(); cit != it->second->m_users.end(); ++cit){
-			Player* toPlayer = cit->second->getPlayer();
-			if(toPlayer){
-				toPlayer->sendClosePrivate(channelId);
-			}
-		}	
+		
+		it->second->closeChannel();
 			
 		delete it->second;
 		m_privateChannels.erase(it);

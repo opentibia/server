@@ -151,7 +151,7 @@ void Protocol76::parsePacket(NetworkMessage &msg)
 		break;
 		
 	case 0x1E: // keep alive / ping response
-		parseRecievePing(msg);
+		parseReceivePing(msg);
 		break;
 		
 	case 0x64: // move with steps
@@ -579,17 +579,22 @@ void Protocol76::parseLogout(NetworkMessage& msg)
 
 void Protocol76::parseCreatePrivateChannel(NetworkMessage& msg)
 {
-	ChatChannel* channel = g_chat.createChannel(player, 0xFFFF);
-	if(!channel){
-		return;	
+	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol76::parseCreatePrivateChannel()");
+	if(player->isRemoved()){
+		return;
 	}
-	if(channel->addUser(player)){	
-		NetworkMessage msg;
-		msg.AddByte(0xB2);
-		msg.AddU16(channel->getId());
-		msg.AddString(channel->getName());
-		
-		WriteBuffer(msg);
+
+	ChatChannel* channel = g_chat.createChannel(player, 0xFFFF);
+	
+	if(channel){
+		if(channel->addUser(player)){	
+			NetworkMessage msg;
+			msg.AddByte(0xB2);
+			msg.AddU16(channel->getId());
+			msg.AddString(channel->getName());
+			
+			WriteBuffer(msg);
+		}
 	}
 }
 
@@ -597,30 +602,49 @@ void Protocol76::parseChannelInvite(NetworkMessage& msg)
 {
 	std::string name = msg.GetString();
 		
-	PrivateChatChannel* channel = g_chat.getPrivateChannel(player);
-	Player* p = game->getPlayerByName(name);
-	
-	if(!channel || !p)
+	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol76::parseChannelInvite()");
+	if(player->isRemoved()){
 		return;
-	
-	channel->invitePlayer(player, p);
+	}
+
+	PrivateChatChannel* channel = g_chat.getPrivateChannel(player);
+
+	if(channel){
+		Player* invitePlayer = game->getPlayerByName(name);
+		
+		if(invitePlayer){
+			channel->invitePlayer(player, invitePlayer);
+		}
+	}
 }
 
 void Protocol76::parseChannelExclude(NetworkMessage& msg)
 {
 	std::string name = msg.GetString();
 
-	PrivateChatChannel* channel = g_chat.getPrivateChannel(player);
-	Player* p = game->getPlayerByName(name);
-	
-	if(!channel || !p)
+	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol76::parseChannelExclude()");
+	if(player->isRemoved()){
 		return;
-	
-	channel->excludePlayer(player, p);
+	}
+
+	PrivateChatChannel* channel = g_chat.getPrivateChannel(player);
+
+	if(channel){
+		Player* excludePlayer = game->getPlayerByName(name);
+		
+		if(excludePlayer){
+			channel->excludePlayer(player, excludePlayer);
+		}
+	}
 }
 
 void Protocol76::parseGetChannels(NetworkMessage& msg)
 {
+	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol76::parseGetChannels()");
+	if(player->isRemoved()){
+		return;
+	}
+
 	sendChannelsDialog();
 }
 
@@ -652,6 +676,7 @@ void Protocol76::parseOpenPriv(NetworkMessage& msg)
 {
 	std::string receiver; 
 	receiver = msg.GetString();
+
 	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol76::parseOpenPriv()");
 	if(player->isRemoved()){
 		return;
@@ -685,9 +710,9 @@ void Protocol76::parseDebug(NetworkMessage& msg)
 }
 
 
-void Protocol76::parseRecievePing(NetworkMessage& msg)
+void Protocol76::parseReceivePing(NetworkMessage& msg)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol76::parseRecievePing()");
+	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol76::parseReceivePing()");
 	if(player->isRemoved()){
 		return;
 	}

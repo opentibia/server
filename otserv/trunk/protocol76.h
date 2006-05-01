@@ -61,7 +61,7 @@ private:
 	void parseLogout(NetworkMessage& msg);	
 	void parseCancelMove(NetworkMessage& msg);
 
-	void parseRecievePing(NetworkMessage& msg);
+	void parseReceivePing(NetworkMessage& msg);
 	void parseAutoWalk(NetworkMessage& msg);
 	void parseStopAutoWalk(NetworkMessage& msg);	
 	void parseMoveNorth(NetworkMessage& msg);
