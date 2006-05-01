@@ -307,11 +307,11 @@ bool IOPlayerSQL::savePlayer(Player* player)
 	query << "`healthmax` = " << player->healthMax << ", ";
 	query << "`direction` = " << (int)player->getDirection() << ", ";
 	query << "`experience` = " << player->experience << ", ";
-	query << "`lookbody` = " << player->lookBody << ", ";
-	query << "`lookfeet` = " << player->lookFeet << ", ";
-	query << "`lookhead` = " << player->lookHead << ", ";
-	query << "`looklegs` = " << player->lookLegs << ", ";
-	query << "`looktype` = " << player->lookType << ", ";
+	query << "`lookbody` = " << (int)player->lookBody << ", ";
+	query << "`lookfeet` = " << (int)player->lookFeet << ", ";
+	query << "`lookhead` = " << (int)player->lookHead << ", ";
+	query << "`looklegs` = " << (int)player->lookLegs << ", ";
+	query << "`looktype` = " << (int)player->lookType << ", ";
 	query << "`magLevel` = " << player->magLevel << ", ";
 	query << "`mana` = " << player->mana << ", ";
 	query << "`manamax` = " << player->manaMax << ", ";
