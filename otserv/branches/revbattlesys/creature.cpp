@@ -51,7 +51,6 @@ Creature::Creature() :
 	lookMaster = 0;
 	lookType   = PLAYER_MALE_1;	
 	lookTypeEx = 0;
-	lookCorpse = 3128;
 	
 	direction  = NORTH;
 	master = NULL;
@@ -68,7 +67,6 @@ Creature::Creature() :
 	followCreature = NULL;
 	eventWalk = 0;
 
-	immunities = 0;
 	eventCheck = 0;
 	eventCheckAttacking = 0;
 	attackedCreature = NULL;
@@ -498,7 +496,7 @@ bool Creature::hasCondition(ConditionType_t type) const
 
 bool Creature::isImmune(DamageType_t type) const
 {
-	return ((immunities & type) == type);
+	return ((getImmunities() & type) == type);
 }
 
 std::string Creature::getDescription(int32_t lookDistance) const

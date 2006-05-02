@@ -25,85 +25,6 @@
 
 #include "creature.h"
 
-/*
-class TimeProbabilityClass{
-public:
-	TimeProbabilityClass()
-	{
-		setDefault();
-	}
-	
-	TimeProbabilityClass(int _cycleTicks, int _probability, int _exhaustionticks)
-	{
-		setDefault();
-		init(_cycleTicks, _probability, _exhaustionticks);
-	};
-	
-	~TimeProbabilityClass() {};
-	
-	bool onTick(int ticks)
-	{
-		ticksleft -= ticks;
-		
-		if(ticksleft <= 0) {
-			ticksleft = cycleTicks;
-			bool ret = (random_range(1, 100) <= probability);
-			return ret;
-		}
-		
-		return false;
-	}
-	
-	void init(int _cycleTicks, int _probability, int _exhaustionticks)
-	{
-		if(_cycleTicks >= 0) {
-			this->ticksleft = _cycleTicks;
-			this->cycleTicks = _cycleTicks;
-		}
-		
-		if(_probability >= 0)
-			probability = std::min(100, _probability);
-		
-		if(_exhaustionticks >= 0)
-			exhaustionTicks = _exhaustionticks;
-	}
-	
-	int getExhaustion() const {return exhaustionTicks;}
-	
-private:
-	void setDefault()
-	{
-		cycleTicks = 2000;
-		ticksleft = cycleTicks;
-		probability = 80;
-		exhaustionTicks = 0;
-	}
-	
-	int ticksleft;
-	int cycleTicks;
-	int probability;
-	int exhaustionTicks;
-};
-
-class PhysicalAttackClass {
-public:
-	PhysicalAttackClass()
-	{
-		disttype = DIST_NONE;
-		minWeapondamage = 0;
-		maxWeapondamage = 1;
-	};
-	
-	~PhysicalAttackClass() {};
-	
-	fight_t fighttype;
-	subfight_t disttype;
-	
-	int minWeapondamage;
-	int maxWeapondamage;
-};
-*/
-
 #define CHANCE_MAX  100000
 struct LootBlock{
 	unsigned short id;
@@ -126,13 +47,6 @@ struct summonBlock{
 };
 
 typedef std::list<LootBlock> LootItems;
-/*
-typedef std::vector<TimeProbabilityClass> TimeProbabilityClassVec;	
-typedef std::map<std::string, TimeProbabilityClassVec> InstantAttackSpells;
-typedef std::map<unsigned short, TimeProbabilityClassVec> RuneAttackSpells;
-typedef std::map<PhysicalAttackClass*, TimeProbabilityClass> PhysicalAttacks;
-typedef std::vector<std::pair<std::string, TimeProbabilityClass> > YellingSentences;
-*/
 typedef std::list<summonBlock> SummonSpells;
 
 class MonsterType{
@@ -163,17 +77,11 @@ public:
 	int health_max;
 	int lookhead, lookbody, looklegs, lookfeet, looktype, lookcorpse, lookmaster;
 	int immunities;
+	RaceType_t race;
 	
 	int lightLevel;
 	int lightColor;
 	
-	/*
-	InstantAttackSpells instantSpells;
-	RuneAttackSpells runeSpells;
-	PhysicalAttacks physicalAttacks;
-	YellingSentences yellingSentences;
-	*/
-
 	SummonSpells summonSpells; 
 
 	LootItems lootItems;

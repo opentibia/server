@@ -57,12 +57,9 @@ Creature()
 	lookLegs = mType->looklegs;
 	lookFeet = mType->lookfeet;
 	lookType = mType->looktype;
-	lookCorpse = mType->lookcorpse;
 	lookMaster = mType->lookmaster;
 	health     = mType->health;
 	healthMax  = mType->health_max;
-	lookCorpse = mType->lookcorpse;
-	immunities = mType->immunities;
 	speed = mType->base_speed;
 	level = mType->level;
 	magLevel = mType->magLevel;
@@ -198,9 +195,4 @@ void Monster::setNormalCreatureLight()
 {
 	internalLight.level = mType->lightLevel;
 	internalLight.color = mType->lightColor;
-}
-
-bool Monster::isAttackable() const
-{
-	return true;
 }

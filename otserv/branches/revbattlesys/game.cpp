@@ -1650,7 +1650,7 @@ bool Game::playerUseItemEx(Player* player, const Position& fromPos, uint8_t from
 bool Game::internalUseItemEx(Player* player, const Position& fromPos, Item* item, const Position& toPos, uint8_t toStackPos, uint16_t toSpriteId)
 {
 	AreaCombat area;
-	uint8_t arr[] = {1, 1, 1, 1};
+	uint8_t arr[] = {1, 1, 1};
 	std::vector<uint8_t> row(arr, arr + sizeof(arr) / sizeof(uint8_t));
 	area.setRow(0, row);
 	area.setRow(1, row);
@@ -2526,7 +2526,8 @@ void Game::checkCreature(uint32_t creatureId, uint32_t interval)
 
 void Game::changeSpeed(Creature* creature, int32_t speedDelta)
 {
-	creature->setSpeed(creature->getSpeed() + speedDelta);
+	uint32_t newSpeed = std::max((int32_t)1, ((int32_t)(creature->getSpeed())) + speedDelta);
+	creature->setSpeed(newSpeed);
 
 	SpectatorVec list;
 	SpectatorVec::iterator it;

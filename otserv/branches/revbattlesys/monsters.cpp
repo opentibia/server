@@ -34,6 +34,7 @@ MonsterType::MonsterType()
 
 void MonsterType::reset()
 {
+	race = RACE_BLOOD;
 	armor = 0;
 	experience = 0;
 	defense = 0;
@@ -57,22 +58,11 @@ void MonsterType::reset()
 	looklegs = 10;
 	lookfeet = 10;
 	looktype = 10;
-	lookcorpse = 1000;
+	lookcorpse = 0;
 	lookmaster = 10;
 	immunities = 0;
 	lightLevel = 0;
 	lightColor = 0;
-	
-	/*
-	for(std::map<PhysicalAttackClass*, TimeProbabilityClass>::iterator it = physicalAttacks.begin(); it != physicalAttacks.end(); ++it) {
-		delete it->first;
-	}
-	physicalAttacks.clear();
-	instantSpells.clear();
-	runeSpells.clear();
-
-	yellingSentences.clear();
-	*/
 
 	summonSpells.clear();
 	lootItems.clear();
@@ -80,13 +70,7 @@ void MonsterType::reset()
 
 MonsterType::~MonsterType()
 {
-	/*
-	for(std::map<PhysicalAttackClass*, TimeProbabilityClass>::iterator it = physicalAttacks.begin(); it != physicalAttacks.end(); ++it) {
-		delete it->first;
-	}
-
-	physicalAttacks.clear();
-	*/
+	//
 }
 
 unsigned long Monsters::getRandom()
@@ -377,6 +361,21 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 
 				if(readXMLInteger(p, "corpse", intValue)){
 					mType->lookcorpse = intValue;
+				}
+
+				if(readXMLInteger(p, "race", intValue)){
+					switch(intValue){
+						case 1:
+							mType->race = RACE_VENOM;
+							break;
+						case 2:
+							mType->race = RACE_BLOOD;
+							break;
+
+						case 3:
+							mType->race = RACE_UNDEAD;
+							break;
+					}
 				}
 			}
 			/*else if(xmlStrcmp(p->name, (const xmlChar*)"attacks") == 0){

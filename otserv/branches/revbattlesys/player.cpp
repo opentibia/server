@@ -78,6 +78,7 @@ Creature()
 
 	level      = 1;
 	experience = 180;
+	immunities = 0;
 	magLevel   = 20;
 	accessLevel = 0;
 	lastlogin  = 0;
@@ -716,7 +717,7 @@ void Player::closeContainer(uint32_t cid)
 #endif
 }
 
-int Player::getLookCorpse()
+uint16_t Player::getLookCorpse() const
 {
 	if(sex != 0)
 		return ITEM_MALE_CORPSE;

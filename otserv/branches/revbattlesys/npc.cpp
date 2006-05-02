@@ -140,12 +140,6 @@ Npc::Npc(const std::string& _name) :
 				}
 				else
 					lookFeet = 40;
-
-				if(readXMLInteger(p, "corpse", intValue)){
-					lookCorpse = intValue;
-				}
-				else
-					lookCorpse = 100;
 			}
 
 			p = p->next;

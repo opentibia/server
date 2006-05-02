@@ -38,32 +38,37 @@ Item* Item::CreateItem(const unsigned short _type, unsigned short _count /*= 1*/
 {
 	Item* newItem = NULL;
 
-	if(_type == ITEM_LOCKER1 || _type == ITEM_LOCKER2 || _type == ITEM_LOCKER3 || _type == ITEM_LOCKER4){
-		newItem = new Depot(_type);
-	}
-	else if(items[_type].isContainer()){
-		newItem = new Container(_type);
-	}
-	else if(items[_type].isTeleport()){
-		newItem = new Teleport(_type);
-	}
-	else if(items[_type].isMagicField()){
-		newItem = new MagicField(_type);
-	}
-	else if(items[_type].isDoor()){
-		newItem = new Door(_type);
-	}
-	else if(_type == ITEM_DUSTBIN){
-		newItem = new TrashHolder(_type /*, NM_ME_PUFF*/);
-	}
-	else if(_type == ITEM_MAILBOX1 || _type == ITEM_MAILBOX2 || _type == ITEM_MAILBOX3){
-		newItem = new Mailbox(_type);
-	}
-	else{
-		newItem = new Item(_type, _count);
-	}
+	const ItemType& it = Item::items[_type];
 	
-	newItem->useThing2();
+	if(it.id != 0){
+		if(_type == ITEM_LOCKER1 || _type == ITEM_LOCKER2 || _type == ITEM_LOCKER3 || _type == ITEM_LOCKER4){
+			newItem = new Depot(_type);
+		}
+		else if(it.isContainer()){
+			newItem = new Container(_type);
+		}
+		else if(it.isTeleport()){
+			newItem = new Teleport(_type);
+		}
+		else if(it.isMagicField()){
+			newItem = new MagicField(_type);
+		}
+		else if(it.isDoor()){
+			newItem = new Door(_type);
+		}
+		else if(_type == ITEM_DUSTBIN){
+			newItem = new TrashHolder(_type /*, NM_ME_PUFF*/);
+		}
+		else if(_type == ITEM_MAILBOX1 || _type == ITEM_MAILBOX2 || _type == ITEM_MAILBOX3){
+			newItem = new Mailbox(_type);
+		}
+		else{
+			newItem = new Item(_type, _count);
+		}
+
+		newItem->useThing2();
+	}
+
 	return newItem;
 }
 

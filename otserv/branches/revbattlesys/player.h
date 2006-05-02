@@ -385,7 +385,8 @@ protected:
 	Protocol* client;
 
 	int32_t accessLevel;
-	unsigned long experience;
+	uint32_t experience;
+	uint32_t immunities;
 	int32_t manaSpent;
 	Vocation_t vocation_id;
 	Vocation* vocation;
@@ -434,16 +435,7 @@ protected:
 	Player* tradePartner;
 	tradestate_t tradeState;
 	Item* tradeItem;
-	/*
-	//cache some data
-	struct SkillCache{
-		unsigned int tries;
-		int level;
-		Vocation_t vocation;
-	};
-	
-	SkillCache SkillAdvanceCache[7][2];
-	*/
+
 	struct SentStats{
 		int health;
 		int healthMax;
@@ -488,7 +480,8 @@ protected:
 
 	virtual int32_t getLostExperience() const { return (int32_t)std::floor(((double)experience * 0.1));}	
 	virtual void dropLoot(Container* corpse);
-	virtual int getLookCorpse();
+	virtual uint32_t getImmunities() const { return immunities; }
+	virtual uint16_t getLookCorpse() const;
 
 	friend OTSYS_THREAD_RETURN ConnectionHandler(void *dat);
 	

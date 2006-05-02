@@ -204,6 +204,7 @@ public:
 	Condition* getCondition(ConditionType_t type);
 	bool hasCondition(ConditionType_t type) const;
 	virtual bool isImmune(DamageType_t type) const;
+	virtual uint32_t getImmunities() const { return 0; }
 	virtual bool isAttackable() const { return true;};
 
 	virtual void changeHealth(int32_t healthChange);
@@ -256,14 +257,12 @@ protected:
 	int32_t level;
 	int32_t magLevel;
 
-	uint8_t lookType, lookHead, lookBody, lookLegs, lookFeet, lookCorpse, lookMaster;
+	uint8_t lookType, lookHead, lookBody, lookLegs, lookFeet, lookMaster;
 	uint16_t lookTypeEx;
 
 	Position masterPos;
 	uint64_t lastMove;
-
-	int32_t immunities;
-	int32_t speed;
+	uint32_t speed;
 
 	Direction direction;
 
@@ -295,7 +294,7 @@ protected:
 	virtual double getDamageRatio(Creature* attacker) const;
 	bool getKillers(Creature** lastHitCreature, Creature** mostDamageCreature);
 	virtual void dropLoot(Container* corpse) {};
-	virtual int getLookCorpse() {return lookCorpse;};
+	virtual uint16_t getLookCorpse() const { return 0; }
 
 	friend class Game;
 	friend class Map;

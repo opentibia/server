@@ -52,10 +52,12 @@ public:
 
 	bool canSee(const Position& pos) const;
 
-	virtual int getArmor() const {return mType->armor;}
-	virtual int getDefense() const {return mType->defense;}
-	virtual bool isPushable() const {return mType->pushable;}
-	virtual bool isAttackable() const;
+	virtual RaceType_t getRace() const { return mType->race; }
+
+	virtual int getArmor() const { return mType->armor; }
+	virtual int getDefense() const { return mType->defense; }
+	virtual bool isPushable() const { return mType->pushable; }
+	virtual bool isAttackable() const { return true;}
 	virtual void doAttacking();
 
 	virtual void setNormalCreatureLight();
@@ -74,8 +76,7 @@ public:
 	virtual bool getNextStep(Direction& dir);
 
 	bool canPushItems() const {return mType->canPushItems;}
-	bool isSummon() const //{ return isSummon; }
-		{ return false; }
+	bool isSummon() const { return false; }
 
 private:
 	std::string strDescription;
@@ -89,9 +90,11 @@ private:
 	void stopThink();
 	int getTargetDistance() {return mType->targetDistance;}
 
-	virtual int32_t getLostExperience() const //{return (isSummon() ? 0 : mType->experience);}
-	{return mType->experience;}
+	virtual int32_t getLostExperience() const { return (isSummon() ? 0 : mType->experience); }
+	virtual int getLookCorpse() { return mType->lookcorpse; }
 	virtual void dropLoot(Container* corpse);
+	virtual uint32_t getImmunities() const { return mType->immunities; }
+	virtual uint16_t getLookCorpse() const { return mType->lookcorpse; }
 };
 
 #endif
