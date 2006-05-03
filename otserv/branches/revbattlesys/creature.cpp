@@ -454,19 +454,18 @@ void Creature::removeCondition(ConditionType_t type)
 void Creature::executeConditions(int32_t newticks)
 {
 	for(ConditionList::iterator it = conditions.begin(); it != conditions.end();){
-		(*it)->setTicks((*it)->getTicks() - newticks);
-		if((*it)->getTicks() <= 0){
+		if((*it)->reduceTicks(newticks)){
+			(*it)->executeCondition(this, newticks);
+			++it;
+		}
+		else{
 			ConditionType_t type = (*it)->getType();
-
+			
 			(*it)->endCondition(this, REASON_ENDTICKS);
 			delete *it;
 			it = conditions.erase(it);
-
+			
 			onEndCondition(type);
-		}
-		else{
-			(*it)->executeCondition(this, newticks);
-			++it;
 		}
 	}
 }

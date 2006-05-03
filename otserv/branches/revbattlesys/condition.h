@@ -66,6 +66,7 @@ public:
 	ConditionType_t getType() const { return conditionType;}
 	int32_t getTicks() const { return ticks; }
 	void setTicks(int32_t newTicks) { ticks = newTicks; }
+	bool reduceTicks(int32_t interval);
 
 	static Condition* createCondition(ConditionType_t _type, int32_t ticks, int32_t param);
 

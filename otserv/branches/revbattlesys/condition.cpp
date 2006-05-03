@@ -33,6 +33,17 @@ Condition::Condition() :
 	//
 }
 
+bool Condition::endTicks(int32_t interval)
+{
+	ticks = ticks - interval;
+	if(ticks > 0){
+		return true;
+	}
+	else{
+		return false;
+	}
+}
+
 Condition* Condition::createCondition(ConditionType_t _type, int32_t _ticks, int32_t param)
 {
 	switch((int32_t)_type){
