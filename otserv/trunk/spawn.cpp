@@ -74,11 +74,11 @@ bool SpawnManager::loadSpawnsXML(std::string filename)
 		spawnNode = root->children;
 		while(spawnNode){
 			if(xmlStrcmp(spawnNode->name, (const xmlChar*)"spawn") == 0){
-				Position centerpos;
+				Position centerPos;
 				int radius;
 
 				if(readXMLInteger(spawnNode, "centerx", intValue)){
-					centerpos.x = intValue;
+					centerPos.x = intValue;
 				}
 				else{
 					xmlFreeDoc(doc);
@@ -86,7 +86,7 @@ bool SpawnManager::loadSpawnsXML(std::string filename)
 				}
 
 				if(readXMLInteger(spawnNode, "centery", intValue)){
-					centerpos.y = intValue;
+					centerPos.y = intValue;
 				}
 				else{
 					xmlFreeDoc(doc);
@@ -94,7 +94,7 @@ bool SpawnManager::loadSpawnsXML(std::string filename)
 				}
 
 				if(readXMLInteger(spawnNode, "centerz", intValue)){
-					centerpos.z = intValue;
+					centerPos.z = intValue;
 				}
 				else{
 					xmlFreeDoc(doc);
@@ -109,12 +109,12 @@ bool SpawnManager::loadSpawnsXML(std::string filename)
 					return false;
 				}
 
-				Spawn* spawn = new Spawn(centerpos, radius);
+				Spawn* spawn = new Spawn(centerPos, radius);
 				spawns.push_back(spawn);
 
 				std::string name;
 				int x, y, spawntime;
-				Direction direction = NORTH;
+				Direction dir = NORTH;
 				int rawdir = 0; //NORTH
 
 				xmlNodePtr tmpNode = spawnNode->children;
@@ -158,17 +158,17 @@ bool SpawnManager::loadSpawnsXML(std::string filename)
 						}
 
 						switch(rawdir){
-							case 0: direction = NORTH; break;
-							case 1: direction = EAST; break;
-							case 2: direction = SOUTH; break;
-							case 3: direction = WEST; break;
+							case 0: dir = NORTH; break;
+							case 1: dir = EAST; break;
+							case 2: dir = SOUTH; break;
+							case 3: dir = WEST; break;
 
 							default:
-								direction = NORTH;
+								dir = NORTH;
 								break;
 						}
 
-						spawn->addMonster(name, direction, x, y, spawntime * 1000);
+						spawn->addMonster(name, dir, x, y, spawntime * 1000);
 					}
 					else if(xmlStrcmp(tmpNode->name, (const xmlChar*)"npc") == 0){
 
@@ -179,7 +179,38 @@ bool SpawnManager::loadSpawnsXML(std::string filename)
 							tmpNode = tmpNode->next;
 							continue;
 						}
+						
+						if(readXMLInteger(tmpNode, "direction", intValue)){
+							rawdir = intValue;
+						}
 
+						if(readXMLInteger(tmpNode, "x", intValue)){
+							x = intValue;
+						}
+						else{
+							tmpNode = tmpNode->next;
+							continue;
+						}
+
+						if(readXMLInteger(tmpNode, "y", intValue)){
+							y = intValue;
+						}
+						else{
+							tmpNode = tmpNode->next;
+							continue;
+						}
+
+						switch(rawdir){
+							case 0: dir = NORTH; break;
+							case 1: dir = EAST; break;
+							case 2: dir = SOUTH; break;
+							case 3: dir = WEST; break;
+
+							default:
+								dir = NORTH;
+								break;
+						}
+						
 						Npc* npc = new Npc(name);
 						if(!npc->isLoaded()){
 							delete npc;
@@ -188,8 +219,14 @@ bool SpawnManager::loadSpawnsXML(std::string filename)
 							continue;
 						}
 						
+						npc->setDirection(dir);
+
+						Position placePos = centerPos;
+						placePos.x += x;
+						placePos.y += y;
+
 						// Place the npc
-						if(!g_game.placeCreature(centerpos, npc)){
+						if(!g_game.placeCreature(placePos, npc)){
 							delete npc;
 
 							tmpNode = tmpNode->next;
