@@ -54,6 +54,7 @@ protected:
 	bool banPlayer(Creature* creature, const std::string& cmd, const std::string& param);
 	bool teleportMasterPos(Creature* creature, const std::string& cmd, const std::string& param);
 	bool teleportHere(Creature* creature, const std::string& cmd, const std::string& param);
+	bool teleportToTown(Creature* creature, const std::string& cmd, const std::string& param);
 	bool teleportTo(Creature* creature, const std::string& cmd, const std::string& param);
 	bool createItemById(Creature* creature, const std::string& cmd, const std::string& param);
 	bool createItemByName(Creature* creature, const std::string& cmd, const std::string& param);

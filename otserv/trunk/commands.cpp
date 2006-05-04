@@ -36,6 +36,7 @@ typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 #include "tools.h"
 #include "ban.h"
 #include "luascript.h"
+#include "town.h"
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
@@ -75,6 +76,7 @@ s_defcommands Commands::defined_commands[] = {
 	{"/gethouse",&Commands::getHouse},
 	{"/bans",&Commands::bansManager},
 	{"/exiva",&Commands::exivaPlayer},
+	{"/town",&Commands::teleportToTown},
 };
 
 
@@ -509,6 +511,27 @@ bool Commands::testCommand(Creature* creature, const std::string& cmd, const std
 	}
 
 	return true;
+}
+
+bool Commands::teleportToTown(Creature* creature, const std::string& cmd, const std::string& param)
+{
+    std::string tmp = param;
+    Player* player = creature->getPlayer();
+    
+    if(!player)
+        return false;
+            
+    Town* town = Towns::getInstance().getTown(tmp);
+    if(town){
+        if(game->internalTeleport(creature, town->getTemplePosition()) == RET_NOERROR) {
+            game->AddMagicEffectAt(town->getTemplePosition(), NM_ME_ENERGY_AREA);
+            return true;
+        }
+    }
+    
+    player->sendCancel("Could not find the town.");
+    
+    return false;    
 }
 
 bool Commands::teleportTo(Creature* creature, const std::string& cmd, const std::string& param)
