@@ -33,7 +33,7 @@ Condition::Condition() :
 	//
 }
 
-bool Condition::endTicks(int32_t interval)
+bool Condition::reduceTicks(int32_t interval)
 {
 	ticks = ticks - interval;
 	if(ticks > 0){
