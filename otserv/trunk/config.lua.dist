@@ -8,7 +8,7 @@ datadir = "data/"
 
 -- map
 -- sets what map to load, if sql, determines the sql map
-map = "data/world/map.otx"
+map = "data/world/map.otbm"
 mapstore = "data/world/map-mapstore.xml"
 housestore = "data/world/map-housestore.xml"
 houserentperiod = "monthly"
