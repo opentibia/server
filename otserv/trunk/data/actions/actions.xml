@@ -28,17 +28,17 @@
 <action itemid="1946" script="switch.lua" />
 <action itemid="2006" script="fluids.lua" />
 
-<action uniqueid="2000" script="quest.lua" />
-<action uniqueid="2001" script="quest.lua" />
-<action uniqueid="2002" script="quest.lua" />
-<action actionid="5000" script="quest.lua" />
-<action actionid="5001" script="quest.lua" />
-
 <action itemid="1985" script="summon.lua" />
-
 <action itemid="2062" script="money.lua" />
-
 <action itemid="2542" script="changevoc.lua" />
-
 <action itemid="2063" script="remove.lua" />
+
+
+<action uniqueid="1002" script="w-helmet.lua" />
+<action uniqueid="1003" script="doublesd.lua" />
+<action uniqueid="1004" script="undead.lua" />
+<action uniqueid="1005" script="undead2.lua" />
+<action uniqueid="1006" script="evilhole.lua" />
+<action uniqueid="1007" script="dsm.lua" />
+
 </actions>
