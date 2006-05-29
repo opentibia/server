@@ -40,5 +40,7 @@
 <action uniqueid="1005" script="undead2.lua" />
 <action uniqueid="1006" script="evilhole.lua" />
 <action uniqueid="1007" script="dsm.lua" />
+<action uniqueid="1008" script="witch1.lua" />
+<action uniqueid="1009" script="witch2.lua" />
 
 </actions>

@@ -392,9 +392,6 @@
 <spawn centerx="166" centery="104" centerz="7" radius="5">
 <monster name="Wolf" x="2" y="-3" spawntime="60"/>
 </spawn>
-<spawn centerx="184" centery="99" centerz="7" radius="5">
-<monster name="Wolf" x="2" y="3" spawntime="60"/>
-</spawn>
 <spawn centerx="183" centery="144" centerz="7" radius="5">
 <monster name="Deer" x="-4" y="1" spawntime="60"/>
 </spawn>
@@ -864,14 +861,109 @@
 <spawn centerx="126" centery="349" centerz="7" radius="5">
 <monster name="Dragon" x="0" y="-1" spawntime="60"/>
 </spawn>
-<spawn centerx="192" centery="121" centerz="7" radius="5">
-<monster name="Wild Warrior" x="-2" y="-3" spawntime="60"/>
+<spawn centerx="191" centery="113" centerz="7" radius="5">
+<monster name="Wild Warrior" x="-1" y="-3" spawntime="60"/>
 </spawn>
-<spawn centerx="197" centery="129" centerz="7" radius="5">
+<spawn centerx="193" centery="126" centerz="7" radius="5">
 <monster name="Wild Warrior" x="3" y="-3" spawntime="60"/>
 </spawn>
-<spawn centerx="189" centery="129" centerz="7" radius="5">
+<spawn centerx="187" centery="119" centerz="7" radius="5">
 <monster name="Wild Warrior" x="-4" y="-2" spawntime="60"/>
-<monster name="Wild Warrior" x="2" y="2" spawntime="60"/>
+<monster name="Wild Warrior" x="3" y="2" spawntime="60"/>
+</spawn>
+<spawn centerx="222" centery="83" centerz="7" radius="5">
+<monster name="Amazon" x="0" y="-2" spawntime="60"/>
+<monster name="Amazon" x="-2" y="1" spawntime="60"/>
+</spawn>
+<spawn centerx="222" centery="83" centerz="6" radius="5">
+<monster name="Valkyrie" x="1" y="0" spawntime="60"/>
+<monster name="Valkyrie" x="0" y="0" spawntime="60"/>
+</spawn>
+<spawn centerx="221" centery="82" centerz="5" radius="5">
+<monster name="Amazon" x="-1" y="-1" spawntime="60"/>
+<monster name="Amazon" x="2" y="1" spawntime="60"/>
+<monster name="Valkyrie" x="2" y="-1" spawntime="60"/>
+</spawn>
+<spawn centerx="222" centery="82" centerz="4" radius="5">
+<monster name="Valkyrie" x="-2" y="-1" spawntime="60"/>
+<monster name="Valkyrie" x="1" y="1" spawntime="60"/>
+<monster name="Amazon" x="-1" y="0" spawntime="60"/>
+</spawn>
+<spawn centerx="222" centery="82" centerz="2" radius="5">
+<monster name="Witch" x="-2" y="-1" spawntime="60"/>
+<monster name="Witch" x="1" y="2" spawntime="60"/>
+<monster name="Valkyrie" x="1" y="0" spawntime="60"/>
+</spawn>
+<spawn centerx="220" centery="111" centerz="7" radius="5">
+<monster name="Amazon" x="-1" y="-1" spawntime="60"/>
+<monster name="Amazon" x="1" y="0" spawntime="60"/>
+<monster name="Amazon" x="-1" y="3" spawntime="60"/>
+<monster name="Amazon" x="-3" y="-4" spawntime="60"/>
+</spawn>
+<spawn centerx="242" centery="107" centerz="7" radius="5">
+<monster name="Valkyrie" x="-1" y="0" spawntime="60"/>
+<monster name="Amazon" x="2" y="1" spawntime="60"/>
+<monster name="Amazon" x="3" y="0" spawntime="60"/>
+<monster name="Smuggler" x="-2" y="-4" spawntime="60"/>
+</spawn>
+<spawn centerx="256" centery="120" centerz="7" radius="5">
+<monster name="Valkyrie" x="0" y="0" spawntime="60"/>
+<monster name="Smuggler" x="2" y="-3" spawntime="60"/>
+<monster name="Valkyrie" x="1" y="4" spawntime="60"/>
+<monster name="Wild Warrior" x="-3" y="1" spawntime="60"/>
+</spawn>
+<spawn centerx="242" centery="89" centerz="7" radius="5">
+<monster name="Amazon" x="-1" y="0" spawntime="60"/>
+<monster name="Amazon" x="-3" y="-4" spawntime="60"/>
+<monster name="Amazon" x="3" y="3" spawntime="60"/>
+</spawn>
+<spawn centerx="209" centery="77" centerz="7" radius="5">
+<monster name="Witch" x="0" y="-3" spawntime="60"/>
+<monster name="Wild Warrior" x="4" y="2" spawntime="60"/>
+<monster name="Wild Warrior" x="-2" y="0" spawntime="60"/>
+<monster name="Valkyrie" x="3" y="-2" spawntime="60"/>
+</spawn>
+<spawn centerx="230" centery="98" centerz="7" radius="5">
+<monster name="Smuggler" x="3" y="3" spawntime="60"/>
+<monster name="Smuggler" x="-3" y="0" spawntime="60"/>
+<monster name="Valkyrie" x="3" y="-2" spawntime="60"/>
+</spawn>
+<spawn centerx="209" centery="105" centerz="7" radius="5">
+<monster name="Amazon" x="-2" y="3" spawntime="60"/>
+<monster name="Amazon" x="2" y="4" spawntime="60"/>
+<monster name="Bandit" x="-1" y="-2" spawntime="60"/>
+<monster name="Bandit" x="2" y="-4" spawntime="60"/>
+</spawn>
+<spawn centerx="224" centery="125" centerz="7" radius="5">
+<monster name="Bandit" x="-3" y="-1" spawntime="60"/>
+<monster name="Bandit" x="2" y="4" spawntime="60"/>
+<monster name="Smuggler" x="3" y="-1" spawntime="60"/>
+<monster name="Smuggler" x="-2" y="3" spawntime="60"/>
+</spawn>
+<spawn centerx="238" centery="134" centerz="7" radius="5">
+<monster name="Bandit" x="0" y="-4" spawntime="60"/>
+<monster name="Smuggler" x="2" y="3" spawntime="60"/>
+<monster name="Smuggler" x="-3" y="1" spawntime="60"/>
+<monster name="Smuggler" x="1" y="0" spawntime="60"/>
+</spawn>
+<spawn centerx="264" centery="107" centerz="7" radius="5">
+<monster name="Wild Warrior" x="-4" y="-3" spawntime="60"/>
+<monster name="Wild Warrior" x="3" y="2" spawntime="60"/>
+<monster name="Wild Warrior" x="-2" y="4" spawntime="60"/>
+<monster name="Hunter" x="3" y="-1" spawntime="60"/>
+<monster name="Smuggler" x="-2" y="1" spawntime="60"/>
+</spawn>
+<spawn centerx="258" centery="85" centerz="7" radius="5">
+<monster name="Hunter" x="-1" y="1" spawntime="60"/>
+<monster name="Smuggler" x="3" y="-2" spawntime="60"/>
+<monster name="Smuggler" x="2" y="3" spawntime="60"/>
+<monster name="Wild Warrior" x="-3" y="3" spawntime="60"/>
+<monster name="Wild Warrior" x="-1" y="-1" spawntime="60"/>
+</spawn>
+<spawn centerx="268" centery="76" centerz="7" radius="5">
+<monster name="Hunter" x="-2" y="-3" spawntime="60"/>
+<monster name="Hunter" x="4" y="1" spawntime="60"/>
+<monster name="Smuggler" x="-1" y="2" spawntime="60"/>
+<monster name="Witch" x="3" y="-2" spawntime="60"/>
 </spawn>
 </spawns>
