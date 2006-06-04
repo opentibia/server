@@ -595,6 +595,7 @@ bool IOPlayerXML::savePlayer(Player* player)
 		sb << *it;
 		xmlSetProp(pn, (const xmlChar*)"playerguid", (const xmlChar*)sb.str().c_str());
 		sb.str("");
+		xmlAddChild(sn, pn);
 	}
 
 	xmlAddChild(root, sn);
