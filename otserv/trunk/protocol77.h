@@ -21,8 +21,8 @@
 //////////////////////////////////////////////////////////////////////
 
 
-#ifndef __OTSERV_PROTOCOL76_H__
-#define __OTSERV_PROTOCOL76_H__
+#ifndef __OTSERV_PROTOCOL77_H__
+#define __OTSERV_PROTOCOL77_H__
 
 #include <string>
 #include "protocol.h"
@@ -30,11 +30,11 @@
 class NetworkMessage;
 class Creature;
 
-class Protocol76 : public Protocol
+class Protocol77 : public Protocol
 {
 public:
-	Protocol76(SOCKET s);
-	virtual ~Protocol76();
+	Protocol77(SOCKET s);
+	virtual ~Protocol77();
 	
 	connectResult_t ConnectPlayer();
 	void ReceiveLoop();  

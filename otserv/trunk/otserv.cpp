@@ -29,7 +29,7 @@
 
 #include "otsystem.h"
 #include "networkmessage.h"
-#include "protocol76.h"
+#include "protocol77.h"
 
 #include <stdlib.h>
 #include <time.h>
@@ -337,8 +337,8 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 						}
 				
 						if(s){
-							Protocol76* protocol;
-							protocol = new Protocol76(s);
+							Protocol77* protocol;
+							protocol = new Protocol77(s);
 							protocol->setKey(k);
 							player = new Player(name, protocol);
 							player->useThing2();
