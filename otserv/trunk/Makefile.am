@@ -4,7 +4,7 @@ noinst_PROGRAMS = otserv
 
 
 AM_CXXFLAGS = $(XML_CPPFLAGS) $(OTSERV_FLAGS) $(LUA50_CFLAGS) $(MYSQL_FLAGS) $(PROFILER_FLAGS) -D_THREAD_SAFE -D_REENTRANT -Werror
-otserv_LDADD = $(XML_LIBS) $(LUA50_LIBS) $(BOOST_LIBS) -ldl
+otserv_LDADD = $(XML_LIBS) $(LUA50_LIBS) $(BOOST_LIBS) $(GMP_LIBS) -ldl
 if USE_MYSQL
 otserv_SOURCES = account.cpp container.cpp creature.cpp game.cpp ioaccount.cpp \
 	iomapxml.cpp ioplayer.cpp ioplayerxml.h ioplayerxml.cpp ioaccountxml.cpp ioaccountxml.h \
@@ -22,7 +22,7 @@ otserv_SOURCES = account.cpp container.cpp creature.cpp game.cpp ioaccount.cpp \
 	trashholder.cpp trashholder.h mailbox.cpp mailbox.h waitlist.cpp waitlist.h \
 	house.cpp house.h housetile.cpp housetile.h iomapserialize.cpp iomapserialize.h \
 	iomapserializesql.cpp iomapserializesql.h iomapserializexml.cpp iomapserializexml.h \
-	cylinder.cpp cylinder.h ban.cpp ban.h
+	cylinder.cpp cylinder.h ban.cpp ban.h rsa.cpp rsa.h
 else
 otserv_SOURCES = account.cpp container.cpp creature.cpp game.cpp ioaccount.cpp \
 	ioaccountxml.cpp iomapxml.cpp ioplayer.cpp ioplayerxml.cpp \
@@ -39,5 +39,6 @@ otserv_SOURCES = account.cpp container.cpp creature.cpp game.cpp ioaccount.cpp \
 	iomapotbm.h iomapotbm.cpp monsters.h monsters.cpp teleport.cpp teleport.h \
 	trashholder.cpp trashholder.h mailbox.cpp mailbox.h waitlist.cpp waitlist.h \
 	house.cpp house.h housetile.cpp housetile.h iomapserialize.cpp iomapserialize.h \
-	iomapserializexml.cpp iomapserializexml.h cylinder.cpp cylinder.h ban.cpp ban.h
+	iomapserializexml.cpp iomapserializexml.h cylinder.cpp cylinder.h ban.cpp ban.h \
+	rsa.cpp rsa.h
 endif

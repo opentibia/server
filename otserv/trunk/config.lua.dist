@@ -20,6 +20,15 @@ mapkind = "XML"
 -- bans
 banIdentifier = "data/bans.xml"
 
+-- how many logins attempts until ip is temporary disabled (set to 0 to disable)
+logintries = 5
+
+-- how long the retry timeout until a new login can be made (without disabling the ip)
+retrytimeout = 5000
+
+-- how long the player need to wait until the ip is allowed again
+logintimeout = 15 * 60 * 1000
+
 -- loginmsg
 -- the message the player gets when he logs in
 loginmsg = "Welcome to OTServ. For help visit http://www.otfans.net"

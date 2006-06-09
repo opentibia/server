@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// Implementation of tibia v7.6 protocoll
+// Implementation of tibia v7.7x protocoll
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -68,13 +68,16 @@ Protocol76::~Protocol76()
 	OTSYS_THREAD_LOCKVARRELEASE(bufferLock);	
 }
 
-void Protocol76::reinitializeProtocol()
+void Protocol76::reinitializeProtocol(SOCKET _s)
 {
 	windowTextID = 0;
 	readItem = NULL;
 	maxTextLenght = 0;
 	OutputBuffer.Reset();
 	knownPlayers.clear();
+	if(s)
+		closesocket(s);
+	s = _s;
 }
 
 connectResult_t Protocol76::ConnectPlayer()
@@ -104,6 +107,8 @@ connectResult_t Protocol76::ConnectPlayer()
 void Protocol76::ReceiveLoop()
 {
 	NetworkMessage msg;
+	msg.setEncryptionState(true);
+	msg.setEncryptionKey(m_key);
 	do{
 		while(pendingLogout == false && msg.ReadFromSocket(s)){
 			parsePacket(msg);
@@ -122,8 +127,14 @@ void Protocol76::ReceiveLoop()
 
 			OTSYS_THREAD_LOCK(game->gameLock, "Protocol76::ReceiveLoop()")
 
-			if(s == 0 && !player->isRemoved()){
-				game->removeCreature(player);
+			if(!player->isRemoved()){
+				if(s == 0){
+					game->removeCreature(player);
+				}
+				else{
+					//set new key after reattaching
+					msg.setEncryptionKey(m_key);
+				}
 			}
 			
 			OTSYS_THREAD_UNLOCK(game->gameLock, "Protocol76::ReceiveLoop()")
@@ -845,27 +856,27 @@ void Protocol76::parseRequestOutfit(NetworkMessage& msg)
 	msg.Reset();
 	
 	msg.AddByte(0xC8);
-	msg.AddByte(player->looktype);
+	msg.AddU16(player->looktype);
 	msg.AddByte(player->lookhead);
 	msg.AddByte(player->lookbody);
 	msg.AddByte(player->looklegs);
 	msg.AddByte(player->lookfeet);
 	switch (player->getSex()) {
 	case PLAYERSEX_FEMALE:
-		msg.AddByte(PLAYER_FEMALE_1);
-		msg.AddByte(PLAYER_FEMALE_7);
+		msg.AddU16(PLAYER_FEMALE_1);
+		msg.AddU16(PLAYER_FEMALE_7);
 		break;
 	case PLAYERSEX_MALE:
-		msg.AddByte(PLAYER_MALE_1);
-		msg.AddByte(PLAYER_MALE_7);
+		msg.AddU16(PLAYER_MALE_1);
+		msg.AddU16(PLAYER_MALE_7);
 		break;
 	case PLAYERSEX_OLDMALE:
-		msg.AddByte(160);
-		msg.AddByte(160);
+		msg.AddU16(160);
+		msg.AddU16(160);
 		break;
 	default:
-		msg.AddByte(PLAYER_MALE_1);
-		msg.AddByte(PLAYER_MALE_7);
+		msg.AddU16(PLAYER_MALE_1);
+		msg.AddU16(PLAYER_MALE_7);
 	}
 	
 	WriteBuffer(msg);
@@ -873,7 +884,7 @@ void Protocol76::parseRequestOutfit(NetworkMessage& msg)
 
 void Protocol76::parseSetOutfit(NetworkMessage& msg)
 {
-	int temp = msg.GetByte();
+	int temp = msg.GetU16();
 	if ( (player->getSex() == PLAYERSEX_FEMALE && temp >= PLAYER_FEMALE_1 && temp <= PLAYER_FEMALE_7) ||
 		(player->getSex() == PLAYERSEX_MALE && temp >= PLAYER_MALE_1 && temp <= PLAYER_MALE_7))
 	{
@@ -1173,7 +1184,7 @@ void Protocol76::sendSetOutfit(const Creature* creature)
 		NetworkMessage newmsg;
 		newmsg.AddByte(0x8E);
 		newmsg.AddU32(creature->getID());
-		newmsg.AddByte(creature->looktype);
+		newmsg.AddU16(creature->looktype);
 		newmsg.AddByte(creature->lookhead);
 		newmsg.AddByte(creature->lookbody);
 		newmsg.AddByte(creature->looklegs);
@@ -1899,7 +1910,8 @@ void Protocol76::AddCreature(NetworkMessage &msg,const Creature *creature, bool 
 	
 	msg.AddByte((unsigned char)creature->getDirection());
 	
-	msg.AddByte(creature->looktype);
+	msg.AddU16(creature->looktype);
+	
 	msg.AddByte(creature->lookhead);
 	msg.AddByte(creature->lookbody);
 	msg.AddByte(creature->looklegs);
@@ -1965,6 +1977,7 @@ void Protocol76::AddPlayerSkills(NetworkMessage& msg)
 void Protocol76::AddCreatureSpeak(NetworkMessage &msg,const Creature *creature, SpeakClasses  type, std::string text, unsigned short channelId)
 {
 	msg.AddByte(0xAA);
+	msg.AddU32(0);
 	msg.AddString(creature->getName());
 	msg.AddByte(type);
 	switch(type){
@@ -2231,4 +2244,11 @@ void Protocol76::WriteBuffer(NetworkMessage& add)
 	OutputBuffer.JoinMessages(add);	
 	OTSYS_THREAD_UNLOCK(bufferLock, "Protocol76::WriteBuffer")	
 	return;
+}
+
+void Protocol76::setKey(const unsigned long* key)
+{
+	memcpy(m_key, key, 16);
+	OutputBuffer.setEncryptionState(true);
+	OutputBuffer.setEncryptionKey(key);
 }

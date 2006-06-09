@@ -32,14 +32,36 @@ extern LuaScript g_config;
 
 IOBan* IOBan::_instance = NULL;
 
-bool Ban::isIpBanished(SOCKET s)
+unsigned long getIP(SOCKET s)
 {
 	sockaddr_in sain;
 	socklen_t salen = sizeof(sockaddr_in);
 	
 	if(getpeername(s, (sockaddr*)&sain, &salen) == 0){
 		unsigned long clientip = *(unsigned long*)&sain.sin_addr;
+		return clientip;
+	}
 
+	return 0;
+}
+
+Ban::Ban()
+{
+	OTSYS_THREAD_LOCKVARINIT(banLock);
+}
+
+void Ban::init()
+{
+	maxLoginTries = (uint32_t)g_config.getGlobalNumber("logintries", 3);
+	retryTimeout = (uint32_t)g_config.getGlobalNumber("retrytimeout", 30 * 1000) / 1000;
+	loginTimeout = (uint32_t)g_config.getGlobalNumber("logintimeout", 5 * 1000) / 1000;
+}
+
+bool Ban::isIpBanished(SOCKET s)
+{
+	OTSYS_THREAD_LOCK_CLASS lockClass(banLock);
+	unsigned long clientip = getIP(s);
+	if(clientip != 0){
 		for(IpBanList::iterator it = ipBanList.begin(); it !=  ipBanList.end(); ++it){
 			if((it->ip & it->mask) == (clientip & it->mask)){
 				uint32_t currentTime = std::time(NULL);
@@ -49,11 +71,66 @@ bool Ban::isIpBanished(SOCKET s)
 			}
 		}
 	}
+
 	return false;
+}
+
+bool Ban::isIpDisabled(SOCKET s)
+{
+	OTSYS_THREAD_LOCK_CLASS lockClass(banLock);
+	if(maxLoginTries == 0){
+		return false;
+	}
+
+	unsigned long clientip = getIP(s);
+	if(clientip != 0){
+		uint32_t currentTime = std::time(NULL);
+		IpLoginMap::const_iterator it = ipLoginMap.find(clientip);
+		if(it != ipLoginMap.end()){
+			if( (it->second.numberOfLogins >= maxLoginTries) && 
+				(currentTime < it->second.lastLoginTime + loginTimeout) ){
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+void Ban::addConnectionAttempt(SOCKET s, bool isSuccess)
+{
+	OTSYS_THREAD_LOCK_CLASS lockClass(banLock);
+	unsigned long clientip = getIP(s);
+	if(clientip != 0){
+		uint32_t currentTime = std::time(NULL);
+
+		IpLoginMap::iterator it = ipLoginMap.find(clientip);
+		if(it == ipLoginMap.end()){
+			LoginConnectionStruct lcs;
+			lcs.lastLoginTime = 0;
+			lcs.numberOfLogins = 0;
+
+			ipLoginMap[clientip] = lcs;
+			it = ipLoginMap.find(clientip);
+		}
+
+		if(it->second.numberOfLogins >= maxLoginTries){
+			it->second.numberOfLogins = 0;
+		}
+
+		if(!isSuccess || (currentTime < it->second.lastLoginTime + retryTimeout) ){
+			++it->second.numberOfLogins;
+		}
+		else 
+			it->second.numberOfLogins = 0;
+
+		it->second.lastLoginTime = currentTime;
+	}
 }
 
 bool Ban::isPlayerBanished(const std::string& name)
 {
+	OTSYS_THREAD_LOCK_CLASS lockClass(banLock);
 	unsigned long playerId;
 	std::string playerName = name;
 	if(!IOPlayer::instance()->getGuidByName(playerId, playerName)){
@@ -72,6 +149,7 @@ bool Ban::isPlayerBanished(const std::string& name)
 
 bool Ban::isAccountBanished(const unsigned long account)
 {
+	OTSYS_THREAD_LOCK_CLASS lockClass(banLock);
 	uint32_t currentTime = std::time(NULL);
 	for(AccountBanList::iterator it = accountBanList.begin(); it !=  accountBanList.end(); ++it){
    		if(it->id  == account){
@@ -86,6 +164,7 @@ bool Ban::isAccountBanished(const unsigned long account)
 
 void Ban::addIpBan(unsigned long ip, unsigned long mask, unsigned long time)
 {
+	OTSYS_THREAD_LOCK_CLASS lockClass(banLock);
 	for(IpBanList::iterator it = ipBanList.begin(); it !=  ipBanList.end(); ++it){
 		if(it->ip == ip && it->mask == mask){
 			it->time = time;
@@ -98,6 +177,7 @@ void Ban::addIpBan(unsigned long ip, unsigned long mask, unsigned long time)
 
 void Ban::addPlayerBan(unsigned long playerId, unsigned long time)
 {
+	OTSYS_THREAD_LOCK_CLASS lockClass(banLock);
 	for(PlayerBanList::iterator it = playerBanList.begin(); it !=  playerBanList.end(); ++it){
 		if(it->id == playerId){
 			it->time = time;
@@ -110,6 +190,7 @@ void Ban::addPlayerBan(unsigned long playerId, unsigned long time)
 
 void Ban::addAccountBan(unsigned long account, unsigned long time)
 {
+	OTSYS_THREAD_LOCK_CLASS lockClass(banLock);
 	for(AccountBanList::iterator it = accountBanList.begin(); it !=  accountBanList.end(); ++it){
 		if(it->id == account){
 			it->time = time;
@@ -122,6 +203,7 @@ void Ban::addAccountBan(unsigned long account, unsigned long time)
 
 bool Ban::removeIpBan(unsigned long n)
 {
+	OTSYS_THREAD_LOCK_CLASS lockClass(banLock);
 	for(IpBanList::iterator it = ipBanList.begin(); it !=  ipBanList.end(); ++it){
 		--n;
 		if(n == 0){
@@ -134,6 +216,7 @@ bool Ban::removeIpBan(unsigned long n)
 
 bool Ban::removePlayerBan(unsigned long n)
 {
+	OTSYS_THREAD_LOCK_CLASS lockClass(banLock);
 	for(PlayerBanList::iterator it = playerBanList.begin(); it !=  playerBanList.end(); ++it){
 		--n;
 		if(n == 0){
@@ -146,6 +229,7 @@ bool Ban::removePlayerBan(unsigned long n)
 
 bool Ban::removeAccountBan(unsigned long n)
 {
+	OTSYS_THREAD_LOCK_CLASS lockClass(banLock);
 	for(AccountBanList::iterator it = accountBanList.begin(); it !=  accountBanList.end(); ++it){
 		--n;
 		if(n == 0){

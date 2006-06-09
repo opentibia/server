@@ -34,6 +34,12 @@ struct IpBanStruct{
 		time = _time;
 	}
 };
+
+struct LoginConnectionStruct{
+	unsigned long lastLoginTime;
+	unsigned long numberOfLogins;
+};
+
 struct idBan{
 	unsigned long id;
 	unsigned long time;
@@ -48,6 +54,7 @@ typedef idBan AccountBanStruct;
 typedef std::list< IpBanStruct > IpBanList;
 typedef std::list< PlayerBanStruct > PlayerBanList;
 typedef std::list< AccountBanStruct > AccountBanList;
+typedef std::map<unsigned long, LoginConnectionStruct > IpLoginMap;
 
 enum BanType_t{
   BAN_IPADDRESS = 1,
@@ -57,16 +64,19 @@ enum BanType_t{
 
 class Ban{
 public:	
-	Ban(){};
+	Ban();
 	~Ban(){};
+	void init();
 	
 	bool isIpBanished(SOCKET s);
 	bool isPlayerBanished(const std::string& name);
 	bool isAccountBanished(const unsigned long account);
-	
+	bool isIpDisabled(SOCKET s);
+
 	void addIpBan(unsigned long ip, unsigned long mask, unsigned long time);
 	void addPlayerBan(unsigned long playerId, unsigned long time);
 	void addAccountBan(unsigned long account, unsigned long time);
+	void addConnectionAttempt(SOCKET s, bool isSuccess);
 	
 	bool removeIpBan(unsigned long n);
 	bool removePlayerBan(unsigned long n);
@@ -84,6 +94,13 @@ protected:
 	IpBanList ipBanList;
 	PlayerBanList playerBanList;
 	AccountBanList accountBanList;
+	IpLoginMap ipLoginMap;
+
+	unsigned long loginTimeout;
+	unsigned long maxLoginTries;
+	unsigned long retryTimeout;
+	
+	OTSYS_THREAD_LOCKVAR banLock;
 
 	friend class IOBanSQL;
 	friend class IOBanXML;

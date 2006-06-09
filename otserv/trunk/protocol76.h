@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// The protocoll for the clients version 7.6
+// The protocoll for the clients version 7.7x
 // the newer clients still use the same protocoll just with a 
 // prequel defined in the 6.5 protocoll
 //////////////////////////////////////////////////////////////////////
@@ -39,17 +39,87 @@ public:
 	connectResult_t ConnectPlayer();
 	void ReceiveLoop();  
 	void WriteBuffer(NetworkMessage &add);
-	virtual void reinitializeProtocol();
+	virtual void reinitializeProtocol(SOCKET s);
 	
-private:
-	NetworkMessage OutputBuffer;
-	std::list<unsigned long> knownPlayers;
-	void checkCreatureAsKnown(unsigned long id, bool &known, unsigned long &removedKnown);
+	virtual void setKey(const unsigned long* key);
 	
 	virtual bool CanSee(int x, int y, int z) const;
 	virtual bool CanSee(const Creature*) const;
 	virtual bool CanSee(const Position& pos) const;
 	virtual void logout();
+	
+	
+	//Send functions
+	virtual void sendClosePrivate(unsigned short channelId);
+	virtual void sendChannelsDialog();
+	virtual void sendChannel(unsigned short channelId, std::string channelName);
+	virtual void sendOpenPriv(const std::string& receiver);
+	virtual void sendToChannel(const Creature *creature, SpeakClasses type, const std::string &text, unsigned short channelId);
+	
+	virtual void sendIcons(int icons);
+
+	virtual void sendDistanceShoot(const Position &from, const Position &to, unsigned char type);
+	virtual void sendMagicEffect(const Position &pos, unsigned char type);
+	virtual void sendAnimatedText(const Position &pos, unsigned char color, std::string text);
+	virtual void sendCreatureHealth(const Creature *creature);
+	virtual void sendSkills();
+	virtual void sendPing();
+	virtual void sendCreatureTurn(const Creature *creature, unsigned char stackpos);
+	virtual void sendCreatureSay(const Creature *creature, SpeakClasses type, const std::string &text);
+	
+	virtual void sendCancel(const char *msg);
+	virtual void sendCancelWalk();
+	virtual void sendChangeSpeed(const Creature* creature);
+	virtual void sendCancelTarget();
+	virtual void sendSetOutfit(const Creature* creature);
+	virtual void sendStats();
+	virtual void sendTextMessage(MessageClasses mclass, const char* message);
+	virtual void sendTextMessage(MessageClasses mclass, const char* message,const Position &pos, unsigned char type);
+	
+	virtual void sendTradeItemRequest(const Player* player, const Item* item, bool ack);
+	virtual void sendCloseTrade();
+	
+	virtual void sendTextWindow(Item* item,const unsigned short maxlen, const bool canWrite);
+	virtual void sendHouseWindow(House* house, unsigned long listid, const std::string& text);
+	
+	virtual void sendVIPLogIn(unsigned long guid);
+	virtual void sendVIPLogOut(unsigned long guid);
+	virtual void sendVIP(unsigned long guid, const std::string &name, bool isOnline);
+	
+	virtual void sendCreatureLight(const Creature* creature);
+	virtual void sendWorldLight(const LightInfo& lightInfo);
+	
+	virtual void sendCreatureSkull(const Creature* creature);
+	virtual void sendCreatureShield(const Creature* creature);
+	virtual void sendCreatureSquare(const Creature* creature, SquareColor color);
+	
+	//tiles
+	virtual void sendAddTileItem(const Position& pos, const Item* item);
+	virtual void sendUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* item);
+	virtual void sendRemoveTileItem(const Position& pos, uint32_t stackpos);
+	virtual void UpdateTile(const Position& pos);
+
+	virtual void sendAddCreature(const Creature* creature, bool isLogin);
+	virtual void sendRemoveCreature(const Creature* creature, const Position& pos, uint32_t stackpos, bool isLogout);
+	virtual void sendMoveCreature(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport);
+	//virtual void sendTeleportCreature(const Creature* creature, const Position& oldPos, uint32_t oldStackPos);
+
+	//containers
+	virtual void sendAddContainerItem(uint8_t cid, const Item* item);
+	virtual void sendUpdateContainerItem(uint8_t cid, uint8_t slot, const Item* item);
+	virtual void sendRemoveContainerItem(uint8_t cid, uint8_t slot);
+
+	virtual void sendContainer(uint32_t cid, const Container* container, bool hasParent);
+	virtual void sendCloseContainer(uint32_t cid);
+
+	//inventory
+	virtual void sendAddInventoryItem(slots_t slot, const Item* item);
+	virtual void sendUpdateInventoryItem(slots_t slot, const Item* item);
+	virtual void sendRemoveInventoryItem(slots_t slot);
+	
+	
+protected:
+	void checkCreatureAsKnown(unsigned long id, bool &known, unsigned long &removedKnown);
 	
 	void flushOutputBuffer();
 	void WriteMsg(NetworkMessage& msg);
@@ -120,74 +190,6 @@ private:
 
 	void parseDebug(NetworkMessage& msg);
 
-	//Send functions
-	virtual void sendClosePrivate(unsigned short channelId);
-	virtual void sendChannelsDialog();
-	virtual void sendChannel(unsigned short channelId, std::string channelName);
-	virtual void sendOpenPriv(const std::string& receiver);
-	virtual void sendToChannel(const Creature *creature, SpeakClasses type, const std::string &text, unsigned short channelId);
-	
-	virtual void sendIcons(int icons);
-
-	virtual void sendDistanceShoot(const Position &from, const Position &to, unsigned char type);
-	virtual void sendMagicEffect(const Position &pos, unsigned char type);
-	virtual void sendAnimatedText(const Position &pos, unsigned char color, std::string text);
-	virtual void sendCreatureHealth(const Creature *creature);
-	virtual void sendSkills();
-	virtual void sendPing();
-	virtual void sendCreatureTurn(const Creature *creature, unsigned char stackpos);
-	virtual void sendCreatureSay(const Creature *creature, SpeakClasses type, const std::string &text);
-	
-	virtual void sendCancel(const char *msg);
-	virtual void sendCancelWalk();
-	virtual void sendChangeSpeed(const Creature* creature);
-	virtual void sendCancelTarget();
-	virtual void sendSetOutfit(const Creature* creature);
-	virtual void sendStats();
-	virtual void sendTextMessage(MessageClasses mclass, const char* message);
-	virtual void sendTextMessage(MessageClasses mclass, const char* message,const Position &pos, unsigned char type);
-	
-	virtual void sendTradeItemRequest(const Player* player, const Item* item, bool ack);
-	virtual void sendCloseTrade();
-	
-	virtual void sendTextWindow(Item* item,const unsigned short maxlen, const bool canWrite);
-	virtual void sendHouseWindow(House* house, unsigned long listid, const std::string& text);
-	
-	virtual void sendVIPLogIn(unsigned long guid);
-	virtual void sendVIPLogOut(unsigned long guid);
-	virtual void sendVIP(unsigned long guid, const std::string &name, bool isOnline);
-	
-	virtual void sendCreatureLight(const Creature* creature);
-	virtual void sendWorldLight(const LightInfo& lightInfo);
-	
-	virtual void sendCreatureSkull(const Creature* creature);
-	virtual void sendCreatureShield(const Creature* creature);
-	virtual void sendCreatureSquare(const Creature* creature, SquareColor color);
-	
-	//tiles
-	virtual void sendAddTileItem(const Position& pos, const Item* item);
-	virtual void sendUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* item);
-	virtual void sendRemoveTileItem(const Position& pos, uint32_t stackpos);
-	virtual void UpdateTile(const Position& pos);
-
-	virtual void sendAddCreature(const Creature* creature, bool isLogin);
-	virtual void sendRemoveCreature(const Creature* creature, const Position& pos, uint32_t stackpos, bool isLogout);
-	virtual void sendMoveCreature(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport);
-	//virtual void sendTeleportCreature(const Creature* creature, const Position& oldPos, uint32_t oldStackPos);
-
-	//containers
-	void sendAddContainerItem(uint8_t cid, const Item* item);
-	void sendUpdateContainerItem(uint8_t cid, uint8_t slot, const Item* item);
-	void sendRemoveContainerItem(uint8_t cid, uint8_t slot);
-
-	virtual void sendContainer(uint32_t cid, const Container* container, bool hasParent);
-	virtual void sendCloseContainer(uint32_t cid);
-
-	//inventory
-	virtual void sendAddInventoryItem(slots_t slot, const Item* item);
-	virtual void sendUpdateInventoryItem(slots_t slot, const Item* item);
-	virtual void sendRemoveInventoryItem(slots_t slot);
-
 	//Help functions
 
 	// translate a tile to clientreadable format
@@ -236,13 +238,18 @@ private:
 	void UpdateInventoryItem(NetworkMessage& msg, slots_t slot, const Item* item);
 	void RemoveInventoryItem(NetworkMessage& msg, slots_t slot);
 
+	NetworkMessage OutputBuffer;
+	std::list<unsigned long> knownPlayers;
+
 	OTSYS_THREAD_LOCKVAR bufferLock;
 	unsigned long windowTextID;
 	Item* readItem;
 	int maxTextLenght;
-	
+		
 	House* house;
 	unsigned long listId;
+	
+	unsigned long m_key[4];
 	
 	friend OTSYS_THREAD_RETURN ConnectionHandler(void *dat);
 };

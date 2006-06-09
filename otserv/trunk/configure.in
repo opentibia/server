@@ -60,9 +60,15 @@ PKG_CHECK_MODULES(LUA50, lualib50 >= 5.0.0, , AC_MSG_ERROR([you need lua and lua
 AC_SUBST(LUA50_CFLAGS)
 AC_SUBST(LUA50_LIBS)
 
+# check for boost
 AC_CHECK_HEADERS([boost/config.hpp boost/bind.hpp],[BOOST_LIBS="-lboost_thread-gcc-mt -lboost_regex-gcc-mt"],[AC_MSG_ERROR("boost headers are missing.")])
 AC_SUBST(BOOST_LIBS)
 
+# check for gmp
+AC_CHECK_HEADERS([gmp.h],[GMP_LIBS="-lgmp"],[AC_MSG_ERROR("gmp header is missing.")])
+AC_SUBST(GMP_LIBS)
+
+# check for mysql if it is enabled
 if test -n "$MYSQL_FLAGS"; then 
    AC_CHECK_HEADERS([mysql/mysql.h],[MYSQL_LIBS=-lmysql],[AC_MSG_ERROR("mysql-client missing.")])
    AC_CHECK_LIB(mysqlclient, main,[],[AC_MSG_ERROR("Linking against mysql-client failed.")])

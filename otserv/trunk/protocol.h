@@ -45,6 +45,7 @@ public:
 	virtual ~Protocol();
 	
 	void setPlayer(Player* p);
+	virtual void setKey(const unsigned long* key) = 0;
 	unsigned long getIP() const;
 	
 	virtual bool CanSee(int x, int y, int z) const = 0;
@@ -54,7 +55,7 @@ public:
 	virtual void sleepTillMove();
 	virtual void flushOutputBuffer() = 0;
 	virtual void logout() = 0;
-	virtual void reinitializeProtocol() = 0;
+	virtual void reinitializeProtocol(SOCKET s) = 0;
 	
 	//tile
 	virtual void sendAddTileItem(const Position& pos, const Item* item) = 0;

@@ -35,65 +35,72 @@ class Position;
 class NetworkMessage
 {
 public:
-  // constructor/destructor
-  NetworkMessage();
-  virtual ~NetworkMessage();
+	// constructor/destructor
+	NetworkMessage();
+	~NetworkMessage();
+
+	// resets the internal buffer to an empty message
+	void Reset();
+
+	// socket functions
+	bool ReadFromSocket(SOCKET socket);
+	bool WriteToSocket(SOCKET socket);
+
+	// simply read functions for incoming message
+	unsigned char  GetByte();
+	unsigned short GetU16();
+	unsigned short GetItemId();
+	unsigned int   GetU32();
+	std::string    GetString();
+	std::string	 GetRaw();
+	Position       GetPosition();
+
+	void setEncryptionState(bool state);
+	void setEncryptionKey(const unsigned long* key);
+
+	// skips count unknown/unused bytes in an incoming message
+	void SkipBytes(int count);
+
+	// simply write functions for outgoing message
+	void AddByte(unsigned char  value);
+	void AddU16 (unsigned short value);
+	void AddU32 (unsigned int   value);
+
+	void AddString(const std::string &value);
+	void AddString(const char* value);
 
 
-  // resets the internal buffer to an empty message
-  void Reset();
-
-
-  // socket functions
-  bool ReadFromSocket(SOCKET socket);
-  bool WriteToSocket(SOCKET socket);
-
-
-  // simply read functions for incoming message
-  unsigned char  GetByte();
-  unsigned short GetU16();
-  unsigned short GetItemId();
-  unsigned int   GetU32();
-  std::string    GetString();
-  std::string	 GetRaw();
-  Position       GetPosition();
-
-
-  // skips count unknown/unused bytes in an incoming message
-  void SkipBytes(int count);
-
-
-  // simply write functions for outgoing message
-  void AddByte(unsigned char  value);
-  void AddU16 (unsigned short value);
-  void AddU32 (unsigned int   value);
-
-  void AddString(const std::string &value);
-  void AddString(const char* value);
-
-
-  // write functions for complex types
-  void AddPosition(const Position &pos);
+	// write functions for complex types
+	void AddPosition(const Position &pos);
 	void AddItem(unsigned short id, unsigned char count);
 	void AddItem(const Item *item);
 	void AddItemId(const Item *item);
-  void AddCreature(const Creature *creature, bool known, unsigned int remove);
+	void AddCreature(const Creature *creature, bool known, unsigned int remove);
 
-  int getMessageLength(){
-      return m_MsgSize;
-      }
-
+  	int getMessageLength(){
+		return m_MsgSize;
+	}
+	
 	void JoinMessages(NetworkMessage &add);
 
-	
-protected:
-  inline bool canAdd(int size){
-    return (size + m_ReadPos < NETWORKMESSAGE_MAXSIZE - 16);
-  };
-  int m_MsgSize;
-  int m_ReadPos;
+	bool RSA_decrypt();
 
-  unsigned char m_MsgBuf[NETWORKMESSAGE_MAXSIZE];
+protected:
+	inline bool canAdd(int size){
+    	return (size + m_ReadPos < NETWORKMESSAGE_MAXSIZE - 16);
+  	};
+  	
+  	void XTEA_encrypt();
+  	void XTEA_decrypt();
+  	
+  	int m_MsgSize;
+  	int m_ReadPos;
+
+	unsigned char m_MsgBuf[NETWORKMESSAGE_MAXSIZE];
+	
+	bool m_encryptionEnabled;
+	bool m_keyset;
+	unsigned long m_key[4];
 };
 
 
