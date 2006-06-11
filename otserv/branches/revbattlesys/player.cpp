@@ -588,25 +588,25 @@ std::string Player::getSkillName(int skillid)
 {
 	std::string skillname;
 	switch(skillid){
-	case 0:
+	case SKILL_FIST:
 		skillname = "fist fighting"; 
 		break;
-	case 1:
+	case SKILL_CLUB:
 		skillname = "club fighting";
 		break;
-	case 2:
+	case SKILL_SWORD:
 		skillname = "sword fighting";
 		break;
-	case 3:
+	case SKILL_AXE:
 		skillname = "axe fighting";
 		break;
-	case 4:
+	case SKILL_DIST:
 		skillname = "distance fighting";
 		break;
-	case 5:
+	case SKILL_SHIELD:
 		skillname = "shielding";
 		break;
-	case 6:
+	case SKILL_FISH:
 		skillname = "fishing";
 		break;
 	default:
