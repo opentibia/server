@@ -22,11 +22,13 @@
 #include <string>
 #include <sstream>
 
+#include "configmanager.h"
 #include "monster.h"
 #include "monsters.h"
 #include "spells.h"
 #include "game.h"
 
+extern ConfigManager g_config;
 extern Spells spells;
 extern Game g_game;
 
@@ -79,7 +81,7 @@ Creature()
 }
 
 unsigned long Monster::getRandom(){
-	return (unsigned long)((rand()<< 16 | rand()) % CHANCE_MAX);
+	return (unsigned long)(((rand()<< 16 | rand()) % CHANCE_MAX) / g_config.getNumber(ConfigManager::RATE_LOOT));
 }
 
 

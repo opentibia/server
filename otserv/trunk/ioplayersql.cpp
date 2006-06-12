@@ -23,7 +23,7 @@
 #include "ioplayersql.h"
 #include "ioaccount.h"
 #include "item.h"
-#include "luascript.h"
+#include "configmanager.h"
 #include "database.h"
 #include "tools.h"
 
@@ -38,7 +38,7 @@
 #include <hash_map>
 #endif
 
-extern LuaScript g_config;
+extern ConfigManager g_config;
 
 typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 
@@ -47,10 +47,10 @@ typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 
 IOPlayerSQL::IOPlayerSQL()
 {
-	m_host = g_config.getGlobalString("sql_host");
-	m_user = g_config.getGlobalString("sql_user");
-	m_pass = g_config.getGlobalString("sql_pass");
-	m_db   = g_config.getGlobalString("sql_db");
+	m_host = g_config.getString(ConfigManager::SQL_HOST);
+	m_user = g_config.getString(ConfigManager::SQL_USER);
+	m_pass = g_config.getString(ConfigManager::SQL_PASS);
+	m_db   = g_config.getString(ConfigManager::SQL_DB);
 }
 
 bool IOPlayerSQL::loadPlayer(Player* player, std::string name)

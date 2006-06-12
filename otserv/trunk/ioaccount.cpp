@@ -25,11 +25,6 @@
 #endif
 #include "ioaccountxml.h"
 
-#ifdef __USE_MYSQL__
-#include "luascript.h"
-extern LuaScript g_config;
-#endif
-
 IOAccount* IOAccount::_instance = NULL;
 
 IOAccount* IOAccount::instance(){

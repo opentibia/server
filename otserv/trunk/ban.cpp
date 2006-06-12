@@ -21,14 +21,14 @@
 
 #include "ban.h"
 #include "ioplayer.h"
-#include "luascript.h"
+#include "configmanager.h"
 #include <sstream>
 
 #ifdef __USE_MYSQL__
 #include "database.h"
 #endif
 
-extern LuaScript g_config;
+extern ConfigManager g_config;
 
 IOBan* IOBan::_instance = NULL;
 
@@ -52,9 +52,9 @@ Ban::Ban()
 
 void Ban::init()
 {
-	maxLoginTries = (uint32_t)g_config.getGlobalNumber("logintries", 3);
-	retryTimeout = (uint32_t)g_config.getGlobalNumber("retrytimeout", 30 * 1000) / 1000;
-	loginTimeout = (uint32_t)g_config.getGlobalNumber("logintimeout", 5 * 1000) / 1000;
+	maxLoginTries = (uint32_t)g_config.getNumber(ConfigManager::LOGIN_TRIES);
+	retryTimeout = (uint32_t)g_config.getNumber(ConfigManager::RETRY_TIMEOUT) / 1000;
+	loginTimeout = (uint32_t)g_config.getNumber(ConfigManager::LOGIN_TIMEOUT) / 1000;
 }
 
 bool Ban::isIpBanished(SOCKET s)
@@ -281,10 +281,10 @@ IOBan* IOBan::getInstance()
 
 IOBanSQL::IOBanSQL()
 {
-	m_host = g_config.getGlobalString("sql_host");
-	m_user = g_config.getGlobalString("sql_user");
-	m_pass = g_config.getGlobalString("sql_pass");
-	m_db   = g_config.getGlobalString("sql_db");
+	m_host = g_config.getString(ConfigManager::SQL_HOST);
+	m_user = g_config.getString(ConfigManager::SQL_USER);
+	m_pass = g_config.getString(ConfigManager::SQL_PASS);
+	m_db   = g_config.getString(ConfigManager::SQL_DB);
 }
 
 

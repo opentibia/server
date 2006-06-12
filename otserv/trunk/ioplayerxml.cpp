@@ -26,7 +26,7 @@
 #include "item.h"
 #include "player.h"
 #include "tools.h"
-#include "luascript.h"
+#include "configmanager.h"
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
@@ -34,7 +34,7 @@
 
 xmlMutexPtr xmlmutex;
 
-extern LuaScript g_config;
+extern ConfigManager g_config;
 
 IOPlayerXML::IOPlayerXML()
 {
@@ -45,7 +45,7 @@ IOPlayerXML::IOPlayerXML()
 
 bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 {
-	std::string datadir = g_config.getGlobalString("datadir");
+	std::string datadir = g_config.getString(ConfigManager::DATA_DIRECTORY);
 	std::string filename = datadir + "players/" + name + ".xml";
 	toLowerCaseString(filename); //all players are saved as lowercase
 
@@ -454,7 +454,7 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 
 bool IOPlayerXML::savePlayer(Player* player)
 {
-	std::string datadir = g_config.getGlobalString("datadir");
+	std::string datadir = g_config.getString(ConfigManager::DATA_DIRECTORY);
 	std::string filename = datadir + "players/" + player->getName() + ".xml";
 	toLowerCaseString(filename); //store all player files in lowercase
 
@@ -627,7 +627,7 @@ bool IOPlayerXML::getGuidByName(unsigned long& guid, std::string& name)
 bool IOPlayerXML::getGuidByNameEx(unsigned long& guid, unsigned long& alvl, std::string& name)
 {
 	//load players.xml to get guid
-	std::string datadir = g_config.getGlobalString("datadir");
+	std::string datadir = g_config.getString(ConfigManager::DATA_DIRECTORY);
 	std::string playersfile = datadir + "players/" + "players.xml";
 
 	xmlDocPtr doc = xmlParseFile(playersfile.c_str());
@@ -709,7 +709,7 @@ bool IOPlayerXML::getGuidByNameEx(unsigned long& guid, unsigned long& alvl, std:
 
 bool IOPlayerXML::getNameByGuid(unsigned long guid, std::string &name)
 {
-	std::string datadir = g_config.getGlobalString("datadir");
+	std::string datadir = g_config.getString(ConfigManager::DATA_DIRECTORY);
 	std::string filename = datadir + "players/" + "players.xml";
 
 	xmlDocPtr doc = xmlParseFile(filename.c_str());
@@ -762,7 +762,7 @@ bool IOPlayerXML::getGuildIdByName(unsigned long& guildId, const std::string& gu
 
 bool IOPlayerXML::playerExists(std::string name)
 {
-	std::string datadir = g_config.getGlobalString("datadir");
+	std::string datadir = g_config.getString(ConfigManager::DATA_DIRECTORY);
 	std::string filename = datadir + "players/" + name + ".xml";
 	std::transform(filename.begin(), filename.end(), filename.begin(), tolower);
 

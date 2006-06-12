@@ -33,11 +33,11 @@ using namespace std;
 #include "protocol.h"
 #include "player.h"
 #include "ioplayer.h"
-#include "luascript.h"
+#include "configmanager.h"
 #include "chat.h"
 #include "house.h"
 
-extern LuaScript g_config;
+extern ConfigManager g_config;
 extern Game g_game;
 extern Chat g_chat;
 
@@ -191,7 +191,7 @@ std::string Player::getDescription(int32_t lookDistance) const
 		s << "yourself.";
 
 		if(vocation != VOCATION_NONE)
-			s << " You are " << g_config.getGlobalStringField("vocations", (int)vocation) << ".";
+			s << " You are " << g_config.getVocationString((int)vocation) << ".";
 		else
 			s << " You have no vocation.";
 	}
@@ -204,7 +204,7 @@ std::string Player::getDescription(int32_t lookDistance) const
 			s << " He";	
 			
 		if(vocation != VOCATION_NONE)
-			s << " is "<< g_config.getGlobalStringField("vocations", (int)vocation) << ".";
+			s << " is "<< g_config.getVocationString((int)vocation) << ".";
 		else
 			s << " has no vocation.";
 	}
@@ -553,7 +553,8 @@ std::string Player::getSkillName(int skillid)
 
 void Player::addSkillTryInternal(int skilltry,int skill)
 {
-	skills[skill][SKILL_TRIES] += skilltry;
+	skills[skill][SKILL_TRIES] += skilltry * g_config.getNumber(ConfigManager::RATE_SKILL);
+	
 	//for skill level advances
 	//int reqTries = (int) ( SkillBases[skill] * pow((float) VocMultipliers[skill][voc], (float) ( skills[skill][SKILL_LEVEL] - 10) ) );			 
 #if __DEBUG__
@@ -1491,7 +1492,7 @@ void Player::addManaSpent(unsigned long spent)
 	if(spent == 0)
 		return;
 
-	manaspent += spent;
+	manaspent += spent * g_config.getNumber(ConfigManager::RATE_MAGIC);
 	int reqMana = getReqMana(maglevel + 1, vocation);
 	if(access == 0 && manaspent >= reqMana){
 		manaspent -= reqMana;

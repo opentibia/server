@@ -20,16 +20,16 @@
 
 #include "iomapserializesql.h"
 #include "house.h"
-#include "luascript.h"
+#include "configmanager.h"
 
-extern LuaScript g_config;
+extern ConfigManager g_config;
 
 IOMapSerializeSQL::IOMapSerializeSQL()
 {
-	m_host = g_config.getGlobalString("sql_host");
-	m_user = g_config.getGlobalString("sql_user");
-	m_pass = g_config.getGlobalString("sql_pass");
-	m_db   = g_config.getGlobalString("sql_db");
+	m_host = g_config.getString(ConfigManager::SQL_HOST);
+	m_user = g_config.getString(ConfigManager::SQL_USER);
+	m_pass = g_config.getString(ConfigManager::SQL_PASS);
+	m_db   = g_config.getString(ConfigManager::SQL_DB);
 }
 
 IOMapSerializeSQL::~IOMapSerializeSQL()

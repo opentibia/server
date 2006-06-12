@@ -33,12 +33,14 @@
 #include "player.h"
 #include "monster.h"
 #include "game.h"
+#include "configmanager.h"
 
 OTSYS_THREAD_LOCKVAR AutoID::autoIDLock;
 unsigned long AutoID::count = 1000;
 AutoID::list_type AutoID::list;
 
 extern Game g_game;
+extern ConfigManager g_config;
 
 Creature::Creature() :
 	access(0)
@@ -266,7 +268,7 @@ int Creature::getGainedExperience(Creature* attacker)
 		gainexperience = (int)std::floor(((double)attackerdamage / totaldamage) * lostexperience);
 	}
 	
-	return gainexperience;
+	return (gainexperience * g_config.getNumber(ConfigManager::RATE_EXPERIENCE));
 }
 
 std::vector<long> Creature::getInflicatedDamageCreatureList()

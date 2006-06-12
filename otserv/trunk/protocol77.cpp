@@ -40,7 +40,7 @@
 
 #include <stdio.h>
 
-#include "luascript.h"
+#include "configmanager.h"
 
 #include "otsystem.h"
 #include "actions.h"
@@ -49,7 +49,7 @@
 #include "house.h"
 #include "waitlist.h"
 
-extern LuaScript g_config;
+extern ConfigManager g_config;
 extern Actions actions;
 Chat g_chat;
 
@@ -1608,7 +1608,7 @@ void Protocol77::sendAddCreature(const Creature* creature, bool isLogin)
 			//player light level
 			AddCreatureLight(msg, creature);
 			
-			std::string tempstring = g_config.getGlobalString("loginmsg", "Welcome.").c_str();
+			std::string tempstring = g_config.getString(ConfigManager::LOGIN_MSG);
 			if(tempstring.size() > 0){
 				AddTextMessage(msg, MSG_STATUS_DEFAULT, tempstring.c_str());
 			}

@@ -44,7 +44,7 @@
 #include "actions.h"
 #include "commands.h"
 
-#include "luascript.h"
+#include "configmanager.h"
 #include "account.h"
 
 #include "tools.h"
@@ -87,7 +87,7 @@ OTSYS_THREAD_LOCK_CLASS::LogList OTSYS_THREAD_LOCK_CLASS::loglist;
 typedef std::vector< std::pair<unsigned long, unsigned long> > IPList;
 IPList serverIPs;
 
-LuaScript g_config;
+ConfigManager g_config;
 
 Items Item::items;
 ReverseItemMap Items::revItems;
@@ -231,9 +231,9 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 							// seems to be a successful load
 							msg.AddByte(0x14);
 							std::stringstream motd;
-							motd << g_config.getGlobalString("motdnum");
+							motd << g_config.getNumber(ConfigManager::MOTD_NUM);
 							motd << "\n";
-							motd << g_config.getGlobalString("motd");
+							motd << g_config.getString(ConfigManager::MOTD);
 							msg.AddString(motd.str());
 					
 							msg.AddByte(0x64);
@@ -244,7 +244,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 								msg.AddString((*it));
 								msg.AddString("OpenTibia");
 								msg.AddU32(serverip);
-								msg.AddU16(atoi(g_config.getGlobalString("port").c_str()));
+								msg.AddU16(g_config.getNumber(ConfigManager::PORT));
 							}
 					
 							msg.AddU16(account.premDays);
@@ -324,7 +324,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 						bool playerexist = (player != NULL);
 						if(player){
 							//reattach player?
-							if(player->client->s == 0 && !player->isRemoved() && !g_config.getGlobalNumber("allowclones", 0)){
+							if(player->client->s == 0 && !player->isRemoved() && !g_config.getNumber(ConfigManager::ALLOW_CLONES)){
 								player->lastlogin = std::time(NULL);
 								player->client->setKey(k);
 								player->client->reinitializeProtocol(s);
@@ -357,7 +357,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 								msg.AddString("Your account is banished!");
 								msg.WriteToSocket(s);
 							}
-							else if(playerexist && !g_config.getGlobalNumber("allowclones", 0)){
+							else if(playerexist && !g_config.getNumber(ConfigManager::ALLOW_CLONES)){
 								#ifdef __DEBUG_PLAYERS__
 								std::cout << "reject player..." << std::endl;
 								#endif
@@ -544,9 +544,9 @@ int main(int argc, char *argv[])
 	std::string configpath;
 	configpath = getenv("HOME");
 	configpath += "/.otserv/config.lua";
-	if (!g_config.OpenFile(configpath.c_str()))
+	if (!g_config.loadFile(configpath))
 #else
-	if (!g_config.OpenFile("config.lua"))
+	if (!g_config.loadFile("config.lua"))
 #endif
 	{
 		ErrorMessage("Unable to load config.lua!");
@@ -567,7 +567,7 @@ int main(int argc, char *argv[])
 	//load bans
 	std::cout << ":: Loading bans... ";
 	g_bans.init();
-	if(!g_bans.loadBans(g_config.getGlobalString("banIdentifier"))){
+	if(!g_bans.loadBans(g_config.getString(ConfigManager::BAN_FILE))){
 		ErrorMessage("Unable to load bans!");
 		return -1;
 	}
@@ -576,9 +576,9 @@ int main(int argc, char *argv[])
 	//load spells data
 	std::stringstream filename;
 	filename.str("");
-	filename << g_config.getGlobalString("datadir") << "spells/spells.xml";
+	filename << g_config.getString(ConfigManager::DATA_DIRECTORY) << "spells/spells.xml";
 	std::cout << ":: Loading " << filename.str() << "... ";
-	if(!spells.loadFromXml(g_config.getGlobalString("datadir"))){
+	if(!spells.loadFromXml(g_config.getString(ConfigManager::DATA_DIRECTORY))){
 		std::stringstream errormsg;
 		errormsg << "Unable to load " << filename.str() << "!";
 		ErrorMessage(errormsg.str().c_str());
@@ -588,9 +588,9 @@ int main(int argc, char *argv[])
 	
 	//load actions data
 	filename.str("");
-	filename << g_config.getGlobalString("datadir") << "actions/actions.xml";
+	filename << g_config.getString(ConfigManager::DATA_DIRECTORY) << "actions/actions.xml";
 	std::cout << ":: Loading " << filename.str() << "... ";
-	if(!actions.loadFromXml(g_config.getGlobalString("datadir"))){
+	if(!actions.loadFromXml(g_config.getString(ConfigManager::DATA_DIRECTORY))){
 		std::stringstream errormsg;
 		errormsg << "Unable to load " << filename.str() << "!";
 		ErrorMessage(errormsg.str().c_str());
@@ -600,9 +600,9 @@ int main(int argc, char *argv[])
 	
 	//load commands
 	filename.str("");
-	filename << g_config.getGlobalString("datadir") << "commands.xml";
+	filename << g_config.getString(ConfigManager::DATA_DIRECTORY) << "commands.xml";
 	std::cout << ":: Loading " << filename.str() << "... ";
-	if(!commands.loadXml(g_config.getGlobalString("datadir"))){
+	if(!commands.loadXml(g_config.getString(ConfigManager::DATA_DIRECTORY))){
 		std::stringstream errormsg;
 		errormsg << "Unable to load " << filename.str() << "!";
 		ErrorMessage(errormsg.str().c_str());
@@ -612,7 +612,7 @@ int main(int argc, char *argv[])
 	
 	// load item data
 	filename.str("");
-	filename << g_config.getGlobalString("datadir") << "items/items.otb";
+	filename << g_config.getString(ConfigManager::DATA_DIRECTORY) << "items/items.otb";
 	std::cout << ":: Loading " << filename.str() << "... ";
 	if(Item::items.loadFromOtb(filename.str())){
 		std::stringstream errormsg;
@@ -624,9 +624,9 @@ int main(int argc, char *argv[])
 	
 	// load monster data
 	filename.str("");
-	filename << g_config.getGlobalString("datadir") << "monsters/monsters.xml";
+	filename << g_config.getString(ConfigManager::DATA_DIRECTORY) << "monsters/monsters.xml";
 	std::cout << ":: Loading " << filename.str() << "... ";
-	if(!g_monsters.loadFromXml(g_config.getGlobalString("datadir"))){
+	if(!g_monsters.loadFromXml(g_config.getString(ConfigManager::DATA_DIRECTORY))){
 		std::stringstream errormsg;
 		errormsg << "Unable to load " << filename.str() << "!";
 		ErrorMessage(errormsg.str().c_str());
@@ -634,7 +634,7 @@ int main(int argc, char *argv[])
 	}
 	std::cout << "[done]" << std::endl;
 		
-	std::string worldType = g_config.getGlobalString("worldtype");
+	std::string worldType = g_config.getString(ConfigManager::WORLD_TYPE);
 	std::transform(worldType.begin(), worldType.end(), worldType.begin(), upchar);
 
 	if(worldType == "PVP")
@@ -653,7 +653,7 @@ int main(int argc, char *argv[])
 	std::cout << ":: Skulls enabled" << std::endl;
 	#endif
 
-	if(g_config.getGlobalString("md5passwords") == "yes"){
+	if(g_config.getString(ConfigManager::MD5_PASS) == "yes"){
 		passwordType = PASSWORD_TYPE_MD5;
 		std::cout << ":: Use MD5 passwords" << std::endl;
 	}
@@ -661,7 +661,7 @@ int main(int argc, char *argv[])
 		passwordType = PASSWORD_TYPE_PLAIN;
 	}
 
-	if(!g_game.loadMap(g_config.getGlobalString("map"), g_config.getGlobalString("mapkind"))){
+	if(!g_game.loadMap(g_config.getString(ConfigManager::MAP_FILE), g_config.getString(ConfigManager::MAP_KIND))){
 		return -1;
 	}
 	
@@ -722,7 +722,7 @@ int main(int argc, char *argv[])
 	if(argc > 1)
 		ip = argv[1];
 	else
-		ip = g_config.getGlobalString("ip", "127.0.0.1");
+		ip = g_config.getString(ConfigManager::IP);
 	
 	std::cout << ip << std::endl << "::" << std::endl;
 	
@@ -732,7 +732,7 @@ int main(int argc, char *argv[])
 	std::cout << ":: Starting Server... ";
 	
 	Status* status = Status::instance();
-	status->playersmax = g_config.getGlobalNumber("maxplayers");
+	status->playersmax = g_config.getNumber(ConfigManager::MAX_PLAYERS);
 	
 	// start the server listen...
 	int listen_errors;
@@ -743,7 +743,7 @@ int main(int argc, char *argv[])
 		memset(&local_adress, 0, sizeof(sockaddr_in)); // zero the struct 
 	
 		local_adress.sin_family      = AF_INET;
-		local_adress.sin_port        = htons(atoi(g_config.getGlobalString("port").c_str()));
+		local_adress.sin_port        = htons(g_config.getNumber(ConfigManager::PORT));
 		local_adress.sin_addr.s_addr = htonl(INADDR_ANY);
 	
 		// first we create a new socket

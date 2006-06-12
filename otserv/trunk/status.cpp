@@ -21,12 +21,12 @@
 #include "status.h"
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
-#include "luascript.h"
+#include "configmanager.h"
 #include <sstream>
 #include "game.h"
 #include "networkmessage.h"
 
-extern LuaScript g_config;
+extern ConfigManager g_config;
 extern Game g_game;
 
 Status* Status::_Status = NULL;
@@ -73,11 +73,15 @@ std::string Status::getStatusString(){
 	ss << running;
 	xmlSetProp(p, (const xmlChar*) "uptime", (const xmlChar*)ss.str().c_str());
 	ss.str("");
-	xmlSetProp(p, (const xmlChar*) "ip", (const xmlChar*)g_config.getGlobalString("ip", "").c_str());
-	xmlSetProp(p, (const xmlChar*) "servername", (const xmlChar*)g_config.getGlobalString("servername", "").c_str());
-	xmlSetProp(p, (const xmlChar*) "port", (const xmlChar*)g_config.getGlobalString("port", "").c_str());
-	xmlSetProp(p, (const xmlChar*) "location", (const xmlChar*)g_config.getGlobalString("location", "").c_str());
-	xmlSetProp(p, (const xmlChar*) "url", (const xmlChar*)g_config.getGlobalString("url", "").c_str());
+	xmlSetProp(p, (const xmlChar*) "ip", (const xmlChar*)g_config.getString(ConfigManager::IP).c_str());
+	xmlSetProp(p, (const xmlChar*) "servername", (const xmlChar*)g_config.getString(ConfigManager::SERVER_NAME).c_str());
+	
+	ss << g_config.getNumber(ConfigManager::PORT);
+	xmlSetProp(p, (const xmlChar*) "port", (const xmlChar*)ss.str().c_str());
+	ss.str("");
+	
+	xmlSetProp(p, (const xmlChar*) "location", (const xmlChar*)g_config.getString(ConfigManager::LOCATION).c_str());
+	xmlSetProp(p, (const xmlChar*) "url", (const xmlChar*)g_config.getString(ConfigManager::URL).c_str());
 	xmlSetProp(p, (const xmlChar*) "server", (const xmlChar*)"otserv");
 	//xmlSetProp(p, (const xmlChar*) "version", (const xmlChar*)"0.5.0_CVS");
 	xmlSetProp(p, (const xmlChar*) "version", (const xmlChar*)"0.5.0");
@@ -85,8 +89,8 @@ std::string Status::getStatusString(){
 	xmlAddChild(root, p);
 
 	p=xmlNewNode(NULL,(const xmlChar*)"owner");
-	xmlSetProp(p, (const xmlChar*) "name", (const xmlChar*)g_config.getGlobalString("ownername", "").c_str());
-	xmlSetProp(p, (const xmlChar*) "email", (const xmlChar*)g_config.getGlobalString("owneremail", "").c_str());
+	xmlSetProp(p, (const xmlChar*) "name", (const xmlChar*)g_config.getString(ConfigManager::OWNER_NAME).c_str());
+	xmlSetProp(p, (const xmlChar*) "email", (const xmlChar*)g_config.getString(ConfigManager::OWNER_EMAIL).c_str());
 	xmlAddChild(root, p);
 
 	p=xmlNewNode(NULL,(const xmlChar*)"players");
@@ -114,7 +118,7 @@ std::string Status::getStatusString(){
 	xmlSetProp(p, (const xmlChar*) "height", (const xmlChar*)"");
 	xmlAddChild(root, p);
 
-	xmlNewTextChild(root, NULL, (const xmlChar*)"motd", (const xmlChar*)g_config.getGlobalString("motd", "").c_str());
+	xmlNewTextChild(root, NULL, (const xmlChar*)"motd", (const xmlChar*)g_config.getString(ConfigManager::MOTD).c_str());
 
 	char *s = NULL;
 	int len = 0;
@@ -135,6 +139,8 @@ void Status::getInfo(NetworkMessage &nm) {
   // the client selects which information may be 
   // sent back, so we'll save some bandwidth and 
   // make many
+	std::stringstream ss;
+	
   bool bserverinfo0 = nm.GetByte() == 1;
   bool bserverinfo1 = nm.GetByte() == 1;
   bool bserverinfo2 = nm.GetByte() == 1;
@@ -150,22 +156,24 @@ void Status::getInfo(NetworkMessage &nm) {
   
   if (bserverinfo0) {
     nm.AddByte(0x10); // server info
-    nm.AddString(g_config.getGlobalString("servername", "").c_str());
-    nm.AddString(g_config.getGlobalString("ip", "").c_str());
-    nm.AddString(g_config.getGlobalString("port", "").c_str());   
+	nm.AddString(g_config.getString(ConfigManager::SERVER_NAME).c_str());
+	nm.AddString(g_config.getString(ConfigManager::IP).c_str());  
+	ss << g_config.getNumber(ConfigManager::PORT);
+	nm.AddString(ss.str().c_str());
+	ss.str(""); 
   }
   
   if (bserverinfo1) {
     nm.AddByte(0x11); // server info - owner info
- 	  nm.AddString(g_config.getGlobalString("ownername", "").c_str());
-    nm.AddString(g_config.getGlobalString("owneremail", "").c_str());
+	nm.AddString(g_config.getString(ConfigManager::OWNER_NAME).c_str());
+	nm.AddString(g_config.getString(ConfigManager::OWNER_EMAIL).c_str());
   }
   
   if (bserverinfo2) {
     nm.AddByte(0x12); // server info - misc
-    nm.AddString(g_config.getGlobalString("motd", "").c_str());
-    nm.AddString(g_config.getGlobalString("location", "").c_str());
-    nm.AddString(g_config.getGlobalString("url", "").c_str());
+	nm.AddString(g_config.getString(ConfigManager::MOTD).c_str());
+	nm.AddString(g_config.getString(ConfigManager::LOCATION).c_str());
+	nm.AddString(g_config.getString(ConfigManager::URL).c_str());
     nm.AddU32((uint32_t)(running >> 32)); // this method prevents a big number parsing
     nm.AddU32((uint32_t)(running));       // since servers can be online for months ;)
     //nm.AddString("0.5.0_CVS");

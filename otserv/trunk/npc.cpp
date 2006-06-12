@@ -33,9 +33,9 @@
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 
-#include "luascript.h"
+#include "configmanager.h"
 
-extern LuaScript g_config;
+extern ConfigManager g_config;
 extern Game g_game;
 
 AutoList<Npc> Npc::listNpc;
@@ -46,7 +46,7 @@ Npc::Npc(const std::string& _name) :
 	loaded = false;
 	name = _name;
 
-	std::string datadir = g_config.getGlobalString("datadir");
+	std::string datadir = g_config.getString(ConfigManager::DATA_DIRECTORY);
 	std::string filename = datadir + "npc/" + std::string(name) + ".xml";
 
 	xmlDocPtr doc = xmlParseFile(filename.c_str());
@@ -307,7 +307,7 @@ NpcScript::NpcScript(std::string scriptname, Npc* _npc)
 	luaopen_string(luaState);
 	luaopen_io(luaState);
 	
-	std::string datadir = g_config.getGlobalString("datadir");
+	std::string datadir = g_config.getString(ConfigManager::DATA_DIRECTORY);
     lua_dofile(luaState, std::string(datadir + "npc/scripts/lib/npc.lua").c_str());
 	
 	FILE* in=fopen(scriptname.c_str(), "r");

@@ -47,9 +47,9 @@
 #include "tile.h"
 
 #include "player.h"
-#include "luascript.h"
+#include "configmanager.h"
 
-extern LuaScript g_config;
+extern ConfigManager g_config;
 
 Map::Map()
 {
@@ -57,8 +57,8 @@ Map::Map()
 	mapwidth = 0;
 	mapheight = 0;
 
-	mapStoreIdentifier = g_config.getGlobalString("mapstore");
-	houseStoreIdentifier = g_config.getGlobalString("housestore");
+	mapStoreIdentifier = g_config.getString(ConfigManager::MAP_STORE_FILE);
+	houseStoreIdentifier = g_config.getString(ConfigManager::HOUSE_STORE_FILE);
 }
 
 Map::~Map()

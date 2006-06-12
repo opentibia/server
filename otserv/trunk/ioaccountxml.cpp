@@ -29,10 +29,10 @@
 #include <libxml/parser.h>
 #include <libxml/threads.h>
 
-#include "luascript.h"
+#include "configmanager.h"
 
 extern xmlMutexPtr xmlmutex;
-extern LuaScript g_config; 
+extern ConfigManager g_config;
 
 IOAccountXML::IOAccountXML()
 {
@@ -46,7 +46,7 @@ Account IOAccountXML::loadAccount(unsigned long accno)
 	Account acc;
 
 	std::stringstream accsstr;
-	std::string datadir = g_config.getGlobalString("datadir");
+	std::string datadir = g_config.getString(ConfigManager::DATA_DIRECTORY);
 	accsstr << datadir + "accounts/" << accno << ".xml";
 	std::string filename = accsstr.str();
 	xmlMutexLock(xmlmutex);
@@ -112,7 +112,7 @@ bool IOAccountXML::getPassword(unsigned long accno, const std::string &name, std
 	std::string acc_password;
 	
 	std::stringstream accsstr;
-	std::string datadir = g_config.getGlobalString("datadir");
+	std::string datadir = g_config.getString(ConfigManager::DATA_DIRECTORY);
 	accsstr << datadir + "accounts/" << accno << ".xml";
 	std::string filename = accsstr.str();
 	

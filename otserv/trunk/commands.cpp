@@ -35,13 +35,13 @@ typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 #include "ioplayer.h"
 #include "tools.h"
 #include "ban.h"
-#include "luascript.h"
+#include "configmanager.h"
 #include "town.h"
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 
-extern LuaScript g_config;
+extern ConfigManager g_config;
 extern Actions actions;
 extern Monsters g_monsters;
 extern Ban g_bans;
@@ -77,6 +77,8 @@ s_defcommands Commands::defined_commands[] = {
 	{"/bans",&Commands::bansManager},
 	{"/exiva",&Commands::exivaPlayer},
 	{"/town",&Commands::teleportToTown},
+	{"/serverinfo",&Commands::serverInfo},
+	{"/reloadconfig",&Commands::reloadConfig},
 };
 
 
@@ -595,7 +597,7 @@ bool Commands::closeServer(Creature* creature, const std::string& cmd, const std
 		}
 	}
 	
-	g_bans.saveBans(g_config.getGlobalString("banIdentifier"));
+	g_bans.saveBans(g_config.getString(ConfigManager::BAN_FILE));
 	
 	if(param == "serversave"){
 		Houses::getInstance().payHouses();
@@ -1010,6 +1012,41 @@ bool Commands::getHouse(Creature* creature, const std::string& cmd, const std::s
 		player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, str.str().c_str());
 	}
 	return false;
+}
+
+bool Commands::serverInfo(Creature* creature, const std::string& cmd, const std::string& param)
+{
+	Player* player = creature->getPlayer();
+	if(!player)
+		return false;
+	
+	std::stringstream text;
+	text << "SERVER INFO:";
+	text << "\nExp Rate: " << g_config.getNumber(ConfigManager::RATE_EXPERIENCE);
+	text << "\nSkill Rate: " << g_config.getNumber(ConfigManager::RATE_SKILL);
+	text << "\nMagic Rate: " << g_config.getNumber(ConfigManager::RATE_MAGIC);
+	text << "\nLoot Rate: " << g_config.getNumber(ConfigManager::RATE_LOOT);
+	
+	player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, text.str().c_str());
+	
+	return true;
+}
+
+bool Commands::reloadConfig(Creature* creature, const std::string& cmd, const std::string& param)
+{
+	Player* player = creature->getPlayer();
+	if(!player)
+		return false;
+	
+	std::stringstream text;
+	if(g_config.reload())
+		text << "Configuration file reloaded successfully." << std::endl;
+	else
+		text << "Failed to reload the configuration file." << std::endl;
+	
+	player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, text.str().c_str());
+	
+	return true;
 }
 
 void showTime(std::stringstream& str, unsigned long time)

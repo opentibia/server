@@ -12,17 +12,17 @@
 #include <hash_map>
 #endif
 
-#include "luascript.h"
+#include "configmanager.h"
 #include <boost/tokenizer.hpp>
 typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
-extern LuaScript g_config;
+extern ConfigManager g_config;
 
 /*
 bool IOMapSQL::loadMap(Map* map, std::string identifier){
-  	std::string host = g_config.getGlobalString("map_host");
-	std::string user = g_config.getGlobalString("map_user");
-	std::string pass = g_config.getGlobalString("map_pass");
-	std::string db   = g_config.getGlobalString("map_db");
+  	std::string host = g_config.getString(ConfigManager::MAP_HOST);
+	std::string user = g_config.getString(ConfigManager::MAP_USER);
+	std::string pass = g_config.getString(ConfigManager::MAP_PASS);
+	std::string db   = g_config.getString(ConfigManager::MAP_DB);
 #ifdef __DEBUG__
 	std::cout << "host" << host << "user" << user << "pass" << pass << "db" << db << std::endl;
 #endif     
@@ -256,10 +256,10 @@ bool IOMapSQL::SaveMap(Map* map, std::string identifier, int x, int y, int z){
    t = map->getTile(x,y,z);
     std::stringstream pos;
        pos << x << ";" << y << ";" << z;
-    std::string host = g_config.getGlobalString("map_host");
-	std::string user = g_config.getGlobalString("map_user");
-	std::string pass = g_config.getGlobalString("map_pass");
-	std::string db   = g_config.getGlobalString("map_db");
+    std::string host = g_config.getString(ConfigManager::MAP_HOST);
+	std::string user = g_config.getString(ConfigManager::MAP_USER);
+	std::string pass = g_config.getString(ConfigManager::MAP_PASS);
+	std::string db   = g_config.getString(ConfigManager::MAP_DB);
 #ifdef __DEBUG__
 	std::cout "host" << host << "user" << user << "pass" << pass << "db" << db << std::endl;
 #endif     

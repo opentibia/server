@@ -49,14 +49,14 @@
 #include "actions.h"
 #include "ioplayer.h"
 #include "chat.h"
-#include "luascript.h"
+#include "configmanager.h"
 
 #if defined __EXCEPTION_TRACER__
 #include "exception.h"
 extern OTSYS_THREAD_LOCKVAR maploadlock;
 #endif
 
-extern LuaScript g_config;
+extern ConfigManager g_config;
 extern Spells spells;
 extern Actions actions;
 extern Commands commands;
@@ -116,7 +116,7 @@ void GameState::onAttack(Creature* attacker, const Position& pos, const MagicEff
 			}
 
 			if(targetCreature->access == 0 && targetPlayer && game->getWorldType() != WORLD_TYPE_NO_PVP) {
-				targetPlayer->inFightTicks = (long)g_config.getGlobalNumber("pzlocked", 0);
+				targetPlayer->inFightTicks = (long)g_config.getNumber(ConfigManager::PZ_LOCKED);
 				targetPlayer->sendIcons();
 			}
 
@@ -167,11 +167,11 @@ void GameState::onAttack(Creature* attacker, const Position& pos, const MagicEff
 	if(attackPlayer && attackPlayer->access == 0) {
 		//Add exhaustion
 		if(me->causeExhaustion(true))
-			attackPlayer->exhaustedTicks = (long)g_config.getGlobalNumber("exhausted", 0);
+			attackPlayer->exhaustedTicks = (long)g_config.getNumber(ConfigManager::EXHAUSTED);
 		
 		//Fight symbol
 		if(me->offensive){
-			attackPlayer->inFightTicks = (long)g_config.getGlobalNumber("pzlocked", 0);
+			attackPlayer->inFightTicks = (long)g_config.getNumber(ConfigManager::PZ_LOCKED);
 			attackPlayer->sendIcons();
 		}
 	}
@@ -428,7 +428,7 @@ int Game::loadMap(std::string filename, std::string filekind)
 		map = new Map;
 	}
 
-	max_players = atoi(g_config.getGlobalString("maxplayers").c_str());	
+	max_players = g_config.getNumber(ConfigManager::MAX_PLAYERS);	
 	return map->loadMap(filename, filekind);
 }
 
@@ -2144,7 +2144,7 @@ bool Game::creatureOnPrepareMagicAttack(Creature *creature, Position pos, const 
 				if(player->exhaustedTicks >= 1000 && me->causeExhaustion(true)) {
 					if(me->offensive) {
 						player->sendTextMessage(MSG_STATUS_SMALL, "You are exhausted.",player->getPosition(), NM_ME_PUFF);
-						player->exhaustedTicks += (long)g_config.getGlobalNumber("exhaustedadd", 0);
+						player->exhaustedTicks += (long)g_config.getNumber(ConfigManager::EXHAUSTED_ADD);
 					}
 
 					return false;
@@ -2211,7 +2211,7 @@ void Game::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fi
 	}	
 
 	if(player && player->access == 0) {
-		player->inFightTicks = (long)g_config.getGlobalNumber("pzlocked", 0);
+		player->inFightTicks = (long)g_config.getNumber(ConfigManager::PZ_LOCKED);
 		player->sendIcons();
 		
 		if(attackedPlayer){
@@ -2237,7 +2237,7 @@ void Game::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fi
 	}
 
 	if(attackedPlayer && attackedPlayer->access ==0){
-		attackedPlayer->inFightTicks = (long)g_config.getGlobalNumber("pzlocked", 0);
+		attackedPlayer->inFightTicks = (long)g_config.getNumber(ConfigManager::PZ_LOCKED);
 		attackedPlayer->sendIcons();
 	}
 	
@@ -2490,12 +2490,12 @@ bool Game::playerYell(Player* player, std::string &text)
 		return false;
 
 	if(player->access == 0 && player->exhaustedTicks >=1000){
-		player->exhaustedTicks += (long)g_config.getGlobalNumber("exhaustedadd", 0);		
+		player->exhaustedTicks += (long)g_config.getNumber(ConfigManager::EXHAUSTED_ADD);		
 		player->sendTextMessage(MSG_STATUS_SMALL, "You are exhausted.");
 		return false;
 	}
 	else{
-		player->exhaustedTicks = (long)g_config.getGlobalNumber("exhausted", 0);
+		player->exhaustedTicks = (long)g_config.getNumber(ConfigManager::EXHAUSTED);
 		std::transform(text.begin(), text.end(), text.begin(), upchar);
 
 		SpectatorVec list;

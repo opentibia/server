@@ -23,6 +23,7 @@
 #include "player.h"
 #include "npc.h"
 #include "tools.h"
+#include "configmanager.h"
 
 #ifdef ENABLESQLMAPSUPPORT
 #include <mysql++.h>
@@ -33,7 +34,7 @@ typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h> 
 
-extern LuaScript g_config;
+extern ConfigManager g_config;
 extern Game g_game;
 
 SpawnManager::SpawnManager()
@@ -251,10 +252,10 @@ bool SpawnManager::loadSpawnsXML(std::string filename)
 #ifdef ENABLESQLMAPSUPPORT	
 bool SpawnManager::loadSpawnsSQL(std::string identifier)
 {
-	std::string host = g_config.getGlobalString("map_host");
-	std::string user = g_config.getGlobalString("map_user");
-	std::string pass = g_config.getGlobalString("map_pass");
-	std::string db   = g_config.getGlobalString("map_db");
+	std::string host = g_config.getString(ConfigManager::MAP_HOST);
+	std::string user = g_config.getString(ConfigManager::MAP_USER);
+	std::string pass = g_config.getString(ConfigManager::MAP_PASS);
+	std::string db   = g_config.getString(ConfigManager::MAP_DB);
 
 #ifdef __DEBUG__
 	std::cout "host" << host << "user" << user << "pass" << pass << "db" << db << std::endl;

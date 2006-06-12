@@ -25,10 +25,10 @@
 #include "ioplayer.h"
 #include "game.h"
 #include "town.h"
-#include "luascript.h"
+#include "configmanager.h"
 #include "tools.h"
 
-extern LuaScript g_config;
+extern ConfigManager g_config;
 extern Game g_game;
 
 House::House(uint32_t _houseid) :
@@ -698,7 +698,7 @@ bool Door::getAccessList(std::string& list) const
 
 Houses::Houses()
 {
-	std::string strRentPeriod = g_config.getGlobalString("houserentperiod", "monthly");
+	std::string strRentPeriod = g_config.getString(ConfigManager::HOUSE_RENT_PERIOD);
 
 	rentPeriod = RENTPERIOD_MONTHLY;
 
