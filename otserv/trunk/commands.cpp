@@ -1271,6 +1271,10 @@ bool Commands::bansManager(Creature* creature, const std::string& cmd, const std
 				str << ipText(ip) << " " << ipText(mask) << " ";
 				showTime(str, it->time);
 				str << std::endl;
+				if(str.str().size() > 200){
+					player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, str.str().c_str());
+					str.str("");
+				}
 			}
 		}
 		//player bans
@@ -1291,6 +1295,10 @@ bool Commands::bansManager(Creature* creature, const std::string& cmd, const std
 					showTime(str, it->time);
 				}
 				str << std::endl;
+				if(str.str().size() > 200){
+					player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, str.str().c_str());
+					str.str("");
+				}
 			}
 		}
 		//account bans
@@ -1308,6 +1316,10 @@ bool Commands::bansManager(Creature* creature, const std::string& cmd, const std
 				str << it->id << " ";
 				showTime(str, it->time);
 				str << std::endl;
+				if(str.str().size() > 200){
+					player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, str.str().c_str());
+					str.str("");
+				}
 			}
 		}
 	}
