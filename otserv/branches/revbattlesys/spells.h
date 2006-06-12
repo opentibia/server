@@ -110,7 +110,7 @@ public:
 	virtual ~InstantSpell();
 	
 	bool configureSpell(xmlNodePtr xmlspell);
-	//bool loadScript(Game* igame,const std::string& datadir, const std::strinf& script);
+	
 	bool castInstant(Creature* creature, const std::string& param);
 	
 	std::string getWords(){return words;};

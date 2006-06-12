@@ -397,7 +397,7 @@ protected:
 	friend class GameState;
 	friend class Spawn;
 	friend class SpawnManager;
-	friend class ActionScript;
+	friend class LuaScriptInterface;
 	friend class Actions;
 	friend class Combat;
 	friend class AreaCombat;

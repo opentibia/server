@@ -24,11 +24,7 @@
 
 #include "position.h"
 
-//#include <libxml/xmlmemory.h>
-//#include <libxml/parser.h>
-
 #include <map>
-
 #include "luascript.h"
 
 extern "C"
@@ -38,15 +34,6 @@ extern "C"
 #include <lualib.h>
 }
 
-class Player;
-class Npc;
-class Monster;
-class Thing;
-class Item;
-class Container;
-class Depot;
-class Game;
-
 class Action;
 
 enum tCanUseRet{
@@ -55,17 +42,33 @@ enum tCanUseRet{
 	CAN_NOT_THROW,
 };
 
+class ActionScriptInterface : public LuaScriptInterface
+{
+public:
+	ActionScriptInterface();
+	virtual ~ActionScriptInterface();
+	
+	virtual std::string getInterfaceName();
+
+protected:
+	
+	
+private:
+	
+};
+
 class Actions
 {
 public:
-	Actions(){};
-	Actions(Game* igame);
-	bool loadFromXml(const std::string& datadir);
+	Actions();
 	~Actions();
-	void clear();
 	
-	bool UseItem(Player* player, const Position& pos, uint8_t index, Item* item);
-	bool UseItemEx(Player* player, const Position& from_pos,
+	bool loadFromXml(const std::string& datadir);
+	bool reload();
+	bool isLoaded(){return loaded;}	
+	
+	bool useItem(Player* player, const Position& pos, uint8_t index, Item* item);
+	bool useItemEx(Player* player, const Position& from_pos,
 		const Position& to_pos, const unsigned char to_stack, Item* item);
 	
 	bool openContainer(Player* player,Container* container, const unsigned char index);
@@ -73,181 +76,53 @@ public:
 	static int canUse(const Creature* creature ,const Position& pos);
 	static int canUseFar(const Creature* creature ,const Position& to_pos, const bool blockWalls);
 	
-	Game* game;
-	bool loaded;
-
-	bool isLoaded(){return loaded;}	
-	bool reload();
-  
 protected:
+	void clear();
+	
+	bool loaded;
+	
 	std::string datadir;
-	//typedef std::map<unsigned short, Action*> ActionUseMap;
-	//ActionUseMap useItemMap;
-	//ActionUseMap uniqueItemMap;
-	//ActionUseMap actionItemMap;
-	//Action *getAction(const Item* item);
-	//Action *loadAction(xmlNodePtr xmlaction);
+	typedef std::map<unsigned short, Action*> ActionUseMap;
+	ActionUseMap useItemMap;
+	ActionUseMap uniqueItemMap;
+	ActionUseMap actionItemMap;
+	
+	Action *getAction(const Item* item);
+	Action *loadAction(xmlNodePtr xmlaction);
+	
+	ActionScriptInterface m_scriptInterface;
+	
 };
 
 class Action
 {
 public:
 	Action();
+	Action(LuaScriptInterface* _interface);
 	virtual ~Action();
+	
+	void setScriptInterface(LuaScriptInterface* _interface);
 	
 	bool configureAction(xmlNodePtr p);
 	
-	bool loadScript(Game* igame,const std::string& datadir, const std::string& script);
+	bool loadScript(const std::string& script);
 	bool isLoaded() const {return loaded;}
+	
 	bool allowFarUse() const {return allowfaruse;};
 	bool blockWalls() const {return blockwalls;};
+	
 	void setAllowFarUse(bool v){allowfaruse = v;};
 	void setBlockWalls(bool v){blockwalls = v;};
-	bool executeUse(Player* player, Item* item, const Position& posFrom, const Position& posTo);
+	
+	bool executeUse(Player* player, Item* item, const PositionEx& posFrom, const PositionEx& posTo);
 	
 protected:
-	LuaScript* script;
 	bool loaded;
+	long m_scriptId;
+	LuaScriptInterface* m_scriptInterface;
 	bool allowfaruse;
 	bool blockwalls;
-};
-/*
-enum tThingType{
-	thingTypeItem,
-	thingTypePlayer,
-	thingTypeMonster,
-	thingTypeNpc,
-	thingTypeUnknown,
+	
 };
 
-enum ePlayerInfo{
-	PlayerInfoFood,
-	PlayerInfoAccess,
-	PlayerInfoLevel,
-	PlayerInfoMagLevel,
-	PlayerInfoMana,
-	PlayerInfoHealth,
-	PlayerInfoName,
-	PlayerInfoPosition,
-	PlayerInfoVocation,
-	PlayerInfoMasterPos,
-	PlayerInfoGuildId,
-};
-
-class Action
-{
-public:
-	Action(Game* igame,const std::string& datadir, const std::string& scriptname);
-	virtual ~Action();
-	bool isLoaded() const {return loaded;}
-	bool allowFarUse() const {return allowfaruse;};
-	bool blockWalls() const {return blockwalls;};
-	void setAllowFarUse(bool v){allowfaruse = v;};
-	void setBlockWalls(bool v){blockwalls = v;};
-	bool executeUse(Player* player,Item* item, PositionEx &posFrom, PositionEx &posTo);
-	
-protected:
-	ActionScript* script;
-	bool loaded;
-	bool allowfaruse;
-	bool blockwalls;
-};
-
-class ActionScript : protected LuaScript{
-public:
-	ActionScript(Game* igame,const std::string& datadir, const std::string& scriptname);
-	virtual ~ActionScript();
-	bool isLoaded()const {return loaded;}
-	
-	lua_State* getLuaState(){return luaState;}
-	
-	void ClearMap();
-	static void AddThingToMapUnique(Thing *thing);
-	unsigned int AddThingToMap(Thing *thing);
-	Thing* GetThingByUID(int uid);
-	Item* GetItemByUID(int uid);
-	Creature* GetCreatureByUID(int uid);
-	Player* GetPlayerByUID(int uid);
-	
-	//lua functions
-	static int luaActionDoRemoveItem(lua_State *L);
-	static int luaActionDoFeedPlayer(lua_State *L);	
-	static int luaActionDoSendCancel(lua_State *L);
-	static int luaActionDoTeleportThing(lua_State *L);
-	static int luaActionDoTransformItem(lua_State *L);
-	static int luaActionDoPlayerSay(lua_State *L);
-	static int luaActionDoSendMagicEffect(lua_State *L);
-	static int luaActionDoChangeTypeItem(lua_State *L);
-	static int luaActionDoSendAnimatedText(lua_State *L);
-	
-	static int luaActionDoPlayerAddSkillTry(lua_State *L);
-	static int luaActionDoPlayerAddHealth(lua_State *L);
-	static int luaActionDoPlayerAddMana(lua_State *L);
-	static int luaActionDoPlayerAddItem(lua_State *L);
-	static int luaActionDoPlayerSendTextMessage(lua_State *L);
-	static int luaActionDoShowTextWindow(lua_State *L);
-	static int luaActionDoDecayItem(lua_State *L);
-	static int luaActionDoCreateItem(lua_State *L);
-	static int luaActionDoSummonCreature(lua_State *L);
-	static int luaActionDoPlayerRemoveMoney(lua_State *L);
-	static int luaActionDoPlayerSetMasterPos(lua_State *L);
-	static int luaActionDoPlayerSetVocation(lua_State *L);
-	static int luaActionDoPlayerRemoveItem(lua_State *L);
-	
-	//get item info
-	static int luaActionGetItemRWInfo(lua_State *L);
-	static int luaActionGetThingfromPos(lua_State *L);
-	//set item
-	static int luaActionDoSetItemActionId(lua_State *L);
-	static int luaActionDoSetItemText(lua_State *L);
-	static int luaActionDoSetItemSpecialDescription(lua_State *L);
-	
-	//get tile info
-	static int luaActionGetTilePzInfo(lua_State *L);
-	static int luaActionGetTileHouseInfo(lua_State *L);
-	
-	//get player info functions
-	static int luaActionGetPlayerFood(lua_State *L);
-	static int luaActionGetPlayerAccess(lua_State *L);
-	static int luaActionGetPlayerLevel(lua_State *L);
-	static int luaActionGetPlayerMagLevel(lua_State *L);
-	static int luaActionGetPlayerMana(lua_State *L);
-	static int luaActionGetPlayerHealth(lua_State *L);
-	static int luaActionGetPlayerName(lua_State *L);
-	static int luaActionGetPlayerPosition(lua_State *L);	
-	static int luaActionGetPlayerSkill(lua_State *L);
-	static int luaActionGetPlayerVocation(lua_State *L);
-	static int luaActionGetPlayerMasterPos(lua_State *L);
-	static int luaActionGetPlayerGuildId(lua_State *L);
-	
-	static int luaActionGetPlayerStorageValue(lua_State *L);
-	static int luaActionSetPlayerStorageValue(lua_State *L);
-	
-protected:			
-	
-	Game* game;
-	Player *_player;
-	unsigned int lastuid;
-	
-	friend class Action;
-	
-	std::map<unsigned int,Thing*> ThingMap;
-	static std::map<unsigned int,Thing*> uniqueIdMap;
-	
-	//lua related functions
-	int registerFunctions();
-	bool loaded;
-	//lua interface helpers
-	static ActionScript* getActionScript(lua_State *L);
-	static void internalAddPositionEx(lua_State *L, const PositionEx& pos);
-	static void internalGetPositionEx(lua_State *L, PositionEx& pos);
-	static unsigned long internalGetNumber(lua_State *L);
-	static const char* internalGetString(lua_State *L);
-	static void internalAddThing(lua_State *L, const Thing *thing, const unsigned int thingid);
-	
-	static const Position& internalGetRealPosition(ActionScript* action, Player* player, const Position& pos);
-	static int internalGetPlayerInfo(lua_State *L, ePlayerInfo info);
-	
-};
-*/
 #endif

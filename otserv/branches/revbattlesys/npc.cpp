@@ -294,7 +294,7 @@ NpcScript::NpcScript(std::string scriptname, Npc* _npc)
 	loaded = false;
 	if(scriptname == "")
 		return;
-
+/*
 	luaState = lua_open();
 	luaopen_loadlib(luaState);
 	luaopen_base(luaState);
@@ -316,6 +316,7 @@ NpcScript::NpcScript(std::string scriptname, Npc* _npc)
 	npc = _npc;
 	setGlobalNumber("addressOfNpc", (int) npc);
 	registerFunctions();
+	*/
 }
 
 void NpcScript::onThink()

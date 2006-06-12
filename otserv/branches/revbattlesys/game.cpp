@@ -56,7 +56,7 @@ extern OTSYS_THREAD_LOCKVAR maploadlock;
 #endif
 
 extern LuaScript g_config;
-extern Actions actions;
+extern Actions g_actions;
 extern Commands commands;
 extern Chat g_chat;
 
@@ -1706,7 +1706,7 @@ bool Game::internalUseItemEx(Player* player, const Position& fromPos, Item* item
 		area.doCombat(player, toPos, combat);
 	}
 
-	actions.UseItemEx(player, fromPos, toPos, toStackPos, item);
+	g_actions.useItemEx(player, fromPos, toPos, toStackPos, item);
 	return true;
 }
 
@@ -1743,7 +1743,7 @@ bool Game::playerUseItem(Player* player, const Position& pos, uint8_t stackpos, 
 		return false;
 	}
 
-	actions.UseItem(player, pos, index, item);
+	g_actions.useItem(player, pos, index, item);
 	return true;
 }
 

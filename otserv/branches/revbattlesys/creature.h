@@ -299,7 +299,7 @@ protected:
 	friend class Game;
 	friend class Map;
 	friend class Commands;
-	friend class GameState;
+	friend class LuaScriptInterface;
 	
 	unsigned long id;
 	bool isInternalRemoved;

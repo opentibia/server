@@ -31,6 +31,7 @@ extern "C"
 #include <lauxlib.h>
 #include <lualib.h>
 }
+#include "position.h"
 
 class Thing;
 class Creature;
@@ -63,7 +64,8 @@ protected:
 };
 
 class LuaScriptInterface;
-
+class Game;
+	
 class ScriptEnviroment
 {
 public:
@@ -75,15 +77,20 @@ public:
 	void setScriptId(long scriptId, LuaScriptInterface* scriptInterface);
 	void setEventDesc(const std::string& desc);
 	
-	void getEventInfo(long& scriptId, std::string& desc, LuaScriptInterface* scriptInterface);
+	void getEventInfo(long& scriptId, std::string& desc, LuaScriptInterface*& scriptInterface);
 	
 	static void addUniqueThing(Thing* thing);
 	long addThing(Thing* thing);
+	
+	void setRealPos(const Position& realPos);
+	Position getRealPos();
 	
 	Thing* getThingByUID(long uid);
 	Item* getItemByUID(long uid);
 	Creature* getCreatureByUID(long uid);
 	Player* getPlayerByUID(long uid);
+	
+	Game* m_game;
 	
 private:
 	typedef std::map<long, Thing*> ThingMap;
@@ -94,13 +101,31 @@ private:
 	//script event desc
 	std::string m_eventdesc;
 	
+	
 	//unique id map
 	static ThingMap m_globalMap;
 	//item/creature map
 	ThingMap m_localMap;
 	long m_lastUID;
+	Position m_realPos;
 	//area map
 	//static AreaMap areaMap;
+};
+
+class Position;
+
+enum PlayerInfo_t{
+	PlayerInfoFood,
+	PlayerInfoAccess,
+	PlayerInfoLevel,
+	PlayerInfoMagLevel,
+	PlayerInfoMana,
+	PlayerInfoHealth,
+	PlayerInfoName,
+	PlayerInfoPosition,
+	PlayerInfoVocation,
+	PlayerInfoMasterPos,
+	PlayerInfoGuildId,
 };
 
 class LuaScriptInterface
@@ -116,15 +141,25 @@ public:
 	
 	static ScriptEnviroment* getScriptEnv();
 	
-	static void reportError(const std::string& error_desc);
+	static void reportError(const char* function, const std::string& error_desc);
 	
 	virtual std::string getInterfaceName();
 	long getLastLuaError();
 	void dumpLuaStack();
 	
+	lua_State* getLuaState();
 	
 	bool pushFunction(long functionId);
 	//push/pop common structures
+	static void pushThing(lua_State *L, Thing* thing, long thingid);
+	static void pushPosition(lua_State *L, const Position& position, long stackpos);
+	
+	static void popPosition(lua_State *L, Position& position, long& stackpos);
+	static long popNumber(lua_State *L);
+	static const char* popString(lua_State *L);
+	
+	static long getField(lua_State *L, const char *key);
+	static void setField(lua_State *L, const char *index, long val);
 	
 protected:
 	bool initState();
@@ -133,10 +168,63 @@ protected:
 	void registerFunctions();
 	
 	//lua functions
+	static int luaDoRemoveItem(lua_State *L);
+	static int luaDoFeedPlayer(lua_State *L);	
+	static int luaDoSendCancel(lua_State *L);
+	static int luaDoTeleportThing(lua_State *L);
+	static int luaDoTransformItem(lua_State *L);
+	static int luaDoPlayerSay(lua_State *L);
+	static int luaDoSendMagicEffect(lua_State *L);
+	static int luaDoChangeTypeItem(lua_State *L);
+	static int luaDoSendAnimatedText(lua_State *L);
 	
+	static int luaDoPlayerAddSkillTry(lua_State *L);
+	static int luaDoPlayerAddHealth(lua_State *L);
+	static int luaDoPlayerAddMana(lua_State *L);
+	static int luaDoPlayerAddItem(lua_State *L);
+	static int luaDoPlayerSendTextMessage(lua_State *L);
+	static int luaDoShowTextWindow(lua_State *L);
+	static int luaDoDecayItem(lua_State *L);
+	static int luaDoCreateItem(lua_State *L);
+	static int luaDoSummonCreature(lua_State *L);
+	static int luaDoPlayerRemoveMoney(lua_State *L);
+	static int luaDoPlayerSetMasterPos(lua_State *L);
+	static int luaDoPlayerSetVocation(lua_State *L);
+	static int luaDoPlayerRemoveItem(lua_State *L);
+	
+	//get item info
+	static int luaGetItemRWInfo(lua_State *L);
+	static int luaGetThingfromPos(lua_State *L);
+	//set item
+	static int luaDoSetItemActionId(lua_State *L);
+	static int luaDoSetItemText(lua_State *L);
+	static int luaDoSetItemSpecialDescription(lua_State *L);
+	
+	//get tile info
+	static int luaGetTilePzInfo(lua_State *L);
+	static int luaGetTileHouseInfo(lua_State *L);
+	
+	//get player info functions
+	static int luaGetPlayerFood(lua_State *L);
+	static int luaGetPlayerAccess(lua_State *L);
+	static int luaGetPlayerLevel(lua_State *L);
+	static int luaGetPlayerMagLevel(lua_State *L);
+	static int luaGetPlayerMana(lua_State *L);
+	static int luaGetPlayerHealth(lua_State *L);
+	static int luaGetPlayerName(lua_State *L);
+	static int luaGetPlayerPosition(lua_State *L);	
+	static int luaGetPlayerSkill(lua_State *L);
+	static int luaGetPlayerVocation(lua_State *L);
+	static int luaGetPlayerMasterPos(lua_State *L);
+	static int luaGetPlayerGuildId(lua_State *L);
+	
+	static int luaGetPlayerStorageValue(lua_State *L);
+	static int luaSetPlayerStorageValue(lua_State *L);
 	//
 	
-	lua_State*  m_luaState;
+	static int internalGetPlayerInfo(lua_State *L, PlayerInfo_t info);
+	
+	lua_State* m_luaState;
 	long m_lastLuaError;
 private:
 	

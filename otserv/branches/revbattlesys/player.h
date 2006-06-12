@@ -486,7 +486,7 @@ protected:
 	friend OTSYS_THREAD_RETURN ConnectionHandler(void *dat);
 	
 	friend class Game;
-	friend class ActionScript;
+	friend class LuaScriptInterface;
 	friend class Commands;
 	friend class Map;
 	friend class IOPlayerXML;

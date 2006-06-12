@@ -41,7 +41,7 @@ typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 #include <libxml/parser.h>
 
 extern LuaScript g_config;
-extern Actions actions;
+extern Actions g_actions;
 extern Monsters g_monsters;
 extern Ban g_bans;
 
@@ -472,7 +472,7 @@ bool Commands::subtractMoney(Creature* creature, const std::string& cmd, const s
 bool Commands::reloadInfo(Creature* creature, const std::string& cmd, const std::string& param)
 {	
 	if(param == "actions"){
-		actions.reload();
+		g_actions.reload();
 	}
 	else if(param == "commands"){
 		this->reload();

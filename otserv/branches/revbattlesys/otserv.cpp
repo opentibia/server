@@ -92,7 +92,7 @@ Items Item::items;
 //ReverseItemMap Items::revItems;
 
 Game g_game;
-Actions actions(&g_game);
+Actions g_actions;
 Commands commands(&g_game);
 Monsters g_monsters;
 Ban g_bans;
@@ -551,7 +551,7 @@ int main(int argc, char *argv[])
 	filename.str("");
 	filename << g_config.getGlobalString("datadir") << "actions/actions.xml";
 	std::cout << ":: Loading " << filename.str() << "... ";
-	if(!actions.loadFromXml(g_config.getGlobalString("datadir"))){
+	if(!g_actions.loadFromXml(g_config.getGlobalString("datadir"))){
 		std::stringstream errormsg;
 		errormsg << "Unable to load " << filename.str() << "!";
 		ErrorMessage(errormsg.str().c_str());
