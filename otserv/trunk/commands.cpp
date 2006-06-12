@@ -78,7 +78,6 @@ s_defcommands Commands::defined_commands[] = {
 	{"/exiva",&Commands::exivaPlayer},
 	{"/town",&Commands::teleportToTown},
 	{"/serverinfo",&Commands::serverInfo},
-	{"/reloadconfig",&Commands::reloadConfig},
 };
 
 
@@ -487,6 +486,9 @@ bool Commands::reloadInfo(Creature* creature, const std::string& cmd, const std:
 	}
 	else if(param == "monsters"){
 		g_monsters.reload();
+	}
+	else if(param == "config"){
+		g_config.reload();
 	}
 	else{
 		Player *player = creature->getPlayer();
@@ -1026,23 +1028,6 @@ bool Commands::serverInfo(Creature* creature, const std::string& cmd, const std:
 	text << "\nSkill Rate: " << g_config.getNumber(ConfigManager::RATE_SKILL);
 	text << "\nMagic Rate: " << g_config.getNumber(ConfigManager::RATE_MAGIC);
 	text << "\nLoot Rate: " << g_config.getNumber(ConfigManager::RATE_LOOT);
-	
-	player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, text.str().c_str());
-	
-	return true;
-}
-
-bool Commands::reloadConfig(Creature* creature, const std::string& cmd, const std::string& param)
-{
-	Player* player = creature->getPlayer();
-	if(!player)
-		return false;
-	
-	std::stringstream text;
-	if(g_config.reload())
-		text << "Configuration file reloaded successfully." << std::endl;
-	else
-		text << "Failed to reload the configuration file." << std::endl;
 	
 	player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, text.str().c_str());
 	

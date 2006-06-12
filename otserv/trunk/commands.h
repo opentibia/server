@@ -73,7 +73,6 @@ protected:
 	bool getHouse(Creature* creature, const std::string& cmd, const std::string& param);
 	bool bansManager(Creature* creature, const std::string& cmd, const std::string& param);
 	bool serverInfo(Creature* creature, const std::string& cmd, const std::string& param);
-	bool reloadConfig(Creature* creature, const std::string& cmd, const std::string& param);
 	
 	//table of commands
 	static s_defcommands defined_commands[];
