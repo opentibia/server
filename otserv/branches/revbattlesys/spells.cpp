@@ -26,9 +26,12 @@
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 
+#include <sstream>
+
 extern Game g_game;
 
-Spells::Spells()
+Spells::Spells():
+m_scriptInterface("Action Interface")
 {
 	loaded = false;
 }
@@ -90,31 +93,39 @@ bool Spells::loadFromXml(const std::string& _datadir)
 		while(p){
 			Spell* spell = NULL;
 			if(xmlStrcmp(p->name, (const xmlChar*)"rune") == 0){
-				spell = new RuneSpell();
+				spell = new RuneSpell(&m_scriptInterface);
 			}
 			else if(xmlStrcmp(p->name, (const xmlChar*)"instant") == 0){
-				spell = new InstantSpell();
+				spell = new InstantSpell(&m_scriptInterface);
 			}
 			
 			if(spell){
 				if(spell->configureSpell(p)){
-					/*TODO: load script
+					bool success = true;
 					std::string scriptfile;
 					if(readXMLString(p, "script", scriptfile)){
-						.....
+						if(!spell->loadScriptSpell(datadir + std::string("actions/scripts/") + scriptfile)){
+							success = false;
+						}
 					}
 					else{
-						.....
+						success = false;
 					}
-					*/
-					if(RuneSpell* rune = dynamic_cast<RuneSpell*>(spell)){
-						runes[rune->getRuneItemId()] = rune;
+					
+					if(success){
+						if(RuneSpell* rune = dynamic_cast<RuneSpell*>(spell)){
+							runes[rune->getRuneItemId()] = rune;
+						}
+						else if(InstantSpell* instant = dynamic_cast<InstantSpell*>(spell)){
+							instants[instant->getWords()] = instant;
+						}
+						else{
+							std::cout << "Warning: [Spells::loadFromXml] Unk spell class" << std::endl;
+							success = false;
+						}
 					}
-					else if(InstantSpell* instant = dynamic_cast<InstantSpell*>(spell)){
-						instants[instant->getWords()] = instant;
-					}
-					else{
-						std::cout << "Warning: [Spells::loadFromXml] Unk spell class" << std::endl;
+					
+					if(!success){
 						delete spell;
 					}
 				}
@@ -160,6 +171,7 @@ InstantSpell* Spells::getInstantSpellByName(const std::string& name)
 {
 	return NULL;
 }
+//
 
 Spell::Spell()
 {
@@ -276,8 +288,12 @@ void Spell::addSpellEffects(Player* player)
 	*/
 }
 
-InstantSpell::InstantSpell()
+InstantSpell::InstantSpell(LuaScriptInterface* _interface)
 {
+	//
+	m_scriptInterface = _interface;
+	m_scriptId = 0;
+	//
 	hasParam = false;
 }
 
@@ -308,19 +324,70 @@ bool InstantSpell::configureSpell(xmlNodePtr p)
 	}
 }
 
-bool InstantSpell::castInstant(Creature* creature, const std::string& param)
+bool InstantSpell::castInstant(Creature* creature, const std::string& words, const std::string& param)
 {
 	if(creature){
 		Player* player = creature->getPlayer();
 		if(player && !spellPlayerChecks(player)){
 			return false;
 		}
+		//TODO: more checks?
+		return executeCastInstant(creature, param);
 	}
 	return false;
 }
 
+bool InstantSpell::loadScriptSpell(const std::string& script)
+{
+	if(!m_scriptInterface || m_scriptId != 0){
+		std::cout << "Failure: [InstantSpell::loadScriptSpell] m_scriptInterface == NULL. scriptid = " << m_scriptId << std::endl;
+		return false;
+	}
+	
+	if(m_scriptInterface->loadFile(script) == -1){
+		std::cout << "Warning: [InstantSpell::loadScriptSpell] Can not load script. " << script << std::endl;
+		return false;
+	}
+	long id = m_scriptInterface->getEvent("onCastInstant");
+	if(id == -1){
+		std::cout << "Warning: [InstantSpell::loadScriptSpell] Event onCastInstant not found. " << script << std::endl;
+		return false;
+		
+	}
+	m_scriptId = id;
+	return true;
+}
 
-RuneSpell::RuneSpell()
+bool InstantSpell::executeCastInstant(Creature* creature, const std::string& param)
+{
+	//onUseRune(...)
+	ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
+	
+	//debug only
+	std::stringstream desc;
+	desc << "onCastInstant";
+	env->setEventDesc(desc.str());
+	//
+	
+	env->setScriptId(m_scriptId, m_scriptInterface);
+	env->setRealPos(creature->getPosition());
+	
+	lua_State* L = m_scriptInterface->getLuaState();
+	int size0 = lua_gettop(L);
+	
+	//TODO:
+	//	call script
+	//
+	
+	if(size0 != lua_gettop(L)){
+		LuaScriptInterface::reportError(NULL, "Stack size changed!");
+	}
+	
+	return false;
+}
+
+RuneSpell::RuneSpell(LuaScriptInterface* _interface) :
+Action(_interface)
 {
 	hasCharges = true;
 	runeId = 0;
@@ -351,8 +418,29 @@ bool RuneSpell::configureSpell(xmlNodePtr p)
 		return false;
 	}
 }
+
+bool RuneSpell::loadScriptSpell(const std::string& script)
+{
+	if(!m_scriptInterface || m_scriptId != 0){
+		std::cout << "Failure: [RuneSpell::loadScriptSpell] m_scriptInterface == NULL. scriptid = " << m_scriptId << std::endl;
+		return false;
+	}
 	
-bool RuneSpell::executeUseRune(Creature* creature, Item* item, const Position& posFrom, const Position& posTo, Creature* target)
+	if(m_scriptInterface->loadFile(script) == -1){
+		std::cout << "Warning: [RuneSpell::loadScriptSpell] Can not load script. " << script << std::endl;
+		return false;
+	}
+	long id = m_scriptInterface->getEvent("onUseRune");
+	if(id == -1){
+		std::cout << "Warning: [RuneSpell::loadScriptSpell] Event onUseRune not found. " << script << std::endl;
+		return false;
+		
+	}
+	m_scriptId = id;
+	return true;
+}
+	
+bool RuneSpell::useRune(Creature* creature, Item* item, const Position& posFrom, const Position& posTo, Creature* target)
 {
 	Player* player = NULL;
 	if(creature){
@@ -380,8 +468,7 @@ bool RuneSpell::executeUseRune(Creature* creature, Item* item, const Position& p
 	}
 	bool success;
 	if(scripted){
-		//call lua script
-		success = false;
+		success = executeUseRune(creature, item, posFrom, posTo, target);
 	}
 	else{
 		//call hardcodedAction
@@ -396,7 +483,35 @@ bool RuneSpell::executeUseRune(Creature* creature, Item* item, const Position& p
 			g_game.transformItem(item, item->getID(), newCharge);
 		}
 	}
-	return false;
+	return success;
+}
+
+bool RuneSpell::executeUseRune(Creature* creature, Item* item, const Position& posFrom, const Position& posTo, Creature* target)
+{
+	//onUseRune(...)
+	ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
+	
+	//debug only
+	std::stringstream desc;
+	desc << "onUseRune";
+	env->setEventDesc(desc.str());
+	//
+	
+	env->setScriptId(m_scriptId, m_scriptInterface);
+	env->setRealPos(creature->getPosition());
+	
+	lua_State* L = m_scriptInterface->getLuaState();
+	int size0 = lua_gettop(L);
+	
+	//TODO:
+	//	script call code 
+	//
+	
+	if(size0 != lua_gettop(L)){
+		LuaScriptInterface::reportError(NULL, "Stack size changed!");
+	}
+	
+	return false; //<-- change this
 }
 
 /*

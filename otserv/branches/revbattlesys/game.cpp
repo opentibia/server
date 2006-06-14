@@ -1782,6 +1782,9 @@ bool Game::playerUseBattleWindow(Player* player, const Position& fromPos, uint8_
 		player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
 		return false;
 	}
+	
+	//look for runes here?
+	
 	return internalUseItemEx(player, fromPos, item, creature->getPosition(), 0, 0);
 }
 

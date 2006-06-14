@@ -90,8 +90,6 @@ public:
 	Creature* getCreatureByUID(long uid);
 	Player* getPlayerByUID(long uid);
 	
-	Game* m_game;
-	
 private:
 	typedef std::map<long, Thing*> ThingMap;
 	//typedef std::map<long, Matrix*> AreaMap;
@@ -131,19 +129,21 @@ enum PlayerInfo_t{
 class LuaScriptInterface
 {
 public:
-	LuaScriptInterface();
+	LuaScriptInterface::LuaScriptInterface(std::string interfaceName);
 	virtual ~LuaScriptInterface();
 	
 	bool reInitState();
 	
-	long loadFile(const std::string& file, const std::string& eventName);
+	long loadFile(const std::string& file);
 	const std::string& getFileById(long scriptId);
+	
+	long getEvent(const std::string& eventName);
 	
 	static ScriptEnviroment* getScriptEnv();
 	
 	static void reportError(const char* function, const std::string& error_desc);
 	
-	virtual std::string getInterfaceName();
+	std::string getInterfaceName();
 	long getLastLuaError();
 	void dumpLuaStack();
 	
@@ -231,10 +231,14 @@ private:
 	static ScriptEnviroment m_scriptEnv;
 	
 	long m_runningEventId;
+	std::string m_loadingFile;
 	
 	//script file cache
 	typedef std::map<long , std::string> ScriptsCache;
 	ScriptsCache m_cacheFiles;
+	
+	
+	std::string m_interfaceName;
 };
 
 #endif  // #ifndef __LUASCRIPT_H__

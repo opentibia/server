@@ -54,7 +54,7 @@ public:
 	
 	InstantSpell* getInstantSpell(const std::string& words);
 	InstantSpell* getInstantSpellByName(const std::string& name);
-		
+	
 protected:
 	bool loaded;
 	std::string datadir;
@@ -62,6 +62,8 @@ protected:
 	typedef std::map<std::string, InstantSpell*> InstantsMap ;
 	RunesMap runes;
 	InstantsMap instants;
+	
+	LuaScriptInterface m_scriptInterface;
 };
 
 
@@ -78,6 +80,8 @@ public:
 	virtual ~Spell(){};
 	
 	bool configureSpell(xmlNodePtr xmlspell);
+	
+	virtual bool loadScriptSpell(const std::string& script) = 0;
 	
 protected:
 	bool spellPlayerChecks(Player* player);
@@ -106,16 +110,25 @@ private:
 class InstantSpell : public Spell//, public Cast
 {
 public:
-	InstantSpell();
+	InstantSpell(LuaScriptInterface* _interface);
 	virtual ~InstantSpell();
 	
 	bool configureSpell(xmlNodePtr xmlspell);
 	
-	bool castInstant(Creature* creature, const std::string& param);
+	bool castInstant(Creature* creature, const std::string& words, const std::string& param);
+	
+	//scripting - move to cast class
+	virtual bool loadScriptSpell(const std::string& script);
+	bool executeCastInstant(Creature* creature, const std::string& param);
+	//
 	
 	std::string getWords(){return words;};
+	
 protected:
-	//LuaScript* script; in Cast class
+	//scripting
+	long m_scriptId;
+	LuaScriptInterface* m_scriptInterface;
+	//
 	std::string words;
 	bool hasParam;
 };
@@ -123,12 +136,17 @@ protected:
 class RuneSpell : public Action, public Spell
 {
 public:
-	RuneSpell();
+	RuneSpell(LuaScriptInterface* _interface);
 	virtual ~RuneSpell();
 	
 	bool configureSpell(xmlNodePtr xmlspell);
 	
+	bool useRune(Creature* creature, Item* item, const Position& posFrom, const Position& posTo, Creature* target);
+	
+	//sciprting
+	virtual bool loadScriptSpell(const std::string& script);
 	bool executeUseRune(Creature* creature, Item* item, const Position& posFrom, const Position& posTo, Creature* target);
+	//
 	
 	uint32_t getRuneItemId(){return runeId;};
 	

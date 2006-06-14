@@ -42,21 +42,6 @@ enum tCanUseRet{
 	CAN_NOT_THROW,
 };
 
-class ActionScriptInterface : public LuaScriptInterface
-{
-public:
-	ActionScriptInterface();
-	virtual ~ActionScriptInterface();
-	
-	virtual std::string getInterfaceName();
-
-protected:
-	
-	
-private:
-	
-};
-
 class Actions
 {
 public:
@@ -90,23 +75,22 @@ protected:
 	Action *getAction(const Item* item);
 	Action *loadAction(xmlNodePtr xmlaction);
 	
-	ActionScriptInterface m_scriptInterface;
+	LuaScriptInterface m_scriptInterface;
 	
 };
 
 class Action
 {
 public:
-	Action();
 	Action(LuaScriptInterface* _interface);
 	virtual ~Action();
-	
-	void setScriptInterface(LuaScriptInterface* _interface);
-	
 	bool configureAction(xmlNodePtr p);
 	
-	bool loadScript(const std::string& script);
-	bool isLoaded() const {return loaded;}
+	//scripting
+	bool loadScriptUse(const std::string& script);
+	//void setScriptInterface(LuaScriptInterface* _interface);
+	bool executeUse(Player* player, Item* item, const PositionEx& posFrom, const PositionEx& posTo);
+	//
 	
 	bool allowFarUse() const {return allowfaruse;};
 	bool blockWalls() const {return blockwalls;};
@@ -114,15 +98,13 @@ public:
 	void setAllowFarUse(bool v){allowfaruse = v;};
 	void setBlockWalls(bool v){blockwalls = v;};
 	
-	bool executeUse(Player* player, Item* item, const PositionEx& posFrom, const PositionEx& posTo);
-	
 protected:
-	bool loaded;
+	//scripting
 	long m_scriptId;
 	LuaScriptInterface* m_scriptInterface;
+	//
 	bool allowfaruse;
 	bool blockwalls;
-	
 };
 
 #endif

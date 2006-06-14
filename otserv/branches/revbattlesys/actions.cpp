@@ -42,7 +42,8 @@
 
 extern Game g_game;
 
-Actions::Actions()
+Actions::Actions() :
+m_scriptInterface("Action Interface")
 {
 	loaded = false;
 }
@@ -94,7 +95,7 @@ bool Actions::loadFromXml(const std::string& _datadir)
 	loaded = false;
 	Action* action = NULL;
 	//load actions lib in script interface
-	if(m_scriptInterface.loadFile(std::string(datadir + "actions/lib/actions.lua"), "") == -1){
+	if(m_scriptInterface.loadFile(std::string(datadir + "actions/lib/actions.lua")) == -1){
 		std::cout << "Warning: [Actions::loadFromXml] Can not load actions lib/actions.lua" << std::endl;
 	}
 	
@@ -120,7 +121,7 @@ bool Actions::loadFromXml(const std::string& _datadir)
 					bool success = true;
 					std::string scriptfile;
 					if(readXMLString(p, "script", scriptfile)){
-						if(!action->loadScript(datadir + std::string("actions/scripts/") + scriptfile)){
+						if(!action->loadScriptUse(datadir + std::string("actions/scripts/") + scriptfile)){
 							success = false;
 						}
 					}
@@ -232,7 +233,7 @@ bool Actions::useItem(Player* player, const Position& pos, uint8_t index, Item* 
 	Action* action = getAction(item);
 	
 	//if found execute it
-	if(action){	
+	if(action){
 		long stack = item->getParent()->__getIndexOfThing(item);
 		PositionEx posEx(pos, stack);
 		if(action->executeUse(player, item, posEx, posEx)){
@@ -325,15 +326,6 @@ bool Actions::useItemEx(Player* player, const Position& from_pos,
 	return false;
 }
 
-
-Action::Action()
-{
-	m_scriptInterface = NULL;
-	m_scriptId = 0;
-	allowfaruse = false;
-	blockwalls = true;
-}
-
 Action::Action(LuaScriptInterface* _interface)
 {
 	m_scriptInterface = _interface;
@@ -364,19 +356,23 @@ bool Action::configureAction(xmlNodePtr p)
 	return true;
 }
 
-bool Action::loadScript(const std::string& script)
+bool Action::loadScriptUse(const std::string& script)
 {
-	if(!m_scriptInterface){
-		std::cout << "Failure: [Action::loadScript] m_scriptInterface == NULL" << std::endl;
+	if(!m_scriptInterface || m_scriptId != 0){
+		std::cout << "Failure: [Action::loadScript] m_scriptInterface == NULL. scriptid = " << m_scriptId << std::endl;
 		return false;
 	}
 	
-	long id = m_scriptInterface->loadFile(script, "onUse");
+	if(m_scriptInterface->loadFile(script) == -1){
+		std::cout << "Warning: [Action::loadScript] Can not load script. " << script << std::endl;
+		return false;
+	}
+	long id = m_scriptInterface->getEvent("onUse");
 	if(id == -1){
-		std::cout << "Warning: [Action::loadScript] Can not load script " << script << std::endl;
+		std::cout << "Warning: [Action::loadScript] Event onUse not found. " << script << std::endl;
 		return false;
+		
 	}
-	
 	m_scriptId = id;
 	return true;
 }
@@ -388,7 +384,7 @@ bool Action::executeUse(Player* player, Item* item, const PositionEx& posFrom, c
 	
 	//debug only
 	std::stringstream desc;
-	desc << "onUse " << player->getName() << " - " << item->getID();
+	desc << player->getName() << " - " << item->getID() << " " << posFrom << "|" << posTo;
 	env->setEventDesc(desc.str());
 	//
 	
@@ -398,9 +394,10 @@ bool Action::executeUse(Player* player, Item* item, const PositionEx& posFrom, c
 	long cid = env->addThing(player);
 	long itemid1 = env->addThing(item);
 	
-	m_scriptInterface->pushFunction(m_scriptId);
 	lua_State* L = m_scriptInterface->getLuaState();
+	int size0 = lua_gettop(L);
 	
+	m_scriptInterface->pushFunction(m_scriptId);
 	lua_pushnumber(L, cid);
 	LuaScriptInterface::pushThing(L, item, itemid1);
 	LuaScriptInterface::pushPosition(L, posFrom, posFrom.stackpos);
@@ -417,13 +414,23 @@ bool Action::executeUse(Player* player, Item* item, const PositionEx& posFrom, c
 		LuaScriptInterface::pushPosition(L, posEx, 0);
 	}
 	
-	lua_pcall(L, 5, 1, 0);
+	bool ret;
+	if(lua_pcall(L, 5, 1, 0) != 0){
+		LuaScriptInterface::reportError(NULL, std::string(LuaScriptInterface::popString(L)));
+		ret = false;
+	}
+	else{
+		ret = (LuaScriptInterface::popNumber(L) != 0);
+	}
 	
-	bool ret = (LuaScriptInterface::popNumber(L) != 0);
+	if(size0 != lua_gettop(L)){
+		LuaScriptInterface::reportError(NULL, "Stack size changed!");
+	}
 	
 	return ret;
 }
 
+/*
 void Action::setScriptInterface(LuaScriptInterface* _interface)
 {
 	if(m_scriptInterface != NULL && m_scriptId != 0){
@@ -431,17 +438,4 @@ void Action::setScriptInterface(LuaScriptInterface* _interface)
 	}
 	m_scriptInterface = _interface;
 }
-
-
-ActionScriptInterface::ActionScriptInterface()
-{
-}
-
-ActionScriptInterface::~ActionScriptInterface()
-{
-}
-	
-std::string ActionScriptInterface::getInterfaceName()
-{
-	return "Actions Lua Interface";
-}
+*/
