@@ -394,17 +394,17 @@ int NpcScriptInterface::luaCreatureGetPos(lua_State *L)
 	ScriptEnviroment* env = getScriptEnv();
 	Creature* creature = env->getCreatureByUID(uid);
 	
-	if(!creature){
-		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
-		lua_pushnil(L);
-		lua_pushnil(L);
-		lua_pushnil(L);
-	}
-	else{
+	if(creature){
 		Position pos = creature->getPosition();
 		lua_pushnumber(L, pos.x);
 		lua_pushnumber(L, pos.y);
 		lua_pushnumber(L, pos.z);
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		lua_pushnil(L);
+		lua_pushnil(L);
+		lua_pushnil(L);
 	}
 	return 3;
 }
@@ -412,9 +412,18 @@ int NpcScriptInterface::luaCreatureGetPos(lua_State *L)
 int NpcScriptInterface::luaSelfGetPos(lua_State *L)
 {
 	Npc* mynpc = getNpc();
-	lua_pushnumber(L, mynpc->getPosition().x);
-	lua_pushnumber(L, mynpc->getPosition().y);
-	lua_pushnumber(L, mynpc->getPosition().z);
+	if(mynpc){
+		Position pos = mynpc->getPosition();
+		lua_pushnumber(L, pos.x);
+		lua_pushnumber(L, pos.y);
+		lua_pushnumber(L, pos.z);
+	}
+	else{
+		lua_pushnil(L);
+		lua_pushnil(L);
+		lua_pushnil(L);
+	}
+	
 	return 3;
 }
 
@@ -612,109 +621,3 @@ bool NpcScript::isLoaded()
 {
 	return m_loaded;
 }
-
-/*
-NpcScript::NpcScript(std::string scriptname, Npc* _npc)
-{
-	loaded = false;
-	if(scriptname == "")
-		return;
-
-	luaState = lua_open();
-	luaopen_loadlib(luaState);
-	luaopen_base(luaState);
-	luaopen_math(luaState);
-	luaopen_string(luaState);
-	luaopen_io(luaState);
-	
-	std::string datadir = g_config.getGlobalString("datadir");
-    lua_dofile(luaState, std::string(datadir + "npc/scripts/lib/npc.lua").c_str());
-	
-	FILE* in=fopen(scriptname.c_str(), "r");
-	if(!in)
-		return;
-	else
-		fclose(in);
-
-	lua_dofile(luaState, scriptname.c_str());
-	loaded = true;
-	npc = _npc;
-	setGlobalNumber("addressOfNpc", (int) npc);
-	registerFunctions();
-	
-}
-
-void NpcScript::onThink()
-{
-	lua_pushstring(luaState, "onThink");
-	lua_gettable(luaState, LUA_GLOBALSINDEX);
-	if(lua_pcall(luaState, 0, 0, 0)){
-		std::cerr << "Lua error: " << lua_tostring(luaState, -1) << std::endl;
-		lua_pop(luaState,1);
-		std::cerr << "Backtrace: " << std::endl;
-		lua_Debug* d = NULL;
-		int i = 0;
-		while(lua_getstack(luaState, i++, d)){
-			std::cerr << "    " << d->name << " @ " << d->currentline << std::endl;
-		}
-	}
-}
-
-void NpcScript::onCreatureAppear(unsigned long cid)
-{
-	if(npc->getID() != cid){
-		lua_pushstring(luaState, "onCreatureAppear");
-		lua_gettable(luaState, LUA_GLOBALSINDEX);
-		lua_pushnumber(luaState, cid);
-		if(lua_pcall(luaState, 1, 0, 0)){
-			std::cerr << "Lua error: " << lua_tostring(luaState, -1) << std::endl;
-			lua_pop(luaState,1);
-			std::cerr << "Backtrace: " << std::endl;
-			lua_Debug* d = NULL;
-			int i = 0;
-
-			while(lua_getstack(luaState, i++, d)){
-				std::cerr << "    " << d->name << " @ " << d->currentline << std::endl;
-			}
-		}
-	}
-}
-
-void NpcScript::onCreatureDisappear(int cid)
-{
-	lua_pushstring(luaState, "onCreatureDisappear");
-	lua_gettable(luaState, LUA_GLOBALSINDEX);
-	lua_pushnumber(luaState, cid);
-	if(lua_pcall(luaState, 1, 0, 0)){
-		std::cerr << "Lua error: " << lua_tostring(luaState, -1) << std::endl;
-		lua_pop(luaState,1);
-		std::cerr << "Backtrace: " << std::endl;
-		lua_Debug* d = NULL;
-		int i = 0;
-		while(lua_getstack(luaState, i++, d)){
-			std::cerr << "    " << d->name << " @ " << d->currentline << std::endl;
-		}
-	}
-}
-
-void NpcScript::onCreatureSay(int cid, SpeakClasses type, const std::string& text)
-{
-	//now we need to call the function
-	lua_pushstring(luaState, "onCreatureSay");
-	lua_gettable(luaState, LUA_GLOBALSINDEX);
-	lua_pushnumber(luaState, cid);
-	lua_pushnumber(luaState, type);
-	lua_pushstring(luaState, text.c_str());
-	if(lua_pcall(luaState, 3, 0, 0)){
-		std::cerr << "Lua error: " << lua_tostring(luaState, -1) << std::endl;
-		lua_pop(luaState,1);
-		std::cerr << "Backtrace: " << std::endl;
-		lua_Debug* d = NULL;
-		int i = 0;
-		while(lua_getstack(luaState, i++, d)){
-			std::cerr << "    " << d->name << " @ " << d->currentline << std::endl;
-		}
-	}
-}
-
-*/
