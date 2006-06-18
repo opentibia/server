@@ -46,6 +46,7 @@ Actions::Actions() :
 m_scriptInterface("Action Interface")
 {
 	loaded = false;
+	m_scriptInterface.initState();
 }
 
 Actions::~Actions()
@@ -414,7 +415,11 @@ bool Action::executeUse(Player* player, Item* item, const PositionEx& posFrom, c
 		LuaScriptInterface::pushPosition(L, posEx, 0);
 	}
 	
-	bool ret;
+	long ret;
+	if(m_scriptInterface->callFunction(5, ret) == false){
+		ret = 0;
+	}
+	/*
 	if(lua_pcall(L, 5, 1, 0) != 0){
 		LuaScriptInterface::reportError(NULL, std::string(LuaScriptInterface::popString(L)));
 		ret = false;
@@ -422,12 +427,12 @@ bool Action::executeUse(Player* player, Item* item, const PositionEx& posFrom, c
 	else{
 		ret = (LuaScriptInterface::popNumber(L) != 0);
 	}
-	
+	*/
 	if(size0 != lua_gettop(L)){
 		LuaScriptInterface::reportError(NULL, "Stack size changed!");
 	}
 	
-	return ret;
+	return (ret != 0);
 }
 
 /*

@@ -25,16 +25,10 @@
 #include "luascript.h"
 #include "templates.h"
 
-extern "C"
-{
-#include <lua.h>
-#include <lauxlib.h>
-#include <lualib.h>
-}
-
-
 //////////////////////////////////////////////////////////////////////
 // Defines an NPC...
+
+/*
 class Npc;
 class NpcScript : protected LuaScript{
 public:
@@ -60,6 +54,68 @@ protected:
 	int registerFunctions();
 	Npc* npc;
 	bool loaded;
+};
+*/
+
+class Npc;
+
+class NpcScriptInterface : public LuaScriptInterface
+{
+public:
+	NpcScriptInterface();
+	virtual ~NpcScriptInterface();
+
+	static void setNpc(Npc* npc);
+
+	bool loadNpcLib(std::string file);
+
+protected:
+	
+	static Npc* getNpc();
+	
+	virtual void registerFunctions();
+	
+	static int luaActionSay(lua_State *L);
+	static int luaActionMove(lua_State *L);
+	static int luaActionMoveTo(lua_State *L);
+	static int luaCreatureGetName(lua_State *L);
+	static int luaCreatureGetName2(lua_State *L);
+	static int luaCreatureGetPos(lua_State *L);
+	static int luaSelfGetPos(lua_State *L);
+	static int luagetDistanceTo(lua_State *L);
+	
+private:
+	virtual bool initState();
+	virtual bool closeState();
+	
+	bool m_libLoaded;
+	static Npc* m_curNpc;
+};
+
+class NpcScript{
+public:
+	NpcScript(std::string file, Npc* npc);
+	~NpcScript();
+	
+	void onCreatureAppear(const Creature* creature);
+	void onCreatureDisappear(const Creature* creature);
+
+	void onCreatureSay(const Creature* creature, SpeakClasses, const std::string& text);
+	void onThink();
+	
+	bool isLoaded();
+	
+private:
+	
+	bool m_loaded;
+	Npc* m_npc;
+	NpcScriptInterface* m_scriptInterface;
+	
+	long m_onCreatureAppear;
+	long m_onCreatureDisappear;
+	long m_onCreatureSay;
+	long m_onThink;
+	
 };
 
 class Npc : public Creature
@@ -89,6 +145,8 @@ public:
 	void doMoveTo(Position pos);
 	bool isLoaded(){return loaded;}
 	
+	NpcScriptInterface* getScriptInterface();
+	
 protected:
 	virtual void onAddTileItem(const Position& pos, const Item* item);
 	virtual void onUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* oldItem, const Item* newItem);
@@ -108,8 +166,9 @@ protected:
 	virtual bool isAttackable() const { return false; };
 	
 	std::string name;
-	std::string scriptname;
-	NpcScript* script;
+	
+	static NpcScriptInterface m_scriptInterface;
+	NpcScript* m_npcScript;
 	std::list<Position> route;
 	bool loaded;
 };

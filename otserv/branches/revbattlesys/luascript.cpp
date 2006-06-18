@@ -216,6 +216,9 @@ void ScriptEnviroment::addUniqueThing(Thing* thing)
 
 long ScriptEnviroment::addThing(Thing* thing)
 {
+	if(!thing)
+		return 0;
+	
 	ThingMap::iterator it;
 	for(it = m_localMap.begin(); it != m_localMap.end(); ++it){
 		if(it->second == thing){
@@ -294,19 +297,13 @@ Player* ScriptEnviroment::getPlayerByUID(long uid)
 	return NULL;
 }
 
-#define reportErrorFunc(a)  reportError(__func__, a)
-
-enum ErrorCode_t{
-	LUA_ERROR_PLAYER_NOT_FOUND,
-	LUA_ERROR_ITEM_NOT_FOUND,
-	LUA_ERROR_THING_NOT_FOUND,
-	LUA_ERROR_TILE_NOT_FOUND,
-};
-
-std::string getErrorDesc(ErrorCode_t code){
+std::string LuaScriptInterface::getErrorDesc(ErrorCode_t code){
 	switch(code){
 	case LUA_ERROR_PLAYER_NOT_FOUND:
 		return "Player not found";
+		break;
+	case LUA_ERROR_CREATURE_NOT_FOUND:
+		return "Creature not found";
 		break;
 	case LUA_ERROR_ITEM_NOT_FOUND:
 		return "Item not found";
@@ -329,9 +326,6 @@ LuaScriptInterface::LuaScriptInterface(std::string interfaceName)
 {
 	m_luaState = NULL;
 	m_interfaceName = interfaceName;
-	if(!initState()){
-		//handle error
-	}
 }
 
 LuaScriptInterface::~LuaScriptInterface()
@@ -510,6 +504,24 @@ bool LuaScriptInterface::closeState()
 	return true;
 }
 
+bool LuaScriptInterface::callFunction(long nParams, long &result)
+{
+	if(lua_pcall(m_luaState, nParams, 1, 0) != 0){
+		LuaScriptInterface::reportError(NULL, std::string(LuaScriptInterface::popString(m_luaState)));
+		return false;
+	}
+	else{
+		result = LuaScriptInterface::popNumber(m_luaState);
+		return true;
+	}
+}
+
+bool LuaScriptInterface::callFunction(long nParams)
+{
+	long a;
+	return callFunction(nParams, a);
+}
+
 void LuaScriptInterface::pushThing(lua_State *L, Thing* thing, long thingid)
 {
 	lua_newtable(L);
@@ -636,7 +648,7 @@ void LuaScriptInterface::registerFunctions()
 	
 	//getTilePzInfo(pos) 1 is pz. 0 no pz.
 	lua_register(m_luaState, "getTilePzInfo", LuaScriptInterface::luaGetTilePzInfo);
-	//getTileHouseInfo(pos) 1 is houser. 0 no house.
+	//getTileHouseInfo(pos). 0 no house. != 0 house id
 	lua_register(m_luaState, "getTileHouseInfo", LuaScriptInterface::luaGetTileHouseInfo);
 	
 	//getItemRWInfo(uid)
@@ -700,6 +712,8 @@ void LuaScriptInterface::registerFunctions()
 	//doMovePlayer(cid,direction)
 	
 	//doPlayerAddCondition(....)
+	
+	lua_register(m_luaState, "debugPrint", LuaScriptInterface::luaDebugPrint);
 	
 }
 
@@ -1570,7 +1584,12 @@ int LuaScriptInterface::luaGetTileHouseInfo(lua_State *L)
 	if(tile){
 		if(HouseTile* houseTile = dynamic_cast<HouseTile*>(tile)){
 			House* house = houseTile->getHouse();
-			lua_pushnumber(L, 1);
+			if(house){
+				lua_pushnumber(L, house->getHouseId());
+			}
+			else{
+				lua_pushnumber(L, 0);
+			}
 		}
 		else{
 			lua_pushnumber(L, 0);
@@ -1688,3 +1707,9 @@ int LuaScriptInterface::luaDoPlayerSetVocation(lua_State *L)
 	return 1;
 }
 
+
+int LuaScriptInterface::luaDebugPrint(lua_State *L)
+{
+	const char * text = popString(L);
+	reportErrorFunc(std::string(text));
+}

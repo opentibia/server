@@ -126,12 +126,23 @@ enum PlayerInfo_t{
 	PlayerInfoGuildId,
 };
 
+#define reportErrorFunc(a)  reportError(__func__, a)
+
+enum ErrorCode_t{
+	LUA_ERROR_PLAYER_NOT_FOUND,
+	LUA_ERROR_CREATURE_NOT_FOUND,
+	LUA_ERROR_ITEM_NOT_FOUND,
+	LUA_ERROR_THING_NOT_FOUND,
+	LUA_ERROR_TILE_NOT_FOUND,
+};
+
 class LuaScriptInterface
 {
 public:
 	LuaScriptInterface::LuaScriptInterface(std::string interfaceName);
 	virtual ~LuaScriptInterface();
 	
+	virtual bool initState();
 	bool reInitState();
 	
 	long loadFile(const std::string& file);
@@ -150,6 +161,9 @@ public:
 	lua_State* getLuaState();
 	
 	bool pushFunction(long functionId);
+	
+	bool callFunction(long nParams, long &result);
+	bool callFunction(long nParams);
 	//push/pop common structures
 	static void pushThing(lua_State *L, Thing* thing, long thingid);
 	static void pushPosition(lua_State *L, const Position& position, long stackpos);
@@ -162,10 +176,11 @@ public:
 	static void setField(lua_State *L, const char *index, long val);
 	
 protected:
-	bool initState();
-	bool closeState();
+	virtual bool closeState();
 	
-	void registerFunctions();
+	virtual void registerFunctions();
+	
+	static std::string LuaScriptInterface::getErrorDesc(ErrorCode_t code);
 	
 	//lua functions
 	static int luaDoRemoveItem(lua_State *L);
@@ -220,6 +235,8 @@ protected:
 	
 	static int luaGetPlayerStorageValue(lua_State *L);
 	static int luaSetPlayerStorageValue(lua_State *L);
+	
+	static int luaDebugPrint(lua_State *L);
 	//
 	
 	static int internalGetPlayerInfo(lua_State *L, PlayerInfo_t info);

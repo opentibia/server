@@ -40,6 +40,8 @@ extern Game g_game;
 
 AutoList<Npc> Npc::listNpc;
 
+NpcScriptInterface Npc::m_scriptInterface;
+
 Npc::Npc(const std::string& _name) :
  Creature()
 {
@@ -48,6 +50,7 @@ Npc::Npc(const std::string& _name) :
 
 	std::string datadir = g_config.getGlobalString("datadir");
 	std::string filename = datadir + "npc/" + std::string(name) + ".xml";
+	std::string scriptname;
 
 	xmlDocPtr doc = xmlParseFile(filename.c_str());
 
@@ -149,16 +152,16 @@ Npc::Npc(const std::string& _name) :
 	}
 
 	//now try to load the script
-	script = new NpcScript(scriptname, this);
+	m_npcScript = new NpcScript(scriptname, this);
 
-	if(!script->isLoaded())
+	if(!m_npcScript->isLoaded())
 		loaded = false;
 }
 
 
 Npc::~Npc()
 {
-	delete script;
+	delete m_npcScript;
 }
 
 bool Npc::canSee(const Position& pos) const
@@ -195,12 +198,12 @@ void Npc::onUpdateTile(const Position& pos)
 
 void Npc::onCreatureAppear(const Creature* creature, bool isLogin)
 {
-	script->onCreatureAppear(creature->getID());
+	m_npcScript->onCreatureAppear(creature);
 }
 
 void Npc::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout)
 {
-	script->onCreatureDisappear(creature->getID());
+	m_npcScript->onCreatureDisappear(creature);
 }
 
 void Npc::onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport)
@@ -217,7 +220,7 @@ void Npc::onCreatureSay(const Creature* creature, SpeakClasses type, const std::
 {
 	if(creature->getID() == this->getID())
 		return;
-	this->script->onCreatureSay(creature->getID(), type, text);
+	m_npcScript->onCreatureSay(creature, type, text);
 }
 
 void Npc::onCreatureChangeOutfit(const Creature* creature)
@@ -230,18 +233,13 @@ void Npc::onCreatureChangeOutfit(const Creature* creature)
 
 void Npc::onThink(uint32_t interval)
 {
-	script->onThink();
+	Creature::onThink(interval);
+	m_npcScript->onThink();
 }
 
 void Npc::doSay(std::string msg)
 {
 	g_game.internalCreatureSay(this, SPEAK_SAY, msg);
-
-	/*
-	if(!g_game.internalCreatureSaySpell(this, msg)){
-		g_game.internalCreatureSay(this, SPEAK_SAY, msg);
-	}
-	*/
 }
 
 void Npc::doMove(Direction dir)
@@ -289,12 +287,339 @@ void Npc::doMoveTo(Position target)
 	g_game.internalMoveCreature(this, dir);
 }
 
+NpcScriptInterface* Npc::getScriptInterface()
+{
+	return &m_scriptInterface;	
+}
+
+Npc* NpcScriptInterface::m_curNpc = NULL;
+
+NpcScriptInterface::NpcScriptInterface() :
+LuaScriptInterface("Npc interface")
+{
+	m_libLoaded = false;
+	initState();
+}
+
+
+NpcScriptInterface::~NpcScriptInterface()
+{
+	//
+}
+
+bool NpcScriptInterface::initState()
+{
+	return LuaScriptInterface::initState();
+}
+
+bool NpcScriptInterface::closeState()
+{
+	m_libLoaded = false;
+	return LuaScriptInterface::closeState();
+}
+
+bool NpcScriptInterface::loadNpcLib(std::string file)
+{
+	if(m_libLoaded)
+		return true;
+		
+	if(loadFile(file) == -1){
+		std::cout << "Warning: [NpcScriptInterface::loadNpcLib] Can not load actions " << file << std::endl;
+	}
+		
+	m_libLoaded = true;
+}
+
+Npc* NpcScriptInterface::getNpc()
+{
+	return m_curNpc;
+}
+
+void NpcScriptInterface::setNpc(Npc* npc)
+{
+	m_curNpc = npc;
+}
+
+void NpcScriptInterface::registerFunctions()
+{
+	LuaScriptInterface::registerFunctions();
+	
+	//npc exclusive functions
+	lua_register(m_luaState, "selfSay", NpcScriptInterface::luaActionSay);
+	lua_register(m_luaState, "selfMove", NpcScriptInterface::luaActionMove);
+	lua_register(m_luaState, "selfMoveTo", NpcScriptInterface::luaActionMoveTo);
+	lua_register(m_luaState, "selfGetPosition", NpcScriptInterface::luaSelfGetPos);
+	lua_register(m_luaState, "creatureGetName", NpcScriptInterface::luaCreatureGetName);
+	lua_register(m_luaState, "creatureGetName2", NpcScriptInterface::luaCreatureGetName2);
+	lua_register(m_luaState, "creatureGetPosition", NpcScriptInterface::luaCreatureGetPos);
+	lua_register(m_luaState, "getDistanceTo", NpcScriptInterface::luagetDistanceTo);
+}
+
+
+int NpcScriptInterface::luaCreatureGetName2(lua_State *L)
+{
+	const char* s = popString(L);
+
+	Creature* creature = g_game.getCreatureByName(std::string(s));	
+	if(creature){
+		lua_pushnumber(L, creature->getID());
+	}
+	else{
+		lua_pushnumber(L, 0);
+	}
+
+	return 1;
+}
+
+int NpcScriptInterface::luaCreatureGetName(lua_State *L)
+{
+	long uid = (long)popNumber(L);
+	ScriptEnviroment* env = getScriptEnv();
+	Creature* creature = env->getCreatureByUID(uid);
+	
+	if(creature){
+		lua_pushstring(L, creature->getName().c_str());
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		lua_pushstring(L, "");
+	}
+	
+	return 1;
+}
+
+int NpcScriptInterface::luaCreatureGetPos(lua_State *L)
+{
+	long uid = (long)popNumber(L);
+	ScriptEnviroment* env = getScriptEnv();
+	Creature* creature = env->getCreatureByUID(uid);
+	
+	if(!creature){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		lua_pushnil(L);
+		lua_pushnil(L);
+		lua_pushnil(L);
+	}
+	else{
+		Position pos = creature->getPosition();
+		lua_pushnumber(L, pos.x);
+		lua_pushnumber(L, pos.y);
+		lua_pushnumber(L, pos.z);
+	}
+	return 3;
+}
+
+int NpcScriptInterface::luaSelfGetPos(lua_State *L)
+{
+	Npc* mynpc = getNpc();
+	lua_pushnumber(L, mynpc->getPosition().x);
+	lua_pushnumber(L, mynpc->getPosition().y);
+	lua_pushnumber(L, mynpc->getPosition().z);
+	return 3;
+}
+
+int NpcScriptInterface::luaActionSay(lua_State* L)
+{
+	std::string msg(popString(L));
+
+	Npc* mynpc = getNpc();
+	if(mynpc)
+		mynpc->doSay(msg);
+	return 0;
+}
+
+int NpcScriptInterface::luaActionMove(lua_State* L)
+{
+	Direction dir = (Direction)(int)popNumber(L);
+
+	Npc* mynpc = getNpc();
+	if(mynpc)
+		mynpc->doMove(dir);
+
+	return 0;
+}
+
+int NpcScriptInterface::luaActionMoveTo(lua_State* L)
+{
+	Position target;
+	target.z = (int)popNumber(L);
+	target.y = (int)popNumber(L);
+	target.x = (int)popNumber(L);
+	Npc* mynpc = getNpc();
+	if(mynpc)
+		mynpc->doMoveTo(target);
+	return 0;
+}
+
+int NpcScriptInterface::luagetDistanceTo(lua_State *L)
+{
+	long uid = (long)popNumber(L);
+	Npc* mynpc = getNpc();
+	
+	ScriptEnviroment* env = getScriptEnv();
+	
+	Thing* thing = env->getThingByUID(uid);
+	if(thing && mynpc){
+		Position thing_pos = thing->getPosition();
+		Position npc_pos = mynpc->getPosition();
+		if(npc_pos.z != thing_pos.z){
+			lua_pushnumber(L, -1);
+		}
+		else{
+			long dist = std::max(std::abs(npc_pos.x - thing_pos.x), std::abs(npc_pos.y - thing_pos.y));
+			lua_pushnumber(L, dist);
+		}	
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_THING_NOT_FOUND));
+		lua_pushnil(L);
+		return 1;
+	}
+	
+	return 1;
+}
+
+NpcScript::NpcScript(std::string file, Npc* npc)
+{
+	m_npc = npc;
+	m_scriptInterface = npc->getScriptInterface();
+	//load npc libs
+	std::string datadir = g_config.getGlobalString("datadir");
+	if(m_scriptInterface->loadFile(std::string(datadir + "npc/scripts/lib/npc.lua")) == -1){
+		std::cout << "Warning: [NpcScript::NpcScript] Can not load npc/scripts/lib/npc.lua" << std::endl;
+	}
+	
+	if(m_scriptInterface->loadFile(file) == -1){
+		std::cout << "Warning: [NpcScript::NpcScript] Can not load script. " << file << std::endl;
+		m_loaded = false;
+		return;
+	}
+	
+	m_onCreatureSay = m_scriptInterface->getEvent("onCreatureSay");
+	m_onCreatureDisappear = m_scriptInterface->getEvent("onCreatureDisappear");
+	m_onCreatureAppear = m_scriptInterface->getEvent("onCreatureAppear");
+	m_onThink = m_scriptInterface->getEvent("onThink");
+	m_loaded = true;
+}
+
+NpcScript::~NpcScript()
+{
+	//
+}
+	
+void NpcScript::onCreatureAppear(const Creature* creature)
+{
+	if(m_onCreatureAppear == -1){
+		return;	
+	}
+	
+	ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
+	
+	//debug only
+	std::stringstream desc;
+	desc << "npc " << m_npc->getName();
+	env->setEventDesc(desc.str());
+	
+	lua_State* L = m_scriptInterface->getLuaState();
+	
+	env->setScriptId(m_onCreatureAppear, m_scriptInterface);
+	env->setRealPos(m_npc->getPosition());
+	m_scriptInterface->setNpc(m_npc);
+	
+	long cid = env->addThing(const_cast<Creature*>(creature));
+	
+	m_scriptInterface->pushFunction(m_onCreatureAppear);
+	lua_pushnumber(L, cid);	
+	m_scriptInterface->callFunction(1);
+}
+
+void NpcScript::onCreatureDisappear(const Creature* creature)
+{
+	if(m_onCreatureDisappear == -1){
+		return;	
+	}
+	
+	ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
+	
+	//debug only
+	std::stringstream desc;
+	desc << "npc " << m_npc->getName();
+	env->setEventDesc(desc.str());
+	
+	lua_State* L = m_scriptInterface->getLuaState();
+	
+	env->setScriptId(m_onCreatureDisappear, m_scriptInterface);
+	env->setRealPos(m_npc->getPosition());
+	m_scriptInterface->setNpc(m_npc);
+	
+	long cid = env->addThing(const_cast<Creature*>(creature));
+	
+	m_scriptInterface->pushFunction(m_onCreatureDisappear);
+	lua_pushnumber(L, cid);	
+	m_scriptInterface->callFunction(1);
+}
+
+void NpcScript::onCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text)
+{
+	if(m_onCreatureSay == -1){
+		return;	
+	}
+	
+	ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
+	
+	//debug only
+	std::stringstream desc;
+	desc << "npc " << m_npc->getName();
+	env->setEventDesc(desc.str());
+	
+	env->setScriptId(m_onCreatureSay, m_scriptInterface);
+	env->setRealPos(m_npc->getPosition());
+	m_scriptInterface->setNpc(m_npc);
+	
+	long cid = env->addThing(const_cast<Creature*>(creature));
+	
+	lua_State* L = m_scriptInterface->getLuaState();
+	m_scriptInterface->pushFunction(m_onCreatureSay);
+	lua_pushnumber(L, cid);
+	lua_pushnumber(L, type);
+	lua_pushstring(L, text.c_str());
+	m_scriptInterface->callFunction(3);
+}
+
+void NpcScript::onThink()
+{
+	if(m_onThink == -1){
+		return;	
+	}
+	
+	ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
+	
+	//debug only
+	std::stringstream desc;
+	desc << "npc " << m_npc->getName();
+	env->setEventDesc(desc.str());
+	
+	env->setScriptId(m_onThink, m_scriptInterface);
+	env->setRealPos(m_npc->getPosition());
+	m_scriptInterface->setNpc(m_npc);
+	
+	m_scriptInterface->pushFunction(m_onThink);
+	m_scriptInterface->callFunction(0);
+}
+
+	
+bool NpcScript::isLoaded()
+{
+	return m_loaded;
+}
+
+/*
 NpcScript::NpcScript(std::string scriptname, Npc* _npc)
 {
 	loaded = false;
 	if(scriptname == "")
 		return;
-/*
+
 	luaState = lua_open();
 	luaopen_loadlib(luaState);
 	luaopen_base(luaState);
@@ -316,7 +641,7 @@ NpcScript::NpcScript(std::string scriptname, Npc* _npc)
 	npc = _npc;
 	setGlobalNumber("addressOfNpc", (int) npc);
 	registerFunctions();
-	*/
+	
 }
 
 void NpcScript::onThink()
@@ -392,126 +717,4 @@ void NpcScript::onCreatureSay(int cid, SpeakClasses type, const std::string& tex
 	}
 }
 
-int NpcScript::registerFunctions()
-{
-	lua_register(luaState, "selfSay", NpcScript::luaActionSay);
-	lua_register(luaState, "selfMove", NpcScript::luaActionMove);
-	lua_register(luaState, "selfMoveTo", NpcScript::luaActionMoveTo);
-	lua_register(luaState, "selfGetPosition", NpcScript::luaSelfGetPos);
-	lua_register(luaState, "creatureGetName", NpcScript::luaCreatureGetName);
-	lua_register(luaState, "creatureGetName2", NpcScript::luaCreatureGetName2);
-	lua_register(luaState, "creatureGetPosition", NpcScript::luaCreatureGetPos);
-	
-	return true;
-}
-
-Npc* NpcScript::getNpc(lua_State *L)
-{
-	lua_getglobal(L, "addressOfNpc");
-	int val = (int)lua_tonumber(L, -1);
-	lua_pop(L,1);
-
-	Npc* mynpc = (Npc*) val;
-	if(!mynpc){
-		return 0;
-	}
-	return mynpc;
-}
-
-int NpcScript::luaCreatureGetName2(lua_State *L)
-{
-	const char* s = lua_tostring(L, -1);
-	lua_pop(L,1);
-
-	Npc* mynpc = getNpc(L);
-	Creature* creature = g_game.getCreatureByName(std::string(s));
-	
-	if(creature){
-		lua_pushnumber(L, creature->getID());
-	}
-	else
-		lua_pushnumber(L, 0);
-
-	return 1;
-}
-
-int NpcScript::luaCreatureGetName(lua_State *L)
-{
-	int id = (int)lua_tonumber(L, -1);
-	lua_pop(L,1);
-	Npc* mynpc = getNpc(L);
-	lua_pushstring(L, g_game.getCreatureByID(id)->getName().c_str());
-	return 1;
-}
-
-int NpcScript::luaCreatureGetPos(lua_State *L)
-{
-	int id = (int)lua_tonumber(L, -1);
-	lua_pop(L,1);
-	Npc* mynpc = getNpc(L);
-	Creature* c = g_game.getCreatureByID(id);
-	
-	if(!c){
-		lua_pushnil(L);
-		lua_pushnil(L);
-		lua_pushnil(L);
-	}
-	else{
-		lua_pushnumber(L, c->getPosition().x);
-		lua_pushnumber(L, c->getPosition().y);
-		lua_pushnumber(L, c->getPosition().z);
-	}
-	return 3;
-}
-
-int NpcScript::luaSelfGetPos(lua_State *L)
-{
-	lua_pop(L,1);
-	Npc* mynpc = getNpc(L);
-	lua_pushnumber(L, mynpc->getPosition().x);
-	lua_pushnumber(L, mynpc->getPosition().y);
-	lua_pushnumber(L, mynpc->getPosition().z);
-	return 3;
-}
-
-int NpcScript::luaActionSay(lua_State* L)
-{
-	int len = (uint32_t)lua_strlen(L, -1);
-	std::string msg(lua_tostring(L, -1), len);
-	lua_pop(L,1);
-	//now, we got the message, we now have to find out
-	//what npc this belongs to
-
-	Npc* mynpc=getNpc(L);
-	if(mynpc)
-		mynpc->doSay(msg);
-	return 0;
-}
-
-int NpcScript::luaActionMove(lua_State* L)
-{
-	Direction dir = (Direction)(int)lua_tonumber(L, -1);
-
-	lua_pop(L,1);
-	Npc* mynpc = getNpc(L);
-
-	if(mynpc)
-		mynpc->doMove(dir);
-
-	return 0;
-}
-
-int NpcScript::luaActionMoveTo(lua_State* L)
-{
-	Position target;
-	target.z=(int)lua_tonumber(L, -1);
-	lua_pop(L,1);
-	target.y=(int)lua_tonumber(L, -1);
-	lua_pop(L,1);
-	target.x=(int)lua_tonumber(L, -1);
-	lua_pop(L,1);
-	Npc* mynpc=getNpc(L);
-	if(mynpc)
-		mynpc->doMoveTo(target);
-	return 0;
-}
+*/

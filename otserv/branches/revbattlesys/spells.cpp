@@ -34,6 +34,7 @@ Spells::Spells():
 m_scriptInterface("Action Interface")
 {
 	loaded = false;
+	m_scriptInterface.initState();
 }
 
 Spells::~Spells()
