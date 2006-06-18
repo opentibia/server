@@ -487,6 +487,7 @@ bool IOPlayerXML::savePlayer(Player* player)
 	sb << player->access;             xmlSetProp(root, (const xmlChar*)"access", (const xmlChar*)sb.str().c_str());	sb.str("");	
 	sb << player->getCapacity();      xmlSetProp(root, (const xmlChar*)"cap", (const xmlChar*)sb.str().c_str());       sb.str("");
 	sb << player->maglevel;	          xmlSetProp(root, (const xmlChar*)"maglevel", (const xmlChar*)sb.str().c_str());  sb.str("");
+	sb << player->maxDepotLimit;	  xmlSetProp(root, (const xmlChar*)"maxdepotitems", (const xmlChar*)sb.str().c_str());  sb.str("");
 	sb << player->lastlogin;	        xmlSetProp(root, (const xmlChar*)"lastlogin", (const xmlChar*)sb.str().c_str());  sb.str("");
 
 	pn = xmlNewNode(NULL,(const xmlChar*)"spawn");
