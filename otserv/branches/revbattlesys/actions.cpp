@@ -45,7 +45,7 @@ extern Game g_game;
 Actions::Actions() :
 m_scriptInterface("Action Interface")
 {
-	loaded = false;
+	m_loaded = false;
 	m_scriptInterface.initState();
 }
 
@@ -81,30 +81,31 @@ void Actions::clear()
 }
 
 bool Actions::reload(){
-	loaded = false;
-	
+	m_loaded = false;
 	//unload
 	clear();
-	
 	//load
-	return loadFromXml(datadir);
+	return loadFromXml(m_datadir);
 }
 
 bool Actions::loadFromXml(const std::string& _datadir)
 {
-	datadir = _datadir;
-	loaded = false;
+	if(m_loaded){
+		std::cout << "Error: [Actions::loadFromXml] loaded == true" << std::endl;
+		return false;
+	}
+	m_datadir = _datadir;
 	Action* action = NULL;
 	//load actions lib in script interface
-	if(m_scriptInterface.loadFile(std::string(datadir + "actions/lib/actions.lua")) == -1){
+	if(m_scriptInterface.loadFile(std::string(m_datadir + "actions/lib/actions.lua")) == -1){
 		std::cout << "Warning: [Actions::loadFromXml] Can not load actions lib/actions.lua" << std::endl;
 	}
 	
-	std::string filename = datadir + "actions/actions.xml";
+	std::string filename = m_datadir + "actions/actions.xml";
 	xmlDocPtr doc = xmlParseFile(filename.c_str());
 	
 	if(doc){
-		loaded = true;
+		m_loaded = true;
 		xmlNodePtr root, p;
 		root = xmlDocGetRootElement(doc);
 		
@@ -122,7 +123,7 @@ bool Actions::loadFromXml(const std::string& _datadir)
 					bool success = true;
 					std::string scriptfile;
 					if(readXMLString(p, "script", scriptfile)){
-						if(!action->loadScriptUse(datadir + std::string("actions/scripts/") + scriptfile)){
+						if(!action->loadScriptUse(m_datadir + std::string("actions/scripts/") + scriptfile)){
 							success = false;
 						}
 					}
@@ -167,7 +168,7 @@ bool Actions::loadFromXml(const std::string& _datadir)
 	else{
 		std::cout << "Warning: [Actions::loadFromXml] Can not open actions.xml" << std::endl;
 	}
-	return this->loaded;
+	return m_loaded;
 }
 
 int Actions::canUse(const Creature* creature, const Position& pos)

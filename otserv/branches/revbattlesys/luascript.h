@@ -124,6 +124,8 @@ enum PlayerInfo_t{
 	PlayerInfoVocation,
 	PlayerInfoMasterPos,
 	PlayerInfoGuildId,
+	PlayerInfoSoul,
+	PlayerInfoFreeCap,
 };
 
 #define reportErrorFunc(a)  reportError(__func__, a)
@@ -134,6 +136,7 @@ enum ErrorCode_t{
 	LUA_ERROR_ITEM_NOT_FOUND,
 	LUA_ERROR_THING_NOT_FOUND,
 	LUA_ERROR_TILE_NOT_FOUND,
+	LUA_ERROR_HOUSE_NOT_FOUND,
 };
 
 class LuaScriptInterface
@@ -196,6 +199,7 @@ protected:
 	static int luaDoPlayerAddSkillTry(lua_State *L);
 	static int luaDoPlayerAddHealth(lua_State *L);
 	static int luaDoPlayerAddMana(lua_State *L);
+	static int luaDoPlayerSoul(lua_State *L);
 	static int luaDoPlayerAddItem(lua_State *L);
 	static int luaDoPlayerSendTextMessage(lua_State *L);
 	static int luaDoShowTextWindow(lua_State *L);
@@ -206,6 +210,8 @@ protected:
 	static int luaDoPlayerSetMasterPos(lua_State *L);
 	static int luaDoPlayerSetVocation(lua_State *L);
 	static int luaDoPlayerRemoveItem(lua_State *L);
+	static int luaDoPlayerAddSoul(lua_State *L);
+	static int luaDoPlayerAddExp(lua_State *L);
 	
 	//get item info
 	static int luaGetItemRWInfo(lua_State *L);
@@ -218,6 +224,9 @@ protected:
 	//get tile info
 	static int luaGetTilePzInfo(lua_State *L);
 	static int luaGetTileHouseInfo(lua_State *L);
+	//houses
+	static int luaGetHouseOwner(lua_State *L);
+	static int luaSetHouseOwner(lua_State *L);
 	
 	//get player info functions
 	static int luaGetPlayerFood(lua_State *L);
@@ -232,9 +241,18 @@ protected:
 	static int luaGetPlayerVocation(lua_State *L);
 	static int luaGetPlayerMasterPos(lua_State *L);
 	static int luaGetPlayerGuildId(lua_State *L);
+	static int luaGetPlayerItemCount(lua_State *L);
+	static int luaGetPlayerSoul(lua_State *L);
+	static int luaGetPlayerFreeCap(lua_State *L);
+	static int luaGetPlayerLight(lua_State *L);
 	
 	static int luaGetPlayerStorageValue(lua_State *L);
 	static int luaSetPlayerStorageValue(lua_State *L);
+	
+	static int luaGetWorldType(lua_State *L);
+	static int luaGetWorldTime(lua_State *L);
+	static int luaGetWorldLight(lua_State *L);
+	static int luaGetWorldCreatures(lua_State *L);
 	
 	static int luaDebugPrint(lua_State *L);
 	//

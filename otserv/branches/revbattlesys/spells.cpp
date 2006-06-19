@@ -60,10 +60,7 @@ void Spells::clear()
 
 bool Spells::reload()
 {
-	if(!loaded){
-		std::cout << "Error: [Spells::reload] loaded == false" << std::endl;
-		return false;
-	}
+	loaded = false;
 	clear();
 	return loadFromXml(datadir);
 }
@@ -76,8 +73,12 @@ bool Spells::loadFromXml(const std::string& _datadir)
 	}
 	datadir = _datadir;
 	
+	//load spell lib in script interface
+	if(m_scriptInterface.loadFile(std::string(datadir + "spells/lib/spells.lua")) == -1){
+		std::cout << "Warning: [Spells::loadFromXml] Can not load spells lib/spells.lua" << std::endl;
+	}
+	
 	std::string filename = datadir + "spells/spells.xml";
-
 	xmlDocPtr doc = xmlParseFile(filename.c_str());
 
 	if(doc){
@@ -91,6 +92,7 @@ bool Spells::loadFromXml(const std::string& _datadir)
 		}
 		
 		p = root->children;
+		
 		while(p){
 			Spell* spell = NULL;
 			if(xmlStrcmp(p->name, (const xmlChar*)"rune") == 0){

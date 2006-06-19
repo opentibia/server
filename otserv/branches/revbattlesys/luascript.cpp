@@ -314,6 +314,9 @@ std::string LuaScriptInterface::getErrorDesc(ErrorCode_t code){
 	case LUA_ERROR_TILE_NOT_FOUND:
 		return "Tile not found";
 		break;
+	case LUA_ERROR_HOUSE_NOT_FOUND:
+		return "House not found";
+		break;
 	default:
 		return "Wrong error code!!";
 		break;
@@ -637,9 +640,14 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "getPlayerVocation", LuaScriptInterface::luaGetPlayerVocation);
 	//getPlayerGuildId(cid)
 	lua_register(m_luaState, "getPlayerGuildId", LuaScriptInterface::luaGetPlayerGuildId);
-	//getPlayerItemCount(uid,itemid)
-	//getPlayerItem(uid,itemid)
-	
+	//getPlayerItemCount(cid,itemid)
+	lua_register(m_luaState, "getPlayerItemCount", LuaScriptInterface::luaGetPlayerItemCount);
+	//getPlayerSoul(cid)
+	lua_register(m_luaState, "getPlayerSoul", LuaScriptInterface::luaGetPlayerSoul);
+	//getPlayerFreeCap(cid)
+	lua_register(m_luaState, "getPlayerFreeCap", LuaScriptInterface::luaGetPlayerFreeCap);
+	//getPlayerLight(cid)
+	lua_register(m_luaState, "getPlayerLight", LuaScriptInterface::luaGetPlayerLight);
 	
 	//getPlayerStorageValue(uid,valueid)
 	lua_register(m_luaState, "getPlayerStorageValue", LuaScriptInterface::luaGetPlayerStorageValue);
@@ -681,19 +689,21 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "doSetItemSpecialDescription", LuaScriptInterface::luaDoSetItemSpecialDescription);
 	//doSendAnimatedText(position,text,color)
 	lua_register(m_luaState, "doSendAnimatedText", LuaScriptInterface::luaDoSendAnimatedText);
-	//doPlayerAddSkillTry(uid,skillid,n)
+	//doPlayerAddSkillTry(cid,skillid,n)
 	lua_register(m_luaState, "doPlayerAddSkillTry", LuaScriptInterface::luaDoPlayerAddSkillTry);
-	//doPlayerAddHealth(uid,health)
+	//doPlayerAddHealth(cid,health)
 	lua_register(m_luaState, "doPlayerAddHealth", LuaScriptInterface::luaDoPlayerAddHealth);
-	//doPlayerAddMana(uid,mana)
+	//doPlayerAddMana(cid,mana)
 	lua_register(m_luaState, "doPlayerAddMana", LuaScriptInterface::luaDoPlayerAddMana);
-	//doPlayerAddItem(uid,itemid,count or type) . returns uid of the created item
+	//doPlayerAddSoul(cid,soul)
+	lua_register(m_luaState, "doPlayerAddSoul", LuaScriptInterface::luaDoPlayerAddSoul);
+	//doPlayerAddItem(cid,itemid,count or type) . returns uid of the created item
 	lua_register(m_luaState, "doPlayerAddItem", LuaScriptInterface::luaDoPlayerAddItem);
-	//doPlayerSendTextMessage(uid,MessageClasses,message)
+	//doPlayerSendTextMessage(cid,MessageClasses,message)
 	lua_register(m_luaState, "doPlayerSendTextMessage", LuaScriptInterface::luaDoPlayerSendTextMessage);
-	//doPlayerRemoveMoney(uid,money)
+	//doPlayerRemoveMoney(cid,money)
 	lua_register(m_luaState, "doPlayerRemoveMoney", LuaScriptInterface::luaDoPlayerRemoveMoney);
-	//doShowTextWindow(uid,maxlen,canWrite)	
+	//doShowTextWindow(cid,maxlen,canWrite)	
 	lua_register(m_luaState, "doShowTextWindow", LuaScriptInterface::luaDoShowTextWindow);	
 	//doDecayItem(uid)
 	lua_register(m_luaState, "doDecayItem", LuaScriptInterface::luaDoDecayItem);
@@ -707,12 +717,29 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "doPlayerSetVocation", LuaScriptInterface::luaDoPlayerSetVocation);
 	//doPlayerRemoveItem(cid,itemid,count)
 	lua_register(m_luaState, "doPlayerRemoveItem", LuaScriptInterface::luaDoPlayerRemoveItem);
+	//doPlayerAddExp(cid,exp)
+	lua_register(m_luaState, "doPlayerAddExp", LuaScriptInterface::luaDoPlayerAddExp);
 	
 	//doMoveItem(uid,toPos)
 	//doMovePlayer(cid,direction)
 	
 	//doPlayerAddCondition(....)
 	
+	//getHouseOwner(houseid)
+	lua_register(m_luaState, "getHouseOwner", LuaScriptInterface::luaGetHouseOwner);
+	//setHouseOwner(houseid, owner)
+	lua_register(m_luaState, "setHouseOwner", LuaScriptInterface::luaSetHouseOwner);
+	
+	//getWorldType()
+	lua_register(m_luaState, "getWorldType", LuaScriptInterface::luaGetWorldType);
+	//getWorldTime()
+	lua_register(m_luaState, "getWorldTime", LuaScriptInterface::luaGetWorldTime);
+	//getWorldLight()
+	lua_register(m_luaState, "getWorldLight", LuaScriptInterface::luaGetWorldLight);
+	//getWorldCreatures(type) 0 players, 1 monsters, 2 npcs, 3 all
+	lua_register(m_luaState, "getWorldCreatures", LuaScriptInterface::luaGetWorldCreatures);
+	
+	//debugPrint(text)
 	lua_register(m_luaState, "debugPrint", LuaScriptInterface::luaDebugPrint);
 	
 }
@@ -735,7 +762,7 @@ int  LuaScriptInterface::internalGetPlayerInfo(lua_State *L, PlayerInfo_t info)
 			break;		
 		case PlayerInfoLevel:
 			value = player->level;
-			break;		
+			break;
 		case PlayerInfoMagLevel:
 			value = player->magLevel;
 			break;
@@ -774,6 +801,12 @@ int  LuaScriptInterface::internalGetPlayerInfo(lua_State *L, PlayerInfo_t info)
 			break;
 		case PlayerInfoGuildId:
 			value = player->guildId;
+			break;
+		case PlayerInfoSoul:
+			value = player->getPlayerInfo(PLAYERINFO_SOUL);
+			break;
+		case PlayerInfoFreeCap:
+			value = (int)player->getFreeCapacity();
 			break;
 		default:
 			std::string error_str = "Unknown player info. info = " + info;
@@ -828,6 +861,12 @@ int LuaScriptInterface::luaGetPlayerMasterPos(lua_State *L){
 
 int LuaScriptInterface::luaGetPlayerGuildId(lua_State *L){
 	return internalGetPlayerInfo(L,PlayerInfoGuildId);}
+
+int LuaScriptInterface::luaGetPlayerSoul(lua_State *L){
+	return internalGetPlayerInfo(L,PlayerInfoSoul);}
+
+int LuaScriptInterface::luaGetPlayerFreeCap(lua_State *L){
+	return internalGetPlayerInfo(L,PlayerInfoFreeCap);}
 //
 
 
@@ -856,9 +895,9 @@ int LuaScriptInterface::luaDoRemoveItem(lua_State *L)
 int LuaScriptInterface::luaDoPlayerRemoveItem(lua_State *L)
 {
 	//doPlayerRemoveItem(cid,itemid,count)
-	long count = (unsigned char)popNumber(L);	
+	long count = (unsigned char)popNumber(L);
 	unsigned short itemId = (unsigned short)popNumber(L);
-	unsigned int cid = (unsigned int)popNumber(L);						
+	unsigned int cid = (unsigned int)popNumber(L);
 	
 	ScriptEnviroment* env = getScriptEnv();
 	
@@ -979,7 +1018,7 @@ int LuaScriptInterface::luaDoPlayerSay(lua_State *L)
 	//doPlayerSay(uid,text,type)
 	int type = (int)popNumber(L);	
 	const char * text = popString(L);
-	unsigned int cid = (unsigned int)popNumber(L);	
+	unsigned int cid = (unsigned int)popNumber(L);
 					
 	ScriptEnviroment* env = getScriptEnv();
 	
@@ -1054,8 +1093,8 @@ int LuaScriptInterface::luaDoPlayerAddSkillTry(lua_State *L)
 	//doPlayerAddSkillTry(uid,skillid,n)
 	int n = (int)popNumber(L);
 	int skillid = (int)popNumber(L);
-	unsigned int cid = (unsigned int)popNumber(L);	
-					
+	unsigned int cid = (unsigned int)popNumber(L);
+	
 	ScriptEnviroment* env = getScriptEnv();
 	
 	Player* player = env->getPlayerByUID(cid);
@@ -1077,8 +1116,8 @@ int LuaScriptInterface::luaDoPlayerAddHealth(lua_State *L)
 {
 	//doPlayerAddHealth(uid,health)
 	int addhealth = (int)popNumber(L);
-	unsigned int cid = (unsigned int)popNumber(L);	
-					
+	unsigned int cid = (unsigned int)popNumber(L);
+	
 	ScriptEnviroment* env = getScriptEnv();
 	
 	Player* player = env->getPlayerByUID(cid);
@@ -1119,8 +1158,8 @@ int LuaScriptInterface::luaDoPlayerAddMana(lua_State *L)
 {
 	//doPlayerAddMana(uid,mana)
 	int addmana = (int)popNumber(L);
-	unsigned int cid = (unsigned int)popNumber(L);	
-					
+	unsigned int cid = (unsigned int)popNumber(L);
+	
 	ScriptEnviroment* env = getScriptEnv();
 	
 	Player* player = env->getPlayerByUID(cid);
@@ -1143,7 +1182,7 @@ int LuaScriptInterface::luaDoPlayerAddItem(lua_State *L)
 	//doPlayerAddItem(uid,itemid,count or type)
 	int type = (int)popNumber(L);
 	int itemid = (int)popNumber(L);
-	unsigned int cid = (unsigned int)popNumber(L);	
+	unsigned int cid = (unsigned int)popNumber(L);
 	
 	ScriptEnviroment* env = getScriptEnv();
 	unsigned int uid;
@@ -1188,8 +1227,8 @@ int LuaScriptInterface::luaDoPlayerSendTextMessage(lua_State *L)
 {	
 	//doPlayerSendTextMessage(uid,MessageClasses,message)
 	const char * text = popString(L);
-	unsigned char messageClass = (unsigned char)popNumber(L);	
-	unsigned int cid = (unsigned int)popNumber(L);	
+	unsigned char messageClass = (unsigned char)popNumber(L);
+	unsigned int cid = (unsigned int)popNumber(L);
 	
 	ScriptEnviroment* env = getScriptEnv();
 	
@@ -1668,7 +1707,7 @@ int LuaScriptInterface::luaDoPlayerSetMasterPos(lua_State *L)
 	Position pos;
 	long stackpos;
 	popPosition(L, pos, stackpos);
-	unsigned int cid = (unsigned int)popNumber(L);	
+	unsigned int cid = (unsigned int)popNumber(L);
 	
 	ScriptEnviroment* env = getScriptEnv();
 	
@@ -1689,8 +1728,8 @@ int LuaScriptInterface::luaDoPlayerSetVocation(lua_State *L)
 {
 	//doPlayerSetVocation(cid,voc)
 	int voc = (int)popNumber(L);
-	unsigned int cid = (unsigned int)popNumber(L);	
-					
+	unsigned int cid = (unsigned int)popNumber(L);
+	
 	ScriptEnviroment* env = getScriptEnv();
 	
 	Player* player = env->getPlayerByUID(cid);
@@ -1710,6 +1749,203 @@ int LuaScriptInterface::luaDoPlayerSetVocation(lua_State *L)
 
 int LuaScriptInterface::luaDebugPrint(lua_State *L)
 {
+	//debugPrint(text)
 	const char * text = popString(L);
 	reportErrorFunc(std::string(text));
+	return 0;
+}
+
+int LuaScriptInterface::luaDoPlayerAddSoul(lua_State *L)
+{
+	//doPlayerAddSoul(cid,soul)
+	int addsoul = (int)popNumber(L);
+	unsigned int cid = (unsigned int)popNumber(L);
+	
+	ScriptEnviroment* env = getScriptEnv();
+	
+	Player* player = env->getPlayerByUID(cid);
+	if(player){
+		//TODO: add soul;
+		player->sendStats();
+	}
+	else{
+		lua_pushnumber(L, -1);
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		return 1;
+	}		
+		
+	lua_pushnumber(L, 0);
+	return 1;
+}
+
+int LuaScriptInterface::luaGetPlayerItemCount(lua_State *L)
+{
+	//getPlayerItemCount(cid,itemid)
+	unsigned short itemId = (unsigned short)popNumber(L);
+	unsigned int cid = (unsigned int)popNumber(L);
+	
+	ScriptEnviroment* env = getScriptEnv();
+	
+	Player* player = env->getPlayerByUID(cid);
+	if(player){
+		long n = player->__getItemTypeCount(itemId);
+		lua_pushnumber(L, n);
+	}
+	else{
+		lua_pushnumber(L, -1);
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		return 1;
+	}
+
+	return 1;
+}
+
+
+int LuaScriptInterface::luaGetHouseOwner(lua_State *L)
+{
+	//getHouseOwner(houseid)
+	int houseid = (int)popNumber(L);
+	
+	House* house = Houses::getInstance().getHouse(houseid);
+	if(house){
+		long owner = house->getHouseOwner();
+		lua_pushnumber(L, owner);
+	}
+	else{
+		lua_pushnumber(L, -1);
+		reportErrorFunc(getErrorDesc(LUA_ERROR_HOUSE_NOT_FOUND));
+	}
+	
+	return 1;
+}
+	
+int LuaScriptInterface::luaSetHouseOwner(lua_State *L)
+{
+	//setHouseOwner(houseid, owner)
+	int owner = (int)popNumber(L);
+	int houseid = (int)popNumber(L);
+	
+	House* house = Houses::getInstance().getHouse(houseid);
+	if(house){
+		house->setHouseOwner(owner);
+		lua_pushnumber(L, 1);
+	}
+	else{
+		lua_pushnumber(L, -1);
+		reportErrorFunc(getErrorDesc(LUA_ERROR_HOUSE_NOT_FOUND));
+	}
+	
+	return 1;
+}
+
+
+int LuaScriptInterface::luaGetWorldType(lua_State *L)
+{
+	//getWorldType()
+	switch(g_game.getWorldType()){
+	case WORLD_TYPE_NO_PVP:
+		lua_pushnumber(L, 1);
+		break;
+	case WORLD_TYPE_PVP:
+		lua_pushnumber(L, 2);
+		break;
+	case WORLD_TYPE_PVP_ENFORCED:
+		lua_pushnumber(L, 3);
+		break;
+	default:
+		lua_pushnumber(L, -1);
+		break;
+	}
+	return 1;
+}
+
+int LuaScriptInterface::luaGetWorldTime(lua_State *L)
+{
+	//getWorldTime()
+	long time = g_game.light_hour;
+	lua_pushnumber(L, time);
+	return 1;
+}
+
+int LuaScriptInterface::luaGetWorldLight(lua_State *L)
+{
+	//getWorldLight()
+	long level = g_game.lightlevel;
+	lua_pushnumber(L, level);
+	lua_pushnumber(L, 0xD7);//color
+	return 2;
+}
+
+int LuaScriptInterface::luaGetWorldCreatures(lua_State *L)
+{
+	//getWorldCreatures(type) 0 players, 1 monsters, 2 npcs, 3 all
+	int type = (int)popNumber(L);
+	int value;
+	switch(type){
+	case 0:
+		value = g_game.getPlayersOnline();
+		break;
+	case 1:
+		value = g_game.getMonstersOnline();
+		break;
+	case 2:
+		value = g_game.getNpcsOnline();
+		break;
+	case 3:
+		value = g_game.getCreaturesOnline();
+		break;
+	default:
+		lua_pushnumber(L, -1);
+		reportErrorFunc("Wrong creature type.");
+		return 1;
+		break;
+	}
+	lua_pushnumber(L, value);
+	return 1;
+}
+
+int LuaScriptInterface::luaGetPlayerLight(lua_State *L)
+{
+	//getPlayerLight(cid)
+	unsigned int cid = (unsigned int)popNumber(L);
+	
+	ScriptEnviroment* env = getScriptEnv();
+	Player* player = env->getPlayerByUID(cid);
+	if(player){
+		LightInfo lightInfo;
+		player->getCreatureLight(lightInfo);
+		lua_pushnumber(L, lightInfo.level);
+		lua_pushnumber(L, lightInfo.color);//color
+	}
+	else{
+		lua_pushnumber(L, -1);
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		return 1;
+	}
+	return 2;
+}
+
+int LuaScriptInterface::luaDoPlayerAddExp(lua_State *L)
+{
+	//doPlayerAddExp(cid,exp)
+	int exp = (int)popNumber(L);
+	unsigned int cid = (unsigned int)popNumber(L);
+	
+	ScriptEnviroment* env = getScriptEnv();
+	Player* player = env->getPlayerByUID(cid);
+	if(player){
+		if(exp > 0){
+			player->addExperience(exp);
+			lua_pushnumber(L, 1);
+		}
+		else{
+			lua_pushnumber(L, 0);
+		}
+	}
+	else{
+		lua_pushnumber(L, -1);
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		return 1;
+	}
+	return 1;
 }

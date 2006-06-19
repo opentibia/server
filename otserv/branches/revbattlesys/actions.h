@@ -50,7 +50,7 @@ public:
 	
 	bool loadFromXml(const std::string& datadir);
 	bool reload();
-	bool isLoaded(){return loaded;}	
+	bool isLoaded(){return m_loaded;}	
 	
 	bool useItem(Player* player, const Position& pos, uint8_t index, Item* item);
 	bool useItemEx(Player* player, const Position& from_pos,
@@ -64,9 +64,9 @@ public:
 protected:
 	void clear();
 	
-	bool loaded;
+	bool m_loaded;
 	
-	std::string datadir;
+	std::string m_datadir;
 	typedef std::map<unsigned short, Action*> ActionUseMap;
 	ActionUseMap useItemMap;
 	ActionUseMap uniqueItemMap;
