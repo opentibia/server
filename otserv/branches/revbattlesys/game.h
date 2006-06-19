@@ -202,7 +202,7 @@ public:
 	  * \param count is the amount to remove
 	  * \returns true if the removal was successful
 	  */
-	bool removeItemOfType(Cylinder* cylinder, uint16_t spriteId, uint32_t count);
+	bool removeItemOfType(Cylinder* cylinder, uint16_t itemId, uint32_t count);
 
 	/**
 	  * Get the amount of money in a a cylinder
