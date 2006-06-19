@@ -29,6 +29,7 @@
 #include "game.h"
 #include "house.h"
 #include "housetile.h"
+#include "status.h"
 
 extern Game g_game;
 
@@ -738,6 +739,9 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "getWorldLight", LuaScriptInterface::luaGetWorldLight);
 	//getWorldCreatures(type) 0 players, 1 monsters, 2 npcs, 3 all
 	lua_register(m_luaState, "getWorldCreatures", LuaScriptInterface::luaGetWorldCreatures);
+	//getWorldUpTime()
+	lua_register(m_luaState, "getWorldUpTime", LuaScriptInterface::luaGetWorldUpTime);
+	
 	
 	//debugPrint(text)
 	lua_register(m_luaState, "debugPrint", LuaScriptInterface::luaDebugPrint);
@@ -1901,6 +1905,20 @@ int LuaScriptInterface::luaGetWorldCreatures(lua_State *L)
 		break;
 	}
 	lua_pushnumber(L, value);
+	return 1;
+}
+
+int LuaScriptInterface::luaGetWorldUpTime(lua_State *L)
+{
+	long uptime;
+	Status* status = Status::instance();
+	if(status){
+		lua_pushnumber(L, (OTSYS_TIME() - status->start)/1000);
+	}
+	else{
+		lua_pushnumber(L, 0);
+	}
+	
 	return 1;
 }
 

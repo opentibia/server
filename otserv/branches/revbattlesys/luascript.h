@@ -253,6 +253,7 @@ protected:
 	static int luaGetWorldTime(lua_State *L);
 	static int luaGetWorldLight(lua_State *L);
 	static int luaGetWorldCreatures(lua_State *L);
+	static int luaGetWorldUpTime(lua_State *L);
 	
 	static int luaDebugPrint(lua_State *L);
 	//
