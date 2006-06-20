@@ -325,9 +325,11 @@ bool NpcScriptInterface::loadNpcLib(std::string file)
 		
 	if(loadFile(file) == -1){
 		std::cout << "Warning: [NpcScriptInterface::loadNpcLib] Can not load actions " << file << std::endl;
+		return false;
 	}
 		
 	m_libLoaded = true;
+	return true;
 }
 
 Npc* NpcScriptInterface::getNpc()

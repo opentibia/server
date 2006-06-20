@@ -31,7 +31,9 @@ extern "C"
 #include <lauxlib.h>
 #include <lualib.h>
 }
+
 #include "position.h"
+#include "definitions.h"
 
 class Thing;
 class Creature;
@@ -128,7 +130,7 @@ enum PlayerInfo_t{
 	PlayerInfoFreeCap,
 };
 
-#define reportErrorFunc(a)  reportError(__func__, a)
+#define reportErrorFunc(a)  reportError(__FUNCTION__, a)
 
 enum ErrorCode_t{
 	LUA_ERROR_PLAYER_NOT_FOUND,

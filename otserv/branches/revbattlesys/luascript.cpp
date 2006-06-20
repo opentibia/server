@@ -1910,15 +1910,14 @@ int LuaScriptInterface::luaGetWorldCreatures(lua_State *L)
 
 int LuaScriptInterface::luaGetWorldUpTime(lua_State *L)
 {
-	long uptime;
+	long uptime = 0;
+
 	Status* status = Status::instance();
 	if(status){
-		lua_pushnumber(L, (OTSYS_TIME() - status->start)/1000);
+		uptime = (OTSYS_TIME() - status->start)/1000;
 	}
-	else{
-		lua_pushnumber(L, 0);
-	}
-	
+
+	lua_pushnumber(L, uptime);
 	return 1;
 }
 

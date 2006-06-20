@@ -44,6 +44,10 @@ typedef unsigned long long uint64_t;
 
 #if defined __WINDOWS__ || defined WIN32
 
+#ifndef __FUNCTION__
+	#define	__FUNCTION__ __func__
+#endif
+
 #define OTSYS_THREAD_RETURN  void
 #define EWOULDBLOCK WSAEWOULDBLOCK
 
@@ -78,6 +82,7 @@ typedef unsigned long long uint64_t;
 
 	#pragma warning(disable:4786) // msvc too long debug names in stl
 	#pragma warning(disable:4250) // 'class1' : inherits 'class2::member' via dominance
+
 #endif
 
 //*nix systems
