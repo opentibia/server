@@ -789,10 +789,13 @@ int main(int argc, char *argv[])
 		accept_errors = 0;
 		while(g_game.getGameState() != GAME_STATE_SHUTDOWN && accept_errors < 100){
 			fd_set listen_set;
+			timeval tv;
 			FD_ZERO(&listen_set);
 			FD_SET(listen_socket, &listen_set);
+			tv.tv_sec = 2;
+			tv.tv_usec = 0;
 			
-			int ret = select(listen_socket + 1, &listen_set, NULL, NULL, NULL);
+			int ret = select(listen_socket + 1, &listen_set, NULL, NULL, &tv);
 				
 			if(ret == SOCKET_ERROR)
 			{
@@ -803,7 +806,6 @@ int main(int argc, char *argv[])
 				errnum = errno;
 #endif
 				if(errnum == ERROR_EINTR){
-					accept_errors++;
 					continue;
 				}
 				else{
@@ -812,7 +814,6 @@ int main(int argc, char *argv[])
 				}
 			}
 			else if(ret == 0){
-				accept_errors++;
 				continue;
 			}
 			
