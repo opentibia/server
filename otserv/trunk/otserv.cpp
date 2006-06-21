@@ -736,6 +736,7 @@ int main(int argc, char *argv[])
 	
 	// start the server listen...
 	int listen_errors;
+	int accept_errors;
 	listen_errors = 0;
 	while(g_game.getGameState() != GAME_STATE_SHUTDOWN && listen_errors < 100){
 		sockaddr_in local_adress;
@@ -785,13 +786,14 @@ int main(int argc, char *argv[])
 
 
 		std::cout << "[done]" << std::endl << ":: OpenTibia Server Running..." << std::endl;
-		while(g_game.getGameState() != GAME_STATE_SHUTDOWN){
+		accept_errors = 0;
+		while(g_game.getGameState() != GAME_STATE_SHUTDOWN && accept_errors < 100){
 			fd_set listen_set;
 			FD_ZERO(&listen_set);
 			FD_SET(listen_socket, &listen_set);
 			
 			int ret = select(listen_socket + 1, &listen_set, NULL, NULL, NULL);
-			
+				
 			if(ret == SOCKET_ERROR)
 			{
 				int errnum;
@@ -801,12 +803,17 @@ int main(int argc, char *argv[])
 				errnum = errno;
 #endif
 				if(errnum == ERROR_EINTR){
+					accept_errors++;
 					continue;
 				}
 				else{
 					std::cout << "WARNING: select() function returned an error." << std::endl;; 
 					break;
 				}
+			}
+			else if(ret == 0){
+				accept_errors++;
+				continue;
 			}
 			
 			SOCKET s = accept(listen_socket, NULL, NULL); // accept a new connection
@@ -815,6 +822,7 @@ int main(int argc, char *argv[])
 				OTSYS_CREATE_THREAD(ConnectionHandler, (void*)&s);
 			}
 			else{
+				accept_errors++;
 				std::cout << "WARNING: Not a valid socket from accept() function." << std::endl;; 
 			}
 		}
