@@ -736,7 +736,6 @@ int main(int argc, char *argv[])
 	
 	// start the server listen...
 	int listen_errors;
-	int accept_errors;
 	listen_errors = 0;
 	while(g_game.getGameState() != GAME_STATE_SHUTDOWN && listen_errors < 100){
 		sockaddr_in local_adress;
@@ -786,44 +785,48 @@ int main(int argc, char *argv[])
 
 
 		std::cout << "[done]" << std::endl << ":: OpenTibia Server Running..." << std::endl;
-		accept_errors = 0;
-		while(g_game.getGameState() != GAME_STATE_SHUTDOWN && accept_errors < 100){
+		while(g_game.getGameState() != GAME_STATE_SHUTDOWN){
 			fd_set listen_set;
-			timeval tv;
 			FD_ZERO(&listen_set);
 			FD_SET(listen_socket, &listen_set);
-			tv.tv_sec = 1;
-			tv.tv_usec = 0;
 			
-			int reads = select(1, &listen_set, NULL, NULL, &tv);
-			int errnum;
+			int ret = select(listen_socket + 1, &listen_set, NULL, NULL, NULL);
+			
+			if(ret == SOCKET_ERROR)
+			{
+				int errnum;
 #ifdef WIN32
-			errnum = WSAGetLastError();
+				errnum = WSAGetLastError();
 #else
-			errnum = errno;
+				errnum = errno;
 #endif
-			if(reads == SOCKET_ERROR){
-				break;
+				if(errnum == ERROR_EINTR){
+					continue;
+				}
+				else{
+					std::cout << "WARNING: select() function returned an error." << std::endl;; 
+					break;
+				}
 			}
-			else if(reads == 0 && errnum == ERROR_EINTR){
-				accept_errors++;
-				continue;
-			}
-		
+			
 			SOCKET s = accept(listen_socket, NULL, NULL); // accept a new connection
-
+			
 			if(s > 0){
 				OTSYS_CREATE_THREAD(ConnectionHandler, (void*)&s);
 			}
 			else{
-				accept_errors++;
+				std::cout << "WARNING: Not a valid socket from accept() function." << std::endl;; 
 			}
 		}
 
 		closesocket(listen_socket);
 		listen_errors++;
 	}
-
+	
+	if(listen_errors >= 100){
+		std::cout << "ERROR: Server shutted down because there where 100 listen errors." << std::endl;
+	}
+	
 #ifdef WIN32
   WSACleanup();
 #endif
