@@ -218,6 +218,8 @@ protected:
 	//get item info
 	static int luaGetItemRWInfo(lua_State *L);
 	static int luaGetThingfromPos(lua_State *L);
+	static int luaGetThing(lua_State *L);
+	static int luaGetThingPos(lua_State *L);
 	//set item
 	static int luaDoSetItemActionId(lua_State *L);
 	static int luaDoSetItemText(lua_State *L);
@@ -247,6 +249,7 @@ protected:
 	static int luaGetPlayerSoul(lua_State *L);
 	static int luaGetPlayerFreeCap(lua_State *L);
 	static int luaGetPlayerLight(lua_State *L);
+	static int luaGetPlayerSlotItem(lua_State *L);
 	
 	static int luaGetPlayerStorageValue(lua_State *L);
 	static int luaSetPlayerStorageValue(lua_State *L);

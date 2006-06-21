@@ -26,6 +26,7 @@
 #include "trashholder.h"
 #include "mailbox.h"
 #include "house.h"
+#include "luascript.h"
 
 #include "actions.h"
 #include "combat.h"
@@ -240,7 +241,7 @@ void Item::setUniqueId(unsigned short n)
 	 if(n < 1000)
 	 	n = 1000;
 	uniqueId = n;
-	//ActionScript::AddThingToMapUnique(this);
+	ScriptEnviroment::addUniqueThing(this);
 }
 
 unsigned short Item::getUniqueId() const

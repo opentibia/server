@@ -19,40 +19,40 @@
 //////////////////////////////////////////////////////////////////////
 
 
-#ifndef __ACTIONS_H__
-#define __ACTIONS_H__
+#ifndef __TALKACTION_H__
+#define __TALKACTION_H__
 
-#include "position.h"
-
-#include <map>
+#include <list>
+#include <string>
 #include "luascript.h"
+#include "const76.h"
 
-class Action;
+extern "C"
+{
+#include <lua.h>
+#include <lauxlib.h>
+#include <lualib.h>
+}
 
-enum tCanUseRet{
-	CAN_USE,
-	TOO_FAR,
-	CAN_NOT_THROW,
+enum talkActionResult_t{
+	//TALKACTION_NOTFOUND,
+	TALKACTION_CONTINUE,
+	TALKACTION_NO_CONTINUE,
 };
 
-class Actions
+class TalkAction;
+
+class TalkActions
 {
 public:
-	Actions();
-	~Actions();
+	TalkActions();
+	~TalkActions();
 	
 	bool loadFromXml(const std::string& datadir);
 	bool reload();
 	bool isLoaded(){return m_loaded;}	
 	
-	bool useItem(Player* player, const Position& pos, uint8_t index, Item* item);
-	bool useItemEx(Player* player, const Position& from_pos,
-		const Position& to_pos, const unsigned char to_stack, Item* item);
-	
-	bool openContainer(Player* player,Container* container, const unsigned char index);
-	
-	static int canUse(const Creature* creature ,const Position& pos);
-	static int canUseFar(const Creature* creature ,const Position& to_pos, const bool blockWalls);
+	talkActionResult_t creatureSay(Creature *creature, SpeakClasses type, const std::string& words);
 	
 protected:
 	void clear();
@@ -60,43 +60,33 @@ protected:
 	bool m_loaded;
 	
 	std::string m_datadir;
-	typedef std::map<unsigned short, Action*> ActionUseMap;
-	ActionUseMap useItemMap;
-	ActionUseMap uniqueItemMap;
-	ActionUseMap actionItemMap;
 	
-	Action *getAction(const Item* item);
+	typedef std::list< std::pair<std::string, TalkAction* > > TalkActionList;
+	TalkActionList wordsMap;
 	
 	LuaScriptInterface m_scriptInterface;
-	
 };
 
-class Action
+class TalkAction
 {
 public:
-	Action(LuaScriptInterface* _interface);
-	virtual ~Action();
-	bool configureAction(xmlNodePtr p);
+	TalkAction(LuaScriptInterface* _interface);
+	virtual ~TalkAction();
+	bool configureTalkAction(xmlNodePtr p);
+	
+	std::string getWords() const {return m_words;};
 	
 	//scripting
-	bool loadScriptUse(const std::string& script);
-	//void setScriptInterface(LuaScriptInterface* _interface);
-	bool executeUse(Player* player, Item* item, const PositionEx& posFrom, const PositionEx& posTo);
+	bool loadScriptSay(const std::string& script);
+	long executeSay(Creature* creature, const std::string& words, const std::string& param);
 	//
-	
-	bool allowFarUse() const {return allowfaruse;};
-	bool blockWalls() const {return blockwalls;};
-	
-	void setAllowFarUse(bool v){allowfaruse = v;};
-	void setBlockWalls(bool v){blockwalls = v;};
 	
 protected:
 	//scripting
 	long m_scriptId;
 	LuaScriptInterface* m_scriptInterface;
 	//
-	bool allowfaruse;
-	bool blockwalls;
+	std::string m_words;
 };
 
 #endif

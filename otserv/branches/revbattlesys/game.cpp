@@ -49,6 +49,7 @@
 #include "ioplayer.h"
 #include "chat.h"
 #include "luascript.h"
+#include "talkaction.h"
 
 #if defined __EXCEPTION_TRACER__
 #include "exception.h"
@@ -59,6 +60,7 @@ extern LuaScript g_config;
 extern Actions g_actions;
 extern Commands commands;
 extern Chat g_chat;
+extern TalkActions g_talkactions;
 
 Game::Game()
 {
@@ -2371,6 +2373,10 @@ bool Game::internalCreatureSay(Creature* creature, SpeakClasses type, const std:
 		if(commandTags[i] == text.substr(0,1)){
 			return commands.exeCommand(creature, text);
 		}
+	}
+
+	if(g_talkactions.creatureSay(creature, type, text) == TALKACTION_NO_CONTINUE){
+		return true;
 	}
 
 	SpectatorVec list;

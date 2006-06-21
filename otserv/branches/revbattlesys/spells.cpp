@@ -20,8 +20,10 @@
 
 
 #include "definitions.h"
-#include "spells.h"
 #include "tools.h"
+#include "house.h"
+#include "housetile.h"
+#include "spells.h"
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
@@ -111,6 +113,11 @@ bool Spells::loadFromXml(const std::string& _datadir)
 							success = false;
 						}
 					}
+					else if(readXMLString(p, "function", scriptfile)){
+						if(!spell->loadFunctionSpell(scriptfile)){
+							success = false;
+						}
+					}
 					else{
 						success = false;
 					}
@@ -187,9 +194,6 @@ Spell::Spell()
 	premium = false;
 	enabled = true;
 	vocationBits = 0;
-	
-	scripted = false;
-	hardcodedAction = 0;
 }
 	
 bool Spell::configureSpell(xmlNodePtr p)
@@ -291,13 +295,12 @@ void Spell::addSpellEffects(Player* player)
 	*/
 }
 
-InstantSpell::InstantSpell(LuaScriptInterface* _interface)
+InstantSpell::InstantSpell(LuaScriptInterface* _interface) :
+TalkAction(_interface)
 {
-	//
-	m_scriptInterface = _interface;
-	m_scriptId = 0;
-	//
+	scripted = true;
 	hasParam = false;
+	function = NULL;
 }
 
 InstantSpell::~InstantSpell()
@@ -306,20 +309,13 @@ InstantSpell::~InstantSpell()
 	
 bool InstantSpell::configureSpell(xmlNodePtr p)
 {
-	std::string str;
 	int intValue;
-	if(readXMLString(p, "words", str)){
-		words = str;
-	}
-	else{
-		std::cout << "Error: [InstantSpell::configureSpell] Instant spell without words." << std::endl;
-		return false;
-	}
+	
 	if(readXMLInteger(p, "params", intValue)){
 		if(intValue == 1)
 	 		hasParam = true;
 	}
-	if(Spell::configureSpell(p)){
+	if(Spell::configureSpell(p) && TalkAction::configureTalkAction(p)){
 		return true;
 	}
 	else{
@@ -330,12 +326,29 @@ bool InstantSpell::configureSpell(xmlNodePtr p)
 bool InstantSpell::castInstant(Creature* creature, const std::string& words, const std::string& param)
 {
 	if(creature){
+		bool success = true;
 		Player* player = creature->getPlayer();
 		if(player && !spellPlayerChecks(player)){
 			return false;
 		}
 		//TODO: more checks?
-		return executeCastInstant(creature, param);
+		
+		if(scripted){
+			success =  executeCastInstant(creature, param);
+		}
+		else{
+			if(function){
+				success =  function(creature, words, param);
+			}
+			else{
+				success = false;
+			}
+		}
+		
+		if(success && player){
+			Spell::addSpellEffects(player);
+		}
+		return success;
 	}
 	return false;
 }
@@ -358,6 +371,29 @@ bool InstantSpell::loadScriptSpell(const std::string& script)
 		
 	}
 	m_scriptId = id;
+	scripted = true;
+	return true;
+}
+
+bool InstantSpell::loadFunctionSpell(const std::string& functionName)
+{
+	if(functionName == "editHouseGuest"){
+		function = HouseGuestList;
+	}
+	else if(functionName == "editHouseSubOwner"){
+		function = HouseSubOwnerList;
+	}
+	else if(functionName == "editHouseDoor"){
+		function = HouseDoorList;	
+	}
+	else if(functionName == "houseKick"){
+		function = HouseKick;
+	}
+	else{
+		return false;
+	}
+	
+	scripted = false;
 	return true;
 }
 
@@ -389,11 +425,118 @@ bool InstantSpell::executeCastInstant(Creature* creature, const std::string& par
 	return false;
 }
 
+House* InstantSpell::getHouseFromPos(Creature* creature)
+{
+	if(creature){
+		Player* player = creature->getPlayer();
+		if(player){
+			HouseTile* houseTile = dynamic_cast<HouseTile*>(player->getTile());
+			if(houseTile){
+				House* house = houseTile->getHouse();
+				if(house){
+					return house;
+				}
+			}
+		}
+	}
+	return NULL;
+}
+
+bool InstantSpell::HouseGuestList(Creature* creature, const std::string& words, const std::string& param)
+{
+	House* house = getHouseFromPos(creature);
+	if(!house)
+		return false;
+	Player* player = creature->getPlayer();
+	
+	if(house->canEditAccessList(GUEST_LIST, player)){
+		player->sendHouseWindow(house, GUEST_LIST);
+		return true;
+	}
+	else{
+		player->sendCancelMessage(RET_NOTPOSSIBLE);
+		player->sendMagicEffect(player->getPosition(), NM_ME_PUFF);
+	}
+	
+	return true;
+}
+
+bool InstantSpell::HouseSubOwnerList(Creature* creature, const std::string& words, const std::string& param)
+{
+	House* house = getHouseFromPos(creature);
+	if(!house)
+		return false;
+	
+	Player* player = creature->getPlayer();
+	
+	if(house->canEditAccessList(SUBOWNER_LIST, player)){
+		player->sendHouseWindow(house, SUBOWNER_LIST);
+		return true;
+	}
+	else{
+		player->sendCancelMessage(RET_NOTPOSSIBLE);
+		player->sendMagicEffect(player->getPosition(), NM_ME_PUFF);
+	}
+		
+	return true;
+}
+
+bool InstantSpell::HouseDoorList(Creature* creature, const std::string& words, const std::string& param)
+{
+	House* house = getHouseFromPos(creature);
+	if(!house)
+		return false;
+	
+	Player* player = creature->getPlayer();
+	Position pos = player->getPosition();
+
+	switch(player->getDirection()){
+	case NORTH:
+		pos.y -= 1;
+		break;
+	case SOUTH:
+		pos.y += 1;
+		break;
+	case WEST:
+		pos.x -= 1;
+		break;
+	case EAST:
+		pos.x += 1;
+		break;
+	}
+
+	Door* door = house->getDoorByPosition(pos);
+	if(door && house->canEditAccessList(door->getDoorId(), player)){
+		player->sendHouseWindow(house, door->getDoorId());
+		return true;
+	}
+	else{
+		player->sendCancelMessage(RET_NOTPOSSIBLE);
+		player->sendMagicEffect(player->getPosition(), NM_ME_PUFF);
+	}
+	
+	return true;
+}
+
+bool InstantSpell::HouseKick(Creature* creature, const std::string& words, const std::string& param)
+{
+	House* house = getHouseFromPos(creature);
+	if(!house)
+		return false;
+	
+	Player* player = creature->getPlayer();
+	house->kickPlayer(player, param);
+	
+	return true;
+}
+
 RuneSpell::RuneSpell(LuaScriptInterface* _interface) :
 Action(_interface)
 {
+	scripted = true;
 	hasCharges = true;
 	runeId = 0;
+	function = NULL;
 }
 
 RuneSpell::~RuneSpell()
@@ -441,6 +584,11 @@ bool RuneSpell::loadScriptSpell(const std::string& script)
 	}
 	m_scriptId = id;
 	return true;
+}
+	
+bool RuneSpell::loadFunctionSpell(const std::string& function)
+{
+	return false;
 }
 	
 bool RuneSpell::useRune(Creature* creature, Item* item, const Position& posFrom, const Position& posTo, Creature* target)

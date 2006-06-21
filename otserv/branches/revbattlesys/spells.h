@@ -27,6 +27,7 @@
 #include "luascript.h"
 #include "player.h"
 #include "actions.h"
+#include "talkaction.h"
 
 extern "C"
 {
@@ -73,6 +74,9 @@ enum TargetType_t{
 	TARGET_POSITION,
 };
 
+typedef bool (InstantSpellFunction)(Creature* creature, const std::string& words, const std::string& param);
+typedef bool (RuneSpellFunction)(Creature* creature, Item* item, const Position& posFrom, const Position& posTo, Creature* target);
+
 class Spell
 {
 public:
@@ -82,6 +86,7 @@ public:
 	bool configureSpell(xmlNodePtr xmlspell);
 	
 	virtual bool loadScriptSpell(const std::string& script) = 0;
+	virtual bool loadFunctionSpell(const std::string& function) = 0;
 	
 protected:
 	bool spellPlayerChecks(Player* player);
@@ -90,9 +95,7 @@ protected:
 	void addSpellEffects(Player* player);
 	
 	TargetType_t targetType;
-	bool scripted;
-	uint32_t hardcodedAction;
-
+	
 private:
 	std::string name;
 	
@@ -107,7 +110,7 @@ private:
 	bool exhaustion;
 };
 
-class InstantSpell : public Spell//, public Cast
+class InstantSpell : public TalkAction, public Spell
 {
 public:
 	InstantSpell(LuaScriptInterface* _interface);
@@ -117,20 +120,25 @@ public:
 	
 	bool castInstant(Creature* creature, const std::string& words, const std::string& param);
 	
-	//scripting - move to cast class
+	virtual bool loadFunctionSpell(const std::string& function);
+	//scripting
 	virtual bool loadScriptSpell(const std::string& script);
 	bool executeCastInstant(Creature* creature, const std::string& param);
 	//
 	
-	std::string getWords(){return words;};
-	
 protected:
-	//scripting
-	long m_scriptId;
-	LuaScriptInterface* m_scriptInterface;
-	//
-	std::string words;
+	
+	static InstantSpellFunction HouseGuestList;
+	static InstantSpellFunction HouseSubOwnerList;
+	static InstantSpellFunction HouseDoorList;
+	static InstantSpellFunction HouseKick;
+	
+	static House* getHouseFromPos(Creature* creature);
+	
 	bool hasParam;
+	
+	bool scripted;
+	InstantSpellFunction* function;
 };
 
 class RuneSpell : public Action, public Spell
@@ -143,6 +151,7 @@ public:
 	
 	bool useRune(Creature* creature, Item* item, const Position& posFrom, const Position& posTo, Creature* target);
 	
+	virtual bool loadFunctionSpell(const std::string& function);
 	//sciprting
 	virtual bool loadScriptSpell(const std::string& script);
 	bool executeUseRune(Creature* creature, Item* item, const Position& posFrom, const Position& posTo, Creature* target);
@@ -153,6 +162,9 @@ public:
 protected:
 	bool hasCharges;
 	uint32_t runeId;
+	
+	bool scripted;
+	RuneSpellFunction* function;
 };
 
 //////////////////////////////////////////////////////////////////////

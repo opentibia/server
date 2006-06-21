@@ -204,7 +204,7 @@ void ScriptEnviroment::addUniqueThing(Thing* thing)
 	Item* item = thing->getItem();
 	if(item && item->getUniqueId() != 0 ){
 		unsigned short uid = item->getUniqueId();
-
+		
 		Thing* tmp = m_globalMap[uid];
 		if(!tmp){
 			m_globalMap[uid] = thing;
@@ -249,17 +249,16 @@ long ScriptEnviroment::addThing(Thing* thing)
 Thing* ScriptEnviroment::getThingByUID(long uid)
 {
 	Thing* tmp = m_localMap[uid];
-	if(tmp){
+	if(tmp && !tmp->isRemoved()){
 		return tmp;
 	}
 	tmp = m_globalMap[uid];
-	if(tmp){
-		m_localMap[uid] = tmp;
+	if(tmp && !tmp->isRemoved()){
 		return tmp;
 	}
 	if(uid >= 0x10000000){ //is a creature id
 		tmp = g_game.getCreatureByID(uid);
-		if(tmp){
+		if(tmp && !tmp->isRemoved()){
 			m_localMap[uid] = tmp;
 			return tmp;
 		}
@@ -270,7 +269,7 @@ Thing* ScriptEnviroment::getThingByUID(long uid)
 Item* ScriptEnviroment::getItemByUID(long uid)
 {
 	Thing* tmp = getThingByUID(uid);
-	if(tmp && !tmp->isRemoved()){
+	if(tmp){
 		if(Item* item = tmp->getItem())
 			return item;
 	}
@@ -280,7 +279,7 @@ Item* ScriptEnviroment::getItemByUID(long uid)
 Creature* ScriptEnviroment::getCreatureByUID(long uid)
 {
 	Thing* tmp = getThingByUID(uid);
-	if(tmp && !tmp->isRemoved()){
+	if(tmp){
 		if(Creature* creature = tmp->getCreature())
 			return creature;
 	}
@@ -290,7 +289,7 @@ Creature* ScriptEnviroment::getCreatureByUID(long uid)
 Player* ScriptEnviroment::getPlayerByUID(long uid)
 {
 	Thing* tmp = getThingByUID(uid);
-	if(tmp && !tmp->isRemoved()){
+	if(tmp){
 		if(Creature* creature = tmp->getCreature())
 			if(Player* player = creature->getPlayer())
 				return player;
@@ -451,7 +450,7 @@ void LuaScriptInterface::reportError(const char* function, const std::string& er
 	LuaScriptInterface* scriptInterface;
 	env->getEventInfo(fileId, event_desc, scriptInterface);
 	
-	std::cout << "Lua Script Error: ";
+	std::cout << std::endl << "Lua Script Error: ";
 	if(scriptInterface){
 		std::cout << "[" << scriptInterface->getInterfaceName() << "] " << std::endl;
 		std::cout << scriptInterface->getFileById(fileId) << std::endl;
@@ -649,6 +648,8 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "getPlayerFreeCap", LuaScriptInterface::luaGetPlayerFreeCap);
 	//getPlayerLight(cid)
 	lua_register(m_luaState, "getPlayerLight", LuaScriptInterface::luaGetPlayerLight);
+	//getPlayerSlotItem(cid, slot)
+	lua_register(m_luaState, "getPlayerSlotItem", LuaScriptInterface::luaGetPlayerSlotItem);
 	
 	//getPlayerStorageValue(uid,valueid)
 	lua_register(m_luaState, "getPlayerStorageValue", LuaScriptInterface::luaGetPlayerStorageValue);
@@ -664,7 +665,10 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "getItemRWInfo", LuaScriptInterface::luaGetItemRWInfo);
 	//getThingfromPos(pos)
 	lua_register(m_luaState, "getThingfromPos", LuaScriptInterface::luaGetThingfromPos);
+	//getThing(uid)
+	lua_register(m_luaState, "getThing", LuaScriptInterface::luaGetThing);
 	//getThingPos(uid)
+	lua_register(m_luaState, "getThingPos", LuaScriptInterface::luaGetThingPos);
 	
 	//doRemoveItem(uid,n)
 	lua_register(m_luaState, "doRemoveItem", LuaScriptInterface::luaDoRemoveItem);
@@ -1910,6 +1914,7 @@ int LuaScriptInterface::luaGetWorldCreatures(lua_State *L)
 
 int LuaScriptInterface::luaGetWorldUpTime(lua_State *L)
 {
+	//getWorldUpTime()
 	long uptime = 0;
 
 	Status* status = Status::instance();
@@ -1962,7 +1967,70 @@ int LuaScriptInterface::luaDoPlayerAddExp(lua_State *L)
 	else{
 		lua_pushnumber(L, -1);
 		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
-		return 1;
 	}
+	return 1;
+}
+
+int LuaScriptInterface::luaGetPlayerSlotItem(lua_State *L)
+{
+	//getPlayerSlotItem(cid, slot)
+	long slot = popNumber(L);
+	unsigned long cid = (unsigned long)popNumber(L);
+	
+	ScriptEnviroment* env = getScriptEnv();
+	Player* player = env->getPlayerByUID(cid);
+	if(player){
+		Thing* thing = player->__getThing(slot);
+		if(thing){
+			long uid = env->addThing(thing);
+			lua_pushnumber(L, uid);
+		}
+		else{
+			lua_pushnumber(L, -1);
+		}
+	}
+	else{
+		lua_pushnumber(L, -1);
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+	}
+	return 1;
+}
+
+int LuaScriptInterface::luaGetThing(lua_State *L)
+{
+	//luaGetThing(uid)
+	unsigned long uid = (unsigned long)popNumber(L);
+	
+	ScriptEnviroment* env = getScriptEnv();
+	
+	Thing* thing = env->getThingByUID(uid);
+	if(thing){
+		pushThing(L, thing, uid);
+	}
+	else{
+		pushThing(L, NULL, 0);
+		reportErrorFunc(getErrorDesc(LUA_ERROR_THING_NOT_FOUND));
+	}
+	
+	return 1;
+}
+
+int LuaScriptInterface::luaGetThingPos(lua_State *L)
+{
+	//getThingPos(uid)
+	unsigned long uid = (unsigned long)popNumber(L);
+	
+	ScriptEnviroment* env = getScriptEnv();
+	
+	Thing* thing = env->getThingByUID(uid);
+	Position pos(0,0,0);
+	if(thing){
+		pos = thing->getPosition();
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_THING_NOT_FOUND));
+	}
+	pushPosition(L, pos, 0);
+
 	return 1;
 }

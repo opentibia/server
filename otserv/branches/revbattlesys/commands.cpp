@@ -35,7 +35,7 @@ typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 #include "ioplayer.h"
 #include "tools.h"
 #include "ban.h"
-#include "luascript.h"
+#include "talkaction.h"
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
@@ -44,6 +44,7 @@ extern LuaScript g_config;
 extern Actions g_actions;
 extern Monsters g_monsters;
 extern Ban g_bans;
+extern TalkActions g_talkactions;
 
 extern bool readXMLInteger(xmlNodePtr p, const char *tag, int &value);
 
@@ -480,6 +481,9 @@ bool Commands::reloadInfo(Creature* creature, const std::string& cmd, const std:
 	else if(param == "monsters"){
 		g_monsters.reload();
 	}
+	else if(param == "talk"){
+		g_talkactions.reload();
+	}
 	else{
 		Player* player = creature->getPlayer();
 		if(player)
@@ -494,12 +498,14 @@ bool Commands::testCommand(Creature* creature, const std::string& cmd, const std
 	int color = atoi(param.c_str());
 	Player* player = creature->getPlayer();
 	if(player) {
-		//player->sendMagicEffect(player->getPosition(), color);
+		player->sendMagicEffect(player->getPosition(), color);
+		/*
 		LightInfo lightInfo;
 		lightInfo.level = color / 0x100;
 		lightInfo.color = color & 0xFF;
 		player->setCreatureLight(lightInfo);
 		game->changeLight(player);
+		*/
 	}
 
 	return true;
