@@ -25,7 +25,6 @@
 #include <iostream>
 #include <iomanip>
 #include <sstream>
-#include <ctime>
 
 #include "otsystem.h"
 #include "networkmessage.h"
@@ -325,7 +324,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 						if(player){
 							//reattach player?
 							if(player->client->s == 0 && !player->isRemoved() && !g_config.getNumber(ConfigManager::ALLOW_CLONES)){
-								player->lastlogin = std::time(NULL);
+								player->lastlogin = time(NULL);
 								player->client->setKey(k);
 								player->client->reinitializeProtocol(s);
 								player->client->sendAddCreature(player, false);
@@ -401,7 +400,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 							else{
 								Status* stat = Status::instance();
 								stat->addPlayer();
-								player->lastlogin = std::time(NULL);
+								player->lastlogin = time(NULL);
 								player->lastip = player->getIP();
 								s = 0;            // protocol/player will close socket
 							
