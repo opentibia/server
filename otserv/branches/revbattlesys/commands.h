@@ -66,7 +66,7 @@ protected:
 	bool onlineList(Creature* creature, const std::string& cmd, const std::string& param);
 	bool teleportNTiles(Creature* creature, const std::string& cmd, const std::string& param);
 	bool kickPlayer(Creature* creature, const std::string& cmd, const std::string& param);
-	bool exivaPlayer(Creature* creature, const std::string& cmd, const std::string& param);
+	//bool exivaPlayer(Creature* creature, const std::string& cmd, const std::string& param);
 	bool setHouseOwner(Creature* creature, const std::string& cmd, const std::string& param);
 	bool sellHouse(Creature* creature, const std::string& cmd, const std::string& param);
 	bool getHouse(Creature* creature, const std::string& cmd, const std::string& param);

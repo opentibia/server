@@ -132,6 +132,7 @@ protected:
 	static InstantSpellFunction HouseSubOwnerList;
 	static InstantSpellFunction HouseDoorList;
 	static InstantSpellFunction HouseKick;
+	static InstantSpellFunction SearchPlayer;
 	
 	static House* getHouseFromPos(Creature* creature);
 	

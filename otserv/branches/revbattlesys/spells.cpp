@@ -389,6 +389,9 @@ bool InstantSpell::loadFunctionSpell(const std::string& functionName)
 	else if(functionName == "houseKick"){
 		function = HouseKick;
 	}
+	else if(functionName == "searchPlayer"){
+		function = SearchPlayer;
+	}
 	else{
 		return false;
 	}
@@ -529,6 +532,190 @@ bool InstantSpell::HouseKick(Creature* creature, const std::string& words, const
 	
 	return true;
 }
+
+bool InstantSpell::SearchPlayer(Creature* creature, const std::string& words, const std::string& param)
+{
+	//a. From 1 to 4 sq's [Person] is standing next to you.
+	//b. From 5 to 100 sq's [Person] is to the south, north, east, west.
+	//c. From 101 to 274 sq's [Person] is far to the south, north, east, west.
+	//d. From 275 to infinite sq's [Person] is very far to the south, north, east, west.
+	//e. South-west, s-e, n-w, n-e (corner coordinates): this phrase appears if the player you're looking for has moved five squares in any direction from the south, north, east or west.
+	//f. Lower level to the (direction): this phrase applies if the person you're looking for is from 1-25 squares up/down the actual floor you're in.
+	//g. Higher level to the (direction): this phrase applies if the person you're looking for is from 1-25 squares up/down the actual floor you're in.
+
+	Player* player = creature->getPlayer();
+	if(!player){
+		return false;
+	}
+	enum distance_t{
+		DISTANCE_BESIDE,
+		DISTANCE_CLOSE_1,
+		DISTANCE_CLOSE_2,
+		DISTANCE_FAR,
+		DISTANCE_VERYFAR,
+	};
+	
+	enum direction_t{
+		DIR_N, DIR_S, DIR_E, DIR_W,
+		DIR_NE, DIR_NW, DIR_SE, DIR_SW,
+	};
+	
+	enum level_t{
+		LEVEL_HIGHER,
+		LEVEL_LOWER,
+		LEVEL_SAME,
+	};
+
+	Player* playerExiva = g_game.getPlayerByName(param);
+	if(playerExiva){
+		const Position lookPos = player->getPosition();
+		const Position searchPos = playerExiva->getPosition();
+		
+		long dx = lookPos.x - searchPos.x;
+		long dy = lookPos.y - searchPos.y;
+		long dz = lookPos.z - searchPos.z;
+		
+		distance_t distance;
+		direction_t direction;
+		level_t level;
+		//getting floor
+		if(dz > 0){
+			level = LEVEL_HIGHER;
+		}
+		else if(dz < 0){
+			level = LEVEL_LOWER;
+		}
+		else{
+			level = LEVEL_SAME;
+		}
+		//getting distance
+		if(std::abs(dx) < 4 && std::abs(dy) <4){
+			distance = DISTANCE_BESIDE;
+		}
+		else{
+			long distance2 = dx*dx + dy*dy;
+			if(distance2 < 625){
+				distance = DISTANCE_CLOSE_1;
+			}
+			else if(distance2 < 10000){
+				distance = DISTANCE_CLOSE_2;
+			}
+			else if(distance2 < 75076){
+				distance = DISTANCE_FAR;
+			}
+			else{
+				distance = DISTANCE_VERYFAR;
+			}
+		}
+		//getting direction
+		float tan;
+		if(dx != 0){
+			tan = (float)dy/(float)dx;
+		}
+		else{
+			tan = 10.;
+		}
+		if(std::abs(tan) < 0.4142){
+			if(dx > 0){
+				direction = DIR_W;
+			}
+			else{
+				direction = DIR_E;
+			}			
+		}
+		else if(std::abs(tan) < 2.4142){
+			if(tan > 0){
+				if(dy > 0){
+					direction = DIR_NW;
+				}
+				else{
+					direction = DIR_SE;
+				}
+			}
+			else{ //tan < 0
+				if(dx > 0){
+					direction = DIR_SW;
+				}
+				else{
+					direction = DIR_NE;
+				}
+			}
+		}
+		else{
+			if(dy > 0){
+				direction = DIR_N;
+			}
+			else{
+				direction = DIR_S;
+			}
+		}
+		
+		std::stringstream ss;
+		ss << playerExiva->getName() << " ";
+		
+		if(distance == DISTANCE_BESIDE && level == LEVEL_SAME){
+			ss << "is standing next to you";
+		}
+		else{
+			switch(distance){
+			case DISTANCE_BESIDE:
+			case DISTANCE_CLOSE_1:
+				if(level == LEVEL_SAME){
+					ss << "is to the";
+				}
+				else if(level == LEVEL_HIGHER){
+					ss << "is on a higher level to the";
+				}
+				else if(level == LEVEL_LOWER){
+					ss << "is on a lower level to the";
+				}
+				break;
+			case DISTANCE_CLOSE_2:
+				ss << "is to the";
+				break;
+			case DISTANCE_FAR:
+				ss << "is far to the";
+				break;
+			case DISTANCE_VERYFAR:
+				ss << "is very far to the";
+				break;
+			}
+			ss << " ";
+			switch(direction){
+			case DIR_N:
+				ss << "north";
+				break;
+			case DIR_S:
+				ss << "south";
+				break;
+			case DIR_E:
+				ss << "east";
+				break;
+			case DIR_W:
+				ss << "west";
+				break;
+			case DIR_NE:
+				ss << "north-east";
+				break;
+			case DIR_NW:
+				ss << "north-west";
+				break;
+			case DIR_SE:
+				ss << "south-east";
+				break;
+			case DIR_SW:
+				ss << "shouth-west";
+				break;
+			}
+		}
+		ss << ".";
+		player->sendTextMessage(MSG_INFO_DESCR, ss.str().c_str());		
+		return true;
+	}
+
+	return false;
+}
+
 
 RuneSpell::RuneSpell(LuaScriptInterface* _interface) :
 Action(_interface)

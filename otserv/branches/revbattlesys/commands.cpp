@@ -75,7 +75,7 @@ s_defcommands Commands::defined_commands[] = {
 	{"/sellhouse",&Commands::sellHouse},
 	{"/gethouse",&Commands::getHouse},
 	{"/bans",&Commands::bansManager},
-	{"/exiva",&Commands::exivaPlayer},
+	//{"/exiva",&Commands::exivaPlayer},
 };
 
 
@@ -681,7 +681,7 @@ bool Commands::kickPlayer(Creature* creature, const std::string& cmd, const std:
 	}
 	return false;
 }
-
+/*
 bool Commands::exivaPlayer(Creature* creature, const std::string& cmd, const std::string& param)
 {
 	//a. From 1 to 4 sq's [Person] is standing next to you.
@@ -864,7 +864,7 @@ bool Commands::exivaPlayer(Creature* creature, const std::string& cmd, const std
 
 	return false;
 }
-
+*/
 bool Commands::setHouseOwner(Creature* creature, const std::string& cmd, const std::string& param)
 {
 	Player* player = creature->getPlayer();
