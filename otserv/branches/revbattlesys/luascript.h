@@ -39,6 +39,8 @@ class Thing;
 class Creature;
 class Player;
 class Item;
+class AreaCombat;
+class Combat;
 
 class LuaScript
 {
@@ -91,10 +93,16 @@ public:
 	Item* getItemByUID(long uid);
 	Creature* getCreatureByUID(long uid);
 	Player* getPlayerByUID(long uid);
-	
+
+	uint32_t addArea(AreaCombat* area);
+	uint32_t addCombatObject(Combat* combat);
+	Combat* getCombatObject(uint32_t combatId);
+
 private:
 	typedef std::map<long, Thing*> ThingMap;
-	//typedef std::map<long, Matrix*> AreaMap;
+	typedef std::map<uint32_t, AreaCombat*> AreaMap;
+	typedef std::map<uint32_t, Combat*> CombatMap;
+
 	//script file id
 	long m_scriptId;
 	LuaScriptInterface* m_interface;
@@ -106,10 +114,17 @@ private:
 	static ThingMap m_globalMap;
 	//item/creature map
 	ThingMap m_localMap;
+
 	long m_lastUID;
 	Position m_realPos;
+	
 	//area map
-	//static AreaMap areaMap;
+	uint32_t m_lastAreaId;
+	static AreaMap m_areaMap;
+
+	//combat map
+	uint32_t m_lastCombatId;
+	static CombatMap m_combatMap;
 };
 
 class Position;
@@ -139,6 +154,7 @@ enum ErrorCode_t{
 	LUA_ERROR_THING_NOT_FOUND,
 	LUA_ERROR_TILE_NOT_FOUND,
 	LUA_ERROR_HOUSE_NOT_FOUND,
+	LUA_ERROR_COMBAT_NOT_FOUND,
 };
 
 class LuaScriptInterface
@@ -260,6 +276,18 @@ protected:
 	static int luaGetWorldCreatures(lua_State *L);
 	static int luaGetWorldUpTime(lua_State *L);
 	
+	//
+	static int luaCreateCombatArea(lua_State *L);
+
+	static int luaCreateCombatHealthObject(lua_State *L);
+	static int luaSetCombatHealthParam(lua_State *L);
+	static int luaDoCombatHealth(lua_State *L);
+	static int luaDoTargetCombatHealth(lua_State *L);
+
+	//static int luaCreateCombatManaObject(lua_State *L);
+	static int luaDoCombatMana(lua_State *L);
+	static int luaDoTargetCombatMana(lua_State *L);
+
 	static int luaDebugPrint(lua_State *L);
 	//
 	
