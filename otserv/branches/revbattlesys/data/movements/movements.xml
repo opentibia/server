@@ -3,5 +3,12 @@
 <movements>
 
 <movevent event="StepIn" itemid="1487" script="firefield.lua" />
+<movevent event="StepOut" itemid="1487" script="firefield.lua" />
+
+<movevent event="AddItem" tileitem="1" itemid="1487" script="firefield.lua" />
+<movevent event="RemoveItem" tileitem="1" itemid="1487" script="firefield.lua" />
+
+<movevent event="Equip" itemid="2195" script="boh.lua" />
+<movevent event="DeEquip" itemid="2195" script="boh.lua" />
 
 </movements>
