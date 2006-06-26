@@ -156,6 +156,8 @@ Creature()
 
  	manaTick = 0;
  	healthTick = 0;
+ 	
+ 	vocation_id = (Vocation_t)0;
 
 #ifdef __SKULLSYSTEM__
 	redSkullTicks = 0;

@@ -29,13 +29,6 @@
 #include "actions.h"
 #include "talkaction.h"
 
-extern "C"
-{
-#include <lua.h>
-#include <lauxlib.h>
-#include <lualib.h>
-}
-
 class RuneSpell;
 class InstantSpell;
 

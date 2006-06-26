@@ -40,7 +40,6 @@
 
 #include "status.h"
 #include "monsters.h"
-#include "actions.h"
 #include "commands.h"
 
 #include "luascript.h"
@@ -51,7 +50,7 @@
 #include "waitlist.h"
 #include "ban.h"
 #include "vocation.h"
-#include "talkaction.h"
+#include "scriptmanager.h"
 
 #ifdef __OTSERV_ALLOCATOR__
 #include "allocator.h"
@@ -93,12 +92,10 @@ Items Item::items;
 //ReverseItemMap Items::revItems;
 
 Game g_game;
-Actions g_actions;
 Commands commands(&g_game);
 Monsters g_monsters;
 Ban g_bans;
 Vocations g_vocations;
-TalkActions g_talkactions;
 
 #if defined __EXCEPTION_TRACER__
 #include "exception.h"
@@ -534,44 +531,10 @@ int main(int argc, char *argv[])
 	}
 	std::cout << "[done]" << std::endl;
 	
-	//load spells data
-
-	/*
-	filename.str("");
-	filename << g_config.getGlobalString("datadir") << "spells/spells.xml";
-	std::cout << ":: Loading " << filename.str() << "... ";
-	if(!spells.loadFromXml(g_config.getGlobalString("datadir"))){
-		std::stringstream errormsg;
-		errormsg << "Unable to load " << filename.str() << "!";
-		ErrorMessage(errormsg.str().c_str());
+	//load scripts
+	if(ScriptingManager::getInstance()->loadScriptSystems() == false){
 		return -1;
 	}
-	std::cout << "[done]" << std::endl;
-	*/
-	
-	//load actions data
-	filename.str("");
-	filename << g_config.getGlobalString("datadir") << "actions/actions.xml";
-	std::cout << ":: Loading " << filename.str() << "... ";
-	if(!g_actions.loadFromXml(g_config.getGlobalString("datadir"))){
-		std::stringstream errormsg;
-		errormsg << "Unable to load " << filename.str() << "!";
-		ErrorMessage(errormsg.str().c_str());
-		return -1;
-	}
-	std::cout << "[done]" << std::endl;
-	
-	//load talkactions data
-	filename.str("");
-	filename << g_config.getGlobalString("datadir") << "talkactions/talkactions.xml";
-	std::cout << ":: Loading " << filename.str() << "... ";
-	if(!g_talkactions.loadFromXml(g_config.getGlobalString("datadir"))){
-		std::stringstream errormsg;
-		errormsg << "Unable to load " << filename.str() << "!";
-		ErrorMessage(errormsg.str().c_str());
-		return -1;
-	}
-	std::cout << "[done]" << std::endl;
 	
 	// load monster data
 	filename.str("");

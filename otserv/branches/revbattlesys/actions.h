@@ -28,6 +28,7 @@
 #include "luascript.h"
 
 class Action;
+class Container;
 
 enum tCanUseRet{
 	CAN_USE,

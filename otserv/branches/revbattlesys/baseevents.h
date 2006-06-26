@@ -19,67 +19,54 @@
 //////////////////////////////////////////////////////////////////////
 
 
-#ifndef __TALKACTION_H__
-#define __TALKACTION_H__
+#ifndef __BASEEVENTS_H__
+#define __BASEEVENTS_H__
 
-#include <list>
-#include <string>
 #include "luascript.h"
-#include "const76.h"
 
-enum talkActionResult_t{
-	//TALKACTION_NOTFOUND,
-	TALKACTION_CONTINUE,
-	TALKACTION_NO_CONTINUE,
-};
+class Event;
 
-class TalkAction;
-
-class TalkActions
+class BaseEvents
 {
 public:
-	TalkActions();
-	~TalkActions();
+	BaseEvents();
+	virtual ~BaseEvents();
 	
 	bool loadFromXml(const std::string& datadir);
 	bool reload();
-	bool isLoaded(){return m_loaded;}	
-	
-	talkActionResult_t creatureSay(Creature *creature, SpeakClasses type, const std::string& words);
+	bool isLoaded(){return m_loaded;}
 	
 protected:
-	void clear();
+	virtual LuaScriptInterface& getScriptInterface() = 0;
+	virtual std::string getScriptBaseName() = 0;
+	virtual bool registerEvent(Event* event, xmlNodePtr p) = 0;
+	virtual Event* getEvent(const std::string& nodeName) = 0;
+	virtual void clear() = 0;
 	
 	bool m_loaded;
-	
 	std::string m_datadir;
 	
-	typedef std::list< std::pair<std::string, TalkAction* > > TalkActionList;
-	TalkActionList wordsMap;
-	
-	LuaScriptInterface m_scriptInterface;
 };
 
-class TalkAction
-{
+
+class Event{
 public:
-	TalkAction(LuaScriptInterface* _interface);
-	virtual ~TalkAction();
-	bool configureTalkAction(xmlNodePtr p);
+	Event(LuaScriptInterface* _interface);
+	virtual ~Event();
 	
-	std::string getWords() const {return m_words;};
+	virtual bool configureEvent(xmlNodePtr p) = 0;
 	
-	//scripting
-	bool loadScriptSay(const std::string& script);
-	long executeSay(Creature* creature, const std::string& words, const std::string& param);
-	//
-	
+	bool loadScript(const std::string& scriptFile);
+	virtual bool loadFunction(const std::string& functionName);
+		
 protected:
-	//scripting
+	virtual std::string getScriptEventName() = 0;
+	
 	long m_scriptId;
 	LuaScriptInterface* m_scriptInterface;
-	//
-	std::string m_words;
+	
+	bool m_scripted;
 };
+
 
 #endif

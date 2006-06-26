@@ -34,8 +34,10 @@
 #include "trashholder.h"
 #include "mailbox.h"
 #include "combat.h"
+#include "movement.h"
 
 extern Game g_game;
+extern MoveEvents g_moveEvents;
 
 Tile Tile::null_tile(0xFFFF, 0xFFFF, 0xFFFF);
 
@@ -1075,6 +1077,11 @@ void Tile::postAddNotification(Thing* thing, bool hasOwnership /*= true*/)
 					}
 				}
 			}
+		}
+		
+		Creature* creature = thing->getCreature();
+		if(creature){
+			g_moveEvents.onCreatureMove(creature, this, true);
 		}
 
 		if(const MagicField* field = dynamic_cast<MagicField*>(thing->getItem())){

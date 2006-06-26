@@ -402,7 +402,7 @@ bool InstantSpell::loadFunctionSpell(const std::string& functionName)
 
 bool InstantSpell::executeCastInstant(Creature* creature, const std::string& param)
 {
-	//onUseRune(...)
+	//onCastInstant(...)
 	ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
 	
 	//debug only
@@ -704,7 +704,7 @@ bool InstantSpell::SearchPlayer(Creature* creature, const std::string& words, co
 				ss << "south-east";
 				break;
 			case DIR_SW:
-				ss << "shouth-west";
+				ss << "south-west";
 				break;
 			}
 		}

@@ -1,0 +1,104 @@
+//////////////////////////////////////////////////////////////////////
+// OpenTibia - an opensource roleplaying game
+//////////////////////////////////////////////////////////////////////
+// 
+//////////////////////////////////////////////////////////////////////
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software Foundation,
+// Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+//////////////////////////////////////////////////////////////////////
+
+#ifndef __MOVEMENT_H__
+#define __MOVEMENT_H__
+
+
+#include "luascript.h"
+#include "baseevents.h"
+#include <map>
+
+enum MoveEvent_t{
+	MOVE_EVENT_STEP_IN = 0,
+	MOVE_EVENT_STEP_OUT,
+	MOVE_EVENT_EQUIP,
+	MOVE_EVENT_DEEQUIP,
+	MOVE_EVENT_ADD_ITEM,
+	MOVE_EVENT_REMOVE_ITEM,
+	MOVE_EVENT_LAST,
+	MOVE_EVENT_NONE,
+};
+
+class MoveEvent;
+
+struct MoveEventList{
+	MoveEvent* event[MOVE_EVENT_LAST];
+MoveEventList(){
+	for(int i=0; i < MOVE_EVENT_LAST; ++i){
+		event[i] = NULL;	
+	}
+};	
+};
+
+class MoveEvents : public BaseEvents
+{
+public:
+	MoveEvents();
+	virtual ~MoveEvents();
+	
+	long onCreatureMove(Creature* creature, Tile* tile, bool isIn);
+	long onPlayerEquip(Player* player, Item* item, long slot, bool isEquip);
+	long onItemMove(Creature* creature, Item* item, Tile* tile, bool isAdd);
+	
+protected:
+	typedef std::map<unsigned short , MoveEventList> MoveListMap;
+	virtual void clear();
+	virtual LuaScriptInterface& getScriptInterface();
+	virtual std::string getScriptBaseName();
+	virtual bool registerEvent(Event* event, xmlNodePtr p);
+	virtual Event* getEvent(const std::string& nodeName);
+	
+	void addEvent(MoveEvent* event, long id, MoveListMap& map);
+	
+	MoveEvent* getEvent(Item* item, MoveEvent_t eventType);
+	
+	MoveListMap m_uniqueIdMap;
+	MoveListMap m_actionIdMap;
+	MoveListMap m_itemIdMap;
+	
+	LuaScriptInterface m_scriptInterface;
+};
+
+
+class MoveEvent : public Event
+{
+public:
+	MoveEvent(LuaScriptInterface* _interface);
+	virtual ~MoveEvent();
+
+	MoveEvent_t getEventType() const;
+	
+	virtual bool configureEvent(xmlNodePtr p);
+	
+	//scripting
+	long executeStep(Creature* creature, Item* item, const Position& pos);
+	long executeEquip(Player* player, Item* item, long slot);
+	long executeAddRemItem(Creature* creature, Item* item, const Position& pos);
+	//
+	
+protected:
+	virtual std::string getScriptEventName();
+	
+	MoveEvent_t m_eventType;
+};
+
+
+#endif

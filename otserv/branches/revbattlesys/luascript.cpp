@@ -727,7 +727,7 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "doTransformItem", LuaScriptInterface::luaDoTransformItem);
 	//doPlayerSay(uid,text,type)
 	lua_register(m_luaState, "doPlayerSay", LuaScriptInterface::luaDoPlayerSay);
-	//doSendMagicEffect(uid,position,type)
+	//doSendMagicEffect(position,type)
 	lua_register(m_luaState, "doSendMagicEffect", LuaScriptInterface::luaDoSendMagicEffect);
 	//doChangeTypeItem(uid,new_type)	
 	lua_register(m_luaState, "doChangeTypeItem", LuaScriptInterface::luaDoChangeTypeItem);
@@ -743,6 +743,8 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "doPlayerAddSkillTry", LuaScriptInterface::luaDoPlayerAddSkillTry);
 	//doPlayerAddHealth(cid,health)
 	lua_register(m_luaState, "doPlayerAddHealth", LuaScriptInterface::luaDoPlayerAddHealth);
+	//doCreatureAddHealth(cid,health)
+	lua_register(m_luaState, "doCreatureAddHealth", LuaScriptInterface::luaDoPlayerAddHealth);
 	//doPlayerAddMana(cid,mana)
 	lua_register(m_luaState, "doPlayerAddMana", LuaScriptInterface::luaDoPlayerAddMana);
 	//doPlayerAddSoul(cid,soul)
@@ -1173,33 +1175,38 @@ int LuaScriptInterface::luaDoPlayerAddSkillTry(lua_State *L)
 int LuaScriptInterface::luaDoPlayerAddHealth(lua_State *L)
 {
 	//doPlayerAddHealth(uid,health)
+	//doCreatureAddHealth(uid,health)
 	int addhealth = (int)popNumber(L);
 	unsigned int cid = (unsigned int)popNumber(L);
 	
 	ScriptEnviroment* env = getScriptEnv();
 	
-	Player* player = env->getPlayerByUID(cid);
-	if(player){
-		int tmp = player->health + addhealth;
+	Creature* creature = env->getCreatureByUID(cid);
+	if(creature){
+		int tmp = creature->health + addhealth;
 		if(tmp <= 0){
-			player->health = 1;
+			creature->health = 1;
 		}
-		else if(tmp > player->healthMax){
-			player->health = player->healthMax;
+		else if(tmp > creature->healthMax){
+			creature->health = creature->healthMax;
 		}
 		else{
-			player->health = tmp;
+			creature->health = tmp;
 		}
-		player->sendStats();
+		Player* player = creature->getPlayer();
+		
+		if(player){
+			player->sendStats();
+		}
 		
 		SpectatorVec list;
 		SpectatorVec::iterator it;
 
-		g_game.getSpectators(Range(player->getPosition(), true), list);
+		g_game.getSpectators(Range(creature->getPosition(), true), list);
 		for(it = list.begin(); it != list.end(); ++it) {
 			Player* p = (*it)->getPlayer();
 			if(p)
-				p->sendCreatureHealth(player);
+				p->sendCreatureHealth(creature);
 		}
 	}
 	else{
@@ -2048,7 +2055,7 @@ int LuaScriptInterface::luaGetPlayerSlotItem(lua_State *L)
 
 int LuaScriptInterface::luaGetThing(lua_State *L)
 {
-	//luaGetThing(uid)
+	//GetThing(uid)
 	unsigned long uid = (unsigned long)popNumber(L);
 	
 	ScriptEnviroment* env = getScriptEnv();

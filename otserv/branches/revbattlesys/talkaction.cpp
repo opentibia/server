@@ -123,7 +123,7 @@ bool TalkActions::loadFromXml(const std::string& _datadir)
 		xmlFreeDoc(doc);
 	}
 	else{
-		std::cout << "Warning: [TalkActions::loadFromXml] Can not open actions.xml" << std::endl;
+		std::cout << "Warning: [TalkActions::loadFromXml] Can not open talkactions.xml" << std::endl;
 	}
 	return m_loaded;
 }
