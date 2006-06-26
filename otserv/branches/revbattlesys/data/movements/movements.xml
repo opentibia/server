@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+
+<movements>
+
+<movevent event="StepIn" itemid="1487" script="firefield.lua" />
+
+</movements>
