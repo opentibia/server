@@ -1079,11 +1079,19 @@ void Tile::postAddNotification(Thing* thing, bool hasOwnership /*= true*/)
 			}
 		}
 		
+		//calling movement scripts
 		Creature* creature = thing->getCreature();
 		if(creature){
 			g_moveEvents.onCreatureMove(creature, this, true);
 		}
+		else{
+			Item* item = thing->getItem();
+			if(item){
+				g_moveEvents.onItemMove(item, this, true);
+			}
+		}
 
+		/*
 		if(const MagicField* field = dynamic_cast<MagicField*>(thing->getItem())){
 			const Condition* condition = field->getCondition();
 
@@ -1093,12 +1101,12 @@ void Tile::postAddNotification(Thing* thing, bool hasOwnership /*= true*/)
 				}
 			}
 		}
+		*/
 
 		if(Teleport* teleport = getTeleportItem()){
 			teleport->__addThing(thing);
 		}
 		else if(TrashHolder* trashHolder = getTrashHolder()){
-			//TODO: query script interface
 			trashHolder->__addThing(thing);
 		}
 		else if(Mailbox* mailbox = getMailbox()){
@@ -1124,6 +1132,19 @@ void Tile::postRemoveNotification(Thing* thing, bool isCompleteRemoval, bool had
 			player->postRemoveNotification(thing, isCompleteRemoval, false);
 		}
 	}
+	
+	//calling movement scripts
+	Creature* creature = thing->getCreature();
+	if(creature){
+		g_moveEvents.onCreatureMove(creature, this, false);
+	}
+	else{
+		Item* item = thing->getItem();
+		if(item){
+			g_moveEvents.onItemMove(item, this, false);
+		}
+	}
+	
 }
 
 void Tile::__internalAddThing(Thing* thing)

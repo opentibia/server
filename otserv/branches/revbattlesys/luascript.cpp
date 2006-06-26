@@ -556,14 +556,20 @@ bool LuaScriptInterface::closeState()
 
 bool LuaScriptInterface::callFunction(long nParams, long &result)
 {
+	bool ret;
+	int size0 = lua_gettop(m_luaState);
 	if(lua_pcall(m_luaState, nParams, 1, 0) != 0){
 		LuaScriptInterface::reportError(NULL, std::string(LuaScriptInterface::popString(m_luaState)));
-		return false;
+		ret =  false;
 	}
 	else{
 		result = LuaScriptInterface::popNumber(m_luaState);
-		return true;
+		ret =  true;
 	}
+	if((lua_gettop(m_luaState) + nParams  + 1) != size0){
+		LuaScriptInterface::reportError(NULL, "Stack size changed!");
+	}
+	return ret;
 }
 
 bool LuaScriptInterface::callFunction(long nParams)

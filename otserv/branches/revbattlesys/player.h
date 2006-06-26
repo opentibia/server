@@ -289,9 +289,9 @@ public:
 	void autoCloseContainers(const Container* container);
 
 	//inventory
-	void onAddInventoryItem(slots_t slot, const Item* item);
-	void onUpdateInventoryItem(slots_t slot, const Item* oldItem, const Item* newItem);
-	void onRemoveInventoryItem(slots_t slot, const Item* item);
+	void onAddInventoryItem(slots_t slot, Item* item);
+	void onUpdateInventoryItem(slots_t slot, Item* oldItem, Item* newItem);
+	void onRemoveInventoryItem(slots_t slot, Item* item);
 
 	void sendIcons();  
 	void sendChangeSpeed(const Creature* creature);

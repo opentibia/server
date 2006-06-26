@@ -93,6 +93,22 @@ bool MoveEvents::registerEvent(Event* event, xmlNodePtr p)
 		
 	bool success = true;
 	int id;
+	std::string str;
+	
+	MoveEvent_t eventType = moveEvent->getEventType();
+	if(eventType == MOVE_EVENT_ADD_ITEM || eventType == MOVE_EVENT_REMOVE_ITEM){
+		if(readXMLInteger(p,"tileitem",id) && id == 1){
+			switch(eventType){
+			case MOVE_EVENT_ADD_ITEM:
+				moveEvent->setEventType(MOVE_EVENT_ADD_ITEM_ITEMTILE);
+				break;
+			case MOVE_EVENT_REMOVE_ITEM:
+				moveEvent->setEventType(MOVE_EVENT_REMOVE_ITEM_ITEMTILE);
+				break;
+			}			
+		}
+	}
+	
 	if(readXMLInteger(p,"itemid",id)){
 		addEvent(moveEvent, id, m_itemIdMap);
 	}
@@ -102,8 +118,10 @@ bool MoveEvents::registerEvent(Event* event, xmlNodePtr p)
 	else if(readXMLInteger(p,"actionid",id)){
 		addEvent(moveEvent, id, m_actionIdMap);
 	}
+	else if(readXMLString(p,"position",str)){
+		//TODO
+	}
 	else{
-		//TODO, position
 		success = false;
 	}
 	return success;
@@ -197,20 +215,35 @@ long MoveEvents::onPlayerEquip(Player* player, Item* item, long slot, bool isEqu
 	return -1;
 }
 
-long MoveEvents::onItemMove(Creature* creature, Item* item, Tile* tile, bool isAdd)
+long MoveEvents::onItemMove(Item* item, Tile* tile, bool isAdd)
 {
-	MoveEvent_t eventType;
+	MoveEvent_t eventType1;
+	MoveEvent_t eventType2;
 	if(isAdd){
-		eventType = MOVE_EVENT_ADD_ITEM;
+		eventType1 = MOVE_EVENT_ADD_ITEM;
+		eventType2 = MOVE_EVENT_ADD_ITEM_ITEMTILE;
 	}
 	else{
-		eventType = MOVE_EVENT_REMOVE_ITEM;
+		eventType1 = MOVE_EVENT_REMOVE_ITEM;
+		eventType2 = MOVE_EVENT_REMOVE_ITEM_ITEMTILE;
 	}
 	
-	MoveEvent* event = getEvent(item, eventType);
+	MoveEvent* event = getEvent(item, eventType1);
 	if(event){
-		return event->executeAddRemItem(creature, item, tile->getPosition());
+		return event->executeAddRemItem(item, NULL, tile->getPosition());
 	}
+	
+	long j = tile->__getLastIndex();
+	for(long i = tile->__getFirstIndex(); i < j; ++i){
+		Thing* thing = tile->__getThing(i);
+		if(Item* tileItem = thing->getItem()){
+			MoveEvent* event = getEvent(tileItem, eventType2);
+			if(event){
+				return event->executeAddRemItem(item, tileItem, tile->getPosition());
+			}
+		}
+	}
+	
 	return -1;
 }
 
@@ -297,6 +330,11 @@ MoveEvent_t MoveEvent::getEventType() const
 	return m_eventType;
 }
 
+void MoveEvent::setEventType(MoveEvent_t type)
+{
+	m_eventType = type;
+}
+
 long MoveEvent::executeStep(Creature* creature, Item* item, const Position& pos)
 {
 	//onStepIn(cid, item, pos)
@@ -333,7 +371,7 @@ long MoveEvent::executeStep(Creature* creature, Item* item, const Position& pos)
 long MoveEvent::executeEquip(Player* player, Item* item, long slot)
 {
 	//onEquip(cid, item, slot)
-	//onStepOut(cid, item, slot)
+	//onDeEquip(cid, item, slot)
 	ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
 	
 	//debug only
@@ -363,29 +401,31 @@ long MoveEvent::executeEquip(Player* player, Item* item, long slot)
 	return ret;
 }
 
-long MoveEvent::executeAddRemItem(Creature* creature, Item* item, const Position& pos)
+long MoveEvent::executeAddRemItem(Item* item, Item* tileItem, const Position& pos)
 {
-	//onAddItem(cid, item, pos)
-	//onRemoveItem(cid, item, pos)
+	//onAddItem(moveitem, tileitem, pos)
+	//onRemoveItem(moveitem, tileitem, pos)
 	ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
 	
 	//debug only
 	std::stringstream desc;
-	desc << creature->getName() << " itemid: " << item->getID() << " - " << pos;
+	if(tileItem)
+		desc << "tileid: " << tileItem->getID();
+	desc << " itemid: " << item->getID() << " - " << pos;
 	env->setEventDesc(desc.str());
 	//
 	
 	env->setScriptId(m_scriptId, m_scriptInterface);
 	env->setRealPos(pos);
 	
-	long cid = env->addThing((Thing*)creature);
-	long itemid = env->addThing(item);
+	long itemidMoved = env->addThing(item);
+	long itemidTile = env->addThing(tileItem);
 	
 	lua_State* L = m_scriptInterface->getLuaState();
 	
 	m_scriptInterface->pushFunction(m_scriptId);
-	lua_pushnumber(L, cid);
-	LuaScriptInterface::pushThing(L, item, itemid);
+	LuaScriptInterface::pushThing(L, item, itemidMoved);
+	LuaScriptInterface::pushThing(L, tileItem, itemidTile);
 	LuaScriptInterface::pushPosition(L, pos, 0);
 	
 	long ret;

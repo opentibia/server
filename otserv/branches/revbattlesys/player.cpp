@@ -35,11 +35,13 @@
 #include "chat.h"
 #include "house.h"
 #include "combat.h"
+#include "movement.h"
 
 extern LuaScript g_config;
 extern Game g_game;
 extern Chat g_chat;
 extern Vocations g_vocations;
+extern MoveEvents g_moveEvents;
 
 AutoList<Player> Player::listPlayer;
 
@@ -1497,12 +1499,13 @@ void Player::onSendContainer(const Container* container)
 }
 
 //inventory
-void Player::onAddInventoryItem(slots_t slot, const Item* item)
+void Player::onAddInventoryItem(slots_t slot, Item* item)
 {
-	//
+	//calling movement scripts
+	g_moveEvents.onPlayerEquip(this, item, slot, true);
 }
 
-void Player::onUpdateInventoryItem(slots_t slot, const Item* oldItem, const Item* newItem)
+void Player::onUpdateInventoryItem(slots_t slot, Item* oldItem, Item* newItem)
 {
 	if(oldItem != newItem){
 		onRemoveInventoryItem(slot, oldItem);
@@ -1513,7 +1516,7 @@ void Player::onUpdateInventoryItem(slots_t slot, const Item* oldItem, const Item
 	}
 }
 
-void Player::onRemoveInventoryItem(slots_t slot, const Item* item)
+void Player::onRemoveInventoryItem(slots_t slot, Item* item)
 {
 	if(tradeState != TRADE_TRANSFER){
 		checkTradeState(item);
@@ -1525,6 +1528,8 @@ void Player::onRemoveInventoryItem(slots_t slot, const Item* item)
 			}
 		}
 	}
+	//calling movement scripts
+	g_moveEvents.onPlayerEquip(this, item, slot, false);
 }
 
 void Player::checkTradeState(const Item* item)

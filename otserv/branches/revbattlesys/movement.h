@@ -33,6 +33,8 @@ enum MoveEvent_t{
 	MOVE_EVENT_DEEQUIP,
 	MOVE_EVENT_ADD_ITEM,
 	MOVE_EVENT_REMOVE_ITEM,
+	MOVE_EVENT_ADD_ITEM_ITEMTILE,
+	MOVE_EVENT_REMOVE_ITEM_ITEMTILE,
 	MOVE_EVENT_LAST,
 	MOVE_EVENT_NONE,
 };
@@ -56,7 +58,7 @@ public:
 	
 	long onCreatureMove(Creature* creature, Tile* tile, bool isIn);
 	long onPlayerEquip(Player* player, Item* item, long slot, bool isEquip);
-	long onItemMove(Creature* creature, Item* item, Tile* tile, bool isAdd);
+	long onItemMove(Item* item, Tile* tile, bool isAdd);
 	
 protected:
 	typedef std::map<unsigned short , MoveEventList> MoveListMap;
@@ -85,13 +87,14 @@ public:
 	virtual ~MoveEvent();
 
 	MoveEvent_t getEventType() const;
+	void setEventType(MoveEvent_t type);
 	
 	virtual bool configureEvent(xmlNodePtr p);
 	
 	//scripting
 	long executeStep(Creature* creature, Item* item, const Position& pos);
 	long executeEquip(Player* player, Item* item, long slot);
-	long executeAddRemItem(Creature* creature, Item* item, const Position& pos);
+	long executeAddRemItem(Item* item, Item* tileItem, const Position& pos);
 	//
 	
 protected:
