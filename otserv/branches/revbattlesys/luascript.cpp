@@ -148,6 +148,8 @@ void LuaScript::setField (lua_State *L, const char *index, int val)
 
 
 ScriptEnviroment::ThingMap ScriptEnviroment::m_globalMap;
+ScriptEnviroment::AreaMap ScriptEnviroment::m_areaMap;
+ScriptEnviroment::CombatMap ScriptEnviroment::m_combatMap;
 
 ScriptEnviroment::ScriptEnviroment()
 {
@@ -2158,7 +2160,7 @@ int LuaScriptInterface::luaDoCombatHealth(lua_State *L)
 	int32_t minDamage = (int32_t)popNumber(L);
 
 	Position pos;
-	int32_t stackpos;
+	long stackpos;
 	popPosition(L, pos, stackpos);
 
 	uint32_t combatId = (int)popNumber(L);
@@ -2238,7 +2240,7 @@ int LuaScriptInterface::luaDoCombatMana(lua_State *L)
 	int32_t minDrain = (int32_t)popNumber(L);
 
 	Position pos;
-	int32_t stackpos;
+	long stackpos;
 	popPosition(L, pos, stackpos);
 
 	uint32_t combatId = (int)popNumber(L);
