@@ -39,8 +39,8 @@ public:
 protected:
 	virtual LuaScriptInterface& getScriptInterface() = 0;
 	virtual std::string getScriptBaseName() = 0;
-	virtual bool registerEvent(Event* event, xmlNodePtr p) = 0;
 	virtual Event* getEvent(const std::string& nodeName) = 0;
+	virtual bool registerEvent(Event* event, xmlNodePtr p) = 0;
 	virtual void clear() = 0;
 	
 	bool m_loaded;

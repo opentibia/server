@@ -65,8 +65,8 @@ protected:
 	virtual void clear();
 	virtual LuaScriptInterface& getScriptInterface();
 	virtual std::string getScriptBaseName();
-	virtual bool registerEvent(Event* event, xmlNodePtr p);
 	virtual Event* getEvent(const std::string& nodeName);
+	virtual bool registerEvent(Event* event, xmlNodePtr p);
 	
 	void addEvent(MoveEvent* event, long id, MoveListMap& map);
 	

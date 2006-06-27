@@ -26,6 +26,7 @@
 
 #include <map>
 #include "luascript.h"
+#include "baseevents.h"
 
 class Action;
 class Container;
@@ -36,15 +37,12 @@ enum tCanUseRet{
 	CAN_NOT_THROW,
 };
 
-class Actions
+class Actions : public BaseEvents
 {
 public:
 	Actions();
-	~Actions();
+	virtual ~Actions();
 	
-	bool loadFromXml(const std::string& datadir);
-	bool reload();
-	bool isLoaded(){return m_loaded;}	
 	
 	bool useItem(Player* player, const Position& pos, uint8_t index, Item* item);
 	bool useItemEx(Player* player, const Position& from_pos,
@@ -56,11 +54,12 @@ public:
 	static int canUseFar(const Creature* creature ,const Position& to_pos, const bool blockWalls);
 	
 protected:
-	void clear();
+	virtual void clear();
+	virtual LuaScriptInterface& getScriptInterface();
+	virtual std::string getScriptBaseName();
+	virtual Event* getEvent(const std::string& nodeName);
+	virtual bool registerEvent(Event* event, xmlNodePtr p);
 	
-	bool m_loaded;
-	
-	std::string m_datadir;
 	typedef std::map<unsigned short, Action*> ActionUseMap;
 	ActionUseMap useItemMap;
 	ActionUseMap uniqueItemMap;
@@ -69,19 +68,17 @@ protected:
 	Action *getAction(const Item* item);
 	
 	LuaScriptInterface m_scriptInterface;
-	
 };
 
-class Action
+class Action : public Event
 {
 public:
 	Action(LuaScriptInterface* _interface);
 	virtual ~Action();
-	bool configureAction(xmlNodePtr p);
+	
+	virtual bool configureEvent(xmlNodePtr p);
 	
 	//scripting
-	bool loadScriptUse(const std::string& script);
-	//void setScriptInterface(LuaScriptInterface* _interface);
 	bool executeUse(Player* player, Item* item, const PositionEx& posFrom, const PositionEx& posTo);
 	//
 	
@@ -92,10 +89,8 @@ public:
 	void setBlockWalls(bool v){blockwalls = v;};
 	
 protected:
-	//scripting
-	long m_scriptId;
-	LuaScriptInterface* m_scriptInterface;
-	//
+	virtual std::string getScriptEventName();
+
 	bool allowfaruse;
 	bool blockwalls;
 };

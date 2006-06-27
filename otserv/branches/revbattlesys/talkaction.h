@@ -25,6 +25,7 @@
 #include <list>
 #include <string>
 #include "luascript.h"
+#include "baseevents.h"
 #include "const76.h"
 
 enum talkActionResult_t{
@@ -35,24 +36,20 @@ enum talkActionResult_t{
 
 class TalkAction;
 
-class TalkActions
+class TalkActions : public BaseEvents
 {
 public:
 	TalkActions();
-	~TalkActions();
-	
-	bool loadFromXml(const std::string& datadir);
-	bool reload();
-	bool isLoaded(){return m_loaded;}	
+	virtual ~TalkActions();
 	
 	talkActionResult_t creatureSay(Creature *creature, SpeakClasses type, const std::string& words);
 	
 protected:
-	void clear();
-	
-	bool m_loaded;
-	
-	std::string m_datadir;
+	virtual LuaScriptInterface& getScriptInterface();
+	virtual std::string getScriptBaseName();
+	virtual Event* getEvent(const std::string& nodeName);
+	virtual bool registerEvent(Event* event, xmlNodePtr p);
+	virtual void clear();
 	
 	typedef std::list< std::pair<std::string, TalkAction* > > TalkActionList;
 	TalkActionList wordsMap;
@@ -60,25 +57,23 @@ protected:
 	LuaScriptInterface m_scriptInterface;
 };
 
-class TalkAction
+class TalkAction : public Event
 {
 public:
 	TalkAction(LuaScriptInterface* _interface);
 	virtual ~TalkAction();
-	bool configureTalkAction(xmlNodePtr p);
+	
+	virtual bool configureEvent(xmlNodePtr p);
 	
 	std::string getWords() const {return m_words;};
 	
 	//scripting
-	bool loadScriptSay(const std::string& script);
 	long executeSay(Creature* creature, const std::string& words, const std::string& param);
 	//
 	
 protected:
-	//scripting
-	long m_scriptId;
-	LuaScriptInterface* m_scriptInterface;
-	//
+	virtual std::string getScriptEventName();
+	
 	std::string m_words;
 };
 

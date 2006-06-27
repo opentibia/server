@@ -33,7 +33,6 @@ extern Game g_game;
 TalkActions::TalkActions() :
 m_scriptInterface("TalkAction Interface")
 {
-	m_loaded = false;
 	m_scriptInterface.initState();
 }
 
@@ -54,78 +53,33 @@ void TalkActions::clear()
 	m_scriptInterface.reInitState();
 }
 
-bool TalkActions::reload(){
-	m_loaded = false;
-	//unload
-	clear();
-	//load
-	return loadFromXml(m_datadir);
+LuaScriptInterface& TalkActions::getScriptInterface()
+{
+	return m_scriptInterface;	
 }
 
-bool TalkActions::loadFromXml(const std::string& _datadir)
+std::string TalkActions::getScriptBaseName()
 {
-	if(m_loaded){
-		std::cout << "Error: [TalkActions::loadFromXml] loaded == true" << std::endl;
-		return false;
-	}
-	m_datadir = _datadir;
-	TalkAction* talkAction = NULL;
-	//load TalkActions lib in script interface
-	if(m_scriptInterface.loadFile(std::string(m_datadir + "talkactions/lib/talkactions.lua")) == -1){
-		std::cout << "Warning: [TalkActions::loadFromXml] Can not load talkactions lib/talkactions.lua" << std::endl;
-	}
-	
-	std::string filename = m_datadir + "talkactions/talkactions.xml";
-	xmlDocPtr doc = xmlParseFile(filename.c_str());
-	
-	if(doc){
-		m_loaded = true;
-		xmlNodePtr root, p;
-		root = xmlDocGetRootElement(doc);
-		
-		if(xmlStrcmp(root->name,(const xmlChar*)"talkactions") != 0){
-			xmlFreeDoc(doc);
-			return false;
-		}
+	return "talkactions";	
+}
 
-		p = root->children;
-		while(p){
-			if(xmlStrcmp(p->name, (const xmlChar*)"talkaction") == 0){
-				talkAction = new TalkAction(&m_scriptInterface);
-				if(talkAction->configureTalkAction(p)){
-					bool success = true;
-					std::string scriptfile;
-					if(readXMLString(p, "script", scriptfile)){
-						if(!talkAction->loadScriptSay(m_datadir + std::string("talkactions/scripts/") + scriptfile)){
-							success = false;
-						}
-					}
-					else{
-						//TODO? hardcoded actions ....
-						success = false;
-					}
-						
-					if(success){
-						wordsMap.push_back(std::make_pair(talkAction->getWords(), talkAction));
-					}
-					else{
-						delete talkAction;
-					}
-				}
-				else{
-					std::cout << "Warning: [TalkActions::loadFromXml] Can not configure talkaction" << std::endl;
-					delete talkAction;
-				}
-			}
-			p = p->next;
-		}
-		
-		xmlFreeDoc(doc);
+Event* TalkActions::getEvent(const std::string& nodeName)
+{
+	if(nodeName == "talkaction"){
+		return new TalkAction(&m_scriptInterface);
 	}
 	else{
-		std::cout << "Warning: [TalkActions::loadFromXml] Can not open talkactions.xml" << std::endl;
+		return NULL;
 	}
-	return m_loaded;
+}
+
+bool TalkActions::registerEvent(Event* event, xmlNodePtr p)
+{
+	TalkAction* talkAction = dynamic_cast<TalkAction*>(event);
+	if(!talkAction)
+		return false;
+		
+	wordsMap.push_back(std::make_pair(talkAction->getWords(), talkAction));
 }
 
 talkActionResult_t TalkActions::creatureSay(Creature *creature, SpeakClasses type, const std::string& words)
@@ -163,10 +117,10 @@ talkActionResult_t TalkActions::creatureSay(Creature *creature, SpeakClasses typ
 }
 
 
-TalkAction::TalkAction(LuaScriptInterface* _interface)
+TalkAction::TalkAction(LuaScriptInterface* _interface) :
+Event(_interface)
 {
-	m_scriptInterface = _interface;
-	m_scriptId = 0;
+	//
 }
 
 TalkAction::~TalkAction()
@@ -174,40 +128,23 @@ TalkAction::~TalkAction()
 	//
 }
 
-bool TalkAction::configureTalkAction(xmlNodePtr p)
+bool TalkAction::configureEvent(xmlNodePtr p)
 {
 	std::string str;
 	if(readXMLString(p, "words", str)){
 		m_words = str;
 	}
 	else{
-		std::cout << "Error: [TalkAction::configureTalkAction] No words for TalkAction or Spell." << std::endl;
+		std::cout << "Error: [TalkAction::configureEvent] No words for TalkAction or Spell." << std::endl;
 		return false;
 	}
 	return true;
 }
 
-bool TalkAction::loadScriptSay(const std::string& script)
+std::string TalkAction::getScriptEventName()
 {
-	if(!m_scriptInterface || m_scriptId != 0){
-		std::cout << "Failure: [TalkAction::loadScript] m_scriptInterface == NULL. scriptid = " << m_scriptId << std::endl;
-		return false;
-	}
-	
-	if(m_scriptInterface->loadFile(script) == -1){
-		std::cout << "Warning: [TalkAction::loadScript] Can not load script. " << script << std::endl;
-		return false;
-	}
-	long id = m_scriptInterface->getEvent("onSay");
-	if(id == -1){
-		std::cout << "Warning: [TlakAction::loadScript] Event onSay not found. " << script << std::endl;
-		return false;
-		
-	}
-	m_scriptId = id;
-	return true;
+	return "onSay";
 }
-
 
 long TalkAction::executeSay(Creature* creature, const std::string& words, const std::string& param)
 {
@@ -226,7 +163,6 @@ long TalkAction::executeSay(Creature* creature, const std::string& words, const 
 	long cid = env->addThing((Thing*)creature);
 	
 	lua_State* L = m_scriptInterface->getLuaState();
-	int size0 = lua_gettop(L);
 	
 	m_scriptInterface->pushFunction(m_scriptId);
 	lua_pushnumber(L, cid);
@@ -236,10 +172,6 @@ long TalkAction::executeSay(Creature* creature, const std::string& words, const 
 	long ret;
 	if(m_scriptInterface->callFunction(3, ret) == false){
 		ret = 0;
-	}
-
-	if(size0 != lua_gettop(L)){
-		LuaScriptInterface::reportError(NULL, "Stack size changed!");
 	}
 	
 	return ret;

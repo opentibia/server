@@ -45,7 +45,6 @@ extern Game g_game;
 Actions::Actions() :
 m_scriptInterface("Action Interface")
 {
-	m_loaded = false;
 	m_scriptInterface.initState();
 }
 
@@ -78,97 +77,52 @@ void Actions::clear()
 	}
 	
 	m_scriptInterface.reInitState();
-}
-
-bool Actions::reload(){
 	m_loaded = false;
-	//unload
-	clear();
-	//load
-	return loadFromXml(m_datadir);
 }
 
-bool Actions::loadFromXml(const std::string& _datadir)
+LuaScriptInterface& Actions::getScriptInterface()
 {
-	if(m_loaded){
-		std::cout << "Error: [Actions::loadFromXml] loaded == true" << std::endl;
-		return false;
-	}
-	m_datadir = _datadir;
-	Action* action = NULL;
-	//load actions lib in script interface
-	if(m_scriptInterface.loadFile(std::string(m_datadir + "actions/lib/actions.lua")) == -1){
-		std::cout << "Warning: [Actions::loadFromXml] Can not load actions lib/actions.lua" << std::endl;
-	}
-	
-	std::string filename = m_datadir + "actions/actions.xml";
-	xmlDocPtr doc = xmlParseFile(filename.c_str());
-	
-	if(doc){
-		m_loaded = true;
-		xmlNodePtr root, p;
-		root = xmlDocGetRootElement(doc);
-		
-		if(xmlStrcmp(root->name,(const xmlChar*)"actions") != 0){
-			xmlFreeDoc(doc);
-			return false;
-		}
+	return m_scriptInterface;	
+}
 
-		p = root->children;
-		while(p){
-			if(xmlStrcmp(p->name, (const xmlChar*)"action") == 0){
-				int itemid,uniqueid,actionid;
-				action = new Action(&m_scriptInterface);
-				if(action->configureAction(p)){
-					bool success = true;
-					std::string scriptfile;
-					if(readXMLString(p, "script", scriptfile)){
-						if(!action->loadScriptUse(m_datadir + std::string("actions/scripts/") + scriptfile)){
-							success = false;
-						}
-					}
-					else{
-						//TODO? hardcoded actions ....
-						success = false;
-					}
-					
-					if(success){
-						if(readXMLInteger(p,"itemid",itemid)){
-							useItemMap[itemid] = action;
-							action = NULL;
-						}
-						else if(readXMLInteger(p,"uniqueid",uniqueid)){
-							uniqueItemMap[uniqueid] = action;
-							action = NULL;
-						}
-						else if(readXMLInteger(p,"actionid",actionid)){
-							actionItemMap[actionid] = action;
-							action = NULL;
-						}
-						else{
-							std::cout << "Warning: [Actions::loadFromXml] Missing item id" << std::endl;
-							success = false;
-						}
-					}
-					
-					if(!success){
-						delete action;
-					}
-				}
-				else{
-					std::cout << "Warning: [Actions::loadFromXml] Can not configure action" << std::endl;
-					delete action;
-				}
-			}
-			p = p->next;
-		}
-		
-		xmlFreeDoc(doc);
+std::string Actions::getScriptBaseName()
+{
+	return "actions";	
+}
+
+Event* Actions::getEvent(const std::string& nodeName)
+{
+	if(nodeName == "action"){
+		return new Action(&m_scriptInterface);
 	}
 	else{
-		std::cout << "Warning: [Actions::loadFromXml] Can not open actions.xml" << std::endl;
+		return NULL;
 	}
-	return m_loaded;
+}
+
+bool Actions::registerEvent(Event* event, xmlNodePtr p)
+{
+	Action* action = dynamic_cast<Action*>(event);
+	if(!action)
+		return false;
+	
+	bool success = true;
+	int value;
+	
+	if(readXMLInteger(p,"itemid",value)){
+		useItemMap[value] = action;
+	}
+	else if(readXMLInteger(p,"uniqueid",value)){
+		uniqueItemMap[value] = action;
+	}
+	else if(readXMLInteger(p,"actionid",value)){
+		actionItemMap[value] = action;
+	}
+	else{
+		success = false;
+	}	
+	
+	return success;
 }
 
 int Actions::canUse(const Creature* creature, const Position& pos)
@@ -328,20 +282,19 @@ bool Actions::useItemEx(Player* player, const Position& from_pos,
 	return false;
 }
 
-Action::Action(LuaScriptInterface* _interface)
+Action::Action(LuaScriptInterface* _interface) :
+Event(_interface)
 {
-	m_scriptInterface = _interface;
-	m_scriptId = 0;
 	allowfaruse = false;
 	blockwalls = true;
 }
 
 Action::~Action()
 {
-
+	//
 }
 
-bool Action::configureAction(xmlNodePtr p)
+bool Action::configureEvent(xmlNodePtr p)
 {
 	int intValue;
 	if(readXMLInteger(p, "allowfaruse", intValue)){
@@ -358,25 +311,9 @@ bool Action::configureAction(xmlNodePtr p)
 	return true;
 }
 
-bool Action::loadScriptUse(const std::string& script)
+std::string Action::getScriptEventName()
 {
-	if(!m_scriptInterface || m_scriptId != 0){
-		std::cout << "Failure: [Action::loadScript] m_scriptInterface == NULL. scriptid = " << m_scriptId << std::endl;
-		return false;
-	}
-	
-	if(m_scriptInterface->loadFile(script) == -1){
-		std::cout << "Warning: [Action::loadScript] Can not load script. " << script << std::endl;
-		return false;
-	}
-	long id = m_scriptInterface->getEvent("onUse");
-	if(id == -1){
-		std::cout << "Warning: [Action::loadScript] Event onUse not found. " << script << std::endl;
-		return false;
-		
-	}
-	m_scriptId = id;
-	return true;
+	return "onUse";
 }
 
 bool Action::executeUse(Player* player, Item* item, const PositionEx& posFrom, const PositionEx& posTo)
@@ -397,7 +334,6 @@ bool Action::executeUse(Player* player, Item* item, const PositionEx& posFrom, c
 	long itemid1 = env->addThing(item);
 	
 	lua_State* L = m_scriptInterface->getLuaState();
-	int size0 = lua_gettop(L);
 	
 	m_scriptInterface->pushFunction(m_scriptId);
 	lua_pushnumber(L, cid);
@@ -420,28 +356,8 @@ bool Action::executeUse(Player* player, Item* item, const PositionEx& posFrom, c
 	if(m_scriptInterface->callFunction(5, ret) == false){
 		ret = 0;
 	}
-	/*
-	if(lua_pcall(L, 5, 1, 0) != 0){
-		LuaScriptInterface::reportError(NULL, std::string(LuaScriptInterface::popString(L)));
-		ret = false;
-	}
-	else{
-		ret = (LuaScriptInterface::popNumber(L) != 0);
-	}
-	*/
-	if(size0 != lua_gettop(L)){
-		LuaScriptInterface::reportError(NULL, "Stack size changed!");
-	}
 	
 	return (ret != 0);
 }
 
-/*
-void Action::setScriptInterface(LuaScriptInterface* _interface)
-{
-	if(m_scriptInterface != NULL && m_scriptId != 0){
-		std::cout << "Warning: [Action::setScriptInterface] m_scriptInterface != NULL && scriptId != 0" << std::endl;
-	}
-	m_scriptInterface = _interface;
-}
-*/
+

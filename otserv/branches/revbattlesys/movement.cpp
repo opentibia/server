@@ -79,10 +79,21 @@ void MoveEvents::clear()
 LuaScriptInterface& MoveEvents::getScriptInterface()
 {
 	return m_scriptInterface;	
-}	
+}
+	
 std::string MoveEvents::getScriptBaseName()
 {
 	return "movements";	
+}
+
+Event* MoveEvents::getEvent(const std::string& nodeName)
+{
+	if(nodeName == "movevent"){
+		return new MoveEvent(&m_scriptInterface);
+	}
+	else{
+		return NULL;
+	}
 }
 	
 bool MoveEvents::registerEvent(Event* event, xmlNodePtr p)
@@ -127,16 +138,6 @@ bool MoveEvents::registerEvent(Event* event, xmlNodePtr p)
 	return success;
 }
 	
-Event* MoveEvents::getEvent(const std::string& nodeName)
-{
-	if(nodeName == "movevent"){
-		return new MoveEvent(&m_scriptInterface);
-	}
-	else{
-		return NULL;
-	}
-}	
-
 void MoveEvents::addEvent(MoveEvent* event, long id, MoveListMap& map)
 {
 	MoveListMap::iterator it = map.find(id);
@@ -162,13 +163,13 @@ MoveEvent* MoveEvents::getEvent(Item* item, MoveEvent_t eventType)
 	}
 	if(item->getActionId() != 0){
 		it = m_actionIdMap.find(item->getActionId());
-    	if (it != m_actionIdMap.end()){
+    	if(it != m_actionIdMap.end()){
 	    	return it->second.event[eventType];
 		}
 	}
 	
 	it = m_itemIdMap.find(item->getID());
-    if (it != m_itemIdMap.end()){
+    if(it != m_itemIdMap.end()){
 	   	return it->second.event[eventType];
 	}
 	
@@ -185,17 +186,18 @@ long MoveEvents::onCreatureMove(Creature* creature, Tile* tile, bool isIn)
 		eventType = MOVE_EVENT_STEP_OUT;
 	}
 	
+	long ret = -1;
 	long j = tile->__getLastIndex();
 	for(long i = tile->__getFirstIndex(); i < j; ++i){
 		Thing* thing = tile->__getThing(i);
 		if(Item* item = thing->getItem()){
 			MoveEvent* event = getEvent(item, eventType);
 			if(event){
-				return event->executeStep(creature, item, tile->getPosition());
+				ret = event->executeStep(creature, item, tile->getPosition());
 			}
 		}
 	}
-	return -1;
+	return ret;
 }
 
 long MoveEvents::onPlayerEquip(Player* player, Item* item, long slot, bool isEquip)
@@ -228,9 +230,10 @@ long MoveEvents::onItemMove(Item* item, Tile* tile, bool isAdd)
 		eventType2 = MOVE_EVENT_REMOVE_ITEM_ITEMTILE;
 	}
 	
+	long ret = -1;
 	MoveEvent* event = getEvent(item, eventType1);
 	if(event){
-		return event->executeAddRemItem(item, NULL, tile->getPosition());
+		ret = event->executeAddRemItem(item, NULL, tile->getPosition());
 	}
 	
 	long j = tile->__getLastIndex();
@@ -239,12 +242,12 @@ long MoveEvents::onItemMove(Item* item, Tile* tile, bool isAdd)
 		if(Item* tileItem = thing->getItem()){
 			MoveEvent* event = getEvent(tileItem, eventType2);
 			if(event){
-				return event->executeAddRemItem(item, tileItem, tile->getPosition());
+				ret = event->executeAddRemItem(item, tileItem, tile->getPosition());
 			}
 		}
 	}
 	
-	return -1;
+	return ret;
 }
 
 

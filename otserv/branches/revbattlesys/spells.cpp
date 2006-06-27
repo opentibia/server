@@ -35,7 +35,6 @@ extern Game g_game;
 Spells::Spells():
 m_scriptInterface("Action Interface")
 {
-	loaded = false;
 	m_scriptInterface.initState();
 }
 
@@ -57,101 +56,47 @@ void Spells::clear()
 		delete it2->second;
 	}
 	instants.clear();
-	loaded = false;
 }	
 
-bool Spells::reload()
+LuaScriptInterface& Spells::getScriptInterface()
 {
-	loaded = false;
-	clear();
-	return loadFromXml(datadir);
+	return m_scriptInterface;	
 }
 
-bool Spells::loadFromXml(const std::string& _datadir)
+std::string Spells::getScriptBaseName()
 {
-	if(loaded){
-		std::cout << "Error: [Spells::loadFromXml] loaded == true" << std::endl;
+	return "spells";	
+}
+
+Event* Spells::getEvent(const std::string& nodeName)
+{
+	if(nodeName == "rune"){
+		return new RuneSpell(&m_scriptInterface);
+	}
+	else if(nodeName == "instant"){
+		new InstantSpell(&m_scriptInterface);
+	}
+	else{
+		return NULL;
+	}
+}
+
+bool Spells::registerEvent(Event* event, xmlNodePtr p)
+{
+	InstantSpell* instant = dynamic_cast<InstantSpell*>(event);
+	RuneSpell* rune = dynamic_cast<RuneSpell*>(event);
+	if(!instant && !rune)
+		return false;
+	
+	if(instant){
+		instants[instant->getWords()] = instant;
+	}
+	else if(rune){
+		runes[rune->getRuneItemId()] = rune;
+	}
+	else{
 		return false;
 	}
-	datadir = _datadir;
-	
-	//load spell lib in script interface
-	if(m_scriptInterface.loadFile(std::string(datadir + "spells/lib/spells.lua")) == -1){
-		std::cout << "Warning: [Spells::loadFromXml] Can not load spells lib/spells.lua" << std::endl;
-	}
-	
-	std::string filename = datadir + "spells/spells.xml";
-	xmlDocPtr doc = xmlParseFile(filename.c_str());
-
-	if(doc){
-		loaded = true;
-		xmlNodePtr root, p;
-		root = xmlDocGetRootElement(doc);
-		
-		if(xmlStrcmp(root->name,(const xmlChar*)"spells") != 0){
-			xmlFreeDoc(doc);
-			return false;
-		}
-		
-		p = root->children;
-		
-		while(p){
-			Spell* spell = NULL;
-			if(xmlStrcmp(p->name, (const xmlChar*)"rune") == 0){
-				spell = new RuneSpell(&m_scriptInterface);
-			}
-			else if(xmlStrcmp(p->name, (const xmlChar*)"instant") == 0){
-				spell = new InstantSpell(&m_scriptInterface);
-			}
-			
-			if(spell){
-				if(spell->configureSpell(p)){
-					bool success = true;
-					std::string scriptfile;
-					if(readXMLString(p, "script", scriptfile)){
-						if(!spell->loadScriptSpell(datadir + std::string("actions/scripts/") + scriptfile)){
-							success = false;
-						}
-					}
-					else if(readXMLString(p, "function", scriptfile)){
-						if(!spell->loadFunctionSpell(scriptfile)){
-							success = false;
-						}
-					}
-					else{
-						success = false;
-					}
-					
-					if(success){
-						if(RuneSpell* rune = dynamic_cast<RuneSpell*>(spell)){
-							runes[rune->getRuneItemId()] = rune;
-						}
-						else if(InstantSpell* instant = dynamic_cast<InstantSpell*>(spell)){
-							instants[instant->getWords()] = instant;
-						}
-						else{
-							std::cout << "Warning: [Spells::loadFromXml] Unk spell class" << std::endl;
-							success = false;
-						}
-					}
-					
-					if(!success){
-						delete spell;
-					}
-				}
-				else{
-					std::cout << "Warning: [Spells::loadFromXml] Can not configure spell" << std::endl;
-					delete spell;
-				}
-			}
-			else{
-				std::cout << "Warning: [Spells::loadFromXml] Unk spell type: " << p->name << std::endl;
-			}			
-			p = p->next;
-		}
-		xmlFreeDoc(doc);
-	}
-	return this->loaded;
 }
 
 RuneSpell* Spells::getRuneSpell(Item* item)
@@ -298,16 +243,21 @@ void Spell::addSpellEffects(Player* player)
 InstantSpell::InstantSpell(LuaScriptInterface* _interface) :
 TalkAction(_interface)
 {
-	scripted = true;
 	hasParam = false;
 	function = NULL;
 }
 
 InstantSpell::~InstantSpell()
 {
+	//
 }
-	
-bool InstantSpell::configureSpell(xmlNodePtr p)
+
+std::string InstantSpell::getScriptEventName()
+{
+	return "onCastInstant";
+}
+
+bool InstantSpell::configureEvent(xmlNodePtr p)
 {
 	int intValue;
 	
@@ -315,7 +265,7 @@ bool InstantSpell::configureSpell(xmlNodePtr p)
 		if(intValue == 1)
 	 		hasParam = true;
 	}
-	if(Spell::configureSpell(p) && TalkAction::configureTalkAction(p)){
+	if(Spell::configureSpell(p) && TalkAction::configureEvent(p)){
 		return true;
 	}
 	else{
@@ -333,7 +283,7 @@ bool InstantSpell::castInstant(Creature* creature, const std::string& words, con
 		}
 		//TODO: more checks?
 		
-		if(scripted){
+		if(m_scripted){
 			success =  executeCastInstant(creature, param);
 		}
 		else{
@@ -353,29 +303,8 @@ bool InstantSpell::castInstant(Creature* creature, const std::string& words, con
 	return false;
 }
 
-bool InstantSpell::loadScriptSpell(const std::string& script)
-{
-	if(!m_scriptInterface || m_scriptId != 0){
-		std::cout << "Failure: [InstantSpell::loadScriptSpell] m_scriptInterface == NULL. scriptid = " << m_scriptId << std::endl;
-		return false;
-	}
-	
-	if(m_scriptInterface->loadFile(script) == -1){
-		std::cout << "Warning: [InstantSpell::loadScriptSpell] Can not load script. " << script << std::endl;
-		return false;
-	}
-	long id = m_scriptInterface->getEvent("onCastInstant");
-	if(id == -1){
-		std::cout << "Warning: [InstantSpell::loadScriptSpell] Event onCastInstant not found. " << script << std::endl;
-		return false;
-		
-	}
-	m_scriptId = id;
-	scripted = true;
-	return true;
-}
 
-bool InstantSpell::loadFunctionSpell(const std::string& functionName)
+bool InstantSpell::loadFunction(const std::string& functionName)
 {
 	if(functionName == "editHouseGuest"){
 		function = HouseGuestList;
@@ -396,7 +325,7 @@ bool InstantSpell::loadFunctionSpell(const std::string& functionName)
 		return false;
 	}
 	
-	scripted = false;
+	m_scripted = false;
 	return true;
 }
 
@@ -652,62 +581,78 @@ bool InstantSpell::SearchPlayer(Creature* creature, const std::string& words, co
 		
 		std::stringstream ss;
 		ss << playerExiva->getName() << " ";
-		
-		if(distance == DISTANCE_BESIDE && level == LEVEL_SAME){
-			ss << "is standing next to you";
-		}
+
+		if(distance == DISTANCE_BESIDE){
+			if(level == LEVEL_SAME)
+				ss << "is standing next to you";
+			else if(level == LEVEL_HIGHER)
+				ss << "is above you";
+			else if(level == LEVEL_LOWER)
+				ss << "is below you";
+			}
 		else{
 			switch(distance){
-			case DISTANCE_BESIDE:
-			case DISTANCE_CLOSE_1:
-				if(level == LEVEL_SAME){
+				case DISTANCE_CLOSE_1:
+					if(level == LEVEL_SAME){
+						ss << "is to the";
+					}
+					else if(level == LEVEL_HIGHER){
+						ss << "is on a higher level to the";
+					}
+					else if(level == LEVEL_LOWER){
+						ss << "is on a lower level to the";
+					}
+					break;
+
+				case DISTANCE_CLOSE_2:
 					ss << "is to the";
-				}
-				else if(level == LEVEL_HIGHER){
-					ss << "is on a higher level to the";
-				}
-				else if(level == LEVEL_LOWER){
-					ss << "is on a lower level to the";
-				}
-				break;
-			case DISTANCE_CLOSE_2:
-				ss << "is to the";
-				break;
-			case DISTANCE_FAR:
-				ss << "is far to the";
-				break;
-			case DISTANCE_VERYFAR:
-				ss << "is very far to the";
-				break;
+					break;
+
+				case DISTANCE_FAR:
+					ss << "is far to the";
+					break;
+
+				case DISTANCE_VERYFAR:
+					ss << "is very far to the";
+					break;
 			}
+
 			ss << " ";
 			switch(direction){
-			case DIR_N:
-				ss << "north";
-				break;
-			case DIR_S:
-				ss << "south";
-				break;
-			case DIR_E:
-				ss << "east";
-				break;
-			case DIR_W:
-				ss << "west";
-				break;
-			case DIR_NE:
-				ss << "north-east";
-				break;
-			case DIR_NW:
-				ss << "north-west";
-				break;
-			case DIR_SE:
-				ss << "south-east";
-				break;
-			case DIR_SW:
-				ss << "south-west";
-				break;
+				case DIR_N:
+					ss << "north";
+					break;
+
+				case DIR_S:
+					ss << "south";
+					break;
+				case DIR_E:
+
+					ss << "east";
+					break;
+
+				case DIR_W:
+					ss << "west";
+					break;
+
+				case DIR_NE:
+					ss << "north-east";
+					break;
+
+				case DIR_NW:
+					ss << "north-west";
+					break;
+
+				case DIR_SE:
+					ss << "south-east";
+					break;
+
+				case DIR_SW:
+					ss << "south-west";
+					break;
 			}
 		}
+
 		ss << ".";
 		player->sendTextMessage(MSG_INFO_DESCR, ss.str().c_str());		
 		return true;
@@ -720,7 +665,6 @@ bool InstantSpell::SearchPlayer(Creature* creature, const std::string& words, co
 RuneSpell::RuneSpell(LuaScriptInterface* _interface) :
 Action(_interface)
 {
-	scripted = true;
 	hasCharges = true;
 	runeId = 0;
 	function = NULL;
@@ -728,9 +672,15 @@ Action(_interface)
 
 RuneSpell::~RuneSpell()
 {
+	//
+}
+
+std::string RuneSpell::getScriptEventName()
+{
+	return "onUseRune";
 }
 	
-bool RuneSpell::configureSpell(xmlNodePtr p)
+bool RuneSpell::configureEvent(xmlNodePtr p)
 {
 	int intValue;
 	if(readXMLInteger(p, "id", intValue)){
@@ -744,7 +694,7 @@ bool RuneSpell::configureSpell(xmlNodePtr p)
 		if(intValue == 0)
 	 		hasCharges = false;
 	}
-	if(Spell::configureSpell(p) && Action::configureAction(p)){
+	if(Spell::configureSpell(p) && Action::configureEvent(p)){
 		return true;
 	}
 	else{
@@ -752,32 +702,11 @@ bool RuneSpell::configureSpell(xmlNodePtr p)
 	}
 }
 
-bool RuneSpell::loadScriptSpell(const std::string& script)
-{
-	if(!m_scriptInterface || m_scriptId != 0){
-		std::cout << "Failure: [RuneSpell::loadScriptSpell] m_scriptInterface == NULL. scriptid = " << m_scriptId << std::endl;
-		return false;
-	}
-	
-	if(m_scriptInterface->loadFile(script) == -1){
-		std::cout << "Warning: [RuneSpell::loadScriptSpell] Can not load script. " << script << std::endl;
-		return false;
-	}
-	long id = m_scriptInterface->getEvent("onUseRune");
-	if(id == -1){
-		std::cout << "Warning: [RuneSpell::loadScriptSpell] Event onUseRune not found. " << script << std::endl;
-		return false;
-		
-	}
-	m_scriptId = id;
-	return true;
-}
-	
-bool RuneSpell::loadFunctionSpell(const std::string& function)
+bool RuneSpell::loadFunction(const std::string& function)
 {
 	return false;
 }
-	
+
 bool RuneSpell::useRune(Creature* creature, Item* item, const Position& posFrom, const Position& posTo, Creature* target)
 {
 	Player* player = NULL;
@@ -805,7 +734,7 @@ bool RuneSpell::useRune(Creature* creature, Item* item, const Position& posFrom,
 		}
 	}
 	bool success;
-	if(scripted){
+	if(m_scripted){
 		success = executeUseRune(creature, item, posFrom, posTo, target);
 	}
 	else{

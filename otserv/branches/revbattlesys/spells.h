@@ -28,20 +28,16 @@
 #include "player.h"
 #include "actions.h"
 #include "talkaction.h"
+#include "baseevents.h"
 
 class RuneSpell;
 class InstantSpell;
 
-class Spells
+class Spells : public BaseEvents
 {
 public:
 	Spells();
-	~Spells();
-	
-	bool reload();
-	void clear();
-	
-	bool loadFromXml(const std::string& datadir);
+	virtual ~Spells();
 	
 	RuneSpell* getRuneSpell(Item* item);
 	RuneSpell* getRuneSpell(const std::string& name);
@@ -50,8 +46,13 @@ public:
 	InstantSpell* getInstantSpellByName(const std::string& name);
 	
 protected:
-	bool loaded;
-	std::string datadir;
+	virtual void clear();
+	virtual LuaScriptInterface& getScriptInterface();
+	virtual std::string getScriptBaseName();
+	virtual Event* getEvent(const std::string& nodeName);
+	virtual bool registerEvent(Event* event, xmlNodePtr p);
+	
+	
 	typedef std::map<uint32_t, RuneSpell*> RunesMap;
 	typedef std::map<std::string, InstantSpell*> InstantsMap ;
 	RunesMap runes;
@@ -77,9 +78,6 @@ public:
 	virtual ~Spell(){};
 	
 	bool configureSpell(xmlNodePtr xmlspell);
-	
-	virtual bool loadScriptSpell(const std::string& script) = 0;
-	virtual bool loadFunctionSpell(const std::string& function) = 0;
 	
 protected:
 	bool spellPlayerChecks(Player* player);
@@ -109,17 +107,16 @@ public:
 	InstantSpell(LuaScriptInterface* _interface);
 	virtual ~InstantSpell();
 	
-	bool configureSpell(xmlNodePtr xmlspell);
+	virtual bool configureEvent(xmlNodePtr p);
+	virtual bool loadFunction(const std::string& functionName);
 	
 	bool castInstant(Creature* creature, const std::string& words, const std::string& param);
-	
-	virtual bool loadFunctionSpell(const std::string& function);
 	//scripting
-	virtual bool loadScriptSpell(const std::string& script);
 	bool executeCastInstant(Creature* creature, const std::string& param);
 	//
 	
-protected:
+protected:	
+	virtual std::string getScriptEventName();
 	
 	static InstantSpellFunction HouseGuestList;
 	static InstantSpellFunction HouseSubOwnerList;
@@ -131,7 +128,6 @@ protected:
 	
 	bool hasParam;
 	
-	bool scripted;
 	InstantSpellFunction* function;
 };
 
@@ -141,23 +137,22 @@ public:
 	RuneSpell(LuaScriptInterface* _interface);
 	virtual ~RuneSpell();
 	
-	bool configureSpell(xmlNodePtr xmlspell);
+	virtual bool configureEvent(xmlNodePtr p);
+	virtual bool loadFunction(const std::string& functionName);
 	
 	bool useRune(Creature* creature, Item* item, const Position& posFrom, const Position& posTo, Creature* target);
-	
-	virtual bool loadFunctionSpell(const std::string& function);
 	//sciprting
-	virtual bool loadScriptSpell(const std::string& script);
 	bool executeUseRune(Creature* creature, Item* item, const Position& posFrom, const Position& posTo, Creature* target);
 	//
 	
 	uint32_t getRuneItemId(){return runeId;};
 	
 protected:
+	virtual std::string getScriptEventName();
+	
 	bool hasCharges;
 	uint32_t runeId;
 	
-	bool scripted;
 	RuneSpellFunction* function;
 };
 

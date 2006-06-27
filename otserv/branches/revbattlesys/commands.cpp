@@ -47,6 +47,7 @@ extern Monsters g_monsters;
 extern Ban g_bans;
 extern TalkActions g_talkactions;
 extern MoveEvents g_moveEvents;
+extern Spells g_spells;
 
 extern bool readXMLInteger(xmlNodePtr p, const char *tag, int &value);
 
@@ -488,6 +489,9 @@ bool Commands::reloadInfo(Creature* creature, const std::string& cmd, const std:
 	}
 	else if(param == "move"){
 		g_moveEvents.reload();
+	}
+	else if(param == "spells"){
+		//g_spells.reload();
 	}
 	else{
 		Player* player = creature->getPlayer();
