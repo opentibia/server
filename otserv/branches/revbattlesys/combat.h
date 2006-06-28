@@ -32,47 +32,65 @@ class Condition;
 class Creature;
 class Position;
 class Item;
+class CombatHealth;
+class CombatMana;
+class CombatCondition;
+class CombatField;
 
 class Combat{
 public:
 	Combat(uint8_t _impactEffect = NM_ME_NONE);
 	virtual ~Combat() = 0;
 
-	virtual bool execute(Creature* attacker, Creature* target) const;
-	virtual bool execute(Creature* attacker, const Position& pos) const;
+	virtual CombatHealth* getCombatHealth() {return NULL;};
+	virtual const CombatHealth* getCombatHealth() const {return NULL;};
+
+	virtual CombatMana* getCombatMana() {return NULL;};
+	virtual const CombatMana* getCombatMana() const {return NULL;};
+
+	virtual CombatCondition* getCombatCondition() {return NULL;};
+	virtual const CombatCondition* getCombatCondition() const {return NULL;};
+
+	virtual CombatField* getCombatField() {return NULL;};
+	virtual const CombatField* getCombatField() const {return NULL;};
 
 protected:
+	void addImpactEffect(const Position& pos) const;
+
 	//configureable
 	uint8_t impactEffect;
 };
 
 class CombatHealth : public Combat{
 public:
-	CombatHealth(DamageType_t _damageType, int32_t _minChange, int32_t _maxChange, uint8_t _impactEffect);
+	CombatHealth(DamageType_t _damageType, uint8_t _impactEffect);
 	~CombatHealth();
 
-	virtual bool execute(Creature* attacker, Creature* target) const;
-	virtual bool execute(Creature* attacker, const Position& pos) const;
+	virtual CombatHealth* getCombatHealth() {return this;};
+	virtual const CombatHealth* getCombatHealth() const {return this;};
+
+	void doCombat(Creature* attacker, Creature* target, int32_t minChange, int32_t maxChange) const;
+	void doCombat(Creature* attacker, const Position& pos, int32_t minChange, int32_t maxChange) const;
 
 protected:
-	DamageType_t damageType;
+	void internalCombat(Creature* attacker, Creature* target, int32_t healthChange) const;
 
-	//configureable
-	int32_t minChange;
-	int32_t maxChange;
+	DamageType_t damageType;
 };
 
 class CombatMana : public Combat{
 public:
-	CombatMana(int32_t _minChange, int32_t _maxChange, uint8_t _impactEffect);
+	CombatMana(uint8_t _impactEffect);
 	~CombatMana();
 
-	virtual bool execute(Creature* attacker, Creature* target) const;
-	virtual bool execute(Creature* attacker, const Position& pos) const;
+	virtual CombatMana* getCombatMana() {return this;};
+	virtual const CombatMana* getCombatMana() const {return this;};
+
+	void doCombat(Creature* attacker, Creature* target, int32_t minChange, int32_t maxChange) const;
+	void doCombat(Creature* attacker, const Position& pos, int32_t minChange, int32_t maxChange) const;
 
 protected:
-	int32_t minChange;
-	int32_t maxChange;
+	void internalCombat(Creature* attacker, Creature* target, int32_t manaChange) const;
 };
 
 class CombatCondition : public Combat{
@@ -81,8 +99,8 @@ public:
 	CombatCondition(ConditionType_t _removeType, uint8_t _impactEffect);
 	~CombatCondition();
 
-	virtual bool execute(Creature* attacker, Creature* target) const;
-	virtual bool execute(Creature* attacker, const Position& pos) const;
+	virtual CombatCondition* getCombatCondition() {return this;};
+	virtual const CombatCondition* getCombatCondition() const {return this;};
 
 protected:
 	Condition* condition;
@@ -96,8 +114,10 @@ public:
 	CombatField(MagicField* _field);
 	~CombatField();
 
-	virtual bool execute(Creature* attacker, Creature* target) const;
-	virtual bool execute(Creature* attacker, const Position& pos) const;
+	virtual CombatField* getCombatField() {return this;};
+	virtual const CombatField* getCombatField() const {return this;};
+	
+	void doCombat(Creature* attacker, const Position& pos) const;
 
 protected:
 	MagicField* field;
@@ -140,6 +160,8 @@ public:
 
 	ReturnValue doCombat(Creature* attacker, const Position& pos, const Combat& combat) const;
 	void setRow(int row, std::vector<uint8_t> data);
+
+	bool getList(const Position& pos, Direction rotatedir, std::list<Tile*> list) const;
 
 protected:
 	Matrix<uint8_t> area;

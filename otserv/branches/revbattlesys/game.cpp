@@ -1651,6 +1651,7 @@ bool Game::playerUseItemEx(Player* player, const Position& fromPos, uint8_t from
 
 bool Game::internalUseItemEx(Player* player, const Position& fromPos, Item* item, const Position& toPos, uint8_t toStackPos, uint16_t toSpriteId)
 {
+	/*
 	AreaCombat area;
 	uint8_t arr[] = {1, 1, 1};
 	std::vector<uint8_t> row(arr, arr + sizeof(arr) / sizeof(uint8_t));
@@ -1707,7 +1708,9 @@ bool Game::internalUseItemEx(Player* player, const Position& fromPos, Item* item
 		CombatCondition combat(CONDITION_OUTFIT, NM_ME_SOUND_BLUE);
 		area.doCombat(player, toPos, combat);
 	}
-
+	else{
+	*/
+	
 	g_actions.useItemEx(player, fromPos, toPos, toStackPos, item);
 	return true;
 }

@@ -94,9 +94,11 @@ public:
 	Creature* getCreatureByUID(long uid);
 	Player* getPlayerByUID(long uid);
 
-	uint32_t addArea(AreaCombat* area);
+	uint32_t addCombatArea(AreaCombat* area);
+	AreaCombat* getCombatArea(uint32_t areaId) const;
+
 	uint32_t addCombatObject(Combat* combat);
-	Combat* getCombatObject(uint32_t combatId);
+	Combat* getCombatObject(uint32_t combatId) const;
 
 private:
 	typedef std::map<long, Thing*> ThingMap;
@@ -278,15 +280,18 @@ protected:
 	
 	//
 	static int luaCreateCombatArea(lua_State *L);
+	static int luaSetCombatParam(lua_State *L);
 
 	static int luaCreateCombatHealthObject(lua_State *L);
-	static int luaSetCombatHealthParam(lua_State *L);
-	static int luaDoCombatHealth(lua_State *L);
+	static int luaDoAreaCombatHealth(lua_State *L);
 	static int luaDoTargetCombatHealth(lua_State *L);
 
-	//static int luaCreateCombatManaObject(lua_State *L);
-	static int luaDoCombatMana(lua_State *L);
+	//
+	static int luaCreateCombatManaObject(lua_State *L);
+	static int luaDoAreaCombatMana(lua_State *L);
 	static int luaDoTargetCombatMana(lua_State *L);
+
+	static int luaDoAreaCombatCondition(lua_State *L);
 
 	static int luaDebugPrint(lua_State *L);
 	//
