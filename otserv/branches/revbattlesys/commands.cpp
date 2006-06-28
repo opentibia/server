@@ -35,6 +35,7 @@ typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 #include "ioplayer.h"
 #include "tools.h"
 #include "ban.h"
+#include "spells.h"
 #include "talkaction.h"
 #include "movement.h"
 

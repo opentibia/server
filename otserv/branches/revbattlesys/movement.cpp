@@ -131,6 +131,7 @@ bool MoveEvents::registerEvent(Event* event, xmlNodePtr p)
 	}
 	else if(readXMLString(p,"position",str)){
 		//TODO
+		success = false;
 	}
 	else{
 		success = false;

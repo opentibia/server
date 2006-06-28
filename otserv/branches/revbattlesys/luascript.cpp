@@ -2117,7 +2117,7 @@ int LuaScriptInterface::luaGetPlayerSlotItem(lua_State *L)
 
 int LuaScriptInterface::luaGetThing(lua_State *L)
 {
-	//GetThing(uid)
+	//getThing(uid)
 	unsigned long uid = (unsigned long)popNumber(L);
 	
 	ScriptEnviroment* env = getScriptEnv();
@@ -2169,7 +2169,7 @@ int LuaScriptInterface::luaCreateCombatArea(lua_State *L)
 	while(lua_next(L, -2) != 0){
 		lua_pushnil(L);
 		row.clear();
-    while(lua_next(L, -2) != 0){
+		while(lua_next(L, -2) != 0){
 			row.push_back((unsigned char)lua_tonumber(L, -1));
 			
 			lua_pop(L, 1);  // removes `value'; keeps `key' for next iteration //

@@ -97,6 +97,8 @@ bool Spells::registerEvent(Event* event, xmlNodePtr p)
 	else{
 		return false;
 	}
+	
+	return true;
 }
 
 RuneSpell* Spells::getRuneSpell(Item* item)

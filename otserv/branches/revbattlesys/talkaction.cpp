@@ -78,8 +78,9 @@ bool TalkActions::registerEvent(Event* event, xmlNodePtr p)
 	TalkAction* talkAction = dynamic_cast<TalkAction*>(event);
 	if(!talkAction)
 		return false;
-		
+	
 	wordsMap.push_back(std::make_pair(talkAction->getWords(), talkAction));
+	return true;
 }
 
 talkActionResult_t TalkActions::creatureSay(Creature *creature, SpeakClasses type, const std::string& words)
