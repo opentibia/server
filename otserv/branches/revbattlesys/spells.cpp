@@ -74,7 +74,7 @@ Event* Spells::getEvent(const std::string& nodeName)
 		return new RuneSpell(&m_scriptInterface);
 	}
 	else if(nodeName == "instant"){
-		new InstantSpell(&m_scriptInterface);
+		return new InstantSpell(&m_scriptInterface);
 	}
 	else{
 		return NULL;

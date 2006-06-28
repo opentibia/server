@@ -61,7 +61,7 @@ public:
 	long onItemMove(Item* item, Tile* tile, bool isAdd);
 	
 protected:
-	typedef std::map<unsigned short , MoveEventList> MoveListMap;
+	typedef std::map<long , MoveEventList> MoveListMap;
 	virtual void clear();
 	virtual LuaScriptInterface& getScriptInterface();
 	virtual std::string getScriptBaseName();
