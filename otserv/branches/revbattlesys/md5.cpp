@@ -99,7 +99,7 @@ static unsigned char MD5_PADDING[64] = {
 #define MD5_S44 21
 
 /* Basic MD5 step. MD5_Transform buf based on in */
-static void MD5_Transform (UINT4 *buf, UINT4 *in)
+void MD5_Transform (UINT4 *buf, UINT4 *in)
 {
 	UINT4 a = buf[0], b = buf[1], c = buf[2], d = buf[3];
 

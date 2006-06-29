@@ -157,6 +157,9 @@ uint8_t ConditionGeneric::getIcons() const
 		
 		case CONDITION_EXHAUSTED:
 			break;
+		
+		default:
+			break;
 	}
 
 	return 0;
@@ -228,6 +231,9 @@ bool ConditionDamage::doDamage(Creature* creature, int32_t damage)
 		case CONDITION_POISON:
 			damageType = DAMAGE_POISON;
 			break;
+		
+		default:
+			break;
 	}
 
 	Creature* attacker = g_game.getCreatureByID(owner);
@@ -272,6 +278,9 @@ uint8_t ConditionDamage::getIcons() const
 
 		case CONDITION_POISON:
 			return ICON_POISON;
+			break;
+			
+		default:
 			break;
 	}
 
@@ -325,6 +334,9 @@ uint8_t ConditionSpeed::getIcons() const
 
 		case CONDITION_PARALYZE:
 			return ICON_PARALYZE;
+			break;
+		
+		default:
 			break;
 	}
 

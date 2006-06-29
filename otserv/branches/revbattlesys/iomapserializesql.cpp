@@ -246,7 +246,7 @@ bool IOMapSerializeSQL::loadTile(Database& db, Tile* tile)
 	if(db.storeQuery(query, result) && (result.getNumRows() > 0)){	
 		Item* item = NULL;
 
-		for(int i=0; i < result.getNumRows(); ++i){
+		for(uint32_t i=0; i < result.getNumRows(); ++i){
 			int sid = result.getDataInt("sid", i);
 			int pid = result.getDataInt("pid", i);
 			int type = result.getDataInt("type", i);
@@ -343,7 +343,7 @@ bool IOMapSerializeSQL::loadHouseInfo(Map* map, const std::string& identifier)
 	if(!db.storeQuery(query, result) || result.getNumRows() == 0)
 		return false;
 	
-	for(int i=0; i < result.getNumRows(); ++i){
+	for(uint32_t i = 0; i < result.getNumRows(); ++i){
 		int houseid = result.getDataInt("houseid", i);
 		House* house = Houses::getInstance().getHouse(houseid);
 		if(house){
@@ -363,7 +363,7 @@ bool IOMapSerializeSQL::loadHouseInfo(Map* map, const std::string& identifier)
 		if(house->getHouseOwner() != 0 && house->getHouseId() != 0){
 			query << "SELECT listid,list FROM houseaccess WHERE houseid =" << house->getHouseId();
 			if(db.storeQuery(query, result) && result.getNumRows() != 0){
-				for(int i=0; i < result.getNumRows(); ++i){
+				for(uint32_t i = 0; i < result.getNumRows(); ++i){
 					int listid = result.getDataInt("listid", i);
 					std::string list = result.getDataString("list", i);
 					house->setAccessList(listid, list);

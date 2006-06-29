@@ -958,6 +958,8 @@ void Protocol76::parseSay(NetworkMessage& msg)
 	case SPEAK_BROADCAST:
 		game->playerBroadcastMessage(player, text);
 		break;
+	default:
+		break;
 	}
 }
 
@@ -1844,7 +1846,9 @@ void Protocol76::AddCreatureSpeak(NetworkMessage& msg,const Creature* creature, 
 	case SPEAK_CHANNEL_R1:
 	case SPEAK_CHANNEL_R2:
 		msg.AddU16(channelId);
-		break;	
+		break;
+	default:
+		break;
 	}
 	msg.AddString(text);
 }

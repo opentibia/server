@@ -190,7 +190,7 @@ bool Actions::useItem(Player* player, const Position& pos, uint8_t index, Item* 
 	
 	//if found execute it
 	if(action){
-		long stack = item->getParent()->__getIndexOfThing(item);
+		int32_t stack = item->getParent()->__getIndexOfThing(item);
 		PositionEx posEx(pos, stack);
 		if(action->executeUse(player, item, posEx, posEx)){
 			return true;
@@ -270,7 +270,7 @@ bool Actions::useItemEx(Player* player, const Position& from_pos,
 			return false;
 		}
 	
-		long from_stack = item->getParent()->__getIndexOfThing(item);
+		int32_t from_stack = item->getParent()->__getIndexOfThing(item);
 		PositionEx posFromEx(from_pos, from_stack);
 		PositionEx posToEx(to_pos, to_stack);
 		if(action->executeUse(player, item, posFromEx, posToEx))

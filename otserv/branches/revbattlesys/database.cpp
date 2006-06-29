@@ -302,7 +302,7 @@ bool Database::storeQuery(DBQuery &q, DBResult &dbres)
 	// Getting the field names
 	//dbres.clearFieldNames();
 	fields = mysql_fetch_fields(r);
-	for(int i=0; i < num_fields; ++i)
+	for(uint32_t i = 0; i < num_fields; ++i)
 	{
 		dbres.setFieldName(std::string(fields[i].name), i);
 	}

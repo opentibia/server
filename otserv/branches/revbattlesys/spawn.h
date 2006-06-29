@@ -59,7 +59,7 @@ private:
 		Position pos;
 		std::string name;
 		Direction dir;
-		int spawntime;
+		uint32_t spawntime;
 		uint64_t lastspawn;
 	};
 

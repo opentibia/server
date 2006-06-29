@@ -418,7 +418,7 @@ ReturnValue Container::__queryMaxCount(int32_t index, const Thing* thing, uint32
 
 ReturnValue Container::__queryRemove(const Thing* thing, uint32_t count) const
 {
-	uint32_t index = __getIndexOfThing(thing);
+	int32_t index = __getIndexOfThing(thing);
 
 	if(index == -1){
 		return RET_NOTPOSSIBLE;
@@ -695,7 +695,7 @@ Thing* Container::__getThing(uint32_t index) const
 	if(index < 0 || index > size())
 		return NULL;
 
-	int count = 0;
+	uint32_t count = 0;
 	for(ItemList::const_iterator cit = itemlist.begin(); cit != itemlist.end(); ++cit){
 		if(count == index)
 			return *cit;

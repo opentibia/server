@@ -210,7 +210,7 @@ bool Monsters::reload()
 MonsterType* Monsters::loadMonster(const std::string& file,const std::string& monster_name, bool reloading /*= false*/)
 {
 	bool monsterLoad;
-	MonsterType* mType;
+	MonsterType* mType = NULL;
 	bool new_mType = true;
 	
 	if(reloading){

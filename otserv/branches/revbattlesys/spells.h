@@ -92,12 +92,12 @@ private:
 	
 	bool enabled;
 	bool premium;
-	uint32_t level;
-	uint32_t magLevel;
+	int32_t level;
+	int32_t magLevel;
 	uint32_t vocationBits;
 	
-	uint32_t mana;
-	uint32_t soul;
+	int32_t mana;
+	int32_t soul;
 	bool exhaustion;
 };
 

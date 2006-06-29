@@ -108,7 +108,7 @@ const unsigned char* FileLoader::getProps(const NODE node, unsigned long &size)
 		return NULL;
 	}
 	
-	int byte, position;
+	int byte;
 	if(!readByte(byte))
 		return NULL;
 
@@ -120,7 +120,7 @@ const unsigned char* FileLoader::getProps(const NODE node, unsigned long &size)
 	if(!readByte(byte))
 		return NO_NODE;
 	
-	position = 0;
+	uint32_t position = 0;
 	while(1){
 		if(!readByte(byte))
 			return NULL;
@@ -489,7 +489,7 @@ long FileLoader::loadCacheBlock(unsigned long pos)
 	long size = fread(m_cached_data[loading_cache].data, 1, m_cache_size, m_file);
 	m_cached_data[loading_cache].size = size;
 
-	if(size < pos - m_cached_data[loading_cache].base){
+	if(size < ((long)pos - m_cached_data[loading_cache].base)){
 		m_lastError = ERROR_SEEK_ERROR;
 		return -1;
 	}

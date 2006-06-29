@@ -404,14 +404,14 @@ bool Map::canThrowObjectTo(const Position& fromPos, const Position& toPos)
 	for( ; x != end.x + stepx; x += stepx){
 		int rx, ry, rz;
 		switch(dir){
-		case 0:
-			rx = x; ry = y; rz = z;
-			break;
 		case 1:
 			rx = y; ry = x; rz = z;
 			break;
 		case 2:
 			rx = z; ry = y; rz = x;
+			break;
+		default: //0
+			rx = x; ry = y; rz = z;
 			break;
 		}
 
@@ -473,7 +473,7 @@ bool Map::isPathValid(Creature* creature, const std::list<Position>& path, int p
 	return true;
 }
 
-std::list<Position> Map::getPathTo(Creature* creature, Position start, Position to, int maxNodeSize /*= 100*/)
+std::list<Position> Map::getPathTo(Creature* creature, Position start, Position to, unsigned long maxNodeSize /*= 100*/)
 {
 	std::list<Position> path;
 	AStarNodes nodes;
@@ -684,7 +684,7 @@ AStarNode* AStarNodes::getBestNode()
 	best_node = 0;
 	found = false;
 
-	for(int i = 0; i < curNode; i++){
+	for(unsigned long i = 0; i < curNode; i++){
 		if(nodes[i].h < best_node_h && openNodes[i] == 1){
 			found = true;
 			best_node_h = nodes[i].h;
@@ -712,7 +712,7 @@ void AStarNodes::closeNode(AStarNode* node)
 unsigned long AStarNodes::countClosedNodes()
 {
 	unsigned long counter = 0;
-	for(int i = 0; i < curNode; i++){
+	for(unsigned long i = 0; i < curNode; i++){
 		if(openNodes[i] == 0){
 			counter++;
 		}
@@ -723,7 +723,7 @@ unsigned long AStarNodes::countClosedNodes()
 unsigned long AStarNodes::countOpenNodes()
 {
 	unsigned long counter = 0;
-	for(int i = 0; i < curNode; i++){
+	for(unsigned long i = 0; i < curNode; i++){
 		if(openNodes[i] == 1){
 			counter++;
 		}
@@ -732,9 +732,9 @@ unsigned long AStarNodes::countOpenNodes()
 }
 
 
-bool AStarNodes::isInList(unsigned long x, unsigned long y)
+bool AStarNodes::isInList(long x, long y)
 {
-	for(int i = 0; i < curNode; i++){
+	for(unsigned long i = 0; i < curNode; i++){
 		if(nodes[i].x == x && nodes[i].y == y){
 			return true;
 		}

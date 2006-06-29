@@ -437,6 +437,8 @@ bool InstantSpell::HouseDoorList(Creature* creature, const std::string& words, c
 	case EAST:
 		pos.x += 1;
 		break;
+	default:
+		break;
 	}
 
 	Door* door = house->getDoorByPosition(pos);
@@ -594,29 +596,32 @@ bool InstantSpell::SearchPlayer(Creature* creature, const std::string& words, co
 			}
 		else{
 			switch(distance){
-				case DISTANCE_CLOSE_1:
-					if(level == LEVEL_SAME){
-						ss << "is to the";
-					}
-					else if(level == LEVEL_HIGHER){
-						ss << "is on a higher level to the";
-					}
-					else if(level == LEVEL_LOWER){
-						ss << "is on a lower level to the";
-					}
-					break;
-
-				case DISTANCE_CLOSE_2:
+			case DISTANCE_CLOSE_1:
+				if(level == LEVEL_SAME){
 					ss << "is to the";
-					break;
+				}
+				else if(level == LEVEL_HIGHER){
+					ss << "is on a higher level to the";
+				}
+				else if(level == LEVEL_LOWER){
+					ss << "is on a lower level to the";
+				}
+				break;
+				
+			case DISTANCE_CLOSE_2:
+				ss << "is to the";
+				break;
 
-				case DISTANCE_FAR:
-					ss << "is far to the";
-					break;
+			case DISTANCE_FAR:
+				ss << "is far to the";
+				break;
 
-				case DISTANCE_VERYFAR:
-					ss << "is very far to the";
-					break;
+			case DISTANCE_VERYFAR:
+				ss << "is very far to the";
+				break;
+			
+			default:
+				break;
 			}
 
 			ss << " ";

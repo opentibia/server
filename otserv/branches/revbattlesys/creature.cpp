@@ -495,7 +495,7 @@ bool Creature::hasCondition(ConditionType_t type) const
 
 bool Creature::isImmune(DamageType_t type) const
 {
-	return ((getImmunities() & type) == type);
+	return ((getImmunities() & (uint32_t)type) == (uint32_t)type);
 }
 
 std::string Creature::getDescription(int32_t lookDistance) const

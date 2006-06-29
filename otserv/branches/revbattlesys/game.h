@@ -202,7 +202,7 @@ public:
 	  * \param count is the amount to remove
 	  * \returns true if the removal was successful
 	  */
-	bool removeItemOfType(Cylinder* cylinder, uint16_t itemId, uint32_t count);
+	bool removeItemOfType(Cylinder* cylinder, uint16_t itemId, int32_t count);
 
 	/**
 	  * Get the amount of money in a a cylinder
@@ -217,7 +217,7 @@ public:
 	  * \param flags optional flags to modifiy the default behaviour
 	  * \returns true if the removal was successful
 	  */
-	bool removeMoney(Cylinder* cylinder, uint32_t money, uint32_t flags = 0);
+	bool removeMoney(Cylinder* cylinder, int32_t money, uint32_t flags = 0);
 
 	/**
 	  * Transform one item to another type/count

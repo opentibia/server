@@ -409,7 +409,7 @@ const Position& Game::internalGetPosition(Player* player, const Position& pos)
 		//container
 		if(pos.y & 0x40){
 			uint8_t fromCid = pos.y & 0x0F;
-			uint8_t slot = pos.z;
+			//uint8_t slot = pos.z;
 			
 			Container* container = player->getContainer(fromCid);
 			if(!container)
@@ -577,7 +577,7 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 	Cylinder* cylinder = creature->getTile();
 	getSpectators(Range(cylinder->getPosition(), true), list);
 
-	uint32_t index = cylinder->__getIndexOfThing(creature);
+	int32_t index = cylinder->__getIndexOfThing(creature);
 	cylinder->__removeThing(creature, 0);
 
 	//send to client
@@ -679,7 +679,7 @@ void Game::moveCreature(Player* player, Cylinder* fromCylinder, Cylinder* toCyli
 		ret = RET_TOOFARAWAY;
 	}
 	else{
-		const Position& fromPos = fromCylinder->getPosition();
+		//const Position& fromPos = fromCylinder->getPosition();
 		const Position& toPos = toCylinder->getPosition();
 		const Position& moveCreaturePos = moveCreature->getPosition();
 
@@ -1098,10 +1098,13 @@ ReturnValue Game::internalRemoveItem(Item* item, int32_t count /*= -1*/,  bool t
 	return RET_NOERROR;
 }
 
-bool Game::removeItemOfType(Cylinder* cylinder, uint16_t itemId, uint32_t count)
+bool Game::removeItemOfType(Cylinder* cylinder, uint16_t itemId, int32_t count)
 {
-	if(cylinder == NULL || (cylinder->__getItemTypeCount(itemId) < count)){
+	if(cylinder == NULL || ((int32_t)cylinder->__getItemTypeCount(itemId) < count)){
 		return false;
+	}
+	if(count <= 0){
+		return true;
 	}
 	
 	std::list<Container*> listContainer;
@@ -1123,7 +1126,7 @@ bool Game::removeItemOfType(Cylinder* cylinder, uint16_t itemId, uint32_t count)
 					count = 0;
 				}
 				else{
-					count-= item->getItemCount();
+					count -= item->getItemCount();
 					internalRemoveItem(item);
 				}
 			}
@@ -1141,7 +1144,7 @@ bool Game::removeItemOfType(Cylinder* cylinder, uint16_t itemId, uint32_t count)
 		Container* container = listContainer.front();
 		listContainer.pop_front();
 		
-		for(int i = 0; i < container->size() && count > 0; i++){
+		for(int i = 0; i < (int32_t)container->size() && count > 0; i++){
 			Item* item = container->getItem(i);
 			if(item->getID() == itemId){
 				if(item->isStackable()){
@@ -1219,10 +1222,13 @@ uint32_t Game::getMoney(Cylinder* cylinder)
 	return moneyCount;
 }
 
-bool Game::removeMoney(Cylinder* cylinder, uint32_t money, uint32_t flags /*= 0*/)
+bool Game::removeMoney(Cylinder* cylinder, int32_t money, uint32_t flags /*= 0*/)
 {
 	if(cylinder == NULL){
 		return false;
+	}
+	if(money <= 0){
+		return true;
 	}
 
 	std::list<Container*> listContainer;
@@ -1234,7 +1240,7 @@ bool Game::removeMoney(Cylinder* cylinder, uint32_t money, uint32_t flags /*= 0*
 	Thing* thing = NULL;
 	Item* item = NULL;
 	
-	uint32_t moneyCount = 0;
+	int32_t moneyCount = 0;
 
 	for(int i = cylinder->__getFirstIndex(); i < cylinder->__getLastIndex() && money > 0; ++i){
 		if(!(thing = cylinder->__getThing(i)))
@@ -1248,7 +1254,7 @@ bool Game::removeMoney(Cylinder* cylinder, uint32_t money, uint32_t flags /*= 0*
 		}
 		else{
 			if(item->getWorth() != 0){
-				moneyCount+= item->getWorth();
+				moneyCount += item->getWorth();
 				moneyMap.insert(moneymap_pair(item->getWorth(), item));
 			}
 		}
@@ -1258,14 +1264,14 @@ bool Game::removeMoney(Cylinder* cylinder, uint32_t money, uint32_t flags /*= 0*
 		Container* container = listContainer.front();
 		listContainer.pop_front();
 
-		for(int i = 0; i < container->size() && money > 0; i++){
+		for(int i = 0; i < (int32_t)container->size() && money > 0; i++){
 			Item* item = container->getItem(i);
 
 			if(tmpContainer = item->getContainer()){
 				listContainer.push_back(tmpContainer);
 			}
 			else if(item->getWorth() != 0){
-				moneyCount+= item->getWorth();
+				moneyCount += item->getWorth();
 				moneyMap.insert(moneymap_pair(item->getWorth(), item));
 			}
 		}
@@ -1341,7 +1347,7 @@ Item* Game::transformItem(Item* item, uint16_t newtype, int32_t count /*= -1*/)
 		return NULL;
 	}
 
-	if(Container* container = item->getContainer()){
+	if(item->getContainer()){
 		//container to container
 		if(Item::items[newtype].isContainer()){
 			cylinder->postRemoveNotification(item, true);
@@ -1352,7 +1358,7 @@ Item* Game::transformItem(Item* item, uint16_t newtype, int32_t count /*= -1*/)
 		}
 		//container to none-container
 		else{
-			uint32_t index = cylinder->__getIndexOfThing(item);
+			int32_t index = cylinder->__getIndexOfThing(item);
 			if(index == -1){
 #ifdef __DEBUG__
 				std::cout << "Error: transformItem, index == -1" << std::endl;
@@ -1375,7 +1381,7 @@ Item* Game::transformItem(Item* item, uint16_t newtype, int32_t count /*= -1*/)
 	else{
 		//none-container to container
 		if(Item::items[newtype].isContainer()){
-			uint32_t index = cylinder->__getIndexOfThing(item);
+			int32_t index = cylinder->__getIndexOfThing(item);
 			if(index == -1){
 #ifdef __DEBUG__
 				std::cout << "Error: transformItem, index == -1" << std::endl;
@@ -2080,7 +2086,7 @@ bool Game::playerLookInTrade(Player* player, bool lookAtCounterOffer, int index)
 	}
 
 	Container* tradeContainer = tradeItem->getContainer();
-	if(!tradeContainer || index > tradeContainer->getItemHoldingCount())
+	if(!tradeContainer || index > (int)tradeContainer->getItemHoldingCount())
 		return false;
 
 	bool foundItem = false;
@@ -2285,7 +2291,7 @@ bool Game::playerRequestAddVip(Player* player, const std::string& vip_name)
 		player->sendTextMessage(MSG_STATUS_SMALL, "A player with that name does not exist.");
 		return false;
 	}
-	if(access_lvl > player->getAccessLevel()){
+	if(access_lvl > (unsigned long)player->getAccessLevel()){
 		player->sendTextMessage(MSG_STATUS_SMALL, "You can not add this player.");
 		return false;
 	}
@@ -2372,7 +2378,7 @@ bool Game::internalCreatureTurn(Creature* creature, Direction dir)
 bool Game::internalCreatureSay(Creature* creature, SpeakClasses type, const std::string& text)
 {	
 	//First, check if this was a command
-	for(int i = 0; i < commandTags.size(); i++){
+	for(uint32_t i = 0; i < commandTags.size(); i++){
 		if(commandTags[i] == text.substr(0,1)){
 			return commands.exeCommand(creature, text);
 		}
@@ -2749,6 +2755,8 @@ bool Game::combatChangeHealth(DamageType_t damageType, Creature* attacker, Creat
 						hitEffect = NM_ME_HITBY_FIRE;
 						break;
 					}
+					default:
+						break;
 				}
 
 				if(textColor != TEXTCOLOR_NONE){
@@ -2924,7 +2932,7 @@ void Game::startDecay(Item* item)
 		return; //dont add 2 times the same item
 
 	//get decay time
-	unsigned long dtime = item->getDecayTime();
+	long dtime = item->getDecayTime();
 	if(dtime == 0)
 		return;
 
@@ -2989,6 +2997,8 @@ void Game::checkLight(int t)
 		newlightlevel -= (LIGHT_LEVEL_DAY - LIGHT_LEVEL_NIGHT)/30;
 		lightChange = true;
 		break;
+	default:
+		break;
 	}
 	
 	if(newlightlevel <= LIGHT_LEVEL_NIGHT){
@@ -3022,7 +3032,7 @@ void Game::getWorldLightInfo(LightInfo& lightInfo)
 void Game::addCommandTag(std::string tag)
 {
 	bool found = false;
-	for(int i=0;i< commandTags.size() ;i++){
+	for(uint32_t i=0; i< commandTags.size() ;i++){
 		if(commandTags[i] == tag){
 			found = true;
 			break;

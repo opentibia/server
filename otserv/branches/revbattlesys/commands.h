@@ -42,8 +42,8 @@ public:
 	bool exeCommand(Creature* creature, const std::string& cmd);
 	
 protected:
-	bool loaded;
 	Game* game;
+	bool loaded;
 	std::string datadir;
 
 	//commands

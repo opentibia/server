@@ -173,7 +173,7 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 	query << "SELECT * FROM skills WHERE player='" << player->getGUID() << "'";
 	if(mysql.storeQuery(query, result)){
 		//now iterate over the skills
-		for(int i=0; i < result.getNumRows(); ++i){
+		for(uint32_t i = 0; i < result.getNumRows(); ++i){
 			int skillid = result.getDataInt("id",i);
 			player->skills[skillid][SKILL_LEVEL] = result.getDataInt("skill",i);
 			player->skills[skillid][SKILL_TRIES] = result.getDataInt("tries",i);
@@ -190,7 +190,7 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 #endif
 	query << "SELECT * FROM items WHERE player='" << player->getGUID() << "' ORDER BY sid ASC";
 	if(mysql.storeQuery(query, result) && (result.getNumRows() > 0)){		
-		for(int i=0; i < result.getNumRows(); ++i){
+		for(uint32_t i=0; i < result.getNumRows(); ++i){
 			int type = result.getDataInt("type",i);
 			int count = result.getDataInt("number",i);
 			Item* myItem = Item::CreateItem(type, count);
@@ -252,7 +252,7 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 	query << "SELECT * FROM playerstorage WHERE player='" << player->getGUID() << "'";
 	
 	if(mysql.storeQuery(query,result)){
-		for(int i=0; i < result.getNumRows(); ++i){
+		for(uint32_t i=0; i < result.getNumRows(); ++i){
 			unsigned long key = result.getDataInt("key",i);
 			long value = result.getDataInt("value",i);
 			player->addStorageValue(key,value);
@@ -262,7 +262,7 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 	//load vip
 	query << "SELECT vip_id FROM viplist WHERE player='" << player->getGUID() << "'";		
 	if(mysql.storeQuery(query,result)){
-		for(int i=0; i < result.getNumRows(); ++i){
+		for(uint32_t i=0; i < result.getNumRows(); ++i){
 			unsigned long vip_id = result.getDataInt("vip_id",i);
 			std::string dummy_str;
 			if(storeNameByGuid(mysql, vip_id)){
@@ -409,7 +409,7 @@ bool IOPlayerSQL::savePlayer(Player* player)
 		parentid = csPair.second;
 		stack.pop_front();
 
-		for(int i = 0; i < container->size(); i++){
+		for(uint32_t i = 0; i < container->size(); i++){
 			++runningID;
 			Item* item = container->getItem(i);
 			Container* container = item->getContainer();
@@ -458,7 +458,7 @@ bool IOPlayerSQL::savePlayer(Player* player)
 		parentid = csPair.second;
 		stack.pop_front();
 
-		for(int i = 0; i < container->size(); i++){
+		for(uint32_t i = 0; i < container->size(); i++){
 			++runningID;
 			Item* item = container->getItem(i);	
 			Container* container = item->getContainer();
@@ -549,7 +549,7 @@ std::string IOPlayerSQL::getItems(Item* i, int &startid, int slot, int player,in
 	if(Container* c = i->getContainer()){
 		//std::cout << "c";	
 		int pid = startid;
-		for(int i = 0; i < c->size(); i++){
+		for(uint32_t i = 0; i < c->size(); i++){
 			Item* item = c->getItem(i);
 			//std::cout << "s";
 			ss << getItems(item, startid, 0, player, pid);

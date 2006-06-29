@@ -88,7 +88,7 @@ game(igame),
 loaded(false)
 {
 	//setup command map
-	for(int i = 0; i < sizeof(defined_commands) / sizeof(defined_commands[0]); i++){
+	for(uint32_t i = 0; i < sizeof(defined_commands) / sizeof(defined_commands[0]); i++){
 		Command* cmd = new Command;
 		cmd->loaded = false;
 		cmd->accesslevel = 1;
@@ -458,7 +458,7 @@ bool Commands::subtractMoney(Creature* creature, const std::string& cmd, const s
 		player->sendCancel(info.str().c_str());
 		return true;
 	}
-	else if(count > money){
+	else if(count > (int)money){
 		std::stringstream info;
 		info << "You have " << money << " gold and is not sufficient.";
 		player->sendCancel(info.str().c_str());
@@ -608,8 +608,8 @@ bool Commands::onlineList(Creature* creature, const std::string& cmd, const std:
 	if(!player)
 		return false;
 
-	unsigned long alevelmin = 0;
-	unsigned long alevelmax = 10000;
+	int32_t alevelmin = 0;
+	int32_t alevelmax = 10000;
 	int i, n;
 	
 	if(param == "gm")
@@ -665,6 +665,8 @@ bool Commands::teleportNTiles(Creature* creature, const std::string& cmd, const 
 			break;
 		case WEST:
 			newPos.x = newPos.x - ntiles;
+			break;
+		default:
 			break;
 		}
 

@@ -92,12 +92,12 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 		return false;
 	}
 	
-	if(root_header->majorVersionItems > Items::dwMajorVersion){
+	if(root_header->majorVersionItems > (unsigned long)Items::dwMajorVersion){
 		map->setLastError(LOADMAPERROR_OUTDATEDHEADER, root);
 		return false;
 	}
 
-	if(root_header->minorVersionItems > Items::dwMinorVersion){
+	if(root_header->minorVersionItems > (unsigned long)Items::dwMinorVersion){
 		std::cout << "Warning: [OTBM loader] This map needs an updated items OTB file." <<std::endl;
 	}
 

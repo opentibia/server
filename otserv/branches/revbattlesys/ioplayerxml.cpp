@@ -709,7 +709,7 @@ bool IOPlayerXML::getNameByGuid(unsigned long guid, std::string& name)
 			if(xmlStrcmp(playerNode->name,(const xmlChar*)"player") == 0){
 				if(readXMLInteger(playerNode, "guid", intValue)){
 
-					if(intValue == guid){
+					if((unsigned long)intValue == guid){
 
 						if(readXMLString(playerNode, "name", strValue)){
 

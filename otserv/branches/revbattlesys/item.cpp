@@ -529,32 +529,33 @@ bool Item::hasProperty(enum ITEMPROPERTY prop) const
 		case BLOCKSOLID:
 			if(it.blockSolid)
 				return true;
-		break;
+			break;
 
 		case HASHEIGHT:
 			if(it.hasHeight)
 				return true;
-		break;
+			break;
 
 		case BLOCKPROJECTILE:
 			if(it.blockProjectile)
 				return true;
-		break;
+			break;
 
 		case BLOCKPATHFIND:
 			if(it.blockPathFind)
 				return true;
-		break;
+			break;
 		
 		case ISVERTICAL:
 			if(it.isVertical)
 				return true;
-		break;
+			break;
 
 		case ISHORIZONTAL:
 			if(it.isHorizontal)
 				return true;
-		break;
+			break;
+			
 	}
 
 	return false;

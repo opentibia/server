@@ -120,7 +120,7 @@ private:
 
 struct AStarNode{
 	/** Current position */
-	int x,y;
+	long x,y;
 	/** Parent of this node. Null if this is the rootnode */
 	AStarNode* parent;
 	/** Heuristics variable */
@@ -143,7 +143,7 @@ public:
 	void closeNode(AStarNode* node);
 	unsigned long countClosedNodes();
 	unsigned long countOpenNodes();
-	bool isInList(unsigned long x, unsigned long y);
+	bool isInList(long x, long y);
 private:
 	AStarNode nodes[MAX_NODES];
 	std::bitset<MAX_NODES> openNodes;
@@ -231,7 +231,7 @@ public:
 	* \param to The destination position
 	* \returns A list of all positions you have to traverse to reach the destination
 	*/
-	std::list<Position> getPathTo(Creature* creature, Position start, Position to, int maxNodeSize = 100);
+	std::list<Position> getPathTo(Creature* creature, Position start, Position to, unsigned long maxNodeSize = 100);
 
 	bool getPathTo(Creature* creature, Position toPosition, std::list<Direction>& listDir);
 

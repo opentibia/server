@@ -116,6 +116,8 @@ bool MoveEvents::registerEvent(Event* event, xmlNodePtr p)
 			case MOVE_EVENT_REMOVE_ITEM:
 				moveEvent->setEventType(MOVE_EVENT_REMOVE_ITEM_ITEMTILE);
 				break;
+			default:
+				break;
 			}			
 		}
 	}
@@ -187,14 +189,14 @@ long MoveEvents::onCreatureMove(Creature* creature, Tile* tile, bool isIn)
 		eventType = MOVE_EVENT_STEP_OUT;
 	}
 	
-	long ret = -1;
+	long ret = 1;
 	long j = tile->__getLastIndex();
 	for(long i = tile->__getFirstIndex(); i < j; ++i){
 		Thing* thing = tile->__getThing(i);
 		if(Item* item = thing->getItem()){
 			MoveEvent* event = getEvent(item, eventType);
 			if(event){
-				ret = event->executeStep(creature, item, tile->getPosition());
+				ret = ret & event->executeStep(creature, item, tile->getPosition());
 			}
 		}
 	}
@@ -215,7 +217,7 @@ long MoveEvents::onPlayerEquip(Player* player, Item* item, long slot, bool isEqu
 	if(event){
 		return event->executeEquip(player, item, slot);
 	}
-	return -1;
+	return 1;
 }
 
 long MoveEvents::onItemMove(Item* item, Tile* tile, bool isAdd)
@@ -231,10 +233,10 @@ long MoveEvents::onItemMove(Item* item, Tile* tile, bool isAdd)
 		eventType2 = MOVE_EVENT_REMOVE_ITEM_ITEMTILE;
 	}
 	
-	long ret = -1;
+	long ret = 1;
 	MoveEvent* event = getEvent(item, eventType1);
 	if(event){
-		ret = event->executeAddRemItem(item, NULL, tile->getPosition());
+		ret = ret & event->executeAddRemItem(item, NULL, tile->getPosition());
 	}
 	
 	long j = tile->__getLastIndex();
@@ -243,7 +245,7 @@ long MoveEvents::onItemMove(Item* item, Tile* tile, bool isAdd)
 		if(Item* tileItem = thing->getItem()){
 			MoveEvent* event = getEvent(tileItem, eventType2);
 			if(event){
-				ret = event->executeAddRemItem(item, tileItem, tile->getPosition());
+				ret = ret & event->executeAddRemItem(item, tileItem, tile->getPosition());
 			}
 		}
 	}

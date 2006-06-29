@@ -226,9 +226,9 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 		// gameworld connection tibia 7.6
 		else if (protId == 0x020A)
 		{
-			unsigned char  clientos = msg.GetByte();
+			/*unsigned char  clientos = */msg.GetByte();
 			unsigned short version  = msg.GetU16();
-			unsigned char  unknown = msg.GetByte();
+			/*unsigned char  unknown = */msg.GetByte();
 			unsigned long accnumber = msg.GetU32();
 			std::string name     = msg.GetString();
 			std::string password = msg.GetString();
@@ -365,8 +365,8 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 			if (msg.GetRaw() == "info"){
 				Status* status = Status::instance();
 				
-				uint64_t running = (OTSYS_TIME() - status->start)/1000;
 				#ifdef __DEBUG__
+				uint64_t running = (OTSYS_TIME() - status->start)/1000;
 				std::cout << ":: Uptime: " << running << std::endl;
 				#endif
 				std::string str = status->getStatusString();

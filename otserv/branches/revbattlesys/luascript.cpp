@@ -1718,7 +1718,7 @@ int LuaScriptInterface::luaGetTilePzInfo(lua_State *L)
 	long stackpos;
 	popPosition(L, pos, stackpos);
 	
-	ScriptEnviroment* env = getScriptEnv();
+	//ScriptEnviroment* env = getScriptEnv();
 	
 	Tile *tile = g_game.map->getTile(pos);
 	
@@ -1744,7 +1744,7 @@ int LuaScriptInterface::luaGetTileHouseInfo(lua_State *L)
 	long stackpos;
 	popPosition(L, pos, stackpos);
 	
-	ScriptEnviroment* env = getScriptEnv();
+	//ScriptEnviroment* env = getScriptEnv();
 	
 	Tile *tile = g_game.map->getTile(pos);
 	if(tile){

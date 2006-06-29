@@ -236,7 +236,7 @@ private:
 	OTSYS_THREAD_LOCKVAR bufferLock;
 	unsigned long windowTextID;
 	Item* readItem;
-	int maxTextLength;
+	unsigned long maxTextLength;
 	
 	House* house;
 	unsigned long listId;

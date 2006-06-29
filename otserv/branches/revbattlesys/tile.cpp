@@ -150,7 +150,7 @@ uint32_t Tile::getHeight() const
 {
 	uint32_t height = 0;
 	Item* iiItem = NULL;
-	for(uint32_t i = 0; i < getThingCount(); ++i){
+	for(int32_t i = 0; i < getThingCount(); ++i){
 		iiItem = __getThing(i)->getItem();
 
 		if(iiItem && iiItem->hasProperty(HASHEIGHT))
@@ -199,7 +199,7 @@ TrashHolder* Tile::getTrashHolder() const
 {
 	TrashHolder* trashholder = NULL;
 	Item* iiItem = NULL;
-	for(uint32_t i = 0; i < getThingCount(); ++i){
+	for(int32_t i = 0; i < getThingCount(); ++i){
 		iiItem = __getThing(i)->getItem();
 		if(iiItem && (trashholder = iiItem->getTrashHolder()))
 			return trashholder;
@@ -212,7 +212,7 @@ Mailbox* Tile::getMailbox() const
 {
 	Mailbox* mailbox = NULL;
 	Item* iiItem = NULL;
-	for(uint32_t i = 0; i < getThingCount(); ++i){
+	for(int32_t i = 0; i < getThingCount(); ++i){
 		iiItem = __getThing(i)->getItem();
 		if(iiItem && (mailbox = iiItem->getMailbox()))
 			return mailbox;
@@ -282,7 +282,7 @@ Item* Tile::getMoveableBlockingItem()
 
 bool Tile::hasFlag(tileflags_t flag) const
 {
-	return ((flags & flag) == flag);
+	return ((flags & (uint32_t)flag) == (uint32_t)flag);
 }
 
 void Tile::setFlag(tileflags_t flag)
@@ -460,7 +460,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 				return RET_NOTPOSSIBLE;
 			}
 
-			for(uint32_t i = 0; i < getThingCount(); ++i){
+			for(int32_t i = 0; i < getThingCount(); ++i){
 				iithing = __getThing(i);
 
 				if(const Item* iitem = iithing->getItem()){
@@ -482,7 +482,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			}
 		}
 
-		for(uint32_t i = 0; i < getThingCount(); ++i){
+		for(int32_t i = 0; i < getThingCount(); ++i){
 			iithing = __getThing(i);
 
 			if(const Item* iitem = iithing->getItem()){
@@ -513,7 +513,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 		if(!creatures.empty() && item->isBlocking())
 			return RET_NOTENOUGHROOM;
 
-		for(uint32_t i = 0; i < getThingCount(); ++i){
+		for(int32_t i = 0; i < getThingCount(); ++i){
 			iithing = __getThing(i);
 
 			if(const Item* iitem = iithing->getItem()){
@@ -572,7 +572,7 @@ ReturnValue Tile::__queryMaxCount(int32_t index, const Thing* thing, uint32_t co
 
 ReturnValue Tile::__queryRemove(const Thing* thing, uint32_t count) const
 {
-	uint32_t index = __getIndexOfThing(thing);
+	int32_t index = __getIndexOfThing(thing);
 
 	if(index == -1){
 		return RET_NOTPOSSIBLE;
@@ -705,7 +705,7 @@ void Tile::__addThing(int32_t index, Thing* thing)
 				onAddTileItem(item);
 			}
 			else{
-				uint32_t index = __getIndexOfThing(ground);				
+				int32_t index = __getIndexOfThing(ground);				
 				onUpdateTileItem(index, ground, item);
 
 				ground->setParent(NULL);
@@ -818,7 +818,7 @@ void Tile::__replaceThing(uint32_t index, Thing* thing)
 		--pos;
 	}
 
-	if(pos >= 0 && pos < topItems.size()){
+	if(pos >= 0 && pos < (int32_t)topItems.size()){
 		ItemVector::iterator it = topItems.begin();
 		it += pos;
 		pos = 0;
@@ -830,7 +830,7 @@ void Tile::__replaceThing(uint32_t index, Thing* thing)
 
 	pos -= (uint32_t)topItems.size();
 
-	if(pos >= 0 && pos < creatures.size()){
+	if(pos >= 0 && pos < (int32_t)creatures.size()){
 #ifdef __DEBUG__MOVESYS__
 		std::cout << "Failure: [Tile::__updateThing] Update object is a creature" << std::endl;
 		DEBUG_REPORT
@@ -840,7 +840,7 @@ void Tile::__replaceThing(uint32_t index, Thing* thing)
 
 	pos -= (uint32_t)creatures.size();
 
-	if(pos >= 0 && pos < downItems.size()){
+	if(pos >= 0 && pos < (int32_t)downItems.size()){
 		ItemVector::iterator it = downItems.begin();
 		it += pos;
 		pos = 0;
@@ -891,7 +891,7 @@ void Tile::__removeThing(Thing* thing, uint32_t count)
 			return /*RET_NOTPOSSIBLE*/;
 		}
 
-		uint32_t index = __getIndexOfThing(item);
+		int32_t index = __getIndexOfThing(item);
 		if(index == -1){
 #ifdef __DEBUG__MOVESYS__
 			std::cout << "Failure: [Tile::__removeThing] index == -1" << std::endl;
@@ -999,7 +999,7 @@ uint32_t Tile::__getItemTypeCount(uint16_t itemId) const
 {
 	uint32_t count = 0;
 	Thing* thing = NULL;
-	for(uint32_t i = 0; i < getThingCount(); ++i){
+	for(int32_t i = 0; i < getThingCount(); ++i){
 		thing = __getThing(i);
 
 		if(const Item* item = thing->getItem()){
@@ -1090,8 +1090,9 @@ void Tile::postAddNotification(Thing* thing, bool hasOwnership /*= true*/)
 				g_moveEvents.onItemMove(item, this, true);
 			}
 		}
-
+		
 		/*
+		//TODO, fields effect
 		if(const MagicField* field = dynamic_cast<MagicField*>(thing->getItem())){
 			const Condition* condition = field->getCondition();
 

@@ -105,8 +105,8 @@ protected:
 	bool m_use_cache;
 	struct _cache{
 		unsigned long loaded;
-		unsigned long base;
-		unsigned long size;
+		long base;
+		long size;
 		unsigned char* data;
 	};
 	#define CACHE_BLOCKS 3
@@ -130,7 +130,7 @@ public:
 
 	template <typename T>
 	inline bool GET_STRUCT(T* &ret){
-		if(size() < sizeof(T)){
+		if(size() < (long)sizeof(T)){
 			ret = NULL;
 			return false;
 		}
@@ -141,7 +141,7 @@ public:
 
 	template <typename T>
 	inline bool GET_VALUE(T &ret){
-		if(size() < sizeof(T)){
+		if(size() < (long)sizeof(T)){
 			return false;
 		}
 		ret = *((T*)p);

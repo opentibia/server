@@ -77,7 +77,6 @@ bool Ban::isAccountBanished(const unsigned long account)
 	uint32_t currentTime = std::time(NULL);
 	for(AccountBanList::iterator it = accountBanList.begin(); it !=  accountBanList.end(); ++it){
    		if(it->id  == account){
-			uint32_t currentTime = std::time(NULL);
 			if(it->time == 0 || currentTime < it->time){
 				return true;
 			}
@@ -220,10 +219,10 @@ bool IOBanSQL::loadBans(const std::string& identifier, Ban& banclass)
 		return true;
 	
 	uint32_t currentTime = std::time(NULL);
-	for(int i=0; i < result.getNumRows(); ++i){
+	for(uint32_t i=0; i < result.getNumRows(); ++i){
 		int banType = result.getDataInt("type", i);		
 		int time = result.getDataInt("time", i);
-		if(time > currentTime){
+		if(time > (int)currentTime){
 			switch(banType){
 				case BAN_IPADDRESS:
 				{

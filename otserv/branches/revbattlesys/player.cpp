@@ -639,7 +639,7 @@ void Player::addSkillTryInternal(int skilltry,int skill)
 	}
 	else{
 		//update percent
-		int new_percent = (unsigned int)(100*(skills[skill][SKILL_TRIES])/(1.*vocation->getReqSkillTries(skill, skills[skill][SKILL_LEVEL]+1)));
+		unsigned long new_percent = (unsigned long)(100*(skills[skill][SKILL_TRIES])/(1.*vocation->getReqSkillTries(skill, skills[skill][SKILL_LEVEL]+1)));
 	 	if(skills[skill][SKILL_PERCENT] != new_percent){
 			skills[skill][SKILL_PERCENT] = new_percent;
 			client->sendSkills();
@@ -1733,7 +1733,7 @@ void Player::die()
 	//
 
 	//Skill loss
-	long lostSkillTries;
+	unsigned long lostSkillTries;
 	unsigned long sumSkillTries;
 	for(int i = 0; i <= 6; i++){  //for each skill
 		lostSkillTries = 0;         //reset to 0
@@ -1744,7 +1744,7 @@ void Player::die()
 		}
 
 		sumSkillTries += skills[i][SKILL_TRIES];
-		lostSkillTries = (long) (sumSkillTries * 0.1);           //player loses 10% of his skill tries
+		lostSkillTries = (unsigned long)(sumSkillTries * 0.1);           //player loses 10% of his skill tries
 
 		while(lostSkillTries > skills[i][SKILL_TRIES]){
 			lostSkillTries -= skills[i][SKILL_TRIES];
@@ -2196,7 +2196,7 @@ ReturnValue Player::__queryMaxCount(int32_t index, const Thing* thing, uint32_t 
 
 ReturnValue Player::__queryRemove(const Thing* thing, uint32_t count) const
 {
-	uint32_t index = __getIndexOfThing(thing);
+	int32_t index = __getIndexOfThing(thing);
 
 	if(index == -1){
 		return RET_NOTPOSSIBLE;
