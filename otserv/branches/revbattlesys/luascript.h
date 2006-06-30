@@ -54,14 +54,14 @@ public:
 	// set a var to a val
 	int setGlobalString(std::string var, std::string val);
 	int setGlobalNumber(std::string var, int val);
-	
+
 protected:
 	int getField (const char *key);
 	void setField (const char *index, int value);
 	//static version
 	static int getField (lua_State *L , const char *key);
-	static void setField (lua_State *L, const char *index, int val);	
-	
+	static void setField (lua_State *L, const char *index, int val);
+
 protected:
 	std::string luaFile;   // the file we represent
 	lua_State*  luaState;  // our lua state
@@ -69,26 +69,26 @@ protected:
 
 class LuaScriptInterface;
 class Game;
-	
+
 class ScriptEnviroment
 {
 public:
 	ScriptEnviroment();
 	~ScriptEnviroment();
-	
+
 	void resetEnv();
-	
+
 	void setScriptId(long scriptId, LuaScriptInterface* scriptInterface);
 	void setEventDesc(const std::string& desc);
-	
+
 	void getEventInfo(long& scriptId, std::string& desc, LuaScriptInterface*& scriptInterface);
-	
+
 	static void addUniqueThing(Thing* thing);
 	long addThing(Thing* thing);
-	
+
 	void setRealPos(const Position& realPos);
 	Position getRealPos();
-	
+
 	Thing* getThingByUID(long uid);
 	Item* getItemByUID(long uid);
 	Creature* getCreatureByUID(long uid);
@@ -110,8 +110,8 @@ private:
 	LuaScriptInterface* m_interface;
 	//script event desc
 	std::string m_eventdesc;
-	
-	
+
+
 	//unique id map
 	static ThingMap m_globalMap;
 	//item/creature map
@@ -119,7 +119,7 @@ private:
 
 	long m_lastUID;
 	Position m_realPos;
-	
+
 	//area map
 	uint32_t m_lastAreaId;
 	static AreaMap m_areaMap;
@@ -162,52 +162,52 @@ enum ErrorCode_t{
 class LuaScriptInterface
 {
 public:
-	LuaScriptInterface::LuaScriptInterface(std::string interfaceName);
+	LuaScriptInterface(std::string interfaceName);
 	virtual ~LuaScriptInterface();
-	
+
 	virtual bool initState();
 	bool reInitState();
-	
+
 	long loadFile(const std::string& file);
 	const std::string& getFileById(long scriptId);
-	
+
 	long getEvent(const std::string& eventName);
-	
+
 	static ScriptEnviroment* getScriptEnv();
-	
+
 	static void reportError(const char* function, const std::string& error_desc);
-	
+
 	std::string getInterfaceName();
 	long getLastLuaError();
 	void dumpLuaStack();
-	
+
 	lua_State* getLuaState();
-	
+
 	bool pushFunction(long functionId);
-	
+
 	bool callFunction(long nParams, long &result);
 	bool callFunction(long nParams);
 	//push/pop common structures
 	static void pushThing(lua_State *L, Thing* thing, long thingid);
 	static void pushPosition(lua_State *L, const Position& position, long stackpos);
-	
+
 	static void popPosition(lua_State *L, Position& position, long& stackpos);
 	static long popNumber(lua_State *L);
 	static const char* popString(lua_State *L);
-	
+
 	static long getField(lua_State *L, const char *key);
 	static void setField(lua_State *L, const char *index, long val);
-	
+
 protected:
 	virtual bool closeState();
-	
+
 	virtual void registerFunctions();
-	
-	static std::string LuaScriptInterface::getErrorDesc(ErrorCode_t code);
-	
+
+	static std::string getErrorDesc(ErrorCode_t code);
+
 	//lua functions
 	static int luaDoRemoveItem(lua_State *L);
-	static int luaDoFeedPlayer(lua_State *L);	
+	static int luaDoFeedPlayer(lua_State *L);
 	static int luaDoSendCancel(lua_State *L);
 	static int luaDoTeleportThing(lua_State *L);
 	static int luaDoTransformItem(lua_State *L);
@@ -215,7 +215,7 @@ protected:
 	static int luaDoSendMagicEffect(lua_State *L);
 	static int luaDoChangeTypeItem(lua_State *L);
 	static int luaDoSendAnimatedText(lua_State *L);
-	
+
 	static int luaDoPlayerAddSkillTry(lua_State *L);
 	static int luaDoPlayerAddHealth(lua_State *L);
 	static int luaDoPlayerAddMana(lua_State *L);
@@ -232,7 +232,7 @@ protected:
 	static int luaDoPlayerRemoveItem(lua_State *L);
 	static int luaDoPlayerAddSoul(lua_State *L);
 	static int luaDoPlayerAddExp(lua_State *L);
-	
+
 	//get item info
 	static int luaGetItemRWInfo(lua_State *L);
 	static int luaGetThingfromPos(lua_State *L);
@@ -242,14 +242,14 @@ protected:
 	static int luaDoSetItemActionId(lua_State *L);
 	static int luaDoSetItemText(lua_State *L);
 	static int luaDoSetItemSpecialDescription(lua_State *L);
-	
+
 	//get tile info
 	static int luaGetTilePzInfo(lua_State *L);
 	static int luaGetTileHouseInfo(lua_State *L);
 	//houses
 	static int luaGetHouseOwner(lua_State *L);
 	static int luaSetHouseOwner(lua_State *L);
-	
+
 	//get player info functions
 	static int luaGetPlayerFood(lua_State *L);
 	static int luaGetPlayerAccess(lua_State *L);
@@ -258,7 +258,7 @@ protected:
 	static int luaGetPlayerMana(lua_State *L);
 	static int luaGetPlayerHealth(lua_State *L);
 	static int luaGetPlayerName(lua_State *L);
-	static int luaGetPlayerPosition(lua_State *L);	
+	static int luaGetPlayerPosition(lua_State *L);
 	static int luaGetPlayerSkill(lua_State *L);
 	static int luaGetPlayerVocation(lua_State *L);
 	static int luaGetPlayerMasterPos(lua_State *L);
@@ -268,16 +268,16 @@ protected:
 	static int luaGetPlayerFreeCap(lua_State *L);
 	static int luaGetPlayerLight(lua_State *L);
 	static int luaGetPlayerSlotItem(lua_State *L);
-	
+
 	static int luaGetPlayerStorageValue(lua_State *L);
 	static int luaSetPlayerStorageValue(lua_State *L);
-	
+
 	static int luaGetWorldType(lua_State *L);
 	static int luaGetWorldTime(lua_State *L);
 	static int luaGetWorldLight(lua_State *L);
 	static int luaGetWorldCreatures(lua_State *L);
 	static int luaGetWorldUpTime(lua_State *L);
-	
+
 	//
 	static int luaCreateCombatArea(lua_State *L);
 	static int luaSetCombatParam(lua_State *L);
@@ -295,23 +295,23 @@ protected:
 
 	static int luaDebugPrint(lua_State *L);
 	//
-	
+
 	static int internalGetPlayerInfo(lua_State *L, PlayerInfo_t info);
-	
+
 	lua_State* m_luaState;
 	long m_lastLuaError;
 private:
-	
+
 	static ScriptEnviroment m_scriptEnv;
-	
+
 	long m_runningEventId;
 	std::string m_loadingFile;
-	
+
 	//script file cache
 	typedef std::map<long , std::string> ScriptsCache;
 	ScriptsCache m_cacheFiles;
-	
-	
+
+
 	std::string m_interfaceName;
 };
 
