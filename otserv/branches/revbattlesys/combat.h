@@ -161,7 +161,7 @@ public:
 	ReturnValue doCombat(Creature* attacker, const Position& pos, const Combat& combat) const;
 	void setRow(int row, std::vector<uint8_t> data);
 
-	bool getList(const Position& pos, Direction rotatedir, std::list<Tile*> list) const;
+	bool getList(const Position& pos, Direction rotatedir, std::list<Tile*>& list) const;
 
 protected:
 	Matrix<uint8_t> area;

@@ -230,7 +230,7 @@ ReturnValue AreaCombat::doCombat(Creature* attacker, const Position& pos, const 
 }
 */
 
-bool AreaCombat::getList(const Position& pos, Direction rotatedir, std::list<Tile*> list) const
+bool AreaCombat::getList(const Position& pos, Direction rotatedir, std::list<Tile*>& list) const
 {
 	Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
 
@@ -243,11 +243,11 @@ bool AreaCombat::getList(const Position& pos, Direction rotatedir, std::list<Til
 	size_t cols = area.getCols();
 	size_t rows = area.getRows();
 
-	tmpPos.x -= (area.getCols() - 1) / 2;
-	tmpPos.y -= (area.getRows() - 1) / 2;
+	tmpPos.x -= (cols - 1) / 2;
+	tmpPos.y -= (rows - 1) / 2;
 
-	for(size_t y = 0; y < area.getRows(); ++y){
-		for(size_t x = 0; x < area.getCols(); ++x){
+	for(size_t y = 0; y < rows; ++y){
+		for(size_t x = 0; x < cols; ++x){
 
 			uint8_t dir = area[y][x];
 			if((!needDirection && dir != 0) || dir == rotatedir){
