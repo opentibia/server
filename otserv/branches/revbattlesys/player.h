@@ -110,8 +110,14 @@ public:
 	void addList();
 	void kickPlayer();
 	
-	const std::string& getGuildName() const {return guildName;};
 	unsigned long getGuildId() const {return guildId;};
+	const std::string& getGuildName() const {return guildName;};
+	const std::string& getGuildRank() const {return guildRank;};
+	const std::string& getGuildNick() const {return guildNick;};
+	
+	void setGuildRank(const std::string& rank) {guildRank = rank;};
+	void setGuildNick(const std::string& nick) {guildNick = nick;};
+	
 	bool isOnline() {return (client != NULL);};
 	unsigned long getIP() const;
 

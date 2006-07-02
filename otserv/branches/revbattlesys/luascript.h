@@ -39,6 +39,7 @@ class Thing;
 class Creature;
 class Player;
 class Item;
+class Container;
 class AreaCombat;
 class Combat;
 
@@ -70,6 +71,7 @@ protected:
 class LuaScriptInterface;
 class Game;
 
+
 class ScriptEnviroment
 {
 public:
@@ -85,12 +87,16 @@ public:
 
 	static void addUniqueThing(Thing* thing);
 	long addThing(Thing* thing);
+	
+	void addGlobalStorageValue(const unsigned long key, const long value);
+	bool getGlobalStorageValue(const unsigned long key, long &value) const;
 
 	void setRealPos(const Position& realPos);
 	Position getRealPos();
 
 	Thing* getThingByUID(long uid);
 	Item* getItemByUID(long uid);
+	Container* getContainerByUID(long uid);
 	Creature* getCreatureByUID(long uid);
 	Player* getPlayerByUID(long uid);
 
@@ -102,6 +108,7 @@ public:
 
 private:
 	typedef std::map<long, Thing*> ThingMap;
+	typedef std::map<unsigned long,long> StorageMap;
 	typedef std::map<uint32_t, AreaCombat*> AreaMap;
 	typedef std::map<uint32_t, Combat*> CombatMap;
 
@@ -111,15 +118,16 @@ private:
 	//script event desc
 	std::string m_eventdesc;
 
-
+	static StorageMap m_globalStorageMap;
 	//unique id map
 	static ThingMap m_globalMap;
-	//item/creature map
-	ThingMap m_localMap;
-
-	long m_lastUID;
+	
 	Position m_realPos;
-
+	
+	//item/creature map
+	long m_lastUID;
+	ThingMap m_localMap;
+	
 	//area map
 	uint32_t m_lastAreaId;
 	static AreaMap m_areaMap;
@@ -142,9 +150,12 @@ enum PlayerInfo_t{
 	PlayerInfoPosition,
 	PlayerInfoVocation,
 	PlayerInfoMasterPos,
-	PlayerInfoGuildId,
 	PlayerInfoSoul,
 	PlayerInfoFreeCap,
+	PlayerInfoGuildId,
+	PlayerInfoGuildName,
+	PlayerInfoGuildRank,
+	PlayerInfoGuildNick,
 };
 
 #define reportErrorFunc(a)  reportError(__FUNCTION__, a)
@@ -157,6 +168,7 @@ enum ErrorCode_t{
 	LUA_ERROR_TILE_NOT_FOUND,
 	LUA_ERROR_HOUSE_NOT_FOUND,
 	LUA_ERROR_COMBAT_NOT_FOUND,
+	LUA_ERROR_CONTAINER_NOT_FOUND,
 };
 
 class LuaScriptInterface
@@ -211,27 +223,31 @@ protected:
 	static int luaDoSendCancel(lua_State *L);
 	static int luaDoTeleportThing(lua_State *L);
 	static int luaDoTransformItem(lua_State *L);
-	static int luaDoPlayerSay(lua_State *L);
 	static int luaDoSendMagicEffect(lua_State *L);
 	static int luaDoChangeTypeItem(lua_State *L);
 	static int luaDoSendAnimatedText(lua_State *L);
+	static int luaDoShowTextWindow(lua_State *L);
+	static int luaDoDecayItem(lua_State *L);
+	static int luaDoCreateItem(lua_State *L);
+	static int luaDoSummonCreature(lua_State *L);
+	static int luaDoMoveCreature(lua_State *L);
 
+	static int luaDoPlayerSay(lua_State *L);
 	static int luaDoPlayerAddSkillTry(lua_State *L);
 	static int luaDoPlayerAddHealth(lua_State *L);
 	static int luaDoPlayerAddMana(lua_State *L);
 	static int luaDoPlayerSoul(lua_State *L);
 	static int luaDoPlayerAddItem(lua_State *L);
 	static int luaDoPlayerSendTextMessage(lua_State *L);
-	static int luaDoShowTextWindow(lua_State *L);
-	static int luaDoDecayItem(lua_State *L);
-	static int luaDoCreateItem(lua_State *L);
-	static int luaDoSummonCreature(lua_State *L);
 	static int luaDoPlayerRemoveMoney(lua_State *L);
 	static int luaDoPlayerSetMasterPos(lua_State *L);
 	static int luaDoPlayerSetVocation(lua_State *L);
 	static int luaDoPlayerRemoveItem(lua_State *L);
 	static int luaDoPlayerAddSoul(lua_State *L);
 	static int luaDoPlayerAddExp(lua_State *L);
+	//static int luaDoPlayerSetGuildId(lua_State *L);
+	static int luaDoPlayerSetGuildRank(lua_State *L);
+	static int luaDoPlayerSetGuildNick(lua_State *L);
 
 	//get item info
 	static int luaGetItemRWInfo(lua_State *L);
@@ -262,21 +278,41 @@ protected:
 	static int luaGetPlayerSkill(lua_State *L);
 	static int luaGetPlayerVocation(lua_State *L);
 	static int luaGetPlayerMasterPos(lua_State *L);
-	static int luaGetPlayerGuildId(lua_State *L);
 	static int luaGetPlayerItemCount(lua_State *L);
 	static int luaGetPlayerSoul(lua_State *L);
 	static int luaGetPlayerFreeCap(lua_State *L);
 	static int luaGetPlayerLight(lua_State *L);
 	static int luaGetPlayerSlotItem(lua_State *L);
+	static int luaGetPlayerDepotItems(lua_State *L);
+	static int luaGetPlayerGuildId(lua_State *L);
+	static int luaGetPlayerGuildName(lua_State *L);
+	static int luaGetPlayerGuildRank(lua_State *L);
+	static int luaGetPlayerGuildNick(lua_State *L);
 
 	static int luaGetPlayerStorageValue(lua_State *L);
 	static int luaSetPlayerStorageValue(lua_State *L);
+	
+	static int luaGetGlobalStorageValue(lua_State *L);
+	static int luaSetGlobalStorageValue(lua_State *L);
 
 	static int luaGetWorldType(lua_State *L);
 	static int luaGetWorldTime(lua_State *L);
 	static int luaGetWorldLight(lua_State *L);
 	static int luaGetWorldCreatures(lua_State *L);
 	static int luaGetWorldUpTime(lua_State *L);
+	static int luaGetGuildId(lua_State *L);
+
+	//type validation
+	static int luaIsPlayer(lua_State *L);
+	static int luaIsContainer(lua_State *L);
+	
+	static int luaGetPlayerByName(lua_State *L);
+	
+	//container
+	static int luaGetContainerSize(lua_State *L);
+	static int luaGetContainerCap(lua_State *L);
+	static int luaGetContainerItem(lua_State *L);
+	static int luaDoAddContainerItem(lua_State *L);
 
 	//
 	static int luaCreateCombatArea(lua_State *L);
