@@ -1433,9 +1433,9 @@ int LuaScriptInterface::luaDoShowTextWindow(lua_State *L)
 {
 	//doShowTextWindow(uid,maxlen,canWrite)
 	//TODO
-	bool canWrite = (popNumber(L) != 0);
-	unsigned short maxlen = (unsigned short)popNumber(L);
-	unsigned int uid = (unsigned int)popNumber(L);
+	/*bool canWrite = */(popNumber(L) != 0);
+	/*unsigned short maxlen = */(unsigned short)popNumber(L);
+	/*unsigned int uid = */(unsigned int)popNumber(L);
 	/*
 	ScriptEnviroment* env = getScriptEnv();
 	
@@ -1885,7 +1885,7 @@ int LuaScriptInterface::luaDebugPrint(lua_State *L)
 int LuaScriptInterface::luaDoPlayerAddSoul(lua_State *L)
 {
 	//doPlayerAddSoul(cid,soul)
-	int addsoul = (int)popNumber(L);
+	/*int addsoul = */(int)popNumber(L);
 	unsigned int cid = (unsigned int)popNumber(L);
 	
 	ScriptEnviroment* env = getScriptEnv();

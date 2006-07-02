@@ -2887,7 +2887,7 @@ void Game::checkDecay(int t)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::checkDecay()");
 	addEvent(makeTask(DECAY_INTERVAL, boost::bind(&Game::checkDecay, this, DECAY_INTERVAL)));
-
+	/*
 	std::list<decayBlock*>::iterator it;
 	for(it = decayVector.begin(); it != decayVector.end();){
 		(*it)->decayTime -= t;
@@ -2924,10 +2924,13 @@ void Game::checkDecay(int t)
 	}
 		
 	flushSendBuffers();
+	*/
 }
 
 void Game::startDecay(Item* item)
 {
+	return;
+	/*
 	if(item->isDecaying)
 		return; //dont add 2 times the same item
 
@@ -2959,6 +2962,7 @@ void Game::startDecay(Item* item)
 	db->decayItems.clear();
 	db->decayItems.push_back(item);
 	decayVector.push_back(db);
+	*/
 }
 
 void Game::checkSpawns(int t)

@@ -191,12 +191,13 @@ long MoveEvents::onCreatureMove(Creature* creature, Tile* tile, bool isIn)
 	
 	long ret = 1;
 	long j = tile->__getLastIndex();
+	Item* tileItem = NULL;
 	for(long i = tile->__getFirstIndex(); i < j; ++i){
 		Thing* thing = tile->__getThing(i);
-		if(Item* item = thing->getItem()){
-			MoveEvent* event = getEvent(item, eventType);
+		if(thing && (tileItem = thing->getItem())){
+			MoveEvent* event = getEvent(tileItem, eventType);
 			if(event){
-				ret = ret & event->executeStep(creature, item, tile->getPosition());
+				ret = ret & event->executeStep(creature, tileItem, tile->getPosition());
 			}
 		}
 	}
@@ -240,9 +241,10 @@ long MoveEvents::onItemMove(Item* item, Tile* tile, bool isAdd)
 	}
 	
 	long j = tile->__getLastIndex();
+	Item* tileItem = NULL;
 	for(long i = tile->__getFirstIndex(); i < j; ++i){
 		Thing* thing = tile->__getThing(i);
-		if(Item* tileItem = thing->getItem()){
+		if(thing && (tileItem = thing->getItem())){
 			MoveEvent* event = getEvent(tileItem, eventType2);
 			if(event){
 				ret = ret & event->executeAddRemItem(item, tileItem, tile->getPosition());

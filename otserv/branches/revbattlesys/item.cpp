@@ -92,81 +92,69 @@ Item* Item::CreateItem(PropStream& propStream)
 	return Item::CreateItem(_id, _count);
 }
 
-Item::Item(const unsigned short _type, unsigned short _count)
+Item::Item(const unsigned short _type, unsigned short _count) :
+	ItemAttributes()
 {
 	//std::cout << "Item constructor2 " << this << std::endl;
 	id = _type;
 	count = 0;
 	chargecount = 0;
 	fluid = 0;
-	actionId = 0;
-	uniqueId = 0;
-	isDecaying = false;
-	specialDescription = NULL;
-	text = NULL;
 	setItemCountOrSubtype(_count);
 
 	if(count == 0)
 		count = 1;
 }
 
-Item::Item()
+Item::Item() :
+	ItemAttributes()
 {
 	//std::cout << "Item constructor3 " << this << std::endl;
 	id = 0;
 	count = 1;
 	chargecount = 0;
-	isDecaying  = false;
-	actionId = 0;
-	uniqueId = 0;
-	specialDescription = NULL;
-	text = NULL;
+	fluid = 0;
 }
 
-Item::Item(const unsigned short _type)
+Item::Item(const unsigned short _type) :
+	ItemAttributes()
 {
 	//std::cout << "Item constructor1 " << this << std::endl;
 	id = _type;
 	count = 1;	
 	chargecount = 0;
 	fluid = 0;
-	actionId = 0;
-	uniqueId = 0;
-	isDecaying = false;
-	specialDescription = NULL;
-	text = NULL;
 }
 
-Item::Item(const Item &i)
+Item::Item(const Item &i) :
+	ItemAttributes()
 {
 	//std::cout << "Item copy constructor " << this << std::endl;
 	id = i.id;
 	count = i.count;
 	chargecount = i.chargecount;
-	isDecaying  = false;
-	actionId = i.actionId;
-	uniqueId = i.uniqueId;
-	if(i.specialDescription != NULL){
-		specialDescription = new std::string(*(i.specialDescription));
+	fluid = i.fluid;
+	
+	unsigned short v;
+	if(v = i.getActionId())
+		setActionId(v);
+	
+	if(v = i.getUniqueId())
+		setUniqueId(v);
+	
+	if(i.getSpecialDescription() != ""){
+		setSpecialDescription(i.getSpecialDescription());
 	}
-	else{
-		specialDescription = NULL;
+	
+	if(i.getText() != ""){
+		setText(i.getText());
 	}
-	if(i.text != NULL){
-		text = new std::string(*(i.text));
-	}
-	else{
-		text = NULL;
-	}	
 }
 
 Item::~Item()
 {
 	//std::cout << "Item destructor " << this << std::endl;
-	if(specialDescription)
-		delete specialDescription;
-	if(text)
-		delete text;
+	//
 }
 
 unsigned short Item::getID() const
@@ -221,33 +209,7 @@ bool Item::hasSubType() const
 	return (it.isFluidContainer() || it.isSplash() || it.stackable || it.runeMagLevel != -1);
 }
 
-void Item::setActionId(unsigned short n)
-{
-	if(n < 100)
-		n = 100;
-	actionId = n;
-}
 
-unsigned short Item::getActionId() const
-{
-	return actionId;
-}
-
-void Item::setUniqueId(unsigned short n)
-{
-	//uniqueId only can be set 1 time
-	if(uniqueId != 0)
-		return;
-	 if(n < 1000)
-	 	n = 1000;
-	uniqueId = n;
-	ScriptEnviroment::addUniqueThing(this);
-}
-
-unsigned short Item::getUniqueId() const
-{
-	return uniqueId;
-}
 
 long Item::getDecayTime()
 {
@@ -273,13 +235,13 @@ bool Item::unserialize(xmlNodePtr nodeItem)
 
 	nodeValue = (char*)xmlGetProp(nodeItem, (const xmlChar *) "special_description");
 	if(nodeValue){
-		specialDescription = new std::string(nodeValue);
+		setSpecialDescription(nodeValue);
 		xmlFreeOTSERV(nodeValue);
 	}
 		
 	nodeValue = (char*)xmlGetProp(nodeItem, (const xmlChar *) "text");
 	if(nodeValue){
-		text = new std::string(nodeValue);
+		setText(nodeValue);
 		xmlFreeOTSERV(nodeValue);
 	}
 		
@@ -313,34 +275,26 @@ xmlNodePtr Item::serialize()
 		xmlSetProp(nodeItem, (const xmlChar*)"count", (const xmlChar*)ss.str().c_str());
 	}
 
-	if(specialDescription){
+	if(getSpecialDescription() != ""){
 		ss.str("");
 		ss << getSpecialDescription();
 		xmlSetProp(nodeItem, (const xmlChar*)"special_description", (const xmlChar*)ss.str().c_str());
 	}
 	
-	if(text){
+	if(getText() != ""){
 		ss.str("");
 		ss << getText();
 		xmlSetProp(nodeItem, (const xmlChar*)"text", (const xmlChar*)ss.str().c_str());
 	}
 	
 	if(!isNotMoveable() /*moveable*/){
-		if(actionId != 0){
+		if(getActionId() != 0){
 			ss.str("");
-			ss << actionId;
+			ss << getActionId();
 			xmlSetProp(nodeItem, (const xmlChar*)"actionId", (const xmlChar*)ss.str().c_str());
 		}
 	}
 	
-	/*we are not saving unique ids
-	if(uniqueId != 0){
-		ss.str("");	
-		ss << uniqueId;
-		xmlSetProp(nodeItem, (const xmlChar*)"uniqueId", (const xmlChar*)ss.str().c_str());
-	}
-	*/
-
 	return nodeItem;
 }
 
@@ -491,20 +445,12 @@ bool Item::serializeAttr(PropWriteStream& propWriteStream)
 	}
 
 	if(!isNotMoveable() /*moveable*/){
-		if(actionId){
+		if(getActionId()){
 			unsigned short _actionId = getActionId();
 			propWriteStream.ADD_UCHAR(ATTR_ACTION_ID);
 			propWriteStream.ADD_USHORT(_actionId);
 		}
 	}
-
-	/*we are not saving unique ids
-	if(uniqueId){
-		unsigned short _uniqueId = getUniqueId();
-		propWriteStream.ADD_UCHAR(ATTR_UNIQUE_ID);
-		propWriteStream.ADD_USHORT(_uniqueId);
-	}
-	*/
 
 	const std::string& _text = getText();
 	if(_text.length() > 0){
@@ -555,9 +501,10 @@ bool Item::hasProperty(enum ITEMPROPERTY prop) const
 			if(it.isHorizontal)
 				return true;
 			break;
-			
+		
+		default:
+			return false;
 	}
-
 	return false;
 }
 
@@ -737,7 +684,7 @@ std::string Item::getDescription(int32_t lookDistance) const
 				}
 			}
 			else if(it.isKey()){
-				s << "a " << it.name << " (Key:" << actionId << ").";
+				s << "a " << it.name << " (Key:" << getActionId() << ").";
 			}
 			else if(it.isGroundTile()){
 				s << it.name << ".";
@@ -749,8 +696,8 @@ std::string Item::getDescription(int32_t lookDistance) const
 				s << it.name << "." << std::endl;
 
 				if(lookDistance <= 4){
-					if(text && text->length() > 0){
-						s << "You read: " << *text;
+					if(getText() != ""){
+						s << "You read: " << getText();
 					}
 					else
 						s << "Nothing is written on it.";
@@ -768,8 +715,8 @@ std::string Item::getDescription(int32_t lookDistance) const
 					s << std::endl << "It weighs " << std::fixed << std::setprecision(2) << weight << " oz.";
 			}
 
-			if(specialDescription)
-				s << std::endl << specialDescription->c_str();
+			if(getSpecialDescription() != "")
+				s << std::endl << getSpecialDescription().c_str();
 			else if(lookDistance <= 1 && it.description.length()){
 				s << std::endl << it.description;
 			}
@@ -793,59 +740,18 @@ std::string Item::getWeightDescription() const
 	return ss.str();
 }
 
-std::string Item::getName() const
+const std::string& Item::getName() const
 {
 	return items[id].name;
 }
 
-void Item::setSpecialDescription(const std::string& desc){
-	if(specialDescription){
-		delete specialDescription;
-		specialDescription = NULL;
-	}
-	if(desc.length() > 1)
-		specialDescription = new std::string(desc);	
-}
-
-std::string Item::getSpecialDescription()
+void Item::setUniqueId(unsigned short n)
 {
-	if(!specialDescription)
-		return std::string("");
-	return *specialDescription;
-}
-
-void Item::clearSpecialDescription(){
-	if(specialDescription)
-		delete specialDescription;
-	specialDescription = NULL;
-}
-
-void Item::setText(const std::string& desc)
-{
-	if(text){
-		delete text;
-		text = NULL;
-	}
-
-	if(desc.length() > 1){
-		text = new std::string(desc);
-	}
-}
-
-void Item::clearText()
-{
-	if(text){
-		delete text;
-		text = NULL;
-	}
-}
-
-std::string Item::getText()
-{
-	if(!text)
-		return std::string("");
-
-	return *text;
+	if(getUniqueId() != 0)
+		return;
+	
+	ItemAttributes::setUniqueId(n);
+	ScriptEnviroment::addUniqueThing(this);
 }
 
 int Item::getRWInfo(int& maxlen) const
@@ -882,4 +788,224 @@ void Item::getLight(LightInfo& lightInfo)
 	const ItemType& it = items[id];
 	lightInfo.color = it.lightColor;
 	lightInfo.level = it.lightLevel;
+}
+
+std::string ItemAttributes::emptyString("");
+
+ItemAttributes::ItemAttributes()
+{
+	m_attributes = 0;
+	m_firstAttr = NULL;
+}
+
+ItemAttributes::~ItemAttributes()
+{
+	if(m_firstAttr){
+		deleteAttrs(m_firstAttr);
+	}
+}
+
+void ItemAttributes::setSpecialDescription(const std::string& desc)
+{
+	setStrAttr(ATTR_ITEM_DESC, desc);
+}
+
+const std::string& ItemAttributes::getSpecialDescription() const
+{
+	return getStrAttr(ATTR_ITEM_DESC);
+}
+
+void ItemAttributes::setText(const std::string& text)
+{
+	setStrAttr(ATTR_ITEM_TEXT, text);
+}
+
+const std::string& ItemAttributes::getText() const
+{
+	return getStrAttr(ATTR_ITEM_TEXT);
+}
+
+void ItemAttributes::setActionId(unsigned short n)
+{
+	if(n < 100)
+		n = 100;
+	setIntAttr(ATTR_ITEM_ACTIONID, n);
+}
+
+unsigned short ItemAttributes::getActionId() const
+{
+	return getIntAttr(ATTR_ITEM_ACTIONID);
+}
+
+void ItemAttributes::setUniqueId(unsigned short n)
+{
+	 if(n < 1000)
+	 	n = 1000;
+	setIntAttr(ATTR_ITEM_UNIQUEID, n);
+}
+
+unsigned short ItemAttributes::getUniqueId() const
+{
+	return getIntAttr(ATTR_ITEM_UNIQUEID);
+}
+
+const std::string& ItemAttributes::getStrAttr(itemAttrTypes type) const
+{
+	if(!validateStrAttrType(type))
+		return emptyString;
+		
+	Attribute* attr = getAttr(type);
+	if(attr){
+		return *(std::string*)attr->value;
+	}
+	else{
+		return emptyString;
+	}
+}
+
+void ItemAttributes::setStrAttr(itemAttrTypes type, const std::string& value)
+{
+	if(!validateStrAttrType(type))
+		return;
+	
+	if(value.length() == 0)
+		return;
+	
+	Attribute* attr = getAttr(type);
+	if(attr){
+		if(attr->value){
+			delete (std::string*)attr->value;
+		}
+		attr->value = (void*)new std::string(value);
+	}
+}
+	
+uint32_t ItemAttributes::getIntAttr(itemAttrTypes type) const
+{
+	if(!validateIntAttrType(type))
+		return 0;
+		
+	Attribute* attr = getAttr(type);
+	if(attr){
+		return (uint32_t)attr->value;
+	}
+	else{
+		return 0;
+	}
+}
+
+void ItemAttributes::setIntAttr(itemAttrTypes type, uint32_t value)
+{
+	if(!validateIntAttrType(type))
+		return;
+	
+	Attribute* attr = getAttr(type);
+	if(attr){
+		attr->value = (void*)value;
+	}
+}
+
+	
+inline bool ItemAttributes::validateIntAttrType(itemAttrTypes type) const
+{
+	switch(type){
+	case ATTR_ITEM_ACTIONID:
+		return true;
+		break;
+	case ATTR_ITEM_UNIQUEID:
+		return true;
+		break;
+	default:
+		return false;
+		break;
+	}
+	return false;
+}
+
+inline bool ItemAttributes::validateStrAttrType(itemAttrTypes type) const
+{
+	switch(type){
+	case ATTR_ITEM_DESC:
+		return true;
+		break;
+	case ATTR_ITEM_TEXT:
+		return true;
+		break;
+	default:
+		return false;
+		break;
+	}
+	return false;
+}
+
+void ItemAttributes::addAttr(Attribute* attr)
+{
+	if(m_firstAttr){
+		Attribute* curAttr = m_firstAttr;
+		while(curAttr->next){
+			curAttr = curAttr->next;
+		}
+		curAttr->next = attr;
+	}
+	else{
+		m_firstAttr = attr;
+	}
+	m_attributes = m_attributes | attr->type;
+}
+
+ItemAttributes::Attribute* ItemAttributes::getAttr(itemAttrTypes type) const
+{
+	if((type & m_attributes) == 0){
+		return NULL;
+	}
+	
+	Attribute* curAttr = m_firstAttr;
+	while(curAttr){
+		if(curAttr->type == type){
+			return curAttr;
+		}
+		curAttr = curAttr->next;
+	}
+	return NULL;
+}
+
+ItemAttributes::Attribute* ItemAttributes::getAttr(itemAttrTypes type)
+{
+	Attribute* curAttr;
+	if((type & m_attributes) == 0){
+		curAttr = new Attribute(type);
+		addAttr(curAttr);
+		return curAttr;
+	}
+	else{
+		curAttr = m_firstAttr;
+		while(curAttr){
+			if(curAttr->type == type){
+				return curAttr;
+			}
+			curAttr = curAttr->next;
+		}
+	}
+	std::cout << "Warning: [ItemAttributes::getAttr] (type & m_attributes) != 0 but attribute not found" << std::endl;
+	curAttr = new Attribute(type);
+	addAttr(curAttr);
+	return curAttr;
+}
+
+void ItemAttributes::deleteAttrs(Attribute* attr)
+{
+	if(attr){
+		if(validateIntAttrType(attr->type)){
+			//
+		}
+		else if(validateStrAttrType(attr->type)){
+			delete (std::string*)attr->value;
+		}
+		Attribute* next_attr = attr->next;
+		attr->next = NULL;
+		if(next_attr){
+			deleteAttrs(next_attr);
+		}
+		delete attr;
+	}
 }

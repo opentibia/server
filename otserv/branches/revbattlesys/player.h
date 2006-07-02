@@ -34,7 +34,7 @@
 #include <algorithm>
 
 class House;
-class Protocol;
+class Protocol76;
 
 enum skillsid_t {
 	SKILL_LEVEL=0,
@@ -92,7 +92,7 @@ typedef std::set<unsigned long> VIPListSet;
 class Player : public Creature, public Cylinder
 {
 public:
-	Player(const std::string& name, Protocol* p);
+	Player(const std::string& name, Protocol76* p);
 	virtual ~Player();
 	
 	virtual Player* getPlayer() {return this;};
@@ -382,7 +382,7 @@ protected:
 	virtual void __internalAddThing(uint32_t index, Thing* thing);
 
 protected:
-	Protocol* client;
+	Protocol76* client;
 
 	int32_t accessLevel;
 	uint32_t experience;

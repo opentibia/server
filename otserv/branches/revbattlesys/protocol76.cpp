@@ -50,12 +50,18 @@
 #include "waitlist.h"
 
 extern LuaScript g_config;
-extern Actions actions;
+extern Game g_game;
 Chat g_chat;
+
 
 Protocol76::Protocol76(SOCKET s)
 {
 	OTSYS_THREAD_LOCKVARINIT(bufferLock);
+	
+	player = NULL;
+	game = NULL;
+	pendingLogout = false;
+	
 	windowTextID = 0;
 	readItem = NULL;
 	maxTextLength = 0;
@@ -66,7 +72,47 @@ Protocol76::Protocol76(SOCKET s)
 Protocol76::~Protocol76()
 {
 	OTSYS_THREAD_LOCKVARRELEASE(bufferLock);
+	if(s){
+		closesocket(s);
+		s = 0;
+	}
+	player = NULL;
+	game = NULL;
 }
+
+unsigned long Protocol76::getIP() const
+{
+	sockaddr_in sain;
+	socklen_t salen = sizeof(sockaddr_in);
+	if (getpeername(s, (sockaddr*)&sain, &salen) == 0)
+	{
+#if defined WIN32 || defined __WINDOWS__
+		return sain.sin_addr.S_un.S_addr;
+#else
+		return sain.sin_addr.s_addr;
+#endif
+	}
+	
+	return 0;
+}
+
+void Protocol76::setPlayer(Player* p)
+{
+	player = p;
+	game   = &g_game;
+}
+
+void Protocol76::sleepTillMove()
+{
+	long long delay = player->getSleepTicks();
+	if(delay > 0 ){       
+#if __DEBUG__     
+		std::cout << "Delaying "<< player->getName() << " --- " << delay << std::endl;		
+#endif	
+		OTSYS_SLEEP((uint32_t)delay);
+	}
+}
+
 
 void Protocol76::reinitializeProtocol()
 {

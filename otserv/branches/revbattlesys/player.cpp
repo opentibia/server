@@ -28,7 +28,7 @@
 
 #include <stdlib.h>
 
-#include "protocol.h"
+#include "protocol76.h"
 #include "player.h"
 #include "ioplayer.h"
 #include "luascript.h"
@@ -45,18 +45,7 @@ extern MoveEvents g_moveEvents;
 
 AutoList<Player> Player::listPlayer;
 
-//for old mana/health regeneration
-//const int Player::gainManaVector[5][2] = {{1,5},{1,5},{1,5},{1,5},{1,5}};
-//const int Player::gainHealthVector[5][2] = {{1,5},{1,5},{1,5},{1,5},{1,5}};
-/*
-const int Player::gainManaVector[5][2] = {{6,1},{3,1},{3,1},{4,1},{6,1}};
-const int Player::gainHealthVector[5][2] = {{6,1},{6,1},{6,1},{4,1},{3,1}};
-const int Player::CapGain[5] = {10, 10, 10, 20, 25};
-const int Player::ManaGain[5] = {5, 30, 30, 15, 5};
-const int Player::HPGain[5] = {5, 5, 5, 10, 15};
-*/
-
-Player::Player(const std::string& _name, Protocol *p) :
+Player::Player(const std::string& _name, Protocol76 *p) :
 Creature()
 {	
 	client = p;

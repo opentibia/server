@@ -412,7 +412,7 @@ int main(int argc, char *argv[])
 #ifdef __OTSERV_ALLOCATOR_STATS__
 	OTSYS_CREATE_THREAD(allocatorStatsThread, NULL);
 #endif
-
+	std::cout << sizeof(Item) << std::endl;
 #if defined __EXCEPTION_TRACER__
 	ExceptionHandler mainExceptionHandler;	
 	mainExceptionHandler.InstallHandler();

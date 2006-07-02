@@ -43,13 +43,13 @@ class Door;
 class MagicField;
 
 enum ITEMPROPERTY{
- BLOCKSOLID,
- HASHEIGHT,
- BLOCKPROJECTILE,
- BLOCKPATHFIND,
- PROTECTIONZONE,
- ISVERTICAL,
- ISHORIZONTAL,
+	BLOCKSOLID,
+	HASHEIGHT,
+	BLOCKPROJECTILE,
+	BLOCKPATHFIND,
+	PROTECTIONZONE,
+	ISVERTICAL,
+	ISHORIZONTAL,
 };
 
 enum TradeEvents_t{
@@ -93,7 +93,64 @@ enum AttrTypes_t{
 	ATTR_COUNT = 15
 };
 
-class Item : virtual public Thing
+class ItemAttributes{
+public:
+	ItemAttributes();
+	virtual ~ItemAttributes();
+	
+	void setSpecialDescription(const std::string& desc);
+	const std::string& getSpecialDescription() const;
+	
+	void setText(const std::string& text);
+	const std::string& getText() const;
+	
+	void setActionId(unsigned short n);
+	unsigned short getActionId() const;
+
+	void setUniqueId(unsigned short n);
+	unsigned short getUniqueId() const;
+	
+private:
+	static std::string emptyString;
+	
+	enum itemAttrTypes{
+		ATTR_ITEM_ACTIONID = 1,
+		ATTR_ITEM_UNIQUEID = 2,
+		ATTR_ITEM_DESC = 4,
+		ATTR_ITEM_TEXT = 8,
+	};
+	
+	struct Attribute{
+		itemAttrTypes type;
+		void* value;
+		Attribute* next;
+		Attribute(itemAttrTypes _type){
+			type = _type;
+			value = NULL;
+			next = NULL;
+		}
+	};
+	
+	uint32_t m_attributes;
+	Attribute* m_firstAttr;
+	
+	const std::string& getStrAttr(itemAttrTypes type) const;
+	void setStrAttr(itemAttrTypes type, const std::string& value);
+	
+	uint32_t getIntAttr(itemAttrTypes type) const;
+	void setIntAttr(itemAttrTypes type, uint32_t value);
+	
+	bool validateIntAttrType(itemAttrTypes type) const;
+	bool validateStrAttrType(itemAttrTypes type) const;
+	
+	void addAttr(Attribute* attr);
+	Attribute* getAttr(itemAttrTypes type) const;
+	Attribute* getAttr(itemAttrTypes type);
+	
+	void deleteAttrs(Attribute* attr);
+};
+
+class Item : virtual public Thing, public ItemAttributes
 {
 public:
 	//Factory member to create item of right type based on type
@@ -101,7 +158,7 @@ public:
 	static Item* CreateItem(PropStream& propStream);
 	static Items items;
 
-  // Constructor for items
+	// Constructor for items
 	Item(const unsigned short _type);
 	Item(const unsigned short _type, unsigned short _count);
 	Item();
@@ -181,15 +238,9 @@ public:
 	bool floorChangeEast() const;
 	bool floorChangeWest() const;
 
-	std::string getName() const ;
-	void setSpecialDescription(const std::string& desc);
-	std::string getSpecialDescription();
-	void clearSpecialDescription();
-	void setText(const std::string& desc);
-	void clearText();
-	std::string getText();
+	const std::string& getName() const;
 
-  // get the number of items
+	// get the number of items
 	unsigned short getItemCount() const;
 	void setItemCount(uint8_t n);
 
@@ -202,16 +253,11 @@ public:
 
 	unsigned char getFluidType() const {return fluid;};
 	void setFluidType(unsigned char n) {fluid = n;};
-
-	void setActionId(unsigned short n);
-	unsigned short getActionId() const;
-
+	
 	void setUniqueId(unsigned short n);
-	unsigned short getUniqueId() const;
 
-	virtual long getDecayTime();
+	long getDecayTime();
 	bool canDecay();
-	bool isDecaying;
 
 	virtual bool canRemove() const {return true;}
 	virtual bool onTradeEvent(TradeEvents_t event, Player* owner){return true;};
@@ -220,11 +266,7 @@ protected:
 	unsigned short id;  // the same id as in ItemType
 	unsigned char count; // number of stacked items
 	unsigned char chargecount; //number of charges on the item
-	unsigned char fluid;
-	unsigned short actionId;
-	unsigned short uniqueId;
-	std::string *specialDescription;
-	std::string *text;	//text written
+	unsigned char fluid; //fluid type
 };
 
 #endif
