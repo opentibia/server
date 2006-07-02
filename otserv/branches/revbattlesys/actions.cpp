@@ -53,28 +53,21 @@ Actions::~Actions()
 	clear();
 }
 
+inline void Actions::clearMap(ActionUseMap& map)
+{
+	ActionUseMap::iterator it = map.begin();
+	while(it != map.end()){
+		delete it->second;
+		map.erase(it);
+		it = map.begin();
+	}
+}
+
 void Actions::clear()
 {
-	ActionUseMap::iterator it = useItemMap.begin();
-	while(it != useItemMap.end()){
-		delete it->second;
-		useItemMap.erase(it);
-		it = useItemMap.begin();
-	}
-
-	it = uniqueItemMap.begin();
-	while(it != uniqueItemMap.end()){
-		delete it->second;
-		uniqueItemMap.erase(it);
-		it = uniqueItemMap.begin();
-	}
-
-	it = actionItemMap.begin();
-	while(it != actionItemMap.end()){
-		delete it->second;
-		actionItemMap.erase(it);
-		it = actionItemMap.begin();
-	}
+	clearMap(useItemMap);
+	clearMap(uniqueItemMap);
+	clearMap(actionItemMap);
 	
 	m_scriptInterface.reInitState();
 	m_loaded = false;
@@ -106,9 +99,7 @@ bool Actions::registerEvent(Event* event, xmlNodePtr p)
 	if(!action)
 		return false;
 	
-	bool success = true;
 	int value;
-	
 	if(readXMLInteger(p,"itemid",value)){
 		useItemMap[value] = action;
 	}
@@ -119,10 +110,10 @@ bool Actions::registerEvent(Event* event, xmlNodePtr p)
 		actionItemMap[value] = action;
 	}
 	else{
-		success = false;
-	}	
+		return false;
+	}
 	
-	return success;
+	return true;
 }
 
 int Actions::canUse(const Creature* creature, const Position& pos)

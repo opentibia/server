@@ -568,8 +568,10 @@ bool LuaScriptInterface::initState()
 		return false;
 	}
 	luaopen_base(m_luaState);
-	luaopen_math(m_luaState);
+	luaopen_table(m_luaState);
+	luaopen_os(m_luaState);
 	luaopen_string(m_luaState);
+	luaopen_math(m_luaState);
 	
 	registerFunctions();
 	

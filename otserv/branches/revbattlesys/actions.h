@@ -66,6 +66,7 @@ protected:
 	ActionUseMap actionItemMap;
 	
 	Action *getAction(const Item* item);
+	void Actions::clearMap(ActionUseMap& map);
 	
 	LuaScriptInterface m_scriptInterface;
 };
