@@ -242,7 +242,7 @@ void ScriptEnviroment::addUniqueThing(Thing* thing)
 {
 	Item* item = thing->getItem();
 	if(item && item->getUniqueId() != 0 ){
-		unsigned short uid = item->getUniqueId();
+		long uid = item->getUniqueId();
 		
 		Thing* tmp = m_globalMap[uid];
 		if(!tmp){
@@ -1087,11 +1087,11 @@ int LuaScriptInterface::luaDoRemoveItem(lua_State *L)
 {	
 	//doRemoveItem(uid,n)
 	char n = (unsigned char)popNumber(L);	
-	unsigned short itemid = (unsigned short)popNumber(L);
-						
+	long uid = (long)popNumber(L);
+	
 	ScriptEnviroment* env = getScriptEnv();
 	
-	Item* item = env->getItemByUID(itemid);
+	Item* item = env->getItemByUID(uid);
 	if(item){
 		g_game.internalRemoveItem(item, n);
 		
