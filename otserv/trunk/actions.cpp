@@ -894,7 +894,7 @@ int ActionScript::luaActionDoRemoveItem(lua_State *L)
 {	
 	//doRemoveItem(uid,n)
 	char n = (unsigned char)internalGetNumber(L);	
-	unsigned short itemid = (unsigned short)internalGetNumber(L);
+	long itemid = (long)internalGetNumber(L);
 						
 	ActionScript *action = getActionScript(L);
 	
