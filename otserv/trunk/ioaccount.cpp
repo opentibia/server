@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -20,7 +20,7 @@
 
 #include "ioaccount.h"
 
-#ifdef __USE_MYSQL__
+#if defined __USE_MYSQL__ || defined __USE_SQLITE__
 #include "ioaccountsql.h"
 #endif
 #include "ioaccountxml.h"
@@ -29,7 +29,7 @@ IOAccount* IOAccount::_instance = NULL;
 
 IOAccount* IOAccount::instance(){
 	if(!_instance){
-#ifdef __USE_MYSQL__
+#if defined __USE_MYSQL__ || defined __USE_SQLITE__
 		_instance = (IOAccount*)new IOAccountSQL;
 #else
 		_instance = (IOAccount*)new IOAccountXML;

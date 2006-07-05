@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -62,7 +62,7 @@ Item* Item::CreateItem(const unsigned short _type, unsigned short _count /*= 1*/
 	else{
 		newItem = new Item(_type, _count);
 	}
-	
+
 	newItem->useThing2();
 	return newItem;
 }
@@ -121,7 +121,7 @@ Item::Item(const unsigned short _type)
 {
 	//std::cout << "Item constructor1 " << this << std::endl;
 	id = _type;
-	count = 1;	
+	count = 1;
 	chargecount = 0;
 	fluid = 0;
 	actionId = 0;
@@ -151,7 +151,7 @@ Item::Item(const Item &i)
 	}
 	else{
 		text = NULL;
-	}	
+	}
 }
 
 Item::~Item()
@@ -253,7 +253,7 @@ bool Item::unserialize(xmlNodePtr nodeItem)
 	}
 	else
 		return false;
-	
+
 	nodeValue = (char*)xmlGetProp(nodeItem, (const xmlChar *) "count");
 	if(nodeValue){
 		setItemCountOrSubtype(atoi(nodeValue));
@@ -265,25 +265,25 @@ bool Item::unserialize(xmlNodePtr nodeItem)
 		specialDescription = new std::string(nodeValue);
 		xmlFreeOTSERV(nodeValue);
 	}
-		
+
 	nodeValue = (char*)xmlGetProp(nodeItem, (const xmlChar *) "text");
 	if(nodeValue){
 		text = new std::string(nodeValue);
 		xmlFreeOTSERV(nodeValue);
 	}
-		
+
 	nodeValue = (char*)xmlGetProp(nodeItem, (const xmlChar *) "actionId");
 	if(nodeValue){
 		setActionId(atoi(nodeValue));
 		xmlFreeOTSERV(nodeValue);
 	}
-	
+
 	nodeValue = (char*)xmlGetProp(nodeItem, (const xmlChar *) "uniqueId");
 	if(nodeValue){
 		setUniqueId(atoi(nodeValue));
 		xmlFreeOTSERV(nodeValue);
 	}
-	
+
 	return true;
 }
 
@@ -295,7 +295,7 @@ xmlNodePtr Item::serialize()
 	ss.str("");
 	ss << getID();
 	xmlSetProp(nodeItem, (const xmlChar*)"id", (const xmlChar*)ss.str().c_str());
-	
+
 	if(hasSubType()){
 		ss.str("");
 		ss << (int)getItemCountOrSubtype();
@@ -307,13 +307,13 @@ xmlNodePtr Item::serialize()
 		ss << getSpecialDescription();
 		xmlSetProp(nodeItem, (const xmlChar*)"special_description", (const xmlChar*)ss.str().c_str());
 	}
-	
+
 	if(text){
 		ss.str("");
 		ss << getText();
 		xmlSetProp(nodeItem, (const xmlChar*)"text", (const xmlChar*)ss.str().c_str());
 	}
-	
+
 	if(!isNotMoveable() /*moveable*/){
 		if(actionId != 0){
 			ss.str("");
@@ -321,10 +321,10 @@ xmlNodePtr Item::serialize()
 			xmlSetProp(nodeItem, (const xmlChar*)"actionId", (const xmlChar*)ss.str().c_str());
 		}
 	}
-	
+
 	/*we are not saving unique ids
 	if(uniqueId != 0){
-		ss.str("");	
+		ss.str("");
 		ss << uniqueId;
 		xmlSetProp(nodeItem, (const xmlChar*)"uniqueId", (const xmlChar*)ss.str().c_str());
 	}
@@ -364,7 +364,7 @@ bool Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 			if(!propStream.GET_USHORT(_uniqueid)){
 				return false;
 			}
-			
+
 			setUniqueId(_uniqueid);
 			break;
 		}
@@ -413,7 +413,7 @@ bool Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 			if(!propStream.GET_USHORT(_depotId)){
 				return false;
 			}
-			
+
 			return true;
 		}
 
@@ -424,10 +424,10 @@ bool Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 			if(!propStream.GET_UCHAR(_doorId)){
 				return false;
 			}
-			
+
 			return true;
 		}
-	
+
 		//Teleport class
 		case ATTR_TELE_DEST:
 		{
@@ -534,7 +534,7 @@ bool Item::hasProperty(enum ITEMPROPERTY prop) const
 			if(it.blockPathFind)
 				return true;
 		break;
-		
+
 		case ISVERTICAL:
 			if(it.isVertical)
 				return true;
@@ -680,7 +680,7 @@ std::string Item::getDescription(int32_t lookDistance) const
 			if(lookDistance <= 1) {
 				s << std::endl << "They weight " << std::fixed << std::setprecision(2) << ((double) count * it.weight) << " oz.";
 			}
-		}		
+		}
 		else{
 			if(items[id].runeMagLevel != -1)
 			{
@@ -700,7 +700,7 @@ std::string Item::getDescription(int32_t lookDistance) const
 					s << "a " << it.name << " (Atk:" << (int)getAttack() << " Def:" << (int)getDefense() << ").";
 				}
 				else{
-					s << "a " << it.name << " (Def:" << (int)getDefense() << ").";	
+					s << "a " << it.name << " (Def:" << (int)getDefense() << ").";
 				}
 			}
 			else if(getArmor()){
@@ -765,7 +765,7 @@ std::string Item::getDescription(int32_t lookDistance) const
 	}
 	else
 		s << "an item of type " << id <<".";
-	
+
 	return s.str();
 }
 
@@ -792,7 +792,7 @@ void Item::setSpecialDescription(const std::string& desc){
 		specialDescription = NULL;
 	}
 	if(desc.length() > 1)
-		specialDescription = new std::string(desc);	
+		specialDescription = new std::string(desc);
 }
 
 std::string Item::getSpecialDescription()

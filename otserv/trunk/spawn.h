@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -85,7 +85,7 @@ public:
 
 	bool addSpawn(Spawn* spawn);
 	bool loadSpawnsXML(std::string filename);
-#ifdef __USE_MYSQL__
+#if defined __USE_MYSQL__ || defined __USE_SQLITE__
 	bool loadSpawnsSQL(std::string identifier);
 #endif
 	bool startup();

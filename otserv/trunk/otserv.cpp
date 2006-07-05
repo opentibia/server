@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -63,11 +63,11 @@
 	#include <arpa/inet.h>
 	#include <signal.h>
 	#include <errno.h>
-	
+
 	#define SOCKET_ERROR -1
 	#define ERROR_EINTR EINTR
-	
-	extern int errno; 
+
+	extern int errno;
 #endif
 
 #ifdef __DEBUG_CRITICALSECTION__
@@ -115,16 +115,16 @@ bool passwordTest(std::string &plain, std::string &hash)
 		MD5_CTX m_md5;
 		std::stringstream hexStream;
 		std::string plainHash;
-	
+
 		MD5Init(&m_md5, 0);
 		MD5Update(&m_md5, (const unsigned char*)plain.c_str(), plain.length());
 		MD5Final(&m_md5);
-	
+
 		hexStream.flags(std::ios::hex);
 		for(int i=0;i<16;i++){
 			hexStream << std::setw(2) << std::setfill('0') << (unsigned long)m_md5.digest[i];
 		}
-	
+
 		plainHash = hexStream.str();
 		std::transform(plainHash.begin(), plainHash.end(), plainHash.begin(), upchar);
 		std::transform(hash.begin(), hash.end(), hash.begin(), upchar);
@@ -142,32 +142,32 @@ bool passwordTest(std::string &plain, std::string &hash)
 		else{
 			return false;
 		}
-		
+
 	}
-	
+
 }
 
 OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 {
 #if defined __EXCEPTION_TRACER__
-	ExceptionHandler playerExceptionHandler;	
+	ExceptionHandler playerExceptionHandler;
 	playerExceptionHandler.InstallHandler();
 #endif
-	
+
 	srand((unsigned)time(NULL));
-	
+
 	SOCKET s = *(SOCKET*)dat;
 
 	NetworkMessage msg;
 	if(msg.ReadFromSocket(s)){
 		unsigned char protId = msg.GetByte();
-		
+
 		// login server connection
 		if(protId == 0x01){
 			unsigned short clientos = msg.GetU16();
 			unsigned short version  = msg.GetU16();
 			msg.SkipBytes(12);
-			
+
 			if(version <= 760){
 				msg.Reset();
 				msg.AddByte(0x0A);
@@ -180,7 +180,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 				k[1] = msg.GetU32();
 				k[2] = msg.GetU32();
 				k[3] = msg.GetU32();
-				
+
 				/*
 				std::cout.flags(std::ios::hex);
 				std::cout << std::setw(2) << std::setfill('0') << k[0] << " " <<
@@ -189,18 +189,18 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 					 std::setw(2) << std::setfill('0') << k[3] << std::endl;
 				std::cout.flags(std::ios::dec);
 				*/
-				
+
 				unsigned int accnumber = msg.GetU32();
 				std::string  password  = msg.GetString();
-				
+
 				msg.Reset();
 				msg.setEncryptionState(true);
 				msg.setEncryptionKey(k);
 
 				if(version == 772){
-					
+
 					int serverip = serverIPs[0].first;
-			
+
 					sockaddr_in sain;
 					socklen_t salen = sizeof(sockaddr_in);
 					if(getpeername(s, (sockaddr*)&sain, &salen) == 0){
@@ -211,7 +211,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 								break;
 							}
 					}
-			
+
 					if(g_bans.isIpDisabled(s)){
 						msg.AddByte(0x0A);
 						msg.AddString("To many connections attempts from this IP. Try again later.");
@@ -222,6 +222,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 					}
 					else{
 						Account account = IOAccount::instance()->loadAccount(accnumber);
+
 						bool isSuccess = accnumber != 0 && account.accnumber == accnumber &&
 							passwordTest(password, account.password);
 						g_bans.addConnectionAttempt(s, isSuccess);
@@ -234,10 +235,10 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 							motd << "\n";
 							motd << g_config.getString(ConfigManager::MOTD);
 							msg.AddString(motd.str());
-					
+
 							msg.AddByte(0x64);
 							msg.AddByte((uint8_t)account.charList.size());
-				
+
 							std::list<std::string>::iterator it;
 							for(it = account.charList.begin(); it != account.charList.end(); it++){
 								msg.AddString((*it));
@@ -245,7 +246,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 								msg.AddU32(serverip);
 								msg.AddU16(g_config.getNumber(ConfigManager::PORT));
 							}
-					
+
 							msg.AddU16(account.premDays);
 						}
 						else{
@@ -266,14 +267,14 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 		else if (protId == 0x0A){
 			unsigned short  clientos = msg.GetU16();
 			unsigned short version  = msg.GetU16();
-			
+
 			if(msg.RSA_decrypt()){
 				unsigned long k[4];
 				k[0] = msg.GetU32();
 				k[1] = msg.GetU32();
 				k[2] = msg.GetU32();
 				k[3] = msg.GetU32();
-				
+
 				/*
 				std::cout.flags(std::ios::hex);
 				std::cout << std::setw(2) << std::setfill('0') << k[0] << " " <<
@@ -282,12 +283,12 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 					 std::setw(2) << std::setfill('0') << k[3] << std::endl;
 				std::cout.flags(std::ios::dec);
 				*/
-				
+
 				unsigned char  unknown = msg.GetByte();
 				unsigned long accnumber = msg.GetU32();
 				std::string name     = msg.GetString();
 				std::string password = msg.GetString();
-				
+
 				msg.Reset();
 				msg.setEncryptionState(true);
 				msg.setEncryptionKey(k);
@@ -310,7 +311,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 				else{
 					OTSYS_SLEEP(1000);
 					std::string acc_pass;
-					
+
 					bool isSuccess = IOAccount::instance()->getPassword(accnumber, name, acc_pass) &&
 						passwordTest(password,acc_pass);
 
@@ -334,7 +335,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 							//guess not...
 							player = NULL;
 						}
-				
+
 						if(s){
 							Protocol77* protocol;
 							protocol = new Protocol77(s);
@@ -343,9 +344,9 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 							player->useThing2();
 							player->setID();
 							IOPlayer::instance()->loadPlayer(player, name);
-						
+
 							connectResult_t connectRes = CONNECT_INTERNALERROR;
-						
+
 							if(g_bans.isPlayerBanished(name) && player->access == 0){
 								msg.AddByte(0x14);
 								msg.AddString("Your character is banished!");
@@ -362,7 +363,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 								#endif
 								msg.AddByte(0x14);
 								msg.AddString("You are already logged in.");
-								msg.WriteToSocket(s);	
+								msg.WriteToSocket(s);
 							}
 							else if(g_game.getGameState() == GAME_STATE_SHUTDOWN){
 								//nothing to do
@@ -384,7 +385,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 									}
 									break;
 									case CONNECT_MASTERPOSERROR:
-									
+
 										msg.AddByte(0x14);
 										msg.AddString("Temple position is wrong. Contact the administrator.");
 									break;
@@ -396,14 +397,14 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 								}
 
 								msg.WriteToSocket(s);
-							} 
+							}
 							else{
 								Status* stat = Status::instance();
 								stat->addPlayer();
 								player->lastlogin = time(NULL);
 								player->lastip = player->getIP();
 								s = 0;            // protocol/player will close socket
-							
+
 								OTSYS_THREAD_UNLOCK(g_game.gameLock, "ConnectionHandler()")
 								isLocked = false;
 								protocol->ReceiveLoop();
@@ -414,14 +415,14 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 								g_game.FreeThing(player);
 							}
 						}
-					
+
 						if(isLocked){
 							OTSYS_THREAD_UNLOCK(g_game.gameLock, "ConnectionHandler()")
 						}
 					}
 				}
 			}
-		} 
+		}
 		// Since Cip made 02xx as Tibia protocol,
 		// Lets make FFxx as "our great info protocol" ;P
 		else if(protId == 0xFF) {
@@ -429,13 +430,13 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 			if(subprot == 0xFF){
 				if(msg.GetRaw() == "info"){
 					Status* status = Status::instance();
-				
+
 					uint64_t running = (OTSYS_TIME() - status->start)/1000;
 					#ifdef __DEBUG__
 					std::cout << ":: Uptime: " << running << std::endl;
 					#endif
 					std::string str = status->getStatusString();
-					send(s, str.c_str(), (int)str.size(), 0); 
+					send(s, str.c_str(), (int)str.size(), 0);
 				}
 			}
 			// Another ServerInfo protocol
@@ -454,8 +455,8 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 #if defined __EXCEPTION_TRACER__
 	playerExceptionHandler.RemoveHandler();
 #endif
-  
-  
+
+
 #if defined WIN32 || defined WINDOWS
 #else
   return 0;
@@ -480,7 +481,7 @@ int main(int argc, char *argv[])
 #endif
 
 #if defined __EXCEPTION_TRACER__
-	ExceptionHandler mainExceptionHandler;	
+	ExceptionHandler mainExceptionHandler;
 	mainExceptionHandler.InstallHandler();
 #endif
 
@@ -519,9 +520,9 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 #endif
-	
+
 	// ignore sigpipe...
-#if defined __WINDOWS__ || defined WIN32	
+#if defined __WINDOWS__ || defined WIN32
 		//nothing yet
 #else
 	struct sigaction sigh;
@@ -531,12 +532,12 @@ int main(int argc, char *argv[])
 
 //	LOG_MESSAGE("main", EVENT, 1, "Starting server");
 
-	
+
 	// random numbers generator
 	std::cout << ":: Initializing the random numbers... ";
 	srand(time(NULL));
 	std::cout << "[done]" << std::endl;
-	
+
 	// read global config
 	std::cout << ":: Loading lua script config.lua... ";
 #if !defined(WIN32) && !defined(__NO_HOMEDIR_CONF__)
@@ -551,18 +552,18 @@ int main(int argc, char *argv[])
 		ErrorMessage("Unable to load config.lua!");
 		return -1;
 	}
-	std::cout << "[done]" << std::endl;	
+	std::cout << "[done]" << std::endl;
 
 	//load RSA key
 	std::cout << ":: Loading RSA key...";
-	char* p("14299623962416399520070177382898895550795403345466153217470516082934737582776038882967213386204600674145392845853859217990626450972452084065728686565928113"); 
+	char* p("14299623962416399520070177382898895550795403345466153217470516082934737582776038882967213386204600674145392845853859217990626450972452084065728686565928113");
 	char* q("7630979195970404721891201847792002125535401292779123937207447574596692788513647179235335529307251350570728407373705564708871762033017096809910315212884101");
 	char* d("46730330223584118622160180015036832148732986808519344675210555262940258739805766860224610646919605860206328024326703361630109888417839241959507572247284807035235569619173792292786907845791904955103601652822519121908367187885509270025388641700821735345222087940578381210879116823013776808975766851829020659073");
 	RSA* rsa = RSA::getInstance();
 	rsa->setKey(p, q, d);
-	
+
 	std::cout << "[done]" << std::endl;
-	
+
 	//load bans
 	std::cout << ":: Loading bans... ";
 	g_bans.init();
@@ -571,7 +572,7 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 	std::cout << "[done]" << std::endl;
-	
+
 	//load spells data
 	std::stringstream filename;
 	filename.str("");
@@ -584,7 +585,7 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 	std::cout << "[done]" << std::endl;
-	
+
 	//load actions data
 	filename.str("");
 	filename << g_config.getString(ConfigManager::DATA_DIRECTORY) << "actions/actions.xml";
@@ -596,7 +597,7 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 	std::cout << "[done]" << std::endl;
-	
+
 	//load commands
 	filename.str("");
 	filename << g_config.getString(ConfigManager::DATA_DIRECTORY) << "commands.xml";
@@ -608,7 +609,7 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 	std::cout << "[done]" << std::endl;
-	
+
 	// load item data
 	filename.str("");
 	filename << g_config.getString(ConfigManager::DATA_DIRECTORY) << "items/items.otb";
@@ -620,7 +621,7 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 	std::cout << "[done]" << std::endl;
-	
+
 	// load monster data
 	filename.str("");
 	filename << g_config.getString(ConfigManager::DATA_DIRECTORY) << "monsters/monsters.xml";
@@ -632,7 +633,7 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 	std::cout << "[done]" << std::endl;
-		
+
 	std::string worldType = g_config.getString(ConfigManager::WORLD_TYPE);
 	std::transform(worldType.begin(), worldType.end(), worldType.begin(), upchar);
 
@@ -647,7 +648,7 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 	std::cout << ":: Worldtype: " << worldType << std::endl;
-	
+
 	#ifdef __SKULLSYSTEM__
 	std::cout << ":: Skulls enabled" << std::endl;
 	#endif
@@ -663,23 +664,23 @@ int main(int argc, char *argv[])
 	if(!g_game.loadMap(g_config.getString(ConfigManager::MAP_FILE), g_config.getString(ConfigManager::MAP_KIND))){
 		return -1;
 	}
-	
+
 	// Call to WSA Startup on Windows Systems...
 #ifdef WIN32
-	WORD wVersionRequested; 
-	WSADATA wsaData; 
+	WORD wVersionRequested;
+	WSADATA wsaData;
 	wVersionRequested = MAKEWORD( 1, 1 );
-	
+
 	if(WSAStartup(wVersionRequested, &wsaData) != 0){
 		ErrorMessage("Winsock startup failed!!");
 		return -1;
-	} 
-	
-	if((LOBYTE(wsaData.wVersion) != 1) || (HIBYTE(wsaData.wVersion) != 1)) { 
-		WSACleanup( ); 
+	}
+
+	if((LOBYTE(wsaData.wVersion) != 1) || (HIBYTE(wsaData.wVersion) != 1)) {
+		WSACleanup( );
 		ErrorMessage("No Winsock 1.1 found!");
 		return -1;
-	} 
+	}
 #endif
 
 
@@ -687,17 +688,17 @@ int main(int argc, char *argv[])
 	IpNetMask.first  = inet_addr("127.0.0.1");
 	IpNetMask.second = 0xFFFFFFFF;
 	serverIPs.push_back(IpNetMask);
-	
+
 	char szHostName[128];
 	if(gethostname(szHostName, 128) == 0){
 		std::cout << "::" << std::endl << ":: Running on host " << szHostName << std::endl;
-	
+
 		hostent *he = gethostbyname(szHostName);
-		
+
 		if(he){
 			std::cout << ":: Local IP address(es):  ";
 			unsigned char** addr = (unsigned char**)he->h_addr_list;
-	
+
 			while (addr[0] != NULL){
 				std::cout << (unsigned int)(addr[0][0]) << "."
 				<< (unsigned int)(addr[0][1]) << "."
@@ -714,40 +715,40 @@ int main(int argc, char *argv[])
 			std::cout << std::endl;
 		}
 	}
-  
+
 	std::cout << ":: Global IP address:     ";
 	std::string ip;
-	
+
 	if(argc > 1)
 		ip = argv[1];
 	else
 		ip = g_config.getString(ConfigManager::IP);
-	
+
 	std::cout << ip << std::endl << "::" << std::endl;
-	
+
 	IpNetMask.first  = inet_addr(ip.c_str());
 	IpNetMask.second = 0;
 	serverIPs.push_back(IpNetMask);
 	std::cout << ":: Starting Server... ";
-	
+
 	Status* status = Status::instance();
 	status->playersmax = g_config.getNumber(ConfigManager::MAX_PLAYERS);
-	
+
 	// start the server listen...
 	int listen_errors;
 	int accept_errors;
 	listen_errors = 0;
 	while(g_game.getGameState() != GAME_STATE_SHUTDOWN && listen_errors < 100){
 		sockaddr_in local_adress;
-		memset(&local_adress, 0, sizeof(sockaddr_in)); // zero the struct 
-	
+		memset(&local_adress, 0, sizeof(sockaddr_in)); // zero the struct
+
 		local_adress.sin_family      = AF_INET;
 		local_adress.sin_port        = htons(g_config.getNumber(ConfigManager::PORT));
 		local_adress.sin_addr.s_addr = htonl(INADDR_ANY);
-	
+
 		// first we create a new socket
 		SOCKET listen_socket = socket(AF_INET, SOCK_STREAM, 0);
-	
+
 		if(listen_socket <= 0){
 #ifdef WIN32
 			WSACleanup();
@@ -773,7 +774,7 @@ int main(int argc, char *argv[])
 			ErrorMessage("Unable to create server socket (2)!");
 			return -1;
   		} // if (bind(...))
-  
+
 		// now we start listen on the new socket
 		if(listen(listen_socket, 10) == SOCKET_ERROR){
 #ifdef WIN32
@@ -793,9 +794,9 @@ int main(int argc, char *argv[])
 			FD_SET(listen_socket, &listen_set);
 			tv.tv_sec = 2;
 			tv.tv_usec = 0;
-			
+
 			int ret = select(listen_socket + 1, &listen_set, NULL, NULL, &tv);
-				
+
 			if(ret == SOCKET_ERROR)
 			{
 				int errnum;
@@ -808,38 +809,38 @@ int main(int argc, char *argv[])
 					continue;
 				}
 				else{
-					std::cout << "WARNING: select() function returned an error." << std::endl;; 
+					std::cout << "WARNING: select() function returned an error." << std::endl;;
 					break;
 				}
 			}
 			else if(ret == 0){
 				continue;
 			}
-			
+
 			SOCKET s = accept(listen_socket, NULL, NULL); // accept a new connection
-			
+
 			if(s > 0){
 				OTSYS_CREATE_THREAD(ConnectionHandler, (void*)&s);
 			}
 			else{
 				accept_errors++;
-				std::cout << "WARNING: Not a valid socket from accept() function." << std::endl;; 
+				std::cout << "WARNING: Not a valid socket from accept() function." << std::endl;;
 			}
 		}
 
 		closesocket(listen_socket);
 		listen_errors++;
 	}
-	
+
 	if(listen_errors >= 100){
 		std::cout << "ERROR: Server shutted down because there where 100 listen errors." << std::endl;
 	}
-	
+
 #ifdef WIN32
   WSACleanup();
 #endif
 
-#if defined __EXCEPTION_TRACER__	
+#if defined __EXCEPTION_TRACER__
 	mainExceptionHandler.RemoveHandler();
 #endif
 

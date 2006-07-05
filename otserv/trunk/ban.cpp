@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// 
+//
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -24,7 +24,7 @@
 #include "configmanager.h"
 #include <sstream>
 
-#ifdef __USE_MYSQL__
+#if defined __USE_MYSQL__ || defined __USE_SQLITE__
 #include "database.h"
 #endif
 
@@ -36,7 +36,7 @@ unsigned long getIP(SOCKET s)
 {
 	sockaddr_in sain;
 	socklen_t salen = sizeof(sockaddr_in);
-	
+
 	if(getpeername(s, (sockaddr*)&sain, &salen) == 0){
 		unsigned long clientip = *(unsigned long*)&sain.sin_addr;
 		return clientip;
@@ -87,7 +87,7 @@ bool Ban::isIpDisabled(SOCKET s)
 		uint32_t currentTime = std::time(NULL);
 		IpLoginMap::const_iterator it = ipLoginMap.find(clientip);
 		if(it != ipLoginMap.end()){
-			if( (it->second.numberOfLogins >= maxLoginTries) && 
+			if( (it->second.numberOfLogins >= maxLoginTries) &&
 				(currentTime < it->second.lastLoginTime + loginTimeout) ){
 				return true;
 			}
@@ -121,7 +121,7 @@ void Ban::addConnectionAttempt(SOCKET s, bool isSuccess)
 		if(!isSuccess || (currentTime < it->second.lastLoginTime + retryTimeout) ){
 			++it->second.numberOfLogins;
 		}
-		else 
+		else
 			it->second.numberOfLogins = 0;
 
 		it->second.lastLoginTime = currentTime;
@@ -254,7 +254,7 @@ const AccountBanList& Ban::getAccountBans()
 {
 	return accountBanList;
 }
-	
+
 
 bool Ban::loadBans(const std::string& identifier)
 {
@@ -268,7 +268,7 @@ bool Ban::saveBans(const std::string& identifier)
 IOBan* IOBan::getInstance()
 {
 	if(!_instance){
-		#ifdef __USE_MYSQL__
+		#if defined __USE_MYSQL__ || defined __USE_SQLITE__
 		_instance = new IOBanSQL();
 		#else
 		_instance = new IOBanXML();
@@ -277,7 +277,7 @@ IOBan* IOBan::getInstance()
 	return _instance;
 }
 
-#ifdef __USE_MYSQL__
+#if defined __USE_MYSQL__ || defined __USE_SQLITE__
 
 IOBanSQL::IOBanSQL()
 {
@@ -290,20 +290,20 @@ IOBanSQL::IOBanSQL()
 
 bool IOBanSQL::loadBans(const std::string& identifier, Ban& banclass)
 {
-	Database db;
-	if(!db.connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str())){
+	Database* db = Database::instance();
+	if(!db->connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str())){
 		return false;
 	}
-	
+
 	DBQuery query;
 	DBResult result;
 	query << "SELECT * FROM bans";
-	if(!db.storeQuery(query, result))
+	if(!db->storeQuery(query, result))
 		return true;
-	
+
 	uint32_t currentTime = std::time(NULL);
 	for(int i=0; i < result.getNumRows(); ++i){
-		int banType = result.getDataInt("type", i);		
+		int banType = result.getDataInt("type", i);
 		int time = result.getDataInt("time", i);
 		if(time > currentTime){
 			switch(banType){
@@ -314,14 +314,14 @@ bool IOBanSQL::loadBans(const std::string& identifier, Ban& banclass)
 					banclass.addIpBan(ip, mask, time);
 					break;
 				}
-				
+
 				case BAN_PLAYER:
 				{
 					int player = result.getDataInt("player", i);
 					banclass.addPlayerBan(player, time);
 					break;
 				}
-				
+
 				case BAN_ACCOUNT:
 				{
 					int account = result.getDataInt("account", i);
@@ -331,44 +331,59 @@ bool IOBanSQL::loadBans(const std::string& identifier, Ban& banclass)
 			}
 		}
 	}
-	
+
 	return true;
 }
 
 bool IOBanSQL::saveBans(const std::string& identifier, const Ban& banclass)
 {
-	Database db;
-	if(!db.connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str())){
+	Database* db = Database::instance();
+	if(!db->connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str())){
 		return false;
 	}
-	
+
 	DBQuery query;
 
 	query << "BEGIN;";
-	if(!db.executeQuery(query))
+	if(!db->executeQuery(query))
 		return false;
 
 	query << "DELETE FROM bans;";
-	if(!db.executeQuery(query))
+	if(!db->executeQuery(query))
 		return false;
-	
+
 	uint32_t currentTime = std::time(NULL);
 	//save ip bans
 	bool executeQuery = false;
+
+	std::stringstream bans;
+
 	query.reset();
 	query << "INSERT INTO `bans` (`type` , `ip` , `mask`, `time`) VALUES ";
 	for(IpBanList::const_iterator it = banclass.ipBanList.begin(); it !=  banclass.ipBanList.end(); ++it){
 		if(it->time > currentTime){
 			executeQuery = true;
-			query << query.getSeparator() << "(1," << it->ip << "," << it->mask << 
+			bans << query.getSeparator() << "(1," << it->ip << "," << it->mask <<
 				"," << it->time << ")";
+			#ifdef __USE_SQLITE__
+            //split into sub-queries
+            DBQuery subquery;
+            subquery << query.str();
+            subquery << bans.str();
+            if(!db->executeQuery(subquery))
+                    return false;
+            bans.str("");
+            #else
+            query << bans;
+            #endif
 		}
 	}
-
+    #ifndef __USE_SQLITE__
 	if(executeQuery){
-		if(!db.executeQuery(query))
+		if(!db->executeQuery(query))
 			return false;
 	}
+    #endif
 
 	//save player bans
 	executeQuery = false;
@@ -377,15 +392,26 @@ bool IOBanSQL::saveBans(const std::string& identifier, const Ban& banclass)
 	for(PlayerBanList::const_iterator it = banclass.playerBanList.begin(); it !=  banclass.playerBanList.end(); ++it){
 		if(it->time > currentTime){
 			executeQuery = true;
-			query << query.getSeparator() << "(2," << it->id << "," << it->time << ")";
+			bans << query.getSeparator() << "(2," << it->id << "," << it->time << ")";
+			#ifdef __USE_SQLITE__
+            //split into sub-queries
+            DBQuery subquery;
+            subquery << query.str();
+            subquery << bans.str();
+            if(!db->executeQuery(subquery))
+                    return false;
+            bans.str("");
+            #else
+            query << bans;
+            #endif
 		}
 	}
-
+    #ifndef __USE_SQLITE__
 	if(executeQuery){
-		if(!db.executeQuery(query))
+		if(!db->executeQuery(query))
 			return false;
 	}
-
+    #endif
 	//save account bans
 	executeQuery = false;
 	query.reset();
@@ -393,20 +419,31 @@ bool IOBanSQL::saveBans(const std::string& identifier, const Ban& banclass)
 	for(AccountBanList::const_iterator it = banclass.accountBanList.begin(); it != banclass.accountBanList.end(); ++it){
 		if(it->time > currentTime){
 			executeQuery = true;
-			query << query.getSeparator() << "(3," << it->id << "," << it->time << ")";
+			bans << query.getSeparator() << "(3," << it->id << "," << it->time << ")";
+			#ifdef __USE_SQLITE__
+            //split into sub-queries
+            DBQuery subquery;
+            subquery << query.str();
+            subquery << bans.str();
+            if(!db->executeQuery(subquery))
+                    return false;
+            bans.str("");
+            #else
+            query << bans;
+            #endif
 		}
 	}
-
+    #ifndef __USE_SQLITE__
 	if(executeQuery){
-		if(!db.executeQuery(query))
+		if(!db->executeQuery(query))
 			return false;
 	}
-	
+    #endif
 	query.reset();
-	query << "COMMIT;";	
-	if(!db.executeQuery(query))
+	query << "COMMIT;";
+	if(!db->executeQuery(query))
 		return false;
-	
+
 	return true;
 }
 
@@ -423,7 +460,7 @@ bool IOBanXML::loadBans(const std::string& identifier, Ban& banclass)
 	if(doc){
 		xmlNodePtr root;
 		root = xmlDocGetRootElement(doc);
-		
+
 		if(xmlStrcmp(root->name,(const xmlChar*)"bans") != 0){
 			xmlFreeDoc(doc);
 			return false;
@@ -462,7 +499,7 @@ bool IOBanXML::loadBans(const std::string& identifier, Ban& banclass)
 
 							break;
 						}
-						
+
 						case BAN_ACCOUNT:
 						{
 							int account = 0;
@@ -497,7 +534,7 @@ bool IOBanXML::saveBans(const std::string& identifier, const Ban& banclass)
 	//save ip bans
 	for(IpBanList::const_iterator it = banclass.ipBanList.begin(); it !=  banclass.ipBanList.end(); ++it){
 		if(it->time > currentTime){
-			
+
 			xmlNodePtr nodeBan = xmlNewChild(nodeBans, NULL, (xmlChar*) "ban", NULL);
 
 			std::stringstream ss;
@@ -561,7 +598,7 @@ bool IOBanXML::saveBans(const std::string& identifier, const Ban& banclass)
 
 	xmlSaveFormatFileEnc(identifier.c_str(), doc, "UTF-8", 1);
 	xmlFreeDoc(doc);
-	
+
 	return true;
 }
 

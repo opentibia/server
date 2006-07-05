@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// 
+//
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -36,13 +36,13 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	lua_State* L = lua_open();
 
 	if(!L) return false;
-	
+
 	if(lua_dofile(L, _filename.c_str()))
 	{
 		lua_close(L);
 		return false;
 	}
-	
+
 	// parse config
 	if(!m_isLoaded) // info that must be loaded one time (unless we reset the modules involved)
 	{
@@ -62,12 +62,13 @@ bool ConfigManager::loadFile(const std::string& _filename)
 		m_confString[SQL_USER] = getGlobalString(L, "sql_user");
 		m_confString[SQL_PASS] = getGlobalString(L, "sql_pass");
 		m_confString[SQL_DB] = getGlobalString(L, "sql_db");
+		m_confString[SQLITE_DB] = getGlobalString(L, "sqlite_db");
 		m_confString[MAP_HOST] = getGlobalString(L, "map_host");
 		m_confString[MAP_USER] = getGlobalString(L, "map_user");
 		m_confString[MAP_PASS] = getGlobalString(L, "map_pass");
 		m_confString[MAP_DB] = getGlobalString(L, "map_db");
-		
-		
+
+
 	}
 	m_confString[LOGIN_MSG] = getGlobalString(L, "loginmsg", "Welcome.");
 	m_confString[SERVER_NAME] = getGlobalString(L, "servername");
@@ -89,12 +90,12 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confInteger[RATE_SKILL] = getGlobalNumber(L, "rate_skill", 1);
 	m_confInteger[RATE_LOOT] = getGlobalNumber(L, "rate_loot", 1);
 	m_confInteger[RATE_MAGIC] = getGlobalNumber(L, "rate_mag", 1);
-	
+
 	for(int i=0; i<4; ++i)
 		m_confVocationString[i] = getGlobalStringField(L, "vocations", i+1, "unknown");
-	
+
 	m_isLoaded = true;
-	
+
 	lua_close(L);
 	return true;
 }
@@ -103,7 +104,7 @@ bool ConfigManager::reload()
 {
 	if(!m_isLoaded)
 		return false;
-	
+
 	return loadFile(m_confString[CONFIG_FILE]);
 }
 

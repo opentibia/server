@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -44,7 +44,7 @@ bool Teleport::unserialize(xmlNodePtr nodeItem)
 {
 	bool ret = Item::unserialize(nodeItem);
 
-	char* nodeValue;	
+	char* nodeValue;
 	nodeValue = (char*)xmlGetProp(nodeItem, (const xmlChar *) "destx");
 	if(nodeValue){
 		destPos.x = atoi(nodeValue);
@@ -56,13 +56,13 @@ bool Teleport::unserialize(xmlNodePtr nodeItem)
 		destPos.y = atoi(nodeValue);
 		xmlFreeOTSERV(nodeValue);
 	}
-	
+
 	nodeValue = (char*)xmlGetProp(nodeItem, (const xmlChar *) "destz");
 	if(nodeValue){
 		destPos.z = atoi(nodeValue);
 		xmlFreeOTSERV(nodeValue);
 	}
-	
+
 	return ret;
 }
 
@@ -109,13 +109,13 @@ bool Teleport::serializeAttr(PropWriteStream& propWriteStream)
 	propWriteStream.ADD_UCHAR(ATTR_TELE_DEST);
 
 	TeleportDest tele_dest;
-	
+
 	tele_dest._x = destPos.x;
 	tele_dest._y = destPos.y;
 	tele_dest._z = destPos.z;
 
 	propWriteStream.ADD_VALUE(tele_dest);
-	
+
 	return ret;
 }
 

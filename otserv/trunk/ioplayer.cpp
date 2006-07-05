@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -20,7 +20,7 @@
 
 #include "ioplayer.h"
 
-#ifdef __USE_MYSQL__
+#if defined __USE_MYSQL__ || defined __USE_SQLITE__
 #include "ioplayersql.h"
 #else
 #include "ioplayerxml.h"
@@ -31,7 +31,7 @@ IOPlayer* IOPlayer::_instance = NULL;
 IOPlayer* IOPlayer::instance()
 {
 	if(!_instance){
-#ifdef __USE_MYSQL__
+#if defined __USE_MYSQL__ || defined __USE_SQLITE__
 		_instance = (IOPlayer*)new IOPlayerSQL;
 #else
 		_instance = (IOPlayer*)new IOPlayerXML;
@@ -40,7 +40,7 @@ IOPlayer* IOPlayer::instance()
 
 #ifdef __DEBUG__
 	printf("%s \n", _instance->getSourceDescription());
-#endif 
+#endif
 
 	return _instance;
 }

@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -55,8 +55,8 @@ IOPlayerSQL::IOPlayerSQL()
 
 bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 {
-	Database mysql;
-	if(!mysql.connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str())){
+	Database* mysql = Database::instance();
+	if(!mysql->connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str())){
 		return false;
 	}
 
@@ -64,23 +64,23 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 	DBResult result;
 
 	query << "SELECT * FROM players WHERE name='" << Database::escapeString(name) << "'";
-	if(!mysql.storeQuery(query, result) || result.getNumRows() != 1)
+	if(!mysql->storeQuery(query, result) || result.getNumRows() != 1)
 		return false;
-	
+
 	int accno = result.getDataInt("account");
 	if(accno < 1)
 		return false;
-	
+
 	// Getting all player properties
 	player->setGUID((int)result.getDataInt("id"));
-	
+
 	player->accountNumber = result.getDataInt("account");
 	player->sex = (playersex_t)result.getDataInt("sex");
-	
+
 	player->guildId   = result.getDataInt("guildid");
 	player->guildRank = result.getDataString("guildrank");
 	player->guildNick = result.getDataString("guildnick");
-	
+
 	player->setDirection((Direction)result.getDataInt("direction"));
 	player->experience = result.getDataLong("experience");
 	player->level = result.getDataInt("level");
@@ -104,7 +104,7 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 	player->vocation = (playervoc_t)result.getDataInt("vocation");
 	player->access = result.getDataInt("access");
 	player->setNormalSpeed();
-	
+
 	player->mana = result.getDataInt("mana");
 	player->manamax = result.getDataInt("manamax");
 	player->manaspent = result.getDataInt("manaspent");
@@ -139,7 +139,7 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 	player->loginPosition.x = atoi(spawnit->c_str()); spawnit++;
 	player->loginPosition.y = atoi(spawnit->c_str()); spawnit++;
 	player->loginPosition.z = atoi(spawnit->c_str());
-	
+
 	//there is no "fuck" in the sources, but every major programm got
 	//one and i think here is a good place to add one
 
@@ -155,26 +155,26 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 
 	//get password
 	query << "SELECT * FROM accounts WHERE accno='" << accno << "'";
-	if(!mysql.storeQuery(query, result))
+	if(!mysql->storeQuery(query, result))
 		return false;
-	
+
 	if(result.getDataInt("accno") != accno)
 		return false;
-	
+
 	player->password = result.getDataString("password");
 
 
 	if(player->guildId){
 		query << "SELECT guildname FROM guilds WHERE guildid='" << player->guildId << "'";
-		if(mysql.storeQuery(query, result)){
+		if(mysql->storeQuery(query, result)){
 			player->guildName = result.getDataString("guildname");
 		}
-	}	
-	
+	}
+
 	// we need to find out our skills
 	// so we query the skill table
 	query << "SELECT * FROM skills WHERE player='" << player->getGUID() << "'";
-	if(mysql.storeQuery(query, result)){
+	if(mysql->storeQuery(query, result)){
 		//now iterate over the skills
 		for(int i=0; i < result.getNumRows(); ++i){
 			int skillid = result.getDataInt("id",i);
@@ -185,9 +185,9 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 				player->skills[skillid][SKILL_PERCENT] = 100;
 		}
 	}
-	
+
 	//load the items
-	
+
 	// cross compatibility vc++ and gcc
 #ifdef __GNUC__
 	__gnu_cxx::hash_map<int,std::pair<Item*,int> > itemmap;
@@ -195,7 +195,7 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 	stdext::hash_map<int,std::pair<Item*,int> > itemmap;
 #endif
 	query << "SELECT * FROM items WHERE player='" << player->getGUID() << "' ORDER BY sid ASC";
-	if(mysql.storeQuery(query, result) && (result.getNumRows() > 0)){		
+	if(mysql->storeQuery(query, result) && (result.getNumRows() > 0)){
 		for(int i=0; i < result.getNumRows(); ++i){
 			int type = result.getDataInt("type",i);
 			int count = result.getDataInt("number",i);
@@ -203,7 +203,7 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 			if(result.getDataInt("actionid",i) >= 100)
 				myItem->setActionId(result.getDataInt("actionid",i));
 
-			myItem->setText(result.getDataString("text",i));	
+			myItem->setText(result.getDataString("text",i));
 			myItem->setSpecialDescription(result.getDataString("specialdesc",i));
 			std::pair<Item*, int> myPair(myItem, result.getDataInt("pid",i));
 			itemmap[result.getDataInt("sid",i)] = myPair;
@@ -217,13 +217,13 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 							player->addDepot(depot, slotid - 100);
 						}
 						else{
-							std::cout << "Error loading depot "<< slotid << " for player " << 
+							std::cout << "Error loading depot "<< slotid << " for player " <<
 								player->getGUID() << std::endl;
 							delete myItem;
 						}
 					}
 					else{
-						std::cout << "Error loading depot "<< slotid << " for player " << 
+						std::cout << "Error loading depot "<< slotid << " for player " <<
 							player->getGUID() << std::endl;
 						delete myItem;
 					}
@@ -231,7 +231,7 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 			}
 		}
 	}
-	
+
 	// cross compatibility vc++ and gcc
 #ifdef __GNUC__
 	__gnu_cxx::hash_map<int,std::pair<Item*,int> >::iterator it;
@@ -249,28 +249,28 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 			}
 		}
 	}
-	
+
 	player->updateInventoryWeigth();
 	player->updateItemsLight(true);
 
 	//load storage map
 	query << "SELECT * FROM playerstorage WHERE player='" << player->getGUID() << "'";
-	
-	if(mysql.storeQuery(query,result)){
+
+	if(mysql->storeQuery(query,result)){
 		for(int i=0; i < result.getNumRows(); ++i){
 			unsigned long key = result.getDataInt("key",i);
 			long value = result.getDataInt("value",i);
 			player->addStorageValue(key,value);
 		}
 	}
-	
+
 	//load vip
-	query << "SELECT vip_id FROM viplist WHERE player='" << player->getGUID() << "'";		
-	if(mysql.storeQuery(query,result)){
+	query << "SELECT vip_id FROM viplist WHERE player='" << player->getGUID() << "'";
+	if(mysql->storeQuery(query,result)){
 		for(int i=0; i < result.getNumRows(); ++i){
 			unsigned long vip_id = result.getDataInt("vip_id",i);
 			std::string dummy_str;
-			if(storeNameByGuid(mysql, vip_id)){
+			if(storeNameByGuid(*mysql, vip_id)){
 				player->addVIP(vip_id, dummy_str, false, true);
 			}
 		}
@@ -282,28 +282,28 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 bool IOPlayerSQL::savePlayer(Player* player)
 {
 	player->preSave();
-		
-	Database mysql;
-	if(!mysql.connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str())){
+
+	Database* mysql = Database::instance();
+	if(!mysql->connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str())){
 		return false;
 	}
-	
+
 	DBQuery query;
 	DBResult result;
 
 	//check if the player have to be saved or not
 	query << "SELECT save FROM players WHERE id='" << player->getGUID() << "'";
-	if(!mysql.storeQuery(query,result) || (result.getNumRows() != 1) )
+	if(!mysql->storeQuery(query,result) || (result.getNumRows() != 1) )
 		return false;
-	
+
 	if(result.getDataInt("save") != 1) // If save var is not 1 don't save the player info
 		return true;
-	
-	//Start the transaction	
+
+	//Start the transaction
 	query << "BEGIN;";
-	if(!mysql.executeQuery(query))
+	if(!mysql->executeQuery(query))
 		return false;
-	
+
 	//First, an UPDATE query to write the player itself
 	query << "UPDATE `players` SET ";
 	query << "`level` = " << player->level << ", ";
@@ -329,7 +329,7 @@ bool IOPlayerSQL::savePlayer(Player* player)
 	query << "`sex` = " << player->sex << ", ";
 	query << "`lastlogin` = " << player->lastlogin << ", ";
 	query << "`lastip` = " << player->lastip << " ";
-	
+
 #ifdef __SKULLSYSTEM__
 	long redSkullTime = 0;
 	if(player->redSkullTicks > 0){
@@ -345,26 +345,31 @@ bool IOPlayerSQL::savePlayer(Player* player)
 	query << "`redskull` = " << redSkull << " ";
 #endif
 
-	query << " WHERE `id` = "<< player->getGUID() <<" LIMIT 1";
-	
-	if(!mysql.executeQuery(query))
+	query << " WHERE `id` = "<< player->getGUID()
+	#ifdef __USE_MYSQL__
+	<<" LIMIT 1";
+    #else
+    ;
+    #endif
+
+	if(!mysql->executeQuery(query))
 		return false;
-	
+
 	// Saving Skills
 	for(int i = 0; i <= 6; i++){
 		query << "UPDATE `skills` SET `skill` = " << player->skills[i][SKILL_LEVEL] <<", `tries` = "<< player->skills[i][SKILL_TRIES] << " WHERE `player` = " << player->getGUID() << " AND  `id` = " << i;
-	
-		if(!mysql.executeQuery(query))
+
+		if(!mysql->executeQuery(query))
 			return false;
 	}
-	
+
 	//now item saving
 	query << "DELETE FROM items WHERE player='"<< player->getGUID() << "'";
-	
-	if(!mysql.executeQuery(query))
+
+	if(!mysql->executeQuery(query))
 		return false;
-	
-	query << "INSERT INTO `items` (`player` , `slot` , `sid` , `pid` , `type` , `number` , `actionid` , `text` , `specialdesc` ) VALUES"; 
+
+	query << "INSERT INTO `items` (`player` , `slot` , `sid` , `pid` , `type` , `number` , `actionid` , `text` , `specialdesc` ) VALUES";
 	int runningID = 0;
 
 	typedef std::pair<Container*, int> containerStackPair;
@@ -383,15 +388,25 @@ bool IOPlayerSQL::savePlayer(Player* player)
 		item = player->items[slotid];
 		++runningID;
 
-		streamitems << "(" << player->getGUID() <<"," << slotid << ","<< runningID <<","<< parentid <<"," << item->getID()<<","<< (int)item->getItemCountOrSubtype() << "," << 
+		streamitems << "(" << player->getGUID() <<"," << slotid << ","<< runningID <<","<< parentid <<"," << item->getID()<<","<< (int)item->getItemCountOrSubtype() << "," <<
 			(int)item->getActionId()<<",'"<< Database::escapeString(item->getText()) <<"','" << Database::escapeString(item->getSpecialDescription()) <<"'),";
-
+        #ifdef __USE_SQLITE__
+        //split into sub-queries
+        DBQuery subquery;
+        subquery << query.str();
+        itemsstring = streamitems.str();
+        itemsstring.erase(itemsstring.length()-1);
+        subquery << itemsstring;
+        if(!mysql->executeQuery(subquery))
+				return false;
+		streamitems.str("");
+        #endif
 		topcontainer = item->getContainer();
 		if(topcontainer) {
 			stack.push_back(containerStackPair(topcontainer, runningID));
 		}
 	}
-			
+
 	while(stack.size() > 0) {
 		//split into sub-queries
 		if(streamitems.str().length() > 8192) {
@@ -402,7 +417,7 @@ bool IOPlayerSQL::savePlayer(Player* player)
 			itemsstring.erase(itemsstring.length()-1);
 			subquery << itemsstring;
 
-			if(!mysql.executeQuery(subquery))
+			if(!mysql->executeQuery(subquery))
 				return false;
 
 			streamitems.str("");
@@ -421,8 +436,19 @@ bool IOPlayerSQL::savePlayer(Player* player)
 			if(container){
 				stack.push_back(containerStackPair(container, runningID));
 			}
-			streamitems << "(" << player->getGUID() <<"," << 0 /*slotid*/ << ","<< runningID <<","<< parentid <<"," << item->getID()<<","<< (int)item->getItemCountOrSubtype() << "," << 
+			streamitems << "(" << player->getGUID() <<"," << 0 /*slotid*/ << ","<< runningID <<","<< parentid <<"," << item->getID()<<","<< (int)item->getItemCountOrSubtype() << "," <<
 			(int)item->getActionId()<<",'"<< Database::escapeString(item->getText()) <<"','" << Database::escapeString(item->getSpecialDescription()) <<"'),";
+			#ifdef __USE_SQLITE__
+            //split into sub-queries
+            DBQuery subquery;
+            subquery << query.str();
+            itemsstring = streamitems.str();
+            itemsstring.erase(itemsstring.length()-1);
+            subquery << itemsstring;
+            if(!mysql->executeQuery(subquery))
+                    return false;
+            streamitems.str("");
+            #endif
 		}
 	}
 
@@ -432,15 +458,27 @@ bool IOPlayerSQL::savePlayer(Player* player)
 		item = dit->second;
 		++runningID;
 
-		streamitems << "(" << player->getGUID() <<"," << dit->first + 100 << ","<< runningID <<","<< parentid <<"," << item->getID()<<","<< (int)item->getItemCountOrSubtype() << "," << 
+		streamitems << "(" << player->getGUID() <<"," << dit->first + 100 << ","<< runningID <<","<< parentid <<"," << item->getID()<<","<< (int)item->getItemCountOrSubtype() << "," <<
 			(int)item->getActionId()<<",'"<< Database::escapeString(item->getText()) <<"','" << Database::escapeString(item->getSpecialDescription()) <<"'),";
+
+        #ifdef __USE_SQLITE__
+        //split into sub-queries
+        DBQuery subquery;
+        subquery << query.str();
+        itemsstring = streamitems.str();
+        itemsstring.erase(itemsstring.length()-1);
+        subquery << itemsstring;
+        if(!mysql->executeQuery(subquery))
+				return false;
+		streamitems.str("");
+        #endif
 
 		topcontainer = item->getContainer();
 		if(topcontainer){
 			stack.push_back(containerStackPair(topcontainer, runningID));
 		}
 	}
-			
+
 	while(stack.size() > 0) {
 		//split into sub-queries
 		if(streamitems.str().length() > 8192) {
@@ -451,7 +489,7 @@ bool IOPlayerSQL::savePlayer(Player* player)
 			itemsstring.erase(itemsstring.length()-1);
 			subquery << itemsstring;
 
-			if(!mysql.executeQuery(subquery))
+			if(!mysql->executeQuery(subquery))
 				return false;
 
 			streamitems.str("");
@@ -465,78 +503,112 @@ bool IOPlayerSQL::savePlayer(Player* player)
 
 		for(int i = 0; i < container->size(); i++){
 			++runningID;
-			Item* item = container->getItem(i);	
+			Item* item = container->getItem(i);
 			Container* container = item->getContainer();
 			if(container) {
 				stack.push_back(containerStackPair(container, runningID));
 			}
 
-			streamitems << "(" << player->getGUID() <<"," << 0 /*slotid*/ << ","<< runningID <<","<< parentid <<"," << item->getID()<<","<< (int)item->getItemCountOrSubtype() << "," << 
+			streamitems << "(" << player->getGUID() <<"," << 0 /*slotid*/ << ","<< runningID <<","<< parentid <<"," << item->getID()<<","<< (int)item->getItemCountOrSubtype() << "," <<
 			(int)item->getActionId()<<",'"<< Database::escapeString(item->getText()) <<"','" << Database::escapeString(item->getSpecialDescription()) <<"'),";
+			#ifdef __USE_SQLITE__
+            //split into sub-queries
+            DBQuery subquery;
+            subquery << query.str();
+            itemsstring = streamitems.str();
+            itemsstring.erase(itemsstring.length()-1);
+            subquery << itemsstring;
+            if(!mysql->executeQuery(subquery))
+                    return false;
+            streamitems.str("");
+            #endif
 		}
 	}
-	
+
 	if(streamitems.str().length() > 0){
 		itemsstring = streamitems.str();
 		itemsstring.erase(itemsstring.length()-1);
 		query << itemsstring;
-		
-		if(!mysql.executeQuery(query))
+
+		if(!mysql->executeQuery(query))
 			return false;
-		
+
 		streamitems.str("");
 		itemsstring = "";
 	}
-	
+
 	//save storage map
 	query.reset();
 	query << "DELETE FROM playerstorage WHERE player='"<< player->getGUID() << "'";
-	
-	if(!mysql.executeQuery(query))
+
+	if(!mysql->executeQuery(query))
 		return false;
-	
-	query << "INSERT INTO `playerstorage` (`player` , `key` , `value` ) VALUES"; 
+
+	query << "INSERT INTO `playerstorage` (`player` , `key` , `value` ) VALUES";
 	std::stringstream ss;
 	for(StorageMap::const_iterator cit = player->getStorageIteratorBegin(); cit != player->getStorageIteratorEnd();cit++){
 		ss << "(" << player->getGUID() <<","<< cit->first <<","<< cit->second<<"),";
+		#ifdef __USE_SQLITE__
+        //split into sub-queries
+        DBQuery subquery;
+        subquery << query.str();
+        itemsstring = ss.str();
+        itemsstring.erase(itemsstring.length()-1);
+        subquery << itemsstring;
+        if(!mysql->executeQuery(subquery))
+				return false;
+		streamitems.str("");
+        #endif
 	}
-
+    #ifndef __USE_SQLITE__
 	std::string ststring = ss.str();
 	if(ststring.length()){
 		ststring.erase(ststring.length()-1);
 		query << ststring;
-		
-		if(!mysql.executeQuery(query))
+
+		if(!mysql->executeQuery(query))
 			return false;
 	}
-	
+    #endif
+
 	//save vip list
 	query.reset();
 	query << "DELETE FROM `viplist` WHERE player='"<< player->getGUID() << "'";
-	
-	if(!mysql.executeQuery(query))
+
+	if(!mysql->executeQuery(query))
 		return false;
-	
-	query << "INSERT INTO `viplist` (`player` , `vip_id` ) VALUES"; 
+
+	query << "INSERT INTO `viplist` (`player` , `vip_id` ) VALUES";
 	std::stringstream ss2;
 	for(VIPListSet::iterator it = player->VIPList.begin(); it != player->VIPList.end(); it++){
 		ss2 << "(" << player->getGUID() <<","<< *it <<"),";
+		#ifdef __USE_SQLITE__
+        //split into sub-queries
+        DBQuery subquery;
+        subquery << query.str();
+        itemsstring = ss2.str();
+        itemsstring.erase(itemsstring.length()-1);
+        subquery << itemsstring;
+        if(!mysql->executeQuery(subquery))
+				return false;
+		streamitems.str("");
+        #endif
 	}
-
+    #ifndef __USE_SQLITE__
 	ststring = ss2.str();
 	if(ststring.length()){
 		ststring.erase(ststring.length()-1);
 		query << ststring;
-		
-		if(!mysql.executeQuery(query))
+
+		if(!mysql->executeQuery(query))
 			return false;
 	}
-	
+    #endif
 	//End the transaction
 	query.reset();
 	query << "COMMIT;";
-	
-	if(!mysql.executeQuery(query))
+
+	if(!mysql->executeQuery(query))
 		return false;
 
 	return true;
@@ -547,12 +619,12 @@ std::string IOPlayerSQL::getItems(Item* i, int &startid, int slot, int player,in
 	++startid;
 	std::stringstream ss;
 
-	ss << "(" << player <<"," << slot << ","<< startid <<","<< parentid <<"," << i->getID()<<","<< (int)i->getItemCountOrSubtype() << "," << 
+	ss << "(" << player <<"," << slot << ","<< startid <<","<< parentid <<"," << i->getID()<<","<< (int)i->getItemCountOrSubtype() << "," <<
 	(int)i->getActionId()<<",'"<< Database::escapeString(i->getText()) <<"','" << Database::escapeString(i->getSpecialDescription()) <<"'),";
 
 	//std::cout << "i";
 	if(Container* c = i->getContainer()){
-		//std::cout << "c";	
+		//std::cout << "c";
 		int pid = startid;
 		for(int i = 0; i < c->size(); i++){
 			Item* item = c->getItem(i);
@@ -575,10 +647,10 @@ bool IOPlayerSQL::storeNameByGuid(Database &mysql, unsigned long guid)
 		return true;
 
 	query << "SELECT name FROM players WHERE id='" << guid << "'";
-	
+
 	if(!mysql.storeQuery(query, result) || result.getNumRows() != 1)
 		return false;
-		
+
 	nameCacheMap[guid] = result.getDataString("name");
 	return true;
 }
@@ -590,9 +662,9 @@ bool IOPlayerSQL::getNameByGuid(unsigned long guid, std::string &name)
 		name = it->second;
 		return true;
 	}
-	
-	Database mysql;	
-	if(!mysql.connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str())){
+
+	Database* mysql = Database::instance();
+	if(!mysql->connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str())){
 		return false;
 	}
 
@@ -600,12 +672,12 @@ bool IOPlayerSQL::getNameByGuid(unsigned long guid, std::string &name)
 	DBResult result;
 
 	query << "SELECT name FROM players WHERE id='" << guid << "'";
-	if(!mysql.storeQuery(query, result) || result.getNumRows() != 1)
+	if(!mysql->storeQuery(query, result) || result.getNumRows() != 1)
 		return false;
-	
+
 	name = result.getDataString("name");
 	nameCacheMap[guid] = name;
-	
+
 	return true;
 }
 
@@ -617,22 +689,22 @@ bool IOPlayerSQL::getGuidByName(unsigned long &guid, std::string &name)
 		guid = it->second;
 		return true;
 	}
-	
-	Database mysql;
-	if(!mysql.connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str())){
+
+	Database* mysql = Database::instance();
+	if(!mysql->connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str())){
 		return false;
 	}
-	
+
 	DBQuery query;
 	DBResult result;
 
-	query << "SELECT name,id FROM players WHERE name='" << Database::escapeString(name) << "'";	
-	if(!mysql.storeQuery(query, result) || result.getNumRows() != 1)
+	query << "SELECT name,id FROM players WHERE name='" << Database::escapeString(name) << "'";
+	if(!mysql->storeQuery(query, result) || result.getNumRows() != 1)
 		return false;
-	
+
 	name = result.getDataString("name");
 	guid = result.getDataInt("id");
-	
+
 	guidCacheMap[name] = guid;
 	return true;
 }
@@ -640,18 +712,18 @@ bool IOPlayerSQL::getGuidByName(unsigned long &guid, std::string &name)
 
 bool IOPlayerSQL::getGuidByNameEx(unsigned long &guid, unsigned long &alvl, std::string &name)
 {
-	Database mysql;
-	if(!mysql.connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str())){
+	Database* mysql = Database::instance();
+	if(!mysql->connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str())){
 		return false;
 	}
-	
+
 	DBQuery query;
 	DBResult result;
 
-	query << "SELECT name,id,access FROM players WHERE name='" << Database::escapeString(name) << "'";	
-	if(!mysql.storeQuery(query, result) || result.getNumRows() != 1)
+	query << "SELECT name,id,access FROM players WHERE name='" << Database::escapeString(name) << "'";
+	if(!mysql->storeQuery(query, result) || result.getNumRows() != 1)
 		return false;
-	
+
 	name = result.getDataString("name");
 	guid = result.getDataInt("id");
 	alvl = result.getDataInt("access");
@@ -660,34 +732,34 @@ bool IOPlayerSQL::getGuidByNameEx(unsigned long &guid, unsigned long &alvl, std:
 
 bool IOPlayerSQL::getGuildIdByName(unsigned long &guildId, const std::string& guildName)
 {
-	Database mysql;
-	if(!mysql.connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str())){
+	Database* mysql = Database::instance();
+	if(!mysql->connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str())){
 		return false;
 	}
-	
+
 	DBQuery query;
 	DBResult result;
 
 	query << "SELECT guildid FROM guilds WHERE guildname='" << Database::escapeString(guildName) << "'";
-	if(!mysql.storeQuery(query, result) || result.getNumRows() != 1)
+	if(!mysql->storeQuery(query, result) || result.getNumRows() != 1)
 		return false;
-		
+
 	guildId = result.getDataInt("guildid");
 	return true;
 }
 
 bool IOPlayerSQL::playerExists(std::string name)
 {
-	Database mysql;
-	if(!mysql.connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str())){
+	Database* mysql = Database::instance();
+	if(!mysql->connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str())){
 		return false;
 	}
-	
+
 	DBQuery query;
 	DBResult result;
 
-	query << "SELECT name FROM players WHERE name='" << Database::escapeString(name) << "'";	
-	if(!mysql.storeQuery(query, result) || result.getNumRows() != 1)
+	query << "SELECT name FROM players WHERE name='" << Database::escapeString(name) << "'";
+	if(!mysql->storeQuery(query, result) || result.getNumRows() != 1)
 		return false;
 
 	return true;

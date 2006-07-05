@@ -15,7 +15,7 @@ houserentperiod = "monthly"
 
 -- mapkind
 -- OTBM for binary, SQL for SQL map, XML for OTX maps
-mapkind = "XML"
+mapkind = "OTBM"
 
 -- bans
 banIdentifier = "data/bans.xml"
@@ -96,6 +96,9 @@ allowclones = 0
 -- vocation names
 vocations = {"a sorcerer", "a druid", "a paladin", "a knight"}
 
+
+---SQLITE part
+sqlite_db	= "db.s3db"
 
 --- SQL part
 sql_host = "localhost"

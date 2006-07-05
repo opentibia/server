@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// 
+//
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -28,7 +28,7 @@
 
 #ifdef __MYSQL_ALT_INCLUDE__
 #include <mysql.h>
-#else
+#elif defined __USE_MYSQL__
 #include <mysql/mysql.h>
 #endif
 #include <sstream>
@@ -55,21 +55,22 @@ class DBQuery : public std::stringstream
 public:
 	DBQuery(){first = true;};
 	~DBQuery(){};
-	
+
 	/** Reset the actual query */
 	void reset(){ this->str(""); first = true;};
-	
+
 	/** Get the text of the query
 	*\returns The text of the actual query
 	*/
 	const char *getText(){ return this->str().c_str(); };
-	
+
 	/** Get size of the query text
 	*\returns The size of the query text
 	*/
 	int getSize(){ return (int)this->str().length(); };
-	
+
 	std::string getSeparator(){
+	    #ifndef __USE_SQLITE__
 		if(first){
 			first = false;
 			return "";
@@ -77,6 +78,9 @@ public:
 		else{
 			return ",";
 		}
+		#else
+		return "";
+		#endif
 	}
 protected:
 	bool first;
@@ -87,28 +91,28 @@ class DBResult
 public:
 	DBResult();
 	~DBResult();
-	
+
 	/** Get the Integer value of a field in database
 	*\returns The Integer value of the selected field and row
 	*\param s The name of the field
 	*\param nrow The number of the row
-	*/ 
+	*/
 	int getDataInt(const std::string &s, unsigned int nrow=0);
-	
+
 	/** Get the Long value of a field in database
 	*\returns The Long value of the selected field and row
 	*\param s The name of the field
 	*\param nrow The number of the row
 	*/
 	long getDataLong(const std::string &s, unsigned int nrow=0);
-	
+
 	/** Get the String of a field in database
 	*\returns The String of the selected field and row
 	*\param s The name of the field
 	*\param nrow The number of the row
 	*/
 	std::string getDataString(const std::string &s, unsigned int nrow=0);
-	
+
 	/** Get the blob of a field in database
 	*\returns a PropStream that is initiated with the blob data field, if not exist it returns NULL.
 	*\param s The name of the field
@@ -120,23 +124,29 @@ public:
 	*\returns The number of rows
 	*/
 	unsigned int getNumRows(){ return m_numRows; };
-	
+
 	/** Get the number of fields
 	*\returns The number of fields
 	*/
 	unsigned int getNumFields(){ return m_numFields; };
-	
+
 private:
-	friend class Database;
+    friend class Database;
+	#ifdef __USE_MYSQL__
+	friend class DatabaseMySQL;
 	void addRow(MYSQL_ROW r, unsigned long* lengths, unsigned int num_fields);
+	#else
+	friend class DatabaseSqLite;
+	void addRow(char **results, unsigned int num_fields);
+	#endif
 	void clear();
 	//void clearRows();
 	//void clearFieldNames();
 	void setFieldName(const std::string &s, unsigned int n){
-		m_listNames[s] = n; 
+		m_listNames[s] = n;
 		m_numFields++;
 	};
-	
+
 	unsigned int m_numFields;
 	//unsigned int m_lastNumFields;
 	unsigned int m_numRows;
@@ -144,7 +154,7 @@ private:
 	listNames_type m_listNames;
 	//typedef std::map<unsigned int, char **> RowDataMap;
 	typedef std::map<unsigned int, RowData* > RowDataMap;
-	RowDataMap m_listRows;	
+	RowDataMap m_listRows;
 };
 
 class DBError
@@ -155,17 +165,17 @@ public:
 		m_type = type;
 	};
 	~DBError(){};
-	
+
 	/** Get the error message
 	*\returns The text message
 	*/
 	const char *getMsg(){ return m_msg.c_str(); };
-	
+
 	/** Get the error type
 	*\returns The error type
 	*/
 	int getType(){ return m_type; };
-	
+
 private:
 	std::string m_msg;
 	int m_type;
@@ -175,8 +185,8 @@ private:
 class Database
 {
 public:
-	Database();
-	~Database();
+
+    static Database* instance();
 
 	/** Connect to a mysql database
 	*\returns
@@ -186,58 +196,49 @@ public:
 	*\param db_host The "host" to connect to
 	*\param db_user The "username" used in the connection
 	*\param db_pass The "password" of the username used
-	*/ 
-	bool connect(const char *db_name, const char *db_host, const char *db_user, const char *db_pass);
+	*/
+	virtual bool connect(const char *db_name, const char *db_host, const char *db_user, const char *db_pass){};
 
 	/** Disconnects from the connected database
 	*\returns
 	* 	TRUE if the database was disconnected
 	* 	FALSE if the database was not disconnected or no database selected
-	*/ 
-	bool disconnect();
-	
+	*/
+	virtual bool disconnect(){};
+
 	/** Execute a query which don't get any information of the database (for ex.: INSERT, UPDATE, etc)
 	*\returns
 	* 	TRUE if the query is ok
 	* 	FALSE if the query fails
 	*\ref q The query object
-	*/ 
-	bool executeQuery(DBQuery &q);
-	
+	*/
+	virtual bool executeQuery(DBQuery &q ){};
+
 	/** Store a query which get information of the database (for ex.: SELECT)
 	*\returns
 	* 	TRUE if the query is ok
 	* 	FALSE if the query fails
 	*\ref q The query object
 	*\ref res The DBResult object where to insert the results of the query
-	*/ 
-	bool storeQuery(DBQuery &q, DBResult &res);
-	
+	*/
+	virtual bool storeQuery(DBQuery &q, DBResult &res){};
+
 	/** Escape the special characters in a string for no problems with the query
 	*\returns The string modified
 	*\param s The source string
 	*/
 	static std::string escapeString(const std::string &s);
-	
+
 	/** Escape the special characters in a string for no problems with the query
 	*\returns The string modified
 	*\param s The source string
 	*/
 	static std::string escapeString(const char* s, unsigned long size);
 
-private:
-
-	/** initialize the database
-	*\returns
-	* 	TRUE if the database was successfully initialized
-	* 	FALSE if the database was not successfully initialized
-	*/ 
-	bool init();
-
-	bool m_initialized;
-	bool m_connected;
-	MYSQL m_handle;
+protected:
+	Database(){};
+	virtual ~Database(){};
+	static Database* _instance;
 };
-
 
 #endif

@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -51,7 +51,7 @@ public:
 	Range(Position centerpos, bool multilevel = false){
 		setRange(centerpos, multilevel);
 	}
-	
+
 	//Creates a union of 2 positions
 	//Should only be used when a player makes a move.
 	Range(const Position& pos1, const Position& pos2)
@@ -83,7 +83,7 @@ public:
 	Position minRange;
 	Position maxRange;
 
-	int zstep;	
+	int zstep;
 	bool multilevel;
 
 private:
@@ -94,14 +94,14 @@ private:
 	void setRange(Position pos, bool multilevel = false)
 	{
 		centerpos = pos;
-		
+
 		//This is the maximum view that the viewer AND the viewers that is seeing the viewer :o
 		minRange.x = -9;
 		minRange.y = -7;
-		
+
 		maxRange.x = 9;
 		maxRange.y = 7;
-		
+
 		zstep = 1;
 
 		if(multilevel){
@@ -187,7 +187,7 @@ class Map
 public:
 	Map();
 	~Map();
-    
+
 	/**
 	* Load a map.
 	* \param identifier file/database to load
@@ -209,10 +209,10 @@ public:
 	*/
 	Tile* getTile(uint16_t _x, uint16_t _y, uint8_t _z);
 	Tile* getTile(const Position &pos);
-    
+
 	/**
 	* Set a single tile.
-	* \param a tile to set for the 
+	* \param a tile to set for the
 	*/
 	void setTile(uint16_t _x, uint16_t _y, uint8_t _z, Tile* newtile);
 
@@ -223,7 +223,7 @@ public:
   * \param forceLogin If true, placing the creature will not fail becase of obstacles (creatures/chests)
 	*/
 	bool placeCreature(const Position &pos, Creature* creature, bool forceLogin = false);
-	
+
 	/**
 	* Remove a creature from the map.
 	* \param c Creature pointer to the creature to remove
@@ -253,7 +253,7 @@ public:
 
 	/* Map Width and Height - for Info purposes */
 	int mapwidth, mapheight;
-	
+
 	MapError_t getLastError() {return lasterrortype;}
 	int getErrorCode() {return lasterrorcode;}
 
@@ -275,7 +275,7 @@ protected:
 	/**
 	* Get the Creatures within a specific Range */
 	void getSpectators(const Range& range, SpectatorVec& list);
-    
+
 	typedef std::map<unsigned long, Tile*> TileMap;
 	TileMap tileMaps[128][128];
 
@@ -286,7 +286,7 @@ protected:
 	friend class IOMap;
 	friend class IOMapSerializeXML;
 
-#ifdef __USE_MYSQL__
+#if defined __USE_MYSQL__ || defined __USE_SQLITE__
 	friend class IOMapSerializeSQL;
 #endif
 };

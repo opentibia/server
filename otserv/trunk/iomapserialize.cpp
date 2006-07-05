@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -20,7 +20,7 @@
 
 #include "iomapserialize.h"
 
-#ifdef __USE_MYSQL__
+#if defined __USE_MYSQL__ || defined __USE_SQLITE__
 #include "iomapserializesql.h"
 #else
 #include "iomapserializexml.h"
@@ -33,7 +33,7 @@ IOMapSerialize* IOMapSerialize::_instance = NULL;
 IOMapSerialize* IOMapSerialize::getInstance()
 {
 	if(!_instance){
-#ifdef __USE_MYSQL__
+#if defined __USE_MYSQL__ || defined __USE_SQLITE__
 		_instance = new IOMapSerializeSQL;
 #else
 		_instance = new IOMapSerializeXML;

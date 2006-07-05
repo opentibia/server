@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// 
+//
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -35,7 +35,7 @@ class ConfigManager {
 public:
 	ConfigManager();
 	~ConfigManager();
-	
+
 	enum string_config_t {
 		CONFIG_FILE = 0,
 		DATA_DIRECTORY,
@@ -59,13 +59,14 @@ public:
 		SQL_USER,
 		SQL_PASS,
 		SQL_DB,
+		SQLITE_DB,
 		MAP_HOST,
 		MAP_USER,
 		MAP_PASS,
 		MAP_DB,
 		LAST_STRING_CONFIG /* this must be the last one */
 	};
-	
+
 	enum integer_config_t {
 		LOGIN_TRIES = 0,
 		RETRY_TIMEOUT,
@@ -83,21 +84,21 @@ public:
 		RATE_MAGIC,
 		LAST_INTEGER_CONFIG /* this must be the last one */
 	};
-	
-	
+
+
 	bool loadFile(const std::string& _filename);
 	bool reload();
 	std::string getString(int _what) { return m_confString[_what]; };
 	int getNumber(int _what);
 	std::string getVocationString(int _vocation) { return m_confVocationString[_vocation-1]; };
-	
+
 	bool setNumber(int _what, int _value);
-	
+
 private:
 	std::string getGlobalString(lua_State* _L, const std::string& _identifier, const std::string& _default="");
 	int getGlobalNumber(lua_State* _L, const std::string& _identifier, const int _default=0);
 	std::string getGlobalStringField(lua_State* _L, const std::string& _identifier, const int _key, const std::string& _default="");
-	
+
 	bool m_isLoaded;
 	std::string m_confString[LAST_STRING_CONFIG];
 	int m_confInteger[LAST_INTEGER_CONFIG];

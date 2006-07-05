@@ -212,14 +212,14 @@ protected:
 
 class PropWriteStream{
 public:
-	PropWriteStream(){buffer = (char*)malloc(32*sizeof(char)); buffer_size = 32; size = 0;}
+	PropWriteStream(){buffer = (char*)malloc(32*sizeof(char)); buffer_size = 32; size = 0; memset(buffer, 0, 32*sizeof(char));}
 	~PropWriteStream(){free(buffer);};
 
 	char* getStream(unsigned long& _size) const{
 		_size = size;
 		return buffer;
 	}
-
+    //TODO: might need temp buffer and zero fill the memory chunk allocated by realloc
 	template <typename T>
 	inline void ADD_TYPE(T* add){
 		if((buffer_size - size) < sizeof(T)){
