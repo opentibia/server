@@ -68,14 +68,14 @@ bool Vocations::loadFromXml(const std::string& datadir)
 					if(readXMLInteger(p, "gainhpticks", intVal)){
 						voc->gainHealthTicks = intVal;
 					}
-					if(readXMLInteger(p, "gainhpammount", intVal)){
-						voc->gainHealthAmmount = intVal;
+					if(readXMLInteger(p, "gainhpamount", intVal)){
+						voc->gainHealthAmount = intVal;
 					}
 					if(readXMLInteger(p, "gainmanaticks", intVal)){
 						voc->gainManaTicks = intVal;
 					}
-					if(readXMLInteger(p, "gainmanaammount", intVal)){
-						voc->gainManaAmmount = intVal;
+					if(readXMLInteger(p, "gainmanaamount", intVal)){
+						voc->gainManaAmount = intVal;
 					}
 					if(readXMLFloat(p, "manamultiplier", floatVal)){
 						voc->manaMultiplier = floatVal;
@@ -137,9 +137,9 @@ Vocation::Vocation()
 {
 	name = "none";
 	gainHealthTicks = 6;
-	gainHealthAmmount = 1;
+	gainHealthAmount = 1;
 	gainManaTicks = 6;
-	gainManaAmmount = 1;
+	gainManaAmount = 1;
 	gainCap = 5;
 	gainMana = 5;
 	gainHP = 5;
@@ -202,8 +202,8 @@ void Vocation::debugVocation()
 {
 	std::cout << "name: " << name << std::endl;
 	std::cout << "gain cap: " << gainCap << " hp: " << gainHP << " mana: " << gainMana << std::endl;
-	std::cout << "gain time: Healht(" << gainHealthTicks << " ticks, +" << gainHealthAmmount << "). Mana(" << 
-		gainManaTicks << " ticks, +" << gainManaAmmount << ")" << std::endl;
+	std::cout << "gain time: Healht(" << gainHealthTicks << " ticks, +" << gainHealthAmount << "). Mana(" << 
+		gainManaTicks << " ticks, +" << gainManaAmount << ")" << std::endl;
 	std::cout << "mana multiplier: " << manaMultiplier << std::endl;
 	for(int i = SKILL_FIRST; i < SKILL_LAST; ++i){
 		std::cout << "Skill id: " << i << " multiplier: " << skillMultipliers[i] << std::endl;

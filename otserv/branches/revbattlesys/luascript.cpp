@@ -1423,20 +1423,18 @@ int LuaScriptInterface::luaDoPlayerAddItem(lua_State *L)
 		
 		if(newItem->getParent()){
 			uid = env->addThing((Thing*)newItem);
+			lua_pushnumber(L, uid);
 		}
 		else{
 			//stackable item stacked with existing object, newItem will be released
-			lua_pushnumber(L, -1);
-			return 1;
+			lua_pushnumber(L, 0);
 		}
 	}
 	else{
 		lua_pushnumber(L, -1);
 		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
-		return 1;
 	}		
 
-	lua_pushnumber(L, uid);
 	return 1;
 }
 
@@ -1660,8 +1658,8 @@ int LuaScriptInterface::luaDoCreateItem(lua_State *L)
 	
 	Tile* tile = g_game.map->getTile(pos);
 	if(!tile){
-		lua_pushnumber(L, 0);
-		return 0;
+		lua_pushnumber(L, -1);
+		return 1;
 	}
 	
 	Item* newItem = Item::CreateItem(itemid, type);
@@ -1669,8 +1667,8 @@ int LuaScriptInterface::luaDoCreateItem(lua_State *L)
 	ReturnValue ret = g_game.internalAddItem(tile, newItem);
 	if(ret != RET_NOERROR){
 		delete newItem;
-		lua_pushnumber(L, 0);
-		return 0;
+		lua_pushnumber(L, -1);
+		return 1;
 	}
 	
 	if(newItem->getParent()){
@@ -1680,7 +1678,7 @@ int LuaScriptInterface::luaDoCreateItem(lua_State *L)
 	}
 	else{
 		//stackable item stacked with existing object, newItem will be released
-		lua_pushnumber(L, -1);
+		lua_pushnumber(L, 0);
 		return 1;
 	}
 }
@@ -2590,7 +2588,7 @@ int LuaScriptInterface::luaSetGlobalStorageValue(lua_State *L)
 
 int LuaScriptInterface::luaGetPlayerDepotItems(lua_State *L)
 {
-	//getPlayerDepotItems(cid, depotid)	
+	//getPlayerDepotItems(cid, depotid)
 	long depotid = popNumber(L);
 	unsigned long cid = (unsigned long)popNumber(L);
 	
@@ -2837,15 +2835,17 @@ int LuaScriptInterface::luaDoAddContainerItem(lua_State *L)
 		if(newItem->getParent()){
 			new_uid = env->addThing((Thing*)newItem);
 			lua_pushnumber(L, new_uid);
+			return 1;
 		}
 		else{
 			//stackable item stacked with existing object, newItem will be released
-			lua_pushnumber(L, -1);
+			lua_pushnumber(L, 0);
+			return 1;
 		}
 	}
 	else{
 		lua_pushnumber(L, -1);
 		reportErrorFunc(getErrorDesc(LUA_ERROR_CONTAINER_NOT_FOUND));
+		return 1;
 	}
-	return 1;
 }

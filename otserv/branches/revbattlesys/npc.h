@@ -27,36 +27,6 @@
 
 //////////////////////////////////////////////////////////////////////
 // Defines an NPC...
-
-/*
-class Npc;
-class NpcScript : protected LuaScript{
-public:
-	NpcScript(std::string name, Npc* npc);
-	virtual ~NpcScript(){}
-	virtual void onCreatureAppear(unsigned long cid);
-	virtual void onCreatureDisappear(int cid);
-
-	virtual void onCreatureSay(int cid, SpeakClasses, const std::string& text);
-	virtual void onThink();
-	static Npc* getNpc(lua_State *L);
-	static int luaActionSay(lua_State *L);
-	static int luaActionMove(lua_State *L);
-	static int luaActionMoveTo(lua_State *L);
-	static int luaCreatureGetName(lua_State *L);
-	static int luaCreatureGetName2(lua_State *L);
-	static int luaCreatureGetPos(lua_State *L);
-	static int luaSelfGetPos(lua_State *L);
-	
-	bool isLoaded(){return loaded;}
-
-protected:
-	int registerFunctions();
-	Npc* npc;
-	bool loaded;
-};
-*/
-
 class Npc;
 
 class NpcScriptInterface : public LuaScriptInterface

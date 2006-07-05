@@ -1837,7 +1837,7 @@ bool Player::gainManaTick()
 	}
 	else{
 		manaTick = 0;
-		manaGain = vocation->getManaGainAmmount();
+		manaGain = vocation->getManaGainAmount();
 		mana += std::min(manaGain, manaMax - mana);
 		return true;
 	}
@@ -1854,7 +1854,7 @@ bool Player::gainHealthTick()
 		}
 		else{
 			healthTick = 0;
-			healthGain = vocation->getHealthGainAmmount();
+			healthGain = vocation->getHealthGainAmount();
 		}
 		//health += std::min(healthGain, healthMax - health);
 		//g_game.changeCreatureHealth(creature, healthGain);

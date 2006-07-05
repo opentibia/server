@@ -37,10 +37,10 @@ public:
 	uint32_t getManaGain() const {return gainMana;};
 	uint32_t getCapGain() const {return gainCap;};
 	
-	uint32_t getManaGainTicks() const {return gainHealthTicks;};
-	uint32_t getManaGainAmmount() const {return gainManaAmmount;};
+	uint32_t getManaGainTicks() const {return gainManaTicks;};
+	uint32_t getManaGainAmount() const {return gainManaAmount;};
 	uint32_t getHealthGainTicks() const {return gainHealthTicks;};
-	uint32_t getHealthGainAmmount() const {return gainManaAmmount;};
+	uint32_t getHealthGainAmount() const {return gainHealthAmount;};
 	
 	void debugVocation();
 	
@@ -51,9 +51,9 @@ protected:
 	std::string name;
 	
 	uint32_t gainHealthTicks;
-	uint32_t gainHealthAmmount;
+	uint32_t gainHealthAmount;
 	uint32_t gainManaTicks;
-	uint32_t gainManaAmmount;
+	uint32_t gainManaAmount;
 
 	uint32_t gainCap;
 	uint32_t gainMana;
