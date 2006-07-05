@@ -73,7 +73,7 @@ public:
 
 	virtual bool isPushable() const { return true;};
 	
-	virtual unsigned long idRange(){ return 0x30000000;}
+	virtual unsigned long idRange(){ return 0x40000000;}
 	static AutoList<Npc> listNpc;
 	void removeList() {listNpc.removeList(getID());}
 	void addList() {listNpc.addList(this);}
