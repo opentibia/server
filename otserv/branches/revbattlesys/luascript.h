@@ -330,6 +330,7 @@ protected:
 	static int luaDoAreaCombatCondition(lua_State *L);
 
 	static int luaDebugPrint(lua_State *L);
+	static int luaIsInArray(lua_State *L);
 	//
 
 	static int internalGetPlayerInfo(lua_State *L, PlayerInfo_t info);

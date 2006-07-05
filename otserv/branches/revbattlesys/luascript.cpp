@@ -936,8 +936,11 @@ void LuaScriptInterface::registerFunctions()
 	//doTargetCombatMana(cid, combat, target, min, max)
 	lua_register(m_luaState, "doTargetCombatMana", LuaScriptInterface::luaDoTargetCombatMana);
 
+
 	//debugPrint(text)
 	lua_register(m_luaState, "debugPrint", LuaScriptInterface::luaDebugPrint);
+	//isInArray(array, value)
+	lua_register(m_luaState, "isInArray", LuaScriptInterface::luaIsInArray);
 	
 }
 
@@ -2807,5 +2810,41 @@ int LuaScriptInterface::luaDoAddContainerItem(lua_State *L)
 		reportErrorFunc(getErrorDesc(LUA_ERROR_CONTAINER_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
 		return 1;
+	}
+}
+
+int LuaScriptInterface::LuaScriptInterface::luaIsInArray(lua_State *L)
+{
+	//isInArray(array, value)
+	long value = (long)popNumber(L);
+	if(lua_istable(L, -1) == 0){
+		lua_pop(L, 1);
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+	
+	int i = 1;
+	while(1){
+		lua_pushnumber(L, i);
+		lua_gettable(L, -2);
+		if(lua_isnil(L, -1) == 1){
+			lua_pop(L, 2);
+			lua_pushnumber(L, LUA_FALSE);
+			return 1;
+		}
+		else if(lua_isnumber(L, -1) == 1){
+			long array_value = (long)popNumber(L);
+			if(array_value == value){
+				lua_pop(L, 1);
+				lua_pushnumber(L, LUA_TRUE);
+				return 1;
+			}
+		}
+		else{
+			lua_pop(L, 2);
+			lua_pushnumber(L, LUA_ERROR);
+			return 1;
+		}
+		++i;
 	}
 }
