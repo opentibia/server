@@ -947,7 +947,7 @@ void LuaScriptInterface::registerFunctions()
 
 int LuaScriptInterface::internalGetPlayerInfo(lua_State *L, PlayerInfo_t info)
 {
-	unsigned int cid = (unsigned int)popNumber(L);
+	unsigned long cid = (unsigned int)popNumber(L);
 	ScriptEnviroment* env = getScriptEnv();
 	int value;
 	
@@ -1117,7 +1117,7 @@ int LuaScriptInterface::luaDoPlayerRemoveItem(lua_State *L)
 	//doPlayerRemoveItem(cid,itemid,count)
 	long count = (unsigned char)popNumber(L);
 	unsigned short itemId = (unsigned short)popNumber(L);
-	unsigned int cid = (unsigned int)popNumber(L);
+	unsigned long cid = (unsigned long)popNumber(L);
 	
 	ScriptEnviroment* env = getScriptEnv();
 	
@@ -1141,7 +1141,7 @@ int LuaScriptInterface::luaDoFeedPlayer(lua_State *L)
 {	
 	//doFeedPlayer(uid,food)
 	int food = (int)popNumber(L);
-	unsigned int cid = (unsigned int)popNumber(L);
+	unsigned long cid = (unsigned long)popNumber(L);
 	
 	ScriptEnviroment* env = getScriptEnv();
 	
@@ -1161,7 +1161,7 @@ int LuaScriptInterface::luaDoSendCancel(lua_State *L)
 {	
 	//doSendCancel(uid,text)
 	const char * text = popString(L);
-	unsigned int cid = (unsigned int)popNumber(L);	
+	unsigned long cid = (unsigned long)popNumber(L);	
 	
 	ScriptEnviroment* env = getScriptEnv();
 	
@@ -1184,11 +1184,11 @@ int LuaScriptInterface::luaDoTeleportThing(lua_State *L)
 	Position pos;
 	long stackpos;
 	popPosition(L, pos, stackpos);
-	unsigned int id = (unsigned int)popNumber(L);	
+	unsigned long uid = (unsigned long)popNumber(L);	
 	
 	ScriptEnviroment* env = getScriptEnv();
 	
-	Thing* tmp = env->getThingByUID(id);
+	Thing* tmp = env->getThingByUID(uid);
 	if(!tmp){
 		reportErrorFunc(getErrorDesc(LUA_ERROR_THING_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
@@ -1210,11 +1210,11 @@ int LuaScriptInterface::luaDoTransformItem(lua_State *L)
 {
 	//doTransformItem(uid,toitemid)	
 	unsigned int toId = (unsigned int)popNumber(L);	
-	unsigned int itemid = (unsigned int)popNumber(L);	
+	unsigned long uid = (unsigned long)popNumber(L);	
 	
 	ScriptEnviroment* env = getScriptEnv();
 	
-	Item* item = env->getItemByUID(itemid);
+	Item* item = env->getItemByUID(uid);
 	if(item){
 		g_game.transformItem(item, toId);
 		lua_pushnumber(L, LUA_NO_ERROR);
@@ -1231,7 +1231,7 @@ int LuaScriptInterface::luaDoPlayerSay(lua_State *L)
 	//doPlayerSay(uid,text,type)
 	int type = (int)popNumber(L);	
 	const char * text = popString(L);
-	unsigned int cid = (unsigned int)popNumber(L);
+	unsigned long cid = (unsigned long)popNumber(L);
 					
 	ScriptEnviroment* env = getScriptEnv();
 	
@@ -1280,11 +1280,11 @@ int LuaScriptInterface::luaDoChangeTypeItem(lua_State *L)
 {
 	//doChangeTypeItem(uid,new_type)
 	unsigned int subtype = (unsigned int)popNumber(L);	
-	unsigned int itemid = (unsigned int)popNumber(L);
+	unsigned long uid = (unsigned long)popNumber(L);
 	
 	ScriptEnviroment* env = getScriptEnv();
 	
-	Item* item = env->getItemByUID(itemid);
+	Item* item = env->getItemByUID(uid);
 	if(item){
 		g_game.transformItem(item, item->getID(), subtype);
 		lua_pushnumber(L, LUA_NO_ERROR);
@@ -1302,7 +1302,7 @@ int LuaScriptInterface::luaDoPlayerAddSkillTry(lua_State *L)
 	//doPlayerAddSkillTry(uid,skillid,n)
 	int n = (int)popNumber(L);
 	int skillid = (int)popNumber(L);
-	unsigned int cid = (unsigned int)popNumber(L);
+	unsigned long cid = (unsigned long)popNumber(L);
 	
 	ScriptEnviroment* env = getScriptEnv();
 	
@@ -1324,7 +1324,7 @@ int LuaScriptInterface::luaDoPlayerAddHealth(lua_State *L)
 	//doPlayerAddHealth(uid,health)
 	//doCreatureAddHealth(uid,health)
 	int addhealth = (int)popNumber(L);
-	unsigned int cid = (unsigned int)popNumber(L);
+	unsigned long cid = (unsigned long)popNumber(L);
 	
 	ScriptEnviroment* env = getScriptEnv();
 	
@@ -1368,7 +1368,7 @@ int LuaScriptInterface::luaDoPlayerAddMana(lua_State *L)
 {
 	//doPlayerAddMana(uid,mana)
 	int addmana = (int)popNumber(L);
-	unsigned int cid = (unsigned int)popNumber(L);
+	unsigned long cid = (unsigned long)popNumber(L);
 	
 	ScriptEnviroment* env = getScriptEnv();
 	
@@ -1390,7 +1390,7 @@ int LuaScriptInterface::luaDoPlayerAddItem(lua_State *L)
 	//doPlayerAddItem(uid,itemid,count or type)
 	int type = (int)popNumber(L);
 	int itemid = (int)popNumber(L);
-	unsigned int cid = (unsigned int)popNumber(L);
+	unsigned long cid = (unsigned long)popNumber(L);
 	
 	ScriptEnviroment* env = getScriptEnv();
 	unsigned int uid;
@@ -1432,7 +1432,7 @@ int LuaScriptInterface::luaDoPlayerSendTextMessage(lua_State *L)
 	//doPlayerSendTextMessage(uid,MessageClasses,message)
 	const char * text = popString(L);
 	unsigned char messageClass = (unsigned char)popNumber(L);
-	unsigned int cid = (unsigned int)popNumber(L);
+	unsigned long cid = (unsigned long)popNumber(L);
 	
 	ScriptEnviroment* env = getScriptEnv();
 	
@@ -1482,7 +1482,7 @@ int LuaScriptInterface::luaGetPlayerSkill(lua_State *L)
 {
 	//getPlayerSkill(uid,skillid)
 	unsigned char skillid = (unsigned int)popNumber(L);
-	unsigned int cid = (unsigned int)popNumber(L);
+	unsigned long cid = (unsigned long)popNumber(L);
 	
 	ScriptEnviroment* env = getScriptEnv();
 	
@@ -1510,7 +1510,7 @@ int LuaScriptInterface::luaDoShowTextWindow(lua_State *L)
 	//TODO
 	/*bool canWrite = */(popNumber(L) != 0);
 	/*unsigned short maxlen = */(unsigned short)popNumber(L);
-	/*unsigned int uid = */(unsigned int)popNumber(L);
+	/*unsigned long uid = */(unsigned long)popNumber(L);
 	/*
 	ScriptEnviroment* env = getScriptEnv();
 	
@@ -1537,7 +1537,7 @@ int LuaScriptInterface::luaDoShowTextWindow(lua_State *L)
 int LuaScriptInterface::luaGetItemRWInfo(lua_State *L)
 {
 	//getItemRWInfo(uid)
-	unsigned int uid = (unsigned int)popNumber(L);
+	unsigned long uid = (unsigned long)popNumber(L);
 	
 	ScriptEnviroment* env = getScriptEnv();
 	
@@ -1557,7 +1557,7 @@ int LuaScriptInterface::luaDoDecayItem(lua_State *L)
 {
 	//doDecayItem(uid)
 	//Note: to stop decay set decayTo = 0 in items.xml
-	unsigned int uid = (unsigned int)popNumber(L);	
+	unsigned long uid = (unsigned long)popNumber(L);	
 	
 	ScriptEnviroment* env = getScriptEnv();
 	
@@ -1671,7 +1671,7 @@ int LuaScriptInterface::luaGetPlayerStorageValue(lua_State *L)
 {
 	//getPlayerStorageValue(cid,valueid)
 	unsigned long key = (unsigned int)popNumber(L);
-	unsigned int cid = (unsigned int)popNumber(L);
+	unsigned long cid = (unsigned long)popNumber(L);
 	
 	ScriptEnviroment* env = getScriptEnv();
 	
@@ -1697,7 +1697,7 @@ int LuaScriptInterface::luaSetPlayerStorageValue(lua_State *L)
 	//setPlayerStorageValue(cid,valueid, newvalue)
 	long value = (unsigned int)popNumber(L);
 	unsigned long key = (unsigned int)popNumber(L);
-	unsigned int cid = (unsigned int)popNumber(L);
+	unsigned long cid = (unsigned long)popNumber(L);
 	
 	ScriptEnviroment* env = getScriptEnv();
 	
@@ -1717,11 +1717,11 @@ int LuaScriptInterface::luaDoSetItemActionId(lua_State *L)
 {
 	//doSetItemActionId(uid,actionid)
 	unsigned int actionid = (unsigned int)popNumber(L);	
-	unsigned int itemid = (unsigned int)popNumber(L);
+	unsigned long uid = (unsigned long)popNumber(L);
 	
 	ScriptEnviroment* env = getScriptEnv();
 	
-	Item* item = env->getItemByUID(itemid);	
+	Item* item = env->getItemByUID(uid);	
 	if(item){
 		item->setActionId(actionid);
 		lua_pushnumber(L, LUA_NO_ERROR);
@@ -1737,11 +1737,11 @@ int LuaScriptInterface::luaDoSetItemText(lua_State *L)
 {
 	//doSetItemText(uid,text)
 	const char *text = popString(L);
-	unsigned int itemid = (unsigned int)popNumber(L);	
+	unsigned long uid = (unsigned long)popNumber(L);	
 	
 	ScriptEnviroment* env = getScriptEnv();
 	
-	Item* item = env->getItemByUID(itemid);
+	Item* item = env->getItemByUID(uid);
 	if(item){
 		std::string str(text);
 		item->setText(str);
@@ -1758,11 +1758,11 @@ int LuaScriptInterface::luaDoSetItemSpecialDescription(lua_State *L)
 {
 	//doSetItemSpecialDescription(uid,desc)
 	const char *desc = popString(L);
-	unsigned int itemid = (unsigned int)popNumber(L);
+	unsigned long uid = (unsigned long)popNumber(L);
 	
 	ScriptEnviroment* env = getScriptEnv();
 	
-	Item* item = env->getItemByUID(itemid);
+	Item* item = env->getItemByUID(uid);
 	if(item){
 		std::string str(desc);
 		item->setSpecialDescription(str);
@@ -1868,9 +1868,9 @@ int LuaScriptInterface::luaDoSummonCreature(lua_State *L){
 
 int LuaScriptInterface::luaDoPlayerRemoveMoney(lua_State *L)
 {
-	//doPlayerRemoveMoney(uid,money)
+	//doPlayerRemoveMoney(cid,money)
 	int money = (int)popNumber(L);
-	unsigned int cid = (unsigned int)popNumber(L);	
+	unsigned long cid = (unsigned long)popNumber(L);	
 					
 	ScriptEnviroment* env = getScriptEnv();
 	
@@ -1896,7 +1896,7 @@ int LuaScriptInterface::luaDoPlayerSetMasterPos(lua_State *L)
 	Position pos;
 	long stackpos;
 	popPosition(L, pos, stackpos);
-	unsigned int cid = (unsigned int)popNumber(L);
+	unsigned long cid = (unsigned long)popNumber(L);
 	
 	ScriptEnviroment* env = getScriptEnv();
 	
@@ -1916,7 +1916,7 @@ int LuaScriptInterface::luaDoPlayerSetVocation(lua_State *L)
 {
 	//doPlayerSetVocation(cid,voc)
 	int voc = (int)popNumber(L);
-	unsigned int cid = (unsigned int)popNumber(L);
+	unsigned long cid = (unsigned long)popNumber(L);
 	
 	ScriptEnviroment* env = getScriptEnv();
 	
@@ -1945,7 +1945,7 @@ int LuaScriptInterface::luaDoPlayerAddSoul(lua_State *L)
 {
 	//doPlayerAddSoul(cid,soul)
 	/*int addsoul = */(int)popNumber(L);
-	unsigned int cid = (unsigned int)popNumber(L);
+	unsigned long cid = (unsigned long)popNumber(L);
 	
 	ScriptEnviroment* env = getScriptEnv();
 	
@@ -1966,7 +1966,7 @@ int LuaScriptInterface::luaGetPlayerItemCount(lua_State *L)
 {
 	//getPlayerItemCount(cid,itemid)
 	unsigned short itemId = (unsigned short)popNumber(L);
-	unsigned int cid = (unsigned int)popNumber(L);
+	unsigned long cid = (unsigned long)popNumber(L);
 	
 	ScriptEnviroment* env = getScriptEnv();
 	
@@ -2101,7 +2101,7 @@ int LuaScriptInterface::luaGetWorldUpTime(lua_State *L)
 int LuaScriptInterface::luaGetPlayerLight(lua_State *L)
 {
 	//getPlayerLight(cid)
-	unsigned int cid = (unsigned int)popNumber(L);
+	unsigned long cid = (unsigned long)popNumber(L);
 	
 	ScriptEnviroment* env = getScriptEnv();
 	Player* player = env->getPlayerByUID(cid);
@@ -2123,7 +2123,7 @@ int LuaScriptInterface::luaDoPlayerAddExp(lua_State *L)
 {
 	//doPlayerAddExp(cid,exp)
 	int exp = (int)popNumber(L);
-	unsigned int cid = (unsigned int)popNumber(L);
+	unsigned long cid = (unsigned long)popNumber(L);
 	
 	ScriptEnviroment* env = getScriptEnv();
 	Player* player = env->getPlayerByUID(cid);
@@ -2523,7 +2523,7 @@ int LuaScriptInterface::luaDoAreaCombatCondition(lua_State *L)
 int LuaScriptInterface::luaGetGlobalStorageValue(lua_State *L)
 {
 	//getGlobalStorageValue(valueid)
-	unsigned long key = (unsigned int)popNumber(L);
+	unsigned long key = (unsigned long)popNumber(L);
 	
 	ScriptEnviroment* env = getScriptEnv();
 	
@@ -2540,8 +2540,8 @@ int LuaScriptInterface::luaGetGlobalStorageValue(lua_State *L)
 int LuaScriptInterface::luaSetGlobalStorageValue(lua_State *L)
 {
 	//setGlobalStorageValue(valueid, newvalue)
-	long value = (unsigned int)popNumber(L);
-	unsigned long key = (unsigned int)popNumber(L);
+	long value = (long)popNumber(L);
+	unsigned long key = (unsigned long)popNumber(L);
 	
 	ScriptEnviroment* env = getScriptEnv();
 	env->addGlobalStorageValue(key,value);
@@ -2779,7 +2779,7 @@ int LuaScriptInterface::luaDoAddContainerItem(lua_State *L)
 	//doAddContainerItem(uid, itemid, count or subtype)
 	int type = (int)popNumber(L);
 	int itemid = (int)popNumber(L);
-	unsigned int uid = (unsigned int)popNumber(L);
+	unsigned long uid = (unsigned long)popNumber(L);
 	
 	ScriptEnviroment* env = getScriptEnv();
 	unsigned long new_uid;
