@@ -5,15 +5,15 @@ function onUse(cid, item, frompos, item2, topos)
 		else
 			if item2.uid == cid then
 				doChangeTypeItem(item.uid, 0)
-				if item.type == 10 then
+				if item.type == 7 then
+					new_mana = math.random(80, 160)
+					doPlayerAddMana(cid, new_mana)
+					doSendMagicEffect(topos, 12)
+					doPlayerSay(cid, "Aaaah...", 1)
+				elseif item.type == 10 then
 					new_life = math.random(40, 80)
 					doPlayerAddHealth(cid, new_life)
-                    doSendMagicEffect(topos, 12)
-					doPlayerSay(cid, "Aaaah...", 1)
-				elseif item.type == 7 then
-					new_mana = math.random(200, 300)
-					doPlayerAddMana(cid, new_mana)
-                    doSendMagicEffect(topos, 12)
+					doSendMagicEffect(topos, 12)
 					doPlayerSay(cid, "Aaaah...", 1)
 				else
 					doPlayerSay(cid, "Gulp.", 1)
