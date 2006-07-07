@@ -20,8 +20,4 @@
 <command cmd="/getonline" access="1" />
 <command cmd="/a" access="1" />
 <command cmd="/kick" access="1" />
-<command cmd="/bans" access="1" />
-<command cmd="/gethouse" access="1" />
-<command cmd="/owner" access="1" />
-<command cmd="/sellhouse" access="1" />
 </commands>
