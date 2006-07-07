@@ -665,6 +665,7 @@ void LuaScriptInterface::pushThing(lua_State *L, Thing* thing, long thingid)
 			setField(L, "type", 0);
 
 		setField(L, "actionid", item->getActionId());
+		setField(L, "uniqueid", item->getUniqueId());
 	}
 	else if(thing && thing->getCreature()){
 		const Creature* creature = thing->getCreature();
@@ -682,12 +683,14 @@ void LuaScriptInterface::pushThing(lua_State *L, Thing* thing, long thingid)
 		}	
 		setField(L, "type", type);
 		setField(L, "actionid", 0);
+		setField(L, "uniqueid", 0);
 	}	
 	else{
 		setField(L, "uid", 0);
 		setField(L, "itemid", 0);
 		setField(L, "type", 0);
 		setField(L, "actionid", 0);
+		setField(L, "uniqueid", 0);
 	}
 }
 
@@ -2813,7 +2816,7 @@ int LuaScriptInterface::luaDoAddContainerItem(lua_State *L)
 	}
 }
 
-int LuaScriptInterface::LuaScriptInterface::luaIsInArray(lua_State *L)
+int LuaScriptInterface::luaIsInArray(lua_State *L)
 {
 	//isInArray(array, value)
 	long value = (long)popNumber(L);
