@@ -277,6 +277,14 @@ long ScriptEnviroment::addThing(Thing* thing)
 		newUid = creature->getID();
 	}
 	else{
+		if(Item* item = thing->getItem()){
+			long uid = item->getUniqueId();
+			if(uid && item->getTile() == item->getParent()){
+				m_localMap[uid] = thing;
+				return uid;
+			}
+		}
+		
 		++m_lastUID;
 		if(m_lastUID < 70000)
 			m_lastUID = 70000;
@@ -665,7 +673,6 @@ void LuaScriptInterface::pushThing(lua_State *L, Thing* thing, long thingid)
 			setField(L, "type", 0);
 
 		setField(L, "actionid", item->getActionId());
-		setField(L, "uniqueid", item->getUniqueId());
 	}
 	else if(thing && thing->getCreature()){
 		const Creature* creature = thing->getCreature();
@@ -683,14 +690,12 @@ void LuaScriptInterface::pushThing(lua_State *L, Thing* thing, long thingid)
 		}	
 		setField(L, "type", type);
 		setField(L, "actionid", 0);
-		setField(L, "uniqueid", 0);
 	}	
 	else{
 		setField(L, "uid", 0);
 		setField(L, "itemid", 0);
 		setField(L, "type", 0);
 		setField(L, "actionid", 0);
-		setField(L, "uniqueid", 0);
 	}
 }
 
