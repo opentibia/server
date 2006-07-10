@@ -19,7 +19,7 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "definitions.h"
-#include "const76.h"
+#include "const77.h"
 #include "player.h"
 #include "monster.h"
 #include "npc.h"

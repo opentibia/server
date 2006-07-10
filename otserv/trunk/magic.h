@@ -25,7 +25,7 @@
 #include "item.h"
 #include <map>
 
-#include "const76.h"
+#include "const77.h"
 class Creature;
 class Player;
 class Item;
