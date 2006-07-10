@@ -534,7 +534,7 @@ bool Game::placeCreature(const Position& pos, Creature* creature, bool isLogin /
 			creature->getParent()->postAddNotification(creature);
 
 			creature->eventCheck = addEvent(makeTask(500, boost::bind(&Game::checkCreature, this, creature->getID(), 500)));
-			creature->eventCheckAttacking = addEvent(makeTask(1500, boost::bind(&Game::checkCreatureAttacking, this, creature->getID(), 1500)));
+			creature->eventCheckAttacking = addEvent(makeTask(2000, boost::bind(&Game::checkCreatureAttacking, this, creature->getID(), 2000)));
 
 			/*
 			if(player){
