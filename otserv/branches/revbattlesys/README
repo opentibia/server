@@ -81,7 +81,7 @@ Features?
 How do I use this new stuff?
 	I'm just going over what might not be familiar to you here.
 
-	The words "actions" might be unfamiliar to you. What it is an action?
+	The word "actions" might be unfamiliar to you. What it is an action?
 	For instance when you click on a door it will open, or drinking mana-fluids.
 	(TODO: talk about movements/talkactions)
 	There is other cool stuff such as SQL-support, This is useful if you have a big community of
@@ -131,6 +131,8 @@ Credits?
 	Primer - Developer, SQL
 	Snack - Developer
 	j4K3xBl4sT3r - Developer
+	the fike - Developer (advisory/optimization status)
+	Vitor - Developer (advisory/optimization status)
 	Anstice - Developer
 	Pedro B. - Developer
 	GriZzm0 - Scripting
