@@ -8,26 +8,17 @@ datadir = "data/"
 
 -- map
 -- sets what map to load, if sql, determines the sql map
-map = "data/world/map.otbm"
+map = "data/world/map.otx"
 mapstore = "data/world/map-mapstore.xml"
 housestore = "data/world/map-housestore.xml"
 houserentperiod = "monthly"
 
 -- mapkind
 -- OTBM for binary, SQL for SQL map, XML for OTX maps
-mapkind = "OTBM"
+mapkind = "XML"
 
 -- bans
 banIdentifier = "data/bans.xml"
-
--- how many logins attempts until ip is temporary disabled (set to 0 to disable)
-logintries = 5
-
--- how long the retry timeout until a new login can be made (without disabling the ip)
-retrytimeout = 5000
-
--- how long the player need to wait until the ip is allowed again
-logintimeout = 15 * 60 * 1000
 
 -- loginmsg
 -- the message the player gets when he logs in
@@ -84,21 +75,12 @@ exhaustedadd = 200
 -- how long does the player has to stay out of fight to get pz unlocked in ms (1000 = 1sec)
 pzlocked = 5*60*1000
 
--- experience, skill and loot rate
-rate_exp = 1
-rate_skill = 1
-rate_mag = 1
-rate_loot = 1
-
 -- allow multiple logins of the same char
 allowclones = 0
 
 -- vocation names
 vocations = {"a sorcerer", "a druid", "a paladin", "a knight"}
 
-
----SQLITE part
-sqlite_db	= "db.s3db"
 
 --- SQL part
 sql_host = "localhost"
