@@ -346,7 +346,7 @@ bool IOPlayerSQL::savePlayer(Player* player)
 #endif
 
 	query << " WHERE `id` = "<< player->getGUID()
-	#ifdef __USE_MYSQL__
+	#ifndef __USE_SQLITE__
 	<<" LIMIT 1";
     #else
     ;
@@ -390,7 +390,7 @@ bool IOPlayerSQL::savePlayer(Player* player)
 
 		streamitems << "(" << player->getGUID() <<"," << slotid << ","<< runningID <<","<< parentid <<"," << item->getID()<<","<< (int)item->getItemCountOrSubtype() << "," <<
 			(int)item->getActionId()<<",'"<< Database::escapeString(item->getText()) <<"','" << Database::escapeString(item->getSpecialDescription()) <<"'),";
-        #ifdef __USE_SQLITE__
+        #ifdef __SPLIT_QUERIES__
         //split into sub-queries
         DBQuery subquery;
         subquery << query.str();
@@ -438,7 +438,7 @@ bool IOPlayerSQL::savePlayer(Player* player)
 			}
 			streamitems << "(" << player->getGUID() <<"," << 0 /*slotid*/ << ","<< runningID <<","<< parentid <<"," << item->getID()<<","<< (int)item->getItemCountOrSubtype() << "," <<
 			(int)item->getActionId()<<",'"<< Database::escapeString(item->getText()) <<"','" << Database::escapeString(item->getSpecialDescription()) <<"'),";
-			#ifdef __USE_SQLITE__
+			#ifdef __SPLIT_QUERIES__
             //split into sub-queries
             DBQuery subquery;
             subquery << query.str();
@@ -461,7 +461,7 @@ bool IOPlayerSQL::savePlayer(Player* player)
 		streamitems << "(" << player->getGUID() <<"," << dit->first + 100 << ","<< runningID <<","<< parentid <<"," << item->getID()<<","<< (int)item->getItemCountOrSubtype() << "," <<
 			(int)item->getActionId()<<",'"<< Database::escapeString(item->getText()) <<"','" << Database::escapeString(item->getSpecialDescription()) <<"'),";
 
-        #ifdef __USE_SQLITE__
+        #ifdef __SPLIT_QUERIES__
         //split into sub-queries
         DBQuery subquery;
         subquery << query.str();
@@ -511,7 +511,7 @@ bool IOPlayerSQL::savePlayer(Player* player)
 
 			streamitems << "(" << player->getGUID() <<"," << 0 /*slotid*/ << ","<< runningID <<","<< parentid <<"," << item->getID()<<","<< (int)item->getItemCountOrSubtype() << "," <<
 			(int)item->getActionId()<<",'"<< Database::escapeString(item->getText()) <<"','" << Database::escapeString(item->getSpecialDescription()) <<"'),";
-			#ifdef __USE_SQLITE__
+			#ifdef __SPLIT_QUERIES__
             //split into sub-queries
             DBQuery subquery;
             subquery << query.str();
@@ -548,7 +548,7 @@ bool IOPlayerSQL::savePlayer(Player* player)
 	std::stringstream ss;
 	for(StorageMap::const_iterator cit = player->getStorageIteratorBegin(); cit != player->getStorageIteratorEnd();cit++){
 		ss << "(" << player->getGUID() <<","<< cit->first <<","<< cit->second<<"),";
-		#ifdef __USE_SQLITE__
+		#ifdef __SPLIT_QUERIES__
         //split into sub-queries
         DBQuery subquery;
         subquery << query.str();
@@ -560,7 +560,7 @@ bool IOPlayerSQL::savePlayer(Player* player)
 		streamitems.str("");
         #endif
 	}
-    #ifndef __USE_SQLITE__
+    #ifndef __SPLIT_QUERIES__
 	std::string ststring = ss.str();
 	if(ststring.length()){
 		ststring.erase(ststring.length()-1);
@@ -582,7 +582,7 @@ bool IOPlayerSQL::savePlayer(Player* player)
 	std::stringstream ss2;
 	for(VIPListSet::iterator it = player->VIPList.begin(); it != player->VIPList.end(); it++){
 		ss2 << "(" << player->getGUID() <<","<< *it <<"),";
-		#ifdef __USE_SQLITE__
+		#ifdef __SPLIT_QUERIES__
         //split into sub-queries
         DBQuery subquery;
         subquery << query.str();
@@ -594,7 +594,7 @@ bool IOPlayerSQL::savePlayer(Player* player)
 		streamitems.str("");
         #endif
 	}
-    #ifndef __USE_SQLITE__
+    #ifndef __SPLIT_QUERIES__
 	ststring = ss2.str();
 	if(ststring.length()){
 		ststring.erase(ststring.length()-1);

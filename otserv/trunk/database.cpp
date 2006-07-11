@@ -24,8 +24,14 @@
 
 #ifdef __USE_MYSQL__
 #include "databasemysql.h"
-#else
+#endif
+#ifdef __USE_SQLITE__
 #include "databasesqlite.h"
+#endif
+
+#if defined __USE_MYSQL__ && defined __USE_SQLITE__
+#include "configmanager.h"
+extern ConfigManager g_config;
 #endif
 
 DBResult::DBResult()
@@ -66,7 +72,8 @@ void DBResult::addRow(MYSQL_ROW r, unsigned long* lengths, unsigned int num_fiel
 	m_listRows[m_numRows] = rd;
 	m_numRows++;
 }
-#else
+#endif
+#ifdef __USE_SQLITE__
 void DBResult::addRow(char **results, unsigned int num_fields)
 {
 	RowData* rd = new RowData;
@@ -229,9 +236,14 @@ Database* Database::_instance = NULL;
 
 Database* Database::instance(){
 	if(!_instance){
-#ifdef __USE_MYSQL__
+#if defined __USE_MYSQL__ && defined __USE_SQLITE__
+        if(g_config.getString(ConfigManager::SQLITE_DB) == "mysql")
+            _instance = (Database*)new DatabaseMySQL;
+        else
+            _instance = (Database*)new DatabaseSqLite;
+#elif defined __USE_MYSQL__
 		_instance = (Database*)new DatabaseMySQL;
-#else
+#elif defined __USE_SQLITE__
 		_instance = (Database*)new DatabaseSqLite;
 #endif
 	}

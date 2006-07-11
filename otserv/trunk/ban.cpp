@@ -365,7 +365,7 @@ bool IOBanSQL::saveBans(const std::string& identifier, const Ban& banclass)
 			executeQuery = true;
 			bans << query.getSeparator() << "(1," << it->ip << "," << it->mask <<
 				"," << it->time << ")";
-			#ifdef __USE_SQLITE__
+			#ifdef __SPLIT_QUERIES__
             //split into sub-queries
             DBQuery subquery;
             subquery << query.str();
@@ -378,7 +378,7 @@ bool IOBanSQL::saveBans(const std::string& identifier, const Ban& banclass)
             #endif
 		}
 	}
-    #ifndef __USE_SQLITE__
+    #ifndef __SPLIT_QUERIES__
 	if(executeQuery){
 		if(!db->executeQuery(query))
 			return false;
@@ -393,7 +393,7 @@ bool IOBanSQL::saveBans(const std::string& identifier, const Ban& banclass)
 		if(it->time > currentTime){
 			executeQuery = true;
 			bans << query.getSeparator() << "(2," << it->id << "," << it->time << ")";
-			#ifdef __USE_SQLITE__
+			#ifdef __SPLIT_QUERIES__
             //split into sub-queries
             DBQuery subquery;
             subquery << query.str();
@@ -406,7 +406,7 @@ bool IOBanSQL::saveBans(const std::string& identifier, const Ban& banclass)
             #endif
 		}
 	}
-    #ifndef __USE_SQLITE__
+    #ifndef __SPLIT_QUERIES__
 	if(executeQuery){
 		if(!db->executeQuery(query))
 			return false;
@@ -420,7 +420,7 @@ bool IOBanSQL::saveBans(const std::string& identifier, const Ban& banclass)
 		if(it->time > currentTime){
 			executeQuery = true;
 			bans << query.getSeparator() << "(3," << it->id << "," << it->time << ")";
-			#ifdef __USE_SQLITE__
+			#ifdef __SPLIT_QUERIES__
             //split into sub-queries
             DBQuery subquery;
             subquery << query.str();
@@ -433,7 +433,7 @@ bool IOBanSQL::saveBans(const std::string& identifier, const Ban& banclass)
             #endif
 		}
 	}
-    #ifndef __USE_SQLITE__
+    #ifndef __SPLIT_QUERIES__
 	if(executeQuery){
 		if(!db->executeQuery(query))
 			return false;

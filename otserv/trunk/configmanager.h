@@ -60,6 +60,7 @@ public:
 		SQL_PASS,
 		SQL_DB,
 		SQLITE_DB,
+		SQL_TYPE,
 		MAP_HOST,
 		MAP_USER,
 		MAP_PASS,

@@ -26,6 +26,12 @@
 #include <winsock.h>
 #endif
 
+#ifdef __USE_SQLITE__
+    #ifndef __SPLIT_QUERIES__
+        #define __SPLIT_QUERIES__
+    #endif
+#endif
+
 #ifdef __MYSQL_ALT_INCLUDE__
 #include <mysql.h>
 #elif defined __USE_MYSQL__
@@ -70,7 +76,7 @@ public:
 	int getSize(){ return (int)this->str().length(); };
 
 	std::string getSeparator(){
-	    #ifndef __USE_SQLITE__
+	    #ifndef __SPLIT_QUERIES__
 		if(first){
 			first = false;
 			return "";
@@ -135,7 +141,8 @@ private:
 	#ifdef __USE_MYSQL__
 	friend class DatabaseMySQL;
 	void addRow(MYSQL_ROW r, unsigned long* lengths, unsigned int num_fields);
-	#else
+	#endif
+	#ifdef __USE_SQLITE__
 	friend class DatabaseSqLite;
 	void addRow(char **results, unsigned int num_fields);
 	#endif

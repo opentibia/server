@@ -98,6 +98,9 @@ allowclones = 0
 -- vocation names
 vocations = {"a sorcerer", "a druid", "a paladin", "a knight"}
 
+--- sql type mysql/sqlite only viable if both are present
+sql_type	=	"sqlite"
+
 --- SQLITE part
 sqlite_db	= "db.s3db"
 

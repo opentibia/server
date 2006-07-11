@@ -63,6 +63,7 @@ bool ConfigManager::loadFile(const std::string& _filename)
 		m_confString[SQL_PASS] = getGlobalString(L, "sql_pass");
 		m_confString[SQL_DB] = getGlobalString(L, "sql_db");
 		m_confString[SQLITE_DB] = getGlobalString(L, "sqlite_db");
+		m_confString[SQL_TYPE] = getGlobalString(L, "sql_type");
 		m_confString[MAP_HOST] = getGlobalString(L, "map_host");
 		m_confString[MAP_USER] = getGlobalString(L, "map_user");
 		m_confString[MAP_PASS] = getGlobalString(L, "map_pass");

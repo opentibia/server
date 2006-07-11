@@ -149,7 +149,7 @@ bool IOMapSerializeSQL::saveTile(Database& db, uint32_t tileId, const Tile* tile
 
 		streamitems << "(" << tileId << "," << runningID << "," << parentid << "," << item->getID() << ","
 			<< "'" << Database::escapeString(attributes, attribSize) <<"'),";
-        #ifdef __USE_SQLITE__
+        #ifdef __SPLIT_QUERIES__
         //split into sub-queries
         DBQuery subquery;
         subquery << query.str();
@@ -213,7 +213,7 @@ bool IOMapSerializeSQL::saveTile(Database& db, uint32_t tileId, const Tile* tile
 
 			streamitems << "(" << tileId << "," << runningID << "," << parentid << "," << item->getID() << ","
 				<< "'" << Database::escapeString(attributes, attribSize) <<"'),";
-			#ifdef __USE_SQLITE__
+			#ifdef __SPLIT_QUERIES__
             //split into sub-queries
             DBQuery subquery;
             subquery << query.str();
@@ -425,7 +425,7 @@ bool IOMapSerializeSQL::saveHouseInfo(Map* map, const std::string& identifier)
 	for(HouseMap::iterator it = Houses::getInstance().getHouseBegin(); it != Houses::getInstance().getHouseEnd(); ++it){
 		House* house = it->second;
 		housestream << query.getSeparator() << "(" << house->getHouseId() << "," << house->getHouseOwner() << "," << house->getPaidUntil() << "," << house->getPayRentWarnings() << ")";
-            #ifdef __USE_SQLITE__
+            #ifdef __SPLIT_QUERIES__
             //split into sub-queries
             DBQuery subquery;
             subquery << query.str();
@@ -438,7 +438,7 @@ bool IOMapSerializeSQL::saveHouseInfo(Map* map, const std::string& identifier)
             #endif
 	}
 
-    #ifndef __USE_SQLITE__
+    #ifndef __SPLIT_QUERIES__
 	if(!db->executeQuery(query))
 		return false;
     #endif
@@ -453,7 +453,7 @@ bool IOMapSerializeSQL::saveHouseInfo(Map* map, const std::string& identifier)
 		if(house->getAccessList(GUEST_LIST, listText) && listText != ""){
 			housestream << query.getSeparator() << "(" << house->getHouseId() << "," << GUEST_LIST << ",'" << Database::escapeString(listText) << "')";
 			save_lists = true;
-			#ifdef __USE_SQLITE__
+			#ifdef __SPLIT_QUERIES__
             //split into sub-queries
             DBQuery subquery;
             subquery << query.str();
@@ -468,7 +468,7 @@ bool IOMapSerializeSQL::saveHouseInfo(Map* map, const std::string& identifier)
 		if(house->getAccessList(SUBOWNER_LIST, listText) && listText != ""){
 			housestream << query.getSeparator()<< "(" << house->getHouseId() << "," << SUBOWNER_LIST << ",'" << Database::escapeString(listText) << "')";
 			save_lists = true;
-			#ifdef __USE_SQLITE__
+			#ifdef __SPLIT_QUERIES__
             //split into sub-queries
             DBQuery subquery;
             subquery << query.str();
@@ -486,7 +486,7 @@ bool IOMapSerializeSQL::saveHouseInfo(Map* map, const std::string& identifier)
 			if(door->getAccessList(listText) && listText != ""){
 				housestream << query.getSeparator() << "(" << house->getHouseId() << "," << door->getDoorId() << ",'" << Database::escapeString(listText) << "')";
 				save_lists = true;
-				#ifdef __USE_SQLITE__
+				#ifdef __SPLIT_QUERIES__
                 //split into sub-queries
                 DBQuery subquery;
                 subquery << query.str();
@@ -499,7 +499,7 @@ bool IOMapSerializeSQL::saveHouseInfo(Map* map, const std::string& identifier)
                 #endif
 			}
 		}
-        #ifndef __USE_SQLITE__
+        #ifndef __SPLIT_QUERIES__
 		if(save_lists){
 			if(!db->executeQuery(query))
 				return false;
