@@ -22,7 +22,27 @@ otserv_SOURCES = account.cpp container.cpp creature.cpp game.cpp ioaccount.cpp \
 	trashholder.cpp trashholder.h mailbox.cpp mailbox.h waitlist.cpp waitlist.h \
 	house.cpp house.h housetile.cpp housetile.h iomapserialize.cpp iomapserialize.h \
 	iomapserializesql.cpp iomapserializesql.h iomapserializexml.cpp iomapserializexml.h \
-	cylinder.cpp cylinder.h ban.cpp ban.h rsa.cpp rsa.h configmanager.cpp configmanager.h
+	cylinder.cpp cylinder.h ban.cpp ban.h rsa.cpp rsa.h configmanager.cpp configmanager.h \
+	databasemysql.cpp databasemysql.h
+else if USE_SQLITE
+otserv_SOURCES = account.cpp container.cpp creature.cpp game.cpp ioaccount.cpp \
+	iomapxml.cpp ioplayer.cpp ioplayerxml.h ioplayerxml.cpp ioaccountxml.cpp ioaccountxml.h \
+	item.cpp items.cpp luascript.cpp magic.cpp map.cpp monster.cpp networkmessage.cpp npc.cpp \
+	otserv.cpp player.cpp position.cpp protocol.cpp protocol77.cpp spells.cpp \
+	status.cpp thing.cpp tile.cpp tools.cpp account.h bootstrap.sh config.h const76.h \
+	container.h creature.h definitions.h game.h ioaccount.h depot.cpp depot.h \
+	iomap.h iomapxml.h ioplayer.h item.h items.h teleport.cpp teleport.h \
+	luascript.h magic.h map.h monster.h networkmessage.h npc.h otsystem.h player.h \
+	position.h protocol.h protocol77.h scheduler.h spells.h stamp-h status.h \
+	tasks.h templates.h texcept.h thing.h tile.h tools.h spawn.cpp spawn.h \
+	actions.h actions.cpp scheduler.cpp ioplayersql.cpp ioplayersql.h ioaccountsql.cpp ioaccountsql.h \
+	commands.cpp commands.h database.cpp database.h md5.cpp md5.h fileloader.cpp fileloader.h \
+	chat.cpp chat.h logger.h logger.cpp iomapotbm.h iomapotbm.cpp monsters.h monsters.cpp \
+	trashholder.cpp trashholder.h mailbox.cpp mailbox.h waitlist.cpp waitlist.h \
+	house.cpp house.h housetile.cpp housetile.h iomapserialize.cpp iomapserialize.h \
+	iomapserializesql.cpp iomapserializesql.h iomapserializexml.cpp iomapserializexml.h \
+	cylinder.cpp cylinder.h ban.cpp ban.h rsa.cpp rsa.h configmanager.cpp configmanager.h \
+	databasesqlite.cpp databasesqlite.h
 else
 otserv_SOURCES = account.cpp container.cpp creature.cpp game.cpp ioaccount.cpp \
 	ioaccountxml.cpp iomapxml.cpp ioplayer.cpp ioplayerxml.cpp \
