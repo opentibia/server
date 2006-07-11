@@ -1,6 +1,5 @@
 ----config.lua--------------
 -- Config file for otserv
--- Comments start with a --
 ----------------------------
 
 -- datadir
@@ -11,10 +10,13 @@ datadir = "data/"
 map = "data/world/map.otbm"
 mapstore = "data/world/map-mapstore.xml"
 housestore = "data/world/map-housestore.xml"
+
+-- house rent period
+-- options: daily, weekly, monthly
 houserentperiod = "monthly"
 
 -- mapkind
--- OTBM for binary, SQL for SQL map, XML for OTX maps
+-- options: OTBM for binary, XML for OTX maps, SQL for SQL map(Not supported by default)
 mapkind = "OTBM"
 
 -- bans
@@ -96,8 +98,7 @@ allowclones = 0
 -- vocation names
 vocations = {"a sorcerer", "a druid", "a paladin", "a knight"}
 
-
----SQLITE part
+--- SQLITE part
 sqlite_db	= "db.s3db"
 
 --- SQL part
@@ -106,10 +107,9 @@ sql_user = "root"
 sql_pass = ""
 sql_db   = "otserv"
 
-
 --- SQL MAP part
 map_host = "localhost"
 map_user = "root"
 map_pass = ""
 map_db   = ""
-----------------------------
+
