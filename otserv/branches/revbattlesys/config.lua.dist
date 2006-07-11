@@ -1,9 +1,9 @@
-----------------------------
--- Config file for OTServ --
+----config.lua--------------
+-- Config file for otserv
+-- Comments start with a --
 ----------------------------
 
 -- datadir
--- sets where is data directory
 datadir = "data/"
 
 -- map
@@ -11,18 +11,23 @@ datadir = "data/"
 map = "data/world/map.otbm"
 mapstore = "data/world/map-mapstore.xml"
 housestore = "data/world/map-housestore.xml"
-
--- mapkind
--- options: OTBM for binary, SQL for SQL map, XML for OTX maps
-mapkind = "OTBM"
-
--- house rent period
--- options: daily, weekly, monthly
 houserentperiod = "monthly"
 
--- bans for XML players
--- sets where is bans file
+-- mapkind
+-- OTBM for binary, SQL for SQL map, XML for OTX maps
+mapkind = "OTBM"
+
+-- bans
 banIdentifier = "data/bans.xml"
+
+-- how many logins attempts until ip is temporary disabled (set to 0 to disable)
+logintries = 5
+
+-- how long the retry timeout until a new login can be made (without disabling the ip)
+retrytimeout = 5000
+
+-- how long the player need to wait until the ip is allowed again
+logintimeout = 15 * 60 * 1000
 
 -- loginmsg
 -- the message the player gets when he logs in
@@ -34,7 +39,7 @@ port = "7171"
 
 -- servername
 -- name of our server
-servername = "OpenTibia"
+servername = "otserv.org"
 
 -- ownername
 -- name of the owner of our server
@@ -42,7 +47,7 @@ ownername = "Tliff"
 
 -- owneremail
 -- email of the owner of our server
-owneremail = "tliff@otserv.org"
+owneremail = "otserv@tibia.de"
 
 -- url
 -- the url for more server info
@@ -57,16 +62,14 @@ location = "Germany"
 ip = "127.0.0.1"
 
 -- motd
--- the messagebox you sometimes get before you choose characters
-motd = "Welcome to OpenTibia 0.6.0"
+-- The messagebox you sometimes get before you choose characters
+motd = "Welcome to OpenTibia 0.5.0"
 motdnum="1"
 
--- use md5 passwords for accounts
--- options: yes/no
+-- use md5 passwords for accounts, yes/no
 md5passwords = "no"
 
--- world type
--- options: pvp, no-pvp, pvp-enforced
+-- world type. options: pvp, no-pvp, pvp-enforced
 worldtype = "pvp"
 
 -- max number of players allowed
@@ -79,10 +82,23 @@ exhausted = 1000
 exhaustedadd = 200
 
 -- how long does the player has to stay out of fight to get pz unlocked in ms (1000 = 1sec)
-pzlocked = 1*60*1000
+pzlocked = 5*60*1000
+
+-- experience, skill and loot rate
+rate_exp = 1
+rate_skill = 1
+rate_mag = 1
+rate_loot = 1
 
 -- allow multiple logins of the same char
 allowclones = 0
+
+-- vocation names
+vocations = {"a sorcerer", "a druid", "a paladin", "a knight"}
+
+
+---SQLITE part
+sqlite_db	= "db.s3db"
 
 --- SQL part
 sql_host = "localhost"
@@ -90,8 +106,10 @@ sql_user = "root"
 sql_pass = ""
 sql_db   = "otserv"
 
+
 --- SQL MAP part
 map_host = "localhost"
 map_user = "root"
 map_pass = ""
 map_db   = ""
+----------------------------
