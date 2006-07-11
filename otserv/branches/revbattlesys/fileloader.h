@@ -23,6 +23,7 @@
 
 #include <string>
 #include "stdio.h"
+#include "definitions.h"
 
 typedef unsigned long NODE;
 

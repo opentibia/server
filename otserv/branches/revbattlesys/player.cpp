@@ -2491,7 +2491,7 @@ Thing* Player::__getThing(uint32_t index) const
 	return NULL;
 }
 
-void Player::postAddNotification(Thing* thing, bool hasOwnership /*= true*/)
+void Player::postAddNotification(Thing* thing, int32_t index, bool hasOwnership /*= true*/)
 {
 	if(hasOwnership){
 		updateItemsLight();
@@ -2521,7 +2521,7 @@ void Player::postAddNotification(Thing* thing, bool hasOwnership /*= true*/)
 	}
 }
 
-void Player::postRemoveNotification(Thing* thing, bool isCompleteRemoval, bool hadOwnership /*= true*/)
+void Player::postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, bool hadOwnership /*= true*/)
 {
 	if(hadOwnership){
 		updateItemsLight();

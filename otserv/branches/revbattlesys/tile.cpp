@@ -397,6 +397,7 @@ void Tile::moveCreature(Creature* creature, Cylinder* toCylinder, bool teleport 
 
 	//add the creature
 	toCylinder->__addThing(creature);
+	int32_t newStackPos = toCylinder->__getIndexOfThing(creature);
 
 	Position fromPos = getPosition();
 	Position toPos = toCylinder->getPosition();
@@ -430,8 +431,8 @@ void Tile::moveCreature(Creature* creature, Cylinder* toCylinder, bool teleport 
 		(*it)->onCreatureMove(creature, fromPos, oldStackPos, teleport);
 	}
 
-	toCylinder->postAddNotification(creature);
-	postRemoveNotification(creature, true);
+	toCylinder->postAddNotification(creature, newStackPos);
+	postRemoveNotification(creature, oldStackPos, true);
 }
 
 ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
@@ -1043,7 +1044,7 @@ Thing* Tile::__getThing(uint32_t index) const
 	return NULL;
 }
 
-void Tile::postAddNotification(Thing* thing, bool hasOwnership /*= true*/)
+void Tile::postAddNotification(Thing* thing, int32_t index, bool hasOwnership /*= true*/)
 {
 	const Position& cylinderMapPos = getPosition();
 
@@ -1053,7 +1054,7 @@ void Tile::postAddNotification(Thing* thing, bool hasOwnership /*= true*/)
 
 	for(it = list.begin(); it != list.end(); ++it){
 		if(Player* player = (*it)->getPlayer()){
-			player->postAddNotification(thing, false);
+			player->postAddNotification(thing, index, false);
 		}
 	}
 
@@ -1116,7 +1117,7 @@ void Tile::postAddNotification(Thing* thing, bool hasOwnership /*= true*/)
 	}
 }
 
-void Tile::postRemoveNotification(Thing* thing, bool isCompleteRemoval, bool hadOwnership /*= true*/)
+void Tile::postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, bool hadOwnership /*= true*/)
 {
 	const Position& cylinderMapPos = getPosition();
 
@@ -1130,7 +1131,7 @@ void Tile::postRemoveNotification(Thing* thing, bool isCompleteRemoval, bool had
 
 	for(it = list.begin(); it != list.end(); ++it){
 		if(Player* player = (*it)->getPlayer()){
-			player->postRemoveNotification(thing, isCompleteRemoval, false);
+			player->postRemoveNotification(thing, index, isCompleteRemoval, false);
 		}
 	}
 	

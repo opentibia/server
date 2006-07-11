@@ -89,12 +89,12 @@ void TrashHolder::__removeThing(Thing* thing, uint32_t count)
 	//
 }
 
-void TrashHolder::postAddNotification(Thing* thing, bool hasOwnership /*= true*/)
+void TrashHolder::postAddNotification(Thing* thing, int32_t index, bool hasOwnership /*= true*/)
 {
-	getParent()->postAddNotification(thing, false /*hasOwnership*/);
+	getParent()->postAddNotification(thing, index, false /*hasOwnership*/);
 }
 
-void TrashHolder::postRemoveNotification(Thing* thing, bool isCompleteRemoval, bool hadOwnership /*= true*/)
+void TrashHolder::postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, bool hadOwnership /*= true*/)
 {
-	getParent()->postRemoveNotification(thing, isCompleteRemoval, false /*hadOwnership*/);
+	getParent()->postRemoveNotification(thing, index, isCompleteRemoval, false /*hadOwnership*/);
 }

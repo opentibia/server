@@ -115,16 +115,16 @@ ReturnValue Depot::__queryMaxCount(int32_t index, const Thing* thing, uint32_t c
 	return Container::__queryMaxCount(index, thing, count, maxQueryCount, flags);
 }
 
-void Depot::postAddNotification(Thing* thing, bool hasOwnership /*= true*/)
+void Depot::postAddNotification(Thing* thing, int32_t index, bool hasOwnership /*= true*/)
 {
 	if(getParent() != NULL){
-		getParent()->postAddNotification(thing, false /*hasOwnership*/);
+		getParent()->postAddNotification(thing, index, false /*hasOwnership*/);
 	}
 }
 
-void Depot::postRemoveNotification(Thing* thing, bool isCompleteRemoval, bool hadOwnership /*= true*/)
+void Depot::postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, bool hadOwnership /*= true*/)
 {
 	if(getParent() != NULL){
-		getParent()->postRemoveNotification(thing, isCompleteRemoval, false /*hadOwnership*/);
+		getParent()->postRemoveNotification(thing, index, isCompleteRemoval, false /*hadOwnership*/);
 	}
 }

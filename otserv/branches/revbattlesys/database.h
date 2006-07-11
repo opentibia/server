@@ -34,6 +34,8 @@
 #include <sstream>
 #include <map>
 
+#include "definitions.h"
+
 enum db_error_t {
 	DB_ERROR_UNKNOWN = 100,
 	DB_ERROR_INIT,

@@ -100,14 +100,14 @@ void Mailbox::__removeThing(Thing* thing, uint32_t count)
 	//
 }
 
-void Mailbox::postAddNotification(Thing* thing, bool hasOwnership /*= true*/)
+void Mailbox::postAddNotification(Thing* thing, int32_t index, bool hasOwnership /*= true*/)
 {
-	getParent()->postAddNotification(thing, false /*hasOwnership*/);
+	getParent()->postAddNotification(thing, index, false /*hasOwnership*/);
 }
 
-void Mailbox::postRemoveNotification(Thing* thing, bool isCompleteRemoval, bool hadOwnership /*= true*/)
+void Mailbox::postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, bool hadOwnership /*= true*/)
 {
-	getParent()->postRemoveNotification(thing, isCompleteRemoval, false /*hadOwnership*/);
+	getParent()->postRemoveNotification(thing, index, isCompleteRemoval, false /*hadOwnership*/);
 }
 
 bool Mailbox::sendItem(Item* item)

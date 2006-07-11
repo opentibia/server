@@ -176,12 +176,12 @@ void Teleport::__removeThing(Thing* thing, uint32_t count)
 	//
 }
 
-void Teleport::postAddNotification(Thing* thing, bool hasOwnership /*= true*/)
+void Teleport::postAddNotification(Thing* thing, int32_t index, bool hasOwnership /*= true*/)
 {
-	getParent()->postAddNotification(thing, false /*hasOwnership*/);
+	getParent()->postAddNotification(thing, index, false /*hasOwnership*/);
 }
 
-void Teleport::postRemoveNotification(Thing* thing, bool isCompleteRemoval, bool hadOwnership /*= true*/)
+void Teleport::postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, bool hadOwnership /*= true*/)
 {
-	getParent()->postRemoveNotification(thing, isCompleteRemoval, false /*hadOwnership*/);
+	getParent()->postRemoveNotification(thing, index, isCompleteRemoval, false /*hadOwnership*/);
 }

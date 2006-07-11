@@ -324,8 +324,8 @@ public:
 
 	virtual void onThink(uint32_t interval);
 
-	virtual void postAddNotification(Thing* thing, bool hasOwnership = true);
-	virtual void postRemoveNotification(Thing* thing, bool isCompleteRemoval, bool hadOwnership = true);
+	virtual void postAddNotification(Thing* thing, int32_t index, bool hasOwnership = true);
+	virtual void postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, bool hadOwnership = true);
 
 	VIPListSet VIPList;
 

@@ -22,6 +22,8 @@
 #ifndef __OTSERV_IOPLAYERXML_H__
 #define __OTSERV_IOPLAYERXML_H__
 
+#include "definitions.h"
+
 class Player;
 
 /** Baseclass for all Player-Loaders */

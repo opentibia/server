@@ -706,42 +706,42 @@ Thing* Container::__getThing(uint32_t index) const
 	return NULL;
 }
 
-void Container::postAddNotification(Thing* thing, bool hasOwnership /*= true*/)
+void Container::postAddNotification(Thing* thing, int32_t index, bool hasOwnership /*= true*/)
 {
 	Cylinder* topParent = getTopParent();
 
 	if(topParent->getCreature()){
-		topParent->postAddNotification(thing, true /*hasOwnership*/);
+		topParent->postAddNotification(thing, index, true /*hasOwnership*/);
 	}
 	else{
 		if(topParent == this){
 			//let the tile class notify surrounding players
-			topParent->getParent()->postAddNotification(thing, false /*hasOwnership*/);
+			topParent->getParent()->postAddNotification(thing, index, false /*hasOwnership*/);
 		}
 		else
-			topParent->postAddNotification(thing, false /*hasOwnership*/);
+			topParent->postAddNotification(thing, index, false /*hasOwnership*/);
 	}
 
-	//getParent()->postAddNotification(thing, true /*hasOwnership*/);
+	//getParent()->postAddNotification(thing, index, true /*hasOwnership*/);
 }
 
-void Container::postRemoveNotification(Thing* thing, bool isCompleteRemoval, bool hadOwnership /*= true*/)
+void Container::postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, bool hadOwnership /*= true*/)
 {
 	Cylinder* topParent = getTopParent();
 
 	if(topParent->getCreature()){
-		topParent->postRemoveNotification(thing, isCompleteRemoval, true /*hasOwnership*/);
+		topParent->postRemoveNotification(thing, index, isCompleteRemoval, true /*hasOwnership*/);
 	}
 	else{
 		if(topParent == this){
 			//let the tile class notify surrounding players
-			topParent->getParent()->postRemoveNotification(thing, isCompleteRemoval, false /*hasOwnership*/);
+			topParent->getParent()->postRemoveNotification(thing, index, isCompleteRemoval, false /*hasOwnership*/);
 		}
 		else
-			topParent->postRemoveNotification(thing, isCompleteRemoval, false /*hasOwnership*/);
+			topParent->postRemoveNotification(thing, index, isCompleteRemoval, false /*hasOwnership*/);
 	}
 
-	//getParent()->postRemoveNotification(thing, isCompleteRemoval, false /*hadOwnership*/);
+	//getParent()->postRemoveNotification(thing, index, isCompleteRemoval, false /*hadOwnership*/);
 }
 
 void Container::__internalAddThing(Thing* thing)
