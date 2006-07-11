@@ -1,5 +1,5 @@
 ============================================
-========== OpenTibia Server 0.5.0 ==========
+========== OpenTibia Server 0.6.0 ==========
 ============================================
 ===== www.otserv.org	www.otfans.net =====
 ============================================
@@ -7,14 +7,14 @@ Readme by Pekay.
 
 
 What is this?
-	OTserv is a free MMORPG emulation, that creates a own gameworld server,
-	based on the CIPsoft's Tibia.
+	OTServ is a free MMORPG emulation, that creates a own gameworld server,
+	based on the CIPSoft's Tibia.
 
 How does it work?
-	In the past Otserv could be played on Tibia 7.1, 7.11 and then 7.4.
-	Otserv is now played using Tibia 7.6.
+	In the past OTServ could be played on Tibia 7.1, 7.11, 7.4, 7.5, 7.6, 7.61, 7.7 and then 7.71.
+	OTServ is now played using Tibia 7.72.
 	To play it you can either download the IP changer (works with
-	only Tibia 7.6) or change the shortcut to Tibia.
+	only Tibia 7.6 and Tibia 7.72) or change the shortcut to Tibia.
 	If you are making a shortcut to it, open the properties of the shortcut
 	and you should see a box marked "Target:" and should look roughly
 	like this: "C:/tibia directory/Tibia.exe".
@@ -25,8 +25,10 @@ How does it work?
 	
         where HOSTNAME is the IP or HostName of the server and PORT is the port where the server acts.
         if the server is located on your machine, it will be "host localhost port 7171".
+	
+	Instructions and download of IP Changer you will found in http://otfans.net/showthread.php?t=20767.
 
-	Once that's done, start the Otserv up, quite simple, just execute otserv.exe by
+	Once that's done, start the OTServ up, quite simple, just execute otserv.exe by
 	double clicking it. Then startup Tibia by double clicking its shortcut you made earlier,
 	then go to Options and Network and tick off "Test Server Login". Then login with the
 	following:
@@ -41,14 +43,17 @@ How does it work?
 
 	
 Whats New?	
-	- 7.6 Protocol
-	- OTB (You now dont have to convert your map, change any ID, 7.5 ID's are just stacked on top of older ID's!)
-	- VIP List (SQL Only)
-	- Houses
-	- Guild support
-	- Logger added
-	- Rotatable items
-	- Smarter monsters	
+	- 7.72 Protocol
+	- Private channels
+	- New movement system (full inventory movements, stacktable items and more)
+	- Parcels, letters
+	- Follow and chase opponent
+	- Waiting list
+	- Day-Night cycles
+	- New scripting interface (unification of spells, actions, npcs, new events and more)
+	- New battle engine
+	- New condition engine
+	- Configure vocations
 
 Features?
 	- Full rearranged protocol and game system
@@ -56,10 +61,6 @@ Features?
 	- SQL databases (for accounts and players)
 	- Crash tracking
 	- Monsters
-	- 7.6 Protocol
-	- OTB (You now dont have to convert your map, change any ID, new ID's are just stacked on top of older ID's!)
-	- VIP List (SQL Only)
-	- Guild support
 	- Spawns (and Respawn)
 	- Commands
 	- Autowalk
@@ -68,18 +69,26 @@ Features?
 	- Enhanced items database
 	- Runes with charges
 	- Depots
+	- OTB (You now dont have to convert your map, change any ID, 7.5 ID's are just stacked on top of older ID's!)
+	- VIP List
+	- Houses
+	- Guild support
+	- Logger added
+	- Rotatable items
+	- Smarter monsters	
 	- And more!
 
 How do I use this new stuff?
 	I'm just going over what might not be familiar to you here.
 
-	The word "actions" might be unfamiliar to you. What it is an action?
+	The words "actions" might be unfamiliar to you. What it is an action?
 	For instance when you click on a door it will open, or drinking mana-fluids.
+	(TODO: talk about movements/talkactions)
 	There is other cool stuff such as SQL-support, This is useful if you have a big community of
 	players for your server. You can use the other option which is xml-based which is good for beginners.
 	Binary map, well this seems quite new doesn't it. For a long time maps have been in xml format
 	and nowadays some maps are like 20 megabytes large which takes quite long to load. So you can now
-	convert your xml map to a binary map format by a simple converter. This can be found at the OTfans.net Forums.
+	convert your xml map to a binary map format by a simple converter. This can be found at the OTFans.net Forums.
 
 MySQL Server
 	SQL has been introduced to otserv, in previous releases, players, accounts, items and others were and
@@ -89,10 +98,10 @@ MySQL Server
 	many advantages.
 	
 		Instructions to setup a server:
-			1. Download Xampp (not Xampp Lite) (http://www.apachefriends.org/download.php?xampp-win32-1.4.14-installer.exe)
+			1. Download XAMPP (not XAMPP Lite) (http://www.apachefriends.org/download.php?xampp-win32-1.5.3a-installer.exe)
 			2. Install
 			3. Open "xampp-control.exe"
-			4. Click on the buttons to open "MySQL" and "Apache"
+			4. Click on the buttons Start to open "MySQL" and "Apache"
 			5. Go on your browser and type in the address bar "localhost" or "127.0.0.1"
 			6. Find the name "phpmyadmin" and go to it
 			7. You will find some controls, make a database called "otserv"
@@ -107,8 +116,8 @@ MySQL Server
 	
 Problems?
 	The server is now stable nowadays, but if you do find bugs you can report them at the 
-	CVS Bug Report board on OTFans Forums (http://otfans.net/index.php?act=SF&s=&f=78). If your 
-	server crashes, you should get a report generated at your Otserv folder named report.txt, 
+	CVS Bug Report board on OTFans Forums (http://otfans.net/forumdisplay.php?f=52). If your 
+	server crashes, you should get a report generated at your OTServ folder named report.txt, 
 	you should also report this at the CVS Report Board, this report will help solving bugs a lot.
 
 Credits?
@@ -118,14 +127,18 @@ Credits?
 	Yorick - Fansite / Forum administrator
 	Pekay - README Documentation, Actions Command Console Developer, DS-IRC Client Developer
 	SimOne - Developer and Map Editor, OTB
-	j4K3xBl4sT3r - Developer and Map Editor
-	GriZzm0 - Developer and Scripting
-	Snack - Developer
 	Spin - Developer, OTB
 	Primer - Developer, SQL
+	Snack - Developer
+	j4K3xBl4sT3r - Developer
+	Anstice - Developer
+	Pedro B. - Developer
+	GriZzm0 - Scripting
+	Heliton - Scripting
+	Jiddo - Scripting	
 	*Inactive*
 	Reebow - Developer (special protocol support)
-        Aire - Developer
+    Aire - Developer
 	Haktivex - Developer
 	Fandoras - Developer
 	TiMMit - Developer
@@ -134,7 +147,7 @@ Credits?
 	Privateer - Documentation on the protocol
 	Torvik - Item list
 
-Forum Credits (OtFans.net):
+Forum Credits (OTFans.net):
 	Yorick - Admin
 	Nuker - Admin
 	Verkon - Admin
