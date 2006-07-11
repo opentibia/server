@@ -1,9 +1,9 @@
-----config.lua--------------
--- Config file for otserv
--- Comments start with a --
+----------------------------
+-- Config file for OTServ --
 ----------------------------
 
 -- datadir
+-- sets where is data directory
 datadir = "data/"
 
 -- map
@@ -11,13 +11,17 @@ datadir = "data/"
 map = "data/world/map.otbm"
 mapstore = "data/world/map-mapstore.xml"
 housestore = "data/world/map-housestore.xml"
-houserentperiod = "monthly"
 
 -- mapkind
--- OTBM for binary, SQL for SQL map, XML for OTX maps
+-- options: OTBM for binary, SQL for SQL map, XML for OTX maps
 mapkind = "OTBM"
 
--- bans
+-- house rent period
+-- options: daily, weekly, monthly
+houserentperiod = "monthly"
+
+-- bans for XML players
+-- sets where is bans file
 banIdentifier = "data/bans.xml"
 
 -- loginmsg
@@ -30,7 +34,7 @@ port = "7171"
 
 -- servername
 -- name of our server
-servername = "otserv.org"
+servername = "OpenTibia"
 
 -- ownername
 -- name of the owner of our server
@@ -38,7 +42,7 @@ ownername = "Tliff"
 
 -- owneremail
 -- email of the owner of our server
-owneremail = "otserv@tibia.de"
+owneremail = "tliff@otserv.org"
 
 -- url
 -- the url for more server info
@@ -53,14 +57,16 @@ location = "Germany"
 ip = "127.0.0.1"
 
 -- motd
--- The messagebox you sometimes get before you choose characters
-motd = "Welcome to OpenTibia 0.5.0"
+-- the messagebox you sometimes get before you choose characters
+motd = "Welcome to OpenTibia 0.6.0"
 motdnum="1"
 
--- use md5 passwords for accounts, yes/no
+-- use md5 passwords for accounts
+-- options: yes/no
 md5passwords = "no"
 
--- world type. options: pvp, no-pvp, pvp-enforced
+-- world type
+-- options: pvp, no-pvp, pvp-enforced
 worldtype = "pvp"
 
 -- max number of players allowed
@@ -78,17 +84,14 @@ pzlocked = 1*60*1000
 -- allow multiple logins of the same char
 allowclones = 0
 
-
 --- SQL part
 sql_host = "localhost"
 sql_user = "root"
 sql_pass = ""
 sql_db   = "otserv"
 
-
 --- SQL MAP part
 map_host = "localhost"
 map_user = "root"
 map_pass = ""
 map_db   = ""
-----------------------------
