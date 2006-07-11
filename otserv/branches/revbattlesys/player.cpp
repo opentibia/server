@@ -1490,8 +1490,7 @@ void Player::onSendContainer(const Container* container)
 //inventory
 void Player::onAddInventoryItem(slots_t slot, Item* item)
 {
-	//calling movement scripts
-	g_moveEvents.onPlayerEquip(this, item, slot, true);
+	//
 }
 
 void Player::onUpdateInventoryItem(slots_t slot, Item* oldItem, Item* newItem)
@@ -1517,8 +1516,6 @@ void Player::onRemoveInventoryItem(slots_t slot, Item* item)
 			}
 		}
 	}
-	//calling movement scripts
-	g_moveEvents.onPlayerEquip(this, item, slot, false);
 }
 
 void Player::checkTradeState(const Item* item)
@@ -2494,6 +2491,9 @@ Thing* Player::__getThing(uint32_t index) const
 void Player::postAddNotification(Thing* thing, int32_t index, bool hasOwnership /*= true*/)
 {
 	if(hasOwnership){
+		//calling movement scripts
+		g_moveEvents.onPlayerEquip(this, thing->getItem(), index, true);
+
 		updateItemsLight();
 		updateInventoryWeigth();
 		client->sendStats();
@@ -2524,6 +2524,9 @@ void Player::postAddNotification(Thing* thing, int32_t index, bool hasOwnership 
 void Player::postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, bool hadOwnership /*= true*/)
 {
 	if(hadOwnership){
+		//calling movement scripts
+		g_moveEvents.onPlayerEquip(this, thing->getItem(), index, false);
+
 		updateItemsLight();
 		updateInventoryWeigth();
 		client->sendStats();
