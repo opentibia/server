@@ -247,15 +247,15 @@ Database* _Database::instance(){
 	if(!_instance){
 #if defined __USE_MYSQL__ && defined __USE_SQLITE__
         if(g_config.getString(ConfigManager::SQLITE_DB) == "mysql"){
-            _instance = (Database*)new DatabaseMySQL;
+            _instance = new DatabaseMySQL;
 		}
         else{
-            _instance = (Database*)new DatabaseSqLite;
+            _instance = new DatabaseSqLite;
 		}
 #elif defined __USE_MYSQL__
-		_instance = (Database*)new DatabaseMySQL;
+		_instance = new DatabaseMySQL;
 #elif defined __USE_SQLITE__
-		_instance = (Database*)new DatabaseSqLite;
+		_instance = new DatabaseSqLite;
 #endif
 		OTSYS_THREAD_LOCKVARINIT(DBQuery::database_lock);
 	}

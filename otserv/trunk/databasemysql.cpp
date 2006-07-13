@@ -20,7 +20,12 @@
 
 #include <iostream>
 #include "databasemysql.h"
+#ifdef __MYSQL_ALT_INCLUDE__
 #include "errmsg.h"
+#else
+#include <mysql/errmsg.h>
+#endif
+
 
 DatabaseMySQL::DatabaseMySQL()
 {
