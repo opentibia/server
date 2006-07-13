@@ -190,10 +190,13 @@ private:
 #ifdef USE_MYSQL_ONLY
 #define DATABASE_VIRTUAL
 #define DATABASE_CLASS DatabaseMySQL
-#else 
+class DatabaseMySQL;
+#else
 #define DATABASE_VIRTUAL virtual
 #define DATABASE_CLASS _Database
+class _Database;
 #endif
+
 
 typedef DATABASE_CLASS Database;
 
