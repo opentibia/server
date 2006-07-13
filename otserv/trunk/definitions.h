@@ -7,7 +7,7 @@
 // modify it under the terms of the GNU General Public License
 // as published by the Free Software Foundation; either version 2
 // of the License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -43,9 +43,7 @@ typedef unsigned long long uint64_t;
 #endif
 
 #ifdef __USE_SQLITE__
-    #ifndef __SPLIT_QUERIES__
-        #define __SPLIT_QUERIES__
-    #endif
+    #define __SPLIT_QUERIES__
 #endif
 
 #ifdef __USE_MYSQL__

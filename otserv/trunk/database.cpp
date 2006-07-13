@@ -246,7 +246,7 @@ Database* _Database::_instance = NULL;
 Database* _Database::instance(){
 	if(!_instance){
 #if defined __USE_MYSQL__ && defined __USE_SQLITE__
-        if(g_config.getString(ConfigManager::SQLITE_DB) == "mysql"){
+        if(g_config.getString(ConfigManager::SQL_TYPE) == "mysql"){
             _instance = new DatabaseMySQL;
 		}
         else{

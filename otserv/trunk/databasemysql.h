@@ -39,7 +39,7 @@ class DatabaseMySQL : public _Database
 {
 public:
 	DatabaseMySQL();
-	~DatabaseMySQL();
+	DATABASE_VIRTUAL ~DatabaseMySQL();
 
 	/** Connect to a mysql DatabaseMySQL
 	*\returns
@@ -50,14 +50,14 @@ public:
 	*\param db_user The "username" used in the connection
 	*\param db_pass The "password" of the username used
 	*/
-	bool connect(const char *db_name, const char *db_host, const char *db_user, const char *db_pass);
+	DATABASE_VIRTUAL bool connect(const char *db_name, const char *db_host, const char *db_user, const char *db_pass);
 
 	/** Disconnects from the connected DatabaseMySQL
 	*\returns
 	* 	TRUE if the DatabaseMySQL was disconnected
 	* 	FALSE if the DatabaseMySQL was not disconnected or no DatabaseMySQL selected
 	*/
-	bool disconnect();
+	DATABASE_VIRTUAL bool disconnect();
 
 	/** Execute a query which don't get any information of the DatabaseMySQL (for ex.: INSERT, UPDATE, etc)
 	*\returns
@@ -65,7 +65,7 @@ public:
 	* 	FALSE if the query fails
 	*\ref q The query object
 	*/
-	bool executeQuery(DBQuery &q);
+	DATABASE_VIRTUAL bool executeQuery(DBQuery &q);
 
 	/** Store a query which get information of the DatabaseMySQL (for ex.: SELECT)
 	*\returns
@@ -74,7 +74,7 @@ public:
 	*\ref q The query object
 	*\ref res The DBResult object where to insert the results of the query
 	*/
-	bool storeQuery(DBQuery &q, DBResult &res);
+	DATABASE_VIRTUAL bool storeQuery(DBQuery &q, DBResult &res);
 
 private:
 
