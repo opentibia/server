@@ -46,10 +46,6 @@ typedef unsigned long long uint64_t;
     #define __SPLIT_QUERIES__
 #endif
 
-#ifdef __USE_MYSQL__
-	#define __SPLIT_QUERIES__
-#endif
-
 #if defined __USE_MYSQL__ || __USE_SQLITE__
 	#define USE_SQL_ENGINE
 #endif

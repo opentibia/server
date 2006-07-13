@@ -39,7 +39,6 @@ OTSYS_THREAD_LOCKVAR DBQuery::database_lock;
 
 DBQuery::DBQuery(){
 	OTSYS_THREAD_LOCK(database_lock, NULL);
-	first = true;
 }
 
 DBQuery::~DBQuery()
@@ -351,3 +350,117 @@ std::string _Database::escapeString(const char* s, unsigned long size)
 
 }
 #endif
+
+DBTransaction::DBTransaction(Database* database)
+{
+	m_database = database;
+	m_state = STATE_NO_START;
+}
+
+DBTransaction::~DBTransaction()
+{
+	if(m_state == STATE_START){
+		if(!m_database->rollback()){
+			//TODO: What to do here?
+		}
+	}
+}
+	
+bool DBTransaction::start()
+{
+	DBQuery query;
+	query << "START TRANSACTION;";
+	if(m_database->executeQuery(query)){
+		m_state = STATE_START;
+		return true;
+	}
+	else{
+		return false;
+	}
+}
+
+bool DBTransaction::success()
+{
+	if(m_state == STATE_START){
+		m_state = STEATE_COMMIT;
+		return m_database->commit();
+	}
+	else{
+		return false;
+	}
+}
+
+
+DBSplitInsert::DBSplitInsert(Database* database)
+{
+	m_database = database;
+}
+
+DBSplitInsert::~DBSplitInsert()
+{
+	//
+}
+
+void DBSplitInsert::clear()
+{
+	m_buffer.clear();
+	m_buffer.reserve(10240);
+}
+
+void DBSplitInsert::setQuery(const std::string& query)
+{
+	clear();
+	m_query = query;
+}
+
+bool DBSplitInsert::addRow(const std::string& row)
+{
+#ifdef __SPLIT_QUERIES__
+	
+	m_buffer = row;
+	bool ret = internalExecuteQuery();
+	m_buffer = "";
+	return ret;
+	
+#else
+	int size = m_buffer.size();
+	if(size == 0){
+		m_buffer = row;
+	}
+	else if(size > 8192){
+		if(!internalExecuteQuery()){
+			return false;
+		}
+		m_buffer = row;
+	}
+	else{
+		m_buffer += "," + row;
+	}
+	return true;
+	
+#endif
+}
+	
+
+bool DBSplitInsert::internalExecuteQuery()
+{
+	DBQuery subquery;
+	subquery << m_query;
+	subquery << m_buffer;
+	
+	if(!m_database->executeQuery(subquery)){
+		return false;
+	}
+	else{
+		return true;
+	}
+}
+
+bool DBSplitInsert::executeQuery()
+{
+	if(m_buffer.size() != 0){
+		return internalExecuteQuery();
+	}
+	return true;
+}
+

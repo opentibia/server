@@ -76,6 +76,9 @@ public:
 	*/
 	DATABASE_VIRTUAL bool storeQuery(DBQuery &q, DBResult &res);
 
+	bool rollback();
+	bool commit();
+
 private:
 
 	/** initialize the DatabaseMySQL

@@ -60,7 +60,7 @@ public:
 	~DBQuery();
 
 	/** Reset the actual query */
-	void reset(){ this->str(""); first = true;};
+	void reset(){ this->str("");};
 
 	/** Get the text of the query
 	*\returns The text of the actual query
@@ -72,21 +72,7 @@ public:
 	*/
 	int getSize(){ return (int)this->str().length(); };
 
-	std::string getSeparator(){
-	    #ifndef __SPLIT_QUERIES__
-		if(first){
-			first = false;
-			return "";
-		}
-		else{
-			return ",";
-		}
-		#else
-		return "";
-		#endif
-	}
 protected:
-	bool first;
 	static OTSYS_THREAD_LOCKVAR database_lock;
 	friend class _Database;
 };
@@ -163,30 +149,6 @@ private:
 	RowDataMap m_listRows;
 };
 
-class DBError
-{
-public:
-	DBError(const char *msg, db_error_t type=DB_ERROR_UNKNOWN){
-		m_msg = std::string(msg);
-		m_type = type;
-	};
-	~DBError(){};
-
-	/** Get the error message
-	*\returns The text message
-	*/
-	const char *getMsg(){ return m_msg.c_str(); };
-
-	/** Get the error type
-	*\returns The error type
-	*/
-	int getType(){ return m_type; };
-
-private:
-	std::string m_msg;
-	int m_type;
-};
-
 #ifdef USE_MYSQL_ONLY
 #define DATABASE_VIRTUAL
 #define DATABASE_CLASS DatabaseMySQL
@@ -197,13 +159,19 @@ class DatabaseMySQL;
 class _Database;
 #endif
 
-
 typedef DATABASE_CLASS Database;
 
 class _Database
 {
 public:
-
+	/** Get Database instance
+	*\returns
+	* 	Database instance
+	*\note
+	*	When you get database instance 
+	*	be sure that you define a DBQuery object
+	*	under it to lock database instance usage
+	*/
     static Database* instance();
 
 	/** Connect to a mysql database
@@ -215,14 +183,14 @@ public:
 	*\param db_user The "username" used in the connection
 	*\param db_pass The "password" of the username used
 	*/
-	DATABASE_VIRTUAL bool connect(const char *db_name, const char *db_host, const char *db_user, const char *db_pass){};
+	DATABASE_VIRTUAL bool connect(const char *db_name, const char *db_host, const char *db_user, const char *db_pass){return false;};
 
 	/** Disconnects from the connected database
 	*\returns
 	* 	TRUE if the database was disconnected
 	* 	FALSE if the database was not disconnected or no database selected
 	*/
-	DATABASE_VIRTUAL bool disconnect(){};
+	DATABASE_VIRTUAL bool disconnect(){return false;};
 
 	/** Execute a query which don't get any information of the database (for ex.: INSERT, UPDATE, etc)
 	*\returns
@@ -230,7 +198,7 @@ public:
 	* 	FALSE if the query fails
 	*\ref q The query object
 	*/
-	DATABASE_VIRTUAL bool executeQuery(DBQuery &q ){};
+	DATABASE_VIRTUAL bool executeQuery(DBQuery &q ){return false;};
 
 	/** Store a query which get information of the database (for ex.: SELECT)
 	*\returns
@@ -239,7 +207,15 @@ public:
 	*\ref q The query object
 	*\ref res The DBResult object where to insert the results of the query
 	*/
-	DATABASE_VIRTUAL bool storeQuery(DBQuery &q, DBResult &res){};
+	DATABASE_VIRTUAL bool storeQuery(DBQuery &q, DBResult &res){return false;};
+	
+	/** Transaciont related functions
+	*\returns
+	* 	TRUE
+	* 	FALSE
+	*/
+	bool rollback(){return false;};
+	bool commit(){return false;};
 
 	/** Escape the special characters in a string for no problems with the query
 	*\returns The string modified
@@ -262,5 +238,46 @@ protected:
 #ifdef USE_MYSQL_ONLY
 #include "databasemysql.h"
 #endif
+
+class DBTransaction
+{
+public:
+	DBTransaction(Database* database);
+	~DBTransaction();
+	
+	bool start();
+	bool success();
+	
+private:
+	enum TransactionStates_t{
+		STATE_NO_START,
+		STATE_START,
+		STEATE_COMMIT,
+	};
+	TransactionStates_t m_state;
+	Database* m_database;
+};
+
+class DBSplitInsert
+{
+public:
+	DBSplitInsert(Database* database);
+	~DBSplitInsert();
+	
+	bool addRow(const std::string& row);
+	
+	void setQuery(const std::string& query);
+	
+	bool executeQuery();
+	
+	void clear();
+private:
+	
+	bool internalExecuteQuery();
+	
+	Database* m_database;
+	std::string m_query;
+	std::string m_buffer;
+};
 
 #endif

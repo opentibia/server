@@ -291,12 +291,13 @@ IOBanSQL::IOBanSQL()
 bool IOBanSQL::loadBans(const std::string& identifier, Ban& banclass)
 {
 	Database* db = Database::instance();
+	DBQuery query;
+	DBResult result;
+	
 	if(!db->connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str())){
 		return false;
 	}
 
-	DBQuery query;
-	DBResult result;
 	query << "SELECT * FROM bans";
 	if(!db->storeQuery(query, result))
 		return true;
@@ -338,14 +339,14 @@ bool IOBanSQL::loadBans(const std::string& identifier, Ban& banclass)
 bool IOBanSQL::saveBans(const std::string& identifier, const Ban& banclass)
 {
 	Database* db = Database::instance();
+	DBQuery query;
+	
 	if(!db->connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str())){
 		return false;
 	}
 
-	DBQuery query;
-
-	query << "BEGIN;";
-	if(!db->executeQuery(query))
+	DBTransaction trans(db);
+	if(!trans.start())
 		return false;
 
 	query << "DELETE FROM bans;";
@@ -358,93 +359,69 @@ bool IOBanSQL::saveBans(const std::string& identifier, const Ban& banclass)
 
 	std::stringstream bans;
 
-	query.reset();
-	query << "INSERT INTO `bans` (`type` , `ip` , `mask`, `time`) VALUES ";
+	DBSplitInsert query_insert(db);
+	
+	query_insert.setQuery("INSERT INTO `bans` (`type` , `ip` , `mask`, `time`) VALUES ");
+	
 	for(IpBanList::const_iterator it = banclass.ipBanList.begin(); it !=  banclass.ipBanList.end(); ++it){
 		if(it->time > currentTime){
 			executeQuery = true;
-			bans << query.getSeparator() << "(1," << it->ip << "," << it->mask <<
+			bans << "(1," << it->ip << "," << it->mask <<
 				"," << it->time << ")";
-			#ifdef __SPLIT_QUERIES__
-            //split into sub-queries
-            DBQuery subquery;
-            subquery << query.str();
-            subquery << bans.str();
-            if(!db->executeQuery(subquery))
-                    return false;
+
+			if(!query_insert.addRow(bans.str()))
+				return false;
+
             bans.str("");
-            #else
-            query << bans;
-            #endif
 		}
 	}
-    #ifndef __SPLIT_QUERIES__
 	if(executeQuery){
-		if(!db->executeQuery(query))
+		if(!query_insert.executeQuery())
 			return false;
 	}
-    #endif
 
 	//save player bans
 	executeQuery = false;
-	query.reset();
-	query << "INSERT INTO `bans` (`type` , `player` , `time`) VALUES ";
+	query_insert.setQuery("INSERT INTO `bans` (`type` , `player` , `time`) VALUES ");
+	
 	for(PlayerBanList::const_iterator it = banclass.playerBanList.begin(); it !=  banclass.playerBanList.end(); ++it){
 		if(it->time > currentTime){
 			executeQuery = true;
-			bans << query.getSeparator() << "(2," << it->id << "," << it->time << ")";
-			#ifdef __SPLIT_QUERIES__
-            //split into sub-queries
-            DBQuery subquery;
-            subquery << query.str();
-            subquery << bans.str();
-            if(!db->executeQuery(subquery))
-                    return false;
-            bans.str("");
-            #else
-            query << bans;
-            #endif
+			bans  << "(2," << it->id << "," << it->time << ")";
+			
+			if(!query_insert.addRow(bans.str()))
+				return false;
+			
+            bans.str("");        
 		}
 	}
-    #ifndef __SPLIT_QUERIES__
 	if(executeQuery){
-		if(!db->executeQuery(query))
+		if(!query_insert.executeQuery())
 			return false;
 	}
-    #endif
+
 	//save account bans
 	executeQuery = false;
-	query.reset();
-	query << "INSERT INTO `bans` (`type` , `account` , `time`) VALUES ";
+	query_insert.setQuery("INSERT INTO `bans` (`type` , `account` , `time`) VALUES ");
+	
 	for(AccountBanList::const_iterator it = banclass.accountBanList.begin(); it != banclass.accountBanList.end(); ++it){
 		if(it->time > currentTime){
 			executeQuery = true;
-			bans << query.getSeparator() << "(3," << it->id << "," << it->time << ")";
-			#ifdef __SPLIT_QUERIES__
-            //split into sub-queries
-            DBQuery subquery;
-            subquery << query.str();
-            subquery << bans.str();
-            if(!db->executeQuery(subquery))
-                    return false;
+			bans << "(3," << it->id << "," << it->time << ")";
+			
+			if(!query_insert.addRow(bans.str()))
+				return false;
+			
             bans.str("");
-            #else
-            query << bans;
-            #endif
 		}
 	}
-    #ifndef __SPLIT_QUERIES__
+	
 	if(executeQuery){
-		if(!db->executeQuery(query))
+		if(!query_insert.executeQuery())
 			return false;
 	}
-    #endif
-	query.reset();
-	query << "COMMIT;";
-	if(!db->executeQuery(query))
-		return false;
 
-	return true;
+	return trans.success();
 }
 
 #else

@@ -42,65 +42,39 @@ Account IOAccountSQL::loadAccount(unsigned long accno)
 {
 	Account acc;
 
-//	try
-//	{
-		Database* mysql = Database::instance();
+	Database* mysql = Database::instance();
+	DBQuery query;
+	DBResult result;
 
-		if(!mysql->connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str())){
-			return acc;
-		}
+	if(!mysql->connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str())){
+		return acc;
+	}
 
-		DBQuery query;
-		DBResult result;
+	query << "SELECT * FROM accounts WHERE accno='" << accno << "'";
+	if(!mysql->storeQuery(query, result))
+		return acc;
 
-		query << "SELECT * FROM accounts WHERE accno='" << accno << "'";
-		if(!mysql->storeQuery(query, result))
-			return acc;
+	acc.accnumber = result.getDataInt("accno");
+	acc.password = result.getDataString("password");
+	acc.accType = result.getDataInt("type");
+	acc.premDays = result.getDataInt("premDays");
 
-		acc.accnumber = result.getDataInt("accno");
-		acc.password = result.getDataString("password");
-		acc.accType = result.getDataInt("type");
-		acc.premDays = result.getDataInt("premDays");
-
-        /*std::cout << "pass '" << acc.password
-        << "'      acc '" << acc.accnumber
+	/*std::cout << "pass '" << acc.password
+		<< "'      acc '" << acc.accnumber
         << "'     type '" << acc.accType
         << "'      prem '" << acc.premDays
         << "'" <<std::endl;*/
 
-		query << "SELECT name FROM players where account='" << accno << "'";
-		if(!mysql->storeQuery(query, result))
-			return acc;
-
-		for(int i=0; i < result.getNumRows(); ++i){
-			std::string ss = result.getDataString("name", i);
-			acc.charList.push_back(ss.c_str());
-		}
-
-		acc.charList.sort();
-
-/*	}
-	catch(DBError e)
-	{
-		switch(e.getType())
-		{
-		case DB_ERROR_QUERY:
-		case DB_ERROR_STORE:
-		case DB_ERROR_DATA_NOT_FOUND:
-			std::cout << "DB WARNING: (" << e.getType() << ") " << e.getMsg() << std::endl;
-			break;
-		default:
-			std::cout << "DB ERROR: (" << e.getType() << ") " << e.getMsg() << std::endl;
-			return acc;
-		}
-	}
-	catch(...)
-	{
-		std::cout << "ERROR: Unknown exception raised.\n\tFile: " << __FILE__ << "\n\tLine: " << __LINE__ << std::endl;
+	query << "SELECT name FROM players where account='" << accno << "'";
+	if(!mysql->storeQuery(query, result))
 		return acc;
-	}*/
 
+	for(int i = 0; i < result.getNumRows(); ++i){
+		std::string ss = result.getDataString("name", i);
+		acc.charList.push_back(ss.c_str());
+	}
 
+	acc.charList.sort();
 	return acc;
 }
 
@@ -108,12 +82,12 @@ Account IOAccountSQL::loadAccount(unsigned long accno)
 bool IOAccountSQL::getPassword(unsigned long accno, const std::string &name, std::string &password)
 {
 	Database* mysql = Database::instance();
+	DBQuery query;
+	DBResult result;
+	
 	if(!mysql->connect(m_db.c_str(), m_host.c_str(), m_user.c_str(), m_pass.c_str())){
 		return false;
 	}
-
-	DBQuery query;
-	DBResult result;
 
 	query << "SELECT password FROM accounts WHERE accno='" << accno << "'";
 	if(!mysql->storeQuery(query, result))

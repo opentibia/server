@@ -599,14 +599,19 @@ bool Commands::closeServer(Creature* creature, const std::string& cmd, const std
 		}
 	}
 	
-	g_bans.saveBans(g_config.getString(ConfigManager::BAN_FILE));
+	Player* player = creature->getPlayer();
+	
+	if(!g_bans.saveBans(g_config.getString(ConfigManager::BAN_FILE))){
+		if(player)
+			player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Error while saving bans.");
+	}
 	
 	if(param == "serversave"){
 		Houses::getInstance().payHouses();
 	}
 	
 	if(!game->map->saveMap("")){
-		if(Player* player = creature->getPlayer())
+		if(player)
 			player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "Error while saving map.");
 	}
 

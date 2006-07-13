@@ -95,7 +95,10 @@ bool DatabaseMySQL::executeQuery(DBQuery &q)
 {
 	if(!m_initialized || !m_connected)
 		return false;
-
+	
+	#ifdef __MYSQL_QUERY_DEBUG__
+	std::cout << q.str() << std::endl;
+	#endif
 	std::string s = q.str();
 	const char* querytext = s.c_str();
 	int querylength = s.length(); //strlen(querytext);
@@ -167,4 +170,35 @@ bool DatabaseMySQL::storeQuery(DBQuery &q, DBResult &dbres)
 		return true;
 	else
 		return false;
+}
+
+
+bool DatabaseMySQL::rollback()
+{
+	if(!m_initialized || !m_connected)
+		return false;
+	
+	#ifdef __MYSQL_QUERY_DEBUG__
+	std::cout << "ROLLBACK;" << std::endl;
+	#endif
+	if(mysql_rollback(&m_handle) != 0){
+		std::cout << "MYSQL ERROR mysql_rollback: " << mysql_error(&m_handle)  << std::endl;
+		return false;
+	}
+	return true;
+}
+
+bool DatabaseMySQL::commit()
+{
+	if(!m_initialized || !m_connected)
+		return false;
+	
+	#ifdef __MYSQL_QUERY_DEBUG__
+	std::cout << "COMMIT;" << std::endl;
+	#endif
+	if(mysql_commit(&m_handle) != 0){
+		std::cout << "MYSQL ERROR mysql_commit: " << mysql_error(&m_handle)  << std::endl;
+		return false;
+	}
+	return true;
 }

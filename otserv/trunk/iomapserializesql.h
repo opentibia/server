@@ -44,7 +44,7 @@ protected:
 	std::string m_pass;
 	std::string m_db;
 
-	bool saveTile(Database& db, uint32_t tileId, const Tile* tile);
+	bool saveTile(Database* db, uint32_t tileId, const Tile* tile);
 	bool loadTile(Database& db, Tile* tile);
 };
 
