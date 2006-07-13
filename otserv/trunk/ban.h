@@ -119,7 +119,7 @@ protected:
 	static IOBan* _instance;
 };
 
-#if defined __USE_MYSQL__ || defined __USE_SQLITE__
+#if defined USE_SQL_ENGINE
 class IOBanSQL : public IOBan{
 public:
 	IOBanSQL();

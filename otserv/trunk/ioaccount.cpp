@@ -18,18 +18,20 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
+#include "definitions.h"
 #include "ioaccount.h"
 
-#if defined __USE_MYSQL__ || defined __USE_SQLITE__
+#if defined USE_SQL_ENGINE
 #include "ioaccountsql.h"
-#endif
+#else
 #include "ioaccountxml.h"
+#endif
 
 IOAccount* IOAccount::_instance = NULL;
 
 IOAccount* IOAccount::instance(){
 	if(!_instance){
-#if defined __USE_MYSQL__ || defined __USE_SQLITE__
+#if defined USE_SQL_ENGINE
 		_instance = (IOAccount*)new IOAccountSQL;
 #else
 		_instance = (IOAccount*)new IOAccountXML;

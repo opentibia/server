@@ -25,8 +25,9 @@ How does it work?
 	
         where HOSTNAME is the IP or HostName of the server and PORT is the port where the server acts.
         if the server is located on your machine, it will be "host localhost port 7171".
-	
-	You will find Instructions and download of an IP Changer at http://otfans.net/showthread.php?t=20767.
+
+	To connect Tibia client to OTServ you will a IP changer, you can get one here 
+	http://web.telia.com/~u49016513/tibialoaderV143.zip or http://otfans.net/showthread.php?t=20767.
 
 	Once that's done, start the OTServ up, quite simple, just execute otserv.exe by
 	double clicking it. Then startup Tibia by double clicking its shortcut you made earlier,

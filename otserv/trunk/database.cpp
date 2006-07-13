@@ -34,6 +34,19 @@
 extern ConfigManager g_config;
 #endif
 
+
+OTSYS_THREAD_LOCKVAR DBQuery::database_lock;
+
+DBQuery::DBQuery(){
+	OTSYS_THREAD_LOCK(database_lock, NULL);
+	first = true;
+}
+
+DBQuery::~DBQuery()
+{
+	OTSYS_THREAD_UNLOCK(database_lock, NULL);
+}
+
 DBResult::DBResult()
 {
 	m_numFields = 0;
@@ -161,7 +174,6 @@ int DBResult::getDataInt(const std::string &s, unsigned int nrow)
 		}
 	}
 
-	//throw DBError("DBResult::GetDataInt()", DB_ERROR_DATA_NOT_FOUND);
 	std::cout << "SQL ERROR DBResult::GetDataInt()" << std::endl;
 	return 0; // Failed
 }
@@ -181,7 +193,6 @@ long DBResult::getDataLong(const std::string &s, unsigned int nrow)
 		}
 	}
 
-	//throw DBError("DBResult::GetDataLong()", DB_ERROR_DATA_NOT_FOUND);
 	std::cout << "SQL ERROR DBResult::GetDataLong()" << std::endl;
 	return 0; // Failed
 }
@@ -202,7 +213,6 @@ std::string DBResult::getDataString(const std::string &s, unsigned int nrow)
 		}
 	}
 
-	//throw DBError("DBResult::GetDataString()", DB_ERROR_DATA_NOT_FOUND);
 	std::cout << "SQL ERROR DBResult::GetDataString()" << std::endl;
 	return std::string(""); // Failed
 }
@@ -226,26 +236,28 @@ const char* DBResult::getDataBlob(const std::string &s, unsigned long& size, uns
 		}
 	}
 
-	//throw DBError("DBResult::getDataBlob()", DB_ERROR_DATA_NOT_FOUND);
 	std::cout << "SQL ERROR DBResult::getDataBlob()" << std::endl;
 	size = 0;
 	return NULL;
 }
 
-Database* Database::_instance = NULL;
+Database* _Database::_instance = NULL;
 
-Database* Database::instance(){
+Database* _Database::instance(){
 	if(!_instance){
 #if defined __USE_MYSQL__ && defined __USE_SQLITE__
-        if(g_config.getString(ConfigManager::SQLITE_DB) == "mysql")
+        if(g_config.getString(ConfigManager::SQLITE_DB) == "mysql"){
             _instance = (Database*)new DatabaseMySQL;
-        else
+		}
+        else{
             _instance = (Database*)new DatabaseSqLite;
+		}
 #elif defined __USE_MYSQL__
 		_instance = (Database*)new DatabaseMySQL;
 #elif defined __USE_SQLITE__
 		_instance = (Database*)new DatabaseSqLite;
 #endif
+		OTSYS_THREAD_LOCKVARINIT(DBQuery::database_lock);
 	}
 	return _instance;
 }
@@ -301,7 +313,7 @@ void escape_string(std::string & s)
 }
 #endif
 
-std::string Database::escapeString(const std::string &s)
+std::string _Database::escapeString(const std::string &s)
 {
     #ifdef __USE_MYSQL__
 	return escapeString(s.c_str(), s.size());
@@ -315,7 +327,7 @@ std::string Database::escapeString(const std::string &s)
 // probably the mysql_escape_string version should be dropped as it's less generic
 // but i'm keeping it atm
 #ifdef __USE_MYSQL__
-std::string Database::escapeString(const char* s, unsigned long size)
+std::string _Database::escapeString(const char* s, unsigned long size)
 {
 	if(s == NULL)
 		return std::string("");
@@ -328,7 +340,7 @@ std::string Database::escapeString(const char* s, unsigned long size)
 	return r;
 }
 #else
-std::string Database::escapeString(const char* s, unsigned long size)
+std::string _Database::escapeString(const char* s, unsigned long size)
 {
 	if(s == NULL)
 		return std::string("");

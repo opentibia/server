@@ -20,6 +20,7 @@
 
 #include <iostream>
 #include "databasemysql.h"
+#include "errmsg.h"
 
 DatabaseMySQL::DatabaseMySQL()
 {
@@ -38,7 +39,6 @@ bool DatabaseMySQL::init()
 
 	// Initialize mysql
 	if(mysql_init(&m_handle) == NULL){
-		//throw DBError("mysql_init", DB_ERROR_INIT);
 		std::cout << "MYSQL ERROR mysql_init" << std::endl;
 	}
 	else
@@ -52,11 +52,14 @@ bool DatabaseMySQL::connect(const char *db_name, const char *db_host, const char
 	if(!m_initialized && !init()){
 		return false;
 	}
+	
+	if(m_connected){
+		return true;
+	}
 
 	// Connect to the DatabaseMySQL host
 	if(!mysql_real_connect(&m_handle, db_host, db_user, db_pass, NULL, 0, NULL, 0))
 	{
-		//throw DBError(mysql_error(&m_handle), DB_ERROR_CONNECT);
 		std::cout << "MYSQL ERROR mysql_real_connect: " << mysql_error(&m_handle)  << std::endl;
 		return false;
 	}
@@ -64,7 +67,6 @@ bool DatabaseMySQL::connect(const char *db_name, const char *db_host, const char
 	// Select the correct DatabaseMySQL
 	if(mysql_select_db(&m_handle, db_name))
 	{
-		//throw DBError("mysql_select_db", DB_ERROR_SELECT);
 		std::cout << "MYSQL ERROR mysql_select_db"  << std::endl;
 		return false;
 	}
@@ -93,10 +95,12 @@ bool DatabaseMySQL::executeQuery(DBQuery &q)
 	const char* querytext = s.c_str();
 	int querylength = s.length(); //strlen(querytext);
 	// Execute the query
-	if(mysql_real_query(&m_handle, querytext, querylength))
+	if(int error = mysql_real_query(&m_handle, querytext, querylength))
 	{
-		//throw DBError( q.getText() , DB_ERROR_QUERY );
 		std::cout << "MYSQL ERROR mysql_real_query: " << q.str() << " " << mysql_error(&m_handle)  << std::endl;
+		if(error == CR_SERVER_LOST || error == CR_SERVER_GONE_ERROR){
+			m_connected = false;
+		}
 		return false;
 	}
 
@@ -120,8 +124,11 @@ bool DatabaseMySQL::storeQuery(DBQuery &q, DBResult &dbres)
 	r = mysql_store_result(&m_handle);
 	if(!r)
 	{
-		//throw DBError( mysql_error(&m_handle), DB_ERROR_STORE );
 		std::cout << "MYSQL ERROR mysql_store_result: " << q.getText() << " " << mysql_error(&m_handle)  << std::endl;
+		int error = mysql_errno(&m_handle);
+		if(error == CR_SERVER_LOST || error == CR_SERVER_GONE_ERROR){
+			m_connected = false;
+		}
 		return false;
 	}
 

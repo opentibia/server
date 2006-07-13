@@ -118,11 +118,8 @@ public:
 	bool blockPathFind;
 };
 
-#ifdef __GNUC__
-typedef __gnu_cxx::hash_map<unsigned long, unsigned long> ReverseItemMap;
-#else
-typedef stdext::hash_map<unsigned long, unsigned long> ReverseItemMap;
-#endif
+
+typedef OTSERV_HASH_MAP<unsigned long, unsigned long> ReverseItemMap;
 
 class Items {
 public:

@@ -286,7 +286,7 @@ protected:
 	friend class IOMap;
 	friend class IOMapSerializeXML;
 
-#if defined __USE_MYSQL__ || defined __USE_SQLITE__
+#if defined USE_SQL_ENGINE
 	friend class IOMapSerializeSQL;
 #endif
 };

@@ -24,8 +24,7 @@
 
 #include "ioplayer.h"
 #include "player.h"
-
-class Database;
+#include "database.h"
 
 /** Baseclass for all Player-Loaders */
 class IOPlayerSQL : protected IOPlayer{

@@ -21,15 +21,12 @@
 #ifndef __OTSERV_DATABASE_H__
 #define __OTSERV_DATABASE_H__
 
+#include "definitions.h"
+#include "otsystem.h"
+
 #ifdef WIN32
 //#include <winsock2.h>
 #include <winsock.h>
-#endif
-
-#ifdef __USE_SQLITE__
-    #ifndef __SPLIT_QUERIES__
-        #define __SPLIT_QUERIES__
-    #endif
 #endif
 
 #ifdef __MYSQL_ALT_INCLUDE__
@@ -59,8 +56,8 @@ struct RowData{
 class DBQuery : public std::stringstream
 {
 public:
-	DBQuery(){first = true;};
-	~DBQuery(){};
+	DBQuery();
+	~DBQuery();
 
 	/** Reset the actual query */
 	void reset(){ this->str(""); first = true;};
@@ -90,6 +87,8 @@ public:
 	}
 protected:
 	bool first;
+	static OTSYS_THREAD_LOCKVAR database_lock;
+	friend class _Database;
 };
 
 class DBResult
@@ -137,7 +136,7 @@ public:
 	unsigned int getNumFields(){ return m_numFields; };
 
 private:
-    friend class Database;
+    //friend class Database;
 	#ifdef __USE_MYSQL__
 	friend class DatabaseMySQL;
 	void addRow(MYSQL_ROW r, unsigned long* lengths, unsigned int num_fields);
@@ -188,8 +187,17 @@ private:
 	int m_type;
 };
 
+#ifdef USE_MYSQL_ONLY
+#define DATABASE_VIRTUAL
+#define DATABASE_CLASS DatabaseMySQL
+#else 
+#define DATABASE_VIRTUAL virtual
+#define DATABASE_CLASS _Database
+#endif
 
-class Database
+typedef DATABASE_CLASS Database;
+
+class _Database
 {
 public:
 
@@ -204,14 +212,14 @@ public:
 	*\param db_user The "username" used in the connection
 	*\param db_pass The "password" of the username used
 	*/
-	virtual bool connect(const char *db_name, const char *db_host, const char *db_user, const char *db_pass){};
+	DATABASE_VIRTUAL bool connect(const char *db_name, const char *db_host, const char *db_user, const char *db_pass){};
 
 	/** Disconnects from the connected database
 	*\returns
 	* 	TRUE if the database was disconnected
 	* 	FALSE if the database was not disconnected or no database selected
 	*/
-	virtual bool disconnect(){};
+	DATABASE_VIRTUAL bool disconnect(){};
 
 	/** Execute a query which don't get any information of the database (for ex.: INSERT, UPDATE, etc)
 	*\returns
@@ -219,7 +227,7 @@ public:
 	* 	FALSE if the query fails
 	*\ref q The query object
 	*/
-	virtual bool executeQuery(DBQuery &q ){};
+	DATABASE_VIRTUAL bool executeQuery(DBQuery &q ){};
 
 	/** Store a query which get information of the database (for ex.: SELECT)
 	*\returns
@@ -228,7 +236,7 @@ public:
 	*\ref q The query object
 	*\ref res The DBResult object where to insert the results of the query
 	*/
-	virtual bool storeQuery(DBQuery &q, DBResult &res){};
+	DATABASE_VIRTUAL bool storeQuery(DBQuery &q, DBResult &res){};
 
 	/** Escape the special characters in a string for no problems with the query
 	*\returns The string modified
@@ -243,9 +251,13 @@ public:
 	static std::string escapeString(const char* s, unsigned long size);
 
 protected:
-	Database(){};
-	virtual ~Database(){};
+	_Database(){};
+	DATABASE_VIRTUAL ~_Database(){};
 	static Database* _instance;
 };
+
+#ifdef USE_MYSQL_ONLY
+#include "databasemysql.h"
+#endif
 
 #endif

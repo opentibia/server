@@ -85,7 +85,7 @@ public:
 
 	bool addSpawn(Spawn* spawn);
 	bool loadSpawnsXML(std::string filename);
-#if defined __USE_MYSQL__ || defined __USE_SQLITE__
+#if defined ENABLESQLMAPSUPPORT
 	bool loadSpawnsSQL(std::string identifier);
 #endif
 	bool startup();

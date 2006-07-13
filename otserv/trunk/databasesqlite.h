@@ -30,7 +30,7 @@
 #include <sstream>
 #include "database.h"
 
-class DatabaseSqLite : protected Database
+class DatabaseSqLite : protected _Database
 {
 public:
 	DatabaseSqLite();

@@ -18,9 +18,10 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
+#include "definitions.h"
 #include "ioplayer.h"
 
-#if defined __USE_MYSQL__ || defined __USE_SQLITE__
+#if defined USE_SQL_ENGINE
 #include "ioplayersql.h"
 #else
 #include "ioplayerxml.h"
@@ -31,7 +32,7 @@ IOPlayer* IOPlayer::_instance = NULL;
 IOPlayer* IOPlayer::instance()
 {
 	if(!_instance){
-#if defined __USE_MYSQL__ || defined __USE_SQLITE__
+#if defined USE_SQL_ENGINE
 		_instance = (IOPlayer*)new IOPlayerSQL;
 #else
 		_instance = (IOPlayer*)new IOPlayerXML;

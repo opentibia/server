@@ -18,9 +18,10 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
+#include "definitions.h"
 #include "iomapserialize.h"
 
-#if defined __USE_MYSQL__ || defined __USE_SQLITE__
+#if defined USE_SQL_ENGINE
 #include "iomapserializesql.h"
 #else
 #include "iomapserializexml.h"
@@ -33,7 +34,7 @@ IOMapSerialize* IOMapSerialize::_instance = NULL;
 IOMapSerialize* IOMapSerialize::getInstance()
 {
 	if(!_instance){
-#if defined __USE_MYSQL__ || defined __USE_SQLITE__
+#if defined USE_SQL_ENGINE
 		_instance = new IOMapSerializeSQL;
 #else
 		_instance = new IOMapSerializeXML;

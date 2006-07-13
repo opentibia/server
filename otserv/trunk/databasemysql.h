@@ -35,7 +35,7 @@
 #include "database.h"
 
 
-class DatabaseMySQL : protected Database
+class DatabaseMySQL : public _Database
 {
 public:
 	DatabaseMySQL();

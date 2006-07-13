@@ -18,13 +18,13 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-
+#include "definitions.h"
 #include "ban.h"
 #include "ioplayer.h"
 #include "configmanager.h"
 #include <sstream>
 
-#if defined __USE_MYSQL__ || defined __USE_SQLITE__
+#if defined USE_SQL_ENGINE
 #include "database.h"
 #endif
 
@@ -268,7 +268,7 @@ bool Ban::saveBans(const std::string& identifier)
 IOBan* IOBan::getInstance()
 {
 	if(!_instance){
-		#if defined __USE_MYSQL__ || defined __USE_SQLITE__
+		#if defined USE_SQL_ENGINE
 		_instance = new IOBanSQL();
 		#else
 		_instance = new IOBanXML();
@@ -277,7 +277,7 @@ IOBan* IOBan::getInstance()
 	return _instance;
 }
 
-#if defined __USE_MYSQL__ || defined __USE_SQLITE__
+#if defined USE_SQL_ENGINE
 
 IOBanSQL::IOBanSQL()
 {

@@ -42,6 +42,24 @@ typedef unsigned long long uint64_t;
 	#endif
 #endif
 
+#ifdef __USE_SQLITE__
+    #ifndef __SPLIT_QUERIES__
+        #define __SPLIT_QUERIES__
+    #endif
+#endif
+
+#ifdef __USE_MYSQL__
+	#define __SPLIT_QUERIES__
+#endif
+
+#if defined __USE_MYSQL__ || __USE_SQLITE__
+	#define USE_SQL_ENGINE
+#endif
+
+#if defined(__USE_MYSQL__) && !defined(__USE_SQLITE__)
+	#define USE_MYSQL_ONLY
+#endif
+
 #if defined __WINDOWS__ || defined WIN32
 
 #define OTSYS_THREAD_RETURN  void

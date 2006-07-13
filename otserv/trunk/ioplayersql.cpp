@@ -24,19 +24,12 @@
 #include "ioaccount.h"
 #include "item.h"
 #include "configmanager.h"
-#include "database.h"
 #include "tools.h"
+#include "definitions.h"
 
 #include <boost/tokenizer.hpp>
 #include <iostream>
 #include <iomanip>
-
-// cross compatibility vc++ and gcc
-#ifdef __GNUC__
-#include <ext/hash_map>
-#else
-#include <hash_map>
-#endif
 
 extern ConfigManager g_config;
 
@@ -187,13 +180,8 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 	}
 
 	//load the items
-
-	// cross compatibility vc++ and gcc
-#ifdef __GNUC__
-	__gnu_cxx::hash_map<int,std::pair<Item*,int> > itemmap;
-#else
-	stdext::hash_map<int,std::pair<Item*,int> > itemmap;
-#endif
+	OTSERV_HASH_MAP<int,std::pair<Item*,int> > itemmap;
+	
 	query << "SELECT * FROM items WHERE player='" << player->getGUID() << "' ORDER BY sid ASC";
 	if(mysql->storeQuery(query, result) && (result.getNumRows() > 0)){
 		for(int i=0; i < result.getNumRows(); ++i){
@@ -232,12 +220,8 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 		}
 	}
 
-	// cross compatibility vc++ and gcc
-#ifdef __GNUC__
-	__gnu_cxx::hash_map<int,std::pair<Item*,int> >::iterator it;
-#else
-	stdext::hash_map<int,std::pair<Item*,int> >::iterator it;
-#endif
+	OTSERV_HASH_MAP<int,std::pair<Item*,int> >::iterator it;
+	
 	for(int i = (int)itemmap.size(); i > 0; --i){
 		it = itemmap.find(i);
 		if(it == itemmap.end())
