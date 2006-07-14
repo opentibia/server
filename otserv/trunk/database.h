@@ -168,7 +168,7 @@ public:
 	*\returns
 	* 	Database instance
 	*\note
-	*	When you get database instance 
+	*	When you get database instance
 	*	be sure that you define a DBQuery object
 	*	under it to lock database instance usage
 	*/
@@ -208,14 +208,14 @@ public:
 	*\ref res The DBResult object where to insert the results of the query
 	*/
 	DATABASE_VIRTUAL bool storeQuery(DBQuery &q, DBResult &res){return false;};
-	
+
 	/** Transaciont related functions
 	*\returns
 	* 	TRUE
 	* 	FALSE
 	*/
-	bool rollback(){return false;};
-	bool commit(){return false;};
+	DATABASE_VIRTUAL bool rollback(){return false;};
+	DATABASE_VIRTUAL bool commit(){return false;};
 
 	/** Escape the special characters in a string for no problems with the query
 	*\returns The string modified
@@ -244,10 +244,10 @@ class DBTransaction
 public:
 	DBTransaction(Database* database);
 	~DBTransaction();
-	
+
 	bool start();
 	bool success();
-	
+
 private:
 	enum TransactionStates_t{
 		STATE_NO_START,
@@ -263,18 +263,18 @@ class DBSplitInsert
 public:
 	DBSplitInsert(Database* database);
 	~DBSplitInsert();
-	
+
 	bool addRow(const std::string& row);
-	
+
 	void setQuery(const std::string& query);
-	
+
 	bool executeQuery();
-	
+
 	void clear();
 private:
-	
+
 	bool internalExecuteQuery();
-	
+
 	Database* m_database;
 	std::string m_query;
 	std::string m_buffer;

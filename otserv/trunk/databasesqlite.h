@@ -71,6 +71,9 @@ public:
 	*/
 	virtual bool storeQuery(DBQuery &q, DBResult &res);
 
+    virtual bool rollback();
+	virtual bool commit();
+
 private:
 
 	/** initialize the DatabaseSqLite

@@ -365,11 +365,15 @@ DBTransaction::~DBTransaction()
 		}
 	}
 }
-	
+
 bool DBTransaction::start()
 {
 	DBQuery query;
+	#ifndef __USE_SQLITE__
 	query << "START TRANSACTION;";
+	#else
+	query << "BEGIN;";
+	#endif
 	if(m_database->executeQuery(query)){
 		m_state = STATE_START;
 		return true;
@@ -416,12 +420,12 @@ void DBSplitInsert::setQuery(const std::string& query)
 bool DBSplitInsert::addRow(const std::string& row)
 {
 #ifdef __SPLIT_QUERIES__
-	
+
 	m_buffer = row;
 	bool ret = internalExecuteQuery();
 	m_buffer = "";
 	return ret;
-	
+
 #else
 	int size = m_buffer.size();
 	if(size == 0){
@@ -437,17 +441,17 @@ bool DBSplitInsert::addRow(const std::string& row)
 		m_buffer += "," + row;
 	}
 	return true;
-	
+
 #endif
 }
-	
+
 
 bool DBSplitInsert::internalExecuteQuery()
 {
 	DBQuery subquery;
 	subquery << m_query;
 	subquery << m_buffer;
-	
+
 	if(!m_database->executeQuery(subquery)){
 		return false;
 	}

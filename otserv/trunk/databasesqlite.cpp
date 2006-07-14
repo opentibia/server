@@ -119,6 +119,32 @@ bool DatabaseSqLite::storeQuery(DBQuery &q, DBResult &dbres)
 		return false;
 }
 
+bool DatabaseSqLite::rollback()
+{
+    DBQuery query;
+	query << "ROLLBACK;";
+
+	if(executeQuery(query)){
+		return true;
+	}
+	else{
+		return false;
+	}
+}
+
+bool DatabaseSqLite::commit()
+{
+    DBQuery query;
+	query << "COMMIT;";
+
+	if(executeQuery(query)){
+		return true;
+	}
+	else{
+		return false;
+	}
+}
+
 int DatabaseSqLite::callback(void *db, int num_fields, char **results, char **columnNames){
   DBResult* dbres = (DBResult*)db;
   if(!DatabaseSqLite::m_fieldnames){
