@@ -324,12 +324,12 @@ bool House::canEditAccessList(unsigned long listId, const Player* player)
 		return true;
 		break;
 	case HOUSE_SUBOWNER:
-		/*subowners can edit door/guest access list*/
-		if(listId == SUBOWNER_LIST){
-			return false;
-		}
-		else /*door/guest list*/{
+		/*subowners can edit guest access list*/
+		if(listId == GUEST_LIST){
 			return true;
+		}
+		else /*subowner/door list*/{
+			return false;
 		}
 		break;
 	default:
