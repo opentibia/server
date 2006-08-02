@@ -132,6 +132,11 @@ bool ItemType::isFluidContainer() const
 	return (group == ITEM_GROUP_FLUID);
 }
 
+bool ItemType::isRune() const
+{
+	return (group == ITEM_GROUP_RUNE);
+}
+
 Items::Items()
 {
 	//
@@ -244,7 +249,7 @@ int Items::loadFromOtb(std::string file)
 		return ERROR_INVALID_FORMAT;
 	}
 	
-	if(Items::dwMinorVersion != CLIENT_VERSION_770){
+	if(Items::dwMinorVersion != CLIENT_VERSION_780){
 		std::cout << "Not supported items.otb client version." << std::endl;
 		return ERROR_INVALID_FORMAT;
 	}

@@ -857,28 +857,33 @@ void Protocol77::parseRequestOutfit(NetworkMessage& msg)
 	
 	msg.AddByte(0xC8);
 	msg.AddU16(player->looktype);
-	msg.AddByte(player->lookhead);
-	msg.AddByte(player->lookbody);
-	msg.AddByte(player->looklegs);
-	msg.AddByte(player->lookfeet);
-	switch (player->getSex()) {
+	msg.AddByte(player->lookhead); //head
+	msg.AddByte(player->lookbody); //primary
+	msg.AddByte(player->looklegs); //secondary
+	msg.AddByte(player->lookfeet); //detail
+	msg.AddByte(0); //addons
+	
+	int first_outfit, last_outfit;
+	switch (player->getSex()){
 	case PLAYERSEX_FEMALE:
-		msg.AddU16(PLAYER_FEMALE_1);
-		msg.AddU16(PLAYER_FEMALE_7);
+		first_outfit = PLAYER_FEMALE_1;
+		last_outfit = PLAYER_FEMALE_7;
 		break;
 	case PLAYERSEX_MALE:
-		msg.AddU16(PLAYER_MALE_1);
-		msg.AddU16(PLAYER_MALE_7);
-		break;
-	case PLAYERSEX_OLDMALE:
-		msg.AddU16(160);
-		msg.AddU16(160);
+		first_outfit = PLAYER_MALE_1;
+		last_outfit = PLAYER_MALE_7;
 		break;
 	default:
-		msg.AddU16(PLAYER_MALE_1);
-		msg.AddU16(PLAYER_MALE_7);
+		first_outfit = PLAYER_MALE_1;
+		last_outfit = PLAYER_MALE_7;
+		break;
 	}
+	msg.AddByte(last_outfit - first_outfit + 1); //number of outfits
 	
+	for(int i = first_outfit; i <= last_outfit; ++i){
+		msg.AddU16(i);
+		msg.AddByte(0); //new 7.8 - addons
+	}
 	WriteBuffer(msg);
 }
 
@@ -895,6 +900,8 @@ void Protocol77::parseSetOutfit(NetworkMessage& msg)
 		player->looklegs = msg.GetByte();
 		player->lookfeet = msg.GetByte();
 		
+		msg.GetByte(); //new 7.8 - addons
+		
 		game->playerChangeOutfit(player);
 	}
 }
@@ -905,11 +912,9 @@ void Protocol77::parseUseItem(NetworkMessage& msg)
 	uint16_t itemId = msg.GetItemId();
 	uint8_t stackpos = msg.GetByte();
 	uint8_t index = msg.GetByte();
-/*	
-#ifdef __DEBUG__
-	std::cout << "parseUseItem: " << "x: " << pos.x << ", y: " << (int)pos.y <<  ", z: " << (int)pos.z << ", item: " << (int)itemId << ", stack: " << (int)stackpos << ", index: " << (int)index << std::endl;
-#endif
-*/
+	
+	std::cout << "parseUseItem: pos: " << pos << ", item: " << (int)itemId << ", stack: " << (int)stackpos << ", index: " << (int)index << std::endl;
+
 	game->playerUseItem(player, pos,stackpos, index, itemId);
 }
 
@@ -922,6 +927,8 @@ void Protocol77::parseUseItemEx(NetworkMessage& msg)
 	uint16_t toItemId = msg.GetU16();
 	uint8_t toStackpos = msg.GetByte();
 	
+	std::cout << "parseUseItemEx: fromPos: " << fromPos << ", item: " << (int)fromItemId << ", fromStack: " << (int)fromStackpos << ", toPos: " << toPos << ", toItemId: " << toItemId << ", toStack: " << (int)toStackpos << std::endl;
+	
 	game->playerUseItemEx(player, fromPos, fromStackpos, fromItemId, toPos, toStackpos, toItemId);
 }
 
@@ -931,6 +938,8 @@ void Protocol77::parseBattleWindow(NetworkMessage &msg)
 	uint16_t itemId = msg.GetItemId();
 	uint8_t fromStackPos = msg.GetByte();
 	uint32_t creatureId = msg.GetU32();
+
+	std::cout << "parseUseBattle: fromPos: " << fromPos << ", item: " << (int)itemId << ", fromStack: " << (int)fromStackPos << ", creature: " << creatureId << std::endl;
 
 	game->playerUseBattleWindow(player, fromPos, fromStackPos, creatureId, itemId);
 }
@@ -1189,6 +1198,9 @@ void Protocol77::sendSetOutfit(const Creature* creature)
 		newmsg.AddByte(creature->lookbody);
 		newmsg.AddByte(creature->looklegs);
 		newmsg.AddByte(creature->lookfeet);
+		
+		newmsg.AddByte(0); //new 7.8 - addons
+		
 		WriteBuffer(newmsg);
 	}
 }
@@ -1323,7 +1335,7 @@ void Protocol77::sendIcons(int icons)
 {
 	NetworkMessage newmsg;
 	newmsg.AddByte(0xA2);
-	newmsg.AddByte(icons);
+	newmsg.AddU16(icons); //new 7.8 - change from 8 to  16 bits
 	WriteBuffer(newmsg);
 }
 
@@ -1425,7 +1437,7 @@ void Protocol77::sendCreatureTurn(const Creature* creature, unsigned char stackP
 		msg.AddPosition(creature->getPosition());
 		msg.AddByte(stackPos); 
 		
-		msg.AddU16(0x63); /*99*/
+		msg.AddU16(0x63);
 		msg.AddU32(creature->getID());
 		msg.AddByte(creature->getDirection());
 		WriteBuffer(msg);
@@ -1916,6 +1928,7 @@ void Protocol77::AddCreature(NetworkMessage &msg,const Creature *creature, bool 
 	msg.AddByte(creature->lookbody);
 	msg.AddByte(creature->looklegs);
 	msg.AddByte(creature->lookfeet);
+	msg.AddByte(0); //new 7.8 - addons
 	
 	LightInfo lightInfo;
 	creature->getCreatureLight(lightInfo);
@@ -1952,6 +1965,7 @@ void Protocol77::AddPlayerStats(NetworkMessage &msg)
 	msg.AddByte(player->getMagicLevel());
 	msg.AddByte(player->getPlayerInfo(PLAYERINFO_MAGICLEVELPERCENT));
 	msg.AddByte(player->getPlayerInfo(PLAYERINFO_SOUL));
+	msg.AddU16(1440); //new 7.8 - stamina(minutes)
 }
 
 void Protocol77::AddPlayerSkills(NetworkMessage& msg)
@@ -1979,6 +1993,12 @@ void Protocol77::AddCreatureSpeak(NetworkMessage &msg,const Creature *creature, 
 	msg.AddByte(0xAA);
 	msg.AddU32(0);
 	msg.AddString(creature->getName());
+	if(const Player* player = creature->getPlayer()){
+		msg.AddU16(player->getPlayerInfo(PLAYERINFO_LEVEL)); //new 7.8 - level
+	}
+	else{
+		msg.AddU16(0); //new 7.8 - level
+	}
 	msg.AddByte(type);
 	switch(type){
 	case SPEAK_SAY:
@@ -1991,8 +2011,9 @@ void Protocol77::AddCreatureSpeak(NetworkMessage &msg,const Creature *creature, 
 	case SPEAK_CHANNEL_Y:
 	case SPEAK_CHANNEL_R1:
 	case SPEAK_CHANNEL_R2:
+	case SPEAK_CHANNEL_O:
 		msg.AddU16(channelId);
-		break;	
+		break;
 	}
 	msg.AddString(text);
 }

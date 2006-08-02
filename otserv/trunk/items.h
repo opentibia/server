@@ -62,6 +62,7 @@ public:
 	bool isKey() const;
 	bool isSplash() const;
 	bool isFluidContainer() const;
+	bool isRune() const;
 
 	unsigned short id;
 	unsigned short clientId;

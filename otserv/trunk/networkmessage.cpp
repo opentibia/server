@@ -33,6 +33,9 @@
 #include "rsa.h"
 
 
+long fluidMap[] = {FLUID_EMPTY_1, FLUID_BLUE_1, FLUID_RED_1, FLUID_BROWN_1, 
+	FLUID_GREEN_1, FLUID_YELLOW_1, FLUID_WHITE_1, FLUID_PURPLE_1};
+
 /******************************************************************************/
 
 NetworkMessage::NetworkMessage()
@@ -318,8 +321,14 @@ void NetworkMessage::AddItem(unsigned short id, unsigned char count)
 
 	AddU16(it.clientId);
 
-	if(it.stackable || it.isSplash() || it.isFluidContainer())
+	if(it.stackable || it.isRune()){
 		AddByte(count);
+	}
+	else if(it.isSplash() || it.isFluidContainer()){
+		long fluidIndex = count % 8;
+		AddByte(fluidMap[fluidIndex]);
+	}
+	
 }
 
 void NetworkMessage::AddItem(const Item *item)
@@ -328,8 +337,13 @@ void NetworkMessage::AddItem(const Item *item)
 
 	AddU16(it.clientId);
 
-	if(it.stackable || it.isSplash() || it.isFluidContainer())
-    AddByte(item->getItemCountOrSubtype());
+	if(it.stackable || it.isRune()){
+    	AddByte(item->getItemCountOrSubtype());
+	}
+	else if(it.isSplash() || it.isFluidContainer()){
+		long fluidIndex = item->getItemCountOrSubtype() % 8;
+		AddByte(fluidMap[fluidIndex]);
+	}
 }
 
 void NetworkMessage::AddItemId(const Item *item)
