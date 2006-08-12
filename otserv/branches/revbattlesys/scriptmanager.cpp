@@ -64,14 +64,12 @@ bool ScriptingManager::loadScriptSystems()
 	std::cout << ":: Loading Script Systems" << std::endl;
 	
 	//load spells data	
-	/*
 	std::cout << ":: Loading Spells ...";
 	if(!g_spells.loadFromXml(g_config.getGlobalString("datadir"))){
 		ErrorMessage("Unable to load Spells!");
 		return false;
 	}
 	std::cout << "[done]" << std::endl;
-	*/
 	
 	//load actions data
 	std::cout << ":: Loading Actions ...";

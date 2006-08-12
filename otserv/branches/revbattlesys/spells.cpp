@@ -101,7 +101,7 @@ bool Spells::registerEvent(Event* event, xmlNodePtr p)
 	return true;
 }
 
-RuneSpell* Spells::getRuneSpell(Item* item)
+RuneSpell* Spells::getRuneSpell(const Item* item)
 {
 	uint32_t id = item->getID();
 	RunesMap::iterator it = runes.find(id);
@@ -191,7 +191,7 @@ bool Spell::configureSpell(xmlNodePtr p)
 	return true;
 }
 	
-bool Spell::spellPlayerChecks(Player* player)
+bool Spell::spellPlayerChecks(const Player* player)
 {
 	if(player->getAccessLevel() > 3)
 		return true;
@@ -305,7 +305,6 @@ bool InstantSpell::castInstant(Creature* creature, const std::string& words, con
 	return false;
 }
 
-
 bool InstantSpell::loadFunction(const std::string& functionName)
 {
 	if(functionName == "editHouseGuest"){
@@ -335,7 +334,7 @@ bool InstantSpell::executeCastInstant(Creature* creature, const std::string& par
 {
 	//onCastInstant(...)
 	ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
-	
+
 	//debug only
 	std::stringstream desc;
 	desc << "onCastInstant";
@@ -714,6 +713,78 @@ bool RuneSpell::loadFunction(const std::string& function)
 	return false;
 }
 
+bool RuneSpell::canUse(const Player* player, const Position& toPos)
+{
+	if(Action::canUse(player, toPos)){
+		return spellPlayerChecks(player);
+	}
+
+	return true;
+}
+
+bool RuneSpell::executeUse(Player* player, Item* item, const PositionEx& posFrom, const PositionEx& posTo)
+{
+	bool isSuccess = false;
+
+	if(m_scripted){
+		//onUseRune(cid, pos, var)
+		ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
+		
+		//debug only
+		std::stringstream desc;
+		desc << "onUseRune";
+		env->setEventDesc(desc.str());
+		
+		env->setScriptId(m_scriptId, m_scriptInterface);
+		env->setRealPos(player->getPosition());
+		
+		lua_State* L = m_scriptInterface->getLuaState();
+
+		int size0 = lua_gettop(L);
+		
+		long cid = env->addThing((Thing*)player);
+
+		uint32_t targetcid = 0;
+
+		/*
+		if(target){
+			targetcid = env->addThing(target);
+		}
+		*/
+
+		m_scriptInterface->pushFunction(m_scriptId);
+		lua_pushnumber(L, cid);
+		LuaScriptInterface::pushPosition(L, posTo, 0);
+		lua_pushnumber(L, targetcid);
+		
+		long ret;
+		if(m_scriptInterface->callFunction(3, ret) == false){
+			ret = 0;
+		}
+	
+		if(size0 != lua_gettop(L)){
+			LuaScriptInterface::reportError(NULL, "Stack size changed!");
+		}
+
+		isSuccess = (ret != 0);
+	}
+	else{
+		//call hardcodedAction
+		isSuccess = false;
+	}
+
+	if(player){
+		Spell::addSpellEffects(player);
+	}
+	if(hasCharges && item){
+		int32_t newCharge = std::max(0, item->getItemCharge() - 1);
+		g_game.transformItem(item, item->getID(), newCharge);
+	}
+
+	return isSuccess;
+}
+
+/*
 bool RuneSpell::useRune(Creature* creature, Item* item, const Position& posFrom, const Position& posTo, Creature* target)
 {
 	Player* player = NULL;
@@ -759,10 +830,12 @@ bool RuneSpell::useRune(Creature* creature, Item* item, const Position& posFrom,
 	}
 	return success;
 }
+*/
 
+/*
 bool RuneSpell::executeUseRune(Creature* creature, Item* item, const Position& posFrom, const Position& posTo, Creature* target)
 {
-	//onUseRune(...)
+	//onUseRune(cid, pos, target)
 	ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
 	
 	//debug only
@@ -775,18 +848,34 @@ bool RuneSpell::executeUseRune(Creature* creature, Item* item, const Position& p
 	env->setRealPos(creature->getPosition());
 	
 	lua_State* L = m_scriptInterface->getLuaState();
+
 	int size0 = lua_gettop(L);
 	
-	//TODO:
-	//	script call code 
-	//
+	long cid = env->addThing((Thing*)creature);
+
+	uint32_t targetcid = 0;
+
+	if(target){
+		targetcid = env->addThing(target);
+	}
+
+	m_scriptInterface->pushFunction(m_scriptId);
+	lua_pushnumber(L, cid);
+	LuaScriptInterface::pushPosition(L, posTo, 0);
+	lua_pushnumber(L, targetcid);
+	
+	long ret;
+	if(m_scriptInterface->callFunction(3, ret) == false){
+		ret = 0;
+	}
 	
 	if(size0 != lua_gettop(L)){
 		LuaScriptInterface::reportError(NULL, "Stack size changed!");
 	}
-	
-	return false; //<-- change this
+
+	return ret;
 }
+*/
 
 /*
 #include <algorithm>

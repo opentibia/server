@@ -39,7 +39,7 @@ public:
 	Spells();
 	virtual ~Spells();
 	
-	RuneSpell* getRuneSpell(Item* item);
+	RuneSpell* getRuneSpell(const Item* item);
 	RuneSpell* getRuneSpell(const std::string& name);
 	
 	InstantSpell* getInstantSpell(const std::string& words);
@@ -80,7 +80,7 @@ public:
 	bool configureSpell(xmlNodePtr xmlspell);
 	
 protected:
-	bool spellPlayerChecks(Player* player);
+	bool spellPlayerChecks(const Player* player);
 	bool causeExhaustion(){return exhaustion;};
 	
 	void addSpellEffects(Player* player);
@@ -140,9 +140,12 @@ public:
 	virtual bool configureEvent(xmlNodePtr p);
 	virtual bool loadFunction(const std::string& functionName);
 	
-	bool useRune(Creature* creature, Item* item, const Position& posFrom, const Position& posTo, Creature* target);
-	//sciprting
-	bool executeUseRune(Creature* creature, Item* item, const Position& posFrom, const Position& posTo, Creature* target);
+	virtual bool canUse(const Player* player, const Position& toPos);
+
+	//bool useRune(Creature* creature, Item* item, const Position& posFrom, const Position& posTo, Creature* target);
+	//scripting
+	//bool executeUseRune(Creature* creature, Item* item, const Position& posFrom, const Position& posTo, Creature* target);
+	virtual bool executeUse(Player* player, Item* item, const PositionEx& posFrom, const PositionEx& posTo);
 	//
 	
 	uint32_t getRuneItemId(){return runeId;};

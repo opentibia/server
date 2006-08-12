@@ -54,6 +54,9 @@ public:
 	virtual CombatField* getCombatField() {return NULL;};
 	virtual const CombatField* getCombatField() const {return NULL;};
 
+	virtual void doCombat(Creature* attacker, Creature* target) const = 0;
+	virtual void doCombat(Creature* attacker, const Position& pos) const = 0;
+
 protected:
 	void addImpactEffect(const Position& pos) const;
 
@@ -69,6 +72,8 @@ public:
 	virtual CombatHealth* getCombatHealth() {return this;};
 	virtual const CombatHealth* getCombatHealth() const {return this;};
 
+	void doCombat(Creature* attacker, Creature* target) const;
+	void doCombat(Creature* attacker, const Position& pos) const;
 	void doCombat(Creature* attacker, Creature* target, int32_t minChange, int32_t maxChange) const;
 	void doCombat(Creature* attacker, const Position& pos, int32_t minChange, int32_t maxChange) const;
 
@@ -86,6 +91,8 @@ public:
 	virtual CombatMana* getCombatMana() {return this;};
 	virtual const CombatMana* getCombatMana() const {return this;};
 
+	void doCombat(Creature* attacker, Creature* target) const;
+	void doCombat(Creature* attacker, const Position& pos) const;
 	void doCombat(Creature* attacker, Creature* target, int32_t minChange, int32_t maxChange) const;
 	void doCombat(Creature* attacker, const Position& pos, int32_t minChange, int32_t maxChange) const;
 
@@ -117,6 +124,7 @@ public:
 	virtual CombatField* getCombatField() {return this;};
 	virtual const CombatField* getCombatField() const {return this;};
 	
+	void doCombat(Creature* attacker, Creature* target) const;
 	void doCombat(Creature* attacker, const Position& pos) const;
 
 protected:

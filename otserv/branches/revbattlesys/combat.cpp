@@ -65,6 +65,34 @@ void CombatHealth::internalCombat(Creature* attacker, Creature* target, int32_t 
 	g_game.combatChangeHealth(damageType, attacker, target, healthChange);
 }
 
+void CombatHealth::doCombat(Creature* attacker, Creature* target) const
+{
+	if(!attacker){
+		return;
+	}
+
+	//callback
+	int32_t minChange = 0;
+	int32_t maxChange = 0;
+	//attacker->onGetCombatValues(this, minChange, maxChange);
+
+	doCombat(attacker, target, minChange, maxChange);
+}
+
+void CombatHealth::doCombat(Creature* attacker, const Position& pos) const
+{
+	if(!attacker){
+		return;
+	}
+
+	//callback
+	int32_t minChange = 0;
+	int32_t maxChange = 0;
+	//attacker->onGetCombatValues(this, minChange, maxChange);
+
+	doCombat(attacker, pos, minChange, maxChange);
+}
+
 void CombatHealth::doCombat(Creature* attacker, Creature* target, int32_t minChange, int32_t maxChange) const
 {
 	int32_t healthChange = random_range(minChange, maxChange);
@@ -102,6 +130,34 @@ CombatMana::~CombatMana()
 void CombatMana::internalCombat(Creature* attacker, Creature* target, int32_t manaChange) const
 {
 	g_game.combatChangeMana(attacker, target, manaChange);
+}
+
+void CombatMana::doCombat(Creature* attacker, Creature* target) const
+{
+	if(!attacker){
+		return;
+	}
+
+	//callback
+	int32_t minChange = 0;
+	int32_t maxChange = 0;
+	//attacker->onGetCombatValues(this, minChange, maxChange);
+
+	doCombat(attacker, target, minChange, maxChange);
+}
+
+void CombatMana::doCombat(Creature* attacker, const Position& pos) const
+{
+	if(!attacker){
+		return;
+	}
+
+	//callback
+	int32_t minChange = 0;
+	int32_t maxChange = 0;
+	//attacker->onGetCombatValues(this, minChange, maxChange);
+
+	doCombat(attacker, pos, minChange, maxChange);
 }
 
 void CombatMana::doCombat(Creature* attacker, Creature* target, int32_t minChange, int32_t maxChange) const
@@ -157,6 +213,12 @@ CombatField::CombatField(MagicField* _field) :
 CombatField::~CombatField()
 {
 	delete field;
+}
+
+
+void CombatField::doCombat(Creature* attacker, Creature* target) const
+{
+	//
 }
 
 void CombatField::doCombat(Creature* attacker, const Position& pos) const

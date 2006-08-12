@@ -80,7 +80,7 @@ public:
 	virtual bool configureEvent(xmlNodePtr p);
 
 	//scripting
-	bool executeUse(Player* player, Item* item, const PositionEx& posFrom, const PositionEx& posTo);
+	virtual bool executeUse(Player* player, Item* item, const PositionEx& posFrom, const PositionEx& posTo);
 	//
 
 	bool allowFarUse() const {return allowfaruse;};
@@ -88,6 +88,8 @@ public:
 
 	void setAllowFarUse(bool v){allowfaruse = v;};
 	void setBlockWalls(bool v){blockwalls = v;};
+
+	virtual bool canUse(const Player* player, const Position& toPos);
 
 protected:
 	virtual std::string getScriptEventName();

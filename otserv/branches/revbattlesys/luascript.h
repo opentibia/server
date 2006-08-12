@@ -318,6 +318,9 @@ protected:
 	static int luaCreateCombatArea(lua_State *L);
 	static int luaSetCombatParam(lua_State *L);
 
+	static int luaDoAreaCombat(lua_State *L);
+	static int luaDoTargetCombat(lua_State *L);
+
 	static int luaCreateCombatHealthObject(lua_State *L);
 	static int luaDoAreaCombatHealth(lua_State *L);
 	static int luaDoTargetCombatHealth(lua_State *L);

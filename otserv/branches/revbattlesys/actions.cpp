@@ -31,6 +31,7 @@
 #include "house.h"
 #include "tasks.h"
 #include "tools.h"
+#include "spells.h"
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h> 
@@ -41,6 +42,7 @@
 #include "actions.h"
 
 extern Game g_game;
+extern Spells g_spells;
 
 Actions::Actions() :
 m_scriptInterface("Action Interface")
@@ -162,6 +164,12 @@ Action *Actions::getAction(const Item* item)
     if (it != useItemMap.end()){
 	   	return it->second;
 	}
+
+	//rune items
+	Action* runeSpell = g_spells.getRuneSpell(item);
+	if(runeSpell){
+		return runeSpell;
+	}
 	
 	return NULL;
 }
@@ -245,22 +253,7 @@ bool Actions::useItemEx(Player* player, const Position& from_pos,
 {
 	Action* action = getAction(item);
 	
-	if(action){
-		if(action->allowFarUse() == false){
-			if(canUse(player,to_pos) == TOO_FAR){
-				player->sendCancelMessage(RET_TOOFARAWAY);
-				return false;
-			}
-		}
-		else if(canUseFar(player, to_pos, action->blockWalls()) == TOO_FAR){
-			player->sendCancelMessage(RET_TOOFARAWAY);
-			return false;
-		}
-		else if(canUseFar(player, to_pos, action->blockWalls()) == CAN_NOT_THROW){
-			player->sendCancelMessage(RET_CANNOTTHROW);
-			return false;
-		}
-	
+	if(action && action->canUse(player, to_pos)){
 		int32_t from_stack = item->getParent()->__getIndexOfThing(item);
 		PositionEx posFromEx(from_pos, from_stack);
 		PositionEx posToEx(to_pos, to_stack);
@@ -305,6 +298,26 @@ bool Action::configureEvent(xmlNodePtr p)
 std::string Action::getScriptEventName()
 {
 	return "onUse";
+}
+
+bool Action::canUse(const Player* player, const Position& toPos)
+{
+	if(allowFarUse() == false){
+		if(Actions::canUse(player, toPos) == TOO_FAR){
+			player->sendCancelMessage(RET_TOOFARAWAY);
+			return false;
+		}
+	}
+	else if(Actions::canUseFar(player, toPos, blockWalls()) == TOO_FAR){
+		player->sendCancelMessage(RET_TOOFARAWAY);
+		return false;
+	}
+	else if(Actions::canUseFar(player, toPos, blockWalls()) == CAN_NOT_THROW){
+		player->sendCancelMessage(RET_CANNOTTHROW);
+		return false;
+	}
+
+	return true;
 }
 
 bool Action::executeUse(Player* player, Item* item, const PositionEx& posFrom, const PositionEx& posTo)
