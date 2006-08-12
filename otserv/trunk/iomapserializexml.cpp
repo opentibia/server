@@ -473,22 +473,20 @@ bool IOMapSerializeXML::saveHouseInfo(Map* map, const std::string& identifier)
 		ss.str("");
 		ss << house->getPayRentWarnings();
 		xmlNewProp(nodeHouse, (xmlChar*) "warnings", (xmlChar*) ss.str().c_str());
-		
-		xmlNodePtr nodeHouseAccessList = xmlNewChild(nodeHouse, NULL, (xmlChar*) "accesslist", NULL);
 
 		std::string listText;
 		if(house->getAccessList(GUEST_LIST, listText) && listText != ""){
-			saveAccessList(nodeHouseAccessList, GUEST_LIST, listText);
+			saveAccessList(nodeHouse, GUEST_LIST, listText);
 		}
 
 		if(house->getAccessList(SUBOWNER_LIST, listText) && listText != ""){
-			saveAccessList(nodeHouseAccessList, SUBOWNER_LIST, listText);
+			saveAccessList(nodeHouse, SUBOWNER_LIST, listText);
 		}
 		
 		for(HouseDoorList::iterator it = house->getHouseDoorBegin(); it != house->getHouseDoorEnd(); ++it){
 			const Door* door = *it;
 			if(door->getAccessList(listText) && listText != ""){
-				saveAccessList(nodeHouseAccessList, door->getDoorId(), listText);
+				saveAccessList(nodeHouse, door->getDoorId(), listText);
 			}
 		}
 	}
@@ -499,9 +497,11 @@ bool IOMapSerializeXML::saveHouseInfo(Map* map, const std::string& identifier)
 	return true;
 }
 
-void IOMapSerializeXML::saveAccessList(xmlNodePtr nodeHouseAccessList, unsigned long listId, const std::string& listText)
+void IOMapSerializeXML::saveAccessList(xmlNodePtr nodeHouse, unsigned long listId, const std::string& listText)
 {
 	std::stringstream ss;
+		
+	xmlNodePtr nodeHouseAccessList = xmlNewNode(NULL, (xmlChar*)"accesslist");
 
 	ss << listId;
 	xmlNewProp(nodeHouseAccessList, (xmlChar*) "listid", (xmlChar*) ss.str().c_str());
@@ -509,4 +509,6 @@ void IOMapSerializeXML::saveAccessList(xmlNodePtr nodeHouseAccessList, unsigned 
 	ss.str("");
 	ss << listText;
 	xmlNewProp(nodeHouseAccessList, (xmlChar*) "text", (xmlChar*) ss.str().c_str());
+
+	xmlAddChild(nodeHouse, nodeHouseAccessList);
 }
