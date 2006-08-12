@@ -253,17 +253,24 @@ bool Actions::useItemEx(Player* player, const Position& from_pos,
 {
 	Action* action = getAction(item);
 	
-	if(action && action->canUse(player, to_pos)){
-		int32_t from_stack = item->getParent()->__getIndexOfThing(item);
-		PositionEx posFromEx(from_pos, from_stack);
-		PositionEx posToEx(to_pos, to_stack);
-		if(action->executeUse(player, item, posFromEx, posToEx))
-			return true;
+	if(action){
+		bool ret = action->canUse(player, to_pos);
+		if(ret){
+			int32_t from_stack = item->getParent()->__getIndexOfThing(item);
+			PositionEx posFromEx(from_pos, from_stack);
+			PositionEx posToEx(to_pos, to_stack);
+			if(action->executeUse(player, item, posFromEx, posToEx)){
+				return true;
+			}
+		}
+
+		return ret;
 	}
-	
-	//not found
-	player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
-	return false;
+	else{
+		//not found
+		player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
+		return false;
+	}
 }
 
 Action::Action(LuaScriptInterface* _interface) :
