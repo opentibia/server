@@ -356,7 +356,17 @@ uint32_t ScriptEnviroment::addCombatObject(Combat* combat)
 	return newCombatId;
 }
 
-Combat* ScriptEnviroment::getCombatObject(uint32_t combatId) const
+const Combat* ScriptEnviroment::getCombatObject(uint32_t combatId) const
+{
+	CombatMap::iterator it = m_combatMap.find(combatId);
+	if(it != m_combatMap.end()){
+		return it->second;
+	}
+
+	return NULL;
+}
+
+Combat* ScriptEnviroment::getCombatObject(uint32_t combatId)
 {
 	CombatMap::iterator it = m_combatMap.find(combatId);
 	if(it != m_combatMap.end()){
@@ -407,6 +417,9 @@ std::string LuaScriptInterface::getErrorDesc(ErrorCode_t code){
 		break;
 	case LUA_ERROR_COMBAT_NOT_FOUND:
 		return "Combat not found";
+		break;
+	case LUA_ERROR_AREA_NOT_FOUND:
+		return "Area not found";
 		break;
 	case LUA_ERROR_CONTAINER_NOT_FOUND:
 		return "Container not found";
@@ -891,7 +904,7 @@ void LuaScriptInterface::registerFunctions()
 	//setCombatParam(combat, key, value)
 	lua_register(m_luaState, "setCombatParam", LuaScriptInterface::luaSetCombatParam);
 
-	//doAreaCombat(cid, area, combat, pos)
+	//doAreaCombat(cid, combat, area, pos)
 	lua_register(m_luaState, "doAreaCombat", LuaScriptInterface::luaDoAreaCombat);
 
 	//doTargetCombat(cid, combat, target)
@@ -900,7 +913,7 @@ void LuaScriptInterface::registerFunctions()
 	//createCombatHealthObject()
 	lua_register(m_luaState, "createCombatHealthObject", LuaScriptInterface::luaCreateCombatHealthObject);
 
-	//doAreaCombatHealth(cid, area, combat, pos, min, max)
+	//doAreaCombatHealth(cid, combat, area, pos, min, max)
 	lua_register(m_luaState, "doAreaCombatHealth", LuaScriptInterface::luaDoAreaCombatHealth);
 
 	//doTargetCombatHealth(cid, combat, target, min, max)
@@ -909,7 +922,7 @@ void LuaScriptInterface::registerFunctions()
 	//createCombatManaObject()
 	lua_register(m_luaState, "createCombatManaObject", LuaScriptInterface::luaCreateCombatManaObject);
 
-	//doAreaCombatMana(cid, area, combat, pos, min, max)
+	//doAreaCombatMana(cid, combat, area, pos, min, max)
 	lua_register(m_luaState, "doAreaCombatMana", LuaScriptInterface::luaDoAreaCombatMana);
 
 	//doTargetCombatMana(cid, combat, target, min, max)
@@ -2227,19 +2240,36 @@ int LuaScriptInterface::luaCreateCombatArea(lua_State *L)
 int LuaScriptInterface::luaSetCombatParam(lua_State *L)
 {
 	//setCombatParam(combat, key, value)
+	
+	uint32_t value = (int)popNumber(L);
+	CombatParam_t key = (CombatParam_t)popNumber(L);
+	uint32_t combatId = (int)popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Combat* combat = env->getCombatObject(combatId);
+
+	if(!combat){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_COMBAT_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
+	combat->setParam(key, value);
+
 	return 0;
 }
 
 int LuaScriptInterface::luaDoAreaCombat(lua_State *L)
 {
-	//doAreaCombat(cid, area, combat, pos)
+	//doAreaCombat(cid, combat, area, pos)
 
 	Position pos;
 	long stackpos;
 	popPosition(L, pos, stackpos);
 
-	uint32_t combatId = (int)popNumber(L);
 	uint32_t areaId = (int)popNumber(L);
+	uint32_t combatId = (int)popNumber(L);
 	uint32_t cid = (uint32_t)popNumber(L);
 
 	ScriptEnviroment* env = getScriptEnv();
@@ -2264,7 +2294,21 @@ int LuaScriptInterface::luaDoAreaCombat(lua_State *L)
 		return 1;
 	}
 
-	combat->doCombat(creature, pos);
+	const AreaCombat* area = env->getCombatArea(areaId);
+	if(!area){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_AREA_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
+	std::list<Tile*> list;
+	area->getList(pos, creature->getDirection(), list);
+
+	//TODO: filter out invalid tiles depending on access level/blocking projectile
+
+	for(std::list<Tile*>::iterator it = list.begin(); it != list.end(); ++it){
+		combat->doCombat(creature, (*it)->getPosition());
+	}
 
 	lua_pushnumber(L, LUA_NO_ERROR);
 	return 1;
@@ -2329,7 +2373,7 @@ int LuaScriptInterface::luaCreateCombatHealthObject(lua_State *L)
 
 int LuaScriptInterface::luaDoAreaCombatHealth(lua_State *L)
 {
-	//doAreaCombatHealth(cid, area, combat, pos, min, max)
+	//doAreaCombatHealth(cid, combat, area, pos, min, max)
 
 	int32_t maxChange = (int32_t)popNumber(L);
 	int32_t minChange = (int32_t)popNumber(L);
@@ -2338,8 +2382,8 @@ int LuaScriptInterface::luaDoAreaCombatHealth(lua_State *L)
 	long stackpos;
 	popPosition(L, pos, stackpos);
 
-	uint32_t combatId = (int)popNumber(L);
 	uint32_t areaId = (int)popNumber(L);
+	uint32_t combatId = (int)popNumber(L);
 	uint32_t cid = (uint32_t)popNumber(L);
 
 	ScriptEnviroment* env = getScriptEnv();
@@ -2444,7 +2488,7 @@ int LuaScriptInterface::luaCreateCombatManaObject(lua_State *L)
 
 int LuaScriptInterface::luaDoAreaCombatMana(lua_State *L)
 {
-	//doAreaCombatMana(cid, area, combat, pos, min, max)
+	//doAreaCombatMana(cid, combat, area, pos, min, max)
 
 	int32_t maxChange = (int32_t)popNumber(L);
 	int32_t minChange = (int32_t)popNumber(L);
@@ -2453,8 +2497,8 @@ int LuaScriptInterface::luaDoAreaCombatMana(lua_State *L)
 	long stackpos;
 	popPosition(L, pos, stackpos);
 
-	uint32_t combatId = (int)popNumber(L);
 	uint32_t areaId = (int)popNumber(L);
+	uint32_t combatId = (int)popNumber(L);
 	uint32_t cid = (uint32_t)popNumber(L);
 
 	ScriptEnviroment* env = getScriptEnv();
@@ -2545,12 +2589,13 @@ int LuaScriptInterface::luaDoTargetCombatMana(lua_State *L)
 
 int LuaScriptInterface::luaDoAreaCombatCondition(lua_State *L)
 {
-	//doAreaCombatCondition(cid, combat, pos)
+	//doAreaCombatCondition(cid, combat, area, pos)
 
 	Position pos;
 	long stackpos;
 	popPosition(L, pos, stackpos);
 
+	uint32_t areaId = (int)popNumber(L);
 	uint32_t combatId = (int)popNumber(L);
 	uint32_t cid = (uint32_t)popNumber(L);
 

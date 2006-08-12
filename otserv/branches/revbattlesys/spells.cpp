@@ -719,7 +719,7 @@ bool RuneSpell::canUse(const Player* player, const Position& toPos)
 		return spellPlayerChecks(player);
 	}
 
-	return true;
+	return false;
 }
 
 bool RuneSpell::executeUse(Player* player, Item* item, const PositionEx& posFrom, const PositionEx& posTo)

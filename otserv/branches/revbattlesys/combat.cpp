@@ -41,6 +41,20 @@ Combat::~Combat()
 	//
 }
 
+bool Combat::setParam(CombatParam_t param, uint32_t value)
+{
+	switch(param){
+		case COMBATPARAM_EFFECTTYPE:
+		{
+			impactEffect = value;
+			return true;
+			break;
+		}
+	}
+
+	return false;
+}
+
 void Combat::addImpactEffect(const Position& pos) const
 {
 	if(impactEffect != NM_ME_NONE){
@@ -58,6 +72,20 @@ CombatHealth::CombatHealth(DamageType_t _damageType, uint8_t _impactEffect) :
 CombatHealth::~CombatHealth()
 {
 	//
+}
+
+bool CombatHealth::setParam(CombatParam_t param, uint32_t value)
+{
+	if(!Combat::setParam(param, value)){		
+		switch(param)
+		case COMBATPARAM_HEALTHTYPE:
+		{
+			damageType = (DamageType_t)value;
+			return true;
+		}
+	}
+
+	return false;
 }
 
 void CombatHealth::internalCombat(Creature* attacker, Creature* target, int32_t healthChange) const

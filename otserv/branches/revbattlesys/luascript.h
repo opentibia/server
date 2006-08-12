@@ -104,7 +104,8 @@ public:
 	AreaCombat* getCombatArea(uint32_t areaId) const;
 
 	uint32_t addCombatObject(Combat* combat);
-	Combat* getCombatObject(uint32_t combatId) const;
+	const Combat* getCombatObject(uint32_t combatId) const;
+	Combat* getCombatObject(uint32_t combatId);
 
 private:
 	typedef std::map<long, Thing*> ThingMap;
@@ -168,6 +169,7 @@ enum ErrorCode_t{
 	LUA_ERROR_TILE_NOT_FOUND,
 	LUA_ERROR_HOUSE_NOT_FOUND,
 	LUA_ERROR_COMBAT_NOT_FOUND,
+	LUA_ERROR_AREA_NOT_FOUND,
 	LUA_ERROR_CONTAINER_NOT_FOUND,
 };
 

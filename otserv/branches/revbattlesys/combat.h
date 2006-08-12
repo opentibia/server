@@ -57,6 +57,8 @@ public:
 	virtual void doCombat(Creature* attacker, Creature* target) const = 0;
 	virtual void doCombat(Creature* attacker, const Position& pos) const = 0;
 
+	virtual bool setParam(CombatParam_t param, uint32_t value);
+
 protected:
 	void addImpactEffect(const Position& pos) const;
 
@@ -76,6 +78,8 @@ public:
 	void doCombat(Creature* attacker, const Position& pos) const;
 	void doCombat(Creature* attacker, Creature* target, int32_t minChange, int32_t maxChange) const;
 	void doCombat(Creature* attacker, const Position& pos, int32_t minChange, int32_t maxChange) const;
+
+	virtual bool setParam(CombatParam_t param, uint32_t value);
 
 protected:
 	void internalCombat(Creature* attacker, Creature* target, int32_t healthChange) const;
