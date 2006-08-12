@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// Implementation of tibia v7.7x protocoll
+// Implementation of tibia v7.8 protocol
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -28,7 +28,7 @@
 #include <list>
 
 #include "networkmessage.h"
-#include "protocol77.h"
+#include "protocol78.h"
 
 #include "items.h"
 
@@ -53,7 +53,7 @@ extern ConfigManager g_config;
 extern Actions actions;
 Chat g_chat;
 
-Protocol77::Protocol77(SOCKET s)
+Protocol78::Protocol78(SOCKET s)
 {
 	OTSYS_THREAD_LOCKVARINIT(bufferLock);
 	windowTextID = 0;
@@ -63,12 +63,12 @@ Protocol77::Protocol77(SOCKET s)
 }
 
 
-Protocol77::~Protocol77()
+Protocol78::~Protocol78()
 {
 	OTSYS_THREAD_LOCKVARRELEASE(bufferLock);	
 }
 
-void Protocol77::reinitializeProtocol(SOCKET _s)
+void Protocol78::reinitializeProtocol(SOCKET _s)
 {
 	windowTextID = 0;
 	readItem = NULL;
@@ -80,7 +80,7 @@ void Protocol77::reinitializeProtocol(SOCKET _s)
 	s = _s;
 }
 
-connectResult_t Protocol77::ConnectPlayer()
+connectResult_t Protocol78::ConnectPlayer()
 {	
 	Waitlist* wait = Waitlist::instance();
 
@@ -104,7 +104,7 @@ connectResult_t Protocol77::ConnectPlayer()
 }
 
 
-void Protocol77::ReceiveLoop()
+void Protocol78::ReceiveLoop()
 {
 	NetworkMessage msg;
 	msg.setEncryptionState(true);
@@ -125,7 +125,7 @@ void Protocol77::ReceiveLoop()
 				OTSYS_SLEEP(250);
 			}
 
-			OTSYS_THREAD_LOCK(game->gameLock, "Protocol77::ReceiveLoop()")
+			OTSYS_THREAD_LOCK(game->gameLock, "Protocol78::ReceiveLoop()")
 
 			if(!player->isRemoved()){
 				if(s == 0){
@@ -137,14 +137,14 @@ void Protocol77::ReceiveLoop()
 				}
 			}
 			
-			OTSYS_THREAD_UNLOCK(game->gameLock, "Protocol77::ReceiveLoop()")
+			OTSYS_THREAD_UNLOCK(game->gameLock, "Protocol78::ReceiveLoop()")
 		}
 		
 	}while(s != 0 && !player->isRemoved());
 }
 
 
-void Protocol77::parsePacket(NetworkMessage &msg)
+void Protocol78::parsePacket(NetworkMessage &msg)
 {
 	if(msg.getMessageLength() <= 0)
 		return;
@@ -360,7 +360,7 @@ void Protocol77::parsePacket(NetworkMessage &msg)
 	game->flushSendBuffers();
 }
 
-void Protocol77::GetTileDescription(const Tile* tile, NetworkMessage &msg)
+void Protocol78::GetTileDescription(const Tile* tile, NetworkMessage &msg)
 {
 	if(tile){
 		int count = 0;
@@ -391,7 +391,7 @@ void Protocol77::GetTileDescription(const Tile* tile, NetworkMessage &msg)
 	}
 }
 
-void Protocol77::GetMapDescription(unsigned short x, unsigned short y, unsigned char z,
+void Protocol78::GetMapDescription(unsigned short x, unsigned short y, unsigned char z,
 	unsigned short width, unsigned short height, NetworkMessage &msg)
 {
 	int skip = -1;
@@ -424,7 +424,7 @@ void Protocol77::GetMapDescription(unsigned short x, unsigned short y, unsigned 
 #endif
 }
 
-void Protocol77::GetFloorDescription(NetworkMessage& msg, int x, int y, int z, int width, int height, int offset, int& skip)
+void Protocol78::GetFloorDescription(NetworkMessage& msg, int x, int y, int z, int width, int height, int offset, int& skip)
 {
 	Tile* tile;
 
@@ -452,7 +452,7 @@ void Protocol77::GetFloorDescription(NetworkMessage& msg, int x, int y, int z, i
 	}
 }
 
-void Protocol77::checkCreatureAsKnown(unsigned long id, bool &known, unsigned long &removedKnown)
+void Protocol78::checkCreatureAsKnown(unsigned long id, bool &known, unsigned long &removedKnown)
 {
 	// loop through the known player and check if the given player is in
 	std::list<unsigned long>::iterator i;
@@ -503,16 +503,16 @@ void Protocol77::checkCreatureAsKnown(unsigned long id, bool &known, unsigned lo
 	}
 }
 
-bool Protocol77::CanSee(const Position& pos) const
+bool Protocol78::CanSee(const Position& pos) const
 {
 	return CanSee(pos.x, pos.y, pos.z);
 }
 
-bool Protocol77::CanSee(int x, int y, int z) const
+bool Protocol78::CanSee(int x, int y, int z) const
 {
 #ifdef __DEBUG__
 	if(z < 0 || z >= MAP_MAX_LAYERS) {
-		std::cout << "WARNING! Protocol77::CanSee() Z-value is out of range!" << std::endl;
+		std::cout << "WARNING! Protocol78::CanSee() Z-value is out of range!" << std::endl;
 	}
 #endif
 
@@ -554,7 +554,7 @@ bool Protocol77::CanSee(int x, int y, int z) const
 	return false;
 }
 
-bool Protocol77::CanSee(const Creature* c) const
+bool Protocol78::CanSee(const Creature* c) const
 {
 	if(c->isRemoved())
 		return false;
@@ -564,7 +564,7 @@ bool Protocol77::CanSee(const Creature* c) const
 }
 
 
-void Protocol77::logout()
+void Protocol78::logout()
 {
 	// we ask the game to remove us
 	if(!player->isRemoved()){
@@ -577,7 +577,7 @@ void Protocol77::logout()
 }
 
 // Parse methods
-void Protocol77::parseLogout(NetworkMessage& msg)
+void Protocol78::parseLogout(NetworkMessage& msg)
 {
 	if(player->inFightTicks >=1000 && !player->isRemoved()){
 		player->sendCancelMessage(RET_YOUMAYNOTLOGOUTDURINGAFIGHT);
@@ -588,9 +588,9 @@ void Protocol77::parseLogout(NetworkMessage& msg)
 	}
 }
 
-void Protocol77::parseCreatePrivateChannel(NetworkMessage& msg)
+void Protocol78::parseCreatePrivateChannel(NetworkMessage& msg)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol77::parseCreatePrivateChannel()");
+	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol78::parseCreatePrivateChannel()");
 	if(player->isRemoved()){
 		return;
 	}
@@ -609,11 +609,11 @@ void Protocol77::parseCreatePrivateChannel(NetworkMessage& msg)
 	}
 }
 
-void Protocol77::parseChannelInvite(NetworkMessage& msg)
+void Protocol78::parseChannelInvite(NetworkMessage& msg)
 {
 	std::string name = msg.GetString();
 		
-	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol77::parseChannelInvite()");
+	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol78::parseChannelInvite()");
 	if(player->isRemoved()){
 		return;
 	}
@@ -629,11 +629,11 @@ void Protocol77::parseChannelInvite(NetworkMessage& msg)
 	}
 }
 
-void Protocol77::parseChannelExclude(NetworkMessage& msg)
+void Protocol78::parseChannelExclude(NetworkMessage& msg)
 {
 	std::string name = msg.GetString();
 
-	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol77::parseChannelExclude()");
+	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol78::parseChannelExclude()");
 	if(player->isRemoved()){
 		return;
 	}
@@ -649,9 +649,9 @@ void Protocol77::parseChannelExclude(NetworkMessage& msg)
 	}
 }
 
-void Protocol77::parseGetChannels(NetworkMessage& msg)
+void Protocol78::parseGetChannels(NetworkMessage& msg)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol77::parseGetChannels()");
+	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol78::parseGetChannels()");
 	if(player->isRemoved()){
 		return;
 	}
@@ -659,10 +659,10 @@ void Protocol77::parseGetChannels(NetworkMessage& msg)
 	sendChannelsDialog();
 }
 
-void Protocol77::parseOpenChannel(NetworkMessage& msg)
+void Protocol78::parseOpenChannel(NetworkMessage& msg)
 {
 	unsigned short channelId = msg.GetU16();
-	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol77::parseOpenChannel()");
+	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol78::parseOpenChannel()");
 	if(player->isRemoved()){
 		return;
 	}
@@ -672,10 +672,10 @@ void Protocol77::parseOpenChannel(NetworkMessage& msg)
 	}
 }
 
-void Protocol77::parseCloseChannel(NetworkMessage &msg)
+void Protocol78::parseCloseChannel(NetworkMessage &msg)
 {
 	unsigned short channelId = msg.GetU16();
-	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol77::parseCloseChannel()");
+	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol78::parseCloseChannel()");
 	if(player->isRemoved()){
 		return;
 	}
@@ -683,12 +683,12 @@ void Protocol77::parseCloseChannel(NetworkMessage &msg)
 	g_chat.removeUserFromChannel(player, channelId);
 }
 
-void Protocol77::parseOpenPriv(NetworkMessage& msg)
+void Protocol78::parseOpenPriv(NetworkMessage& msg)
 {
 	std::string receiver; 
 	receiver = msg.GetString();
 
-	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol77::parseOpenPriv()");
+	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol78::parseOpenPriv()");
 	if(player->isRemoved()){
 		return;
 	}
@@ -699,13 +699,13 @@ void Protocol77::parseOpenPriv(NetworkMessage& msg)
 	}
 }
 
-void Protocol77::parseCancelMove(NetworkMessage& msg)
+void Protocol78::parseCancelMove(NetworkMessage& msg)
 {
 	game->playerSetAttackedCreature(player, 0);
 	game->playerFollowCreature(player, 0);
 }
 
-void Protocol77::parseDebug(NetworkMessage& msg)
+void Protocol78::parseDebug(NetworkMessage& msg)
 {
 	int dataLength = msg.getMessageLength() - 3;
 	if(dataLength != 0){
@@ -721,9 +721,9 @@ void Protocol77::parseDebug(NetworkMessage& msg)
 }
 
 
-void Protocol77::parseReceivePing(NetworkMessage& msg)
+void Protocol78::parseReceivePing(NetworkMessage& msg)
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol77::parseReceivePing()");
+	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol78::parseReceivePing()");
 	if(player->isRemoved()){
 		return;
 	}
@@ -731,7 +731,7 @@ void Protocol77::parseReceivePing(NetworkMessage& msg)
 	player->receivePing();
 }
 
-void Protocol77::parseAutoWalk(NetworkMessage& msg)
+void Protocol78::parseAutoWalk(NetworkMessage& msg)
 {
 	// first we get all directions...
 	std::list<Direction> path;
@@ -766,40 +766,40 @@ void Protocol77::parseAutoWalk(NetworkMessage& msg)
 	game->playerAutoWalk(player, path);
 }
 
-void Protocol77::parseStopAutoWalk(NetworkMessage& msg)
+void Protocol78::parseStopAutoWalk(NetworkMessage& msg)
 {
 	game->playerStopAutoWalk(player);
 }
 
-void Protocol77::parseMoveNorth(NetworkMessage& msg)
+void Protocol78::parseMoveNorth(NetworkMessage& msg)
 {
 	sleepTillMove();
 	
 	game->movePlayer(player, NORTH);
 }
 
-void Protocol77::parseMoveEast(NetworkMessage& msg)
+void Protocol78::parseMoveEast(NetworkMessage& msg)
 {
 	sleepTillMove();
 
 	game->movePlayer(player, EAST);
 }
 
-void Protocol77::parseMoveSouth(NetworkMessage& msg)
+void Protocol78::parseMoveSouth(NetworkMessage& msg)
 {
 	sleepTillMove();
 
 	game->movePlayer(player, SOUTH);
 }
 
-void Protocol77::parseMoveWest(NetworkMessage& msg)
+void Protocol78::parseMoveWest(NetworkMessage& msg)
 {
 	sleepTillMove();
 
 	game->movePlayer(player, WEST);
 }
 
-void Protocol77::parseMoveNorthEast(NetworkMessage& msg)
+void Protocol78::parseMoveNorthEast(NetworkMessage& msg)
 {
 	sleepTillMove();
 	sleepTillMove();
@@ -807,7 +807,7 @@ void Protocol77::parseMoveNorthEast(NetworkMessage& msg)
 	game->movePlayer(player, NORTHEAST);
 }
 
-void Protocol77::parseMoveSouthEast(NetworkMessage& msg)
+void Protocol78::parseMoveSouthEast(NetworkMessage& msg)
 {
 	sleepTillMove();
 	sleepTillMove();
@@ -815,7 +815,7 @@ void Protocol77::parseMoveSouthEast(NetworkMessage& msg)
 	game->movePlayer(player, SOUTHEAST);
 }
 
-void Protocol77::parseMoveSouthWest(NetworkMessage& msg)
+void Protocol78::parseMoveSouthWest(NetworkMessage& msg)
 {
 	sleepTillMove();
 	sleepTillMove();
@@ -823,7 +823,7 @@ void Protocol77::parseMoveSouthWest(NetworkMessage& msg)
 	game->movePlayer(player, SOUTHWEST);
 }
 
-void Protocol77::parseMoveNorthWest(NetworkMessage& msg)
+void Protocol78::parseMoveNorthWest(NetworkMessage& msg)
 {
 	sleepTillMove();
 	sleepTillMove();
@@ -831,27 +831,27 @@ void Protocol77::parseMoveNorthWest(NetworkMessage& msg)
 	game->movePlayer(player, NORTHWEST);
 }
 
-void Protocol77::parseTurnNorth(NetworkMessage& msg)
+void Protocol78::parseTurnNorth(NetworkMessage& msg)
 {
 	game->playerTurn(player, NORTH);
 }
 
-void Protocol77::parseTurnEast(NetworkMessage& msg)
+void Protocol78::parseTurnEast(NetworkMessage& msg)
 {
 	game->playerTurn(player, EAST);
 }
 
-void Protocol77::parseTurnSouth(NetworkMessage& msg)
+void Protocol78::parseTurnSouth(NetworkMessage& msg)
 {
 	game->playerTurn(player, SOUTH);
 }
 
-void Protocol77::parseTurnWest(NetworkMessage& msg)
+void Protocol78::parseTurnWest(NetworkMessage& msg)
 {
 	game->playerTurn(player, WEST);
 }
 
-void Protocol77::parseRequestOutfit(NetworkMessage& msg)
+void Protocol78::parseRequestOutfit(NetworkMessage& msg)
 {
 	msg.Reset();
 	
@@ -882,12 +882,12 @@ void Protocol77::parseRequestOutfit(NetworkMessage& msg)
 	
 	for(int i = first_outfit; i <= last_outfit; ++i){
 		msg.AddU16(i);
-		msg.AddByte(0); //new 7.8 - addons
+		msg.AddByte(0); //addons
 	}
 	WriteBuffer(msg);
 }
 
-void Protocol77::parseSetOutfit(NetworkMessage& msg)
+void Protocol78::parseSetOutfit(NetworkMessage& msg)
 {
 	int temp = msg.GetU16();
 	if ( (player->getSex() == PLAYERSEX_FEMALE && temp >= PLAYER_FEMALE_1 && temp <= PLAYER_FEMALE_7) ||
@@ -900,13 +900,13 @@ void Protocol77::parseSetOutfit(NetworkMessage& msg)
 		player->looklegs = msg.GetByte();
 		player->lookfeet = msg.GetByte();
 		
-		msg.GetByte(); //new 7.8 - addons
+		msg.GetByte(); //addons
 		
 		game->playerChangeOutfit(player);
 	}
 }
 
-void Protocol77::parseUseItem(NetworkMessage& msg)
+void Protocol78::parseUseItem(NetworkMessage& msg)
 {
 	Position pos = msg.GetPosition();
 	uint16_t itemId = msg.GetItemId();
@@ -918,7 +918,7 @@ void Protocol77::parseUseItem(NetworkMessage& msg)
 	game->playerUseItem(player, pos,stackpos, index, itemId);
 }
 
-void Protocol77::parseUseItemEx(NetworkMessage& msg)
+void Protocol78::parseUseItemEx(NetworkMessage& msg)
 {
 	Position fromPos = msg.GetPosition();
 	uint16_t fromItemId = msg.GetItemId();
@@ -932,7 +932,7 @@ void Protocol77::parseUseItemEx(NetworkMessage& msg)
 	game->playerUseItemEx(player, fromPos, fromStackpos, fromItemId, toPos, toStackpos, toItemId);
 }
 
-void Protocol77::parseBattleWindow(NetworkMessage &msg)
+void Protocol78::parseBattleWindow(NetworkMessage &msg)
 {
 	Position fromPos = msg.GetPosition();
 	uint16_t itemId = msg.GetItemId();
@@ -944,11 +944,11 @@ void Protocol77::parseBattleWindow(NetworkMessage &msg)
 	game->playerUseBattleWindow(player, fromPos, fromStackPos, creatureId, itemId);
 }
 
-void Protocol77::parseCloseContainer(NetworkMessage& msg)
+void Protocol78::parseCloseContainer(NetworkMessage& msg)
 {
 	unsigned char containerid = msg.GetByte();
 
-	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol77::parseCloseContainer()");
+	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol78::parseCloseContainer()");
 	if(player->isRemoved()){
 		return;
 	}
@@ -957,10 +957,10 @@ void Protocol77::parseCloseContainer(NetworkMessage& msg)
 	sendCloseContainer(containerid);
 }
 
-void Protocol77::parseUpArrowContainer(NetworkMessage& msg)
+void Protocol78::parseUpArrowContainer(NetworkMessage& msg)
 {
 	uint32_t cid = msg.GetByte();
-	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol77::parseUpArrowContainer()");
+	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol78::parseUpArrowContainer()");
 	if(player->isRemoved()){
 		return;
 	}
@@ -977,10 +977,10 @@ void Protocol77::parseUpArrowContainer(NetworkMessage& msg)
 	}
 }
 
-void Protocol77::parseUpdateContainer(NetworkMessage& msg)
+void Protocol78::parseUpdateContainer(NetworkMessage& msg)
 {
 	uint32_t cid = msg.GetByte();
-	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol77::parseUpdateContainer()");
+	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol78::parseUpdateContainer()");
 	if(player->isRemoved()){
 		return;
 	}
@@ -993,7 +993,7 @@ void Protocol77::parseUpdateContainer(NetworkMessage& msg)
 	sendContainer(cid, container, hasParent);
 }
 
-void Protocol77::parseThrow(NetworkMessage& msg)
+void Protocol78::parseThrow(NetworkMessage& msg)
 {
 	Position fromPos = msg.GetPosition();
 	uint16_t itemId = msg.GetItemId();
@@ -1015,7 +1015,7 @@ void Protocol77::parseThrow(NetworkMessage& msg)
 	game->thingMove(player, fromPos, itemId, fromStackpos, toPos, count);
 }
 
-void Protocol77::parseLookAt(NetworkMessage& msg)
+void Protocol78::parseLookAt(NetworkMessage& msg)
 {
 	Position pos = msg.GetPosition();
 	uint16_t itemId = msg.GetItemId();
@@ -1030,7 +1030,7 @@ void Protocol77::parseLookAt(NetworkMessage& msg)
 	game->playerLookAt(player, pos, itemId, stackpos);
 }
 
-void Protocol77::parseSay(NetworkMessage& msg)
+void Protocol78::parseSay(NetworkMessage& msg)
 {
 	SpeakClasses type = (SpeakClasses)msg.GetByte();
 	
@@ -1074,7 +1074,7 @@ void Protocol77::parseSay(NetworkMessage& msg)
 	}
 }
 
-void Protocol77::parseFightModes(NetworkMessage& msg)
+void Protocol78::parseFightModes(NetworkMessage& msg)
 {
 	uint8_t fightMode = msg.GetByte(); //1 - offensive, 2 - balanced, 3 - defensive
 	uint8_t chaseMode = msg.GetByte(); // 0 - stand while fightning, 1 - chase opponent
@@ -1082,19 +1082,19 @@ void Protocol77::parseFightModes(NetworkMessage& msg)
 	game->playerSetFightModes(player, fightMode, chaseMode);
 }
 
-void Protocol77::parseAttack(NetworkMessage& msg)
+void Protocol78::parseAttack(NetworkMessage& msg)
 {
 	unsigned long creatureid = msg.GetU32();
 	game->playerSetAttackedCreature(player, creatureid);
 }
 
-void Protocol77::parseFollow(NetworkMessage& msg)
+void Protocol78::parseFollow(NetworkMessage& msg)
 {
 	unsigned long creatureId = msg.GetU32();
 	game->playerFollowCreature(player, creatureId);
 }
 
-void Protocol77::parseTextWindow(NetworkMessage& msg)
+void Protocol78::parseTextWindow(NetworkMessage& msg)
 {
 	unsigned long id = msg.GetU32();
 	std::string new_text = msg.GetString();
@@ -1108,13 +1108,13 @@ void Protocol77::parseTextWindow(NetworkMessage& msg)
 	}
 }
 
-void Protocol77::parseHouseWindow(NetworkMessage &msg)
+void Protocol78::parseHouseWindow(NetworkMessage &msg)
 {
 	unsigned char _listid = msg.GetByte();
 	unsigned long id = msg.GetU32();
 	std::string new_list = msg.GetString();
 	
-	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol77::parseHouseWindow()");
+	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol78::parseHouseWindow()");
 	if(player->isRemoved()){
 		return;
 	}
@@ -1126,7 +1126,7 @@ void Protocol77::parseHouseWindow(NetworkMessage &msg)
 	}
 }
 
-void Protocol77::parseRequestTrade(NetworkMessage& msg)
+void Protocol78::parseRequestTrade(NetworkMessage& msg)
 {
 	Position pos = msg.GetPosition();
 	uint16_t itemId = msg.GetItemId();
@@ -1136,12 +1136,12 @@ void Protocol77::parseRequestTrade(NetworkMessage& msg)
 	game->playerRequestTrade(player, pos, stackpos, playerId, itemId);
 }
 
-void Protocol77::parseAcceptTrade(NetworkMessage& msg)
+void Protocol78::parseAcceptTrade(NetworkMessage& msg)
 {
 	game->playerAcceptTrade(player);
 }
 
-void Protocol77::parseLookInTrade(NetworkMessage& msg)
+void Protocol78::parseLookInTrade(NetworkMessage& msg)
 {
 	bool counterOffer = (msg.GetByte() == 0x01);
 	int index = msg.GetByte();
@@ -1149,12 +1149,12 @@ void Protocol77::parseLookInTrade(NetworkMessage& msg)
 	game->playerLookInTrade(player, counterOffer, index);
 }
 
-void Protocol77::parseCloseTrade()
+void Protocol78::parseCloseTrade()
 {
 	game->playerCloseTrade(player);
 }
 
-void Protocol77::parseAddVip(NetworkMessage& msg)
+void Protocol78::parseAddVip(NetworkMessage& msg)
 {
 	std::string vip_name = msg.GetString();
 	if(vip_name.size() > 32)
@@ -1163,13 +1163,13 @@ void Protocol77::parseAddVip(NetworkMessage& msg)
 	game->playerRequestAddVip(player, vip_name);
 }
 
-void Protocol77::parseRemVip(NetworkMessage& msg)
+void Protocol78::parseRemVip(NetworkMessage& msg)
 {
 	unsigned long id = msg.GetU32();
 	player->removeVIP(id);
 }
 
-void Protocol77::parseRotateItem(NetworkMessage& msg)
+void Protocol78::parseRotateItem(NetworkMessage& msg)
 {
 	Position pos = msg.GetPosition();
 	uint16_t itemId = msg.GetItemId();
@@ -1179,7 +1179,7 @@ void Protocol77::parseRotateItem(NetworkMessage& msg)
 }
 
 // Send methods
-void Protocol77::sendOpenPriv(const std::string& receiver)
+void Protocol78::sendOpenPriv(const std::string& receiver)
 {
 	NetworkMessage newmsg; 
 	newmsg.AddByte(0xAD); 
@@ -1187,7 +1187,7 @@ void Protocol77::sendOpenPriv(const std::string& receiver)
 	WriteBuffer(newmsg);
 }
 
-void Protocol77::sendSetOutfit(const Creature* creature)
+void Protocol78::sendSetOutfit(const Creature* creature)
 {
 	if(CanSee(creature)){
 		NetworkMessage newmsg;
@@ -1199,13 +1199,13 @@ void Protocol77::sendSetOutfit(const Creature* creature)
 		newmsg.AddByte(creature->looklegs);
 		newmsg.AddByte(creature->lookfeet);
 		
-		newmsg.AddByte(0); //new 7.8 - addons
+		newmsg.AddByte(0); //addons
 		
 		WriteBuffer(newmsg);
 	}
 }
 
-void Protocol77::sendCreatureLight(const Creature* creature)
+void Protocol78::sendCreatureLight(const Creature* creature)
 {
 	if(CanSee(creature)){
 		NetworkMessage msg;
@@ -1214,14 +1214,14 @@ void Protocol77::sendCreatureLight(const Creature* creature)
 	}
 }
 
-void Protocol77::sendWorldLight(const LightInfo& lightInfo)
+void Protocol78::sendWorldLight(const LightInfo& lightInfo)
 {
 	NetworkMessage msg; 
 	AddWorldLight(msg, lightInfo);
 	WriteBuffer(msg);
 }
 
-void Protocol77::sendCreatureSkull(const Creature* creature)
+void Protocol78::sendCreatureSkull(const Creature* creature)
 {
 	if(CanSee(creature)){
 		NetworkMessage msg;
@@ -1242,7 +1242,7 @@ void Protocol77::sendCreatureSkull(const Creature* creature)
 	}
 }
 
-void Protocol77::sendCreatureShield(const Creature* creature)
+void Protocol78::sendCreatureShield(const Creature* creature)
 {
 	if(CanSee(creature)){
 		NetworkMessage msg;
@@ -1253,7 +1253,7 @@ void Protocol77::sendCreatureShield(const Creature* creature)
 	}
 }
 
-void Protocol77::sendCreatureSquare(const Creature* creature, SquareColor color)
+void Protocol78::sendCreatureSquare(const Creature* creature, SquareColor color)
 {
 	if(CanSee(creature)){
 		NetworkMessage msg;
@@ -1264,21 +1264,21 @@ void Protocol77::sendCreatureSquare(const Creature* creature, SquareColor color)
 	}
 }
 
-void Protocol77::sendStats()
+void Protocol78::sendStats()
 {
 	NetworkMessage msg;
 	AddPlayerStats(msg);
 	WriteBuffer(msg);
 }
 
-void Protocol77::sendTextMessage(MessageClasses mclass, const char* message)
+void Protocol78::sendTextMessage(MessageClasses mclass, const char* message)
 {
 	NetworkMessage msg;
 	AddTextMessage(msg,mclass, message);
 	WriteBuffer(msg);
 }
 
-void Protocol77::sendTextMessage(MessageClasses mclass, const char* message,
+void Protocol78::sendTextMessage(MessageClasses mclass, const char* message,
 	const Position &pos, unsigned char type)
 {
 	NetworkMessage msg;
@@ -1287,7 +1287,7 @@ void Protocol77::sendTextMessage(MessageClasses mclass, const char* message,
 	WriteBuffer(msg);
 }
 
-void Protocol77::sendClosePrivate(unsigned short channelId)
+void Protocol78::sendClosePrivate(unsigned short channelId)
 {
 	NetworkMessage msg;
 
@@ -1297,7 +1297,7 @@ void Protocol77::sendClosePrivate(unsigned short channelId)
 	WriteBuffer(msg);
 }
 
-void Protocol77::sendChannelsDialog()
+void Protocol78::sendChannelsDialog()
 {
 	NetworkMessage newmsg;
 	ChannelList list;
@@ -1320,7 +1320,7 @@ void Protocol77::sendChannelsDialog()
 	WriteBuffer(newmsg);
 }
 
-void Protocol77::sendChannel(unsigned short channelId, std::string channelName)
+void Protocol78::sendChannel(unsigned short channelId, std::string channelName)
 {
 	NetworkMessage newmsg;
 
@@ -1331,15 +1331,15 @@ void Protocol77::sendChannel(unsigned short channelId, std::string channelName)
 	WriteBuffer(newmsg); 
 }
 
-void Protocol77::sendIcons(int icons)
+void Protocol78::sendIcons(int icons)
 {
 	NetworkMessage newmsg;
 	newmsg.AddByte(0xA2);
-	newmsg.AddU16(icons); //new 7.8 - change from 8 to  16 bits
+	newmsg.AddU16(icons);
 	WriteBuffer(newmsg);
 }
 
-void Protocol77::sendContainer(uint32_t cid, const Container* container, bool hasParent)
+void Protocol78::sendContainer(uint32_t cid, const Container* container, bool hasParent)
 {
 	NetworkMessage msg;
 	
@@ -1360,7 +1360,7 @@ void Protocol77::sendContainer(uint32_t cid, const Container* container, bool ha
 	WriteBuffer(msg);
 }
 
-void Protocol77::sendTradeItemRequest(const Player* player, const Item* item, bool ack)
+void Protocol78::sendTradeItemRequest(const Player* player, const Item* item, bool ack)
 {
 	NetworkMessage msg;
 	if(ack){
@@ -1411,7 +1411,7 @@ void Protocol77::sendTradeItemRequest(const Player* player, const Item* item, bo
 	WriteBuffer(msg);
 }
 
-void Protocol77::sendCloseTrade()
+void Protocol78::sendCloseTrade()
 {
 	NetworkMessage msg;
 	msg.AddByte(0x7F);
@@ -1419,7 +1419,7 @@ void Protocol77::sendCloseTrade()
 	WriteBuffer(msg);
 }
 
-void Protocol77::sendCloseContainer(uint32_t cid)
+void Protocol78::sendCloseContainer(uint32_t cid)
 {
 	NetworkMessage msg;
 	
@@ -1428,7 +1428,7 @@ void Protocol77::sendCloseContainer(uint32_t cid)
 	WriteBuffer(msg);
 }
 
-void Protocol77::sendCreatureTurn(const Creature* creature, unsigned char stackPos)
+void Protocol78::sendCreatureTurn(const Creature* creature, unsigned char stackPos)
 {
 	if(CanSee(creature)){
 		NetworkMessage msg;
@@ -1444,34 +1444,34 @@ void Protocol77::sendCreatureTurn(const Creature* creature, unsigned char stackP
 	}
 }
 
-void Protocol77::sendCreatureSay(const Creature *creature, SpeakClasses type, const std::string &text)
+void Protocol78::sendCreatureSay(const Creature *creature, SpeakClasses type, const std::string &text)
 {
 	NetworkMessage msg;
 	AddCreatureSpeak(msg,creature, type, text, 0);
 	WriteBuffer(msg);
 }
 
-void Protocol77::sendToChannel(const Creature * creature, SpeakClasses type, const std::string &text, unsigned short channelId){
+void Protocol78::sendToChannel(const Creature * creature, SpeakClasses type, const std::string &text, unsigned short channelId){
 	NetworkMessage msg;
 	AddCreatureSpeak(msg,creature, type, text, channelId);
 	WriteBuffer(msg);
 }
 
-void Protocol77::sendCancel(const char *msg)
+void Protocol78::sendCancel(const char *msg)
 {
 	NetworkMessage netmsg;
 	AddTextMessage(netmsg, MSG_STATUS_SMALL, msg);
 	WriteBuffer(netmsg);
 }
 
-void Protocol77::sendCancelTarget()
+void Protocol78::sendCancelTarget()
 {
 	NetworkMessage netmsg;
 	netmsg.AddByte(0xa3);
 	WriteBuffer(netmsg);
 }
 
-void Protocol77::sendChangeSpeed(const Creature *creature)
+void Protocol78::sendChangeSpeed(const Creature *creature)
 {
 	NetworkMessage netmsg;
 	netmsg.AddByte(0x8F);
@@ -1481,7 +1481,7 @@ void Protocol77::sendChangeSpeed(const Creature *creature)
 	WriteBuffer(netmsg);
 }
 
-void Protocol77::sendCancelWalk()
+void Protocol78::sendCancelWalk()
 {
 	NetworkMessage netmsg;
 	netmsg.AddByte(0xB5);
@@ -1489,42 +1489,42 @@ void Protocol77::sendCancelWalk()
 	WriteBuffer(netmsg);
 }
 
-void Protocol77::sendSkills()
+void Protocol78::sendSkills()
 {
 	NetworkMessage msg;
 	AddPlayerSkills(msg);
 	WriteBuffer(msg);
 }
 
-void Protocol77::sendPing()
+void Protocol78::sendPing()
 {
 	NetworkMessage msg;
 	msg.AddByte(0x1E);
 	WriteBuffer(msg);
 }
 
-void Protocol77::sendDistanceShoot(const Position &from, const Position &to, unsigned char type)
+void Protocol78::sendDistanceShoot(const Position &from, const Position &to, unsigned char type)
 {
 	NetworkMessage msg;
 	AddDistanceShoot(msg,from, to,type );
 	WriteBuffer(msg);
 }
 
-void Protocol77::sendMagicEffect(const Position &pos, unsigned char type)
+void Protocol78::sendMagicEffect(const Position &pos, unsigned char type)
 {
 	NetworkMessage msg;
 	AddMagicEffect(msg, pos, type);
 	WriteBuffer(msg);
 }
 
-void Protocol77::sendAnimatedText(const Position &pos, unsigned char color, std::string text)
+void Protocol78::sendAnimatedText(const Position &pos, unsigned char color, std::string text)
 {
 	NetworkMessage msg;
 	AddAnimatedText(msg, pos, color, text);
 	WriteBuffer(msg);
 }
 
-void Protocol77::sendCreatureHealth(const Creature *creature)
+void Protocol78::sendCreatureHealth(const Creature *creature)
 {
 	NetworkMessage msg;
 	AddCreatureHealth(msg,creature);
@@ -1532,7 +1532,7 @@ void Protocol77::sendCreatureHealth(const Creature *creature)
 }
 
 //tile
-void Protocol77::sendAddTileItem(const Position& pos, const Item* item)
+void Protocol78::sendAddTileItem(const Position& pos, const Item* item)
 {
 	if(CanSee(pos)){
 		NetworkMessage msg;
@@ -1541,7 +1541,7 @@ void Protocol77::sendAddTileItem(const Position& pos, const Item* item)
 	}
 }
 
-void Protocol77::sendUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* item)
+void Protocol78::sendUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* item)
 {
 	if(CanSee(pos)){
 		NetworkMessage msg;
@@ -1550,7 +1550,7 @@ void Protocol77::sendUpdateTileItem(const Position& pos, uint32_t stackpos, cons
 	}
 }
 
-void Protocol77::sendRemoveTileItem(const Position& pos, uint32_t stackpos)
+void Protocol78::sendRemoveTileItem(const Position& pos, uint32_t stackpos)
 {
 	if(CanSee(pos)){
 		NetworkMessage msg;
@@ -1559,7 +1559,7 @@ void Protocol77::sendRemoveTileItem(const Position& pos, uint32_t stackpos)
 	}
 }
 
-void Protocol77::UpdateTile(const Position& pos)
+void Protocol78::UpdateTile(const Position& pos)
 {
 	if(CanSee(pos)){
 		NetworkMessage msg;
@@ -1568,7 +1568,7 @@ void Protocol77::UpdateTile(const Position& pos)
 	}
 }
 
-void Protocol77::sendAddCreature(const Creature* creature, bool isLogin)
+void Protocol78::sendAddCreature(const Creature* creature, bool isLogin)
 {
 	if(CanSee(creature->getPosition())){
 		NetworkMessage msg;
@@ -1657,7 +1657,7 @@ void Protocol77::sendAddCreature(const Creature* creature, bool isLogin)
 	}
 }
 
-void Protocol77::sendRemoveCreature(const Creature* creature, const Position& pos, uint32_t stackpos, bool isLogout)
+void Protocol78::sendRemoveCreature(const Creature* creature, const Position& pos, uint32_t stackpos, bool isLogout)
 {
 	if(CanSee(pos)){
 		NetworkMessage msg;
@@ -1671,7 +1671,7 @@ void Protocol77::sendRemoveCreature(const Creature* creature, const Position& po
 	}
 }
 
-void Protocol77::sendMoveCreature(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport)
+void Protocol78::sendMoveCreature(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport)
 {
 	const Position& newPos = creature->getPosition();
 
@@ -1751,21 +1751,21 @@ void Protocol77::sendMoveCreature(const Creature* creature, const Position& oldP
 }
 
 //inventory
-void Protocol77::sendAddInventoryItem(slots_t slot, const Item* item)
+void Protocol78::sendAddInventoryItem(slots_t slot, const Item* item)
 {
 	NetworkMessage msg;
 	AddInventoryItem(msg, slot, item);
 	WriteBuffer(msg);
 }
 
-void Protocol77::sendUpdateInventoryItem(slots_t slot, const Item* item)
+void Protocol78::sendUpdateInventoryItem(slots_t slot, const Item* item)
 {
 	NetworkMessage msg;
 	UpdateInventoryItem(msg, slot, item);
 	WriteBuffer(msg);
 }
 
-void Protocol77::sendRemoveInventoryItem(slots_t slot)
+void Protocol78::sendRemoveInventoryItem(slots_t slot)
 {
 	NetworkMessage msg;
 	RemoveInventoryItem(msg, slot);
@@ -1773,28 +1773,28 @@ void Protocol77::sendRemoveInventoryItem(slots_t slot)
 }
 
 //containers
-void Protocol77::sendAddContainerItem(uint8_t cid, const Item* item)
+void Protocol78::sendAddContainerItem(uint8_t cid, const Item* item)
 {
 	NetworkMessage msg;
 	AddContainerItem(msg, cid, item);
 	WriteBuffer(msg);
 }
 
-void Protocol77::sendUpdateContainerItem(uint8_t cid, uint8_t slot, const Item* item)
+void Protocol78::sendUpdateContainerItem(uint8_t cid, uint8_t slot, const Item* item)
 {
 	NetworkMessage msg;
 	UpdateContainerItem(msg, cid, slot, item);
 	WriteBuffer(msg);
 }
 
-void Protocol77::sendRemoveContainerItem(uint8_t cid, uint8_t slot)
+void Protocol78::sendRemoveContainerItem(uint8_t cid, uint8_t slot)
 {
 	NetworkMessage msg;
 	RemoveContainerItem(msg, cid, slot);
 	WriteBuffer(msg);
 }
 
-void Protocol77::sendTextWindow(Item* item,const unsigned short maxlen, const bool canWrite)
+void Protocol78::sendTextWindow(Item* item,const unsigned short maxlen, const bool canWrite)
 {
 	NetworkMessage msg;
 	if(readItem){
@@ -1821,7 +1821,7 @@ void Protocol77::sendTextWindow(Item* item,const unsigned short maxlen, const bo
 	WriteBuffer(msg);
 }
 
-void Protocol77::sendHouseWindow(House* _house, unsigned long _listid, const std::string& text)
+void Protocol78::sendHouseWindow(House* _house, unsigned long _listid, const std::string& text)
 {
 	NetworkMessage msg;
 	windowTextID++;
@@ -1834,7 +1834,7 @@ void Protocol77::sendHouseWindow(House* _house, unsigned long _listid, const std
 	WriteBuffer(msg);
 }
 
-void Protocol77::sendVIPLogIn(unsigned long guid)
+void Protocol78::sendVIPLogIn(unsigned long guid)
 {
 	NetworkMessage msg;
 	msg.AddByte(0xD3);
@@ -1842,7 +1842,7 @@ void Protocol77::sendVIPLogIn(unsigned long guid)
 	WriteBuffer(msg);
 }
 
-void Protocol77::sendVIPLogOut(unsigned long guid)
+void Protocol78::sendVIPLogOut(unsigned long guid)
 {
 	NetworkMessage msg;
 	msg.AddByte(0xD4);
@@ -1850,7 +1850,7 @@ void Protocol77::sendVIPLogOut(unsigned long guid)
 	WriteBuffer(msg);
 }
 
-void Protocol77::sendVIP(unsigned long guid, const std::string &name, bool isOnline)
+void Protocol78::sendVIP(unsigned long guid, const std::string &name, bool isOnline)
 {
 	NetworkMessage msg;
 	msg.AddByte(0xD2);
@@ -1861,21 +1861,21 @@ void Protocol77::sendVIP(unsigned long guid, const std::string &name, bool isOnl
 }
 
 ////////////// Add common messages
-void Protocol77::AddMapDescription(NetworkMessage& msg, const Position& pos)
+void Protocol78::AddMapDescription(NetworkMessage& msg, const Position& pos)
 {
 	msg.AddByte(0x64); 
 	msg.AddPosition(player->getPosition()); 
 	GetMapDescription(pos.x - 8, pos.y - 6, pos.z, 18, 14, msg);
 }
 
-void Protocol77::AddTextMessage(NetworkMessage &msg,MessageClasses mclass, const char* message)
+void Protocol78::AddTextMessage(NetworkMessage &msg,MessageClasses mclass, const char* message)
 {
 	msg.AddByte(0xB4);
 	msg.AddByte(mclass);
 	msg.AddString(message);
 }
 
-void Protocol77::AddAnimatedText(NetworkMessage &msg,const Position &pos, unsigned char color, std::string text)
+void Protocol78::AddAnimatedText(NetworkMessage &msg,const Position &pos, unsigned char color, std::string text)
 {
 #ifdef __DEBUG__
 	if(text.length() == 0) {
@@ -1889,7 +1889,7 @@ void Protocol77::AddAnimatedText(NetworkMessage &msg,const Position &pos, unsign
 	msg.AddString(text);
 }
 
-void Protocol77::AddMagicEffect(NetworkMessage &msg,const Position &pos, unsigned char type)
+void Protocol78::AddMagicEffect(NetworkMessage &msg,const Position &pos, unsigned char type)
 {
 	msg.AddByte(0x83);
 	msg.AddPosition(pos);
@@ -1897,7 +1897,7 @@ void Protocol77::AddMagicEffect(NetworkMessage &msg,const Position &pos, unsigne
 }
 
 
-void Protocol77::AddDistanceShoot(NetworkMessage &msg,const Position &from, const Position &to, unsigned char type)
+void Protocol78::AddDistanceShoot(NetworkMessage &msg,const Position &from, const Position &to, unsigned char type)
 {
 	msg.AddByte(0x85); 
 	msg.AddPosition(from);
@@ -1905,7 +1905,7 @@ void Protocol77::AddDistanceShoot(NetworkMessage &msg,const Position &from, cons
 	msg.AddByte(type + 1);
 }
 
-void Protocol77::AddCreature(NetworkMessage &msg,const Creature *creature, bool known, unsigned int remove)
+void Protocol78::AddCreature(NetworkMessage &msg,const Creature *creature, bool known, unsigned int remove)
 {
 	if(known){
 		msg.AddU16(0x62);
@@ -1928,7 +1928,7 @@ void Protocol77::AddCreature(NetworkMessage &msg,const Creature *creature, bool 
 	msg.AddByte(creature->lookbody);
 	msg.AddByte(creature->looklegs);
 	msg.AddByte(creature->lookfeet);
-	msg.AddByte(0); //new 7.8 - addons
+	msg.AddByte(0); //addons
 	
 	LightInfo lightInfo;
 	creature->getCreatureLight(lightInfo);
@@ -1951,7 +1951,7 @@ void Protocol77::AddCreature(NetworkMessage &msg,const Creature *creature, bool 
 }
 
 
-void Protocol77::AddPlayerStats(NetworkMessage &msg)
+void Protocol78::AddPlayerStats(NetworkMessage &msg)
 {
 	msg.AddByte(0xA0);
 	msg.AddU16(player->getHealth());
@@ -1965,10 +1965,10 @@ void Protocol77::AddPlayerStats(NetworkMessage &msg)
 	msg.AddByte(player->getMagicLevel());
 	msg.AddByte(player->getPlayerInfo(PLAYERINFO_MAGICLEVELPERCENT));
 	msg.AddByte(player->getPlayerInfo(PLAYERINFO_SOUL));
-	msg.AddU16(1440); //new 7.8 - stamina(minutes)
+	msg.AddU16(1440); //stamina(minutes)
 }
 
-void Protocol77::AddPlayerSkills(NetworkMessage& msg)
+void Protocol78::AddPlayerSkills(NetworkMessage& msg)
 {
 	msg.AddByte(0xA1);
 	
@@ -1988,16 +1988,16 @@ void Protocol77::AddPlayerSkills(NetworkMessage& msg)
 	msg.AddByte(player->getSkill(SKILL_FISH,   SKILL_PERCENT));
 }
 
-void Protocol77::AddCreatureSpeak(NetworkMessage &msg,const Creature *creature, SpeakClasses  type, std::string text, unsigned short channelId)
+void Protocol78::AddCreatureSpeak(NetworkMessage &msg,const Creature *creature, SpeakClasses  type, std::string text, unsigned short channelId)
 {
 	msg.AddByte(0xAA);
 	msg.AddU32(0);
 	msg.AddString(creature->getName());
 	if(const Player* player = creature->getPlayer()){
-		msg.AddU16(player->getPlayerInfo(PLAYERINFO_LEVEL)); //new 7.8 - level
+		msg.AddU16(player->getPlayerInfo(PLAYERINFO_LEVEL));
 	}
 	else{
-		msg.AddU16(0); //new 7.8 - level
+		msg.AddU16(0);
 	}
 	msg.AddByte(type);
 	switch(type){
@@ -2018,21 +2018,21 @@ void Protocol77::AddCreatureSpeak(NetworkMessage &msg,const Creature *creature, 
 	msg.AddString(text);
 }
 
-void Protocol77::AddCreatureHealth(NetworkMessage &msg,const Creature *creature)
+void Protocol78::AddCreatureHealth(NetworkMessage &msg,const Creature *creature)
 {
 	msg.AddByte(0x8C);
 	msg.AddU32(creature->getID());
 	msg.AddByte(std::max(1, creature->health*100/std::max(creature->healthmax,1)));
 }
 
-void Protocol77::AddWorldLight(NetworkMessage &msg, const LightInfo& lightInfo)
+void Protocol78::AddWorldLight(NetworkMessage &msg, const LightInfo& lightInfo)
 {
 	msg.AddByte(0x82);
 	msg.AddByte(lightInfo.level);
 	msg.AddByte(lightInfo.color);
 }
 
-void Protocol77::AddCreatureLight(NetworkMessage &msg, const Creature* creature)
+void Protocol78::AddCreatureLight(NetworkMessage &msg, const Creature* creature)
 {
 	LightInfo lightInfo;
 	creature->getCreatureLight(lightInfo);
@@ -2043,14 +2043,14 @@ void Protocol77::AddCreatureLight(NetworkMessage &msg, const Creature* creature)
 }
 
 //tile
-void Protocol77::AddTileItem(NetworkMessage& msg, const Position& pos, const Item* item)
+void Protocol78::AddTileItem(NetworkMessage& msg, const Position& pos, const Item* item)
 {
 	msg.AddByte(0x6A);
 	msg.AddPosition(pos);	
 	msg.AddItem(item);
 }
 
-void Protocol77::AddTileCreature(NetworkMessage& msg, const Position& pos, const Creature* creature)
+void Protocol78::AddTileCreature(NetworkMessage& msg, const Position& pos, const Creature* creature)
 {
 	msg.AddByte(0x6A);
 	msg.AddPosition(pos);	
@@ -2061,7 +2061,7 @@ void Protocol77::AddTileCreature(NetworkMessage& msg, const Position& pos, const
 	AddCreature(msg, creature, known, removedKnown);
 }
 
-void Protocol77::UpdateTileItem(NetworkMessage& msg, const Position& pos, uint32_t stackpos, const Item* item)
+void Protocol78::UpdateTileItem(NetworkMessage& msg, const Position& pos, uint32_t stackpos, const Item* item)
 {
 	if(stackpos < 10){
 		msg.AddByte(0x6B);
@@ -2071,7 +2071,7 @@ void Protocol77::UpdateTileItem(NetworkMessage& msg, const Position& pos, uint32
 	}
 }
 
-void Protocol77::RemoveTileItem(NetworkMessage& msg, const Position& pos, uint32_t stackpos)
+void Protocol78::RemoveTileItem(NetworkMessage& msg, const Position& pos, uint32_t stackpos)
 {
 	if(stackpos < 10){
 		msg.AddByte(0x6C);
@@ -2080,7 +2080,7 @@ void Protocol77::RemoveTileItem(NetworkMessage& msg, const Position& pos, uint32
 	}
 }
 
-void Protocol77::UpdateTile(NetworkMessage& msg, const Position& pos)
+void Protocol78::UpdateTile(NetworkMessage& msg, const Position& pos)
 {
 	msg.AddByte(0x69);
 	msg.AddPosition(pos);
@@ -2097,7 +2097,7 @@ void Protocol77::UpdateTile(NetworkMessage& msg, const Position& pos)
 	}
 }
 
-void Protocol77::MoveUpCreature(NetworkMessage& msg, const Creature* creature,
+void Protocol78::MoveUpCreature(NetworkMessage& msg, const Creature* creature,
 	const Position& newPos, const Position& oldPos, uint32_t oldStackPos)
 {
 	if(creature == player){
@@ -2141,7 +2141,7 @@ void Protocol77::MoveUpCreature(NetworkMessage& msg, const Creature* creature,
 	}
 }
 
-void Protocol77::MoveDownCreature(NetworkMessage& msg, const Creature* creature,
+void Protocol78::MoveDownCreature(NetworkMessage& msg, const Creature* creature,
 	const Position& newPos, const Position& oldPos, uint32_t oldStackPos)
 {
 	if(creature == player){
@@ -2185,7 +2185,7 @@ void Protocol77::MoveDownCreature(NetworkMessage& msg, const Creature* creature,
 
 
 //inventory
-void Protocol77::AddInventoryItem(NetworkMessage& msg, slots_t slot, const Item* item)
+void Protocol78::AddInventoryItem(NetworkMessage& msg, slots_t slot, const Item* item)
 {
 	if(item == NULL){
 		msg.AddByte(0x79);
@@ -2198,7 +2198,7 @@ void Protocol77::AddInventoryItem(NetworkMessage& msg, slots_t slot, const Item*
 	}
 }
 
-void Protocol77::UpdateInventoryItem(NetworkMessage& msg, slots_t slot, const Item* item)
+void Protocol78::UpdateInventoryItem(NetworkMessage& msg, slots_t slot, const Item* item)
 {
 	if(item == NULL){
 		msg.AddByte(0x79);
@@ -2211,21 +2211,21 @@ void Protocol77::UpdateInventoryItem(NetworkMessage& msg, slots_t slot, const It
 	}
 }
 
-void Protocol77::RemoveInventoryItem(NetworkMessage& msg, slots_t slot)
+void Protocol78::RemoveInventoryItem(NetworkMessage& msg, slots_t slot)
 {
 	msg.AddByte(0x79);
 	msg.AddByte(slot);
 }
 
 //containers
-void Protocol77::AddContainerItem(NetworkMessage& msg, uint8_t cid, const Item *item)
+void Protocol78::AddContainerItem(NetworkMessage& msg, uint8_t cid, const Item *item)
 {
 	msg.AddByte(0x70);
 	msg.AddByte(cid);
 	msg.AddItem(item);
 }
 
-void Protocol77::UpdateContainerItem(NetworkMessage& msg, uint8_t cid, uint8_t slot, const Item* item)
+void Protocol78::UpdateContainerItem(NetworkMessage& msg, uint8_t cid, uint8_t slot, const Item* item)
 {
 	msg.AddByte(0x71);
 	msg.AddByte(cid);
@@ -2233,7 +2233,7 @@ void Protocol77::UpdateContainerItem(NetworkMessage& msg, uint8_t cid, uint8_t s
 	msg.AddItem(item);
 }
 
-void Protocol77::RemoveContainerItem(NetworkMessage& msg, uint8_t cid, uint8_t slot)
+void Protocol78::RemoveContainerItem(NetworkMessage& msg, uint8_t cid, uint8_t slot)
 {
 	msg.AddByte(0x72);
 	msg.AddByte(cid);
@@ -2242,9 +2242,9 @@ void Protocol77::RemoveContainerItem(NetworkMessage& msg, uint8_t cid, uint8_t s
 
 //////////////////////////
 
-void Protocol77::flushOutputBuffer()
+void Protocol78::flushOutputBuffer()
 {
-	OTSYS_THREAD_LOCK_CLASS lockClass(bufferLock, "Protocol77::flushOutputBuffer()");
+	OTSYS_THREAD_LOCK_CLASS lockClass(bufferLock, "Protocol78::flushOutputBuffer()");
 	//force writetosocket	
 	OutputBuffer.WriteToSocket(s);
 	OutputBuffer.Reset();
@@ -2252,22 +2252,22 @@ void Protocol77::flushOutputBuffer()
 	return;
 }
 
-void Protocol77::WriteBuffer(NetworkMessage& add)
+void Protocol78::WriteBuffer(NetworkMessage& add)
 {
 	game->addPlayerBuffer(player);	
 	
-	OTSYS_THREAD_LOCK(bufferLock, "Protocol77::WriteBuffer")
+	OTSYS_THREAD_LOCK(bufferLock, "Protocol78::WriteBuffer")
 	
 	if(OutputBuffer.getMessageLength() + add.getMessageLength() >= NETWORKMESSAGE_MAXSIZE - 16){
 		this->flushOutputBuffer();
 	}
 	
 	OutputBuffer.JoinMessages(add);	
-	OTSYS_THREAD_UNLOCK(bufferLock, "Protocol77::WriteBuffer")	
+	OTSYS_THREAD_UNLOCK(bufferLock, "Protocol78::WriteBuffer")	
 	return;
 }
 
-void Protocol77::setKey(const unsigned long* key)
+void Protocol78::setKey(const unsigned long* key)
 {
 	memcpy(m_key, key, 16);
 	OutputBuffer.setEncryptionState(true);

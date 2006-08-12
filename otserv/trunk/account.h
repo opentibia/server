@@ -22,11 +22,9 @@
 #ifndef __ACCOUNT_H__
 #define __ACCOUNT_H__
 
-
 #include <list>
 #include <string>
 
-//class Player;
 
 
 class Account

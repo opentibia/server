@@ -23,7 +23,7 @@
 
 #include "item.h"
 #include "cylinder.h"
-#include "const77.h"
+#include "const78.h"
 
 class TrashHolder : public Item, public Cylinder
 {

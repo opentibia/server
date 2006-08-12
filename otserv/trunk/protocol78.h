@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// The protocoll for the clients version 7.7x
-// the newer clients still use the same protocoll just with a 
+// The protocol for the clients version 7.8x
+// the newer clients still use the same protocol just with a 
 // prequel defined in the 6.5 protocoll
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
@@ -21,8 +21,8 @@
 //////////////////////////////////////////////////////////////////////
 
 
-#ifndef __OTSERV_PROTOCOL77_H__
-#define __OTSERV_PROTOCOL77_H__
+#ifndef __OTSERV_PROTOCOL78_H__
+#define __OTSERV_PROTOCOL78_H__
 
 #include <string>
 #include "protocol.h"
@@ -30,11 +30,11 @@
 class NetworkMessage;
 class Creature;
 
-class Protocol77 : public Protocol
+class Protocol78 : public Protocol
 {
 public:
-	Protocol77(SOCKET s);
-	virtual ~Protocol77();
+	Protocol78(SOCKET s);
+	virtual ~Protocol78();
 	
 	connectResult_t ConnectPlayer();
 	void ReceiveLoop();  
