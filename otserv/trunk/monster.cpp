@@ -71,7 +71,6 @@ Creature()
 	lookmaster = mType->lookmaster;
 	health     = mType->health;
 	healthmax  = mType->health_max;
-	lookcorpse = mType->lookcorpse;
 	immunities = mType->immunities;
 	speed = mType->base_speed;
 	level = mType->level;
