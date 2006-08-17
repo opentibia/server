@@ -89,7 +89,7 @@ public:
 	void setAllowFarUse(bool v){allowfaruse = v;};
 	void setBlockWalls(bool v){blockwalls = v;};
 
-	virtual bool canUse(const Player* player, const Position& toPos);
+	virtual bool canExecuteAction(const Player* player, const Position& toPos);
 
 protected:
 	virtual std::string getScriptEventName();

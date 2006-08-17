@@ -162,3 +162,35 @@ bool Event::loadFunction(const std::string& functionName)
 	return false;
 }
 
+CallBack::CallBack()
+{
+	m_scriptId = 0;
+	m_scriptInterface = NULL;
+	m_loaded = false;
+}
+
+CallBack::~CallBack()
+{
+	//
+}
+	
+bool CallBack::loadCallBack(LuaScriptInterface* _interface, std::string name)
+{
+	if(!_interface){
+		std::cout << "Failure: [CallBack::loadCallBack] m_scriptInterface == NULL" << std::endl;
+		return false;
+	}
+	
+	m_scriptInterface = _interface;
+	
+	long id = m_scriptInterface->getEvent(name);
+	if(id == -1){
+		std::cout << "Warning: [CallBack::loadCallBack] Event " << name << " not found." << std::endl;
+		return false;
+	}
+	
+	m_callbackName = name;
+	m_scriptId = id;
+	m_loaded = true;
+	return true;
+}

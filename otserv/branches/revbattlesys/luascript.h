@@ -71,7 +71,6 @@ protected:
 class LuaScriptInterface;
 class Game;
 
-
 class ScriptEnviroment
 {
 public:
@@ -82,6 +81,10 @@ public:
 
 	void setScriptId(long scriptId, LuaScriptInterface* scriptInterface);
 	void setEventDesc(const std::string& desc);
+	
+	std::string getEventDesc();
+	long getScriptId();
+	LuaScriptInterface* getScriptInterface();
 
 	void getEventInfo(long& scriptId, std::string& desc, LuaScriptInterface*& scriptInterface);
 
@@ -319,6 +322,7 @@ protected:
 	//
 	static int luaCreateCombatArea(lua_State *L);
 	static int luaSetCombatParam(lua_State *L);
+	static int luaSetCombatCallBack(lua_State *L);
 
 	static int luaDoAreaCombat(lua_State *L);
 	static int luaDoTargetCombat(lua_State *L);

@@ -1515,6 +1515,12 @@ bool Game::playerWhisper(Player* player, const std::string& text)
 
 	getSpectators(Range(player->getPosition()), list);
 	
+	for(it = list.begin(); it != list.end(); ++it){
+		if(Player* player = (*it)->getPlayer()){
+			player->sendCreatureSay(creature, type, text);
+		}
+	}
+	
 	//event method
 	for(it = list.begin(); it != list.end(); ++it) {
 		if(!Position::areInRange<1,1,0>(player->getPosition(), (*it)->getPosition())){
@@ -1546,6 +1552,12 @@ bool Game::playerYell(Player* player, std::string& text)
 		SpectatorVec::iterator it;
 
 		getSpectators(Range(player->getPosition(), 18, 18, 14, 14), list);
+
+		for(it = list.begin(); it != list.end(); ++it){
+			if(Player* player = (*it)->getPlayer()){
+				player->sendCreatureSay(creature, type, text);
+			}
+		}
 
 		for(it = list.begin(); it != list.end(); ++it) {
 			(*it)->onCreatureSay(player, SPEAK_YELL, text);
@@ -2400,7 +2412,13 @@ bool Game::internalCreatureSay(Creature* creature, SpeakClasses type, const std:
 
 	getSpectators(Range(creature->getPosition()), list);
 
-	for(it = list.begin(); it != list.end(); ++it) {
+	for(it = list.begin(); it != list.end(); ++it){
+		if(Player* player = (*it)->getPlayer()){
+			player->sendCreatureSay(creature, type, text);
+		}
+	}
+
+	for(it = list.begin(); it != list.end(); ++it){
 		(*it)->onCreatureSay(creature, type, text);
 	}
 

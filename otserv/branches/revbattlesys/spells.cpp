@@ -713,13 +713,33 @@ bool RuneSpell::loadFunction(const std::string& function)
 	return false;
 }
 
-bool RuneSpell::canUse(const Player* player, const Position& toPos)
+bool RuneSpell::canExecuteAction(const Player* player, const Position& toPos)
 {
-	if(Action::canUse(player, toPos)){
+	if(Action::canExecuteAction(player, toPos)){
 		return spellPlayerChecks(player);
 	}
-
 	return false;
+}
+
+bool RuneSpell::useRune(Creature* creature, const Position& posFrom, const Position& posTo, Creature* target)
+{
+	//non-players
+	bool isSuccess = false;
+
+	if(m_scripted){
+		if(executeUseRune(creature, NULL, posFrom, posTo, target) != 0){
+			isSuccess = true;
+		}
+		else{
+			isSuccess = false;
+		}
+	}
+	else{
+		//call hardcodedAction
+		isSuccess = false;
+	}
+
+	return isSuccess;
 }
 
 bool RuneSpell::executeUse(Player* player, Item* item, const PositionEx& posFrom, const PositionEx& posTo)
@@ -727,46 +747,12 @@ bool RuneSpell::executeUse(Player* player, Item* item, const PositionEx& posFrom
 	bool isSuccess = false;
 
 	if(m_scripted){
-		//onUseRune(cid, pos, var)
-		ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
-		
-		//debug only
-		std::stringstream desc;
-		desc << "onUseRune";
-		env->setEventDesc(desc.str());
-		
-		env->setScriptId(m_scriptId, m_scriptInterface);
-		env->setRealPos(player->getPosition());
-		
-		lua_State* L = m_scriptInterface->getLuaState();
-
-		int size0 = lua_gettop(L);
-		
-		long cid = env->addThing((Thing*)player);
-
-		uint32_t targetcid = 0;
-
-		/*
-		if(target){
-			targetcid = env->addThing(target);
+		if(executeUseRune(player, item, posFrom, posTo, NULL) != 0){
+			isSuccess = true;
 		}
-		*/
-
-		m_scriptInterface->pushFunction(m_scriptId);
-		lua_pushnumber(L, cid);
-		LuaScriptInterface::pushPosition(L, posTo, 0);
-		lua_pushnumber(L, targetcid);
-		
-		long ret;
-		if(m_scriptInterface->callFunction(3, ret) == false){
-			ret = 0;
+		else{
+			isSuccess = false;
 		}
-	
-		if(size0 != lua_gettop(L)){
-			LuaScriptInterface::reportError(NULL, "Stack size changed!");
-		}
-
-		isSuccess = (ret != 0);
 	}
 	else{
 		//call hardcodedAction
@@ -776,6 +762,7 @@ bool RuneSpell::executeUse(Player* player, Item* item, const PositionEx& posFrom
 	if(player){
 		Spell::addSpellEffects(player);
 	}
+	
 	if(hasCharges && item){
 		int32_t newCharge = std::max(0, item->getItemCharge() - 1);
 		g_game.transformItem(item, item->getID(), newCharge);
@@ -783,6 +770,43 @@ bool RuneSpell::executeUse(Player* player, Item* item, const PositionEx& posFrom
 
 	return isSuccess;
 }
+
+long RuneSpell::executeUseRune(Creature* creature, Item* item, const Position& posFrom, const Position& posTo, Creature* target)
+{
+	//onUseRune(cid, pos, var)
+	ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
+		
+	//debug only
+	std::stringstream desc;
+	desc << "onUseRune";
+	env->setEventDesc(desc.str());
+		
+	env->setScriptId(m_scriptId, m_scriptInterface);
+	env->setRealPos(creature->getPosition());
+		
+	lua_State* L = m_scriptInterface->getLuaState();
+		
+	long cid = env->addThing(Creature);
+
+	uint32_t targetcid = 0;
+
+	if(target){
+		targetcid = env->addThing(target);
+	}
+
+	m_scriptInterface->pushFunction(m_scriptId);
+	lua_pushnumber(L, cid);
+	LuaScriptInterface::pushPosition(L, posTo, 0);
+	lua_pushnumber(L, targetcid);
+	
+	long ret;
+	if(m_scriptInterface->callFunction(3, ret) == false){
+		ret = 0;
+	}
+	
+	return ret;
+}
+
 
 /*
 bool RuneSpell::useRune(Creature* creature, Item* item, const Position& posFrom, const Position& posTo, Creature* target)
@@ -829,51 +853,6 @@ bool RuneSpell::useRune(Creature* creature, Item* item, const Position& posFrom,
 		}
 	}
 	return success;
-}
-*/
-
-/*
-bool RuneSpell::executeUseRune(Creature* creature, Item* item, const Position& posFrom, const Position& posTo, Creature* target)
-{
-	//onUseRune(cid, pos, target)
-	ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
-	
-	//debug only
-	std::stringstream desc;
-	desc << "onUseRune";
-	env->setEventDesc(desc.str());
-	//
-	
-	env->setScriptId(m_scriptId, m_scriptInterface);
-	env->setRealPos(creature->getPosition());
-	
-	lua_State* L = m_scriptInterface->getLuaState();
-
-	int size0 = lua_gettop(L);
-	
-	long cid = env->addThing((Thing*)creature);
-
-	uint32_t targetcid = 0;
-
-	if(target){
-		targetcid = env->addThing(target);
-	}
-
-	m_scriptInterface->pushFunction(m_scriptId);
-	lua_pushnumber(L, cid);
-	LuaScriptInterface::pushPosition(L, posTo, 0);
-	lua_pushnumber(L, targetcid);
-	
-	long ret;
-	if(m_scriptInterface->callFunction(3, ret) == false){
-		ret = 0;
-	}
-	
-	if(size0 != lua_gettop(L)){
-		LuaScriptInterface::reportError(NULL, "Stack size changed!");
-	}
-
-	return ret;
 }
 */
 

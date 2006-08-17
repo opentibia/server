@@ -140,12 +140,12 @@ public:
 	virtual bool configureEvent(xmlNodePtr p);
 	virtual bool loadFunction(const std::string& functionName);
 	
-	virtual bool canUse(const Player* player, const Position& toPos);
+	virtual bool canExecuteAction(const Player* player, const Position& toPos);
 
-	//bool useRune(Creature* creature, Item* item, const Position& posFrom, const Position& posTo, Creature* target);
-	//scripting
-	//bool executeUseRune(Creature* creature, Item* item, const Position& posFrom, const Position& posTo, Creature* target);
+	bool useRune(Creature* creature, const Position& posFrom, const Position& posTo, Creature* target);
 	virtual bool executeUse(Player* player, Item* item, const PositionEx& posFrom, const PositionEx& posTo);
+	//scripting
+	long executeUseRune(Creature* creature, Item* item, const Position& posFrom, const Position& posTo, Creature* target);
 	//
 	
 	uint32_t getRuneItemId(){return runeId;};

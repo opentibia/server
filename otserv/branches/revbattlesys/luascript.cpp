@@ -31,6 +31,7 @@
 #include "housetile.h"
 #include "status.h"
 #include "combat.h"
+#include "baseevents.h"
 #include "ioplayer.h"
 
 extern Game g_game;
@@ -41,6 +42,11 @@ enum LUA_RET_CODE{
 	LUA_TRUE = 1,
 	LUA_FALSE = 0,
 	LUA_NULL = 0,
+};
+
+enum{
+	EVENT_ID_LOADING = 1,
+	EVENT_ID_USER = 1000,
 };
 
 LuaScript::LuaScript()
@@ -204,7 +210,22 @@ void ScriptEnviroment::setEventDesc(const std::string& desc)
 {
 	m_eventdesc = desc;
 }
-	
+
+std::string ScriptEnviroment::getEventDesc()
+{
+	return m_eventdesc;
+}
+
+long ScriptEnviroment::getScriptId()
+{
+	return m_scriptId;
+}
+
+LuaScriptInterface* ScriptEnviroment::getScriptInterface()
+{
+	return m_interface;
+}
+
 void ScriptEnviroment::getEventInfo(long& scriptId, std::string& desc, LuaScriptInterface*& scriptInterface)
 {
 	scriptId = m_scriptId;
@@ -490,6 +511,10 @@ long LuaScriptInterface::loadFile(const std::string& file)
 	if(lua_isfunction(m_luaState, -1) == 0){
 		return -1;
 	}
+	
+	ScriptEnviroment* env = getScriptEnv();
+	env->setScriptId(EVENT_ID_LOADING, this);
+	
 	//execute it
 	ret = lua_pcall(m_luaState, 0, 0, 0);
 	if(ret != 0){
@@ -605,7 +630,7 @@ bool LuaScriptInterface::initState()
 	lua_newtable(m_luaState);
 	lua_setfield(m_luaState, LUA_REGISTRYINDEX, "EVENTS");
 	
-	m_runningEventId = 1000;
+	m_runningEventId = EVENT_ID_USER;
 	return true;
 }
 
@@ -903,6 +928,9 @@ void LuaScriptInterface::registerFunctions()
 
 	//setCombatParam(combat, key, value)
 	lua_register(m_luaState, "setCombatParam", LuaScriptInterface::luaSetCombatParam);
+	
+	//setCombatCallBack(combat, key, function_name)
+	lua_register(m_luaState, "setCombatCallback", LuaScriptInterface::luaSetCombatCallBack);
 
 	//doAreaCombat(cid, combat, area, pos)
 	lua_register(m_luaState, "doAreaCombat", LuaScriptInterface::luaDoAreaCombat);
@@ -2257,6 +2285,48 @@ int LuaScriptInterface::luaSetCombatParam(lua_State *L)
 
 	combat->setParam(key, value);
 
+	return 0;
+}
+
+int LuaScriptInterface::luaSetCombatCallBack(lua_State *L)
+{
+	//setCombatCallBack(combat, key, function_name)
+	const char* function = popString(L);
+	std::string function_str(function);
+	CombatParam_t key = (CombatParam_t)popNumber(L);
+	uint32_t combatId = (int)popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+	
+	if(env->getScriptId() != EVENT_ID_LOADING){
+		reportError(__FUNCTION__, "Not called during script loading!");
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+	
+	Combat* combat = env->getCombatObject(combatId);
+
+	if(!combat){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_COMBAT_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+		
+	LuaScriptInterface* scriptInterface = env->getScriptInterface();
+	
+	/*CallBack* callback = combat->getCallback(key);
+	if(!callback){
+		reportError(__FUNCTION__, std::string("Not valid callback key ") + key);
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+	
+	if(!callback->loadCallBack(scriptInterface, function_str)){
+		reportError(__FUNCTION__, "Can not load callback");
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+	*/
 	return 0;
 }
 

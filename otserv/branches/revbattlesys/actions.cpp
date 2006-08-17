@@ -254,7 +254,7 @@ bool Actions::useItemEx(Player* player, const Position& from_pos,
 	Action* action = getAction(item);
 	
 	if(action){
-		bool ret = action->canUse(player, to_pos);
+		bool ret = action->canExecuteAction(player, to_pos);
 		if(ret){
 			int32_t from_stack = item->getParent()->__getIndexOfThing(item);
 			PositionEx posFromEx(from_pos, from_stack);
@@ -307,7 +307,7 @@ std::string Action::getScriptEventName()
 	return "onUse";
 }
 
-bool Action::canUse(const Player* player, const Position& toPos)
+bool Action::canExecuteAction(const Player* player, const Position& toPos)
 {
 	if(allowFarUse() == false){
 		if(Actions::canUse(player, toPos) == TOO_FAR){
@@ -315,15 +315,17 @@ bool Action::canUse(const Player* player, const Position& toPos)
 			return false;
 		}
 	}
-	else if(Actions::canUseFar(player, toPos, blockWalls()) == TOO_FAR){
-		player->sendCancelMessage(RET_TOOFARAWAY);
-		return false;
+	else{
+		int useFar = Actions::canUseFar(player, toPos, blockWalls());
+		if(useFar == TOO_FAR){
+			player->sendCancelMessage(RET_TOOFARAWAY);
+			return false;
+		}
+		else if(useFar == CAN_NOT_THROW){
+			player->sendCancelMessage(RET_CANNOTTHROW);
+			return false;
+		}
 	}
-	else if(Actions::canUseFar(player, toPos, blockWalls()) == CAN_NOT_THROW){
-		player->sendCancelMessage(RET_CANNOTTHROW);
-		return false;
-	}
-
 	return true;
 }
 

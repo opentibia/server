@@ -48,7 +48,6 @@ protected:
 	
 };
 
-
 class Event{
 public:
 	Event(LuaScriptInterface* _interface);
@@ -68,5 +67,21 @@ protected:
 	bool m_scripted;
 };
 
+
+class CallBack{
+public:
+	CallBack();
+	virtual ~CallBack();
+	
+	bool loadCallBack(LuaScriptInterface* _interface, std::string name);
+	
+protected:
+	long m_scriptId;
+	LuaScriptInterface* m_scriptInterface;
+	
+	bool m_loaded;
+	
+	std::string m_callbackName;
+};
 
 #endif
