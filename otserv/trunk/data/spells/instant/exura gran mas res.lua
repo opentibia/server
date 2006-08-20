@@ -14,11 +14,11 @@ area = {
 
 attackType = ATTACK_NONE
 needDirection = false
-areaEffect = NM_ME_MAGIC_ENERGIE
+areaEffect = NM_ME_MAGIC_ENERGY
 animationEffect = NM_ANI_NONE
 
 hitEffect = NM_ME_NONE
-damageEffect = NM_ME_MAGIC_ENERGIE
+damageEffect = NM_ME_MAGIC_ENERGY
 animationColor = GREEN
 offensive = false
 drawblood = false

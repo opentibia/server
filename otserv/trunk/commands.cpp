@@ -391,7 +391,7 @@ bool Commands::createItemById(Creature* creature, const std::string& cmd, const 
 		}
 	}
 	
-	game->AddMagicEffectAt(player->getPosition(), NM_ME_MAGIC_POISEN);
+	game->AddMagicEffectAt(player->getPosition(), NM_ME_MAGIC_POISON);
 	return true;
 }
 
@@ -442,7 +442,7 @@ bool Commands::createItemByName(Creature* creature, const std::string& cmd, cons
 		}
 	}
 	
-	game->AddMagicEffectAt(player->getPosition(), NM_ME_MAGIC_POISEN);
+	game->AddMagicEffectAt(player->getPosition(), NM_ME_MAGIC_POISON);
 	return true;
 }
 

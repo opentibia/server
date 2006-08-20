@@ -25,22 +25,22 @@
 
 enum MagicEffectClasses {
 	NM_ME_DRAW_BLOOD  	= 0x00,
-	NM_ME_LOOSE_ENERGY	= 0x01, //fishing?
+	NM_ME_LOSE_ENERGY	= 0x01,
 	NM_ME_PUFF			= 0x02,
 	NM_ME_BLOCKHIT		= 0x03,
 	NM_ME_EXPLOSION_AREA   = 0x04,
 	NM_ME_EXPLOSION_DAMAGE = 0x05,
 	NM_ME_FIRE_AREA        = 0x06,
 	NM_ME_YELLOW_RINGS     = 0x07,
-	NM_ME_POISEN_RINGS     = 0x08,
+	NM_ME_POISON_RINGS     = 0x08,
 	NM_ME_HIT_AREA         = 0x09,
 	NM_ME_ENERGY_AREA      = 0x0A, //10
 	NM_ME_ENERGY_DAMAGE    = 0x0B, //11
-	NM_ME_MAGIC_ENERGIE    = 0x0C, //12
+	NM_ME_MAGIC_ENERGY    = 0x0C, //12
 	NM_ME_MAGIC_BLOOD      = 0x0D, //13
-	NM_ME_MAGIC_POISEN     = 0x0E, //14
+	NM_ME_MAGIC_POISON     = 0x0E, //14
 	NM_ME_HITBY_FIRE       = 0x0F, //15
-	NM_ME_POISEN           = 0x10, //16
+	NM_ME_POISON           = 0x10, //16
 	NM_ME_MORT_AREA        = 0x11, //17
 	NM_ME_SOUND_GREEN      = 0x12, //18
 	NM_ME_SOUND_RED        = 0x13, //19

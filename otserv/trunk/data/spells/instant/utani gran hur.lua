@@ -2,7 +2,7 @@ attackType = ATTACK_NONE
 animationEffect = NM_ANI_NONE
 
 hitEffect = NM_ME_NONE
-damageEffect = NM_ME_MAGIC_POISEN
+damageEffect = NM_ME_MAGIC_POISON
 animationColor = GREEN
 offensive = false
 drawblood = false

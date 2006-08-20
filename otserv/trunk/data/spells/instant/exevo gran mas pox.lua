@@ -14,11 +14,11 @@ area = {
 
 attackType = ATTACK_POISON
 needDirection = false
-areaEffect = NM_ME_POISEN_RINGS
+areaEffect = NM_ME_POISON_RINGS
 animationEffect = NM_ANI_NONE
 
-hitEffect = NM_ME_POISEN
-damageEffect = NM_ME_POISEN_RINGS
+hitEffect = NM_ME_POISON
+damageEffect = NM_ME_POISON_RINGS
 animationColor = GREEN
 offensive = true
 needDirection = false

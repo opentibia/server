@@ -2032,7 +2032,7 @@ bool Game::creatureMakeMagic(Creature *creature, const Position& centerpos, cons
 							}
 
 							if(creatureState.manaDamage > 0){
-								spectator->sendMagicEffect(creatureState.pos, NM_ME_LOOSE_ENERGY);
+								spectator->sendMagicEffect(creatureState.pos, NM_ME_LOSE_ENERGY);
 								std::stringstream manaDmg;
 								manaDmg << std::abs(creatureState.manaDamage);
 								spectator->sendAnimatedText(creatureState.pos, 2, manaDmg.str());
@@ -2321,7 +2321,7 @@ void Game::creatureMakeDamage(Creature *creature, Creature *attackedCreature, fi
 				if(creatureState.manaDamage >0) {
 					std::stringstream manaDmg;
 					manaDmg << std::abs(creatureState.manaDamage);
-					spectator->sendMagicEffect(attackPosition, NM_ME_LOOSE_ENERGY);
+					spectator->sendMagicEffect(attackPosition, NM_ME_LOSE_ENERGY);
 					spectator->sendAnimatedText(attackPosition, 2, manaDmg.str());
 				}
 

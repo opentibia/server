@@ -9,7 +9,7 @@ needDirection = false
 areaEffect = NM_ME_EXPLOSION_AREA
 animationEffect = NM_ANI_FIRE
 
-hitEffect = NM_ME_EXPLOSION_DAMAGE
+hitEffect = NM_ME_EXPLOSION_AREA
 damageEffect = NM_ME_DRAW_BLOOD
 animationColor = RED
 offensive = true

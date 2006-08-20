@@ -4,7 +4,7 @@ area = {
 {0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0},
 {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
 {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
-{1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1},
+{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
 {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0},
 {0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0},
@@ -17,7 +17,7 @@ needDirection = false
 areaEffect = NM_ME_EXPLOSION_AREA
 animationEffect = NM_ANI_NONE
 
-hitEffect = NM_ME_EXPLOSION_DAMAGE
+hitEffect = NM_ME_EXPLOSION_AREA
 damageEffect = NM_ME_DRAW_BLOOD
 animationColor = RED
 offensive = true

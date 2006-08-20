@@ -872,11 +872,11 @@ int SpellScript::luaActionMakeRune(lua_State *L)
 			magicTarget.manaCost = 0;
 		}
 		else if(a == 1 || b == 1) {
-			magicTarget.damageEffect = 12; //NM_ME_MAGIC_ENERGIE = 12
+			magicTarget.damageEffect = 13; //NM_ME_MAGIC_BLOOD = 13
 		}
 
 		/*else{
-			magicTarget.damageEffect = 12; //NM_ME_MAGIC_ENERGIE = 12
+			magicTarget.damageEffect = 12; //NM_ME_MAGIC_ENERGY = 12
 
 			if(b==1){
 				magicTarget.manaCost = spell->getMana();
@@ -946,7 +946,7 @@ int SpellScript::luaActionMakeArrows(lua_State *L)
 		}
 		else{			
 			magicTarget.manaCost = spell->getMana();
-			magicTarget.damageEffect = 12; //NM_ME_MAGIC_ENERGIE = 12
+			magicTarget.damageEffect = 12; //NM_ME_MAGIC_ENERGY = 12
  		}
  		
 		bool isSuccess = spell->game->creatureThrowRune(player, player->getPosition(), magicTarget);
@@ -997,7 +997,7 @@ int SpellScript::luaActionMakeFood(lua_State *L)
   		}
   		else{  
   			magicTarget.manaCost = spell->getMana();
-  			magicTarget.damageEffect = 12; //NM_ME_MAGIC_ENERGIE = 12    	
+  			magicTarget.damageEffect = 14; //NM_ME_MAGIC_POISON = 14    	
 		}
   
 		bool isSuccess = spell->game->creatureThrowRune(player, player->getPosition(), magicTarget);

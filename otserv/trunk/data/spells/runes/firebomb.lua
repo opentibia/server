@@ -6,11 +6,11 @@ area = {
 
 attackType = ATTACK_FIRE
 needDirection = false
-areaEffect = NM_ME_FIRE_AREA
+areaEffect = NM_ME_HITBY_FIRE
 animationEffect = NM_ANI_FIRE
 
-hitEffect = NM_ME_FIRE_AREA
-damageEffect = NM_ME_HITBY_FIRE
+hitEffect = NM_ME_HITBY_FIRE
+damageEffect = NM_ME_NONE
 animationColor = RED
 offensive = true
 drawblood = false

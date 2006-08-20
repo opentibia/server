@@ -13,7 +13,7 @@ needDirection = false
 areaEffect = NM_ME_FIRE_AREA
 animationEffect = NM_ANI_FIRE
 
-hitEffect = NM_ME_FIRE_AREA
+hitEffect = NM_ME_HITBY_FIRE
 damageEffect = NM_ME_HITBY_FIRE
 animationColor = RED
 offensive = true
