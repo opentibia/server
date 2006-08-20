@@ -223,8 +223,7 @@ public:
 	void thingMove(Player* player, const Position& fromPos, uint16_t itemId, uint8_t fromStackpos,
 		const Position& toPos, uint8_t count);
 
-	void moveCreature(Player* player, Cylinder* fromCylinder, Cylinder* toCylinder,
-	Creature* moveCreature);
+	void moveCreature(unsigned long playerID, Position playerPos, unsigned long movingCreatureID, Position toPos);
 
 	ReturnValue internalMoveCreature(Creature* creature, Direction direction);
 	ReturnValue internalMoveCreature(Creature* creature, Cylinder* fromCylinder, Cylinder* toCylinder);

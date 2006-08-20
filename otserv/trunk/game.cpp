@@ -949,7 +949,12 @@ void Game::thingMove(Player* player, const Position& fromPos, uint16_t itemId, u
 
 	if(thing){
 		if(Creature* movingCreature = thing->getCreature()){
-			moveCreature(player, fromCylinder, toCylinder, movingCreature);
+            if(abs(fromCylinder->getPosition().x - toCylinder->getPosition().x) == abs(fromCylinder->getPosition().y - toCylinder->getPosition().y)) // Diagonal
+                addEvent(makeTask(1500, boost::bind(&Game::moveCreature, this, player->getID(), 
+                player->getPosition(), movingCreature->getID(), toPos)));
+            else
+                addEvent(makeTask(800, boost::bind(&Game::moveCreature, this, player->getID(), 
+                player->getPosition(), movingCreature->getID(), toPos)));
 		}
 		else if(Item* movingItem = thing->getItem()){
 			moveItem(player, fromCylinder, toCylinder, toIndex, movingItem, count, itemId);
@@ -959,66 +964,55 @@ void Game::thingMove(Player* player, const Position& fromPos, uint16_t itemId, u
 		player->sendCancelMessage(RET_NOTPOSSIBLE);
 }
 
-void Game::moveCreature(Player* player, Cylinder* fromCylinder, Cylinder* toCylinder,
-	Creature* moveCreature)
+void Game::moveCreature(unsigned long playerID, Position playerPos, unsigned long movingCreatureID, Position toPos)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::creatureMove()");
-	if(player->isRemoved())
+	
+	Player* player = getPlayerByID(playerID);
+	Creature* movingCreature = getCreatureByID(movingCreatureID);
+	
+	if(!player || player->isRemoved() || !movingCreature || movingCreature->isRemoved())
 		return;
+	if(player->getPosition() != playerPos)
+	    return;
+    if(!Position::areInRange<1,1,0>(movingCreature->getPosition(), player->getPosition()))
+        return;
 
 	ReturnValue ret = RET_NOERROR;
 
-	if(fromCylinder == NULL || toCylinder == NULL || moveCreature == NULL){
+	if(!map->getTile(toPos)){
 		ret = RET_NOTPOSSIBLE;
 	}
-	else if(toCylinder != toCylinder->getTile()){
-		ret = RET_NOTPOSSIBLE;
-	}
-	else if(!moveCreature->isPushable() && player->access == 0){
+	else if(!movingCreature->isPushable() && player->access == 0){
 		ret = RET_NOTMOVEABLE;
 	}
-	else if(player->getPosition().z != fromCylinder->getPosition().z){
-		ret = RET_NOTPOSSIBLE;
-	}
-	else if(!Position::areInRange<1,1,0>(moveCreature->getPosition(), player->getPosition())){
+	else if(!Position::areInRange<1,1,0>(movingCreature->getPosition(), player->getPosition())){
 		ret = RET_TOOFARAWAY;
 	}
 	else{
-		const Position& fromPos = fromCylinder->getPosition();
-		const Position& toPos = toCylinder->getPosition();
-		const Position& moveCreaturePos = moveCreature->getPosition();
+		const Position& movingCreaturePos = movingCreature->getPosition();
 
 		//check throw distance
-		if( (std::abs(moveCreaturePos.x - toPos.x) > moveCreature->getThrowRange()) ||
-				(std::abs(moveCreaturePos.y - toPos.y) > moveCreature->getThrowRange()) ||
-				(std::abs(moveCreaturePos.z - toPos.z) * 4 > moveCreature->getThrowRange()) ) {
+		if( (std::abs(movingCreaturePos.x - toPos.x) > movingCreature->getThrowRange()) ||
+				(std::abs(movingCreaturePos.y - toPos.y) > movingCreature->getThrowRange()) ||
+				(std::abs(movingCreaturePos.z - toPos.z) * 4 > movingCreature->getThrowRange()) ) {
 			ret = RET_DESTINATIONOUTOFREACH;
 		}
-		else if(player != moveCreature && player->access == 0){
-			if(toCylinder->getTile()->hasProperty(BLOCKPATHFIND))
+		else if(player != movingCreature){
+			if(map->getTile(toPos)->hasProperty(BLOCKPATHFIND))
 				ret = RET_NOTENOUGHROOM;
-			if(fromCylinder->getTile()->hasProperty(PROTECTIONZONE) &&
-			!toCylinder->getTile()->hasProperty(PROTECTIONZONE))
+			if(map->getTile(movingCreature->getPosition())->hasProperty(PROTECTIONZONE) &&
+			!map->getTile(toPos)->hasProperty(PROTECTIONZONE))
 				ret = RET_NOTPOSSIBLE;
-
-			/*if(toCylinder->getTile()->getTeleportItem() ||
-				toCylinder->getTile()->getFieldItem() ||
-				toCylinder->getTile()->floorChange()){
-				ret = RET_NOTENOUGHROOM;
-			}
-			else if(fromCylinder->getTile()->isPz() && !toCylinder->getTile()->isPz())
-				ret = RET_NOTPOSSIBLE;
-			*/
 		}
 	}
 
 	if(ret == RET_NOERROR){
-		ret = internalMoveCreature(moveCreature, fromCylinder, toCylinder);
+		ret = internalMoveCreature(movingCreature, map->getTile(movingCreature->getPosition()), map->getTile(toPos));
 	}
 
-	if((player == moveCreature || ret == RET_NOTMOVEABLE) && ret != RET_NOERROR){
+	else{
 		player->sendCancelMessage(ret);
-		player->sendCancelWalk();
 	}
 }
 
