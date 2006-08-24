@@ -24,8 +24,6 @@
 </spell>
 <spell name="Haste" words="utani hur" maglv="4" mana="60" enabled="1"><vocation id="0" /><vocation id="1" /><vocation id="2" /><vocation id="3" />
 </spell>
-<spell name="Paralyze" words="utani slow" maglv="4" mana="60" enabled="1"><vocation id="0" /><vocation id="1" /><vocation id="2" /><vocation id="3" />
-</spell>
 <spell name="Strong Haste" words="utani gran hur" maglv="17" mana="100" enabled="1"><vocation id="1" /><vocation id="2" />
 </spell>
 <spell name="Poison storm" words="exevo gran mas pox" maglv="20" mana="200" enabled="1"><vocation id="1" /><vocation id="2" />
