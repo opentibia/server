@@ -23,6 +23,135 @@
 -- Others
 <action itemid="2785" script="blueberry_bush.lua"   />
 
+-- Depots
+<action itemid="446" script="switch_tile.lua" />
+<action itemid="447" script="switch_tile.lua" />
+<action itemid="426" script="switch_tile.lua"/>
+<action itemid="425" script="switch_tile.lua"/>
+<action itemid="416" script="switch_tile.lua"/>
+<action itemid="417" script="switch_tile.lua"/>
+<action itemid="3216" script="switch_tile.lua"/>
+<action itemid="3217" script="switch_tile.lua"/>
+
+-- Construction Lits
+<action itemid="3901" script="construction_kits.lua" />
+<action itemid="3902" script="construction_kits.lua" />
+<action itemid="3903" script="construction_kits.lua" />
+<action itemid="3904" script="construction_kits.lua" />
+<action itemid="3905" script="construction_kits.lua" />
+<action itemid="3906" script="construction_kits.lua" />
+<action itemid="3907" script="construction_kits.lua" />
+<action itemid="3908" script="construction_kits.lua" />
+<action itemid="3909" script="construction_kits.lua" />
+<action itemid="3910" script="construction_kits.lua" />
+<action itemid="3911" script="construction_kits.lua" />
+<action itemid="3912" script="construction_kits.lua" />
+<action itemid="3913" script="construction_kits.lua" />
+<action itemid="3914" script="construction_kits.lua" />
+<action itemid="3915" script="construction_kits.lua" />
+<action itemid="3916" script="construction_kits.lua" />
+<action itemid="3917" script="construction_kits.lua" />
+<action itemid="3918" script="construction_kits.lua" />
+<action itemid="3919" script="construction_kits.lua" />
+<action itemid="3920" script="construction_kits.lua" />
+<action itemid="3921" script="construction_kits.lua" />
+<action itemid="3922" script="construction_kits.lua" />
+<action itemid="3923" script="construction_kits.lua" />
+<action itemid="3924" script="construction_kits.lua" />
+<action itemid="3925" script="construction_kits.lua" />
+<action itemid="3926" script="construction_kits.lua" />
+<action itemid="3927" script="construction_kits.lua" />
+<action itemid="3928" script="construction_kits.lua" />
+<action itemid="3929" script="construction_kits.lua" />
+<action itemid="3930" script="construction_kits.lua" />
+<action itemid="3931" script="construction_kits.lua" />
+<action itemid="3932" script="construction_kits.lua" />
+<action itemid="3933" script="construction_kits.lua" />
+<action itemid="3934" script="construction_kits.lua" />
+<action itemid="3935" script="construction_kits.lua" />
+<action itemid="3936" script="construction_kits.lua" />
+<action itemid="3937" script="construction_kits.lua" />
+<action itemid="3938" script="construction_kits.lua" />
+
+-- Destroying Furniture With Weapons
+<action itemid="2376" script="destroy.lua" />
+<action itemid="2377" script="destroy.lua" />
+<action itemid="2378" script="destroy.lua" />
+<action itemid="2379" script="destroy.lua" />
+<action itemid="2380" script="destroy.lua" />
+<action itemid="2381" script="destroy.lua" />
+<action itemid="2382" script="destroy.lua" />
+<action itemid="2383" script="destroy.lua" />
+<action itemid="2384" script="destroy.lua" />
+<action itemid="2385" script="destroy.lua" />
+<action itemid="2386" script="destroy.lua" />
+<action itemid="2387" script="destroy.lua" />
+<action itemid="2388" script="destroy.lua" />
+<action itemid="2389" script="destroy.lua" />
+<action itemid="2390" script="destroy.lua" />
+<action itemid="2391" script="destroy.lua" />
+<action itemid="2392" script="destroy.lua" />
+<action itemid="2393" script="destroy.lua" />
+<action itemid="2394" script="destroy.lua" />
+<action itemid="2395" script="destroy.lua" />
+<action itemid="2396" script="destroy.lua" />
+<action itemid="2397" script="destroy.lua" />
+<action itemid="2398" script="destroy.lua" />
+<action itemid="2399" script="destroy.lua" />
+<action itemid="2400" script="destroy.lua" />
+<action itemid="2401" script="destroy.lua" />
+<action itemid="2402" script="destroy.lua" />
+<action itemid="2403" script="destroy.lua" />
+<action itemid="2404" script="destroy.lua" />
+<action itemid="2406" script="destroy.lua" />
+<action itemid="2407" script="destroy.lua" />
+<action itemid="2408" script="destroy.lua" />
+<action itemid="2409" script="destroy.lua" />
+<action itemid="2410" script="destroy.lua" />
+<action itemid="2411" script="destroy.lua" />
+<action itemid="2412" script="destroy.lua" />
+<action itemid="2413" script="destroy.lua" />
+<action itemid="2414" script="destroy.lua" />
+<action itemid="2415" script="destroy.lua" />
+<action itemid="2416" script="destroy.lua" />
+<action itemid="2417" script="destroy.lua" />
+<action itemid="2418" script="destroy.lua" />
+<action itemid="2419" script="destroy.lua" />
+<action itemid="2420" script="destroy.lua" />
+<action itemid="2421" script="destroy.lua" />
+<action itemid="2422" script="destroy.lua" />
+<action itemid="2423" script="destroy.lua" />
+<action itemid="2424" script="destroy.lua" />
+<action itemid="2425" script="destroy.lua" />
+<action itemid="2426" script="destroy.lua" />
+<action itemid="2427" script="destroy.lua" />
+<action itemid="2428" script="destroy.lua" />
+<action itemid="2429" script="destroy.lua" />
+<action itemid="2430" script="destroy.lua" />
+<action itemid="2431" script="destroy.lua" />
+<action itemid="2432" script="destroy.lua" />
+<action itemid="2433" script="destroy.lua" />
+<action itemid="2434" script="destroy.lua" />
+<action itemid="2435" script="destroy.lua" />
+<action itemid="2436" script="destroy.lua" />
+<action itemid="2437" script="destroy.lua" />
+<action itemid="2438" script="destroy.lua" />
+<action itemid="2439" script="destroy.lua" />
+<action itemid="2440" script="destroy.lua" />
+<action itemid="2441" script="destroy.lua" />
+<action itemid="2442" script="destroy.lua" />
+<action itemid="2443" script="destroy.lua" />
+<action itemid="2444" script="destroy.lua" />
+<action itemid="2445" script="destroy.lua" />
+<action itemid="2446" script="destroy.lua" />
+<action itemid="2447" script="destroy.lua" />
+<action itemid="2448" script="destroy.lua" />
+<action itemid="2449" script="destroy.lua" />
+<action itemid="2450" script="destroy.lua" />
+<action itemid="2451" script="destroy.lua" />
+<action itemid="2452" script="destroy.lua" />
+<action itemid="2453" script="destroy.lua" />
+
 -- Teleports
 <action itemid="430" script="teleport.lua"  />
 <action itemid="1386" script="teleport.lua" />
