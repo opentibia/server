@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<monster name="Sibang" level="20" maglevel="10" experience="95" pushable="0" speed="214"  armor="3" defense="5" canpushitems="0" staticattack="35" changetarget="200">
+	<health now="225" max="225"/>
+	<look type="118" corpse="4274"/>
+	<combat targetdistance="1" runonhealth="0"/>
+<attacks>
+	<attack type="melee" maxdamage="20" cycleticks="2000" probability="100"/>
+        <attack type="distance" name="smallstone" maxdamage="20" cycleticks="3000" probability="100"/>	
+        
+
+</attacks>
+
+<defenses>
+	<defense immunity="poison"/>
+</defenses>
+
+<voices>
+	<voice sentence="Huh! Huh! Huh!"/>
+	<voice sentence="Ahhuuaaa!"/>
+	<voice sentence="Eeeeek! Eeeeek"/>
+</voices>
+
+<loot>
+ 	<item id="2148" countmax="10" chance1="100000" chancemax="0"/>
+	<item id="2676" chance="1333"/>
+	<item id="2647" chance="2222"/>
+</loot>
+
+</monster>

@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<monster name="Demon Skeleton" level="20" maglevel="30" experience="240" pushable="0" armor="30" defense="30" canpushitems="1" staticattack="50" changetarget="180">
+	<health now="400" max="400"/>
+	<look type="37" head="20" body="30" legs="40" feet="50" corpse="2809"/>
+	<combat targetdistance="1" runonhealth="0"/>
+
+<attacks>
+	<attack type="melee" maxdamage="150"/>
+</attacks>
+
+<defenses>
+	<defense immunity="fire"/>
+	<defense immunity="poison"/>
+</defenses>
+
+<loot>
+ 	<item id="2148" countmax="40" chance1="100000" chancemax="0"/>
+ 	<item id="2399" countmax="1" chance1="10000" chancemax="0"/>
+ 	<item id="2515" chance="1666"/>
+ 	<item id="2178" chance="1333"/>
+ 	<item id="2050" chance="33333"/>
+
+ 	<item id="1987" chance="100000">
+ 	<inside>
+ 	<item id="2417" chance="5000"/>
+	<item id="0000" countmax="2" chance1="20000" chancemax="0"/>
+ 	<item id="2482" chance="2857"/>
+ 	<item id="2194" chance="1666"/>
+ 	<item id="2398" chance="10000"/>
+ 	</inside>
+ 	</item>
+</loot>
+</monster>

@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<monster name="Dwarf Guard" level="20" maglevel="30" experience="170" pushable="0" armor="15" defense="20" canpushitems="1" staticattack="50" changetarget="200" speed="200">
+	<health now="245" max="245"/>
+	<look type="70" head="20" body="30" legs="40" feet="50" corpse="2983"/>
+	<combat targetdistance="1" runonhealth="0"/>
+
+<attacks>
+	<attack type="melee" maxdamage="120"/>
+</attacks>
+
+<defenses>
+	<defense immunity="poison"/>
+	<defense immunity="invisible"/>
+	<defense immunity="drunk"/>
+</defenses>
+
+<loot>
+ 	<item id="2148" countmax="50" chance1="100000" chancemax="0"/>
+ 	<item id="2483" chance="20000"/>
+ 	<item id="2417" chance="33333"/>
+ 	<item id="2387" chance="25000"/>
+	<item id="2787" countmax="3" chance1="33333" chancemax="0"/>
+ 	<item id="1987" chance="100000">
+ 	<inside>
+ 	<item id="2148" countmax="15" chance1="90000" chancemax="0"/>
+ 	<item id="2459" chance="10000"/>
+ 	<item id="2513" chance="6666"/>
+	<item id="2150" countmax="2" chance1="4000" chancemax="0"/>
+ 	<item id="2378" chance="5000"/>
+ 	<item id="2169" chance="2500"/>
+ 	</inside>
+ 	</item>
+</loot>
+</monster>

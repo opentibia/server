@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<monster name="Crab" level="20" maglevel="10" experience="30" pushable="0" speed="120"  armor="3" defense="5" canpushitems="0" staticattack="50" changetarget="200">
+	<health now="55" max="55"/>
+	<look type="112" corpse="4253"/>
+	<combat targetdistance="1" runonhealth="0"/>
+<attacks>
+	<attack type="melee" maxdamage="25" cycleticks="2000" probability="100"/>
+        	
+</attacks>
+
+<defenses>
+</defenses>
+
+<loot>
+
+</loot>
+<voices>
+
+	
+</voices>
+</monster>

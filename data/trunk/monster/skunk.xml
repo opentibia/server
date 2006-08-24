@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<monster name="Skunk" level="20" maglevel="0" experience="0" pushable="1" armor="15" defense="20" canpushitems="0" staticattack="50" changetarget="200" speed="138">
+	<health now="20" max="20"/>
+	<look type="106" head="20" body="30" legs="40" feet="50" corpse="3046"/>
+	<combat targetdistance="3" runonhealth="4"/>
+
+<attacks>
+	<attack type="melee" maxdamage="0"/>
+</attacks>
+
+<defenses>
+	<defense immunity="poison"/>
+</defenses>
+
+<loot>
+        <item id="2671" countmax="1" chance1="50000" chancemax="1"/>
+</loot>
+</monster>

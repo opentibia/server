@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<monster name="Tarantula" level="20" maglevel="10" experience="120" pushable="0" speed="214"  armor="3" defense="5" canpushitems="0" staticattack="50" changetarget="200">
+	<health now="225" max="225"/>
+	<look type="219" corpse="4320"/>
+	<combat targetdistance="1" runonhealth="0"/>
+<attacks>
+	<attack type="melee" maxdamage="30" cycleticks="2000" probability="100"/>	
+
+</attacks>
+
+<defenses>
+	<defense immunity="poison"/>
+</defenses>
+
+<loot>
+ 	<item id="2148" countmax="20" chance1="100000" chancemax="0"/>
+	<item id="2483" chance="10000"/>
+	<item id="2647" chance="5000"/>
+	<item id="2457" chance="8000"/>
+
+</loot>
+
+</monster>

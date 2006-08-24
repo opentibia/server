@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<monster name="Black Knight" level="26" maglevel="2" experience="1600" pushable="0" armor="30" defense="38" canpushitems="1" staticattack="50" changetarget="200" speed="390">
+	<health now="1800" max="1800"/>
+	<look type="131" head="95" body="95" legs="95" feet="95" corpse="3128"/>
+	<combat targetdistance="1" runonhealth="0"/>
+
+<attacks>
+	<attack type="melee" maxdamage="210"/>
+	<attack type="distance" name="spear" mindamage="10" maxdamage="250"/>
+	<attack type="instant" name="exori" exhaustion="500" cycleticks="5000" probability="70"/>
+</attacks>
+
+<defenses>
+	<defense immunity="invisible"/>
+	<defense immunity="fire"/>
+	<defense immunity="poison"/>
+	<defense immunity="energy"/>
+</defenses>
+
+<voices>
+	<voice sentence="No prisoners!"/>
+	<voice sentence="By Bolg's Blood!"/>
+	<voice sentence="You're no match for me!"/>
+	<voice sentence="NO MERCY!"/>
+	<voice sentence="MINE!"/>
+</voices>
+
+<loot>
+ 	<item id="2148" countmax="100" chance1="100000" chancemax="0"/>
+ 	<item id="2476" chance="1000"/>
+ 	<item id="2489" chance="1428"/>
+ 	<item id="2490" chance="6666"/>
+ 	<item id="2381" chance="5000"/>
+ 	<item id="2389" countmax="1" chance1="20000" chancemax="0"/>
+
+ 	<item id="1987" chance="100000">
+ 	<inside>
+ 	<item id="2463" chance="2500"/>
+ 	<item id="2148" countmax="15" chance1="100000" chancemax="0"/>
+ 	<item id="2120" chance="20000"/>
+ 	<item id="2387" chance="6666"/>
+ 	<item id="2377" chance="2857"/>
+ 	<item id="2430" chance="1333"/>
+ 	<item id="2414" chance="909"/>
+ 	<item id="2195" chance="555"/>
+ 	</inside>
+ 	</item>
+</loot>
+</monster>

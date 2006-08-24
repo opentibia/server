@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<monster name="Elf Scout" level="60" maglevel="30" experience="75" pushable="0" armor="15" defense="20" canpushitems="1" staticattack="50" changetarget="220">
+	<health now="160" max="160"/>
+	<look type="64" head="20" body="30" legs="40" feet="50" corpse="2981"/>
+	<combat targetdistance="3" runonhealth="0"/>
+
+<attacks>
+	<attack type="distance" name="arrow" mindamage="10" maxdamage="70"/>
+</attacks>
+
+<defenses>
+	<defense immunity="invisible"/>
+</defenses>
+
+<voices>
+	<voice sentence="Feel the sting of my arrows!"/>
+	<voice sentence="Your existence will end here!"/>
+	<voice sentence="Evicor guide my arrow"/>
+	<voice sentence="Thy blood will quench the soil's thirst!"/>
+	<voice sentence="Tha'shi Ab'dendriel!"/>
+</voices>
+
+<loot>
+ 	<item id="2148" countmax="10" chance1="100000" chancemax="0"/>
+ 	<item id="2544" countmax="10" chance1="50000" chancemax="0"/>
+ 	<item id="2484" chance="10000"/>
+ 	<item id="2456" chance="10000"/>
+ 	<item id="2681" chance="20000"/>
+
+ 	<item id="1987" chance="6666">
+ 	<inside>
+ 	<item id="2148" countmax="5" chance1="80000" chancemax="0"/>
+ 	<item id="2642" chance="5500"/>
+ 	<item id="2397" chance="4000"/>
+ 	</inside>
+ 	</item>
+</loot>
+</monster>

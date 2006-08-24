@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<monster name="Crypt Shambler" level="20" maglevel="30" experience="195" pushable="0" armor="15" defense="20" canpushitems="1" staticattack="50" changetarget="200" speed="140">
+	<health now="330" max="330"/>
+	<look type="100" head="20" body="30" legs="40" feet="50" corpse="3028"/>
+	<combat targetdistance="1" runonhealth="0"/>
+
+<attacks>
+	<attack type="melee" maxdamage="160"/>
+</attacks>
+
+<defenses>
+	<defense immunity="poison"/>
+	<defense immunity="paralyze"/>
+</defenses>
+
+<loot>
+	<item id="2148" countmax="15" chance1="100000" chancemax="0"/>
+	<item id="2671" countmax="2" chance1="33333" chancemax="0"/>
+ 	<item id="1987" chance="100000">
+ 	<inside>
+ 	<item id="2377" chance="2857"/>
+	<item id="2399" countmax="2" chance1="33333" chancemax="0"/>
+ 	<item id="2450" chance="5000"/>
+ 	<item id="2482" chance="20000"/>
+ 	<item id="2541" chance="2000"/>
+ 	</inside>
+ 	</item>
+</loot>
+</monster>

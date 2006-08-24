@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<monster name="Flamingo" level="20" maglevel="10" experience="0" pushable="0" speed="168"  armor="3" defense="5" canpushitems="0" staticattack="50" changetarget="200">
+	<health now="25" max="25"/>
+	<look type="212" corpse="4301"/>
+	<combat targetdistance="6" runonhealth="25"/>
+<attacks>
+
+
+</attacks>
+
+<defenses>
+
+</defenses>
+
+<loot>
+
+</loot>
+
+<voices>
+
+	
+</voices>
+</monster>

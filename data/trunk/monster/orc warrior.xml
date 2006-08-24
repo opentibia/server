@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<monster name="Orc Warrior" level="20" maglevel="30" experience="50" pushable="0" armor="15" defense="20" canpushitems="1" staticattack="50" changetarget="200" speed="190">
+	<health now="125" max="125"/>
+	<look type="7" head="20" body="30" legs="40" feet="50" corpse="2862"/>
+	<combat targetdistance="1" runonhealth="0"/>
+
+<attacks>
+	<attack type="melee" maxdamage="60"/>
+</attacks>
+
+<defenses>
+
+</defenses>
+
+<voices>
+	<voice sentence="Alk!"/>
+	<voice sentence="Trak grrr brik."/>
+</voices>
+
+<loot>
+ 	<item id="2148" countmax="12" chance1="100000" chancemax="0"/>
+ 	<item id="2666" countmax="2" chance1="40000" chancemax="0"/>
+ 	<item id="2512" chance="10000"/>
+ 	<item id="2530" chance="4000"/>
+
+ 	<item id="1987" chance="100000">
+ 	<inside>
+ 	<item id="2385" chance="6666"/>
+ 	<item id="2464" chance="5000"/>
+ 	<item id="2420" chance="5000"/>
+ 	<item id="2448" chance="5000"/>
+ 	<item id="2007" chance="20000"/>
+ 	</inside>
+ 	</item>
+</loot>
+</monster>

@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<monster name="Gazer" level="20" maglevel="30" experience="120" pushable="0" armor="15" defense="20" canpushitems="1" staticattack="50" changetarget="200" speed="140">
+	<health now="250" max="250"/>
+	<look type="109" head="20" body="30" legs="40" feet="50" corpse="3049"/>
+	<combat targetdistance="1" runonhealth="40"/>
+<attacks>
+	<attack type="melee" maxdamage="20"/>
+
+</attacks>
+
+<defenses>
+	<defense immunity="poison"/>
+</defenses>
+
+
+<voices>
+</voices>
+
+<loot>
+
+</loot>
+</monster>

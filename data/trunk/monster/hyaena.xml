@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<monster name="Hyaena" level="20" maglevel="30" experience="20" pushable="0" armor="15" defense="20" canpushitems="0" staticattack="50" changetarget="200" speed="196">
+	<health now="60" max="60"/>
+	<look type="94" head="20" body="30" legs="40" feet="50" corpse="3019"/>
+	<combat targetdistance="1" runonhealth="0"/>
+
+<attacks>
+	<attack type="melee" maxdamage="40"/>
+</attacks>
+
+<defenses>
+
+</defenses>
+
+<loot>
+ 	<item id="2666" countmax="3" chance1="90000" chancemax="0"/>
+</loot>
+</monster>

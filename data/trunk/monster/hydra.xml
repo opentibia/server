@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<monster name="Hydra" level="20" maglevel="20" experience="2100" pushable="0" speed="200"  armor="38" defense="35" canpushitems="0" staticattack="50" changetarget="200">
+	<health now="2250" max="2250"/>
+	<look type="121" corpse="4283"/>
+	<combat targetdistance="1" runonhealth="0"/>
+<attacks>
+	<attack type="melee" maxdamage="150" probability="100"/>
+        <attack type="instant" name="exura vita" cycleticks="3000" probability="65"/>
+        <attack type="instant" name="exura vita" cycleticks="8000" probability="100"/>
+
+	<attack type="instant" name="hydra_bubblewave" exhaustion="500" cycleticks="6000" probability="80"/>
+	<attack type="instant" name="hydra_bubblewave" exhaustion="500" cycleticks="1200" probability="40"/>
+	<attack type="instant" name="hydra_poisonwave" exhaustion="500" cycleticks="6000" probability="80"/>
+	<attack type="instant" name="hydra_poisonwave" exhaustion="500" cycleticks="10000" probability="30"/>
+
+</attacks>
+
+<defenses>
+        <defense immunity="poison"/>
+	<defense immunity="paralyze"/>
+	<defense immunity="drunk"/>
+</defenses>
+
+<loot>
+
+</loot>
+<voices>
+	<voice sentence="FCHHHHH"/>
+	<voice sentence="HISSSS"/>
+</voices>
+</monster>

@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<monster name="Banshee" level="1" maglevel="30" experience="900" pushable="0" armor="35" defense="28" canpushitems="1" staticattack="50" changetarget="200" speed="220">
+	<health now="1000" max="1000"/>
+	<look type="78" head="20" body="30" legs="40" feet="50" corpse="2998"/>
+	<combat targetdistance="1" runonhealth="0"/>
+
+<attacks>
+	<attack type="melee" maxdamage="250" probability="80"/>
+	<attack type="instant" name="banshee_sonar" exhaustion="500" cycleticks="4000" probability="80"/>
+</attacks>
+
+<defenses>
+	<defense immunity="invisible"/>
+	<defense immunity="fire"/>
+	<defense immunity="poison"/>
+	<defense immunity="paralyze"/>
+</defenses>
+
+<voices>
+	<voice sentence="Dance for me your dance of death!"/>
+</voices>
+
+<loot>
+ 	<item id="2148" countmax="40" chance1="100000" chancemax="0"/>
+ 	<item id="2144" countmax="3" chance1="1000" chancemax="0"/>
+ 	<item id="2657" chance="5000"/>
+ 	<item id="2168" chance="1333"/>
+ 	<item id="2170" chance="2000"/>
+ 	<item id="1987" chance="100000">
+ 	<inside>
+ 	<item id="2654" chance="20000"/>
+ 	<item id="2655" chance="1666"/>
+ 	<item id="2656" chance="1333"/>
+ 	</inside>
+ 	</item>
+</loot>
+</monster>

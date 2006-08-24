@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<monster name="Rat" level="20" maglevel="30" experience="5" pushable="1" armor="15" defense="20" canpushitems="0" staticattack="50" changetarget="200" speed="134">
+	<health now="20" max="20"/>
+	<look type="21" head="20" body="30" legs="40" feet="50" corpse="2813"/>
+	<combat targetdistance="1" runonhealth="0"/>
+
+<attacks>
+	<attack type="melee" maxdamage="15"/>
+</attacks>
+
+<defenses>
+
+</defenses>
+
+<loot>
+ 	<item id="2148" countmax="7" chance1="80000" chancemax="0"/>
+ 	<item id="2696" chance="20000"/>
+</loot>
+</monster>

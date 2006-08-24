@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<monster name="Lizard Templar" level="60" maglevel="30" experience="140" pushable="0" speed="174"  armor="3" defense="5" canpushitems="0" staticattack="50" changetarget="200">
+	<health now="410" max="410"/>
+	<look type="113" corpse="4256"/>
+	<combat targetdistance="1" runonhealth="0"/>
+<attacks>
+	<attack type="melee" maxdamage="100" cycleticks="2000" probability="100"/>	
+	<attack type="instant" name="exura" maxdamage="100" cycleticks="2000" probability="100"/>
+
+</attacks>
+
+<defenses>
+	<defense immunity="poison"/>
+</defenses>
+
+<voices>
+	<voice sentence="Hissss!"/>
+</voices>
+
+<loot>
+<item id="3962" chance="6666"/>
+<item id="2148" countmax="20" chance1="100000" chancemax="0"/>
+<item id="2449" chance="8000"/>
+<item id="2377" chance="8000"/>
+<item id="2457" chance="6500"/>
+
+
+</loot>
+
+</monster>

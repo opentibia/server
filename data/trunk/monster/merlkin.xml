@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<monster name="Merlkin" level="20" maglevel="10" experience="110" pushable="0" speed="194"  armor="3" defense="5" canpushitems="0" staticattack="50" changetarget="200">
+	<health now="230" max="230"/>
+	<look type="117" corpse="4271"/>
+	<combat targetdistance="3" runonhealth="0"/>
+
+<attacks>
+	<attack type="rune" name="heavy magic missile" exhaustion="500" cycleticks="2500" probability="100"/>
+</attacks>
+
+<defenses>
+	<defense immunity="poison"/>
+	<defense immunity="energy"/>
+	<defense immunity="paralyze"/>
+	<defense immunity="drunk"/>
+</defenses>
+
+<loot>
+ 	<item id="2148" countmax="12" chance1="100000" chancemax="0"/>
+ 	<item id="3961" chance="5000"/>
+</loot>
+
+<voices>
+	<voice sentence="Chakka! Chakka!"/>
+	<voice sentence="Ugh! Ugh! Ugh!"/>
+	<voice sentence="Holy banana!"/>
+</voices>
+</monster>

@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<monster name="Marid" level="70" maglevel="60" experience="300" pushable="0" armor="35" defense="28" canpushitems="1" staticattack="50" changetarget="200" speed="170">
+	<health now="550" max="550"/>
+	<look type="104" head="20" body="30" legs="40" feet="50" corpse="3040"/>
+	<combat targetdistance="1" runonhealth="50"/>
+
+<attacks>
+	<attack type="melee" maxdamage="140"/>
+	<attack type="instant" name="djinn_exori" exhaustion="500" cycleticks="6000" probability="80"/>
+	<attack type="instant" name="djinn_exori" exhaustion="500" cycleticks="1200" probability="10"/>
+</attacks>
+
+<defenses>
+	<defense immunity="energy"/>
+	<defense immunity="fire"/>
+	<defense immunity="poison"/>
+	<defense immunity="paralyze"/>
+	<defense immunity="drunk"/>
+</defenses>
+
+<loot>
+ 	<item id="2148" countmax="50" chance1="100000" chancemax="0"/>
+ 	<item id="2442" chance="5000"/>
+
+ 	<item id="1987" chance="100000">
+ 	<inside>
+ 	<item id="2148" countmax="14" chance1="100000" chancemax="0"/>
+ 	<item id="2063" chance="3333"/>
+	<item id="2677" countmax="4" chance1="20000" chancemax="0"/>
+ 	<item id="2177" chance="10000"/>
+ 	</inside>
+ 	</item>
+</loot>
+</monster>

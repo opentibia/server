@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<monster name="Deer" level="20" maglevel="0" experience="0" pushable="0" armor="15" defense="20" canpushitems="0" staticattack="50" changetarget="200" speed="150">
+	<health now="25" max="25"/>
+	<look type="31" head="20" body="30" legs="40" feet="50" corpse="2835"/>
+	<combat targetdistance="8" runonhealth="25"/>
+
+<attacks>
+
+</attacks>
+
+<defenses>
+
+</defenses>
+
+<loot>
+ 	<item id="2666" countmax="4" chance1="100000" chancemax="0"/>
+</loot>
+</monster>

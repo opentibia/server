@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<monster name="Smuggler" level="20" maglevel="30" experience="48" pushable="0" armor="25" defense="20" canpushitems="1" staticattack="50" changetarget="200" speed="176">
+	<health now="130" max="130"/>
+	<look type="134" head="95" body="57" legs="113" feet="115" corpse="3128"/>
+	<combat targetdistance="4" runonhealth="0"/>
+<attacks>
+	<attack type="melee" maxdamage="30" cycleticks="2000" probability="100"/>
+</attacks>
+
+<voices>
+	<voice sentence="I will silence you forever!"/>
+	<voice sentence="You saw something you shouldn't!"/>
+</voices>
+
+<defenses>
+</defenses>
+
+<loot>
+ 	<item id="2148" countmax="20" chance1="100000" chancemax="0"/>
+ 	<item id="2465" chance="10000"/>
+ 	<item id="2649" chance="10000"/>
+ 	<item id="2671" countmax="2" chance1="20000" chancemax="0"/>
+
+ 	<item id="1987" chance="100000">
+ 	<inside>
+	<item id="2675" countmax="4" chance1="6666" chancemax="0"/>
+ 	<item id="2050" chance="20000"/>
+ 	<item id="2478" chance="3333"/>
+ 	</inside>
+ 	</item>
+</loot>
+</monster>

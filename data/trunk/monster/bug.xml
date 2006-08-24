@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<monster name="Bug" level="1" maglevel="30" experience="18" pushable="0" armor="15" defense="20" canpushitems="0" staticattack="50" changetarget="200" speed="240">
+	<health now="29" max="29"/>
+	<look type="45" head="20" body="30" legs="40" feet="50" corpse="2902"/>
+	<combat targetdistance="1" runonhealth="0"/>
+
+<attacks>
+	<attack type="melee" maxdamage="15"/>
+</attacks>
+
+<defenses>
+
+</defenses>
+
+<loot>
+ 	<item id="2148" countmax="4" chance1="100000" chancemax="0"/>
+        <item id="2679" countmax="3" chance1="50000" chancemax="0"/>
+</loot>
+</monster>

@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<monster name="Cobra" level="20" maglevel="30" experience="30" pushable="0" armor="15" defense="20" canpushitems="0" staticattack="50" changetarget="200" speed="120">
+	<health now="65" max="65"/>
+	<look type="81" head="20" body="30" legs="40" feet="50" corpse="3007"/>
+	<combat targetdistance="1" runonhealth="10"/>
+
+<attacks>
+	<attack type="distance" name="poisonfield" mindamage="5" maxdamage="10"/>
+</attacks>
+
+<defenses>
+	<defense immunity="poison"/>
+</defenses>
+
+<loot>
+ 	<item id="2220" chance="33333"/>
+ 	<item id="2230" chance="20000"/>
+</loot>
+
+<voices>
+	<voice sentence="Zzzzzz"/>
+</voices>
+
+</monster>

@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<monster name="Butterfly" level="20" maglevel="10" experience="0" pushable="0" speed="320"  armor="3" defense="5" canpushitems="0" staticattack="1" changetarget="200">
+	<health now="2" max="2"/>
+	<look type="213" corpse="4313"/>
+	<combat targetdistance="3" runonhealth="2"/>
+<attacks>
+
+</attacks>
+
+<defenses>
+
+</defenses>
+
+<loot>
+
+</loot>
+
+<voices>
+
+</voices>
+
+</monster>
