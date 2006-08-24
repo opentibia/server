@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<monster name="Dworc Fleshhunter" level="20" maglevel="10" experience="35" speed="148"  pushable="0" armor="3" defense="5" canpushitems="0" staticattack="50" changetarget="200">
+	<health now="80" max="80"/>
+	<look type="215" corpse="4307"/>
+	<combat targetdistance="1" runonhealth="0"/>
+<attacks>
+	<attack type="melee" maxdamage="20" cycleticks="2000" probability="100"/>	
+</attacks>
+
+<defenses>
+	<defense immunity="poison"/>
+</defenses>
+
+<loot>
+ 	<item id="2148" countmax="20" chance1="100000" chancemax="0"/>
+	<item id="2483" chance="10000"/>
+	<item id="2647" chance="5000"/>
+	<item id="2457" chance="8000"/>
+
+</loot>
+
+<voices>
+	<voice sentence="Grak brrretz!"/>
+	<voice sentence="Grow truk grrrrr"/>
+	<voice sentence="Prek tars, dekklep zurk"/>
+</voices>
+</monster>

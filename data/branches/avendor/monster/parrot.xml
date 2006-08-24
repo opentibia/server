@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<monster name="Parrot" level="20" maglevel="10" experience="0" pushable="0" speed="320"  armor="3" defense="5" canpushitems="0" staticattack="50" changetarget="200">
+	<health now="25" max="25"/>
+	<look type="217" corpse="4314"/>
+	<combat targetdistance="4" runonhealth="25"/>
+<attacks>
+
+        	
+
+</attacks>
+
+<defenses>
+
+</defenses>
+
+<loot>
+
+</loot>
+
+<voices>
+
+</voices>
+
+</monster>

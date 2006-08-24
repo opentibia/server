@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<monster name="Necromancer" level="60" maglevel="40" experience="580" pushable="0" armor="40" defense="35" canpushitems="1" staticattack="50" changetarget="200" speed="188">
+	<health now="580" max="580"/>
+	<look type="9" head="20" body="30" legs="40" feet="50" corpse="3128"/>
+	<combat targetdistance="5" runonhealth="50"/>
+
+<attacks>
+	<attack type="melee" maxdamage="90"/>
+	<attack type="instant" name="exura" exhaustion="500" cycleticks="3000" probability="80"/>
+	<attack type="distance" name="poisonfield" mindamage="10" maxdamage="100"/>
+</attacks>
+
+<defenses>
+	<defense immunity="poison"/>
+	<defense immunity="invisible"/>
+</defenses>
+
+<loot>
+ 	<item id="2148" countmax="40" chance1="100000" chancemax="0"/>
+ 	<item id="2032" chance="10000"/>
+	<item id="2804" countmax="2" chance1="20000" chancemax="0"/>
+
+ 	<item id="1987" chance="100000">
+ 	<inside>
+ 	<item id="2412" chance="10000"/>
+	<item id="2229" countmax="3" chance1="20000" chancemax="0"/>
+ 	<item id="2747" chance="20000"/>
+ 	<item id="2436" chance="1333"/>
+ 	<item id="2663" chance="909"/>
+ 	<item id="2195" chance="666"/>
+ 	<item id="2423" chance="5000"/>
+ 	</inside>
+ 	</item>
+</loot>
+</monster>

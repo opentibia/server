@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<monster name="Dog" level="20" maglevel="0" experience="0" pushable="0" armor="15" defense="20" canpushitems="0" staticattack="50" changetarget="200">
+	<health now="20" max="20"/>
+	<look type="32" head="20" body="30" legs="40" feet="50" corpse="2839"/>
+	<combat targetdistance="1" runonhealth="0"/>
+
+<attacks>
+
+</attacks>
+
+<defenses>
+
+</defenses>
+
+<voices>
+	<voice sentence="Wuff wuff!"/>
+</voices>
+
+<loot>
+
+</loot>
+
+</monster>

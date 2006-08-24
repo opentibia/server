@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<monster name="Skeleton" level="20" maglevel="30" experience="35" pushable="0" armor="15" defense="20" canpushitems="0" staticattack="50" changetarget="200" speed="154">
+	<health now="50" max="50"/>
+	<look type="33" head="20" body="30" legs="40" feet="50" corpse="2843"/>
+	<combat targetdistance="1" runonhealth="0"/>
+
+<attacks>
+	<attack type="melee" maxdamage="40"/>
+</attacks>
+
+<defenses>
+	<defense immunity="poison"/>
+</defenses>
+
+<loot>
+ 	<item id="2148" countmax="10" chance1="90000" chancemax="0"/>
+ 	<item id="2480" chance="6666"/>
+
+ 	<item id="1987" chance="100000">
+ 	<inside>
+ 	<item id="2388" chance="10000"/>
+	<item id="0000" countmax="2" chance1="20000" chancemax="0"/>
+ 	<item id="2398" chance="10000"/>
+ 	<item id="2511" chance="5000"/>
+ 	<item id="2473" chance="5000"/>
+ 	<item id="2376" chance="3333"/>
+ 	<item id="2050" chance="20000"/>
+ 	</inside>
+ 	</item>
+</loot>
+</monster>

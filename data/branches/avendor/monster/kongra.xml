@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<monster name="Kongra" level="20" maglevel="10" experience="105" pushable="0" armor="3" speed="240" defense="5" canpushitems="0" staticattack="50" changetarget="184">
+	<health now="340" max="340"/>
+	<look type="116" corpse="4268"/>
+	<combat targetdistance="1" runonhealth="0"/>
+<attacks>
+	<attack type="melee" maxdamage="60" cycleticks="2000" probability="100"/>
+
+</attacks>
+
+<defenses>
+	<defense immunity="poison"/>
+	<defense immunity="paralyze"/>
+	<defense immunity="drunk"/>
+</defenses>
+
+<loot>
+ 	<item id="2148" countmax="20" chance1="100000" chancemax="0"/>
+ 	<item id="2678" countmax="5" chance1="5000" chancemax="0"/>
+	<item id="2483" chance="10000"/>
+	<item id="2463" chance="5000"/>
+	<item id="2457" chance="8000"/>
+</loot>
+
+<voices>
+	<voice sentence="Hugah!"/>
+	<voice sentence="Ungh! Ungh!"/>
+</voices>
+</monster>

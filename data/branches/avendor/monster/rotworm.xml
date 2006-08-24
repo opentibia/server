@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<monster name="Rotworm" level="1" maglevel="0" experience="40" pushable="0" armor="15" defense="20" canpushitems="0" staticattack="50" changetarget="200" speed="116">
+	<health now="65" max="65"/>
+	<look type="26" head="20" body="30" legs="40" feet="50" corpse="2824"/>
+	<combat targetdistance="1" runonhealth="0"/>
+
+<attacks>
+	<attack type="melee" maxdamage="40"/>
+</attacks>
+
+<defenses>
+
+</defenses>
+
+<loot>
+ 	<item id="2148" countmax="32" chance1="100000" chancemax="0"/>
+ 	<item id="2480" chance="3333"/>
+ 	<item id="2530" chance="2857"/>
+
+ 	<item id="1987" chance="100000">
+ 	<inside>
+ 	<item id="2398" chance="3333"/>
+	<item id="2671" countmax="2" chance1="20000" chancemax="0"/>
+ 	<item id="2376" chance="10000"/>
+ 	<item id="2412" chance="2222"/>
+ 	</inside>
+ 	</item>
+</loot>
+</monster>

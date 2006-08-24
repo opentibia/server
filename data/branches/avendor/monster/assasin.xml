@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<monster name="Assasin" level="20" maglevel="30" experience="105" pushable="0" armor="25" defense="20" canpushitems="1" staticattack="40" changetarget="200" speed="224">
+	<health now="175" max="175"/>
+	<look type="129" head="114" body="114" legs="114" feet="114" corpse="3128"/>
+	<combat targetdistance="1" runonhealth="0"/>
+
+<attacks>
+	<attack type="melee" maxdamage="40"/>
+</attacks>
+
+<defenses>
+	<defense immunity="poison"/>
+</defenses>
+
+<voices>
+
+</voices>
+
+<loot>
+</loot>
+
+</monster>

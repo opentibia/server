@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<monster name="Elephant" level="20" maglevel="10" experience="160" pushable="0" speed="190"  armor="3" defense="5" canpushitems="0" staticattack="50" changetarget="200">
+	<health now="320" max="320"/>
+	<look type="211" corpse="4295"/>
+	<combat targetdistance="1" runonhealth="0"/>
+<attacks>
+	<attack type="melee" maxdamage="40" cycleticks="2000" probability="100"/>
+        	
+
+</attacks>
+
+<defenses>
+	<defense immunity="poison"/>
+	<defense immunity="paralyze"/>
+	<defense immunity="drunk"/>
+</defenses>
+
+<loot>
+
+</loot>
+<voices>
+	<voice sentence="Hooooot-Toooooot!"/>
+	
+</voices>
+</monster>

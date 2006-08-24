@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<monster name="Omruc" level="110" maglevel="90" experience="2000" pushable="0" armor="40" defense="30" canpushitems="1" staticattack="50" changetarget="200" speed="200">
+	<health now="1500" max="1500"/>
+	<look type="84" head="20" body="30" legs="40" feet="50" corpse="3016"/>
+	<combat targetdistance="1" runonhealth="100"/>
+<attacks>
+	<attack type="melee" maxdamage="490"/>
+	<attack type="distance" name="throwingknife" mindamage="10" maxdamage="180" cycleticks="3000" probability="100"/>
+	<attack type="rune" name="great fireball" exhaustion="500" cycleticks="4000" probability="70"/>
+	<attack type="instant" name="exevo gran vis lux" exhaustion="500" cycleticks="5000" probability="70"/>
+	<attack type="instant" name="exura vita" exhaustion="500" cycleticks="6000" probability="85"/>
+	<attack type="rune" name="Heavy magic missile" exhaustion="500" cycleticks="2000" probability="100"/>
+</attacks>
+
+<defenses>
+	<defense immunity="energy"/>
+	<defense immunity="fire"/>
+	<defense immunity="poison"/>
+	<defense immunity="paralyze"/>
+	<defense immunity="drunk"/>
+</defenses>
+
+<voices>
+</voices>
+
+<loot>
+ 	<item id="2148" countmax="100" chance1="100000" chancemax="0"/>
+
+ 	<item id="1987" chance="100000">
+ 	<inside>
+	 	<item id="2141" chance="1000"/>
+	</inside>
+ 	</item>
+</loot>
+</monster>

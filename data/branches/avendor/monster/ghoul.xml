@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<monster name="Ghoul" level="20" maglevel="30" experience="85" pushable="0" armor="15" defense="20" canpushitems="1" staticattack="50" changetarget="200" speed="144">
+	<health now="100" max="100"/>
+	<look type="18" head="20" body="30" legs="40" feet="50" corpse="3113"/>
+	<combat targetdistance="1" runonhealth="0"/>
+
+<attacks>
+	<attack type="melee" maxdamage="80"/>
+	<attack type="instant" name="exura vita" exhaustion="500" cycleticks="4000" probability="100"/>
+</attacks>
+
+<defenses>
+	<defense immunity="poison"/>
+	<defense immunity="invisible"/>
+</defenses>
+
+<loot>
+ 	<item id="2148" countmax="30" chance1="100000" chancemax="0"/>
+ 	<item id="2050" chance="20000"/>
+ 	<item id="2483" chance="10000"/>
+ 	<item id="2473" chance="6666"/>
+ 	<item id="2398" chance="20000"/>
+
+ 	<item id="1987" chance="100000">
+ 	<inside>
+ 	<item id="2460" chance="6666"/>
+	<item id="2229" countmax="2" chance1="20000" chancemax="0"/>
+ 	<item id="2403" chance="10000"/>
+ 	<item id="2168" chance="2500"/>
+ 	</inside>
+ 	</item>
+</loot>
+</monster>

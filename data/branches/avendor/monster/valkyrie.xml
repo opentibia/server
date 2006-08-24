@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<monster name="Valkyrie" level="20" maglevel="30" experience="85" pushable="0" armor="15" defense="20" canpushitems="0" staticattack="50" changetarget="200" speed="176">
+	<health now="190" max="190"/>
+	<look type="139" head="113" body="57" legs="95" feet="113" corpse="3065"/>
+	<combat targetdistance="2" runonhealth="0"/>
+
+<attacks>
+	<attack type="distance" name="spear" mindamage="10" maxdamage="50"/>
+	<attack type="melee" maxdamage="15"/>
+</attacks>
+
+<defenses>
+
+</defenses>
+
+<voices>
+	<voice sentence="Another head for me!"/>
+	<voice sentence="Head off!"/>
+	<voice sentence="Your head will be mine."/>
+	<voice sentence="Stand still!"/>
+</voices>
+
+<loot>
+ 	<item id="2148" countmax="20" chance1="100000" chancemax="0"/>
+ 	<item id="2464" chance="6666"/>
+ 	<item id="2125" chance="2500"/>
+ 	<item id="2387" chance="3333"/>
+ 	<item id="2458" chance="5000"/>
+
+ 	<item id="1987" chance="100000">
+ 	<inside>
+	<item id="2674" countmax="4" chance1="10000" chancemax="0"/>
+ 	<item id="2420" chance="10000"/>
+	<item id="2666" countmax="3" chance1="20000" chancemax="0"/>
+	<item id="2147" countmax="2" chance1="2500" chancemax="0"/>
+	<item id="2145" countmax="2" chance1="2500" chancemax="0"/>
+ 	<item id="2200" chance="2000"/>
+ 	<item id="2463" chance="2500"/>
+ 	</inside>
+ 	</item>
+</loot>
+</monster>

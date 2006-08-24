@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<monster name="Priestess" level="20" maglevel="60" experience="420" pushable="0" armor="15" defense="20" canpushitems="1" staticattack="50" changetarget="200" speed="170">
+	<health now="390" max="390"/>
+	<look type="58" head="20" body="30" legs="40" feet="50" corpse="3065"/>
+	<combat targetdistance="1" runonhealth="0"/>
+
+<attacks>
+	<attack type="melee" maxdamage="90"/>
+	<attack type="rune" name="sudden death" exhaustion="500" cycleticks="3000" probability="70"/>
+	<attack type="instant" name="exura" exhaustion="500" cycleticks="3000" probability="100"/>
+</attacks>
+
+<defenses>
+	<defense immunity="energy"/>
+	<defense immunity="fire"/>
+	<defense immunity="invisible"/>
+	<defense immunity="poison"/>
+	<defense immunity="paralyze"/>
+	<defense immunity="drunk"/>
+</defenses>
+
+<voices>
+	<voice sentence="Your energy is mine."/>
+	<voice sentence="Now your life is come to the end, hahahaha!"/>
+</voices>
+
+<loot>
+ 	<item id="2148" countmax="10" chance1="100000" chancemax="0"/>
+ 	<item id="2032" chance="10000"/>
+ 	<item id="2070" chance="3333"/>
+ 	<item id="2529" chance="1818"/>
+
+ 	<item id="1987" chance="100000">
+ 	<inside>
+ 	<item id="2420" chance="10000"/>
+	<item id="2143" countmax="2" chance1="5000" chancemax="0"/>
+ 	<item id="2760" chance="5000"/>
+
+ 	<item id="2192" chance="2500"/>
+ 	<item id="2114" chance="2857"/>
+ 	<item id="2134" chance="3333"/>
+	<item id="2151" countmax="2" chance1="4000" chancemax="0"/>
+	<item id="2145" countmax="2" chance1="1666" chancemax="0"/>
+ 	</inside>
+ 	</item>
+</loot>
+</monster>

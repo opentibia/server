@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<monster name="Chicken" level="20" maglevel="10" experience="0" pushable="0" speed="140"  armor="3" defense="5" canpushitems="0" staticattack="50" changetarget="200">
+	<health now="15" max="15"/>
+	<look type="111" corpse="4265"/>
+	<combat targetdistance="5" runonhealth="15"/>
+<attacks>
+       
+</attacks>
+
+<voices>
+
+</voices>
+
+<defenses>
+
+</defenses>
+
+<loot>
+ 	<item id="3976" countmax="5" chance1="100000" chancemax="0"/>
+</loot>
+
+</monster>
