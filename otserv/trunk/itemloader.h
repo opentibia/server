@@ -154,89 +154,53 @@ enum subfightOTB_t {
 	OTB_DIST_POISONFIELD   = 15
 };
 
-#pragma pack(8)
-struct decayBlock{
-	unsigned short decayTo;
-	unsigned short decayTime;
-};
-
-struct weaponBlock{
-	unsigned char weaponType;
-	unsigned char amuType;
-	unsigned char shootType;
-	unsigned char attack;
-	unsigned char defence;
-};
-
-struct amuBlock{
-	unsigned char amuType;
-	unsigned char shootType;
-	unsigned char attack;
-};
-
-struct armorBlock{
-	unsigned short armor;
-	double weight;
-	unsigned short slot_position;
-};
-
-struct writeableBlock{
-	unsigned short readOnlyId;
-};
-
-struct lightBlock{
-	unsigned short lightLevel;
-	unsigned short lightColor;
-};
-#pragma pack()
-
 //1-byte aligned structs
 #pragma pack(1)
 
 struct VERSIONINFO{
-	unsigned long dwMajorVersion;
-	unsigned long dwMinorVersion;
-	unsigned long dwBuildNumber;
-	char CSDVersion[128];
+	uint32_t dwMajorVersion;
+	uint32_t dwMinorVersion;
+	uint32_t dwBuildNumber;
+	uint8_t CSDVersion[128];
 };
 
 struct decayBlock2{
-	unsigned short decayTo;
-	unsigned short decayTime;
+	uint16_t decayTo;
+	uint16_t decayTime;
 };
 
 struct weaponBlock2{
-	unsigned char weaponType;
-	unsigned char amuType;
-	unsigned char shootType;
-	unsigned char attack;
-	unsigned char defence;
+	uint8_t weaponType;
+	uint8_t amuType;
+	uint8_t shootType;
+	uint8_t attack;
+	uint8_t defence;
 };
 
 struct amuBlock2{
-	unsigned char amuType;
-	unsigned char shootType;
-	unsigned char attack;
+	uint8_t amuType;
+	uint8_t shootType;
+	uint8_t attack;
 };
 
 struct armorBlock2{
-	unsigned short armor;
+	uint16_t armor;
 	double weight;
-	unsigned short slot_position;
+	uint16_t slot_position;
 };
 
 struct writeableBlock2{
-	unsigned short readOnlyId;
+	uint16_t readOnlyId;
 };
 
 struct lightBlock2{
-	unsigned short lightLevel;
-	unsigned short lightColor;
+	uint16_t lightLevel;
+	uint16_t lightColor;
 };
 
 struct writeableBlock3{
-	unsigned short readOnlyId;
-	unsigned short maxTextLen;
+	uint16_t readOnlyId;
+	uint16_t maxTextLen;
 };
 
 #pragma pack()

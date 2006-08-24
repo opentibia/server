@@ -36,7 +36,7 @@ enum MagicEffectClasses {
 	NM_ME_HIT_AREA         = 0x09,
 	NM_ME_ENERGY_AREA      = 0x0A, //10
 	NM_ME_ENERGY_DAMAGE    = 0x0B, //11
-	NM_ME_MAGIC_ENERGY    = 0x0C, //12
+	NM_ME_MAGIC_ENERGY     = 0x0C, //12
 	NM_ME_MAGIC_BLOOD      = 0x0D, //13
 	NM_ME_MAGIC_POISON     = 0x0E, //14
 	NM_ME_HITBY_FIRE       = 0x0F, //15
@@ -44,7 +44,7 @@ enum MagicEffectClasses {
 	NM_ME_MORT_AREA        = 0x11, //17
 	NM_ME_SOUND_GREEN      = 0x12, //18
 	NM_ME_SOUND_RED        = 0x13, //19
-	/*NM_ME_POISON_AREA    = 0x14, //20*/
+	NM_ME_POISON_AREA      = 0x14, //20
 	NM_ME_SOUND_YELLOW     = 0x15, //21
 	NM_ME_SOUND_PURPLE     = 0x16, //22
 	NM_ME_SOUND_BLUE       = 0x17, //23

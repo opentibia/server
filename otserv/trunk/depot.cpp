@@ -63,7 +63,7 @@ xmlNodePtr Depot::serialize()
 bool Depot::readAttr(AttrTypes_t attr, PropStream& propStream)
 {
 	if(ATTR_DEPOT_ID == attr){
-		unsigned short _depotId;
+		uint16_t _depotId;
 		if(!propStream.GET_USHORT(_depotId)){
 			return false;
 		}

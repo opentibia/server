@@ -218,7 +218,7 @@ int Items::loadFromOtb(std::string file)
 		//4 byte flags
 		//attributes
 		//0x01 = version data
-		unsigned long flags;
+		uint32_t flags;
 		if(!props.GET_ULONG(flags)){
 			return ERROR_INVALID_FORMAT;
 		}
@@ -334,10 +334,10 @@ int Items::loadFromOtb(std::string file)
 			switch(attrib){
 			case ITEM_ATTR_SERVERID:
 			{
-				if(datalen != sizeof(unsigned short))
+				if(datalen != sizeof(uint16_t))
 					return ERROR_INVALID_FORMAT;
 				
-				unsigned short serverid;				
+				uint16_t serverid;				
 				if(!props.GET_USHORT(serverid))
 					return ERROR_INVALID_FORMAT;
 				
@@ -349,17 +349,19 @@ int Items::loadFromOtb(std::string file)
 			}
 			case ITEM_ATTR_CLIENTID:
 			{
-				if(datalen != sizeof(unsigned short))
+				if(datalen != sizeof(uint16_t))
 					return ERROR_INVALID_FORMAT;
 
-				if(!props.GET_USHORT(iType->clientId))
+				uint16_t clientid;
+				if(!props.GET_USHORT(clientid))
 					return ERROR_INVALID_FORMAT;
 				
+				iType->clientId = clientid;
 				break;
 			}		
 			case ITEM_ATTR_NAME:
 			{
-				char name[128];
+				uint8_t name[128];
 				if(datalen >= sizeof(name))
 					return ERROR_INVALID_FORMAT;
 
@@ -370,7 +372,7 @@ int Items::loadFromOtb(std::string file)
 			}	
 			case ITEM_ATTR_DESCR:
 			{
-				char descr[128];
+				uint8_t descr[128];
 				if(datalen >= sizeof(descr))
 					return ERROR_INVALID_FORMAT;
 	
@@ -381,20 +383,23 @@ int Items::loadFromOtb(std::string file)
 			}	
 			case ITEM_ATTR_SPEED:
 			{
-				if(datalen != sizeof(unsigned short))
+				if(datalen != sizeof(uint16_t))
 					return ERROR_INVALID_FORMAT;
-
-				if(!props.GET_USHORT(iType->speed))
+				
+				uint16_t speed;
+				if(!props.GET_USHORT(speed))
 					return ERROR_INVALID_FORMAT;
+				
+				iType->speed = speed;
 
 				break;
 			}					
 			case ITEM_ATTR_SLOT:
 			{
-				if(datalen != sizeof(unsigned short))
+				if(datalen != sizeof(uint16_t))
 					return ERROR_INVALID_FORMAT;
 				
-				unsigned short otb_slot;
+				uint16_t otb_slot;
 				
 				if(!props.GET_USHORT(otb_slot))
 					return ERROR_INVALID_FORMAT;
@@ -435,11 +440,14 @@ int Items::loadFromOtb(std::string file)
 			}	
 			case ITEM_ATTR_MAXITEMS:
 			{
-				if(datalen != sizeof(unsigned short))
+				if(datalen != sizeof(uint16_t))
 					return ERROR_INVALID_FORMAT;
 				
-				if(!props.GET_USHORT(iType->maxItems))
+				uint16_t maxItems;
+				if(!props.GET_USHORT(maxItems))
 					return ERROR_INVALID_FORMAT;
+
+				iType->maxItems = maxItems;
 
 				break;
 			}		
@@ -455,10 +463,10 @@ int Items::loadFromOtb(std::string file)
 			}
 			case ITEM_ATTR_MAGLEVEL:
 			{
-				if(datalen != sizeof(unsigned short))
+				if(datalen != sizeof(uint16_t))
 					return ERROR_INVALID_FORMAT;
 					
-				unsigned short maglev;
+				uint16_t maglev;
 				if(!props.GET_USHORT(maglev))
 					return ERROR_INVALID_FORMAT;
 				
@@ -467,7 +475,7 @@ int Items::loadFromOtb(std::string file)
 			}
 			case ITEM_ATTR_MAGFIELDTYPE:
 			{
-				if(datalen != sizeof(unsigned char))
+				if(datalen != sizeof(uint8_t))
 					return ERROR_INVALID_FORMAT;
 				
 				unsigned char fieldtype;
@@ -479,10 +487,10 @@ int Items::loadFromOtb(std::string file)
 			}	
 			case ITEM_ATTR_ROTATETO:
 			{
-				if(datalen != sizeof(unsigned short))
+				if(datalen != sizeof(uint16_t))
 					return ERROR_INVALID_FORMAT;
 				
-				unsigned short rotate;
+				uint16_t rotate;
 				if(!props.GET_USHORT(rotate))
 					return ERROR_INVALID_FORMAT;
 				
@@ -578,7 +586,7 @@ int Items::loadFromOtb(std::string file)
 			}
 			case ITEM_ATTR_TOPORDER:
 			{
-				if(datalen != sizeof(unsigned char))
+				if(datalen != sizeof(uint8_t))
 					return ERROR_INVALID_FORMAT;
 				
 				if(!props.GET_UCHAR(iType->alwaysOnTopOrder))

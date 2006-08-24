@@ -69,7 +69,7 @@ Item* Item::CreateItem(const unsigned short _type, unsigned short _count /*= 1*/
 
 Item* Item::CreateItem(PropStream& propStream)
 {
-	unsigned short _id;
+	uint16_t _id;
 	if(!propStream.GET_USHORT(_id)){
 		return NULL;
 	}
@@ -349,7 +349,7 @@ bool Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 
 		case ATTR_ACTION_ID:
 		{
-			unsigned short _actionid = 0;
+			uint16_t _actionid = 0;
 			if(!propStream.GET_USHORT(_actionid)){
 				return false;
 			}
@@ -360,7 +360,7 @@ bool Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 
 		case ATTR_UNIQUE_ID:
 		{
-			unsigned short _uniqueid;
+			uint16_t _uniqueid;
 			if(!propStream.GET_USHORT(_uniqueid)){
 				return false;
 			}
@@ -409,7 +409,7 @@ bool Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 		//Depot class
 		case ATTR_DEPOT_ID:
 		{
-			unsigned short _depotId;
+			uint16_t _depotId;
 			if(!propStream.GET_USHORT(_depotId)){
 				return false;
 			}

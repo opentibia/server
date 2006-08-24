@@ -149,21 +149,21 @@ public:
 		return true;
 	}
 
-	inline bool GET_ULONG(unsigned long &ret){
+	inline bool GET_ULONG(uint32_t &ret){
 		return GET_VALUE(ret);
 	}
 
-	inline bool GET_USHORT(unsigned short &ret){
+	inline bool GET_USHORT(uint16_t &ret){
 		return GET_VALUE(ret);
 	}
 
-	inline bool GET_UCHAR(unsigned char &ret){
+	inline bool GET_UCHAR(uint8_t &ret){
 		return GET_VALUE(ret);
 	}
 
 	inline bool GET_STRING(std::string &ret){
 		char* str;
-		unsigned short str_len;
+		uint16_t str_len;
 
 		if(!GET_USHORT(str_len)){
 			return false;
@@ -242,15 +242,15 @@ public:
 		size = size + sizeof(T);
 	}
 
-	inline void ADD_ULONG(unsigned long ret){
+	inline void ADD_ULONG(uint32_t ret){
 		ADD_VALUE(ret);
 	}
 
-	inline void ADD_USHORT(unsigned short ret){
+	inline void ADD_USHORT(uint16_t ret){
 		ADD_VALUE(ret);
 	}
 
-	inline void ADD_UCHAR(unsigned char ret){
+	inline void ADD_UCHAR(uint8_t ret){
 		ADD_VALUE(ret);
 	}
 

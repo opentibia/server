@@ -61,40 +61,40 @@ enum OTBM_NodeTypes_t{
 #pragma pack(1)
 
 struct OTBM_root_header{
-	unsigned long version;
-	unsigned short width;
-	unsigned short height;
-	unsigned long majorVersionItems;
-	unsigned long minorVersionItems;
+	uint32_t version;
+	uint16_t width;
+	uint16_t height;
+	uint32_t majorVersionItems;
+	uint32_t minorVersionItems;
 };
 
 struct OTBM_TeleportDest{
-	unsigned short _x;
-	unsigned short _y;
-	unsigned char	_z;
+	uint16_t _x;
+	uint16_t _y;
+	uint8_t _z;
 };
 
 struct OTBM_Tile_area_coords{
-	unsigned short _x;
-	unsigned short _y;
-	unsigned char _z;
+	uint16_t _x;
+	uint16_t _y;
+	uint8_t _z;
 };
 
 struct OTBM_Tile_coords{
-	unsigned char _x;
-	unsigned char _y;
+	uint8_t _x;
+	uint8_t _y;
 };
 
 struct OTBM_TownTemple_coords{
-	unsigned short _x;
-	unsigned short _y;
-	unsigned char _z;
+	uint16_t _x;
+	uint16_t _y;
+	uint8_t _z;
 };
 
 struct OTBM_HouseTile_coords{
-	unsigned char _x;
-	unsigned char _y;
-	unsigned long _houseid;
+	uint8_t _x;
+	uint8_t _y;
+	uint32_t _houseid;
 };
 
 #pragma pack()

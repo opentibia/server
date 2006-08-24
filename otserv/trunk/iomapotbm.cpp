@@ -212,7 +212,7 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 						tile = new Tile(px, py, pz);
 					}
 					else if(type == OTBM_HOUSETILE){
-						unsigned long _houseid;
+						uint32_t _houseid;
 						if(!propStream.GET_ULONG(_houseid)){
 							map->setLastError(LOADMAPERROR_GETPROPFAILED, nodeTile);
 							return false;
@@ -241,7 +241,7 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 						switch(attribute){
 						case OTBM_ATTR_TILE_FLAGS:
 						{
-							unsigned long flags;
+							uint32_t flags;
 							if(!propStream.GET_ULONG(flags)){
 								map->setLastError(LOADMAPERROR_GETPROPFAILED, nodeTile);
 								return false;
@@ -337,7 +337,7 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 						return false;
 					}
 					
-					unsigned long townid = 0;
+					uint32_t townid = 0;
 					if(!propStream.GET_ULONG(townid)){
 						map->setLastError(LOADMAPERROR_GETPROPFAILED, nodeTown);
 						return false;
