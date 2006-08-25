@@ -431,8 +431,8 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 				if(msg.GetRaw() == "info"){
 					Status* status = Status::instance();
 
-					uint64_t running = (OTSYS_TIME() - status->start)/1000;
 					#ifdef __DEBUG__
+					uint64_t running = (OTSYS_TIME() - status->start)/1000;
 					std::cout << ":: Uptime: " << running << std::endl;
 					#endif
 					std::string str = status->getStatusString();
@@ -684,7 +684,7 @@ int main(int argc, char *argv[])
 #endif
 
 
-	std::pair<unsigned long, unsigned long> IpNetMask;
+	std::pair<uint32_t, uint32_t> IpNetMask;
 	IpNetMask.first  = inet_addr("127.0.0.1");
 	IpNetMask.second = 0xFFFFFFFF;
 	serverIPs.push_back(IpNetMask);
@@ -705,7 +705,7 @@ int main(int argc, char *argv[])
 				<< (unsigned int)(addr[0][2]) << "."
 				<< (unsigned int)(addr[0][3]) << "  ";
 
-				IpNetMask.first  = *(unsigned long*)(*addr);
+				IpNetMask.first  = *(uint32_t*)(*addr);
 				IpNetMask.second = 0x0000FFFF;
 				serverIPs.push_back(IpNetMask);
 
@@ -733,6 +733,8 @@ int main(int argc, char *argv[])
 
 	Status* status = Status::instance();
 	status->playersmax = g_config.getNumber(ConfigManager::MAX_PLAYERS);
+
+	OTSYS_CREATE_THREAD(Status::SendInfoThread, 0);
 
 	// start the server listen...
 	int listen_errors;
@@ -837,7 +839,7 @@ int main(int argc, char *argv[])
 	}
 
 #ifdef WIN32
-  WSACleanup();
+	WSACleanup();
 #endif
 
 #if defined __EXCEPTION_TRACER__

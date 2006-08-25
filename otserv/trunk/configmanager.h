@@ -65,6 +65,7 @@ public:
 		MAP_USER,
 		MAP_PASS,
 		MAP_DB,
+		OTSERV_DB_HOST,
 		LAST_STRING_CONFIG /* this must be the last one */
 	};
 
@@ -83,6 +84,7 @@ public:
 		RATE_SKILL,
 		RATE_LOOT,
 		RATE_MAGIC,
+		OTSERV_DB_ENABLED,
 		LAST_INTEGER_CONFIG /* this must be the last one */
 	};
 

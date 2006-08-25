@@ -68,9 +68,9 @@ bool ConfigManager::loadFile(const std::string& _filename)
 		m_confString[MAP_USER] = getGlobalString(L, "map_user");
 		m_confString[MAP_PASS] = getGlobalString(L, "map_pass");
 		m_confString[MAP_DB] = getGlobalString(L, "map_db");
-
-
+		
 	}
+	
 	m_confString[LOGIN_MSG] = getGlobalString(L, "loginmsg", "Welcome.");
 	m_confString[SERVER_NAME] = getGlobalString(L, "servername");
 	m_confString[OWNER_NAME] = getGlobalString(L, "ownername");
@@ -91,9 +91,12 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confInteger[RATE_SKILL] = getGlobalNumber(L, "rate_skill", 1);
 	m_confInteger[RATE_LOOT] = getGlobalNumber(L, "rate_loot", 1);
 	m_confInteger[RATE_MAGIC] = getGlobalNumber(L, "rate_mag", 1);
+	m_confString[OTSERV_DB_HOST] = getGlobalString(L, "otserv_db_host", "default_db_host_here");
+	m_confInteger[OTSERV_DB_ENABLED] = getGlobalNumber(L, "otserv_db_enabled", 0);
 
-	for(int i=0; i<4; ++i)
+	for(int i=0; i<4; ++i){
 		m_confVocationString[i] = getGlobalStringField(L, "vocations", i+1, "unknown");
+	}
 
 	m_isLoaded = true;
 

@@ -26,36 +26,38 @@
 #include "definitions.h"
 #include "networkmessage.h"
 
-
 class Status{
-  public:
-  // procs       
+public:
+	// procs
+	static Status* instance();
+	
 	void addPlayer();
 	void removePlayer();
-	static Status* instance();
-	std::string getStatusString();
-	void getInfo(NetworkMessage &nm);
 	bool hasSlot();
 	
+	std::string getStatusString();
+	void getInfo(NetworkMessage &nm);
+
 	int getPlayersOnline(){return playersonline;}
 	int getMaxPlayersOnline(){return playersmax;}
 	
-	// vars
-	int playersonline, playersmax, playerspeak;
+	//
+	static OTSYS_THREAD_RETURN SendInfoThread(void *p);
+
+	uint64_t start;
+	int playersmax;
+
+private:
+	int playersonline, playerspeak;
 	std::string ownername, owneremail;
 	std::string motd;
 	std::string mapname, mapauthor;
 	int mapsizex, mapsizey;
 	std::string servername, location, url;
 	std::string version;
-	uint64_t start;
 
-
-  private:
 	Status();
 	static Status* _Status;
-
-	// the stats of our server
 };
 
 #endif
