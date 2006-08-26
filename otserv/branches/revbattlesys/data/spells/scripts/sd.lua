@@ -1,6 +1,6 @@
 local combat = createCombatHealthObject()
 setCombatParam(combat, CONST_COMBAT_HEALTHTYPE, CONST_COMBAT_DAMAGE_SUDDENDEATH)
-setCombatParam(combat, CONST_COMBAT_EFFECTTYPE, NM_ME_MORT_AREA)
+setCombatParam(combat, CONST_COMBAT_EFFECTTYPE, CONST_ME_MORTAREA)
 
 function onGetPlayerMinMaxValues(cid, level, maglevel, values)
 	min = -(level * 2 + maglevel * 3) * 1.3 - 30

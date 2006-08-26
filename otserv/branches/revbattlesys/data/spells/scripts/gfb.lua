@@ -2,8 +2,8 @@ local combat = createCombatHealthObject()
 local area = createCombatArea( { {1, 1, 1}, {1, 1, 1}, {1, 1, 1} } )
 
 setCombatArea(combat, area)
-setCombatParam(combat, CONST_COMBAT_HEALTHTYPE, CONST_COMBAT_DAMAGE_PHYSICAL)
-setCombatParam(combat, CONST_COMBAT_EFFECTTYPE, CONST_ME_MORTAREA)
+setCombatParam(combat, CONST_COMBAT_HEALTHTYPE, CONST_COMBAT_DAMAGE_FIRE)
+setCombatParam(combat, CONST_COMBAT_EFFECTTYPE, CONST_ME_FIREAREA)
 
 function onGetPlayerMinMaxValues(cid, level, maglevel)
 	min = -(level * 2 + maglevel * 3) * 1.3 - 30
