@@ -41,7 +41,7 @@ class CombatField;
 //for luascript callback
 class CombatCallBack : public CallBack{
 public:
-	void CombatCallBack::getMinMaxValues(Player* player, int32_t& min, int32_t& max);
+	void getMinMaxValues(Player* player, int32_t& min, int32_t& max) const;
 };
 
 class Combat{
@@ -68,11 +68,17 @@ public:
 	CallBack* getCallback();
 
 	virtual bool setParam(CombatParam_t param, uint32_t value);
+	void setArea(const AreaCombat* _area);
 
 protected:
+	void getCombatArea(Creature* attacker, const Position& pos, std::list<Tile*>& list) const;
+	bool canDoCombat(const Creature* attacker, const Tile* tile) const;
+	void getMinMaxValues(Creature* creature, int32_t& min, int32_t& max) const;
+
 	void addImpactEffect(const Position& pos) const;
 
 	//configureable
+	AreaCombat* area;
 	CombatCallBack* callback;
 	uint8_t impactEffect;
 };
@@ -94,6 +100,8 @@ public:
 
 protected:
 	void internalCombat(Creature* attacker, Creature* target, int32_t healthChange) const;
+	void internalCombat(Creature* attacker, const Position& pos, int32_t minChange, int32_t maxChange) const;
+	bool canDoCombat(const Creature* attacker, const Tile* tile) const;
 	DamageType_t damageType;
 };
 
@@ -112,6 +120,8 @@ public:
 
 protected:
 	void internalCombat(Creature* attacker, Creature* target, int32_t manaChange) const;
+	void internalCombat(Creature* attacker, const Position& pos, int32_t minChange, int32_t maxChange) const;
+	bool canDoCombat(const Creature* attacker, const Tile* tile) const;
 };
 
 class CombatCondition : public Combat{

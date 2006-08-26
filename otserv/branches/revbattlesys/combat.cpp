@@ -33,12 +33,70 @@ extern Game g_game;
 Combat::Combat(uint8_t _impactEffect) : 
 	impactEffect(_impactEffect)
 {
-	//
+	area = NULL;
+	callback = NULL;
 }
 
 Combat::~Combat()
 {
-	//
+	delete area;
+	delete callback;
+}
+
+void Combat::getMinMaxValues(Creature* creature, int32_t& min, int32_t& max) const
+{
+	if(!creature){
+		return;
+	}
+
+	if(Player* player = creature->getPlayer()){
+		if(callback){
+			callback->getMinMaxValues(player, min, max);
+		}
+		else{
+			std::cout << "No callback set for combat" << std::endl;
+		}
+	}
+	else{
+		//creature->getMinMaxCombatValues();
+	}
+}
+
+void Combat::getCombatArea(Creature* attacker, const Position& pos, std::list<Tile*>& list) const
+{
+	if(area){
+		area->getList(pos, attacker->getDirection(), list);
+	}
+	else{
+		Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
+		if(tile){
+			list.push_back(tile);
+		}
+	}
+}
+
+bool Combat::canDoCombat(const Creature* attacker, const Tile* tile) const
+{
+	if(const Player* player = attacker->getPlayer()){
+		if(player->getAccessLevel() > 2){
+			return true;
+		}
+	}
+
+	if(tile->isPz()){
+		return false;
+	}
+
+	if(tile->hasProperty(BLOCKPROJECTILE)){
+		return false;
+	}
+
+	return true;
+}
+
+void Combat::setArea(const AreaCombat* _area)
+{
+	area = new AreaCombat(*_area);
 }
 
 bool Combat::setParam(CombatParam_t param, uint32_t value)
@@ -83,7 +141,7 @@ void Combat::addImpactEffect(const Position& pos) const
 	}
 }
 
-void CombatCallBack::getMinMaxValues(Player* player, int32_t& min, int32_t& max)
+void CombatCallBack::getMinMaxValues(Player* player, int32_t& min, int32_t& max) const
 {
 	//"onGetPlayerMinMaxValues"(cid, level, maglevel)
 	
@@ -152,76 +210,62 @@ void CombatHealth::internalCombat(Creature* attacker, Creature* target, int32_t 
 	g_game.combatChangeHealth(damageType, attacker, target, healthChange);
 }
 
+void CombatHealth::internalCombat(Creature* attacker, const Position& pos, int32_t minChange, int32_t maxChange) const
+{
+	std::list<Tile*> list;
+	getCombatArea(attacker, pos, list);
+
+	for(std::list<Tile*>::iterator it = list.begin(); it != list.end(); ++it){
+		if(canDoCombat(attacker, *it)){
+			for(CreatureVector::iterator cit = (*it)->creatures.begin(); cit != (*it)->creatures.end(); ++cit){
+				int32_t healthChange = random_range(minChange, maxChange);
+				g_game.combatChangeHealth(damageType, attacker, *cit, healthChange);
+			}
+
+			addImpactEffect((*it)->getPosition());
+		}
+	}
+}
+
+bool CombatHealth::canDoCombat(const Creature* attacker, const Tile* tile) const
+{
+	return Combat::canDoCombat(attacker, tile);
+	//do further filtering here
+}
+
 void CombatHealth::doCombat(Creature* attacker, Creature* target) const
 {
-	if(!attacker){
-		return;
-	}
-	
+	//target callback function
 	int32_t minChange = 0;
 	int32_t maxChange = 0;
 
-	if(Player* player = attacker->getPlayer()){
-		if(callback){
-			callback->getMinMaxValues(player, minChange, maxChange);
-		}
-		else{
-			std::cout << "No callback set for CombatHealth" << std::endl;
-		}
-	}
-	else{
-		//creature->getMinMaxValues();
-	}
-
+	getMinMaxValues(attacker, minChange, maxChange);
 	doCombat(attacker, target, minChange, maxChange);
 }
 
 void CombatHealth::doCombat(Creature* attacker, const Position& pos) const
 {
-	if(!attacker){
-		return;
-	}
+	//area combat callback function
 
-	//callback
 	int32_t minChange = 0;
 	int32_t maxChange = 0;
 
-	if(Player* player = attacker->getPlayer()){
-		if(callback){
-			callback->getMinMaxValues(player, minChange, maxChange);
-		}
-		else{
-			std::cout << "No callback set for CombatHealth" << std::endl;
-		}
-	}
-	else{
-		//creature->getMinMaxValues();
-	}
-
-	doCombat(attacker, pos, minChange, maxChange);
+	getMinMaxValues(attacker, minChange, maxChange);
+	internalCombat(attacker, pos, minChange, maxChange);
 }
 
 void CombatHealth::doCombat(Creature* attacker, Creature* target, int32_t minChange, int32_t maxChange) const
 {
-	int32_t healthChange = random_range(minChange, maxChange);
+	//target combat function with pre-defined min/max values
 
+	int32_t healthChange = random_range(minChange, maxChange);
 	internalCombat(attacker, target, healthChange);
-	addImpactEffect(target->getPosition());
 }
 
 void CombatHealth::doCombat(Creature* attacker, const Position& pos, int32_t minChange, int32_t maxChange) const
 {
-	Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
-
-	if(tile && !tile->creatures.empty()){
-		int32_t healthChange = random_range(minChange, maxChange);
-
-		for(CreatureVector::const_iterator it = tile->creatures.begin(); it != tile->creatures.end(); ++it){
-			internalCombat(attacker, *it, healthChange);
-		}
-	}
-
-	addImpactEffect(pos);
+	//area combat function with pre-defined min/max values
+	internalCombat(attacker, pos, minChange, maxChange);
 }
 
 CombatMana::CombatMana(uint8_t _impactEffect) :
@@ -240,55 +284,71 @@ void CombatMana::internalCombat(Creature* attacker, Creature* target, int32_t ma
 	g_game.combatChangeMana(attacker, target, manaChange);
 }
 
+void CombatMana::internalCombat(Creature* attacker, const Position& pos, int32_t minChange, int32_t maxChange) const
+{
+	std::list<Tile*> list;
+	getCombatArea(attacker, pos, list);
+
+	for(std::list<Tile*>::iterator it = list.begin(); it != list.end(); ++it){
+		if(canDoCombat(attacker, *it)){
+			for(CreatureVector::iterator cit = (*it)->creatures.begin(); cit != (*it)->creatures.end(); ++cit){
+				int32_t manaChange = random_range(minChange, maxChange);
+				g_game.combatChangeMana(attacker, *cit, manaChange);
+			}
+
+			addImpactEffect(pos);
+		}
+	}
+}
+
+bool CombatMana::canDoCombat(const Creature* attacker, const Tile* tile) const
+{
+	return Combat::canDoCombat(attacker, tile);
+	//do further filtering here
+}
+
 void CombatMana::doCombat(Creature* attacker, Creature* target) const
 {
+	//target callback function
+
 	if(!attacker){
 		return;
 	}
 
-	//callback
 	int32_t minChange = 0;
 	int32_t maxChange = 0;
-	//attacker->onGetCombatValues(this, minChange, maxChange);
 
+	getMinMaxValues(attacker, minChange, maxChange);
 	doCombat(attacker, target, minChange, maxChange);
 }
 
 void CombatMana::doCombat(Creature* attacker, const Position& pos) const
 {
+	//area combat callback function
+
 	if(!attacker){
 		return;
 	}
 
-	//callback
 	int32_t minChange = 0;
 	int32_t maxChange = 0;
-	//attacker->onGetCombatValues(this, minChange, maxChange);
 
-	doCombat(attacker, pos, minChange, maxChange);
+	getMinMaxValues(attacker, minChange, maxChange);
+	internalCombat(attacker, pos, minChange, maxChange);
 }
 
 void CombatMana::doCombat(Creature* attacker, Creature* target, int32_t minChange, int32_t maxChange) const
 {
-	int32_t manaChange = random_range(minChange, maxChange);
+	//target combat function with pre-defined min/max values
 
-	internalCombat(attacker, target, manaChange);
-	addImpactEffect(target->getPosition());
+	int32_t healthChange = random_range(minChange, maxChange);
+	internalCombat(attacker, target, healthChange);
 }
 
 void CombatMana::doCombat(Creature* attacker, const Position& pos, int32_t minChange, int32_t maxChange) const
 {
-	Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
-
-	if(tile && !tile->creatures.empty()){
-		int32_t manaChange = random_range(minChange, maxChange);
-
-		for(CreatureVector::const_iterator it = tile->creatures.begin(); it != tile->creatures.end(); ++it){
-			internalCombat(attacker, *it, manaChange);
-		}
-	}
-
-	addImpactEffect(pos);
+	//area combat function with pre-defined min/max values
+	internalCombat(attacker, pos, minChange, maxChange);
 }
 
 CombatCondition::CombatCondition(Condition* _condition, uint8_t _impactEffect) :
