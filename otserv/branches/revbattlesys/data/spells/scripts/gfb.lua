@@ -1,16 +1,20 @@
 local combat = createCombatHealthObject()
 local area = createCombatArea( { {1, 1, 1}, {1, 1, 1}, {1, 1, 1} } )
 
-setCombatParam(combat, CONST_COMBAT_HEALTHTYPE, CONST_COMBAT_DAMAGE_FIRE)
+setCombatParam(combat, CONST_COMBAT_HEALTHTYPE, CONST_COMBAT_DAMAGE_PHYSICAL)
 setCombatParam(combat, CONST_COMBAT_EFFECTTYPE, CONST_ME_MORTAREA)
 
-function onPlayerGetValues(cid, level, maglevel, values)
-	values.minDamage = (level * 2 + maglevel * 3) * 1.3 - 30
-	values.maxDamage = (level * 2 + maglevel * 3) * 1.7
+function onGetPlayerMinMaxValues(cid, level, maglevel)
+min = -(level * 2 + maglevel * 3) * 1.3 - 30
+max = -(level * 2 + maglevel * 3) * 1.7
+
+return min, max
 end
 
---function onUse(cid, item, frompos, item2, topos)
+setCombatCallback(combat, CONST_COMBAT_MINMAXCALLBACK, "onGetPlayerMinMaxValues")
+
 function onUseRune(cid, pos, var)
 	-- gfb
 	doAreaCombat(cid, combat, area, pos)
 end
+
