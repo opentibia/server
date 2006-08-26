@@ -16,5 +16,5 @@ setCombatCallback(combat, CONST_COMBAT_MINMAXCALLBACK, "onGetPlayerMinMaxValues"
 
 function onUseRune(cid, pos, var)
 	-- gfb
-	doAreaCombat(cid, combat, area, pos)
+	doAreaCombat(cid, combat, pos)
 end
