@@ -281,9 +281,9 @@ public:
 	virtual void onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout);
 	virtual void onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport);
 
-	virtual void onCreatureTurn(const Creature* creature, uint32_t stackpos);
-	virtual void onCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text);
-	virtual void onCreatureChangeOutfit(const Creature* creature);
+	//virtual void onCreatureTurn(const Creature* creature, uint32_t stackpos);
+	//virtual void onCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text);
+	//virtual void onCreatureChangeOutfit(const Creature* creature);
 
 	//container
 	void onAddContainerItem(const Container* container, const Item* item);

@@ -786,7 +786,7 @@ long RuneSpell::executeUseRune(Creature* creature, Item* item, const Position& p
 		
 	lua_State* L = m_scriptInterface->getLuaState();
 		
-	long cid = env->addThing(Creature);
+	uint32_t cid = env->addThing(creature);
 
 	uint32_t targetcid = 0;
 

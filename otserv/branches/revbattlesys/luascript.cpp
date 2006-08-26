@@ -2314,9 +2314,12 @@ int LuaScriptInterface::luaSetCombatCallBack(lua_State *L)
 		
 	LuaScriptInterface* scriptInterface = env->getScriptInterface();
 	
-	/*CallBack* callback = combat->getCallback(key);
+	combat->setCallback(key);
+	CallBack* callback = combat->getCallback();
 	if(!callback){
-		reportError(__FUNCTION__, std::string("Not valid callback key ") + key);
+		std::stringstream ss;
+		ss << (uint32_t)key << " is not a valid callback key";
+		reportError(__FUNCTION__, ss.str());
 		lua_pushnumber(L, LUA_ERROR);
 		return 1;
 	}
@@ -2326,7 +2329,7 @@ int LuaScriptInterface::luaSetCombatCallBack(lua_State *L)
 		lua_pushnumber(L, LUA_ERROR);
 		return 1;
 	}
-	*/
+
 	return 0;
 }
 

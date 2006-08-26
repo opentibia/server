@@ -1517,7 +1517,7 @@ bool Game::playerWhisper(Player* player, const std::string& text)
 	
 	for(it = list.begin(); it != list.end(); ++it){
 		if(Player* player = (*it)->getPlayer()){
-			player->sendCreatureSay(creature, type, text);
+			player->sendCreatureSay(player, SPEAK_WHISPER, text);
 		}
 	}
 	
@@ -1555,7 +1555,7 @@ bool Game::playerYell(Player* player, std::string& text)
 
 		for(it = list.begin(); it != list.end(); ++it){
 			if(Player* player = (*it)->getPlayer()){
-				player->sendCreatureSay(creature, type, text);
+				player->sendCreatureSay(player, SPEAK_YELL, text);
 			}
 		}
 

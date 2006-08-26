@@ -55,10 +55,69 @@ bool Combat::setParam(CombatParam_t param, uint32_t value)
 	return false;
 }
 
+bool Combat::setCallback(CombatParam_t key)
+{
+	switch(key){
+		case COMBATPARAM_MINMAXCALLBACK:
+			callback = new CombatCallBack();
+			return true;
+			break;
+
+			default:
+				std::cout << "Combat::setCallback - Unknown callback type: " << (uint32_t)key << std::endl;
+				break;
+	}
+
+	return false;
+}
+
+CallBack* Combat::getCallback()
+{
+	return callback;
+}
+
 void Combat::addImpactEffect(const Position& pos) const
 {
 	if(impactEffect != NM_ME_NONE){
 		g_game.addMagicEffect(pos, impactEffect);
+	}
+}
+
+void CombatCallBack::getMinMaxValues(Player* player, int32_t& min, int32_t& max)
+{
+	//"onGetPlayerMinMaxValues"(cid, level, maglevel)
+	
+	ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
+
+	//debug only
+	std::stringstream desc;
+	desc << m_callbackName;
+	env->setEventDesc(desc.str());
+		
+	env->setScriptId(m_scriptId, m_scriptInterface);
+	env->setRealPos(player->getPosition());
+		
+	lua_State* L = m_scriptInterface->getLuaState();
+		
+	uint32_t cid = env->addThing(player);
+
+	m_scriptInterface->pushFunction(m_scriptId);
+	lua_pushnumber(L, cid);
+	lua_pushnumber(L, player->getLevel());
+	lua_pushnumber(L, player->getMagicLevel());
+
+	bool ret;
+	int size0 = lua_gettop(L);
+	if(lua_pcall(L, 3 /*nParams*/, 2 /*nReturnValues*/, 0) != 0){
+		LuaScriptInterface::reportError(NULL, std::string(LuaScriptInterface::popString(L)));
+	}
+	else{
+		max = LuaScriptInterface::popNumber(L);
+		min = LuaScriptInterface::popNumber(L);
+	}
+
+	if((lua_gettop(L) + 3 /*nParams*/  + 1) != size0){
+		LuaScriptInterface::reportError(NULL, "Stack size changed!");
 	}
 }
 
@@ -98,11 +157,21 @@ void CombatHealth::doCombat(Creature* attacker, Creature* target) const
 	if(!attacker){
 		return;
 	}
-
-	//callback
+	
 	int32_t minChange = 0;
 	int32_t maxChange = 0;
-	//attacker->onGetCombatValues(this, minChange, maxChange);
+
+	if(Player* player = attacker->getPlayer()){
+		if(callback){
+			callback->getMinMaxValues(player, minChange, maxChange);
+		}
+		else{
+			std::cout << "No callback set for CombatHealth" << std::endl;
+		}
+	}
+	else{
+		//creature->getMinMaxValues();
+	}
 
 	doCombat(attacker, target, minChange, maxChange);
 }
@@ -116,7 +185,18 @@ void CombatHealth::doCombat(Creature* attacker, const Position& pos) const
 	//callback
 	int32_t minChange = 0;
 	int32_t maxChange = 0;
-	//attacker->onGetCombatValues(this, minChange, maxChange);
+
+	if(Player* player = attacker->getPlayer()){
+		if(callback){
+			callback->getMinMaxValues(player, minChange, maxChange);
+		}
+		else{
+			std::cout << "No callback set for CombatHealth" << std::endl;
+		}
+	}
+	else{
+		//creature->getMinMaxValues();
+	}
 
 	doCombat(attacker, pos, minChange, maxChange);
 }

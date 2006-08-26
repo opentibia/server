@@ -25,6 +25,7 @@
 #include "definitions.h"
 #include "enums.h"
 #include "map.h"
+#include "baseevents.h"
 
 #include <vector>
 
@@ -36,6 +37,12 @@ class CombatHealth;
 class CombatMana;
 class CombatCondition;
 class CombatField;
+
+//for luascript callback
+class CombatCallBack : public CallBack{
+public:
+	void CombatCallBack::getMinMaxValues(Player* player, int32_t& min, int32_t& max);
+};
 
 class Combat{
 public:
@@ -57,12 +64,16 @@ public:
 	virtual void doCombat(Creature* attacker, Creature* target) const = 0;
 	virtual void doCombat(Creature* attacker, const Position& pos) const = 0;
 
+	bool setCallback(CombatParam_t key);
+	CallBack* getCallback();
+
 	virtual bool setParam(CombatParam_t param, uint32_t value);
 
 protected:
 	void addImpactEffect(const Position& pos) const;
 
 	//configureable
+	CombatCallBack* callback;
 	uint8_t impactEffect;
 };
 
@@ -83,7 +94,6 @@ public:
 
 protected:
 	void internalCombat(Creature* attacker, Creature* target, int32_t healthChange) const;
-
 	DamageType_t damageType;
 };
 

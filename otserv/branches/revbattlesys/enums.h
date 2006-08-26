@@ -50,7 +50,8 @@ enum DamageType_t {
 
 enum CombatParam_t{
 	COMBATPARAM_EFFECTTYPE = 1,
-	COMBATPARAM_HEALTHTYPE = 2
+	COMBATPARAM_HEALTHTYPE = 2,
+	COMBATPARAM_MINMAXCALLBACK = 3
 };
 
 enum BlockType_t {
