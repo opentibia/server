@@ -97,13 +97,13 @@ protected:
 enum world_type_t{
 	WORLD_TYPE_NO_PVP,
 	WORLD_TYPE_PVP,
-	WORLD_TYPE_PVP_ENFORCED
+	WORLD_TYPE_PVP_ENFORCED,
 };
 
 enum game_state_t{
 	GAME_STATE_NORMAL,
 	GAME_STATE_CLOSED,
-	GAME_STATE_SHUTDOWN
+	GAME_STATE_SHUTDOWN,
 };
 
 enum lightState_t{
@@ -354,7 +354,7 @@ public:
 	void AddMagicEffectAt(const Position& pos, uint8_t type);
 	
 	game_state_t getGameState();
-	void setGameState(game_state_t newstate){game_state = newstate;}
+	void setGameState(game_state_t newstate);
 
 	//Lock variable for Game class
 	OTSYS_THREAD_LOCKVAR gameLock;   

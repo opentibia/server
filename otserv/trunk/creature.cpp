@@ -71,7 +71,6 @@ Creature::Creature() :
 	hasteTicks = 0;
 	paralyzeTicks = 0;
 	exhaustedTicks  = 0;
-	pzLocked = false;
 	immunities = 0;
 	eventCheck = 0;
 	eventCheckAttacking = 0;

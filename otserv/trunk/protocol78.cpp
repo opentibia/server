@@ -913,7 +913,7 @@ void Protocol78::parseUseItem(NetworkMessage& msg)
 	uint8_t stackpos = msg.GetByte();
 	uint8_t index = msg.GetByte();
 	
-	std::cout << "parseUseItem: pos: " << pos << ", item: " << (int)itemId << ", stack: " << (int)stackpos << ", index: " << (int)index << std::endl;
+	//std::cout << "parseUseItem: pos: " << pos << ", item: " << (int)itemId << ", stack: " << (int)stackpos << ", index: " << (int)index << std::endl;
 
 	game->playerUseItem(player, pos,stackpos, index, itemId);
 }
@@ -927,7 +927,7 @@ void Protocol78::parseUseItemEx(NetworkMessage& msg)
 	uint16_t toItemId = msg.GetU16();
 	uint8_t toStackpos = msg.GetByte();
 	
-	std::cout << "parseUseItemEx: fromPos: " << fromPos << ", item: " << (int)fromItemId << ", fromStack: " << (int)fromStackpos << ", toPos: " << toPos << ", toItemId: " << toItemId << ", toStack: " << (int)toStackpos << std::endl;
+	//std::cout << "parseUseItemEx: fromPos: " << fromPos << ", item: " << (int)fromItemId << ", fromStack: " << (int)fromStackpos << ", toPos: " << toPos << ", toItemId: " << toItemId << ", toStack: " << (int)toStackpos << std::endl;
 	
 	game->playerUseItemEx(player, fromPos, fromStackpos, fromItemId, toPos, toStackpos, toItemId);
 }
@@ -939,7 +939,7 @@ void Protocol78::parseBattleWindow(NetworkMessage &msg)
 	uint8_t fromStackPos = msg.GetByte();
 	uint32_t creatureId = msg.GetU32();
 
-	std::cout << "parseUseBattle: fromPos: " << fromPos << ", item: " << (int)itemId << ", fromStack: " << (int)fromStackPos << ", creature: " << creatureId << std::endl;
+	//std::cout << "parseUseBattle: fromPos: " << fromPos << ", item: " << (int)itemId << ", fromStack: " << (int)fromStackPos << ", creature: " << creatureId << std::endl;
 
 	game->playerUseBattleWindow(player, fromPos, fromStackPos, creatureId, itemId);
 }

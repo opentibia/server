@@ -87,6 +87,7 @@ bool Map::loadMap(const std::string& identifier, const std::string& type)
 #endif
 	else{
 		std::cout << "FATAL: Could not determine the map format!" << std::endl;
+		std::cin.get();
 		return false;
 	}
 

@@ -119,10 +119,23 @@ public:
 	bool blockPathFind;
 };
 
+template<typename A>
+class Array{
+public:
+	Array(long n);
+	~Array();
+	
+	A getElement(long id);
+	void addElement(A a, long pos);
+	
+private:
+	A* m_data;
+	long m_size;
+};
 
-typedef OTSERV_HASH_MAP<unsigned long, unsigned long> ReverseItemMap;
 
-class Items {
+
+class Items{
 public:
 	Items();
 	~Items();
@@ -138,11 +151,17 @@ public:
 	static long dwMinorVersion;
 	static long dwBuildNumber;
 	
+	void addItemType(ItemType* iType);
+	
 protected:
-	typedef OTSERV_HASH_MAP<unsigned short, ItemType*> ItemMap;
+	//typedef OTSERV_HASH_MAP<unsigned short, ItemType*> ItemMap;
+	//typedef OTSERV_HASH_MAP<unsigned long, unsigned long> ReverseItemMap;
 
-	ItemMap items;
-	static ReverseItemMap revItems;
+	//ItemMap items;
+	//static ReverseItemMap revItems;
+	
+	Array<ItemType*> items;
+	Array<long> revItems;
 
 	ItemType dummyItemType; // use this for invalid ids
 };

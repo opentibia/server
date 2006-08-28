@@ -422,6 +422,13 @@ game_state_t Game::getGameState()
 	return game_state;
 }
 
+void Game::setGameState(game_state_t newstate)
+{
+	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::setGameState()");
+	game_state = newstate;
+}
+
+
 int Game::loadMap(std::string filename, std::string filekind)
 {
 	if(!map){
@@ -949,12 +956,16 @@ void Game::thingMove(Player* player, const Position& fromPos, uint16_t itemId, u
 
 	if(thing){
 		if(Creature* movingCreature = thing->getCreature()){
-            if(abs(fromCylinder->getPosition().x - toCylinder->getPosition().x) == abs(fromCylinder->getPosition().y - toCylinder->getPosition().y)) // Diagonal
+			Position from_pos_cyl = fromCylinder->getPosition();
+			Position to_pos_cyl = fromCylinder->getPosition();
+            if(abs(from_pos_cyl.x - to_pos_cyl.x) == abs(from_pos_cyl.y - to_pos_cyl.y)){ // Diagonal
                 addEvent(makeTask(1500, boost::bind(&Game::moveCreature, this, player->getID(), 
-                player->getPosition(), movingCreature->getID(), toPos)));
-            else
+                	player->getPosition(), movingCreature->getID(), toPos)));
+			}
+            else{
                 addEvent(makeTask(800, boost::bind(&Game::moveCreature, this, player->getID(), 
-                player->getPosition(), movingCreature->getID(), toPos)));
+                	player->getPosition(), movingCreature->getID(), toPos)));
+			}
 		}
 		else if(Item* movingItem = thing->getItem()){
 			moveItem(player, fromCylinder, toCylinder, toIndex, movingItem, count, itemId);
@@ -973,44 +984,44 @@ void Game::moveCreature(unsigned long playerID, Position playerPos, unsigned lon
 	
 	if(!player || player->isRemoved() || !movingCreature || movingCreature->isRemoved())
 		return;
+	
 	if(player->getPosition() != playerPos)
-	    return;
-    if(!Position::areInRange<1,1,0>(movingCreature->getPosition(), player->getPosition()))
-        return;
+		return;
+	
+	if(!Position::areInRange<1,1,0>(movingCreature->getPosition(), player->getPosition()))
+		return;
 
 	ReturnValue ret = RET_NOERROR;
+	Tile* toTile = map->getTile(toPos);
+	const Position& movingCreaturePos = movingCreature->getPosition();
 
-	if(!map->getTile(toPos)){
+	if(!toTile){
 		ret = RET_NOTPOSSIBLE;
 	}
 	else if(!movingCreature->isPushable() && player->access == 0){
 		ret = RET_NOTMOVEABLE;
 	}
-	else if(!Position::areInRange<1,1,0>(movingCreature->getPosition(), player->getPosition())){
-		ret = RET_TOOFARAWAY;
-	}
 	else{
-		const Position& movingCreaturePos = movingCreature->getPosition();
-
 		//check throw distance
-		if( (std::abs(movingCreaturePos.x - toPos.x) > movingCreature->getThrowRange()) ||
+		if((std::abs(movingCreaturePos.x - toPos.x) > movingCreature->getThrowRange()) ||
 				(std::abs(movingCreaturePos.y - toPos.y) > movingCreature->getThrowRange()) ||
-				(std::abs(movingCreaturePos.z - toPos.z) * 4 > movingCreature->getThrowRange()) ) {
+				(std::abs(movingCreaturePos.z - toPos.z) * 4 > movingCreature->getThrowRange())){
 			ret = RET_DESTINATIONOUTOFREACH;
 		}
 		else if(player != movingCreature){
-			if(map->getTile(toPos)->hasProperty(BLOCKPATHFIND))
+			if(toTile->hasProperty(BLOCKPATHFIND)){
 				ret = RET_NOTENOUGHROOM;
-			if(map->getTile(movingCreature->getPosition())->hasProperty(PROTECTIONZONE) &&
-			!map->getTile(toPos)->hasProperty(PROTECTIONZONE))
+			}
+			else if(map->getTile(movingCreaturePos)->hasProperty(PROTECTIONZONE) &&
+				!toTile->hasProperty(PROTECTIONZONE)){
 				ret = RET_NOTPOSSIBLE;
+			}
 		}
 	}
 
 	if(ret == RET_NOERROR){
-		ret = internalMoveCreature(movingCreature, map->getTile(movingCreature->getPosition()), map->getTile(toPos));
+		ret = internalMoveCreature(movingCreature, map->getTile(movingCreaturePos), toTile);
 	}
-
 	else{
 		player->sendCancelMessage(ret);
 	}

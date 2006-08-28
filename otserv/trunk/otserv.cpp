@@ -88,8 +88,6 @@ IPList serverIPs;
 
 ConfigManager g_config;
 
-Items Item::items;
-ReverseItemMap Items::revItems;
 Game g_game;
 Spells spells(&g_game);
 Actions actions(&g_game);

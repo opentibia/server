@@ -34,6 +34,8 @@
 #include <sstream>
 #include <iomanip>
 
+Items Item::items;
+
 Item* Item::CreateItem(const unsigned short _type, unsigned short _count /*= 1*/)
 {
 	Item* newItem = NULL;

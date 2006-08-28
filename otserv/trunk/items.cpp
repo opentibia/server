@@ -137,15 +137,16 @@ bool ItemType::isRune() const
 	return (group == ITEM_GROUP_RUNE);
 }
 
-Items::Items()
+Items::Items() :
+items(8000), revItems(8000)
 {
 	//
 }
 
 Items::~Items()
 {
-	for (ItemMap::iterator it = items.begin(); it != items.end(); it++)
-		delete it->second;
+	//for (ItemMap::iterator it = items.begin(); it != items.end(); it++)
+	//	delete it->second;
 }
 
 inline subfight_t translateOTBsubfight_t(subfightOTB_t sf)
@@ -612,8 +613,10 @@ int Items::loadFromOtb(std::string file)
 			}	
 		}
 		// store the found item	 
-		items[iType->id] = iType;
-		revItems[iType->clientId] = iType->id;
+		//items[iType->id] = iType;
+		//revItems[iType->clientId] = iType->id;
+		items.addElement(iType, iType->id);
+		revItems.addElement(iType->id, iType->clientId);
 		
 		node = f.getNextNode(node, type);
 	}
@@ -623,37 +626,97 @@ int Items::loadFromOtb(std::string file)
 
 const ItemType& Items::operator[](int id)
 {
+	/*
 	ItemMap::iterator it = items.find(id);
 	if ((it != items.end()) && (it->second != NULL))
 		return *it->second;
-	
-#ifdef __DEBUG__
-	std::cout << "WARNING! unknown itemtypeid " << id << ". using defaults." << std::endl;
-#endif
 	   
 	return dummyItemType;
+	*/
+	
+	ItemType* iType = items.getElement(id);
+	if(!iType){
+		return dummyItemType;
+	}
+	else{
+		return *iType;
+	}
 }
 
 int Items::getItemIdByName(const std::string& name)
 {
 	if(!name.empty()){
+		/*
 		for(ItemMap::iterator it = items.begin(); it != items.end(); ++it){
 			if(strcasecmp(name.c_str(), it->second->name.c_str()) == 0){
 				return it->first;
 			}
 		}
+		*/
+		long i = 100;
+		ItemType* iType;
+		do{
+			iType = items.getElement(i);
+			if(iType){
+				if(strcasecmp(name.c_str(), iType->name.c_str()) == 0){
+					return i;
+				}
+			}
+			i++;
+		}while(iType);
 	}
-
 	return -1;
 }
 
 int Items::reverseLookUp(int id)
 {
-	ReverseItemMap::iterator it = revItems.find(id);
+	/*ReverseItemMap::iterator it = revItems.find(id);
 	if(it != revItems.end()){
 		return it->second;
 	}
 	else{
 		return 0;
 	}
+	*/
+	long v = revItems.getElement(id);
+}
+
+template<typename A> 
+Array<A>::Array(long n)
+{
+	m_data = (A*)malloc(sizeof(A)*n);
+	memset(m_data, 0, sizeof(A)*n);
+	m_size = n;
+}
+
+template<typename A> 
+Array<A>::~Array()
+{
+	free(m_data);
+}
+
+template<typename A>
+A Array<A>::getElement(long id)
+{
+	if(id < 0 || id >= m_size){
+		return 0;
+	}
+	else{
+		return m_data[id];
+	}
+}
+
+template<typename A>
+void Array<A>::addElement(A a, long pos)
+{
+	#define INCREMENT 5000
+	if(pos >= m_size){
+		m_data = (A*)realloc(m_data, sizeof(A)*(pos + INCREMENT));
+		memset(m_data + m_size, 0, sizeof(A)*(pos + INCREMENT - m_size));
+		m_size = pos + INCREMENT;
+	}
+	if(pos < 0){
+		return;
+	}
+	m_data[pos] = a;
 }
