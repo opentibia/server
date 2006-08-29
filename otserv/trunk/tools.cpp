@@ -179,3 +179,28 @@ char upchar(char c) {
   else
       return c;
 }
+
+std::string urlEncode(const std::string& str)
+{
+	return urlEncode(str.c_str());
+}
+
+std::string urlEncode(const char* str)
+{
+	std::string out;
+	const char* it;
+	for(it = str; *it != 0; it++){
+		char ch = *it;
+		if(!(ch >= '0' && ch <= '9') &&
+			!(ch >= 'A' && ch <= 'Z') &&
+			!(ch >= 'a' && ch <= 'z')){
+				char tmp[4];
+				sprintf(tmp, "%%%02X", ch);
+				out = out + tmp;
+			}
+		else{
+			out = out + *it;
+		}
+	}
+	return out;
+}

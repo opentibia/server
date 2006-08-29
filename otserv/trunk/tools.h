@@ -44,5 +44,7 @@ int random_range(int lowest_number, int highest_number);
 void hexdump(unsigned char *_data, int _len);
 char upchar(char c);
 
-#endif
+std::string urlEncode(const char* str);
+std::string urlEncode(const std::string& str);
 
+#endif

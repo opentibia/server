@@ -25,11 +25,17 @@
 #include <sstream>
 #include "game.h"
 #include "networkmessage.h"
+#include "tools.h"
 
 extern ConfigManager g_config;
 extern Game g_game;
 
 Status* Status::_Status = NULL;
+
+//#define STATUS_SERVER_VERSION "0.5.0_CVS"
+#define STATUS_SERVER_VERSION "0.5.0"
+#define STATUS_SERVER_NAME "otserv"
+#define STATUS_CLIENT_VERISON "7.8"
 
 Status* Status::instance()
 {
@@ -88,10 +94,9 @@ std::string Status::getStatusString()
 	
 	xmlSetProp(p, (const xmlChar*) "location", (const xmlChar*)g_config.getString(ConfigManager::LOCATION).c_str());
 	xmlSetProp(p, (const xmlChar*) "url", (const xmlChar*)g_config.getString(ConfigManager::URL).c_str());
-	xmlSetProp(p, (const xmlChar*) "server", (const xmlChar*)"otserv");
-	//xmlSetProp(p, (const xmlChar*) "version", (const xmlChar*)"0.5.0_CVS");
-	xmlSetProp(p, (const xmlChar*) "version", (const xmlChar*)"0.5.0");
-	xmlSetProp(p, (const xmlChar*) "client", (const xmlChar*)"7.8");
+	xmlSetProp(p, (const xmlChar*) "server", (const xmlChar*)STATUS_SERVER_NAME);
+	xmlSetProp(p, (const xmlChar*) "version", (const xmlChar*)STATUS_SERVER_VERSION);
+	xmlSetProp(p, (const xmlChar*) "client", (const xmlChar*)STATUS_CLIENT_VERISON);
 	xmlAddChild(root, p);
 
 	p=xmlNewNode(NULL,(const xmlChar*)"owner");
@@ -185,8 +190,7 @@ void Status::getInfo(NetworkMessage &nm)
 		nm.AddString(g_config.getString(ConfigManager::URL).c_str());
     	nm.AddU32((uint32_t)(running >> 32)); // this method prevents a big number parsing
     	nm.AddU32((uint32_t)(running));       // since servers can be online for months ;)
-    	//nm.AddString("0.5.0_CVS");
-    	nm.AddString("0.5.0");
+    	nm.AddString(STATUS_SERVER_VERSION);
   	}
 
 	if(bplayersinfo){
@@ -259,21 +263,51 @@ OTSYS_THREAD_RETURN Status::SendInfoThread(void *p)
 			continue;
 		}
 
-		Status* status_instance = Status::instance();		
-		std::string status = status_instance->getStatusString();
+		Status* status_instance = Status::instance();
+		
+		std::stringstream status;
+		uint64_t running = (OTSYS_TIME() - status_instance->start)/1000;
+		status << "uptime=" << running << "&"
+			"ip=" << urlEncode(g_config.getString(ConfigManager::IP)) << "&"
+			"servername=" << urlEncode(g_config.getString(ConfigManager::SERVER_NAME)) << "&"
+			"port=" << g_config.getNumber(ConfigManager::PORT) << "&"
+			"location=" << urlEncode(g_config.getString(ConfigManager::LOCATION)) << "&"
+			"url=" << urlEncode(g_config.getString(ConfigManager::URL)) << "&"
+			"server=" << urlEncode(STATUS_SERVER_NAME) << "&"
+			"version=" << urlEncode(STATUS_SERVER_VERSION) << "&"
+			"client=" << urlEncode(STATUS_CLIENT_VERISON) << "&"
+			"ownername=" << urlEncode(g_config.getString(ConfigManager::OWNER_NAME)) << "&"
+			"owneremail=" << urlEncode(g_config.getString(ConfigManager::OWNER_EMAIL)) << "&"
+			"playersonline=" << status_instance->playersonline << "&"
+			"playersmax=" << status_instance->playersmax << "&"
+			"playerspeak=" << status_instance->playerspeak << "&"
+			"monsterstotal=" << g_game.getMonstersOnline() << "&"
+			"mapname=" << urlEncode(status_instance->mapname) << "&"
+			"mapauthor=" << urlEncode(status_instance->mapauthor) << "&"
+			"width=" << "&"
+			"heigh=" << "&"
+			"motd=" << urlEncode(g_config.getString(ConfigManager::MOTD));
+		
+		
 		char size[16] = {'0'};
-		sprintf(size, "%d", status.size());
-		std::string status_lenght = std::string(size);
-		post_message = "POST /otservdb.php HTTP/1.0 \r\n"
-					   "Content-Length: " + status_lenght + "\r\n"
-					   "\r\n" +
-					   status;
+		sprintf(size, "%d", status.str().size());
+		std::string status_length = std::string(size);
+		post_message =	"POST /otservdb.php HTTP/1.1\r\n"
+						"Host: " + host +"\r\n"
+						"User-Agent: otserv("STATUS_SERVER_NAME"/"STATUS_SERVER_VERSION")\r\n"
+						"Connection: close\r\n"
+						"Cache-Control: no-cache\r\n"
+						"Content-Type: application/x-www-form-urlencoded\r\n"
+						"Content-Length: " + status_length + "\r\n"
+						"\r\n" +
+						status.str();
 		
 		if(send(s, post_message.c_str(), post_message.size(), 0) == SOCKET_ERROR){
 			std::cout << "[Status::SendInfoThread] Error while sending status to " << host << std::endl;
 			closesocket(s);
 			continue;
 		}
+		status.clear();
 		
 		//TODO: read server response?
 		

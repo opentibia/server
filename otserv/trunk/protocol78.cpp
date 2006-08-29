@@ -58,7 +58,7 @@ Protocol78::Protocol78(SOCKET s)
 	OTSYS_THREAD_LOCKVARINIT(bufferLock);
 	windowTextID = 0;
 	readItem = NULL;
-	maxTextLenght = 0;
+	maxTextLength = 0;
 	this->s = s;
 }
 
@@ -72,7 +72,7 @@ void Protocol78::reinitializeProtocol(SOCKET _s)
 {
 	windowTextID = 0;
 	readItem = NULL;
-	maxTextLenght = 0;
+	maxTextLength = 0;
 	OutputBuffer.Reset();
 	knownPlayers.clear();
 	if(s)
@@ -1098,7 +1098,7 @@ void Protocol78::parseTextWindow(NetworkMessage& msg)
 {
 	unsigned long id = msg.GetU32();
 	std::string new_text = msg.GetString();
-	if(new_text.length() > maxTextLenght)
+	if(new_text.length() > maxTextLength)
 		return;
 	
 	if(readItem && windowTextID == id){
@@ -1809,13 +1809,13 @@ void Protocol78::sendTextWindow(Item* item,const unsigned short maxlen, const bo
 		msg.AddString(item->getText());		
 		item->useThing2();
 		readItem = item;
-		maxTextLenght = maxlen;
+		maxTextLength = maxlen;
 	}
 	else{		
 		msg.AddU16(item->getText().size());
 		msg.AddString(item->getText());									
 		readItem = NULL;
-		maxTextLenght = 0;
+		maxTextLength = 0;
 	}
 	msg.AddString("unknown");
 	WriteBuffer(msg);
