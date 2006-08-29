@@ -2,29 +2,20 @@
 
 <actions>
 
--- Quests
-<action uniqueid="1002" script="quests/w-helmet.lua" />
-<action uniqueid="1003" script="quests/doublesd.lua" />
-<action uniqueid="1004" script="quests/undead1.lua" 	 />
-<action uniqueid="1005" script="quests/undead2.lua"  />
-<action uniqueid="1006" script="quests/evilhole.lua" />
-<action uniqueid="1007" script="quests/dsm.lua" 	 />
-<action uniqueid="1008" script="quests/witch1.lua" 	 />
-<action uniqueid="1009" script="quests/witch2.lua" 	 />
 
 -- Tools
-<action itemid="2580" script="tools/fishing_rod.lua" allowfaruse="1" />
-<action itemid="2120" script="tools/rope.lua"	 />
-<action itemid="2554" script="tools/shovel.lua"  />
-<action itemid="2420" script="tools/machete.lua" />
-<action itemid="2442" script="tools/machete.lua" />
-<action itemid="2550" script="tools/scythe.lua"  />
+<action itemid="2580" script="fishing_rod.lua" allowfaruse="1" />
+<action itemid="2120" script="rope.lua"	 />
+<action itemid="2554" script="shovel.lua"  />
+<action itemid="2420" script="machete.lua" />
+<action itemid="2442" script="machete.lua" />
+<action itemid="2550" script="scythe.lua"  />
 
 -- Others
 <action itemid="2785" script="blueberry_bush.lua"   />
+<action itemid="2261" script="destroyfield.lua" allowfaruse="1" blockwalls="1"/>
 
-
--- Construction Lits
+-- Construction Kits
 <action itemid="3901" script="construction_kits.lua" />
 <action itemid="3902" script="construction_kits.lua" />
 <action itemid="3903" script="construction_kits.lua" />
@@ -148,7 +139,6 @@
 <action itemid="1386" script="teleport.lua" />
 <action itemid="3678" script="teleport.lua" />
 <action itemid="3135" script="teleport.lua" />
-<action itemid="3678" script="teleport.lua" />
 
 -- Foods
 <action itemid="2328" script="food.lua" />
@@ -192,6 +182,7 @@
 <action itemid="2794" script="food.lua" />
 <action itemid="2795" script="food.lua" />
 <action itemid="2796" script="food.lua" />
+
 -- Fluids
 <action itemid="1775" script="fluids.lua" />
 <action itemid="2562" script="fluids.lua" />
@@ -233,61 +224,135 @@
 <action itemid="2055" script="decayto.lua" />
 
 -- Keys
-<action itemid="2086" script="doors_keys/key.lua"	/>
-<action itemid="2087" script="doors_keys/key.lua"	/>
-<action itemid="2088" script="doors_keys/key.lua"	/>
-<action itemid="2089" script="doors_keys/key.lua"	/>
-<action itemid="2090" script="doors_keys/key.lua"	/>
-<action itemid="2091" script="doors_keys/key.lua"	/>
-<action itemid="2092" script="doors_keys/key.lua"	/>
+<action itemid="2086" script="key.lua"	/>
+<action itemid="2087" script="key.lua"	/>
+<action itemid="2088" script="key.lua"	/>
+<action itemid="2089" script="key.lua"	/>
+<action itemid="2090" script="key.lua"	/>
+<action itemid="2091" script="key.lua"	/>
+<action itemid="2092" script="key.lua"	/>
 
 -- Doors
-<action itemid="1209" script="doors_keys/door_locked.lua" 			/>
-<action itemid="1210" script="doors_keys/door_closed.lua" 			/>
-<action itemid="1211" script="doors_keys/door_open_vertical.lua" 	/>
-<action itemid="1212" script="doors_keys/door_locked.lua" 			/>
-<action itemid="1213" script="doors_keys/door_closed.lua" 			/>
-<action itemid="1214" script="doors_keys/door_open_horizontal.lua" 	/>
-<action itemid="1219" script="doors_keys/door_closed.lua" 			/>
-<action itemid="1220" script="doors_keys/door_open_vertical.lua" 	/>
-<action itemid="1221" script="doors_keys/door_closed.lua" 			/>
-<action itemid="1222" script="doors_keys/door_open_horizontal.lua" 	/>
-<action itemid="1231" script="doors_keys/door_locked.lua" 			/>
-<action itemid="1232" script="doors_keys/door_closed.lua" 			/>
-<action itemid="1233" script="doors_keys/door_open_vertical.lua" 	/>
-<action itemid="1234" script="doors_keys/door_locked.lua" 			/>
-<action itemid="1235" script="doors_keys/door_closed.lua" 			/>
-<action itemid="1236" script="doors_keys/door_open_horizontal.lua" 	/>
-<action itemid="1237" script="doors_keys/door_closed.lua" 			/>
-<action itemid="1238" script="doors_keys/door_open_vertical.lua" 	/>
-<action itemid="1239" script="doors_keys/door_closed.lua" 			/>
-<action itemid="1240" script="doors_keys/door_open_horizontal.lua" 	/>
-<action itemid="1249" script="doors_keys/door_locked.lua" 			/>
-<action itemid="1250" script="doors_keys/door_closed.lua" 			/>
-<action itemid="1251" script="doors_keys/door_open_vertical.lua" 	/>
-<action itemid="1252" script="doors_keys/door_locked.lua" 			/>
-<action itemid="1253" script="doors_keys/door_closed.lua" 			/>
-<action itemid="1254" script="doors_keys/door_open_horizontal.lua" 	/>
-<action itemid="3535" script="doors_keys/door_locked.lua" 			/>
-<action itemid="3536" script="doors_keys/door_closed.lua" 			/>
-<action itemid="3537" script="doors_keys/door_open_horizontal.lua" 	/>
-<action itemid="3538" script="doors_keys/door_closed.lua" 			/>
-<action itemid="3539" script="doors_keys/door_open_horizontal.lua" 	/>
-<action itemid="3547" script="doors_keys/door_closed.lua" 			/>
-<action itemid="3548" script="doors_keys/door_open_vertical.lua" 	/>
-<action itemid="3544" script="doors_keys/door_locked.lua" 			/>
-<action itemid="3545" script="doors_keys/door_closed.lua" 			/>
-<action itemid="3546" script="doors_keys/door_open_vertical.lua" 	/>
-<action itemid="4913" script="doors_keys/door_locked.lua" 			/>
-<action itemid="4914" script="doors_keys/door_closed.lua" 			/>
-<action itemid="4915" script="doors_keys/door_open_vertical.lua" 	/>
-<action itemid="4916" script="doors_keys/door_locked.lua" 			/>
-<action itemid="4917" script="doors_keys/door_closed.lua" 			/>
-<action itemid="4918" script="doors_keys/door_open_horizontal.lua" 	/>
-<action itemid="5082" script="doors_keys/door_closed.lua" 			/>
-<action itemid="5083" script="doors_keys/door_open_horizontal.lua" 	/>
-<action itemid="5084" script="doors_keys/door_closed.lua" 			/>
-<action itemid="5085" script="doors_keys/door_open_vertical.lua" 	/>
+<action itemid="1539" script="door_open1.lua" /> 
+<action itemid="1540" script="door_close1e.lua" /> 
+<action itemid="1541" script="door_open1.lua" /> 
+<action itemid="1542" script="door_close1n.lua" /> 
+
+<action itemid="1209" script="door_open2.lua" /> 
+<action itemid="1211" script="door_close2e.lua" />
+<action itemid="1212" script="door_open2.lua" />
+<action itemid="1214" script="door_close2n.lua" />
+
+<action itemid="1219" script="door_open1.lua" />
+<action itemid="1220" script="door_close1e.lua" />
+<action itemid="1221" script="door_open1.lua" />
+<action itemid="1222" script="door_close1n.lua" />
+
+<action itemid="1223" script="door_open1.lua" />
+<action itemid="1224" script="door_close1e.lua" />
+<action itemid="1225" script="door_open1.lua" />
+<action itemid="1226" script="door_close1n.lua" />
+
+<action itemid="1227" script="door_open1.lua" />
+<action itemid="1228" script="door_close1e.lua" />
+<action itemid="1229" script="door_open1.lua" />
+<action itemid="1230" script="door_close1n.lua" />
+
+<action itemid="1231" script="door_open2.lua" /> 
+<action itemid="1233" script="door_close2e.lua" /> 
+<action itemid="1234" script="door_open2.lua" /> 
+<action itemid="1236" script="door_close2n.lua" /> 
+
+<action itemid="1237" script="door_open1.lua" />
+<action itemid="1238" script="door_close1e.lua" /> 
+<action itemid="1239" script="door_open1.lua" /> 
+<action itemid="1240" script="door_close1n.lua" /> 
+
+<action itemid="1241" script="door_open1.lua" />
+<action itemid="1242" script="door_close1e.lua" />
+<action itemid="1243" script="door_open1.lua" />
+<action itemid="1244" script="door_close1n.lua" />
+
+<action itemid="1245" script="door_open1.lua" />
+<action itemid="1246" script="door_close1e.lua" />
+<action itemid="1247" script="door_open1.lua" />
+<action itemid="1248" script="door_close1n.lua" />
+
+<action itemid="1249" script="door_open2.lua" />
+<action itemid="1251" script="door_close2e.lua" />
+<action itemid="1252" script="door_open2.lua" />
+<action itemid="1254" script="door_close2n.lua" />
+
+<action itemid="1255" script="door_open1.lua" />
+<action itemid="1256" script="door_close1e.lua" />
+<action itemid="1257" script="door_open1.lua" />
+<action itemid="1258" script="door_close1n.lua" />
+
+<action itemid="1259" script="door_open1.lua" />
+<action itemid="1260" script="door_close1e.lua" />
+<action itemid="1261" script="door_open1.lua" />
+<action itemid="1262" script="door_close1n.lua" />
+
+<action itemid="3535" script="door_open2.lua" />
+<action itemid="3537" script="door_close2n.lua" />
+
+<action itemid="3538" script="door_open1.lua" />
+<action itemid="3539" script="door_close1n.lua" />
+
+<action itemid="3540" script="door_open1.lua" />
+<action itemid="3541" script="door_close1n.lua" />
+
+<action itemid="3542" script="door_open1.lua" />
+<action itemid="3543" script="door_close1n.lua" />
+
+<action itemid="3544" script="door_open2.lua" />
+<action itemid="3546" script="door_close2e.lua" />
+
+<action itemid="3547" script="door_open1.lua" />
+<action itemid="3548" script="door_close1e.lua" />
+
+<action itemid="3549" script="door_open1.lua" />
+<action itemid="3550" script="door_close1e.lua" />
+
+<action itemid="3551" script="door_open1.lua" />
+<action itemid="3552" script="door_close1e.lua" />
+
+<action itemid="4913" script="door_open2.lua" /> 
+<action itemid="4915" script="door_close2e.lua" /> 
+<action itemid="4916" script="door_open2.lua" /> 
+<action itemid="4918" script="door_close2n.lua" /> 
+
+<action itemid="5082" script="door_open1.lua" />
+<action itemid="5083" script="door_close1e.lua" /> 
+
+<action itemid="5084" script="door_open1.lua" /> 
+<action itemid="5085" script="door_close1n.lua" /> 
+
+<action itemid="3535" script="door_open2.lua" />
+<action itemid="3537" script="door_close2n.lua" />
+
+<action itemid="3538" script="door_open1.lua" />
+<action itemid="3539" script="door_close1n.lua" />
+
+<action itemid="3540" script="door_open1.lua" />
+<action itemid="3541" script="door_close1n.lua" />
+
+<action itemid="3542" script="door_open1.lua" />
+<action itemid="3543" script="door_close1n.lua" />
+
+<action itemid="3544" script="door_open2.lua" />
+<action itemid="3546" script="door_close2e.lua" />
+
+<action itemid="3547" script="door_open1.lua" />
+<action itemid="3548" script="door_close1e.lua" />
+
+<action itemid="3549" script="door_open1.lua" />
+<action itemid="3550" script="door_close1e.lua" />
+
+<action itemid="3551" script="door_open1.lua" />
+<action itemid="3552" script="door_close1e.lua" />
+
+
 
 -- Watch and Clocks
 <action itemid="1728" script="watch_clock.lua" />
@@ -307,9 +372,9 @@
 <action itemid="2036" script="watch_clock.lua" />
 
 -- Make Bread
-<action itemid="2694" script="make_bread/wheat.lua" />
-<action itemid="2692" script="make_bread/flour.lua" />
-<action itemid="2693" script="make_bread/dough.lua" />
+<action itemid="2694" script="bread2.lua" />
+<action itemid="2692" script="bread3.lua" />
+<action itemid="2693" script="bread4.lua" />
 
 -- Music
 <action itemid="2070" script="music.lua" />
@@ -344,117 +409,228 @@
 <action itemid="3952" script="music.lua" />
 <action itemid="3953" script="music.lua" />
 
--- Readable/Writeable Items
-<action itemid="1947" script="rwitems.lua" />
-<action itemid="1954" script="rwitems.lua" />
-<action itemid="2597" script="rwitems.lua" />
-<action itemid="2598" script="rwitems.lua" />
-<action itemid="2599" script="rwitems.lua" />
-<action itemid="2661" script="rwitems.lua" />
-<action itemid="1948" script="rwitems.lua" />
-<action itemid="1949" script="rwitems.lua" />
-<action itemid="1950" script="rwitems.lua" />
-<action itemid="1951" script="rwitems.lua" />
-<action itemid="1952" script="rwitems.lua" />
-<action itemid="1953" script="rwitems.lua" />
-<action itemid="1955" script="rwitems.lua" />
-<action itemid="1956" script="rwitems.lua" />
-<action itemid="1957" script="rwitems.lua" />
-<action itemid="1958" script="rwitems.lua" />
-<action itemid="1959" script="rwitems.lua" />
-<action itemid="1960" script="rwitems.lua" />
-<action itemid="1961" script="rwitems.lua" />
-<action itemid="1962" script="rwitems.lua" />
-<action itemid="1963" script="rwitems.lua" />
-<action itemid="1964" script="rwitems.lua" />
-<action itemid="1965" script="rwitems.lua" />
-<action itemid="1966" script="rwitems.lua" />
-<action itemid="1967" script="rwitems.lua" />
-<action itemid="1968" script="rwitems.lua" />
-<action itemid="1969" script="rwitems.lua" />
-<action itemid="1970" script="rwitems.lua" />
-<action itemid="1971" script="rwitems.lua" />
-<action itemid="1972" script="rwitems.lua" />
-<action itemid="1973" script="rwitems.lua" />
-<action itemid="1974" script="rwitems.lua" />
-<action itemid="1975" script="rwitems.lua" />
-<action itemid="1976" script="rwitems.lua" />
-<action itemid="1977" script="rwitems.lua" />
-<action itemid="1978" script="rwitems.lua" />
-<action itemid="1979" script="rwitems.lua" />
-<action itemid="1980" script="rwitems.lua" />
-<action itemid="1981" script="rwitems.lua" />
-<action itemid="1982" script="rwitems.lua" />
-<action itemid="1983" script="rwitems.lua" />
-<action itemid="1984" script="rwitems.lua" />
-<action itemid="1985" script="rwitems.lua" />
-<action itemid="1986" script="rwitems.lua" />
-<action itemid="1810" script="rwitems.lua" />
-<action itemid="1811" script="rwitems.lua" />
-<action itemid="1815" script="rwitems.lua" />
-<action itemid="1818" script="rwitems.lua" />
-
 -- Objects
-<action itemid="1479" script="objects/increment.lua" />
-<action itemid="1480" script="objects/decrement.lua" />
-<action itemid="1945" script="objects/increment.lua" /> 
-<action itemid="1946" script="objects/decrement.lua" /> 
-<action itemid="2037" script="objects/increment.lua" />
-<action itemid="2038" script="objects/decrement.lua" />
-<action itemid="2039" script="objects/increment.lua" />
-<action itemid="2040" script="objects/decrement.lua" />
-<action itemid="2058" script="objects/increment.lua" />
-<action itemid="2059" script="objects/decrement.lua" />
-<action itemid="2060" script="objects/increment.lua" />
-<action itemid="2061" script="objects/decrement.lua" />
-<action itemid="2066" script="objects/increment.lua" />
-<action itemid="2067" script="objects/decrement.lua" />
-<action itemid="2068" script="objects/increment.lua" />
-<action itemid="2069" script="objects/decrement.lua" />
-<action itemid="2578" script="objects/increment.lua" />
-<action itemid="2579" script="objects/decrement.lua" />
-<action itemid="2064" script="objects/increment.lua" />
-<action itemid="2065" script="objects/decrement.lua" />
-<action itemid="2114" script="objects/increment.lua" />
-<action itemid="2096" script="objects/increment.lua" />
-<action itemid="2097" script="objects/decrement.lua" />
-<action itemid="1786" script="objects/increment.lua" />
-<action itemid="1787" script="objects/decrement.lua" />
-<action itemid="1788" script="objects/increment.lua" />
-<action itemid="1789" script="objects/decrement.lua" />
-<action itemid="1790" script="objects/increment.lua" />
-<action itemid="1791" script="objects/decrement.lua" />
-<action itemid="1792" script="objects/increment.lua" />
-<action itemid="1793" script="objects/decrement.lua" />
-<action itemid="1873" script="objects/increment.lua" />
-<action itemid="1874" script="objects/decrement.lua" />
-<action itemid="1875" script="objects/increment.lua" />
-<action itemid="1876" script="objects/decrement.lua" />
-<action itemid="2162" script="objects/increment.lua" />
-<action itemid="2163" script="objects/decrement.lua" />
-<action itemid="3697" script="objects/increment.lua" />
-<action itemid="3698" script="objects/decrement.lua" />
-<action itemid="3699" script="objects/increment.lua" />
-<action itemid="3700" script="objects/decrement.lua" />
-<action itemid="3709" script="objects/increment.lua" />
-<action itemid="3710" script="objects/decrement.lua" />
-<action itemid="3743" script="objects/increment.lua" />
-<action itemid="3744" script="objects/decrement.lua" />
-<action itemid="3943" script="objects/increment.lua" />
-<action itemid="3944" script="objects/decrement.lua" />
-<action itemid="3945" script="objects/increment.lua" />
-<action itemid="3946" script="objects/decrement.lua" />
-<action itemid="3947" script="objects/increment.lua" />
-<action itemid="3948" script="objects/decrement.lua" />
-<action itemid="3949" script="objects/increment.lua" />
-<action itemid="3950" script="objects/decrement.lua" />
-<action itemid="1634" script="objects/increment.lua" />
-<action itemid="1635" script="objects/decrement.lua" />
-<action itemid="1636" script="objects/increment.lua" />
-<action itemid="1637" script="objects/decrement.lua" />
-<action itemid="1638" script="objects/increment.lua" />
-<action itemid="1639" script="objects/decrement.lua" />
-<action itemid="1640" script="objects/increment.lua" />
-<action itemid="1641" script="objects/decrement.lua" />
+<action itemid="1479" script="trans_inc.lua" />
+<action itemid="1480" script="trans_dec.lua" />
+
+<action itemid="1945" script="trans_inc.lua" /> 
+<action itemid="1946" script="trans_dec.lua" /> 
+
+<action itemid="2037" script="trans_inc.lua" />
+<action itemid="2038" script="trans_dec.lua" />
+
+<action itemid="2039" script="trans_inc.lua" />
+<action itemid="2040" script="trans_dec.lua" />
+
+<action itemid="2058" script="trans_inc.lua" />
+<action itemid="2059" script="trans_dec.lua" />
+
+<action itemid="2060" script="trans_inc.lua" />
+<action itemid="2061" script="trans_dec.lua" />
+
+<action itemid="2066" script="trans_inc.lua" />
+<action itemid="2067" script="trans_dec.lua" />
+
+<action itemid="2068" script="trans_inc.lua" />
+<action itemid="2069" script="trans_dec.lua" />
+
+<action itemid="2578" script="trans_inc.lua" />
+<action itemid="2579" script="trans_dec.lua" />
+
+<action itemid="2064" script="trans_inc.lua" />
+<action itemid="2065" script="trans_dec.lua" />
+
+<action itemid="2114" script="trans_inc.lua" />
+
+<action itemid="2096" script="trans_inc.lua" />
+<action itemid="2097" script="trans_dec.lua" />
+
+<action itemid="1786" script="trans_inc.lua" />
+<action itemid="1787" script="trans_dec.lua" />
+
+<action itemid="1788" script="trans_inc.lua" />
+<action itemid="1789" script="trans_dec.lua" />
+
+<action itemid="1790" script="trans_inc.lua" />
+<action itemid="1791" script="trans_dec.lua" />
+
+<action itemid="1792" script="trans_inc.lua" />
+<action itemid="1793" script="trans_dec.lua" />
+
+<action itemid="1873" script="trans_inc.lua" />
+<action itemid="1874" script="trans_dec.lua" />
+
+<action itemid="1875" script="trans_inc.lua" />
+<action itemid="1876" script="trans_dec.lua" />
+
+<action itemid="2162" script="trans_inc.lua" />
+<action itemid="2163" script="trans_dec.lua" />
+
+<action itemid="1634" script="trans_inc.lua" />
+<action itemid="1635" script="trans_dec.lua" />
+
+<action itemid="1636" script="trans_inc.lua" />
+<action itemid="1637" script="trans_dec.lua" />
+
+<action itemid="1638" script="trans_inc.lua" />
+<action itemid="1639" script="trans_dec.lua" />
+
+<action itemid="1640" script="trans_inc.lua" />
+<action itemid="1641" script="trans_dec.lua" />
+
+<action itemid="3697" script="trans_inc.lua" />
+<action itemid="3698" script="trans_dec.lua" />
+
+<action itemid="3699" script="trans_inc.lua" />
+<action itemid="3700" script="trans_dec.lua" />
+
+<action itemid="3709" script="trans_inc.lua" />
+<action itemid="3710" script="trans_dec.lua" />
+
+<action itemid="3743" script="trans_inc.lua" />
+<action itemid="3744" script="trans_dec.lua" />
+
+<action itemid="3943" script="trans_inc.lua" />
+<action itemid="3944" script="trans_dec.lua" />
+
+<action itemid="3945" script="trans_inc.lua" />
+<action itemid="3946" script="trans_dec.lua" />
+
+<action itemid="3947" script="trans_inc.lua" />
+<action itemid="3948" script="trans_dec.lua" />
+
+<action itemid="3949" script="trans_inc.lua" />
+<action itemid="3950" script="trans_dec.lua" />
+
+
+--new 7.8
+
+<action itemid="5097" script="food.lua" />
+
+<action itemid="5098" script="door_open2.lua" /> 
+<action itemid="5100" script="door_close2n.lua" /> 
+ 
+<action itemid="5101" script="door_open1.lua" />
+<action itemid="5102" script="door_close1n.lua" /> 
+
+<action itemid="5103" script="door_open1.lua" />
+<action itemid="5104" script="door_close1n.lua" /> 
+
+<action itemid="5105" script="door_open1.lua" />
+<action itemid="5106" script="door_close1n.lua" /> 
+
+<action itemid="5107" script="door_open2.lua" /> 
+<action itemid="5109" script="door_close2e.lua" /> 
+ 
+<action itemid="5110" script="door_open1.lua" />
+<action itemid="5111" script="door_close1e.lua" /> 
+
+<action itemid="5112" script="door_open1.lua" />
+<action itemid="5113" script="door_close1e.lua" /> 
+
+<action itemid="5114" script="door_open1.lua" />
+<action itemid="5115" script="door_close1e.lua" /> 
+
+<action itemid="5116" script="door_open2.lua" /> 
+<action itemid="5118" script="door_close2n.lua" /> 
+ 
+<action itemid="5119" script="door_open1.lua" />
+<action itemid="5120" script="door_close1n.lua" /> 
+
+<action itemid="5121" script="door_open1.lua" />
+<action itemid="5122" script="door_close1n.lua" /> 
+
+<action itemid="5123" script="door_open1.lua" />
+<action itemid="5124" script="door_close1n.lua" /> 
+
+<action itemid="5125" script="door_open2.lua" /> 
+<action itemid="5127" script="door_close2e.lua" /> 
+ 
+<action itemid="5128" script="door_open1.lua" />
+<action itemid="5129" script="door_close1e.lua" /> 
+
+<action itemid="5130" script="door_open1.lua" />
+<action itemid="5131" script="door_close1e.lua" /> 
+
+<action itemid="5132" script="door_open1.lua" />
+<action itemid="5133" script="door_close1e.lua" /> 
+
+<action itemid="5134" script="door_open2.lua" /> 
+<action itemid="5136" script="door_close2n.lua" /> 
+
+<action itemid="5137" script="door_open2.lua" /> 
+<action itemid="5139" script="door_close2n.lua" /> 
+ 
+<action itemid="5140" script="door_open2.lua" /> 
+<action itemid="5142" script="door_close2e.lua" /> 
+
+<action itemid="5143" script="door_open2.lua" /> 
+<action itemid="5145" script="door_close2e.lua" /> 
+
+<action itemid="5278" script="door_open2.lua" /> 
+<action itemid="5280" script="door_close2n.lua" /> 
+ 
+<action itemid="5281" script="door_open2.lua" /> 
+<action itemid="5283" script="door_close2e.lua" /> 
+
+<action itemid="5284" script="door_open1.lua" /> 
+<action itemid="5285" script="door_close1e.lua" /> 
+
+<action itemid="5286" script="door_open1.lua" /> 
+<action itemid="5287" script="door_close1n.lua" /> 
+
+<action itemid="5288" script="door_open1.lua" /> 
+<action itemid="5289" script="door_close1e.lua" /> 
+
+<action itemid="5290" script="door_open1.lua" /> 
+<action itemid="5291" script="door_close1n.lua" /> 
+
+<action itemid="5292" script="door_open1.lua" /> 
+<action itemid="5293" script="door_close1e.lua" /> 
+
+<action itemid="5294" script="door_open1.lua" /> 
+<action itemid="5295" script="door_close1n.lua" /> 
+
+<action itemid="5615" script="door_open1.lua" /> 
+<action itemid="5616" script="door_close1e.lua" /> 
+
+<action itemid="5617" script="door_open1.lua" /> 
+<action itemid="5618" script="door_close1n.lua" /> 
+
+<action itemid="5732" script="door_open2.lua" /> 
+<action itemid="5734" script="door_close2n.lua" /> 
+ 
+<action itemid="5735" script="door_open2.lua" /> 
+<action itemid="5737" script="door_close2e.lua" /> 
+
+<action itemid="5745" script="door_open1.lua" /> 
+<action itemid="5746" script="door_close1n.lua" /> 
+
+<action itemid="5748" script="door_open1.lua" /> 
+<action itemid="5749" script="door_close1e.lua" /> 
+
+<action itemid="5543" script="teleport.lua" />
+
+
+<action itemid="5812" script="trans_inc.lua" />
+<action itemid="5813" script="trans_dec.lua" />
+
+
+<action itemid="6123" script="music.lua" />
+
+<action itemid="5710" script="shovel.lua"  />
+<action itemid="5468" script="fire_bug.lua" />
+
+<action itemid="5467" script="distilling.lua" />
+
+<action itemid="5792" script="dice.lua" />
+<action itemid="5793" script="dice.lua" />
+<action itemid="5794" script="dice.lua" />
+<action itemid="5795" script="dice.lua" />
+<action itemid="5796" script="dice.lua" />
+<action itemid="5797" script="dice.lua" />
+
+
+--TODO:juice squeezer. waiting revbattle branch
 
 </actions>

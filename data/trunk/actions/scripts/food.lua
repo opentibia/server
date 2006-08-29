@@ -82,6 +82,8 @@ function onUse(cid, item, frompos, item2, topos)
 		food = 136
 	elseif item.itemid == 2796 then
 		food = 60
+	elseif item.itemid == 5097 then
+		food = 48
 	else
 		return 0
 	end
