@@ -27,6 +27,11 @@
 #include "networkmessage.h"
 #include "tools.h"
 
+#ifndef WIN32
+	#define SOCKET_ERROR -1
+	#define INVALID_SOCKET -1
+#endif
+
 extern ConfigManager g_config;
 extern Game g_game;
 
