@@ -169,7 +169,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 			if(version <= 760){
 				msg.Reset();
 				msg.AddByte(0x0A);
-				msg.AddString("Only clients with protocol 7.8 allowed!");
+				msg.AddString("Only clients with protocol 7.8x allowed!");
 				msg.WriteToSocket(s);
 			}
 			else if(msg.RSA_decrypt()){
@@ -195,7 +195,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 				msg.setEncryptionState(true);
 				msg.setEncryptionKey(k);
 
-				if(version == 780){
+				if(version == 780 || version == 781){
 
 					int serverip = serverIPs[0].first;
 
@@ -253,15 +253,15 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 						}
 					}
 				}
-				else{//version != 780
+				else{//version != 78x
 					msg.AddByte(0x0A);
-					msg.AddString("Only clients with protocol 7.8 allowed!");
+					msg.AddString("Only clients with protocol 7.8x allowed!");
 				}
 
 				msg.WriteToSocket(s);
 			}
 		}
-		// gameworld connection tibia 7.8
+		// gameworld connection tibia 7.8x
 		else if (protId == 0x0A){
 			unsigned short  clientos = msg.GetU16();
 			unsigned short version  = msg.GetU16();
@@ -291,9 +291,9 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 				msg.setEncryptionState(true);
 				msg.setEncryptionKey(k);
 
-				if(version != 780){
+				if(version != 780 && version != 781){
 					msg.AddByte(0x14);
-					msg.AddString("Only clients with protocol 7.8 allowed!");
+					msg.AddString("Only clients with protocol 7.8x allowed!");
 					msg.WriteToSocket(s);
 				}
 				else if(g_bans.isIpDisabled(s)){

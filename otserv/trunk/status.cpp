@@ -35,7 +35,7 @@ Status* Status::_Status = NULL;
 //#define STATUS_SERVER_VERSION "0.5.0_CVS"
 #define STATUS_SERVER_VERSION "0.5.0"
 #define STATUS_SERVER_NAME "otserv"
-#define STATUS_CLIENT_VERISON "7.8"
+#define STATUS_CLIENT_VERISON "7.8x"
 
 Status* Status::instance()
 {
@@ -292,7 +292,7 @@ OTSYS_THREAD_RETURN Status::SendInfoThread(void *p)
 		char size[16] = {'0'};
 		sprintf(size, "%d", status.str().size());
 		std::string status_length = std::string(size);
-		post_message =	"POST /otservdb.php HTTP/1.1\r\n"
+		post_message = "POST /otservdb.php HTTP/1.1\r\n"
 						"Host: " + host +"\r\n"
 						"User-Agent: otserv("STATUS_SERVER_NAME"/"STATUS_SERVER_VERSION")\r\n"
 						"Connection: close\r\n"
