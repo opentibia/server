@@ -55,7 +55,7 @@
 <monster name="gazer" file="gazer.xml" />
 <monster name="ghost" file="ghost.xml" />
 <monster name="ghoul" file="ghoul.xml" />
-<monster name="giant Spider" file="Giant Spider.xml" />
+<monster name="giant spider" file="giant spider.xml" />
 <monster name="goblin" file="goblin.xml" />
 <monster name="green djinn" file="green djinn.xml" />
 <monster name="hero" file="hero.xml" />
@@ -65,7 +65,7 @@
 <monster name="kongra" file="kongra.xml" />
 <monster name="larva" file="larva.xml" />
 <monster name="lich" file="lich.xml" />
-<monster name="Lion" file="Lion.xml" />
+<monster name="lion" file="lion.xml" />
 <monster name="lizard sentinel" file="lizard sentinel.xml" />
 <monster name="lizard snakecharmer" file="lizard snakecharmer.xml" />
 <monster name="lizard templar" file="lizard templar.xml" />
