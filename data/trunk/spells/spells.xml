@@ -81,6 +81,21 @@
 <vocation id="5" />
 </spell>
 
+<spell name="pirate_corsair_notes" words="pirate_corsair_notes" maglv="4000" mana="800" enabled="1">
+<vocation id="5" />
+</spell>
+
+<spell name="pirate_ghost_notes" words="pirate_ghost_notes" maglv="4000" mana="800" enabled="1">
+<vocation id="5" />
+</spell>
+
+<spell name="quara_exori" words="quara_exori" maglv="4000" mana="800" enabled="1">
+<vocation id="5" />
+</spell>
+
+<spell name="elemental_poison" words="elemental_poison" maglv="4000" mana="800" enabled="1">
+<vocation id="5" />
+</spell>
 
 <!--// Make arrow and bolt \\-->
 
@@ -191,6 +206,19 @@
 <rune name="dragonlord_firebomb" id="5002" charges="1" maglv="4000" mana="0" enabled="1">
 <vocation id="5" />
 </rune>
+
+<rune name="novice_poison" id="5002" charges="1" maglv="4000" mana="0" enabled="1">
+<vocation id="5" />
+</rune>
+
+<rune name="cult_energy" id="5002" charges="1" maglv="4000" mana="0" enabled="1">
+<vocation id="5" />
+</rune>
+
+<rune name="cult_poison" id="5002" charges="1" maglv="4000" mana="0" enabled="1">
+<vocation id="5" />
+</rune>
+
 
 <!--// Runes \\-->
 <rune name="sudden death" id="2268" charges="1" maglv="15" mana="0" enabled="1"></rune>
