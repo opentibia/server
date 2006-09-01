@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<monster name="Enlightened of the Cult" level="20" maglevel="0" experience="500" pushable="0" armor="15" defense="20" canpushitems="1" staticattack="50" changetarget="200" speed="180">
+	<health now="700" max="700"/>
+	<look type="193" corpse="6068"/>
+	<combat targetdistance="1" runonhealth="0"/>
+<attacks>
+	<attack type="melee" maxdamage="45" cycleticks="2000" probability="100"/>
+</attacks>
+
+<defenses>
+	<defense immunity="poison"/>
+	<defense immunity="paralyze"/>
+	<defense immunity="invisibility"/>
+</defenses>
+
+<loot>
+	<item id="2148" countmax="82" chance1="47831" chancemax="1032"/>
+ 	<item id="2654" chance="14826"/>
+ 	<item id="5656" chance="592"/>
+</loot>
+
+</monster>

@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<monster name="Green Frog" level="20" maglevel="30" experience="0" pushable="0" armor="8" defense="8" canpushitems="0" staticattack="50" changetarget="200" speed="230">
+	<health now="60" max="60"/>
+	<look type="224" head="69" body="66" legs="69" feet="66" corpse="6079"/>
+	<combat targetdistance="100" runonhealth="60"/>
+
+<attacks>
+
+</attacks>
+
+<defenses>
+
+</defenses>
+
+<voices>
+	<voice sentence="Ribbit!"/>
+</voices>
+
+<loot>
+
+</loot>
+</monster>

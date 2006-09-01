@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<monster name="Quara Mantassin" level="20" maglevel="0" experience="400" pushable="0" armor="25" defense="20" canpushitems="1" staticattack="50" changetarget="200" speed="180">
+	<health now="800" max="800"/>
+	<look type="72" corpse="6064"/>
+	<combat targetdistance="1" runonhealth="0"/>
+<attacks>
+	<attack type="melee" maxdamage="65" cycleticks="2000" probability="100"/>
+</attacks>
+
+<defenses>
+	<defense immunity="fire"/>
+	<defense immunity="poison"/>
+</defenses>
+
+<voices>
+	<voice sentence="Zuerk Pachak!"/>
+	<voice sentence="Shrrrr"/>
+</voices>
+
+<loot>
+	<item id="2148" countmax="35" chance1="100000" chancemax="0"/>
+ 	<item id="2654" chance="12000"/>
+	<item id="2464" chance="16000"/>
+ 	<item id="2229" countmax="2" chance1="12000" chancemax="0"/>
+ 	<item id="2377" chance="12000"/>
+</loot>
+
+</monster>

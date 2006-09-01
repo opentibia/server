@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<monster name="Novice of the Cult" level="20" maglevel="0" experience="100" pushable="0" armor="15" defense="20" canpushitems="1" staticattack="50" changetarget="200" speed="180">
+	<health now="285" max="285"/>
+	<look type="133" head="114" body="95" legs="114" feet="114" corpse="6080"/>
+	<combat targetdistance="1" runonhealth="42"/>
+<attacks>
+	<attack type="melee" maxdamage="80" cycleticks="2000" probability="100"/>
+	<attack type="distance" name="poisonfield" mindamage="30" maxdamage="70"/>
+	<attack type="instant" name="exura gran" cycleticks="5000" probability="50"/>
+	<attack type="rune" name="novice_poison" cycleticks="5000" probability="50"/>
+</attacks>
+
+<defenses>
+
+</defenses>
+
+<voices>
+	<voice sentence="Fear us!"/>
+	<voice sentence="You will not tell anyone what you have seen."/>
+	<voice sentence="Your curiosity will be punished!"/>
+</voices>
+
+<loot>
+	<item id="2148" countmax="21" chance1="40000" chancemax="954"/>
+ 	<item id="2661" chance="12793"/>
+ 	<item id="2145" countmax="3" chance1="5000" chancemax="0"/>
+ 	<item id="2199" chance="7367"/>
+ 	<item id="2190" chance="1826"/>
+ 	<item id="5810" chance="491"/>
+	<item id="6087" chance="5839"/>
+ 	<item id="2213" chance="14822"/>
+ 	<item id="2478" chance="8236"/>
+	<item id="2398" chance="18427"/>
+</loot>
+
+<summons maxSummons="3">
+	<summon name="Chicken" chance="10000"/>
+</summons>
+
+
+</monster>

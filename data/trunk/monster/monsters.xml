@@ -55,7 +55,7 @@
 <monster name="gazer" file="gazer.xml" />
 <monster name="ghost" file="ghost.xml" />
 <monster name="ghoul" file="ghoul.xml" />
-<monster name="giant spider" file="giant spider.xml" />
+<monster name="giant Spider" file="Giant Spider.xml" />
 <monster name="goblin" file="goblin.xml" />
 <monster name="green djinn" file="green djinn.xml" />
 <monster name="hero" file="hero.xml" />
@@ -65,7 +65,7 @@
 <monster name="kongra" file="kongra.xml" />
 <monster name="larva" file="larva.xml" />
 <monster name="lich" file="lich.xml" />
-<monster name="lion" file="lion.xml" />
+<monster name="Lion" file="Lion.xml" />
 <monster name="lizard sentinel" file="lizard sentinel.xml" />
 <monster name="lizard snakecharmer" file="lizard snakecharmer.xml" />
 <monster name="lizard templar" file="lizard templar.xml" />
@@ -124,7 +124,39 @@
 <monster name="wolf" file="wolf.xml" />
 <monster name="yeti" file="yeti.xml" />
 
+<!-- 7.8 Monsters made by Thax and Subarmy -->
 
+<monster name="azure frog" file="azure frog.xml" />
+<monster name="crimson frog" file="crimson frog.xml" />
+<monster name="coral frog" file="coral frog.xml" />
+<monster name="green frog" file="green frog.xml" />
+<monster name="orchid frog" file="orchid frog.xml" />
+<monster name="carrion worm" file="carrion worm.xml" />
+<monster name="thornback tortoise" file="thornback tortoise.xml" />
+<monster name="tortoise" file="tortoise.xml" />
+<monster name="enlightened of the cult" file="enlightened of the cult.xml" />
+<monster name="acolyte of the cult" file="Acolyte of the cult.xml" />
+<monster name="adept of the cult" file="adept of the cult.xml" />
+<monster name="novice of the cult" file="novice of the cult.xml" />
+<monster name="blood crab" file="blood crab.xml" />
+<monster name="toad" file="toad.xml" />
+<monster name="mammoth" file="mammoth.xml" />
+<monster name="quara predator" file="quara predator.xml" />
+<monster name="quara constrictor" file="quara constrictor.xml" />
+<monster name="quara hydromancer" file="quara hydromancer.xml" />
+<monster name="quara mantassin" file="quara mantassin.xml" />
+<monster name="quara pincher" file="quara pincher.xml" />
+<monster name="ferumbras" file="ferumbras.xml" />
+<monster name="island troll" file="island troll.xml" />
+<monster name="water elemental" file="water elemental.xml" />
+<monster name="massive water elemental" file="massive water elemental.xml" />
+<monster name="pirate marauder" file="pirate marauder.xml" />
+<monster name="pirate cutthroat" file="pirate cutthroat.xml" />
+<monster name="pirate skeleton" file="pirate skeleton.xml" />
+<monster name="pirate ghost" file="pirate ghost.xml" />
+<monster name="pirate corsair" file="pirate corsair.xml" />
+<monster name="pirate buccaneer" file="pirate buccaneer.xml" />
+<monster name="seagull" file="seagull.xml" />
 
 
 </monsters>

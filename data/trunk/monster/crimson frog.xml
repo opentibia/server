@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<monster name="Crimson Frog" level="20" maglevel="30" experience="20" pushable="0" armor="8" defense="8" canpushitems="0" staticattack="50" changetarget="200" speed="230">
+	<health now="60" max="60"/>
+	<look type="226" head="94" body="78" legs="94" feet="78" corpse="6079"/>
+	<combat targetdistance="1" runonhealth="0"/>
+
+<attacks>
+	<attack type="melee" maxdamage="3" cycleticks="2000" probability="100"/>
+</attacks>
+
+<defenses>
+
+</defenses>
+
+<voices>
+	<voice sentence="Ribbit!Ribbit!"/>
+</voices>
+
+<loot>
+ 	<item id="2148" countmax="3" chance1="60000" chancemax="1321"/>
+	<item id="3976" countmax="6" chance1="53500" chancemax="2120"/>
+</loot>
+</monster>

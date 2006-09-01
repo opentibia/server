@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<monster name="Pirate Cutthroat" level="20" maglevel="0" experience="175" pushable="0" armor="18" defense="22" canpushitems="1" staticattack="50" changetarget="200" speed="180">
+	<health now="325" max="325"/>
+	<look type="96" corpse="6080"/>
+	<combat targetdistance="1" runonhealth="0"/>
+<attacks>
+	<attack type="melee" maxdamage="90" cycleticks="2000" probability="100"/>
+</attacks>
+
+<defenses>
+	<defense immunity="invisible"/>
+</defenses>
+
+<loot>
+     <item id="2376" chance="13000"/>
+     <item id="2148" countmax="53" chance1="70470" chancemax="350"/>
+</loot>
+
+</monster>

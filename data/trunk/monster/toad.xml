@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<monster name="Toad" level="20" maglevel="0" experience="60" pushable="0" armor="15" defense="20" canpushitems="1" staticattack="50" changetarget="200" speed="180">
+	<health now="135" max="135"/>
+	<look type="222" corpse="6077"/>
+	<combat targetdistance="1" runonhealth="20"/>
+<attacks>
+	<attack type="melee" maxdamage="25" cycleticks="2000" probability="100"/>
+<attack type="distance" name="poisonfield" mindamage="30" maxdamage="45"/>
+<attack type="instant" name="utani hur" cycleticks="5000" probability="50"/>
+</attacks>
+
+<defenses>
+	<defense immunity="poison"/>
+</defenses>
+
+<voices>
+	<voice sentence="Ribbit!Ribbit!"/>
+</voices>
+
+<loot>
+ 	<item id="2148" countmax="12" chance1="60000" chancemax="1321"/>
+	<item id="2666" countmax="2" chance1="12500" chancemax="2120"/>
+ 	<item id="2667" countmax="1" chance1="10362" chancemax="0"/>
+	<item id="2398" chance="7926"/>
+	<item id="2382" chance="17132"/>
+	<item id="2391" chance="294"/>
+</loot>
+
+</monster>

@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<monster name="Quara Pincher" level="20" maglevel="0" experience="1200" pushable="0" armor="35" defense="35" canpushitems="1" staticattack="50" changetarget="200" speed="180">
+	<health now="1800" max="1800"/>
+	<look type="77" corpse="6063"/>
+	<combat targetdistance="1" runonhealth="0"/>
+<attacks>
+	<attack type="melee" maxdamage="165" cycleticks="2000" probability="100"/>
+</attacks>
+
+<defenses>
+	<defense immunity="fire"/>
+	<defense immunity="poison"/>
+	<defense immunity="invisible"/>
+</defenses>
+
+<voices>
+	<voice sentence="Clank! Clank!"/>
+	<voice sentence="Crrrk! Crrrk!"/>
+</voices>
+
+<loot>
+	<item id="2148" countmax="40" chance1="100000" chancemax="0"/>
+ 	<item id="2487" chance="10000"/>
+ 	<item id="2381" chance="13000"/>
+ 	<item id="2398" chance="14000"/>
+	<item id="2144" countmax="2" chance1="12000" chancemax="0"/>
+</loot>
+
+</monster>
