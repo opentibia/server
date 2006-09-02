@@ -97,6 +97,10 @@
 <vocation id="5" />
 </spell>
 
+<spell name="hydra_heal" words="hydra_heal" maglv="2000" mana="2500" enabled="1"/>
+
+<spell name="serpent_beam" words="serpent_beam" maglv="2000" mana="2500" enabled="1"></spell>
+
 <!--// Make arrow and bolt \\-->
 
 <spell name="Conjure Arrow" words="exevo con" maglv="2" mana="40" enabled="1"> 
@@ -219,6 +223,7 @@
 <vocation id="5" />
 </rune>
 
+<rune name="serpent_poisonball" id="2278" charges="1" maglv="1" mana="0" enabled="1"><vocation id="5" /></rune>
 
 <!--// Runes \\-->
 <rune name="sudden death" id="2268" charges="1" maglv="15" mana="0" enabled="1"></rune>

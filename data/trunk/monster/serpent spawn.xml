@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<monster name="Serpent Spawn" level="45" maglevel="55" experience="2000" pushable="0" speed="350" armor="32" defense="41" canpushitems="0" staticattack="50" changetarget="550">
+	<health now="3000" max="3000"/>
+	<look type="220" corpse="4323"/>
+	<combat targetdistance="1" runonhealth="0"/>
+<attacks>
+	<attack type="melee" mindamage="0" maxdamage="200" cycleticks="2000" probability="100"/>
+	<attack type="rune" name="serpent_poisonball" exhaustion="500" cycleticks="3000" probability="45"/>
+	<attack type="instant" name="poison_wave" exhaustion="500" cycleticks="4000" probability="60"/>
+	<attack type="instant" name="serpent_beam" exhaustion="500" cycleticks="4000" probability="50"/>
+	<attack type="instant" name="exura gran" exhaustion="500" cycleticks="4000" probability="50"/>
+
+</attacks>
+
+<defenses>
+        <defense immunity="poison"/>
+</defenses>
+
+<loot>
+    	<item id="2148" countmax="96" chance1="50000" chancemax="3"/>
+    	<item id="2146" countmax="2" chance1="10000" chancemax="0"/>
+    	<item id="2147" countmax="1" chance1="10000" chancemax="0"/>
+ 
+    	<item id="1987" chance="100000">
+    	<inside>
+    	<item id="2148" countmax="84" chance1="50000" chancemax="3"/>
+    	<item id="3971" chance="3333"/>
+ 	<item id="2492" chance="5000"/>
+ 	<item id="2476" chance="4000"/>
+ 	<item id="2198" chance="3333"/>
+ 	<item id="2130" chance="1818"/>
+ 	<item id="2498" chance="1818"/>
+	<item id="2547" countmax="4" chance1="20000" chancemax="0"/>
+	<item id="2678" countmax="6" chance1="20000" chancemax="0"/>
+ 	<item id="2796" countmax="1" chance1="20000" chancemax="0"/>
+ 	<item id="2504" chance="333"/>
+    	</inside>
+    	</item>
+</loot>
+
+<voices>
+	<voice sentence="Sssssouls for the one"/>
+	<voice sentence="Tsssse one will risssse again"/>
+	<voice sentence="I bring your deathhh, mortlessss"/>
+	<voice sentence="HISSSS"/>
+</voices>
+</monster>
