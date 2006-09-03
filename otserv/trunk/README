@@ -3,7 +3,6 @@
 ============================================
 ===== www.otserv.org	www.otfans.net =====
 ============================================
-Readme by Pekay.
 
 
 What is this?
@@ -12,21 +11,9 @@ What is this?
 
 How does it work?
 	In the past OTServ could be played on Tibia 7.1, 7.11, 7.4, 7.5, 7.6, 7.61, 7.7 and then 7.71.
-	OTServ is now played using Tibia 7.72.
-	To play it you can either download the IP changer (works with
-	only Tibia 7.6 and Tibia 7.72) or change the shortcut to Tibia.
-	If you are making a shortcut to it, open the properties of the shortcut
-	and you should see a box marked "Target:" and should look roughly
-	like this: "C:/tibia directory/Tibia.exe".
-	on the end it will have host and port properties on it, so then the target box
-	will be like the following:
-	
-	"C:/<Tibia directory>/Tibia.exe" host HOSTNAME port PORT
-	
-        where HOSTNAME is the IP or HostName of the server and PORT is the port where the server acts.
-        if the server is located on your machine, it will be "host localhost port 7171".
+	OTServ is now played using Tibia 7.8 or 7.81.
 
-	To connect Tibia client to OTServ you will a IP changer, you can get one here 
+	To connect Tibia client to OTServ you will have to use an IP changer, you can get one here 
 	http://web.telia.com/~u49016513/tibialoaderV143.zip or http://otfans.net/showthread.php?t=20767.
 
 	Once that's done, start the OTServ up, quite simple, just execute otserv.exe by
@@ -42,8 +29,8 @@ How does it work?
 	not connecting to the CIP servers.
 	Then you are logged in.
 
-Whats New?	
-	- 7.72 Protocol
+Whats New in 0.5.0?
+	- 7.8x Protocol
 	- Houses
 	- New binary map format OTBM
 	- Private channels
@@ -52,7 +39,7 @@ Whats New?
 	- Follow and chase opponent
 	- Waiting list
 	- Day-Night cycles
-
+	- SQlite support
 
 Features?
 	- Full rearranged protocol and game system
@@ -60,15 +47,13 @@ Features?
 	- SQL databases (for accounts and players)
 	- Crash tracking
 	- Monsters
-	- 7.72 Protocol
 	- OTB (You now dont have to convert your map, change any ID, new ID's are just stacked on top of older ID's!)
-	- VIP List (SQL Only)
+	- VIP List
 	- Guild support
 	- Spawns (and Respawn)
 	- Commands
 	- Autowalk
 	- Rotatable items
-	- Logger
 	- Enhanced items database
 	- Runes with charges
 	- Depots
@@ -115,57 +100,40 @@ Problems?
 	you should also report this at the CVS Report Board, this report will help solving bugs a lot.
 
 Credits?
-	Shi'Voc - Initial project developer
-	Acrimon - Initial project developer
-	Tliff - Developer, some kind of project leader
-	Yorick - Fansite / Forum administrator
-	Pekay - README Documentation, Actions Command Console Developer, DS-IRC Client Developer
-	SimOne - Developer and Map Editor, OTB
-	Spin - Developer, OTB
-	Primer - Developer, SQL
+	Tliff - Developer, some kind of project leader, Forum administrator
+	SimOne - Developer
 	Snack - Developer
-	j4K3xBl4sT3r - Developer
+	Primer - Developer
+	Spin - Developer
 	Anstice - Developer
 	Pedro B. - Developer
 	GriZzm0 - Scripting
 	Heliton - Scripting
 	Jiddo - Scripting
-	the fike - Developer (advisory/optimization status)
-	Vitor - Developer (advisory/optimization status)	
-	*Inactive*
-	Reebow - Developer (special protocol support)
-	Aire - Developer
-	Haktivex - Developer
-	Fandoras - Developer
-	TiMMit - Developer
-	Decar - Fansiter
-	Matkus - Developer
-	Privateer - Documentation on the protocol
-	Torvik - Item list
+	the fike - Developer (advisory/optimization)
+	Vitor - Developer (advisory/optimization)
 
-Forum Credits (OTFans.net):
-	Yorick - Admin
-	Nuker - Admin
-	Verkon - Admin
-	Pekay - Admin
-	Tliff - Admin
-	
-	Runar - Super Moderator
-	GriZzm0 - Super Moderator
-	Jorris (Sixpack) - Super Moderator
-	
-	Algenon - Moderator
-	Rifleet - Moderator
-	Orio - Moderator
-	brave - Moderator, OTServ List
-	Gecko Slayer - Moderator
-	Jason - Moderator
-	Qwerty| - Moderator
-	Tibia Rules - Moderator
-	Tijn - Moderator
-	Jero - Moderator
-	j4K3xBl4sT3r - Moderator
-	 
+	Yorick - Fansite , Forum administrator
+	Pekay - README Documentation, Forum administrator
+	Nuker - Forum administrator
+	verkon - Forum administrator
+
+	Shi'Voc - Initial project developer (Inactive)
+	Acrimon - Initial project developer (Inactive)
+	Reebow - Developer, special protocol support (Inactive)
+	Aire - Developer (Inactive)
+	Haktivex - Developer (Inactive)
+	Fandoras - Developer (Inactive)
+	TiMMit - Developer (Inactive)
+	Decar - Fansite (Inactive)
+	Matkus - Developer (Inactive)
+	Privateer - Documentation on the protocol (Inactive)
+	Torvik - Item list (Inactive)
+	j4K3xBl4sT3r - Developer (Inactive)
+	Smygflik - Developer (Inactive)
+
+	And special thanks to all otfans.net moderators.
+
 Help?
 	We always need help. Post on the forums:
 	OTFans - http://otfans.net
@@ -178,4 +146,5 @@ Help?
 Anything else?
 	Yes! There are utilities available as a seperate package soon at the sourceforge site
 	where the otserv project is, check out Releases there soon on best utilites that are
-	most helpful. We have a chat room now as well on #otserv: http://otfans.net/javachat.php .
+	most helpful.
+	We have a chat room now as well on #otserv: http://otfans.net/javachat.php.
