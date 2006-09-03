@@ -16,6 +16,10 @@
 	<voice sentence="Blubb"/>
 </voices>
 
+<summons maxSummons="3">
+	<summon name="slime2" chance="1333"/>
+</summons>
+
 <loot>
 
 </loot>
