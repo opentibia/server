@@ -204,7 +204,8 @@ public:
 	bool isImmune(DamageType_t type) const;
 	virtual bool isAttackable() const;
 	bool isPzLocked() const { return pzLocked; }
-	virtual BlockType_t blockHit(Creature* attacker, DamageType_t damageType, int32_t& damage);
+	virtual BlockType_t blockHit(Creature* attacker, DamageType_t damageType, int32_t& damage,
+		bool checkDefense = false, bool checkArmor = false);
 	virtual void doAttacking();
 
 	int getSkill(skills_t skilltype, skillsid_t skillinfo) const;

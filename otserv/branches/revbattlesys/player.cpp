@@ -1675,11 +1675,13 @@ void Player::addExperience(unsigned long exp)
 	}
 }
 
-BlockType_t Player::blockHit(Creature* attacker, DamageType_t damageType, int32_t& damage)
+BlockType_t Player::blockHit(Creature* attacker, DamageType_t damageType, int32_t& damage,
+	bool checkDefense /* = false*/, bool checkArmor /* = false*/)
 {
 	BlockType_t blockType = Creature::blockHit(attacker, damageType, damage);
 
-	if(blockType == BLOCK_DEFENSE && damageType == DAMAGE_PHYSICAL){
+	//if(blockType == BLOCK_DEFENSE && damageType == DAMAGE_PHYSICAL){
+	if(blockType == BLOCK_DEFENSE){
 		//addSkillShieldTry(1);
 		internalDefense = false;
 	}

@@ -30,19 +30,19 @@ class Creature;
 class Player;
 
 enum ConditionType_t {
-	CONDITION_NONE,
-	CONDITION_POISON,		   //Damage
-	CONDITION_FIRE,			   //Damage
-	CONDITION_ENERGY,		   //Damage
-	CONDITION_HASTE,		   //Speed
-	CONDITION_PARALYZE,		 //Speed
-	CONDITION_OUTFIT,		   //Outfit
-	CONDITION_LIGHT,		   //Light   -- Player only
-	CONDITION_MANASHIELD,  //Generic -- Player only
-	CONDITION_INFIGHT,		 //Generic -- Player only
-	CONDITION_DRUNK,		   //Generic -- Player only
-	CONDITION_EXHAUSTED,	 //Generic
-	CONDITION_FOOD,			   //Generic -- Player only
+	CONDITION_NONE = 0,
+	CONDITION_POISON = 1,     //Damage
+	CONDITION_FIRE = 2,	      //Damage
+	CONDITION_ENERGY = 3,	    //Damage
+	CONDITION_HASTE = 4,      //Speed
+	CONDITION_PARALYZE = 5,	  //Speed
+	CONDITION_OUTFIT = 6,	    //Outfit
+	CONDITION_LIGHT = 7,	    //Light   -- Player only
+	CONDITION_MANASHIELD = 8, //Generic -- Player only
+	CONDITION_INFIGHT = 9,    //Generic -- Player only
+	CONDITION_DRUNK = 10,     //Generic -- Player only
+	CONDITION_EXHAUSTED = 11, //Generic
+	CONDITION_FOOD = 12,			//Generic -- Player only
 };
 
 enum EndCondition_t {
@@ -52,7 +52,7 @@ enum EndCondition_t {
 
 class Condition{
 public:
-	Condition();
+	Condition(ConditionType_t _type, int32_t _ticks);
 	virtual ~Condition(){};
 	
 	virtual bool startCondition(Creature* creature) = 0;
@@ -69,6 +69,8 @@ public:
 	bool reduceTicks(int32_t interval);
 
 	static Condition* createCondition(ConditionType_t _type, int32_t ticks, int32_t param);
+
+	virtual bool setParam(ConditionParam_t param, int32_t value);
 
 protected:
 	int32_t ticks;
@@ -93,7 +95,8 @@ public:
 class ConditionDamage: public Condition
 {
 public:
-	ConditionDamage(ConditionType_t _type, int32_t _ticks, int32_t _damagetype);
+	//ConditionDamage(ConditionType_t _type, int32_t _ticks, int32_t _damagetype);
+	ConditionDamage(ConditionType_t _type);
 	virtual ~ConditionDamage(){};
 	
 	virtual bool startCondition(Creature* creature);
@@ -103,6 +106,10 @@ public:
 	virtual uint8_t getIcons() const;	
 
 	virtual ConditionDamage* clone()  const { return new ConditionDamage(*this); }
+
+	virtual bool setParam(ConditionParam_t param, int32_t value);
+
+	void addDamage(uint32_t rounds, uint32_t time, int32_t value);
 
 protected:
 	uint32_t owner;
@@ -134,8 +141,9 @@ protected:
 class ConditionOutfit: public Condition
 {
 public:
-	ConditionOutfit(int32_t _ticks, uint8_t _lookType, uint16_t _lookTypeEx,
-		uint8_t _lookHead = 0, uint8_t _lookBody = 0, uint8_t _lookLegs = 0, uint8_t _lookFeet = 0);
+	//ConditionOutfit(int32_t _ticks, uint8_t _lookType, uint16_t _lookTypeEx,
+	//	uint8_t _lookHead = 0, uint8_t _lookBody = 0, uint8_t _lookLegs = 0, uint8_t _lookFeet = 0);
+	ConditionOutfit(ConditionType_t _type, int32_t _ticks);
 	virtual ~ConditionOutfit(){};
 	
 	virtual bool startCondition(Creature* creature);
@@ -146,20 +154,28 @@ public:
 
 	virtual ConditionOutfit* clone()  const { return new ConditionOutfit(*this); }
 
-protected:
-	uint8_t lookType;
-	uint16_t lookTypeEx;
-	uint8_t lookHead;
-	uint8_t lookBody;
-	uint8_t lookLegs;
-	uint8_t lookFeet;
+	void addOutfit(uint32_t lookTypeEx, uint32_t lookType, uint32_t lookHead, uint32_t lookBody, uint32_t lookLegs, uint32_t lookFeet);
 
-	uint8_t prevLookType;
-	uint16_t prevLookTypeEx;
-	uint8_t prevLookHead;
-	uint8_t prevLookBody;
-	uint8_t prevLookLegs;
-	uint8_t prevLookFeet;
+protected:
+	struct Outfit_t{
+		uint32_t lookType;
+		uint32_t lookTypeEx;
+		uint32_t lookHead;
+		uint32_t lookBody;
+		uint32_t lookLegs;
+		uint32_t lookFeet;
+	};
+
+	std::vector<Outfit_t> outfits;
+
+	uint32_t prevLookType;
+	uint32_t prevLookTypeEx;
+	uint32_t prevLookHead;
+	uint32_t prevLookBody;
+	uint32_t prevLookLegs;
+	uint32_t prevLookFeet;
+
+	void changeOutfit(Creature* creature, int32_t index = -1);
 };
 
 class ConditionLight: public Condition

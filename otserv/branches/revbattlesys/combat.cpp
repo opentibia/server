@@ -30,17 +30,21 @@
 
 extern Game g_game;
 
-Combat::Combat(uint8_t _impactEffect) : 
-	impactEffect(_impactEffect)
+Combat::Combat(CombatType_t _type)
 {
 	area = NULL;
 	callback = NULL;
+	condition = NULL;
+
+	combatType = _type;
+	damageType = DAMAGE_NONE;
 }
 
 Combat::~Combat()
 {
 	delete area;
 	delete callback;
+	delete condition;
 }
 
 void Combat::getMinMaxValues(Creature* creature, int32_t& min, int32_t& max) const
@@ -62,7 +66,7 @@ void Combat::getMinMaxValues(Creature* creature, int32_t& min, int32_t& max) con
 	}
 }
 
-void Combat::getCombatArea(Creature* attacker, const Position& pos, std::list<Tile*>& list) const
+void Combat::getCombatArea(Creature* attacker, const Position& pos, const AreaCombat* area, std::list<Tile*>& list)
 {
 	if(area){
 		area->getList(pos, attacker->getDirection(), list);
@@ -75,7 +79,7 @@ void Combat::getCombatArea(Creature* attacker, const Position& pos, std::list<Ti
 	}
 }
 
-bool Combat::canDoCombat(const Creature* attacker, const Tile* tile) const
+bool Combat::canDoCombat(const Creature* attacker, const Tile* tile)
 {
 	if(const Player* player = attacker->getPlayer()){
 		if(player->getAccessLevel() > 2){
@@ -99,12 +103,24 @@ void Combat::setArea(const AreaCombat* _area)
 	area = new AreaCombat(*_area);
 }
 
+void Combat::setCondition(const Condition* _condition)
+{
+	condition = _condition->clone();
+}
+
 bool Combat::setParam(CombatParam_t param, uint32_t value)
 {
 	switch(param){
-		case COMBATPARAM_EFFECTTYPE:
+		case COMBATPARAM_EFFECT:
 		{
 			impactEffect = value;
+			return true;
+			break;
+		}
+
+		case COMBATPARAM_DAMAGETYPE:
+		{
+			damageType = (DamageType_t)value;
 			return true;
 			break;
 		}
@@ -121,7 +137,7 @@ bool Combat::setCallback(CombatParam_t key)
 			return true;
 			break;
 
-			default:
+		default:
 				std::cout << "Combat::setCallback - Unknown callback type: " << (uint32_t)key << std::endl;
 				break;
 	}
@@ -134,10 +150,170 @@ CallBack* Combat::getCallback()
 	return callback;
 }
 
-void Combat::addImpactEffect(const Position& pos) const
+void Combat::doCombat(Creature* attacker, Creature* target) const
 {
-	if(impactEffect != NM_ME_NONE){
-		g_game.addMagicEffect(pos, impactEffect);
+	//target combat callback function
+
+	if(combatType == COMBAT_HITPOINTS){
+		int32_t minChange = 0;
+		int32_t maxChange = 0;
+		getMinMaxValues(attacker, minChange, maxChange);
+
+		doCombatHealth(attacker, damageType, target, minChange, maxChange, impactEffect, condition);
+	}
+	else if(combatType == COMBAT_MANAPOINTS){
+		int32_t minChange = 0;
+		int32_t maxChange = 0;
+		getMinMaxValues(attacker, minChange, maxChange);
+
+		doCombatMana(attacker, target, minChange, maxChange, impactEffect, condition);
+	}
+	else if(combatType == COMBAT_CONDITION){
+		doCombatCondition(attacker, target, condition);
+	}
+}
+
+void Combat::doCombat(Creature* attacker, const Position& pos) const
+{
+	//area combat callback function
+
+	if(combatType == COMBAT_HITPOINTS){
+		int32_t minChange = 0;
+		int32_t maxChange = 0;
+		getMinMaxValues(attacker, minChange, maxChange);
+
+		doCombatHealth(attacker, damageType, pos, area, minChange, maxChange, impactEffect, condition);
+	}
+	else if(combatType == COMBAT_MANAPOINTS){
+		int32_t minChange = 0;
+		int32_t maxChange = 0;
+		getMinMaxValues(attacker, minChange, maxChange);
+
+		doCombatMana(attacker, pos, area, minChange, maxChange, impactEffect, condition);
+	}
+	else if(combatType == COMBAT_CONDITION){
+		doCombatCondition(attacker, pos, area, condition, impactEffect);
+	}
+}
+
+bool Combat::doCombatHealth(Creature* attacker, DamageType_t damageType, Creature* target,
+	int32_t minChange, int32_t maxChange)
+{
+	int32_t healthChange = random_range(minChange, maxChange);
+	return g_game.combatChangeHealth(damageType, attacker, target, healthChange);
+}
+
+void Combat::doCombatHealth(Creature* attacker, DamageType_t damageType, Creature* target,
+	int32_t minChange, int32_t maxChange, uint8_t effect, const Condition* condition /*= NULL*/)
+{
+	doCombatHealth(attacker, damageType, target, minChange, maxChange);
+
+	if(effect != NM_ME_NONE){
+		g_game.addMagicEffect(target->getPosition(), effect);
+	}
+}
+
+void Combat::doCombatHealth(Creature* attacker, DamageType_t damageType, const Position& pos,
+	const AreaCombat* area, int32_t minChange, int32_t maxChange, uint8_t effect,
+	const Condition* condition /*= NULL*/)
+{
+	std::list<Tile*> list;
+	getCombatArea(attacker, pos, area, list);
+
+	for(std::list<Tile*>::iterator it = list.begin(); it != list.end(); ++it){
+		if(canDoCombat(attacker, *it)){
+			for(CreatureVector::iterator cit = (*it)->creatures.begin(); cit != (*it)->creatures.end(); ++cit){
+				if(doCombatHealth(attacker, damageType, *cit, minChange, maxChange)){
+					doCombatCondition(attacker, *cit, condition);
+				}
+			}
+
+			if(effect != NM_ME_NONE){
+				g_game.addMagicEffect((*it)->getPosition(), effect);
+			}
+		}
+	}
+}
+
+bool Combat::doCombatMana(Creature* attacker, Creature* target,
+	int32_t minChange, int32_t maxChange)
+{
+	int32_t manaChange = random_range(minChange, maxChange);
+	return g_game.combatChangeMana(attacker, target, manaChange);
+}
+
+void Combat::doCombatMana(Creature* attacker, Creature* target,
+	int32_t minChange, int32_t maxChange, uint8_t effect,
+	const Condition* condition /*= NULL*/)
+{
+	doCombatMana(attacker, target, minChange, maxChange);
+
+	if(effect != NM_ME_NONE){
+		g_game.addMagicEffect(target->getPosition(), effect);
+	}
+}
+
+void Combat::doCombatMana(Creature* attacker, const Position& pos,
+	const AreaCombat* area, int32_t minChange, int32_t maxChange, uint8_t effect,
+	const Condition* condition /*= NULL*/)
+{
+	std::list<Tile*> list;
+	getCombatArea(attacker, pos, area, list);
+
+	for(std::list<Tile*>::iterator it = list.begin(); it != list.end(); ++it){
+		if(canDoCombat(attacker, *it)){
+			for(CreatureVector::iterator cit = (*it)->creatures.begin(); cit != (*it)->creatures.end(); ++cit){
+				if(doCombatMana(attacker, *cit, minChange, maxChange)){
+					doCombatCondition(attacker, *cit, condition);
+				}
+			}
+
+			if(effect != NM_ME_NONE){
+				g_game.addMagicEffect((*it)->getPosition(), effect);
+			}
+		}
+	}
+}
+
+bool Combat::doCombatCondition(Creature* attacker, Creature* target, const Condition* condition)
+{
+	if(condition){
+		Condition* conditionCopy = condition->clone();
+		if(attacker){
+			conditionCopy->setParam(CONDITIONPARAM_OWNER, attacker->getID());
+		}
+
+		return target->addCondition(conditionCopy);
+	}
+
+	return false;
+}
+
+void Combat::doCombatCondition(Creature* attacker, const Position& pos,
+	const AreaCombat* area, const Condition* condition, uint8_t effect)
+{
+	std::list<Tile*> list;
+	getCombatArea(attacker, pos, area, list);
+
+	for(std::list<Tile*>::iterator it = list.begin(); it != list.end(); ++it){
+		if(canDoCombat(attacker, *it)){
+			for(CreatureVector::iterator cit = (*it)->creatures.begin(); cit != (*it)->creatures.end(); ++cit){
+				doCombatCondition(attacker, *cit, condition);
+			}
+
+			if(effect != NM_ME_NONE){
+				g_game.addMagicEffect((*it)->getPosition(), effect);
+			}
+		}
+	}
+}
+
+void Combat::doCombatCondition(Creature* attacker, Creature* target, const Condition* condition, uint8_t effect)
+{
+	doCombatCondition(attacker, target, condition);
+
+	if(effect != NM_ME_NONE){
+		g_game.addMagicEffect(target->getPosition(), effect);
 	}
 }
 
@@ -179,6 +355,7 @@ void CombatCallBack::getMinMaxValues(Player* player, int32_t& min, int32_t& max)
 	}
 }
 
+/*
 CombatHealth::CombatHealth(DamageType_t _damageType, uint8_t _impactEffect) :
 	Combat(_impactEffect),
 	damageType(_damageType)
@@ -293,7 +470,7 @@ void CombatMana::internalCombat(Creature* attacker, const Position& pos, int32_t
 		if(canDoCombat(attacker, *it)){
 			for(CreatureVector::iterator cit = (*it)->creatures.begin(); cit != (*it)->creatures.end(); ++cit){
 				int32_t manaChange = random_range(minChange, maxChange);
-				g_game.combatChangeMana(attacker, *cit, manaChange);
+				internalCombat(attacker, *cit, manaChange);
 			}
 
 			addImpactEffect(pos);
@@ -372,6 +549,39 @@ CombatCondition::~CombatCondition()
 	delete condition;
 }
 
+void CombatCondition::internalDoCombat(Creature* attacker, Creature* target) const
+{
+	if(condition){
+		target->addCondition(condition->clone());
+	}
+	else{
+		target->removeCondition(removeType);
+	}
+}
+
+void CombatCondition::doCombat(Creature* attacker, Creature* target) const
+{
+	internalDoCombat(attacker, target);
+	addImpactEffect(target->getPosition());
+}
+
+void CombatCondition::doCombat(Creature* attacker, const Position& pos) const
+{
+	std::list<Tile*> list;
+	getCombatArea(attacker, pos, list);
+
+	for(std::list<Tile*>::iterator it = list.begin(); it != list.end(); ++it){
+		if(canDoCombat(attacker, *it)){
+			for(CreatureVector::iterator cit = (*it)->creatures.begin(); cit != (*it)->creatures.end(); ++cit){
+				internalDoCombat(attacker, *cit);
+			}
+
+			addImpactEffect(pos);
+		}
+	}
+}
+
+/*
 CombatField::CombatField(MagicField* _field) :
 	field(_field)
 {
@@ -401,6 +611,7 @@ void CombatField::doCombat(Creature* attacker, const Position& pos) const
 
 	addImpactEffect(pos);
 }
+*/
 
 AreaCombat::AreaCombat() : 
 	needDirection(false)
@@ -413,52 +624,6 @@ AreaCombat::~AreaCombat()
 	//
 }
 
-/*
-ReturnValue AreaCombat::doCombat(Creature* attacker, const Position& pos, const Combat& combat) const
-{
-	Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
-
-	if(!tile){
-		return RET_NOTPOSSIBLE;
-	}
-
-	Position tmpPos = pos;
-
-	size_t cols = area.getCols();
-	size_t rows = area.getRows();
-
-	tmpPos.x -= (area.getCols() - 1) / 2;
-	tmpPos.y -= (area.getRows() - 1) / 2;
-
-	for(size_t y = 0; y < area.getRows(); ++y){
-		for(size_t x = 0; x < area.getCols(); ++x){
-
-			uint8_t dir = area[y][x];
-			if((!needDirection && dir != 0) || dir == attacker->getDirection()){
-
-				if(g_game.map->canThrowObjectTo(pos, tmpPos)){
-					tile = g_game.getTile(tmpPos.x, tmpPos.y, tmpPos.z);
-
-					if(tile){
-						if(!tile->hasProperty(PROTECTIONZONE) &&						
-							!tile->hasProperty(BLOCKPROJECTILE))
-						{
-							combat.execute(attacker, tmpPos);
-						}
-					}
-				}
-			}
-
-			tmpPos.x += 1;
-		}
-
-		tmpPos.x -= cols;
-		tmpPos.y += 1;
-	}
-
-	return RET_NOTPOSSIBLE;
-}
-*/
 
 bool AreaCombat::getList(const Position& pos, Direction rotatedir, std::list<Tile*>& list) const
 {

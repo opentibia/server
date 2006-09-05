@@ -120,9 +120,8 @@ void Creature::onWalk()
 		g_game.internalMoveCreature(this, dir);
 	}
 
-	int64_t ticks = getEventStepTicks();
-	eventWalk = g_game.addEvent(makeTask(ticks, boost::bind(&Game::checkWalk,
-		&g_game, getID())));
+	eventWalk = 0;
+	addWalkEvent();
 }
 
 bool Creature::getNextStep(Direction& dir)
@@ -135,6 +134,28 @@ bool Creature::getNextStep(Direction& dir)
 	}
 
 	return false;
+}
+
+void Creature::addWalk(std::list<Direction>& listDir)
+{
+	listWalkDir = listDir;
+	addWalkEvent();
+}
+
+void Creature::addWalkEvent()
+{
+	if(eventWalk == 0){
+		int64_t ticks = getEventStepTicks();
+		eventWalk = g_game.addEvent(makeTask(ticks, std::bind2nd(std::mem_fun(&Game::checkWalk), getID())));
+	}
+}
+
+void Creature::stopWalkEvent()
+{
+	if(eventWalk != 0){
+		g_game.stopEvent(eventWalk);
+		eventWalk = 0;
+	}
 }
 
 void Creature::onCreatureAppear(const Creature* creature, bool isLogin)
@@ -255,7 +276,8 @@ void Creature::setAttackedCreature(Creature* creature)
 	}
 }
 
-BlockType_t Creature::blockHit(Creature* attacker, DamageType_t damageType, int32_t& damage)
+BlockType_t Creature::blockHit(Creature* attacker, DamageType_t damageType, int32_t& damage,
+	bool checkDefense /* = false */, bool checkArmor /* = false */)
 {
 	if(attacker){
 		attacker->onAttackedCreature(this);
@@ -266,7 +288,8 @@ BlockType_t Creature::blockHit(Creature* attacker, DamageType_t damageType, int3
 		return BLOCK_IMMUNITY;
 	}
 
-	if(internalDefense && damageType == DAMAGE_PHYSICAL){
+	//if(internalDefense && damageType == DAMAGE_PHYSICAL){
+	if(internalDefense && checkDefense){
 		internalDefense = false;
 		int32_t defense = getDefense();
 
@@ -278,7 +301,8 @@ BlockType_t Creature::blockHit(Creature* attacker, DamageType_t damageType, int3
 		}
 	}
 	
-	if(internalArmor && (damageType == DAMAGE_PHYSICAL || damageType == DAMAGE_PHYSICALPROJECTILE)){
+	//if(internalArmor && (damageType == DAMAGE_PHYSICAL || damageType == DAMAGE_PHYSICALPROJECTILE)){
+	if(internalArmor && checkArmor){
 		internalArmor = false;
 		int32_t armor = getArmor();
 
@@ -454,18 +478,19 @@ void Creature::removeCondition(ConditionType_t type)
 void Creature::executeConditions(int32_t newticks)
 {
 	for(ConditionList::iterator it = conditions.begin(); it != conditions.end();){
-		if((*it)->reduceTicks(newticks)){
-			(*it)->executeCondition(this, newticks);
-			++it;
-		}
-		else{
+		(*it)->setTicks((*it)->getTicks() - newticks);
+		if((*it)->getTicks() <= 0){
 			ConditionType_t type = (*it)->getType();
-			
+
 			(*it)->endCondition(this, REASON_ENDTICKS);
 			delete *it;
 			it = conditions.erase(it);
-			
+
 			onEndCondition(type);
+		}
+		else{
+			(*it)->executeCondition(this, newticks);
+			++it;
 		}
 	}
 }

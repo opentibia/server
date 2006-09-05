@@ -253,6 +253,7 @@ public:
 
 	bool internalMonsterYell(Monster* monster, const std::string& text);
 
+	ReturnValue internalFollowCreature2(Creature* creature, const Creature* followCreature, uint32_t followDistance = 1);
 	bool internalFollowCreature(Player* player, const Creature* followCreature);
 
 	//Implementation of player invoked events
@@ -319,7 +320,8 @@ public:
 	void checkSpawns(int t);
 	void checkLight(int t);
 	
-	bool combatChangeHealth(DamageType_t damageType, Creature* attacker, Creature* target, int32_t healthChange);
+	bool combatChangeHealth(DamageType_t damageType, Creature* attacker, Creature* target,
+		int32_t healthChange, bool checkDefense = false, bool checkArmor = false);
 	bool combatChangeMana(Creature* attacker, Creature* target, int32_t manaChange);
 
 	//animation help functions

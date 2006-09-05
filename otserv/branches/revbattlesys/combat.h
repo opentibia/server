@@ -33,10 +33,10 @@ class Condition;
 class Creature;
 class Position;
 class Item;
-class CombatHealth;
-class CombatMana;
-class CombatCondition;
-class CombatField;
+//class CombatHealth;
+//class CombatMana;
+//class CombatCondition;
+//class CombatField;
 
 //for luascript callback
 class CombatCallBack : public CallBack{
@@ -46,43 +46,61 @@ public:
 
 class Combat{
 public:
-	Combat(uint8_t _impactEffect = NM_ME_NONE);
-	virtual ~Combat() = 0;
+	Combat(CombatType_t _type);
+	~Combat();
 
-	virtual CombatHealth* getCombatHealth() {return NULL;};
-	virtual const CombatHealth* getCombatHealth() const {return NULL;};
+	static bool doCombatHealth(Creature* attacker, DamageType_t damageType, Creature* target,
+		int32_t minChange, int32_t maxChange);
+	static void doCombatHealth(Creature* attacker, DamageType_t damageType, Creature* target,
+		int32_t minChange, int32_t maxChange, uint8_t effect,
+		const Condition* condition = NULL);
+	static void doCombatHealth(Creature* attacker, DamageType_t damageType, const Position& pos,
+		const AreaCombat* area, int32_t minChange, int32_t maxChange, uint8_t effect,
+		const Condition* condition = NULL);
 
-	virtual CombatMana* getCombatMana() {return NULL;};
-	virtual const CombatMana* getCombatMana() const {return NULL;};
+	static bool doCombatMana(Creature* attacker, Creature* target,
+		int32_t minChange, int32_t maxChange);
+	static void doCombatMana(Creature* attacker, Creature* target,
+		int32_t minChange, int32_t maxChange, uint8_t effect,
+		const Condition* condition = NULL);
+	static void doCombatMana(Creature* attacker, const Position& pos,
+		const AreaCombat* area, int32_t minChange, int32_t maxChange, uint8_t effect,
+		const Condition* condition = NULL);
 
-	virtual CombatCondition* getCombatCondition() {return NULL;};
-	virtual const CombatCondition* getCombatCondition() const {return NULL;};
+	static bool doCombatCondition(Creature* attacker, Creature* target,
+		const Condition* condition);
+	static void doCombatCondition(Creature* attacker, Creature* target,
+		const Condition* condition, uint8_t effect);
+	static void doCombatCondition(Creature* attacker, const Position& pos,
+		const AreaCombat* area, const Condition* condition, uint8_t effect);
 
-	virtual CombatField* getCombatField() {return NULL;};
-	virtual const CombatField* getCombatField() const {return NULL;};
+	static void getCombatArea(Creature* attacker, const Position& pos, const AreaCombat* area, std::list<Tile*>& list);
+	static bool canDoCombat(const Creature* attacker, const Tile* tile);
 
-	virtual void doCombat(Creature* attacker, Creature* target) const = 0;
-	virtual void doCombat(Creature* attacker, const Position& pos) const = 0;
+	void doCombat(Creature* attacker, Creature* target) const;
+	void doCombat(Creature* attacker, const Position& pos) const;
 
 	bool setCallback(CombatParam_t key);
 	CallBack* getCallback();
 
 	virtual bool setParam(CombatParam_t param, uint32_t value);
 	void setArea(const AreaCombat* _area);
+	void setCondition(const Condition* _condition);
 
 protected:
-	void getCombatArea(Creature* attacker, const Position& pos, std::list<Tile*>& list) const;
-	bool canDoCombat(const Creature* attacker, const Tile* tile) const;
 	void getMinMaxValues(Creature* creature, int32_t& min, int32_t& max) const;
 
-	void addImpactEffect(const Position& pos) const;
-
 	//configureable
+	CombatType_t combatType;
+	DamageType_t damageType;
+
 	AreaCombat* area;
+	Condition* condition;
 	CombatCallBack* callback;
 	uint8_t impactEffect;
 };
 
+/*
 class CombatHealth : public Combat{
 public:
 	CombatHealth(DamageType_t _damageType, uint8_t _impactEffect);
@@ -123,7 +141,9 @@ protected:
 	void internalCombat(Creature* attacker, const Position& pos, int32_t minChange, int32_t maxChange) const;
 	bool canDoCombat(const Creature* attacker, const Tile* tile) const;
 };
+*/
 
+/*
 class CombatCondition : public Combat{
 public:
 	CombatCondition(Condition* _condition, uint8_t _impactEffect);
@@ -133,11 +153,18 @@ public:
 	virtual CombatCondition* getCombatCondition() {return this;};
 	virtual const CombatCondition* getCombatCondition() const {return this;};
 
+	virtual void doCombat(Creature* attacker, Creature* target) const;
+	virtual void doCombat(Creature* attacker, const Position& pos) const;
+
 protected:
+	void internalDoCombat(Creature* attacker, Creature* target) const;
+
 	Condition* condition;
 	ConditionType_t removeType;
 };
+*/
 
+/*
 class MagicField;
 
 class CombatField : public Combat{
@@ -154,6 +181,7 @@ public:
 protected:
 	MagicField* field;
 };
+*/
 
 template <typename T>
 class Matrix

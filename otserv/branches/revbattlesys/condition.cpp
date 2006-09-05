@@ -26,11 +26,24 @@
 
 extern Game g_game;
 
-Condition::Condition() :
-  ticks(0),
-  conditionType(CONDITION_NONE)
+Condition::Condition(ConditionType_t _type, int32_t _ticks) :
+	conditionType(_type),
+  ticks(_ticks)
 {
 	//
+}
+
+bool Condition::setParam(ConditionParam_t param, int32_t value)
+{
+	switch(param){
+		case CONDITIONPARAM_TICKS:
+		{
+			ticks = value;
+			return true;
+		}
+	}
+
+	return false;
 }
 
 bool Condition::reduceTicks(int32_t interval)
@@ -57,7 +70,8 @@ Condition* Condition::createCondition(ConditionType_t _type, int32_t _ticks, int
 		case CONDITION_FIRE:
 		case CONDITION_ENERGY:
 		{
-			return new ConditionDamage(_type, _ticks, param);
+			//return new ConditionDamage(_type, _ticks, param);
+			return new ConditionDamage(_type);
 			break;
 		}
 
@@ -80,10 +94,7 @@ Condition* Condition::createCondition(ConditionType_t _type, int32_t _ticks, int
 
 		case CONDITION_OUTFIT:
 		{
-			//if param = 0 -> invisble
-			//elseif param <= 110 -> looktype = param
-			//else -> looktype = 0, looktype_ex = param >> 8
-			return new ConditionOutfit(_ticks, PLAYER_MALE_1, 0);
+			return new ConditionOutfit(_type, _ticks);
 		}
 
 		case CONDITION_LIGHT:
@@ -110,10 +121,10 @@ Condition* Condition::createCondition(ConditionType_t _type, int32_t _ticks, int
 	}
 }
 
-ConditionGeneric::ConditionGeneric(ConditionType_t _type, int32_t _ticks)
+ConditionGeneric::ConditionGeneric(ConditionType_t _type, int32_t _ticks) :
+Condition(_type, _ticks)
 {
-	conditionType = _type;
-	ticks = _ticks;
+	//
 }
 
 bool ConditionGeneric::startCondition(Creature* creature)
@@ -165,18 +176,35 @@ uint8_t ConditionGeneric::getIcons() const
 	return 0;
 }
 
-ConditionDamage::ConditionDamage(ConditionType_t _type, int32_t _ticks, int32_t _owner)
+//ConditionDamage::ConditionDamage(ConditionType_t _type, int32_t _ticks, int32_t _owner)
+ConditionDamage::ConditionDamage(ConditionType_t _type) :
+Condition(_type, 0)
 {
-	conditionType = _type;
-	owner = _owner;
-	ticks = _ticks;
+	owner = 0;
+}
 
-	damageList.push_back(DamagePair(1000, -200));
-	damageList.push_back(DamagePair(5000, -100));
-	damageList.push_back(DamagePair(4000, -90));
-	damageList.push_back(DamagePair(3000, -80));
-	damageList.push_back(DamagePair(2000, -70));
-	damageList.push_back(DamagePair(1000, -60));
+bool ConditionDamage::setParam(ConditionParam_t param, int32_t value)
+{
+	bool ret = Condition::setParam(param, value);
+
+	switch(param){
+		case CONDITIONPARAM_OWNER:
+		{
+			owner = value;
+			return true;
+		}
+	}
+
+	return ret;
+}
+
+void ConditionDamage::addDamage(uint32_t rounds, uint32_t time, int32_t value)
+{
+	//rounds, time, damage
+	for(int i = 0; i < rounds; ++i){
+		damageList.push_back(DamagePair(time, value));
+		ticks += time;
+	}
 }
 
 bool ConditionDamage::startCondition(Creature* creature)
@@ -287,10 +315,9 @@ uint8_t ConditionDamage::getIcons() const
 	return 0;
 }
 
-ConditionSpeed::ConditionSpeed(ConditionType_t _type, int32_t _ticks, int32_t changeSpeed)
+ConditionSpeed::ConditionSpeed(ConditionType_t _type, int32_t _ticks, int32_t changeSpeed) :
+Condition(_type, _ticks)
 {
-	conditionType = _type;
-	ticks = _ticks;
 	speedDelta = changeSpeed;
 }
 
@@ -343,11 +370,12 @@ uint8_t ConditionSpeed::getIcons() const
 	return 0;
 }
 
-ConditionOutfit::ConditionOutfit(int32_t _ticks, uint8_t _lookType, uint16_t _lookTypeEx,
-	uint8_t _lookHead /*= 0*/, uint8_t _lookBody /*= 0*/, uint8_t _lookLegs /*= 0*/, uint8_t _lookFeet /*= 0*/)
+//ConditionOutfit::ConditionOutfit(int32_t _ticks, uint8_t _lookType, uint16_t _lookTypeEx,
+//	uint8_t _lookHead /*= 0*/, uint8_t _lookBody /*= 0*/, uint8_t _lookLegs /*= 0*/, uint8_t _lookFeet /*= 0*/)
+ConditionOutfit::ConditionOutfit(ConditionType_t _type, int32_t _ticks) :
+Condition(_type, _ticks)
 {
-	conditionType = CONDITION_OUTFIT;
-	ticks = _ticks;
+	/*
 	lookType = _lookType;
 	lookTypeEx = _lookTypeEx;
 
@@ -355,6 +383,39 @@ ConditionOutfit::ConditionOutfit(int32_t _ticks, uint8_t _lookType, uint16_t _lo
 	lookBody = _lookBody;
 	lookLegs = _lookLegs;
 	lookFeet = _lookFeet;
+	*/
+}
+
+/*
+bool ConditionOutfit::setParam(ConditionParam_t param, int32_t value)
+{
+	bool ret = Condition::setParam(param, value);
+
+	switch(param){
+		case CONDITIONPARAM_OUTFIT:
+		{
+			//
+			return true;
+		}
+	}
+
+	return ret;
+}
+*/
+
+void ConditionOutfit::addOutfit(uint32_t lookTypeEx, uint32_t lookType, uint32_t lookHead,
+	uint32_t lookBody, uint32_t lookLegs, uint32_t lookFeet)
+{
+	Outfit_t outfit = {0, 0, 0, 0, 0, 0};
+
+	outfit.lookTypeEx = lookTypeEx;
+	outfit.lookType = lookType;
+	outfit.lookHead = lookHead;
+	outfit.lookBody = lookBody;
+	outfit.lookLegs = lookLegs;
+	outfit.lookFeet = lookFeet;
+
+	outfits.push_back(outfit);
 }
 
 bool ConditionOutfit::startCondition(Creature* creature)
@@ -366,13 +427,24 @@ bool ConditionOutfit::startCondition(Creature* creature)
 	prevLookLegs = creature->getLookLegs();
 	prevLookFeet = creature->getLookFeet();
 
-	g_game.changeOutfit(creature, lookType, lookTypeEx, lookHead, lookBody, lookLegs, lookFeet);
+	changeOutfit(creature);
+	//g_game.changeOutfit(creature, lookType, lookTypeEx, lookHead, lookBody, lookLegs, lookFeet);
 	return true;
 }
 
 void ConditionOutfit::executeCondition(Creature* creature, int32_t interval)
 {
 	//
+}
+
+void ConditionOutfit::changeOutfit(Creature* creature, int32_t index /*= -1*/)
+{
+	if(index == -1){
+		index = random_range(0, outfits.size() - 1);
+	}
+
+	Outfit_t outfit = outfits[index];
+	g_game.changeOutfit(creature, outfit.lookType, outfit.lookTypeEx, outfit.lookHead, outfit.lookBody, outfit.lookLegs, outfit.lookFeet);	
 }
 
 void ConditionOutfit::endCondition(Creature* creature, EndCondition_t reason)
@@ -388,12 +460,17 @@ void ConditionOutfit::addCondition(Creature* creature, const Condition* addCondi
 		}
 
 		ConditionOutfit conditionOutfit = static_cast<const ConditionOutfit&>(*addCondition);
+		outfits = conditionOutfit.outfits;
+
+		changeOutfit(creature);
+		/*
 		if(conditionOutfit.lookType != lookType){
 			lookType = conditionOutfit.lookType;
 			lookTypeEx = conditionOutfit.lookTypeEx;
 			
 			g_game.changeOutfit(creature, lookType, lookTypeEx);
 		}
+		*/
 	}
 }
 

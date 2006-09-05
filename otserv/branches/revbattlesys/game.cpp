@@ -2635,7 +2635,7 @@ void Game::changeLight(const Creature* creature)
 }
 
 bool Game::combatChangeHealth(DamageType_t damageType, Creature* attacker, Creature* target,
-	int32_t healthChange)
+	int32_t healthChange, bool checkDefense /* = false */, bool checkArmor /* = false */)
 {
 	const Position& targetPos = target->getPosition();
 
@@ -2664,7 +2664,7 @@ bool Game::combatChangeHealth(DamageType_t damageType, Creature* attacker, Creat
 			}
 		}
 
-		BlockType_t blockType = target->blockHit(attacker, damageType, damage);
+		BlockType_t blockType = target->blockHit(attacker, damageType, damage, checkDefense, checkArmor);
 
 		if(blockType == BLOCK_DEFENSE){
 			addMagicEffect(list, targetPos, NM_ME_PUFF);
@@ -2726,8 +2726,8 @@ bool Game::combatChangeHealth(DamageType_t damageType, Creature* attacker, Creat
 
 				switch(damageType){
 					case DAMAGE_PHYSICAL:
-					case DAMAGE_SUDDENDEATH:
-					case DAMAGE_PHYSICALPROJECTILE:
+					//case DAMAGE_SUDDENDEATH:
+					//case DAMAGE_PHYSICALPROJECTILE:
 					{
 						Item* splash = NULL;
 						switch(target->getRace()){

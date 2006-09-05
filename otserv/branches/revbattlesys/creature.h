@@ -185,7 +185,8 @@ public:
 	//combat functions
 	Creature* getAttackedCreature() { return attackedCreature; }
 	virtual void setAttackedCreature(Creature* creature);
-	virtual BlockType_t blockHit(Creature* attacker, DamageType_t damageType, int32_t& damage);
+	virtual BlockType_t blockHit(Creature* attacker, DamageType_t damageType, int32_t& damage,
+		bool checkDefense = false, bool checkArmor = false);
 	virtual void doAttacking() {};
 
 	void setMaster(Creature* creature);
@@ -235,6 +236,9 @@ public:
 	virtual void onThink(uint32_t interval);
 	virtual void onWalk();
 	virtual bool getNextStep(Direction& dir);
+	void addWalk(std::list<Direction>& listDir);
+	void addWalkEvent();
+	void stopWalkEvent();
 
 	virtual void onAddTileItem(const Position& pos, const Item* item) {};
 	virtual void onUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* oldItem, const Item* newItem) {};

@@ -42,6 +42,7 @@ class Item;
 class Container;
 class AreaCombat;
 class Combat;
+class Condition;
 
 class LuaScript
 {
@@ -110,11 +111,16 @@ public:
 	const Combat* getCombatObject(uint32_t combatId) const;
 	Combat* getCombatObject(uint32_t combatId);
 
+	uint32_t addConditionObject(Condition* condition);
+	const Condition* getConditionObject(uint32_t conditionId) const;
+	Condition* getConditionObject(uint32_t conditionId);
+
 private:
 	typedef std::map<long, Thing*> ThingMap;
 	typedef std::map<unsigned long,long> StorageMap;
 	typedef std::map<uint32_t, AreaCombat*> AreaMap;
 	typedef std::map<uint32_t, Combat*> CombatMap;
+	typedef std::map<uint32_t, Condition*> ConditionMap;
 
 	//script file id
 	long m_scriptId;
@@ -139,6 +145,11 @@ private:
 	//combat map
 	uint32_t m_lastCombatId;
 	static CombatMap m_combatMap;
+
+	//condition map
+	uint32_t m_lastConditionId;
+	static ConditionMap m_conditionMap;
+	
 };
 
 class Position;
@@ -172,6 +183,7 @@ enum ErrorCode_t{
 	LUA_ERROR_TILE_NOT_FOUND,
 	LUA_ERROR_HOUSE_NOT_FOUND,
 	LUA_ERROR_COMBAT_NOT_FOUND,
+	LUA_ERROR_CONDITION_NOT_FOUND,
 	LUA_ERROR_AREA_NOT_FOUND,
 	LUA_ERROR_CONTAINER_NOT_FOUND,
 };
@@ -320,20 +332,25 @@ protected:
 	static int luaDoAddContainerItem(lua_State *L);
 
 	//
+	static int luaCreateCombatObject(lua_State *L);
 	static int luaCreateCombatArea(lua_State *L);
 	static int luaSetCombatArea(lua_State *L);
+	static int luaSetCombatCondition(lua_State *L);
 	static int luaSetCombatParam(lua_State *L);
-	static int luaSetCombatCallBack(lua_State *L);
+	static int luaCreateConditionObject(lua_State *L);
+	static int luaSetConditionParam(lua_State *L);
+	static int luaAddDamageCondition(lua_State *L);
+	static int luaAddOutfitCondition(lua_State *L);
 
+	static int luaSetCombatCallBack(lua_State *L);
+	//
 	static int luaDoAreaCombat(lua_State *L);
 	static int luaDoTargetCombat(lua_State *L);
 
-	static int luaCreateCombatHealthObject(lua_State *L);
 	static int luaDoAreaCombatHealth(lua_State *L);
 	static int luaDoTargetCombatHealth(lua_State *L);
 
 	//
-	static int luaCreateCombatManaObject(lua_State *L);
 	static int luaDoAreaCombatMana(lua_State *L);
 	static int luaDoTargetCombatMana(lua_State *L);
 
