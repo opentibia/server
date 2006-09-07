@@ -22,6 +22,7 @@
 #define __OTSERV_ITEMLOADER_H__
 
 #include "fileloader.h"
+#include "definitions.h"
 
 typedef unsigned char attribute_t;
 typedef unsigned short datasize_t;

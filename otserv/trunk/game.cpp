@@ -975,16 +975,16 @@ void Game::thingMove(Player* player, const Position& fromPos, uint16_t itemId, u
 		player->sendCancelMessage(RET_NOTPOSSIBLE);
 }
 
-void Game::moveCreature(unsigned long playerID, Position playerPos, unsigned long movingCreatureID, Position toPos)
+void Game::moveCreature(unsigned long playerID, const Position& playerPos, unsigned long movingCreatureID, const Position& toPos)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::creatureMove()");
-	
+
 	Player* player = getPlayerByID(playerID);
 	Creature* movingCreature = getCreatureByID(movingCreatureID);
 	
 	if(!player || player->isRemoved() || !movingCreature || movingCreature->isRemoved())
 		return;
-	
+
 	if(player->getPosition() != playerPos)
 		return;
 	

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////
-// OTItemEditor
+// OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
 // 
 //////////////////////////////////////////////////////////////////////
@@ -465,7 +465,7 @@ long FileLoader::loadCacheBlock(unsigned long pos)
 	}
 	if(loading_cache == -1){
 		for(i = 0; i < CACHE_BLOCKS; i++){
-			if(abs(m_cached_data[i].base - base_pos) > 2*m_cache_size){
+			if(std::abs(((int32_t)(m_cached_data[i].base)) - base_pos) > 2*m_cache_size){
 				loading_cache = i;
 				break;
 			}
