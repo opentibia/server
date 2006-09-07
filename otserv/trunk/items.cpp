@@ -670,15 +670,7 @@ int Items::getItemIdByName(const std::string& name)
 
 int Items::reverseLookUp(int id)
 {
-	/*ReverseItemMap::iterator it = revItems.find(id);
-	if(it != revItems.end()){
-		return it->second;
-	}
-	else{
-		return 0;
-	}
-	*/
-	long v = revItems.getElement(id);
+	return revItems.getElement(id);
 }
 
 template<typename A> 
