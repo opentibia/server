@@ -223,37 +223,39 @@ void Map::setTile(uint16_t _x, uint16_t _y, uint8_t _z, Tile* newtile)
 bool Map::placeCreature(const Position& pos, Creature* creature, bool forceLogin /*=false*/)
 {
 	Tile* tile = getTile(pos.x, pos.y, pos.z);
-	
-	bool placeInPZ = false;
-	if(tile){
-		placeInPZ = tile->isPz();
-		ReturnValue ret = tile->__queryAdd(0, creature, 1, 0);
 
-		if(forceLogin || ret == RET_NOERROR){
-			tile->__internalAddThing(creature);
-			return true;
-		}
-		else if(tile->hasFlag(TILESTATE_HOUSE) && ret == RET_PLAYERISNOTINVITED){
-			int32_t index = 0;
-			Item* toItem = NULL;
-			uint32_t flags = 0;
-			Cylinder* cylinder = tile->__queryDestination(index, creature, &toItem, flags);
-			cylinder->__internalAddThing(creature);
-			return true;
+	bool foundTile = false;
+	bool placeInPZ = false;
+
+	if(tile){
+		placeInPZ = tile->isPz();		
+
+		ReturnValue ret = tile->__queryAdd(0, creature, 1, 0);
+		if(forceLogin || ret == RET_NOERROR || ret == RET_PLAYERISNOTINVITED){
+			foundTile = true;
 		}
 	}
 
-	for(int cx = pos.x - 1; cx <= pos.x + 1; cx++){
-		for(int cy = pos.y - 1; cy <= pos.y + 1; cy++){
+	for(int cx = pos.x - 1; cx <= pos.x + 1 && !foundTile; cx++){
+		for(int cy = pos.y - 1; cy <= pos.y + 1 && !foundTile; cy++){
 			tile = getTile(cx, cy, pos.z);
 			if(!tile || (placeInPZ && !tile->isPz()))
 				continue;
 
 			if(tile->__queryAdd(0, creature, 1, 0) == RET_NOERROR){
-				tile->__internalAddThing(creature);
-				return true;
+				foundTile = true;
+				break;
 			}
 		}
+	}
+
+	if(foundTile){
+		int32_t index = 0;
+		Item* toItem = NULL;
+		uint32_t flags = 0;
+		Cylinder* toCylinder = tile->__queryDestination(index, creature, &toItem, flags);
+		toCylinder->__internalAddThing(creature);
+		return true;
 	}
 
 #ifdef __DEBUG__
