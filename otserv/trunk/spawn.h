@@ -85,9 +85,6 @@ public:
 
 	bool addSpawn(Spawn* spawn);
 	bool loadSpawnsXML(std::string filename);
-#if defined ENABLESQLMAPSUPPORT
-	bool loadSpawnsSQL(std::string identifier);
-#endif
 	bool startup();
 
 	void checkSpawns(int t);

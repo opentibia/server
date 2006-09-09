@@ -31,10 +31,6 @@
 
 #include "iomap.h"
 
-#ifdef ENABLESQLMAPSUPPORT	
-#include "iomapsql.h"
-#endif
-//#include "iomapbin.h"
 #include "iomapxml.h"
 #include "iomapotbm.h"
 #include "iomapserialize.h"
@@ -70,21 +66,12 @@ bool Map::loadMap(const std::string& identifier, const std::string& type)
 {
 	IOMap* loader;
 
-	/*if(type == "BIN"){
-		loader = new IOMapBin();
-		ret = SPAWN_BUILTIN;
-	}
-	else */if(type == "XML"){
+	if(type == "XML"){
 		loader = new IOMapXML();
 	}
 	else if(type == "OTBM"){
 		loader = new IOMapOTBM();
 	}
-	#ifdef ENABLESQLMAPSUPPORT
-	else if(type == "SQL"){
-		loader = new IOMapSQL();
-	}
-#endif
 	else{
 		std::cout << "FATAL: Could not determine the map format!" << std::endl;
 		std::cin.get();
