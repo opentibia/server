@@ -240,7 +240,7 @@ public:
 	unsigned long attackedCreature2;
 	//Creature* attackedCreature;
 
-	int lookhead, lookbody, looklegs, lookfeet, looktype, lookcorpse, lookmaster;
+	int lookhead, lookbody, looklegs, lookfeet, looktype, lookcorpse, lookmaster, lookaddons;
 	long manaShieldTicks, hasteTicks, paralyzeTicks;
 	Position masterPos;
 	uint64_t lastmove;

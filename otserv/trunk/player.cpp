@@ -17,7 +17,7 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
-
+#include "otpch.h"
 
 #include "definitions.h"
 
@@ -783,7 +783,26 @@ Item* Player::GetDistWeapon() const
 
 void Player::addStorageValue(const unsigned long key, const long value)
 {
-	storageMap[key] = value;
+	if(IS_IN_KEYRANGE(key, RESERVED_RANGE)){
+		if(IS_IN_KEYRANGE(key, OUTFITS_RANGE)){
+			Outfit outfit;
+			outfit.looktype = value >> 16;
+			outfit.addons = value & 0xFF;
+			if(outfit.addons > 3){
+				std::cout << "Warning: No valid addons value key:" << key << " value: " << (int)(value & 0xFF) << " player: " << getName() << std::endl;
+			}
+			else{
+				m_playerOutfits.addOutfit(outfit);
+			}
+		}
+		else{
+			//warning
+			std::cout << "Warning: unknown reserved key: " << key << " player: " << getName() << std::endl;
+		}
+	}
+	else{
+		storageMap[key] = value;
+	}
 }
 
 bool Player::getStorageValue(unsigned long key, long &value) const
@@ -2631,3 +2650,23 @@ void Player::checkRedSkullTicks(long ticks)
 	}
 }
 #endif
+
+const OutfitListType& Player::getPlayerOutfits()
+{
+	return m_playerOutfits.getOutfits();
+}
+
+
+bool Player::canWear(uint32_t _looktype, uint32_t _addons)
+{
+	if(m_playerOutfits.isInList(_looktype, _addons)){
+		return true;
+	}
+	Outfits* outfits = Outfits::getInstance();
+	const OutfitList& global_outfits = outfits->getOutfitList(getSex());
+	if(global_outfits.isInList(_looktype, _addons)){
+		return true;
+	}
+	
+	return false;
+}

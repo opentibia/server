@@ -17,6 +17,7 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
+#include "otpch.h"
 
 #include "status.h"
 #include <libxml/xmlmemory.h>
@@ -37,8 +38,8 @@ extern Game g_game;
 
 Status* Status::_Status = NULL;
 
-//#define STATUS_SERVER_VERSION "0.5.0_CVS"
-#define STATUS_SERVER_VERSION "0.5.0"
+#define STATUS_SERVER_VERSION "0.6.0_CVS"
+//#define STATUS_SERVER_VERSION "0.6.0"
 #define STATUS_SERVER_NAME "otserv"
 #define STATUS_CLIENT_VERISON "7.8x"
 

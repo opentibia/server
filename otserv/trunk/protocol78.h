@@ -41,7 +41,7 @@ public:
 	void WriteBuffer(NetworkMessage &add);
 	virtual void reinitializeProtocol(SOCKET s);
 	
-	virtual void setKey(const unsigned long* key);
+	virtual void setKey(const uint32_t* key);
 	
 	virtual bool CanSee(int x, int y, int z) const;
 	virtual bool CanSee(const Creature*) const;
@@ -249,7 +249,7 @@ protected:
 	House* house;
 	unsigned long listId;
 	
-	unsigned long m_key[4];
+	uint32_t m_key[4];
 	
 	friend OTSYS_THREAD_RETURN ConnectionHandler(void *dat);
 };

@@ -65,7 +65,7 @@ ip = "127.0.0.1"
 
 -- motd
 -- The messagebox you sometimes get before you choose characters
-motd = "Welcome to OpenTibia 0.5.0"
+motd = "Welcome to OpenTibia 0.6.0"
 motdnum="1"
 
 -- use md5 passwords for accounts, yes/no

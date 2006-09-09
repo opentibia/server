@@ -17,7 +17,7 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
-
+#include "otpch.h"
 
 #include "definitions.h"
 
@@ -853,6 +853,7 @@ void Protocol78::parseTurnWest(NetworkMessage& msg)
 
 void Protocol78::parseRequestOutfit(NetworkMessage& msg)
 {
+	OTSYS_THREAD_LOCK_CLASS lockClass(game->gameLock, "Protocol78::parseRequestOutfit()");
 	msg.Reset();
 	
 	msg.AddByte(0xC8);
@@ -861,46 +862,57 @@ void Protocol78::parseRequestOutfit(NetworkMessage& msg)
 	msg.AddByte(player->lookbody); //primary
 	msg.AddByte(player->looklegs); //secondary
 	msg.AddByte(player->lookfeet); //detail
-	msg.AddByte(0); //addons
+	msg.AddByte(player->lookaddons);
 	
 	int first_outfit, last_outfit;
-	switch (player->getSex()){
-	case PLAYERSEX_FEMALE:
-		first_outfit = PLAYER_FEMALE_1;
-		last_outfit = PLAYER_FEMALE_7;
-		break;
-	case PLAYERSEX_MALE:
-		first_outfit = PLAYER_MALE_1;
-		last_outfit = PLAYER_MALE_7;
-		break;
-	default:
-		first_outfit = PLAYER_MALE_1;
-		last_outfit = PLAYER_MALE_7;
-		break;
-	}
-	msg.AddByte(last_outfit - first_outfit + 1); //number of outfits
+	uint32_t type = player->getSex();
 	
-	for(int i = first_outfit; i <= last_outfit; ++i){
-		msg.AddU16(i);
-		msg.AddByte(0); //addons
+	Outfits* outfits = Outfits::getInstance();
+	const OutfitListType& global_outfits = outfits->getOutfits(type);
+	const OutfitListType& player_outfits = player->getPlayerOutfits();
+	long count_global = global_outfits.size();
+	long count_player = player_outfits.size();
+	
+	if(count_global + count_player > 16){
+		msg.AddByte(16);
 	}
+	else{
+		msg.AddByte(count_global + count_player);
+	}
+	
+	long counter = 0;
+	OutfitListType::const_iterator it;
+	
+	for(it = global_outfits.begin(); it != global_outfits.end() && (counter <= 16); ++it, ++counter){
+		msg.AddU16((*it)->looktype);
+		msg.AddByte((*it)->addons);
+	}
+	
+	for(it = player_outfits.begin(); it != player_outfits.end() && (counter <= 16); ++it, ++counter){
+		msg.AddU16((*it)->looktype);
+		msg.AddByte((*it)->addons);
+	}
+		
 	WriteBuffer(msg);
 }
 
 void Protocol78::parseSetOutfit(NetworkMessage& msg)
 {
-	int temp = msg.GetU16();
-	if ( (player->getSex() == PLAYERSEX_FEMALE && temp >= PLAYER_FEMALE_1 && temp <= PLAYER_FEMALE_7) ||
-		(player->getSex() == PLAYERSEX_MALE && temp >= PLAYER_MALE_1 && temp <= PLAYER_MALE_7))
-	{
-		player->looktype = temp;
+	int looktype = msg.GetU16();
+	int lookhead = msg.GetByte();
+	int lookbody = msg.GetByte();
+	int looklegs = msg.GetByte();
+	int lookfeet = msg.GetByte();
+	int lookaddons = msg.GetByte();
+	
+	if(player->canWear(looktype, lookaddons)){
 		player->lookmaster = player->looktype;
-		player->lookhead = msg.GetByte();
-		player->lookbody = msg.GetByte();
-		player->looklegs = msg.GetByte();
-		player->lookfeet = msg.GetByte();
-		
-		msg.GetByte(); //addons
+		player->looktype = looktype;
+		player->lookhead = lookhead;
+		player->lookbody = lookbody;
+		player->looklegs = looklegs;
+		player->lookfeet = lookfeet;
+		player->lookaddons = lookaddons;
 		
 		game->playerChangeOutfit(player);
 	}
@@ -1198,8 +1210,7 @@ void Protocol78::sendSetOutfit(const Creature* creature)
 		newmsg.AddByte(creature->lookbody);
 		newmsg.AddByte(creature->looklegs);
 		newmsg.AddByte(creature->lookfeet);
-		
-		newmsg.AddByte(0); //addons
+		newmsg.AddByte(creature->lookaddons);
 		
 		WriteBuffer(newmsg);
 	}
@@ -1928,7 +1939,7 @@ void Protocol78::AddCreature(NetworkMessage &msg,const Creature *creature, bool 
 	msg.AddByte(creature->lookbody);
 	msg.AddByte(creature->looklegs);
 	msg.AddByte(creature->lookfeet);
-	msg.AddByte(0); //addons
+	msg.AddByte(creature->lookaddons);
 	
 	LightInfo lightInfo;
 	creature->getCreatureLight(lightInfo);
@@ -2267,7 +2278,7 @@ void Protocol78::WriteBuffer(NetworkMessage& add)
 	return;
 }
 
-void Protocol78::setKey(const unsigned long* key)
+void Protocol78::setKey(const uint32_t* key)
 {
 	memcpy(m_key, key, 16);
 	OutputBuffer.setEncryptionState(true);

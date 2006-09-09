@@ -263,5 +263,14 @@ enum item_t {
 	ITEM_DOCUMENT_RO      = 1968, //read-only
 };
 
+//Reserved player storage key ranges
+//[10000000 - 20000000]
+#define PSTRG_RESERVED_RANGE_START  10000000
+#define PSTRG_RESERVED_RANGE_SIZE   10000000
+//[1000 - 1500]
+#define PSTRG_OUTFITS_RANGE_START   PSTRG_RESERVED_RANGE_START + 1000
+#define PSTRG_OUTFITS_RANGE_SIZE    500
+	
+#define IS_IN_KEYRANGE(key, range) (key >= PSTRG_##range##_START && (key - PSTRG_##range##_START) < PSTRG_##range##_SIZE)
 
 #endif

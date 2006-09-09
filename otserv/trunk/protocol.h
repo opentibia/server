@@ -45,7 +45,7 @@ public:
 	virtual ~Protocol();
 	
 	void setPlayer(Player* p);
-	virtual void setKey(const unsigned long* key) = 0;
+	virtual void setKey(const uint32_t* key) = 0;
 	unsigned long getIP() const;
 	
 	virtual bool CanSee(int x, int y, int z) const = 0;

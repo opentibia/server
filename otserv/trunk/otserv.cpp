@@ -17,7 +17,7 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
-
+#include "otpch.h"
 
 #include "definitions.h"
 
@@ -42,6 +42,7 @@
 #include "monsters.h"
 #include "actions.h"
 #include "commands.h"
+#include "outfit.h"
 
 #include "configmanager.h"
 #include "account.h"
@@ -173,7 +174,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 				msg.WriteToSocket(s);
 			}
 			else if(msg.RSA_decrypt()){
-				unsigned long k[4];
+				uint32_t k[4];
 				k[0] = msg.GetU32();
 				k[1] = msg.GetU32();
 				k[2] = msg.GetU32();
@@ -202,7 +203,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 					sockaddr_in sain;
 					socklen_t salen = sizeof(sockaddr_in);
 					if(getpeername(s, (sockaddr*)&sain, &salen) == 0){
-						unsigned long clientip = *(unsigned long*)&sain.sin_addr;
+						uint32_t clientip = *(uint32_t*)&sain.sin_addr;
 						for(unsigned int i = 0; i < serverIPs.size(); i++)
 							if((serverIPs[i].first & serverIPs[i].second) == (clientip & serverIPs[i].second)){
 								serverip = serverIPs[i].first;
@@ -267,7 +268,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 			unsigned short version  = msg.GetU16();
 
 			if(msg.RSA_decrypt()){
-				unsigned long k[4];
+				uint32_t k[4];
 				k[0] = msg.GetU32();
 				k[1] = msg.GetU32();
 				k[2] = msg.GetU32();
@@ -493,9 +494,10 @@ int main(int argc, char *argv[])
 		std::cout << "Heap Error" << std::endl;
 	}
 #endif
-	//std::cout << ":: OTServ Development-Version 0.5.0 - CVS Preview" << std::endl;
-	std::cout << ":: OTServ Version 0.5.0" << std::endl;
-	std::cout << ":: ====================" << std::endl;
+	std::cout << ":: OTServ Development-Version 0.6.0 - CVS Preview" << std::endl;
+	std::cout << ":: ==============================================" << std::endl;
+	//std::cout << ":: OTServ Version 0.6.0" << std::endl;
+	//std::cout << ":: ====================" << std::endl;
 	std::cout << "::" << std::endl;
 #if defined __DEBUG__MOVESYS__ || defined __DEBUG_HOUSES__ || defined __DEBUG_MAILBOX__
 	std::cout << ":: Debugging:";
@@ -631,6 +633,20 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 	std::cout << "[done]" << std::endl;
+	
+	// load outfits data
+	filename.str("");
+	filename << g_config.getString(ConfigManager::DATA_DIRECTORY) << "/outfits.xml";
+	std::cout << ":: Loading " << filename.str() << "... ";
+	Outfits* outfits = Outfits::getInstance();
+	if(!outfits->loadFromXml(g_config.getString(ConfigManager::DATA_DIRECTORY))){
+		std::stringstream errormsg;
+		errormsg << "Unable to load " << filename.str() << "!";
+		ErrorMessage(errormsg.str().c_str());
+		return -1;
+	}
+	std::cout << "[done]" << std::endl;
+	
 
 	std::string worldType = g_config.getString(ConfigManager::WORLD_TYPE);
 	std::transform(worldType.begin(), worldType.end(), worldType.begin(), upchar);

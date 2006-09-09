@@ -17,6 +17,7 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
+#include "otpch.h"
 
 #include "definitions.h"
 #include "const78.h"
@@ -1523,6 +1524,11 @@ int ActionScript::luaActionSetPlayerStorageValue(lua_State *L)
 	long value = (unsigned int)internalGetNumber(L);
 	unsigned long key = (unsigned int)internalGetNumber(L);
 	unsigned int cid = (unsigned int)internalGetNumber(L);
+	if(IS_IN_KEYRANGE(key, RESERVED_RANGE)){
+		lua_pushnumber(L, -1);
+		std::cout << "SetPlayerStorageValue: Accesing to reserverd range: " << key << std::endl;
+		return 1;
+	}
 	
 	ActionScript *action = getActionScript(L);
 	

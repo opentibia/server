@@ -26,6 +26,7 @@
 #include "container.h"
 #include "depot.h"
 #include "cylinder.h"
+#include "outfit.h"
 
 #include <vector>
 #include <ctime>
@@ -149,7 +150,7 @@ public:
 	int getHealth() const {return health;}
 	int getMana() const {return mana;}
 	int getMagicLevel() const {return maglevel;}
-	playersex_t getSex() {return sex;}
+	playersex_t getSex() const {return sex;}
 	bool gainManaTick();
 	bool gainHealthTick();
 	
@@ -286,7 +287,10 @@ public:
 	void setSkull(skulls_t new_skull);
 	void sendCreatureSkull(const Creature* creature) const;
 	void checkRedSkullTicks(long ticks);
-	#endif
+#endif
+	
+	const OutfitListType& getPlayerOutfits();
+	bool canWear(uint32_t _looktype, uint32_t _addons);
 	
 	//tile
 	//send methods
@@ -466,6 +470,8 @@ protected:
 	
 	StorageMap storageMap;
 	LightInfo itemsLight;
+	
+	OutfitList m_playerOutfits;
 	
 	#ifdef __SKULLSYSTEM__
 	int64_t redSkullTicks;

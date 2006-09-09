@@ -64,10 +64,10 @@ public:
 	bool isFluidContainer() const;
 	bool isRune() const;
 
-	unsigned short id;
-	unsigned short clientId;
+	uint16_t id;
+	uint16_t clientId;
 
-	unsigned short maxItems;    // maximum size if this is a container
+	uint16_t       maxItems;    // maximum size if this is a container
 	double         weight;      // weight of the item, e.g. throwing distance depends on it
 	std::string    name;        // the name of the item
 	std::string    description; // additional description... as in "The blade is a magic flame." for fireswords
@@ -77,9 +77,9 @@ public:
 	int            attack;
 	int            defence;
 	int            armor;
-	unsigned short slot_position;
-	unsigned short decayTo;
-	unsigned short decayTime;
+	uint16_t       slot_position;
+	uint16_t       decayTo;
+	uint16_t       decayTime;
 	bool           canDecay;
 	bool           isVertical;
 	bool           isHorizontal;
@@ -97,7 +97,7 @@ public:
 	bool            useable;
 	bool            moveable;
 	bool            alwaysOnTop;
-	unsigned char   alwaysOnTopOrder;
+	int             alwaysOnTopOrder;
 	int             runeMagLevel;
 	bool            pickupable;
 	bool            rotable;
@@ -154,11 +154,6 @@ public:
 	void addItemType(ItemType* iType);
 	
 protected:
-	//typedef OTSERV_HASH_MAP<unsigned short, ItemType*> ItemMap;
-	//typedef OTSERV_HASH_MAP<unsigned long, unsigned long> ReverseItemMap;
-
-	//ItemMap items;
-	//static ReverseItemMap revItems;
 	
 	Array<ItemType*> items;
 	Array<long> revItems;

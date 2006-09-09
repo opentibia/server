@@ -17,7 +17,7 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
-
+#include "otpch.h"
 
 #include "items.h"
 #include "spells.h"
@@ -590,8 +590,11 @@ int Items::loadFromOtb(std::string file)
 				if(datalen != sizeof(uint8_t))
 					return ERROR_INVALID_FORMAT;
 				
-				if(!props.GET_UCHAR(iType->alwaysOnTopOrder))
+				uint8_t v;
+				if(!props.GET_UCHAR(v))
 					return ERROR_INVALID_FORMAT;
+					
+				iType->alwaysOnTopOrder = v;
 				break;
 			}
 			default:

@@ -17,6 +17,7 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
+#include "otpch.h"
 
 #include <string>
 #include <iostream>
@@ -186,29 +187,28 @@ bool NetworkMessage::WriteToSocket(SOCKET socket)
 /******************************************************************************/
 
 
-unsigned char NetworkMessage::GetByte()
+uint8_t NetworkMessage::GetByte()
 {
 	return m_MsgBuf[m_ReadPos++];
 }
 
 
-unsigned short NetworkMessage::GetU16()
+uint16_t NetworkMessage::GetU16()
 {
-	unsigned short v = ((m_MsgBuf[m_ReadPos]) | (m_MsgBuf[m_ReadPos+1] << 8));
+	uint16_t v = *(uint16_t*)(m_MsgBuf + m_ReadPos);
 	m_ReadPos += 2;
 	return v;
 }
 
-unsigned short NetworkMessage::GetItemId()
+uint16_t NetworkMessage::GetItemId()
 {
-	unsigned short v = this->GetU16();
+	uint16_t v = this->GetU16();
 	return Item::items.reverseLookUp(v);
 }
 
-unsigned int NetworkMessage::GetU32()
+uint32_t NetworkMessage::GetU32()
 {
-	unsigned int v = ((m_MsgBuf[m_ReadPos  ]      ) | (m_MsgBuf[m_ReadPos+1] <<  8) |
-						(m_MsgBuf[m_ReadPos+2] << 16) | (m_MsgBuf[m_ReadPos+3] << 24));
+	uint32_t v = *(uint32_t*)(m_MsgBuf + m_ReadPos);
 	m_ReadPos += 4;
 	return v;
 }
@@ -216,22 +216,22 @@ unsigned int NetworkMessage::GetU32()
 
 std::string NetworkMessage::GetString()
 {
-	int stringlen = GetU16();
-	if (stringlen >= (16384 - m_ReadPos))
+	uint16_t stringlen = GetU16();
+	if(stringlen >= (16384 - m_ReadPos))
 		return std::string();
 
-	char* v = (char*)(m_MsgBuf+m_ReadPos);
+	char* v = (char*)(m_MsgBuf + m_ReadPos);
 	m_ReadPos += stringlen;
 	return std::string(v, stringlen);
 }
 
 std::string NetworkMessage::GetRaw()
 {
-	int stringlen = m_MsgSize- m_ReadPos;
-	if (stringlen >= (16384 - m_ReadPos))
+	uint16_t stringlen = m_MsgSize- m_ReadPos;
+	if(stringlen >= (16384 - m_ReadPos))
 		return std::string();
 
-	char* v = (char*)(m_MsgBuf+m_ReadPos);
+	char* v = (char*)(m_MsgBuf + m_ReadPos);
 	m_ReadPos += stringlen;
 	return std::string(v, stringlen);
 }
@@ -255,7 +255,7 @@ void NetworkMessage::SkipBytes(int count)
 /******************************************************************************/
 
 
-void NetworkMessage::AddByte(unsigned char value)
+void NetworkMessage::AddByte(uint8_t value)
 {
 	if(!canAdd(1))
 		return;
@@ -264,24 +264,24 @@ void NetworkMessage::AddByte(unsigned char value)
 }
 
 
-void NetworkMessage::AddU16(unsigned short value)
+void NetworkMessage::AddU16(uint16_t value)
 {
 	if(!canAdd(2))
 		return;
-	m_MsgBuf[m_ReadPos++] = (unsigned char)(value);
-	m_MsgBuf[m_ReadPos++] = (unsigned char)(value >> 8);
+	
+	*(uint16_t*)(m_MsgBuf + m_ReadPos) = value;
+	m_ReadPos += 2;
 	m_MsgSize += 2;
 }
 
 
-void NetworkMessage::AddU32(unsigned int value)
+void NetworkMessage::AddU32(uint32_t value)
 {
 	if(!canAdd(4))
 		return;
-	m_MsgBuf[m_ReadPos++] = (unsigned char)(value);
-	m_MsgBuf[m_ReadPos++] = (unsigned char)(value >>  8);
-	m_MsgBuf[m_ReadPos++] = (unsigned char)(value >> 16);
-	m_MsgBuf[m_ReadPos++] = (unsigned char)(value >> 24);
+	
+	*(uint32_t*)(m_MsgBuf + m_ReadPos) = value;
+	m_ReadPos += 4;
 	m_MsgSize += 4;
 }
 
@@ -294,11 +294,12 @@ void NetworkMessage::AddString(const std::string &value)
 
 void NetworkMessage::AddString(const char* value)
 {
-	unsigned long stringlen = (unsigned long) strlen(value);
+	uint32_t stringlen = (uint32_t)strlen(value);
 	if(!canAdd(stringlen+2) || stringlen > 8192)
 		return;
+	
 	AddU16(stringlen);
-	strcpy((char*)m_MsgBuf + m_ReadPos, value);
+	strcpy((char*)(m_MsgBuf + m_ReadPos), value);
 	m_ReadPos += stringlen;
 	m_MsgSize += stringlen;
 }
@@ -315,7 +316,7 @@ void NetworkMessage::AddPosition(const Position &pos)
 }
 
 
-void NetworkMessage::AddItem(unsigned short id, unsigned char count)
+void NetworkMessage::AddItem(uint16_t id, uint8_t count)
 {
 	const ItemType &it = Item::items[id];
 
@@ -325,7 +326,7 @@ void NetworkMessage::AddItem(unsigned short id, unsigned char count)
 		AddByte(count);
 	}
 	else if(it.isSplash() || it.isFluidContainer()){
-		long fluidIndex = count % 8;
+		uint32_t fluidIndex = count % 8;
 		AddByte(fluidMap[fluidIndex]);
 	}
 	
@@ -341,7 +342,7 @@ void NetworkMessage::AddItem(const Item *item)
     	AddByte(item->getItemCountOrSubtype());
 	}
 	else if(it.isSplash() || it.isFluidContainer()){
-		long fluidIndex = item->getItemCountOrSubtype() % 8;
+		uint32_t fluidIndex = item->getItemCountOrSubtype() % 8;
 		AddByte(fluidMap[fluidIndex]);
 	}
 }
@@ -357,6 +358,7 @@ void NetworkMessage::JoinMessages(NetworkMessage &add)
 {
 	if(!canAdd(add.m_MsgSize))
 		return;
+	
 	memcpy(&m_MsgBuf[m_ReadPos],&(add.m_MsgBuf[4]),add.m_MsgSize);
 	m_ReadPos += add.m_MsgSize;
   	m_MsgSize += add.m_MsgSize;
@@ -367,7 +369,7 @@ void NetworkMessage::setEncryptionState(bool state)
 	m_encryptionEnabled = state;
 }
 
-void NetworkMessage::setEncryptionKey(const unsigned long* key)
+void NetworkMessage::setEncryptionKey(const uint32_t* key)
 {
 	memcpy(m_key, key, 16);
 	m_keyset = true;
@@ -376,11 +378,11 @@ void NetworkMessage::setEncryptionKey(const unsigned long* key)
 
 void NetworkMessage::XTEA_encrypt()
 {
-	unsigned long k[4];
+	uint32_t k[4];
 	k[0] = m_key[0]; k[1] = m_key[1]; k[2] = m_key[2]; k[3] = m_key[3];
 	
 	//add bytes until reach 8 multiple
-	unsigned long n;
+	uint32_t n;
 	if(((m_MsgSize + 2) % 8) != 0){
 		n = 8 - ((m_MsgSize + 2) % 8);
 		memset((void*)&m_MsgBuf[m_ReadPos], 0, n);
@@ -388,13 +390,13 @@ void NetworkMessage::XTEA_encrypt()
 	}
 	
 	unsigned long read_pos = 0;
-	unsigned long* buffer = (unsigned long*)&m_MsgBuf[2];
+	uint32_t* buffer = (uint32_t*)&m_MsgBuf[2];
 	while(read_pos < m_MsgSize/4){
-		unsigned long v0 = buffer[read_pos], v1 = buffer[read_pos + 1];
-		unsigned long delta = 0x61C88647;
-		unsigned long sum = 0;
+		uint32_t v0 = buffer[read_pos], v1 = buffer[read_pos + 1];
+		uint32_t delta = 0x61C88647;
+		uint32_t sum = 0;
 		
-		for(unsigned long i = 0; i<32; i++) {
+		for(long i = 0; i<32; i++) {
 			v0 += ((v1 << 4 ^ v1 >> 5) + v1) ^ (sum + k[sum & 3]);
 			sum -= delta;
 			v1 += ((v0 << 4 ^ v0 >> 5) + v0) ^ (sum + k[sum>>11 & 3]);
@@ -403,24 +405,23 @@ void NetworkMessage::XTEA_encrypt()
 		read_pos = read_pos + 2;
 	}
 	m_MsgSize = m_MsgSize + 2;
-	m_MsgBuf[0] = (unsigned char)(m_MsgSize);
-	m_MsgBuf[1] = (unsigned char)(m_MsgSize >> 8);
 	
+	*(uint16_t*)(m_MsgBuf) = m_MsgSize;
 }
 
 void NetworkMessage::XTEA_decrypt()
 {
-	unsigned long k[4];
+	uint32_t k[4];
 	k[0] = m_key[0]; k[1] = m_key[1]; k[2] = m_key[2]; k[3] = m_key[3];
 	
-	unsigned long* buffer = (unsigned long*)&m_MsgBuf[2];
+	uint32_t* buffer = (uint32_t*)&m_MsgBuf[2];
 	unsigned long read_pos = 0;
 	while(read_pos < m_MsgSize/4){
-		unsigned long v0 = buffer[read_pos], v1 = buffer[read_pos + 1];
-		unsigned long delta = 0x61C88647;
-		unsigned long sum = 0xC6EF3720;
+		uint32_t v0 = buffer[read_pos], v1 = buffer[read_pos + 1];
+		uint32_t delta = 0x61C88647;
+		uint32_t sum = 0xC6EF3720;
 		
-		for(unsigned long i = 0; i<32; i++) {
+		for(long i = 0; i<32; i++) {
 			v1 -= ((v0 << 4 ^ v0 >> 5) + v0) ^ (sum + k[sum>>11 & 3]);
 			sum += delta;
 			v0 -= ((v1 << 4 ^ v1 >> 5) + v1) ^ (sum + k[sum & 3]);
@@ -438,7 +439,7 @@ bool NetworkMessage::RSA_decrypt()
 	}
 	
 	RSA* rsa = RSA::getInstance();
-	if(!rsa->decrypt((char*)&m_MsgBuf[m_ReadPos], 128)){
+	if(!rsa->decrypt((char*)(m_MsgBuf + m_ReadPos), 128)){
 		return false;
 	}
 	

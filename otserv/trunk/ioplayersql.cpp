@@ -17,7 +17,7 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
-
+#include "otpch.h"
 
 #include "ioplayer.h"
 #include "ioplayersql.h"
@@ -120,6 +120,7 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 	player->lookbody = result.getDataInt("lookbody");
 	player->looklegs = result.getDataInt("looklegs");
 	player->lookfeet = result.getDataInt("lookfeet");
+	player->lookaddons = result.getDataInt("lookaddons");
 
 	boost::char_separator<char> sep(";");
 
@@ -301,6 +302,7 @@ bool IOPlayerSQL::savePlayer(Player* player)
 	query << "`lookhead` = " << player->lookhead << ", ";
 	query << "`looklegs` = " << player->looklegs << ", ";
 	query << "`looktype` = " << player->looktype << ", ";
+	query << "`lookaddons` = " << player->lookaddons << ", ";
 	query << "`maglevel` = " << player->maglevel << ", ";
 	query << "`mana` = " << player->mana << ", ";
 	query << "`manamax` = " << player->manamax << ", ";

@@ -17,7 +17,7 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
-
+#include "otpch.h"
 
 #include "definitions.h"
 
@@ -55,6 +55,7 @@ Creature::Creature() :
 	lookfeet   = 0;
 	lookmaster = 0;
 	looktype   = PLAYER_MALE_1;
+	lookaddons = 0;
 	pzLocked = false;
 	
 	lookcorpse = 3128;
