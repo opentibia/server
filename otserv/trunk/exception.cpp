@@ -32,7 +32,7 @@
 #include <map>
 #include <string>
 
-typedef std::map<unsigned long, std::string> FunctionMap;
+typedef std::map<unsigned long, char*> FunctionMap;
 
 
 #if defined WIN32 || defined __WINDOWS__
@@ -317,47 +317,59 @@ bool ExceptionHandler::LoadMap(){
 	}
 	installed = false;
 	//load map file if exists
-	std::string line;
-	std::ifstream input("otserv.map");
+    char line[1024];
+	FILE* input = fopen("otserv.map", "r");
 	min_off = 0xFFFFFF;
 	max_off = 0;
 	long n = 0;
-    if (input.fail()){
+    if(!input){
 		std::cout << "Failed loading symbols. otserv.map not found. " << std::endl;
-		std::cout << "Go to http://otfans.net/index.php?showtopic=1716 for more info." << std::endl;
+		std::cout << "Go to http://otfans.net/showthread.php?t=4718 for more info." << std::endl;
 		system("pause");
 		exit(1);
         return false;
 	}
+	
     //read until found .text           0x00401000
-    while (getline(input,line,'\n')) {
-		if(line.substr(0,5) == ".text")
+    while(fgets(line, 1024, input)){
+		if(memcmp(line,".text",5) == 0)
 			break;
 	}
-     
-	if(input.eof()){
+    
+	if(feof(input)){
 		return false;
 	}
 	
-	std::string tofind = "0x";
-    std::string space = " ";
-    std::string lib = ".a(";
-    while (getline(input,line,'\n')) {
-		std::string::size_type pos = line.find(lib,0);
-        if(pos != std::string::npos)
+	char tofind[] = "0x";
+    char space[] = " ";
+    char lib[] = ".a(";
+    while(fgets(line, 1024, input)){
+		char* pos = strstr(line, lib);
+        if(pos)
         	break;	//not load libs
-		pos = line.find(tofind,0);
-        if(pos != std::string::npos){
+		pos = strstr(line, tofind);
+        if(pos){
 			//read hex offset
-			std::string hexnumber = line.substr(pos,10);
-			char *pEnd;
-			unsigned long offset = strtol(hexnumber.c_str(),&pEnd,0);
+			char hexnumber[12];
+			strncpy(hexnumber, pos, 10);
+			hexnumber[10] = 0;
+			char* pEnd;
+			unsigned long offset = strtol(hexnumber, &pEnd, 0);
 			if(offset){
 				//read function name
-				std::string::size_type pos2 = line.find_first_not_of(space,pos+10);
-				if(line[pos2] == '0' && line[pos2+1] == 'x')
+				char* pos2 = pos + 12;
+				while(*pos2 != 0){
+					if(*pos2 != ' ')
+						break;
+					pos2++;
+				}
+				if(*pos2 == 0 || (*pos2 == '0' && *(pos2+1) == 'x'))
 					continue;
-				functionMap[offset] = line.substr(pos2,line.size() - pos2);
+				
+				char* name = new char[strlen(pos2)+1];
+				strcpy(name, pos2);
+				name[strlen(pos2) - 1] = 0;
+				functionMap[offset] = name;
 				if(offset > max_off)
 					max_off = offset;
 				if(offset < min_off)
@@ -367,7 +379,7 @@ bool ExceptionHandler::LoadMap(){
 		}
     }
     // close file
-    input.close();
+	fclose(input);
 	//std::cout << "Loaded " << n << " stack symbols" <<std::endl;
 	maploaded = true;
 	return true;
