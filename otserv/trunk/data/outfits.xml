@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+
+<outfits>
+<!-- Female outfits -->
+<outfit type="0" looktype="136" addons="11" />
+<outfit type="0" looktype="137" addons="11" />
+<outfit type="0" looktype="138" addons="11" />
+<outfit type="0" looktype="139" addons="11" />
+<outfit type="0" looktype="140" addons="11" />
+<outfit type="0" looktype="141" addons="11" />
+<outfit type="0" looktype="142" addons="11" />
+<outfit type="0" looktype="147" addons="11" />
+<outfit type="0" looktype="148" addons="11" />
+<outfit type="0" looktype="149" addons="11" />
+<outfit type="0" looktype="150" addons="11" />
+<outfit type="0" looktype="155" addons="11" />
+<outfit type="0" looktype="156" addons="11" />
+<outfit type="0" looktype="157" addons="11" />
+<outfit type="0" looktype="158" addons="11" />
+<!-- Male outfits -->
+<outfit type="1" looktype="128" addons="11" />
+<outfit type="1" looktype="129" addons="11" />
+<outfit type="1" looktype="130" addons="11" />
+<outfit type="1" looktype="131" addons="11" />
+<outfit type="1" looktype="132" addons="11" />
+<outfit type="1" looktype="133" addons="11" />
+<outfit type="1" looktype="134" addons="11" />
+<outfit type="1" looktype="143" addons="11" />
+<outfit type="1" looktype="144" addons="11" />
+<outfit type="1" looktype="145" addons="11" />
+<outfit type="1" looktype="146" addons="11" />
+<outfit type="1" looktype="151" addons="11" />
+<outfit type="1" looktype="152" addons="11" />
+<outfit type="1" looktype="153" addons="11" />
+<outfit type="1" looktype="154" addons="11" />
+<!-- Elf outfits -->
+<outfit type="2" looktype="159" addons="11" />
+<!-- Dwarf outfits -->
+<outfit type="2" looktype="160" addons="11" />
+<!-- Frog outfits -->
+<outfit type="2" looktype="226" addons="11" />
+<!-- Cult -->
+<outfit type="2" looktype="194" addons="11" />
+
+</outfits>
