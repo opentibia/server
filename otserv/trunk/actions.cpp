@@ -687,6 +687,11 @@ int ActionScript::registerFunctions()
 	//doPlayerRemoveItem(cid,itemid,count)
 	lua_register(luaState, "doPlayerRemoveItem", ActionScript::luaActionDoPlayerRemoveItem);
 	
+	//doPlayerAddOutfit(cid,looktype,addons)
+	lua_register(luaState, "doPlayerAddOutfit", ActionScript::luaActionDoPlayerAddOutfit);
+	//doPlayerRemOutfit(cid,looktype,addons)
+	lua_register(luaState, "doPlayerRemOutfit", ActionScript::luaActionDoPlayerRemOutfit);	
+	
 	//doMoveItem(uid,toPos)
 	//doMovePlayer(cid,direction)
 	
@@ -1770,5 +1775,49 @@ int ActionScript::luaActionDoPlayerSetVocation(lua_State *L)
 	}
 	
 	lua_pushnumber(L, 0);
+	return 1;
+}
+
+int ActionScript::luaActionDoPlayerAddOutfit(lua_State *L)
+{
+	//doPlayerAddOutfit(cid, looktype, addon)
+	int addon = (int)internalGetNumber(L);
+	int looktype = (int)internalGetNumber(L);
+	unsigned int cid = (unsigned int)internalGetNumber(L);	
+	
+	ActionScript* action = getActionScript(L);
+	unsigned int uid;
+	Player* player = action->GetPlayerByUID(cid);
+	if(player){
+		player->addOutfit(looktype, addon);
+	}
+	else{
+		lua_pushnumber(L, -1);
+		std::cout << "luadoPlayerAddOutfit: player not found" << std::endl;
+		return 1;
+	}
+	lua_pushnumber(L, uid);
+	return 1;
+}
+
+int ActionScript::luaActionDoPlayerRemOutfit(lua_State *L)
+{
+	//doPlayerRemOutfit(cid, looktype, addon)
+	int addon = (int)internalGetNumber(L);
+	int looktype = (int)internalGetNumber(L);
+	unsigned int cid = (unsigned int)internalGetNumber(L);	
+	
+	ActionScript* action = getActionScript(L);
+	unsigned int uid;
+	Player* player = action->GetPlayerByUID(cid);
+	if(player){
+		player->remOutfit(looktype, addon);
+	}
+	else{
+		lua_pushnumber(L, -1);
+		std::cout << "luadoPlayerRemOutfit: player not found" << std::endl;
+		return 1;
+	}
+	lua_pushnumber(L, uid);
 	return 1;
 }

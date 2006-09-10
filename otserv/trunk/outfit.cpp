@@ -43,11 +43,36 @@ OutfitList::~OutfitList()
 }
 
 void OutfitList::addOutfit(const Outfit& outfit)
-{
+{	
+	OutfitListType::iterator it;
+	for(it = m_list.begin(); it != m_list.end(); ++it){
+		if((*it)->looktype == outfit.looktype){
+			(*it)->addons = (*it)->addons | outfit.addons;
+			return;
+		}
+	}
+	//adding a new outfit
 	Outfit* new_outfit = new Outfit;
 	new_outfit->looktype = outfit.looktype;
 	new_outfit->addons = outfit.addons;
 	m_list.push_back(new_outfit);
+}
+
+bool OutfitList::remOutfit(const Outfit& outfit)
+{
+	OutfitListType::iterator it;
+	for(it = m_list.begin(); it != m_list.end(); ++it){
+		if((*it)->looktype == outfit.looktype){
+			if(outfit.addons == 0xFF){//remove looktype
+				m_list.erase(it);
+			}
+			else{ //remove addons
+				(*it)->addons = (*it)->addons & (~outfit.addons);
+			}
+			return true;
+		}
+	}
+	return false;
 }
 
 bool OutfitList::isInList(uint32_t looktype, uint32_t addons) const

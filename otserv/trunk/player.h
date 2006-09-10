@@ -142,6 +142,7 @@ public:
 	
 	void addStorageValue(const unsigned long key, const long value);
 	bool getStorageValue(const unsigned long key, long &value) const;
+	void genReservedStorageRange();
 	inline StorageMap::const_iterator getStorageIteratorBegin() const {return storageMap.begin();}
 	inline StorageMap::const_iterator getStorageIteratorEnd() const {return storageMap.end();}
 	
@@ -291,6 +292,8 @@ public:
 	
 	const OutfitListType& getPlayerOutfits();
 	bool canWear(uint32_t _looktype, uint32_t _addons);
+	void addOutfit(uint32_t _looktype, uint32_t _addons);
+	bool remOutfit(uint32_t _looktype, uint32_t _addons);
 	
 	//tile
 	//send methods

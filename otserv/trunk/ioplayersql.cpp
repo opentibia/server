@@ -470,7 +470,7 @@ bool IOPlayerSQL::savePlayer(Player* player)
 		return false;
 
 	query_insert.setQuery("INSERT INTO `playerstorage` (`player` , `key` , `value` ) VALUES ");
-	
+	player->genReservedStorageRange();
 	for(StorageMap::const_iterator cit = player->getStorageIteratorBegin(); cit != player->getStorageIteratorEnd();cit++){
 		streamitems << "(" << player->getGUID() <<","<< cit->first <<","<< cit->second<<")";
 		

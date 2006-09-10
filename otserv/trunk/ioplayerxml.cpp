@@ -576,6 +576,7 @@ bool IOPlayerXML::savePlayer(Player* player)
 	xmlAddChild(root, sn);
    
 	sn = xmlNewNode(NULL,(const xmlChar*)"storage");
+	player->genReservedStorageRange();
 	for(StorageMap::const_iterator cit = player->getStorageIteratorBegin(); cit != player->getStorageIteratorEnd();cit++){
 		pn = xmlNewNode(NULL,(const xmlChar*)"data");
 		sb << cit->first;

@@ -39,6 +39,7 @@ public:
 	~OutfitList();
 
 	void addOutfit(const Outfit& outfit);
+	bool remOutfit(const Outfit& outfit);
 	const OutfitListType& getOutfits() const;
 	bool isInList(uint32_t looktype, uint32_t addons) const;
 	

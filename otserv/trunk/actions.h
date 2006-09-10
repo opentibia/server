@@ -201,6 +201,10 @@ public:
 	static int luaActionGetPlayerStorageValue(lua_State *L);
 	static int luaActionSetPlayerStorageValue(lua_State *L);
 	
+	static int luaActionDoPlayerAddOutfit(lua_State *L);
+	static int luaActionDoPlayerRemOutfit(lua_State *L);
+	
+	
 protected:			
 	
 	Game *game;

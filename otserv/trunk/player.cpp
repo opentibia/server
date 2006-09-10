@@ -2670,3 +2670,38 @@ bool Player::canWear(uint32_t _looktype, uint32_t _addons)
 	
 	return false;
 }
+
+
+void Player::genReservedStorageRange()
+{
+	unsigned long base_key;
+	//generate outfits range
+	base_key = PSTRG_OUTFITS_RANGE_START + 1;
+	const OutfitListType& outfits = m_playerOutfits.getOutfits();
+	OutfitListType::const_iterator it;
+	for(it = outfits.begin(); it != outfits.end(); ++it){
+		long value = ((*it)->looktype << 16) | ((*it)->addons & 0xFF);
+		storageMap[base_key] = value;
+		base_key++;
+		if(base_key > PSTRG_OUTFITS_RANGE_START + PSTRG_OUTFITS_RANGE_SIZE){
+			std::cout << "Warning: [Player::genReservedStorageRange()] Player " << getName() << " with more than 500 outfits!." << std::endl;
+			break;
+		}
+	}
+}
+
+void Player::addOutfit(uint32_t _looktype, uint32_t _addons)
+{
+	Outfit outfit;
+	outfit.looktype = _looktype;
+	outfit.addons = _addons;
+	m_playerOutfits.addOutfit(outfit);
+}
+
+bool Player::remOutfit(uint32_t _looktype, uint32_t _addons)
+{
+	Outfit outfit;
+	outfit.looktype = _looktype;
+	outfit.addons = _addons;
+	return m_playerOutfits.remOutfit(outfit);
+}
