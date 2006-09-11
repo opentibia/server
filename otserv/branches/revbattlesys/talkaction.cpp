@@ -83,7 +83,7 @@ bool TalkActions::registerEvent(Event* event, xmlNodePtr p)
 	return true;
 }
 
-TalkActionResult_t TalkActions::creatureSay(Creature* creature, SpeakClasses type, const std::string& words)
+TalkActionResult_t TalkActions::playerSaySpell(Player* player, SpeakClasses type, const std::string& words)
 {
 	if(type != SPEAK_SAY){
 		return TALKACTION_CONTINUE;
@@ -108,7 +108,7 @@ TalkActionResult_t TalkActions::creatureSay(Creature* creature, SpeakClasses typ
 	for(it = wordsMap.begin(); it != wordsMap.end(); ++it){
 		if(it->first == str_words){
 			TalkAction* talkAction = it->second;
-			long ret =  talkAction->executeSay(creature, str_words, str_param);
+			long ret =  talkAction->executeSay(player, str_words, str_param);
 			if(ret == 1){
 				return TALKACTION_CONTINUE;
 			}

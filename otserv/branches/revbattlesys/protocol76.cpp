@@ -978,34 +978,34 @@ void Protocol76::parseSay(NetworkMessage& msg)
 		channelId = msg.GetU16();
 	std::string text = msg.GetString();
 
-	if(game->playerSaySpell(player, text))
-		type = SPEAK_SAY;
+	if(game->playerSaySpell(player, type, text)){
+		return;
+	}
 
-	switch (type)
-	{
-	case SPEAK_SAY:
-		game->playerSay(player, type, text);
-		break;
-	case SPEAK_WHISPER:
-		game->playerWhisper(player, text);
-		break;
-	case SPEAK_YELL:
-		game->playerYell(player, text);
-		break;
-	case SPEAK_PRIVATE:
-	case SPEAK_PRIVATE_RED:
-		game->playerSpeakTo(player, type, receiver, text);
-		break;
-	case SPEAK_CHANNEL_Y:
-	case SPEAK_CHANNEL_R1:
-	case SPEAK_CHANNEL_R2:
-		game->playerTalkToChannel(player, type, text, channelId);
-		break;
-	case SPEAK_BROADCAST:
-		game->playerBroadcastMessage(player, text);
-		break;
-	default:
-		break;
+	switch(type){
+		case SPEAK_SAY:
+			game->playerSay(player, type, text);
+			break;
+		case SPEAK_WHISPER:
+			game->playerWhisper(player, text);
+			break;
+		case SPEAK_YELL:
+			game->playerYell(player, text);
+			break;
+		case SPEAK_PRIVATE:
+		case SPEAK_PRIVATE_RED:
+			game->playerSpeakTo(player, type, receiver, text);
+			break;
+		case SPEAK_CHANNEL_Y:
+		case SPEAK_CHANNEL_R1:
+		case SPEAK_CHANNEL_R2:
+			game->playerTalkToChannel(player, type, text, channelId);
+			break;
+		case SPEAK_BROADCAST:
+			game->playerBroadcastMessage(player, text);
+			break;
+		default:
+			break;
 	}
 }
 

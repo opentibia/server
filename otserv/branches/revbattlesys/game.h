@@ -289,7 +289,7 @@ public:
 	bool playerSay(Player* player, SpeakClasses type, const std::string& text);
 	bool playerChangeOutfit(Player* player, uint8_t lookType,
 		uint8_t lookHead, uint8_t lookBody, uint8_t lookLegs, uint8_t lookFeet);
-	bool playerSaySpell(Player* player, const std::string& text);
+	bool playerSaySpell(Player* player, SpeakClasses type, const std::string& text);
 
 	void flushSendBuffers();
 	void addPlayerBuffer(Player* p);

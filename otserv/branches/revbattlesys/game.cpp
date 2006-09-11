@@ -2350,14 +2350,28 @@ bool Game::playerChangeOutfit(Player* player, uint8_t lookType, uint8_t lookHead
 	return true;
 }
 
-bool Game::playerSaySpell(Player* player, const std::string& text)
+bool Game::playerSaySpell(Player* player, SpeakClasses type, const std::string& text)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerSaySpell()");
 	if(player->isRemoved())
 		return false;
 
+	//First, check if this was a command
+	for(uint32_t i = 0; i < commandTags.size(); i++){
+		if(commandTags[i] == text.substr(0,1)){
+			return commands.exeCommand(player, text);
+		}
+	}
+
+	if(g_talkactions.playerSaySpell(player, type, text) == TALKACTION_BREAK){
+		return true;
+	}
+
+	if(g_spells.playerSaySpell(player, type, text)){
+		return playerSay(player, SPEAK_SAY, text);
+	}
+
 	return false;
-	//return internalCreatureSaySpell(player, text);
 }
 
 //--
@@ -2397,22 +2411,7 @@ bool Game::internalCreatureTurn(Creature* creature, Direction dir)
 }
 
 bool Game::internalCreatureSay(Creature* creature, SpeakClasses type, const std::string& text)
-{	
-	//First, check if this was a command
-	for(uint32_t i = 0; i < commandTags.size(); i++){
-		if(commandTags[i] == text.substr(0,1)){
-			return commands.exeCommand(creature, text);
-		}
-	}
-
-	if(g_talkactions.creatureSay(creature, type, text) == TALKACTION_BREAK){
-		return true;
-	}
-
-	if(g_spells.creatureSay(creature, type, text) == TALKACTION_BREAK){
-		return true;
-	}
-
+{
 	SpectatorVec list;
 	SpectatorVec::iterator it;
 

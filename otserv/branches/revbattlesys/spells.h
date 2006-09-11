@@ -45,7 +45,7 @@ public:
 	InstantSpell* getInstantSpell(const std::string& words);
 	InstantSpell* getInstantSpellByName(const std::string& name);
 
-	TalkActionResult_t creatureSay(Creature* creature, SpeakClasses type, const std::string& words);
+	bool playerSaySpell(Player* player, SpeakClasses type, const std::string& words);
 	
 protected:
 	virtual void clear();
@@ -64,14 +64,16 @@ protected:
 };
 
 
+/*
 enum TargetType_t{
 	TARGET_NONE,
 	TARGET_CREATURE,
 	TARGET_POSITION,
 	TARGET_NAME
 };
+*/
 
-typedef bool (InstantSpellFunction)(Creature* creature, const std::string& words, const std::string& param);
+typedef bool (InstantSpellFunction)(Creature* creature, const std::string& param);
 typedef bool (RuneSpellFunction)(Creature* creature, Item* item, const Position& posFrom, const Position& posTo, Creature* target);
 
 class Spell
@@ -83,25 +85,25 @@ public:
 	bool configureSpell(xmlNodePtr xmlspell);
 	
 protected:
-	bool spellPlayerChecks(const Player* player);
+	bool playerSpellCheck(const Player* player);
+	
 	bool causeExhaustion(){return exhaustion;};
 	
-	void addSpellEffects(Player* player);
-	
-	TargetType_t targetType;
-	
-private:
-	std::string name;
+	void postCastSpell(Player* player);
 	
 	bool enabled;
 	bool premium;
 	int32_t level;
 	int32_t magLevel;
-	uint32_t vocationBits;
 	
 	int32_t mana;
 	int32_t soul;
 	bool exhaustion;
+	bool needTarget;
+
+private:
+	std::string name;
+	uint32_t vocationBits;
 };
 
 class InstantSpell : public TalkAction, public Spell
@@ -113,9 +115,12 @@ public:
 	virtual bool configureEvent(xmlNodePtr p);
 	virtual bool loadFunction(const std::string& functionName);
 	
-	bool castInstant(Creature* creature, const std::string& words, const std::string& param);
+	bool playerCastInstant(Player* player, const std::string& param);
+	bool castInstant(Creature* creature);
+	bool castInstant(Creature* creature, Creature* target);
+
 	//scripting
-	bool executeCastInstant(Creature* creature, const std::string& param);
+	bool executeCastInstant(Creature* creature, const LuaVariant& var);
 	//
 	
 protected:	
@@ -129,8 +134,9 @@ protected:
 	
 	static House* getHouseFromPos(Creature* creature);
 	
-	bool hasParam;
+	bool castInstant(Creature* creature, const LuaVariant& var);
 	
+	bool hasParam;
 	InstantSpellFunction* function;
 };
 
@@ -145,10 +151,12 @@ public:
 	
 	virtual bool canExecuteAction(const Player* player, const Position& toPos);
 
-	bool useRune(Creature* creature, const Position& posFrom, const Position& posTo, Creature* target);
 	virtual bool executeUse(Player* player, Item* item, const PositionEx& posFrom, const PositionEx& posTo);
+	bool castRune(Creature* creature, Creature* target);
+	bool castRune(Creature* creature, const Position& pos);
+
 	//scripting
-	long executeUseRune(Creature* creature, Item* item, const Position& posFrom, const Position& posTo, Creature* target);
+	bool executeCastRune(Creature* creature, const LuaVariant& var);
 	//
 	
 	uint32_t getRuneItemId(){return runeId;};
@@ -156,6 +164,8 @@ public:
 protected:
 	virtual std::string getScriptEventName();
 	
+	bool castRune(Creature* creature, const LuaVariant& var);
+
 	bool hasCharges;
 	uint32_t runeId;
 	

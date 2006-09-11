@@ -42,7 +42,7 @@ public:
 	TalkActions();
 	virtual ~TalkActions();
 	
-	TalkActionResult_t creatureSay(Creature *creature, SpeakClasses type, const std::string& words);
+	TalkActionResult_t playerSaySpell(Player* player, SpeakClasses type, const std::string& words);
 	
 protected:
 	virtual LuaScriptInterface& getScriptInterface();
