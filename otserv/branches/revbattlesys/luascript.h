@@ -44,6 +44,30 @@ class AreaCombat;
 class Combat;
 class Condition;
 
+enum LuaVariantType_t{	
+	VARIANT_NONE = 0,
+	VARIANT_NUMBER,
+	VARIANT_POSITION,
+	VARIANT_STRING,
+};
+
+struct LuaVariant{
+	LuaVariant()
+	{
+		type = VARIANT_NONE;
+		text = "";
+		pos.x = 0;
+		pos.y = 0;
+		pos.z = 0;
+		number = 0;
+	}
+
+	LuaVariantType_t type;
+	std::string text;
+	Position pos;
+	uint32_t number;
+};
+
 class LuaScript
 {
 public:
@@ -91,6 +115,8 @@ public:
 
 	static void addUniqueThing(Thing* thing);
 	long addThing(Thing* thing);
+	uint32_t addVariant(const LuaVariant* variant);
+	const LuaVariant* getVariant(uint32_t index);
 	
 	void addGlobalStorageValue(const unsigned long key, const long value);
 	bool getGlobalStorageValue(const unsigned long key, long &value) const;
@@ -117,6 +143,7 @@ public:
 
 private:
 	typedef std::map<long, Thing*> ThingMap;
+	typedef std::vector<const LuaVariant*> VariantVector;
 	typedef std::map<unsigned long,long> StorageMap;
 	typedef std::map<uint32_t, AreaCombat*> AreaMap;
 	typedef std::map<uint32_t, Combat*> CombatMap;
@@ -137,6 +164,9 @@ private:
 	//item/creature map
 	long m_lastUID;
 	ThingMap m_localMap;
+	
+	//variant vector
+	VariantVector m_variants;
 	
 	//area map
 	uint32_t m_lastAreaId;
@@ -186,7 +216,10 @@ enum ErrorCode_t{
 	LUA_ERROR_CONDITION_NOT_FOUND,
 	LUA_ERROR_AREA_NOT_FOUND,
 	LUA_ERROR_CONTAINER_NOT_FOUND,
+	LUA_ERROR_VARIANT_NOT_FOUND,
+	LUA_ERROR_VARIANT_UNKNOWN
 };
+
 
 class LuaScriptInterface
 {
@@ -344,8 +377,9 @@ protected:
 
 	static int luaSetCombatCallBack(lua_State *L);
 	//
-	static int luaDoAreaCombat(lua_State *L);
-	static int luaDoTargetCombat(lua_State *L);
+	//static int luaDoAreaCombat(lua_State *L);
+	//static int luaDoTargetCombat(lua_State *L);
+	static int luaDoCombat(lua_State *L);
 
 	static int luaDoAreaCombatHealth(lua_State *L);
 	static int luaDoTargetCombatHealth(lua_State *L);

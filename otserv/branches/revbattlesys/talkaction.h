@@ -28,10 +28,10 @@
 #include "baseevents.h"
 #include "const76.h"
 
-enum talkActionResult_t{
+enum TalkActionResult_t{
 	//TALKACTION_NOTFOUND,
 	TALKACTION_CONTINUE,
-	TALKACTION_NO_CONTINUE,
+	TALKACTION_BREAK,
 };
 
 class TalkAction;
@@ -42,7 +42,7 @@ public:
 	TalkActions();
 	virtual ~TalkActions();
 	
-	talkActionResult_t creatureSay(Creature *creature, SpeakClasses type, const std::string& words);
+	TalkActionResult_t creatureSay(Creature *creature, SpeakClasses type, const std::string& words);
 	
 protected:
 	virtual LuaScriptInterface& getScriptInterface();

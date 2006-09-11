@@ -50,6 +50,7 @@
 #include "chat.h"
 #include "luascript.h"
 #include "talkaction.h"
+#include "spells.h"
 
 #if defined __EXCEPTION_TRACER__
 #include "exception.h"
@@ -61,6 +62,7 @@ extern Actions g_actions;
 extern Commands commands;
 extern Chat g_chat;
 extern TalkActions g_talkactions;
+extern Spells g_spells;
 
 Game::Game()
 {
@@ -2403,7 +2405,11 @@ bool Game::internalCreatureSay(Creature* creature, SpeakClasses type, const std:
 		}
 	}
 
-	if(g_talkactions.creatureSay(creature, type, text) == TALKACTION_NO_CONTINUE){
+	if(g_talkactions.creatureSay(creature, type, text) == TALKACTION_BREAK){
+		return true;
+	}
+
+	if(g_spells.creatureSay(creature, type, text) == TALKACTION_BREAK){
 		return true;
 	}
 

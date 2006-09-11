@@ -58,7 +58,8 @@ enum CombatParam_t{
 enum ConditionParam_t{
 	CONDITIONPARAM_OWNER = 1,
 	CONDITIONPARAM_TICKS = 2,
-	CONDITION_PARAM_OUTFIT = 3
+	CONDITION_PARAM_OUTFIT = 3,
+	CONDITIONPARAM_SPEED = 4,
 };
 
 enum BlockType_t {

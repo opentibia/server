@@ -321,6 +321,28 @@ Condition(_type, _ticks)
 	speedDelta = changeSpeed;
 }
 
+bool ConditionSpeed::setParam(ConditionParam_t param, int32_t value)
+{
+	bool ret = Condition::setParam(param, value);
+
+	switch(param){
+		case CONDITIONPARAM_SPEED:
+		{
+			speedDelta = value;
+			if(value > 0){
+				conditionType = CONDITION_HASTE;
+			}
+			else{
+				conditionType = CONDITION_PARALYZE;
+			}
+
+			return true;
+		}
+	}
+
+	return ret;
+}
+
 bool ConditionSpeed::startCondition(Creature* creature)
 {
 	g_game.changeSpeed(creature, speedDelta);

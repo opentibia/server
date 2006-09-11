@@ -44,6 +44,8 @@ public:
 	
 	InstantSpell* getInstantSpell(const std::string& words);
 	InstantSpell* getInstantSpellByName(const std::string& name);
+
+	TalkActionResult_t creatureSay(Creature* creature, SpeakClasses type, const std::string& words);
 	
 protected:
 	virtual void clear();
@@ -66,6 +68,7 @@ enum TargetType_t{
 	TARGET_NONE,
 	TARGET_CREATURE,
 	TARGET_POSITION,
+	TARGET_NAME
 };
 
 typedef bool (InstantSpellFunction)(Creature* creature, const std::string& words, const std::string& param);

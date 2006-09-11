@@ -186,6 +186,12 @@ void ScriptEnviroment::resetEnv()
 	m_interface = NULL;
 	m_localMap.clear();
 
+	for(VariantVector::iterator it = m_variants.begin(); it != m_variants.end(); ++it){
+		delete *it;
+	}
+	
+	m_variants.clear();
+
 	m_realPos.x = 0;
 	m_realPos.y = 0;
 	m_realPos.z = 0;
@@ -289,6 +295,17 @@ long ScriptEnviroment::addThing(Thing* thing)
 	
 	m_localMap[newUid] = thing;
 	return newUid;
+}
+
+uint32_t ScriptEnviroment::addVariant(const LuaVariant* variant)
+{
+	m_variants.push_back(variant);
+	return m_variants.size() - 1;
+}
+
+const LuaVariant* ScriptEnviroment::getVariant(uint32_t index)
+{
+	return m_variants[index];
 }
 	
 Thing* ScriptEnviroment::getThingByUID(long uid)
@@ -479,6 +496,11 @@ std::string LuaScriptInterface::getErrorDesc(ErrorCode_t code){
 		break;
 	case LUA_ERROR_CONTAINER_NOT_FOUND:
 		return "Container not found";
+		break;
+	case LUA_ERROR_VARIANT_NOT_FOUND:
+		return "Variant not found";
+	case LUA_ERROR_VARIANT_UNKNOWN:
+		return "Unknown variant type";
 		break;
 	default:
 		return "Wrong error code!";
@@ -985,11 +1007,16 @@ void LuaScriptInterface::registerFunctions()
 	//setCombatCallBack(combat, key, function_name)
 	lua_register(m_luaState, "setCombatCallback", LuaScriptInterface::luaSetCombatCallBack);
 
+	/*
 	//doAreaCombat(cid, combat, pos)
 	lua_register(m_luaState, "doAreaCombat", LuaScriptInterface::luaDoAreaCombat);
 
 	//doTargetCombat(cid, combat, target)
 	lua_register(m_luaState, "doTargetCombat", LuaScriptInterface::luaDoTargetCombat);
+	*/
+
+	//doCombat(cid, combat, param)
+	lua_register(m_luaState, "doCombat", LuaScriptInterface::luaDoCombat);
 
 	//createCombatObject()
 	lua_register(m_luaState, "createCombatObject", LuaScriptInterface::luaCreateCombatObject);
@@ -2557,6 +2584,7 @@ int LuaScriptInterface::luaSetCombatCallBack(lua_State *L)
 	return 0;
 }
 
+/*
 int LuaScriptInterface::luaDoAreaCombat(lua_State *L)
 {
 	//doAreaCombat(cid, combat, pos)
@@ -2595,7 +2623,9 @@ int LuaScriptInterface::luaDoAreaCombat(lua_State *L)
 	lua_pushnumber(L, LUA_NO_ERROR);
 	return 1;
 }
+*/
 
+/*
 int LuaScriptInterface::luaDoTargetCombat(lua_State *L)
 {
 	//doTargetCombat(cid, combat, target)
@@ -2635,6 +2665,149 @@ int LuaScriptInterface::luaDoTargetCombat(lua_State *L)
 	}
 
 	combat->doCombat(creature, target);
+
+	lua_pushnumber(L, LUA_NO_ERROR);
+	return 1;
+}
+*/
+
+int LuaScriptInterface::luaDoCombat(lua_State *L)
+{
+	//doCombat(cid, combat, param)
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	uint32_t variant = (uint32_t)popNumber(L);
+	uint32_t combatId = (uint32_t)popNumber(L);
+	uint32_t cid = (uint32_t)popNumber(L);
+
+	const LuaVariant* var = env->getVariant(variant);
+	
+	Creature* creature = NULL;
+	
+	if(cid != 0){
+		creature = env->getCreatureByUID(cid);
+
+		if(!creature){
+			reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+			lua_pushnumber(L, LUA_ERROR);
+			return 1;
+		}
+	}
+
+	const Combat* combat = env->getCombatObject(combatId);
+
+	if(!combat){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_COMBAT_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
+	if(!var){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_VARIANT_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
+	switch(var->type){
+		case VARIANT_NUMBER:
+		{
+			Creature* target = g_game.getCreatureByID(var->number);
+
+			if(!target){
+				lua_pushnumber(L, LUA_ERROR);
+				return 1;
+			}
+
+			combat->doCombat(creature, target);
+			break;
+		}
+
+		case VARIANT_POSITION:
+		{
+			combat->doCombat(creature, var->pos);
+			break;
+		}
+
+		case VARIANT_STRING:
+		{
+			Player* target = g_game.getPlayerByName(var->text);
+			if(!target){
+				lua_pushnumber(L, LUA_ERROR);
+				return 1;
+			}
+
+			combat->doCombat(creature, target);
+			break;
+		}
+
+		default:
+		{
+			reportErrorFunc(getErrorDesc(LUA_ERROR_VARIANT_UNKNOWN));
+			lua_pushnumber(L, LUA_ERROR);
+			return 1;
+			break;
+		}
+	}
+
+	/*
+	LuaVariantType_t type = (VariantType_t)LuaScriptInterface::getField(L, "type");
+
+	switch(type){
+		case VARIANT_NUMBER:
+		{
+			int32_t cid = getField(L, "cid");
+			break;
+		}
+
+		case VARIANT_POSITION:
+		{
+			lua_pushstring(L, "text");
+			lua_gettable(L, -2);
+			std::string text = lua_tostring(L, -1);
+			lua_pop(L, 1);
+
+			lua_pushstring(L, "cid");
+			lua_gettable(L, -2);
+			int32_t cid = lua_tonumber(L, -1);
+			lua_pop(L, 1);
+
+			lua_pushstring(L, "pos");
+			lua_gettable(L, -2);
+			
+			Position pos;
+
+			pos.x = LuaScriptInterface::getField(L, "x");
+			pos.y = LuaScriptInterface::getField(L, "y");
+			pos.z = LuaScriptInterface::getField(L, "z");
+
+			lua_pop(L, 1);  // remove number and key
+			break;
+		}
+
+		case VARIANT_STRING:
+		{
+			lua_pushstring(L, "text");
+			lua_gettable(L, -2);  // get table[key]
+			std::string text = lua_tostring(L, -1);
+			lua_pop(L, 1);  // remove number and key
+			break;
+		}
+
+		default:
+		{
+			reportErrorFunc(getErrorDesc(LUA_ERROR_UNKNOWNVARIANT));
+			lua_pushnumber(L, LUA_ERROR);
+			return 1;
+			break;
+		}
+	}
+
+	lua_pop(L, 1); //table
+	*/
+
+	//combat
+	//cid
 
 	lua_pushnumber(L, LUA_NO_ERROR);
 	return 1;

@@ -43,6 +43,40 @@ Spells::~Spells()
 	clear();
 }
 
+TalkActionResult_t Spells::creatureSay(Creature* creature, SpeakClasses type, const std::string& words)
+{
+	if(type != SPEAK_SAY){
+		return TALKACTION_CONTINUE;
+	}
+	
+	std::string str_words;
+	std::string str_param;
+	unsigned int loc = (uint32_t)words.find( '"', 0 );
+	if(loc != std::string::npos && loc >= 0){
+		str_words = std::string(words, 0, loc);
+		str_param = std::string(words, (loc+1), words.size()-loc-1);
+	}
+	else {
+		str_words = words;
+		str_param = std::string(""); 
+	}
+	
+	trim_left(str_words, " ");
+	trim_right(str_words, " ");
+
+	InstantsMap::iterator it;
+	for(it = instants.begin(); it != instants.end(); ++it){
+		if(it->first == str_words){
+			InstantSpell* instantSpell = it->second;
+			if(instantSpell->castInstant(creature, str_words, str_param)){
+				return TALKACTION_BREAK;
+			}
+		}
+	}
+
+	return TALKACTION_CONTINUE;
+}
+
 void Spells::clear()
 {
 	RunesMap::iterator it;
@@ -332,7 +366,7 @@ bool InstantSpell::loadFunction(const std::string& functionName)
 
 bool InstantSpell::executeCastInstant(Creature* creature, const std::string& param)
 {
-	//onCastInstant(...)
+	//onCastInstant(cid, var)
 	ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
 
 	//debug only
@@ -347,15 +381,52 @@ bool InstantSpell::executeCastInstant(Creature* creature, const std::string& par
 	lua_State* L = m_scriptInterface->getLuaState();
 	int size0 = lua_gettop(L);
 	
-	//TODO:
-	//	call script
+	uint32_t cid = env->addThing(creature);
+
+	LuaVariant* var = new LuaVariant;
+	var->type = VARIANT_STRING;
+	var->text = param;
+
+	uint32_t variant = env->addVariant(var);
+
+	m_scriptInterface->pushFunction(m_scriptId);
+	lua_pushnumber(L, cid);
+	lua_pushnumber(L, variant);
+
+	/*
+	lua_newtable(L);
+
+	//"pushVariantString"
+	//lua_pushstring(L, param.c_str());
+
+	lua_newtable(L);
+	lua_pushstring(L, "pos");
+	lua_settable(L, -2);
+
+	LuaScriptInterface::setField(L, "x", 1);
+	LuaScriptInterface::setField(L, "y", 2);
+	LuaScriptInterface::setField(L, "z", 3);
 	//
+
+	LuaScriptInterface::setField(L, "type", VARIANT_POSITION);
+	LuaScriptInterface::setField(L, "cid", 12345);
+
+	//LuaScriptInterface::setField(L, "text", param.c_str());
+	lua_pushstring(L, "text");
+	lua_pushstring(L, param.c_str());
+	lua_settable(L, -3);
+	*/
 	
+	long result;
+	if(m_scriptInterface->callFunction(2, result) == false){
+		result = 0;
+	}
+
 	if(size0 != lua_gettop(L)){
 		LuaScriptInterface::reportError(NULL, "Stack size changed!");
 	}
 	
-	return false;
+	return (result > 0);
 }
 
 House* InstantSpell::getHouseFromPos(Creature* creature)
@@ -773,7 +844,8 @@ bool RuneSpell::executeUse(Player* player, Item* item, const PositionEx& posFrom
 
 long RuneSpell::executeUseRune(Creature* creature, Item* item, const Position& posFrom, const Position& posTo, Creature* target)
 {
-	//onUseRune(cid, pos, var)
+	//onUseRune(cid, var)
+
 	ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
 		
 	//debug only
@@ -785,9 +857,27 @@ long RuneSpell::executeUseRune(Creature* creature, Item* item, const Position& p
 	env->setRealPos(creature->getPosition());
 		
 	lua_State* L = m_scriptInterface->getLuaState();
+	int size0 = lua_gettop(L);
 		
 	uint32_t cid = env->addThing(creature);
 
+	LuaVariant* var = new LuaVariant;
+	if(target){
+		var->type = VARIANT_NUMBER;
+		var->number = creature->getID();
+	}
+	else{
+		var->type = VARIANT_POSITION;
+		var->pos = posTo;
+	}
+
+	uint32_t variant = env->addVariant(var);
+
+	m_scriptInterface->pushFunction(m_scriptId);
+	lua_pushnumber(L, cid);
+	lua_pushnumber(L, variant);
+
+	/*
 	uint32_t targetcid = 0;
 
 	if(target){
@@ -798,13 +888,18 @@ long RuneSpell::executeUseRune(Creature* creature, Item* item, const Position& p
 	lua_pushnumber(L, cid);
 	LuaScriptInterface::pushPosition(L, posTo, 0);
 	lua_pushnumber(L, targetcid);
+	*/
 	
-	long ret;
-	if(m_scriptInterface->callFunction(3, ret) == false){
-		ret = 0;
+	long result;
+	if(m_scriptInterface->callFunction(2, result) == false){
+		result = 0;
 	}
 	
-	return ret;
+	if(size0 != lua_gettop(L)){
+		LuaScriptInterface::reportError(NULL, "Stack size changed!");
+	}
+
+	return (result > 0);
 }
 
 

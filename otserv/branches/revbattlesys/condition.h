@@ -133,6 +133,8 @@ public:
 	virtual uint8_t getIcons() const;
 
 	virtual ConditionSpeed* clone()  const { return new ConditionSpeed(*this); }
+
+	virtual bool setParam(ConditionParam_t param, int32_t value);
 	
 protected:
 	int32_t speedDelta;
