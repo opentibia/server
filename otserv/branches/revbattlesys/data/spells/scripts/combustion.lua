@@ -1,6 +1,7 @@
 local combat = createCombatObject(COMBAT_TYPE_HITPOINTS)
 setCombatParam(combat, COMBAT_PARAM_TYPE, COMBAT_DAMAGE_FIRE)
 setCombatParam(combat, COMBAT_PARAM_EFFECT, CONST_ME_FIREAREA)
+setCombatParam(combat, COMBAT_PARAM_DISTANCEEFFECT, CONST_ANI_FIRE)
 
 local condition = createConditionObject(CONDITION_FIRE)
 addDamageCondition(condition, 10, 3000, -100)
@@ -16,6 +17,6 @@ end
 
 setCombatCallback(combat, COMBAT_PARAM_MINMAXCALLBACK, "onGetPlayerMinMaxValues")
 
-function onUseRune(cid, var)
+function onCastSpell(cid, var)
 	doCombat(cid, combat, var)
 end

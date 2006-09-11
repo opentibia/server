@@ -16,6 +16,6 @@ end
 
 --setConditionCallback(condition, CONDITION_CALLBACK_VALUE, "onGetSpeedPlayerValue")
 
-function onUseRune(cid, var)
+function onCastSpell(cid, var)
 	doCombat(cid, combat, var)
 end

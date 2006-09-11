@@ -11,6 +11,6 @@ setCombatCondition(combat, condition)
 setCombatArea(combat, area)
 setCombatParam(combat, COMBAT_PARAM_EFFECT, CONST_ME_MAGIC_GREEN)
 
-function onUseRune(cid, var)
+function onCastSpell(cid, var)
 	doCombat(cid, combat, var)
 end

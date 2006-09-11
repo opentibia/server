@@ -14,6 +14,6 @@ end
 
 setCombatCallback(combat, COMBAT_PARAM_MINMAXCALLBACK, "onGetPlayerMinMaxValues")
 
-function onUseRune(cid, var)
+function onCastSpell(cid, var)
 	doCombat(cid, combat, var)
 end

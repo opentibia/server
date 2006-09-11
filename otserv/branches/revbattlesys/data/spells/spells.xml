@@ -1,11 +1,12 @@
 <?xml version="1.0"?>
 <spells>
-<rune name="Sudden death" id="2268" hascharges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="sd.lua"></rune>
+<rune name="Sudden death" id="2268" needtarget="1" hascharges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="sd.lua"></rune>
 <rune name="Great fireball" id="2269" hascharges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="gfb.lua"></rune>
 <rune name="Polymorph" id="2270" hascharges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="polymorph.lua"></rune>
 <rune name="Combustion" id="2271" hascharges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="combustion.lua"></rune>
 <rune name="Paralyze" id="2272" hascharges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="paralyze.lua"></rune>
+<rune name="Ultimate healing" id="2273" needtarget="1" hascharges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="uh.lua"></rune>
 
 <instant name="Find Person" words="exiva" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" function="searchPlayer"></instant>
-<instant name="Heal Friend" words="exura sio" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="healfriend.lua"></instant>
+<instant name="Heal Friend" words="exura sio" needtarget="1"  lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="healfriend.lua"></instant>
 </spells>
