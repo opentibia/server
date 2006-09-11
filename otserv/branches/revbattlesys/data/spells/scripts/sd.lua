@@ -11,11 +11,6 @@ end
 
 setCombatCallback(combat, COMBAT_PARAM_MINMAXCALLBACK, "onGetPlayerMinMaxValues")
 
-function onUseRune(cid, pos, var)
-	if var ~= nil then
-		-- sd rune
-		doAreaCombat(cid, combat, pos)
-	else
-		doTargetCombat(cid, combat, var)
-	end
+function onUseRune(cid, var)
+	doCombat(cid, combat, var)
 end

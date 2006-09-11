@@ -4,22 +4,13 @@ local area = createCombatArea( { {1, 1, 1}, {1, 1, 1}, {1, 1, 1} } )
 local condition = createConditionObject(CONDITION_OUTFIT)
 setConditionParam(condition, CONDITION_PARAM_TICKS, 20000)
 addOutfitCondition(condition, 0, 60, 0, 0, 0, 0)
+addOutfitCondition(condition, 0, 61, 0, 0, 0, 0)
+addOutfitCondition(condition, 0, 63, 0, 0, 0, 0)
 
 setCombatCondition(combat, condition)
 setCombatArea(combat, area)
-setCombatParam(combat, COMBAT_PARAM_TYPE, COMBAT_DAMAGE_FIRE)
-setCombatParam(combat, COMBAT_PARAM_EFFECT, CONST_ME_FIREAREA)
+setCombatParam(combat, COMBAT_PARAM_EFFECT, CONST_ME_MAGIC_GREEN)
 
-function onGetPlayerMinMaxValues(cid, level, maglevel)
-	min = -(level * 2 + maglevel * 3) * 1.3 - 30
-	max = -(level * 2 + maglevel * 3) * 1.7
-
-	return min, max
-end
-
-setCombatCallback(combat, COMBAT_PARAM_MINMAXCALLBACK, "onGetPlayerMinMaxValues")
-
-function onUseRune(cid, pos, var)
-	-- gfb
-	doAreaCombat(cid, combat, pos)
+function onUseRune(cid, var)
+	doCombat(cid, combat, var)
 end
