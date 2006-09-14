@@ -13,15 +13,17 @@
 </defenses>
 
 <loot>
-      <item id="2148" countmax="74" chance1="40000" chancemax="108"/>
-      <item id="5264" chance="5000"/>
-      <item id="2385" chance="10321"/>
-      <item id="2114" chance="6000"/>
-      <item id="2489" chance="6000"/>
-      <item id="2521" chance="5000"/>
-      <item id="6096" chance="6000"/>
-      <item id="6097" countmax="1" chance1="1983" chancemax="1982"/>
-      <item id="6126" countmax="1" chance1="1392" chancemax="1391"/>
+	<item id="2148" countmax="74" chance1="40000" chancemax="108"/>
+	<item id="2385" chance="10321"/>
+	<item id="2114" chance="104"/>
+	<item id="2489" chance="284"/>
+	<item id="2521" chance="587"/>
+	<item id="5926" chance="6721"/>
+	<inside>
+	<item id="6096" chance="92"/>
+	<item id="5812" chance="3891"/>
+	<item id="5462" chance="801"/>
+	</inside>
 </loot>
 
 </monster>
