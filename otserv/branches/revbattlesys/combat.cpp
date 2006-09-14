@@ -71,13 +71,14 @@ void Combat::getMinMaxValues(Creature* creature, int32_t& min, int32_t& max) con
 	}
 }
 
-void Combat::getCombatArea(Creature* caster, const Position& pos, const AreaCombat* area, std::list<Tile*>& list)
+void Combat::getCombatArea(const Position& centerPos, const Position& targetPos, const AreaCombat* area, std::list<Tile*>& list)
 {
 	if(area){
-		area->getList(pos, caster->getDirection(), list);
+		//area->getList(pos, caster->getDirection(), list);
+		area->getList(centerPos, targetPos, list);
 	}
 	else{
-		Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
+		Tile* tile = g_game.getTile(targetPos.x, targetPos.y, targetPos.z);
 		if(tile){
 			list.push_back(tile);
 		}
@@ -255,7 +256,7 @@ void Combat::doCombatHealth(Creature* caster, const Position& pos,
 	const Condition* condition)
 {
 	std::list<Tile*> list;
-	getCombatArea(caster, pos, area, list);
+	getCombatArea(caster->getPosition(), pos, area, list);
 
 	bool bContinue = true;
 
@@ -320,7 +321,7 @@ void Combat::doCombatMana(Creature* caster, const Position& pos,
 	const Condition* condition)
 {
 	std::list<Tile*> list;
-	getCombatArea(caster, pos, area, list);
+	getCombatArea(caster->getPosition(), pos, area, list);
 
 	for(std::list<Tile*>::iterator it = list.begin(); it != list.end(); ++it){
 		if(canDoCombat(caster, *it)){
@@ -359,7 +360,7 @@ void Combat::doCombatCondition(Creature* caster, const Position& pos,
 	const AreaCombat* area, const Condition* condition, const CombatParams& params)
 {
 	std::list<Tile*> list;
-	getCombatArea(caster, pos, area, list);
+	getCombatArea(caster->getPosition(), pos, area, list);
 
 	for(std::list<Tile*>::iterator it = list.begin(); it != list.end(); ++it){
 		if(canDoCombat(caster, *it)){
@@ -430,299 +431,54 @@ void CombatCallBack::getMinMaxValues(Player* player, int32_t& min, int32_t& max)
 	}
 }
 
-/*
-CombatHealth::CombatHealth(DamageType_t _damageType, uint8_t _impactEffect) :
-	Combat(_impactEffect),
-	damageType(_damageType)
+AreaCombat::AreaCombat()
 {
-	//
-}
-
-CombatHealth::~CombatHealth()
-{
-	//
-}
-
-bool CombatHealth::setParam(CombatParam_t param, uint32_t value)
-{
-	if(!Combat::setParam(param, value)){		
-		switch(param)
-		case COMBATPARAM_HEALTHTYPE:
-		{
-			damageType = (DamageType_t)value;
-			return true;
-		}
-	}
-
-	return false;
-}
-
-void CombatHealth::internalCombat(Creature* attacker, Creature* target, int32_t healthChange) const
-{
-	g_game.combatChangeHealth(damageType, attacker, target, healthChange);
-}
-
-void CombatHealth::internalCombat(Creature* attacker, const Position& pos, int32_t minChange, int32_t maxChange) const
-{
-	std::list<Tile*> list;
-	getCombatArea(attacker, pos, list);
-
-	for(std::list<Tile*>::iterator it = list.begin(); it != list.end(); ++it){
-		if(canDoCombat(attacker, *it)){
-			for(CreatureVector::iterator cit = (*it)->creatures.begin(); cit != (*it)->creatures.end(); ++cit){
-				int32_t healthChange = random_range(minChange, maxChange);
-				g_game.combatChangeHealth(damageType, attacker, *cit, healthChange);
-			}
-
-			addImpactEffect((*it)->getPosition());
-		}
-	}
-}
-
-bool CombatHealth::canDoCombat(const Creature* attacker, const Tile* tile) const
-{
-	return Combat::canDoCombat(attacker, tile);
-	//do further filtering here
-}
-
-void CombatHealth::doCombat(Creature* attacker, Creature* target) const
-{
-	//target callback function
-	int32_t minChange = 0;
-	int32_t maxChange = 0;
-
-	getMinMaxValues(attacker, minChange, maxChange);
-	doCombat(attacker, target, minChange, maxChange);
-}
-
-void CombatHealth::doCombat(Creature* attacker, const Position& pos) const
-{
-	//area combat callback function
-
-	int32_t minChange = 0;
-	int32_t maxChange = 0;
-
-	getMinMaxValues(attacker, minChange, maxChange);
-	internalCombat(attacker, pos, minChange, maxChange);
-}
-
-void CombatHealth::doCombat(Creature* attacker, Creature* target, int32_t minChange, int32_t maxChange) const
-{
-	//target combat function with pre-defined min/max values
-
-	int32_t healthChange = random_range(minChange, maxChange);
-	internalCombat(attacker, target, healthChange);
-}
-
-void CombatHealth::doCombat(Creature* attacker, const Position& pos, int32_t minChange, int32_t maxChange) const
-{
-	//area combat function with pre-defined min/max values
-	internalCombat(attacker, pos, minChange, maxChange);
-}
-
-CombatMana::CombatMana(uint8_t _impactEffect) :
-	Combat(_impactEffect)
-{
-	//
-}
-
-CombatMana::~CombatMana()
-{
-	//
-}
-
-void CombatMana::internalCombat(Creature* attacker, Creature* target, int32_t manaChange) const
-{
-	g_game.combatChangeMana(attacker, target, manaChange);
-}
-
-void CombatMana::internalCombat(Creature* attacker, const Position& pos, int32_t minChange, int32_t maxChange) const
-{
-	std::list<Tile*> list;
-	getCombatArea(attacker, pos, list);
-
-	for(std::list<Tile*>::iterator it = list.begin(); it != list.end(); ++it){
-		if(canDoCombat(attacker, *it)){
-			for(CreatureVector::iterator cit = (*it)->creatures.begin(); cit != (*it)->creatures.end(); ++cit){
-				int32_t manaChange = random_range(minChange, maxChange);
-				internalCombat(attacker, *cit, manaChange);
-			}
-
-			addImpactEffect(pos);
-		}
-	}
-}
-
-bool CombatMana::canDoCombat(const Creature* attacker, const Tile* tile) const
-{
-	return Combat::canDoCombat(attacker, tile);
-	//do further filtering here
-}
-
-void CombatMana::doCombat(Creature* attacker, Creature* target) const
-{
-	//target callback function
-
-	if(!attacker){
-		return;
-	}
-
-	int32_t minChange = 0;
-	int32_t maxChange = 0;
-
-	getMinMaxValues(attacker, minChange, maxChange);
-	doCombat(attacker, target, minChange, maxChange);
-}
-
-void CombatMana::doCombat(Creature* attacker, const Position& pos) const
-{
-	//area combat callback function
-
-	if(!attacker){
-		return;
-	}
-
-	int32_t minChange = 0;
-	int32_t maxChange = 0;
-
-	getMinMaxValues(attacker, minChange, maxChange);
-	internalCombat(attacker, pos, minChange, maxChange);
-}
-
-void CombatMana::doCombat(Creature* attacker, Creature* target, int32_t minChange, int32_t maxChange) const
-{
-	//target combat function with pre-defined min/max values
-
-	int32_t healthChange = random_range(minChange, maxChange);
-	internalCombat(attacker, target, healthChange);
-}
-
-void CombatMana::doCombat(Creature* attacker, const Position& pos, int32_t minChange, int32_t maxChange) const
-{
-	//area combat function with pre-defined min/max values
-	internalCombat(attacker, pos, minChange, maxChange);
-}
-
-CombatCondition::CombatCondition(Condition* _condition, uint8_t _impactEffect) :
-	Combat(_impactEffect),
-	condition(_condition),
-	removeType(CONDITION_NONE)
-{
-	//
-}
-
-CombatCondition::CombatCondition(ConditionType_t _removeType, uint8_t _impactEffect) :
-	Combat(_impactEffect),
-	condition(NULL),
-	removeType(_removeType)
-{
-	//
-}
-
-CombatCondition::~CombatCondition()
-{
-	delete condition;
-}
-
-void CombatCondition::internalDoCombat(Creature* attacker, Creature* target) const
-{
-	if(condition){
-		target->addCondition(condition->clone());
-	}
-	else{
-		target->removeCondition(removeType);
-	}
-}
-
-void CombatCondition::doCombat(Creature* attacker, Creature* target) const
-{
-	internalDoCombat(attacker, target);
-	addImpactEffect(target->getPosition());
-}
-
-void CombatCondition::doCombat(Creature* attacker, const Position& pos) const
-{
-	std::list<Tile*> list;
-	getCombatArea(attacker, pos, list);
-
-	for(std::list<Tile*>::iterator it = list.begin(); it != list.end(); ++it){
-		if(canDoCombat(attacker, *it)){
-			for(CreatureVector::iterator cit = (*it)->creatures.begin(); cit != (*it)->creatures.end(); ++cit){
-				internalDoCombat(attacker, *cit);
-			}
-
-			addImpactEffect(pos);
-		}
-	}
-}
-
-/*
-CombatField::CombatField(MagicField* _field) :
-	field(_field)
-{
-	//
-}
-
-CombatField::~CombatField()
-{
-	delete field;
-}
-
-
-void CombatField::doCombat(Creature* attacker, Creature* target) const
-{
-	//
-}
-
-void CombatField::doCombat(Creature* attacker, const Position& pos) const
-{
-	Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
-	if(tile && !tile->hasProperty(BLOCKSOLID)){
-		if(field && g_game.internalAddItem(tile, field, INDEX_WHEREEVER, 0, true) == RET_NOERROR){
-			MagicField* newField = new MagicField(*field);
-			g_game.internalAddItem(tile, newField);
-		}
-	}
-
-	addImpactEffect(pos);
-}
-*/
-
-AreaCombat::AreaCombat() : 
-	needDirection(false)
-{
-	//
+	hasExtArea = false;
 }
 
 AreaCombat::~AreaCombat() 
 {
-	//
+	clear();
 }
 
-
-bool AreaCombat::getList(const Position& pos, Direction rotatedir, std::list<Tile*>& list) const
+void AreaCombat::clear()
 {
-	Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
+	for(AreaCombatMap::iterator it = areas.begin(); it != areas.end(); ++it){
+		delete it->second;
+	}
+
+	areas.clear();
+}
+
+bool AreaCombat::getList(const Position& centerPos, const Position& targetPos, std::list<Tile*>& list) const
+{
+	Tile* tile = g_game.getTile(targetPos.x, targetPos.y, targetPos.z);
 
 	if(!tile){
 		return false;
 	}
 
-	Position tmpPos = pos;
+	const MatrixArea* area = getArea(centerPos, targetPos);
+	if(!area){
+		return false;
+	}
 
-	size_t cols = area.getCols();
-	size_t rows = area.getRows();
+	Position tmpPos = targetPos;
 
-	tmpPos.x -= (cols - 1) / 2;
-	tmpPos.y -= (rows - 1) / 2;
+	size_t cols = area->getCols();
+	size_t rows = area->getRows();
+
+	uint32_t centerY, centerX;
+	area->getCenter(centerY, centerX);
+
+	tmpPos.x -= centerX;
+	tmpPos.y -= centerY;
 
 	for(size_t y = 0; y < rows; ++y){
 		for(size_t x = 0; x < cols; ++x){
-
-			uint8_t dir = area[y][x];
-			if((!needDirection && dir != 0) || dir == rotatedir){
-
-				if(g_game.map->canThrowObjectTo(pos, tmpPos)){
+			
+			if(area->getValue(y, x) != 0){
+				if(g_game.map->canThrowObjectTo(targetPos, tmpPos)){
 					tile = g_game.getTile(tmpPos.x, tmpPos.y, tmpPos.z);
 
 					if(tile){
@@ -741,19 +497,179 @@ bool AreaCombat::getList(const Position& pos, Direction rotatedir, std::list<Til
 	return true;
 }
 
-void AreaCombat::setRow(int row, std::vector<uint8_t> data)
+long round(float v)
 {
-	if(area.getRows() <= row){
-		area.resize(area.getRows() + 1, data.size());
+	long t = std::floor(v);
+	if((v - t) > 0.5){
+		return t + 1;
 	}
+	else{
+		return t;
+	}
+}
 
-	if(area.getCols() == data.size()){
-		int col = 0;
-		for(std::vector<uint8_t>::iterator it = data.begin(); it != data.end(); ++it){
-			area[row][col] = *it;
-			++col;
+void AreaCombat::copyArea(const MatrixArea* input, MatrixArea* output, MatrixOperation_t op) const
+{
+	uint32_t centerY, centerX;
+	input->getCenter(centerY, centerX);
+
+	if(op == MATRIXOPERATION_COPY){
+		for(int y = 0; y < input->getRows(); ++y){
+			for(int x = 0; x < input->getCols(); ++x){
+				(*output)[y][x] = (*input)[y, x];
+			}
+		}
+
+		output->setCenter(centerY, centerX);
+	}
+	else if(op == MATRIXOPERATION_MIRROR){
+		for(int y = 0; y < input->getRows(); ++y){
+			int rx = 0;
+			for(int x = input->getCols() - 1; x >= 0; --x){
+				(*output)[y][rx++] = (*input)[y][x];
+			}
+
+			output->setCenter(centerY, (input->getRows() - 1) - centerX);
+		}
+	} else if(op == MATRIXOPERATION_FLIP){
+		for(int x = 0; x < input->getCols(); ++x){
+			int ry = 0;
+			for(int y = input->getRows() - 1; y >= 0; --y){
+				(*output)[ry++][x] = (*input)[y][x];
+			}
+		}
+
+		output->setCenter((input->getCols() - 1) - centerY, centerX);
+	}
+	//rotation
+	else{
+		uint32_t centerX, centerY;
+		input->getCenter(centerY, centerX);
+
+		int32_t rotateCenterX = (output->getCols() / 2) - 1;
+		int32_t rotateCenterY = (output->getRows() / 2) - 1;
+		int32_t angle = 0;
+
+		switch(op){
+			case MATRIXOPERATION_ROTATE90:
+				angle = 90;
+				break;
+
+			case MATRIXOPERATION_ROTATE180:
+				angle = 180;
+				break;
+
+			case MATRIXOPERATION_ROTATER90:
+				angle = 0;
+				break;
+		}
+		double angleRad = 3.1416 * angle / 180.0;
+
+		float a = std::cos(angleRad);
+		float b = -std::sin(angleRad);
+		float c = std::sin(angleRad);
+		float d = std::cos(angleRad);
+		
+		for(int x = 0; x < input->getCols(); ++x){
+			for(int y = 0; y < input->getRows(); ++y){
+				//calculate new coordinates using rotation center
+				long newX = x - centerX;
+				long newY = y - centerY;
+
+				//perform rotation
+				long rotatedX = round(newX * a + newY * b);
+				long rotatedY = round(newX * c + newY * d);
+
+				//write in the output matrix using rotated coordinates
+				(*output)[rotatedX + rotateCenterX][rotatedY + rotateCenterY] = (*input)[y][x];
+			}
+		}
+
+		output->setCenter(rotateCenterY, rotateCenterX);
+	}
+}
+
+MatrixArea* AreaCombat::createArea(const std::list<uint32_t>& list, uint32_t rows)
+{
+	int cols = list.size() / rows;
+	MatrixArea* area = new MatrixArea(rows, cols);
+
+	uint32_t x = 0;
+	uint32_t y = 0;
+
+	for(std::list<uint32_t>::const_iterator it = list.begin(); it != list.end(); ++it){
+		if(*it != 0){
+			area->setValue(y, x, true);
+		}
+		
+		if(*it == 3){
+			area->setCenter(y, x);
+		}
+
+		++x;
+
+		if(cols == x){
+			x = 0;
+			++y;
 		}
 	}
+
+	return area;
+}
+
+void AreaCombat::setupArea(const std::list<uint32_t>& list, uint32_t rows)
+{
+	MatrixArea* area = createArea(list, rows);
+
+	//NORTH
+	areas[NORTH] = area;
+
+	uint32_t maxOutput = std::max(area->getCols(), area->getRows()) * 2;
+
+	//SOUTH
+	MatrixArea* southArea = new MatrixArea(maxOutput, maxOutput);
+	copyArea(area, southArea, MATRIXOPERATION_ROTATE90);
+	areas[SOUTH] = southArea;
+
+	//EAST
+	MatrixArea* eastArea = new MatrixArea(maxOutput, maxOutput);
+	copyArea(area, eastArea, MATRIXOPERATION_ROTATE180);
+	areas[EAST] = eastArea;
+
+	//WEST
+	MatrixArea* westArea = new MatrixArea(maxOutput, maxOutput);
+	copyArea(area, westArea, MATRIXOPERATION_ROTATER90);
+	areas[WEST] = westArea;
+}
+
+void AreaCombat::setupExtArea(const std::list<uint32_t>& list, uint32_t rows)
+{
+	if(list.empty()){
+		return;
+	}
+
+	hasExtArea = true;
+	MatrixArea* area = createArea(list, rows);
+
+	//NORTH-WEST
+	areas[NORTHWEST] = area;
+
+	uint32_t maxOutput = std::max(area->getCols(), area->getRows()) * 2;
+
+	//NORTH-EAST
+	MatrixArea* neArea = new MatrixArea(maxOutput, maxOutput);
+	copyArea(area, neArea, MATRIXOPERATION_MIRROR);
+	areas[NORTHEAST] = neArea;
+
+	//SOUTH-WEST
+	MatrixArea* swArea = new MatrixArea(maxOutput, maxOutput);
+	copyArea(area, swArea, MATRIXOPERATION_FLIP);
+	areas[SOUTHWEST] = swArea;
+
+	//SOUTH-EAST
+	MatrixArea* seArea = new MatrixArea(maxOutput, maxOutput);
+	copyArea(swArea, seArea, MATRIXOPERATION_MIRROR);
+	areas[SOUTHEAST] = seArea;
 }
 
 MagicField::MagicField(uint16_t _type) : Item(_type)

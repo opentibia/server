@@ -89,7 +89,8 @@ public:
 	static void doCombatCondition(Creature* caster, const Position& pos,
 		const AreaCombat* area, const Condition* condition, const CombatParams& params);
 
-	static void getCombatArea(Creature* caster, const Position& pos, const AreaCombat* area, std::list<Tile*>& list);
+	static void getCombatArea(const Position& centerPos, const Position& targetPos,
+		const AreaCombat* area, std::list<Tile*>& list);
 	static bool canDoCombat(const Creature* caster, const Tile* tile);
 
 	void doCombat(Creature* caster, Creature* target) const;
@@ -138,31 +139,58 @@ template <typename T>
 class Matrix
 {
 public:
-  Matrix(){};
-  Matrix(int rows, int cols)
+	//Matrix() {}
+  Matrix(uint32_t _rows, uint32_t _cols)
   {
-    for(int i = 0; i < rows; ++i){
-      data_.push_back(std::vector<T>(cols));
+		centerX = 0;
+		centerY = 0;
+
+		rows = _rows;
+		cols = _cols;
+
+		data_ = new T*[rows];
+
+		for(uint32_t row = 0; row < rows; ++row){
+			data_[row] = new T[cols];
+			
+			for(uint32_t col = 0; col < cols; ++col){
+				data_[row][col] = 0;
+			}
 		}
   }
 
-	size_t getRows() const {return data_.size();}
-	size_t getCols() const {return data_[0].size();}
-  inline std::vector<T> & operator[](int i) { return data_[i]; }
-
-  inline const std::vector<T> & operator[] (int i) const { return data_[i]; }
-
-  void resize(int rows, int cols)
-  {
-    data_.resize(rows);
-		for(int i = 0; i < rows; ++i){
-      data_[i].resize(cols);
+	~Matrix()
+	{
+		for(uint32_t row = 0; row < rows; ++row){
+			delete[] data_[row];
 		}
-  }
+
+		delete[] data_;
+	}
+
+	void setValue(uint32_t row, uint32_t col, T value) const {data_[row][col] = value;}
+	T getValue(uint32_t row, uint32_t col) const {return data_[row][col];}
+
+	void setCenter(uint32_t y, uint32_t x) {centerX = x; centerY = y;}
+	void getCenter(uint32_t& y, uint32_t& x) const {x = centerX; y = centerY;}
+
+	size_t getRows() const {return rows;}
+	size_t getCols() const {return cols;}
+
+	inline const T* & operator[](uint32_t i) const { return data_[i]; }
+	inline T* & operator[](uint32_t i) { return data_[i]; }
 
 private:
-  std::vector<std::vector<T> > data_; 
+	uint32_t centerX;
+	uint32_t centerY;
+
+	uint32_t rows;
+	uint32_t cols;
+	T** data_;
 };
+
+typedef Matrix<bool> MatrixArea;
+typedef std::map<Direction, MatrixArea* > AreaCombatMap;
 
 class AreaCombat{
 public:
@@ -170,13 +198,66 @@ public:
 	~AreaCombat();
 
 	ReturnValue doCombat(Creature* attacker, const Position& pos, const Combat& combat) const;
-	void setRow(int row, std::vector<uint8_t> data);
+	bool getList(const Position& centerPos, const Position& targetPos, std::list<Tile*>& list) const;
 
-	bool getList(const Position& pos, Direction rotatedir, std::list<Tile*>& list) const;
+	void setupArea(const std::list<uint32_t>& list, uint32_t rows);
+	void setupExtArea(const std::list<uint32_t>& list, uint32_t rows);
+	void clear();
 
 protected:
-	Matrix<uint8_t> area;
-	bool needDirection;
+	enum MatrixOperation_t{
+		MATRIXOPERATION_COPY,
+		MATRIXOPERATION_MIRROR,
+		MATRIXOPERATION_FLIP,
+		MATRIXOPERATION_ROTATE90,
+		MATRIXOPERATION_ROTATE180,
+		MATRIXOPERATION_ROTATER90
+	};
+
+	MatrixArea* createArea(const std::list<uint32_t>& list, uint32_t rows);
+	void copyArea(const MatrixArea* input, MatrixArea* output, MatrixOperation_t op) const;
+
+	MatrixArea* getArea(const Position& centerPos, const Position& targetPos) const
+	{
+		int32_t dx = targetPos.x - centerPos.x;
+		int32_t dy = targetPos.y - centerPos.y;
+
+		Direction dir = NORTH;
+
+		if(dx < 0){
+			dir = WEST;
+		}
+		else if(dx > 0){
+			dir = EAST;
+		}
+		else if(dy < 0){
+			dir = NORTH;
+		}
+		else{
+			dir = SOUTH;
+		}
+
+		if(hasExtArea){
+			if(dx < 0 && dy < 0)
+				dir = NORTHWEST;
+			else if(dx > 0 && dy < 0)
+				dir = NORTHEAST;
+			else if(dx < 0 && dy > 0)
+				dir = SOUTHWEST;
+			else if(dx > 0 && dy > 0)
+				dir = SOUTHEAST;
+		}
+
+		AreaCombatMap::const_iterator it = areas.find(dir);
+		if(it != areas.end()){
+			return it->second;
+		}
+		
+		return NULL;
+	}
+
+	AreaCombatMap areas;
+	bool hasExtArea;
 };
 
 class MagicField : public Item{

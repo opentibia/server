@@ -1678,66 +1678,6 @@ bool Game::playerUseItemEx(Player* player, const Position& fromPos, uint8_t from
 
 bool Game::internalUseItemEx(Player* player, const Position& fromPos, Item* item, const Position& toPos, uint8_t toStackPos, uint16_t toSpriteId)
 {
-	/*
-	AreaCombat area;
-	uint8_t arr[] = {1, 1, 1};
-	std::vector<uint8_t> row(arr, arr + sizeof(arr) / sizeof(uint8_t));
-	area.setRow(0, row);
-	area.setRow(1, row);
-	area.setRow(2, row);
-
-	if(item->getID() == 2304){
-		CombatHealth combat(DAMAGE_POISON, -100, -200, NM_ME_SOUND_GREEN);
-		area.doCombat(player, toPos, combat);
-	}
-	else if(item->getID() == 2305){
-		MagicField* field = new MagicField(1487);
-		field->useThing2();
-
-		Condition* condition = Condition::createCondition(CONDITION_FIRE, 15000, player->getID());
-		field->setCondition(condition);
-		CombatField combat(field);
-
-		area.doCombat(player, toPos, combat);
-	}
-	else if(item->getID() == 2268){
-		CombatHealth combat(DAMAGE_SUDDENDEATH, -100, -200, NM_ME_MORT_AREA);
-		combat.execute(player, toPos);
-	}
-	else if(item->getID() == 2311){
-		CombatMana combat(-100, -200, NM_ME_YELLOW_RINGS);
-		combat.execute(player, toPos);
-	}
-	else if(item->getID() == 2312){
-		Condition* condition = Condition::createCondition(CONDITION_MANASHIELD, 15000, 0);
-		CombatCondition combat(condition, NM_ME_LOOSE_ENERGY);
-		area.doCombat(player, toPos, combat);
-	}
-	else if(item->getID() == 2313){
-		CombatCondition combat(CONDITION_MANASHIELD, NM_ME_MAGIC_BLOOD);
-		area.doCombat(player, toPos, combat);
-	}
-	else if(item->getID() == 2314){
-		Condition* condition = Condition::createCondition(CONDITION_PARALYZE, 15000, -200);
-		CombatCondition combat(condition, NM_ME_MAGIC_ENERGIE);
-		area.doCombat(player, toPos, combat);
-	}
-	else if(item->getID() == 2315){
-		CombatCondition combat(CONDITION_PARALYZE, NM_ME_MAGIC_BLOOD);
-		area.doCombat(player, toPos, combat);
-	}
-	else if(item->getID() == 2316){
-		ConditionOutfit* condition = new ConditionOutfit(15000, 0, 0);
-		CombatCondition combat(condition, NM_ME_SOUND_BLUE);
-		area.doCombat(player, toPos, combat);
-	}
-	else if(item->getID() == 2306){
-		CombatCondition combat(CONDITION_OUTFIT, NM_ME_SOUND_BLUE);
-		area.doCombat(player, toPos, combat);
-	}
-	else{
-	*/
-	
 	g_actions.useItemEx(player, fromPos, toPos, toStackPos, item);
 	return true;
 }

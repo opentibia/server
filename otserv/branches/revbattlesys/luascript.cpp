@@ -980,7 +980,7 @@ void LuaScriptInterface::registerFunctions()
 	//getGuildId(guild_name)
 	lua_register(m_luaState, "getGuildId", LuaScriptInterface::luaGetGuildId);
 	
-	//createCombatArea( { {...}, {...} } )
+	//createCombatArea( {area}, {extArea} )
 	lua_register(m_luaState, "createCombatArea", LuaScriptInterface::luaCreateCombatArea);
 
 	//createConditionObject(type)
@@ -2324,30 +2324,22 @@ int LuaScriptInterface::luaCreateCombatObject(lua_State *L)
 	return 1;
 }
 
-int LuaScriptInterface::luaCreateCombatArea(lua_State *L)
+bool LuaScriptInterface::getArea(lua_State *L, std::list<uint32_t>& list, uint32_t& rows)
 {
-	//createCombatArea( { {...}, {...} } )
-
-	std::vector<uint8_t> row;
-	uint32_t col = 0;
-
-	AreaCombat* area = new AreaCombat;
-
-	int i = 0, j = 0;
+	rows = 0;
+	uint32_t i = 0, j = 0;
 	lua_pushnil(L);  // first key //
 
 	while(lua_next(L, -2) != 0){
 		lua_pushnil(L);
-		row.clear();
 		while(lua_next(L, -2) != 0){
-			row.push_back((unsigned char)lua_tonumber(L, -1));
+			list.push_back((uint32_t)lua_tonumber(L, -1));
 			
 			lua_pop(L, 1);  // removes `value'; keeps `key' for next iteration //
 			j++;
 		}
 
-		area->setRow(col, row);
-		++col;
+		++rows;
 		
 		j = 0;
 		lua_pop(L, 1);  // removes `value'; keeps `key' for next iteration //
@@ -2355,6 +2347,34 @@ int LuaScriptInterface::luaCreateCombatArea(lua_State *L)
 	}
 	
 	lua_pop(L, 1);
+	return (rows != 0);
+}
+
+int LuaScriptInterface::luaCreateCombatArea(lua_State *L)
+{
+	//createCombatArea( {area}, {extArea} )
+
+	int32_t parameters = lua_gettop(L);
+
+	AreaCombat* area = new AreaCombat;
+
+	if(parameters > 1){
+		//has extra parameter with diagonal area information
+
+		uint32_t rowsExtArea;
+		std::list<uint32_t> listExtArea;
+		getArea(L, listExtArea, rowsExtArea);
+		
+		/*setup all possible rotations*/
+		area->setupExtArea(listExtArea, rowsExtArea);
+	}
+
+	uint32_t rowsArea = 0;
+	std::list<uint32_t> listArea;
+	getArea(L, listArea, rowsArea);
+
+	/*setup all possible rotations*/
+	area->setupArea(listArea, rowsArea);
 
 	ScriptEnviroment* env = getScriptEnv();
 	uint32_t newAreaId = env->addCombatArea(area);

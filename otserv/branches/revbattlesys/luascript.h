@@ -266,6 +266,7 @@ protected:
 	virtual void registerFunctions();
 
 	static std::string getErrorDesc(ErrorCode_t code);
+	static bool getArea(lua_State *L, std::list<uint32_t>& list, uint32_t& rows);
 
 	//lua functions
 	static int luaDoRemoveItem(lua_State *L);
