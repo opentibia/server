@@ -865,29 +865,19 @@ void Protocol78::parseRequestOutfit(NetworkMessage& msg)
 	msg.AddByte(player->lookaddons);
 	
 	int first_outfit, last_outfit;
-	uint32_t type = player->getSex();
 	
-	Outfits* outfits = Outfits::getInstance();
-	const OutfitListType& global_outfits = outfits->getOutfits(type);
 	const OutfitListType& player_outfits = player->getPlayerOutfits();
-	long count_global = global_outfits.size();
-	long count_player = player_outfits.size();
+	long count_outfits = player_outfits.size();
 	
-	if(count_global + count_player > 16){
+	if(count_outfits > 16){
 		msg.AddByte(16);
 	}
 	else{
-		msg.AddByte(count_global + count_player);
+		msg.AddByte(count_outfits);
 	}
 	
 	long counter = 0;
 	OutfitListType::const_iterator it;
-	
-	for(it = global_outfits.begin(); it != global_outfits.end() && (counter <= 16); ++it, ++counter){
-		msg.AddU16((*it)->looktype);
-		msg.AddByte((*it)->addons);
-	}
-	
 	for(it = player_outfits.begin(); it != player_outfits.end() && (counter <= 16); ++it, ++counter){
 		msg.AddU16((*it)->looktype);
 		msg.AddByte((*it)->addons);

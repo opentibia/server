@@ -17,7 +17,7 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
-#include "otpch.h"
+//#include "otpch.h"
 
 #include "definitions.h"
 
@@ -2652,40 +2652,39 @@ void Player::checkRedSkullTicks(long ticks)
 #endif
 
 const OutfitListType& Player::getPlayerOutfits()
-{
+{	
 	return m_playerOutfits.getOutfits();
 }
-
 
 bool Player::canWear(uint32_t _looktype, uint32_t _addons)
 {
 	if(m_playerOutfits.isInList(_looktype, _addons)){
 		return true;
-	}
-	Outfits* outfits = Outfits::getInstance();
-	const OutfitList& global_outfits = outfits->getOutfitList(getSex());
-	if(global_outfits.isInList(_looktype, _addons)){
-		return true;
-	}
-	
+	}	
 	return false;
 }
-
 
 void Player::genReservedStorageRange()
 {
 	unsigned long base_key;
 	//generate outfits range
 	base_key = PSTRG_OUTFITS_RANGE_START + 1;
+	
+	const OutfitList& global_outfits = Outfits::getInstance()->getOutfitList(sex);
+	
 	const OutfitListType& outfits = m_playerOutfits.getOutfits();
 	OutfitListType::const_iterator it;
 	for(it = outfits.begin(); it != outfits.end(); ++it){
-		long value = ((*it)->looktype << 16) | ((*it)->addons & 0xFF);
-		storageMap[base_key] = value;
-		base_key++;
-		if(base_key > PSTRG_OUTFITS_RANGE_START + PSTRG_OUTFITS_RANGE_SIZE){
-			std::cout << "Warning: [Player::genReservedStorageRange()] Player " << getName() << " with more than 500 outfits!." << std::endl;
-			break;
+		uint32_t looktype = (*it)->looktype;
+		uint32_t addons = (*it)->addons;
+		if(!global_outfits.isInList(looktype, addons)){
+			long value = (looktype << 16) | (addons & 0xFF);
+			storageMap[base_key] = value;
+			base_key++;
+			if(base_key > PSTRG_OUTFITS_RANGE_START + PSTRG_OUTFITS_RANGE_SIZE){
+				std::cout << "Warning: [Player::genReservedStorageRange()] Player " << getName() << " with more than 500 outfits!." << std::endl;
+				break;
+			}
 		}
 	}
 }
@@ -2704,4 +2703,19 @@ bool Player::remOutfit(uint32_t _looktype, uint32_t _addons)
 	outfit.looktype = _looktype;
 	outfit.addons = _addons;
 	return m_playerOutfits.remOutfit(outfit);
+}
+
+void Player::setSex(playersex_t player_sex)
+{
+	sex = player_sex;
+	//add default outfits to player outfits
+	Outfits* outfits = Outfits::getInstance();
+	const OutfitListType& global_outfits = outfits->getOutfits(sex);
+	OutfitListType::const_iterator it;
+	Outfit outfit;
+	for(it = global_outfits.begin(); it != global_outfits.end(); ++it){
+		outfit.looktype = (*it)->looktype;
+		outfit.addons = (*it)->addons;
+		m_playerOutfits.addOutfit(outfit);
+	}
 }

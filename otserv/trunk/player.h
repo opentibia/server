@@ -152,6 +152,7 @@ public:
 	int getMana() const {return mana;}
 	int getMagicLevel() const {return maglevel;}
 	playersex_t getSex() const {return sex;}
+	void setSex(playersex_t);
 	bool gainManaTick();
 	bool gainHealthTick();
 	

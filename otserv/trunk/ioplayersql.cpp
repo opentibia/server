@@ -68,7 +68,7 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 	player->setGUID((int)result.getDataInt("id"));
 
 	player->accountNumber = result.getDataInt("account");
-	player->sex = (playersex_t)result.getDataInt("sex");
+	player->setSex((playersex_t)result.getDataInt("sex"));
 
 	player->guildId   = result.getDataInt("guildid");
 	player->guildRank = result.getDataString("guildrank");
