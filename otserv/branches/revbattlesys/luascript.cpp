@@ -2873,7 +2873,7 @@ int LuaScriptInterface::luaDoAreaCombatHealth(lua_State *L)
 	CombatParams params;
 	params.damageType = damageType;
 	params.impactEffect = effect;
-	Combat::doCombatHealth(creature, pos, area, minChange, maxChange, params, NULL);
+	Combat::doCombatHealth(creature, pos, area, minChange, maxChange, params);
 
 	lua_pushnumber(L, LUA_NO_ERROR);
 	return 1;
@@ -2969,7 +2969,7 @@ int LuaScriptInterface::luaDoAreaCombatMana(lua_State *L)
 	
 	CombatParams params;
 	params.impactEffect = effect;
-	Combat::doCombatMana(creature, pos, area, minChange, maxChange, params, NULL);
+	Combat::doCombatMana(creature, pos, area, minChange, maxChange, params);
 
 	lua_pushnumber(L, LUA_NO_ERROR);
 	return 1;
@@ -3011,7 +3011,7 @@ int LuaScriptInterface::luaDoTargetCombatMana(lua_State *L)
 
 	CombatParams params;
 	params.impactEffect = effect;
-	Combat::doCombatMana(creature, target, minChange, maxChange, params, NULL);
+	Combat::doCombatMana(creature, target, minChange, maxChange, params);
 
 	lua_pushnumber(L, LUA_NO_ERROR);
 	return 1;
