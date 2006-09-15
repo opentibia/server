@@ -1,5 +1,5 @@
 local combat = createCombatObject(COMBAT_TYPE_CONDITION)
-local area = createCombatArea( { {1, 1, 1}, {1, 1, 1}, {1, 1, 1} } )
+local area = createCombatArea( { {1, 1, 1}, {1, 3, 1}, {1, 1, 1} } )
 
 local condition = createConditionObject(CONDITION_OUTFIT)
 setConditionParam(condition, CONDITION_PARAM_TICKS, 20000)
