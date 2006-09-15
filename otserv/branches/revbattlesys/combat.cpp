@@ -155,6 +155,10 @@ bool Combat::setParam(CombatParam_t param, uint32_t value)
 			return true;
 			break;
 		}
+		default:
+		{
+			break;
+		}
 	}
 
 	return false;
@@ -403,7 +407,6 @@ void CombatCallBack::getMinMaxValues(Player* player, int32_t& min, int32_t& max)
 	lua_pushnumber(L, player->getLevel());
 	lua_pushnumber(L, player->getMagicLevel());
 
-	bool ret;
 	int size0 = lua_gettop(L);
 	if(lua_pcall(L, 3 /*nParams*/, 2 /*nReturnValues*/, 0) != 0){
 		LuaScriptInterface::reportError(NULL, std::string(LuaScriptInterface::popString(L)));
@@ -486,7 +489,7 @@ bool AreaCombat::getList(const Position& centerPos, const Position& targetPos, s
 
 long round(float v)
 {
-	long t = std::floor(v);
+	long t = (long)std::floor(v);
 	if((v - t) > 0.5){
 		return t + 1;
 	}
@@ -501,25 +504,26 @@ void AreaCombat::copyArea(const MatrixArea* input, MatrixArea* output, MatrixOpe
 	input->getCenter(centerY, centerX);
 
 	if(op == MATRIXOPERATION_COPY){
-		for(int y = 0; y < input->getRows(); ++y){
-			for(int x = 0; x < input->getCols(); ++x){
-				(*output)[y][x] = (*input)[y, x];
+		for(unsigned int y = 0; y < input->getRows(); ++y){
+			for(unsigned int x = 0; x < input->getCols(); ++x){
+				(*output)[y][x] = (*input)[y][x];
 			}
 		}
 
 		output->setCenter(centerY, centerX);
 	}
 	else if(op == MATRIXOPERATION_MIRROR){
-		for(int y = 0; y < input->getRows(); ++y){
+		for(unsigned int y = 0; y < input->getRows(); ++y){
 			int rx = 0;
 			for(int x = input->getCols() - 1; x >= 0; --x){
 				(*output)[y][rx++] = (*input)[y][x];
 			}
-
-			output->setCenter(centerY, (input->getRows() - 1) - centerX);
 		}
-	} else if(op == MATRIXOPERATION_FLIP){
-		for(int x = 0; x < input->getCols(); ++x){
+		
+		output->setCenter(centerY, (input->getRows() - 1) - centerX);
+	}
+	else if(op == MATRIXOPERATION_FLIP){
+		for(unsigned int x = 0; x < input->getCols(); ++x){
 			int ry = 0;
 			for(int y = input->getRows() - 1; y >= 0; --y){
 				(*output)[ry++][x] = (*input)[y][x];
@@ -549,6 +553,10 @@ void AreaCombat::copyArea(const MatrixArea* input, MatrixArea* output, MatrixOpe
 			case MATRIXOPERATION_ROTATER90:
 				angle = 0;
 				break;
+				
+			default:
+				angle = 0;
+				break;
 		}
 		double angleRad = 3.1416 * angle / 180.0;
 
@@ -557,8 +565,8 @@ void AreaCombat::copyArea(const MatrixArea* input, MatrixArea* output, MatrixOpe
 		float c = std::sin(angleRad);
 		float d = std::cos(angleRad);
 		
-		for(int x = 0; x < input->getCols(); ++x){
-			for(int y = 0; y < input->getRows(); ++y){
+		for(unsigned int x = 0; x < input->getCols(); ++x){
+			for(unsigned int y = 0; y < input->getRows(); ++y){
 				//calculate new coordinates using rotation center
 				long newX = x - centerX;
 				long newY = y - centerY;
@@ -578,7 +586,7 @@ void AreaCombat::copyArea(const MatrixArea* input, MatrixArea* output, MatrixOpe
 
 MatrixArea* AreaCombat::createArea(const std::list<uint32_t>& list, uint32_t rows)
 {
-	int cols = list.size() / rows;
+	unsigned int cols = list.size() / rows;
 	MatrixArea* area = new MatrixArea(rows, cols);
 
 	uint32_t x = 0;
@@ -684,6 +692,8 @@ DamageType_t MagicField::getDamageType() const
 
 			case CONDITION_POISON:
 				return DAMAGE_POISON;
+				break;
+			default:
 				break;
 		}
 	}

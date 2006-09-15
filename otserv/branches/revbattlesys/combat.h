@@ -104,7 +104,7 @@ public:
 	bool setCallback(CombatParam_t key);
 	CallBack* getCallback();
 
-	virtual bool setParam(CombatParam_t param, uint32_t value);
+	bool setParam(CombatParam_t param, uint32_t value);
 	void setArea(const AreaCombat* _area);
 	void setCondition(const Condition* _condition);
 
@@ -170,8 +170,8 @@ public:
 	size_t getRows() const {return rows;}
 	size_t getCols() const {return cols;}
 
-	inline const T* & operator[](uint32_t i) const { return data_[i]; }
-	inline T* & operator[](uint32_t i) { return data_[i]; }
+	inline const T* operator[](uint32_t i) const { return data_[i]; }
+	inline T* operator[](uint32_t i) { return data_[i]; }
 
 private:
 	uint32_t centerX;
