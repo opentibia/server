@@ -88,7 +88,7 @@ MySQL Server
 			8. Now you will be taken to the database, click the tab "SQL"
 			9. Goto the file named sample.sql, its in the folder this README is in.
 			10. Copy the text in that file and paste it in that text box on your browser then press ok ;)
-			11. SQL instructions have been executed and a sample account(Account number: 1, Password: test) and player should be made.
+			11. SQL instructions have been executed and a sample account (Account number: 111111, Password: tibia) and player should be made.
 			12. Now go to your folder and open config.lua and make sure the SQL Stuff there is correct such as the mysql user and password ;).
 				Should be all correct for you anyway ;).
 			13. Start the server and login.
