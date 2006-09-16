@@ -75,6 +75,7 @@ public:
 	
 protected:
 	bool playerSpellCheck(const Player* player);
+	bool playerRuneSpellCheck(const Player* player, const Position& toPos);
 	
 	bool causeExhaustion(){return exhaustion;};
 	
@@ -89,6 +90,7 @@ protected:
 	int32_t soul;
 	bool exhaustion;
 	bool needTarget;
+	bool blocking;
 
 private:
 	std::string name;

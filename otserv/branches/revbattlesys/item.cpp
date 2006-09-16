@@ -501,6 +501,11 @@ bool Item::hasProperty(enum ITEMPROPERTY prop) const
 			if(it.isHorizontal)
 				return true;
 			break;
+
+		case BLOCKINGANDNOTMOVEABLE:
+			if(it.blockSolid && !it.moveable)
+				return true;
+			break;
 		
 		default:
 			return false;

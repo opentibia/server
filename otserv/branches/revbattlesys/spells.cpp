@@ -168,6 +168,7 @@ Spell::Spell()
 	soul = 0;
 	exhaustion = false;
 	needTarget = false;
+	blocking = false;
 	premium = false;
 	enabled = true;
 	vocationBits = 0;
@@ -184,30 +185,41 @@ bool Spell::configureSpell(xmlNodePtr p)
 		std::cout << "Error: [Spell::configureSpell] Spell without name." << std::endl;
 		return false;
 	}
+
 	if(readXMLInteger(p, "lvl", intValue)){
 	 	level = intValue;
 	}
+
 	if(readXMLInteger(p, "maglv", intValue)){
 	 	magLevel = intValue;
 	}
+
 	if(readXMLInteger(p, "mana", intValue)){
 	 	mana = intValue;
 	}
+
 	if(readXMLInteger(p, "soul", intValue)){
 	 	soul = intValue;
 	}
+
 	if(readXMLInteger(p, "exhaustion", intValue)){
 		exhaustion = (intValue == 1);
 	}
+
 	if(readXMLInteger(p, "prem", intValue)){
 		premium = (intValue == 1);
 	}
+
 	if(readXMLInteger(p, "enabled", intValue)){
 		enabled = (intValue == 1);
 	}
 
 	if(readXMLInteger(p, "needtarget", intValue)){
 		needTarget = (intValue == 1);
+	}
+
+	if(readXMLInteger(p, "blocking", intValue)){
+		blocking = (intValue == 1);
 	}
 
 	vocationBits = 0xFFFFFFFF;
@@ -251,6 +263,52 @@ bool Spell::playerSpellCheck(const Player* player)
 	}
 	*/
 	return true;
+}
+
+bool Spell::playerRuneSpellCheck(const Player* player, const Position& toPos)
+{
+	bool result = playerSpellCheck(player);
+
+	if(result){
+		ReturnValue ret = RET_NOERROR;
+
+		const Position& playerPos = player->getPosition();
+		if(playerPos.z > toPos.z){
+			ret = RET_FIRSTGOUPSTAIRS;
+		}
+		else if(playerPos.z < toPos.z){
+			ret = RET_FIRSTGODOWNSTAIRS;
+		}
+		else{
+			Tile* tile = g_game.getTile(toPos.x, toPos.y, toPos.z);
+
+			if(!tile){
+				ret = RET_NOTPOSSIBLE;
+			}
+			
+			if(ret == RET_NOERROR){
+				ret = Combat::canDoCombat(player, tile);
+			}
+
+			if(ret == RET_NOERROR && blocking){
+				if(!tile->creatures.empty() || tile->hasProperty(BLOCKSOLID)){
+					ret = RET_NOTENOUGHROOM;
+				}
+			}
+			
+			if(ret == RET_NOERROR && needTarget && tile->creatures.empty()){
+				ret = RET_CANONLYUSETHISRUNEONCREATURES;
+			}
+		}
+
+		if(ret != RET_NOERROR){
+			player->sendCancelMessage(ret);
+			player->sendMagicEffect(player->getPosition(), NM_ME_PUFF);
+			return false;
+		}
+	}
+
+	return result;
 }
 
 void Spell::postCastSpell(Player* player)
@@ -448,40 +506,18 @@ bool InstantSpell::executeCastInstant(Creature* creature, const LuaVariant& var)
 	lua_pushnumber(L, cid);
 	lua_pushnumber(L, variant);
 
-	/*
-	lua_newtable(L);
+	bool isSuccess = true;
 
-	//"pushVariantString"
-	//lua_pushstring(L, param.c_str());
-
-	lua_newtable(L);
-	lua_pushstring(L, "pos");
-	lua_settable(L, -2);
-
-	LuaScriptInterface::setField(L, "x", 1);
-	LuaScriptInterface::setField(L, "y", 2);
-	LuaScriptInterface::setField(L, "z", 3);
-	//
-
-	LuaScriptInterface::setField(L, "type", VARIANT_POSITION);
-	LuaScriptInterface::setField(L, "cid", 12345);
-
-	//LuaScriptInterface::setField(L, "text", param.c_str());
-	lua_pushstring(L, "text");
-	lua_pushstring(L, param.c_str());
-	lua_settable(L, -3);
-	*/
-	
 	long result;
 	if(m_scriptInterface->callFunction(2, result) == false){
-		result = 0;
+		isSuccess = false;
 	}
 
 	if(size0 != lua_gettop(L)){
 		LuaScriptInterface::reportError(NULL, "Stack size changed!");
 	}
 	
-	return (result > 0);
+	return isSuccess;
 }
 
 House* InstantSpell::getHouseFromPos(Creature* creature)
@@ -856,20 +892,7 @@ bool RuneSpell::canExecuteAction(const Player* player, const Position& toPos)
 
 bool RuneSpell::executeUse(Player* player, Item* item, const PositionEx& posFrom, const PositionEx& posTo)
 {
-	if(!playerSpellCheck(player)){
-		return false;
-	}
-	
-	Tile* tile = g_game.getTile(posTo.x, posTo.y, posTo.z);
-
-	if(!tile || !Combat::canDoCombat(player, tile)){
-		player->sendCancelMessage(RET_NOTPOSSIBLE);
-		player->sendMagicEffect(player->getPosition(), NM_ME_PUFF);
-		return false;
-	}
-
-	if(needTarget && tile->creatures.empty()){
-		player->sendTextMessage(MSG_STATUS_SMALL, "You can only use this rune on creatures.", player->getPosition(), NM_ME_PUFF);
+	if(!playerRuneSpellCheck(player, posTo)){
 		return false;
 	}
 
@@ -950,14 +973,16 @@ bool RuneSpell::executeCastRune(Creature* creature, const LuaVariant& var)
 	lua_pushnumber(L, cid);
 	lua_pushnumber(L, variant);
 	
+	bool isSuccess = true;
+
 	long result;
 	if(m_scriptInterface->callFunction(2, result) == false){
-		result = 0;
+		isSuccess = false;
 	}
 	
 	if(size0 != lua_gettop(L)){
 		LuaScriptInterface::reportError(NULL, "Stack size changed!");
 	}
 
-	return (result > 0);
+	return isSuccess;
 }

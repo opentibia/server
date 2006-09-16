@@ -768,7 +768,7 @@ ReturnValue Game::internalMoveCreature(Creature* creature, Direction direction)
 	
 	if(creature->getPlayer()){
 		//try go up
-		if(currentPos.z != 8 && creature->getTile()->getHeight() >= 3){
+		if(currentPos.z != 8 && creature->getTile()->hasHeight(3)){
 			Tile* tmpTile = map->getTile(currentPos.x, currentPos.y, currentPos.z - 1);
 			if(tmpTile == NULL || (tmpTile->ground == NULL && !tmpTile->hasProperty(BLOCKSOLID))){
 				tmpTile = map->getTile(destPos.x, destPos.y, destPos.z - 1);
@@ -783,7 +783,7 @@ ReturnValue Game::internalMoveCreature(Creature* creature, Direction direction)
 			if(creature->getPosition().z != 7 && (tmpTile == NULL || (tmpTile->ground == NULL && !tmpTile->hasProperty(BLOCKSOLID)))){
 				tmpTile = map->getTile(destPos.x, destPos.y, destPos.z + 1);
 
-				if(tmpTile && tmpTile->getHeight() >= 3){
+				if(tmpTile && tmpTile->hasHeight(3)){
 					destPos.z += 1;
 				}
 			}

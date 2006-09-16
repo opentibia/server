@@ -96,7 +96,7 @@ public:
 
 	static void getCombatArea(const Position& centerPos, const Position& targetPos,
 		const AreaCombat* area, std::list<Tile*>& list);
-	static bool canDoCombat(const Creature* caster, const Tile* tile);
+	static ReturnValue canDoCombat(const Creature* caster, const Tile* tile);
 
 	void doCombat(Creature* caster, Creature* target) const;
 	void doCombat(Creature* caster, const Position& pos) const;
@@ -115,7 +115,9 @@ protected:
 	static bool CombatHealthFunc(Creature* caster, Creature* target, const CombatParams& params, void* data);
 	static bool CombatManaFunc(Creature* caster, Creature* target, const CombatParams& params, void* data);
 	static bool CombatConditionFunc(Creature* caster, Creature* target, const CombatParams& params, void* data);
+	static bool CombatNullFunc(Creature* caster, Creature* target, const CombatParams& params, void* data);
 
+	static void CombatTileEffects(Creature* caster, Tile* tile, const CombatParams& params);
 	void getMinMaxValues(Creature* creature, int32_t& min, int32_t& max) const;
 
 	//configureable

@@ -2770,65 +2770,6 @@ int LuaScriptInterface::luaDoCombat(lua_State *L)
 		}
 	}
 
-	/*
-	LuaVariantType_t type = (VariantType_t)LuaScriptInterface::getField(L, "type");
-
-	switch(type){
-		case VARIANT_NUMBER:
-		{
-			int32_t cid = getField(L, "cid");
-			break;
-		}
-
-		case VARIANT_POSITION:
-		{
-			lua_pushstring(L, "text");
-			lua_gettable(L, -2);
-			std::string text = lua_tostring(L, -1);
-			lua_pop(L, 1);
-
-			lua_pushstring(L, "cid");
-			lua_gettable(L, -2);
-			int32_t cid = lua_tonumber(L, -1);
-			lua_pop(L, 1);
-
-			lua_pushstring(L, "pos");
-			lua_gettable(L, -2);
-			
-			Position pos;
-
-			pos.x = LuaScriptInterface::getField(L, "x");
-			pos.y = LuaScriptInterface::getField(L, "y");
-			pos.z = LuaScriptInterface::getField(L, "z");
-
-			lua_pop(L, 1);  // remove number and key
-			break;
-		}
-
-		case VARIANT_STRING:
-		{
-			lua_pushstring(L, "text");
-			lua_gettable(L, -2);  // get table[key]
-			std::string text = lua_tostring(L, -1);
-			lua_pop(L, 1);  // remove number and key
-			break;
-		}
-
-		default:
-		{
-			reportErrorFunc(getErrorDesc(LUA_ERROR_UNKNOWNVARIANT));
-			lua_pushnumber(L, LUA_ERROR);
-			return 1;
-			break;
-		}
-	}
-
-	lua_pop(L, 1); //table
-	*/
-
-	//combat
-	//cid
-
 	lua_pushnumber(L, LUA_NO_ERROR);
 	return 1;
 }

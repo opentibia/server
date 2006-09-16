@@ -300,26 +300,26 @@ public:
 	void onUpdateInventoryItem(slots_t slot, Item* oldItem, Item* newItem);
 	void onRemoveInventoryItem(slots_t slot, Item* item);
 
-	void sendIcons();  
-	void sendChangeSpeed(const Creature* creature);
-	void sendToChannel(Creature* creature, SpeakClasses type, const std::string& text, unsigned short channelId);
+	void sendIcons() const;  
+	void sendChangeSpeed(const Creature* creature) const;
+	void sendToChannel(Creature* creature, SpeakClasses type, const std::string& text, unsigned short channelId) const;
 	void sendCancelMessage(ReturnValue message) const;
 	void sendCancel(const char* msg) const;
 	void sendCancelWalk() const;
-	void sendCancelTarget();
+	void sendCancelTarget() const;
 	void sendStats();
 	void sendTextMessage(MessageClasses mclass, const std::string& message) const;
 	void sendTextMessage(MessageClasses mclass, const std::string& message, const Position& pos,
 		unsigned char type) const;
 	void sendPing();
-	void sendTextWindow(Item* item,const unsigned short maxlen, const bool canWrite);  
-	void sendDistanceShoot(const Position& from, const Position& to, unsigned char type);
-	void sendMagicEffect(const Position& pos, unsigned char type);
-	void sendAnimatedText(const Position& pos, unsigned char color, std::string text);
-	void sendCreatureHealth(const Creature* creature);
-	void sendTradeItemRequest(const Player* player, const Item* item, bool ack);
-	void sendCloseTrade();
-	void sendHouseWindow(House* _house, unsigned long _listid);
+	void sendTextWindow(Item* item,const unsigned short maxlen, const bool canWrite) const;
+	void sendDistanceShoot(const Position& from, const Position& to, unsigned char type) const;
+	void sendMagicEffect(const Position& pos, unsigned char type) const;
+	void sendAnimatedText(const Position& pos, unsigned char color, std::string text) const;
+	void sendCreatureHealth(const Creature* creature) const;
+	void sendTradeItemRequest(const Player* player, const Item* item, bool ack) const;
+	void sendCloseTrade() const;
+	void sendHouseWindow(House* _house, unsigned long _listid) const;
 	void receivePing();
 	void flushMsg();
 

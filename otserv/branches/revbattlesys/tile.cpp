@@ -146,6 +146,24 @@ bool Tile::floorChange(Direction direction) const
 	return false;
 }
 
+bool Tile::hasHeight(uint32_t n) const
+{
+	uint32_t height = 0;
+	Item* iiItem = NULL;
+	for(int32_t i = 0; i < getThingCount(); ++i){
+		iiItem = __getThing(i)->getItem();
+
+		if(iiItem && iiItem->hasProperty(HASHEIGHT))
+			++height;
+
+		if(n == height){
+			return true;
+		}
+	}
+
+	return height;
+}
+
 uint32_t Tile::getHeight() const
 {
 	uint32_t height = 0;
@@ -508,6 +526,8 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			return RET_NOERROR;
 		}
 
+		//return queryAddItem(item->isBlocking(), item->isPickupable());
+
 		if(ground == NULL)
 			return RET_NOTPOSSIBLE;
 
@@ -533,30 +553,6 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 					else
 						return RET_NOTENOUGHROOM;
 				}
-
-				/*
-				//TODO: query script interface
-				if(iitem->getID() == ITEM_DUSTBIN)
-					continue;
-
-				if(iiType.blockSolid){
-					if(item->isPickupable()){
-						//experimental
-						//if((iiType.isVertical || iiType.isHorizontal) && item->isHangable()){
-						//	ItemVector::const_iterator iit;
-						//	for(iit = downItems.begin(); iit != downItems.end(); ++iit){
-						//		if((*iit)->isHangable())
-						//			return RET_NOTENOUGHROOM;
-						//	}
-						//}
-						//else
-						if(!iiType.hasHeight || iiType.pickupable)
-							return RET_NOTENOUGHROOM;
-					}
-					else
-						return RET_NOTENOUGHROOM;
-				}
-				*/
 			}
 		}
 	}

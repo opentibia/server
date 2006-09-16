@@ -75,23 +75,42 @@ void Combat::getCombatArea(const Position& centerPos, const Position& targetPos,
 	}
 }
 
-bool Combat::canDoCombat(const Creature* caster, const Tile* tile)
+ReturnValue Combat::canDoCombat(const Creature* caster, const Tile* tile)
 {
+	if(tile->hasProperty(BLOCKPROJECTILE) || tile->hasProperty(BLOCKINGANDNOTMOVEABLE)){
+		return RET_NOTENOUGHROOM;
+	}
+
+	if(!tile->ground){
+		return RET_NOTPOSSIBLE;
+	}
+
+	if(tile->floorChange()){
+		return RET_NOTENOUGHROOM;
+	}
+
+	if(tile->getTeleportItem()){
+		return RET_NOTENOUGHROOM;
+	}
+
+	if(caster->getPosition().z < tile->getPosition().z){
+		return RET_FIRSTGODOWNSTAIRS;
+	}
+	if(caster->getPosition().z > tile->getPosition().z){
+		return RET_FIRSTGOUPSTAIRS;
+	}
+
 	if(const Player* player = caster->getPlayer()){
 		if(player->getAccessLevel() > 2){
-			return true;
+			return RET_NOERROR;
 		}
 	}
 
 	if(tile->isPz()){
-		return false;
+		return RET_NOTPOSSIBLE;
 	}
 
-	if(tile->hasProperty(BLOCKPROJECTILE)){
-		return false;
-	}
-
-	return true;
+	return RET_NOERROR;
 }
 
 void Combat::setArea(const AreaCombat* _area)
@@ -225,6 +244,27 @@ bool Combat::CombatConditionFunc(Creature* caster, Creature* target, const Comba
 	return false;
 }
 
+bool Combat::CombatNullFunc(Creature* caster, Creature* target, const CombatParams& params, void* data)
+{
+	return true;
+}
+
+void Combat::CombatTileEffects(Creature* caster, Tile* tile, const CombatParams& params)
+{
+	if(params.itemId != 0){
+		Item* item = Item::CreateItem(params.itemId);
+
+		ReturnValue ret = g_game.internalAddItem(tile, item);
+		if(ret != RET_NOERROR){
+			delete item;
+		}
+	}
+
+	if(params.impactEffect != NM_ME_NONE){
+		g_game.addMagicEffect(tile->getPosition(), params.impactEffect);
+	}
+}
+
 void Combat::CombatFunc(Creature* caster, const Position& pos,
 	const AreaCombat* area, const CombatParams& params, COMBATFUNC func, void* data)
 {
@@ -234,7 +274,7 @@ void Combat::CombatFunc(Creature* caster, const Position& pos,
 	bool bContinue = true;
 
 	for(std::list<Tile*>::iterator it = list.begin(); it != list.end(); ++it){
-		if(canDoCombat(caster, *it)){
+		if(canDoCombat(caster, *it) == RET_NOERROR){
 			for(CreatureVector::iterator cit = (*it)->creatures.begin(); bContinue && cit != (*it)->creatures.end(); ++cit){
 
 				if(params.targetCasterOrTopMost){
@@ -254,9 +294,7 @@ void Combat::CombatFunc(Creature* caster, const Position& pos,
 				func(caster, *cit, params, data);
 			}
 
-			if(params.impactEffect != NM_ME_NONE){
-				g_game.addMagicEffect((*it)->getPosition(), params.impactEffect);
-			}
+			CombatTileEffects(caster, *it, params);
 		}
 	}
 
@@ -308,6 +346,9 @@ void Combat::doCombat(Creature* caster, const Position& pos) const
 	}
 	else if(combatType == COMBAT_CONDITION){
 		doCombatCondition(caster, pos, area, params);
+	}
+	else{
+		CombatFunc(caster, pos, area, params, CombatNullFunc, NULL);
 	}
 }
 
@@ -593,11 +634,11 @@ MatrixArea* AreaCombat::createArea(const std::list<uint32_t>& list, uint32_t row
 	uint32_t y = 0;
 
 	for(std::list<uint32_t>::const_iterator it = list.begin(); it != list.end(); ++it){
-		if(*it != 0){
+		if(*it == 1 || *it == 3){
 			area->setValue(y, x, true);
 		}
 		
-		if(*it == 3){
+		if(*it == 2 || *it == 3){
 			area->setCenter(y, x);
 		}
 

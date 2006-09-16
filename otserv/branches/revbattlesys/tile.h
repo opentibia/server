@@ -71,6 +71,7 @@ public:
 	Creature* getTopCreature();
 	Item* getTopTopItem();
 	Item* getTopDownItem();
+	bool isMoveableBlocking() const;
 	Item* getMoveableBlockingItem();
 	Thing* getTopThing();
 	
@@ -86,8 +87,9 @@ public:
 	bool floorChange() const;
 	bool floorChangeDown() const;
 	bool floorChange(Direction direction) const;
+	bool hasHeight(uint32_t n) const;
 	uint32_t getHeight() const;
-  
+
 	virtual std::string getDescription(int32_t lookDistance) const;
 
 	void moveCreature(Creature* creature, Cylinder* toCylinder, bool teleport = false);

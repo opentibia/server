@@ -431,11 +431,11 @@ int Player::getDefense() const
 	return random_range(int(defense*0.25), int(1+(int)(defense*rand())/(RAND_MAX+1.0)));
 }
 
-void Player::sendIcons()
+void Player::sendIcons() const
 {
 	int icons = 0;
 
-	ConditionList::iterator it;
+	ConditionList::const_iterator it;
 	for(it = conditions.begin(); it != conditions.end(); ++it){
 		icons |= (*it)->getIcons();
 	}
@@ -1021,6 +1021,10 @@ void Player::sendCancelMessage(ReturnValue message) const
 		sendCancel("You are not allowed to shoot directly on players.");
 		break;
 
+	case RET_CANONLYUSETHISRUNEONCREATURES:
+		sendCancel("You can only use this rune on creatures.");
+		break;
+
 	case RET_NOTPOSSIBLE:
 	default:
 		sendCancel("Sorry, not possible.");
@@ -1033,18 +1037,18 @@ void Player::sendCancel(const char* msg) const
   client->sendCancel(msg);
 }
 
-void Player::sendChangeSpeed(const Creature* creature)
+void Player::sendChangeSpeed(const Creature* creature) const
 {
 	client->sendChangeSpeed(creature);
 }
 
 void Player::sendToChannel(Creature* creature, SpeakClasses type,
-	const std::string& text, unsigned short channelId)
+	const std::string& text, unsigned short channelId) const
 {
 	client->sendToChannel(creature, type, text, channelId);
 }
 
-void Player::sendCancelTarget()
+void Player::sendCancelTarget() const
 {
 	client->sendCancelTarget();
 }
@@ -1129,42 +1133,42 @@ void Player::receivePing()
 		npings--;
 }
 
-void Player::sendDistanceShoot(const Position& from, const Position& to, unsigned char type)
+void Player::sendDistanceShoot(const Position& from, const Position& to, unsigned char type) const
 {
 	client->sendDistanceShoot(from, to,type);
 }
 
-void Player::sendMagicEffect(const Position& pos, unsigned char type)
+void Player::sendMagicEffect(const Position& pos, unsigned char type) const
 {
 	client->sendMagicEffect(pos,type);
 }
 
-void Player::sendAnimatedText(const Position& pos, unsigned char color, std::string text)
+void Player::sendAnimatedText(const Position& pos, unsigned char color, std::string text) const
 {
 	client->sendAnimatedText(pos,color,text);
 }
 
-void Player::sendCreatureHealth(const Creature* creature)
+void Player::sendCreatureHealth(const Creature* creature) const
 {
 	client->sendCreatureHealth(creature);
 }
 
-void Player::sendTradeItemRequest(const Player* player, const Item* item, bool ack)
+void Player::sendTradeItemRequest(const Player* player, const Item* item, bool ack) const
 {
 	client->sendTradeItemRequest(player, item, ack);
 }
 
-void Player::sendCloseTrade()
+void Player::sendCloseTrade() const
 {
 	client->sendCloseTrade();
 }
 
-void Player::sendTextWindow(Item* item, const unsigned short maxlen, const bool canWrite)
+void Player::sendTextWindow(Item* item, const unsigned short maxlen, const bool canWrite) const
 {
 	client->sendTextWindow(item,maxlen,canWrite);
 }
 
-void Player::sendHouseWindow(House* _house, unsigned long _listid)
+void Player::sendHouseWindow(House* _house, unsigned long _listid) const
 {
 	std::string text;
 	if(_house->getAccessList(_listid, text)){

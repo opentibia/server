@@ -253,7 +253,7 @@ bool House::transferToDepot()
 	return true;
 }
 
-bool House::getAccessList(unsigned long listId, std::string& list)
+bool House::getAccessList(unsigned long listId, std::string& list) const
 {
 	if(listId == GUEST_LIST){
 		guestList.getList(list);
@@ -298,6 +298,17 @@ void House::addDoor(Door* door)
 Door* House::getDoorByNumber(unsigned long doorId)
 {
 	HouseDoorList::iterator it;
+	for(it = doorList.begin(); it != doorList.end(); ++it){
+		if((*it)->getDoorId() == doorId){
+			return *it;
+		}
+	}
+	return NULL;
+}
+
+Door* House::getDoorByNumber(unsigned long doorId) const
+{
+	HouseDoorList::const_iterator it;
 	for(it = doorList.begin(); it != doorList.end(); ++it){
 		if((*it)->getDoorId() == doorId){
 			return *it;

@@ -146,7 +146,7 @@ public:
 	//	GUEST_LIST     guest list
 	//  SUBOWNER_LIST subowner list
 	void setAccessList(unsigned long listId, const std::string& textlist);
-	bool getAccessList(unsigned long listId, std::string& list);
+	bool getAccessList(unsigned long listId, std::string& list) const;
 
 	bool isInvited(const Player* player);
 	
@@ -178,6 +178,7 @@ public:
 
 	void addDoor(Door* door);
 	Door* getDoorByNumber(unsigned long doorId);
+	Door* getDoorByNumber(unsigned long doorId) const;
 	Door* getDoorByPosition(const Position& pos);
 	
 	HouseTransferItem* getTransferItem();
