@@ -636,7 +636,7 @@ int main(int argc, char *argv[])
 	
 	// load outfits data
 	filename.str("");
-	filename << g_config.getString(ConfigManager::DATA_DIRECTORY) << "/outfits.xml";
+	filename << g_config.getString(ConfigManager::DATA_DIRECTORY) << "outfits.xml";
 	std::cout << ":: Loading " << filename.str() << "... ";
 	Outfits* outfits = Outfits::getInstance();
 	if(!outfits->loadFromXml(g_config.getString(ConfigManager::DATA_DIRECTORY))){
