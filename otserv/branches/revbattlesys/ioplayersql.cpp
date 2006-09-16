@@ -42,8 +42,10 @@ extern LuaScript g_config;
 
 typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 
+#ifndef __GNUC__
 #pragma warning( disable : 4005)
 #pragma warning( disable : 4996)
+#endif
 
 IOPlayerSQL::IOPlayerSQL()
 {

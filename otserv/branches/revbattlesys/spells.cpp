@@ -388,6 +388,10 @@ bool InstantSpell::castInstant(Creature* creature)
 			var.pos = creature->getPosition();
 			var.pos.x -= 1;
 			break;
+		
+		default:
+			return false;
+			break;
 	}
 
 	return castInstant(creature, var);

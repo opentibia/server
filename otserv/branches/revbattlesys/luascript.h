@@ -24,6 +24,7 @@
 
 #include <string>
 #include <map>
+#include <list>
 
 extern "C"
 {

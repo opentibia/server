@@ -27,8 +27,8 @@
 extern Game g_game;
 
 Condition::Condition(ConditionType_t _type, int32_t _ticks) :
-	conditionType(_type),
-  ticks(_ticks)
+ticks(_ticks) ,
+conditionType(_type)
 {
 	//
 }
@@ -40,6 +40,10 @@ bool Condition::setParam(ConditionParam_t param, int32_t value)
 		{
 			ticks = value;
 			return true;
+		}
+		default:
+		{
+			return false;
 		}
 	}
 
@@ -193,6 +197,10 @@ bool ConditionDamage::setParam(ConditionParam_t param, int32_t value)
 			owner = value;
 			return true;
 		}
+		default:
+		{
+			return false;
+		}
 	}
 
 	return ret;
@@ -201,7 +209,7 @@ bool ConditionDamage::setParam(ConditionParam_t param, int32_t value)
 void ConditionDamage::addDamage(uint32_t rounds, uint32_t time, int32_t value)
 {
 	//rounds, time, damage
-	for(int i = 0; i < rounds; ++i){
+	for(unsigned int i = 0; i < rounds; ++i){
 		damageList.push_back(DamagePair(time, value));
 		ticks += time;
 	}
@@ -337,6 +345,10 @@ bool ConditionSpeed::setParam(ConditionParam_t param, int32_t value)
 			}
 
 			return true;
+		}
+		default:
+		{
+			return false;
 		}
 	}
 
