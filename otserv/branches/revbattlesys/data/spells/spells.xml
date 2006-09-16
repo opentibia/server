@@ -8,7 +8,10 @@
 <rune name="Ultimate healing" id="2273" needtarget="1" hascharges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="uh.lua"></rune>
 <rune name="Energy arrow" id="2274" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="energy wave.lua"></rune>
 <rune name="Energy wall" id="2275" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="energy wall.lua"></rune>
+<rune name="Magic wall" id="2276" blocking="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="magic wall.lua"></rune>
+<rune name="Magic prison" id="2277" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="magic prison.lua"></rune>
 
+<instant name="Wild Growth" words="exevo grav vita" blocking="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="wild growth.lua"></instant>
 <instant name="Find Person" words="exiva" params="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" function="searchPlayer"></instant>
 <instant name="Heal Friend" words="exura sio" params="1" needtarget="1"  lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="healfriend.lua"></instant>
 <instant name="Energy wave" words="exevo mort hur" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="energy wave.lua"></instant>
