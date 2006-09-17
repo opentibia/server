@@ -378,9 +378,6 @@ protected:
 	static int luaAddOutfitCondition(lua_State *L);
 
 	static int luaSetCombatCallBack(lua_State *L);
-	//
-	//static int luaDoAreaCombat(lua_State *L);
-	//static int luaDoTargetCombat(lua_State *L);
 	static int luaDoCombat(lua_State *L);
 
 	static int luaDoAreaCombatHealth(lua_State *L);
@@ -391,6 +388,7 @@ protected:
 	static int luaDoTargetCombatMana(lua_State *L);
 
 	static int luaDoAreaCombatCondition(lua_State *L);
+	static int luaDoTargetCombatCondition(lua_State *L);
 
 	static int luaDebugPrint(lua_State *L);
 	static int luaIsInArray(lua_State *L);

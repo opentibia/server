@@ -57,7 +57,7 @@ struct CombatParams{
 		delete condition;
 	}
 
-	Condition* condition;
+	const Condition* condition;
 	DamageType_t damageType;
 	bool blockedByArmor;
 	bool blockedByShield;

@@ -1033,6 +1033,12 @@ void LuaScriptInterface::registerFunctions()
 	//doTargetCombatMana(cid, target, min, max, effect)
 	lua_register(m_luaState, "doTargetCombatMana", LuaScriptInterface::luaDoTargetCombatMana);
 
+	//doAreaCombatCondition(cid, pos, area, condition, effect)
+	lua_register(m_luaState, "doAreaCombatCondition", LuaScriptInterface::luaDoAreaCombatCondition);
+
+	//doTargetCombatCondition(cid, target, condition, effect)
+	lua_register(m_luaState, "doTargetCombatCondition", LuaScriptInterface::luaDoTargetCombatCondition);
+
 	//debugPrint(text)
 	lua_register(m_luaState, "debugPrint", LuaScriptInterface::luaDebugPrint);
 	//isInArray(array, value)
@@ -2604,93 +2610,6 @@ int LuaScriptInterface::luaSetCombatCallBack(lua_State *L)
 	return 0;
 }
 
-/*
-int LuaScriptInterface::luaDoAreaCombat(lua_State *L)
-{
-	//doAreaCombat(cid, combat, pos)
-
-	Position pos;
-	long stackpos;
-	popPosition(L, pos, stackpos);
-
-	uint32_t combatId = (uint32_t)popNumber(L);
-	uint32_t cid = (uint32_t)popNumber(L);
-
-	ScriptEnviroment* env = getScriptEnv();
-
-	Creature* creature = NULL;
-	
-	if(cid != 0){
-		creature = env->getCreatureByUID(cid);
-
-		if(!creature){
-			reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
-			lua_pushnumber(L, LUA_ERROR);
-			return 1;
-		}
-	}
-
-	const Combat* combat = env->getCombatObject(combatId);
-
-	if(!combat){
-		reportErrorFunc(getErrorDesc(LUA_ERROR_COMBAT_NOT_FOUND));
-		lua_pushnumber(L, LUA_ERROR);
-		return 1;
-	}
-
-	combat->doCombat(creature, pos);
-
-	lua_pushnumber(L, LUA_NO_ERROR);
-	return 1;
-}
-*/
-
-/*
-int LuaScriptInterface::luaDoTargetCombat(lua_State *L)
-{
-	//doTargetCombat(cid, combat, target)
-
-	uint32_t targetCid = (int)popNumber(L);
-
-	uint32_t combatId = (int)popNumber(L);
-	uint32_t cid = (uint32_t)popNumber(L);
-
-	ScriptEnviroment* env = getScriptEnv();
-
-	Creature* creature = NULL;
-	
-	if(cid != 0){
-		creature = env->getCreatureByUID(cid);
-
-		if(!creature){
-			reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
-			lua_pushnumber(L, LUA_ERROR);
-			return 1;
-		}
-	}
-
-	Creature* target = env->getCreatureByUID(targetCid);
-	if(!target){
-		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
-		lua_pushnumber(L, LUA_ERROR);
-		return 1;
-	}
-
-	const Combat* combat = env->getCombatObject(combatId);
-
-	if(!combat){
-		reportErrorFunc(getErrorDesc(LUA_ERROR_COMBAT_NOT_FOUND));
-		lua_pushnumber(L, LUA_ERROR);
-		return 1;
-	}
-
-	combat->doCombat(creature, target);
-
-	lua_pushnumber(L, LUA_NO_ERROR);
-	return 1;
-}
-*/
-
 int LuaScriptInterface::luaDoCombat(lua_State *L)
 {
 	//doCombat(cid, combat, param)
@@ -2828,7 +2747,6 @@ int LuaScriptInterface::luaDoTargetCombatHealth(lua_State *L)
 	int32_t maxChange = (int32_t)popNumber(L);
 	int32_t minChange = (int32_t)popNumber(L);
 	DamageType_t damageType = (DamageType_t)popNumber(L);
-
 	uint32_t targetCid = (int)popNumber(L);
 	uint32_t cid = (uint32_t)popNumber(L);
 
@@ -2923,10 +2841,7 @@ int LuaScriptInterface::luaDoTargetCombatMana(lua_State *L)
 	uint8_t effect = (uint8_t)popNumber(L);
 	int32_t maxChange = (int32_t)popNumber(L);
 	int32_t minChange = (int32_t)popNumber(L);
-
 	uint32_t targetCid = (int)popNumber(L);
-
-	uint32_t combatId = (int)popNumber(L);
 	uint32_t cid = (uint32_t)popNumber(L);
 
 	ScriptEnviroment* env = getScriptEnv();
@@ -2960,13 +2875,14 @@ int LuaScriptInterface::luaDoTargetCombatMana(lua_State *L)
 
 int LuaScriptInterface::luaDoAreaCombatCondition(lua_State *L)
 {
-	//doAreaCombatCondition(cid, combat, pos)
+	//doAreaCombatCondition(cid, pos, area, condition, effect)
 
+	uint8_t effect = (uint8_t)popNumber(L);
+	uint32_t conditionId = (uint32_t)popNumber(L);
+	uint32_t areaId = (uint32_t)popNumber(L);
 	Position pos;
 	long stackpos;
 	popPosition(L, pos, stackpos);
-
-	uint32_t combatId = (int)popNumber(L);
 	uint32_t cid = (uint32_t)popNumber(L);
 
 	ScriptEnviroment* env = getScriptEnv();
@@ -2983,18 +2899,70 @@ int LuaScriptInterface::luaDoAreaCombatCondition(lua_State *L)
 		}
 	}
 
-	const Combat* combat = env->getCombatObject(combatId);
-
-	if(!combat){
-		reportErrorFunc(getErrorDesc(LUA_ERROR_COMBAT_NOT_FOUND));
+	const Condition* condition = env->getConditionObject(conditionId);
+	if(!condition){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CONDITION_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
 		return 1;
 	}
 
-	//const CombatCondition* combatCondition = combat->getCombatCondition();
-	//combatCondition->doCombat(creature, pos);
+	const AreaCombat* area = env->getCombatArea(areaId);
+	if(!area && areaId != 0){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_AREA_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
 
-	//combat->doCombatCondition(creature, pos);
+	CombatParams params;
+	params.impactEffect = effect;
+	params.condition = condition;
+	Combat::doCombatCondition(creature, pos, area, params);
+
+	lua_pushnumber(L, LUA_NO_ERROR);
+	return 1;
+}
+
+int LuaScriptInterface::luaDoTargetCombatCondition(lua_State *L)
+{
+	//doTargetCombatCondition(cid, target, condition, effect)
+
+	uint8_t effect = (uint8_t)popNumber(L);
+	uint32_t conditionId = (uint32_t)popNumber(L);
+	uint32_t targetCid = (uint32_t)popNumber(L);
+	uint32_t cid = (uint32_t)popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Creature* creature = NULL;
+
+	if(cid != 0){
+		creature = env->getCreatureByUID(cid);
+
+		if(!creature){
+			reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+			lua_pushnumber(L, LUA_ERROR);
+			return 1;
+		}
+	}
+
+	Creature* target = env->getCreatureByUID(targetCid);
+	if(!target){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
+	const Condition* condition = env->getConditionObject(conditionId);
+	if(!condition){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CONDITION_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
+	CombatParams params;
+	params.impactEffect = effect;
+	params.condition = condition;
+	Combat::doCombatCondition(creature, target, params);
 
 	lua_pushnumber(L, LUA_NO_ERROR);
 	return 1;
