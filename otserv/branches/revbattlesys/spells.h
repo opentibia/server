@@ -91,6 +91,7 @@ protected:
 	bool exhaustion;
 	bool needTarget;
 	bool blocking;
+	bool defensive;
 
 private:
 	std::string name;

@@ -1024,6 +1024,10 @@ void Player::sendCancelMessage(ReturnValue message) const
 	case RET_CANONLYUSETHISRUNEONCREATURES:
 		sendCancel("You can only use this rune on creatures.");
 		break;
+	
+	case RET_ACTIONNOTPERMITTEDINPROTECTIONZONE:
+		sendCancel("This action is not permitted in a protection zone.");
+		break;
 
 	case RET_NOTPOSSIBLE:
 	default:

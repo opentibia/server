@@ -522,11 +522,20 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 	}
 	else if(const Item* item = thing->getItem()){
 		//If its a new (summoned item) always accept it, or FLAG_NOLIMIT is set
+		/*
 		if(thing->getParent() == NULL || ((flags & FLAG_NOLIMIT) == FLAG_NOLIMIT) ){
 			return RET_NOERROR;
 		}
+		*/
+#ifdef __DEBUG__
+		if(thing->getParent() == NULL){
+			std::cout << "Notice: Tile::__queryAdd() - thing->getParent() == NULL" << std::endl;
+		}
+#endif
 
-		//return queryAddItem(item->isBlocking(), item->isPickupable());
+		if((flags & FLAG_NOLIMIT) == FLAG_NOLIMIT){
+			return RET_NOERROR;
+		}
 
 		if(ground == NULL)
 			return RET_NOTPOSSIBLE;

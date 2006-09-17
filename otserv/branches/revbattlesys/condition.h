@@ -112,6 +112,7 @@ public:
 	void addDamage(uint32_t rounds, uint32_t time, int32_t value);
 
 protected:
+	bool delayed;
 	uint32_t owner;
 	typedef std::pair<int32_t, int32_t> DamagePair;
 	std::list<DamagePair> damageList;

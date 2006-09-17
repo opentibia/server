@@ -2494,13 +2494,13 @@ void Game::checkCreature(uint32_t creatureId, uint32_t interval)
 
 			Tile* tile = creature->getTile();
 			if(splash){
-				internalAddItem(tile, splash);
+				internalAddItem(tile, splash, INDEX_WHEREEVER, FLAG_NOLIMIT);
 				startDecay(splash);
 			}
 
 			Item* corpse = creature->getCorpse();
 			if(corpse){
-				internalAddItem(tile, corpse);
+				internalAddItem(tile, corpse, INDEX_WHEREEVER, FLAG_NOLIMIT);
 				startDecay(corpse);
 			}
 
@@ -2671,8 +2671,6 @@ bool Game::combatChangeHealth(DamageType_t damageType, Creature* attacker, Creat
 
 				switch(damageType){
 					case DAMAGE_PHYSICAL:
-					//case DAMAGE_SUDDENDEATH:
-					//case DAMAGE_PHYSICALPROJECTILE:
 					{
 						Item* splash = NULL;
 						switch(target->getRace()){
@@ -2698,7 +2696,7 @@ bool Game::combatChangeHealth(DamageType_t damageType, Creature* attacker, Creat
 						}
 
 						if(splash){
-							internalAddItem(target->getTile(), splash);
+							internalAddItem(target->getTile(), splash, INDEX_WHEREEVER, FLAG_NOLIMIT);
 							startDecay(splash);
 						}
 

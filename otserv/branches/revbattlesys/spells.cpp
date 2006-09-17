@@ -169,6 +169,7 @@ Spell::Spell()
 	exhaustion = false;
 	needTarget = false;
 	blocking = false;
+	defensive = false;
 	premium = false;
 	enabled = true;
 	vocationBits = 0;
@@ -220,6 +221,10 @@ bool Spell::configureSpell(xmlNodePtr p)
 
 	if(readXMLInteger(p, "blocking", intValue)){
 		blocking = (intValue == 1);
+	}
+
+	if(readXMLInteger(p, "defensive", intValue)){
+		defensive = (intValue == 1);
 	}
 
 	vocationBits = 0xFFFFFFFF;
@@ -285,7 +290,15 @@ bool Spell::playerRuneSpellCheck(const Player* player, const Position& toPos)
 			if(!tile){
 				ret = RET_NOTPOSSIBLE;
 			}
-			
+
+			/*
+			if(ret == RET_NOERROR && !defensive){
+				if(player->getAccessLevel() < 2 && tile->isPz()){
+					ret = RET_ACTIONNOTPERMITTEDINPROTECTIONZONE;
+				}
+			}
+			*/
+
 			if(ret == RET_NOERROR){
 				ret = Combat::canDoCombat(player, tile);
 			}

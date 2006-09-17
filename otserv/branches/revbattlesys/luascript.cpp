@@ -1507,7 +1507,7 @@ int LuaScriptInterface::luaDoPlayerAddItem(lua_State *L)
 		ReturnValue ret = g_game.internalAddItem(player, newItem);
 		if(ret != RET_NOERROR){
 			Tile* tile = player->getTile();
-			ret = g_game.internalAddItem(tile, newItem);
+			ret = g_game.internalAddItem(tile, newItem, INDEX_WHEREEVER, FLAG_NOLIMIT);
 			if(ret != RET_NOERROR){
 				delete newItem;
 				reportErrorFunc("Could not add item");

@@ -184,6 +184,7 @@ uint8_t ConditionGeneric::getIcons() const
 ConditionDamage::ConditionDamage(ConditionType_t _type) :
 Condition(_type, 0)
 {
+	delayed = false;
 	owner = 0;
 }
 
@@ -196,7 +197,16 @@ bool ConditionDamage::setParam(ConditionParam_t param, int32_t value)
 		{
 			owner = value;
 			return true;
+			break;
 		}
+
+		case CONDITIONPARAM_DELAYED:
+		{
+			delayed = (value != 0);
+			return true;
+			break;
+		}
+
 		default:
 		{
 			return false;
@@ -217,6 +227,10 @@ void ConditionDamage::addDamage(uint32_t rounds, uint32_t time, int32_t value)
 
 bool ConditionDamage::startCondition(Creature* creature)
 {
+	if(delayed){
+		return true;
+	}
+
 	int32_t damage = 0;
 	if(getNextDamage(damage)){
 		return doDamage(creature, damage);

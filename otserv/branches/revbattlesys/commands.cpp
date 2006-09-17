@@ -38,6 +38,7 @@ typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 #include "spells.h"
 #include "talkaction.h"
 #include "movement.h"
+#include "spells.h"
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
@@ -381,7 +382,7 @@ bool Commands::createItemById(Creature* creature, const std::string& cmd, const 
 	ReturnValue ret = game->internalAddItem(player, newItem);
 	
 	if(ret != RET_NOERROR){
-		ret = game->internalAddItem(player->getTile(), newItem);
+		ret = game->internalAddItem(player->getTile(), newItem, INDEX_WHEREEVER, FLAG_NOLIMIT);
 
 		if(ret != RET_NOERROR){
 			delete newItem;
@@ -432,7 +433,7 @@ bool Commands::createItemByName(Creature* creature, const std::string& cmd, cons
 	ReturnValue ret = game->internalAddItem(player, newItem);
 	
 	if(ret != RET_NOERROR){
-		ret = game->internalAddItem(player->getTile(), newItem);
+		ret = game->internalAddItem(player->getTile(), newItem, INDEX_WHEREEVER, FLAG_NOLIMIT);
 
 		if(ret != RET_NOERROR){
 			delete newItem;
