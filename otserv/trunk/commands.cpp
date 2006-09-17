@@ -1053,7 +1053,7 @@ void showTime(std::stringstream& str, unsigned long time)
 		const tm* tms = localtime(&tmp);
 		if(tms){
 			str << tms->tm_hour << ":" << tms->tm_min << ":" << tms->tm_sec << "  " << 
-				tms->tm_mday << "/" << tms->tm_mon << "/" << tms->tm_year + 1900;
+				tms->tm_mday << "/" << tms->tm_mon + 1 << "/" << tms->tm_year + 1900;
 		}
 		else{
 			str << "UNIX Time : " <<  time;
