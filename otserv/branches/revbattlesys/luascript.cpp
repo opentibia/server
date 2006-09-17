@@ -183,6 +183,7 @@ ScriptEnviroment::~ScriptEnviroment()
 void ScriptEnviroment::resetEnv()
 {
 	m_scriptId = 0;
+	m_callbackId = 0;
 	m_interface = NULL;
 	m_localMap.clear();
 
@@ -196,7 +197,6 @@ void ScriptEnviroment::resetEnv()
 	m_realPos.y = 0;
 	m_realPos.z = 0;
 }
-
 
 void ScriptEnviroment::setRealPos(const Position& realPos)
 {
@@ -213,6 +213,19 @@ void ScriptEnviroment::setScriptId(long scriptId, LuaScriptInterface* scriptInte
 	resetEnv();
 	m_scriptId = scriptId;
 	m_interface = scriptInterface;
+}
+
+bool ScriptEnviroment::setCallbackId(long callbackId)
+{
+	//nested callbacks are not allowed
+	if(m_callbackId != 0){
+		if(m_interface){
+			m_interface->reportError(__FUNCTION__, "Nested callbacks!");
+		}
+		return false;
+	}
+	m_callbackId = callbackId;
+	return true;
 }
 
 void ScriptEnviroment::setEventDesc(const std::string& desc)
@@ -235,11 +248,12 @@ LuaScriptInterface* ScriptEnviroment::getScriptInterface()
 	return m_interface;
 }
 
-void ScriptEnviroment::getEventInfo(long& scriptId, std::string& desc, LuaScriptInterface*& scriptInterface)
+void ScriptEnviroment::getEventInfo(long& scriptId, std::string& desc, LuaScriptInterface*& scriptInterface, long& callbackId)
 {
 	scriptId = m_scriptId;
 	desc = m_eventdesc;
 	scriptInterface = m_interface;
+	callbackId = m_callbackId;
 }
 
 void ScriptEnviroment::addUniqueThing(Thing* thing)
@@ -548,16 +562,6 @@ lua_State* LuaScriptInterface::getLuaState()
 
 long LuaScriptInterface::loadFile(const std::string& file)
 {
-	/*
-	//search if we have loaded that file before
-	ScriptsCache::iterator it;
-	for(it = m_cacheFiles.begin(); it != m_cacheFiles.end(); ++it){
-		if(it->second == file){
-			return it->first;
-		}
-	}
-	*/
-	
 	//loads file as a chunk at stack top
 	int ret = luaL_loadfile(m_luaState, file.c_str());
 	if(ret != 0){
@@ -569,6 +573,7 @@ long LuaScriptInterface::loadFile(const std::string& file)
 		return -1;
 	}
 	
+	m_loadingFile = file;
 	ScriptEnviroment* env = getScriptEnv();
 	env->setScriptId(EVENT_ID_LOADING, this);
 	
@@ -578,11 +583,6 @@ long LuaScriptInterface::loadFile(const std::string& file)
 		return -1;
 	}
 	
-	/*++m_runningFileId;
-	m_cacheFiles[m_runningFileId] = file;
-	return m_runningFileId;
-	*/
-	m_loadingFile = file;
 	return 0;
 }
 
@@ -635,13 +635,17 @@ void LuaScriptInterface::reportError(const char* function, const std::string& er
 {
 	ScriptEnviroment* env = getScriptEnv();
 	long fileId;
+	long callbackId;
 	std::string event_desc;
 	LuaScriptInterface* scriptInterface;
-	env->getEventInfo(fileId, event_desc, scriptInterface);
+	env->getEventInfo(fileId, event_desc, scriptInterface, callbackId);
 	
 	std::cout << std::endl << "Lua Script Error: ";
 	if(scriptInterface){
 		std::cout << "[" << scriptInterface->getInterfaceName() << "] " << std::endl;
+		if(callbackId){
+			std::cout << "in callback: " << scriptInterface->getFileById(callbackId) << std::endl;
+		}
 		std::cout << scriptInterface->getFileById(fileId) << std::endl;
 	}
 	std::cout << event_desc << std::endl;

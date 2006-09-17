@@ -432,7 +432,7 @@ int main(int argc, char *argv[])
 	std::cout << ":: OTServ Version 0.5.0" << std::endl;
 	std::cout << ":: ====================" << std::endl;
 	std::cout << "::" << std::endl;
-#if defined __DEBUG__MOVESYS__ || defined __DEBUG_HOUSES__ || defined __DEBUG_MAILBOX__
+#if defined __DEBUG__MOVESYS__ || defined __DEBUG_HOUSES__ || defined __DEBUG_MAILBOX__ || defined __DEBUG_LUASCRIPTS__
 	std::cout << ":: Debugging:";
 	#ifdef __DEBUG__MOVESYS__
 	std::cout << " MOVESYS";
@@ -442,6 +442,9 @@ int main(int argc, char *argv[])
 	#endif
 	#ifdef __DEBUG_HOUSES__
 	std::cout << " HOUSES";
+	#endif
+	#ifdef __DEBUG_LUASCRIPTS__
+	std::cout << " LUA-SCRIPTS";
 	#endif
 	std::cout << std::endl;
 #endif

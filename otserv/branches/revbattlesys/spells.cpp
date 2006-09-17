@@ -485,11 +485,11 @@ bool InstantSpell::executeCastInstant(Creature* creature, const LuaVariant& var)
 	//onCastSpell(cid, var)
 	ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
 
-	//debug only
+	#ifdef __DEBUG_LUASCRIPTS__
 	std::stringstream desc;
-	desc << "onCastSpell";
+	desc << "onCastSpell - " << creature->getName();
 	env->setEventDesc(desc.str());
-	//
+	#endif
 	
 	env->setScriptId(m_scriptId, m_scriptInterface);
 	env->setRealPos(creature->getPosition());
@@ -953,10 +953,11 @@ bool RuneSpell::executeCastRune(Creature* creature, const LuaVariant& var)
 
 	ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
 		
-	//debug only
+	#ifdef __DEBUG_LUASCRIPTS__
 	std::stringstream desc;
-	desc << "onCastSpell";
+	desc << "onCastSpell - " << creature->getName();
 	env->setEventDesc(desc.str());
+	#endif
 		
 	env->setScriptId(m_scriptId, m_scriptInterface);
 	env->setRealPos(creature->getPosition());

@@ -334,11 +334,11 @@ bool Action::executeUse(Player* player, Item* item, const PositionEx& posFrom, c
 	//onUse(cid, item1, position1, item2, position2)
 	ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
 	
-	//debug only
+	#ifdef __DEBUG_LUASCRIPTS__
 	std::stringstream desc;
 	desc << player->getName() << " - " << item->getID() << " " << posFrom << "|" << posTo;
 	env->setEventDesc(desc.str());
-	//
+	#endif
 	
 	env->setScriptId(m_scriptId, m_scriptInterface);
 	env->setRealPos(player->getPosition());

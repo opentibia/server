@@ -431,6 +431,8 @@ void CombatCallBack::getMinMaxValues(Player* player, int32_t& min, int32_t& max)
 	
 	ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
 	lua_State* L = m_scriptInterface->getLuaState();
+	
+	env->setCallbackId(m_scriptId);
 		
 	uint32_t cid = env->addThing(player);
 

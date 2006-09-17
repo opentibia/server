@@ -155,11 +155,11 @@ long TalkAction::executeSay(Creature* creature, const std::string& words, const 
 	//onSay(cid, words, param)
 	ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
 	
-	//debug only
+	#ifdef __DEBUG_LUASCRIPTS__
 	std::stringstream desc;
 	desc << creature->getName() << " - " << words << " " << param;
 	env->setEventDesc(desc.str());
-	//
+	#endif
 	
 	env->setScriptId(m_scriptId, m_scriptInterface);
 	env->setRealPos(creature->getPosition());

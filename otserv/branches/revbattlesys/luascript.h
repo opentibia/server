@@ -106,13 +106,14 @@ public:
 	void resetEnv();
 
 	void setScriptId(long scriptId, LuaScriptInterface* scriptInterface);
+	bool setCallbackId(long callbackId);
 	void setEventDesc(const std::string& desc);
 	
 	std::string getEventDesc();
 	long getScriptId();
 	LuaScriptInterface* getScriptInterface();
 
-	void getEventInfo(long& scriptId, std::string& desc, LuaScriptInterface*& scriptInterface);
+	void getEventInfo(long& scriptId, std::string& desc, LuaScriptInterface*& scriptInterface, long& callbackId);
 
 	static void addUniqueThing(Thing* thing);
 	long addThing(Thing* thing);
@@ -152,6 +153,7 @@ private:
 
 	//script file id
 	long m_scriptId;
+	long m_callbackId;
 	LuaScriptInterface* m_interface;
 	//script event desc
 	std::string m_eventdesc;
