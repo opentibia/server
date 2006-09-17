@@ -430,15 +430,6 @@ void CombatCallBack::getMinMaxValues(Player* player, int32_t& min, int32_t& max)
 	//"onGetPlayerMinMaxValues"(cid, level, maglevel)
 	
 	ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
-
-	//debug only
-	std::stringstream desc;
-	desc << m_callbackName;
-	env->setEventDesc(desc.str());
-		
-	env->setScriptId(m_scriptId, m_scriptInterface);
-	env->setRealPos(player->getPosition());
-		
 	lua_State* L = m_scriptInterface->getLuaState();
 		
 	uint32_t cid = env->addThing(player);
