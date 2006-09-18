@@ -313,6 +313,7 @@ public:
 	bool playerYell(Player* player, std::string& text);
 	bool playerSpeakTo(Player* player, SpeakClasses type, const std::string& receiver, const std::string& text);
 	bool playerBroadcastMessage(Player* player, const std::string& text);
+	bool anonymousBroadcastMessage(const std::string& text);
 	bool playerTalkToChannel(Player* player, SpeakClasses type, const std::string& text, unsigned short channelId);
 	bool playerAutoWalk(Player* player, std::list<Direction>& listDir);
 	bool playerStopAutoWalk(Player* player);

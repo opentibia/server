@@ -110,6 +110,7 @@ enum ePlayerInfo{
 	PlayerInfoVocation,
 	PlayerInfoMasterPos,
 	PlayerInfoGuildId,
+	PlayerInfoSex,
 };
 
 class Action
@@ -197,6 +198,7 @@ public:
 	static int luaActionGetPlayerVocation(lua_State *L);
 	static int luaActionGetPlayerMasterPos(lua_State *L);
 	static int luaActionGetPlayerGuildId(lua_State *L);
+	static int luaActionGetPlayerSex(lua_State *L);
 	
 	static int luaActionGetPlayerStorageValue(lua_State *L);
 	static int luaActionSetPlayerStorageValue(lua_State *L);
