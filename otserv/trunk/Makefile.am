@@ -35,6 +35,6 @@ otserv_SOURCES = $(MAYBE_SQL) $(MAYBE_MYSQL) $(MAYBE_SQLITE) \
 	trashholder.cpp trashholder.h mailbox.cpp mailbox.h waitlist.cpp waitlist.h \
 	house.cpp house.h housetile.cpp housetile.h iomapserialize.cpp iomapserialize.h \
 	iomapserializexml.cpp iomapserializexml.h cylinder.cpp cylinder.h ban.cpp ban.h \
-	rsa.cpp rsa.h configmanager.cpp configmanager.h
+	rsa.cpp rsa.h configmanager.cpp configmanager.h outfit.cpp outfit.h otpch.h
 
 
