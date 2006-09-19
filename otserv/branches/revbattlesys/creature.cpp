@@ -248,6 +248,18 @@ void Creature::changeMana(int32_t manaChange)
 	}
 }
 
+/*
+void Creature::changeSoul(int32_t soulChange)
+{
+	if(soulChange > 0){
+		soul += std::min(soulChange, soulMax - mana);
+	}
+	else{
+		soul = std::max((int32_t)0, soul + soulChange);
+	}
+}
+*/
+
 void Creature::drainHealth(Creature* attacker, DamageType_t damageType, int32_t damage)
 {
 	changeHealth(-damage);

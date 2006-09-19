@@ -226,6 +226,9 @@ enum item_t {
 	ITEM_ROLL             = 2690,
 	ITEM_CHEESE           = 2696,
 
+	ITEM_BOLT             = 2543,
+	ITEM_ARROW            = 2544,
+
 	ITEM_FULLSPLASH       = 2016,
 	ITEM_SMALLSPLASH      = 2019,
 	ITEM_LOCKER1          = 2589,

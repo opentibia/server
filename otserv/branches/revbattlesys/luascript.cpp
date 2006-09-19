@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// class which takes care of all data which must get saved in the player
+// Lua script interface
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -686,6 +686,20 @@ bool LuaScriptInterface::initState()
 	luaopen_string(m_luaState);
 	luaopen_math(m_luaState);
 	
+	std::string datadir = "data/";
+
+	lua_getglobal(m_luaState, "datadir");
+	if(lua_isstring(m_luaState, -1)){
+		int len = (int)lua_strlen(m_luaState, -1);
+		datadir = std::string(lua_tostring(m_luaState, -1), len);
+		lua_pop(m_luaState, 1);
+	}
+	
+	std::string globalScriptFile = "global.lua";
+	if(loadFile(std::string(datadir + globalScriptFile)) == -1){
+		std::cout << "Warning: [LuaScriptInterface::initState] Can not load " << globalScriptFile << "." << std::endl;
+	}
+
 	registerFunctions();
 	
 	lua_newtable(m_luaState);

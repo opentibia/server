@@ -28,12 +28,13 @@
 #include "talkaction.h"
 #include "spells.h"
 #include "movement.h"
-
+#include "weapons.h"
 
 Actions g_actions;
 TalkActions g_talkactions;
 Spells g_spells;
 MoveEvents g_moveEvents;
+Weapons g_weapons;
 
 extern LuaScript g_config;
 extern void ErrorMessage(const char* message) ;
@@ -63,6 +64,16 @@ bool ScriptingManager::loadScriptSystems()
 {
 	std::cout << ":: Loading Script Systems" << std::endl;
 	
+	//load weapons data
+	std::cout << ":: Loading Weapons ...";
+	if(!g_weapons.loadFromXml(g_config.getGlobalString("datadir"))){
+		ErrorMessage("Unable to load Weapons!");
+		return false;
+	}
+
+	g_weapons.loadDefaults();
+	std::cout << "[done]" << std::endl;
+
 	//load spells data	
 	std::cout << ":: Loading Spells ...";
 	if(!g_spells.loadFromXml(g_config.getGlobalString("datadir"))){

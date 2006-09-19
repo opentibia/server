@@ -100,7 +100,7 @@ public:
 	int             runeMagLevel;
 	bool            pickupable;
 	bool            rotable;
-	int				rotateTo;
+	int				      rotateTo;
 
 	int lightLevel;
 	int lightColor;
@@ -139,6 +139,8 @@ public:
 	static long dwMajorVersion;
 	static long dwMinorVersion;
 	static long dwBuildNumber;
+
+	size_t size() {return items.size();}
 	
 protected:
 	typedef OTSERV_HASH_MAP<unsigned short, ItemType*> ItemMap;

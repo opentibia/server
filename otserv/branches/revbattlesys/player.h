@@ -348,12 +348,8 @@ protected:
 	bool hasCapacity(const Item* item, uint32_t count) const;
 
 	//combat help functions
-	const Item* getWeapon() const;
-	//WeaponType_t getWeaponType() const;
-	//virtual int getWeaponDamage() const;
-	//Item* GetDistWeapon() const;
-	//void addSkillTry(int skilltry);
-	//void addSkillShieldTry(int skilltry);
+	Item* getAttackItem();
+	//Item* getWeapon();
 
 	std::string getSkillName(int skillid);
 

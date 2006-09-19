@@ -34,7 +34,7 @@
 extern Game g_game;
 
 Spells::Spells():
-m_scriptInterface("Action Interface")
+m_scriptInterface("Spell Interface")
 {
 	m_scriptInterface.initState();
 }
@@ -508,8 +508,7 @@ bool InstantSpell::executeCastInstant(Creature* creature, const LuaVariant& var)
 	env->setRealPos(creature->getPosition());
 	
 	lua_State* L = m_scriptInterface->getLuaState();
-	int size0 = lua_gettop(L);
-	
+
 	uint32_t cid = env->addThing(creature);
 
 	LuaVariant* pVar = new LuaVariant(var);
@@ -524,10 +523,6 @@ bool InstantSpell::executeCastInstant(Creature* creature, const LuaVariant& var)
 	long result;
 	if(m_scriptInterface->callFunction(2, result) == false){
 		isSuccess = false;
-	}
-
-	if(size0 != lua_gettop(L)){
-		LuaScriptInterface::reportError(NULL, "Stack size changed!");
 	}
 	
 	return isSuccess;

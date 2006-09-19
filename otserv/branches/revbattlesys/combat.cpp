@@ -96,6 +96,7 @@ ReturnValue Combat::canDoCombat(const Creature* caster, const Tile* tile)
 	if(caster->getPosition().z < tile->getPosition().z){
 		return RET_FIRSTGODOWNSTAIRS;
 	}
+
 	if(caster->getPosition().z > tile->getPosition().z){
 		return RET_FIRSTGOUPSTAIRS;
 	}
@@ -107,7 +108,7 @@ ReturnValue Combat::canDoCombat(const Creature* caster, const Tile* tile)
 	}
 
 	if(tile->isPz()){
-		return RET_NOTPOSSIBLE;
+		return RET_ACTIONNOTPERMITTEDINPROTECTIONZONE;
 	}
 
 	return RET_NOERROR;
@@ -584,10 +585,10 @@ void AreaCombat::copyArea(const MatrixArea* input, MatrixArea* output, MatrixOpe
 				angle = 180;
 				break;
 
-			case MATRIXOPERATION_ROTATER90:
-				angle = 0;
+			case MATRIXOPERATION_ROTATE270:
+				angle = 270;
 				break;
-				
+
 			default:
 				angle = 0;
 				break;
@@ -610,7 +611,7 @@ void AreaCombat::copyArea(const MatrixArea* input, MatrixArea* output, MatrixOpe
 				long rotatedY = round(newX * c + newY * d);
 
 				//write in the output matrix using rotated coordinates
-				(*output)[rotatedX + rotateCenterX][rotatedY + rotateCenterY] = (*input)[y][x];
+				(*output)[rotatedY + rotateCenterY][rotatedX + rotateCenterX] = (*input)[y][x];
 			}
 		}
 
@@ -657,17 +658,17 @@ void AreaCombat::setupArea(const std::list<uint32_t>& list, uint32_t rows)
 
 	//SOUTH
 	MatrixArea* southArea = new MatrixArea(maxOutput, maxOutput);
-	copyArea(area, southArea, MATRIXOPERATION_ROTATE90);
+	copyArea(area, southArea, MATRIXOPERATION_ROTATE180);
 	areas[SOUTH] = southArea;
 
 	//EAST
 	MatrixArea* eastArea = new MatrixArea(maxOutput, maxOutput);
-	copyArea(area, eastArea, MATRIXOPERATION_ROTATE180);
+	copyArea(area, eastArea, MATRIXOPERATION_ROTATE90);
 	areas[EAST] = eastArea;
 
 	//WEST
 	MatrixArea* westArea = new MatrixArea(maxOutput, maxOutput);
-	copyArea(area, westArea, MATRIXOPERATION_ROTATER90);
+	copyArea(area, westArea, MATRIXOPERATION_ROTATE270);
 	areas[WEST] = westArea;
 }
 
