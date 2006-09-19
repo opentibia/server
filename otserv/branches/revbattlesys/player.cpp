@@ -36,12 +36,14 @@
 #include "house.h"
 #include "combat.h"
 #include "movement.h"
+#include "weapons.h"
 
 extern LuaScript g_config;
 extern Game g_game;
 extern Chat g_chat;
 extern Vocations g_vocations;
 extern MoveEvents g_moveEvents;
+extern Weapons g_weapons;
 
 AutoList<Player> Player::listPlayer;
 
@@ -257,133 +259,47 @@ Item* Player::getInventoryItem(slots_t slot) const
 	return NULL;
 }
 
-const Item* Player::getWeapon() const
+Item* Player::getAttackItem()
 {
-	const Item* weapon = NULL;
-	for(int slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++){
-		if((weapon = getInventoryItem((slots_t)slot)) && weapon->isWeapon()){
-			switch(weapon->getWeaponType()){
-				case WEAPON_SWORD:
-				case WEAPON_CLUB:
-				case WEAPON_AXE:
-				case WEAPON_WAND:
-					return weapon;
+	Item* item = NULL;
 
-				default:
-					break;
+	for(int slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++){
+		item = getInventoryItem((slots_t)slot);
+		if(!item){
+			continue;
+		}
+
+		switch(item->getWeaponType()){
+			case WEAPON_SWORD:
+			case WEAPON_AXE:
+			case WEAPON_CLUB:
+			case WEAPON_WAND:
+				return item;
+				break;
+
+			case WEAPON_DIST:
+			{
+				if(item->getAmuType() != AMMO_NONE){
+					Item* ammuItem = getInventoryItem(SLOT_AMMO);
+
+					if(ammuItem && ammuItem->getAmuType() == item->getAmuType()){
+						return ammuItem;
+					}
+				}
+				else{
+					return item;
+				}
 			}
 		}
-	}
 
+		const Weapon* weapon = g_weapons.getWeapon(item);
+		if(weapon){
+			return item;
+		}
+	}
+	
 	return NULL;
 }
-
-/*
-WeaponType_t Player::getWeaponType() const
-{
-	for(int slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++){
-		if((weapon = getInventoryItem((slots_t)slot)) && weapon->isWeapon()){
-			switch(weapon->getWeaponType()){
-				case WEAPON_SWORD:
-				case WEAPON_CLUB:
-				case WEAPON_AXE:
-				case WEAPON_WAND:
-					return weapon;
-
-				default:
-					break;
-			}
-		}
-	}
-
-	return WEAPON_NONE;
-}
-*/
-
-/*
-int Player::getWeaponDamage() const
-{
-	double damagemax = 0;
-  for(int slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++)
-		if(Item* item = items[slot]){
-			if(item->isWeapon()){
-				// check which kind of skill we use...
-				// and calculate the damage dealt
-				switch(item->getWeaponType()){
-					case SWORD:
-					{
-						damagemax = skills[SKILL_SWORD][SKILL_LEVEL] * Item::items[item->getID()].attack / 20 +
-							Item::items[item->getID()].attack;
-						break;
-					}
-
-					case CLUB:
-					{
-						damagemax = skills[SKILL_CLUB][SKILL_LEVEL]*Item::items[item->getID()].attack / 20 +
-							Item::items[item->getID()].attack;
-						break;
-					}
-
-					case AXE:
-					{
-						damagemax = skills[SKILL_AXE][SKILL_LEVEL]*Item::items[item->getID()].attack / 20 +
-							Item::items[item->getID()].attack; 
-						break;
-					}
-
-					case DIST:
-					{
-						Item* distItem = GetDistWeapon();
-						if(distItem){
-							damagemax = skills[SKILL_DIST][SKILL_LEVEL] * Item::items[distItem->getID()].attack / 20 +
-								Item::items[distItem->getID()].attack;
-
-							//hit or miss
-							int hitChance;
-							if(distItem->getWeaponType() == AMO){
-								hitChance = 90;
-							}
-							else{//thrown weapons
-								hitChance = 50;
-							}
-
-							if(rand()%100 < hitChance){ //hit
-								return 1 + (int)(damagemax * rand()/(RAND_MAX+1.0));
-							}
-							else{	//miss
-								return 0;
-							}
-						}
-						break;
-					}
-
-					case MAGIC:
-						damagemax = (level * 2 + magLevel * 3) * 1.25;
-						break;
-
-					case AMO:
-					case NONE:
-					case SHIELD:
-					{
-						// nothing to do
-						break;
-					}
-			  }
-		  }
-
-			if(damagemax != 0)
-		  	break;
-    }
-
-	// no weapon found -> fist fighting
-	if(damagemax == 0){
-		damagemax = 2*skills[SKILL_FIST][SKILL_LEVEL] + 5;
-	}
-
-	// return it
-	return 1+(int)(damagemax*rand()/(RAND_MAX+1.0));
-}
-*/
 
 int Player::getArmor() const
 {
@@ -2618,76 +2534,24 @@ void Player::setAttackedCreature(Creature* creature)
 void Player::doAttacking()
 {
 	if(attackedCreature){
-		WeaponType_t weaponType = WEAPON_NONE;
-		const Item* item = getWeapon();
-		int32_t damage = 0;
-
-		if(item){
-			weaponType = item->getWeaponType();
-		}
-		
 		/*
-		switch(weaponType){
-			case WEAPON_SWORD:
-			case WEAPON_CLUB:
-			case WEAPON_AXE:
-			{
-				damage = skills[SKILL_SWORD][SKILL_LEVEL] * Item::items[item->getID()].attack / 20 +
-					Item::items[item->getID()].attack;
-
-				Combat combat;
-				combat.setCombatType(COMBAT_HITPOINTS, DAMAGE_PHYSICAL);
-				combat.doCombat(this, attackedCreature, -damage);
-				break;
-			}
-
-			case WEAPON_DIST:
-			{
-				Item* distItem = GetDistWeapon();
-				if(distItem){
-					damagemax = skills[SKILL_DIST][SKILL_LEVEL] * Item::items[distItem->getID()].attack / 20 +
-						Item::items[distItem->getID()].attack;
-
-					//hit or miss
-					int hitChance;
-					if(distItem->getWeaponType() == AMO){
-						hitChance = 90;
-					}
-					else{//thrown weapons
-						hitChance = 50;
-					}
-
-					if(rand()%100 < hitChance){ //hit
-						return 1 + (int)(damagemax * rand()/(RAND_MAX+1.0));
-					}
-					else{	//miss
-						return 0;
-					}
-				}
-
-				break;
-			}
-
-			case WEAPON_WAND:
-			{
-				damage = (int32_t)((level * 2 + magLevel * 3) * 1.25);
-				break;
-			}
-
-			case WEAPON_NONE:
-			{
-				//fist
-
-				damage = 2 * skills[SKILL_FIST][SKILL_LEVEL] + 5;
-
-				Combat combat;
-				combat.setCombatType(COMBAT_HITPOINTS, DAMAGE_PHYSICAL);
-				combat.doCombat(this, attackedCreature, -damage);
-
-				break;
-			}
+		case WEAPON_NONE:
+		{
+			//fist
+			damage = 2 * skills[SKILL_FIST][SKILL_LEVEL] + 5;
+			break;
 		}
 		*/
+
+		Item* item = getAttackItem();
+
+		if(item){
+			const Weapon* weapon = g_weapons.getWeapon(item);
+
+			if(weapon){
+				weapon->useWeapon(this, item, attackedCreature);
+			}
+		}
 	}
 }
 
