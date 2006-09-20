@@ -22,6 +22,7 @@
 #include "definitions.h"
 #include "weapons.h"
 #include "combat.h"
+#include <sstream>
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
@@ -76,7 +77,7 @@ std::string Weapons::getScriptBaseName()
 
 bool Weapons::loadDefaults()
 {
-	for(int i = 0; i < Item::items.size(); ++i){
+	for(unsigned int i = 0; i < Item::items.size(); ++i){
 		const ItemType& it = Item::items[i];
 
 		if(weapons.find(it.id) != weapons.end())
@@ -105,6 +106,10 @@ bool Weapons::loadDefaults()
 					WeaponDistance* weapon = new WeaponDistance(&m_scriptInterface);
 					weapon->configureWeapon(it);
 					weapons[it.id] = weapon;
+					break;
+				}
+				default:
+				{
 					break;
 				}
 			}
@@ -411,7 +416,7 @@ bool Weapon::executeUseWeapon(Player* player, const LuaVariant& var) const
 
 	#ifdef __DEBUG_LUASCRIPTS__
 	std::stringstream desc;
-	desc << "onUseWeapon - " << creature->getName();
+	desc << "onUseWeapon - " << player->getName();
 	env->setEventDesc(desc.str());
 	#endif
 	
@@ -503,6 +508,10 @@ int32_t WeaponMelee::getWeaponDamage(const Player* player, const Item* item) con
 		case WEAPON_AXE:
 		{
 			skillLevel = player->getSkill(SKILL_AXE, SKILL_LEVEL);
+			break;
+		}
+		default:
+		{
 			break;
 		}
 	}

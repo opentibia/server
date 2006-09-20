@@ -58,11 +58,11 @@ extern OTSYS_THREAD_LOCKVAR maploadlock;
 #endif
 
 extern LuaScript g_config;
-extern Actions g_actions;
+extern Actions* g_actions;
 extern Commands commands;
 extern Chat g_chat;
-extern TalkActions g_talkactions;
-extern Spells g_spells;
+extern TalkActions* g_talkactions;
+extern Spells* g_spells;
 
 Game::Game()
 {
@@ -1678,7 +1678,7 @@ bool Game::playerUseItemEx(Player* player, const Position& fromPos, uint8_t from
 
 bool Game::internalUseItemEx(Player* player, const Position& fromPos, Item* item, const Position& toPos, uint8_t toStackPos, uint16_t toSpriteId)
 {
-	g_actions.useItemEx(player, fromPos, toPos, toStackPos, item);
+	g_actions->useItemEx(player, fromPos, toPos, toStackPos, item);
 	return true;
 }
 
@@ -1715,7 +1715,7 @@ bool Game::playerUseItem(Player* player, const Position& pos, uint8_t stackpos, 
 		return false;
 	}
 
-	g_actions.useItem(player, pos, index, item);
+	g_actions->useItem(player, pos, index, item);
 	return true;
 }
 
@@ -2303,11 +2303,11 @@ bool Game::playerSaySpell(Player* player, SpeakClasses type, const std::string& 
 		}
 	}
 
-	if(g_talkactions.playerSaySpell(player, type, text) == TALKACTION_BREAK){
+	if(g_talkactions->playerSaySpell(player, type, text) == TALKACTION_BREAK){
 		return true;
 	}
 
-	if(g_spells.playerSaySpell(player, type, text)){
+	if(g_spells->playerSaySpell(player, type, text)){
 		return playerSay(player, SPEAK_SAY, text);
 	}
 

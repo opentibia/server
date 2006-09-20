@@ -62,30 +62,42 @@ private:
 	static Npc* m_curNpc;
 };
 
-class NpcScript{
+class NpcEventsHandler
+{
 public:
-	NpcScript(std::string file, Npc* npc);
-	~NpcScript();
+	NpcEventsHandler(Npc* npc);
+	virtual ~NpcEventsHandler();
 	
-	void onCreatureAppear(const Creature* creature);
-	void onCreatureDisappear(const Creature* creature);
-
-	void onCreatureSay(const Creature* creature, SpeakClasses, const std::string& text);
-	void onThink();
+	virtual void onCreatureAppear(const Creature* creature){};
+	virtual void onCreatureDisappear(const Creature* creature){};
+	virtual void onCreatureSay(const Creature* creature, SpeakClasses, const std::string& text){};
+	virtual void onThink(){};
 	
 	bool isLoaded();
 	
-private:
-	
-	bool m_loaded;
+protected:
 	Npc* m_npc;
+	bool m_loaded;
+};
+
+class NpcScript : public NpcEventsHandler
+{
+public:
+	NpcScript(std::string file, Npc* npc);
+	virtual ~NpcScript();
+	
+	virtual void onCreatureAppear(const Creature* creature);
+	virtual void onCreatureDisappear(const Creature* creature);
+	virtual void onCreatureSay(const Creature* creature, SpeakClasses, const std::string& text);
+	virtual void onThink();
+	
+private:
 	NpcScriptInterface* m_scriptInterface;
 	
 	long m_onCreatureAppear;
 	long m_onCreatureDisappear;
 	long m_onCreatureSay;
 	long m_onThink;
-	
 };
 
 class Npc : public Creature
@@ -137,10 +149,11 @@ protected:
 	
 	std::string name;
 	
-	static NpcScriptInterface m_scriptInterface;
-	NpcScript* m_npcScript;
+	NpcEventsHandler* m_npcEventHandler;
 	std::list<Position> route;
 	bool loaded;
+	
+	static NpcScriptInterface *m_scriptInterface;
 };
 
 #endif

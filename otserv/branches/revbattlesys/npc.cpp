@@ -40,11 +40,14 @@ extern Game g_game;
 
 AutoList<Npc> Npc::listNpc;
 
-NpcScriptInterface Npc::m_scriptInterface;
+NpcScriptInterface* Npc::m_scriptInterface = NULL;
 
 Npc::Npc(const std::string& _name) :
- Creature()
+Creature()
 {
+	if(!m_scriptInterface){
+		 m_scriptInterface = new NpcScriptInterface();
+	}
 	loaded = false;
 	name = _name;
 
@@ -152,16 +155,20 @@ Npc::Npc(const std::string& _name) :
 	}
 
 	//now try to load the script
-	m_npcScript = new NpcScript(scriptname, this);
+	if(scriptname != ""){
+		m_npcEventHandler = new NpcScript(scriptname, this);
+	}
+	else{ //default npcs
+	}
 
-	if(!m_npcScript->isLoaded())
+	if(!m_npcEventHandler->isLoaded())
 		loaded = false;
 }
 
 
 Npc::~Npc()
 {
-	delete m_npcScript;
+	delete m_npcEventHandler;
 }
 
 bool Npc::canSee(const Position& pos) const
@@ -198,12 +205,12 @@ void Npc::onUpdateTile(const Position& pos)
 
 void Npc::onCreatureAppear(const Creature* creature, bool isLogin)
 {
-	m_npcScript->onCreatureAppear(creature);
+	m_npcEventHandler->onCreatureAppear(creature);
 }
 
 void Npc::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout)
 {
-	m_npcScript->onCreatureDisappear(creature);
+	m_npcEventHandler->onCreatureDisappear(creature);
 }
 
 void Npc::onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport)
@@ -220,7 +227,7 @@ void Npc::onCreatureSay(const Creature* creature, SpeakClasses type, const std::
 {
 	if(creature->getID() == this->getID())
 		return;
-	m_npcScript->onCreatureSay(creature, type, text);
+	m_npcEventHandler->onCreatureSay(creature, type, text);
 }
 
 void Npc::onCreatureChangeOutfit(const Creature* creature)
@@ -234,7 +241,7 @@ void Npc::onCreatureChangeOutfit(const Creature* creature)
 void Npc::onThink(uint32_t interval)
 {
 	Creature::onThink(interval);
-	m_npcScript->onThink();
+	m_npcEventHandler->onThink();
 }
 
 void Npc::doSay(std::string msg)
@@ -289,7 +296,7 @@ void Npc::doMoveTo(Position target)
 
 NpcScriptInterface* Npc::getScriptInterface()
 {
-	return &m_scriptInterface;	
+	return m_scriptInterface;	
 }
 
 Npc* NpcScriptInterface::m_curNpc = NULL;
@@ -490,9 +497,26 @@ int NpcScriptInterface::luagetDistanceTo(lua_State *L)
 	return 1;
 }
 
-NpcScript::NpcScript(std::string file, Npc* npc)
+NpcEventsHandler::NpcEventsHandler(Npc* npc)
 {
 	m_npc = npc;
+	m_loaded = false;
+}
+
+NpcEventsHandler::~NpcEventsHandler()
+{
+	//
+}
+
+bool NpcEventsHandler::isLoaded()
+{
+	return m_loaded;
+}
+
+
+NpcScript::NpcScript(std::string file, Npc* npc) :
+NpcEventsHandler(npc)
+{
 	m_scriptInterface = npc->getScriptInterface();
 	//load npc libs
 	std::string datadir = g_config.getGlobalString("datadir");
@@ -526,10 +550,11 @@ void NpcScript::onCreatureAppear(const Creature* creature)
 	
 	ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
 	
-	//debug only
+	#ifdef __DEBUG_LUASCRIPTS__
 	std::stringstream desc;
 	desc << "npc " << m_npc->getName();
 	env->setEventDesc(desc.str());
+	#endif
 	
 	lua_State* L = m_scriptInterface->getLuaState();
 	
@@ -552,10 +577,11 @@ void NpcScript::onCreatureDisappear(const Creature* creature)
 	
 	ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
 	
-	//debug only
+	#ifdef __DEBUG_LUASCRIPTS__
 	std::stringstream desc;
 	desc << "npc " << m_npc->getName();
 	env->setEventDesc(desc.str());
+	#endif
 	
 	lua_State* L = m_scriptInterface->getLuaState();
 	
@@ -578,10 +604,11 @@ void NpcScript::onCreatureSay(const Creature* creature, SpeakClasses type, const
 	
 	ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
 	
-	//debug only
+	#ifdef __DEBUG_LUASCRIPTS__
 	std::stringstream desc;
 	desc << "npc " << m_npc->getName();
 	env->setEventDesc(desc.str());
+	#endif
 	
 	env->setScriptId(m_onCreatureSay, m_scriptInterface);
 	env->setRealPos(m_npc->getPosition());
@@ -605,10 +632,11 @@ void NpcScript::onThink()
 	
 	ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
 	
-	//debug only
+	#ifdef __DEBUG_LUASCRIPTS__
 	std::stringstream desc;
 	desc << "npc " << m_npc->getName();
 	env->setEventDesc(desc.str());
+	#endif
 	
 	env->setScriptId(m_onThink, m_scriptInterface);
 	env->setRealPos(m_npc->getPosition());
@@ -616,10 +644,4 @@ void NpcScript::onThink()
 	
 	m_scriptInterface->pushFunction(m_onThink);
 	m_scriptInterface->callFunction(0);
-}
-
-	
-bool NpcScript::isLoaded()
-{
-	return m_loaded;
 }

@@ -30,11 +30,11 @@
 #include "movement.h"
 #include "weapons.h"
 
-Actions g_actions;
-TalkActions g_talkactions;
-Spells g_spells;
-MoveEvents g_moveEvents;
-Weapons g_weapons;
+Actions* g_actions = NULL;
+TalkActions* g_talkactions = NULL;
+Spells* g_spells = NULL;
+MoveEvents* g_moveEvents = NULL;
+Weapons* g_weapons = NULL;
 
 extern LuaScript g_config;
 extern void ErrorMessage(const char* message) ;
@@ -66,41 +66,46 @@ bool ScriptingManager::loadScriptSystems()
 	
 	//load weapons data
 	std::cout << ":: Loading Weapons ...";
-	if(!g_weapons.loadFromXml(g_config.getGlobalString("datadir"))){
+	g_weapons = new Weapons();
+	if(!g_weapons->loadFromXml(g_config.getGlobalString("datadir"))){
 		ErrorMessage("Unable to load Weapons!");
 		return false;
 	}
 
-	g_weapons.loadDefaults();
+	g_weapons->loadDefaults();
 	std::cout << "[done]" << std::endl;
 
 	//load spells data	
+	g_spells = new Spells();
 	std::cout << ":: Loading Spells ...";
-	if(!g_spells.loadFromXml(g_config.getGlobalString("datadir"))){
+	if(!g_spells->loadFromXml(g_config.getGlobalString("datadir"))){
 		ErrorMessage("Unable to load Spells!");
 		return false;
 	}
 	std::cout << "[done]" << std::endl;
 	
 	//load actions data
+	g_actions = new Actions();
 	std::cout << ":: Loading Actions ...";
-	if(!g_actions.loadFromXml(g_config.getGlobalString("datadir"))){
+	if(!g_actions->loadFromXml(g_config.getGlobalString("datadir"))){
 		ErrorMessage("Unable to load Actions!");
 		return false;
 	}
 	std::cout << "[done]" << std::endl;
 	
 	//load talkactions data
+	g_talkactions = new TalkActions();
 	std::cout << ":: Loading Talkactions ...";
-	if(!g_talkactions.loadFromXml(g_config.getGlobalString("datadir"))){
+	if(!g_talkactions->loadFromXml(g_config.getGlobalString("datadir"))){
 		ErrorMessage("Unable to load Talkactions!");
 		return false;
 	}
 	std::cout << "[done]" << std::endl;
 	
 	//load moveEvents
+	g_moveEvents = new MoveEvents();
 	std::cout << ":: Loading MoveEvents ...";
-	if(!g_moveEvents.loadFromXml(g_config.getGlobalString("datadir"))){
+	if(!g_moveEvents->loadFromXml(g_config.getGlobalString("datadir"))){
 		ErrorMessage("Unable to load MoveEvents!");
 		return false;
 	}

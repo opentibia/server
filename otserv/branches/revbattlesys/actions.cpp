@@ -42,7 +42,7 @@
 #include "actions.h"
 
 extern Game g_game;
-extern Spells g_spells;
+extern Spells* g_spells;
 
 Actions::Actions() :
 m_scriptInterface("Action Interface")
@@ -166,7 +166,7 @@ Action *Actions::getAction(const Item* item)
 	}
 
 	//rune items
-	Action* runeSpell = g_spells.getRuneSpell(item);
+	Action* runeSpell = g_spells->getRuneSpell(item);
 	if(runeSpell){
 		return runeSpell;
 	}

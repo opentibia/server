@@ -690,7 +690,7 @@ bool LuaScriptInterface::initState()
 	std::string datadir = g_config.getGlobalString("datadir");
 	
 	if(loadFile(std::string(datadir + "global.lua")) == -1){
-		std::cout << "Warning: [LuaScriptInterface::initState] Can not load global.lua." << std::endl;
+		std::cout << "Warning: [LuaScriptInterface::initState] Can not load " << datadir << "global.lua." << std::endl;
 	}
 
 	registerFunctions();

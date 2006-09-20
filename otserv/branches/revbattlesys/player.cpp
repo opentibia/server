@@ -42,8 +42,8 @@ extern LuaScript g_config;
 extern Game g_game;
 extern Chat g_chat;
 extern Vocations g_vocations;
-extern MoveEvents g_moveEvents;
-extern Weapons g_weapons;
+extern MoveEvents* g_moveEvents;
+extern Weapons* g_weapons;
 
 AutoList<Player> Player::listPlayer;
 
@@ -290,9 +290,13 @@ Item* Player::getAttackItem()
 					return item;
 				}
 			}
+			default:
+			{
+				break;
+			}
 		}
 
-		const Weapon* weapon = g_weapons.getWeapon(item);
+		const Weapon* weapon = g_weapons->getWeapon(item);
 		if(weapon){
 			return item;
 		}
@@ -2385,7 +2389,7 @@ void Player::postAddNotification(Thing* thing, int32_t index, bool hasOwnership 
 {
 	if(hasOwnership){
 		//calling movement scripts
-		g_moveEvents.onPlayerEquip(this, thing->getItem(), index, true);
+		g_moveEvents->onPlayerEquip(this, thing->getItem(), index, true);
 
 		updateItemsLight();
 		updateInventoryWeigth();
@@ -2418,7 +2422,7 @@ void Player::postRemoveNotification(Thing* thing, int32_t index, bool isComplete
 {
 	if(hadOwnership){
 		//calling movement scripts
-		g_moveEvents.onPlayerEquip(this, thing->getItem(), index, false);
+		g_moveEvents->onPlayerEquip(this, thing->getItem(), index, false);
 
 		updateItemsLight();
 		updateInventoryWeigth();
@@ -2511,7 +2515,7 @@ void Player::doAttacking()
 		Item* item = getAttackItem();
 
 		if(item){
-			const Weapon* weapon = g_weapons.getWeapon(item);
+			const Weapon* weapon = g_weapons->getWeapon(item);
 
 			if(weapon){
 				weapon->useWeapon(this, item, attackedCreature);

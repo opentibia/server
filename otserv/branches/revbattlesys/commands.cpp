@@ -44,12 +44,12 @@ typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 #include <libxml/parser.h>
 
 extern LuaScript g_config;
-extern Actions g_actions;
+extern Actions* g_actions;
 extern Monsters g_monsters;
 extern Ban g_bans;
-extern TalkActions g_talkactions;
-extern MoveEvents g_moveEvents;
-extern Spells g_spells;
+extern TalkActions* g_talkactions;
+extern MoveEvents* g_moveEvents;
+extern Spells* g_spells;
 
 extern bool readXMLInteger(xmlNodePtr p, const char *tag, int &value);
 
@@ -478,7 +478,7 @@ bool Commands::subtractMoney(Creature* creature, const std::string& cmd, const s
 bool Commands::reloadInfo(Creature* creature, const std::string& cmd, const std::string& param)
 {	
 	if(param == "actions"){
-		g_actions.reload();
+		g_actions->reload();
 	}
 	else if(param == "commands"){
 		this->reload();
@@ -487,13 +487,13 @@ bool Commands::reloadInfo(Creature* creature, const std::string& cmd, const std:
 		g_monsters.reload();
 	}
 	else if(param == "talk"){
-		g_talkactions.reload();
+		g_talkactions->reload();
 	}
 	else if(param == "move"){
-		g_moveEvents.reload();
+		g_moveEvents->reload();
 	}
 	else if(param == "spells"){
-		//g_spells.reload();
+		g_spells->reload();
 	}
 	else{
 		Player* player = creature->getPlayer();
