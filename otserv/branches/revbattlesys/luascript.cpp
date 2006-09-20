@@ -36,6 +36,7 @@
 #include "ioplayer.h"
 
 extern Game g_game;
+extern LuaScript g_config;
 
 enum LUA_RET_CODE{
 	LUA_NO_ERROR = 0,
@@ -686,18 +687,10 @@ bool LuaScriptInterface::initState()
 	luaopen_string(m_luaState);
 	luaopen_math(m_luaState);
 	
-	std::string datadir = "data/";
-
-	lua_getglobal(m_luaState, "datadir");
-	if(lua_isstring(m_luaState, -1)){
-		int len = (int)lua_strlen(m_luaState, -1);
-		datadir = std::string(lua_tostring(m_luaState, -1), len);
-		lua_pop(m_luaState, 1);
-	}
+	std::string datadir = g_config.getGlobalString("datadir");
 	
-	std::string globalScriptFile = "global.lua";
-	if(loadFile(std::string(datadir + globalScriptFile)) == -1){
-		std::cout << "Warning: [LuaScriptInterface::initState] Can not load " << globalScriptFile << "." << std::endl;
+	if(loadFile(std::string(datadir + "global.lua")) == -1){
+		std::cout << "Warning: [LuaScriptInterface::initState] Can not load global.lua." << std::endl;
 	}
 
 	registerFunctions();
