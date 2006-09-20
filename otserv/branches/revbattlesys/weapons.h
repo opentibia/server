@@ -35,6 +35,13 @@ class WeaponMelee;
 class WeaponDistance;
 class WeaponWand;
 
+enum AmmoAction_t{
+	AMMOACTION_NONE,
+	AMMOACTION_REMOVECOUNT,
+	AMMOACTION_REMOVECHARGE,
+	AMMOACTION_MOVE
+};
+
 class Weapons : public BaseEvents
 {
 public:
@@ -69,7 +76,7 @@ public:
 	virtual bool playerWeaponCheck(Player* player, Creature* target) const;
 	virtual bool useWeapon(Player* player, Item* item, Creature* target) const;
 
-	bool init();
+	//bool init();
 	void setCombatParam(const CombatParams& _params);
 
 	uint16_t getID() const {return id;}
@@ -93,7 +100,9 @@ protected:
 	int32_t soul;
 	uint32_t exhaustion;
 	int32_t range;
+	AmmoAction_t ammoAction;
 	CombatParams params;
+	//Combat* combat;
 
 private:
 	uint32_t vocationBits;
@@ -112,8 +121,6 @@ protected:
 	virtual std::string getScriptEventName();
 	virtual void onUsedWeapon(Player* player, Item* item, Tile* destTile) const;
 	virtual int32_t getWeaponDamage(const Player* player, const Item* item) const;
-
-	bool hasCharges;
 };
 
 class WeaponDistance : public Weapon
@@ -134,7 +141,6 @@ protected:
 	virtual void onUsedWeapon(Player* player, Item* item, Tile* destTile) const;
 	virtual int32_t getWeaponDamage(const Player* player, const Item* item) const;
 
-	bool moveAmmu;
 	bool hasArea;
 	int32_t hitChance;
 	int32_t ammuAttackValue;

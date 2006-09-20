@@ -165,16 +165,33 @@ void Creature::onCreatureAppear(const Creature* creature, bool isLogin)
 
 void Creature::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout)
 {
+	onCreatureDisappear(creature);
+
+	/*
 	if(attackedCreature == creature || followCreature == creature){
 		onTargetCreatureDisappear();
 	}
+	*/
 }
 
 void Creature::onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport)
 {
+	if(followCreature == creature || (creature == this && followCreature)){
+		if(!Position::areInRange<7, 5, 0>(followCreature->getPosition(), getPosition())){
+			onCreatureDisappear(followCreature);	
+		}
+	}
+	if(attackedCreature == creature || (creature == this && attackedCreature)){
+		if(!Position::areInRange<7, 5, 0>(attackedCreature->getPosition(), getPosition())){
+			onCreatureDisappear(attackedCreature);	
+		}
+	}
+
+	/*
 	if((attackedCreature == creature || followCreature == creature) && !canSee(creature->getPosition())){
 		onTargetCreatureDisappear();
 	}
+	*/
 }
 
 void Creature::die()

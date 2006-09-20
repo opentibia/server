@@ -1025,14 +1025,6 @@ void LuaScriptInterface::registerFunctions()
 	//setCombatCallBack(combat, key, function_name)
 	lua_register(m_luaState, "setCombatCallback", LuaScriptInterface::luaSetCombatCallBack);
 
-	/*
-	//doAreaCombat(cid, combat, pos)
-	lua_register(m_luaState, "doAreaCombat", LuaScriptInterface::luaDoAreaCombat);
-
-	//doTargetCombat(cid, combat, target)
-	lua_register(m_luaState, "doTargetCombat", LuaScriptInterface::luaDoTargetCombat);
-	*/
-
 	//doCombat(cid, combat, param)
 	lua_register(m_luaState, "doCombat", LuaScriptInterface::luaDoCombat);
 
@@ -2627,6 +2619,17 @@ int LuaScriptInterface::luaSetCombatCallBack(lua_State *L)
 
 	return 0;
 }
+
+/*
+int LuaScriptInterface::luaSetCombatDefaultValues(lua_State *L)
+{
+	//setCombatDefaultValues(combat, mina, minb, maxa, maxb) 
+	//setCombatDefaultValues(combat, 2.2, 35, 4.5, 50)
+
+	//max = (level * 2 + mag * 3) * 2.2 +35
+	//min = (level * 2 + mag * 3) *4.5 + 50
+}
+*/
 
 int LuaScriptInterface::luaDoCombat(lua_State *L)
 {

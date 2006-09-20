@@ -133,7 +133,7 @@ Event* Weapons::getEvent(const std::string& nodeName)
 bool Weapons::registerEvent(Event* event, xmlNodePtr p)
 {
 	Weapon* weapon = dynamic_cast<Weapon*>(event);
-	weapon->init();
+	//weapon->init();
 	
 	if(weapon){
 		weapons[weapon->getID()] = weapon;
@@ -160,6 +160,8 @@ Weapon::Weapon(LuaScriptInterface* _interface) :
 	vocationBits = 0;
 	exhaustion = 0;
 	range = 1;
+	ammoAction = AMMOACTION_NONE;
+	//combat = NULL;
 }
 
 Weapon::~Weapon()
@@ -173,9 +175,9 @@ void Weapon::setCombatParam(const CombatParams& _params)
 	params = _params;
 }
 
+/*
 bool Weapon::init()
 {
-	/*
 	//getCombatHandle()
 	ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
 
@@ -189,31 +191,23 @@ bool Weapon::init()
 	env->setRealPos(Position(0, 0, 0));
 	
 	lua_State* L = m_scriptInterface->getLuaState();
-	int size0 = lua_gettop(L);
 
 	m_scriptInterface->pushFunction(m_scriptId);
 
-	bool isSuccess = false;
-
 	long result;
 	if(m_scriptInterface->callFunction(0, result)){
-		isSuccess = true;
-		combatId = result;
-	}
-
-	if(size0 != lua_gettop(L)){
-		LuaScriptInterface::reportError(NULL, "Stack size changed!");
+		combat = env->getCombatObject(result);
+		return true;
 	}
 	
-	return isSuccess;
-	*/
-
-	return true;
+	return false;
 }
+*/
 
 bool Weapon::configureEvent(xmlNodePtr p)
 {
 	int intValue;
+	std::string strValue;
 
 	if(readXMLInteger(p, "id", intValue)){
 	 	id = intValue;
@@ -254,7 +248,25 @@ bool Weapon::configureEvent(xmlNodePtr p)
 	if(readXMLInteger(p, "range", intValue)){
 		range = intValue;
 	}
-	
+
+	if(readXMLString(p, "ammo", strValue)){
+		if(xmlStrcmp((const xmlChar*)strValue.c_str(), (const xmlChar*)"move") == 0){
+			ammoAction = AMMOACTION_MOVE;
+		}
+		else if(xmlStrcmp((const xmlChar*)strValue.c_str(), (const xmlChar*)"removecharge") == 0){
+			ammoAction = AMMOACTION_REMOVECHARGE;
+		}
+		else if(xmlStrcmp((const xmlChar*)strValue.c_str(), (const xmlChar*)"removecount") == 0){
+			ammoAction = AMMOACTION_REMOVECOUNT;
+		}
+	}
+
+	/*
+	if(readXMLInteger(p, "charges", intValue)){
+		hasCharges = (intValue == 1);
+	}
+	*/
+
 	vocationBits = 0xFFFFFFFF;
 
 	//TODO
@@ -351,10 +363,6 @@ bool Weapon::internalUseWeapon(Player* player, Item* item, Tile* tile) const
 
 void Weapon::onUsedWeapon(Player* player, Item* item, Tile* destTile) const
 {
-	if(player->getAccessLevel() > 0){
-		return;
-	}
-
 	Condition* condition = Condition::createCondition(CONDITION_INFIGHT, 60 * 1000, 0);
 	if(!player->addCondition(condition)){
 		delete condition;
@@ -370,6 +378,22 @@ void Weapon::onUsedWeapon(Player* player, Item* item, Tile* destTile) const
 
 	if(mana > 0){
 		player->changeMana(-((int32_t)mana));
+	}
+
+	if(ammoAction == AMMOACTION_REMOVECOUNT){
+		int32_t newCount = std::max(0, item->getItemCount() - 1);
+		g_game.transformItem(item, item->getID(), newCount);
+	}
+	else if(ammoAction == AMMOACTION_REMOVECHARGE){
+		int32_t newCharge = std::max(0, item->getItemCharge() - 1);
+		g_game.transformItem(item, item->getID(), newCharge);
+	}
+	else if(ammoAction == AMMOACTION_MOVE){
+		g_game.internalMoveItem(item->getParent(), destTile, INDEX_WHEREEVER, item, 1);
+	}
+
+	if(player->getAccessLevel() > 0){
+		return;
 	}
 
 	//TODO
@@ -398,12 +422,6 @@ bool Weapon::executeUseWeapon(Player* player, const LuaVariant& var) const
 	
 	uint32_t cid = env->addThing(player);
 
-	/*
-	LuaVariant* pVar = new LuaVariant;
-	pVar->type = VARIANT_NUMBER;
-	pVar->number = target->getID();
-	*/
-
 	LuaVariant* pVar = new LuaVariant(var);
 	uint32_t variant = env->addVariant(pVar);
 
@@ -425,7 +443,7 @@ bool Weapon::executeUseWeapon(Player* player, const LuaVariant& var) const
 WeaponMelee::WeaponMelee(LuaScriptInterface* _interface) :
 	Weapon(_interface)
 {
-	hasCharges = false;
+	//
 }
 
 bool WeaponMelee::configureEvent(xmlNodePtr p)
@@ -434,11 +452,13 @@ bool WeaponMelee::configureEvent(xmlNodePtr p)
 		return false;
 	}
 
+	/*
 	int intValue;
 
 	if(readXMLInteger(p, "charges", intValue)){
 		hasCharges = (intValue == 1);
 	}
+	*/
 
 	return true;
 }
@@ -461,11 +481,6 @@ std::string WeaponMelee::getScriptEventName()
 void WeaponMelee::onUsedWeapon(Player* player, Item* item, Tile* destTile) const
 {
 	Weapon::onUsedWeapon(player, item, destTile);
-
-	if(hasCharges){
-		int32_t newCharge = std::max(0, item->getItemCharge() - 1);
-		g_game.transformItem(item, item->getID(), newCharge);
-	}
 }
 
 int32_t WeaponMelee::getWeaponDamage(const Player* player, const Item* item) const
@@ -499,7 +514,7 @@ int32_t WeaponMelee::getWeaponDamage(const Player* player, const Item* item) con
 WeaponDistance::WeaponDistance(LuaScriptInterface* _interface) :
 	Weapon(_interface)
 {
-	moveAmmu = false;
+	hasArea = false;
 	hitChance = 50;
 	ammuAttackValue = 20;
 }
@@ -512,8 +527,8 @@ bool WeaponDistance::configureEvent(xmlNodePtr p)
 
 	int intValue;
 
-	if(readXMLInteger(p, "moveammu", intValue)){
-		moveAmmu = (intValue == 1);
+	if(readXMLInteger(p, "hitchance", intValue)){
+		hitChance = intValue;
 	}
 
 	if(readXMLInteger(p, "hasarea", intValue)){
@@ -612,9 +627,9 @@ bool WeaponDistance::useWeapon(Player* player, Item* item, Creature* target) con
 				g_game.addDistanceEffect(player->getPosition(), destPos, params.distanceEffect);
 				g_game.addMagicEffect(destPos, NM_ME_PUFF);
 			}
-		}
 
-		onUsedWeapon(player, item, destTile);
+			onUsedWeapon(player, item, destTile);
+		}
 	}
 
 	return true;
@@ -624,8 +639,9 @@ void WeaponDistance::onUsedWeapon(Player* player, Item* item, Tile* destTile) co
 {
 	Weapon::onUsedWeapon(player, item, destTile);
 
+	/*
 	if(item->getAmuType() != AMMO_NONE){
-		if(moveAmmu){
+		if(ammoAction == AMMOACTION_MOVE){
 			g_game.internalMoveItem(item->getParent(), destTile, INDEX_WHEREEVER, item, 1);
 		}
 		else{
@@ -633,6 +649,7 @@ void WeaponDistance::onUsedWeapon(Player* player, Item* item, Tile* destTile) co
 			g_game.transformItem(item, item->getID(), newCount);
 		}
 	}
+	*/
 }
 
 int32_t WeaponDistance::getWeaponDamage(const Player* player, const Item* item) const

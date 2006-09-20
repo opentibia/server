@@ -1238,32 +1238,27 @@ void Player::onCreatureAppear(const Creature* creature, bool isLogin)
 	//
 }
 
-void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout)
+void Player::onCreatureDisappear(const Creature* creature)
 {
-	Creature::onCreatureDisappear(creature, stackpos, isLogout);
-
-	/*
 	if(attackedCreature == creature){
 		setAttackedCreature(NULL);
 		sendCancelTarget();
-
-		if(isLogout){
-			sendTextMessage(MSG_STATUS_SMALL, "Target lost.");
-		}
+		sendTextMessage(MSG_STATUS_SMALL, "Target lost.");
 	}
-
 
 	if(followCreature == creature){
 		setFollowCreature(NULL);
 		sendCancelTarget();
-
-		if(isLogout){
-			sendTextMessage(MSG_STATUS_SMALL, "Target lost.");
-		}
+		sendTextMessage(MSG_STATUS_SMALL, "Target lost.");
 	}
-	*/
+}
+
+void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout)
+{
+	Creature::onCreatureDisappear(creature, stackpos, isLogout);
 
 	if(creature == this){
+		
 		if(isLogout){
 			loginPosition = getPosition();
 		}
@@ -1290,43 +1285,13 @@ void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bo
 
 #ifdef __DEBUG_PLAYERS__
 		std::cout << (uint32_t)getPlayersOnline() << " players online." << std::endl;
-		#endif
+#endif
 	}
 }
 
 void Player::onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport)
 {
 	Creature::onCreatureMove(creature, oldPos, oldStackPos, teleport);
-
-	/*
-	if(followCreature && (creature == followCreature || creature == this)){
-		if(!Position::areInRange<7,5,0>(followCreature->getPosition(), getPosition())){
-			setFollowCreature(NULL);
-			sendCancelTarget();
-			sendTextMessage(MSG_STATUS_SMALL, "Target lost.");
-		}
-	}
-
-	if(attackedCreature && (creature == attackedCreature || creature == this)){
-		CanSee(creature->getPosition()
-		//if(!Position::areInRange<7,5,0>(followCreature->getPosition(), getPosition())){
-			setFollowCreature(NULL);
-			sendCancelTarget();
-			sendTextMessage(MSG_STATUS_SMALL, "Target lost.");
-		}
-	}
-	*/
-
-	/*
-	Creature* targetCreature = getAttackedCreature();
-	if((creature == this && targetCreature) || targetCreature == creature){
-		if(!Position::areInRange<7,5,0>(targetCreature->getPosition(), getPosition())){
-			setAttackedCreature(NULL);
-			sendCancelTarget();
-			sendTextMessage(MSG_STATUS_SMALL, "Target lost.");
-		} 
-	}
-	*/
 
 	if(creature == this){
 		if(tradeState != TRADE_TRANSFER){
