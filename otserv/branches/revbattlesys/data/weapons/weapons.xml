@@ -2,6 +2,7 @@
 <weapons>
 <wand id="2181" range="4" enabled="1" script="quagmire rod.lua"></wand>
 <wand id="2183" range="2" enabled="1" script="tempest rod.lua"></wand>
-<distance id="2545" range="6" enabled="1" moveammu="1" script="poison arrow.lua"></distance>
-<distance id="2546" range="6" enabled="1" hasarea="1" script="explosive arrow.lua"></distance>
+<distance id="2389" range="6" ammo="move" enabled="1" script="poison spear.lua"></distance>
+<distance id="2545" range="6" enabled="1" hitchance="80" ammo="move" script="poison arrow.lua"></distance>
+<distance id="2546" range="6" enabled="1" hitchance="80" hasarea="1" script="explosive arrow.lua"></distance>
 </weapons>
