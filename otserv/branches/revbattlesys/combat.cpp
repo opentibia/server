@@ -54,7 +54,19 @@ void Combat::getMinMaxValues(Creature* creature, int32_t& min, int32_t& max) con
 			callback->getMinMaxValues(player, min, max);
 		}
 		else{
-			std::cout << "No callback set for combat" << std::endl;
+			switch(formula.type){
+				case COMBAT_FORMULA_LEVELMAGIC:
+					max = (player->getLevel() * 2 + player->getMagicLevel() * 3) * formula.mina + formula.minb;
+					min = (player->getLevel() * 2 + player->getMagicLevel() * 3) * formula.maxa + formula.maxb;
+					break;
+
+				default:
+					min = 0;
+					max = 0;
+					break;
+			}
+
+			//std::cout << "No callback set for combat" << std::endl;
 		}
 	}
 	else{
@@ -124,6 +136,15 @@ void Combat::setCondition(const Condition* _condition)
 	params.condition = _condition->clone();
 }
 
+void Combat::setPlayerCombatValues(CombatFormulaType type, double mina, double minb, double maxa, double maxb)
+{
+	formula.type = type;
+	formula.mina = mina;
+	formula.minb = minb;
+	formula.maxa = maxa;
+	formula.maxb = maxb;
+}
+
 bool Combat::setParam(CombatParam_t param, uint32_t value)
 {
 	switch(param){
@@ -187,8 +208,13 @@ bool Combat::setParam(CombatParam_t param, uint32_t value)
 bool Combat::setCallback(CombatParam_t key)
 {
 	switch(key){
-		case COMBATPARAM_MINMAXCALLBACK:
-			callback = new CombatCallBack();
+		case COMBATPARAM_LEVELMAGICVALUECALLBACK:
+			callback = new CombatCallBack(COMBAT_FORMULA_LEVELMAGIC);
+			return true;
+			break;
+
+		case COMBATPARAM_SKILLVALUECALLBACK:
+			callback = new CombatCallBack(COMBAT_FORMULA_SKILL);
 			return true;
 			break;
 
@@ -250,7 +276,7 @@ bool Combat::CombatNullFunc(Creature* caster, Creature* target, const CombatPara
 	return true;
 }
 
-void Combat::CombatTileEffects(Creature* caster, Tile* tile, const CombatParams& params)
+void Combat::combatTileEffects(Creature* caster, Tile* tile, const CombatParams& params)
 {
 	if(params.itemId != 0){
 		Item* item = Item::CreateItem(params.itemId);
@@ -263,6 +289,13 @@ void Combat::CombatTileEffects(Creature* caster, Tile* tile, const CombatParams&
 
 	if(params.impactEffect != NM_ME_NONE){
 		g_game.addMagicEffect(tile->getPosition(), params.impactEffect);
+	}
+}
+
+void Combat::postCombatEffects(Creature* caster, const Position& pos, const CombatParams& params)
+{
+	if(caster && params.distanceEffect != NM_ME_NONE){
+		g_game.addDistanceEffect(caster->getPosition(), pos, params.distanceEffect);
 	}
 }
 
@@ -295,13 +328,11 @@ void Combat::CombatFunc(Creature* caster, const Position& pos,
 				func(caster, *cit, params, data);
 			}
 
-			CombatTileEffects(caster, *it, params);
+			combatTileEffects(caster, *it, params);
 		}
 	}
 
-	if(caster && params.distanceEffect != NM_ME_NONE){
-		g_game.addDistanceEffect(caster->getPosition(), pos, params.distanceEffect);
-	}
+	postCombatEffects(caster, pos, params);
 }
 
 void Combat::doCombat(Creature* caster, Creature* target) const
@@ -426,9 +457,24 @@ void Combat::doCombatCondition(Creature* caster, Creature* target, const CombatP
 	}
 }
 
+void Combat::postCombatEffects(Creature* caster, const Position& pos, bool success) const
+{
+	Combat::postCombatEffects(caster, pos, params);
+
+	if(!success){
+		g_game.addMagicEffect(pos, NM_ME_PUFF);
+	}
+}
+
+
+CombatCallBack::CombatCallBack(CombatFormulaType _type)
+{
+	type = _type;
+}
+
 void CombatCallBack::getMinMaxValues(Player* player, int32_t& min, int32_t& max) const
 {
-	//"onGetPlayerMinMaxValues"(cid, level, maglevel)
+	//"onGetPlayerMinMaxValues"(...)
 	
 	ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
 	lua_State* L = m_scriptInterface->getLuaState();
@@ -440,11 +486,33 @@ void CombatCallBack::getMinMaxValues(Player* player, int32_t& min, int32_t& max)
 
 	m_scriptInterface->pushFunction(m_scriptId);
 	lua_pushnumber(L, cid);
-	lua_pushnumber(L, player->getLevel());
-	lua_pushnumber(L, player->getMagicLevel());
+
+	int32_t parameters = 1;
+
+	switch(type){
+		case COMBAT_FORMULA_LEVELMAGIC:
+			//"onGetPlayerMinMaxValues"(cid, level, maglevel)
+			lua_pushnumber(L, player->getLevel());
+			lua_pushnumber(L, player->getMagicLevel());
+			parameters += 2;
+			break;
+
+		/*
+		case COMBAT_FORMULA_SKILL:
+			lua_pushnumber(L, player->getSkill(x, SKILL_LEVEL));
+			lua_pushnumber(L, (int32_t)minb);
+			parameters += 2;
+			break;
+		*/
+
+		default:
+			std::cout << "CombatCallBack::getMinMaxValues - unknown callback type" << std::endl;
+			return;
+			break;
+	}
 
 	int size0 = lua_gettop(L);
-	if(lua_pcall(L, 3 /*nParams*/, 2 /*nReturnValues*/, 0) != 0){
+	if(lua_pcall(L, parameters, 2 /*nReturnValues*/, 0) != 0){
 		LuaScriptInterface::reportError(NULL, std::string(LuaScriptInterface::popString(L)));
 	}
 	else{

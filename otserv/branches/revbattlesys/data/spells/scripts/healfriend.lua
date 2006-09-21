@@ -1,14 +1,6 @@
 local combat = createCombatObject(COMBAT_TYPE_HITPOINTS)
 setCombatParam(combat, COMBAT_PARAM_EFFECT, CONST_ME_MAGIC_BLUE)
-
-function onGetPlayerMinMaxValues(cid, level, maglevel, values)
-	min = (level * 2 + maglevel * 3) * 1.3 - 30
-	max = (level * 2 + maglevel * 3) * 1.7
-
-	return min, max
-end
-
-setCombatCallback(combat, COMBAT_PARAM_MINMAXCALLBACK, "onGetPlayerMinMaxValues")
+setCombatFormula(combat, COMBAT_FORMULA_LEVELMAGIC, 0.6, -30, 1.2, 0)
 
 function onCastSpell(cid, var)
 	return doCombat(cid, combat, var)

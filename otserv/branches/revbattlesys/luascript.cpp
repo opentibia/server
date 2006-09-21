@@ -797,6 +797,12 @@ long LuaScriptInterface::popNumber(lua_State *L)
 	return (unsigned long)lua_tonumber(L, 0);
 }
 
+double LuaScriptInterface::popFloatNumber(lua_State *L)
+{
+	lua_pop(L,1);
+	return (double)lua_tonumber(L, 0);
+}
+
 const char* LuaScriptInterface::popString(lua_State *L)
 {
 	lua_pop(L,1);
@@ -1017,6 +1023,9 @@ void LuaScriptInterface::registerFunctions()
 
 	//setCombatCallBack(combat, key, function_name)
 	lua_register(m_luaState, "setCombatCallback", LuaScriptInterface::luaSetCombatCallBack);
+
+	//setCombatFormula(combat, type, mina, minb, maxa, maxb)
+	lua_register(m_luaState, "setCombatFormula", LuaScriptInterface::luaSetCombatFormula);
 
 	//doCombat(cid, combat, param)
 	lua_register(m_luaState, "doCombat", LuaScriptInterface::luaDoCombat);
@@ -1413,7 +1422,7 @@ int LuaScriptInterface::luaDoPlayerAddSkillTry(lua_State *L)
 	
 	Player* player = env->getPlayerByUID(cid);
 	if(player){
-		player->addSkillTryInternal(n,skillid);
+		player->addSkillAdvance((skills_t)skillid, n);
 		lua_pushnumber(L, LUA_NO_ERROR);
 	}
 	else{
@@ -2439,7 +2448,8 @@ int LuaScriptInterface::luaSetCombatArea(lua_State *L)
 
 	combat->setArea(area);
 
-	return 0;
+	lua_pushnumber(L, LUA_NO_ERROR);
+	return 1;
 }
 
 int LuaScriptInterface::luaSetCombatCondition(lua_State *L)
@@ -2468,7 +2478,8 @@ int LuaScriptInterface::luaSetCombatCondition(lua_State *L)
 
 	combat->setCondition(condition);
 
-	return 0;
+	lua_pushnumber(L, LUA_NO_ERROR);
+	return 1;
 }
 
 int LuaScriptInterface::luaSetCombatParam(lua_State *L)
@@ -2491,7 +2502,8 @@ int LuaScriptInterface::luaSetCombatParam(lua_State *L)
 
 	combat->setParam(key, value);
 
-	return 0;
+	lua_pushnumber(L, LUA_NO_ERROR);
+	return 1;
 }
 
 int LuaScriptInterface::luaSetConditionParam(lua_State *L)
@@ -2514,7 +2526,8 @@ int LuaScriptInterface::luaSetConditionParam(lua_State *L)
 
 	condition->setParam(key, value);
 
-	return 0;
+	lua_pushnumber(L, LUA_NO_ERROR);
+	return 1;
 }
 
 int LuaScriptInterface::luaAddDamageCondition(lua_State *L)
@@ -2538,7 +2551,8 @@ int LuaScriptInterface::luaAddDamageCondition(lua_State *L)
 
 	condition->addDamage(rounds, time, value);
 
-	return 0;
+	lua_pushnumber(L, LUA_NO_ERROR);
+	return 1;
 }
 
 int LuaScriptInterface::luaAddOutfitCondition(lua_State *L)
@@ -2565,12 +2579,14 @@ int LuaScriptInterface::luaAddOutfitCondition(lua_State *L)
 	
 	condition->addOutfit(lookTypeEx, lookType, lookHead, lookBody, lookLegs, lookFeet);
 
-	return 0;
+	lua_pushnumber(L, LUA_NO_ERROR);
+	return 1;
 }
 
 int LuaScriptInterface::luaSetCombatCallBack(lua_State *L)
 {
 	//setCombatCallBack(combat, key, function_name)
+
 	const char* function = popString(L);
 	std::string function_str(function);
 	CombatParam_t key = (CombatParam_t)popNumber(L);
@@ -2610,19 +2626,37 @@ int LuaScriptInterface::luaSetCombatCallBack(lua_State *L)
 		return 1;
 	}
 
-	return 0;
+	lua_pushnumber(L, LUA_NO_ERROR);
+	return 1;
 }
 
-/*
-int LuaScriptInterface::luaSetCombatDefaultValues(lua_State *L)
+int LuaScriptInterface::luaSetCombatFormula(lua_State *L)
 {
-	//setCombatDefaultValues(combat, mina, minb, maxa, maxb) 
-	//setCombatDefaultValues(combat, 2.2, 35, 4.5, 50)
+	//setCombatFormula(combat, type, mina, minb, maxa, maxb)
 
-	//max = (level * 2 + mag * 3) * 2.2 +35
-	//min = (level * 2 + mag * 3) *4.5 + 50
+	ScriptEnviroment* env = getScriptEnv();
+
+	double maxb = (double)popFloatNumber(L);
+	double maxa = (double)popFloatNumber(L);
+	double minb = (double)popFloatNumber(L);
+	double mina = (double)popFloatNumber(L);
+
+	CombatFormulaType type = (CombatFormulaType)popNumber(L);
+	uint32_t combatId = (uint32_t)popNumber(L);
+
+	Combat* combat = env->getCombatObject(combatId);
+
+	if(!combat){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_COMBAT_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
+	combat->setPlayerCombatValues(type, mina, minb, maxa, maxb);
+
+	lua_pushnumber(L, LUA_NO_ERROR);
+	return 1;
 }
-*/
 
 int LuaScriptInterface::luaDoCombat(lua_State *L)
 {
@@ -2672,13 +2706,30 @@ int LuaScriptInterface::luaDoCombat(lua_State *L)
 				return 1;
 			}
 
-			combat->doCombat(creature, target);
+			if(combat->hasArea()){
+				combat->doCombat(creature, target->getPosition());
+				std::cout << "Combat->hasArea()" << std::endl;
+			}
+			else{
+				combat->doCombat(creature, target);
+			}
 			break;
 		}
 
 		case VARIANT_POSITION:
 		{
 			combat->doCombat(creature, var->pos);
+			break;
+		}
+
+		case VARIANT_TARGETPOSITION:
+		{
+			if(combat->hasArea()){
+				combat->doCombat(creature, var->pos);
+			}
+			else{
+				combat->postCombatEffects(creature, var->pos, (bool)false);
+			}
 			break;
 		}
 

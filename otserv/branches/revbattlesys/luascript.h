@@ -49,6 +49,7 @@ enum LuaVariantType_t{
 	VARIANT_NONE = 0,
 	VARIANT_NUMBER,
 	VARIANT_POSITION,
+	VARIANT_TARGETPOSITION,
 	VARIANT_STRING,
 };
 
@@ -252,12 +253,14 @@ public:
 
 	bool callFunction(long nParams, long &result);
 	bool callFunction(long nParams);
+
 	//push/pop common structures
 	static void pushThing(lua_State *L, Thing* thing, long thingid);
 	static void pushPosition(lua_State *L, const Position& position, long stackpos);
 
 	static void popPosition(lua_State *L, Position& position, long& stackpos);
 	static long popNumber(lua_State *L);
+	static double popFloatNumber(lua_State *L);
 	static const char* popString(lua_State *L);
 
 	static long getField(lua_State *L, const char *key);
@@ -380,6 +383,7 @@ protected:
 	static int luaAddOutfitCondition(lua_State *L);
 
 	static int luaSetCombatCallBack(lua_State *L);
+	static int luaSetCombatFormula(lua_State *L);
 	static int luaDoCombat(lua_State *L);
 
 	static int luaDoAreaCombatHealth(lua_State *L);

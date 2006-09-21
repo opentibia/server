@@ -376,101 +376,6 @@ void Player::updateInventoryWeigth()
 		}
 	}
 }
-/*
-unsigned int Player::getReqSkillTries(int skill, int level, Vocation_t voc)
-{
-	//first find on cache
-	for(int i=0;i<2;i++){
-		if(SkillAdvanceCache[skill][i].level == level && SkillAdvanceCache[skill][i].vocation == voc){
-#ifdef __DEBUG__
-	std::cout << "Skill cache hit: " << this->name << " " << skill << " " << level << " " << voc <<std::endl;
-#endif
-			return SkillAdvanceCache[skill][i].tries;
-		}
-	}
-	// follows the order of enum skills_t  
-	unsigned short int SkillBases[7] = { 50, 50, 50, 50, 30, 100, 20 };
-	float SkillMultipliers[7][5] = {
-                                   {1.5f, 1.5f, 1.5f, 1.2f, 1.1f},     // Fist
-                                   {2.0f, 2.0f, 1.8f, 1.2f, 1.1f},     // Club
-                                   {2.0f, 2.0f, 1.8f, 1.2f, 1.1f},     // Sword
-                                   {2.0f, 2.0f, 1.8f, 1.2f, 1.1f},     // Axe
-                                   {2.0f, 2.0f, 1.8f, 1.1f, 1.4f},     // Distance
-                                   {1.5f, 1.5f, 1.5f, 1.1f, 1.1f},     // Shielding
-                                   {1.1f, 1.1f, 1.1f, 1.1f, 1.1f}      // Fishing
-	                           };
-#ifdef __DEBUG__
-	std::cout << "Skill cache miss: " << this->name << " "<< skill << " " << level << " " << voc <<std::endl;
-#endif
-	//update cache
-	//remove minor level
-	int j;
-	if(SkillAdvanceCache[skill][0].level > SkillAdvanceCache[skill][1].level){
-		j = 1;
-	}
-	else{
-		j = 0;
-	}	
-	SkillAdvanceCache[skill][j].level = level;
-	SkillAdvanceCache[skill][j].vocation = voc;
-	SkillAdvanceCache[skill][j].tries = (unsigned int) ( SkillBases[skill] * pow((float) SkillMultipliers[skill][voc], (float) ( level - 11) ) );	
-    return SkillAdvanceCache[skill][j].tries;
-}
-*/
-/*
-void Player::addSkillTry(int skilltry)
-{
-	int skill;
-	bool foundSkill;
-	foundSkill = false;
-	std::string skillname;
-	
-	for(int slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++){
-		if(items[slot]){
-			if(items[slot]->isWeapon()) {
-				
-				switch (items[slot]->getWeaponType()) {
-					case SWORD: skill = 2; break;
-					case CLUB: skill = 1; break;
-					case AXE: skill = 3; break;
-					case DIST: 
-						if(GetDistWeapon())
-							skill = 4;
-						else
-							skill = 0;
-						break;
-					case SHIELD: continue; break;
-					case MAGIC: return; break;//TODO: should add skill try?
-					default: skill = 0; break;
-			 	}
-
-			 	addSkillTryInternal(skilltry,skill);
-			 	foundSkill = true;
-			 	break;
-			}			
-		}
-	}
-	
-	if(foundSkill == false)
-		addSkillTryInternal(skilltry,0); //add fist try
-}
-
-void Player::addSkillShieldTry(int skilltry)
-{
-	//look for a shield
-	
-	for (int slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++) {
-		if (items[slot]) {
-			if (items[slot]->isWeapon()) {
-				if (items[slot]->getWeaponType() == SHIELD) {
-					addSkillTryInternal(skilltry,5);
-					break;
-			 	}			 	
-			}			
-		}
-	}	
-}
-*/
 
 int Player::getPlayerInfo(playerinfo_t playerinfo) const
 {
@@ -529,9 +434,9 @@ std::string Player::getSkillName(int skillid)
 	return skillname;
 }
 
-void Player::addSkillTryInternal(int skilltry,int skill)
+void Player::addSkillAdvance(skills_t skill, int count)
 {
-	skills[skill][SKILL_TRIES] += skilltry;
+	skills[skill][SKILL_TRIES] += count;
 //#if __DEBUG__
 	std::cout << getName() << ", has the vocation: " << (int)getVocationId() << " and is training his " << getSkillName(skill) << "(" << skill << "). Tries: " << skills[skill][SKILL_TRIES] << "(" << vocation->getReqSkillTries(skill, skills[skill][SKILL_LEVEL] + 1) << ")" << std::endl;
 	std::cout << "Current skill: " << skills[skill][SKILL_LEVEL] << std::endl;
@@ -2503,15 +2408,6 @@ void Player::setAttackedCreature(Creature* creature)
 void Player::doAttacking()
 {
 	if(attackedCreature){
-		/*
-		case WEAPON_NONE:
-		{
-			//fist
-			damage = 2 * skills[SKILL_FIST][SKILL_LEVEL] + 5;
-			break;
-		}
-		*/
-
 		Item* item = getAttackItem();
 
 		if(item){
@@ -2520,6 +2416,14 @@ void Player::doAttacking()
 			if(weapon){
 				weapon->useWeapon(this, item, attackedCreature);
 			}
+		}
+		else{
+			int32_t damage = 2 * skills[SKILL_FIST][SKILL_LEVEL] + 5;
+			CombatParams params;
+			params.damageType = DAMAGE_PHYSICAL;
+			params.blockedByArmor = true;
+			params.blockedByShield = true;
+			Combat::doCombatHealth(this, attackedCreature, damage, damage, params);
 		}
 	}
 }

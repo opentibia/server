@@ -34,10 +34,36 @@ class Creature;
 class Position;
 class Item;
 
+enum CombatFormulaType{
+	COMBAT_FORMULA_UNDEFINED = 0,
+	COMBAT_FORMULA_LEVELMAGIC,
+	COMBAT_FORMULA_SKILL,
+};
+
+struct CombatFormula_t{
+	CombatFormula_t(){
+		type = COMBAT_FORMULA_UNDEFINED;
+		mina = 0.0;
+		minb = 0.0;
+		maxa = 0.0;
+		maxb = 0.0;
+	}
+
+	CombatFormulaType type;
+	double mina;
+	double minb;
+	double maxa;
+	double maxb;
+};
+
 //for luascript callback
 class CombatCallBack : public CallBack{
 public:
+	CombatCallBack(CombatFormulaType _type);
 	void getMinMaxValues(Player* player, int32_t& min, int32_t& max) const;
+
+protected:
+	CombatFormulaType type;
 };
 
 struct CombatParams{
@@ -106,7 +132,10 @@ public:
 
 	bool setParam(CombatParam_t param, uint32_t value);
 	void setArea(const AreaCombat* _area);
+	bool hasArea() const {return area != NULL;}
 	void setCondition(const Condition* _condition);
+	void setPlayerCombatValues(CombatFormulaType type, double mina, double minb, double maxa, double maxb);
+	void postCombatEffects(Creature* caster, const Position& pos, bool success) const;
 
 protected:
 	static void CombatFunc(Creature* caster, const Position& pos,
@@ -117,16 +146,16 @@ protected:
 	static bool CombatConditionFunc(Creature* caster, Creature* target, const CombatParams& params, void* data);
 	static bool CombatNullFunc(Creature* caster, Creature* target, const CombatParams& params, void* data);
 
-	static void CombatTileEffects(Creature* caster, Tile* tile, const CombatParams& params);
+	static void combatTileEffects(Creature* caster, Tile* tile, const CombatParams& params);
+	static void postCombatEffects(Creature* caster, const Position& pos, const CombatParams& params);
 	void getMinMaxValues(Creature* creature, int32_t& min, int32_t& max) const;
 
 	//configureable
 	CombatType_t combatType;
-
 	CombatParams params;
+	CombatFormula_t formula;
 
 	AreaCombat* area;
-	//Condition* condition;
 	CombatCallBack* callback;
 };
 

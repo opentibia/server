@@ -1,11 +1,10 @@
 local combat = createCombatObject(COMBAT_TYPE_CONDITION)
+setCombatParam(combat, COMBAT_PARAM_EFFECT, CONST_ME_MAGIC_RED)
 
 local condition = createConditionObject(CONDITION_PARALYZE)
 setConditionParam(condition, CONDITION_PARAM_TICKS, 20000)
 setConditionParam(condition, CONDITION_PARAM_SPEED, -200)
 setCombatCondition(combat, condition)
-
-setCombatParam(combat, COMBAT_PARAM_EFFECT, CONST_ME_MAGIC_RED)
 
 
 function onGetSpeedPlayerValue(cid)

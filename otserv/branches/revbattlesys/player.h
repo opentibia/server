@@ -213,6 +213,7 @@ public:
 	virtual void drainHealth(Creature* attacker, DamageType_t damageType, int32_t damage);
 	virtual void drainMana(Creature* attacker, int32_t manaLoss);	
 	void addManaSpent(uint32_t amount);
+	void addSkillAdvance(skills_t skill, int count);
 
 	virtual int getArmor() const;
 	virtual int getDefense() const;
@@ -344,13 +345,10 @@ protected:
 	bool gainHealthTick();
 
 	void checkTradeState(const Item* item);
-	void addSkillTryInternal(int skilltry,int skill);
-
 	bool hasCapacity(const Item* item, uint32_t count) const;
 
 	//combat help functions
 	Item* getAttackItem();
-	//Item* getWeapon();
 
 	std::string getSkillName(int skillid);
 
@@ -421,7 +419,7 @@ protected:
 	Item* items[11]; //equipement of the player
 	
 	//player advances variables
-	unsigned int skills[7][3];
+	unsigned int skills[SKILL_LAST + 1][3];
 	
 	//reminder: 0 = None, 1 = Sorcerer, 2 = Druid, 3 = Paladin, 4 = Knight
 	static const int CapGain[5];
