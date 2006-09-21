@@ -89,7 +89,7 @@ protected:
 
 	virtual void onUsedWeapon(Player* player, Item* item, Tile* destTile) const;
 	virtual int32_t getWeaponDamage(const Player* player, const Item* item) const = 0;
-	virtual bool getSkillType(const Item* item, skills_t& skill) const {return false;};
+	virtual bool getSkillType(const Player* player, const Item* item, skills_t& skill, uint32_t& skillpoint) const {return false;};
 
 	uint16_t id;
 	bool enabled;
@@ -119,7 +119,7 @@ public:
 protected:
 	virtual void onUsedWeapon(Player* player, Item* item, Tile* destTile) const;
 	virtual int32_t getWeaponDamage(const Player* player, const Item* item) const;
-	virtual bool getSkillType(const Item* item, skills_t& skill) const;
+	virtual bool getSkillType(const Player* player, const Item* item, skills_t& skill, uint32_t& skillpoint) const;
 };
 
 class WeaponDistance : public Weapon
@@ -137,7 +137,7 @@ public:
 protected:
 	virtual void onUsedWeapon(Player* player, Item* item, Tile* destTile) const;
 	virtual int32_t getWeaponDamage(const Player* player, const Item* item) const;
-	virtual bool getSkillType(const Item* item, skills_t& skill) const {skill = SKILL_DIST; return true;};
+	virtual bool getSkillType(const Player* player, const Item* item, skills_t& skill, uint32_t& skillpoint) const;
 
 	int32_t hitChance;
 	int32_t ammuAttackValue;
@@ -153,7 +153,7 @@ public:
 
 protected:
 	virtual int32_t getWeaponDamage(const Player* player, const Item* item) const;
-	virtual bool getSkillType(const Item* item, skills_t& skill) const {return false;};
+	virtual bool getSkillType(const Player* player, const Item* item, skills_t& skill, uint32_t& skillpoint) const {return false;};
 
 	int32_t minChange;
 	int32_t maxChange;

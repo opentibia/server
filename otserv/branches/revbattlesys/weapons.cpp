@@ -390,8 +390,9 @@ void Weapon::onUsedWeapon(Player* player, Item* item, Tile* destTile) const
 	}
 
 	skills_t skillType;
-	if(getSkillType(item, skillType)){
-		player->addSkillAdvance(skillType, 1);
+	uint32_t skillPoint = 0;
+	if(getSkillType(player, item, skillType, skillPoint)){
+		player->addSkillAdvance(skillType, skillPoint);
 	}
 
 	Condition* condition = Condition::createCondition(CONDITION_INFIGHT, 60 * 1000, 0);
@@ -485,8 +486,10 @@ void WeaponMelee::onUsedWeapon(Player* player, Item* item, Tile* destTile) const
 	Weapon::onUsedWeapon(player, item, destTile);
 }
 
-bool WeaponMelee::getSkillType(const Item* item, skills_t& skill) const
+bool WeaponMelee::getSkillType(const Player* player, const Item* item,
+	skills_t& skill, uint32_t& skillpoint) const
 {
+	skillpoint = player->getSkillPoint();
 	WeaponType_t weaponType = item->getWeaponType();
 
 	switch(weaponType){
@@ -650,13 +653,20 @@ bool WeaponDistance::useWeapon(Player* player, Item* item, Creature* target) con
 void WeaponDistance::onUsedWeapon(Player* player, Item* item, Tile* destTile) const
 {
 	Weapon::onUsedWeapon(player, item, destTile);
-	player->addSkillAdvance(SKILL_DIST, 1);
 }
 
 int32_t WeaponDistance::getWeaponDamage(const Player* player, const Item* item) const
 {
 	int32_t skillLevel = player->getSkill(SKILL_DIST, SKILL_LEVEL);
 	return -(skillLevel * (ammuAttackValue / 20) + ammuAttackValue );
+}
+
+bool WeaponDistance::getSkillType(const Player* player, const Item* item,
+	skills_t& skill, uint32_t& skillpoint) const
+{
+	skill = SKILL_DIST;
+	skillpoint = player->getSkillPoint();
+	return true;
 }
 
 WeaponWand::WeaponWand(LuaScriptInterface* _interface) :

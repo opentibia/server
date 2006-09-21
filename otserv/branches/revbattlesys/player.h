@@ -35,6 +35,7 @@
 
 class House;
 class Protocol76;
+class Weapon;
 
 enum skillsid_t {
 	SKILL_LEVEL=0,
@@ -209,11 +210,12 @@ public:
 	virtual void doAttacking();
 
 	int getSkill(skills_t skilltype, skillsid_t skillinfo) const;
+	uint32_t getSkillPoint() const {return skillPoint;}
 
 	virtual void drainHealth(Creature* attacker, DamageType_t damageType, int32_t damage);
 	virtual void drainMana(Creature* attacker, int32_t manaLoss);	
 	void addManaSpent(uint32_t amount);
-	void addSkillAdvance(skills_t skill, int count);
+	void addSkillAdvance(skills_t skill, uint32_t count);
 
 	virtual int getArmor() const;
 	virtual int getDefense() const;
@@ -229,7 +231,8 @@ public:
 	virtual void onAttackedCreatureDrainHealth(Creature* target, int32_t points);
 	virtual void onKilledCreature(Creature* target);
 	virtual void onGainExperience(int32_t gainExperience);
-	virtual void onTargetCreatureDisappear();
+	virtual void onAttackedCreatureBlockHit(Creature* target, BlockType_t blockType);
+	//virtual void onTargetCreatureDisappear();
 
 	virtual void getCreatureLight(LightInfo& light) const;
 
@@ -348,10 +351,9 @@ protected:
 	bool hasCapacity(const Item* item, uint32_t count) const;
 
 	//combat help functions
-	Item* getAttackItem();
+	bool getCombatItem(Item** tool, const Weapon** weapon);
 
 	std::string getSkillName(int skillid);
-
 	void addExperience(unsigned long exp);
 
 	bool NeedUpdateStats();
@@ -403,7 +405,8 @@ protected:
 	long npings;
 
 	bool pzLocked;
-	bool internalAddSkillTry;
+	uint32_t blockCount;
+	uint32_t skillPoint;
 	
 	chaseMode_t chaseMode;
 

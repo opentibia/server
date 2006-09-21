@@ -81,7 +81,8 @@ Creature()
 	internal_ping = 0;
 
 	pzLocked = false;
-	internalAddSkillTry = false;
+	blockCount  = 0;
+	skillPoint = 0;
 
 	chaseMode = CHASEMODE_STANDSTILL;
 	//fightMode = FIGHTMODE_NONE;
@@ -259,7 +260,7 @@ Item* Player::getInventoryItem(slots_t slot) const
 	return NULL;
 }
 
-Item* Player::getAttackItem()
+bool Player::getCombatItem(Item** tool, const Weapon** weapon)
 {
 	Item* item = NULL;
 
@@ -274,7 +275,13 @@ Item* Player::getAttackItem()
 			case WEAPON_AXE:
 			case WEAPON_CLUB:
 			case WEAPON_WAND:
-				return item;
+				//return item;
+
+				*weapon = g_weapons->getWeapon(item);
+				if(*weapon){
+					*tool = item;
+					return true;
+				}
 				break;
 
 			case WEAPON_DIST:
@@ -283,26 +290,39 @@ Item* Player::getAttackItem()
 					Item* ammuItem = getInventoryItem(SLOT_AMMO);
 
 					if(ammuItem && ammuItem->getAmuType() == item->getAmuType()){
-						return ammuItem;
+						//return ammuItem;
+
+						*weapon = g_weapons->getWeapon(ammuItem);
+						if(*weapon){
+							*tool = ammuItem;
+							return true;
+						}
 					}
 				}
 				else{
-					return item;
+					//return item;
+
+					*weapon = g_weapons->getWeapon(item);
+					if(*weapon){
+						*tool = item;
+						return true;
+					}
 				}
 			}
+
 			default:
-			{
 				break;
-			}
 		}
 
+		/*
 		const Weapon* weapon = g_weapons->getWeapon(item);
 		if(weapon){
 			return item;
 		}
+		*/
 	}
 	
-	return NULL;
+	return false;
 }
 
 int Player::getArmor() const
@@ -434,13 +454,15 @@ std::string Player::getSkillName(int skillid)
 	return skillname;
 }
 
-void Player::addSkillAdvance(skills_t skill, int count)
+void Player::addSkillAdvance(skills_t skill, uint32_t count)
 {
 	skills[skill][SKILL_TRIES] += count;
-//#if __DEBUG__
+
+#if __DEBUG__
 	std::cout << getName() << ", has the vocation: " << (int)getVocationId() << " and is training his " << getSkillName(skill) << "(" << skill << "). Tries: " << skills[skill][SKILL_TRIES] << "(" << vocation->getReqSkillTries(skill, skills[skill][SKILL_LEVEL] + 1) << ")" << std::endl;
 	std::cout << "Current skill: " << skills[skill][SKILL_LEVEL] << std::endl;
-//#endif			 
+#endif
+
 	//Need skill up?
 	if(skills[skill][SKILL_TRIES] >= vocation->getReqSkillTries(skill, skills[skill][SKILL_LEVEL] + 1)){
 	 	skills[skill][SKILL_LEVEL]++;
@@ -461,23 +483,6 @@ void Player::addSkillAdvance(skills_t skill, int count)
 	}
 }
 
-/*
-unsigned int Player::getReqMana(int magLevel, Vocation_t voc)
-{
-  //ATTENTION: MAKE SURE THAT CHARS HAVE REASONABLE MAGIC LEVELS. ESPECIALY KNIGHTS!!!!!!!!!!!
-  float ManaMultiplier[5] = { 1.0f, 1.1f, 1.1f, 1.4f, 3};
-
-	//will calculate required mana for a magic level
-  unsigned int reqMana = (unsigned int) ( 400 * pow(ManaMultiplier[(int)voc], magLevel-1) );
-
-	if (reqMana % 20 < 10) //CIP must have been bored when they invented this odd rounding
-    reqMana = reqMana - (reqMana % 20);
-  else
-    reqMana = reqMana - (reqMana % 20) + 20;
-
-  return reqMana;
-}
-*/
 Container* Player::getContainer(uint32_t cid)
 {
   for(ContainerVector::iterator it = containerVec.begin(); it != containerVec.end(); ++it){
@@ -1473,16 +1478,84 @@ void Player::addExperience(unsigned long exp)
 	}
 }
 
+void Player::onAttackedCreatureBlockHit(Creature* target, BlockType_t blockType)
+{
+	Creature::onAttackedCreatureBlockHit(target, blockType);
+
+	switch(blockType){
+		case BLOCK_NONE:
+			skillPoint = 1;
+			blockCount = 0;
+			break;
+
+		case BLOCK_DEFENSE:
+		case BLOCK_ARMOR:
+			//need to draw blood every 30 hits
+			if(blockCount < 30){
+				blockCount++;
+				skillPoint = 1;
+			}
+			else{
+				skillPoint = 0;
+			}
+
+			break;
+
+		default:
+			skillPoint = 0;
+			break;
+	}
+}
+
 BlockType_t Player::blockHit(Creature* attacker, DamageType_t damageType, int32_t& damage,
 	bool checkDefense /* = false*/, bool checkArmor /* = false*/)
 {
 	BlockType_t blockType = Creature::blockHit(attacker, damageType, damage);
 
-	//if(blockType == BLOCK_DEFENSE && damageType == DAMAGE_PHYSICAL){
 	if(blockType == BLOCK_DEFENSE){
-		//addSkillShieldTry(1);
-		internalDefense = false;
+		addSkillAdvance(SKILL_SHIELD, 1);
 	}
+
+	int32_t absorbedDamage = 0;
+
+	//reduce damage against inventory items
+	Item* item = NULL;
+	for(int slot = SLOT_FIRST; slot < SLOT_LAST; ++slot){
+		if(!(item = getInventoryItem((slots_t)slot)))
+			continue;
+
+		if(item->abilities.absorbPercentAll != 0){
+			absorbedDamage += (item->abilities.absorbPercentAll / 100) * damage;
+		}
+
+		switch(damageType){
+			case DAMAGE_PHYSICAL:
+				absorbedDamage += (item->abilities.absorbPercentPhysical / 100) * damage;
+				break;
+			case DAMAGE_FIRE:
+				absorbedDamage = (item->abilities.absorbPercentFire / 100) * damage;
+				break;
+			case DAMAGE_ENERGY:
+				absorbedDamage = (item->abilities.absorbPercentEnergy / 100) * damage;
+				break;
+			case DAMAGE_POISON:
+				absorbedDamage = (item->abilities.absorbPercentPoison / 100) * damage;
+				break;
+		}
+	
+		if(absorbedDamage != 0){
+			damage -= absorbedDamage;
+
+			int32_t charges = item->getItemCharge();
+
+			if(charges != 0){
+				g_game.transformItem(item, item->getID(), charges - 1);
+			}
+		}
+	}
+
+	damage -= absorbedDamage;
+	damage = std::max((int32_t)0, damage);
 
 	return blockType;
 }
@@ -2408,22 +2481,27 @@ void Player::setAttackedCreature(Creature* creature)
 void Player::doAttacking()
 {
 	if(attackedCreature){
-		Item* item = getAttackItem();
+		Item* tool;
+		const Weapon* weapon;
 
-		if(item){
-			const Weapon* weapon = g_weapons->getWeapon(item);
-
+		if(getCombatItem(&tool, &weapon)){
 			if(weapon){
-				weapon->useWeapon(this, item, attackedCreature);
+				weapon->useWeapon(this, tool, attackedCreature);
 			}
 		}
 		else{
-			int32_t damage = 2 * skills[SKILL_FIST][SKILL_LEVEL] + 5;
-			CombatParams params;
-			params.damageType = DAMAGE_PHYSICAL;
-			params.blockedByArmor = true;
-			params.blockedByShield = true;
-			Combat::doCombatHealth(this, attackedCreature, damage, damage, params);
+			const Position& playerPos = getPosition();
+			const Position& targetPos = attackedCreature->getPosition();
+
+			if(std::max(std::abs(playerPos.x - targetPos.x), std::abs(playerPos.y - targetPos.y)) <= 1){
+				int32_t damage = - (0.5 * skills[SKILL_FIST][SKILL_LEVEL]);
+				CombatParams params;
+				params.damageType = DAMAGE_PHYSICAL;
+				params.blockedByArmor = true;
+				params.blockedByShield = true;
+				Combat::doCombatHealth(this, attackedCreature, damage, damage, params);
+				addSkillAdvance(SKILL_FIST, getSkillPoint());
+			}
 		}
 	}
 }
@@ -2671,6 +2749,7 @@ void Player::onGainExperience(int32_t gainExperience)
 	}
 }
 
+/*
 void Player::onTargetCreatureDisappear()
 {
 	Creature::onTargetCreatureDisappear();
@@ -2678,6 +2757,7 @@ void Player::onTargetCreatureDisappear()
 	sendCancelTarget();
 	sendTextMessage(MSG_STATUS_SMALL, "Target lost.");
 }
+*/
 
 bool Player::isImmune(DamageType_t type) const
 {

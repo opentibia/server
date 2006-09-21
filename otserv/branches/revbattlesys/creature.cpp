@@ -308,17 +308,14 @@ void Creature::setAttackedCreature(Creature* creature)
 BlockType_t Creature::blockHit(Creature* attacker, DamageType_t damageType, int32_t& damage,
 	bool checkDefense /* = false */, bool checkArmor /* = false */)
 {
-	if(attacker){
-		attacker->onAttackedCreature(this);
-	}
+	BlockType_t blockType = BLOCK_NONE;
 
-	if(isImmune(damageType)){
+	if(blockType == BLOCK_NONE && isImmune(damageType)){
 		damage = 0;
-		return BLOCK_IMMUNITY;
+		blockType = BLOCK_IMMUNITY;
 	}
 
-	//if(internalDefense && damageType == DAMAGE_PHYSICAL){
-	if(internalDefense && checkDefense){
+	if(blockType == BLOCK_NONE && internalDefense && checkDefense){
 		internalDefense = false;
 		int32_t defense = getDefense();
 
@@ -326,27 +323,32 @@ BlockType_t Creature::blockHit(Creature* attacker, DamageType_t damageType, int3
 		int32_t probability = rand() % 100;
 		if(probability < defense){
 			damage = 0;
-			return BLOCK_DEFENSE;
+			blockType = BLOCK_DEFENSE;
 		}
 	}
 	
-	//if(internalArmor && (damageType == DAMAGE_PHYSICAL || damageType == DAMAGE_PHYSICALPROJECTILE)){
-	if(internalArmor && checkArmor){
+	if(blockType == BLOCK_NONE && internalArmor && checkArmor){
 		internalArmor = false;
 		int32_t armor = getArmor();
 
+		//TODO: change formulas
 		int32_t probability = rand() % 100;
 		int32_t reduceDamage = (probability * armor * damage) / 3000;
 		if(reduceDamage >= damage){
 			damage = 0;
-			return BLOCK_ARMOR;
+			blockType = BLOCK_ARMOR;
 		}
 		else{
 			damage -= reduceDamage;
 		}
 	}
 
-	return BLOCK_NONE;
+	if(attacker){
+		//attacker->onAttackedCreature(this);
+		attacker->onAttackedCreatureBlockHit(this, blockType);
+	}
+
+	return blockType;
 }
 
 void Creature::setFollowCreature(const Creature* creature)
@@ -435,11 +437,18 @@ void Creature::onGainExperience(int32_t gainExperience)
 	}
 }
 
+void Creature::onAttackedCreatureBlockHit(Creature* target, BlockType_t blockType)
+{
+	onAttackedCreature(target);
+}
+
+/*
 void Creature::onTargetCreatureDisappear()
 {
 	setAttackedCreature(NULL);
 	setFollowCreature(NULL);
 }
+*/
 
 void Creature::setMaster(Creature* creature)
 {
@@ -508,6 +517,23 @@ void Creature::executeConditions(int32_t newticks)
 {
 	for(ConditionList::iterator it = conditions.begin(); it != conditions.end();){
 		(*it)->setTicks((*it)->getTicks() - newticks);
+
+		(*it)->executeCondition(this, newticks);
+
+		if((*it)->getTicks() <= 0){
+			ConditionType_t type = (*it)->getType();
+
+			(*it)->endCondition(this, REASON_ENDTICKS);
+			delete *it;
+			it = conditions.erase(it);
+
+			onEndCondition(type);
+		}
+		else{
+			++it;
+		}
+
+		/*
 		if((*it)->getTicks() <= 0){
 			ConditionType_t type = (*it)->getType();
 
@@ -521,6 +547,7 @@ void Creature::executeConditions(int32_t newticks)
 			(*it)->executeCondition(this, newticks);
 			++it;
 		}
+		*/
 	}
 }
 
