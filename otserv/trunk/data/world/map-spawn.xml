@@ -179,8 +179,8 @@
 <monster name="Troll" x="-4" y="-1" spawntime="60"/>
 <monster name="Troll" x="-2" y="-3" spawntime="60"/>
 <monster name="Troll" x="4" y="-1" spawntime="60"/>
-<monster name="Troll" x="4" y="0" spawntime="60"/>
 <monster name="Troll" x="4" y="1" spawntime="60"/>
+<monster name="Troll" x="2" y="0" spawntime="60"/>
 </spawn>
 <spawn centerx="180" centery="199" centerz="8" radius="5">
 <monster name="Troll" x="0" y="-2" spawntime="60"/>
@@ -965,5 +965,240 @@
 <monster name="Hunter" x="4" y="1" spawntime="60"/>
 <monster name="Smuggler" x="-1" y="2" spawntime="60"/>
 <monster name="Witch" x="3" y="-2" spawntime="60"/>
+</spawn>
+<spawn centerx="280" centery="261" centerz="7" radius="5">
+<monster name="Lion" x="0" y="-1" spawntime="60"/>
+<monster name="Lion" x="0" y="5" spawntime="60"/>
+</spawn>
+<spawn centerx="272" centery="271" centerz="7" radius="5">
+<monster name="Lion" x="-2" y="-2" spawntime="60"/>
+<monster name="Lion" x="2" y="3" spawntime="60"/>
+</spawn>
+<spawn centerx="290" centery="276" centerz="7" radius="5">
+<monster name="Lion" x="4" y="-1" spawntime="60"/>
+<monster name="Lion" x="-2" y="2" spawntime="60"/>
+</spawn>
+<spawn centerx="255" centery="266" centerz="6" radius="5">
+<monster name="Hyaena" x="3" y="-2" spawntime="60"/>
+<monster name="Hyaena" x="-3" y="-2" spawntime="60"/>
+<monster name="Hyaena" x="1" y="4" spawntime="60"/>
+</spawn>
+<spawn centerx="276" centery="247" centerz="6" radius="5">
+<monster name="Hyaena" x="-2" y="4" spawntime="60"/>
+<monster name="Hyaena" x="1" y="-4" spawntime="60"/>
+<monster name="Hyaena" x="1" y="2" spawntime="60"/>
+</spawn>
+<spawn centerx="282" centery="238" centerz="6" radius="5">
+<monster name="Cyclops" x="-1" y="2" spawntime="60"/>
+</spawn>
+<spawn centerx="232" centery="276" centerz="6" radius="5">
+<monster name="Cyclops" x="3" y="-3" spawntime="60"/>
+<monster name="Cyclops" x="-2" y="1" spawntime="60"/>
+</spawn>
+<spawn centerx="232" centery="284" centerz="6" radius="5">
+<monster name="Cyclops" x="0" y="-2" spawntime="60"/>
+</spawn>
+<spawn centerx="258" centery="283" centerz="6" radius="5">
+<monster name="Cyclops" x="-1" y="-2" spawntime="60"/>
+<monster name="Cyclops" x="2" y="1" spawntime="60"/>
+</spawn>
+<spawn centerx="271" centery="280" centerz="6" radius="5">
+<monster name="Cyclops" x="1" y="0" spawntime="60"/>
+</spawn>
+<spawn centerx="301" centery="264" centerz="6" radius="5">
+<monster name="Hyaena" x="2" y="3" spawntime="60"/>
+<monster name="Hyaena" x="-2" y="-4" spawntime="60"/>
+</spawn>
+<spawn centerx="292" centery="286" centerz="6" radius="5">
+<monster name="Hyaena" x="-2" y="1" spawntime="60"/>
+<monster name="Hyaena" x="3" y="-2" spawntime="60"/>
+</spawn>
+<spawn centerx="283" centery="281" centerz="6" radius="5">
+<monster name="Cyclops" x="-2" y="0" spawntime="60"/>
+</spawn>
+<spawn centerx="278" centery="270" centerz="6" radius="5">
+<monster name="Hyaena" x="-3" y="-2" spawntime="60"/>
+</spawn>
+<spawn centerx="306" centery="243" centerz="6" radius="5">
+<monster name="Cyclops" x="1" y="-2" spawntime="60"/>
+<monster name="Cyclops" x="-3" y="4" spawntime="60"/>
+</spawn>
+<spawn centerx="295" centery="242" centerz="6" radius="5">
+<monster name="Cyclops" x="-1" y="-1" spawntime="60"/>
+</spawn>
+<spawn centerx="291" centery="244" centerz="7" radius="5">
+<monster name="Dragon" x="-1" y="-1" spawntime="60"/>
+</spawn>
+<spawn centerx="282" centery="271" centerz="5" radius="5">
+<monster name="Scorpion" x="0" y="-1" spawntime="60"/>
+</spawn>
+<spawn centerx="292" centery="285" centerz="5" radius="5">
+<monster name="Scorpion" x="-1" y="-1" spawntime="60"/>
+<monster name="Cyclops" x="2" y="2" spawntime="60"/>
+</spawn>
+<spawn centerx="306" centery="271" centerz="5" radius="5">
+<monster name="Scorpion" x="-2" y="1" spawntime="60"/>
+</spawn>
+<spawn centerx="301" centery="255" centerz="5" radius="5">
+<monster name="Scorpion" x="2" y="3" spawntime="60"/>
+</spawn>
+<spawn centerx="306" centery="244" centerz="5" radius="5">
+<monster name="Cyclops" x="0" y="0" spawntime="60"/>
+</spawn>
+<spawn centerx="219" centery="281" centerz="7" radius="5">
+<monster name="Minotaur" x="-1" y="-3" spawntime="60"/>
+<monster name="Minotaur" x="1" y="1" spawntime="60"/>
+<monster name="Minotaur Guard" x="0" y="5" spawntime="60"/>
+</spawn>
+<spawn centerx="228" centery="250" centerz="7" radius="5">
+<monster name="Minotaur" x="-1" y="-2" spawntime="60"/>
+</spawn>
+<spawn centerx="271" centery="238" centerz="7" radius="5">
+<monster name="Orc" x="-2" y="-2" spawntime="60"/>
+</spawn>
+<spawn centerx="277" centery="225" centerz="7" radius="5">
+<monster name="Poison Spider" x="-3" y="0" spawntime="60"/>
+<monster name="Poison Spider" x="3" y="-1" spawntime="60"/>
+<monster name="Poison Spider" x="3" y="3" spawntime="60"/>
+</spawn>
+<spawn centerx="290" centery="220" centerz="7" radius="5">
+<monster name="Poison Spider" x="-2" y="-1" spawntime="60"/>
+<monster name="Poison Spider" x="2" y="3" spawntime="60"/>
+</spawn>
+<spawn centerx="266" centery="338" centerz="7" radius="5">
+<monster name="Wasp" x="-2" y="-2" spawntime="60"/>
+<monster name="Wasp" x="2" y="2" spawntime="60"/>
+</spawn>
+<spawn centerx="271" centery="349" centerz="7" radius="5">
+<monster name="Wasp" x="-2" y="-2" spawntime="60"/>
+<monster name="Wasp" x="4" y="-1" spawntime="60"/>
+<monster name="Wasp" x="-2" y="3" spawntime="60"/>
+</spawn>
+<spawn centerx="397" centery="392" centerz="7" radius="5">
+<monster name="Stone Golem" x="-1" y="0" spawntime="60"/>
+<monster name="Stone Golem" x="1" y="3" spawntime="60"/>
+</spawn>
+<spawn centerx="403" centery="396" centerz="7" radius="5">
+<monster name="Stone Golem" x="0" y="-2" spawntime="60"/>
+</spawn>
+<spawn centerx="236" centery="393" centerz="8" radius="5">
+<monster name="Troll" x="0" y="-5" spawntime="60"/>
+<monster name="Troll" x="3" y="-2" spawntime="60"/>
+<monster name="Swamp Troll" x="-1" y="-2" spawntime="60"/>
+<monster name="Troll" x="2" y="2" spawntime="60"/>
+</spawn>
+<spawn centerx="264" centery="403" centerz="8" radius="5">
+<monster name="Troll" x="2" y="-3" spawntime="60"/>
+<monster name="Troll" x="0" y="2" spawntime="60"/>
+</spawn>
+<spawn centerx="271" centery="410" centerz="8" radius="5">
+<monster name="Troll" x="-3" y="-3" spawntime="60"/>
+<monster name="Troll" x="3" y="-4" spawntime="60"/>
+<monster name="Troll" x="0" y="1" spawntime="60"/>
+</spawn>
+<spawn centerx="259" centery="392" centerz="8" radius="5">
+<monster name="Troll" x="-4" y="-3" spawntime="60"/>
+<monster name="Troll" x="0" y="2" spawntime="60"/>
+<monster name="Troll" x="3" y="1" spawntime="60"/>
+</spawn>
+<spawn centerx="247" centery="373" centerz="8" radius="5">
+<monster name="Troll" x="-3" y="-4" spawntime="60"/>
+<monster name="Troll" x="-2" y="0" spawntime="60"/>
+<monster name="Troll" x="2" y="1" spawntime="60"/>
+</spawn>
+<spawn centerx="261" centery="365" centerz="8" radius="5">
+<monster name="Troll" x="-3" y="-3" spawntime="60"/>
+<monster name="Troll" x="-1" y="3" spawntime="60"/>
+<monster name="Troll" x="3" y="2" spawntime="60"/>
+</spawn>
+<spawn centerx="269" centery="348" centerz="8" radius="5">
+<monster name="Troll" x="-1" y="-3" spawntime="60"/>
+<monster name="Troll" x="3" y="2" spawntime="60"/>
+<monster name="Troll" x="2" y="4" spawntime="60"/>
+</spawn>
+<spawn centerx="262" centery="318" centerz="8" radius="5">
+<monster name="Troll" x="0" y="2" spawntime="60"/>
+<monster name="Troll" x="3" y="4" spawntime="60"/>
+</spawn>
+<spawn centerx="343" centery="335" centerz="8" radius="5">
+<monster name="Rotworm" x="2" y="2" spawntime="60"/>
+<monster name="Rotworm" x="-1" y="-2" spawntime="60"/>
+<monster name="Rotworm" x="-4" y="-2" spawntime="60"/>
+</spawn>
+<spawn centerx="332" centery="322" centerz="8" radius="5">
+<monster name="Rotworm" x="2" y="-4" spawntime="60"/>
+<monster name="Rotworm" x="-1" y="-1" spawntime="60"/>
+<monster name="Rotworm" x="3" y="3" spawntime="60"/>
+</spawn>
+<spawn centerx="335" centery="298" centerz="8" radius="5">
+<monster name="Rotworm" x="1" y="-2" spawntime="60"/>
+<monster name="Rotworm" x="0" y="5" spawntime="60"/>
+</spawn>
+<spawn centerx="359" centery="307" centerz="8" radius="5">
+<monster name="Rotworm" x="-2" y="1" spawntime="60"/>
+<monster name="Rotworm" x="0" y="-1" spawntime="60"/>
+</spawn>
+<spawn centerx="366" centery="287" centerz="8" radius="5">
+<monster name="Rotworm" x="2" y="-2" spawntime="60"/>
+<monster name="Rotworm" x="-3" y="4" spawntime="60"/>
+</spawn>
+<spawn centerx="364" centery="268" centerz="8" radius="5">
+<monster name="Rotworm" x="-1" y="-3" spawntime="60"/>
+</spawn>
+<spawn centerx="385" centery="261" centerz="8" radius="5">
+<monster name="Rotworm" x="-2" y="1" spawntime="60"/>
+<monster name="Rotworm" x="2" y="-2" spawntime="60"/>
+</spawn>
+<spawn centerx="398" centery="287" centerz="8" radius="5">
+<monster name="Rotworm" x="-3" y="-2" spawntime="60"/>
+<monster name="Carrion Worm" x="1" y="0" spawntime="60"/>
+</spawn>
+<spawn centerx="420" centery="280" centerz="8" radius="5">
+<monster name="Rotworm" x="-3" y="3" spawntime="60"/>
+<monster name="Rotworm" x="1" y="-1" spawntime="60"/>
+</spawn>
+<spawn centerx="380" centery="292" centerz="8" radius="5">
+<monster name="Rotworm" x="-1" y="0" spawntime="60"/>
+</spawn>
+<spawn centerx="391" centery="298" centerz="8" radius="5">
+<monster name="Rotworm" x="-1" y="0" spawntime="60"/>
+</spawn>
+<spawn centerx="403" centery="314" centerz="8" radius="5">
+<monster name="Rotworm" x="-1" y="-4" spawntime="60"/>
+<monster name="Rotworm" x="2" y="4" spawntime="60"/>
+</spawn>
+<spawn centerx="389" centery="316" centerz="8" radius="5">
+<monster name="Rotworm" x="-1" y="-2" spawntime="60"/>
+<monster name="Rotworm" x="1" y="-1" spawntime="60"/>
+</spawn>
+<spawn centerx="370" centery="324" centerz="8" radius="5">
+<monster name="Rotworm" x="3" y="-2" spawntime="60"/>
+<monster name="Rotworm" x="-1" y="1" spawntime="60"/>
+</spawn>
+<spawn centerx="385" centery="292" centerz="9" radius="5">
+<monster name="Rotworm" x="-2" y="2" spawntime="60"/>
+<monster name="Rotworm" x="1" y="-3" spawntime="60"/>
+</spawn>
+<spawn centerx="399" centery="294" centerz="9" radius="5">
+<monster name="Carrion Worm" x="0" y="-5" spawntime="60"/>
+<monster name="Rotworm" x="4" y="0" spawntime="60"/>
+</spawn>
+<spawn centerx="396" centery="304" centerz="9" radius="5">
+<monster name="Rotworm" x="5" y="0" spawntime="60"/>
+<monster name="Carrion Worm" x="0" y="3" spawntime="60"/>
+</spawn>
+<spawn centerx="402" centery="312" centerz="9" radius="5">
+<monster name="Rotworm" x="3" y="-3" spawntime="60"/>
+<monster name="Rotworm" x="-4" y="0" spawntime="60"/>
+<monster name="Carrion Worm" x="1" y="1" spawntime="60"/>
+</spawn>
+<spawn centerx="387" centery="301" centerz="9" radius="5">
+<monster name="Rotworm" x="2" y="-2" spawntime="60"/>
+</spawn>
+<spawn centerx="405" centery="305" centerz="9" radius="5">
+<monster name="Rotworm" x="2" y="-1" spawntime="60"/>
+</spawn>
+<spawn centerx="286" centery="240" centerz="8" radius="5">
+<monster name="Fire Devil" x="-1" y="0" spawntime="60"/>
 </spawn>
 </spawns>
