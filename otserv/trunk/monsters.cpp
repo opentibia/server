@@ -356,6 +356,10 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 				if(readXMLInteger(p, "feet", intValue)){
 					mType->lookfeet = intValue;
 				}
+				
+				if(readXMLInteger(p, "addons", intValue)){
+					mType->lookaddons = intValue;
+				}
 
 				if(readXMLInteger(p, "corpse", intValue)){
 					mType->lookcorpse = intValue;

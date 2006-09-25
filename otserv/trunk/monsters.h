@@ -156,7 +156,7 @@ public:
 	int maglevel;
 	int health;
 	int health_max;
-	int lookhead, lookbody, looklegs, lookfeet, looktype, lookcorpse, lookmaster;
+	int lookhead, lookbody, looklegs, lookfeet, looktype, lookcorpse, lookmaster, lookaddons;
 	int immunities;
 	
 	int lightLevel;

@@ -68,6 +68,7 @@ Creature()
 	looklegs = mType->looklegs;
 	lookfeet = mType->lookfeet;
 	looktype = mType->looktype;
+	lookaddons = mType->lookaddons;
 	lookcorpse = mType->lookcorpse;
 	lookmaster = mType->lookmaster;
 	health     = mType->health;
