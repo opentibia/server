@@ -295,6 +295,7 @@ public:
 	void addPlayerBuffer(Player* p);
 	void FreeThing(Thing* thing);
 
+	bool canThrowObjectTo(const Position& fromPos, const Position& toPos);
 	bool getPathTo(Creature* creature, Position toPosition, std::list<Direction>& listDir);
 	void changeSpeed(Creature* creature, int32_t speedDelta);
 	void changeOutfit(Creature* creature, uint8_t lookType, uint16_t lookTypeEx = 0,

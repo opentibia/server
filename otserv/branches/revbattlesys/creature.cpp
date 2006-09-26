@@ -163,6 +163,17 @@ void Creature::onCreatureAppear(const Creature* creature, bool isLogin)
 	//
 }
 
+void Creature::onCreatureDisappear(const Creature* creature)
+{
+	if(attackedCreature == creature){
+		setAttackedCreature(NULL);
+	}
+
+	if(followCreature == creature){
+		setFollowCreature(NULL);
+	}
+}
+
 void Creature::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout)
 {
 	onCreatureDisappear(creature);

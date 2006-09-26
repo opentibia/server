@@ -28,10 +28,17 @@
 #include <libxml/parser.h>
 
 extern Game g_game;
+extern LuaScript g_config;
+
+int32_t Weapons::weaponExhaustionTime = 0;
+int32_t Weapons::weaponInFightTime = 0;
 
 Weapons::Weapons():
 m_scriptInterface("Weapon Interface")
 {
+	weaponExhaustionTime = g_config.getGlobalNumber("exhausted", 0);
+	weaponInFightTime = g_config.getGlobalNumber("pzlocked", 0);
+
 	m_scriptInterface.initState();
 }
 
@@ -166,7 +173,6 @@ Weapon::Weapon(LuaScriptInterface* _interface) :
 	exhaustion = 0;
 	range = 1;
 	ammoAction = AMMOACTION_NONE;
-	//combat = NULL;
 }
 
 Weapon::~Weapon()
@@ -239,7 +245,7 @@ bool Weapon::configureEvent(xmlNodePtr p)
 	}
 
 	if(readXMLInteger(p, "exhaustion", intValue)){
-		exhaustion = intValue;
+		exhaustion = (intValue == 1);
 	}
 
 	if(readXMLInteger(p, "prem", intValue)){
@@ -395,14 +401,8 @@ void Weapon::onUsedWeapon(Player* player, Item* item, Tile* destTile) const
 		player->addSkillAdvance(skillType, skillPoint);
 	}
 
-	Condition* condition = Condition::createCondition(CONDITION_INFIGHT, 60 * 1000, 0);
-	if(!player->addCondition(condition)){
-		delete condition;
-	}
-
-	if(exhaustion != 0){
-		Condition* condition = Condition::createCondition(CONDITION_EXHAUSTED, exhaustion, 0);
-
+	if(exhaustion && Weapons::weaponExhaustionTime != 0){
+		Condition* condition = Condition::createCondition(CONDITION_EXHAUSTED, Weapons::weaponExhaustionTime, 0);
 		if(!player->addCondition(condition)){
 			delete condition;
 		}
@@ -547,7 +547,8 @@ int32_t WeaponMelee::getWeaponDamage(const Player* player, const Item* item) con
 	}
 	
 	int32_t attackValue = item->getAttack();
-	return -(skillLevel * (attackValue / 20) + attackValue);
+	int32_t maxDamage = (skillLevel * (attackValue / 20) + attackValue);
+	return -(1 + (int32_t)(maxDamage * rand()/(RAND_MAX + 1.0)));
 }
 
 WeaponDistance::WeaponDistance(LuaScriptInterface* _interface) :
@@ -587,20 +588,20 @@ bool WeaponDistance::configureWeapon(const ItemType& it)
 		case AMMO_ARROW:
 		{
 			hitChance = 80;
-			range = 6;
+			range = 5;
 			break;
 		}
 
 		case AMMO_BOLT:
 		{
 			hitChance = 90;
-			range = 7;
+			range = 6;
 			break;
 		}
 
 		default:
 			hitChance = 50;
-			range = 5;
+			range = 4;
 			break;
 	}
 
@@ -658,7 +659,9 @@ void WeaponDistance::onUsedWeapon(Player* player, Item* item, Tile* destTile) co
 int32_t WeaponDistance::getWeaponDamage(const Player* player, const Item* item) const
 {
 	int32_t skillLevel = player->getSkill(SKILL_DIST, SKILL_LEVEL);
-	return -(skillLevel * (ammuAttackValue / 20) + ammuAttackValue );
+
+	int32_t maxDamage = (skillLevel * (ammuAttackValue / 20) + ammuAttackValue);
+	return -(1 + (int32_t)(maxDamage * rand()/(RAND_MAX + 1.0)));
 }
 
 bool WeaponDistance::getSkillType(const Player* player, const Item* item,

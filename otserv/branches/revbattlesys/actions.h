@@ -19,23 +19,18 @@
 //////////////////////////////////////////////////////////////////////
 
 
-#ifndef __ACTIONS_H__
-#define __ACTIONS_H__
+#ifndef __OTSERV_ACTIONS_H__
+#define __OTSERV_ACTIONS_H__
 
 #include "position.h"
 
 #include <map>
 #include "luascript.h"
 #include "baseevents.h"
+#include "thing.h"
 
 class Action;
 class Container;
-
-enum tCanUseRet{
-	CAN_USE,
-	TOO_FAR,
-	CAN_NOT_THROW,
-};
 
 class Actions : public BaseEvents
 {
@@ -50,8 +45,8 @@ public:
 
 	bool openContainer(Player* player,Container* container, const unsigned char index);
 
-	static int canUse(const Creature* creature ,const Position& pos);
-	static int canUseFar(const Creature* creature ,const Position& to_pos, const bool blockWalls);
+	static ReturnValue canUse(const Creature* creature, const Position& pos);
+	static ReturnValue canUseFar(const Creature* creature ,const Position& toPos, const bool blockWalls);
 
 protected:
 	virtual void clear();

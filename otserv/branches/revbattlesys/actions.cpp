@@ -118,32 +118,49 @@ bool Actions::registerEvent(Event* event, xmlNodePtr p)
 	return true;
 }
 
-int Actions::canUse(const Creature* creature, const Position& pos)
+ReturnValue Actions::canUse(const Creature* creature, const Position& pos)
 {
+	const Position& creaturePos = creature->getPosition();
+
 	if(pos.x != 0xFFFF){
-		if(!Position::areInRange<1,1,0>(pos, creature->getPosition())){
-			return TOO_FAR;
+		if(creaturePos.z > pos.z){
+			return RET_FIRSTGOUPSTAIRS;
+		}
+		else if(creaturePos.z < pos.z){
+			return RET_FIRSTGODOWNSTAIRS;
+		}
+		else if(!Position::areInRange<1,1,0>(creaturePos, pos)){
+			return RET_TOOFARAWAY;
 		}
 	}
-	return CAN_USE;
+
+	return RET_NOERROR;
 }
 
-int Actions::canUseFar(const Creature* creature, const Position& to_pos, const bool blockWalls)
+ReturnValue Actions::canUseFar(const Creature* creature, const Position& toPos, const bool blockWalls)
 {
-	if(to_pos.x == 0xFFFF){
-		return CAN_USE;
-	}
-	Position creature_pos = creature->getPosition();
-	if(!Position::areInRange<7,5,0>(to_pos, creature_pos)){
-		return TOO_FAR;
-	}
-	
-	if(blockWalls && canUse(creature, to_pos) == TOO_FAR && 
-		!g_game.map->canThrowObjectTo(creature_pos, to_pos)){
-		return CAN_NOT_THROW;
+	if(toPos.x == 0xFFFF){
+		return RET_NOERROR;
 	}
 
-	return CAN_USE;
+	const Position& creaturePos = creature->getPosition();
+
+	if(creaturePos.z > toPos.z){
+		return RET_FIRSTGOUPSTAIRS;
+	}
+	else if(creaturePos.z < toPos.z){
+		return RET_FIRSTGODOWNSTAIRS;
+	}
+	else if(!Position::areInRange<7,5,0>(toPos, creaturePos)){
+		return RET_TOOFARAWAY;
+	}
+	
+	if(blockWalls && canUse(creature, toPos) == RET_TOOFARAWAY && 
+		!g_game.map->canThrowObjectTo(creaturePos, toPos)){
+			return RET_CANNOTTHROW;
+	}
+
+	return RET_NOERROR;
 }
 
 Action *Actions::getAction(const Item* item)
@@ -309,20 +326,18 @@ std::string Action::getScriptEventName()
 
 bool Action::canExecuteAction(const Player* player, const Position& toPos)
 {
+	ReturnValue ret = RET_NOERROR;
+
 	if(allowFarUse() == false){
-		if(Actions::canUse(player, toPos) == TOO_FAR){
-			player->sendCancelMessage(RET_TOOFARAWAY);
+		if((ret = Actions::canUse(player, toPos)) != RET_NOERROR){
+			player->sendCancelMessage(ret);
 			return false;
 		}
 	}
 	else{
-		int useFar = Actions::canUseFar(player, toPos, blockWalls());
-		if(useFar == TOO_FAR){
-			player->sendCancelMessage(RET_TOOFARAWAY);
-			return false;
-		}
-		else if(useFar == CAN_NOT_THROW){
-			player->sendCancelMessage(RET_CANNOTTHROW);
+		ret = Actions::canUseFar(player, toPos, blockWalls());
+		if(ret != RET_NOERROR){
+			player->sendCancelMessage(ret);
 			return false;
 		}
 	}

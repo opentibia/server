@@ -35,13 +35,13 @@ extern Game g_game;
 extern LuaScript g_config;
 
 int32_t Spells::spellExhaustionTime = 0;
-int32_t Spells::spellPzLockedTime = 0;
+int32_t Spells::spellInFightTime = 0;
 
 Spells::Spells():
 m_scriptInterface("Spell Interface")
 {
 	spellExhaustionTime = g_config.getGlobalNumber("exhausted", 0);
-	spellPzLockedTime = g_config.getGlobalNumber("pzlocked", 0);
+	spellInFightTime = g_config.getGlobalNumber("pzlocked", 0);
 	m_scriptInterface.initState();
 }
 
@@ -392,8 +392,8 @@ void Spell::postCastSpell(Player* player)
 		}
 	}
 	
-	if(isAggressive){
-		Condition* condition = Condition::createCondition(CONDITION_INFIGHT, Spells::spellPzLockedTime, 0);
+	if(isAggressive && Spells::spellInFightTime != 0){
+		Condition* condition = Condition::createCondition(CONDITION_INFIGHT, Spells::spellInFightTime, 0);
 		if(!player->addCondition(condition)){
 			delete condition;
 		}
@@ -486,24 +486,29 @@ bool InstantSpell::playerCastInstant(Player* player, const std::string& param)
 			player->sendTextMessage(MSG_STATUS_SMALL, "A player with this name is not online.", player->getPosition(), NM_ME_PUFF);
 			return false;
 		}
-	}
-	
-	bool result = false;
 
-	if(hasParam){
+		if(!g_game.canThrowObjectTo(player->getPosition(), target->getPosition())){
+			player->sendTextMessage(MSG_STATUS_SMALL, "Player is not reachable.", player->getPosition(), NM_ME_PUFF);
+			return false;
+		}
+
+		var.type = VARIANT_NUMBER;
+		var.number = target->getID();
+	}
+	else if(hasParam){
 		var.type = VARIANT_STRING;
 		var.text = param;
-
-		result = castInstant(player, var);
 	}
 	else{
 		var.type = VARIANT_POSITION;
 		var.pos = getCasterPosition(player);
 
-		if(playerInstantSpellCheck(player, var.pos)){
-			result = castInstant(player, var);
+		if(!playerInstantSpellCheck(player, var.pos)){
+			return false;
 		}
 	}
+
+	bool result = castInstant(player, var);
 
 	if(result){
 		Spell::postCastSpell(player);
@@ -517,7 +522,6 @@ Position InstantSpell::getCasterPosition(Creature* creature)
 	Position pos = creature->getPosition();
 
 	if(needDirection){
-
 		switch(creature->getDirection()){
 			case NORTH:
 				pos.y -= 1;

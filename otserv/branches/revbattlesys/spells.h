@@ -47,7 +47,7 @@ public:
 	bool playerSaySpell(Player* player, SpeakClasses type, const std::string& words);
 
 	static int32_t spellExhaustionTime;
-	static int32_t spellPzLockedTime;
+	static int32_t spellInFightTime;
 	
 protected:
 	virtual void clear();

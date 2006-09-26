@@ -714,10 +714,16 @@ void Game::moveCreature(Player* player, Cylinder* fromCylinder, Cylinder* toCyli
 		ret = internalMoveCreature(moveCreature, fromCylinder, toCylinder);
 	}
 	
-	if((player == moveCreature || ret == RET_NOTMOVEABLE) && ret != RET_NOERROR){
+	if(ret != RET_NOERROR){
 		player->sendCancelMessage(ret);
-		player->sendCancelWalk();
 	}
+
+	/*
+	if((player == moveCreature || ret == RET_NOTMOVEABLE) && ret != RET_NOERROR){
+		player->sendCancelWalk();
+		player->sendCancelMessage(ret);
+	}
+	*/
 }
 
 ReturnValue Game::internalMoveCreature(Creature* creature, Direction direction)
@@ -1489,8 +1495,19 @@ void Game::checkCreatureAttacking(uint32_t creatureId, uint32_t interval)
 
 	Creature* creature = getCreatureByID(creatureId);
 	if(creature){
-		//do attack
-		creature->doAttacking();
+		Creature* attackedCreature = creature->getAttackedCreature();
+
+		if(attackedCreature){
+			if(attackedCreature->getTile()->hasProperty(PROTECTIONZONE) ||
+			creature->getTile()->hasProperty(PROTECTIONZONE)){
+				creature->onCreatureDisappear(attackedCreature);
+			}
+			else{
+				//do attack
+				creature->doAttacking();
+			}
+		}
+
 		creature->eventCheckAttacking = addEvent(makeTask(interval, boost::bind(&Game::checkCreatureAttacking, this, creature->getID(), interval)));
 	}
 }
@@ -1656,8 +1673,9 @@ bool Game::playerUseItemEx(Player* player, const Position& fromPos, uint8_t from
 	if(player->isRemoved())
 		return false;
 
-	if(Actions::canUse(player, fromPos) == TOO_FAR){
-		player->sendCancelMessage(RET_TOOFARAWAY);
+	ReturnValue ret = RET_NOERROR;
+	if((ret = Actions::canUse(player, fromPos)) != RET_NOERROR){
+		player->sendCancelMessage(ret);
 		return false;
 	}
 	
@@ -1688,8 +1706,9 @@ bool Game::playerUseItem(Player* player, const Position& pos, uint8_t stackpos, 
 	if(player->isRemoved())
 		return false;
 
-	if(Actions::canUse(player, pos) == TOO_FAR){
-		player->sendCancelMessage(RET_TOOFARAWAY);
+	ReturnValue ret = RET_NOERROR;
+	if((ret = Actions::canUse(player, pos)) != RET_NOERROR){
+		player->sendCancelMessage(ret);
 		return false;
 		/*
 		Task* task = new Task( boost::bind(&Game::playerUseItem, game,
@@ -1740,8 +1759,9 @@ bool Game::playerUseBattleWindow(Player* player, const Position& fromPos, uint8_
 		return false;
 	}
 
-	if(Actions::canUse(player, fromPos) == TOO_FAR){
-		player->sendCancelMessage(RET_TOOFARAWAY);
+	ReturnValue ret = RET_NOERROR;
+	if((ret = Actions::canUse(player, fromPos)) != RET_NOERROR){
+		player->sendCancelMessage(ret);
 		return false;
 	}
 
@@ -1754,8 +1774,6 @@ bool Game::playerUseBattleWindow(Player* player, const Position& fromPos, uint8_
 		player->sendCancelMessage(RET_CANNOTUSETHISOBJECT);
 		return false;
 	}
-	
-	//look for runes here?
 	
 	return internalUseItemEx(player, fromPos, item, creature->getPosition(), 0, 0);
 }
@@ -2188,26 +2206,44 @@ bool Game::playerSetAttackedCreature(Player* player, unsigned long creatureId)
 
 	Creature* attackCreature = getCreatureByID(creatureId);
 	if(!attackCreature){
+		player->setAttackedCreature(NULL);
 		player->sendCancelTarget();
 		return false;
 	}
 
-	if(!attackCreature->isAttackable()){
-		player->sendTextMessage(MSG_STATUS_SMALL, "You may not attack this player.");
-		player->sendCancelTarget();
-		return false;
-	}
+	ReturnValue ret = RET_NOERROR;
+	if(player->getAccessLevel() == 0){
+		if(player->getTile()->hasProperty(PROTECTIONZONE)){
+			ret = RET_YOUMAYNOTATTACKAPERSONWHILEINPROTECTIONZONE;
+		}
 
-	if(Player* attackPlayer = attackCreature->getPlayer()){
-		if(getWorldType() == WORLD_TYPE_NO_PVP || attackPlayer->getAccessLevel() > player->getAccessLevel()){
-			player->sendTextMessage(MSG_STATUS_SMALL, "You may not attack this player.");
-			player->sendCancelTarget();
-			return false;
+		if(ret == RET_NOERROR && attackCreature->getTile()->hasProperty(PROTECTIONZONE)){
+			ret = RET_YOUMAYNOTATTACKAPERSONINPROTECTIONZONE;
+		}
+
+		if(ret == RET_NOERROR && !attackCreature->isAttackable()){
+			ret = RET_YOUMAYNOTATTACKTHISPLAYER;
+		}
+
+		if(ret == RET_NOERROR){
+			if(Player* attackPlayer = attackCreature->getPlayer()){
+				if(getWorldType() == WORLD_TYPE_NO_PVP || attackPlayer->getAccessLevel() > player->getAccessLevel()){
+					ret = RET_YOUMAYNOTATTACKTHISPLAYER;
+				}
+			}
 		}
 	}
 
-	player->setAttackedCreature(attackCreature);	
-	return true;
+	if(ret == RET_NOERROR){
+		player->setAttackedCreature(attackCreature);	
+		return true;
+	}
+	else{
+		player->sendCancelMessage(ret);
+		player->sendCancelTarget();
+		player->setAttackedCreature(NULL);
+		return false;
+	}
 }
 
 bool Game::playerFollowCreature(Player* player, unsigned long creatureId)
@@ -2315,6 +2351,11 @@ bool Game::playerSaySpell(Player* player, SpeakClasses type, const std::string& 
 }
 
 //--
+bool Game::canThrowObjectTo(const Position& fromPos, const Position& toPos)
+{
+	return map->canThrowObjectTo(fromPos, toPos);
+}
+
 bool Game::getPathTo(Creature* creature, Position toPosition, std::list<Direction>& listDir)
 {
 	return map->getPathTo(creature, toPosition, listDir);

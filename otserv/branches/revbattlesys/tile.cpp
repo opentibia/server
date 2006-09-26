@@ -1065,28 +1065,6 @@ void Tile::postAddNotification(Thing* thing, int32_t index, bool hasOwnership /*
 
 
 	if(hasOwnership){
-		/*
-		//do action(s)
-		if(Creature* creature = thing->getCreature()){
-			MagicField* field = getFieldItem();
-			if(field){
-
-				//remove magic walls/wild growth
-				if(field->isBlocking()){
-					g_game.internalRemoveItem(field, 1);
-				}
-				else{
-					//add condition
-					const Condition* condition = field->getCondition();
-
-					if(condition){
-						creature->addCondition(condition->clone());
-					}
-				}
-			}
-		}
-		*/
-		
 		//calling movement scripts
 		Creature* creature = thing->getCreature();
 		if(creature){
@@ -1098,19 +1076,6 @@ void Tile::postAddNotification(Thing* thing, int32_t index, bool hasOwnership /*
 				g_moveEvents->onItemMove(item, this, true);
 			}
 		}
-		
-		/*
-		//TODO, fields effect
-		if(const MagicField* field = dynamic_cast<MagicField*>(thing->getItem())){
-			const Condition* condition = field->getCondition();
-
-			if(condition){
-				for(CreatureVector::iterator cit = creatures.begin(); cit != creatures.end(); ++cit){
-					(*cit)->addCondition(condition->clone());
-				}
-			}
-		}
-		*/
 
 		if(Teleport* teleport = getTeleportItem()){
 			teleport->__addThing(thing);

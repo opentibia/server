@@ -858,6 +858,19 @@ void Player::sendCancelMessage(ReturnValue message) const
 	case RET_ACTIONNOTPERMITTEDINPROTECTIONZONE:
 		sendCancel("This action is not permitted in a protection zone.");
 		break;
+	
+	case RET_YOUMAYNOTATTACKTHISPLAYER:
+		sendCancel("You may not attack this player.");
+		break;
+
+	case RET_YOUMAYNOTATTACKAPERSONINPROTECTIONZONE:
+		sendCancel("You may not attack a person in a protection zone.");
+		break;
+	
+	case RET_YOUMAYNOTATTACKAPERSONWHILEINPROTECTIONZONE:
+		sendCancel("You may not attack a person while you are in a protection zone.");
+		break;
+	
 
 	case RET_NOTPOSSIBLE:
 	default:
@@ -1392,8 +1405,8 @@ void Player::drainHealth(Creature* attacker, DamageType_t damageType, int32_t da
 {
 	Creature::drainHealth(attacker, damageType, damage);
 
-	Condition* condition = Condition::createCondition(CONDITION_INFIGHT, 60 * 1000, 0);
-	addCondition(condition);
+	//Condition* condition = Condition::createCondition(CONDITION_INFIGHT, 60 * 1000, 0);
+	//addCondition(condition);
 
 	sendStats();
 
@@ -1510,7 +1523,7 @@ void Player::onAttackedCreatureBlockHit(Creature* target, BlockType_t blockType)
 BlockType_t Player::blockHit(Creature* attacker, DamageType_t damageType, int32_t& damage,
 	bool checkDefense /* = false*/, bool checkArmor /* = false*/)
 {
-	BlockType_t blockType = Creature::blockHit(attacker, damageType, damage);
+	BlockType_t blockType = Creature::blockHit(attacker, damageType, damage, checkDefense, checkArmor);
 
 	if(blockType == BLOCK_DEFENSE){
 		addSkillAdvance(SKILL_SHIELD, 1);
@@ -2505,6 +2518,22 @@ void Player::doAttacking()
 				addSkillAdvance(SKILL_FIST, getSkillPoint());
 			}
 		}
+		
+		onAttackedCreature(attackedCreature);
+
+		/*
+		if(Weapons::weaponInFightTime != 0){
+			Condition* condition = Condition::createCondition(CONDITION_INFIGHT, Weapons::weaponInFightTime, 0);
+			if(!addCondition(condition)){
+				delete condition;
+			}
+
+			Condition* targetCondition = Condition::createCondition(CONDITION_INFIGHT, Weapons::weaponInFightTime, 0);
+			if(!attackedCreature->addCondition(targetCondition)){
+				delete targetCondition;
+			}
+		}
+		*/
 	}
 }
 
@@ -2687,7 +2716,7 @@ void Player::onAttackedCreature(Creature* target)
 
 	if(target != this){
 		if(getAccessLevel() == 0){
-			if(const Player* targetPlayer = target->getPlayer()){
+			if(Player* targetPlayer = target->getPlayer()){
 				pzLocked = true;
 
 #ifdef __SKULLSYSTEM__
@@ -2705,10 +2734,21 @@ void Player::onAttackedCreature(Creature* target)
 					addAttacked(targetPlayer);
 				}
 #endif
+
+				if(Weapons::weaponInFightTime != 0){
+					Condition* condition = Condition::createCondition(CONDITION_INFIGHT, Weapons::weaponInFightTime, 0);
+					if(!targetPlayer->addCondition(condition)){
+						delete condition;
+					}
+				}
 			}
 
-			Condition* condition = Condition::createCondition(CONDITION_INFIGHT, 60 * 1000, 0);
-			addCondition(condition);
+			if(Weapons::weaponInFightTime != 0){
+				Condition* condition = Condition::createCondition(CONDITION_INFIGHT, Weapons::weaponInFightTime, 0);
+				if(!addCondition(condition)){
+					delete condition;
+				}
+			}
 		}
 	}
 }
@@ -2790,10 +2830,6 @@ Skulls_t Player::getSkull() const
 
 Skulls_t Player::getSkullClient(const Player* player) const
 {
-#ifdef __SKULLSYSTEM__
-	return SKULL_NONE;
-#endif
-
 	if(!player){
 		return SKULL_NONE;
 	}
@@ -2805,6 +2841,7 @@ Skulls_t Player::getSkullClient(const Player* player) const
 			skull = SKULL_YELLOW;
 		}
 	}
+
 	return skull;
 }
 

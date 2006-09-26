@@ -51,6 +51,9 @@ public:
 	bool loadDefaults();
 	const Weapon* getWeapon(const Item* item) const;
 
+	static int32_t weaponExhaustionTime;
+	static int32_t weaponInFightTime;
+
 protected:
 	virtual void clear();
 	virtual LuaScriptInterface& getScriptInterface();
@@ -94,11 +97,11 @@ protected:
 	uint16_t id;
 	bool enabled;
 	bool premium;
+	bool exhaustion;
 	int32_t level;
 	int32_t magLevel;
 	int32_t mana;
 	int32_t soul;
-	uint32_t exhaustion;
 	int32_t range;
 	AmmoAction_t ammoAction;
 	CombatParams params;

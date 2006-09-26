@@ -1762,7 +1762,7 @@ int LuaScriptInterface::luaDoCreateItem(lua_State *L)
 	
 	Item* newItem = Item::CreateItem(itemid, type);
 	
-	ReturnValue ret = g_game.internalAddItem(tile, newItem);
+	ReturnValue ret = g_game.internalAddItem(tile, newItem, INDEX_WHEREEVER, FLAG_NOLIMIT);
 	if(ret != RET_NOERROR){
 		delete newItem;
 		reportErrorFunc("Can not add Item");

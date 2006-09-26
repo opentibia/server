@@ -1834,7 +1834,7 @@ void Protocol76::AddCreature(NetworkMessage &msg,const Creature* creature, bool 
 	msg.AddByte(lightInfo.color);
 
 	msg.AddU16(creature->getSpeed());
-    #ifdef __SKULLSYSTEM__
+	#ifdef __SKULLSYSTEM__
 	msg.AddByte(player->getSkullClient(creature->getPlayer()));
 	#else
 	msg.AddByte(SKULL_NONE);
