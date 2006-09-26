@@ -41,6 +41,7 @@ bool Condition::setParam(ConditionParam_t param, int32_t value)
 			ticks = value;
 			return true;
 		}
+
 		default:
 		{
 			return false;
@@ -59,6 +60,11 @@ bool Condition::reduceTicks(int32_t interval)
 	else{
 		return false;
 	}
+}
+
+void Condition::executeCondition(Creature* creature, int32_t interval)
+{
+	setTicks(getTicks() - interval);
 }
 
 Condition* Condition::createCondition(ConditionType_t _type, int32_t _ticks, int32_t param)
@@ -138,7 +144,7 @@ bool ConditionGeneric::startCondition(Creature* creature)
 
 void ConditionGeneric::executeCondition(Creature* creature, int32_t interval)
 {
-	//nothing
+	Condition::executeCondition(creature, interval);
 }
 
 void ConditionGeneric::endCondition(Creature* creature, EndCondition_t reason)
@@ -180,7 +186,6 @@ uint8_t ConditionGeneric::getIcons() const
 	return 0;
 }
 
-//ConditionDamage::ConditionDamage(ConditionType_t _type, int32_t _ticks, int32_t _owner)
 ConditionDamage::ConditionDamage(ConditionType_t _type) :
 Condition(_type, 0)
 {
@@ -220,7 +225,12 @@ void ConditionDamage::addDamage(uint32_t rounds, uint32_t time, int32_t value)
 {
 	//rounds, time, damage
 	for(unsigned int i = 0; i < rounds; ++i){
-		damageList.push_back(DamagePair(time, value));
+		DamageInfo di;
+		di.interval = time;
+		di.timeLeft = time;
+		di.damage = value;
+		
+		damageList.push_back(di);
 		ticks += time;
 	}
 }
@@ -242,23 +252,39 @@ bool ConditionDamage::startCondition(Creature* creature)
 void ConditionDamage::executeCondition(Creature* creature, int32_t interval)
 {
 	if(!damageList.empty()){
-		DamagePair& damagePair = damageList.front();
-		damagePair.first -= interval;
+		DamageInfo& damageInfo = damageList.front();		
 
-		if(damagePair.first <= 0){
-			damageList.pop_front();
-			doDamage(creature, damagePair.second);
+		bool bRemove = true;
+		creature->onTickCondition(getType(), bRemove);
+		damageInfo.timeLeft -= interval;
+
+		if(damageInfo.timeLeft <= 0){
+			if(bRemove){
+				damageList.pop_front();
+			}
+			else{
+				//restore timeLeft
+				damageInfo.timeLeft = damageInfo.interval;
+			}
+
+			doDamage(creature, damageInfo.damage);
+		}
+		
+		if(!bRemove){
+			interval = 0;
 		}
 	}
+
+	Condition::executeCondition(creature, interval);
 }
 
 bool ConditionDamage::getNextDamage(int32_t& damage)
 {
 	if(!damageList.empty()){
-		DamagePair& damagePair = damageList.front();
-		damage = damagePair.second;
-		damageList.pop_front();
+		DamageInfo& damageInfo = damageList.front();
 
+		damage = damageInfo.damage;
+		damageList.pop_front();
 		return true;
 	}
 
@@ -377,7 +403,7 @@ bool ConditionSpeed::startCondition(Creature* creature)
 
 void ConditionSpeed::executeCondition(Creature* creature, int32_t interval)
 {
-	//
+	Condition::executeCondition(creature, interval);
 }
 
 void ConditionSpeed::endCondition(Creature* creature, EndCondition_t reason)
@@ -482,7 +508,7 @@ bool ConditionOutfit::startCondition(Creature* creature)
 
 void ConditionOutfit::executeCondition(Creature* creature, int32_t interval)
 {
-	//
+	Condition::executeCondition(creature, interval);
 }
 
 void ConditionOutfit::changeOutfit(Creature* creature, int32_t index /*= -1*/)

@@ -32,10 +32,16 @@
 #include <sstream>
 
 extern Game g_game;
+extern LuaScript g_config;
+
+int32_t Spells::spellExhaustionTime = 0;
+int32_t Spells::spellPzLockedTime = 0;
 
 Spells::Spells():
 m_scriptInterface("Spell Interface")
 {
+	spellExhaustionTime = g_config.getGlobalNumber("exhausted", 0);
+	spellPzLockedTime = g_config.getGlobalNumber("pzlocked", 0);
 	m_scriptInterface.initState();
 }
 
@@ -63,7 +69,7 @@ bool Spells::playerSaySpell(Player* player, SpeakClasses type, const std::string
 
 	InstantsMap::iterator it;
 	for(it = instants.begin(); it != instants.end(); ++it){
-		if(it->first == str_words){
+		if(strcasecmp(it->first.c_str(), str_words.c_str()) == 0){
 			InstantSpell* instantSpell = it->second;
 			if(instantSpell->playerCastInstant(player, str_param)){
 				return true;
@@ -169,9 +175,9 @@ Spell::Spell()
 	exhaustion = false;
 	needTarget = false;
 	blocking = false;
-	defensive = false;
 	premium = false;
 	enabled = true;
+	isAggressive = true;
 	vocationBits = 0;
 }
 	
@@ -223,8 +229,8 @@ bool Spell::configureSpell(xmlNodePtr p)
 		blocking = (intValue == 1);
 	}
 
-	if(readXMLInteger(p, "defensive", intValue)){
-		defensive = (intValue == 1);
+	if(readXMLInteger(p, "aggressive", intValue)){
+		isAggressive = (intValue == 1);
 	}
 
 	vocationBits = 0xFFFFFFFF;
@@ -242,7 +248,18 @@ bool Spell::playerSpellCheck(const Player* player)
 	if(!enabled)
 		return false;
 	
-	//TODO changes messages
+	if(isAggressive){
+		if(player->getAccessLevel() < 2 && player->getTile()->isPz()){
+			player->sendCancelMessage(RET_ACTIONNOTPERMITTEDINPROTECTIONZONE);
+			return false;
+		}
+	}
+
+	if(player->hasCondition(CONDITION_EXHAUSTED)){
+		player->sendTextMessage(MSG_STATUS_SMALL, "You are exhausted.",player->getPosition(), NM_ME_PUFF);
+		return false;
+	}
+
 	if(player->getLevel() < level){
 		player->sendTextMessage(MSG_STATUS_SMALL, "You do not have enough level.",player->getPosition(), NM_ME_PUFF);
 		return false;
@@ -270,6 +287,48 @@ bool Spell::playerSpellCheck(const Player* player)
 	return true;
 }
 
+bool Spell::playerInstantSpellCheck(const Player* player, const Position& toPos)
+{
+	bool result = playerSpellCheck(player);
+
+	if(result){
+		ReturnValue ret = RET_NOERROR;
+
+		const Position& playerPos = player->getPosition();
+		if(playerPos.z > toPos.z){
+			ret = RET_FIRSTGOUPSTAIRS;
+		}
+		else if(playerPos.z < toPos.z){
+			ret = RET_FIRSTGODOWNSTAIRS;
+		}
+		else{
+			Tile* tile = g_game.getTile(toPos.x, toPos.y, toPos.z);
+
+			if(!tile){
+				ret = RET_NOTPOSSIBLE;
+			}
+
+			if(ret == RET_NOERROR){
+				ret = Combat::canDoCombat(player, tile, isAggressive);
+			}
+
+			if(ret == RET_NOERROR && blocking){
+				if(!tile->creatures.empty() || tile->hasProperty(BLOCKSOLID)){
+					ret = RET_NOTENOUGHROOM;
+				}
+			}
+		}
+
+		if(ret != RET_NOERROR){
+			player->sendCancelMessage(ret);
+			player->sendMagicEffect(player->getPosition(), NM_ME_PUFF);
+			return false;
+		}
+	}
+
+	return result;
+}
+
 bool Spell::playerRuneSpellCheck(const Player* player, const Position& toPos)
 {
 	bool result = playerSpellCheck(player);
@@ -291,16 +350,8 @@ bool Spell::playerRuneSpellCheck(const Player* player, const Position& toPos)
 				ret = RET_NOTPOSSIBLE;
 			}
 
-			/*
-			if(ret == RET_NOERROR && !defensive){
-				if(player->getAccessLevel() < 2 && tile->isPz()){
-					ret = RET_ACTIONNOTPERMITTEDINPROTECTIONZONE;
-				}
-			}
-			*/
-
 			if(ret == RET_NOERROR){
-				ret = Combat::canDoCombat(player, tile);
+				ret = Combat::canDoCombat(player, tile, isAggressive);
 			}
 
 			if(ret == RET_NOERROR && blocking){
@@ -326,16 +377,32 @@ bool Spell::playerRuneSpellCheck(const Player* player, const Position& toPos)
 
 void Spell::postCastSpell(Player* player)
 {
+	if(player->getAccessLevel() > 0){
+		return;
+	}
+
 	if(mana > 0){
 		player->changeMana(-((int32_t)mana));
 	}
+
+	if(exhaustion){
+		Condition* condition = Condition::createCondition(CONDITION_EXHAUSTED, Spells::spellExhaustionTime, 0);
+		if(!player->addCondition(condition)){
+			delete condition;
+		}
+	}
+	
+	if(isAggressive){
+		Condition* condition = Condition::createCondition(CONDITION_INFIGHT, Spells::spellPzLockedTime, 0);
+		if(!player->addCondition(condition)){
+			delete condition;
+		}
+	}
+
 	//TODO
 	/*
 	if(soul > 0){
 		player->changeSoul(-soul);
-	}
-	if(exhaustion){
-		
 	}
 	*/
 }
@@ -343,6 +410,7 @@ void Spell::postCastSpell(Player* player)
 InstantSpell::InstantSpell(LuaScriptInterface* _interface) :
 TalkAction(_interface)
 {
+	needDirection = false;
 	hasParam = false;
 	function = NULL;
 }
@@ -365,6 +433,11 @@ bool InstantSpell::configureEvent(xmlNodePtr p)
 		if(intValue == 1)
 	 		hasParam = true;
 	}
+
+	if(readXMLInteger(p, "direction", intValue)){
+		needDirection = (intValue == 1);
+	}
+
 	if(Spell::configureSpell(p) && TalkAction::configureEvent(p)){
 		return true;
 	}
@@ -424,7 +497,12 @@ bool InstantSpell::playerCastInstant(Player* player, const std::string& param)
 		result = castInstant(player, var);
 	}
 	else{
-		result = castInstant(player);
+		var.type = VARIANT_POSITION;
+		var.pos = getCasterPosition(player);
+
+		if(playerInstantSpellCheck(player, var.pos)){
+			result = castInstant(player, var);
+		}
 	}
 
 	if(result){
@@ -434,36 +512,42 @@ bool InstantSpell::playerCastInstant(Player* player, const std::string& param)
 	return result;
 }
 
+Position InstantSpell::getCasterPosition(Creature* creature)
+{
+	Position pos = creature->getPosition();
+
+	if(needDirection){
+
+		switch(creature->getDirection()){
+			case NORTH:
+				pos.y -= 1;
+				break;
+
+			case SOUTH:
+				pos.y += 1;
+				break;
+
+			case EAST:
+				pos.x += 1;
+				break;
+
+			case WEST:
+				pos.x -= 1;
+				break;
+			
+			default:
+				break;
+		}
+	}
+
+	return pos;
+}
+
 bool InstantSpell::castInstant(Creature* creature)
 {
 	LuaVariant var;
 	var.type = VARIANT_POSITION;
-
-	switch(creature->getDirection()){
-		case NORTH:
-			var.pos = creature->getPosition();
-			var.pos.y -= 1;
-			break;
-
-		case SOUTH:
-			var.pos = creature->getPosition();
-			var.pos.y += 1;
-			break;
-
-		case EAST:
-			var.pos = creature->getPosition();
-			var.pos.x += 1;
-			break;
-
-		case WEST:
-			var.pos = creature->getPosition();
-			var.pos.x -= 1;
-			break;
-		
-		default:
-			return false;
-			break;
-	}
+	var.pos = getCasterPosition(creature);
 
 	return castInstant(creature, var);
 }

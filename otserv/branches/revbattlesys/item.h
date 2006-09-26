@@ -119,6 +119,8 @@ private:
 		ATTR_ITEM_UNIQUEID = 2,
 		ATTR_ITEM_DESC = 4,
 		ATTR_ITEM_TEXT = 8,
+
+		ATTR_ITEM_OWNER = 65536
 	};
 	
 	struct Attribute{
@@ -262,25 +264,6 @@ public:
 
 	virtual bool canRemove() const {return true;}
 	virtual bool onTradeEvent(TradeEvents_t event, Player* owner){return true;};
-
-	struct ItemAbilities{
-		ItemAbilities()
-		{
-			absorbPercentAll = 0;
-			absorbPercentPhysical = 0;
-			absorbPercentFire = 0;
-			absorbPercentEnergy = 0;
-			absorbPercentPoison = 0;
-		};
-
-		uint8_t absorbPercentAll;
-		uint8_t absorbPercentPhysical;
-		uint8_t absorbPercentFire;
-		uint8_t absorbPercentEnergy;
-		uint8_t absorbPercentPoison;
-	};
-
-	ItemAbilities abilities;
 
 protected:
 	unsigned short id;  // the same id as in ItemType

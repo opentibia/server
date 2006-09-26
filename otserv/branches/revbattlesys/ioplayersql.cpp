@@ -374,10 +374,10 @@ bool IOPlayerSQL::savePlayer(Player* player)
 	std::stringstream streamitems;
 	std::string itemsstring;
 	for(int slotid = 1; slotid <= 10; ++slotid){
-		if(!player->items[slotid])
+		if(!player->inventory[slotid])
 			continue;
 
-		item = player->items[slotid];
+		item = player->inventory[slotid];
 		++runningID;
 
 		streamitems << "(" << player->getGUID() <<"," << slotid << ","<< runningID <<","<< parentid <<"," << item->getID()<<","<< (int)item->getItemCountOrSubtype() << "," << 

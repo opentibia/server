@@ -45,6 +45,9 @@ public:
 	InstantSpell* getInstantSpellByName(const std::string& name);
 
 	bool playerSaySpell(Player* player, SpeakClasses type, const std::string& words);
+
+	static int32_t spellExhaustionTime;
+	static int32_t spellPzLockedTime;
 	
 protected:
 	virtual void clear();
@@ -58,7 +61,7 @@ protected:
 	typedef std::map<std::string, InstantSpell*> InstantsMap ;
 	RunesMap runes;
 	InstantsMap instants;
-	
+
 	LuaScriptInterface m_scriptInterface;
 };
 
@@ -75,6 +78,7 @@ public:
 	
 protected:
 	bool playerSpellCheck(const Player* player);
+	bool playerInstantSpellCheck(const Player* player, const Position& toPos);
 	bool playerRuneSpellCheck(const Player* player, const Position& toPos);
 	
 	bool causeExhaustion(){return exhaustion;};
@@ -91,7 +95,7 @@ protected:
 	bool exhaustion;
 	bool needTarget;
 	bool blocking;
-	bool defensive;
+	bool isAggressive;
 
 private:
 	std::string name;
@@ -116,6 +120,8 @@ public:
 	
 protected:	
 	virtual std::string getScriptEventName();
+
+	Position getCasterPosition(Creature* creature);
 	
 	static InstantSpellFunction HouseGuestList;
 	static InstantSpellFunction HouseSubOwnerList;
@@ -127,6 +133,7 @@ protected:
 	
 	bool castInstant(Creature* creature, const LuaVariant& var);
 	
+	bool needDirection;
 	bool hasParam;
 	InstantSpellFunction* function;
 };

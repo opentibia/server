@@ -83,6 +83,12 @@ ItemType::ItemType()
 
 	lightLevel    = 0;
 	lightColor    = 0;
+
+	initialDamage = 0;
+	damageType = DAMAGE_NONE;
+	roundMin = 0;
+	roundTime = 0;
+	roundDamage = 0;
 }
 
 ItemType::~ItemType()

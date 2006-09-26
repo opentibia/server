@@ -2708,7 +2708,7 @@ int LuaScriptInterface::luaDoCombat(lua_State *L)
 
 			if(combat->hasArea()){
 				combat->doCombat(creature, target->getPosition());
-				std::cout << "Combat->hasArea()" << std::endl;
+				//std::cout << "Combat->hasArea()" << std::endl;
 			}
 			else{
 				combat->doCombat(creature, target);
@@ -2728,7 +2728,7 @@ int LuaScriptInterface::luaDoCombat(lua_State *L)
 				combat->doCombat(creature, var->pos);
 			}
 			else{
-				combat->postCombatEffects(creature, var->pos, (bool)false);
+				combat->postCombatEffects(creature, var->pos, false);
 			}
 			break;
 		}

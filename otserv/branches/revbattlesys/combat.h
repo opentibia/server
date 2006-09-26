@@ -72,15 +72,11 @@ struct CombatParams{
 		blockedByArmor = false;
 		blockedByShield = false;
 		targetCasterOrTopMost = false;
+		isAggressive = true;
 		itemId = 0;
 		impactEffect = NM_ME_NONE;
 		distanceEffect = NM_ME_NONE;
 		condition = NULL;
-	}
-
-	~CombatParams()
-	{
-		delete condition;
 	}
 
 	const Condition* condition;
@@ -88,6 +84,7 @@ struct CombatParams{
 	bool blockedByArmor;
 	bool blockedByShield;
 	bool targetCasterOrTopMost;
+	bool isAggressive;
 	int32_t itemId;
 	uint8_t impactEffect;
 	uint8_t distanceEffect;
@@ -122,7 +119,7 @@ public:
 
 	static void getCombatArea(const Position& centerPos, const Position& targetPos,
 		const AreaCombat* area, std::list<Tile*>& list);
-	static ReturnValue canDoCombat(const Creature* caster, const Tile* tile);
+	static ReturnValue canDoCombat(const Creature* caster, const Tile* tile, bool isAggressive);
 
 	void doCombat(Creature* caster, Creature* target) const;
 	void doCombat(Creature* caster, const Position& pos) const;
@@ -293,11 +290,12 @@ public:
 	virtual const MagicField* getMagicField() const {return this;};
 
 	DamageType_t getDamageType() const;
-	const Condition* getCondition() const { return condition; }
-	void setCondition(Condition* _condition) { condition = _condition; }
+	const ConditionDamage* getCondition() const { return condition; }
 
 protected:
-	Condition* condition;
+	void load();
+
+	ConditionDamage* condition;
 	DamageType_t damageType;
 };
 

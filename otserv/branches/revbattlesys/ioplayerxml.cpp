@@ -530,13 +530,13 @@ bool IOPlayerXML::savePlayer(Player* player)
 
 	sn = xmlNewNode(NULL,(const xmlChar*)"inventory");
 	for(int i = 1; i <= 10; i++){
-		if(player->items[i]){
+		if(player->inventory[i]){
 			pn = xmlNewNode(NULL,(const xmlChar*)"slot");
 			sb << i;
 			xmlSetProp(pn, (const xmlChar*)"slotid", (const xmlChar*)sb.str().c_str());
 			sb.str("");
 
-			nn = player->items[i]->serialize();
+			nn = player->inventory[i]->serialize();
 
 			xmlAddChild(pn, nn);
 			xmlAddChild(sn, pn);

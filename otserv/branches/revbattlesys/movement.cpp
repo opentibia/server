@@ -19,11 +19,13 @@
 //////////////////////////////////////////////////////////////////////
 
 
+#include "game.h"
 #include "creature.h"
 #include "player.h"
 #include "tile.h"
 #include <sstream>
 #include "tools.h"
+#include "combat.h"
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h> 
@@ -197,7 +199,7 @@ long MoveEvents::onCreatureMove(Creature* creature, Tile* tile, bool isIn)
 		if(thing && (tileItem = thing->getItem())){
 			MoveEvent* event = getEvent(tileItem, eventType);
 			if(event){
-				ret = ret & event->executeStep(creature, tileItem, tile->getPosition());
+				ret = ret & event->fireStepEvent(creature, tileItem, tile->getPosition());
 			}
 		}
 	}
@@ -247,7 +249,7 @@ long MoveEvents::onItemMove(Item* item, Tile* tile, bool isAdd)
 		if(thing && (tileItem = thing->getItem())){
 			MoveEvent* event = getEvent(tileItem, eventType2);
 			if(event){
-				ret = ret & event->executeAddRemItem(item, tileItem, tile->getPosition());
+				ret = ret & event->fireAddRemItem(item, tileItem, tile->getPosition());
 			}
 		}
 	}
@@ -260,6 +262,8 @@ MoveEvent::MoveEvent(LuaScriptInterface* _interface) :
 Event(_interface)
 {
 	m_eventType = MOVE_EVENT_NONE;
+	stepFunction = NULL;
+	moveFunction = NULL;
 }
 
 MoveEvent::~MoveEvent()
@@ -329,6 +333,28 @@ bool MoveEvent::configureEvent(xmlNodePtr p)
 	return true;
 }
 
+bool MoveEvent::loadFunction(const std::string& functionName)
+{
+	if(functionName == "onStepInField"){
+		stepFunction = StepInField;
+	}
+	else if(functionName == "onStepOutField"){
+		stepFunction = StepOutField;
+	}
+	else if(functionName == "onAddField"){
+		moveFunction = AddItemField;
+	}
+	else if(functionName == "onRemoveField"){
+		moveFunction = RemoveItemField;
+	}
+	else{
+		return false;
+	}
+	
+	m_scripted = false;
+	return true;
+}
+
 MoveEvent_t MoveEvent::getEventType() const
 {
 	if(m_eventType == MOVE_EVENT_NONE){
@@ -341,6 +367,67 @@ MoveEvent_t MoveEvent::getEventType() const
 void MoveEvent::setEventType(MoveEvent_t type)
 {
 	m_eventType = type;
+}
+
+long MoveEvent::StepInField(Creature* creature, Item* item, const Position& pos)
+{
+	MagicField* field = item->getMagicField();
+
+	if(field){
+		//remove magic walls/wild growth
+		if(field->isBlocking()){
+			g_game.internalRemoveItem(field, 1);
+		}
+		else{
+			//add condition
+			const Condition* condition = field->getCondition();
+
+			if(condition){
+				creature->addCondition(condition->clone());
+			}
+		}
+
+		return 1;
+	}
+
+	return LUA_ERROR_ITEM_NOT_FOUND;
+}
+
+long MoveEvent::StepOutField(Creature* creature, Item* item, const Position& pos)
+{
+	return 1;
+}
+
+long MoveEvent::AddItemField(Item* item, Item* tileItem, const Position& pos)
+{
+	if(const MagicField* field = tileItem->getMagicField()){
+		const Condition* condition = field->getCondition();
+		if(condition){
+			Tile* tile = tileItem->getTile();
+			for(CreatureVector::iterator cit = tile->creatures.begin(); cit != tile->creatures.end(); ++cit){
+				(*cit)->addCondition(condition->clone());
+			}
+		}
+
+		return 1;
+	}
+
+	return LUA_ERROR_ITEM_NOT_FOUND;
+}
+
+long MoveEvent::RemoveItemField(Item* item, Item* tileItem, const Position& pos)
+{
+	return 1;
+}
+
+long MoveEvent::fireStepEvent(Creature* creature, Item* item, const Position& pos)
+{
+	if(m_scripted){
+		return executeStep(creature, item, pos);
+	}
+	else{
+		return stepFunction(creature, item, pos);
+	}
 }
 
 long MoveEvent::executeStep(Creature* creature, Item* item, const Position& pos)
@@ -407,6 +494,16 @@ long MoveEvent::executeEquip(Player* player, Item* item, long slot)
 	}
 	
 	return ret;
+}
+
+long MoveEvent::fireAddRemItem(Item* item, Item* tileItem, const Position& pos)
+{
+	if(m_scripted){
+		return executeAddRemItem(item, tileItem, pos);
+	}
+	else{
+		return moveFunction(item, tileItem, pos);
+	}
 }
 
 long MoveEvent::executeAddRemItem(Item* item, Item* tileItem, const Position& pos)

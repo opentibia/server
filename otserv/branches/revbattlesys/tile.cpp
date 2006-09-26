@@ -1065,6 +1065,7 @@ void Tile::postAddNotification(Thing* thing, int32_t index, bool hasOwnership /*
 
 
 	if(hasOwnership){
+		/*
 		//do action(s)
 		if(Creature* creature = thing->getCreature()){
 			MagicField* field = getFieldItem();
@@ -1075,7 +1076,7 @@ void Tile::postAddNotification(Thing* thing, int32_t index, bool hasOwnership /*
 					g_game.internalRemoveItem(field, 1);
 				}
 				else{
-					/*add condition*/
+					//add condition
 					const Condition* condition = field->getCondition();
 
 					if(condition){
@@ -1084,6 +1085,7 @@ void Tile::postAddNotification(Thing* thing, int32_t index, bool hasOwnership /*
 				}
 			}
 		}
+		*/
 		
 		//calling movement scripts
 		Creature* creature = thing->getCreature();

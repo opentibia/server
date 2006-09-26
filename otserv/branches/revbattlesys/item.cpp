@@ -51,7 +51,7 @@ Item* Item::CreateItem(const unsigned short _type, unsigned short _count /*= 1*/
 		else if(it.isTeleport()){
 			newItem = new Teleport(_type);
 		}
-		else if(it.isMagicField()){
+		else if(it.isMagicField() || it.id == 1487){
 			newItem = new MagicField(_type);
 		}
 		else if(it.isDoor()){

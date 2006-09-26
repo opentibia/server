@@ -117,7 +117,7 @@ Creature()
 	maglevel_percent = 0;
 
 	for(int i = 0; i < 11; i++){
-		items[i] = NULL;
+		inventory[i] = NULL;
 	}
 
 	for(int i = SKILL_FIRST; i < SKILL_LAST; ++i){
@@ -162,10 +162,10 @@ Creature()
 Player::~Player()
 {
 	for(int i = 0; i < 11; i++){
-		if(items[i]){
-			items[i]->setParent(NULL);
-			items[i]->releaseThing2();
-			items[i] = NULL;
+		if(inventory[i]){
+			inventory[i]->setParent(NULL);
+			inventory[i]->releaseThing2();
+			inventory[i] = NULL;
 		}
 	}
 
@@ -255,7 +255,7 @@ std::string Player::getDescription(int32_t lookDistance) const
 Item* Player::getInventoryItem(slots_t slot) const
 {
 	if(slot > 0 && slot < 11)
-		return items[slot];
+		return inventory[slot];
 
 	return NULL;
 }
@@ -329,18 +329,18 @@ int Player::getArmor() const
 {
 	int armor=0;
 	
-	if(items[SLOT_HEAD])
-		armor += items[SLOT_HEAD]->getArmor();
-	if(items[SLOT_NECKLACE])
-		armor += items[SLOT_NECKLACE]->getArmor();
-	if(items[SLOT_ARMOR])
-		armor += items[SLOT_ARMOR]->getArmor();
-	if(items[SLOT_LEGS])
-		armor += items[SLOT_LEGS]->getArmor();
-	if(items[SLOT_FEET])
-		armor += items[SLOT_FEET]->getArmor();
-	if(items[SLOT_RING])
-		armor += items[SLOT_RING]->getArmor();
+	if(inventory[SLOT_HEAD])
+		armor += inventory[SLOT_HEAD]->getArmor();
+	if(inventory[SLOT_NECKLACE])
+		armor += inventory[SLOT_NECKLACE]->getArmor();
+	if(inventory[SLOT_ARMOR])
+		armor += inventory[SLOT_ARMOR]->getArmor();
+	if(inventory[SLOT_LEGS])
+		armor += inventory[SLOT_LEGS]->getArmor();
+	if(inventory[SLOT_FEET])
+		armor += inventory[SLOT_FEET]->getArmor();
+	if(inventory[SLOT_RING])
+		armor += inventory[SLOT_RING]->getArmor();
 	
 	return armor;
 }
@@ -349,18 +349,18 @@ int Player::getDefense() const
 {
 	int defense = 0;
 	
-	if(items[SLOT_LEFT]){		
-		if(items[SLOT_LEFT]->getWeaponType() == WEAPON_SHIELD)
-			defense += skills[SKILL_SHIELD][SKILL_LEVEL] + items[SLOT_LEFT]->getDefense();
+	if(inventory[SLOT_LEFT]){		
+		if(inventory[SLOT_LEFT]->getWeaponType() == WEAPON_SHIELD)
+			defense += skills[SKILL_SHIELD][SKILL_LEVEL] + inventory[SLOT_LEFT]->getDefense();
 		else
-			defense += items[SLOT_LEFT]->getDefense();
+			defense += inventory[SLOT_LEFT]->getDefense();
 	}
 
-	if(items[SLOT_RIGHT]){
-		if(items[SLOT_RIGHT]->getWeaponType() == WEAPON_SHIELD)
-			defense += skills[SKILL_SHIELD][SKILL_LEVEL] + items[SLOT_RIGHT]->getDefense();
+	if(inventory[SLOT_RIGHT]){
+		if(inventory[SLOT_RIGHT]->getWeaponType() == WEAPON_SHIELD)
+			defense += skills[SKILL_SHIELD][SKILL_LEVEL] + inventory[SLOT_RIGHT]->getDefense();
 		else
-			defense += items[SLOT_RIGHT]->getDefense();		
+			defense += inventory[SLOT_RIGHT]->getDefense();		
 	}
 
 	if(defense == 0) 
@@ -551,7 +551,7 @@ uint16_t Player::getLookCorpse() const
 void Player::dropLoot(Container* corpse)
 {
 	for(int i = SLOT_FIRST; i < SLOT_LAST; ++i){
-		Item* item = items[i];		
+		Item* item = inventory[i];		
 #ifdef __SKULLSYSTEM__
 		if(item && ((item->getContainer()) || random_range(1, 100) <= 10 || getSkull() == SKULL_RED)){
 #else
@@ -560,7 +560,7 @@ void Player::dropLoot(Container* corpse)
 			corpse->__internalAddThing(item);
 			sendRemoveInventoryItem((slots_t)i, item);
 			onRemoveInventoryItem((slots_t)i, item);
-			items[i] = NULL;
+			inventory[i] = NULL;
 		}
 	}
 }
@@ -1524,22 +1524,24 @@ BlockType_t Player::blockHit(Creature* attacker, DamageType_t damageType, int32_
 		if(!(item = getInventoryItem((slots_t)slot)))
 			continue;
 
-		if(item->abilities.absorbPercentAll != 0){
-			absorbedDamage += (item->abilities.absorbPercentAll / 100) * damage;
+		const ItemType& it = Item::items[item->getID()];
+
+		if(it.abilities.absorbPercentAll != 0){
+			absorbedDamage += (it.abilities.absorbPercentAll / 100) * damage;
 		}
 
 		switch(damageType){
 			case DAMAGE_PHYSICAL:
-				absorbedDamage += (item->abilities.absorbPercentPhysical / 100) * damage;
+				absorbedDamage += (it.abilities.absorbPercentPhysical / 100) * damage;
 				break;
 			case DAMAGE_FIRE:
-				absorbedDamage = (item->abilities.absorbPercentFire / 100) * damage;
+				absorbedDamage = (it.abilities.absorbPercentFire / 100) * damage;
 				break;
 			case DAMAGE_ENERGY:
-				absorbedDamage = (item->abilities.absorbPercentEnergy / 100) * damage;
+				absorbedDamage = (it.abilities.absorbPercentEnergy / 100) * damage;
 				break;
 			case DAMAGE_POISON:
-				absorbedDamage = (item->abilities.absorbPercentPoison / 100) * damage;
+				absorbedDamage = (it.abilities.absorbPercentPoison / 100) * damage;
 				break;
 		}
 	
@@ -1915,7 +1917,7 @@ ReturnValue Player::__queryAdd(int32_t index, const Thing* thing, uint32_t count
 			if(item->getSlotPosition() & SLOTP_RIGHT){
 				//check if we already carry an item in the other hand
 				if(item->getSlotPosition() & SLOTP_TWO_HAND){
-					if(items[SLOT_LEFT] && items[SLOT_LEFT] != item){
+					if(inventory[SLOT_LEFT] && inventory[SLOT_LEFT] != item){
 						ret = RET_BOTHHANDSNEEDTOBEFREE;
 					}
 					else
@@ -1923,14 +1925,14 @@ ReturnValue Player::__queryAdd(int32_t index, const Thing* thing, uint32_t count
 				}
 				else{
 					//check if we already carry a double-handed item
-					if(items[SLOT_LEFT]){
-						if(items[SLOT_LEFT]->getSlotPosition() & SLOTP_TWO_HAND){
+					if(inventory[SLOT_LEFT]){
+						if(inventory[SLOT_LEFT]->getSlotPosition() & SLOTP_TWO_HAND){
 							ret = RET_DROPTWOHANDEDITEM;
 						}
 						//check if weapon, can only carry one weapon
-						else if(item != items[SLOT_LEFT] && items[SLOT_LEFT]->isWeapon() &&
-							(items[SLOT_LEFT]->getWeaponType() != WEAPON_SHIELD) &&
-							(items[SLOT_LEFT]->getWeaponType() != WEAPON_AMMO) &&
+						else if(item != inventory[SLOT_LEFT] && inventory[SLOT_LEFT]->isWeapon() &&
+							(inventory[SLOT_LEFT]->getWeaponType() != WEAPON_SHIELD) &&
+							(inventory[SLOT_LEFT]->getWeaponType() != WEAPON_AMMO) &&
 							item->isWeapon() && (item->getWeaponType() != WEAPON_SHIELD) && (item->getWeaponType() != WEAPON_AMMO)){
 								ret = RET_CANONLYUSEONEWEAPON;
 						}
@@ -1946,7 +1948,7 @@ ReturnValue Player::__queryAdd(int32_t index, const Thing* thing, uint32_t count
 			if(item->getSlotPosition() & SLOTP_LEFT){
 				//check if we already carry an item in the other hand
 				if(item->getSlotPosition() & SLOTP_TWO_HAND){
-					if(items[SLOT_RIGHT] && items[SLOT_RIGHT] != item){
+					if(inventory[SLOT_RIGHT] && inventory[SLOT_RIGHT] != item){
 						ret = RET_BOTHHANDSNEEDTOBEFREE;
 					}
 					else
@@ -1954,14 +1956,14 @@ ReturnValue Player::__queryAdd(int32_t index, const Thing* thing, uint32_t count
 				}
 				else{
 					//check if we already carry a double-handed item
-					if(items[SLOT_RIGHT]){
-						if(items[SLOT_RIGHT]->getSlotPosition() & SLOTP_TWO_HAND){
+					if(inventory[SLOT_RIGHT]){
+						if(inventory[SLOT_RIGHT]->getSlotPosition() & SLOTP_TWO_HAND){
 							ret = RET_DROPTWOHANDEDITEM;
 						}
 						//check if weapon, can only carry one weapon
-						else if(item != items[SLOT_RIGHT] && items[SLOT_RIGHT]->isWeapon() &&
-							(items[SLOT_RIGHT]->getWeaponType() != WEAPON_SHIELD) &&
-							(items[SLOT_RIGHT]->getWeaponType() != WEAPON_AMMO) &&
+						else if(item != inventory[SLOT_RIGHT] && inventory[SLOT_RIGHT]->isWeapon() &&
+							(inventory[SLOT_RIGHT]->getWeaponType() != WEAPON_SHIELD) &&
+							(inventory[SLOT_RIGHT]->getWeaponType() != WEAPON_AMMO) &&
 							item->isWeapon() && (item->getWeaponType() != WEAPON_SHIELD) && (item->getWeaponType() != WEAPON_AMMO)){
 								ret = RET_CANONLYUSEONEWEAPON;
 						}
@@ -2092,7 +2094,7 @@ Cylinder* Player::__queryDestination(int32_t& index, const Thing* thing, Item** 
 
 		//find a appropiate slot
 		for(int i = SLOT_FIRST; i < SLOT_LAST; ++i){
-			if(items[i] == NULL){
+			if(inventory[i] == NULL){
 				if(__queryAdd(i, item, item->getItemCount(), 0) == RET_NOERROR){
 					index = i;
 					return this;
@@ -2102,7 +2104,7 @@ Cylinder* Player::__queryDestination(int32_t& index, const Thing* thing, Item** 
 
 		//try containers
 		for(int i = SLOT_FIRST; i < SLOT_LAST; ++i){
-			if(Container* subContainer = dynamic_cast<Container*>(items[i])){
+			if(Container* subContainer = dynamic_cast<Container*>(inventory[i])){
 				if(subContainer != tradeItem && subContainer->__queryAdd(-1, item, item->getItemCount(), 0) == RET_NOERROR){
 					index = INDEX_WHEREEVER;
 					*destItem = NULL;
@@ -2163,7 +2165,7 @@ void Player::__addThing(int32_t index, Thing* thing)
 	}
 
 	item->setParent(this);
-	items[index] = item;
+	inventory[index] = item;
 
 	//send to client
 	sendAddInventoryItem((slots_t)index, item);
@@ -2236,7 +2238,7 @@ void Player::__replaceThing(uint32_t index, Thing* thing)
 	onUpdateInventoryItem((slots_t)index, oldItem, item);
 
 	item->setParent(this);
-	items[index] = item;
+	inventory[index] = item;
 }
 
 void Player::__removeThing(Thing* thing, uint32_t count)
@@ -2268,7 +2270,7 @@ void Player::__removeThing(Thing* thing, uint32_t count)
 			onRemoveInventoryItem((slots_t)index, item);
 
 			item->setParent(NULL);
-			items[index] = NULL;
+			inventory[index] = NULL;
 		}
 		else{
 			int newCount = std::max(0, (int)(item->getItemCount() - count));
@@ -2289,14 +2291,14 @@ void Player::__removeThing(Thing* thing, uint32_t count)
 		onRemoveInventoryItem((slots_t)index, item);
 
 		item->setParent(NULL);
-		items[index] = NULL;
+		inventory[index] = NULL;
 	}
 }
 
 int32_t Player::__getIndexOfThing(const Thing* thing) const
 {
 	for(int i = SLOT_FIRST; i < SLOT_LAST; ++i){
-		if(items[i] == thing)
+		if(inventory[i] == thing)
 			return i;
 	}
 
@@ -2323,7 +2325,7 @@ uint32_t Player::__getItemTypeCount(uint16_t itemId) const
 	Item* item = NULL;
 
 	for(int i = SLOT_FIRST; i < SLOT_LAST; i++){
-		if(item = items[i]){
+		if(item = inventory[i]){
 			if(item->getID() == itemId){
 				if(item->isStackable()){
 					count+= item->getItemCount();
@@ -2358,7 +2360,7 @@ uint32_t Player::__getItemTypeCount(uint16_t itemId) const
 Thing* Player::__getThing(uint32_t index) const
 {
 	if(index >= SLOT_FIRST && index < SLOT_LAST)
-		return items[index];
+		return inventory[index];
 
 	return NULL;
 }
@@ -2450,7 +2452,7 @@ void Player::__internalAddThing(uint32_t index, Thing* thing)
 	}
 
 	if(index > 0 && index < 11){
-		if(items[index]){
+		if(inventory[index]){
 #ifdef __DEBUG__MOVESYS__
 			std::cout << "Warning: [Player::__internalAddThing], player: " << getName() << ", items[index] is not empty." << std::endl;
 			//DEBUG_REPORT
@@ -2458,7 +2460,7 @@ void Player::__internalAddThing(uint32_t index, Thing* thing)
 			return;
 		}
 
-		items[index] = item;
+		inventory[index] = item;
 		item->setParent(this);
   }
 }

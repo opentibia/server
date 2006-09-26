@@ -56,7 +56,7 @@ public:
 	virtual ~Condition(){};
 	
 	virtual bool startCondition(Creature* creature) = 0;
-	virtual void executeCondition(Creature* creature, int32_t interval) = 0;
+	virtual void executeCondition(Creature* creature, int32_t interval);
 	virtual void endCondition(Creature* creature, EndCondition_t reason) = 0;	
 	virtual void addCondition(Creature* creature, const Condition* condition) = 0;
 	virtual uint8_t getIcons() const = 0;
@@ -114,8 +114,16 @@ public:
 protected:
 	bool delayed;
 	uint32_t owner;
-	typedef std::pair<int32_t, int32_t> DamagePair;
-	std::list<DamagePair> damageList;
+
+	struct DamageInfo{
+		int32_t timeLeft;
+		int32_t damage;
+		int32_t interval;
+	};
+
+	//typedef std::pair<int32_t, int32_t> DamagePair;
+	//std::list<DamagePair> damageList;
+	std::list<DamageInfo> damageList;
 
 	bool getNextDamage(int32_t& damage);
 	bool doDamage(Creature* creature, int32_t damage);

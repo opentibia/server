@@ -419,7 +419,8 @@ protected:
 	unsigned long lastip;
 	
 	//inventory variables
-	Item* items[11]; //equipement of the player
+	Item* inventory[11];
+	//Abilities ExtraAbilities;
 	
 	//player advances variables
 	unsigned int skills[SKILL_LAST + 1][3];

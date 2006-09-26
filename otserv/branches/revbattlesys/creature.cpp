@@ -404,6 +404,17 @@ void Creature::onEndCondition(ConditionType_t type)
 	//
 }
 
+void Creature::onTickCondition(ConditionType_t type, bool& bRemove)
+{
+	if(const MagicField* field = getTile()->getFieldItem()){
+		switch(type){
+			case CONDITION_FIRE: bRemove = (field->getDamageType() != DAMAGE_FIRE); break;
+			case CONDITION_ENERGY: bRemove = (field->getDamageType() != DAMAGE_ENERGY); break;
+			case CONDITION_POISON: bRemove = (field->getDamageType() != DAMAGE_POISON); break;
+		}
+	}
+}
+
 void Creature::onAttackedCreature(Creature* target)
 {
 	//
@@ -483,7 +494,7 @@ bool Creature::addCondition(Condition* condition)
 	}
 	
 	Condition* prevCond = getCondition(condition->getType());
-
+	
 	if(prevCond){
 		prevCond->addCondition(this, condition);
 		delete condition;
@@ -516,7 +527,7 @@ void Creature::removeCondition(ConditionType_t type)
 void Creature::executeConditions(int32_t newticks)
 {
 	for(ConditionList::iterator it = conditions.begin(); it != conditions.end();){
-		(*it)->setTicks((*it)->getTicks() - newticks);
+		//(*it)->setTicks((*it)->getTicks() - newticks);
 
 		(*it)->executeCondition(this, newticks);
 

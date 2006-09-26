@@ -79,6 +79,8 @@ protected:
 	LuaScriptInterface m_scriptInterface;
 };
 
+typedef long (StepFunction)(Creature* creature, Item* item, const Position& pos);
+typedef long (MoveFunction)(Item* item, Item* tileItem, const Position& pos);
 
 class MoveEvent : public Event
 {
@@ -90,7 +92,11 @@ public:
 	void setEventType(MoveEvent_t type);
 	
 	virtual bool configureEvent(xmlNodePtr p);
-	
+	virtual bool loadFunction(const std::string& functionName);
+
+	long fireStepEvent(Creature* creature, Item* item, const Position& pos);
+	long fireAddRemItem(Item* item, Item* tileItem, const Position& pos);
+
 	//scripting
 	long executeStep(Creature* creature, Item* item, const Position& pos);
 	long executeEquip(Player* player, Item* item, long slot);
@@ -100,7 +106,16 @@ public:
 protected:
 	virtual std::string getScriptEventName();
 	
+	static StepFunction StepInField;
+	static StepFunction StepOutField;
+
+	static MoveFunction AddItemField;
+	static MoveFunction RemoveItemField;
+
 	MoveEvent_t m_eventType;
+	StepFunction* stepFunction;
+	MoveFunction* moveFunction;
+	
 };
 
 

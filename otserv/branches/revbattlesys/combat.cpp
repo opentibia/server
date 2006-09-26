@@ -32,6 +32,7 @@ extern Game g_game;
 
 Combat::Combat(CombatType_t _type)
 {
+	params.condition = NULL;
 	area = NULL;
 	callback = NULL;
 	combatType = _type;
@@ -39,6 +40,7 @@ Combat::Combat(CombatType_t _type)
 
 Combat::~Combat()
 {
+	delete params.condition;
 	delete area;
 	delete callback;
 }
@@ -87,7 +89,7 @@ void Combat::getCombatArea(const Position& centerPos, const Position& targetPos,
 	}
 }
 
-ReturnValue Combat::canDoCombat(const Creature* caster, const Tile* tile)
+ReturnValue Combat::canDoCombat(const Creature* caster, const Tile* tile, bool isAggressive)
 {
 	if(tile->hasProperty(BLOCKPROJECTILE) || tile->hasProperty(BLOCKINGANDNOTMOVEABLE)){
 		return RET_NOTENOUGHROOM;
@@ -114,12 +116,12 @@ ReturnValue Combat::canDoCombat(const Creature* caster, const Tile* tile)
 	}
 
 	if(const Player* player = caster->getPlayer()){
-		if(player->getAccessLevel() > 2){
+		if(player->getAccessLevel() > 0){
 			return RET_NOERROR;
 		}
 	}
 
-	if(tile->isPz()){
+	if(isAggressive && tile->isPz()){
 		return RET_ACTIONNOTPERMITTEDINPROTECTIONZONE;
 	}
 
@@ -196,6 +198,12 @@ bool Combat::setParam(CombatParam_t param, uint32_t value)
 			return true;
 			break;
 		}
+
+		case COMBATPARAM_AGGRESSIVE:
+		{
+			params.isAggressive = (value != 0);
+		}
+
 		default:
 		{
 			break;
@@ -305,10 +313,10 @@ void Combat::CombatFunc(Creature* caster, const Position& pos,
 	std::list<Tile*> list;
 	getCombatArea(caster->getPosition(), pos, area, list);
 
-	bool bContinue = true;
-
 	for(std::list<Tile*>::iterator it = list.begin(); it != list.end(); ++it){
-		if(canDoCombat(caster, *it) == RET_NOERROR){
+		bool bContinue = true;
+		
+		if(canDoCombat(caster, *it, params.isAggressive) == RET_NOERROR){
 			for(CreatureVector::iterator cit = (*it)->creatures.begin(); bContinue && cit != (*it)->creatures.end(); ++cit){
 
 				if(params.targetCasterOrTopMost){
@@ -775,6 +783,37 @@ MagicField::MagicField(uint16_t _type) : Item(_type)
 {
 	condition = NULL;
 	damageType = DAMAGE_NONE;
+
+	load();
+}
+
+void MagicField::load()
+{
+	const ItemType& it = Item::items[getID()];
+
+	damageType = it.damageType;
+
+	switch(damageType){
+		case DAMAGE_ENERGY:
+			condition = new ConditionDamage(CONDITION_ENERGY);
+			break;
+
+		case DAMAGE_FIRE:
+			condition = new ConditionDamage(CONDITION_FIRE);
+			break;
+
+		case DAMAGE_POISON:
+			condition = new ConditionDamage(CONDITION_POISON);
+			break;
+	}
+
+	if(condition){
+		if(it.initialDamage != 0){
+			condition->addDamage(1, 0, it.initialDamage);
+		}
+
+		condition->addDamage(it.roundMin, it.roundTime, it.roundDamage);
+	}
 }
 
 MagicField::~MagicField()
@@ -784,6 +823,9 @@ MagicField::~MagicField()
 
 DamageType_t MagicField::getDamageType() const
 {
+	return damageType;
+
+	/*
 	if(condition){
 		switch(condition->getType()){
 			case CONDITION_FIRE:
@@ -803,4 +845,5 @@ DamageType_t MagicField::getDamageType() const
 	}
 
 	return DAMAGE_NONE;
+	*/
 }

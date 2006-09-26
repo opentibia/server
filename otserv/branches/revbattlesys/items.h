@@ -26,6 +26,7 @@
 #include "definitions.h"
 #include "const76.h"
 #include "itemloader.h"
+#include "enums.h"
 
 
 #define SLOTP_WHEREEVER 0xFFFFFFFF
@@ -45,6 +46,40 @@
 enum eRWInfo{
 	CAN_BE_READ = 1,
 	CAN_BE_WRITTEN = 2
+};
+
+struct Abilities{
+	Abilities()
+	{
+		absorbPercentAll = 0;
+		absorbPercentPhysical = 0;
+		absorbPercentFire = 0;
+		absorbPercentEnergy = 0;
+		absorbPercentPoison = 0;
+		absorbPercentLifeDrain = 0;
+		absorbPercentManaDrain = 0;
+
+		memset(skills, 0, sizeof(skills));
+	};
+
+	/*
+	uint8_t absorbAll;
+	uint8_t absorbPhysical;
+	uint8_t absorbFire;
+	uint8_t absorbEnergy;
+	uint8_t absorbPoison;
+	uint8_t absorbLifeDrain;
+	uint8_t absorbManaDrain;
+	*/
+
+	uint8_t absorbPercentAll;
+	uint8_t absorbPercentPhysical;
+	uint8_t absorbPercentFire;
+	uint8_t absorbPercentEnergy;
+	uint8_t absorbPercentPoison;
+	uint8_t absorbPercentLifeDrain;
+	uint8_t absorbPercentManaDrain;
+	uint32_t skills[SKILL_LAST + 1];
 };
 
 class ItemType {
@@ -68,7 +103,7 @@ public:
 
 	std::string    name;
 	std::string    description;
-	unsigned short maxItems;    // capacity (containers)
+	unsigned short maxItems;
 	double         weight;
 	WeaponType_t   weaponType;
 	Ammo_t         amuType;
@@ -116,6 +151,16 @@ public:
 	bool blockPickupable;
 	bool blockProjectile;
 	bool blockPathFind;
+
+	Abilities abilities;
+
+	//fields
+	int32_t initialDamage;
+	DamageType_t damageType;
+
+	int32_t roundMin;
+	int32_t roundTime;
+	int32_t roundDamage;
 };
 
 #ifdef __GNUC__
