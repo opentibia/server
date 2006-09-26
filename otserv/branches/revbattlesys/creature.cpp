@@ -422,6 +422,8 @@ void Creature::onTickCondition(ConditionType_t type, bool& bRemove)
 			case CONDITION_FIRE: bRemove = (field->getDamageType() != DAMAGE_FIRE); break;
 			case CONDITION_ENERGY: bRemove = (field->getDamageType() != DAMAGE_ENERGY); break;
 			case CONDITION_POISON: bRemove = (field->getDamageType() != DAMAGE_POISON); break;
+			default: 
+				break;
 		}
 	}
 }

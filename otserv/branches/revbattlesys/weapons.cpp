@@ -513,9 +513,12 @@ bool WeaponMelee::getSkillType(const Player* player, const Item* item,
 			return true;
 			break;
 		}
+		default:
+		{
+			return false;
+			break;
+		}
 	}
-
-	return false;
 }
 
 int32_t WeaponMelee::getWeaponDamage(const Player* player, const Item* item) const

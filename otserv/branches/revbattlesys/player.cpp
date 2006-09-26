@@ -1556,6 +1556,8 @@ BlockType_t Player::blockHit(Creature* attacker, DamageType_t damageType, int32_
 			case DAMAGE_POISON:
 				absorbedDamage = (it.abilities.absorbPercentPoison / 100) * damage;
 				break;
+			default:
+				break;
 		}
 	
 		if(absorbedDamage != 0){
@@ -2509,7 +2511,7 @@ void Player::doAttacking()
 			const Position& targetPos = attackedCreature->getPosition();
 
 			if(std::max(std::abs(playerPos.x - targetPos.x), std::abs(playerPos.y - targetPos.y)) <= 1){
-				int32_t damage = - (0.5 * skills[SKILL_FIST][SKILL_LEVEL]);
+				int32_t damage = -(int32_t)(0.5 * skills[SKILL_FIST][SKILL_LEVEL]);
 				CombatParams params;
 				params.damageType = DAMAGE_PHYSICAL;
 				params.blockedByArmor = true;

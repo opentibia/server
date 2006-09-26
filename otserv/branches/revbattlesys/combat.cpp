@@ -58,8 +58,8 @@ void Combat::getMinMaxValues(Creature* creature, int32_t& min, int32_t& max) con
 		else{
 			switch(formula.type){
 				case COMBAT_FORMULA_LEVELMAGIC:
-					max = (player->getLevel() * 2 + player->getMagicLevel() * 3) * formula.mina + formula.minb;
-					min = (player->getLevel() * 2 + player->getMagicLevel() * 3) * formula.maxa + formula.maxb;
+					max = (int32_t)((player->getLevel() * 2 + player->getMagicLevel() * 3) * 1. * formula.mina + formula.minb);
+					min = (int32_t)((player->getLevel() * 2 + player->getMagicLevel() * 3) * 1. * formula.maxa + formula.maxb);
 					break;
 
 				default:
@@ -804,6 +804,9 @@ void MagicField::load()
 
 		case DAMAGE_POISON:
 			condition = new ConditionDamage(CONDITION_POISON);
+			break;
+		
+		default:
 			break;
 	}
 
