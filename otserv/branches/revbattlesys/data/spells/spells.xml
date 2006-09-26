@@ -5,15 +5,16 @@
 <rune name="Polymorph" id="2270" hascharges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="polymorph.lua"></rune>
 <rune name="Combustion" id="2271" hascharges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="combustion.lua"></rune>
 <rune name="Paralyze" id="2272" hascharges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="paralyze.lua"></rune>
-<rune name="Ultimate Healing" id="2273" needtarget="1" hascharges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="uh.lua"></rune>
+<rune name="Ultimate Healing" id="2273" needtarget="1" hascharges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="0" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="uh.lua"></rune>
 <rune name="Energy Arrow" id="2274" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="energy wave.lua"></rune>
 <rune name="Energy Wall" id="2275" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="energy wall.lua"></rune>
 <rune name="Magic Wall" id="2276" blocking="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="magic wall.lua"></rune>
 <rune name="Magic Prison" id="2277" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="magic prison.lua"></rune>
+<rune name="Fire Field" id="2278" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="fire field.lua"></rune>
 
 <instant name="Wild Growth" words="exevo grav vita" direction="1" blocking="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="wild growth.lua"></instant>
 <instant name="Find Person" words="exiva" aggressive="0" params="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" function="searchPlayer"></instant>
 <instant name="Heal Friend" words="exura sio" aggressive="0" params="1" needtarget="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="healfriend.lua"></instant>
-<instant name="Energy wave" words="exevo mort hur" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="energy wave.lua"></instant>
+<instant name="Energy wave" words="exevo mort hur" direction="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="energy wave.lua"></instant>
 <instant name="Mass Healing" words="exura gran mas res" aggressive="0" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="mass healing.lua"></instant>
 </spells>
