@@ -26,6 +26,7 @@
 #include <string>
 
 #include "protocol.h"
+#include "tools.h"
 
 class Player;
 
@@ -51,20 +52,9 @@ Protocol::~Protocol()
 	game = NULL;
 }
 
-unsigned long Protocol::getIP() const
-{
-	sockaddr_in sain;
-	socklen_t salen = sizeof(sockaddr_in);
-	if (getpeername(s, (sockaddr*)&sain, &salen) == 0)
-	{
-#if defined WIN32 || defined __WINDOWS__
-		return sain.sin_addr.S_un.S_addr;
-#else
-		return sain.sin_addr.s_addr;
-#endif
-	}
-	
-	return 0;
+uint32_t Protocol::getIP() const
+{	
+	return getIPSocket(s);
 }
 
 void Protocol::setPlayer(Player* p)

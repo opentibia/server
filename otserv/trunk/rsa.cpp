@@ -21,49 +21,31 @@
 
 #include "rsa.h"
 
-RSA* RSA::instance = NULL;
-
-#ifdef __RSA_MIRACL__
-Miracl mir = 128;
-#endif
-
-RSA* RSA::getInstance()
-{
-	if(!instance){
-		instance = new RSA;
-	}
-	return instance;
-}
-
 RSA::RSA()
 {
 	OTSYS_THREAD_LOCKVARINIT(rsaLock);
 	m_keySet = false;
-	#ifdef __RSA_MIRACL__
-	#else //default GMP
 	mpz_init2(m_p, 1024);
 	mpz_init2(m_q, 1024);
 	mpz_init2(m_d, 1024);
 	mpz_init2(m_u, 1024);
 	mpz_init2(m_dp, 1024);
 	mpz_init2(m_dq, 1024);
-	#endif
+	mpz_init2(m_mod, 1024);
 }
 
 RSA::~RSA()
 {
-	#ifdef __RSA_MIRACL__
-	#else //default GMP
 	mpz_clear(m_p);
 	mpz_clear(m_q);
 	mpz_clear(m_d);
 	mpz_clear(m_u);
 	mpz_clear(m_dp);
 	mpz_clear(m_dq);
-	#endif
+	mpz_clear(m_mod);
 }
 
-#ifdef __RSA_MIRACL__
+/*
 void RSA::setKey(char* p, char* q, char* d)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(rsaLock);
@@ -104,7 +86,8 @@ bool RSA::decrypt(char* msg, long size)
 	
 	return true;
 }
-#else //default GMP
+*/
+
 void RSA::setKey(char* p, char* q, char* d)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(rsaLock);
@@ -122,6 +105,8 @@ void RSA::setKey(char* p, char* q, char* d)
 	mpz_invert(m_u, m_p, m_q);
 	mpz_mod(m_dp, m_d, pm1);
 	mpz_mod(m_dq, m_d, qm1);
+	
+	mpz_mul(m_mod, m_p, m_q);
 	
 	mpz_clear(pm1);
 	mpz_clear(qm1);
@@ -167,4 +152,17 @@ bool RSA::decrypt(char* msg, long size)
 	
 	return true;
 }
-#endif
+
+long RSA::getKeySize()
+{
+	size_t count = (mpz_sizeinbase(m_mod, 2) + 7)/8;
+	long a = count/128;
+	return a*128;
+}
+
+void RSA::getPublicKey(char* buffer)
+{
+	size_t count = (mpz_sizeinbase(m_mod, 2) + 7)/8;
+	memset(buffer, 0, 128 - count);
+	mpz_export(&buffer[128 - count], NULL, 1, 1, 0, 0, m_mod);
+}

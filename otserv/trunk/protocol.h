@@ -46,7 +46,7 @@ public:
 	
 	void setPlayer(Player* p);
 	virtual void setKey(const uint32_t* key) = 0;
-	unsigned long getIP() const;
+	uint32_t getIP() const;
 	
 	virtual bool CanSee(int x, int y, int z) const = 0;
 	virtual bool CanSee(const Creature*) const = 0;

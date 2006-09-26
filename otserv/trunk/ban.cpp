@@ -24,6 +24,7 @@
 #include "ioplayer.h"
 #include "configmanager.h"
 #include <sstream>
+#include "tools.h"
 
 #if defined USE_SQL_ENGINE
 #include "database.h"
@@ -32,19 +33,6 @@
 extern ConfigManager g_config;
 
 IOBan* IOBan::_instance = NULL;
-
-unsigned long getIP(SOCKET s)
-{
-	sockaddr_in sain;
-	socklen_t salen = sizeof(sockaddr_in);
-
-	if(getpeername(s, (sockaddr*)&sain, &salen) == 0){
-		unsigned long clientip = *(unsigned long*)&sain.sin_addr;
-		return clientip;
-	}
-
-	return 0;
-}
 
 Ban::Ban()
 {
@@ -61,7 +49,7 @@ void Ban::init()
 bool Ban::isIpBanished(SOCKET s)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(banLock);
-	unsigned long clientip = getIP(s);
+	unsigned long clientip = getIPSocket(s);
 	if(clientip != 0){
 		for(IpBanList::iterator it = ipBanList.begin(); it !=  ipBanList.end(); ++it){
 			if((it->ip & it->mask) == (clientip & it->mask)){
@@ -83,7 +71,7 @@ bool Ban::isIpDisabled(SOCKET s)
 		return false;
 	}
 
-	unsigned long clientip = getIP(s);
+	unsigned long clientip = getIPSocket(s);
 	if(clientip != 0){
 		uint32_t currentTime = std::time(NULL);
 		IpLoginMap::const_iterator it = ipLoginMap.find(clientip);
@@ -101,7 +89,7 @@ bool Ban::isIpDisabled(SOCKET s)
 void Ban::addConnectionAttempt(SOCKET s, bool isSuccess)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(banLock);
-	unsigned long clientip = getIP(s);
+	unsigned long clientip = getIPSocket(s);
 	if(clientip != 0){
 		uint32_t currentTime = std::time(NULL);
 

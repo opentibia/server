@@ -211,7 +211,7 @@ public:
 	ContainerVector containerVec;
 	void preSave();
 
-	unsigned long getIP() const;
+	uint32_t getIP() const;
 	Depot* getDepot(uint32_t depotId, bool autoCreateDepot);
 	bool addDepot(Depot* depot, uint32_t depotId);
 

@@ -52,6 +52,7 @@
 #include "waitlist.h"
 #include "ban.h"
 #include "rsa.h"
+#include "admin.h"
 
 #ifdef __OTSERV_ALLOCATOR__
 #include "allocator.h"
@@ -95,6 +96,8 @@ Actions actions(&g_game);
 Commands commands(&g_game);
 Monsters g_monsters;
 Ban g_bans;
+
+RSA* g_otservRSA = NULL;
 
 #if defined __EXCEPTION_TRACER__
 #include "exception.h"
@@ -166,7 +169,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 			unsigned short clientos = msg.GetU16();
 			unsigned short version  = msg.GetU16();
 			msg.SkipBytes(12);
-
+			msg.setRSAInstance(g_otservRSA);
 			if(version <= 760){
 				msg.Reset();
 				msg.AddByte(0x0A);
@@ -266,7 +269,8 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 		else if (protId == 0x0A){
 			unsigned short  clientos = msg.GetU16();
 			unsigned short version  = msg.GetU16();
-
+			
+			msg.setRSAInstance(g_otservRSA);
 			if(msg.RSA_decrypt()){
 				uint32_t k[4];
 				k[0] = msg.GetU32();
@@ -422,6 +426,12 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 				}
 			}
 		}
+		//Admin protocol
+		else if(protId == 0xFE){
+			AdminProtocol* adminProtocol = new AdminProtocol(s);
+			adminProtocol->receiveLoop();
+			delete adminProtocol;
+		}
 		// Since Cip made 02xx as Tibia protocol,
 		// Lets make FFxx as "our great info protocol" ;P
 		else if(protId == 0xFF) {
@@ -559,8 +569,8 @@ int main(int argc, char *argv[])
 	char* p("14299623962416399520070177382898895550795403345466153217470516082934737582776038882967213386204600674145392845853859217990626450972452084065728686565928113");
 	char* q("7630979195970404721891201847792002125535401292779123937207447574596692788513647179235335529307251350570728407373705564708871762033017096809910315212884101");
 	char* d("46730330223584118622160180015036832148732986808519344675210555262940258739805766860224610646919605860206328024326703361630109888417839241959507572247284807035235569619173792292786907845791904955103601652822519121908367187885509270025388641700821735345222087940578381210879116823013776808975766851829020659073");
-	RSA* rsa = RSA::getInstance();
-	rsa->setKey(p, q, d);
+	g_otservRSA = new RSA();
+	g_otservRSA->setKey(p, q, d);
 
 	std::cout << "[done]" << std::endl;
 

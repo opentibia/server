@@ -43,13 +43,19 @@ NetworkMessage::NetworkMessage()
 {
 	m_encryptionEnabled = false;
 	m_keyset = false;
+	m_RSA = NULL;
 	Reset();
 }
 
 NetworkMessage::~NetworkMessage()
 {
+	//
 }
 
+void NetworkMessage::setRSAInstance(RSA* rsa)
+{
+	m_RSA = rsa;
+}
 
 /******************************************************************************/
 
@@ -213,7 +219,6 @@ uint32_t NetworkMessage::GetU32()
 	return v;
 }
 
-
 std::string NetworkMessage::GetString()
 {
 	uint16_t stringlen = GetU16();
@@ -304,6 +309,15 @@ void NetworkMessage::AddString(const char* value)
 	m_MsgSize += stringlen;
 }
 
+void NetworkMessage::AddBytes(const char* bytes, uint32_t size)
+{
+	if(!canAdd(size) || size > 8192)
+		return;
+	
+	strcpy((char*)(m_MsgBuf + m_ReadPos), bytes);
+	m_ReadPos += size;
+	m_MsgSize += size;
+}
 
 /******************************************************************************/
 
@@ -438,8 +452,12 @@ bool NetworkMessage::RSA_decrypt()
 		return false;
 	}
 	
-	RSA* rsa = RSA::getInstance();
-	if(!rsa->decrypt((char*)(m_MsgBuf + m_ReadPos), 128)){
+	if(!m_RSA){
+		std::cout << "Warning: [NetworkMessage::RSA_decrypt()]. m_RSA no set" << std::endl;
+		return false;
+	}
+	
+	if(!m_RSA->decrypt((char*)(m_MsgBuf + m_ReadPos), 128)){
 		return false;
 	}
 	

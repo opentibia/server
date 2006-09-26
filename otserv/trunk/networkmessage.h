@@ -30,7 +30,7 @@ class Creature;
 class Player;
 class Item;
 class Position;
-
+class RSA;
 
 class NetworkMessage
 {
@@ -50,10 +50,10 @@ public:
 	uint8_t  GetByte();
 	uint16_t GetU16();
 	uint16_t GetItemId();
-	uint32_t   GetU32();
-	std::string    GetString();
-	std::string	 GetRaw();
-	Position       GetPosition();
+	uint32_t GetU32();
+	std::string GetString();
+	std::string GetRaw();
+	Position GetPosition();
 
 	void setEncryptionState(bool state);
 	void setEncryptionKey(const uint32_t* key);
@@ -63,8 +63,9 @@ public:
 
 	// simply write functions for outgoing message
 	void AddByte(uint8_t  value);
-	void AddU16 (uint16_t value);
-	void AddU32 (uint32_t value);
+	void AddU16(uint16_t value);
+	void AddU32(uint32_t value);
+	void AddBytes(const char* bytes, uint32_t size);
 
 	void AddString(const std::string &value);
 	void AddString(const char* value);
@@ -85,6 +86,8 @@ public:
 
 	bool RSA_decrypt();
 
+	void setRSAInstance(RSA* rsa);
+
 protected:
 	inline bool canAdd(int size){
     	return (size + m_ReadPos < NETWORKMESSAGE_MAXSIZE - 16);
@@ -101,6 +104,8 @@ protected:
 	bool m_encryptionEnabled;
 	bool m_keyset;
 	uint32_t m_key[4];
+	
+	RSA* m_RSA;
 };
 
 

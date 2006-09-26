@@ -47,4 +47,6 @@ char upchar(char c);
 std::string urlEncode(const char* str);
 std::string urlEncode(const std::string& str);
 
+uint32_t getIPSocket(SOCKET s);
+
 #endif

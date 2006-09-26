@@ -24,33 +24,26 @@
 
 #include "otsystem.h"
 
-#ifdef __RSA_MIRACL__
-#include <big.h>
-#else //default GMP
 #include "gmp.h"
-#endif
 
 class RSA{
 public:
-	static RSA* getInstance();	
+	RSA();
+	~RSA();
 	void setKey(char* p, char* q, char* d);
 	bool decrypt(char* msg,long size);
 	
-protected:
-	RSA();
-	~RSA();
+	long getKeySize();
+	void getPublicKey(char* buffer);
 	
-	static RSA* instance;
+protected:
 	
 	bool m_keySet;
 	
 	OTSYS_THREAD_LOCKVAR rsaLock;
 	
-	#ifdef __RSA_MIRACL__
-	Big m_p, m_q, m_u, m_d, m_dp, m_dq;
-	#else //default GMP
-	mpz_t m_p, m_q, m_u, m_d, m_dp, m_dq;
-	#endif
+	//use only GMP
+	mpz_t m_p, m_q, m_u, m_d, m_dp, m_dq, m_mod;
 };
 
 #endif

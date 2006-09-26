@@ -1549,7 +1549,7 @@ void Player::addExperience(unsigned long exp)
 	}
 }
 
-unsigned long Player::getIP() const
+uint32_t Player::getIP() const
 {
 	return client->getIP();
 }
