@@ -1,0 +1,4 @@
+<fields>
+<field id="1487" type="fire" initDamage="25" roundMin="10" roundTime="2000" roundDamage="10"/>
+<field id="1506" type="fire" initDamage="400"/>
+</fields>
