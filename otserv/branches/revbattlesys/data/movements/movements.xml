@@ -2,10 +2,10 @@
 
 <movements>
 <movevent event="StepIn" itemid="1487" function="onStepInField" />
-<movevent event="AddItem" tileitem="1" itemid="1487" function="onAddField" />
+<movevent event="AddItem" tileitem="0" itemid="1487" function="onAddField" />
 
 <movevent event="StepIn" itemid="1506" function="onStepInField" />
-<movevent event="AddItem" tileitem="1" itemid="1506" function="onAddField" />
+<movevent event="AddItem" tileitem="0" itemid="1506" function="onAddField" />
 
 <movevent event="Equip" itemid="2195" script="boh.lua" />
 <movevent event="DeEquip" itemid="2195" script="boh.lua" />
