@@ -1670,7 +1670,7 @@ int LuaScriptInterface::luaGetItemRWInfo(lua_State *L)
 int LuaScriptInterface::luaDoDecayItem(lua_State *L)
 {
 	//doDecayItem(uid)
-	//Note: to stop decay set decayTo = 0 in items.xml
+	//Note: to stop decay set decayTo = 0 in items.otb
 	unsigned long uid = (unsigned long)popNumber(L);	
 	
 	ScriptEnviroment* env = getScriptEnv();
