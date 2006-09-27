@@ -559,8 +559,8 @@ OTSYS_THREAD_RETURN Game::eventThread(void *p)
 
 unsigned long Game::addEvent(SchedulerTask* event)
 {
-  bool do_signal = false;
-  OTSYS_THREAD_LOCK(eventLock, "addEvent()")
+	bool do_signal = false;
+	OTSYS_THREAD_LOCK(eventLock, "addEvent()");
 
 	if(event->getEventId() == 0) {
 		++eventIdCount;
@@ -579,7 +579,7 @@ unsigned long Game::addEvent(SchedulerTask* event)
 	if(isEmpty || *event < *eventList.top())
 		do_signal = true;
 
-  OTSYS_THREAD_UNLOCK(eventLock, "addEvent()")
+	OTSYS_THREAD_UNLOCK(eventLock, "addEvent()");
 
 	if (do_signal)
 		OTSYS_THREAD_SIGNAL_SEND(eventSignal);
@@ -604,11 +604,11 @@ bool Game::stopEvent(unsigned long eventid)
 		//it->second->setEventId(0); //invalidate the event
 		eventIdMap.erase(it);
 
-	  OTSYS_THREAD_UNLOCK(eventLock, "stopEvent()")
+		OTSYS_THREAD_UNLOCK(eventLock, "stopEvent()")
 		return true;
 	}
 
-  OTSYS_THREAD_UNLOCK(eventLock, "stopEvent()")
+	OTSYS_THREAD_UNLOCK(eventLock, "stopEvent()");
 	return false;
 }
 
@@ -1782,7 +1782,7 @@ bool Game::internalCreatureSaySpell(Creature *creature, const std::string &text)
 {
 	Player* player = dynamic_cast<Player*>(creature);
 	std::string temp, var;
-	std::string::size_type loc = (uint32_t)text.find("\"", 0);
+	std::string::size_type loc = text.find("\"", 0);
 	if(loc != std::string::npos && loc >= 0){
 		temp = std::string(text, 0, loc-1);
 		var = std::string(text, (loc+1), text.size()-loc-1);

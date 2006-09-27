@@ -240,7 +240,7 @@ int Items::loadFromOtb(std::string file)
 				return ERROR_INVALID_FORMAT;
 			}
 			Items::dwMajorVersion = vi->dwMajorVersion;	//items otb format file version
-			Items::dwMinorVersion = vi->dwMinorVersion; //client version
+			Items::dwMinorVersion = vi->dwMinorVersion;	//client version
 			Items::dwBuildNumber = vi->dwBuildNumber;	//revision
 		}
 	}
@@ -258,9 +258,9 @@ int Items::loadFromOtb(std::string file)
 	node = f.getChildNode(node, type);
 
 	while(node != NO_NODE){
-		PropStream props;	
+		PropStream props;
 		if(!f.getProps(node,props)){
-			return f.getError();	
+			return f.getError();
 		}
 			
 		flags_t flags;
@@ -331,7 +331,6 @@ int Items::loadFromOtb(std::string file)
 				delete iType;
 				return ERROR_INVALID_FORMAT;
 			}
-	
 			switch(attrib){
 			case ITEM_ATTR_SERVERID:
 			{

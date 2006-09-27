@@ -24,7 +24,6 @@
 
 #include "exception.h"
 
-typedef unsigned long long uint64_t;
 
 #ifdef XML_GCC_FREE
 	#define xmlFreeOTSERV(s)	free(s)
@@ -66,6 +65,8 @@ typedef unsigned long long uint64_t;
 	#define OTSERV_HASH_SET __gnu_cxx::hash_set
 
 #else
+	typedef unsigned long long uint64_t;
+
 	#ifndef NOMINMAX
 		#define NOMINMAX
 	#endif

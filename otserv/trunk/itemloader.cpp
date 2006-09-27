@@ -21,6 +21,16 @@
 
 #include "itemloader.h"
 
+ItemLoader::ItemLoader()
+{
+	//
+}
+
+ItemLoader::~ItemLoader()
+{
+	//
+}
+
 int ItemLoader::setProps(attribute_t attr, void* data, datasize_t size)
 {
 	//attribute

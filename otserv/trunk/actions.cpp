@@ -476,7 +476,7 @@ _player(NULL)
 	else
 		fclose(in);
 	lua_dofile(luaState, scriptname.c_str());
-	this->setGlobalNumber("addressOfActionScript", (int)this);
+	this->setGlobalNumber("addressOfActionScript", (long)this);
 	this->loaded = true;
 	this->registerFunctions();
 }

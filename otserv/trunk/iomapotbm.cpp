@@ -32,8 +32,8 @@
 #include "town.h"
 #include "house.h"
 
-typedef unsigned char attribute_t;
-typedef unsigned long flags_t;
+typedef uint8_t attribute_t;
+typedef uint32_t flags_t;
 
 extern Game g_game;
 

@@ -180,7 +180,7 @@ bool Commands::exeCommand(Creature* creature, const std::string& cmd)
 	std::string str_command;
 	std::string str_param;
 	
-	unsigned int loc = (uint32_t)cmd.find( ' ', 0 );
+	std::string::size_type loc = cmd.find( ' ', 0 );
 	if( loc != std::string::npos && loc >= 0){
 		str_command = std::string(cmd, 0, loc);
 		str_param = std::string(cmd, (loc+1), cmd.size()-loc-1);

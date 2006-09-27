@@ -24,9 +24,9 @@
 #include "fileloader.h"
 #include "definitions.h"
 
-typedef unsigned char attribute_t;
-typedef unsigned short datasize_t;
-typedef unsigned long flags_t;
+typedef uint8_t attribute_t;
+typedef uint16_t datasize_t;
+typedef uint32_t flags_t;
 
 enum itemgroup_t{
 	ITEM_GROUP_NONE = 0,
@@ -209,6 +209,8 @@ struct writeableBlock3{
 
 class ItemLoader : public FileLoader {
 public:
+	ItemLoader();
+	virtual ~ItemLoader();
 	int setFlags(flags_t flags);
 	int setProps(attribute_t attr, void* data, datasize_t size);
 };

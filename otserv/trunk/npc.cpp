@@ -319,7 +319,7 @@ NpcScript::NpcScript(std::string scriptname, Npc* _npc)
 	lua_dofile(luaState, scriptname.c_str());
 	loaded = true;
 	npc = _npc;
-	setGlobalNumber("addressOfNpc", (int) npc);
+	setGlobalNumber("addressOfNpc", (long) npc);
 	registerFunctions();
 }
 
