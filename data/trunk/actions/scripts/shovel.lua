@@ -1,28 +1,41 @@
-
 function onUse(cid, item, frompos, item2, topos)
-	if item2.itemid == 0 then
-		return 0
-	end	
-
-	if item2.itemid == 468 then
-		doTransformItem(item2.uid,469)
-
-        elseif item2.itemid == 481 then
-		doTransformItem(item2.uid,482)
-
-        elseif item2.itemid == 483 then
-		doTransformItem(item2.uid,484)
-
-	elseif item2.itemid == 1335 then
-		doTransformItem(item2.uid,383)
-
-	elseif item2.itemid == 293 then
-		doTransformItem(item2.uid,294)
+	if isInArray(CLOSED_HOLE, item2.itemid) == 1 then
+		doTransformItem(item2.uid, item2.itemid+1)
+	elseif item2.itemid == 231 then
+		if item2.actionid == 100 then
+			chance = math.random(1, 50)
+			if chance <= 10 then
+				doTransformItem(item2.uid, 489)
+			end
+		elseif item2.actionid == 101 then
+			chance = math.random(1, 100)
+			if chance <= 5 then
+				doSummonCreature("scarab", topos)
+				doSetItemActionId(item2.uid, 103)
+			end
+		elseif item2.actionid == 102 then
+			chance = math.random(1, 100)
+			if chance <= 5 then
+				doPlayerAddItem(cid, 2159, 1)
+				doSetItemActionId(item2.uid, 104)
+			end
+		elseif item2.actionid == 103 then
+			chance = math.random(1, 200)
+			if chance <= 5 then
+				doSetItemActionId(item2.uid, 101)
+			end
+		elseif item2.actionid == 104 then
+			chance = math.random(1, 200)
+			if chance <= 5 then
+				doSetItemActionId(item2.uid, 102)
+			end
+		else
+			doSendMagicEffect(topos, 2)
+		end
+		doSendMagicEffect(topos, 2)
 	else
 		return 0
 	end
-
-        doDecayItem(item2.uid)
-	
+	doDecayItem(item2.uid)
 	return 1
 end

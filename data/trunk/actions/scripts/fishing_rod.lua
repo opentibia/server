@@ -1,26 +1,30 @@
--- By GriZzm0
-
 function onUse(cid, item, frompos, item2, topos)
-	-- 490 fish
-	-- 491 no fish 
-	-- 492 fish regeneration :)
-	if doPlayerRemoveItem(cid, 3976, 1) == 1 then
-		if item2.itemid == 490 then
-			fishingskill = getPlayerSkill(cid,6)
-			formula = fishingskill /200+0.85* math.random()
+	if delay(cid) == 1 then
+		formula = getPlayerSkill(cid, 6) / 200 + 0.85 * math.random()
+		if isInArray(WATER_WITH_FISH, item2.itemid) == 1 then
 			if formula > 0.70 then
-				doTransformItem(item2.uid,492)
-				doDecayItem(item2.uid)
-				doSendMagicEffect(topos,1)
-				doPlayerAddSkillTry(cid,6,2)
-				doPlayerAddItem(cid,2667,1)
-			else
-				doSendMagicEffect(topos,1)
-				doPlayerAddSkillTry(cid,6,1)
+				if doPlayerRemoveItem(cid, 3976, 1) == 1 then
+					if item2.itemid == 490 then
+						doTransformItem(item2.uid, 492)
+					else
+						doTransformItem(item2.uid, 4610)
+					end
+					doDecayItem(item2.uid)
+					doPlayerAddItem(cid, 2667, 1)
+				end
 			end
-		elseif item2.itemid == 491 or item2.itemid == 492 then
-			doSendMagicEffect(topos,1)
+			doSendMagicEffect(topos, 1)
+			doPlayerAddSkillTry(cid, 6, 1)
+		elseif isInArray(WATER_WITHOUT_FISH, item2.itemid) == 1 then
+			doSendMagicEffect(topos, 1)
 		end
 	end
 	return 1
+end
+
+function delay(cid)
+    if os.difftime(os.time(), getPlayerStorageValue(cid, 1000)) >= 0.5 then
+        setPlayerStorageValue(cid, 1000, os.time()) 
+        return 1
+    end
 end
