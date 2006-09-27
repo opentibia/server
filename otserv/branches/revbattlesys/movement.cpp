@@ -239,14 +239,14 @@ long MoveEvents::onItemMove(Item* item, Tile* tile, bool isAdd)
 	long ret = 1;
 	MoveEvent* event = getEvent(item, eventType1);
 	if(event){
-		ret = ret & event->executeAddRemItem(item, NULL, tile->getPosition());
+		ret = ret & event->fireAddRemItem(item, NULL, tile->getPosition());
 	}
 	
 	long j = tile->__getLastIndex();
 	Item* tileItem = NULL;
 	for(long i = tile->__getFirstIndex(); i < j; ++i){
 		Thing* thing = tile->__getThing(i);
-		if(thing && (tileItem = thing->getItem())){
+		if(thing && (tileItem = thing->getItem()) && (tileItem != item)){
 			MoveEvent* event = getEvent(tileItem, eventType2);
 			if(event){
 				ret = ret & event->fireAddRemItem(item, tileItem, tile->getPosition());
@@ -374,19 +374,7 @@ long MoveEvent::StepInField(Creature* creature, Item* item, const Position& pos)
 	MagicField* field = item->getMagicField();
 
 	if(field){
-		//remove magic walls/wild growth
-		if(field->isBlocking()){
-			g_game.internalRemoveItem(field, 1);
-		}
-		else{
-			//add condition
-			const Condition* condition = field->getCondition();
-
-			if(condition){
-				creature->addCondition(condition->clone());
-			}
-		}
-
+		field->onStepInField(creature);
 		return 1;
 	}
 
@@ -400,13 +388,10 @@ long MoveEvent::StepOutField(Creature* creature, Item* item, const Position& pos
 
 long MoveEvent::AddItemField(Item* item, Item* tileItem, const Position& pos)
 {
-	if(const MagicField* field = tileItem->getMagicField()){
-		const Condition* condition = field->getCondition();
-		if(condition){
-			Tile* tile = tileItem->getTile();
-			for(CreatureVector::iterator cit = tile->creatures.begin(); cit != tile->creatures.end(); ++cit){
-				(*cit)->addCondition(condition->clone());
-			}
+	if(MagicField* field = item->getMagicField()){
+		Tile* tile = item->getTile();
+		for(CreatureVector::iterator cit = tile->creatures.begin(); cit != tile->creatures.end(); ++cit){
+			field->onStepInField(*cit);
 		}
 
 		return 1;

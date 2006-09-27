@@ -51,7 +51,7 @@ Item* Item::CreateItem(const unsigned short _type, unsigned short _count /*= 1*/
 		else if(it.isTeleport()){
 			newItem = new Teleport(_type);
 		}
-		else if(it.isMagicField() || it.id == 1487){
+		else if(it.isMagicField()){
 			newItem = new MagicField(_type);
 		}
 		else if(it.isDoor()){
@@ -602,12 +602,6 @@ Ammo_t Item::getAmuType() const{
 	return items[id].amuType;
 }
 
-/*
-subfight_t Item::getSubfightType() const{
-	return items[id].shootType;
-}
-*/
-
 int Item::getAttack() const{
 	return items[id].attack;
 }
@@ -854,6 +848,16 @@ unsigned short ItemAttributes::getUniqueId() const
 	return getIntAttr(ATTR_ITEM_UNIQUEID);
 }
 
+void ItemAttributes::setOwner(uint32_t _owner)
+{
+	setIntAttr(ATTR_ITEM_OWNER, _owner);
+}
+
+uint32_t ItemAttributes::getOwner()
+{
+	return getIntAttr(ATTR_ITEM_OWNER);
+}
+
 const std::string& ItemAttributes::getStrAttr(itemAttrTypes type) const
 {
 	if(!validateStrAttrType(type))
@@ -915,11 +919,11 @@ inline bool ItemAttributes::validateIntAttrType(itemAttrTypes type) const
 {
 	switch(type){
 	case ATTR_ITEM_ACTIONID:
-		return true;
-		break;
 	case ATTR_ITEM_UNIQUEID:
+	case ATTR_ITEM_OWNER:
 		return true;
 		break;
+
 	default:
 		return false;
 		break;

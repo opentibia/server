@@ -2521,21 +2521,7 @@ void Player::doAttacking()
 			}
 		}
 		
-		onAttackedCreature(attackedCreature);
-
-		/*
-		if(Weapons::weaponInFightTime != 0){
-			Condition* condition = Condition::createCondition(CONDITION_INFIGHT, Weapons::weaponInFightTime, 0);
-			if(!addCondition(condition)){
-				delete condition;
-			}
-
-			Condition* targetCondition = Condition::createCondition(CONDITION_INFIGHT, Weapons::weaponInFightTime, 0);
-			if(!attackedCreature->addCondition(targetCondition)){
-				delete targetCondition;
-			}
-		}
-		*/
+		//onAttackedCreature(attackedCreature);
 	}
 }
 
@@ -2716,8 +2702,8 @@ void Player::onAttackedCreature(Creature* target)
 {
 	Creature::onAttackedCreature(target);
 
-	if(target != this){
-		if(getAccessLevel() == 0){
+	if(getAccessLevel() == 0){
+		if(target != this){
 			if(Player* targetPlayer = target->getPlayer()){
 				pzLocked = true;
 
@@ -2737,19 +2723,36 @@ void Player::onAttackedCreature(Creature* target)
 				}
 #endif
 
+				/*
 				if(Weapons::weaponInFightTime != 0){
 					Condition* condition = Condition::createCondition(CONDITION_INFIGHT, Weapons::weaponInFightTime, 0);
 					if(!targetPlayer->addCondition(condition)){
 						delete condition;
 					}
 				}
+				*/
 			}
 
-			if(Weapons::weaponInFightTime != 0){
-				Condition* condition = Condition::createCondition(CONDITION_INFIGHT, Weapons::weaponInFightTime, 0);
-				if(!addCondition(condition)){
-					delete condition;
-				}
+		}
+
+		if(Weapons::weaponInFightTime != 0){
+			Condition* condition = Condition::createCondition(CONDITION_INFIGHT, Weapons::weaponInFightTime, 0);
+			if(!addCondition(condition)){
+				delete condition;
+			}
+		}
+	}
+}
+
+void Player::onAttacked()
+{
+	Creature::onAttacked();
+
+	if(getAccessLevel() == 0){
+		if(Weapons::weaponInFightTime != 0){
+			Condition* condition = Condition::createCondition(CONDITION_INFIGHT, Weapons::weaponInFightTime, 0);
+			if(!addCondition(condition)){
+				delete condition;
 			}
 		}
 	}

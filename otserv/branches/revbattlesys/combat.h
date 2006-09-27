@@ -291,6 +291,7 @@ public:
 
 	DamageType_t getDamageType() const;
 	const ConditionDamage* getCondition() const { return condition; }
+	void onStepInField(Creature* creature);
 
 protected:
 	void load();

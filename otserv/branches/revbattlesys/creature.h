@@ -224,6 +224,7 @@ public:
 	virtual void onEndCondition(ConditionType_t type);
 	virtual void onTickCondition(ConditionType_t type, bool& bRemove);
 	virtual void onAttackedCreature(Creature* target);
+	virtual void onAttacked();
 	virtual void onAttackedCreatureDrainHealth(Creature* target, int32_t points);
 	virtual void onAttackedCreatureKilled(Creature* target);
 	virtual void onKilledCreature(Creature* target);

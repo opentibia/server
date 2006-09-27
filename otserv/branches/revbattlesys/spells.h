@@ -46,6 +46,7 @@ public:
 
 	bool playerSaySpell(Player* player, SpeakClasses type, const std::string& words);
 
+	static bool loadFieldsFromXml(const std::string& datadir);
 	static int32_t spellExhaustionTime;
 	static int32_t spellInFightTime;
 	

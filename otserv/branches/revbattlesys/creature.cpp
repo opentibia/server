@@ -299,6 +299,7 @@ void Creature::drainHealth(Creature* attacker, DamageType_t damageType, int32_t 
 
 void Creature::drainMana(Creature* attacker, int32_t manaLoss)
 {
+	onAttacked();
 	changeMana(-manaLoss);
 }
 
@@ -307,7 +308,8 @@ void Creature::setAttackedCreature(Creature* creature)
 	attackedCreature = creature;
 
 	if(attackedCreature){
-		onAttackedCreature(creature);
+		onAttackedCreature(attackedCreature);
+		attackedCreature->onAttacked();
 	}
 
 	std::list<Creature*>::iterator cit;
@@ -355,9 +357,11 @@ BlockType_t Creature::blockHit(Creature* attacker, DamageType_t damageType, int3
 	}
 
 	if(attacker){
-		//attacker->onAttackedCreature(this);
+		attacker->onAttackedCreature(this);
 		attacker->onAttackedCreatureBlockHit(this, blockType);
 	}
+
+	onAttacked();
 
 	return blockType;
 }
@@ -433,6 +437,11 @@ void Creature::onAttackedCreature(Creature* target)
 	//
 }
 
+void Creature::onAttacked()
+{
+	//
+}
+
 void Creature::onAttackedCreatureDrainHealth(Creature* target, int32_t points)
 {
 	target->addDamagePoints(this, points);
@@ -463,7 +472,7 @@ void Creature::onGainExperience(int32_t gainExperience)
 
 void Creature::onAttackedCreatureBlockHit(Creature* target, BlockType_t blockType)
 {
-	onAttackedCreature(target);
+	//onAttackedCreature(target);
 }
 
 /*

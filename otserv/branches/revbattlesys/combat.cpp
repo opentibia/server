@@ -289,6 +289,10 @@ void Combat::combatTileEffects(Creature* caster, Tile* tile, const CombatParams&
 	if(params.itemId != 0){
 		Item* item = Item::CreateItem(params.itemId);
 
+		if(caster){
+			item->setOwner(caster->getID());
+		}
+
 		ReturnValue ret = g_game.internalAddItem(tile, item);
 		if(ret != RET_NOERROR){
 			delete item;
@@ -827,26 +831,23 @@ MagicField::~MagicField()
 DamageType_t MagicField::getDamageType() const
 {
 	return damageType;
+}
 
-	/*
-	if(condition){
-		switch(condition->getType()){
-			case CONDITION_FIRE:
-				return DAMAGE_FIRE;
-				break;
+void MagicField::onStepInField(Creature* creature)
+{
+	//remove magic walls/wild growth
+	if(isBlocking()){
+		g_game.internalRemoveItem(this, 1);
+	}
+	else{
+		if(condition){
+			Condition* conditionCopy = condition->clone();
+			uint32_t owner = getOwner();
+			if(owner != 0){
+				conditionCopy->setParam(CONDITIONPARAM_OWNER, owner);
+			}
 
-			case CONDITION_ENERGY:
-				return DAMAGE_ENERGY;
-				break;
-
-			case CONDITION_POISON:
-				return DAMAGE_POISON;
-				break;
-			default:
-				break;
+			creature->addCondition(conditionCopy);
 		}
 	}
-
-	return DAMAGE_NONE;
-	*/
 }

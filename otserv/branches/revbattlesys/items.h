@@ -177,6 +177,7 @@ public:
 	int loadFromOtb(std::string);
 	
 	const ItemType& operator[](int id);
+	ItemType& getItemType(int id);
 
 	int getItemIdByName(const std::string& name);
 	//int reverseLookUp(int id);

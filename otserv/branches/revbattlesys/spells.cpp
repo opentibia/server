@@ -164,7 +164,78 @@ InstantSpell* Spells::getInstantSpellByName(const std::string& name)
 {
 	return NULL;
 }
-//
+
+bool Spells::loadFieldsFromXml(const std::string& datadir)
+{
+	std::string filename = datadir + "/" + "fields.xml";
+	xmlDocPtr doc = xmlParseFile(filename.c_str());
+	int intValue;
+	std::string strValue;
+	uint32_t id = 0;
+
+	if(doc){
+		xmlNodePtr root, p;
+		root = xmlDocGetRootElement(doc);
+		
+		if(xmlStrcmp(root->name,(const xmlChar*)"fields") != 0){
+			xmlFreeDoc(doc);
+			return false;
+		}
+
+		p = root->children;
+		while(p){
+			if(xmlStrcmp(p->name, (const xmlChar*)"field") == 0){
+				if(readXMLInteger(p, "id", intValue)){
+					id = intValue;
+
+					ItemType& it = Item::items.getItemType(id);
+
+					if(readXMLString(p, "type", strValue)){
+						if(strcasecmp(strValue.c_str(), "fire") == 0){				
+							it.group = ITEM_GROUP_MAGICFIELD;
+							it.damageType = DAMAGE_FIRE;
+						}
+						else if(strcasecmp(strValue.c_str(), "energy") == 0){
+							it.group = ITEM_GROUP_MAGICFIELD;
+							it.damageType = DAMAGE_ENERGY;
+						}
+						else if(strcasecmp(strValue.c_str(), "poison") == 0){
+							it.group = ITEM_GROUP_MAGICFIELD;
+							it.damageType = DAMAGE_POISON;
+						}
+					}
+
+					if(readXMLInteger(p, "initDamage", intValue)){
+						it.initialDamage = -intValue;
+					}
+
+					if(readXMLInteger(p, "roundMin", intValue)){
+						it.roundMin = intValue;
+					}
+
+					if(readXMLInteger(p, "roundTime", intValue)){
+						it.roundTime = intValue;
+					}
+
+					if(readXMLInteger(p, "roundDamage", intValue)){
+						it.roundDamage = -intValue;
+					}
+
+				}
+				else{
+					std::cout << "Warning: [Spells::loadFieldsFromXml] Can not configure field - no item id found" << std::endl;
+					return false;
+				}
+			}
+			
+			p = p->next;
+		}
+
+		xmlFreeDoc(doc);
+	}
+
+	return true;
+}
 
 Spell::Spell()
 {

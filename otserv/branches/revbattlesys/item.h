@@ -110,7 +110,10 @@ public:
 
 	void setUniqueId(unsigned short n);
 	unsigned short getUniqueId() const;
-	
+
+	void setOwner(uint32_t _owner);
+	uint32_t getOwner();
+
 private:
 	static std::string emptyString;
 	
@@ -207,7 +210,6 @@ public:
 
 	WeaponType_t getWeaponType() const;
 	Ammo_t	getAmuType() const;
-	//subfight_t getSubfightType() const;
 
 	virtual double getWeight() const;
 	int getAttack() const;

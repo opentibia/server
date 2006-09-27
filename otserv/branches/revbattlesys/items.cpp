@@ -617,6 +617,11 @@ int Items::loadFromOtb(std::string file)
 
 const ItemType& Items::operator[](int id)
 {
+	return getItemType(id);
+}
+
+ItemType& Items::getItemType(int id)
+{
 	ItemMap::iterator it = items.find(id);
 	if ((it != items.end()) && (it->second != NULL))
 		return *it->second;
