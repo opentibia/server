@@ -369,6 +369,9 @@ long AdminProtocol::parsePacket(NetworkMessage &msg, NetworkMessage &outputBuffe
 		{
 			AdminLog::addLine(m_connection, "Start server shutdown");
 			g_game.setGameState(GAME_STATE_SHUTDOWN);
+			outputBuffer.AddByte(AP_MSG_COMMAND_OK);
+			outputBuffer.WriteToSocket(m_socket);
+			return END_LOOP;
 			break;
 		}
 		default:
