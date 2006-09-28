@@ -6,6 +6,11 @@
 <action itemid="2120" script="rope.lua" />
 <action itemid="2554" script="shovel.lua" />
 <action itemid="5710" script="shovel.lua" />
+<action itemid="2420" script="machete.lua" />
+<action itemid="2442" script="machete.lua" />
+<action itemid="2553" script="pick.lua" />
+<action itemid="2553" script="scythe.lua" />
 <action itemid="2580" script="fishing_rod.lua" allowfaruse="1" />
+<!-- waiting revbattlesys to be finished to code newer tools of protocol 7.8x -->
 
 </actions>

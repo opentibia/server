@@ -1,6 +1,6 @@
 function onUse(cid, item, frompos, item2, topos)
 	if isInArray(CLOSED_HOLE, item2.itemid) == 1 then
-		doTransformItem(item2.uid, item2.itemid+1)
+		doTransformItem(item2.uid, item2.itemid + 1)
 	elseif item2.itemid == 231 then
 		if item2.actionid == 100 then
 			chance = math.random(1, 50)
@@ -29,8 +29,6 @@ function onUse(cid, item, frompos, item2, topos)
 			if chance <= 5 then
 				doSetItemActionId(item2.uid, 102)
 			end
-		else
-			doSendMagicEffect(topos, 2)
 		end
 		doSendMagicEffect(topos, 2)
 	else
