@@ -529,9 +529,9 @@ bool AdminProtocolConfig::loadXMLConfig(const std::string& directory)
 			}
 			q = p->children;
 			while(q){
-				if(xmlStrcmp(q->name, (const xmlChar*)"key") == 0){
+				if(xmlStrEqual(q->name, (const xmlChar*)"key")){
 					std::string str;
-					if(readXMLString(p, "type", str)){
+					if(readXMLString(q, "type", str)){
 						if(str == "RSA1024XTEA"){
 							if(readXMLString(p, "file", str)){
 								m_key_RSA1024XTEA = new RSA();
@@ -542,7 +542,7 @@ bool AdminProtocolConfig::loadXMLConfig(const std::string& directory)
 								}
 							}
 							else{
-								std::cout << "Missing file for RSA1024XTEA file." << std::endl;
+								std::cout << "Missing file for RSA1024XTEA key." << std::endl;
 							}
 						}
 						else{

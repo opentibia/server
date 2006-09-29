@@ -2,6 +2,6 @@
 <otadmin enabled="1">
 <security onlylocalhost="1" maxconnections="2" loginrequired="1" loginpassword="test" />
 <encryption required="0" >
-<key type="RSA1024XTEA" file="rsakey.private" />
+<!-- key type="RSA1024XTEA" file="rsakey.private" -->
 </encryption>
 </otadmin>
