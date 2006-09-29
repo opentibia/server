@@ -135,11 +135,12 @@ public:
 	AdminProtocolConfig();
 	~AdminProtocolConfig();
 	
-	bool loadXMLConfig(std::string& directory);
+	bool loadXMLConfig(const std::string& directory);
 	
 	bool onlyLocalHost();
 	bool addConnection();
 	void removeConnection();
+	bool isEnabled();
 	
 	bool requireLogin();
 	bool requireEncryption();
@@ -154,7 +155,10 @@ public:
 	RSA* getRSAKey(uint8_t type);
 	
 protected:
+	bool m_enabled;
 	bool m_onlyLocalHost;
+	bool m_requireLogin;
+	bool m_requireEncryption;
 	long m_maxConnections;
 	long m_currrentConnections;
 	

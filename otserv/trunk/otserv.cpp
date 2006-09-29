@@ -99,6 +99,8 @@ Ban g_bans;
 
 RSA* g_otservRSA = NULL;
 
+extern AdminProtocolConfig* adminConfig;
+
 #if defined __EXCEPTION_TRACER__
 #include "exception.h"
 #endif
@@ -650,6 +652,19 @@ int main(int argc, char *argv[])
 	std::cout << ":: Loading " << filename.str() << "... ";
 	Outfits* outfits = Outfits::getInstance();
 	if(!outfits->loadFromXml(g_config.getString(ConfigManager::DATA_DIRECTORY))){
+		std::stringstream errormsg;
+		errormsg << "Unable to load " << filename.str() << "!";
+		ErrorMessage(errormsg.str().c_str());
+		return -1;
+	}
+	std::cout << "[done]" << std::endl;
+
+	//load admin protocol configuration
+	filename.str("");
+	filename << g_config.getString(ConfigManager::DATA_DIRECTORY) << "admin.xml";
+	adminConfig = new AdminProtocolConfig();
+	std::cout << ":: Loading admin protocol config... ";
+	if(!adminConfig->loadXMLConfig(g_config.getString(ConfigManager::DATA_DIRECTORY))){
 		std::stringstream errormsg;
 		errormsg << "Unable to load " << filename.str() << "!";
 		ErrorMessage(errormsg.str().c_str());

@@ -102,6 +102,11 @@ enum{
 
 void AdminProtocol::receiveLoop()
 {
+	//is the remote admin protocol enabled?
+	if(!adminConfig->isEnabled()){
+		return;
+	}
+	
 	m_state = NO_CONNECTED;
 	//is allowed this ip?
 	if(!adminConfig->allowIP(getIPSocket(m_socket))){
@@ -329,6 +334,11 @@ long AdminProtocol::parsePacket(NetworkMessage &msg, NetworkMessage &outputBuffe
 	}
 	case AP_MSG_COMMAND:
 	{
+		if(m_state != LOGGED_IN){
+			AdminLog::addLine(m_connection, "recvbyte == AP_MSG_COMMAND && m_state != LOGGED_IN !!!");
+			//never should reach this point!!
+			break;
+		}
 		uint8_t command = msg.GetByte();
 		switch(command){
 		case CMD_BROADCAST:
@@ -433,22 +443,126 @@ bool AdminProtocol::adminCommandPayHouses()
 
 AdminProtocolConfig::AdminProtocolConfig()
 {
+	m_enabled = true;
 	m_onlyLocalHost = true;
 	m_maxConnections = 1;
 	m_currrentConnections = 0;
-	m_password = "test";
+	m_password = "";
 	m_key_RSA1024XTEA = NULL;
+	m_requireLogin = true;
+	m_requireEncryption = false;
 }
 
 AdminProtocolConfig::~AdminProtocolConfig()
 {
-	//
+	delete m_key_RSA1024XTEA;
 }
 
-bool AdminProtocolConfig::loadXMLConfig(std::string& directory)
+bool AdminProtocolConfig::loadXMLConfig(const std::string& directory)
+{	
+	std::string filename = directory + "admin.xml";
+	
+	xmlDocPtr doc = xmlParseFile(filename.c_str());
+	if(!doc){
+		return false;
+	}
+
+	xmlNodePtr root, p, q;
+	root = xmlDocGetRootElement(doc);
+	
+	if(!xmlStrEqual(root->name,(const xmlChar*)"otadmin")){
+		xmlFreeDoc(doc);
+		return false;
+	}
+		
+	int enabled;
+	if(readXMLInteger(root, "enabled", enabled)){
+		if(enabled){
+			m_enabled = true;
+		}
+		else{
+			m_enabled = false;
+		}
+	}
+		
+	int value;
+	p = root->children;
+	while(p){
+		if(xmlStrEqual(p->name, (const xmlChar*)"security")){
+			if(readXMLInteger(p, "onlylocalhost", value)){
+				if(value){
+					m_onlyLocalHost = true;
+				}
+				else{
+					m_onlyLocalHost = false;
+				}
+			}
+			if(readXMLInteger(p, "maxconnections", value) && value > 0){
+				m_maxConnections = value;
+			}
+			if(readXMLInteger(p, "loginrequired", value)){
+				if(value){
+					m_requireLogin = true;
+				}
+				else{
+					m_requireLogin = false;
+				}
+			}
+			std::string password;
+			if(readXMLString(p, "loginpassword", password)){
+				m_password = password;
+			}
+			else{
+				if(m_requireLogin){
+					std::cout << "Security warning: require login but use default password." << std::endl;
+				}
+			}
+		}
+		else if(xmlStrEqual(p->name, (const xmlChar*)"encryption")){
+			if(readXMLInteger(p, "required", value)){
+				if(value){
+					m_requireEncryption = true;
+				}
+				else{
+					m_requireEncryption = false;
+				}
+			}
+			q = p->children;
+			while(q){
+				if(xmlStrcmp(q->name, (const xmlChar*)"key") == 0){
+					std::string str;
+					if(readXMLString(p, "type", str)){
+						if(str == "RSA1024XTEA"){
+							if(readXMLString(p, "file", str)){
+								m_key_RSA1024XTEA = new RSA();
+								if(!m_key_RSA1024XTEA->setKey(directory + str)){
+									delete m_key_RSA1024XTEA;
+									m_key_RSA1024XTEA = NULL;
+									std::cout << "Can not load key from " << directory << str << std::endl;
+								}
+							}
+							else{
+								std::cout << "Missing file for RSA1024XTEA file." << std::endl;
+							}
+						}
+						else{
+							std::cout << str << " is not a valid key type." << std::endl;
+						}
+					}
+				}
+				q = q->next;
+			}
+		}
+		p = p->next;
+	}
+	xmlFreeDoc(doc);
+
+	return true;
+}
+
+bool AdminProtocolConfig::isEnabled()
 {
-	//TODO: load config from admin.xml
-	return false;
+	return m_enabled;
 }
 
 bool AdminProtocolConfig::onlyLocalHost()
@@ -494,7 +608,7 @@ bool AdminProtocolConfig::allowIP(uint32_t ip)
 		return false;
 	}
 	if(m_onlyLocalHost){
-		if(ip == 0x0100007F){
+		if(ip == 0x0100007F){ //127.0.0.1
 			return true;
 		}
 		else{
@@ -509,12 +623,12 @@ bool AdminProtocolConfig::allowIP(uint32_t ip)
 
 bool AdminProtocolConfig::requireLogin()
 {
-	return true;
+	return m_requireLogin;
 }
 
 bool AdminProtocolConfig::requireEncryption()
 {
-	return false;
+	return m_requireEncryption;
 }
 
 uint16_t AdminProtocolConfig::getProtocolPolicy()
@@ -530,12 +644,13 @@ uint16_t AdminProtocolConfig::getProtocolPolicy()
 
 uint32_t AdminProtocolConfig::getProtocolOptions()
 {
+	uint32_t ret = 0;
 	if(requireEncryption()){
-		return ENCRYPTION_RSA1024XTEA;
+		if(m_key_RSA1024XTEA){
+			ret = ret | ENCRYPTION_RSA1024XTEA;
+		}
 	}
-	else{
-		return 0;
-	}
+	return ret;
 }
 
 RSA* AdminProtocolConfig::getRSAKey(uint8_t type)
