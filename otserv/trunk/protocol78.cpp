@@ -869,8 +869,8 @@ void Protocol78::parseRequestOutfit(NetworkMessage& msg)
 	const OutfitListType& player_outfits = player->getPlayerOutfits();
 	long count_outfits = player_outfits.size();
 	
-	if(count_outfits > 16){
-		msg.AddByte(16);
+	if(count_outfits > 15){
+		msg.AddByte(15);
 	}
 	else{
 		msg.AddByte(count_outfits);
@@ -878,7 +878,7 @@ void Protocol78::parseRequestOutfit(NetworkMessage& msg)
 	
 	long counter = 0;
 	OutfitListType::const_iterator it;
-	for(it = player_outfits.begin(); it != player_outfits.end() && (counter <= 16); ++it, ++counter){
+	for(it = player_outfits.begin(); it != player_outfits.end() && (counter < 16); ++it, ++counter){
 		msg.AddU16((*it)->looktype);
 		msg.AddByte((*it)->addons);
 	}
