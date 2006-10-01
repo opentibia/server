@@ -158,7 +158,7 @@ bool NetworkMessage::WriteToSocket(SOCKET socket)
 	}
 	
   	do{
-    	int b = send(socket, (char*)m_MsgBuf+sendBytes+start, std::min(m_MsgSize-sendBytes+2, 1000), flags);
+		int b = send(socket, (char*)m_MsgBuf+sendBytes+start, std::min(m_MsgSize-sendBytes+2, 1000), flags);
 		if(b <= 0){
 #if defined WIN32 || defined __WINDOWS__
 			int errnum = ::WSAGetLastError();
@@ -314,7 +314,7 @@ void NetworkMessage::AddBytes(const char* bytes, uint32_t size)
 	if(!canAdd(size) || size > 8192)
 		return;
 	
-	strcpy((char*)(m_MsgBuf + m_ReadPos), bytes);
+	memcpy(m_MsgBuf + m_ReadPos, bytes, size);
 	m_ReadPos += size;
 	m_MsgSize += size;
 }
