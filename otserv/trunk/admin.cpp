@@ -29,6 +29,8 @@
 #include "tools.h"
 #include "rsa.h"
 
+static void addLogLine(AdminConnection* conn, eLogType type, int level, std::string message);
+
 extern Game g_game;
 extern ConfigManager g_config;
 extern Ban g_bans;
@@ -40,9 +42,9 @@ AdminConnection::AdminConnection(SOCKET s)
 	if(!adminConfig){
 		adminConfig = new AdminProtocolConfig();
 	}
-	long ip = getIPSocket(s);
+	uint32_t ip = getIPSocket(s);
 	char string_ip[32];
-	sprintf(string_ip, "%d.%d.%d.%d", ip & 0xFF, (ip >> 8) & 0xFF, (ip >> 16) & 0xFF, (ip >> 24)) ;
+	formatIP(ip, string_ip);
 	m_ip = string_ip;
 	m_startTime = time(NULL);
 	m_lastCommand = 0;
@@ -109,16 +111,18 @@ void AdminProtocol::receiveLoop()
 	
 	m_state = NO_CONNECTED;
 	//is allowed this ip?
-	if(!adminConfig->allowIP(getIPSocket(m_socket))){
+	if(!adminConfig->allowIP(m_socket)){
+		addLogLine(m_connection, LOGTYPE_EVENT, 1, "ip not allowed");
 		return;
 	}
 	
 	//max connections limit
 	if(!adminConfig->addConnection()){
+		addLogLine(m_connection, LOGTYPE_EVENT, 1, "can not add new connection");
 		return;
 	}
 	
-	AdminLog::addLine(m_connection, "Start message loop.");
+	addLogLine(m_connection, LOGTYPE_EVENT, 1, "start message loop");
 	//read loop
 	NetworkMessage msg;
 	
@@ -144,7 +148,7 @@ void AdminProtocol::receiveLoop()
 			break;
 		}
 	}
-	AdminLog::addLine(m_connection, "End message loop.");
+	addLogLine(m_connection, LOGTYPE_EVENT, 1, "end message loop");
 	
 	adminConfig->removeConnection();
 	
@@ -169,7 +173,7 @@ long AdminProtocol::parsePacket(NetworkMessage &msg, NetworkMessage &outputBuffe
 	{
 		if(adminConfig->requireEncryption()){
 			if((time(NULL) - m_connection->getStartTime()) > 30000){
-				AdminLog::addLine(m_connection, "Encryption timeout.");
+				addLogLine(m_connection, LOGTYPE_WARNING, 1, "encryption timeout");
 				return END_LOOP;
 			}
 		
@@ -177,7 +181,7 @@ long AdminProtocol::parsePacket(NetworkMessage &msg, NetworkMessage &outputBuffe
 				outputBuffer.AddByte(AP_MSG_ERROR);
 				outputBuffer.AddString("encryption needed");
 				outputBuffer.WriteToSocket(m_socket);
-				//AdminLog::addLine(m_connection, "Command being not logged in.");
+				addLogLine(m_connection, LOGTYPE_WARNING, 1, "wrong command while ENCRYPTION_NO_SET");
 				return CONTINUE_LOOP;
 			}
 			break;
@@ -191,7 +195,7 @@ long AdminProtocol::parsePacket(NetworkMessage &msg, NetworkMessage &outputBuffe
 		if(adminConfig->requireLogin()){
 			if((time(NULL) - m_connection->getStartTime()) > 30000){
 				//login timeout
-				AdminLog::addLine(m_connection, "Login timeout.");
+				addLogLine(m_connection, LOGTYPE_WARNING, 1, "login timeout");
 				return END_LOOP;
 			}
 
@@ -199,7 +203,7 @@ long AdminProtocol::parsePacket(NetworkMessage &msg, NetworkMessage &outputBuffe
 				outputBuffer.AddByte(AP_MSG_ERROR);
 				outputBuffer.AddString("too many login tries");
 				outputBuffer.WriteToSocket(m_socket);
-				AdminLog::addLine(m_connection, "Too many loggin tries.");
+				addLogLine(m_connection, LOGTYPE_WARNING, 1, "too many login tries");
 				return END_LOOP;
 			}
 
@@ -207,7 +211,7 @@ long AdminProtocol::parsePacket(NetworkMessage &msg, NetworkMessage &outputBuffe
 				outputBuffer.AddByte(AP_MSG_ERROR);
 				outputBuffer.AddString("you are not logged in");
 				outputBuffer.WriteToSocket(m_socket);
-				AdminLog::addLine(m_connection, "Command while not logged in.");
+				addLogLine(m_connection, LOGTYPE_WARNING, 1, "wrong command while NO_LOGGED_IN");
 				return CONTINUE_LOOP;
 			}
 			break;
@@ -222,7 +226,7 @@ long AdminProtocol::parsePacket(NetworkMessage &msg, NetworkMessage &outputBuffe
 		break;
 	}
 	default:
-		AdminLog::addLine(m_connection, "No valid connection state!!!.");
+		addLogLine(m_connection, LOGTYPE_ERROR, 1, "no valid connection state!!!");
 		return END_LOOP;
 	}
 	
@@ -235,19 +239,19 @@ long AdminProtocol::parsePacket(NetworkMessage &msg, NetworkMessage &outputBuffe
 			if(adminConfig->passwordMatch(password)){
 				m_state = LOGGED_IN;
 				outputBuffer.AddByte(AP_MSG_LOGIN_OK);
-				AdminLog::addLine(m_connection, "Login OK.");
+				addLogLine(m_connection, LOGTYPE_EVENT, 1, "login ok");
 			}
 			else{
 				m_loginTries++;
 				outputBuffer.AddByte(AP_MSG_LOGIN_FAILED);
 				outputBuffer.AddString("wrong password");
-				AdminLog::addLine(m_connection, "Login Failed.(" + password + ")");
+				addLogLine(m_connection, LOGTYPE_WARNING, 1, "login failed.("+ password + ")");
 			}
 		}
 		else{
 			outputBuffer.AddByte(AP_MSG_LOGIN_FAILED);
 			outputBuffer.AddString("can not login");
-			AdminLog::addLine(m_connection, "Wrong state at login.");
+			addLogLine(m_connection, LOGTYPE_WARNING, 1, "wrong state at login");
 		}
 		break;
 	}
@@ -261,12 +265,13 @@ long AdminProtocol::parsePacket(NetworkMessage &msg, NetworkMessage &outputBuffe
 				RSA* rsa = adminConfig->getRSAKey(ENCRYPTION_RSA1024XTEA);
 				if(!rsa){
 					outputBuffer.AddByte(AP_MSG_ENCRYPTION_FAILED);
-					outputBuffer.AddString("no valid key type");
+					addLogLine(m_connection, LOGTYPE_WARNING, 1, "no valid server key type");
 					break;
 				}
 				
 				msg.setRSAInstance(rsa);
 				if(msg.RSA_decrypt()){
+					m_state = NO_LOGGED_IN;
 					uint32_t k[4];
 					k[0] = msg.GetU32();
 					k[1] = msg.GetU32();
@@ -274,28 +279,33 @@ long AdminProtocol::parsePacket(NetworkMessage &msg, NetworkMessage &outputBuffe
 					k[3] = msg.GetU32();
 					
 					msg.Reset();
+					//use for in/out the new key we have
 					msg.setEncryptionState(true);
 					msg.setEncryptionKey(k);
 					outputBuffer.setEncryptionState(true);
 					outputBuffer.setEncryptionKey(k);
 					
 					outputBuffer.AddByte(AP_MSG_ENCRYPTION_OK);
+					addLogLine(m_connection, LOGTYPE_EVENT, 1, "encryption ok");
 				}
 				else{
 					outputBuffer.AddByte(AP_MSG_ENCRYPTION_FAILED);
 					outputBuffer.AddString("wrong encrypted packet");
+					addLogLine(m_connection, LOGTYPE_WARNING, 1, "wrong encrypted packet");
 				}
 				break;
 			}
 			default:
 				outputBuffer.AddByte(AP_MSG_ENCRYPTION_FAILED);
 				outputBuffer.AddString("no valid key type");
+				addLogLine(m_connection, LOGTYPE_WARNING, 1, "no valid client key type");
 				break;
 			}
 		}
 		else{
 			outputBuffer.AddByte(AP_MSG_ENCRYPTION_FAILED);
 			outputBuffer.AddString("can not set encryption");
+			addLogLine(m_connection, LOGTYPE_EVENT, 1, "can not set encryption");
 		}
 		break;
 	}
@@ -309,7 +319,7 @@ long AdminProtocol::parsePacket(NetworkMessage &msg, NetworkMessage &outputBuffe
 				RSA* rsa = adminConfig->getRSAKey(ENCRYPTION_RSA1024XTEA);
 				if(!rsa){
 					outputBuffer.AddByte(AP_MSG_KEY_EXCHANGE);
-					outputBuffer.AddString("no valid key type");
+					addLogLine(m_connection, LOGTYPE_WARNING, 1, "no valid server key type");
 					break;
 				}
 				
@@ -317,18 +327,19 @@ long AdminProtocol::parsePacket(NetworkMessage &msg, NetworkMessage &outputBuffe
 				outputBuffer.AddByte(ENCRYPTION_RSA1024XTEA);
 				char RSAPublicKey[128];
 				rsa->getPublicKey(RSAPublicKey);
-				msg.AddBytes(RSAPublicKey, 128);
+				outputBuffer.AddBytes(RSAPublicKey, 128);
 				break;
 			}
 			default:
 				outputBuffer.AddByte(AP_MSG_KEY_EXCHANGE_FAILED);
-				outputBuffer.AddString("no valid key type");
+				addLogLine(m_connection, LOGTYPE_WARNING, 1, "no valid client key type");
 				break;
 			}
 		}
 		else{
 			outputBuffer.AddByte(AP_MSG_KEY_EXCHANGE_FAILED);
 			outputBuffer.AddString("can not get public key");
+			addLogLine(m_connection, LOGTYPE_WARNING, 1, "can not get public key");
 		}
 		break;
 	}
@@ -344,7 +355,7 @@ long AdminProtocol::parsePacket(NetworkMessage &msg, NetworkMessage &outputBuffe
 		case CMD_BROADCAST:
 		{
 			std::string message = msg.GetString();
-			AdminLog::addLine(m_connection, "Broadcast: " + message);
+			addLogLine(m_connection, LOGTYPE_EVENT, 1, "broadcast: " + message);
 			g_game.anonymousBroadcastMessage(message);
 			outputBuffer.AddByte(AP_MSG_COMMAND_OK);
 			break;
@@ -352,11 +363,11 @@ long AdminProtocol::parsePacket(NetworkMessage &msg, NetworkMessage &outputBuffe
 		case CMD_CLOSE_SERVER:
 		{
 			if(adminCommandCloseServer()){
-				AdminLog::addLine(m_connection, "Closeserver OK");
+				addLogLine(m_connection, LOGTYPE_EVENT, 1, "close server ok");
 				outputBuffer.AddByte(AP_MSG_COMMAND_OK);
 			}
 			else{
-				AdminLog::addLine(m_connection, "Closeserver FAIL");
+				addLogLine(m_connection, LOGTYPE_WARNING, 1, "close server fail");
 				outputBuffer.AddByte(AP_MSG_COMMAND_FAILED);
 				outputBuffer.AddString(" ");
 			}
@@ -365,11 +376,11 @@ long AdminProtocol::parsePacket(NetworkMessage &msg, NetworkMessage &outputBuffe
 		case CMD_PAY_HOUSES:
 		{
 			if(adminCommandPayHouses()){
-				AdminLog::addLine(m_connection, "Pay houses OK");
+				addLogLine(m_connection, LOGTYPE_EVENT, 1, "pay houses ok");
 				outputBuffer.AddByte(AP_MSG_COMMAND_OK);
 			}
 			else{
-				AdminLog::addLine(m_connection, "Pay houses FAIL");
+				addLogLine(m_connection, LOGTYPE_WARNING, 1, "pay houses fail");
 				outputBuffer.AddByte(AP_MSG_COMMAND_FAILED);
 				outputBuffer.AddString(" ");
 			}
@@ -377,7 +388,7 @@ long AdminProtocol::parsePacket(NetworkMessage &msg, NetworkMessage &outputBuffe
 		}
 		case CMD_SHUTDOWN_SERVER:
 		{
-			AdminLog::addLine(m_connection, "Start server shutdown");
+			addLogLine(m_connection, LOGTYPE_EVENT, 1, "start server shutdown");
 			g_game.setGameState(GAME_STATE_SHUTDOWN);
 			outputBuffer.AddByte(AP_MSG_COMMAND_OK);
 			outputBuffer.WriteToSocket(m_socket);
@@ -388,7 +399,7 @@ long AdminProtocol::parsePacket(NetworkMessage &msg, NetworkMessage &outputBuffe
 		{
 			outputBuffer.AddByte(AP_MSG_COMMAND_FAILED);
 			outputBuffer.AddString("not known server command");
-			AdminLog::addLine(m_connection, "Not known server command.");
+			addLogLine(m_connection, LOGTYPE_WARNING, 1, "not known server command");
 		}
 		};
 		break;
@@ -399,7 +410,7 @@ long AdminProtocol::parsePacket(NetworkMessage &msg, NetworkMessage &outputBuffe
 	default:
 		outputBuffer.AddByte(AP_MSG_ERROR);
 		outputBuffer.AddString("not known command byte");
-		AdminLog::addLine(m_connection, "Not known command byte.");
+		addLogLine(m_connection, LOGTYPE_WARNING, 1, "not known command byte");
 		break;
 	};
 	
@@ -533,7 +544,7 @@ bool AdminProtocolConfig::loadXMLConfig(const std::string& directory)
 					std::string str;
 					if(readXMLString(q, "type", str)){
 						if(str == "RSA1024XTEA"){
-							if(readXMLString(p, "file", str)){
+							if(readXMLString(q, "file", str)){
 								m_key_RSA1024XTEA = new RSA();
 								if(!m_key_RSA1024XTEA->setKey(directory + str)){
 									delete m_key_RSA1024XTEA;
@@ -602,8 +613,9 @@ bool AdminProtocolConfig::passwordMatch(std::string& password)
 	}
 }
 
-bool AdminProtocolConfig::allowIP(uint32_t ip)
+bool AdminProtocolConfig::allowIP(SOCKET s)
 {
+	uint32_t ip = getIPSocket(s);
 	if(ip == 0){
 		return false;
 	}
@@ -612,12 +624,19 @@ bool AdminProtocolConfig::allowIP(uint32_t ip)
 			return true;
 		}
 		else{
+			char str_ip[32];
+			formatIP(ip, str_ip);
+			addLogLine(m_connection, LOGTYPE_WARNING, 1, "forbidden connection try from " + str_ip);
 			return false;
 		}
 	}
 	else{
-		//check for banned ips?
-		return false;
+		if(!g_bans.isIpDisabled(s)){
+			return true;
+		}
+		else{
+			return false;
+		}
 	}
 }
 
@@ -640,6 +659,7 @@ uint16_t AdminProtocolConfig::getProtocolPolicy()
 	if(requireEncryption()){
 		policy = policy | REQUIRE_ENCRYPTION;
 	}
+	return policy;
 }
 
 uint32_t AdminProtocolConfig::getProtocolOptions()
@@ -665,38 +685,10 @@ RSA* AdminProtocolConfig::getRSAKey(uint8_t type)
 }
 
 /////////////////////////////////////////////
-AdminLog* AdminLog::instance = NULL;
 
-AdminLog::AdminLog()
+static void addLogLine(AdminConnection* conn, eLogType type, int level, std::string message)
 {
-	file = fopen("adminlog.txt", "a");
-}
-
-AdminLog::~AdminLog()
-{
-	if(file){
-		fclose(file);
-	}
-}
-
-void AdminLog::addLine(AdminConnection* conn, std::string line)
-{
-	if(!instance){
-		instance = new AdminLog();
-	}
-	if(!instance->file){
-		std::cout << "Error: [AdminLog::addLine]. Can not open log file" << std::endl;
-		return;
-	}
-	
-	time_t tmp = time(NULL);
-	const tm* tms = localtime(&tmp);
-	if(tms){
-		fprintf(instance->file, "%02d/%02d/%04d  %02d:%02d:%02d", tms->tm_mday, tms->tm_mon + 1, tms->tm_year + 1900,
-			tms->tm_hour, tms->tm_min, tms->tm_sec);
-	}
-	fprintf(instance->file, " [%s] - %s\n", conn->getIPString().c_str(), line.c_str());
-	
-	fflush(instance->file); 
+	std::string logMsg = "[" + conn->getIPString() + "] - " + message;
+	LOG_MESSAGE("OTADMIN", type, level, logMsg);
 }
 

@@ -78,6 +78,7 @@
 
 #include "otsystem.h"
 #include "player.h"
+#include "logger.h"
 #include <string>
 
 class NetworkMessage;
@@ -135,12 +136,11 @@ public:
 	AdminProtocolConfig();
 	~AdminProtocolConfig();
 	
-	bool loadXMLConfig(const std::string& directory);
+	bool loadXMLConfig(std::string& directory);
 	
 	bool onlyLocalHost();
 	bool addConnection();
 	void removeConnection();
-	bool isEnabled();
 	
 	bool requireLogin();
 	bool requireEncryption();
@@ -148,17 +148,14 @@ public:
 	uint16_t getProtocolPolicy();
 	uint32_t getProtocolOptions();
 	
-	bool allowIP(uint32_t ip);
+	bool allowIP(SOCKET s);
 	
 	bool passwordMatch(std::string& password);
 	
 	RSA* getRSAKey(uint8_t type);
 	
 protected:
-	bool m_enabled;
 	bool m_onlyLocalHost;
-	bool m_requireLogin;
-	bool m_requireEncryption;
 	long m_maxConnections;
 	long m_currrentConnections;
 	
@@ -184,19 +181,6 @@ protected:
 	std::string m_ip;
 	long m_startTime;
 	long m_lastCommand;
-};
-
-class AdminLog{
-public:
-	AdminLog();
-	~AdminLog();
-	
-	static void addLine(AdminConnection* conn, std::string line);
-	
-protected:
-	FILE* file;
-	
-	static AdminLog* instance;
 };
 
 class AdminProtocol{

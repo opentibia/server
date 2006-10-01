@@ -221,3 +221,9 @@ uint32_t getIPSocket(SOCKET s)
 
 	return 0;
 }
+
+//buffer should have at least 17 bytes
+void formatIP(uint32_t ip, char* buffer)
+{
+	sprintf(buffer, "%d.%d.%d.%d", ip & 0xFF, (ip >> 8) & 0xFF, (ip >> 16) & 0xFF, (ip >> 24));
+}
