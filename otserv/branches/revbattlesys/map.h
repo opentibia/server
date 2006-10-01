@@ -222,7 +222,7 @@ public:
 	*/
 	bool canThrowObjectTo(const Position& fromPos, const Position& toPos);
 
-	bool isPathValid(Creature* creature, const std::list<Position>& path, int pathSize = -1);
+	//bool isPathValid(Creature* creature, const std::list<Position>& path, int pathSize = -1);
 
 	/**
 	* Get the path to a specific position on the map.
@@ -231,9 +231,10 @@ public:
 	* \param to The destination position
 	* \returns A list of all positions you have to traverse to reach the destination
 	*/
-	std::list<Position> getPathTo(Creature* creature, Position start, Position to, unsigned long maxNodeSize = 100);
+	//std::list<Position> getPathTo(const Creature* creature, Position start, Position to, unsigned long maxNodeSize = 100);
 
-	bool getPathTo(Creature* creature, Position toPosition, std::list<Direction>& listDir);
+	bool getPathTo(const Creature* creature, Position toPosition, std::list<Direction>& listDir);
+	bool isPathValid(const Creature* creature, const std::list<Direction>& listDir, const Position& destPos);
 
 	/* Map Width and Height - for Info purposes */
 	int mapwidth, mapheight;

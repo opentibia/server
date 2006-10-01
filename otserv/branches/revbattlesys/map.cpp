@@ -445,7 +445,8 @@ bool Map::canThrowObjectTo(const Position& fromPos, const Position& toPos)
 	return true;
 }
 
-bool Map::isPathValid(Creature* creature, const std::list<Position>& path, int pathSize /* = -1*/)
+/*
+bool Map::isPathValid(Creature* creature, const std::list<Position>& path, int pathSize // = -1)
 {
 	if(pathSize == -1)
 		pathSize = path.size();
@@ -472,8 +473,10 @@ bool Map::isPathValid(Creature* creature, const std::list<Position>& path, int p
 
 	return true;
 }
+*/
 
-std::list<Position> Map::getPathTo(Creature* creature, Position start, Position to, unsigned long maxNodeSize /*= 100*/)
+/*
+std::list<Position> Map::getPathTo(const Creature* creature, Position start, Position to, unsigned long maxNodeSize //= 100)
 {
 	std::list<Position> path;
 	AStarNodes nodes;
@@ -524,11 +527,6 @@ std::list<Position> Map::getPathTo(Creature* creature, Position start, Position 
 							}
 						}
 					}
-					/*else{
-						if(current->g + 1 < child->g)
-							child->parent = current;
-							child->g=current->g+1;
-					}*/
 				}
 			}
 		}
@@ -545,8 +543,39 @@ std::list<Position> Map::getPathTo(Creature* creature, Position start, Position 
 
 	return path;
 }
+*/
 
-bool Map::getPathTo(Creature* creature, Position toPosition, std::list<Direction>& listDir)
+bool Map::isPathValid(const Creature* creature, const std::list<Direction>& listDir, const Position& destPos)
+{
+	Position pos = creature->getPosition();
+
+	std::list<Direction>::const_iterator it;
+	for(it = listDir.begin(); it != listDir.end(); ++it) {
+		switch(*it){
+			case NORTH: pos.y -= 1; break;
+			case SOUTH: pos.y += 1; break;
+			case WEST: pos.x -= 1; break;
+			case EAST: pos.x += 1; break;
+			case NORTHEAST: pos.x += 1; pos.y -= 1; break;
+			case NORTHWEST: pos.x -= 1; pos.y -= 1; break;
+			case SOUTHEAST: pos.x += 1; pos.y += 1; break;
+			case SOUTHWEST: pos.x -= 1; pos.y += 1; break;
+		}
+
+		Tile* tile = getTile(pos);
+		if(!tile || tile->__queryAdd(0, creature, 1, FLAG_PATHFINDING) != RET_NOERROR){
+			return false;
+		}
+	}
+
+	if(std::abs(destPos.x - pos.x) <= 1 && std::abs(destPos.y - pos.y) <= 1){
+		return true;
+	}
+
+	return false;
+}
+
+bool Map::getPathTo(const Creature* creature, Position toPosition, std::list<Direction>& listDir)
 {
 	if(creature->getPosition().z != toPosition.z){
 		return false;
@@ -577,54 +606,53 @@ bool Map::getPathTo(Creature* creature, Position toPosition, std::list<Direction
 		
 		for(int dx = -1; dx <= 1; dx++){
 			for(int dy = -1; dy <= 1; dy++){
-				if(std::abs(dx) != std::abs(dy)){
-					x = current->x + dx;
-					y = current->y + dy;
 
-					if(!(x == startPos.x && y == startPos.y)){
-						Tile* tile = getTile(x, y, z);
-						if(!tile || tile->hasProperty(BLOCKPATHFIND) || tile->__queryAdd(0, creature, 1, 0) != RET_NOERROR){
-							continue;
+				if(std::abs(dx) == std::abs(dy)){
+					//TODO: diagonal movement
+					continue;
+				}
+
+				x = current->x + dx;
+				y = current->y + dy;
+
+				if(!(x == startPos.x && y == startPos.y)){
+					Tile* tile = getTile(x, y, z);
+
+					if(!tile || tile->__queryAdd(0, creature, 1, FLAG_PATHFINDING) != RET_NOERROR){
+						continue;
+					}
+				}
+				
+				if(!nodes.isInList(x,y)){
+					AStarNode* n = nodes.createOpenNode();
+					if(n){
+						n->x = x;
+						n->y = y;
+						n->h = std::abs(n->x - startPos.x) * std::abs(n->x - startPos.x) +
+										std::abs(n->y - startPos.y) * std::abs(n->y - startPos.y);
+
+						n->parent = current;
+
+						if(x == startPos.x && y == startPos.y){
+							found = n;
 						}
 					}
-					
-					if(!nodes.isInList(x,y)){
-						AStarNode* n = nodes.createOpenNode();
-						if(n){
-							n->x = x;
-							n->y = y;
-							n->h = std::abs(n->x - startPos.x) * std::abs(n->x - startPos.x) + std::abs(n->y - startPos.y) * std::abs(n->y - startPos.y);
-							n->parent = current;
-
-							if(x == startPos.x && y == startPos.y){
-								found = n;
-							}
-						}
-					}
-					/*else{
-						if(current->g + 1 < child->g)
-							child->parent = current;
-							child->g=current->g+1;
-					}*/
 				}
 			}
 		}
 	}
 
-	Position prevPos = startPos;
 	Direction dir;
+	int32_t prevx = startPos.x;
+	int32_t prevy = startPos.y;
+	int32_t dx, dy;
 
-	//cleanup the mess
 	while(found){
-		Position p;
-		p.x = found->x;
-		p.y = found->y;
-		p.z = z;
+		dx = found->x - prevx;
+		dy = found->y - prevy;
 
-		int dx = p.x - prevPos.x;
-		int dy = p.y - prevPos.y;
-
-		prevPos = p;
+		prevx = found->x;
+		prevy = found->y;
 
 		if(dx == -1 && dy == -1)
 			dir = NORTHWEST;

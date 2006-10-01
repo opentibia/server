@@ -50,7 +50,8 @@ public:
 	virtual const std::string& getNameDescription() const {return mType->nameDescription;}
 	virtual std::string getDescription(int32_t lookDistance) const;
 
-	bool canSee(const Position& pos) const;
+	virtual bool canSee(const Position& pos) const;
+	virtual bool isInRange(const Position& pos) const;
 
 	virtual RaceType_t getRace() const { return mType->race; }
 
@@ -80,15 +81,21 @@ public:
 
 private:
 	std::string strDescription;
+	bool targetIsRecentAdded;
+	bool isActive;
 
 	typedef std::list<Creature*> TargetList;
-	Creature* targetCreature;
 	TargetList targetList;
 	MonsterType* mType;
 
+	void searchTarget();
+
 	void startThink();
 	void stopThink();
-	int getTargetDistance() {return mType->targetDistance;}
+	//int getTargetDistance() {return mType->targetDistance;}
+
+	void onCreatureEnter(const Creature* creature);
+	void onCreatureLeave(const Creature* creature);
 
 	virtual int32_t getLostExperience() const { return (isSummon() ? 0 : mType->experience); }
 	virtual int getLookCorpse() { return mType->lookcorpse; }

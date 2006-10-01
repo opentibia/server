@@ -116,7 +116,8 @@ public:
 	void removeList() {listNpc.removeList(getID());}
 	void addList() {listNpc.addList(this);}
 	
-	bool canSee(const Position& pos) const;
+	virtual bool canSee(const Position& pos) const;
+	virtual bool isInRange(const Position& pos) const;
 	
 	void speak(const std::string& text){};
 	virtual const std::string& getName() const {return name;};
@@ -150,10 +151,10 @@ protected:
 	std::string name;
 	
 	NpcEventsHandler* m_npcEventHandler;
-	std::list<Position> route;
+	//std::list<Position> route;
 	bool loaded;
 	
-	static NpcScriptInterface *m_scriptInterface;
+	static NpcScriptInterface* m_scriptInterface;
 };
 
 #endif

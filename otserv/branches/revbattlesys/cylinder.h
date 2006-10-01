@@ -31,7 +31,8 @@ class Creature;
 
 enum cylinderflags_t {
 	FLAG_NOLIMIT = 1,
-	FLAG_CHILDISOWNER = 2
+	FLAG_CHILDISOWNER = 2,
+	FLAG_PATHFINDING = 4,
 };
 
 class Cylinder : virtual public Thing{

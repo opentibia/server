@@ -690,12 +690,10 @@ bool Player::canSee(const Position& pos) const
 	return client->CanSee(pos);
 }
 
-/*
-bool Player::CanSee(int x, int y, int z) const
+bool Player::isInRange(const Position& pos) const
 {
-  return client->CanSee(x, y, z);
+	return Position::areInRange<7, 5, 0>(getPosition(), pos);
 }
-*/
 
 Depot* Player::getDepot(uint32_t depotId, bool autoCreateDepot)
 {	
@@ -1125,11 +1123,13 @@ void Player::sendRemoveInventoryItem(slots_t slot, const Item* item)
 
 void Player::onAddTileItem(const Position& pos, const Item* item)
 {
-	//
+	Creature::onAddTileItem(pos, item);
 }
 
 void Player::onUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* oldItem, const Item* newItem)
 {
+	Creature::onUpdateTileItem(pos, stackpos, oldItem, newItem);
+
 	if(oldItem != newItem){
 		onRemoveTileItem(pos, stackpos, oldItem);
 	}
@@ -1383,9 +1383,9 @@ void Player::onThink(uint32_t interval)
 
 	if(!tile->isPz()){
 		if(food > 1000){
-			gainManaTick();
 			food -= interval;
 
+			gainManaTick();
 			gainHealthTick();
 		}
 	}
@@ -1404,9 +1404,6 @@ void Player::onThink(uint32_t interval)
 void Player::drainHealth(Creature* attacker, DamageType_t damageType, int32_t damage)
 {
 	Creature::drainHealth(attacker, damageType, damage);
-
-	//Condition* condition = Condition::createCondition(CONDITION_INFIGHT, 60 * 1000, 0);
-	//addCondition(condition);
 
 	sendStats();
 
@@ -2480,6 +2477,22 @@ void Player::__internalAddThing(uint32_t index, Thing* thing)
   }
 }
 
+bool Player::internalFollowCreature(const Creature* creature)
+{
+	bool result = Creature::internalFollowCreature(creature);
+
+	if(!result){
+		setFollowCreature(NULL);
+		setAttackedCreature(NULL);
+
+		sendCancelMessage(RET_THEREISNOWAY);
+		sendCancelTarget();
+		stopAutoWalk();
+	}
+
+	return result;
+}
+
 void Player::setAttackedCreature(Creature* creature)
 {
 	Creature::setAttackedCreature(creature);
@@ -2487,7 +2500,8 @@ void Player::setAttackedCreature(Creature* creature)
 	if(chaseMode == CHASEMODE_FOLLOW && creature){
 		if(followCreature != creature){
 			//chase opponent
-			g_game.internalFollowCreature(this, creature);
+			//g_game.internalFollowCreature(this, creature);
+			internalFollowCreature(creature);
 		}
 	}
 	else{
@@ -2550,6 +2564,14 @@ int32_t Player::getGainedExperience(Creature* attacker) const
 	return 0;
 }
 
+void Player::onFollowCreature(const Creature* creature)
+{
+	if(!creature){
+		stopAutoWalk();
+	}
+}
+
+/*
 void Player::setFollowCreature(const Creature* creature)
 {
 	if(followCreature != creature){
@@ -2560,6 +2582,7 @@ void Player::setFollowCreature(const Creature* creature)
 		}
 	}
 }
+*/
 
 void Player::setChaseMode(uint8_t mode)
 {
@@ -2576,12 +2599,40 @@ void Player::setChaseMode(uint8_t mode)
 		if(chaseMode == CHASEMODE_FOLLOW){
 			if(!followCreature && attackedCreature){
 				//chase opponent
-				g_game.internalFollowCreature(this, attackedCreature);
+				//g_game.internalFollowCreature(this, attackedCreature);
+				internalFollowCreature(attackedCreature);
 			}
 		}
 		else if(attackedCreature){
 			setFollowCreature(NULL);
 			stopAutoWalk();
+		}
+	}
+}
+
+/*
+void Player::onWalk()
+{
+	bool continueWalk = true;
+
+	if(listWalkDir.empty()){
+		if(checkStopAutoWalk(true)){
+			continueWalk = false;
+		}
+	}
+	
+	if(continueWalk){
+		if(!listWalkDir.empty()){
+			Position pos = getPosition();
+			Direction dir = listWalkDir.front();
+			listWalkDir.pop_front();
+
+			if(g_game.internalMoveCreature(this, dir) == RET_NOERROR || !checkStopAutoWalk(true)){
+				addEventWalk();
+			}
+		}
+		else{
+			addEventWalk();
 		}
 	}
 }
@@ -2627,7 +2678,23 @@ bool Player::stopAutoWalk()
 
 	return true;
 }
+*/
 
+void Player::onWalkQuery(bool& continueWalk)
+{
+	/*
+	if(checkStopAutoWalk(true)){
+		continueWalk = false;
+	}
+	*/
+}
+
+void Player::onWalkAborted()
+{
+	sendCancelWalk();
+}
+
+/*
 bool Player::checkStopAutoWalk(bool pathInvalid)
 {
 	if(followCreature){
@@ -2642,6 +2709,7 @@ bool Player::checkStopAutoWalk(bool pathInvalid)
 	stopAutoWalk();
 	return true;
 }
+*/
 
 void Player::getCreatureLight(LightInfo& light) const
 {
@@ -2722,17 +2790,7 @@ void Player::onAttackedCreature(Creature* target)
 					addAttacked(targetPlayer);
 				}
 #endif
-
-				/*
-				if(Weapons::weaponInFightTime != 0){
-					Condition* condition = Condition::createCondition(CONDITION_INFIGHT, Weapons::weaponInFightTime, 0);
-					if(!targetPlayer->addCondition(condition)){
-						delete condition;
-					}
-				}
-				*/
 			}
-
 		}
 
 		if(Weapons::weaponInFightTime != 0){

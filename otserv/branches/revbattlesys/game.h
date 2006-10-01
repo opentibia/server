@@ -253,8 +253,8 @@ public:
 
 	bool internalMonsterYell(Monster* monster, const std::string& text);
 
-	ReturnValue internalFollowCreature2(Creature* creature, const Creature* followCreature, uint32_t followDistance = 1);
-	bool internalFollowCreature(Player* player, const Creature* followCreature);
+	//ReturnValue internalFollowCreature2(Creature* creature, const Creature* followCreature, uint32_t followDistance = 1);
+	//bool internalFollowCreature(Player* player, const Creature* followCreature);
 
 	//Implementation of player invoked events
 	bool movePlayer(Player* player, Direction direction);
@@ -296,7 +296,12 @@ public:
 	void FreeThing(Thing* thing);
 
 	bool canThrowObjectTo(const Position& fromPos, const Position& toPos);
-	bool getPathTo(Creature* creature, Position toPosition, std::list<Direction>& listDir);
+	bool getPathTo(const Creature* creature, Position toPosition, std::list<Direction>& listDir);
+	bool isPathValid(const Creature* creature, const std::list<Direction>& listDir, const Position& destPos);
+
+	bool getPathToEx(const Creature* creature, const Position& targetPos,
+		uint32_t minDist, uint32_t maxDist, bool fullPathSearch, std::list<Direction>& dirList);
+
 	void changeSpeed(Creature* creature, int32_t speedDelta);
 	void changeOutfit(Creature* creature, uint8_t lookType, uint16_t lookTypeEx = 0,
 		uint8_t lookHead = 0, uint8_t lookBody = 0, uint8_t lookLegs = 0, uint8_t lookFeet = 0);
@@ -314,7 +319,7 @@ public:
 
 	//Events
 	void checkWalk(unsigned long creatureId);
-	void checkAutoWalkPlayer(unsigned long creatureId);
+	//void checkAutoWalkPlayer(unsigned long creatureId);
 	void checkCreature(uint32_t creatureId, uint32_t interval);
 	void checkCreatureAttacking(uint32_t creatureId, uint32_t interval);
 	void checkDecay(int t);

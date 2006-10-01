@@ -70,13 +70,17 @@ bool Tile::floorChange() const
 	if(ground && ground->floorChangeDown())
 		return true;
 
-	for (iit = topItems.begin(); iit != topItems.end(); ++iit){  
-		if ((*iit)->floorChangeNorth() || (*iit)->floorChangeSouth() || (*iit)->floorChangeEast() || (*iit)->floorChangeWest())
+	for (iit = topItems.begin(); iit != topItems.end(); ++iit){
+		const ItemType& iiType = Item::items[(*iit)->getID()];
+
+		if (iiType.floorChangeNorth || iiType.floorChangeSouth || iiType.floorChangeEast || iiType.floorChangeWest)
 			return true;      
 	}
 
 	for (iit = downItems.begin(); iit != downItems.end(); ++iit){ 
-		if ((*iit)->floorChangeNorth() || (*iit)->floorChangeSouth() || (*iit)->floorChangeEast() || (*iit)->floorChangeWest())
+		const ItemType& iiType = Item::items[(*iit)->getID()];
+
+		if (iiType.floorChangeNorth || iiType.floorChangeSouth || iiType.floorChangeEast || iiType.floorChangeWest)
 			return true;
 	}
 
@@ -459,12 +463,15 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 	Thing* iithing = NULL;
 
 	if(const Creature* creature = thing->getCreature()){
-		if(!creatures.empty())
-			return RET_NOTPOSSIBLE;
+		if((flags & FLAG_PATHFINDING) == FLAG_PATHFINDING){
+			if(floorChange() || getTeleportItem()){
+				return RET_NOTPOSSIBLE;
+			}
+		}
 
 		if(ground == NULL)
 			return RET_NOTPOSSIBLE;
-		
+
 		if(const Monster* monster = creature->getMonster()){
 			if(hasFlag(TILESTATE_PROTECTIONZONE))
 				return RET_NOTPOSSIBLE;
@@ -476,6 +483,17 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			}
 
 			if(floorChange() || getTeleportItem()){
+				return RET_NOTPOSSIBLE;
+			}
+			
+			if(monster->canPushItems()){
+				for(CreatureVector::const_iterator cit = creatures.begin(); cit != creatures.end(); ++cit){
+					if( (*cit)->getMonster() && !(*cit)->isPushable() ){
+						return RET_NOTPOSSIBLE;
+					}
+				}
+			}
+			else if(!creatures.empty()){
 				return RET_NOTPOSSIBLE;
 			}
 
@@ -496,8 +514,17 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			return RET_NOERROR;
 		}
 		else if(const Player* player = creature->getPlayer()){
+			if(!creatures.empty()){
+				return RET_NOTPOSSIBLE;
+			}
+
 			if(hasFlag(TILESTATE_PROTECTIONZONE) && player->isPzLocked()){
 				return RET_PLAYERISPZLOCKED;
+			}
+		}
+		else{
+			if(!creatures.empty()){
+				return RET_NOTPOSSIBLE;
 			}
 		}
 

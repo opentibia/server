@@ -173,7 +173,12 @@ Npc::~Npc()
 
 bool Npc::canSee(const Position& pos) const
 {
-	return Position::areInRange<7,5,0>(pos, getPosition());
+	return Position::areInRange<7, 5, 0>(pos, getPosition());
+}
+
+bool Npc::isInRange(const Position& pos) const
+{
+	return Position::areInRange<7, 5, 0>(getPosition(), pos);
 }
 
 std::string Npc::getDescription(int32_t lookDistance) const
@@ -185,48 +190,51 @@ std::string Npc::getDescription(int32_t lookDistance) const
 
 void Npc::onAddTileItem(const Position& pos, const Item* item)
 {
-	//not implemented yet
+	Creature::onAddTileItem(pos, item);
 }
 
 void Npc::onUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* oldItem, const Item* newItem)
 {
-	//not implemented yet
+	Creature::onUpdateTileItem(pos, stackpos, oldItem, newItem);
 }
 
 void Npc::onRemoveTileItem(const Position& pos, uint32_t stackpos, const Item* item)
 {
-	//not implemented yet
+	Creature::onRemoveTileItem(pos, stackpos, item);
 }
 
 void Npc::onUpdateTile(const Position& pos)
 {
-	//not implemented yet
+	Creature::onUpdateTile(pos);
 }
 
 void Npc::onCreatureAppear(const Creature* creature, bool isLogin)
 {
+	Creature::onCreatureAppear(creature, isLogin);
 	m_npcEventHandler->onCreatureAppear(creature);
 }
 
 void Npc::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout)
 {
+	Creature::onCreatureDisappear(creature, stackpos, isLogout);
 	m_npcEventHandler->onCreatureDisappear(creature);
 }
 
 void Npc::onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport)
 {
-	//not implemented yet
+	Creature::onCreatureMove(creature, oldPos, oldStackPos, teleport);
 }
 
 void Npc::onCreatureTurn(const Creature* creature, uint32_t stackpos)
 {
-	//not implemented yet, do we need it?
+	Creature::onCreatureTurn(creature, stackpos);
 }
 
 void Npc::onCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text)
 {
 	if(creature->getID() == this->getID())
 		return;
+
 	m_npcEventHandler->onCreatureSay(creature, type, text);
 }
 
@@ -256,6 +264,14 @@ void Npc::doMove(Direction dir)
 
 void Npc::doMoveTo(Position target)
 {
+	std::list<Direction> listDir;
+	if(!g_game.getPathToEx(this, target, 1, 1, true, listDir)){
+		return;
+	}
+
+	startAutoWalk(listDir);
+	
+	/*
 	if(route.size() == 0 || route.back() != target || route.front() != getPosition()){
 		route = g_game.map->getPathTo(this, getPosition(), target);
 	}
@@ -292,6 +308,7 @@ void Npc::doMoveTo(Position target)
 		dir = SOUTH;
 
 	g_game.internalMoveCreature(this, dir);
+	*/
 }
 
 NpcScriptInterface* Npc::getScriptInterface()

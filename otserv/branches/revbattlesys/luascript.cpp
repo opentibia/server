@@ -3148,19 +3148,20 @@ int LuaScriptInterface::luaDoMoveCreature(lua_State *L)
 	unsigned long cid = (unsigned long)popNumber(L);
 	
 	switch(direction){
-	case NORTH:
-	case SOUTH:
-	case WEST:
-	case EAST:
-	case SOUTHWEST:
-	case NORTHWEST:
-	case NORTHEAST:
-	case SOUTHEAST:
-		break;
-	default:
-		reportErrorFunc("No valid direction");
-		lua_pushnumber(L, LUA_ERROR);
-		return 1;
+		case NORTH:
+		case SOUTH:
+		case WEST:
+		case EAST:
+		case SOUTHWEST:
+		case NORTHWEST:
+		case NORTHEAST:
+		case SOUTHEAST:
+			break;
+
+		default:
+			reportErrorFunc("No valid direction");
+			lua_pushnumber(L, LUA_ERROR);
+			return 1;
 	}
 	
 	ScriptEnviroment* env = getScriptEnv();

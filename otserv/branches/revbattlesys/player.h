@@ -174,8 +174,8 @@ public:
 	Depot* getDepot(uint32_t depotId, bool autoCreateDepot);
 	bool addDepot(Depot* depot, uint32_t depotId);
 	
-	bool canSee(const Position& pos) const;
-	//bool CanSee(int x, int y, int z) const;
+	virtual bool canSee(const Position& pos) const;
+	virtual bool isInRange(const Position& pos) const;
 	
 	virtual RaceType_t getRace() const {return RACE_BLOOD;}
 
@@ -191,14 +191,17 @@ public:
 	bool addVIP(unsigned long guid, std::string& name, bool isOnline, bool interal = false);
 
 	//follow functions
-	//const Creature* getFollowCreature() {return followCreature;};
-	virtual void setFollowCreature(const Creature* creature);
+	virtual bool internalFollowCreature(const Creature* creature);
 	void setChaseMode(uint8_t mode);
 
-	bool startAutoWalk(std::list<Direction>& listDir);
-	bool addEventWalk();
-	bool checkStopAutoWalk(bool pathInvalid = false);
-	bool stopAutoWalk();
+	//follow events
+	virtual void onFollowCreature(const Creature* creature);
+
+	//bool checkStopAutoWalk(bool pathInvalid = false);
+
+	//walk events
+	virtual void onWalkQuery(bool& continueWalk);
+	virtual void onWalkAborted();
 
 	//combat functions
 	virtual void setAttackedCreature(Creature* creature);

@@ -538,21 +538,6 @@ bool Game::placeCreature(const Position& pos, Creature* creature, bool isLogin /
 
 			creature->eventCheck = addEvent(makeTask(500, boost::bind(&Game::checkCreature, this, creature->getID(), 500)));
 			creature->eventCheckAttacking = addEvent(makeTask(1500, boost::bind(&Game::checkCreatureAttacking, this, creature->getID(), 1500)));
-
-			/*
-			if(player){
-				#ifdef __DEBUG_PLAYERS__
-				std::cout << (uint32_t)getPlayersOnline() << " players online." << std::endl;
-				#endif
-
-				creature->eventCheck = addEvent(makeTask(1000, std::bind2nd(std::mem_fun(&Game::checkCreature), creature->getID())));
-				creature->eventCheckAttacking = addEvent(makeTask(1500, boost::bind(&Game::checkCreatureAttacking, this, creature->getID(), 1500)));
-			}
-			else{
-				creature->eventCheck = addEvent(makeTask(500, std::bind2nd(std::mem_fun(&Game::checkCreature), creature->getID())));
-				creature->eventCheckAttacking = addEvent(makeTask(500, boost::bind(&Game::checkCreatureAttacking, this, creature->getID(), 500)));
-			}
-			*/
 		}
 	}
 
@@ -1519,7 +1504,8 @@ bool Game::movePlayer(Player* player, Direction direction)
 	if(player->isRemoved())
 		return false;
 
-	player->checkStopAutoWalk();
+	player->setFollowCreature(NULL);
+	player->getNextStep(direction);
 	return (internalMoveCreature(player, direction) == RET_NOERROR);
 }
 
@@ -2259,7 +2245,8 @@ bool Game::playerFollowCreature(Player* player, unsigned long creatureId)
 		followCreature = getCreatureByID(creatureId);
 	}
 
-	return internalFollowCreature(player, followCreature);
+	return player->internalFollowCreature(followCreature);
+	//return internalFollowCreature(player, followCreature);
 }
 
 bool Game::playerSetFightModes(Player* player, uint8_t fightMode, uint8_t chaseMode)
@@ -2356,9 +2343,14 @@ bool Game::canThrowObjectTo(const Position& fromPos, const Position& toPos)
 	return map->canThrowObjectTo(fromPos, toPos);
 }
 
-bool Game::getPathTo(Creature* creature, Position toPosition, std::list<Direction>& listDir)
+bool Game::getPathTo(const Creature* creature, Position toPosition, std::list<Direction>& listDir)
 {
 	return map->getPathTo(creature, toPosition, listDir);
+}
+
+bool Game::isPathValid(const Creature* creature, const std::list<Direction>& listDir, const Position& destPos)
+{
+	return map->isPathValid(creature, listDir, destPos);
 }
 
 bool Game::internalCreatureTurn(Creature* creature, Direction dir)
@@ -2428,9 +2420,122 @@ bool Game::internalMonsterYell(Monster* monster, const std::string& text)
 	return true;
 }
 
+bool Game::getPathToEx(const Creature* creature, const Position& targetPos,
+	uint32_t minDist, uint32_t maxDist, bool fullPathSearch, std::list<Direction>& dirList)
+{
+#ifdef __DEBUG__
+	__int64 startTick = OTSYS_TIME();
+#endif
+
+	if(!creature->isInRange(targetPos)){
+		return false;
+	}
+
+	const Position& creaturePos = creature->getPosition();
+
+	if(Position::areInRange<1,1,0>(creaturePos, targetPos)){
+		return true;
+	}
+
+	std::list<Direction> tmpDirList;
+
+	Position tmpPos;
+	Position minWalkPos;
+
+	int tmpDist = 0;
+	int prevDist = 0;
+
+	int tmpWalkDist = 0;
+	int minWalkDist = 0;
+
+	int xmindelta = ((fullPathSearch || (creaturePos.x - targetPos.x) <= 0) ? maxDist : 0);
+	int xmaxdelta = ((fullPathSearch || (creaturePos.x - targetPos.x) >= 0) ? maxDist : 0);
+	int ymindelta = ((fullPathSearch || (creaturePos.y - targetPos.y) <= 0) ? maxDist : 0);
+	int ymaxdelta = ((fullPathSearch || (creaturePos.y - targetPos.y) >= 0) ? maxDist : 0);
+
+	minDist = minDist * minDist;
+	maxDist = maxDist * maxDist;
+
+	int32_t currentDist = maxDist;
+	//int counter = 1;
+
+	while(currentDist-- >= minDist){
+		for(int y = targetPos.y - ymindelta; y <= targetPos.y + ymaxdelta; ++y) {
+			for(int x = targetPos.x - xmindelta; x <= targetPos.x + xmaxdelta; ++x) {
+
+				if((targetPos.x == x && targetPos.y == y))
+					continue;
+
+				/*tmpDist = std::abs(target.x - x) * std::abs(target.x - x) +
+									std::abs(target.y - y) * std::abs(target.y - y);*/
+
+				tmpDist = std::max( std::abs(targetPos.x - x) * std::abs(targetPos.x - x),
+														std::abs(targetPos.y - y) * std::abs(targetPos.y - y) );
+
+				tmpPos.x = x;
+				tmpPos.y = y;
+				tmpPos.z = creaturePos.z;
+
+				if(tmpDist <= maxDist && (tmpDist >= prevDist || prevDist == 0) && (tmpDist >= currentDist) ){
+
+					tmpWalkDist = std::abs(creaturePos.x - x) * std::abs(creaturePos.x - x) + 
+												std::abs(creaturePos.y - y) * std::abs(creaturePos.y - y);
+
+					/*
+					Item* item = Item::CreateItem(2160, counter);
+					internalAddItem(getTile(tmpPos.x, tmpPos.y, tmpPos.z), item, INDEX_WHEREEVER, FLAG_NOLIMIT);
+					counter++;
+					*/
+
+					if(tmpWalkDist > 0 && (tmpWalkDist < minWalkDist || minWalkDist == 0)){
+						if(!canThrowObjectTo(tmpPos, targetPos)){
+							continue;
+						}
+
+						Tile* tile = getTile(tmpPos.x, tmpPos.y, tmpPos.z);
+						if(!tile || tile->__queryAdd(0, creature, 1, FLAG_PATHFINDING) != RET_NOERROR){
+							continue;
+						}
+
+						tmpDirList.clear();
+						if(!getPathTo(creature, tmpPos, tmpDirList)){
+							continue;
+						}
+
+						minWalkDist = tmpWalkDist;
+						minWalkPos = tmpPos;
+						dirList = tmpDirList;
+					}
+				}
+				/*else{
+					Item* item = Item::CreateItem(2159, counter);
+					internalAddItem(getTile(tmpPos.x, tmpPos.y, tmpPos.z), item, INDEX_WHEREEVER, FLAG_NOLIMIT);
+					counter++;
+				}*/
+			}
+		}
+
+		if(minWalkDist != 0){
+#ifdef __DEBUG__
+			__int64 endTick = OTSYS_TIME();
+			std::cout << "distance: " << currentDist << ", ticks: "<< (__int64 )endTick - startTick << std::endl;
+#endif
+			return true;
+		}
+	}
+
+#ifdef __DEBUG__
+	__int64 endTick = OTSYS_TIME();
+	std::cout << "distance: " << currentDist << ", ticks: "<< (__int64 )endTick - startTick << std::endl;
+#endif
+
+	return false;
+}
+
+/*
 bool Game::internalFollowCreature(Player* player, const Creature* followCreature)
 {
-	if(!followCreature || !Position::areInRange<7,5,0>(player->getPosition(), followCreature->getPosition())){
+	if(!followCreature || !player->isInRange(followCreature)){
 		player->setFollowCreature(NULL);
 		player->setAttackedCreature(NULL);
 
@@ -2460,6 +2565,7 @@ bool Game::internalFollowCreature(Player* player, const Creature* followCreature
 	player->setFollowCreature(followCreature);
 	return playerAutoWalk(player, listDir);
 }
+*/
 
 void Game::checkWalk(unsigned long creatureId)
 {
@@ -2472,6 +2578,7 @@ void Game::checkWalk(unsigned long creatureId)
 	}
 }
 
+/*
 void Game::checkAutoWalkPlayer(unsigned long id)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::checkAutoWalkPlayer");
@@ -2503,6 +2610,7 @@ void Game::checkAutoWalkPlayer(unsigned long id)
 		}
 	}
 }
+*/
 
 void Game::checkCreature(uint32_t creatureId, uint32_t interval)
 {

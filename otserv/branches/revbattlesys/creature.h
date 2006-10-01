@@ -114,6 +114,7 @@ public:
 	virtual void addList() = 0;
 
 	virtual bool canSee(const Position& pos) const = 0;
+	virtual bool isInRange(const Position& pos) const = 0;
 
 	unsigned long getExpForLv(const int& lv) const
 	{ 
@@ -138,26 +139,8 @@ public:
 	uint32_t getSpeed() const {return speed;};
 	void setSpeed(uint32_t newSpeed){ speed = newSpeed; }
 	
-	void setNormalSpeed()
-	{
-		/*
-		if(access != 0){
-			speed = 900;
-		}
-		else*/
-			speed = 220 + (2* (level - 1));
-	}
-	
-	int getNormalSpeed()
-	{
-		/*
-		if(access != 0){
-			return 900;
-		}
-		*/
-
-		return 220 + (2* (level - 1));
-	}
+	void setNormalSpeed() {speed = 220 + (2* (level - 1));}	
+	int getNormalSpeed() {return 220 + (2* (level - 1));}
 	
 	int32_t getHealth() const {return health;}
 	int32_t getMaxHealth() const {return healthMax;}
@@ -171,16 +154,21 @@ public:
 	uint8_t getLookFeet() const { return lookFeet; }
 
 	//walk functions
-	/*
-	bool startWalk(std::list<Direction>& listDir);
+	bool startAutoWalk(std::list<Direction>& listDir);
 	bool addEventWalk();
-	bool checkStopWalk(bool pathInvalid = false);
 	bool stopAutoWalk();
-	*/
+
+	//walk events
+	//virtual void onWalkQuery(bool& continueWalk) {};
+	virtual void onWalkAborted() {};
 
 	//follow functions
 	virtual const Creature* getFollowCreature() { return followCreature; };
 	virtual void setFollowCreature(const Creature* creature);
+	virtual bool internalFollowCreature(const Creature* creature);
+
+	//follow events
+	virtual void onFollowCreature(const Creature* creature) {};
 
 	//combat functions
 	Creature* getAttackedCreature() { return attackedCreature; }
@@ -243,10 +231,10 @@ public:
 	void addWalkEvent();
 	void stopWalkEvent();
 
-	virtual void onAddTileItem(const Position& pos, const Item* item) {};
-	virtual void onUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* oldItem, const Item* newItem) {};
-	virtual void onRemoveTileItem(const Position& pos, uint32_t stackpos, const Item* item) {};
-	virtual void onUpdateTile(const Position& pos) {};
+	virtual void onAddTileItem(const Position& pos, const Item* item);
+	virtual void onUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* oldItem, const Item* newItem);
+	virtual void onRemoveTileItem(const Position& pos, uint32_t stackpos, const Item* item);
+	virtual void onUpdateTile(const Position& pos);
 
 	virtual void onCreatureAppear(const Creature* creature, bool isLogin);
 	virtual void onCreatureDisappear(const Creature* creature);
@@ -287,6 +275,8 @@ protected:
 	const Creature* followCreature;
 	unsigned long eventWalk;
 	std::list<Direction> listWalkDir;
+	bool internalUpdateFollow;
+	uint32_t followDistance;
 
 	//combat variables
 	Creature* attackedCreature;
@@ -297,7 +287,7 @@ protected:
 	bool internalArmor;
 
 	LightInfo internalLight;
-
+	void validateWalkPath();
 	virtual int32_t getLostExperience() const { return 0; };
 	virtual double getDamageRatio(Creature* attacker) const;
 	bool getKillers(Creature** lastHitCreature, Creature** mostDamageCreature);
