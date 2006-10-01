@@ -29,6 +29,8 @@
 #include "tools.h"
 #include "rsa.h"
 
+#include "logger.h"
+
 static void addLogLine(AdminConnection* conn, eLogType type, int level, std::string message);
 
 extern Game g_game;
@@ -346,7 +348,7 @@ long AdminProtocol::parsePacket(NetworkMessage &msg, NetworkMessage &outputBuffe
 	case AP_MSG_COMMAND:
 	{
 		if(m_state != LOGGED_IN){
-			AdminLog::addLine(m_connection, "recvbyte == AP_MSG_COMMAND && m_state != LOGGED_IN !!!");
+			addLogLine(m_connection, LOGTYPE_ERROR, 1, "recvbyte == AP_MSG_COMMAND && m_state != LOGGED_IN !!!");
 			//never should reach this point!!
 			break;
 		}
@@ -626,7 +628,7 @@ bool AdminProtocolConfig::allowIP(SOCKET s)
 		else{
 			char str_ip[32];
 			formatIP(ip, str_ip);
-			addLogLine(m_connection, LOGTYPE_WARNING, 1, "forbidden connection try from " + str_ip);
+			addLogLine(NULL, LOGTYPE_WARNING, 1, std::string("forbidden connection try from ") + str_ip);
 			return false;
 		}
 	}
@@ -688,7 +690,11 @@ RSA* AdminProtocolConfig::getRSAKey(uint8_t type)
 
 static void addLogLine(AdminConnection* conn, eLogType type, int level, std::string message)
 {
-	std::string logMsg = "[" + conn->getIPString() + "] - " + message;
+	std::string logMsg;
+	if(conn){
+		logMsg = "[" + conn->getIPString() + "] - ";
+	}
+	logMsg = logMsg + message;
 	LOG_MESSAGE("OTADMIN", type, level, logMsg);
 }
 
