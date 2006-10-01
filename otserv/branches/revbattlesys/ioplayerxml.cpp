@@ -211,33 +211,38 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 			else if(xmlStrcmp(p->name, (const xmlChar*)"look") == 0){
 
 				if(readXMLInteger(p, "type", intValue)){
-					player->lookType = intValue;
+					player->defaultOutfit.lookType = intValue;
+					player->currentOutfit.lookType = intValue;
 				}
 				else
 					isLoaded = false;
 
-				player->lookMaster = player->lookType;
+				//player->lookMaster = player->lookType;
 
 				if(readXMLInteger(p, "head", intValue)){
-					player->lookHead = intValue;
+					player->defaultOutfit.lookHead = intValue;
+					player->currentOutfit.lookHead = intValue;
 				}
 				else
 					isLoaded = false;
 
 				if(readXMLInteger(p, "body", intValue)){
-					player->lookBody = intValue;
+					player->defaultOutfit.lookBody = intValue;
+					player->currentOutfit.lookBody = intValue;
 				}
 				else
 					isLoaded = false;
 
 				if(readXMLInteger(p, "legs", intValue)){
-					player->lookLegs = intValue;
+					player->defaultOutfit.lookLegs = intValue;
+					player->currentOutfit.lookLegs = intValue;
 				}
 				else
 					isLoaded = false;
 
 				if(readXMLInteger(p, "feet", intValue)){
-					player->lookFeet = intValue;
+					player->defaultOutfit.lookFeet = intValue;
+					player->currentOutfit.lookFeet = intValue;
 				}
 				else
 					isLoaded = false;
@@ -502,11 +507,11 @@ bool IOPlayerXML::savePlayer(Player* player)
 
     //upconversion of uchar(uint8_t) to get value not character into the stream
 	pn = xmlNewNode(NULL,(const xmlChar*)"look");
-	sb << (int16_t)player->lookMaster;  xmlSetProp(pn, (const xmlChar*)"type", (const xmlChar*)sb.str().c_str());        sb.str("");
-	sb << (int16_t)player->lookHead;    xmlSetProp(pn, (const xmlChar*)"head", (const xmlChar*)sb.str().c_str());        sb.str("");
-	sb << (int16_t)player->lookBody;    xmlSetProp(pn, (const xmlChar*)"body", (const xmlChar*)sb.str().c_str());        sb.str("");
-	sb << (int16_t)player->lookLegs;    xmlSetProp(pn, (const xmlChar*)"legs", (const xmlChar*)sb.str().c_str());        sb.str("");
-	sb << (int16_t)player->lookFeet;    xmlSetProp(pn, (const xmlChar*)"feet", (const xmlChar*)sb.str().c_str());        sb.str("");
+	//sb << (int16_t)player->lookMaster;  xmlSetProp(pn, (const xmlChar*)"type", (const xmlChar*)sb.str().c_str());        sb.str("");
+	sb << (int16_t)player->defaultOutfit.lookHead;    xmlSetProp(pn, (const xmlChar*)"head", (const xmlChar*)sb.str().c_str());        sb.str("");
+	sb << (int16_t)player->defaultOutfit.lookBody;    xmlSetProp(pn, (const xmlChar*)"body", (const xmlChar*)sb.str().c_str());        sb.str("");
+	sb << (int16_t)player->defaultOutfit.lookLegs;    xmlSetProp(pn, (const xmlChar*)"legs", (const xmlChar*)sb.str().c_str());        sb.str("");
+	sb << (int16_t)player->defaultOutfit.lookFeet;    xmlSetProp(pn, (const xmlChar*)"feet", (const xmlChar*)sb.str().c_str());        sb.str("");
 	xmlAddChild(root, pn);
 
 	pn = xmlNewNode(NULL,(const xmlChar*)"guild");

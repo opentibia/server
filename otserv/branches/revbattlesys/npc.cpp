@@ -113,39 +113,33 @@ Creature()
 				else
 					healthMax = 100;
 			}
+
 			if(xmlStrcmp(p->name, (const xmlChar*)"look") == 0){
 
 				if(readXMLInteger(p, "type", intValue)){
-					lookType = intValue;
+					currentOutfit.lookType = intValue;
+					defaultOutfit.lookType = intValue;
 				}
-				else
-					lookType = 20;
-
-				lookMaster = lookType;
 
 				if(readXMLInteger(p, "head", intValue)){
-					lookHead = intValue;
+					currentOutfit.lookHead = intValue;
+					defaultOutfit.lookHead = intValue;
 				}
-				else
-					lookHead = 10;
 
 				if(readXMLInteger(p, "body", intValue)){
-					lookBody = intValue;
+					currentOutfit.lookBody = intValue;
+					defaultOutfit.lookBody = intValue;
 				}
-				else
-					lookBody = 20;
 
 				if(readXMLInteger(p, "legs", intValue)){
-					lookLegs = intValue;
+					currentOutfit.lookLegs = intValue;
+					defaultOutfit.lookLegs = intValue;
 				}
-				else
-					lookLegs = 30;
 				
 				if(readXMLInteger(p, "feet", intValue)){
-					lookFeet = intValue;
+					currentOutfit.lookFeet = intValue;
+					defaultOutfit.lookFeet = intValue;
 				}
-				else
-					lookFeet = 40;
 			}
 
 			p = p->next;

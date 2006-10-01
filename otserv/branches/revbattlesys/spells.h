@@ -32,21 +32,23 @@
 class RuneSpell;
 class InstantSpell;
 
+typedef std::map<uint32_t, RuneSpell*> RunesMap;
+typedef std::map<std::string, InstantSpell*> InstantsMap;
+
 class Spells : public BaseEvents
 {
 public:
 	Spells();
 	virtual ~Spells();
 	
-	RuneSpell* getRuneSpell(const Item* item);
-	RuneSpell* getRuneSpell(const std::string& name);
+	RuneSpell* getRuneSpell(uint32_t id);
+	RuneSpell* getRuneSpellByName(const std::string& name);
 	
 	InstantSpell* getInstantSpell(const std::string& words);
 	InstantSpell* getInstantSpellByName(const std::string& name);
 
 	bool playerSaySpell(Player* player, SpeakClasses type, const std::string& words);
 
-	static bool loadFieldsFromXml(const std::string& datadir);
 	static int32_t spellExhaustionTime;
 	static int32_t spellInFightTime;
 	
@@ -55,11 +57,8 @@ protected:
 	virtual LuaScriptInterface& getScriptInterface();
 	virtual std::string getScriptBaseName();
 	virtual Event* getEvent(const std::string& nodeName);
-	virtual bool registerEvent(Event* event, xmlNodePtr p);
+	virtual bool registerEvent(Event* event, xmlNodePtr p);	
 	
-	
-	typedef std::map<uint32_t, RuneSpell*> RunesMap;
-	typedef std::map<std::string, InstantSpell*> InstantsMap ;
 	RunesMap runes;
 	InstantsMap instants;
 
@@ -77,6 +76,8 @@ public:
 	
 	bool configureSpell(xmlNodePtr xmlspell);
 	
+	const std::string& getName() const {return name;}
+
 protected:
 	bool playerSpellCheck(const Player* player);
 	bool playerInstantSpellCheck(const Player* player, const Position& toPos);

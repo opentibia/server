@@ -44,14 +44,6 @@ extern Game g_game;
 Creature::Creature() :
   isInternalRemoved(false)
 {
-	lookHead   = 0;
-	lookBody   = 0;
-	lookLegs   = 0;
-	lookFeet   = 0;
-	lookMaster = 0;
-	lookType   = PLAYER_MALE_1;	
-	lookTypeEx = 0;
-	
 	direction  = NORTH;
 	master = NULL;
 
@@ -115,20 +107,6 @@ void Creature::onThink(uint32_t interval)
 		internalFollowCreature(followCreature);
 	}
 
-	/*
-	static int32_t internalTicks = 0;
-	internalTicks -= interval;
-
-	if(internalTicks <= 0){
-		internalTicks = 2000;
-
-		if(internalUpdateFollow && followCreature){
-			internalUpdateFollow = false;
-			internalFollowCreature(followCreature);
-		}
-	}
-	*/
-
 	internalDefense = true;
 	internalArmor = true;
 }
@@ -143,12 +121,6 @@ void Creature::onWalk()
 			internalUpdateFollow = true;
 		}
 	}
-
-	/*
-	if(ret != RET_NOERROR){
-		internalUpdateFollow = true;
-	}
-	*/
 
 	eventWalk = 0;
 	addWalkEvent();
@@ -555,16 +527,8 @@ void Creature::onGainExperience(int32_t gainExperience)
 
 void Creature::onAttackedCreatureBlockHit(Creature* target, BlockType_t blockType)
 {
-	//onAttackedCreature(target);
+	//
 }
-
-/*
-void Creature::onTargetCreatureDisappear()
-{
-	setAttackedCreature(NULL);
-	setFollowCreature(NULL);
-}
-*/
 
 void Creature::setMaster(Creature* creature)
 {
@@ -648,22 +612,6 @@ void Creature::executeConditions(int32_t newticks)
 		else{
 			++it;
 		}
-
-		/*
-		if((*it)->getTicks() <= 0){
-			ConditionType_t type = (*it)->getType();
-
-			(*it)->endCondition(this, REASON_ENDTICKS);
-			delete *it;
-			it = conditions.erase(it);
-
-			onEndCondition(type);
-		}
-		else{
-			(*it)->executeCondition(this, newticks);
-			++it;
-		}
-		*/
 	}
 }
 

@@ -287,8 +287,7 @@ public:
 	bool playerRequestAddVip(Player* player, const std::string& vip_name);
 	bool playerTurn(Player* player, Direction dir);
 	bool playerSay(Player* player, SpeakClasses type, const std::string& text);
-	bool playerChangeOutfit(Player* player, uint8_t lookType,
-		uint8_t lookHead, uint8_t lookBody, uint8_t lookLegs, uint8_t lookFeet);
+	bool playerChangeOutfit(Player* player, Outfit_t outfit);
 	bool playerSaySpell(Player* player, SpeakClasses type, const std::string& text);
 
 	void flushSendBuffers();
@@ -303,8 +302,7 @@ public:
 		uint32_t minDist, uint32_t maxDist, bool fullPathSearch, std::list<Direction>& dirList);
 
 	void changeSpeed(Creature* creature, int32_t speedDelta);
-	void changeOutfit(Creature* creature, uint8_t lookType, uint16_t lookTypeEx = 0,
-		uint8_t lookHead = 0, uint8_t lookBody = 0, uint8_t lookLegs = 0, uint8_t lookFeet = 0);
+	void internalChangeOutfit(Creature* creature, Outfit_t oufit, bool isDefault);
 	void changeLight(const Creature* creature);
 
 #ifdef __SKULLSYSTEM__

@@ -92,4 +92,23 @@ enum skills_t {
 	SKILL_LAST = SKILL_FISH
 };
 
+struct Outfit_t{
+	Outfit_t(){
+		lookHead   = 0;
+		lookBody   = 0;
+		lookLegs   = 0;
+		lookFeet   = 0;
+		lookType   = 0;	
+		lookTypeEx = 0;
+	}
+
+	uint32_t lookType;
+	uint32_t lookTypeEx;
+	uint32_t lookHead;
+	uint32_t lookBody;
+	uint32_t lookLegs;
+	uint32_t lookFeet;
+};
+
+
 #endif

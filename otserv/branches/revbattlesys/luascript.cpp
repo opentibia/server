@@ -2559,12 +2559,13 @@ int LuaScriptInterface::luaAddOutfitCondition(lua_State *L)
 {
 	//addOutfitCondition(condition, lookTypeEx, lookType, lookHead, lookBody, lookLegs, lookFeet)
 
-	uint32_t lookFeet = (uint32_t)popNumber(L);
-	uint32_t lookLegs = (uint32_t)popNumber(L);
-	uint32_t lookBody = (uint32_t)popNumber(L);
-	uint32_t lookHead = (uint32_t)popNumber(L);
-	uint32_t lookType = (uint32_t)popNumber(L);
-	uint32_t lookTypeEx = (uint32_t)popNumber(L);
+	Outfit_t outfit;
+	outfit.lookFeet = (uint32_t)popNumber(L);
+	outfit.lookLegs = (uint32_t)popNumber(L);
+	outfit.lookBody = (uint32_t)popNumber(L);
+	outfit.lookHead = (uint32_t)popNumber(L);
+	outfit.lookType = (uint32_t)popNumber(L);
+	outfit.lookTypeEx = (uint32_t)popNumber(L);
 	uint32_t conditionId = (uint32_t)popNumber(L);
 
 	ScriptEnviroment* env = getScriptEnv();
@@ -2577,7 +2578,7 @@ int LuaScriptInterface::luaAddOutfitCondition(lua_State *L)
 		return 1;
 	}
 	
-	condition->addOutfit(lookTypeEx, lookType, lookHead, lookBody, lookLegs, lookFeet);
+	condition->addOutfit(outfit);
 
 	lua_pushnumber(L, LUA_NO_ERROR);
 	return 1;

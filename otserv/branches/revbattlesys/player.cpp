@@ -57,7 +57,6 @@ Creature()
 	}
 
 	name        = _name;
-	lookType    = PLAYER_MALE_1;
 	setVocation(VOCATION_NONE);
 	capacity   = 300.00;
 	mana       = 0;
@@ -65,9 +64,6 @@ Creature()
 	manaSpent  = 0;
 	food       = 0;
 	guildId    = 0;
-
-	//eventAutoWalk = 0;
-	//followCreature = NULL;
 
 	level      = 1;
 	experience = 180;
@@ -95,6 +91,7 @@ Creature()
 		skills[i][SKILL_LEVEL] = 10;
 		skills[i][SKILL_TRIES] = 0;
 		skills[i][SKILL_PERCENT] = 0;
+
 		/*
 		for(int j = 0; j < 2; j++){
 			SkillAdvanceCache[i][j].level = 10;
@@ -2679,15 +2676,6 @@ bool Player::stopAutoWalk()
 	return true;
 }
 */
-
-void Player::onWalkQuery(bool& continueWalk)
-{
-	/*
-	if(checkStopAutoWalk(true)){
-		continueWalk = false;
-	}
-	*/
-}
 
 void Player::onWalkAborted()
 {

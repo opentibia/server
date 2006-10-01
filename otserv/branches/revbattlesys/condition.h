@@ -165,26 +165,10 @@ public:
 
 	virtual ConditionOutfit* clone()  const { return new ConditionOutfit(*this); }
 
-	void addOutfit(uint32_t lookTypeEx, uint32_t lookType, uint32_t lookHead, uint32_t lookBody, uint32_t lookLegs, uint32_t lookFeet);
+	void addOutfit(Outfit_t outfit);
 
 protected:
-	struct Outfit_t{
-		uint32_t lookType;
-		uint32_t lookTypeEx;
-		uint32_t lookHead;
-		uint32_t lookBody;
-		uint32_t lookLegs;
-		uint32_t lookFeet;
-	};
-
 	std::vector<Outfit_t> outfits;
-
-	uint32_t prevLookType;
-	uint32_t prevLookTypeEx;
-	uint32_t prevLookHead;
-	uint32_t prevLookBody;
-	uint32_t prevLookLegs;
-	uint32_t prevLookFeet;
 
 	void changeOutfit(Creature* creature, int32_t index = -1);
 };

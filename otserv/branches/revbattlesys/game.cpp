@@ -2302,14 +2302,13 @@ bool Game::playerSay(Player* player, SpeakClasses type, const std::string& text)
 	return internalCreatureSay(player, type, text);
 }
 
-bool Game::playerChangeOutfit(Player* player, uint8_t lookType, uint8_t lookHead,
-	uint8_t lookBody, uint8_t lookLegs, uint8_t lookFeet)
+bool Game::playerChangeOutfit(Player* player, Outfit_t outfit)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::playerChangeOutfit()");
 	if(player->isRemoved())
 		return false;
 
-	changeOutfit(player, lookType, 0, lookHead, lookBody, lookLegs, lookFeet);
+	internalChangeOutfit(player, outfit, true);
 	return true;
 }
 
@@ -2679,21 +2678,20 @@ void Game::changeSpeed(Creature* creature, int32_t speedDelta)
 	}
 }
 
-void Game::changeOutfit(Creature* creature, uint8_t lookType, uint16_t lookTypeEx /*= 0*/,
-	uint8_t lookHead /*= 0*/, uint8_t lookBody /*= 0*/, uint8_t lookLegs /*= 0*/, uint8_t lookFeet /*= 0*/)
+void Game::internalChangeOutfit(Creature* creature, Outfit_t oufit, bool isDefault)
 {
-	creature->lookType = lookType;
-	creature->lookMaster = lookType;
-	if(lookType != 0){
-		creature->lookHead = lookHead;
-		creature->lookBody = lookBody;
-		creature->lookLegs = lookLegs;
-		creature->lookFeet = lookFeet;
+	if(isDefault){
+		creature->defaultOutfit = oufit;
 	}
-	else{
-		creature->lookTypeEx = lookTypeEx;
+
+	/*
+	if(!creature->isInvisible()){
+		return;
 	}
-	
+	*/
+
+	creature->currentOutfit = oufit;
+
 	SpectatorVec list;
 	SpectatorVec::iterator it;
 

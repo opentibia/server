@@ -146,12 +146,8 @@ public:
 	int32_t getMaxHealth() const {return healthMax;}
 	int32_t getMana() const {return mana;}
 
-	uint8_t getLookType() const { return lookType; }
-	uint16_t getLookTypeEx() const { return lookTypeEx; }
-	uint8_t getLookHead() const { return lookHead; }
-	uint8_t getLookBody() const { return lookBody; }
-	uint8_t getLookLegs() const { return lookLegs; }
-	uint8_t getLookFeet() const { return lookFeet; }
+	const Outfit_t getCurrentOutfit() const {return currentOutfit;}
+	const Outfit_t getDefaultOutfit() const {return defaultOutfit;}	
 
 	//walk functions
 	bool startAutoWalk(std::list<Direction>& listDir);
@@ -159,7 +155,6 @@ public:
 	bool stopAutoWalk();
 
 	//walk events
-	//virtual void onWalkQuery(bool& continueWalk) {};
 	virtual void onWalkAborted() {};
 
 	//follow functions
@@ -253,8 +248,8 @@ protected:
 	int32_t level;
 	int32_t magLevel;
 
-	uint8_t lookType, lookHead, lookBody, lookLegs, lookFeet, lookMaster;
-	uint16_t lookTypeEx;
+	Outfit_t currentOutfit;
+	Outfit_t defaultOutfit;
 
 	Position masterPos;
 	uint64_t lastMove;

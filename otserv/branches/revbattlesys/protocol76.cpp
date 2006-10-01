@@ -829,15 +829,18 @@ void Protocol76::parseRequestOutfit(NetworkMessage& msg)
 void Protocol76::parseSetOutfit(NetworkMessage& msg)
 {
 	uint8_t lookType = msg.GetByte();
+	
 	if ( (player->getSex() == PLAYERSEX_FEMALE && lookType >= PLAYER_FEMALE_1 && lookType <= PLAYER_FEMALE_7) ||
 		(player->getSex() == PLAYERSEX_MALE && lookType >= PLAYER_MALE_1 && lookType <= PLAYER_MALE_7))
 	{
-		uint8_t lookHead = msg.GetByte();
-		uint8_t lookBody = msg.GetByte();
-		uint8_t lookLegs = msg.GetByte();
-		uint8_t lookFeet = msg.GetByte();
+		Outfit_t newOutfit;
+		newOutfit.lookType = lookType;
+		newOutfit.lookHead = msg.GetByte();
+		newOutfit.lookBody = msg.GetByte();
+		newOutfit.lookLegs = msg.GetByte();
+		newOutfit.lookFeet = msg.GetByte();
 
-		game->playerChangeOutfit(player, lookType, lookHead, lookBody, lookLegs, lookFeet);
+		game->playerChangeOutfit(player, newOutfit);
 	}
 }
 
@@ -1912,16 +1915,17 @@ void Protocol76::AddCreatureHealth(NetworkMessage& msg,const Creature* creature)
 
 void Protocol76::AddCreatureOutfit(NetworkMessage &msg, const Creature* creature)
 {
-	msg.AddByte(creature->getLookType());
+	const Outfit_t outfit = creature->getCurrentOutfit();
+	msg.AddByte(outfit.lookType);
 
-	if(creature->getLookType() != 0){
-		msg.AddByte(creature->getLookHead());
-		msg.AddByte(creature->getLookBody());
-		msg.AddByte(creature->getLookLegs());
-		msg.AddByte(creature->getLookFeet());
+	if(outfit.lookType != 0){
+		msg.AddByte(outfit.lookHead);
+		msg.AddByte(outfit.lookBody);
+		msg.AddByte(outfit.lookLegs);
+		msg.AddByte(outfit.lookFeet);
 	}
 	else{
-		msg.AddItemId(creature->getLookTypeEx());
+		msg.AddItemId(outfit.lookTypeEx);
 	}
 }
 

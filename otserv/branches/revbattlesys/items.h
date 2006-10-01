@@ -25,9 +25,8 @@
 
 #include "definitions.h"
 #include "const76.h"
-#include "itemloader.h"
 #include "enums.h"
-
+#include "itemloader.h"
 
 #define SLOTP_WHEREEVER 0xFFFFFFFF
 #define SLOTP_HEAD 1
@@ -185,6 +184,8 @@ public:
 	static long dwMajorVersion;
 	static long dwMinorVersion;
 	static long dwBuildNumber;
+
+	static bool loadFieldsFromXml(const std::string& datadir);
 
 	size_t size() {return items.size();}
 	

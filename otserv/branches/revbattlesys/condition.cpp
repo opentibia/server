@@ -444,20 +444,10 @@ uint8_t ConditionSpeed::getIcons() const
 	return 0;
 }
 
-//ConditionOutfit::ConditionOutfit(int32_t _ticks, uint8_t _lookType, uint16_t _lookTypeEx,
-//	uint8_t _lookHead /*= 0*/, uint8_t _lookBody /*= 0*/, uint8_t _lookLegs /*= 0*/, uint8_t _lookFeet /*= 0*/)
 ConditionOutfit::ConditionOutfit(ConditionType_t _type, int32_t _ticks) :
 Condition(_type, _ticks)
 {
-	/*
-	lookType = _lookType;
-	lookTypeEx = _lookTypeEx;
-
-	lookHead = _lookHead;
-	lookBody = _lookBody;
-	lookLegs = _lookLegs;
-	lookFeet = _lookFeet;
-	*/
+	//
 }
 
 /*
@@ -477,32 +467,14 @@ bool ConditionOutfit::setParam(ConditionParam_t param, int32_t value)
 }
 */
 
-void ConditionOutfit::addOutfit(uint32_t lookTypeEx, uint32_t lookType, uint32_t lookHead,
-	uint32_t lookBody, uint32_t lookLegs, uint32_t lookFeet)
+void ConditionOutfit::addOutfit(Outfit_t outfit)
 {
-	Outfit_t outfit = {0, 0, 0, 0, 0, 0};
-
-	outfit.lookTypeEx = lookTypeEx;
-	outfit.lookType = lookType;
-	outfit.lookHead = lookHead;
-	outfit.lookBody = lookBody;
-	outfit.lookLegs = lookLegs;
-	outfit.lookFeet = lookFeet;
-
 	outfits.push_back(outfit);
 }
 
 bool ConditionOutfit::startCondition(Creature* creature)
 {
-	prevLookType = creature->getLookType();
-	prevLookTypeEx = creature->getLookTypeEx();
-	prevLookHead = creature->getLookHead();
-	prevLookBody = creature->getLookBody();
-	prevLookLegs = creature->getLookLegs();
-	prevLookFeet = creature->getLookFeet();
-
 	changeOutfit(creature);
-	//g_game.changeOutfit(creature, lookType, lookTypeEx, lookHead, lookBody, lookLegs, lookFeet);
 	return true;
 }
 
@@ -518,12 +490,12 @@ void ConditionOutfit::changeOutfit(Creature* creature, int32_t index /*= -1*/)
 	}
 
 	Outfit_t outfit = outfits[index];
-	g_game.changeOutfit(creature, outfit.lookType, outfit.lookTypeEx, outfit.lookHead, outfit.lookBody, outfit.lookLegs, outfit.lookFeet);	
+	g_game.internalChangeOutfit(creature, outfit, false);
 }
 
 void ConditionOutfit::endCondition(Creature* creature, EndCondition_t reason)
 {
-	g_game.changeOutfit(creature, prevLookType, prevLookTypeEx, prevLookHead, prevLookBody, prevLookLegs, prevLookFeet);
+	g_game.internalChangeOutfit(creature, creature->getDefaultOutfit(), true);
 }
 
 void ConditionOutfit::addCondition(Creature* creature, const Condition* addCondition)
@@ -537,14 +509,6 @@ void ConditionOutfit::addCondition(Creature* creature, const Condition* addCondi
 		outfits = conditionOutfit.outfits;
 
 		changeOutfit(creature);
-		/*
-		if(conditionOutfit.lookType != lookType){
-			lookType = conditionOutfit.lookType;
-			lookTypeEx = conditionOutfit.lookTypeEx;
-			
-			g_game.changeOutfit(creature, lookType, lookTypeEx);
-		}
-		*/
 	}
 }
 

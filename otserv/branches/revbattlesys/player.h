@@ -200,7 +200,6 @@ public:
 	//bool checkStopAutoWalk(bool pathInvalid = false);
 
 	//walk events
-	virtual void onWalkQuery(bool& continueWalk);
 	virtual void onWalkAborted();
 
 	//combat functions

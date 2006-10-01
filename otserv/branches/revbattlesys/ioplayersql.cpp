@@ -120,12 +120,12 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 
 	player->food = result.getDataInt("food");
 
-	player->lookType = result.getDataInt("looktype");
-	player->lookMaster = player->lookType;
-	player->lookHead = result.getDataInt("lookhead");
-	player->lookBody = result.getDataInt("lookbody");
-	player->lookLegs = result.getDataInt("looklegs");
-	player->lookFeet = result.getDataInt("lookfeet");
+	player->defaultOutfit.lookType = result.getDataInt("looktype");
+	player->defaultOutfit.lookHead = result.getDataInt("lookhead");
+	player->defaultOutfit.lookBody = result.getDataInt("lookbody");
+	player->defaultOutfit.lookLegs = result.getDataInt("looklegs");
+	player->defaultOutfit.lookFeet = result.getDataInt("lookfeet");
+	player->currentOutfit = player->defaultOutfit;
 
 	boost::char_separator<char> sep(";");
 
@@ -309,11 +309,11 @@ bool IOPlayerSQL::savePlayer(Player* player)
 	query << "`healthmax` = " << player->healthMax << ", ";
 	query << "`direction` = " << (int)player->getDirection() << ", ";
 	query << "`experience` = " << player->experience << ", ";
-	query << "`lookbody` = " << (int)player->lookBody << ", ";
-	query << "`lookfeet` = " << (int)player->lookFeet << ", ";
-	query << "`lookhead` = " << (int)player->lookHead << ", ";
-	query << "`looklegs` = " << (int)player->lookLegs << ", ";
-	query << "`looktype` = " << (int)player->lookType << ", ";
+	query << "`lookbody` = " << (int)player->defaultOutfit.lookBody << ", ";
+	query << "`lookfeet` = " << (int)player->defaultOutfit.lookFeet << ", ";
+	query << "`lookhead` = " << (int)player->defaultOutfit.lookHead << ", ";
+	query << "`looklegs` = " << (int)player->defaultOutfit.lookLegs << ", ";
+	query << "`looktype` = " << (int)player->defaultOutfit.lookType << ", ";
 	query << "`magLevel` = " << player->magLevel << ", ";
 	query << "`mana` = " << player->mana << ", ";
 	query << "`manamax` = " << player->manaMax << ", ";

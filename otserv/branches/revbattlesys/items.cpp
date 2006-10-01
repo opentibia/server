@@ -20,6 +20,7 @@
 
 
 #include "items.h"
+#include "spells.h"
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
@@ -30,6 +31,8 @@
 long Items::dwMajorVersion = 0;
 long Items::dwMinorVersion = 0;
 long Items::dwBuildNumber = 0;
+
+extern Spells* g_spells;
 
 ItemType::ItemType()
 {
@@ -591,19 +594,6 @@ int Items::loadFromOtb(std::string file)
 				break;
 			}
 		}
-		
-		//get rune mag level from spells.xml
-		if(iType->group == ITEM_GROUP_RUNE){
-			/*
-			std::map<unsigned short, Spell*>::iterator it = spells.getAllRuneSpells()->find(iType->id);
-			if(it != spells.getAllRuneSpells()->end()){
-				iType->runeMagLevel = it->second->getMagLv();
-			}
-			else{
-				iType->runeMagLevel = 0;
-			}
-			*/
-		}
 
 		// store the found item	 
 		items[iType->id] = iType;
@@ -613,6 +603,78 @@ int Items::loadFromOtb(std::string file)
 	}
 	
 	return ERROR_NONE;
+}
+
+bool Items::loadFieldsFromXml(const std::string& datadir)
+{
+	std::string filename = datadir + "/" + "fields.xml";
+	xmlDocPtr doc = xmlParseFile(filename.c_str());
+	int intValue;
+	std::string strValue;
+	uint32_t id = 0;
+
+	if(doc){
+		xmlNodePtr root, p;
+		root = xmlDocGetRootElement(doc);
+		
+		if(xmlStrcmp(root->name,(const xmlChar*)"fields") != 0){
+			xmlFreeDoc(doc);
+			return false;
+		}
+
+		p = root->children;
+		while(p){
+			if(xmlStrcmp(p->name, (const xmlChar*)"field") == 0){
+				if(readXMLInteger(p, "id", intValue)){
+					id = intValue;
+
+					ItemType& it = Item::items.getItemType(id);
+
+					if(readXMLString(p, "type", strValue)){
+						if(strcasecmp(strValue.c_str(), "fire") == 0){				
+							it.group = ITEM_GROUP_MAGICFIELD;
+							it.damageType = DAMAGE_FIRE;
+						}
+						else if(strcasecmp(strValue.c_str(), "energy") == 0){
+							it.group = ITEM_GROUP_MAGICFIELD;
+							it.damageType = DAMAGE_ENERGY;
+						}
+						else if(strcasecmp(strValue.c_str(), "poison") == 0){
+							it.group = ITEM_GROUP_MAGICFIELD;
+							it.damageType = DAMAGE_POISON;
+						}
+					}
+
+					if(readXMLInteger(p, "initDamage", intValue)){
+						it.initialDamage = -intValue;
+					}
+
+					if(readXMLInteger(p, "roundMin", intValue)){
+						it.roundMin = intValue;
+					}
+
+					if(readXMLInteger(p, "roundTime", intValue)){
+						it.roundTime = intValue;
+					}
+
+					if(readXMLInteger(p, "roundDamage", intValue)){
+						it.roundDamage = -intValue;
+					}
+
+				}
+				else{
+					std::cout << "Warning: [Spells::loadFieldsFromXml] Can not configure field - no item id found" << std::endl;
+					return false;
+				}
+			}
+			
+			p = p->next;
+		}
+
+		xmlFreeDoc(doc);
+	}
+
+	return true;
 }
 
 const ItemType& Items::operator[](int id)

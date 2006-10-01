@@ -183,7 +183,7 @@ Action *Actions::getAction(const Item* item)
 	}
 
 	//rune items
-	Action* runeSpell = g_spells->getRuneSpell(item);
+	Action* runeSpell = g_spells->getRuneSpell(item->getID());
 	if(runeSpell){
 		return runeSpell;
 	}

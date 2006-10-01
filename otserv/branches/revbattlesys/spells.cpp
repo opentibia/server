@@ -138,103 +138,47 @@ bool Spells::registerEvent(Event* event, xmlNodePtr p)
 	return true;
 }
 
-RuneSpell* Spells::getRuneSpell(const Item* item)
+RuneSpell* Spells::getRuneSpell(uint32_t id)
 {
-	uint32_t id = item->getID();
 	RunesMap::iterator it = runes.find(id);
 	if(it != runes.end()){
 		return it->second;
 	}
-	else{
-		return NULL;
-	}
+
+	return NULL;
 }
 
-RuneSpell* Spells::getRuneSpell(const std::string& name)
+RuneSpell* Spells::getRuneSpellByName(const std::string& name)
 {
+	for(RunesMap::iterator it = runes.begin(); it != runes.end(); ++it){
+		if(strcasecmp(it->second->getName().c_str(), name.c_str()) == 0){
+			return it->second;
+		}
+	}
+
 	return NULL;
 }
 	
 InstantSpell* Spells::getInstantSpell(const std::string& words)
 {
+	for(InstantsMap::iterator it = instants.begin(); it != instants.end(); ++it){
+		if(strcasecmp(it->second->getWords().c_str(), words.c_str()) == 0){
+			return it->second;
+		}
+	}
+
 	return NULL;
 }
 
 InstantSpell* Spells::getInstantSpellByName(const std::string& name)
 {
-	return NULL;
-}
-
-bool Spells::loadFieldsFromXml(const std::string& datadir)
-{
-	std::string filename = datadir + "/" + "fields.xml";
-	xmlDocPtr doc = xmlParseFile(filename.c_str());
-	int intValue;
-	std::string strValue;
-	uint32_t id = 0;
-
-	if(doc){
-		xmlNodePtr root, p;
-		root = xmlDocGetRootElement(doc);
-		
-		if(xmlStrcmp(root->name,(const xmlChar*)"fields") != 0){
-			xmlFreeDoc(doc);
-			return false;
+	for(InstantsMap::iterator it = instants.begin(); it != instants.end(); ++it){
+		if(strcasecmp(it->second->getName().c_str(), name.c_str()) == 0){
+			return it->second;
 		}
-
-		p = root->children;
-		while(p){
-			if(xmlStrcmp(p->name, (const xmlChar*)"field") == 0){
-				if(readXMLInteger(p, "id", intValue)){
-					id = intValue;
-
-					ItemType& it = Item::items.getItemType(id);
-
-					if(readXMLString(p, "type", strValue)){
-						if(strcasecmp(strValue.c_str(), "fire") == 0){				
-							it.group = ITEM_GROUP_MAGICFIELD;
-							it.damageType = DAMAGE_FIRE;
-						}
-						else if(strcasecmp(strValue.c_str(), "energy") == 0){
-							it.group = ITEM_GROUP_MAGICFIELD;
-							it.damageType = DAMAGE_ENERGY;
-						}
-						else if(strcasecmp(strValue.c_str(), "poison") == 0){
-							it.group = ITEM_GROUP_MAGICFIELD;
-							it.damageType = DAMAGE_POISON;
-						}
-					}
-
-					if(readXMLInteger(p, "initDamage", intValue)){
-						it.initialDamage = -intValue;
-					}
-
-					if(readXMLInteger(p, "roundMin", intValue)){
-						it.roundMin = intValue;
-					}
-
-					if(readXMLInteger(p, "roundTime", intValue)){
-						it.roundTime = intValue;
-					}
-
-					if(readXMLInteger(p, "roundDamage", intValue)){
-						it.roundDamage = -intValue;
-					}
-
-				}
-				else{
-					std::cout << "Warning: [Spells::loadFieldsFromXml] Can not configure field - no item id found" << std::endl;
-					return false;
-				}
-			}
-			
-			p = p->next;
-		}
-
-		xmlFreeDoc(doc);
 	}
 
-	return true;
+	return NULL;
 }
 
 Spell::Spell()
@@ -498,6 +442,14 @@ std::string InstantSpell::getScriptEventName()
 
 bool InstantSpell::configureEvent(xmlNodePtr p)
 {
+	if(!Spell::configureSpell(p)){
+		return false;
+	}
+
+	if(!TalkAction::configureEvent(p)){
+		return false;
+	}
+
 	int intValue;
 	
 	if(readXMLInteger(p, "params", intValue)){
@@ -509,12 +461,7 @@ bool InstantSpell::configureEvent(xmlNodePtr p)
 		needDirection = (intValue == 1);
 	}
 
-	if(Spell::configureSpell(p) && TalkAction::configureEvent(p)){
-		return true;
-	}
-	else{
-		return false;
-	}
+	return true;
 }
 
 bool InstantSpell::loadFunction(const std::string& functionName)
@@ -1017,6 +964,14 @@ std::string RuneSpell::getScriptEventName()
 	
 bool RuneSpell::configureEvent(xmlNodePtr p)
 {
+	if(!Spell::configureSpell(p)){
+		return false;
+	}
+	
+	if(!Action::configureEvent(p)){
+		return false;
+	}
+
 	int intValue;
 	if(readXMLInteger(p, "id", intValue)){
 		runeId = intValue;
@@ -1025,16 +980,18 @@ bool RuneSpell::configureEvent(xmlNodePtr p)
 		std::cout << "Error: [RuneSpell::configureSpell] Rune spell without id." << std::endl;
 		return false;
 	}
+
 	if(readXMLInteger(p, "hascharges", intValue)){
-		if(intValue == 0)
-	 		hasCharges = false;
+		hasCharges = (intValue != 0);
 	}
-	if(Spell::configureSpell(p) && Action::configureEvent(p)){
-		return true;
+
+	if(magLevel != 0){
+		//Change magic level in the ItemType to get accurate description
+		ItemType& iType = Item::items.getItemType(runeId);
+		iType.runeMagLevel = magLevel;
 	}
-	else{
-		return false;
-	}
+
+	return true;
 }
 
 bool RuneSpell::loadFunction(const std::string& function)
