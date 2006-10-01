@@ -2246,7 +2246,6 @@ bool Game::playerFollowCreature(Player* player, unsigned long creatureId)
 	}
 
 	return player->internalFollowCreature(followCreature);
-	//return internalFollowCreature(player, followCreature);
 }
 
 bool Game::playerSetFightModes(Player* player, uint8_t fightMode, uint8_t chaseMode)
@@ -2531,41 +2530,6 @@ bool Game::getPathToEx(const Creature* creature, const Position& targetPos,
 	return false;
 }
 
-/*
-bool Game::internalFollowCreature(Player* player, const Creature* followCreature)
-{
-	if(!followCreature || !player->isInRange(followCreature)){
-		player->setFollowCreature(NULL);
-		player->setAttackedCreature(NULL);
-
-		player->sendCancelTarget();
-		if(followCreature){
-			player->sendCancelMessage(RET_NOTPOSSIBLE);
-		}
-
-		player->stopAutoWalk();
-		return false;
-	}
-
-	std::list<Direction> listDir;
-	if(!Position::areInRange<1,1,0>(player->getPosition(), followCreature->getPosition())){
-		if(!map->getPathTo(player, followCreature->getPosition(), listDir)){
-			player->setFollowCreature(NULL);
-			player->setAttackedCreature(NULL);
-
-			player->sendCancelTarget();
-			player->sendCancelMessage(RET_THEREISNOWAY);
-			return false;
-		}
-
-		listDir.pop_back(); //remove the followCreature position
-	}
-
-	player->setFollowCreature(followCreature);
-	return playerAutoWalk(player, listDir);
-}
-*/
-
 void Game::checkWalk(unsigned long creatureId)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::checkWalk");
@@ -2576,40 +2540,6 @@ void Game::checkWalk(unsigned long creatureId)
 		flushSendBuffers();
 	}
 }
-
-/*
-void Game::checkAutoWalkPlayer(unsigned long id)
-{
-	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::checkAutoWalkPlayer");
-
-	Player* player = getPlayerByID(id);
-	if(player){
-		bool continueWalk = true;
-
-		if(player->listWalkDir.empty()){
-			if(player->checkStopAutoWalk(true)){
-				continueWalk = false;
-			}
-		}
-		
-		if(continueWalk){
-			if(!player->listWalkDir.empty()){
-				Position pos = player->getPosition();
-				Direction dir = player->listWalkDir.front();
-				player->listWalkDir.pop_front();
-
-				if(internalMoveCreature(player, dir) == RET_NOERROR || !player->checkStopAutoWalk(true)){
-					player->addEventWalk();
-				}
-
-				flushSendBuffers();
-			}
-			else
-				player->addEventWalk();
-		}
-	}
-}
-*/
 
 void Game::checkCreature(uint32_t creatureId, uint32_t interval)
 {

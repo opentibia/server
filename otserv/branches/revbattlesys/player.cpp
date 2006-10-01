@@ -2497,7 +2497,6 @@ void Player::setAttackedCreature(Creature* creature)
 	if(chaseMode == CHASEMODE_FOLLOW && creature){
 		if(followCreature != creature){
 			//chase opponent
-			//g_game.internalFollowCreature(this, creature);
 			internalFollowCreature(creature);
 		}
 	}
@@ -2568,19 +2567,6 @@ void Player::onFollowCreature(const Creature* creature)
 	}
 }
 
-/*
-void Player::setFollowCreature(const Creature* creature)
-{
-	if(followCreature != creature){
-		Creature::setFollowCreature(creature);
-
-		if(!followCreature){
-			stopAutoWalk();
-		}
-	}
-}
-*/
-
 void Player::setChaseMode(uint8_t mode)
 {
 	chaseMode_t prevChaseMode = chaseMode;
@@ -2596,7 +2582,6 @@ void Player::setChaseMode(uint8_t mode)
 		if(chaseMode == CHASEMODE_FOLLOW){
 			if(!followCreature && attackedCreature){
 				//chase opponent
-				//g_game.internalFollowCreature(this, attackedCreature);
 				internalFollowCreature(attackedCreature);
 			}
 		}
@@ -2607,97 +2592,10 @@ void Player::setChaseMode(uint8_t mode)
 	}
 }
 
-/*
-void Player::onWalk()
-{
-	bool continueWalk = true;
-
-	if(listWalkDir.empty()){
-		if(checkStopAutoWalk(true)){
-			continueWalk = false;
-		}
-	}
-	
-	if(continueWalk){
-		if(!listWalkDir.empty()){
-			Position pos = getPosition();
-			Direction dir = listWalkDir.front();
-			listWalkDir.pop_front();
-
-			if(g_game.internalMoveCreature(this, dir) == RET_NOERROR || !checkStopAutoWalk(true)){
-				addEventWalk();
-			}
-		}
-		else{
-			addEventWalk();
-		}
-	}
-}
-
-bool Player::startAutoWalk(std::list<Direction>& listDir)
-{
-	if(eventWalk == 0){
-		//start a new event
-		listWalkDir = listDir;
-		return addEventWalk();
-	}
-	else{
-		//event already running
-		listWalkDir = listDir;
-	}
-
-	return true;
-}
-
-bool Player::addEventWalk()
-{
-	if(isRemoved()){
-		eventWalk = 0;
-		return false;
-	}
-
-	int64_t ticks = getEventStepTicks();
-	eventWalk = g_game.addEvent(makeTask(ticks, std::bind2nd(std::mem_fun(&Game::checkAutoWalkPlayer), getID())));
-	return true;
-}
-
-bool Player::stopAutoWalk()
-{
-	if(eventWalk != 0){
-		g_game.stopEvent(eventWalk);
-		eventWalk = 0;
-
-		if(!listWalkDir.empty()){
-			listWalkDir.clear();
-			sendCancelWalk();
-		}
-	}
-
-	return true;
-}
-*/
-
 void Player::onWalkAborted()
 {
 	sendCancelWalk();
 }
-
-/*
-bool Player::checkStopAutoWalk(bool pathInvalid)
-{
-	if(followCreature){
-		if(pathInvalid || chaseMode == CHASEMODE_FOLLOW){
-			if(g_game.internalFollowCreature(this, followCreature)){
-				return false;
-			}
-		}
-	}
-
-	setFollowCreature(NULL);
-	stopAutoWalk();
-	return true;
-}
-*/
 
 void Player::getCreatureLight(LightInfo& light) const
 {

@@ -253,9 +253,6 @@ public:
 
 	bool internalMonsterYell(Monster* monster, const std::string& text);
 
-	//ReturnValue internalFollowCreature2(Creature* creature, const Creature* followCreature, uint32_t followDistance = 1);
-	//bool internalFollowCreature(Player* player, const Creature* followCreature);
-
 	//Implementation of player invoked events
 	bool movePlayer(Player* player, Direction direction);
 	bool playerWhisper(Player* player, const std::string& text);
