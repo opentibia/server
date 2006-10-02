@@ -9,8 +9,32 @@
 <action itemid="2420" script="machete.lua" />
 <action itemid="2442" script="machete.lua" />
 <action itemid="2553" script="pick.lua" />
-<action itemid="2553" script="scythe.lua" />
+<action itemid="2550" script="scythe.lua" />
 <action itemid="2580" script="fishing_rod.lua" allowfaruse="1" />
-<!-- waiting revbattlesys to be finished to code newer tools of protocol 7.8x -->
+
+-- Liquids
+<action itemid="1775" script="liquid.lua" />
+<action itemid="2005" script="liquid.lua" />
+<action itemid="2006" script="liquid.lua" />
+<action itemid="2007" script="liquid.lua" />
+<action itemid="2008" script="liquid.lua" />
+<action itemid="2009" script="liquid.lua" />
+<action itemid="2011" script="liquid.lua" />
+<action itemid="2012" script="liquid.lua" />
+<action itemid="2013" script="liquid.lua" />
+<action itemid="2014" script="liquid.lua" />
+<action itemid="2015" script="liquid.lua" />
+<action itemid="2023" script="liquid.lua" />
+<action itemid="2031" script="liquid.lua" />
+<action itemid="2032" script="liquid.lua" />
+<action itemid="2033" script="liquid.lua" />
+<action itemid="2034" script="liquid.lua" />
+<action itemid="2562" script="liquid.lua" />
+<action itemid="2574" script="liquid.lua" />
+<action itemid="2575" script="liquid.lua" />
+<action itemid="2576" script="liquid.lua" />
+<action itemid="2577" script="liquid.lua" />
+<action itemid="3941" script="liquid.lua" />
+<action itemid="3942" script="liquid.lua" />
 
 </actions>
