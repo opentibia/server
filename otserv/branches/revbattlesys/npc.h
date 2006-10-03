@@ -117,7 +117,6 @@ public:
 	void addList() {listNpc.addList(this);}
 	
 	virtual bool canSee(const Position& pos) const;
-	virtual bool isInRange(const Position& pos) const;
 	
 	void speak(const std::string& text){};
 	virtual const std::string& getName() const {return name;};
@@ -138,7 +137,8 @@ protected:
 
 	virtual void onCreatureAppear(const Creature* creature, bool isLogin);
 	virtual void onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout);
-	virtual void onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport);
+	virtual void onCreatureMove(const Creature* creature, const Position& newPos, const Position& oldPos,
+		uint32_t oldStackPos, bool teleport);
 
 	virtual void onCreatureTurn(const Creature* creature, uint32_t stackpos);
 	virtual void onCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text);
@@ -151,7 +151,6 @@ protected:
 	std::string name;
 	
 	NpcEventsHandler* m_npcEventHandler;
-	//std::list<Position> route;
 	bool loaded;
 	
 	static NpcScriptInterface* m_scriptInterface;

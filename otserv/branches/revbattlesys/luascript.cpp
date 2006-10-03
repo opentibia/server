@@ -1378,14 +1378,7 @@ int LuaScriptInterface::luaDoSendMagicEffect(lua_State *L)
 		pos = env->getRealPos();
 	}
 	
-	g_game.getSpectators(Range(pos, true), list);
-
-	for(it = list.begin(); it != list.end(); ++it) {
-		Player *p = (*it)->getPlayer();
-		if(p)
-			p->sendMagicEffect(pos, type);
-	}	
-	
+	g_game.addMagicEffect(pos, type);
 	lua_pushnumber(L, LUA_NO_ERROR);
 	return 1;
 }
@@ -1437,38 +1430,14 @@ int LuaScriptInterface::luaDoPlayerAddHealth(lua_State *L)
 {
 	//doPlayerAddHealth(uid,health)
 	//doCreatureAddHealth(uid,health)
-	int addhealth = (int)popNumber(L);
+	int healthChange = (int)popNumber(L);
 	unsigned long cid = (unsigned long)popNumber(L);
 	
 	ScriptEnviroment* env = getScriptEnv();
 	
 	Creature* creature = env->getCreatureByUID(cid);
 	if(creature){
-		int tmp = creature->health + addhealth;
-		if(tmp <= 0){
-			creature->health = 1;
-		}
-		else if(tmp > creature->healthMax){
-			creature->health = creature->healthMax;
-		}
-		else{
-			creature->health = tmp;
-		}
-		Player* player = creature->getPlayer();
-		
-		if(player){
-			player->sendStats();
-		}
-		
-		SpectatorVec list;
-		SpectatorVec::iterator it;
-
-		g_game.getSpectators(Range(creature->getPosition(), true), list);
-		for(it = list.begin(); it != list.end(); ++it) {
-			Player* p = (*it)->getPlayer();
-			if(p)
-				p->sendCreatureHealth(creature);
-		}
+		g_game.combatChangeHealth(DAMAGE_NONE, NULL, creature, healthChange);
 		lua_pushnumber(L, LUA_NO_ERROR);
 	}
 	else{
@@ -1481,15 +1450,14 @@ int LuaScriptInterface::luaDoPlayerAddHealth(lua_State *L)
 int LuaScriptInterface::luaDoPlayerAddMana(lua_State *L)
 {
 	//doPlayerAddMana(uid,mana)
-	int addmana = (int)popNumber(L);
+	int manaChange = (int)popNumber(L);
 	unsigned long cid = (unsigned long)popNumber(L);
 	
 	ScriptEnviroment* env = getScriptEnv();
 	
 	Player* player = env->getPlayerByUID(cid);
 	if(player){
-		player->mana = std::min(player->manaMax,player->mana+addmana);
-		player->sendStats();
+		g_game.combatChangeMana(NULL, player, manaChange);
 		lua_pushnumber(L, LUA_NO_ERROR);
 	}
 	else{
@@ -1580,15 +1548,7 @@ int LuaScriptInterface::luaDoSendAnimatedText(lua_State *L)
 		pos = env->getRealPos();
 	}
 	
-	g_game.getSpectators(Range(pos, true), list);
-
-	for(it = list.begin(); it != list.end(); ++it) {
-		Player *p = (*it)->getPlayer();
-		if(p)
-			p->sendAnimatedText(pos, color, text);
-	}
-	
-	lua_pushnumber(L, LUA_NO_ERROR);
+	g_game.addAnimatedText(pos, color, text);
 	return 1;
 }
 

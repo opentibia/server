@@ -507,7 +507,7 @@ void Protocol76::checkCreatureAsKnown(unsigned long id, bool &known, unsigned lo
 			removedKnown = knownPlayers.front();
 
 			Creature *c = game->getCreatureByID(removedKnown);
-			if ((!c) || (!CanSee(c)))
+			if ((!c) || (!canSee(c)))
 				break;
 
 			// this creature we can't remove, still in sight, so back to the end
@@ -526,30 +526,38 @@ void Protocol76::checkCreatureAsKnown(unsigned long id, bool &known, unsigned lo
 	}
 }
 
-bool Protocol76::CanSee(const Position& pos) const
+bool Protocol76::canSee(const Creature* c) const
 {
-	return CanSee(pos.x, pos.y, pos.z);
+	if(c->isRemoved())
+		return false;
+
+	return canSee(c->getPosition());
 }
 
-bool Protocol76::CanSee(int x, int y, int z) const
+bool Protocol76::canSee(const Position& pos) const
+{
+	return canSee(pos.x, pos.y, pos.z);
+}
+
+bool Protocol76::canSee(int x, int y, int z) const
 {
 #ifdef __DEBUG__
 	if(z < 0 || z >= MAP_MAX_LAYERS) {
-		std::cout << "WARNING! Protocol76::CanSee() Z-value is out of range!" << std::endl;
+		std::cout << "WARNING! Protocol76::canSee() Z-value is out of range!" << std::endl;
 	}
 #endif
 
 	const Position& myPos = player->getPosition();
 
-	//we are on ground level or above (7 -> 0)
 	if(myPos.z <= 7){
+		//we are on ground level or above (7 -> 0)
 		//view is from 7 -> 0
 		if(z > 7){
 			return false;
 		}
 	}
-	//we are underground (8 -> 15)
 	else if(myPos.z >= 8){
+		//we are underground (8 -> 15)
 		//view is +/- 2 from the floor we stand on
 		if(std::abs(myPos.z - z) > 2){
 			return false;
@@ -565,16 +573,6 @@ bool Protocol76::CanSee(int x, int y, int z) const
 
 	return false;
 }
-
-bool Protocol76::CanSee(const Creature* c) const
-{
-	if(c->isRemoved())
-		return false;
-
-	Position pos = c->getPosition();
-	return CanSee(pos.x, pos.y, pos.z);
-}
-
 
 void Protocol76::logout()
 {
@@ -1127,7 +1125,7 @@ void Protocol76::sendOpenPriv(const std::string& receiver)
 
 void Protocol76::sendSetOutfit(const Creature* creature)
 {
-	if(CanSee(creature)){
+	if(canSee(creature)){
 		NetworkMessage msg;
 		msg.AddByte(0x8E);
 		msg.AddU32(creature->getID());
@@ -1138,7 +1136,7 @@ void Protocol76::sendSetOutfit(const Creature* creature)
 
 void Protocol76::sendCreatureLight(const Creature* creature)
 {
-	if(CanSee(creature)){
+	if(canSee(creature)){
 		NetworkMessage msg;
 		AddCreatureLight(msg, creature);
 		WriteBuffer(msg);
@@ -1154,7 +1152,7 @@ void Protocol76::sendWorldLight(const LightInfo& lightInfo)
 
 void Protocol76::sendCreatureSkull(const Creature* creature, Skulls_t skull)
 {
-	if(CanSee(creature)){
+	if(canSee(creature)){
 		NetworkMessage msg;
 		msg.AddByte(0x90);
 		msg.AddU32(creature->getID());
@@ -1165,7 +1163,7 @@ void Protocol76::sendCreatureSkull(const Creature* creature, Skulls_t skull)
 
 void Protocol76::sendCreatureShield(const Creature* creature)
 {
-	if(CanSee(creature)){
+	if(canSee(creature)){
 		NetworkMessage msg;
 		msg.AddByte(0x91);
 		msg.AddU32(creature->getID());
@@ -1176,7 +1174,7 @@ void Protocol76::sendCreatureShield(const Creature* creature)
 
 void Protocol76::sendCreatureSquare(const Creature* creature, SquareColor_t color)
 {
-	if(CanSee(creature)){
+	if(canSee(creature)){
 		NetworkMessage msg;
 		msg.AddByte(0x86);
 		msg.AddU32(creature->getID());
@@ -1341,7 +1339,7 @@ void Protocol76::sendCloseContainer(uint32_t cid)
 
 void Protocol76::sendCreatureTurn(const Creature* creature, unsigned char stackPos)
 {
-	if(CanSee(creature)){
+	if(canSee(creature)){
 		NetworkMessage msg;
 
 		msg.AddByte(0x6B);
@@ -1396,7 +1394,7 @@ void Protocol76::sendCancelWalk()
 {
 	NetworkMessage netmsg;
 	netmsg.AddByte(0xB5);
-	netmsg.AddByte(player->getDirection()); // direction
+	netmsg.AddByte(player->getDirection());
 	WriteBuffer(netmsg);
 }
 
@@ -1417,7 +1415,7 @@ void Protocol76::sendPing()
 void Protocol76::sendDistanceShoot(const Position& from, const Position& to, unsigned char type)
 {
 	NetworkMessage msg;
-	AddDistanceShoot(msg,from, to,type );
+	AddDistanceShoot(msg,from, to,type);
 	WriteBuffer(msg);
 }
 
@@ -1445,7 +1443,7 @@ void Protocol76::sendCreatureHealth(const Creature* creature)
 //tile
 void Protocol76::sendAddTileItem(const Position& pos, const Item* item)
 {
-	if(CanSee(pos)){
+	if(canSee(pos)){
 		NetworkMessage msg;
 		AddTileItem(msg, pos, item);
 		WriteBuffer(msg);
@@ -1454,7 +1452,7 @@ void Protocol76::sendAddTileItem(const Position& pos, const Item* item)
 
 void Protocol76::sendUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* item)
 {
-	if(CanSee(pos)){
+	if(canSee(pos)){
 		NetworkMessage msg;
 		UpdateTileItem(msg, pos, stackpos, item);
 		WriteBuffer(msg);
@@ -1463,7 +1461,7 @@ void Protocol76::sendUpdateTileItem(const Position& pos, uint32_t stackpos, cons
 
 void Protocol76::sendRemoveTileItem(const Position& pos, uint32_t stackpos)
 {
-	if(CanSee(pos)){
+	if(canSee(pos)){
 		NetworkMessage msg;
 		RemoveTileItem(msg, pos, stackpos);
 		WriteBuffer(msg);
@@ -1472,7 +1470,7 @@ void Protocol76::sendRemoveTileItem(const Position& pos, uint32_t stackpos)
 
 void Protocol76::UpdateTile(const Position& pos)
 {
-	if(CanSee(pos)){
+	if(canSee(pos)){
 		NetworkMessage msg;
 		UpdateTile(msg, pos);
 		WriteBuffer(msg);
@@ -1481,7 +1479,7 @@ void Protocol76::UpdateTile(const Position& pos)
 
 void Protocol76::sendAddCreature(const Creature* creature, bool isLogin)
 {
-	if(CanSee(creature->getPosition())){
+	if(canSee(creature->getPosition())){
 		NetworkMessage msg;
 
 		if(creature == player){
@@ -1570,7 +1568,7 @@ void Protocol76::sendAddCreature(const Creature* creature, bool isLogin)
 
 void Protocol76::sendRemoveCreature(const Creature* creature, const Position& pos, uint32_t stackpos, bool isLogout)
 {
-	if(CanSee(pos)){
+	if(canSee(pos)){
 		NetworkMessage msg;
 		RemoveTileItem(msg, pos, stackpos);
 
@@ -1582,10 +1580,9 @@ void Protocol76::sendRemoveCreature(const Creature* creature, const Position& po
 	}
 }
 
-void Protocol76::sendMoveCreature(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport)
+void Protocol76::sendMoveCreature(const Creature* creature, const Position& newPos, const Position& oldPos,
+	uint32_t oldStackPos, bool teleport)
 {
-	const Position& newPos = creature->getPosition();
-
 	if(creature == player){
 		NetworkMessage msg;
 
@@ -1636,7 +1633,7 @@ void Protocol76::sendMoveCreature(const Creature* creature, const Position& oldP
 
 		WriteBuffer(msg);
 	}
-	else if(CanSee(oldPos) && CanSee(creature->getPosition())){
+	else if(canSee(oldPos) && canSee(creature->getPosition())){
 		if(teleport || (oldPos.z == 7 && newPos.z >= 8)){
 			sendRemoveCreature(creature, oldPos, oldStackPos, false);
 			sendAddCreature(creature, false);
@@ -1653,10 +1650,10 @@ void Protocol76::sendMoveCreature(const Creature* creature, const Position& oldP
 			}
 		}
 	}
-	else if(CanSee(oldPos)){
+	else if(canSee(oldPos)){
 		sendRemoveCreature(creature, oldPos, oldStackPos, false);
 	}
-	else if(CanSee(creature->getPosition())){
+	else if(canSee(creature->getPosition())){
 		sendAddCreature(creature, false);
 	}
 }
@@ -1915,7 +1912,7 @@ void Protocol76::AddCreatureHealth(NetworkMessage& msg,const Creature* creature)
 
 void Protocol76::AddCreatureOutfit(NetworkMessage &msg, const Creature* creature)
 {
-	const Outfit_t outfit = creature->getCurrentOutfit();
+	const Outfit_t outfit = creature->getDefaultOutfit();
 	msg.AddByte(outfit.lookType);
 
 	if(outfit.lookType != 0){

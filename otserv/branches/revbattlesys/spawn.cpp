@@ -501,7 +501,8 @@ void Spawn::idle(int t)
 				SpectatorVec list;
 				SpectatorVec::iterator it;
 
-				g_game.getSpectators(Range(sit->second.pos, true), list);
+				//g_game.getSpectators(Range(sit->second.pos, true), list);
+				g_game.getSpectators(list, sit->second.pos, true);
 
 				bool playerFound = false;
 				Player* player = NULL;

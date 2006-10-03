@@ -167,12 +167,14 @@ Npc::~Npc()
 
 bool Npc::canSee(const Position& pos) const
 {
-	return Position::areInRange<7, 5, 0>(pos, getPosition());
-}
+	const Position& myPos = getPosition();
 
-bool Npc::isInRange(const Position& pos) const
-{
-	return Position::areInRange<7, 5, 0>(getPosition(), pos);
+	if(pos.z != myPos.z){
+		return false;
+	}
+
+	return (std::abs(myPos.x - pos.x) <= Map::maxViewportX &&
+					std::abs(myPos.y - pos.y) <= Map::maxViewportY);
 }
 
 std::string Npc::getDescription(int32_t lookDistance) const
@@ -214,9 +216,10 @@ void Npc::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool 
 	m_npcEventHandler->onCreatureDisappear(creature);
 }
 
-void Npc::onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport)
+void Npc::onCreatureMove(const Creature* creature, const Position& newPos, const Position& oldPos,
+	uint32_t oldStackPos, bool teleport)
 {
-	Creature::onCreatureMove(creature, oldPos, oldStackPos, teleport);
+	Creature::onCreatureMove(creature, newPos, oldPos, oldStackPos, teleport);
 }
 
 void Npc::onCreatureTurn(const Creature* creature, uint32_t stackpos)

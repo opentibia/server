@@ -114,7 +114,6 @@ public:
 	virtual void addList() = 0;
 
 	virtual bool canSee(const Position& pos) const = 0;
-	virtual bool isInRange(const Position& pos) const = 0;
 
 	unsigned long getExpForLv(const int& lv) const
 	{ 
@@ -151,8 +150,8 @@ public:
 
 	//walk functions
 	bool startAutoWalk(std::list<Direction>& listDir);
-	bool addEventWalk();
-	bool stopAutoWalk();
+	void addEventWalk();
+	void stopEventWalk();
 
 	//walk events
 	virtual void onWalkAborted() {};
@@ -222,9 +221,6 @@ public:
 	virtual void onThink(uint32_t interval);
 	virtual void onWalk();
 	virtual bool getNextStep(Direction& dir);
-	void addWalk(std::list<Direction>& listDir);
-	void addWalkEvent();
-	void stopWalkEvent();
 
 	virtual void onAddTileItem(const Position& pos, const Item* item);
 	virtual void onUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* oldItem, const Item* newItem);
@@ -234,7 +230,8 @@ public:
 	virtual void onCreatureAppear(const Creature* creature, bool isLogin);
 	virtual void onCreatureDisappear(const Creature* creature);
 	virtual void onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout);
-	virtual void onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport);
+	virtual void onCreatureMove(const Creature* creature, const Position& newPos, const Position& oldPos,
+		uint32_t oldStackPos, bool teleport);
 
 	virtual void onCreatureTurn(const Creature* creature, uint32_t stackPos) { };
 	virtual void onCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text) { };
@@ -253,6 +250,7 @@ protected:
 
 	Position masterPos;
 	uint64_t lastMove;
+	uint32_t lastStepCost;
 	uint32_t speed;
 
 	Direction direction;

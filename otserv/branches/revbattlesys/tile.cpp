@@ -328,7 +328,8 @@ void Tile::onAddTileItem(Item* item)
 
 	SpectatorVec list;
 	SpectatorVec::iterator it;
-	g_game.getSpectators(Range(cylinderMapPos, true), list);
+	//g_game.getSpectators(Range(cylinderMapPos, true), list);
+	g_game.getSpectators(list, cylinderMapPos, true);
 
 	//send to client
 	Player* player = NULL;
@@ -350,7 +351,8 @@ void Tile::onUpdateTileItem(uint32_t index, Item* oldItem, Item* newItem)
 
 	SpectatorVec list;
 	SpectatorVec::iterator it;
-	g_game.getSpectators(Range(cylinderMapPos, true), list);
+	//g_game.getSpectators(Range(cylinderMapPos, true), list);
+	g_game.getSpectators(list, cylinderMapPos, true);
 
 	//send to client
 	Player* player = NULL;
@@ -372,7 +374,8 @@ void Tile::onRemoveTileItem(uint32_t index, Item* item)
 
 	SpectatorVec list;
 	SpectatorVec::iterator it;
-	g_game.getSpectators(Range(cylinderMapPos, true), list);
+	//g_game.getSpectators(Range(cylinderMapPos, true), list);
+	g_game.getSpectators(list, cylinderMapPos, true);
 
 	//send to client
 	Player* player = NULL;
@@ -394,7 +397,8 @@ void Tile::onUpdateTile()
 
 	SpectatorVec list;
 	SpectatorVec::iterator it;
-	g_game.getSpectators(Range(cylinderMapPos, true), list);
+	//g_game.getSpectators(Range(cylinderMapPos, true), list);
+	g_game.getSpectators(list, cylinderMapPos, true);
 
 	//send to client
 	Player* player = NULL;
@@ -437,20 +441,23 @@ void Tile::moveCreature(Creature* creature, Cylinder* toCylinder, bool teleport 
 
 	SpectatorVec list;
 	SpectatorVec::iterator it;
-	g_game.getSpectators(Range(fromPos, true), list);
-	g_game.getSpectators(Range(toPos, true), list);
+	//g_game.getSpectators(Range(fromPos, true), list);
+	//g_game.getSpectators(Range(toPos, true), list);
+
+	g_game.getSpectators(list, fromPos, true);
+	g_game.getSpectators(list, toPos, true);
 
 	//send to client
 	Player* player = NULL;
 	for(it = list.begin(); it != list.end(); ++it) {
 		if(player = (*it)->getPlayer()){
-			player->sendCreatureMove(creature, fromPos, oldStackPos, teleport);
+			player->sendCreatureMove(creature, toPos, fromPos, oldStackPos, teleport);
 		}
 	}
 
 	//event method
 	for(it = list.begin(); it != list.end(); ++it) {
-		(*it)->onCreatureMove(creature, fromPos, oldStackPos, teleport);
+		(*it)->onCreatureMove(creature, toPos, fromPos, oldStackPos, teleport);
 	}
 
 	toCylinder->postAddNotification(creature, newStackPos);
@@ -488,7 +495,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			
 			if(monster->canPushItems()){
 				for(CreatureVector::const_iterator cit = creatures.begin(); cit != creatures.end(); ++cit){
-					if( (*cit)->getMonster() && !(*cit)->isPushable() ){
+					if( !(*cit)->getMonster() || !(*cit)->isPushable() ){
 						return RET_NOTPOSSIBLE;
 					}
 				}
@@ -1082,14 +1089,14 @@ void Tile::postAddNotification(Thing* thing, int32_t index, bool hasOwnership /*
 
 	SpectatorVec list;
 	SpectatorVec::iterator it;
-	g_game.getSpectators(Range(cylinderMapPos, true), list);
+	//g_game.getSpectators(Range(cylinderMapPos, true), list);
+	g_game.getSpectators(list, cylinderMapPos, true);
 
 	for(it = list.begin(); it != list.end(); ++it){
 		if(Player* player = (*it)->getPlayer()){
 			player->postAddNotification(thing, index, false);
 		}
 	}
-
 
 	if(hasOwnership){
 		//calling movement scripts
@@ -1122,7 +1129,8 @@ void Tile::postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRe
 
 	SpectatorVec list;
 	SpectatorVec::iterator it;
-	g_game.getSpectators(Range(cylinderMapPos, true), list);
+	//g_game.getSpectators(Range(cylinderMapPos, true), list);
+	g_game.getSpectators(list, cylinderMapPos, true);
 
 	if(/*isCompleteRemoval &&*/ getThingCount() > 8){
 		onUpdateTile();

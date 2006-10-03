@@ -22,7 +22,6 @@
 #define __OTSERV_MONSTERS_H__
 
 #include <string>
-
 #include "creature.h"
 
 #define CHANCE_MAX  100000
@@ -41,13 +40,21 @@ struct LootBlock{
 	}
 };	
 
-struct summonBlock{
+struct summonBlock_t{
 	std::string name;
-	unsigned long summonChance;
+	uint32_t chance;
+};
+
+class Spell;
+
+struct spellBlock_t{
+	Spell* spell;
+	uint32_t chance;
 };
 
 typedef std::list<LootBlock> LootItems;
-typedef std::list<summonBlock> SummonSpells;
+typedef std::list<summonBlock_t> SummonList;
+typedef std::list<spellBlock_t> SpellList;
 
 class MonsterType{
 public:
@@ -82,9 +89,9 @@ public:
 	int lightLevel;
 	int lightColor;
 	
-	SummonSpells summonSpells; 
-
+	SummonList summonList;
 	LootItems lootItems;
+	SpellList spellList;
 	
 	void createLoot(Container* corpse);
 	void createLootContainer(Container* parent, const LootBlock& lootblock);

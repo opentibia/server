@@ -54,6 +54,7 @@ Creature::Creature() :
 	mana = 0;
 	manaMax = 0;
 	lastMove = 0;
+	lastStepCost = 0;
 	speed = 220;
 
 	followCreature = NULL;
@@ -123,7 +124,7 @@ void Creature::onWalk()
 	}
 
 	eventWalk = 0;
-	addWalkEvent();
+	addEventWalk();
 }
 
 bool Creature::getNextStep(Direction& dir)
@@ -152,6 +153,35 @@ bool Creature::getNextStep(Direction& dir)
 	return result;
 }
 
+bool Creature::startAutoWalk(std::list<Direction>& listDir)
+{
+	listWalkDir = listDir;
+	addEventWalk();
+	return true;
+}
+
+void Creature::addEventWalk()
+{
+	if(eventWalk == 0){
+		int64_t ticks = getEventStepTicks();
+		eventWalk = g_game.addEvent(makeTask(ticks, std::bind2nd(std::mem_fun(&Game::checkWalk), getID())));
+	}
+}
+
+void Creature::stopEventWalk()
+{
+	if(eventWalk != 0){
+		g_game.stopEvent(eventWalk);
+		eventWalk = 0;
+
+		if(!listWalkDir.empty()){
+			listWalkDir.clear();
+			onWalkAborted();
+		}
+	}
+}
+
+/*
 void Creature::addWalk(std::list<Direction>& listDir)
 {
 	listWalkDir = listDir;
@@ -166,20 +196,21 @@ void Creature::addWalkEvent()
 	}
 }
 
+void Creature::stopWalkEvent()
+{
+	if(eventWalk != 0){
+		g_game.stopEvent(eventWalk);
+		eventWalk = 0;
+	}
+}
+*/
+
 void Creature::validateWalkPath()
 {
 	if(!internalUpdateFollow && followCreature){
 		if(!g_game.isPathValid(this, listWalkDir, followCreature->getPosition())){
 			internalUpdateFollow = true;
 		}
-	}
-}
-
-void Creature::stopWalkEvent()
-{
-	if(eventWalk != 0){
-		g_game.stopEvent(eventWalk);
-		eventWalk = 0;
 	}
 }
 
@@ -226,17 +257,29 @@ void Creature::onCreatureDisappear(const Creature* creature, uint32_t stackpos, 
 	onCreatureDisappear(creature);
 }
 
-void Creature::onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport)
+void Creature::onCreatureMove(const Creature* creature, const Position& newPos, const Position& oldPos,
+	uint32_t oldStackPos, bool teleport)
 {
+	if(creature == this){
+		lastMove = OTSYS_TIME();
+		
+		lastStepCost = 1;
+
+		if(!teleport &&  (std::abs(newPos.x - oldPos.x) >=1 && std::abs(newPos.y - oldPos.y) >= 1) ){
+			//diagonal extra cost
+			lastStepCost = 2;
+		}
+	}
+
 	if(followCreature == creature || (creature == this && followCreature)){
-		if(!creature->isInRange(followCreature->getPosition())){
-			onCreatureDisappear(followCreature);	
+		if(!creature->canSee(followCreature->getPosition())){
+			onCreatureDisappear(followCreature);
 		}
 		
 		validateWalkPath();
 	}
 	if(attackedCreature == creature || (creature == this && attackedCreature)){
-		if(!creature->isInRange(attackedCreature->getPosition())){
+		if(!creature->canSee(attackedCreature->getPosition())){
 			onCreatureDisappear(attackedCreature);	
 		}
 	}
@@ -653,21 +696,24 @@ int Creature::getStepDuration() const
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(g_game.gameLock, "Creature::getStepDuration()");
 
-	int duration = 500;
+	int32_t duration = 500;
 
-	if(!isRemoved()){
-		const Position& tilePos = getPosition();
-		Tile* tile = g_game.getTile(tilePos.x, tilePos.y, tilePos.z);
-		if(tile && tile->ground){
-			int groundid = tile->ground->getID();
-			uint16_t stepspeed = Item::items[groundid].speed;
-			if(stepspeed != 0) {
-				duration =  (1000 * stepspeed) / (getSpeed() != 0 ? getSpeed() : 220);
-			}
+	if(isRemoved()){
+		return duration;
+	}
+
+	const Position& tilePos = getPosition();
+	Tile* tile = g_game.getTile(tilePos.x, tilePos.y, tilePos.z);
+	if(tile && tile->ground){
+		uint32_t groundId = tile->ground->getID();
+		uint16_t stepSpeed = Item::items[groundId].speed;
+
+		if(stepSpeed != 0){
+			duration =  (1000 * stepSpeed) / (getSpeed() != 0 ? getSpeed() : 220);
 		}
 	}
 
-	return duration;
+	return duration * lastStepCost;
 };
 
 int64_t Creature::getSleepTicks() const
@@ -686,53 +732,11 @@ int64_t Creature::getEventStepTicks() const
 {
 	int64_t ret = getSleepTicks();
 
-	if(ret <=0){
+	if(ret <= 0){
 		ret = getStepDuration();
 	}
 
 	return ret;
-}
-
-bool Creature::startAutoWalk(std::list<Direction>& listDir)
-{
-	if(eventWalk == 0){
-		//start a new event
-		listWalkDir = listDir;
-		return addEventWalk();
-	}
-	else{
-		//event already running
-		listWalkDir = listDir;
-	}
-
-	return true;
-}
-
-bool Creature::addEventWalk()
-{
-	if(isRemoved()){
-		eventWalk = 0;
-		return false;
-	}
-
-	int64_t ticks = getEventStepTicks();
-	eventWalk = g_game.addEvent(makeTask(ticks, std::bind2nd(std::mem_fun(&Game::checkWalk), getID())));
-	return true;
-}
-
-bool Creature::stopAutoWalk()
-{
-	if(eventWalk != 0){
-		g_game.stopEvent(eventWalk);
-		eventWalk = 0;
-
-		if(!listWalkDir.empty()){
-			listWalkDir.clear();
-			onWalkAborted();
-		}
-	}
-
-	return true;
 }
 
 void Creature::getCreatureLight(LightInfo& light) const

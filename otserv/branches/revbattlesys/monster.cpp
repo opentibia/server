@@ -52,7 +52,7 @@ Creature()
 {
 	isActive = false;
 	targetIsRecentAdded = false;
-
+	
 	mType = _mtype;
 	defaultOutfit.lookHead = mType->lookhead;
 	defaultOutfit.lookBody = mType->lookbody;
@@ -61,7 +61,6 @@ Creature()
 	defaultOutfit.lookType = mType->looktype;
 	currentOutfit = defaultOutfit;
 
-	//lookMaster = mType->lookmaster;
 	health     = mType->health;
 	healthMax  = mType->health_max;
 	speed = mType->base_speed;
@@ -81,12 +80,14 @@ Monster::~Monster()
 
 bool Monster::canSee(const Position& pos) const
 {
-	return Position::areInRange<7, 5, 0>(pos, getPosition());
-}
+	const Position& myPos = getPosition();
 
-bool Monster::isInRange(const Position& pos) const
-{
-	return Position::areInRange<9, 9, 0>(getPosition(), pos);
+	if(pos.z != myPos.z){
+		return false;
+	}
+
+	return (std::abs(myPos.x - pos.x) <= Map::maxViewportX &&
+					std::abs(myPos.y - pos.y) <= Map::maxViewportY);
 }
 
 void Monster::onAddTileItem(const Position& pos, const Item* item)
@@ -121,39 +122,31 @@ void Monster::onCreatureDisappear(const Creature* creature, uint32_t stackpos, b
 	onCreatureLeave(creature);
 }
 
-void Monster::onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport)
+void Monster::onCreatureMove(const Creature* creature, const Position& newPos, const Position& oldPos, uint32_t oldStackPos, bool teleport)
 {
-	Creature::onCreatureMove(creature, oldPos, oldStackPos, teleport);
-
-	const Position& creaturePos = creature->getPosition();
+	Creature::onCreatureMove(creature, newPos, oldPos, oldStackPos, teleport);
 
 	if(creature == this){
 		if(isActive){
 			for(TargetList::iterator it = targetList.begin(); it != targetList.end(); ){
-				if(!isInRange((*it)->getPosition())){
+				if(!canSee((*it)->getPosition())){
 					it = targetList.erase(it);
 				}
 				else
 					++it;
 			}
-
-			/*
-			if(followCreature && !isInRange(followCreature->getPosition())){
-				onCreatureLeave(followCreature);
-			}
-			*/
 		}
 		else{
 			onCreatureEnter(creature);
 		}
 	}
-	else if(canSee(creaturePos) && canSee(oldPos)){
+	/*else if(canSee(newPos) && canSee(oldPos)){
 		//creature just moving around in-range
-	}
-	else if(canSee(creaturePos) && !canSee(oldPos)){
+	}*/
+	else if(canSee(newPos) && !canSee(oldPos)){
 		onCreatureEnter(creature);
 	}
-	else if(!canSee(creaturePos) && canSee(oldPos)){
+	else if(!canSee(newPos) && canSee(oldPos)){
 		onCreatureLeave(creature);
 	}
 }
@@ -168,7 +161,8 @@ void Monster::onCreatureEnter(const Creature* creature)
 		SpectatorVec list;
 		SpectatorVec::iterator it;
 
-		g_game.getSpectators(Range(getPosition(), true), list);
+		//g_game.getSpectators(Range(getPosition(), true), list);
+		g_game.getSpectators(list, getPosition(), true);
 		for(it = list.begin(); it != list.end(); ++it) {
 			if(*it != this){
 				onCreatureEnter(*it);
@@ -182,10 +176,13 @@ void Monster::onCreatureEnter(const Creature* creature)
 		if(creature->isAttackable() &&
 			(creature->getPlayer() ||
 			(creature->getMaster() && creature->getMaster()->getPlayer()))){
-			targetList.push_back(const_cast<Creature*>(creature));
 
-			startThink();
-			targetIsRecentAdded = true;
+			if(std::find(targetList.begin(), targetList.end(), creature) == targetList.end()){
+				targetList.push_back(const_cast<Creature*>(creature));
+	
+				startThink();
+				targetIsRecentAdded = true;
+			}
 		}
 	}
 }
@@ -195,9 +192,9 @@ void Monster::onCreatureLeave(const Creature* creature)
 	if(creature == this || getMaster() == creature){
 		stopThink();
 	}
-	else if(followCreature == creature){
+	/*else if(followCreature == creature){
 		stopThink();
-	}
+	}*/
 
 	TargetList::iterator it = std::find(targetList.begin(), targetList.end(), creature);
 	if(it != targetList.end()){
@@ -216,7 +213,7 @@ void Monster::startThink()
 		eventCheck = g_game.addEvent(makeTask(500, boost::bind(&Game::checkCreature, &g_game, getID(), 500)));
 	}
 
-	addWalkEvent();
+	addEventWalk();
 }
 
 void Monster::stopThink()
@@ -227,7 +224,8 @@ void Monster::stopThink()
 		(*cit)->setAttackedCreature(NULL);
 	}
 
-	stopWalkEvent();
+	stopEventWalk();
+	eventWalk = 0;
 
 	g_game.stopEvent(eventCheck);
 	eventCheck = 0;
@@ -240,16 +238,21 @@ void Monster::searchTarget()
 {
 	if(!targetList.empty()){
 		TargetList::iterator it = targetList.begin();
+		Creature* target = *it;
 
-		if(!internalFollowCreature(*it)){
+		if(!internalFollowCreature(target)){
 			targetList.erase(it);
-			targetList.push_back(*it);
+			targetList.push_back(target);
 		}
 	}
 }
 
 void Monster::onThink(uint32_t interval)
 {
+	if(!isActive){
+		return;
+	}
+
 	Creature::onThink(interval);
 
 	if(targetList.empty()){
@@ -271,6 +274,10 @@ void Monster::onThink(uint32_t interval)
 
 void Monster::onWalk()
 {
+	if(!isActive){
+		return;
+	}
+
 	Creature::onWalk();
 }
 

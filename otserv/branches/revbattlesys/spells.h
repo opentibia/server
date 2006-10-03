@@ -31,6 +31,7 @@
 
 class RuneSpell;
 class InstantSpell;
+class Spell;
 
 typedef std::map<uint32_t, RuneSpell*> RunesMap;
 typedef std::map<std::string, InstantSpell*> InstantsMap;
@@ -41,6 +42,7 @@ public:
 	Spells();
 	virtual ~Spells();
 	
+	Spell* getSpellByName(const std::string& name);
 	RuneSpell* getRuneSpell(uint32_t id);
 	RuneSpell* getRuneSpellByName(const std::string& name);
 	
@@ -78,12 +80,13 @@ public:
 	
 	const std::string& getName() const {return name;}
 
+	virtual bool castSpell(Creature* creature) = 0;
+	virtual bool castSpell(Creature* creature, Creature* target) = 0;
+
 protected:
 	bool playerSpellCheck(const Player* player);
 	bool playerInstantSpellCheck(const Player* player, const Position& toPos);
 	bool playerRuneSpellCheck(const Player* player, const Position& toPos);
-	
-	bool causeExhaustion(){return exhaustion;};
 	
 	void postCastSpell(Player* player);
 	
@@ -114,16 +117,15 @@ public:
 	virtual bool loadFunction(const std::string& functionName);
 	
 	bool playerCastInstant(Player* player, const std::string& param);
-	bool castInstant(Creature* creature);
-	bool castInstant(Creature* creature, Creature* target);
+
+	virtual bool castSpell(Creature* creature);
+	virtual bool castSpell(Creature* creature, Creature* target);
 
 	//scripting
-	bool executeCastInstant(Creature* creature, const LuaVariant& var);
+	bool executeCastSpell(Creature* creature, const LuaVariant& var);
 	
 protected:	
 	virtual std::string getScriptEventName();
-
-	Position getCasterPosition(Creature* creature);
 	
 	static InstantSpellFunction HouseGuestList;
 	static InstantSpellFunction HouseSubOwnerList;
@@ -133,7 +135,8 @@ protected:
 	
 	static House* getHouseFromPos(Creature* creature);
 	
-	bool castInstant(Creature* creature, const LuaVariant& var);
+	bool internalCastSpell(Creature* creature, const LuaVariant& var);
+	Position getCasterPosition(Creature* creature);
 	
 	bool needDirection;
 	bool hasParam;
@@ -152,18 +155,19 @@ public:
 	virtual bool canExecuteAction(const Player* player, const Position& toPos);
 
 	virtual bool executeUse(Player* player, Item* item, const PositionEx& posFrom, const PositionEx& posTo);
-	bool castRune(Creature* creature, Creature* target);
-	bool castRune(Creature* creature, const Position& pos);
+	
+	virtual bool castSpell(Creature* creature);
+	virtual bool castSpell(Creature* creature, Creature* target);
 
 	//scripting
-	bool executeCastRune(Creature* creature, const LuaVariant& var);
+	bool executeCastSpell(Creature* creature, const LuaVariant& var);
 	
 	uint32_t getRuneItemId(){return runeId;};
 	
 protected:
 	virtual std::string getScriptEventName();
 	
-	bool castRune(Creature* creature, const LuaVariant& var);
+	bool internalCastSpell(Creature* creature, const LuaVariant& var);
 
 	bool hasCharges;
 	uint32_t runeId;

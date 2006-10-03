@@ -51,7 +51,6 @@ public:
 	virtual std::string getDescription(int32_t lookDistance) const;
 
 	virtual bool canSee(const Position& pos) const;
-	virtual bool isInRange(const Position& pos) const;
 
 	virtual RaceType_t getRace() const { return mType->race; }
 
@@ -70,7 +69,8 @@ public:
 
 	virtual void onCreatureAppear(const Creature* creature, bool isLogin);
 	virtual void onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout);
-	virtual void onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport);
+	virtual void onCreatureMove(const Creature* creature, const Position& newPos, const Position& oldPos,
+		uint32_t oldStackPos, bool teleport);
 
 	virtual void onThink(uint32_t interval);
 	virtual void onWalk();

@@ -138,6 +138,21 @@ bool Spells::registerEvent(Event* event, xmlNodePtr p)
 	return true;
 }
 
+Spell* Spells::getSpellByName(const std::string& name)
+{
+	Spell* spell;
+
+	if(spell = getRuneSpellByName(name)){
+		return spell;
+	}
+
+	if(spell = getInstantSpellByName(name)){
+		return spell;
+	}
+
+	return NULL;
+}
+
 RuneSpell* Spells::getRuneSpell(uint32_t id)
 {
 	RunesMap::iterator it = runes.find(id);
@@ -422,6 +437,7 @@ void Spell::postCastSpell(Player* player)
 	*/
 }
 
+
 InstantSpell::InstantSpell(LuaScriptInterface* _interface) :
 TalkAction(_interface)
 {
@@ -489,6 +505,35 @@ bool InstantSpell::loadFunction(const std::string& functionName)
 	return true;
 }
 
+Position InstantSpell::getCasterPosition(Creature* creature)
+{
+	Position pos = creature->getPosition();
+
+	if(needDirection){
+		switch(creature->getDirection()){
+			case NORTH:
+				pos.y -= 1;
+				break;
+
+			case SOUTH:
+				pos.y += 1;
+				break;
+
+			case EAST:
+				pos.x += 1;
+				break;
+
+			case WEST:
+				pos.x -= 1;
+				break;
+			
+			default:
+				break;
+		}
+	}
+
+	return pos;
+}
 
 bool InstantSpell::playerCastInstant(Player* player, const std::string& param)
 {
@@ -526,7 +571,7 @@ bool InstantSpell::playerCastInstant(Player* player, const std::string& param)
 		}
 	}
 
-	bool result = castInstant(player, var);
+	bool result = internalCastSpell(player, var);
 
 	if(result){
 		Spell::postCastSpell(player);
@@ -535,60 +580,30 @@ bool InstantSpell::playerCastInstant(Player* player, const std::string& param)
 	return result;
 }
 
-Position InstantSpell::getCasterPosition(Creature* creature)
-{
-	Position pos = creature->getPosition();
-
-	if(needDirection){
-		switch(creature->getDirection()){
-			case NORTH:
-				pos.y -= 1;
-				break;
-
-			case SOUTH:
-				pos.y += 1;
-				break;
-
-			case EAST:
-				pos.x += 1;
-				break;
-
-			case WEST:
-				pos.x -= 1;
-				break;
-			
-			default:
-				break;
-		}
-	}
-
-	return pos;
-}
-
-bool InstantSpell::castInstant(Creature* creature)
+bool InstantSpell::castSpell(Creature* creature)
 {
 	LuaVariant var;
 	var.type = VARIANT_POSITION;
 	var.pos = getCasterPosition(creature);
 
-	return castInstant(creature, var);
+	return internalCastSpell(creature, var);
 }
 
-bool InstantSpell::castInstant(Creature* creature, Creature* target)
+bool InstantSpell::castSpell(Creature* creature, Creature* target)
 {
 	LuaVariant var;
 	var.type = VARIANT_NUMBER;
 	var.number = target->getID();
 
-	return castInstant(creature, var);
+	return internalCastSpell(creature, var);
 }
 
-bool InstantSpell::castInstant(Creature* creature, const LuaVariant& var)
+bool InstantSpell::internalCastSpell(Creature* creature, const LuaVariant& var)
 {
 	bool result = false;
 	
 	if(m_scripted){
-		result =  executeCastInstant(creature, var);
+		result =  executeCastSpell(creature, var);
 	}
 	else{
 		if(function){
@@ -599,7 +614,7 @@ bool InstantSpell::castInstant(Creature* creature, const LuaVariant& var)
 	return result;
 }
 
-bool InstantSpell::executeCastInstant(Creature* creature, const LuaVariant& var)
+bool InstantSpell::executeCastSpell(Creature* creature, const LuaVariant& var)
 {
 	//onCastSpell(cid, var)
 	ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
@@ -1024,7 +1039,7 @@ bool RuneSpell::executeUse(Player* player, Item* item, const PositionEx& posFrom
 	var.type = VARIANT_POSITION;
 	var.pos = posTo;
 
-	bool result = castRune(player, var);
+	bool result = internalCastSpell(player, var);
 
 	if(result){
 		Spell::postCastSpell(player);
@@ -1038,30 +1053,30 @@ bool RuneSpell::executeUse(Player* player, Item* item, const PositionEx& posFrom
 	return result;
 }
 
-bool RuneSpell::castRune(Creature* creature, Creature* target)
+bool RuneSpell::castSpell(Creature* creature)
+{
+	LuaVariant var;
+	var.type = VARIANT_NUMBER;
+	var.number = creature->getID();
+
+	return internalCastSpell(creature, var);
+}
+
+bool RuneSpell::castSpell(Creature* creature, Creature* target)
 {
 	LuaVariant var;
 	var.type = VARIANT_NUMBER;
 	var.number = target->getID();
 
-	return castRune(creature, var);
+	return internalCastSpell(creature, var);
 }
 
-bool RuneSpell::castRune(Creature* creature, const Position& pos)
-{
-	LuaVariant var;
-	var.type = VARIANT_POSITION;
-	var.pos = pos;
-
-	return castRune(creature, var);
-}
-
-bool RuneSpell::castRune(Creature* creature, const LuaVariant& var)
+bool RuneSpell::internalCastSpell(Creature* creature, const LuaVariant& var)
 {
 	bool result = false;
 	
 	if(m_scripted){
-		result = executeCastRune(creature, var);
+		result = executeCastSpell(creature, var);
 	}
 	else{
 		//call hardcodedAction
@@ -1071,7 +1086,7 @@ bool RuneSpell::castRune(Creature* creature, const LuaVariant& var)
 	return result;
 }
 
-bool RuneSpell::executeCastRune(Creature* creature, const LuaVariant& var)
+bool RuneSpell::executeCastSpell(Creature* creature, const LuaVariant& var)
 {
 	//onCastSpell(cid, var)
 

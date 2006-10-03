@@ -175,7 +175,6 @@ public:
 	bool addDepot(Depot* depot, uint32_t depotId);
 	
 	virtual bool canSee(const Position& pos) const;
-	virtual bool isInRange(const Position& pos) const;
 	
 	virtual RaceType_t getRace() const {return RACE_BLOOD;}
 
@@ -260,7 +259,7 @@ public:
 
 	void sendCreatureAppear(const Creature* creature, bool isLogin);
 	void sendCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout);
-	void sendCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport);
+	void sendCreatureMove(const Creature* creature, const Position& newPos, const Position& oldPos, uint32_t oldStackPos, bool teleport);
 
 	void sendCreatureTurn(const Creature* creature, uint32_t stackpos);
 	void sendCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text);
@@ -288,7 +287,8 @@ public:
 	virtual void onCreatureAppear(const Creature* creature, bool isLogin);
 	virtual void onCreatureDisappear(const Creature* creature);
 	virtual void onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout);
-	virtual void onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport);
+	virtual void onCreatureMove(const Creature* creature, const Position& newPos, const Position& oldPos,
+		uint32_t oldStackPos, bool teleport);
 
 	//virtual void onCreatureTurn(const Creature* creature, uint32_t stackpos);
 	//virtual void onCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text);

@@ -518,7 +518,8 @@ bool Game::placeCreature(const Position& pos, Creature* creature, bool isLogin /
 			SpectatorVec list;
 			SpectatorVec::iterator it;
 
-			getSpectators(Range(creature->getPosition(), true), list);
+			//getSpectators(Range(creature->getPosition(), true), list);
+			getSpectators(list, creature->getPosition(), true);
 
 			//send to client
 			Player* tmpPlayer = NULL;
@@ -563,7 +564,8 @@ bool Game::removeCreature(Creature* creature, bool isLogout /*= true*/)
 	SpectatorVec::iterator it;
 
 	Cylinder* cylinder = creature->getTile();
-	getSpectators(Range(cylinder->getPosition(), true), list);
+	//getSpectators(Range(cylinder->getPosition(), true), list);
+	getSpectators(list, cylinder->getPosition(), true);
 
 	int32_t index = cylinder->__getIndexOfThing(creature);
 	cylinder->__removeThing(creature, 0);
@@ -824,7 +826,7 @@ ReturnValue Game::internalMoveCreature(Creature* creature, Cylinder* fromCylinde
 			break;
 	}
 
-	creature->lastMove = OTSYS_TIME();
+	//creature->lastMove = OTSYS_TIME();
 	return RET_NOERROR;
 }
 
@@ -1468,10 +1470,19 @@ ReturnValue Game::internalTeleport(Thing* thing, const Position& newPos)
 	return RET_NOTPOSSIBLE;
 }
 
+void Game::getSpectators(SpectatorVec& list, const Position& centerPos, bool multifloor /*= false*/,
+	int32_t minRangeX /*= 0*/, int32_t maxRangeX /*= 0*/,
+	int32_t minRangeY /*= 0*/, int32_t maxRangeY /*= 0*/)
+{
+	map->getSpectators(list, centerPos, multifloor, minRangeX, maxRangeY, minRangeY, maxRangeY);
+}
+
+/*
 void Game::getSpectators(const Range& range, SpectatorVec& list)
 {
 	map->getSpectators(range, list);
 }
+*/
 
 //battle system
 void Game::checkCreatureAttacking(uint32_t creatureId, uint32_t interval)
@@ -1483,12 +1494,11 @@ void Game::checkCreatureAttacking(uint32_t creatureId, uint32_t interval)
 		Creature* attackedCreature = creature->getAttackedCreature();
 
 		if(attackedCreature){
-			if(attackedCreature->getTile()->hasProperty(PROTECTIONZONE) ||
-			creature->getTile()->hasProperty(PROTECTIONZONE)){
+			if( attackedCreature->getTile()->hasProperty(PROTECTIONZONE) ||
+					creature->getTile()->hasProperty(PROTECTIONZONE)){
 				creature->onCreatureDisappear(attackedCreature);
 			}
-			else{
-				//do attack
+			else if(map->canThrowObjectTo(creature->getPosition(), attackedCreature->getPosition())){
 				creature->doAttacking();
 			}
 		}
@@ -1518,11 +1528,13 @@ bool Game::playerWhisper(Player* player, const std::string& text)
 	SpectatorVec list;
 	SpectatorVec::iterator it;
 
-	getSpectators(Range(player->getPosition()), list);
+	//getSpectators(Range(player->getPosition()), list);
+	getSpectators(list, player->getPosition());
 	
+	Player* tmpPlayer = NULL;
 	for(it = list.begin(); it != list.end(); ++it){
-		if(Player* player = (*it)->getPlayer()){
-			player->sendCreatureSay(player, SPEAK_WHISPER, text);
+		if(tmpPlayer = (*it)->getPlayer()){
+			tmpPlayer->sendCreatureSay(player, SPEAK_WHISPER, text);
 		}
 	}
 	
@@ -1556,11 +1568,13 @@ bool Game::playerYell(Player* player, std::string& text)
 		SpectatorVec list;
 		SpectatorVec::iterator it;
 
-		getSpectators(Range(player->getPosition(), 18, 18, 14, 14), list);
+		//getSpectators(Range(player->getPosition(), 18, 18, 14, 14), list);
+		getSpectators(list, player->getPosition(), false, 18, 18, 14, 14);
 
+		Player* tmpPlayer = NULL;
 		for(it = list.begin(); it != list.end(); ++it){
-			if(Player* player = (*it)->getPlayer()){
-				player->sendCreatureSay(player, SPEAK_YELL, text);
+			if(tmpPlayer = (*it)->getPlayer()){
+				tmpPlayer->sendCreatureSay(player, SPEAK_YELL, text);
 			}
 		}
 
@@ -1649,7 +1663,8 @@ bool Game::playerStopAutoWalk(Player* player)
 	if(player->isRemoved())
 		return false;
 
-	return player->stopAutoWalk();
+	player->stopEventWalk();
+	return true;
 }
 
 bool Game::playerUseItemEx(Player* player, const Position& fromPos, uint8_t fromStackPos, uint16_t fromSpriteId,
@@ -2360,13 +2375,14 @@ bool Game::internalCreatureTurn(Creature* creature, Direction dir)
 
 		SpectatorVec list;
 		SpectatorVec::iterator it;
-		map->getSpectators(Range(creature->getPosition(), true), list);
+		//map->getSpectators(Range(creature->getPosition(), true), list);
+		getSpectators(list, creature->getPosition(), true);
 
 		//send to client
-		Player* player = NULL;
+		Player* tmpPlayer = NULL;
 		for(it = list.begin(); it != list.end(); ++it) {
-			if(player = (*it)->getPlayer()){
-				player->sendCreatureTurn(creature, stackpos);
+			if(tmpPlayer = (*it)->getPlayer()){
+				tmpPlayer->sendCreatureTurn(creature, stackpos);
 			}
 		}
 		
@@ -2386,7 +2402,8 @@ bool Game::internalCreatureSay(Creature* creature, SpeakClasses type, const std:
 	SpectatorVec list;
 	SpectatorVec::iterator it;
 
-	getSpectators(Range(creature->getPosition()), list);
+	//getSpectators(Range(creature->getPosition()), list);
+	getSpectators(list, creature->getPosition());
 
 	for(it = list.begin(); it != list.end(); ++it){
 		if(Player* player = (*it)->getPlayer()){
@@ -2406,7 +2423,8 @@ bool Game::internalMonsterYell(Monster* monster, const std::string& text)
 	SpectatorVec list;
 	SpectatorVec::iterator it;
 
-	map->getSpectators(Range(monster->getPosition(), 18, 18, 14, 14), list);
+	//map->getSpectators(Range(monster->getPosition(), 18, 18, 14, 14), list);
+	getSpectators(list, monster->getPosition(), false, 18, 18, 14, 14);
 
 	//players
 	for(it = list.begin(); it != list.end(); ++it) {
@@ -2425,7 +2443,7 @@ bool Game::getPathToEx(const Creature* creature, const Position& targetPos,
 	__int64 startTick = OTSYS_TIME();
 #endif
 
-	if(!creature->isInRange(targetPos)){
+	if(creature->getPosition().z != targetPos.z || !creature->canSee(targetPos)){
 		return false;
 	}
 
@@ -2598,7 +2616,8 @@ void Game::changeSpeed(Creature* creature, int32_t speedDelta)
 	SpectatorVec list;
 	SpectatorVec::iterator it;
 
-	getSpectators(Range(creature->getPosition(), true), list);
+	//getSpectators(Range(creature->getPosition(), true), list);
+	getSpectators(list, creature->getPosition(), true);
 
 	Player* player;
 	for(it = list.begin(); it != list.end(); ++it){
@@ -2625,13 +2644,14 @@ void Game::internalChangeOutfit(Creature* creature, Outfit_t oufit, bool isDefau
 	SpectatorVec list;
 	SpectatorVec::iterator it;
 
-	getSpectators(Range(creature->getPosition(), true), list);
+	//getSpectators(Range(creature->getPosition(), true), list);
+	getSpectators(list, creature->getPosition(), true);
 
 	//send to client
-	Player* player = NULL;
+	Player* tmpPlayer = NULL;
 	for(it = list.begin(); it != list.end(); ++it) {
-		if(player = (*it)->getPlayer()){
-			player->sendCreatureChangeOutfit(creature);
+		if(tmpPlayer = (*it)->getPlayer()){
+			tmpPlayer->sendCreatureChangeOutfit(creature);
 		}
 	}
 
@@ -2646,7 +2666,8 @@ void Game::changeLight(const Creature* creature)
 	SpectatorVec list;
 	SpectatorVec::iterator it;
 
-	getSpectators(Range(creature->getPosition(), true), list);
+	//getSpectators(Range(creature->getPosition(), true), list);
+	getSpectators(list, creature->getPosition(), true);
 
 	Player* player;
 	for(it = list.begin(); it != list.end(); ++it){
@@ -2662,20 +2683,23 @@ bool Game::combatChangeHealth(DamageType_t damageType, Creature* attacker, Creat
 	const Position& targetPos = target->getPosition();
 
 	SpectatorVec list;
-	getSpectators(Range(targetPos, true), list);
+	//getSpectators(Range(targetPos, true), list);
+	getSpectators(list, targetPos, true);
 
 	if(healthChange > 0){
 		target->changeHealth(healthChange);
 		addCreatureHealth(list, target);
 	}
 	else{
-		int32_t damage = -healthChange;
-
 		if(!target->isAttackable()){
 			addMagicEffect(list, targetPos, NM_ME_PUFF);
 			return false;
 		}
 		
+		if(attacker == target){
+			return false;
+		}
+
 		if(getWorldType() == WORLD_TYPE_NO_PVP){
 			if(attacker && (attacker->getPlayer() && target->getPlayer())){
 				return false;
@@ -2686,6 +2710,7 @@ bool Game::combatChangeHealth(DamageType_t damageType, Creature* attacker, Creat
 			}
 		}
 
+		int32_t damage = -healthChange;
 		BlockType_t blockType = target->blockHit(attacker, damageType, damage, checkDefense, checkArmor);
 
 		if(blockType == BLOCK_DEFENSE){
@@ -2842,7 +2867,8 @@ bool Game::combatChangeMana(Creature* attacker, Creature* target, int32_t manaCh
 void Game::addCreatureHealth(const Creature* target)
 {
 	SpectatorVec list;
-	getSpectators(Range(target->getPosition(), true), list);
+	//getSpectators(Range(target->getPosition(), true), list);
+	getSpectators(list, target->getPosition(), true);
 
 	addCreatureHealth(list, target);
 }
@@ -2861,7 +2887,8 @@ void Game::addAnimatedText(const Position& pos, uint8_t textColor,
 	const std::string& text)
 {
 	SpectatorVec list;
-	getSpectators(Range(pos, true), list);
+	//getSpectators(Range(pos, true), list);
+	getSpectators(list, pos, true);
 
 	addAnimatedText(list, pos, textColor, text);
 }
@@ -2880,7 +2907,8 @@ void Game::addAnimatedText(const SpectatorVec& list, const Position& pos, uint8_
 void Game::addMagicEffect(const Position& pos, uint8_t effect)
 {
 	SpectatorVec list;
-	getSpectators(Range(pos, true), list);
+	//getSpectators(Range(pos, true), list);
+	getSpectators(list, pos, true);
 
 	addMagicEffect(list, pos, effect);
 }
@@ -2899,8 +2927,11 @@ void Game::addDistanceEffect(const Position& fromPos, const Position& toPos,
 	uint8_t effect)
 {
 	SpectatorVec list;
-	getSpectators(Range(fromPos, true), list);
-	getSpectators(Range(toPos, true), list);
+	//getSpectators(Range(fromPos, true), list);
+	//getSpectators(Range(toPos, true), list);
+
+	getSpectators(list, fromPos, true);
+	getSpectators(list, toPos, true);
 
 	Player* player = NULL;
 	for(SpectatorVec::const_iterator it = list.begin(); it != list.end(); ++it){
@@ -2917,7 +2948,8 @@ void Game::changeSkull(Player* player, Skulls_t newSkull)
 	SpectatorVec::iterator it;
 
 	player->setSkull(newSkull);
-	getSpectators(Range(player->getPosition(), true), list);
+	//getSpectators(Range(player->getPosition(), true), list);
+	getSpectators(list, player->getPosition(), true);
 
 	Player* spectator;
 	for(it = list.begin(); it != list.end(); ++it){

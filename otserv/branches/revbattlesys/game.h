@@ -174,7 +174,11 @@ public:
 
 	void getWorldLightInfo(LightInfo& lightInfo);
 
-	void getSpectators(const Range& range, SpectatorVec& list);
+	void getSpectators(SpectatorVec& list, const Position& centerPos, bool multifloor = false,
+		int32_t minRangeX = 0, int32_t maxRangeX = 0,
+		int32_t minRangeY = 0, int32_t maxRangeY = 0);
+	
+	//void getSpectators(const Range& range, SpectatorVec& list);
 
 	void thingMove(Player* player, const Position& fromPos, uint16_t spriteId, uint8_t fromStackpos,
 		const Position& toPos, uint8_t count);

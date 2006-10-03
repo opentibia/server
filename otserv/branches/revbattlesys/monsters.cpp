@@ -22,10 +22,13 @@
 #include "monster.h"
 #include "container.h"
 #include "tools.h"
+#include "spells.h"
 #include "luascript.h"
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
+
+extern Spells* g_spells;
 
 MonsterType::MonsterType()
 {
@@ -64,7 +67,7 @@ void MonsterType::reset()
 	lightLevel = 0;
 	lightColor = 0;
 
-	summonSpells.clear();
+	summonList.clear();
 	lootItems.clear();
 }
 
@@ -378,116 +381,25 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 					}
 				}
 			}
-			/*else if(xmlStrcmp(p->name, (const xmlChar*)"attacks") == 0){
+			else if(xmlStrcmp(p->name, (const xmlChar*)"attacks") == 0){
 				xmlNodePtr tmpNode = p->children;
 				while(tmpNode){
 					if(xmlStrcmp(tmpNode->name, (const xmlChar*)"attack") == 0){
-						int cycleTicks = -1;
-						int probability = -1;
-						int exhaustionTicks = -1;
+						
+						uint32_t chance = 0;
 
-						if(readXMLInteger(tmpNode, "exhaustion", intValue)){
-							exhaustionTicks = intValue;
+						if(readXMLInteger(tmpNode, "chance", intValue)){
+							chance = intValue;
 						}
 
-						if(readXMLInteger(tmpNode, "cycleticks", intValue)){
-							cycleTicks = intValue;
-						}
+						if(readXMLString(tmpNode, "name", strValue)){
+							Spell* spell;
+							if(spell = g_spells->getSpellByName(strValue)){
+								spellBlock_t sb;
+								sb.chance = chance;
+								sb.spell = spell;
 
-						if(readXMLInteger(tmpNode, "probability", intValue)){
-							probability = intValue;
-						}
-
-						TimeProbabilityClass timeprobsystem(cycleTicks, probability, exhaustionTicks);
-
-						std::string	attacktype = "";
-						if(readXMLString(tmpNode, "type", strValue)){
-							attacktype = strValue;
-						}
-
-						if(strcmp(attacktype.c_str(), "melee") == 0){
-							PhysicalAttackClass* physicalattack = new PhysicalAttackClass();
-
-							physicalattack->fighttype = FIGHT_MELEE;
-
-							if(readXMLInteger(tmpNode, "mindamage", intValue)){
-								physicalattack->minWeapondamage = intValue;
-							}
-
-							if(readXMLInteger(tmpNode, "maxdamage", intValue)){
-								physicalattack->maxWeapondamage = intValue;
-							}
-
-							mType->physicalAttacks[physicalattack] = TimeProbabilityClass(cycleTicks, probability, exhaustionTicks);
-						}
-						else if(strcmp(attacktype.c_str(), "distance") == 0){
-							mType->hasDistanceAttack = true;
-							PhysicalAttackClass* physicalattack = new PhysicalAttackClass();
-
-							physicalattack->fighttype = FIGHT_DIST;
-							std::string subattacktype = "";
-
-							if(readXMLString(tmpNode, "name", strValue)){
-								subattacktype = strValue;
-							}
-
-							if(strcmp(subattacktype.c_str(), "bolt") == 0)
-								physicalattack->disttype = DIST_BOLT;
-							else if(strcmp(subattacktype.c_str(), "arrow") == 0)
-								physicalattack->disttype = DIST_ARROW;
-							else if(strcmp(subattacktype.c_str(), "throwingstar") == 0)
-								physicalattack->disttype = DIST_THROWINGSTAR;
-							else if(strcmp(subattacktype.c_str(), "throwingknife") == 0)
-								physicalattack->disttype = DIST_THROWINGKNIFE;
-							else if(strcmp(subattacktype.c_str(), "smallstone") == 0)
-								physicalattack->disttype = DIST_SMALLSTONE;
-							else if(strcmp(subattacktype.c_str(), "largerock") == 0)
-								physicalattack->disttype = DIST_LARGEROCK;
-							else if(strcmp(subattacktype.c_str(), "snowball") == 0)
-								physicalattack->disttype = DIST_SNOWBALL;
-							else if(strcmp(subattacktype.c_str(), "powerbolt") == 0)
-								physicalattack->disttype = DIST_POWERBOLT;
-							else if(strcmp(subattacktype.c_str(), "poisonfield") == 0)
-								physicalattack->disttype = DIST_POISONFIELD;
-
-							if(readXMLInteger(tmpNode, "mindamage", intValue)){
-								physicalattack->minWeapondamage = intValue;
-							}
-
-							if(readXMLInteger(tmpNode, "maxdamage", intValue)){
-								physicalattack->maxWeapondamage = intValue;
-							}
-
-							mType->physicalAttacks[physicalattack] = TimeProbabilityClass(cycleTicks, probability, exhaustionTicks);
-						}
-						else if(strcmp(attacktype.c_str(), "instant") == 0) {
-							mType->hasDistanceAttack = true;
-							std::string spellname = "";
-
-							if(readXMLString(tmpNode, "name", strValue)){
-								spellname = strValue;
-							}
-
-							if(spells.getAllSpells()->find(spellname) != spells.getAllSpells()->end()){
-								mType->instantSpells[spellname].push_back(timeprobsystem);
-							}
-						}
-						else if(strcmp(attacktype.c_str(), "rune") == 0) {
-							mType->hasDistanceAttack = true;
-							std::string spellname = "";
-
-							if(readXMLString(tmpNode, "name", strValue)){
-								spellname = strValue;
-							}
-
-							std::transform(spellname.begin(), spellname.end(), spellname.begin(), tolower);
-
-							std::map<unsigned short, Spell*>::const_iterator rsIt;
-							for(rsIt = spells.getAllRuneSpells()->begin(); rsIt != spells.getAllRuneSpells()->end(); ++rsIt) {
-								if(strcmp(rsIt->second->getName().c_str(), spellname.c_str()) == 0) {
-									mType->runeSpells[rsIt->first].push_back(timeprobsystem);
-									break;
-								}
+								mType->spellList.push_back(sb);
 							}
 						}
 					}
@@ -505,20 +417,16 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 							immunity = strValue;
 						}
 
-						if(strcmp(immunity.c_str(), "energy") == 0)
-							mType->immunities |= ATTACK_ENERGY;
-						else if(strcmp(immunity.c_str(), "burst") == 0)
-							mType->immunities |= ATTACK_BURST;
-						else if(strcmp(immunity.c_str(), "fire") == 0)
-							mType->immunities |= ATTACK_FIRE;
-						else if(strcmp(immunity.c_str(), "physical") == 0)
-							mType->immunities |= ATTACK_PHYSICAL;
-						else if(strcmp(immunity.c_str(), "poison") == 0)
-							mType->immunities |= ATTACK_POISON;
-						else if(strcmp(immunity.c_str(), "paralyze") == 0)
-							mType->immunities |= ATTACK_PARALYZE;
-						else if(strcmp(immunity.c_str(), "drunk") == 0)
-							mType->immunities |= ATTACK_DRUNKNESS;
+						if(strcasecmp(immunity.c_str(), "energy") == 0)
+							mType->immunities |= CONDITION_ENERGY;
+						else if(strcasecmp(immunity.c_str(), "fire") == 0)
+							mType->immunities |= CONDITION_FIRE;
+						else if(strcasecmp(immunity.c_str(), "poison") == 0)
+							mType->immunities |= CONDITION_POISON;
+						else if(strcasecmp(immunity.c_str(), "paralyze") == 0)
+							mType->immunities |= CONDITION_PARALYZE;
+						else if(strcasecmp(immunity.c_str(), "drunk") == 0)
+							mType->immunities |= CONDITION_DRUNK;
 					}
 
 					tmpNode = tmpNode->next;
@@ -528,6 +436,7 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 				xmlNodePtr tmpNode = p->children;
 				while(tmpNode){
 					if(xmlStrcmp(tmpNode->name, (const xmlChar*)"voice") == 0) {
+						/*
 						int cycleTicks, probability, exhaustionTicks;
 
 						if(readXMLInteger(tmpNode, "exhaustion", intValue)){
@@ -557,10 +466,13 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 							mType->yellingSentences.push_back(make_pair(sentence, TimeProbabilityClass(cycleTicks, probability, exhaustionTicks)));
 						}
 					}
+					*/
+
+					}
 
 					tmpNode = tmpNode->next;
 				}
-			}*/
+			}
 			else if(xmlStrcmp(p->name, (const xmlChar*)"loot") == 0){
 				xmlNodePtr tmpNode = p->children;
 				while(tmpNode){
@@ -582,9 +494,9 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 				while(tmpNode){
 
 					if(xmlStrcmp(tmpNode->name, (const xmlChar*)"summon") == 0){
-						summonBlock sb;
+						summonBlock_t sb;
 						sb.name = "";
-						sb.summonChance = CHANCE_MAX;
+						sb.chance = CHANCE_MAX;
 
 						if(readXMLString(tmpNode, "name", strValue)){
 							sb.name = strValue;
@@ -593,12 +505,12 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 							continue;
 
 						if(readXMLInteger(tmpNode, "chance", intValue)){
-							sb.summonChance = std::max(intValue, 100);
-							if(sb.summonChance > CHANCE_MAX)
-								sb.summonChance = CHANCE_MAX;
+							sb.chance = std::max(intValue, 100);
+							if(sb.chance > CHANCE_MAX)
+								sb.chance = CHANCE_MAX;
 						}
 
-						mType->summonSpells.push_back(sb);
+						mType->summonList.push_back(sb);
 					}
 
 					tmpNode = tmpNode->next;

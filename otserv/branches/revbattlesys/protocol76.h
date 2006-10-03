@@ -44,12 +44,12 @@ class Protocol76
 {
 public:
 	Protocol76(SOCKET s);
-	virtual ~Protocol76();
+	~Protocol76();
 	
 	connectResult_t ConnectPlayer();
 	void ReceiveLoop();  
 	void WriteBuffer(NetworkMessage &add);
-	virtual void reinitializeProtocol();
+	void reinitializeProtocol();
 	
 	void setPlayer(Player* p);
 	unsigned long getIP() const;
@@ -60,9 +60,9 @@ private:
 	std::list<unsigned long> knownPlayers;
 	void checkCreatureAsKnown(unsigned long id, bool &known, unsigned long &removedKnown);
 	
-	virtual bool CanSee(int x, int y, int z) const;
-	bool CanSee(const Creature*) const;
-	bool CanSee(const Position& pos) const;
+	bool canSee(int x, int y, int z) const;
+	bool canSee(const Creature*) const;
+	bool canSee(const Position& pos) const;
 	void logout();
 	
 	void flushOutputBuffer();
@@ -182,8 +182,8 @@ private:
 
 	void sendAddCreature(const Creature* creature, bool isLogin);
 	void sendRemoveCreature(const Creature* creature, const Position& pos, uint32_t stackpos, bool isLogout);
-	void sendMoveCreature(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport);
-	//void sendTeleportCreature(const Creature* creature, const Position& oldPos, uint32_t oldStackPos);
+	void sendMoveCreature(const Creature* creature, const Position& newPos, const Position& oldPos,
+		uint32_t oldStackPos, bool teleport);
 
 	//containers
 	void sendAddContainerItem(uint8_t cid, const Item* item);

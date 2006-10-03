@@ -45,6 +45,7 @@ class Tile;
 class Map;
 class IOMap;
 
+/*
 class Range{
 public:
 	Range(Position centerpos, bool multilevel = false){
@@ -94,9 +95,6 @@ private:
 				minRange.z = std::min(centerpos.z + 2, MAP_MAX_LAYERS - 1);
 				maxRange.z = std::max(centerpos.z - 2, 0);
 
-				//minRange.z = std::min(centerpos.z + 2, MAP_MAX_LAYERS - 1);
-				//maxRange.z = std::max(centerpos.z - 2, 8);
-
 				zstep = -1;
 			}
 			else{
@@ -117,6 +115,7 @@ private:
 		}
 	}
 };
+*/
 
 struct AStarNode{
 	/** Current position */
@@ -172,6 +171,9 @@ public:
 	Map();
 	~Map();
     
+	static int32_t maxViewportX;
+	static int32_t maxViewportY;
+
 	/**
 	* Load a map.
 	* \param identifier file/database to load
@@ -222,8 +224,6 @@ public:
 	*/
 	bool canThrowObjectTo(const Position& fromPos, const Position& toPos);
 
-	//bool isPathValid(Creature* creature, const std::list<Position>& path, int pathSize = -1);
-
 	/**
 	* Get the path to a specific position on the map.
 	* \param creature The creature that wants a route
@@ -231,8 +231,6 @@ public:
 	* \param to The destination position
 	* \returns A list of all positions you have to traverse to reach the destination
 	*/
-	//std::list<Position> getPathTo(const Creature* creature, Position start, Position to, unsigned long maxNodeSize = 100);
-
 	bool getPathTo(const Creature* creature, Position toPosition, std::list<Direction>& listDir);
 	bool isPathValid(const Creature* creature, const std::list<Direction>& listDir, const Position& destPos);
 
@@ -257,9 +255,13 @@ protected:
 	std::string mapStoreIdentifier;
 	std::string houseStoreIdentifier;
 
+	void getSpectators(SpectatorVec& list, const Position& centerPos, bool multifloor = false,
+		int32_t minRangeX = 0, int32_t maxRangeX = 0,
+		int32_t minRangeY = 0, int32_t maxRangeY = 0);
+
 	/**
 	* Get the Creatures within a specific Range */
-	void getSpectators(const Range& range, SpectatorVec& list);
+	//void getSpectators(const Range& range, SpectatorVec& list);
     
 	typedef std::map<unsigned long, Tile*> TileMap;
 	TileMap tileMaps[128][128];

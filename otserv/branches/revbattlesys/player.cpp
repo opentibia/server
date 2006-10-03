@@ -684,12 +684,7 @@ bool Player::getStorageValue(unsigned long key, long &value) const
 
 bool Player::canSee(const Position& pos) const
 {
-	return client->CanSee(pos);
-}
-
-bool Player::isInRange(const Position& pos) const
-{
-	return Position::areInRange<7, 5, 0>(getPosition(), pos);
+	return client->canSee(pos);
 }
 
 Depot* Player::getDepot(uint32_t depotId, bool autoCreateDepot)
@@ -1050,9 +1045,10 @@ void Player::sendCreatureDisappear(const Creature* creature, uint32_t stackpos, 
 	client->sendRemoveCreature(creature, creature->getPosition(), stackpos, isLogout);
 }
 
-void Player::sendCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport)
+void Player::sendCreatureMove(const Creature* creature, const Position& newPos, const Position& oldPos,
+	uint32_t oldStackPos, bool teleport)
 {
-	client->sendMoveCreature(creature, oldPos, oldStackPos, teleport);
+	client->sendMoveCreature(creature, newPos, oldPos, oldStackPos, teleport);
 }
 
 void Player::sendCreatureTurn(const Creature* creature, uint32_t stackPos)
@@ -1213,9 +1209,10 @@ void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bo
 	}
 }
 
-void Player::onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport)
+void Player::onCreatureMove(const Creature* creature, const Position& newPos, const Position& oldPos,
+	uint32_t oldStackPos, bool teleport)
 {
-	Creature::onCreatureMove(creature, oldPos, oldStackPos, teleport);
+	Creature::onCreatureMove(creature, newPos, oldPos, oldStackPos, teleport);
 
 	if(creature == this){
 		if(tradeState != TRADE_TRANSFER){
@@ -2484,7 +2481,7 @@ bool Player::internalFollowCreature(const Creature* creature)
 
 		sendCancelMessage(RET_THEREISNOWAY);
 		sendCancelTarget();
-		stopAutoWalk();
+		stopEventWalk();
 	}
 
 	return result;
@@ -2563,7 +2560,7 @@ int32_t Player::getGainedExperience(Creature* attacker) const
 void Player::onFollowCreature(const Creature* creature)
 {
 	if(!creature){
-		stopAutoWalk();
+		stopEventWalk();
 	}
 }
 
@@ -2587,7 +2584,7 @@ void Player::setChaseMode(uint8_t mode)
 		}
 		else if(attackedCreature){
 			setFollowCreature(NULL);
-			stopAutoWalk();
+			stopEventWalk();
 		}
 	}
 }
