@@ -37,4 +37,26 @@
 <action itemid="3941" script="liquid.lua" />
 <action itemid="3942" script="liquid.lua" />
 
+-- Make Bread
+<action itemid="2692" script="flour.lua" />
+<action itemid="2694" script="wheat.lua" />
+<action itemid="2693" script="dough.lua" />
+
+-- Watches and Clocks
+<action itemid="1728" script="watch_clock.lua" />
+<action itemid="1729" script="watch_clock.lua" />
+<action itemid="1730" script="watch_clock.lua" />
+<action itemid="1731" script="watch_clock.lua" />
+<action itemid="1732" script="watch_clock.lua" />
+<action itemid="1733" script="watch_clock.lua" />
+<action itemid="1734" script="watch_clock.lua" />
+<action itemid="1735" script="watch_clock.lua" />
+<action itemid="1873" script="watch_clock.lua" />
+<action itemid="1874" script="watch_clock.lua" />
+<action itemid="1875" script="watch_clock.lua" />
+<action itemid="1876" script="watch_clock.lua" />
+<action itemid="1877" script="watch_clock.lua" />
+<action itemid="1881" script="watch_clock.lua" />
+<action itemid="2036" script="watch_clock.lua" />
+
 </actions>

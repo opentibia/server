@@ -1,28 +1,28 @@
 function onUse(cid, item, frompos, item2, topos)
-    time = rl2tib(os.date('%M'), os.date('%S'))
+    time = gameTime(os.date('%M'), os.date('%S'))
     doPlayerSendTextMessage(cid, 22, "The time is "..time..".")
     return 1
 end
 
-function rl2tib(min, sec)
+function gameTime(min, sec) -- Special thanks to Alreth (creator of this function)
     suffix = ''
-    varh = (min*60+sec)/150
-    tibH = math.floor(varh)
-    tibM = math.floor(60*(varh-tibH))
-    if tonumber(tibH) > 11 then
-		tibH = tonumber(tibH) - 12
+	h = (min * 60 + sec) / 150
+    gameh = math.floor(h)
+    gamem = math.floor(60 * (h - gameh))
+    if tonumber(gameh) > 11 then
+		gameh = tonumber(gameh) - 12
 		suffix = ' pm'
     else
 		suffix = ' am'
     end
-    if tibH == 0 then
-		tibH = 12
+    if gameh == 0 then
+		gameh = 12
     end
-    if (tibH < 10) then
-        tibH = '0'..tibH
+    if gameh < 10 then
+        gameh = '0'..gameh
     end
-    if (tibM < 10) then
-        tibM = '0'..tibM
+    if gamem < 10 then
+        gamem = '0'..gamem
     end
-    return (tibH..':'..tibM..suffix)
+    return gameh..':'..gamem..suffix
 end
