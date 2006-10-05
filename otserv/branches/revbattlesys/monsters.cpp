@@ -51,8 +51,6 @@ void MonsterType::reset()
 	runAwayHealth = 0;
 	pushable = true;
 	base_speed = 200;
-	level = 1;
-	magLevel = 1;
 	
 	health = 100;
 	health_max = 100;
@@ -69,6 +67,10 @@ void MonsterType::reset()
 
 	summonList.clear();
 	lootItems.clear();
+	spellList.clear();
+
+	yellChance = 0;
+	voiceVector.clear();
 }
 
 MonsterType::~MonsterType()
@@ -268,16 +270,8 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 			mType->pushable = (intValue != 0);
 		}
 
-		if(readXMLInteger(root, "level", intValue)){
-			mType->level = intValue;
-		}
-
 		if(readXMLInteger(root, "speed", intValue)){
 			mType->base_speed = intValue;
-		}
-
-		if(readXMLInteger(root, "magLevel", intValue)){
-			mType->magLevel = intValue;
 		}
 
 		if(readXMLInteger(root, "defense", intValue)){
@@ -386,19 +380,18 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 				while(tmpNode){
 					if(xmlStrcmp(tmpNode->name, (const xmlChar*)"attack") == 0){
 						
-						uint32_t chance = 0;
+						spellBlock_t sb;
+						sb.chance = 0;
 
 						if(readXMLInteger(tmpNode, "chance", intValue)){
-							chance = intValue;
+							//0	never, 10000 always
+							sb.chance = intValue;
 						}
 
 						if(readXMLString(tmpNode, "name", strValue)){
 							Spell* spell;
 							if(spell = g_spells->getSpellByName(strValue)){
-								spellBlock_t sb;
-								sb.chance = chance;
 								sb.spell = spell;
-
 								mType->spellList.push_back(sb);
 							}
 						}
@@ -434,40 +427,18 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 			}
 			else if(xmlStrcmp(p->name, (const xmlChar*)"voices") == 0){
 				xmlNodePtr tmpNode = p->children;
+
+				if(readXMLInteger(p, "chance", intValue)){
+					//0	never, 10000 always
+					mType->yellChance = intValue;
+				}
+
 				while(tmpNode){
 					if(xmlStrcmp(tmpNode->name, (const xmlChar*)"voice") == 0) {
-						/*
-						int cycleTicks, probability, exhaustionTicks;
-
-						if(readXMLInteger(tmpNode, "exhaustion", intValue)){
-							exhaustionTicks = intValue;
-						}
-						else
-							exhaustionTicks = 0;
-
-						if(readXMLInteger(tmpNode, "cycleticks", intValue)){
-							cycleTicks = intValue;
-						}
-						else
-							cycleTicks = 30000;
-
-						if(readXMLInteger(tmpNode, "probability", intValue)){
-							probability = intValue;
-						}
-						else
-							probability = 30;
-
-						std::string sentence = "";
 						if(readXMLString(tmpNode, "sentence", strValue)){
-							sentence = strValue;
+							//vb.text = strValue;
+							mType->voiceVector.push_back(strValue);
 						}
-
-						if(sentence.length() > 0) {
-							mType->yellingSentences.push_back(make_pair(sentence, TimeProbabilityClass(cycleTicks, probability, exhaustionTicks)));
-						}
-					}
-					*/
-
 					}
 
 					tmpNode = tmpNode->next;

@@ -302,7 +302,7 @@ public:
 	bool getPathToEx(const Creature* creature, const Position& targetPos,
 		uint32_t minDist, uint32_t maxDist, bool fullPathSearch, std::list<Direction>& dirList);
 
-	void changeSpeed(Creature* creature, int32_t speedDelta);
+	void changeSpeed(Creature* creature, int32_t newSpeed);
 	void internalChangeOutfit(Creature* creature, Outfit_t oufit, bool isDefault);
 	void changeLight(const Creature* creature);
 

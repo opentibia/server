@@ -94,7 +94,7 @@ private:
 
 	void startThink();
 	void stopThink();
-	//int getTargetDistance() {return mType->targetDistance;}
+	void onThinkYell();
 
 	void onCreatureEnter(const Creature* creature);
 	void onCreatureLeave(const Creature* creature);

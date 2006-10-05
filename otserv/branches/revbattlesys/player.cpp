@@ -874,9 +874,9 @@ void Player::sendCancel(const char* msg) const
   client->sendCancel(msg);
 }
 
-void Player::sendChangeSpeed(const Creature* creature) const
+void Player::sendChangeSpeed(const Creature* creature, uint32_t newSpeed) const
 {
-	client->sendChangeSpeed(creature);
+	client->sendChangeSpeed(creature, newSpeed);
 }
 
 void Player::sendToChannel(Creature* creature, SpeakClasses type,
@@ -1467,12 +1467,14 @@ void Player::addExperience(unsigned long exp)
 	}
 
 	if(prevLevel != newLevel){
-		int32_t oldSpeed = getSpeed();		
+		int32_t oldSpeed = getBaseSpeed();		
 		level = newLevel;
-		int32_t newSpeed = getSpeed();
+		updateBaseSpeed();
 
-		int32_t speedDelta = (newSpeed - oldSpeed);
-		g_game.changeSpeed(this, speedDelta);
+		int32_t newSpeed = getBaseSpeed();
+		setBaseSpeed(newSpeed);
+
+		g_game.changeSpeed(this, newSpeed);
 		g_game.addCreatureHealth(this);
 
 		std::stringstream levelMsg;

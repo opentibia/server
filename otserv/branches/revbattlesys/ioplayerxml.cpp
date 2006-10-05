@@ -149,7 +149,7 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 		else
 			isLoaded = false;
 
-		player->setNormalSpeed();
+		player->updateBaseSpeed();
 
 		if(readXMLInteger(root, "lastlogin", intValue)){
 			player->lastLoginSaved = intValue;

@@ -134,13 +134,13 @@ public:
 	int64_t getSleepTicks() const;
 	int64_t getEventStepTicks() const;
 	int getStepDuration() const;
+
+	uint32_t getSpeed() const {return baseSpeed + varSpeed;};
+	void setSpeed(uint32_t speedChange){ varSpeed = speedChange; }
 	
-	uint32_t getSpeed() const {return speed;};
-	void setSpeed(uint32_t newSpeed){ speed = newSpeed; }
-	
-	void setNormalSpeed() {speed = 220 + (2* (level - 1));}	
-	int getNormalSpeed() {return 220 + (2* (level - 1));}
-	
+	void setBaseSpeed(uint32_t newBaseSpeed) {baseSpeed = newBaseSpeed;}
+	int getBaseSpeed() {return baseSpeed;}
+
 	int32_t getHealth() const {return health;}
 	int32_t getMaxHealth() const {return healthMax;}
 	int32_t getMana() const {return mana;}
@@ -243,8 +243,6 @@ protected:
 	
 	int32_t health, healthMax;
 	int32_t mana, manaMax;
-	int32_t level;
-	int32_t magLevel;
 
 	Outfit_t currentOutfit;
 	Outfit_t defaultOutfit;
@@ -252,7 +250,9 @@ protected:
 	Position masterPos;
 	uint64_t lastMove;
 	uint32_t lastStepCost;
-	uint32_t speed;
+	//uint32_t speed;
+	uint32_t baseSpeed;
+	int32_t varSpeed;
 
 	Direction direction;
 

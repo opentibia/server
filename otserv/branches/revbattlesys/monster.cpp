@@ -63,9 +63,8 @@ Creature()
 
 	health     = mType->health;
 	healthMax  = mType->health_max;
-	speed = mType->base_speed;
-	level = mType->level;
-	magLevel = mType->magLevel;
+	baseSpeed = mType->base_speed;
+	varSpeed = baseSpeed;
 	internalLight.level = mType->lightLevel;
 	internalLight.color = mType->lightColor;
 
@@ -253,6 +252,8 @@ void Monster::onThink(uint32_t interval)
 
 	Creature::onThink(interval);
 
+	onThinkYell();
+
 	if(!isSummon()){
 		if(!targetList.empty()){
 			static int32_t internalTicks = 0;
@@ -273,9 +274,23 @@ void Monster::onThink(uint32_t interval)
 	}
 	else{
 		//monster is a summon
-		if(!followCreature){
+
+		if(attackedCreature){
+			if(followCreature != attackedCreature){
+				internalFollowCreature(attackedCreature);
+			}
+		}
+		else if(getMaster() != followCreature){
 			internalFollowCreature(getMaster());
 		}
+	}
+}
+
+void Monster::onThinkYell()
+{
+	if(!mType->voiceVector.empty() && mType->yellChance > rand() * 10000 / (RAND_MAX+1) ){
+		uint32_t index = random_range(0, mType->voiceVector.size() - 1);
+		g_game.internalMonsterYell(this, mType->voiceVector[index]);
 	}
 }
 
@@ -365,10 +380,16 @@ void Monster::setNormalCreatureLight()
 
 uint32_t Monster::getFollowDistance() const
 {
-	if(followCreature != NULL && getMaster() == followCreature){
-		return 2;
+	if(isSummon()){
+		if(getMaster() == followCreature){
+			return 2;
+		}
 	}
 	else{
-		return followDistance;
+		if(getHealth() <= mType->runAwayHealth){
+			return 8;
+		}
 	}
+
+	return followDistance;
 }

@@ -50,12 +50,12 @@ Creature::Creature() :
 	health     = 1000;
 	healthMax  = 1000;
 
-	level = 0;
 	mana = 0;
 	manaMax = 0;
 	lastMove = 0;
 	lastStepCost = 0;
-	speed = 220;
+	baseSpeed = 220;
+	varSpeed = 220;
 
 	followCreature = NULL;
 	eventWalk = 0;
@@ -248,14 +248,14 @@ void Creature::onCreatureMove(const Creature* creature, const Position& newPos, 
 	}
 
 	if(followCreature == creature || (creature == this && followCreature)){
-		if(!creature->canSee(followCreature->getPosition())){
+		if(!canSee(followCreature->getPosition())){
 			onCreatureDisappear(followCreature);
 		}
 		
 		validateWalkPath();
 	}
 	if(attackedCreature == creature || (creature == this && attackedCreature)){
-		if(!creature->canSee(attackedCreature->getPosition())){
+		if(!canSee(attackedCreature->getPosition())){
 			onCreatureDisappear(attackedCreature);	
 		}
 	}

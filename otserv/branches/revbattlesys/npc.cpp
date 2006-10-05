@@ -84,20 +84,14 @@ Creature()
 		else
 			name = "";
 		
-		if(readXMLInteger(root, "level", intValue)){
-			level = intValue;
+		if(readXMLInteger(root, "speed", intValue)){
+			baseSpeed = intValue;
 		}
 		else
-			level = 1;
+			baseSpeed = 220;
+		
+		varSpeed = baseSpeed;
 
-		setNormalSpeed();
-		
-		if(readXMLInteger(root, "magLevel", intValue)){
-			magLevel = intValue;
-		}
-		else
-			magLevel = 1;
-		
 		while(p){
 			if(xmlStrcmp(p->name, (const xmlChar*)"health") == 0){
 

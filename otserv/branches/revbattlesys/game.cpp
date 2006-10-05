@@ -2405,9 +2405,10 @@ bool Game::internalCreatureSay(Creature* creature, SpeakClasses type, const std:
 	//getSpectators(Range(creature->getPosition()), list);
 	getSpectators(list, creature->getPosition());
 
+	Player* tmpPlayer = NULL;
 	for(it = list.begin(); it != list.end(); ++it){
-		if(Player* player = (*it)->getPlayer()){
-			player->sendCreatureSay(creature, type, text);
+		if(tmpPlayer = (*it)->getPlayer()){
+			tmpPlayer->sendCreatureSay(creature, type, text);
 		}
 	}
 
@@ -2427,9 +2428,10 @@ bool Game::internalMonsterYell(Monster* monster, const std::string& text)
 	getSpectators(list, monster->getPosition(), false, 18, 18, 14, 14);
 
 	//players
+	Player* tmpPlayer = NULL;
 	for(it = list.begin(); it != list.end(); ++it) {
-		if((*it)->getPlayer()){
-			(*it)->onCreatureSay(monster, SPEAK_MONSTER1, text);
+		if(tmpPlayer = (*it)->getPlayer()){
+			tmpPlayer->sendCreatureSay(monster, SPEAK_MONSTER1, text);
 		}
 	}
 
@@ -2615,9 +2617,12 @@ void Game::checkCreature(uint32_t creatureId, uint32_t interval)
 	}
 }
 
-void Game::changeSpeed(Creature* creature, int32_t speedDelta)
+void Game::changeSpeed(Creature* creature, int32_t newSpeed)
 {
-	uint32_t newSpeed = std::max((int32_t)1, ((int32_t)(creature->getSpeed())) + speedDelta);
+	if(newSpeed <= 0){
+		newSpeed = 1;
+	}
+
 	creature->setSpeed(newSpeed);
 
 	SpectatorVec list;
@@ -2629,7 +2634,7 @@ void Game::changeSpeed(Creature* creature, int32_t speedDelta)
 	Player* player;
 	for(it = list.begin(); it != list.end(); ++it){
 		if(player = (*it)->getPlayer()){
-			player->sendChangeSpeed(creature);
+			player->sendChangeSpeed(creature, newSpeed);
 		}
 	}
 }

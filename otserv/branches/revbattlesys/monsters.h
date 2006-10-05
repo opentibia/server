@@ -52,9 +52,17 @@ struct spellBlock_t{
 	uint32_t chance;
 };
 
+/*
+struct voiceBlock_t{
+	std::string text;
+	uint32_t chance;
+};
+*/
+
 typedef std::list<LootBlock> LootItems;
 typedef std::list<summonBlock_t> SummonList;
 typedef std::list<spellBlock_t> SpellList;
+typedef std::vector<std::string> voiceVector;
 
 class MonsterType{
 public:
@@ -78,8 +86,6 @@ public:
 	int runAwayHealth;
 	bool pushable;
 	int base_speed;
-	int level;
-	int magLevel;
 	int health;
 	int health_max;
 	int lookhead, lookbody, looklegs, lookfeet, looktype, lookcorpse, lookmaster;
@@ -92,6 +98,9 @@ public:
 	SummonList summonList;
 	LootItems lootItems;
 	SpellList spellList;
+
+	uint32_t yellChance;
+	voiceVector voiceVector;
 	
 	void createLoot(Container* corpse);
 	void createLootContainer(Container* parent, const LootBlock& lootblock);

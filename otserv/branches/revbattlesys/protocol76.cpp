@@ -1380,13 +1380,13 @@ void Protocol76::sendCancelTarget()
 	WriteBuffer(netmsg);
 }
 
-void Protocol76::sendChangeSpeed(const Creature* creature)
+void Protocol76::sendChangeSpeed(const Creature* creature, uint32_t speed)
 {
 	NetworkMessage netmsg;
 	netmsg.AddByte(0x8F);
 
 	netmsg.AddU32(creature->getID());
-	netmsg.AddU16(creature->getSpeed());
+	netmsg.AddU16(speed);
 	WriteBuffer(netmsg);
 }
 

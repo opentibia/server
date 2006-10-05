@@ -397,7 +397,7 @@ bool ConditionSpeed::setParam(ConditionParam_t param, int32_t value)
 
 bool ConditionSpeed::startCondition(Creature* creature)
 {
-	g_game.changeSpeed(creature, speedDelta);
+	g_game.changeSpeed(creature, creature->getSpeed() + speedDelta);
 	return true;
 }
 
@@ -408,7 +408,7 @@ void ConditionSpeed::executeCondition(Creature* creature, int32_t interval)
 
 void ConditionSpeed::endCondition(Creature* creature, EndCondition_t reason)
 {
-	g_game.changeSpeed(creature, -speedDelta);
+	g_game.changeSpeed(creature, creature->getSpeed() - speedDelta);
 }
 
 void ConditionSpeed::addCondition(Creature* creature, const Condition* addCondition)
@@ -422,7 +422,7 @@ void ConditionSpeed::addCondition(Creature* creature, const Condition* addCondit
 		int32_t oldSpeedDelta = speedDelta;
 		speedDelta = conditionSpeed.speedDelta;
 		
-		g_game.changeSpeed(creature, + speedDelta - oldSpeedDelta);
+		g_game.changeSpeed(creature, creature->getSpeed() + (speedDelta - oldSpeedDelta));
 	}
 }
 

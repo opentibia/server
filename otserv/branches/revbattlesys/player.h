@@ -309,7 +309,7 @@ public:
 	void onRemoveInventoryItem(slots_t slot, Item* item);
 
 	void sendIcons() const;  
-	void sendChangeSpeed(const Creature* creature) const;
+	void sendChangeSpeed(const Creature* creature, uint32_t newSpeed) const;
 	void sendToChannel(Creature* creature, SpeakClasses type, const std::string& text, unsigned short channelId) const;
 	void sendCancelMessage(ReturnValue message) const;
 	void sendCancel(const char* msg) const;
@@ -391,6 +391,8 @@ protected:
 protected:
 	Protocol76* client;
 
+	int32_t level;
+	int32_t magLevel;
 	int32_t accessLevel;
 	uint32_t experience;
 	uint32_t immunities;
@@ -479,13 +481,8 @@ protected:
 	AttackedSet attackedSet;
 #endif
 	
-	//for skill advances
-	//unsigned int getReqSkillTries(int skill, int level, Vocation_t voc);
-	
-	//for magic level advances
-	//unsigned int getReqMana(int magLevel, Vocation_t voc); 
-	
 	void updateItemsLight(bool internal = false);
+	void updateBaseSpeed() {baseSpeed = 220 + (2* (level - 1));}
 
 	virtual int32_t getLostExperience() const { return (int32_t)std::floor(((double)experience * 0.1));}	
 	virtual void dropLoot(Container* corpse);

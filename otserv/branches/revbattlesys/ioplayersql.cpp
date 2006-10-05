@@ -103,7 +103,7 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 
 	player->setVocation(result.getDataInt("vocation"));
 	player->accessLevel = result.getDataInt("access");
-	player->setNormalSpeed();
+	player->updateBaseSpeed();
 	
 	player->mana = result.getDataInt("mana");
 	player->manaMax = result.getDataInt("manamax");
@@ -320,7 +320,7 @@ bool IOPlayerSQL::savePlayer(Player* player)
 	query << "`manaspent` = " << player->manaSpent << ", ";
 	query << "`masterpos` = '" << player->masterPos.x<<";"<< player->masterPos.y<<";"<< player->masterPos.z << "', ";
 	query << "`pos` = '" << player->getLoginPosition().x<<";"<< player->getLoginPosition().y<<";"<< player->getLoginPosition().z << "', ";
-	query << "`speed` = " << player->speed << ", ";
+	query << "`speed` = " << player->baseSpeed << ", ";
 	query << "`cap` = " << player->getCapacity() << ", ";
 	query << "`food` = " << player->food << ", ";
 	query << "`sex` = " << player->sex << ", ";
