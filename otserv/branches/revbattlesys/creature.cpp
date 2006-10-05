@@ -181,34 +181,10 @@ void Creature::stopEventWalk()
 	}
 }
 
-/*
-void Creature::addWalk(std::list<Direction>& listDir)
-{
-	listWalkDir = listDir;
-	addWalkEvent();
-}
-
-void Creature::addWalkEvent()
-{
-	if(eventWalk == 0){
-		int64_t ticks = getEventStepTicks();
-		eventWalk = g_game.addEvent(makeTask(ticks, std::bind2nd(std::mem_fun(&Game::checkWalk), getID())));
-	}
-}
-
-void Creature::stopWalkEvent()
-{
-	if(eventWalk != 0){
-		g_game.stopEvent(eventWalk);
-		eventWalk = 0;
-	}
-}
-*/
-
 void Creature::validateWalkPath()
 {
 	if(!internalUpdateFollow && followCreature){
-		if(!g_game.isPathValid(this, listWalkDir, followCreature->getPosition())){
+		if(listWalkDir.empty() || !g_game.isPathValid(this, listWalkDir, followCreature->getPosition())){
 			internalUpdateFollow = true;
 		}
 	}
@@ -459,7 +435,8 @@ bool Creature::internalFollowCreature(const Creature* creature)
 {
 	if(creature){
 		listWalkDir.clear();
-		if(!g_game.getPathToEx(this, creature->getPosition(), followDistance, followDistance, true, listWalkDir)){
+		uint32_t distance = getFollowDistance();
+		if(!g_game.getPathToEx(this, creature->getPosition(), distance, distance, true, listWalkDir)){
 			setFollowCreature(NULL);
 			return false;
 		}

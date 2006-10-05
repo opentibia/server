@@ -69,6 +69,8 @@ Creature()
 	internalLight.level = mType->lightLevel;
 	internalLight.color = mType->lightColor;
 
+	followDistance = mType->targetDistance;
+
 	strDescription = "a " + getName() + ".";
 	toLowerCaseString(strDescription);
 }
@@ -140,9 +142,6 @@ void Monster::onCreatureMove(const Creature* creature, const Position& newPos, c
 			onCreatureEnter(creature);
 		}
 	}
-	/*else if(canSee(newPos) && canSee(oldPos)){
-		//creature just moving around in-range
-	}*/
 	else if(canSee(newPos) && !canSee(oldPos)){
 		onCreatureEnter(creature);
 	}
@@ -192,9 +191,6 @@ void Monster::onCreatureLeave(const Creature* creature)
 	if(creature == this || getMaster() == creature){
 		stopThink();
 	}
-	/*else if(followCreature == creature){
-		stopThink();
-	}*/
 
 	TargetList::iterator it = std::find(targetList.begin(), targetList.end(), creature);
 	if(it != targetList.end()){
@@ -240,6 +236,8 @@ void Monster::searchTarget()
 		TargetList::iterator it = targetList.begin();
 		Creature* target = *it;
 
+		//TODO: check invisibility, pz etc.
+
 		if(!internalFollowCreature(target)){
 			targetList.erase(it);
 			targetList.push_back(target);
@@ -255,19 +253,28 @@ void Monster::onThink(uint32_t interval)
 
 	Creature::onThink(interval);
 
-	if(targetList.empty()){
-		stopThink();
+	if(!isSummon()){
+		if(!targetList.empty()){
+			static int32_t internalTicks = 0;
+			internalTicks -= interval;
+
+			if(internalTicks <= 0 || targetIsRecentAdded){
+				targetIsRecentAdded = false;
+				internalTicks = 4000;
+
+				if(!followCreature){
+					searchTarget();
+				}
+			}
+		}
+		else{
+			stopThink();
+		}
 	}
-
-	static int32_t internalTicks = 0;
-	internalTicks -= interval;
-
-	if(internalTicks <= 0 || targetIsRecentAdded){
-		targetIsRecentAdded = false;
-		internalTicks = 4000;
-
+	else{
+		//monster is a summon
 		if(!followCreature){
-			searchTarget();
+			internalFollowCreature(getMaster());
 		}
 	}
 }
@@ -285,7 +292,7 @@ bool Monster::getNextStep(Direction& dir)
 {
 	bool result = false;
 
-	if(!followCreature){
+	if(!followCreature && !isSummon()){
 		//"randomize" step
 
 		int32_t dirArr[4] = {0};
@@ -354,4 +361,14 @@ void Monster::setNormalCreatureLight()
 {
 	internalLight.level = mType->lightLevel;
 	internalLight.color = mType->lightColor;
+}
+
+uint32_t Monster::getFollowDistance() const
+{
+	if(followCreature != NULL && getMaster() == followCreature){
+		return 2;
+	}
+	else{
+		return followDistance;
+	}
 }

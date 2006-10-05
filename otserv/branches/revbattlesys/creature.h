@@ -160,6 +160,7 @@ public:
 	virtual const Creature* getFollowCreature() { return followCreature; };
 	virtual void setFollowCreature(const Creature* creature);
 	virtual bool internalFollowCreature(const Creature* creature);
+	virtual uint32_t getFollowDistance() const {return followDistance;}
 
 	//follow events
 	virtual void onFollowCreature(const Creature* creature) {};

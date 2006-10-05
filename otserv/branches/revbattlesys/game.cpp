@@ -2448,9 +2448,16 @@ bool Game::getPathToEx(const Creature* creature, const Position& targetPos,
 	}
 
 	const Position& creaturePos = creature->getPosition();
+	
+	int32_t distX = std::abs(creaturePos.x - targetPos.x);
+	int32_t distY = std::abs(creaturePos.y - targetPos.y);
 
-	if(Position::areInRange<1,1,0>(creaturePos, targetPos)){
-		return true;
+	if((distX >= minDist && distX <= maxDist && distY <= maxDist) ||
+		(distY >= minDist && distY <= maxDist && distX <= maxDist))
+	{
+		if(map->canThrowObjectTo(creaturePos, targetPos)){
+			return true;
+		}
 	}
 
 	std::list<Direction> tmpDirList;

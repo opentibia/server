@@ -77,7 +77,9 @@ public:
 	virtual bool getNextStep(Direction& dir);
 
 	bool canPushItems() const {return mType->canPushItems;}
-	bool isSummon() const { return false; }
+	bool isSummon() const { return getMaster() != NULL; }
+
+	virtual uint32_t getFollowDistance() const;
 
 private:
 	std::string strDescription;
