@@ -555,7 +555,7 @@ bool Commands::getInfo(Creature* creature, const std::string& cmd, const std::st
 		        "access: " << paramPlayer->getAccessLevel() << std::endl <<
 		        "level:  " << paramPlayer->getPlayerInfo(PLAYERINFO_LEVEL) << std::endl <<
 		        "maglvl: " << paramPlayer->getPlayerInfo(PLAYERINFO_MAGICLEVEL) << std::endl <<
-		        "speed:  " <<  paramPlayer->speed <<std::endl <<
+		        "speed:  " <<  paramPlayer->getSpeed() <<std::endl <<
 		        "position " << paramPlayer->getPosition() << std::endl << 
 				"ip: " << ipText(ip);
 		player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, info.str().c_str());
