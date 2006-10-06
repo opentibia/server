@@ -61,13 +61,18 @@ void MonsterType::reset()
 	looktype = 10;
 	lookcorpse = 0;
 	lookmaster = 10;
-	immunities = 0;
+	damageImmunities = 0;
+	conditionImmunities = 0;
 	lightLevel = 0;
 	lightColor = 0;
 
+	combatMeleeMin = 0;
+	combatMeleeMax = 0;
+
 	summonList.clear();
 	lootItems.clear();
-	spellList.clear();
+	spellAttackList.clear();
+	spellDefenseList.clear();
 
 	yellChance = 0;
 	voiceVector.clear();
@@ -380,20 +385,52 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 				while(tmpNode){
 					if(xmlStrcmp(tmpNode->name, (const xmlChar*)"attack") == 0){
 						
-						spellBlock_t sb;
-						sb.chance = 0;
+						int32_t min = 0;
+						int32_t max = 0;
+						int32_t chance = 100;
+						int32_t speed = 1000;
+
+						if(readXMLInteger(tmpNode, "speed", intValue)){
+							speed = intValue;
+						}
 
 						if(readXMLInteger(tmpNode, "chance", intValue)){
-							//0	never, 10000 always
-							sb.chance = intValue;
+							chance = intValue;
+						}
+
+						if(readXMLInteger(tmpNode, "min", intValue)){
+							min = intValue;
+						}
+
+						if(readXMLInteger(tmpNode, "max", intValue)){
+							max = intValue;
 						}
 
 						if(readXMLString(tmpNode, "name", strValue)){
-							Spell* spell;
-							if(spell = g_spells->getSpellByName(strValue)){
-								sb.spell = spell;
-								mType->spellList.push_back(sb);
+							if(strcasecmp(strValue.c_str(), "melee") == 0){
+								mType->combatMeleeMin = min;
+								mType->combatMeleeMax = min;
+								mType->combatMeleeSpeed = speed;
 							}
+							else{
+								spellBlock_t sb;
+								sb.chance = chance;
+								sb.minCombatValue = min;
+								sb.maxCombatValue = max;
+								sb.speed = speed;
+
+								Spell* spell;
+								if(spell = g_spells->getSpellByName(strValue)){
+									sb.spell = spell;
+									mType->spellAttackList.push_back(sb);
+								}
+								else{
+									std::cout << "Warning: [Monsters::loadMonster] Spell not found - " << file << std::endl;
+								}
+							}
+						}
+						else{
+							std::cout << "Warning: [Monsters::loadMonster] name attribute is missing - " << file << std::endl;
 						}
 					}
 
@@ -404,22 +441,81 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 				xmlNodePtr tmpNode = p->children;
 				while(tmpNode){
 					if(xmlStrcmp(tmpNode->name, (const xmlChar*)"defense") == 0){
-						std::string immunity = "";
+						
+						int32_t min = 0;
+						int32_t max = 0;
+						int32_t chance = 100;
+						int32_t speed = 1000;
 
-						if(readXMLString(tmpNode, "immunity", strValue)){
-							immunity = strValue;
+						if(readXMLInteger(tmpNode, "speed", intValue)){
+							speed = intValue;
 						}
 
-						if(strcasecmp(immunity.c_str(), "energy") == 0)
-							mType->immunities |= CONDITION_ENERGY;
-						else if(strcasecmp(immunity.c_str(), "fire") == 0)
-							mType->immunities |= CONDITION_FIRE;
-						else if(strcasecmp(immunity.c_str(), "poison") == 0)
-							mType->immunities |= CONDITION_POISON;
-						else if(strcasecmp(immunity.c_str(), "paralyze") == 0)
-							mType->immunities |= CONDITION_PARALYZE;
-						else if(strcasecmp(immunity.c_str(), "drunk") == 0)
-							mType->immunities |= CONDITION_DRUNK;
+						if(readXMLInteger(tmpNode, "chance", intValue)){
+							chance = intValue;
+						}
+
+						if(readXMLInteger(tmpNode, "min", intValue)){
+							min = intValue;
+						}
+
+						if(readXMLInteger(tmpNode, "max", intValue)){
+							max = intValue;
+						}
+
+						if(readXMLString(tmpNode, "name", strValue)){
+							spellBlock_t sb;
+							sb.chance = chance;
+							sb.minCombatValue = min;
+							sb.maxCombatValue = max;
+							sb.speed = speed;
+
+							Spell* spell;
+							if(spell = g_spells->getSpellByName(strValue)){
+								sb.spell = spell;
+								mType->spellDefenseList.push_back(sb);
+							}
+							else{
+								std::cout << "Warning: [Monsters::loadMonster] Spell not found - " << file << std::endl;
+							}
+						}
+						else{
+							std::cout << "Warning: [Monsters::loadMonster] name attribute is missing - " << file << std::endl;
+						}
+					}
+
+					tmpNode = tmpNode->next;
+				}
+			}
+			else if(xmlStrcmp(p->name, (const xmlChar*)"immunities") == 0){
+				xmlNodePtr tmpNode = p->children;
+				while(tmpNode){
+					if(xmlStrcmp(tmpNode->name, (const xmlChar*)"immunity") == 0){
+
+						if(readXMLString(tmpNode, "name", strValue)){
+
+							if(strcasecmp(strValue.c_str(), "energy") == 0){
+								mType->damageImmunities |= DAMAGE_ENERGY;
+								mType->conditionImmunities |= CONDITION_ENERGY;
+							}
+							else if(strcasecmp(strValue.c_str(), "fire") == 0){
+								mType->damageImmunities |= DAMAGE_FIRE;
+								mType->conditionImmunities |= CONDITION_FIRE;
+							}
+							else if(strcasecmp(strValue.c_str(), "poison") == 0){
+								mType->damageImmunities |= DAMAGE_POISON;
+								mType->conditionImmunities |= CONDITION_POISON;
+							}
+							else if(strcasecmp(strValue.c_str(), "paralyze") == 0){
+								mType->conditionImmunities |= CONDITION_PARALYZE;
+							}
+							else if(strcasecmp(strValue.c_str(), "outfit") == 0){
+								mType->conditionImmunities |= CONDITION_OUTFIT;
+							}
+							else if(strcasecmp(strValue.c_str(), "drunk") == 0){
+								mType->conditionImmunities |= CONDITION_DRUNK;
+							}
+						}
 					}
 
 					tmpNode = tmpNode->next;
@@ -427,9 +523,12 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 			}
 			else if(xmlStrcmp(p->name, (const xmlChar*)"voices") == 0){
 				xmlNodePtr tmpNode = p->children;
+				
+				if(readXMLInteger(p, "speed", intValue)){
+					mType->yellSpeedTicks = intValue;
+				}
 
 				if(readXMLInteger(p, "chance", intValue)){
-					//0	never, 10000 always
 					mType->yellChance = intValue;
 				}
 

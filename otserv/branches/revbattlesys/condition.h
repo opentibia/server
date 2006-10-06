@@ -30,19 +30,19 @@ class Creature;
 class Player;
 
 enum ConditionType_t {
-	CONDITION_NONE = 0,
-	CONDITION_POISON = 1,     //Damage
-	CONDITION_FIRE = 2,	      //Damage
-	CONDITION_ENERGY = 3,	    //Damage
-	CONDITION_HASTE = 4,      //Speed
-	CONDITION_PARALYZE = 5,	  //Speed
-	CONDITION_OUTFIT = 6,	    //Outfit
-	CONDITION_LIGHT = 7,	    //Light   -- Player only
-	CONDITION_MANASHIELD = 8, //Generic -- Player only
-	CONDITION_INFIGHT = 9,    //Generic -- Player only
-	CONDITION_DRUNK = 10,     //Generic -- Player only
-	CONDITION_EXHAUSTED = 11, //Generic
-	CONDITION_FOOD = 12,			//Generic -- Player only
+	CONDITION_NONE				= 0,
+	CONDITION_POISON			= 1,
+	CONDITION_FIRE				= 2,
+	CONDITION_ENERGY			= 4,
+	CONDITION_HASTE				= 8,
+	CONDITION_PARALYZE		= 16,
+	CONDITION_OUTFIT			= 32,
+	CONDITION_LIGHT				= 64,
+	CONDITION_MANASHIELD	= 128,
+	CONDITION_INFIGHT			= 256,
+	CONDITION_DRUNK				= 512,
+	CONDITION_EXHAUSTED		= 1024,
+	CONDITION_FOOD				= 2048
 };
 
 enum EndCondition_t {

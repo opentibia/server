@@ -303,7 +303,7 @@ public:
 		uint32_t minDist, uint32_t maxDist, bool fullPathSearch, std::list<Direction>& dirList);
 
 	void changeSpeed(Creature* creature, int32_t newSpeed);
-	void internalChangeOutfit(Creature* creature, Outfit_t oufit, bool isDefault);
+	void internalChangeOutfit(Creature* creature, Outfit_t oufit);
 	void changeLight(const Creature* creature);
 
 #ifdef __SKULLSYSTEM__

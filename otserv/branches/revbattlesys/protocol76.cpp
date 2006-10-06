@@ -801,7 +801,7 @@ void Protocol76::parseRequestOutfit(NetworkMessage& msg)
 	msg.Reset();
 
 	msg.AddByte(0xC8);
-	AddCreatureOutfit(msg, player);
+	AddCreatureOutfit(msg, player, player->getDefaultOutfit());
 
 	switch (player->getSex()) {
 	case PLAYERSEX_FEMALE:
@@ -1129,7 +1129,7 @@ void Protocol76::sendSetOutfit(const Creature* creature)
 		NetworkMessage msg;
 		msg.AddByte(0x8E);
 		msg.AddU32(creature->getID());
-		AddCreatureOutfit(msg, creature);
+		AddCreatureOutfit(msg, creature, creature->getCurrentOutfit());
 		WriteBuffer(msg);
 	}
 }
@@ -1826,7 +1826,7 @@ void Protocol76::AddCreature(NetworkMessage &msg,const Creature* creature, bool 
 
 	msg.AddByte((unsigned char)creature->getDirection());
 
-	AddCreatureOutfit(msg, creature);
+	AddCreatureOutfit(msg, creature, creature->getCurrentOutfit());
 
 	LightInfo lightInfo;
 	creature->getCreatureLight(lightInfo);
@@ -1910,9 +1910,8 @@ void Protocol76::AddCreatureHealth(NetworkMessage& msg,const Creature* creature)
 	msg.AddByte(std::max((int32_t)1, creature->getHealth() * 100 / std::max(creature->getMaxHealth(), (int32_t)1) ));
 }
 
-void Protocol76::AddCreatureOutfit(NetworkMessage &msg, const Creature* creature)
+void Protocol76::AddCreatureOutfit(NetworkMessage &msg, const Creature* creature, const Outfit_t& outfit)
 {
-	const Outfit_t outfit = creature->getDefaultOutfit();
 	msg.AddByte(outfit.lookType);
 
 	if(outfit.lookType != 0){

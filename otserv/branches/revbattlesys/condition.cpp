@@ -490,12 +490,12 @@ void ConditionOutfit::changeOutfit(Creature* creature, int32_t index /*= -1*/)
 	}
 
 	Outfit_t outfit = outfits[index];
-	g_game.internalChangeOutfit(creature, outfit, false);
+	g_game.internalChangeOutfit(creature, outfit);
 }
 
 void ConditionOutfit::endCondition(Creature* creature, EndCondition_t reason)
 {
-	g_game.internalChangeOutfit(creature, creature->getDefaultOutfit(), true);
+	g_game.internalChangeOutfit(creature, creature->getDefaultOutfit());
 }
 
 void ConditionOutfit::addCondition(Creature* creature, const Condition* addCondition)

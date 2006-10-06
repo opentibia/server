@@ -220,7 +220,7 @@ private:
 	void AddPlayerStats(NetworkMessage &msg);
 	void AddCreatureSpeak(NetworkMessage &msg,const Creature* creature, SpeakClasses type, std::string text, unsigned short channelId);
 	void AddCreatureHealth(NetworkMessage &msg,const Creature* creature);
-	void AddCreatureOutfit(NetworkMessage &msg, const Creature* creature);
+	void AddCreatureOutfit(NetworkMessage &msg, const Creature* creature, const Outfit_t& outfit);
 	void AddPlayerSkills(NetworkMessage &msg);
 	void AddWorldLight(NetworkMessage &msg, const LightInfo& lightInfo);
 	void AddCreatureLight(NetworkMessage &msg, const Creature* creature);

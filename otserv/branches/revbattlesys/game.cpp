@@ -1499,7 +1499,7 @@ void Game::checkCreatureAttacking(uint32_t creatureId, uint32_t interval)
 				creature->onCreatureDisappear(attackedCreature);
 			}
 			else if(map->canThrowObjectTo(creature->getPosition(), attackedCreature->getPosition())){
-				creature->doAttacking();
+				creature->doAttacking(interval);
 			}
 		}
 
@@ -2322,7 +2322,11 @@ bool Game::playerChangeOutfit(Player* player, Outfit_t outfit)
 	if(player->isRemoved())
 		return false;
 
-	internalChangeOutfit(player, outfit, true);
+	player->defaultOutfit = outfit;
+
+	if(!player->hasCondition(CONDITION_OUTFIT)){
+		internalChangeOutfit(player, outfit);
+	}
 	return true;
 }
 
@@ -2451,12 +2455,10 @@ bool Game::getPathToEx(const Creature* creature, const Position& targetPos,
 
 	const Position& creaturePos = creature->getPosition();
 	
-	int32_t distX = std::abs(creaturePos.x - targetPos.x);
-	int32_t distY = std::abs(creaturePos.y - targetPos.y);
+	int32_t dx = std::abs(creaturePos.x - targetPos.x);
+	int32_t dy = std::abs(creaturePos.y - targetPos.y);
 
-	if((distX >= minDist && distX <= maxDist && distY <= maxDist) ||
-		(distY >= minDist && distY <= maxDist && distX <= maxDist))
-	{
+	if((dx >= minDist && dx <= maxDist && dy <= maxDist) || (dy >= minDist && dy <= maxDist && dx <= maxDist)){
 		if(map->canThrowObjectTo(creaturePos, targetPos)){
 			return true;
 		}
@@ -2639,12 +2641,8 @@ void Game::changeSpeed(Creature* creature, int32_t newSpeed)
 	}
 }
 
-void Game::internalChangeOutfit(Creature* creature, Outfit_t oufit, bool isDefault)
+void Game::internalChangeOutfit(Creature* creature, Outfit_t oufit)
 {
-	if(isDefault){
-		creature->defaultOutfit = oufit;
-	}
-
 	/*
 	if(!creature->isInvisible()){
 		return;

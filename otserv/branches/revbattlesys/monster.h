@@ -58,7 +58,7 @@ public:
 	virtual int getDefense() const { return mType->defense; }
 	virtual bool isPushable() const { return mType->pushable; }
 	virtual bool isAttackable() const { return true;}
-	virtual void doAttacking();
+	virtual void doAttacking(uint32_t interval);
 
 	virtual void setNormalCreatureLight();
 
@@ -80,11 +80,15 @@ public:
 	bool isSummon() const { return getMaster() != NULL; }
 
 	virtual uint32_t getFollowDistance() const;
+	virtual void getCombatValues(int32_t& min, int32_t& max);
 
 private:
 	std::string strDescription;
 	bool targetIsRecentAdded;
 	bool isActive;
+
+	int32_t minCombatValue;
+	int32_t maxCombatValue;
 
 	typedef std::list<Creature*> TargetList;
 	TargetList targetList;
@@ -94,15 +98,20 @@ private:
 
 	void startThink();
 	void stopThink();
-	void onThinkYell();
+	void onThinkYell(uint32_t interval);
+	void onDefending(uint32_t interval);
 
 	void onCreatureEnter(const Creature* creature);
 	void onCreatureLeave(const Creature* creature);
 
+	void updateLookDirection();
+	bool getRandomStep(const Position& creaturePos, const Position& centerPos, Direction& dir);
+
 	virtual int32_t getLostExperience() const { return (isSummon() ? 0 : mType->experience); }
 	virtual int getLookCorpse() { return mType->lookcorpse; }
 	virtual void dropLoot(Container* corpse);
-	virtual uint32_t getImmunities() const { return mType->immunities; }
+	virtual uint32_t getDamageImmunities() const { return mType->damageImmunities; }
+	virtual uint32_t getConditionImmunities() const { return mType->conditionImmunities; }
 	virtual uint16_t getLookCorpse() const { return mType->lookcorpse; }
 };
 

@@ -50,19 +50,15 @@ class Spell;
 struct spellBlock_t{
 	Spell* spell;
 	uint32_t chance;
+	uint32_t speed;
+	int32_t minCombatValue;
+	int32_t maxCombatValue;
 };
-
-/*
-struct voiceBlock_t{
-	std::string text;
-	uint32_t chance;
-};
-*/
 
 typedef std::list<LootBlock> LootItems;
 typedef std::list<summonBlock_t> SummonList;
 typedef std::list<spellBlock_t> SpellList;
-typedef std::vector<std::string> voiceVector;
+typedef std::vector<std::string> VoiceVector;
 
 class MonsterType{
 public:
@@ -89,7 +85,8 @@ public:
 	int health;
 	int health_max;
 	int lookhead, lookbody, looklegs, lookfeet, looktype, lookcorpse, lookmaster;
-	int immunities;
+	int conditionImmunities;
+	int damageImmunities;
 	RaceType_t race;
 	
 	int lightLevel;
@@ -97,10 +94,16 @@ public:
 	
 	SummonList summonList;
 	LootItems lootItems;
-	SpellList spellList;
+	SpellList spellAttackList;
+	SpellList spellDefenseList;
+
+	int32_t combatMeleeMin;
+	int32_t combatMeleeMax;
+	uint32_t combatMeleeSpeed;
 
 	uint32_t yellChance;
-	voiceVector voiceVector;
+	uint32_t yellSpeedTicks;
+	VoiceVector voiceVector;
 	
 	void createLoot(Container* corpse);
 	void createLootContainer(Container* parent, const LootBlock& lootblock);

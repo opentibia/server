@@ -67,7 +67,8 @@ Creature()
 
 	level      = 1;
 	experience = 180;
-	immunities = 0;
+	damageImmunities = 0;
+	conditionImmunities = 0;
 	magLevel   = 20;
 	accessLevel = 0;
 	lastlogin  = 0;
@@ -2504,7 +2505,7 @@ void Player::setAttackedCreature(Creature* creature)
 	}
 }
 
-void Player::doAttacking()
+void Player::doAttacking(uint32_t interval)
 {
 	if(attackedCreature){
 		Item* tool;
@@ -2750,6 +2751,15 @@ void Player::onTargetCreatureDisappear()
 */
 
 bool Player::isImmune(DamageType_t type) const
+{
+	if(getAccessLevel() != 0){
+		return true;
+	}
+
+	return Creature::isImmune(type);
+}
+
+bool Player::isImmune(ConditionType_t type) const
 {
 	if(getAccessLevel() != 0){
 		return true;

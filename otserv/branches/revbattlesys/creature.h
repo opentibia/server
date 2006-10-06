@@ -170,7 +170,7 @@ public:
 	virtual void setAttackedCreature(Creature* creature);
 	virtual BlockType_t blockHit(Creature* attacker, DamageType_t damageType, int32_t& damage,
 		bool checkDefense = false, bool checkArmor = false);
-	virtual void doAttacking() {};
+	virtual void doAttacking(uint32_t interval) {};
 
 	void setMaster(Creature* creature);
 	Creature* getMaster() {return master;}
@@ -187,8 +187,10 @@ public:
 	void executeConditions(int32_t newticks);
 	Condition* getCondition(ConditionType_t type);
 	bool hasCondition(ConditionType_t type) const;
+	virtual bool isImmune(ConditionType_t type) const;
 	virtual bool isImmune(DamageType_t type) const;
-	virtual uint32_t getImmunities() const { return 0; }
+	virtual uint32_t getDamageImmunities() const { return 0; }
+	virtual uint32_t getConditionImmunities() const { return 0; }
 	virtual bool isAttackable() const { return true;};
 
 	virtual void changeHealth(int32_t healthChange);
@@ -238,6 +240,7 @@ public:
 	virtual void onCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text) { };
 	
 	virtual void onCreatureChangeOutfit(const Creature* creature) { };
+	virtual void getCombatValues(int32_t& min, int32_t& max) {};
 
 protected:	
 	
@@ -250,7 +253,6 @@ protected:
 	Position masterPos;
 	uint64_t lastMove;
 	uint32_t lastStepCost;
-	//uint32_t speed;
 	uint32_t baseSpeed;
 	int32_t varSpeed;
 

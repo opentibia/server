@@ -505,9 +505,9 @@ bool IOPlayerXML::savePlayer(Player* player)
 	sb << player->manaSpent; xmlSetProp(pn, (const xmlChar*)"spent", (const xmlChar*)sb.str().c_str());      sb.str("");
 	xmlAddChild(root, pn);
 
-    //upconversion of uchar(uint8_t) to get value not character into the stream
+	//upconversion of uchar(uint8_t) to get value not character into the stream
 	pn = xmlNewNode(NULL,(const xmlChar*)"look");
-	//sb << (int16_t)player->lookMaster;  xmlSetProp(pn, (const xmlChar*)"type", (const xmlChar*)sb.str().c_str());        sb.str("");
+	sb << (int16_t)player->defaultOutfit.lookType;    xmlSetProp(pn, (const xmlChar*)"type", (const xmlChar*)sb.str().c_str());        sb.str("");
 	sb << (int16_t)player->defaultOutfit.lookHead;    xmlSetProp(pn, (const xmlChar*)"head", (const xmlChar*)sb.str().c_str());        sb.str("");
 	sb << (int16_t)player->defaultOutfit.lookBody;    xmlSetProp(pn, (const xmlChar*)"body", (const xmlChar*)sb.str().c_str());        sb.str("");
 	sb << (int16_t)player->defaultOutfit.lookLegs;    xmlSetProp(pn, (const xmlChar*)"legs", (const xmlChar*)sb.str().c_str());        sb.str("");

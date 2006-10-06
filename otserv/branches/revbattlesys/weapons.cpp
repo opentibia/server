@@ -639,7 +639,6 @@ bool WeaponDistance::useWeapon(Player* player, Item* item, Creature* target) con
 
 		destTile = g_game.getTile(destPos.x + dx, destPos.y + dy, destPos.z);
 		
-		//if(destTile && g_game.internalAddItem(destTile, item, INDEX_WHEREEVER, 0, true) == RET_NOERROR){
 		if(destTile && !destTile->hasProperty(BLOCKINGANDNOTMOVEABLE)){
 			destPos.x += dx;
 			destPos.y += dy;

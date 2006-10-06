@@ -248,14 +248,14 @@ void Creature::onCreatureMove(const Creature* creature, const Position& newPos, 
 	}
 
 	if(followCreature == creature || (creature == this && followCreature)){
-		if(!canSee(followCreature->getPosition())){
+		if(newPos.z != oldPos.z || !canSee(followCreature->getPosition())){
 			onCreatureDisappear(followCreature);
 		}
 		
 		validateWalkPath();
 	}
 	if(attackedCreature == creature || (creature == this && attackedCreature)){
-		if(!canSee(attackedCreature->getPosition())){
+		if(newPos.z != oldPos.z || !canSee(attackedCreature->getPosition())){
 			onCreatureDisappear(attackedCreature);	
 		}
 	}
@@ -660,7 +660,12 @@ bool Creature::hasCondition(ConditionType_t type) const
 
 bool Creature::isImmune(DamageType_t type) const
 {
-	return ((getImmunities() & (uint32_t)type) == (uint32_t)type);
+	return ((getDamageImmunities() & (uint32_t)type) == (uint32_t)type);
+}
+
+bool Creature::isImmune(ConditionType_t type) const
+{
+	return ((getConditionImmunities() & (uint32_t)type) == (uint32_t)type);
 }
 
 std::string Creature::getDescription(int32_t lookDistance) const

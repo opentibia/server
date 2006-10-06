@@ -72,7 +72,7 @@ void Combat::getMinMaxValues(Creature* creature, int32_t& min, int32_t& max) con
 		}
 	}
 	else{
-		//creature->getMinMaxCombatValues();
+		creature->getCombatValues(min, max);
 	}
 }
 
@@ -267,13 +267,15 @@ bool Combat::CombatManaFunc(Creature* caster, Creature* target, const CombatPara
 
 bool Combat::CombatConditionFunc(Creature* caster, Creature* target, const CombatParams& params, void* data)
 {
-	if(params.condition){
-		Condition* conditionCopy = params.condition->clone();
-		if(caster){
-			conditionCopy->setParam(CONDITIONPARAM_OWNER, caster->getID());
-		}
+	if(!params.isAggressive || caster != target){
+		if(params.condition){
+			Condition* conditionCopy = params.condition->clone();
+			if(caster){
+				conditionCopy->setParam(CONDITIONPARAM_OWNER, caster->getID());
+			}
 
-		return target->addCondition(conditionCopy);
+			return target->addCondition(conditionCopy);
+		}
 	}
 
 	return false;

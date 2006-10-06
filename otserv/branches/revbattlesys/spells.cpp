@@ -591,11 +591,16 @@ bool InstantSpell::castSpell(Creature* creature)
 
 bool InstantSpell::castSpell(Creature* creature, Creature* target)
 {
-	LuaVariant var;
-	var.type = VARIANT_NUMBER;
-	var.number = target->getID();
+	if(needTarget){
+		LuaVariant var;
+		var.type = VARIANT_NUMBER;
+		var.number = target->getID();
 
-	return internalCastSpell(creature, var);
+		return internalCastSpell(creature, var);
+	}
+	else{
+		return castSpell(creature);
+	}
 }
 
 bool InstantSpell::internalCastSpell(Creature* creature, const LuaVariant& var)

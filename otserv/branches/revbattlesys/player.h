@@ -204,11 +204,12 @@ public:
 	//combat functions
 	virtual void setAttackedCreature(Creature* creature);
 	bool isImmune(DamageType_t type) const;
+	bool isImmune(ConditionType_t type) const;
 	virtual bool isAttackable() const;
 	bool isPzLocked() const { return pzLocked; }
 	virtual BlockType_t blockHit(Creature* attacker, DamageType_t damageType, int32_t& damage,
 		bool checkDefense = false, bool checkArmor = false);
-	virtual void doAttacking();
+	virtual void doAttacking(uint32_t interval);
 
 	int getSkill(skills_t skilltype, skillsid_t skillinfo) const;
 	uint32_t getSkillPoint() const {return skillPoint;}
@@ -395,7 +396,8 @@ protected:
 	int32_t magLevel;
 	int32_t accessLevel;
 	uint32_t experience;
-	uint32_t immunities;
+	uint32_t damageImmunities;
+	uint32_t conditionImmunities;
 	int32_t manaSpent;
 	Vocation_t vocation_id;
 	Vocation* vocation;
@@ -486,7 +488,8 @@ protected:
 
 	virtual int32_t getLostExperience() const { return (int32_t)std::floor(((double)experience * 0.1));}	
 	virtual void dropLoot(Container* corpse);
-	virtual uint32_t getImmunities() const { return immunities; }
+	virtual uint32_t getDamageImmunities() const { return damageImmunities; }
+	virtual uint32_t getConditionImmunities() const { return conditionImmunities; }
 	virtual uint16_t getLookCorpse() const;
 
 	friend OTSYS_THREAD_RETURN ConnectionHandler(void *dat);
