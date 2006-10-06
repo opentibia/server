@@ -954,18 +954,10 @@ void Game::thingMove(Player* player, const Position& fromPos, uint16_t itemId, u
 		}
 	}
 
-	if(thing){
+	if(thing && toCylinder){
 		if(Creature* movingCreature = thing->getCreature()){
-			Position from_pos_cyl = fromCylinder->getPosition();
-			Position to_pos_cyl = fromCylinder->getPosition();
-            if(abs(from_pos_cyl.x - to_pos_cyl.x) == abs(from_pos_cyl.y - to_pos_cyl.y)){ // Diagonal
-                addEvent(makeTask(1500, boost::bind(&Game::moveCreature, this, player->getID(), 
-                	player->getPosition(), movingCreature->getID(), toPos)));
-			}
-            else{
-                addEvent(makeTask(800, boost::bind(&Game::moveCreature, this, player->getID(), 
-                	player->getPosition(), movingCreature->getID(), toPos)));
-			}
+			addEvent(makeTask(1500, boost::bind(&Game::moveCreature, this, player->getID(),
+				player->getPosition(), movingCreature->getID(), toCylinder->getPosition())));
 		}
 		else if(Item* movingItem = thing->getItem()){
 			moveItem(player, fromCylinder, toCylinder, toIndex, movingItem, count, itemId);
