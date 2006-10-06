@@ -106,4 +106,59 @@
 <action itemid="1386" script="teleport.lua"/>
 <action itemid="3678" script="teleport.lua"/>
 
+-- Furniture Packages 
+<action itemid="3901" script="furniture_package.lua"/>
+<action itemid="3902" script="furniture_package.lua"/>
+<action itemid="3903" script="furniture_package.lua"/>
+<action itemid="3904" script="furniture_package.lua"/>
+<action itemid="3905" script="furniture_package.lua"/>
+<action itemid="3906" script="furniture_package.lua"/>
+<action itemid="3907" script="furniture_package.lua"/>
+<action itemid="3908" script="furniture_package.lua"/>
+<action itemid="3909" script="furniture_package.lua"/>
+<action itemid="3910" script="furniture_package.lua"/>
+<action itemid="3911" script="furniture_package.lua"/>
+<action itemid="3912" script="furniture_package.lua"/>
+<action itemid="3913" script="furniture_package.lua"/>
+<action itemid="3914" script="furniture_package.lua"/>
+<action itemid="3915" script="furniture_package.lua"/>
+<action itemid="3917" script="furniture_package.lua"/>
+<action itemid="3918" script="furniture_package.lua"/>
+<action itemid="3919" script="furniture_package.lua"/>
+<action itemid="3920" script="furniture_package.lua"/>
+<action itemid="3921" script="furniture_package.lua"/>
+<action itemid="3923" script="furniture_package.lua"/>
+<action itemid="3926" script="furniture_package.lua"/>
+<action itemid="3927" script="furniture_package.lua"/>
+<action itemid="3928" script="furniture_package.lua"/>
+<action itemid="3929" script="furniture_package.lua"/>
+<action itemid="3931" script="furniture_package.lua"/>
+<action itemid="3932" script="furniture_package.lua"/>
+<action itemid="3933" script="furniture_package.lua"/>
+<action itemid="3935" script="furniture_package.lua"/>
+<action itemid="3936" script="furniture_package.lua"/>
+<action itemid="3937" script="furniture_package.lua"/>
+<action itemid="3938" script="furniture_package.lua"/>
+
+-- Level Doors
+<action itemid="1227" script="level_door.lua" />
+<action itemid="1228" script="level_door.lua" />
+<action itemid="1229" script="level_door.lua" />
+<action itemid="1230" script="level_door.lua" />
+<action itemid="1245" script="level_door.lua" />
+<action itemid="1246" script="level_door.lua" />
+<action itemid="1247" script="level_door.lua" />
+<action itemid="1248" script="level_door.lua" />
+<action itemid="1259" script="level_door.lua" />
+<action itemid="1260" script="level_door.lua" />
+<action itemid="1261" script="level_door.lua" />
+<action itemid="1262" script="level_door.lua" />
+<action itemid="3540" script="level_door.lua" />
+<action itemid="3541" script="level_door.lua" />
+<action itemid="3549" script="level_door.lua" />
+<action itemid="3550" script="level_door.lua" />
+
+-- Others
+<action itemid="2785" script="blueberry_bush.lua"/>
+
 </actions>
