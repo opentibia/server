@@ -305,7 +305,7 @@ void Monster::onThinkYell(uint32_t interval)
 	if(mType->yellSpeedTicks <= internalTicks){
 		internalTicks = 0;
 
-		if(!mType->voiceVector.empty() && (mType->yellChance >= random_range(0, 100))){
+		if(!mType->voiceVector.empty() && (mType->yellChance >= (uint32_t)random_range(0, 100))){
 			uint32_t index = random_range(0, mType->voiceVector.size() - 1);
 			g_game.internalMonsterYell(this, mType->voiceVector[index]);
 		}
@@ -416,7 +416,7 @@ void Monster::doAttacking(uint32_t interval)
 			continue;
 		}
 
-		if((it->chance >= random_range(0, 100))){
+		if((it->chance >= (uint32_t)random_range(0, 100))){
 			minCombatValue = it->minCombatValue;
 			maxCombatValue = it->maxCombatValue;
 			it->spell->castSpell(this, attackedCreature);
@@ -456,7 +456,7 @@ void Monster::onDefending(uint32_t interval)
 			continue;
 		}
 
-		if((it->chance >= random_range(0, 100))){
+		if((it->chance >= (uint32_t)random_range(0, 100))){
 			minCombatValue = it->minCombatValue;
 			maxCombatValue = it->maxCombatValue;
 			it->spell->castSpell(this, this);

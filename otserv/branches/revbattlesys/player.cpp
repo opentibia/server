@@ -1468,7 +1468,7 @@ void Player::addExperience(unsigned long exp)
 	}
 
 	if(prevLevel != newLevel){
-		int32_t oldSpeed = getBaseSpeed();		
+		//int32_t oldSpeed = getBaseSpeed();		
 		level = newLevel;
 		updateBaseSpeed();
 

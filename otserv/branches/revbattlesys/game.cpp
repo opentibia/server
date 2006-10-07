@@ -2455,8 +2455,8 @@ bool Game::getPathToEx(const Creature* creature, const Position& targetPos,
 
 	const Position& creaturePos = creature->getPosition();
 	
-	int32_t dx = std::abs(creaturePos.x - targetPos.x);
-	int32_t dy = std::abs(creaturePos.y - targetPos.y);
+	uint32_t dx = std::abs(creaturePos.x - targetPos.x);
+	uint32_t dy = std::abs(creaturePos.y - targetPos.y);
 
 	if((dx >= minDist && dx <= maxDist && dy <= maxDist) || (dy >= minDist && dy <= maxDist && dx <= maxDist)){
 		if(map->canThrowObjectTo(creaturePos, targetPos)){
@@ -2486,7 +2486,7 @@ bool Game::getPathToEx(const Creature* creature, const Position& targetPos,
 	int32_t currentDist = maxDist;
 	//int counter = 1;
 
-	while(currentDist-- >= minDist){
+	while(currentDist-- >= (int32_t)minDist){
 		for(int y = targetPos.y - ymindelta; y <= targetPos.y + ymaxdelta; ++y) {
 			for(int x = targetPos.x - xmindelta; x <= targetPos.x + xmaxdelta; ++x) {
 
@@ -2503,7 +2503,7 @@ bool Game::getPathToEx(const Creature* creature, const Position& targetPos,
 				tmpPos.y = y;
 				tmpPos.z = creaturePos.z;
 
-				if(tmpDist <= maxDist && (tmpDist >= prevDist || prevDist == 0) && (tmpDist >= currentDist) ){
+				if(tmpDist <= (int32_t)maxDist && (tmpDist >= prevDist || prevDist == 0) && (tmpDist >= currentDist) ){
 
 					tmpWalkDist = std::abs(creaturePos.x - x) * std::abs(creaturePos.x - x) + 
 												std::abs(creaturePos.y - y) * std::abs(creaturePos.y - y);
