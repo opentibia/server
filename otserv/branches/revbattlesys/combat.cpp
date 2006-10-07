@@ -76,7 +76,8 @@ void Combat::getMinMaxValues(Creature* creature, int32_t& min, int32_t& max) con
 	}
 }
 
-void Combat::getCombatArea(const Position& centerPos, const Position& targetPos, const AreaCombat* area, std::list<Tile*>& list)
+void Combat::getCombatArea(const Position& centerPos, const Position& targetPos, const AreaCombat* area,
+	std::list<Tile*>& list)
 {
 	if(area){
 		area->getList(centerPos, targetPos, list);
@@ -107,17 +108,19 @@ ReturnValue Combat::canDoCombat(const Creature* caster, const Tile* tile, bool i
 		return RET_NOTENOUGHROOM;
 	}
 
-	if(caster->getPosition().z < tile->getPosition().z){
-		return RET_FIRSTGODOWNSTAIRS;
-	}
+	if(caster){
+		if(caster->getPosition().z < tile->getPosition().z){
+			return RET_FIRSTGODOWNSTAIRS;
+		}
 
-	if(caster->getPosition().z > tile->getPosition().z){
-		return RET_FIRSTGOUPSTAIRS;
-	}
+		if(caster->getPosition().z > tile->getPosition().z){
+			return RET_FIRSTGOUPSTAIRS;
+		}
 
-	if(const Player* player = caster->getPlayer()){
-		if(player->getAccessLevel() > 0){
-			return RET_NOERROR;
+		if(const Player* player = caster->getPlayer()){
+			if(player->getAccessLevel() > 0){
+				return RET_NOERROR;
+			}
 		}
 	}
 
@@ -317,7 +320,13 @@ void Combat::CombatFunc(Creature* caster, const Position& pos,
 	const AreaCombat* area, const CombatParams& params, COMBATFUNC func, void* data)
 {
 	std::list<Tile*> list;
-	getCombatArea(caster->getPosition(), pos, area, list);
+
+	if(caster){
+		getCombatArea(caster->getPosition(), pos, area, list);
+	}
+	else{
+		getCombatArea(pos, pos, area, list);
+	}
 
 	for(std::list<Tile*>::iterator it = list.begin(); it != list.end(); ++it){
 		bool bContinue = true;

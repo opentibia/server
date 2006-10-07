@@ -19,8 +19,8 @@
 //////////////////////////////////////////////////////////////////////
 
 
-#ifndef __LUASCRIPT_H__
-#define __LUASCRIPT_H__
+#ifndef __OTSERV_LUASCRIPT_H__
+#define __OTSERV_LUASCRIPT_H__
 
 #include <string>
 #include <map>
@@ -395,6 +395,8 @@ protected:
 
 	static int luaDoAreaCombatCondition(lua_State *L);
 	static int luaDoTargetCombatCondition(lua_State *L);
+
+	static int luaVariantToNumber(lua_State *L);
 
 	static int luaDebugPrint(lua_State *L);
 	static int luaIsInArray(lua_State *L);

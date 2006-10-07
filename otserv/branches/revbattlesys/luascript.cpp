@@ -617,7 +617,7 @@ long LuaScriptInterface::getEvent(const std::string& eventName)
 
 const std::string& LuaScriptInterface::getFileById(long scriptId)
 {
-	static std::string unk = "(Unknow script file)";
+	static std::string unk = "(Unknown scriptfile)";
 	ScriptsCache::iterator it = m_cacheFiles.find(scriptId);
 	if(it != m_cacheFiles.end()){
 		return it->second;
@@ -1050,6 +1050,9 @@ void LuaScriptInterface::registerFunctions()
 
 	//doTargetCombatCondition(cid, target, condition, effect)
 	lua_register(m_luaState, "doTargetCombatCondition", LuaScriptInterface::luaDoTargetCombatCondition);
+
+	//variantToNumber(var)
+	lua_register(m_luaState, "variantToNumber", LuaScriptInterface::luaVariantToNumber);
 
 	//debugPrint(text)
 	lua_register(m_luaState, "debugPrint", LuaScriptInterface::luaDebugPrint);
@@ -2773,7 +2776,7 @@ int LuaScriptInterface::luaDoTargetCombatHealth(lua_State *L)
 	int32_t maxChange = (int32_t)popNumber(L);
 	int32_t minChange = (int32_t)popNumber(L);
 	DamageType_t damageType = (DamageType_t)popNumber(L);
-	uint32_t targetCid = (int)popNumber(L);
+	uint32_t targetCid = (uint32_t)popNumber(L);
 	uint32_t cid = (uint32_t)popNumber(L);
 
 	ScriptEnviroment* env = getScriptEnv();
@@ -2819,7 +2822,6 @@ int LuaScriptInterface::luaDoAreaCombatMana(lua_State *L)
 	long stackpos;
 	popPosition(L, pos, stackpos);
 
-	uint32_t combatId = (int)popNumber(L);
 	uint32_t cid = (uint32_t)popNumber(L);
 
 	ScriptEnviroment* env = getScriptEnv();
@@ -2834,14 +2836,6 @@ int LuaScriptInterface::luaDoAreaCombatMana(lua_State *L)
 			lua_pushnumber(L, LUA_ERROR);
 			return 1;
 		}
-	}
-
-	const Combat* combat = env->getCombatObject(combatId);
-
-	if(!combat){
-		reportErrorFunc(getErrorDesc(LUA_ERROR_COMBAT_NOT_FOUND));
-		lua_pushnumber(L, LUA_ERROR);
-		return 1;
 	}
 
 	const AreaCombat* area = env->getCombatArea(areaId);
@@ -2991,6 +2985,25 @@ int LuaScriptInterface::luaDoTargetCombatCondition(lua_State *L)
 	Combat::doCombatCondition(creature, target, params);
 
 	lua_pushnumber(L, LUA_NO_ERROR);
+	return 1;
+}
+
+int LuaScriptInterface::luaVariantToNumber(lua_State *L)
+{
+	//variantToNumber(var)
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	uint32_t variant = (uint32_t)popNumber(L);
+	const LuaVariant* var = env->getVariant(variant);
+
+	uint32_t number = 0;
+
+	if(var && var->type == VARIANT_NUMBER){
+		number = var->number;
+	}
+
+	lua_pushnumber(L, number);
 	return 1;
 }
 

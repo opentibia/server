@@ -416,7 +416,7 @@ void Monster::doAttacking(uint32_t interval)
 			continue;
 		}
 
-		if((it->chance <= random_range(0, 100))){
+		if((it->chance >= random_range(0, 100))){
 			minCombatValue = it->minCombatValue;
 			maxCombatValue = it->maxCombatValue;
 			it->spell->castSpell(this, attackedCreature);
@@ -456,7 +456,7 @@ void Monster::onDefending(uint32_t interval)
 			continue;
 		}
 
-		if((it->chance <= random_range(0, 100))){
+		if((it->chance >= random_range(0, 100))){
 			minCombatValue = it->minCombatValue;
 			maxCombatValue = it->maxCombatValue;
 			it->spell->castSpell(this, this);

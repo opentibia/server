@@ -2854,20 +2854,47 @@ bool Game::combatChangeHealth(DamageType_t damageType, Creature* attacker, Creat
 
 bool Game::combatChangeMana(Creature* attacker, Creature* target, int32_t manaChange)
 {
+	const Position& targetPos = target->getPosition();
+
+	SpectatorVec list;
+	getSpectators(list, targetPos, true);
+
 	if(manaChange > 0){
 		target->changeMana(manaChange);
 	}
 	else{
+		if(!target->isAttackable()){
+			addMagicEffect(list, targetPos, NM_ME_PUFF);
+			return false;
+		}
+		
+		if(attacker == target){
+			return false;
+		}
+
+		if(getWorldType() == WORLD_TYPE_NO_PVP){
+			if(attacker && (attacker->getPlayer() && target->getPlayer())){
+				return false;
+			}
+
+			if(target->getMaster() && target->getMaster()->getPlayer()){
+				return false;
+			}
+		}
+
+		if(target->isImmune(DAMAGE_MANA)){
+			addMagicEffect(list, targetPos, NM_ME_PUFF);
+			return false;
+		}
+
 		int32_t manaLoss = std::min(target->getMana(), -manaChange);
 
 		if(manaLoss > 0){
 			target->drainMana(attacker, manaLoss);
 
-			const Position& targetPos = target->getPosition();
-
 			std::stringstream ss;
 			ss << manaLoss;
-			addAnimatedText(targetPos, TEXTCOLOR_BLUE, ss.str());
+			addAnimatedText(list, targetPos, TEXTCOLOR_BLUE, ss.str());
 		}
 	}
 
