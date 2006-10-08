@@ -363,7 +363,11 @@ bool Monster::getRandomStep(const Position& creaturePos, const Position& centerP
 	int32_t maxDist = getFollowDistance();
 
 	//NORTH
-	if((dx >= maxDist && dx <= maxDist && dy - 1 <= maxDist) || (dy - 1 >= maxDist && dy - 1 <= maxDist && dx <= maxDist)){
+	//check so that the new distance is the same as before (unless dx and dy is 0)
+
+	if((dx == 0 && dy == 0) ||
+		((dx >= maxDist && dx <= maxDist && dy - 1 <= maxDist) ||
+		 (dy - 1 >= maxDist && dy - 1 <= maxDist && dx <= maxDist)) ){
 		tile = g_game.getTile(creaturePos.x, creaturePos.y - 1, creaturePos.z);
 		if(tile && tile->__queryAdd(0, this, 1, FLAG_PATHFINDING) == RET_NOERROR){
 			dirArr[dirSize++] = NORTH;
@@ -371,7 +375,9 @@ bool Monster::getRandomStep(const Position& creaturePos, const Position& centerP
 	}
 
 	//SOUTH
-	if((dx >= maxDist && dx <= maxDist && dy + 1 <= maxDist) || (dy + 1 >= maxDist && dy + 1 <= maxDist && dx <= maxDist)){
+	if((dx == 0 && dy == 0) ||
+		((dx >= maxDist && dx <= maxDist && dy + 1 <= maxDist) ||
+		 (dy + 1 >= maxDist && dy + 1 <= maxDist && dx <= maxDist)) ){
 		tile = g_game.getTile(creaturePos.x, creaturePos.y + 1, creaturePos.z);
 		if(tile && tile->__queryAdd(0, this, 1, FLAG_PATHFINDING) == RET_NOERROR){
 			dirArr[dirSize++] = SOUTH;
@@ -379,7 +385,9 @@ bool Monster::getRandomStep(const Position& creaturePos, const Position& centerP
 	}
 
 	//WEST
-	if((dx - 1 >= maxDist && dx - 1 <= maxDist && dy <= maxDist) || (dy >= maxDist && dy <= maxDist && dx - 1 <= maxDist)){
+	if((dx == 0 && dy == 0) ||
+		((dx - 1 >= maxDist && dx - 1 <= maxDist && dy <= maxDist) ||
+		 (dy >= maxDist && dy <= maxDist && dx - 1 <= maxDist)) ){
 		tile = g_game.getTile(creaturePos.x - 1, creaturePos.y, creaturePos.z);
 		if(tile && tile->__queryAdd(0, this, 1, FLAG_PATHFINDING) == RET_NOERROR){
 			dirArr[dirSize++] = WEST;
@@ -387,7 +395,9 @@ bool Monster::getRandomStep(const Position& creaturePos, const Position& centerP
 	}
 
 	//EAST
-	if((dx + 1 >= maxDist && dx + 1 <= maxDist && dy <= maxDist) || (dy >= maxDist && dy <= maxDist && dx + 1 <= maxDist)){
+	if((dx == 0 && dy == 0) ||
+		((dx + 1 >= maxDist && dx + 1 <= maxDist && dy <= maxDist) ||
+		 (dy >= maxDist && dy <= maxDist && dx + 1 <= maxDist)) ){
 		tile = g_game.getTile(creaturePos.x + 1, creaturePos.y, creaturePos.z);
 		if(tile && tile->__queryAdd(0, this, 1, FLAG_PATHFINDING) == RET_NOERROR){
 			dirArr[dirSize++] = EAST;
