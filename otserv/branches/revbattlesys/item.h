@@ -114,7 +114,8 @@ public:
 	void setOwner(uint32_t _owner);
 	uint32_t getOwner();
 
-	void setDuration(uint32_t _owner);
+	void setDuration(uint32_t t);
+	void decreaseDuration(uint32_t );
 	uint32_t getDuration();
 
 	void setDecaying(bool decay);
@@ -153,6 +154,7 @@ private:
 	
 	uint32_t getIntAttr(itemAttrTypes type) const;
 	void setIntAttr(itemAttrTypes type, uint32_t value);
+	void increaseIntAttr(itemAttrTypes type, uint32_t value);
 	
 	bool validateIntAttrType(itemAttrTypes type) const;
 	bool validateStrAttrType(itemAttrTypes type) const;

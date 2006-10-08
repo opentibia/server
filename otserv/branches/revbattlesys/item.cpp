@@ -866,6 +866,11 @@ void ItemAttributes::setDuration(uint32_t time)
 	setIntAttr(ATTR_ITEM_DURATION, time);
 }
 
+void ItemAttributes::decreaseDuration(uint32_t time)
+{
+	increaseIntAttr(ATTR_ITEM_DURATION, -time);
+}
+
 uint32_t ItemAttributes::getDuration()
 {
 	return getIntAttr(ATTR_ITEM_DURATION);
@@ -937,6 +942,16 @@ void ItemAttributes::setIntAttr(itemAttrTypes type, uint32_t value)
 	}
 }
 
+void ItemAttributes::increaseIntAttr(itemAttrTypes type, uint32_t value)
+{
+	if(!validateIntAttrType(type))
+		return;
+	
+	Attribute* attr = getAttr(type);
+	if(attr){
+		attr->value = (void*)((uint32_t)attr->value + value);
+	}
+}
 	
 inline bool ItemAttributes::validateIntAttrType(itemAttrTypes type) const
 {
