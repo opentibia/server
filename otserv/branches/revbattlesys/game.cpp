@@ -2835,6 +2835,14 @@ bool Game::combatChangeHealth(DamageType_t damageType, Creature* attacker, Creat
 						hitEffect = NM_ME_HITBY_FIRE;
 						break;
 					}
+
+					case DAMAGE_LIFEDRAIN:
+					{
+						textColor = TEXTCOLOR_RED;
+						hitEffect = NM_ME_MAGIC_BLOOD;
+						break;
+					}
+
 					default:
 						break;
 				}
@@ -2882,7 +2890,7 @@ bool Game::combatChangeMana(Creature* attacker, Creature* target, int32_t manaCh
 			}
 		}
 
-		if(target->isImmune(DAMAGE_MANA)){
+		if(target->isImmune(DAMAGE_MANADRAIN)){
 			addMagicEffect(list, targetPos, NM_ME_PUFF);
 			return false;
 		}
@@ -2997,10 +3005,47 @@ void Game::changeSkull(Player* player, Skulls_t newSkull)
 }
 #endif
 
-void Game::checkDecay(int t)
+void Game::checkDecay(int32_t interval)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::checkDecay()");
 	addEvent(makeTask(DECAY_INTERVAL, boost::bind(&Game::checkDecay, this, DECAY_INTERVAL)));
+	
+	Item* item = NULL;
+	for(DecayList::iterator it = decayItems.begin(); it != decayItems.end();){
+		item = *it;
+
+		item->setDuration(item->getDuration() - interval);
+
+		if(!item->canDecay()){
+			FreeThing(item);
+			it = decayItems.erase(it);
+			continue;
+		}
+
+		if(item->getDuration() <= 0){
+			uint32_t decayTo = Item::items[item->getID()].decayTo;
+
+			if(decayTo != 0){
+				Item* newItem = transformItem(item, decayTo);
+				startDecay(newItem);
+			}
+			else{
+				ReturnValue ret = internalRemoveItem(item);
+
+				if(ret != RET_NOERROR){
+					std::cout << "DEBUG, checkDecay failed, error code: " << (int) ret << "item id: " << item->getID() << std::endl;
+				}
+			}
+
+			item->setDecaying(false);
+			it = decayItems.erase(it);
+			FreeThing(item);
+		}
+		else{
+			++it;
+		}
+	}
+
 	/*
 	std::list<decayBlock*>::iterator it;
 	for(it = decayVector.begin(); it != decayVector.end();){
@@ -3043,7 +3088,14 @@ void Game::checkDecay(int t)
 
 void Game::startDecay(Item* item)
 {
-	return;
+	if(item->canDecay()){
+		if(!item->isDecaying()){
+			item->useThing2();
+			item->setDecaying(true);
+			decayItems.push_back(item);
+		}
+	}
+
 	/*
 	if(item->isDecaying)
 		return; //dont add 2 times the same item

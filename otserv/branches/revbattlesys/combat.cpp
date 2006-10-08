@@ -270,8 +270,8 @@ bool Combat::CombatManaFunc(Creature* caster, Creature* target, const CombatPara
 
 bool Combat::CombatConditionFunc(Creature* caster, Creature* target, const CombatParams& params, void* data)
 {
-	if(!params.isAggressive || caster != target){
-		if(params.condition){
+	if(params.condition && !target->isImmune(params.condition->getType())){
+		if(!params.isAggressive || caster != target){
 			Condition* conditionCopy = params.condition->clone();
 			if(caster){
 				conditionCopy->setParam(CONDITIONPARAM_OWNER, caster->getID());
@@ -299,7 +299,10 @@ void Combat::combatTileEffects(Creature* caster, Tile* tile, const CombatParams&
 		}
 
 		ReturnValue ret = g_game.internalAddItem(tile, item);
-		if(ret != RET_NOERROR){
+		if(ret == RET_NOERROR){
+			g_game.startDecay(item);
+		}
+		else{
 			delete item;
 		}
 	}

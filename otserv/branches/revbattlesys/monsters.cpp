@@ -506,6 +506,10 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 								mType->damageImmunities |= DAMAGE_POISON;
 								mType->conditionImmunities |= CONDITION_POISON;
 							}
+							else if(strcasecmp(strValue.c_str(), "lifedrain") == 0){
+								mType->damageImmunities |= DAMAGE_LIFEDRAIN;
+								mType->conditionImmunities |= CONDITION_LIFEDRAIN;
+							}
 							else if(strcasecmp(strValue.c_str(), "paralyze") == 0){
 								mType->conditionImmunities |= CONDITION_PARALYZE;
 							}

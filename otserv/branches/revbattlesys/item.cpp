@@ -68,6 +68,10 @@ Item* Item::CreateItem(const unsigned short _type, unsigned short _count /*= 1*/
 		}
 
 		newItem->useThing2();
+		
+		if(it.decayTime != 0){
+			newItem->setDuration(it.decayTime * 1000);
+		}
 	}
 
 	return newItem;
@@ -208,10 +212,8 @@ bool Item::hasSubType() const
 	const ItemType& it = items[id];
 	return (it.isFluidContainer() || it.isSplash() || it.stackable || it.runeMagLevel != -1);
 }
-
-
-
-long Item::getDecayTime()
+ 
+uint32_t Item::getDefaultDuration()
 {
 	return items[id].decayTime * 1000;
 }
@@ -762,8 +764,9 @@ int Item::getRWInfo(int& maxlen) const
 
 bool Item::canDecay()
 {
-	if(isRemoved())
+	if(isRemoved()){
 		return false;
+	}
 
 	return items[id].canDecay;
 }
@@ -858,6 +861,26 @@ uint32_t ItemAttributes::getOwner()
 	return getIntAttr(ATTR_ITEM_OWNER);
 }
 
+void ItemAttributes::setDuration(uint32_t time)
+{
+	setIntAttr(ATTR_ITEM_DURATION, time);
+}
+
+uint32_t ItemAttributes::getDuration()
+{
+	return getIntAttr(ATTR_ITEM_DURATION);
+}
+
+void ItemAttributes::setDecaying(bool decay)
+{
+	setIntAttr(ATTR_ITEM_DECAYING, (decay ? 1 : 0));
+}
+
+bool ItemAttributes::isDecaying()
+{
+	return (getIntAttr(ATTR_ITEM_DECAYING) == 1);
+}
+
 const std::string& ItemAttributes::getStrAttr(itemAttrTypes type) const
 {
 	if(!validateStrAttrType(type))
@@ -921,6 +944,8 @@ inline bool ItemAttributes::validateIntAttrType(itemAttrTypes type) const
 	case ATTR_ITEM_ACTIONID:
 	case ATTR_ITEM_UNIQUEID:
 	case ATTR_ITEM_OWNER:
+	case ATTR_ITEM_DURATION:
+	case ATTR_ITEM_DECAYING:
 		return true;
 		break;
 

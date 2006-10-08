@@ -1541,15 +1541,23 @@ BlockType_t Player::blockHit(Creature* attacker, DamageType_t damageType, int32_
 			case DAMAGE_PHYSICAL:
 				absorbedDamage += (it.abilities.absorbPercentPhysical / 100) * damage;
 				break;
+
 			case DAMAGE_FIRE:
 				absorbedDamage = (it.abilities.absorbPercentFire / 100) * damage;
 				break;
+
 			case DAMAGE_ENERGY:
 				absorbedDamage = (it.abilities.absorbPercentEnergy / 100) * damage;
 				break;
+
 			case DAMAGE_POISON:
 				absorbedDamage = (it.abilities.absorbPercentPoison / 100) * damage;
 				break;
+
+			case DAMAGE_LIFEDRAIN:
+				absorbedDamage = (it.abilities.absorbPercentLifeDrain / 100) * damage;
+				break;
+
 			default:
 				break;
 		}

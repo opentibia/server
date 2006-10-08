@@ -36,12 +36,13 @@ enum CombatType_t {
 };
 
 enum DamageType_t {
-	DAMAGE_NONE			= 0,
-	DAMAGE_PHYSICAL = 1,
-	DAMAGE_ENERGY		= 2,
-	DAMAGE_POISON		= 4,
-	DAMAGE_FIRE			= 8,
-	DAMAGE_MANA			= 16,
+	DAMAGE_NONE				= 0,
+	DAMAGE_PHYSICAL		= 1,
+	DAMAGE_ENERGY			= 2,
+	DAMAGE_POISON			= 4,
+	DAMAGE_FIRE				= 8,
+	DAMAGE_LIFEDRAIN	= 16,
+	DAMAGE_MANADRAIN	= 32,
 };
 
 enum CombatParam_t{

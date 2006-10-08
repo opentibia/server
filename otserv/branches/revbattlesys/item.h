@@ -114,6 +114,12 @@ public:
 	void setOwner(uint32_t _owner);
 	uint32_t getOwner();
 
+	void setDuration(uint32_t _owner);
+	uint32_t getDuration();
+
+	void setDecaying(bool decay);
+	bool isDecaying();
+
 private:
 	static std::string emptyString;
 	
@@ -123,7 +129,9 @@ private:
 		ATTR_ITEM_DESC = 4,
 		ATTR_ITEM_TEXT = 8,
 
-		ATTR_ITEM_OWNER = 65536
+		ATTR_ITEM_OWNER = 65536,
+		ATTR_ITEM_DURATION = 131072,
+		ATTR_ITEM_DECAYING = 262144
 	};
 	
 	struct Attribute{
@@ -261,7 +269,7 @@ public:
 	
 	void setUniqueId(unsigned short n);
 
-	long getDecayTime();
+	uint32_t getDefaultDuration();
 	bool canDecay();
 
 	virtual bool canRemove() const {return true;}

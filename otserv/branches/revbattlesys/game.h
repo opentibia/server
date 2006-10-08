@@ -321,7 +321,6 @@ public:
 	//void checkAutoWalkPlayer(unsigned long creatureId);
 	void checkCreature(uint32_t creatureId, uint32_t interval);
 	void checkCreatureAttacking(uint32_t creatureId, uint32_t interval);
-	void checkDecay(int t);
 	void checkSpawns(int t);
 	void checkLight(int t);
 	
@@ -366,13 +365,21 @@ protected:
 		void*    data;
 	};
 	
-	#define DECAY_INTERVAL  10000
+	#define DECAY_INTERVAL  1000
+	void startDecay(Item* item);
+	void checkDecay(int32_t interval);
+
+	typedef std::vector<Item*> DecayList;
+	DecayList decayItems;
+
+	/*	
 	void startDecay(Item* item);
 	struct decayBlock{
 		long decayTime;
 		std::list<Item*> decayItems;
 	};
 	std::list<decayBlock*> decayVector;
+	*/
 	
 	static const int LIGHT_LEVEL_DAY = 250;
 	static const int LIGHT_LEVEL_NIGHT = 40;
