@@ -876,9 +876,9 @@ void Protocol78::parseRequestOutfit(NetworkMessage& msg)
 		msg.AddByte(count_outfits);
 	}
 	
-	long counter = 0;
+	unsigned long counter = 0;
 	OutfitListType::const_iterator it;
-	for(it = player_outfits.begin(); it != player_outfits.end() && (counter < 16); ++it, ++counter){
+	for(it = player_outfits.begin(); it != player_outfits.end() && (counter < 15); ++it, ++counter){
 		msg.AddU16((*it)->looktype);
 		msg.AddByte((*it)->addons);
 	}
