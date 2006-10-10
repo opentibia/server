@@ -97,7 +97,7 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 		player->accountNumber = account;
 
 		if(readXMLInteger(root, "sex", intValue)){
-			player->sex = (playersex_t)intValue;
+			player->setSex((playersex_t)intValue);
 		}
 		else
 			isLoaded = false;

@@ -476,7 +476,7 @@ void Protocol78::checkCreatureAsKnown(unsigned long id, bool &known, unsigned lo
 	knownPlayers.push_back(id);
 	
 	// to many known players?
-	if(knownPlayers.size() > 150) //150 for 7.4 clients, changed for 7.5?
+	if(knownPlayers.size() > 150) //150 for 7.8x
 	{
 		// lets try to remove one from the end of the list
 		for (int n = 0; n < 150; n++)
@@ -862,15 +862,21 @@ void Protocol78::parseRequestOutfit(NetworkMessage& msg)
 	msg.AddByte(player->lookbody); //primary
 	msg.AddByte(player->looklegs); //secondary
 	msg.AddByte(player->lookfeet); //detail
-	msg.AddByte(player->lookaddons);
+	msg.AddByte(player->lookaddons); //addons. bit field
 	
 	int first_outfit, last_outfit;
 	
 	const OutfitListType& player_outfits = player->getPlayerOutfits();
 	long count_outfits = player_outfits.size();
 	
+	//client outfits limit is 15
 	if(count_outfits > 15){
 		msg.AddByte(15);
+	}
+	//if there is not any available outfit
+	// return
+	else if(count_outfits == 0){
+		return;
 	}
 	else{
 		msg.AddByte(count_outfits);
