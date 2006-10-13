@@ -669,7 +669,6 @@ void Game::moveCreature(Player* player, Cylinder* fromCylinder, Cylinder* toCyli
 		ret = RET_TOOFARAWAY;
 	}
 	else{
-		//const Position& fromPos = fromCylinder->getPosition();
 		const Position& toPos = toCylinder->getPosition();
 		const Position& moveCreaturePos = moveCreature->getPosition();
 
@@ -685,15 +684,6 @@ void Game::moveCreature(Player* player, Cylinder* fromCylinder, Cylinder* toCyli
 			if(fromCylinder->getTile()->hasProperty(PROTECTIONZONE) &&
 			!toCylinder->getTile()->hasProperty(PROTECTIONZONE))
 				ret = RET_NOTPOSSIBLE;
-
-			/*if(toCylinder->getTile()->getTeleportItem() ||
-				toCylinder->getTile()->getFieldItem() ||
-				toCylinder->getTile()->floorChange()){
-				ret = RET_NOTENOUGHROOM;
-			}
-			else if(fromCylinder->getTile()->isPz() && !toCylinder->getTile()->isPz())
-				ret = RET_NOTPOSSIBLE;
-			*/
 		}
 	}
 
@@ -1515,7 +1505,7 @@ bool Game::movePlayer(Player* player, Direction direction)
 		return false;
 
 	player->setFollowCreature(NULL);
-	player->getNextStep(direction);
+	player->onWalk(direction);
 	return (internalMoveCreature(player, direction) == RET_NOERROR);
 }
 
@@ -2324,9 +2314,10 @@ bool Game::playerChangeOutfit(Player* player, Outfit_t outfit)
 
 	player->defaultOutfit = outfit;
 
-	if(!player->hasCondition(CONDITION_OUTFIT)){
+	if(!player->isInvisible()){
 		internalChangeOutfit(player, outfit);
 	}
+
 	return true;
 }
 
@@ -2442,8 +2433,8 @@ bool Game::internalMonsterYell(Monster* monster, const std::string& text)
 	return true;
 }
 
-bool Game::getPathToEx(const Creature* creature, const Position& targetPos,
-	uint32_t minDist, uint32_t maxDist, bool fullPathSearch, std::list<Direction>& dirList)
+bool Game::getPathToEx(const Creature* creature, const Position& targetPos, uint32_t minDist, uint32_t maxDist,
+	bool fullPathSearch, bool targetMustBeReachable, std::list<Direction>& dirList)
 {
 #ifdef __DEBUG__
 	__int64 startTick = OTSYS_TIME();
@@ -2454,106 +2445,90 @@ bool Game::getPathToEx(const Creature* creature, const Position& targetPos,
 	}
 
 	const Position& creaturePos = creature->getPosition();
-	
-	uint32_t dx = std::abs(creaturePos.x - targetPos.x);
-	uint32_t dy = std::abs(creaturePos.y - targetPos.y);
 
-	if((dx >= minDist && dx <= maxDist && dy <= maxDist) || (dy >= minDist && dy <= maxDist && dx <= maxDist)){
-		if(map->canThrowObjectTo(creaturePos, targetPos)){
+	uint32_t currentDist = std::max(std::abs(creaturePos.x - targetPos.x), std::abs(creaturePos.y - targetPos.y));
+	if(currentDist == maxDist){
+		if(!targetMustBeReachable || map->canThrowObjectTo(creaturePos, targetPos)){
 			return true;
 		}
 	}
 
+	int32_t dxMin = ((fullPathSearch || (creaturePos.x - targetPos.x) <= 0) ? maxDist : 0);
+	int32_t dxMax = ((fullPathSearch || (creaturePos.x - targetPos.x) >= 0) ? maxDist : 0);
+	int32_t dyMin = ((fullPathSearch || (creaturePos.y - targetPos.y) <= 0) ? maxDist : 0);
+	int32_t dyMax = ((fullPathSearch || (creaturePos.y - targetPos.y) >= 0) ? maxDist : 0);
+
 	std::list<Direction> tmpDirList;
+	Tile* tile;
 
-	Position tmpPos;
 	Position minWalkPos;
+	Position tmpPos;
+	int minWalkDist = -1;
 
-	int tmpDist = 0;
-	int prevDist = 0;
+	int tmpDist;
+	int tmpWalkDist;
 
-	int tmpWalkDist = 0;
-	int minWalkDist = 0;
+	int32_t tryDist = maxDist;
 
-	int xmindelta = ((fullPathSearch || (creaturePos.x - targetPos.x) <= 0) ? maxDist : 0);
-	int xmaxdelta = ((fullPathSearch || (creaturePos.x - targetPos.x) >= 0) ? maxDist : 0);
-	int ymindelta = ((fullPathSearch || (creaturePos.y - targetPos.y) <= 0) ? maxDist : 0);
-	int ymaxdelta = ((fullPathSearch || (creaturePos.y - targetPos.y) >= 0) ? maxDist : 0);
+	while(tryDist >= minDist){
+		for(int y = targetPos.y - dyMin; y <= targetPos.y + dyMax; ++y) {
+			for(int x = targetPos.x - dxMin; x <= targetPos.x + dxMax; ++x) {
 
-	minDist = minDist * minDist;
-	maxDist = maxDist * maxDist;
+				tmpDist = std::max( std::abs(targetPos.x - x), std::abs(targetPos.y - y) );
 
-	int32_t currentDist = maxDist;
-	//int counter = 1;
+				if(tmpDist == tryDist){
+					tmpWalkDist = std::abs(creaturePos.x - x) + std::abs(creaturePos.y - y);
 
-	while(currentDist-- >= (int32_t)minDist){
-		for(int y = targetPos.y - ymindelta; y <= targetPos.y + ymaxdelta; ++y) {
-			for(int x = targetPos.x - xmindelta; x <= targetPos.x + xmaxdelta; ++x) {
+					tmpPos.x = x;
+					tmpPos.y = y;
+					tmpPos.z = creaturePos.z;
 
-				if((targetPos.x == x && targetPos.y == y))
-					continue;
+					if(tmpWalkDist <= minWalkDist || tmpPos == creaturePos || minWalkDist == -1){
 
-				/*tmpDist = std::abs(target.x - x) * std::abs(target.x - x) +
-									std::abs(target.y - y) * std::abs(target.y - y);*/
-
-				tmpDist = std::max( std::abs(targetPos.x - x) * std::abs(targetPos.x - x),
-														std::abs(targetPos.y - y) * std::abs(targetPos.y - y) );
-
-				tmpPos.x = x;
-				tmpPos.y = y;
-				tmpPos.z = creaturePos.z;
-
-				if(tmpDist <= (int32_t)maxDist && (tmpDist >= prevDist || prevDist == 0) && (tmpDist >= currentDist) ){
-
-					tmpWalkDist = std::abs(creaturePos.x - x) * std::abs(creaturePos.x - x) + 
-												std::abs(creaturePos.y - y) * std::abs(creaturePos.y - y);
-
-					/*
-					Item* item = Item::CreateItem(2160, counter);
-					internalAddItem(getTile(tmpPos.x, tmpPos.y, tmpPos.z), item, INDEX_WHEREEVER, FLAG_NOLIMIT);
-					counter++;
-					*/
-
-					if(tmpWalkDist > 0 && (tmpWalkDist < minWalkDist || minWalkDist == 0)){
-						if(!canThrowObjectTo(tmpPos, targetPos)){
+						if(targetMustBeReachable && !canThrowObjectTo(tmpPos, targetPos)){
 							continue;
 						}
+						
+						if(tmpPos != creaturePos){
+							tile = getTile(tmpPos.x, tmpPos.y, tmpPos.z);
+							if(!tile || tile->__queryAdd(0, creature, 1, FLAG_PATHFINDING) != RET_NOERROR){
+								continue;
+							}
 
-						Tile* tile = getTile(tmpPos.x, tmpPos.y, tmpPos.z);
-						if(!tile || tile->__queryAdd(0, creature, 1, FLAG_PATHFINDING) != RET_NOERROR){
-							continue;
+							tmpDirList.clear();
+							if(!getPathTo(creature, tmpPos, tmpDirList)){
+								continue;
+							}
 						}
-
-						tmpDirList.clear();
-						if(!getPathTo(creature, tmpPos, tmpDirList)){
-							continue;
+						else{
+							tmpDirList.clear();
 						}
-
-						minWalkDist = tmpWalkDist;
-						minWalkPos = tmpPos;
-						dirList = tmpDirList;
+						
+						if(tmpWalkDist < minWalkDist || tmpDirList.size() < dirList.size() || minWalkDist == -1){
+							minWalkDist = tmpWalkDist;
+							minWalkPos = tmpPos;
+							dirList = tmpDirList;
+						}
 					}
 				}
-				/*else{
-					Item* item = Item::CreateItem(2159, counter);
-					internalAddItem(getTile(tmpPos.x, tmpPos.y, tmpPos.z), item, INDEX_WHEREEVER, FLAG_NOLIMIT);
-					counter++;
-				}*/
 			}
+
 		}
 
-		if(minWalkDist != 0){
+		if(minWalkDist != -1){
 #ifdef __DEBUG__
 			__int64 endTick = OTSYS_TIME();
-			std::cout << "distance: " << currentDist << ", ticks: "<< (__int64 )endTick - startTick << std::endl;
+			std::cout << "distance: " << tryDist << ", ticks: "<< (__int64 )endTick - startTick << std::endl;
 #endif
 			return true;
 		}
+
+		--tryDist;
 	}
 
 #ifdef __DEBUG__
 	__int64 endTick = OTSYS_TIME();
-	std::cout << "distance: " << currentDist << ", ticks: "<< (__int64 )endTick - startTick << std::endl;
+	std::cout << "distance: " << tryDist << ", ticks: "<< (__int64 )endTick - startTick << std::endl;
 #endif
 
 	return false;
@@ -2619,13 +2594,12 @@ void Game::checkCreature(uint32_t creatureId, uint32_t interval)
 	}
 }
 
-void Game::changeSpeed(Creature* creature, int32_t newSpeed)
+void Game::changeSpeed(Creature* creature, int32_t varSpeedDelta)
 {
-	if(newSpeed <= 0){
-		newSpeed = 1;
-	}
+	int32_t varSpeed = creature->getSpeed() - creature->getBaseSpeed();
+	varSpeed += varSpeedDelta;
 
-	creature->setSpeed(newSpeed);
+	creature->setSpeed(varSpeed);
 
 	SpectatorVec list;
 	SpectatorVec::iterator it;
@@ -2636,19 +2610,13 @@ void Game::changeSpeed(Creature* creature, int32_t newSpeed)
 	Player* player;
 	for(it = list.begin(); it != list.end(); ++it){
 		if(player = (*it)->getPlayer()){
-			player->sendChangeSpeed(creature, newSpeed);
+			player->sendChangeSpeed(creature, creature->getSpeed());
 		}
 	}
 }
 
 void Game::internalChangeOutfit(Creature* creature, Outfit_t oufit)
 {
-	/*
-	if(!creature->isInvisible()){
-		return;
-	}
-	*/
-
 	creature->currentOutfit = oufit;
 
 	SpectatorVec list;
@@ -2722,6 +2690,11 @@ bool Game::combatChangeHealth(DamageType_t damageType, Creature* attacker, Creat
 
 		int32_t damage = -healthChange;
 		BlockType_t blockType = target->blockHit(attacker, damageType, damage, checkDefense, checkArmor);
+
+		if(blockType != BLOCK_NONE && target->isInvisible()){
+			//No effects for invisible creatures to avoid detection
+			return false;
+		}
 
 		if(blockType == BLOCK_DEFENSE){
 			addMagicEffect(list, targetPos, NM_ME_PUFF);
@@ -3005,6 +2978,56 @@ void Game::changeSkull(Player* player, Skulls_t newSkull)
 }
 #endif
 
+void Game::startDecay(Item* item)
+{
+	if(item->canDecay()){
+		if(!item->isDecaying()){
+			if(item->getDuration() > 0){
+				item->useThing2();
+				item->setDecaying(true);
+				decayItems.push_back(item);
+			}
+			else{
+				internalDecayItem(item);
+			}
+		}
+	}
+
+	/*
+	if(item->isDecaying)
+		return; //dont add 2 times the same item
+
+	//get decay time
+	long dtime = item->getDecayTime();
+	if(dtime == 0)
+		return;
+
+	item->isDecaying = true;
+
+	//round time
+	if(dtime < DECAY_INTERVAL)
+		dtime = DECAY_INTERVAL;
+	dtime = (dtime/DECAY_INTERVAL)*DECAY_INTERVAL;
+	item->useThing2();
+
+	//search if there are any block with this time
+	std::list<decayBlock*>::iterator it;
+	for(it = decayVector.begin();it != decayVector.end();it++){
+		if((*it)->decayTime == dtime){			
+			(*it)->decayItems.push_back(item);
+			return;
+		}
+	}
+
+	//we need a new decayBlock
+	decayBlock* db = new decayBlock;
+	db->decayTime = dtime;
+	db->decayItems.clear();
+	db->decayItems.push_back(item);
+	decayVector.push_back(db);
+	*/
+}
+
 void Game::checkDecay(int32_t interval)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::checkDecay()");
@@ -3023,21 +3046,7 @@ void Game::checkDecay(int32_t interval)
 		}
 
 		if(item->getDuration() <= 0){
-			uint32_t decayTo = Item::items[item->getID()].decayTo;
-
-			if(decayTo != 0){
-				Item* newItem = transformItem(item, decayTo);
-				startDecay(newItem);
-			}
-			else{
-				ReturnValue ret = internalRemoveItem(item);
-
-				if(ret != RET_NOERROR){
-					std::cout << "DEBUG, checkDecay failed, error code: " << (int) ret << "item id: " << item->getID() << std::endl;
-				}
-			}
-
-			item->setDecaying(false);
+			internalDecayItem(item);
 			it = decayItems.erase(it);
 			FreeThing(item);
 		}
@@ -3086,49 +3095,23 @@ void Game::checkDecay(int32_t interval)
 	*/
 }
 
-void Game::startDecay(Item* item)
+void Game::internalDecayItem(Item* item)
 {
-	if(item->canDecay()){
-		if(!item->isDecaying()){
-			item->useThing2();
-			item->setDecaying(true);
-			decayItems.push_back(item);
+	uint32_t decayTo = Item::items[item->getID()].decayTo;
+
+	if(decayTo != 0){
+		Item* newItem = transformItem(item, decayTo);
+		startDecay(newItem);
+	}
+	else{
+		ReturnValue ret = internalRemoveItem(item);
+
+		if(ret != RET_NOERROR){
+			std::cout << "DEBUG, internalDecayItem failed, error code: " << (int) ret << "item id: " << item->getID() << std::endl;
 		}
 	}
 
-	/*
-	if(item->isDecaying)
-		return; //dont add 2 times the same item
-
-	//get decay time
-	long dtime = item->getDecayTime();
-	if(dtime == 0)
-		return;
-
-	item->isDecaying = true;
-
-	//round time
-	if(dtime < DECAY_INTERVAL)
-		dtime = DECAY_INTERVAL;
-	dtime = (dtime/DECAY_INTERVAL)*DECAY_INTERVAL;
-	item->useThing2();
-
-	//search if there are any block with this time
-	std::list<decayBlock*>::iterator it;
-	for(it = decayVector.begin();it != decayVector.end();it++){
-		if((*it)->decayTime == dtime){			
-			(*it)->decayItems.push_back(item);
-			return;
-		}
-	}
-
-	//we need a new decayBlock
-	decayBlock* db = new decayBlock;
-	db->decayTime = dtime;
-	db->decayItems.clear();
-	db->decayItems.push_back(item);
-	decayVector.push_back(db);
-	*/
+	item->setDecaying(false);
 }
 
 void Game::checkSpawns(int t)

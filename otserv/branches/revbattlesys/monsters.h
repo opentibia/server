@@ -43,6 +43,7 @@ struct LootBlock{
 struct summonBlock_t{
 	std::string name;
 	uint32_t chance;
+	uint32_t speed;
 };
 
 class Spell;
@@ -51,6 +52,7 @@ struct spellBlock_t{
 	Spell* spell;
 	uint32_t chance;
 	uint32_t speed;
+	uint32_t range;
 	int32_t minCombatValue;
 	int32_t maxCombatValue;
 };

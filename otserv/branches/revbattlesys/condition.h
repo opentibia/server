@@ -38,12 +38,13 @@ enum ConditionType_t {
 	CONDITION_HASTE				= 16,
 	CONDITION_PARALYZE		= 32,
 	CONDITION_OUTFIT			= 64,
-	CONDITION_LIGHT				= 128,
-	CONDITION_MANASHIELD	= 256,
-	CONDITION_INFIGHT			= 512,
-	CONDITION_DRUNK				= 1024,
-	CONDITION_EXHAUSTED		= 2048,
-	CONDITION_FOOD				= 4096
+	CONDITION_INVISIBLE		= 128,
+	CONDITION_LIGHT				= 256,
+	CONDITION_MANASHIELD	= 512,
+	CONDITION_INFIGHT			= 1024,
+	CONDITION_DRUNK				= 2048,
+	CONDITION_EXHAUSTED		= 4096,
+	CONDITION_FOOD				= 8192
 };
 
 enum EndCondition_t {
@@ -153,8 +154,6 @@ protected:
 class ConditionOutfit: public Condition
 {
 public:
-	//ConditionOutfit(int32_t _ticks, uint8_t _lookType, uint16_t _lookTypeEx,
-	//	uint8_t _lookHead = 0, uint8_t _lookBody = 0, uint8_t _lookLegs = 0, uint8_t _lookFeet = 0);
 	ConditionOutfit(ConditionType_t _type, int32_t _ticks);
 	virtual ~ConditionOutfit(){};
 	

@@ -389,6 +389,7 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 						int32_t max = 0;
 						int32_t chance = 100;
 						int32_t speed = 1000;
+						int32_t range = 0;
 
 						if(readXMLInteger(tmpNode, "speed", intValue)){
 							speed = intValue;
@@ -406,6 +407,10 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 							max = intValue;
 						}
 
+						if(readXMLInteger(tmpNode, "range", intValue)){
+							range = intValue;
+						}
+
 						if(readXMLString(tmpNode, "name", strValue)){
 							if(strcasecmp(strValue.c_str(), "melee") == 0){
 								mType->combatMeleeMin = min;
@@ -417,6 +422,7 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 								sb.chance = chance;
 								sb.minCombatValue = min;
 								sb.maxCombatValue = max;
+								sb.range = range;
 								sb.speed = speed;
 
 								Spell* spell;
@@ -446,6 +452,7 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 						int32_t max = 0;
 						int32_t chance = 100;
 						int32_t speed = 1000;
+						int32_t range = 0;
 
 						if(readXMLInteger(tmpNode, "speed", intValue)){
 							speed = intValue;
@@ -461,6 +468,10 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 
 						if(readXMLInteger(tmpNode, "max", intValue)){
 							max = intValue;
+						}
+
+						if(readXMLInteger(tmpNode, "range", intValue)){
+							range = intValue;
 						}
 
 						if(readXMLString(tmpNode, "name", strValue)){
@@ -539,7 +550,6 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 				while(tmpNode){
 					if(xmlStrcmp(tmpNode->name, (const xmlChar*)"voice") == 0) {
 						if(readXMLString(tmpNode, "sentence", strValue)){
-							//vb.text = strValue;
 							mType->voiceVector.push_back(strValue);
 						}
 					}
@@ -568,23 +578,25 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 				while(tmpNode){
 
 					if(xmlStrcmp(tmpNode->name, (const xmlChar*)"summon") == 0){
-						summonBlock_t sb;
-						sb.name = "";
-						sb.chance = CHANCE_MAX;
+						int32_t chance = 100;
+						int32_t speed = 1000;
+
+						if(readXMLInteger(p, "speed", intValue)){
+							speed = intValue;
+						}
+
+						if(readXMLInteger(p, "chance", intValue)){
+							chance = intValue;
+						}
 
 						if(readXMLString(tmpNode, "name", strValue)){
+							summonBlock_t sb;
 							sb.name = strValue;
-						}
-						else
-							continue;
+							sb.speed = speed;
+							sb.chance = chance;							
 
-						if(readXMLInteger(tmpNode, "chance", intValue)){
-							sb.chance = std::max(intValue, 100);
-							if(sb.chance > CHANCE_MAX)
-								sb.chance = CHANCE_MAX;
+							mType->summonList.push_back(sb);
 						}
-
-						mType->summonList.push_back(sb);
 					}
 
 					tmpNode = tmpNode->next;

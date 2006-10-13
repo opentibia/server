@@ -103,6 +103,7 @@ Condition* Condition::createCondition(ConditionType_t _type, int32_t _ticks, int
 		}
 
 		case CONDITION_OUTFIT:
+		case CONDITION_INVISIBLE:
 		{
 			return new ConditionOutfit(_type, _ticks);
 		}
@@ -145,6 +146,13 @@ bool ConditionGeneric::startCondition(Creature* creature)
 void ConditionGeneric::executeCondition(Creature* creature, int32_t interval)
 {
 	Condition::executeCondition(creature, interval);
+
+	bool bRemove = false;
+	creature->onTickCondition(getType(), bRemove);
+
+	if(bRemove){
+		setTicks(0);
+	}
 }
 
 void ConditionGeneric::endCondition(Creature* creature, EndCondition_t reason)
@@ -397,7 +405,7 @@ bool ConditionSpeed::setParam(ConditionParam_t param, int32_t value)
 
 bool ConditionSpeed::startCondition(Creature* creature)
 {
-	g_game.changeSpeed(creature, creature->getSpeed() + speedDelta);
+	g_game.changeSpeed(creature, speedDelta);
 	return true;
 }
 
@@ -408,7 +416,7 @@ void ConditionSpeed::executeCondition(Creature* creature, int32_t interval)
 
 void ConditionSpeed::endCondition(Creature* creature, EndCondition_t reason)
 {
-	g_game.changeSpeed(creature, creature->getSpeed() - speedDelta);
+	g_game.changeSpeed(creature, -speedDelta);
 }
 
 void ConditionSpeed::addCondition(Creature* creature, const Condition* addCondition)
@@ -422,7 +430,7 @@ void ConditionSpeed::addCondition(Creature* creature, const Condition* addCondit
 		int32_t oldSpeedDelta = speedDelta;
 		speedDelta = conditionSpeed.speedDelta;
 		
-		g_game.changeSpeed(creature, creature->getSpeed() + (speedDelta - oldSpeedDelta));
+		g_game.changeSpeed(creature, (speedDelta - oldSpeedDelta));
 	}
 }
 
@@ -447,7 +455,10 @@ uint8_t ConditionSpeed::getIcons() const
 ConditionOutfit::ConditionOutfit(ConditionType_t _type, int32_t _ticks) :
 Condition(_type, _ticks)
 {
-	//
+	if(_type == CONDITION_INVISIBLE){
+		Outfit_t outfit;
+		outfits.push_back(outfit);
+	}
 }
 
 /*
@@ -485,17 +496,21 @@ void ConditionOutfit::executeCondition(Creature* creature, int32_t interval)
 
 void ConditionOutfit::changeOutfit(Creature* creature, int32_t index /*= -1*/)
 {
-	if(index == -1){
-		index = random_range(0, outfits.size() - 1);
-	}
+	if(!outfits.empty()){
+		if(index == -1){
+			index = random_range(0, outfits.size() - 1);
+		}
 
-	Outfit_t outfit = outfits[index];
-	g_game.internalChangeOutfit(creature, outfit);
+		Outfit_t outfit = outfits[index];
+		g_game.internalChangeOutfit(creature, outfit);
+	}
 }
 
 void ConditionOutfit::endCondition(Creature* creature, EndCondition_t reason)
 {
-	g_game.internalChangeOutfit(creature, creature->getDefaultOutfit());
+	if(!creature->isInvisible() || getType() == CONDITION_INVISIBLE){
+		g_game.internalChangeOutfit(creature, creature->getDefaultOutfit());
+	}
 }
 
 void ConditionOutfit::addCondition(Creature* creature, const Condition* addCondition)

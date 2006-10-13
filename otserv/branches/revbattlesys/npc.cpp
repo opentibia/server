@@ -89,8 +89,6 @@ Creature()
 		}
 		else
 			baseSpeed = 220;
-		
-		varSpeed = baseSpeed;
 
 		while(p){
 			if(xmlStrcmp(p->name, (const xmlChar*)"health") == 0){
@@ -256,7 +254,7 @@ void Npc::doMove(Direction dir)
 void Npc::doMoveTo(Position target)
 {
 	std::list<Direction> listDir;
-	if(!g_game.getPathToEx(this, target, 1, 1, true, listDir)){
+	if(!g_game.getPathToEx(this, target, 1, 1, true, true, listDir)){
 		return;
 	}
 

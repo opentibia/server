@@ -191,7 +191,13 @@ uint32_t Player::getVocationId() const
 
 bool Player::isPushable() const
 {
-	return ((getSleepTicks() <= 0) && getAccessLevel() == 0);
+	bool ret = Creature::isPushable();
+
+	if(getAccessLevel() != 0){
+		return false;
+	}
+
+	return ret;
 }
 
 std::string Player::getDescription(int32_t lookDistance) const
@@ -562,107 +568,6 @@ void Player::dropLoot(Container* corpse)
 		}
 	}
 }
-
-/*
-fight_t Player::getFightType()
-{
-  for(int slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++){
-    if(items[slot]){
-			if((items[slot]->isWeapon())){
-				Item* distItem = NULL;
-				switch(items[slot]->getWeaponType()){
-					case DIST:
-						distItem = GetDistWeapon();
-						if(distItem){
-							return FIGHT_DIST;
-						}
-						else{
-							return FIGHT_MELEE;
-						}
-					break;
-
-					case MAGIC:
-						return FIGHT_MAGICDIST;
-				
-					default:
-						break;
-				}
-			}
-    }
-  }
-
-	return FIGHT_MELEE;
-}
-
-void Player::removeDistItem()
-{
-	Item* distItem = GetDistWeapon();
-
-	if(distItem && distItem->isStackable()){
-		g_game.internalRemoveItem(distItem, 1);
-	}
-}
-
-subfight_t Player::getSubFightType()
-{
-	fight_t type = getFightType();
-	if(type == FIGHT_DIST){
-		Item *DistItem = GetDistWeapon();
-		if(DistItem){
-			return DistItem->getSubfightType();
-		}
-	}
-
-	if(type == FIGHT_MAGICDIST) {
-	Item* distItem = GetDistWeapon();
-		if(distItem){
-			return distItem->getSubfightType();
-		}	
-	}
-
-	return DIST_NONE;
-}
-*/
-
-/*
-Item* Player::GetDistWeapon() const
-{
-	for(int slot = SLOT_RIGHT; slot <= SLOT_LEFT; slot++){
-	    if(items[slot]){
-				if((items[slot]->isWeapon())) {
-					switch (items[slot]->getWeaponType()){
-					case DIST:
-					{
-						//find ammunition
-						if(items[slot]->getAmuType() == AMU_NONE){
-							return items[slot];
-						}
-
-						if(items[SLOT_AMMO]){
-							//compare ammo types
-							if(items[SLOT_AMMO]->getWeaponType() == AMO && 
-								items[slot]->getAmuType() == items[SLOT_AMMO]->getAmuType()){
-									return items[SLOT_AMMO];
-							}
-
-							return NULL;
-						}
-
-						break;
-					}
-
-					case MAGIC:
-						return items[slot];
-
-					default:
-						break;
-					}
-				}
-			}
-  	}
-  	return NULL;
-}
-*/
 
 void Player::addStorageValue(const unsigned long key, const long value)
 {
@@ -1475,7 +1380,7 @@ void Player::addExperience(unsigned long exp)
 		int32_t newSpeed = getBaseSpeed();
 		setBaseSpeed(newSpeed);
 
-		g_game.changeSpeed(this, newSpeed);
+		g_game.changeSpeed(this, 0);
 		g_game.addCreatureHealth(this);
 
 		std::stringstream levelMsg;

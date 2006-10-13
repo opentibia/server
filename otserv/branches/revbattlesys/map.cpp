@@ -331,10 +331,10 @@ void Map::getSpectators(SpectatorVec& list, const Position& centerPos, bool mult
 				tile = getTile(nx + centerPos.x, ny + centerPos.y, nz);
 				if(tile){
 					for(cit = tile->creatures.begin(); cit != tile->creatures.end(); ++cit){
-							if(std::find(list.begin(), list.end(), *cit) == list.end()){
-								if((*cit)->canSee(centerPos)){
-									list.push_back(*cit);
-							}
+						if(std::find(list.begin(), list.end(), *cit) == list.end()){
+							//if((*cit)->canSee(centerPos)){
+							list.push_back(*cit);
+							//}
 						}
 					}
 				}

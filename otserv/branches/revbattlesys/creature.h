@@ -128,15 +128,16 @@ public:
 	void setMasterPos(const Position& pos) { masterPos = pos;}
 
 	virtual int getThrowRange() const {return 1;};
-	virtual bool isPushable() const {return true;};
+	virtual bool isPushable() const {return (getSleepTicks() <= 0);};
 	virtual bool isRemoved() const {return isInternalRemoved;};
+	virtual bool canSeeInvisibility() const { return false;}
 		
 	int64_t getSleepTicks() const;
 	int64_t getEventStepTicks() const;
 	int getStepDuration() const;
 
 	uint32_t getSpeed() const {return baseSpeed + varSpeed;};
-	void setSpeed(uint32_t speedChange){ varSpeed = speedChange; }
+	void setSpeed(uint32_t varSpeedDelta){ varSpeed = varSpeedDelta; }
 	
 	void setBaseSpeed(uint32_t newBaseSpeed) {baseSpeed = newBaseSpeed;}
 	int getBaseSpeed() {return baseSpeed;}
@@ -146,7 +147,8 @@ public:
 	int32_t getMana() const {return mana;}
 
 	const Outfit_t getCurrentOutfit() const {return currentOutfit;}
-	const Outfit_t getDefaultOutfit() const {return defaultOutfit;}	
+	const Outfit_t getDefaultOutfit() const {return defaultOutfit;}
+	bool isInvisible() const {return hasCondition(CONDITION_INVISIBLE);}
 
 	//walk functions
 	bool startAutoWalk(std::list<Direction>& listDir);
@@ -154,6 +156,7 @@ public:
 	void stopEventWalk();
 
 	//walk events
+	void onWalk(Direction& dir);
 	virtual void onWalkAborted() {};
 
 	//follow functions
@@ -161,6 +164,8 @@ public:
 	virtual void setFollowCreature(const Creature* creature);
 	virtual bool internalFollowCreature(const Creature* creature);
 	virtual uint32_t getFollowDistance() const {return followDistance;}
+	virtual bool getFullPathSearch() const {return !followCreature;}
+	virtual bool getFollowReachable() const {return true;}
 
 	//follow events
 	virtual void onFollowCreature(const Creature* creature) {};
@@ -177,7 +182,7 @@ public:
 	const Creature* getMaster() const {return master;}
 	
 	virtual void addSummon(Creature* creature);
-	virtual void removeSummon(Creature* creature);
+	virtual void removeSummon(const Creature* creature);
 
 	virtual int getArmor() const {return 0;}
 	virtual int getDefense() const {return 0;}
@@ -215,7 +220,6 @@ public:
 	virtual void onKilledCreature(Creature* target);
 	virtual void onGainExperience(int32_t gainExperience);
 	virtual void onAttackedCreatureBlockHit(Creature* target, BlockType_t blockType);
-	//virtual void onTargetCreatureDisappear();
 	
 	virtual void getCreatureLight(LightInfo& light) const;
 	virtual void setNormalCreatureLight();

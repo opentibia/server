@@ -55,7 +55,7 @@ Creature::Creature() :
 	lastMove = 0;
 	lastStepCost = 0;
 	baseSpeed = 220;
-	varSpeed = 220;
+	varSpeed = 0;
 
 	followCreature = NULL;
 	eventWalk = 0;
@@ -114,17 +114,40 @@ void Creature::onThink(uint32_t interval)
 
 void Creature::onWalk()
 {
-	Direction dir;
-	if(getNextStep(dir)){
-		ReturnValue ret = g_game.internalMoveCreature(this, dir);
+	if(getSleepTicks() <= 0){
+		Direction dir;
+		if(getNextStep(dir)){
+			ReturnValue ret = g_game.internalMoveCreature(this, dir);
 
-		if(ret != RET_NOERROR){
-			internalUpdateFollow = true;
+			if(ret != RET_NOERROR){
+				internalUpdateFollow = true;
+			}
 		}
 	}
 
 	eventWalk = 0;
 	addEventWalk();
+}
+
+void Creature::onWalk(Direction& dir)
+{
+	if(hasCondition(CONDITION_DRUNK)){
+		uint32_t r = random_range(0, 6);
+
+		if(r <= 4){
+			switch(r){
+				case 0: dir = NORTH; break;
+				case 1: dir = WEST;  break;
+				case 3: dir = SOUTH; break;
+				case 4: dir = EAST;  break;
+
+				default:
+					break;
+			}
+
+			g_game.addAnimatedText(getPosition(), TEXTCOLOR_ORANGE, "Hicks!");
+		}
+	}
 }
 
 bool Creature::getNextStep(Direction& dir)
@@ -135,19 +158,9 @@ bool Creature::getNextStep(Direction& dir)
 		Position pos = getPosition();
 		dir = listWalkDir.front();
 		listWalkDir.pop_front();
+		onWalk(dir);
+
 		result = true;
-	}
-
-	if(hasCondition(CONDITION_DRUNK)){
-		switch(random_range(0, 4)){
-			case 0: dir = NORTH; break;
-			case 1: dir = WEST;  break;
-			case 3: dir = SOUTH; break;
-			case 4: dir = EAST;  break;
-
-			default:
-				break;
-		}
 	}
 
 	return result;
@@ -217,6 +230,10 @@ void Creature::onCreatureAppear(const Creature* creature, bool isLogin)
 
 void Creature::onCreatureDisappear(const Creature* creature)
 {
+	if(creature->getMaster() == this){
+		removeSummon(creature);
+	}
+
 	if(attackedCreature == creature){
 		setAttackedCreature(NULL);
 	}
@@ -434,9 +451,18 @@ void Creature::setFollowCreature(const Creature* creature)
 bool Creature::internalFollowCreature(const Creature* creature)
 {
 	if(creature){
+		/*
+		if(creature->isInvisible() && !canSeeInvisibility()){
+			setFollowCreature(NULL);
+			return false;
+		}
+		*/
+
 		listWalkDir.clear();
-		uint32_t distance = getFollowDistance();
-		if(!g_game.getPathToEx(this, creature->getPosition(), distance, distance, true, listWalkDir)){
+		uint32_t maxDistance = getFollowDistance();
+		bool fullPath = getFullPathSearch();
+		bool reachable = getFollowReachable();
+		if(!g_game.getPathToEx(this, creature->getPosition(), 1, maxDistance, fullPath, reachable, listWalkDir)){
 			setFollowCreature(NULL);
 			return false;
 		}
@@ -562,10 +588,9 @@ void Creature::addSummon(Creature* creature)
 	creature->setMaster(this);
 	creature->useThing2();
 	summons.push_back(creature);
-	
 }
 
-void Creature::removeSummon(Creature* creature)
+void Creature::removeSummon(const Creature* creature)
 {
 	//std::cout << "removeSummon: " << this << " summon=" << creature << std::endl;
 	std::list<Creature*>::iterator cit = std::find(summons.begin(), summons.end(), creature);

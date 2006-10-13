@@ -60,6 +60,8 @@ public:
 	virtual bool isAttackable() const { return true;}
 	virtual void doAttacking(uint32_t interval);
 
+	virtual void drainHealth(Creature* attacker, DamageType_t damageType, int32_t damage);
+
 	virtual void setNormalCreatureLight();
 
 	virtual void onAddTileItem(const Position& pos, const Item* item);
@@ -80,10 +82,16 @@ public:
 	bool isSummon() const { return getMaster() != NULL; }
 
 	virtual uint32_t getFollowDistance() const;
+	virtual bool getFollowReachable() const;
 	virtual void getCombatValues(int32_t& min, int32_t& max);
 
 private:
+	int32_t thinkTicks;
+	int32_t yellTicks;
+	int32_t attackTicks;
+	int32_t defenseTicks;
 	std::string strDescription;
+	bool needThink;
 	bool targetIsRecentAdded;
 	bool isActive;
 
@@ -103,8 +111,11 @@ private:
 
 	void onCreatureEnter(const Creature* creature);
 	void onCreatureLeave(const Creature* creature);
+	void onCreatureFound(const Creature* creature);
 
 	void updateLookDirection();
+	void updateTargetList();
+
 	bool getRandomStep(const Position& creaturePos, const Position& centerPos, Direction& dir);
 
 	virtual int32_t getLostExperience() const { return (isSummon() ? 0 : mType->experience); }

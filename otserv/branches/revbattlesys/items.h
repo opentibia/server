@@ -58,10 +58,18 @@ struct Abilities{
 		absorbPercentLifeDrain = 0;
 		absorbPercentManaDrain = 0;
 
+		absorbAll = 0;
+		absorbPhysical = 0;
+		absorbFire = 0;
+		absorbEnergy = 0;
+		absorbPoison = 0;
+		absorbLifeDrain = 0;
+		absorbManaDrain = 0;
+
 		memset(skills, 0, sizeof(skills));
 	};
 
-	/*
+	//damage abilities modifiers
 	uint8_t absorbAll;
 	uint8_t absorbPhysical;
 	uint8_t absorbFire;
@@ -69,7 +77,6 @@ struct Abilities{
 	uint8_t absorbPoison;
 	uint8_t absorbLifeDrain;
 	uint8_t absorbManaDrain;
-	*/
 
 	uint8_t absorbPercentAll;
 	uint8_t absorbPercentPhysical;
@@ -78,6 +85,8 @@ struct Abilities{
 	uint8_t absorbPercentPoison;
 	uint8_t absorbPercentLifeDrain;
 	uint8_t absorbPercentManaDrain;
+
+	//extra skill modifiers
 	uint32_t skills[SKILL_LAST + 1];
 };
 

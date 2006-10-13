@@ -299,10 +299,10 @@ public:
 	bool getPathTo(const Creature* creature, Position toPosition, std::list<Direction>& listDir);
 	bool isPathValid(const Creature* creature, const std::list<Direction>& listDir, const Position& destPos);
 
-	bool getPathToEx(const Creature* creature, const Position& targetPos,
-		uint32_t minDist, uint32_t maxDist, bool fullPathSearch, std::list<Direction>& dirList);
+	bool getPathToEx(const Creature* creature, const Position& targetPos, uint32_t minDist, uint32_t maxDist,
+		bool fullPathSearch, bool targetMustBeReachable, std::list<Direction>& dirList);
 
-	void changeSpeed(Creature* creature, int32_t newSpeed);
+	void changeSpeed(Creature* creature, int32_t varSpeedDelta);
 	void internalChangeOutfit(Creature* creature, Outfit_t oufit);
 	void changeLight(const Creature* creature);
 
@@ -365,9 +365,10 @@ protected:
 		void*    data;
 	};
 	
-	#define DECAY_INTERVAL  1000
+	#define DECAY_INTERVAL  10000
 	void startDecay(Item* item);
 	void checkDecay(int32_t interval);
+	void internalDecayItem(Item* item);
 
 	typedef std::vector<Item*> DecayList;
 	DecayList decayItems;
