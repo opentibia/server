@@ -1282,7 +1282,7 @@ int LuaScriptInterface::luaDoSendCancel(lua_State *L)
 	
 	ScriptEnviroment* env = getScriptEnv();
 	
-	const Player* player = env->getPlayerByUID(cid);
+	Player* player = env->getPlayerByUID(cid);
 	if(player){
 		player->sendCancel(text);
 		lua_pushnumber(L, LUA_NO_ERROR);
