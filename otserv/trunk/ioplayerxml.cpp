@@ -243,6 +243,12 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 				}
 				else
 					isLoaded = false;
+				
+				if(readXMLInteger(p, "addons", intValue)){
+					player->lookaddons = intValue;
+				}
+				else
+					isLoaded = false;
 			}
 			else if(xmlStrcmp(p->name, (const xmlChar*)"spawn") == 0){
 
@@ -522,6 +528,7 @@ bool IOPlayerXML::savePlayer(Player* player)
 	sb << player->lookbody;    xmlSetProp(pn, (const xmlChar*)"body", (const xmlChar*)sb.str().c_str());        sb.str("");
 	sb << player->looklegs;    xmlSetProp(pn, (const xmlChar*)"legs", (const xmlChar*)sb.str().c_str());        sb.str("");
 	sb << player->lookfeet;    xmlSetProp(pn, (const xmlChar*)"feet", (const xmlChar*)sb.str().c_str());        sb.str("");
+	sb << player->lookaddons;  xmlSetProp(pn, (const xmlChar*)"addons", (const xmlChar*)sb.str().c_str());      sb.str("");
 	xmlAddChild(root, pn);
     
 	pn = xmlNewNode(NULL,(const xmlChar*)"guild");

@@ -902,8 +902,8 @@ void Protocol78::parseSetOutfit(NetworkMessage& msg)
 	int lookaddons = msg.GetByte();
 	
 	if(player->canWear(looktype, lookaddons)){
-		player->lookmaster = player->looktype;
 		player->looktype = looktype;
+		player->lookmaster = looktype;
 		player->lookhead = lookhead;
 		player->lookbody = lookbody;
 		player->looklegs = looklegs;
