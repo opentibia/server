@@ -201,7 +201,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 				msg.setEncryptionState(true);
 				msg.setEncryptionKey(k);
 
-				if(version == 780 || version == 781){
+				if(version >= 780 && version <= 782){
 
 					int serverip = serverIPs[0].first;
 
@@ -298,7 +298,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 				msg.setEncryptionState(true);
 				msg.setEncryptionKey(k);
 
-				if(version != 780 && version != 781){
+				if(version < 780 || version > 782){
 					msg.AddByte(0x14);
 					msg.AddString("Only clients with protocol 7.8x allowed!");
 					msg.WriteToSocket(s);
