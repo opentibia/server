@@ -1404,7 +1404,7 @@ Item* Game::transformItem(Item* item, uint16_t newtype, int32_t count /*= -1*/)
 						return item;
 					}
 				}
-				else if(item->isRune()){
+				else if(item->getItemCharge() > 0){
 					if(count <= 0){
 						internalRemoveItem(item);
 					}
@@ -2313,10 +2313,7 @@ bool Game::playerChangeOutfit(Player* player, Outfit_t outfit)
 		return false;
 
 	player->defaultOutfit = outfit;
-
-	if(!player->isInvisible()){
-		internalChangeOutfit(player, outfit);
-	}
+	internalCreatureChangeOutfit(player, outfit);
 
 	return true;
 }
@@ -2599,6 +2596,10 @@ void Game::changeSpeed(Creature* creature, int32_t varSpeedDelta)
 	int32_t varSpeed = creature->getSpeed() - creature->getBaseSpeed();
 	varSpeed += varSpeedDelta;
 
+	if(varSpeed + creature->getBaseSpeed() < 0){
+		varSpeed = -creature->getBaseSpeed();
+	}
+
 	creature->setSpeed(varSpeed);
 
 	SpectatorVec list;
@@ -2615,10 +2616,34 @@ void Game::changeSpeed(Creature* creature, int32_t varSpeedDelta)
 	}
 }
 
-void Game::internalChangeOutfit(Creature* creature, Outfit_t oufit)
+void Game::internalCreatureChangeOutfit(Creature* creature, const Outfit_t& outfit)
 {
-	creature->currentOutfit = oufit;
+	creature->setCurrentOutfit(outfit);
+	
+	if(!creature->isInvisible()){
+		SpectatorVec list;
+		SpectatorVec::iterator it;
 
+		//getSpectators(Range(creature->getPosition(), true), list);
+		getSpectators(list, creature->getPosition(), true);
+
+		//send to client
+		Player* tmpPlayer = NULL;
+		for(it = list.begin(); it != list.end(); ++it) {
+			if(tmpPlayer = (*it)->getPlayer()){
+				tmpPlayer->sendCreatureChangeOutfit(creature, outfit);
+			}
+		}
+
+		//event method
+		for(it = list.begin(); it != list.end(); ++it) {
+			(*it)->onCreatureChangeOutfit(creature, outfit);
+		}
+	}
+}
+
+void Game::internalCreatureChangeVisible(Creature* creature, bool visible)
+{
 	SpectatorVec list;
 	SpectatorVec::iterator it;
 
@@ -2629,15 +2654,18 @@ void Game::internalChangeOutfit(Creature* creature, Outfit_t oufit)
 	Player* tmpPlayer = NULL;
 	for(it = list.begin(); it != list.end(); ++it) {
 		if(tmpPlayer = (*it)->getPlayer()){
-			tmpPlayer->sendCreatureChangeOutfit(creature);
+			tmpPlayer->sendCreatureChangeVisible(creature, visible);
 		}
 	}
 
+	/*
 	//event method
 	for(it = list.begin(); it != list.end(); ++it) {
-		(*it)->onCreatureChangeOutfit(creature);
+		(*it)->onCreatureChangeVisible(creature, visible);
 	}
+	*/
 }
+
 
 void Game::changeLight(const Creature* creature)
 {
@@ -2705,6 +2733,9 @@ bool Game::combatChangeHealth(DamageType_t damageType, Creature* attacker, Creat
 			uint8_t hitEffect = 0;
 
 			switch(damageType){
+				case DAMAGE_UNDEFINED:
+					break;
+
 				case DAMAGE_ENERGY:
 				{
 					hitEffect = NM_ME_BLOCKHIT;
@@ -2982,6 +3013,8 @@ void Game::startDecay(Item* item)
 {
 	if(item->canDecay()){
 		if(!item->isDecaying()){
+			item->setDefaultDuration();
+
 			if(item->getDuration() > 0){
 				item->useThing2();
 				item->setDecaying(true);
@@ -2992,40 +3025,6 @@ void Game::startDecay(Item* item)
 			}
 		}
 	}
-
-	/*
-	if(item->isDecaying)
-		return; //dont add 2 times the same item
-
-	//get decay time
-	long dtime = item->getDecayTime();
-	if(dtime == 0)
-		return;
-
-	item->isDecaying = true;
-
-	//round time
-	if(dtime < DECAY_INTERVAL)
-		dtime = DECAY_INTERVAL;
-	dtime = (dtime/DECAY_INTERVAL)*DECAY_INTERVAL;
-	item->useThing2();
-
-	//search if there are any block with this time
-	std::list<decayBlock*>::iterator it;
-	for(it = decayVector.begin();it != decayVector.end();it++){
-		if((*it)->decayTime == dtime){			
-			(*it)->decayItems.push_back(item);
-			return;
-		}
-	}
-
-	//we need a new decayBlock
-	decayBlock* db = new decayBlock;
-	db->decayTime = dtime;
-	db->decayItems.clear();
-	db->decayItems.push_back(item);
-	decayVector.push_back(db);
-	*/
 }
 
 void Game::checkDecay(int32_t interval)
@@ -3040,14 +3039,15 @@ void Game::checkDecay(int32_t interval)
 		item->setDuration(item->getDuration() - interval);
 
 		if(!item->canDecay()){
+			item->setDecaying(false);
 			FreeThing(item);
 			it = decayItems.erase(it);
 			continue;
 		}
 
 		if(item->getDuration() <= 0){
-			internalDecayItem(item);
 			it = decayItems.erase(it);
+			internalDecayItem(item);
 			FreeThing(item);
 		}
 		else{
@@ -3055,52 +3055,17 @@ void Game::checkDecay(int32_t interval)
 		}
 	}
 
-	/*
-	std::list<decayBlock*>::iterator it;
-	for(it = decayVector.begin(); it != decayVector.end();){
-		(*it)->decayTime -= t;
-		if((*it)->decayTime <= 0){
-			std::list<Item*>::iterator it2;
-			for(it2 = (*it)->decayItems.begin(); it2 != (*it)->decayItems.end(); it2++){
-				Item* item = *it2;
-				item->isDecaying = false;
-				if(item->canDecay()){
-					uint32_t decayTo = Item::items[item->getID()].decayTo;
-
-					if(decayTo != 0){
-						Item* newItem = transformItem(item, decayTo);
-						startDecay(newItem);
-					}
-					else{
-						ReturnValue ret = internalRemoveItem(item);
-
-						if(ret != RET_NOERROR){
-							std::cout << "DEBUG, checkDecay failed, error code: " << (int) ret << "item id: " << item->getID() << std::endl;
-						}
-					}
-				}
-
-				FreeThing(item);
-			}
-
-			delete *it;
-			it = decayVector.erase(it);
-		}
-		else{
-			it++;
-		}
-	}
-		
 	flushSendBuffers();
-	*/
 }
 
 void Game::internalDecayItem(Item* item)
 {
-	uint32_t decayTo = Item::items[item->getID()].decayTo;
+	const ItemType& it = Item::items[item->getID()];
 
-	if(decayTo != 0){
-		Item* newItem = transformItem(item, decayTo);
+	if(it.decayTo != 0){
+		Item* newItem = transformItem(item, it.decayTo);
+		newItem->setDecaying(false);
+		newItem->setDuration(newItem->getDefaultDuration());
 		startDecay(newItem);
 	}
 	else{
@@ -3110,8 +3075,6 @@ void Game::internalDecayItem(Item* item)
 			std::cout << "DEBUG, internalDecayItem failed, error code: " << (int) ret << "item id: " << item->getID() << std::endl;
 		}
 	}
-
-	item->setDecaying(false);
 }
 
 void Game::checkSpawns(int t)

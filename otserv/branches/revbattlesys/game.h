@@ -303,7 +303,8 @@ public:
 		bool fullPathSearch, bool targetMustBeReachable, std::list<Direction>& dirList);
 
 	void changeSpeed(Creature* creature, int32_t varSpeedDelta);
-	void internalChangeOutfit(Creature* creature, Outfit_t oufit);
+	void internalCreatureChangeOutfit(Creature* creature, const Outfit_t& oufit);
+	void internalCreatureChangeVisible(Creature* creature, bool visible);
 	void changeLight(const Creature* creature);
 
 #ifdef __SKULLSYSTEM__
@@ -340,6 +341,8 @@ public:
 	void addDistanceEffect(const Position& fromPos, const Position& toPos,
 	uint8_t effect);
 
+	void startDecay(Item* item);
+
 protected:
 	std::vector<Player*> BufferedPlayers;
 	std::vector<Thing*> ToReleaseThings;
@@ -366,21 +369,11 @@ protected:
 	};
 	
 	#define DECAY_INTERVAL  10000
-	void startDecay(Item* item);
 	void checkDecay(int32_t interval);
 	void internalDecayItem(Item* item);
 
 	typedef std::vector<Item*> DecayList;
 	DecayList decayItems;
-
-	/*	
-	void startDecay(Item* item);
-	struct decayBlock{
-		long decayTime;
-		std::list<Item*> decayItems;
-	};
-	std::list<decayBlock*> decayVector;
-	*/
 	
 	static const int LIGHT_LEVEL_DAY = 250;
 	static const int LIGHT_LEVEL_NIGHT = 40;
