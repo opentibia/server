@@ -154,7 +154,7 @@ public:
 	
 	virtual bool canExecuteAction(const Player* player, const Position& toPos);
 
-	virtual bool executeUse(Player* player, Item* item, const PositionEx& posFrom, const PositionEx& posTo);
+	virtual bool executeUse(Player* player, Item* item, const PositionEx& posFrom, const PositionEx& posTo, bool extendedUse);
 	
 	virtual bool castSpell(Creature* creature);
 	virtual bool castSpell(Creature* creature, Creature* target);

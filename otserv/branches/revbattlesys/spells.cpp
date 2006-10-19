@@ -413,6 +413,7 @@ void Spell::postCastSpell(Player* player)
 
 	if(mana > 0){
 		player->changeMana(-((int32_t)mana));
+		player->sendStats();
 	}
 
 	if(exhaustion){
@@ -1001,14 +1002,18 @@ bool RuneSpell::configureEvent(xmlNodePtr p)
 		return false;
 	}
 
-	if(readXMLInteger(p, "hascharges", intValue)){
-		hasCharges = (intValue != 0);
+	uint32_t charges = 0;
+	if(readXMLInteger(p, "charges", intValue)){
+		charges = intValue;
 	}
+
+	hasCharges = (charges > 0);
 
 	if(magLevel != 0){
 		//Change magic level in the ItemType to get accurate description
 		ItemType& iType = Item::items.getItemType(runeId);
 		iType.runeMagLevel = magLevel;
+		iType.charges = charges;
 	}
 
 	return true;
@@ -1034,7 +1039,7 @@ bool RuneSpell::canExecuteAction(const Player* player, const Position& toPos)
 	return true;
 }
 
-bool RuneSpell::executeUse(Player* player, Item* item, const PositionEx& posFrom, const PositionEx& posTo)
+bool RuneSpell::executeUse(Player* player, Item* item, const PositionEx& posFrom, const PositionEx& posTo, bool extendedUse)
 {
 	if(!playerRuneSpellCheck(player, posTo)){
 		return false;
