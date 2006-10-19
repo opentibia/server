@@ -227,7 +227,7 @@ void Npc::onCreatureSay(const Creature* creature, SpeakClasses type, const std::
 	m_npcEventHandler->onCreatureSay(creature, type, text);
 }
 
-void Npc::onCreatureChangeOutfit(const Creature* creature)
+void Npc::onCreatureChangeOutfit(const Creature* creature, const Outfit_t& outfit)
 {
 	#ifdef __DEBUG_NPC__
 		std::cout << "Npc::onCreatureChangeOutfit" << std::endl;

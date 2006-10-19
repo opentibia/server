@@ -142,7 +142,7 @@ protected:
 
 	virtual void onCreatureTurn(const Creature* creature, uint32_t stackpos);
 	virtual void onCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text);
-	virtual void onCreatureChangeOutfit(const Creature* creature);
+	virtual void onCreatureChangeOutfit(const Creature* creature, const Outfit_t& outfit);
 	virtual void onThink(uint32_t interval);
 	virtual std::string getDescription(int32_t lookDistance) const;
 	
