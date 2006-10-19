@@ -7,7 +7,18 @@
 <movevent event="StepIn" itemid="1506" function="onStepInField" />
 <movevent event="AddItem" tileitem="0" itemid="1506" function="onAddField" />
 
-<movevent event="Equip" itemid="2195" script="boh.lua" />
-<movevent event="DeEquip" itemid="2195" script="boh.lua" />
+<movevent event="StepIn" itemid="1489" script="firefield.lua" />
+
+<movevent event="Equip" itemid="2207" function="onEquipItem" />
+<movevent event="DeEquip" itemid="2210" function="onDeEquipItem" />
+
+<movevent event="Equip" itemid="2197" slot="necklace" function="onEquipItem" />
+<movevent event="DeEquip" itemid="2197" slot="necklace" function="onDeEquipItem" />
+
+<movevent event="Equip" itemid="2165" slot="ring" function="onEquipItem" />
+<movevent event="DeEquip" itemid="2202" slot="ring" function="onDeEquipItem" />
+
+<movevent event="Equip" itemid="2195" function="onEquipItem" />
+<movevent event="DeEquip" itemid="2195" function="onDeEquipItem" />
 
 </movements>
