@@ -410,6 +410,7 @@ void Weapon::onUsedWeapon(Player* player, Item* item, Tile* destTile) const
 
 	if(mana > 0){
 		player->changeMana(-((int32_t)mana));
+		player->sendStats();
 	}
 
 	//TODO
