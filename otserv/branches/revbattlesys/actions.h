@@ -75,7 +75,7 @@ public:
 	virtual bool configureEvent(xmlNodePtr p);
 
 	//scripting
-	virtual bool executeUse(Player* player, Item* item, const PositionEx& posFrom, const PositionEx& posTo);
+	virtual bool executeUse(Player* player, Item* item, const PositionEx& posFrom, const PositionEx& posTo, bool extendedUse);
 	//
 
 	bool allowFarUse() const {return allowfaruse;};
