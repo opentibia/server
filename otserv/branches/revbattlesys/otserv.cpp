@@ -382,9 +382,12 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 			status->getInfo(msg);
 			msg.WriteToSocket(s);
 		}
-  }
-  if(s)
-	  closesocket(s);
+	}
+
+	if(s){
+		closesocket(s);
+	}
+
 #if defined __EXCEPTION_TRACER__
   playerExceptionHandler.RemoveHandler();
 #endif
@@ -532,6 +535,14 @@ int main(int argc, char *argv[])
 		ErrorMessage(errormsg.str().c_str());
 		return -1;
 	}
+
+	if(!Items::loadFromXml(g_config.getGlobalString("datadir"))){
+		std::stringstream errormsg;
+		errormsg << "Unable to load " << "items/items.xml" << "!";
+		ErrorMessage(errormsg.str().c_str());
+		return -1;
+	}
+
 	std::cout << "[done]" << std::endl;
 	
 	//load scripts
