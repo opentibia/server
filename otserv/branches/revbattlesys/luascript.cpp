@@ -1054,6 +1054,9 @@ void LuaScriptInterface::registerFunctions()
 	//variantToNumber(var)
 	lua_register(m_luaState, "variantToNumber", LuaScriptInterface::luaVariantToNumber);
 
+	//doChangeSpeed(cid, delta)
+	lua_register(m_luaState, "doChangeSpeed", LuaScriptInterface::luaDoChangeSpeed);
+
 	//debugPrint(text)
 	lua_register(m_luaState, "debugPrint", LuaScriptInterface::luaDebugPrint);
 	//isInArray(array, value)
@@ -1440,7 +1443,7 @@ int LuaScriptInterface::luaDoPlayerAddHealth(lua_State *L)
 	
 	Creature* creature = env->getCreatureByUID(cid);
 	if(creature){
-		g_game.combatChangeHealth(DAMAGE_NONE, NULL, creature, healthChange);
+		g_game.combatChangeHealth(DAMAGE_UNDEFINED, NULL, creature, healthChange);
 		lua_pushnumber(L, LUA_NO_ERROR);
 	}
 	else{
@@ -3004,6 +3007,29 @@ int LuaScriptInterface::luaVariantToNumber(lua_State *L)
 	}
 
 	lua_pushnumber(L, number);
+	return 1;
+}
+
+int LuaScriptInterface::luaDoChangeSpeed(lua_State *L)
+{
+	//doChangeSpeed(cid, delta)
+
+	int32_t delta = (int32_t)popNumber(L);
+	uint32_t cid = (uint32_t)popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Creature* creature = env->getCreatureByUID(cid);
+
+	if(!creature){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
+	g_game.changeSpeed(creature, delta);
+
+	lua_pushnumber(L, LUA_NO_ERROR);
 	return 1;
 }
 

@@ -398,6 +398,8 @@ protected:
 
 	static int luaVariantToNumber(lua_State *L);
 
+	static int luaDoChangeSpeed(lua_State *L);
+
 	static int luaDebugPrint(lua_State *L);
 	static int luaIsInArray(lua_State *L);
 	//
