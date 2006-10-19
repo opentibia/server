@@ -151,7 +151,9 @@ private:
 	void sendCancelWalk();
 	void sendChangeSpeed(const Creature* creature, uint32_t speed);
 	void sendCancelTarget();
-	void sendSetOutfit(const Creature* creature);
+	void sendCreatureVisible(const Creature* creature, bool visible);
+	void sendCreatureOutfit(const Creature* creature, const Outfit_t& outfit);
+	void sendCreatureInvisible(const Creature* creature);
 	void sendStats();
 	void sendTextMessage(MessageClasses mclass, const std::string& message);
 	void sendTextMessage(MessageClasses mclass, const std::string& message, const Position& pos,
@@ -221,6 +223,7 @@ private:
 	void AddCreatureSpeak(NetworkMessage &msg,const Creature* creature, SpeakClasses type, std::string text, unsigned short channelId);
 	void AddCreatureHealth(NetworkMessage &msg,const Creature* creature);
 	void AddCreatureOutfit(NetworkMessage &msg, const Creature* creature, const Outfit_t& outfit);
+	void AddCreatureInvisible(NetworkMessage &msg, const Creature* creature);	
 	void AddPlayerSkills(NetworkMessage &msg);
 	void AddWorldLight(NetworkMessage &msg, const LightInfo& lightInfo);
 	void AddCreatureLight(NetworkMessage &msg, const Creature* creature);

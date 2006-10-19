@@ -1123,13 +1123,24 @@ void Protocol76::sendOpenPriv(const std::string& receiver)
 	WriteBuffer(newmsg);
 }
 
-void Protocol76::sendSetOutfit(const Creature* creature)
+void Protocol76::sendCreatureOutfit(const Creature* creature, const Outfit_t& outfit)
 {
 	if(canSee(creature)){
 		NetworkMessage msg;
 		msg.AddByte(0x8E);
 		msg.AddU32(creature->getID());
-		AddCreatureOutfit(msg, creature, creature->getCurrentOutfit());
+		AddCreatureOutfit(msg, creature, outfit);
+		WriteBuffer(msg);
+	}
+}
+
+void Protocol76::sendCreatureInvisible(const Creature* creature)
+{
+	if(canSee(creature)){
+		NetworkMessage msg;
+		msg.AddByte(0x8E);
+		msg.AddU32(creature->getID());
+		AddCreatureInvisible(msg, creature);
 		WriteBuffer(msg);
 	}
 }
@@ -1826,7 +1837,12 @@ void Protocol76::AddCreature(NetworkMessage &msg,const Creature* creature, bool 
 
 	msg.AddByte((unsigned char)creature->getDirection());
 
-	AddCreatureOutfit(msg, creature, creature->getCurrentOutfit());
+	if(!creature->isInvisible()){
+		AddCreatureOutfit(msg, creature, creature->getCurrentOutfit());
+	}
+	else{
+		AddCreatureInvisible(msg, creature);
+	}
 
 	LightInfo lightInfo;
 	creature->getCreatureLight(lightInfo);
@@ -1910,7 +1926,13 @@ void Protocol76::AddCreatureHealth(NetworkMessage& msg,const Creature* creature)
 	msg.AddByte(std::max((int32_t)1, creature->getHealth() * 100 / std::max(creature->getMaxHealth(), (int32_t)1) ));
 }
 
-void Protocol76::AddCreatureOutfit(NetworkMessage &msg, const Creature* creature, const Outfit_t& outfit)
+void Protocol76::AddCreatureInvisible(NetworkMessage& msg, const Creature* creature)
+{
+	msg.AddByte(0);
+	msg.AddU16(0);
+}
+
+void Protocol76::AddCreatureOutfit(NetworkMessage& msg, const Creature* creature, const Outfit_t& outfit)
 {
 	msg.AddByte(outfit.lookType);
 
