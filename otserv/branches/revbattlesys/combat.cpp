@@ -813,15 +813,15 @@ void MagicField::load()
 
 	switch(damageType){
 		case DAMAGE_ENERGY:
-			condition = new ConditionDamage(CONDITION_ENERGY);
+			condition = new ConditionDamage(0, CONDITION_ENERGY);
 			break;
 
 		case DAMAGE_FIRE:
-			condition = new ConditionDamage(CONDITION_FIRE);
+			condition = new ConditionDamage(0, CONDITION_FIRE);
 			break;
 
 		case DAMAGE_POISON:
-			condition = new ConditionDamage(CONDITION_POISON);
+			condition = new ConditionDamage(0, CONDITION_POISON);
 			break;
 		
 		default:

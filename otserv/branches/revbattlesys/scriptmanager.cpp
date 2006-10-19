@@ -84,10 +84,11 @@ bool ScriptingManager::loadScriptSystems()
 	}
 	std::cout << "[done]" << std::endl;
 	
-	//
+	/*
 	std::cout << ":: Loading Fields ...";
 	Items::loadFieldsFromXml(g_config.getGlobalString("datadir"));
 	std::cout << "[done]" << std::endl;
+	*/
 
 	//load actions data
 	g_actions = new Actions();
