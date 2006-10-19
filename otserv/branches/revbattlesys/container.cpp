@@ -709,42 +709,46 @@ Thing* Container::__getThing(uint32_t index) const
 	return NULL;
 }
 
-void Container::postAddNotification(Thing* thing, int32_t index, bool hasOwnership /*= true*/)
+void Container::postAddNotification(Thing* thing, int32_t index, cylinderlink_t link /*= LINK_OWNER*/)
 {
 	Cylinder* topParent = getTopParent();
 
 	if(topParent->getCreature()){
-		topParent->postAddNotification(thing, index, true /*hasOwnership*/);
+		//topParent->postAddNotification(thing, index, true /*hasOwnership*/);
+		topParent->postAddNotification(thing, index, LINK_TOPPARENT);
 	}
 	else{
 		if(topParent == this){
 			//let the tile class notify surrounding players
-			topParent->getParent()->postAddNotification(thing, index, false /*hasOwnership*/);
+			//topParent->getParent()->postAddNotification(thing, index, false /*hasOwnership*/);
+			topParent->getParent()->postAddNotification(thing, index, LINK_NEAR);
 		}
-		else
-			topParent->postAddNotification(thing, index, false /*hasOwnership*/);
+		else{
+			//topParent->postAddNotification(thing, index, false /*hasOwnership*/);
+			topParent->postAddNotification(thing, index, LINK_PARENT);
+		}
 	}
-
-	//getParent()->postAddNotification(thing, index, true /*hasOwnership*/);
 }
 
-void Container::postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, bool hadOwnership /*= true*/)
+void Container::postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, cylinderlink_t link /*= LINK_OWNER*/)
 {
 	Cylinder* topParent = getTopParent();
 
 	if(topParent->getCreature()){
-		topParent->postRemoveNotification(thing, index, isCompleteRemoval, true /*hasOwnership*/);
+		//topParent->postRemoveNotification(thing, index, isCompleteRemoval, true /*hadOwnership*/);
+		topParent->postRemoveNotification(thing, index, isCompleteRemoval, LINK_TOPPARENT);
 	}
 	else{
 		if(topParent == this){
 			//let the tile class notify surrounding players
-			topParent->getParent()->postRemoveNotification(thing, index, isCompleteRemoval, false /*hasOwnership*/);
+			//topParent->getParent()->postRemoveNotification(thing, index, isCompleteRemoval, false /*hadOwnership*/);
+			topParent->getParent()->postRemoveNotification(thing, index, isCompleteRemoval, LINK_NEAR);
 		}
-		else
-			topParent->postRemoveNotification(thing, index, isCompleteRemoval, false /*hasOwnership*/);
+		else{
+			//topParent->postRemoveNotification(thing, index, isCompleteRemoval, false /*hadOwnership*/);
+			topParent->postRemoveNotification(thing, index, isCompleteRemoval, LINK_PARENT);
+		}
 	}
-
-	//getParent()->postRemoveNotification(thing, index, isCompleteRemoval, false /*hadOwnership*/);
 }
 
 void Container::__internalAddThing(Thing* thing)

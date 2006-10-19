@@ -35,6 +35,13 @@ enum cylinderflags_t {
 	FLAG_PATHFINDING = 4,
 };
 
+enum cylinderlink_t{
+	LINK_OWNER,
+	LINK_PARENT,
+	LINK_TOPPARENT,
+	LINK_NEAR
+};
+
 class Cylinder : virtual public Thing{
 public:	
 	/**
@@ -122,20 +129,22 @@ public:
 	  * Is sent after an operation (move/add) to update internal values
 	  * \param thing is the object that has been added
 	  * \param index is the objects new index value
-	  * \param hasOwnership if this value is true the cylinder (or its children) has added the object to itself
+	  * \param link holds the relation the object has to the cylinder
 		* otherwise another cylinder (like Tile class and wish to inform this change) has sent the message.
 	  */
-	virtual void postAddNotification(Thing* thing, int32_t index, bool hasOwnership = true) = 0;
+	//virtual void postAddNotification(Thing* thing, int32_t index, bool hasOwnership = true) = 0;
+	virtual void postAddNotification(Thing* thing, int32_t index, cylinderlink_t link = LINK_OWNER) = 0;
 
 	/**
 	  * Is sent after an operation (move/remove) to update internal values
 	  * \param thing is the object that has been removed
 	  * \param index is the previous index of the removed object
 	  * \param isCompleteRemoval indicates if the item was completely removed or just partially (stackables)
-	  * \param hadOwnership if this value is true the cylinder (or its children) has removed the object from itself
+	  * \param link holds the relation the object has to the cylinder
 		* otherwise another cylinder (like Tile class and wish to inform this change) has sent the message.
 	  */
-	virtual void postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, bool hadOwnership = true) = 0;
+	//virtual void postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, bool hadOwnership = true) = 0;
+	virtual void postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, cylinderlink_t link = LINK_OWNER) = 0;
 
 	/**
 	  * Gets the index of an object

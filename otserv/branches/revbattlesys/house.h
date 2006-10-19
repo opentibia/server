@@ -122,7 +122,7 @@ class HouseTransferItem : public Item
 public:
 	static HouseTransferItem* createHouseTransferItem(House* house);
 	
-	HouseTransferItem(House* _house){house = _house;};
+	HouseTransferItem(House* _house) : Item(0) {house = _house;};
 	virtual ~HouseTransferItem(){};
 	
 	virtual bool onTradeEvent(TradeEvents_t event, Player* owner);

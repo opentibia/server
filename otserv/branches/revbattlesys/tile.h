@@ -117,8 +117,8 @@ public:
 	virtual uint32_t __getItemTypeCount(uint16_t itemId) const;
 	virtual Thing* __getThing(uint32_t index) const;
 
-	virtual void postAddNotification(Thing* thing, int32_t index, bool hasOwnership = true);
-	virtual void postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, bool hadOwnership = true);
+	virtual void postAddNotification(Thing* thing, int32_t index, cylinderlink_t link = LINK_OWNER);
+	virtual void postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, cylinderlink_t link = LINK_OWNER);
 
 	virtual void __internalAddThing(Thing* thing);
 	virtual void __internalAddThing(uint32_t index, Thing* thing);

@@ -165,7 +165,7 @@ bool Tile::hasHeight(uint32_t n) const
 		}
 	}
 
-	return height;
+	return false;
 }
 
 uint32_t Tile::getHeight() const
@@ -1083,7 +1083,7 @@ Thing* Tile::__getThing(uint32_t index) const
 	return NULL;
 }
 
-void Tile::postAddNotification(Thing* thing, int32_t index, bool hasOwnership /*= true*/)
+void Tile::postAddNotification(Thing* thing, int32_t index, cylinderlink_t link /*= LINK_OWNER*/)
 {
 	const Position& cylinderMapPos = getPosition();
 
@@ -1094,11 +1094,12 @@ void Tile::postAddNotification(Thing* thing, int32_t index, bool hasOwnership /*
 
 	for(it = list.begin(); it != list.end(); ++it){
 		if(Player* player = (*it)->getPlayer()){
-			player->postAddNotification(thing, index, false);
+			//player->postAddNotification(thing, index, false);
+			player->postAddNotification(thing, index, LINK_NEAR);
 		}
 	}
 
-	if(hasOwnership){
+	if(link == LINK_OWNER){
 		//calling movement scripts
 		Creature* creature = thing->getCreature();
 		if(creature){
@@ -1123,7 +1124,7 @@ void Tile::postAddNotification(Thing* thing, int32_t index, bool hasOwnership /*
 	}
 }
 
-void Tile::postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, bool hadOwnership /*= true*/)
+void Tile::postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, cylinderlink_t link /*= LINK_OWNER*/)
 {
 	const Position& cylinderMapPos = getPosition();
 
@@ -1138,7 +1139,8 @@ void Tile::postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRe
 
 	for(it = list.begin(); it != list.end(); ++it){
 		if(Player* player = (*it)->getPlayer()){
-			player->postRemoveNotification(thing, index, isCompleteRemoval, false);
+			//player->postRemoveNotification(thing, index, isCompleteRemoval, false);
+			player->postRemoveNotification(thing, index, isCompleteRemoval, LINK_NEAR);
 		}
 	}
 	
