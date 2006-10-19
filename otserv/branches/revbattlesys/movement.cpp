@@ -206,7 +206,7 @@ long MoveEvents::onCreatureMove(Creature* creature, Tile* tile, bool isIn)
 	return ret;
 }
 
-long MoveEvents::onPlayerEquip(Player* player, Item* item, long slot, bool isEquip)
+long MoveEvents::onPlayerEquip(Player* player, Item* item, slots_t slot, bool isEquip)
 {
 	MoveEvent_t eventType;
 	if(isEquip){
@@ -217,8 +217,8 @@ long MoveEvents::onPlayerEquip(Player* player, Item* item, long slot, bool isEqu
 	}
 	
 	MoveEvent* event = getEvent(item, eventType);
-	if(event){
-		return event->executeEquip(player, item, slot);
+	if(event && slot == event->getSlot()){
+		return event->fireEquip(player, item, slot);
 	}
 	return 1;
 }
@@ -264,6 +264,8 @@ Event(_interface)
 	m_eventType = MOVE_EVENT_NONE;
 	stepFunction = NULL;
 	moveFunction = NULL;
+	equipFunction = NULL;
+	slot = SLOT_WHEREEVER;
 }
 
 MoveEvent::~MoveEvent()
@@ -325,6 +327,38 @@ bool MoveEvent::configureEvent(xmlNodePtr p)
 			std::cout << "Error: [MoveEvent::configureMoveEvent] No valid event name " << str << std::endl;
 			return false;
 		}
+	
+		if(m_eventType == MOVE_EVENT_EQUIP || m_eventType == MOVE_EVENT_DEEQUIP){
+			if(readXMLString(p, "slot", str)){
+				if(strcasecmp(str.c_str(), "head") == 0){
+					slot = SLOT_HEAD;
+				}
+				else if(strcasecmp(str.c_str(), "necklace") == 0){
+					slot = SLOT_NECKLACE;
+				}
+				else if(strcasecmp(str.c_str(), "backpack") == 0){
+					slot = SLOT_BACKPACK;
+				}
+				else if(strcasecmp(str.c_str(), "armor") == 0){
+					slot = SLOT_ARMOR;
+				}
+				else if(strcasecmp(str.c_str(), "right-hand") == 0){
+					slot = SLOT_RIGHT;
+				}
+				else if(strcasecmp(str.c_str(), "left-hand") == 0){
+					slot = SLOT_LEFT;
+				}
+				else if(strcasecmp(str.c_str(), "legs") == 0){
+					slot = SLOT_LEGS;
+				}
+				else if(strcasecmp(str.c_str(), "feet") == 0){
+					slot = SLOT_FEET;
+				}
+				else if(strcasecmp(str.c_str(), "ring") == 0){
+					slot = SLOT_RING;
+				}
+			}
+		}
 	}
 	else{
 		std::cout << "Error: [MoveEvent::configureMoveEvent] No event found." << std::endl;
@@ -346,6 +380,12 @@ bool MoveEvent::loadFunction(const std::string& functionName)
 	}
 	else if(functionName == "onRemoveField"){
 		moveFunction = RemoveItemField;
+	}
+	else if(functionName == "onEquipItem"){
+		equipFunction = EquipItem;
+	}
+	else if(functionName == "onDeEquipItem"){
+		equipFunction = DeEquipItem;
 	}
 	else{
 		return false;
@@ -405,6 +445,67 @@ long MoveEvent::RemoveItemField(Item* item, Item* tileItem, const Position& pos)
 	return 1;
 }
 
+long MoveEvent::EquipItem(Player* player, Item* item, slots_t slot)
+{
+	player->setItemAbility(slot, true);
+
+	const ItemType& it = Item::items[item->getID()];
+	
+	if(it.transformTo != 0){
+		g_game.transformItem(item, it.transformTo);
+		g_game.startDecay(item);
+	}
+
+	const ItemType& iit = Item::items[item->getID()];
+
+	if(iit.abilities.invisible){
+		Condition* condition = Condition::createCondition(CONDITION_INVISIBLE, -1, 0, slot);
+		player->addCondition(condition);
+	}
+
+	/*
+	if(iit.abilities.speed != 0){
+		g_game.changeSpeed(player, iit.abilities.speed);
+	}
+
+	//skill modifiers
+	for(int32_t i = SKILL_FIRST; i <= SKILL_LAST; ++i){
+		player->varskills[i] += iit.abilities.skills[i];
+	}
+	*/
+
+	return 1;
+}
+
+long MoveEvent::DeEquipItem(Player* player, Item* item, slots_t slot)
+{
+	player->setItemAbility(slot, false);
+
+	const ItemType& it = Item::items[item->getID()];
+
+	if(it.transformTo != 0){
+		g_game.transformItem(item, it.transformTo);
+		g_game.startDecay(item);
+	}
+
+	if(it.abilities.invisible){
+		player->removeCondition(CONDITION_INVISIBLE, slot);
+	}
+
+	/*
+	if(it.abilities.speed != 0){
+		g_game.changeSpeed(player, -iit.abilities.speed);
+	}
+
+	//skill modifiers
+	for(int32_t i = SKILL_FIRST; i <= SKILL_LAST; ++i){
+		player->varskills[i] -= it.abilities.skills[i];
+	}
+	*/
+
+	return 1;
+}
+
 long MoveEvent::fireStepEvent(Creature* creature, Item* item, const Position& pos)
 {
 	if(m_scripted){
@@ -448,7 +549,17 @@ long MoveEvent::executeStep(Creature* creature, Item* item, const Position& pos)
 	return ret;
 }
 
-long MoveEvent::executeEquip(Player* player, Item* item, long slot)
+long MoveEvent::fireEquip(Player* player, Item* item, slots_t slot)
+{
+	if(m_scripted){
+		return executeEquip(player, item, slot);
+	}
+	else{
+		return equipFunction(player, item, slot);
+	}
+}
+
+long MoveEvent::executeEquip(Player* player, Item* item, slots_t slot)
 {
 	//onEquip(cid, item, slot)
 	//onDeEquip(cid, item, slot)

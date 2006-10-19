@@ -132,7 +132,7 @@ void Creature::onWalk()
 void Creature::onWalk(Direction& dir)
 {
 	if(hasCondition(CONDITION_DRUNK)){
-		uint32_t r = random_range(0, 6);
+		uint32_t r = random_range(0, 16);
 
 		if(r <= 4){
 			switch(r){
@@ -451,13 +451,6 @@ void Creature::setFollowCreature(const Creature* creature)
 bool Creature::internalFollowCreature(const Creature* creature)
 {
 	if(creature){
-		/*
-		if(creature->isInvisible() && !canSeeInvisibility()){
-			setFollowCreature(NULL);
-			return false;
-		}
-		*/
-
 		listWalkDir.clear();
 		uint32_t maxDistance = getFollowDistance();
 		bool fullPath = getFullPathSearch();
@@ -601,13 +594,13 @@ void Creature::removeSummon(const Creature* creature)
 	}
 }
 
-bool Creature::addCondition(Condition* condition)
+bool Creature::addCondition(Condition* condition, uint32_t id /*= 0*/)
 {
 	if(condition == NULL){
 		return false;
 	}
 	
-	Condition* prevCond = getCondition(condition->getType());
+	Condition* prevCond = getCondition(condition->getType(), id);
 	
 	if(prevCond){
 		prevCond->addCondition(this, condition);
@@ -624,13 +617,15 @@ bool Creature::addCondition(Condition* condition)
 	return true;
 }
 
-void Creature::removeCondition(ConditionType_t type)
+void Creature::removeCondition(ConditionType_t type, uint32_t id /*= 0*/)
 {
 	for(ConditionList::iterator it = conditions.begin(); it != conditions.end(); ++it){
-		if((*it)->getType() == type){
-			(*it)->endCondition(this, REASON_ABORT);
-			delete *it;
+		if((*it)->getType() == type && (id == 0 || (*it)->getId())){
+			Condition* condition = *it;
 			conditions.erase(it);
+
+			(*it)->endCondition(this, REASON_ABORT);
+			delete condition;
 
 			onEndCondition(type);
 			break;
@@ -643,9 +638,9 @@ void Creature::executeConditions(int32_t newticks)
 	for(ConditionList::iterator it = conditions.begin(); it != conditions.end();){
 		//(*it)->setTicks((*it)->getTicks() - newticks);
 
-		(*it)->executeCondition(this, newticks);
-
-		if((*it)->getTicks() <= 0){
+		//(*it)->executeCondition(this, newticks);
+		//if((*it)->getTicks() <= 0){
+		if(!(*it)->executeCondition(this, newticks)){
 			ConditionType_t type = (*it)->getType();
 
 			(*it)->endCondition(this, REASON_ENDTICKS);
@@ -660,14 +655,15 @@ void Creature::executeConditions(int32_t newticks)
 	}
 }
 
-Condition* Creature::getCondition(ConditionType_t type)
+Condition* Creature::getCondition(ConditionType_t type, uint32_t id /*= 0*/)
 {
 	if(conditions.empty())
 		return NULL;
 	
 	for(ConditionList::iterator it = conditions.begin(); it != conditions.end(); ++it){
-		if((*it)->getType() == type)
+		if((*it)->getType() == type && (id == 0 || (*it)->getId())){
 			return *it;
+		}
 	}
 
 	return NULL;

@@ -54,14 +54,16 @@ enum EndCondition_t {
 
 class Condition{
 public:
-	Condition(ConditionType_t _type, int32_t _ticks);
+	Condition(uint32_t _id, ConditionType_t _type, int32_t _ticks);
 	virtual ~Condition(){};
 	
 	virtual bool startCondition(Creature* creature) = 0;
-	virtual void executeCondition(Creature* creature, int32_t interval);
+	virtual bool executeCondition(Creature* creature, int32_t interval);
 	virtual void endCondition(Creature* creature, EndCondition_t reason) = 0;	
 	virtual void addCondition(Creature* creature, const Condition* condition) = 0;
 	virtual uint8_t getIcons() const = 0;
+	virtual bool stackable() const = 0;
+	virtual uint32_t getId() const {return id;}
 
 	virtual Condition* clone() const = 0;
 
@@ -70,11 +72,12 @@ public:
 	void setTicks(int32_t newTicks) { ticks = newTicks; }
 	bool reduceTicks(int32_t interval);
 
-	static Condition* createCondition(ConditionType_t _type, int32_t ticks, int32_t param);
+	static Condition* createCondition(ConditionType_t _type, int32_t ticks, int32_t param, uint32_t _id = 0);
 
 	virtual bool setParam(ConditionParam_t param, int32_t value);
 
 protected:
+	uint32_t id;
 	int32_t ticks;
 	ConditionType_t conditionType;
 };
@@ -82,30 +85,50 @@ protected:
 class ConditionGeneric: public Condition
 {
 public:
-	ConditionGeneric(ConditionType_t _type, int32_t _ticks);
+	ConditionGeneric(uint32_t _id, ConditionType_t _type, int32_t _ticks);
 	virtual ~ConditionGeneric(){};
 	
 	virtual bool startCondition(Creature* creature);
-	virtual void executeCondition(Creature* creature, int32_t interval);
+	virtual bool executeCondition(Creature* creature, int32_t interval);
 	virtual void endCondition(Creature* creature, EndCondition_t reason);
 	virtual void addCondition(Creature* creature, const Condition* condition);
 	virtual uint8_t getIcons() const;
+	virtual bool stackable() const {return false;};
 	
 	virtual ConditionGeneric* clone()  const { return new ConditionGeneric(*this); }
+};
+
+class ConditionManaShield : public ConditionGeneric
+{
+public:
+	ConditionManaShield(uint32_t _id, ConditionType_t _type, int32_t _ticks) : ConditionGeneric(_id, _type, ticks) {};
+	virtual ~ConditionManaShield(){};
+	virtual bool stackable() const {return true;};
+};
+
+class ConditionInvisible: public ConditionGeneric
+{
+public:
+	ConditionInvisible(uint32_t _id, ConditionType_t _type, int32_t _ticks);
+	virtual ~ConditionInvisible(){};
+
+	virtual bool startCondition(Creature* creature);
+	virtual void endCondition(Creature* creature, EndCondition_t reason);
+	virtual bool stackable() const {return true;};
 };
 
 class ConditionDamage: public Condition
 {
 public:
-	//ConditionDamage(ConditionType_t _type, int32_t _ticks, int32_t _damagetype);
-	ConditionDamage(ConditionType_t _type);
+	ConditionDamage(uint32_t _id, ConditionType_t _type);
 	virtual ~ConditionDamage(){};
 	
 	virtual bool startCondition(Creature* creature);
-	virtual void executeCondition(Creature* creature, int32_t interval);
-	virtual void endCondition(Creature* creature, EndCondition_t reason);	
-	virtual void addCondition(Creature* creature, const Condition* condition);	
-	virtual uint8_t getIcons() const;	
+	virtual bool executeCondition(Creature* creature, int32_t interval);
+	virtual void endCondition(Creature* creature, EndCondition_t reason);
+	virtual void addCondition(Creature* creature, const Condition* condition);
+	virtual uint8_t getIcons() const;
+	virtual bool stackable() const {return false;};
 
 	virtual ConditionDamage* clone()  const { return new ConditionDamage(*this); }
 
@@ -123,8 +146,6 @@ protected:
 		int32_t interval;
 	};
 
-	//typedef std::pair<int32_t, int32_t> DamagePair;
-	//std::list<DamagePair> damageList;
 	std::list<DamageInfo> damageList;
 
 	bool getNextDamage(int32_t& damage);
@@ -134,14 +155,15 @@ protected:
 class ConditionSpeed: public Condition
 {
 public:
-	ConditionSpeed(ConditionType_t _type, int32_t _ticks, int32_t changeSpeed);
+	ConditionSpeed(uint32_t _id, ConditionType_t _type, int32_t _ticks, int32_t changeSpeed);
 	virtual ~ConditionSpeed(){};
 	
 	virtual bool startCondition(Creature* creature);
-	virtual void executeCondition(Creature* creature, int32_t interval);
+	virtual bool executeCondition(Creature* creature, int32_t interval);
 	virtual void endCondition(Creature* creature, EndCondition_t reason);	
 	virtual void addCondition(Creature* creature, const Condition* condition);	
-	virtual uint8_t getIcons() const;
+	virtual uint8_t getIcons() const;	
+	virtual bool stackable() const {return false;};
 
 	virtual ConditionSpeed* clone()  const { return new ConditionSpeed(*this); }
 
@@ -154,14 +176,15 @@ protected:
 class ConditionOutfit: public Condition
 {
 public:
-	ConditionOutfit(ConditionType_t _type, int32_t _ticks);
+	ConditionOutfit(uint32_t _id, ConditionType_t _type, int32_t _ticks);
 	virtual ~ConditionOutfit(){};
 	
 	virtual bool startCondition(Creature* creature);
-	virtual void executeCondition(Creature* creature, int32_t interval);
+	virtual bool executeCondition(Creature* creature, int32_t interval);
 	virtual void endCondition(Creature* creature, EndCondition_t reason);	
 	virtual void addCondition(Creature* creature, const Condition* condition);	
 	virtual uint8_t getIcons() const;
+	virtual bool stackable() const {return false;};
 
 	virtual ConditionOutfit* clone()  const { return new ConditionOutfit(*this); }
 
@@ -176,14 +199,15 @@ protected:
 class ConditionLight: public Condition
 {
 public:
-	ConditionLight(int32_t _ticks, int32_t _lightlevel, int32_t _lightcolor);
+	ConditionLight(uint32_t _id, int32_t _ticks, int32_t _lightlevel, int32_t _lightcolor);
 	virtual ~ConditionLight(){};
 	
 	virtual bool startCondition(Creature* creature);
-	virtual void executeCondition(Creature* creature, int32_t interval);
+	virtual bool executeCondition(Creature* creature, int32_t interval);
 	virtual void endCondition(Creature* creature, EndCondition_t reason);	
 	virtual void addCondition(Creature* creature, const Condition* condition);	
 	virtual uint8_t getIcons() const;
+	virtual bool stackable() const {return false;};
 
 	virtual ConditionLight* clone()  const { return new ConditionLight(*this); }
 };

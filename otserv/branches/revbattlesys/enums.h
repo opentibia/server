@@ -43,6 +43,7 @@ enum DamageType_t {
 	DAMAGE_FIRE				= 8,
 	DAMAGE_LIFEDRAIN	= 16,
 	DAMAGE_MANADRAIN	= 32,
+	DAMAGE_UNDEFINED  = 64,
 };
 
 enum CombatParam_t{

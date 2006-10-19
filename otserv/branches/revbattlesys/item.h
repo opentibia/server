@@ -115,15 +115,13 @@ public:
 	uint32_t getOwner();
 
 	void setDuration(uint32_t t);
-	void decreaseDuration(uint32_t );
-	uint32_t getDuration();
+	void decreaseDuration(int32_t );
+	uint32_t getDuration() const;
 
 	void setDecaying(bool decay);
 	bool isDecaying();
 
-private:
-	static std::string emptyString;
-	
+protected:
 	enum itemAttrTypes{
 		ATTR_ITEM_ACTIONID = 1,
 		ATTR_ITEM_UNIQUEID = 2,
@@ -134,6 +132,11 @@ private:
 		ATTR_ITEM_DURATION = 131072,
 		ATTR_ITEM_DECAYING = 262144
 	};
+
+	bool hasAttribute(itemAttrTypes type) const;
+
+private:
+	static std::string emptyString;
 	
 	struct Attribute{
 		itemAttrTypes type;
@@ -175,9 +178,9 @@ public:
 	static Items items;
 
 	// Constructor for items
-	Item(const unsigned short _type);
-	Item(const unsigned short _type, unsigned short _count);
-	Item();
+	Item(const unsigned short _type, unsigned short _count = 0);
+	//Item(const unsigned short _type);
+	//Item();
 	Item(const Item &i);
 
 	virtual ~Item();
@@ -263,15 +266,16 @@ public:
 	void setItemCountOrSubtype(unsigned char n);
 	bool hasSubType() const;
 
-	unsigned char getItemCharge() const {return chargecount;};
-	void setItemCharge(unsigned char n) {chargecount = n;};
+	unsigned char getItemCharge() const {return charges;};
+	void setItemCharge(unsigned char n) {charges = n;};
 
 	unsigned char getFluidType() const {return fluid;};
 	void setFluidType(unsigned char n) {fluid = n;};
 	
 	void setUniqueId(unsigned short n);
 
-	uint32_t getDefaultDuration();
+	void setDefaultDuration();
+	uint32_t getDefaultDuration() const;
 	bool canDecay();
 
 	virtual bool canRemove() const {return true;}
@@ -280,7 +284,7 @@ public:
 protected:
 	unsigned short id;  // the same id as in ItemType
 	unsigned char count; // number of stacked items
-	unsigned char chargecount; //number of charges on the item
+	unsigned char charges; //number of charges on the item
 	unsigned char fluid; //fluid type
 };
 

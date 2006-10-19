@@ -171,6 +171,9 @@ public:
 	
 	Item* getInventoryItem(slots_t slot) const;
 
+	void setItemAbility(slots_t slot, bool enabled);
+	bool isItemAbilityEnabled(slots_t slot);
+
 	Depot* getDepot(uint32_t depotId, bool autoCreateDepot);
 	bool addDepot(Depot* depot, uint32_t depotId);
 	
@@ -265,7 +268,8 @@ public:
 	void sendCreatureTurn(const Creature* creature, uint32_t stackpos);
 	void sendCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text);
 	void sendCreatureSquare(const Creature* creature, SquareColor_t color);
-	void sendCreatureChangeOutfit(const Creature* creature);
+	void sendCreatureChangeOutfit(const Creature* creature, const Outfit_t& outfit);
+	void sendCreatureChangeVisible(const Creature* creature, bool visible);
 	void sendCreatureLight(const Creature* creature);
 	void sendWorldLight(LightInfo& lightInfo);
 
@@ -293,7 +297,7 @@ public:
 
 	//virtual void onCreatureTurn(const Creature* creature, uint32_t stackpos);
 	//virtual void onCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text);
-	//virtual void onCreatureChangeOutfit(const Creature* creature);
+	//virtual void onCreatureChangeOutfit(const Creature* creature, const Outfit_t& outfit);
 
 	//container
 	void onAddContainerItem(const Container* container, const Item* item);
@@ -334,8 +338,8 @@ public:
 
 	virtual void onThink(uint32_t interval);
 
-	virtual void postAddNotification(Thing* thing, int32_t index, bool hasOwnership = true);
-	virtual void postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, bool hadOwnership = true);
+	virtual void postAddNotification(Thing* thing, int32_t index, cylinderlink_t link = LINK_OWNER);
+	virtual void postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, cylinderlink_t link = LINK_OWNER);
 
 	VIPListSet VIPList;
 
@@ -427,10 +431,14 @@ protected:
 	
 	//inventory variables
 	Item* inventory[11];
+	bool inventoryAbilities[11];
 	//Abilities ExtraAbilities;
 	
 	//player advances variables
-	unsigned int skills[SKILL_LAST + 1][3];
+	uint32_t skills[SKILL_LAST + 1][3];
+
+	//extra skill modifiers
+	uint32_t varskills[SKILL_LAST + 1];
 	
 	//reminder: 0 = None, 1 = Sorcerer, 2 = Druid, 3 = Paladin, 4 = Knight
 	static const int CapGain[5];

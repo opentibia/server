@@ -68,10 +68,6 @@ Item* Item::CreateItem(const unsigned short _type, unsigned short _count /*= 1*/
 		}
 
 		newItem->useThing2();
-		
-		if(it.decayTime != 0){
-			newItem->setDuration(it.decayTime * 1000);
-		}
 	}
 
 	return newItem;
@@ -96,27 +92,44 @@ Item* Item::CreateItem(PropStream& propStream)
 	return Item::CreateItem(_id, _count);
 }
 
-Item::Item(const unsigned short _type, unsigned short _count) :
+Item::Item(const unsigned short _type, unsigned short _count /*= 0*/) :
 	ItemAttributes()
 {
-	//std::cout << "Item constructor2 " << this << std::endl;
 	id = _type;
-	count = 0;
-	chargecount = 0;
+	count = 1;
+
+	const ItemType& it = items[id];
+
+	charges = it.charges;
 	fluid = 0;
+
+	if(it.isFluidContainer() || it.isSplash()){
+		fluid = _count;
+	}
+	else if(it.charges != 0){
+		charges = _count;
+	}
+	else if(it.stackable){
+		count = _count;
+	}
+
+	/*
 	setItemCountOrSubtype(_count);
 
-	if(count == 0)
+	if(count == 0){
 		count = 1;
+	}
+	*/
 }
 
+/*
 Item::Item() :
 	ItemAttributes()
 {
 	//std::cout << "Item constructor3 " << this << std::endl;
 	id = 0;
 	count = 1;
-	chargecount = 0;
+	charges = 0;
 	fluid = 0;
 }
 
@@ -126,9 +139,10 @@ Item::Item(const unsigned short _type) :
 	//std::cout << "Item constructor1 " << this << std::endl;
 	id = _type;
 	count = 1;	
-	chargecount = 0;
+	charges = 0;
 	fluid = 0;
 }
+*/
 
 Item::Item(const Item &i) :
 	ItemAttributes()
@@ -136,7 +150,7 @@ Item::Item(const Item &i) :
 	//std::cout << "Item copy constructor " << this << std::endl;
 	id = i.id;
 	count = i.count;
-	chargecount = i.chargecount;
+	charges = i.charges;
 	fluid = i.fluid;
 	
 	unsigned short v;
@@ -188,16 +202,35 @@ void Item::setItemCount(uint8_t n)
 
 unsigned char Item::getItemCountOrSubtype() const
 {
-	if(isFluidContainer() || isSplash())
+	const ItemType& it = items[getID()];
+
+	if(it.isFluidContainer() || it.isSplash()){
 		return fluid;
-	else if(items[id].runeMagLevel != -1)
-		return chargecount;
-	else
+	}
+	//else if(items[id].runeMagLevel != -1)
+	else if(charges != 0){
+		return charges;
+	}
+	else{
 		return count;
+	}
 }
 
 void Item::setItemCountOrSubtype(unsigned char n)
 {
+	const ItemType& it = items[id];
+
+	if(it.isFluidContainer() || it.isSplash()){
+		fluid = n;
+	}
+	else if(it.charges != 0){
+		charges = n;
+	}
+	else{
+		count = n;
+	}
+
+	/*
 	if(isFluidContainer() || isSplash())
 		fluid = n;
 	else if(items[id].runeMagLevel != -1)
@@ -205,6 +238,7 @@ void Item::setItemCountOrSubtype(unsigned char n)
 	else{
 		count = n;
 	}
+	*/
 }
 
 bool Item::hasSubType() const
@@ -212,8 +246,19 @@ bool Item::hasSubType() const
 	const ItemType& it = items[id];
 	return (it.isFluidContainer() || it.isSplash() || it.stackable || it.runeMagLevel != -1);
 }
- 
-uint32_t Item::getDefaultDuration()
+
+void Item::setDefaultDuration()
+{
+	if(!hasAttribute(ATTR_ITEM_DURATION)){
+		uint32_t duration = getDefaultDuration();
+
+		if(duration != 0){
+			setDuration(duration);
+		}
+	}
+}
+
+uint32_t Item::getDefaultDuration() const
 {
 	return items[id].decayTime * 1000;
 }
@@ -707,7 +752,39 @@ std::string Item::getDescription(int32_t lookDistance) const
 					s << "You are too far away to read it.";
 			}
 			else{
-				s << "a " << it.name << ".";
+				s << "a " << it.name;
+
+				if(it.showCharges){
+					uint32_t charges = getItemCharge();
+
+					if(charges > 1){
+						s << " that has " << charges << " charges left";
+					}
+					else{
+						s << " that has " << charges << " charge left";
+					}
+				}
+				if(it.showDuration){
+					uint32_t duration = getDuration() / 1000;
+					if(duration > 0){
+						s << " that has energy for ";
+
+						if(duration >= 120){
+							s << duration / 60 << " minutes left";
+						}
+						else if(duration > 60){
+							s << duration / 60 << " minute left";
+						}
+						else{
+							s << " less than a minute left";
+						}
+					}
+					else{
+						s << std::endl << " that is brand-new";
+					}
+				}
+
+				s << ".";
 			}
 
 			if(lookDistance <= 1){
@@ -866,12 +943,12 @@ void ItemAttributes::setDuration(uint32_t time)
 	setIntAttr(ATTR_ITEM_DURATION, time);
 }
 
-void ItemAttributes::decreaseDuration(uint32_t time)
+void ItemAttributes::decreaseDuration(int32_t time)
 {
 	increaseIntAttr(ATTR_ITEM_DURATION, -time);
 }
 
-uint32_t ItemAttributes::getDuration()
+uint32_t ItemAttributes::getDuration() const
 {
 	return getIntAttr(ATTR_ITEM_DURATION);
 }
@@ -915,6 +992,19 @@ void ItemAttributes::setStrAttr(itemAttrTypes type, const std::string& value)
 		}
 		attr->value = (void*)new std::string(value);
 	}
+}
+
+bool ItemAttributes::hasAttribute(itemAttrTypes type) const
+{
+	if(!validateIntAttrType(type))
+		return false;
+
+	Attribute* attr = getAttr(type);
+	if(attr){
+		return true;
+	}
+
+	return false;
 }
 	
 uint32_t ItemAttributes::getIntAttr(itemAttrTypes type) const

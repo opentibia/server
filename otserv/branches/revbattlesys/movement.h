@@ -57,7 +57,7 @@ public:
 	virtual ~MoveEvents();
 	
 	long onCreatureMove(Creature* creature, Tile* tile, bool isIn);
-	long onPlayerEquip(Player* player, Item* item, long slot, bool isEquip);
+	long onPlayerEquip(Player* player, Item* item, slots_t slot, bool isEquip);
 	long onItemMove(Item* item, Tile* tile, bool isAdd);
 	
 protected:
@@ -81,6 +81,7 @@ protected:
 
 typedef long (StepFunction)(Creature* creature, Item* item, const Position& pos);
 typedef long (MoveFunction)(Item* item, Item* tileItem, const Position& pos);
+typedef long (EquipFunction)(Player* player, Item* item, slots_t slot);
 
 class MoveEvent : public Event
 {
@@ -96,10 +97,13 @@ public:
 
 	long fireStepEvent(Creature* creature, Item* item, const Position& pos);
 	long fireAddRemItem(Item* item, Item* tileItem, const Position& pos);
+	long fireEquip(Player* player, Item* item, slots_t slot);
+
+	slots_t getSlot() const {return slot;}
 
 	//scripting
 	long executeStep(Creature* creature, Item* item, const Position& pos);
-	long executeEquip(Player* player, Item* item, long slot);
+	long executeEquip(Player* player, Item* item, slots_t slot);
 	long executeAddRemItem(Item* item, Item* tileItem, const Position& pos);
 	//
 	
@@ -111,10 +115,14 @@ protected:
 
 	static MoveFunction AddItemField;
 	static MoveFunction RemoveItemField;
+	static EquipFunction EquipItem;
+	static EquipFunction DeEquipItem;
 
 	MoveEvent_t m_eventType;
 	StepFunction* stepFunction;
 	MoveFunction* moveFunction;
+	EquipFunction* equipFunction;
+	slots_t slot;
 	
 };
 

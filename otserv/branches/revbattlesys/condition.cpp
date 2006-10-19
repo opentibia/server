@@ -26,9 +26,10 @@
 
 extern Game g_game;
 
-Condition::Condition(ConditionType_t _type, int32_t _ticks) :
-ticks(_ticks) ,
-conditionType(_type)
+Condition::Condition(uint32_t _id, ConditionType_t _type, int32_t _ticks) :
+id(_id),
+conditionType(_type),
+ticks(_ticks)
 {
 	//
 }
@@ -62,65 +63,64 @@ bool Condition::reduceTicks(int32_t interval)
 	}
 }
 
-void Condition::executeCondition(Creature* creature, int32_t interval)
+bool Condition::executeCondition(Creature* creature, int32_t interval)
 {
-	setTicks(getTicks() - interval);
+	if(ticks != -1){
+		setTicks(getTicks() - interval);
+		return (getTicks() > 0);
+	}
+
+	return true;
 }
 
-Condition* Condition::createCondition(ConditionType_t _type, int32_t _ticks, int32_t param)
+Condition* Condition::createCondition(ConditionType_t _type, int32_t _ticks, int32_t param, uint32_t _id /*= 0*/)
 {
 	switch((int32_t)_type){
-		case CONDITION_NONE:
-		{
-			return NULL;
-			break;
-		}
-
 		case CONDITION_POISON:
 		case CONDITION_FIRE:
 		case CONDITION_ENERGY:
 		{
-			//return new ConditionDamage(_type, _ticks, param);
-			return new ConditionDamage(_type);
+			return new ConditionDamage(_id, _type);
 			break;
 		}
 
 		case CONDITION_HASTE:
 		case CONDITION_PARALYZE:
 		{
-			//param can be positive and negative
-			ConditionType_t speedType;
-
-			if(param >= 0){
-				speedType = CONDITION_HASTE;
-			}
-			else{
-				speedType = CONDITION_PARALYZE;
-			}
-
-			return new ConditionSpeed(speedType, _ticks, param);
+			return new ConditionSpeed(_id, _type, _ticks, param);
 			break;
 		}
 
-		case CONDITION_OUTFIT:
 		case CONDITION_INVISIBLE:
 		{
-			return new ConditionOutfit(_type, _ticks);
+			return new ConditionInvisible(_id, _type, _ticks);
+		}
+
+		//case CONDITION_INVISIBLE:
+		case CONDITION_OUTFIT:
+		{
+			return new ConditionOutfit(_id, _type, _ticks);
 		}
 
 		case CONDITION_LIGHT:
 		{
-			//return new ConditionLight(_ticks, param & 0xFF, (param & 0xFF00) >> 8);
+			//return new ConditionLight(_id, _ticks, param & 0xFF, (param & 0xFF00) >> 8);
 			return NULL;
 			break;
 		}
 
 		case CONDITION_MANASHIELD:
+		{
+			return new ConditionManaShield(_id, _type,_ticks);
+			break;
+		}
+
+		//case CONDITION_MANASHIELD:
 		case CONDITION_INFIGHT:
 		case CONDITION_DRUNK:
 		case CONDITION_EXHAUSTED:
 		{
-			return new ConditionGeneric(_type,_ticks);
+			return new ConditionGeneric(_id, _type,_ticks);
 			break;
 		}
 
@@ -132,8 +132,8 @@ Condition* Condition::createCondition(ConditionType_t _type, int32_t _ticks, int
 	}
 }
 
-ConditionGeneric::ConditionGeneric(ConditionType_t _type, int32_t _ticks) :
-Condition(_type, _ticks)
+ConditionGeneric::ConditionGeneric(uint32_t _id, ConditionType_t _type, int32_t _ticks) :
+Condition(_id, _type, _ticks)
 {
 	//
 }
@@ -143,16 +143,18 @@ bool ConditionGeneric::startCondition(Creature* creature)
 	return true;
 }
 
-void ConditionGeneric::executeCondition(Creature* creature, int32_t interval)
+bool ConditionGeneric::executeCondition(Creature* creature, int32_t interval)
 {
-	Condition::executeCondition(creature, interval);
+	return Condition::executeCondition(creature, interval);
 
+	/*
 	bool bRemove = false;
 	creature->onTickCondition(getType(), bRemove);
 
 	if(bRemove){
 		setTicks(0);
 	}
+	*/
 }
 
 void ConditionGeneric::endCondition(Creature* creature, EndCondition_t reason)
@@ -194,8 +196,8 @@ uint8_t ConditionGeneric::getIcons() const
 	return 0;
 }
 
-ConditionDamage::ConditionDamage(ConditionType_t _type) :
-Condition(_type, 0)
+ConditionDamage::ConditionDamage(uint32_t _id, ConditionType_t _type) :
+Condition(_id, _type, 0)
 {
 	delayed = false;
 	owner = 0;
@@ -257,7 +259,7 @@ bool ConditionDamage::startCondition(Creature* creature)
 	return false;
 }
 
-void ConditionDamage::executeCondition(Creature* creature, int32_t interval)
+bool ConditionDamage::executeCondition(Creature* creature, int32_t interval)
 {
 	if(!damageList.empty()){
 		DamageInfo& damageInfo = damageList.front();		
@@ -283,7 +285,7 @@ void ConditionDamage::executeCondition(Creature* creature, int32_t interval)
 		}
 	}
 
-	Condition::executeCondition(creature, interval);
+	return Condition::executeCondition(creature, interval);
 }
 
 bool ConditionDamage::getNextDamage(int32_t& damage)
@@ -371,8 +373,8 @@ uint8_t ConditionDamage::getIcons() const
 	return 0;
 }
 
-ConditionSpeed::ConditionSpeed(ConditionType_t _type, int32_t _ticks, int32_t changeSpeed) :
-Condition(_type, _ticks)
+ConditionSpeed::ConditionSpeed(uint32_t _id, ConditionType_t _type, int32_t _ticks, int32_t changeSpeed) :
+Condition(_id, _type, _ticks)
 {
 	speedDelta = changeSpeed;
 }
@@ -409,9 +411,9 @@ bool ConditionSpeed::startCondition(Creature* creature)
 	return true;
 }
 
-void ConditionSpeed::executeCondition(Creature* creature, int32_t interval)
+bool ConditionSpeed::executeCondition(Creature* creature, int32_t interval)
 {
-	Condition::executeCondition(creature, interval);
+	return Condition::executeCondition(creature, interval);
 }
 
 void ConditionSpeed::endCondition(Creature* creature, EndCondition_t reason)
@@ -452,31 +454,30 @@ uint8_t ConditionSpeed::getIcons() const
 	return 0;
 }
 
-ConditionOutfit::ConditionOutfit(ConditionType_t _type, int32_t _ticks) :
-Condition(_type, _ticks)
+ConditionInvisible::ConditionInvisible(uint32_t _id, ConditionType_t _type, int32_t _ticks) :
+ConditionGeneric(_id, _type, _ticks)
 {
-	if(_type == CONDITION_INVISIBLE){
-		Outfit_t outfit;
-		outfits.push_back(outfit);
+	//
+}
+
+bool ConditionInvisible::startCondition(Creature* creature)
+{
+	g_game.internalCreatureChangeVisible(creature, false);
+	return true;
+}
+
+void ConditionInvisible::endCondition(Creature* creature, EndCondition_t reason)
+{
+	if(!creature->isInvisible()){
+		g_game.internalCreatureChangeVisible(creature, true);
 	}
 }
 
-/*
-bool ConditionOutfit::setParam(ConditionParam_t param, int32_t value)
+ConditionOutfit::ConditionOutfit(uint32_t _id, ConditionType_t _type, int32_t _ticks) :
+Condition(_id, _type, _ticks)
 {
-	bool ret = Condition::setParam(param, value);
-
-	switch(param){
-		case CONDITIONPARAM_OUTFIT:
-		{
-			//
-			return true;
-		}
-	}
-
-	return ret;
+	//
 }
-*/
 
 void ConditionOutfit::addOutfit(Outfit_t outfit)
 {
@@ -489,9 +490,9 @@ bool ConditionOutfit::startCondition(Creature* creature)
 	return true;
 }
 
-void ConditionOutfit::executeCondition(Creature* creature, int32_t interval)
+bool ConditionOutfit::executeCondition(Creature* creature, int32_t interval)
 {
-	Condition::executeCondition(creature, interval);
+	return Condition::executeCondition(creature, interval);
 }
 
 void ConditionOutfit::changeOutfit(Creature* creature, int32_t index /*= -1*/)
@@ -502,15 +503,13 @@ void ConditionOutfit::changeOutfit(Creature* creature, int32_t index /*= -1*/)
 		}
 
 		Outfit_t outfit = outfits[index];
-		g_game.internalChangeOutfit(creature, outfit);
+		g_game.internalCreatureChangeOutfit(creature, outfit);
 	}
 }
 
 void ConditionOutfit::endCondition(Creature* creature, EndCondition_t reason)
 {
-	if(!creature->isInvisible() || getType() == CONDITION_INVISIBLE){
-		g_game.internalChangeOutfit(creature, creature->getDefaultOutfit());
-	}
+	g_game.internalCreatureChangeOutfit(creature, creature->getDefaultOutfit());
 }
 
 void ConditionOutfit::addCondition(Creature* creature, const Condition* addCondition)

@@ -137,7 +137,7 @@ public:
 	int getStepDuration() const;
 
 	uint32_t getSpeed() const {return baseSpeed + varSpeed;};
-	void setSpeed(uint32_t varSpeedDelta){ varSpeed = varSpeedDelta; }
+	void setSpeed(int32_t varSpeedDelta){ varSpeed = varSpeedDelta; }
 	
 	void setBaseSpeed(uint32_t newBaseSpeed) {baseSpeed = newBaseSpeed;}
 	int getBaseSpeed() {return baseSpeed;}
@@ -147,6 +147,7 @@ public:
 	int32_t getMana() const {return mana;}
 
 	const Outfit_t getCurrentOutfit() const {return currentOutfit;}
+	const void setCurrentOutfit(Outfit_t outfit) {currentOutfit = outfit;}
 	const Outfit_t getDefaultOutfit() const {return defaultOutfit;}
 	bool isInvisible() const {return hasCondition(CONDITION_INVISIBLE);}
 
@@ -187,10 +188,10 @@ public:
 	virtual int getArmor() const {return 0;}
 	virtual int getDefense() const {return 0;}
 
-	bool addCondition(Condition* condition);
-	void removeCondition(ConditionType_t type);
+	bool addCondition(Condition* condition, uint32_t id = 0);
+	void removeCondition(ConditionType_t type, uint32_t id = 0);
 	void executeConditions(int32_t newticks);
-	Condition* getCondition(ConditionType_t type);
+	Condition* getCondition(ConditionType_t type, uint32_t id = 0);
 	bool hasCondition(ConditionType_t type) const;
 	virtual bool isImmune(ConditionType_t type) const;
 	virtual bool isImmune(DamageType_t type) const;
@@ -243,7 +244,9 @@ public:
 	virtual void onCreatureTurn(const Creature* creature, uint32_t stackPos) { };
 	virtual void onCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text) { };
 	
-	virtual void onCreatureChangeOutfit(const Creature* creature) { };
+	virtual void onCreatureChangeOutfit(const Creature* creature, const Outfit_t& outfit) { };
+	virtual void onCreatureInvisible(const Creature* creature) { };
+
 	virtual void getCombatValues(int32_t& min, int32_t& max) {};
 
 protected:	

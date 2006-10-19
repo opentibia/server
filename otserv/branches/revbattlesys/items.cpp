@@ -76,7 +76,7 @@ ItemType::ItemType()
 	defence       = 0;
 	armor         = 0;
 	decayTo       = 0;
-	decayTime     = 60;
+	decayTime     = 0;
 	canDecay      =	true;
 	allowDistRead = false;
 
@@ -87,6 +87,12 @@ ItemType::ItemType()
 	lightLevel    = 0;
 	lightColor    = 0;
 
+	transformTo   = 0;
+	showDuration  = false;
+	showCharges   = false;
+	charges       = 0;
+
+	//fields
 	initialDamage = 0;
 	damageType = DAMAGE_NONE;
 	roundMin = 0;
@@ -313,8 +319,7 @@ int Items::loadFromOtb(std::string file)
 		iType->isHorizontal = ((flags & FLAG_HORIZONTAL) == FLAG_HORIZONTAL);
 		iType->isHangable = ((flags & FLAG_HANGABLE) == FLAG_HANGABLE);
 		iType->allowDistRead = ((flags & FLAG_ALLOWDISTREAD) == FLAG_ALLOWDISTREAD);
-							
-							
+
 		if(type == ITEM_GROUP_WRITEABLE) {
 			iType->RWInfo |= CAN_BE_WRITTEN;
 		}
@@ -605,6 +610,7 @@ int Items::loadFromOtb(std::string file)
 	return ERROR_NONE;
 }
 
+/*
 bool Items::loadFieldsFromXml(const std::string& datadir)
 {
 	std::string filename = datadir + "/" + "fields.xml";
@@ -669,6 +675,154 @@ bool Items::loadFieldsFromXml(const std::string& datadir)
 			}
 			
 			p = p->next;
+		}
+
+		xmlFreeDoc(doc);
+	}
+
+	return true;
+}
+*/
+
+bool Items::loadFromXml(const std::string& datadir)
+{
+	std::string filename = datadir + "/items/items.xml";
+	xmlDocPtr doc = xmlParseFile(filename.c_str());
+	int intValue;
+	std::string strValue;
+	uint32_t id = 0;
+
+	if(doc){
+		xmlNodePtr root = xmlDocGetRootElement(doc);
+		
+		if(xmlStrcmp(root->name,(const xmlChar*)"items") != 0){
+			xmlFreeDoc(doc);
+			return false;
+		}
+
+		xmlNodePtr itemNode = root->children;
+		while(itemNode){
+			if(xmlStrcmp(itemNode->name,(const xmlChar*)"item") == 0){
+				if(readXMLInteger(itemNode, "id", intValue)){
+					id = intValue;
+
+					ItemType& it = Item::items.getItemType(id);
+
+					xmlNodePtr itemAttributesNode = itemNode->children;
+
+					while(itemAttributesNode){
+						if(readXMLString(itemAttributesNode, "key", strValue)){
+							if(strcasecmp(strValue.c_str(), "canDecay") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.canDecay = (intValue != 0);
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "transformTo") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.transformTo = intValue;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "duration") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.decayTime = intValue;
+									it.canDecay = true;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "showduration") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.showDuration = true;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "charges") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.charges = true;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "showcharges") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.showCharges = true;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "invisible") == 0){
+								it.abilities.invisible = true;
+							}
+							else if(strcasecmp(strValue.c_str(), "absorbPercentAll") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.absorbPercentAll = intValue;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "absorbPercentEnergy") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.absorbPercentEnergy = intValue;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "absorbPercentFire") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.absorbPercentFire = intValue;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "absorbPercentLifeDrain") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.absorbPercentLifeDrain = intValue;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "absorbPercentManaDrain") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.absorbPercentManaDrain = intValue;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "absorbPercentPhysical") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.absorbPercentPhysical = intValue;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "absorbPercentPoison") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.absorbPercentPoison = intValue;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "field") == 0){
+								it.group = ITEM_GROUP_MAGICFIELD;
+
+								if(readXMLString(itemAttributesNode, "damageType", strValue)){
+									if(strcasecmp(strValue.c_str(), "fire") == 0){
+										it.damageType = DAMAGE_FIRE;
+									}
+									else if(strcasecmp(strValue.c_str(), "energy") == 0){
+										it.damageType = DAMAGE_ENERGY;
+									}
+									else if(strcasecmp(strValue.c_str(), "poison") == 0){
+										it.damageType = DAMAGE_POISON;
+									}
+								}
+
+								if(readXMLInteger(itemAttributesNode, "initDamage", intValue)){
+									it.initialDamage = -intValue;
+								}
+
+								if(readXMLInteger(itemAttributesNode, "roundMin", intValue)){
+									it.roundMin = intValue;
+								}
+
+								if(readXMLInteger(itemAttributesNode, "roundTime", intValue)){
+									it.roundTime = intValue;
+								}
+
+								if(readXMLInteger(itemAttributesNode, "roundDamage", intValue)){
+									it.roundDamage = -intValue;
+								}
+							}
+						}
+
+						itemAttributesNode = itemAttributesNode->next;
+					}
+				}
+				else{
+					std::cout << "Warning: [Spells::loadFromXml] - No itemid found" << std::endl;
+				}
+			}
+
+			itemNode = itemNode->next;
 		}
 
 		xmlFreeDoc(doc);

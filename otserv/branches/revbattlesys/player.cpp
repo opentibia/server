@@ -88,20 +88,6 @@ Creature()
 	tradeState = TRADE_NONE;
 	tradeItem = NULL;
 
-	for(int i = 0; i < 7; i++){
-		skills[i][SKILL_LEVEL] = 10;
-		skills[i][SKILL_TRIES] = 0;
-		skills[i][SKILL_PERCENT] = 0;
-
-		/*
-		for(int j = 0; j < 2; j++){
-			SkillAdvanceCache[i][j].level = 10;
-			SkillAdvanceCache[i][j].vocation = VOCATION_NONE;
-			SkillAdvanceCache[i][j].tries = 0;
-		}
-		*/
-	}
-
 	lastSentStats.health = 0;
 	lastSentStats.healthMax = 0;
 	lastSentStats.freeCapacity = 0;
@@ -114,35 +100,20 @@ Creature()
 	level_percent = 0;
 	maglevel_percent = 0;
 
-	for(int i = 0; i < 11; i++){
+	for(int32_t i = 0; i < 11; i++){
 		inventory[i] = NULL;
+		inventoryAbilities[i] = false;
 	}
 
-	for(int i = SKILL_FIRST; i < SKILL_LAST; ++i){
+	for(int32_t i = SKILL_FIRST; i <= SKILL_LAST; ++i){
 		skills[i][SKILL_LEVEL]= 10;
 		skills[i][SKILL_TRIES]= 0;
 		skills[i][SKILL_PERCENT] = 0;
 	}
 
-	/*
- 	CapGain[0]  = 10;     //for level advances
- 	CapGain[1]  = 10;     //e.g. Sorcerers will get 10 Cap with each level up
- 	CapGain[2]  = 10;     
- 	CapGain[3]  = 20;
-	CapGain[4]  = 25;
-  
- 	ManaGain[0] = 5;      //for level advances
- 	ManaGain[1] = 30;
- 	ManaGain[2] = 30;
- 	ManaGain[3] = 15;
- 	ManaGain[4] = 5;
-  
-	HPGain[0]   = 5;      //for level advances
- 	HPGain[1]   = 5;
- 	HPGain[2]   = 5;
- 	HPGain[3]   = 10;
- 	HPGain[4]   = 15;  
- 	*/
+	for(int32_t i = SKILL_FIRST; i <= SKILL_LAST; ++i){
+		varskills[0] = 0;
+	}
 
 	maxDepotLimit = 1000;
 
@@ -164,6 +135,7 @@ Player::~Player()
 			inventory[i]->setParent(NULL);
 			inventory[i]->releaseThing2();
 			inventory[i] = NULL;
+			inventoryAbilities[i] = false;
 		}
 	}
 
@@ -262,6 +234,16 @@ Item* Player::getInventoryItem(slots_t slot) const
 		return inventory[slot];
 
 	return NULL;
+}
+
+void Player::setItemAbility(slots_t slot, bool enabled)
+{
+	inventoryAbilities[slot] = enabled;
+}
+
+bool Player::isItemAbilityEnabled(slots_t slot)
+{
+	return inventoryAbilities[slot];
 }
 
 bool Player::getCombatItem(Item** tool, const Weapon** weapon)
@@ -423,7 +405,13 @@ int Player::getPlayerInfo(playerinfo_t playerinfo) const
 
 int Player::getSkill(skills_t skilltype, skillsid_t skillinfo) const
 {
-	return skills[skilltype][skillinfo];
+	int32_t n = skills[skilltype][skillinfo];
+
+	if(skillinfo == SKILL_LEVEL){
+		n += varskills[skilltype];
+	}
+
+	return n;
 }
 
 std::string Player::getSkillName(int skillid)
@@ -962,9 +950,19 @@ void Player::sendCreatureTurn(const Creature* creature, uint32_t stackPos)
   client->sendCreatureTurn(creature, stackPos);
 }
 
-void Player::sendCreatureChangeOutfit(const Creature* creature)
+void Player::sendCreatureChangeOutfit(const Creature* creature, const Outfit_t& outfit)
 {
-	client->sendSetOutfit(creature);
+	client->sendCreatureOutfit(creature, outfit);
+}
+
+void Player::sendCreatureChangeVisible(const Creature* creature, bool visible)
+{
+	if(visible){
+		client->sendCreatureOutfit(creature, creature->getCurrentOutfit());
+	}
+	else{
+		client->sendCreatureInvisible(creature);
+	}
 }
 
 void Player::sendCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text)
@@ -1144,7 +1142,7 @@ void Player::onCreatureTurn(const Creature* creature, uint32_t stackPos)
   //
 }
 
-void Player::onCreatureChangeOutfit(const Creature* creature)
+void Player::onCreatureChangeOutfit(const Creature* creature, const Outfit_t& outfit)
 {
 	//
 }
@@ -1224,6 +1222,8 @@ void Player::onUpdateInventoryItem(slots_t slot, Item* oldItem, Item* newItem)
 
 void Player::onRemoveInventoryItem(slots_t slot, Item* item)
 {
+	setItemAbility(slot, false);
+
 	if(tradeState != TRADE_TRANSFER){
 		checkTradeState(item);
 
@@ -1433,34 +1433,38 @@ BlockType_t Player::blockHit(Creature* attacker, DamageType_t damageType, int32_
 	//reduce damage against inventory items
 	Item* item = NULL;
 	for(int slot = SLOT_FIRST; slot < SLOT_LAST; ++slot){
+		if(!isItemAbilityEnabled((slots_t)slot)){
+			continue;
+		}
+
 		if(!(item = getInventoryItem((slots_t)slot)))
 			continue;
 
 		const ItemType& it = Item::items[item->getID()];
 
 		if(it.abilities.absorbPercentAll != 0){
-			absorbedDamage += (it.abilities.absorbPercentAll / 100) * damage;
+			absorbedDamage += (int32_t)((((double)it.abilities.absorbPercentAll) / 100) * damage);
 		}
 
 		switch(damageType){
 			case DAMAGE_PHYSICAL:
-				absorbedDamage += (it.abilities.absorbPercentPhysical / 100) * damage;
+				absorbedDamage += (int32_t)((((double)it.abilities.absorbPercentPhysical) / 100) * damage);
 				break;
 
 			case DAMAGE_FIRE:
-				absorbedDamage = (it.abilities.absorbPercentFire / 100) * damage;
+				absorbedDamage += (int32_t)((((double)it.abilities.absorbPercentFire) / 100) * damage);
 				break;
 
 			case DAMAGE_ENERGY:
-				absorbedDamage = (it.abilities.absorbPercentEnergy / 100) * damage;
+				absorbedDamage += (int32_t)((((double)it.abilities.absorbPercentEnergy) / 100) * damage);
 				break;
 
 			case DAMAGE_POISON:
-				absorbedDamage = (it.abilities.absorbPercentPoison / 100) * damage;
+				absorbedDamage += (int32_t)((((double)it.abilities.absorbPercentPoison) / 100) * damage);
 				break;
 
 			case DAMAGE_LIFEDRAIN:
-				absorbedDamage = (it.abilities.absorbPercentLifeDrain / 100) * damage;
+				absorbedDamage += (int32_t)(((double)it.abilities.absorbPercentLifeDrain) / 100) * damage;
 				break;
 
 			default:
@@ -1468,8 +1472,6 @@ BlockType_t Player::blockHit(Creature* attacker, DamageType_t damageType, int32_
 		}
 	
 		if(absorbedDamage != 0){
-			damage -= absorbedDamage;
-
 			int32_t charges = item->getItemCharge();
 
 			if(charges != 0){
@@ -1479,7 +1481,10 @@ BlockType_t Player::blockHit(Creature* attacker, DamageType_t damageType, int32_
 	}
 
 	damage -= absorbedDamage;
-	damage = std::max((int32_t)0, damage);
+	if(damage <= 0){
+		damage = 0;
+		blockType = BLOCK_DEFENSE;
+	}
 
 	return blockType;
 }
@@ -2287,12 +2292,14 @@ Thing* Player::__getThing(uint32_t index) const
 	return NULL;
 }
 
-void Player::postAddNotification(Thing* thing, int32_t index, bool hasOwnership /*= true*/)
+void Player::postAddNotification(Thing* thing, int32_t index, cylinderlink_t link /*= LINK_OWNER*/)
 {
-	if(hasOwnership){
+	if(link == LINK_OWNER){
 		//calling movement scripts
-		g_moveEvents->onPlayerEquip(this, thing->getItem(), index, true);
+		g_moveEvents->onPlayerEquip(this, thing->getItem(), (slots_t)index, true);
+	}
 
+	if(link == LINK_OWNER || link == LINK_TOPPARENT){
 		updateItemsLight();
 		updateInventoryWeigth();
 		client->sendStats();
@@ -2320,12 +2327,14 @@ void Player::postAddNotification(Thing* thing, int32_t index, bool hasOwnership 
 	}
 }
 
-void Player::postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, bool hadOwnership /*= true*/)
+void Player::postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, cylinderlink_t link /*= LINK_OWNER*/)
 {
-	if(hadOwnership){
+	if(link == LINK_OWNER){
 		//calling movement scripts
-		g_moveEvents->onPlayerEquip(this, thing->getItem(), index, false);
+		g_moveEvents->onPlayerEquip(this, thing->getItem(), (slots_t)index, false);
+	}
 
+	if(link == LINK_OWNER || link == LINK_TOPPARENT){
 		updateItemsLight();
 		updateInventoryWeigth();
 		client->sendStats();
