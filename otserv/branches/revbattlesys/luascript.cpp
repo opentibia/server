@@ -1285,7 +1285,7 @@ int LuaScriptInterface::luaDoSendCancel(lua_State *L)
 	
 	ScriptEnviroment* env = getScriptEnv();
 	
-	Player* player = env->getPlayerByUID(cid);
+	const Player* player = env->getPlayerByUID(cid);
 	if(player){
 		player->sendCancel(text);
 		lua_pushnumber(L, LUA_NO_ERROR);
@@ -1524,7 +1524,7 @@ int LuaScriptInterface::luaDoPlayerSendTextMessage(lua_State *L)
 	
 	ScriptEnviroment* env = getScriptEnv();
 	
-	Player* player = env->getPlayerByUID(cid);
+	const Player* player = env->getPlayerByUID(cid);
 	if(player){
 		player->sendTextMessage((MessageClasses)messageClass,text);
 		lua_pushnumber(L, LUA_NO_ERROR);
@@ -1566,7 +1566,7 @@ int LuaScriptInterface::luaGetPlayerSkill(lua_State *L)
 	
 	ScriptEnviroment* env = getScriptEnv();
 	
-	Player* player = env->getPlayerByUID(cid);
+	const Player* player = env->getPlayerByUID(cid);
 	if(player){
 		if(skillid > 6){
 			reportErrorFunc("No valid skillId");
@@ -1621,7 +1621,7 @@ int LuaScriptInterface::luaGetItemRWInfo(lua_State *L)
 	
 	ScriptEnviroment* env = getScriptEnv();
 	
-	Item* item = env->getItemByUID(uid);
+	const Item* item = env->getItemByUID(uid);
 	if(item){
 		int maxlen;
 		lua_pushnumber(L, (int)(item->getRWInfo(maxlen)));
@@ -1755,7 +1755,7 @@ int LuaScriptInterface::luaGetPlayerStorageValue(lua_State *L)
 	
 	ScriptEnviroment* env = getScriptEnv();
 	
-	Player* player = env->getPlayerByUID(cid);
+	const Player* player = env->getPlayerByUID(cid);
 	if(player){
 		long value;
 		if(player->getStorageValue(key,value)){
@@ -2050,7 +2050,7 @@ int LuaScriptInterface::luaGetPlayerItemCount(lua_State *L)
 	
 	ScriptEnviroment* env = getScriptEnv();
 	
-	Player* player = env->getPlayerByUID(cid);
+	const Player* player = env->getPlayerByUID(cid);
 	if(player){
 		long n = player->__getItemTypeCount(itemId);
 		lua_pushnumber(L, n);
@@ -2184,7 +2184,7 @@ int LuaScriptInterface::luaGetPlayerLight(lua_State *L)
 	unsigned long cid = (unsigned long)popNumber(L);
 	
 	ScriptEnviroment* env = getScriptEnv();
-	Player* player = env->getPlayerByUID(cid);
+	const Player* player = env->getPlayerByUID(cid);
 	if(player){
 		LightInfo lightInfo;
 		player->getCreatureLight(lightInfo);
@@ -2230,7 +2230,7 @@ int LuaScriptInterface::luaGetPlayerSlotItem(lua_State *L)
 	unsigned long cid = (unsigned long)popNumber(L);
 	
 	ScriptEnviroment* env = getScriptEnv();
-	Player* player = env->getPlayerByUID(cid);
+	const Player* player = env->getPlayerByUID(cid);
 	if(player){
 		Thing* thing = player->__getThing(slot);
 		if(thing){
@@ -3071,7 +3071,7 @@ int LuaScriptInterface::luaGetPlayerDepotItems(lua_State *L)
 	ScriptEnviroment* env = getScriptEnv();
 	Player* player = env->getPlayerByUID(cid);
 	if(player){
-		Depot* depot = player->getDepot(depotid, false);
+		const Depot* depot = player->getDepot(depotid, false);
 		if(depot){
 			lua_pushnumber(L, depot->getItemHoldingCount());
 		}

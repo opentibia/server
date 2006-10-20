@@ -87,9 +87,9 @@ public:
 
 private:
 	int32_t thinkTicks;
-	int32_t yellTicks;
-	int32_t attackTicks;
-	int32_t defenseTicks;
+	uint32_t yellTicks;
+	uint32_t attackTicks;
+	uint32_t defenseTicks;
 	std::string strDescription;
 	bool needThink;
 	bool targetIsRecentAdded;

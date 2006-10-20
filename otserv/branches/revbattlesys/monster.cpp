@@ -443,7 +443,7 @@ void Monster::doAttacking(uint32_t interval)
 			continue;
 		}
 
-		if(it->range != 0 && std::max(std::abs(myPos.x - targetPos.x), std::abs(myPos.y - targetPos.y)) > it->range){
+		if(it->range != 0 && std::max(std::abs(myPos.x - targetPos.x), std::abs(myPos.y - targetPos.y)) > (int32_t)it->range){
 			continue;
 		}
 
@@ -495,7 +495,7 @@ void Monster::onDefending(uint32_t interval)
 		}
 	}
 
-	if(summons.size() < mType->maxSummons){
+	if((int32_t)summons.size() < mType->maxSummons){
 		for(SummonList::iterator it = mType->summonList.begin(); it != mType->summonList.end(); ++it){
 			if(it->speed > defenseTicks){
 				resetTicks = false;

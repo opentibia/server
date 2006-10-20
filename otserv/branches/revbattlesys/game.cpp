@@ -2467,7 +2467,7 @@ bool Game::getPathToEx(const Creature* creature, const Position& targetPos, uint
 
 	int32_t tryDist = maxDist;
 
-	while(tryDist >= minDist){
+	while(tryDist >= (int32_t)minDist){
 		for(int y = targetPos.y - dyMin; y <= targetPos.y + dyMax; ++y) {
 			for(int x = targetPos.x - dxMin; x <= targetPos.x + dxMax; ++x) {
 
