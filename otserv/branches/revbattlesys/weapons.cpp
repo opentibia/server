@@ -403,9 +403,7 @@ void Weapon::onUsedWeapon(Player* player, Item* item, Tile* destTile) const
 
 	if(exhaustion && Weapons::weaponExhaustionTime != 0){
 		Condition* condition = Condition::createCondition(CONDITION_EXHAUSTED, Weapons::weaponExhaustionTime, 0);
-		if(!player->addCondition(condition)){
-			delete condition;
-		}
+		player->addCondition(condition);
 	}
 
 	if(mana > 0){

@@ -31,7 +31,10 @@ id(_id),
 ticks(_ticks),
 conditionType(_type)
 {
-	//
+	mina = 0.0;
+	minb = 0.0;
+	maxa = 0.0;
+	maxb = 0.0;
 }
 
 bool Condition::setParam(ConditionParam_t param, int32_t value)
@@ -50,6 +53,20 @@ bool Condition::setParam(ConditionParam_t param, int32_t value)
 	}
 
 	return false;
+}
+
+void Condition::setFormulaVars(double _mina, double _minb, double _maxa, double _maxb)
+{
+	mina = _mina;
+	minb = _minb;
+	maxa = _maxa;
+	maxb = _maxb;
+}
+
+void Condition::getFormulaValues(int32_t var, int32_t& min, int32_t& max) const
+{
+	min = (var * 1. * mina + minb);
+	max = (var * 1. * maxa + maxb);
 }
 
 bool Condition::reduceTicks(int32_t interval)
@@ -407,6 +424,13 @@ bool ConditionSpeed::setParam(ConditionParam_t param, int32_t value)
 
 bool ConditionSpeed::startCondition(Creature* creature)
 {
+	if(speedDelta == 0){
+		int32_t min;
+		int32_t max;
+		getFormulaValues(creature->getBaseSpeed(), min, max);
+		speedDelta = random_range(min, max);
+	}
+
 	g_game.changeSpeed(creature, speedDelta);
 	return true;
 }
@@ -431,6 +455,13 @@ void ConditionSpeed::addCondition(Creature* creature, const Condition* addCondit
 		ConditionSpeed conditionSpeed = static_cast<const ConditionSpeed&>(*addCondition);
 		int32_t oldSpeedDelta = speedDelta;
 		speedDelta = conditionSpeed.speedDelta;
+
+		if(speedDelta == 0){
+			int32_t min;
+			int32_t max;
+			getFormulaValues(creature->getBaseSpeed(), min, max);
+			speedDelta = random_range(min, max);
+		}
 		
 		g_game.changeSpeed(creature, (speedDelta - oldSpeedDelta));
 	}

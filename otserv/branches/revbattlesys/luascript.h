@@ -384,6 +384,7 @@ protected:
 
 	static int luaSetCombatCallBack(lua_State *L);
 	static int luaSetCombatFormula(lua_State *L);
+	static int luaSetConditionFormula(lua_State *L);
 	static int luaDoCombat(lua_State *L);
 
 	static int luaDoAreaCombatHealth(lua_State *L);

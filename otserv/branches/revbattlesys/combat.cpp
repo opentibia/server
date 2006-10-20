@@ -36,6 +36,12 @@ Combat::Combat(CombatType_t _type)
 	area = NULL;
 	callback = NULL;
 	combatType = _type;
+
+	formulaType = FORMULA_UNDEFINED;
+	mina = 0.0;
+	minb = 0.0;
+	maxa = 0.0;
+	maxb = 0.0;
 }
 
 Combat::~Combat()
@@ -56,10 +62,10 @@ void Combat::getMinMaxValues(Creature* creature, int32_t& min, int32_t& max) con
 			callback->getMinMaxValues(player, min, max);
 		}
 		else{
-			switch(formula.type){
-				case COMBAT_FORMULA_LEVELMAGIC:
-					max = (int32_t)((player->getLevel() * 2 + player->getMagicLevel() * 3) * 1. * formula.mina + formula.minb);
-					min = (int32_t)((player->getLevel() * 2 + player->getMagicLevel() * 3) * 1. * formula.maxa + formula.maxb);
+			switch(formulaType){
+				case FORMULA_LEVELMAGIC:
+					max = (int32_t)((player->getLevel() * 2 + player->getMagicLevel() * 3) * 1. * mina + minb);
+					min = (int32_t)((player->getLevel() * 2 + player->getMagicLevel() * 3) * 1. * maxa + maxb);
 					break;
 
 				default:
@@ -141,13 +147,13 @@ void Combat::setCondition(const Condition* _condition)
 	params.condition = _condition->clone();
 }
 
-void Combat::setPlayerCombatValues(CombatFormulaType type, double mina, double minb, double maxa, double maxb)
+void Combat::setPlayerCombatValues(formulaType_t _type, double _mina, double _minb, double _maxa, double _maxb)
 {
-	formula.type = type;
-	formula.mina = mina;
-	formula.minb = minb;
-	formula.maxa = maxa;
-	formula.maxb = maxb;
+	formulaType = _type;
+	mina = _mina;
+	minb = _minb;
+	maxa = _maxa;
+	maxb = _maxb;
 }
 
 bool Combat::setParam(CombatParam_t param, uint32_t value)
@@ -220,12 +226,12 @@ bool Combat::setCallback(CombatParam_t key)
 {
 	switch(key){
 		case COMBATPARAM_LEVELMAGICVALUECALLBACK:
-			callback = new CombatCallBack(COMBAT_FORMULA_LEVELMAGIC);
+			callback = new CombatCallBack(FORMULA_LEVELMAGIC);
 			return true;
 			break;
 
 		case COMBATPARAM_SKILLVALUECALLBACK:
-			callback = new CombatCallBack(COMBAT_FORMULA_SKILL);
+			callback = new CombatCallBack(FORMULA_SKILL);
 			return true;
 			break;
 
@@ -493,7 +499,7 @@ void Combat::postCombatEffects(Creature* caster, const Position& pos, bool succe
 }
 
 
-CombatCallBack::CombatCallBack(CombatFormulaType _type)
+CombatCallBack::CombatCallBack(formulaType_t _type)
 {
 	type = _type;
 }
@@ -516,7 +522,7 @@ void CombatCallBack::getMinMaxValues(Player* player, int32_t& min, int32_t& max)
 	int32_t parameters = 1;
 
 	switch(type){
-		case COMBAT_FORMULA_LEVELMAGIC:
+		case FORMULA_LEVELMAGIC:
 			//"onGetPlayerMinMaxValues"(cid, level, maglevel)
 			lua_pushnumber(L, player->getLevel());
 			lua_pushnumber(L, player->getMagicLevel());
@@ -524,7 +530,7 @@ void CombatCallBack::getMinMaxValues(Player* player, int32_t& min, int32_t& max)
 			break;
 
 		/*
-		case COMBAT_FORMULA_SKILL:
+		case FORMULA_SKILL:
 			lua_pushnumber(L, player->getSkill(x, SKILL_LEVEL));
 			lua_pushnumber(L, (int32_t)minb);
 			parameters += 2;

@@ -99,6 +99,7 @@ protected:
 	int32_t soul;
 	bool exhaustion;
 	bool needTarget;
+	bool selfTarget;
 	bool blocking;
 	bool isAggressive;
 

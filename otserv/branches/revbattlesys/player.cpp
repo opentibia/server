@@ -366,7 +366,7 @@ void Player::sendIcons() const
 		icons |= (*it)->getIcons();
 	}
 
-	client->sendIcons(icons);             
+	client->sendIcons(icons);
 }
 
 void Player::updateInventoryWeigth()

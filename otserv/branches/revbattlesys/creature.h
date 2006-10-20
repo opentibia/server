@@ -136,7 +136,7 @@ public:
 	int64_t getEventStepTicks() const;
 	int getStepDuration() const;
 
-	uint32_t getSpeed() const {return baseSpeed + varSpeed;};
+	uint32_t getSpeed() const {int32_t n = baseSpeed + varSpeed; return std::max(n, (int32_t)1);}
 	void setSpeed(int32_t varSpeedDelta){ varSpeed = varSpeedDelta; }
 	
 	void setBaseSpeed(uint32_t newBaseSpeed) {baseSpeed = newBaseSpeed;}
@@ -188,10 +188,10 @@ public:
 	virtual int getArmor() const {return 0;}
 	virtual int getDefense() const {return 0;}
 
-	bool addCondition(Condition* condition, uint32_t id = 0);
+	bool addCondition(Condition* condition);
 	void removeCondition(ConditionType_t type, uint32_t id = 0);
 	void executeConditions(int32_t newticks);
-	Condition* getCondition(ConditionType_t type, uint32_t id = 0);
+	//Condition* getCondition(ConditionType_t type, uint32_t id = 0);
 	bool hasCondition(ConditionType_t type) const;
 	virtual bool isImmune(ConditionType_t type) const;
 	virtual bool isImmune(DamageType_t type) const;

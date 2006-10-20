@@ -98,7 +98,7 @@ struct Abilities{
 	//extra skill modifiers
 	uint32_t skills[SKILL_LAST + 1];
 
-	uint32_t speed;
+	int32_t speed;
 	bool manaShield;
 	bool invisible;
 	uint32_t conditionImmunities;

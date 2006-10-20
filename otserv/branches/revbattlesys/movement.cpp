@@ -463,11 +463,16 @@ long MoveEvent::EquipItem(Player* player, Item* item, slots_t slot)
 		player->addCondition(condition);
 	}
 
-	/*
+	if(iit.abilities.manaShield){
+		Condition* condition = Condition::createCondition(CONDITION_MANASHIELD, -1, 0, slot);
+		player->addCondition(condition);
+	}
+
 	if(iit.abilities.speed != 0){
 		g_game.changeSpeed(player, iit.abilities.speed);
 	}
 
+	/*
 	//skill modifiers
 	for(int32_t i = SKILL_FIRST; i <= SKILL_LAST; ++i){
 		player->varskills[i] += iit.abilities.skills[i];
@@ -492,11 +497,15 @@ long MoveEvent::DeEquipItem(Player* player, Item* item, slots_t slot)
 		player->removeCondition(CONDITION_INVISIBLE, slot);
 	}
 
-	/*
-	if(it.abilities.speed != 0){
-		g_game.changeSpeed(player, -iit.abilities.speed);
+	if(it.abilities.manaShield){
+		player->removeCondition(CONDITION_MANASHIELD, slot);
 	}
 
+	if(it.abilities.speed != 0){
+		g_game.changeSpeed(player, -it.abilities.speed);
+	}
+
+	/*
 	//skill modifiers
 	for(int32_t i = SKILL_FIRST; i <= SKILL_LAST; ++i){
 		player->varskills[i] -= it.abilities.skills[i];

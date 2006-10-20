@@ -204,6 +204,7 @@ Spell::Spell()
 	soul = 0;
 	exhaustion = false;
 	needTarget = false;
+	selfTarget = false;
 	blocking = false;
 	premium = false;
 	enabled = true;
@@ -253,6 +254,10 @@ bool Spell::configureSpell(xmlNodePtr p)
 
 	if(readXMLInteger(p, "needtarget", intValue)){
 		needTarget = (intValue == 1);
+	}
+
+	if(readXMLInteger(p, "selftarget", intValue)){
+		selfTarget = (intValue == 1);
 	}
 
 	if(readXMLInteger(p, "blocking", intValue)){
@@ -418,19 +423,15 @@ void Spell::postCastSpell(Player* player)
 
 	if(exhaustion){
 		Condition* condition = Condition::createCondition(CONDITION_EXHAUSTED, Spells::spellExhaustionTime, 0);
-		if(!player->addCondition(condition)){
-			delete condition;
-		}
+		player->addCondition(condition);
 	}
 	
 	if(isAggressive && Spells::spellInFightTime != 0){
 		Condition* condition = Condition::createCondition(CONDITION_INFIGHT, Spells::spellInFightTime, 0);
-		if(!player->addCondition(condition)){
-			delete condition;
-		}
+		player->addCondition(condition);
 	}
 
-	//TODO
+	//TODO: reduce soul
 	/*
 	if(soul > 0){
 		player->changeSoul(-soul);
@@ -544,7 +545,11 @@ bool InstantSpell::playerCastInstant(Player* player, const std::string& param)
 
 	LuaVariant var;
 
-	if(needTarget){
+	if(selfTarget){
+		var.type = VARIANT_NUMBER;
+		var.number = player->getID();
+	}
+	else if(needTarget){
 		Player* target = g_game.getPlayerByName(param);
 		if(!target){
 			player->sendTextMessage(MSG_STATUS_SMALL, "A player with this name is not online.", player->getPosition(), NM_ME_PUFF);

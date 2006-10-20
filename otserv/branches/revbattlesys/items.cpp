@@ -746,6 +746,16 @@ bool Items::loadFromXml(const std::string& datadir)
 							else if(strcasecmp(strValue.c_str(), "invisible") == 0){
 								it.abilities.invisible = true;
 							}
+							else if(strcasecmp(strValue.c_str(), "speed") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.speed = intValue;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "manashield") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.manaShield = true;
+								}
+							}
 							else if(strcasecmp(strValue.c_str(), "absorbPercentAll") == 0){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.absorbPercentAll = intValue;

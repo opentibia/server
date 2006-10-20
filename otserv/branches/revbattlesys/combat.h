@@ -34,12 +34,7 @@ class Creature;
 class Position;
 class Item;
 
-enum CombatFormulaType{
-	COMBAT_FORMULA_UNDEFINED = 0,
-	COMBAT_FORMULA_LEVELMAGIC,
-	COMBAT_FORMULA_SKILL,
-};
-
+/*
 struct CombatFormula_t{
 	CombatFormula_t(){
 		type = COMBAT_FORMULA_UNDEFINED;
@@ -49,21 +44,22 @@ struct CombatFormula_t{
 		maxb = 0.0;
 	}
 
-	CombatFormulaType type;
+	CombatFormula_t type;
 	double mina;
 	double minb;
 	double maxa;
 	double maxb;
 };
+*/
 
 //for luascript callback
 class CombatCallBack : public CallBack{
 public:
-	CombatCallBack(CombatFormulaType _type);
+	CombatCallBack(formulaType_t _type);
 	void getMinMaxValues(Player* player, int32_t& min, int32_t& max) const;
 
 protected:
-	CombatFormulaType type;
+	formulaType_t type;
 };
 
 struct CombatParams{
@@ -131,7 +127,7 @@ public:
 	void setArea(const AreaCombat* _area);
 	bool hasArea() const {return area != NULL;}
 	void setCondition(const Condition* _condition);
-	void setPlayerCombatValues(CombatFormulaType type, double mina, double minb, double maxa, double maxb);
+	void setPlayerCombatValues(formulaType_t _type, double _mina, double _minb, double _maxa, double _maxb);
 	void postCombatEffects(Creature* caster, const Position& pos, bool success) const;
 
 protected:
@@ -150,7 +146,13 @@ protected:
 	//configureable
 	CombatType_t combatType;
 	CombatParams params;
-	CombatFormula_t formula;
+
+	//formula variables
+	formulaType_t formulaType;
+	double mina;
+	double minb;
+	double maxa;
+	double maxb;
 
 	AreaCombat* area;
 	CombatCallBack* callback;

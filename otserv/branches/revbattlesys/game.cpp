@@ -2596,10 +2596,6 @@ void Game::changeSpeed(Creature* creature, int32_t varSpeedDelta)
 	int32_t varSpeed = creature->getSpeed() - creature->getBaseSpeed();
 	varSpeed += varSpeedDelta;
 
-	if(varSpeed + creature->getBaseSpeed() < 0){
-		varSpeed = -creature->getBaseSpeed();
-	}
-
 	creature->setSpeed(varSpeed);
 
 	SpectatorVec list;
@@ -2769,12 +2765,14 @@ bool Game::combatChangeHealth(DamageType_t damageType, Creature* attacker, Creat
 				int32_t manaDamage = std::min(target->getMana(), damage);
 				damage = std::max((int32_t)0, damage - manaDamage);
 
-				target->drainMana(attacker, manaDamage);
-				
-				std::stringstream ss;
-				ss << manaDamage;
-				addMagicEffect(list, targetPos, NM_ME_LOOSE_ENERGY);
-				addAnimatedText(list, targetPos, TEXTCOLOR_BLUE, ss.str());
+				if(manaDamage != 0){
+					target->drainMana(attacker, manaDamage);
+					
+					std::stringstream ss;
+					ss << manaDamage;
+					addMagicEffect(list, targetPos, NM_ME_LOOSE_ENERGY);
+					addAnimatedText(list, targetPos, TEXTCOLOR_BLUE, ss.str());
+				}
 			}
 
 			damage = std::min(target->getHealth(), damage);

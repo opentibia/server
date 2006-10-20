@@ -75,11 +75,20 @@ public:
 	static Condition* createCondition(ConditionType_t _type, int32_t ticks, int32_t param, uint32_t _id = 0);
 
 	virtual bool setParam(ConditionParam_t param, int32_t value);
+	void setFormulaVars(double _mina, double _minb, double _maxa, double _maxb);
 
 protected:
+	void Condition::getFormulaValues(int32_t var, int32_t& min, int32_t& max) const;
+
 	uint32_t id;
 	int32_t ticks;
 	ConditionType_t conditionType;
+
+	//formula variables
+	double mina;
+	double minb;
+	double maxa;
+	double maxb;
 };
 
 class ConditionGeneric: public Condition
@@ -101,7 +110,7 @@ public:
 class ConditionManaShield : public ConditionGeneric
 {
 public:
-	ConditionManaShield(uint32_t _id, ConditionType_t _type, int32_t _ticks) : ConditionGeneric(_id, _type, ticks) {};
+	ConditionManaShield(uint32_t _id, ConditionType_t _type, int32_t _ticks) : ConditionGeneric(_id, _type, _ticks) {};
 	virtual ~ConditionManaShield(){};
 	virtual bool stackable() const {return true;};
 };

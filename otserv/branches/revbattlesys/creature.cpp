@@ -125,8 +125,10 @@ void Creature::onWalk()
 		}
 	}
 
-	eventWalk = 0;
-	addEventWalk();
+	if(eventWalk != 0){
+		eventWalk = 0;
+		addEventWalk();
+	}
 }
 
 void Creature::onWalk(Direction& dir)
@@ -145,25 +147,23 @@ void Creature::onWalk(Direction& dir)
 					break;
 			}
 
-			g_game.addAnimatedText(getPosition(), TEXTCOLOR_ORANGE, "Hicks!");
+			g_game.internalCreatureSay(this, SPEAK_SAY, "Hicks!");
 		}
 	}
 }
 
 bool Creature::getNextStep(Direction& dir)
 {
-	bool result = false;
-
 	if(!listWalkDir.empty()){
 		Position pos = getPosition();
 		dir = listWalkDir.front();
 		listWalkDir.pop_front();
 		onWalk(dir);
 
-		result = true;
+		return true;
 	}
 
-	return result;
+	return false;
 }
 
 bool Creature::startAutoWalk(std::list<Direction>& listDir)
@@ -506,6 +506,9 @@ void Creature::onAddCondition(ConditionType_t type)
 	if(type == CONDITION_PARALYZE && hasCondition(CONDITION_HASTE)){
 		removeCondition(CONDITION_HASTE);
 	}
+	else if(type == CONDITION_HASTE && hasCondition(CONDITION_PARALYZE)){
+		removeCondition(CONDITION_PARALYZE);
+	}
 }
 
 void Creature::onEndCondition(ConditionType_t type)
@@ -594,14 +597,21 @@ void Creature::removeSummon(const Creature* creature)
 	}
 }
 
-bool Creature::addCondition(Condition* condition, uint32_t id /*= 0*/)
+bool Creature::addCondition(Condition* condition)
 {
 	if(condition == NULL){
 		return false;
 	}
 	
-	Condition* prevCond = getCondition(condition->getType(), id);
-	
+	//Condition* prevCond = getCondition(condition->getType(), condition->getId());
+	Condition* prevCond = NULL;
+	for(ConditionList::iterator it = conditions.begin(); it != conditions.end(); ++it){
+		if(condition->getType() == (*it)->getType() && condition->getId() == (*it)->getId()){
+			prevCond = *it;
+			break;
+		}
+	}
+
 	if(prevCond){
 		prevCond->addCondition(this, condition);
 		delete condition;
@@ -609,9 +619,12 @@ bool Creature::addCondition(Condition* condition, uint32_t id /*= 0*/)
 	else{
 		if(condition->startCondition(this)){
 			conditions.push_back(condition);
+			onAddCondition(condition->getType());
 		}
-
-		onAddCondition(condition->getType());
+		else{
+			delete condition;
+			return false;
+		}
 	}
 
 	return true;
@@ -619,16 +632,20 @@ bool Creature::addCondition(Condition* condition, uint32_t id /*= 0*/)
 
 void Creature::removeCondition(ConditionType_t type, uint32_t id /*= 0*/)
 {
-	for(ConditionList::iterator it = conditions.begin(); it != conditions.end(); ++it){
+	for(ConditionList::iterator it = conditions.begin(); it != conditions.end();){
 		if((*it)->getType() == type && (id == 0 || (*it)->getId())){
-			Condition* condition = *it;
-			conditions.erase(it);
+			//TODO: check if we can remove this condition
 
-			(*it)->endCondition(this, REASON_ABORT);
+			Condition* condition = *it;
+			it = conditions.erase(it);
+
+			condition->endCondition(this, REASON_ABORT);
 			delete condition;
 
 			onEndCondition(type);
-			break;
+		}
+		else{
+			++it;
 		}
 	}
 }
@@ -636,10 +653,9 @@ void Creature::removeCondition(ConditionType_t type, uint32_t id /*= 0*/)
 void Creature::executeConditions(int32_t newticks)
 {
 	for(ConditionList::iterator it = conditions.begin(); it != conditions.end();){
-		//(*it)->setTicks((*it)->getTicks() - newticks);
-
 		//(*it)->executeCondition(this, newticks);
 		//if((*it)->getTicks() <= 0){
+
 		if(!(*it)->executeCondition(this, newticks)){
 			ConditionType_t type = (*it)->getType();
 
@@ -655,19 +671,22 @@ void Creature::executeConditions(int32_t newticks)
 	}
 }
 
-Condition* Creature::getCondition(ConditionType_t type, uint32_t id /*= 0*/)
+/*
+Condition* Creature::getCondition(ConditionType_t type, uint32_t id = 0)
 {
 	if(conditions.empty())
 		return NULL;
 	
 	for(ConditionList::iterator it = conditions.begin(); it != conditions.end(); ++it){
-		if((*it)->getType() == type && (id == 0 || (*it)->getId())){
+		//if((*it)->getType() == type && (id == 0 || (*it)->getId())){
+		if((*it)->getType() == type && id == (*it)->getId()){
 			return *it;
 		}
 	}
 
 	return NULL;
 }
+*/
 
 bool Creature::hasCondition(ConditionType_t type) const
 {
@@ -699,7 +718,7 @@ int Creature::getStepDuration() const
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(g_game.gameLock, "Creature::getStepDuration()");
 
-	int32_t duration = 500;
+	int32_t duration = 0;
 
 	if(isRemoved()){
 		return duration;
@@ -712,7 +731,7 @@ int Creature::getStepDuration() const
 		uint16_t stepSpeed = Item::items[groundId].speed;
 
 		if(stepSpeed != 0){
-			duration =  (1000 * stepSpeed) / (getSpeed() != 0 ? getSpeed() : 220);
+			duration =  (1000 * stepSpeed) / getSpeed();
 		}
 	}
 

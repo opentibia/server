@@ -94,6 +94,12 @@ enum skills_t {
 	SKILL_LAST = SKILL_FISH
 };
 
+enum formulaType_t{
+	FORMULA_UNDEFINED = 0,
+	FORMULA_LEVELMAGIC = 1,
+	FORMULA_SKILL = 2
+};
+
 struct Outfit_t{
 	Outfit_t(){
 		lookHead   = 0;
