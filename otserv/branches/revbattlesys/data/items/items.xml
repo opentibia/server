@@ -25,11 +25,38 @@
 
 	<item id="2202" name="stealth ring">
 		<attribute key="transformTo" value="2165"/>
-		<attribute key="duration" value="60"/>
+		<attribute key="duration" value="600"/>
 		<attribute key="showduration" value="1"/>
 		<attribute key="invisible" value="1"/>
 	</item>
 	
+	<item id="2169" name="time ring">
+		<attribute key="transformTo" value="2206"/>
+		<attribute key="canDecay" value="0"/>
+		<attribute key="showduration" value="1"/>
+	</item>
+
+	<item id="2206" name="time ring">
+		<attribute key="transformTo" value="2169"/>
+		<attribute key="duration" value="600"/>
+		<attribute key="showduration" value="1"/>
+		<attribute key="speed" value="60"/>
+	</item>
+
+	<item id="2167" name="energy ring">
+		<attribute key="transformTo" value="2204"/>
+		<attribute key="canDecay" value="0"/>
+		<attribute key="showduration" value="1"/>
+	</item>
+
+	<item id="2204" name="energy ring">
+		<attribute key="transformTo" value="2167"/>
+		<attribute key="duration" value="600"/>
+		<attribute key="showduration" value="1"/>
+		<attribute key="manashield" value="1"/>
+	</item>
+
+
 	<item id="2207" name="sword ring">
 		<attribute key="transformTo" value="2210"/>
 		<attribute key="showduration" value="1"/>
@@ -45,6 +72,14 @@
 
 	<item id="1491" name="energy">
 		<attribute key="duration" value="60"/>
+	</item>
+
+	<item id="2195" name="boots of haste">
+		<attribute key="speed" value="40"/>
+	</item>
+
+	<item id="2195" name="boots of haste">
+		<attribute key="speed" value="40"/>
 	</item>
 
 	<item id="1487" name="fire">
