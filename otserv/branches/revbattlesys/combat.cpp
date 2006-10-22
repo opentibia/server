@@ -290,6 +290,18 @@ bool Combat::CombatConditionFunc(Creature* caster, Creature* target, const Comba
 	return false;
 }
 
+bool Combat::CombatRemoveConditionFunc(Creature* caster, Creature* target, const CombatParams& params, void* data)
+{
+	if(target->hasCondition(params.removeCondition)){
+		if(!params.isAggressive || caster != target){
+			//TODO: check if creature resist remove condition
+			//caster->removeCondition(params.removeCondition);
+		}
+	}
+
+	return false;
+}
+
 bool Combat::CombatNullFunc(Creature* caster, Creature* target, const CombatParams& params, void* data)
 {
 	return true;

@@ -111,12 +111,14 @@ Condition* Condition::createCondition(ConditionType_t _type, int32_t _ticks, int
 		case CONDITION_INVISIBLE:
 		{
 			return new ConditionInvisible(_id, _type, _ticks);
+			break;
 		}
 
 		//case CONDITION_INVISIBLE:
 		case CONDITION_OUTFIT:
 		{
 			return new ConditionOutfit(_id, _type, _ticks);
+			break;
 		}
 
 		case CONDITION_LIGHT:

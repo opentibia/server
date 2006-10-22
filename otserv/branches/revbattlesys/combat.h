@@ -73,9 +73,11 @@ struct CombatParams{
 		impactEffect = NM_ME_NONE;
 		distanceEffect = NM_ME_NONE;
 		condition = NULL;
+		removeCondition = CONDITION_NONE;
 	}
 
 	const Condition* condition;
+	ConditionType_t removeCondition;
 	DamageType_t damageType;
 	bool blockedByArmor;
 	bool blockedByShield;
@@ -137,6 +139,7 @@ protected:
 	static bool CombatHealthFunc(Creature* caster, Creature* target, const CombatParams& params, void* data);
 	static bool CombatManaFunc(Creature* caster, Creature* target, const CombatParams& params, void* data);
 	static bool CombatConditionFunc(Creature* caster, Creature* target, const CombatParams& params, void* data);
+	static bool CombatRemoveConditionFunc(Creature* caster, Creature* target, const CombatParams& params, void* data);
 	static bool CombatNullFunc(Creature* caster, Creature* target, const CombatParams& params, void* data);
 
 	static void combatTileEffects(Creature* caster, Tile* tile, const CombatParams& params);

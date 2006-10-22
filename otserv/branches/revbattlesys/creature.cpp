@@ -659,9 +659,11 @@ void Creature::executeConditions(int32_t newticks)
 		if(!(*it)->executeCondition(this, newticks)){
 			ConditionType_t type = (*it)->getType();
 
-			(*it)->endCondition(this, REASON_ENDTICKS);
-			delete *it;
+			Condition* condition = *it;
 			it = conditions.erase(it);
+
+			condition->endCondition(this, REASON_ENDTICKS);
+			delete condition;
 
 			onEndCondition(type);
 		}

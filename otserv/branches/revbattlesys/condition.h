@@ -62,7 +62,7 @@ public:
 	virtual void endCondition(Creature* creature, EndCondition_t reason) = 0;	
 	virtual void addCondition(Creature* creature, const Condition* condition) = 0;
 	virtual uint8_t getIcons() const = 0;
-	virtual bool stackable() const = 0;
+	//virtual bool stackable() const = 0;
 	virtual uint32_t getId() const {return id;}
 
 	virtual Condition* clone() const = 0;
@@ -102,7 +102,7 @@ public:
 	virtual void endCondition(Creature* creature, EndCondition_t reason);
 	virtual void addCondition(Creature* creature, const Condition* condition);
 	virtual uint8_t getIcons() const;
-	virtual bool stackable() const {return false;};
+	//virtual bool stackable() const {return false;};
 	
 	virtual ConditionGeneric* clone()  const { return new ConditionGeneric(*this); }
 };
@@ -112,7 +112,9 @@ class ConditionManaShield : public ConditionGeneric
 public:
 	ConditionManaShield(uint32_t _id, ConditionType_t _type, int32_t _ticks) : ConditionGeneric(_id, _type, _ticks) {};
 	virtual ~ConditionManaShield(){};
-	virtual bool stackable() const {return true;};
+	//virtual bool stackable() const {return true;};
+
+	virtual ConditionManaShield* clone()  const { return new ConditionManaShield(*this); }
 };
 
 class ConditionInvisible: public ConditionGeneric
@@ -123,7 +125,9 @@ public:
 
 	virtual bool startCondition(Creature* creature);
 	virtual void endCondition(Creature* creature, EndCondition_t reason);
-	virtual bool stackable() const {return true;};
+	//virtual bool stackable() const {return true;};
+
+	virtual ConditionInvisible* clone()  const { return new ConditionInvisible(*this); }
 };
 
 class ConditionDamage: public Condition
@@ -137,7 +141,7 @@ public:
 	virtual void endCondition(Creature* creature, EndCondition_t reason);
 	virtual void addCondition(Creature* creature, const Condition* condition);
 	virtual uint8_t getIcons() const;
-	virtual bool stackable() const {return false;};
+	//virtual bool stackable() const {return false;};
 
 	virtual ConditionDamage* clone()  const { return new ConditionDamage(*this); }
 
@@ -172,7 +176,7 @@ public:
 	virtual void endCondition(Creature* creature, EndCondition_t reason);	
 	virtual void addCondition(Creature* creature, const Condition* condition);	
 	virtual uint8_t getIcons() const;	
-	virtual bool stackable() const {return false;};
+	//virtual bool stackable() const {return false;};
 
 	virtual ConditionSpeed* clone()  const { return new ConditionSpeed(*this); }
 
@@ -193,7 +197,7 @@ public:
 	virtual void endCondition(Creature* creature, EndCondition_t reason);	
 	virtual void addCondition(Creature* creature, const Condition* condition);	
 	virtual uint8_t getIcons() const;
-	virtual bool stackable() const {return false;};
+	//virtual bool stackable() const {return false;};
 
 	virtual ConditionOutfit* clone()  const { return new ConditionOutfit(*this); }
 
@@ -216,7 +220,7 @@ public:
 	virtual void endCondition(Creature* creature, EndCondition_t reason);	
 	virtual void addCondition(Creature* creature, const Condition* condition);	
 	virtual uint8_t getIcons() const;
-	virtual bool stackable() const {return false;};
+	//virtual bool stackable() const {return false;};
 
 	virtual ConditionLight* clone()  const { return new ConditionLight(*this); }
 };
