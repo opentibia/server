@@ -65,8 +65,8 @@
 
 	<item id="2210" name="sword ring">
 		<attribute key="transformTo" value="2207"/>
-		<attribute key="swordSkill" value="5"/>
-		<attribute key="duration" value="10"/>
+		<attribute key="skillSword" value="5"/>
+		<attribute key="duration" value="300"/>
 		<attribute key="showduration" value="1"/>
 	</item>
 
