@@ -756,6 +756,41 @@ bool Items::loadFromXml(const std::string& datadir)
 									it.abilities.manaShield = true;
 								}
 							}
+							else if(strcasecmp(strValue.c_str(), "skillSword") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.skills[SKILL_SWORD] = intValue;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "skillAxe") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.skills[SKILL_AXE] = intValue;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "skillClub") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.skills[SKILL_CLUB] = intValue;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "skillDist") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.skills[SKILL_DIST] = intValue;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "skillFish") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.skills[SKILL_FISH] = intValue;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "skillShield") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.skills[SKILL_SHIELD] = intValue;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "skillFist") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.skills[SKILL_FIST] = intValue;
+								}
+							}
 							else if(strcasecmp(strValue.c_str(), "absorbPercentAll") == 0){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.absorbPercentAll = intValue;

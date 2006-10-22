@@ -28,6 +28,7 @@
 #include <libxml/parser.h>
 
 extern Game g_game;
+extern Vocations g_vocations;
 extern LuaScript g_config;
 
 int32_t Weapons::weaponExhaustionTime = 0;
@@ -169,7 +170,6 @@ Weapon::Weapon(LuaScriptInterface* _interface) :
 	exhaustion = false;
 	premium = false;
 	enabled = true;
-	vocationBits = 0;
 	exhaustion = 0;
 	range = 1;
 	ammoAction = AMMOACTION_NONE;
@@ -272,16 +272,20 @@ bool Weapon::configureEvent(xmlNodePtr p)
 		}
 	}
 
-	/*
-	if(readXMLInteger(p, "charges", intValue)){
-		hasCharges = (intValue == 1);
+	xmlNodePtr vocationNode = p->children;
+	while(vocationNode){
+		if(xmlStrcmp(vocationNode->name,(const xmlChar*)"vocation") == 0){
+			if(readXMLString(vocationNode, "name", strValue)){
+				int32_t vocationId = g_vocations.getVocationId(strValue);
+
+				if(vocationId != -1){
+					vocWeaponMap[vocationId] = true;
+				}
+			}
+		}
+		
+		vocationNode = vocationNode->next;
 	}
-	*/
-
-	vocationBits = 0xFFFFFFFF;
-
-	//TODO
-	//get vocations
 
 	return true;
 }
@@ -309,11 +313,13 @@ bool Weapon::playerWeaponCheck(Player* player, Creature* target) const
 		return false;
 	}
 
-	if(player->getAccessLevel() > 0)
+	if(player->getAccessLevel() > 0){
 		return true;
+	}
 	
-	if(!enabled)
+	if(!enabled){
 		return false;
+	}
 
 	if(player->getLevel() < level){
 		return false;
@@ -329,6 +335,12 @@ bool Weapon::playerWeaponCheck(Player* player, Creature* target) const
 
 	if(player->getPlayerInfo(PLAYERINFO_SOUL) < soul){
 		return false;
+	}
+
+	if(!vocWeaponMap.empty()){
+		if(vocWeaponMap.find(player->getVocationId()) == vocWeaponMap.end()){
+			return false;
+		}
 	}
 
 	return true;

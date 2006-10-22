@@ -32,6 +32,7 @@
 #include <sstream>
 
 extern Game g_game;
+extern Vocations g_vocations;
 extern LuaScript g_config;
 
 int32_t Spells::spellExhaustionTime = 0;
@@ -209,7 +210,6 @@ Spell::Spell()
 	premium = false;
 	enabled = true;
 	isAggressive = true;
-	vocationBits = 0;
 }
 	
 bool Spell::configureSpell(xmlNodePtr p)
@@ -268,23 +268,36 @@ bool Spell::configureSpell(xmlNodePtr p)
 		isAggressive = (intValue == 1);
 	}
 
-	vocationBits = 0xFFFFFFFF;
-	//TODO
-	//get vocations
+	xmlNodePtr vocationNode = p->children;
+	while(vocationNode){
+		if(xmlStrcmp(vocationNode->name,(const xmlChar*)"vocation") == 0){
+			if(readXMLString(vocationNode, "name", strValue)){
+				int32_t vocationId = g_vocations.getVocationId(strValue);
+
+				if(vocationId != -1){
+					vocSpellMap[vocationId] = true;
+				}
+			}
+		}
+		
+		vocationNode = vocationNode->next;
+	}
 
 	return true;
 }
 
 bool Spell::playerSpellCheck(const Player* player)
 {
-	if(player->getAccessLevel() > 3)
+	if(player->getAccessLevel() > 0){
 		return true;
+	}
 	
-	if(!enabled)
+	if(!enabled){
 		return false;
+	}
 	
 	if(isAggressive){
-		if(player->getAccessLevel() < 2 && player->getTile()->isPz()){
+		if(player->getAccessLevel() == 0 && player->getTile()->isPz()){
 			player->sendCancelMessage(RET_ACTIONNOTPERMITTEDINPROTECTIONZONE);
 			return false;
 		}
@@ -299,21 +312,30 @@ bool Spell::playerSpellCheck(const Player* player)
 		player->sendTextMessage(MSG_STATUS_SMALL, "You do not have enough level.",player->getPosition(), NM_ME_PUFF);
 		return false;
 	}
+
 	if(player->getMagicLevel() < magLevel){
 		player->sendTextMessage(MSG_STATUS_SMALL, "You do not have enough magic level.",player->getPosition(), NM_ME_PUFF);
 		return false;
 	}
+
 	if(player->getPlayerInfo(PLAYERINFO_MANA) < mana){
 		player->sendTextMessage(MSG_STATUS_SMALL, "You do not have enough mana.",player->getPosition(), NM_ME_PUFF);
 		return false;
 	}
+
 	if(player->getPlayerInfo(PLAYERINFO_SOUL) < soul){
 		player->sendTextMessage(MSG_STATUS_SMALL, "You do not have enough soul.",player->getPosition(), NM_ME_PUFF);
 		return false;
 	}
 
+	if(!vocSpellMap.empty()){
+		if(vocSpellMap.find(player->getVocationId()) == vocSpellMap.end()){
+			player->sendTextMessage(MSG_STATUS_SMALL, "Your vocation cannot use this spell.",player->getPosition(), NM_ME_PUFF);
+			return false;
+		}
+	}
+
 	//TODO: check if the player knows the spell
-	//TODO: check vocs
 	/*
 	if(premium && !player->getPremium()){
 		return false;

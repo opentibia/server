@@ -472,12 +472,11 @@ long MoveEvent::EquipItem(Player* player, Item* item, slots_t slot)
 		g_game.changeSpeed(player, iit.abilities.speed);
 	}
 
-	/*
 	//skill modifiers
 	for(int32_t i = SKILL_FIRST; i <= SKILL_LAST; ++i){
-		player->varskills[i] += iit.abilities.skills[i];
+		player->setVarSkill((skills_t)i, iit.abilities.skills[i]);
+		player->sendSkills();
 	}
-	*/
 
 	return 1;
 }
@@ -505,12 +504,11 @@ long MoveEvent::DeEquipItem(Player* player, Item* item, slots_t slot)
 		g_game.changeSpeed(player, -it.abilities.speed);
 	}
 
-	/*
 	//skill modifiers
 	for(int32_t i = SKILL_FIRST; i <= SKILL_LAST; ++i){
-		player->varskills[i] -= it.abilities.skills[i];
+		player->setVarSkill((skills_t)i, -it.abilities.skills[i]);
+		player->sendSkills();
 	}
-	*/
 
 	return 1;
 }

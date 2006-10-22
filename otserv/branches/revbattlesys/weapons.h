@@ -107,7 +107,8 @@ protected:
 	CombatParams params;
 
 private:
-	uint32_t vocationBits;
+	typedef std::map<int32_t, bool> VocWeaponMap;
+	VocWeaponMap vocWeaponMap;
 };
 
 class WeaponMelee : public Weapon

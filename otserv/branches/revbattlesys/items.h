@@ -96,7 +96,7 @@ struct Abilities{
 	uint8_t absorbPercentManaDrain;
 
 	//extra skill modifiers
-	uint32_t skills[SKILL_LAST + 1];
+	int32_t skills[SKILL_LAST + 1];
 
 	int32_t speed;
 	bool manaShield;

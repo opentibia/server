@@ -171,8 +171,11 @@ public:
 	
 	Item* getInventoryItem(slots_t slot) const;
 
+	bool isItemAbilityEnabled(slots_t slot) const;
 	void setItemAbility(slots_t slot, bool enabled);
-	bool isItemAbilityEnabled(slots_t slot);
+
+	int32_t getVarSkill(skills_t skill) const;
+	void setVarSkill(skills_t skill, int32_t modifier);
 
 	Depot* getDepot(uint32_t depotId, bool autoCreateDepot);
 	bool addDepot(Depot* depot, uint32_t depotId);
@@ -321,6 +324,7 @@ public:
 	void sendCancelWalk() const;
 	void sendCancelTarget() const;
 	void sendStats();
+	void sendSkills() const;
 	void sendTextMessage(MessageClasses mclass, const std::string& message) const;
 	void sendTextMessage(MessageClasses mclass, const std::string& message, const Position& pos,
 		unsigned char type) const;
@@ -438,7 +442,7 @@ protected:
 	uint32_t skills[SKILL_LAST + 1][3];
 
 	//extra skill modifiers
-	uint32_t varskills[SKILL_LAST + 1];
+	int32_t varSkills[SKILL_LAST + 1];
 	
 	//reminder: 0 = None, 1 = Sorcerer, 2 = Druid, 3 = Paladin, 4 = Knight
 	static const int CapGain[5];

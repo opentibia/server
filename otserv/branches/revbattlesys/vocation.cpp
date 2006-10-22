@@ -56,6 +56,9 @@ bool Vocations::loadFromXml(const std::string& datadir)
 					if(readXMLString(p, "name", str)){
 						voc->name = str;
 					}
+					if(readXMLString(p, "description", str)){
+						voc->description = str;
+					}
 					if(readXMLInteger(p, "gaincap", intVal)){
 						voc->gainCap = intVal;
 					}
@@ -131,6 +134,17 @@ Vocation* Vocations::getVocation(uint32_t vocId)
 	}
 }
 
+int32_t Vocations::getVocationId(const std::string& name)
+{
+	for(VocationsMap::iterator it = vocationsMap.begin(); it != vocationsMap.end(); ++it){
+		if(strcasecmp(it->second->name.c_str(), name.c_str()) == 0){
+			return it->first;
+		}
+	}
+
+	return -1;
+}
+
 uint32_t Vocation::skillBase[SKILL_LAST + 1] = { 50, 50, 50, 50, 30, 100, 20 };
 
 Vocation::Vocation()
@@ -164,6 +178,11 @@ Vocation::~Vocation()
 const std::string& Vocation::getVocName() const
 {
 	return name;
+}
+
+const std::string& Vocation::getVocDescription() const
+{
+	return description;
 }
 
 uint32_t Vocation::getReqSkillTries(int skill, int level)

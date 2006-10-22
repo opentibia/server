@@ -30,6 +30,7 @@ class Vocation
 public:
 	~Vocation();
 	const std::string& getVocName() const;
+	const std::string& getVocDescription() const;
 	uint32_t getReqSkillTries(int skill, int level);
 	uint32_t getReqMana(int magLevel);
 	
@@ -49,6 +50,7 @@ protected:
 	Vocation();
 	
 	std::string name;
+	std::string description;
 	
 	uint32_t gainHealthTicks;
 	uint32_t gainHealthAmount;
@@ -77,6 +79,7 @@ public:
 	
 	bool loadFromXml(const std::string& datadir);
 	Vocation* getVocation(uint32_t vocId);
+	int32_t getVocationId(const std::string& name);
 	
 private:
 	typedef std::map<uint32_t, Vocation*> VocationsMap;

@@ -112,7 +112,7 @@ Creature()
 	}
 
 	for(int32_t i = SKILL_FIRST; i <= SKILL_LAST; ++i){
-		varskills[0] = 0;
+		varSkills[0] = 0;
 	}
 
 	maxDepotLimit = 1000;
@@ -181,7 +181,7 @@ std::string Player::getDescription(int32_t lookDistance) const
 		s << "yourself.";
 
 		if(getVocationId() != VOCATION_NONE)
-			s << " You are " << vocation->getVocName() << ".";
+			s << " You are " << vocation->getVocDescription() << ".";
 		else
 			s << " You have no vocation.";
 	}
@@ -194,7 +194,7 @@ std::string Player::getDescription(int32_t lookDistance) const
 			s << " He";	
 			
 		if(getVocationId() != VOCATION_NONE)
-			s << " is "<< vocation->getVocName() << ".";
+			s << " is "<< vocation->getVocDescription() << ".";
 		else
 			s << " has no vocation.";
 	}
@@ -236,14 +236,24 @@ Item* Player::getInventoryItem(slots_t slot) const
 	return NULL;
 }
 
+bool Player::isItemAbilityEnabled(slots_t slot) const
+{
+	return inventoryAbilities[slot];
+}
+
 void Player::setItemAbility(slots_t slot, bool enabled)
 {
 	inventoryAbilities[slot] = enabled;
 }
 
-bool Player::isItemAbilityEnabled(slots_t slot)
+int32_t Player::getVarSkill(skills_t skill) const
 {
-	return inventoryAbilities[slot];
+	return varSkills[skill];
+}
+
+void Player::setVarSkill(skills_t skill, int32_t var)
+{
+	varSkills[skill] += var;
 }
 
 bool Player::getCombatItem(Item** tool, const Weapon** weapon)
@@ -408,7 +418,7 @@ int Player::getSkill(skills_t skilltype, skillsid_t skillinfo) const
 	int32_t n = skills[skilltype][skillinfo];
 
 	if(skillinfo == SKILL_LEVEL){
-		n += varskills[skilltype];
+		n += varSkills[skilltype];
 	}
 
 	return n;
@@ -810,6 +820,11 @@ void Player::sendStats()
 	lastSentStats.manaSpent = manaSpent;
 	
 	client->sendStats();
+}
+
+void Player::sendSkills() const
+{
+	client->sendSkills();
 }
 
 void Player::sendTextMessage(MessageClasses mclass, const std::string& message) const

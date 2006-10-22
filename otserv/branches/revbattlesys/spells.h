@@ -102,10 +102,12 @@ protected:
 	bool selfTarget;
 	bool blocking;
 	bool isAggressive;
+	
+	typedef std::map<int32_t, bool> VocSpellMap;
+	VocSpellMap vocSpellMap;
 
 private:
 	std::string name;
-	uint32_t vocationBits;
 };
 
 class InstantSpell : public TalkAction, public Spell
