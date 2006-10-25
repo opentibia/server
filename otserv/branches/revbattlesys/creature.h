@@ -30,6 +30,7 @@
 #include "position.h"
 #include "condition.h"
 #include "const76.h"
+#include "tile.h"
 #include "enums.h"
 
 #include <list>
@@ -150,6 +151,7 @@ public:
 	const void setCurrentOutfit(Outfit_t outfit) {currentOutfit = outfit;}
 	const Outfit_t getDefaultOutfit() const {return defaultOutfit;}
 	bool isInvisible() const {return hasCondition(CONDITION_INVISIBLE);}
+	bool isInPz() const {return getTile()->hasProperty(PROTECTIONZONE);}
 
 	//walk functions
 	bool startAutoWalk(std::list<Direction>& listDir);
@@ -245,7 +247,7 @@ public:
 	virtual void onCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text) { };
 	
 	virtual void onCreatureChangeOutfit(const Creature* creature, const Outfit_t& outfit) { };
-	virtual void onCreatureInvisible(const Creature* creature) { };
+	virtual void onCreatureChangeVisible(const Creature* creature, bool visible);
 
 	virtual void getCombatValues(int32_t& min, int32_t& max) {};
 

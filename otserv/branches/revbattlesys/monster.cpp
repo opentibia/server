@@ -255,7 +255,7 @@ void Monster::searchTarget()
 		targetList.erase(it);
 		targetList.push_back(target);
 
-		if(canSeeInvisibility() || !target->isInvisible()){
+		if(!target->isInPz() && (canSeeInvisibility() || !target->isInvisible())){
 			internalFollowCreature(target);
 			setAttackedCreature(target);
 		}
@@ -281,10 +281,12 @@ void Monster::onThink(uint32_t interval)
 	onThinkYell(interval);
 	onDefending(interval);
 
+	/*
 	if(followCreature && followCreature->isInvisible() && !canSeeInvisibility()){
 		setFollowCreature(NULL);
 		setAttackedCreature(NULL);
 	}
+	*/
 
 	thinkTicks -= interval;
 

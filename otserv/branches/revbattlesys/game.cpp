@@ -1484,11 +1484,11 @@ void Game::checkCreatureAttacking(uint32_t creatureId, uint32_t interval)
 		Creature* attackedCreature = creature->getAttackedCreature();
 
 		if(attackedCreature){
-			if( attackedCreature->getTile()->hasProperty(PROTECTIONZONE) ||
+			/*if( attackedCreature->getTile()->hasProperty(PROTECTIONZONE) ||
 					creature->getTile()->hasProperty(PROTECTIONZONE)){
 				creature->onCreatureDisappear(attackedCreature);
 			}
-			else if(map->canThrowObjectTo(creature->getPosition(), attackedCreature->getPosition())){
+			else*/ if(map->canThrowObjectTo(creature->getPosition(), attackedCreature->getPosition())){
 				creature->doAttacking(interval);
 			}
 		}
@@ -2654,12 +2654,10 @@ void Game::internalCreatureChangeVisible(Creature* creature, bool visible)
 		}
 	}
 
-	/*
 	//event method
 	for(it = list.begin(); it != list.end(); ++it) {
 		(*it)->onCreatureChangeVisible(creature, visible);
 	}
-	*/
 }
 
 

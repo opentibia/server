@@ -25,7 +25,6 @@
 #include "player.h"
 #include "npc.h"
 #include "monster.h"
-#include "tile.h"
 #include "container.h"
 #include "condition.h"
 #include "combat.h"
@@ -271,9 +270,26 @@ void Creature::onCreatureMove(const Creature* creature, const Position& newPos, 
 		
 		validateWalkPath();
 	}
+
 	if(attackedCreature == creature || (creature == this && attackedCreature)){
 		if(newPos.z != oldPos.z || !canSee(attackedCreature->getPosition())){
-			onCreatureDisappear(attackedCreature);	
+			onCreatureDisappear(attackedCreature);
+		}
+		else if(attackedCreature->isInPz() || isInPz()){
+			onCreatureDisappear(attackedCreature);
+		}
+	}
+}
+
+void Creature::onCreatureChangeVisible(const Creature* creature, bool visible)
+{
+	if(!visible && !canSeeInvisibility() && getMaster() != creature){
+		if(followCreature == creature){
+			onCreatureDisappear(followCreature);
+		}
+
+		if(attackedCreature == creature){
+			onCreatureDisappear(attackedCreature);
 		}
 	}
 }
