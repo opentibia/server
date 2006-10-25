@@ -249,12 +249,10 @@ bool Item::hasSubType() const
 
 void Item::setDefaultDuration()
 {
-	if(!hasAttribute(ATTR_ITEM_DURATION)){
-		uint32_t duration = getDefaultDuration();
+	uint32_t duration = getDefaultDuration();
 
-		if(duration != 0){
-			setDuration(duration);
-		}
+	if(duration != 0){
+		setDuration(duration);
 	}
 }
 
@@ -414,6 +412,29 @@ bool Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 			break;
 		}
 
+		case ATTR_DURATION:
+		{
+			//uint32_t duration = 0;
+			unsigned long duration = 0;
+			if(!propStream.GET_ULONG(duration)){
+				return false;
+			}
+			setDuration(duration);
+			break;
+		}
+		
+		case ATTR_DECAYING_STATE:
+		{
+			unsigned char state = 0;
+			if(!propStream.GET_UCHAR(state)){
+				return false;
+			}
+			if(state == ITEM_DECAYING){
+				setDecaying(ITEM_PENDING_START_DECAY);
+			}
+			break;
+		}
+
 		//these should be handled through derived classes
 		//If these are called then something has changed in the items.otb since the map was saved
 		//just read the values
@@ -492,8 +513,8 @@ bool Item::serializeAttr(PropWriteStream& propWriteStream)
 	}
 
 	if(!isNotMoveable() /*moveable*/){
-		if(getActionId()){
-			unsigned short _actionId = getActionId();
+		unsigned short _actionId = getActionId();
+		if(_actionId){
 			propWriteStream.ADD_UCHAR(ATTR_ACTION_ID);
 			propWriteStream.ADD_USHORT(_actionId);
 		}
@@ -509,6 +530,18 @@ bool Item::serializeAttr(PropWriteStream& propWriteStream)
 	if(_specialDesc.length() > 0){
 		propWriteStream.ADD_UCHAR(ATTR_DESC);
 		propWriteStream.ADD_STRING(_specialDesc);
+	}
+
+	uint32_t duration = getDuration();
+	if(duration != 0){
+		propWriteStream.ADD_UCHAR(ATTR_DURATION);
+		propWriteStream.ADD_ULONG(duration);
+	}
+
+	uint32_t decayState = getDecaying();
+	if(decayState == ITEM_DECAYING || decayState == ITEM_PENDING_START_DECAY){
+		propWriteStream.ADD_UCHAR(ATTR_DECAYING_STATE);
+		propWriteStream.ADD_UCHAR(decayState);
 	}
 
 	return true;
@@ -844,8 +877,7 @@ bool Item::canDecay()
 	if(isRemoved()){
 		return false;
 	}
-
-	return items[id].canDecay;
+	return (items[id].canDecay && getDefaultDuration() > 0);
 }
 
 int Item::getWorth() const
@@ -938,7 +970,7 @@ uint32_t ItemAttributes::getOwner()
 	return getIntAttr(ATTR_ITEM_OWNER);
 }
 
-void ItemAttributes::setDuration(uint32_t time)
+void ItemAttributes::setDuration(int32_t time)
 {
 	setIntAttr(ATTR_ITEM_DURATION, time);
 }
@@ -948,19 +980,19 @@ void ItemAttributes::decreaseDuration(int32_t time)
 	increaseIntAttr(ATTR_ITEM_DURATION, -time);
 }
 
-uint32_t ItemAttributes::getDuration() const
+int32_t ItemAttributes::getDuration() const
 {
 	return getIntAttr(ATTR_ITEM_DURATION);
 }
 
-void ItemAttributes::setDecaying(bool decay)
+void ItemAttributes::setDecaying(ItemDecayState_t decayState)
 {
-	setIntAttr(ATTR_ITEM_DECAYING, (decay ? 1 : 0));
+	setIntAttr(ATTR_ITEM_DECAYING, decayState);
 }
 
-bool ItemAttributes::isDecaying()
+uint32_t ItemAttributes::getDecaying()
 {
-	return (getIntAttr(ATTR_ITEM_DECAYING) == 1);
+	return getIntAttr(ATTR_ITEM_DECAYING);
 }
 
 const std::string& ItemAttributes::getStrAttr(itemAttrTypes type) const

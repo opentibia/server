@@ -89,7 +89,7 @@ Game::Game()
 	OTSYS_CREATE_THREAD(monitorThread, this);
 #endif
 
-	addEvent(makeTask(DECAY_INTERVAL, boost::bind(&Game::checkDecay, this, DECAY_INTERVAL)));	
+	addEvent(makeTask(DECAY_INTERVAL, boost::bind(&Game::checkDecay, this, DECAY_INTERVAL)));
 
 	int daycycle = 3600;
 	//(1440 minutes/day)/(3600 seconds/day)*10 seconds event interval
@@ -3010,12 +3010,18 @@ void Game::changeSkull(Player* player, Skulls_t newSkull)
 void Game::startDecay(Item* item)
 {
 	if(item->canDecay()){
-		if(!item->isDecaying()){
-			item->setDefaultDuration();
-
+		uint32_t decayState = item->getDecaying();
+		if(decayState == ITEM_NO_DECAYING || decayState == ITEM_PENDING_START_DECAY){
+			if(decayState == ITEM_NO_DECAYING){		
+				item->setDefaultDuration();
+			}
+			else{//decayState == ITEM_PENDING_START_DECAY
+				//no change duration because was set during loading time
+			}
+			
 			if(item->getDuration() > 0){
 				item->useThing2();
-				item->setDecaying(true);
+				item->setDecaying(ITEM_DECAYING);
 				decayItems.push_back(item);
 			}
 			else{
@@ -3025,19 +3031,40 @@ void Game::startDecay(Item* item)
 	}
 }
 
+void Game::internalDecayItem(Item* item)
+{
+	const ItemType& it = Item::items[item->getID()];
+
+	if(it.decayTo != 0){
+		Item* newItem = transformItem(item, it.decayTo);
+		newItem->setDecaying(ITEM_NO_DECAYING);
+		//newItem->setDuration(newItem->getDefaultDuration());
+		newItem->setDefaultDuration();
+		startDecay(newItem);
+	}
+	else{
+		ReturnValue ret = internalRemoveItem(item);
+
+		if(ret != RET_NOERROR){
+			std::cout << "DEBUG, internalDecayItem failed, error code: " << (int) ret << "item id: " << item->getID() << std::endl;
+		}
+	}
+}
+
 void Game::checkDecay(int32_t interval)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::checkDecay()");
 	addEvent(makeTask(DECAY_INTERVAL, boost::bind(&Game::checkDecay, this, DECAY_INTERVAL)));
-	
+	std::cout << "checkDecay" << std::endl;
 	Item* item = NULL;
 	for(DecayList::iterator it = decayItems.begin(); it != decayItems.end();){
 		item = *it;
-
-		item->setDuration(item->getDuration() - interval);
-
+		std::cout << "check Item " << item << std::endl;
+		//item->setDuration(item->getDuration() - interval);
+		item->decreaseDuration(interval);
+		
 		if(!item->canDecay()){
-			item->setDecaying(false);
+			item->setDecaying(ITEM_NO_DECAYING);
 			FreeThing(item);
 			it = decayItems.erase(it);
 			continue;
@@ -3054,25 +3081,6 @@ void Game::checkDecay(int32_t interval)
 	}
 
 	flushSendBuffers();
-}
-
-void Game::internalDecayItem(Item* item)
-{
-	const ItemType& it = Item::items[item->getID()];
-
-	if(it.decayTo != 0){
-		Item* newItem = transformItem(item, it.decayTo);
-		newItem->setDecaying(false);
-		newItem->setDuration(newItem->getDefaultDuration());
-		startDecay(newItem);
-	}
-	else{
-		ReturnValue ret = internalRemoveItem(item);
-
-		if(ret != RET_NOERROR){
-			std::cout << "DEBUG, internalDecayItem failed, error code: " << (int) ret << "item id: " << item->getID() << std::endl;
-		}
-	}
 }
 
 void Game::checkSpawns(int t)

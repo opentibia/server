@@ -67,6 +67,12 @@ struct LightInfo{
 	};
 };
 
+enum ItemDecayState_t{
+	ITEM_NO_DECAYING = 0,
+	ITEM_DECAYING = 1,
+	ITEM_PENDING_START_DECAY = 2,
+};
+
 /*from iomapotbm.h*/
 #pragma pack(1)
 struct TeleportDest{
@@ -91,7 +97,9 @@ enum AttrTypes_t{
 	ATTR_RUNE_CHARGES = 12,
 	//ATTR_EXT_HOUSE_FILE = 13,
 	ATTR_HOUSEDOORID = 14,
-	ATTR_COUNT = 15
+	ATTR_COUNT = 15,
+	ATTR_DURATION = 16,
+	ATTR_DECAYING_STATE = 17,
 };
 
 class ItemAttributes{
@@ -114,12 +122,12 @@ public:
 	void setOwner(uint32_t _owner);
 	uint32_t getOwner();
 
-	void setDuration(uint32_t t);
+	void setDuration(int32_t t);
 	void decreaseDuration(int32_t );
-	uint32_t getDuration() const;
+	int32_t getDuration() const;
 
-	void setDecaying(bool decay);
-	bool isDecaying();
+	void setDecaying(ItemDecayState_t decayState);
+	uint32_t getDecaying();
 
 protected:
 	enum itemAttrTypes{

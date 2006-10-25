@@ -21,8 +21,10 @@
 #include "iomapserializesql.h"
 #include "house.h"
 #include "luascript.h"
+#include "game.h"
 
 extern LuaScript g_config;
+extern Game g_game;
 
 IOMapSerializeSQL::IOMapSerializeSQL()
 {
@@ -269,6 +271,7 @@ bool IOMapSerializeSQL::loadTile(Database& db, Tile* tile)
 
 					if(pid == 0){
 						tile->__internalAddThing(item);
+						g_game.startDecay(item);
 					}
 				}
 				else
@@ -322,6 +325,7 @@ bool IOMapSerializeSQL::loadTile(Database& db, Tile* tile)
 			
 			if(Container* container = (*pit).second.first->getContainer()){
 				container->__internalAddThing((*it).second.first);
+				g_game.startDecay((*it).second.first);
 			}
 		}
 	}

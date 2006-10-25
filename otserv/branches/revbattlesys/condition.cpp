@@ -65,8 +65,8 @@ void Condition::setFormulaVars(double _mina, double _minb, double _maxa, double 
 
 void Condition::getFormulaValues(int32_t var, int32_t& min, int32_t& max) const
 {
-	min = (var * 1. * mina + minb);
-	max = (var * 1. * maxa + maxb);
+	min = (int32_t)std::ceil(var * 1. * mina + minb);
+	max = (int32_t)std::ceil(var * 1. * maxa + maxb);
 }
 
 bool Condition::reduceTicks(int32_t interval)
