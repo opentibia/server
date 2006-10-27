@@ -28,7 +28,6 @@
 
 #include <stdlib.h>
 
-#include "protocol76.h"
 #include "player.h"
 #include "ioplayer.h"
 #include "luascript.h"
@@ -235,26 +234,6 @@ Item* Player::getInventoryItem(slots_t slot) const
 		return inventory[slot];
 
 	return NULL;
-}
-
-bool Player::isItemAbilityEnabled(slots_t slot) const
-{
-	return inventoryAbilities[slot];
-}
-
-void Player::setItemAbility(slots_t slot, bool enabled)
-{
-	inventoryAbilities[slot] = enabled;
-}
-
-int32_t Player::getVarSkill(skills_t skill) const
-{
-	return varSkills[skill];
-}
-
-void Player::setVarSkill(skills_t skill, int32_t var)
-{
-	varSkills[skill] += var;
 }
 
 void Player::setConditionSuppressions(uint32_t conditions, bool remove)
@@ -786,32 +765,6 @@ void Player::sendCancelMessage(ReturnValue message) const
 	}
 }
 
-void Player::sendCancel(const char* msg) const
-{
-  client->sendCancel(msg);
-}
-
-void Player::sendChangeSpeed(const Creature* creature, uint32_t newSpeed) const
-{
-	client->sendChangeSpeed(creature, newSpeed);
-}
-
-void Player::sendToChannel(Creature* creature, SpeakClasses type,
-	const std::string& text, unsigned short channelId) const
-{
-	client->sendToChannel(creature, type, text, channelId);
-}
-
-void Player::sendCancelTarget() const
-{
-	client->sendCancelTarget();
-}
-
-void Player::sendCancelWalk() const
-{
-  client->sendCancelWalk();
-}
-
 void Player::sendStats()
 {
 	//update level and magLevel percents
@@ -835,37 +788,6 @@ void Player::sendStats()
 	client->sendStats();
 }
 
-void Player::sendSkills() const
-{
-	client->sendSkills();
-}
-
-void Player::sendTextMessage(MessageClasses mclass, const std::string& message) const
-{
-	client->sendTextMessage(mclass, message);
-}
-
-void Player::sendTextMessage(MessageClasses mclass, const std::string& message,
-	const Position& pos, unsigned char type) const
-{
-	client->sendTextMessage(mclass, message, pos, type);
-}
-
-void Player::sendCreatureLight(const Creature* creature)
-{
-	client->sendCreatureLight(creature);
-}
-
-void Player::sendWorldLight(LightInfo& lightInfo)
-{
-	client->sendWorldLight(lightInfo);
-}
-
-void Player::flushMsg()
-{
-	client->flushOutputBuffer();
-}
-
 void Player::sendPing()
 {
 	internal_ping++;
@@ -886,47 +808,6 @@ void Player::sendPing()
 	}
 }
 
-void Player::receivePing()
-{
-	if(npings > 0)
-		npings--;
-}
-
-void Player::sendDistanceShoot(const Position& from, const Position& to, unsigned char type) const
-{
-	client->sendDistanceShoot(from, to,type);
-}
-
-void Player::sendMagicEffect(const Position& pos, unsigned char type) const
-{
-	client->sendMagicEffect(pos,type);
-}
-
-void Player::sendAnimatedText(const Position& pos, unsigned char color, std::string text) const
-{
-	client->sendAnimatedText(pos,color,text);
-}
-
-void Player::sendCreatureHealth(const Creature* creature) const
-{
-	client->sendCreatureHealth(creature);
-}
-
-void Player::sendTradeItemRequest(const Player* player, const Item* item, bool ack) const
-{
-	client->sendTradeItemRequest(player, item, ack);
-}
-
-void Player::sendCloseTrade() const
-{
-	client->sendCloseTrade();
-}
-
-void Player::sendTextWindow(Item* item, const unsigned short maxlen, const bool canWrite) const
-{
-	client->sendTextWindow(item,maxlen,canWrite);
-}
-
 void Player::sendHouseWindow(House* _house, unsigned long _listid) const
 {
 	std::string text;
@@ -935,74 +816,8 @@ void Player::sendHouseWindow(House* _house, unsigned long _listid) const
 	}
 }
 
-//tile
-//send methods
-void Player::sendAddTileItem(const Position& pos, const Item* item)
-{
-	client->sendAddTileItem(pos, item);
-}
 
-void Player::sendUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* olditem, const Item* newitem)
-{
-	client->sendUpdateTileItem(pos, stackpos, newitem);
-}
-
-void Player::sendRemoveTileItem(const Position& pos, uint32_t stackpos, const Item* item)
-{
-	client->sendRemoveTileItem(pos, stackpos);
-}
-
-void Player::sendUpdateTile(const Position& pos)
-{
-	client->UpdateTile(pos);
-}
-
-void Player::sendCreatureAppear(const Creature* creature, bool isLogin)
-{
-	client->sendAddCreature(creature, isLogin);
-}
-
-void Player::sendCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout)
-{
-	client->sendRemoveCreature(creature, creature->getPosition(), stackpos, isLogout);
-}
-
-void Player::sendCreatureMove(const Creature* creature, const Position& newPos, const Position& oldPos,
-	uint32_t oldStackPos, bool teleport)
-{
-	client->sendMoveCreature(creature, newPos, oldPos, oldStackPos, teleport);
-}
-
-void Player::sendCreatureTurn(const Creature* creature, uint32_t stackPos)
-{
-  client->sendCreatureTurn(creature, stackPos);
-}
-
-void Player::sendCreatureChangeOutfit(const Creature* creature, const Outfit_t& outfit)
-{
-	client->sendCreatureOutfit(creature, outfit);
-}
-
-void Player::sendCreatureChangeVisible(const Creature* creature, bool visible)
-{
-	if(visible){
-		client->sendCreatureOutfit(creature, creature->getCurrentOutfit());
-	}
-	else{
-		client->sendCreatureInvisible(creature);
-	}
-}
-
-void Player::sendCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text)
-{
-  client->sendCreatureSay(creature, type, text);
-}
-
-void Player::sendCreatureSquare(const Creature* creature, SquareColor_t color)
-{
-	client->sendCreatureSquare(creature, color);
-}
-
+//container
 void Player::sendAddContainerItem(const Container* container, const Item* item)
 {
   for(ContainerVector::const_iterator cl = containerVec.begin(); cl != containerVec.end(); ++cl){
@@ -1028,22 +843,6 @@ void Player::sendRemoveContainerItem(const Container* container, uint8_t slot, c
 			client->sendRemoveContainerItem(cl->first, slot);
 		}
 	}
-}
-
-//inventory
-void Player::sendAddInventoryItem(slots_t slot, const Item* item)
-{
-	client->sendAddInventoryItem(slot, item);
-}
-
-void Player::sendUpdateInventoryItem(slots_t slot, const Item* oldItem, const Item* newItem)
-{
-	client->sendUpdateInventoryItem(slot, newItem);
-}
-
-void Player::sendRemoveInventoryItem(slots_t slot, const Item* item)
-{
-	client->sendRemoveInventoryItem(slot);
 }
 
 void Player::onAddTileItem(const Position& pos, const Item* item)
@@ -1653,11 +1452,6 @@ void Player::preSave()
 				capacity = 0.0;         
 		}
 	}
-}
-
-void Player::kickPlayer()
-{
-	client->logout();
 }
 
 bool Player::gainManaTick()
@@ -2846,16 +2640,6 @@ void Player::addUnjustifiedDead(const Player* attacked)
 	if(redSkullTicks >= 3*24*3600*1000){
 		g_game.changeSkull(this, SKULL_RED);
 	}
-}
-
-void Player::setSkull(Skulls_t newSkull)
-{
-	skull = newSkull;
-}
-
-void Player::sendCreatureSkull(const Creature* creature, Skulls_t skull) const
-{
-	client->sendCreatureSkull(creature, skull);
 }
 
 void Player::checkRedSkullTicks(long ticks)

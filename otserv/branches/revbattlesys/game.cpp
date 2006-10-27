@@ -2012,12 +2012,12 @@ bool Game::playerAcceptTrade(Player* player)
 		player->setTradeState(TRADE_NONE);
 		player->tradeItem = NULL;
 		player->tradePartner = NULL;
-		player->sendCloseTrade();
+		player->sendTradeClose();
 
 		tradePartner->setTradeState(TRADE_NONE);
 		tradePartner->tradeItem = NULL;
 		tradePartner->tradePartner = NULL;
-		tradePartner->sendCloseTrade();
+		tradePartner->sendTradeClose();
 
 		return isSuccess;
 	}
@@ -2124,7 +2124,7 @@ bool Game::playerCloseTrade(Player* player)
 	player->tradePartner = NULL;
 
 	player->sendTextMessage(MSG_STATUS_SMALL, "Trade cancelled.");
-	player->sendCloseTrade();
+	player->sendTradeClose();
 
 	if(tradePartner){
 		if(tradePartner->getTradeItem()){
@@ -2142,7 +2142,7 @@ bool Game::playerCloseTrade(Player* player)
 		tradePartner->tradePartner = NULL;
 
 		tradePartner->sendTextMessage(MSG_STATUS_SMALL, "Trade cancelled.");
-		tradePartner->sendCloseTrade();
+		tradePartner->sendTradeClose();
 	}
 
 	return true;

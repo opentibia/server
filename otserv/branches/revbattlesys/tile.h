@@ -75,14 +75,14 @@ public:
 	Item* getMoveableBlockingItem();
 	Thing* getTopThing();
 	
-	int getThingCount() const;
+	uint32_t getThingCount() const {return (uint32_t)(ground ? 1 : 0) + topItems.size() + creatures.size() + downItems.size();}
 
 	bool hasProperty(enum ITEMPROPERTY prop) const;
 
-	bool hasFlag(tileflags_t flag) const;
-	void setFlag(tileflags_t flag);
-	bool isPz() const;
-	void setPz();
+	bool hasFlag(tileflags_t flag) const {return ((flags & (uint32_t)flag) == (uint32_t)flag);}
+	void setFlag(tileflags_t flag) {flags |= flag;}
+	bool isPz() const {return hasFlag(TILESTATE_PROTECTIONZONE);}
+	void setPz() {setFlag(TILESTATE_PROTECTIONZONE);}
   
 	bool floorChange() const;
 	bool floorChangeDown() const;

@@ -126,7 +126,7 @@ bool IOMapSerializeSQL::saveTile(Database& db, uint32_t tileId, const Tile* tile
 	DBQuery query;
 	query << "INSERT INTO `tileitems` (`tileid`, `sid` , `pid` , `type` , `attributes` ) VALUES";
 
-	for(int i = 0; i < tile->getThingCount(); ++i){
+	for(uint32_t i = 0; i < tile->getThingCount(); ++i){
 		item = tile->__getThing(i)->getItem();
 
 		if(!item)
@@ -281,7 +281,7 @@ bool IOMapSerializeSQL::loadTile(Database& db, Tile* tile)
 				bool isDoor = iType.isDoor();
 
 				//find this type in the tile
-				for(int i = 0; i < tile->getThingCount(); ++i){
+				for(uint32_t i = 0; i < tile->getThingCount(); ++i){
 					Item* findItem = tile->__getThing(i)->getItem();
 
 					if(!findItem)

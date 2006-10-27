@@ -351,7 +351,8 @@ bool Monster::getNextStep(Direction& dir)
 	}
 	else{
 		if(!followCreature){
-			result = getRandomStep(getPosition(), getPosition(), dir);
+			const Position& position = getPosition();
+			result = getRandomStep(position, position, dir);
 		}
 		else{
 			result = Creature::getNextStep(dir);
@@ -366,8 +367,45 @@ bool Monster::getNextStep(Direction& dir)
 			}
 		}
 	}
-
-	//TODO: destroy blocking items/monsters
+	
+	//destroy blocking items
+	if(result && canPushItems()){
+		int dx, dy;
+		switch(dir){
+		case NORTH:
+			dx = 0; dy = -1;
+			break;
+		case SOUTH:
+			dx = 0; dy = +1;
+			break;
+		case EAST:
+			dx = 1; dy = 0;
+			break;
+		case WEST:
+			dx = -1; dy = 0;
+			break;
+		default:
+			dx = dy = 0;
+			break;
+		}
+		const Position& position = getPosition();
+		Tile* tile = g_game.getTile(position.x + dx, position.y + dy, position.z);
+		if(tile){
+			bool itemRemoved = false;
+			while(Item* item = tile->getMoveableBlockingItem()){
+				//TODO. move items?
+				if(g_game.internalRemoveItem(item) == RET_NOERROR){
+					itemRemoved = true;
+				}
+				else{
+					break;
+				}
+			}
+			if(itemRemoved){
+				g_game.addMagicEffect(tile->getPosition(), NM_ME_PUFF);
+			}
+		}
+	}
 
 	return result;
 }

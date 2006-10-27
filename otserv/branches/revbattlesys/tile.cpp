@@ -154,7 +154,7 @@ bool Tile::hasHeight(uint32_t n) const
 {
 	uint32_t height = 0;
 	Item* iiItem = NULL;
-	for(int32_t i = 0; i < getThingCount(); ++i){
+	for(uint32_t i = 0; i < getThingCount(); ++i){
 		iiItem = __getThing(i)->getItem();
 
 		if(iiItem && iiItem->hasProperty(HASHEIGHT))
@@ -172,7 +172,7 @@ uint32_t Tile::getHeight() const
 {
 	uint32_t height = 0;
 	Item* iiItem = NULL;
-	for(int32_t i = 0; i < getThingCount(); ++i){
+	for(uint32_t i = 0; i < getThingCount(); ++i){
 		iiItem = __getThing(i)->getItem();
 
 		if(iiItem && iiItem->hasProperty(HASHEIGHT))
@@ -180,11 +180,6 @@ uint32_t Tile::getHeight() const
 	}
 
 	return height;
-}
-
-int Tile::getThingCount() const
-{
-	return (uint32_t) (ground ? 1 : 0) + topItems.size() + creatures.size() + downItems.size();
 }
 
 std::string Tile::getDescription(int32_t lookDistance) const
@@ -221,7 +216,7 @@ TrashHolder* Tile::getTrashHolder() const
 {
 	TrashHolder* trashholder = NULL;
 	Item* iiItem = NULL;
-	for(int32_t i = 0; i < getThingCount(); ++i){
+	for(uint32_t i = 0; i < getThingCount(); ++i){
 		iiItem = __getThing(i)->getItem();
 		if(iiItem && (trashholder = iiItem->getTrashHolder()))
 			return trashholder;
@@ -234,7 +229,7 @@ Mailbox* Tile::getMailbox() const
 {
 	Mailbox* mailbox = NULL;
 	Item* iiItem = NULL;
-	for(int32_t i = 0; i < getThingCount(); ++i){
+	for(uint32_t i = 0; i < getThingCount(); ++i){
 		iiItem = __getThing(i)->getItem();
 		if(iiItem && (mailbox = iiItem->getMailbox()))
 			return mailbox;
@@ -300,26 +295,6 @@ Item* Tile::getMoveableBlockingItem()
 	}
 
 	return NULL;
-}
-
-bool Tile::hasFlag(tileflags_t flag) const
-{
-	return ((flags & (uint32_t)flag) == (uint32_t)flag);
-}
-
-void Tile::setFlag(tileflags_t flag)
-{
-	flags |= flag;
-}
-
-bool Tile::isPz() const
-{
-	return hasFlag(TILESTATE_PROTECTIONZONE);
-}
-
-void Tile::setPz()
-{
-	setFlag(TILESTATE_PROTECTIONZONE);
 }
 
 void Tile::onAddTileItem(Item* item)
@@ -504,7 +479,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 				return RET_NOTPOSSIBLE;
 			}
 
-			for(int32_t i = 0; i < getThingCount(); ++i){
+			for(uint32_t i = 0; i < getThingCount(); ++i){
 				iithing = __getThing(i);
 
 				if(const Item* iitem = iithing->getItem()){
@@ -535,7 +510,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			}
 		}
 
-		for(int32_t i = 0; i < getThingCount(); ++i){
+		for(uint32_t i = 0; i < getThingCount(); ++i){
 			iithing = __getThing(i);
 
 			if(const Item* iitem = iithing->getItem()){
@@ -577,7 +552,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 		if(!creatures.empty() && item->isBlocking())
 			return RET_NOTENOUGHROOM;
 
-		for(int32_t i = 0; i < getThingCount(); ++i){
+		for(uint32_t i = 0; i < getThingCount(); ++i){
 			iithing = __getThing(i);
 
 			if(const Item* iitem = iithing->getItem()){
@@ -1039,7 +1014,7 @@ uint32_t Tile::__getItemTypeCount(uint16_t itemId) const
 {
 	uint32_t count = 0;
 	Thing* thing = NULL;
-	for(int32_t i = 0; i < getThingCount(); ++i){
+	for(uint32_t i = 0; i < getThingCount(); ++i){
 		thing = __getThing(i);
 
 		if(const Item* item = thing->getItem()){

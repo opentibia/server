@@ -127,5 +127,13 @@ struct Outfit_t{
 	uint32_t lookFeet;
 };
 
+struct LightInfo{
+	uint32_t level;
+	uint32_t color;
+	LightInfo(){
+		level = 0;
+		color = 0;
+	};
+};
 
 #endif

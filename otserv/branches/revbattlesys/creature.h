@@ -180,7 +180,7 @@ public:
 		bool checkDefense = false, bool checkArmor = false);
 	virtual void doAttacking(uint32_t interval) {};
 
-	void setMaster(Creature* creature);
+	void setMaster(Creature* creature) {master = creature;}
 	Creature* getMaster() {return master;}
 	const Creature* getMaster() const {return master;}
 	
@@ -230,7 +230,7 @@ public:
 	
 	virtual void getCreatureLight(LightInfo& light) const;
 	virtual void setNormalCreatureLight();
-	void setCreatureLight(LightInfo& light);
+	void setCreatureLight(LightInfo& light) {internalLight = light;}
 	
 	virtual void onThink(uint32_t interval);
 	virtual void onWalk();

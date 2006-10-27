@@ -433,7 +433,7 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 									mType->spellAttackList.push_back(sb);
 								}
 								else{
-									std::cout << "Warning: [Monsters::loadMonster] Spell not found - " << file << std::endl;
+									std::cout << "Warning: [Monsters::loadMonster] Spell \"" << strValue << "\" not found - " << file << std::endl;
 								}
 							}
 						}

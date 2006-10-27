@@ -224,7 +224,7 @@ bool House::transferToDepot()
 	Item* item = NULL;
 
 	for(HouseTileList::iterator it = houseTiles.begin(); it != houseTiles.end(); ++it){
-		for(int i = 0; i < (*it)->getThingCount(); ++i){
+		for(uint32_t i = 0; i < (*it)->getThingCount(); ++i){
 			item = (*it)->__getThing(i)->getItem();
 
 			if(!item)

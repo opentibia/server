@@ -58,15 +58,6 @@ enum TradeEvents_t{
 	ON_TRADE_CANCEL,
 };
 
-struct LightInfo{
-	long level;
-	long color;
-	LightInfo(){
-		level = 0;
-		color = 0;
-	};
-};
-
 enum ItemDecayState_t{
 	DECAYING_FALSE = 0,
 	DECAYING_TRUE,
@@ -113,28 +104,28 @@ public:
 	ItemAttributes();
 	virtual ~ItemAttributes();
 	
-	void setSpecialDescription(const std::string& desc);
-	const std::string& getSpecialDescription() const;
+	void setSpecialDescription(const std::string& desc) {setStrAttr(ATTR_ITEM_DESC, desc);}
+	const std::string& getSpecialDescription() const {return getStrAttr(ATTR_ITEM_DESC);}
 	
-	void setText(const std::string& text);
-	const std::string& getText() const;
+	void setText(const std::string& text) {setStrAttr(ATTR_ITEM_TEXT, text);}
+	const std::string& getText() const {return getStrAttr(ATTR_ITEM_TEXT);}
 	
-	void setActionId(unsigned short n);
-	unsigned short getActionId() const;
+	void setActionId(unsigned short n) {if(n < 100) n = 100; setIntAttr(ATTR_ITEM_ACTIONID, n);}
+	unsigned short getActionId() const {return getIntAttr(ATTR_ITEM_ACTIONID);}
 
-	void setUniqueId(unsigned short n);
-	unsigned short getUniqueId() const;
+	void setUniqueId(unsigned short n) {if(n < 1000) n = 1000; setIntAttr(ATTR_ITEM_UNIQUEID, n);}
+	unsigned short getUniqueId() const {return getIntAttr(ATTR_ITEM_UNIQUEID);}
 
-	void setOwner(uint32_t _owner);
-	uint32_t getOwner();
+	void setOwner(uint32_t _owner) {setIntAttr(ATTR_ITEM_OWNER, _owner);}
+	uint32_t getOwner() const {return getIntAttr(ATTR_ITEM_OWNER);}
 
-	void setDuration(int32_t t);
-	void decreaseDuration(int32_t );
-	bool hasDuration();
-	int32_t getDuration() const;
+	void setDuration(int32_t time) {setIntAttr(ATTR_ITEM_DURATION, time);}
+	void decreaseDuration(int32_t time) {increaseIntAttr(ATTR_ITEM_DURATION, -time);}
+	bool hasDuration() {return hasAttribute(ATTR_ITEM_DURATION);}
+	int32_t getDuration() const {return getIntAttr(ATTR_ITEM_DURATION);}
 
-	void setDecaying(ItemDecayState_t decayState);
-	uint32_t getDecaying();
+	void setDecaying(ItemDecayState_t decayState) {setIntAttr(ATTR_ITEM_DECAYING, decayState);}
+	uint32_t getDecaying() const {return getIntAttr(ATTR_ITEM_DECAYING);}
 
 protected:
 	enum itemAttrTypes{
@@ -201,7 +192,7 @@ public:
 	virtual ~Item();
 
 	virtual Item* getItem() {return this;};
-	virtual const Item* getItem()const {return this;};
+	virtual const Item* getItem() const {return this;};
 	virtual Container* getContainer() {return NULL;};
 	virtual const Container* getContainer() const {return NULL;};
 	virtual Teleport* getTeleport() {return NULL;};
@@ -232,50 +223,50 @@ public:
 	virtual std::string getDescription(int32_t lookDistance) const;
 	std::string getWeightDescription() const;
 
-	unsigned short getID() const;    // ID as in ItemType
-	unsigned short getClientID() const;
-	virtual void setID(unsigned short newid);
+	unsigned short getID() const {return id;}
+	unsigned short getClientID() const {return items[id].clientId;}
+	virtual void setID(unsigned short newid) {id = newid;}
 
-	WeaponType_t getWeaponType() const;
-	Ammo_t	getAmuType() const;
+	WeaponType_t getWeaponType() const {return items[id].weaponType;}
+	Ammo_t	getAmuType() const {return items[id].amuType;}
 
 	virtual double getWeight() const;
-	int getAttack() const;
-	int getArmor() const;
-	int getDefense() const;
-	int getSlotPosition() const;
+	int getAttack() const {return items[id].attack;}
+	int getArmor() const {return items[id].armor;}
+	int getDefense() const {return items[id].defence;}
+	int getSlotPosition() const {return items[id].slot_position;}
 	int getRWInfo(int& maxlen) const;
 	int getWorth() const;
 	void getLight(LightInfo& lightInfo);
 
 	bool hasProperty(enum ITEMPROPERTY prop) const;
-	bool isBlocking() const;
-	bool isStackable() const;
-	bool isRune() const;
-	bool isFluidContainer() const;
-	bool isAlwaysOnTop() const;
-	bool isGroundTile() const;
-	bool isSplash() const;
-	bool isMagicField() const;
-	bool isNotMoveable() const;
-	bool isPickupable() const;
-	bool isWeapon() const;
-	bool isUseable() const;
-	bool isHangable() const;
-	bool isRoteable() const;
-	bool isDoor() const;
+	bool isBlocking() const {return items[id].blockSolid;}
+	bool isStackable() const {return items[id].stackable;}
+	bool isRune() const {return (items[id].group == ITEM_GROUP_RUNE);}
+	bool isFluidContainer() const {return (items[id].isFluidContainer());}
+	bool isAlwaysOnTop() const {return items[id].alwaysOnTop;}
+	bool isGroundTile() const {return items[id].isGroundTile();}
+	bool isSplash() const {return items[id].isSplash();}
+	bool isMagicField() const {return items[id].isMagicField();}
+	bool isNotMoveable() const {return !items[id].moveable;}
+	bool isPickupable() const {return items[id].pickupable;}
+	bool isWeapon() const {return (items[id].weaponType != WEAPON_NONE && items[id].weaponType != WEAPON_AMMO);}
+	bool isUseable() const {return items[id].useable;}
+	bool isHangable() const {return items[id].isHangable;}
+	bool isRoteable() const {const ItemType& it = items[id]; return it.rotable && it.rotateTo;}
+	bool isDoor() const {return items[id].isDoor();}
 
-	bool floorChangeDown() const;
-	bool floorChangeNorth() const;
-	bool floorChangeSouth() const;
-	bool floorChangeEast() const;
-	bool floorChangeWest() const;
+	bool floorChangeDown() const {return items[id].floorChangeDown;}
+	bool floorChangeNorth() const {return items[id].floorChangeNorth;}
+	bool floorChangeSouth() const {return items[id].floorChangeSouth;}
+	bool floorChangeEast() const {return items[id].floorChangeEast;}
+	bool floorChangeWest() const {return items[id].floorChangeWest;}
 
-	const std::string& getName() const;
+	const std::string& getName() const {return items[id].name;}
 
 	// get the number of items
-	unsigned short getItemCount() const;
-	void setItemCount(uint8_t n);
+	unsigned short getItemCount() const {return count;}
+	void setItemCount(uint8_t n) {count = n;}
 
 	unsigned char getItemCountOrSubtype() const;
 	void setItemCountOrSubtype(unsigned char n);

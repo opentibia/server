@@ -28,14 +28,15 @@
 #include "cylinder.h"
 #include "enums.h"
 #include "vocation.h"
+#include "protocol76.h"
 
 #include <vector>
 #include <ctime>
 #include <algorithm>
 
 class House;
-class Protocol76;
 class Weapon;
+class Protocol76;
 
 enum skillsid_t {
 	SKILL_LEVEL=0,
@@ -109,7 +110,7 @@ public:
 	static AutoList<Player> listPlayer;
 	void removeList();
 	void addList();
-	void kickPlayer();
+	void kickPlayer() {client->logout();}
 	
 	unsigned long getGuildId() const {return guildId;};
 	const std::string& getGuildName() const {return guildName;};
@@ -171,11 +172,11 @@ public:
 	
 	Item* getInventoryItem(slots_t slot) const;
 
-	bool isItemAbilityEnabled(slots_t slot) const;
-	void setItemAbility(slots_t slot, bool enabled);
+	bool isItemAbilityEnabled(slots_t slot) const {return inventoryAbilities[slot];}
+	void setItemAbility(slots_t slot, bool enabled) {inventoryAbilities[slot] = enabled;}
 
-	int32_t getVarSkill(skills_t skill) const;
-	void setVarSkill(skills_t skill, int32_t modifier);
+	int32_t getVarSkill(skills_t skill) const {return varSkills[skill];}
+	void setVarSkill(skills_t skill, int32_t modifier) {varSkills[skill] += modifier;}
 	void setConditionSuppressions(uint32_t conditions, bool remove);
 
 	Depot* getDepot(uint32_t depotId, bool autoCreateDepot);
@@ -261,29 +262,47 @@ public:
 	void addAttacked(const Player* attacked);
 	void clearAttacked();
 	void addUnjustifiedDead(const Player* attacked);
-	void setSkull(Skulls_t new_skull);
-	void sendCreatureSkull(const Creature* creature, Skulls_t skull) const;
+	void setSkull(Skulls_t newSkull) {skull = newSkull;}
+	void sendCreatureSkull(const Creature* creature, Skulls_t skull) const
+		{client->sendCreatureSkull(creature, skull);}
 	void checkRedSkullTicks(long ticks);
 #endif
 	
 	//tile
 	//send methods
-	void sendAddTileItem(const Position& pos, const Item* item);
-	void sendUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* olditem, const Item* newitem);
-	void sendRemoveTileItem(const Position& pos, uint32_t stackpos, const Item* item);
-	void sendUpdateTile(const Position& pos);
+	void sendAddTileItem(const Position& pos, const Item* item)
+		{client->sendAddTileItem(pos, item);}
+	void sendUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* olditem, const Item* newitem)
+		{client->sendUpdateTileItem(pos, stackpos, newitem);}
+	void sendRemoveTileItem(const Position& pos, uint32_t stackpos, const Item* item)
+		{client->sendRemoveTileItem(pos, stackpos);}
+	void sendUpdateTile(const Position& pos)
+		{client->UpdateTile(pos);}
 
-	void sendCreatureAppear(const Creature* creature, bool isLogin);
-	void sendCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout);
-	void sendCreatureMove(const Creature* creature, const Position& newPos, const Position& oldPos, uint32_t oldStackPos, bool teleport);
+	void sendCreatureAppear(const Creature* creature, bool isLogin)
+		{client->sendAddCreature(creature, isLogin);}
+	void sendCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout)
+		{client->sendRemoveCreature(creature, creature->getPosition(), stackpos, isLogout);}
+	void sendCreatureMove(const Creature* creature, const Position& newPos, const Position& oldPos, uint32_t oldStackPos, bool teleport)
+		{client->sendMoveCreature(creature, newPos, oldPos, oldStackPos, teleport);}
 
-	void sendCreatureTurn(const Creature* creature, uint32_t stackpos);
-	void sendCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text);
-	void sendCreatureSquare(const Creature* creature, SquareColor_t color);
-	void sendCreatureChangeOutfit(const Creature* creature, const Outfit_t& outfit);
-	void sendCreatureChangeVisible(const Creature* creature, bool visible);
-	void sendCreatureLight(const Creature* creature);
-	void sendWorldLight(LightInfo& lightInfo);
+	void sendCreatureTurn(const Creature* creature, uint32_t stackpos)
+		{client->sendCreatureTurn(creature, stackpos);}
+	void sendCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text)
+		{client->sendCreatureSay(creature, type, text);}
+	void sendCreatureSquare(const Creature* creature, SquareColor_t color)
+		{client->sendCreatureSquare(creature, color);}
+	void sendCreatureChangeOutfit(const Creature* creature, const Outfit_t& outfit)
+		{client->sendCreatureOutfit(creature, outfit);}
+	void sendCreatureChangeVisible(const Creature* creature, bool visible)
+		{
+			if(visible)
+				client->sendCreatureOutfit(creature, creature->getCurrentOutfit());
+			else
+				client->sendCreatureInvisible(creature);
+		}
+	void sendCreatureLight(const Creature* creature)
+		{client->sendCreatureLight(creature);}
 
 	//container
 	void sendAddContainerItem(const Container* container, const Item* item);
@@ -291,9 +310,12 @@ public:
 	void sendRemoveContainerItem(const Container* container, uint8_t slot, const Item* item);
 
 	//inventory
-	void sendAddInventoryItem(slots_t slot, const Item* item);
-	void sendUpdateInventoryItem(slots_t slot, const Item* oldItem, const Item* newItem);
-	void sendRemoveInventoryItem(slots_t slot, const Item* item);
+	void sendAddInventoryItem(slots_t slot, const Item* item)
+		{client->sendAddInventoryItem(slot, item);}
+	void sendUpdateInventoryItem(slots_t slot, const Item* oldItem, const Item* newItem)
+		{client->sendUpdateInventoryItem(slot, newItem);}
+	void sendRemoveInventoryItem(slots_t slot, const Item* item)
+		{client->sendRemoveInventoryItem(slot);}
 
 	//event methods
 	virtual void onAddTileItem(const Position& pos, const Item* item);
@@ -325,29 +347,47 @@ public:
 	void onUpdateInventoryItem(slots_t slot, Item* oldItem, Item* newItem);
 	void onRemoveInventoryItem(slots_t slot, Item* item);
 
-	void sendIcons() const;  
-	void sendChangeSpeed(const Creature* creature, uint32_t newSpeed) const;
-	void sendToChannel(Creature* creature, SpeakClasses type, const std::string& text, unsigned short channelId) const;
+	//other send messages
+	void sendAnimatedText(const Position& pos, unsigned char color, std::string text) const
+		{client->sendAnimatedText(pos,color,text);}
+	void sendCancel(const char* msg) const
+		{client->sendCancel(msg);}
 	void sendCancelMessage(ReturnValue message) const;
-	void sendCancel(const char* msg) const;
-	void sendCancelWalk() const;
-	void sendCancelTarget() const;
-	void sendStats();
-	void sendSkills() const;
-	void sendTextMessage(MessageClasses mclass, const std::string& message) const;
-	void sendTextMessage(MessageClasses mclass, const std::string& message, const Position& pos,
-		unsigned char type) const;
-	void sendPing();
-	void sendTextWindow(Item* item,const unsigned short maxlen, const bool canWrite) const;
-	void sendDistanceShoot(const Position& from, const Position& to, unsigned char type) const;
-	void sendMagicEffect(const Position& pos, unsigned char type) const;
-	void sendAnimatedText(const Position& pos, unsigned char color, std::string text) const;
-	void sendCreatureHealth(const Creature* creature) const;
-	void sendTradeItemRequest(const Player* player, const Item* item, bool ack) const;
-	void sendCloseTrade() const;
+	void sendCancelTarget() const
+		{client->sendCancelTarget();}
+	void sendCancelWalk() const
+		{client->sendCancelWalk();}
+	void sendChangeSpeed(const Creature* creature, uint32_t newSpeed) const 
+		{client->sendChangeSpeed(creature, newSpeed);}
+	void sendCreatureHealth(const Creature* creature) const
+		{client->sendCreatureHealth(creature);}
+	void sendDistanceShoot(const Position& from, const Position& to, unsigned char type) const
+		{client->sendDistanceShoot(from, to,type);}
 	void sendHouseWindow(House* _house, unsigned long _listid) const;
-	void receivePing();
-	void flushMsg();
+	void sendIcons() const; 
+	void sendMagicEffect(const Position& pos, unsigned char type) const
+		{client->sendMagicEffect(pos,type);}
+	void sendPing();
+	void sendStats();
+	void sendSkills() const
+		{client->sendSkills();}
+	void sendTextMessage(MessageClasses mclass, const std::string& message) const
+		{client->sendTextMessage(mclass, message);}
+	void sendTextMessage(MessageClasses mclass, const std::string& message, const Position& pos, unsigned char type) const
+		{client->sendTextMessage(mclass, message, pos, type);}
+	void sendTextWindow(Item* item,const unsigned short maxlen, const bool canWrite) const
+		{client->sendTextWindow(item,maxlen,canWrite);}
+	void sendToChannel(Creature* creature, SpeakClasses type, const std::string& text, unsigned short channelId) const
+		{client->sendToChannel(creature, type, text, channelId);}
+	void sendTradeItemRequest(const Player* player, const Item* item, bool ack) const
+		{client->sendTradeItemRequest(player, item, ack);}
+	void sendTradeClose() const 
+		{client->sendCloseTrade();}
+	void sendWorldLight(LightInfo& lightInfo)
+		{client->sendWorldLight(lightInfo);}
+	
+	void receivePing() {if(npings > 0) npings--;}
+	void flushMsg() {client->flushOutputBuffer();}
 
 	virtual void onThink(uint32_t interval);
 

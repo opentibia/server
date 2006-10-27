@@ -178,31 +178,6 @@ Item::~Item()
 	//
 }
 
-unsigned short Item::getID() const
-{
-	return id;
-}
-
-unsigned short Item::getClientID() const
-{
-	return items[id].clientId;
-}
-
-void Item::setID(unsigned short newid)
-{
-	id = newid;
-}
-
-unsigned short Item::getItemCount() const
-{
-	return count;
-}
-
-void Item::setItemCount(uint8_t n)
-{
-	count = n;
-}
-
 unsigned char Item::getItemCountOrSubtype() const
 {
 	const ItemType& it = items[getID()];
@@ -627,111 +602,6 @@ bool Item::hasProperty(enum ITEMPROPERTY prop) const
 	return false;
 }
 
-bool Item::isBlocking() const{
-	const ItemType& it = items[id];
-	return it.blockSolid;
-}
-
-bool Item::isStackable() const{
-	return items[id].stackable;
-}
-
-bool Item::isRune() const{
-	return (items[id].group == ITEM_GROUP_RUNE);
-}
-
-bool Item::isFluidContainer() const{
-	return (items[id].isFluidContainer());
-}
-
-bool Item::isAlwaysOnTop() const{
-	return items[id].alwaysOnTop;
-}
-
-bool Item::isNotMoveable() const{
-	return !items[id].moveable;
-}
-
-bool Item::isGroundTile() const{
-	return items[id].isGroundTile();
-}
-
-bool Item::isSplash() const{
-	return items[id].isSplash();
-}
-
-bool Item::isMagicField() const{
-	return items[id].isMagicField();
-}
-
-bool Item::isPickupable() const{
-	return items[id].pickupable;
-}
-
-bool Item::isUseable() const{
-	return items[id].useable;
-}
-
-bool Item::isHangable() const{
-	return items[id].isHangable;
-}
-
-bool Item::isRoteable() const{
-	const ItemType& it = items[id];
-	return it.rotable && it.rotateTo;
-}
-
-bool Item::isDoor() const
-{
-	const ItemType& it = items[id];
-	return it.isDoor();
-}
-
-bool Item::floorChangeDown() const{
-	return items[id].floorChangeDown;
-}
-
-bool Item::floorChangeNorth() const{
-	return items[id].floorChangeNorth;
-}
-bool Item::floorChangeSouth() const{
-	return items[id].floorChangeSouth;
-}
-bool Item::floorChangeEast() const{
-	return items[id].floorChangeEast;
-}
-bool Item::floorChangeWest() const{
-	return items[id].floorChangeWest;
-}
-
-bool Item::isWeapon() const{
-  return (items[id].weaponType != WEAPON_NONE && items[id].weaponType != WEAPON_AMMO);
-}
-
-WeaponType_t Item::getWeaponType() const{
-	return items[id].weaponType;
-}
-
-Ammo_t Item::getAmuType() const{
-	return items[id].amuType;
-}
-
-int Item::getAttack() const{
-	return items[id].attack;
-}
-
-int Item::getArmor() const{
-	return items[id].armor;
-}
-
-int Item::getDefense() const{
-	return items[id].defence;
-}
-
-int Item::getSlotPosition() const{
-	return items[id].slot_position;
-}
-
 double Item::getWeight() const {
 	if(isStackable()){
 		return items[id].weight * std::max(1, (int)count);
@@ -885,11 +755,6 @@ std::string Item::getWeightDescription() const
 	return ss.str();
 }
 
-const std::string& Item::getName() const
-{
-	return items[id].name;
-}
-
 void Item::setUniqueId(unsigned short n)
 {
 	if(getUniqueId() != 0)
@@ -948,90 +813,6 @@ ItemAttributes::~ItemAttributes()
 	if(m_firstAttr){
 		deleteAttrs(m_firstAttr);
 	}
-}
-
-void ItemAttributes::setSpecialDescription(const std::string& desc)
-{
-	setStrAttr(ATTR_ITEM_DESC, desc);
-}
-
-const std::string& ItemAttributes::getSpecialDescription() const
-{
-	return getStrAttr(ATTR_ITEM_DESC);
-}
-
-void ItemAttributes::setText(const std::string& text)
-{
-	setStrAttr(ATTR_ITEM_TEXT, text);
-}
-
-const std::string& ItemAttributes::getText() const
-{
-	return getStrAttr(ATTR_ITEM_TEXT);
-}
-
-void ItemAttributes::setActionId(unsigned short n)
-{
-	if(n < 100)
-		n = 100;
-	setIntAttr(ATTR_ITEM_ACTIONID, n);
-}
-
-unsigned short ItemAttributes::getActionId() const
-{
-	return getIntAttr(ATTR_ITEM_ACTIONID);
-}
-
-void ItemAttributes::setUniqueId(unsigned short n)
-{
-	 if(n < 1000)
-	 	n = 1000;
-	setIntAttr(ATTR_ITEM_UNIQUEID, n);
-}
-
-unsigned short ItemAttributes::getUniqueId() const
-{
-	return getIntAttr(ATTR_ITEM_UNIQUEID);
-}
-
-void ItemAttributes::setOwner(uint32_t _owner)
-{
-	setIntAttr(ATTR_ITEM_OWNER, _owner);
-}
-
-uint32_t ItemAttributes::getOwner()
-{
-	return getIntAttr(ATTR_ITEM_OWNER);
-}
-
-void ItemAttributes::setDuration(int32_t time)
-{
-	setIntAttr(ATTR_ITEM_DURATION, time);
-}
-
-void ItemAttributes::decreaseDuration(int32_t time)
-{
-	increaseIntAttr(ATTR_ITEM_DURATION, -time);
-}
-
-int32_t ItemAttributes::getDuration() const
-{
-	return getIntAttr(ATTR_ITEM_DURATION);
-}
-
-bool ItemAttributes::hasDuration()
-{
-	return hasAttribute(ATTR_ITEM_DURATION);
-}
-
-void ItemAttributes::setDecaying(ItemDecayState_t decayState)
-{
-	setIntAttr(ATTR_ITEM_DECAYING, decayState);
-}
-
-uint32_t ItemAttributes::getDecaying()
-{
-	return getIntAttr(ATTR_ITEM_DECAYING);
 }
 
 const std::string& ItemAttributes::getStrAttr(itemAttrTypes type) const

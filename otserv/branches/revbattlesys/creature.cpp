@@ -595,12 +595,6 @@ void Creature::onAttackedCreatureBlockHit(Creature* target, BlockType_t blockTyp
 	//
 }
 
-void Creature::setMaster(Creature* creature)
-{
-	//std::cout << "setMaster: " << this << " master=" << creature << std::endl;
-	master = creature;
-}
-
 void Creature::addSummon(Creature* creature)
 {
 	//std::cout << "addSummon: " << this << " summon=" << creature << std::endl;
@@ -814,9 +808,4 @@ void Creature::setNormalCreatureLight()
 {
 	internalLight.level = 0;
 	internalLight.color = 0;
-}
-
-void Creature::setCreatureLight(LightInfo& light)
-{
-	internalLight = light;
 }

@@ -25,9 +25,10 @@
 #define __OTSERV_PROTOCOL76_H__
 
 #include "definitions.h"
-#include "game.h"
 #include <string>
 #include "networkmessage.h"
+#include "enums.h"
+#include "creature.h"
 
 enum connectResult_t{
 	CONNECT_SUCCESS = 1,
@@ -37,8 +38,11 @@ enum connectResult_t{
 };
 
 class NetworkMessage;
-class Creature;
 class Player;
+class Game;
+class House;
+class Container;
+class Tile;
 
 class Protocol76
 {

@@ -49,8 +49,8 @@ public:
 	uint32_t size() const {return (uint32_t)itemlist.size();};
 	uint32_t capacity() const {return maxSize;};
 
-	ItemList::const_iterator getItems() const;
-	ItemList::const_iterator getEnd() const;
+	ItemList::const_iterator getItems() const {return itemlist.begin();}
+	ItemList::const_iterator getEnd() const {return itemlist.end();}
 
 	Item* getItem(uint32_t index);
 	bool isHoldingItem(const Item* item) const;

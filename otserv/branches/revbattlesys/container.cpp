@@ -177,16 +177,6 @@ double Container::getWeight() const
 	return weight;
 }
 
-ItemList::const_iterator Container::getItems() const
-{
-	return itemlist.begin();
-}
-
-ItemList::const_iterator Container::getEnd() const
-{
-	return itemlist.end();
-}
-
 Item* Container::getItem(uint32_t index)
 {
 	size_t n = 0;			
