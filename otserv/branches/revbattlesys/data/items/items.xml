@@ -70,6 +70,33 @@
 		<attribute key="showduration" value="1"/>
 	</item>
 
+	<item id="2213" name="dwarfen ring">
+		<attribute key="transformEquipTo" value="2215"/>
+		<attribute key="showduration" value="1"/>
+		<attribute key="canDecay" value="0"/>
+	</item>
+
+	<item id="2215" name="dwarfen ring">
+		<attribute key="transformDeEquipTo" value="2213"/>
+		<attribute key="suppressDrunk" value="1"/>
+		<attribute key="duration" value="300"/>
+		<attribute key="showduration" value="1"/>
+	</item>
+
+	<item id="2168" name="life ring">
+		<attribute key="transformEquipTo" value="2205"/>
+		<attribute key="showduration" value="1"/>
+		<attribute key="canDecay" value="0"/>
+	</item>
+
+	<item id="2205" name="life ring">
+		<attribute key="transformDeEquipTo" value="2168"/>
+		<attribute key="duration" value="500"/>
+		<attribute key="manaGain" value="50"/>
+		<attribute key="manaTicks" value="3000"/>
+		<attribute key="showduration" value="1"/>
+	</item>
+
 	<item id="2162" name="magic lightwand">
 		<attribute key="showduration" value="1"/>
 		<attribute key="canDecay" value="0"/>
