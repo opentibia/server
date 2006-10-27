@@ -3009,17 +3009,18 @@ void Game::startDecay(Item* item)
 {
 	if(item->canDecay()){
 		uint32_t decayState = item->getDecaying();
-		if(decayState == ITEM_NO_DECAYING || decayState == ITEM_PENDING_START_DECAY){
-			if(decayState == ITEM_NO_DECAYING){		
+		//if(decayState == DECAYING_FALSE || decayState == DECAYING_PENDING){
+		if(decayState != DECAYING_TRUE){
+			if(decayState == DECAYING_FALSE && !item->hasDuration()){
 				item->setDefaultDuration();
 			}
-			else{//decayState == ITEM_PENDING_START_DECAY
+			else if(decayState == DECAYING_PENDING){
 				//no change duration because was set during loading time
 			}
 			
 			if(item->getDuration() > 0){
 				item->useThing2();
-				item->setDecaying(ITEM_DECAYING);
+				item->setDecaying(DECAYING_TRUE);
 				decayItems.push_back(item);
 			}
 			else{
@@ -3035,7 +3036,7 @@ void Game::internalDecayItem(Item* item)
 
 	if(it.decayTo != 0){
 		Item* newItem = transformItem(item, it.decayTo);
-		newItem->setDecaying(ITEM_NO_DECAYING);
+		newItem->setDecaying(DECAYING_FALSE);
 		//newItem->setDuration(newItem->getDefaultDuration());
 		newItem->setDefaultDuration();
 		startDecay(newItem);
@@ -3053,16 +3054,16 @@ void Game::checkDecay(int32_t interval)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::checkDecay()");
 	addEvent(makeTask(DECAY_INTERVAL, boost::bind(&Game::checkDecay, this, DECAY_INTERVAL)));
-	std::cout << "checkDecay" << std::endl;
+	//std::cout << "checkDecay" << std::endl;
 	Item* item = NULL;
 	for(DecayList::iterator it = decayItems.begin(); it != decayItems.end();){
 		item = *it;
-		std::cout << "check Item " << item << std::endl;
+		//std::cout << "check Item " << item << std::endl;
 		//item->setDuration(item->getDuration() - interval);
 		item->decreaseDuration(interval);
 		
 		if(!item->canDecay()){
-			item->setDecaying(ITEM_NO_DECAYING);
+			item->setDecaying(DECAYING_FALSE);
 			FreeThing(item);
 			it = decayItems.erase(it);
 			continue;
