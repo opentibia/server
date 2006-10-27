@@ -271,7 +271,7 @@ bool IOMapSerializeSQL::loadTile(Database& db, Tile* tile)
 
 					if(pid == 0){
 						tile->__internalAddThing(item);
-						g_game.startDecay(item);
+						item->__startDecaying();
 					}
 				}
 				else

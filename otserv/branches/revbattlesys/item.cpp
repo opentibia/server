@@ -26,6 +26,7 @@
 #include "trashholder.h"
 #include "mailbox.h"
 #include "house.h"
+#include "game.h"
 #include "luascript.h"
 
 #include "actions.h"
@@ -34,6 +35,8 @@
 #include <iostream>
 #include <sstream>
 #include <iomanip>
+
+extern Game g_game;
 
 Item* Item::CreateItem(const unsigned short _type, unsigned short _count /*= 1*/)
 {
@@ -301,7 +304,23 @@ bool Item::unserialize(xmlNodePtr nodeItem)
 		setUniqueId(atoi(nodeValue));
 		xmlFreeOTSERV(nodeValue);
 	}
-	
+
+	nodeValue = (char*)xmlGetProp(nodeItem, (const xmlChar *) "duration");
+	if(nodeValue){
+		setDuration(atoi(nodeValue));
+		xmlFreeOTSERV(nodeValue);
+	}
+
+	nodeValue = (char*)xmlGetProp(nodeItem, (const xmlChar *) "decayState");
+	if(nodeValue){
+		ItemDecayState_t decayState = (ItemDecayState_t)atoi(nodeValue);
+		if(decayState != DECAYING_FALSE){
+			setDecaying(DECAYING_PENDING);
+		}
+
+		xmlFreeOTSERV(nodeValue);
+	}
+
 	return true;
 }
 
@@ -325,13 +344,13 @@ xmlNodePtr Item::serialize()
 		ss << getSpecialDescription();
 		xmlSetProp(nodeItem, (const xmlChar*)"special_description", (const xmlChar*)ss.str().c_str());
 	}
-	
+
 	if(getText() != ""){
 		ss.str("");
 		ss << getText();
 		xmlSetProp(nodeItem, (const xmlChar*)"text", (const xmlChar*)ss.str().c_str());
 	}
-	
+
 	if(!isNotMoveable() /*moveable*/){
 		if(getActionId() != 0){
 			ss.str("");
@@ -340,6 +359,20 @@ xmlNodePtr Item::serialize()
 		}
 	}
 	
+	uint32_t duration = getDuration();
+	if(duration != 0){
+		ss.str("");
+		ss << duration;
+		xmlSetProp(nodeItem, (const xmlChar*)"duration", (const xmlChar*)ss.str().c_str());
+	}
+
+	uint32_t decayState = getDecaying();
+	if(decayState == DECAYING_TRUE || decayState == DECAYING_PENDING){
+		ss.str("");
+		ss << decayState;
+		xmlSetProp(nodeItem, (const xmlChar*)"decayState", (const xmlChar*)ss.str().c_str());
+	}
+
 	return nodeItem;
 }
 
@@ -429,8 +462,9 @@ bool Item::readAttr(AttrTypes_t attr, PropStream& propStream)
 			if(!propStream.GET_UCHAR(state)){
 				return false;
 			}
-			if(state == ITEM_DECAYING){
-				setDecaying(ITEM_PENDING_START_DECAY);
+
+			if(state != DECAYING_FALSE){
+				setDecaying(DECAYING_PENDING);
 			}
 			break;
 		}
@@ -539,7 +573,7 @@ bool Item::serializeAttr(PropWriteStream& propWriteStream)
 	}
 
 	uint32_t decayState = getDecaying();
-	if(decayState == ITEM_DECAYING || decayState == ITEM_PENDING_START_DECAY){
+	if(decayState == DECAYING_TRUE || decayState == DECAYING_PENDING){
 		propWriteStream.ADD_UCHAR(ATTR_DECAYING_STATE);
 		propWriteStream.ADD_UCHAR(decayState);
 	}
@@ -985,6 +1019,11 @@ int32_t ItemAttributes::getDuration() const
 	return getIntAttr(ATTR_ITEM_DURATION);
 }
 
+bool ItemAttributes::hasDuration()
+{
+	return hasAttribute(ATTR_ITEM_DURATION);
+}
+
 void ItemAttributes::setDecaying(ItemDecayState_t decayState)
 {
 	setIntAttr(ATTR_ITEM_DECAYING, decayState);
@@ -1179,4 +1218,9 @@ void ItemAttributes::deleteAttrs(Attribute* attr)
 		}
 		delete attr;
 	}
+}
+
+void Item::__startDecaying()
+{
+	g_game.startDecay(this);
 }

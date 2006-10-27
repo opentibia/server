@@ -268,6 +268,7 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 							}
 							else{
 								tile->__internalAddThing(item);
+								item->__startDecaying();
 							}
 							
 							break;
@@ -300,6 +301,8 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 								}
 								else{
 									tile->__internalAddThing(item);
+									item->__startDecaying();
+
 									if(isHouseTile){
 										Door* door = item->getDoor();
 										if(door && door->getDoorId() != 0){

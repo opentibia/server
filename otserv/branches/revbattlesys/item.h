@@ -68,9 +68,15 @@ struct LightInfo{
 };
 
 enum ItemDecayState_t{
+	DECAYING_FALSE = 0,
+	DECAYING_TRUE,
+	DECAYING_PENDING
+
+	/*
 	ITEM_NO_DECAYING = 0,
 	ITEM_DECAYING = 1,
 	ITEM_PENDING_START_DECAY = 2,
+	*/
 };
 
 /*from iomapotbm.h*/
@@ -124,6 +130,7 @@ public:
 
 	void setDuration(int32_t t);
 	void decreaseDuration(int32_t );
+	bool hasDuration();
 	int32_t getDuration() const;
 
 	void setDecaying(ItemDecayState_t decayState);
@@ -288,6 +295,8 @@ public:
 
 	virtual bool canRemove() const {return true;}
 	virtual bool onTradeEvent(TradeEvents_t event, Player* owner){return true;};
+
+	virtual void __startDecaying();
 
 protected:
 	unsigned short id;  // the same id as in ItemType

@@ -319,6 +319,7 @@ bool IOMapSerializeXML::loadTile(Map* map, xmlNodePtr nodeTile, Tile* tile)
 				}
 
 				tile->__internalAddThing(item);
+				item->__startDecaying();
 
 				Door* door = item->getDoor();
 				if(door && door->getDoorId() != 0){
