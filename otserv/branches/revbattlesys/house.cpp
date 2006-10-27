@@ -28,8 +28,8 @@
 #include "luascript.h"
 #include "tools.h"
 
-extern LuaScript g_config;
 extern Game g_game;
+extern LuaScript g_config;
 
 House::House(uint32_t _houseid) :
 transfer_container(ITEM_LOCKER1)
