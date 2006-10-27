@@ -109,6 +109,8 @@ void MonsterType::createLoot(Container* corpse)
 			}
 		}
 	}
+
+	corpse->__startDecaying();
 }
 
 Item* MonsterType::createLootItem(const LootBlock& lootBlock)
