@@ -758,6 +758,30 @@ bool Items::loadFromXml(const std::string& datadir)
 									it.abilities.speed = intValue;
 								}
 							}
+							else if(strcasecmp(strValue.c_str(), "healthGain") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.regeneration = true;
+									it.abilities.healthGain = intValue;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "healthTicks") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.regeneration = true;
+									it.abilities.healthTicks = intValue;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "manaGain") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.regeneration = true;
+									it.abilities.manaGain = intValue;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "manaTicks") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.regeneration = true;
+									it.abilities.manaTicks = intValue;
+								}
+							}
 							else if(strcasecmp(strValue.c_str(), "manashield") == 0){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.manaShield = true;
@@ -813,6 +837,11 @@ bool Items::loadFromXml(const std::string& datadir)
 									it.abilities.absorbPercentFire = intValue;
 								}
 							}
+							else if(strcasecmp(strValue.c_str(), "absorbPercentPoison") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.absorbPercentPoison = intValue;
+								}
+							}
 							else if(strcasecmp(strValue.c_str(), "absorbPercentLifeDrain") == 0){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.absorbPercentLifeDrain = intValue;
@@ -828,11 +857,43 @@ bool Items::loadFromXml(const std::string& datadir)
 									it.abilities.absorbPercentPhysical = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "absorbPercentPoison") == 0){
+							else if(strcasecmp(strValue.c_str(), "suppressDrunk") == 0){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.abilities.absorbPercentPoison = intValue;
+									it.abilities.conditionSuppressions |= CONDITION_DRUNK;
 								}
 							}
+							/*
+							else if(strcasecmp(strValue.c_str(), "suppressEnergy") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.conditionSuppressions |= CONDITION_ENERGY;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "suppressFire") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.conditionSuppressions |= CONDITION_FIRE;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "suppressPoison") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.conditionSuppressions |= CONDITION_POISON;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "suppressLifeDrain") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.conditionSuppressions |= CONDITION_LIFEDRAIN;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "suppressManaDrain") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.conditionSuppressions |= CONDITION_MANADRAIN;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "suppressPhysical") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.abilities.conditionSuppressions |= CONDITION_PHYSICAL;
+								}
+							}
+							*/
 							else if(strcasecmp(strValue.c_str(), "field") == 0){
 								it.group = ITEM_GROUP_MAGICFIELD;
 

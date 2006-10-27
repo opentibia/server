@@ -74,6 +74,14 @@ struct Abilities{
 		manaShield = false;
 		invisible = false;
 		conditionImmunities = 0;
+		conditionSuppressions = 0;
+
+		regeneration = false;
+		healthGain = 0;
+		healthTicks = 0;
+
+		manaGain = 0;
+		manaTicks = 0;
 	};
 
 	//damage abilities modifiers
@@ -101,7 +109,16 @@ struct Abilities{
 	int32_t speed;
 	bool manaShield;
 	bool invisible;
+
+	bool regeneration;
+	uint32_t healthGain;
+	uint32_t healthTicks;
+
+	uint32_t manaGain;
+	uint32_t manaTicks;
+
 	uint32_t conditionImmunities;
+	uint32_t conditionSuppressions;
 };
 
 class ItemType {

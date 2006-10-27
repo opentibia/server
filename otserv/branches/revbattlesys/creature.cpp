@@ -353,6 +353,8 @@ void Creature::changeHealth(int32_t healthChange)
 	else{
 		health = std::max((int32_t)0, health + healthChange);
 	}
+
+	g_game.addCreatureHealth(this);
 }
 
 void Creature::changeMana(int32_t manaChange)
@@ -722,9 +724,14 @@ void Creature::executeConditions(int32_t newticks)
 
 bool Creature::hasCondition(ConditionType_t type) const
 {
+	if(isSuppress(type)){
+		return false;
+	}
+
 	for(ConditionList::const_iterator it = conditions.begin(); it != conditions.end(); ++it){
-		if((*it)->getType() == type)
+		if((*it)->getType() == type){
 			return true;
+		}
 	}
 
 	return false;
@@ -738,6 +745,11 @@ bool Creature::isImmune(DamageType_t type) const
 bool Creature::isImmune(ConditionType_t type) const
 {
 	return ((getConditionImmunities() & (uint32_t)type) == (uint32_t)type);
+}
+
+bool Creature::isSuppress(ConditionType_t type) const
+{
+	return ((getConditionSuppressions() & (uint32_t)type) == (uint32_t)type);
 }
 
 std::string Creature::getDescription(int32_t lookDistance) const

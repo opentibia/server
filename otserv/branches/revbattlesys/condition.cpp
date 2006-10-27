@@ -128,6 +128,12 @@ Condition* Condition::createCondition(ConditionType_t _type, int32_t _ticks, int
 			break;
 		}
 
+		case CONDITION_REGENERATION:
+		{
+			return new ConditionRegeneration(_id, _type, _ticks);
+			break;
+		}
+
 		case CONDITION_MANASHIELD:
 		{
 			return new ConditionManaShield(_id, _type,_ticks);
@@ -213,6 +219,106 @@ uint8_t ConditionGeneric::getIcons() const
 	}
 
 	return 0;
+}
+
+
+ConditionRegeneration::ConditionRegeneration(uint32_t _id, ConditionType_t _type, int32_t _ticks) :
+	ConditionGeneric(_id, _type, _ticks)
+{
+	internalTicks = 0;
+
+	healthTicks = 1000;
+	manaTicks = 1000;
+
+	healthGain = 0;
+	manaGain = 0;
+}
+
+void ConditionRegeneration::addCondition(Creature* creature, const Condition* addCondition)
+{
+	if(addCondition->getType() == conditionType){
+		if(addCondition->getTicks() > ticks){
+			ticks = addCondition->getTicks();
+		}
+		
+		ConditionRegeneration conditionRegen = static_cast<const ConditionRegeneration&>(*addCondition);
+
+		healthTicks = conditionRegen.healthTicks;
+		manaTicks = conditionRegen.manaTicks;
+
+		healthGain = conditionRegen.healthGain;
+		manaGain = conditionRegen.manaGain;
+	}
+}
+
+bool ConditionRegeneration::executeCondition(Creature* creature, int32_t interval)
+{
+	bool resetTicks = true;
+	internalTicks += interval;
+
+	if(!creature->isInPz()){
+		if(healthTicks <= internalTicks){
+			creature->changeHealth(healthGain);
+		}
+		else{
+			resetTicks = false;
+		}
+
+		if(manaTicks <= internalTicks){
+			creature->changeMana(manaGain);
+		}
+		else{
+			resetTicks = false;
+		}
+	}
+
+	if(resetTicks){
+		internalTicks = 0;
+	}
+
+	return true;
+}
+
+bool ConditionRegeneration::setParam(ConditionParam_t param, int32_t value)
+{
+	bool ret = ConditionGeneric::setParam(param, value);
+
+	switch(param){
+		case CONDITIONPARAM_HEALTHGAIN:
+		{
+			healthGain = value;
+			return true;
+			break;
+		}
+
+		case CONDITIONPARAM_HEALTHTICKS:
+		{
+			healthTicks = value;
+			return true;
+			break;
+		}
+
+		case CONDITIONPARAM_MANAGAIN:
+		{
+			manaGain = value;
+			return true;
+			break;
+		}
+
+		case CONDITIONPARAM_MANATICKS:
+		{
+			manaTicks = value;
+			return true;
+			break;
+		}
+
+		default:
+		{
+			return false;
+		}
+	}
+
+	return ret;
 }
 
 ConditionDamage::ConditionDamage(uint32_t _id, ConditionType_t _type) :
@@ -322,6 +428,10 @@ bool ConditionDamage::getNextDamage(int32_t& damage)
 
 bool ConditionDamage::doDamage(Creature* creature, int32_t damage)
 {
+	if(creature->isSuppress(getType())){
+		return true;
+	}
+
 	DamageType_t damageType = DAMAGE_NONE;
 
 	switch(conditionType){

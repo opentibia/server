@@ -440,6 +440,7 @@ void Spell::postCastSpell(Player* player)
 
 	if(mana > 0){
 		player->changeMana(-((int32_t)mana));
+		player->addManaSpent(mana);
 		player->sendStats();
 	}
 

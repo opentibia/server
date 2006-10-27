@@ -195,12 +195,13 @@ public:
 	void removeCondition(ConditionType_t type, uint32_t id = 0);
 	void removeCondition(const Creature* attacker, ConditionType_t type);
 	void executeConditions(int32_t newticks);
-	//Condition* getCondition(ConditionType_t type, uint32_t id = 0);
 	bool hasCondition(ConditionType_t type) const;
 	virtual bool isImmune(ConditionType_t type) const;
 	virtual bool isImmune(DamageType_t type) const;
+	virtual bool isSuppress(ConditionType_t type) const;
 	virtual uint32_t getDamageImmunities() const { return 0; }
 	virtual uint32_t getConditionImmunities() const { return 0; }
+	virtual uint32_t getConditionSuppressions() const { return 0; }
 	virtual bool isAttackable() const { return true;};
 
 	virtual void changeHealth(int32_t healthChange);

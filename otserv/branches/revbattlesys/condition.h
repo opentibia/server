@@ -30,21 +30,21 @@ class Creature;
 class Player;
 
 enum ConditionType_t {
-	CONDITION_NONE				= 0,
-	CONDITION_POISON			= 1,
-	CONDITION_FIRE				= 2,
-	CONDITION_ENERGY			= 4,
-	CONDITION_LIFEDRAIN		= 8,
-	CONDITION_HASTE				= 16,
-	CONDITION_PARALYZE		= 32,
-	CONDITION_OUTFIT			= 64,
-	CONDITION_INVISIBLE		= 128,
-	CONDITION_LIGHT				= 256,
-	CONDITION_MANASHIELD	= 512,
-	CONDITION_INFIGHT			= 1024,
-	CONDITION_DRUNK				= 2048,
-	CONDITION_EXHAUSTED		= 4096,
-	CONDITION_FOOD				= 8192
+	CONDITION_NONE					= 0,
+	CONDITION_POISON				= 1,
+	CONDITION_FIRE					= 2,
+	CONDITION_ENERGY				= 4,
+	CONDITION_LIFEDRAIN			= 8,
+	CONDITION_HASTE					= 16,
+	CONDITION_PARALYZE			= 32,
+	CONDITION_OUTFIT				= 64,
+	CONDITION_INVISIBLE			= 128,
+	CONDITION_LIGHT					= 256,
+	CONDITION_MANASHIELD		= 512,
+	CONDITION_INFIGHT				= 1024,
+	CONDITION_DRUNK					= 2048,
+	CONDITION_EXHAUSTED			= 4096,
+	CONDITION_REGENERATION	= 8192
 };
 
 enum EndCondition_t {
@@ -115,6 +115,29 @@ public:
 	//virtual bool stackable() const {return true;};
 
 	virtual ConditionManaShield* clone()  const { return new ConditionManaShield(*this); }
+};
+
+class ConditionRegeneration : public ConditionGeneric
+{
+public:
+	ConditionRegeneration(uint32_t _id, ConditionType_t _type, int32_t _ticks);
+	virtual ~ConditionRegeneration(){};
+	virtual void addCondition(Creature* creature, const Condition* addCondition);
+	virtual bool executeCondition(Creature* creature, int32_t interval);
+	//virtual bool stackable() const {return true;};
+
+	virtual ConditionRegeneration* clone()  const { return new ConditionRegeneration(*this); }
+
+	virtual bool setParam(ConditionParam_t param, int32_t value);
+
+protected:
+	uint32_t internalTicks;
+
+	uint32_t healthTicks;
+	uint32_t manaTicks;
+
+	uint32_t healthGain;
+	uint32_t manaGain;
 };
 
 class ConditionInvisible: public ConditionGeneric

@@ -69,6 +69,7 @@ Creature()
 	experience = 180;
 	damageImmunities = 0;
 	conditionImmunities = 0;
+	conditionSuppressions = 0;
 	magLevel   = 20;
 	accessLevel = 0;
 	lastlogin  = 0;
@@ -256,6 +257,16 @@ void Player::setVarSkill(skills_t skill, int32_t var)
 	varSkills[skill] += var;
 }
 
+void Player::setConditionSuppressions(uint32_t conditions, bool remove)
+{
+	if(!remove){
+		conditionSuppressions |= conditions;
+	}
+	else{
+		conditionSuppressions &= ~conditions;
+	}
+}
+
 bool Player::getCombatItem(Item** tool, const Weapon** weapon)
 {
 	Item* item = NULL;
@@ -373,7 +384,9 @@ void Player::sendIcons() const
 
 	ConditionList::const_iterator it;
 	for(it = conditions.begin(); it != conditions.end(); ++it){
-		icons |= (*it)->getIcons();
+		if(!isSuppress((*it)->getType())){
+			icons |= (*it)->getIcons();
+		}
 	}
 
 	client->sendIcons(icons);
@@ -1300,9 +1313,7 @@ void Player::onThink(uint32_t interval)
 {
 	Creature::onThink(interval);
 
-	Tile* tile = getTile();
-
-	if(!tile->isPz()){
+	if(!isInPz()){
 		if(food > 1000){
 			food -= interval;
 
@@ -1661,8 +1672,9 @@ bool Player::gainManaTick()
 		manaTick = 0;
 		manaGain = vocation->getManaGainAmount();
 		mana += std::min(manaGain, manaMax - mana);
-		return true;
 	}
+
+	return true;
 }
 
 bool Player::gainHealthTick()
@@ -1678,9 +1690,8 @@ bool Player::gainHealthTick()
 			healthTick = 0;
 			healthGain = vocation->getHealthGainAmount();
 		}
-		//health += std::min(healthGain, healthMax - health);
-		//g_game.changeCreatureHealth(creature, healthGain);
 	}
+
 	return true;
 }
 
@@ -2743,6 +2754,19 @@ bool Player::isAttackable() const
 
 	return true;
 }
+
+void Player::changeHealth(int32_t healthChange)
+{
+	Creature::changeHealth(healthChange);
+	sendStats();
+}
+
+void Player::changeMana(int32_t manaChange)
+{
+	Creature::changeMana(manaChange);
+	sendStats();
+}
+
 
 #ifdef __SKULLSYSTEM__
 Skulls_t Player::getSkull() const

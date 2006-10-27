@@ -2682,15 +2682,15 @@ bool Game::combatChangeHealth(DamageType_t damageType, Creature* attacker, Creat
 {
 	const Position& targetPos = target->getPosition();
 
-	SpectatorVec list;
-	//getSpectators(Range(targetPos, true), list);
-	getSpectators(list, targetPos, true);
-
 	if(healthChange > 0){
 		target->changeHealth(healthChange);
-		addCreatureHealth(list, target);
+		//addCreatureHealth(list, target);
 	}
 	else{
+		SpectatorVec list;
+		//getSpectators(Range(targetPos, true), list);
+		getSpectators(list, targetPos, true);
+
 		if(!target->isAttackable()){
 			addMagicEffect(list, targetPos, NM_ME_PUFF);
 			return false;

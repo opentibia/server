@@ -176,6 +176,7 @@ public:
 
 	int32_t getVarSkill(skills_t skill) const;
 	void setVarSkill(skills_t skill, int32_t modifier);
+	void setConditionSuppressions(uint32_t conditions, bool remove);
 
 	Depot* getDepot(uint32_t depotId, bool autoCreateDepot);
 	bool addDepot(Depot* depot, uint32_t depotId);
@@ -212,6 +213,10 @@ public:
 	bool isImmune(DamageType_t type) const;
 	bool isImmune(ConditionType_t type) const;
 	virtual bool isAttackable() const;
+	
+	virtual void changeHealth(int32_t healthChange);
+	virtual void changeMana(int32_t manaChange);
+
 	bool isPzLocked() const { return pzLocked; }
 	virtual BlockType_t blockHit(Creature* attacker, DamageType_t damageType, int32_t& damage,
 		bool checkDefense = false, bool checkArmor = false);
@@ -227,6 +232,9 @@ public:
 
 	virtual int getArmor() const;
 	virtual int getDefense() const;
+
+	bool gainManaTick();
+	bool gainHealthTick();
 
 	virtual void die();
 	virtual Item* getCorpse();
@@ -357,9 +365,6 @@ public:
 	uint32_t maxDepotLimit;
 
 protected:
-	bool gainManaTick();
-	bool gainHealthTick();
-
 	void checkTradeState(const Item* item);
 	bool hasCapacity(const Item* item, uint32_t count) const;
 
@@ -407,6 +412,8 @@ protected:
 	uint32_t experience;
 	uint32_t damageImmunities;
 	uint32_t conditionImmunities;
+	uint32_t conditionSuppressions;
+	uint32_t condition;
 	int32_t manaSpent;
 	Vocation_t vocation_id;
 	Vocation* vocation;
@@ -503,6 +510,7 @@ protected:
 	virtual void dropLoot(Container* corpse);
 	virtual uint32_t getDamageImmunities() const { return damageImmunities; }
 	virtual uint32_t getConditionImmunities() const { return conditionImmunities; }
+	virtual uint32_t getConditionSuppressions() const { return conditionSuppressions; }
 	virtual uint16_t getLookCorpse() const;
 
 	friend OTSYS_THREAD_RETURN ConnectionHandler(void *dat);

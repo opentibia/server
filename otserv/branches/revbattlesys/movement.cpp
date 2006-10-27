@@ -470,6 +470,32 @@ long MoveEvent::EquipItem(Player* player, Item* item, slots_t slot)
 		g_game.changeSpeed(player, it.abilities.speed);
 	}
 
+	if(it.abilities.conditionSuppressions != 0){
+		player->setConditionSuppressions(it.abilities.conditionSuppressions, false);
+		player->sendIcons();
+	}
+
+	if(it.abilities.regeneration){
+		Condition* condition = Condition::createCondition(CONDITION_REGENERATION, -1, 0, slot);
+		if(it.abilities.healthGain != 0){
+			condition->setParam(CONDITIONPARAM_HEALTHGAIN, it.abilities.healthGain);
+		}
+		
+		if(it.abilities.healthTicks != 0){
+			condition->setParam(CONDITIONPARAM_HEALTHTICKS, it.abilities.healthTicks);
+		}
+
+		if(it.abilities.manaGain != 0){
+			condition->setParam(CONDITIONPARAM_MANAGAIN, it.abilities.manaGain);
+		}
+
+		if(it.abilities.manaTicks != 0){
+			condition->setParam(CONDITIONPARAM_MANATICKS, it.abilities.manaTicks);
+		}
+
+		player->addCondition(condition);
+	}
+
 	//skill modifiers
 	for(int32_t i = SKILL_FIRST; i <= SKILL_LAST; ++i){
 		player->setVarSkill((skills_t)i, it.abilities.skills[i]);
@@ -500,6 +526,15 @@ long MoveEvent::DeEquipItem(Player* player, Item* item, slots_t slot)
 
 	if(it.abilities.speed != 0){
 		g_game.changeSpeed(player, -it.abilities.speed);
+	}
+
+	if(it.abilities.conditionSuppressions != 0){
+		player->setConditionSuppressions(it.abilities.conditionSuppressions, true);
+		player->sendIcons();
+	}
+
+	if(it.abilities.regeneration){
+		player->removeCondition(CONDITION_REGENERATION, slot);
 	}
 
 	//skill modifiers
