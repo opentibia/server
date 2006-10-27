@@ -451,32 +451,30 @@ long MoveEvent::EquipItem(Player* player, Item* item, slots_t slot)
 
 	const ItemType& it = Item::items[item->getID()];
 	
-	if(it.transformTo != 0){
-		g_game.transformItem(item, it.transformTo);
+	if(it.transformEquipTo != 0){
+		g_game.transformItem(item, it.transformEquipTo);
 		g_game.startDecay(item);
 	}
 
-	const ItemType& iit = Item::items[item->getID()];
-
-	if(iit.abilities.invisible){
+	if(it.abilities.invisible){
 		Condition* condition = Condition::createCondition(CONDITION_INVISIBLE, -1, 0, slot);
 		player->addCondition(condition);
 	}
 
-	if(iit.abilities.manaShield){
+	if(it.abilities.manaShield){
 		Condition* condition = Condition::createCondition(CONDITION_MANASHIELD, -1, 0, slot);
 		player->addCondition(condition);
 	}
 
-	if(iit.abilities.speed != 0){
-		g_game.changeSpeed(player, iit.abilities.speed);
+	if(it.abilities.speed != 0){
+		g_game.changeSpeed(player, it.abilities.speed);
 	}
 
 	//skill modifiers
 	for(int32_t i = SKILL_FIRST; i <= SKILL_LAST; ++i){
-		player->setVarSkill((skills_t)i, iit.abilities.skills[i]);
-		player->sendSkills();
+		player->setVarSkill((skills_t)i, it.abilities.skills[i]);
 	}
+	player->sendSkills();
 
 	return 1;
 }
@@ -487,8 +485,8 @@ long MoveEvent::DeEquipItem(Player* player, Item* item, slots_t slot)
 
 	const ItemType& it = Item::items[item->getID()];
 
-	if(it.transformTo != 0){
-		g_game.transformItem(item, it.transformTo);
+	if(it.transformDeEquipTo != 0){
+		g_game.transformItem(item, it.transformDeEquipTo);
 		g_game.startDecay(item);
 	}
 
@@ -507,8 +505,8 @@ long MoveEvent::DeEquipItem(Player* player, Item* item, slots_t slot)
 	//skill modifiers
 	for(int32_t i = SKILL_FIRST; i <= SKILL_LAST; ++i){
 		player->setVarSkill((skills_t)i, -it.abilities.skills[i]);
-		player->sendSkills();
 	}
+	player->sendSkills();
 
 	return 1;
 }
