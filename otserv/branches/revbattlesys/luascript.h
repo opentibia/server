@@ -397,6 +397,9 @@ protected:
 	static int luaDoAreaCombatCondition(lua_State *L);
 	static int luaDoTargetCombatCondition(lua_State *L);
 
+	static int luaDoAreaCombatDispel(lua_State *L);
+	static int luaDoTargetCombatDispel(lua_State *L);
+
 	static int luaVariantToNumber(lua_State *L);
 
 	static int luaDoChangeSpeed(lua_State *L);

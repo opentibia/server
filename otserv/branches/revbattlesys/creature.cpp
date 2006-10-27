@@ -545,6 +545,11 @@ void Creature::onTickCondition(ConditionType_t type, bool& bRemove)
 	}
 }
 
+void Creature::onCombatRemoveCondition(const Creature* attacker, Condition* condition)
+{
+	removeCondition(condition);
+}
+
 void Creature::onAttackedCreature(Creature* target)
 {
 	//
@@ -666,6 +671,32 @@ void Creature::removeCondition(ConditionType_t type, uint32_t id /*= 0*/)
 	}
 }
 
+void Creature::removeCondition(const Creature* attacker, ConditionType_t type)
+{
+	ConditionList tmpList = conditions;
+
+	for(ConditionList::iterator it = tmpList.begin(); it != tmpList.end(); ++it){
+		if((*it)->getType() == type){
+			onCombatRemoveCondition(attacker, *it);
+		}
+	}
+}
+
+void Creature::removeCondition(Condition* condition)
+{
+	ConditionList::iterator it = std::find(conditions.begin(), conditions.end(), condition);
+
+	if(it != conditions.end()){
+		Condition* condition = *it;
+		it = conditions.erase(it);
+
+		condition->endCondition(this, REASON_ABORT);
+		onEndCondition(condition->getType());
+		delete condition;
+	}
+}
+
+
 void Creature::executeConditions(int32_t newticks)
 {
 	for(ConditionList::iterator it = conditions.begin(); it != conditions.end();){
@@ -688,23 +719,6 @@ void Creature::executeConditions(int32_t newticks)
 		}
 	}
 }
-
-/*
-Condition* Creature::getCondition(ConditionType_t type, uint32_t id = 0)
-{
-	if(conditions.empty())
-		return NULL;
-	
-	for(ConditionList::iterator it = conditions.begin(); it != conditions.end(); ++it){
-		//if((*it)->getType() == type && (id == 0 || (*it)->getId())){
-		if((*it)->getType() == type && id == (*it)->getId()){
-			return *it;
-		}
-	}
-
-	return NULL;
-}
-*/
 
 bool Creature::hasCondition(ConditionType_t type) const
 {

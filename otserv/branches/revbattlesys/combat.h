@@ -73,11 +73,12 @@ struct CombatParams{
 		impactEffect = NM_ME_NONE;
 		distanceEffect = NM_ME_NONE;
 		condition = NULL;
-		removeCondition = CONDITION_NONE;
+		dispelType = CONDITION_NONE;
 	}
 
 	const Condition* condition;
-	ConditionType_t removeCondition;
+	//ConditionType_t removeCondition;
+	ConditionType_t dispelType;
 	DamageType_t damageType;
 	bool blockedByArmor;
 	bool blockedByShield;
@@ -115,6 +116,11 @@ public:
 	static void doCombatCondition(Creature* caster, const Position& pos,
 		const AreaCombat* area, const CombatParams& params);
 
+	static void doCombatDispel(Creature* caster, Creature* target,
+		const CombatParams& params);
+	static void doCombatDispel(Creature* caster, const Position& pos,
+		const AreaCombat* area, const CombatParams& params);
+
 	static void getCombatArea(const Position& centerPos, const Position& targetPos,
 		const AreaCombat* area, std::list<Tile*>& list);
 	static ReturnValue canDoCombat(const Creature* caster, const Tile* tile, bool isAggressive);
@@ -139,7 +145,7 @@ protected:
 	static bool CombatHealthFunc(Creature* caster, Creature* target, const CombatParams& params, void* data);
 	static bool CombatManaFunc(Creature* caster, Creature* target, const CombatParams& params, void* data);
 	static bool CombatConditionFunc(Creature* caster, Creature* target, const CombatParams& params, void* data);
-	static bool CombatRemoveConditionFunc(Creature* caster, Creature* target, const CombatParams& params, void* data);
+	static bool CombatDispelFunc(Creature* caster, Creature* target, const CombatParams& params, void* data);
 	static bool CombatNullFunc(Creature* caster, Creature* target, const CombatParams& params, void* data);
 
 	static void combatTileEffects(Creature* caster, Tile* tile, const CombatParams& params);

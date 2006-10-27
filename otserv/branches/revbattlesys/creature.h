@@ -191,7 +191,9 @@ public:
 	virtual int getDefense() const {return 0;}
 
 	bool addCondition(Condition* condition);
+	void removeCondition(Condition* condition);
 	void removeCondition(ConditionType_t type, uint32_t id = 0);
+	void removeCondition(const Creature* attacker, ConditionType_t type);
 	void executeConditions(int32_t newticks);
 	//Condition* getCondition(ConditionType_t type, uint32_t id = 0);
 	bool hasCondition(ConditionType_t type) const;
@@ -216,6 +218,7 @@ public:
 	virtual void onAddCondition(ConditionType_t type);
 	virtual void onEndCondition(ConditionType_t type);
 	virtual void onTickCondition(ConditionType_t type, bool& bRemove);
+	virtual void onCombatRemoveCondition(const Creature* attacker, Condition* condition);
 	virtual void onAttackedCreature(Creature* target);
 	virtual void onAttacked();
 	virtual void onAttackedCreatureDrainHealth(Creature* target, int32_t points);

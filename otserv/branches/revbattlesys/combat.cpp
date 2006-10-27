@@ -211,6 +211,15 @@ bool Combat::setParam(CombatParam_t param, uint32_t value)
 		case COMBATPARAM_AGGRESSIVE:
 		{
 			params.isAggressive = (value != 0);
+			return true;
+			break;
+		}
+		
+		case COMBATPARAM_DISPEL:
+		{
+			params.dispelType = (ConditionType_t)value;
+			return true;
+			break;
 		}
 
 		default:
@@ -256,6 +265,7 @@ bool Combat::CombatHealthFunc(Creature* caster, Creature* target, const CombatPa
 
 	if(result){
 		CombatConditionFunc(caster, target, params, NULL);
+		CombatDispelFunc(caster, target, params, NULL);
 	}
 
 	return result;
@@ -269,6 +279,7 @@ bool Combat::CombatManaFunc(Creature* caster, Creature* target, const CombatPara
 
 	if(result){
 		CombatConditionFunc(caster, target, params, NULL);
+		CombatDispelFunc(caster, target, params, NULL);
 	}
 
 	return result;
@@ -276,6 +287,8 @@ bool Combat::CombatManaFunc(Creature* caster, Creature* target, const CombatPara
 
 bool Combat::CombatConditionFunc(Creature* caster, Creature* target, const CombatParams& params, void* data)
 {
+	bool result = false;
+
 	if(params.condition && !target->isImmune(params.condition->getType())){
 		if(!params.isAggressive || caster != target){
 			Condition* conditionCopy = params.condition->clone();
@@ -283,19 +296,19 @@ bool Combat::CombatConditionFunc(Creature* caster, Creature* target, const Comba
 				conditionCopy->setParam(CONDITIONPARAM_OWNER, caster->getID());
 			}
 
-			return target->addCondition(conditionCopy);
+			result = target->addCondition(conditionCopy);
 		}
 	}
 
-	return false;
+	return result;
 }
 
-bool Combat::CombatRemoveConditionFunc(Creature* caster, Creature* target, const CombatParams& params, void* data)
+bool Combat::CombatDispelFunc(Creature* caster, Creature* target, const CombatParams& params, void* data)
 {
-	if(target->hasCondition(params.removeCondition)){
+	if(target->hasCondition(params.dispelType)){
 		if(!params.isAggressive || caster != target){
-			//TODO: check if creature resist remove condition
-			//caster->removeCondition(params.removeCondition);
+			target->removeCondition(caster, params.dispelType);
+			return true;
 		}
 	}
 
@@ -400,6 +413,9 @@ void Combat::doCombat(Creature* caster, Creature* target) const
 	else if(combatType == COMBAT_CONDITION){
 		doCombatCondition(caster, target, params);
 	}
+	else if(combatType == COMBAT_DISPEL){
+		doCombatDispel(caster, target, params);
+	}
 }
 
 void Combat::doCombat(Creature* caster, const Position& pos) const
@@ -422,6 +438,9 @@ void Combat::doCombat(Creature* caster, const Position& pos) const
 	}
 	else if(combatType == COMBAT_CONDITION){
 		doCombatCondition(caster, pos, area, params);
+	}
+	else if(combatType == COMBAT_DISPEL){
+		doCombatDispel(caster, pos, area, params);
 	}
 	else{
 		CombatFunc(caster, pos, area, params, CombatNullFunc, NULL);
@@ -491,6 +510,25 @@ void Combat::doCombatCondition(Creature* caster, const Position& pos, const Area
 void Combat::doCombatCondition(Creature* caster, Creature* target, const CombatParams& params)
 {
 	CombatConditionFunc(caster, target, params, NULL);	
+
+	if(params.impactEffect != NM_ME_NONE){
+		g_game.addMagicEffect(target->getPosition(), params.impactEffect);
+	}
+
+	if(caster && params.distanceEffect != NM_ME_NONE){
+		g_game.addDistanceEffect(caster->getPosition(), target->getPosition(), params.distanceEffect);
+	}
+}
+
+void Combat::doCombatDispel(Creature* caster, const Position& pos, const AreaCombat* area,
+	const CombatParams& params)
+{
+	CombatFunc(caster, pos, area, params, CombatDispelFunc, NULL);
+}
+
+void Combat::doCombatDispel(Creature* caster, Creature* target, const CombatParams& params)
+{
+	CombatDispelFunc(caster, target, params, NULL);	
 
 	if(params.impactEffect != NM_ME_NONE){
 		g_game.addMagicEffect(target->getPosition(), params.impactEffect);

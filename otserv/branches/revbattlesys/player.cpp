@@ -1074,7 +1074,13 @@ void Player::onUpdateTile(const Position& pos)
 
 void Player::onCreatureAppear(const Creature* creature, bool isLogin)
 {
-	//
+	Item* item;
+	for(int slot = SLOT_FIRST; slot < SLOT_LAST; ++slot){
+		if(item = getInventoryItem((slots_t)slot)){
+			item->__startDecaying();
+			g_moveEvents->onPlayerEquip(this, item, (slots_t)slot, true);
+		}
+	}
 }
 
 void Player::onCreatureDisappear(const Creature* creature)
@@ -2586,6 +2592,30 @@ void Player::onEndCondition(ConditionType_t type)
 			g_game.changeSkull(this, SKULL_NONE);
 		}
 #endif
+	}
+}
+
+void Player::onCombatRemoveCondition(const Creature* attacker, Condition* condition)
+{
+	//Creature::onCombatRemoveCondition(attacker, condition);
+	bool remove = true;
+	
+	if(condition->getId() != 0){
+		remove = false;
+
+		//Means the condition is from an item, id == slot
+		//if(g_game.getWorldType() == WORLD_TYPE_PVP_ENFORCED){
+			Item* item = getInventoryItem((slots_t)condition->getId());
+			if(item){
+				if(25 >= random_range(0, 100)){
+					g_game.internalRemoveItem(item);
+				}
+			}
+		//}
+	}
+
+	if(remove){
+		removeCondition(condition);
 	}
 }
 

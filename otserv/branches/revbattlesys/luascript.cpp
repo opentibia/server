@@ -1054,6 +1054,12 @@ void LuaScriptInterface::registerFunctions()
 	//doTargetCombatCondition(cid, target, condition, effect)
 	lua_register(m_luaState, "doTargetCombatCondition", LuaScriptInterface::luaDoTargetCombatCondition);
 
+	//doAreaCombatDispel(cid, pos, area, type, effect)
+	lua_register(m_luaState, "doAreaCombatDispel", LuaScriptInterface::luaDoAreaCombatDispel);
+
+	//doTargetCombatDispel(cid, target, type, effect)
+	lua_register(m_luaState, "doTargetCombatDispel", LuaScriptInterface::luaDoTargetCombatDispel);
+
 	//variantToNumber(var)
 	lua_register(m_luaState, "variantToNumber", LuaScriptInterface::luaVariantToNumber);
 
@@ -3016,6 +3022,87 @@ int LuaScriptInterface::luaDoTargetCombatCondition(lua_State *L)
 	params.impactEffect = effect;
 	params.condition = condition;
 	Combat::doCombatCondition(creature, target, params);
+
+	lua_pushnumber(L, LUA_NO_ERROR);
+	return 1;
+}
+
+int LuaScriptInterface::luaDoAreaCombatDispel(lua_State *L)
+{
+	//doAreaCombatDispel(cid, pos, area, type, effect)
+
+	uint8_t effect = (uint8_t)popNumber(L);
+	ConditionType_t dispelType = (ConditionType_t)popNumber(L);
+	uint32_t areaId = (uint32_t)popNumber(L);
+	Position pos;
+	long stackpos;
+	popPosition(L, pos, stackpos);
+	uint32_t cid = (uint32_t)popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Creature* creature = NULL;
+	
+	if(cid != 0){
+		creature = env->getCreatureByUID(cid);
+
+		if(!creature){
+			reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+			lua_pushnumber(L, LUA_ERROR);
+			return 1;
+		}
+	}
+
+	const AreaCombat* area = env->getCombatArea(areaId);
+	if(!area && areaId != 0){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_AREA_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
+	CombatParams params;
+	params.impactEffect = effect;
+	params.dispelType = dispelType;
+	Combat::doCombatDispel(creature, pos, area, params);
+
+	lua_pushnumber(L, LUA_NO_ERROR);
+	return 1;
+}
+
+int LuaScriptInterface::luaDoTargetCombatDispel(lua_State *L)
+{
+	//doTargetCombatDispel(cid, target, type, effect)
+
+	uint8_t effect = (uint8_t)popNumber(L);
+	ConditionType_t dispelType = (ConditionType_t)popNumber(L);
+	uint32_t targetCid = (uint32_t)popNumber(L);
+	uint32_t cid = (uint32_t)popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Creature* creature = NULL;
+
+	if(cid != 0){
+		creature = env->getCreatureByUID(cid);
+
+		if(!creature){
+			reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+			lua_pushnumber(L, LUA_ERROR);
+			return 1;
+		}
+	}
+
+	Creature* target = env->getCreatureByUID(targetCid);
+	if(!target){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
+	CombatParams params;
+	params.impactEffect = effect;
+	params.dispelType = dispelType;
+	Combat::doCombatDispel(creature, target, params);
 
 	lua_pushnumber(L, LUA_NO_ERROR);
 	return 1;
