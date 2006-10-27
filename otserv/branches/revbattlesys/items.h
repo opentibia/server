@@ -174,10 +174,13 @@ public:
 	bool blockProjectile;
 	bool blockPathFind;
 
-	unsigned short transformTo;
+	unsigned short transformEquipTo;
+	unsigned short transformDeEquipTo;
 	bool showDuration;
 	bool showCharges;
 	uint32_t charges;
+	uint32_t breakChance;
+
 	Abilities abilities;
 
 	//fields

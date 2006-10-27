@@ -87,10 +87,12 @@ ItemType::ItemType()
 	lightLevel    = 0;
 	lightColor    = 0;
 
-	transformTo   = 0;
+	transformEquipTo   = 0;
+	transformDeEquipTo = 0;
 	showDuration  = false;
 	showCharges   = false;
 	charges       = 0;
+	breakChance   = 0;
 
 	//fields
 	initialDamage = 0;
@@ -717,9 +719,14 @@ bool Items::loadFromXml(const std::string& datadir)
 									it.canDecay = (intValue != 0);
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "transformTo") == 0){
+							else if(strcasecmp(strValue.c_str(), "transformEquipTo") == 0){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.transformTo = intValue;
+									it.transformEquipTo = intValue;
+								}
+							}
+							else if(strcasecmp(strValue.c_str(), "transformDeEquipTo") == 0){
+								if(readXMLInteger(itemAttributesNode, "value", intValue)){
+									it.transformDeEquipTo = intValue;
 								}
 							}
 							else if(strcasecmp(strValue.c_str(), "duration") == 0){
