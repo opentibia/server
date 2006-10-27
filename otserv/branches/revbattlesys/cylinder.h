@@ -130,7 +130,6 @@ public:
 	  * \param thing is the object that has been added
 	  * \param index is the objects new index value
 	  * \param link holds the relation the object has to the cylinder
-		* otherwise another cylinder (like Tile class and wish to inform this change) has sent the message.
 	  */
 	//virtual void postAddNotification(Thing* thing, int32_t index, bool hasOwnership = true) = 0;
 	virtual void postAddNotification(Thing* thing, int32_t index, cylinderlink_t link = LINK_OWNER) = 0;
@@ -141,7 +140,6 @@ public:
 	  * \param index is the previous index of the removed object
 	  * \param isCompleteRemoval indicates if the item was completely removed or just partially (stackables)
 	  * \param link holds the relation the object has to the cylinder
-		* otherwise another cylinder (like Tile class and wish to inform this change) has sent the message.
 	  */
 	//virtual void postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, bool hadOwnership = true) = 0;
 	virtual void postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, cylinderlink_t link = LINK_OWNER) = 0;
@@ -190,6 +188,8 @@ public:
 	  * \param index points to the destination index (inventory slot/container position)
 	  */
 	virtual void __internalAddThing(uint32_t index, Thing* thing);
+
+	virtual void __startDecaying();
 };
 
 #endif

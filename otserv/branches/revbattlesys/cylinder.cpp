@@ -54,3 +54,8 @@ void Cylinder::__internalAddThing(uint32_t index, Thing* thing)
 {
 	//
 }
+
+void Cylinder::__startDecaying()
+{
+	//
+}
