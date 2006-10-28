@@ -118,7 +118,7 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 	if(player->healthMax <= 0)
 		player->healthMax = 100;
 
-	player->food = result.getDataInt("food");
+	//player->food = result.getDataInt("food");
 
 	player->defaultOutfit.lookType = result.getDataInt("looktype");
 	player->defaultOutfit.lookHead = result.getDataInt("lookhead");
@@ -322,7 +322,7 @@ bool IOPlayerSQL::savePlayer(Player* player)
 	query << "`pos` = '" << player->getLoginPosition().x<<";"<< player->getLoginPosition().y<<";"<< player->getLoginPosition().z << "', ";
 	query << "`speed` = " << player->baseSpeed << ", ";
 	query << "`cap` = " << player->getCapacity() << ", ";
-	query << "`food` = " << player->food << ", ";
+	//query << "`food` = " << player->food << ", ";
 	query << "`sex` = " << player->sex << ", ";
 	query << "`lastlogin` = " << player->lastlogin << ", ";
 	query << "`lastip` = " << player->lastip << " ";

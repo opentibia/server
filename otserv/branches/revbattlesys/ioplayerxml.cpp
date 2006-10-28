@@ -202,11 +202,13 @@ bool IOPlayerXML::loadPlayer(Player* player, std::string name)
 				else
 					isLoaded = false;
 
+				/*
 				if(readXMLInteger(p, "food", intValue)){
 					player->food = intValue;
 				}
 				else
 					isLoaded = false;
+				*/
 			}
 			else if(xmlStrcmp(p->name, (const xmlChar*)"look") == 0){
 
@@ -495,7 +497,7 @@ bool IOPlayerXML::savePlayer(Player* player)
 	pn = xmlNewNode(NULL,(const xmlChar*)"health");
 	sb << player->health;     xmlSetProp(pn, (const xmlChar*)"now", (const xmlChar*)sb.str().c_str());        sb.str("");
 	sb << player->healthMax;  xmlSetProp(pn, (const xmlChar*)"max", (const xmlChar*)sb.str().c_str());        sb.str("");
-	sb << player->food;  	    xmlSetProp(pn, (const xmlChar*)"food", (const xmlChar*)sb.str().c_str());       sb.str("");
+	//sb << player->food;  	    xmlSetProp(pn, (const xmlChar*)"food", (const xmlChar*)sb.str().c_str());       sb.str("");
 
 	xmlAddChild(root, pn);
 

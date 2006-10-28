@@ -26,7 +26,7 @@
 
 extern Game g_game;
 
-Condition::Condition(uint32_t _id, ConditionType_t _type, int32_t _ticks) :
+Condition::Condition(int32_t _id, ConditionType_t _type, int32_t _ticks) :
 id(_id),
 ticks(_ticks),
 conditionType(_type)
@@ -90,7 +90,7 @@ bool Condition::executeCondition(Creature* creature, int32_t interval)
 	return true;
 }
 
-Condition* Condition::createCondition(ConditionType_t _type, int32_t _ticks, int32_t param, uint32_t _id /*= 0*/)
+Condition* Condition::createCondition(ConditionType_t _type, int32_t _ticks, int32_t param, int32_t _id /*= 0*/)
 {
 	switch((int32_t)_type){
 		case CONDITION_POISON:
@@ -157,7 +157,7 @@ Condition* Condition::createCondition(ConditionType_t _type, int32_t _ticks, int
 	}
 }
 
-ConditionGeneric::ConditionGeneric(uint32_t _id, ConditionType_t _type, int32_t _ticks) :
+ConditionGeneric::ConditionGeneric(int32_t _id, ConditionType_t _type, int32_t _ticks) :
 Condition(_id, _type, _ticks)
 {
 	//
@@ -222,10 +222,11 @@ uint8_t ConditionGeneric::getIcons() const
 }
 
 
-ConditionRegeneration::ConditionRegeneration(uint32_t _id, ConditionType_t _type, int32_t _ticks) :
+ConditionRegeneration::ConditionRegeneration(int32_t _id, ConditionType_t _type, int32_t _ticks) :
 	ConditionGeneric(_id, _type, _ticks)
 {
-	internalTicks = 0;
+	internalHealthTicks = 0;
+	internalManaTicks = 0;
 
 	healthTicks = 1000;
 	manaTicks = 1000;
@@ -253,30 +254,22 @@ void ConditionRegeneration::addCondition(Creature* creature, const Condition* ad
 
 bool ConditionRegeneration::executeCondition(Creature* creature, int32_t interval)
 {
-	bool resetTicks = true;
-	internalTicks += interval;
+	internalHealthTicks += interval;
+	internalManaTicks += interval;
 
 	if(!creature->isInPz()){
-		if(healthTicks <= internalTicks){
+		if(internalHealthTicks >= healthTicks){
+			internalHealthTicks = 0;
 			creature->changeHealth(healthGain);
 		}
-		else{
-			resetTicks = false;
-		}
 
-		if(manaTicks <= internalTicks){
+		if(internalManaTicks >= manaTicks){
+			internalManaTicks = 0;
 			creature->changeMana(manaGain);
 		}
-		else{
-			resetTicks = false;
-		}
 	}
 
-	if(resetTicks){
-		internalTicks = 0;
-	}
-
-	return true;
+	return ConditionGeneric::executeCondition(creature, interval);
 }
 
 bool ConditionRegeneration::setParam(ConditionParam_t param, int32_t value)
@@ -321,7 +314,7 @@ bool ConditionRegeneration::setParam(ConditionParam_t param, int32_t value)
 	return ret;
 }
 
-ConditionDamage::ConditionDamage(uint32_t _id, ConditionType_t _type) :
+ConditionDamage::ConditionDamage(int32_t _id, ConditionType_t _type) :
 Condition(_id, _type, 0)
 {
 	delayed = false;
@@ -502,7 +495,7 @@ uint8_t ConditionDamage::getIcons() const
 	return 0;
 }
 
-ConditionSpeed::ConditionSpeed(uint32_t _id, ConditionType_t _type, int32_t _ticks, int32_t changeSpeed) :
+ConditionSpeed::ConditionSpeed(int32_t _id, ConditionType_t _type, int32_t _ticks, int32_t changeSpeed) :
 Condition(_id, _type, _ticks)
 {
 	speedDelta = changeSpeed;
@@ -597,7 +590,7 @@ uint8_t ConditionSpeed::getIcons() const
 	return 0;
 }
 
-ConditionInvisible::ConditionInvisible(uint32_t _id, ConditionType_t _type, int32_t _ticks) :
+ConditionInvisible::ConditionInvisible(int32_t _id, ConditionType_t _type, int32_t _ticks) :
 ConditionGeneric(_id, _type, _ticks)
 {
 	//
@@ -616,7 +609,7 @@ void ConditionInvisible::endCondition(Creature* creature, EndCondition_t reason)
 	}
 }
 
-ConditionOutfit::ConditionOutfit(uint32_t _id, ConditionType_t _type, int32_t _ticks) :
+ConditionOutfit::ConditionOutfit(int32_t _id, ConditionType_t _type, int32_t _ticks) :
 Condition(_id, _type, _ticks)
 {
 	//

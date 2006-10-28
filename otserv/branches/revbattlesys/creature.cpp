@@ -619,15 +619,8 @@ bool Creature::addCondition(Condition* condition)
 	if(condition == NULL){
 		return false;
 	}
-	
-	//Condition* prevCond = getCondition(condition->getType(), condition->getId());
-	Condition* prevCond = NULL;
-	for(ConditionList::iterator it = conditions.begin(); it != conditions.end(); ++it){
-		if(condition->getType() == (*it)->getType() && condition->getId() == (*it)->getId()){
-			prevCond = *it;
-			break;
-		}
-	}
+
+	Condition* prevCond = getCondition(condition->getType(), condition->getId());
 
 	if(prevCond){
 		prevCond->addCondition(this, condition);
@@ -647,12 +640,28 @@ bool Creature::addCondition(Condition* condition)
 	return true;
 }
 
-void Creature::removeCondition(ConditionType_t type, uint32_t id /*= 0*/)
+void Creature::removeCondition(ConditionType_t type)
 {
 	for(ConditionList::iterator it = conditions.begin(); it != conditions.end();){
-		if((*it)->getType() == type && (id == 0 || (*it)->getId())){
-			//TODO: check if we can remove this condition
+		if((*it)->getType() == type){
+			Condition* condition = *it;
+			it = conditions.erase(it);
 
+			condition->endCondition(this, REASON_ABORT);
+			delete condition;
+
+			onEndCondition(type);
+		}
+		else{
+			++it;
+		}
+	}
+}
+
+void Creature::removeCondition(ConditionType_t type, uint32_t id)
+{
+	for(ConditionList::iterator it = conditions.begin(); it != conditions.end();){
+		if((*it)->getType() == type && (*it)->getId() == id){
 			Condition* condition = *it;
 			it = conditions.erase(it);
 
@@ -692,6 +701,16 @@ void Creature::removeCondition(Condition* condition)
 	}
 }
 
+Condition* Creature::getCondition(ConditionType_t type, uint32_t id /*= 0*/) const
+{
+	for(ConditionList::const_iterator it = conditions.begin(); it != conditions.end(); ++it){
+		if((*it)->getType() == type && (*it)->getId() == id){
+			return *it;
+		}
+	}
+
+	return NULL;
+}
 
 void Creature::executeConditions(int32_t newticks)
 {

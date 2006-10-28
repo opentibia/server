@@ -445,12 +445,12 @@ void Spell::postCastSpell(Player* player)
 	}
 
 	if(exhaustion){
-		Condition* condition = Condition::createCondition(CONDITION_EXHAUSTED, Spells::spellExhaustionTime, 0);
+		Condition* condition = Condition::createCondition(CONDITION_EXHAUSTED, Spells::spellExhaustionTime, 0, -1);
 		player->addCondition(condition);
 	}
 	
 	if(isAggressive && Spells::spellInFightTime != 0){
-		Condition* condition = Condition::createCondition(CONDITION_INFIGHT, Spells::spellInFightTime, 0);
+		Condition* condition = Condition::createCondition(CONDITION_INFIGHT, Spells::spellInFightTime, 0, -1);
 		player->addCondition(condition);
 	}
 

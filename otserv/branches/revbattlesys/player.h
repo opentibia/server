@@ -234,8 +234,10 @@ public:
 	virtual int getArmor() const;
 	virtual int getDefense() const;
 
-	bool gainManaTick();
-	bool gainHealthTick();
+	//bool gainManaTick();
+	//bool gainHealthTick();
+
+	void addDefaultRegeneration(uint32_t addTicks);
 
 	virtual void die();
 	virtual Item* getCorpse();
@@ -458,7 +460,7 @@ protected:
 	Vocation_t vocation_id;
 	Vocation* vocation;
 	playersex_t sex;
-	int food;
+	//int food;
 	
 	double inventoryWeight;
 	double capacity;

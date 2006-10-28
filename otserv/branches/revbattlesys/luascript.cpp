@@ -1123,8 +1123,17 @@ int LuaScriptInterface::internalGetPlayerInfo(lua_State *L, PlayerInfo_t info)
 			return 1;
 			break;
 		case PlayerInfoFood:
-			value = player->food/1000;
+		{
+			//value = player->food/1000;
+			value = 0;
+
+			Condition* condition = player->getCondition(CONDITION_REGENERATION, -1);
+			if(condition){
+				value = condition->getTicks() / 1000;
+			}
+
 			break;
+		}
 		case PlayerInfoVocation:
 			value = player->getVocationId();
 			break;
@@ -1276,7 +1285,8 @@ int LuaScriptInterface::luaDoFeedPlayer(lua_State *L)
 	
 	Player* player = env->getPlayerByUID(cid);
 	if(player){
-		player->food += food*1000;
+		player->addDefaultRegeneration(food * 1000);
+		//player->food += food*1000;
 		lua_pushnumber(L, LUA_NO_ERROR);
 	}
 	else{
@@ -2384,7 +2394,7 @@ int LuaScriptInterface::luaCreateConditionObject(lua_State *L)
 
 	ConditionType_t type = (ConditionType_t)popNumber(L);
 
-	Condition* condition = Condition::createCondition(type, 0, 0);
+	Condition* condition = Condition::createCondition(type, 0, 0, 0);
 	if(!condition){
 		reportErrorFunc(getErrorDesc(LUA_ERROR_CONDITION_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);

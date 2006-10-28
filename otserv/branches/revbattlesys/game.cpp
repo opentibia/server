@@ -1579,7 +1579,7 @@ bool Game::playerYell(Player* player, std::string& text)
 	}
 
 	if(addExhaustion > 0){
-		Condition* condition = Condition::createCondition(CONDITION_EXHAUSTED, addExhaustion, 0);
+		Condition* condition = Condition::createCondition(CONDITION_EXHAUSTED, addExhaustion, 0, -1);
 		player->addCondition(condition);
 	}
 

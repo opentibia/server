@@ -61,7 +61,7 @@ Creature()
 	mana       = 0;
 	manaMax    = 0;
 	manaSpent  = 0;
-	food       = 0;
+	//food       = 0;
 	guildId    = 0;
 
 	level      = 1;
@@ -1112,6 +1112,7 @@ void Player::onThink(uint32_t interval)
 {
 	Creature::onThink(interval);
 
+	/*
 	if(!isInPz()){
 		if(food > 1000){
 			food -= interval;
@@ -1124,6 +1125,7 @@ void Player::onThink(uint32_t interval)
 	if(NeedUpdateStats()){
 		sendStats();
 	}
+	*/
 
 	sendPing();
 
@@ -1454,6 +1456,25 @@ void Player::preSave()
 	}
 }
 
+void Player::addDefaultRegeneration(uint32_t addTicks)
+{
+	Condition* condition = getCondition(CONDITION_REGENERATION, -1);
+
+	if(condition){
+		condition->setTicks(condition->getTicks() + addTicks);
+	}
+	else{
+		condition = Condition::createCondition(CONDITION_REGENERATION, addTicks, 0, -1);
+		condition->setParam(CONDITIONPARAM_HEALTHGAIN, vocation->getHealthGainAmount());
+		condition->setParam(CONDITIONPARAM_HEALTHTICKS, vocation->getHealthGainTicks() * 1000);
+		condition->setParam(CONDITIONPARAM_MANAGAIN, vocation->getManaGainAmount());
+		condition->setParam(CONDITIONPARAM_MANATICKS, vocation->getManaGainTicks() * 1000);
+
+		addCondition(condition);
+	}
+}
+
+/*
 bool Player::gainManaTick()
 {
 	int32_t manaGain = 0;
@@ -1488,6 +1509,7 @@ bool Player::gainHealthTick()
 
 	return true;
 }
+*/
 
 void Player::removeList()
 {
@@ -2452,7 +2474,7 @@ void Player::onAttackedCreature(Creature* target)
 		}
 
 		if(Weapons::weaponInFightTime != 0){
-			Condition* condition = Condition::createCondition(CONDITION_INFIGHT, Weapons::weaponInFightTime, 0);
+			Condition* condition = Condition::createCondition(CONDITION_INFIGHT, Weapons::weaponInFightTime, 0, -1);
 			if(!addCondition(condition)){
 				delete condition;
 			}
@@ -2466,7 +2488,7 @@ void Player::onAttacked()
 
 	if(getAccessLevel() == 0){
 		if(Weapons::weaponInFightTime != 0){
-			Condition* condition = Condition::createCondition(CONDITION_INFIGHT, Weapons::weaponInFightTime, 0);
+			Condition* condition = Condition::createCondition(CONDITION_INFIGHT, Weapons::weaponInFightTime, 0, -1);
 			if(!addCondition(condition)){
 				delete condition;
 			}
@@ -2493,7 +2515,7 @@ void Player::onKilledCreature(Creature* target)
 #endif
 
 			pzLocked = true;
-			Condition* condition = Condition::createCondition(CONDITION_INFIGHT, 60 * 1000 * 15, 0);
+			Condition* condition = Condition::createCondition(CONDITION_INFIGHT, 60 * 1000 * 15, 0, -1);
 			addCondition(condition);
 		}
 	}
