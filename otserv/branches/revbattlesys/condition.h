@@ -63,7 +63,7 @@ public:
 	virtual void addCondition(Creature* creature, const Condition* condition) = 0;
 	virtual uint8_t getIcons() const = 0;
 	//virtual bool stackable() const = 0;
-	virtual uint32_t getId() const {return id;}
+	virtual int32_t getId() const {return id;}
 
 	virtual Condition* clone() const = 0;
 

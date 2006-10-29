@@ -313,7 +313,7 @@ bool Player::getCombatItem(Item** tool, const Weapon** weapon)
 
 int Player::getArmor() const
 {
-	int armor=0;
+	int armor = 0;
 	
 	if(inventory[SLOT_HEAD])
 		armor += inventory[SLOT_HEAD]->getArmor();
@@ -346,15 +346,12 @@ int Player::getDefense() const
 		if(inventory[SLOT_RIGHT]->getWeaponType() == WEAPON_SHIELD)
 			defense += skills[SKILL_SHIELD][SKILL_LEVEL] + inventory[SLOT_RIGHT]->getDefense();
 		else
-			defense += inventory[SLOT_RIGHT]->getDefense();		
+			defense += inventory[SLOT_RIGHT]->getDefense();
 	}
+	
+	defense += random_range(0, skills[SKILL_SHIELD][SKILL_LEVEL]);
 
-	if(defense == 0) 
-		defense = (int)random_range(0,(int)skills[SKILL_SHIELD][SKILL_LEVEL]);
-	else 
-		defense += (int)random_range(0,(int)skills[SKILL_SHIELD][SKILL_LEVEL]);
-
-	return random_range(int(defense*0.25), int(1+(int)(defense*rand())/(RAND_MAX+1.0)));
+	return random_range(defense/4, (defense*rand())/(RAND_MAX + 1));
 }
 
 void Player::sendIcons() const
@@ -469,7 +466,7 @@ void Player::addSkillAdvance(skills_t skill, uint32_t count)
 	}
 	else{
 		//update percent
-		unsigned long new_percent = (unsigned long)(100*(skills[skill][SKILL_TRIES])/(1.*vocation->getReqSkillTries(skill, skills[skill][SKILL_LEVEL]+1)));
+		uint32_t new_percent = (uint32_t)(100*(skills[skill][SKILL_TRIES])/(1.*vocation->getReqSkillTries(skill, skills[skill][SKILL_LEVEL]+1)));
 	 	if(skills[skill][SKILL_PERCENT] != new_percent){
 			skills[skill][SKILL_PERCENT] = new_percent;
 			client->sendSkills();
@@ -559,12 +556,12 @@ void Player::dropLoot(Container* corpse)
 	}
 }
 
-void Player::addStorageValue(const unsigned long key, const long value)
+void Player::addStorageValue(const uint32_t key, const int32_t value)
 {
 	storageMap[key] = value;
 }
 
-bool Player::getStorageValue(unsigned long key, long &value) const
+bool Player::getStorageValue(const uint32_t key, int32_t& value) const
 {
 	StorageMap::const_iterator it;
 	it = storageMap.find(key);
@@ -808,7 +805,7 @@ void Player::sendPing()
 	}
 }
 
-void Player::sendHouseWindow(House* _house, unsigned long _listid) const
+void Player::sendHouseWindow(House* _house, uint32_t _listid) const
 {
 	std::string text;
 	if(_house->getAccessList(_listid, text)){
@@ -930,7 +927,7 @@ void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bo
 
 		g_chat.removeUserFromAllChannels(this);
 		bool saved = false;
-		for(long tries = 0; tries < 3; tries++){
+		for(uint32_t tries = 0; tries < 3; ++tries){
 			if(IOPlayer::instance()->savePlayer(this)){
 				saved = true;
 				break;
@@ -1190,7 +1187,7 @@ void Player::addManaSpent(uint32_t amount)
 	}
 }
 
-void Player::addExperience(unsigned long exp)
+void Player::addExperience(uint32_t exp)
 {
 	experience += exp;
 	int prevLevel = getLevel();
@@ -1322,7 +1319,7 @@ BlockType_t Player::blockHit(Creature* attacker, DamageType_t damageType, int32_
 	return blockType;
 }
 
-unsigned long Player::getIP() const
+uint32_t Player::getIP() const
 {
 	return client->getIP();
 }
@@ -1336,15 +1333,15 @@ void Player::die()
 	loginPosition = masterPos;
 
 	//Magic level loss
-	unsigned long sumMana = 0;
-	long lostMana = 0;
-	for (int i = 1; i <= magLevel; i++) {              //sum up all the mana
+	uint32_t sumMana = 0;
+	int32_t lostMana = 0;
+	for(int32_t i = 1; i <= magLevel; ++i){              //sum up all the mana
 		sumMana += vocation->getReqMana(i);
 	}
 
 	sumMana += manaSpent;
 
-	lostMana = (long)(sumMana * 0.1);   //player loses 10% of all spent mana when he dies
+	lostMana = (int32_t)(sumMana * 0.1);   //player loses 10% of all spent mana when he dies
     
 	while(lostMana > manaSpent){
 		lostMana -= manaSpent;
@@ -1356,18 +1353,18 @@ void Player::die()
 	//
 
 	//Skill loss
-	unsigned long lostSkillTries;
-	unsigned long sumSkillTries;
-	for(int i = 0; i <= 6; i++){  //for each skill
+	uint32_t lostSkillTries;
+	uint32_t sumSkillTries;
+	for(uint32_t i = 0; i <= 6; ++i){  //for each skill
 		lostSkillTries = 0;         //reset to 0
 		sumSkillTries = 0;
 
-		for(unsigned c = 11; c <= skills[i][SKILL_LEVEL]; c++) { //sum up all required tries for all skill levels
+		for(uint32_t c = 11; c <= skills[i][SKILL_LEVEL]; ++c) { //sum up all required tries for all skill levels
 			sumSkillTries += vocation->getReqSkillTries(i, c);
 		}
 
 		sumSkillTries += skills[i][SKILL_TRIES];
-		lostSkillTries = (unsigned long)(sumSkillTries * 0.1);           //player loses 10% of his skill tries
+		lostSkillTries = (uint32_t)(sumSkillTries * 0.1);           //player loses 10% of his skill tries
 
 		while(lostSkillTries > skills[i][SKILL_TRIES]){
 			lostSkillTries -= skills[i][SKILL_TRIES];
@@ -1388,8 +1385,8 @@ void Player::die()
 	//
 
 	//Level loss
-	long newLevel = level;
-	while((unsigned long)(experience - getLostExperience()) < getExpForLv(newLevel)){
+	int32_t newLevel = level;
+	while((uint32_t)(experience - getLostExperience()) < getExpForLv(newLevel)){
 		if(newLevel > 1)
 			newLevel--;
 		else
@@ -1549,7 +1546,7 @@ void Player::notifyLogOut(Player* logout_player)
 	}
 }
 
-bool Player::removeVIP(unsigned long _guid)
+bool Player::removeVIP(uint32_t _guid)
 {
 	VIPListSet::iterator it = VIPList.find(_guid);
 	if(it != VIPList.end()){
@@ -1559,7 +1556,7 @@ bool Player::removeVIP(unsigned long _guid)
 	return false;
 }
 
-bool Player::addVIP(unsigned long _guid, std::string& name, bool isOnline, bool internal /*=false*/)
+bool Player::addVIP(uint32_t _guid, std::string& name, bool isOnline, bool internal /*=false*/)
 {
 	if(guid == _guid){
 		if(!internal)
@@ -2619,7 +2616,7 @@ bool Player::hasAttacked(const Player* attacked) const
 		return false;
 	
 	AttackedSet::const_iterator it;
-	unsigned long attacked_id = attacked->getID();
+	uint32_t attacked_id = attacked->getID();
 	it = attackedSet.find(attacked_id);
 	if(it != attackedSet.end()){
 		return true;
@@ -2638,7 +2635,7 @@ void Player::addAttacked(const Player* attacked)
 		return;
 
 	AttackedSet::iterator it;
-	unsigned long attacked_id = attacked->getID();
+	uint32_t attacked_id = attacked->getID();
 	it = attackedSet.find(attacked_id);
 	if(it == attackedSet.end()){
 		attackedSet.insert(attacked_id);

@@ -111,10 +111,10 @@ public:
 	const std::string& getText() const {return getStrAttr(ATTR_ITEM_TEXT);}
 	
 	void setActionId(unsigned short n) {if(n < 100) n = 100; setIntAttr(ATTR_ITEM_ACTIONID, n);}
-	unsigned short getActionId() const {return getIntAttr(ATTR_ITEM_ACTIONID);}
+	uint16_t getActionId() const {return getIntAttr(ATTR_ITEM_ACTIONID);}
 
 	void setUniqueId(unsigned short n) {if(n < 1000) n = 1000; setIntAttr(ATTR_ITEM_UNIQUEID, n);}
-	unsigned short getUniqueId() const {return getIntAttr(ATTR_ITEM_UNIQUEID);}
+	uint16_t getUniqueId() const {return getIntAttr(ATTR_ITEM_UNIQUEID);}
 
 	void setOwner(uint32_t _owner) {setIntAttr(ATTR_ITEM_OWNER, _owner);}
 	uint32_t getOwner() const {return getIntAttr(ATTR_ITEM_OWNER);}

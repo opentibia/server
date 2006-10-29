@@ -25,8 +25,6 @@
 #include "definitions.h"
 
 #include "templates.h"
-#include "thing.h"
-#include "item.h"
 #include "position.h"
 #include "condition.h"
 #include "const76.h"
@@ -82,6 +80,7 @@ class Container;
 class Player;
 class Monster;
 class Npc;
+class Item;
 
 //////////////////////////////////////////////////////////////////////
 // Defines the Base class for all creatures and base functions which 
@@ -109,8 +108,8 @@ public:
 	void setID(){this->id = auto_id | this->idRange();}
 	void setRemoved();
 
-	virtual unsigned long idRange() = 0;
-	unsigned long getID() const { return id; }
+	virtual uint32_t idRange() = 0;
+	uint32_t getID() const { return id; }
 	virtual void removeList() = 0;
 	virtual void addList() = 0;
 
@@ -193,9 +192,9 @@ public:
 	bool addCondition(Condition* condition);
 	void removeCondition(ConditionType_t type);
 	void removeCondition(Condition* condition);
-	void removeCondition(ConditionType_t type, uint32_t id /*= 0*/);
+	void removeCondition(ConditionType_t type, int32_t id);
 	void removeCondition(const Creature* attacker, ConditionType_t type);
-	Condition* getCondition(ConditionType_t type, uint32_t id /*= 0*/) const;
+	Condition* getCondition(ConditionType_t type, int32_t id) const;
 	void executeConditions(int32_t newticks);
 	bool hasCondition(ConditionType_t type) const;
 	virtual bool isImmune(ConditionType_t type) const;
@@ -310,7 +309,7 @@ protected:
 	friend class Commands;
 	friend class LuaScriptInterface;
 	
-	unsigned long id;
+	uint32_t id;
 	bool isInternalRemoved;
 };
 

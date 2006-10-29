@@ -581,7 +581,7 @@ long MoveEvent::executeStep(Creature* creature, Item* item, const Position& pos)
 	LuaScriptInterface::pushThing(L, item, itemid);
 	LuaScriptInterface::pushPosition(L, pos, 0);
 	
-	long ret;
+	int32_t ret;
 	if(m_scriptInterface->callFunction(3, ret) == false){
 		ret = 0;
 	}
@@ -624,7 +624,7 @@ long MoveEvent::executeEquip(Player* player, Item* item, slots_t slot)
 	LuaScriptInterface::pushThing(L, item, itemid);
 	lua_pushnumber(L, slot);
 	
-	long ret;
+	int32_t ret;
 	if(m_scriptInterface->callFunction(3, ret) == false){
 		ret = 0;
 	}
@@ -670,7 +670,7 @@ long MoveEvent::executeAddRemItem(Item* item, Item* tileItem, const Position& po
 	LuaScriptInterface::pushThing(L, tileItem, itemidTile);
 	LuaScriptInterface::pushPosition(L, pos, 0);
 	
-	long ret;
+	int32_t ret;
 	if(m_scriptInterface->callFunction(3, ret) == false){
 		ret = 0;
 	}

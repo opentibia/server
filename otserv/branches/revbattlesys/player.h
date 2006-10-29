@@ -82,11 +82,11 @@ enum tradestate_t {
 	TRADE_TRANSFER
 };
 
-typedef std::pair<unsigned long, Container*> containervector_pair;
+typedef std::pair<uint32_t, Container*> containervector_pair;
 typedef std::vector<containervector_pair> ContainerVector;
-typedef std::map<unsigned long, Depot*> DepotMap;
-typedef std::map<unsigned long,long> StorageMap;
-typedef std::set<unsigned long> VIPListSet;
+typedef std::map<uint32_t, Depot*> DepotMap;
+typedef std::map<uint32_t, int32_t> StorageMap;
+typedef std::set<uint32_t> VIPListSet;
 
 //////////////////////////////////////////////////////////////////////
 // Defines a player...
@@ -104,15 +104,15 @@ public:
 	virtual const std::string& getNameDescription() const {return name;};
 	virtual std::string getDescription(int32_t lookDistance) const;
 
-	void setGUID(unsigned long _guid) {guid = _guid;};
-	unsigned long getGUID() const { return guid;};
-	virtual unsigned long idRange(){ return 0x10000000;}
+	void setGUID(uint32_t _guid) {guid = _guid;};
+	uint32_t getGUID() const { return guid;};
+	virtual uint32_t idRange(){ return 0x10000000;}
 	static AutoList<Player> listPlayer;
 	void removeList();
 	void addList();
 	void kickPlayer() {client->logout();}
 	
-	unsigned long getGuildId() const {return guildId;};
+	uint32_t getGuildId() const {return guildId;};
 	const std::string& getGuildName() const {return guildName;};
 	const std::string& getGuildRank() const {return guildRank;};
 	const std::string& getGuildNick() const {return guildNick;};
@@ -121,15 +121,15 @@ public:
 	void setGuildNick(const std::string& nick) {guildNick = nick;};
 	
 	bool isOnline() {return (client != NULL);};
-	unsigned long getIP() const;
+	uint32_t getIP() const;
 
 	void addContainer(uint32_t containerid, Container* container);
 	void closeContainer(uint32_t containerid);
 	int32_t getContainerID(const Container* container) const;
 	Container* getContainer(uint32_t cid);
 	
-	void addStorageValue(const unsigned long key, const long value);
-	bool getStorageValue(const unsigned long key, long &value) const;
+	void addStorageValue(const uint32_t key, const int32_t value);
+	bool getStorageValue(const uint32_t key, int32_t& value) const;
 	inline StorageMap::const_iterator getStorageIteratorBegin() const {return storageMap.begin();}
 	inline StorageMap::const_iterator getStorageIteratorEnd() const {return storageMap.end();}
 	
@@ -145,7 +145,7 @@ public:
 
 	playersex_t getSex() {return sex;}	
 	int getPlayerInfo(playerinfo_t playerinfo) const;	
-	unsigned long getExperience() const {return experience;}
+	uint32_t getExperience() const {return experience;}
 
 	time_t getLastLoginSaved() const { return lastLoginSaved; };
 	const Position& getLoginPosition() { return loginPosition; };
@@ -194,8 +194,8 @@ public:
 	//V.I.P. functions
 	void notifyLogIn(Player* player);
 	void notifyLogOut(Player* player);
-	bool removeVIP(unsigned long guid);
-	bool addVIP(unsigned long guid, std::string& name, bool isOnline, bool interal = false);
+	bool removeVIP(uint32_t guid);
+	bool addVIP(uint32_t guid, std::string& name, bool isOnline, bool interal = false);
 
 	//follow functions
 	virtual bool internalFollowCreature(const Creature* creature);
@@ -365,7 +365,7 @@ public:
 		{client->sendCreatureHealth(creature);}
 	void sendDistanceShoot(const Position& from, const Position& to, unsigned char type) const
 		{client->sendDistanceShoot(from, to,type);}
-	void sendHouseWindow(House* _house, unsigned long _listid) const;
+	void sendHouseWindow(House* _house, uint32_t _listid) const;
 	void sendIcons() const; 
 	void sendMagicEffect(const Position& pos, unsigned char type) const
 		{client->sendMagicEffect(pos,type);}
@@ -377,9 +377,9 @@ public:
 		{client->sendTextMessage(mclass, message);}
 	void sendTextMessage(MessageClasses mclass, const std::string& message, const Position& pos, unsigned char type) const
 		{client->sendTextMessage(mclass, message, pos, type);}
-	void sendTextWindow(Item* item,const unsigned short maxlen, const bool canWrite) const
+	void sendTextWindow(Item* item,const uint16_t maxlen, const bool canWrite) const
 		{client->sendTextWindow(item,maxlen,canWrite);}
-	void sendToChannel(Creature* creature, SpeakClasses type, const std::string& text, unsigned short channelId) const
+	void sendToChannel(Creature* creature, SpeakClasses type, const std::string& text, uint16_t channelId) const
 		{client->sendToChannel(creature, type, text, channelId);}
 	void sendTradeItemRequest(const Player* player, const Item* item, bool ack) const
 		{client->sendTradeItemRequest(player, item, ack);}
@@ -414,7 +414,7 @@ protected:
 	bool getCombatItem(Item** tool, const Weapon** weapon);
 
 	std::string getSkillName(int skillid);
-	void addExperience(unsigned long exp);
+	void addExperience(uint32_t exp);
 
 	bool NeedUpdateStats();
 	void updateInventoryWeigth();
@@ -466,8 +466,8 @@ protected:
 	double capacity;
 	
 	bool SendBuffer;
-	long internal_ping;
-	long npings;
+	uint32_t internal_ping;
+	uint32_t npings;
 
 	bool pzLocked;
 	uint32_t blockCount;
@@ -481,7 +481,7 @@ protected:
 	time_t lastlogin;
 	time_t lastLoginSaved;
 	Position loginPosition;
-	unsigned long lastip;
+	uint32_t lastip;
 	
 	//inventory variables
 	Item* inventory[11];
@@ -500,8 +500,8 @@ protected:
 	static const int HPGain[5];
 	static const int gainManaVector[5][2];
 	static const int gainHealthVector[5][2];
-	unsigned short manaTick;
-	unsigned short healthTick;
+	uint16_t manaTick;
+	uint16_t healthTick;
 	
 	unsigned char level_percent;
 	unsigned char maglevel_percent;
@@ -512,25 +512,25 @@ protected:
 	Item* tradeItem;
 
 	struct SentStats{
-		int health;
-		int healthMax;
-		unsigned long experience;
-		int level;
+		int32_t health;
+		int32_t healthMax;
+		uint32_t experience;
+		int32_t level;
 		double freeCapacity;
-		int mana;
-		int manaMax;
-		int manaSpent;
-		int magLevel;
+		int32_t mana;
+		int32_t manaMax;
+		int32_t manaSpent;
+		int32_t magLevel;
 	};
 	
 	SentStats lastSentStats;
 
 	std::string name;	
 	std::string nameDescription;
-	unsigned long guid;
+	uint32_t guid;
 	
 	//guild variables
-	unsigned long guildId;
+	uint32_t guildId;
 	std::string guildName;
 	std::string guildRank;
 	std::string guildNick;
@@ -541,7 +541,7 @@ protected:
 #ifdef __SKULLSYSTEM__
 	int64_t redSkullTicks;
 	Skulls_t skull;
-	typedef std::set<long> AttackedSet;
+	typedef std::set<uint32_t> AttackedSet;
 	AttackedSet attackedSet;
 #endif
 	

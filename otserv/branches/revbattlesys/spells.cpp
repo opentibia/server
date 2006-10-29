@@ -675,7 +675,7 @@ bool InstantSpell::executeCastSpell(Creature* creature, const LuaVariant& var)
 
 	bool isSuccess = true;
 
-	long result;
+	int32_t result;
 	if(m_scriptInterface->callFunction(2, result) == false){
 		isSuccess = false;
 	}
@@ -1153,7 +1153,7 @@ bool RuneSpell::executeCastSpell(Creature* creature, const LuaVariant& var)
 	
 	bool isSuccess = true;
 
-	long result;
+	int32_t result;
 	if(m_scriptInterface->callFunction(2, result) == false){
 		isSuccess = false;
 	}

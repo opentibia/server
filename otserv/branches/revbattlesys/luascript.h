@@ -117,21 +117,21 @@ public:
 	void getEventInfo(long& scriptId, std::string& desc, LuaScriptInterface*& scriptInterface, long& callbackId);
 
 	static void addUniqueThing(Thing* thing);
-	long addThing(Thing* thing);
+	uint32_t addThing(Thing* thing);
 	uint32_t addVariant(const LuaVariant* variant);
 	const LuaVariant* getVariant(uint32_t index);
 	
-	void addGlobalStorageValue(const unsigned long key, const long value);
-	bool getGlobalStorageValue(const unsigned long key, long &value) const;
+	void addGlobalStorageValue(const uint32_t key, const int32_t value);
+	bool getGlobalStorageValue(const uint32_t key, int32_t& value) const;
 
 	void setRealPos(const Position& realPos);
 	Position getRealPos();
 
-	Thing* getThingByUID(long uid);
-	Item* getItemByUID(long uid);
-	Container* getContainerByUID(long uid);
-	Creature* getCreatureByUID(long uid);
-	Player* getPlayerByUID(long uid);
+	Thing* getThingByUID(uint32_t uid);
+	Item* getItemByUID(uint32_t uid);
+	Container* getContainerByUID(uint32_t uid);
+	Creature* getCreatureByUID(uint32_t uid);
+	Player* getPlayerByUID(uint32_t uid);
 
 	uint32_t addCombatArea(AreaCombat* area);
 	AreaCombat* getCombatArea(uint32_t areaId) const;
@@ -249,22 +249,22 @@ public:
 
 	lua_State* getLuaState();
 
-	bool pushFunction(long functionId);
+	bool pushFunction(int32_t functionId);
 
-	bool callFunction(long nParams, long &result);
-	bool callFunction(long nParams);
+	bool callFunction(uint32_t nParams, int32_t& result);
+	bool callFunction(uint32_t nParams);
 
 	//push/pop common structures
-	static void pushThing(lua_State *L, Thing* thing, long thingid);
-	static void pushPosition(lua_State *L, const Position& position, long stackpos);
+	static void pushThing(lua_State *L, Thing* thing, uint32_t thingid);
+	static void pushPosition(lua_State *L, const Position& position, uint32_t stackpos);
 
-	static void popPosition(lua_State *L, Position& position, long& stackpos);
-	static long popNumber(lua_State *L);
+	static void popPosition(lua_State *L, Position& position, uint32_t& stackpos);
+	static uint32_t popNumber(lua_State *L);
 	static double popFloatNumber(lua_State *L);
 	static const char* popString(lua_State *L);
 
-	static long getField(lua_State *L, const char *key);
-	static void setField(lua_State *L, const char *index, long val);
+	static int32_t getField(lua_State *L, const char *key);
+	static void setField(lua_State *L, const char *index, uint32_t val);
 
 protected:
 	virtual bool closeState();

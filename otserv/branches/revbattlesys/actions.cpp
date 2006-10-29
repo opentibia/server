@@ -380,7 +380,7 @@ bool Action::executeUse(Player* player, Item* item, const PositionEx& posFrom, c
 		LuaScriptInterface::pushPosition(L, posEx, 0);
 	}
 	
-	long ret;
+	int32_t ret;
 	if(m_scriptInterface->callFunction(5, ret) == false){
 		ret = 0;
 	}

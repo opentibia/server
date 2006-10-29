@@ -41,7 +41,7 @@ public:
 	virtual Monster* getMonster() {return this;};
 	virtual const Monster* getMonster() const {return this;};
 
-	virtual unsigned long idRange(){ return 0x40000000;}
+	virtual uint32_t idRange(){ return 0x40000000;}
 	static AutoList<Monster> listMonster;
 	void removeList() {listMonster.removeList(getID());}
 	void addList() {listMonster.addList(this);}

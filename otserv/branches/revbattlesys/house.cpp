@@ -145,7 +145,7 @@ bool House::kickPlayer(Player* player, const std::string& name)
 	return false;
 }
 
-void House::setAccessList(unsigned long listId, const std::string& textlist)
+void House::setAccessList(uint32_t listId, const std::string& textlist)
 {
 	if(listId == GUEST_LIST){
 		guestList.parseList(textlist);
@@ -253,7 +253,7 @@ bool House::transferToDepot()
 	return true;
 }
 
-bool House::getAccessList(unsigned long listId, std::string& list) const
+bool House::getAccessList(uint32_t listId, std::string& list) const
 {
 	if(listId == GUEST_LIST){
 		guestList.getList(list);
@@ -295,7 +295,7 @@ void House::addDoor(Door* door)
 	door->setHouse(this);
 }
 
-Door* House::getDoorByNumber(unsigned long doorId)
+Door* House::getDoorByNumber(uint32_t doorId)
 {
 	HouseDoorList::iterator it;
 	for(it = doorList.begin(); it != doorList.end(); ++it){
@@ -306,7 +306,7 @@ Door* House::getDoorByNumber(unsigned long doorId)
 	return NULL;
 }
 
-Door* House::getDoorByNumber(unsigned long doorId) const
+Door* House::getDoorByNumber(uint32_t doorId) const
 {
 	HouseDoorList::const_iterator it;
 	for(it = doorList.begin(); it != doorList.end(); ++it){
@@ -328,7 +328,7 @@ Door* House::getDoorByPosition(const Position& pos)
 	return NULL;
 }
 
-bool House::canEditAccessList(unsigned long listId, const Player* player)
+bool House::canEditAccessList(uint32_t listId, const Player* player)
 {
 	switch(getHouseAccessLevel(player)){
 	case HOUSE_OWNER:
@@ -727,7 +727,7 @@ Houses::~Houses()
 	//
 }
 
-House* Houses::getHouseByPlayerId(unsigned long playerId)
+House* Houses::getHouseByPlayerId(uint32_t playerId)
 {
 	for(HouseMap::iterator it = houseMap.begin(); it != houseMap.end(); ++it){
 		House* house = it->second;
