@@ -423,9 +423,8 @@ BlockType_t Creature::blockHit(Creature* attacker, DamageType_t damageType, int3
 		internalDefense = false;
 		int32_t defense = getDefense();
 
-		//TODO: change formulas
-		int32_t atkValue = (rand() % 80) + (damage / 16);
-		if(atkValue < defense){
+		int32_t attackValue = (rand() % 80) + (damage / 16);
+		if(attackValue < defense){
 			damage = 0;
 			blockType = BLOCK_DEFENSE;
 		}
@@ -435,12 +434,12 @@ BlockType_t Creature::blockHit(Creature* attacker, DamageType_t damageType, int3
 		internalArmor = false;
 		int32_t armor = getArmor();
 
-		//TODO: change formulas
 		int32_t armor2 = armor*armor;
 		int32_t max = armor2/8 + 2*armor + 8;
 		int32_t min = -armor2/32 + (5*armor)/2;
 		min = random_range(min/2, min);
 		int32_t reduceDamage = random_range(min, max);
+
 		if(reduceDamage >= damage){
 			damage = 0;
 			blockType = BLOCK_ARMOR;
@@ -661,7 +660,7 @@ void Creature::removeCondition(ConditionType_t type)
 	}
 }
 
-void Creature::removeCondition(ConditionType_t type, int32_t id)
+void Creature::removeCondition(ConditionType_t type, ConditionId_t id)
 {
 	for(ConditionList::iterator it = conditions.begin(); it != conditions.end();){
 		if((*it)->getType() == type && (*it)->getId() == id){
@@ -704,7 +703,7 @@ void Creature::removeCondition(Condition* condition)
 	}
 }
 
-Condition* Creature::getCondition(ConditionType_t type, int32_t id) const
+Condition* Creature::getCondition(ConditionType_t type, ConditionId_t id) const
 {
 	for(ConditionList::const_iterator it = conditions.begin(); it != conditions.end(); ++it){
 		if((*it)->getType() == type && (*it)->getId() == id){

@@ -350,7 +350,6 @@ int Player::getDefense() const
 	}
 	
 	defense += random_range(0, skills[SKILL_SHIELD][SKILL_LEVEL]);
-
 	return random_range(defense/4, (defense*rand())/(RAND_MAX + 1));
 }
 
@@ -1455,13 +1454,13 @@ void Player::preSave()
 
 void Player::addDefaultRegeneration(uint32_t addTicks)
 {
-	Condition* condition = getCondition(CONDITION_REGENERATION, -1);
+	Condition* condition = getCondition(CONDITION_REGENERATION, CONDITIONID_DEFAULT);
 
 	if(condition){
 		condition->setTicks(condition->getTicks() + addTicks);
 	}
 	else{
-		condition = Condition::createCondition(CONDITION_REGENERATION, addTicks, 0, -1);
+		condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_REGENERATION, addTicks, 0);
 		condition->setParam(CONDITIONPARAM_HEALTHGAIN, vocation->getHealthGainAmount());
 		condition->setParam(CONDITIONPARAM_HEALTHTICKS, vocation->getHealthGainTicks() * 1000);
 		condition->setParam(CONDITIONPARAM_MANAGAIN, vocation->getManaGainAmount());
@@ -2471,7 +2470,7 @@ void Player::onAttackedCreature(Creature* target)
 		}
 
 		if(Weapons::weaponInFightTime != 0){
-			Condition* condition = Condition::createCondition(CONDITION_INFIGHT, Weapons::weaponInFightTime, 0, -1);
+			Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_INFIGHT, Weapons::weaponInFightTime, 0);
 			if(!addCondition(condition)){
 				delete condition;
 			}
@@ -2485,7 +2484,7 @@ void Player::onAttacked()
 
 	if(getAccessLevel() == 0){
 		if(Weapons::weaponInFightTime != 0){
-			Condition* condition = Condition::createCondition(CONDITION_INFIGHT, Weapons::weaponInFightTime, 0, -1);
+			Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_INFIGHT, Weapons::weaponInFightTime, 0);
 			if(!addCondition(condition)){
 				delete condition;
 			}
@@ -2512,7 +2511,7 @@ void Player::onKilledCreature(Creature* target)
 #endif
 
 			pzLocked = true;
-			Condition* condition = Condition::createCondition(CONDITION_INFIGHT, 60 * 1000 * 15, 0, -1);
+			Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_INFIGHT, 60 * 1000 * 15, 0);
 			addCondition(condition);
 		}
 	}

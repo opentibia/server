@@ -47,14 +47,14 @@ enum ConditionType_t {
 	CONDITION_REGENERATION	= 8192
 };
 
-enum EndCondition_t {
+enum EndCondition_t{
 	REASON_ENDTICKS,
 	REASON_ABORT,
 };
 
 class Condition{
 public:
-	Condition(int32_t _id, ConditionType_t _type, int32_t _ticks);
+	Condition(ConditionId_t _id, ConditionType_t _type, int32_t _ticks);
 	virtual ~Condition(){};
 	
 	virtual bool startCondition(Creature* creature) = 0;
@@ -63,7 +63,7 @@ public:
 	virtual void addCondition(Creature* creature, const Condition* condition) = 0;
 	virtual uint8_t getIcons() const = 0;
 	//virtual bool stackable() const = 0;
-	virtual int32_t getId() const {return id;}
+	virtual ConditionId_t getId() const {return id;}
 
 	virtual Condition* clone() const = 0;
 
@@ -72,7 +72,7 @@ public:
 	void setTicks(int32_t newTicks) { ticks = newTicks; }
 	bool reduceTicks(int32_t interval);
 
-	static Condition* createCondition(ConditionType_t _type, int32_t ticks, int32_t param, int32_t _id /*= 0*/);
+	static Condition* createCondition(ConditionId_t _id, ConditionType_t _type, int32_t ticks, int32_t param);
 
 	virtual bool setParam(ConditionParam_t param, int32_t value);
 	void setFormulaVars(double _mina, double _minb, double _maxa, double _maxb);
@@ -80,7 +80,7 @@ public:
 protected:
 	void Condition::getFormulaValues(int32_t var, int32_t& min, int32_t& max) const;
 
-	int32_t id;
+	ConditionId_t id;
 	int32_t ticks;
 	ConditionType_t conditionType;
 
@@ -94,7 +94,7 @@ protected:
 class ConditionGeneric: public Condition
 {
 public:
-	ConditionGeneric(int32_t _id, ConditionType_t _type, int32_t _ticks);
+	ConditionGeneric(ConditionId_t _id, ConditionType_t _type, int32_t _ticks);
 	virtual ~ConditionGeneric(){};
 	
 	virtual bool startCondition(Creature* creature);
@@ -110,7 +110,7 @@ public:
 class ConditionManaShield : public ConditionGeneric
 {
 public:
-	ConditionManaShield(int32_t _id, ConditionType_t _type, int32_t _ticks) : ConditionGeneric(_id, _type, _ticks) {};
+	ConditionManaShield(ConditionId_t _id, ConditionType_t _type, int32_t _ticks) : ConditionGeneric(_id, _type, _ticks) {};
 	virtual ~ConditionManaShield(){};
 	//virtual bool stackable() const {return true;};
 
@@ -120,7 +120,7 @@ public:
 class ConditionRegeneration : public ConditionGeneric
 {
 public:
-	ConditionRegeneration(int32_t _id, ConditionType_t _type, int32_t _ticks);
+	ConditionRegeneration(ConditionId_t _id, ConditionType_t _type, int32_t _ticks);
 	virtual ~ConditionRegeneration(){};
 	virtual void addCondition(Creature* creature, const Condition* addCondition);
 	virtual bool executeCondition(Creature* creature, int32_t interval);
@@ -144,7 +144,7 @@ protected:
 class ConditionInvisible: public ConditionGeneric
 {
 public:
-	ConditionInvisible(int32_t _id, ConditionType_t _type, int32_t _ticks);
+	ConditionInvisible(ConditionId_t _id, ConditionType_t _type, int32_t _ticks);
 	virtual ~ConditionInvisible(){};
 
 	virtual bool startCondition(Creature* creature);
@@ -157,7 +157,7 @@ public:
 class ConditionDamage: public Condition
 {
 public:
-	ConditionDamage(int32_t _id, ConditionType_t _type);
+	ConditionDamage(ConditionId_t _id, ConditionType_t _type);
 	virtual ~ConditionDamage(){};
 	
 	virtual bool startCondition(Creature* creature);
@@ -192,7 +192,7 @@ protected:
 class ConditionSpeed: public Condition
 {
 public:
-	ConditionSpeed(int32_t _id, ConditionType_t _type, int32_t _ticks, int32_t changeSpeed);
+	ConditionSpeed(ConditionId_t _id, ConditionType_t _type, int32_t _ticks, int32_t changeSpeed);
 	virtual ~ConditionSpeed(){};
 	
 	virtual bool startCondition(Creature* creature);
@@ -213,7 +213,7 @@ protected:
 class ConditionOutfit: public Condition
 {
 public:
-	ConditionOutfit(int32_t _id, ConditionType_t _type, int32_t _ticks);
+	ConditionOutfit(ConditionId_t _id, ConditionType_t _type, int32_t _ticks);
 	virtual ~ConditionOutfit(){};
 	
 	virtual bool startCondition(Creature* creature);
@@ -236,7 +236,7 @@ protected:
 class ConditionLight: public Condition
 {
 public:
-	ConditionLight(int32_t _id, int32_t _ticks, int32_t _lightlevel, int32_t _lightcolor);
+	ConditionLight(ConditionId_t _id, int32_t _ticks, int32_t _lightlevel, int32_t _lightcolor);
 	virtual ~ConditionLight(){};
 	
 	virtual bool startCondition(Creature* creature);

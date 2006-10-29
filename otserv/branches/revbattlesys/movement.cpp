@@ -457,12 +457,12 @@ long MoveEvent::EquipItem(Player* player, Item* item, slots_t slot)
 	}
 
 	if(it.abilities.invisible){
-		Condition* condition = Condition::createCondition(CONDITION_INVISIBLE, -1, 0, slot);
+		Condition* condition = Condition::createCondition((ConditionId_t)slot, CONDITION_INVISIBLE, -1, 0);
 		player->addCondition(condition);
 	}
 
 	if(it.abilities.manaShield){
-		Condition* condition = Condition::createCondition(CONDITION_MANASHIELD, -1, 0, slot);
+		Condition* condition = Condition::createCondition((ConditionId_t)slot, CONDITION_MANASHIELD, -1, 0);
 		player->addCondition(condition);
 	}
 
@@ -476,7 +476,7 @@ long MoveEvent::EquipItem(Player* player, Item* item, slots_t slot)
 	}
 
 	if(it.abilities.regeneration){
-		Condition* condition = Condition::createCondition(CONDITION_REGENERATION, -1, 0, slot);
+		Condition* condition = Condition::createCondition((ConditionId_t)slot, CONDITION_REGENERATION, -1, 0);
 		if(it.abilities.healthGain != 0){
 			condition->setParam(CONDITIONPARAM_HEALTHGAIN, it.abilities.healthGain);
 		}
@@ -517,11 +517,11 @@ long MoveEvent::DeEquipItem(Player* player, Item* item, slots_t slot)
 	}
 
 	if(it.abilities.invisible){
-		player->removeCondition(CONDITION_INVISIBLE, slot);
+		player->removeCondition(CONDITION_INVISIBLE, (ConditionId_t)slot);
 	}
 
 	if(it.abilities.manaShield){
-		player->removeCondition(CONDITION_MANASHIELD, slot);
+		player->removeCondition(CONDITION_MANASHIELD, (ConditionId_t)slot);
 	}
 
 	if(it.abilities.speed != 0){
@@ -534,7 +534,7 @@ long MoveEvent::DeEquipItem(Player* player, Item* item, slots_t slot)
 	}
 
 	if(it.abilities.regeneration){
-		player->removeCondition(CONDITION_REGENERATION, slot);
+		player->removeCondition(CONDITION_REGENERATION, (ConditionId_t)slot);
 	}
 
 	//skill modifiers

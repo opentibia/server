@@ -190,11 +190,11 @@ public:
 	virtual int getDefense() const {return 0;}
 
 	bool addCondition(Condition* condition);
+	void removeCondition(ConditionType_t type, ConditionId_t id);
 	void removeCondition(ConditionType_t type);
 	void removeCondition(Condition* condition);
-	void removeCondition(ConditionType_t type, int32_t id);
 	void removeCondition(const Creature* attacker, ConditionType_t type);
-	Condition* getCondition(ConditionType_t type, int32_t id) const;
+	Condition* getCondition(ConditionType_t type, ConditionId_t id) const;
 	void executeConditions(int32_t newticks);
 	bool hasCondition(ConditionType_t type) const;
 	virtual bool isImmune(ConditionType_t type) const;
