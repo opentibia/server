@@ -443,6 +443,9 @@ BlockType_t Creature::blockHit(Creature* attacker, DamageType_t damageType, int3
 		int32_t armor2 = armor*armor;
 		int32_t max = armor2/8 + 2*armor + 8;
 		int32_t min = -armor2/32 + (5*armor)/2;
+		if(min < 0){
+			min = 0;
+		}
 		min = random_range(min/2, min);
 		int32_t reduceDamage = random_range(min, max);
 

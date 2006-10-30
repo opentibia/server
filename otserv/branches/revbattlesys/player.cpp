@@ -2290,8 +2290,8 @@ void Player::doAttacking(uint32_t interval)
 			const Position& playerPos = getPosition();
 			const Position& targetPos = attackedCreature->getPosition();
 
-			if(std::max(std::abs(playerPos.x - targetPos.x), std::abs(playerPos.y - targetPos.y)) <= 1){
-				int32_t damage = -(int32_t)(0.5 * skills[SKILL_FIST][SKILL_LEVEL]);
+			if(Position::areInRange<1,1>(playerPos, targetPos)){
+				int32_t damage = -(int32_t)(0.5 * skills[SKILL_FIST][SKILL_LEVEL])*rand()/RAND_MAX;
 				CombatParams params;
 				params.damageType = DAMAGE_PHYSICAL;
 				params.blockedByArmor = true;
