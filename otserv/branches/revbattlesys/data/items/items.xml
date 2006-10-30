@@ -92,8 +92,10 @@
 	<item id="2205" name="life ring">
 		<attribute key="transformDeEquipTo" value="2168"/>
 		<attribute key="duration" value="500"/>
+		<attribute key="healthGain" value="100"/>
+		<attribute key="HealthTicks" value="1000"/>
 		<attribute key="manaGain" value="50"/>
-		<attribute key="manaTicks" value="3000"/>
+		<attribute key="manaTicks" value="1000"/>
 		<attribute key="showduration" value="1"/>
 	</item>
 
