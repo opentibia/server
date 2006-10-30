@@ -67,6 +67,7 @@ Creature::Creature() :
 	lastHitCreature = 0;
 	internalDefense = true;
 	internalArmor = true;
+	blockTicks = 0;
 }
 
 Creature::~Creature()
@@ -107,8 +108,13 @@ void Creature::onThink(uint32_t interval)
 		internalFollowCreature(followCreature);
 	}
 
-	internalDefense = true;
-	internalArmor = true;
+	blockTicks += interval;
+
+	if(blockTicks >= 1500){
+		blockTicks = 0;
+		internalDefense = true;
+		internalArmor = true;
+	}
 }
 
 void Creature::onWalk()

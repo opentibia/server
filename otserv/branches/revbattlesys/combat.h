@@ -98,7 +98,8 @@ struct Combat2Var{
 
 class Combat{
 public:
-	Combat(CombatType_t _type);
+	//Combat(CombatType_t _type);
+	Combat();
 	~Combat();
 
 	static void doCombatHealth(Creature* caster, Creature* target,
@@ -139,6 +140,8 @@ public:
 	void postCombatEffects(Creature* caster, const Position& pos, bool success) const;
 
 protected:
+	static void doCombatDefault(Creature* caster, Creature* target, const CombatParams& params);
+
 	static void CombatFunc(Creature* caster, const Position& pos,
 		const AreaCombat* area, const CombatParams& params, COMBATFUNC func, void* data);
 
@@ -153,7 +156,7 @@ protected:
 	void getMinMaxValues(Creature* creature, int32_t& min, int32_t& max) const;
 
 	//configureable
-	CombatType_t combatType;
+	//CombatType_t combatType;
 	CombatParams params;
 
 	//formula variables

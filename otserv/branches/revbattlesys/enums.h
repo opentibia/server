@@ -28,14 +28,6 @@ enum RaceType_t {
 	RACE_UNDEAD	= 3
 };
 
-enum CombatType_t {
-	COMBAT_NONE				= 0,
-	COMBAT_HITPOINTS	= 1,
-	COMBAT_MANAPOINTS = 2,
-	COMBAT_CONDITION	= 3,
-	COMBAT_DISPEL   	= 4
-};
-
 enum DamageType_t {
 	DAMAGE_NONE				= 0,
 	DAMAGE_PHYSICAL		= 1,

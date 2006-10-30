@@ -1035,7 +1035,9 @@ ReturnValue Game::internalAddItem(Cylinder* toCylinder, Item* item, int32_t inde
 			}
 			
 			if(m - n > 0){
-				moveItem = Item::CreateItem(item->getID(), m - n);
+				if(m - n != item->getItemCount()){
+					moveItem = Item::CreateItem(item->getID(), m - n);
+				}
 			}
 			else{
 				moveItem = NULL;
@@ -1094,6 +1096,22 @@ ReturnValue Game::internalRemoveItem(Item* item, int32_t count /*= -1*/,  bool t
 		cylinder->postRemoveNotification(item, index, isCompleteRemoval);
 	}
 	
+	return RET_NOERROR;
+}
+
+ReturnValue Game::internalPlayerAddItem(Player* player, Item* item)
+{
+	ReturnValue ret = internalAddItem(player, item);
+
+	if(ret != RET_NOERROR){
+		Tile* tile = player->getTile();
+		ret = internalAddItem(tile, item, INDEX_WHEREEVER, FLAG_NOLIMIT);
+		if(ret != RET_NOERROR){
+			delete item;
+			return ret;
+		}
+	}
+
 	return RET_NOERROR;
 }
 
@@ -2743,6 +2761,12 @@ bool Game::combatChangeHealth(DamageType_t damageType, Creature* attacker, Creat
 				}
 
 				case DAMAGE_FIRE:
+				{
+					hitEffect = NM_ME_BLOCKHIT;
+					break;
+				}
+
+				case DAMAGE_PHYSICAL:
 				{
 					hitEffect = NM_ME_BLOCKHIT;
 					break;

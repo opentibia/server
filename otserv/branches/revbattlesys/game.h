@@ -199,6 +199,8 @@ public:
 		uint32_t flags = 0, bool test = false);
 	ReturnValue internalRemoveItem(Item* item, int32_t count = -1,  bool test = false);
 
+	ReturnValue internalPlayerAddItem(Player* player, Item* item);
+
 	/**
 	  * Remove item(s) of a certain type
 	  * \param cylinder to remove the item(s) from

@@ -204,8 +204,6 @@ public:
 	//follow events
 	virtual void onFollowCreature(const Creature* creature);
 
-	//bool checkStopAutoWalk(bool pathInvalid = false);
-
 	//walk events
 	virtual void onWalkAborted();
 
@@ -233,9 +231,6 @@ public:
 
 	virtual int getArmor() const;
 	virtual int getDefense() const;
-
-	//bool gainManaTick();
-	//bool gainHealthTick();
 
 	void addDefaultRegeneration(uint32_t addTicks);
 

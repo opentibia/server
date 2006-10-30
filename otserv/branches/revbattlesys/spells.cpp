@@ -114,6 +114,9 @@ Event* Spells::getEvent(const std::string& nodeName)
 	else if(nodeName == "instant"){
 		return new InstantSpell(&m_scriptInterface);
 	}
+	else if(nodeName == "conjure"){
+		return new ConjureSpell(&m_scriptInterface);
+	}
 	else{
 		return NULL;
 	}
@@ -286,7 +289,7 @@ bool Spell::configureSpell(xmlNodePtr p)
 	return true;
 }
 
-bool Spell::playerSpellCheck(const Player* player)
+bool Spell::playerSpellCheck(const Player* player) const
 {
 	if(player->getAccessLevel() > 0){
 		return true;
@@ -432,7 +435,7 @@ bool Spell::playerRuneSpellCheck(const Player* player, const Position& toPos)
 	return result;
 }
 
-void Spell::postCastSpell(Player* player)
+void Spell::postCastSpell(Player* player) const
 {
 	if(player->getAccessLevel() > 0){
 		return;
@@ -641,7 +644,7 @@ bool InstantSpell::internalCastSpell(Creature* creature, const LuaVariant& var)
 	}
 	else{
 		if(function){
-			result = function(creature, var.text);
+			result = function(this, creature, var.text);
 		}
 	}
 
@@ -700,7 +703,7 @@ House* InstantSpell::getHouseFromPos(Creature* creature)
 	return NULL;
 }
 
-bool InstantSpell::HouseGuestList(Creature* creature, const std::string& param)
+bool InstantSpell::HouseGuestList(const InstantSpell* spell, Creature* creature, const std::string& param)
 {
 	House* house = getHouseFromPos(creature);
 	if(!house)
@@ -719,7 +722,7 @@ bool InstantSpell::HouseGuestList(Creature* creature, const std::string& param)
 	return true;
 }
 
-bool InstantSpell::HouseSubOwnerList(Creature* creature, const std::string& param)
+bool InstantSpell::HouseSubOwnerList(const InstantSpell* spell, Creature* creature, const std::string& param)
 {
 	House* house = getHouseFromPos(creature);
 	if(!house)
@@ -739,7 +742,7 @@ bool InstantSpell::HouseSubOwnerList(Creature* creature, const std::string& para
 	return true;
 }
 
-bool InstantSpell::HouseDoorList(Creature* creature, const std::string& param)
+bool InstantSpell::HouseDoorList(const InstantSpell* spell, Creature* creature, const std::string& param)
 {
 	House* house = getHouseFromPos(creature);
 	if(!house)
@@ -778,7 +781,7 @@ bool InstantSpell::HouseDoorList(Creature* creature, const std::string& param)
 	return true;
 }
 
-bool InstantSpell::HouseKick(Creature* creature, const std::string& param)
+bool InstantSpell::HouseKick(const InstantSpell* spell, Creature* creature, const std::string& param)
 {
 	House* house = getHouseFromPos(creature);
 	if(!house)
@@ -790,7 +793,7 @@ bool InstantSpell::HouseKick(Creature* creature, const std::string& param)
 	return true;
 }
 
-bool InstantSpell::SearchPlayer(Creature* creature, const std::string& param)
+bool InstantSpell::SearchPlayer(const InstantSpell* spell, Creature* creature, const std::string& param)
 {
 	//a. From 1 to 4 sq's [Person] is standing next to you.
 	//b. From 5 to 100 sq's [Person] is to the south, north, east, west.
@@ -992,6 +995,260 @@ bool InstantSpell::SearchPlayer(Creature* creature, const std::string& param)
 	return false;
 }
 
+ConjureSpell::ConjureSpell(LuaScriptInterface* _interface) :
+InstantSpell(_interface)
+{
+	conjureId = 0;
+	conjureCount = 1;
+	conjureReagentId = 0;
+}
+
+ConjureSpell::~ConjureSpell()
+{
+	//
+}
+
+std::string ConjureSpell::getScriptEventName()
+{
+	return "onCastSpell";
+}
+
+bool ConjureSpell::configureEvent(xmlNodePtr p)
+{
+	if(!InstantSpell::configureEvent(p)){
+		return false;
+	}
+
+	/*
+	if(!Spell::configureSpell(p)){
+		return false;
+	}
+
+	if(!TalkAction::configureEvent(p)){
+		return false;
+	}
+	*/
+
+	int intValue;
+	
+	if(readXMLInteger(p, "conjureId", intValue)){
+		conjureId = intValue;
+	}
+
+	if(readXMLInteger(p, "conjureCount", intValue)){
+		conjureCount = intValue;
+	}
+
+	if(readXMLInteger(p, "reagentId", intValue)){
+		conjureReagentId = intValue;
+	}	
+
+	return true;
+}
+
+bool ConjureSpell::loadFunction(const std::string& functionName)
+{
+	if(functionName == "conjureItem"){
+		function = ConjureItem;
+	}
+	else if(functionName == "conjureRune"){
+		function = ConjureItem;
+	}
+	else if(functionName == "conjureFood"){
+		function = ConjureFood;
+	}
+	else{
+		return false;
+	}
+	
+	m_scripted = false;
+	return true;
+}
+
+bool ConjureSpell::internalConjureItem(Player* player, uint32_t conjureId, uint32_t conjureCount)
+{
+	Item* newItem = Item::CreateItem(conjureId, conjureCount);
+	if(!newItem){
+		return false;
+	}
+
+	ReturnValue ret = g_game.internalPlayerAddItem(player, newItem);
+	return (ret == RET_NOERROR);
+}
+
+bool ConjureSpell::internalConjureItem(Player* player, uint32_t conjureId, uint32_t conjureCount, uint32_t reagentId, slots_t slot)
+{
+	bool result = false;
+	if(reagentId != 0){
+		Item* item;
+
+		item = player->getInventoryItem(slot);
+		if(item && item->getID() == reagentId){
+			
+			g_game.transformItem(item, conjureId, conjureCount);
+			result = true;
+		}
+	}
+
+	return result;
+}
+
+bool ConjureSpell::ConjureItem(const ConjureSpell* spell, Creature* creature, const std::string& param)
+{
+	Player* player = creature->getPlayer();
+
+	if(!player){
+		return false;
+	}
+	
+	bool result = false;
+
+	if(spell->getReagentId() != 0){
+		
+		if(!spell->playerSpellCheck(player)){
+			return false;
+		}
+
+		if(internalConjureItem(player, spell->getConjureId(), spell->getConjureCount(),
+		spell->getReagentId(), SLOT_LEFT)){
+			spell->postCastSpell(player);
+			result = true;
+		}
+
+		if(!spell->playerSpellCheck(player)){
+			return false;
+		}
+
+		if(internalConjureItem(player, spell->getConjureId(), spell->getConjureCount(),
+		spell->getReagentId(), SLOT_RIGHT)){
+			spell->postCastSpell(player);
+			result = true;
+		}
+	}
+	else{
+		if(internalConjureItem(player, spell->getConjureId(), spell->getConjureId())){
+			spell->postCastSpell(player);
+			result = true;
+		}
+	}
+
+	if(result){
+		player->sendMagicEffect(player->getPosition(), NM_ME_MAGIC_BLOOD);
+	}
+	else if(spell->getReagentId() != 0){
+		player->sendCancel("You need a magic item to cast this spell.");
+		player->sendMagicEffect(player->getPosition(), NM_ME_PUFF);
+	}
+
+	return result;
+}
+
+bool ConjureSpell::ConjureFood(const ConjureSpell* spell, Creature* creature, const std::string& param)
+{
+	Player* player = creature->getPlayer();
+
+	if(!player){
+		return false;
+	}
+
+	uint32_t foodType = 0;
+	switch(rand() % 7){
+		case 0: foodType = ITEM_MEAT; break;
+		case 1: foodType = ITEM_HAM; break;
+		case 2: foodType = ITEM_GRAPE; break;
+		case 3: foodType = ITEM_APPLE; break;
+		case 4: foodType = ITEM_BREAD; break;
+		case 5: foodType = ITEM_CHEESE; break;
+		case 6: foodType = ITEM_ROLL; break;
+		case 7: foodType = ITEM_BREAD; break;
+	}
+
+	bool result = internalConjureItem(player, foodType, 1);
+
+	if(result){
+		player->sendMagicEffect(player->getPosition(), NM_ME_MAGIC_POISEN);
+	}
+
+	return result;
+}
+
+bool ConjureSpell::playerCastInstant(Player* player, const std::string& param)
+{
+	if(!playerSpellCheck(player)){
+		return false;
+	}
+
+	bool result = false;
+	
+	if(m_scripted){
+		LuaVariant var;
+		var.type = VARIANT_STRING;
+		var.text = param;
+		result =  executeCastSpell(player, var);
+	}
+	else{
+		if(function){
+			result = function(this, player, param);
+		}
+	}
+
+	return result;
+
+	/*
+	bool result = false;
+	if(conjureReagentId != 0){
+		Item* item;
+
+		item = player->getInventoryItem(SLOT_RIGHT);
+		if(item && item->getID() == conjureReagentId){
+
+			if(!playerSpellCheck(player)){
+				return false;
+			}
+			
+			g_game.transformItem(item, conjureId);
+			Spell::postCastSpell(player);
+			result = true;
+		}
+
+		item = player->getInventoryItem(SLOT_LEFT);
+		if(item && item->getID() == conjureReagentId){
+			if(!playerSpellCheck(player)){
+				return false;
+			}
+
+			g_game.transformItem(item, conjureId);
+			Spell::postCastSpell(player);
+			result = true;
+		}
+
+		if(result){
+			player->sendMagicEffect(player->getPosition(), NM_ME_MAGIC_BLOOD);
+		}
+		else{
+			player->sendCancel("You need a magic item to cast this spell.");
+			player->sendMagicEffect(player->getPosition(), NM_ME_PUFF);
+		}
+	}
+	else{
+		if(!playerSpellCheck(player)){
+			return false;
+		}
+
+		Item* newItem = Item::CreateItem(conjureId, conjureCount);
+		if(!newItem){
+			ReturnValue ret = g_game.internalPlayerAddItem(player, newItem);
+
+			if(ret == RET_NOERROR){
+				player->sendMagicEffect(player->getPosition(), NM_ME_MAGIC_BLOOD);
+				result = true;
+			}
+		}
+	}
+
+	return result;
+	*/
+}
 
 RuneSpell::RuneSpell(LuaScriptInterface* _interface) :
 Action(_interface)

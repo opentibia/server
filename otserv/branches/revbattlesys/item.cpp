@@ -109,11 +109,11 @@ Item::Item(const unsigned short _type, unsigned short _count /*= 0*/) :
 	if(it.isFluidContainer() || it.isSplash()){
 		fluid = _count;
 	}
-	else if(it.charges != 0){
-		charges = _count;
-	}
 	else if(it.stackable){
 		count = _count;
+	}
+	else if(it.charges != 0){
+		charges = _count;
 	}
 
 	/*

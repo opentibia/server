@@ -112,7 +112,7 @@ Creature()
 	}
 
 	for(int32_t i = SKILL_FIRST; i <= SKILL_LAST; ++i){
-		varSkills[0] = 0;
+		varSkills[i] = 0;
 	}
 
 	maxDepotLimit = 1000;
@@ -1309,10 +1309,12 @@ BlockType_t Player::blockHit(Creature* attacker, DamageType_t damageType, int32_
 		}
 	}
 
-	damage -= absorbedDamage;
-	if(damage <= 0){
-		damage = 0;
-		blockType = BLOCK_DEFENSE;
+	if(absorbedDamage > 0){
+		damage -= absorbedDamage;
+		if(damage <= 0){
+			damage = 0;
+			blockType = BLOCK_DEFENSE;
+		}
 	}
 
 	return blockType;
@@ -1334,7 +1336,9 @@ void Player::die()
 	//Magic level loss
 	uint32_t sumMana = 0;
 	int32_t lostMana = 0;
-	for(int32_t i = 1; i <= magLevel; ++i){              //sum up all the mana
+	
+	//sum up all the mana
+	for(int32_t i = 1; i <= magLevel; ++i){
 		sumMana += vocation->getReqMana(i);
 	}
 

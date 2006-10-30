@@ -30,12 +30,13 @@
 
 extern Game g_game;
 
-Combat::Combat(CombatType_t _type)
+//Combat::Combat(CombatType_t _type)
+Combat::Combat()
 {
 	params.condition = NULL;
 	area = NULL;
 	callback = NULL;
-	combatType = _type;
+	//combatType = _type;
 
 	formulaType = FORMULA_UNDEFINED;
 	mina = 0.0;
@@ -317,6 +318,8 @@ bool Combat::CombatDispelFunc(Creature* caster, Creature* target, const CombatPa
 
 bool Combat::CombatNullFunc(Creature* caster, Creature* target, const CombatParams& params, void* data)
 {
+	CombatConditionFunc(caster, target, params, NULL);
+	CombatDispelFunc(caster, target, params, NULL);
 	return true;
 }
 
@@ -396,6 +399,23 @@ void Combat::doCombat(Creature* caster, Creature* target) const
 {
 	//target combat callback function
 
+	if(params.damageType != DAMAGE_NONE){
+		int32_t minChange = 0;
+		int32_t maxChange = 0;
+		getMinMaxValues(caster, minChange, maxChange);
+
+		if(params.damageType != DAMAGE_MANADRAIN){
+			doCombatHealth(caster, target, minChange, maxChange, params);
+		}
+		else{
+			doCombatMana(caster, target, minChange, maxChange, params);
+		}
+	}
+	else{
+		doCombatDefault(caster, target, params);
+	}
+
+	/*
 	if(combatType == COMBAT_HITPOINTS){
 		int32_t minChange = 0;
 		int32_t maxChange = 0;
@@ -416,12 +436,30 @@ void Combat::doCombat(Creature* caster, Creature* target) const
 	else if(combatType == COMBAT_DISPEL){
 		doCombatDispel(caster, target, params);
 	}
+	*/
 }
 
 void Combat::doCombat(Creature* caster, const Position& pos) const
 {
 	//area combat callback function
 
+	if(params.damageType != DAMAGE_NONE){
+		int32_t minChange = 0;
+		int32_t maxChange = 0;
+		getMinMaxValues(caster, minChange, maxChange);
+
+		if(params.damageType != DAMAGE_MANADRAIN){
+			doCombatHealth(caster, pos, area, minChange, maxChange, params);
+		}
+		else{
+			doCombatMana(caster, pos, area, minChange, maxChange, params);
+		}
+	}
+	else{
+		CombatFunc(caster, pos, area, params, CombatNullFunc, NULL);
+	}
+
+	/*
 	if(combatType == COMBAT_HITPOINTS){
 		int32_t minChange = 0;
 		int32_t maxChange = 0;
@@ -445,6 +483,7 @@ void Combat::doCombat(Creature* caster, const Position& pos) const
 	else{
 		CombatFunc(caster, pos, area, params, CombatNullFunc, NULL);
 	}
+	*/
 }
 
 void Combat::doCombatHealth(Creature* caster, Creature* target,
@@ -529,6 +568,19 @@ void Combat::doCombatDispel(Creature* caster, const Position& pos, const AreaCom
 void Combat::doCombatDispel(Creature* caster, Creature* target, const CombatParams& params)
 {
 	CombatDispelFunc(caster, target, params, NULL);	
+
+	if(params.impactEffect != NM_ME_NONE){
+		g_game.addMagicEffect(target->getPosition(), params.impactEffect);
+	}
+
+	if(caster && params.distanceEffect != NM_ME_NONE){
+		g_game.addDistanceEffect(caster->getPosition(), target->getPosition(), params.distanceEffect);
+	}
+}
+
+void Combat::doCombatDefault(Creature* caster, Creature* target, const CombatParams& params)
+{
+	CombatNullFunc(caster, target, params, NULL);
 
 	if(params.impactEffect != NM_ME_NONE){
 		g_game.addMagicEffect(target->getPosition(), params.impactEffect);

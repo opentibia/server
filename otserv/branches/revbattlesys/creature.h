@@ -295,6 +295,7 @@ protected:
 	uint32_t lastHitCreature;
 	bool internalDefense;
 	bool internalArmor;
+	uint32_t blockTicks;
 
 	LightInfo internalLight;
 	void validateWalkPath();
