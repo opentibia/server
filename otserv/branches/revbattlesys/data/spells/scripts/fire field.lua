@@ -1,4 +1,4 @@
-local combat = createCombatObject(COMBAT_TYPE_NULL)
+local combat = createCombatObject()
 setCombatParam(combat, COMBAT_PARAM_DISTANCEEFFECT, CONST_ANI_FIRE)
 setCombatParam(combat, COMBAT_PARAM_CREATEITEM, 1487)
 

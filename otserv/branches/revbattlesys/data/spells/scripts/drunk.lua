@@ -1,4 +1,4 @@
-local combat = createCombatObject(COMBAT_TYPE_CONDITION)
+local combat = createCombatObject()
 setCombatParam(combat, COMBAT_PARAM_EFFECT, CONST_ME_MAGIC_RED)
 
 local condition = createConditionObject(CONDITION_DRUNK)

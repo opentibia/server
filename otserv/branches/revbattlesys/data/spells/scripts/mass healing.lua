@@ -1,4 +1,5 @@
-local combat = createCombatObject(COMBAT_TYPE_HITPOINTS)
+local combat = createCombatObject()
+setCombatParam(combat, COMBAT_PARAM_TYPE, COMBAT_NONE)
 setCombatParam(combat, COMBAT_PARAM_EFFECT, CONST_ME_MAGIC_BLUE)
 setCombatParam(combat, COMBAT_PARAM_AGGRESSIVE, 0)
 setCombatParam(combat, COMBAT_PARAM_TARGETCASTERORTOPMOST, 1)
