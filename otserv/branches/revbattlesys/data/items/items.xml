@@ -118,10 +118,6 @@
 		<attribute key="speed" value="40"/>
 	</item>
 
-	<item id="2195" name="boots of haste">
-		<attribute key="speed" value="40"/>
-	</item>
-
 	<item id="1487" name="fire">
 		<attribute key="duration" value="60"/>
 		<attribute key="field" damageType="fire" initDamage="25" roundMin="10" roundTime="2000" roundDamage="10"/>
