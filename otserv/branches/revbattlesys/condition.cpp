@@ -425,19 +425,19 @@ bool ConditionDamage::doDamage(Creature* creature, int32_t damage)
 		return true;
 	}
 
-	DamageType_t damageType = DAMAGE_NONE;
+	CombatType_t combatType = COMBAT_NONE;
 
 	switch(conditionType){
 		case CONDITION_FIRE:
-			damageType = DAMAGE_FIRE;
+			combatType = COMBAT_FIREDAMAGE;
 			break;
 
 		case CONDITION_ENERGY:
-			damageType = DAMAGE_ENERGY;
+			combatType = COMBAT_ENERGYDAMAGE;
 			break;
 
 		case CONDITION_POISON:
-			damageType = DAMAGE_POISON;
+			combatType = COMBAT_POISONDAMAGE;
 			break;
 		
 		default:
@@ -445,7 +445,7 @@ bool ConditionDamage::doDamage(Creature* creature, int32_t damage)
 	}
 
 	Creature* attacker = g_game.getCreatureByID(owner);
-	return g_game.combatChangeHealth(damageType, attacker, creature, damage);
+	return g_game.combatChangeHealth(combatType, attacker, creature, damage);
 }
 
 void ConditionDamage::endCondition(Creature* creature, EndCondition_t reason)

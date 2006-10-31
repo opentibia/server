@@ -202,7 +202,7 @@ public:
 
 	//fields
 	int32_t initialDamage;
-	DamageType_t damageType;
+	CombatType_t combatType;
 
 	int32_t roundMin;
 	int32_t roundTime;

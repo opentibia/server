@@ -30,13 +30,11 @@
 
 extern Game g_game;
 
-//Combat::Combat(CombatType_t _type)
 Combat::Combat()
 {
 	params.condition = NULL;
 	area = NULL;
 	callback = NULL;
-	//combatType = _type;
 
 	formulaType = FORMULA_UNDEFINED;
 	mina = 0.0;
@@ -160,9 +158,9 @@ void Combat::setPlayerCombatValues(formulaType_t _type, double _mina, double _mi
 bool Combat::setParam(CombatParam_t param, uint32_t value)
 {
 	switch(param){
-		case COMBATPARAM_DAMAGETYPE:
+		case COMBATPARAM_COMBATTYPE:
 		{
-			params.damageType = (DamageType_t)value;
+			params.combatType = (CombatType_t)value;
 			return true;
 			break;
 		}
@@ -262,7 +260,7 @@ bool Combat::CombatHealthFunc(Creature* caster, Creature* target, const CombatPa
 {
 	Combat2Var* var = (Combat2Var*)data;
 	int32_t healthChange = random_range(var->minChange, var->maxChange);
-	bool result = g_game.combatChangeHealth(params.damageType, caster, target, healthChange, params.blockedByShield, params.blockedByArmor);
+	bool result = g_game.combatChangeHealth(params.combatType, caster, target, healthChange, params.blockedByShield, params.blockedByArmor);
 
 	if(result){
 		CombatConditionFunc(caster, target, params, NULL);
@@ -399,12 +397,12 @@ void Combat::doCombat(Creature* caster, Creature* target) const
 {
 	//target combat callback function
 
-	if(params.damageType != DAMAGE_NONE){
+	if(params.combatType != COMBAT_NONE){
 		int32_t minChange = 0;
 		int32_t maxChange = 0;
 		getMinMaxValues(caster, minChange, maxChange);
 
-		if(params.damageType != DAMAGE_MANADRAIN){
+		if(params.combatType != COMBAT_MANADRAIN){
 			doCombatHealth(caster, target, minChange, maxChange, params);
 		}
 		else{
@@ -443,12 +441,12 @@ void Combat::doCombat(Creature* caster, const Position& pos) const
 {
 	//area combat callback function
 
-	if(params.damageType != DAMAGE_NONE){
+	if(params.combatType != COMBAT_NONE){
 		int32_t minChange = 0;
 		int32_t maxChange = 0;
 		getMinMaxValues(caster, minChange, maxChange);
 
-		if(params.damageType != DAMAGE_MANADRAIN){
+		if(params.combatType != COMBAT_MANADRAIN){
 			doCombatHealth(caster, pos, area, minChange, maxChange, params);
 		}
 		else{
@@ -908,7 +906,7 @@ void AreaCombat::setupExtArea(const std::list<uint32_t>& list, uint32_t rows)
 MagicField::MagicField(uint16_t _type) : Item(_type)
 {
 	condition = NULL;
-	damageType = DAMAGE_NONE;
+	combatType = COMBAT_NONE;
 
 	load();
 }
@@ -917,18 +915,18 @@ void MagicField::load()
 {
 	const ItemType& it = Item::items[getID()];
 
-	damageType = it.damageType;
+	combatType = it.combatType;
 
-	switch(damageType){
-		case DAMAGE_ENERGY:
+	switch(combatType){
+		case COMBAT_ENERGYDAMAGE:
 			condition = new ConditionDamage(CONDITIONID_COMBAT, CONDITION_ENERGY);
 			break;
 
-		case DAMAGE_FIRE:
+		case COMBAT_FIREDAMAGE:
 			condition = new ConditionDamage(CONDITIONID_COMBAT, CONDITION_FIRE);
 			break;
 
-		case DAMAGE_POISON:
+		case COMBAT_POISONDAMAGE:
 			condition = new ConditionDamage(CONDITIONID_COMBAT, CONDITION_POISON);
 			break;
 		
@@ -950,9 +948,9 @@ MagicField::~MagicField()
 	//
 }
 
-DamageType_t MagicField::getDamageType() const
+CombatType_t MagicField::getCombatType() const
 {
-	return damageType;
+	return combatType;
 }
 
 void MagicField::onStepInField(Creature* creature)

@@ -60,7 +60,7 @@ public:
 	virtual bool isAttackable() const { return true;}
 	virtual void doAttacking(uint32_t interval);
 
-	virtual void drainHealth(Creature* attacker, DamageType_t damageType, int32_t damage);
+	virtual void drainHealth(Creature* attacker, CombatType_t combatType, int32_t damage);
 
 	virtual void setNormalCreatureLight();
 

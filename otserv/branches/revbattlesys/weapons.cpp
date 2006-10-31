@@ -489,7 +489,7 @@ bool WeaponMelee::configureWeapon(const ItemType& it)
 	
 	params.blockedByArmor = true;
 	params.blockedByShield = true;
-	params.damageType = DAMAGE_PHYSICAL;
+	params.combatType = COMBAT_PHYSICALDAMAGE;
 	return true;
 }
 
@@ -593,7 +593,7 @@ bool WeaponDistance::configureWeapon(const ItemType& it)
 	m_scripted = false;
 
 	params.blockedByArmor = true;
-	params.damageType = DAMAGE_PHYSICAL;
+	params.combatType = COMBAT_PHYSICALDAMAGE;
 
 	id = it.id;
 	ammuAttackValue = it.attack;

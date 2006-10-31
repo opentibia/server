@@ -499,7 +499,7 @@ void Monster::doAttacking(uint32_t interval)
 
 			if(std::max(std::abs(myPos.x - targetPos.x), std::abs(myPos.y - targetPos.y)) <= 1){
 				CombatParams params;
-				params.damageType = DAMAGE_PHYSICAL;
+				params.combatType = COMBAT_PHYSICALDAMAGE;
 				params.blockedByArmor = true;
 				params.blockedByShield = true;
 				Combat::doCombatHealth(this, attackedCreature, mType->combatMeleeMin, mType->combatMeleeMax, params);
@@ -650,9 +650,9 @@ void Monster::setNormalCreatureLight()
 	internalLight.color = mType->lightColor;
 }
 
-void Monster::drainHealth(Creature* attacker, DamageType_t damageType, int32_t damage)
+void Monster::drainHealth(Creature* attacker, CombatType_t combatType, int32_t damage)
 {
-	Creature::drainHealth(attacker, damageType, damage);
+	Creature::drainHealth(attacker, combatType, damage);
 
 	if(isInvisible()){
 		removeCondition(CONDITION_INVISIBLE);

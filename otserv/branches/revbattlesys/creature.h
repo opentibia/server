@@ -175,7 +175,7 @@ public:
 	//combat functions
 	Creature* getAttackedCreature() { return attackedCreature; }
 	virtual void setAttackedCreature(Creature* creature);
-	virtual BlockType_t blockHit(Creature* attacker, DamageType_t damageType, int32_t& damage,
+	virtual BlockType_t blockHit(Creature* attacker, CombatType_t combatType, int32_t& damage,
 		bool checkDefense = false, bool checkArmor = false);
 	virtual void doAttacking(uint32_t interval) {};
 
@@ -198,7 +198,7 @@ public:
 	void executeConditions(int32_t newticks);
 	bool hasCondition(ConditionType_t type) const;
 	virtual bool isImmune(ConditionType_t type) const;
-	virtual bool isImmune(DamageType_t type) const;
+	virtual bool isImmune(CombatType_t type) const;
 	virtual bool isSuppress(ConditionType_t type) const;
 	virtual uint32_t getDamageImmunities() const { return 0; }
 	virtual uint32_t getConditionImmunities() const { return 0; }
@@ -208,7 +208,7 @@ public:
 	virtual void changeHealth(int32_t healthChange);
 	virtual void changeMana(int32_t manaChange);
 
-	virtual void drainHealth(Creature* attacker, DamageType_t damageType, int32_t damage);
+	virtual void drainHealth(Creature* attacker, CombatType_t combatType, int32_t damage);
 	virtual void drainMana(Creature* attacker, int32_t manaLoss);
 
 	virtual void die();

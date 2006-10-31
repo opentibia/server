@@ -385,7 +385,7 @@ void Creature::changeSoul(int32_t soulChange)
 }
 */
 
-void Creature::drainHealth(Creature* attacker, DamageType_t damageType, int32_t damage)
+void Creature::drainHealth(Creature* attacker, CombatType_t combatType, int32_t damage)
 {
 	changeHealth(-damage);
 
@@ -415,12 +415,12 @@ void Creature::setAttackedCreature(Creature* creature)
 	}
 }
 
-BlockType_t Creature::blockHit(Creature* attacker, DamageType_t damageType, int32_t& damage,
+BlockType_t Creature::blockHit(Creature* attacker, CombatType_t combatType, int32_t& damage,
 	bool checkDefense /* = false */, bool checkArmor /* = false */)
 {
 	BlockType_t blockType = BLOCK_NONE;
 
-	if(blockType == BLOCK_NONE && isImmune(damageType)){
+	if(blockType == BLOCK_NONE && isImmune(combatType)){
 		damage = 0;
 		blockType = BLOCK_IMMUNITY;
 	}
@@ -549,9 +549,9 @@ void Creature::onTickCondition(ConditionType_t type, bool& bRemove)
 {
 	if(const MagicField* field = getTile()->getFieldItem()){
 		switch(type){
-			case CONDITION_FIRE: bRemove = (field->getDamageType() != DAMAGE_FIRE); break;
-			case CONDITION_ENERGY: bRemove = (field->getDamageType() != DAMAGE_ENERGY); break;
-			case CONDITION_POISON: bRemove = (field->getDamageType() != DAMAGE_POISON); break;
+			case CONDITION_FIRE: bRemove = (field->getCombatType() != COMBAT_FIREDAMAGE); break;
+			case CONDITION_ENERGY: bRemove = (field->getCombatType() != COMBAT_ENERGYDAMAGE); break;
+			case CONDITION_POISON: bRemove = (field->getCombatType() != COMBAT_POISONDAMAGE); break;
 			default: 
 				break;
 		}
@@ -761,7 +761,7 @@ bool Creature::hasCondition(ConditionType_t type) const
 	return false;
 }
 
-bool Creature::isImmune(DamageType_t type) const
+bool Creature::isImmune(CombatType_t type) const
 {
 	return ((getDamageImmunities() & (uint32_t)type) == (uint32_t)type);
 }

@@ -1466,7 +1466,13 @@ int LuaScriptInterface::luaDoPlayerAddHealth(lua_State *L)
 	
 	Creature* creature = env->getCreatureByUID(cid);
 	if(creature){
-		g_game.combatChangeHealth(DAMAGE_UNDEFINED, NULL, creature, healthChange);
+		if(healthChange >= 0){
+			g_game.combatChangeHealth(COMBAT_HEALING, NULL, creature, healthChange);
+		}
+		else{
+			g_game.combatChangeHealth(COMBAT_UNDEFINEDDAMAGE, NULL, creature, healthChange);
+		}
+
 		lua_pushnumber(L, LUA_NO_ERROR);
 	}
 	else{
@@ -2317,9 +2323,6 @@ int LuaScriptInterface::luaCreateCombatObject(lua_State *L)
 
 	ScriptEnviroment* env = getScriptEnv();
 
-	//CombatType_t type = (CombatType_t)popNumber(L);
-	//Combat* combat = new Combat(type);
-	
 	Combat* combat = new Combat;
 
 	if(combat){
@@ -2785,7 +2788,7 @@ int LuaScriptInterface::luaDoAreaCombatHealth(lua_State *L)
 	uint32_t stackpos;
 	popPosition(L, pos, stackpos);
 
-	DamageType_t damageType = (DamageType_t)popNumber(L);
+	CombatType_t combatType = (CombatType_t)popNumber(L);
 	uint32_t cid = (uint32_t)popNumber(L);
 
 	ScriptEnviroment* env = getScriptEnv();
@@ -2810,7 +2813,7 @@ int LuaScriptInterface::luaDoAreaCombatHealth(lua_State *L)
 	}
 
 	CombatParams params;
-	params.damageType = damageType;
+	params.combatType = combatType;
 	params.impactEffect = effect;
 	Combat::doCombatHealth(creature, pos, area, minChange, maxChange, params);
 
@@ -2825,7 +2828,7 @@ int LuaScriptInterface::luaDoTargetCombatHealth(lua_State *L)
 	uint8_t effect = (uint8_t)popNumber(L);
 	int32_t maxChange = (int32_t)popNumber(L);
 	int32_t minChange = (int32_t)popNumber(L);
-	DamageType_t damageType = (DamageType_t)popNumber(L);
+	CombatType_t combatType = (CombatType_t)popNumber(L);
 	uint32_t targetCid = popNumber(L);
 	uint32_t cid = popNumber(L);
 
@@ -2851,7 +2854,7 @@ int LuaScriptInterface::luaDoTargetCombatHealth(lua_State *L)
 	}
 
 	CombatParams params;
-	params.damageType = damageType;
+	params.combatType = combatType;
 	params.impactEffect = effect;
 	Combat::doCombatHealth(creature, target, minChange, maxChange, params);
 

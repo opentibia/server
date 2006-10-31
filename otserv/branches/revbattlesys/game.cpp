@@ -2695,7 +2695,7 @@ void Game::changeLight(const Creature* creature)
 	}
 }
 
-bool Game::combatChangeHealth(DamageType_t damageType, Creature* attacker, Creature* target,
+bool Game::combatChangeHealth(CombatType_t combatType, Creature* attacker, Creature* target,
 	int32_t healthChange, bool checkDefense /* = false */, bool checkArmor /* = false */)
 {
 	const Position& targetPos = target->getPosition();
@@ -2729,7 +2729,7 @@ bool Game::combatChangeHealth(DamageType_t damageType, Creature* attacker, Creat
 		}
 
 		int32_t damage = -healthChange;
-		BlockType_t blockType = target->blockHit(attacker, damageType, damage, checkDefense, checkArmor);
+		BlockType_t blockType = target->blockHit(attacker, combatType, damage, checkDefense, checkArmor);
 
 		if(blockType != BLOCK_NONE && target->isInvisible()){
 			//No effects for invisible creatures to avoid detection
@@ -2744,29 +2744,29 @@ bool Game::combatChangeHealth(DamageType_t damageType, Creature* attacker, Creat
 		if(blockType == BLOCK_ARMOR || blockType == BLOCK_IMMUNITY){
 			uint8_t hitEffect = 0;
 
-			switch(damageType){
-				case DAMAGE_UNDEFINED:
+			switch(combatType){
+				case COMBAT_UNDEFINEDDAMAGE:
 					break;
 
-				case DAMAGE_ENERGY:
+				case COMBAT_ENERGYDAMAGE:
 				{
 					hitEffect = NM_ME_BLOCKHIT;
 					break;
 				}
 
-				case DAMAGE_POISON:
+				case COMBAT_POISONDAMAGE:
 				{
 					hitEffect = NM_ME_POISEN_RINGS;
 					break;
 				}
 
-				case DAMAGE_FIRE:
+				case COMBAT_FIREDAMAGE:
 				{
 					hitEffect = NM_ME_BLOCKHIT;
 					break;
 				}
 
-				case DAMAGE_PHYSICAL:
+				case COMBAT_PHYSICALDAMAGE:
 				{
 					hitEffect = NM_ME_BLOCKHIT;
 					break;
@@ -2799,14 +2799,14 @@ bool Game::combatChangeHealth(DamageType_t damageType, Creature* attacker, Creat
 
 			damage = std::min(target->getHealth(), damage);
 			if(damage > 0){
-				target->drainHealth(attacker, damageType, damage);
+				target->drainHealth(attacker, combatType, damage);
 				addCreatureHealth(list, target);
 
 				TextColor_t textColor = TEXTCOLOR_NONE;
 				uint8_t hitEffect = 0;
 
-				switch(damageType){
-					case DAMAGE_PHYSICAL:
+				switch(combatType){
+					case COMBAT_PHYSICALDAMAGE:
 					{
 						Item* splash = NULL;
 						switch(target->getRace()){
@@ -2839,28 +2839,28 @@ bool Game::combatChangeHealth(DamageType_t damageType, Creature* attacker, Creat
 						break;
 					}
 
-					case DAMAGE_ENERGY:
+					case COMBAT_ENERGYDAMAGE:
 					{
 						textColor = TEXTCOLOR_LIGHTBLUE;
 						hitEffect = NM_ME_ENERGY_DAMAGE;
 						break;
 					}
 
-					case DAMAGE_POISON:
+					case COMBAT_POISONDAMAGE:
 					{
 						textColor = TEXTCOLOR_LIGHTGREEN;
 						hitEffect = NM_ME_POISEN_RINGS;
 						break;
 					}
 
-					case DAMAGE_FIRE:
+					case COMBAT_FIREDAMAGE:
 					{
 						textColor = TEXTCOLOR_ORANGE;
 						hitEffect = NM_ME_HITBY_FIRE;
 						break;
 					}
 
-					case DAMAGE_LIFEDRAIN:
+					case COMBAT_LIFEDRAIN:
 					{
 						textColor = TEXTCOLOR_RED;
 						hitEffect = NM_ME_MAGIC_BLOOD;
@@ -2914,7 +2914,7 @@ bool Game::combatChangeMana(Creature* attacker, Creature* target, int32_t manaCh
 			}
 		}
 
-		if(target->isImmune(DAMAGE_MANADRAIN)){
+		if(target->isImmune(COMBAT_MANADRAIN)){
 			addMagicEffect(list, targetPos, NM_ME_PUFF);
 			return false;
 		}

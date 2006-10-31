@@ -508,19 +508,19 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 						if(readXMLString(tmpNode, "name", strValue)){
 
 							if(strcasecmp(strValue.c_str(), "energy") == 0){
-								mType->damageImmunities |= DAMAGE_ENERGY;
+								mType->damageImmunities |= COMBAT_ENERGYDAMAGE;
 								mType->conditionImmunities |= CONDITION_ENERGY;
 							}
 							else if(strcasecmp(strValue.c_str(), "fire") == 0){
-								mType->damageImmunities |= DAMAGE_FIRE;
+								mType->damageImmunities |= COMBAT_FIREDAMAGE;
 								mType->conditionImmunities |= CONDITION_FIRE;
 							}
 							else if(strcasecmp(strValue.c_str(), "poison") == 0){
-								mType->damageImmunities |= DAMAGE_POISON;
+								mType->damageImmunities |= COMBAT_POISONDAMAGE;
 								mType->conditionImmunities |= CONDITION_POISON;
 							}
 							else if(strcasecmp(strValue.c_str(), "lifedrain") == 0){
-								mType->damageImmunities |= DAMAGE_LIFEDRAIN;
+								mType->damageImmunities |= COMBAT_LIFEDRAIN;
 								mType->conditionImmunities |= CONDITION_LIFEDRAIN;
 							}
 							else if(strcasecmp(strValue.c_str(), "paralyze") == 0){

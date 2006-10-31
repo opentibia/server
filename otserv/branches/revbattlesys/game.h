@@ -327,7 +327,7 @@ public:
 	void checkSpawns(int t);
 	void checkLight(int t);
 	
-	bool combatChangeHealth(DamageType_t damageType, Creature* attacker, Creature* target,
+	bool combatChangeHealth(CombatType_t combatType, Creature* attacker, Creature* target,
 		int32_t healthChange, bool checkDefense = false, bool checkArmor = false);
 	bool combatChangeMana(Creature* attacker, Creature* target, int32_t manaChange);
 

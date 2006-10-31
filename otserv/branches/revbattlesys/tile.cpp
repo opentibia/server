@@ -459,7 +459,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 				return RET_NOTPOSSIBLE;
 
 			if(const MagicField* fieldItem = getFieldItem()){
-				if(!monster->isImmune(fieldItem->getDamageType())){
+				if(!monster->isImmune(fieldItem->getCombatType())){
 					return RET_NOTPOSSIBLE;
 				}
 			}

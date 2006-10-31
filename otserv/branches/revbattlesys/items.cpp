@@ -96,7 +96,7 @@ ItemType::ItemType()
 
 	//fields
 	initialDamage = 0;
-	damageType = DAMAGE_NONE;
+	combatType = COMBAT_NONE;
 	roundMin = 0;
 	roundTime = 0;
 	roundDamage = 0;
@@ -612,80 +612,6 @@ int Items::loadFromOtb(std::string file)
 	return ERROR_NONE;
 }
 
-/*
-bool Items::loadFieldsFromXml(const std::string& datadir)
-{
-	std::string filename = datadir + "/" + "fields.xml";
-	xmlDocPtr doc = xmlParseFile(filename.c_str());
-	int intValue;
-	std::string strValue;
-	uint32_t id = 0;
-
-	if(doc){
-		xmlNodePtr root, p;
-		root = xmlDocGetRootElement(doc);
-		
-		if(xmlStrcmp(root->name,(const xmlChar*)"fields") != 0){
-			xmlFreeDoc(doc);
-			return false;
-		}
-
-		p = root->children;
-		while(p){
-			if(xmlStrcmp(p->name, (const xmlChar*)"field") == 0){
-				if(readXMLInteger(p, "id", intValue)){
-					id = intValue;
-
-					ItemType& it = Item::items.getItemType(id);
-
-					if(readXMLString(p, "type", strValue)){
-						if(strcasecmp(strValue.c_str(), "fire") == 0){				
-							it.group = ITEM_GROUP_MAGICFIELD;
-							it.damageType = DAMAGE_FIRE;
-						}
-						else if(strcasecmp(strValue.c_str(), "energy") == 0){
-							it.group = ITEM_GROUP_MAGICFIELD;
-							it.damageType = DAMAGE_ENERGY;
-						}
-						else if(strcasecmp(strValue.c_str(), "poison") == 0){
-							it.group = ITEM_GROUP_MAGICFIELD;
-							it.damageType = DAMAGE_POISON;
-						}
-					}
-
-					if(readXMLInteger(p, "initDamage", intValue)){
-						it.initialDamage = -intValue;
-					}
-
-					if(readXMLInteger(p, "roundMin", intValue)){
-						it.roundMin = intValue;
-					}
-
-					if(readXMLInteger(p, "roundTime", intValue)){
-						it.roundTime = intValue;
-					}
-
-					if(readXMLInteger(p, "roundDamage", intValue)){
-						it.roundDamage = -intValue;
-					}
-
-				}
-				else{
-					std::cout << "Warning: [Spells::loadFieldsFromXml] Can not configure field - no item id found" << std::endl;
-					return false;
-				}
-			}
-			
-			p = p->next;
-		}
-
-		xmlFreeDoc(doc);
-	}
-
-	return true;
-}
-*/
-
 bool Items::loadFromXml(const std::string& datadir)
 {
 	std::string filename = datadir + "/items/items.xml";
@@ -899,13 +825,13 @@ bool Items::loadFromXml(const std::string& datadir)
 
 								if(readXMLString(itemAttributesNode, "damageType", strValue)){
 									if(strcasecmp(strValue.c_str(), "fire") == 0){
-										it.damageType = DAMAGE_FIRE;
+										it.combatType = COMBAT_FIREDAMAGE;
 									}
 									else if(strcasecmp(strValue.c_str(), "energy") == 0){
-										it.damageType = DAMAGE_ENERGY;
+										it.combatType = COMBAT_ENERGYDAMAGE;
 									}
 									else if(strcasecmp(strValue.c_str(), "poison") == 0){
-										it.damageType = DAMAGE_POISON;
+										it.combatType = COMBAT_POISONDAMAGE;
 									}
 								}
 

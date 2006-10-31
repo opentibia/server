@@ -209,7 +209,7 @@ public:
 
 	//combat functions
 	virtual void setAttackedCreature(Creature* creature);
-	bool isImmune(DamageType_t type) const;
+	bool isImmune(CombatType_t type) const;
 	bool isImmune(ConditionType_t type) const;
 	virtual bool isAttackable() const;
 	
@@ -217,14 +217,14 @@ public:
 	virtual void changeMana(int32_t manaChange);
 
 	bool isPzLocked() const { return pzLocked; }
-	virtual BlockType_t blockHit(Creature* attacker, DamageType_t damageType, int32_t& damage,
+	virtual BlockType_t blockHit(Creature* attacker, CombatType_t combatType, int32_t& damage,
 		bool checkDefense = false, bool checkArmor = false);
 	virtual void doAttacking(uint32_t interval);
 
 	int getSkill(skills_t skilltype, skillsid_t skillinfo) const;
 	uint32_t getSkillPoint() const {return skillPoint;}
 
-	virtual void drainHealth(Creature* attacker, DamageType_t damageType, int32_t damage);
+	virtual void drainHealth(Creature* attacker, CombatType_t combatType, int32_t damage);
 	virtual void drainMana(Creature* attacker, int32_t manaLoss);	
 	void addManaSpent(uint32_t amount);
 	void addSkillAdvance(skills_t skill, uint32_t count);

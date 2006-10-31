@@ -1130,9 +1130,9 @@ void Player::onThink(uint32_t interval)
 #endif
 }
 
-void Player::drainHealth(Creature* attacker, DamageType_t damageType, int32_t damage)
+void Player::drainHealth(Creature* attacker, CombatType_t combatType, int32_t damage)
 {
-	Creature::drainHealth(attacker, damageType, damage);
+	Creature::drainHealth(attacker, combatType, damage);
 
 	sendStats();
 
@@ -1248,10 +1248,10 @@ void Player::onAttackedCreatureBlockHit(Creature* target, BlockType_t blockType)
 	}
 }
 
-BlockType_t Player::blockHit(Creature* attacker, DamageType_t damageType, int32_t& damage,
+BlockType_t Player::blockHit(Creature* attacker, CombatType_t combatType, int32_t& damage,
 	bool checkDefense /* = false*/, bool checkArmor /* = false*/)
 {
-	BlockType_t blockType = Creature::blockHit(attacker, damageType, damage, checkDefense, checkArmor);
+	BlockType_t blockType = Creature::blockHit(attacker, combatType, damage, checkDefense, checkArmor);
 
 	if(blockType == BLOCK_DEFENSE){
 		addSkillAdvance(SKILL_SHIELD, 1);
@@ -1275,24 +1275,24 @@ BlockType_t Player::blockHit(Creature* attacker, DamageType_t damageType, int32_
 			absorbedDamage += (int32_t)((((double)it.abilities.absorbPercentAll) / 100) * damage);
 		}
 
-		switch(damageType){
-			case DAMAGE_PHYSICAL:
+		switch(combatType){
+			case COMBAT_PHYSICALDAMAGE:
 				absorbedDamage += (int32_t)((((double)it.abilities.absorbPercentPhysical) / 100) * damage);
 				break;
 
-			case DAMAGE_FIRE:
+			case COMBAT_FIREDAMAGE:
 				absorbedDamage += (int32_t)((((double)it.abilities.absorbPercentFire) / 100) * damage);
 				break;
 
-			case DAMAGE_ENERGY:
+			case COMBAT_ENERGYDAMAGE:
 				absorbedDamage += (int32_t)((((double)it.abilities.absorbPercentEnergy) / 100) * damage);
 				break;
 
-			case DAMAGE_POISON:
+			case COMBAT_POISONDAMAGE:
 				absorbedDamage += (int32_t)((((double)it.abilities.absorbPercentPoison) / 100) * damage);
 				break;
 
-			case DAMAGE_LIFEDRAIN:
+			case COMBAT_LIFEDRAIN:
 				absorbedDamage += (int32_t)(((double)it.abilities.absorbPercentLifeDrain) / 100) * damage;
 				break;
 
@@ -2293,7 +2293,7 @@ void Player::doAttacking(uint32_t interval)
 			if(Position::areInRange<1,1>(playerPos, targetPos)){
 				int32_t damage = -(int32_t)(0.5 * skills[SKILL_FIST][SKILL_LEVEL])*rand()/RAND_MAX;
 				CombatParams params;
-				params.damageType = DAMAGE_PHYSICAL;
+				params.combatType = COMBAT_PHYSICALDAMAGE;
 				params.blockedByArmor = true;
 				params.blockedByShield = true;
 				Combat::doCombatHealth(this, attackedCreature, damage, damage, params);
@@ -2544,7 +2544,7 @@ void Player::onTargetCreatureDisappear()
 }
 */
 
-bool Player::isImmune(DamageType_t type) const
+bool Player::isImmune(CombatType_t type) const
 {
 	if(getAccessLevel() != 0){
 		return true;

@@ -64,7 +64,7 @@ protected:
 
 struct CombatParams{
 	CombatParams() {
-		damageType = DAMAGE_NONE;
+		combatType = COMBAT_NONE;
 		blockedByArmor = false;
 		blockedByShield = false;
 		targetCasterOrTopMost = false;
@@ -79,7 +79,7 @@ struct CombatParams{
 	const Condition* condition;
 	//ConditionType_t removeCondition;
 	ConditionType_t dispelType;
-	DamageType_t damageType;
+	CombatType_t combatType;
 	bool blockedByArmor;
 	bool blockedByShield;
 	bool targetCasterOrTopMost;
@@ -98,7 +98,6 @@ struct Combat2Var{
 
 class Combat{
 public:
-	//Combat(CombatType_t _type);
 	Combat();
 	~Combat();
 
@@ -156,7 +155,6 @@ protected:
 	void getMinMaxValues(Creature* creature, int32_t& min, int32_t& max) const;
 
 	//configureable
-	//CombatType_t combatType;
 	CombatParams params;
 
 	//formula variables
@@ -303,7 +301,7 @@ public:
 	virtual MagicField* getMagicField() {return this;};
 	virtual const MagicField* getMagicField() const {return this;};
 
-	DamageType_t getDamageType() const;
+	CombatType_t getCombatType() const;
 	const ConditionDamage* getCondition() const { return condition; }
 	void onStepInField(Creature* creature);
 
@@ -311,7 +309,7 @@ protected:
 	void load();
 
 	ConditionDamage* condition;
-	DamageType_t damageType;
+	CombatType_t combatType;
 };
 
 #endif
