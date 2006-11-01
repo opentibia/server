@@ -592,6 +592,7 @@ bool WeaponDistance::configureWeapon(const ItemType& it)
 {
 	m_scripted = false;
 
+	ammoAction = AMMOACTION_REMOVECOUNT;
 	params.blockedByArmor = true;
 	params.combatType = COMBAT_PHYSICALDAMAGE;
 
