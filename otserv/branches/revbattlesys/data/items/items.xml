@@ -118,9 +118,29 @@
 		<attribute key="speed" value="40"/>
 	</item>
 
+	<item id="2195" name="boots of haste">
+		<attribute key="speed" value="40"/>
+	</item>
+
 	<item id="1487" name="fire">
 		<attribute key="duration" value="60"/>
-		<attribute key="field" damageType="fire" initDamage="25" roundMin="10" roundTime="2000" roundDamage="10"/>
+		<attribute key="field" value="fire">
+			<attribute key="damage" value="25"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="10"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="10"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="10"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="10"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="10"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="10"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="10"/>
+		</attribute>
 	</item>
 
 	<item id="1506" name="magic fire">
