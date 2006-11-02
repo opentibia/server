@@ -121,7 +121,12 @@ struct Abilities{
 	uint32_t conditionSuppressions;
 };
 
+class Condition;
+
 class ItemType {
+private:
+	ItemType(const ItemType& it){};
+
 public:
 	ItemType();
 	~ItemType();
@@ -200,13 +205,17 @@ public:
 
 	Abilities abilities;
 
+	Condition* condition;
+	CombatType_t combatType;
+
+	/*
 	//fields
 	int32_t initialDamage;
-	CombatType_t combatType;
 
 	int32_t roundMin;
 	int32_t roundTime;
 	int32_t roundDamage;
+	*/
 };
 
 #ifdef __GNUC__
@@ -220,6 +229,9 @@ public:
 	Items();
 	~Items();
 	
+	bool reload();
+	void clear();
+
 	int loadFromOtb(std::string);
 	
 	const ItemType& operator[](int id);
@@ -232,14 +244,14 @@ public:
 	static long dwMinorVersion;
 	static long dwBuildNumber;
 
-	//static bool loadFieldsFromXml(const std::string& datadir);
-	static bool loadFromXml(const std::string& datadir);
+	bool loadFromXml(const std::string& datadir);
 
 	size_t size() {return items.size();}
 	
 protected:
 	typedef OTSERV_HASH_MAP<unsigned short, ItemType*> ItemMap;
 
+	std::string m_datadir;
 	ItemMap items;
 	//static ReverseItemMap revItems;
 

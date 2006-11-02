@@ -536,7 +536,7 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 
-	if(!Items::loadFromXml(g_config.getGlobalString("datadir"))){
+	if(!Item::items.loadFromXml(g_config.getGlobalString("datadir"))){
 		std::stringstream errormsg;
 		errormsg << "Unable to load " << "items/items.xml" << "!";
 		ErrorMessage(errormsg.str().c_str());

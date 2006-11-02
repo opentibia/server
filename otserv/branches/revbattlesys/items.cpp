@@ -21,6 +21,7 @@
 
 #include "items.h"
 #include "spells.h"
+#include "condition.h"
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
@@ -94,16 +95,21 @@ ItemType::ItemType()
 	charges       = 0;
 	breakChance   = 0;
 
+	condition = NULL;
+	combatType = COMBAT_NONE;
+
+	/*
 	//fields
 	initialDamage = 0;
-	combatType = COMBAT_NONE;
 	roundMin = 0;
 	roundTime = 0;
 	roundDamage = 0;
+	*/
 }
 
 ItemType::~ItemType()
 {
+	delete condition;
 }
 
 bool ItemType::isGroundTile() const
@@ -153,8 +159,20 @@ Items::Items()
 
 Items::~Items()
 {
-	for (ItemMap::iterator it = items.begin(); it != items.end(); it++)
+	clear();
+}
+
+void Items::clear()
+{
+	for (ItemMap::iterator it = items.begin(); it != items.end(); it++){
 		delete it->second;
+	}
+}
+
+bool Items::reload()
+{
+	clear();
+	return loadFromXml(m_datadir);
 }
 
 inline ShootType_t translateOTBShootType(ShootTypeOtb_t sf)
@@ -614,7 +632,9 @@ int Items::loadFromOtb(std::string file)
 
 bool Items::loadFromXml(const std::string& datadir)
 {
-	std::string filename = datadir + "/items/items.xml";
+	m_datadir = datadir;
+	std::string filename = m_datadir + "/items/items.xml";
+
 	xmlDocPtr doc = xmlParseFile(filename.c_str());
 	int intValue;
 	std::string strValue;
@@ -708,7 +728,7 @@ bool Items::loadFromXml(const std::string& datadir)
 									it.abilities.manaTicks = intValue;
 								}
 							}
-							else if(strcasecmp(strValue.c_str(), "manashield") == 0){
+							else if(strcasecmp(strValue.c_str(), "manaShield") == 0){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
 									it.abilities.manaShield = true;
 								}
@@ -822,7 +842,54 @@ bool Items::loadFromXml(const std::string& datadir)
 							*/
 							else if(strcasecmp(strValue.c_str(), "field") == 0){
 								it.group = ITEM_GROUP_MAGICFIELD;
+								CombatType_t combatType = COMBAT_NONE;
+								ConditionDamage* conditionDamage = NULL;
 
+								if(readXMLString(itemAttributesNode, "value", strValue)){
+									if(strcasecmp(strValue.c_str(), "fire") == 0){
+										conditionDamage = new ConditionDamage(CONDITIONID_COMBAT, CONDITION_FIRE);
+										combatType = COMBAT_FIREDAMAGE;
+									}
+									else if(strcasecmp(strValue.c_str(), "energy") == 0){
+										conditionDamage = new ConditionDamage(CONDITIONID_COMBAT, CONDITION_ENERGY);
+										combatType = COMBAT_ENERGYDAMAGE;
+									}
+									else if(strcasecmp(strValue.c_str(), "poison") == 0){
+										conditionDamage = new ConditionDamage(CONDITIONID_COMBAT, CONDITION_POISON);
+										combatType = COMBAT_POISONDAMAGE;
+									}
+									//else if(strcasecmp(strValue.c_str(), "physical") == 0){
+									//	damageCondition = new ConditionDamage(CONDITIONID_COMBAT, CONDITION_PHYSICAL);
+									//	combatType = COMBAT_PHYSICALDAMAGE;
+									//}
+
+									if(combatType != COMBAT_NONE){
+										it.combatType = combatType;
+										it.condition = conditionDamage;
+										uint32_t ticks = 0;
+
+										xmlNodePtr fieldAttributesNode = itemAttributesNode->children;
+										while(fieldAttributesNode){
+											if(readXMLString(fieldAttributesNode, "key", strValue)){
+												if(strcasecmp(strValue.c_str(), "ticks") == 0){
+													if(readXMLInteger(fieldAttributesNode, "value", intValue)){
+														ticks = std::max(0, intValue);
+													}
+												}
+
+												if(strcasecmp(strValue.c_str(), "damage") == 0){
+													if(readXMLInteger(fieldAttributesNode, "value", intValue)){
+														conditionDamage->addDamage(1, ticks, -intValue);
+													}
+												}
+											}
+
+											fieldAttributesNode = fieldAttributesNode->next;
+										}
+									}
+								}
+
+								/*
 								if(readXMLString(itemAttributesNode, "damageType", strValue)){
 									if(strcasecmp(strValue.c_str(), "fire") == 0){
 										it.combatType = COMBAT_FIREDAMAGE;
@@ -850,6 +917,7 @@ bool Items::loadFromXml(const std::string& datadir)
 								if(readXMLInteger(itemAttributesNode, "roundDamage", intValue)){
 									it.roundDamage = -intValue;
 								}
+								*/
 							}
 						}
 

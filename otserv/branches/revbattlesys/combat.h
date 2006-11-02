@@ -302,14 +302,14 @@ public:
 	virtual const MagicField* getMagicField() const {return this;};
 
 	CombatType_t getCombatType() const;
-	const ConditionDamage* getCondition() const { return condition; }
+	//const ConditionDamage* getCondition() const;
 	void onStepInField(Creature* creature);
 
 protected:
-	void load();
+	//void load();
 
-	ConditionDamage* condition;
-	CombatType_t combatType;
+	//ConditionDamage* condition;
+	//CombatType_t combatType;
 };
 
 #endif

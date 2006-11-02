@@ -39,6 +39,7 @@ typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 #include "talkaction.h"
 #include "movement.h"
 #include "spells.h"
+#include "weapons.h"
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
@@ -50,6 +51,7 @@ extern Ban g_bans;
 extern TalkActions* g_talkactions;
 extern MoveEvents* g_moveEvents;
 extern Spells* g_spells;
+extern Weapons* g_weapons;
 
 extern bool readXMLInteger(xmlNodePtr p, const char *tag, int &value);
 
@@ -494,6 +496,12 @@ bool Commands::reloadInfo(Creature* creature, const std::string& cmd, const std:
 	}
 	else if(param == "spells"){
 		g_spells->reload();
+	}
+	else if(param == "weapons"){
+		g_weapons->reload();
+	}
+	else if(param == "items"){
+		Item::items.reload();
 	}
 	else{
 		Player* player = creature->getPlayer();

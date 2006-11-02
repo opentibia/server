@@ -905,12 +905,12 @@ void AreaCombat::setupExtArea(const std::list<uint32_t>& list, uint32_t rows)
 
 MagicField::MagicField(uint16_t _type) : Item(_type)
 {
-	condition = NULL;
-	combatType = COMBAT_NONE;
-
-	load();
+	//condition = NULL;
+	//combatType = COMBAT_NONE;
+	//load();
 }
 
+/*
 void MagicField::load()
 {
 	const ItemType& it = Item::items[getID()];
@@ -942,6 +942,7 @@ void MagicField::load()
 		condition->addDamage(it.roundMin, it.roundTime, it.roundDamage);
 	}
 }
+*/
 
 MagicField::~MagicField()
 {
@@ -950,8 +951,17 @@ MagicField::~MagicField()
 
 CombatType_t MagicField::getCombatType() const
 {
-	return combatType;
+	const ItemType& it = items[getID()];
+	return it.combatType;
 }
+
+/*
+const ConditionDamage* MagicField::getCondition() const
+{
+	const ItemType& it = items[getID()];
+	return it.condition;
+}
+*/
 
 void MagicField::onStepInField(Creature* creature)
 {
@@ -960,8 +970,9 @@ void MagicField::onStepInField(Creature* creature)
 		g_game.internalRemoveItem(this, 1);
 	}
 	else{
-		if(condition){
-			Condition* conditionCopy = condition->clone();
+		const ItemType& it = items[getID()];
+		if(it.condition){
+			Condition* conditionCopy = it.condition->clone();
 			uint32_t owner = getOwner();
 			if(owner != 0){
 				conditionCopy->setParam(CONDITIONPARAM_OWNER, owner);

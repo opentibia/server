@@ -83,7 +83,7 @@ Item* Item::CreateItem(PropStream& propStream)
 		return NULL;
 	}
 
-	ItemType iType = Item::items[_id];
+	const ItemType& iType = Item::items[_id];
 	unsigned char _count = 1;
 
 	if(iType.stackable || iType.isSplash() || iType.isFluidContainer()){
