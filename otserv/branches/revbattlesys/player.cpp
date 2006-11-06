@@ -891,8 +891,11 @@ void Player::onCreatureAppear(const Creature* creature, bool isLogin)
 	}
 }
 
+/*
 void Player::onCreatureDisappear(const Creature* creature)
 {
+	Creature::onCreatureDisappear(creature);
+
 	if(attackedCreature == creature){
 		setAttackedCreature(NULL);
 		sendCancelTarget();
@@ -904,6 +907,19 @@ void Player::onCreatureDisappear(const Creature* creature)
 		sendCancelTarget();
 		sendTextMessage(MSG_STATUS_SMALL, "Target lost.");
 	}
+}
+*/
+
+void Player::onAttackedCreatureDissapear()
+{
+	sendCancelTarget();
+	sendTextMessage(MSG_STATUS_SMALL, "Target lost.");
+}
+
+void Player::onFollowCreatureDissapear()
+{
+	sendCancelTarget();
+	sendTextMessage(MSG_STATUS_SMALL, "Target lost.");
 }
 
 void Player::onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout)
@@ -2431,14 +2447,15 @@ void Player::onCombatRemoveCondition(const Creature* attacker, Condition* condit
 		remove = false;
 
 		//Means the condition is from an item, id == slot
-		//if(g_game.getWorldType() == WORLD_TYPE_PVP_ENFORCED){
+		if(g_game.getWorldType() == WORLD_TYPE_PVP_ENFORCED){
 			Item* item = getInventoryItem((slots_t)condition->getId());
 			if(item){
+				//25% chance to destroy the item
 				if(25 >= random_range(0, 100)){
 					g_game.internalRemoveItem(item);
 				}
 			}
-		//}
+		}
 	}
 
 	if(remove){

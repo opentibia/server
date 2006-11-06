@@ -166,6 +166,7 @@ Weapon::Weapon(LuaScriptInterface* _interface) :
 	level = 0;
 	magLevel = 0;
 	mana = 0;
+	manaPercent = 0;
 	soul = 0;
 	exhaustion = false;
 	premium = false;
@@ -238,6 +239,10 @@ bool Weapon::configureEvent(xmlNodePtr p)
 
 	if(readXMLInteger(p, "mana", intValue)){
 	 	mana = intValue;
+	}
+
+	if(readXMLInteger(p, "manaPercent", intValue)){
+	 	manaPercent = intValue;
 	}
 
 	if(readXMLInteger(p, "soul", intValue)){
@@ -329,7 +334,7 @@ bool Weapon::playerWeaponCheck(Player* player, Creature* target) const
 		return false;
 	}
 
-	if(player->getPlayerInfo(PLAYERINFO_MANA) < mana){
+	if(player->getMana() < getManaCost(player)){
 		return false;
 	}
 
@@ -418,9 +423,11 @@ void Weapon::onUsedWeapon(Player* player, Item* item, Tile* destTile) const
 		player->addCondition(condition);
 	}
 
-	if(mana > 0){
-		player->changeMana(-((int32_t)mana));
-		player->addManaSpent(mana);
+	int32_t manaCost = getManaCost(player);
+
+	if(manaCost > 0){
+		player->changeMana(manaCost);
+		player->addManaSpent(manaCost);
 		player->sendStats();
 	}
 
@@ -431,6 +438,22 @@ void Weapon::onUsedWeapon(Player* player, Item* item, Tile* destTile) const
 	}
 	*/
 }
+
+int32_t Weapon::getManaCost(const Player* player) const
+{
+	if(mana != 0){
+		return mana;
+	}
+
+	if(manaPercent != 0){
+		int32_t currentMana = player->getMana();
+		int32_t manaCost = currentMana * (((double)manaPercent) / 100);
+		return manaCost;
+	}
+
+	return 0;
+}
+
 
 bool Weapon::executeUseWeapon(Player* player, const LuaVariant& var) const
 {

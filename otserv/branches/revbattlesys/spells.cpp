@@ -25,6 +25,7 @@
 #include "housetile.h"
 #include "spells.h"
 #include "combat.h"
+#include "commands.h"
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
@@ -205,6 +206,7 @@ Spell::Spell()
 	level = 0;
 	magLevel = 0;
 	mana = 0;
+	manaPercent = 0;
 	soul = 0;
 	exhaustion = false;
 	needTarget = false;
@@ -237,6 +239,10 @@ bool Spell::configureSpell(xmlNodePtr p)
 
 	if(readXMLInteger(p, "mana", intValue)){
 	 	mana = intValue;
+	}
+
+	if(readXMLInteger(p, "manaPercent", intValue)){
+	 	manaPercent = intValue;
 	}
 
 	if(readXMLInteger(p, "soul", intValue)){
@@ -321,7 +327,7 @@ bool Spell::playerSpellCheck(const Player* player) const
 		return false;
 	}
 
-	if(player->getPlayerInfo(PLAYERINFO_MANA) < mana){
+	if(player->getMana() < getManaCost(player)){
 		player->sendTextMessage(MSG_STATUS_SMALL, "You do not have enough mana.",player->getPosition(), NM_ME_PUFF);
 		return false;
 	}
@@ -441,9 +447,11 @@ void Spell::postCastSpell(Player* player) const
 		return;
 	}
 
-	if(mana > 0){
-		player->changeMana(-((int32_t)mana));
-		player->addManaSpent(mana);
+	int32_t manaCost = getManaCost(player);
+
+	if(manaCost > 0){
+		player->changeMana(-manaCost);
+		player->addManaSpent(manaCost);
 		player->sendStats();
 	}
 
@@ -465,6 +473,20 @@ void Spell::postCastSpell(Player* player) const
 	*/
 }
 
+int32_t Spell::getManaCost(const Player* player) const
+{
+	if(mana != 0){
+		return mana;
+	}
+
+	if(manaPercent != 0){
+		int32_t currentMana = player->getMana();
+		int32_t manaCost = currentMana * (((double)manaPercent) / 100);
+		return manaCost;
+	}
+
+	return 0;
+}
 
 InstantSpell::InstantSpell(LuaScriptInterface* _interface) :
 TalkAction(_interface)
@@ -524,6 +546,9 @@ bool InstantSpell::loadFunction(const std::string& functionName)
 	}
 	else if(functionName == "searchPlayer"){
 		function = SearchPlayer;
+	}
+	else if(functionName == "summonMonster"){
+		function = SummonMonster;
 	}
 	else{
 		return false;
@@ -807,6 +832,7 @@ bool InstantSpell::SearchPlayer(const InstantSpell* spell, Creature* creature, c
 	if(!player){
 		return false;
 	}
+
 	enum distance_t{
 		DISTANCE_BESIDE,
 		DISTANCE_CLOSE_1,
@@ -993,6 +1019,32 @@ bool InstantSpell::SearchPlayer(const InstantSpell* spell, Creature* creature, c
 	}
 
 	return false;
+}
+
+bool InstantSpell::SummonMonster(const InstantSpell* spell, Creature* creature, const std::string& param)
+{
+	Player* player = creature->getPlayer();
+	if(!player){
+		return false;
+	}
+
+	if(player->getSummonCount() >= 2){
+		player->sendCancel("You cannot summon more creatures.");
+		player->sendMagicEffect(player->getPosition(), NM_ME_PUFF);
+		return false;
+	}
+
+	ReturnValue ret = Commands::placeSummon(player, param);
+
+	if(ret == RET_NOERROR){
+		player->sendMagicEffect(player->getPosition(), NM_ME_MAGIC_POISEN);
+	}
+	else{
+		player->sendCancelMessage(ret);
+		player->sendMagicEffect(player->getPosition(), NM_ME_PUFF);
+	}
+
+	return (ret == RET_NOERROR);
 }
 
 ConjureSpell::ConjureSpell(LuaScriptInterface* _interface) :

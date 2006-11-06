@@ -105,6 +105,7 @@ public:
 	~ScriptEnviroment();
 
 	void resetEnv();
+	void resetCallback();
 
 	void setScriptId(long scriptId, LuaScriptInterface* scriptInterface);
 	bool setCallbackId(long callbackId);

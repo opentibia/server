@@ -199,6 +199,11 @@ void ScriptEnviroment::resetEnv()
 	m_realPos.z = 0;
 }
 
+void ScriptEnviroment::resetCallback()
+{
+	m_callbackId = 0;
+}
+
 void ScriptEnviroment::setRealPos(const Position& realPos)
 {
 	m_realPos = realPos;	
@@ -2580,7 +2585,7 @@ int LuaScriptInterface::luaSetCombatCallBack(lua_State *L)
 
 	const char* function = popString(L);
 	std::string function_str(function);
-	CombatParam_t key = (CombatParam_t)popNumber(L);
+	CallBackParam_t key = (CallBackParam_t)popNumber(L);
 	uint32_t combatId = popNumber(L);
 
 	ScriptEnviroment* env = getScriptEnv();
@@ -2602,7 +2607,7 @@ int LuaScriptInterface::luaSetCombatCallBack(lua_State *L)
 	LuaScriptInterface* scriptInterface = env->getScriptInterface();
 	
 	combat->setCallback(key);
-	CallBack* callback = combat->getCallback();
+	CallBack* callback = combat->getCallback(key);
 	if(!callback){
 		std::stringstream ss;
 		ss << (uint32_t)key << " is not a valid callback key";

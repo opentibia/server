@@ -37,6 +37,8 @@ MonsterType::MonsterType()
 
 void MonsterType::reset()
 {
+	isSummonable = false;
+	isIllusionable = false;
 	race = RACE_BLOOD;
 	armor = 0;
 	experience = 0;
@@ -273,6 +275,14 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 			mType->experience = intValue;
 		}
 
+		if(readXMLInteger(root, "summonable", intValue)){
+			mType->isSummonable = (intValue != 0);
+		}
+		
+		if(readXMLInteger(root, "illusionable", intValue)){
+			mType->isIllusionable = (intValue != 0);
+		}
+
 		if(readXMLInteger(root, "pushable", intValue)){
 			mType->pushable = (intValue != 0);
 		}
@@ -416,7 +426,7 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 						if(readXMLString(tmpNode, "name", strValue)){
 							if(strcasecmp(strValue.c_str(), "melee") == 0){
 								mType->combatMeleeMin = min;
-								mType->combatMeleeMax = min;
+								mType->combatMeleeMax = max;
 								mType->combatMeleeSpeed = speed;
 							}
 							else{

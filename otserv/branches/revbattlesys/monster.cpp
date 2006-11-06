@@ -49,6 +49,28 @@ Monster* Monster::createMonster(const std::string& name)
 	return new_monster;
 }
 
+Monster* Monster::createMonster(const Creature* creature, const std::string& name)
+{
+	unsigned long id = g_monsters.getIdByName(name);
+	if(!id){
+		return NULL;
+	}
+	
+	MonsterType* mType = g_monsters.getMonsterType(id);
+	if(!mType){
+		return NULL;
+	}
+
+	if(const Player* player = creature->getPlayer()){
+		if(player->getAccessLevel() == 0 && !mType->isSummonable){
+			return NULL;
+		}
+	}
+	
+	Monster* monster = new Monster(mType);
+	return monster;
+}
+
 Monster::Monster(MonsterType* _mtype) :
 Creature()
 {

@@ -34,33 +34,24 @@ class Creature;
 class Position;
 class Item;
 
-/*
-struct CombatFormula_t{
-	CombatFormula_t(){
-		type = COMBAT_FORMULA_UNDEFINED;
-		mina = 0.0;
-		minb = 0.0;
-		maxa = 0.0;
-		maxb = 0.0;
-	}
-
-	CombatFormula_t type;
-	double mina;
-	double minb;
-	double maxa;
-	double maxb;
-};
-*/
-
 //for luascript callback
-class CombatCallBack : public CallBack{
+class ValueCallback : public CallBack{
 public:
-	CombatCallBack(formulaType_t _type);
+	ValueCallback(formulaType_t _type);
 	void getMinMaxValues(Player* player, int32_t& min, int32_t& max) const;
 
 protected:
 	formulaType_t type;
 };
+
+class TileCallback : public CallBack{
+public:
+	TileCallback() {};
+	void onTileCombat(Creature* creature, Tile* tile) const;
+
+protected:
+	formulaType_t type;
+};	
 
 struct CombatParams{
 	CombatParams() {
@@ -74,10 +65,12 @@ struct CombatParams{
 		distanceEffect = NM_ME_NONE;
 		condition = NULL;
 		dispelType = CONDITION_NONE;
+
+		valueCallback = NULL;
+		tileCallback = NULL;
 	}
 
 	const Condition* condition;
-	//ConditionType_t removeCondition;
 	ConditionType_t dispelType;
 	CombatType_t combatType;
 	bool blockedByArmor;
@@ -87,6 +80,9 @@ struct CombatParams{
 	int32_t itemId;
 	uint8_t impactEffect;
 	uint8_t distanceEffect;
+
+	ValueCallback* valueCallback;
+	TileCallback* tileCallback;
 };
 
 typedef bool (*COMBATFUNC)(Creature*, Creature*, const CombatParams&, void*);
@@ -128,8 +124,8 @@ public:
 	void doCombat(Creature* caster, Creature* target) const;
 	void doCombat(Creature* caster, const Position& pos) const;
 
-	bool setCallback(CombatParam_t key);
-	CallBack* getCallback();
+	bool setCallback(CallBackParam_t key);
+	CallBack* getCallback(CallBackParam_t key);
 
 	bool setParam(CombatParam_t param, uint32_t value);
 	void setArea(const AreaCombat* _area);
@@ -165,7 +161,6 @@ protected:
 	double maxb;
 
 	AreaCombat* area;
-	CombatCallBack* callback;
 };
 
 template <typename T>
@@ -302,14 +297,7 @@ public:
 	virtual const MagicField* getMagicField() const {return this;};
 
 	CombatType_t getCombatType() const;
-	//const ConditionDamage* getCondition() const;
 	void onStepInField(Creature* creature);
-
-protected:
-	//void load();
-
-	//ConditionDamage* condition;
-	//CombatType_t combatType;
 };
 
 #endif

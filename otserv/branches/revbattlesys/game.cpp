@@ -2236,7 +2236,16 @@ bool Game::playerSetAttackedCreature(Player* player, unsigned long creatureId)
 
 		if(ret == RET_NOERROR){
 			if(Player* attackPlayer = attackCreature->getPlayer()){
-				if(getWorldType() == WORLD_TYPE_NO_PVP || attackPlayer->getAccessLevel() > player->getAccessLevel()){
+				if(attackPlayer->getAccessLevel() > player->getAccessLevel()){
+					ret = RET_YOUMAYNOTATTACKTHISPLAYER;
+				}
+			}
+
+			if(getWorldType() == WORLD_TYPE_NO_PVP){
+				if(attackCreature->getPlayer()){
+					ret = RET_YOUMAYNOTATTACKTHISPLAYER;
+				}
+				else if(attackCreature->getMaster() && attackCreature->getMaster()->getPlayer()){
 					ret = RET_YOUMAYNOTATTACKTHISPLAYER;
 				}
 			}

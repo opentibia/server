@@ -90,6 +90,8 @@ public:
 	int conditionImmunities;
 	int damageImmunities;
 	RaceType_t race;
+	bool isSummonable;
+	bool isIllusionable;
 	
 	int lightLevel;
 	int lightColor;

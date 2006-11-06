@@ -248,6 +248,9 @@ public:
 	virtual void onCreatureMove(const Creature* creature, const Position& newPos, const Position& oldPos,
 		uint32_t oldStackPos, bool teleport);
 
+	virtual void onAttackedCreatureDissapear() {};
+	virtual void onFollowCreatureDissapear() {};
+
 	virtual void onCreatureTurn(const Creature* creature, uint32_t stackPos) { };
 	virtual void onCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text) { };
 	
@@ -256,7 +259,9 @@ public:
 
 	virtual void getCombatValues(int32_t& min, int32_t& max) {};
 
-protected:	
+	uint32_t getSummonCount() const {return summons.size();}
+
+protected:
 	
 	int32_t health, healthMax;
 	int32_t mana, manaMax;

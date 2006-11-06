@@ -94,6 +94,8 @@ protected:
 	virtual int32_t getWeaponDamage(const Player* player, const Item* item) const = 0;
 	virtual bool getSkillType(const Player* player, const Item* item, skills_t& skill, uint32_t& skillpoint) const {return false;};
 
+	int32_t getManaCost(const Player* player) const;
+
 	uint16_t id;
 	bool enabled;
 	bool premium;
@@ -101,6 +103,7 @@ protected:
 	int32_t level;
 	int32_t magLevel;
 	int32_t mana;
+	int32_t manaPercent;
 	int32_t soul;
 	int32_t range;
 	AmmoAction_t ammoAction;

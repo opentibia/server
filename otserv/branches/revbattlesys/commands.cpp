@@ -52,6 +52,7 @@ extern TalkActions* g_talkactions;
 extern MoveEvents* g_moveEvents;
 extern Spells* g_spells;
 extern Weapons* g_weapons;
+extern Game g_game;
 
 extern bool readXMLInteger(xmlNodePtr p, const char *tag, int &value);
 
@@ -266,8 +267,37 @@ bool Commands::placeMonster(Creature* creature, const std::string& cmd, const st
 	return false;
 }
 
+ReturnValue Commands::placeSummon(Creature* creature, const std::string& name)
+{
+	Monster* monster = Monster::createMonster(creature, name);
+	if(!monster){
+		return RET_NOTPOSSIBLE;
+	}
+	
+	// Place the monster
+	creature->addSummon(monster);
+	if(!g_game.placeCreature(creature->getPosition(), monster)){
+		creature->removeSummon(monster);
+		return RET_NOTENOUGHROOM;
+	}
+
+	return RET_NOERROR;
+}
+
 bool Commands::placeSummon(Creature* creature, const std::string& cmd, const std::string& param)
 {
+	ReturnValue ret = placeSummon(creature, param);
+
+	if(ret != RET_NOERROR){
+		if(Player* player = creature->getPlayer()){
+			player->sendCancelMessage(ret);
+			player->sendMagicEffect(player->getPosition(), NM_ME_PUFF);
+		}
+	}
+
+	return (ret == RET_NOERROR);
+
+	/*
 	Monster* monster = Monster::createMonster(param);
 	if(!monster){
 		return false;
@@ -289,6 +319,7 @@ bool Commands::placeSummon(Creature* creature, const std::string& cmd, const std
 	}
 
 	return false;
+	*/
 }
 
 bool Commands::broadcastMessage(Creature* creature, const std::string& cmd, const std::string& param)

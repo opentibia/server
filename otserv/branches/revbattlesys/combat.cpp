@@ -33,8 +33,9 @@ extern Game g_game;
 Combat::Combat()
 {
 	params.condition = NULL;
+	params.valueCallback = NULL;
+	params.tileCallback = NULL;
 	area = NULL;
-	callback = NULL;
 
 	formulaType = FORMULA_UNDEFINED;
 	mina = 0.0;
@@ -46,8 +47,9 @@ Combat::Combat()
 Combat::~Combat()
 {
 	delete params.condition;
+	delete params.valueCallback;
+	delete params.tileCallback;
 	delete area;
-	delete callback;
 }
 
 void Combat::getMinMaxValues(Creature* creature, int32_t& min, int32_t& max) const
@@ -57,8 +59,8 @@ void Combat::getMinMaxValues(Creature* creature, int32_t& min, int32_t& max) con
 	}
 
 	if(Player* player = creature->getPlayer()){
-		if(callback){
-			callback->getMinMaxValues(player, min, max);
+		if(params.valueCallback){
+			params.valueCallback->getMinMaxValues(player, min, max);
 		}
 		else{
 			switch(formulaType){
@@ -230,30 +232,60 @@ bool Combat::setParam(CombatParam_t param, uint32_t value)
 	return false;
 }
 
-bool Combat::setCallback(CombatParam_t key)
+bool Combat::setCallback(CallBackParam_t key)
 {
 	switch(key){
-		case COMBATPARAM_LEVELMAGICVALUECALLBACK:
-			callback = new CombatCallBack(FORMULA_LEVELMAGIC);
+		case CALLBACKPARAM_LEVELMAGICVALUE:
+		{
+			delete params.valueCallback;
+			params.valueCallback = new ValueCallback(FORMULA_LEVELMAGIC);
 			return true;
 			break;
+		}
 
-		case COMBATPARAM_SKILLVALUECALLBACK:
-			callback = new CombatCallBack(FORMULA_SKILL);
+		case CALLBACKPARAM_SKILLVALUE:
+		{
+			delete params.valueCallback;
+			params.valueCallback = new ValueCallback(FORMULA_SKILL);
 			return true;
 			break;
+		}
+
+		case CALLBACKPARAM_TARGETTILECALLBACK:
+		{
+			delete params.tileCallback;
+			params.tileCallback = new TileCallback();
+			break;
+		}
 
 		default:
-				std::cout << "Combat::setCallback - Unknown callback type: " << (uint32_t)key << std::endl;
-				break;
+		{
+			std::cout << "Combat::setCallback - Unknown callback type: " << (uint32_t)key << std::endl;
+			break;
+		}
 	}
 
 	return false;
 }
 
-CallBack* Combat::getCallback()
+CallBack* Combat::getCallback(CallBackParam_t key)
 {
-	return callback;
+	switch(key){
+		case CALLBACKPARAM_LEVELMAGICVALUE:
+		case CALLBACKPARAM_SKILLVALUE:
+		{
+			return params.valueCallback;
+			break;
+		}
+
+		case CALLBACKPARAM_TARGETTILECALLBACK:
+		{
+			return params.tileCallback;
+			break;
+		}
+	}
+
+	return NULL;
 }
 
 bool Combat::CombatHealthFunc(Creature* caster, Creature* target, const CombatParams& params, void* data)
@@ -290,6 +322,17 @@ bool Combat::CombatConditionFunc(Creature* caster, Creature* target, const Comba
 
 	if(params.condition && !target->isImmune(params.condition->getType())){
 		if(!params.isAggressive || caster != target){
+
+			if(g_game.getWorldType() == WORLD_TYPE_NO_PVP){
+				if(caster && (caster->getPlayer() && target->getPlayer())){
+					return false;
+				}
+
+				if(target->getMaster() && target->getMaster()->getPlayer()){
+					return false;
+				}
+			}
+
 			Condition* conditionCopy = params.condition->clone();
 			if(caster){
 				conditionCopy->setParam(CONDITIONPARAM_OWNER, caster->getID());
@@ -306,6 +349,17 @@ bool Combat::CombatDispelFunc(Creature* caster, Creature* target, const CombatPa
 {
 	if(target->hasCondition(params.dispelType)){
 		if(!params.isAggressive || caster != target){
+
+			if(g_game.getWorldType() == WORLD_TYPE_NO_PVP){
+				if(caster && (caster->getPlayer() && target->getPlayer())){
+					return false;
+				}
+
+				if(target->getMaster() && target->getMaster()->getPlayer()){
+					return false;
+				}
+			}
+
 			target->removeCondition(caster, params.dispelType);
 			return true;
 		}
@@ -337,6 +391,10 @@ void Combat::combatTileEffects(Creature* caster, Tile* tile, const CombatParams&
 		else{
 			delete item;
 		}
+	}
+
+	if(params.tileCallback){
+		params.tileCallback->onTileCombat(caster, tile);
 	}
 
 	if(params.impactEffect != NM_ME_NONE){
@@ -412,29 +470,6 @@ void Combat::doCombat(Creature* caster, Creature* target) const
 	else{
 		doCombatDefault(caster, target, params);
 	}
-
-	/*
-	if(combatType == COMBAT_HITPOINTS){
-		int32_t minChange = 0;
-		int32_t maxChange = 0;
-		getMinMaxValues(caster, minChange, maxChange);
-
-		doCombatHealth(caster, target, minChange, maxChange, params);
-	}
-	else if(combatType == COMBAT_MANAPOINTS){
-		int32_t minChange = 0;
-		int32_t maxChange = 0;
-		getMinMaxValues(caster, minChange, maxChange);
-
-		doCombatMana(caster, target, minChange, maxChange, params);
-	}
-	else if(combatType == COMBAT_CONDITION){
-		doCombatCondition(caster, target, params);
-	}
-	else if(combatType == COMBAT_DISPEL){
-		doCombatDispel(caster, target, params);
-	}
-	*/
 }
 
 void Combat::doCombat(Creature* caster, const Position& pos) const
@@ -456,32 +491,6 @@ void Combat::doCombat(Creature* caster, const Position& pos) const
 	else{
 		CombatFunc(caster, pos, area, params, CombatNullFunc, NULL);
 	}
-
-	/*
-	if(combatType == COMBAT_HITPOINTS){
-		int32_t minChange = 0;
-		int32_t maxChange = 0;
-		getMinMaxValues(caster, minChange, maxChange);
-
-		doCombatHealth(caster, pos, area, minChange, maxChange, params);
-	}
-	else if(combatType == COMBAT_MANAPOINTS){
-		int32_t minChange = 0;
-		int32_t maxChange = 0;
-		getMinMaxValues(caster, minChange, maxChange);
-
-		doCombatMana(caster, pos, area, minChange, maxChange, params);
-	}
-	else if(combatType == COMBAT_CONDITION){
-		doCombatCondition(caster, pos, area, params);
-	}
-	else if(combatType == COMBAT_DISPEL){
-		doCombatDispel(caster, pos, area, params);
-	}
-	else{
-		CombatFunc(caster, pos, area, params, CombatNullFunc, NULL);
-	}
-	*/
 }
 
 void Combat::doCombatHealth(Creature* caster, Creature* target,
@@ -598,13 +607,12 @@ void Combat::postCombatEffects(Creature* caster, const Position& pos, bool succe
 	}
 }
 
-
-CombatCallBack::CombatCallBack(formulaType_t _type)
+ValueCallback::ValueCallback(formulaType_t _type)
 {
 	type = _type;
 }
 
-void CombatCallBack::getMinMaxValues(Player* player, int32_t& min, int32_t& max) const
+void ValueCallback::getMinMaxValues(Player* player, int32_t& min, int32_t& max) const
 {
 	//"onGetPlayerMinMaxValues"(...)
 	
@@ -638,7 +646,7 @@ void CombatCallBack::getMinMaxValues(Player* player, int32_t& min, int32_t& max)
 		*/
 
 		default:
-			std::cout << "CombatCallBack::getMinMaxValues - unknown callback type" << std::endl;
+			std::cout << "ValueCallback::getMinMaxValues - unknown callback type" << std::endl;
 			return;
 			break;
 	}
@@ -655,6 +663,36 @@ void CombatCallBack::getMinMaxValues(Player* player, int32_t& min, int32_t& max)
 	if((lua_gettop(L) + 3 /*nParams*/  + 1) != size0){
 		LuaScriptInterface::reportError(NULL, "Stack size changed!");
 	}
+
+	env->resetCallback();
+}
+
+void TileCallback::onTileCombat(Creature* creature, Tile* tile) const
+{
+	//"onTileCombat"(cid, pos)
+	
+	ScriptEnviroment* env = m_scriptInterface->getScriptEnv();
+	lua_State* L = m_scriptInterface->getLuaState();
+	
+	if(!env->setCallbackId(m_scriptId))
+		return;
+		
+	uint32_t cid = env->addThing(creature);
+
+	m_scriptInterface->pushFunction(m_scriptId);
+	lua_pushnumber(L, cid);
+	m_scriptInterface->pushPosition(L, tile->getPosition(), 0);
+
+	int size0 = lua_gettop(L);
+	if(lua_pcall(L, 2, 0 /*nReturnValues*/, 0) != 0){
+		LuaScriptInterface::reportError(NULL, std::string(LuaScriptInterface::popString(L)));
+	}
+
+	if((lua_gettop(L) + 2 /*nParams*/  + 1) != size0){
+		LuaScriptInterface::reportError(NULL, "Stack size changed!");
+	}
+
+	env->resetCallback();
 }
 
 AreaCombat::AreaCombat()
@@ -905,44 +943,8 @@ void AreaCombat::setupExtArea(const std::list<uint32_t>& list, uint32_t rows)
 
 MagicField::MagicField(uint16_t _type) : Item(_type)
 {
-	//condition = NULL;
-	//combatType = COMBAT_NONE;
-	//load();
+	//
 }
-
-/*
-void MagicField::load()
-{
-	const ItemType& it = Item::items[getID()];
-
-	combatType = it.combatType;
-
-	switch(combatType){
-		case COMBAT_ENERGYDAMAGE:
-			condition = new ConditionDamage(CONDITIONID_COMBAT, CONDITION_ENERGY);
-			break;
-
-		case COMBAT_FIREDAMAGE:
-			condition = new ConditionDamage(CONDITIONID_COMBAT, CONDITION_FIRE);
-			break;
-
-		case COMBAT_POISONDAMAGE:
-			condition = new ConditionDamage(CONDITIONID_COMBAT, CONDITION_POISON);
-			break;
-		
-		default:
-			break;
-	}
-
-	if(condition){
-		if(it.initialDamage != 0){
-			condition->addDamage(1, 0, it.initialDamage);
-		}
-
-		condition->addDamage(it.roundMin, it.roundTime, it.roundDamage);
-	}
-}
-*/
 
 MagicField::~MagicField()
 {
@@ -954,14 +956,6 @@ CombatType_t MagicField::getCombatType() const
 	const ItemType& it = items[getID()];
 	return it.combatType;
 }
-
-/*
-const ConditionDamage* MagicField::getCondition() const
-{
-	const ItemType& it = items[getID()];
-	return it.condition;
-}
-*/
 
 void MagicField::onStepInField(Creature* creature)
 {

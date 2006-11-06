@@ -36,6 +36,7 @@ private:
 
 public:
 	static Monster* createMonster(const std::string& name);
+	static Monster* createMonster(const Creature* creature, const std::string& name);
 	virtual ~Monster();
 
 	virtual Monster* getMonster() {return this;};

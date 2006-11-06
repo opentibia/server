@@ -91,6 +91,7 @@ protected:
 	bool playerRuneSpellCheck(const Player* player, const Position& toPos);
 	
 	void postCastSpell(Player* player) const;
+	int32_t getManaCost(const Player* player) const;
 	
 	bool enabled;
 	bool premium;
@@ -98,6 +99,7 @@ protected:
 	int32_t magLevel;
 	
 	int32_t mana;
+	int32_t manaPercent;
 	int32_t soul;
 	bool exhaustion;
 	bool needTarget;
@@ -137,6 +139,7 @@ protected:
 	static InstantSpellFunction HouseDoorList;
 	static InstantSpellFunction HouseKick;
 	static InstantSpellFunction SearchPlayer;
+	static InstantSpellFunction SummonMonster;
 	
 	static House* getHouseFromPos(Creature* creature);
 	
