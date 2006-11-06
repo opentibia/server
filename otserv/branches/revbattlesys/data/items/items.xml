@@ -1,13 +1,16 @@
 <items>
 	<item id="1499" name="wild growth">
+		<attribute key="field" value="block"/>
 		<attribute key="duration" value="20"/>
 	</item>
 
 	<item id="1497" name="magic wall">
+		<attribute key="field" value="block"/>
 		<attribute key="duration" value="20"/>
 	</item>
 
 	<item id="1498" name="magic wall">
+		<attribute key="field" value="block"/>
 		<attribute key="duration" value="20"/>
 	</item>
 
