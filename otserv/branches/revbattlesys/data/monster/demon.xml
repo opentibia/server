@@ -1,8 +1,9 @@
 <?xml version="1.0"?>
-<monster name="Demon" experience="6000" pushable="0" armor="40" defense="45" canpushitems="0" staticattack="40" changetarget="200" speed="500">
+<monster name="Demon" experience="6000" pushable="0" armor="40" defense="45" canpushitems="1" staticattack="40" speed="500">
 	<health now="8200" max="8200"/>
 	<look type="35" head="20" body="30" legs="40" feet="50" corpse="2916"/>
 	<combat targetdistance="1" runonhealth="0"/>
+	<targetchange speed="2000" chance="5"/>
 
 <attacks>
 	<attack name="melee" speed="2000" min="-200" max="-550"/> 

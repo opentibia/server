@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<monster name="Minotaur Archer" experience="65" pushable="1" summonable="1" illusionable="1" armor="15" defense="20" canpushitems="0" staticattack="50" changetarget="200" speed="170">
+<monster name="Minotaur Archer" experience="65" pushable="1" summonable="1" illusionable="1" armor="15" defense="20" canpushitems="0" staticattack="50" speed="170">
 	<health now="100" max="100"/>
 	<look type="24" corpse="2871"/>
 	<combat targetdistance="3" runonhealth="80"/>
