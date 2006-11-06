@@ -4,6 +4,10 @@
 <movevent event="StepIn" itemid="1487" function="onStepInField" />
 <movevent event="AddItem" tileitem="0" itemid="1487" function="onAddField" />
 
+<movevent event="StepIn" itemid="1497" function="onStepInField" />
+<movevent event="StepIn" itemid="1498" function="onStepInField" />
+<movevent event="StepIn" itemid="1499" function="onStepInField" />
+
 <movevent event="StepIn" itemid="1506" function="onStepInField" />
 <movevent event="AddItem" tileitem="0" itemid="1506" function="onAddField" />
 
