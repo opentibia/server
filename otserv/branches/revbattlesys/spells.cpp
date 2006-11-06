@@ -387,7 +387,7 @@ bool Spell::playerInstantSpellCheck(const Player* player, const Position& toPos)
 
 		if(ret != RET_NOERROR){
 			player->sendCancelMessage(ret);
-			player->sendMagicEffect(player->getPosition(), NM_ME_PUFF);
+			g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 			return false;
 		}
 	}
@@ -433,7 +433,7 @@ bool Spell::playerRuneSpellCheck(const Player* player, const Position& toPos)
 
 		if(ret != RET_NOERROR){
 			player->sendCancelMessage(ret);
-			player->sendMagicEffect(player->getPosition(), NM_ME_PUFF);
+			g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 			return false;
 		}
 	}
@@ -603,12 +603,14 @@ bool InstantSpell::playerCastInstant(Player* player, const std::string& param)
 	else if(needTarget){
 		Player* target = g_game.getPlayerByName(param);
 		if(!target){
-			player->sendTextMessage(MSG_STATUS_SMALL, "A player with this name is not online.", player->getPosition(), NM_ME_PUFF);
+			player->sendCancelMessage(RET_PLAYERWITHTHISNAMEISNOTONLINE);
+			g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 			return false;
 		}
 
 		if(!g_game.canThrowObjectTo(player->getPosition(), target->getPosition())){
-			player->sendTextMessage(MSG_STATUS_SMALL, "Player is not reachable.", player->getPosition(), NM_ME_PUFF);
+			player->sendCancelMessage(RET_PLAYERISNOTREACHABLE);
+			g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 			return false;
 		}
 
@@ -741,7 +743,7 @@ bool InstantSpell::HouseGuestList(const InstantSpell* spell, Creature* creature,
 	}
 	else{
 		player->sendCancelMessage(RET_NOTPOSSIBLE);
-		player->sendMagicEffect(player->getPosition(), NM_ME_PUFF);
+		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 	}
 	
 	return true;
@@ -761,7 +763,7 @@ bool InstantSpell::HouseSubOwnerList(const InstantSpell* spell, Creature* creatu
 	}
 	else{
 		player->sendCancelMessage(RET_NOTPOSSIBLE);
-		player->sendMagicEffect(player->getPosition(), NM_ME_PUFF);
+		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 	}
 		
 	return true;
@@ -800,7 +802,7 @@ bool InstantSpell::HouseDoorList(const InstantSpell* spell, Creature* creature, 
 	}
 	else{
 		player->sendCancelMessage(RET_NOTPOSSIBLE);
-		player->sendMagicEffect(player->getPosition(), NM_ME_PUFF);
+		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 	}
 	
 	return true;
@@ -1014,8 +1016,13 @@ bool InstantSpell::SearchPlayer(const InstantSpell* spell, Creature* creature, c
 		}
 
 		ss << ".";
-		player->sendTextMessage(MSG_INFO_DESCR, ss.str().c_str());		
+		player->sendTextMessage(MSG_INFO_DESCR, ss.str().c_str());
+		g_game.addMagicEffect(player->getPosition(), NM_ME_MAGIC_ENERGIE);
 		return true;
+	}
+	else{
+		player->sendCancelMessage(RET_PLAYERWITHTHISNAMEISNOTONLINE);
+		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 	}
 
 	return false;
@@ -1030,18 +1037,18 @@ bool InstantSpell::SummonMonster(const InstantSpell* spell, Creature* creature, 
 
 	if(player->getSummonCount() >= 2){
 		player->sendCancel("You cannot summon more creatures.");
-		player->sendMagicEffect(player->getPosition(), NM_ME_PUFF);
+		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 		return false;
 	}
 
 	ReturnValue ret = Commands::placeSummon(player, param);
 
 	if(ret == RET_NOERROR){
-		player->sendMagicEffect(player->getPosition(), NM_ME_MAGIC_POISEN);
+		g_game.addMagicEffect(player->getPosition(), NM_ME_MAGIC_POISEN);
 	}
 	else{
 		player->sendCancelMessage(ret);
-		player->sendMagicEffect(player->getPosition(), NM_ME_PUFF);
+		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 	}
 
 	return (ret == RET_NOERROR);
@@ -1185,11 +1192,11 @@ bool ConjureSpell::ConjureItem(const ConjureSpell* spell, Creature* creature, co
 	}
 
 	if(result){
-		player->sendMagicEffect(player->getPosition(), NM_ME_MAGIC_BLOOD);
+		g_game.addMagicEffect(player->getPosition(), NM_ME_MAGIC_BLOOD);
 	}
 	else if(spell->getReagentId() != 0){
 		player->sendCancel("You need a magic item to cast this spell.");
-		player->sendMagicEffect(player->getPosition(), NM_ME_PUFF);
+		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 	}
 
 	return result;
@@ -1218,7 +1225,7 @@ bool ConjureSpell::ConjureFood(const ConjureSpell* spell, Creature* creature, co
 	bool result = internalConjureItem(player, foodType, 1);
 
 	if(result){
-		player->sendMagicEffect(player->getPosition(), NM_ME_MAGIC_POISEN);
+		g_game.addMagicEffect(player->getPosition(), NM_ME_MAGIC_POISEN);
 	}
 
 	return result;
@@ -1245,61 +1252,6 @@ bool ConjureSpell::playerCastInstant(Player* player, const std::string& param)
 	}
 
 	return result;
-
-	/*
-	bool result = false;
-	if(conjureReagentId != 0){
-		Item* item;
-
-		item = player->getInventoryItem(SLOT_RIGHT);
-		if(item && item->getID() == conjureReagentId){
-
-			if(!playerSpellCheck(player)){
-				return false;
-			}
-			
-			g_game.transformItem(item, conjureId);
-			Spell::postCastSpell(player);
-			result = true;
-		}
-
-		item = player->getInventoryItem(SLOT_LEFT);
-		if(item && item->getID() == conjureReagentId){
-			if(!playerSpellCheck(player)){
-				return false;
-			}
-
-			g_game.transformItem(item, conjureId);
-			Spell::postCastSpell(player);
-			result = true;
-		}
-
-		if(result){
-			player->sendMagicEffect(player->getPosition(), NM_ME_MAGIC_BLOOD);
-		}
-		else{
-			player->sendCancel("You need a magic item to cast this spell.");
-			player->sendMagicEffect(player->getPosition(), NM_ME_PUFF);
-		}
-	}
-	else{
-		if(!playerSpellCheck(player)){
-			return false;
-		}
-
-		Item* newItem = Item::CreateItem(conjureId, conjureCount);
-		if(!newItem){
-			ReturnValue ret = g_game.internalPlayerAddItem(player, newItem);
-
-			if(ret == RET_NOERROR){
-				player->sendMagicEffect(player->getPosition(), NM_ME_MAGIC_BLOOD);
-				result = true;
-			}
-		}
-	}
-
-	return result;
-	*/
 }
 
 RuneSpell::RuneSpell(LuaScriptInterface* _interface) :

@@ -98,6 +98,34 @@ void Creature::setRemoved()
 	isInternalRemoved = true;
 }
 
+bool Creature::canSee(const Position& pos) const
+{
+	const Position& myPos = getPosition();
+
+	if(myPos.z <= 7){
+		//we are on ground level or above (7 -> 0)
+		//view is from 7 -> 0
+		if(pos.z > 7){
+			return false;
+		}
+	}
+	else if(myPos.z >= 8){
+		//we are underground (8 -> 15)
+		//view is +/- 2 from the floor we stand on
+		if(std::abs(myPos.z - pos.z) > 2){
+			return false;
+		}
+	}
+
+	int offsetz = myPos.z - pos.z;
+
+	if ((pos.x >= myPos.x - 8 + offsetz) && (pos.x <= myPos.x + 9 + offsetz) &&
+		(pos.y >= myPos.y - 6 + offsetz) && (pos.y <= myPos.y + 7 + offsetz))
+		return true;
+
+	return false;
+}
+
 void Creature::onThink(uint32_t interval)
 {
 	eventCheck = g_game.addEvent(makeTask(interval, boost::bind(&Game::checkCreature,

@@ -78,6 +78,7 @@ Creature()
 	yellTicks = 0;
 	attackTicks = 0;
 	defenseTicks = 0;
+	changeTargetTicks = 0;
 	isActive = false;
 	needThink = false;
 	targetIsRecentAdded = false;
@@ -112,15 +113,18 @@ Monster::~Monster()
 
 bool Monster::canSee(const Position& pos) const
 {
+	return Creature::canSee(pos);
+
+	/*
 	const Position& myPos = getPosition();
 
-	//TODO: See more than one floor
 	if(pos.z != myPos.z){
 		return false;
 	}
 
 	return (std::abs(myPos.x - pos.x) <= Map::maxViewportX &&
 					std::abs(myPos.y - pos.y) <= Map::maxViewportY);
+	*/
 }
 
 void Monster::onAddTileItem(const Position& pos, const Item* item)
@@ -277,16 +281,10 @@ void Monster::searchTarget()
 		targetList.erase(it);
 		targetList.push_back(target);
 
-		if(!target->isInPz() && (canSeeInvisibility() || !target->isInvisible())){
+		if(target->getPosition().z == getPosition().z && !target->isInPz() && (canSeeInvisibility() || !target->isInvisible())){
 			internalFollowCreature(target);
 			setAttackedCreature(target);
 		}
-
-		/*
-		if(internalFollowCreature(target)){
-			setAttackedCreature(target);
-		}
-		*/
 	}
 }
 
@@ -303,13 +301,6 @@ void Monster::onThink(uint32_t interval)
 	onThinkYell(interval);
 	onDefending(interval);
 
-	/*
-	if(followCreature && followCreature->isInvisible() && !canSeeInvisibility()){
-		setFollowCreature(NULL);
-		setAttackedCreature(NULL);
-	}
-	*/
-
 	thinkTicks -= interval;
 
 	if(thinkTicks <= 0 || targetIsRecentAdded){
@@ -321,6 +312,9 @@ void Monster::onThink(uint32_t interval)
 		if(!isSummon()){
 			if(!followCreature){
 				searchTarget();
+			}
+			else{
+				onThinkChangeTarget(interval);
 			}
 		}
 		else{
@@ -413,17 +407,25 @@ bool Monster::getNextStep(Direction& dir)
 		const Position& position = getPosition();
 		Tile* tile = g_game.getTile(position.x + dx, position.y + dy, position.z);
 		if(tile){
-			bool itemRemoved = false;
+			bool objectRemoved = false;
 			while(Item* item = tile->getMoveableBlockingItem()){
 				//TODO. move items?
 				if(g_game.internalRemoveItem(item) == RET_NOERROR){
-					itemRemoved = true;
+					objectRemoved = true;
 				}
 				else{
 					break;
 				}
 			}
-			if(itemRemoved){
+
+			for(CreatureVector::iterator cit = tile->creatures.begin(); cit != tile->creatures.end(); ++cit){
+				if((*cit)->getMonster()){
+					(*cit)->changeHealth(-(*cit)->getHealth());
+					objectRemoved = true;
+				}
+			}
+
+			if(objectRemoved){
 				g_game.addMagicEffect(tile->getPosition(), NM_ME_PUFF);
 			}
 		}
@@ -583,6 +585,21 @@ void Monster::onDefending(uint32_t interval)
 	}
 }
 
+void Monster::onThinkChangeTarget(uint32_t interval)
+{
+	if(mType->changeTargetSpeed > 0){
+		changeTargetTicks += interval;
+	
+		if(mType->changeTargetSpeed >= changeTargetTicks){
+			changeTargetTicks = 0;
+
+			if(mType->changeTargetChance >= (uint32_t)random_range(0, 100)){
+				searchTarget();
+			}
+		}
+	}
+}
+
 void Monster::getCombatValues(int32_t& min, int32_t& max)
 {
 	min = minCombatValue;
@@ -684,7 +701,8 @@ void Monster::drainHealth(Creature* attacker, CombatType_t combatType, int32_t d
 uint32_t Monster::getFollowDistance() const
 {
 	if(isSummon()){
-		if(getMaster() == followCreature){
+		//if(getMaster() == followCreature){
+		if(!followCreature || getMaster() == followCreature){
 			return 2;
 		}
 	}

@@ -1485,13 +1485,6 @@ void Game::getSpectators(SpectatorVec& list, const Position& centerPos, bool mul
 	map->getSpectators(list, centerPos, multifloor, minRangeX, maxRangeY, minRangeY, maxRangeY);
 }
 
-/*
-void Game::getSpectators(const Range& range, SpectatorVec& list)
-{
-	map->getSpectators(range, list);
-}
-*/
-
 //battle system
 void Game::checkCreatureAttacking(uint32_t creatureId, uint32_t interval)
 {
@@ -2235,6 +2228,9 @@ bool Game::playerSetAttackedCreature(Player* player, unsigned long creatureId)
 		}
 
 		if(ret == RET_NOERROR){
+			ret = Combat::canDoCombat(player, attackCreature);
+
+			/*
 			if(Player* attackPlayer = attackCreature->getPlayer()){
 				if(attackPlayer->getAccessLevel() > player->getAccessLevel()){
 					ret = RET_YOUMAYNOTATTACKTHISPLAYER;
@@ -2249,6 +2245,7 @@ bool Game::playerSetAttackedCreature(Player* player, unsigned long creatureId)
 					ret = RET_YOUMAYNOTATTACKTHISPLAYER;
 				}
 			}
+			*/
 		}
 	}
 
@@ -2723,6 +2720,11 @@ bool Game::combatChangeHealth(CombatType_t combatType, Creature* attacker, Creat
 			return false;
 		}
 		
+		if(Combat::canDoCombat(attacker, target) != RET_NOERROR){
+			return false;
+		}
+
+		/*
 		if(attacker == target){
 			return false;
 		}
@@ -2736,6 +2738,7 @@ bool Game::combatChangeHealth(CombatType_t combatType, Creature* attacker, Creat
 				return false;
 			}
 		}
+		*/
 
 		int32_t damage = -healthChange;
 		BlockType_t blockType = target->blockHit(attacker, combatType, damage, checkDefense, checkArmor);
@@ -2909,6 +2912,11 @@ bool Game::combatChangeMana(Creature* attacker, Creature* target, int32_t manaCh
 			return false;
 		}
 		
+		if(Combat::canDoCombat(attacker, target) != RET_NOERROR){
+			return false;
+		}
+
+		/*
 		if(attacker == target){
 			return false;
 		}
@@ -2922,6 +2930,7 @@ bool Game::combatChangeMana(Creature* attacker, Creature* target, int32_t manaCh
 				return false;
 			}
 		}
+		*/
 
 		if(target->isImmune(COMBAT_MANADRAIN)){
 			addMagicEffect(list, targetPos, NM_ME_PUFF);

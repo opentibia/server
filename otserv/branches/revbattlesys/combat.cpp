@@ -138,6 +138,33 @@ ReturnValue Combat::canDoCombat(const Creature* caster, const Tile* tile, bool i
 	return RET_NOERROR;
 }
 
+ReturnValue Combat::canDoCombat(Creature* attacker, Creature* target)
+{
+	if(attacker == target){
+		return RET_YOUMAYNOTATTACKTHISPLAYER;
+	}
+
+	if(attacker && attacker->getPlayer() && target->getPlayer()){
+		if(attacker->getPlayer()->getAccessLevel() > target->getPlayer()->getAccessLevel()){
+			return RET_NOERROR;
+		}
+		else if(attacker->getPlayer()->getAccessLevel() < target->getPlayer()->getAccessLevel()){
+			return RET_YOUMAYNOTATTACKTHISPLAYER;
+		}
+	}
+
+	if(g_game.getWorldType() == WORLD_TYPE_NO_PVP){
+		if(target->getPlayer()){
+			return RET_YOUMAYNOTATTACKTHISPLAYER;
+		}
+		else if(target->getMaster() && target->getMaster()->getPlayer()){
+			return RET_YOUMAYNOTATTACKTHISPLAYER;
+		}
+	}
+
+	return RET_NOERROR;
+}
+
 void Combat::setArea(const AreaCombat* _area)
 {
 	area = new AreaCombat(*_area);
@@ -321,18 +348,7 @@ bool Combat::CombatConditionFunc(Creature* caster, Creature* target, const Comba
 	bool result = false;
 
 	if(params.condition && !target->isImmune(params.condition->getType())){
-		if(!params.isAggressive || caster != target){
-
-			if(g_game.getWorldType() == WORLD_TYPE_NO_PVP){
-				if(caster && (caster->getPlayer() && target->getPlayer())){
-					return false;
-				}
-
-				if(target->getMaster() && target->getMaster()->getPlayer()){
-					return false;
-				}
-			}
-
+		if(!params.isAggressive || Combat::canDoCombat(caster, target) == RET_NOERROR){
 			Condition* conditionCopy = params.condition->clone();
 			if(caster){
 				conditionCopy->setParam(CONDITIONPARAM_OWNER, caster->getID());
@@ -340,6 +356,27 @@ bool Combat::CombatConditionFunc(Creature* caster, Creature* target, const Comba
 
 			result = target->addCondition(conditionCopy);
 		}
+
+		/*
+		if(params.isAggressive && g_game.getWorldType() == WORLD_TYPE_NO_PVP){
+			if(caster && (caster->getPlayer() && target->getPlayer())){
+				return false;
+			}
+
+			if(target->getMaster() && target->getMaster()->getPlayer()){
+				return false;
+			}
+		}
+
+		if(!params.isAggressive || caster != target){
+			Condition* conditionCopy = params.condition->clone();
+			if(caster){
+				conditionCopy->setParam(CONDITIONPARAM_OWNER, caster->getID());
+			}
+
+			result = target->addCondition(conditionCopy);
+		}
+		*/
 	}
 
 	return result;
@@ -348,21 +385,27 @@ bool Combat::CombatConditionFunc(Creature* caster, Creature* target, const Comba
 bool Combat::CombatDispelFunc(Creature* caster, Creature* target, const CombatParams& params, void* data)
 {
 	if(target->hasCondition(params.dispelType)){
-		if(!params.isAggressive || caster != target){
-
-			if(g_game.getWorldType() == WORLD_TYPE_NO_PVP){
-				if(caster && (caster->getPlayer() && target->getPlayer())){
-					return false;
-				}
-
-				if(target->getMaster() && target->getMaster()->getPlayer()){
-					return false;
-				}
-			}
-
+		if(!params.isAggressive || Combat::canDoCombat(caster, target) == RET_NOERROR){
 			target->removeCondition(caster, params.dispelType);
 			return true;
 		}
+
+		/*
+		if(params.isAggressive && g_game.getWorldType() == WORLD_TYPE_NO_PVP){
+			if(caster && (caster->getPlayer() && target->getPlayer())){
+				return false;
+			}
+
+			if(target->getMaster() && target->getMaster()->getPlayer()){
+				return false;
+			}
+		}
+
+		if(!params.isAggressive || caster != target){
+			target->removeCondition(caster, params.dispelType);
+			return true;
+		}
+		*/
 	}
 
 	return false;

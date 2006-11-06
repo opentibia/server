@@ -713,6 +713,10 @@ void Player::sendCancelMessage(ReturnValue message) const
 		sendCancel("You can not use this object.");
 		break;
 
+	case RET_PLAYERWITHTHISNAMEISNOTONLINE:
+		sendCancel("A player with this name is not online.");
+		break;
+
 	case RET_NOTREQUIREDLEVELTOUSERUNE:
 		sendCancel("You do not have the required magic level to use this rune.");
 		break;
@@ -737,6 +741,10 @@ void Player::sendCancelMessage(ReturnValue message) const
 		sendCancel("You can only use this rune on creatures.");
 		break;
 	
+	case RET_PLAYERISNOTREACHABLE:
+		sendCancel("Player is not reachable.");
+		break;
+
 	case RET_ACTIONNOTPERMITTEDINPROTECTIONZONE:
 		sendCancel("This action is not permitted in a protection zone.");
 		break;

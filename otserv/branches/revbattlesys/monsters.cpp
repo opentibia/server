@@ -43,11 +43,8 @@ void MonsterType::reset()
 	armor = 0;
 	experience = 0;
 	defense = 0;
-	hasDistanceAttack = false;
 	canPushItems = false;
-	staticLook = 1;
-	staticAttack = 1;
-	changeTargetChance = 1;
+	//staticAttack = 1;
 	maxSummons = 0;
 	targetDistance = 1;
 	runAwayHealth = 0;
@@ -78,6 +75,9 @@ void MonsterType::reset()
 
 	yellChance = 0;
 	voiceVector.clear();
+
+	changeTargetSpeed = 0;
+	changeTargetChance = 0;
 }
 
 MonsterType::~MonsterType()
@@ -312,11 +312,6 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 				mType->staticAttack = intValue;
 		}
 
-		if(readXMLInteger(root, "changetarget", intValue)){
-			//0	never, 10000 always
-			mType->changeTargetChance = intValue;
-		}
-
 		if(readXMLInteger(root, "lightlevel", intValue)){
 			mType->lightLevel = intValue;
 		}
@@ -348,6 +343,16 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 
 				if(readXMLInteger(p, "runonhealth", intValue)){
 					mType->runAwayHealth = intValue;
+				}
+			}
+			else if(xmlStrcmp(p->name, (const xmlChar*)"targetchange") == 0){
+
+				if(readXMLInteger(p, "speed", intValue)){
+					mType->changeTargetSpeed = intValue;
+				}
+
+				if(readXMLInteger(p, "chance", intValue)){
+					mType->changeTargetChance = intValue;
 				}
 			}
 			else if(xmlStrcmp(p->name, (const xmlChar*)"look") == 0){
@@ -448,7 +453,7 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 							}
 						}
 						else{
-							std::cout << "Warning: [Monsters::loadMonster] name attribute is missing - " << file << std::endl;
+							std::cout << "Warning: [Monsters::loadMonster] attack name attribute is missing - " << file << std::endl;
 						}
 					}
 
@@ -503,7 +508,7 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 							}
 						}
 						else{
-							std::cout << "Warning: [Monsters::loadMonster] name attribute is missing - " << file << std::endl;
+							std::cout << "Warning: [Monsters::loadMonster] defense name attribute is missing - " << file << std::endl;
 						}
 					}
 

@@ -113,7 +113,7 @@ public:
 	virtual void removeList() = 0;
 	virtual void addList() = 0;
 
-	virtual bool canSee(const Position& pos) const = 0;
+	virtual bool canSee(const Position& pos) const;
 
 	unsigned long getExpForLv(const int& lv) const
 	{ 

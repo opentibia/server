@@ -159,6 +159,9 @@ Npc::~Npc()
 
 bool Npc::canSee(const Position& pos) const
 {
+	return Creature::canSee(pos);
+
+	/*
 	const Position& myPos = getPosition();
 
 	if(pos.z != myPos.z){
@@ -167,6 +170,7 @@ bool Npc::canSee(const Position& pos) const
 
 	return (std::abs(myPos.x - pos.x) <= Map::maxViewportX &&
 					std::abs(myPos.y - pos.y) <= Map::maxViewportY);
+	*/
 }
 
 std::string Npc::getDescription(int32_t lookDistance) const

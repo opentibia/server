@@ -234,8 +234,8 @@ bool Commands::placeNpc(Creature* creature, const std::string& cmd, const std::s
 		delete npc;
 		Player* player = creature->getPlayer();
 		if(player){
-			player->sendMagicEffect(player->getPosition(), NM_ME_PUFF);
 			player->sendCancelMessage(RET_NOTENOUGHROOM);
+			game->addMagicEffect(creature->getPosition(), NM_ME_PUFF);
 		}
 		return true;
 	}
@@ -245,8 +245,14 @@ bool Commands::placeNpc(Creature* creature, const std::string& cmd, const std::s
 
 bool Commands::placeMonster(Creature* creature, const std::string& cmd, const std::string& param)
 {
+	Player* player = creature->getPlayer();
+
 	Monster* monster = Monster::createMonster(param);
 	if(!monster){
+		if(player){
+			player->sendCancelMessage(RET_NOTPOSSIBLE);
+			game->addMagicEffect(player->getPosition(), NM_ME_PUFF);
+		}
 		return false;
 	}
 
@@ -257,10 +263,9 @@ bool Commands::placeMonster(Creature* creature, const std::string& cmd, const st
 	}
 	else{
 		delete monster;
-		Player* player = creature->getPlayer();
 		if(player){
 			player->sendCancelMessage(RET_NOTENOUGHROOM);
-			player->sendMagicEffect(player->getPosition(), NM_ME_PUFF);
+			game->addMagicEffect(player->getPosition(), NM_ME_PUFF);
 		}
 	}
 
@@ -291,35 +296,11 @@ bool Commands::placeSummon(Creature* creature, const std::string& cmd, const std
 	if(ret != RET_NOERROR){
 		if(Player* player = creature->getPlayer()){
 			player->sendCancelMessage(ret);
-			player->sendMagicEffect(player->getPosition(), NM_ME_PUFF);
+			g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 		}
 	}
 
 	return (ret == RET_NOERROR);
-
-	/*
-	Monster* monster = Monster::createMonster(param);
-	if(!monster){
-		return false;
-	}
-	
-	// Place the monster
-	creature->addSummon(monster);
-	if(game->placeCreature(creature->getPosition(), monster)){
-		return true;
-	}
-	else{
-		creature->removeSummon(monster);
-		//delete monster;
-
-		if(Player* player = creature->getPlayer()) {
-			player->sendMagicEffect(player->getPosition(), NM_ME_PUFF);
-			player->sendCancelMessage(RET_NOTENOUGHROOM);
-		}
-	}
-
-	return false;
-	*/
 }
 
 bool Commands::broadcastMessage(Creature* creature, const std::string& cmd, const std::string& param)

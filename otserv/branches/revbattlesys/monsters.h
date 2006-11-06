@@ -74,11 +74,8 @@ public:
 	int experience;
 	int armor;
 	int defense;
-	bool hasDistanceAttack;
 	bool canPushItems;
-	unsigned long staticLook;
 	unsigned long staticAttack;
-	unsigned short changeTargetChance;  
 	int maxSummons;
 	int targetDistance;
 	int runAwayHealth;
@@ -95,7 +92,7 @@ public:
 	
 	int lightLevel;
 	int lightColor;
-	
+		
 	SummonList summonList;
 	LootItems lootItems;
 	SpellList spellAttackList;
@@ -108,7 +105,10 @@ public:
 	uint32_t yellChance;
 	uint32_t yellSpeedTicks;
 	VoiceVector voiceVector;
-	
+
+	int32_t changeTargetSpeed;
+	int32_t changeTargetChance;
+
 	void createLoot(Container* corpse);
 	void createLootContainer(Container* parent, const LootBlock& lootblock);
 	Item* createLootItem(const LootBlock& lootblock);

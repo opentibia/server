@@ -91,6 +91,7 @@ private:
 	uint32_t yellTicks;
 	uint32_t attackTicks;
 	uint32_t defenseTicks;
+	int32_t changeTargetTicks;
 	std::string strDescription;
 	bool needThink;
 	bool targetIsRecentAdded;
@@ -109,6 +110,7 @@ private:
 	void stopThink();
 	void onThinkYell(uint32_t interval);
 	void onDefending(uint32_t interval);
+	void onThinkChangeTarget(uint32_t interval);
 
 	void onCreatureEnter(const Creature* creature);
 	void onCreatureLeave(const Creature* creature);
