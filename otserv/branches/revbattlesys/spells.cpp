@@ -26,6 +26,7 @@
 #include "spells.h"
 #include "combat.h"
 #include "commands.h"
+#include "monsters.h"
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
@@ -33,6 +34,7 @@
 #include <sstream>
 
 extern Game g_game;
+extern Monsters g_monsters;
 extern Vocations g_vocations;
 extern LuaScript g_config;
 
@@ -313,33 +315,39 @@ bool Spell::playerSpellCheck(const Player* player) const
 	}
 
 	if(player->hasCondition(CONDITION_EXHAUSTED)){
-		player->sendTextMessage(MSG_STATUS_SMALL, "You are exhausted.",player->getPosition(), NM_ME_PUFF);
+		player->sendCancelMessage(RET_YOUAREEXHAUSTED);
+		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 		return false;
 	}
 
 	if(player->getLevel() < level){
-		player->sendTextMessage(MSG_STATUS_SMALL, "You do not have enough level.",player->getPosition(), NM_ME_PUFF);
+		player->sendCancelMessage(RET_NOTENOUGHLEVEL);
+		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 		return false;
 	}
 
 	if(player->getMagicLevel() < magLevel){
-		player->sendTextMessage(MSG_STATUS_SMALL, "You do not have enough magic level.",player->getPosition(), NM_ME_PUFF);
+		player->sendCancelMessage(RET_NOTENOUGHMAGICLEVEL);
+		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 		return false;
 	}
 
 	if(player->getMana() < getManaCost(player)){
-		player->sendTextMessage(MSG_STATUS_SMALL, "You do not have enough mana.",player->getPosition(), NM_ME_PUFF);
+		player->sendCancelMessage(RET_NOTENOUGHMANA);
+		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 		return false;
 	}
 
-	if(player->getPlayerInfo(PLAYERINFO_SOUL) < soul){
-		player->sendTextMessage(MSG_STATUS_SMALL, "You do not have enough soul.",player->getPosition(), NM_ME_PUFF);
+	if(player->getPlayerInfo(PLAYERINFO_SOUL) < soul){		
+		player->sendCancelMessage(RET_NOTENOUGHSOUL);
+		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 		return false;
 	}
 
 	if(!vocSpellMap.empty()){
 		if(vocSpellMap.find(player->getVocationId()) == vocSpellMap.end()){
-			player->sendTextMessage(MSG_STATUS_SMALL, "Your vocation cannot use this spell.",player->getPosition(), NM_ME_PUFF);
+			player->sendCancel("Your vocation cannot use this spell.");
+			g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 			return false;
 		}
 	}
@@ -447,14 +455,6 @@ void Spell::postCastSpell(Player* player) const
 		return;
 	}
 
-	int32_t manaCost = getManaCost(player);
-
-	if(manaCost > 0){
-		player->changeMana(-manaCost);
-		player->addManaSpent(manaCost);
-		player->sendStats();
-	}
-
 	if(exhaustion){
 		Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_EXHAUSTED, Spells::spellExhaustionTime, 0);
 		player->addCondition(condition);
@@ -465,13 +465,31 @@ void Spell::postCastSpell(Player* player) const
 		player->addCondition(condition);
 	}
 
+	int32_t manaCost = getManaCost(player);
+	int32_t soulCost = 0;
+	postCastSpell(player, manaCost, soulCost);
+}
+
+void Spell::postCastSpell(Player* player, uint32_t manaCost, uint32_t soulCost) const
+{
+	if(player->getAccessLevel() > 0){
+		return;
+	}
+
+	if(manaCost > 0){
+		player->changeMana(-manaCost);
+		player->addManaSpent(manaCost);
+		player->sendStats();
+	}
+
 	//TODO: reduce soul
 	/*
-	if(soul > 0){
+	if(soulCoust > 0){
 		player->changeSoul(-soul);
 	}
 	*/
 }
+
 
 int32_t Spell::getManaCost(const Player* player) const
 {
@@ -483,6 +501,15 @@ int32_t Spell::getManaCost(const Player* player) const
 		int32_t currentMana = player->getMana();
 		int32_t manaCost = currentMana * (((double)manaPercent) / 100);
 		return manaCost;
+	}
+
+	return 0;
+}
+
+int32_t Spell::getSoulCost(const Player* player) const
+{
+	if(soul != 0){
+		return soul;
 	}
 
 	return 0;
@@ -1035,15 +1062,43 @@ bool InstantSpell::SummonMonster(const InstantSpell* spell, Creature* creature, 
 		return false;
 	}
 
+	uint32_t mId = g_monsters.getIdByName(param);
+	if(!mId){
+		player->sendCancelMessage(RET_NOTPOSSIBLE);
+		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+		return false;
+	}
+
+	MonsterType* mType = g_monsters.getMonsterType(mId);
+	if(!mType){
+		player->sendCancelMessage(RET_NOTPOSSIBLE);
+		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+		return false;
+	}
+
+	if(player->getAccessLevel() == 0 && !mType->isSummonable){
+		player->sendCancelMessage(RET_NOTPOSSIBLE);
+		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+		return false;
+	}
+
+	int32_t manaCost = mType->manaSummonCost;
+	if(player->getMana() < manaCost){
+		player->sendCancelMessage(RET_NOTENOUGHMANA);
+		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+		return false;
+	}
+
 	if(player->getSummonCount() >= 2){
 		player->sendCancel("You cannot summon more creatures.");
 		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 		return false;
 	}
 
-	ReturnValue ret = Commands::placeSummon(player, param);
+	ReturnValue ret = Commands::placeSummon(creature, param);
 
 	if(ret == RET_NOERROR){
+		spell->postCastSpell(player, manaCost, spell->getSoulCost(player));
 		g_game.addMagicEffect(player->getPosition(), NM_ME_MAGIC_POISEN);
 	}
 	else{

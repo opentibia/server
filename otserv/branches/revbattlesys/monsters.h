@@ -93,6 +93,7 @@ public:
 	int lightLevel;
 	int lightColor;
 		
+	uint32_t manaSummonCost;
 	SummonList summonList;
 	LootItems lootItems;
 	SpellList spellAttackList;

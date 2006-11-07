@@ -737,6 +737,26 @@ void Player::sendCancelMessage(ReturnValue message) const
 		sendCancel("You are not allowed to shoot directly on players.");
 		break;
 
+	case RET_NOTENOUGHLEVEL:
+		sendCancel("You do not have enough level.");
+		break;
+
+	case RET_NOTENOUGHMAGICLEVEL:
+		sendCancel("You do not have enough magic level.");
+		break;
+
+	case RET_NOTENOUGHMANA:
+		sendCancel("You do not have enough mana.");
+		break;
+
+	case RET_NOTENOUGHSOUL:
+		sendCancel("You do not have enough soul");
+		break;
+
+	case RET_YOUAREEXHAUSTED:
+		sendCancel("You are exhausted.");
+		break;
+
 	case RET_CANONLYUSETHISRUNEONCREATURES:
 		sendCancel("You can only use this rune on creatures.");
 		break;

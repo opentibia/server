@@ -44,7 +44,7 @@ void MonsterType::reset()
 	experience = 0;
 	defense = 0;
 	canPushItems = false;
-	//staticAttack = 1;
+	staticAttack = 1;
 	maxSummons = 0;
 	targetDistance = 1;
 	runAwayHealth = 0;
@@ -68,6 +68,7 @@ void MonsterType::reset()
 	combatMeleeMin = 0;
 	combatMeleeMax = 0;
 
+	manaSummonCost = 0;
 	summonList.clear();
 	lootItems.clear();
 	spellAttackList.clear();
@@ -279,6 +280,10 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 			mType->isSummonable = (intValue != 0);
 		}
 		
+		if(readXMLInteger(root, "summonmana", intValue)){
+			mType->manaSummonCost = intValue;
+		}
+
 		if(readXMLInteger(root, "illusionable", intValue)){
 			mType->isIllusionable = (intValue != 0);
 		}

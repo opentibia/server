@@ -36,7 +36,6 @@ private:
 
 public:
 	static Monster* createMonster(const std::string& name);
-	static Monster* createMonster(const Creature* creature, const std::string& name);
 	virtual ~Monster();
 
 	virtual Monster* getMonster() {return this;};
@@ -85,6 +84,8 @@ public:
 	virtual uint32_t getFollowDistance() const;
 	virtual bool getFollowReachable() const;
 	virtual void getCombatValues(int32_t& min, int32_t& max);
+	
+	uint32_t getManaSummonCost() const {mType->manaSummonCost;}
 
 private:
 	int32_t thinkTicks;

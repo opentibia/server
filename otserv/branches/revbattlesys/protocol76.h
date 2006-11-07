@@ -160,8 +160,8 @@ private:
 	void sendCreatureInvisible(const Creature* creature);
 	void sendStats();
 	void sendTextMessage(MessageClasses mclass, const std::string& message);
-	void sendTextMessage(MessageClasses mclass, const std::string& message, const Position& pos,
-		unsigned char type);
+	//void sendTextMessage(MessageClasses mclass, const std::string& message, const Position& pos,
+	//	unsigned char type);
 	
 	void sendTradeItemRequest(const Player* player, const Item* item, bool ack);
 	void sendCloseTrade();

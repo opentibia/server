@@ -373,8 +373,8 @@ public:
 		{client->sendSkills();}
 	void sendTextMessage(MessageClasses mclass, const std::string& message) const
 		{client->sendTextMessage(mclass, message);}
-	void sendTextMessage(MessageClasses mclass, const std::string& message, const Position& pos, unsigned char type) const
-		{client->sendTextMessage(mclass, message, pos, type);}
+	/*void sendTextMessage(MessageClasses mclass, const std::string& message, const Position& pos, unsigned char type) const
+		{client->sendTextMessage(mclass, message, pos, type);}*/
 	void sendTextWindow(Item* item,const uint16_t maxlen, const bool canWrite) const
 		{client->sendTextWindow(item,maxlen,canWrite);}
 	void sendToChannel(Creature* creature, SpeakClasses type, const std::string& text, uint16_t channelId) const

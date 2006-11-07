@@ -274,7 +274,7 @@ bool Commands::placeMonster(Creature* creature, const std::string& cmd, const st
 
 ReturnValue Commands::placeSummon(Creature* creature, const std::string& name)
 {
-	Monster* monster = Monster::createMonster(creature, name);
+	Monster* monster = Monster::createMonster(name);
 	if(!monster){
 		return RET_NOTPOSSIBLE;
 	}
@@ -508,6 +508,7 @@ bool Commands::reloadInfo(Creature* creature, const std::string& cmd, const std:
 	}
 	else if(param == "spells"){
 		g_spells->reload();
+		g_monsters.reload();
 	}
 	else if(param == "weapons"){
 		g_weapons->reload();

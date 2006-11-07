@@ -85,13 +85,16 @@ public:
 	virtual bool castSpell(Creature* creature) = 0;
 	virtual bool castSpell(Creature* creature, Creature* target) = 0;
 
+	void postCastSpell(Player* player) const;
+	void postCastSpell(Player* player, uint32_t manaCost, uint32_t soulCost) const;
+
+	int32_t getManaCost(const Player* player) const;
+	int32_t getSoulCost(const Player* player) const;
+
 protected:
 	bool playerSpellCheck(const Player* player) const;
 	bool playerInstantSpellCheck(const Player* player, const Position& toPos);
 	bool playerRuneSpellCheck(const Player* player, const Position& toPos);
-	
-	void postCastSpell(Player* player) const;
-	int32_t getManaCost(const Player* player) const;
 	
 	bool enabled;
 	bool premium;

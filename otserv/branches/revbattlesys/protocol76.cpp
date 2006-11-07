@@ -1208,6 +1208,7 @@ void Protocol76::sendTextMessage(MessageClasses mclass, const std::string& messa
 	WriteBuffer(msg);
 }
 
+/*
 void Protocol76::sendTextMessage(MessageClasses mclass, const std::string& message,
 	const Position& pos, unsigned char type)
 {
@@ -1216,6 +1217,7 @@ void Protocol76::sendTextMessage(MessageClasses mclass, const std::string& messa
 	AddTextMessage(msg,mclass, message);
 	WriteBuffer(msg);
 }
+*/
 
 void Protocol76::sendChannelsDialog()
 {
