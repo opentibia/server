@@ -571,7 +571,7 @@ void Monster::onThinkChangeTarget(uint32_t interval)
 		if(mType->changeTargetSpeed >= changeTargetTicks){
 			changeTargetTicks = 0;
 
-			if(mType->changeTargetChance >= (uint32_t)random_range(0, 100)){
+			if(mType->changeTargetChance >= random_range(0, 100)){
 				searchTarget();
 			}
 		}

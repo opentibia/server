@@ -2666,8 +2666,8 @@ int LuaScriptInterface::luaSetConditionFormula(lua_State *L)
 
 	uint32_t conditionId = popNumber(L);
 
-	Condition* condition = env->getConditionObject(conditionId);
-
+	ConditionSpeed* condition = dynamic_cast<ConditionSpeed*>(env->getConditionObject(conditionId));
+	
 	if(!condition){
 		reportErrorFunc(getErrorDesc(LUA_ERROR_CONDITION_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);

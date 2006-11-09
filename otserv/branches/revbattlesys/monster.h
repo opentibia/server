@@ -85,7 +85,7 @@ public:
 	virtual bool getFollowReachable() const;
 	virtual void getCombatValues(int32_t& min, int32_t& max);
 	
-	uint32_t getManaSummonCost() const {mType->manaSummonCost;}
+	uint32_t getManaSummonCost() const {return mType->manaSummonCost;}
 
 private:
 	int32_t thinkTicks;

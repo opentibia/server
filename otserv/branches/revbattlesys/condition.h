@@ -70,25 +70,15 @@ public:
 	ConditionType_t getType() const { return conditionType;}
 	int32_t getTicks() const { return ticks; }
 	void setTicks(int32_t newTicks) { ticks = newTicks; }
-	bool reduceTicks(int32_t interval);
 
 	static Condition* createCondition(ConditionId_t _id, ConditionType_t _type, int32_t ticks, int32_t param);
 
 	virtual bool setParam(ConditionParam_t param, int32_t value);
-	void setFormulaVars(double _mina, double _minb, double _maxa, double _maxb);
 
 protected:
-	void Condition::getFormulaValues(int32_t var, int32_t& min, int32_t& max) const;
-
 	ConditionId_t id;
 	int32_t ticks;
 	ConditionType_t conditionType;
-
-	//formula variables
-	double mina;
-	double minb;
-	double maxa;
-	double maxb;
 };
 
 class ConditionGeneric: public Condition
@@ -206,8 +196,18 @@ public:
 
 	virtual bool setParam(ConditionParam_t param, int32_t value);
 	
-protected:
+	void setFormulaVars(float _mina, float _minb, float _maxa, float _maxb);
+	
+protected:	
+	void getFormulaValues(int32_t var, int32_t& min, int32_t& max) const;
+	
 	int32_t speedDelta;
+	
+	//formula variables
+	float mina;
+	float minb;
+	float maxa;
+	float maxb;
 };
 
 class ConditionOutfit: public Condition

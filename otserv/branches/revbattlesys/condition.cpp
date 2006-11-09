@@ -31,10 +31,7 @@ id(_id),
 ticks(_ticks),
 conditionType(_type)
 {
-	mina = 0.0;
-	minb = 0.0;
-	maxa = 0.0;
-	maxb = 0.0;
+	//
 }
 
 bool Condition::setParam(ConditionParam_t param, int32_t value)
@@ -53,31 +50,6 @@ bool Condition::setParam(ConditionParam_t param, int32_t value)
 	}
 
 	return false;
-}
-
-void Condition::setFormulaVars(double _mina, double _minb, double _maxa, double _maxb)
-{
-	mina = _mina;
-	minb = _minb;
-	maxa = _maxa;
-	maxb = _maxb;
-}
-
-void Condition::getFormulaValues(int32_t var, int32_t& min, int32_t& max) const
-{
-	min = (int32_t)std::ceil(var * 1. * mina + minb);
-	max = (int32_t)std::ceil(var * 1. * maxa + maxb);
-}
-
-bool Condition::reduceTicks(int32_t interval)
-{
-	ticks = ticks - interval;
-	if(ticks > 0){
-		return true;
-	}
-	else{
-		return false;
-	}
 }
 
 bool Condition::executeCondition(Creature* creature, int32_t interval)
@@ -499,6 +471,24 @@ ConditionSpeed::ConditionSpeed(ConditionId_t _id, ConditionType_t _type, int32_t
 Condition(_id, _type, _ticks)
 {
 	speedDelta = changeSpeed;
+	mina = 0.0f;
+	minb = 0.0f;
+	maxa = 0.0f;
+	maxb = 0.0f;
+}
+
+void ConditionSpeed::setFormulaVars(float _mina, float _minb, float _maxa, float _maxb)
+{
+	mina = _mina;
+	minb = _minb;
+	maxa = _maxa;
+	maxb = _maxb;
+}
+
+void ConditionSpeed::getFormulaValues(int32_t var, int32_t& min, int32_t& max) const
+{
+	min = (int32_t)std::ceil(var * 1.f * mina + minb);
+	max = (int32_t)std::ceil(var * 1.f * maxa + maxb);
 }
 
 bool ConditionSpeed::setParam(ConditionParam_t param, int32_t value)
@@ -666,4 +656,3 @@ uint8_t ConditionOutfit::getIcons() const
 {
 	return 0;
 }
-

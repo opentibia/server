@@ -499,7 +499,7 @@ int32_t Spell::getManaCost(const Player* player) const
 
 	if(manaPercent != 0){
 		int32_t currentMana = player->getMana();
-		int32_t manaCost = currentMana * (((double)manaPercent) / 100);
+		int32_t manaCost = (currentMana * manaPercent)/100;
 		return manaCost;
 	}
 
@@ -1456,7 +1456,6 @@ bool RuneSpell::executeCastSpell(Creature* creature, const LuaVariant& var)
 	env->setRealPos(creature->getPosition());
 		
 	lua_State* L = m_scriptInterface->getLuaState();
-	int size0 = lua_gettop(L);
 		
 	uint32_t cid = env->addThing(creature);
 
@@ -1473,10 +1472,5 @@ bool RuneSpell::executeCastSpell(Creature* creature, const LuaVariant& var)
 	if(m_scriptInterface->callFunction(2, result) == false){
 		isSuccess = false;
 	}
-	
-	if(size0 != lua_gettop(L)){
-		LuaScriptInterface::reportError(NULL, "Stack size changed!");
-	}
-
 	return isSuccess;
 }
