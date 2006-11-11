@@ -70,7 +70,7 @@ protected:
 
 typedef bool (InstantSpellFunction)(const InstantSpell* spell, Creature* creature, const std::string& param);
 typedef bool (ConjureSpellFunction)(const ConjureSpell* spell, Creature* creature, const std::string& param);
-typedef bool (RuneSpellFunction)(const RuneSpell* spell, Creature* creature, Item* item, const Position& posFrom, const Position& posTo, Creature* target);
+typedef bool (RuneSpellFunction)(const RuneSpell* spell, Creature* creature, Item* item, const Position& posFrom, const Position& posTo);
 
 class Spell
 {
@@ -90,6 +90,9 @@ public:
 
 	int32_t getManaCost(const Player* player) const;
 	int32_t getSoulCost(const Player* player) const;
+
+	static ReturnValue CreateIllusion(Creature* creature, const std::string& name, int32_t time);
+	static ReturnValue CreateIllusion(Creature* creature, uint32_t itemId, int32_t time);
 
 protected:
 	bool playerSpellCheck(const Player* player) const;
@@ -133,7 +136,9 @@ public:
 
 	//scripting
 	bool executeCastSpell(Creature* creature, const LuaVariant& var);
-	
+
+	static Position getCasterPosition(Creature* creature);
+
 protected:	
 	virtual std::string getScriptEventName();
 	
@@ -143,11 +148,12 @@ protected:
 	static InstantSpellFunction HouseKick;
 	static InstantSpellFunction SearchPlayer;
 	static InstantSpellFunction SummonMonster;
+	static InstantSpellFunction Levitate;
+	static InstantSpellFunction Illusion;
 	
 	static House* getHouseFromPos(Creature* creature);
 	
 	bool internalCastSpell(Creature* creature, const LuaVariant& var);
-	Position getCasterPosition(Creature* creature);
 	
 	bool needDirection;
 	bool hasParam;
@@ -215,6 +221,8 @@ public:
 protected:
 	virtual std::string getScriptEventName();
 	
+	static RuneSpellFunction Illusion;
+
 	bool internalCastSpell(Creature* creature, const LuaVariant& var);
 
 	bool hasCharges;

@@ -31,11 +31,14 @@
 #include "housetile.h"
 #include "status.h"
 #include "combat.h"
+#include "spells.h"
 #include "condition.h"
+#include "monsters.h"
 #include "baseevents.h"
 #include "ioplayer.h"
 
 extern Game g_game;
+extern Monsters g_monsters;
 extern LuaScript g_config;
 
 enum LUA_RET_CODE{
@@ -974,6 +977,8 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "isPlayer", LuaScriptInterface::luaIsPlayer);
 	//isContainer(uid)
 	lua_register(m_luaState, "isContainer", LuaScriptInterface::luaIsContainer);
+	//isMoveable(uid)
+	lua_register(m_luaState, "isMoveable", LuaScriptInterface::luaIsMoveable);
 
 	//getPlayerByName(name)
 	lua_register(m_luaState, "getPlayerByName", LuaScriptInterface::luaGetPlayerByName);
@@ -1070,9 +1075,16 @@ void LuaScriptInterface::registerFunctions()
 
 	//variantToNumber(var)
 	lua_register(m_luaState, "variantToNumber", LuaScriptInterface::luaVariantToNumber);
+	//variantToString(var)
+	lua_register(m_luaState, "variantToString", LuaScriptInterface::luaVariantToString);
 
 	//doChangeSpeed(cid, delta)
 	lua_register(m_luaState, "doChangeSpeed", LuaScriptInterface::luaDoChangeSpeed);
+
+	//doSetCreatureOutfit(cid, name, time)
+	lua_register(m_luaState, "doSetCreatureOutfit", LuaScriptInterface::luaSetCreatureOutfit);
+	//doSetItemOutfit(cid, item, time)
+	lua_register(m_luaState, "doSetItemOutfit", LuaScriptInterface::luaSetItemOutfit);
 
 	//debugPrint(text)
 	lua_register(m_luaState, "debugPrint", LuaScriptInterface::luaDebugPrint);
@@ -3146,6 +3158,25 @@ int LuaScriptInterface::luaVariantToNumber(lua_State *L)
 	return 1;
 }
 
+int LuaScriptInterface::luaVariantToString(lua_State *L)
+{
+	//variantToString(var)
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	uint32_t variant = popNumber(L);
+	const LuaVariant* var = env->getVariant(variant);
+
+	std::string text = "";
+
+	if(var && var->type == VARIANT_STRING){
+		text = var->text;
+	}
+
+	lua_pushstring(L, text.c_str());
+	return 1;
+}
+
 int LuaScriptInterface::luaDoChangeSpeed(lua_State *L)
 {
 	//doChangeSpeed(cid, delta)
@@ -3164,6 +3195,64 @@ int LuaScriptInterface::luaDoChangeSpeed(lua_State *L)
 	}
 
 	g_game.changeSpeed(creature, delta);
+
+	lua_pushnumber(L, LUA_NO_ERROR);
+	return 1;
+}
+
+int LuaScriptInterface::luaSetCreatureOutfit(lua_State *L)
+{
+	//doSetCreatureOutfit(cid, name, time)
+
+	int32_t time = (int32_t)popNumber(L);
+	std::string name = popString(L);
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Creature* creature = env->getCreatureByUID(cid);
+
+	if(!creature){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+	
+	ReturnValue ret = Spell::CreateIllusion(creature, name, time);
+
+	if(ret != RET_NOERROR){
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
+	lua_pushnumber(L, LUA_NO_ERROR);
+	return 1;
+}
+
+int LuaScriptInterface::luaSetItemOutfit(lua_State *L)
+{
+	//doSetItemOutfit(cid, item, time)
+
+	int32_t time = (int32_t)popNumber(L);
+	uint32_t item = (uint32_t)popNumber(L);
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Creature* creature = env->getCreatureByUID(cid);
+
+	if(!creature){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
+	ReturnValue ret = Spell::CreateIllusion(creature, item, time);
+
+	if(ret != RET_NOERROR){
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
 
 	lua_pushnumber(L, LUA_NO_ERROR);
 	return 1;
@@ -3345,6 +3434,25 @@ int LuaScriptInterface::luaIsContainer(lua_State *L)
 	return 1;
 }
 	
+int LuaScriptInterface::luaIsMoveable(lua_State *L)
+{
+	//isMoveable(uid)
+	uint32_t uid = popNumber(L);
+	
+	ScriptEnviroment* env = getScriptEnv();
+	
+	Thing* thing = env->getThingByUID(uid);
+	
+	if(thing && thing->isPushable()){
+		lua_pushnumber(L, LUA_TRUE);
+	}
+	else{
+		lua_pushnumber(L, LUA_FALSE);
+	}
+
+	return 1;
+}
+
 int LuaScriptInterface::luaGetPlayerByName(lua_State *L)
 {
 	//getPlayerByName(name)

@@ -83,7 +83,9 @@ public:
 	int base_speed;
 	int health;
 	int health_max;
-	int lookhead, lookbody, looklegs, lookfeet, looktype, lookcorpse, lookmaster;
+	Outfit_t outfit;
+	int32_t lookcorpse;
+	//int lookhead, lookbody, looklegs, lookfeet, looktype, lookcorpse, lookmaster;
 	int conditionImmunities;
 	int damageImmunities;
 	RaceType_t race;

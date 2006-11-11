@@ -62,12 +62,8 @@ Creature()
 	targetIsRecentAdded = false;
 	
 	mType = _mtype;
-	defaultOutfit.lookHead = mType->lookhead;
-	defaultOutfit.lookBody = mType->lookbody;
-	defaultOutfit.lookLegs = mType->looklegs;
-	defaultOutfit.lookFeet = mType->lookfeet;
-	defaultOutfit.lookType = mType->looktype;
-	currentOutfit = defaultOutfit;
+	defaultOutfit = mType->outfit;
+	currentOutfit = mType->outfit;
 
 	health     = mType->health;
 	healthMax  = mType->health_max;

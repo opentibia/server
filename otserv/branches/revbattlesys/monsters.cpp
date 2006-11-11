@@ -53,13 +53,13 @@ void MonsterType::reset()
 	
 	health = 100;
 	health_max = 100;
-	lookhead = 10;
-	lookbody = 10;
-	looklegs = 10;
-	lookfeet = 10;
-	looktype = 10;
+	outfit.lookHead = 10;
+	outfit.lookBody = 10;
+	outfit.lookLegs = 10;
+	outfit.lookFeet = 10;
+	outfit.lookType = 10;
 	lookcorpse = 0;
-	lookmaster = 10;
+	//lookmaster = 10;
 	damageImmunities = 0;
 	conditionImmunities = 0;
 	lightLevel = 0;
@@ -363,24 +363,24 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 			else if(xmlStrcmp(p->name, (const xmlChar*)"look") == 0){
 
 				if(readXMLInteger(p, "type", intValue)){
-					mType->looktype = intValue;
-					mType->lookmaster = mType->looktype;
+					mType->outfit.lookType = intValue;
+					//mType->lookmaster = mType->looktype;
 				}
 
 				if(readXMLInteger(p, "head", intValue)){
-					mType->lookhead = intValue;
+					mType->outfit.lookHead = intValue;
 				}
 
 				if(readXMLInteger(p, "body", intValue)){
-					mType->lookbody = intValue;
+					mType->outfit.lookBody = intValue;
 				}
 
 				if(readXMLInteger(p, "legs", intValue)){
-					mType->looklegs = intValue;
+					mType->outfit.lookLegs = intValue;
 				}
 
 				if(readXMLInteger(p, "feet", intValue)){
-					mType->lookfeet = intValue;
+					mType->outfit.lookFeet = intValue;
 				}
 
 				if(readXMLInteger(p, "corpse", intValue)){

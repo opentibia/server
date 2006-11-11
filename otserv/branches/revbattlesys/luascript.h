@@ -363,6 +363,7 @@ protected:
 	//type validation
 	static int luaIsPlayer(lua_State *L);
 	static int luaIsContainer(lua_State *L);
+	static int luaIsMoveable(lua_State *L);
 	
 	static int luaGetPlayerByName(lua_State *L);
 	
@@ -402,8 +403,12 @@ protected:
 	static int luaDoTargetCombatDispel(lua_State *L);
 
 	static int luaVariantToNumber(lua_State *L);
+	static int luaVariantToString(lua_State *L);
 
 	static int luaDoChangeSpeed(lua_State *L);
+
+	static int luaSetCreatureOutfit(lua_State *L);
+	static int luaSetItemOutfit(lua_State *L);
 
 	static int luaDebugPrint(lua_State *L);
 	static int luaIsInArray(lua_State *L);

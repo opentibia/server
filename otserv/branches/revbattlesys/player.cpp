@@ -705,6 +705,10 @@ void Player::sendCancelMessage(ReturnValue message) const
 		sendCancel("You are not invited.");
 		break;
 
+	case RET_CREATUREDOESNOTEXIST:
+		sendCancel("Creature does not exist.");
+		break;
+
 	case RET_DEPOTISFULL:
 		sendCancel("You cannot put more items in this depot.");
 		break;

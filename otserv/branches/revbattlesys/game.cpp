@@ -763,7 +763,7 @@ ReturnValue Game::internalMoveCreature(Creature* creature, Direction direction)
 		else{
 			//try go down
 			Tile* tmpTile = map->getTile(destPos);
-			if(creature->getPosition().z != 7 && (tmpTile == NULL || (tmpTile->ground == NULL && !tmpTile->hasProperty(BLOCKSOLID)))){
+			if(currentPos.z != 7 && (tmpTile == NULL || (tmpTile->ground == NULL && !tmpTile->hasProperty(BLOCKSOLID)))){
 				tmpTile = map->getTile(destPos.x, destPos.y, destPos.z + 1);
 
 				if(tmpTile && tmpTile->hasHeight(3)){
