@@ -86,7 +86,35 @@ bool Ban::isIpDisabled(SOCKET s)
 	return false;
 }
 
-void Ban::addConnectionAttempt(SOCKET s, bool isSuccess)
+bool Ban::acceptConnection(SOCKET s)
+{
+	OTSYS_THREAD_LOCK_CLASS lockClass(banLock);
+	unsigned long clientip = getIPSocket(s);
+
+	if(clientip == 0){
+		return false;
+	}
+
+	uint64_t currentTime = OTSYS_TIME();
+
+	IpConnectMap::iterator it = ipConnectMap.find(clientip);
+	if(it == ipConnectMap.end()){
+		ConnectBlock cb;
+		cb.lastConnection = currentTime;
+
+		ipConnectMap[clientip] = cb;
+		return true;
+	}
+
+	if(currentTime - it->second.lastConnection < 1000){
+		return false;
+	}
+
+	it->second.lastConnection = currentTime;
+	return true;
+}
+
+void Ban::addLoginAttempt(SOCKET s, bool isSuccess)
 {
 	OTSYS_THREAD_LOCK_CLASS lockClass(banLock);
 	unsigned long clientip = getIPSocket(s);
@@ -95,11 +123,11 @@ void Ban::addConnectionAttempt(SOCKET s, bool isSuccess)
 
 		IpLoginMap::iterator it = ipLoginMap.find(clientip);
 		if(it == ipLoginMap.end()){
-			LoginConnectionStruct lcs;
-			lcs.lastLoginTime = 0;
-			lcs.numberOfLogins = 0;
+			LoginBlock lb;
+			lb.lastLoginTime = 0;
+			lb.numberOfLogins = 0;
 
-			ipLoginMap[clientip] = lcs;
+			ipLoginMap[clientip] = lb;
 			it = ipLoginMap.find(clientip);
 		}
 

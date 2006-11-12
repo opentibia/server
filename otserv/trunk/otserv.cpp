@@ -227,7 +227,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 
 						bool isSuccess = accnumber != 0 && account.accnumber == accnumber &&
 							passwordTest(password, account.password);
-						g_bans.addConnectionAttempt(s, isSuccess);
+						g_bans.addLoginAttempt(s, isSuccess);
 
 						if(isSuccess){
 							// seems to be a successful load
@@ -318,7 +318,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 					bool isSuccess = IOAccount::instance()->getPassword(accnumber, name, acc_pass) &&
 						passwordTest(password,acc_pass);
 
-					g_bans.addConnectionAttempt(s, isSuccess);
+					g_bans.addLoginAttempt(s, isSuccess);
 
 					if(isSuccess){
 						bool isLocked = true;
@@ -860,9 +860,15 @@ int main(int argc, char *argv[])
 			}
 
 			SOCKET s = accept(listen_socket, NULL, NULL); // accept a new connection
+			OTSYS_SLEEP(100);
 
 			if(s > 0){
-				OTSYS_CREATE_THREAD(ConnectionHandler, (void*)&s);
+				if(g_bans.acceptConnection(s)){
+					OTSYS_CREATE_THREAD(ConnectionHandler, (void*)&s);
+				}
+				else{
+					closesocket(s);
+				}
 			}
 			else{
 				accept_errors++;
