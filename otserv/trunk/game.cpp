@@ -1645,7 +1645,7 @@ bool Game::playerBroadcastMessage(Player* player, const std::string& text)
 		return false;
 
 	for(AutoList<Player>::listiterator it = Player::listPlayer.list.begin(); it != Player::listPlayer.list.end(); ++it){
-		(*it).second->onCreatureSay(player, SPEAK_BROADCAST, text);
+		(*it).second->sendCreatureSay(player, SPEAK_BROADCAST, text);
 	}
 
 	return true;

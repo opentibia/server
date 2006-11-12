@@ -33,7 +33,6 @@
 <command cmd="/town" access="1" />			-- Go to your town
 
 -- Players
-<command cmd="/exiva" access="0" />			-- Find a player
 <command cmd="/sellhouse" access="0" />		-- Sell your house to a player
 
 </commands>

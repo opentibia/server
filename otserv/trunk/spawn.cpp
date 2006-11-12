@@ -322,6 +322,9 @@ Monster* Spawn::respawn(unsigned long spawnid, Position& pos, std::string& name,
 		delete monster;
 		monster = NULL;
 	}
+	else{
+		std::cout << "[Spawn::respawn] Can not create monster " << name << std::endl;
+	}
 
 	return NULL;
 }

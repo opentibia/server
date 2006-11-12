@@ -942,25 +942,6 @@ void Player::onCreatureAppear(const Creature* creature, bool isLogin)
 	}
 }
 
-/*
-void Player::onCreatureDisappear(const Creature* creature)
-{
-	Creature::onCreatureDisappear(creature);
-
-	if(attackedCreature == creature){
-		setAttackedCreature(NULL);
-		sendCancelTarget();
-		sendTextMessage(MSG_STATUS_SMALL, "Target lost.");
-	}
-
-	if(followCreature == creature){
-		setFollowCreature(NULL);
-		sendCancelTarget();
-		sendTextMessage(MSG_STATUS_SMALL, "Target lost.");
-	}
-}
-*/
-
 void Player::onAttackedCreatureDissapear()
 {
 	sendCancelTarget();
@@ -1031,23 +1012,6 @@ void Player::onCreatureMove(const Creature* creature, const Position& newPos, co
 		}
 	}
 }
-
-/*
-void Player::onCreatureTurn(const Creature* creature, uint32_t stackPos)
-{
-  //
-}
-
-void Player::onCreatureChangeOutfit(const Creature* creature, const Outfit_t& outfit)
-{
-	//
-}
-
-void Player::onCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text)
-{
-	//
-}
-*/
 
 //container
 void Player::onAddContainerItem(const Container* container, const Item* item)

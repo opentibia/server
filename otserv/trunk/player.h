@@ -329,7 +329,6 @@ public:
 	virtual void onUpdateTile(const Position& pos);
 	
 	virtual void onCreatureAppear(const Creature* creature, bool isLogin);
-	//virtual void onCreatureDisappear(const Creature* creature);
 	virtual void onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout);
 	virtual void onCreatureMove(const Creature* creature, const Position& newPos, const Position& oldPos,
 		uint32_t oldStackPos, bool teleport);
@@ -556,7 +555,14 @@ protected:
 #endif
 	
 	void updateItemsLight(bool internal = false);
-	void updateBaseSpeed() {baseSpeed = 220 + (2* (level - 1));}
+	void updateBaseSpeed(){ 
+		if(getAccessLevel() == 0){
+			baseSpeed = 220 + (2* (level - 1));
+		}
+		else{
+			baseSpeed = 900;
+		};
+	}
 
 	virtual int32_t getLostExperience() const { return (int32_t)std::floor(((double)experience * 0.1));}	
 	virtual void dropLoot(Container* corpse);

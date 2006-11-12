@@ -383,7 +383,7 @@ bool Monster::getNextStep(Direction& dir)
 		const Position& position = getPosition();
 		*/
 
-		const Position& pos = Spells::getCasterPosition(this, dir)
+		const Position& pos = Spells::getCasterPosition(this, dir);
 		Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
 
 		if(tile){

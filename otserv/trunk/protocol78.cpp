@@ -17,7 +17,7 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
-
+#include "otpch.h"
 
 #include "definitions.h"
 
@@ -2048,7 +2048,7 @@ void Protocol78::AddCreatureSpeak(NetworkMessage& msg,const Creature* creature, 
 	else{
 		msg.AddU16(0);
 	}
-
+	msg.AddByte(type);
 	switch(type){
 		case SPEAK_SAY:
 		case SPEAK_WHISPER:
