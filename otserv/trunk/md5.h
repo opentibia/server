@@ -65,7 +65,7 @@ typedef struct {
 	unsigned char digest[16];     /* Actual digest after MD5Final call */
 } MD5_CTX;
 
-static void MD5_Transform (UINT4 *buf, UINT4 *in);
+void MD5_Transform (UINT4 *buf, UINT4 *in);
 
 void MD5Init(MD5_CTX *mdContext, unsigned long pseudoRandomNumber = 0);
 void MD5Update(MD5_CTX *mdContext, const unsigned char *inBuf, unsigned int inLen);

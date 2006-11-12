@@ -25,27 +25,26 @@
 #include "luascript.h"
 #include "templates.h"
 
-extern "C"
-{
-#include <lua.h>
-#include <lauxlib.h>
-#include <lualib.h>
-}
-
-
 //////////////////////////////////////////////////////////////////////
 // Defines an NPC...
 class Npc;
-class NpcScript : protected LuaScript{
-public:
-	NpcScript(std::string name, Npc* npc);
-	virtual ~NpcScript(){}
-	virtual void onCreatureAppear(unsigned long cid);
-	virtual void onCreatureDisappear(int cid);
 
-	virtual void onCreatureSay(int cid, SpeakClasses, const std::string &text);
-	virtual void onThink();
-	static Npc* getNpc(lua_State *L);
+class NpcScriptInterface : public LuaScriptInterface
+{
+public:
+	NpcScriptInterface();
+	virtual ~NpcScriptInterface();
+
+	static void setNpc(Npc* npc);
+
+	bool loadNpcLib(std::string file);
+
+protected:
+	
+	static Npc* getNpc();
+	
+	virtual void registerFunctions();
+	
 	static int luaActionSay(lua_State *L);
 	static int luaActionMove(lua_State *L);
 	static int luaActionMoveTo(lua_State *L);
@@ -53,13 +52,52 @@ public:
 	static int luaCreatureGetName2(lua_State *L);
 	static int luaCreatureGetPos(lua_State *L);
 	static int luaSelfGetPos(lua_State *L);
+	static int luagetDistanceTo(lua_State *L);
 	
-	bool isLoaded(){return loaded;}
+private:
+	virtual bool initState();
+	virtual bool closeState();
+	
+	bool m_libLoaded;
+	static Npc* m_curNpc;
+};
 
+class NpcEventsHandler
+{
+public:
+	NpcEventsHandler(Npc* npc);
+	virtual ~NpcEventsHandler();
+	
+	virtual void onCreatureAppear(const Creature* creature){};
+	virtual void onCreatureDisappear(const Creature* creature){};
+	virtual void onCreatureSay(const Creature* creature, SpeakClasses, const std::string& text){};
+	virtual void onThink(){};
+	
+	bool isLoaded();
+	
 protected:
-	int registerFunctions();
-	Npc* npc;
-	bool loaded;
+	Npc* m_npc;
+	bool m_loaded;
+};
+
+class NpcScript : public NpcEventsHandler
+{
+public:
+	NpcScript(std::string file, Npc* npc);
+	virtual ~NpcScript();
+	
+	virtual void onCreatureAppear(const Creature* creature);
+	virtual void onCreatureDisappear(const Creature* creature);
+	virtual void onCreatureSay(const Creature* creature, SpeakClasses, const std::string& text);
+	virtual void onThink();
+	
+private:
+	NpcScriptInterface* m_scriptInterface;
+	
+	long m_onCreatureAppear;
+	long m_onCreatureDisappear;
+	long m_onCreatureSay;
+	long m_onThink;
 };
 
 class Npc : public Creature
@@ -73,18 +111,23 @@ public:
 
 	virtual bool isPushable() const { return true;};
 	
-	virtual unsigned long idRange(){ return 0x40000000;}
+	virtual uint32_t idRange(){ return 0x30000000;}
 	static AutoList<Npc> listNpc;
 	void removeList() {listNpc.removeList(getID());}
 	void addList() {listNpc.addList(this);}
 	
-	void speak(const std::string &text){};
-	const std::string& getName() const {return name;};
+	virtual bool canSee(const Position& pos) const;
+	
+	void speak(const std::string& text){};
+	virtual const std::string& getName() const {return name;};
+	virtual const std::string& getNameDescription() const {return name;};
 	
 	void doSay(std::string msg);
 	void doMove(Direction dir);
 	void doMoveTo(Position pos);
 	bool isLoaded(){return loaded;}
+	
+	NpcScriptInterface* getScriptInterface();
 	
 protected:
 	virtual void onAddTileItem(const Position& pos, const Item* item);
@@ -94,21 +137,23 @@ protected:
 
 	virtual void onCreatureAppear(const Creature* creature, bool isLogin);
 	virtual void onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout);
-	virtual void onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport);
+	virtual void onCreatureMove(const Creature* creature, const Position& newPos, const Position& oldPos,
+		uint32_t oldStackPos, bool teleport);
 
-	virtual void onCreatureTurn(const Creature *creature, uint32_t stackpos);
-	virtual void onCreatureSay(const Creature *creature, SpeakClasses type, const std::string &text);
-	virtual void onCreatureChangeOutfit(const Creature* creature);
-	virtual int onThink(int& newThinkTicks);
+	virtual void onCreatureTurn(const Creature* creature, uint32_t stackpos);
+	virtual void onCreatureSay(const Creature* creature, SpeakClasses type, const std::string& text);
+	virtual void onCreatureChangeOutfit(const Creature* creature, const Outfit_t& outfit);
+	virtual void onThink(uint32_t interval);
 	virtual std::string getDescription(int32_t lookDistance) const;
 	
 	virtual bool isAttackable() const { return false; };
 	
 	std::string name;
-	std::string scriptname;
-	NpcScript* script;
-	std::list<Position> route;
+	
+	NpcEventsHandler* m_npcEventHandler;
 	bool loaded;
+	
+	static NpcScriptInterface* m_scriptInterface;
 };
 
 #endif

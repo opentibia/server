@@ -341,7 +341,6 @@ bool ExceptionHandler::LoadMap(){
 	}
 	
 	char tofind[] = "0x";
-    char space[] = " ";
     char lib[] = ".a(";
     while(fgets(line, 1024, input)){
 		char* pos = strstr(line, lib);

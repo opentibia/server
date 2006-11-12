@@ -38,7 +38,7 @@ bool ConfigManager::loadFile(const std::string& _filename)
 
 	if(!L) return false;
 
-	if(lua_dofile(L, _filename.c_str()))
+	if(luaL_dofile(L, _filename.c_str()))
 	{
 		lua_close(L);
 		return false;
@@ -95,9 +95,11 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	m_confString[OTSERV_DB_HOST] = getGlobalString(L, "otserv_db_host", "default_db_host_here");
 	m_confInteger[OTSERV_DB_ENABLED] = getGlobalNumber(L, "otserv_db_enabled", 0);
 
+	/*
 	for(int i=0; i<4; ++i){
 		m_confVocationString[i] = getGlobalStringField(L, "vocations", i+1, "unknown");
 	}
+	*/
 
 	m_isLoaded = true;
 

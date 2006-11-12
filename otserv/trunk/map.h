@@ -19,8 +19,8 @@
 //////////////////////////////////////////////////////////////////////
 
 
-#ifndef __MAP_H__
-#define __MAP_H__
+#ifndef __OTSERV_MAP_H__
+#define __OTSERV_MAP_H__
 
 #include <queue>
 #include <bitset>
@@ -30,13 +30,12 @@
 #include "position.h"
 #include "item.h"
 #include "creature.h"
-#include "magic.h"
 #include "iomapserialize.h"
 
 #include "tools.h"
 #include "tile.h"
 
-class Creature;   // see creature.h
+class Creature;
 class Player;
 class Game;
 
@@ -46,97 +45,9 @@ class Tile;
 class Map;
 class IOMap;
 
-class Range{
-public:
-	Range(Position centerpos, bool multilevel = false){
-		setRange(centerpos, multilevel);
-	}
-
-	//Creates a union of 2 positions
-	//Should only be used when a player makes a move.
-	Range(const Position& pos1, const Position& pos2)
-	{
-		Position topleft(std::min(pos1.x, pos2.x), std::min(pos1.y, pos2.y), pos1.z);
-		Position bottomright(std::max(pos1.x, pos2.x), std::max(pos1.y, pos2.y), pos1.z);
-
-		setRange(topleft, true);
-
-		minRange.x = -9;
-		minRange.y = -7;
-		maxRange.x = std::max(topleft.x + 9, bottomright.x + 9) - topleft.x;
-		maxRange.y = std::max(topleft.y + 7, bottomright.y + 7) - topleft.y;
-	}
-
-	Range(Position centerpos, int minRangeX, int maxRangeX, int minRangeY, int maxRangeY, bool multilevel = true)
-	{
-		setRange(centerpos, multilevel);
-
-		minRange.x = -minRangeX;
-		minRange.y = -minRangeY;
-
-		maxRange.x = maxRangeX;
-		maxRange.y = maxRangeY;
-	}
-
-
-	Position centerpos;
-	Position minRange;
-	Position maxRange;
-
-	int zstep;
-	bool multilevel;
-
-private:
-	bool isUnderground() const{
-		return (centerpos.z > 7);
-	}
-
-	void setRange(Position pos, bool multilevel = false)
-	{
-		centerpos = pos;
-
-		//This is the maximum view that the viewer AND the viewers that is seeing the viewer :o
-		minRange.x = -9;
-		minRange.y = -7;
-
-		maxRange.x = 9;
-		maxRange.y = 7;
-
-		zstep = 1;
-
-		if(multilevel){
-			if(isUnderground()){
-				//8->15
-				minRange.z = std::min(centerpos.z + 2, MAP_MAX_LAYERS - 1);
-				maxRange.z = std::max(centerpos.z - 2, 0);
-
-				//minRange.z = std::min(centerpos.z + 2, MAP_MAX_LAYERS - 1);
-				//maxRange.z = std::max(centerpos.z - 2, 8);
-
-				zstep = -1;
-			}
-			else{
-				minRange.z = 7;
-				maxRange.z = 0;
-
-				if(centerpos.z == 7)
-					minRange.z = 9;
-				else if(centerpos.z == 6)
-					minRange.z = 8;
-
-				zstep = -1;
-			}
-		}
-		else{
-			minRange.z = centerpos.z;
-			maxRange.z = centerpos.z;
-		}
-	}
-};
-
 struct AStarNode{
 	/** Current position */
-	int x,y;
+	long x,y;
 	/** Parent of this node. Null if this is the rootnode */
 	AStarNode* parent;
 	/** Heuristics variable */
@@ -159,7 +70,7 @@ public:
 	void closeNode(AStarNode* node);
 	unsigned long countClosedNodes();
 	unsigned long countOpenNodes();
-	bool isInList(unsigned long x, unsigned long y);
+	bool isInList(long x, long y);
 private:
 	AStarNode nodes[MAX_NODES];
 	std::bitset<MAX_NODES> openNodes;
@@ -187,6 +98,9 @@ class Map
 public:
 	Map();
 	~Map();
+    
+	static int32_t maxViewportX;
+	static int32_t maxViewportY;
 
 	/**
 	* Load a map.
@@ -208,8 +122,8 @@ public:
 	* \returns A pointer to that tile.
 	*/
 	Tile* getTile(uint16_t _x, uint16_t _y, uint8_t _z);
-	Tile* getTile(const Position &pos);
-
+	Tile* getTile(const Position& pos);
+    
 	/**
 	* Set a single tile.
 	* \param a tile to set for the
@@ -222,8 +136,8 @@ public:
   * \param creature Creature to place on the map
   * \param forceLogin If true, placing the creature will not fail becase of obstacles (creatures/chests)
 	*/
-	bool placeCreature(const Position &pos, Creature* creature, bool forceLogin = false);
-
+	bool placeCreature(const Position& pos, Creature* creature, bool forceLogin = false);
+	
 	/**
 	* Remove a creature from the map.
 	* \param c Creature pointer to the creature to remove
@@ -238,8 +152,6 @@ public:
 	*/
 	bool canThrowObjectTo(const Position& fromPos, const Position& toPos);
 
-	bool isPathValid(Creature* creature, const std::list<Position>& path, int pathSize = -1);
-
 	/**
 	* Get the path to a specific position on the map.
 	* \param creature The creature that wants a route
@@ -247,9 +159,8 @@ public:
 	* \param to The destination position
 	* \returns A list of all positions you have to traverse to reach the destination
 	*/
-	std::list<Position> getPathTo(Creature* creature, Position start, Position to, int maxNodeSize = 100);
-
-	bool getPathTo(Creature* creature, Position toPosition, std::list<Direction>& listDir);
+	bool getPathTo(const Creature* creature, Position toPosition, std::list<Direction>& listDir);
+	bool isPathValid(const Creature* creature, const std::list<Direction>& listDir, const Position& destPos);
 
 	/* Map Width and Height - for Info purposes */
 	int mapwidth, mapheight;
@@ -272,9 +183,10 @@ protected:
 	std::string mapStoreIdentifier;
 	std::string houseStoreIdentifier;
 
-	/**
-	* Get the Creatures within a specific Range */
-	void getSpectators(const Range& range, SpectatorVec& list);
+	void getSpectators(SpectatorVec& list, const Position& centerPos, bool multifloor = false,
+		int32_t minRangeX = 0, int32_t maxRangeX = 0,
+		int32_t minRangeY = 0, int32_t maxRangeY = 0);
+
 
 	typedef std::map<unsigned long, Tile*> TileMap;
 	TileMap tileMaps[128][128];

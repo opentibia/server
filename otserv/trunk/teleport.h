@@ -39,7 +39,7 @@ public:
 	virtual bool readAttr(AttrTypes_t attr, PropStream& propStream);
 	virtual bool serializeAttr(PropWriteStream& propWriteStream);
 
-	void setDestPos(const Position &pos) {destPos = pos;};
+	void setDestPos(const Position& pos) {destPos = pos;};
 	const Position& getDestPos() const {return destPos;};
 
 	//cylinder implementations
@@ -59,8 +59,8 @@ public:
 
 	virtual void __removeThing(Thing* thing, uint32_t count);
 
-	virtual void postAddNotification(Thing* thing, bool hasOwnership = true);
-	virtual void postRemoveNotification(Thing* thing, bool isCompleteRemoval, bool hadOwnership = true);
+	virtual void postAddNotification(Thing* thing, int32_t index, cylinderlink_t link = LINK_OWNER);
+	virtual void postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, cylinderlink_t link = LINK_OWNER);
 
 private:
 	Position destPos;

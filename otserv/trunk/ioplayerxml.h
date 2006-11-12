@@ -22,6 +22,8 @@
 #ifndef __OTSERV_IOPLAYERXML_H__
 #define __OTSERV_IOPLAYERXML_H__
 
+#include "definitions.h"
+
 class Player;
 
 /** Baseclass for all Player-Loaders */
@@ -43,7 +45,7 @@ public:
 
 	virtual bool getGuidByName(unsigned long& guid, std::string& name);
 	virtual bool getGuidByNameEx(unsigned long& guid, unsigned long& alvl, std::string& name);
-	virtual bool getNameByGuid(unsigned long guid, std::string &name);
+	virtual bool getNameByGuid(unsigned long guid, std::string& name);
 	virtual bool getGuildIdByName(unsigned long& guildId, const std::string& guildName);
 	virtual bool playerExists(std::string name);
 

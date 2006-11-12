@@ -34,7 +34,7 @@ class IOAccountSQL : protected IOAccount {
 	  * \returns Name of the source*/
 	virtual char* getSourceDescription(){return "Account source: SQL";};
 	virtual Account loadAccount(unsigned long accno);
-	virtual bool getPassword(unsigned long accno, const std::string &name, std::string &password);
+	virtual bool getPassword(unsigned long accno, const std::string& name, std::string& password);
 	
 	IOAccountSQL();
 	virtual ~IOAccountSQL(){};

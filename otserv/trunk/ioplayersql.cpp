@@ -35,8 +35,10 @@ extern ConfigManager g_config;
 
 typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 
+#ifndef __GNUC__
 #pragma warning( disable : 4005)
 #pragma warning( disable : 4996)
+#endif
 
 IOPlayerSQL::IOPlayerSQL()
 {
@@ -94,33 +96,30 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 	}
 	#endif
 
-	player->vocation = (playervoc_t)result.getDataInt("vocation");
-	player->access = result.getDataInt("access");
-	player->setNormalSpeed();
-
+	player->setVocation(result.getDataInt("vocation"));
+	player->accessLevel = result.getDataInt("access");
+	player->updateBaseSpeed();
+	
 	player->mana = result.getDataInt("mana");
-	player->manamax = result.getDataInt("manamax");
-	player->manaspent = result.getDataInt("manaspent");
-	player->maglevel = result.getDataInt("maglevel");
-	player->maglevel_percent  = (unsigned char)(100*(player->manaspent/(1.*player->getReqMana(player->maglevel+1, player->vocation))));
+	player->manaMax = result.getDataInt("manamax");
+	player->manaSpent = result.getDataInt("manaspent");
+	player->magLevel = result.getDataInt("maglevel");
 
 	player->health = result.getDataInt("health");
 	if(player->health <= 0)
 		player->health = 100;
 
-	player->healthmax = result.getDataInt("healthmax");
-	if(player->healthmax <= 0)
-		player->healthmax = 100;
+	player->healthMax = result.getDataInt("healthmax");
+	if(player->healthMax <= 0)
+		player->healthMax = 100;
 
-	player->food = result.getDataInt("food");
-
-	player->looktype = result.getDataInt("looktype");
-	player->lookmaster = player->looktype;
-	player->lookhead = result.getDataInt("lookhead");
-	player->lookbody = result.getDataInt("lookbody");
-	player->looklegs = result.getDataInt("looklegs");
-	player->lookfeet = result.getDataInt("lookfeet");
-	player->lookaddons = result.getDataInt("lookaddons");
+	player->defaultOutfit.lookType = result.getDataInt("looktype");
+	player->defaultOutfit.lookHead = result.getDataInt("lookhead");
+	player->defaultOutfit.lookBody = result.getDataInt("lookbody");
+	player->defaultOutfit.lookLegs = result.getDataInt("looklegs");
+	player->defaultOutfit.lookFeet = result.getDataInt("lookfeet");
+	player->defaultOutfit.lookAddons = result.getDataInt("lookaddons");
+	player->currentOutfit = player->defaultOutfit;
 
 	boost::char_separator<char> sep(";");
 
@@ -170,13 +169,10 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 	query << "SELECT * FROM skills WHERE player='" << player->getGUID() << "'";
 	if(mysql->storeQuery(query, result)){
 		//now iterate over the skills
-		for(int i=0; i < result.getNumRows(); ++i){
+		for(uint32_t i = 0; i < result.getNumRows(); ++i){
 			int skillid = result.getDataInt("id",i);
 			player->skills[skillid][SKILL_LEVEL] = result.getDataInt("skill",i);
 			player->skills[skillid][SKILL_TRIES] = result.getDataInt("tries",i);
-			player->skills[skillid][SKILL_PERCENT] = (unsigned int)(100*(player->skills[skillid][SKILL_TRIES])/(1.*player->getReqSkillTries(skillid, (player->skills[skillid][SKILL_LEVEL]+1), player->vocation)));
-			if(player->skills[skillid][SKILL_PERCENT] > 100)
-				player->skills[skillid][SKILL_PERCENT] = 100;
 		}
 	}
 
@@ -184,8 +180,8 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 	OTSERV_HASH_MAP<int,std::pair<Item*,int> > itemmap;
 	
 	query << "SELECT * FROM items WHERE player='" << player->getGUID() << "' ORDER BY sid ASC";
-	if(mysql->storeQuery(query, result) && (result.getNumRows() > 0)){
-		for(int i=0; i < result.getNumRows(); ++i){
+	if(mysql->storeQuery(query, result) && (result.getNumRows() > 0)){		
+		for(uint32_t i=0; i < result.getNumRows(); ++i){
 			int type = result.getDataInt("type",i);
 			int count = result.getDataInt("number",i);
 			Item* myItem = Item::CreateItem(type, count);
@@ -237,12 +233,13 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 
 	player->updateInventoryWeigth();
 	player->updateItemsLight(true);
+	player->setSkillsPercents();
 
 	//load storage map
 	query << "SELECT * FROM playerstorage WHERE player='" << player->getGUID() << "'";
 
 	if(mysql->storeQuery(query,result)){
-		for(int i=0; i < result.getNumRows(); ++i){
+		for(uint32_t i=0; i < result.getNumRows(); ++i){
 			unsigned long key = result.getDataInt("key",i);
 			long value = result.getDataInt("value",i);
 			player->addStorageValue(key,value);
@@ -250,9 +247,9 @@ bool IOPlayerSQL::loadPlayer(Player* player, std::string name)
 	}
 
 	//load vip
-	query << "SELECT vip_id FROM viplist WHERE player='" << player->getGUID() << "'";
+	query << "SELECT vip_id FROM viplist WHERE player='" << player->getGUID() << "'";		
 	if(mysql->storeQuery(query,result)){
-		for(int i=0; i < result.getNumRows(); ++i){
+		for(uint32_t i = 0; i < result.getNumRows(); ++i){
 			unsigned long vip_id = result.getDataInt("vip_id",i);
 			std::string dummy_str;
 			if(storeNameByGuid(*mysql, vip_id)){
@@ -292,26 +289,25 @@ bool IOPlayerSQL::savePlayer(Player* player)
 	//First, an UPDATE query to write the player itself
 	query << "UPDATE `players` SET ";
 	query << "`level` = " << player->level << ", ";
-	query << "`vocation` = " << (int)player->vocation << ", ";
+	query << "`vocation` = " << (int)player->getVocationId() << ", ";
 	query << "`health` = " << player->health << ", ";
-	query << "`healthmax` = " << player->healthmax << ", ";
+	query << "`healthmax` = " << player->healthMax << ", ";
 	query << "`direction` = " << (int)player->getDirection() << ", ";
 	query << "`experience` = " << player->experience << ", ";
-	query << "`lookbody` = " << player->lookbody << ", ";
-	query << "`lookfeet` = " << player->lookfeet << ", ";
-	query << "`lookhead` = " << player->lookhead << ", ";
-	query << "`looklegs` = " << player->looklegs << ", ";
-	query << "`looktype` = " << player->looktype << ", ";
-	query << "`lookaddons` = " << player->lookaddons << ", ";
-	query << "`maglevel` = " << player->maglevel << ", ";
+	query << "`lookbody` = " << (int)player->defaultOutfit.lookBody << ", ";
+	query << "`lookfeet` = " << (int)player->defaultOutfit.lookFeet << ", ";
+	query << "`lookhead` = " << (int)player->defaultOutfit.lookHead << ", ";
+	query << "`looklegs` = " << (int)player->defaultOutfit.lookLegs << ", ";
+	query << "`looktype` = " << (int)player->defaultOutfit.lookType << ", ";
+	query << "`lookaddons` = " << (int)player->defaultOutfit.lookAddons << ", ";
+	query << "`magLevel` = " << player->magLevel << ", ";
 	query << "`mana` = " << player->mana << ", ";
-	query << "`manamax` = " << player->manamax << ", ";
-	query << "`manaspent` = " << player->manaspent << ", ";
+	query << "`manamax` = " << player->manaMax << ", ";
+	query << "`manaspent` = " << player->manaSpent << ", ";
 	query << "`masterpos` = '" << player->masterPos.x<<";"<< player->masterPos.y<<";"<< player->masterPos.z << "', ";
 	query << "`pos` = '" << player->getLoginPosition().x<<";"<< player->getLoginPosition().y<<";"<< player->getLoginPosition().z << "', ";
-	query << "`speed` = " << player->speed << ", ";
+	query << "`speed` = " << player->baseSpeed << ", ";
 	query << "`cap` = " << player->getCapacity() << ", ";
-	query << "`food` = " << player->food << ", ";
 	query << "`sex` = " << player->sex << ", ";
 	query << "`lastlogin` = " << player->lastlogin << ", ";
 	query << "`lastip` = " << player->lastip << " ";
@@ -370,10 +366,10 @@ bool IOPlayerSQL::savePlayer(Player* player)
 	std::stringstream streamitems;
 	
 	for(int slotid = 1; slotid <= 10; ++slotid){
-		if(!player->items[slotid])
+		if(!player->inventory[slotid])
 			continue;
 
-		item = player->items[slotid];
+		item = player->inventory[slotid];
 		++runningID;
 
 		streamitems << "(" << player->getGUID() <<"," << slotid << ","<< runningID <<","<< parentid <<"," << item->getID()<<","<< (int)item->getItemCountOrSubtype() << "," <<
@@ -397,7 +393,7 @@ bool IOPlayerSQL::savePlayer(Player* player)
 		parentid = csPair.second;
 		stack.pop_front();
 
-		for(int i = 0; i < container->size(); i++){
+		for(uint32_t i = 0; i < container->size(); i++){
 			++runningID;
 			Item* item = container->getItem(i);
 			Container* container = item->getContainer();
@@ -442,7 +438,7 @@ bool IOPlayerSQL::savePlayer(Player* player)
 		parentid = csPair.second;
 		stack.pop_front();
 
-		for(int i = 0; i < container->size(); i++){
+		for(uint32_t i = 0; i < container->size(); i++){
 			++runningID;
 			Item* item = container->getItem(i);
 			Container* container = item->getContainer();
@@ -518,7 +514,7 @@ std::string IOPlayerSQL::getItems(Item* i, int &startid, int slot, int player,in
 	if(Container* c = i->getContainer()){
 		//std::cout << "c";
 		int pid = startid;
-		for(int i = 0; i < c->size(); i++){
+		for(uint32_t i = 0; i < c->size(); i++){
 			Item* item = c->getItem(i);
 			//std::cout << "s";
 			ss << getItems(item, startid, 0, player, pid);
@@ -547,7 +543,7 @@ bool IOPlayerSQL::storeNameByGuid(Database &mysql, unsigned long guid)
 	return true;
 }
 
-bool IOPlayerSQL::getNameByGuid(unsigned long guid, std::string &name)
+bool IOPlayerSQL::getNameByGuid(unsigned long guid, std::string& name)
 {
 	NameCacheMap::iterator it = nameCacheMap.find(guid);
 	if(it != nameCacheMap.end()){
@@ -573,7 +569,7 @@ bool IOPlayerSQL::getNameByGuid(unsigned long guid, std::string &name)
 	return true;
 }
 
-bool IOPlayerSQL::getGuidByName(unsigned long &guid, std::string &name)
+bool IOPlayerSQL::getGuidByName(unsigned long &guid, std::string& name)
 {
 	GuidCacheMap::iterator it = guidCacheMap.find(name);
 	if(it != guidCacheMap.end()){
@@ -602,7 +598,7 @@ bool IOPlayerSQL::getGuidByName(unsigned long &guid, std::string &name)
 }
 
 
-bool IOPlayerSQL::getGuidByNameEx(unsigned long &guid, unsigned long &alvl, std::string &name)
+bool IOPlayerSQL::getGuidByNameEx(unsigned long &guid, unsigned long &alvl, std::string& name)
 {
 	Database* mysql = Database::instance();
 	DBQuery query;

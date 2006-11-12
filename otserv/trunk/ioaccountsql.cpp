@@ -70,7 +70,7 @@ Account IOAccountSQL::loadAccount(unsigned long accno)
 	if(!mysql->storeQuery(query, result))
 		return acc;
 
-	for(int i = 0; i < result.getNumRows(); ++i){
+	for(uint32_t i = 0; i < result.getNumRows(); ++i){
 		std::string ss = result.getDataString("name", i);
 		acc.charList.push_back(ss.c_str());
 	}
@@ -100,7 +100,7 @@ bool IOAccountSQL::getPassword(unsigned long accno, const std::string &name, std
 	if(!mysql->storeQuery(query, result))
 		return false;
 
-	for(int i=0; i < result.getNumRows(); ++i)
+	for(uint32_t i = 0; i < result.getNumRows(); ++i)
 	{
 		std::string ss = result.getDataString("name", i);
 		if(ss == name){

@@ -93,7 +93,7 @@ public:
 	bool reload();
 	std::string getString(int _what) { return m_confString[_what]; };
 	int getNumber(int _what);
-	std::string getVocationString(int _vocation) { return m_confVocationString[_vocation-1]; };
+	//std::string getVocationString(int _vocation) { return m_confVocationString[_vocation-1]; };
 
 	bool setNumber(int _what, int _value);
 

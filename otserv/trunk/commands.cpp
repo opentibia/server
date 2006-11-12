@@ -38,14 +38,24 @@ typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 #include "ban.h"
 #include "configmanager.h"
 #include "town.h"
+#include "spells.h"
+#include "talkaction.h"
+#include "movement.h"
+#include "spells.h"
+#include "weapons.h"
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 
 extern ConfigManager g_config;
-extern Actions actions;
+extern Actions* g_actions;
 extern Monsters g_monsters;
 extern Ban g_bans;
+extern TalkActions* g_talkactions;
+extern MoveEvents* g_moveEvents;
+extern Spells* g_spells;
+extern Weapons* g_weapons;
+extern Game g_game;
 
 extern bool readXMLInteger(xmlNodePtr p, const char *tag, int &value);
 
@@ -76,7 +86,6 @@ s_defcommands Commands::defined_commands[] = {
 	{"/sellhouse",&Commands::sellHouse},
 	{"/gethouse",&Commands::getHouse},
 	{"/bans",&Commands::bansManager},
-	{"/exiva",&Commands::exivaPlayer},
 	{"/town",&Commands::teleportToTown},
 	{"/serverinfo",&Commands::serverInfo},
 };
@@ -87,7 +96,7 @@ game(igame),
 loaded(false)
 {
 	//setup command map
-	for(int i = 0; i < sizeof(defined_commands) / sizeof(defined_commands[0]); i++){
+	for(uint32_t i = 0; i < sizeof(defined_commands) / sizeof(defined_commands[0]); i++){
 		Command* cmd = new Command;
 		cmd->loaded = false;
 		cmd->accesslevel = 1;
@@ -198,17 +207,11 @@ bool Commands::exeCommand(Creature* creature, const std::string& cmd)
 
 	Player* player = creature->getPlayer();
 	//check access for this command
-	if(creature->access < it->second->accesslevel){
-		if(creature->access > 0){
-			if(player)
-				player->sendTextMessage(MSG_STATUS_SMALL, "You can not execute this command.");
-
-			return true;
-		}
-		else{
-			return false;
-		}
+	if(player && player->getAccessLevel() < it->second->accesslevel){
+		player->sendTextMessage(MSG_STATUS_SMALL, "You can not execute this command.");
+		return false;
 	}
+
 	//execute command
 	CommandFunc cfunc = it->second->f;
 	(this->*cfunc)(creature, str_command, str_param);
@@ -228,15 +231,15 @@ bool Commands::placeNpc(Creature* creature, const std::string& cmd, const std::s
 
 	// Place the npc
 	if(game->placeCreature(creature->getPosition(), npc)){
-		game->AddMagicEffectAt(creature->getPosition(), NM_ME_MAGIC_BLOOD);
+		game->addMagicEffect(creature->getPosition(), NM_ME_MAGIC_BLOOD);
 		return true;
 	}
 	else{
 		delete npc;
 		Player* player = creature->getPlayer();
 		if(player){
-			player->sendMagicEffect(player->getPosition(), NM_ME_PUFF);
 			player->sendCancelMessage(RET_NOTENOUGHROOM);
+			game->addMagicEffect(creature->getPosition(), NM_ME_PUFF);
 		}
 		return true;
 	}
@@ -246,51 +249,62 @@ bool Commands::placeNpc(Creature* creature, const std::string& cmd, const std::s
 
 bool Commands::placeMonster(Creature* creature, const std::string& cmd, const std::string& param)
 {
+	Player* player = creature->getPlayer();
+
 	Monster* monster = Monster::createMonster(param);
 	if(!monster){
+		if(player){
+			player->sendCancelMessage(RET_NOTPOSSIBLE);
+			game->addMagicEffect(player->getPosition(), NM_ME_PUFF);
+		}
 		return false;
 	}
 
 	// Place the monster
 	if(game->placeCreature(creature->getPosition(), monster)){
-		game->AddMagicEffectAt(creature->getPosition(), NM_ME_MAGIC_BLOOD);
+		game->addMagicEffect(creature->getPosition(), NM_ME_MAGIC_BLOOD);
 		return true;
 	}
 	else{
 		delete monster;
-		Player* player = creature->getPlayer();
 		if(player){
 			player->sendCancelMessage(RET_NOTENOUGHROOM);
-			player->sendMagicEffect(player->getPosition(), NM_ME_PUFF);
+			game->addMagicEffect(player->getPosition(), NM_ME_PUFF);
 		}
 	}
 
 	return false;
 }
 
-bool Commands::placeSummon(Creature* creature, const std::string& cmd, const std::string& param)
+ReturnValue Commands::placeSummon(Creature* creature, const std::string& name)
 {
-	Monster* monster = Monster::createMonster(param);
+	Monster* monster = Monster::createMonster(name);
 	if(!monster){
-		return false;
+		return RET_NOTPOSSIBLE;
 	}
 	
 	// Place the monster
 	creature->addSummon(monster);
-	if(game->placeCreature(creature->getPosition(), monster)){
-		return true;
-	}
-	else{
+	if(!g_game.placeCreature(creature->getPosition(), monster)){
 		creature->removeSummon(monster);
-		//delete monster;
+		return RET_NOTENOUGHROOM;
+	}
 
-		if(Player* player = creature->getPlayer()) {
-			player->sendMagicEffect(player->getPosition(), NM_ME_PUFF);
-			player->sendCancelMessage(RET_NOTENOUGHROOM);
+	return RET_NOERROR;
+}
+
+bool Commands::placeSummon(Creature* creature, const std::string& cmd, const std::string& param)
+{
+	ReturnValue ret = placeSummon(creature, param);
+
+	if(ret != RET_NOERROR){
+		if(Player* player = creature->getPlayer()){
+			player->sendCancelMessage(ret);
+			g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 		}
 	}
 
-	return false;
+	return (ret == RET_NOERROR);
 }
 
 bool Commands::broadcastMessage(Creature* creature, const std::string& cmd, const std::string& param)
@@ -307,6 +321,7 @@ bool Commands::banPlayer(Creature* creature, const std::string& cmd, const std::
 {	
 	Player* playerBan = game->getPlayerByName(param);
 	if(playerBan) {
+		/*
 		MagicEffectClass me;
 		
 		me.animationColor = 0xB4;
@@ -316,9 +331,10 @@ bool Commands::banPlayer(Creature* creature, const std::string& cmd, const std::
 		me.offensive = true;
 
 		game->creatureMakeMagic(NULL, playerBan->getPosition(), &me);
+		*/
 
 		Player* player = creature->getPlayer();
-		if(player && player->access <= playerBan->access){
+		if(player && player->getAccessLevel() <= playerBan->getAccessLevel()){
 			player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "You cannot ban this player.");
 			return true;
 		}
@@ -340,7 +356,7 @@ bool Commands::teleportMasterPos(Creature* creature, const std::string& cmd, con
 {
 	Position destPos = creature->getPosition();
 	if(game->internalTeleport(creature, creature->masterPos) == RET_NOERROR){
-		game->AddMagicEffectAt(destPos, NM_ME_ENERGY_AREA);
+		game->addMagicEffect(destPos, NM_ME_ENERGY_AREA);
 		return true;
 	}
 
@@ -353,7 +369,7 @@ bool Commands::teleportHere(Creature* creature, const std::string& cmd, const st
 	if(paramCreature){
 		Position destPos = paramCreature->getPosition();
 		if(game->internalTeleport(paramCreature, creature->getPosition()) == RET_NOERROR){
-			game->AddMagicEffectAt(destPos, NM_ME_ENERGY_AREA);
+			game->addMagicEffect(destPos, NM_ME_ENERGY_AREA);
 			return true;
 		}
 	}
@@ -384,7 +400,7 @@ bool Commands::createItemById(Creature* creature, const std::string& cmd, const 
 	ReturnValue ret = game->internalAddItem(player, newItem);
 	
 	if(ret != RET_NOERROR){
-		ret = game->internalAddItem(player->getTile(), newItem);
+		ret = game->internalAddItem(player->getTile(), newItem, INDEX_WHEREEVER, FLAG_NOLIMIT);
 
 		if(ret != RET_NOERROR){
 			delete newItem;
@@ -392,7 +408,7 @@ bool Commands::createItemById(Creature* creature, const std::string& cmd, const 
 		}
 	}
 	
-	game->AddMagicEffectAt(player->getPosition(), NM_ME_MAGIC_POISON);
+	game->addMagicEffect(player->getPosition(), NM_ME_MAGIC_POISON);
 	return true;
 }
 
@@ -435,7 +451,7 @@ bool Commands::createItemByName(Creature* creature, const std::string& cmd, cons
 	ReturnValue ret = game->internalAddItem(player, newItem);
 	
 	if(ret != RET_NOERROR){
-		ret = game->internalAddItem(player->getTile(), newItem);
+		ret = game->internalAddItem(player->getTile(), newItem, INDEX_WHEREEVER, FLAG_NOLIMIT);
 
 		if(ret != RET_NOERROR){
 			delete newItem;
@@ -443,7 +459,7 @@ bool Commands::createItemByName(Creature* creature, const std::string& cmd, cons
 		}
 	}
 	
-	game->AddMagicEffectAt(player->getPosition(), NM_ME_MAGIC_POISON);
+	game->addMagicEffect(player->getPosition(), NM_ME_MAGIC_POISON);
 	return true;
 }
 
@@ -461,7 +477,7 @@ bool Commands::subtractMoney(Creature* creature, const std::string& cmd, const s
 		player->sendCancel(info.str().c_str());
 		return true;
 	}
-	else if(count > money){
+	else if(count > (int)money){
 		std::stringstream info;
 		info << "You have " << money << " gold and is not sufficient.";
 		player->sendCancel(info.str().c_str());
@@ -480,7 +496,7 @@ bool Commands::subtractMoney(Creature* creature, const std::string& cmd, const s
 bool Commands::reloadInfo(Creature* creature, const std::string& cmd, const std::string& param)
 {	
 	if(param == "actions"){
-		actions.reload();
+		g_actions->reload();
 	}
 	else if(param == "commands"){
 		this->reload();
@@ -491,8 +507,26 @@ bool Commands::reloadInfo(Creature* creature, const std::string& cmd, const std:
 	else if(param == "config"){
 		g_config.reload();
 	}
+	else if(param == "talk"){
+		g_talkactions->reload();
+	}
+	else if(param == "move"){
+		g_moveEvents->reload();
+	}
+	else if(param == "spells"){
+		g_spells->reload();
+		g_monsters.reload();
+	}
+	/*
+	else if(param == "weapons"){
+		g_weapons->reload();
+	}
+	else if(param == "items"){
+		Item::items.reload();
+	}
+	*/
 	else{
-		Player *player = creature->getPlayer();
+		Player* player = creature->getPlayer();
 		if(player)
 			player->sendCancel("Option not found.");
 	}
@@ -529,7 +563,7 @@ bool Commands::teleportToTown(Creature* creature, const std::string& cmd, const 
     Town* town = Towns::getInstance().getTown(tmp);
     if(town){
         if(game->internalTeleport(creature, town->getTemplePosition()) == RET_NOERROR) {
-            game->AddMagicEffectAt(town->getTemplePosition(), NM_ME_ENERGY_AREA);
+            game->addMagicEffect(town->getTemplePosition(), NM_ME_ENERGY_AREA);
             return true;
         }
     }
@@ -545,7 +579,7 @@ bool Commands::teleportTo(Creature* creature, const std::string& cmd, const std:
 	if(paramCreature){
 		Position destPos = creature->getPosition();
 		if(game->internalTeleport(creature, paramCreature->getPosition()) == RET_NOERROR){
-			game->AddMagicEffectAt(destPos, NM_ME_ENERGY_AREA);
+			game->addMagicEffect(destPos, NM_ME_ENERGY_AREA);
 			return true;
 		}
 	}
@@ -562,17 +596,17 @@ bool Commands::getInfo(Creature* creature, const std::string& cmd, const std::st
 	Player* paramPlayer = game->getPlayerByName(param);
 	if(paramPlayer) {
 		std::stringstream info;
-		if(paramPlayer->access >= player->access && player != paramPlayer){
+		if(paramPlayer->getAccessLevel() >= player->getAccessLevel() && player != paramPlayer){
 			player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "You can not get info about this player.");
 			return true;
 		}
 		unsigned char ip[4];
 		*(unsigned long*)&ip = paramPlayer->lastip;
 		info << "name:   " << paramPlayer->getName() << std::endl <<
-		        "access: " << paramPlayer->access << std::endl <<
+		        "access: " << paramPlayer->getAccessLevel() << std::endl <<
 		        "level:  " << paramPlayer->getPlayerInfo(PLAYERINFO_LEVEL) << std::endl <<
 		        "maglvl: " << paramPlayer->getPlayerInfo(PLAYERINFO_MAGICLEVEL) << std::endl <<
-		        "speed:  " <<  paramPlayer->speed <<std::endl <<
+		        "speed:  " <<  paramPlayer->getSpeed() <<std::endl <<
 		        "position " << paramPlayer->getPosition() << std::endl << 
 				"ip: " << ipText(ip);
 		player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, info.str().c_str());
@@ -591,7 +625,7 @@ bool Commands::closeServer(Creature* creature, const std::string& cmd, const std
 	AutoList<Player>::listiterator it = Player::listPlayer.list.begin();
 	while(it != Player::listPlayer.list.end())
 	{
-		if((*it).second->access == 0){
+		if((*it).second->getAccessLevel() == 0){
 			(*it).second->kickPlayer();
 			it = Player::listPlayer.list.begin();
 		}
@@ -631,8 +665,8 @@ bool Commands::onlineList(Creature* creature, const std::string& cmd, const std:
 	if(!player)
 		return false;
 
-	unsigned long alevelmin = 0;
-	unsigned long alevelmax = 10000;
+	int32_t alevelmin = 0;
+	int32_t alevelmax = 10000;
 	int i, n;
 	
 	if(param == "gm")
@@ -648,7 +682,7 @@ bool Commands::onlineList(Creature* creature, const std::string& cmd, const std:
 	AutoList<Player>::listiterator it = Player::listPlayer.list.begin();
 	for(;it != Player::listPlayer.list.end();++it)
 	{
-		if((*it).second->access >= alevelmin && (*it).second->access <= alevelmax){
+		if((*it).second->getAccessLevel() >= alevelmin && (*it).second->getAccessLevel() <= alevelmax){
 			players << (*it).second->getName() << "   " << 
 				(*it).second->getPlayerInfo(PLAYERINFO_LEVEL) << "    " <<
 				(*it).second->getPlayerInfo(PLAYERINFO_MAGICLEVEL) << std::endl;
@@ -689,22 +723,24 @@ bool Commands::teleportNTiles(Creature* creature, const std::string& cmd, const 
 		case WEST:
 			newPos.x = newPos.x - ntiles;
 			break;
+		default:
+			break;
 		}
 
 		if(game->internalTeleport(creature, newPos) == RET_NOERROR){
-			game->AddMagicEffectAt(newPos, NM_ME_ENERGY_AREA);
+			game->addMagicEffect(newPos, NM_ME_ENERGY_AREA);
 		}
 	}
 
 	return true;
 }
 
-bool Commands::kickPlayer(Creature* creature, const std::string &cmd, const std::string &param)
+bool Commands::kickPlayer(Creature* creature, const std::string& cmd, const std::string& param)
 {
 	Player* playerKick = game->getPlayerByName(param);
 	if(playerKick){
 		Player* player = creature->getPlayer();
-		if(player && player->access <= playerKick->access){
+		if(player && player->getAccessLevel() <= playerKick->getAccessLevel()){
 			player->sendTextMessage(MSG_STATUS_CONSOLE_BLUE, "You cannot kick this player.");
 			return true;
 		}
@@ -712,205 +748,6 @@ bool Commands::kickPlayer(Creature* creature, const std::string &cmd, const std:
 		playerKick->kickPlayer();
 		return true;
 	}
-	return false;
-}
-
-bool Commands::exivaPlayer(Creature* creature, const std::string &cmd, const std::string &param)
-{
-	//a. From 1 to 4 sq's [Person] is standing next to you.
-	//b. From 5 to 100 sq's [Person] is to the south, north, east, west.
-	//c. From 101 to 274 sq's [Person] is far to the south, north, east, west.
-	//d. From 275 to infinite sq's [Person] is very far to the south, north, east, west.
-	//e. South-west, s-e, n-w, n-e (corner coordinates): this phrase appears if the player you're looking for has moved five squares in any direction from the south, north, east or west.
-	//f. Lower level to the (direction): this phrase applies if the person you're looking for is from 1-25 squares up/down the actual floor you're in.
-	//g. Higher level to the (direction): this phrase applies if the person you're looking for is from 1-25 squares up/down the actual floor you're in.
-
-	Player* player = creature->getPlayer();
-	if(!player){
-		return false;
-	}
-	enum distance_t{
-		DISTANCE_BESIDE,
-		DISTANCE_CLOSE_1,
-		DISTANCE_CLOSE_2,
-		DISTANCE_FAR,
-		DISTANCE_VERYFAR,
-	};
-	
-	enum direction_t{
-		DIR_N, DIR_S, DIR_E, DIR_W,
-		DIR_NE, DIR_NW, DIR_SE, DIR_SW,
-	};
-	
-	enum level_t{
-		LEVEL_HIGHER,
-		LEVEL_LOWER,
-		LEVEL_SAME,
-	};
-
-	Player* playerExiva = game->getPlayerByName(param);
-	if(playerExiva){
-		const Position lookPos = player->getPosition();
-		const Position searchPos = playerExiva->getPosition();
-		
-		long dx = lookPos.x - searchPos.x;
-		long dy = lookPos.y - searchPos.y;
-		long dz = lookPos.z - searchPos.z;
-		
-		distance_t distance;
-		direction_t direction;
-		level_t level;
-		//getting floor
-		if(dz > 0){
-			level = LEVEL_HIGHER;
-		}
-		else if(dz < 0){
-			level = LEVEL_LOWER;
-		}
-		else{
-			level = LEVEL_SAME;
-		}
-		//getting distance
-		if(std::abs(dx) < 4 && std::abs(dy) <4){
-			distance = DISTANCE_BESIDE;
-		}
-		else{
-			long distance2 = dx*dx + dy*dy;
-			if(distance2 < 625){
-				distance = DISTANCE_CLOSE_1;
-			}
-			else if(distance2 < 10000){
-				distance = DISTANCE_CLOSE_2;
-			}
-			else if(distance2 < 75076){
-				distance = DISTANCE_FAR;
-			}
-			else{
-				distance = DISTANCE_VERYFAR;
-			}
-		}
-		//getting direction
-		float tan;
-		if(dx != 0){
-			tan = (float)dy/(float)dx;
-		}
-		else{
-			tan = 10.;
-		}
-		if(std::abs(tan) < 0.4142){
-			if(dx > 0){
-				direction = DIR_W;
-			}
-			else{
-				direction = DIR_E;
-			}			
-		}
-		else if(std::abs(tan) < 2.4142){
-			if(tan > 0){
-				if(dy > 0){
-					direction = DIR_NW;
-				}
-				else{
-					direction = DIR_SE;
-				}
-			}
-			else{ //tan < 0
-				if(dx > 0){
-					direction = DIR_SW;
-				}
-				else{
-					direction = DIR_NE;
-				}
-			}
-		}
-		else{
-			if(dy > 0){
-				direction = DIR_N;
-			}
-			else{
-				direction = DIR_S;
-			}
-		}
-		
-		std::stringstream ss;
-		ss << playerExiva->getName() << " ";
-
-		if(distance == DISTANCE_BESIDE){
-			if(level == LEVEL_SAME)
-				ss << "is standing next to you";
-			else if(level == LEVEL_HIGHER)
-				ss << "is above you";
-			else if(level == LEVEL_LOWER)
-				ss << "is below you";
-			}
-		else{
-			switch(distance){
-				case DISTANCE_CLOSE_1:
-					if(level == LEVEL_SAME){
-						ss << "is to the";
-					}
-					else if(level == LEVEL_HIGHER){
-						ss << "is on a higher level to the";
-					}
-					else if(level == LEVEL_LOWER){
-						ss << "is on a lower level to the";
-					}
-					break;
-
-				case DISTANCE_CLOSE_2:
-					ss << "is to the";
-					break;
-
-				case DISTANCE_FAR:
-					ss << "is far to the";
-					break;
-
-				case DISTANCE_VERYFAR:
-					ss << "is very far to the";
-					break;
-			}
-
-			ss << " ";
-			switch(direction){
-				case DIR_N:
-					ss << "north";
-					break;
-
-				case DIR_S:
-					ss << "south";
-					break;
-				case DIR_E:
-
-					ss << "east";
-					break;
-
-				case DIR_W:
-					ss << "west";
-					break;
-
-				case DIR_NE:
-					ss << "north-east";
-					break;
-
-				case DIR_NW:
-					ss << "north-west";
-					break;
-
-				case DIR_SE:
-					ss << "south-east";
-					break;
-
-				case DIR_SW:
-					ss << "south-west";
-					break;
-			}
-		}
-
-		ss << ".";
-		player->sendTextMessage(MSG_INFO_DESCR, ss.str().c_str());		
-		return true;
-	}
-
 	return false;
 }
 

@@ -38,12 +38,11 @@
 #include "ioplayer.h"
 
 #include "status.h"
-#include "spells.h"
 #include "monsters.h"
-#include "actions.h"
 #include "commands.h"
 #include "outfit.h"
-
+#include "vocation.h"
+#include "scriptmanager.h"
 #include "configmanager.h"
 #include "account.h"
 
@@ -91,11 +90,10 @@ IPList serverIPs;
 ConfigManager g_config;
 
 Game g_game;
-Spells spells(&g_game);
-Actions actions(&g_game);
 Commands commands(&g_game);
 Monsters g_monsters;
 Ban g_bans;
+Vocations g_vocations;
 
 RSA* g_otservRSA = NULL;
 
@@ -168,8 +166,8 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 
 		// login server connection
 		if(protId == 0x01){
-			unsigned short clientos = msg.GetU16();
-			unsigned short version  = msg.GetU16();
+			/*uint16_t clientos =*/ msg.GetU16();
+			uint16_t version  = msg.GetU16();
 			msg.SkipBytes(12);
 			msg.setRSAInstance(g_otservRSA);
 			if(version <= 760){
@@ -269,8 +267,8 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 		}
 		// gameworld connection tibia 7.8x
 		else if (protId == 0x0A){
-			unsigned short  clientos = msg.GetU16();
-			unsigned short version  = msg.GetU16();
+			/*uint16_t  clientos =*/ msg.GetU16();
+			uint16_t version  = msg.GetU16();
 			
 			msg.setRSAInstance(g_otservRSA);
 			if(msg.RSA_decrypt()){
@@ -289,7 +287,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 				std::cout.flags(std::ios::dec);
 				*/
 
-				unsigned char  unknown = msg.GetByte();
+				/*unsigned char  unknown =*/ msg.GetByte();
 				unsigned long accnumber = msg.GetU32();
 				std::string name     = msg.GetString();
 				std::string password = msg.GetString();
@@ -352,12 +350,12 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 
 							connectResult_t connectRes = CONNECT_INTERNALERROR;
 
-							if(g_bans.isPlayerBanished(name) && player->access == 0){
+							if(g_bans.isPlayerBanished(name) && player->getAccessLevel() == 0){
 								msg.AddByte(0x14);
 								msg.AddString("Your character is banished!");
 								msg.WriteToSocket(s);
 							}
-							else if(g_bans.isAccountBanished(accnumber) && player->access == 0){
+							else if(g_bans.isAccountBanished(accnumber) && player->getAccessLevel() == 0){
 								msg.AddByte(0x14);
 								msg.AddString("Your account is banished!");
 								msg.WriteToSocket(s);
@@ -373,7 +371,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 							else if(g_game.getGameState() == GAME_STATE_SHUTDOWN){
 								//nothing to do
 							}
-							else if(g_game.getGameState() == GAME_STATE_CLOSED && player->access == 0){
+							else if(g_game.getGameState() == GAME_STATE_CLOSED && player->getAccessLevel() == 0){
 								msg.AddByte(0x14);
 								msg.AddString("Server temporarly closed.");
 								msg.WriteToSocket(s);
@@ -511,7 +509,8 @@ int main(int argc, char *argv[])
 	//std::cout << ":: OTServ Version 0.6.0" << std::endl;
 	//std::cout << ":: ====================" << std::endl;
 	std::cout << "::" << std::endl;
-#if defined __DEBUG__MOVESYS__ || defined __DEBUG_HOUSES__ || defined __DEBUG_MAILBOX__
+#if defined __DEBUG__MOVESYS__ || defined __DEBUG_HOUSES__ || defined __DEBUG_MAILBOX__ || defined __DEBUG_LUASCRIPTS__
+	
 	std::cout << ":: Debugging:";
 	#ifdef __DEBUG__MOVESYS__
 	std::cout << " MOVESYS";
@@ -522,6 +521,9 @@ int main(int argc, char *argv[])
 	#ifdef __DEBUG_HOUSES__
 	std::cout << " HOUSES";
 	#endif
+	#ifdef __DEBUG_LUASCRIPTS__
+	std::cout << " LUA-SCRIPTS";
+	 #endif
 	std::cout << std::endl;
 #endif
 
@@ -585,27 +587,14 @@ int main(int argc, char *argv[])
 	}
 	std::cout << "[done]" << std::endl;
 
-	//load spells data
 	std::stringstream filename;
-	filename.str("");
-	filename << g_config.getString(ConfigManager::DATA_DIRECTORY) << "spells/spells.xml";
-	std::cout << ":: Loading " << filename.str() << "... ";
-	if(!spells.loadFromXml(g_config.getString(ConfigManager::DATA_DIRECTORY))){
-		std::stringstream errormsg;
-		errormsg << "Unable to load " << filename.str() << "!";
-		ErrorMessage(errormsg.str().c_str());
-		return -1;
-	}
-	std::cout << "[done]" << std::endl;
 
-	//load actions data
+	//load vocations
 	filename.str("");
-	filename << g_config.getString(ConfigManager::DATA_DIRECTORY) << "actions/actions.xml";
+	filename << g_config.getString(ConfigManager::DATA_DIRECTORY) << "vocations.xml";
 	std::cout << ":: Loading " << filename.str() << "... ";
-	if(!actions.loadFromXml(g_config.getString(ConfigManager::DATA_DIRECTORY))){
-		std::stringstream errormsg;
-		errormsg << "Unable to load " << filename.str() << "!";
-		ErrorMessage(errormsg.str().c_str());
+	if(!g_vocations.loadFromXml(g_config.getString(ConfigManager::DATA_DIRECTORY))){
+		ErrorMessage("Unable to load vocations!");
 		return -1;
 	}
 	std::cout << "[done]" << std::endl;
@@ -632,7 +621,19 @@ int main(int argc, char *argv[])
 		ErrorMessage(errormsg.str().c_str());
 		return -1;
 	}
+	
+	if(!Item::items.loadFromXml(g_config.getString(ConfigManager::DATA_DIRECTORY))){
+		std::stringstream errormsg;
+		errormsg << "Unable to load " << "items/items.xml" << "!";
+		ErrorMessage(errormsg.str().c_str());
+		return -1;
+	}
 	std::cout << "[done]" << std::endl;
+	
+	//load scripts
+	if(ScriptingManager::getInstance()->loadScriptSystems() == false){
+		return -1;
+	}
 
 	// load monster data
 	filename.str("");

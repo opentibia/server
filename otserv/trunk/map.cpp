@@ -47,6 +47,11 @@
 
 extern ConfigManager g_config;
 
+//client viewport: 8, 6
+//minimum viewport 9, 7
+int32_t Map::maxViewportX = 9; 
+int32_t Map::maxViewportY = 7;
+
 Map::Map()
 {
 	defaultMapLoaded = false;
@@ -173,6 +178,7 @@ Tile* Map::getTile(uint16_t _x, uint16_t _y, uint8_t _z)
 		//TileMap *tm = &tileMaps[_x & 0x1F][_y & 0x1F][_z];
 		//TileMap *tm = &tileMaps[_x & 0xFF][_y & 0xFF];
 		TileMap* tm = &tileMaps[_x & 0x7F][_y & 0x7F];
+
 		if(!tm)
 			return NULL;
 	
@@ -263,47 +269,68 @@ bool Map::removeCreature(Creature* creature)
 	return false;
 }
 
-
-void Map::getSpectators(const Range& range, SpectatorVec& list)
+void Map::getSpectators(SpectatorVec& list, const Position& centerPos, bool multifloor /*= false*/,
+	int32_t minRangeX /*= 0*/, int32_t maxRangeX /*= 0*/,
+	int32_t minRangeY /*= 0*/, int32_t maxRangeY /*= 0*/)
 {
-/*
-#ifdef __DEBUG__
-	std::cout << "Viewer position at x: " << range.centerpos.x
-		<< ", y: " << range.centerpos.y
-		<< ", z: " << range.centerpos.z << std::endl;
-	std::cout << "Min Range x: " << range.minRange.x
-		<< ", y: " << range.minRange.y
-		<< ", z: " << range.minRange.z << std::endl;
-    std::cout << "Max Range x: " << range.maxRange.x
-		<< ", y: " << range.maxRange.y
-		<< ", z: " << range.maxRange.z << std::endl;    	
-#endif
-*/
 
-	int offsetz;
+	minRangeX = (minRangeX == 0 ? -maxViewportX : -minRangeX);
+	maxRangeX = (maxRangeX == 0 ? maxViewportX : maxRangeX);
+	minRangeY = (minRangeY == 0 ? -maxViewportY : -minRangeY);
+	maxRangeY = (maxRangeY == 0 ? maxViewportY : maxRangeY);
+	
+	int32_t minRangeZ;
+	int32_t maxRangeZ;
+	int32_t offsetZ;
+
+	if(multifloor){
+		if(centerPos.z > 7){
+			//underground
+
+			//8->15
+			minRangeZ = std::max(centerPos.z - 2, 0);
+			maxRangeZ = std::min(centerPos.z + 2, MAP_MAX_LAYERS - 1);
+		}
+		//above ground
+		else if(centerPos.z == 6){
+			minRangeZ = 0;
+			maxRangeZ = 8;
+		}
+		else if(centerPos.z == 7){
+			minRangeZ = 0;
+			maxRangeZ = 9;
+		}
+		else{
+			minRangeZ = 0;
+			maxRangeZ = 7;
+		}
+	}
+	else{
+		minRangeZ = centerPos.z;
+		maxRangeZ = centerPos.z;
+	}
+
 	CreatureVector::iterator cit;
 	Tile* tile;
 
-	for(int nz = range.minRange.z; nz != range.maxRange.z + range.zstep; nz += range.zstep){
-		offsetz = range.centerpos.z - nz;
-		for(int nx = range.minRange.x + offsetz; nx <= range.maxRange.x + offsetz; ++nx){
-			for(int ny = range.minRange.y + offsetz; ny <= range.maxRange.y + offsetz; ++ny){
-				tile = getTile(nx + range.centerpos.x, ny + range.centerpos.y, nz);
+	for(int nz = minRangeZ; nz < maxRangeZ + 1; ++nz){
+		offsetZ = centerPos.z - nz;
+
+		for(int nx = minRangeX + offsetZ; nx <= maxRangeX + offsetZ; ++nx){
+			for(int ny = minRangeY + offsetZ; ny <= maxRangeY + offsetZ; ++ny){
+				tile = getTile(nx + centerPos.x, ny + centerPos.y, nz);
 				if(tile){
 					for(cit = tile->creatures.begin(); cit != tile->creatures.end(); ++cit){
-/*
-#ifdef __DEBUG__
-						std::cout << "Found " << (*cit)->getName() << " at x: " << (*cit)->pos.x << ", y: " << (*cit)->pos.y << ", z: " << (*cit)->pos.z << ", offset: " << offsetz << std::endl;
-#endif
-*/					
 						if(std::find(list.begin(), list.end(), *cit) == list.end()){
+							//if((*cit)->canSee(centerPos)){
 							list.push_back(*cit);
+							//}
 						}
 					}
 				}
 			}
 		}
-	}	
+	}
 }
 
 bool Map::canThrowObjectTo(const Position& fromPos, const Position& toPos)
@@ -379,14 +406,14 @@ bool Map::canThrowObjectTo(const Position& fromPos, const Position& toPos)
 	for( ; x != end.x + stepx; x += stepx){
 		int rx, ry, rz;
 		switch(dir){
-		case 0:
-			rx = x; ry = y; rz = z;
-			break;
 		case 1:
 			rx = y; ry = x; rz = z;
 			break;
 		case 2:
 			rx = z; ry = y; rz = x;
+			break;
+		default: //0
+			rx = x; ry = y; rz = z;
 			break;
 		}
 
@@ -420,113 +447,43 @@ bool Map::canThrowObjectTo(const Position& fromPos, const Position& toPos)
 	return true;
 }
 
-bool Map::isPathValid(Creature* creature, const std::list<Position>& path, int pathSize /* = -1*/)
+bool Map::isPathValid(const Creature* creature, const std::list<Direction>& listDir, const Position& destPos)
 {
-	if(pathSize == -1)
-		pathSize = path.size();
+	Position pos = creature->getPosition();
 
-	int pathCount = 0;
-	std::list<Position>::const_iterator iit;
-	for(iit = path.begin(); iit != path.end(); ++iit) {
-
-		Tile* tile = getTile(iit->x, iit->y, iit->z);
-		if(tile){
-			if(creature->getTile() != tile){
-				ReturnValue ret = tile->__queryAdd(0, creature, 1, 0);
-
-				if(ret != RET_NOERROR)
-					continue;
-			}
+	std::list<Direction>::const_iterator it;
+	for(it = listDir.begin(); it != listDir.end(); ++it) {
+		switch(*it){
+			case NORTH: pos.y -= 1; break;
+			case SOUTH: pos.y += 1; break;
+			case WEST: pos.x -= 1; break;
+			case EAST: pos.x += 1; break;
+			case NORTHEAST: pos.x += 1; pos.y -= 1; break;
+			case NORTHWEST: pos.x -= 1; pos.y -= 1; break;
+			case SOUTHEAST: pos.x += 1; pos.y += 1; break;
+			case SOUTHWEST: pos.x -= 1; pos.y += 1; break;
 		}
-		else
+
+		Tile* tile = getTile(pos);
+		if(!tile || tile->__queryAdd(0, creature, 1, FLAG_PATHFINDING) != RET_NOERROR){
 			return false;
-
-		if(pathCount++ >= pathSize)
-			return RET_NOERROR;
-	}
-
-	return true;
-}
-
-std::list<Position> Map::getPathTo(Creature* creature, Position start, Position to, int maxNodeSize /*= 100*/)
-{
-	std::list<Position> path;
-	AStarNodes nodes;
-	AStarNode* found = NULL;
-	int z = start.z;
-
-	AStarNode* startNode = nodes.createOpenNode();
-	startNode->parent = NULL;
-	startNode->h = 0;
-	startNode->x = start.x;
-	startNode->y = start.y;
-	
-	while(!found && nodes.countClosedNodes() < maxNodeSize){		
-		AStarNode* current = nodes.getBestNode();
-		if(!current)
-			return path; //no path
-		
-		nodes.closeNode(current);
-		
-		for(int dx=-1; dx <= 1; dx++){
-			for(int dy=-1; dy <= 1; dy++){
-				if(std::abs(dx) != std::abs(dy)){
-					int x = current->x + dx;
-					int y = current->y + dy;
-
-					Tile* tile = getTile(x, y, z);
-					if(tile){
-						if(creature->getTile() != tile){
-							ReturnValue ret = tile->__queryAdd(0, creature, 1, 0);
-
-							if(ret != RET_NOERROR)
-								continue;
-						}
-					}
-					else
-						continue;
-					
-					if(!nodes.isInList(x,y)){
-						AStarNode* n = nodes.createOpenNode();
-						if(n){
-							n->x = x;
-							n->y = y;
-							n->h = std::abs(n->x - to.x) * std::abs(n->x - to.x) + std::abs(n->y - to.y) * std::abs(n->y - to.y);
-							n->parent = current;
-
-							if(x == to.x && y == to.y){
-								found = n;
-							}
-						}
-					}
-					/*else{
-						if(current->g + 1 < child->g)
-							child->parent = current;
-							child->g=current->g+1;
-					}*/
-				}
-			}
 		}
 	}
-	//cleanup the mess
-	while(found){
-		Position p;
-		p.x = found->x;
-		p.y = found->y;
-		p.z = z;
-		path.push_front(p);
-		found = found->parent;
+
+	if(std::abs(destPos.x - pos.x) <= 1 && std::abs(destPos.y - pos.y) <= 1){
+		return true;
 	}
 
-	return path;
+	return false;
 }
 
-bool Map::getPathTo(Creature* creature, Position toPosition, std::list<Direction>& listDir)
+bool Map::getPathTo(const Creature* creature, Position toPosition, std::list<Direction>& listDir)
 {
 	if(creature->getPosition().z != toPosition.z){
 		return false;
 	}
 
+	Tile* tile;
 	AStarNodes nodes;
 	AStarNode* found = NULL;
 
@@ -538,92 +495,156 @@ bool Map::getPathTo(Creature* creature, Position toPosition, std::list<Direction
 	startNode->x = toPosition.x;
 	startNode->y = toPosition.y;
 
-	int x, y = 0;
-	int z = toPosition.z;
-	
+	int32_t x, y;
+	int32_t dx, dy;
+	int32_t z = toPosition.z;
+
 	while(!found && nodes.countClosedNodes() < 100){		
 		AStarNode* current = nodes.getBestNode();
 		if(!current){
 			listDir.clear();
 			return false; //no path found
 		}
-		
+
 		nodes.closeNode(current);
-		
+
 		for(int dx = -1; dx <= 1; dx++){
 			for(int dy = -1; dy <= 1; dy++){
-				if(std::abs(dx) != std::abs(dy)){
-					x = current->x + dx;
-					y = current->y + dy;
 
-					if(!(x == startPos.x && y == startPos.y)){
-						Tile* tile = getTile(x, y, z);
-						if(!tile || tile->hasProperty(BLOCKPATHFIND) || tile->__queryAdd(0, creature, 1, 0) != RET_NOERROR){
-							continue;
+				x = current->x + dx;
+				y = current->y + dy;
+
+				if(!(x == startPos.x && y == startPos.y)){
+					tile = getTile(x, y, z);
+
+					if(!tile || tile->__queryAdd(0, creature, 1, FLAG_PATHFINDING) != RET_NOERROR){
+						continue;
+					}
+				}
+				
+				if(!nodes.isInList(x,y)){
+					AStarNode* n = nodes.createOpenNode();
+					if(n){
+						n->x = x;
+						n->y = y;
+
+						n->h = std::abs(n->x - startPos.x) * std::abs(n->x - startPos.x) +
+									std::abs(n->y - startPos.y) * std::abs(n->y - startPos.y);
+
+						n->parent = current;
+
+						if(x == startPos.x && y == startPos.y){
+							found = n;
 						}
 					}
-					
-					if(!nodes.isInList(x,y)){
-						AStarNode* n = nodes.createOpenNode();
-						if(n){
-							n->x = x;
-							n->y = y;
-							n->h = std::abs(n->x - startPos.x) * std::abs(n->x - startPos.x) + std::abs(n->y - startPos.y) * std::abs(n->y - startPos.y);
-							n->parent = current;
-
-							if(x == startPos.x && y == startPos.y){
-								found = n;
-							}
-						}
-					}
-					/*else{
-						if(current->g + 1 < child->g)
-							child->parent = current;
-							child->g=current->g+1;
-					}*/
 				}
 			}
 		}
 	}
 
-	Position prevPos = startPos;
-	Direction dir;
+	int32_t prevx = startPos.x;
+	int32_t prevy = startPos.y;
 
-	//cleanup the mess
 	while(found){
-		Position p;
-		p.x = found->x;
-		p.y = found->y;
-		p.z = z;
+		x = found->x;
+		y = found->y;
 
-		int dx = p.x - prevPos.x;
-		int dy = p.y - prevPos.y;
-
-		prevPos = p;
-
-		if(dx == -1 && dy == -1)
-			dir = NORTHWEST;
-		else if(dx == 1 && dy == -1)
-			dir = NORTHEAST;
-		else if(dx == -1 && dy == 1)
-			dir = SOUTHWEST;
-		else if(dx == 1 && dy == 1)
-			dir = SOUTHEAST;
-		else if(dx == -1)
-			dir = WEST;
-		else if(dx == 1)
-			dir = EAST;
-		else if(dy == -1)
-			dir = NORTH;
-		else if(dy == 1)
-			dir = SOUTH;
-		else{
-			found = found->parent;
-			continue;
-		}
-
-		listDir.push_back(dir);
 		found = found->parent;
+
+		dx = x - prevx;
+		dy = y - prevy;
+
+		prevx = x;
+		prevy = y;
+
+		if(dx == -1 && dy == -1){
+			//north-west
+			tile = getTile(x + 1, y, z);
+			if(tile && tile->__queryAdd(0, creature, 1, FLAG_PATHFINDING) == RET_NOERROR){
+				listDir.push_back(NORTH);
+				listDir.push_back(WEST);
+				continue;
+			}
+
+			//west-north
+			tile = getTile(x, y + 1, z);
+			if(tile && tile->__queryAdd(0, creature, 1, FLAG_PATHFINDING) == RET_NOERROR){
+				listDir.push_back(WEST);
+				listDir.push_back(NORTH);
+				continue;
+			}
+			
+			listDir.push_back(NORTHWEST);
+		}
+		else if(dx == 1 && dy == -1){
+			//north-east
+			tile = getTile(x - 1, y, z);
+			if(tile && tile->__queryAdd(0, creature, 1, FLAG_PATHFINDING) == RET_NOERROR){
+				listDir.push_back(NORTH);
+				listDir.push_back(EAST);
+				continue;
+			}
+
+			//east-north
+			tile = getTile(x, y + 1, z);
+			if(tile && tile->__queryAdd(0, creature, 1, FLAG_PATHFINDING) == RET_NOERROR){
+				listDir.push_back(EAST);
+				listDir.push_back(NORTH);
+				continue;
+			}
+
+			listDir.push_back(NORTHEAST);
+		}
+		else if(dx == -1 && dy == 1){
+			//south-west
+			tile = getTile(x + 1, y, z);
+			if(tile && tile->__queryAdd(0, creature, 1, FLAG_PATHFINDING) == RET_NOERROR){
+				listDir.push_back(SOUTH);
+				listDir.push_back(WEST);
+				continue;
+			}
+
+			//west-south
+			tile = getTile(x, y - 1, z);
+			if(tile && tile->__queryAdd(0, creature, 1, FLAG_PATHFINDING) == RET_NOERROR){
+				listDir.push_back(WEST);
+				listDir.push_back(SOUTH);
+				continue;
+			}
+
+			listDir.push_back(SOUTHWEST);
+		}
+		else if(dx == 1 && dy == 1){
+			//south-east
+			tile = getTile(x - 1, y, z);
+			if(tile && tile->__queryAdd(0, creature, 1, FLAG_PATHFINDING) == RET_NOERROR){
+				listDir.push_back(SOUTH);
+				listDir.push_back(EAST);
+				continue;
+			}
+
+			//east-south
+			tile = getTile(x, y - 1, z);
+			if(tile && tile->__queryAdd(0, creature, 1, FLAG_PATHFINDING) == RET_NOERROR){
+				listDir.push_back(EAST);
+				listDir.push_back(SOUTH);
+				continue;
+			}
+
+			listDir.push_back(SOUTHEAST);
+		}
+		else if(dx == -1){
+			listDir.push_back(WEST);
+		}
+		else if(dx == 1){
+			listDir.push_back(EAST);
+		}
+		else if(dy == -1){
+			listDir.push_back(NORTH);
+		}
+		else if(dy == 1){
+			listDir.push_back(SOUTH);
+		}
 	}
 
 	return !listDir.empty();
@@ -659,7 +680,7 @@ AStarNode* AStarNodes::getBestNode()
 	best_node = 0;
 	found = false;
 
-	for(int i = 0; i < curNode; i++){
+	for(unsigned long i = 0; i < curNode; i++){
 		if(nodes[i].h < best_node_h && openNodes[i] == 1){
 			found = true;
 			best_node_h = nodes[i].h;
@@ -681,13 +702,14 @@ void AStarNodes::closeNode(AStarNode* node)
 		std::cout << "AStarNodes. trying to close node out of range" << std::endl;
 		return;
 	}
+
 	openNodes[pos] = 0;
 }
 
 unsigned long AStarNodes::countClosedNodes()
 {
 	unsigned long counter = 0;
-	for(int i = 0; i < curNode; i++){
+	for(unsigned long i = 0; i < curNode; i++){
 		if(openNodes[i] == 0){
 			counter++;
 		}
@@ -698,7 +720,7 @@ unsigned long AStarNodes::countClosedNodes()
 unsigned long AStarNodes::countOpenNodes()
 {
 	unsigned long counter = 0;
-	for(int i = 0; i < curNode; i++){
+	for(unsigned long i = 0; i < curNode; i++){
 		if(openNodes[i] == 1){
 			counter++;
 		}
@@ -706,10 +728,9 @@ unsigned long AStarNodes::countOpenNodes()
 	return counter;
 }
 
-
-bool AStarNodes::isInList(unsigned long x, unsigned long y)
+bool AStarNodes::isInList(long x, long y)
 {
-	for(int i = 0; i < curNode; i++){
+	for(unsigned long i = 0; i < curNode; i++){
 		if(nodes[i].x == x && nodes[i].y == y){
 			return true;
 		}

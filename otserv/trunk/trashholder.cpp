@@ -69,7 +69,7 @@ void TrashHolder::__addThing(int32_t index, Thing* thing)
 		if(item != this){
 			g_game.internalRemoveItem(item);
 			if(effect != NM_ME_NONE){
-				g_game.AddMagicEffectAt(getPosition(), effect);
+				g_game.addMagicEffect(getPosition(), effect);
 			}
 		}
 	}
@@ -90,12 +90,14 @@ void TrashHolder::__removeThing(Thing* thing, uint32_t count)
 	//
 }
 
-void TrashHolder::postAddNotification(Thing* thing, bool hasOwnership /*= true*/)
+void TrashHolder::postAddNotification(Thing* thing, int32_t index, cylinderlink_t link /*= LINK_OWNER*/)
 {
-	getParent()->postAddNotification(thing, false /*hasOwnership*/);
+	//getParent()->postAddNotification(thing, index, false /*hasOwnership*/);
+	getParent()->postAddNotification(thing, index, LINK_PARENT);
 }
 
-void TrashHolder::postRemoveNotification(Thing* thing, bool isCompleteRemoval, bool hadOwnership /*= true*/)
+void TrashHolder::postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, cylinderlink_t link /*= LINK_OWNER*/)
 {
-	getParent()->postRemoveNotification(thing, isCompleteRemoval, false /*hadOwnership*/);
+	//getParent()->postRemoveNotification(thing, index, isCompleteRemoval, false /*hadOwnership*/);
+	getParent()->postRemoveNotification(thing, index, isCompleteRemoval, LINK_PARENT);
 }

@@ -33,22 +33,22 @@ bool fileExists(const char* filename)
 
 void replaceString(std::string& str, const std::string sought, const std::string replacement)
 {
-	int pos = 0;
-	int start = 0;
-	int soughtLen = sought.length();
-	int replaceLen = replacement.length();
+	uint32_t pos = 0;
+	uint32_t start = 0;
+	uint32_t soughtLen = sought.length();
+	uint32_t replaceLen = replacement.length();
 	while((pos = str.find(sought, start)) != std::string::npos){
 		str = str.substr(0, pos) + replacement + str.substr(pos + soughtLen);
 		start = pos + replaceLen;
 	}
 }
 
-void trim_right(std::string &source, const std::string &t)
+void trim_right(std::string& source, const std::string& t)
 {
 	source.erase(source.find_last_not_of(t)+1);
 }
 
-void trim_left(std::string &source, const std::string &t)
+void trim_left(std::string& source, const std::string& t)
 {
 	source.erase(0, source.find_first_not_of(t));
 }
@@ -63,6 +63,18 @@ bool readXMLInteger(xmlNodePtr node, const char* tag, int& value)
 	char* nodeValue = (char*)xmlGetProp(node, (xmlChar*)tag);
 	if(nodeValue){
 		value = atoi(nodeValue);
+		xmlFreeOTSERV(nodeValue);
+		return true;
+	}
+
+	return false;
+}
+
+bool readXMLFloat(xmlNodePtr node, const char* tag, float& value)
+{
+	char* nodeValue = (char*)xmlGetProp(node, (xmlChar*)tag);
+	if(nodeValue){
+		value = atof(nodeValue);
 		xmlFreeOTSERV(nodeValue);
 		return true;
 	}

@@ -154,7 +154,7 @@ void Teleport::__addThing(int32_t index, Thing* thing)
 	if(destTile){
 		if(Creature* creature = thing->getCreature()){
 			getTile()->moveCreature(creature, destTile, true);
-			g_game.AddMagicEffectAt(destTile->getPosition(), NM_ME_ENERGY_AREA);
+			g_game.addMagicEffect(destTile->getPosition(), NM_ME_ENERGY_AREA);
 		}
 		else if(Item* item = thing->getItem()){
 			g_game.internalMoveItem(getTile(), destTile, INDEX_WHEREEVER, item, item->getItemCount());
@@ -177,12 +177,14 @@ void Teleport::__removeThing(Thing* thing, uint32_t count)
 	//
 }
 
-void Teleport::postAddNotification(Thing* thing, bool hasOwnership /*= true*/)
+void Teleport::postAddNotification(Thing* thing, int32_t index, cylinderlink_t link /*= LINK_OWNER*/)
 {
-	getParent()->postAddNotification(thing, false /*hasOwnership*/);
+	//getParent()->postAddNotification(thing, index, false /*hasOwnership*/);
+	getParent()->postAddNotification(thing, index, LINK_PARENT);
 }
 
-void Teleport::postRemoveNotification(Thing* thing, bool isCompleteRemoval, bool hadOwnership /*= true*/)
+void Teleport::postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, cylinderlink_t link /*= LINK_OWNER*/)
 {
-	getParent()->postRemoveNotification(thing, isCompleteRemoval, false /*hadOwnership*/);
+	//getParent()->postRemoveNotification(thing, index, isCompleteRemoval, false /*hadOwnership*/);
+	getParent()->postRemoveNotification(thing, index, isCompleteRemoval, LINK_PARENT);
 }

@@ -178,16 +178,6 @@ double Container::getWeight() const
 	return weight;
 }
 
-ItemList::const_iterator Container::getItems() const
-{
-	return itemlist.begin();
-}
-
-ItemList::const_iterator Container::getEnd() const
-{
-	return itemlist.end();
-}
-
 Item* Container::getItem(uint32_t index)
 {
 	size_t n = 0;			
@@ -258,7 +248,8 @@ void Container::onAddContainerItem(Item* item)
 
 	SpectatorVec list;
 	SpectatorVec::iterator it;
-	g_game.getSpectators(Range(cylinderMapPos, 2, 2, 2, 2, false), list);
+	//g_game.getSpectators(Range(cylinderMapPos, 2, 2, 2, 2, false), list);
+	g_game.getSpectators(list, cylinderMapPos, false, 2, 2, 2, 2);
 
 	//send to client
 	Player* player = NULL;
@@ -282,7 +273,8 @@ void Container::onUpdateContainerItem(uint32_t index, Item* oldItem, Item* newIt
 
 	SpectatorVec list;
 	SpectatorVec::iterator it;
-	g_game.getSpectators(Range(cylinderMapPos, 2, 2, 2, 2, false), list);
+	//g_game.getSpectators(Range(cylinderMapPos, 2, 2, 2, 2, false), list);
+	g_game.getSpectators(list, cylinderMapPos, false, 2, 2, 2, 2);
 
 	//send to client
 	Player* player = NULL;
@@ -306,7 +298,8 @@ void Container::onRemoveContainerItem(uint32_t index, Item* item)
 
 	SpectatorVec list;
 	SpectatorVec::iterator it;
-	g_game.getSpectators(Range(cylinderMapPos, 2, 2, 2, 2, false), list);
+	//g_game.getSpectators(Range(cylinderMapPos, 2, 2, 2, 2, false), list);
+	g_game.getSpectators(list, cylinderMapPos, false, 2, 2, 2, 2);
 
 	//send change to client
 	Player* player = NULL;
@@ -419,7 +412,7 @@ ReturnValue Container::__queryMaxCount(int32_t index, const Thing* thing, uint32
 
 ReturnValue Container::__queryRemove(const Thing* thing, uint32_t count) const
 {
-	uint32_t index = __getIndexOfThing(thing);
+	int32_t index = __getIndexOfThing(thing);
 
 	if(index == -1){
 		return RET_NOTPOSSIBLE;
@@ -696,7 +689,7 @@ Thing* Container::__getThing(uint32_t index) const
 	if(index < 0 || index > size())
 		return NULL;
 
-	int count = 0;
+	uint32_t count = 0;
 	for(ItemList::const_iterator cit = itemlist.begin(); cit != itemlist.end(); ++cit){
 		if(count == index)
 			return *cit;
@@ -707,42 +700,46 @@ Thing* Container::__getThing(uint32_t index) const
 	return NULL;
 }
 
-void Container::postAddNotification(Thing* thing, bool hasOwnership /*= true*/)
+void Container::postAddNotification(Thing* thing, int32_t index, cylinderlink_t link /*= LINK_OWNER*/)
 {
 	Cylinder* topParent = getTopParent();
 
 	if(topParent->getCreature()){
-		topParent->postAddNotification(thing, true /*hasOwnership*/);
+		//topParent->postAddNotification(thing, index, true /*hasOwnership*/);
+		topParent->postAddNotification(thing, index, LINK_TOPPARENT);
 	}
 	else{
 		if(topParent == this){
 			//let the tile class notify surrounding players
-			topParent->getParent()->postAddNotification(thing, false /*hasOwnership*/);
+			//topParent->getParent()->postAddNotification(thing, index, false /*hasOwnership*/);
+			topParent->getParent()->postAddNotification(thing, index, LINK_NEAR);
 		}
-		else
-			topParent->postAddNotification(thing, false /*hasOwnership*/);
+		else{
+			//topParent->postAddNotification(thing, index, false /*hasOwnership*/);
+			topParent->postAddNotification(thing, index, LINK_PARENT);
+		}
 	}
-
-	//getParent()->postAddNotification(thing, true /*hasOwnership*/);
 }
 
-void Container::postRemoveNotification(Thing* thing, bool isCompleteRemoval, bool hadOwnership /*= true*/)
+void Container::postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, cylinderlink_t link /*= LINK_OWNER*/)
 {
 	Cylinder* topParent = getTopParent();
 
 	if(topParent->getCreature()){
-		topParent->postRemoveNotification(thing, isCompleteRemoval, true /*hasOwnership*/);
+		//topParent->postRemoveNotification(thing, index, isCompleteRemoval, true /*hadOwnership*/);
+		topParent->postRemoveNotification(thing, index, isCompleteRemoval, LINK_TOPPARENT);
 	}
 	else{
 		if(topParent == this){
 			//let the tile class notify surrounding players
-			topParent->getParent()->postRemoveNotification(thing, isCompleteRemoval, false /*hasOwnership*/);
+			//topParent->getParent()->postRemoveNotification(thing, index, isCompleteRemoval, false /*hadOwnership*/);
+			topParent->getParent()->postRemoveNotification(thing, index, isCompleteRemoval, LINK_NEAR);
 		}
-		else
-			topParent->postRemoveNotification(thing, isCompleteRemoval, false /*hasOwnership*/);
+		else{
+			//topParent->postRemoveNotification(thing, index, isCompleteRemoval, false /*hadOwnership*/);
+			topParent->postRemoveNotification(thing, index, isCompleteRemoval, LINK_PARENT);
+		}
 	}
-
-	//getParent()->postRemoveNotification(thing, isCompleteRemoval, false /*hadOwnership*/);
 }
 
 void Container::__internalAddThing(Thing* thing)
@@ -775,4 +772,11 @@ void Container::__internalAddThing(uint32_t index, Thing* thing)
 
 	itemlist.push_front(item);
 	item->setParent(this);
+}
+
+void Container::__startDecaying()
+{
+	for(ItemList::const_iterator it = itemlist.begin(); it != itemlist.end(); ++it){
+		(*it)->__startDecaying();
+	}
 }

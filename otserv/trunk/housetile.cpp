@@ -42,7 +42,7 @@ ReturnValue HouseTile::__queryAdd(int32_t index, const Thing* thing, uint32_t co
 {
 	if(const Creature* creature = thing->getCreature()){
 		if(const Player* player = creature->getPlayer()){
-			if(player->access < 3 && !house->isInvited(player))
+			if(player->getAccessLevel() < 3 && !house->isInvited(player))
 				return RET_PLAYERISNOTINVITED;
 		}
 	}

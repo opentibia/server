@@ -63,7 +63,7 @@ enum tile_flags_t{
 
 bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 {
-	__int64 start = OTSYS_TIME();
+	int64_t start = OTSYS_TIME();
 	map->setLastError(LOADMAPERROR_NONE);
 
 	FileLoader f;
@@ -93,12 +93,12 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 		return false;
 	}
 	
-	if(root_header->majorVersionItems > Items::dwMajorVersion){
+	if(root_header->majorVersionItems > (unsigned long)Items::dwMajorVersion){
 		map->setLastError(LOADMAPERROR_OUTDATEDHEADER, root);
 		return false;
 	}
 
-	if(root_header->minorVersionItems > Items::dwMinorVersion){
+	if(root_header->minorVersionItems > (unsigned long)Items::dwMinorVersion){
 		std::cout << "Warning: [OTBM loader] This map needs an updated items OTB file." <<std::endl;
 	}
 
@@ -269,6 +269,7 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 							}
 							else{
 								tile->__internalAddThing(item);
+								//item->__startDecaying();
 							}
 							
 							break;
@@ -301,6 +302,8 @@ bool IOMapOTBM::loadMap(Map* map, const std::string& identifier)
 								}
 								else{
 									tile->__internalAddThing(item);
+									//item->__startDecaying();
+
 									if(isHouseTile){
 										Door* door = item->getDoor();
 										if(door && door->getDoorId() != 0){

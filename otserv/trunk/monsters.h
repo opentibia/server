@@ -18,89 +18,11 @@
 // Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef __monsters_h_
-#define __monsters_h_
+#ifndef __OTSERV_MONSTERS_H__
+#define __OTSERV_MONSTERS_H__
 
 #include <string>
-
 #include "creature.h"
-
-class TimeProbabilityClass{
-public:
-	TimeProbabilityClass()
-	{
-		setDefault();
-	}
-	
-	TimeProbabilityClass(int _cycleTicks, int _probability, int _exhaustionticks)
-	{
-		setDefault();
-		init(_cycleTicks, _probability, _exhaustionticks);
-	};
-	
-	~TimeProbabilityClass() {};
-	
-	bool onTick(int ticks)
-	{
-		ticksleft -= ticks;
-		
-		if(ticksleft <= 0) {
-			ticksleft = cycleTicks;
-			bool ret = (random_range(1, 100) <= probability);
-			return ret;
-		}
-		
-		return false;
-	}
-	
-	void init(int _cycleTicks, int _probability, int _exhaustionticks)
-	{
-		if(_cycleTicks >= 0) {
-			this->ticksleft = _cycleTicks;
-			this->cycleTicks = _cycleTicks;
-		}
-		
-		if(_probability >= 0)
-			probability = std::min(100, _probability);
-		
-		if(_exhaustionticks >= 0)
-			exhaustionTicks = _exhaustionticks;
-	}
-	
-	int getExhaustion() const {return exhaustionTicks;}
-	
-private:
-	void setDefault()
-	{
-		cycleTicks = 2000;
-		ticksleft = cycleTicks;
-		probability = 80;
-		exhaustionTicks = 0;
-	}
-	
-	int ticksleft;
-	int cycleTicks;
-	int probability;
-	int exhaustionTicks;
-};
-
-class PhysicalAttackClass {
-public:
-	PhysicalAttackClass()
-	{
-		disttype = DIST_NONE;
-		minWeapondamage = 0;
-		maxWeapondamage = 1;
-	};
-	
-	~PhysicalAttackClass() {};
-	
-	fight_t fighttype;
-	subfight_t disttype;
-	
-	int minWeapondamage;
-	int maxWeapondamage;
-};
 
 #define CHANCE_MAX  100000
 struct LootBlock{
@@ -118,18 +40,27 @@ struct LootBlock{
 	}
 };	
 
-struct summonBlock{
+struct summonBlock_t{
 	std::string name;
-	unsigned long summonChance;
+	uint32_t chance;
+	uint32_t speed;
+};
+
+class Spell;
+
+struct spellBlock_t{
+	Spell* spell;
+	uint32_t chance;
+	uint32_t speed;
+	uint32_t range;
+	int32_t minCombatValue;
+	int32_t maxCombatValue;
 };
 
 typedef std::list<LootBlock> LootItems;
-typedef std::vector<TimeProbabilityClass> TimeProbabilityClassVec;	
-typedef std::map<std::string, TimeProbabilityClassVec> InstantAttackSpells;
-typedef std::map<unsigned short, TimeProbabilityClassVec> RuneAttackSpells;
-typedef std::map<PhysicalAttackClass*, TimeProbabilityClass> PhysicalAttacks;
-typedef std::vector<std::pair<std::string, TimeProbabilityClass> > YellingSentences;
-typedef std::list<summonBlock> SummonSpells;
+typedef std::list<summonBlock_t> SummonList;
+typedef std::list<spellBlock_t> SpellList;
+typedef std::vector<std::string> VoiceVector;
 
 class MonsterType{
 public:
@@ -139,37 +70,48 @@ public:
 	void reset();
 	
 	std::string name;
+	std::string nameDescription;
 	int experience;
 	int armor;
 	int defense;
-	bool hasDistanceAttack;
 	bool canPushItems;
-	unsigned long staticLook;
 	unsigned long staticAttack;
-	unsigned short changeTargetChance;  
 	int maxSummons;
 	int targetDistance;
 	int runAwayHealth;
 	bool pushable;
 	int base_speed;
-	int level;
-	int maglevel;
 	int health;
 	int health_max;
-	int lookhead, lookbody, looklegs, lookfeet, looktype, lookcorpse, lookmaster, lookaddons;
-	int immunities;
+	
+	Outfit_t outfit;
+	int32_t lookcorpse;
+	int conditionImmunities;
+	int damageImmunities;
+	RaceType_t race;
+	bool isSummonable;
+	bool isIllusionable;
 	
 	int lightLevel;
 	int lightColor;
-	
-	InstantAttackSpells instantSpells;
-	RuneAttackSpells runeSpells;
-	PhysicalAttacks physicalAttacks;
-	YellingSentences yellingSentences;
-	SummonSpells summonSpells; 
-
+		
+	uint32_t manaSummonCost;
+	SummonList summonList;
 	LootItems lootItems;
-	
+	SpellList spellAttackList;
+	SpellList spellDefenseList;
+
+	int32_t combatMeleeMin;
+	int32_t combatMeleeMax;
+	uint32_t combatMeleeSpeed;
+
+	uint32_t yellChance;
+	uint32_t yellSpeedTicks;
+	VoiceVector voiceVector;
+
+	int32_t changeTargetSpeed;
+	int32_t changeTargetChance;
+
 	void createLoot(Container* corpse);
 	void createLootContainer(Container* parent, const LootBlock& lootblock);
 	Item* createLootItem(const LootBlock& lootblock);
@@ -180,15 +122,18 @@ public:
 	Monsters();
 	~Monsters();
 	
-	bool loadFromXml(const std::string &_datadir, bool reloading = false);
+	bool loadFromXml(const std::string& _datadir, bool reloading = false);
 	bool isLoaded(){return loaded;}	
 	bool reload();
 	
 	MonsterType* getMonsterType(unsigned long mid);
 	unsigned long getIdByName(const std::string& name);
+
+	static uint32_t getLootRandom();
 	
 private:
 	MonsterType* loadMonster(const std::string& file, const std::string& monster_name, bool reloading = false);
+
 	bool loadLootContainer(xmlNodePtr, LootBlock&);
 	bool loadLootItem(xmlNodePtr, LootBlock&);
 

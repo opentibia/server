@@ -56,7 +56,16 @@ public:
 		}
 		return true;
 	}
-
+	
+	template<int deltax, int deltay>
+	inline static bool areInRange(const Position& p1, const Position& p2){
+		if(std::abs(p1.x - p2.x) > deltax ||
+			std::abs(p1.y - p2.y) > deltay){
+			return false;
+		}
+		return true;
+	}
+	
 	Position(int _x, int _y, int _z)
 	: x(_x), y(_y), z(_z) {};
 

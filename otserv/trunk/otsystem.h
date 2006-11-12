@@ -78,11 +78,11 @@
 
 typedef HANDLE OTSYS_THREAD_SIGNALVAR;
 
-inline __int64 OTSYS_TIME()
+inline int64_t OTSYS_TIME()
 {
   _timeb t;
   _ftime(&t);
-  return ((__int64)t.millitm) + ((__int64)t.time) * 1000;
+  return ((int64_t)t.millitm) + ((int64_t)t.time) * 1000;
 }
 
 inline int OTSYS_THREAD_WAITSIGNAL(OTSYS_THREAD_SIGNALVAR& signal, OTSYS_THREAD_LOCKVAR& lock)
@@ -101,9 +101,9 @@ inline void OTSYS_SLEEP(uint32_t t){
 }
 
 
-inline int OTSYS_THREAD_WAITSIGNAL_TIMED(OTSYS_THREAD_SIGNALVAR& signal, OTSYS_THREAD_LOCKVAR& lock, __int64 cycle)
+inline int OTSYS_THREAD_WAITSIGNAL_TIMED(OTSYS_THREAD_SIGNALVAR& signal, OTSYS_THREAD_LOCKVAR& lock, int64_t cycle)
 {
-  __int64 tout64 = (cycle - OTSYS_TIME());
+  int64_t tout64 = (cycle - OTSYS_TIME());
   
   DWORD tout = 0;
   if (tout64 > 0)
@@ -174,20 +174,20 @@ inline void OTSYS_SLEEP(int t)
   nanosleep(&tv, NULL);
 }
 
-inline __int64 OTSYS_TIME()
+inline int64_t OTSYS_TIME()
 {
   timeb t;
   ftime(&t);
-  return ((__int64)t.millitm) + ((__int64)t.time) * 1000;
+  return ((int64_t)t.millitm) + ((int64_t)t.time) * 1000;
 }
 
 #define OTSYS_THREAD_WAITSIGNAL(a,b) pthread_cond_wait(&a, &b)
 
-inline int OTSYS_THREAD_WAITSIGNAL_TIMED(OTSYS_THREAD_SIGNALVAR& signal, OTSYS_THREAD_LOCKVAR& lock, __int64 cycle) {
+inline int OTSYS_THREAD_WAITSIGNAL_TIMED(OTSYS_THREAD_SIGNALVAR& signal, OTSYS_THREAD_LOCKVAR& lock, int64_t cycle) {
 		  timespec tv;
-		  tv.tv_sec = (__int64)(cycle / 1000);
+		  tv.tv_sec = (int64_t)(cycle / 1000);
 		  // tv_nsec is in nanoseconds while we only store microseconds...
-		  tv.tv_nsec = (__int64)(cycle % 1000) * 1000000;
+		  tv.tv_nsec = (int64_t)(cycle % 1000) * 1000000;
 		  return pthread_cond_timedwait(&signal, &lock, &tv);
 }
 

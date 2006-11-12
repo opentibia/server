@@ -320,6 +320,7 @@ bool IOMapSerializeXML::loadTile(Map* map, xmlNodePtr nodeTile, Tile* tile)
 				}
 
 				tile->__internalAddThing(item);
+				item->__startDecaying();
 
 				Door* door = item->getDoor();
 				if(door && door->getDoorId() != 0){
@@ -339,7 +340,7 @@ bool IOMapSerializeXML::loadTile(Map* map, xmlNodePtr nodeTile, Tile* tile)
 				bool isDoor = iType.isDoor();
 
 				//find this type in the tile
-				for(int i = 0; i < tile->getThingCount(); ++i){
+				for(uint32_t i = 0; i < tile->getThingCount(); ++i){
 					Item* findItem = tile->__getThing(i)->getItem();
 
 					if(!findItem)

@@ -58,7 +58,7 @@ public:
 		std::cout << "MovePlayerTask: " << dir << std::endl;
 #endif
 
-		_player->lastmove = OTSYS_TIME();
+		//_player->lastMove = OTSYS_TIME();
 		ReturnValue ret = game->internalMoveCreature(_player, dir);
 
 		game->flushSendBuffers();

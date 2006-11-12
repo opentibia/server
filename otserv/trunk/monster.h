@@ -19,34 +19,19 @@
 //////////////////////////////////////////////////////////////////////
 
 
-#ifndef __MONSTER_H__
-#define __MONSTER_H__
+#ifndef __OTSERV_MONSTER_H__
+#define __OTSERV_MONSTER_H__
 
 #include "tile.h"
-#include "templates.h"
 #include "monsters.h"
 
 class Creature;
 class Game;
 
-enum monsterstate_t{
-	STATE_IDLE,
-	STATE_IDLESUMMON,
-	STATE_TARGETNOTREACHABLE,
-	STATE_ATTACKING,
-	STATE_FLEEING,
-};
-
-enum monstermode_t{
-	MODE_NORMAL,
-	MODE_AGGRESSIVE
-};
-
 class Monster : public Creature
 {
 private:
 	Monster(MonsterType* mtype);
-
 	//const Monster& operator=(const Monster& rhs);
 
 public:
@@ -56,25 +41,28 @@ public:
 	virtual Monster* getMonster() {return this;};
 	virtual const Monster* getMonster() const {return this;};
 
-	virtual const std::string& getName() const;
-	virtual bool isPushable() const;
-
-	virtual unsigned long idRange(){ return 0x40000000;}
+	virtual uint32_t idRange(){ return 0x40000000;}
 	static AutoList<Monster> listMonster;
 	void removeList() {listMonster.removeList(getID());}
 	void addList() {listMonster.addList(this);}
 	
-	virtual int getArmor() const;
-	virtual int getDefense() const;
-	
-	virtual void setMaster(Creature* creature);
-	bool isSummon() {return (getMaster() != NULL);}
-	virtual void onAttack();
-	bool canPushItems() const {return mType->canPushItems;};
-	
-	virtual void setNormalCreatureLight();
+	virtual const std::string& getName() const {return mType->name;}
+	virtual const std::string& getNameDescription() const {return mType->nameDescription;}
+	virtual std::string getDescription(int32_t lookDistance) const;
 
-	static unsigned long getRandom();
+	virtual bool canSee(const Position& pos) const;
+
+	virtual RaceType_t getRace() const { return mType->race; }
+
+	virtual int getArmor() const { return mType->armor; }
+	virtual int getDefense() const { return mType->defense; }
+	virtual bool isPushable() const { return mType->pushable; }
+	virtual bool isAttackable() const { return true;}
+	virtual void doAttacking(uint32_t interval);
+
+	virtual void drainHealth(Creature* attacker, CombatType_t combatType, int32_t damage);
+
+	virtual void setNormalCreatureLight();
 
 	virtual void onAddTileItem(const Position& pos, const Item* item);
 	virtual void onUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* oldItem, const Item* newItem);
@@ -83,67 +71,63 @@ public:
 
 	virtual void onCreatureAppear(const Creature* creature, bool isLogin);
 	virtual void onCreatureDisappear(const Creature* creature, uint32_t stackpos, bool isLogout);
-	virtual void onCreatureMove(const Creature* creature, const Position& oldPos, uint32_t oldStackPos, bool teleport);
+	virtual void onCreatureMove(const Creature* creature, const Position& newPos, const Position& oldPos,
+		uint32_t oldStackPos, bool teleport);
+
+	virtual void onThink(uint32_t interval);
+	virtual void onWalk();
+	virtual bool getNextStep(Direction& dir);
+
+	bool canPushItems() const {return mType->canPushItems;}
+	bool isSummon() const { return getMaster() != NULL; }
+
+	virtual uint32_t getFollowDistance() const;
+	virtual bool getFollowReachable() const;
+	virtual void getCombatValues(int32_t& min, int32_t& max);
+	
+	uint32_t getManaSummonCost() const {return mType->manaSummonCost;}
 
 private:
-	std::list<Position> route;
-	monsterstate_t state;
-	bool updateMovePos;
-	int oldThinkTicks;
-	Position targetPos;
-	Position moveToPos;
-	bool hasLostMaster;
-	MonsterType *mType;
-	
-	void doMoveTo(int dx, int dy);
-	
-	int getCurrentDistanceToTarget(const Position &target);
-	int getTargetDistance();
-	void setUpdateMovePos();
-	bool calcMovePosition();
-	void updateLookDirection();
-	
-	bool getRandomPosition(const Position &target, Position &dest);
-	bool getDistancePosition(const Position &target, const int& maxTryDist, bool fullPathSearch, Position &dest);
-	bool getCloseCombatPosition(const Position &target, Position &dest);
-	bool canMoveTo(unsigned short x, unsigned short y, unsigned char z);
-	bool isInRange(const Position &pos);
-	bool isCreatureReachable(const  Creature* creature);
-	Creature* findTarget(long range, bool &canReach, const Creature *ignoreCreature = NULL);
-	void stopAttack();
+	int32_t thinkTicks;
+	uint32_t yellTicks;
+	uint32_t attackTicks;
+	uint32_t defenseTicks;
+	int32_t changeTargetTicks;
+	std::string strDescription;
+	bool needThink;
+	bool targetIsRecentAdded;
+	bool isActive;
+
+	int32_t minCombatValue;
+	int32_t maxCombatValue;
+
+	typedef std::list<Creature*> TargetList;
+	TargetList targetList;
+	MonsterType* mType;
+
+	void searchTarget();
+
 	void startThink();
 	void stopThink();
-	void reThink(bool updateOnlyState = true);
-	
-	void selectTarget(const Creature* creature, bool canReach /* = true*/);
+	void onThinkYell(uint32_t interval);
+	void onDefending(uint32_t interval);
+	void onThinkChangeTarget(uint32_t interval);
 
-protected:
-	PhysicalAttackClass	*curPhysicalAttack;
-		
-	bool doAttacks(Creature* attackedCreature, monstermode_t mode = MODE_NORMAL);
-		
-	virtual fight_t getFightType() {return curPhysicalAttack->fighttype;};
-	virtual subfight_t getSubFightType()  {return curPhysicalAttack->disttype;}
-	virtual int getWeaponDamage() const;
-	
-	void creatureEnter(const Creature *creature, bool canReach = true);
-	void creatureLeave(const Creature *creature);
-	void creatureMove(const Creature *creature, const Position& oldPos);
-	
-	bool validateDistanceAttack(const Creature *creature);
-	bool validateDistanceAttack(const Position &pos);
-	bool monsterMoveItem(Item* item, int radius);
-	bool isCreatureAttackable(const Creature* creature);
-	
-	virtual int getLostExperience();
-	virtual void dropLoot(Container *corpse);
+	void onCreatureEnter(const Creature* creature);
+	void onCreatureLeave(const Creature* creature);
+	void onCreatureFound(const Creature* creature);
 
-	virtual bool isAttackable() const { return true; };
-	
-	virtual int onThink(int& newThinkTicks);
-	virtual void setAttackedCreature(const Creature* creature);
-	
-	virtual std::string getDescription(int32_t lookDistance) const;
+	void updateLookDirection();
+	void updateTargetList();
+
+	bool getRandomStep(const Position& creaturePos, const Position& centerPos, Direction& dir);
+
+	virtual int32_t getLostExperience() const { return (isSummon() ? 0 : mType->experience); }
+	virtual int getLookCorpse() { return mType->lookcorpse; }
+	virtual void dropLoot(Container* corpse);
+	virtual uint32_t getDamageImmunities() const { return mType->damageImmunities; }
+	virtual uint32_t getConditionImmunities() const { return mType->conditionImmunities; }
+	virtual uint16_t getLookCorpse() const { return mType->lookcorpse; }
 };
 
 #endif

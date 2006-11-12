@@ -25,12 +25,12 @@
 
 #include "cylinder.h"
 #include "item.h"
-#include "magic.h"
 
 class Creature;
 class Teleport;
 class TrashHolder;
 class Mailbox;
+class MagicField;
 
 typedef std::vector<Item*> ItemVector;
 typedef std::vector<Creature*> CreatureVector;
@@ -63,7 +63,7 @@ public:
 	CreatureVector creatures;
 	ItemVector     downItems;
 
-	MagicEffectItem* getFieldItem() const;
+	MagicField* getFieldItem() const;
 	Teleport* getTeleportItem() const;
 	TrashHolder* getTrashHolder() const;
 	Mailbox* getMailbox() const;
@@ -71,23 +71,25 @@ public:
 	Creature* getTopCreature();
 	Item* getTopTopItem();
 	Item* getTopDownItem();
+	bool isMoveableBlocking() const;
 	Item* getMoveableBlockingItem();
 	Thing* getTopThing();
 	
-	int getThingCount() const;
+	uint32_t getThingCount() const {return (uint32_t)(ground ? 1 : 0) + topItems.size() + creatures.size() + downItems.size();}
 
 	bool hasProperty(enum ITEMPROPERTY prop) const;
 
-	bool hasFlag(tileflags_t flag) const;
-	void setFlag(tileflags_t flag);
-	bool isPz() const;
-	void setPz();
+	bool hasFlag(tileflags_t flag) const {return ((flags & (uint32_t)flag) == (uint32_t)flag);}
+	void setFlag(tileflags_t flag) {flags |= flag;}
+	bool isPz() const {return hasFlag(TILESTATE_PROTECTIONZONE);}
+	void setPz() {setFlag(TILESTATE_PROTECTIONZONE);}
   
 	bool floorChange() const;
 	bool floorChangeDown() const;
 	bool floorChange(Direction direction) const;
+	bool hasHeight(uint32_t n) const;
 	uint32_t getHeight() const;
-  
+
 	virtual std::string getDescription(int32_t lookDistance) const;
 
 	void moveCreature(Creature* creature, Cylinder* toCylinder, bool teleport = false);
@@ -115,8 +117,8 @@ public:
 	virtual uint32_t __getItemTypeCount(uint16_t itemId) const;
 	virtual Thing* __getThing(uint32_t index) const;
 
-	virtual void postAddNotification(Thing* thing, bool hasOwnership = true);
-	virtual void postRemoveNotification(Thing* thing, bool isCompleteRemoval, bool hadOwnership = true);
+	virtual void postAddNotification(Thing* thing, int32_t index, cylinderlink_t link = LINK_OWNER);
+	virtual void postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, cylinderlink_t link = LINK_OWNER);
 
 	virtual void __internalAddThing(Thing* thing);
 	virtual void __internalAddThing(uint32_t index, Thing* thing);
@@ -136,6 +138,4 @@ protected:
 	uint32_t flags;
 };
 
-
-#endif // #ifndef __TILE_H__
-
+#endif

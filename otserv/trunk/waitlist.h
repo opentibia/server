@@ -28,7 +28,7 @@ struct Wait{
 	int acc;
 	unsigned long ip;
 	
-	 __int64 timeout;
+	 int64_t timeout;
 	int slot;
 		
 	Wait(int account, unsigned long ipnum, int place){

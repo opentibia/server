@@ -25,6 +25,7 @@
 #include <libxml/parser.h>
 #include "creature.h"
 #include "player.h"
+#include "tools.h"
 
 Outfits* Outfits::_instance = NULL;
 

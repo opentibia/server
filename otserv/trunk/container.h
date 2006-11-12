@@ -49,8 +49,8 @@ public:
 	uint32_t size() const {return (uint32_t)itemlist.size();};
 	uint32_t capacity() const {return maxSize;};
 
-	ItemList::const_iterator getItems() const;
-	ItemList::const_iterator getEnd() const;
+	ItemList::const_iterator getItems() const {return itemlist.begin();}
+	ItemList::const_iterator getEnd() const {return itemlist.end();}
 
 	Item* getItem(uint32_t index);
 	bool isHoldingItem(const Item* item) const;
@@ -81,11 +81,12 @@ public:
 	virtual uint32_t __getItemTypeCount(uint16_t itemId) const;
 	virtual Thing* __getThing(uint32_t index) const;
 
-	virtual void postAddNotification(Thing* thing, bool hasOwnership = true);
-	virtual void postRemoveNotification(Thing* thing, bool isCompleteRemoval, bool hadOwnership = true);
+	virtual void postAddNotification(Thing* thing, int32_t index, cylinderlink_t link = LINK_OWNER);
+	virtual void postRemoveNotification(Thing* thing, int32_t index, bool isCompleteRemoval, cylinderlink_t link = LINK_OWNER);
 
 	virtual void __internalAddThing(Thing* thing);
 	virtual void __internalAddThing(uint32_t index, Thing* thing);
+	virtual void __startDecaying();
 
 private:
 	void onAddContainerItem(Item* item);

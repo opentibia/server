@@ -35,7 +35,7 @@ class IOAccount {
 	virtual char* getSourceDescription(){return "Account source: NULL";};
 	virtual Account loadAccount(unsigned long accno);
 	
-	virtual bool getPassword(unsigned long accno, const std::string &name, std::string &password);
+	virtual bool getPassword(unsigned long accno, const std::string& name, std::string& password);
 
   protected:
 	IOAccount(){};

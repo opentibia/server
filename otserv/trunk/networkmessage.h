@@ -49,7 +49,7 @@ public:
 	// simply read functions for incoming message
 	uint8_t  GetByte();
 	uint16_t GetU16();
-	uint16_t GetItemId();
+	uint16_t GetSpriteId();
 	uint32_t GetU32();
 	std::string GetString();
 	std::string GetRaw();
@@ -76,6 +76,7 @@ public:
 	void AddItem(uint16_t id, uint8_t count);
 	void AddItem(const Item *item);
 	void AddItemId(const Item *item);
+	void AddItemId(uint16_t itemId);
 	void AddCreature(const Creature *creature, bool known, unsigned int remove);
 
   	int getMessageLength(){

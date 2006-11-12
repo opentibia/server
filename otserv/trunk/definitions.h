@@ -55,6 +55,10 @@
 
 #if defined __WINDOWS__ || defined WIN32
 
+#ifndef __FUNCTION__
+	#define	__FUNCTION__ __func__
+#endif
+
 #define OTSYS_THREAD_RETURN  void
 #define EWOULDBLOCK WSAEWOULDBLOCK
 
@@ -83,13 +87,16 @@
 		return ::_stricmp(s1, s2);
 	}
 
+	typedef signed long long int64_t;
 	typedef unsigned long uint32_t;
 	typedef signed long int32_t;
 	typedef unsigned short uint16_t;
+	typedef signed short int16_t;
 	typedef unsigned char uint8_t;
 
 	#pragma warning(disable:4786) // msvc too long debug names in stl
 	#pragma warning(disable:4250) // 'class1' : inherits 'class2::member' via dominance
+
 #endif
 
 //*nix systems
@@ -103,7 +110,7 @@
 
 	#define OTSERV_HASH_MAP __gnu_cxx::hash_map
 	#define OTSERV_HASH_SET __gnu_cxx::hash_set
-	typedef int64_t __int64;
+	typedef int64_t int64_t;
 
 #endif
 

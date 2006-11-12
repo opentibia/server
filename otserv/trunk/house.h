@@ -80,8 +80,8 @@ public:
 	virtual bool readAttr(AttrTypes_t attr, PropStream& propStream);
 	virtual bool serializeAttr(PropWriteStream& propWriteStream);
 
-	void setDoorId(unsigned long _doorId){ doorId = _doorId;};
-	unsigned long getDoorId() const{ return doorId;};
+	void setDoorId(uint32_t _doorId){ doorId = _doorId;};
+	uint32_t getDoorId() const{ return doorId;};
 	
 	bool canUse(const Player* player);
 	
@@ -95,7 +95,7 @@ protected:
 	void setHouse(House* _house);
 	
 private:
-	unsigned long doorId;
+	uint32_t doorId;
 	House* house;
 	AccessList* accessList;
 	friend class House;
@@ -122,7 +122,7 @@ class HouseTransferItem : public Item
 public:
 	static HouseTransferItem* createHouseTransferItem(House* house);
 	
-	HouseTransferItem(House* _house){house = _house;};
+	HouseTransferItem(House* _house) : Item(0) {house = _house;};
 	virtual ~HouseTransferItem(){};
 	
 	virtual bool onTradeEvent(TradeEvents_t event, Player* owner);
@@ -141,12 +141,12 @@ public:
 	
 	void addTile(HouseTile* tile);
 	
-	bool canEditAccessList(unsigned long listId, const Player* player);
+	bool canEditAccessList(uint32_t listId, const Player* player);
 	// listId special values:
 	//	GUEST_LIST     guest list
 	//  SUBOWNER_LIST subowner list
-	void setAccessList(unsigned long listId, const std::string& textlist);
-	bool getAccessList(unsigned long listId, std::string& list);
+	void setAccessList(uint32_t listId, const std::string& textlist);
+	bool getAccessList(uint32_t listId, std::string& list) const;
 
 	bool isInvited(const Player* player);
 	
@@ -177,7 +177,8 @@ public:
 	uint32_t getHouseId() const {return houseid;};
 
 	void addDoor(Door* door);
-	Door* getDoorByNumber(unsigned long doorId);
+	Door* getDoorByNumber(uint32_t doorId);
+	Door* getDoorByNumber(uint32_t doorId) const;
 	Door* getDoorByPosition(const Position& pos);
 	
 	HouseTransferItem* getTransferItem();
@@ -249,7 +250,7 @@ public:
 		
 	}
 	
-	House* getHouseByPlayerId(unsigned long playerId);
+	House* getHouseByPlayerId(uint32_t playerId);
 
 	bool loadHousesXML(std::string filename);
 	

@@ -60,19 +60,19 @@ public:
 		return _eventid;
 	}
 
-	virtual void setTicks(const __int64 ticks)
+	virtual void setTicks(const int64_t ticks)
 	{
 		_cycle = OTSYS_TIME() + ticks;
 	}
 
-	inline __int64 getCycle() const
+	inline int64_t getCycle() const
 	{
 		return _cycle;
 	}
 
 protected:
 	unsigned long _eventid;
-	__int64 _cycle;
+	int64_t _cycle;
 };
 
 class TSchedulerTask : public SchedulerTask{
@@ -98,7 +98,7 @@ protected:
 };
 
 SchedulerTask* makeTask(boost::function1<void, Game*> f);
-SchedulerTask* makeTask(__int64 ticks, boost::function1<void, Game*> f);
+SchedulerTask* makeTask(int64_t ticks, boost::function1<void, Game*> f);
 
 class lessSchedTask : public std::binary_function<SchedulerTask*, SchedulerTask*, bool>{
 public:

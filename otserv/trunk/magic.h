@@ -20,7 +20,7 @@
 
 #ifndef __MAGIC_H__
 #define __MAGIC_H__
-
+/*
 #include "position.h"
 #include "item.h"
 #include <map>
@@ -65,7 +65,7 @@ MagicEffectClass
 |                 (Holds a MagicEffectItem*)
 |
 |----->	MagicEffectItem : public Item, public MagicEffectClass
-*/
+//
 //------------------------------------------------------------------------------
 
 class MagicEffectItem;
@@ -330,5 +330,6 @@ protected:
 	MagicEffectItem* magicItem;
 };
 #include "creature.h"
+*/
 #endif //__MAGIC_H__
 

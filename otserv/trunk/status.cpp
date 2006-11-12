@@ -247,7 +247,6 @@ OTSYS_THREAD_RETURN Status::SendInfoThread(void *p)
 			}
 			else{
 				std::cout << "[Status::SendInfoThread] Can not resolve host ip \"" << host << "\"" << std::endl;
-				closesocket(s);
 				continue;
         	}
     	}

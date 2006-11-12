@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////
 // OpenTibia - an opensource roleplaying game
 //////////////////////////////////////////////////////////////////////
-// base class for every creature
+//
 //////////////////////////////////////////////////////////////////////
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -33,7 +33,7 @@ class ChatChannel
 {
 public:
 	ChatChannel(unsigned short channelId, std::string channelName);
-	~ChatChannel(){};
+	virtual ~ChatChannel(){};
 	
 	bool addUser(Player* player);
 	bool removeUser(Player* player);
@@ -56,7 +56,7 @@ class PrivateChatChannel : public ChatChannel
 {
 public:	
 	PrivateChatChannel(unsigned short channelId, std::string channelName);
-	~PrivateChatChannel(){};
+	virtual ~PrivateChatChannel(){};
 		
 	const unsigned long getOwner(){return m_owner;};
 	void setOwner(unsigned long id){m_owner = id;};

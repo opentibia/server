@@ -206,10 +206,10 @@ uint16_t NetworkMessage::GetU16()
 	return v;
 }
 
-uint16_t NetworkMessage::GetItemId()
+uint16_t NetworkMessage::GetSpriteId()
 {
-	uint16_t v = this->GetU16();
-	return Item::items.reverseLookUp(v);
+	unsigned short v = this->GetU16();
+	return v;
 }
 
 uint32_t NetworkMessage::GetU32()
@@ -291,7 +291,7 @@ void NetworkMessage::AddU32(uint32_t value)
 }
 
 
-void NetworkMessage::AddString(const std::string &value)
+void NetworkMessage::AddString(const std::string& value)
 {
 	AddString(value.c_str());
 }
@@ -322,7 +322,7 @@ void NetworkMessage::AddBytes(const char* bytes, uint32_t size)
 /******************************************************************************/
 
 
-void NetworkMessage::AddPosition(const Position &pos)
+void NetworkMessage::AddPosition(const Position& pos)
 {
 	AddU16(pos.x);
 	AddU16(pos.y);
@@ -346,7 +346,7 @@ void NetworkMessage::AddItem(uint16_t id, uint8_t count)
 	
 }
 
-void NetworkMessage::AddItem(const Item *item)
+void NetworkMessage::AddItem(const Item* item)
 {
 	const ItemType &it = Item::items[item->getID()];
 
@@ -361,7 +361,13 @@ void NetworkMessage::AddItem(const Item *item)
 	}
 }
 
-void NetworkMessage::AddItemId(const Item *item)
+void NetworkMessage::AddItemId(uint16_t itemId)
+{
+	const ItemType &it = Item::items[itemId];
+	AddU16(it.clientId);
+}
+
+void NetworkMessage::AddItemId(const Item* item)
 {
 	const ItemType &it = Item::items[item->getID()];
 
@@ -403,7 +409,7 @@ void NetworkMessage::XTEA_encrypt()
 		m_MsgSize = m_MsgSize + n;
 	}
 	
-	unsigned long read_pos = 0;
+	int read_pos = 0;
 	uint32_t* buffer = (uint32_t*)&m_MsgBuf[2];
 	while(read_pos < m_MsgSize/4){
 		uint32_t v0 = buffer[read_pos], v1 = buffer[read_pos + 1];
@@ -429,7 +435,7 @@ void NetworkMessage::XTEA_decrypt()
 	k[0] = m_key[0]; k[1] = m_key[1]; k[2] = m_key[2]; k[3] = m_key[3];
 	
 	uint32_t* buffer = (uint32_t*)&m_MsgBuf[2];
-	unsigned long read_pos = 0;
+	int read_pos = 0;
 	while(read_pos < m_MsgSize/4){
 		uint32_t v0 = buffer[read_pos], v1 = buffer[read_pos + 1];
 		uint32_t delta = 0x61C88647;

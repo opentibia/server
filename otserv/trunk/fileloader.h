@@ -24,6 +24,7 @@
 #include "definitions.h"
 #include <string>
 #include "stdio.h"
+#include "definitions.h"
 
 typedef unsigned long NODE;
 
@@ -106,8 +107,8 @@ protected:
 	bool m_use_cache;
 	struct _cache{
 		unsigned long loaded;
-		unsigned long base;
-		unsigned long size;
+		long base;
+		long size;
 		unsigned char* data;
 	};
 	#define CACHE_BLOCKS 3
@@ -131,7 +132,7 @@ public:
 
 	template <typename T>
 	inline bool GET_STRUCT(T* &ret){
-		if(size() < sizeof(T)){
+		if(size() < (long)sizeof(T)){
 			ret = NULL;
 			return false;
 		}
@@ -142,7 +143,7 @@ public:
 
 	template <typename T>
 	inline bool GET_VALUE(T &ret){
-		if(size() < sizeof(T)){
+		if(size() < (long)sizeof(T)){
 			return false;
 		}
 		ret = *((T*)p);
@@ -162,7 +163,7 @@ public:
 		return GET_VALUE(ret);
 	}
 
-	inline bool GET_STRING(std::string &ret){
+	inline bool GET_STRING(std::string& ret){
 		char* str;
 		uint16_t str_len;
 
@@ -181,7 +182,7 @@ public:
 		return true;
 	}
 
-	inline bool GET_NSTRING(unsigned short str_len, std::string &ret){
+	inline bool GET_NSTRING(unsigned short str_len, std::string& ret){
 		char* str;
 
 		if(size() < str_len){

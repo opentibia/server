@@ -113,7 +113,7 @@ void House::setHouseOwner(uint32_t guid)
 
 AccessHouseLevel_t House::getHouseAccessLevel(const Player* player)
 {
-	if(player->access > 2)
+	if(player->getAccessLevel() > 2)
 		return HOUSE_OWNER;
 	
 	if(player->getGUID() == houseOwner)
@@ -135,9 +135,9 @@ bool House::kickPlayer(Player* player, const std::string& name)
 		HouseTile* houseTile = dynamic_cast<HouseTile*>(kickingPlayer->getTile());
 		
 		if(houseTile && houseTile->getHouse() == this){
-			if(getHouseAccessLevel(player) >= getHouseAccessLevel(kickingPlayer) && player->access >= kickingPlayer->access){
+			if(getHouseAccessLevel(player) >= getHouseAccessLevel(kickingPlayer) && player->getAccessLevel() >= kickingPlayer->getAccessLevel()){
 				if(g_game.internalTeleport(kickingPlayer, getEntryPosition()) == RET_NOERROR){
-					g_game.AddMagicEffectAt(getEntryPosition(), NM_ME_ENERGY_AREA);
+					g_game.addMagicEffect(getEntryPosition(), NM_ME_ENERGY_AREA);
 				}
 				return true;
 			}
@@ -146,7 +146,7 @@ bool House::kickPlayer(Player* player, const std::string& name)
 	return false;
 }
 
-void House::setAccessList(unsigned long listId, const std::string& textlist)
+void House::setAccessList(uint32_t listId, const std::string& textlist)
 {
 	if(listId == GUEST_LIST){
 		guestList.parseList(textlist);
@@ -175,9 +175,9 @@ void House::setAccessList(unsigned long listId, const std::string& textlist)
 	for(it = houseTiles.begin(); it != houseTiles.end(); ++it){
 		HouseTile* hTile = *it;
 		if(hTile->creatures.size() > 0){
-			CreatureVector::iterator creatureit;
-			for(creatureit = hTile->creatures.begin(); creatureit != hTile->creatures.end(); ++creatureit){
-				Player* player = (*creatureit)->getPlayer();
+			CreatureVector::iterator cit;
+			for(cit = hTile->creatures.begin(); cit != hTile->creatures.end(); ++cit){
+				Player* player = (*cit)->getPlayer();
 				if(player && isInvited(player) == false){
 					kickList.push_back(player);
 				}
@@ -188,7 +188,7 @@ void House::setAccessList(unsigned long listId, const std::string& textlist)
 	KickPlayerList::iterator itkick;
 	for(itkick = kickList.begin(); itkick != kickList.end(); ++itkick){
 		if(g_game.internalTeleport(*itkick, getEntryPosition()) == RET_NOERROR){
-			g_game.AddMagicEffectAt(getEntryPosition(), NM_ME_ENERGY_AREA);
+			g_game.addMagicEffect(getEntryPosition(), NM_ME_ENERGY_AREA);
 		}
 	}
 }
@@ -225,7 +225,7 @@ bool House::transferToDepot()
 	Item* item = NULL;
 
 	for(HouseTileList::iterator it = houseTiles.begin(); it != houseTiles.end(); ++it){
-		for(int i = 0; i < (*it)->getThingCount(); ++i){
+		for(uint32_t i = 0; i < (*it)->getThingCount(); ++i){
 			item = (*it)->__getThing(i)->getItem();
 
 			if(!item)
@@ -254,7 +254,7 @@ bool House::transferToDepot()
 	return true;
 }
 
-bool House::getAccessList(unsigned long listId, std::string& list)
+bool House::getAccessList(uint32_t listId, std::string& list) const
 {
 	if(listId == GUEST_LIST){
 		guestList.getList(list);
@@ -296,9 +296,20 @@ void House::addDoor(Door* door)
 	door->setHouse(this);
 }
 
-Door* House::getDoorByNumber(unsigned long doorId)
+Door* House::getDoorByNumber(uint32_t doorId)
 {
 	HouseDoorList::iterator it;
+	for(it = doorList.begin(); it != doorList.end(); ++it){
+		if((*it)->getDoorId() == doorId){
+			return *it;
+		}
+	}
+	return NULL;
+}
+
+Door* House::getDoorByNumber(uint32_t doorId) const
+{
+	HouseDoorList::const_iterator it;
 	for(it = doorList.begin(); it != doorList.end(); ++it){
 		if((*it)->getDoorId() == doorId){
 			return *it;
@@ -318,7 +329,7 @@ Door* House::getDoorByPosition(const Position& pos)
 	return NULL;
 }
 
-bool House::canEditAccessList(unsigned long listId, const Player* player)
+bool House::canEditAccessList(uint32_t listId, const Player* player)
 {
 	switch(getHouseAccessLevel(player)){
 	case HOUSE_OWNER:
@@ -719,7 +730,7 @@ Houses::~Houses()
 	//
 }
 
-House* Houses::getHouseByPlayerId(unsigned long playerId)
+House* Houses::getHouseByPlayerId(uint32_t playerId)
 {
 	for(HouseMap::iterator it = houseMap.begin(); it != houseMap.end(); ++it){
 		House* house = it->second;

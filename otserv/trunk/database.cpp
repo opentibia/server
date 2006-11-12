@@ -174,7 +174,7 @@ int DBResult::getDataInt(const std::string &s, unsigned int nrow)
 		}
 	}
 
-	std::cout << "SQL ERROR DBResult::GetDataInt()" << std::endl;
+	std::cout << "SQL ERROR DBResult::GetDataInt() " << s << std::endl;
 	return 0; // Failed
 }
 
@@ -193,7 +193,7 @@ long DBResult::getDataLong(const std::string &s, unsigned int nrow)
 		}
 	}
 
-	std::cout << "SQL ERROR DBResult::GetDataLong()" << std::endl;
+	std::cout << "SQL ERROR DBResult::GetDataLong() " << s << std::endl;
 	return 0; // Failed
 }
 
@@ -213,7 +213,7 @@ std::string DBResult::getDataString(const std::string &s, unsigned int nrow)
 		}
 	}
 
-	std::cout << "SQL ERROR DBResult::GetDataString()" << std::endl;
+	std::cout << "SQL ERROR DBResult::GetDataString() " << s << std::endl;
 	return std::string(""); // Failed
 }
 
@@ -236,7 +236,7 @@ const char* DBResult::getDataBlob(const std::string &s, unsigned long& size, uns
 		}
 	}
 
-	std::cout << "SQL ERROR DBResult::getDataBlob()" << std::endl;
+	std::cout << "SQL ERROR DBResult::getDataBlob() " << s << std::endl;
 	size = 0;
 	return NULL;
 }
@@ -468,4 +468,3 @@ bool DBSplitInsert::executeQuery()
 	}
 	return true;
 }
-
