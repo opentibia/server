@@ -54,6 +54,8 @@ public:
 
 	static int32_t spellExhaustionTime;
 	static int32_t spellInFightTime;
+
+	static Position getCasterPosition(Creature* creature, Direction dir);
 	
 protected:
 	virtual void clear();
@@ -136,8 +138,6 @@ public:
 
 	//scripting
 	bool executeCastSpell(Creature* creature, const LuaVariant& var);
-
-	static Position getCasterPosition(Creature* creature);
 
 protected:	
 	virtual std::string getScriptEventName();

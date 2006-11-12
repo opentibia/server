@@ -361,6 +361,7 @@ bool Monster::getNextStep(Direction& dir)
 	
 	//destroy blocking items
 	if(result && canPushItems()){
+		/*
 		int dx, dy;
 		switch(dir){
 		case NORTH:
@@ -380,7 +381,11 @@ bool Monster::getNextStep(Direction& dir)
 			break;
 		}
 		const Position& position = getPosition();
-		Tile* tile = g_game.getTile(position.x + dx, position.y + dy, position.z);
+		*/
+
+		const Position& pos = Spells::getCasterPosition(this, dir)
+		Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
+
 		if(tile){
 			bool objectRemoved = false;
 			while(Item* item = tile->getMoveableBlockingItem()){

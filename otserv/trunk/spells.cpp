@@ -204,6 +204,54 @@ InstantSpell* Spells::getInstantSpellByName(const std::string& name)
 	return NULL;
 }
 
+Position Spells::getCasterPosition(Creature* creature, Direction dir)
+{
+	Position pos = creature->getPosition();
+
+	switch(dir){
+		case NORTH:
+			pos.y -= 1;
+			break;
+
+		case SOUTH:
+			pos.y += 1;
+			break;
+
+		case EAST:
+			pos.x += 1;
+			break;
+
+		case WEST:
+			pos.x -= 1;
+			break;
+		
+		case SOUTHWEST:
+			pos.x -= 1;
+			pos.y += 1;
+		break;
+
+		case NORTHWEST:
+			pos.x -= 1;
+			pos.y -= 1;
+		break;
+
+		case NORTHEAST:
+			pos.x += 1;
+			pos.y -= 1;
+		break;
+
+		case SOUTHEAST:
+			pos.x += 1;
+			pos.y += 1;
+		break;
+
+		default:
+			break;
+	}
+
+	return pos;
+}
+
 Spell::Spell()
 {
 	level = 0;
@@ -369,27 +417,29 @@ bool Spell::playerInstantSpellCheck(const Player* player, const Position& toPos)
 	if(result){
 		ReturnValue ret = RET_NOERROR;
 
-		const Position& playerPos = player->getPosition();
-		if(playerPos.z > toPos.z){
-			ret = RET_FIRSTGOUPSTAIRS;
-		}
-		else if(playerPos.z < toPos.z){
-			ret = RET_FIRSTGODOWNSTAIRS;
-		}
-		else{
-			Tile* tile = g_game.getTile(toPos.x, toPos.y, toPos.z);
-
-			if(!tile){
-				ret = RET_NOTPOSSIBLE;
+		if(toPos.x != 0xFFFF){
+			const Position& playerPos = player->getPosition();
+			if(playerPos.z > toPos.z){
+				ret = RET_FIRSTGOUPSTAIRS;
 			}
-
-			if(ret == RET_NOERROR){
-				ret = Combat::canDoCombat(player, tile, isAggressive);
+			else if(playerPos.z < toPos.z){
+				ret = RET_FIRSTGODOWNSTAIRS;
 			}
+			else{
+				Tile* tile = g_game.getTile(toPos.x, toPos.y, toPos.z);
 
-			if(ret == RET_NOERROR && blocking){
-				if(!tile->creatures.empty() || tile->hasProperty(BLOCKSOLID)){
-					ret = RET_NOTENOUGHROOM;
+				if(!tile){
+					ret = RET_NOTPOSSIBLE;
+				}
+
+				if(ret == RET_NOERROR){
+					ret = Combat::canDoCombat(player, tile, isAggressive);
+				}
+
+				if(ret == RET_NOERROR && blocking){
+					if(!tile->creatures.empty() || tile->hasProperty(BLOCKSOLID)){
+						ret = RET_NOTENOUGHROOM;
+					}
 				}
 			}
 		}
@@ -411,32 +461,34 @@ bool Spell::playerRuneSpellCheck(const Player* player, const Position& toPos)
 	if(result){
 		ReturnValue ret = RET_NOERROR;
 
-		const Position& playerPos = player->getPosition();
-		if(playerPos.z > toPos.z){
-			ret = RET_FIRSTGOUPSTAIRS;
-		}
-		else if(playerPos.z < toPos.z){
-			ret = RET_FIRSTGODOWNSTAIRS;
-		}
-		else{
-			Tile* tile = g_game.getTile(toPos.x, toPos.y, toPos.z);
-
-			if(!tile){
-				ret = RET_NOTPOSSIBLE;
+		if(toPos.x != 0xFFFF){
+			const Position& playerPos = player->getPosition();
+			if(playerPos.z > toPos.z){
+				ret = RET_FIRSTGOUPSTAIRS;
 			}
-
-			if(ret == RET_NOERROR){
-				ret = Combat::canDoCombat(player, tile, isAggressive);
+			else if(playerPos.z < toPos.z){
+				ret = RET_FIRSTGODOWNSTAIRS;
 			}
+			else{
+				Tile* tile = g_game.getTile(toPos.x, toPos.y, toPos.z);
 
-			if(ret == RET_NOERROR && blocking){
-				if(!tile->creatures.empty() || tile->hasProperty(BLOCKSOLID)){
-					ret = RET_NOTENOUGHROOM;
+				if(!tile){
+					ret = RET_NOTPOSSIBLE;
 				}
-			}
-			
-			if(ret == RET_NOERROR && needTarget && tile->creatures.empty()){
-				ret = RET_CANONLYUSETHISRUNEONCREATURES;
+
+				if(ret == RET_NOERROR){
+					ret = Combat::canDoCombat(player, tile, isAggressive);
+				}
+
+				if(ret == RET_NOERROR && blocking){
+					if(!tile->creatures.empty() || tile->hasProperty(BLOCKSOLID)){
+						ret = RET_NOTENOUGHROOM;
+					}
+				}
+				
+				if(ret == RET_NOERROR && needTarget && tile->creatures.empty()){
+					ret = RET_CANONLYUSETHISRUNEONCREATURES;
+				}
 			}
 		}
 
@@ -644,34 +696,6 @@ bool InstantSpell::loadFunction(const std::string& functionName)
 	return true;
 }
 
-Position InstantSpell::getCasterPosition(Creature* creature)
-{
-	Position pos = creature->getPosition();
-
-	switch(creature->getDirection()){
-		case NORTH:
-			pos.y -= 1;
-			break;
-
-		case SOUTH:
-			pos.y += 1;
-			break;
-
-		case EAST:
-			pos.x += 1;
-			break;
-
-		case WEST:
-			pos.x -= 1;
-			break;
-		
-		default:
-			break;
-	}
-
-	return pos;
-}
-
 bool InstantSpell::playerCastInstant(Player* player, const std::string& param)
 {
 	if(!playerSpellCheck(player)){
@@ -708,7 +732,7 @@ bool InstantSpell::playerCastInstant(Player* player, const std::string& param)
 	else{
 		var.type = VARIANT_POSITION;
 		if(needDirection){
-			var.pos = getCasterPosition(player);
+			var.pos = Spells::getCasterPosition(player, player->getDirection());
 		}
 		else{
 			var.pos = player->getPosition();
@@ -733,7 +757,7 @@ bool InstantSpell::castSpell(Creature* creature)
 	LuaVariant var;
 	var.type = VARIANT_POSITION;
 	if(needDirection){
-		var.pos = getCasterPosition(creature);
+		var.pos = Spells::getCasterPosition(creature, creature->getDirection());
 	}
 	else{
 		var.pos = creature->getPosition();
@@ -1184,7 +1208,7 @@ bool InstantSpell::Levitate(const InstantSpell* spell, Creature* creature, const
 	}
 
 	const Position& currentPos = creature->getPosition();
-	const Position& destPos = getCasterPosition(creature);
+	const Position& destPos = Spells::getCasterPosition(creature, creature->getDirection());
 
 	ReturnValue ret = RET_NOTPOSSIBLE;
 
