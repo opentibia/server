@@ -1,48 +1,54 @@
 <?xml version="1.0"?>
-<spells maxVoc="4">
-<spell name="Ultimate Healing" words="exura vita" maglv="8" mana="100" enabled="1">
-<vocation id="0" /><vocation id="1" /><vocation id="2" /><vocation id="3" />
-</spell>
-<spell name="Light Healing" words="exura" maglv="8" mana="20" enabled="1">
-<vocation id="0" /><vocation id="1" /><vocation id="2" /><vocation id="3" />
-</spell>
-<spell name="Ultimate Explosion" words="exevo gran mas vis" maglv="40" mana="800" enabled="1">
-<vocation id="0" /><vocation id="1" />
-</spell>
-<spell name="Great Energy Beam" words="exevo gran vis lux" maglv="40" mana="150" enabled="1">
-<vocation id="0" /><vocation id="1" />
-</spell>
-<spell name="Energy Wave" words="exevo mort hur" maglv="20" mana="250" enabled="1"><vocation id="0" /><vocation id="1" />
-</spell>
-<spell name="Mass Healing" words="exura gran mas res" maglv="20" mana="100" enabled="1"><vocation id="1" />
-</spell>
-<spell name="Creature Illusion" words="utevo res ina" maglv="10" mana="100" enabled="1"><vocation id="0" /><vocation id="1" /><vocation id="2" />
-</spell>
-<spell name="Mana Shield" words="utamo vita" maglv="4" mana="50" enabled="1"><vocation id="0" /><vocation id="1" /><vocation id="2" /><vocation id="3" />
-</spell>
-<spell name="Heal Friend" words="exura sio" maglv="7" mana="70" enabled="1"><vocation id="0" /><vocation id="2" />
-</spell>
-<spell name="Haste" words="utani hur" maglv="4" mana="60" enabled="1"><vocation id="0" /><vocation id="1" /><vocation id="2" /><vocation id="3" />
-</spell>
-<spell name="Strong Haste" words="utani gran hur" maglv="17" mana="100" enabled="1"><vocation id="1" /><vocation id="2" />
-</spell>
-<spell name="Poison storm" words="exevo gran mas pox" maglv="20" mana="200" enabled="1"><vocation id="1" /><vocation id="2" />
-</spell>
-<spell name="Ultimate healing rune" words="adura vita" maglv="11" mana="100" enabled="1"><vocation id="2" />
-</spell>
-<spell name="Conjure Arrow" words="exevo con" maglv="2" mana="40" enabled="1">
-<vocation id="3" />
-</spell>
-<spell name="Create Food" words="exevo pan" maglv="0" mana="30" enabled="1">
-<vocation id="0" /><vocation id="1" /><vocation id="2" /><vocation id="3" />
-</spell>
-<rune name="Sudden death" id="2268" charges="1" maglv="18" mana="0" enabled="1"></rune>
-<rune name="Ultimate healing" id="2273" charges="1" maglv="4" mana="0" enabled="1"></rune>
-<rune name="Great fireball" id="2304" charges="2" maglv="4" mana="0" enabled="1"></rune>
-<rune name="Explosion" id="2313" charges="2" maglv="7" mana="0" enabled="1"></rune>
-<rune name="Firebomb" id="2305" charges="2" maglv="10" mana="0" enabled="1"></rune>
-<rune name="Energybomb" id="2262" charges="5" maglv="10" mana="0" enabled="1"></rune>
-<rune name="Magic wall" id="2293" charges="5" maglv="10" mana="0" enabled="1"></rune>
-<rune name="Soul fire" id="2308" charges="5" maglv="10" mana="0" enabled="1"></rune>
-<rune name="Heavy magic missile" id="2311" charges="5" maglv="7" mana="0" enabled="1"></rune>
+<spells>
+<rune name="Sudden Death" id="2268" charges="1" needtarget="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="sd.lua"></rune>
+<rune name="Heavy Magic Missile" id="2311" charges="5" needtarget="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="hmm.lua"></rune>
+<rune name="Great Fireball" id="2269" charges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="gfb.lua"></rune>
+<rune name="Polymorph" id="2270" charges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="polymorph.lua"></rune>
+<rune name="Combustion" id="2271" charges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="combustion.lua"></rune>
+<rune name="Paralyze" id="2272" charges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="paralyze.lua"></rune>
+<rune name="Ultimate Healing" id="2273" aggressive="0" charges="1" needtarget="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="0" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="uh.lua"></rune>
+<rune name="Energy Arrow" id="2274" charges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="energy wave.lua"></rune>
+<rune name="Energy Wall" id="2275" charges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="energy wall.lua"></rune>
+<rune name="Magic Wall" id="2276" charges="1" blocking="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="magic wall.lua"></rune>
+<rune name="Magic Prison" id="2277" charges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="magic prison.lua"></rune>
+<rune name="Fire Field" id="2278" charges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="fire field.lua"></rune>
+<rune name="Invisible" id="2279" charges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" script="invisible.lua"></rune>
+<rune name="Drunk" id="2267" charges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" script="drunk.lua"></rune>
+<rune name="Chameleon" id="2291" charges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" function="chameleon"></rune>
+
+<instant name="Wild Growth" words="exevo grav vita" direction="1" blocking="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="wild growth.lua">
+<vocation name="Druid"/>
+</instant>
+<instant name="Levitate" words="exani hur" params="1" soul="0" exhaustion="1" prem="0" enabled="1" function="Levitate"></instant>
+<instant name="Summon Creature" words="utevo res" aggressive="1" params="1" soul="0" exhaustion="1" prem="0" enabled="1" function="summonMonster"></instant>
+<instant name="Find Person" words="exiva" aggressive="0" params="1" mana="100" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" function="searchPlayer"></instant>
+<instant name="Heal Friend" words="exura sio" aggressive="0" params="1" needtarget="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="healfriend.lua">
+<vocation name="Druid"/>
+</instant>
+<instant name="Energy Wave" words="exevo mort hur" direction="1" lvl="10" maglv="20" mana="200" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="energy wave.lua"></instant>
+<instant name="Mass Healing" words="exura gran mas res" aggressive="0" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="mass healing.lua">
+<vocation name="Druid"/>
+</instant>
+<instant name="Strong Haste" words="utani gran hur" selftarget="1" aggressive="0" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="strong haste.lua">
+<vocation name="Druid"/>
+<vocation name="Sorcerer"/>
+</instant>
+<instant name="Magic Shield" words="utamo vita" selftarget="1" aggressive="0" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="magic shield.lua">
+<vocation name="Druid"/>
+<vocation name="Sorcerer"/>
+<vocation name="Paladin"/>
+</instant>
+
+<instant name="Create Illusion" words="utevo res ina" params="1" aggressive="0" lvl="10" maglv="20" mana="200" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" function="Illusion"></instant>
+
+<conjure name="Ultimate Healing Rune" words="adura vita" reagentId="2260" conjureId="2273" aggressive="0" maglv="20" mana="150" soul="10" prem="0" enabled="1" function="conjureRune">
+</conjure>
+
+<conjure name="Heavy Magic Missile" words="adori gran" reagentId="2260" conjureId="2311" conjureCount="5" aggressive="0" maglv="20" mana="200" soul="10" prem="0" enabled="1" function="conjureRune">
+</conjure>
+
+<conjure name="Create Food" words="exevo pan" maglv="20" mana="200" soul="10" prem="0" enabled="1" function="conjureFood">
+</conjure>
+
+<rune name="bolt" id="20001" enabled="1" allowfaruse="1" blockwalls="1" script="monsters/bolt.lua"></rune>
 </spells>

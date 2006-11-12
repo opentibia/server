@@ -1,0 +1,153 @@
+<items>
+	<item id="1499" name="wild growth">
+		<attribute key="field" value="block"/>
+		<attribute key="duration" value="20"/>
+	</item>
+
+	<item id="1497" name="magic wall">
+		<attribute key="field" value="block"/>
+		<attribute key="duration" value="20"/>
+	</item>
+
+	<item id="1498" name="magic wall">
+		<attribute key="field" value="block"/>
+		<attribute key="duration" value="20"/>
+	</item>
+
+	<item id="2197" name="stone skin amulet">
+		<attribute key="charges" value="5"/>
+		<attribute key="showcharges" value="1"/>
+		<attribute key="absorbPercentPhysical" value="95"/>
+	</item>
+	
+	<item id="2165" name="stealth ring">
+		<attribute key="transformEquipTo" value="2202"/>
+		<attribute key="canDecay" value="0"/>
+		<attribute key="showduration" value="1"/>
+	</item>
+
+	<item id="2202" name="stealth ring">
+		<attribute key="transformDeEquipTo" value="2165"/>
+		<attribute key="duration" value="600"/>
+		<attribute key="showduration" value="1"/>
+		<attribute key="invisible" value="1"/>
+	</item>
+	
+	<item id="2169" name="time ring">
+		<attribute key="transformEquipTo" value="2206"/>
+		<attribute key="canDecay" value="0"/>
+		<attribute key="showduration" value="1"/>
+	</item>
+
+	<item id="2206" name="time ring">
+		<attribute key="transformDeEquipTo" value="2169"/>
+		<attribute key="duration" value="600"/>
+		<attribute key="showduration" value="1"/>
+		<attribute key="speed" value="60"/>
+	</item>
+
+	<item id="2167" name="energy ring">
+		<attribute key="transformEquipTo" value="2204"/>
+		<attribute key="canDecay" value="0"/>
+		<attribute key="showduration" value="1"/>
+	</item>
+
+	<item id="2204" name="energy ring">
+		<attribute key="transformDeEquipTo" value="2167"/>
+		<attribute key="duration" value="600"/>
+		<attribute key="showduration" value="1"/>
+		<attribute key="manashield" value="1"/>
+	</item>
+
+
+	<item id="2207" name="sword ring">
+		<attribute key="transformEquipTo" value="2210"/>
+		<attribute key="showduration" value="1"/>
+		<attribute key="canDecay" value="0"/>
+	</item>
+
+	<item id="2210" name="sword ring">
+		<attribute key="transformDeEquipTo" value="2207"/>
+		<attribute key="skillSword" value="5"/>
+		<attribute key="duration" value="300"/>
+		<attribute key="showduration" value="1"/>
+	</item>
+
+	<item id="2213" name="dwarfen ring">
+		<attribute key="transformEquipTo" value="2215"/>
+		<attribute key="showduration" value="1"/>
+		<attribute key="canDecay" value="0"/>
+	</item>
+
+	<item id="2215" name="dwarfen ring">
+		<attribute key="transformDeEquipTo" value="2213"/>
+		<attribute key="suppressDrunk" value="1"/>
+		<attribute key="duration" value="300"/>
+		<attribute key="showduration" value="1"/>
+	</item>
+
+	<item id="2168" name="life ring">
+		<attribute key="transformEquipTo" value="2205"/>
+		<attribute key="showduration" value="1"/>
+		<attribute key="canDecay" value="0"/>
+	</item>
+
+	<item id="2205" name="life ring">
+		<attribute key="transformDeEquipTo" value="2168"/>
+		<attribute key="duration" value="500"/>
+		<attribute key="healthGain" value="100"/>
+		<attribute key="HealthTicks" value="1000"/>
+		<attribute key="manaGain" value="50"/>
+		<attribute key="manaTicks" value="1000"/>
+		<attribute key="showduration" value="1"/>
+	</item>
+
+	<item id="2162" name="magic lightwand">
+		<attribute key="showduration" value="1"/>
+		<attribute key="canDecay" value="0"/>
+	</item>
+
+	<item id="2163" name="magic lightwand">
+		<attribute key="showduration" value="1"/>
+		<attribute key="canDecay" value="1"/>
+		<attribute key="duration" value="300"/>
+	</item>
+
+	<item id="1491" name="energy">
+		<attribute key="duration" value="60"/>
+	</item>
+
+	<item id="2195" name="boots of haste">
+		<attribute key="speed" value="40"/>
+	</item>
+
+	<item id="2195" name="boots of haste">
+		<attribute key="speed" value="40"/>
+	</item>
+
+	<item id="1487" name="fire">
+		<attribute key="duration" value="60"/>
+		<attribute key="field" value="fire">
+			<attribute key="damage" value="25"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="10"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="10"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="10"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="10"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="10"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="10"/>
+			<attribute key="ticks" value="2000"/>
+			<attribute key="damage" value="10"/>
+		</attribute>
+	</item>
+
+	<item id="1506" name="magic fire">
+		<attribute key="field" damageType="fire" initDamage="400"/>
+	</item>
+
+</items>

@@ -2,9 +2,7 @@
 
 <monsters>
 
-<monster name="demon" file="demon.xml" />
-<monster name="giant spider" file="giant spider.xml" />
-<monster name="minotaur archer" file="minotaur archer.xml" />
-<monster name="poison spider" file="poison spider.xml" />
-
+<monster name="demon" file="demon.xml"/>
+<monster name="minotaur archer" file="minotaur archer.xml"/>
+<monster name="poison spider" file="poison spider.xml"/>
 </monsters>
