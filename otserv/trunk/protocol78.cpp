@@ -2048,6 +2048,7 @@ void Protocol78::AddCreatureSpeak(NetworkMessage& msg,const Creature* creature, 
 	else{
 		msg.AddU16(0);
 	}
+
 	msg.AddByte(type);
 	switch(type){
 		case SPEAK_SAY:
@@ -2078,7 +2079,7 @@ void Protocol78::AddCreatureHealth(NetworkMessage& msg,const Creature* creature)
 
 void Protocol78::AddCreatureInvisible(NetworkMessage& msg, const Creature* creature)
 {
-	msg.AddByte(0);
+	msg.AddU16(0);
 	msg.AddU16(0);
 }
 
