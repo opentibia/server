@@ -266,12 +266,32 @@ void Monster::searchTarget()
 void Monster::onThink(uint32_t interval)
 {
 	needThink = false;
+
+	if(isSummon()){
+		if(!isActive && conditions.empty()){
+			stopThink();
+		}
+		else{
+			Creature::onThink(interval);
+		}
+	}
+	else{
+		if((!isActive || targetList.empty()) && conditions.empty()){
+			stopThink();
+		}
+		else{
+			Creature::onThink(interval);
+		}
+	}
+
+	/*
 	if((!isActive || targetList.empty()) && conditions.empty()){
 		stopThink();
 	}
 	else{
 		Creature::onThink(interval);
 	}
+	*/
 	
 	onThinkYell(interval);
 	onDefending(interval);
@@ -474,6 +494,12 @@ bool Monster::getRandomStep(const Position& creaturePos, const Position& centerP
 
 void Monster::doAttacking(uint32_t interval)
 {
+	if(isSummon(){
+		if(attackedCreature == this){
+			return;
+		}
+	}
+
 	bool resetTicks = true;
 	attackTicks += interval;
 
@@ -484,6 +510,11 @@ void Monster::doAttacking(uint32_t interval)
 
 		if(it->speed > attackTicks){
 			resetTicks = false;
+			continue;
+		}
+
+		if(attackTicks % it->speed > interval){
+			//already used this spell for this round
 			continue;
 		}
 
@@ -501,7 +532,10 @@ void Monster::doAttacking(uint32_t interval)
 	if(mType->combatMeleeMin != 0 || mType->combatMeleeMax != 0){
 		if(mType->combatMeleeSpeed < attackTicks){
 
-			if(std::max(std::abs(myPos.x - targetPos.x), std::abs(myPos.y - targetPos.y)) <= 1){
+			if(attackTicks % mType->combatMeleeSpeed > interval){
+				//already used this melee attack for this round
+			}
+			else if(std::max(std::abs(myPos.x - targetPos.x), std::abs(myPos.y - targetPos.y)) <= 1){
 				CombatParams params;
 				params.combatType = COMBAT_PHYSICALDAMAGE;
 				params.blockedByArmor = true;
@@ -532,6 +566,11 @@ void Monster::onDefending(uint32_t interval)
 			continue;
 		}
 
+		if(defenseTicks % it->speed > interval){
+			//already used this spell for this round
+			continue;
+		}
+
 		if((it->chance >= (uint32_t)random_range(0, 100))){
 			minCombatValue = it->minCombatValue;
 			maxCombatValue = it->maxCombatValue;
@@ -543,6 +582,11 @@ void Monster::onDefending(uint32_t interval)
 		for(SummonList::iterator it = mType->summonList.begin(); it != mType->summonList.end(); ++it){
 			if(it->speed > defenseTicks){
 				resetTicks = false;
+				continue;
+			}
+
+			if(defenseTicks % it->speed > interval){
+				//already used this spell for this round
 				continue;
 			}
 
@@ -682,7 +726,8 @@ uint32_t Monster::getFollowDistance() const
 {
 	if(isSummon()){
 		//if(getMaster() == followCreature){
-		if(!followCreature || getMaster() == followCreature){
+		//if(!followCreature || getMaster() == followCreature){
+		if((!followCreature && !attackedCreature) || getMaster() == followCreature){
 			return 2;
 		}
 	}
