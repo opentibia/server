@@ -494,7 +494,7 @@ bool Monster::getRandomStep(const Position& creaturePos, const Position& centerP
 
 void Monster::doAttacking(uint32_t interval)
 {
-	if(isSummon(){
+	if(isSummon()){
 		if(attackedCreature == this){
 			return;
 		}

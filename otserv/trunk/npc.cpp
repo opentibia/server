@@ -49,7 +49,7 @@ Creature()
 	if(!m_scriptInterface){
 		 m_scriptInterface = new NpcScriptInterface();
 	}
-	loaded = false;
+	loaded = true;
 	name = _name;
 
 	std::string datadir = g_config.getString(ConfigManager::DATA_DIRECTORY);
@@ -59,7 +59,6 @@ Creature()
 	xmlDocPtr doc = xmlParseFile(filename.c_str());
 
 	if(doc){
-		loaded = true;
 		xmlNodePtr root, p;
 		root = xmlDocGetRootElement(doc);
 
@@ -139,17 +138,22 @@ Creature()
 		}
 
 		xmlFreeDoc(doc);
+		
+		//now try to load the script
+		if(scriptname != ""){
+			m_npcEventHandler = new NpcScript(scriptname, this);
+			if(!m_npcEventHandler->isLoaded()){
+				loaded = false;
+			}
+		}
+		else{ //default npcs
+			//TODO
+			loaded = false;
+		}	
 	}
-
-	//now try to load the script
-	if(scriptname != ""){
-		m_npcEventHandler = new NpcScript(scriptname, this);
-	}
-	else{ //default npcs
-	}
-
-	if(!m_npcEventHandler->isLoaded())
+	else{
 		loaded = false;
+	}
 }
 
 

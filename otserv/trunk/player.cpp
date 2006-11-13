@@ -496,7 +496,7 @@ int32_t Player::getContainerID(const Container* container) const
 void Player::addContainer(uint32_t cid, Container* container)
 {
 #ifdef __DEBUG__
-	cout << getName() << ", addContainer: " << (int)cid << std::endl;
+	std::cout << getName() << ", addContainer: " << (int)cid << std::endl;
 #endif
 	if(cid > 0xF)
 		return;
@@ -526,7 +526,7 @@ void Player::closeContainer(uint32_t cid)
 	}
 
 #ifdef __DEBUG__
-	cout << getName() << ", closeContainer: " << (int)cid << std::endl;
+	std::cout << getName() << ", closeContainer: " << (int)cid << std::endl;
 #endif
 }
 
