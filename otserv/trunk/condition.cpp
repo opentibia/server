@@ -360,6 +360,8 @@ bool ConditionDamage::executeCondition(Creature* creature, int32_t interval)
 		damageInfo.timeLeft -= interval;
 
 		if(damageInfo.timeLeft <= 0){
+			int32_t damage = damageInfo.damage;
+
 			if(bRemove){
 				damageList.pop_front();
 			}
@@ -368,7 +370,7 @@ bool ConditionDamage::executeCondition(Creature* creature, int32_t interval)
 				damageInfo.timeLeft = damageInfo.interval;
 			}
 
-			doDamage(creature, damageInfo.damage);
+			doDamage(creature, damage);
 		}
 		
 		if(!bRemove){

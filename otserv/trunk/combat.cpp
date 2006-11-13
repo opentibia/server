@@ -632,6 +632,7 @@ void Combat::doCombatDispel(Creature* caster, Creature* target, const CombatPara
 void Combat::doCombatDefault(Creature* caster, Creature* target, const CombatParams& params)
 {
 	CombatNullFunc(caster, target, params, NULL);
+	combatTileEffects(caster, target->getTile(), params);
 
 	if(params.impactEffect != NM_ME_NONE){
 		g_game.addMagicEffect(target->getPosition(), params.impactEffect);

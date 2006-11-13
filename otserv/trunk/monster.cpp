@@ -419,7 +419,7 @@ bool Monster::getNextStep(Direction& dir)
 			}
 
 			for(CreatureVector::iterator cit = tile->creatures.begin(); cit != tile->creatures.end(); ++cit){
-				if((*cit)->getMonster()){
+				if((*cit)->getMonster() && (*cit)->isPushable()){
 					(*cit)->changeHealth(-(*cit)->getHealth());
 					objectRemoved = true;
 				}

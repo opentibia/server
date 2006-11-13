@@ -534,7 +534,11 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 
 						if(readXMLString(tmpNode, "name", strValue)){
 
-							if(strcasecmp(strValue.c_str(), "energy") == 0){
+							if(strcasecmp(strValue.c_str(), "physical") == 0){
+								mType->damageImmunities |= COMBAT_PHYSICALDAMAGE;
+								//mType->conditionImmunities |= CONDITION_PHYSICAL;
+							}
+							else if(strcasecmp(strValue.c_str(), "energy") == 0){
 								mType->damageImmunities |= COMBAT_ENERGYDAMAGE;
 								mType->conditionImmunities |= CONDITION_ENERGY;
 							}
@@ -610,11 +614,11 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 						int32_t chance = 100;
 						int32_t speed = 1000;
 
-						if(readXMLInteger(p, "speed", intValue)){
+						if(readXMLInteger(tmpNode, "speed", intValue)){
 							speed = intValue;
 						}
 
-						if(readXMLInteger(p, "chance", intValue)){
+						if(readXMLInteger(tmpNode, "chance", intValue)){
 							chance = intValue;
 						}
 
