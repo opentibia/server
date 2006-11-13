@@ -224,7 +224,7 @@ bool Commands::exeCommand(Creature* creature, const std::string& cmd)
 bool Commands::placeNpc(Creature* creature, const std::string& cmd, const std::string& param)
 {
 	Npc* npc = new Npc(param);
-	if(!npc->isLoaded()){
+	if(!npc || !npc->isLoaded()){
 		delete npc;
 		return true;
 	}
