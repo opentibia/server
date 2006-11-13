@@ -228,9 +228,11 @@ public:
 	A getElement(long id);
 	void addElement(A a, long pos);
 	
+	uint32_t size() {return m_size;}
+
 private:
 	A* m_data;
-	long m_size;
+	uint32_t m_size;
 };
 
 
@@ -257,6 +259,9 @@ public:
 	bool loadFromXml(const std::string& datadir);
 	
 	void addItemType(ItemType* iType);
+	
+	uint32_t size() {return items.size();}
+
 protected:
 	Array<ItemType*> items;
 	ItemType dummyItemType; // use this for invalid ids

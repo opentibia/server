@@ -86,12 +86,12 @@ std::string Weapons::getScriptBaseName()
 
 bool Weapons::loadDefaults()
 {
-	/*TODO!!!!
-	for(unsigned int i = 0; i < Item::items.size(); ++i){
+	for(uint32_t i = 0; i < Item::items.size(); ++i){
 		const ItemType& it = Item::items[i];
 
-		if(weapons.find(it.id) != weapons.end())
+		if(it.id == 0 || weapons.find(it.id) != weapons.end()){
 			continue;
+		}
 
 		if(it.weaponType != WEAPON_NONE){
 			switch(it.weaponType){
@@ -125,7 +125,7 @@ bool Weapons::loadDefaults()
 			}
 		}
 	}
-*/
+
 	return true;
 }
 
