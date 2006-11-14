@@ -16,30 +16,32 @@
 <rune name="Drunk" id="2267" charges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" script="drunk.lua"></rune>
 <rune name="Chameleon" id="2291" charges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" function="chameleon"></rune>
 
-<instant name="Wild Growth" words="exevo grav vita" direction="1" blocking="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="wild growth.lua">
+<instant name="Wild Growth" words="exevo grav vita" direction="1" blocking="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" script="wild growth.lua">
 <vocation name="Druid"/>
 </instant>
 <instant name="Levitate" words="exani hur" params="1" soul="0" exhaustion="1" prem="0" enabled="1" function="Levitate"></instant>
 <instant name="Summon Creature" words="utevo res" aggressive="1" params="1" soul="0" exhaustion="1" prem="0" enabled="1" function="summonMonster"></instant>
-<instant name="Find Person" words="exiva" aggressive="0" params="1" mana="100" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" function="searchPlayer"></instant>
-<instant name="Heal Friend" words="exura sio" aggressive="0" params="1" needtarget="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="healfriend.lua">
+<instant name="Find Person" words="exiva" aggressive="0" params="1" mana="100" soul="0" exhaustion="1" prem="0" enabled="1" function="searchPlayer"></instant>
+<instant name="Heal Friend" words="exura sio" aggressive="0" params="1" needtarget="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" script="healfriend.lua">
 <vocation name="Druid"/>
 </instant>
-<instant name="Energy Wave" words="exevo mort hur" direction="1" lvl="10" maglv="20" mana="200" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="energy wave.lua"></instant>
-<instant name="Mass Healing" words="exura gran mas res" aggressive="0" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="mass healing.lua">
+<instant name="Energy Wave" words="exevo mort hur" direction="1" lvl="10" maglv="20" mana="200" soul="0" exhaustion="1" prem="0" enabled="1" script="energy wave.lua"></instant>
+<instant name="Mass Healing" words="exura gran mas res" aggressive="0" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" script="mass healing.lua">
 <vocation name="Druid"/>
 </instant>
-<instant name="Strong Haste" words="utani gran hur" selftarget="1" aggressive="0" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="strong haste.lua">
+<instant name="Strong Haste" words="utani gran hur" selftarget="1" aggressive="0" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" script="strong haste.lua">
 <vocation name="Druid"/>
 <vocation name="Sorcerer"/>
 </instant>
-<instant name="Magic Shield" words="utamo vita" selftarget="1" aggressive="0" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="magic shield.lua">
+<instant name="Magic Shield" words="utamo vita" selftarget="1" aggressive="0" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" script="magic shield.lua">
 <vocation name="Druid"/>
 <vocation name="Sorcerer"/>
 <vocation name="Paladin"/>
 </instant>
 
-<instant name="Create Illusion" words="utevo res ina" params="1" aggressive="0" lvl="10" maglv="20" mana="200" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" function="Illusion"></instant>
+<instant name="Create Illusion" words="utevo res ina" params="1" aggressive="0" lvl="10" maglv="20" mana="200" soul="0" exhaustion="1" prem="0" enabled="1" function="Illusion"></instant>
+
+<instant name="Light" words="utevo lux" aggressive="0" lvl="2" maglv="0" mana="20" soul="0" exhaustion="1" prem="0" enabled="1" script="light.lua"></instant>
 
 <conjure name="Ultimate Healing Rune" words="adura vita" reagentId="2260" conjureId="2273" aggressive="0" maglv="20" mana="150" soul="10" prem="0" enabled="1" function="conjureRune">
 </conjure>

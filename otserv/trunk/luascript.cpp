@@ -867,6 +867,8 @@ void LuaScriptInterface::registerFunctions()
 	lua_register(m_luaState, "doPlayerAddOutfit", LuaScriptInterface::luaDoPlayerAddOutfit);
 	//doPlayerRemOutfit(cid,looktype,addons)
 	lua_register(m_luaState, "doPlayerRemOutfit", LuaScriptInterface::luaDoPlayerRemOutfit);	
+	//doSetCreatureLight(cid, lightLevel, lightColor, time)
+	lua_register(m_luaState, "doSetCreatureLight", LuaScriptInterface::luaDoSetCreatureLight);
 	
 	//isPlayer(cid)
 	lua_register(m_luaState, "isPlayer", LuaScriptInterface::luaIsPlayer);
@@ -2523,7 +2525,7 @@ int LuaScriptInterface::luaSetCombatCallBack(lua_State *L)
 		lua_pushnumber(L, LUA_ERROR);
 		return 1;
 	}
-		
+	
 	LuaScriptInterface* scriptInterface = env->getScriptInterface();
 	
 	combat->setCallback(key);
@@ -2564,6 +2566,7 @@ int LuaScriptInterface::luaSetCombatFormula(lua_State *L)
 
 	if(combat){
 		combat->setPlayerCombatValues(type, mina, minb, maxa, maxb);
+		
 		lua_pushnumber(L, LUA_NO_ERROR);
 	}
 	else{
@@ -2588,15 +2591,15 @@ int LuaScriptInterface::luaSetConditionFormula(lua_State *L)
 
 	ConditionSpeed* condition = dynamic_cast<ConditionSpeed*>(env->getConditionObject(conditionId));
 	
-	if(!condition){
+	if(condition){
+		condition->setFormulaVars(mina, minb, maxa, maxb);
+
+		lua_pushnumber(L, LUA_NO_ERROR);	
+	}
+	else{
 		reportErrorFunc(getErrorDesc(LUA_ERROR_CONDITION_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
-		return 1;
 	}
-
-	condition->setFormulaVars(mina, minb, maxa, maxb);
-
-	lua_pushnumber(L, LUA_NO_ERROR);
 	return 1;
 }
 
@@ -2731,18 +2734,19 @@ int LuaScriptInterface::luaDoAreaCombatHealth(lua_State *L)
 	}
 
 	const AreaCombat* area = env->getCombatArea(areaId);
-	if(!area && areaId != 0){
+	if(area || areaId == 0){
+		CombatParams params;
+		params.combatType = combatType;
+		params.impactEffect = effect;
+		Combat::doCombatHealth(creature, pos, area, minChange, maxChange, params);
+
+		lua_pushnumber(L, LUA_NO_ERROR);
+	}
+	else{
 		reportErrorFunc(getErrorDesc(LUA_ERROR_AREA_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
-		return 1;
 	}
 
-	CombatParams params;
-	params.combatType = combatType;
-	params.impactEffect = effect;
-	Combat::doCombatHealth(creature, pos, area, minChange, maxChange, params);
-
-	lua_pushnumber(L, LUA_NO_ERROR);
 	return 1;
 }
 
@@ -2772,18 +2776,18 @@ int LuaScriptInterface::luaDoTargetCombatHealth(lua_State *L)
 	}
 
 	Creature* target = env->getCreatureByUID(targetCid);
-	if(!target){
+	if(target){
+		CombatParams params;
+		params.combatType = combatType;
+		params.impactEffect = effect;
+		Combat::doCombatHealth(creature, target, minChange, maxChange, params);
+
+		lua_pushnumber(L, LUA_NO_ERROR);
+	}
+	else{
 		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
-		return 1;
 	}
-
-	CombatParams params;
-	params.combatType = combatType;
-	params.impactEffect = effect;
-	Combat::doCombatHealth(creature, target, minChange, maxChange, params);
-
-	lua_pushnumber(L, LUA_NO_ERROR);
 	return 1;
 }
 
@@ -2817,18 +2821,17 @@ int LuaScriptInterface::luaDoAreaCombatMana(lua_State *L)
 	}
 
 	const AreaCombat* area = env->getCombatArea(areaId);
-	if(!area && areaId != 0){
+	if(area || areaId == 0){
+		CombatParams params;
+		params.impactEffect = effect;
+		Combat::doCombatMana(creature, pos, area, minChange, maxChange, params);
+		
+		lua_pushnumber(L, LUA_NO_ERROR);
+	}
+	else{
 		reportErrorFunc(getErrorDesc(LUA_ERROR_AREA_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
-		return 1;
 	}
-
-	
-	CombatParams params;
-	params.impactEffect = effect;
-	Combat::doCombatMana(creature, pos, area, minChange, maxChange, params);
-
-	lua_pushnumber(L, LUA_NO_ERROR);
 	return 1;
 }
 
@@ -2857,17 +2860,17 @@ int LuaScriptInterface::luaDoTargetCombatMana(lua_State *L)
 	}
 
 	Creature* target = env->getCreatureByUID(targetCid);
-	if(!target){
+	if(target){
+		CombatParams params;
+		params.impactEffect = effect;
+		Combat::doCombatMana(creature, target, minChange, maxChange, params);
+		
+		lua_pushnumber(L, LUA_NO_ERROR);
+	}
+	else{
 		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
-		return 1;
 	}
-
-	CombatParams params;
-	params.impactEffect = effect;
-	Combat::doCombatMana(creature, target, minChange, maxChange, params);
-
-	lua_pushnumber(L, LUA_NO_ERROR);
 	return 1;
 }
 
@@ -2889,7 +2892,6 @@ int LuaScriptInterface::luaDoAreaCombatCondition(lua_State *L)
 	
 	if(cid != 0){
 		creature = env->getCreatureByUID(cid);
-
 		if(!creature){
 			reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
 			lua_pushnumber(L, LUA_ERROR);
@@ -2898,25 +2900,27 @@ int LuaScriptInterface::luaDoAreaCombatCondition(lua_State *L)
 	}
 
 	const Condition* condition = env->getConditionObject(conditionId);
-	if(!condition){
+	if(condition){
+		
+		const AreaCombat* area = env->getCombatArea(areaId);
+		
+		if(area || areaId == 0){
+			CombatParams params;
+			params.impactEffect = effect;
+			params.condition = condition;
+			Combat::doCombatCondition(creature, pos, area, params);
+			
+			lua_pushnumber(L, LUA_NO_ERROR);
+		}
+		else{
+			reportErrorFunc(getErrorDesc(LUA_ERROR_AREA_NOT_FOUND));
+			lua_pushnumber(L, LUA_ERROR);
+		}
+	}
+	else{
 		reportErrorFunc(getErrorDesc(LUA_ERROR_CONDITION_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
-		return 1;
 	}
-
-	const AreaCombat* area = env->getCombatArea(areaId);
-	if(!area && areaId != 0){
-		reportErrorFunc(getErrorDesc(LUA_ERROR_AREA_NOT_FOUND));
-		lua_pushnumber(L, LUA_ERROR);
-		return 1;
-	}
-
-	CombatParams params;
-	params.impactEffect = effect;
-	params.condition = condition;
-	Combat::doCombatCondition(creature, pos, area, params);
-
-	lua_pushnumber(L, LUA_NO_ERROR);
 	return 1;
 }
 
@@ -2944,25 +2948,25 @@ int LuaScriptInterface::luaDoTargetCombatCondition(lua_State *L)
 	}
 
 	Creature* target = env->getCreatureByUID(targetCid);
-	if(!target){
+	if(target){
+		const Condition* condition = env->getConditionObject(conditionId);
+		if(condition){
+			CombatParams params;
+			params.impactEffect = effect;
+			params.condition = condition;
+			Combat::doCombatCondition(creature, target, params);
+			
+			lua_pushnumber(L, LUA_NO_ERROR);
+		}
+		else{
+			reportErrorFunc(getErrorDesc(LUA_ERROR_CONDITION_NOT_FOUND));
+			lua_pushnumber(L, LUA_ERROR);
+		}
+	}
+	else{
 		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
-		return 1;
 	}
-
-	const Condition* condition = env->getConditionObject(conditionId);
-	if(!condition){
-		reportErrorFunc(getErrorDesc(LUA_ERROR_CONDITION_NOT_FOUND));
-		lua_pushnumber(L, LUA_ERROR);
-		return 1;
-	}
-
-	CombatParams params;
-	params.impactEffect = effect;
-	params.condition = condition;
-	Combat::doCombatCondition(creature, target, params);
-
-	lua_pushnumber(L, LUA_NO_ERROR);
 	return 1;
 }
 
@@ -2993,18 +2997,18 @@ int LuaScriptInterface::luaDoAreaCombatDispel(lua_State *L)
 	}
 
 	const AreaCombat* area = env->getCombatArea(areaId);
-	if(!area && areaId != 0){
+	if(area || areaId == 0){
+		CombatParams params;
+		params.impactEffect = effect;
+		params.dispelType = dispelType;
+		Combat::doCombatDispel(creature, pos, area, params);
+
+		lua_pushnumber(L, LUA_NO_ERROR);
+	}
+	else{
 		reportErrorFunc(getErrorDesc(LUA_ERROR_AREA_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
-		return 1;
 	}
-
-	CombatParams params;
-	params.impactEffect = effect;
-	params.dispelType = dispelType;
-	Combat::doCombatDispel(creature, pos, area, params);
-
-	lua_pushnumber(L, LUA_NO_ERROR);
 	return 1;
 }
 
@@ -3032,18 +3036,19 @@ int LuaScriptInterface::luaDoTargetCombatDispel(lua_State *L)
 	}
 
 	Creature* target = env->getCreatureByUID(targetCid);
-	if(!target){
+	if(target){
+		CombatParams params;
+		params.impactEffect = effect;
+		params.dispelType = dispelType;
+		Combat::doCombatDispel(creature, target, params);
+
+		lua_pushnumber(L, LUA_NO_ERROR);
+	}
+	else{
 		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
-		return 1;
 	}
 
-	CombatParams params;
-	params.impactEffect = effect;
-	params.dispelType = dispelType;
-	Combat::doCombatDispel(creature, target, params);
-
-	lua_pushnumber(L, LUA_NO_ERROR);
 	return 1;
 }
 
@@ -3096,15 +3101,14 @@ int LuaScriptInterface::luaDoChangeSpeed(lua_State *L)
 
 	Creature* creature = env->getCreatureByUID(cid);
 
-	if(!creature){
+	if(creature){
+		g_game.changeSpeed(creature, delta);
+		lua_pushnumber(L, LUA_NO_ERROR);
+	}
+	else{
 		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
-		return 1;
 	}
-
-	g_game.changeSpeed(creature, delta);
-
-	lua_pushnumber(L, LUA_NO_ERROR);
 	return 1;
 }
 
@@ -3120,20 +3124,19 @@ int LuaScriptInterface::luaSetCreatureOutfit(lua_State *L)
 
 	Creature* creature = env->getCreatureByUID(cid);
 
-	if(!creature){
+	if(creature){
+		ReturnValue ret = Spell::CreateIllusion(creature, name, time);
+		if(ret == RET_NOERROR){
+			lua_pushnumber(L, LUA_NO_ERROR);
+		}
+		else{
+			lua_pushnumber(L, LUA_ERROR);
+		}
+	}
+	else{
 		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
-		return 1;
 	}
-	
-	ReturnValue ret = Spell::CreateIllusion(creature, name, time);
-
-	if(ret != RET_NOERROR){
-		lua_pushnumber(L, LUA_ERROR);
-		return 1;
-	}
-
-	lua_pushnumber(L, LUA_NO_ERROR);
 	return 1;
 }
 
@@ -3149,20 +3152,19 @@ int LuaScriptInterface::luaSetItemOutfit(lua_State *L)
 
 	Creature* creature = env->getCreatureByUID(cid);
 
-	if(!creature){
+	if(creature){
+		ReturnValue ret = Spell::CreateIllusion(creature, item, time);
+		if(ret == RET_NOERROR){
+			lua_pushnumber(L, LUA_NO_ERROR);
+		}
+		else{
+			lua_pushnumber(L, LUA_ERROR);
+		}
+	}
+	else{
 		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
 		lua_pushnumber(L, LUA_ERROR);
-		return 1;
 	}
-
-	ReturnValue ret = Spell::CreateIllusion(creature, item, time);
-
-	if(ret != RET_NOERROR){
-		lua_pushnumber(L, LUA_ERROR);
-		return 1;
-	}
-
-	lua_pushnumber(L, LUA_NO_ERROR);
 	return 1;
 }
 
@@ -3552,3 +3554,27 @@ int LuaScriptInterface::luaDoPlayerRemOutfit(lua_State *L)
 	}
 	return 1;
 }
+
+int LuaScriptInterface::luaDoSetCreatureLight(lua_State *L)
+{
+	//doSetCreatureLight(cid, lightLevel, lightColor, time)
+	uint32_t time = popNumber(L);
+	uint8_t color = (uint8_t)popNumber(L);
+	uint8_t level = (uint8_t)popNumber(L);
+	uint32_t cid = popNumber(L);
+	
+	ScriptEnviroment* env = getScriptEnv();
+	Creature* creature = env->getCreatureByUID(cid);
+	if(creature){
+		Condition* condition = Condition::createCondition(CONDITIONID_COMBAT, CONDITION_LIGHT, time, level | (color << 8));
+		
+		creature->addCondition(condition);
+		lua_pushnumber(L, LUA_NO_ERROR);
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_PLAYER_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+	}
+	return 1;
+}
+

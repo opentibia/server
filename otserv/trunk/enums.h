@@ -69,6 +69,8 @@ enum ConditionParam_t{
 	CONDITIONPARAM_MANATICKS = 7,
 	CONDITIONPARAM_DELAYED = 8,
 	CONDITIONPARAM_SPEED = 9,
+	CONDITIONPARAM_LIGHT_LEVEL = 10,
+	CONDITIONPARAM_LIGHT_COLOR = 11,
 };
 
 enum BlockType_t {
@@ -145,6 +147,10 @@ struct LightInfo{
 	LightInfo(){
 		level = 0;
 		color = 0;
+	};
+	LightInfo(uint32_t _level, uint32_t _color){
+		level = _level;
+		color = _color;
 	};
 };
 

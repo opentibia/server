@@ -222,11 +222,11 @@ public:
 template<typename A>
 class Array{
 public:
-	Array(long n);
+	Array(uint32_t n);
 	~Array();
 	
-	A getElement(long id);
-	void addElement(A a, long pos);
+	A getElement(uint32_t id);
+	void addElement(A a, uint32_t pos);
 	
 	uint32_t size() {return m_size;}
 

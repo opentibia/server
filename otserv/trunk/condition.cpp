@@ -87,7 +87,6 @@ Condition* Condition::createCondition(ConditionId_t _id, ConditionType_t _type, 
 			break;
 		}
 
-		//case CONDITION_INVISIBLE:
 		case CONDITION_OUTFIT:
 		{
 			return new ConditionOutfit(_id, _type, _ticks);
@@ -96,8 +95,7 @@ Condition* Condition::createCondition(ConditionId_t _id, ConditionType_t _type, 
 
 		case CONDITION_LIGHT:
 		{
-			//return new ConditionLight(_id, _ticks, param & 0xFF, (param & 0xFF00) >> 8);
-			return NULL;
+			return new ConditionLight(_id, _type, _ticks, param & 0xFF, (param & 0xFF00) >> 8);
 			break;
 		}
 
@@ -113,7 +111,6 @@ Condition* Condition::createCondition(ConditionId_t _id, ConditionType_t _type, 
 			break;
 		}
 
-		//case CONDITION_MANASHIELD:
 		case CONDITION_INFIGHT:
 		case CONDITION_DRUNK:
 		case CONDITION_EXHAUSTED:
@@ -169,7 +166,7 @@ void ConditionGeneric::addCondition(Creature* creature, const Condition* addCond
 	}
 }
 
-uint8_t ConditionGeneric::getIcons() const
+uint32_t ConditionGeneric::getIcons() const
 {
 	switch(conditionType){
 		case CONDITION_MANASHIELD:
@@ -215,7 +212,7 @@ void ConditionRegeneration::addCondition(Creature* creature, const Condition* ad
 			ticks = addCondition->getTicks();
 		}
 		
-		ConditionRegeneration conditionRegen = static_cast<const ConditionRegeneration&>(*addCondition);
+		const ConditionRegeneration& conditionRegen = static_cast<const ConditionRegeneration&>(*addCondition);
 
 		healthTicks = conditionRegen.healthTicks;
 		manaTicks = conditionRegen.manaTicks;
@@ -435,7 +432,7 @@ void ConditionDamage::addCondition(Creature* creature, const Condition* addCondi
 			ticks = addCondition->getTicks();
 		}
 		
-		ConditionDamage conditionDamage = static_cast<const ConditionDamage&>(*addCondition);
+		const ConditionDamage& conditionDamage = static_cast<const ConditionDamage&>(*addCondition);
 
 		owner = conditionDamage.owner;
 		damageList.clear();
@@ -448,7 +445,7 @@ void ConditionDamage::addCondition(Creature* creature, const Condition* addCondi
 	}
 }
 
-uint8_t ConditionDamage::getIcons() const
+uint32_t ConditionDamage::getIcons() const
 {
 	switch(conditionType){
 		case CONDITION_FIRE:
@@ -550,7 +547,7 @@ void ConditionSpeed::addCondition(Creature* creature, const Condition* addCondit
 			ticks = addCondition->getTicks();
 		}
 
-		ConditionSpeed conditionSpeed = static_cast<const ConditionSpeed&>(*addCondition);
+		const ConditionSpeed& conditionSpeed = static_cast<const ConditionSpeed&>(*addCondition);
 		int32_t oldSpeedDelta = speedDelta;
 		speedDelta = conditionSpeed.speedDelta;
 
@@ -565,7 +562,7 @@ void ConditionSpeed::addCondition(Creature* creature, const Condition* addCondit
 	}
 }
 
-uint8_t ConditionSpeed::getIcons() const
+uint32_t ConditionSpeed::getIcons() const
 {
 	switch(conditionType){
 		case CONDITION_HASTE:
@@ -648,14 +645,98 @@ void ConditionOutfit::addCondition(Creature* creature, const Condition* addCondi
 			ticks = addCondition->getTicks();
 		}
 
-		ConditionOutfit conditionOutfit = static_cast<const ConditionOutfit&>(*addCondition);
+		const ConditionOutfit& conditionOutfit = static_cast<const ConditionOutfit&>(*addCondition);
 		outfits = conditionOutfit.outfits;
 
 		changeOutfit(creature);
 	}
 }
 
-uint8_t ConditionOutfit::getIcons() const
+uint32_t ConditionOutfit::getIcons() const
+{
+	return 0;
+}
+
+
+ConditionLight::ConditionLight(ConditionId_t _id, ConditionType_t _type, int32_t _ticks, int32_t _lightlevel, int32_t _lightcolor) :
+Condition(_id, _type, _ticks)
+{
+	lightInfo.level = _lightlevel;
+	lightInfo.color = _lightcolor;
+	internalLightTicks = 0;
+	lightChangeInterval = 0;
+}
+	
+bool ConditionLight::startCondition(Creature* creature)
+{
+	internalLightTicks = 0;
+	lightChangeInterval = ticks/lightInfo.level;
+	creature->setCreatureLight(lightInfo);
+	g_game.changeLight(creature);
+	return true;
+}
+
+bool ConditionLight::executeCondition(Creature* creature, int32_t interval)
+{
+	internalLightTicks += interval;
+	if(internalLightTicks >= lightChangeInterval){
+		internalLightTicks = 0;
+		LightInfo creatureLight;
+		creature->getCreatureLight(creatureLight);
+		if(creatureLight.level > 0){
+			--creatureLight.level;
+			creature->setCreatureLight(creatureLight);
+			g_game.changeLight(creature);
+		}
+	}
+	return Condition::executeCondition(creature, interval);
+}
+
+void ConditionLight::endCondition(Creature* creature, EndCondition_t reason)
+{
+	creature->setNormalCreatureLight();
+	g_game.changeLight(creature);
+}
+
+void ConditionLight::addCondition(Creature* creature, const Condition* addCondition)
+{
+	if(addCondition->getType() == conditionType){
+		const ConditionLight& conditionLight = static_cast<const ConditionLight&>(*addCondition);
+		
+		//replace old light values with the new ones
+		
+		lightInfo.level = conditionLight.lightInfo.level;
+		lightInfo.color = conditionLight.lightInfo.color;
+		uint32_t addTicks = conditionLight.getTicks();
+		lightChangeInterval = addTicks/lightInfo.level;
+		internalLightTicks = 0;
+		setTicks(addTicks);
+		creature->setCreatureLight(lightInfo);
+		g_game.changeLight(creature);
+	}
+}
+
+bool ConditionLight::setParam(ConditionParam_t param, int32_t value)
+{
+	bool ret = Condition::setParam(param, value);
+	if(!ret){
+		switch(param){
+		case CONDITIONPARAM_LIGHT_LEVEL:
+			lightInfo.level = value;
+			return true;
+			break;
+		case CONDITIONPARAM_LIGHT_COLOR:
+			lightInfo.color = value;
+			return true;
+			break;
+		default:
+			return false;
+		}
+	}
+	return false;
+}
+
+uint32_t ConditionLight::getIcons() const
 {
 	return 0;
 }

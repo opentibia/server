@@ -1002,7 +1002,7 @@ int Items::getItemIdByName(const std::string& name)
 }
 
 template<typename A> 
-Array<A>::Array(long n)
+Array<A>::Array(uint32_t n)
 {
 	m_data = (A*)malloc(sizeof(A)*n);
 	memset(m_data, 0, sizeof(A)*n);
@@ -1016,7 +1016,7 @@ Array<A>::~Array()
 }
 
 template<typename A>
-A Array<A>::getElement(long id)
+A Array<A>::getElement(uint32_t id)
 {
 	if(id < 0 || id >= m_size){
 		return 0;
@@ -1027,7 +1027,7 @@ A Array<A>::getElement(long id)
 }
 
 template<typename A>
-void Array<A>::addElement(A a, long pos)
+void Array<A>::addElement(A a, uint32_t pos)
 {
 	#define INCREMENT 5000
 	if(pos >= m_size){
