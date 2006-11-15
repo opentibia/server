@@ -74,6 +74,7 @@ bool ConfigManager::loadFile(const std::string& _filename)
 	
 	m_confString[LOGIN_MSG] = getGlobalString(L, "loginmsg", "Welcome.");
 	m_confString[SERVER_NAME] = getGlobalString(L, "servername");
+	m_confString[WORLD_NAME] = getGlobalString(L, "worldname", "OpenTibia");
 	m_confString[OWNER_NAME] = getGlobalString(L, "ownername");
 	m_confString[OWNER_EMAIL] = getGlobalString(L, "owneremail");
 	m_confString[URL] = getGlobalString(L, "url");

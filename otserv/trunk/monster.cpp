@@ -102,6 +102,16 @@ bool Monster::canSee(const Position& pos) const
 	*/
 }
 
+void Monster::onAttackedCreatureDissapear()
+{
+	targetIsRecentAdded = true;
+}
+
+void Monster::onFollowCreatureDissapear()
+{
+	targetIsRecentAdded = true;
+}
+
 void Monster::onAddTileItem(const Position& pos, const Item* item)
 {
 	Creature::onAddTileItem(pos, item);
@@ -139,6 +149,7 @@ void Monster::onCreatureMove(const Creature* creature, const Position& newPos, c
 	Creature::onCreatureMove(creature, newPos, oldPos, oldStackPos, teleport);
 
 	if(creature == this){
+		targetIsRecentAdded = true;
 		updateTargetList();
 		startThink();
 	}
@@ -148,16 +159,34 @@ void Monster::onCreatureMove(const Creature* creature, const Position& newPos, c
 	else if(!canSee(newPos) && canSee(oldPos)){
 		onCreatureLeave(creature);
 	}
+	else{
+		//creature walking around in visible range
+		if(!isSummon()){
+			if(!followCreature){
+				if(creature->getPlayer() || (creature->getMaster() && creature->getMaster()->getPlayer())){
+					selectTarget(const_cast<Creature*>(creature));
+				}
+			}
+		}
+	}
 }
 
 void Monster::updateTargetList()
 {
-	targetList.clear();
+	//targetList.clear();
+
+	for(TargetList::iterator it = targetList.begin(); it != targetList.end();){
+		if(!canSee((*it)->getPosition())){
+			it = targetList.erase(it);
+		}
+		else
+			++it;
+	}
 
 	SpectatorVec list;
 	g_game.getSpectators(list, getPosition(), true);
 	for(SpectatorVec::iterator it = list.begin(); it != list.end(); ++it){
-		if(*it != this){
+		if(*it != this && canSee((*it)->getPosition())){
 			onCreatureFound(*it);
 		}
 	}
@@ -183,10 +212,7 @@ void Monster::onCreatureEnter(const Creature* creature)
 
 void Monster::onCreatureFound(const Creature* creature)
 {
-	if(creature->isAttackable() &&
-		(creature->getPlayer() ||
-		(creature->getMaster() && creature->getMaster()->getPlayer()))){
-
+	if((creature->getPlayer() || (creature->getMaster() && creature->getMaster()->getPlayer()))){
 		if(std::find(targetList.begin(), targetList.end(), creature) == targetList.end()){
 			targetList.push_back(const_cast<Creature*>(creature));
 
@@ -250,17 +276,45 @@ void Monster::stopThink()
 void Monster::searchTarget()
 {
 	if(!targetList.empty()){
+		Creature* lastCreature = *targetList.rbegin();
+
+		do{
+			TargetList::iterator it = targetList.begin();
+			Creature* target = *it;
+
+			targetList.erase(it);
+			targetList.push_back(target);
+
+			if(selectTarget(target)){
+				break;
+			}
+		}while(lastCreature != *targetList.begin());
+	}
+
+	/*
+	if(!targetList.empty()){
 		TargetList::iterator it = targetList.begin();
 		Creature* target = *it;
 
 		targetList.erase(it);
 		targetList.push_back(target);
 
-		if(target->getPosition().z == getPosition().z && !target->isInPz() && (canSeeInvisibility() || !target->isInvisible())){
-			internalFollowCreature(target);
-			setAttackedCreature(target);
+		selectTarget(target);
+	}
+	*/
+}
+
+bool Monster::selectTarget(Creature* creature)
+{
+	if(creature->isAttackable()){
+		if(creature->getPosition().z == getPosition().z && !creature->isInPz() && (canSeeInvisibility() || !creature->isInvisible())){
+			internalFollowCreature(creature);
+			setAttackedCreature(creature);
+			return true;
 		}
 	}
+
+	return false;
 }
 
 void Monster::onThink(uint32_t interval)

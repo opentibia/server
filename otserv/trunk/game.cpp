@@ -2233,37 +2233,21 @@ bool Game::playerSetAttackedCreature(Player* player, unsigned long creatureId)
 
 	ReturnValue ret = RET_NOERROR;
 	if(player->getAccessLevel() == 0){
-		if(player->getTile()->hasProperty(PROTECTIONZONE)){
+		if(attackCreature == player){
+			ret = RET_YOUMAYNOTATTACKTHISPLAYER;
+		}
+		else if(player->getTile()->hasProperty(PROTECTIONZONE)){
 			ret = RET_YOUMAYNOTATTACKAPERSONWHILEINPROTECTIONZONE;
 		}
-
-		if(ret == RET_NOERROR && attackCreature->getTile()->hasProperty(PROTECTIONZONE)){
+		else if(attackCreature->getTile()->hasProperty(PROTECTIONZONE)){
 			ret = RET_YOUMAYNOTATTACKAPERSONINPROTECTIONZONE;
 		}
-
-		if(ret == RET_NOERROR && !attackCreature->isAttackable()){
+		else if(!attackCreature->isAttackable()){
 			ret = RET_YOUMAYNOTATTACKTHISPLAYER;
 		}
 
 		if(ret == RET_NOERROR){
 			ret = Combat::canDoCombat(player, attackCreature);
-
-			/*
-			if(Player* attackPlayer = attackCreature->getPlayer()){
-				if(attackPlayer->getAccessLevel() > player->getAccessLevel()){
-					ret = RET_YOUMAYNOTATTACKTHISPLAYER;
-				}
-			}
-
-			if(getWorldType() == WORLD_TYPE_NO_PVP){
-				if(attackCreature->getPlayer()){
-					ret = RET_YOUMAYNOTATTACKTHISPLAYER;
-				}
-				else if(attackCreature->getMaster() && attackCreature->getMaster()->getPlayer()){
-					ret = RET_YOUMAYNOTATTACKTHISPLAYER;
-				}
-			}
-			*/
 		}
 	}
 
@@ -2762,6 +2746,13 @@ bool Game::combatChangeHealth(CombatType_t combatType, Creature* attacker, Creat
 		*/
 
 		int32_t damage = -healthChange;
+
+		/*
+		if(attacker && attacker->getPlayer() && target->getPlayer()){
+			damage = damage * 0.50;
+		}
+		*/
+
 		BlockType_t blockType = target->blockHit(attacker, combatType, damage, checkDefense, checkArmor);
 
 		if(blockType != BLOCK_NONE && target->isInvisible()){
@@ -2964,6 +2955,12 @@ bool Game::combatChangeMana(Creature* attacker, Creature* target, int32_t manaCh
 		}
 
 		int32_t manaLoss = std::min(target->getMana(), -manaChange);
+
+		/*
+		if(attacker && attacker->getPlayer() && target->getPlayer()){
+			manaLoss = manaLoss * 0.50;
+		}
+		*/
 
 		if(manaLoss > 0){
 			target->drainMana(attacker, manaLoss);

@@ -64,6 +64,9 @@ public:
 
 	virtual void setNormalCreatureLight();
 
+	virtual void onAttackedCreatureDissapear();
+	virtual void onFollowCreatureDissapear();
+
 	virtual void onAddTileItem(const Position& pos, const Item* item);
 	virtual void onUpdateTileItem(const Position& pos, uint32_t stackpos, const Item* oldItem, const Item* newItem);
 	virtual void onRemoveTileItem(const Position& pos, uint32_t stackpos, const Item* item);
@@ -106,6 +109,7 @@ private:
 	MonsterType* mType;
 
 	void searchTarget();
+	bool selectTarget(Creature* creature);
 
 	void startThink();
 	void stopThink();

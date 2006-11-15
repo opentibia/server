@@ -244,7 +244,7 @@ OTSYS_THREAD_RETURN ConnectionHandler(void *dat)
 							std::list<std::string>::iterator it;
 							for(it = account.charList.begin(); it != account.charList.end(); it++){
 								msg.AddString((*it));
-								msg.AddString("OpenTibia");
+								msg.AddString(g_config.getString(ConfigManager::WORLD_NAME));
 								msg.AddU32(serverip);
 								msg.AddU16(g_config.getNumber(ConfigManager::PORT));
 							}

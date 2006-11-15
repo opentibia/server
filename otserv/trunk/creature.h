@@ -145,6 +145,7 @@ public:
 	int32_t getHealth() const {return health;}
 	int32_t getMaxHealth() const {return healthMax;}
 	int32_t getMana() const {return mana;}
+	int32_t getMaxMana() const {return manaMax;}
 
 	const Outfit_t getCurrentOutfit() const {return currentOutfit;}
 	const void setCurrentOutfit(Outfit_t outfit) {currentOutfit = outfit;}

@@ -271,13 +271,13 @@ void Creature::onCreatureDisappear(const Creature* creature)
 	}
 
 	if(attackedCreature == creature){
-		onAttackedCreatureDissapear();
 		setAttackedCreature(NULL);
+		onAttackedCreatureDissapear();
 	}
 
 	if(followCreature == creature){
-		onFollowCreatureDissapear();
 		setFollowCreature(NULL);
+		onFollowCreatureDissapear();
 	}
 }
 
