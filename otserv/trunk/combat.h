@@ -53,6 +53,15 @@ protected:
 	formulaType_t type;
 };	
 
+class TargetCallback : public CallBack{
+public:
+	TargetCallback() {};
+	void onTargetCombat(Creature* creature, Creature* target) const;
+
+protected:
+	formulaType_t type;
+};	
+
 struct CombatParams{
 	CombatParams() {
 		combatType = COMBAT_NONE;
@@ -68,6 +77,7 @@ struct CombatParams{
 
 		valueCallback = NULL;
 		tileCallback = NULL;
+		targetCallback = NULL;
 	}
 
 	const Condition* condition;
@@ -83,6 +93,7 @@ struct CombatParams{
 
 	ValueCallback* valueCallback;
 	TileCallback* tileCallback;
+	TargetCallback* targetCallback;
 };
 
 typedef bool (*COMBATFUNC)(Creature*, Creature*, const CombatParams&, void*);

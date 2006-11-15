@@ -292,7 +292,7 @@ bool Spell::configureSpell(xmlNodePtr p)
 	 	mana = intValue;
 	}
 
-	if(readXMLInteger(p, "manaPercent", intValue)){
+	if(readXMLInteger(p, "manapercent", intValue)){
 	 	manaPercent = intValue;
 	}
 

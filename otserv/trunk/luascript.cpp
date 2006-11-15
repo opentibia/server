@@ -972,6 +972,9 @@ void LuaScriptInterface::registerFunctions()
 	//doTargetCombatDispel(cid, target, type, effect)
 	lua_register(m_luaState, "doTargetCombatDispel", LuaScriptInterface::luaDoTargetCombatDispel);
 
+	//doChallengeCreature(cid, target)
+	lua_register(m_luaState, "doChallengeCreature", LuaScriptInterface::luaDoChallengeCreature);
+
 	//variantToNumber(var)
 	lua_register(m_luaState, "variantToNumber", LuaScriptInterface::luaVariantToNumber);
 	//variantToString(var)
@@ -2250,6 +2253,12 @@ int LuaScriptInterface::luaCreateCombatObject(lua_State *L)
 
 	ScriptEnviroment* env = getScriptEnv();
 
+	if(env->getScriptId() != EVENT_ID_LOADING){
+		reportError(__FUNCTION__, "This function can only be used while loading the script.");
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
 	Combat* combat = new Combat;
 
 	if(combat){
@@ -2293,6 +2302,14 @@ int LuaScriptInterface::luaCreateCombatArea(lua_State *L)
 {
 	//createCombatArea( {area}, {extArea} )
 
+	ScriptEnviroment* env = getScriptEnv();
+
+	if(env->getScriptId() != EVENT_ID_LOADING){
+		reportError(__FUNCTION__, "This function can only be used while loading the script.");
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
 	int32_t parameters = lua_gettop(L);
 
 	AreaCombat* area = new AreaCombat;
@@ -2315,7 +2332,6 @@ int LuaScriptInterface::luaCreateCombatArea(lua_State *L)
 	/*setup all possible rotations*/
 	area->setupArea(listArea, rowsArea);
 
-	ScriptEnviroment* env = getScriptEnv();
 	uint32_t newAreaId = env->addCombatArea(area);
 
 	lua_pushnumber(L, newAreaId);
@@ -2327,6 +2343,12 @@ int LuaScriptInterface::luaCreateConditionObject(lua_State *L)
 	//createConditionObject(type)
 
 	ScriptEnviroment* env = getScriptEnv();
+
+	if(env->getScriptId() != EVENT_ID_LOADING){
+		reportError(__FUNCTION__, "This function can only be used while loading the script.");
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
 
 	ConditionType_t type = (ConditionType_t)popNumber(L);
 
@@ -2351,6 +2373,12 @@ int LuaScriptInterface::luaSetCombatArea(lua_State *L)
 	uint32_t combatId = popNumber(L);
 
 	ScriptEnviroment* env = getScriptEnv();
+
+	if(env->getScriptId() != EVENT_ID_LOADING){
+		reportError(__FUNCTION__, "This function can only be used while loading the script.");
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
 
 	Combat* combat = env->getCombatObject(combatId);
 
@@ -2381,6 +2409,12 @@ int LuaScriptInterface::luaSetCombatCondition(lua_State *L)
 	uint32_t combatId = popNumber(L);
 
 	ScriptEnviroment* env = getScriptEnv();
+
+	if(env->getScriptId() != EVENT_ID_LOADING){
+		reportError(__FUNCTION__, "This function can only be used while loading the script.");
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
 
 	Combat* combat = env->getCombatObject(combatId);
 
@@ -2413,6 +2447,12 @@ int LuaScriptInterface::luaSetCombatParam(lua_State *L)
 
 	ScriptEnviroment* env = getScriptEnv();
 
+	if(env->getScriptId() != EVENT_ID_LOADING){
+		reportError(__FUNCTION__, "This function can only be used while loading the script.");
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
 	Combat* combat = env->getCombatObject(combatId);
 
 	if(combat){
@@ -2435,6 +2475,12 @@ int LuaScriptInterface::luaSetConditionParam(lua_State *L)
 	uint32_t conditionId = popNumber(L);
 
 	ScriptEnviroment* env = getScriptEnv();
+
+	if(env->getScriptId() != EVENT_ID_LOADING){
+		reportError(__FUNCTION__, "This function can only be used while loading the script.");
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
 
 	Condition* condition = env->getConditionObject(conditionId);
 
@@ -2459,6 +2505,12 @@ int LuaScriptInterface::luaAddDamageCondition(lua_State *L)
 	uint32_t conditionId = popNumber(L);
 
 	ScriptEnviroment* env = getScriptEnv();
+
+	if(env->getScriptId() != EVENT_ID_LOADING){
+		reportError(__FUNCTION__, "This function can only be used while loading the script.");
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
 
 	ConditionDamage* condition = dynamic_cast<ConditionDamage*>(env->getConditionObject(conditionId));
 
@@ -2488,6 +2540,12 @@ int LuaScriptInterface::luaAddOutfitCondition(lua_State *L)
 
 	ScriptEnviroment* env = getScriptEnv();
 
+	if(env->getScriptId() != EVENT_ID_LOADING){
+		reportError(__FUNCTION__, "This function can only be used while loading the script.");
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
 	ConditionOutfit* condition = dynamic_cast<ConditionOutfit*>(env->getConditionObject(conditionId));
 
 	if(condition){
@@ -2513,7 +2571,7 @@ int LuaScriptInterface::luaSetCombatCallBack(lua_State *L)
 	ScriptEnviroment* env = getScriptEnv();
 	
 	if(env->getScriptId() != EVENT_ID_LOADING){
-		reportError(__FUNCTION__, "Not called during script loading!");
+		reportError(__FUNCTION__, "This function can only be used while loading the script.");
 		lua_pushnumber(L, LUA_ERROR);
 		return 1;
 	}
@@ -2554,6 +2612,12 @@ int LuaScriptInterface::luaSetCombatFormula(lua_State *L)
 
 	ScriptEnviroment* env = getScriptEnv();
 
+	if(env->getScriptId() != EVENT_ID_LOADING){
+		reportError(__FUNCTION__, "This function can only be used while loading the script.");
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
 	double maxb = popFloatNumber(L);
 	double maxa = popFloatNumber(L);
 	double minb = popFloatNumber(L);
@@ -2581,6 +2645,12 @@ int LuaScriptInterface::luaSetConditionFormula(lua_State *L)
 	//setConditionFormula(condition, mina, minb, maxa, maxb)
 
 	ScriptEnviroment* env = getScriptEnv();
+
+	if(env->getScriptId() != EVENT_ID_LOADING){
+		reportError(__FUNCTION__, "This function can only be used while loading the script.");
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
 
 	double maxb = popFloatNumber(L);
 	double maxa = popFloatNumber(L);
@@ -3042,6 +3112,36 @@ int LuaScriptInterface::luaDoTargetCombatDispel(lua_State *L)
 		params.dispelType = dispelType;
 		Combat::doCombatDispel(creature, target, params);
 
+		lua_pushnumber(L, LUA_NO_ERROR);
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+	}
+
+	return 1;
+}
+
+int LuaScriptInterface::luaDoChallengeCreature(lua_State *L)
+{
+	//doChallengeCreature(cid, target)
+
+	uint32_t targetCid = popNumber(L);
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Creature* creature = env->getCreatureByUID(cid);
+
+	if(!creature){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
+	Creature* target = env->getCreatureByUID(targetCid);
+	if(target){
+		target->combatChallenge(creature);
 		lua_pushnumber(L, LUA_NO_ERROR);
 	}
 	else{

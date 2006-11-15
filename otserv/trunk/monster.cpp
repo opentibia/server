@@ -776,6 +776,16 @@ void Monster::drainHealth(Creature* attacker, CombatType_t combatType, int32_t d
 	}
 }
 
+bool Monster::combatChallenge(Creature* creature)
+{
+	if(isSummon()){
+		return false;
+	}
+	else{
+		return selectTarget(creature);
+	}
+}
+
 uint32_t Monster::getFollowDistance() const
 {
 	if(isSummon()){

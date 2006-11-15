@@ -62,6 +62,8 @@ public:
 
 	virtual void drainHealth(Creature* attacker, CombatType_t combatType, int32_t damage);
 
+	virtual bool combatChallenge(Creature* creature);
+
 	virtual void setNormalCreatureLight();
 
 	virtual void onAttackedCreatureDissapear();
