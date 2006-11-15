@@ -2608,6 +2608,9 @@ void Game::checkCreature(uint32_t creatureId, uint32_t interval)
 
 				case RACE_UNDEAD:
 					break;
+					
+				case RACE_FIRE:
+					break;
 
 				default:
 					break;
@@ -2855,6 +2858,11 @@ bool Game::combatChangeHealth(CombatType_t combatType, Creature* attacker, Creat
 							case RACE_UNDEAD:
 								textColor = TEXTCOLOR_WHITE;
 								hitEffect = NM_ME_HIT_AREA;
+								break;
+								
+							case RACE_FIRE:
+								textColor = TEXTCOLOR_ORANGE;
+								hitEffect = NM_ME_DRAW_BLOOD;
 								break;
 
 							default:

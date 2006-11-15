@@ -25,7 +25,8 @@ enum RaceType_t {
 	RACE_NONE		= 0,
 	RACE_VENOM  = 1,
 	RACE_BLOOD	= 2,
-	RACE_UNDEAD	= 3
+	RACE_UNDEAD	= 3,
+	RACE_FIRE	= 4,
 };
 
 enum CombatType_t {

@@ -402,9 +402,11 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 						case 2:
 							mType->race = RACE_BLOOD;
 							break;
-
 						case 3:
 							mType->race = RACE_UNDEAD;
+							break;
+						case 4:
+							mType->race = RACE_FIRE;
 							break;
 					}
 				}
