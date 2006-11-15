@@ -1493,15 +1493,11 @@ void Game::checkCreatureAttacking(uint32_t creatureId, uint32_t interval)
 	OTSYS_THREAD_LOCK_CLASS lockClass(gameLock, "Game::checkCreatureAttacking()");
 
 	Creature* creature = getCreatureByID(creatureId);
-	if(creature){
+	if(creature && creature->getHealth() > 0){
 		Creature* attackedCreature = creature->getAttackedCreature();
 
 		if(attackedCreature){
-			/*if( attackedCreature->getTile()->hasProperty(PROTECTIONZONE) ||
-					creature->getTile()->hasProperty(PROTECTIONZONE)){
-				creature->onCreatureDisappear(attackedCreature);
-			}
-			else*/ if(map->canThrowObjectTo(creature->getPosition(), attackedCreature->getPosition())){
+			if(map->canThrowObjectTo(creature->getPosition(), attackedCreature->getPosition())){
 				creature->doAttacking(interval);
 			}
 		}
