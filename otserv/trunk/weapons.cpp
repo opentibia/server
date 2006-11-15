@@ -448,8 +448,8 @@ int32_t Weapon::getManaCost(const Player* player) const
 	}
 
 	if(manaPercent != 0){
-		int32_t currentMana = player->getMana();
-		int32_t manaCost = (currentMana * manaPercent)/100;
+		int32_t maxMana = player->getMaxMana();
+		int32_t manaCost = (maxMana * manaPercent)/100;
 		return manaCost;
 	}
 
