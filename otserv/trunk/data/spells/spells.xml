@@ -1,17 +1,17 @@
 <?xml version="1.0"?>
 <spells>
-<rune name="Sudden Death" id="2268" charges="1" needtarget="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="sd.lua"></rune>
-<rune name="Heavy Magic Missile" id="2311" charges="5" needtarget="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="hmm.lua"></rune>
-<rune name="Great Fireball" id="2269" charges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="gfb.lua"></rune>
-<rune name="Polymorph" id="2270" charges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="polymorph.lua"></rune>
-<rune name="Combustion" id="2271" charges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="combustion.lua"></rune>
-<rune name="Paralyze" id="2272" charges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="paralyze.lua"></rune>
-<rune name="Ultimate Healing" id="2273" aggressive="0" charges="1" needtarget="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="0" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="uh.lua"></rune>
-<rune name="Energy Arrow" id="2274" charges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="energy wave.lua"></rune>
-<rune name="Energy Wall" id="2275" charges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="energy wall.lua"></rune>
-<rune name="Magic Wall" id="2276" charges="1" blocking="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="magic wall.lua"></rune>
-<rune name="Magic Prison" id="2277" charges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="magic prison.lua"></rune>
-<rune name="Fire Field" id="2278" charges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" blockwalls="1" script="fire field.lua"></rune>
+<rune name="Sudden Death" id="2268" charges="1" needtarget="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" script="sd.lua"></rune>
+<rune name="Heavy Magic Missile" id="2311" charges="5" needtarget="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" script="hmm.lua"></rune>
+<rune name="Great Fireball" id="2269" charges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" script="gfb.lua"></rune>
+<rune name="Polymorph" id="2270" charges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" script="polymorph.lua"></rune>
+<rune name="Combustion" id="2271" charges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" script="combustion.lua"></rune>
+<rune name="Paralyze" id="2272" charges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" script="paralyze.lua"></rune>
+<rune name="Ultimate Healing" id="2273" aggressive="0" charges="1" needtarget="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="0" prem="0" enabled="1" script="uh.lua"></rune>
+<rune name="Energy Arrow" id="2274" charges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" script="energy wave.lua"></rune>
+<rune name="Energy Wall" id="2275" charges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" script="energy wall.lua"></rune>
+<rune name="Magic Wall" id="2276" charges="1" blocking="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" script="magic wall.lua"></rune>
+<rune name="Magic Prison" id="2277" charges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" script="magic prison.lua"></rune>
+<rune name="Fire Field" id="2278" charges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" script="fire field.lua"></rune>
 <rune name="Invisible" id="2279" charges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" script="invisible.lua"></rune>
 <rune name="Drunk" id="2267" charges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" script="drunk.lua"></rune>
 <rune name="Chameleon" id="2291" charges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" function="chameleon"></rune>
@@ -39,9 +39,9 @@
 <vocation name="Paladin"/>
 </instant>
 
-<instant name="Create Illusion" words="utevo res ina" params="1" aggressive="0" lvl="10" maglv="20" mana="200" soul="0" exhaustion="1" prem="0" enabled="1" function="Illusion"></instant>
+<instant name="Challenge" words="exeta res" lvl="10" maglv="20" manapercent="10" soul="0" exhaustion="1" prem="0" enabled="1" script="challenge.lua"></instant>
 
-<instant name="Light" words="utevo lux" aggressive="0" lvl="2" maglv="0" mana="20" soul="0" exhaustion="1" prem="0" enabled="1" script="light.lua"></instant>
+<instant name="Create Illusion" words="utevo res ina" params="1" aggressive="0" lvl="10" maglv="20" mana="200" soul="0" exhaustion="1" prem="0" enabled="1" function="Illusion"></instant>
 
 <conjure name="Ultimate Healing Rune" words="adura vita" reagentId="2260" conjureId="2273" aggressive="0" maglv="20" mana="150" soul="10" prem="0" enabled="1" function="conjureRune">
 </conjure>
@@ -52,5 +52,5 @@
 <conjure name="Create Food" words="exevo pan" maglv="20" mana="200" soul="10" prem="0" enabled="1" function="conjureFood">
 </conjure>
 
-<rune name="bolt" id="20001" enabled="1" allowfaruse="1" blockwalls="1" script="monsters/bolt.lua"></rune>
+<rune name="bolt" id="20001" enabled="1" script="monsters/bolt.lua"></rune>
 </spells>
