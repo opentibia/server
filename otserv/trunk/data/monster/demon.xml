@@ -7,10 +7,10 @@
 
 <attacks>
 	<attack name="melee" speed="2000" min="-200" max="-550"/> 
-	<attack name="Great Fireball" speed="1000" chance="50" min="-100" max="-350"/>
-	<attack name="Combustion" speed="1000" chance="10" min="-100" max="-350"/>
-	<attack name="Polymorph" speed="1000" chance="10"/>
-	<attack name="Energy Wave" speed="2000" chance="10"/>
+	<attack name="Great Fireball" speed="10000" chance="0" min="-100" max="-350"/>
+	<attack name="Combustion" speed="20000" chance="10" min="-100" max="-350"/>
+	<attack name="Polymorph" speed="30000" chance="50"/>
+	<attack name="Energy Wave" speed="5000" chance="20"/>
 </attacks>
 
 <defenses>
