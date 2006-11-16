@@ -975,6 +975,9 @@ void LuaScriptInterface::registerFunctions()
 	//doChallengeCreature(cid, target)
 	lua_register(m_luaState, "doChallengeCreature", LuaScriptInterface::luaDoChallengeCreature);
 
+	//doConvinceCreature(cid, target)
+	lua_register(m_luaState, "doConvinceCreature", LuaScriptInterface::luaDoConvinceCreature);
+
 	//variantToNumber(var)
 	lua_register(m_luaState, "variantToNumber", LuaScriptInterface::luaVariantToNumber);
 	//variantToString(var)
@@ -3145,7 +3148,37 @@ int LuaScriptInterface::luaDoChallengeCreature(lua_State *L)
 
 	Creature* target = env->getCreatureByUID(targetCid);
 	if(target){
-		target->combatChallenge(creature);
+		target->challengeCreature(creature);
+		lua_pushnumber(L, LUA_NO_ERROR);
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+	}
+
+	return 1;
+}
+
+int LuaScriptInterface::luaDoConvinceCreature(lua_State *L)
+{
+	//doConvinceCreature(cid, target)
+
+	uint32_t targetCid = popNumber(L);
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Creature* creature = env->getCreatureByUID(cid);
+
+	if(!creature){
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+		return 1;
+	}
+
+	Creature* target = env->getCreatureByUID(targetCid);
+	if(target){
+		target->convinceCreature(creature);
 		lua_pushnumber(L, LUA_NO_ERROR);
 	}
 	else{

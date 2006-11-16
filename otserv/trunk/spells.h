@@ -150,6 +150,7 @@ protected:
 	static InstantSpellFunction SearchPlayer;
 	static InstantSpellFunction SummonMonster;
 	static InstantSpellFunction Levitate;
+	static InstantSpellFunction MagicRope;
 	static InstantSpellFunction Illusion;
 	
 	static House* getHouseFromPos(Creature* creature);
@@ -223,6 +224,7 @@ protected:
 	virtual std::string getScriptEventName();
 	
 	static RuneSpellFunction Illusion;
+	static RuneSpellFunction Convince;
 
 	bool internalCastSpell(Creature* creature, const LuaVariant& var);
 

@@ -532,13 +532,11 @@ void Spell::postCastSpell(Player* player, uint32_t manaCost, uint32_t soulCost) 
 	if(manaCost > 0){
 		player->changeMana(-(int32_t)manaCost);
 		player->addManaSpent(manaCost);
-		player->sendStats();
 	}
 
-	//TODO: reduce soul
 	/*
-	if(soulCoust > 0){
-		player->changeSoul(-soul);
+	if(soulCost > 0){
+		player->changeSoul(-(int32_t)soulCost);
 	}
 	*/
 }
@@ -708,6 +706,9 @@ bool InstantSpell::loadFunction(const std::string& functionName)
 	}
 	else if(strcasecmp(functionName.c_str(), "Levitate") == 0){
 		function = Levitate;
+	}
+	else if(strcasecmp(functionName.c_str(), "magicrope") == 0){
+		function = MagicRope;
 	}
 	else if(strcasecmp(functionName.c_str(), "illusion") == 0){
 		function = Illusion;
@@ -1197,7 +1198,7 @@ bool InstantSpell::SummonMonster(const InstantSpell* spell, Creature* creature, 
 		return false;
 	}
 
-	int32_t manaCost = mType->manaSummonCost;
+	int32_t manaCost = mType->manaCost;
 	if(player->getMana() < manaCost){
 		player->sendCancelMessage(RET_NOTENOUGHMANA);
 		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
@@ -1267,6 +1268,27 @@ bool InstantSpell::Levitate(const InstantSpell* spell, Creature* creature, const
 	}
 
 	return (ret == RET_NOERROR);
+}
+
+bool InstantSpell::MagicRope(const InstantSpell* spell, Creature* creature, const std::string& param)
+{
+	Player* player = creature->getPlayer();
+	if(!player){
+		return false;
+	}
+
+	const Position& currentPos = creature->getPosition();
+
+	Tile* tmpTile = g_game.getTile(currentPos.x + 1, currentPos.y, currentPos.z - 1);
+	if(!tmpTile || !tmpTile->ground || tmpTile->hasProperty(BLOCKSOLID)){
+		player->sendCancelMessage(RET_NOTPOSSIBLE);
+		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+		return false;
+	}
+
+	g_game.internalTeleport(creature, tmpTile->getPosition());
+	g_game.addMagicEffect(player->getPosition(), NM_ME_ENERGY_AREA);
+	return true;
 }
 
 bool InstantSpell::Illusion(const InstantSpell* spell, Creature* creature, const std::string& param)
@@ -1379,7 +1401,8 @@ bool ConjureSpell::internalConjureItem(Player* player, uint32_t conjureId, uint3
 		item = player->getInventoryItem(slot);
 		if(item && item->getID() == reagentId){
 			
-			g_game.transformItem(item, conjureId, conjureCount);
+			Item* newItem = g_game.transformItem(item, conjureId, conjureCount);
+			g_game.startDecay(newItem);
 			result = true;
 		}
 	}
@@ -1420,7 +1443,7 @@ bool ConjureSpell::ConjureItem(const ConjureSpell* spell, Creature* creature, co
 		}
 	}
 	else{
-		if(internalConjureItem(player, spell->getConjureId(), spell->getConjureId())){
+		if(internalConjureItem(player, spell->getConjureId(), spell->getConjureCount())){
 			spell->postCastSpell(player);
 			result = true;
 		}
@@ -1548,6 +1571,9 @@ bool RuneSpell::loadFunction(const std::string& functionName)
 	if(strcasecmp(functionName.c_str(), "chameleon") == 0){
 		function = Illusion;
 	}
+	else if(strcasecmp(functionName.c_str(), "convince") == 0){
+		function = Convince;
+	}
 	else{
 		return false;
 	}
@@ -1588,6 +1614,50 @@ bool RuneSpell::Illusion(const RuneSpell* spell, Creature* creature, Item* item,
 	}
 
 	return (ret == RET_NOERROR);
+}
+
+bool RuneSpell::Convince(const RuneSpell* spell, Creature* creature, Item* item, const Position& posFrom, const Position& posTo)
+{
+	Player* player = creature->getPlayer();
+	if(!player){
+		return false;
+	}
+
+	if(player->getSummonCount() >= 2){
+		player->sendCancelMessage(RET_NOTPOSSIBLE);
+		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+		return false;
+	}
+
+	Thing* thing = g_game.internalGetThing(player, posTo, STACKPOS_LOOK);
+	if(!thing){
+		player->sendCancelMessage(RET_NOTPOSSIBLE);
+		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+		return false;
+	}
+
+	Creature* convinceCreature = thing->getCreature();
+	if(!convinceCreature || !convinceCreature->convinceCreature(creature)){
+		player->sendCancelMessage(RET_NOTPOSSIBLE);
+		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+		return false;
+	}
+
+	int32_t manaCost = 0;
+	
+	if(convinceCreature->getMonster()){
+		manaCost = convinceCreature->getMonster()->getManaCost();
+	}
+
+	if(player->getMana() < manaCost){
+		player->sendCancelMessage(RET_NOTENOUGHMANA);
+		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
+		return false;
+	}
+
+	spell->postCastSpell(player, manaCost, spell->getSoulCost(player));
+	g_game.addMagicEffect(player->getPosition(), NM_ME_MAGIC_BLOOD);
+	return true;
 }
 
 bool RuneSpell::canExecuteAction(const Player* player, const Position& toPos)

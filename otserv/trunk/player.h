@@ -219,6 +219,7 @@ public:
 	
 	virtual void changeHealth(int32_t healthChange);
 	virtual void changeMana(int32_t manaChange);
+	void changeSoul(int32_t soulChange);
 
 	bool isPzLocked() const { return pzLocked; }
 	virtual BlockType_t blockHit(Creature* attacker, CombatType_t combatType, int32_t& damage,
@@ -467,8 +468,8 @@ protected:
 	Vocation_t vocation_id;
 	Vocation* vocation;
 	playersex_t sex;
-	//int food;
-	
+	int32_t soul, soulMax;
+
 	double inventoryWeight;
 	double capacity;
 	
@@ -507,8 +508,6 @@ protected:
 	static const int HPGain[5];
 	static const int gainManaVector[5][2];
 	static const int gainHealthVector[5][2];
-	uint16_t manaTick;
-	uint16_t healthTick;
 	
 	unsigned char level_percent;
 	unsigned char maglevel_percent;

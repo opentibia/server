@@ -253,6 +253,7 @@ public:
 	bool isHangable() const {return items[id].isHangable;}
 	bool isRoteable() const {const ItemType& it = items[id]; return it.rotable && it.rotateTo;}
 	bool isDoor() const {return items[id].isDoor();}
+	bool hasCharges() const {return items[id].charges != 0;}
 
 	bool floorChangeDown() const {return items[id].floorChangeDown;}
 	bool floorChangeNorth() const {return items[id].floorChangeNorth;}

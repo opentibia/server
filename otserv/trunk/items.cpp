@@ -706,7 +706,7 @@ bool Items::loadFromXml(const std::string& datadir)
 							}
 							else if(strcasecmp(strValue.c_str(), "charges") == 0){
 								if(readXMLInteger(itemAttributesNode, "value", intValue)){
-									it.charges = true;
+									it.charges = intValue;
 								}
 							}
 							else if(strcasecmp(strValue.c_str(), "showcharges") == 0){

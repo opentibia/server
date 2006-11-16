@@ -409,6 +409,10 @@ void Weapon::onUsedWeapon(Player* player, Item* item, Tile* destTile) const
 	else if(ammoAction == AMMOACTION_MOVE){
 		g_game.internalMoveItem(item->getParent(), destTile, INDEX_WHEREEVER, item, 1, FLAG_NOLIMIT);
 	}
+	else if(item->hasCharges()){
+		int32_t newCharge = std::max(0, item->getItemCharge() - 1);
+		g_game.transformItem(item, item->getID(), newCharge);
+	}
 
 	if(player->getAccessLevel() > 0){
 		return;
@@ -430,13 +434,13 @@ void Weapon::onUsedWeapon(Player* player, Item* item, Tile* destTile) const
 	if(manaCost > 0){
 		player->changeMana(manaCost);
 		player->addManaSpent(manaCost);
-		player->sendStats();
 	}
 
-	//TODO
 	/*
-	if(soul > 0){
-		player->changeSoul(-soul);
+	int32_t soulCost = soul;
+
+	if(soulCost > 0){
+		player->changeSoul(-soulCost);
 	}
 	*/
 }

@@ -42,6 +42,7 @@ void MonsterType::reset()
 {
 	isSummonable = false;
 	isIllusionable = false;
+	isConvinceable = false;
 	race = RACE_BLOOD;
 	armor = 0;
 	experience = 0;
@@ -71,7 +72,7 @@ void MonsterType::reset()
 	combatMeleeMin = 0;
 	combatMeleeMax = 0;
 
-	manaSummonCost = 0;
+	manaCost = 0;
 	summonList.clear();
 	lootItems.clear();
 	spellAttackList.clear();
@@ -283,12 +284,16 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 			mType->isSummonable = (intValue != 0);
 		}
 		
-		if(readXMLInteger(root, "summonmana", intValue)){
-			mType->manaSummonCost = intValue;
+		if(readXMLInteger(root, "manacost", intValue)){
+			mType->manaCost = intValue;
 		}
 
 		if(readXMLInteger(root, "illusionable", intValue)){
 			mType->isIllusionable = (intValue != 0);
+		}
+
+		if(readXMLInteger(root, "convinceable", intValue)){
+			mType->isConvinceable = (intValue != 0);
 		}
 
 		if(readXMLInteger(root, "pushable", intValue)){

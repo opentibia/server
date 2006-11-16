@@ -62,7 +62,8 @@ public:
 
 	virtual void drainHealth(Creature* attacker, CombatType_t combatType, int32_t damage);
 
-	virtual bool combatChallenge(Creature* creature);
+	virtual bool challengeCreature(Creature* creature);
+	virtual bool convinceCreature(Creature* creature);
 
 	virtual void setNormalCreatureLight();
 
@@ -90,7 +91,7 @@ public:
 	virtual bool getFollowReachable() const;
 	virtual void getCombatValues(int32_t& min, int32_t& max);
 	
-	uint32_t getManaSummonCost() const {return mType->manaSummonCost;}
+	uint32_t getManaCost() const {return mType->manaCost;}
 
 private:
 	int32_t thinkTicks;

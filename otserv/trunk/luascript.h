@@ -384,6 +384,7 @@ protected:
 	static int luaDoTargetCombatDispel(lua_State *L);
 
 	static int luaDoChallengeCreature(lua_State *L);
+	static int luaDoConvinceCreature(lua_State *L);
 
 	static int luaVariantToNumber(lua_State *L);
 	static int luaVariantToString(lua_State *L);

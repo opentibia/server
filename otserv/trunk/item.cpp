@@ -114,7 +114,7 @@ Item::Item(const unsigned short _type, unsigned short _count /*= 0*/) :
 	else if(it.stackable){
 		count = _count;
 	}
-	else if(it.charges != 0){
+	else if(it.charges != 0 && _count != 0){
 		charges = _count;
 	}
 

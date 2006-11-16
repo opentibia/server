@@ -212,7 +212,8 @@ public:
 	virtual void drainHealth(Creature* attacker, CombatType_t combatType, int32_t damage);
 	virtual void drainMana(Creature* attacker, int32_t manaLoss);
 
-	virtual bool combatChallenge(Creature* creature) {return false;};
+	virtual bool challengeCreature(Creature* creature) {return false;};
+	virtual bool convinceCreature(Creature* creature) {return false;};
 
 	virtual void die();
 	virtual Item* getCorpse();

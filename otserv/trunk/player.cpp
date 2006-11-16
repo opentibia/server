@@ -61,7 +61,8 @@ Creature()
 	mana       = 0;
 	manaMax    = 0;
 	manaSpent  = 0;
-	//food       = 0;
+	soul       = 0;
+	soulMax    = 100;
 	guildId    = 0;
 
 	level      = 1;
@@ -116,9 +117,6 @@ Creature()
 	}
 
 	maxDepotLimit = 1000;
-
- 	manaTick = 0;
- 	healthTick = 0;
  	
  	vocation_id = (Vocation_t)0;
 
@@ -393,7 +391,7 @@ int Player::getPlayerInfo(playerinfo_t playerinfo) const
 		case PLAYERINFO_MANA: return mana; break;
 		case PLAYERINFO_MAXMANA: return manaMax; break;
 		case PLAYERINFO_MANAPERCENT: return maglevel_percent; break;
-		case PLAYERINFO_SOUL: return 100; break;
+		case PLAYERINFO_SOUL: return soul; break;
 		default:
 			return 0; break;
 	}
@@ -1505,43 +1503,6 @@ void Player::addDefaultRegeneration(uint32_t addTicks)
 	}
 }
 
-/*
-bool Player::gainManaTick()
-{
-	int32_t manaGain = 0;
-
-	manaTick++;
-	if(manaTick < vocation->getManaGainTicks()){
-		return false;
-	}
-	else{
-		manaTick = 0;
-		manaGain = vocation->getManaGainAmount();
-		mana += std::min(manaGain, manaMax - mana);
-	}
-
-	return true;
-}
-
-bool Player::gainHealthTick()
-{
-	if(healthMax - health > 0){
-		int32_t healthGain = 0;
-
-		healthTick++;
-		if(healthTick < vocation->getHealthGainTicks()){
-			return false;
-		}
-		else{
-			healthTick = 0;
-			healthGain = vocation->getHealthGainAmount();
-		}
-	}
-
-	return true;
-}
-*/
-
 void Player::removeList()
 {
 	listPlayer.removeList(getID());
@@ -2507,9 +2468,7 @@ void Player::onAttackedCreature(Creature* target)
 
 		if(Weapons::weaponInFightTime != 0){
 			Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_INFIGHT, Weapons::weaponInFightTime, 0);
-			if(!addCondition(condition)){
-				delete condition;
-			}
+			addCondition(condition);
 		}
 	}
 }
@@ -2521,9 +2480,7 @@ void Player::onAttacked()
 	if(getAccessLevel() == 0){
 		if(Weapons::weaponInFightTime != 0){
 			Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_INFIGHT, Weapons::weaponInFightTime, 0);
-			if(!addCondition(condition)){
-				delete condition;
-			}
+			addCondition(condition);
 		}
 	}
 }
@@ -2531,6 +2488,15 @@ void Player::onAttacked()
 void Player::onAttackedCreatureDrainHealth(Creature* target, int32_t points)
 {
 	//TODO: Share damage points with team (share exp)
+
+	/*
+	Soul regeneration
+	if(points > getLevel()){
+		Condition* condition = Condition::createCondition(CONDITIONID_DEFAULT, CONDITION_SOULREGENERATION, 3600 * 4, 0);
+		addCondition(condition);
+	}
+	*/
+
 	Creature::onAttackedCreatureDrainHealth(target, points);
 }
 
@@ -2615,6 +2581,17 @@ void Player::changeMana(int32_t manaChange)
 	sendStats();
 }
 
+void Player::changeSoul(int32_t soulChange)
+{
+	if(soulChange > 0){
+		soul += std::min(soulChange, soulMax - soulChange);
+	}
+	else{
+		soul = std::max((int32_t)0, soul + soulChange);
+	}
+
+	sendStats();
+}
 
 #ifdef __SKULLSYSTEM__
 Skulls_t Player::getSkull() const

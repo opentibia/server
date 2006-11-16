@@ -754,7 +754,7 @@ void Monster::drainHealth(Creature* attacker, CombatType_t combatType, int32_t d
 	}
 }
 
-bool Monster::combatChallenge(Creature* creature)
+bool Monster::challengeCreature(Creature* creature)
 {
 	if(isSummon()){
 		return false;
@@ -762,6 +762,37 @@ bool Monster::combatChallenge(Creature* creature)
 	else{
 		return selectTarget(creature);
 	}
+}
+
+bool Monster::convinceCreature(Creature* creature)
+{
+	if(!mType->isConvinceable){
+		return false;
+	}
+
+	if(isSummon()){
+		if(getMaster()->getPlayer()){
+			return false;
+		}
+		else if(getMaster() != creature){
+			Creature* oldMaster = getMaster();
+			oldMaster->removeSummon(this);
+			creature->addSummon(this);
+
+			setFollowCreature(NULL);
+			setAttackedCreature(NULL);
+			return true;
+		}
+	}
+	else{
+		creature->addSummon(this);
+		setFollowCreature(NULL);
+		setAttackedCreature(NULL);
+
+		return true;
+	}
+
+	return false;
 }
 
 uint32_t Monster::getFollowDistance() const

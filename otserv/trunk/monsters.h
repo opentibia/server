@@ -91,11 +91,12 @@ public:
 	RaceType_t race;
 	bool isSummonable;
 	bool isIllusionable;
+	bool isConvinceable;
 	
 	int lightLevel;
 	int lightColor;
 		
-	uint32_t manaSummonCost;
+	uint32_t manaCost;
 	SummonList summonList;
 	LootItems lootItems;
 	SpellList spellAttackList;
