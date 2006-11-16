@@ -20,6 +20,10 @@
 		<attribute key="absorbPercentPhysical" value="95"/>
 	</item>
 	
+	<item id="2396" name="ice rapier">
+		<attribute key="charges" value="1"/>
+	</item>
+
 	<item id="2165" name="stealth ring">
 		<attribute key="transformEquipTo" value="2202"/>
 		<attribute key="canDecay" value="0"/>
