@@ -93,6 +93,7 @@ public:
 	int32_t getManaCost(const Player* player) const;
 	int32_t getSoulCost(const Player* player) const;
 
+	static ReturnValue CreateIllusion(Creature* creature, const Outfit_t outfit, int32_t time);
 	static ReturnValue CreateIllusion(Creature* creature, const std::string& name, int32_t time);
 	static ReturnValue CreateIllusion(Creature* creature, uint32_t itemId, int32_t time);
 

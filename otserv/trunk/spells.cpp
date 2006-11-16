@@ -568,6 +568,20 @@ int32_t Spell::getSoulCost(const Player* player) const
 	return 0;
 }
 
+ReturnValue Spell::CreateIllusion(Creature* creature, const Outfit_t outfit, int32_t time)
+{
+	ConditionOutfit* outfitCondition = new ConditionOutfit(CONDITIONID_COMBAT, CONDITION_OUTFIT, time);
+
+	if(!outfitCondition){
+		return RET_NOTPOSSIBLE;
+	}
+
+	outfitCondition->addOutfit(outfit);
+	creature->addCondition(outfitCondition);
+
+	return RET_NOERROR;
+}
+
 ReturnValue Spell::CreateIllusion(Creature* creature, const std::string& name, int32_t time)
 {
 	uint32_t mId = g_monsters.getIdByName(name);
@@ -588,6 +602,7 @@ ReturnValue Spell::CreateIllusion(Creature* creature, const std::string& name, i
 		}
 	}
 
+	/*
 	ConditionOutfit* outfitCondition = new ConditionOutfit(CONDITIONID_COMBAT, CONDITION_OUTFIT, time);
 
 	if(!outfitCondition){
@@ -596,7 +611,9 @@ ReturnValue Spell::CreateIllusion(Creature* creature, const std::string& name, i
 
 	outfitCondition->addOutfit(mType->outfit);
 	creature->addCondition(outfitCondition);
-	return RET_NOERROR;
+	*/
+
+	return CreateIllusion(creature, mType->outfit, time);
 }
 
 ReturnValue Spell::CreateIllusion(Creature* creature, uint32_t itemId, int32_t time)
@@ -606,6 +623,7 @@ ReturnValue Spell::CreateIllusion(Creature* creature, uint32_t itemId, int32_t t
 		return RET_NOTPOSSIBLE;
 	}
 
+	/*
 	ConditionOutfit* outfitCondition = new ConditionOutfit(CONDITIONID_COMBAT, CONDITION_OUTFIT, time);
 
 	if(!outfitCondition){
@@ -618,6 +636,12 @@ ReturnValue Spell::CreateIllusion(Creature* creature, uint32_t itemId, int32_t t
 	creature->addCondition(outfitCondition);
 
 	return RET_NOERROR;
+	*/
+
+	Outfit_t outfit;
+	outfit.lookTypeEx = itemId;
+
+	return CreateIllusion(creature, outfit, time);
 }
 
 InstantSpell::InstantSpell(LuaScriptInterface* _interface) :

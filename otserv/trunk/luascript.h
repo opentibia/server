@@ -391,6 +391,8 @@ protected:
 	static int luaDoChangeSpeed(lua_State *L);
 
 	static int luaSetCreatureOutfit(lua_State *L);
+	static int luaGetCreatureOutfit(lua_State *L);
+	static int luaSetMonsterOutfit(lua_State *L);
 	static int luaSetItemOutfit(lua_State *L);
 
 	static int luaDebugPrint(lua_State *L);

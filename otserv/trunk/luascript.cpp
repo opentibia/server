@@ -983,10 +983,14 @@ void LuaScriptInterface::registerFunctions()
 	//doChangeSpeed(cid, delta)
 	lua_register(m_luaState, "doChangeSpeed", LuaScriptInterface::luaDoChangeSpeed);
 
-	//doSetCreatureOutfit(cid, name, time)
-	lua_register(m_luaState, "doSetCreatureOutfit", LuaScriptInterface::luaSetCreatureOutfit);
+	//doSetMonsterOutfit(cid, name, time)
+	lua_register(m_luaState, "doSetMonsterOutfit", LuaScriptInterface::luaSetMonsterOutfit);
 	//doSetItemOutfit(cid, item, time)
 	lua_register(m_luaState, "doSetItemOutfit", LuaScriptInterface::luaSetItemOutfit);
+	//doSetCreatureOutfit(cid, outfit, time)
+	lua_register(m_luaState, "doSetCreatureOutfit", LuaScriptInterface::luaSetCreatureOutfit);
+	//getCreatureOutfit(cid)
+	lua_register(m_luaState, "getCreatureOutfit", LuaScriptInterface::luaGetCreatureOutfit);
 
 	//debugPrint(text)
 	lua_register(m_luaState, "debugPrint", LuaScriptInterface::luaDebugPrint);
@@ -3214,7 +3218,74 @@ int LuaScriptInterface::luaDoChangeSpeed(lua_State *L)
 
 int LuaScriptInterface::luaSetCreatureOutfit(lua_State *L)
 {
-	//doSetCreatureOutfit(cid, name, time)
+	//doSetCreatureOutfit(cid, outfit, time)
+
+	int32_t time = (int32_t)popNumber(L);
+	Outfit_t outfit;
+	outfit.lookType = getField(L, "lookType");
+	outfit.lookHead = getField(L, "lookHead");
+	outfit.lookBody = getField(L, "lookBody");
+	outfit.lookLegs = getField(L, "lookLegs");
+	outfit.lookFeet = getField(L, "lookFeet");
+	outfit.lookAddons = getField(L, "lookAddons");
+	lua_pop(L, 1);
+
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Creature* creature = env->getCreatureByUID(cid);
+
+	if(creature){
+		ReturnValue ret = Spell::CreateIllusion(creature, outfit, time);
+		if(ret == RET_NOERROR){
+			lua_pushnumber(L, LUA_NO_ERROR);
+		}
+		else{
+			lua_pushnumber(L, LUA_ERROR);
+		}
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+	}
+	return 1;
+}
+
+int LuaScriptInterface::luaGetCreatureOutfit(lua_State *L)
+{
+	//getCreatureOutfit(cid)
+
+	uint32_t cid = popNumber(L);
+
+	ScriptEnviroment* env = getScriptEnv();
+
+	Creature* creature = env->getCreatureByUID(cid);
+
+	if(creature){
+		const Outfit_t outfit = creature->getCurrentOutfit();
+
+		lua_newtable(L);
+		setField(L, "lookType", outfit.lookType);
+		setField(L, "lookHead", outfit.lookHead);
+		setField(L, "lookBody", outfit.lookBody);
+		setField(L, "lookLegs", outfit.lookLegs);
+		setField(L, "lookFeet", outfit.lookFeet);
+		setField(L, "lookAddons", outfit.lookAddons);
+
+		return 1;
+	}
+	else{
+		reportErrorFunc(getErrorDesc(LUA_ERROR_CREATURE_NOT_FOUND));
+		lua_pushnumber(L, LUA_ERROR);
+	}
+
+	return 1;
+}
+
+int LuaScriptInterface::luaSetMonsterOutfit(lua_State *L)
+{
+	//doSetMonsterOutfit(cid, name, time)
 
 	int32_t time = (int32_t)popNumber(L);
 	std::string name = popString(L);
