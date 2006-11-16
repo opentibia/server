@@ -435,28 +435,6 @@ bool Monster::getNextStep(Direction& dir)
 	
 	//destroy blocking items
 	if(result && canPushItems()){
-		/*
-		int dx, dy;
-		switch(dir){
-		case NORTH:
-			dx = 0; dy = -1;
-			break;
-		case SOUTH:
-			dx = 0; dy = +1;
-			break;
-		case EAST:
-			dx = 1; dy = 0;
-			break;
-		case WEST:
-			dx = -1; dy = 0;
-			break;
-		default:
-			dx = dy = 0;
-			break;
-		}
-		const Position& position = getPosition();
-		*/
-
 		const Position& pos = Spells::getCasterPosition(this, dir);
 		Tile* tile = g_game.getTile(pos.x, pos.y, pos.z);
 
@@ -567,7 +545,7 @@ void Monster::doAttacking(uint32_t interval)
 			continue;
 		}
 
-		if(attackTicks % it->speed > interval){
+		if(attackTicks % it->speed >= interval){
 			//already used this spell for this round
 			continue;
 		}
@@ -586,7 +564,7 @@ void Monster::doAttacking(uint32_t interval)
 	if(mType->combatMeleeMin != 0 || mType->combatMeleeMax != 0){
 		if(mType->combatMeleeSpeed < attackTicks){
 
-			if(attackTicks % mType->combatMeleeSpeed > interval){
+			if(attackTicks % mType->combatMeleeSpeed >= interval){
 				//already used this melee attack for this round
 			}
 			else if(std::max(std::abs(myPos.x - targetPos.x), std::abs(myPos.y - targetPos.y)) <= 1){
@@ -620,7 +598,7 @@ void Monster::onDefending(uint32_t interval)
 			continue;
 		}
 
-		if(defenseTicks % it->speed > interval){
+		if(defenseTicks % it->speed >= interval){
 			//already used this spell for this round
 			continue;
 		}
@@ -639,7 +617,7 @@ void Monster::onDefending(uint32_t interval)
 				continue;
 			}
 
-			if(defenseTicks % it->speed > interval){
+			if(defenseTicks % it->speed >= interval){
 				//already used this spell for this round
 				continue;
 			}

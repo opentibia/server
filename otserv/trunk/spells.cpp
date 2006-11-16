@@ -1539,14 +1539,14 @@ bool RuneSpell::Illusion(const RuneSpell* spell, Creature* creature, Item* item,
 		return false;
 	}
 
-	Tile* tile = g_game.getTile(posTo.x, posTo.y, posTo.z);
-	if(!tile){
+	Thing* thing = g_game.internalGetThing(player, posTo, STACKPOS_MOVE);
+	if(!thing){
 		player->sendCancelMessage(RET_NOTPOSSIBLE);
 		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);
 		return false;
 	}
 
-	Item* illusionItem = tile->getTopDownItem();
+	Item* illusionItem = thing->getItem();
 	if(!illusionItem || illusionItem->isNotMoveable()){
 		player->sendCancelMessage(RET_NOTPOSSIBLE);
 		g_game.addMagicEffect(player->getPosition(), NM_ME_PUFF);

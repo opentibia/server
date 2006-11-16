@@ -485,11 +485,19 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 				if(const Item* iitem = iithing->getItem()){
 					const ItemType& iiType = Item::items[iitem->getID()];
 
+					if(iiType.blockSolid || (((flags & FLAG_PATHFINDING) == FLAG_PATHFINDING) && iiType.blockPathFind)){
+						if(!monster->canPushItems() || !iiType.moveable){
+							return RET_NOTPOSSIBLE;
+						}
+					}
+
+					/*
 					if(iiType.blockSolid){
 						if(!monster->canPushItems() || !iiType.moveable){
 							return RET_NOTPOSSIBLE;
 						}
 					}
+					*/
 				}
 			}
 

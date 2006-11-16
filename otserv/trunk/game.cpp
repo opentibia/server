@@ -2760,8 +2760,12 @@ bool Game::combatChangeHealth(CombatType_t combatType, Creature* attacker, Creat
 			addMagicEffect(list, targetPos, NM_ME_PUFF);
 			return false;
 		}
-
-		if(blockType == BLOCK_ARMOR || blockType == BLOCK_IMMUNITY){
+		else if(blockType == BLOCK_ARMOR){
+			addMagicEffect(list, targetPos, NM_ME_BLOCKHIT);
+			return false;
+		}
+		//if(blockType == BLOCK_ARMOR || blockType == BLOCK_IMMUNITY){
+		else if(blockType == BLOCK_IMMUNITY){
 			uint8_t hitEffect = 0;
 
 			switch(combatType){
