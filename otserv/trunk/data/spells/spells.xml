@@ -56,4 +56,5 @@
 
 <rune name="bolt" id="20001" enabled="1" script="monsters/bolt.lua"></rune>
 <rune name="spider bite" id="20002" enabled="1" script="monsters/spider bite.lua"></rune>
+<rune name="imitate" id="20003" enabled="1" script="monsters/imitate.lua"></rune>
 </spells>

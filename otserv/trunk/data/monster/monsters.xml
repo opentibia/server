@@ -5,4 +5,5 @@
 <monster name="demon" file="demon.xml"/>
 <monster name="minotaur archer" file="minotaur archer.xml"/>
 <monster name="poison spider" file="poison spider.xml"/>
+<monster name="stalker" file="stalker.xml"/>
 </monsters>
