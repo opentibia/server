@@ -61,6 +61,8 @@ Creature()
 	isActive = false;
 	needThink = false;
 	targetIsRecentAdded = false;
+	meleeBonusAttack = false;
+	spellBonusAttack = false;
 	
 	mType = _mtype;
 	defaultOutfit = mType->outfit;
@@ -539,18 +541,18 @@ void Monster::doAttacking(uint32_t interval)
 	const Position& targetPos = attackedCreature->getPosition();
 
 	for(SpellList::iterator it = mType->spellAttackList.begin(); it != mType->spellAttackList.end(); ++it){
-
 		if(it->speed > attackTicks){
 			resetTicks = false;
 			continue;
 		}
 
-		if(attackTicks % it->speed >= interval){
+		if(attackTicks % it->speed >= interval && !spellBonusAttack){
 			//already used this spell for this round
 			continue;
 		}
 
 		if(it->range != 0 && std::max(std::abs(myPos.x - targetPos.x), std::abs(myPos.y - targetPos.y)) > (int32_t)it->range){
+			spellBonusAttack = true;
 			continue;
 		}
 
@@ -558,12 +560,28 @@ void Monster::doAttacking(uint32_t interval)
 			minCombatValue = it->minCombatValue;
 			maxCombatValue = it->maxCombatValue;
 			it->spell->castSpell(this, attackedCreature);
+			spellBonusAttack = false;
 		}
 	}
 
 	if(mType->combatMeleeMin != 0 || mType->combatMeleeMax != 0){
-		if(mType->combatMeleeSpeed < attackTicks){
+		if(mType->combatMeleeSpeed < attackTicks || meleeBonusAttack){
+			
+			if(meleeBonusAttack || attackTicks % mType->combatMeleeSpeed < interval){
+				if(std::max(std::abs(myPos.x - targetPos.x), std::abs(myPos.y - targetPos.y)) <= 1){
+					CombatParams params;
+					params.combatType = COMBAT_PHYSICALDAMAGE;
+					params.blockedByArmor = true;
+					params.blockedByShield = true;
+					Combat::doCombatHealth(this, attackedCreature, mType->combatMeleeMin, mType->combatMeleeMax, params);
+					meleeBonusAttack = false;
+				}
+				else{
+					meleeBonusAttack = true;
+				}
+			}
 
+			/*
 			if(attackTicks % mType->combatMeleeSpeed >= interval){
 				//already used this melee attack for this round
 			}
@@ -573,7 +591,12 @@ void Monster::doAttacking(uint32_t interval)
 				params.blockedByArmor = true;
 				params.blockedByShield = true;
 				Combat::doCombatHealth(this, attackedCreature, mType->combatMeleeMin, mType->combatMeleeMax, params);
+				meleeBonusAttack = false;
 			}
+			else{
+				meleeBonusAttack = true;
+			}
+			*/
 		}
 		else{
 			resetTicks = false;

@@ -103,6 +103,8 @@ private:
 	bool needThink;
 	bool targetIsRecentAdded;
 	bool isActive;
+	bool meleeBonusAttack;
+	bool spellBonusAttack;
 
 	int32_t minCombatValue;
 	int32_t maxCombatValue;
