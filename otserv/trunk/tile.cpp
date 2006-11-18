@@ -458,11 +458,13 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 			if(hasFlag(TILESTATE_PROTECTIONZONE))
 				return RET_NOTPOSSIBLE;
 
+			/*
 			if(const MagicField* fieldItem = getFieldItem()){
 				if(!monster->isImmune(fieldItem->getCombatType())){
 					return RET_NOTPOSSIBLE;
 				}
 			}
+			*/
 
 			if(floorChange() || getTeleportItem()){
 				return RET_NOTPOSSIBLE;
@@ -485,7 +487,13 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 				if(const Item* iitem = iithing->getItem()){
 					const ItemType& iiType = Item::items[iitem->getID()];
 
-					if(iiType.blockSolid || (((flags & FLAG_PATHFINDING) == FLAG_PATHFINDING) && iiType.blockPathFind)){
+					if(iiType.isMagicField()){
+						const MagicField* field = iitem->getMagicField();
+						if(!monster->isImmune(field->getCombatType())){
+							return RET_NOTPOSSIBLE;
+						}
+					}
+					else if(iiType.blockSolid || (((flags & FLAG_PATHFINDING) == FLAG_PATHFINDING) && iiType.blockPathFind)){
 						if(!monster->canPushItems() || !iiType.moveable){
 							return RET_NOTPOSSIBLE;
 						}
