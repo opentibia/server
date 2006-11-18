@@ -399,6 +399,7 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 					mType->lookcorpse = intValue;
 				}
 
+				/*
 				if(readXMLInteger(p, "race", intValue)){
 					switch(intValue){
 						case 1:
@@ -413,6 +414,22 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 						case 4:
 							mType->race = RACE_FIRE;
 							break;
+					}
+				}
+				*/
+
+				if(readXMLString(p, "race", strValue)){
+					if((strcasecmp(strValue.c_str(), "venom") == 0) || (atoi(strValue.c_str()) == 1)){
+						mType->race = RACE_VENOM;
+					}
+					else if((strcasecmp(strValue.c_str(), "humanoid") == 0) || (atoi(strValue.c_str()) == 2)){
+						mType->race = RACE_BLOOD;
+					}
+					else if((strcasecmp(strValue.c_str(), "undead") == 0) || (atoi(strValue.c_str()) == 3)){
+						mType->race = RACE_UNDEAD;
+					}
+					else if((strcasecmp(strValue.c_str(), "fire") == 0) || (atoi(strValue.c_str()) == 4)){
+						mType->race = RACE_FIRE;
 					}
 				}
 			}
