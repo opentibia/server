@@ -60,7 +60,7 @@ Creature()
 	changeTargetTicks = 0;
 	isActive = false;
 	needThink = false;
-	targetIsRecentAdded = false;
+	internalUpdateTargetList = false;
 	meleeBonusAttack = false;
 	spellBonusAttack = false;
 	
@@ -106,12 +106,14 @@ bool Monster::canSee(const Position& pos) const
 
 void Monster::onAttackedCreatureDissapear()
 {
-	targetIsRecentAdded = true;
+	internalUpdateTargetList = true;
+	spellBonusAttack = true;
+	meleeBonusAttack = true;
 }
 
 void Monster::onFollowCreatureDissapear()
 {
-	targetIsRecentAdded = true;
+	internalUpdateTargetList = true;
 }
 
 void Monster::onAddTileItem(const Position& pos, const Item* item)
@@ -151,8 +153,9 @@ void Monster::onCreatureMove(const Creature* creature, const Position& newPos, c
 	Creature::onCreatureMove(creature, newPos, oldPos, oldStackPos, teleport);
 
 	if(creature == this){
-		targetIsRecentAdded = true;
-		updateTargetList();
+		//targetIsRecentAdded = true;
+		//updateTargetList();
+		internalUpdateTargetList = true;
 		startThink();
 	}
 	else if(canSee(newPos) && !canSee(oldPos)){
@@ -175,6 +178,8 @@ void Monster::onCreatureMove(const Creature* creature, const Position& newPos, c
 
 void Monster::updateTargetList()
 {
+	//std::cout << "updateTargetList" << std::endl;
+
 	//targetList.clear();
 
 	for(TargetList::iterator it = targetList.begin(); it != targetList.end();){
@@ -198,13 +203,14 @@ void Monster::onCreatureEnter(const Creature* creature)
 {
 	if(creature == this){
 		setFollowCreature(NULL);
-		updateTargetList();
 
+		//updateTargetList();
+		internalUpdateTargetList = true;
 		startThink();
 	}
 	else if(creature == getMaster()){
-		updateTargetList();
-
+		//updateTargetList();
+		internalUpdateTargetList = true;
 		startThink();
 	}
 	else{
@@ -218,8 +224,9 @@ void Monster::onCreatureFound(const Creature* creature)
 		if(std::find(targetList.begin(), targetList.end(), creature) == targetList.end()){
 			targetList.push_back(const_cast<Creature*>(creature));
 
+			//targetIsRecentAdded = true;
+			internalUpdateTargetList = true;
 			startThink();
-			targetIsRecentAdded = true;
 		}
 	}
 }
@@ -245,14 +252,14 @@ void Monster::startThink()
 		setAttackedCreature(getMaster()->getAttackedCreature());
 		setFollowCreature(getMaster()->getFollowCreature());
 	}
-	
-	if(!eventCheckAttacking){
-		eventCheckAttacking = g_game.addEvent(makeTask(500, boost::bind(&Game::checkCreatureAttacking, &g_game, getID(), 500)));
-	}
 
 	if(!eventCheck){
 		needThink = true;
 		eventCheck = g_game.addEvent(makeTask(500, boost::bind(&Game::checkCreature, &g_game, getID(), 500)));
+	}
+
+	if(!eventCheckAttacking){
+		eventCheckAttacking = g_game.addEvent(makeTask(500, boost::bind(&Game::checkCreatureAttacking, &g_game, getID(), 500)));
 	}
 
 	addEventWalk();
@@ -321,8 +328,22 @@ bool Monster::selectTarget(Creature* creature)
 
 void Monster::onThink(uint32_t interval)
 {
+	if(internalUpdateTargetList){
+		updateTargetList();
+
+		if(targetList.empty()){
+			isActive = false;
+		}
+	}
+
 	needThink = false;
 
+	if(!isActive && conditions.empty()){
+		stopThink();
+		return;
+	}
+
+	/*
 	if(isSummon()){
 		if(!isActive && conditions.empty()){
 			stopThink();
@@ -339,14 +360,16 @@ void Monster::onThink(uint32_t interval)
 			Creature::onThink(interval);
 		}
 	}
+	*/
+
+	Creature::onThink(interval);
 
 	/*
-	if((!isActive || targetList.empty()) && conditions.empty()){
-		stopThink();
+	if(!eventCheckAttacking){
+		eventCheckAttacking = g_game.addEvent(makeTask(500, boost::bind(&Game::checkCreatureAttacking, &g_game, getID(), 500)));
 	}
-	else{
-		Creature::onThink(interval);
-	}
+
+	addEventWalk();
 	*/
 	
 	onThinkYell(interval);
@@ -354,8 +377,8 @@ void Monster::onThink(uint32_t interval)
 
 	thinkTicks -= interval;
 
-	if(thinkTicks <= 0 || targetIsRecentAdded){
-		targetIsRecentAdded = false;
+	if(thinkTicks <= 0 || internalUpdateTargetList){
+		internalUpdateTargetList = false;
 		thinkTicks = 2000;
 
 		updateLookDirection();
@@ -380,6 +403,7 @@ void Monster::onThink(uint32_t interval)
 			}
 		}
 	}
+
 }
 
 void Monster::onThinkYell(uint32_t interval)
@@ -485,7 +509,7 @@ bool Monster::getRandomStep(const Position& creaturePos, const Position& centerP
 	tmpDist = std::max(std::abs(creaturePos.x - centerPos.x), std::abs((creaturePos.y - 1) - centerPos.y));
 	if(currentDist == 0 || tmpDist == currentDist){
 		tile = g_game.getTile(creaturePos.x, creaturePos.y - 1, creaturePos.z);
-		if(tile && tile->__queryAdd(0, this, 1, FLAG_PATHFINDING) == RET_NOERROR){
+		if(tile && tile->creatures.empty() && tile->__queryAdd(0, this, 1, FLAG_PATHFINDING) == RET_NOERROR){
 			dirArr[dirSize++] = NORTH;
 		}
 	}
@@ -494,7 +518,7 @@ bool Monster::getRandomStep(const Position& creaturePos, const Position& centerP
 	tmpDist = std::max(std::abs(creaturePos.x - centerPos.x), std::abs((creaturePos.y + 1) - centerPos.y));
 	if(currentDist == 0 || tmpDist == currentDist){
 		tile = g_game.getTile(creaturePos.x, creaturePos.y + 1, creaturePos.z);
-		if(tile && tile->__queryAdd(0, this, 1, FLAG_PATHFINDING) == RET_NOERROR){
+		if(tile && tile->creatures.empty() && tile->__queryAdd(0, this, 1, FLAG_PATHFINDING) == RET_NOERROR){
 			dirArr[dirSize++] = SOUTH;
 		}
 	}
@@ -503,7 +527,7 @@ bool Monster::getRandomStep(const Position& creaturePos, const Position& centerP
 	tmpDist = std::max(std::abs((creaturePos.x - 1) - centerPos.x), std::abs(creaturePos.y - centerPos.y));
 	if(currentDist == 0 || tmpDist == currentDist){
 		tile = g_game.getTile(creaturePos.x - 1, creaturePos.y, creaturePos.z);
-		if(tile && tile->__queryAdd(0, this, 1, FLAG_PATHFINDING) == RET_NOERROR){
+		if(tile && tile->creatures.empty() && tile->__queryAdd(0, this, 1, FLAG_PATHFINDING) == RET_NOERROR){
 			dirArr[dirSize++] = WEST;
 		}
 	}
@@ -512,7 +536,7 @@ bool Monster::getRandomStep(const Position& creaturePos, const Position& centerP
 	tmpDist = std::max(std::abs((creaturePos.x + 1) - centerPos.x), std::abs(creaturePos.y - centerPos.y));
 	if(currentDist == 0 || tmpDist == currentDist){
 		tile = g_game.getTile(creaturePos.x + 1, creaturePos.y, creaturePos.z);
-		if(tile && tile->__queryAdd(0, this, 1, FLAG_PATHFINDING) == RET_NOERROR){
+		if(tile && tile->creatures.empty() && tile->__queryAdd(0, this, 1, FLAG_PATHFINDING) == RET_NOERROR){
 			dirArr[dirSize++] = EAST;
 		}
 	}

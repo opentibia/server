@@ -101,7 +101,8 @@ private:
 	int32_t changeTargetTicks;
 	std::string strDescription;
 	bool needThink;
-	bool targetIsRecentAdded;
+	//bool targetIsRecentAdded;
+	bool internalUpdateTargetList;
 	bool isActive;
 	bool meleeBonusAttack;
 	bool spellBonusAttack;
