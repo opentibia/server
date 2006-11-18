@@ -137,12 +137,12 @@ std::string Status::getStatusString()
 
 	xmlNewTextChild(root, NULL, (const xmlChar*)"motd", (const xmlChar*)g_config.getString(ConfigManager::MOTD).c_str());
 
-	char *s = NULL;
+	xmlChar *s = NULL;
 	int len = 0;
 	xmlDocDumpMemory(doc, (xmlChar**)&s, &len);
 	
 	if(s){
-		xml = std::string(s, len);
+		xml = std::string((char*)s, len);
 	}
 	else{
 		xml = "";
@@ -295,7 +295,7 @@ OTSYS_THREAD_RETURN Status::SendInfoThread(void *p)
 		
 		
 		char size[16] = {'0'};
-		sprintf(size, "%d", status.str().size());
+		sprintf(size, "%d", (int)status.str().size());
 		std::string status_length = std::string(size);
 		post_message = "POST /otservdb.php HTTP/1.1\r\n"
 						"Host: " + host +"\r\n"

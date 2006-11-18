@@ -340,7 +340,7 @@ bool Combat::CombatHealthFunc(Creature* caster, Creature* target, const CombatPa
 
 	if(healthChange < 0){
 		if(caster && caster->getPlayer() && target->getPlayer()){
-			healthChange = healthChange * 0.50;
+			healthChange = healthChange/2;
 		}
 	}
 
@@ -361,7 +361,7 @@ bool Combat::CombatManaFunc(Creature* caster, Creature* target, const CombatPara
 
 	if(manaChange < 0){
 		if(caster && caster->getPlayer() && target->getPlayer()){
-			manaChange = manaChange * 0.50;
+			manaChange = manaChange/2;
 		}
 	}
 
@@ -946,8 +946,8 @@ void AreaCombat::copyArea(const MatrixArea* input, MatrixArea* output, MatrixOpe
 		float c = std::sin(angleRad);
 		float d = std::cos(angleRad);
 		
-		for(unsigned int x = 0; x < input->getCols(); ++x){
-			for(unsigned int y = 0; y < input->getRows(); ++y){
+		for(long x = 0; x < (long)input->getCols(); ++x){
+			for(long y = 0; y < (long)input->getRows(); ++y){
 				//calculate new coordinates using rotation center
 				long newX = x - centerX;
 				long newY = y - centerY;

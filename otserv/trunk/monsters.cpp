@@ -243,7 +243,7 @@ MonsterType* Monsters::loadMonster(const std::string& file,const std::string& mo
 		}
 	}
 	if(new_mType){
-		mType = new MonsterType;
+		mType = new MonsterType();
 	}
 	
 	monsterLoad = true;

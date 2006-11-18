@@ -181,7 +181,7 @@ public:
 	void thingMove(Player* player, const Position& fromPos, uint16_t spriteId, uint8_t fromStackpos,
 		const Position& toPos, uint8_t count);
 
-	void Game::moveCreature(uint32_t playerID, const Position& playerPos, uint32_t movingCreatureID, const Position& toPos);
+	void moveCreature(uint32_t playerID, const Position& playerPos, uint32_t movingCreatureID, const Position& toPos);
 
 	ReturnValue internalMoveCreature(Creature* creature, Direction direction);
 	ReturnValue internalMoveCreature(Creature* creature, Cylinder* fromCylinder, Cylinder* toCylinder);

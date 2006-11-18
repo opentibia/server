@@ -931,11 +931,13 @@ void Player::onUpdateTile(const Position& pos)
 
 void Player::onCreatureAppear(const Creature* creature, bool isLogin)
 {
-	Item* item;
-	for(int slot = SLOT_FIRST; slot < SLOT_LAST; ++slot){
-		if(item = getInventoryItem((slots_t)slot)){
-			item->__startDecaying();
-			g_moveEvents->onPlayerEquip(this, item, (slots_t)slot, true);
+	if(isLogin && creature == this){
+		Item* item;
+		for(int slot = SLOT_FIRST; slot < SLOT_LAST; ++slot){
+			if(item = getInventoryItem((slots_t)slot)){
+				item->__startDecaying();
+				g_moveEvents->onPlayerEquip(this, item, (slots_t)slot, true);
+			}
 		}
 	}
 }

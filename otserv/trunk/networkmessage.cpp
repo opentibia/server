@@ -137,12 +137,12 @@ bool NetworkMessage::WriteToSocket(SOCKET socket)
 #if defined WIN32 || defined __WINDOWS__
 	// Set the socket I/O mode; iMode = 0 for blocking; iMode != 0 for non-blocking
 	unsigned long mode = 1;
+	int retry = 0;
 	ioctlsocket(socket, FIONBIO, &mode);
 	flags = 0;
 #else
 	flags = MSG_DONTWAIT;
 #endif
-	int retry = 0;
 	
 	int start;
 	if(m_encryptionEnabled){

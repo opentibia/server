@@ -28,7 +28,7 @@
 #include <list>
 
 #include "networkmessage.h"
-#include "Protocol78.h"
+#include "protocol78.h"
 
 #include "items.h"
 
@@ -172,7 +172,7 @@ void Protocol78::ReceiveLoop()
 				OTSYS_SLEEP(250);
 			}
 
-			OTSYS_THREAD_LOCK(game->gameLock, "Protocol78::ReceiveLoop()")
+			OTSYS_THREAD_LOCK(game->gameLock, "Protocol78::ReceiveLoop()");
 
 			if(!player->isRemoved()){
 				if(s == 0){
@@ -184,7 +184,7 @@ void Protocol78::ReceiveLoop()
 				}
 			}
 
-			OTSYS_THREAD_UNLOCK(game->gameLock, "Protocol78::ReceiveLoop()")
+			OTSYS_THREAD_UNLOCK(game->gameLock, "Protocol78::ReceiveLoop()");
 		}
 	}while(s != 0 && !player->isRemoved());
 }
@@ -743,7 +743,7 @@ void Protocol78::parseDebug(NetworkMessage& msg)
 	int dataLength = msg.getMessageLength() - 3;
 	if(dataLength != 0){
 		printf("data: ");
-		size_t data = msg.GetByte();
+		int data = msg.GetByte();
 		while(dataLength > 0){
 			printf("%d ", data);
 			if(--dataLength > 0)
@@ -2330,14 +2330,14 @@ void Protocol78::WriteBuffer(NetworkMessage& add)
 {
 	game->addPlayerBuffer(player);
 
-	OTSYS_THREAD_LOCK(bufferLock, "Protocol78::WriteBuffer")
+	OTSYS_THREAD_LOCK(bufferLock, "Protocol78::WriteBuffer");
 
 	if(OutputBuffer.getMessageLength() + add.getMessageLength() >= NETWORKMESSAGE_MAXSIZE - 16){
 		this->flushOutputBuffer();
 	}
 
 	OutputBuffer.JoinMessages(add);
-	OTSYS_THREAD_UNLOCK(bufferLock, "Protocol78::WriteBuffer")
+	OTSYS_THREAD_UNLOCK(bufferLock, "Protocol78::WriteBuffer");
 	return;
 }
 

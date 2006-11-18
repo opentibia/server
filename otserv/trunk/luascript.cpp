@@ -1550,8 +1550,8 @@ int LuaScriptInterface::luaDoShowTextWindow(lua_State *L)
 	//doShowTextWindow(uid,maxlen,canWrite)
 	//TODO
 	/*bool canWrite = */(popNumber(L) != 0);
-	/*unsigned short maxlen = */(unsigned short)popNumber(L);
-	/*unsigned long uid = */(unsigned long)popNumber(L);
+	/*unsigned short maxlen = (unsigned short)*/popNumber(L);
+	/*unsigned long uid = (unsigned long)*/popNumber(L);
 	/*
 	ScriptEnviroment* env = getScriptEnv();
 	
