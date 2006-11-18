@@ -2716,16 +2716,16 @@ bool Game::combatChangeHealth(CombatType_t combatType, Creature* attacker, Creat
 		//getSpectators(Range(targetPos, true), list);
 		getSpectators(list, targetPos, true);
 
-		if(!target->isAttackable()){
+		if(!target->isAttackable() || Combat::canDoCombat(attacker, target) != RET_NOERROR){
 			addMagicEffect(list, targetPos, NM_ME_PUFF);
 			return false;
 		}
 		
+		/*
 		if(Combat::canDoCombat(attacker, target) != RET_NOERROR){
 			return false;
 		}
 
-		/*
 		if(attacker == target){
 			return false;
 		}
@@ -2924,16 +2924,16 @@ bool Game::combatChangeMana(Creature* attacker, Creature* target, int32_t manaCh
 		target->changeMana(manaChange);
 	}
 	else{
-		if(!target->isAttackable()){
+		if(!target->isAttackable() || Combat::canDoCombat(attacker, target) != RET_NOERROR){
 			addMagicEffect(list, targetPos, NM_ME_PUFF);
 			return false;
 		}
 		
+		/*
 		if(Combat::canDoCombat(attacker, target) != RET_NOERROR){
 			return false;
 		}
 
-		/*
 		if(attacker == target){
 			return false;
 		}

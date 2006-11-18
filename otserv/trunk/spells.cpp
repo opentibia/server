@@ -262,7 +262,8 @@ Spell::Spell()
 	exhaustion = false;
 	needTarget = false;
 	selfTarget = false;
-	blocking = false;
+	blockingSolid = false;
+	blockingCreature = false;
 	premium = false;
 	enabled = true;
 	isAggressive = true;
@@ -321,7 +322,21 @@ bool Spell::configureSpell(xmlNodePtr p)
 	}
 
 	if(readXMLInteger(p, "blocking", intValue)){
-		blocking = (intValue == 1);
+		blockingSolid = (intValue == 1);
+		blockingCreature = (intValue == 1);
+	}
+
+	if(readXMLString(p, "blocktype", strValue)){
+		if(strcasecmp(strValue.c_str(), "all") == 0){
+			blockingSolid = true;
+			blockingCreature = true;
+		}
+		else if(strcasecmp(strValue.c_str(), "solid") == 0){
+			blockingSolid = true;
+		}
+		else if(strcasecmp(strValue.c_str(), "creature") == 0){
+			blockingCreature = true;
+		}
 	}
 
 	if(readXMLInteger(p, "aggressive", intValue)){
@@ -435,12 +450,23 @@ bool Spell::playerInstantSpellCheck(const Player* player, const Position& toPos)
 				if(ret == RET_NOERROR){
 					ret = Combat::canDoCombat(player, tile, isAggressive);
 				}
+				
+				if(ret == RET_NOERROR){
+					if(blockingCreature && !tile->creatures.empty()){
+						ret = RET_NOTENOUGHROOM;
+					}
+					else if(blockingSolid && tile->hasProperty(BLOCKSOLID)){
+						ret = RET_NOTENOUGHROOM;
+					}
+				}
 
-				if(ret == RET_NOERROR && blocking){
+				/*
+				if(ret == RET_NOERROR && blockingSolid){
 					if(!tile->creatures.empty() || tile->hasProperty(BLOCKSOLID)){
 						ret = RET_NOTENOUGHROOM;
 					}
 				}
+				*/
 			}
 		}
 
@@ -480,11 +506,22 @@ bool Spell::playerRuneSpellCheck(const Player* player, const Position& toPos)
 					ret = Combat::canDoCombat(player, tile, isAggressive);
 				}
 
+				if(ret == RET_NOERROR){
+					if(blockingCreature && !tile->creatures.empty()){
+						ret = RET_NOTENOUGHROOM;
+					}
+					else if(blockingSolid && tile->hasProperty(BLOCKSOLID)){
+						ret = RET_NOTENOUGHROOM;
+					}
+				}
+
+				/*
 				if(ret == RET_NOERROR && blocking){
 					if(!tile->creatures.empty() || tile->hasProperty(BLOCKSOLID)){
 						ret = RET_NOTENOUGHROOM;
 					}
 				}
+				*/
 				
 				if(ret == RET_NOERROR && needTarget && tile->creatures.empty()){
 					ret = RET_CANONLYUSETHISRUNEONCREATURES;

@@ -102,7 +102,8 @@ void Combat::getCombatArea(const Position& centerPos, const Position& targetPos,
 
 ReturnValue Combat::canDoCombat(const Creature* caster, const Tile* tile, bool isAggressive)
 {
-	if(tile->hasProperty(BLOCKPROJECTILE) || tile->hasProperty(BLOCKINGANDNOTMOVEABLE)){
+	//if(tile->hasProperty(BLOCKPROJECTILE) || tile->hasProperty(BLOCKINGANDNOTMOVEABLE)){
+	if(tile->hasProperty(BLOCKPROJECTILE)){
 		return RET_NOTENOUGHROOM;
 	}
 
@@ -379,15 +380,15 @@ bool Combat::CombatConditionFunc(Creature* caster, Creature* target, const Comba
 {
 	bool result = false;
 
-	if(params.condition && !target->isImmune(params.condition->getType())){
-		//if((caster != target || !params.isAggressive) && (Combat::canDoCombat(caster, target) == RET_NOERROR)){
+	if(params.condition){
+		if(caster == target || !target->isImmune(params.condition->getType())){
 			Condition* conditionCopy = params.condition->clone();
 			if(caster){
 				conditionCopy->setParam(CONDITIONPARAM_OWNER, caster->getID());
 			}
 
 			result = target->addCondition(conditionCopy);
-		//}
+		}
 	}
 
 	return result;
@@ -396,10 +397,8 @@ bool Combat::CombatConditionFunc(Creature* caster, Creature* target, const Comba
 bool Combat::CombatDispelFunc(Creature* caster, Creature* target, const CombatParams& params, void* data)
 {
 	if(target->hasCondition(params.dispelType)){
-		//if((caster != target || !params.isAggressive) && (Combat::canDoCombat(caster, target) == RET_NOERROR)){
-			target->removeCondition(caster, params.dispelType);
-			return true;
-		//}
+		target->removeCondition(caster, params.dispelType);
+		return true;
 	}
 
 	return false;
@@ -477,7 +476,8 @@ void Combat::CombatFunc(Creature* caster, const Position& pos,
 					}
 				}
 				
-				if((caster != *cit || !params.isAggressive) && (Combat::canDoCombat(caster, *cit) == RET_NOERROR)){
+				//if((caster != *cit || !params.isAggressive) && (Combat::canDoCombat(caster, *cit) == RET_NOERROR)){
+				if(!params.isAggressive || (caster != *cit && Combat::canDoCombat(caster, *cit) == RET_NOERROR)){
 					func(caster, *cit, params, data);
 
 					if(params.targetCallback){
@@ -538,7 +538,8 @@ void Combat::doCombat(Creature* caster, const Position& pos) const
 void Combat::doCombatHealth(Creature* caster, Creature* target,
 	int32_t minChange, int32_t maxChange, const CombatParams& params)
 {
-	if((caster != target || !params.isAggressive) && (Combat::canDoCombat(caster, target) == RET_NOERROR)){
+	//if((caster != target || !params.isAggressive) && (Combat::canDoCombat(caster, target) == RET_NOERROR)){
+	if(!params.isAggressive || (caster != target && Combat::canDoCombat(caster, target) == RET_NOERROR)){
 		Combat2Var var;
 		var.minChange = minChange;
 		var.maxChange = maxChange;
@@ -567,7 +568,8 @@ void Combat::doCombatHealth(Creature* caster, const Position& pos,
 void Combat::doCombatMana(Creature* caster, Creature* target,
 	int32_t minChange, int32_t maxChange, const CombatParams& params)
 {
-	if((caster != target || !params.isAggressive) && (Combat::canDoCombat(caster, target) == RET_NOERROR)){
+	//if((caster != target || !params.isAggressive) && (Combat::canDoCombat(caster, target) == RET_NOERROR)){
+	if(!params.isAggressive || (caster != target && Combat::canDoCombat(caster, target) == RET_NOERROR)){
 		Combat2Var var;
 		var.minChange = minChange;
 		var.maxChange = maxChange;
@@ -605,7 +607,8 @@ void Combat::doCombatCondition(Creature* caster, const Position& pos, const Area
 
 void Combat::doCombatCondition(Creature* caster, Creature* target, const CombatParams& params)
 {
-	if((caster != target || !params.isAggressive) && (Combat::canDoCombat(caster, target) == RET_NOERROR)){
+	//if((caster != target || !params.isAggressive) && (Combat::canDoCombat(caster, target) == RET_NOERROR)){
+	if(!params.isAggressive || (caster != target && Combat::canDoCombat(caster, target) == RET_NOERROR)){
 		CombatConditionFunc(caster, target, params, NULL);	
 
 		if(params.targetCallback){
@@ -630,7 +633,8 @@ void Combat::doCombatDispel(Creature* caster, const Position& pos, const AreaCom
 
 void Combat::doCombatDispel(Creature* caster, Creature* target, const CombatParams& params)
 {
-	if((caster != target || !params.isAggressive) && (Combat::canDoCombat(caster, target) == RET_NOERROR)){
+	//if((caster != target || !params.isAggressive) && (Combat::canDoCombat(caster, target) == RET_NOERROR)){
+	if(!params.isAggressive || (caster != target && Combat::canDoCombat(caster, target) == RET_NOERROR)){
 		CombatDispelFunc(caster, target, params, NULL);	
 
 		if(params.targetCallback){
@@ -649,7 +653,8 @@ void Combat::doCombatDispel(Creature* caster, Creature* target, const CombatPara
 
 void Combat::doCombatDefault(Creature* caster, Creature* target, const CombatParams& params)
 {
-	if((caster != target || !params.isAggressive) && (Combat::canDoCombat(caster, target) == RET_NOERROR)){
+	//if((caster != target || !params.isAggressive) && (Combat::canDoCombat(caster, target, isAggressive) == RET_NOERROR)){
+	if(!params.isAggressive || (caster != target && Combat::canDoCombat(caster, target) == RET_NOERROR)){
 		CombatNullFunc(caster, target, params, NULL);
 		combatTileEffects(caster, target->getTile(), params);
 

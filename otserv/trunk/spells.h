@@ -113,7 +113,8 @@ protected:
 	bool exhaustion;
 	bool needTarget;
 	bool selfTarget;
-	bool blocking;
+	bool blockingSolid;
+	bool blockingCreature;
 	bool isAggressive;
 	
 	typedef std::map<int32_t, bool> VocSpellMap;
