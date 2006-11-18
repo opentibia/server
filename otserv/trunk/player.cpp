@@ -1284,9 +1284,11 @@ BlockType_t Player::blockHit(Creature* attacker, CombatType_t combatType, int32_
 {
 	BlockType_t blockType = Creature::blockHit(attacker, combatType, damage, checkDefense, checkArmor);
 
+	/*
 	if(blockType == BLOCK_DEFENSE){
 		addSkillAdvance(SKILL_SHIELD, 1);
 	}
+	*/
 
 	int32_t absorbedDamage = 0;
 
@@ -1349,6 +1351,21 @@ BlockType_t Player::blockHit(Creature* attacker, CombatType_t combatType, int32_
 	}
 
 	return blockType;
+}
+
+void Player::onDefenseBlock(bool blockedHit)
+{
+	if(blockedHit){
+		addSkillAdvance(SKILL_SHIELD, 2);
+	}
+	else{
+		addSkillAdvance(SKILL_SHIELD, 1);
+	}
+}
+
+void Player::onArmorBlock(bool blockedHit)
+{
+	//
 }
 
 uint32_t Player::getIP() const

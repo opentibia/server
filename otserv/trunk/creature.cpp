@@ -55,7 +55,7 @@ Creature::Creature() :
 	manaMax = 0;
 	
 	lastMove = 0;
-	lastStepCost = 0;
+	lastStepCost = 1;
 	baseSpeed = 220;
 	varSpeed = 0;
 
@@ -212,6 +212,8 @@ bool Creature::startAutoWalk(std::list<Direction>& listDir)
 void Creature::addEventWalk()
 {
 	if(eventWalk == 0){
+		//std::cout << "addEventWalk()" << std::endl;
+
 		int64_t ticks = getEventStepTicks();
 		eventWalk = g_game.addEvent(makeTask(ticks, std::bind2nd(std::mem_fun(&Game::checkWalk), getID())));
 	}
@@ -296,10 +298,23 @@ void Creature::onCreatureMove(const Creature* creature, const Position& newPos, 
 		
 		lastStepCost = 1;
 
+		if(!teleport){
+			if(oldPos.z != newPos.z){
+				//floor change extra cost
+				lastStepCost = 2;
+			}
+			else if(std::abs(newPos.x - oldPos.x) >=1 && std::abs(newPos.y - oldPos.y) >= 1){
+				//diagonal extra cost
+				lastStepCost = 2;
+			}
+		}
+
+		/*
 		if(!teleport &&  (std::abs(newPos.x - oldPos.x) >=1 && std::abs(newPos.y - oldPos.y) >= 1) ){
 			//diagonal extra cost
 			lastStepCost = 2;
 		}
+		*/
 	}
 
 	if(followCreature == creature || (creature == this && followCreature)){
@@ -447,13 +462,17 @@ BlockType_t Creature::blockHit(Creature* attacker, CombatType_t combatType, int3
 	}
 
 	if(blockType == BLOCK_NONE && internalDefense && checkDefense){
-		internalDefense = false;
 		int32_t defense = getDefense();
 
 		int32_t attackValue = (rand() % 80) + (damage / 16);
 		if(attackValue < defense){
 			damage = 0;
 			blockType = BLOCK_DEFENSE;
+			internalDefense = false;
+			onDefenseBlock(true);
+		}
+		else{
+			onDefenseBlock(false);
 		}
 	}
 	
@@ -473,9 +492,11 @@ BlockType_t Creature::blockHit(Creature* attacker, CombatType_t combatType, int3
 		if(reduceDamage >= damage){
 			damage = 0;
 			blockType = BLOCK_ARMOR;
+			onArmorBlock(true);
 		}
 		else{
 			damage -= reduceDamage;
+			onArmorBlock(false);
 		}
 	}
 

@@ -253,7 +253,8 @@ public:
 	virtual void onKilledCreature(Creature* target);
 	virtual void onGainExperience(int32_t gainExperience);
 	virtual void onAttackedCreatureBlockHit(Creature* target, BlockType_t blockType);
-	//virtual void onTargetCreatureDisappear();
+	virtual void onDefenseBlock(bool blockedHit);
+	virtual void onArmorBlock(bool blockedHit);
 
 	virtual void getCreatureLight(LightInfo& light) const;
 
