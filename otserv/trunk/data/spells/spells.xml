@@ -9,15 +9,15 @@
 <rune name="Ultimate Healing" id="2273" aggressive="0" charges="1" needtarget="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="0" prem="0" enabled="1" allowfaruse="1" script="uh.lua"></rune>
 <rune name="Energy Arrow" id="2274" charges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" script="energy wave.lua"></rune>
 <rune name="Energy Wall" id="2275" charges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" script="energy wall.lua"></rune>
-<rune name="Magic Wall" id="2276" charges="1" blocking="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" script="magic wall.lua"></rune>
+<rune name="Magic Wall" id="2276" charges="1" blocktype="all" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" script="magic wall.lua"></rune>
 <rune name="Magic Prison" id="2277" charges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" script="magic prison.lua"></rune>
-<rune name="Fire Field" id="2278" charges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" script="fire field.lua"></rune>
+<rune name="Fire Field" id="2278" charges="1" blocktype="solid" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" script="fire field.lua"></rune>
 <rune name="Invisible" id="2279" charges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" script="invisible.lua"></rune>
 <rune name="Drunk" id="2267" charges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" allowfaruse="1" script="drunk.lua"></rune>
 <rune name="Chameleon" id="2291" charges="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" function="chameleon"></rune>
 <rune name="Convince Creature" id="2292" charges="3" lvl="10" maglv="20" exhaustion="1" prem="0" enabled="1" allowfaruse="1" function="convince"></rune>
 
-<instant name="Wild Growth" words="exevo grav vita" direction="1" blocking="1" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" script="wild growth.lua">
+<instant name="Wild Growth" words="exevo grav vita" direction="1" blocktype="all" lvl="10" maglv="20" mana="0" soul="0" exhaustion="1" prem="0" enabled="1" script="wild growth.lua">
 <vocation name="Druid"/>
 </instant>
 <instant name="Levitate" words="exani hur" params="1" soul="0" exhaustion="1" prem="0" enabled="1" function="Levitate"></instant>
@@ -55,6 +55,8 @@
 
 <conjure name="Create Food" words="exevo pan" maglv="20" mana="200" soul="10" prem="0" enabled="1" function="conjureFood">
 </conjure>
+
+<conjure name="Conjure Bolt" words="exevo con mort" conjureId="2543" conjureCount="15" aggressive="0" maglv="6" mana="70" soul="0" prem="0" enabled="1" function="conjureItem"/>
 
 <rune name="bolt" id="20001" enabled="1" script="monsters/bolt.lua"></rune>
 <rune name="spider bite" id="20002" enabled="1" script="monsters/spider bite.lua"></rune>
