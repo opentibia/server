@@ -8,5 +8,5 @@ end
 setCombatCallback(combat, CALLBACK_PARAM_TARGETCREATURE, "onTargetCreature")
 
 function onCastSpell(cid, var)
-	doCombat(cid, combat, var)
+	return doCombat(cid, combat, var)
 end

@@ -9,5 +9,5 @@ local area = createCombatArea( { {1, 1, 1}, {1, 3, 1}, {1, 1, 1} } )
 setCombatArea(combat, area)
 
 function onCastSpell(cid, var)
-	doCombat(cid, combat, var)
+	return doCombat(cid, combat, var)
 end

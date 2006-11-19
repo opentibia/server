@@ -4,6 +4,7 @@ setCombatParam(combat, COMBAT_PARAM_EFFECT, CONST_ME_MAGIC_BLUE)
 setCombatParam(combat, COMBAT_PARAM_TARGETCASTERORTOPMOST, 1)
 setCombatParam(combat, COMBAT_PARAM_AGGRESSIVE, 0)
 setCombatParam(combat, COMBAT_PARAM_DISPEL, CONDITION_PARALYZE)
+--setCombatFormula(combat, COMBAT_FORMULA_LEVELMAGIC, 1.3, -30, 1.7, 0)
 
 function onGetFormulaValues(cid, level, maglevel)
 	min = (level * 2 + maglevel * 3) * 1.3 - 30

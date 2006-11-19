@@ -21,5 +21,5 @@ local area = createCombatArea(arr)
 setCombatArea(combat, area)
 
 function onCastSpell(cid, var)
-	doCombat(cid, combat, var)
+	return doCombat(cid, combat, var)
 end

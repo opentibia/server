@@ -44,7 +44,7 @@
 <instant name="Challenge" words="exeta res" lvl="10" maglv="20" manapercent="10" soul="0" exhaustion="1" prem="0" enabled="1" script="challenge.lua"></instant>
 <instant name="Ultimate Explosion" words="exevo gran mas vis" lvl="40" maglv="40" mana="200" soul="0" exhaustion="1" prem="0" enabled="1" script="ultimate explosion.lua"></instant>
 
-<instant name="Magic Rope" words="exani tera" aggressive="0" lvl="10" maglv="20" mana="200" soul="0" exhaustion="1" prem="0" enabled="1" function="magicrope"></instant>
+<instant name="Magic Rope" words="exani tera" aggressive="0" lvl="10" maglv="20" mana="200" soul="0" exhaustion="1" prem="0" enabled="1" script="magic rope.lua"></instant>
 <instant name="Create Illusion" words="utevo res ina" params="1" aggressive="0" lvl="10" maglv="20" mana="200" soul="0" exhaustion="1" prem="0" enabled="1" function="Illusion"></instant>
 
 <conjure name="Ultimate Healing Rune" words="adura vita" reagentId="2260" conjureId="2273" aggressive="0" maglv="20" mana="150" soul="10" prem="0" enabled="1" function="conjureRune">

@@ -8,5 +8,5 @@ setConditionFormula(condition, 0.7, -56, 0.7, -56)
 setCombatCondition(combat, condition)
 
 function onCastSpell(cid, var)
-	doCombat(cid, combat, var)
+	return doCombat(cid, combat, var)
 end
