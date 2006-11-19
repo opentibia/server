@@ -644,7 +644,7 @@ void Game::thingMove(Player* player, const Position& fromPos, uint16_t spriteId,
 
 	if(thing && toCylinder){
 		if(Creature* movingCreature = thing->getCreature()){
-			addEvent(makeTask(1500, boost::bind(&Game::moveCreature, this, player->getID(),
+			addEvent(makeTask(1000, boost::bind(&Game::moveCreature, this, player->getID(),
 				player->getPosition(), movingCreature->getID(), toCylinder->getPosition())));
 		}
 		else if(Item* movingItem = thing->getItem()){
@@ -693,17 +693,17 @@ void Game::moveCreature(uint32_t playerID, const Position& playerPos, uint32_t m
 			if(toTile->hasProperty(BLOCKPATHFIND)){
 				ret = RET_NOTENOUGHROOM;
 			}
-			else if(map->getTile(movingCreaturePos)->hasProperty(PROTECTIONZONE) &&
-				!toTile->hasProperty(PROTECTIONZONE)){
+			else if(movingCreature->isInPz() && !toTile->hasProperty(PROTECTIONZONE)){
 				ret = RET_NOTPOSSIBLE;
 			}
 		}
 	}
 
 	if(ret == RET_NOERROR){
-		ret = internalMoveCreature(movingCreature, map->getTile(movingCreaturePos), toTile);
+		ret = internalMoveCreature(movingCreature, movingCreature->getTile(), toTile);
 	}
-	else{
+	
+	if(ret != RET_NOERROR){
 		player->sendCancelMessage(ret);
 	}
 }
@@ -2237,10 +2237,10 @@ bool Game::playerSetAttackedCreature(Player* player, unsigned long creatureId)
 		if(attackCreature == player){
 			ret = RET_YOUMAYNOTATTACKTHISPLAYER;
 		}
-		else if(player->getTile()->hasProperty(PROTECTIONZONE)){
+		else if(player->isInPz()){
 			ret = RET_YOUMAYNOTATTACKAPERSONWHILEINPROTECTIONZONE;
 		}
-		else if(attackCreature->getTile()->hasProperty(PROTECTIONZONE)){
+		else if(attackCreature->isInPz()){
 			ret = RET_YOUMAYNOTATTACKAPERSONINPROTECTIONZONE;
 		}
 		else if(!attackCreature->isAttackable()){

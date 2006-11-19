@@ -540,7 +540,7 @@ ReturnValue Tile::__queryAdd(int32_t index, const Thing* thing, uint32_t count,
 							return RET_NOTPOSSIBLE;
 					}
 					else
-						return RET_NOTPOSSIBLE;
+						return RET_NOTENOUGHROOM;
 				}
 			}
 		}
