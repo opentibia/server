@@ -1476,31 +1476,17 @@ Item* Player::getCorpse()
 void Player::preSave()
 {
 	if(health <= 0){
-		health = healthMax;
 		experience -= getLostExperience();
 				
-		while(experience < getExpForLv(level)){
-			if(level > 1)                               
-				level--;
-			else
-				break;
-			
-			// This checks (but not the downgrade sentences) aren't really necesary cause if the
-			// player has a "normal" hp,mana,etc when he gets level 1 he will not lose more
-			// hp,mana,etc... but here they are :P 
-			if((healthMax -= vocation->getHPGain()) < 0) //This could be avoided with a proper use of unsigend int
-				healthMax = 10;
-			
-			health = healthMax;
-			
-			if((manaMax -= vocation->getManaGain()) < 0) //This could be avoided with a proper use of unsigend int
-				manaMax = 0;
-			
-			mana = manaMax;
-			
-			if((capacity -= vocation->getCapGain()) < 0) //This could be avoided with a proper use of unsigend int
-				capacity = 0.0;         
+		while(level > 1 && experience < getExpForLv(level)){
+			--level;
+			healthMax = std::max((int32_t)0, (healthMax - (int32_t)vocation->getHPGain()));
+			manaMax = std::max((int32_t)0, (manaMax - (int32_t)vocation->getManaGain()));
+			capacity = std::max((double)0, (capacity - (double)vocation->getCapGain()));
 		}
+
+		health = healthMax;
+		mana = manaMax;
 	}
 }
 
